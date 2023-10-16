@@ -9,6 +9,10 @@
 #include "emu.h"
 #include "c8280.h"
 
+#include "cpu/m6502/m6502.h"
+#include "formats/c8280_dsk.h"
+
+
 
 
 //**************************************************************************
@@ -317,8 +321,9 @@ void c8280_device::device_add_mconfig(machine_config &config)
 	FD1797(config, m_fdc, XTAL(12'000'000)/6);
 	m_fdc->intrq_wr_callback().set_inputline(m_fdccpu, M6502_IRQ_LINE);
 	m_fdc->drq_wr_callback().set_inputline(m_fdccpu, M6502_SET_OVERFLOW);
-	FLOPPY_CONNECTOR(config, m_floppy0, c8280_floppies, "8dsdd", c8280_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy1, c8280_floppies, "8dsdd", c8280_device::floppy_formats);
+
+	for (auto &floppy : m_floppy)
+		FLOPPY_CONNECTOR(config, floppy, c8280_floppies, "8dsdd", c8280_device::floppy_formats);
 }
 
 
@@ -387,10 +392,9 @@ c8280_device::c8280_device(const machine_config &mconfig, const char *tag, devic
 	m_riot0(*this, M6532_0_TAG),
 	m_riot1(*this, M6532_1_TAG),
 	m_fdc(*this, WD1797_TAG),
-	m_floppy0(*this, WD1797_TAG ":0"),
-	m_floppy1(*this, WD1797_TAG ":1"),
+	m_floppy(*this, WD1797_TAG ":%u", 0U),
 	m_address(*this, "ADDRESS"),
-	m_floppy(nullptr),
+	m_selected_floppy(nullptr),
 	m_leds(*this, "led%u", 0U),
 	m_rfdo(1),
 	m_daco(1),
@@ -437,8 +441,8 @@ void c8280_device::device_reset()
 	m_riot1->pa_bit_w<7>(1);
 
 	m_fk5 = 0;
-	m_floppy = nullptr;
-	m_fdc->set_floppy(m_floppy);
+	m_selected_floppy = nullptr;
+	m_fdc->set_floppy(m_selected_floppy);
 	m_fdc->dden_w(0);
 }
 
@@ -488,8 +492,8 @@ uint8_t c8280_device::fk5_r()
 
 	uint8_t data = m_fk5;
 
-	data |= (m_floppy ? m_floppy->dskchg_r() : 1) << 3;
-	data |= (m_floppy ? m_floppy->twosid_r() : 1) << 4;
+	data |= (m_selected_floppy ? m_selected_floppy->dskchg_r() : 1) << 3;
+	data |= (m_selected_floppy ? m_selected_floppy->twosid_r() : 1) << 4;
 
 	return data;
 }
@@ -514,14 +518,17 @@ void c8280_device::fk5_w(uint8_t data)
 	m_fk5 = data & 0x27;
 
 	// drive select
-	m_floppy = nullptr;
+	m_selected_floppy = nullptr;
+	for (int n = 0; n < 2; n++)
+	{
+		if (BIT(data, n))
+			m_selected_floppy = m_floppy[n]->get_device();
+	}
 
-	if (BIT(data, 0)) m_floppy = m_floppy0->get_device();
-	if (BIT(data, 1)) m_floppy = m_floppy1->get_device();
+	m_fdc->set_floppy(m_selected_floppy);
 
-	m_fdc->set_floppy(m_floppy);
-
-	if (m_floppy) m_floppy->mon_w(!BIT(data, 5));
+	if (m_selected_floppy)
+		m_selected_floppy->mon_w(!BIT(data, 5));
 
 	// density select
 	m_fdc->dden_w(BIT(data, 2));

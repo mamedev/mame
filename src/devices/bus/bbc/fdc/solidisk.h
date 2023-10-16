@@ -6,7 +6,6 @@
 
 **********************************************************************/
 
-
 #ifndef MAME_BUS_BBC_FDC_SOLIDISK_H
 #define MAME_BUS_BBC_FDC_SOLIDISK_H
 
@@ -16,8 +15,6 @@
 #include "machine/i8271.h"
 #include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
-#include "formats/acorn_dsk.h"
-#include "formats/fsd_dsk.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

@@ -20,13 +20,13 @@ public:
 	micropolis_vgi_format();
 
 	int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
-	bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const override;
-	bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const override;
+	bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const override;
+	bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const override;
 
-	const char *name() const override { return "vgi"; }
-	const char *description() const override { return "Micropolis VGI disk image"; }
-	const char *extensions() const override { return "vgi"; }
-	bool supports_save() const override { return true; }
+	const char *name() const noexcept override { return "vgi"; }
+	const char *description() const noexcept override { return "Micropolis VGI disk image"; }
+	const char *extensions() const noexcept override { return "vgi"; }
+	bool supports_save() const noexcept override { return true; }
 };
 
 extern const micropolis_vgi_format FLOPPY_VGI_FORMAT;

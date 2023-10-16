@@ -16,7 +16,6 @@ SMSC FDC37C665GT High Performance Multi-Mode Parallel Port Super I/O Floppy Disk
 // floppy disk controller
 #include "machine/upd765.h"
 #include "imagedev/floppy.h"
-#include "formats/pc_dsk.h"
 // parallel port
 #include "machine/pc_lpt.h"
 // serial port

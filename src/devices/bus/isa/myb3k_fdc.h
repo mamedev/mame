@@ -13,7 +13,6 @@
 #include "isa.h"
 #include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
-#include "formats/imd_dsk.h"
 
 class isa8_myb3k_fdc471x_device_base :
 	public device_t,

@@ -11,7 +11,6 @@
 #include "emu.h"
 #include "cpu/z180/z180.h"
 #include "imagedev/floppy.h"
-#include "formats/imd_dsk.h"
 #include "formats/tim011_dsk.h"
 #include "machine/upd765.h"
 #include "bus/rs232/rs232.h"
@@ -135,7 +134,6 @@ static void tim011_floppies(device_slot_interface &device)
 static void tim011_floppy_formats(format_registration &fr)
 {
 	fr.add_mfm_containers();
-	fr.add(FLOPPY_IMD_FORMAT);
 	fr.add(FLOPPY_TIM011_FORMAT);
 }
 

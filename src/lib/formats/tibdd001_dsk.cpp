@@ -14,17 +14,17 @@ tib_dd_001_format::tib_dd_001_format() : upd765_format(formats)
 {
 }
 
-const char *tib_dd_001_format::name() const
+const char *tib_dd_001_format::name() const noexcept
 {
 	return "tibdd001";
 }
 
-const char *tib_dd_001_format::description() const
+const char *tib_dd_001_format::description() const noexcept
 {
 	return "TIB Disc Drive DD-001 floppy disk image";
 }
 
-const char *tib_dd_001_format::extensions() const
+const char *tib_dd_001_format::extensions() const noexcept
 {
 	return "img";
 }

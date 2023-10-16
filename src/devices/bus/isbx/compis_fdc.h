@@ -12,7 +12,6 @@
 #pragma once
 
 #include "isbx.h"
-#include "formats/cpis_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/upd765.h"
 
@@ -53,8 +52,7 @@ private:
 	static void floppy_formats(format_registration &fr);
 
 	required_device<i8272a_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 };
 
 

@@ -9,6 +9,8 @@
 #include "emu.h"
 #include "isbc_218a.h"
 
+#include "formats/flopimg.h"
+
 
 //**************************************************************************
 //  MACROS / CONSTANTS

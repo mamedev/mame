@@ -14,7 +14,6 @@
 
 #include "sg1000exp.h"
 #include "sk1100prn.h"
-#include "formats/sc3000_bit.h"
 #include "imagedev/cassette.h"
 #include "machine/i8255.h"
 

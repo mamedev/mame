@@ -21,6 +21,8 @@
 #include "emu.h"
 #include "beta128.h"
 
+#include "formats/trd_dsk.h"
+
 
 /***************************************************************************
     DEVICE DEFINITIONS

@@ -41,6 +41,7 @@ Please feel free to join. See http://www.portaudio.com for details.
     src/hostapi/dsound      = Windows Direct Sound
     src/hostapi/jack        = JACK Audio Connection Kit
     src/hostapi/oss         = Unix Open Sound System (OSS)
+    src/hostapi/pulseaudio  = Sound system for POSIX OSes
     src/hostapi/wasapi      = Windows Vista WASAPI
     src/hostapi/wdmks       = Windows WDM Kernel Streaming
     src/hostapi/wmme        = Windows MultiMedia Extensions (MME)

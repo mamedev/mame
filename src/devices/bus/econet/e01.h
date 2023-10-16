@@ -23,7 +23,6 @@
 #include "machine/mc6854.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
-#include "formats/afs_dsk.h"
 
 class econet_e01_device : public device_t,
 	public device_econet_interface
@@ -79,10 +78,6 @@ private:
 	void hdc_data_w(uint8_t data);
 	void hdc_select_w(uint8_t data);
 	void hdc_irq_enable_w(uint8_t data);
-	uint8_t rtc_address_r();
-	void rtc_address_w(uint8_t data);
-	uint8_t rtc_data_r();
-	void rtc_data_w(uint8_t data);
 
 	static void floppy_formats_afs(format_registration &fr);
 

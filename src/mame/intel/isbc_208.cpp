@@ -6,7 +6,7 @@
 #include "emu.h"
 #include "isbc_208.h"
 
-#include "formats/pc_dsk.h"
+#include "formats/flopimg.h"
 
 
 DEFINE_DEVICE_TYPE(ISBC_208, isbc_208_device, "isbc_208", "ISBC 208 Flexible Disk Driver Controller")

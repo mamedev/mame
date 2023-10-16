@@ -68,22 +68,22 @@ fsd_format::fsd_format()
 {
 }
 
-const char *fsd_format::name() const
+const char *fsd_format::name() const noexcept
 {
 	return "fsd";
 }
 
-const char *fsd_format::description() const
+const char *fsd_format::description() const noexcept
 {
 	return "BBC Micro 8271 protected disk image";
 }
 
-const char *fsd_format::extensions() const
+const char *fsd_format::extensions() const noexcept
 {
 	return "fsd";
 }
 
-bool fsd_format::supports_save() const
+bool fsd_format::supports_save() const noexcept
 {
 	return false;
 }
@@ -101,7 +101,7 @@ int fsd_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	return 0;
 }
 
-bool fsd_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool fsd_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	const char* result[255];
 	result[0x00] = "OK";

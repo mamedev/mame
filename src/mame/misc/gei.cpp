@@ -1720,7 +1720,7 @@ ROM_START( gtsers9 ) /* TRIV-3 PCB, stickered 256 TRIV #9 7/85 */
 	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "prog1_versionc",  0x00000, 0x4000, CRC(340246a4) SHA1(d655e1cf2b1e87a05e87ff6af4b794e6d54a2a52) )
 	ROM_LOAD( "facts",           0x10000, 0x8000, CRC(21bd6181) SHA1(609ae1097a4011e90d03d4c4f03140fbe84c084a) )
-	ROM_LOAD( "rock-n-roll+",    0x10000, 0x8000, CRC(8eb83052) SHA1(93e3c1ae6c2048fb44ecafe1013b6a96da38fa84) ) /* Labeled as ROCK-N-ROL* */
+	ROM_LOAD( "rock-n-roll+",    0x18000, 0x8000, CRC(8eb83052) SHA1(93e3c1ae6c2048fb44ecafe1013b6a96da38fa84) ) /* Labeled as ROCK-N-ROL* */
 	ROM_LOAD( "television+",     0x20000, 0x8000, CRC(731d4cc0) SHA1(184b6e48edda24f50e377a473a1a4709a218181b) ) /* Labeled as T.V.* */
 	ROM_LOAD( "usa_trivia+",     0x28000, 0x8000, CRC(829543b4) SHA1(deb0a4132852643ad884cf194b0a2e6671aa2b4e) ) /* Labeled as USA TRV* */
 	ROM_LOAD( "adult_sex_2+",    0x30000, 0x8000, CRC(0d683f21) SHA1(f47ce3c31c4c5ed02247fa280303e6ae760315df) ) /* Listed as an alternate question set - Labeled as ADULT SEX 2* */

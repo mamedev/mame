@@ -2,7 +2,7 @@
 // copyright-holders:tim lindner, 68bit
 /*********************************************************************
 
-    formats/os9_dsk.c
+    formats/os9_dsk.cpp
 
     OS-9 disk images
 
@@ -56,17 +56,17 @@ os9_format::os9_format() : wd177x_format(formats)
 {
 }
 
-const char *os9_format::name() const
+const char *os9_format::name() const noexcept
 {
 	return "os9";
 }
 
-const char *os9_format::description() const
+const char *os9_format::description() const noexcept
 {
 	return "OS-9 floppy disk image";
 }
 
-const char *os9_format::extensions() const
+const char *os9_format::extensions() const noexcept
 {
 	return "os9,dsk";
 }

@@ -48,7 +48,7 @@ memory.regions[]
 Address space
 -------------
 
-Wraps MAME’s ``address_space`` class, which represent’s an address space
+Wraps MAME’s ``address_space`` class, which represents an address space
 belonging to a device.
 
 Instantiation

@@ -415,7 +415,7 @@ void floppy_image_device::commit_image()
 	if (err)
 		popmessage("Error, unable to truncate image: %s", err.message());
 
-	output_format->save(*io, variants, image.get());
+	output_format->save(*io, variants, *image);
 }
 
 void floppy_image_device::device_config_complete()
@@ -609,7 +609,7 @@ std::pair<std::error_condition, std::string> floppy_image_device::call_load()
 		return std::make_pair(image_error::INVALIDIMAGE, "Unable to identify image file format");
 
 	image = std::make_unique<floppy_image>(tracks, sides, form_factor);
-	if (!best_format->load(*io, form_factor, variants, image.get())) {
+	if (!best_format->load(*io, form_factor, variants, *image)) {
 		image.reset();
 		return std::make_pair(image_error::INVALIDIMAGE, "Incompatible image file format or corrupted data");
 	}
@@ -833,7 +833,7 @@ void floppy_image_device::init_fs(const fs_info *fs, const fs::meta_data &meta)
 		cfs->format(meta);
 
 		auto io = util::ram_read(img.data(), img.size(), 0xff);
-		fs->m_type->load(*io, floppy_image::FF_UNKNOWN, variants, image.get());
+		fs->m_type->load(*io, floppy_image::FF_UNKNOWN, variants, *image);
 	} else {
 		fs::unformatted_image::format(fs->m_key, image.get());
 	}
@@ -919,14 +919,14 @@ TIMER_CALLBACK_MEMBER(floppy_image_device::index_resync)
 	// if hard-sectored floppy, has extra IDX pulses
 	if(image)
 		image->find_index_hole(position, last_index, next_index);
-	int new_idx = position - last_index < 2000000;
+	bool new_idx = position - last_index < 2000000;
 
 	if(new_idx) {
 		uint32_t index_up = last_index + 2000000;
 		attotime index_up_time = attotime::from_double(index_up/angular_speed);
 		index_timer->adjust(index_up_time - delta);
 	} else {
-		attotime next_index_time = attotime::from_double(next_index/angular_speed);
+		attotime next_index_time = next_index >= 200000000 ? rev_time : attotime::from_double(next_index/angular_speed);
 		index_timer->adjust(next_index_time - delta);
 	}
 

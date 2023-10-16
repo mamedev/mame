@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont, Olivier Galibert
 /*********************************************************************
 
-    formats/esq16_dsk.c
+    formats/esq16_dsk.cpp
 
     Formats for 16-bit Ensoniq synthesizers and samplers
 
@@ -51,22 +51,22 @@ esqimg_format::esqimg_format()
 {
 }
 
-const char *esqimg_format::name() const
+const char *esqimg_format::name() const noexcept
 {
 	return "esq16";
 }
 
-const char *esqimg_format::description() const
+const char *esqimg_format::description() const noexcept
 {
 	return "Ensoniq VFX-SD/SD-1/EPS-16 floppy disk image";
 }
 
-const char *esqimg_format::extensions() const
+const char *esqimg_format::extensions() const noexcept
 {
 	return "img";
 }
 
-bool esqimg_format::supports_save() const
+bool esqimg_format::supports_save() const noexcept
 {
 	return true;
 }
@@ -97,7 +97,7 @@ int esqimg_format::identify(util::random_read &io, uint32_t form_factor, const s
 	return 0;
 }
 
-bool esqimg_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool esqimg_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	uint8_t track_count, head_count, sector_count;
 	find_size(io, track_count, head_count, sector_count);
@@ -119,12 +119,12 @@ bool esqimg_format::load(util::random_read &io, uint32_t form_factor, const std:
 		}
 	}
 
-	image->set_variant(floppy_image::DSDD);
+	image.set_variant(floppy_image::DSDD);
 
 	return true;
 }
 
-bool esqimg_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool esqimg_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
 {
 	int track_count, head_count, sector_count;
 	get_geometry_mfm_pc(image, 2000, track_count, head_count, sector_count);

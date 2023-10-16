@@ -34,7 +34,7 @@ public:
 		m_io_fake(*this, "FAKE"),
 		m_lamp_start(*this, "P%u_lamp_start", 1U),
 		m_gun_recoil(*this, "P%u_gun_recoil", 1U),
-		m_lamp(*this, "Lamp_%", 1U),
+		m_lamp(*this, "Lamp_%u", 1U),
 		m_wheel_vibration(*this, "Wheel_vibration")
 	{ }
 

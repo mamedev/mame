@@ -33,8 +33,11 @@
 #include "bus/rs232/terminal.h"
 #include "cpu/i386/athlon.h"
 #include "machine/pci-ide.h"
+#include "machine/pckeybrd.h"
 #include "bus/isa/isa.h"
 #include "video/virge_pci.h"
+
+#include "formats/naslite_dsk.h"
 
 
 #if 1
@@ -457,6 +460,10 @@ void it8703f_device::device_add_mconfig(machine_config &config)
 	m_kbdc->input_buffer_full_callback().set(FUNC(it8703f_device::irq_keyboard_w));
 	m_kbdc->system_reset_callback().set(FUNC(it8703f_device::kbdp20_gp20_reset_w));
 	m_kbdc->gate_a20_callback().set(FUNC(it8703f_device::kbdp21_gp25_gatea20_w));
+	m_kbdc->set_keyboard_tag("at_keyboard");
+
+	at_keyboard_device &at_keyb(AT_KEYB(config, "at_keyboard", pc_keyboard_device::KEYBOARD_TYPE::AT, 1));
+	at_keyb.keypress().set(m_kbdc, FUNC(kbdc8042_device::keyboard_w));
 }
 
 uint8_t it8703f_device::read_it8703f(offs_t offset)

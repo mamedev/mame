@@ -215,7 +215,7 @@ void orion_state::orion128_floppy_w(offs_t offset, uint8_t data)
 uint8_t orion_state::orionz80_floppy_rtc_r(offs_t offset)
 {
 	if ((offset >= 0x60) && (offset <= 0x6f))
-		return m_rtc->read(offset-0x60);
+		return m_rtc->data_r();
 	else
 		return orion128_floppy_r(offset);
 }
@@ -223,7 +223,12 @@ uint8_t orion_state::orionz80_floppy_rtc_r(offs_t offset)
 void orion_state::orionz80_floppy_rtc_w(offs_t offset, uint8_t data)
 {
 	if ((offset >= 0x60) && (offset <= 0x6f))
-		m_rtc->write(offset-0x60,data);
+	{
+		if (BIT(offset, 0))
+			m_rtc->data_w(data);
+		else
+			m_rtc->address_w(data);
+	}
 	else
 		orion128_floppy_w(offset,data);
 }

@@ -758,12 +758,6 @@ to make when generating the Visual Studio project files.  This stops warnings
 from being treated as errors.  (MSVC seems to lack options to control which
 specific warnings are treated as error, which other compilers support.)
 
-There is an as-yet unresolved issue with duplicate COM GUIDS being defined in
-the PortAudio library when the target Windows version is set to Windows Vista
-(6.0) or later.  To work around this, add ``NO_USE_PORTAUDIO=1`` to the options
-passed to make when generating the Visual Studio project files.  MAME will be
-built without support for sound output via PortAudio.
-
 
 .. _compiling-unusual:
 

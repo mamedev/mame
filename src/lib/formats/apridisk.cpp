@@ -20,17 +20,17 @@ apridisk_format::apridisk_format()
 {
 }
 
-const char *apridisk_format::name() const
+const char *apridisk_format::name() const noexcept
 {
 	return "apridisk";
 }
 
-const char *apridisk_format::description() const
+const char *apridisk_format::description() const noexcept
 {
 	return "APRIDISK disk image";
 }
 
-const char *apridisk_format::extensions() const
+const char *apridisk_format::extensions() const noexcept
 {
 	return "dsk";
 }
@@ -49,7 +49,7 @@ int apridisk_format::identify(util::random_read &io, uint32_t form_factor, const
 		return 0;
 }
 
-bool apridisk_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool apridisk_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	desc_pc_sector sectors[80][2][18];
 	std::unique_ptr<uint8_t []> sector_data(new uint8_t [MAX_SECTORS * SECTOR_SIZE]);
@@ -149,7 +149,7 @@ bool apridisk_format::load(util::random_read &io, uint32_t form_factor, const st
 	return true;
 }
 
-bool apridisk_format::supports_save() const
+bool apridisk_format::supports_save() const noexcept
 {
 	return false;
 }

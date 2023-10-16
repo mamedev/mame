@@ -28,8 +28,6 @@
 
 #include "emupal.h"
 
-#include "formats/pc_dsk.h"
-
 
 #define MAINCPU_TAG "maincpu"
 

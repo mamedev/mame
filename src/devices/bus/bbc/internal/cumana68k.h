@@ -8,7 +8,6 @@
 
 **********************************************************************/
 
-
 #ifndef MAME_BUS_BBC_INTERNAL_CUMANA68K_H
 #define MAME_BUS_BBC_INTERNAL_CUMANA68K_H
 
@@ -20,7 +19,6 @@
 #include "machine/nscsi_cb.h"
 #include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
-#include "formats/os9_dsk.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

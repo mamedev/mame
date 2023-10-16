@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /*********************************************************************
 
-    formats/oric_dsk.c
+    formats/oric_dsk.cpp
 
     Oric disk images
 
@@ -16,22 +16,22 @@
 #include <cstring>
 
 
-const char *oric_dsk_format::name() const
+const char *oric_dsk_format::name() const noexcept
 {
 	return "oric_dsk";
 }
 
-const char *oric_dsk_format::description() const
+const char *oric_dsk_format::description() const noexcept
 {
 	return "Oric disk image";
 }
 
-const char *oric_dsk_format::extensions() const
+const char *oric_dsk_format::extensions() const noexcept
 {
 	return "dsk";
 }
 
-bool oric_dsk_format::supports_save() const
+bool oric_dsk_format::supports_save() const noexcept
 {
 	return true;
 }
@@ -58,7 +58,7 @@ int oric_dsk_format::identify(util::random_read &io, uint32_t form_factor, const
 	return FIFID_SIGN|FIFID_SIZE|FIFID_STRUCT;
 }
 
-bool oric_dsk_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool oric_dsk_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	size_t actual;
 	uint8_t h[256];
@@ -111,22 +111,22 @@ bool oric_dsk_format::load(util::random_read &io, uint32_t form_factor, const st
 const oric_dsk_format FLOPPY_ORIC_DSK_FORMAT;
 
 
-const char *oric_jasmin_format::name() const
+const char *oric_jasmin_format::name() const noexcept
 {
 	return "oric_jasmin";
 }
 
-const char *oric_jasmin_format::description() const
+const char *oric_jasmin_format::description() const noexcept
 {
 	return "Oric Jasmin pure sector image";
 }
 
-const char *oric_jasmin_format::extensions() const
+const char *oric_jasmin_format::extensions() const noexcept
 {
 	return "dsk";
 }
 
-bool oric_jasmin_format::supports_save() const
+bool oric_jasmin_format::supports_save() const noexcept
 {
 	return true;
 }
@@ -144,7 +144,7 @@ int oric_jasmin_format::identify(util::random_read &io, uint32_t form_factor, co
 	return 0;
 }
 
-bool oric_jasmin_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool oric_jasmin_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	uint64_t size;
 	if(io.length(size))
@@ -179,15 +179,15 @@ bool oric_jasmin_format::load(util::random_read &io, uint32_t form_factor, const
 			build_wd_track_mfm(track, head, image, 100000, 17, sdesc, 38, 40);
 		}
 
-	image->set_form_variant(floppy_image::FF_3, heads == 2 ? floppy_image::DSDD : floppy_image::SSDD);
+	image.set_form_variant(floppy_image::FF_3, heads == 2 ? floppy_image::DSDD : floppy_image::SSDD);
 
 	return true;
 }
 
-bool oric_jasmin_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool oric_jasmin_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
 {
 	int tracks, heads;
-	image->get_actual_geometry(tracks, heads);
+	image.get_actual_geometry(tracks, heads);
 
 	bool can_ds = variants.empty() || has_variant(variants, floppy_image::DSDD);
 	if(heads == 2 && !can_ds)

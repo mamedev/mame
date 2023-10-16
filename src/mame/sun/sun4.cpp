@@ -435,9 +435,6 @@
 #include "debugger.h"
 #include "screen.h"
 
-#include "formats/mfi_dsk.h"
-#include "formats/pc_dsk.h"
-
 #define LOG_AUXIO               (1U << 1)
 #define LOG_IRQ_READS           (1U << 2)
 #define LOG_IRQ_WRITES          (1U << 3)

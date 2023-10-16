@@ -253,8 +253,8 @@ void ks0164_cpu_device::execute_run()
 			case 0x9: cond = !(m_r[R_PSW] & F_Z) && !(m_r[R_PSW] & F_C); break;
 			case 0xa: cond = (m_r[R_PSW] & F_Z) || (m_r[R_PSW] & F_C); break;
 			case 0xb: cond = (!(m_r[R_PSW] & F_Z) && (m_r[R_PSW] & F_N) && (m_r[R_PSW] & F_V)) || (!(m_r[R_PSW] & F_Z) && !(m_r[R_PSW] & F_V) && !(m_r[R_PSW] & F_N)); break;
-			case 0xc: cond = (m_r[R_PSW] & F_Z) || ((m_r[R_PSW] & F_N) && !(m_r[R_PSW] & F_V)) || ((m_r[R_PSW] & F_V) && !(m_r[R_PSW] & F_N)); break;
-			case 0xd: cond = ((m_r[R_PSW] & F_N) && (m_r[R_PSW] & F_V)) || (!(m_r[R_PSW] & F_V) && !(m_r[R_PSW] & F_N)); break;
+			case 0xc: cond = ((m_r[R_PSW] & F_N) && (m_r[R_PSW] & F_V)) || (!(m_r[R_PSW] & F_V) && !(m_r[R_PSW] & F_N)); break;
+			case 0xd: cond = (m_r[R_PSW] & F_Z) || ((m_r[R_PSW] & F_N) && !(m_r[R_PSW] & F_V)) || ((m_r[R_PSW] & F_V) && !(m_r[R_PSW] & F_N)); break;
 			case 0xe: cond = ((m_r[R_PSW] & F_N) && !(m_r[R_PSW] & F_V)) || ((m_r[R_PSW] & F_V) && !(m_r[R_PSW] & F_N)); break;
 			case 0xf: default: cond = true; break;
 			}
@@ -462,7 +462,7 @@ void ks0164_cpu_device::execute_run()
 		case 0x1b: {
 			switch((opcode >> 12) & 3) {
 			case 0: {
-				// Push all registers
+				// Pop all registers
 				// 1100 .... .... .011
 
 				m_r[0] = m_program.read_word(m_r[R_SP] + 6);
@@ -550,7 +550,7 @@ void ks0164_cpu_device::execute_run()
 
 			case 2: {
 				// Bit clear in register
-				// 1110 .rrr bbbb .001
+				// 1110 .rrr bbbb .100
 				if(m_r[(opcode >> 8) & 7] & (1 << ((opcode >> 4) & 0xf))) {
 					m_r[(opcode >> 8) & 7] &= ~(1 << ((opcode >> 4) & 0xf));
 					m_r[R_PSW] &= ~F_Z;
@@ -561,6 +561,7 @@ void ks0164_cpu_device::execute_run()
 
 			case 3: {
 				// Decrement and branch
+				// 1111 .rrr .... .100
 				int r = (opcode >> 8) & 7;
 				u16 a = m_program_cache.read_word(m_r[R_PC]);
 				m_r[R_PC] += 2;
@@ -643,7 +644,44 @@ void ks0164_cpu_device::execute_run()
 		case 0x1e: {
 			switch((opcode >> 12) & 3) {
 			case 0: {
-				unk(opcode);
+				// Rotate without carry?
+				// 1100 drrr nnnn .110
+				/*
+				From btplay2k flash.u22:
+				Surrounding code gives some context to usage here? + opcode is sandwiched between other shift/rotate commands
+				6E2C: 7010           r0 = 10
+				6E2E: 8817 0001      r0 -= (r1 + 1).bu
+				6E32: 0406           beq 6e3a
+				6E34: CA1C           r2 >>= 1
+				6E36: F004 6E34      dbra r0, 6e34
+				...
+				6E52: B017 0001      r0 = (r1 + 1).bu
+				6E56: CA1E           ?ca1e
+				6E58: F004 6E56      dbra r0, 6e56
+				*/
+
+				int r = (opcode >> 8) & 7;
+				int shift = (opcode >> 4) & 0xf;
+				u16 v1 = m_r[r];
+				u16 res;
+
+				if(!shift) {
+					m_r[R_PSW] = (m_r[R_PSW] & ~F_MASK) | (v1 ? v1 & 0x8000 ? F_N : 0 : F_Z);
+					res = v1;
+				} else if(opcode & 0x0800) {
+					res = (v1 >> shift) | (v1 << (16 - shift));
+					u16 f = res ? 0 : F_Z;
+					if(v1 & (1 << (shift - 1)))
+						f |= F_C;
+					m_r[R_PSW] = (m_r[R_PSW] & ~F_MASK) | f;
+				} else {
+					res = (v1 << shift) | (v1 >> (16 - shift));
+					u16 f = res ? res & 0x8000 ? F_N : 0 : F_Z;
+					if(v1 & (1 << (16-shift)))
+						f |= F_C;
+					m_r[R_PSW] = (m_r[R_PSW] & ~F_MASK) | f;
+				}
+				m_r[r] = res;
 				break;
 			}
 

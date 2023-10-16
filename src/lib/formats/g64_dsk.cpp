@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /*********************************************************************
 
-    formats/g64_dsk.c
+    formats/g64_dsk.cpp
 
     Commodore 1541/1571 GCR disk image format
 
@@ -45,7 +45,7 @@ int g64_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	return 0;
 }
 
-bool g64_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool g64_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	uint64_t size;
 	if (io.length(size))
@@ -101,14 +101,14 @@ bool g64_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	}
 
 	if (!head)
-		image->set_variant(floppy_image::SSSD);
+		image.set_variant(floppy_image::SSSD);
 	else
-		image->set_variant(floppy_image::DSSD);
+		image.set_variant(floppy_image::DSSD);
 
 	return true;
 }
 
-int g64_format::generate_bitstream(int track, int head, int speed_zone, std::vector<bool> &trackbuf, floppy_image *image)
+int g64_format::generate_bitstream(int track, int head, int speed_zone, std::vector<bool> &trackbuf, const floppy_image &image)
 {
 	int cell_size = c1541_cell_size[speed_zone];
 
@@ -120,14 +120,14 @@ int g64_format::generate_bitstream(int track, int head, int speed_zone, std::vec
 	return ((actual_cell_size >= cell_size-10) && (actual_cell_size <= cell_size+10)) ? speed_zone : -1;
 }
 
-bool g64_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool g64_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
 {
 	uint8_t const zerofill[] = { 0x00, 0x00, 0x00, 0x00 };
 	std::vector<uint8_t> const prefill(TRACK_LENGTH, 0xff);
 	size_t actual;
 
 	int tracks, heads;
-	image->get_actual_geometry(tracks, heads);
+	image.get_actual_geometry(tracks, heads);
 	tracks = TRACK_COUNT * heads;
 
 	// write header
@@ -148,7 +148,7 @@ bool g64_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 			io.write_at(tpos, zerofill, 4, actual);
 			io.write_at(spos, zerofill, 4, actual);
 
-			if (image->get_buffer(track, head).size() <= 1)
+			if (image.get_buffer(track, head).size() <= 1)
 				continue;
 
 			int track_size;
@@ -191,17 +191,17 @@ bool g64_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 	return true;
 }
 
-const char *g64_format::name() const
+const char *g64_format::name() const noexcept
 {
 	return "g64";
 }
 
-const char *g64_format::description() const
+const char *g64_format::description() const noexcept
 {
 	return "Commodore 1541/1571 GCR disk image";
 }
 
-const char *g64_format::extensions() const
+const char *g64_format::extensions() const noexcept
 {
 	return "g64,g41,g71";
 }

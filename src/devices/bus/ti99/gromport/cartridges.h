@@ -12,12 +12,14 @@
 
 #include "imagedev/cartrom.h"
 #include "machine/tmc0430.h"
-#include "formats/rpk.h"
 
 #include "emuopts.h"
 
 #include "utilfwd.h"
 
+
+// declared in formats/rpk.h
+class rpk_socket;
 
 namespace bus::ti99::gromport {
 

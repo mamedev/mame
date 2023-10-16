@@ -392,6 +392,8 @@ protected:
 
 private:
 	void remap(int space_id, offs_t start, offs_t end) override;
+
+	void device_map(address_map &map);
 };
 
 DEFINE_DEVICE_TYPE(ISA16_P5TXLA_MB, isa16_p5txla_mb, "isa16_p5txla_mb", "ISA16 P5TX-LA Virtual MB resources")
@@ -433,10 +435,14 @@ void isa16_p5txla_mb::device_reset()
 void isa16_p5txla_mb::remap(int space_id, offs_t start, offs_t end)
 {
 	if (space_id == AS_IO)
-	{
-		m_isa->install_device(0x60, 0x6f, read8sm_delegate(m_kbdc, FUNC(kbdc8042_device::data_r)), write8sm_delegate(m_kbdc, FUNC(kbdc8042_device::data_w)));
-		m_isa->install_device(0x70, 0x7f, read8sm_delegate(m_rtc, FUNC(mc146818_device::read)), write8sm_delegate(m_rtc, FUNC(mc146818_device::write)));
-	}
+		m_isa->install_device(0x60, 0x7f, *this, &isa16_p5txla_mb::device_map);
+}
+
+void isa16_p5txla_mb::device_map(address_map &map)
+{
+	map(0x00, 0x0f).rw(m_kbdc, FUNC(kbdc8042_device::data_r), FUNC(kbdc8042_device::data_w));
+	map(0x10, 0x1f).w(m_rtc, FUNC(mc146818_device::address_w)).umask32(0x00ff00ff);
+	map(0x10, 0x1f).rw(m_rtc, FUNC(mc146818_device::data_r), FUNC(mc146818_device::data_w)).umask32(0xff00ff00);
 }
 
 namespace {

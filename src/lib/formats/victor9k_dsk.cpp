@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /*********************************************************************
 
-    formats/victor9k_dsk.c
+    formats/victor9k_dsk.cpp
 
     Victor 9000 sector disk image format
 
@@ -118,17 +118,17 @@ victor9k_format::victor9k_format()
 {
 }
 
-const char *victor9k_format::name() const
+const char *victor9k_format::name() const noexcept
 {
 	return "victor9k";
 }
 
-const char *victor9k_format::description() const
+const char *victor9k_format::description() const noexcept
 {
 	return "Victor 9000 disk image";
 }
 
-const char *victor9k_format::extensions() const
+const char *victor9k_format::extensions() const noexcept
 {
 	return "img";
 }
@@ -153,11 +153,11 @@ int victor9k_format::find_size(util::random_read &io, uint32_t form_factor)
 	return find_size(io);
 }
 
-int victor9k_format::identify(floppy_image *image)
+int victor9k_format::identify(const floppy_image &image)
 {
 	for(int i=0; formats[i].form_factor; i++) {
 		const format &f = formats[i];
-		if(f.variant == image->get_variant())
+		if(f.variant == image.get_variant())
 			return i;
 	}
 
@@ -175,7 +175,7 @@ int victor9k_format::identify(util::random_read &io, uint32_t form_factor, const
 	return 0;
 }
 
-void victor9k_format::log_boot_sector(uint8_t *data)
+void victor9k_format::log_boot_sector(const uint8_t *data)
 {
 	// System disc ID
 	osd_printf_verbose("System disc: %s\n", ((data[0] == 0xff) && (data[1] == 0x00)) ? "yes" : "no");
@@ -288,7 +288,7 @@ void victor9k_format::build_sector_description(const format &f, uint8_t *sectdat
 	}
 }
 
-bool victor9k_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool victor9k_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	int const type = find_size(io, form_factor);
 	if(type == -1)
@@ -346,7 +346,7 @@ bool victor9k_format::load(util::random_read &io, uint32_t form_factor, const st
 		}
 	}
 
-	image->set_variant(f.variant);
+	image.set_variant(f.variant);
 
 	return true;
 }
@@ -445,7 +445,7 @@ const int victor9k_format::rpm[9] =
 	252, 267, 283, 300, 321, 342, 368, 401, 417
 };
 
-bool victor9k_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool victor9k_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
 {
 	int type = victor9k_format::identify(image);
 	uint64_t size;
@@ -479,7 +479,7 @@ bool victor9k_format::save(util::random_read_write &io, const std::vector<uint32
 	return true;
 }
 
-void victor9k_format::extract_sectors(floppy_image *image, const format &f, desc_s *sdesc, int track, int head, int sector_count)
+void victor9k_format::extract_sectors(const floppy_image &image, const format &f, desc_s *sdesc, int track, int head, int sector_count)
 {
 
 	// Extract the sectors

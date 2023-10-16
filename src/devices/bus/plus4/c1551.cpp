@@ -9,6 +9,9 @@
 #include "emu.h"
 #include "c1551.h"
 
+#include "formats/d64_dsk.h"
+#include "formats/g64_dsk.h"
+
 
 
 //**************************************************************************

@@ -3,6 +3,8 @@
 #include "emu.h"
 #include "konami.h"
 
+#include "machine/intelfsh.h"
+
 #include "sound/k051649.h"
 #include "sound/vlm5030.h"
 #include "sound/dac.h"
@@ -192,6 +194,142 @@ void msx_cart_konami_scc_device::bank_w(u8 data)
 	{
 		m_scc_view.select(((data & 0x3f) == 0x3f) ? 1 : 0);
 	}
+}
+
+
+
+
+
+
+class msx_cart_sunrise_scc_device : public device_t, public msx_cart_interface
+{
+public:
+	msx_cart_sunrise_scc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, MSX_CART_SUNRISE_SCC, tag, owner, clock)
+		, msx_cart_interface(mconfig, *this)
+		, m_k051649(*this, "k051649")
+		, m_flash(*this, "flash")
+		, m_scc_view(*this, "scc_view")
+	{ }
+
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
+
+protected:
+	// device_t implementation
+	virtual void device_start() override { save_item(NAME(m_selected_bank)); }
+	virtual void device_reset() override;
+
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+private:
+	template <int Bank> u8 flash_r(offs_t offset);
+	template <int Bank> void flash_w(offs_t offset, u8 data);
+	template <int Bank> void bank_w(offs_t offset, u8 data);
+
+	required_device<k051649_device> m_k051649;
+	required_device<intelfsh8_device> m_flash;
+	memory_view m_scc_view;
+
+	u8 m_selected_bank[4];
+};
+
+ROM_START(msx_cart_sunrise_scc)
+	ROM_REGION(0x80000, "flash", ROMREGION_ERASEFF)
+ROM_END
+
+const tiny_rom_entry *msx_cart_sunrise_scc_device::device_rom_region() const
+{
+	return ROM_NAME(msx_cart_sunrise_scc);
+}
+
+void msx_cart_sunrise_scc_device::device_add_mconfig(machine_config &config)
+{
+	K051649(config, m_k051649, DERIVED_CLOCK(1, 1));
+	if (parent_slot())
+		m_k051649->add_route(ALL_OUTPUTS, soundin(), 0.4);
+
+	AMD_29F040(config, m_flash);
+}
+
+void msx_cart_sunrise_scc_device::device_reset()
+{
+	m_scc_view.select(0);
+	for (int i = 0; i < 4; i++)
+		m_selected_bank[i] = i;
+}
+
+std::error_condition msx_cart_sunrise_scc_device::initialize_cartridge(std::string &message)
+{
+	if (!cart_rom_region())
+	{
+		message = "msx_cart_sunrise_scc_device: Required region 'rom' was not found.";
+		return image_error::INTERNAL;
+	}
+
+	const u32 size = cart_rom_region()->bytes();
+	if (size != 0x80000)
+	{
+		message = "msx_cart_sunrise_scc_device: Region 'rom' has unsupported size.";
+		return image_error::INVALIDLENGTH;
+	}
+
+	u8 *flash = memregion("flash")->base();
+	memcpy(flash, cart_rom_region()->base(), size);
+
+	page(0)->install_read_handler(0x0000, 0x1fff, emu::rw_delegate(*this, FUNC(msx_cart_sunrise_scc_device::flash_r<2>)));
+	page(0)->install_write_handler(0x0000, 0x1fff, emu::rw_delegate(*this, FUNC(msx_cart_sunrise_scc_device::flash_w<2>)));
+	page(0)->install_read_handler(0x2000, 0x3fff, emu::rw_delegate(*this, FUNC(msx_cart_sunrise_scc_device::flash_r<3>)));
+	page(0)->install_write_handler(0x2000, 0x3fff, emu::rw_delegate(*this, FUNC(msx_cart_sunrise_scc_device::flash_w<3>)));
+	page(1)->install_read_handler(0x4000, 0x5fff, emu::rw_delegate(*this, FUNC(msx_cart_sunrise_scc_device::flash_r<0>)));
+	page(1)->install_write_handler(0x4000, 0x5fff, emu::rw_delegate(*this, FUNC(msx_cart_sunrise_scc_device::bank_w<0>)));
+	page(1)->install_read_handler(0x6000, 0x7fff, emu::rw_delegate(*this, FUNC(msx_cart_sunrise_scc_device::flash_r<1>)));
+	page(1)->install_write_handler(0x6000, 0x7fff, emu::rw_delegate(*this, FUNC(msx_cart_sunrise_scc_device::bank_w<1>)));
+	page(2)->install_view(0x8000, 0x9fff, m_scc_view);
+	m_scc_view[0].install_read_handler(0x8000, 0x9fff, emu::rw_delegate(*this, FUNC(msx_cart_sunrise_scc_device::flash_r<2>)));
+	m_scc_view[0].install_write_handler(0x8000, 0x97ff, emu::rw_delegate(*this, FUNC(msx_cart_sunrise_scc_device::bank_w<2>)));
+	m_scc_view[1].install_read_handler(0x8000, 0x97ff, emu::rw_delegate(*this, FUNC(msx_cart_sunrise_scc_device::flash_r<2>)));
+	m_scc_view[1].install_write_handler(0x8000, 0x97ff, emu::rw_delegate(*this, FUNC(msx_cart_sunrise_scc_device::bank_w<2>)));
+	m_scc_view[1].install_read_handler(0x9800, 0x987f, 0, 0x0700, 0, emu::rw_delegate(m_k051649, FUNC(k051649_device::k051649_waveform_r)));
+	m_scc_view[1].install_write_handler(0x9800, 0x987f, 0, 0x0700, 0, emu::rw_delegate(m_k051649, FUNC(k051649_device::k051649_waveform_w)));
+	m_scc_view[1].install_write_handler(0x9880, 0x9889, 0, 0x0710, 0, emu::rw_delegate(m_k051649, FUNC(k051649_device::k051649_frequency_w)));
+	m_scc_view[1].install_write_handler(0x988a, 0x988e, 0, 0x0710, 0, emu::rw_delegate(m_k051649, FUNC(k051649_device::k051649_volume_w)));
+	m_scc_view[1].install_write_handler(0x988f, 0x988f, 0, 0x0710, 0, emu::rw_delegate(m_k051649, FUNC(k051649_device::k051649_keyonoff_w)));
+	m_scc_view[1].install_read_handler(0x98e0, 0x98e0, 0, 0x071f, 0, emu::rw_delegate(m_k051649, FUNC(k051649_device::k051649_test_r)));
+	m_scc_view[1].install_write_handler(0x98e0, 0x98e0, 0, 0x071f, 0, emu::rw_delegate(m_k051649, FUNC(k051649_device::k051649_test_w)));
+	page(2)->install_read_handler(0xa000, 0xbfff, emu::rw_delegate(*this, FUNC(msx_cart_sunrise_scc_device::flash_r<3>)));
+	page(2)->install_write_handler(0xa000, 0xbfff, emu::rw_delegate(*this, FUNC(msx_cart_sunrise_scc_device::bank_w<3>)));
+	page(3)->install_read_handler(0xc000, 0xdfff, emu::rw_delegate(*this, FUNC(msx_cart_sunrise_scc_device::flash_r<0>)));
+	page(3)->install_write_handler(0xc000, 0xdfff, emu::rw_delegate(*this, FUNC(msx_cart_sunrise_scc_device::flash_w<0>)));
+	page(3)->install_read_handler(0xe000, 0xffff, emu::rw_delegate(*this, FUNC(msx_cart_sunrise_scc_device::flash_r<1>)));
+	page(3)->install_write_handler(0xe000, 0xffff, emu::rw_delegate(*this, FUNC(msx_cart_sunrise_scc_device::flash_w<1>)));
+
+	return std::error_condition();
+}
+
+template <int Bank>
+u8 msx_cart_sunrise_scc_device::flash_r(offs_t offset)
+{
+	return m_flash->read(m_selected_bank[Bank] * 0x2000 + offset);
+}
+
+template <int Bank>
+void msx_cart_sunrise_scc_device::flash_w(offs_t offset, u8 data)
+{
+	m_flash->write(m_selected_bank[Bank] * 0x2000 + offset, data);
+}
+
+template <int Bank>
+void msx_cart_sunrise_scc_device::bank_w(offs_t offset, u8 data)
+{
+	if ((offset & 0x1800) == 0x1000)
+	{
+		m_selected_bank[Bank] = data & 0x3f;
+		if (Bank == 2)
+			m_scc_view.select(((data & 0x3f) == 0x3f) ? 1 : 0);
+	}
+	else
+		m_flash->write(m_selected_bank[Bank] * 0x2000 + offset, data);
 }
 
 
@@ -817,6 +955,7 @@ void msx_cart_ec701_device::bank_w(u8 data)
 
 DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_KONAMI,           msx_cart_interface, msx_cart_konami_device,                  "msx_cart_konami",           "MSX Cartridge - KONAMI")
 DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_KONAMI_SCC,       msx_cart_interface, msx_cart_konami_scc_device,              "msx_cart_konami_scc",       "MSX Cartridge - KONAMI+SCC")
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_SUNRISE_SCC,      msx_cart_interface, msx_cart_sunrise_scc_device,             "msx_cart_sunrise_scc",      "MSX Cartridge - Sunrise+SCC")
 DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_GAMEMASTER2,      msx_cart_interface, msx_cart_gamemaster2_device,             "msx_cart_gamemaster2",      "MSX Cartridge - GAMEMASTER2")
 DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_SYNTHESIZER,      msx_cart_interface, msx_cart_synthesizer_device,             "msx_cart_synthesizer",      "MSX Cartridge - Synthesizer")
 DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_SOUND_SNATCHER,   msx_cart_interface, msx_cart_konami_sound_snatcher_device,   "msx_cart_sound_snatcher",   "MSX Cartridge - Sound Snatcher")

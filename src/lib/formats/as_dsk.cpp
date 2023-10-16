@@ -67,7 +67,7 @@ uint32_t as_format::crc32r(const uint8_t *data, uint32_t size)
 	return ~crc;
 }
 
-bool as_format::load_bitstream_track(const std::vector<uint8_t> &img, floppy_image *image, int head, int track, int subtrack, uint8_t idx, uint32_t off_trks, bool may_be_short, bool set_variant)
+bool as_format::load_bitstream_track(const std::vector<uint8_t> &img, floppy_image &image, int head, int track, int subtrack, uint8_t idx, uint32_t off_trks, bool may_be_short, bool set_variant)
 {
 	uint32_t trks_off = off_trks + (idx * 8);
 
@@ -92,11 +92,11 @@ bool as_format::load_bitstream_track(const std::vector<uint8_t> &img, floppy_ima
 		generate_track_from_bitstream(track, head, &img[boff], track_size, image, subtrack, 0xffff);
 
 	if(set_variant)
-		image->set_variant(r32(img, trks_off + 4) >= 90000 ? floppy_image::DSHD : floppy_image::DSDD);
+		image.set_variant(r32(img, trks_off + 4) >= 90000 ? floppy_image::DSHD : floppy_image::DSDD);
 	return true;
 }
 
-void as_format::load_flux_track(const std::vector<uint8_t> &img, floppy_image *image, int head, int track, int subtrack, uint8_t fidx, uint32_t off_trks)
+void as_format::load_flux_track(const std::vector<uint8_t> &img, floppy_image &image, int head, int track, int subtrack, uint8_t fidx, uint32_t off_trks)
 {
 	uint32_t trks_off = off_trks + (fidx * 8);
 	uint32_t boff = (uint32_t)r16(img, trks_off + 0) * 512;
@@ -108,7 +108,7 @@ void as_format::load_flux_track(const std::vector<uint8_t> &img, floppy_image *i
 
 	// There is always a pulse at index, and it's
 	// the last one in the stream
-	std::vector<uint32_t> &buf = image->get_buffer(track, head, subtrack);
+	std::vector<uint32_t> &buf = image.get_buffer(track, head, subtrack);
 	buf.push_back(floppy_image::MG_F | 0);
 	uint32_t cpos = 0;
 	for(uint32_t i=0; i != track_size; i++) {
@@ -120,7 +120,7 @@ void as_format::load_flux_track(const std::vector<uint8_t> &img, floppy_image *i
 }
 
 
-as_format::tdata as_format::analyze_for_save(floppy_image *image, int head, int track, int subtrack, int speed_zone)
+as_format::tdata as_format::analyze_for_save(const floppy_image &image, int head, int track, int subtrack, int speed_zone)
 {
 	// 200000000 / 60.0 * 1.979e-6 ~= 6.5967
 	static const int cell_size_per_speed_zone[7] = {
@@ -147,7 +147,7 @@ as_format::tdata as_format::analyze_for_save(floppy_image *image, int head, int 
 
 	tdata result;
 
-	if(!image->track_is_formatted(track, head, subtrack))
+	if(!image.track_is_formatted(track, head, subtrack))
 		return result;
 
 	// Generate a bitstream to get the data and whether the phase is clean
@@ -167,7 +167,7 @@ as_format::tdata as_format::analyze_for_save(floppy_image *image, int head, int 
 
 	result.flux = true;
 
-	const std::vector<uint32_t> &tbuf = image->get_buffer(track, head, subtrack);
+	const std::vector<uint32_t> &tbuf = image.get_buffer(track, head, subtrack);
 	uint32_t first_edge = 0, last_edge = 0;
 	for(uint32_t fp : tbuf)
 		if((fp & floppy_image::MG_MASK) == floppy_image::MG_F) {
@@ -290,22 +290,22 @@ woz_format::woz_format() : as_format()
 {
 }
 
-const char *woz_format::name() const
+const char *woz_format::name() const noexcept
 {
 	return "woz";
 }
 
-const char *woz_format::description() const
+const char *woz_format::description() const noexcept
 {
 	return "Apple II WOZ Image";
 }
 
-const char *woz_format::extensions() const
+const char *woz_format::extensions() const noexcept
 {
 	return "woz";
 }
 
-bool woz_format::supports_save() const
+bool woz_format::supports_save() const noexcept
 {
 	return true;
 }
@@ -323,7 +323,7 @@ int woz_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	return 0;
 }
 
-bool woz_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool woz_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	uint64_t image_size;
 	if(io.length(image_size))
@@ -370,9 +370,9 @@ bool woz_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	unsigned int limit = is_35 ? 160 : 141;
 
 	if(is_35)
-		image->set_form_variant(floppy_image::FF_35, floppy_image::SSDD);
+		image.set_form_variant(floppy_image::FF_35, floppy_image::SSDD);
 	else
-		image->set_form_variant(floppy_image::FF_525, floppy_image::SSSD);
+		image.set_form_variant(floppy_image::FF_525, floppy_image::SSSD);
 
 	if (woz_vers == 1) {
 		for (unsigned int trkid = 0; trkid != limit; trkid++) {
@@ -387,7 +387,7 @@ bool woz_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 					return false;
 				generate_track_from_bitstream(track, head, &img[boff], r16(img, boff + 6648), image, subtrack, r16(img, boff + 6650));
 				if(is_35 && !track && head)
-					image->set_variant(floppy_image::DSDD);
+					image.set_variant(floppy_image::DSDD);
 			}
 		}
 	} else if (woz_vers == 2) {
@@ -414,16 +414,16 @@ bool woz_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 }
 
 
-bool woz_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool woz_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
 {
 	std::vector<tdata> tracks(160);
 	bool twosided = false;
 
-	if(image->get_form_factor() == floppy_image::FF_525) {
+	if(image.get_form_factor() == floppy_image::FF_525) {
 		for(unsigned int i=0; i != 141; i++)
 			tracks[i] = analyze_for_save(image, 0, i >> 2, i & 3, 5);
 
-	} else if(image->get_variant() == floppy_image::DSHD) {
+	} else if(image.get_variant() == floppy_image::DSHD) {
 		for(unsigned int i=0; i != 160; i++) {
 			tracks[i] = analyze_for_save(image, i & 1, i >> 1, 0, 6);
 			if((i & 1) && tracks[i].track_size)
@@ -448,7 +448,7 @@ bool woz_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 	w32(data, 12, 0x4F464E49);  // INFO
 	w32(data, 16, 60);          // size
 	data[20] = 3;               // chunk version
-	data[21] = image->get_form_factor() == floppy_image::FF_525 ? 1 : 2;
+	data[21] = image.get_form_factor() == floppy_image::FF_525 ? 1 : 2;
 	data[22] = 0;               // not write protected
 	data[23] = 1;               // synchronized, since our internal format is
 	data[24] = 1;               // weak bits are generated, not stored
@@ -459,7 +459,7 @@ bool woz_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 	memset(&data[29], ' ', 32-4);
 	data[57] = twosided ? 2 : 1;
 	data[58] = 0;               // boot sector unknown
-	data[59] = image->get_form_factor() == floppy_image::FF_525 ? 32 : image->get_variant() == floppy_image::DSHD ? 8 : 16;
+	data[59] = image.get_form_factor() == floppy_image::FF_525 ? 32 : image.get_variant() == floppy_image::DSHD ? 8 : 16;
 	w16(data, 60, 0);           // compatibility unknown
 	w16(data, 62, 0);           // needed ram unknown
 	w16(data, 64, max_blocks);
@@ -480,22 +480,22 @@ moof_format::moof_format() : as_format()
 {
 }
 
-const char *moof_format::name() const
+const char *moof_format::name() const noexcept
 {
 	return "moof";
 }
 
-const char *moof_format::description() const
+const char *moof_format::description() const noexcept
 {
 	return "Macintosh MOOF Image";
 }
 
-const char *moof_format::extensions() const
+const char *moof_format::extensions() const noexcept
 {
 	return "moof";
 }
 
-bool moof_format::supports_save() const
+bool moof_format::supports_save() const noexcept
 {
 	return true;
 }
@@ -511,7 +511,7 @@ int moof_format::identify(util::random_read &io, uint32_t form_factor, const std
 	return 0;
 }
 
-bool moof_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool moof_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	uint64_t image_size;
 	if(io.length(image_size))
@@ -548,13 +548,13 @@ bool moof_format::load(util::random_read &io, uint32_t form_factor, const std::v
 
 	switch(r8(img, off_info + 1)) {
 	case 1:
-		image->set_form_variant(floppy_image::FF_35, floppy_image::SSDD);
+		image.set_form_variant(floppy_image::FF_35, floppy_image::SSDD);
 		break;
 	case 2:
-		image->set_form_variant(floppy_image::FF_35, floppy_image::DSDD);
+		image.set_form_variant(floppy_image::FF_35, floppy_image::DSDD);
 		break;
 	case 3:
-		image->set_form_variant(floppy_image::FF_35, floppy_image::DSHD);
+		image.set_form_variant(floppy_image::FF_35, floppy_image::DSHD);
 		break;
 	default:
 		return false;
@@ -579,13 +579,13 @@ bool moof_format::load(util::random_read &io, uint32_t form_factor, const std::v
 	return true;
 }
 
-bool moof_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool moof_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
 {
 	std::vector<tdata> tracks(160);
 	bool twosided = false;
 	bool is_hd = false;
 
-	if(image->get_variant() == floppy_image::DSHD) {
+	if(image.get_variant() == floppy_image::DSHD) {
 		twosided = true;
 		is_hd = true;
 		for(unsigned int i=0; i != 160; i++)

@@ -91,10 +91,7 @@
 #include "bus/pc_kbd/keyboards.h"
 
 #include "imagedev/floppy.h"
-#include "formats/pc_dsk.h"
 #include "softlist.h"
-
-#include "debugger.h"
 
 #include "jazz.lh"
 
@@ -229,8 +226,8 @@ void jazz_state::mct_map(address_map &map)
 	// LE: only reads 4000
 	// BE: read 400d, write 400d, write 400c
 	map(0x80004000, 0x8000400f).lrw8(
-			NAME([this] (offs_t offset) { return m_rtc->read(1); }),
-			NAME([this] (offs_t offset, u8 data) { m_rtc->write(1, data); }));
+			NAME([this] (offs_t offset) { return m_rtc->data_r(); }),
+			NAME([this] (offs_t offset, u8 data) { m_rtc->data_w(data); }));
 	map(0x80005000, 0x80005000).rw(m_kbdc, FUNC(ps2_keyboard_controller_device::data_r), FUNC(ps2_keyboard_controller_device::data_w));
 	map(0x80005001, 0x80005001).rw(m_kbdc, FUNC(ps2_keyboard_controller_device::status_r), FUNC(ps2_keyboard_controller_device::command_w));
 	map(0x80006000, 0x80006007).rw(m_ace[0], FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
@@ -415,7 +412,7 @@ void jazz_state::jazz(machine_config &config)
 	m_net->set_bus(m_mct_adr, 1);
 
 	I82357(config, m_isp, 14.318181_MHz_XTAL);
-	m_isp->out_rtc_cb().set(m_rtc, FUNC(mc146818_device::write));
+	m_isp->out_rtc_address_cb().set(m_rtc, FUNC(mc146818_device::address_w));
 	m_isp->out_int_cb().set_inputline(m_cpu, INPUT_LINE_IRQ2);
 	m_isp->out_nmi_cb().set_inputline(m_cpu, INPUT_LINE_IRQ3);
 	m_isp->out_spkr_cb().set(m_buzzer, FUNC(speaker_sound_device::level_w));

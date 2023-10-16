@@ -33,6 +33,8 @@
 #include "emu.h"
 #include "floppyone.h"
 
+#include "formats/fl1_dsk.h"
+
 
 /***************************************************************************
     DEVICE DEFINITIONS

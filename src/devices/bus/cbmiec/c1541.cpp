@@ -139,6 +139,8 @@
 
 #include "bus/centronics/ctronics.h"
 
+#include "formats/d64_dsk.h"
+#include "formats/g64_dsk.h"
 #include "formats/fs_cbmdos.h"
 
 

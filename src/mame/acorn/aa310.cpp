@@ -143,7 +143,6 @@
 #include "formats/acorn_dsk.h"
 #include "formats/apd_dsk.h"
 #include "formats/jfd_dsk.h"
-#include "formats/pc_dsk.h"
 #include "formats/st_dsk.h"
 #include "screen.h"
 #include "softlist.h"

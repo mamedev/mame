@@ -782,7 +782,6 @@ void savquest_state::savquest_map(address_map &map)
 void savquest_state::savquest_io(address_map &map)
 {
 	pcat32_io_common(map);
-	map(0x0070, 0x007f).rw(m_mc146818, FUNC(ds12885_device::read), FUNC(ds12885_device::write));
 
 	map(0x00e8, 0x00ef).noprw();
 

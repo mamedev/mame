@@ -2,13 +2,14 @@
 // copyright-holders:R. Belmont
 /***************************************************************************
 
-    NuBus, SE/30 PDS, and LC PDS slot cards
+    NuBus, SE/30 PDS, and LC slot cards
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "cards.h"
 
+#include "8lc.h"
 #include "bootbug.h"
 #include "laserview.h"
 #include "nubus_48gc.h"
@@ -63,6 +64,13 @@ void mac_pds030_cards(device_slot_interface &device)
 void mac_pdslc_cards(device_slot_interface &device)
 {
 	device.option_add("macconilc", PDSLC_MACCONILC);    // Asante MacCON i LC Ethernet card
+}
+
+// cards for the LC PDS slot that only work in the original LC
+void mac_pdslc_orig_cards(device_slot_interface &device)
+{
+	device.option_add("macconilc", PDSLC_MACCONILC);    // Asante MacCON i LC Ethernet card
+	device.option_add("ro8lc", PDSLC_COLORVUE8LC);      // RasterOps ColorVue 8LC
 }
 
 // IIsi can take either one SE/30 PDS or one NuBus card

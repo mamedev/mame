@@ -26,7 +26,7 @@ BTANB:
 Hardware notes:
 
 V(Verkauf?) home version:
-- 68030 @ 36MHz (not sure about type, big heatsink in the way)
+- XC68030RC33B @ 36MHz
 - 256KB SRAM (8*TC55465P-25), 128KB or 256KB ROM
 - 2MB DRAM (16*TC514256AP-70)
 - 8KB battery-backed SRAM (TC5565PL-15)

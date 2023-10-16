@@ -18,8 +18,7 @@ public:
 	hotstuff_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_bitmapram(*this, "bitmapram"),
-		m_maincpu(*this, "maincpu"),
-		m_rtc(*this, "rtc")
+		m_maincpu(*this, "maincpu")
 	{ }
 
 	void hotstuff(machine_config &config);
@@ -29,7 +28,6 @@ private:
 	virtual void video_start() override;
 	uint32_t screen_update_hotstuff(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
-	required_device<mc146818_device> m_rtc;
 	void hotstuff_map(address_map &map);
 };
 
@@ -87,9 +85,8 @@ void hotstuff_state::hotstuff_map(address_map &map)
 
 	map(0x600000, 0x600003).rw("scc1", FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w));
 	map(0x620000, 0x620003).rw("scc2", FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w));
-	map(0x680000, 0x680001).lrw8(
-			NAME([this] (offs_t offset) { return m_rtc->read(offset^1); }),
-			NAME([this] (offs_t offset, u8 data) { m_rtc->write(offset^1, data); }));
+	map(0x680000, 0x680000).rw("rtc", FUNC(mc146818_device::data_r), FUNC(mc146818_device::data_w));
+	map(0x680001, 0x680001).w("rtc", FUNC(mc146818_device::address_w));
 
 	map(0x980000, 0x9bffff).ram().share("bitmapram");
 }
@@ -111,14 +108,14 @@ void hotstuff_state::hotstuff(machine_config &config)
 
 	PALETTE(config, "palette").set_entries(0x200);
 
-	scc8530_device& scc1(SCC8530N(config, "scc1", 4915200));
+	scc8530_device &scc1(SCC8530N(config, "scc1", 4915200));
 	scc1.out_int_callback().set_inputline(m_maincpu, M68K_IRQ_4);
 
-	scc8530_device& scc2(SCC8530N(config, "scc2", 4915200));
+	scc8530_device &scc2(SCC8530N(config, "scc2", 4915200));
 	scc2.out_int_callback().set_inputline(m_maincpu, M68K_IRQ_5);
 
-	MC146818(config, m_rtc, XTAL(32'768));
-	m_rtc->irq().set_inputline("maincpu", M68K_IRQ_1);
+	mc146818_device &rtc(MC146818(config, "rtc", XTAL(32'768)));
+	rtc.irq().set_inputline("maincpu", M68K_IRQ_1);
 }
 
 

@@ -514,9 +514,7 @@ uint8_t octopus_state::rtc_r()
 	uint8_t ret = 0xff;
 
 	if(m_rtc_data)
-		ret = m_rtc->read(1);
-	else if(m_rtc_address)
-		ret = m_rtc->read(0);
+		ret = m_rtc->data_r();
 
 	return ret;
 }
@@ -524,9 +522,9 @@ uint8_t octopus_state::rtc_r()
 void octopus_state::rtc_w(uint8_t data)
 {
 	if(m_rtc_data)
-		m_rtc->write(1,data);
+		m_rtc->data_w(data);
 	else if(m_rtc_address)
-		m_rtc->write(0,data);
+		m_rtc->address_w(data);
 }
 
 // RTC/FDC control - PPI port B
@@ -939,7 +937,7 @@ void octopus_state::octopus(machine_config &config)
 	m_pic2->in_sp_callback().set_constant(0);
 
 	// RTC (MC146818 via i8255 PPI)
-	I8255(config, m_ppi, 0);
+	I8255(config, m_ppi);
 	m_ppi->in_pa_callback().set(FUNC(octopus_state::rtc_r));
 	m_ppi->in_pb_callback().set(FUNC(octopus_state::cntl_r));
 	m_ppi->in_pc_callback().set(FUNC(octopus_state::gpo_r));

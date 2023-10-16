@@ -10,12 +10,10 @@
 #define MAME_BUS_SPECTRUM_FLPONE_H
 
 #include "exp.h"
-#include "softlist.h"
 #include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
-#include "formats/fl1_dsk.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

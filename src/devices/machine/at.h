@@ -28,7 +28,7 @@ public:
 	void kbd_data_w(int state);
 	uint8_t portb_r();
 	void portb_w(uint8_t data);
-	void write_rtc(offs_t offset, uint8_t data);
+	void rtcas_nmi_w(uint8_t data);
 	void iochck_w(int state);
 
 	void shutdown(int state);

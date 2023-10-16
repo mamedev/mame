@@ -377,7 +377,7 @@ FLOPPY_CONSTRUCT(d88_dsk_construct)
 // copyright-holders:Olivier Galibert
 /*********************************************************************
 
-    formats/d88_dsk.h
+    formats/d88_dsk.cpp
 
     D88 disk images
 
@@ -389,17 +389,17 @@ d88_format::d88_format()
 {
 }
 
-const char *d88_format::name() const
+const char *d88_format::name() const noexcept
 {
 	return "d88";
 }
 
-const char *d88_format::description() const
+const char *d88_format::description() const noexcept
 {
 	return "D88 disk image";
 }
 
-const char *d88_format::extensions() const
+const char *d88_format::extensions() const noexcept
 {
 	return "d77,d88,1dd";
 }
@@ -420,7 +420,7 @@ int d88_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	return 0;
 }
 
-bool d88_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool d88_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	size_t actual;
 
@@ -435,35 +435,35 @@ bool d88_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		cell_count = 100000;
 		track_count = 42;
 		head_count = 2;
-		image->set_variant(floppy_image::DSDD);
+		image.set_variant(floppy_image::DSDD);
 		break;
 
 	case 0x10:
 		cell_count = 100000;
 		track_count = 82;
 		head_count = 2;
-		image->set_variant(floppy_image::DSQD);
+		image.set_variant(floppy_image::DSQD);
 		break;
 
 	case 0x20:
 		cell_count = form_factor == floppy_image::FF_35 ? 200000 : 166666;
 		track_count = 82;
 		head_count = 2;
-		image->set_variant(floppy_image::DSHD);
+		image.set_variant(floppy_image::DSHD);
 		break;
 
 	case 0x30:
 		cell_count = 100000;
 		track_count = 42;
 		head_count = 1;
-		image->set_variant(floppy_image::SSDD);
+		image.set_variant(floppy_image::SSDD);
 		break;
 
 	case 0x40:
 		cell_count = 100000;
 		track_count = 82;
 		head_count = 1;
-		image->set_variant(floppy_image::SSQD);
+		image.set_variant(floppy_image::SSQD);
 		break;
 	}
 
@@ -537,7 +537,7 @@ bool d88_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	return true;
 }
 
-bool d88_format::supports_save() const
+bool d88_format::supports_save() const noexcept
 {
 	return false;
 }

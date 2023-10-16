@@ -44,6 +44,9 @@ Q6,Q7: LEDs common anode
 The keypad is read through a 74HC251, where S0,1,2 is from CPU A0,1,2, Y is connected to CPU D7.
 If control Q4 is set, printer data can be read from I0.
 
+Similar to EAS, the new game command for SC12 is: RE -> A6 (or A8) -> CL.
+The newer model 6086 does not have this issue.
+
 TODO:
 - is SE12 program the same as SC12? just a faster CPU, and probably /4 divider?
 

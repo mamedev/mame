@@ -9,7 +9,6 @@
 #include "emu.h"
 #include "fdc.h"
 #include "machine/busmouse.h"
-#include "formats/pc_dsk.h"
 #include "formats/naslite_dsk.h"
 #include "formats/ibmxdf_dsk.h"
 

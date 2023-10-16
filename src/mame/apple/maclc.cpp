@@ -366,7 +366,6 @@ void maclc_state::maclc_base(machine_config &config)
 	// V8 supports interrupts for slots $C, $D, and $E, but the LC, LC II, and Color Classic
 	// only hook the slot $E IRQ up to the PDS slot.
 	nubus.out_irqe_callback().set(m_v8, FUNC(v8_device::slot_irq_w<0x20>));
-	NUBUS_SLOT(config, "lcpds", "pds", mac_pdslc_cards, nullptr);
 
 	MACADB(config, m_macadb, C15M);
 
@@ -396,6 +395,8 @@ void maclc_state::maclc(machine_config &config)
 {
 	maclc_base(config);
 
+	NUBUS_SLOT(config, "lcpds", "pds", mac_pdslc_orig_cards, nullptr);
+
 	m_ram->set_default_size("2M");
 	m_ram->set_extra_options("4M,6M,10M");
 	m_v8->set_baseram_is_4M(false);
@@ -404,6 +405,8 @@ void maclc_state::maclc(machine_config &config)
 void maclc_state::maclc2(machine_config &config)
 {
 	maclc_base(config);
+
+	NUBUS_SLOT(config, "lcpds", "pds", mac_pdslc_cards, nullptr);
 
 	M68030(config.replace(), m_maincpu, C15M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &maclc_state::maclc_map);
@@ -445,6 +448,8 @@ void maclc_state::maccclas(machine_config &config)
 	m_v8->pb5_callback().set(m_cuda, FUNC(cuda_device::set_tip));
 	m_v8->cb2_callback().set(m_cuda, FUNC(cuda_device::set_via_data));
 
+	NUBUS_SLOT(config, "lcpds", "pds", mac_pdslc_cards, nullptr);
+
 	m_ram->set_default_size("4M");
 	m_ram->set_extra_options("6M,8M,10M");
 	m_v8->set_baseram_is_4M(true);
@@ -470,7 +475,6 @@ void maclc_state::macclas2(machine_config &config)
 	m_v8->cb2_callback().set(m_egret, FUNC(egret_device::set_via_data));
 
 	// Classic II doesn't have an LC PDS slot (and its ROM has the Slot Manager disabled)
-	config.device_remove("lcpds");
 	config.device_remove("pds");
 
 	m_ram->set_default_size("4M");

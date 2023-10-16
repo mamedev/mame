@@ -194,7 +194,7 @@ keyboard microcontroller ROM as follows:
   called **mackbd_m0110a_f.zip**, or a 7-Zip archive called
   **mackbd_m0110a_f.7z**.
 * The parent ROM device is the U.S. Macintosh Plus keyboard with integrated
-  numeric keypad, whcih has the short name ``mackbd_m0110a``, so MAME will look
+  numeric keypad, which has the short name ``mackbd_m0110a``, so MAME will look
   for a folder called **mackbd_m0110a**, a PKZIP archive called
   **mackbd_m0110a.zip**, or a 7-Zip archive called **mackbd_m0110a.7z**.
 * The short name of the Unitron 1024 system is ``utrn1024``, so MAME will look

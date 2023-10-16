@@ -41,6 +41,9 @@ Mach IV has 2*256KB DRAM, and a daughterboard(510.1123B01) for the 68020 + 32KB 
 
 I/O is via TTL, overall very similar to EAG.
 
+Holding NEW GAME does a quick self-test, on Mach III and Mach IV it will also
+display a ROM checksum.
+
 fex68km4 continuously tests RAM at boot and displays "512", this is normal.
 To start, hold New Game or Clear.
 
@@ -144,8 +147,8 @@ The ROM dump came from the V11(see below). Built-in factory test proves
 that this program is a V10. Hold TB button immediately after power-on and
 press it for a sequence of tests:
 1) all LEDs on
-2) F40C: V10 program version
-3) 38b9: V10 ROM checksum
+2) F40C: V10 ROM checksum 1
+3) 38b9: V10 ROM checksum 2
 4) xxxx: external module ROM checksum (0000 if no module present)
 5) xxxx: user settings (stored in EEPROM)
 6) xxxx: "
@@ -911,20 +914,20 @@ ROM_START( fex68km4 ) // model 6110, PCB label 510.1120B01 - checksum FD96
 ROM_END
 
 
-ROM_START( feagv4 ) // dumped from a V3
+ROM_START( feagv4 ) // dumped from a V3 - checksum F66D 4B3E
 	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("elite_1.6_e.u22", 0x00000, 0x10000, CRC(c8b89ccc) SHA1(d62e0a72f54b793ab8853468a81255b62f874658) )
 	ROM_LOAD16_BYTE("elite_1.6_o.u19", 0x00001, 0x10000, CRC(904c7061) SHA1(742110576cf673321440bc81a4dae4c949b49e38) )
 ROM_END
 
-ROM_START( feagv4a ) // dumped from a V2
+ROM_START( feagv4a ) // dumped from a V2 - checksum FD5C 49AC
 	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("6114_e5_yellow.u22", 0x00000, 0x10000, CRC(f9c7bada) SHA1(60e545f829121b9a4f1100d9e85ac83797715e80) ) // 27c512
 	ROM_LOAD16_BYTE("6114_o5_green.u19",  0x00001, 0x10000, CRC(04f97b22) SHA1(8b2845dd115498f7b385e8948eca6a5893c223d1) ) // "
 ROM_END
 
 ROM_START( feagv5 )
-	ROM_REGION16_BE( 0x20000, "maincpu", 0 ) // PCB label 510.1136A01
+	ROM_REGION16_BE( 0x20000, "maincpu", 0 ) // PCB label 510.1136A01 - checksum 0140 9CF2
 	ROM_LOAD16_BYTE("master_e", 0x00000, 0x10000, CRC(e424bddc) SHA1(ff03656addfe5c47f06df2efb4602f43a9e19d96) )
 	ROM_LOAD16_BYTE("master_o", 0x00001, 0x10000, CRC(33a00894) SHA1(849460332b1ac10d452ca3631eb99f5597511b73) )
 
@@ -933,31 +936,31 @@ ROM_START( feagv5 )
 	ROM_LOAD16_BYTE("slave_o", 0x00001, 0x08000, CRC(35fe2fdf) SHA1(731da12ee290bad9bc03cffe281c8cc48e555dfb) )
 ROM_END
 
-ROM_START( feagv7 ) // dumped from a repro pcb
+ROM_START( feagv7 ) // dumped from a repro pcb - checksum FCA0 6969
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("eag-v7b", 0x00000, 0x10000, CRC(f2f68b63) SHA1(621e5073e9c5083ac9a9b467f3ef8aa29beac5ac) )
 	ROM_LOAD16_BYTE("eag-v7a", 0x00001, 0x10000, CRC(506b688f) SHA1(0a091c35d0f01166b57f964b111cde51c5720d58) )
 ROM_END
 
-ROM_START( feagv7a ) // PCB label 510.1136A01, dumped from a V6
+ROM_START( feagv7a ) // PCB label 510.1136A01, dumped from a V6 - checksum 005D 6AB7
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("e1_yellow.u22", 0x00000, 0x10000, CRC(2fa692a9) SHA1(357fd47e97f823462e372c7b4d0730c1fa35c364) )
 	ROM_LOAD16_BYTE("o1_red.u19",    0x00001, 0x10000, CRC(bceb99f0) SHA1(601869be5fb9724fe75f14d4dac58471eed6e0f4) )
 ROM_END
 
-ROM_START( feagv7b )
+ROM_START( feagv7b ) // checksum 00D5 6939
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("e1_yellow.u22", 0x00000, 0x10000, CRC(44baefbf) SHA1(dbc24340d7e3013cc8f111ebb2a59169c5dcb8e8) )
 	ROM_LOAD16_BYTE("o1_red.u19",    0x00001, 0x10000, CRC(951a7857) SHA1(dad21b049fd4f411a79d4faefb922c1277569c0e) )
 ROM_END
 
-ROM_START( feagv9 )
+ROM_START( feagv9 ) // checksum F702 6893
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("eag-v9b", 0x00000, 0x10000, CRC(60523199) SHA1(a308eb6b782732af1ab2fd0ed8b046de7a8dd24b) )
 	ROM_LOAD16_BYTE("eag-v9a", 0x00001, 0x10000, CRC(255c63c0) SHA1(8aa0397bdb3731002f5b066cd04ec62531267e22) )
 ROM_END
 
-ROM_START( feagv10 )
+ROM_START( feagv10 ) // checksum F40C 38B9
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD32_BYTE("16", 0x00000, 0x08000, CRC(8375d61f) SHA1(e042f6f01480c59ee09a458cf34f135664479824) ) // 27c256
 	ROM_LOAD32_BYTE("17", 0x00001, 0x08000, CRC(bfd14916) SHA1(115af6dfd29ddd8ad6d2ce390f8ecc4d60de6fce) ) // "
@@ -965,7 +968,7 @@ ROM_START( feagv10 )
 	ROM_LOAD32_BYTE("19", 0x00003, 0x08000, CRC(a70c5468) SHA1(7f6b4f46577d5cfdaa84d387c7ce35d941e5bbc7) ) // "
 ROM_END
 
-ROM_START( feagv11 )
+ROM_START( feagv11 ) // checksum F40C 38B9
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD32_BYTE("16", 0x00000, 0x08000, CRC(8375d61f) SHA1(e042f6f01480c59ee09a458cf34f135664479824) ) // 27c256
 	ROM_LOAD32_BYTE("17", 0x00001, 0x08000, CRC(bfd14916) SHA1(115af6dfd29ddd8ad6d2ce390f8ecc4d60de6fce) ) // "
@@ -973,7 +976,7 @@ ROM_START( feagv11 )
 	ROM_LOAD32_BYTE("19", 0x00003, 0x08000, CRC(a70c5468) SHA1(7f6b4f46577d5cfdaa84d387c7ce35d941e5bbc7) ) // "
 ROM_END
 
-ROM_START( premiere ) // model 6131, PCB label 510.1157A01
+ROM_START( premiere ) // model 6131, PCB label 510.1157A01 - checksum (2265 only) F667 4B06
 	ROM_REGION16_BE( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("101.1103a01_1meg_even.u22", 0x00000, 0x20000, CRC(0df2d4d8) SHA1(2c6cd8d83768d14aeb9860be76ed2ec0f64f118b) ) // M27C1001
 	ROM_LOAD16_BYTE("101.1104a01_1meg_odd.u19",  0x00001, 0x20000, CRC(afae9d5e) SHA1(7ab5fb8b8a2fa30f2fd444a050eae2432c9236d0) ) // "

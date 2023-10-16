@@ -2,7 +2,7 @@
 // copyright-holders:O. Galibert, R. Belmont
 /*********************************************************************
 
-    ap_dsk35.c
+    ap_dsk35.cpp
 
     Apple 3.5" disk images
 
@@ -115,22 +115,22 @@ dc42_format::dc42_format() : floppy_image_format_t()
 {
 }
 
-const char *dc42_format::name() const
+const char *dc42_format::name() const noexcept
 {
 	return "dc42";
 }
 
-const char *dc42_format::description() const
+const char *dc42_format::description() const noexcept
 {
 	return "DiskCopy 4.2 image";
 }
 
-const char *dc42_format::extensions() const
+const char *dc42_format::extensions() const noexcept
 {
 	return "dc42";
 }
 
-bool dc42_format::supports_save() const
+bool dc42_format::supports_save() const noexcept
 {
 	return true;
 }
@@ -158,7 +158,7 @@ int dc42_format::identify(util::random_read &io, uint32_t form_factor, const std
 	return (size == 0x54+tsize+dsize && h[0] < 64 && h[0x52] == 1 && h[0x53] == 0) ? FIFID_STRUCT : 0;
 }
 
-bool dc42_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool dc42_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	size_t actual;
 	uint8_t h[0x54];
@@ -176,20 +176,20 @@ bool dc42_format::load(util::random_read &io, uint32_t form_factor, const std::v
 
 	switch(dsize) {
 		case 409600:    // Mac 400K
-			image->set_form_variant(floppy_image::FF_35, floppy_image::SSDD);
+			image.set_form_variant(floppy_image::FF_35, floppy_image::SSDD);
 			break;
 
 		case 737280:    // PC 720K
 		case 819200:    // Mac/A2 800K
-			image->set_form_variant(floppy_image::FF_35, floppy_image::DSDD);
+			image.set_form_variant(floppy_image::FF_35, floppy_image::DSDD);
 			break;
 
 		case 1474560:   // PC or Mac 1.44M
-			image->set_form_variant(floppy_image::FF_35, floppy_image::DSHD);
+			image.set_form_variant(floppy_image::FF_35, floppy_image::DSHD);
 			break;
 
 		case 871424:    // Apple Twiggy 851KiB
-			image->set_form_variant(floppy_image::FF_525, floppy_image::DSHD);
+			image.set_form_variant(floppy_image::FF_525, floppy_image::DSHD);
 			break;
 
 		default:
@@ -245,10 +245,10 @@ void dc42_format::update_chk(const uint8_t *data, int size, uint32_t &chk)
 	}
 }
 
-bool dc42_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool dc42_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
 {
 	int g_tracks, g_heads;
-	image->get_actual_geometry(g_tracks, g_heads);
+	image.get_actual_geometry(g_tracks, g_heads);
 
 	if(g_heads == 0)
 		g_heads = 1;
@@ -312,22 +312,22 @@ apple_gcr_format::apple_gcr_format() : floppy_image_format_t()
 {
 }
 
-const char *apple_gcr_format::name() const
+const char *apple_gcr_format::name() const noexcept
 {
 	return "apple_gcr";
 }
 
-const char *apple_gcr_format::description() const
+const char *apple_gcr_format::description() const noexcept
 {
 	return "Apple GCR 400/800K raw sector image";
 }
 
-const char *apple_gcr_format::extensions() const
+const char *apple_gcr_format::extensions() const noexcept
 {
 	return "img";
 }
 
-bool apple_gcr_format::supports_save() const
+bool apple_gcr_format::supports_save() const noexcept
 {
 	return true;
 }
@@ -344,7 +344,7 @@ int apple_gcr_format::identify(util::random_read &io, uint32_t form_factor, cons
 	return 0;
 }
 
-bool apple_gcr_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool apple_gcr_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	size_t actual;
 	desc_gcr_sector sectors[12];
@@ -360,7 +360,7 @@ bool apple_gcr_format::load(util::random_read &io, uint32_t form_factor, const s
 		return false;
 	int head_count = size == 409600 ? 1 : size == 819200 ? 2 : 0;
 
-	image->set_form_variant(floppy_image::FF_35, head_count == 2 ? floppy_image::DSDD : floppy_image::SSDD);
+	image.set_form_variant(floppy_image::FF_35, head_count == 2 ? floppy_image::DSDD : floppy_image::SSDD);
 
 	if(!head_count)
 		return false;
@@ -388,10 +388,10 @@ bool apple_gcr_format::load(util::random_read &io, uint32_t form_factor, const s
 	return true;
 }
 
-bool apple_gcr_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool apple_gcr_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
 {
 	int g_tracks, g_heads;
-	image->get_actual_geometry(g_tracks, g_heads);
+	image.get_actual_geometry(g_tracks, g_heads);
 
 	if(g_heads == 0)
 		g_heads = 1;
@@ -421,22 +421,22 @@ apple_2mg_format::apple_2mg_format() : floppy_image_format_t()
 {
 }
 
-const char *apple_2mg_format::name() const
+const char *apple_2mg_format::name() const noexcept
 {
 	return "apple_2mg";
 }
 
-const char *apple_2mg_format::description() const
+const char *apple_2mg_format::description() const noexcept
 {
 	return "Apple II .2MG image";
 }
 
-const char *apple_2mg_format::extensions() const
+const char *apple_2mg_format::extensions() const noexcept
 {
 	return "2mg";
 }
 
-bool apple_2mg_format::supports_save() const
+bool apple_2mg_format::supports_save() const noexcept
 {
 	return true;
 }
@@ -460,7 +460,7 @@ int apple_2mg_format::identify(util::random_read &io, uint32_t form_factor, cons
 	return 0;
 }
 
-bool apple_2mg_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool apple_2mg_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	size_t actual;
 	desc_gcr_sector sectors[12];
@@ -472,7 +472,7 @@ bool apple_2mg_format::load(util::random_read &io, uint32_t form_factor, const s
 	if(blocks != 1600 && blocks != 16390)
 		return false;
 
-	image->set_form_variant(floppy_image::FF_35, (blocks > 800) ? floppy_image::DSDD : floppy_image::SSDD);
+	image.set_form_variant(floppy_image::FF_35, (blocks > 800) ? floppy_image::DSDD : floppy_image::SSDD);
 
 	for(int track=0; track < 80; track++) {
 		for(int head=0; head < 2; head++) {
@@ -498,7 +498,7 @@ bool apple_2mg_format::load(util::random_read &io, uint32_t form_factor, const s
 	return true;
 }
 
-bool apple_2mg_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool apple_2mg_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
 {
 	size_t actual;
 

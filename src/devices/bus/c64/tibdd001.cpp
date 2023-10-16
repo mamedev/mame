@@ -31,6 +31,8 @@ Notes: (All ICs shown)
 #include "emu.h"
 #include "tibdd001.h"
 
+#include "formats/tibdd001_dsk.h"
+
 
 
 //**************************************************************************

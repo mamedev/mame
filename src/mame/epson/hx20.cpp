@@ -538,7 +538,7 @@ void hx20_state::hx20_mem(address_map &map)
 	map(0x002a, 0x002a).w(FUNC(hx20_state::lcd_data_w));
 	map(0x002c, 0x002c); // mask interruption by using IC 8E in sleep mode
 	map(0x0030, 0x0033); // switch memory banks (expansion unit)
-	map(0x0040, 0x007f).rw(m_rtc, FUNC(mc146818_device::read), FUNC(mc146818_device::write));
+	map(0x0040, 0x007f).rw(m_rtc, FUNC(mc146818_device::read_direct), FUNC(mc146818_device::write_direct));
 	map(0x0080, 0x00ff).ram();
 	map(0x0100, 0x3fff).ram();
 	map(0x6000, 0x7fff).rom().r(FUNC(hx20_state::optrom_r));
