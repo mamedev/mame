@@ -3,7 +3,7 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="gjrstar" description="VTech Genius Junior Redstar (and clones) cartridges">
+<softwarelist name="gjrstar" description="VTech Genius Junior Redstar cartridges">
 
 	<!-- According to the boxart, this is compatible with: Junior Redstar/Redstar 2/Redstar 3 -->
 	<software name="wortspie">
@@ -23,8 +23,8 @@ license:CC0-1.0
 	<software name="matematika">
 		<description>Matematika - Podarok Pervoklassniku</description> <!-- Mathematics - Gift for a First Grader -->
 		<year>????</year>
-		<publisher>Video Technology / DjiNo</publisher> <!-- VTech / ДжиНо -->
-		<info name="serial" value="80-10126-04" /> <!-- Nº 4 -->
+		<publisher>Video Technology / DzhiNo</publisher> <!-- VTech / ДжиНо -->
+		<info name="serial" value="80-10126-04" /> <!-- № 4 -->
 		<info name="alt_title" value="Математика - Подарок Первокласснику"/>
 		<part name="rom" interface="genius_rom">
 			<dataarea name="rom" size="0x10000">
@@ -36,8 +36,8 @@ license:CC0-1.0
 	<software name="nazagadki">
 		<description>Narodnyye Zagadki</description> <!-- Folk Riddles -->
 		<year>????</year>
-		<publisher>Video Technology / DjiNo</publisher> <!-- VTech / ДжиНо -->
-		<info name="serial" value="80-10126-08" /> <!-- Nº 8 -->
+		<publisher>Video Technology / DzhiNo</publisher> <!-- VTech / ДжиНо -->
+		<info name="serial" value="80-10126-08" /> <!-- № 8 -->
 		<info name="alt_title" value="Народные Загадки"/>
 		<part name="rom" interface="genius_rom">
 			<dataarea name="rom" size="0x10000">
@@ -47,11 +47,11 @@ license:CC0-1.0
 	</software>
 
 	<software name="poiskakhds">
-		<description>B Poiskakh Dukhovnykh Sokrovishch</description> <!-- In Search of Spiritual Treasures -->
+		<description>V Poiskakh Dukhovnykh Sokrovishch</description> <!-- In Search of Spiritual Treasures -->
 		<year>????</year>
-		<publisher>Video Technology / DjiNo</publisher> <!-- VTech / ДжиНо -->
-		<info name="serial" value="80-10126-14" /> <!-- Nº 14 -->
-		<info name="alt_title" value="B Поисках Духовных Сокровищ"/>
+		<publisher>Video Technology / DzhiNo</publisher> <!-- VTech / ДжиНо -->
+		<info name="serial" value="80-10126-14" /> <!-- № 14 -->
+		<info name="alt_title" value="В Поисках Духовных Сокровищ"/>
 		<part name="rom" interface="genius_rom">
 			<dataarea name="rom" size="0x10000">
 				<rom name="80-10126-14.bin" size="0x10000" crc="87e0ba37" sha1="902d1417d1fcc26216b35d18c685bbcf5b65b96c"/> <!-- 27C512 inside the cart -->
