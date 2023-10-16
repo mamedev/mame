@@ -17,6 +17,7 @@
 #include "pcshare.h"
 
 #include "cpu/i86/i286.h"
+#include "machine/pckeybrd.h"
 
 /******************
 DMA8237 Controller
@@ -131,13 +132,14 @@ void pcat_base_state::pcat32_io_common(address_map &map)
 	map(0x0020, 0x003f).rw(m_pic8259_1, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x0040, 0x005f).rw(m_pit8254, FUNC(pit8254_device::read), FUNC(pit8254_device::write));
 	map(0x0060, 0x006f).rw(m_kbdc, FUNC(kbdc8042_device::data_r), FUNC(kbdc8042_device::data_w));
-	map(0x0070, 0x007f).rw(m_mc146818, FUNC(mc146818_device::read), FUNC(mc146818_device::write));
+	map(0x0070, 0x007f).w(m_mc146818, FUNC(mc146818_device::address_w)).umask32(0x00ff00ff);
+	map(0x0070, 0x007f).rw(m_mc146818, FUNC(mc146818_device::data_r), FUNC(mc146818_device::data_w)).umask32(0xff00ff00);
 	map(0x0080, 0x009f).rw(FUNC(pcat_base_state::dma_page_select_r), FUNC(pcat_base_state::dma_page_select_w));//TODO
 	map(0x00a0, 0x00bf).rw(m_pic8259_2, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x00c0, 0x00df).rw(m_dma8237_2, FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask32(0x00ff00ff);
 }
 
-void pcat_base_state::pcat_common(machine_config &config)
+void pcat_base_state::pcat_common_nokeyboard(machine_config &config)
 {
 	PIC8259(config, m_pic8259_1, 0);
 	m_pic8259_1->out_int_callback().set_inputline(m_maincpu, 0);
@@ -175,4 +177,13 @@ void pcat_base_state::pcat_common(machine_config &config)
 	m_kbdc->system_reset_callback().set_inputline(m_maincpu, INPUT_LINE_RESET);
 	m_kbdc->gate_a20_callback().set_inputline(m_maincpu, INPUT_LINE_A20);
 	m_kbdc->input_buffer_full_callback().set(m_pic8259_1, FUNC(pic8259_device::ir1_w));
+}
+
+void pcat_base_state::pcat_common(machine_config &config)
+{
+	pcat_common_nokeyboard(config);
+	m_kbdc->set_keyboard_tag("at_keyboard");
+
+	at_keyboard_device &at_keyb(AT_KEYB(config, "at_keyboard", pc_keyboard_device::KEYBOARD_TYPE::AT, 1));
+	at_keyb.keypress().set(m_kbdc, FUNC(kbdc8042_device::keyboard_w));
 }

@@ -6,7 +6,8 @@
 #define Rn  ((opcode>>8)&15)
 #define Rm  ((opcode>>4)&15)
 
-const char *const sh_disassembler::regname[16] = {
+const char *const sh_disassembler::regname[16] =
+{
 	"R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7",
 	"R8", "R9", "R10","R11","R12","R13","R14",
 	// The old SH2 dasm used 'SP' here, the old SH4 used 'R15'
@@ -17,7 +18,7 @@ const char *const sh_disassembler::regname[16] = {
 uint32_t sh_disassembler::op0000(std::ostream &stream, uint32_t pc, uint16_t opcode)
 {
 	uint32_t  flags = 0;
-	switch(opcode & 0x3f)
+	switch (opcode & 0x3f)
 	{
 	case 0x02:
 		util::stream_format(stream, "STC     SR,%s", regname[Rn]);
@@ -73,7 +74,7 @@ uint32_t sh_disassembler::op0000(std::ostream &stream, uint32_t pc, uint16_t opc
 		flags = STEP_OUT | step_over_extra(1);
 		break;
 	default:
-		switch(opcode & 15)
+		switch (opcode & 15)
 		{
 		case  0:
 			util::stream_format(stream, "??????  $%04X", opcode);
@@ -249,7 +250,7 @@ uint32_t sh_disassembler::op0011(std::ostream &stream, uint32_t pc, uint16_t opc
 uint32_t sh_disassembler::op0100(std::ostream &stream, uint32_t pc, uint16_t opcode)
 {
 	uint32_t flags = 0;
-	switch(opcode & 0x3F)
+	switch (opcode & 0x3F)
 	{
 	case 0x00:
 		util::stream_format(stream, "SHLL    %s", regname[Rn]);
@@ -384,7 +385,7 @@ uint32_t sh_disassembler::op0101(std::ostream &stream, uint32_t pc, uint16_t opc
 uint32_t sh_disassembler::op0110(std::ostream &stream, uint32_t pc, uint16_t opcode)
 
 {
-	switch(opcode & 0xF)
+	switch (opcode & 0xF)
 	{
 	case 0x00:
 		util::stream_format(stream, "MOV.B   @%s,%s", regname[Rm], regname[Rn]);
@@ -446,7 +447,7 @@ uint32_t sh_disassembler::op0111(std::ostream &stream, uint32_t pc, uint16_t opc
 
 uint32_t sh_disassembler::op1000(std::ostream &stream, uint32_t pc, uint16_t opcode)
 {
-	switch((opcode >> 8) & 15)
+	switch ((opcode >> 8) & 15)
 	{
 	case  0:
 		util::stream_format(stream, "MOV.B   R0,@($%02X,%s)", (opcode & 15), regname[Rm]);
@@ -502,7 +503,7 @@ uint32_t sh_disassembler::op1011(std::ostream &stream, uint32_t pc, uint16_t opc
 uint32_t sh_disassembler::op1100(std::ostream &stream, uint32_t pc, uint16_t opcode)
 {
 	uint32_t flags = 0;
-	switch((opcode >> 8) & 15)
+	switch ((opcode >> 8) & 15)
 	{
 	case  0:
 		util::stream_format(stream, "MOV.B   R0,@($%02X,GBR)", opcode & 0xff);
@@ -589,7 +590,8 @@ uint32_t sh_disassembler::op0000_sh34(std::ostream &stream, uint32_t pc, uint16_
 		util::stream_format(stream, "??????  $%04X", opcode);
 		break;
 	case 0x2:
-		if (opcode & 0x80) {
+		if (opcode & 0x80)
+		{
 			util::stream_format(stream, "STC     %s_BANK,%s", regname[(Rm) & 7], regname[Rn]);
 			return flags;
 		}
@@ -794,7 +796,8 @@ uint32_t sh_disassembler::op0100_sh34(std::ostream &stream, uint32_t pc, uint16_
 		}
 		break;
 	case 0x3:
-		if (opcode & 0x80) {
+		if (opcode & 0x80)
+		{
 			util::stream_format(stream, "STC.L   %s_BANK,@-%s", regname[(Rm) & 7],regname[Rn]);
 			return flags;
 		}
@@ -866,7 +869,8 @@ uint32_t sh_disassembler::op0100_sh34(std::ostream &stream, uint32_t pc, uint16_
 		}
 		break;
 	case 0x7:
-		if (opcode & 0x80) {
+		if (opcode & 0x80)
+		{
 			util::stream_format(stream, "LDC.L   @%s+,%s_BANK", regname[Rn],regname[(Rm) & 7]);
 			return flags;
 		}
@@ -962,7 +966,8 @@ uint32_t sh_disassembler::op0100_sh34(std::ostream &stream, uint32_t pc, uint16_
 		util::stream_format(stream, "SHLD    %s,%s", regname[Rm], regname[Rn]);
 			break;
 	case 0xE:
-		if (opcode & 0x80) {
+		if (opcode & 0x80)
+		{
 			util::stream_format(stream, "LDC     %s,%s_BANK", regname[Rn],regname[(Rm) & 7]);
 			return flags;
 		}
@@ -1079,8 +1084,10 @@ uint32_t sh_disassembler::op1111_sh34(std::ostream &stream, uint32_t pc, uint16_
 			util::stream_format(stream, "FIPR    FV%d, FV%d", (Rn & 3) << 2, Rn & 12);
 			break;
 		case 0xF0:
-			if (opcode & 0x100) {
-				if (opcode & 0x200) {
+			if (opcode & 0x100)
+			{
+				if (opcode & 0x200)
+				{
 					switch (opcode & 0xC00)
 					{
 					case 0x000:
@@ -1093,10 +1100,14 @@ uint32_t sh_disassembler::op1111_sh34(std::ostream &stream, uint32_t pc, uint16_
 						util::stream_format(stream, "Funknown $%04X", opcode);
 						break;
 					}
-				} else {
+				}
+				else
+				{
 					util::stream_format(stream, "FTRV    XMTRX, FV%d", Rn & 12);
 				}
-			} else {
+			}
+			else
+			{
 				util::stream_format(stream, "FSCA   FPUL, F%s", regname[Rn & 14]);
 			}
 			break;

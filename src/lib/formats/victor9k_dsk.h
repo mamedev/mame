@@ -30,14 +30,14 @@ public:
 
 	victor9k_format();
 
-	virtual const char *name() const override;
-	virtual const char *description() const override;
-	virtual const char *extensions() const override;
+	virtual const char *name() const noexcept override;
+	virtual const char *description() const noexcept override;
+	virtual const char *extensions() const noexcept override;
 
 	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
-	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const override;
-	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const override;
-	virtual bool supports_save() const override { return true; }
+	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const override;
+	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const override;
+	virtual bool supports_save() const noexcept override { return true; }
 
 	static int get_rpm(int head, int track);
 
@@ -51,13 +51,13 @@ protected:
 
 	static int find_size(util::random_read &io);
 	static int find_size(util::random_read &io, uint32_t form_factor);
-	static int identify(floppy_image *image);
-	static void log_boot_sector(uint8_t *data);
+	static int identify(const floppy_image &image);
+	static void log_boot_sector(const uint8_t *data);
 	static floppy_image_format_t::desc_e* get_sector_desc(const format &f, int &current_size, int sector_count);
 	static void build_sector_description(const format &f, uint8_t *sectdata, uint32_t sect_offs, desc_s *sectors, int sector_count);
 	static int get_image_offset(const format &f, int head, int track);
 	static int compute_track_size(const format &f, int head, int track);
-	static void extract_sectors(floppy_image *image, const format &f, desc_s *sdesc, int track, int head, int sector_count);
+	static void extract_sectors(const floppy_image &image, const format &f, desc_s *sdesc, int track, int head, int sector_count);
 };
 
 extern const victor9k_format FLOPPY_VICTOR_9000_FORMAT;

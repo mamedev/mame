@@ -247,6 +247,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "sound/okim6295.h"
+#include "video/pwm.h"
 
 #include "speaker.h"
 
@@ -258,17 +259,18 @@ namespace {
 class katosmedz80_state : public driver_device
 {
 public:
-	katosmedz80_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	katosmedz80_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_digits(*this, "digit%u", 0U),
+		m_ppi(*this, "ppi%u", 0),
+		m_digits_pwm(*this, "digits_pwm"),
 		m_ledsp2(*this, "p2led%u", 0U),
 		m_ledsp3(*this, "p3led%u", 0U),
 		m_ledsp5(*this, "p5led%u", 0U),
 		m_ledsp6(*this, "p6led%u", 0U),
 		m_ledsp8(*this, "p8led%u", 0U),
 		m_pos(*this, "mpos%u", 0U)
-	{}
+	{ }
 
 	DECLARE_CUSTOM_INPUT_MEMBER(arm_sensors_r);
 	void dnbanban(machine_config &config) ATTR_COLD;
@@ -279,14 +281,14 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	output_finder<4> m_digits;
+	required_device_array<i8255_device, 2> m_ppi;
+	required_device<pwm_display_device> m_digits_pwm;
 	output_finder<8> m_ledsp2;
 	output_finder<8> m_ledsp3;
 	output_finder<8> m_ledsp5;
 	output_finder<8> m_ledsp6;
 	output_finder<8> m_ledsp8;
 	output_finder<4> m_pos;
-
 
 	void program_map(address_map &map);
 	void io_map(address_map &map);
@@ -298,8 +300,9 @@ private:
 	void ppi1_b_w(uint8_t data);
 	void ppi1_c_w(uint8_t data);
 
-	u16 m_var[4];
-	u8 dn, m_sensors, m_pre[4];
+	u16 m_var[4] = { };
+	u8 m_pre[4] = { };
+	u8 m_sensors = 0xff;
 };
 
 
@@ -309,13 +312,18 @@ private:
 
 void katosmedz80_state::machine_start()
 {
-	m_digits.resolve();
+	// resolve handlers
 	m_ledsp2.resolve();
 	m_ledsp3.resolve();
 	m_ledsp5.resolve();
 	m_ledsp6.resolve();
 	m_ledsp8.resolve();
 	m_pos.resolve();
+
+	// register for savestates
+	save_item(NAME(m_var));
+	save_item(NAME(m_pre));
+	save_item(NAME(m_sensors));
 }
 
 void katosmedz80_state::machine_reset()
@@ -345,8 +353,8 @@ void katosmedz80_state::program_map(address_map &map)
 void katosmedz80_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x03).rw("ppi0", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x04, 0x07).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x00, 0x03).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x04, 0x07).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x08, 0x08).w(FUNC(katosmedz80_state::port8_w));
 	map(0x0c, 0x0c).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
@@ -450,7 +458,7 @@ void katosmedz80_state::ppi1_b_w(uint8_t data)
 */
 
 	// show layout (game score - max score)
-	m_digits[dn] = data & 0x7f;
+	m_digits_pwm->write_mx(data & 0x7f);
 
 	// show layout (debug)
 	for(u8 i = 0; i < 8; i++)
@@ -473,9 +481,7 @@ void katosmedz80_state::ppi1_c_w(uint8_t data)
 */
 
 	// Digit Selector for multiplexed 7Seg display
-	for(u8 i = 0; i < 4; i++)
-		if(((data >> i) & 1) == 1)
-			dn = i;
+	m_digits_pwm->write_my(data & 0xf);
 
 	// show layout (debug)
 	for(u8 i = 0; i < 8; i++)
@@ -546,8 +552,8 @@ static INPUT_PORTS_START( dnbanban )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1)    PORT_NAME("Coin In")           // COIN IN (related error E5)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Coin")      // Service COIN (related error E6)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1)     PORT_NAME("Coin In")          // COIN IN (related error E5)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service Coin")     // Service COIN (related error E6)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_GAMBLE_DOOR ) PORT_NAME("Door Switch")  // DOOR (related error E7)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I) PORT_NAME("IN1-8")  // to figure out...
 
@@ -566,24 +572,26 @@ INPUT_PORTS_END
 void katosmedz80_state::dnbanban(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 12_MHz_XTAL / 2);  // guess
+	Z80(config, m_maincpu, 12_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &katosmedz80_state::program_map);
 	m_maincpu->set_addrmap(AS_IO, &katosmedz80_state::io_map);
-	m_maincpu->set_periodic_int(FUNC(katosmedz80_state::irq0_line_hold), attotime::from_hz(60 * 25));  // to verify
+	m_maincpu->set_periodic_int(FUNC(katosmedz80_state::irq0_line_hold), attotime::from_hz(12_MHz_XTAL / 0x2000));  // to verify
 
-	i8255_device &ppi0(I8255(config, "ppi0"));  // D71055C IC10
+	I8255(config, m_ppi[0]);  // D71055C IC10
 	// (00-03) Mode 0 - Ports A set as input, Ports B, high C & low C as output.
-	ppi0.in_pa_callback().set_ioport("IN0");
-	ppi0.out_pb_callback().set(FUNC(katosmedz80_state::ppi0_b_w));
-	ppi0.out_pc_callback().set(FUNC(katosmedz80_state::ppi0_c_w));
+	m_ppi[0]->in_pa_callback().set_ioport("IN0");
+	m_ppi[0]->out_pb_callback().set(FUNC(katosmedz80_state::ppi0_b_w));
+	m_ppi[0]->out_pc_callback().set(FUNC(katosmedz80_state::ppi0_c_w));
 
-	i8255_device &ppi1(I8255(config, "ppi1"));  // D71055C IC5
+	I8255(config, m_ppi[1]);  // D71055C IC5
 	// (04-07) Mode 0 - Ports A set as input, Ports B, high C & low C as output.
-	ppi1.in_pa_callback().set_ioport("IN1");
-	ppi1.out_pb_callback().set(FUNC(katosmedz80_state::ppi1_b_w));
-	ppi1.out_pc_callback().set(FUNC(katosmedz80_state::ppi1_c_w));
+	m_ppi[1]->in_pa_callback().set_ioport("IN1");
+	m_ppi[1]->out_pb_callback().set(FUNC(katosmedz80_state::ppi1_b_w));
+	m_ppi[1]->out_pc_callback().set(FUNC(katosmedz80_state::ppi1_c_w));
 
 	// video
+	PWM_DISPLAY(config, m_digits_pwm).set_size(4, 7);
+	m_digits_pwm->set_segmask(0xf, 0x7f);
 	config.set_default_layout(layout_dnbanban);
 
 	// sound hardware
@@ -604,9 +612,7 @@ ROM_START( dnbanban )
 	ROM_LOAD( "g25_v.ic7", 0x00000, 0x20000, CRC(87c7d45d) SHA1(3f035d5e62fe62111cee978ed1708e902c98526a) )  // MBM27C1000
 ROM_END
 
-}
-
-// anonymous namespace
+} // anonymous namespace
 
 
 /*********************************************
@@ -614,4 +620,4 @@ ROM_END
 *********************************************/
 
 //    YEAR  NAME      PARENT   MACHINE   INPUT     STATE              INIT        ROT    COMPANY            FULLNAME           FLAGS
-GAME( 1993, dnbanban, 0,       dnbanban, dnbanban, katosmedz80_state, empty_init, ROT0, "Kato Seisakusho", "Dora Neco BanBan", MACHINE_MECHANICAL )
+GAME( 1993, dnbanban, 0,       dnbanban, dnbanban, katosmedz80_state, empty_init, ROT0, "Kato Seisakusho", "Dora Neco BanBan", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )

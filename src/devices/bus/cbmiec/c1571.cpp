@@ -22,6 +22,9 @@
 #include "emu.h"
 #include "c1571.h"
 
+#include "formats/d64_dsk.h"
+#include "formats/g64_dsk.h"
+#include "formats/d71_dsk.h"
 
 
 //**************************************************************************

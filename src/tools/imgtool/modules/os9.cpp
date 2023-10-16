@@ -99,17 +99,13 @@ static void pick_string(const void *ptr, size_t offset, size_t length, char *des
 
 
 
-static void place_string(void *ptr, size_t length, const char *s)
+static void place_string(uint8_t *bptr, size_t length, const char *s)
 {
-	size_t i;
-	uint8_t b;
-	uint8_t *bptr = (uint8_t *) ptr;
-
 	bptr[0] = 0x80;
 
-	for (i = 0; s[i] && (i < length); i++)
+	for (size_t i = 0; s[i] && (i < length); i++)
 	{
-		b = ((uint8_t) s[i]) & 0x7F;
+		uint8_t b = ((uint8_t) s[i]) & 0x7F;
 		if (s[i+1] == '\0')
 			b |= 0x80;
 		bptr[i] = b;

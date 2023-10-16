@@ -6,7 +6,6 @@
 
 **********************************************************************/
 
-
 #ifndef MAME_BUS_MTX_EXP_SDX_H
 #define MAME_BUS_MTX_EXP_SDX_H
 
@@ -14,7 +13,6 @@
 #include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 #include "video/mc6845.h"
-#include "formats/mtx_dsk.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -42,10 +40,8 @@ protected:
 
 	required_memory_region m_sdx_rom;
 	required_device<mb8877_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 	required_ioport_array<2> m_dsw;
-	floppy_image_device *m_floppy;
 	uint8_t m_control;
 };
 

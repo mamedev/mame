@@ -33,7 +33,7 @@ public:
 	void sh2_notify_dma_data_available();
 
 protected:
-	sh2_sh7604_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cpu_type,address_map_constructor internal_map, int addrlines);
+	sh2_sh7604_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cpu_type, address_map_constructor internal_map, int addrlines);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -173,7 +173,8 @@ private:
 	uint16_t m_ocra, m_ocrb, m_frc_icr;
 
 	// INTC
-	struct {
+	struct
+	{
 		uint8_t frc;
 		uint8_t sci;
 		uint8_t divu;
@@ -181,7 +182,8 @@ private:
 		uint8_t wdt;
 	} m_irq_level;
 
-	struct {
+	struct
+	{
 		uint8_t fic;
 		uint8_t foc;
 		uint8_t fov;
@@ -203,7 +205,8 @@ private:
 	uint16_t m_wtcw[2];
 
 	// DMAC
-	struct {
+	struct
+	{
 		uint8_t drcr;
 		uint32_t sar;
 		uint32_t dar;
@@ -242,9 +245,9 @@ private:
 	dma_fifo_data_available_delegate m_dma_fifo_data_available_cb;
 	ftcsr_read_delegate              m_ftcsr_read_cb;
 
-	TIMER_CALLBACK_MEMBER( sh2_timer_callback );
-	TIMER_CALLBACK_MEMBER( sh2_wdtimer_callback );
-	TIMER_CALLBACK_MEMBER( sh2_dma_current_active_callback );
+	TIMER_CALLBACK_MEMBER(sh2_timer_callback);
+	TIMER_CALLBACK_MEMBER(sh2_wdtimer_callback);
+	TIMER_CALLBACK_MEMBER(sh2_dma_current_active_callback);
 	void sh2_timer_resync();
 	void sh2_timer_activate();
 	void sh2_wtcnt_recalc();

@@ -2,7 +2,7 @@
 // copyright-holders:Juergen Buchmueller, R. Belmont
 /*****************************************************************************
  *
- *   sh2.c
+ *   sh7604.cpp
  *   Portable Hitachi SH-2 (SH7600 family) emulator
  *
  *  This work is based on <tiraniddo@hotmail.com> C/C++ implementation of
@@ -67,7 +67,7 @@ sh2_sh7604_device::sh2_sh7604_device(const machine_config &mconfig, const char *
 
 	m_irq_level.frc = m_irq_level.sci = m_irq_level.divu = m_irq_level.dmac = m_irq_level.wdt = 0;
 
-	for(int i = 0; i < 2; i++)
+	for (int i = 0; i < 2; i++)
 		m_dmac[i].drcr = m_dmac[i].sar = m_dmac[i].dar = m_dmac[i].tcr = m_dmac[i].chcr = 0;
 }
 
@@ -182,7 +182,7 @@ void sh2_sh7604_device::device_reset()
 	m_frc_base = 0;
 	m_frt_input = 0;
 
-	for ( int i = 0; i < 2; i++ )
+	for (int i = 0; i < 2; i++)
 	{
 		m_dma_timer_active[i] = 0;
 		m_dma_irq[i] = 0;
@@ -308,7 +308,7 @@ void sh2_sh7604_device::sh2_exception(const char *message, int irqline)
 		}
 		else
 		{
-			if(m_vecmd == true)
+			if (m_vecmd)
 			{
 				vector = standard_irq_callback(irqline, m_sh2_state->pc);
 				LOG("SH-2 exception #%d (external vector: $%x) after [%s]\n", irqline, vector, message);
@@ -344,7 +344,7 @@ void sh2_sh7604_device::sh2_timer_resync()
 
 	if (add > 0)
 	{
-		if(divider)
+		if (divider)
 			m_frc += add;
 
 		m_frc_base = cur_time;
@@ -354,60 +354,63 @@ void sh2_sh7604_device::sh2_timer_resync()
 void sh2_sh7604_device::sh2_timer_activate()
 {
 	int max_delta = 0xfffff;
-	uint16_t frc;
 
 	m_timer->adjust(attotime::never);
 
-	frc = m_frc;
-	if(!(m_ftcsr & OCFA)) {
+	uint16_t frc = m_frc;
+	if (!(m_ftcsr & OCFA))
+	{
 		uint16_t delta = m_ocra - frc;
-		if(delta < max_delta)
+		if (delta < max_delta)
 			max_delta = delta;
 	}
 
-	if(!(m_ftcsr & OCFB) && (m_ocra <= m_ocrb || !(m_ftcsr & CCLRA))) {
+	if (!(m_ftcsr & OCFB) && (m_ocra <= m_ocrb || !(m_ftcsr & CCLRA)))
+	{
 		uint16_t delta = m_ocrb - frc;
-		if(delta < max_delta)
+		if (delta < max_delta)
 			max_delta = delta;
 	}
 
-	if(!(m_ftcsr & OVF) && !(m_ftcsr & CCLRA)) {
+	if (!(m_ftcsr & OVF) && !(m_ftcsr & CCLRA))
+	{
 		int delta = 0x10000 - frc;
-		if(delta < max_delta)
+		if (delta < max_delta)
 			max_delta = delta;
 	}
 
-	if(max_delta != 0xfffff) {
+	if (max_delta != 0xfffff)
+	{
 		int divider = div_tab[m_frc_tcr & 3];
-		if(divider) {
+		if (divider)
+		{
 			max_delta <<= divider;
 			m_frc_base = total_cycles();
 			m_timer->adjust(cycles_to_attotime(max_delta));
-		} else {
+		}
+		else
+		{
 			logerror("SH2.%s: Timer event in %d cycles of external clock", tag(), max_delta);
 		}
 	}
 }
 
-TIMER_CALLBACK_MEMBER( sh2_sh7604_device::sh2_timer_callback )
+TIMER_CALLBACK_MEMBER(sh2_sh7604_device::sh2_timer_callback)
 {
-	uint16_t frc;
-
 	sh2_timer_resync();
+	uint16_t frc = m_frc;
 
-	frc = m_frc;
-
-	if(frc == m_ocrb)
+	if (frc == m_ocrb)
 		m_ftcsr |= OCFB;
 
-	if(frc == 0x0000)
+	if (frc == 0x0000)
 		m_ftcsr |= OVF;
 
-	if(frc == m_ocra)
+	if (frc == m_ocra)
 	{
 		m_ftcsr |= OCFA;
 
-		if(m_ftcsr & CCLRA)
+		if (m_ftcsr & CCLRA)
 			m_frc = 0;
 	}
 
@@ -472,11 +475,11 @@ void sh2_sh7604_device::sh2_notify_dma_data_available()
 
 	for (int dmach=0;dmach<2;dmach++)
 	{
-		//printf("m_dma_timer_active[dmach] %04x\n",m_dma_timer_active[dmach]);
+		//printf("m_dma_timer_active[dmach] %04x\n", m_dma_timer_active[dmach]);
 
 		if (m_dma_timer_active[dmach]==2) // 2 = stalled
 		{
-		//  printf("resuming stalled dma\n");
+			//printf("resuming stalled dma\n");
 			m_dma_timer_active[dmach]=1;
 			m_dma_current_active_timer[dmach]->adjust(attotime::zero, dmach);
 		}
@@ -486,217 +489,214 @@ void sh2_sh7604_device::sh2_notify_dma_data_available()
 
 void sh2_sh7604_device::sh2_do_dma(int dmach)
 {
-	uint32_t dmadata;
-
-	uint32_t tempsrc, tempdst;
-
 	if (m_active_dma_count[dmach] > 0)
 	{
 		// process current DMA
-		switch(m_active_dma_size[dmach])
+		switch (m_active_dma_size[dmach])
 		{
 		case 0:
+		{
+			// we need to know the src / dest ahead of time without changing them
+			// to allow for the callback to check if we can process the DMA at this
+			// time (we need to know where we're reading / writing to/from)
+
+			uint32_t tempsrc = m_active_dma_src[dmach];
+			if (m_active_dma_incs[dmach] == 2)
+				tempsrc--;
+
+			uint32_t tempdst = m_active_dma_dst[dmach];
+			if (m_active_dma_incd[dmach] == 2)
+				tempdst--;
+
+			if (!m_dma_fifo_data_available_cb.isnull())
 			{
-				// we need to know the src / dest ahead of time without changing them
-				// to allow for the callback to check if we can process the DMA at this
-				// time (we need to know where we're reading / writing to/from)
+				int available = m_dma_fifo_data_available_cb(tempsrc, tempdst, 0, m_active_dma_size[dmach]);
 
-				if(m_active_dma_incs[dmach] == 2)
-					tempsrc = m_active_dma_src[dmach] - 1;
-				else
-					tempsrc = m_active_dma_src[dmach];
-
-				if(m_active_dma_incd[dmach] == 2)
-					tempdst = m_active_dma_dst[dmach] - 1;
-				else
-					tempdst = m_active_dma_dst[dmach];
-
-				if (!m_dma_fifo_data_available_cb.isnull())
+				if (!available)
 				{
-					int available = m_dma_fifo_data_available_cb(tempsrc, tempdst, 0, m_active_dma_size[dmach]);
-
-					if (!available)
-					{
-						//printf("dma stalled\n");
-						m_dma_timer_active[dmach]=2;// mark as stalled
-						return;
-					}
+					//printf("dma stalled\n");
+					m_dma_timer_active[dmach] = 2; // mark as stalled
+					return;
 				}
-
-				//schedule next DMA callback
-				m_dma_current_active_timer[dmach]->adjust(cycles_to_attotime(2), dmach);
-
-				dmadata = m_program->read_byte(tempsrc);
-				if (!m_dma_kludge_cb.isnull()) dmadata = m_dma_kludge_cb(tempsrc, tempdst, dmadata, m_active_dma_size[dmach]);
-				m_program->write_byte(tempdst, dmadata);
-
-				if(m_active_dma_incs[dmach] == 2)
-					m_active_dma_src[dmach] --;
-				if(m_active_dma_incd[dmach] == 2)
-					m_active_dma_dst[dmach] --;
-
-
-				if(m_active_dma_incs[dmach] == 1)
-					m_active_dma_src[dmach] ++;
-				if(m_active_dma_incd[dmach] == 1)
-					m_active_dma_dst[dmach] ++;
-
-				m_active_dma_count[dmach] --;
 			}
+
+			//schedule next DMA callback
+			m_dma_current_active_timer[dmach]->adjust(cycles_to_attotime(2), dmach);
+
+			uint32_t dmadata = m_program->read_byte(tempsrc);
+			if (!m_dma_kludge_cb.isnull())
+				dmadata = m_dma_kludge_cb(tempsrc, tempdst, dmadata, m_active_dma_size[dmach]);
+			m_program->write_byte(tempdst, dmadata);
+
+			if (m_active_dma_incs[dmach] == 2)
+				m_active_dma_src[dmach]--;
+			if (m_active_dma_incd[dmach] == 2)
+				m_active_dma_dst[dmach]--;
+
+			if (m_active_dma_incs[dmach] == 1)
+				m_active_dma_src[dmach]++;
+			if (m_active_dma_incd[dmach] == 1)
+				m_active_dma_dst[dmach]++;
+
+			m_active_dma_count[dmach]--;
 			break;
+		}
+
 		case 1:
+		{
+			uint32_t tempsrc = m_active_dma_src[dmach];
+			if (m_active_dma_incs[dmach] == 2)
+				tempsrc -= 2;
+
+			uint32_t tempdst = m_active_dma_dst[dmach];
+			if (m_active_dma_incd[dmach] == 2)
+				tempdst -= 2;
+
+			if (!m_dma_fifo_data_available_cb.isnull())
 			{
-				if(m_active_dma_incs[dmach] == 2)
-					tempsrc = m_active_dma_src[dmach] - 2;
-				else
-					tempsrc = m_active_dma_src[dmach];
+				int available = m_dma_fifo_data_available_cb(tempsrc, tempdst, 0, m_active_dma_size[dmach]);
 
-				if(m_active_dma_incd[dmach] == 2)
-					tempdst = m_active_dma_dst[dmach] - 2;
-				else
-					tempdst = m_active_dma_dst[dmach];
-
-				if (!m_dma_fifo_data_available_cb.isnull())
+				if (!available)
 				{
-					int available = m_dma_fifo_data_available_cb(tempsrc, tempdst, 0, m_active_dma_size[dmach]);
-
-					if (!available)
-					{
-						//printf("dma stalled\n");
-						m_dma_timer_active[dmach]=2;// mark as stalled
-						return;
-					}
+					//printf("dma stalled\n");
+					m_dma_timer_active[dmach] = 2; // mark as stalled
+					return;
 				}
-
-				//schedule next DMA callback
-				m_dma_current_active_timer[dmach]->adjust(cycles_to_attotime(2), dmach);
-
-				// check: should this really be using read_word_32 / write_word_32?
-				dmadata = m_program->read_word(tempsrc);
-				if (!m_dma_kludge_cb.isnull()) dmadata = m_dma_kludge_cb(tempsrc, tempdst, dmadata, m_active_dma_size[dmach]);
-				m_program->write_word(tempdst, dmadata);
-
-				if(m_active_dma_incs[dmach] == 2)
-					m_active_dma_src[dmach] -= 2;
-				if(m_active_dma_incd[dmach] == 2)
-					m_active_dma_dst[dmach] -= 2;
-
-				if(m_active_dma_incs[dmach] == 1)
-					m_active_dma_src[dmach] += 2;
-				if(m_active_dma_incd[dmach] == 1)
-					m_active_dma_dst[dmach] += 2;
-
-				m_active_dma_count[dmach] --;
 			}
+
+			//schedule next DMA callback
+			m_dma_current_active_timer[dmach]->adjust(cycles_to_attotime(2), dmach);
+
+			// check: should this really be using read_word_32 / write_word_32?
+			uint32_t dmadata = m_program->read_word(tempsrc);
+			if (!m_dma_kludge_cb.isnull())
+				dmadata = m_dma_kludge_cb(tempsrc, tempdst, dmadata, m_active_dma_size[dmach]);
+			m_program->write_word(tempdst, dmadata);
+
+			if (m_active_dma_incs[dmach] == 2)
+				m_active_dma_src[dmach] -= 2;
+			if (m_active_dma_incd[dmach] == 2)
+				m_active_dma_dst[dmach] -= 2;
+
+			if (m_active_dma_incs[dmach] == 1)
+				m_active_dma_src[dmach] += 2;
+			if (m_active_dma_incd[dmach] == 1)
+				m_active_dma_dst[dmach] += 2;
+
+			m_active_dma_count[dmach]--;
 			break;
+		}
+
 		case 2:
+		{
+			uint32_t tempsrc = m_active_dma_src[dmach];
+			if (m_active_dma_incs[dmach] == 2)
+				tempsrc -= 4;
+
+			uint32_t tempdst = m_active_dma_dst[dmach];
+			if (m_active_dma_incd[dmach] == 2)
+				tempdst -= 4;
+
+			if (!m_dma_fifo_data_available_cb.isnull())
 			{
-				if(m_active_dma_incs[dmach] == 2)
-					tempsrc = m_active_dma_src[dmach] - 4;
-				else
-					tempsrc = m_active_dma_src[dmach];
+				int available = m_dma_fifo_data_available_cb(tempsrc, tempdst, 0, m_active_dma_size[dmach]);
 
-				if(m_active_dma_incd[dmach] == 2)
-					tempdst = m_active_dma_dst[dmach] - 4;
-				else
-					tempdst = m_active_dma_dst[dmach];
-
-				if (!m_dma_fifo_data_available_cb.isnull())
+				if (!available)
 				{
-					int available = m_dma_fifo_data_available_cb(tempsrc, tempdst, 0, m_active_dma_size[dmach]);
-
-					if (!available)
-					{
-						//printf("dma stalled\n");
-						m_dma_timer_active[dmach]=2;// mark as stalled
-						return;
-					}
+					//printf("dma stalled\n");
+					m_dma_timer_active[dmach] = 2; // mark as stalled
+					return;
 				}
-
-				//schedule next DMA callback
-				m_dma_current_active_timer[dmach]->adjust(cycles_to_attotime(2), dmach);
-
-				dmadata = m_program->read_dword(tempsrc);
-				if (!m_dma_kludge_cb.isnull()) dmadata = m_dma_kludge_cb(tempsrc, tempdst, dmadata, m_active_dma_size[dmach]);
-				m_program->write_dword(tempdst, dmadata);
-
-				if(m_active_dma_incs[dmach] == 2)
-					m_active_dma_src[dmach] -= 4;
-				if(m_active_dma_incd[dmach] == 2)
-					m_active_dma_dst[dmach] -= 4;
-
-				if(m_active_dma_incs[dmach] == 1)
-					m_active_dma_src[dmach] += 4;
-				if(m_active_dma_incd[dmach] == 1)
-					m_active_dma_dst[dmach] += 4;
-
-				m_active_dma_count[dmach] --;
 			}
+
+			//schedule next DMA callback
+			m_dma_current_active_timer[dmach]->adjust(cycles_to_attotime(2), dmach);
+
+			uint32_t dmadata = m_program->read_dword(tempsrc);
+			if (!m_dma_kludge_cb.isnull())
+				dmadata = m_dma_kludge_cb(tempsrc, tempdst, dmadata, m_active_dma_size[dmach]);
+			m_program->write_dword(tempdst, dmadata);
+
+			if (m_active_dma_incs[dmach] == 2)
+				m_active_dma_src[dmach] -= 4;
+			if (m_active_dma_incd[dmach] == 2)
+				m_active_dma_dst[dmach] -= 4;
+
+			if (m_active_dma_incs[dmach] == 1)
+				m_active_dma_src[dmach] += 4;
+			if (m_active_dma_incd[dmach] == 1)
+				m_active_dma_dst[dmach] += 4;
+
+			m_active_dma_count[dmach]--;
 			break;
+		}
+
 		case 3:
+		{
+			// shouldn't this really be 4 calls here instead?
+
+			uint32_t tempsrc = m_active_dma_src[dmach];
+
+			uint32_t tempdst = m_active_dma_dst[dmach];
+			if (m_active_dma_incd[dmach] == 2)
+				tempdst -= 16;
+
+			if (!m_dma_fifo_data_available_cb.isnull())
 			{
-				// shouldn't this really be 4 calls here instead?
+				int available = m_dma_fifo_data_available_cb(tempsrc, tempdst, 0, m_active_dma_size[dmach]);
 
-				tempsrc = m_active_dma_src[dmach];
-
-				if(m_active_dma_incd[dmach] == 2)
-					tempdst = m_active_dma_dst[dmach] - 16;
-				else
-					tempdst = m_active_dma_dst[dmach];
-
-				if (!m_dma_fifo_data_available_cb.isnull())
+				if (!available)
 				{
-					int available = m_dma_fifo_data_available_cb(tempsrc, tempdst, 0, m_active_dma_size[dmach]);
-
-					if (!available)
-					{
-						//printf("dma stalled\n");
-						m_dma_timer_active[dmach]=2;// mark as stalled
-						fatalerror("SH2 dma_callback_fifo_data_available == 0 in unsupported mode\n");
-					}
+					//printf("dma stalled\n");
+					m_dma_timer_active[dmach] = 2; // mark as stalled
+					fatalerror("SH2 dma_callback_fifo_data_available == 0 in unsupported mode\n");
 				}
-
-				//schedule next DMA callback
-				m_dma_current_active_timer[dmach]->adjust(cycles_to_attotime(2), dmach);
-
-				dmadata = m_program->read_dword(tempsrc);
-				if (!m_dma_kludge_cb.isnull()) dmadata = m_dma_kludge_cb(tempsrc, tempdst, dmadata, m_active_dma_size[dmach]);
-				m_program->write_dword(tempdst, dmadata);
-
-				dmadata = m_program->read_dword(tempsrc+4);
-				if (!m_dma_kludge_cb.isnull()) dmadata = m_dma_kludge_cb(tempsrc, tempdst, dmadata, m_active_dma_size[dmach]);
-				m_program->write_dword(tempdst+4, dmadata);
-
-				dmadata = m_program->read_dword(tempsrc+8);
-				if (!m_dma_kludge_cb.isnull()) dmadata = m_dma_kludge_cb(tempsrc, tempdst, dmadata, m_active_dma_size[dmach]);
-				m_program->write_dword(tempdst+8, dmadata);
-
-				dmadata = m_program->read_dword(tempsrc+12);
-				if (!m_dma_kludge_cb.isnull()) dmadata = m_dma_kludge_cb(tempsrc, tempdst, dmadata, m_active_dma_size[dmach]);
-				m_program->write_dword(tempdst+12, dmadata);
-
-				if(m_active_dma_incd[dmach] == 2)
-					m_active_dma_dst[dmach] -= 16;
-
-				m_active_dma_src[dmach] += 16;
-				if(m_active_dma_incd[dmach] == 1)
-					m_active_dma_dst[dmach] += 16;
-
-				m_active_dma_count[dmach]-=4;
 			}
+
+			//schedule next DMA callback
+			m_dma_current_active_timer[dmach]->adjust(cycles_to_attotime(2), dmach);
+
+			uint32_t dmadata = m_program->read_dword(tempsrc);
+			if (!m_dma_kludge_cb.isnull())
+				dmadata = m_dma_kludge_cb(tempsrc, tempdst, dmadata, m_active_dma_size[dmach]);
+			m_program->write_dword(tempdst, dmadata);
+
+			dmadata = m_program->read_dword(tempsrc + 4);
+			if (!m_dma_kludge_cb.isnull())
+				dmadata = m_dma_kludge_cb(tempsrc, tempdst, dmadata, m_active_dma_size[dmach]);
+			m_program->write_dword(tempdst + 4, dmadata);
+
+			dmadata = m_program->read_dword(tempsrc + 8);
+			if (!m_dma_kludge_cb.isnull())
+				dmadata = m_dma_kludge_cb(tempsrc, tempdst, dmadata, m_active_dma_size[dmach]);
+			m_program->write_dword(tempdst + 8, dmadata);
+
+			dmadata = m_program->read_dword(tempsrc + 12);
+			if (!m_dma_kludge_cb.isnull())
+				dmadata = m_dma_kludge_cb(tempsrc, tempdst, dmadata, m_active_dma_size[dmach]);
+			m_program->write_dword(tempdst + 12, dmadata);
+
+			if (m_active_dma_incd[dmach] == 2)
+				m_active_dma_dst[dmach] -= 16;
+
+			m_active_dma_src[dmach] += 16;
+			if (m_active_dma_incd[dmach] == 1)
+				m_active_dma_dst[dmach] += 16;
+
+			m_active_dma_count[dmach] -= 4;
 			break;
+		}
 		}
 	}
 	else // the dma is complete
 	{
-	//  int dma = param & 1;
+		// int dma = param & 1;
 
 		// fever soccer uses cycle-stealing mode, resume the CPU now DMA has finished
 		if (m_active_dma_steal[dmach])
 		{
-			resume(SUSPEND_REASON_HALT );
+			resume(SUSPEND_REASON_HALT);
 		}
-
 
 		LOG("SH2: DMA %d complete\n", dmach);
 		m_dmac[dmach].tcr = 0;
@@ -708,34 +708,32 @@ void sh2_sh7604_device::sh2_do_dma(int dmach)
 	}
 }
 
-TIMER_CALLBACK_MEMBER( sh2_sh7604_device::sh2_dma_current_active_callback )
+TIMER_CALLBACK_MEMBER(sh2_sh7604_device::sh2_dma_current_active_callback)
 {
-	int dma = param & 1;
-
-	sh2_do_dma(dma);
+	sh2_do_dma(param & 1);
 }
 
 
 void sh2_sh7604_device::sh2_dmac_check(int dmach)
 {
-	if(m_dmac[dmach].chcr & m_dmaor & 1)
+	if (m_dmac[dmach].chcr & m_dmaor & 1)
 	{
-		if(!m_dma_timer_active[dmach] && !(m_dmac[dmach].chcr & 2))
+		if (!m_dma_timer_active[dmach] && !(m_dmac[dmach].chcr & 2))
 		{
 			m_active_dma_incd[dmach] = (m_dmac[dmach].chcr >> 14) & 3;
 			m_active_dma_incs[dmach] = (m_dmac[dmach].chcr >> 12) & 3;
 			m_active_dma_size[dmach] = (m_dmac[dmach].chcr >> 10) & 3;
 			m_active_dma_steal[dmach] = (m_dmac[dmach].chcr & 0x10);
 
-			if(m_active_dma_incd[dmach] == 3 || m_active_dma_incs[dmach] == 3)
+			if (m_active_dma_incd[dmach] == 3 || m_active_dma_incs[dmach] == 3)
 			{
-				logerror("SH2: DMA: bad increment values (%d, %d, %d, %04x)\n", m_active_dma_incd[dmach], m_active_dma_incs[dmach], m_active_dma_size[dmach], m_dmac[dmach].chcr);
+				LOG("SH2: DMA: bad increment values (%d, %d, %d, %04x)\n", m_active_dma_incd[dmach], m_active_dma_incs[dmach], m_active_dma_size[dmach], m_dmac[dmach].chcr);
 				return;
 			}
 			m_active_dma_src[dmach]   = m_dmac[dmach].sar;
 			m_active_dma_dst[dmach]   = m_dmac[dmach].dar;
 			m_active_dma_count[dmach] = m_dmac[dmach].tcr;
-			if(!m_active_dma_count[dmach])
+			if (!m_active_dma_count[dmach])
 				m_active_dma_count[dmach] = 0x1000000;
 
 			LOG("SH2: DMA %d start %x, %x, %x, %04x, %d, %d, %d\n", dmach, m_active_dma_src[dmach], m_active_dma_dst[dmach], m_active_dma_count[dmach], m_dmac[dmach].chcr, m_active_dma_incs[dmach], m_active_dma_incd[dmach], m_active_dma_size[dmach]);
@@ -745,7 +743,7 @@ void sh2_sh7604_device::sh2_dmac_check(int dmach)
 			m_active_dma_src[dmach] &= m_am;
 			m_active_dma_dst[dmach] &= m_am;
 
-			switch(m_active_dma_size[dmach])
+			switch (m_active_dma_size[dmach])
 			{
 			case 0:
 				break;
@@ -770,7 +768,7 @@ void sh2_sh7604_device::sh2_dmac_check(int dmach)
 			if (m_active_dma_steal[dmach])
 			{
 				//printf("cycle stealing DMA\n");
-				suspend(SUSPEND_REASON_HALT, 1 );
+				suspend(SUSPEND_REASON_HALT, 1);
 			}
 
 			m_dma_current_active_timer[dmach]->adjust(cycles_to_attotime(2), dmach);
@@ -778,9 +776,9 @@ void sh2_sh7604_device::sh2_dmac_check(int dmach)
 	}
 	else
 	{
-		if(m_dma_timer_active[dmach])
+		if (m_dma_timer_active[dmach])
 		{
-			logerror("SH2: DMA %d cancelled in-flight\n", dmach);
+			LOG("SH2: DMA %d cancelled in-flight\n", dmach);
 			//m_dma_complete_timer[dmach]->adjust(attotime::never);
 			m_dma_current_active_timer[dmach]->adjust(attotime::never, dmach);
 
@@ -832,7 +830,7 @@ uint8_t sh2_sh7604_device::tdr_r()
 void sh2_sh7604_device::tdr_w(uint8_t data)
 {
 	m_tdr = data;
-	// printf("%c",data & 0xff);
+	//printf("%c", data & 0xff);
 }
 
 uint8_t sh2_sh7604_device::ssr_r()
@@ -872,19 +870,18 @@ uint8_t sh2_sh7604_device::ftcsr_r()
 {
 	// TODO: to be tested
 	if (!m_ftcsr_read_cb.isnull())
-		m_ftcsr_read_cb((((m_tier<<24) | (m_ftcsr<<16)) & 0xffff0000) | m_frc);
+		m_ftcsr_read_cb((((m_tier << 24) | (m_ftcsr << 16)) & 0xffff0000) | m_frc);
 
 	return m_ftcsr;
 }
 
 void sh2_sh7604_device::ftcsr_w(uint8_t data)
 {
-	uint8_t old;
-	old = m_ftcsr;
+	uint8_t old = m_ftcsr;
 
 	m_ftcsr = data;
 	sh2_timer_resync();
-	m_ftcsr = (m_ftcsr & ~(ICF|OCFA|OCFB|OVF)) | (old & m_ftcsr & (ICF|OCFA|OCFB|OVF));
+	m_ftcsr = (m_ftcsr & ~(ICF | OCFA | OCFB | OVF)) | (old & m_ftcsr & (ICF | OCFA | OCFB | OVF));
 	sh2_timer_activate();
 	sh2_recalc_irq();
 }
@@ -911,10 +908,10 @@ uint16_t sh2_sh7604_device::ocra_b_r()
 void sh2_sh7604_device::ocra_b_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	sh2_timer_resync();
-	if(m_tocr & 0x10)
-		m_ocrb = (m_ocrb & (~mem_mask)) | (data & mem_mask);
+	if (m_tocr & 0x10)
+		m_ocrb = (m_ocrb & ~mem_mask) | (data & mem_mask);
 	else
-		m_ocra = (m_ocra & (~mem_mask)) | (data & mem_mask);
+		m_ocra = (m_ocra & ~mem_mask) | (data & mem_mask);
 	sh2_timer_activate();
 	sh2_recalc_irq();
 }
@@ -959,14 +956,14 @@ uint16_t sh2_sh7604_device::intc_icr_r()
 {
 	// TODO: flip meaning based off NMI edge select bit (NMIE)
 	uint16_t nmilv = m_nmi_line_state == ASSERT_LINE ? 0 : 0x8000;
-	return (nmilv) | (m_intc_icr & 0x0101);
+	return nmilv | (m_intc_icr & 0x0101);
 }
 
 void sh2_sh7604_device::intc_icr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_intc_icr);
-	m_nmie = bool(BIT(m_intc_icr, 8));
-	m_vecmd = bool(BIT(m_intc_icr, 0));
+	m_nmie = BIT(m_intc_icr, 8);
+	m_vecmd = BIT(m_intc_icr, 0);
 }
 
 uint16_t sh2_sh7604_device::ipra_r()
@@ -1076,20 +1073,20 @@ void sh2_sh7604_device::vcrdiv_w(offs_t offset, uint32_t data, uint32_t mem_mask
 
 uint32_t sh2_sh7604_device::dvcr_r()
 {
-	return (m_divu_ovfie == true ? 2 : 0) | (m_divu_ovf == true ? 1 : 0);
+	return (m_divu_ovfie ? 2 : 0) | (m_divu_ovf ? 1 : 0);
 }
 
 void sh2_sh7604_device::dvcr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	if(ACCESSING_BITS_0_7)
+	if (ACCESSING_BITS_0_7)
 	{
 		if (data & 1)
 			m_divu_ovf = false;
 		if (data & 2)
 		{
-			m_divu_ovfie = bool(BIT(data, 1));
-			if (m_divu_ovfie == true)
-				logerror("SH2: unemulated DIVU OVF interrupt enable\n");
+			m_divu_ovfie = BIT(data, 1);
+			if (m_divu_ovfie)
+				LOG("SH2: unemulated DIVU OVF interrupt enable\n");
 		}
 		sh2_recalc_irq();
 	}
@@ -1148,7 +1145,7 @@ void sh2_sh7604_device::dvdnth_w(offs_t offset, uint32_t data, uint32_t mem_mask
 void sh2_sh7604_device::dvdntl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_dvdntl);
-	int64_t a = m_dvdntl | ((uint64_t)(m_dvdnth) << 32);
+	int64_t a = m_dvdntl | ((uint64_t)m_dvdnth << 32);
 	int64_t b = (int32_t)m_dvsr;
 	LOG("SH2 div64+mod %d/%d\n", a, b);
 	if (b)
@@ -1358,20 +1355,20 @@ void sh2_sh7604_device::rtcor_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 void sh2_sh7604_device::set_frt_input(int state)
 {
-	if(m_frt_input == state) {
+	if (m_frt_input == state)
 		return;
-	}
 
 	m_frt_input = state;
 
-	if(m_frc_tcr & 0x80) {
-		if(state == CLEAR_LINE) {
+	if (m_frc_tcr & 0x80)
+	{
+		if (state == CLEAR_LINE)
 			return;
-		}
-	} else {
-		if(state == ASSERT_LINE) {
+	}
+	else
+	{
+		if (state == ASSERT_LINE)
 			return;
-		}
 	}
 
 	sh2_timer_resync();
@@ -1383,20 +1380,21 @@ void sh2_sh7604_device::set_frt_input(int state)
 
 void sh2_sh7604_device::sh2_recalc_irq()
 {
-	int irq = 0, vector = -1;
-	int  level;
+	int irq = 0;
+	int vector = -1;
+	int level;
 
 	// Timer irqs
-	if (m_tier & m_ftcsr & (ICF|OCFA|OCFB|OVF))
+	if (m_tier & m_ftcsr & (ICF | OCFA | OCFB | OVF))
 	{
 		level = (m_irq_level.frc & 15);
 		if (level > irq)
 		{
 			int mask = m_tier & m_ftcsr;
 			irq = level;
-			if(mask & ICF)
+			if (mask & ICF)
 				vector = m_irq_vector.fic & 0x7f;
-			else if(mask & (OCFA|OCFB))
+			else if (mask & (OCFA | OCFB))
 				vector = m_irq_vector.foc & 0x7f;
 			else
 				vector = m_irq_vector.fov & 0x7f;
@@ -1415,17 +1413,21 @@ void sh2_sh7604_device::sh2_recalc_irq()
 	}
 
 	// DMA irqs
-	if((m_dmac[0].chcr & 6) == 6 && m_dma_irq[0]) {
+	if ((m_dmac[0].chcr & 6) == 6 && m_dma_irq[0])
+	{
 		level = m_irq_level.dmac & 15;
-		if(level > irq) {
+		if (level > irq)
+		{
 			irq = level;
 			m_dma_irq[0] &= ~1;
 			vector = m_irq_vector.dmac[0] & 0x7f;
 		}
 	}
-	else if((m_dmac[1].chcr & 6) == 6 && m_dma_irq[1]) {
+	else if ((m_dmac[1].chcr & 6) == 6 && m_dma_irq[1])
+	{
 		level = m_irq_level.dmac & 15;
-		if(level > irq) {
+		if (level > irq)
+		{
 			irq = level;
 			m_dma_irq[1] &= ~1;
 			vector = m_irq_vector.dmac[1] & 0x7f;
@@ -1456,7 +1458,8 @@ void sh2_sh7604_device::vcrdma_w(offs_t offset, uint32_t data, uint32_t mem_mask
 }
 
 template <int Channel>
-uint8_t sh2_sh7604_device::drcr_r() {
+uint8_t sh2_sh7604_device::drcr_r()
+{
 	return m_dmac[Channel].drcr & 3;
 }
 
@@ -1527,10 +1530,9 @@ uint32_t sh2_sh7604_device::dmaor_r()
 
 void sh2_sh7604_device::dmaor_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	if(ACCESSING_BITS_0_7)
+	if (ACCESSING_BITS_0_7)
 	{
-		uint8_t old;
-		old = m_dmaor & 0xf;
+		uint8_t old = m_dmaor & 0xf;
 		m_dmaor = (data & ~6) | (old & m_dmaor & 6); // TODO: should this be old & data & 6? bug?
 		sh2_dmac_check(0);
 		sh2_dmac_check(1);

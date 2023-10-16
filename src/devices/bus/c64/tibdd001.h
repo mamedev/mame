@@ -13,7 +13,6 @@
 
 
 #include "exp.h"
-#include "formats/tibdd001_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/upd765.h"
 

@@ -40,22 +40,22 @@ mfm_format::mfm_format() : floppy_image_format_t()
 {
 }
 
-const char *mfm_format::name() const
+const char *mfm_format::name() const noexcept
 {
 	return "mfm";
 }
 
-const char *mfm_format::description() const
+const char *mfm_format::description() const noexcept
 {
 	return "HxCFloppyEmulator floppy disk image";
 }
 
-const char *mfm_format::extensions() const
+const char *mfm_format::extensions() const noexcept
 {
 	return "mfm";
 }
 
-bool mfm_format::supports_save() const
+bool mfm_format::supports_save() const noexcept
 {
 	return true;
 }
@@ -72,7 +72,7 @@ int mfm_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	return 0;
 }
 
-bool mfm_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool mfm_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	size_t actual;
 	MFMIMG header;
@@ -82,7 +82,7 @@ bool mfm_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	io.read_at(0, &header, sizeof(header), actual);
 
 	int drivecyl, driveheads;
-	image->get_maximal_geometry(drivecyl, driveheads);
+	image.get_maximal_geometry(drivecyl, driveheads);
 	bool skip_odd = (drivecyl < 50 && header.number_of_track >= 80);
 
 	int counter = 0;
@@ -110,17 +110,17 @@ bool mfm_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		}
 	}
 
-	image->set_variant(floppy_image::DSDD);
+	image.set_variant(floppy_image::DSDD);
 	return true;
 }
 
-bool mfm_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool mfm_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
 {
 	// TODO: HD support
 	size_t actual;
 	MFMIMG header;
 	int track_count, head_count;
-	image->get_actual_geometry(track_count, head_count);
+	image.get_actual_geometry(track_count, head_count);
 
 	memcpy(&header.headername, MFM_FORMAT_HEADER, 7);
 	header.number_of_track = track_count;

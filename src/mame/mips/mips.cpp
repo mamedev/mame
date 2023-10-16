@@ -238,11 +238,7 @@
 #include "sound/spkrdev.h"
 #include "speaker.h"
 
-#include "formats/pc_dsk.h"
-
 #include "imagedev/floppy.h"
-
-#include "debugger.h"
 
 #define LOG_MMU     (1U << 1)
 #define LOG_IOCB    (1U << 2)
@@ -571,10 +567,8 @@ void rx2030_state::iop_io_map(address_map &map)
 	map(0x0200, 0x0201).rw(m_fio, FUNC(z8038_device::fifo_r<1>), FUNC(z8038_device::fifo_w<1>)).umask16(0xff);
 	map(0x0202, 0x0203).rw(m_fio, FUNC(z8038_device::reg_r<1>), FUNC(z8038_device::reg_w<1>)).umask16(0xff);
 
-	map(0x0240, 0x0241).lw8(NAME([this] (u8 data) { m_rtc->write(0, data); })).umask16(0xff00);
-	map(0x0280, 0x0281).lrw8(
-			NAME([this] () { return m_rtc->read(1); }),
-			NAME([this] (u8 data) { m_rtc->write(1, data); })).umask16(0xff00);
+	map(0x0240, 0x0241).w(m_rtc, FUNC(mc146818_device::address_w)).umask16(0xff00);
+	map(0x0280, 0x0281).rw(m_rtc, FUNC(mc146818_device::data_r), FUNC(mc146818_device::data_w)).umask16(0xff00);
 
 	map(0x02c0, 0x2c1).lw8([this](u8 data)
 	{

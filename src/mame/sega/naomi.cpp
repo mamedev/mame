@@ -11142,7 +11142,7 @@ void naomi_state::init_hotd2()
 /* 0041  */ GAME( 2006, ggxxac,    naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,"Arc System Works",  "Guilty Gear XX Accent Core (Japan) (GDL-0041)", GAME_FLAGS )
 /* 0042  */ GAME( 2006, takoron,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Compile Heart",  "Noukone Puzzle Takoron (Japan) (GDL-0042)", GAME_FLAGS )
 
-/* CDP-xxxxx and CDV-xxxxx (CD-ROM and DVD-ROM for Naomi 2 Satellite Terminal) */
+/* CDP-xxxxx and CDV-xxxxx (CD-ROM or DVD-ROM for Windows-based PC servers used with Naomi Satellite Terminals) */
 // CDP-10001?- World Club Champion Football Serie A 2001-2002 (Sega, 2002)
 // CDP-10001?- World Club Champion Football Serie A 2001-2002 Ver.1.2 (Sega, 2002)
 /* CDP-10001C*/ GAME( 2003, wccf116,  naomigd, naomigd, naomi, naomi_state, init_naomigd, ROT0, "Hitmaker / Sega", "World Club Champion Football Serie A 2001-2002 Ver.2 (Japan) (CDP-10001C)", GAME_FLAGS )

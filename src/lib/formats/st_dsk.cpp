@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /*********************************************************************
 
-    formats/st_dsk.c
+    formats/st_dsk.cpp
 
     All usual Atari ST formats
 
@@ -20,22 +20,22 @@ st_format::st_format()
 {
 }
 
-const char *st_format::name() const
+const char *st_format::name() const noexcept
 {
 	return "st";
 }
 
-const char *st_format::description() const
+const char *st_format::description() const noexcept
 {
 	return "Atari ST floppy disk image";
 }
 
-const char *st_format::extensions() const
+const char *st_format::extensions() const noexcept
 {
 	return "st";
 }
 
-bool st_format::supports_save() const
+bool st_format::supports_save() const noexcept
 {
 	return true;
 }
@@ -63,7 +63,7 @@ int st_format::identify(util::random_read &io, uint32_t form_factor, const std::
 	return 0;
 }
 
-bool st_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool st_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	uint8_t track_count, head_count, sector_count;
 	find_size(io, track_count, head_count, sector_count);
@@ -86,12 +86,12 @@ bool st_format::load(util::random_read &io, uint32_t form_factor, const std::vec
 		}
 	}
 
-	image->set_variant(floppy_image::DSDD);
+	image.set_variant(floppy_image::DSDD);
 
 	return true;
 }
 
-bool st_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool st_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
 {
 	int track_count, head_count, sector_count;
 	get_geometry_mfm_pc(image, 2000, track_count, head_count, sector_count);
@@ -129,22 +129,22 @@ msa_format::msa_format()
 {
 }
 
-const char *msa_format::name() const
+const char *msa_format::name() const noexcept
 {
 	return "msa";
 }
 
-const char *msa_format::description() const
+const char *msa_format::description() const noexcept
 {
 	return "Atari MSA floppy disk image";
 }
 
-const char *msa_format::extensions() const
+const char *msa_format::extensions() const noexcept
 {
 	return "msa";
 }
 
-bool msa_format::supports_save() const
+bool msa_format::supports_save() const noexcept
 {
 	return true;
 }
@@ -229,7 +229,7 @@ int msa_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	return 0;
 }
 
-bool msa_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool msa_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	uint16_t sign, sect, heads, strack, etrack;
 	read_header(io, sign, sect, heads, strack, etrack);
@@ -263,12 +263,12 @@ bool msa_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		}
 	}
 
-	image->set_variant(floppy_image::DSDD);
+	image.set_variant(floppy_image::DSDD);
 	return true;
 }
 
 
-bool msa_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool msa_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
 {
 	int track_count, head_count, sector_count;
 	get_geometry_mfm_pc(image, 2000, track_count, head_count, sector_count);

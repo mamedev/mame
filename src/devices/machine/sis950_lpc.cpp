@@ -29,7 +29,9 @@
 
 #include "emu.h"
 #include "sis950_lpc.h"
+
 #include "bus/pc_kbd/keyboards.h"
+#include "machine/pckeybrd.h"
 #include "speaker.h"
 
 #define LOG_IO     (1U << 1) // log PCI register accesses
@@ -164,6 +166,10 @@ void sis950_lpc_device::device_add_mconfig(machine_config &config)
 	m_keybc->input_buffer_full_mouse_callback().set(m_pic_slave, FUNC(pic8259_device::ir4_w));
 	m_keybc->system_reset_callback().set(FUNC(sis950_lpc_device::cpu_reset_w));
 	m_keybc->gate_a20_callback().set(FUNC(sis950_lpc_device::cpu_a20_w));
+	m_keybc->set_keyboard_tag("at_keyboard");
+
+	at_keyboard_device &at_keyb(AT_KEYB(config, "at_keyboard", pc_keyboard_device::KEYBOARD_TYPE::AT, 1));
+	at_keyb.keypress().set(m_keybc, FUNC(kbdc8042_device::keyboard_w));
 
 	// TODO: unknown RTC type
 	// Has external RTC bank select at $48, using this one as convenience

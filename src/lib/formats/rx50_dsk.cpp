@@ -2,7 +2,7 @@
 // copyright-holders:Karl-Ludwig Deisenhofer
 /**********************************************************************
 
-    formats/rx50_dsk.c
+    formats/rx50_dsk.cpp
     Floppies used by Rainbow 100 and 190.
 
     The RX50 drive: 5.25" format; 300 rpm; MFM 250 kbps; 96 - 100 tpi
@@ -75,22 +75,22 @@ rx50img_format::rx50img_format()
 {
 }
 
-const char *rx50img_format::name() const
+const char *rx50img_format::name() const noexcept
 {
 	return "rx50";
 }
 
-const char *rx50img_format::description() const
+const char *rx50img_format::description() const noexcept
 {
 	return "DEC Rainbow 100 floppy image";
 }
 
-const char *rx50img_format::extensions() const
+const char *rx50img_format::extensions() const noexcept
 {
 	return "img";
 }
 
-bool rx50img_format::supports_save() const
+bool rx50img_format::supports_save() const noexcept
 {
 	return true;
 }
@@ -140,7 +140,7 @@ int rx50img_format::identify(util::random_read &io, uint32_t form_factor, const 
 }
 
 	//  /* Sectors are numbered 1 to 10 */
-bool rx50img_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool rx50img_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	uint8_t track_count, head_count, sector_count;
 	find_size(io, track_count, head_count, sector_count);
@@ -164,12 +164,12 @@ bool rx50img_format::load(util::random_read &io, uint32_t form_factor, const std
 		}
 	}
 
-	image->set_variant(floppy_image::SSQD);
+	image.set_variant(floppy_image::SSQD);
 
 	return true;
 }
 
-bool rx50img_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool rx50img_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
 {
 	int track_count, head_count, sector_count;
 	get_geometry_mfm_pc(image, 2000, track_count, head_count, sector_count);

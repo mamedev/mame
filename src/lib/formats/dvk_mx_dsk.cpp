@@ -62,22 +62,22 @@ dvk_mx_format::dvk_mx_format()
 {
 }
 
-const char *dvk_mx_format::name() const
+const char *dvk_mx_format::name() const noexcept
 {
 	return "mx";
 }
 
-const char *dvk_mx_format::description() const
+const char *dvk_mx_format::description() const noexcept
 {
 	return "DVK MX: floppy image";
 }
 
-const char *dvk_mx_format::extensions() const
+const char *dvk_mx_format::extensions() const noexcept
 {
 	return "mx";
 }
 
-bool dvk_mx_format::supports_save() const
+bool dvk_mx_format::supports_save() const noexcept
 {
 	return false;
 }
@@ -136,7 +136,7 @@ int dvk_mx_format::identify(util::random_read &io, uint32_t form_factor, const s
 	return 0;
 }
 
-bool dvk_mx_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool dvk_mx_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	uint8_t track_count, head_count, sector_count;
 
@@ -165,17 +165,17 @@ bool dvk_mx_format::load(util::random_read &io, uint32_t form_factor, const std:
 
 	if (head_count == 1)
 	{
-		image->set_variant(floppy_image::SSDD);
+		image.set_variant(floppy_image::SSDD);
 	}
 	else
 	{
 		if (track_count > 40)
 		{
-			image->set_variant(floppy_image::DSQD);
+			image.set_variant(floppy_image::DSQD);
 		}
 		else
 		{
-			image->set_variant(floppy_image::DSDD);
+			image.set_variant(floppy_image::DSDD);
 		}
 	}
 

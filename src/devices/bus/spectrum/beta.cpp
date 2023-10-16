@@ -96,6 +96,8 @@
 #include "emu.h"
 #include "beta.h"
 
+#include "formats/trd_dsk.h"
+
 
 /***************************************************************************
     DEVICE DEFINITIONS

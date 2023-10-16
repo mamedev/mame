@@ -2,7 +2,7 @@
 // copyright-holders:Juergen Buchmueller, R. Belmont
 /*****************************************************************************
  *
- *   sh2.c
+ *   sh2.cpp
  *   Portable Hitachi SH-2 (SH7600 family) emulator
  *
  *  This work is based on <tiraniddo@hotmail.com> C/C++ implementation of
@@ -22,31 +22,6 @@
 #include "logmacro.h"
 
 constexpr int SH2_INT_15 = 15;
-
-#define CHECK_PENDING_IRQ(message)              \
-do {                                            \
-	int irq = -1;                               \
-	if (m_sh2_state->pending_irq & (1 <<  0)) irq = 0;  \
-	if (m_sh2_state->pending_irq & (1 <<  1)) irq = 1;  \
-	if (m_sh2_state->pending_irq & (1 <<  2)) irq = 2;  \
-	if (m_sh2_state->pending_irq & (1 <<  3)) irq = 3;  \
-	if (m_sh2_state->pending_irq & (1 <<  4)) irq = 4;  \
-	if (m_sh2_state->pending_irq & (1 <<  5)) irq = 5;  \
-	if (m_sh2_state->pending_irq & (1 <<  6)) irq = 6;  \
-	if (m_sh2_state->pending_irq & (1 <<  7)) irq = 7;  \
-	if (m_sh2_state->pending_irq & (1 <<  8)) irq = 8;  \
-	if (m_sh2_state->pending_irq & (1 <<  9)) irq = 9;  \
-	if (m_sh2_state->pending_irq & (1 << 10)) irq = 10; \
-	if (m_sh2_state->pending_irq & (1 << 11)) irq = 11; \
-	if (m_sh2_state->pending_irq & (1 << 12)) irq = 12; \
-	if (m_sh2_state->pending_irq & (1 << 13)) irq = 13; \
-	if (m_sh2_state->pending_irq & (1 << 14)) irq = 14; \
-	if (m_sh2_state->pending_irq & (1 << 15)) irq = 15; \
-	if ((m_sh2_state->internal_irq_level != -1) && (m_sh2_state->internal_irq_level > irq)) irq = m_sh2_state->internal_irq_level; \
-	if (irq >= 0)                               \
-		sh2_exception(message,irq);         \
-} while(0)
-
 
 sh2_device::sh2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cpu_type, address_map_constructor internal_map, int addrlines, uint32_t address_mask)
 	: sh_common_execution(mconfig, type, tag, owner, clock, ENDIANNESS_BIG, internal_map)
@@ -69,14 +44,14 @@ void sh2_device::device_start()
 	if (m_decrypted_program->endianness() != ENDIANNESS_NATIVE)
 		m_prptr = [this](offs_t address) -> const void * {
 			const u16 *ptr = reinterpret_cast<u16 *>(m_cache32.read_ptr(address & ~3));
-			if(!(address & 2))
+			if (!(address & 2))
 				ptr++;
 			return ptr;
 		};
 	else
 		m_prptr = [this](offs_t address) -> const void * {
 			const u16 *ptr = reinterpret_cast<u16 *>(m_cache32.read_ptr(address & ~3));
-			if(address & 2)
+			if (address & 2)
 				ptr++;
 			return ptr;
 		};
@@ -88,8 +63,8 @@ void sh2_device::device_start()
 	save_item(NAME(m_nmi_line_state));
 	save_item(NAME(m_internal_irq_vector));
 
-	state_add( STATE_GENPC, "PC", m_sh2_state->pc).mask(m_am).callimport();
-	state_add( STATE_GENPCBASE, "CURPC", m_sh2_state->pc ).callimport().noshow();
+	state_add(STATE_GENPC, "PC", m_sh2_state->pc).mask(m_am).callimport();
+	state_add(STATE_GENPCBASE, "CURPC", m_sh2_state->pc).callimport().noshow();
 
 	m_nmi_line_state = 0;
 
@@ -105,11 +80,12 @@ void sh2_device::device_reset()
 	m_sh2_state->evec = m_sh2_state->irqsr = 0;
 	m_sh2_state->ea = m_sh2_state->m_delay = 0;
 	m_sh2_state->pending_irq = 0;
+	m_sh2_state->pending_nmi = 0;
 	m_sh2_state->sleep_mode = 0;
 	m_sh2_state->internal_irq_level = -1;
 	m_sh2_state->sr = SH_I;
-	m_sh2_state->pc = RL(0);
-	m_sh2_state->r[15] = RL(4);
+	m_sh2_state->pc = read_long(0);
+	m_sh2_state->r[15] = read_long(4);
 
 	m_test_irq = 0;
 	m_cpu_off = 0;
@@ -119,13 +95,15 @@ void sh2_device::device_reset()
 
 device_memory_interface::space_config_vector sh2_device::memory_space_config() const
 {
-	if(has_configured_map(AS_OPCODES))
-		return space_config_vector {
+	if (has_configured_map(AS_OPCODES))
+		return space_config_vector
+		{
 			std::make_pair(AS_PROGRAM, &m_program_config),
 			std::make_pair(AS_OPCODES, &m_decrypted_program_config)
 		};
 	else
-		return space_config_vector {
+		return space_config_vector
+		{
 			std::make_pair(AS_PROGRAM, &m_program_config)
 		};
 }
@@ -135,75 +113,105 @@ std::unique_ptr<util::disasm_interface> sh2_device::create_disassembler()
 	return std::make_unique<sh_disassembler>(false);
 }
 
-uint8_t sh2_device::RB(offs_t A)
+uint8_t sh2_device::read_byte(offs_t offset)
 {
-	if((A & 0xf0000000) == 0 || (A & 0xf0000000) == 0x20000000)
-		return m_program->read_byte(A & m_am);
+	if ((offset & 0xf0000000) == 0 || (offset & 0xf0000000) == 0x20000000)
+		return m_program->read_byte(offset & m_am);
 
-	return m_program->read_byte(A);
+	return m_program->read_byte(offset);
 }
 
-uint16_t sh2_device::RW(offs_t A)
+uint16_t sh2_device::read_word(offs_t offset)
 {
-	if((A & 0xf0000000) == 0 || (A & 0xf0000000) == 0x20000000)
-		return m_program->read_word(A & m_am);
+	if ((offset & 0xf0000000) == 0 || (offset & 0xf0000000) == 0x20000000)
+		return m_program->read_word(offset & m_am);
 
-	return m_program->read_word(A);
+	return m_program->read_word(offset);
 }
 
-uint32_t sh2_device::RL(offs_t A)
+uint32_t sh2_device::read_long(offs_t offset)
 {
 	/* 0x20000000 no Cache */
 	/* 0x00000000 read thru Cache if CE bit is 1 */
-	if((A & 0xf0000000) == 0 || (A & 0xf0000000) == 0x20000000)
-		return m_program->read_dword(A & m_am);
+	if ((offset & 0xf0000000) == 0 || (offset & 0xf0000000) == 0x20000000)
+		return m_program->read_dword(offset & m_am);
 
-	return m_program->read_dword(A);
+	return m_program->read_dword(offset);
 }
 
-void sh2_device::WB(offs_t A, uint8_t V)
+uint16_t sh2_device::decrypted_read_word(offs_t offset)
 {
-	if((A & 0xf0000000) == 0 || (A & 0xf0000000) == 0x20000000)
+	return m_decrypted_program->read_word(offset);
+}
+
+void sh2_device::write_byte(offs_t offset, uint8_t data)
+{
+	if ((offset & 0xf0000000) == 0 || (offset & 0xf0000000) == 0x20000000)
 	{
-		m_program->write_byte(A & m_am,V);
+		m_program->write_byte(offset & m_am, data);
 		return;
 	}
 
-	m_program->write_byte(A,V);
+	m_program->write_byte(offset, data);
 }
 
-void sh2_device::WW(offs_t A, uint16_t V)
+void sh2_device::write_word(offs_t offset, uint16_t data)
 {
-	if((A & 0xf0000000) == 0 || (A & 0xf0000000) == 0x20000000)
+	if ((offset & 0xf0000000) == 0 || (offset & 0xf0000000) == 0x20000000)
 	{
-		m_program->write_word(A & m_am,V);
+		m_program->write_word(offset & m_am, data);
 		return;
 	}
 
-	m_program->write_word(A,V);
+	m_program->write_word(offset, data);
 }
 
-void sh2_device::WL(offs_t A, uint32_t V)
+void sh2_device::write_long(offs_t offset, uint32_t data)
 {
-	if((A & 0xf0000000) == 0 || (A & 0xf0000000) == 0x20000000)
+	if ((offset & 0xf0000000) == 0 || (offset & 0xf0000000) == 0x20000000)
 	{
-		m_program->write_dword(A & m_am,V);
+		m_program->write_dword(offset & m_am, data);
 		return;
 	}
 
 	/* 0x20000000 no Cache */
 	/* 0x00000000 read thru Cache if CE bit is 1 */
-	m_program->write_dword(A,V);
+	m_program->write_dword(offset, data);
+}
+
+void sh2_device::check_pending_irq(const char *message)
+{
+	if (m_sh2_state->pending_nmi)
+	{
+		sh2_exception(message, 16);
+		m_sh2_state->pending_nmi = 0;
+	}
+	else
+	{
+		int irq = m_sh2_state->internal_irq_level;
+		if (m_sh2_state->pending_irq)
+		{
+			int external_irq = 15 - (count_leading_zeros_32(m_sh2_state->pending_irq) - 16);
+			if (external_irq >= irq)
+			{
+				irq = external_irq;
+			}
+		}
+
+		if (irq >= 0)
+		{
+			sh2_exception(message, irq);
+		}
+	}
 }
 
 /*  LDC.L   @Rm+,SR */
 inline void sh2_device::LDCMSR(const uint16_t opcode) // passes Rn
 {
-	uint32_t x = Rn;
-
-	m_sh2_state->ea = m_sh2_state->r[x];
-	m_sh2_state->sr = RL( m_sh2_state->ea ) & SH_FLAGS;
-	m_sh2_state->r[x] += 4;
+	const uint32_t rn = REG_N;
+	m_sh2_state->ea = m_sh2_state->r[rn];
+	m_sh2_state->sr = read_long(m_sh2_state->ea) & SH_FLAGS;
+	m_sh2_state->r[rn] += 4;
 	m_sh2_state->icount -= 2;
 	m_test_irq = 1;
 }
@@ -211,9 +219,7 @@ inline void sh2_device::LDCMSR(const uint16_t opcode) // passes Rn
 /*  LDC     Rm,SR */
 inline void sh2_device::LDCSR(const uint16_t opcode) // passes Rn
 {
-	uint32_t x = Rn;
-
-	m_sh2_state->sr = m_sh2_state->r[x] & SH_FLAGS;
+	m_sh2_state->sr = m_sh2_state->r[REG_N] & SH_FLAGS;
 	m_test_irq = 1;
 }
 
@@ -221,10 +227,10 @@ inline void sh2_device::LDCSR(const uint16_t opcode) // passes Rn
 inline void sh2_device::RTE()
 {
 	m_sh2_state->ea = m_sh2_state->r[15];
-	m_sh2_state->m_delay = RL( m_sh2_state->ea );
+	m_sh2_state->m_delay = read_long(m_sh2_state->ea);
 	m_sh2_state->r[15] += 4;
 	m_sh2_state->ea = m_sh2_state->r[15];
-	m_sh2_state->sr = RL( m_sh2_state->ea ) & SH_FLAGS;
+	m_sh2_state->sr = read_long(m_sh2_state->ea) & SH_FLAGS;
 	m_sh2_state->r[15] += 4;
 	m_sh2_state->icount -= 3;
 	m_test_irq = 1;
@@ -239,11 +245,11 @@ inline void sh2_device::TRAPA(uint32_t i)
 	m_sh2_state->ea = m_sh2_state->vbr + imm * 4;
 
 	m_sh2_state->r[15] -= 4;
-	WL( m_sh2_state->r[15], m_sh2_state->sr );
+	write_long(m_sh2_state->r[15], m_sh2_state->sr);
 	m_sh2_state->r[15] -= 4;
-	WL( m_sh2_state->r[15], m_sh2_state->pc );
+	write_long(m_sh2_state->r[15], m_sh2_state->pc);
 
-	m_sh2_state->pc = RL( m_sh2_state->ea );
+	m_sh2_state->pc = read_long(m_sh2_state->ea);
 
 	m_sh2_state->icount -= 7;
 }
@@ -255,12 +261,12 @@ inline void sh2_device::ILLEGAL()
 	debugger_exception_hook(4);
 
 	m_sh2_state->r[15] -= 4;
-	WL( m_sh2_state->r[15], m_sh2_state->sr );     /* push SR onto stack */
+	write_long(m_sh2_state->r[15], m_sh2_state->sr);     /* push SR onto stack */
 	m_sh2_state->r[15] -= 4;
-	WL( m_sh2_state->r[15], m_sh2_state->pc - 2 ); /* push PC onto stack */
+	write_long(m_sh2_state->r[15], m_sh2_state->pc - 2); /* push PC onto stack */
 
 	/* fetch PC */
-	m_sh2_state->pc = RL( m_sh2_state->vbr + 4 * 4 );
+	m_sh2_state->pc = read_long(m_sh2_state->vbr + 4 * 4);
 
 	/* TODO: timing is a guess */
 	m_sh2_state->icount -= 5;
@@ -273,7 +279,7 @@ void sh2_device::execute_one_f000(uint16_t opcode)
 
 void sh2_device::execute_run()
 {
-	if ( m_isdrc )
+	if (m_isdrc)
 	{
 		execute_run_drc();
 		return;
@@ -301,13 +307,13 @@ void sh2_device::execute_run()
 
 		execute_one(opcode);
 
-		if(m_test_irq && !m_sh2_state->m_delay)
+		if (m_test_irq && !m_sh2_state->m_delay)
 		{
-			CHECK_PENDING_IRQ("mame_sh2_execute");
+			check_pending_irq("mame_sh2_execute");
 			m_test_irq = 0;
 		}
 		m_sh2_state->icount--;
-	} while( m_sh2_state->icount > 0 );
+	} while (m_sh2_state->icount > 0);
 }
 
 void sh2_device::init_drc_frontend()
@@ -340,7 +346,7 @@ void sh2_device::state_import(const device_state_entry &entry)
 			break;
 
 		case SH_SR:
-			CHECK_PENDING_IRQ("sh2_set_reg");
+			check_pending_irq("sh2_set_reg");
 			break;
 	}
 }
@@ -351,26 +357,37 @@ void sh2_device::execute_set_input(int irqline, int state)
 	{
 		if (m_nmi_line_state == state)
 			return;
+
 		m_nmi_line_state = state;
 
 		if (state == CLEAR_LINE)
 		{
-			LOG("SH-2 cleared nmi\n");
+			LOG("SH-2 cleared NMI\n");
 		}
 		else
 		{
-			LOG("SH-2 asserted nmi\n");
+			LOG("SH-2 asserted NMI\n");
 
-			sh2_exception("Set IRQ line", 16);
+			m_sh2_state->pending_nmi = 1;
 
 			if (m_isdrc)
-				m_sh2_state->pending_nmi = 1;
+			{
+				sh2_exception("Set IRQ line", 16);
+			}
+			else
+			{
+				if (m_sh2_state->m_delay)
+					m_test_irq = 1;
+				else
+					check_pending_irq("sh2_set_nmi_line");
+			}
 		}
 	}
 	else
 	{
 		if (m_irq_line_state[irqline] == state)
 			return;
+
 		m_irq_line_state[irqline] = state;
 
 		if (state == CLEAR_LINE)
@@ -382,14 +399,17 @@ void sh2_device::execute_set_input(int irqline, int state)
 		{
 			LOG("SH-2 asserted irq #%d\n", irqline);
 			m_sh2_state->pending_irq |= 1 << irqline;
+
 			if (m_isdrc)
 			{
 				m_test_irq = 1;
-			} else {
-				if(m_sh2_state->m_delay)
+			}
+			else
+			{
+				if (m_sh2_state->m_delay)
 					m_test_irq = 1;
 				else
-					CHECK_PENDING_IRQ("sh2_set_irq_line");
+					check_pending_irq("sh2_set_irq_line");
 			}
 		}
 	}
@@ -435,7 +455,7 @@ void sh2_device::sh2_exception_internal(const char *message, int irqline, int ve
 
 	if (m_isdrc)
 	{
-		m_sh2_state->evec = RL( m_sh2_state->vbr + vector * 4 );
+		m_sh2_state->evec = read_long(m_sh2_state->vbr + vector * 4);
 		m_sh2_state->evec &= m_am;
 		m_sh2_state->irqsr = m_sh2_state->sr;
 
@@ -446,11 +466,13 @@ void sh2_device::sh2_exception_internal(const char *message, int irqline, int ve
 			m_sh2_state->sr = (m_sh2_state->sr & ~SH_I) | (irqline << 4);
 
 //  printf("sh2_exception [%s] irqline %x evec %x save SR %x new SR %x\n", message, irqline, m_sh2_state->evec, m_sh2_state->irqsr, m_sh2_state->sr);
-	} else {
+	}
+	else
+	{
 		m_sh2_state->r[15] -= 4;
-		WL( m_sh2_state->r[15], m_sh2_state->sr );     /* push SR onto stack */
+		write_long(m_sh2_state->r[15], m_sh2_state->sr);     /* push SR onto stack */
 		m_sh2_state->r[15] -= 4;
-		WL( m_sh2_state->r[15], m_sh2_state->pc );     /* push PC onto stack */
+		write_long(m_sh2_state->r[15], m_sh2_state->pc);     /* push PC onto stack */
 
 		/* set I flags in SR */
 		if (irqline > SH2_INT_15)
@@ -459,10 +481,11 @@ void sh2_device::sh2_exception_internal(const char *message, int irqline, int ve
 			m_sh2_state->sr = (m_sh2_state->sr & ~SH_I) | (irqline << 4);
 
 		/* fetch PC */
-		m_sh2_state->pc = RL( m_sh2_state->vbr + vector * 4 );
+		m_sh2_state->pc = read_long(m_sh2_state->vbr + vector * 4);
 	}
 
-	if(m_sh2_state->sleep_mode == 1) { m_sh2_state->sleep_mode = 2; }
+	if (m_sh2_state->sleep_mode == 1)
+		m_sh2_state->sleep_mode = 2;
 }
 
 /////////
@@ -475,7 +498,7 @@ const opcode_desc* sh2_device::get_desclist(offs_t pc)
 
 void sh2_device::func_fastirq()
 {
-	sh2_exception("fastirq",m_sh2_state->irqline);
+	sh2_exception("fastirq", m_sh2_state->irqline);
 }
 static void cfunc_fastirq(void *param) { ((sh2_device *)param)->func_fastirq(); };
 

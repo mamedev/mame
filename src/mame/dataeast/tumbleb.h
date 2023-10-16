@@ -70,6 +70,8 @@ public:
 	void init_magipur();
 	void init_carket();
 
+	DECLARE_CUSTOM_INPUT_MEMBER(suprtrio_prot_latch_r);
+
 protected:
 	/* memory pointers */
 	optional_shared_ptr<uint16_t> m_mainram;
@@ -183,6 +185,8 @@ protected:
 	void suprtrio_sound_map(address_map &map);
 	void tumblepopb_main_map(address_map &map);
 	void tumblepopba_main_map(address_map &map);
+
+	u8 m_suprtrio_prot_latch = 0;
 };
 
 class tumbleb_pic_state : public tumbleb_state

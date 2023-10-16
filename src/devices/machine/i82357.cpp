@@ -33,7 +33,7 @@ i82357_device::i82357_device(const machine_config &mconfig, const char *tag, dev
 	, m_pic(*this, "pic%u", 0)
 	, m_pit(*this, "pit%u", 0)
 	, m_dma(*this, "dma%u", 0)
-	, m_out_rtc(*this)
+	, m_out_rtc_address(*this)
 	, m_out_nmi(*this)
 	, m_out_spkr(*this)
 {
@@ -128,7 +128,7 @@ void i82357_device::map(address_map &map)
 			{
 				m_nmi_enabled = !BIT(data, 7);
 
-				m_out_rtc(0, data & 0x7f);
+				m_out_rtc_address(data & 0x7f);
 
 				m_nmi_check->adjust(attotime::zero);
 			}, "nmi_rtc").umask64(0xff);

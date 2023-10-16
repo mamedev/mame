@@ -2819,7 +2819,7 @@ The following floppies came with the machines.
 	<software name="raftoid">
 		<description>Raftoid</description>
 		<year>2020</year>
-		<publisher>PlattySoft</publisher>
+		<publisher>Platty Soft</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="368640">
 				<rom name="raftoid - plattysoft.dsk" size="368640" crc="11da66da" sha1="e9c5c128e6119e7bc18aa9b4b907ba826ce3da66" />

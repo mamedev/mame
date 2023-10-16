@@ -11,8 +11,6 @@
 
 #pragma once
 
-#include "formats/d80_dsk.h"
-#include "formats/d82_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/fdc_pll.h"
 

@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /*********************************************************************
 
-    formats/abc800i_dsk.c
+    formats/abc800i_dsk.cpp
 
     Luxor ABC 830 interleaved disk image formats
 
@@ -17,17 +17,17 @@ abc800i_format::abc800i_format() : wd177x_format(formats)
 {
 }
 
-const char *abc800i_format::name() const
+const char *abc800i_format::name() const noexcept
 {
 	return "abc800i";
 }
 
-const char *abc800i_format::description() const
+const char *abc800i_format::description() const noexcept
 {
 	return "Luxor ABC 830 interleaved disk image";
 }
 
-const char *abc800i_format::extensions() const
+const char *abc800i_format::extensions() const noexcept
 {
 	return "dsk";
 }

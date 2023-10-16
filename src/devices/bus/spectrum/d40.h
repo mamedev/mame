@@ -17,7 +17,6 @@
 #include "machine/wd_fdc.h"
 #include "machine/upd765.h"
 #include "machine/i8255.h"
-#include "formats/pc_dsk.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

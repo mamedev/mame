@@ -17,7 +17,10 @@
   TODO:
     - INS8250 needs to implement "Set Break" (LCR, bit 6) before Break key
       will function as expected.
-
+    - 49/50 row mode does not work when DOT clocks are programmed as documented
+      in the manual. It does work when DOT clock is fixed at the 20.282 MHz
+      rate.
+    - In 49/50 row mode, character descenders are cut off.
 ****************************************************************************/
 /***************************************************************************
   Memory Layout

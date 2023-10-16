@@ -50,6 +50,12 @@ else
 	}
 end
 
+if _OPTIONS["USE_WAYLAND"]=="1" then
+	defines {
+		"SDLMAME_USE_WAYLAND",
+	}
+end
+
 if _OPTIONS["NO_USE_XINPUT"]=="1" then
 	defines {
 		"USE_XINPUT=0",

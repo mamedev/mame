@@ -45,6 +45,8 @@
 #include "emu.h"
 #include "sixword.h"
 
+#include "formats/swd_dsk.h"
+
 
 /***************************************************************************
     DEVICE DEFINITIONS

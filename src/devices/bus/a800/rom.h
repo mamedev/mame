@@ -83,7 +83,7 @@ protected:
 	virtual void device_start() override;
 };
 
-class a5200_rom_2chips_device : public a800_rom_device
+class a5200_rom_2chips_device : public a5200_rom_device
 {
 public:
 	a5200_rom_2chips_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

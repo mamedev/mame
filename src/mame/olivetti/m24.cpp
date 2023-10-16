@@ -37,7 +37,6 @@
 #include "sound/spkrdev.h"
 #include "speaker.h"
 
-#include "formats/pc_dsk.h"
 #include "formats/naslite_dsk.h"
 #include "formats/m20_dsk.h"
 

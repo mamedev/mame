@@ -144,7 +144,7 @@ int lw30_format::identify(util::random_read &io, uint32_t form_factor, const std
 	return 0;
 }
 
-bool lw30_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool lw30_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	uint8_t trackdata[SECTORS_PER_TRACK * SECTOR_SIZE], rawdata[CELLS_PER_REV / 8];
 	memset(rawdata, 0xaa, sizeof(rawdata));
@@ -182,27 +182,27 @@ bool lw30_format::load(util::random_read &io, uint32_t form_factor, const std::v
 		generate_track_from_bitstream(track, 0, rawdata, CELLS_PER_REV, image);
 	}
 
-	image->set_variant(floppy_image::SSDD);
+	image.set_variant(floppy_image::SSDD);
 
 	return true;
 }
 
-const char *lw30_format::name() const
+const char *lw30_format::name() const noexcept
 {
 	return "lw30";
 }
 
-const char *lw30_format::description() const
+const char *lw30_format::description() const noexcept
 {
 	return "Brother LW-30 floppy disk image";
 }
 
-const char *lw30_format::extensions() const
+const char *lw30_format::extensions() const noexcept
 {
 	return "img";
 }
 
-bool lw30_format::supports_save() const
+bool lw30_format::supports_save() const noexcept
 {
 	// TODO
 	return false;

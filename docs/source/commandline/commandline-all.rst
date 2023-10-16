@@ -40,7 +40,7 @@ File Names and Directory Paths
 ------------------------------
 
 A number of options for specifying directories support multiple paths (for
-for example to search for ROMs in multiple locations).  MAME expects multiple
+example to search for ROMs in multiple locations).  MAME expects multiple
 paths to be separated with semicolons ( ``;`` ).
 
 MAME expands environment variable expressions in paths.  The syntax used depends
@@ -1905,7 +1905,7 @@ Core Performance Options
 
 **-[no]throttle**
 
-   Enable or disable thottling emulation speed.  When throttling is enabled,
+   Enable or disable throttling emulation speed.  When throttling is enabled,
    MAME limits emulation speed to so the emulated system will not run faster
    than the original hardware.  When throttling is disabled, MAME runs the
    emulation as fast as possible. Depending on your settings and the
@@ -2334,7 +2334,7 @@ Core Video Options
 
     The default is ``1``.
 
-    This is supported with all video output types ( ``bgfx``, ``d3d``, etc) on
+    This is supported with all video output types ( ``bgfx``, ``d3d``, etc.) on
     Windows and is supported with BGFX and OpenGL on other platforms.
 
     Example:
@@ -2369,7 +2369,7 @@ Core Video Options
 **-[no]unevenstretch**
 
     Allow non-integer scaling factors allowing for great window sizing
-    flexability.
+    flexibility.
 
     The default is ON. (**-unevenstretch**)
 
@@ -2896,7 +2896,7 @@ Core Video OpenGL GLSL Options
 
 **-glsl_shader_mame9**
 
-    Set a custom OpenGL GLSL shader effect to the internal systcm screen in the
+    Set a custom OpenGL GLSL shader effect to the internal system screen in the
     given slot. MAME does not include a vast selection of shaders by default;
     more can be found online.
 
@@ -2917,7 +2917,7 @@ Core Video OpenGL GLSL Options
 
 
     Set a custom OpenGL GLSL shader effect to the whole scaled-up output screen
-    that will be rendered by your graphics card.MAME does not include a vast
+    that will be rendered by your graphics card. MAME does not include a vast
     selection of shaders by default; more can be found online.
 
     Example:
@@ -3458,7 +3458,7 @@ Core Input Options
 
     Allows user to specify whether or not to use a natural keyboard or not.
     This allows you to start your system in a 'native' mode, depending on your
-    region, allowing compatability for non-"QWERTY" style keyboards.
+    region, allowing compatibility for non-"QWERTY" style keyboards.
 
     The default is OFF (**-nonatural**)
 
@@ -4072,8 +4072,8 @@ Scripting Options
 **-autoboot_command** *"<command>"*
 
     Command string to execute after machine boot (in quotes " "). To issue a
-    quote to the emulation, use """ in the string. Using **\\n** will issue a
-    create a new line, issuing what was typed prior as a command.
+    quote to the emulation, use """ in the string. Using **\\n** will create
+    a new line, issuing what was typed prior as a command.
 
     This works only with systems that support natural keyboard mode.
 

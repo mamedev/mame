@@ -15,7 +15,6 @@
 #include "bus/acorn/bus.h"
 #include "imagedev/floppy.h"
 #include "machine/i8271.h"
-#include "formats/acorn_dsk.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

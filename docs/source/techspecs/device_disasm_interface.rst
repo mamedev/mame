@@ -168,7 +168,7 @@ A CPU core derives from **device_disasm_interface** through
 That method must return a pointer to a newly allocated disassembler
 object.  The caller takes ownership and handles the lifetime.
 
-THis method will be called at most one in the lifetime of the cpu
+This method will be called at most one in the lifetime of the cpu
 object.
 
 4. Disassembler configuration and communication
@@ -184,7 +184,7 @@ model name), feel free to use a parameter.  Otherwise derive the
 class.
 
 Dynamic configuration must be done by first defining a nested public
-struct called "config" in the disassembler, with virtual destructor
+struct called ``config`` in the disassembler, with virtual destructor
 and pure virtual methods to pull the required information.  A pointer
 to that struct should be passed to the disassembler constructor.  The
 cpu core should then add a derivation from that config struct and
@@ -195,9 +195,9 @@ the config class to give the information.
 ----------------
 
 There currently is no way for the debugger GUI to add per-core
-configuration.  It is needed for in particular the s2650 and the
-saturn cores.  It should go through the cpu core class itself, since
-it's pulled from the config struct.
+configuration.  In particular, it is needed for the s2650 and Saturn
+cores. It should go through the cpu core class itself, since it's
+pulled from the config struct.
 
 There is support missing in unidasm for per-cpu configuration.  That's
 needed for a lot of things, see the unidasm source code for the

@@ -164,7 +164,7 @@ programmer
     Programmer who wrote the code for the software.
 release
     Fine-grained release date for the software, if known.  Use
-    YYYYMMDD format with no punctuation.  If only the month is know,
+    YYYYMMDD format with no punctuation.  If only the month is known,
     use “xx” for the day digits.  For example ``199103xx`` or
     ``19940729``.
 serial

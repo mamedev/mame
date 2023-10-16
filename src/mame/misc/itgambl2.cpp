@@ -609,6 +609,21 @@ ROM_START( mcard_h8 )
 ROM_END
 
 
+// PCB is marked 2-0249 and has a SanRemo Games sticker.
+ROM_START( smcard )
+	ROM_REGION( 0x1000000, "maincpu", 0 ) // all the program code is in here
+	ROM_LOAD( "smcard_h8_hd64f3337cp16.mcu", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION( 0x200000, "gfx1", 0 ) // all handwritten labels
+	ROM_LOAD( "1.bin", 0x000000, 0x80000, CRC(0edd5f93) SHA1(a6cfe88a3d3e5be7948e125f9911ed120be5202a) )
+	ROM_LOAD( "2.bin", 0x080000, 0x80000, CRC(e09748c3) SHA1(9778498745176ee36d5f6bec5fdd2f071f595936) )
+	ROM_LOAD( "3.bin", 0x100000, 0x80000, CRC(69832697) SHA1(51da0149849b8f11422de91728ea27148f602a54) )
+	ROM_LOAD( "4.bin", 0x180000, 0x80000, CRC(cad9599d) SHA1(21cfd9d18cde456ae5782b2bcf7b60720d1ff2af) )
+
+	ROM_REGION( 0x80000, "upd", 0 ) // NEC D7759GC samples, on a ST M27C4001 with original label
+	ROM_LOAD( "smcard_msg_0.bin", 0x00000, 0x80000, CRC(8274d2f0) SHA1(cfddc958ba10e74fb8117cea1b0b416f482f706d) ) // 1ST AND 2ND HALF IDENTICAL, 1st quarter matches the sets above
+ROM_END
+
 /*
   Millennium Sun.
 
@@ -1179,6 +1194,7 @@ GAME( 2001, te0144,   0,        itgambl2, itgambl2, itgambl2_state, empty_init, 
 GAME( 200?, btorneo,  0,        itgambl2, itgambl2, itgambl2_state, empty_init, ROT0, "<unknown>", "Bubble Torneo",                         MACHINE_IS_SKELETON )
 GAME( 200?, cmagica,  0,        itgambl2, itgambl2, itgambl2_state, empty_init, ROT0, "<unknown>", "Carta Magica (Ver 1.8)",                MACHINE_IS_SKELETON )
 GAME( 200?, mcard_h8, cmagica,  itgambl2, itgambl2, itgambl2_state, empty_init, ROT0, "<unknown>", "Magic Card (H8, English)",              MACHINE_IS_SKELETON )
+GAME( 200?, smcard,   cmagica,  itgambl2, itgambl2, itgambl2_state, empty_init, ROT0, "<unknown>", "Super Magic Card",                      MACHINE_IS_SKELETON )
 GAME( 200?, millsun,  0,        itgambl2, itgambl2, itgambl2_state, empty_init, ROT0, "<unknown>", "Millennium Sun",                        MACHINE_IS_SKELETON )
 GAME( 200?, sspac2k1, 0,        itgambl2, itgambl2, itgambl2_state, empty_init, ROT0, "<unknown>", "Super Space 2001",                      MACHINE_IS_SKELETON )
 GAME( 200?, elvis,    0,        itgambl2, itgambl2, itgambl2_state, empty_init, ROT0, "<unknown>", "Elvis?",                                MACHINE_IS_SKELETON )

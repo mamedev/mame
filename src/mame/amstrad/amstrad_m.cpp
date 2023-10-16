@@ -2487,13 +2487,13 @@ void amstrad_state::update_psg()
 		switch(m_aleste_rtc_function)
 		{
 		case 0x02:  // AS
-			m_rtc->write(0, m_ppi_port_outputs[amstrad_ppi_PortA]);
+			m_rtc->address_w(m_ppi_port_outputs[amstrad_ppi_PortA]);
 			break;
 		case 0x04:  // DS write
-			m_rtc->write(1, m_ppi_port_outputs[amstrad_ppi_PortA]);
+			m_rtc->data_w(m_ppi_port_outputs[amstrad_ppi_PortA]);
 			break;
 		case 0x05:  // DS read
-			m_ppi_port_inputs[amstrad_ppi_PortA] = m_rtc->read(1);
+			m_ppi_port_inputs[amstrad_ppi_PortA] = m_rtc->data_r();
 			break;
 		}
 		return;

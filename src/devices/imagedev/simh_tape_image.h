@@ -30,8 +30,8 @@ public:
 	virtual void call_unload() override;
 
 	// miscellaneous
-	inline void set_interface(const char *interface) { m_interface = interface; }
-	inline simh_tape_file *get_file() const { return m_file.get(); }
+	void set_interface(const char *interface) { m_interface = interface; }
+	simh_tape_file *get_file() const { return m_file.get(); }
 
 protected:
 	// construction

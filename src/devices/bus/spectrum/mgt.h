@@ -19,7 +19,6 @@
 #include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 #include "bus/centronics/ctronics.h"
-#include "formats/coupedsk.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

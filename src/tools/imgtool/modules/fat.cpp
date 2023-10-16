@@ -423,7 +423,7 @@ static imgtoolerr_t fat_partition_open(imgtool::partition &partition, uint64_t f
 	if (info->sectors_per_cluster == 0)
 		return IMGTOOLERR_CORRUPTIMAGE;
 
-	info->total_sectors = total_sectors_l + (((uint64_t) total_sectors_h) << 16);
+	info->total_sectors = total_sectors_l + (uint64_t(total_sectors_h) << 16);
 	available_sectors = info->total_sectors - info->reserved_sectors
 		- (info->sectors_per_fat * info->fat_count)
 		- (info->root_entries * FAT_DIRENT_SIZE + FAT_SECLEN - 1) / FAT_SECLEN;
@@ -526,13 +526,13 @@ static imgtoolerr_t fat_partition_create(imgtool::image &image, uint64_t first_b
 	header[14] = reserved_sectors;
 	header[16] = fat_count;
 	put_u16le(&header[17], root_dir_count);
-	put_u16le(&header[19], (uint16_t) (block_count >> 0));
+	put_u16le(&header[19], uint16_t(block_count >> 0));
 	header[21] = media_descriptor;
 	put_u16le(&header[22], sectors_per_fat);
 	put_u16le(&header[24], sectors_per_track);
 	put_u16le(&header[26], heads);
 	put_u32le(&header[28], hidden_sectors);
-	put_u32le(&header[32], (uint32_t) (block_count >> 16));
+	put_u32le(&header[32], uint32_t(block_count >> 16));
 	header[36] = 0xFF;
 	header[38] = 0x28;
 	header[39] = std::rand();
@@ -554,14 +554,14 @@ static imgtoolerr_t fat_partition_create(imgtool::image &image, uint64_t first_b
 	if (boot_sector_offset <= 129)
 	{
 		header[0] = 0xEB;                                    /* JMP rel8 */
-		header[1] = (uint8_t) (boot_sector_offset - 2);        /* (offset) */
+		header[1] = uint8_t(boot_sector_offset - 2);         /* (offset) */
 		header[2] = 0x90;                                    /* NOP */
 	}
 	else
 	{
 		header[0] = 0xE9;                                    /* JMP rel16 */
-		header[1] = (uint8_t) ((boot_sector_offset - 2) >> 0); /* (offset) */
-		header[2] = (uint8_t) ((boot_sector_offset - 2) >> 8); /* (offset) */
+		header[1] = uint8_t((boot_sector_offset - 2) >> 0);  /* (offset) */
+		header[2] = uint8_t((boot_sector_offset - 2) >> 8);  /* (offset) */
 	}
 
 	err = image.write_block(first_block, header);
@@ -579,9 +579,9 @@ static imgtoolerr_t fat_partition_create(imgtool::image &image, uint64_t first_b
 	// FIXME: this causes a corrupt PC floppy image since it doubles the FAT partition header - works without it though
 #if 0
 	/* set first two FAT entries */
-	first_fat_entries = ((uint64_t) media_descriptor) | 0xFFFFFF00;
-	first_fat_entries &= (((uint64_t) 1) << fat_bits) - 1;
-	first_fat_entries |= ((((uint64_t) 1) << fat_bits) - 1) << fat_bits;
+	first_fat_entries = uint64_t(media_descriptor) | 0xFFFFFF00;
+	first_fat_entries &= (uint64_t(1) << fat_bits) - 1;
+	first_fat_entries |= ((uint64_t(1) << fat_bits) - 1) << fat_bits;
 	first_fat_entries = little_endianize_int64(first_fat_entries);
 
 	for (i = 0; i < fat_count; i++)
@@ -707,8 +707,8 @@ static uint32_t fat_get_fat_entry(imgtool::partition &partition, const uint8_t *
 		entry &= bit_mask;
 
 		if (i == 0)
-			last_entry = (uint32_t) entry;
-		else if (last_entry != (uint32_t) entry)
+			last_entry = uint32_t(entry);
+		else if (last_entry != uint32_t(entry))
 			return 1;   /* if the FATs disagree; mark this as reserved */
 	}
 
@@ -740,8 +740,8 @@ static void fat_set_fat_entry(imgtool::partition &partition, uint8_t *fat_table,
 			* disk_info->sectors_per_fat) + (bit_index / 8), sizeof(entry));
 
 		entry = little_endianize_int64(entry);
-		entry &= (~((uint64_t) 0xFFFFFFFF >> (32 - disk_info->fat_bits)) << (bit_index % 8)) | ((1 << (bit_index % 8)) - 1);
-		entry |= ((uint64_t) value) << (bit_index % 8);
+		entry &= (~(uint64_t(0xFFFFFFFF) >> (32 - disk_info->fat_bits)) << (bit_index % 8)) | ((1 << (bit_index % 8)) - 1);
+		entry |= uint64_t(value) << (bit_index % 8);
 		entry = little_endianize_int64(entry);
 
 		memcpy(fat_table + (i * FAT_SECLEN
@@ -1229,7 +1229,7 @@ static void fat_canonicalize_sfn(char *sfn, const uint8_t *sfn_bytes)
 	memcpy(sfn, sfn_bytes, 8);
 	rtrim(sfn);
 	if (sfn[0] == 0x05)
-		sfn[0] = (char) 0xE5;
+		sfn[0] = char(0xE5);
 	if ((sfn_bytes[8] != ' ') || (sfn_bytes[9] != ' ') || (sfn_bytes[10] != ' '))
 	{
 		strcat(sfn, ".");
@@ -1452,13 +1452,13 @@ static imgtoolerr_t fat_construct_dirent(const char *filename, creation_policy_t
 		/* append to short filename, if possible */
 		if ((ch < 32) || (ch > 128))
 			short_char = '\0';
-		else if (isalnum((char) ch))
-			short_char = toupper((char) ch);
-		else if (strchr(".!#$%^()-@^_`{}~", (char) ch))
-			short_char = (char) ch;
+		else if (isalnum(char(ch)))
+			short_char = toupper(char(ch));
+		else if (strchr(".!#$%^()-@^_`{}~", char(ch)))
+			short_char = char(ch);
 		else
 			short_char = '\0';  /* illegal SFN char */
-		canonical_short_char = fat_canonicalize_sfn_char((char) ch);
+		canonical_short_char = fat_canonicalize_sfn_char(char(ch));
 		if (!short_char || (short_char != canonical_short_char))
 		{
 			if (toupper(short_char) == toupper(canonical_short_char))
@@ -1606,7 +1606,7 @@ static void fat_bump_dirent(imgtool::partition &partition, uint8_t *entry, size_
 	sfn_entry = &entry[entry_len - FAT_DIRENT_SIZE];
 
 	digit_place = 1;
-	for (pos = 7; (pos >= 0) && isdigit((char) sfn_entry[pos]); pos--)
+	for (pos = 7; (pos >= 0) && isdigit(char(sfn_entry[pos])); pos--)
 	{
 		val += (sfn_entry[pos] - '0') * digit_place;
 		digit_place *= 10;
@@ -1946,7 +1946,7 @@ static imgtoolerr_t fat_partition_writefile(imgtool::partition &partition, const
 	if (file.directory)
 		return IMGTOOLERR_FILENOTFOUND;
 
-	bytes_left = (uint32_t) sourcef.size();
+	bytes_left = uint32_t(sourcef.size());
 
 	err = fat_set_file_size(partition, &file, bytes_left);
 	if (err)

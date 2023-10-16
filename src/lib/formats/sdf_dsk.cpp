@@ -2,7 +2,7 @@
 // copyright-holders:Wilbert Pol, tim lindner
 /*********************************************************************
 
-    formats/sdf_dsk.h
+    formats/sdf_dsk.cpp
 
     SDF disk images. Format created by Darren Atkinson for use with
     his CoCoSDC floppy disk emulator.
@@ -22,19 +22,19 @@ sdf_format::sdf_format()
 }
 
 
-const char *sdf_format::name() const
+const char *sdf_format::name() const noexcept
 {
 	return "sdf";
 }
 
 
-const char *sdf_format::description() const
+const char *sdf_format::description() const noexcept
 {
 	return "SDF disk image";
 }
 
 
-const char *sdf_format::extensions() const
+const char *sdf_format::extensions() const noexcept
 {
 	return "sdf";
 }
@@ -77,7 +77,7 @@ int sdf_format::identify(util::random_read &io, uint32_t form_factor, const std:
 }
 
 
-bool sdf_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool sdf_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	size_t actual;
 	uint8_t header[HEADER_SIZE];
@@ -91,11 +91,11 @@ bool sdf_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 
 	if (heads == 2)
 	{
-		image->set_variant(floppy_image::DSDD);
+		image.set_variant(floppy_image::DSDD);
 	}
 	else
 	{
-		image->set_variant(floppy_image::SSDD);
+		image.set_variant(floppy_image::SSDD);
 	}
 
 	for (int track = 0; track < tracks; track++)
@@ -185,7 +185,7 @@ bool sdf_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 }
 
 
-bool sdf_format::supports_save() const
+bool sdf_format::supports_save() const noexcept
 {
 	return false;
 }

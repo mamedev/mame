@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:68bit
 /*
- * uniflex_dsk.c  -  UniFLEX compatible disk images
+ * uniflex_dsk.cpp  -  UniFLEX compatible disk images
  *
  * The UniFLEX floppy disk format is distinctily different to the FLEX format,
  * the sector size is 512 byte sectors versus 256 byte sectors and the format
@@ -20,17 +20,17 @@ uniflex_format::uniflex_format() : wd177x_format(formats)
 {
 }
 
-const char *uniflex_format::name() const
+const char *uniflex_format::name() const noexcept
 {
 	return "uniflex";
 }
 
-const char *uniflex_format::description() const
+const char *uniflex_format::description() const noexcept
 {
 	return "UniFLEX compatible disk image";
 }
 
-const char *uniflex_format::extensions() const
+const char *uniflex_format::extensions() const noexcept
 {
 	return "dsk";
 }
