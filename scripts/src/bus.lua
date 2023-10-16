@@ -1026,6 +1026,20 @@ if (BUSES["C64"]~=null) then
 end
 
 
+--
+--@src/devices/bus/casloopy/slot.h,BUSES["CASLOOPY_CART"] = true
+---------------------------------------------------
+
+if (BUSES["CASLOOPY_CART"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/casloopy/slot.cpp",
+		MAME_DIR .. "src/devices/bus/casloopy/slot.h",
+		MAME_DIR .. "src/devices/bus/casloopy/rom.cpp",
+		MAME_DIR .. "src/devices/bus/casloopy/rom.h",
+	}
+end
+
+
 ---------------------------------------------------
 --
 --@src/devices/bus/cbm2/exp.h,BUSES["CBM2"] = true
