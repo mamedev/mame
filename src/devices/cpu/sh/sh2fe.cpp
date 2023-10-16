@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont
 /***************************************************************************
 
-    sh2fe.c
+    sh2fe.cpp
 
     Front end for SH-2 recompiler
 

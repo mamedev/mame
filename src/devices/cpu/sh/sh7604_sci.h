@@ -45,7 +45,8 @@ public:
 	uint8_t receive_data_r();
 
 protected:
-	enum {
+	enum
+	{
 		STATUS_MPBT = 1 << 0,
 		STATUS_MPB =  1 << 1,
 		STATUS_TEND = 1 << 2,
