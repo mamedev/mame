@@ -31,6 +31,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
+static constexpr XTAL CLOCK_SAA1099 = XTAL(14'318'181/2);   // ISA OSC pin / 2
 static constexpr XTAL CLOCK_YM3812  = XTAL(14'318'181/4);   // ISA OSC pin / 4
 static constexpr XTAL XTAL_DSP      = XTAL(12'000'000);     // crystal X1
 
@@ -52,12 +53,27 @@ void isa8_sblaster_2_0_lle_device::device_add_mconfig(machine_config &config)
 
 	PC_JOY(config, m_joy);
 
-	SPEAKER(config, m_speaker).front_center();
-	MC1408(config, m_dac, 0).add_route(ALL_OUTPUTS, m_speaker, 0.5);
+	SPEAKER(config, m_lspeaker).front_left();
+	SPEAKER(config, m_rspeaker).front_right();
+
+	MC1408(config, m_dac, 0);
+	m_dac->add_route(ALL_OUTPUTS, m_lspeaker, 0.5);
+	m_dac->add_route(ALL_OUTPUTS, m_rspeaker, 0.5);
 
 	YM3812(config, m_ym3812, CLOCK_YM3812);
-	m_ym3812->add_route(ALL_OUTPUTS, m_speaker, 1.0);
-	/* no CMS */
+	m_ym3812->add_route(ALL_OUTPUTS, m_lspeaker, 1.0);
+	m_ym3812->add_route(ALL_OUTPUTS, m_rspeaker, 1.0);
+
+	if(m_cms_present)
+	{
+		// FM and DAC are mono, but CMS is stereo.
+		SAA1099(config, m_saa1099_1, CLOCK_SAA1099);
+		m_saa1099_1->add_route(0, m_lspeaker, 0.5);
+		m_saa1099_1->add_route(1, m_rspeaker, 0.5);
+		SAA1099(config, m_saa1099_2, CLOCK_SAA1099);
+		m_saa1099_2->add_route(0, m_lspeaker, 0.5);
+		m_saa1099_2->add_route(1, m_rspeaker, 0.5);
+	}
 }
 
 static INPUT_PORTS_START( sb_dsw )
@@ -72,6 +88,16 @@ static INPUT_PORTS_START( sb_dsw )
 	PORT_CONFSETTING(    0x04, "IRQ3" )
 	PORT_CONFSETTING(    0x02, "IRQ5")
 	PORT_CONFSETTING(    0x01, "IRQ7")
+
+	PORT_START("JP8")
+	PORT_CONFNAME( 0x01, 0x01, "Game Port")
+	PORT_CONFSETTING(    0x00, "Disabled")
+	PORT_CONFSETTING(    0x01, "Enabled")
+
+	PORT_START("JP9")
+	PORT_CONFNAME( 0x01, 0x00, "Creative Music System Present?")
+	PORT_CONFSETTING(    0x00, "No")
+	PORT_CONFSETTING(    0x01, "Yes")
 INPUT_PORTS_END
 
 ioport_constructor isa8_sblaster_2_0_lle_device::device_input_ports() const
@@ -86,21 +112,42 @@ isa8_sblaster_2_0_lle_device::isa8_sblaster_2_0_lle_device(const machine_config 
 	m_joy(*this, "pc_joy"),
 	m_ym3812(*this, "ym3812"),
 	m_dac(*this, "dac"),
-	m_speaker(*this, "speaker"),
+	m_lspeaker(*this, "lspeaker"),
+	m_rspeaker(*this, "rspeaker"),
+	m_saa1099_1(*this, "saa1099.1"),
+	m_saa1099_2(*this, "saa1099.2"),
 	m_jp1(*this, "JP1"),
-	m_jp4(*this, "JP4")
+	m_jp4(*this, "JP4"),
+	m_jp8(*this, "JP8"),
+	m_jp9(*this, "JP9")
 {
 }
 
 void isa8_sblaster_2_0_lle_device::device_start()
 {
 	m_installed_base_io = 0;
+	m_selected_irq = 0;
 	set_isa_device();
 }
 
 void isa8_sblaster_2_0_lle_device::device_reset()
 {
+	m_gameport_enabled = m_jp8->read() & 0x01;
+	m_cms_present = m_jp9->read() & 0x01;
+
+	if(m_selected_irq == 0)
+	{
+		switch(m_jp4->read())
+		{
+			case 1: m_selected_irq = 7; break;
+			case 2: m_selected_irq = 5; break;
+			case 4: m_selected_irq = 3; break;
+			case 8: m_selected_irq = 2; break;
+		}
+	}
+
 	install_io();
+
 	lower_irq();
 	lower_dma();
 
@@ -119,44 +166,48 @@ void isa8_sblaster_2_0_lle_device::device_reset()
 
 void isa8_sblaster_2_0_lle_device::install_io()
 {
-	uint16_t base = (m_jp1->read() & 0x02) ? 0x240 : 0x220;
-
-	if(m_installed_base_io != 0)
+	if(m_installed_base_io == 0)
 	{
-		// Unmap if already mapped.
-		m_isa->unmap_device(m_installed_base_io+0x6, m_installed_base_io+0x7);
-		m_isa->unmap_device(m_installed_base_io+0x8, m_installed_base_io+0x9);
-		m_isa->unmap_device(m_installed_base_io+0xa, m_installed_base_io+0xb);
-		m_isa->unmap_device(m_installed_base_io+0xc, m_installed_base_io+0xd);
-		m_isa->unmap_device(m_installed_base_io+0xe, m_installed_base_io+0xf);
+		uint16_t base = (m_jp1->read() & 0x02) ? 0x240 : 0x220;
+
+		m_isa->install_device(base + 0x6, base + 0x7,
+			emu::rw_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::dsp_reset_r)),
+			emu::rw_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::dsp_reset_w)));
+		m_isa->install_device(base + 0x8, base + 0x9,
+			emu::rw_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::ym3812_16_r)),
+			emu::rw_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::ym3812_16_w)));
+		m_isa->install_device(base + 0xa, base + 0xb,
+			emu::rw_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::dsp_data_r)),
+			emu::rw_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::dsp_data_w)));
+		m_isa->install_device(base + 0xc, base + 0xd,
+			emu::rw_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::dsp_wbuf_status_r)),
+			emu::rw_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::dsp_cmd_w)));
+		m_isa->install_device(base + 0xe, base + 0xf,
+			emu::rw_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::dsp_rbuf_status_r)),
+			emu::rw_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::dsp_rbuf_status_w)));
+		m_isa->install_device(0x388, 0x389,
+			emu::rw_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::ym3812_16_r)),
+			emu::rw_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::ym3812_16_w)));
+
+		if(m_gameport_enabled)
+		{
+			m_isa->install_device(0x200, 0x207,
+				emu::rw_delegate(m_joy, FUNC(pc_joy_device::joy_port_r)),
+				emu::rw_delegate(m_joy, FUNC(pc_joy_device::joy_port_w)));
+		}
+
+		if(m_cms_present)
+		{
+			m_isa->install_device(base + 0x0, base + 0x1,
+				emu::rw_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::saa1099_16_r)),
+				emu::rw_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::saa1099_1_16_w)));
+			m_isa->install_device(base + 0x2, base + 0x3,
+				emu::rw_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::saa1099_16_r)),
+				emu::rw_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::saa1099_2_16_w)));
+		}
+
+		m_installed_base_io = base;
 	}
-
-	m_isa->install_device(base + 0x6, base + 0x7,
-		emu::rw_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::dsp_reset_r)),
-		emu::rw_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::dsp_reset_w)));
-	m_isa->install_device(base + 0x8, base + 0x9,
-		emu::rw_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::ym3812_16_r)),
-		emu::rw_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::ym3812_16_w)));
-	m_isa->install_device(base + 0xa, base + 0xb,
-		emu::rw_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::dsp_data_r)),
-		emu::rw_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::dsp_data_w)));
-	m_isa->install_device(base + 0xc, base + 0xd,
-		emu::rw_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::dsp_wbuf_status_r)),
-		emu::rw_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::dsp_cmd_w)));
-	m_isa->install_device(base + 0xe, base + 0xf,
-		emu::rw_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::dsp_rbuf_status_r)),
-		emu::rw_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::dsp_rbuf_status_w)));
-
-
-	// The joystick port and AdLib-compatible port are not affected by jumpers.
-	m_isa->install_device(0x200, 0x207,
-		emu::rw_delegate(m_joy, FUNC(pc_joy_device::joy_port_r)),
-		emu::rw_delegate(m_joy, FUNC(pc_joy_device::joy_port_w)));
-	m_isa->install_device(0x388, 0x389,
-		emu::rw_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::ym3812_16_r)),
-		emu::rw_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::ym3812_16_w)));
-
-	m_installed_base_io = base;
 }
 
 // ISA DMA handling
@@ -191,29 +242,32 @@ void isa8_sblaster_2_0_lle_device::raise_irq()
 {
 	if(!m_irq_raised)
 	{
-		LOG("SB raising IRQ %d\n", 5);
-		switch(m_jp4->read())
+		LOG("SB raising IRQ %d\n", m_selected_irq);
+		switch(m_selected_irq)
 		{
-			case 1: m_isa->irq7_w(ASSERT_LINE); m_irq_raised = 7; break;
-			case 2: m_isa->irq5_w(ASSERT_LINE); m_irq_raised = 5; break;
-			case 4: m_isa->irq3_w(ASSERT_LINE); m_irq_raised = 3; break;
-			case 8: m_isa->irq2_w(ASSERT_LINE); m_irq_raised = 2; break;
+			case 7: m_isa->irq7_w(ASSERT_LINE); m_irq_raised = 7; break;
+			case 5: m_isa->irq5_w(ASSERT_LINE); m_irq_raised = 5; break;
+			case 3: m_isa->irq3_w(ASSERT_LINE); m_irq_raised = 3; break;
+			case 2: m_isa->irq2_w(ASSERT_LINE); m_irq_raised = 2; break;
 		}
 	}
 }
 
 void isa8_sblaster_2_0_lle_device::lower_irq()
 {
-	LOG("SB lowering IRQ %d\n", 5);
-	switch(m_irq_raised)
+	if(m_irq_raised != 0)
 	{
-		case 2: m_isa->irq2_w(CLEAR_LINE); break;
-		case 3: m_isa->irq3_w(CLEAR_LINE); break;
-		case 5: m_isa->irq5_w(CLEAR_LINE); break;
-		case 7: m_isa->irq7_w(CLEAR_LINE); break;
-		default: break;
+		LOG("SB lowering IRQ %d\n", m_irq_raised);
+		switch(m_irq_raised)
+		{
+			case 2: m_isa->irq2_w(CLEAR_LINE); break;
+			case 3: m_isa->irq3_w(CLEAR_LINE); break;
+			case 5: m_isa->irq5_w(CLEAR_LINE); break;
+			case 7: m_isa->irq7_w(CLEAR_LINE); break;
+			default: break;
+		}
+		m_irq_raised = 0;
 	}
-	m_irq_raised = 0;
 }
 
 // YM3812
@@ -257,7 +311,8 @@ uint8_t isa8_sblaster_2_0_lle_device::dsp_port2_r()
 void isa8_sblaster_2_0_lle_device::dsp_port2_w(uint8_t data)
 {
 	// Bit 0 is the only output, which mutes audio output when pulled high.
-	m_speaker->set_output_gain(ALL_OUTPUTS, !BIT(data, 0));
+	m_lspeaker->set_output_gain(ALL_OUTPUTS, !BIT(data, 0));
+	m_rspeaker->set_output_gain(ALL_OUTPUTS, !BIT(data, 0));
 }
 
 /*
@@ -404,9 +459,27 @@ void isa8_sblaster_2_0_lle_device::map_dsp_io(address_map &map)
 	map(0x0000, 0xffff).rw(FUNC(isa8_sblaster_2_0_lle_device::dsp_latch_r), FUNC(isa8_sblaster_2_0_lle_device::dsp_latch_w));
 }
 
+uint8_t isa8_sblaster_2_0_lle_device::saa1099_16_r(offs_t offset)
+{
+	return 0xff;
+}
+
+void isa8_sblaster_2_0_lle_device::saa1099_1_16_w(offs_t offset, uint8_t data)
+{
+	m_saa1099_1->write(offset, data);
+}
+
+void isa8_sblaster_2_0_lle_device::saa1099_2_16_w(offs_t offset, uint8_t data)
+{
+	m_saa1099_2->write(offset, data);
+}
+
 ROM_START(isa8_sblaster_2_0)
 	ROM_REGION(0x1000, "dsp", 0)
-	ROM_LOAD("ct1351v202.bin", 0x0000, 0x1000, CRC(bb2dd936) SHA1(2b5b75f2c9e923f0b44a454bdb06d9612ff4a8bb))
+	ROM_SYSTEM_BIOS(0, "dsp_v202", "DSP V2.02 (Creative Labs CT1351)")
+	ROMX_LOAD("ct1351v202.bin", 0x0000, 0x1000, CRC(bb2dd936) SHA1(2b5b75f2c9e923f0b44a454bdb06d9612ff4a8bb), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "anchor_v201", "DSP V2.01 (Anchor Electronics clone)")
+	ROMX_LOAD("anchorv201.bin", 0x0000, 0x1000, CRC(bb2dd936) SHA1(2b5b75f2c9e923f0b44a454bdb06d9612ff4a8bb), ROM_BIOS(1))
 ROM_END
 
 const tiny_rom_entry *isa8_sblaster_2_0_lle_device::device_rom_region() const
