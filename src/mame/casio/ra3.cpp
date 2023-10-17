@@ -55,7 +55,7 @@ void casio_ra3_device::call_unload()
 /**************************************************************************/
 std::pair<std::error_condition, std::string> casio_ra3_device::call_create(int format_type, util::option_resolution *format_options)
 {
-	std::fill(m_ram.begin(), m_ram.end(), 0xff);
+	std::fill(m_ram.begin(), m_ram.end(), 0);
 
 	const size_t size = m_ram.size();
 	const size_t ret = fwrite(m_ram.data(), size);
