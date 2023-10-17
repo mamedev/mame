@@ -74,9 +74,9 @@ public:
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	// reading and writing
-	virtual u16 rom_r(offs_t offset) { return m_cart ? m_cart->rom_r(offset) : 0xffff; }
-	virtual u8 ram_r(offs_t offset) { return m_cart ? m_cart->ram_r(offset) : 0xff; }
-	virtual void ram_w(offs_t offset, u8 data) { if (m_cart) m_cart->ram_w(offset, data); }
+	u16 rom_r(offs_t offset) { return m_cart ? m_cart->rom_r(offset) : 0xffff; }
+	u8 ram_r(offs_t offset) { return m_cart ? m_cart->ram_r(offset) : 0xff; }
+	void ram_w(offs_t offset, u8 data) { if (m_cart) m_cart->ram_w(offset, data); }
 
 protected:
 	// device_t implementation
