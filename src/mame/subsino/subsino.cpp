@@ -3358,6 +3358,53 @@ ROM_START( newhunterb )
 	ROM_LOAD( "ht-4.bin",     0x00345, 0x00117, CRC(f4f78925) SHA1(738281c05c0f51c0edcf65bacc18ebc87c2408c1) )
 ROM_END
 
+/*  Several custom modifications on this PCB:
+     -3V battery directly soldered to the main HM62256ALP-10 RAM.
+     -One 8-dipswitches bank soldered to a 74LS245.
+     -One 5-dipswitches bank soldered to another 74LS245.
+     -A single switch button soldered to another 74LS245.
+   And the usual hardware configuration:
+     -HD647180X0CP6.
+     -12 MHz xtal.
+     -1 x 8-dipswitches bank, plus the other two banks described before.
+     -Sound: K-666 + K-664. */
+ROM_START( newhunterc )
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	ROM_LOAD( "hd647180.bin", 0x00000, 0x04000, NO_DUMP ) // HD647180X0CP8L
+	HD647180X_FAKE_INTERNAL_ROM
+
+	ROM_REGION( 0x10000, "program", 0 )
+	ROM_LOAD( "nm27c512q.u26", 0x00000, 0x10000, CRC(fe79a7da) SHA1(f326070f8a15aa518e1c928890549e63a99e6961) )
+
+	ROM_REGION( 0x40000, "tilemap", 0 )
+	ROM_LOAD( "e27c010u.u24",  0x00000, 0x08000, CRC(893d8e6d) SHA1(e18fa4db54230eef92b78ccd5fe3ea509b83a1ec) )
+	ROM_CONTINUE(              0x10000, 0x08000 )
+	ROM_CONTINUE(              0x08000, 0x08000 )
+	ROM_CONTINUE(              0x18000, 0x08000 )
+	ROM_LOAD( "ds40986.u25",   0x20000, 0x08000, CRC(3b46a3a1) SHA1(db98ed804def24d069e09623588f37a60a2cce46) )
+	ROM_CONTINUE(              0x30000, 0x08000 )
+	ROM_CONTINUE(              0x28000, 0x08000 )
+	ROM_CONTINUE(              0x38000, 0x08000 )
+
+	ROM_REGION( 0x08000, "reels", 0 )
+	ROM_LOAD( "tms27c512.u29", 0x00000, 0x04000, CRC(ad203af2) SHA1(58314dc795fba157bd9c3da64e7e158e13376860) )
+	ROM_IGNORE(0xc000)
+	ROM_LOAD( "tms27c512.u30", 0x04000, 0x04000, CRC(27a3910e) SHA1(6c9f5061f8a278d5a570f0f10f4f01b86558fe46) )
+	ROM_IGNORE(0xc000)
+
+	ROM_REGION( 0x00300, "proms", 0 )
+	ROM_LOAD( "n82s129an.u1",  0x00000, 0x00100, CRC(971843e5) SHA1(4cb5fc1085503dae2f2f02eb49cca051ac84b890) )
+	ROM_LOAD( "n82s129an.u2",  0x00100, 0x00100, CRC(b4bd872c) SHA1(c0f9fe68186636d6d6bc6f81415459631cf38edd) )
+	ROM_LOAD( "n82s129an.u3",  0x00200, 0x00100, CRC(db99f6da) SHA1(d281a2fa06f1890ef0b1c4d099e6828827db14fd) )
+
+	ROM_REGION( 0x00045c, "plds", 0 )
+	ROM_LOAD( "gal16v8b.u41",  0x00000, 0x00117, NO_DUMP )
+	ROM_LOAD( "gal16v8b.s63",  0x00117, 0x00117, NO_DUMP )
+	ROM_LOAD( "gal16v8b.u42",  0x0022e, 0x00117, NO_DUMP )
+	ROM_LOAD( "gal16v8b.u9",   0x00345, 0x00117, NO_DUMP )
+ROM_END
+
+
 /***************************************************************************
 
 Cross Bingo
@@ -4207,7 +4254,8 @@ GAMEL( 1992, tisub,       0,       tisub,      tisub,    subsino_state, init_tis
 GAMEL( 1992, tisuba,      tisub,   tisub,      tisub,    subsino_state, init_tisub,       ROT0, "Subsino",         "Treasure Island (Subsino, set 2)",            0,                   layout_tisub    )
 GAMEL( 1992, tisubb,      tisub,   tisub,      tisubb,   subsino_state, init_tisubb,      ROT0, "American Alpha",  "Treasure Island (American Alpha, v3.0N)",     0,                   layout_tisubb   )
 GAMEL( 1992, newhunter,   tisub,   tisub,      tisub,    subsino_state, init_tisubb,      ROT0, "Karam",           "New HUNTer",                                  0,                   layout_tisubb   ) // 1989 on screen, but this bootleg is from 1992
-GAMEL( 1993, newhunterb,  tisub,   newhunterb, tisub,    subsino_state, init_newhunterb,  ROT0, "bootleg",         "New HUNTer (bootleg)",                        0,                   layout_tisubb   )
+GAMEL( 1993, newhunterb,  tisub,   newhunterb, tisub,    subsino_state, init_newhunterb,  ROT0, "bootleg",         "New HUNTer (bootleg, set 1)",                 0,                   layout_tisubb   )
+GAMEL( 1993, newhunterc,  tisub,   tisub,      tisub,    subsino_state, init_tisubb,      ROT0, "bootleg",         "New HUNTer (bootleg, set 2)",                 MACHINE_NOT_WORKING, layout_tisubb   ) // 1989 on screen, but "Copyright 1993 SubSino Corp. Taipei, Taiwan." on program ROM
 
 GAMEL( 1991, crsbingo,    0,       crsbingo,   crsbingo, subsino_state, init_crsbingo,    ROT0, "Subsino",         "Poker Carnival",                              0,                   layout_crsbingo )
 
