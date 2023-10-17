@@ -1,46 +1,48 @@
 // license:BSD-3-Clause
-// copyright-holders:Phil Bennett
+// copyright-holders:Vas Crabb
 #ifndef MAME_BUS_CASLOOPY_SLOT_H
 #define MAME_BUS_CASLOOPY_SLOT_H
 
 #include "imagedev/cartrom.h"
+
+#include <system_error>
+#include <utility>
 
 
 /***************************************************************************
  TYPE DEFINITIONS
  ***************************************************************************/
 
-// ======================> device_casloopy_cart_interface
+class casloopy_cart_slot_device;
+
 
 class device_casloopy_cart_interface : public device_interface
 {
 public:
-	// construction/destruction
-	device_casloopy_cart_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_casloopy_cart_interface();
 
-	// reading and writing
-	virtual uint16_t read_rom(offs_t offset) { return 0xffff; }
-	virtual uint8_t read_ram(offs_t offset) { return 0xff; }
-	virtual void write_ram(offs_t offset, u8 data) { }
+	// load/unload
+	virtual std::error_condition load() = 0;
+	virtual void unload() = 0;
 
-	void rom_alloc(uint32_t size);
-	void nvram_alloc(uint32_t size);
-	uint16_t* get_rom_base() const { return m_rom; }
-	uint32_t get_rom_size() const { return m_rom_size; }
-
-	uint8_t* get_nvram_base() { return &m_nvram[0]; }
-	uint32_t get_nvram_size() { return m_nvram.size(); }
+	// read/write
+	virtual u16 rom_r(offs_t offset) = 0;
+	virtual u8 ram_r(offs_t offset) = 0;
+	virtual void ram_w(offs_t offset, u8 data) = 0;
 
 protected:
-	uint16_t *m_rom;
-	uint32_t m_rom_size;
+	// construction/destruction
+	device_casloopy_cart_interface(const machine_config &mconfig, device_t &device);
 
-	std::vector<uint8_t> m_nvram;
+	// helpers for slot stuff
+	void battery_load(void *buffer, int length, int fill);
+	void battery_load(void *buffer, int length, void *def_buffer);
+	void battery_save(const void *buffer, int length);
+
+private:
+	casloopy_cart_slot_device *const m_slot;
 };
 
-
-// ======================> casloopy_cart_slot_device
 
 class casloopy_cart_slot_device : public device_t,
 								public device_cartrom_image_interface,
@@ -49,7 +51,7 @@ class casloopy_cart_slot_device : public device_t,
 public:
 	// construction/destruction
 	template <typename T>
-	casloopy_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock, T &&opts, char const *dflt)
+	casloopy_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, T &&opts, char const *dflt)
 		: casloopy_cart_slot_device(mconfig, tag, owner, clock)
 	{
 		option_reset();
@@ -57,7 +59,7 @@ public:
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	casloopy_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	casloopy_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 	virtual ~casloopy_cart_slot_device();
 
 	// device_image_interface implementation
@@ -72,9 +74,9 @@ public:
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	// reading and writing
-	uint16_t read_rom(offs_t offset);
-	uint8_t read_ram(offs_t offset);
-	void write_ram(offs_t offset, u8 data);
+	virtual u16 rom_r(offs_t offset) { return m_cart ? m_cart->rom_r(offset) : 0xffff; }
+	virtual u8 ram_r(offs_t offset) { return m_cart ? m_cart->ram_r(offset) : 0xff; }
+	virtual void ram_w(offs_t offset, u8 data) { if (m_cart) m_cart->ram_w(offset, data); }
 
 protected:
 	// device_t implementation

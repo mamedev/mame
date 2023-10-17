@@ -1830,7 +1830,7 @@ void casloopy_state::casloopy_map(address_map &map)
 	map(0x01000000, 0x0107ffff).ram().mirror(0x08f80000);
 
 	// /CS2: Cartridge SRAM
-	map(0x02000000, 0x023fffff).rw(m_cart, FUNC(casloopy_cart_slot_device::read_ram), FUNC(casloopy_cart_slot_device::write_ram));
+	map(0x02000000, 0x023fffff).rw(m_cart, FUNC(casloopy_cart_slot_device::ram_r), FUNC(casloopy_cart_slot_device::ram_w));
 
 	// /CS4: RH-7500 VDP
 	map(0x04000000, 0x0401ffff).rw(FUNC(casloopy_state::bitmap_r), FUNC(casloopy_state::bitmap_w)).mirror(0x00020000);
@@ -1915,7 +1915,7 @@ void casloopy_state::casloopy_map(address_map &map)
 	map(0x040a0000, 0x040a0001).w(FUNC(casloopy_state::reg_a0000_w));
 
 	// /CS6: Cartridge ROM
-	map(0x06000000, 0x063fffff).r(m_cart, FUNC(casloopy_cart_slot_device::read_rom)).mirror(0x08000000); // FIXME: This mirror should not be required
+	map(0x06000000, 0x063fffff).r(m_cart, FUNC(casloopy_cart_slot_device::rom_r)).mirror(0x08000000); // FIXME: This mirror should not be required
 }
 
 
