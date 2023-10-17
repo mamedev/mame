@@ -19572,6 +19572,9 @@ husky                           // DVW Husky
 @source:ibm/ibm3153.cpp
 ibm3153                         //
 
+@source:ibm/ibm5550.cpp
+ibm5550                         //
+
 @source:ibm/ibm6580.cpp
 ibm6580                         //
 
@@ -35506,7 +35509,6 @@ eppc                            // 1985 Ericsson Portable PC
 hyo88t                          // Hyosung Topstar 88T
 hyu16t                          // Hyundai Super 16 T
 hyu16te                         // Hyundai Super 16 TE
-ibm5550                         //
 iskr3104                        //
 ittxtra                         // 1984 ITT XTRA
 juko8                           // JUKO NEST motherboards with 8088/V20 CPU
