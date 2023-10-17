@@ -14,6 +14,7 @@
     Jumping Break                   (c) 1999 F2 System
     Poosho Poosho                   (c) 1999 F2 System
     New Cross Pang                  (c) 1999 F2 System
+    Solitaire                       (c) 1999 F2 System          (version 2.5)
     World Adventure                 (c) 1999 F2 System + Logic
     Lup Lup Puzzle                  (c) 1999 Omega System       (version 3.0, 2.9 and 1.05)
     Puzzle Bang Bang                (c) 1999 Omega System       (version 2.8 and 2.9)
@@ -1929,6 +1930,38 @@ ROM_END
 
 /*
 
+Solitaire (c) 1999 F2 System
+
+   CPU: Hyperstone E1-16T
+ Video: 2 x QuickLogic QL2003-XPL84C FPGA
+ Sound: AD-65 (OKI 6295), KA51 (YM2151) & KA12 (YM3012)
+   OSC: 20MHz & 28MHz
+EEPROM: 93C46
+
+PCB: F-E1-16-004
+
+*/
+
+ROM_START( solitaire ) // Version 2.5
+	ROM_REGION32_BE( 0x100000, "maincpu", ROMREGION_ERASE00 ) // Hyperstone CPU Code
+	// 0 - 0x80000 empty
+	ROM_LOAD( "rom2-27c040.bin",                    0x080000, 0x080000, CRC(304e4338) SHA1(6b2817d7505c943ca7cdfa9176c9504e30936235) )
+
+	ROM_REGION32_BE( 0x800000, "gfx", 0 )  // gfx data
+	ROM_LOAD32_WORD_SWAP( "romu00-mx29f1610mc.bin", 0x000000, 0x200000, CRC(7fee63ac) SHA1(ef22145da9ce3100c8736e9a77e59da4f984aaba) )
+	ROM_LOAD32_WORD_SWAP( "roml00-mx29f1610mc.bin", 0x000002, 0x200000, CRC(0d973625) SHA1(b482a97732a6117d9c1c7507118e111ac4f7f3f1) )
+	ROM_LOAD32_WORD_SWAP( "romu01-mx29f1610mc.bin", 0x400000, 0x200000, CRC(f3f3f3e5) SHA1(9a0d91351903b70049fbbc76a9ccff1a382ecbfd) )
+	ROM_LOAD32_WORD_SWAP( "roml01-mx29f1610mc.bin", 0x400002, 0x200000, CRC(5bba95b8) SHA1(6d884a694cbbad6768e606afd5b234a07a3b5b50) )
+
+	ROM_REGION( 0x80000, "oki1", 0 ) // Oki Samples
+	ROM_LOAD( "vrom1-27c020.bin",                   0x000000, 0x040000, CRC(bbbf4ac8) SHA1(b37f945143a9ed7a372a953ef93dbea01c4fcce4) )
+
+	ROM_REGION( 0x2dd, "plds", 0 )
+	ROM_LOAD( "palce22v10.gal1",                    0x000000, 0x0002dd, NO_DUMP ) // Protected
+ROM_END
+
+/*
+
 Mr. Dig
 SUN, 2000
 
@@ -3682,16 +3715,18 @@ GAME( 1999, newxpanga,  newxpang, jmpbreak,  common,   vamphalf_state,      init
 
 GAME( 1999, worldadv,   0,        worldadv,  common,   vamphalf_state,      init_worldadv,  ROT0,   "Logic / F2 System",             "World Adventure", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // game starts to stall for several seconds at a time after it's been running for a certain amount of time
 
+GAME( 1999, solitaire,  0,        jmpbreak,  common,   vamphalf_state,      init_worldadv,  ROT0,   "F2 System",                     "Solitaire (version 2.5)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+
 GAME( 1999, suplup,     0,        suplup,    common,   vamphalf_state,      init_suplup,    ROT0,   "Omega System",                  "Super Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 4.0 / 990518)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, luplup,     suplup,   suplup,    common,   vamphalf_state,      init_luplup,    ROT0,   "Omega System",                  "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 3.0 / 990128)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, luplup29,   suplup,   suplup,    common,   vamphalf_state,      init_luplup29,  ROT0,   "Omega System",                  "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 2.9 / 990108)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, luplup10,   suplup,   suplup,    common,   vamphalf_state,      init_luplup10,  ROT0,   "Omega System (Adko license)",   "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 1.05 / 981214)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, puzlbang,   suplup,   suplup,    common,   vamphalf_state,      init_puzlbang,  ROT0,   "Omega System",                  "Puzzle Bang Bang (Korea, version 2.9 / 990108)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, puzlbanga,  suplup,   suplup,    common,   vamphalf_state,      init_puzlbang,  ROT0,   "Omega System",                  "Puzzle Bang Bang (Korea, version 2.8 / 990106)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, luplup,     suplup,   suplup,    common,   vamphalf_state,      init_luplup,    ROT0,   "Omega System",                  "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 3.0 / 990128)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1999, luplup29,   suplup,   suplup,    common,   vamphalf_state,      init_luplup29,  ROT0,   "Omega System",                  "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 2.9 / 990108)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1999, luplup10,   suplup,   suplup,    common,   vamphalf_state,      init_luplup10,  ROT0,   "Omega System (Adko license)",   "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 1.05 / 981214)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1999, puzlbang,   suplup,   suplup,    common,   vamphalf_state,      init_puzlbang,  ROT0,   "Omega System",                  "Puzzle Bang Bang (Korea, version 2.9 / 990108)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1999, puzlbanga,  suplup,   suplup,    common,   vamphalf_state,      init_puzlbang,  ROT0,   "Omega System",                  "Puzzle Bang Bang (Korea, version 2.8 / 990106)",                   MACHINE_SUPPORTS_SAVE )
 
 GAME( 1999, vamphalf,   0,        vamphalf,  common,   vamphalf_state,      init_vamphalf,  ROT0,   "Danbi / F2 System",             "Vamf x1/2 (Europe, version 1.1.0908)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, vamphalfr1, vamphalf, vamphalf,  common,   vamphalf_state,      init_vamphalfr1,ROT0,   "Danbi / F2 System",             "Vamf x1/2 (Europe, version 1.0.0903)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, vamphalfk,  vamphalf, vamphalf,  common,   vamphalf_state,      init_vamphafk,  ROT0,   "Danbi / F2 System",             "Vamp x1/2 (Korea, version 1.1.0908)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, vamphalfk,  vamphalf, vamphalf,  common,   vamphalf_state,      init_vamphafk,  ROT0,   "Danbi / F2 System",             "Vamp x1/2 (Korea, version 1.1.0908)",  MACHINE_SUPPORTS_SAVE )
 
 GAME( 2000, dquizgo2,   0,        coolmini,  common,   vamphalf_state,      init_dquizgo2,  ROT0,   "SemiCom",                       "Date Quiz Go Go Episode 2", MACHINE_SUPPORTS_SAVE )
 
@@ -3704,12 +3739,12 @@ GAME( 2001, dtfamily,   0,        mrkicker,  common,   vamphalf_state,      init
 
 GAME( 2001, finalgdr,   0,        finalgdr,  finalgdr, vamphalf_nvram_state,init_finalgdr,  ROT0,   "SemiCom",                       "Final Godori (Korea, version 2.20.5915)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2001, mrkicker,   0,        mrkicker,  common,   vamphalf_state,      init_mrkicker,  ROT0,   "SemiCom",                       "Mr. Kicker (F-E1-16-010 PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, mrkicker,   0,        mrkicker,  common,   vamphalf_state,      init_mrkicker,  ROT0,   "SemiCom",                       "Mr. Kicker (F-E1-16-010 PCB)",  MACHINE_SUPPORTS_SAVE )
 GAME( 2001, mrkickera,  mrkicker, mrkickera, finalgdr, vamphalf_nvram_state,init_mrkickera, ROT0,   "SemiCom",                       "Mr. Kicker (SEMICOM-003b PCB)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // if you allow EEPROM saving, then this set corrupts the EEPROM and then won't boot
 
 GAME( 2001, toyland,    0,        coolmini,  common,   vamphalf_state,      init_toyland,   ROT0,   "SemiCom",                       "Toy Land Adventure", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2001, wivernwg,   0,        wyvernwg,  common,   vamphalf_qdsp_state, init_wyvernwg,  ROT270, "SemiCom",                       "Wivern Wings", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // gives a protection error after a certain number of plays / coins?
+GAME( 2001, wivernwg,   0,        wyvernwg,  common,   vamphalf_qdsp_state, init_wyvernwg,  ROT270, "SemiCom",                       "Wivern Wings",         MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // gives a protection error after a certain number of plays / coins?
 GAME( 2001, wyvernwg,   wivernwg, wyvernwg,  common,   vamphalf_qdsp_state, init_wyvernwg,  ROT270, "SemiCom (Game Vision license)", "Wyvern Wings (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2001, wyvernwga,  wivernwg, wyvernwg,  common,   vamphalf_qdsp_state, init_wyvernwg,  ROT270, "SemiCom (Game Vision license)", "Wyvern Wings (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
 
