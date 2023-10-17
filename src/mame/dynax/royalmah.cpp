@@ -1462,7 +1462,7 @@ void royalmah_prgbank_state::cafepara_map(address_map &map)
 	map(0x7ff0, 0x7ff0).w(FUNC(royalmah_prgbank_state::janptr96_coin_counter_w));
 	map(0x7ff1, 0x7ff1).portr("SYSTEM").nopw();
 	map(0x7ff3, 0x7ff3).w(FUNC(royalmah_prgbank_state::input_port_select_w));
-	map(0x7ff4, 0x7ff4).lw8(NAME([this] (uint8_t data) { m_mainbank->set_entry(data); logerror("mainbank_w: %02x\n", data); }));
+	map(0x7ff4, 0x7ff4).lw8(NAME([this] (uint8_t data) { m_mainbank->set_entry(data); if (data >= 0x10) logerror("mainbank_w: %02x\n", data); }));
 	map(0x7ff5, 0x7ff5).lw8(NAME([this] (uint8_t data) { logerror("0x7ff5 write: %02x\n", data); })); // bit 1 seems coin counter but it's actually at 0x7ff0
 	map(0x7ff6, 0x7ff6).w(FUNC(royalmah_prgbank_state::mjderngr_palbank_w));
 	map(0x7ff7, 0x7ff7).w(FUNC(royalmah_prgbank_state::cafetime_7fe3_w));
@@ -4144,16 +4144,16 @@ void royalmah_prgbank_state::cafepara(machine_config &config)
 	tmp.set_addrmap(AS_PROGRAM, &royalmah_prgbank_state::cafepara_map);
 	tmp.port_read<3>().set([this] () { logerror("%s: p3 in\n", machine().describe_context()); return uint8_t(0); }); // read sometimes
 	tmp.port_read<4>().set([this] () { logerror("%s: p4 in\n", machine().describe_context()); return uint8_t(0); }); // not seen yet
-	tmp.port_read<5>().set([this] () { logerror("%s: p5 in\n", machine().describe_context()); return uint8_t(0); }); // dips
-	tmp.port_read<6>().set([this] () { logerror("%s: p6 in\n", machine().describe_context()); return uint8_t(0); }); // dips
+	tmp.port_read<5>().set([this] () { logerror("%s: p5 in\n", machine().describe_context()); return uint8_t(0); }); // dips 5-8 for each of the 4 dip banks + dips 9-10 for first and second bank
+	tmp.port_read<6>().set([this] () { logerror("%s: p6 in\n", machine().describe_context()); return uint8_t(0); }); // dips 1-4 for each of the 4 dip banks + dips 9-10 for third and fourth bank
 	tmp.port_read<7>().set([this] () { logerror("%s: p7 in\n", machine().describe_context()); return uint8_t(0); }); // not seen yet
 	tmp.port_read<8>().set([this] () { logerror("%s: p8 in\n", machine().describe_context()); return uint8_t(0); });
 	tmp.port_write<3>().set([this] (uint8_t data) { logerror("%s: p3 out %02X\n", machine().describe_context(), data); }); // 0x6c at startup, remnant of older games?
 	tmp.port_write<4>().set([this] (uint8_t data) { logerror("%s: p4 out %02X\n", machine().describe_context(), data); }); // 0x00 at startup
 	tmp.port_write<5>().set([this] (uint8_t data) { logerror("%s: p5 out %02X\n", machine().describe_context(), data); }); // not seen yet
 	tmp.port_write<6>().set([this] (uint8_t data) { logerror("%s: p6 out %02X\n", machine().describe_context(), data); }); // not seen yet
-	tmp.port_write<7>().set([this] (uint8_t data) { logerror("%s: p7 out %02X\n", machine().describe_context(), data); }); // seen 0x07, 0x0b, 0x0d, 0x0f. ???
-	tmp.port_write<8>().set([this] (uint8_t data) { logerror("%s: p8 out %02X\n", machine().describe_context(), data); }); // 0x00 or 0x08, most probably view
+	tmp.port_write<7>().set([this] (uint8_t data) { logerror("%s: p7 out %02X\n", machine().describe_context(), data); }); // seen 0x07, 0x0b, 0x0d, 0x0f. DSW select
+	tmp.port_write<8>().set([this] (uint8_t data) { logerror("%s: p8 out %02X\n", machine().describe_context(), data); }); // 0x00 or 0x08, most probably view but could also have to do with DSW select
 }
 
 void royalmah_prgbank_state::mjvegasa(machine_config &config)
@@ -5145,7 +5145,7 @@ ROM_END
 
 /***************************************************************************
 
-Mahjong Shinkirou Deja Vu (+ some ROMs from Jan Oh (Toapan) !?)
+Mahjong Shinkirou Deja Vu (+ some ROMs from Jan Oh (Toaplan) !?)
 
 This game runs on Royal Mahjong hardware.
 
@@ -5990,4 +5990,4 @@ GAME( 1996,  janptr96, 0,        janptr96, janptr96, royalmah_prgbank_state, ini
 GAME( 1997,  janptrsp, 0,        janptr96, janptr96, royalmah_prgbank_state, init_janptr96, ROT0,   "Dynax",                      "Janputer Special (Japan)",              0 )
 GAME( 1997,  pongboo2, 0,        pongboo2, ichiban,  royalmah_prgbank_state, init_pongboo2, ROT0,   "OCT",                        "Pong Boo! 2 (Ver. 1.31)",               MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS ) // banking, palette, inputs
 GAME( 1999,  cafebrk,  0,        mjifb,    mjifb,    royalmah_prgbank_state, init_mjifb,    ROT0,   "Nakanihon / Dynax",          "Mahjong Cafe Break",                    MACHINE_NOT_WORKING ) // missing internal ROM dump
-GAME( 1999,  cafepara, 0,        cafepara, cafetime, royalmah_prgbank_state, init_mjtensin, ROT0,   "Techno-Top",                 "Mahjong Cafe Paradise (Ver. 1.00)",     MACHINE_NOT_WORKING ) // needs correct memory map and CPU ports
+GAME( 1999,  cafepara, 0,        cafepara, cafetime, royalmah_prgbank_state, init_mjtensin, ROT0,   "Techno-Top",                 "Mahjong Cafe Paradise (Ver. 1.00)",     MACHINE_NOT_WORKING ) // needs correct banking and / or ROM descrambling
