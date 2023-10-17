@@ -3360,13 +3360,13 @@ ROM_END
 
 /*  Several custom modifications on this PCB:
      -3V battery directly soldered to the main HM62256ALP-10 RAM.
-     -One 8-dipswitches bank soldered to a 74LS245.
-     -One 5-dipswitches bank soldered to another 74LS245.
+     -One bank of 8 DIP switches soldered to a 74LS245.
+     -One bank of 5 DIP switches soldered to another 74LS245.
      -A single switch button soldered to another 74LS245.
    And the usual hardware configuration:
      -HD647180X0CP6.
      -12 MHz xtal.
-     -1 x 8-dipswitches bank, plus the other two banks described before.
+     -One bank of 8 DIP switches, plus the other two banks described before.
      -Sound: K-666 + K-664. */
 ROM_START( newhunterc )
 	ROM_REGION( 0x04000, "maincpu", 0 )
