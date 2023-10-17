@@ -60,7 +60,7 @@ license:CC0-1.0
 			<dataarea name="rom" size="0x200000">
 				<rom name="harihari.bin" size="0x200000" crc="39a417d6" sha1="1adbd97181b61a1a65e21976b0146e9dd80fbdbf"/>
 			</dataarea>
-				<dataarea name="nvram" size="0x2000">
+			<dataarea name="nvram" size="0x2000">
 			</dataarea>
 		</part>
 	</software>
