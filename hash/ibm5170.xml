@@ -9659,7 +9659,7 @@ Missing [modem] features, assume requiring a connection to a Reuters device such
 		</part>
 	</software>
 
-	<software name="aopacex" cloneof="aopac">
+	<software name="aopacex">
 		<description>Aces of the Pacific Expansion Disk - WWII: 1946</description>
 		<year>1992</year>
 		<publisher>Dynamix</publisher>
@@ -9677,6 +9677,7 @@ Missing [modem] features, assume requiring a connection to a Reuters device such
 		<notes><![CDATA[
 The disks have had their OEM IDs modified by Windows
 ]]></notes>
+		<info name="region" value="France" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Aces Over Europe (France) (Disk 1).img" size="1474560" crc="4659ac93" sha1="f1296c37734f6a2cc5d6bcfa55a810535413795a" status="baddump"/>
@@ -9973,6 +9974,7 @@ The disks have had their OEM IDs modified by Windows
 		<info name="copy_protection" value="Miniature book required" />
 		<info name="developer" value="Infogrames" />
 		<info name="language" value="French" />
+		<info name="region" value="France" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Alone in the Dark (France) (Disk 1).img" size="1474560" crc="86b5e021" sha1="7a4cf2a406a62ed547719c1c7313483f7c2a45e7"/>
@@ -10004,6 +10006,7 @@ The disks have had their OEM IDs modified by Windows
 		<info name="copy_protection" value="Miniature book required" />
 		<info name="developer" value="Infogrames" />
 		<info name="language" value="French" />
+		<info name="region" value="France" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Alone in the Dark (France) [Infogrames] [1992] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="940a3e1f" sha1="a4d9e129fded8abf91d695a608dea5019002b8c0"/>
@@ -10064,6 +10067,7 @@ The disks have had their OEM IDs modified by Windows
 		<info name="copy_protection" value="Playing cards required" />
 		<info name="developer" value="Infogrames" />
 		<info name="language" value="English" />
+		<info name="region" value="UK" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Alone in the Dark 2 [Infogrames] [1993] [3.5HD] [Disk 1 of 9].img" size="1474560" crc="f1a73e14" sha1="4ca20f2461f843a3bf52e7870254493bf39e090d"/>
@@ -10118,6 +10122,7 @@ The disks have had their OEM IDs modified by Windows
 		<info name="copy_protection" value="Playing cards required" />
 		<info name="developer" value="Infogrames" />
 		<info name="language" value="French" />
+		<info name="region" value="France" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Alone in the Dark 2 (France) [Infogrames] [1993] [3.5HD] [Disk 1 of 9].img" size="1474560" crc="ed2958cb" sha1="788422cd961edd03782d3ae471886f35eb24b806"/>
@@ -10275,7 +10280,7 @@ The disks have had their OEM IDs modified by Windows
 		</part>
 	</software>
 
-	<software name="aitd2sd" cloneof="aitd2">
+	<software name="aitd2sd">
 		<description>Alone in the Dark 2 - Secret Doors (USA)</description>
 		<year>1994</year>
 		<publisher>I·Motion</publisher>
@@ -10351,6 +10356,7 @@ This disk contains 6 packages of 6 saved games.
 		<year>1993</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="developer" value="Delphine Software" />
+		<info name="region" value="Europe" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Another World [U.S. Gold] [1993] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="4eb64a42" sha1="b04f581b6c14c4b592b89f1875e645f7c03a90d6"/>
@@ -10364,6 +10370,7 @@ This disk contains 6 packages of 6 saved games.
 		<publisher>Interplay</publisher>
 		<info name="copy_protection" value="Codewheel required" />
 		<info name="developer" value="Delphine Software" />
+		<info name="region" value="USA" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1228800">
 				<rom name="Out of this World [Interplay] [1992] [5.25HD] [Disk 1 of 1].img" size="1228800" crc="25a14c8e" sha1="31556fda8c25d39d2c29cba54f9e8d49e33355d6"/>
@@ -10377,6 +10384,7 @@ This disk contains 6 packages of 6 saved games.
 		<publisher>Interplay</publisher>
 		<info name="copy_protection" value="Codewheel required" />
 		<info name="developer" value="Delphine Software" />
+		<info name="region" value="USA" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Out of this World [Interplay] [1992] [3.5DD] [Disk 1 of 2].img" size="737280" crc="121ceb6f" sha1="1e04092ec17c671688b53ef392ba3e514b4bbd8e"/>
@@ -10714,7 +10722,7 @@ This disk contains 6 packages of 6 saved games.
 		<publisher>Virgin</publisher>
 		<info name="developer" value="Revolution Software" />
 		<info name="language" value="English/French/German" />
-		<info name="region" value="Europe" />
+		<info name="region" value="France" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Beneath a Steel Sky (fr) [Virgin] [1994] [3.5HD] [Disk 1 of 6].img" size="1474560" crc="6b5e3247" sha1="b4cc255abfc5f72fc5c5dbea1aca595c92bbe70a"/>
@@ -11880,6 +11888,7 @@ This disk contains 6 packages of 6 saved games.
 		<year>1993</year>
 		<publisher>MicroProse</publisher>
 		<info name="developer" value="Vektor Grafix" />
+		<info name="region" value="Europe" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="Dogfight [MicroProse] [1993] [3.5HD] [Disk A].img" size="1474560" crc="34a6bd08" sha1="2d6df5f445641384a698bee2df0ee557237fc03f"/>
@@ -12008,8 +12017,9 @@ This disk contains 6 packages of 6 saved games.
 		<year>1993</year>
 		<publisher>Imagineer</publisher>
 		<info name="developer" value="id Software" />
-		<info name="version" value="v1.1" />
+		<info name="region" value="Japan" />
 		<info name="usage" value="Disks 1-2 contain the shareware version, disks 3-6 contain the full version" />
+		<info name="version" value="v1.1" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size = "1474560">
@@ -12115,6 +12125,7 @@ This disk contains 6 packages of 6 saved games.
 		<year>1994</year>
 		<publisher>SoftKey</publisher>
 		<info name="developer" value="id Software" />
+		<info name="region" value="USA" />
 		<info name="version" value="1.1" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
@@ -13243,6 +13254,8 @@ Prompts user to "press fire" but no correlated keyboard bind, requires unemulate
 		<publisher>SSI</publisher>
 		<info name="alt_title" value="Eye of the Beholder 3: Assaut sur Myth Drannor" />
 		<info name="developer" value="Strategic Simulations Inc" />
+		<info name="language" value="French" />
+		<info name="region" value="France" />
 		<info name="version" value="1.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
@@ -14030,7 +14043,7 @@ Bad Dump: the disks has an accessed file record
 		</part>
 	</software>
 
-	<software name="fpsbas94exp" cloneof="fpsbas94">
+	<software name="fpsbas94exp">
 		<description>Front Page Sports: Baseball '94 - Legends and Stadiums expansion</description>
 		<year>1995</year>
 		<publisher>Sierra On-Line</publisher>
@@ -14570,7 +14583,7 @@ Bad Dump: the disks has an accessed file record and a modified OEM id
 		</part>
 	</software>
 
-	<software name="hardbal3pl" cloneof="hardbal3">
+	<software name="hardbal3pl">
 		<description>HardBall 3 - MLBPA Players Disk</description>
 		<year>1992</year>
 		<publisher>Accolade</publisher>
@@ -14627,7 +14640,7 @@ Bad Dump: the disks has an accessed file record and a modified OEM id
 		</part>
 	</software>
 
-	<software name="harp2bs2" cloneof="harpoon2">
+	<software name="harp2bs2">
 		<description>Harpoon II - BattleSet 2: WestPac</description>
 		<year>1994</year>
 		<publisher>Three-Sixty Pacific</publisher>
@@ -14650,7 +14663,7 @@ Add-on for Harpoon II and update patch to version 2.0.2
 		</part>
 	</software>
 
-	<software name="harp2bs3" cloneof="harpoon2">
+	<software name="harp2bs3">
 		<description>Harpoon II - BattleSet 3: Cold War</description>
 		<year>1995</year>
 		<publisher>Three-Sixty Pacific</publisher>
@@ -15014,6 +15027,8 @@ Add-on for Harpoon II and update patch to version 2.1.11
 		<info name="alt_title" value="The Humans 2: The Jurassic Levels" />
 		<info name="copy_protection" value="Manual - Code sheet required" />
 		<info name="developer" value="Imagitec Design" />
+		<info name="language" value="English" />
+		<info name="region" value="France" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="The Humans 2 (France) [GameTek] [1993] [3.5DD] [Disk 1 of 4].img" size="737280" crc="fd31aa77" sha1="ff428781222e311e242c7e1f7811192182788669"/>
@@ -15043,6 +15058,7 @@ Add-on for Harpoon II and update patch to version 2.1.11
 		<info name="copy_protection" value="Manual - Code sheet required" />
 		<info name="developer" value="Imagitec Design" />
 		<info name="distributed" value="Planeta DeAgostini" />
+		<info name="language" value="English" />
 		<info name="region" value="Spain" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
@@ -16953,7 +16969,7 @@ Add-on for Harpoon II and update patch to version 2.1.11
 		</part>
 	</software>
 
-	<software name="linksfcc" cloneof="links">
+	<software name="linksfcc">
 		<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
 		<description>Links - Championship Course - Firestone Country Club</description>
 		<year>1991</year>
@@ -16992,7 +17008,7 @@ Add-on for Harpoon II and update patch to version 2.1.11
 		</part>
 	</software>
 
-	<software name="links386bnt" cloneof="links386">
+	<software name="links386bnt">
 		<description>Links 386 - Bountiful Golf Club Championship Course</description>
 		<year>1994</year>
 		<publisher>Access Software</publisher>
@@ -17340,8 +17356,10 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Maniac Mansion: Day of the Tentacle (France)</description>
 		<year>1993</year>
 		<publisher>LucasArts</publisher>
-		<info name="version" value="1.1" />
 		<info name="developer" value="LucasArts" />
+		<info name="language" value="French" />
+		<info name="region" value="France" />
+		<info name="version" value="1.1" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Day of the Tentacle (France) [LucasArts] [1993] [3.5HD] [Disk 1 of 7].img" size="1474560" crc="464e52a1" sha1="83bb837a82de1b6fa09203b031b314b8ba2767f5"/>
@@ -18320,7 +18338,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		</part>
 	</software>
 
-	<software name="nascarpck" cloneof="nascar">
+	<software name="nascarpck">
 		<description>NASCAR: Track Pack</description>
 		<year>1995</year>
 		<publisher>Virgin</publisher>
@@ -19358,6 +19376,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<year>1994</year>
 		<publisher>Titanium Seal</publisher>
 		<info name="developer" value="Cygnus Software" />
+		<info name="region" value="USA" />
 		<info name="version" value="V1.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
@@ -20989,13 +21008,10 @@ Floppy disk 2 - Bad Dump Status: Modified OEM ID and modified root
 		</part>
 	</software>
 
-	<software name="spearof2" cloneof="spearofd">
+	<software name="spearof2">
 		<description>Spear of Destiny - Mission 2: Return to Danger</description>
 		<year>1994</year>
 		<publisher>FormGen</publisher>
-		<notes><![CDATA[
-Accessory game for Spear of Destiny.
-]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Spear of Destiny Mission 2 - Return to Danger (World) (Add-on).img" size="1474560" crc="b3ae0ea2" sha1="4526cb173c8715477de759c680c0edeae8625011"/>
@@ -21003,13 +21019,10 @@ Accessory game for Spear of Destiny.
 		</part>
 	</software>
 
-	<software name="spearof3" cloneof="spearofd">
+	<software name="spearof3">
 		<description>Spear of Destiny - Mission 3: Ultimate Challenge</description>
 		<year>1994</year>
 		<publisher>FormGen</publisher>
-		<notes><![CDATA[
-Accessory game for Spear of Destiny.
-]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Spear of Destiny Mission 3 - Ultimate Challenge (World) (Add-on).img" size="1474560" crc="6046a918" sha1="42f7969a494f82d20c42343f767239fcfe58417d"/>
@@ -21432,7 +21445,7 @@ Accessory game for Spear of Destiny.
 		</part>
 	</software>
 
-	<software name="swxwingbw" cloneof="swxwing">
+	<software name="swxwingbw">
 		<description>Star Wars: X-Wing - B-Wing Expansion</description>
 		<year>1993</year>
 		<publisher>LucasArts</publisher>
@@ -21444,7 +21457,7 @@ Accessory game for Spear of Destiny.
 		</part>
 	</software>
 
-	<software name="swxwingip" cloneof="swxwing">
+	<software name="swxwingip">
 		<description>Star Wars: X-Wing - Imperial Pursuit</description>
 		<year>1993</year>
 		<publisher>LucasArts</publisher>
@@ -21627,7 +21640,7 @@ Accessory game for Spear of Destiny.
 		</part>
 	</software>
 
-	<software name="speechpk" cloneof="strkcomm" supported="no">
+	<software name="speechpk" supported="no">
 		<description>Strike Commander: Speech Pack</description>
 		<year>1993</year>
 		<publisher>Origin</publisher>
@@ -21649,7 +21662,7 @@ Accessory game for Spear of Destiny.
 		</part>
 	</software>
 
-	<software name="tactops" cloneof="strkcomm" supported="no">
+	<software name="tactops" supported="no">
 		<description>Strike Commander: Tactical Operations</description>
 		<year>1993</year>
 		<publisher>Origin</publisher>
@@ -21860,7 +21873,7 @@ Accessory game for Spear of Destiny.
 		</part>
 	</software>
 
-	<software name="syndictar" cloneof="syndicate">
+	<software name="syndictar">
 		<description>Syndicate: American Revolt (Germany)</description>
 		<year>1993</year>
 		<publisher>Electronic Arts</publisher>
@@ -22515,7 +22528,7 @@ Add-on pack to Syndicate. It requires the original game and includes 3 new weapo
 		</part>
 	</software>
 
-	<software name="wngcomsm" cloneof="wingcom">
+	<software name="wngcomsm">
 		<description>Wing Commander: The Secret Missions</description>
 		<year>1990</year>
 		<publisher>ORIGIN Systems</publisher>
@@ -22527,7 +22540,7 @@ Add-on pack to Syndicate. It requires the original game and includes 3 new weapo
 		</part>
 	</software>
 
-	<software name="wngcomsm2" cloneof="wingcom">
+	<software name="wngcomsm2">
 		<description>Wing Commander: The Secret Missions 2</description>
 		<year>1991</year>
 		<publisher>ORIGIN Systems</publisher>
@@ -22663,7 +22676,7 @@ Add-on pack to Syndicate. It requires the original game and includes 3 new weapo
 		</part>
 	</software>
 
-	<software name="wngcm2s1" cloneof="wingcom2">
+	<software name="wngcm2s1">
 		<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
 		<description>Wing Commander II - Vengeance of the Kilrathi - Special Operations 1</description>
 		<year>1991</year>
@@ -22683,7 +22696,7 @@ Add-on pack to Syndicate. It requires the original game and includes 3 new weapo
 		</part>
 	</software>
 
-	<software name="wngcm2s2" cloneof="wingcom2">
+	<software name="wngcm2s2">
 		<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
 		<description>Wing Commander II - Vengeance of the Kilrathi - Special Operations 2</description>
 		<year>1992</year>
@@ -22703,7 +22716,7 @@ Add-on pack to Syndicate. It requires the original game and includes 3 new weapo
 		</part>
 	</software>
 
-	<software name="wngcm2sp" cloneof="wingcom2">
+	<software name="wngcm2sp">
 		<description>Wing Commander II - Vengeance of the Kilrathi - Speech Accessory Pack (3.5")</description>
 		<year>1991</year>
 		<publisher>ORIGIN Systems</publisher>
@@ -22726,7 +22739,7 @@ Add-on pack to Syndicate. It requires the original game and includes 3 new weapo
 		</part>
 	</software>
 
-	<software name="wngcm2sp525" cloneof="wingcom2">
+	<software name="wngcm2sp525" cloneof="wngcm2sp">
 		<description>Wing Commander II - Vengeance of the Kilrathi - Speech Accessory Pack (5.25")</description>
 		<year>1991</year>
 		<publisher>ORIGIN Systems</publisher>
@@ -22875,6 +22888,7 @@ Add-on pack to Syndicate. It requires the original game and includes 3 new weapo
 		<year>1994</year>
 		<publisher>Titanium Seal</publisher>
 		<info name="developer" value="id Software" />
+		<info name="region" value="USA" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Wolfenstein 3D (shareware) [Titanium Seal] [1994] [3.5DD] [Disk 1 of 1].img" size="737280" crc="7b233ee7" sha1="ce2bbf3c5b52602ebea2b78a8d4b0a839820ce44"/>
@@ -22887,6 +22901,7 @@ Add-on pack to Syndicate. It requires the original game and includes 3 new weapo
 		<year>1993</year>
 		<publisher>CWI Information Services</publisher>
 		<info name="developer" value="id Software" />
+		<info name="region" value="USA" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Wolfenstein 3D (shareware) [CWI Information Services] [1993] [5.25DD] [Disk 1 of 2].img" size="368640" crc="5e073ffe" sha1="7b5a43fdd162a89d2697e8ab840520a5f2c73c6f"/>
@@ -22899,7 +22914,7 @@ Add-on pack to Syndicate. It requires the original game and includes 3 new weapo
 		</part>
 	</software>
 
-	<software name="wolf3dsu" cloneof="wolf3d">
+	<software name="wolf3dsu">
 		<description>Wolfenstein 3-D Super Upgrades!</description>
 		<year>1994</year>
 		<publisher>Apogee Software</publisher>
@@ -23488,6 +23503,7 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 		<year>1992</year>
 		<publisher>Computec</publisher>
 		<info name="contents" value="Gobliins 2 Demo" />
+		<info name="region" value="Germany" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pcgames11-92.img" size="737280" crc="f4d79314" sha1="2698ff66cf8d53774d9d09ec26f42514272ef9a6" status="baddump" />
@@ -23503,7 +23519,8 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 		<description>PC Games (coverdisk 1993/01 - January 1993) (Germany)</description>
 		<year>1993</year>
 		<publisher>Computec</publisher>
-		<info name="contents" value="History-Line 1914-1918 Demo" />
+		<info name="contents" value="History-Line 1914-1918 demo" />
+		<info name="region" value="Germany" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pcgames01-93.img" size="737280" crc="7597e279" sha1="7fde2fd85e9362ae7223855e60a95508917a96a1" status="baddump" />
@@ -23515,7 +23532,8 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 		<description>PC Games (coverdisk 1993/02 - February 1993) (Germany)</description>
 		<year>1993</year>
 		<publisher>Computec</publisher>
-		<info name="contents" value="Oxyd Demo" />
+		<info name="contents" value="Oxyd demo" />
+		<info name="region" value="Germany" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pcgames02-93.img" size="737280" crc="518c19d3" sha1="a071a3c78b7bc30cc04263c925c72887ed36146d" status="baddump" />
@@ -23539,7 +23557,8 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 		<description>PC Games (coverdisk 1993/06 - June 1993) (Germany)</description>
 		<year>1993</year>
 		<publisher>Computec</publisher>
-		<info name="contents" value="Skat 2010 Demo" />
+		<info name="contents" value="Skat 2010 demo" />
+		<info name="region" value="Germany" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pcgames06-93.img" size="737280" crc="60e3fd08" sha1="01d36ceb390c85b724031a1d62c04a5681efdddf" status="baddump" />
@@ -23551,7 +23570,8 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 		<description>PC Games (coverdisk 1993/07 - July 1993) (Germany)</description>
 		<year>1993</year>
 		<publisher>Computec</publisher>
-		<info name="contents" value="Syndicate Demo" />
+		<info name="contents" value="Syndicate demo" />
+		<info name="region" value="Germany" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pcgames07-93.img" size="737280" crc="d5e48d7b" sha1="cc73c5aa2d35b0e19874bff0d6cacae24fc699b4" status="baddump" />
@@ -23563,7 +23583,8 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 		<description>PC Games (coverdisk 1993/08 - August 1993) (Germany)</description>
 		<year>1993</year>
 		<publisher>Computec</publisher>
-		<info name="contents" value="Pinball Dreams Demo" />
+		<info name="contents" value="Pinball Dreams demo" />
+		<info name="region" value="Germany" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pcgames08-93.img" size="737280" crc="5c97c2dd" sha1="612dda3f5d2431fff0398f7f1aaf3a89a0d11a66" status="baddump" />
@@ -23579,7 +23600,8 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 		<description>PC Games (coverdisk 1993/10 - October 1993) (Germany)</description>
 		<year>1993</year>
 		<publisher>Computec</publisher>
-		<info name="contents" value="The Lost Vikings Demo" />
+		<info name="contents" value="The Lost Vikings demo" />
+		<info name="region" value="Germany" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pcgames10-93.img" size="737280" crc="889763d3" sha1="e50ac372d72b23e06a5a516e895a98f66987317f" status="baddump" />
@@ -23603,7 +23625,8 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 		<description>PC Games (coverdisk 1994/02 - February 1994) (Germany)</description>
 		<year>1993</year>
 		<publisher>Computec</publisher>
-		<info name="contents" value="Magic Boy / Oxyd Magnum Demo" />
+		<info name="contents" value="Magic Boy / Oxyd Magnum demo" />
+		<info name="region" value="Germany" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pcgames02-94.img" size="737280" crc="9f2d7737" sha1="65d61d1d827f9e954a6e1f21082e33f81ff1ae01" status="baddump" />
@@ -23619,7 +23642,8 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 		<description>PC Games (coverdisk 1994/04 - April 1994) (Germany)</description>
 		<year>1993</year>
 		<publisher>Computec</publisher>
-		<info name="contents" value="Beneath a Steel Sky Demo" />
+		<info name="contents" value="Beneath a Steel Sky demo" />
+		<info name="region" value="Germany" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pcgames04-94.img" size="737280" crc="de1257c6" sha1="be2584f9181758f17e6559ebfeec62437b5a56ab" status="baddump" />
@@ -23631,7 +23655,8 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 		<description>PC Games (coverdisk 1994/05 - May 1994) (Germany)</description>
 		<year>1993</year>
 		<publisher>Computec</publisher>
-		<info name="contents" value="Mad News Demo" />
+		<info name="contents" value="Mad News demo" />
+		<info name="region" value="Germany" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pcgames05-94.img" size="737280" crc="79596853" sha1="0baaa8f39c91b7623ae7c8b87e45afcc7e10b2a3" status="baddump" />
@@ -23643,7 +23668,8 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 		<description>PC Games (coverdisk 1994/06 - June 1994) (Germany)</description>
 		<year>1993</year>
 		<publisher>Computec</publisher>
-		<info name="contents" value="Die Siedler Demo" />
+		<info name="contents" value="Die Siedler demo" />
+		<info name="region" value="Germany" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pcgames06-94.img" size="737280" crc="0062b36b" sha1="a68b9201c6f723896fe3ac44177e4daab8d8ebcd" status="baddump" />
@@ -23679,7 +23705,8 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 		<description>PC Games (coverdisk 1995/01 - January 1995) (Germany)</description>
 		<year>1993</year>
 		<publisher>Computec</publisher>
-		<info name="contents" value="Universe / Cheat it Demo" />
+		<info name="contents" value="Universe / Cheat it demo" />
+		<info name="region" value="Germany" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pcgames01-95.img" size="737280" crc="12e12534" sha1="091393557c281cc2e659b8fd089e9b98845a5dec" status="baddump" />
@@ -23922,6 +23949,7 @@ Bombs: An amusing little desktop game.
 		<description>Air Duel: 80 Years of Dogfighting (USA)</description>
 		<year>1993</year>
 		<publisher>MicroProse</publisher>
+		<info name="region" value="Europe" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="diska.img" size="1474560" crc="d8e7a342" sha1="026af5576bf2b75ef609af0774958485c50c773b" status="baddump" />
