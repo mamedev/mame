@@ -68,7 +68,3 @@ void casloopy_rom_device::write_ram(offs_t offset, u8 data)
 	m_nvram[offset & (m_nvram.size() - 1)] = data;
 }
 
-
-
-
-

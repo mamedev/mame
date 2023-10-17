@@ -1026,11 +1026,12 @@ if (BUSES["C64"]~=null) then
 end
 
 
+---------------------------------------------------
 --
---@src/devices/bus/casloopy/slot.h,BUSES["CASLOOPY_CART"] = true
+--@src/devices/bus/casloopy/slot.h,BUSES["CASLOOPY"] = true
 ---------------------------------------------------
 
-if (BUSES["CASLOOPY_CART"]~=null) then
+if (BUSES["CASLOOPY"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/casloopy/slot.cpp",
 		MAME_DIR .. "src/devices/bus/casloopy/slot.h",

@@ -142,18 +142,19 @@ class casloopy_state : public driver_device
 {
 public:
 	casloopy_state(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_cart(*this, "cartslot"),
-	m_palette(*this, "palette"),
-	m_screen(*this, "screen"),
-	m_io0(*this, "CONTROLLER_0"),
-	m_io1(*this, "CONTROLLER_1"),
-	m_io2(*this, "CONTROLLER_2"),
-	m_mouse(*this, "MOUSE"),
-	m_mouse_x(*this, "MOUSE_X"),
-	m_mouse_y(*this, "MOUSE_Y"),
-	m_config(*this, "CONFIG") {}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_cart(*this, "cartslot")
+		, m_palette(*this, "palette")
+		, m_screen(*this, "screen")
+		, m_io0(*this, "CONTROLLER_0")
+		, m_io1(*this, "CONTROLLER_1")
+		, m_io2(*this, "CONTROLLER_2")
+		, m_mouse(*this, "MOUSE")
+		, m_mouse_x(*this, "MOUSE_X")
+		, m_mouse_y(*this, "MOUSE_Y")
+		, m_config(*this, "CONFIG")
+	{ }
 
 	void casloopy(machine_config &config);
 
@@ -358,10 +359,10 @@ void casloopy_state::video_start()
 	m_hblank_timer = timer_alloc(FUNC(casloopy_state::hblank_start), this);
 	m_hblank_timer->adjust(m_screen->time_until_pos(0, 256));
 
-	save_pointer(NAME(m_palette_ram), 0x1000 * sizeof(u16));
-	save_pointer(NAME(m_vram), 0x8000 * sizeof(u16));
-	save_pointer(NAME(m_bitmap_vram), 0x20000 * sizeof(u8));
-	save_pointer(NAME(m_sprite_ram), 0x100 * sizeof(u16));
+	save_pointer(NAME(m_palette_ram), 0x1000);
+	save_pointer(NAME(m_vram), 0x8000);
+	save_pointer(NAME(m_bitmap_vram), 0x20000);
+	save_pointer(NAME(m_sprite_ram), 0x100);
 }
 
 int casloopy_state::bitmap_bpp() const
@@ -2079,7 +2080,7 @@ void casloopy_state::casloopy(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(256);
 
-	CASLOOPY_CART_SLOT(config, "cartslot", casloopy_cart, nullptr).set_must_be_loaded(true);
+	CASLOOPY_CART_SLOT(config, m_cart, SH1_CLOCK, casloopy_cart, nullptr).set_must_be_loaded(true);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("casloopy");
 }
