@@ -1028,6 +1028,21 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/casloopy/slot.h,BUSES["CASLOOPY"] = true
+---------------------------------------------------
+
+if (BUSES["CASLOOPY"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/casloopy/slot.cpp",
+		MAME_DIR .. "src/devices/bus/casloopy/slot.h",
+		MAME_DIR .. "src/devices/bus/casloopy/rom.cpp",
+		MAME_DIR .. "src/devices/bus/casloopy/rom.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/cbm2/exp.h,BUSES["CBM2"] = true
 --@src/devices/bus/cbm2/user.h,BUSES["CBM2"] = true
 ---------------------------------------------------
