@@ -221,7 +221,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(megasys1_state::megasys1A_iganinju_scanline)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
-void megasys1_state::megasys1Z_map(address_map &map)
+void megasys1_typez_state::megasys1Z_map(address_map &map)
+{
+	megasys_base_map(map);
+	map(0x084308, 0x084309).w(FUNC(megasys1_typez_state::soundlatch_z_w));
+}
+
+void megasys1_state::megasys_base_map(address_map &map)
 {
 	map.global_mask(0xfffff);
 	map(0x000000, 0x03ffff).rom();
@@ -231,19 +237,19 @@ void megasys1_state::megasys1Z_map(address_map &map)
 	map(0x080006, 0x080007).portr("DSW");
 	map(0x084200, 0x084205).rw("scroll0", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
 	map(0x084208, 0x08420d).rw("scroll1", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
-	map(0x084300, 0x084301).w(FUNC(megasys1_state::screen_flag_w));
-	map(0x084308, 0x084309).w(FUNC(megasys1_state::soundlatch_z_w));
+	map(0x084300, 0x084301).w(FUNC(megasys1_typez_state::screen_flag_w));
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x08e000, 0x08ffff).ram().share("objectram");
 	map(0x090000, 0x093fff).ram().w("scroll0", FUNC(megasys1_tilemap_device::write)).share("scroll0");
 	map(0x094000, 0x097fff).ram().w("scroll1", FUNC(megasys1_tilemap_device::write)).share("scroll1");
-	map(0x0f0000, 0x0fffff).ram().w(FUNC(megasys1_state::ram_w)).share("ram");
+	map(0x0f0000, 0x0fffff).ram().w(FUNC(megasys1_typez_state::ram_w)).share("ram");
+
 }
 
 void megasys1_state::megasys1A_map(address_map &map)
 {
 	map.global_mask(0xfffff);
-	megasys1Z_map(map);
+	megasys_base_map(map);
 	map(0x000000, 0x07ffff).rom();
 	map(0x080008, 0x080009).r(m_soundlatch[1], FUNC(generic_latch_16_device::read));    /* from sound cpu */
 	map(0x084000, 0x084001).w(FUNC(megasys1_state::active_layers_w));
@@ -748,7 +754,7 @@ void megasys1_state::megasys1B_sound_map(address_map &map)
 
 
 
-void megasys1_state::z80_sound_map(address_map &map)
+void megasys1_typez_state::z80_sound_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0xc000, 0xc7ff).ram();
@@ -756,7 +762,7 @@ void megasys1_state::z80_sound_map(address_map &map)
 	map(0xf000, 0xf000).nopw(); /* ?? */
 }
 
-void megasys1_state::z80_sound_io_map(address_map &map)
+void megasys1_typez_state::z80_sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x01).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
@@ -1867,7 +1873,6 @@ void megasys1_state::system_A(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_abc);
 	PALETTE(config, m_palette, FUNC(megasys1_state::megasys1_palette)).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x800/2);
-	MCFG_VIDEO_START_OVERRIDE(megasys1_state,megasys1)
 
 	MEGASYS1_TILEMAP(config, m_tmap[0], m_palette, 256*0);
 	MEGASYS1_TILEMAP(config, m_tmap[1], m_palette, 256*1);
@@ -2002,7 +2007,6 @@ void megasys1_state::system_Bbl(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_abc);
 	PALETTE(config, m_palette, FUNC(megasys1_state::megasys1_palette)).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x800/2);
-	MCFG_VIDEO_START_OVERRIDE(megasys1_state,megasys1)
 
 	MEGASYS1_TILEMAP(config, m_tmap[0], m_palette, 256*0);
 	MEGASYS1_TILEMAP(config, m_tmap[1], m_palette, 256*1);
@@ -2101,7 +2105,6 @@ void megasys1_state::system_D(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_abc);
 	PALETTE(config, m_palette, FUNC(megasys1_state::megasys1_palette)).set_format(palette_device::RGBx_555, 0x800/2);
-	MCFG_VIDEO_START_OVERRIDE(megasys1_state,megasys1)
 
 	MEGASYS1_TILEMAP(config, m_tmap[0], m_palette, 256*0);
 	MEGASYS1_TILEMAP(config, m_tmap[1], m_palette, 256*1);
@@ -2128,16 +2131,16 @@ void megasys1_state::system_D(machine_config &config)
 ***************************************************************************/
 
 
-void megasys1_state::system_Z(machine_config &config)
+void megasys1_typez_state::system_Z(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, SYS_A_CPU_CLOCK); /* 6MHz (12MHz / 2) */
-	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_state::megasys1Z_map);
-	TIMER(config, m_scantimer).configure_scanline(FUNC(megasys1_state::megasys1A_scanline), "screen", 0, 1);
+	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_typez_state::megasys1Z_map);
+	TIMER(config, m_scantimer).configure_scanline(FUNC(megasys1_typez_state::megasys1A_scanline), "screen", 0, 1);
 
 	Z80(config, m_audiocpu, 3000000); /* OSC 12MHz divided by 4 ??? */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &megasys1_state::z80_sound_map);
-	m_audiocpu->set_addrmap(AS_IO, &megasys1_state::z80_sound_io_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &megasys1_typez_state::z80_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &megasys1_typez_state::z80_sound_io_map);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -2145,7 +2148,7 @@ void megasys1_state::system_Z(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(32*8, 32*8);
 	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	m_screen->set_screen_update(FUNC(megasys1_state::screen_update));
+	m_screen->set_screen_update(FUNC(megasys1_typez_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_z);

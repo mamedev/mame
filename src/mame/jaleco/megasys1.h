@@ -29,7 +29,11 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_soundlatch(*this, "soundlatch%u", 1U),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_screen(*this, "screen"),
+		m_tmap(*this, "scroll%u", 0),
 		m_oki(*this, "oki%u", 1U),
 		m_ram(*this, "ram"),
 		m_io_system(*this, "SYSTEM"),
@@ -40,12 +44,8 @@ public:
 		m_io_dsw2(*this, "DSW2"),
 		m_scantimer(*this, "scantimer"),
 		m_objectram(*this, "objectram"),
-		m_tmap(*this, "scroll%u", 0),
 		m_ymsnd(*this, "ymsnd"),
 		m_p47b_adpcm(*this, "msm%u", 1U),
-		m_palette(*this, "palette"),
-		m_screen(*this, "screen"),
-		m_soundlatch(*this, "soundlatch%u", 1U),
 		m_rom_maincpu(*this, "maincpu"),
 		m_okibank(*this, "okibank")
 	{
@@ -62,7 +62,6 @@ public:
 	void system_Bbl(machine_config &config);
 	void system_A(machine_config &config);
 	void system_A_jitsupro(machine_config &config);
-	void system_Z(machine_config &config);
 
 	void init_peekaboo();
 	void init_soldam();
@@ -78,18 +77,21 @@ public:
 	void init_monkelf();
 	void init_edfp();
 	void init_rodland();
-	void init_edfbl();
 	void init_stdragona();
 	void init_stdragonb();
-	void init_systemz();
 	void init_lordofkbp();
 
 protected:
 	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
+	optional_device_array<generic_latch_16_device, 2> m_soundlatch;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
+	optional_device_array<megasys1_tilemap_device, 3> m_tmap;
 	optional_device_array<okim6295_device, 2> m_oki;
 	required_shared_ptr<u16> m_ram;
 	required_ioport m_io_system;
@@ -104,14 +106,19 @@ protected:
 	void megasys1C_map(address_map &map);
 
 	void megasys1c_handle_scanline_irq(int scanline);
+	TIMER_DEVICE_CALLBACK_MEMBER(megasys1A_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(megasys1B_scanline);
 
+	void megasys_base_map(address_map &map);
 	void megasys1B_sound_map(address_map &map);
 
 	virtual void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void mix_sprite_bitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void partial_clear_sprite_bitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u8 param);
 	inline void draw_16x16_priority_sprite(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect, s32 code, s32 color, s32 sx, s32 sy, s32 flipx, s32 flipy, u8 mosaic, u8 mosaicsol, s32 priority);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void screen_flag_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	int m_hardware_type_z = 0; // System Z
 
@@ -138,12 +145,8 @@ protected:
 
 private:
 	required_shared_ptr<u16> m_objectram;
-	optional_device_array<megasys1_tilemap_device, 3> m_tmap;
 	optional_device<device_t> m_ymsnd;
 	optional_device_array<msm5205_device, 2> m_p47b_adpcm;
-	required_device<palette_device> m_palette;
-	required_device<screen_device> m_screen;
-	optional_device_array<generic_latch_16_device, 2> m_soundlatch;
 	required_region_ptr<u16> m_rom_maincpu;
 	optional_memory_bank m_okibank;
 
@@ -172,25 +175,19 @@ private:
 	void sprite_bank_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 sprite_flag_r();
 	void sprite_flag_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void screen_flag_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void soundlatch_w(u16 data);
-	void soundlatch_z_w(u16 data);
 	void soundlatch_c_w(u16 data);
 	void monkelf_scroll0_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void monkelf_scroll1_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void megasys1_set_vreg_flag(int which, int data);
 	template<int Chip> u8 oki_status_r();
 	void ram_w(offs_t offset, u16 data);
 	void p47b_adpcm_w(offs_t offset, u8 data);
 	
 
-	DECLARE_VIDEO_START(megasys1);
 	void megasys1_palette(palette_device &palette);
 
-	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
 	INTERRUPT_GEN_MEMBER(megasys1D_irq);
-	TIMER_DEVICE_CALLBACK_MEMBER(megasys1A_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(megasys1A_iganinju_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(megasys1C_scanline);
 
@@ -209,9 +206,6 @@ private:
 	void megasys1B_monkelf_map(address_map &map);
 	void megasys1D_map(address_map &map);
 	void megasys1D_oki_map(address_map &map);
-	void megasys1Z_map(address_map &map);
-	void z80_sound_io_map(address_map &map);
-	void z80_sound_map(address_map &map);
 };
 
 class megasys1_hachoo_state : public megasys1_state
@@ -234,8 +228,17 @@ public:
 		m_hardware_type_z = 1;
 	}
 
+	void system_Z(machine_config &config);
+
 protected:
 	virtual void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect) override;
+
+private:
+	void soundlatch_z_w(u16 data);
+
+	void megasys1Z_map(address_map &map);
+	void z80_sound_io_map(address_map &map);
+	void z80_sound_map(address_map &map);
 };
 
 
@@ -283,7 +286,12 @@ public:
 
 	void system_C_bigstrik(machine_config &config);
 
-	// MCU related
+protected:
+	virtual void machine_reset() override;
+
+private:
+	required_device<tlcs90_device> m_iomcu;
+
 	u16 ip_select_bigstrik_r();
 	void ip_select_bigstrik_w(u16 data);
 	u8 mcu_capture_inputs_r(offs_t offset);
@@ -298,12 +306,6 @@ public:
 	void iomcu_map(address_map &map);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(megasys1C_bigstrik_scanline);
-
-protected:
-	virtual void machine_reset() override;
-
-private:
-	required_device<tlcs90_device> m_iomcu;
 };
 
 #endif // MAME_JALECO_MEGASYS1_H

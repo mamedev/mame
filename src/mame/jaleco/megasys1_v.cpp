@@ -199,7 +199,7 @@ actual code sent to the hardware.
 
 
 
-VIDEO_START_MEMBER(megasys1_state,megasys1)
+void megasys1_state::video_start()
 {
 	m_spriteram = &m_ram[0x8000/2];
 
@@ -273,7 +273,7 @@ void megasys1_state::soundlatch_w(u16 data)
 	m_audiocpu->set_input_line(4, HOLD_LINE);
 }
 
-void megasys1_state::soundlatch_z_w(u16 data)
+void megasys1_typez_state::soundlatch_z_w(u16 data)
 {
 	m_soundlatch[0]->write(data & 0xff);
 	m_audiocpu->set_input_line(5, HOLD_LINE);
