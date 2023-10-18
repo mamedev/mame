@@ -147,14 +147,19 @@ void megasys1_state::machine_reset()
 {
 	m_ignore_oki_status = 1;    /* ignore oki status due 'protection' */
 	m_mcu_hs = 0;
-	m_mcu_input_data = 0x00;
-	m_mcu_io_data = 0x0;
 }
 
 void megasys1_bc_iosim_state::machine_reset()
 {
 	megasys1_state::machine_reset();
 	m_ip_latched = 0x0006; /* reset protection - some games expect this initial read without sending anything */
+}
+
+void megasys1_bc_iomcu_state::machine_reset()
+{
+	megasys1_state::machine_reset();
+	m_mcu_input_data = 0x00;
+	m_mcu_io_data = 0x0;
 }
 
 
@@ -378,42 +383,36 @@ void megasys1_state::megasys1B_monkelf_map(address_map &map)
 #define INTERRUPT_NUM_C INTERRUPT_NUM_B
 #define interrupt_C     interrupt_B
 
-TIMER_DEVICE_CALLBACK_MEMBER(megasys1_state::megasys1C_scanline)
+void megasys1_state::megasys1c_handle_scanline_irq(int scanline)
 {
-	int scanline = param;
-
-//	if(scanline == 240) // vblank-out irq
 	if(scanline == 224) // vblank-out irq
 		m_maincpu->set_input_line(4, HOLD_LINE);
 
-	if(scanline == 0)
-		m_maincpu->set_input_line(2, HOLD_LINE);
-
-//	if(scanline == 128)
 	if(scanline == 80)
 		m_maincpu->set_input_line(1, HOLD_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(megasys1_state::megasys1C_bigstrik_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(megasys1_state::megasys1C_scanline)
 {
 	int scanline = param;
 
-//	if(scanline == 240) // vblank-out irq
-	if(scanline == 224) // vblank-out irq (falling edge)
-	{
-		m_maincpu->set_input_line(4, HOLD_LINE);
-	}
+	megasys1c_handle_scanline_irq(scanline);
+
+	if(scanline == 0)
+		m_maincpu->set_input_line(2, HOLD_LINE);
+
+}
+TIMER_DEVICE_CALLBACK_MEMBER(megasys1_bc_iomcu_state::megasys1C_bigstrik_scanline)
+{
+	int scanline = param;
+
+	megasys1c_handle_scanline_irq(scanline);
 
 	if(scanline == 0) // end of vblank (rising edge)
 	{
 		LOG("%s: megasys1C_bigstrik_scanline: Send INT1 to MCU: (scanline %03d)\n", machine().describe_context(), scanline);
-//		m_maincpu->set_input_line(2, HOLD_LINE);
 		m_iomcu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 	}
-	
-//	if(scanline == 128)
-	if(scanline == 80)
-		m_maincpu->set_input_line(1, HOLD_LINE);
 }
 
 void megasys1_state::ram_w(offs_t offset, u16 data)
@@ -459,7 +458,7 @@ void megasys1_bc_iosim_state::megasys1C_iosim_map(address_map &map)
   which one was previously selected by the MCU itself using the offset.
   It also sends the IRQ2 to the main CPU for some case
 */
-u8 megasys1_state::mcu_capture_inputs_r(offs_t offset)
+u8 megasys1_bc_iomcu_state::mcu_capture_inputs_r(offs_t offset)
 {		
 	u8 input_data = 0x00;
 	u8 bank = offset >> 16;
@@ -486,7 +485,7 @@ u8 megasys1_state::mcu_capture_inputs_r(offs_t offset)
 /*
   Used by IO MCU to read data from the main CPU when INT0 is triggered
 */
-u8 megasys1_state::mcu_port1_r()
+u8 megasys1_bc_iomcu_state::mcu_port1_r()
 {
 	LOG("%s: mcu_port1_r: Read data from CPU: (data %02x)\n", machine().describe_context(), m_mcu_input_data);
 
@@ -496,7 +495,7 @@ u8 megasys1_state::mcu_port1_r()
 /*
   Used by IO MCU to send data to the main CPU when INT0 is triggered
 */
-void megasys1_state::mcu_port2_w(u8 data)
+void megasys1_bc_iomcu_state::mcu_port2_w(u8 data)
 {
 	LOG("%s: mcu_port2_w: Send data to CPU: (data %02x)\n", machine().describe_context(), data);
 	
@@ -506,7 +505,7 @@ void megasys1_state::mcu_port2_w(u8 data)
 /*
   Unknown purpose, but the IO MCU writes into the bit 3 of the port 6
 */
-void megasys1_state::mcu_port6_w(u8 data)
+void megasys1_bc_iomcu_state::mcu_port6_w(u8 data)
 {
 	LOG("%s: mcu_port6_w: Write data to port 6: (data %02x)\n", machine().describe_context(), data);
 }
@@ -514,7 +513,7 @@ void megasys1_state::mcu_port6_w(u8 data)
 /*
   Read handler triggered by the main CPU at some specific address. Used to read data from port 2 of IO MCU
 */
-u16 megasys1_state::ip_select_bigstrik_r() // FROM MCU
+u16 megasys1_bc_iomcu_state::ip_select_bigstrik_r() // FROM MCU
 {
 	LOG("%s: ip_select_bigstrik_r: Read data from MCU: (data %02x)\n", machine().describe_context(), m_mcu_io_data);
 
@@ -524,7 +523,7 @@ u16 megasys1_state::ip_select_bigstrik_r() // FROM MCU
 /*
   Write handler triggered by the main CPU at some specific address. Used to write data to port 1 of IO MCU and send irq0
 */
-void megasys1_state::ip_select_bigstrik_w(u16 data) // TO MCU
+void megasys1_bc_iomcu_state::ip_select_bigstrik_w(u16 data) // TO MCU
 {
 	LOG("%s: ip_select_bigstrik_w: Send data to MCU: (data %02x)\n", machine().describe_context(), data);
 
@@ -533,32 +532,16 @@ void megasys1_state::ip_select_bigstrik_w(u16 data) // TO MCU
 	m_iomcu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
-void megasys1_state::iomcu_map(address_map &map)
+void megasys1_bc_iomcu_state::iomcu_map(address_map &map)
 {
 	//  0x000000- 0x003fff is hidden by internal ROM, as are some 0x00fxxx addresses by RAM
-	map(0x000000, 0x0fffff).r(FUNC(megasys1_state::mcu_capture_inputs_r));
+	map(0x000000, 0x0fffff).r(FUNC(megasys1_bc_iomcu_state::mcu_capture_inputs_r));
 }
 
-void megasys1_state::megasys1C_bigstrik_map(address_map &map)
+void megasys1_bc_iomcu_state::megasys1C_bigstrik_map(address_map &map)
 {
-	map.global_mask(0x1fffff);
-	map(0x000000, 0x07ffff).rom();
-	map(0x0c2000, 0x0c2005).rw("scroll0", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
-	map(0x0c2008, 0x0c200d).rw("scroll1", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
-	map(0x0c2100, 0x0c2105).rw("scroll2", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
-	map(0x0c2108, 0x0c2109).w(FUNC(megasys1_state::sprite_bank_w));
-	map(0x0c2200, 0x0c2201).rw(FUNC(megasys1_state::sprite_flag_r), FUNC(megasys1_state::sprite_flag_w));
-	map(0x0c2208, 0x0c2209).w(FUNC(megasys1_state::active_layers_w));
-	map(0x0c2308, 0x0c2309).w(FUNC(megasys1_state::screen_flag_w));
-	map(0x0c8000, 0x0c8001).r(m_soundlatch[1], FUNC(generic_latch_16_device::read)).w(FUNC(megasys1_state::soundlatch_c_w));
-	map(0x0d2000, 0x0d3fff).ram().share("objectram");
-	map(0x0d8000, 0x0d8001).rw(FUNC(megasys1_state::ip_select_bigstrik_r), FUNC(megasys1_state::ip_select_bigstrik_w));
-	// 64th Street actively uses 0xe4*** for breakable objects.
-	map(0x0e0000, 0x0e3fff).mirror(0x4000).ram().w("scroll0", FUNC(megasys1_tilemap_device::write)).share("scroll0");
-	map(0x0e8000, 0x0ebfff).mirror(0x4000).ram().w("scroll1", FUNC(megasys1_tilemap_device::write)).share("scroll1");
-	map(0x0f0000, 0x0f3fff).mirror(0x4000).ram().w("scroll2", FUNC(megasys1_tilemap_device::write)).share("scroll2");
-	map(0x0f8000, 0x0f87ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x1c0000, 0x1cffff).mirror(0x30000).ram().w(FUNC(megasys1_state::ram_w)).share("ram"); //0x1f****, Cybattler reads attract mode inputs at 0x1d****
+	megasys1C_map(map);
+	map(0x0d8000, 0x0d8001).rw(FUNC(megasys1_bc_iomcu_state::ip_select_bigstrik_r), FUNC(megasys1_bc_iomcu_state::ip_select_bigstrik_w));
 }
 
 
@@ -2074,20 +2057,18 @@ void megasys1_bc_iosim_state::system_C_iosim(machine_config &config)
 
 
 
-void megasys1_state::system_C_bigstrik(machine_config &config)
+void megasys1_bc_iomcu_state::system_C_bigstrik(machine_config &config)
 {
 	system_C(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_state::megasys1C_bigstrik_map);
-	m_scantimer->set_callback(FUNC(megasys1_state::megasys1C_bigstrik_scanline));
+	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_bc_iomcu_state::megasys1C_bigstrik_map);
+	m_scantimer->set_callback(FUNC(megasys1_bc_iomcu_state::megasys1C_bigstrik_scanline));
 
 	TMP91640(config, m_iomcu, SYS_C_CPU_CLOCK); // Toshiba TMP91640, with 16Kbyte internal ROM, 512bytes internal RAM
-	m_iomcu->set_addrmap(AS_PROGRAM, &megasys1_state::iomcu_map);
-	//m_iomcu->port_read<0>().set(FUNC(megasys1_state::mcu_port0_r));
-	m_iomcu->port_read<1>().set(FUNC(megasys1_state::mcu_port1_r));
-	m_iomcu->port_write<2>().set(FUNC(megasys1_state::mcu_port2_w));
-	//m_iomcu->port_write<4>().set(FUNC(megasys1_state::mcu_port4_w));
-	m_iomcu->port_write<6>().set(FUNC(megasys1_state::mcu_port6_w));
+	m_iomcu->set_addrmap(AS_PROGRAM, &megasys1_bc_iomcu_state::iomcu_map);
+	m_iomcu->port_read<1>().set(FUNC(megasys1_bc_iomcu_state::mcu_port1_r));
+	m_iomcu->port_write<2>().set(FUNC(megasys1_bc_iomcu_state::mcu_port2_w));
+	m_iomcu->port_write<6>().set(FUNC(megasys1_bc_iomcu_state::mcu_port6_w));
 
 }
 /***************************************************************************
@@ -5106,7 +5087,7 @@ void megasys1_bc_iosim_state::init_avspirit()
 	save_item(NAME(m_ip_latched));
 }
 
-void megasys1_state::init_bigstrik()
+void megasys1_bc_iomcu_state::init_bigstrik()
 {
 	save_item(NAME(m_sprite_bank));
 	save_item(NAME(m_mcu_input_data));
@@ -5403,8 +5384,8 @@ void megasys1_state::init_monkelf()
  *************************************/
 
 // Type Z
-GAME( 1988, lomakai,    0,        system_Z,          lomakai,  megasys1_state, empty_init,    ROT0,   "Jaleco", "Legend of Makai (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, makaiden,   lomakai,  system_Z,          lomakai,  megasys1_state, empty_init,    ROT0,   "Jaleco", "Makai Densetsu (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, lomakai,    0,        system_Z,          lomakai,  megasys1_typez_state, empty_init,    ROT0,   "Jaleco", "Legend of Makai (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, makaiden,   lomakai,  system_Z,          lomakai,  megasys1_typez_state, empty_init,    ROT0,   "Jaleco", "Makai Densetsu (Japan)", MACHINE_SUPPORTS_SAVE )
 
 // Type A
 GAME( 1988, p47,        0,        system_A,          p47,      megasys1_state, empty_init,    ROT0,   "Jaleco", "P-47 - The Phantom Fighter (World)", MACHINE_SUPPORTS_SAVE )
@@ -5454,10 +5435,10 @@ GAME( 1993, hayaosi1,   0,        system_B_hayaosi1, hayaosi1, megasys1_bc_iosim
 GAME( 1991, 64street,   0,        system_C_iosim,          64street, megasys1_bc_iosim_state, init_64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, 64streetj,  64street, system_C_iosim,          64street, megasys1_bc_iosim_state, init_64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, 64streetja, 64street, system_C_iosim,          64street, megasys1_bc_iosim_state, init_64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, bigstrik,   0,        system_C_bigstrik,       bigstrik, megasys1_bc_iosim_state, init_bigstrik, ROT0,   "Jaleco", "Big Striker", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, bigstrik,   0,        system_C_bigstrik,       bigstrik, megasys1_bc_iomcu_state, init_bigstrik, ROT0,   "Jaleco", "Big Striker", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, chimerab,   0,        system_C_iosim,          chimerab, megasys1_bc_iosim_state, init_chimerab, ROT0,   "Jaleco", "Chimera Beast (Japan, prototype)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, cybattlr,   0,        system_C_iosim,          cybattlr, megasys1_bc_iosim_state, init_cybattlr, ROT90,  "Jaleco", "Cybattler", MACHINE_SUPPORTS_SAVE )
 
 // Type D
-GAME( 1993, peekaboo,   0,        system_D,          peekaboo, megasys1_typez_state, init_peekaboo, ROT0,   "Jaleco", "Peek-a-Boo! (Japan, ver. 1.1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, peekaboou,  peekaboo, system_D,          peekaboo, megasys1_typez_state, init_peekaboo, ROT0,   "Jaleco", "Peek-a-Boo! (North America, ver 1.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, peekaboo,   0,        system_D,          peekaboo, megasys1_state, init_peekaboo, ROT0,   "Jaleco", "Peek-a-Boo! (Japan, ver. 1.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, peekaboou,  peekaboo, system_D,          peekaboo, megasys1_state, init_peekaboo, ROT0,   "Jaleco", "Peek-a-Boo! (North America, ver 1.0)", MACHINE_SUPPORTS_SAVE )

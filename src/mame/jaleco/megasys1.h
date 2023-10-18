@@ -41,7 +41,6 @@ public:
 		m_scantimer(*this, "scantimer"),
 		m_objectram(*this, "objectram"),
 		m_tmap(*this, "scroll%u", 0),
-		m_iomcu(*this, "iomcu"),
 		m_ymsnd(*this, "ymsnd"),
 		m_p47b_adpcm(*this, "msm%u", 1U),
 		m_palette(*this, "palette"),
@@ -60,7 +59,6 @@ public:
 	void p47b(machine_config &config);
 	void system_D(machine_config &config);
 	void system_C(machine_config &config);
-	void system_C_bigstrik(machine_config &config);
 	void system_Bbl(machine_config &config);
 	void system_A(machine_config &config);
 	void system_A_jitsupro(machine_config &config);
@@ -79,7 +77,6 @@ public:
 	void init_rodlandjb();
 	void init_monkelf();
 	void init_edfp();
-	void init_bigstrik();
 	void init_rodland();
 	void init_edfbl();
 	void init_stdragona();
@@ -106,11 +103,15 @@ protected:
 	void megasys1B_map(address_map &map);
 	void megasys1C_map(address_map &map);
 
+	void megasys1c_handle_scanline_irq(int scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(megasys1B_scanline);
 
 	void megasys1B_sound_map(address_map &map);
 
 	virtual void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
+	void mix_sprite_bitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void partial_clear_sprite_bitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u8 param);
+	inline void draw_16x16_priority_sprite(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect, s32 code, s32 color, s32 sx, s32 sy, s32 flipx, s32 flipy, u8 mosaic, u8 mosaicsol, s32 priority);
 
 	int m_hardware_type_z = 0; // System Z
 
@@ -124,21 +125,6 @@ protected:
 
 	u16 m_screen_flag = 0;
 
-private:
-	required_shared_ptr<u16> m_objectram;
-	optional_device_array<megasys1_tilemap_device, 3> m_tmap;
-	optional_device<tlcs90_device> m_iomcu;
-	optional_device<device_t> m_ymsnd;
-	optional_device_array<msm5205_device, 2> m_p47b_adpcm;
-	required_device<palette_device> m_palette;
-	required_device<screen_device> m_screen;
-	optional_device_array<generic_latch_16_device, 2> m_soundlatch;
-	required_region_ptr<u16> m_rom_maincpu;
-	optional_memory_bank m_okibank;
-
-	// configuration
-	int m_layers_order[16]{};
-
 	// all
 	bitmap_ind16 m_sprite_buffer_bitmap;
 	std::unique_ptr<u16[]> m_buffer_objectram;
@@ -150,6 +136,19 @@ private:
 	u16 m_active_layers = 0;
 	u16 m_sprite_flag = 0;
 
+private:
+	required_shared_ptr<u16> m_objectram;
+	optional_device_array<megasys1_tilemap_device, 3> m_tmap;
+	optional_device<device_t> m_ymsnd;
+	optional_device_array<msm5205_device, 2> m_p47b_adpcm;
+	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
+	optional_device_array<generic_latch_16_device, 2> m_soundlatch;
+	required_region_ptr<u16> m_rom_maincpu;
+	optional_memory_bank m_okibank;
+
+	// configuration
+	int m_layers_order[16]{};
 
 	// System A only
 	int m_mcu_hs = 0;
@@ -184,16 +183,6 @@ private:
 	void ram_w(offs_t offset, u16 data);
 	void p47b_adpcm_w(offs_t offset, u8 data);
 	
-	// MCU related
-	u16 ip_select_bigstrik_r();
-	void ip_select_bigstrik_w(u16 data);
-	u8 mcu_capture_inputs_r(offs_t offset);
-	u8 mcu_port1_r();
-	void mcu_port2_w(u8 data);
-	void mcu_port6_w(u8 data);
-	
-	u8 m_mcu_input_data;
-	u8 m_mcu_io_data;
 
 	DECLARE_VIDEO_START(megasys1);
 	void megasys1_palette(palette_device &palette);
@@ -204,12 +193,8 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(megasys1A_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(megasys1A_iganinju_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(megasys1C_scanline);
-	TIMER_DEVICE_CALLBACK_MEMBER(megasys1C_bigstrik_scanline);
 
 	void priority_create();
-	void mix_sprite_bitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void partial_clear_sprite_bitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u8 param);
-	inline void draw_16x16_priority_sprite(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect, s32 code, s32 color, s32 sx, s32 sy, s32 flipx, s32 flipy, u8 mosaic, u8 mosaicsol, s32 priority);
 	void rodland_gfx_unmangle(const char *region);
 	void jitsupro_gfx_unmangle(const char *region);
 	void stdragona_gfx_unmangle(const char *region);
@@ -222,13 +207,11 @@ private:
 	void megasys1A_jitsupro_sound_map(address_map &map);
 	void megasys1B_edfbl_map(address_map &map);
 	void megasys1B_monkelf_map(address_map &map);
-	void megasys1C_bigstrik_map(address_map &map);
 	void megasys1D_map(address_map &map);
 	void megasys1D_oki_map(address_map &map);
 	void megasys1Z_map(address_map &map);
 	void z80_sound_io_map(address_map &map);
 	void z80_sound_map(address_map &map);
-	void iomcu_map(address_map &map);
 };
 
 class megasys1_hachoo_state : public megasys1_state
@@ -253,7 +236,6 @@ public:
 
 protected:
 	virtual void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect) override;
-
 };
 
 
@@ -273,7 +255,6 @@ public:
 
 	void system_B(machine_config &config);
 	void system_B_hayaosi1(machine_config &config);
-	void system_B_iosim(machine_config &config);
 	void system_C_iosim(machine_config &config);
 
 protected:
@@ -290,5 +271,39 @@ protected:
 	void ip_select_w(u16 data);
 };
 
+class megasys1_bc_iomcu_state : public megasys1_state
+{
+public:
+	megasys1_bc_iomcu_state(const machine_config &mconfig, device_type type, const char *tag) :
+		megasys1_state(mconfig, type, tag),
+		m_iomcu(*this, "iomcu")
+	{ }
+
+	void init_bigstrik();
+
+	void system_C_bigstrik(machine_config &config);
+
+	// MCU related
+	u16 ip_select_bigstrik_r();
+	void ip_select_bigstrik_w(u16 data);
+	u8 mcu_capture_inputs_r(offs_t offset);
+	u8 mcu_port1_r();
+	void mcu_port2_w(u8 data);
+	void mcu_port6_w(u8 data);
+	
+	u8 m_mcu_input_data;
+	u8 m_mcu_io_data;
+
+	void megasys1C_bigstrik_map(address_map &map);
+	void iomcu_map(address_map &map);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(megasys1C_bigstrik_scanline);
+
+protected:
+	virtual void machine_reset() override;
+
+private:
+	required_device<tlcs90_device> m_iomcu;
+};
 
 #endif // MAME_JALECO_MEGASYS1_H

@@ -423,10 +423,9 @@ inline void megasys1_state::draw_16x16_priority_sprite(screen_device &screen, bi
 
 }
 
+// Legend of Makai / Makai Densetsu only
 void megasys1_typez_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	printf("sprites\n");
-
 	int color,code,sx,sy,flipx,flipy,attr,sprite;
 	u16 *spriteram16 = m_spriteram;
 
@@ -468,7 +467,6 @@ void megasys1_typez_state::draw_sprites(screen_device &screen, bitmap_ind16 &bit
 
 void megasys1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-
 	/* objram: 0x100*4 entries      spritedata: 0x80 entries */
 
 	/* sprite order is from first in Sprite Data RAM (frontmost) to last */
