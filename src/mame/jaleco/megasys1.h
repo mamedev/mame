@@ -252,6 +252,7 @@ public:
 	void init_avspirit();
 	void init_64street();
 	void init_chimerab();
+	void init_chimeraba();
 	void init_cybattlr();
 	void init_hayaosi1();
 	void init_edf();

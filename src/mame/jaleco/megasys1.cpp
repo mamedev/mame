@@ -2897,6 +2897,40 @@ ROM_START( chimerab )
 	ROM_LOAD( "pr-91044",  0x0000, 0x0200, BAD_DUMP CRC(c69423d6) SHA1(ba9644a9899df2d73a5a16bf7ceef1954c2e25f3) ) // guess, but 99% sure it's meant to be the same as 64street/hayaosi1 based on analysis of game and previous handcrafted data
 ROM_END
 
+ROM_START( chimeraba )
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* Main CPU Code */
+	ROM_LOAD16_BYTE( "chim3.bin", 0x000000, 0x040000, CRC(d3b83ca9) SHA1(cef69684db90bfca69e088718636d8c1404ea647) )
+	ROM_LOAD16_BYTE( "chim2.bin", 0x000001, 0x040000, CRC(4e66e630) SHA1(b1f1c30e97a80383a7b6cc6c968ee9a6438687e2) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
+	ROM_LOAD16_BYTE( "prg8.bin", 0x000000, 0x010000, CRC(a682b1ca) SHA1(66f5d5a73f5e8cba87eac09c55eee59117d94f7b) )
+	ROM_LOAD16_BYTE( "prg7.bin", 0x000001, 0x010000, CRC(83b9982d) SHA1(68e7d344ebfffe19822c4cf9f7b13cb51f23537a) )
+
+	ROM_REGION( 0x4000, "iomcu", 0 ) /* TMP91640 Internal Code */
+	ROM_LOAD( "chimerab.mcu", 0x00000, 0x04000, NO_DUMP )
+
+	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
+	ROM_LOAD( "s1.bin",   0x000000, 0x080000, CRC(e4c2ac77) SHA1(db4bff3c02f22cc59a67b103fd176f4d88531f93) )
+
+	ROM_REGION( 0x080000, "scroll1", 0 ) /* Scroll 1 */
+	ROM_LOAD( "s2.bin",   0x000000, 0x080000, CRC(fafb37a5) SHA1(e36c4d18209add696982e36e84397ec51b9a9e7e) )
+
+	ROM_REGION( 0x020000, "scroll2", 0 ) /* Scroll 2 */
+	ROM_LOAD( "scr3.bin", 0x000000, 0x020000, CRC(5fe38a83) SHA1(0492be1a92baacb80ed5bdc0167beda3e9163d76) )
+
+	ROM_REGION( 0x100000, "sprites", 0 ) /* Sprites */
+	ROM_LOAD( "b2.bin",   0x000000, 0x080000, CRC(6e7f1778) SHA1(ac93f56c998f28e3f453fcdbf85f3217c9ae97de) )
+	ROM_LOAD( "b1.bin",   0x080000, 0x080000, CRC(29c0385e) SHA1(4416cb17d3121ec00bceff2614dc424a359f127a) )
+
+	ROM_REGION( 0x040000, "oki1", 0 )       /* Samples */
+	ROM_LOAD( "voi11.bin", 0x000000, 0x040000, CRC(14b3afe6) SHA1(6d8659d0fc6980ffc1661702fc787737448dce9d) )
+
+	ROM_REGION( 0x040000, "oki2", 0 )       /* Samples */
+	ROM_LOAD( "voi10.bin", 0x000000, 0x040000, CRC(67498914) SHA1(8d89fa90f38fd102b15f26f71491ea833ec32cb2) )
+
+	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM */
+	ROM_LOAD( "pr-91044",  0x0000, 0x0200, BAD_DUMP CRC(c69423d6) SHA1(ba9644a9899df2d73a5a16bf7ceef1954c2e25f3) ) // guess, but 99% sure it's meant to be the same as 64street/hayaosi1 based on analysis of game and previous handcrafted data
+ROM_END
 
 /***************************************************************************
 
@@ -5167,6 +5201,22 @@ void megasys1_bc_iosim_state::init_chimerab()
 	save_item(NAME(m_sprite_bank));
 }
 
+void megasys1_bc_iosim_state::init_chimeraba()
+{
+	m_ip_select_values[0] = 0x56;
+	m_ip_select_values[1] = 0x52;
+	m_ip_select_values[2] = 0x53;
+	m_ip_select_values[3] = 0x55;
+	m_ip_select_values[4] = 0x54;
+
+	m_ip_select_values[5] = 0xfa;
+	m_ip_select_values[6] = 0x06;
+
+	save_item(NAME(m_ip_latched));
+	save_item(NAME(m_sprite_bank));
+}
+
+
 void megasys1_bc_iosim_state::init_cybattlr()
 {
 	m_ip_select_values[0] = 0x56;
@@ -5494,8 +5544,8 @@ GAME( 1991, 64street,   0,        system_C_iosim,          64street, megasys1_bc
 GAME( 1991, 64streetj,  64street, system_C_iosim,          64street, megasys1_bc_iosim_state, init_64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, 64streetja, 64street, system_C_iosim,          64street, megasys1_bc_iosim_state, init_64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, bigstrik,   0,        system_C_bigstrik,       bigstrik, megasys1_bc_iomcu_state, init_bigstrik, ROT0,   "Jaleco", "Big Striker", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, chimerab,   0,        system_C_iosim,          chimerab, megasys1_bc_iosim_state, init_chimerab, ROT0,   "Jaleco", "Chimera Beast (Japan, prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, cybattlr,   0,        system_C_iosim,          cybattlr, megasys1_bc_iosim_state, init_cybattlr, ROT90,  "Jaleco", "Cybattler", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, chimerab,   0,        system_C_iosim,          chimerab, megasys1_bc_iosim_state, init_chimerab, ROT0,   "Jaleco", "Chimera Beast (Japan, prototype, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, chimeraba,  chimerab, system_C_iosim,          chimerab, megasys1_bc_iosim_state, init_chimeraba,ROT0,   "Jaleco", "Chimera Beast (Japan, prototype, set 2)", MACHINE_SUPPORTS_SAVE )GAME( 1993, cybattlr,   0,        system_C_iosim,          cybattlr, megasys1_bc_iosim_state, init_cybattlr, ROT90,  "Jaleco", "Cybattler", MACHINE_SUPPORTS_SAVE )
 
 // Type D
 GAME( 1993, peekaboo,   0,        system_D,          peekaboo, megasys1_state, init_peekaboo, ROT0,   "Jaleco", "Peek-a-Boo! (Japan, ver. 1.1)", MACHINE_SUPPORTS_SAVE )
