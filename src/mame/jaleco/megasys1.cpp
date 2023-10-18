@@ -465,10 +465,10 @@ void megasys1_bc_iosim_state::megasys1C_iosim_map(address_map &map)
   It also sends the IRQ2 to the main CPU for some case
 */
 u8 megasys1_bc_iomcu_state::mcu_capture_inputs_r(offs_t offset)
-{		
+{
 	u8 input_data = 0x00;
 	u8 bank = offset >> 16;
-	
+
 	switch (bank)
 	{
 		case 0x01:  input_data = m_io_p1->read(); break;
@@ -504,7 +504,7 @@ u8 megasys1_bc_iomcu_state::mcu_port1_r()
 void megasys1_bc_iomcu_state::mcu_port2_w(u8 data)
 {
 	LOG("%s: mcu_port2_w: Send data to CPU: (data %02x)\n", machine().describe_context(), data);
-	
+
 	m_mcu_io_data = data;
 }
 
@@ -534,7 +534,7 @@ void megasys1_bc_iomcu_state::ip_select_bigstrik_w(u16 data) // TO MCU
 	LOG("%s: ip_select_bigstrik_w: Send data to MCU: (data %02x)\n", machine().describe_context(), data);
 
 	m_mcu_input_data = data;
-	
+
 	m_iomcu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
@@ -2054,7 +2054,7 @@ void megasys1_state::system_C(machine_config &config)
 
 	/* video hardware */
 	m_screen->set_raw(SYS_A_CPU_CLOCK, 384,  0, 256, 278, 16, 240);
-//	m_screen->set_raw(SYS_A_CPU_CLOCK, 406,  0, 256, 263, 16, 240);
+//  m_screen->set_raw(SYS_A_CPU_CLOCK, 406,  0, 256, 263, 16, 240);
 
 	m_audiocpu->set_addrmap(AS_PROGRAM, &megasys1_state::megasys1B_sound_map);
 }
@@ -5545,7 +5545,8 @@ GAME( 1991, 64streetj,  64street, system_C_iosim,          64street, megasys1_bc
 GAME( 1991, 64streetja, 64street, system_C_iosim,          64street, megasys1_bc_iosim_state, init_64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, bigstrik,   0,        system_C_bigstrik,       bigstrik, megasys1_bc_iomcu_state, init_bigstrik, ROT0,   "Jaleco", "Big Striker", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, chimerab,   0,        system_C_iosim,          chimerab, megasys1_bc_iosim_state, init_chimerab, ROT0,   "Jaleco", "Chimera Beast (Japan, prototype, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, chimeraba,  chimerab, system_C_iosim,          chimerab, megasys1_bc_iosim_state, init_chimeraba,ROT0,   "Jaleco", "Chimera Beast (Japan, prototype, set 2)", MACHINE_SUPPORTS_SAVE )GAME( 1993, cybattlr,   0,        system_C_iosim,          cybattlr, megasys1_bc_iosim_state, init_cybattlr, ROT90,  "Jaleco", "Cybattler", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, chimeraba,  chimerab, system_C_iosim,          chimerab, megasys1_bc_iosim_state, init_chimeraba,ROT0,   "Jaleco", "Chimera Beast (Japan, prototype, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, cybattlr,   0,        system_C_iosim,          cybattlr, megasys1_bc_iosim_state, init_cybattlr, ROT90,  "Jaleco", "Cybattler", MACHINE_SUPPORTS_SAVE )
 
 // Type D
 GAME( 1993, peekaboo,   0,        system_D,          peekaboo, megasys1_state, init_peekaboo, ROT0,   "Jaleco", "Peek-a-Boo! (Japan, ver. 1.1)", MACHINE_SUPPORTS_SAVE )

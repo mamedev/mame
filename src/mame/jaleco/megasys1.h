@@ -182,7 +182,7 @@ private:
 	template<int Chip> u8 oki_status_r();
 	void ram_w(offs_t offset, u16 data);
 	void p47b_adpcm_w(offs_t offset, u8 data);
-	
+
 
 	void megasys1_palette(palette_device &palette);
 
@@ -299,7 +299,7 @@ private:
 	u8 mcu_port1_r();
 	void mcu_port2_w(u8 data);
 	void mcu_port6_w(u8 data);
-	
+
 	u8 m_mcu_input_data;
 	u8 m_mcu_io_data;
 
