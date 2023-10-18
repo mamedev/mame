@@ -1458,7 +1458,7 @@ void tlcs90_device::execute_run()
 	do
 	{
 		check_interrupts();
-		
+
 		// when in HALT state, the fetched opcode is not dispatched (aka a NOP) and the PC is not increased
 		if (m_halt)
 			m_op = NOP;
@@ -1644,10 +1644,10 @@ void tlcs90_device::execute_run()
 				Cyc();
 				break;
 
-            case HALT:
+			case HALT:
 				halt();
-                Cyc();
-                break;
+				Cyc();
+				break;
 			case DI:
 				m_after_EI = 0;
 				F &= ~IF;
