@@ -1379,9 +1379,6 @@ void tlcs90_device::take_interrupt(tlcs90_e_irq irq)
 
 	leave_halt();
 
-	if (!(F & IF))
-		return;
-
 	Push( PC );
 	Push( AF );
 
@@ -1396,6 +1393,9 @@ void tlcs90_device::check_interrupts()
 {
 	tlcs90_e_irq irq;
 	int mask;
+
+	if (!(F & IF))
+		return;
 
 	for (irq = INTSWI; irq < INTMAX; ++irq)
 	{
