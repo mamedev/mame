@@ -197,13 +197,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(megasys1_state::megasys1A_scanline)
 	// soldam: irq 1 & 3 RTE, irq 2 valid
 	// edfp: irq 1?, 2 sets vregs etc, 3 RTE
 
-	if(scanline == 240) // vblank-out irq
+	if(scanline == 224+16) // vblank-out irq
 		m_maincpu->set_input_line(2, HOLD_LINE);
 
-	if(scanline == 16)
+	if(scanline == 80+16)
 		m_maincpu->set_input_line(1, HOLD_LINE);
 
-	if(scanline == 128)
+	if(scanline == 0+16)
 		m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
@@ -1875,8 +1875,11 @@ void megasys1_state::system_A(machine_config &config)
 	PALETTE(config, m_palette, FUNC(megasys1_state::megasys1_palette)).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x800/2);
 
 	MEGASYS1_TILEMAP(config, m_tmap[0], m_palette, 256*0);
+	m_tmap[0]->set_screen_tag("screen");
 	MEGASYS1_TILEMAP(config, m_tmap[1], m_palette, 256*1);
+	m_tmap[1]->set_screen_tag("screen");
 	MEGASYS1_TILEMAP(config, m_tmap[2], m_palette, 256*2);
+	m_tmap[2]->set_screen_tag("screen");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -2009,8 +2012,11 @@ void megasys1_state::system_Bbl(machine_config &config)
 	PALETTE(config, m_palette, FUNC(megasys1_state::megasys1_palette)).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x800/2);
 
 	MEGASYS1_TILEMAP(config, m_tmap[0], m_palette, 256*0);
+	m_tmap[0]->set_screen_tag("screen");
 	MEGASYS1_TILEMAP(config, m_tmap[1], m_palette, 256*1);
+	m_tmap[1]->set_screen_tag("screen");
 	MEGASYS1_TILEMAP(config, m_tmap[2], m_palette, 256*2);
+	m_tmap[2]->set_screen_tag("screen");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -2107,7 +2113,9 @@ void megasys1_state::system_D(machine_config &config)
 	PALETTE(config, m_palette, FUNC(megasys1_state::megasys1_palette)).set_format(palette_device::RGBx_555, 0x800/2);
 
 	MEGASYS1_TILEMAP(config, m_tmap[0], m_palette, 256*0);
+	m_tmap[0]->set_screen_tag("screen");
 	MEGASYS1_TILEMAP(config, m_tmap[1], m_palette, 256*1);
+	m_tmap[1]->set_screen_tag("screen");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2155,7 +2163,9 @@ void megasys1_typez_state::system_Z(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x800/2);
 
 	MEGASYS1_TILEMAP(config, m_tmap[0], m_palette, 256*0);
+	m_tmap[0]->set_screen_tag("screen");
 	MEGASYS1_TILEMAP(config, m_tmap[1], m_palette, 256*2);
+	m_tmap[1]->set_screen_tag("screen");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
