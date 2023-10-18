@@ -143,21 +143,26 @@ RAM             RW      0e0000-0effff*        <               <
 #define VERBOSE     1
 #include "logmacro.h"
 
-MACHINE_RESET_MEMBER(megasys1_state,megasys1)
+void megasys1_state::machine_reset()
 {
 	m_ignore_oki_status = 1;    /* ignore oki status due 'protection' */
-	m_ip_latched = 0x0006; /* reset protection - some games expect this initial read without sending anything */
 	m_mcu_hs = 0;
 	m_mcu_input_data = 0x00;
 	m_mcu_io_data = 0x0;
 }
 
-MACHINE_RESET_MEMBER(megasys1_state,megasys1_hachoo)
+void megasys1_bc_iosim_state::machine_reset()
 {
-	MACHINE_RESET_CALL_MEMBER(megasys1);
-	m_ignore_oki_status = 0;    /* strangely hachoo need real oki status */
+	megasys1_state::machine_reset();
+	m_ip_latched = 0x0006; /* reset protection - some games expect this initial read without sending anything */
 }
 
+
+void megasys1_hachoo_state::machine_reset()
+{
+	megasys1_state::machine_reset();
+	m_ignore_oki_status = 0;    // strangely hachoo need real oki status
+}
 
 
 /*************************************
@@ -271,14 +276,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(megasys1_state::megasys1B_scanline)
 
  in that order.         */
 
-u16 megasys1_state::ip_select_r() // FROM MCU
+u16 megasys1_bc_iosim_state::ip_select_r() // FROM MCU
 {
 	return m_ip_latched;
 }
 
 
 
-void megasys1_state::ip_select_w(u16 data) // TO MCU
+void megasys1_bc_iosim_state::ip_select_w(u16 data) // TO MCU
 {
 	int i;
 
@@ -329,7 +334,12 @@ void megasys1_state::megasys1B_map(address_map &map)
 	map(0x058000, 0x05bfff).ram().w("scroll2", FUNC(megasys1_tilemap_device::write)).share("scroll2");
 	map(0x060000, 0x07ffff).ram().w(FUNC(megasys1_state::ram_w)).share("ram");
 	map(0x080000, 0x0bffff).rom();
-	map(0x0e0000, 0x0e0001).rw(FUNC(megasys1_state::ip_select_r), FUNC(megasys1_state::ip_select_w));
+}
+
+void megasys1_bc_iosim_state::megasys1B_iosim_map(address_map &map)
+{
+	megasys1B_map(map);
+	map(0x0e0000, 0x0e0001).rw(FUNC(megasys1_bc_iosim_state::ip_select_r), FUNC(megasys1_bc_iosim_state::ip_select_w));
 }
 
 void megasys1_state::megasys1B_edfbl_map(address_map &map)
@@ -430,13 +440,18 @@ void megasys1_state::megasys1C_map(address_map &map)
 	map(0x0c2308, 0x0c2309).w(FUNC(megasys1_state::screen_flag_w));
 	map(0x0c8000, 0x0c8001).r(m_soundlatch[1], FUNC(generic_latch_16_device::read)).w(FUNC(megasys1_state::soundlatch_c_w));
 	map(0x0d2000, 0x0d3fff).ram().share("objectram");
-	map(0x0d8000, 0x0d8001).rw(FUNC(megasys1_state::ip_select_r), FUNC(megasys1_state::ip_select_w));
 	// 64th Street actively uses 0xe4*** for breakable objects.
 	map(0x0e0000, 0x0e3fff).mirror(0x4000).ram().w("scroll0", FUNC(megasys1_tilemap_device::write)).share("scroll0");
 	map(0x0e8000, 0x0ebfff).mirror(0x4000).ram().w("scroll1", FUNC(megasys1_tilemap_device::write)).share("scroll1");
 	map(0x0f0000, 0x0f3fff).mirror(0x4000).ram().w("scroll2", FUNC(megasys1_tilemap_device::write)).share("scroll2");
 	map(0x0f8000, 0x0f87ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x1c0000, 0x1cffff).mirror(0x30000).ram().w(FUNC(megasys1_state::ram_w)).share("ram"); //0x1f****, Cybattler reads attract mode inputs at 0x1d****
+}
+
+void megasys1_bc_iosim_state::megasys1C_iosim_map(address_map &map)
+{
+	megasys1C_map(map);
+	map(0x0d8000, 0x0d8001).rw(FUNC(megasys1_bc_iosim_state::ip_select_r), FUNC(megasys1_bc_iosim_state::ip_select_w));
 }
 
 /*
@@ -1858,8 +1873,6 @@ void megasys1_state::system_A(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(120000));
 
-	MCFG_MACHINE_RESET_OVERRIDE(megasys1_state,megasys1)
-
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	//m_screen->set_refresh_hz(56.18); // same as nmk16.cpp based on YT videos.
@@ -1896,12 +1909,6 @@ void megasys1_state::system_A(machine_config &config)
 	OKIM6295(config, m_oki[1], OKI4_SOUND_CLOCK, okim6295_device::PIN7_HIGH); /* 4MHz verified */
 	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.30);
 	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.30);
-}
-
-void megasys1_state::system_A_hachoo(machine_config &config)
-{
-	system_A(config);
-	MCFG_MACHINE_RESET_OVERRIDE(megasys1_state,megasys1_hachoo)
 }
 
 void megasys1_state::system_A_iganinju(machine_config &config)
@@ -1966,23 +1973,30 @@ void megasys1_state::p47b(machine_config &config)
 	m_p47b_adpcm[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }
 
-void megasys1_state::system_B(machine_config &config)
+void megasys1_bc_iosim_state::system_B(machine_config &config)
 {
 	system_A(config);
 
 	/* basic machine hardware */
 
 	m_maincpu->set_clock(SYS_B_CPU_CLOCK); /* 8MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_state::megasys1B_map);
-	m_scantimer->set_callback(FUNC(megasys1_state::megasys1B_scanline));
+	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_bc_iosim_state::megasys1B_iosim_map);
+	m_scantimer->set_callback(FUNC(megasys1_bc_iosim_state::megasys1B_scanline));
 
-	m_audiocpu->set_addrmap(AS_PROGRAM, &megasys1_state::megasys1B_sound_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &megasys1_bc_iosim_state::megasys1B_sound_map);
 }
 
 void megasys1_state::system_B_monkelf(machine_config &config)
 {
-	system_B(config);
+	system_A(config);
+
+	/* basic machine hardware */
+
+	m_maincpu->set_clock(SYS_B_CPU_CLOCK); /* 8MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_state::megasys1B_monkelf_map);
+	m_scantimer->set_callback(FUNC(megasys1_state::megasys1B_scanline));
+
+	m_audiocpu->set_addrmap(AS_PROGRAM, &megasys1_state::megasys1B_sound_map);
 }
 
 void megasys1_state::system_Bbl(machine_config &config)
@@ -1991,8 +2005,6 @@ void megasys1_state::system_Bbl(machine_config &config)
 	M68000(config, m_maincpu, 12_MHz_XTAL / 2); // edfbl has lower clock, verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_state::megasys1B_edfbl_map);
 	TIMER(config, m_scantimer).configure_scanline(FUNC(megasys1_state::megasys1B_scanline), "screen", 0, 1);
-
-	MCFG_MACHINE_RESET_OVERRIDE(megasys1_state,megasys1)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -2023,7 +2035,7 @@ void megasys1_state::system_Bbl(machine_config &config)
 	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.30);
 }
 
-void megasys1_state::system_B_hayaosi1(machine_config &config)
+void megasys1_bc_iosim_state::system_B_hayaosi1(machine_config &config)
 {
 	system_B(config);
 
@@ -2053,6 +2065,14 @@ void megasys1_state::system_C(machine_config &config)
 
 	m_audiocpu->set_addrmap(AS_PROGRAM, &megasys1_state::megasys1B_sound_map);
 }
+
+void megasys1_bc_iosim_state::system_C_iosim(machine_config &config)
+{
+	system_C(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_bc_iosim_state::megasys1C_iosim_map);
+}
+
+
 
 void megasys1_state::system_C_bigstrik(machine_config &config)
 {
@@ -2087,8 +2107,6 @@ void megasys1_state::system_D(machine_config &config)
 	M68000(config, m_maincpu, SYS_D_CPU_CLOCK);    /* 8MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_state::megasys1D_map);
 	m_maincpu->set_vblank_int("screen", FUNC(megasys1_state::megasys1D_irq));
-
-	MCFG_MACHINE_RESET_OVERRIDE(megasys1_state,megasys1)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -2151,7 +2169,6 @@ void megasys1_state::system_Z(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_z);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x800/2);
-	MCFG_VIDEO_START_OVERRIDE(megasys1_state,megasys1_z)
 
 	MEGASYS1_TILEMAP(config, m_tmap[0], m_palette, 256*0);
 	MEGASYS1_TILEMAP(config, m_tmap[1], m_palette, 256*2);
@@ -2221,8 +2238,8 @@ ROM_START( 64street )
 	ROM_LOAD16_BYTE( "64th_08.rom", 0x000000, 0x010000, CRC(632be0c1) SHA1(626073037249d96ac70b2d11b2dd72b22bac49c7) )
 	ROM_LOAD16_BYTE( "64th_07.rom", 0x000001, 0x010000, CRC(13595d01) SHA1(e730a530ca232aab883217fa12804075cb2aa640) )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) /* MCU Internal Code, M50747? */
-	ROM_LOAD( "64street.mcu", 0x000000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x4000, "iomcu", 0 ) /* TMP91640 Internal Code */
+	ROM_LOAD( "64street.mcu", 0x00000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0x80000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "64th_01.rom", 0x000000, 0x080000, CRC(06222f90) SHA1(52b6cb88b9d2209c16d1633c83c0224b6ebf29dc) )
@@ -2256,8 +2273,8 @@ ROM_START( 64streetja )
 	ROM_LOAD16_BYTE( "64th_08.rom", 0x000000, 0x010000, CRC(632be0c1) SHA1(626073037249d96ac70b2d11b2dd72b22bac49c7) )
 	ROM_LOAD16_BYTE( "64th_07.rom", 0x000001, 0x010000, CRC(13595d01) SHA1(e730a530ca232aab883217fa12804075cb2aa640) )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) /* MCU Internal Code, M50747? */
-	ROM_LOAD( "64street.mcu", 0x000000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x4000, "iomcu", 0 ) /* TMP91640 Internal Code */
+	ROM_LOAD( "64street.mcu", 0x00000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0x80000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "64th_01.rom", 0x000000, 0x080000, CRC(06222f90) SHA1(52b6cb88b9d2209c16d1633c83c0224b6ebf29dc) )
@@ -2291,8 +2308,8 @@ ROM_START( 64streetj )
 	ROM_LOAD16_BYTE( "64th_08.rom", 0x000000, 0x010000, CRC(632be0c1) SHA1(626073037249d96ac70b2d11b2dd72b22bac49c7) )
 	ROM_LOAD16_BYTE( "64th_07.rom", 0x000001, 0x010000, CRC(13595d01) SHA1(e730a530ca232aab883217fa12804075cb2aa640) )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) /* MCU Internal Code, m50747? */
-	ROM_LOAD( "64street.mcu", 0x000000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x4000, "iomcu", 0 ) /* TMP91640 Internal Code */
+	ROM_LOAD( "64street.mcu", 0x00000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0x80000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "64th_01.rom", 0x000000, 0x080000, CRC(06222f90) SHA1(52b6cb88b9d2209c16d1633c83c0224b6ebf29dc) )
@@ -2636,8 +2653,8 @@ ROM_START( avspirit )
 	ROM_LOAD16_BYTE( "spirit01.rom",  0x000000, 0x020000, CRC(d02ec045) SHA1(465b61d89ca06e7e0a42c42efb6919c964ad0f93) )
 	ROM_LOAD16_BYTE( "spirit02.rom",  0x000001, 0x020000, CRC(30213390) SHA1(9334978d3568b36215ed29789501f7cbaf6651ea) )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) /* MCU Internal Code */
-	ROM_LOAD( "m50747", 0x000000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x4000, "iomcu", 0 ) /* TMP91640 Internal Code */
+	ROM_LOAD( "avspirit.mcu", 0x00000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0x80000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "spirit12.rom",  0x000000, 0x080000, CRC(728335d4) SHA1(bbf13378ac0bff5e732eb30081b421ed89d12fa2) )
@@ -2860,8 +2877,8 @@ ROM_START( chimerab )
 	ROM_LOAD16_BYTE( "prg8.bin", 0x000000, 0x010000, CRC(a682b1ca) SHA1(66f5d5a73f5e8cba87eac09c55eee59117d94f7b) )
 	ROM_LOAD16_BYTE( "prg7.bin", 0x000001, 0x010000, CRC(83b9982d) SHA1(68e7d344ebfffe19822c4cf9f7b13cb51f23537a) )
 
-	ROM_REGION( 0x1000, "cpu2", 0 ) /* MCU Internal Code, m50747? */
-	ROM_LOAD( "chimerab.mcu", 0x000000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x4000, "iomcu", 0 ) /* TMP91640 Internal Code */
+	ROM_LOAD( "chimerab.mcu", 0x00000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "s1.bin",   0x000000, 0x080000, CRC(e4c2ac77) SHA1(db4bff3c02f22cc59a67b103fd176f4d88531f93) )
@@ -2948,8 +2965,8 @@ ROM_START( cybattlr )
 	ROM_LOAD16_BYTE( "cb_08.rom", 0x000000, 0x010000, CRC(bf7b3558) SHA1(6046b965d61560e0227437f00f1ff1f7dbc16232) )
 	ROM_LOAD16_BYTE( "cb_07.rom", 0x000001, 0x010000, CRC(85d219d7) SHA1(a9628efc5eddefad739363ff0b2f37a2d095df86) )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) /* MCU Internal Code, m50747? */
-	ROM_LOAD( "cybattlr.mcu", 0x000000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x4000, "iomcu", 0 ) /* TMP91640 Internal Code */
+	ROM_LOAD( "cybattlr.mcu", 0x00000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "cb_m01.rom", 0x000000, 0x080000, CRC(1109337f) SHA1(ab294d87c9b4eb54401da5ad6ea171e4c0a700b5) )
@@ -3010,8 +3027,8 @@ ROM_START( edf )
 	ROM_LOAD16_BYTE( "edf1.f5",  0x000000, 0x020000, CRC(2290ea19) SHA1(64c9394bd4d5569d68833d2e57abaf2f1af5be97) )
 	ROM_LOAD16_BYTE( "edf2.f3",  0x000001, 0x020000, CRC(ce93643e) SHA1(686bf0ec104af8c97624a782e0d60afe170fd945) )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) /* MCU Internal Code, 64 pin DIP surface scratched, m50747? */
-	ROM_LOAD( "edf.mcu", 0x000000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x4000, "iomcu", 0 ) /* TMP91640 Internal Code */
+	ROM_LOAD( "edf.mcu", 0x00000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "edf_m04.rom",  0x000000, 0x080000, CRC(6744f406) SHA1(3b8f13ca968456186d9ad61f34611b7eab62ea86) )
@@ -3049,8 +3066,8 @@ ROM_START( edfa )
 	ROM_LOAD16_BYTE( "edf1.f5",  0x000000, 0x020000, CRC(2290ea19) SHA1(64c9394bd4d5569d68833d2e57abaf2f1af5be97) )
 	ROM_LOAD16_BYTE( "edf2.f3",  0x000001, 0x020000, CRC(ce93643e) SHA1(686bf0ec104af8c97624a782e0d60afe170fd945) )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) /* MCU Internal Code, 64 pin DIP surface scratched, m50747? */
-	ROM_LOAD( "edf.mcu", 0x000000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x4000, "iomcu", 0 ) /* TMP91640 Internal Code */
+	ROM_LOAD( "edf.mcu", 0x00000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "edf_m04.rom",  0x000000, 0x080000, CRC(6744f406) SHA1(3b8f13ca968456186d9ad61f34611b7eab62ea86) )
@@ -3088,8 +3105,8 @@ ROM_START( edfu )
 	ROM_LOAD16_BYTE( "edf1.f5",  0x000000, 0x020000, CRC(2290ea19) SHA1(64c9394bd4d5569d68833d2e57abaf2f1af5be97) )
 	ROM_LOAD16_BYTE( "edf2.f3",  0x000001, 0x020000, CRC(ce93643e) SHA1(686bf0ec104af8c97624a782e0d60afe170fd945) )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) /* MCU Internal Code, 64 pin DIP surface scratched, m50747? */
-	ROM_LOAD( "edf.mcu", 0x000000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x4000, "iomcu", 0 ) /* TMP91640 Internal Code */
+	ROM_LOAD( "edf.mcu", 0x00000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "edf_m04.rom",  0x000000, 0x080000, CRC(6744f406) SHA1(3b8f13ca968456186d9ad61f34611b7eab62ea86) )
@@ -3270,7 +3287,7 @@ JALECO ED9075
 EB90004-20027
 
 CPU: HD68000PS8 x2
-MCU: M50747? (labeled "MO-91044")
+MCU: TMP91640 (labeled "MO-91044")
 Sound: YM2151 YM3012 M6295x2
 Custom: GS-9000401 (44pin QFP)
         GS-9000403 (44pin QFP, x2)
@@ -3310,8 +3327,8 @@ ROM_START( hayaosi1 )
 	ROM_LOAD16_BYTE( "1", 0x00000, 0x20000, CRC(b088b27e) SHA1(198e2520ce4f9b19ea108e09ff00f7e27768f290) )
 	ROM_LOAD16_BYTE( "2", 0x00001, 0x20000, CRC(cebc7b16) SHA1(18b166560ffff7c43cec3d52e4b2da79256dfb2e) )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) /* MCU Internal Code, M50747 */
-	ROM_LOAD( "mo-91044.mcu", 0x000000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x4000, "iomcu", 0 ) /* TMP91640 Internal Code */
+	ROM_LOAD( "mo-91044.mcu", 0x00000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0x80000, "scroll0", ROMREGION_ERASEFF) /* Scroll 0 */
 	ROM_LOAD( "7", 0x000000, 0x80000, CRC(3629c455) SHA1(c216b600750861b073062c165f36e6949db10d78) )
@@ -4145,7 +4162,7 @@ ROM_START( peekaboo )
 	ROM_LOAD16_BYTE( "peek a boo j ver 1.1 - 3.ic29", 0x000000, 0x020000, CRC(f5f4cf33) SHA1(f135f2b627347255bb0811e9a4a213e3b447c199) )
 	ROM_LOAD16_BYTE( "peek a boo j ver 1.1 - 2.ic28", 0x000001, 0x020000, CRC(7b3d430d) SHA1(8b48101929da4938a61dfd0eda845368c4184831) )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) /* MCU Internal Code, M50747 */
+	ROM_REGION( 0x1000, "mcu", 0 ) /* MCU Internal Code, M50747? */
 	ROM_LOAD( "mo-90233.mcu", 0x000000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
@@ -4169,7 +4186,7 @@ ROM_START( peekaboou )
 	ROM_LOAD16_BYTE( "pb92127a_3_ver1.0.ic29", 0x000000, 0x020000, CRC(4603176a) SHA1(bbdc3fa439b32bdaaef5ca374af89e25fc4d9c1a) )
 	ROM_LOAD16_BYTE( "pb92127a_2_ver1.0.ic28", 0x000001, 0x020000, CRC(7bf4716b) SHA1(f2c0bfa32426c9816d9d3fbd73560566a497912d) )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) /* MCU Internal Code, M50747 */
+	ROM_REGION( 0x1000, "mcu", 0 ) /* MCU Internal Code, M50747? */
 	ROM_LOAD( "mo-90233.mcu", 0x000000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
@@ -4989,7 +5006,7 @@ void megasys1_state::stdragona_gfx_unmangle(const char *region)
 		m_mcu_hs_ram[4/2] == _3_ && \
 		m_mcu_hs_ram[6/2] == _4_)
 
-void megasys1_state::init_64street()
+void megasys1_bc_iosim_state::init_64street()
 {
 //  u16 *ROM = (u16 *) memregion("maincpu")->base();
 //  ROM[0x006b8/2] = 0x6004;        // d8001 test
@@ -5070,7 +5087,7 @@ void megasys1_state::init_lordofkbp()
 	}
 }
 
-void megasys1_state::init_avspirit()
+void megasys1_bc_iosim_state::init_avspirit()
 {
 	m_ip_select_values[0] = 0x37;
 	m_ip_select_values[1] = 0x35;
@@ -5082,7 +5099,7 @@ void megasys1_state::init_avspirit()
 	m_ip_select_values[6] = 0x06;
 
 
-	// has twice less RAM
+	// has half as much RAM
 	m_maincpu->space(AS_PROGRAM).unmap_readwrite(0x060000, 0x06ffff);
 	m_maincpu->space(AS_PROGRAM).install_ram(0x070000, 0x07ffff, m_ram);
 
@@ -5091,22 +5108,12 @@ void megasys1_state::init_avspirit()
 
 void megasys1_state::init_bigstrik()
 {
-	m_ip_select_values[0] = 0x58;
-	m_ip_select_values[1] = 0x54;
-	m_ip_select_values[2] = 0x55;
-	m_ip_select_values[3] = 0x56;
-	m_ip_select_values[4] = 0x57;
-
-	m_ip_select_values[5] = 0xfb;
-	m_ip_select_values[6] = 0x06;
-
-	save_item(NAME(m_ip_latched));
 	save_item(NAME(m_sprite_bank));
 	save_item(NAME(m_mcu_input_data));
 	save_item(NAME(m_mcu_io_data));
 }
 
-void megasys1_state::init_chimerab()
+void megasys1_bc_iosim_state::init_chimerab()
 {
 	/* same as cybattlr */
 	m_ip_select_values[0] = 0x56;
@@ -5122,7 +5129,7 @@ void megasys1_state::init_chimerab()
 	save_item(NAME(m_sprite_bank));
 }
 
-void megasys1_state::init_cybattlr()
+void megasys1_bc_iosim_state::init_cybattlr()
 {
 	m_ip_select_values[0] = 0x56;
 	m_ip_select_values[1] = 0x52;
@@ -5137,7 +5144,7 @@ void megasys1_state::init_cybattlr()
 	save_item(NAME(m_sprite_bank));
 }
 
-void megasys1_state::init_edf()
+void megasys1_bc_iosim_state::init_edf()
 {
 	m_ip_select_values[0] = 0x20;
 	m_ip_select_values[1] = 0x21;
@@ -5156,7 +5163,7 @@ void megasys1_state::init_edfp()
 	phantasm_rom_decode(machine(), "maincpu");
 }
 
-void megasys1_state::init_hayaosi1()
+void megasys1_bc_iosim_state::init_hayaosi1()
 {
 	m_ip_select_values[0] = 0x51;
 	m_ip_select_values[1] = 0x52;
@@ -5373,7 +5380,9 @@ void megasys1_state::init_stdragonb()
 
 void megasys1_state::init_monkelf()
 {
-	init_avspirit();
+	// has half as much RAM
+	m_maincpu->space(AS_PROGRAM).unmap_readwrite(0x060000, 0x06ffff);
+	m_maincpu->space(AS_PROGRAM).install_ram(0x070000, 0x07ffff, m_ram);
 
 	m_rom_maincpu[0x00744/2] = 0x4e71; // weird check, 0xe000e R is a port-based trap?
 
@@ -5414,7 +5423,7 @@ GAME( 1989, astyanaxa,  astyanax, system_A,          astyanax, megasys1_state, i
 GAME( 1989, lordofk,    astyanax, system_A,          astyanax, megasys1_state, init_astyanax, ROT0,   "Jaleco", "The Lord of King (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, lordofkb,   astyanax, system_A,          astyanax, megasys1_state, empty_init,    ROT0,   "bootleg","The Lord of King (bootleg, not protected)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, lordofkbp,  astyanax, system_A,          astyanax, megasys1_state, init_lordofkbp,ROT0,   "bootleg","The Lord of King (bootleg, protected)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, hachoo,     0,        system_A_hachoo,   hachoo,   megasys1_state, init_astyanax, ROT0,   "Jaleco", "Hachoo!", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, hachoo,     0,        system_A,          hachoo,   megasys1_hachoo_state, init_astyanax, ROT0,   "Jaleco", "Hachoo!", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, jitsupro,   0,        system_A_jitsupro, jitsupro, megasys1_state, init_jitsupro, ROT0,   "Jaleco", "Jitsuryoku!! Pro Yakyuu (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, plusalph,   0,        system_A,          plusalph, megasys1_state, init_astyanax, ROT270, "Jaleco", "Plus Alpha", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, stdragon,   0,        system_A,          stdragon, megasys1_state, init_stdragon, ROT0,   "Jaleco", "Saint Dragon (set 1)", MACHINE_SUPPORTS_SAVE )
@@ -5433,22 +5442,22 @@ GAME( 1992, soldam,     0,        system_A_soldam,   soldam,   megasys1_state, i
 GAME( 1992, soldamj,    soldam,   system_A_soldam,   soldam,   megasys1_state, init_soldamj,  ROT0,   "Jaleco", "Soldam (Japan)", MACHINE_SUPPORTS_SAVE )
 
 // Type B
-GAME( 1991, avspirit,   0,        system_B,          avspirit, megasys1_state, init_avspirit, ROT0,   "Jaleco", "Avenging Spirit", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, monkelf,    avspirit, system_B_monkelf,  avspirit, megasys1_state, init_monkelf,  ROT0,   "bootleg","Monky Elf (Korean bootleg of Avenging Spirit)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, edf,        0,        system_B,          edf,      megasys1_state, init_edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, edfa,       edf,      system_B,          edf,      megasys1_state, init_edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, edfu,       edf,      system_B,          edf,      megasys1_state, init_edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (North America)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, edfbl,      edf,      system_Bbl,        edf,      megasys1_state, empty_init,    ROT0,   "bootleg","E.D.F. : Earth Defense Force (bootleg)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, hayaosi1,   0,        system_B_hayaosi1, hayaosi1, megasys1_state, init_hayaosi1, ROT0,   "Jaleco", "Hayaoshi Quiz Ouza Ketteisen - The King Of Quiz", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, avspirit,   0,        system_B,          avspirit, megasys1_bc_iosim_state, init_avspirit, ROT0,   "Jaleco", "Avenging Spirit", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, monkelf,    avspirit, system_B_monkelf,  avspirit, megasys1_state,          init_monkelf,  ROT0,   "bootleg","Monky Elf (Korean bootleg of Avenging Spirit)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, edf,        0,        system_B,          edf,      megasys1_bc_iosim_state, init_edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, edfa,       edf,      system_B,          edf,      megasys1_bc_iosim_state, init_edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, edfu,       edf,      system_B,          edf,      megasys1_bc_iosim_state, init_edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (North America)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, edfbl,      edf,      system_Bbl,        edf,      megasys1_state,          empty_init,    ROT0,   "bootleg","E.D.F. : Earth Defense Force (bootleg)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, hayaosi1,   0,        system_B_hayaosi1, hayaosi1, megasys1_bc_iosim_state, init_hayaosi1, ROT0,   "Jaleco", "Hayaoshi Quiz Ouza Ketteisen - The King Of Quiz", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 // Type C
-GAME( 1991, 64street,   0,        system_C,          64street, megasys1_state, init_64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, 64streetj,  64street, system_C,          64street, megasys1_state, init_64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, 64streetja, 64street, system_C,          64street, megasys1_state, init_64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, bigstrik,   0,        system_C_bigstrik, bigstrik, megasys1_state, init_bigstrik, ROT0,   "Jaleco", "Big Striker", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, chimerab,   0,        system_C,          chimerab, megasys1_state, init_chimerab, ROT0,   "Jaleco", "Chimera Beast (Japan, prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, cybattlr,   0,        system_C,          cybattlr, megasys1_state, init_cybattlr, ROT90,  "Jaleco", "Cybattler", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, 64street,   0,        system_C_iosim,          64street, megasys1_bc_iosim_state, init_64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, 64streetj,  64street, system_C_iosim,          64street, megasys1_bc_iosim_state, init_64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, 64streetja, 64street, system_C_iosim,          64street, megasys1_bc_iosim_state, init_64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, bigstrik,   0,        system_C_bigstrik,       bigstrik, megasys1_bc_iosim_state, init_bigstrik, ROT0,   "Jaleco", "Big Striker", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, chimerab,   0,        system_C_iosim,          chimerab, megasys1_bc_iosim_state, init_chimerab, ROT0,   "Jaleco", "Chimera Beast (Japan, prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, cybattlr,   0,        system_C_iosim,          cybattlr, megasys1_bc_iosim_state, init_cybattlr, ROT90,  "Jaleco", "Cybattler", MACHINE_SUPPORTS_SAVE )
 
 // Type D
-GAME( 1993, peekaboo,   0,        system_D,          peekaboo, megasys1_state, init_peekaboo, ROT0,   "Jaleco", "Peek-a-Boo! (Japan, ver. 1.1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, peekaboou,  peekaboo, system_D,          peekaboo, megasys1_state, init_peekaboo, ROT0,   "Jaleco", "Peek-a-Boo! (North America, ver 1.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, peekaboo,   0,        system_D,          peekaboo, megasys1_typez_state, init_peekaboo, ROT0,   "Jaleco", "Peek-a-Boo! (Japan, ver. 1.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, peekaboou,  peekaboo, system_D,          peekaboo, megasys1_typez_state, init_peekaboo, ROT0,   "Jaleco", "Peek-a-Boo! (North America, ver 1.0)", MACHINE_SUPPORTS_SAVE )
