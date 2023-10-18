@@ -291,6 +291,7 @@ public:
 	void init_victor5();
 	void init_tisubb();
 	void init_newhunterb();
+	void init_newhunterc();
 	void init_sharkpye();
 	void init_tisub();
 	void init_mtrainnv();
@@ -4157,6 +4158,12 @@ void subsino_state::init_newhunterb()
 	subsino_decrypt(rom, tisubb_bitswaps, tisubb_xors, 0x8000);
 }
 
+void subsino_state::init_newhunterc()
+{
+	uint8_t *rom = memregion( "program" )->base() + 0x6000;
+	subsino_decrypt(rom, newhunterc_bitswaps, newhunterc_xors, 0x8000);
+}
+
 void subsino_state::init_stbsub()
 {
 #if 1
@@ -4255,7 +4262,7 @@ GAMEL( 1992, tisuba,      tisub,   tisub,      tisub,    subsino_state, init_tis
 GAMEL( 1992, tisubb,      tisub,   tisub,      tisubb,   subsino_state, init_tisubb,      ROT0, "American Alpha",  "Treasure Island (American Alpha, v3.0N)",     0,                   layout_tisubb   )
 GAMEL( 1992, newhunter,   tisub,   tisub,      tisub,    subsino_state, init_tisubb,      ROT0, "Karam",           "New HUNTer",                                  0,                   layout_tisubb   ) // 1989 on screen, but this bootleg is from 1992
 GAMEL( 1993, newhunterb,  tisub,   newhunterb, tisub,    subsino_state, init_newhunterb,  ROT0, "bootleg",         "New HUNTer (bootleg, set 1)",                 0,                   layout_tisubb   )
-GAMEL( 1993, newhunterc,  tisub,   tisub,      tisub,    subsino_state, init_tisubb,      ROT0, "bootleg",         "New HUNTer (bootleg, set 2)",                 MACHINE_NOT_WORKING, layout_tisubb   ) // 1989 on screen, but "Copyright 1993 SubSino Corp. Taipei, Taiwan." on program ROM
+GAMEL( 1993, newhunterc,  tisub,   newhunterb, tisub,    subsino_state, init_newhunterc,  ROT0, "bootleg",         "New HUNTer (bootleg, set 2)",                 MACHINE_NOT_WORKING, layout_tisubb   ) // 1989 on screen, but "Copyright 1993 SubSino Corp. Taipei, Taiwan." on program ROM
 
 GAMEL( 1991, crsbingo,    0,       crsbingo,   crsbingo, subsino_state, init_crsbingo,    ROT0, "Subsino",         "Poker Carnival",                              0,                   layout_crsbingo )
 
