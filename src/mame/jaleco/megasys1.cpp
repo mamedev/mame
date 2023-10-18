@@ -140,7 +140,7 @@ RAM             RW      0e0000-0effff*        <               <
 #define SOUND_CPU_CLOCK     XTAL(7'000'000)       /* clock for sound 68000 */
 #define OKI4_SOUND_CLOCK    XTAL(4'000'000)
 
-#define VERBOSE     1
+#define VERBOSE     0
 #include "logmacro.h"
 
 void megasys1_state::machine_reset()
