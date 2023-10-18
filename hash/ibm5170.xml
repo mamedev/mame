@@ -12725,6 +12725,7 @@ This disk contains 6 packages of 6 saved games.
 		<year>1993</year>
 		<publisher>Virgin Games</publisher>
 		<info name="developer" value="Westwood Studios" />
+		<info name="region" value="Europe" />
 		<info name="version" value="V1.07" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
@@ -12753,6 +12754,7 @@ This disk contains 6 packages of 6 saved games.
 		<year>1992</year>
 		<publisher>Virgin Games</publisher>
 		<info name="developer" value="Westwood Studios" />
+		<info name="region" value="USA" />
 		<info name="version" value="V1.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
@@ -13469,6 +13471,7 @@ Eye of the Beholder III: Assault on Myth Drannor
 		<publisher>Virgin Games</publisher>
 		<info name="copy_protection" value="Manual required (two checks during gameplay)" />
 		<info name="developer" value="Westwood Studios" />
+		<info name="language" value="French" />
 		<info name="region" value="France" />
 		<info name="version" value="1.7" />
 		<part name="flop1" interface="floppy_3_5">
@@ -16483,6 +16486,7 @@ Add-on for Harpoon II and update patch to version 2.1.11
 		<publisher>MicroLeague Multimedia</publisher>
 		<info name="developer" value="Target Games" />
 		<info name="language" value="English" />
+		<info name="region" value="USA" />
 		<info name="version" value="1.00" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk #1" />
@@ -16499,11 +16503,12 @@ Add-on for Harpoon II and update patch to version 2.1.11
 	</software>
 
 	<software name="lsquad_525" cloneof="lsquad">
-		<description>Laser Squad (5.25", Euro)</description>
+		<description>Laser Squad (5.25", Europe)</description>
 		<year>1992</year>
 		<publisher>Krisalis Software</publisher>
 		<info name="developer" value="Target Games" />
-		<info name="language" value="English, Français, Deustch, Italiano, Español" />
+		<info name="language" value="English/French/German/Italian/Spanish" />
+		<info name="region" value="Europe" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size = "1228800">
@@ -16529,6 +16534,7 @@ Add-on for Harpoon II and update patch to version 2.1.11
 		<year>1993</year>
 		<publisher>MicroProse</publisher>
 		<info name="developer" value="Magnetic Scrolls/MicroProse" />
+		<info name="region" value="Europe" />
 		<info name="version" value="1.154 Apr 21 1993 19:52:07 European Release" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
@@ -23321,6 +23327,7 @@ Disk 3 includes: "Media8or 2 (shareware)"
 Disk 1 includes: "Beneath a Steel Sky (demo)", "Micro Machines (demo)"
 Disk 2 includes: "Krusty's Super Funhouse (demo)", "Subwar 2050 (demo)", "Graham Gooch World Class Cricket (demo)"
 ]]></notes>
+		<info name="region" value="UK" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="PC Gamer (Vol.01 N.01 - December 1993) [Future] [1993] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="e92ac224" sha1="4fab08e30ff3a13a259018dd207e7ea4263892a9"/>
@@ -23339,6 +23346,7 @@ Disk 2 includes: "Krusty's Super Funhouse (demo)", "Subwar 2050 (demo)", "Graham
 		<year>1994</year>
 		<publisher>Future Publishing</publisher>
 		<notes>Disk includes: "Terminator: Rampage (demo)"</notes>
+		<info name="region" value="UK" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="PC Gamer (Vol.01 N.02 - January 1994) [Future] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="cda7e234" sha1="8eb289edfbc32bce318be6e549a980a3568d6a1e"/>
@@ -23351,6 +23359,7 @@ Disk 2 includes: "Krusty's Super Funhouse (demo)", "Subwar 2050 (demo)", "Graham
 		<year>1994</year>
 		<publisher>Future Publishing</publisher>
 		<notes>Disk includes: "NFL Coaches Club Football! (demo)"</notes>
+		<info name="region" value="UK" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="PC Gamer (Vol.01 N.03 - February 1994) [Future] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="8144a298" sha1="70c831b469690413dc03eacfccd05c28530a8556"/>
@@ -23363,6 +23372,7 @@ Disk 2 includes: "Krusty's Super Funhouse (demo)", "Subwar 2050 (demo)", "Graham
 		<year>1994</year>
 		<publisher>Future Publishing</publisher>
 		<notes>Disk 1 includes: "Sid &amp; Al's Incredible Toons (demo)"</notes>
+		<info name="region" value="UK" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="PC Gamer (Vol.01 N.04 - March 1994) [Future] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="77718485" sha1="59404805c54565dbc744d04afa048702344334cc"/>
@@ -23378,6 +23388,7 @@ Disk 2 includes: "Krusty's Super Funhouse (demo)", "Subwar 2050 (demo)", "Graham
 Disk 1 includes: "UFO - Enemy Unknown (demo)"
 Disk 2 includes: "DragonSphere (demo)"
 ]]></notes>
+		<info name="region" value="UK" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="PC Gamer (Vol.01 N.05 - April 1994) [Future] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="ad8cc33b" sha1="1b4fe82dcc85338675ab2faa1b35588266e9e32f"/>
@@ -23398,6 +23409,7 @@ Disk 2 includes: "DragonSphere (demo)"
 Disk 1 includes: "Theme Park (demo)"
 Disk 2 includes: "Star Hammer (demo)", "Slicks'N'Slides (demo)", "Doom Party Pack! (DOOM add-on)"
 ]]></notes>
+		<info name="region" value="UK" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="PC Gamer (Vol.01 N.07 - June 1994) [Future] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="14119f8f" sha1="ec12488229b55d7cf0919ee8eda6fa18c4bc8e6c"/>
@@ -23419,6 +23431,7 @@ Disk 2 includes: "Star Hammer (demo)", "Slicks'N'Slides (demo)", "Doom Party Pac
 Disk 1 includes: "Pinball Illusions (demo)"
 Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX Spectrum)", "The BogeyMan"
 ]]></notes>
+		<info name="region" value="UK" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="PC Gamer (Vol.02 N.10 - September 1995) [Future] [1995] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="b683ecef" sha1="0a8ba56b5578744e721dffc55bdc9a0b7d99398c" status="baddump"/>
@@ -23438,6 +23451,7 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 		<year>1994</year>
 		<publisher>Future Publishing</publisher>
 		<notes>Disk includes: "Theme Park (demo)"</notes>
+		<info name="region" value="USA" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="PC Gamer US (Vol.01 N.01 - May-June 1994) [Future] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="f8b77e7c" sha1="ae5d4e92269e5100724620a5ef7250917efb65e7"/>
@@ -23450,6 +23464,7 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 		<year>1994</year>
 		<publisher>Future Publishing</publisher>
 		<notes>Disk includes: "Detroit (demo)"</notes>
+		<info name="region" value="USA" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="PC Gamer US (Vol.01 N.03 - August 1994) [Future] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="6ccf97f5" sha1="77cbe83d386f86b392948e8b44d8a1fd349be548"/>
@@ -23462,6 +23477,7 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 		<year>1994</year>
 		<publisher>Future Publishing</publisher>
 		<notes>Disk includes: "CyClones (demo)"</notes>
+		<info name="region" value="USA" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="PC Gamer US (Vol.01 N.04 - September 1994) [Future] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="682267ce" sha1="9d848bf6b48411a1ccaf611e3f0fcce08270315e"/>
@@ -23474,6 +23490,7 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 		<year>1994</year>
 		<publisher>Future Publishing</publisher>
 		<notes>Disk includes: "Blackthorne (demo)"</notes>
+		<info name="region" value="USA" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="PC Gamer US (Vol.01 N.06 - November 1994) [Future] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="44ebe165" sha1="acbca88be7c17798e6e00fe7587a976fda53ed54" status="baddump"/>
@@ -23486,6 +23503,7 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 		<year>1995</year>
 		<publisher>Future Publishing</publisher>
 		<notes>Disk includes: "The Incredible Machine 2 (demo)"</notes>
+		<info name="region" value="USA" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="PC Gamer US (Vol.02 N.03 - March 1995) [Future] [1995] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="427f7100" sha1="79c390edc51d4041de514ec8faf71716536c9702"/>
