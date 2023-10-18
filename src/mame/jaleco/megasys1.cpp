@@ -5512,7 +5512,7 @@ GAME( 1989, lordofk,    astyanax, system_A,          astyanax, megasys1_state, i
 GAME( 1989, lordofkb,   astyanax, system_A,          astyanax, megasys1_state, empty_init,    ROT0,   "bootleg","The Lord of King (bootleg, not protected)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, lordofkbp,  astyanax, system_A,          astyanax, megasys1_state, init_lordofkbp,ROT0,   "bootleg","The Lord of King (bootleg, protected)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, hachoo,     0,        system_A,          hachoo,   megasys1_hachoo_state, init_astyanax, ROT0,   "Jaleco", "Hachoo! (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, hachooa,    hachoo,   system_A,          hachoo,   megasys1_hachoo_state, init_astyanax, ROT0,   "Jaleco", "Hachoo! (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // boots, but program ROMs aren't good, so marked as NOT WORKING
+GAME( 1989, hachooa,    hachoo,   system_A,          hachoo,   megasys1_hachoo_state, init_astyanax, ROT0,   "Jaleco", "Hachoo! (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, jitsupro,   0,        system_A_jitsupro, jitsupro, megasys1_state, init_jitsupro, ROT0,   "Jaleco", "Jitsuryoku!! Pro Yakyuu (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, plusalph,   0,        system_A,          plusalph, megasys1_state, init_astyanax, ROT270, "Jaleco", "Plus Alpha", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, stdragon,   0,        system_A,          stdragon, megasys1_state, init_stdragon, ROT0,   "Jaleco", "Saint Dragon (set 1)", MACHINE_SUPPORTS_SAVE )
