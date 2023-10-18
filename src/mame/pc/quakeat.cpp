@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Angelo Salese
 /*
 
  Quake Arcade Tournament
@@ -9,8 +9,6 @@
  We've also seen CDs of this for sale, so maybe there should be a CD too, for the music?
 
 TODO:
-- Throws "Primary master hard disk fail" in shutms11. Disk has a non canonical -chs of 263,255,63.
-  Recompressing as -chs 4150,16,63 fixes it.
 - In pcipc throws "E0409 -- Security key not found." in glquake.exe when it starts running.
 
 ===================================================================================================
@@ -105,6 +103,9 @@ private:
 
 void quakeat_state::quake_map(address_map &map)
 {
+	map(0x000f0000, 0x000fffff).rom().region("pc_bios", 0);
+	map(0xffff0000, 0xffffffff).rom().region("pc_bios", 0);
+
 }
 
 
@@ -116,7 +117,7 @@ void quakeat_state::quake(machine_config &config)
 {
 	PENTIUM2(config, m_maincpu, 233'000'000); /* Pentium II, 233MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &quakeat_state::quake_map);
-	m_maincpu->set_disable();
+//	m_maincpu->set_disable();
 
 	PCI_ROOT(config, "pci", 0);
 	// ...
@@ -124,11 +125,19 @@ void quakeat_state::quake(machine_config &config)
 
 
 ROM_START(quake)
-	ROM_REGION32_LE(0x20000, "pc_bios", 0)  /* motherboard bios */
+	// 4N4XL0X0.86A.0011.P05
+	ROM_REGION32_LE(0x10000, "pc_bios", 0)  /* motherboard bios */
+//	ROM_LOAD16_WORD("p05-0011.bio", 0x000000, 0xa0, NO_DUMP )
+//	ROM_CONTINUE( 0, 0x10000 )
 	ROM_LOAD("quakearcadetournament.pcbios", 0x000000, 0x20000, NO_DUMP )
 
+	// Hitachi DK237A-21 A/A0A0, IDE/ATA 2.5" 2.1GB 4000 RPM
+	// WS03131880
 	DISK_REGION( "disks" )
-	DISK_IMAGE( "quakeat", 0, BAD_DUMP SHA1(c44695b9d521273c9d3c0e18c88f0dca0185bd7b) )
+	// wrong chs 263,255,63
+//	DISK_IMAGE( "quakeat", 0, BAD_DUMP SHA1(c44695b9d521273c9d3c0e18c88f0dca0185bd7b) )
+	// regenerated from above, with -chs 4200,16,63 as per reported HDD label
+	DISK_IMAGE( "quakeat", 0, BAD_DUMP SHA1(9a422ad342aeddd447514d0287efde49e3de5fa8) )
 ROM_END
 
 } // anonymous namespace
