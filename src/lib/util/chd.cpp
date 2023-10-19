@@ -318,6 +318,16 @@ util::random_read &chd_file::file()
 	return *m_file;
 }
 
+bool chd_file::parent_missing() const noexcept
+{
+	if (m_parent_missing)
+		return true;
+	else if (!m_parent)
+		return false;
+	else
+		return m_parent->parent_missing();
+}
+
 /**
  * @fn  util::sha1_t chd_file::sha1()
  *
@@ -590,7 +600,12 @@ void chd_file::set_parent_sha1(util::sha1_t parent)
  * @return  A std::error_condition.
  */
 
-std::error_condition chd_file::create(util::random_read_write::ptr &&file, uint64_t logicalbytes, uint32_t hunkbytes, uint32_t unitbytes, chd_codec_type compression[4])
+std::error_condition chd_file::create(
+		util::random_read_write::ptr &&file,
+		uint64_t logicalbytes,
+		uint32_t hunkbytes,
+		uint32_t unitbytes,
+		chd_codec_type compression[4])
 {
 	// make sure we don't already have a file open
 	if (m_file)
@@ -603,7 +618,7 @@ std::error_condition chd_file::create(util::random_read_write::ptr &&file, uint6
 	m_hunkbytes = hunkbytes;
 	m_unitbytes = unitbytes;
 	memcpy(m_compression, compression, sizeof(m_compression));
-	m_parent = nullptr;
+	m_parent.reset();
 
 	// take ownership of the file
 	m_file = std::move(file);
@@ -626,7 +641,12 @@ std::error_condition chd_file::create(util::random_read_write::ptr &&file, uint6
  * @return  A std::error_condition.
  */
 
-std::error_condition chd_file::create(util::random_read_write::ptr &&file, uint64_t logicalbytes, uint32_t hunkbytes, chd_codec_type compression[4], chd_file &parent)
+std::error_condition chd_file::create(
+		util::random_read_write::ptr &&file,
+		uint64_t logicalbytes,
+		uint32_t hunkbytes,
+		chd_codec_type compression[4],
+		chd_file &parent)
 {
 	// make sure we don't already have a file open
 	if (m_file)
@@ -639,7 +659,7 @@ std::error_condition chd_file::create(util::random_read_write::ptr &&file, uint6
 	m_hunkbytes = hunkbytes;
 	m_unitbytes = parent.unit_bytes();
 	memcpy(m_compression, compression, sizeof(m_compression));
-	m_parent = &parent;
+	m_parent = std::shared_ptr<chd_file>(std::shared_ptr<chd_file>(), &parent);
 
 	// take ownership of the file
 	m_file = std::move(file);
@@ -662,7 +682,12 @@ std::error_condition chd_file::create(util::random_read_write::ptr &&file, uint6
  * @return  A std::error_condition.
  */
 
-std::error_condition chd_file::create(std::string_view filename, uint64_t logicalbytes, uint32_t hunkbytes, uint32_t unitbytes, chd_codec_type compression[4])
+std::error_condition chd_file::create(
+		std::string_view filename,
+		uint64_t logicalbytes,
+		uint32_t hunkbytes,
+		uint32_t unitbytes,
+		chd_codec_type compression[4])
 {
 	// make sure we don't already have a file open
 	if (m_file)
@@ -702,7 +727,12 @@ std::error_condition chd_file::create(std::string_view filename, uint64_t logica
  * @return  A std::error_condition.
  */
 
-std::error_condition chd_file::create(std::string_view filename, uint64_t logicalbytes, uint32_t hunkbytes, chd_codec_type compression[4], chd_file &parent)
+std::error_condition chd_file::create(
+		std::string_view filename,
+		uint64_t logicalbytes,
+		uint32_t hunkbytes,
+		chd_codec_type compression[4],
+		chd_file &parent)
 {
 	// make sure we don't already have a file open
 	if (m_file)
@@ -740,7 +770,11 @@ std::error_condition chd_file::create(std::string_view filename, uint64_t logica
  * @return  A std::error_condition.
  */
 
-std::error_condition chd_file::open(std::string_view filename, bool writeable, chd_file *parent)
+std::error_condition chd_file::open(
+		std::string_view filename,
+		bool writeable,
+		chd_file *parent,
+		const open_parent_func &open_parent)
 {
 	// make sure we don't already have a file open
 	if (m_file)
@@ -754,12 +788,7 @@ std::error_condition chd_file::open(std::string_view filename, bool writeable, c
 		return filerr;
 
 	// now open the CHD
-	std::error_condition err = open(std::move(file), writeable, parent);
-	if (err)
-		return err;
-
-	// we now own this file
-	return err;
+	return open(std::move(file), writeable, parent, open_parent);
 }
 
 /**
@@ -776,7 +805,11 @@ std::error_condition chd_file::open(std::string_view filename, bool writeable, c
  * @return  A std::error_condition.
  */
 
-std::error_condition chd_file::open(util::random_read_write::ptr &&file, bool writeable, chd_file *parent)
+std::error_condition chd_file::open(
+		util::random_read_write::ptr &&file,
+		bool writeable,
+		chd_file *parent,
+		const open_parent_func &open_parent)
 {
 	// make sure we don't already have a file open
 	if (m_file)
@@ -786,9 +819,9 @@ std::error_condition chd_file::open(util::random_read_write::ptr &&file, bool wr
 
 	// open the file
 	m_file = std::move(file);
-	m_parent = parent;
+	m_parent = std::shared_ptr<chd_file>(std::shared_ptr<chd_file>(), parent);
 	m_cachehunk = ~0;
-	return open_common(writeable);
+	return open_common(writeable, open_parent);
 }
 
 /**
@@ -816,7 +849,7 @@ void chd_file::close()
 	m_unitbytes = 0;
 	m_unitcount = 0;
 	memset(m_compression, 0, sizeof(m_compression));
-	m_parent = nullptr;
+	m_parent.reset();
 	m_parent_missing = false;
 
 	// reset key offsets within the header
@@ -936,7 +969,7 @@ std::error_condition chd_file::read_hunk(uint32_t hunknum, void *buffer)
 						file_read(blockoffs, dest, m_hunkbytes);
 					else if (m_parent_missing)
 						throw std::error_condition(error::REQUIRES_PARENT);
-					else if (m_parent != nullptr)
+					else if (m_parent)
 						m_parent->read_hunk(hunknum, dest);
 					else
 						memset(dest, 0, m_hunkbytes);
@@ -2300,7 +2333,7 @@ std::error_condition chd_file::create_common()
 		put_u32be(&rawheader[60], m_unitbytes);
 		be_write_sha1(&rawheader[64], util::sha1_t::null);
 		be_write_sha1(&rawheader[84], util::sha1_t::null);
-		be_write_sha1(&rawheader[104], (m_parent != nullptr) ? m_parent->sha1() : util::sha1_t::null);
+		be_write_sha1(&rawheader[104], m_parent ? m_parent->sha1() : util::sha1_t::null);
 
 		// write the resulting header
 		file_write(0, rawheader, sizeof(rawheader));
@@ -2368,7 +2401,7 @@ std::error_condition chd_file::create_common()
  * @return  A std::error_condition.
  */
 
-std::error_condition chd_file::open_common(bool writeable)
+std::error_condition chd_file::open_common(bool writeable, const open_parent_func &open_parent)
 {
 	// wrap in try for proper error handling
 	try
@@ -2406,13 +2439,18 @@ std::error_condition chd_file::open_common(bool writeable)
 		// make sure we have a parent if we need one (and don't if we don't)
 		if (parentsha1 != util::sha1_t::null)
 		{
+			if (!m_parent && open_parent)
+				m_parent = open_parent(parentsha1);
+
 			if (!m_parent)
 				m_parent_missing = true;
 			else if (m_parent->sha1() != parentsha1)
 				throw std::error_condition(error::INVALID_PARENT);
 		}
 		else if (m_parent)
+		{
 			throw std::error_condition(std::errc::invalid_argument);
+		}
 
 		// finish opening the file
 		create_open_common();
@@ -2789,7 +2827,7 @@ chd_file_compressor::~chd_file_compressor()
 void chd_file_compressor::compress_begin()
 {
 	// reset state
-	m_walking_parent = (m_parent != nullptr);
+	m_walking_parent = bool(m_parent);
 	m_total_in = 0;
 	m_total_out = 0;
 	m_compsha1.reset();
@@ -2922,7 +2960,7 @@ std::error_condition chd_file_compressor::compress_continue(double &progress, do
 			}
 
 			// if not, see if it's in the parent map
-			if (m_parent != nullptr)
+			if (m_parent)
 			{
 				uint64_t parentunit = m_parent_map.find(item.m_hash[0].m_crc16, item.m_hash[0].m_sha1);
 				if (parentunit != hashmap::NOT_FOUND)

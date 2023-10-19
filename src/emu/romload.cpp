@@ -53,13 +53,41 @@ auto next_parent_system(game_driver const &system)
 				if (0 > parent)
 				{
 					sys = nullptr;
+					roms.clear();
+					roms.shrink_to_fit();
 					return nullptr;
 				}
 				else
 				{
 					sys = &driver_list::driver(parent);
 					roms = rom_build_entries(sys->rom);
-					return &roms[0];
+					return &roms.front();
+				}
+			};
+}
+
+
+auto next_parent_device(device_t const &device, emu_options &options)
+{
+	return
+			[&options, type = &device.type(), roms = std::vector<rom_entry>()] () mutable -> rom_entry const *
+			{
+				if (!type)
+					return nullptr;
+				type = type->parent_rom_device_type();
+				if (!type)
+				{
+					roms.clear();
+					roms.shrink_to_fit();
+					return nullptr;
+				}
+				else
+				{
+					machine_config config(GAME_NAME(___empty), options);
+					machine_config::token const tok(config.begin_configuration(config.root_device()));
+					roms = config.device_add("_tmp", *type, 0)->rom_region_vector();
+					config.device_remove("_tmp");
+					return &roms.front();
 				}
 			};
 }
@@ -106,7 +134,13 @@ std::vector<std::string> make_software_searchpath(software_list_device &swlist, 
 }
 
 
-std::error_condition do_open_disk(const emu_options &options, std::initializer_list<std::reference_wrapper<const std::vector<std::string> > > searchpath, const rom_entry *romp, chd_file &chd, std::function<const rom_entry * ()> next_parent)
+std::error_condition do_open_disk(
+		emu_options const &options,
+		std::initializer_list<std::reference_wrapper<std::vector<std::string> const> > searchpath,
+		rom_entry const *romp,
+		chd_file &chd,
+		std::function<rom_entry const * ()> next_parent,
+		chd_file::open_parent_func const &open_parent)
 {
 	// hashes are fixed, but we might need to try multiple filenames
 	std::set<std::string> tried;
@@ -137,7 +171,7 @@ std::error_condition do_open_disk(const emu_options &options, std::initializer_l
 			{
 				fullpath = imgfile->fullpath();
 				imgfile.reset();
-				result = chd.open(fullpath);
+				result = chd.open(fullpath, false, nullptr, open_parent);
 			}
 		}
 
@@ -159,10 +193,7 @@ std::error_condition do_open_disk(const emu_options &options, std::initializer_l
 							romp = nullptr;
 							break;
 						}
-						while (ROMENTRY_ISPARAMETER(parent) || ROMENTRY_ISSYSTEM_BIOS(parent) || ROMENTRY_ISDEFAULT_BIOS(parent))
-							++parent;
-						if (ROMENTRY_ISEND(parent))
-							parent = nullptr;
+						parent = rom_first_region(parent);
 					}
 					else
 					{
@@ -181,6 +212,46 @@ std::error_condition do_open_disk(const emu_options &options, std::initializer_l
 		}
 	}
 	return result;
+}
+
+
+auto open_parent_disk(
+		emu_options const &options,
+		std::initializer_list<std::reference_wrapper<std::vector<std::string> const> > searchpath,
+		std::function<rom_entry const * ()> const &next_parent)
+{
+	return
+			[&options, searchpath, next_parent] (util::sha1_t const &sha1) -> std::unique_ptr<chd_file>
+			{
+				util::hash_collection hashes;
+				hashes.add_sha1(sha1);
+				std::function<rom_entry const * ()> np(next_parent);
+				for (rom_entry const *parent = np(); parent; parent = np())
+				{
+					parent = rom_first_region(parent);
+					while (parent)
+					{
+						while (parent && !ROMREGION_ISDISKDATA(parent))
+							parent = rom_next_region(parent);
+						if (parent)
+						{
+							rom_entry const *romp = rom_first_file(parent);
+							while (romp)
+							{
+								if (util::hash_collection(romp->hashdata()) == hashes)
+								{
+									std::unique_ptr<chd_file> chd(new chd_file);
+									if (!do_open_disk(options, searchpath, romp, *chd, next_parent, nullptr))
+										return chd;
+								}
+								romp = rom_next_file(romp);
+							}
+							parent = rom_next_region(parent);
+						}
+					}
+				}
+				return nullptr;
+			};
 }
 
 } // anonymous namespace
@@ -640,7 +711,11 @@ void rom_load_manager::region_post_process(memory_region *region, bool invert)
     up the parent and loading by checksum
 -------------------------------------------------*/
 
-std::unique_ptr<emu_file> rom_load_manager::open_rom_file(std::initializer_list<std::reference_wrapper<const std::vector<std::string> > > searchpath, const rom_entry *romp, std::vector<std::string> &tried_file_names, bool from_list)
+std::unique_ptr<emu_file> rom_load_manager::open_rom_file(
+		search_paths searchpath,
+		const rom_entry *romp,
+		std::vector<std::string> &tried_file_names,
+		bool from_list)
 {
 	std::error_condition filerr = std::errc::no_such_file_or_directory;
 	u32 const romsize = rom_file_size(romp);
@@ -675,7 +750,13 @@ std::unique_ptr<emu_file> rom_load_manager::open_rom_file(std::initializer_list<
 }
 
 
-std::unique_ptr<emu_file> rom_load_manager::open_rom_file(const std::vector<std::string> &paths, std::vector<std::string> &tried, bool has_crc, u32 crc, std::string_view name, std::error_condition &filerr)
+std::unique_ptr<emu_file> rom_load_manager::open_rom_file(
+		const std::vector<std::string> &paths,
+		std::vector<std::string> &tried,
+		bool has_crc,
+		u32 crc,
+		std::string_view name,
+		std::error_condition &filerr)
 {
 	// record the set names we search
 	tried.insert(tried.end(), paths.begin(), paths.end());
@@ -718,7 +799,11 @@ int rom_load_manager::rom_fread(emu_file *file, u8 *buffer, int length, const ro
     entry
 -------------------------------------------------*/
 
-int rom_load_manager::read_rom_data(emu_file *file, const rom_entry *parent_region, const rom_entry *romp)
+int rom_load_manager::read_rom_data(
+		emu_file *file,
+		memory_region &region,
+		const rom_entry *parent_region,
+		const rom_entry *romp)
 {
 	int datashift = ROM_GETBITSHIFT(romp);
 	int datamask = ((1 << ROM_GETBITWIDTH(romp)) - 1) << datashift;
@@ -727,7 +812,7 @@ int rom_load_manager::read_rom_data(emu_file *file, const rom_entry *parent_regi
 	int skip = ROM_GETSKIPCOUNT(romp);
 	int reversed = ROM_ISREVERSED(romp);
 	int numgroups = (numbytes + groupsize - 1) / groupsize;
-	u8 *base = m_region->base() + ROM_GETOFFSET(romp);
+	u8 *base = region.base() + ROM_GETOFFSET(romp);
 	u32 tempbufsize;
 	int i;
 
@@ -738,7 +823,7 @@ int rom_load_manager::read_rom_data(emu_file *file, const rom_entry *parent_regi
 		osd_printf_warning("Warning in RomModule definition: %s length not an even multiple of group size\n", romp->name());
 
 	/* make sure we only fill within the region space */
-	if (ROM_GETOFFSET(romp) + numgroups * groupsize + (numgroups - 1) * skip > m_region->bytes())
+	if (ROM_GETOFFSET(romp) + numgroups * groupsize + (numgroups - 1) * skip > region.bytes())
 		throw emu_fatalerror("Error in RomModule definition: %s out of memory region space\n", romp->name());
 
 	/* make sure the length was valid */
@@ -833,14 +918,14 @@ int rom_load_manager::read_rom_data(emu_file *file, const rom_entry *parent_regi
     fill_rom_data - fill a region of ROM space
 -------------------------------------------------*/
 
-void rom_load_manager::fill_rom_data(const rom_entry *romp)
+void rom_load_manager::fill_rom_data(memory_region &region, const rom_entry *romp)
 {
 	u32 numbytes = ROM_GETLENGTH(romp);
 	int skip = ROM_GETSKIPCOUNT(romp);
-	u8 *base = m_region->base() + ROM_GETOFFSET(romp);
+	u8 *base = region.base() + ROM_GETOFFSET(romp);
 
 	// make sure we fill within the region space
-	if (ROM_GETOFFSET(romp) + numbytes > m_region->bytes())
+	if (ROM_GETOFFSET(romp) + numbytes > region.bytes())
 		throw emu_fatalerror("Error in RomModule definition: FILL out of memory region space\n");
 
 	// make sure the length was valid
@@ -865,15 +950,15 @@ void rom_load_manager::fill_rom_data(const rom_entry *romp)
     copy_rom_data - copy a region of ROM space
 -------------------------------------------------*/
 
-void rom_load_manager::copy_rom_data(const rom_entry *romp)
+void rom_load_manager::copy_rom_data(memory_region &region, const rom_entry *romp)
 {
-	u8 *base = m_region->base() + ROM_GETOFFSET(romp);
+	u8 *base = region.base() + ROM_GETOFFSET(romp);
 	const std::string &srcrgntag = romp->name();
 	u32 numbytes = ROM_GETLENGTH(romp);
 	u32 srcoffs = u32(strtol(romp->hashdata().c_str(), nullptr, 0));  /* srcoffset in place of hashdata */
 
 	/* make sure we copy within the region space */
-	if (ROM_GETOFFSET(romp) + numbytes > m_region->bytes())
+	if (ROM_GETOFFSET(romp) + numbytes > region.bytes())
 		throw emu_fatalerror("Error in RomModule definition: COPY out of target memory region space\n");
 
 	/* make sure the length was valid */
@@ -881,16 +966,16 @@ void rom_load_manager::copy_rom_data(const rom_entry *romp)
 		throw emu_fatalerror("Error in RomModule definition: COPY has an invalid length\n");
 
 	/* make sure the source was valid */
-	memory_region *region = machine().root_device().memregion(srcrgntag);
-	if (region == nullptr)
+	memory_region *src = machine().root_device().memregion(srcrgntag);
+	if (!src)
 		throw emu_fatalerror("Error in RomModule definition: COPY from an invalid region\n");
 
 	/* make sure we find within the region space */
-	if (srcoffs + numbytes > region->bytes())
+	if (srcoffs + numbytes > src->bytes())
 		throw emu_fatalerror("Error in RomModule definition: COPY out of source memory region space\n");
 
 	/* fill the data */
-	memcpy(base, region->base() + srcoffs, numbytes);
+	memcpy(base, src->base() + srcoffs, numbytes);
 }
 
 
@@ -899,7 +984,13 @@ void rom_load_manager::copy_rom_data(const rom_entry *romp)
     for a region
 -------------------------------------------------*/
 
-void rom_load_manager::process_rom_entries(std::initializer_list<std::reference_wrapper<const std::vector<std::string> > > searchpath, u8 bios, const rom_entry *parent_region, const rom_entry *romp, bool from_list)
+void rom_load_manager::process_rom_entries(
+		search_paths searchpath,
+		u8 bios,
+		memory_region &region,
+		const rom_entry *parent_region,
+		const rom_entry *romp,
+		bool from_list)
 {
 	u32 lastflags = 0;
 	std::vector<std::string> tried_file_names;
@@ -921,13 +1012,13 @@ void rom_load_manager::process_rom_entries(std::initializer_list<std::reference_
 		if (ROMENTRY_ISFILL(romp))
 		{
 			if (!ROM_GETBIOSFLAGS(romp) || (ROM_GETBIOSFLAGS(romp) == bios))
-				fill_rom_data(romp);
+				fill_rom_data(region, romp);
 
 			romp++;
 		}
 		else if (ROMENTRY_ISCOPY(romp))
 		{
-			copy_rom_data(romp++);
+			copy_rom_data(region, romp++);
 		}
 		else if (ROMENTRY_ISFILE(romp))
 		{
@@ -965,7 +1056,7 @@ void rom_load_manager::process_rom_entries(std::initializer_list<std::reference_
 
 					// attempt to read using the modified entry
 					if (!ROMENTRY_ISIGNORE(&modified_romp) && !irrelevantbios)
-						/*readresult = */read_rom_data(file.get(), parent_region, &modified_romp);
+						/*readresult = */read_rom_data(file.get(), region, parent_region, &modified_romp);
 				}
 				while (ROMENTRY_ISCONTINUE(romp) || ROMENTRY_ISIGNORE(romp));
 
@@ -1004,7 +1095,11 @@ void rom_load_manager::process_rom_entries(std::initializer_list<std::reference_
     open_disk_diff - open a DISK diff file
 -------------------------------------------------*/
 
-std::error_condition rom_load_manager::open_disk_diff(emu_options &options, const rom_entry *romp, chd_file &source, chd_file &diff_chd)
+std::error_condition rom_load_manager::open_disk_diff(
+		emu_options &options,
+		const rom_entry *romp,
+		chd_file &source,
+		chd_file &diff_chd)
 {
 	// TODO: use system name and/or software list name in the path - the current setup doesn't scale
 	std::string fname = romp->name() + ".dif";
@@ -1050,11 +1145,20 @@ std::error_condition rom_load_manager::open_disk_diff(emu_options &options, cons
     for a region
 -------------------------------------------------*/
 
-void rom_load_manager::process_disk_entries(std::initializer_list<std::reference_wrapper<const std::vector<std::string> > > searchpath, std::string_view regiontag, const rom_entry *romp, std::function<const rom_entry * ()> next_parent)
+void rom_load_manager::process_disk_entries(
+		search_paths searchpath,
+		std::string_view regiontag,
+		const rom_entry *romp,
+		std::function<const rom_entry * ()> next_parent,
+		chd_file::open_parent_func const &open_parent)
 {
 	/* remove existing disk entries for this region */
-	m_chd_list.erase(std::remove_if(m_chd_list.begin(), m_chd_list.end(),
-			[regiontag] (std::unique_ptr<open_chd> &chd) { return chd->region() == regiontag; }), m_chd_list.end());
+	m_chd_list.erase(
+			std::remove_if(
+				m_chd_list.begin(),
+				m_chd_list.end(),
+				[&regiontag] (std::unique_ptr<open_chd> &chd) { return chd->region() == regiontag; }),
+			m_chd_list.end());
 
 	/* loop until we hit the end of this region */
 	for ( ; !ROMENTRY_ISREGIONEND(romp); romp++)
@@ -1071,7 +1175,9 @@ void rom_load_manager::process_disk_entries(std::initializer_list<std::reference
 			/* first open the source drive */
 			// FIXME: we've lost the ability to search parents here
 			LOG("Opening disk image: %s\n", filename.c_str());
-			err = do_open_disk(machine().options(), searchpath, romp, chd->orig_chd(), next_parent);
+			err = do_open_disk(machine().options(), searchpath, romp, chd->orig_chd(), next_parent, open_parent);
+			if (!err && chd->orig_chd().parent_missing())
+				err = chd_file::error::REQUIRES_PARENT;
 			if (err)
 			{
 				std::vector<std::string> tried;
@@ -1142,7 +1248,11 @@ std::vector<std::string> rom_load_manager::get_software_searchpath(software_list
     device
 -------------------------------------------------*/
 
-std::error_condition rom_load_manager::open_disk_image(const emu_options &options, const device_t &device, const rom_entry *romp, chd_file &image_chd)
+std::error_condition rom_load_manager::open_disk_image(
+		emu_options &options,
+		const device_t &device,
+		const rom_entry *romp,
+		chd_file &image_chd)
 {
 	const std::vector<std::string> searchpath(device.searchpath());
 
@@ -1151,8 +1261,14 @@ std::error_condition rom_load_manager::open_disk_image(const emu_options &option
 	if (driver)
 		next_parent = next_parent_system(driver->system());
 	else
-		next_parent = [] () { return nullptr; };
-	return do_open_disk(options, { searchpath }, romp, image_chd, std::move(next_parent));
+		next_parent = next_parent_device(device, options);
+	chd_file::open_parent_func open_parent(open_parent_disk(options, { searchpath }, next_parent));
+	std::error_condition const err(
+			do_open_disk(options, { searchpath }, romp, image_chd, std::move(next_parent), open_parent));
+	if (!err && image_chd.parent_missing())
+		return chd_file::error::REQUIRES_PARENT;
+	else
+		return err;
 }
 
 
@@ -1161,12 +1277,24 @@ std::error_condition rom_load_manager::open_disk_image(const emu_options &option
     software item
 -------------------------------------------------*/
 
-std::error_condition rom_load_manager::open_disk_image(const emu_options &options, software_list_device &swlist, const software_info &swinfo, const rom_entry *romp, chd_file &image_chd)
+std::error_condition rom_load_manager::open_disk_image(
+		emu_options &options,
+		software_list_device &swlist,
+		const software_info &swinfo,
+		const rom_entry *romp,
+		chd_file &image_chd)
 {
 	std::vector<software_info const *> parents;
-	std::vector<std::string> searchpath = make_software_searchpath(swlist, swinfo, parents);
+	std::vector<std::string> searchpath(make_software_searchpath(swlist, swinfo, parents));
 	searchpath.emplace_back(swlist.list_name()); // look for loose disk images in software list directory
-	return do_open_disk(options, { searchpath }, romp, image_chd, next_parent_software(parents));
+	std::function<const rom_entry * ()> next_parent(next_parent_software(parents));
+	chd_file::open_parent_func open_parent(open_parent_disk(options, { searchpath }, next_parent));
+	std::error_condition const err(
+			do_open_disk(options, { searchpath }, romp, image_chd, std::move(next_parent), open_parent));
+	if (!err && image_chd.parent_missing())
+		return chd_file::error::REQUIRES_PARENT;
+	else
+		return err;
 }
 
 
@@ -1262,6 +1390,7 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 
 	// loop until we hit the end
 	std::function<const rom_entry * ()> next_parent;
+	chd_file::open_parent_func open_parent;
 	for (const rom_entry *region = start_region; region != nullptr; region = rom_next_region(region))
 	{
 		u32 regionlength = ROMREGION_GETLENGTH(region);
@@ -1276,7 +1405,7 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 		endianness_t endianness = ROMREGION_ISBIGENDIAN(region) ? ENDIANNESS_BIG : ENDIANNESS_LITTLE;
 		u8 width = ROMREGION_GETWIDTH(region) / 8;
 		memory_region *memregion = machine().root_device().memregion(regiontag);
-		if (memregion != nullptr)
+		if (memregion)
 		{
 			normalize_flags_for_device(regiontag, width, endianness);
 
@@ -1285,16 +1414,16 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 		}
 
 		// remember the base and length
-		m_region = machine().memory().region_alloc(regiontag, regionlength, width, endianness);
-		LOG("Allocated %X bytes @ %p\n", m_region->bytes(), m_region->base());
+		memregion = machine().memory().region_alloc(regiontag, regionlength, width, endianness);
+		LOG("Allocated %X bytes @ %p\n", memregion->bytes(), memregion->base());
 
 		if (ROMREGION_ISERASE(region)) // clear the region if it's requested
-			memset(m_region->base(), ROMREGION_GETERASEVAL(region), m_region->bytes());
-		else if (m_region->bytes() <= 0x400000) // or if it's sufficiently small (<= 4MB)
-			memset(m_region->base(), 0, m_region->bytes());
+			memset(memregion->base(), ROMREGION_GETERASEVAL(region), memregion->bytes());
+		else if (memregion->bytes() <= 0x400000) // or if it's sufficiently small (<= 4MB)
+			memset(memregion->base(), 0, memregion->bytes());
 #ifdef MAME_DEBUG
 		else // if we're debugging, fill region with random data to catch errors
-			fill_random(m_region->base(), m_region->bytes());
+			fill_random(memregion->base(), memregion->bytes());
 #endif
 
 		// update total number of roms
@@ -1308,9 +1437,9 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 		if (ROMREGION_ISROMDATA(region))
 		{
 			if (devsearch.empty())
-				process_rom_entries({ swsearch }, 0U, region, region + 1, true);
+				process_rom_entries({ swsearch }, 0U, *memregion, region, region + 1, true);
 			else
-				process_rom_entries({ swsearch, devsearch }, 0U, region, region + 1, true);
+				process_rom_entries({ swsearch, devsearch }, 0U, *memregion, region, region + 1, true);
 		}
 		else if (ROMREGION_ISDISKDATA(region))
 		{
@@ -1320,11 +1449,15 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 					next_parent = next_parent_software(parents);
 				else
 					next_parent = [] () { return nullptr; };
+				if (devsearch.empty())
+					open_parent = open_parent_disk(machine().options(), { swsearch, disksearch }, next_parent);
+				else
+					open_parent = open_parent_disk(machine().options(), { swsearch, disksearch, devsearch }, next_parent);
 			}
 			if (devsearch.empty())
-				process_disk_entries({ swsearch, disksearch }, regiontag, region + 1, next_parent);
+				process_disk_entries({ swsearch, disksearch }, regiontag, region + 1, next_parent, open_parent);
 			else
-				process_disk_entries({ swsearch, disksearch, devsearch }, regiontag, region + 1, next_parent);
+				process_disk_entries({ swsearch, disksearch, devsearch }, regiontag, region + 1, next_parent, open_parent);
 		}
 	}
 
@@ -1350,6 +1483,7 @@ void rom_load_manager::process_region_list()
 	{
 		searchpath.clear();
 		std::function<const rom_entry * ()> next_parent;
+		chd_file::open_parent_func open_parent;
 		for (const rom_entry *region = rom_first_region(device); region != nullptr; region = rom_next_region(region))
 		{
 			u32 regionlength = ROMREGION_GETLENGTH(region);
@@ -1368,23 +1502,23 @@ void rom_load_manager::process_region_list()
 				normalize_flags_for_device(regiontag, width, endianness);
 
 				// remember the base and length
-				m_region = machine().memory().region_alloc(regiontag, regionlength, width, endianness);
-				LOG("Allocated %X bytes @ %p\n", m_region->bytes(), m_region->base());
+				memory_region *const memregion = machine().memory().region_alloc(regiontag, regionlength, width, endianness);
+				LOG("Allocated %X bytes @ %p\n", memregion->bytes(), memregion->base());
 
 				if (ROMREGION_ISERASE(region)) // clear the region if it's requested
-					memset(m_region->base(), ROMREGION_GETERASEVAL(region), m_region->bytes());
-				else if (m_region->bytes() <= 0x400000) // or if it's sufficiently small (<= 4MB)
-					memset(m_region->base(), 0, m_region->bytes());
+					memset(memregion->base(), ROMREGION_GETERASEVAL(region), memregion->bytes());
+				else if (memregion->bytes() <= 0x400000) // or if it's sufficiently small (<= 4MB)
+					memset(memregion->base(), 0, memregion->bytes());
 #ifdef MAME_DEBUG
 				else // if we're debugging, fill region with random data to catch errors
-					fill_random(m_region->base(), m_region->bytes());
+					fill_random(memregion->base(), memregion->bytes());
 #endif
 
 				// now process the entries in the region
 				if (searchpath.empty())
 					searchpath = device.searchpath();
 				assert(!searchpath.empty());
-				process_rom_entries({ searchpath }, device.system_bios(), region, region + 1, false);
+				process_rom_entries({ searchpath }, device.system_bios(), *memregion, region, region + 1, false);
 			}
 			else if (ROMREGION_ISDISKDATA(region))
 			{
@@ -1397,9 +1531,10 @@ void rom_load_manager::process_region_list()
 					if (driver)
 						next_parent = next_parent_system(driver->system());
 					else
-						next_parent = [] () { return nullptr; };
+						next_parent = next_parent_device(device, machine().options());
+					open_parent = open_parent_disk(machine().options(), { searchpath }, next_parent);
 				}
-				process_disk_entries({ searchpath }, regiontag, region + 1, next_parent);
+				process_disk_entries({ searchpath }, regiontag, region + 1, next_parent, open_parent);
 			}
 		}
 	}
@@ -1436,7 +1571,6 @@ rom_load_manager::rom_load_manager(running_machine &machine)
 	, m_romsloadedsize(0)
 	, m_romstotalsize(0)
 	, m_chd_list()
-	, m_region(nullptr)
 	, m_errorstring()
 	, m_softwarningstring()
 {
