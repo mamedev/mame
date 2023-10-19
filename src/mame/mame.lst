@@ -35618,7 +35618,8 @@ i8580071                        // IBM PS/2 8580-071 (Model 80)
 i8580111                        // IBM PS/2 8580-111 (Model 80)
 
 @source:pc/quakeat.cpp
-quake                           // (c) 19?? Lazer-Tron / iD Software
+ga6la7                          //
+quake                           // (c) 1998 Lazer-Tron / iD Software
 
 @source:pc/queen.cpp
 queen                           //
