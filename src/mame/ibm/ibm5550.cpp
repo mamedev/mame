@@ -11,6 +11,17 @@ TODO:
 \- it's barely known that it uses a specific "JDA" video adapter, and that it uses a specific
    incompatible bus slot;
 
+POST codes (to port $a1):
+- 0xe2: ROM check
+[- 0xfc:] goes high if first $a1 check = 1 at PC=0xfc0d8
+- 0xfa: PIC check #1
+- 0xf6: undefined boundary check at $4c000-$ec000
+- 0xe4: RAM check
+- 0xe8: PIC check #2
+- 0xf0: PIT check
+- 0xf8: $3d0-$3d1 check (JDA adapter?)
+- 0xf2: VRAM check
+
 **************************************************************************************************/
 
 #include "emu.h"
@@ -44,17 +55,23 @@ public:
 		, m_dma(*this, "dma")
 		, m_crtc(*this, "crtc")
 		, m_screen(*this, "screen")
+		, m_vram(*this, "vram")
+		, m_palette(*this, "palette")
 	{ }
 
 	void ibm5550(machine_config &config);
 
 private:
+	virtual void machine_reset() override;
+
 	required_device<i8086_cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
 	required_device<pic8259_device> m_pic;
 	required_device<am9517a_device> m_dma;
 	required_device<mc6845_device> m_crtc;
 	required_device<screen_device> m_screen;
+	required_shared_ptr<uint16_t> m_vram;
+	required_device<palette_device> m_palette;
 
 	void main_map(address_map &map);
 	void main_io(address_map &map);
@@ -74,6 +91,8 @@ void ibm5550_state::main_map(address_map &map)
 	map.unmap_value_high();
 	map(0x00000, 0x3ffff).ram(); // 256 or 512KB
 	// POST test $f6 expects that all the blocks between $4c000-$ec000 returns 0xff
+	map(0xd8000, 0xd8fff).ram().share("vram"); // text VRAM?
+	map(0xe0000, 0xe0fff).ram(); // attribute VRAM?
 	map(0xfc000, 0xfffff).rom().region("ipl", 0);
 }
 
@@ -88,15 +107,26 @@ void ibm5550_state::main_io(address_map &map)
 
 	// bit 0 on will punt before testing for $20-$21, 
 	// but will be required on after $4c-$ec RAM holes above
-	// ... RAM bank?
+	// ... RAM protection?
 	map(0x00a0, 0x00a0).lrw8(
 		NAME([this] (offs_t offset) { return m_a0_unk; }),
 		NAME([this] (offs_t offset, u8 data) { 
 			logerror("$a0 %02x\n", data);
 			m_a0_unk = BIT(data, 6);
+			if (data == 0xc0)
+			{
+				// attached to bus error?
+				m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+			}
 		})
 	);
 //	map(0x00a1, 0x00a1) LED write?
+	map(0x00a1, 0x00a1).lr8(
+		NAME([] (offs_t offset) {
+			// read thru NMI trap above, bit 3-0 must be low
+			return 0;
+		})
+	);
 	map(0x00a2, 0x00a2).lw8(
 		NAME([this] (offs_t offset, u8 data) { 
 			logerror("$a2 %02x\n", data);
@@ -104,12 +134,18 @@ void ibm5550_state::main_io(address_map &map)
 		})
 	);
 
+	// TODO: not right, definitely an address/data of some sort (extended regs?)
 	map(0x3d0, 0x3d0).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x3d1, 0x3d1).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 }
 
 static INPUT_PORTS_START( ibm5550 )
 INPUT_PORTS_END
+
+void ibm5550_state::machine_reset()
+{
+	m_a0_unk = 0;
+}
 
 void ibm5550_state::ibm5550(machine_config &config)
 {
@@ -164,9 +200,9 @@ void ibm5550_state::ibm5550(machine_config &config)
 	m_screen->set_screen_update(FUNC(ibm5550_state::screen_update));
 	m_screen->set_size(1280, 1024);
 	m_screen->set_visarea(0, 1023, 0, 767);
-	m_screen->set_palette("palette");
+	m_screen->set_palette(m_palette);
 
-	PALETTE(config, "palette", palette_device::MONOCHROME_HIGHLIGHT);
+	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 
 
 
@@ -196,6 +232,9 @@ void ibm5550_state::ibm5550(machine_config &config)
 ROM_START( ibm5550 )
 	ROM_REGION16_LE(0x4000, "ipl", 0)
 	ROM_LOAD("ipl5550.rom", 0x0000, 0x4000, CRC(40cf34c9) SHA1(d41f77fdfa787b0e97ed311e1c084b8699a5b197))
+
+	ROM_REGION(0x20000, "kanji", ROMREGION_ERASEFF)
+	ROM_LOAD("chargen.rom", 0x00000, 0x20000, NO_DUMP )
 ROM_END
 
 COMP( 1983, ibm5550, 0, 0, ibm5550, ibm5550, ibm5550_state, empty_init, "International Business Machines", "Multistation 5550", MACHINE_IS_SKELETON )
