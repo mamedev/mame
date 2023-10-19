@@ -103,8 +103,8 @@ private:
 
 void quakeat_state::quake_map(address_map &map)
 {
-	map(0x000f0000, 0x000fffff).rom().region("pc_bios", 0);
-	map(0xffff0000, 0xffffffff).rom().region("pc_bios", 0);
+	map(0x000e0000, 0x000fffff).rom().region("pc_bios", 0);
+	map(0xfffe0000, 0xffffffff).rom().region("pc_bios", 0);
 
 }
 
@@ -126,9 +126,10 @@ void quakeat_state::quake(machine_config &config)
 
 ROM_START(quake)
 	// 4N4XL0X0.86A.0011.P05
-	ROM_REGION32_LE(0x10000, "pc_bios", 0)  /* motherboard bios */
-//	ROM_LOAD16_WORD("p05-0011.bio", 0x000000, 0xa0, NO_DUMP )
-//	ROM_CONTINUE( 0, 0x10000 )
+	ROM_REGION32_LE(0x20000, "pc_bios", 0)  /* motherboard bios */
+	// TODO: compressed
+//	ROM_LOAD("p05-0011.bio", 0x000000, 0x10000, NO_DUMP )
+//	ROM_CONTINUE( 0x1ffff-0xa0, 0xa0 )
 	ROM_LOAD("quakearcadetournament.pcbios", 0x000000, 0x20000, NO_DUMP )
 
 	// Hitachi DK237A-21 A/A0A0, IDE/ATA 2.5" 2.1GB 4000 RPM
