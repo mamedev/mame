@@ -353,6 +353,7 @@ void render_texture::release()
 	m_bitmap = nullptr;
 	m_sbounds.set(0, -1, 0, -1);
 	m_format = TEXFORMAT_ARGB32;
+	m_scaler = nullptr;
 	m_curseq = 0;
 }
 
