@@ -64,16 +64,13 @@ void isa8_sblaster_2_0_lle_device::device_add_mconfig(machine_config &config)
 	m_ym3812->add_route(ALL_OUTPUTS, m_lspeaker, 1.0);
 	m_ym3812->add_route(ALL_OUTPUTS, m_rspeaker, 1.0);
 
-	if(m_cms_present)
-	{
-		// FM and DAC are mono, but CMS is stereo.
-		SAA1099(config, m_saa1099_1, CLOCK_SAA1099);
-		m_saa1099_1->add_route(0, m_lspeaker, 0.5);
-		m_saa1099_1->add_route(1, m_rspeaker, 0.5);
-		SAA1099(config, m_saa1099_2, CLOCK_SAA1099);
-		m_saa1099_2->add_route(0, m_lspeaker, 0.5);
-		m_saa1099_2->add_route(1, m_rspeaker, 0.5);
-	}
+	// FM and DAC are mono, but CMS is stereo.
+	SAA1099(config, m_saa1099_1, CLOCK_SAA1099);
+	m_saa1099_1->add_route(0, m_lspeaker, 0.5);
+	m_saa1099_1->add_route(1, m_rspeaker, 0.5);
+	SAA1099(config, m_saa1099_2, CLOCK_SAA1099);
+	m_saa1099_2->add_route(0, m_lspeaker, 0.5);
+	m_saa1099_2->add_route(1, m_rspeaker, 0.5);
 }
 
 static INPUT_PORTS_START( sb_dsw )
@@ -199,11 +196,11 @@ void isa8_sblaster_2_0_lle_device::install_io()
 		if(m_cms_present)
 		{
 			m_isa->install_device(base + 0x0, base + 0x1,
-				emu::rw_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::saa1099_16_r)),
-				emu::rw_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::saa1099_1_16_w)));
+				emu::rw_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::saa1099_16_r)), // read is a NOP
+				emu::rw_delegate(m_saa1099_1, FUNC(saa1099_device::write)));
 			m_isa->install_device(base + 0x2, base + 0x3,
-				emu::rw_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::saa1099_16_r)),
-				emu::rw_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::saa1099_2_16_w)));
+				emu::rw_delegate(*this, FUNC(isa8_sblaster_2_0_lle_device::saa1099_16_r)), // read is a NOP
+				emu::rw_delegate(m_saa1099_2, FUNC(saa1099_device::write)));
 		}
 
 		m_installed_base_io = base;
@@ -245,11 +242,12 @@ void isa8_sblaster_2_0_lle_device::raise_irq()
 		LOG("SB raising IRQ %d\n", m_selected_irq);
 		switch(m_selected_irq)
 		{
-			case 7: m_isa->irq7_w(ASSERT_LINE); m_irq_raised = 7; break;
-			case 5: m_isa->irq5_w(ASSERT_LINE); m_irq_raised = 5; break;
-			case 3: m_isa->irq3_w(ASSERT_LINE); m_irq_raised = 3; break;
-			case 2: m_isa->irq2_w(ASSERT_LINE); m_irq_raised = 2; break;
+			case 7: m_isa->irq7_w(ASSERT_LINE); break;
+			case 5: m_isa->irq5_w(ASSERT_LINE); break;
+			case 3: m_isa->irq3_w(ASSERT_LINE); break;
+			case 2: m_isa->irq2_w(ASSERT_LINE); break;
 		}
+		m_irq_raised = m_selected_irq;
 	}
 }
 
@@ -293,7 +291,7 @@ void isa8_sblaster_2_0_lle_device::ym3812_16_w(offs_t offset, uint8_t data)
 // 80C51
 /*
     DSP port 2
-    Bit 0: w OUTPUT_EN: 1 = Mute, 0 = Not M
+    Bit 0: w OUTPUT_EN: 1 = Mute, 0 = Not Mute
     Bit 5: r MIC_COMP:  1 = Mic <- DAC. 0 = Mic -> DAC.
     Bit 6: r DAV_PC:    1 = Data waiting in buffer for host PC to read it.
     Bit 7: r DAV_DSP:   1 = Data waiting in buffer for DSP to read it.
@@ -462,16 +460,6 @@ void isa8_sblaster_2_0_lle_device::map_dsp_io(address_map &map)
 uint8_t isa8_sblaster_2_0_lle_device::saa1099_16_r(offs_t offset)
 {
 	return 0xff;
-}
-
-void isa8_sblaster_2_0_lle_device::saa1099_1_16_w(offs_t offset, uint8_t data)
-{
-	m_saa1099_1->write(offset, data);
-}
-
-void isa8_sblaster_2_0_lle_device::saa1099_2_16_w(offs_t offset, uint8_t data)
-{
-	m_saa1099_2->write(offset, data);
 }
 
 ROM_START(isa8_sblaster_2_0)

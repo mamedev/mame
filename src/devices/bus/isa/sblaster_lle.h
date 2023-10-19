@@ -9,9 +9,9 @@
 #include "bus/pc_joy/pc_joy.h"
 #include "cpu/mcs51/mcs51.h"
 #include "sound/dac.h"
-#include "sound/ymopl.h"
-#include "sound/spkrdev.h"
 #include "sound/saa1099.h"
+#include "sound/spkrdev.h"
+#include "sound/ymopl.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
