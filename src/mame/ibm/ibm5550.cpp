@@ -56,6 +56,7 @@ public:
 		, m_crtc(*this, "crtc")
 		, m_screen(*this, "screen")
 		, m_vram(*this, "vram")
+		, m_gfxram(*this, "gfxram")
 		, m_palette(*this, "palette")
 	{ }
 
@@ -71,6 +72,7 @@ private:
 	required_device<mc6845_device> m_crtc;
 	required_device<screen_device> m_screen;
 	required_shared_ptr<uint16_t> m_vram;
+	required_shared_ptr<uint16_t> m_gfxram;
 	required_device<palette_device> m_palette;
 
 	void main_map(address_map &map);
@@ -81,8 +83,52 @@ private:
 	u8 m_a0_unk = 0;
 };
 
+/*
+static const gfx_layout kanji_layout =
+{
+	32, 32,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ STEP16(0,1), STEP16(16, 16) },
+	{ STEP16(0,16), STEP16(16*16, 16) },
+	32*32
+};
+*/
+
 uint32_t ibm5550_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	const u32 pitch = 82;
+	bitmap.fill(m_palette->black_pen(), cliprect);
+
+	for(int y = 0; y < 24; y++)
+	{
+		for(int x = 0; x < pitch; x++)
+		{
+			const u16 tile = m_vram[x + y * pitch] & 0x1f;
+
+			for (int yi = 0; yi < 32; yi ++)
+			{
+				u16 color = m_gfxram[tile * 64 + yi];
+				for (int xi = 0; xi < 16; xi ++)
+				{
+					const int res_x = x * 32 + xi;
+					const int res_y = y * 32 + yi;
+					if(cliprect.contains(res_x, res_y))
+						bitmap.pix(res_y, res_x) = m_palette->pen(BIT(color, 15 - xi) ? 2 : 0);
+				}
+				color = m_gfxram[tile * 64 + yi + 32];
+				for (int xi = 0; xi < 16; xi ++)
+				{
+					const int res_x = x * 32 + xi + 16;
+					const int res_y = y * 32 + yi;
+					if(cliprect.contains(res_x, res_y))
+						bitmap.pix(res_y, res_x) = m_palette->pen(BIT(color, 15 - xi) ? 2 : 0);
+				}
+			}
+		}
+	}
+
 	return 0;
 }
 
@@ -91,8 +137,8 @@ void ibm5550_state::main_map(address_map &map)
 	map.unmap_value_high();
 	map(0x00000, 0x3ffff).ram(); // 256 or 512KB
 	// POST test $f6 expects that all the blocks between $4c000-$ec000 returns 0xff
-	map(0xd8000, 0xd8fff).ram().share("vram"); // text VRAM?
-	map(0xe0000, 0xe0fff).ram(); // attribute VRAM?
+	map(0xd8000, 0xd8fff).ram().share("gfxram");
+	map(0xe0000, 0xe0fff).ram().share("vram");
 	map(0xfc000, 0xfffff).rom().region("ipl", 0);
 }
 
@@ -104,6 +150,8 @@ void ibm5550_state::main_io(address_map &map)
 
 	// tested later, with bit 6 irq from PIC
 //	map(0x0040, 0x0047).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+
+//	map(0x0060, 0x0060) / map(0x0064, 0x0064) standard XT keyboard
 
 	// bit 0 on will punt before testing for $20-$21, 
 	// but will be required on after $4c-$ec RAM holes above
@@ -135,8 +183,11 @@ void ibm5550_state::main_io(address_map &map)
 	);
 
 	// TODO: not right, definitely an address/data of some sort (extended regs?)
-	map(0x3d0, 0x3d0).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
-	map(0x3d1, 0x3d1).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	//map(0x3d0, 0x3d0).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	//map(0x3d1, 0x3d1).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+
+	// TODO: vblank
+	//map(0x3da, 0x3da).lr8(
 }
 
 static INPUT_PORTS_START( ibm5550 )
@@ -184,11 +235,11 @@ void ibm5550_state::ibm5550(machine_config &config)
 	// JDA display board
 
 	// CX0-043C @ 40 MHz
-	// HD46505SP-2
-	HD6845S(config, m_crtc, XTAL(40'000'000));
+	// HD46505SP-2, unknown pixel clock
+	HD6845S(config, m_crtc, XTAL(40'000'000) / 10);
 	m_crtc->set_screen(m_screen);
 //	m_crtc->set_show_border_area(true);
-	m_crtc->set_char_width(8);
+	m_crtc->set_char_width(16);
 
 	// IBM6343870 / MN50015SPG
 	// IBM6343869 / MN50007SPF
@@ -203,8 +254,6 @@ void ibm5550_state::ibm5550(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
-
-
 
 //	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb"));
 //	mb.set_cputag(m_maincpu);
@@ -233,6 +282,7 @@ ROM_START( ibm5550 )
 	ROM_REGION16_LE(0x4000, "ipl", 0)
 	ROM_LOAD("ipl5550.rom", 0x0000, 0x4000, CRC(40cf34c9) SHA1(d41f77fdfa787b0e97ed311e1c084b8699a5b197))
 
+	// integrated for later models
 	ROM_REGION(0x20000, "kanji", ROMREGION_ERASEFF)
 	ROM_LOAD("chargen.rom", 0x00000, 0x20000, NO_DUMP )
 ROM_END
