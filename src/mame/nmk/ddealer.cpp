@@ -10,10 +10,9 @@
 
     TODO:
     - Understand better the video emulation and convert it to tilemaps;
-    - Check audio IRQ freuqency (controls music tempo, if too high 2 Player mode becomes slow)
+    - Check audio IRQ frequency (controls music tempo, if too high 2 Player mode becomes slow)
  
 ==========================================================================================================
-    --
 
     pcb marked  GD91071
 
@@ -26,7 +25,7 @@
     NMK 903 x2
     82S135N ("5")
     82S129N ("6")
-    xtals 16.000 MHz and  6.000 MHz
+    xtals 16.000 MHz and 6.000 MHz
     DSW x2
 
 *********************************************************************************************************/
