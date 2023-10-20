@@ -1158,11 +1158,11 @@ std::error_condition rom_load_manager::open_disk_diff(
 void rom_load_manager::process_disk_entries(
 		search_paths searchpath,
 		std::string_view regiontag,
-		const rom_entry *romp,
-		std::function<const rom_entry * ()> next_parent,
+		rom_entry const *romp,
+		std::function<rom_entry const * ()> next_parent,
 		chd_file::open_parent_func const &open_parent)
 {
-	/* remove existing disk entries for this region */
+	// remove existing disk entries for this region
 	m_chd_list.erase(
 			std::remove_if(
 				m_chd_list.begin(),
@@ -1170,20 +1170,19 @@ void rom_load_manager::process_disk_entries(
 				[&regiontag] (std::unique_ptr<open_chd> &chd) { return chd->region() == regiontag; }),
 			m_chd_list.end());
 
-	/* loop until we hit the end of this region */
+	// loop until we hit the end of this region
 	for ( ; !ROMENTRY_ISREGIONEND(romp); romp++)
 	{
-		/* handle files */
+		// handle files
 		if (ROMENTRY_ISFILE(romp))
 		{
-			auto chd = std::make_unique<open_chd>(regiontag);
+			auto chd(std::make_unique<open_chd>(regiontag));
 			std::error_condition err;
 
-			/* make the filename of the source */
-			const std::string filename = romp->name() + ".chd";
+			// make the filename of the source
+			std::string const filename(romp->name() + ".chd");
 
-			/* first open the source drive */
-			// FIXME: we've lost the ability to search parents here
+			// first open the reference disk image
 			LOG("Opening disk image: %s\n", filename.c_str());
 			err = do_open_disk(machine().options(), searchpath, romp, chd->orig_chd(), next_parent, open_parent);
 			if (!err && chd->orig_chd().parent_missing())
@@ -1197,16 +1196,14 @@ void rom_load_manager::process_disk_entries(
 						tried.emplace_back(path);
 				}
 				handle_missing_file(romp, tried, err);
-				chd = nullptr;
+				chd.reset();
 				continue;
 			}
 
-			/* get the header and extract the SHA1 */
+			// get the header and verify the SHA1 digest
 			util::hash_collection acthashes;
 			acthashes.add_sha1(chd->orig_chd().sha1());
-
-			/* verify the hash */
-			const util::hash_collection hashes(romp->hashdata());
+			util::hash_collection const hashes(romp->hashdata());
 			if (hashes != acthashes)
 			{
 				m_errorstring.append(string_format("%s WRONG CHECKSUMS:\n", filename));
@@ -1219,23 +1216,22 @@ void rom_load_manager::process_disk_entries(
 				m_knownbad++;
 			}
 
-			/* if not read-only, make the diff file */
+			// if not read-only, open or create the diff file
 			if (!DISK_ISREADONLY(romp))
 			{
-				/* try to open or create the diff */
 				err = open_disk_diff(machine().options(), romp, chd->orig_chd(), chd->diff_chd());
 				if (err)
 				{
 					m_errorstring.append(string_format("%s DIFF CHD ERROR: %s\n", filename, err.message()));
 					m_errors++;
-					chd = nullptr;
+					chd.reset();
 					continue;
 				}
 			}
 
-			/* we're okay, add to the list of disks */
+			// we're okay, add to the list of disks
 			LOG("Assigning to handle %d\n", DISK_GETINDEX(romp));
-			m_chd_list.push_back(std::move(chd));
+			m_chd_list.emplace_back(std::move(chd));
 		}
 	}
 }
