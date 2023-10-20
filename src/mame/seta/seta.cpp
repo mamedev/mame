@@ -5720,7 +5720,7 @@ static INPUT_PORTS_START( rezon )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(5)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_TILT1 )
-	PORT_CONFNAME( 0x0010, 0x0010, "License to" )
+	PORT_CONFNAME( 0x0010, 0x0010, "Licensee" )
 	PORT_CONFSETTING(      0x0010, "Allumer" )
 	PORT_CONFSETTING(      0x0000, "Taito" )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -11348,7 +11348,7 @@ GAME( 1992, neobattl,  0,        umanclub,  neobattl,  seta_state,     empty_ini
 
 GAME( 1992, umanclub,  0,        umanclub,  umanclub,  seta_state,     empty_init,     ROT0,   "Banpresto / Tsuburaya Productions", "Ultraman Club - Tatakae! Ultraman Kyoudai!!", 0 )
 
-GAME( 1992, zingzip,   0,        zingzip,   zingzip,   seta_state,     empty_init,     ROT270, "Allumer / Tecmo",           "Zing Zing Zip (World) / Zhen zhen ji pao (China?)", 0 ) // This set has Chinese Characters in Title screen, it distributed for Chinese market/or Title: DSW?
+GAME( 1992, zingzip,   0,        zingzip,   zingzip,   seta_state,     empty_init,     ROT270, "Allumer / Tecmo",           "Zing Zing Zip (World) / Zhen Zhen Ji Pao (China?)", 0 ) // This set has Chinese Characters in Title screen, it distributed for Chinese market/or Title: DSW?
 GAME( 1992, zingzipbl, zingzip,  zingzipbl, zingzip,   seta_state,     empty_init,     ROT270, "bootleg",                   "Zing Zing Zip (bootleg)", MACHINE_NOT_WORKING )
 
 GAME( 1993, atehate,   0,        atehate,   atehate,   seta_state,     empty_init,     ROT0,   "Athena",                    "Athena no Hatena?", 0 )
