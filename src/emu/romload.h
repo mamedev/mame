@@ -17,7 +17,9 @@
 
 #include <functional>
 #include <initializer_list>
+#include <memory>
 #include <string>
+#include <string_view>
 #include <system_error>
 #include <type_traits>
 #include <vector>
@@ -421,7 +423,7 @@ public:
 	chd_file *get_disk_handle(std::string_view region);
 
 	/* set a pointer to the CHD file associated with the given region */
-	std::error_condition set_disk_handle(std::string_view region, const char *fullpath);
+	std::error_condition set_disk_handle(std::string_view region, std::string_view fullpath);
 
 	void load_software_part_region(device_t &device, software_list_device &swlist, std::string_view swname, const rom_entry *start_region);
 
