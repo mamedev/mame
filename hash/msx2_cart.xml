@@ -105,7 +105,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="ashguine">
-		<description>Densetsu no Seisenshi Ashguine (Japan)</description>
+		<description>Densetsu no Seisenshi AshGuine (Japan)</description>
 		<year>1987</year>
 		<publisher>Panasoft</publisher>
 		<info name="alt_title" value="伝説の聖戦士 アシュギーネ" />
@@ -122,7 +122,7 @@ LZ93A13 (32 pin) - 8KB banks
 
 	<!-- Bottom line of status bar flickers; is it supposed to be like that? -->
 	<software name="ashguin2">
-		<description>Ashguine 2 - Kokuu no Gajou (Japan)</description>
+		<description>AshGuine 2 - Kokuu no Gajou (Japan)</description>
 		<year>1987</year>
 		<publisher>Panasoft / T&amp;E Soft</publisher>
 		<info name="serial" value="SW-M002" />
@@ -139,7 +139,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="ashguin3">
-		<description>Ashguine - Fukushuu no Honoo (Japan)</description>
+		<description>AshGuine - Fukushuu no Honoo (Japan)</description>
 		<year>1987</year>
 		<publisher>Panasoft / Micro Cabin</publisher>
 		<info name="serial" value="SW-M003" />
@@ -156,7 +156,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="ashguin3a" cloneof="ashguin3">
-		<description>Ashguine - Fukushuu no Honoo (Japan, alt)</description>
+		<description>AshGuine - Fukushuu no Honoo (Japan, alt)</description>
 		<year>1987</year>
 		<publisher>Panasoft / Micro Cabin</publisher>
 		<info name="alt_title" value="アシュギーネ 復讐の炎" />
@@ -1931,7 +1931,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="ashguin3b" cloneof="ashguin3">
-		<description>Ashguine - Fukushuu no Honoo (Japan, alt 2)</description>
+		<description>AshGuine - Fukushuu no Honoo (Japan, alt 2)</description>
 		<year>1987</year>
 		<publisher>Panasoft / Micro Cabin</publisher>
 		<info name="alt_title" value="アシュギーネ 復讐の炎"/>
@@ -2136,7 +2136,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="ehagaki" supported="no">
-		<description>Ehagaki-yō wāpuro (Japan)</description>
+		<description>Ehagaki-yō Wāpuro (Japan)</description>
 		<year>1985</year>
 		<publisher>Hitachi</publisher>
 		<notes>Included with Hitachi MB-H3. The MB-H3 touchpad is not emulated.</notes>
