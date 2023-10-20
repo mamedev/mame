@@ -445,7 +445,7 @@ private:
 	void display_rom_load_results(bool from_list);
 	void region_post_process(memory_region *region, bool invert);
 	std::unique_ptr<emu_file> open_rom_file(
-			search_paths searchpath,
+			const std::vector<std::string> &searchpath,
 			const rom_entry *romp,
 			std::vector<std::string> &tried_file_names,
 			bool from_list);
@@ -461,7 +461,7 @@ private:
 	void fill_rom_data(memory_region &region, const rom_entry *romp);
 	void copy_rom_data(memory_region &region, const rom_entry *romp);
 	void process_rom_entries(
-			search_paths searchpath,
+			const std::vector<std::string> &searchpath,
 			u8 bios,
 			memory_region &region,
 			const rom_entry *parent_region,

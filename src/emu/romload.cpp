@@ -712,7 +712,7 @@ void rom_load_manager::region_post_process(memory_region *region, bool invert)
 -------------------------------------------------*/
 
 std::unique_ptr<emu_file> rom_load_manager::open_rom_file(
-		search_paths searchpath,
+		const std::vector<std::string> &searchpath,
 		const rom_entry *romp,
 		std::vector<std::string> &tried_file_names,
 		bool from_list)
@@ -730,13 +730,8 @@ std::unique_ptr<emu_file> rom_load_manager::open_rom_file(
 
 	// attempt reading up the chain through the parents
 	// it also automatically attempts any kind of load by checksum supported by the archives.
-	std::unique_ptr<emu_file> result;
-	for (const std::vector<std::string> &paths : searchpath)
-	{
-		result = open_rom_file(paths, tried_file_names, has_crc, crc, ROM_GETNAME(romp), filerr);
-		if (result)
-			break;
-	}
+	std::unique_ptr<emu_file> result(
+			open_rom_file(searchpath, tried_file_names, has_crc, crc, ROM_GETNAME(romp), filerr));
 
 	// update counters
 	m_romsloaded++;
@@ -985,7 +980,7 @@ void rom_load_manager::copy_rom_data(memory_region &region, const rom_entry *rom
 -------------------------------------------------*/
 
 void rom_load_manager::process_rom_entries(
-		search_paths searchpath,
+		const std::vector<std::string> &searchpath,
 		u8 bios,
 		memory_region &region,
 		const rom_entry *parent_region,
@@ -1354,7 +1349,7 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 	m_romsloadedsize = 0;
 
 	std::vector<const software_info *> parents;
-	std::vector<std::string> swsearch, disksearch, devsearch;
+	std::vector<std::string> swsearch, disksearch;
 	const software_info *const swinfo = swlist.find(std::string(swname));
 	if (swinfo)
 	{
@@ -1382,11 +1377,6 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 
 	// this is convenient for CD-only lists so you don't need an extra level of directories containing one file each
 	disksearch.emplace_back(swlist.list_name());
-
-	// for historical reasons, add the search path for the software list device's owner
-	const device_t *const listowner = swlist.owner();
-	if (listowner)
-		devsearch = listowner->searchpath();
 
 	// loop until we hit the end
 	std::function<const rom_entry * ()> next_parent;
@@ -1436,10 +1426,7 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 		// now process the entries in the region
 		if (ROMREGION_ISROMDATA(region))
 		{
-			if (devsearch.empty())
-				process_rom_entries({ swsearch }, 0U, *memregion, region, region + 1, true);
-			else
-				process_rom_entries({ swsearch, devsearch }, 0U, *memregion, region, region + 1, true);
+			process_rom_entries(swsearch, 0U, *memregion, region, region + 1, true);
 		}
 		else if (ROMREGION_ISDISKDATA(region))
 		{
@@ -1449,15 +1436,9 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 					next_parent = next_parent_software(parents);
 				else
 					next_parent = [] () { return nullptr; };
-				if (devsearch.empty())
-					open_parent = open_parent_disk(machine().options(), { swsearch, disksearch }, next_parent);
-				else
-					open_parent = open_parent_disk(machine().options(), { swsearch, disksearch, devsearch }, next_parent);
+				open_parent = open_parent_disk(machine().options(), { swsearch, disksearch }, next_parent);
 			}
-			if (devsearch.empty())
-				process_disk_entries({ swsearch, disksearch }, regiontag, region + 1, next_parent, open_parent);
-			else
-				process_disk_entries({ swsearch, disksearch, devsearch }, regiontag, region + 1, next_parent, open_parent);
+			process_disk_entries({ swsearch, disksearch }, regiontag, region + 1, next_parent, open_parent);
 		}
 	}
 
@@ -1518,7 +1499,7 @@ void rom_load_manager::process_region_list()
 				if (searchpath.empty())
 					searchpath = device.searchpath();
 				assert(!searchpath.empty());
-				process_rom_entries({ searchpath }, device.system_bios(), *memregion, region, region + 1, false);
+				process_rom_entries(searchpath, device.system_bios(), *memregion, region, region + 1, false);
 			}
 			else if (ROMREGION_ISDISKDATA(region))
 			{
