@@ -12,9 +12,9 @@
 
 #pragma once
 
+#include "cpu/tlcs90/tlcs90.h"
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
-#include "cpu/tlcs90/tlcs90.h"
 #include "sound/msm5205.h"
 #include "sound/okim6295.h"
 #include "ms1_tmap.h"

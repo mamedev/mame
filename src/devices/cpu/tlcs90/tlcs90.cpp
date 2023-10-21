@@ -1431,14 +1431,18 @@ void tlcs90_device::execute_set_input(int inputnum, int state)
 
 void tlcs90_device::set_irq_line(int irq, int state)
 {
+	if ( ((m_irq_line_state >> irq)&1) == state ) return;
+
 	if (state)
 	{
 		raise_irq(irq);
+		m_irq_line_state |= 1 << irq;
 	}
 	else
 	{
 		if (irq == INT0 && (m_p8cr & 1) == 0)
 			clear_irq(irq);
+		m_irq_line_state &= ~(1 << irq);
 	}
 }
 

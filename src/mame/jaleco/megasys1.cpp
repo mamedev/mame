@@ -419,6 +419,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(megasys1_bc_iomcu_state::megasys1C_bigstrik_scanlin
 		LOG("%s: megasys1C_bigstrik_scanline: Send INT1 to MCU: (scanline %03d)\n", machine().describe_context(), scanline);
 		m_iomcu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 	}
+
+    if(scanline == 224) // start of vblank (falling edge)
+    {
+        LOG("%s: megasys1C_bigstrik_scanline: Clear INT1 to MCU: (scanline %03d)\n", machine().describe_context(), scanline);
+        m_iomcu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
+    }
 }
 
 void megasys1_state::ram_w(offs_t offset, u16 data)
@@ -535,7 +541,7 @@ void megasys1_bc_iomcu_state::ip_select_bigstrik_w(u16 data) // TO MCU
 
 	m_mcu_input_data = data;
 
-	m_iomcu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+	m_iomcu->pulse_input_line(INPUT_LINE_IRQ0, attotime::from_ticks(1, m_maincpu->clock()));
 }
 
 void megasys1_bc_iomcu_state::iomcu_map(address_map &map)
@@ -1855,7 +1861,7 @@ void megasys1_state::system_A(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, SYS_A_CPU_CLOCK); /* 6MHz verified */
 	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_state::megasys1A_map);
-	TIMER(config, m_scantimer).configure_scanline(FUNC(megasys1_state::megasys1A_scanline), "screen", 0, 1);
+	TIMER(config, m_scantimer).configure_scanline(FUNC(megasys1_state::megasys1A_scanline), m_screen, 0, 1);
 
 	M68000(config, m_audiocpu, SOUND_CPU_CLOCK); /* 7MHz verified */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &megasys1_state::megasys1A_sound_map);
@@ -1875,11 +1881,11 @@ void megasys1_state::system_A(machine_config &config)
 	PALETTE(config, m_palette, FUNC(megasys1_state::megasys1_palette)).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x800/2);
 
 	MEGASYS1_TILEMAP(config, m_tmap[0], m_palette, 256*0);
-	m_tmap[0]->set_screen_tag("screen");
+	m_tmap[0]->set_screen_tag(m_screen);
 	MEGASYS1_TILEMAP(config, m_tmap[1], m_palette, 256*1);
-	m_tmap[1]->set_screen_tag("screen");
+	m_tmap[1]->set_screen_tag(m_screen);
 	MEGASYS1_TILEMAP(config, m_tmap[2], m_palette, 256*2);
-	m_tmap[2]->set_screen_tag("screen");
+	m_tmap[2]->set_screen_tag(m_screen);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1905,7 +1911,7 @@ void megasys1_state::system_A(machine_config &config)
 void megasys1_state::system_A_iganinju(machine_config &config)
 {
 	system_A(config);
-	TIMER(config.replace(), m_scantimer).configure_scanline(FUNC(megasys1_state::megasys1A_iganinju_scanline), "screen", 0, 1);
+	TIMER(config.replace(), m_scantimer).configure_scanline(FUNC(megasys1_state::megasys1A_iganinju_scanline), m_screen, 0, 1);
 }
 
 void megasys1_state::system_A_soldam(machine_config &config)
@@ -1995,7 +2001,7 @@ void megasys1_state::system_Bbl(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 12_MHz_XTAL / 2); // edfbl has lower clock, verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_state::megasys1B_edfbl_map);
-	TIMER(config, m_scantimer).configure_scanline(FUNC(megasys1_state::megasys1B_scanline), "screen", 0, 1);
+	TIMER(config, m_scantimer).configure_scanline(FUNC(megasys1_state::megasys1B_scanline), m_screen, 0, 1);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -2012,11 +2018,11 @@ void megasys1_state::system_Bbl(machine_config &config)
 	PALETTE(config, m_palette, FUNC(megasys1_state::megasys1_palette)).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x800/2);
 
 	MEGASYS1_TILEMAP(config, m_tmap[0], m_palette, 256*0);
-	m_tmap[0]->set_screen_tag("screen");
+	m_tmap[0]->set_screen_tag(m_screen);
 	MEGASYS1_TILEMAP(config, m_tmap[1], m_palette, 256*1);
-	m_tmap[1]->set_screen_tag("screen");
+	m_tmap[1]->set_screen_tag(m_screen);
 	MEGASYS1_TILEMAP(config, m_tmap[2], m_palette, 256*2);
-	m_tmap[2]->set_screen_tag("screen");
+	m_tmap[2]->set_screen_tag(m_screen);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -2113,9 +2119,9 @@ void megasys1_state::system_D(machine_config &config)
 	PALETTE(config, m_palette, FUNC(megasys1_state::megasys1_palette)).set_format(palette_device::RGBx_555, 0x800/2);
 
 	MEGASYS1_TILEMAP(config, m_tmap[0], m_palette, 256*0);
-	m_tmap[0]->set_screen_tag("screen");
+	m_tmap[0]->set_screen_tag(m_screen);
 	MEGASYS1_TILEMAP(config, m_tmap[1], m_palette, 256*1);
-	m_tmap[1]->set_screen_tag("screen");
+	m_tmap[1]->set_screen_tag(m_screen);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2144,7 +2150,7 @@ void megasys1_typez_state::system_Z(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, SYS_A_CPU_CLOCK); /* 6MHz (12MHz / 2) */
 	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_typez_state::megasys1Z_map);
-	TIMER(config, m_scantimer).configure_scanline(FUNC(megasys1_typez_state::megasys1A_scanline), "screen", 0, 1);
+	TIMER(config, m_scantimer).configure_scanline(FUNC(megasys1_typez_state::megasys1A_scanline), m_screen, 0, 1);
 
 	Z80(config, m_audiocpu, 3000000); /* OSC 12MHz divided by 4 ??? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &megasys1_typez_state::z80_sound_map);
@@ -2163,9 +2169,9 @@ void megasys1_typez_state::system_Z(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x800/2);
 
 	MEGASYS1_TILEMAP(config, m_tmap[0], m_palette, 256*0);
-	m_tmap[0]->set_screen_tag("screen");
+	m_tmap[0]->set_screen_tag(m_screen);
 	MEGASYS1_TILEMAP(config, m_tmap[1], m_palette, 256*2);
-	m_tmap[1]->set_screen_tag("screen");
+	m_tmap[1]->set_screen_tag(m_screen);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

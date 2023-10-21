@@ -18,7 +18,6 @@
 
 #include "emu.h"
 #include "ms1_tmap.h"
-#include "screen.h"
 
 static constexpr int TILES_PER_PAGE_X = 0x20;
 static constexpr int TILES_PER_PAGE_Y = 0x20;
