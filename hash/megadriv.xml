@@ -32,28 +32,9 @@ license:CC0-1.0
     WORLD CUP SOCCER                    JAPAN/USA   we have v1.0 (Rev ?), v1.2 (Rev ?) and v1.3 (Rev B), v1.1 (Rev ?) needed
     WORLD OF ILLUSION                   JAPAN       we have v1.0 (Rev 0?), v1.1 (Rev A?) needed (confirmed by Xacrow)
 
-
-Known missing entries from the Sega Game Toshokan service:
-	Columns (1991)
-	Flicky (1990)
-	Kinetic Connection ① Nei Second (1991)
-	Kinetic Connection ② Ohana Batake (1991)
-	Kinetic Connection ③ Shirogane wa Warau yo (1991)
-	Kinetic Connection ④ Mogura no Oasobi (1991)
-	Kinetic Connection ⑤ Lightning Nei (1991)
-	Pyramid Magic Editor (1991)
-	Pyramid Magic Editor (1991)
-	Pyramid Magic Soushuuhen (1992)
-	Pyramid Magic Yokokuhen (1990)
-	Sega Music Collection Phantasy Star III (1991)
-	Sega Music Collection Bonanza Brothers (1991)
-	Sega Music Collection Sonic The Hedgehog (1991)
-	Taiketsu! Columns (1991)
-
 Known undumped cartridges for the HeartBeat Personal Trainer:
 	NHLPA Hockey (1994)
 	Outworld 2375 AD (1994)
-
 
 Known undumped protos
 
@@ -80,6 +61,26 @@ Known undumped pirates
   * Chinese Checkers (by RealTec) - 中國象棋 ?
   * Shizen Mahjong / Competition Mahjong (by Sachen, apparently dumped but hoarded)
   * Magic 7 Block - 百変七巧板
+
+
+Sega Game Toshokan games could be downloaded via the Mega Modem while a subscription was active. The existing dumps were either extracted from Sega's B-Club! game rental service or ripped from the Game no Kanzume compilations.
+Known missing entries from the Sega Game Toshokan service:
+	Columns (1991)
+	Flicky (1990)
+	Kinetic Connection ① Nei Second (1991)
+	Kinetic Connection ② Ohana Batake (1991)
+	Kinetic Connection ③ Shirogane wa Warau yo (1991)
+	Kinetic Connection ④ Mogura no Oasobi (1991)
+	Kinetic Connection ⑤ Lightning Nei (1991)
+	Pyramid Magic Editor (1991)
+	Pyramid Magic Editor (1991)
+	Pyramid Magic Soushuuhen (1992)
+	Pyramid Magic Yokokuhen (1990)
+	Sega Music Collection Phantasy Star III (1991)
+	Sega Music Collection Bonanza Brothers (1991)
+	Sega Music Collection Sonic The Hedgehog (1991)
+	Taiketsu! Columns (1991)
+
 
 TODO:
 - Phantasy Star (serial G-4534, pstarjmd) is actually a SMS cart in MD shell,
@@ -10125,7 +10126,7 @@ but dumps still have to be confirmed.
 	</software>
 
 	<software name="16ton" supported="yes">
-		<description>16 Ton (Japan, SegaNet)</description>
+		<description>16t (Japan, Sega Game Toshokan)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -10136,7 +10137,7 @@ but dumps still have to be confirmed.
 	</software>
 
 	<software name="16tongnk" cloneof="16ton">
-		<description>16 Ton (Japan, Game no Kandume MegaCD rip)</description>
+		<description>16t (Japan, ripped from Game no Kanzume Vol. 2)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -11325,7 +11326,7 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 	</software>
 
 	<software name="aworg">
-		<description>Aworg (Japan, SegaNet)</description>
+		<description>Aworg (Japan, Sega Game Toshokan)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -14874,7 +14875,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="dokidoki">
-		<description>Ikazuse! Koi no Doki Doki Penguin Land MD (Japan, SegaNet)</description>
+		<description>Ikazuse! Koi no Doki Doki Penguin Land MD (Japan, Sega Game Toshokan)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -14885,7 +14886,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="dokidokignk" cloneof="dokidoki">
-		<description>Ikazuse! Koi no Doki Doki Penguin Land MD (Japan, Game no Kandume MegaCD rip)</description>
+		<description>Ikazuse! Koi no Doki Doki Penguin Land MD (Japan, ripped from Game no Kanzume Vol. 2)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -16316,7 +16317,7 @@ https://segaretro.org/Elitserien_96
 	</software>
 
 	<software name="labdeath" cloneof="fatallab">
-		<description>Shi no Meikyuu - Labyrinth of Death (Japan, SegaNet)</description>
+		<description>Shi no Meikyuu - Labyrinth of Death (Japan, Sega Game Toshokan)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -16327,7 +16328,7 @@ https://segaretro.org/Elitserien_96
 	</software>
 
 	<software name="labdeathgnk" cloneof="fatallab">
-		<description>Shi no Meikyuu - Labyrinth of Death (Japan, Game no Kandume MegaCD rip)</description>
+		<description>Shi no Meikyuu - Labyrinth of Death (Japan, ripped from Game no Kanzume Vol. 2)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -17787,7 +17788,7 @@ Unemulated [Sega Mega Modem] features
 	</software>
 
 	<software name="hyperm">
-		<description>Hyper Marbles (Japan, SegaNet)</description>
+		<description>Hyper Marbles (Japan, Sega Game Toshokan)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -17798,7 +17799,7 @@ Unemulated [Sega Mega Modem] features
 	</software>
 
 	<software name="hypermgnk" cloneof="hyperm">
-		<description>Hyper Marbles (Japan, Game no Kandume MegaCD rip)</description>
+		<description>Hyper Marbles (Japan, ripped from Game no Kanzume Vol. 1)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -18789,7 +18790,7 @@ Black screen
 	</software>
 
 	<software name="kissshot">
-		<description>Kiss Shot (Japan, SegaNet)</description>
+		<description>Kiss Shot (Japan, Sega Game Toshokan)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -19890,7 +19891,7 @@ https://segaretro.org/Ma_Qiao_E_Mo_Ta:_Devilish_Mahjong_Tower
 	</software>
 
 	<software name="medalc">
-		<description>Medal City (Japan, SegaNet)</description>
+		<description>Medal City (Japan, Sega Game Toshokan)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -20045,7 +20046,7 @@ https://segaretro.org/Ma_Qiao_E_Mo_Ta:_Devilish_Mahjong_Tower
 	</software>
 
 	<software name="megamind">
-		<description>MegaMind (Japan, SegaNet)</description>
+		<description>MegaMind (Japan, Sega Game Toshokan)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -22826,7 +22827,7 @@ Black screen at intro
 	</software>
 
 	<software name="paddle">
-		<description>Paddle Fighter (Japan, SegaNet)</description>
+		<description>Paddle Fighter (Japan, Sega Game Toshokan)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -22837,7 +22838,7 @@ Black screen at intro
 	</software>
 
 	<software name="paddlegnk" cloneof="paddle">
-		<description>Paddle Fighter (Japan, Game no Kandume MegaCD rip)</description>
+		<description>Paddle Fighter (Japan, ripped from Game no Kanzume Vol. 1)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -23169,7 +23170,7 @@ Black screen at intro
 	</software>
 
 	<software name="ps2aa">
-		<description>Phantasy Star II - Amia's Adventure (Japan, SegaNet)</description>
+		<description>Phantasy Star II - Amia's Adventure (Japan, Sega Game Toshokan)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -23180,7 +23181,7 @@ Black screen at intro
 	</software>
 
 	<software name="ps2ab">
-		<description>Phantasy Star II - Anne's Adventure (Japan, SegaNet)</description>
+		<description>Phantasy Star II - Anne's Adventure (Japan, Sega Game Toshokan)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -23191,7 +23192,7 @@ Black screen at intro
 	</software>
 
 	<software name="ps2ac">
-		<description>Phantasy Star II - Huey's Adventure (Japan, SegaNet)</description>
+		<description>Phantasy Star II - Huey's Adventure (Japan, Sega Game Toshokan)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -23202,7 +23203,7 @@ Black screen at intro
 	</software>
 
 	<software name="ps2ad">
-		<description>Phantasy Star II - Kinds's Adventure (Japan, SegaNet)</description>
+		<description>Phantasy Star II - Kinds's Adventure (Japan, Sega Game Toshokan)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -23213,7 +23214,7 @@ Black screen at intro
 	</software>
 
 	<software name="ps2ae">
-		<description>Phantasy Star II - Nei's Adventure (Japan, SegaNet)</description>
+		<description>Phantasy Star II - Nei's Adventure (Japan, Sega Game Toshokan)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -23224,7 +23225,7 @@ Black screen at intro
 	</software>
 
 	<software name="ps2af">
-		<description>Phantasy Star II - Rudger's Adventure (Japan, SegaNet)</description>
+		<description>Phantasy Star II - Rudger's Adventure (Japan, Sega Game Toshokan)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -23235,7 +23236,7 @@ Black screen at intro
 	</software>
 
 	<software name="ps2ag">
-		<description>Phantasy Star II - Shilka's Adventure (Japan, SegaNet)</description>
+		<description>Phantasy Star II - Shilka's Adventure (Japan, Sega Game Toshokan)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -23246,7 +23247,7 @@ Black screen at intro
 	</software>
 
 	<software name="ps2ah">
-		<description>Phantasy Star II - Yushis's Adventure (Japan, SegaNet)</description>
+		<description>Phantasy Star II - Yushis's Adventure (Japan, Sega Game Toshokan)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -23977,7 +23978,7 @@ Black screen
 	</software>
 
 	<software name="putter">
-		<description>Putter Golf (Japan, SegaNet)</description>
+		<description>Putter Golf (Japan, Sega Game Toshokan)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -23988,7 +23989,7 @@ Black screen
 	</software>
 
 	<software name="puttergnk" cloneof="putter">
-		<description>Putter Golf (Japan, Game no Kandume MegaCD rip)</description>
+		<description>Putter Golf (Japan, ripped from Game no Kanzume Vol. 2)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -24070,7 +24071,7 @@ Black screen
 	</software>
 
 	<software name="pyramid">
-		<description>Pyramid Magic (Japan, SegaNet)</description>
+		<description>Pyramid Magic (Japan, Sega Game Toshokan)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -24081,7 +24082,7 @@ Black screen
 	</software>
 
 	<software name="pyramidgnk" cloneof="pyramid">
-		<description>Pyramid Magic (Japan, Game no Kandume MegaCD rip)</description>
+		<description>Pyramid Magic (Japan, ripped from Game no Kanzume Vol. 1)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -24092,7 +24093,7 @@ Black screen
 	</software>
 
 	<software name="pyramid2">
-		<description>Pyramid Magic II (Japan, SegaNet)</description>
+		<description>Pyramid Magic II (Japan, Sega Game Toshokan)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -24103,7 +24104,7 @@ Black screen
 	</software>
 
 	<software name="pyramid3">
-		<description>Pyramid Magic III (Japan, SegaNet)</description>
+		<description>Pyramid Magic III (Japan, Sega Game Toshokan)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -24114,7 +24115,7 @@ Black screen
 	</software>
 
 	<software name="pyramids">
-		<description>Pyramid Magic Special (Japan, SegaNet)</description>
+		<description>Pyramid Magic Special (Japan, Sega Game Toshokan)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -24666,7 +24667,7 @@ Red screen
 	</software>
 
 	<software name="riddle">
-		<description>Riddle Wired (Japan, SegaNet)</description>
+		<description>Riddle Wired (Japan, Sega Game Toshokan)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -24962,7 +24963,7 @@ Red screen
 	</software>
 
 	<software name="robotbat">
-		<description>Robot Battler (Japan, SegaNet)</description>
+		<description>Robot Battler (Japan, Sega Game Toshokan)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -26482,7 +26483,7 @@ https://bootleggames.fandom.com/wiki/Shui_Hu_Feng_Yun_Zhuan
 	</software>
 
 	<software name="sonicer">
-		<description>Sonic Eraser (Japan, SegaNet)</description>
+		<description>Sonic Eraser (Japan, Sega Game Toshokan)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -29104,7 +29105,7 @@ Freezes at the start of any in-game mode
 	</software>
 
 	<software name="teddyboy" supported="partial">
-		<description>Teddy Boy Blues (Japan, SegaNet)</description>
+		<description>Teddy Boy Blues (Japan, Sega Game Toshokan)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
