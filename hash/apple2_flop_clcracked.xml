@@ -50348,7 +50348,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="pfse841126" cloneof="pfsreport">
+	<software name="pfsreportf841126" cloneof="pfsreport">
 		<description>pfs: etat (French, version 1984-11-26) (4am crack)</description>
 		<!--French version of pfs: report-->
 		<year>1984</year>
@@ -50366,7 +50366,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="pfsfich841126" cloneof="pfsfile">
+	<software name="pfsfilef841126" cloneof="pfsfile">
 		<description>pfs: fichier (French, version 1984-11-26) (4am crack)</description>
 		<!--French version of pfs: file-->
 		<year>1984</year>
@@ -50384,7 +50384,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="pfsfa00" cloneof="pfsfile">
+	<software name="pfsfilea00" cloneof="pfsfile">
 		<description>pfs: file (version A.00) (4am crack)</description>
 		<year>1983</year>
 		<publisher>Software Publishing Corporation</publisher>
@@ -50401,7 +50401,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="pfsfb01" cloneof="pfsfile">
+	<software name="pfsfileb01" cloneof="pfsfile">
 		<description>pfs: file (version B.01) (4am crack)</description>
 		<year>1982</year>
 		<publisher>Software Publishing Corporation</publisher>
@@ -50418,7 +50418,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="pfsfc00" cloneof="pfsfile">
+	<software name="pfsfilec00" cloneof="pfsfile">
 		<description>pfs: file (version C.00) (4am crack)</description>
 		<year>1984</year>
 		<publisher>Software Publishing Corporation</publisher>
@@ -50452,7 +50452,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="pfsg830112" cloneof="pfsgraph">
+	<software name="pfsgraph830112" cloneof="pfsgraph">
 		<description>pfs: graph (version 1983-01-12) (4am crack)</description>
 		<year>1983</year>
 		<publisher>Software Publishing Corporation</publisher>
@@ -50469,7 +50469,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="pfsg840131" cloneof="pfsgraph">
+	<software name="pfsgraph840131" cloneof="pfsgraph">
 		<description>pfs: graph (version 1984-01-31) (4am crack)</description>
 		<year>1984</year>
 		<publisher>Software Publishing Corporation</publisher>
@@ -50503,7 +50503,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="pfsrb00" cloneof="pfsreport">
+	<software name="pfsreportb00" cloneof="pfsreport">
 		<description>pfs: report (version B.00, 1981-01-03) (4am crack)</description>
 		<year>1981</year>
 		<publisher>Software Publishing Corporation</publisher>
@@ -50520,7 +50520,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="pfsrb02" cloneof="pfsreport">
+	<software name="pfsreportb02" cloneof="pfsreport">
 		<description>pfs: report (version B.02) (4am crack)</description>
 		<year>1982</year>
 		<publisher>Software Publishing Corporation</publisher>
@@ -50537,7 +50537,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="pfsr820114" cloneof="pfsreport">
+	<software name="pfsreport820114" cloneof="pfsreport">
 		<description>pfs: report (version 1982-01-14) (4am crack)</description>
 		<year>1982</year>
 		<publisher>Software Publishing Corporation</publisher>
@@ -50554,7 +50554,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="pfsr840320" cloneof="pfsreport">
+	<software name="pfsreport840320" cloneof="pfsreport">
 		<description>pfs: report (version 1984-03-20) (4am crack)</description>
 		<year>1984</year>
 		<publisher>Software Publishing Corporation</publisher>
@@ -50588,7 +50588,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="pfsw840927" cloneof="pfswrite">
+	<software name="pfswrite840927" cloneof="pfswrite">
 		<description>pfs: write (version 1984-09-27) (4am crack)</description>
 		<year>1984</year>
 		<publisher>Software Publishing Corporation</publisher>
@@ -50605,7 +50605,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="pfsw841101" cloneof="pfswrite">
+	<software name="pfswrite841101" cloneof="pfswrite">
 		<description>pfs: write (version 1984-11-01) (4am crack)</description>
 		<year>1984</year>
 		<publisher>Software Publishing Corporation</publisher>
@@ -50622,7 +50622,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="pfsw860101" cloneof="pfswrite">
+	<software name="pfswrite860101" cloneof="pfswrite">
 		<description>pfs: write (version 1986-01-01) (4am crack)</description>
 		<year>1986</year>
 		<publisher>Software Publishing Corporation</publisher>
