@@ -21,7 +21,6 @@ license:CC0-1.0
     NFL PRO FOOTBALL '94                JAPAN
     OSAKA BANK MY LINE                  JAPAN
     OSAKA BANK MY LINE DEMO             JAPAN
-    OUTBACK JOEY - PERSONAL TRAINER     ???         http://www.guardiana.net/MDG-Database/Mega%20Drive/Outback%20Joey/#v3553
     PGA TOUR GOLF                       USA/PAL     we have v1.1 and v1.2, v1.0 needed (does it exist?)
     PRO VERSION ACTION REPLAY           PAL         Datel's 2nd Action Replay release
     ROAD RASH                           USA         needs proper dump
@@ -32,6 +31,28 @@ license:CC0-1.0
     WONDER MIDI                         JAPAN
     WORLD CUP SOCCER                    JAPAN/USA   we have v1.0 (Rev ?), v1.2 (Rev ?) and v1.3 (Rev B), v1.1 (Rev ?) needed
     WORLD OF ILLUSION                   JAPAN       we have v1.0 (Rev 0?), v1.1 (Rev A?) needed (confirmed by Xacrow)
+
+
+Known missing entries from the Sega Game Toshokan service:
+	Columns (1991)
+	Flicky (1990)
+	Kinetic Connection ① Nei Second (1991)
+	Kinetic Connection ② Ohana Batake (1991)
+	Kinetic Connection ③ Shirogane wa Warau yo (1991)
+	Kinetic Connection ④ Mogura no Oasobi (1991)
+	Kinetic Connection ⑤ Lightning Nei (1991)
+	Pyramid Magic Editor (1991)
+	Pyramid Magic Editor (1991)
+	Pyramid Magic Soushuuhen (1992)
+	Pyramid Magic Yokokuhen (1990)
+	Sega Music Collection Phantasy Star III (1991)
+	Sega Music Collection Bonanza Brothers (1991)
+	Sega Music Collection Sonic The Hedgehog (1991)
+	Taiketsu! Columns (1991)
+
+Known undumped cartridges for the HeartBeat Personal Trainer:
+	NHLPA Hockey (1994)
+	Outworld 2375 AD (1994)
 
 
 Known undumped protos
@@ -35062,6 +35083,39 @@ Has missing sound samples (i.e. tire screech, "time bonus" on checkpoints)
 			<feature name="ic5" value="HC08"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="mpr-16419-t.ic2" size="2097152" crc="7e1a324a" sha1="ff969ae53120cc4e7cb1a8a7e47458f2eb8a2165"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+	<!--
+		Games for the HeartBeat Personal Trainer.
+		These require use of the HeartBeat Catalyst fitness sensor.
+	-->
+
+    <software name="outbackj" supported="no">
+        <description>Outback Joey (HeartBeat Personal Trainer)</description>
+        <year>1993</year>
+        <publisher>HeartBeat Corporation</publisher>
+		<info name="usage" value="Requires HeartBeat Catalyst fitness sensor." />
+        <part name="cart" interface="megadriv_cart">
+            <dataarea name="rom" width="16" endianness="big" size="1048576">
+                <rom name="outback joey.bin" size="1048576" crc="10abd93f" sha1="ec2eef751bc8515bc99293d96f833270916c9af7" />
+            </dataarea>
+        </part>
+    </software>
+
+	<software name="pga2hb" cloneof="pga2" supported="no">
+		<description>PGA Tour Golf II (HeartBeat Personal Trainer)</description>
+		<year>1995</year>
+        <publisher>HeartBeat Corporation</publisher>
+		<info name="usage" value="Requires HeartBeat Catalyst fitness sensor." />
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram" />
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="pga_tour_golf_u.bin" size="1048576" crc="3eff8b37" sha1="c9c18b389a9afc5f30ab5d457f8f72e1966ff1e6" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
