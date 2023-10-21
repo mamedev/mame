@@ -2,8 +2,13 @@
 // copyright-holders:R. Belmont, Olivier Galibert
 /*************************************************************************************
 
-    Yamaha MU-80 and MU-100 : 32-voice polyphonic/multitimbral General MIDI/GS/XG tone modules
+    Yamaha MU-100 : 32-part, 64-voice polyphonic/multitimbral General MIDI/GS/XG
+                    tone module
     Preliminary driver by R. Belmont and O. Galibert
+
+    The successor to the mu90, uses the same one-chip SWP30 with a better sample rom.
+    Exists in rackable (mu100r) and screenless (mu100b), and single board (xt446)
+    variants.
 
     MU100 CPU: Hitachi H8S/2655 (HD6432655F), strapped for mode 4 (24-bit address, 16-bit data, no internal ROM)
     Sound ASIC: Yamaha XS725A0/SWP30
