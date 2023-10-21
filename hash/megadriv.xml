@@ -16933,7 +16933,7 @@ https://segaretro.org/Feng_Shen_Ying_Jie_Chuan
 	<software name="gamenko">
 		<description>Game no Kanzume Otokuyou (Japan, Sega Channel)</description>
 		<year>1995</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
 				<rom name="game no kanzume otokuyou (jpn).bin" size="3145728" crc="cdad7e6b" sha1="31c66bd13abf4ae8271c09ec5286a0ee0289dbbc"/>
