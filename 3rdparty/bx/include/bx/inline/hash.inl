@@ -73,9 +73,8 @@ namespace bx
 	inline void HashMurmur2A::begin(uint32_t _seed)
 	{
 		m_hash  = _seed;
-		m_tail  = 0;
-		m_count = 0;
 		m_size  = 0;
+		m_count = 0;
 	}
 
 	inline void HashMurmur2A::add(const char* _data)
@@ -90,6 +89,29 @@ namespace bx
 
 	template<typename Ty>
 	inline void HashMurmur2A::add(const Ty& _data)
+	{
+		add(&_data, sizeof(Ty) );
+	}
+
+	inline void HashMurmur3::begin(uint32_t _seed)
+	{
+		m_hash  = _seed;
+		m_size  = 0;
+		m_count = 0;
+	}
+
+	inline void HashMurmur3::add(const char* _data)
+	{
+		return add(StringView(_data) );
+	}
+
+	inline void HashMurmur3::add(const StringView& _data)
+	{
+		return add(_data.getPtr(), _data.getLength() );
+	}
+
+	template<typename Ty>
+	inline void HashMurmur3::add(const Ty& _data)
 	{
 		add(&_data, sizeof(Ty) );
 	}
