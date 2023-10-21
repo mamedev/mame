@@ -9,11 +9,11 @@
 
 #include "mulcd.lh"
 
-DEFINE_DEVICE_TYPE(MULCD, mulcd_device, "mulcd", "Yamaha MU/VL70/FS1R common LCD")
+DEFINE_DEVICE_TYPE(MULCD,   mulcd_device,   "mulcd",   "Yamaha MU/VL70/FS1R common LCD")
 
 ROM_START( mulcd )
-	ROM_REGION( 524998, "screen", 0)
-	ROM_LOAD( "mulcd.svg", 0, 524998, CRC(fe07d6c6) SHA1(57a760f77f0f458c8657491f77db2057edc767aa))
+	ROM_REGION( 525021, "screen", 0)
+	ROM_LOAD( "mulcd.svg", 0, 525021, CRC(81eba091) SHA1(d998f4b508555ddd56b187a868311cd34f28e077))
 
 	ROM_REGION( 0x1000, "hd44780", 0)
 	// Hand made, 3 characters unused
