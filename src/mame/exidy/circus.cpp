@@ -621,6 +621,6 @@ GAME(  1977, robotbwl, 0,      robotbwl, robotbwl, robotbwl_state, empty_init, R
 
 GAMEL( 1979, crash,    0,      crash,    crash,    crash_state,    empty_init, ROT0, "Exidy", "Crash (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_crash )
 GAMEL( 1979, crasha,   crash,  crash,    crash,    crash_state,    empty_init, ROT0, "Exidy", "Crash (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_crasha )
-GAMEL( 1979, smash,    crash,  crash,    crash,    crash_state,    empty_init, ROT0, "bootleg", "Smash (Crash bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_crash ) // looks like a text hack, but it also had a different bezel
+GAMEL( 1979, smash,    crash,  crash,    crash,    crash_state,    empty_init, ROT0, "bootleg", "Smash (bootleg of Crash)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_crash ) // looks like a text hack, but it also had a different bezel
 
 GAME(  1979, ripcord,  0,      ripcord,  ripcord,  ripcord_state,  empty_init, ROT0, "Exidy", "Rip Cord", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

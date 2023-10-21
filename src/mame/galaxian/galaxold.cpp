@@ -2514,8 +2514,8 @@ GAME( 1982, tazzmang,  tazmania, tazzmang,  tazzmang,  galaxold_state, empty_ini
 GAME( 1982, tazzmang2, tazmania, tazzmang,  tazzmang,  galaxold_state, empty_init,     ROT90,  "bootleg",                       "Tazz-Mania (bootleg on Galaxian hardware with Starfield)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 // Videotron cartridge system
-GAME( 1981, hustlerb3, hustler,  videotron, hustlerb3, galaxold_state, empty_init,     ROT90,  "bootleg (Videotron)",            "Video Pool (Video Hustler bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, froggerv,  frogger,  videotron, froggerv,  galaxold_state, empty_init,     ROT90,  "bootleg (Videotron / Gamepack)", "Frogger (Videotron bootleg)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1981, hustlerb3, hustler,  videotron, hustlerb3, galaxold_state, empty_init,     ROT90,  "bootleg (Videotron)",            "Video Pool (bootleg of Video Hustler)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, froggerv,  frogger,  videotron, froggerv,  galaxold_state, empty_init,     ROT90,  "bootleg (Videotron / Gamepack)", "Frogger (Videotron bootleg)",           MACHINE_SUPPORTS_SAVE )
 
 // S2650 games
 //    YEAR  NAME       PARENT    MACHINE    INPUT      STATE           INIT            ROT     COMPANY,                                               FULLNAME,                                                      FLAGS
