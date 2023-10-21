@@ -2,16 +2,16 @@
 // copyright-holders:R. Belmont
 /***************************************************************************
 
-	RasterOps ColorVue 8LC
+    RasterOps ColorVue 8LC
     1, 2, 4, and 8 bpp at 1024x768 for the Macintosh LC
 
     This is the same hardware as the ClearVueGS/LC board, which shows grayscale.
     Both cards are documented to only work with the original LC due to some shortcuts
-	taken in how they map the address space.
+    taken in how they map the address space.
 
     Note: the current ROM is a prototype from a former ROPS employee.
-	RasterOps' graphics driver software doesn't recognize it to enable the pan/zoom functionality.
-	ROM dumps from a retail card would resolve several questions.
+    RasterOps' graphics driver software doesn't recognize it to enable the pan/zoom functionality.
+    ROM dumps from a retail card would resolve several questions.
 
     Map:
     0xXXX00000: VRAM (768K)
@@ -27,9 +27,9 @@
     bit 8: monitor sense (1 = connected)
     bit 11: Display enable switch on the 708+/SE this is derived from
 
-	TODO:
-	- Get real declaration ROMs for 8LC and ClearVueGS/LC and other related cards
-	- Implement pan/zoom functionality if supported, which likely requires VRAM to go through the TMS34061
+    TODO:
+    - Get real declaration ROMs for 8LC and ClearVueGS/LC and other related cards
+    - Implement pan/zoom functionality if supported, which likely requires VRAM to go through the TMS34061
 
 ***************************************************************************/
 

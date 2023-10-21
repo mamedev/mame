@@ -484,8 +484,8 @@ void rfslotsmcs48_state::exp2_p4_w(u8 data)  // coils and emcounters
 void rfslotsmcs48_state::exp2_p5_w(u8 data)  // game lights
 {
 	m_outbit[7] = BIT(data, 0);   // insert coin lamp
-	m_outbit[8] = BIT(data, 1);	  // fault lamp
-	m_outbit[9] = BIT(data, 2);	  // start lamp
+	m_outbit[8] = BIT(data, 1);   // fault lamp
+	m_outbit[9] = BIT(data, 2);   // start lamp
 	m_outbit[10] = BIT(data, 3);  // unused
 }
 
@@ -519,7 +519,7 @@ void rfslotsmcs48_state::kbd_sl_w(u8 data)
 {
 //  Scan Line
 	m_kbd_sl = data;
-    // logerror("I8279: Scan Line: %02X\n", data);
+	// logerror("I8279: Scan Line: %02X\n", data);
 }
 
 void rfslotsmcs48_state::disp_w(u8 data)
@@ -615,30 +615,30 @@ static INPUT_PORTS_START(babyfrts)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("SWA")  // switches order from schematics...
-	PORT_DIPNAME(0x01, 0x01, DEF_STR(Unknown))	PORT_DIPLOCATION("SWA:4")
+	PORT_DIPNAME(0x01, 0x01, DEF_STR(Unknown))  PORT_DIPLOCATION("SWA:4")
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_DIPSETTING(0x01, DEF_STR(Off))
-	PORT_DIPNAME(0x02, 0x02, DEF_STR(Unknown))	PORT_DIPLOCATION("SWA:3")
+	PORT_DIPNAME(0x02, 0x02, DEF_STR(Unknown))  PORT_DIPLOCATION("SWA:3")
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_DIPSETTING(0x02, DEF_STR(Off))
-	PORT_DIPNAME(0x04, 0x04, DEF_STR(Unknown))	PORT_DIPLOCATION("SWA:2")
+	PORT_DIPNAME(0x04, 0x04, DEF_STR(Unknown))  PORT_DIPLOCATION("SWA:2")
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_DIPSETTING(0x04, DEF_STR(Off))
-	PORT_DIPNAME(0x08, 0x08, DEF_STR(Unknown))	PORT_DIPLOCATION("SWA:1")
+	PORT_DIPNAME(0x08, 0x08, DEF_STR(Unknown))  PORT_DIPLOCATION("SWA:1")
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_DIPSETTING(0x08, DEF_STR(Off))
 
 	PORT_START("SWB")  // switches order from schematics...
-	PORT_DIPNAME(0x01, 0x01, DEF_STR(Unknown))	PORT_DIPLOCATION("SWB:4")
+	PORT_DIPNAME(0x01, 0x01, DEF_STR(Unknown))  PORT_DIPLOCATION("SWB:4")
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_DIPSETTING(0x01, DEF_STR(Off))
-	PORT_DIPNAME(0x02, 0x02, DEF_STR(Unknown))	PORT_DIPLOCATION("SWB:1")
+	PORT_DIPNAME(0x02, 0x02, DEF_STR(Unknown))  PORT_DIPLOCATION("SWB:1")
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_DIPSETTING(0x02, DEF_STR(Off))
-	PORT_DIPNAME(0x04, 0x04, DEF_STR(Unknown))	PORT_DIPLOCATION("SWB:2")
+	PORT_DIPNAME(0x04, 0x04, DEF_STR(Unknown))  PORT_DIPLOCATION("SWB:2")
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_DIPSETTING(0x04, DEF_STR(Off))
-	PORT_DIPNAME(0x08, 0x08, DEF_STR(Unknown))	PORT_DIPLOCATION("SWB:3")
+	PORT_DIPNAME(0x08, 0x08, DEF_STR(Unknown))  PORT_DIPLOCATION("SWB:3")
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_DIPSETTING(0x08, DEF_STR(Off))
 INPUT_PORTS_END
@@ -830,7 +830,7 @@ void rfslotsmcs48_state::ajofrin(machine_config &config)
      .----------------------------------.
      |    .-------------------------.   |
      |    |·························|   |
-	 |    '-------------------------'   |
+     |    '-------------------------'   |
      |             Xtal                 |
      |            6.000 MHz             |
      |           .--------------------. |
@@ -849,10 +849,10 @@ void rfslotsmcs48_state::ajofrin(machine_config &config)
      |          | GI AY-3-8910       |  |
      |          |                    |  |
      |          '--------------------'  |
-	 | .-------.                        |
+     | .-------.                        |
      | |· · · ·|                        |
      | '-------'                        |
-	 '----------------------------------'
+     '----------------------------------'
 
 */
 ROM_START(babyfrts)

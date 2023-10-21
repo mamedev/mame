@@ -33,7 +33,7 @@ const std::array<s32, 16> swp00_device::panmap = {
 
 bool swp00_device::istep(s32 &value, s32 limit, s32 step)
 {
-	//	fprintf(stderr, "istep(%x, %x, %x)\n", value, limit, step);
+	//  fprintf(stderr, "istep(%x, %x, %x)\n", value, limit, step);
 	if(value < limit) {
 		value += step;
 		if(value >= limit) {
@@ -78,7 +78,7 @@ s32 swp00_device::fpsub(s32 value, s32 step)
 	s32 e = value >> 24;
 	s32 m = (value & 0xffffff) | 0xfe000000;
 	m = e < 0xc ? m - (step << e) : (m >> (e - 0xb)) - (step << 0xb);
-	//	fprintf(stderr, "%07x %05x -> %x %08x\n", value, step, e, m);
+	//  fprintf(stderr, "%07x %05x -> %x %08x\n", value, step, e, m);
 	if(m >= 0)
 		return 0;
 	if(e >= 0xc)
@@ -93,13 +93,13 @@ s32 swp00_device::fpsub(s32 value, s32 step)
 		e ++;
 		m <<= 1;
 	}
-	
+
 	return (e << 24) | (m & 0xffffff);
 }
 
 bool swp00_device::fpstep(s32 &value, s32 limit, s32 step)
 {
-	//	fprintf(stderr, "fpstep(%x, %x, %x)\n", value, limit, step);
+	//  fprintf(stderr, "fpstep(%x, %x, %x)\n", value, limit, step);
 
 	// value, limit and step are 4.24 but step has its exponent and
 	// top four bits zero
@@ -578,7 +578,7 @@ void swp00_device::decay_speed_w(offs_t offset, u8 data)
 
 	m_stream->update();
 	m_decay_speed[chan] = data;
-	
+
 	if(data & 0x80)
 		m_decay[chan] = true;
 
@@ -834,7 +834,7 @@ u8 swp00_device::state_r()
 {
 	m_stream->update();
 
-	//	logerror("state_r %x.%02x\n", m_state_adr >> 5, m_state_adr & 0x1f);
+	//  logerror("state_r %x.%02x\n", m_state_adr >> 5, m_state_adr & 0x1f);
 	int chan = m_state_adr & 0x1f;
 	switch(m_state_adr & 0xe0) {
 	case 0x00:  // lpf value
@@ -905,8 +905,8 @@ u8 swp00_device::snd_r(offs_t offset)
 
 void swp00_device::snd_w(offs_t offset, u8 data)
 {
-	//	if(rr[offset] == data)
-	//		return;
+	//  if(rr[offset] == data)
+	//      return;
 
 	rr[offset] = data;
 

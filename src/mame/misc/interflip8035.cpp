@@ -38,7 +38,7 @@
   Sound CPU: I8035 @ 4 MHz.
   2K EPROM
 
-  4051 (8-channel analog multiplexers/demultiplexers) as DAC + resistor 
+  4051 (8-channel analog multiplexers/demultiplexers) as DAC + resistor
 
   3x I8243 (I/O expander)
   1x I8279 (programmable keyboard/display interface)
@@ -67,7 +67,7 @@
 
     - Auxiliary Lever Activation: The cam activates the Auxiliary Lever microswitch as it initiates the mechanism's forward movement
       when the player pulls the lever.
-    
+
     - Lever Microswitch Activation: The Lever microswitch is engaged when the cam reaches the end-of-tour position.
 
   The game is initiated by processing the combination of these signal events within the system.
@@ -115,7 +115,7 @@
 
 
   Error codes:
-  
+
   01: Physical RAM error.
   02: CPU/MCU error.
   03: Coin-In error.
@@ -278,7 +278,7 @@
 
      Toledo plays from 1 to 6 tokens.
      All coins bet in the central line, but usually
-	 the prize is multiplied by the number of inserted tokens.
+     the prize is multiplied by the number of inserted tokens.
 
 
          TOLEDO PAYTABLE                      PRIZE
@@ -409,7 +409,7 @@
 
      Sevilla plays from 1 to 3 tokens.
      All coins bet in the central line, but usually
-	 the prize is multiplied by the number of inserted tokens.
+     the prize is multiplied by the number of inserted tokens.
 
 
         SEVILLA PAYTABLE            PRIZE
@@ -541,7 +541,7 @@ private:
 	u8 m_mp2 = 0xff;
 	u8 m_int_flag = 0x00;
 
-	// Audio MCU Interface	
+	// Audio MCU Interface
 	u8 audio_io_r(offs_t offset);
 	void audio_io_w(offs_t offset, u8 data);
 	u8 audio_p2_r();
@@ -652,7 +652,7 @@ u8 interflip8035_state::main_io_r(offs_t offset)
 			// logerror("Data RAM Read Offs:%02X - Data:%02X\n", offset, ret);
 			break;
 		}
-		default: 
+		default:
 			ret =  0xff;
 	}
 	return ret;
@@ -681,32 +681,32 @@ void interflip8035_state::main_io_w(offs_t offset, u8 data)
 			break;
 		}
 	}
-	// logerror("%s: Main I/O Write Offs:%02X - Data: %02X\n", machine().describe_context(), offset, data);	
+	// logerror("%s: Main I/O Write Offs:%02X - Data: %02X\n", machine().describe_context(), offset, data);
 
 /* gpkd commands ( under revision)
 
 CMD  Binary
----- ---- ---- 
-0x25 0010-0101 -> 001 (1) - 00101	Code=1: Program Clock Divider 5 
+---- ---- ----
+0x25 0010-0101 -> 001 (1) - 00101   Code=1: Program Clock Divider 5
 
-0x0C 0000-1100 -> 000 (0) - 01-100	Code=0: Keyboard Display Mode Set. 
-									DD=01: 16 8bit character display.
-									KKK=100: Encoded Scan Sensor Matrix.
+0x0C 0000-1100 -> 000 (0) - 01-100  Code=0: Keyboard Display Mode Set.
+                                    DD=01: 16 8bit character display.
+                                    KKK=100: Encoded Scan Sensor Matrix.
 
-0xD6 1101-0110 -> 110 (6) - 101-10	Code=6: Clear
-									CD CD CD = 101: Clear all Zeroes
-									CF = 1: Fifo Status Cleared an the interrupt output line is reset.
-									        Also, the sensor raw pointer is set to row 0.
-									CA = 0: No Clear all bit.
+0xD6 1101-0110 -> 110 (6) - 101-10  Code=6: Clear
+                                    CD CD CD = 101: Clear all Zeroes
+                                    CF = 1: Fifo Status Cleared an the interrupt output line is reset.
+                                            Also, the sensor raw pointer is set to row 0.
+                                    CA = 0: No Clear all bit.
 
 0xA5 1010-0101 -> 101 (5) - 0-0101  Code=5: Display Write inhibit/blanking
-									x       = 0: 
-									IWA IWB = 01: Inhibit port B
-									BLA BLB = 01: Blank port B
+                                    x       = 0:
+                                    IWA IWB = 01: Inhibit port B
+                                    BLA BLB = 01: Blank port B
 
 0x90 1001-0000 -> 100 (4) - 1-0000  Code = 4: Write display Ram
-									AI = 1  : Autoincrement
-									AD AD AD AD = 0000: Buffer base address to write.
+                                    AI = 1  : Autoincrement
+                                    AD AD AD AD = 0000: Buffer base address to write.
 
 Then MPU sends gpkd data.
 
@@ -730,17 +730,17 @@ void interflip8035_state::audio_io_w(offs_t offset, u8 data)
 void interflip8035_state::main_p1_enc_data_w(u8 data)  // Encoded lamps. (Sevilla & Toledo)
 {
 /*
-	Port P1 Maincpu
-	===============
+    Port P1 Maincpu
+    ===============
 
-	P1.0 Coin Lamp Bit 0
-	P1.1 Coin Lamp Bit 1
-	P1.2 Coin Lamp Bit 2
-	P1.3 Interrupt Flag (enable/disable /INT via NAND Gate.)
-	P1.4 /CS PIA 1 - Debug: MPU usually writes 0x67, 0x6f, 0xe7 or 0xef to enable PIA access
-	P1.5 /CS PIA 2 - Debug: MPU usually writes 0x57, 0x5f, 0x57 or 0x5f to enable PIA access
-	P1.6 /CS PIA 3 - Debug: MPU usually writes 0x37, 0x3f, 0x37 or 0x3f to enable PIA access
-	P1.7 /GPKD Reset (Not implemented on device)
+    P1.0 Coin Lamp Bit 0
+    P1.1 Coin Lamp Bit 1
+    P1.2 Coin Lamp Bit 2
+    P1.3 Interrupt Flag (enable/disable /INT via NAND Gate.)
+    P1.4 /CS PIA 1 - Debug: MPU usually writes 0x67, 0x6f, 0xe7 or 0xef to enable PIA access
+    P1.5 /CS PIA 2 - Debug: MPU usually writes 0x57, 0x5f, 0x57 or 0x5f to enable PIA access
+    P1.6 /CS PIA 3 - Debug: MPU usually writes 0x37, 0x3f, 0x37 or 0x3f to enable PIA access
+    P1.7 /GPKD Reset (Not implemented on device)
 */
 
 	m_mp1 = data;
@@ -762,7 +762,7 @@ m_outbit[5] -> Lamp: 6th. Coin
 
 	m_int_flag = BIT(data, 3);       // Main Interrupt Flag
 	m_outbit[44] = BIT(data, 3);     // Main Interrupt Flag
-	m_ioexp[0]->cs_w(BIT(data, 4));  // Chip Select IO Expander_1 
+	m_ioexp[0]->cs_w(BIT(data, 4));  // Chip Select IO Expander_1
 	m_ioexp[1]->cs_w(BIT(data, 5));  // Chip Select IO Expander_2
 	m_ioexp[2]->cs_w(BIT(data, 6));  // Chip Select IO Expander_3
 	// m_kbdc->reset(BIT(data, 7));  // Reset GPKD (not implemented on device)
@@ -773,17 +773,17 @@ m_outbit[5] -> Lamp: 6th. Coin
 void interflip8035_state::main_p1_dec_data_w(u8 data)  // Decoded lamps. (Costa Brava)
 {
 /*
-	Port P1 Maincpu
-	===============
+    Port P1 Maincpu
+    ===============
 
-	P1.0 Lamp 1st. Coin
-	P1.1 Lamp 2nd. Coin
-	P1.2 Lamp 3rd. Coin
-	P1.3 Interrupt Flag (enable/disable /INT via NAND Gate.)
-	P1.4 /CS PIA 1 - Debug: MPU usually writes 0x67, 0x6f, 0xe7 or 0xef to enable PIA access
-	P1.5 /CS PIA 2 - Debug: MPU usually writes 0x57, 0x5f, 0x57 or 0x5f to enable PIA access
-	P1.6 /CS PIA 3 - Debug: MPU usually writes 0x37, 0x3f, 0x37 or 0x3f to enable PIA access
-	P1.7 /GPKD Reset (Not implemented on device)
+    P1.0 Lamp 1st. Coin
+    P1.1 Lamp 2nd. Coin
+    P1.2 Lamp 3rd. Coin
+    P1.3 Interrupt Flag (enable/disable /INT via NAND Gate.)
+    P1.4 /CS PIA 1 - Debug: MPU usually writes 0x67, 0x6f, 0xe7 or 0xef to enable PIA access
+    P1.5 /CS PIA 2 - Debug: MPU usually writes 0x57, 0x5f, 0x57 or 0x5f to enable PIA access
+    P1.6 /CS PIA 3 - Debug: MPU usually writes 0x37, 0x3f, 0x37 or 0x3f to enable PIA access
+    P1.7 /GPKD Reset (Not implemented on device)
 */
 
 	m_mp1 = data;
@@ -792,7 +792,7 @@ void interflip8035_state::main_p1_dec_data_w(u8 data)  // Decoded lamps. (Costa 
 	m_outbit[2] = BIT(data, 2);      // Lamp: 3rd. Coin
 	m_int_flag = BIT(data, 3);       // Main Interrupt Flag
 	m_outbit[44] = BIT(data, 3);     // Main Interrupt Flag
-	m_ioexp[0]->cs_w(BIT(data, 4));  // Chip Select IO Expander_1 
+	m_ioexp[0]->cs_w(BIT(data, 4));  // Chip Select IO Expander_1
 	m_ioexp[1]->cs_w(BIT(data, 5));  // Chip Select IO Expander_2
 	m_ioexp[2]->cs_w(BIT(data, 6));  // Chip Select IO Expander_3
 	// m_kbdc->reset(BIT(data, 7));  // Reset GPKD (not implemented on device)
@@ -803,19 +803,19 @@ void interflip8035_state::main_p1_dec_data_w(u8 data)  // Decoded lamps. (Costa 
 void interflip8035_state::main_p2_w(u8 data)
 {
 /*
-	Port P2 Maincpu
-	===============
+    Port P2 Maincpu
+    ===============
 
-	P2.0 A8  Address line
-	P2.1 A9  Address line
-	P2.2 A10 Address line
-	P2.3 A11 Address line
-	P2.4 /CE1 RAM 1 - Debug: MPU usually writes 0xef to enable NVRAM access
-	P2.5 /CE1 RAM 2 - Unused on these games
-	P2.6 /A0 GPKD   - Selects -> [Data (rw)] or [Status(r)/ Control(w)] access on I8279
-	P2.7 /CS GPKD   - Enable I8279 access. 
+    P2.0 A8  Address line
+    P2.1 A9  Address line
+    P2.2 A10 Address line
+    P2.3 A11 Address line
+    P2.4 /CE1 RAM 1 - Debug: MPU usually writes 0xef to enable NVRAM access
+    P2.5 /CE1 RAM 2 - Unused on these games
+    P2.6 /A0 GPKD   - Selects -> [Data (rw)] or [Status(r)/ Control(w)] access on I8279
+    P2.7 /CS GPKD   - Enable I8279 access.
 
-	GPKD Notes: MPU writes 0x3f to data access and 0x7f to status/control
+    GPKD Notes: MPU writes 0x3f to data access and 0x7f to status/control
 */
 
 	m_mp2 = data;
@@ -831,9 +831,9 @@ void interflip8035_state::main_p2_w(u8 data)
 u8 interflip8035_state::main_p2_r()
 {
 /*
-	P1.4 /CS PIA 1 - Debug: MPU usually writes 0x67, 0x6f, 0xe7 or 0xef to enable PIA access
-	P1.5 /CS PIA 2 - Debug: MPU usually writes 0x57, 0x5f, 0xd7 or 0xdf to enable PIA access
-	P1.6 /CS PIA 3 - Debug: MPU usually writes 0x37, 0x3f, 0xb7 or 0xbf to enable PIA access
+    P1.4 /CS PIA 1 - Debug: MPU usually writes 0x67, 0x6f, 0xe7 or 0xef to enable PIA access
+    P1.5 /CS PIA 2 - Debug: MPU usually writes 0x57, 0x5f, 0xd7 or 0xdf to enable PIA access
+    P1.6 /CS PIA 3 - Debug: MPU usually writes 0x37, 0x3f, 0xb7 or 0xbf to enable PIA access
 */
 	u8 opt, ret;
 	opt = (m_mp1 & 0x70) >> 4;  // valid PIA selectors are 3, 5, 6
@@ -870,9 +870,9 @@ u8 interflip8035_state::main_p2_r()
 u8 interflip8035_state::audio_p2_r()
 {
 /*
-	P2.4 Sound Code 0
-	P2.5 Sound Code 1
-	P2.6 Sound Code 2
+    P2.4 Sound Code 0
+    P2.5 Sound Code 1
+    P2.6 Sound Code 2
 */
 	return m_audio;
 }
@@ -888,7 +888,7 @@ void interflip8035_state::audio_p2_w(u8 data)
 	u8 change = false;
 	if(m_outbit[28] != BIT(data, 7))
 		change = true;
-	m_outbit[28] = BIT(data, 7);  //	P2.7 Topper Lamp
+	m_outbit[28] = BIT(data, 7);  //    P2.7 Topper Lamp
 
 	if(!m_outbit[28] && change)
 	{
@@ -911,9 +911,9 @@ void interflip8035_state::audio_p2_w(u8 data)
 
                I8243 IO Expander Interface x 3
 
-	Access:
-	P1 -> Enable PIA Access
-	IORW -> Destination Port (4, 5, 6, 7) 0xf4, 0xf5, 0xf6, 0xf7
+    Access:
+    P1 -> Enable PIA Access
+    IORW -> Destination Port (4, 5, 6, 7) 0xf4, 0xf5, 0xf6, 0xf7
 
 ****************************************************************/
 
@@ -947,7 +947,7 @@ void interflip8035_state::exp2_p6_w(u8 data)
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));  // EM.Counter: Coin Out
 	machine().bookkeeping().coin_counter_w(2, BIT(data, 2));  // EM.Counter: Coin Drop
 	machine().bookkeeping().coin_counter_w(3, BIT(data, 3));  // EM.Counter: Jackpot Times
-	
+
 // Coin in sound
 	if(BIT(data, 0))
 		m_samples->start(0, 1, false);
@@ -984,12 +984,12 @@ void interflip8035_state::exp3_p4_w(u8 data)
 void interflip8035_state::exp3_p6_w(u8 data)
 {
 /*  Swapped Sound Control bits
-	==========================
-	IO_Exp_Data    ->	Audio MPU P2
-	bit 0 - /Int		/Int
-	bit 1 - Code2		P2.6
-	bit 2 - Code1		P2.5
-	bit 3 - Code0		P2.4
+    ==========================
+    IO_Exp_Data    ->   Audio MPU P2
+    bit 0 - /Int        /Int
+    bit 1 - Code2       P2.6
+    bit 2 - Code1       P2.5
+    bit 3 - Code0       P2.4
 */
 
 	u8 state;
@@ -1009,7 +1009,7 @@ void interflip8035_state::kbd_sl_w(u8 data)
 {
 //  Scan Line
 	m_kbd_sl = data;
-    // logerror("I8279: Scan Line: %02X\n", data);
+	// logerror("I8279: Scan Line: %02X\n", data);
 }
 
 u8 interflip8035_state::kbd_rl_r()
@@ -1054,7 +1054,7 @@ void interflip8035_state::output_digit(int i, u8 data)
 //  Segment Decode
 	static const u8 led_map[16] =
 		{ 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0x00 };
-//  show layout 
+//  show layout
 	m_outbyte[i] = led_map[data & 0x0f];
 }
 
@@ -1154,30 +1154,30 @@ static INPUT_PORTS_START( interflip )
 //  To select Game Mode all DSW5, DSW6 and DSW7 must be On. All others are ignored.
 
 	PORT_START("DSW_A")
-	PORT_DIPNAME(0x01, 0x00, DEF_STR(Unused))	PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME(0x01, 0x00, DEF_STR(Unused))   PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x01, DEF_STR(On))
-	PORT_DIPNAME(0x02, 0x00, DEF_STR(Unused))	PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME(0x02, 0x00, DEF_STR(Unused))   PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x02, DEF_STR(On))
-	PORT_DIPNAME(0x04, 0x00, DEF_STR(Unused))	PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME(0x04, 0x00, DEF_STR(Unused))   PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x04, DEF_STR(On))
-	PORT_DIPNAME(0x08, 0x00, DEF_STR(Unused))	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME(0x08, 0x00, DEF_STR(Unused))   PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x08, DEF_STR(On))
 
 	PORT_START("DSW_B")
-	PORT_DIPNAME(0x01, 0x00, "General Test")	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME(0x01, 0x00, "General Test")    PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x01, DEF_STR(On))
-	PORT_DIPNAME(0x02, 0x00, "Reels Test")		PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME(0x02, 0x00, "Reels Test")      PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x02, DEF_STR(On))
-	PORT_DIPNAME(0x04, 0x00, "Timing Test")		PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME(0x04, 0x00, "Timing Test")     PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x04, DEF_STR(On))
-	PORT_DIPNAME(0x08, 0x00, DEF_STR(Unused))	PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME(0x08, 0x00, DEF_STR(Unused))   PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x08, DEF_STR(On))
 INPUT_PORTS_END
@@ -1235,10 +1235,10 @@ void interflip8035_state::interflip(machine_config &config)
 
 	// electromechanics
 	add_em_reels(config, 20, attotime::from_double(2));
-	
+
 	// hopper device
 	HOPPER(config, m_hopper, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
-	
+
 	// sound stuff
 	SPEAKER(config, "mono").front_center();
 
@@ -1277,7 +1277,7 @@ void interflip8035_state::sev_81_cnf(machine_config &config)
 {
 	interflip(config);
 
-	m_maincpu->p1_out_cb().set(FUNC(interflip8035_state::main_p1_enc_data_w));  // encoded coin lamps 
+	m_maincpu->p1_out_cb().set(FUNC(interflip8035_state::main_p1_enc_data_w));  // encoded coin lamps
 
 	// video layout
 	config.set_default_layout(layout_sevilla_81);
@@ -1287,7 +1287,7 @@ void interflip8035_state::sev_77_cnf(machine_config &config)
 {
 	interflip(config);
 
-	m_maincpu->p1_out_cb().set(FUNC(interflip8035_state::main_p1_enc_data_w));  // encoded coin lamps 
+	m_maincpu->p1_out_cb().set(FUNC(interflip8035_state::main_p1_enc_data_w));  // encoded coin lamps
 
 	// video layout
 	config.set_default_layout(layout_sevilla_77);
@@ -1299,7 +1299,7 @@ void interflip8035_state::tol_87_cnf(machine_config &config)
 	interflip(config);
 
 	m_maincpu->p1_out_cb().set(FUNC(interflip8035_state::main_p1_enc_data_w));  // encoded coin lamps
-	
+
 	// video layout
 	config.set_default_layout(layout_toledo_87);
 }
@@ -1309,7 +1309,7 @@ void interflip8035_state::tol_83_cnf(machine_config &config)
 	interflip(config);
 
 	m_maincpu->p1_out_cb().set(FUNC(interflip8035_state::main_p1_enc_data_w));  // encoded coin lamps
-	
+
 	// video layout
 	config.set_default_layout(layout_toledo_83);
 }

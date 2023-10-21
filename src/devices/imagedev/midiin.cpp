@@ -495,7 +495,7 @@ std::error_condition midiin_device::midi_sequence::parse(util::random_read &stre
 		}
 		else if ((u8)type == 0xf0)
 			parse_sysex_data(buffer.reset());
-		else 
+		else
 			parse_midi_data(buffer.reset());
 
 		m_iterator = m_list.begin();

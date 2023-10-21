@@ -2490,10 +2490,10 @@ void tumbleb_state::suprtrio(machine_config &config) // OSCs: 14MHz, 12MHz & 8MH
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-//	m_screen->set_refresh_hz(60);
-//	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529));
-//	m_screen->set_size(40*8, 32*8);
-//	m_screen->set_visarea(0*8, 40*8-1, 1*8-1, 31*8-2);
+//  m_screen->set_refresh_hz(60);
+//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529));
+//  m_screen->set_size(40*8, 32*8);
+//  m_screen->set_visarea(0*8, 40*8-1, 1*8-1, 31*8-2);
 	// not measured, assume same as tumblep for now.
 	// Game has a very dull irq routine to stay at the mercy of set_vblank_time,
 	// reportedly happens to randomly crash at stage 3 boss + be laggy on later levels otherwise.

@@ -43,7 +43,7 @@ copyright-holders: Roberto Fresca, Grull Osgo
 	<element name="stat" defstate="0">
 		<text string="off" state="0">
 			<color red="1.0" green="0.0" blue="0.0" />
-		</text>	
+		</text>
 		<text string="on" state="1">
 			<color red="0.0" green="1.0" blue="0.0" />
 		</text>
@@ -52,7 +52,7 @@ copyright-holders: Roberto Fresca, Grull Osgo
 	<element name="statinv" defstate="1">
 		<text string="off" state="1">
 			<color red="1.0" green="0.0" blue="0.0" />
-		</text>	
+		</text>
 		<text string="on" state="0">
 			<color red="0.0" green="1.0" blue="0.0" />
 		</text>
@@ -470,7 +470,7 @@ copyright-holders: Roberto Fresca, Grull Osgo
 
 		<bounds left="0" top="0" right="640" bottom="480" />
 
-<!-- Coin Lamps -->	
+<!-- Coin Lamps -->
 
 		<element name="outbit0" ref="L0">
 			<bounds x="10" y="120" width="60" height="20" />
@@ -593,7 +593,7 @@ copyright-holders: Roberto Fresca, Grull Osgo
 				<bounds x="~x~" y="35" width="40" height="50" />
 			</element>
 		</repeat>
-		
+
 <!-- Optos A/B Readout -->
 
 		<repeat count="3">

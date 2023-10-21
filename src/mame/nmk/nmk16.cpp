@@ -686,7 +686,7 @@ void nmk16_state::hachamf_map(address_map &map)
 	map(0x09c000, 0x09c7ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share("txvideoram");
 	// Main RAM, inc sprites, shared with MCU
 
-    map(0x0f0000, 0x0fffff).ram().share("mainram"); // ram is shared with MCU
+	map(0x0f0000, 0x0fffff).ram().share("mainram"); // ram is shared with MCU
 }
 
 

@@ -311,7 +311,7 @@ uint8_t wiz_state::kungfuta_protection_r()
 	case 0x5a: return 0xda; // after bonus round, prevents infinite loop
 	case 0x7a: return 0xfa; // maybe not, condition is inverted
 	case 0xaa: return 0x0a; // all the time during gameplay, unknown purpose
-	case 0xba: return 0x0a; 
+	case 0xba: return 0x0a;
 	case 0xca: return 0xca; // game over, unknown purpose
 	case 0xff: return 0xff; // done before other checks, although code at 0xacc8 will skip 2nd check like this
 	}

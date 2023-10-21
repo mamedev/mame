@@ -79,7 +79,7 @@ private:
 	std::array<s32, 0x20>  m_lpf_value;
 	std::array<s32, 0x20>  m_lpf_timer;
 	std::array<s32, 0x20>  m_lpf_ha;
-	std::array<s32, 0x20>  m_lpf_hb;	
+	std::array<s32, 0x20>  m_lpf_hb;
 	std::array<bool, 0x20> m_active, m_decay, m_decay_done, m_lpf_done;
 
 	u16 m_waverom_val;
