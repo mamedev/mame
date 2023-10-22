@@ -124,9 +124,6 @@ protected:
 	 // System C
 	u16 m_sprite_bank = 0;
 
-	// soldam
-	u16 *m_spriteram = nullptr;
-
 	u16 m_screen_flag = 0;
 
 	// all
