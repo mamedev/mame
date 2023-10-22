@@ -26,7 +26,16 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	//  required_device<meg_embedded_device> m_meg;
+	template<size_t size> struct delay_block {
+		swp00_device *m_swp;
+		std::array<s32, size> &m_buffer;
+
+		delay_block(swp00_device *swp, std::array<s32, size> &buffer);
+		s32 r(int offreg) const;
+		s32 rlfo(int offreg, u32 phase, s32 delta_phase, int levelreg) const;
+		s32 rlfo2(int offreg, s32 offset) const;
+		void w(int offreg, s32 value) const;
+	};
 
 	sound_stream *m_stream;
 
@@ -41,9 +50,14 @@ private:
 	static const std::array<u32, 4> lfo_shape_offset_saw;
 	static const std::array<u32, 4> lfo_shape_offset_tri;
 
+	// MEG reverb memory
+	std::array<s32, 0x20000> m_rev_buffer;
+	std::array<s32, 0x8000>  m_cho_buffer;
+	std::array<s32, 0x20000> m_var_buffer;
+
 	// MEG registers
-	std::array<u16, 0x40>  m_off;
-	std::array<u16, 0xc0>  m_fp;
+	std::array<u16, 0x40>  m_offset;
+	std::array<u16, 0xc0>  m_const;
 
 	// AWM registers
 	std::array<u16, 0x20>  m_lpf_info;
@@ -86,6 +100,36 @@ private:
 	u8 m_waverom_access;
 	u8 m_state_adr;
 	u8 m_meg_control;
+
+	// MEG state
+	u32 m_buffer_offset;
+	s32 m_rev_vol, m_cho_vol, m_var_vol;
+
+	u32 m_var_lfo_phase;
+
+	s32 m_var_lfo_h_1, m_var_lfo_h_2;
+	s32 m_var_lfo1a, m_var_lfo2a, m_var_lfo3a, m_var_lfo4a;
+
+	s32 m_var_filter_1, m_var_filter_2, m_var_filter_3;
+	s32 m_var_filter_l_1, m_var_filter_l_2, m_var_filter_l_3;
+	s32 m_var_filter_r_1, m_var_filter_r_2, m_var_filter_r_3;
+	s32 m_var_filter2_1, m_var_filter2_2a, m_var_filter2_2b, m_var_filter2_3a, m_var_filter2_3b, m_var_filter2_4;
+	s32 m_var_filter3_1, m_var_filter3_2;
+
+	s32 m_var_filterp_l_1, m_var_filterp_l_2, m_var_filterp_l_3;
+	s32 m_var_filterp_l_4, m_var_filterp_l_5, m_var_filterp_l_6;
+	s32 m_var_filterp_r_1, m_var_filterp_r_2, m_var_filterp_r_3;
+	s32 m_var_filterp_r_4, m_var_filterp_r_5, m_var_filterp_r_6;
+
+	s32 m_var_h1, m_var_h2, m_var_h3, m_var_h4;
+
+	u32 m_cho_lfo_phase;
+	s32 m_cho_filter_l_1, m_cho_filter_l_2, m_cho_filter_l_3;
+	s32 m_cho_filter_r_1, m_cho_filter_r_2, m_cho_filter_r_3;
+
+	s32 m_rev_filter_1, m_rev_filter_2, m_rev_filter_3;
+	s32 m_rev_hist_a, m_rev_hist_b, m_rev_hist_c, m_rev_hist_d;
+
 
 	// Voice control
 
@@ -138,10 +182,10 @@ private:
 	void state_adr_w(u8 data);
 
 	// MEG
-	void off_w(offs_t offset, u8 data);
-	u8 off_r(offs_t offset);
-	void fp_w(offs_t offset, u8 data);
-	u8 fp_r(offs_t offset);
+	void offset_w(offs_t offset, u8 data);
+	u8 offset_r(offs_t offset);
+	void const_w(offs_t offset, u8 data);
+	u8 const_r(offs_t offset);
 	void meg_control_w(u8 data);
 	u8 meg_control_r();
 
@@ -173,6 +217,28 @@ private:
 	static s32 fpsub(s32 value, s32 step);
 	static s32 fpapply(s32 value, s32 sample);
 	static s32 lpffpapply(s32 value, s32 sample);
+
+	s32 rext(int reg) const;
+	static s32 m7v(s32 value, s32 mult);
+	s32 m7(s32 value, int reg) const;
+	static s32 m9v(s32 value, s32 mult);
+	s32 m9(s32 value, int reg) const;
+	s32 lfo_get_step(int reg) const;
+	void lfo_step(u32 &phase, int reg) const;
+	static u32 lfo_wrap(s32 phase, s32 delta);
+	static s32 lfo_saturate(s32 phase);
+	s32 lfo_wrap_reg(s32 phase, int deltareg) const;
+	void filtered_lfo_step(s32 &position, s32 phase, int deltareg, int postdeltareg, int scalereg, int feedbackreg);
+	s32 lfo_mod(s32 phase, int scalereg) const;
+	s32 lfo_scale(s32 phase, int scalereg) const;
+
+	s32 alfo(u32 phase, s32 delta_phase, int levelreg, int offsetreg, bool sub) const;
+
+	s32 sx(int reg) const;
+	double sx7(int reg) const;
+	double sx9(int reg) const;
+
+	static s32 saturate(s32 value);
 };
 
 DECLARE_DEVICE_TYPE(SWP00, swp00_device)
