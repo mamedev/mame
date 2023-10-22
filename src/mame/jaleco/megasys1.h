@@ -152,7 +152,7 @@ private:
 	u16 m_mcu_hs_ram[0x10]{};
 
 	const u16* m_gatearray_seq = nullptr;
-	//                                          write sequence                return value
+	//                                     write sequence                return value
 	static constexpr u16 iga_seq[5] =    { 0x0000,0x0055,0x00aa,0x00ff,  0x835d };
 	static constexpr u16 hachoo_seq[5] = { 0x00ff,0x0055,0x00aa,0x0000,  0x889e };
 

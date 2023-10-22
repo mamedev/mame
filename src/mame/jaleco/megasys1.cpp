@@ -436,11 +436,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(megasys1_bc_iomcu_state::megasys1C_bigstrik_scanlin
 		m_iomcu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 	}
 
-    if(scanline == 224+16) // start of vblank (falling edge)
-    {
-        LOG("%s: megasys1C_bigstrik_scanline: Clear INT1 to MCU: (scanline %03d)\n", machine().describe_context(), scanline);
-        m_iomcu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
-    }
+	if(scanline == 224+16) // start of vblank (falling edge)
+	{
+		LOG("%s: megasys1C_bigstrik_scanline: Clear INT1 to MCU: (scanline %03d)\n", machine().describe_context(), scanline);
+		m_iomcu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
+	}
 }
 
 void megasys1_state::ram_w(offs_t offset, u16 data)
