@@ -68,6 +68,7 @@ public:
 	void init_stdragon();
 	void init_soldamj();
 	void init_phantasm();
+	void init_tshingen();
 	void init_jitsupro();
 	void init_iganinju();
 	void init_rodlandj();

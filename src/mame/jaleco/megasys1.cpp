@@ -5155,6 +5155,12 @@ void megasys1_state::init_stdragon() // Type A
 	install_gatearray_overlay(0x23ff0, iga_seq);
 }
 
+void megasys1_state::init_tshingen() // Type A
+{
+	phantasm_rom_decode(machine(), "maincpu");
+	install_gatearray_overlay(0x20c00, iga_seq); // protection check sometimes kicks in at the start of 2nd level, but not always
+}
+
 void megasys1_state::init_jitsupro() // Type A
 {
 	init_astyanax();
@@ -5305,7 +5311,7 @@ GAME( 1988, p47je,      p47,      system_A,          p47,      megasys1_state, e
 GAME( 1988, p47b,       p47,      p47b,              p47,      megasys1_state, empty_init,    ROT0,   "bootleg","P-47 - The Freedom Fighter (World, bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, kickoff,    0,        system_A,          kickoff,  megasys1_state, empty_init,    ROT0,   "Jaleco", "Kick Off - Jaleco Cup (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, kickoffb,   kickoff,  kickoffb,          kickoff,  megasys1_state, empty_init,    ROT0,   "bootleg (Comodo)", "Kick Off - World Cup (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // OKI needs to be checked
-GAME( 1988, tshingen,   0,        system_A,          tshingen, megasys1_state, init_phantasm, ROT0,   "Jaleco", "Shingen Samurai-Fighter (Japan, English)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tshingen,   0,        system_A,          tshingen, megasys1_state, init_tshingen, ROT0,   "Jaleco", "Shingen Samurai-Fighter (Japan, English)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1988, tshingena,  tshingen, system_A,          tshingen, megasys1_state, init_phantasm, ROT0,   "Jaleco", "Takeda Shingen (Japan, Japanese)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1988, kazan,      0,        system_A_iganinju, kazan,    megasys1_state, init_iganinju, ROT0,   "Jaleco", "Ninja Kazan (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, iganinju,   kazan,    system_A_iganinju, kazan,    megasys1_state, init_iganinju, ROT0,   "Jaleco", "Iga Ninjyutsuden (Japan)", MACHINE_SUPPORTS_SAVE )
