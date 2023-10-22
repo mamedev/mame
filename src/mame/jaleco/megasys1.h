@@ -257,6 +257,7 @@ public:
 	void system_C_iosim(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	const u8* m_ip_select_values = nullptr; // System B and C
@@ -290,6 +291,7 @@ public:
 	void system_C_bigstrik(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 private:

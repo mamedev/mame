@@ -153,6 +153,11 @@ void megasys1_state::machine_reset()
 	m_mcu_hs = 0;
 }
 
+void megasys1_bc_iosim_state::machine_start()
+{
+	save_item(NAME(m_ip_latched));
+}
+
 void megasys1_bc_iosim_state::machine_reset()
 {
 	megasys1_state::machine_reset();
@@ -166,6 +171,11 @@ void megasys1_bc_iomcu_state::machine_reset()
 	m_mcu_io_data = 0x0;
 }
 
+void megasys1_bc_iomcu_state::machine_start()
+{
+	save_item(NAME(m_mcu_input_data));
+	save_item(NAME(m_mcu_io_data));
+}
 
 void megasys1_hachoo_state::machine_reset()
 {
@@ -5203,19 +5213,16 @@ void megasys1_state::init_rodlandjb() // Type A, bootleg
 void megasys1_bc_iosim_state::init_avspirit() // Type B
 {
 	m_ip_select_values = avspirit_seq;
-	save_item(NAME(m_ip_latched));
 }
 
 void megasys1_bc_iosim_state::init_edf() // Type B
 {
 	m_ip_select_values = edf_seq;
-	save_item(NAME(m_ip_latched));
 }
 
 void megasys1_bc_iosim_state::init_hayaosi1() // Type B
 {
 	m_ip_select_values = hayaosi1_seq;
-	save_item(NAME(m_ip_latched));
 }
 
 void megasys1_bc_iosim_state::init_64street() // Type C
@@ -5224,29 +5231,24 @@ void megasys1_bc_iosim_state::init_64street() // Type C
 //  ROM[0x006b8/2] = 0x6004;        // d8001 test
 //  ROM[0x10EDE/2] = 0x6012;        // watchdog
 	m_ip_select_values = street_seq;
-	save_item(NAME(m_ip_latched));
 	save_item(NAME(m_sprite_bank));
 }
 
 void megasys1_bc_iosim_state::init_chimeraba() // Type C
 {
 	m_ip_select_values = chimeraba_seq;
-	save_item(NAME(m_ip_latched));
 	save_item(NAME(m_sprite_bank));
 }
 
 void megasys1_bc_iosim_state::init_cybattlr() // Type C
 {
 	m_ip_select_values = cybattler_seq;
-	save_item(NAME(m_ip_latched));
 	save_item(NAME(m_sprite_bank));
 }
 
 void megasys1_bc_iomcu_state::init_bigstrik() // Type C
 {
 	save_item(NAME(m_sprite_bank));
-	save_item(NAME(m_mcu_input_data));
-	save_item(NAME(m_mcu_io_data));
 }
 
 // Type D
