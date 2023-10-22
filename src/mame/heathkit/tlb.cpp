@@ -1241,6 +1241,7 @@ void heath_gp19_tlb_device::device_add_mconfig(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &heath_gp19_tlb_device::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &heath_gp19_tlb_device::io_map);
 
+	m_crtc->set_begin_update_callback(FUNC(heath_gp19_tlb_device::crtc_begin_update));
 	m_crtc->set_update_row_callback(FUNC(heath_gp19_tlb_device::crtc_update_row));
 	m_crtc->set_clock(GP19_DOT_CLOCK_2 / 8);
 
@@ -1322,6 +1323,10 @@ void heath_gp19_tlb_device::latch_u5_w(uint8_t data)
 	}
 }
 
+MC6845_BEGIN_UPDATE(heath_gp19_tlb_device::crtc_begin_update)
+{
+	bitmap.fill(rgb_t::black(), cliprect);
+}
 
 MC6845_UPDATE_ROW(heath_gp19_tlb_device::crtc_update_row)
 {

@@ -919,6 +919,17 @@ uint8_t mc6845_device::draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangl
 	// displayable area, not relative to the screen bitmap origin.
 	int8_t cursor_x = cursor_visible ? (m_cursor_addr - m_current_disp_addr) : -1;
 	int de = (y <= m_max_visible_y) ? 1 : 0;
+	bool call_update_row = true;
+
+	if (MODE_INTERLACE_AND_VIDEO)
+	{
+		if ((m_odd_frame && ((y & 0x01) == 0x01)) ||
+			(!m_odd_frame && ((y & 0x01) == 0x00)))
+		{
+			call_update_row = false;
+		}
+	}
+
 	int vbp = m_vert_pix_total - m_vsync_off_pos;
 	if (vbp < 0) vbp = 0;
 	int hbp = m_horiz_pix_total - m_hsync_off_pos;
@@ -931,16 +942,25 @@ uint8_t mc6845_device::draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangl
 		uint8_t cr = y / (m_max_ras_addr + (MODE_INTERLACE_AND_VIDEO ? m_interlace_adjust : m_noninterlace_adjust));
 		uint16_t ma = (cr << 8) | cc;
 
-		m_update_row_cb(bitmap, cliprect, ma + m_disp_start_addr, ra, y, m_horiz_disp, cursor_x, de, hbp, vbp);
+		if (call_update_row)
+		{
+			m_update_row_cb(bitmap, cliprect, ma + m_disp_start_addr, ra, y, m_horiz_disp, cursor_x, de, hbp, vbp);
+		}
 	}
 	else
 	{
-		m_update_row_cb(bitmap, cliprect, m_current_disp_addr, ra, y, m_horiz_disp, cursor_x, de, hbp, vbp);
+		if (call_update_row)
+		{
+			m_update_row_cb(bitmap, cliprect, m_current_disp_addr, ra, y, m_horiz_disp, cursor_x, de, hbp, vbp);
+		}
 	}
 
 	/* update MA if the last raster address */
-	if (ra == m_max_ras_addr + (MODE_INTERLACE_AND_VIDEO ? m_interlace_adjust : m_noninterlace_adjust) - 1)
+	if ((!MODE_INTERLACE_AND_VIDEO && (ra == m_max_ras_addr + m_noninterlace_adjust - 1)) ||
+		(MODE_INTERLACE_AND_VIDEO && (ra >= m_max_ras_addr + m_interlace_adjust - 1)))
+	{
 		m_current_disp_addr = (m_current_disp_addr + m_horiz_disp) & 0x3fff;
+	}
 
 	return ra;
 }
@@ -992,6 +1012,7 @@ uint32_t mc6845_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		{
 			this->draw_scanline(y, bitmap, cliprect);
 		}
+		m_odd_frame = !m_odd_frame;
 
 		/* call the tear down function if any */
 		m_end_update_cb(bitmap, cliprect);
@@ -1047,6 +1068,7 @@ void mc6845_device::device_start()
 	m_double_r6_in_interlace_video_mode = true;
 	m_has_valid_parameters = false;
 	m_display_disabled_msg_shown = false;
+	m_odd_frame = true;
 	m_line_enable_ff = false;
 	m_vsync_ff = 0;
 	m_raster_counter = 0;
@@ -1118,7 +1140,7 @@ void mc6845_device::device_start()
 	save_item(NAME(m_line_address));
 	save_item(NAME(m_cursor_x));
 	save_item(NAME(m_has_valid_parameters));
-	save_item(NAME(m_double_r6_in_interlace_video_mode));
+	save_item(NAME(m_odd_frame));
 }
 
 

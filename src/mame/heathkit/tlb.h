@@ -229,6 +229,7 @@ protected:
 
 	void latch_u5_w(uint8_t data);
 
+	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	virtual MC6845_UPDATE_ROW(crtc_update_row) override;
 
 	bool m_char_gen_a11;
