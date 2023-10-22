@@ -5197,8 +5197,9 @@ void megasys1_state::init_soldamj() // Type A
 	astyanax_rom_decode(machine(), "maincpu");
 }
 
-void megasys1_state::init_stdragonb() // Type A
+void megasys1_state::init_stdragonb() // Type A, bootleg
 {
+	// no program scramble on bootleg
 	stdragona_gfx_unmangle("scroll0");
 	stdragona_gfx_unmangle("sprites");
 }
