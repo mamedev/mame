@@ -311,6 +311,8 @@ void megasys1_bc_iosim_state::ip_select_w(u16 data) // TO MCU
 //  51      52      53      54      55      < hayaosi1
 
 	/* f(x) = ((x*x)>>4)&0xFF ; f(f($D)) == 6 */
+	if (!m_ip_select_values)
+		return;
 
 	for (i = 0; i < 7; i++) if ((data & 0x00ff) == m_ip_select_values[i]) break;
 
@@ -5199,43 +5201,19 @@ void megasys1_state::init_rodlandjb() // Type A, bootleg
 
 void megasys1_bc_iosim_state::init_avspirit() // Type B
 {
-	m_ip_select_values[0] = 0x37;
-	m_ip_select_values[1] = 0x35;
-	m_ip_select_values[2] = 0x36;
-	m_ip_select_values[3] = 0x33;
-	m_ip_select_values[4] = 0x34;
-
-	m_ip_select_values[5] = 0xff;
-	m_ip_select_values[6] = 0x06;
-
+	m_ip_select_values = avspirit_seq;
 	save_item(NAME(m_ip_latched));
 }
 
 void megasys1_bc_iosim_state::init_edf() // Type B
 {
-	m_ip_select_values[0] = 0x20;
-	m_ip_select_values[1] = 0x21;
-	m_ip_select_values[2] = 0x22;
-	m_ip_select_values[3] = 0x23;
-	m_ip_select_values[4] = 0x24;
-
-	m_ip_select_values[5] = 0xf0;
-	m_ip_select_values[6] = 0x06;
-
+	m_ip_select_values = edf_seq;
 	save_item(NAME(m_ip_latched));
 }
 
 void megasys1_bc_iosim_state::init_hayaosi1() // Type B
 {
-	m_ip_select_values[0] = 0x51;
-	m_ip_select_values[1] = 0x52;
-	m_ip_select_values[2] = 0x53;
-	m_ip_select_values[3] = 0x54;
-	m_ip_select_values[4] = 0x55;
-
-	m_ip_select_values[5] = 0xfc;
-	m_ip_select_values[6] = 0x06;
-
+	m_ip_select_values = hayaosi1_seq;
 	save_item(NAME(m_ip_latched));
 }
 
@@ -5244,62 +5222,21 @@ void megasys1_bc_iosim_state::init_64street() // Type C
 //  u16 *ROM = (u16 *) memregion("maincpu")->base();
 //  ROM[0x006b8/2] = 0x6004;        // d8001 test
 //  ROM[0x10EDE/2] = 0x6012;        // watchdog
-
-	m_ip_select_values[0] = 0x57;
-	m_ip_select_values[1] = 0x53;
-	m_ip_select_values[2] = 0x54;
-	m_ip_select_values[3] = 0x55;
-	m_ip_select_values[4] = 0x56;
-
-	m_ip_select_values[5] = 0xfa;
-	m_ip_select_values[6] = 0x06;
-
-	save_item(NAME(m_ip_latched));
-	save_item(NAME(m_sprite_bank));
-}
-
-void megasys1_bc_iosim_state::init_chimerab() // Type C
-{
-	/* same as cybattlr - was this a bootleg conversion? */
-	m_ip_select_values[0] = 0x56;
-	m_ip_select_values[1] = 0x52;
-	m_ip_select_values[2] = 0x53;
-	m_ip_select_values[3] = 0x54;
-	m_ip_select_values[4] = 0x55;
-
-	m_ip_select_values[5] = 0xf2;
-	m_ip_select_values[6] = 0x06;
-
+	m_ip_select_values = street_seq;
 	save_item(NAME(m_ip_latched));
 	save_item(NAME(m_sprite_bank));
 }
 
 void megasys1_bc_iosim_state::init_chimeraba() // Type C
 {
-	m_ip_select_values[0] = 0x56;
-	m_ip_select_values[1] = 0x52;
-	m_ip_select_values[2] = 0x53;
-	m_ip_select_values[3] = 0x55;
-	m_ip_select_values[4] = 0x54;
-
-	m_ip_select_values[5] = 0xfa;
-	m_ip_select_values[6] = 0x06;
-
+	m_ip_select_values = chimeraba_seq;
 	save_item(NAME(m_ip_latched));
 	save_item(NAME(m_sprite_bank));
 }
 
 void megasys1_bc_iosim_state::init_cybattlr() // Type C
 {
-	m_ip_select_values[0] = 0x56;
-	m_ip_select_values[1] = 0x52;
-	m_ip_select_values[2] = 0x53;
-	m_ip_select_values[3] = 0x54;
-	m_ip_select_values[4] = 0x55;
-
-	m_ip_select_values[5] = 0xf2;
-	m_ip_select_values[6] = 0x06;
-
+	m_ip_select_values = cybattler_seq;
 	save_item(NAME(m_ip_latched));
 	save_item(NAME(m_sprite_bank));
 }
@@ -5415,7 +5352,7 @@ GAME( 1991, 64street,   0,        system_C_iosim,          64street, megasys1_bc
 GAME( 1991, 64streetj,  64street, system_C_iosim,          64street, megasys1_bc_iosim_state, init_64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, 64streetja, 64street, system_C_iosim,          64street, megasys1_bc_iosim_state, init_64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, bigstrik,   0,        system_C_bigstrik,       bigstrik, megasys1_bc_iomcu_state, init_bigstrik, ROT0,   "Jaleco", "Big Striker", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, chimerab,   0,        system_C_iosim,          chimerab, megasys1_bc_iosim_state, init_chimerab, ROT0,   "Jaleco", "Chimera Beast (Japan, prototype, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, chimerab,   0,        system_C_iosim,          chimerab, megasys1_bc_iosim_state, init_cybattlr, ROT0,   "Jaleco", "Chimera Beast (Japan, prototype, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, chimeraba,  chimerab, system_C_iosim,          chimerab, megasys1_bc_iosim_state, init_chimeraba,ROT0,   "Jaleco", "Chimera Beast (Japan, prototype, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, cybattlr,   0,        system_C_iosim,          cybattlr, megasys1_bc_iosim_state, init_cybattlr, ROT90,  "Jaleco", "Cybattler", MACHINE_SUPPORTS_SAVE )
 

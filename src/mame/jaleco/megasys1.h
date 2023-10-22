@@ -154,10 +154,10 @@ private:
 	int m_mcu_hs = 0;
 	u16 m_mcu_hs_ram[0x10]{};
 
-	const uint16_t* m_gatearray_seq = nullptr;
+	const u16* m_gatearray_seq = nullptr;
 	//                                          write sequence                return value
-	static constexpr uint16_t iga_seq[5] =    { 0x0000,0x0055,0x00aa,0x00ff,  0x835d };
-	static constexpr uint16_t hachoo_seq[5] = { 0x00ff,0x0055,0x00aa,0x0000,  0x889e };
+	static constexpr u16 iga_seq[5] =    { 0x0000,0x0055,0x00aa,0x00ff,  0x835d };
+	static constexpr u16 hachoo_seq[5] = { 0x00ff,0x0055,0x00aa,0x0000,  0x889e };
 
 	// peekaboo
 	u16 m_protection_val = 0;
@@ -247,7 +247,6 @@ public:
 
 	void init_avspirit();
 	void init_64street();
-	void init_chimerab();
 	void init_chimeraba();
 	void init_cybattlr();
 	void init_hayaosi1();
@@ -260,9 +259,16 @@ public:
 protected:
 	virtual void machine_reset() override;
 
-	u16 m_ip_select_values[7]{}; // System B and C
+	const u8* m_ip_select_values = nullptr; // System B and C
 
 	u16 m_ip_latched = 0;
+
+	static constexpr u8 avspirit_seq[7] =    { 0x37,0x35,0x36,0x33,0x34,  0xff,0x06 };
+	static constexpr u8 edf_seq[7] =         { 0x20,0x21,0x22,0x23,0x24,  0xf0,0x06 };
+	static constexpr u8 hayaosi1_seq[7] =    { 0x51,0x52,0x53,0x54,0x55,  0xfc,0x06 };
+	static constexpr u8 street_seq[7]   =    { 0x57,0x53,0x54,0x55,0x56,  0xfa,0x06 };
+	static constexpr u8 chimeraba_seq[7]   = { 0x56,0x52,0x53,0x55,0x54,  0xfa,0x06 };
+	static constexpr u8 cybattler_seq[7]   = { 0x56,0x52,0x53,0x54,0x55,  0xf2,0x06 };
 
 	void megasys1B_iosim_map(address_map &map);
 	void megasys1C_iosim_map(address_map &map);
