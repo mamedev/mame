@@ -397,10 +397,10 @@ void megasys1_state::megasys1B_monkelf_map(address_map &map)
 
 void megasys1_state::megasys1c_handle_scanline_irq(int scanline)
 {
-	if(scanline == 224) // vblank-out irq
+	if(scanline == 224+16) // vblank-out irq
 		m_maincpu->set_input_line(4, HOLD_LINE);
 
-	if(scanline == 80)
+	if(scanline == 80+16)
 		m_maincpu->set_input_line(1, HOLD_LINE);
 }
 
@@ -410,7 +410,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(megasys1_state::megasys1C_scanline)
 
 	megasys1c_handle_scanline_irq(scanline);
 
-	if(scanline == 0)
+	if(scanline == 0+16)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 
 }
@@ -420,13 +420,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(megasys1_bc_iomcu_state::megasys1C_bigstrik_scanlin
 
 	megasys1c_handle_scanline_irq(scanline);
 
-	if(scanline == 0) // end of vblank (rising edge)
+	if(scanline == 0+16) // end of vblank (rising edge)
 	{
 		LOG("%s: megasys1C_bigstrik_scanline: Send INT1 to MCU: (scanline %03d)\n", machine().describe_context(), scanline);
 		m_iomcu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 	}
 
-    if(scanline == 224) // start of vblank (falling edge)
+    if(scanline == 224+16) // start of vblank (falling edge)
     {
         LOG("%s: megasys1C_bigstrik_scanline: Clear INT1 to MCU: (scanline %03d)\n", machine().describe_context(), scanline);
         m_iomcu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
