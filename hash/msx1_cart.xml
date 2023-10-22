@@ -11090,7 +11090,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 			</dataarea>
 		</part>
 		<part name="cass" interface="msx_cass">
-			<dataarea name="cass" size="0">
+			<dataarea name="cass" size="1">
 				<rom name="cass" size="0" status="nodump"/>
 			</dataarea>
 		</part>

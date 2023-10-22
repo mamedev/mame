@@ -2755,7 +2755,7 @@ The cassette stops during the game loading
 		</part>
 		<part name="cass2" interface="oric1_cass">
 			<feature name="part_id" value="FACE B - ATMOS"/>
-			<dataarea name="cass" size="0">
+			<dataarea name="cass" size="1">
 				<rom name="Mission Impossible - Face B.tap" size="0" status="nodump"/>
 			</dataarea>
 		</part>
