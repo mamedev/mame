@@ -61,7 +61,6 @@ public:
 	void system_C(machine_config &config);
 	void system_Bbl(machine_config &config);
 	void system_A(machine_config &config);
-	void system_A_jitsupro(machine_config &config);
 
 	void init_peekaboo();
 	void init_soldam();
@@ -72,10 +71,8 @@ public:
 	void init_jitsupro();
 	void init_iganinju();
 	void init_rodlandj();
-	void init_rittam();
 	void init_rodlandjb();
 	void init_monkelf();
-	void init_edfp();
 	void init_rodland();
 	void init_stdragona();
 	void init_stdragonb();
@@ -157,20 +154,19 @@ private:
 	int m_mcu_hs = 0;
 	u16 m_mcu_hs_ram[0x10]{};
 
+	const uint16_t* m_gatearray_seq = nullptr;
+	//                                          write sequence                return value
+	static constexpr uint16_t iga_seq[5] =    { 0x0000,0x0055,0x00aa,0x00ff,  0x835d };
+	static constexpr uint16_t hachoo_seq[5] = { 0x00ff,0x0055,0x00aa,0x0000,  0x889e };
+
 	// peekaboo
 	u16 m_protection_val = 0;
 
 	void sound_irq(int state);
 	u16 protection_peekaboo_r();
 	void protection_peekaboo_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	u16 megasys1A_mcu_hs_r(offs_t offset, u16 mem_mask = ~0);
-	void megasys1A_mcu_hs_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	u16 iganinju_mcu_hs_r(offs_t offset, u16 mem_mask = ~0);
-	void iganinju_mcu_hs_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	u16 soldamj_spriteram16_r(offs_t offset);
-	void soldamj_spriteram16_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	u16 stdragon_mcu_hs_r(offs_t offset, u16 mem_mask = ~0);
-	void stdragon_mcu_hs_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 gatearray_r(offs_t offset, u16 mem_mask = ~0);
+	void gatearray_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void active_layers_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void sprite_bank_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 sprite_flag_r();
@@ -191,6 +187,7 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(megasys1A_iganinju_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(megasys1C_scanline);
 
+	void install_gatearray_overlay(uint32_t base_write, const uint16_t* sequence);
 	void priority_create();
 	void rodland_gfx_unmangle(const char *region);
 	void jitsupro_gfx_unmangle(const char *region);
@@ -201,7 +198,6 @@ private:
 	void p47b_extracpu_io_map(address_map &map);
 	void megasys1A_map(address_map &map);
 	void megasys1A_sound_map(address_map &map);
-	void megasys1A_jitsupro_sound_map(address_map &map);
 	void megasys1B_edfbl_map(address_map &map);
 	void megasys1B_monkelf_map(address_map &map);
 	void megasys1D_map(address_map &map);

@@ -12,38 +12,42 @@ To enter service mode in some games press service1+F3.
 
 Year + Game                       System    Protection
 ---------------------------------------------------------------------
-88  Legend of Makai (World) /       Z
+88  Legend of Makai (World)         Z
     Makai Densetsu  (Japan)         Z
-    P-47  (World) /                 A
-    P-47  (Japan) /                 A
+---------------------------------------------------------------------
+88  P-47  (World)                   A
+    P-47  (Japan)                   A
     P-47  (Japan, Export)           A
     Kick Off (Japan)                A
-    Takeda Shingen (Japan)          A             Encryption (key 1)
-    Ninja Kazan (World) /           A       Yes + Encryption (key 1)
+    Takeda Shingen (Japan)          A             Encryption (key 1) - games with Encryption key 1 have a D65006 marked custom (NEC NEC-UPD65006 gate array?)
+    Ninja Kazan (World)             A       Yes + Encryption (key 1)
     Iga Ninjyutsuden (Japan)        A       Yes + Encryption (key 1)
-89  Astyanax          (World) /     A       Yes + Encryption (key 2)
+89  Astyanax          (World)       A       Yes + Encryption (key 2) - games with Encryption key 2 have a GS-88000 marked custom (rebadged UPD65006?, same package)
     The Lord of King  (Japan)       A       Yes + Encryption (key 2)
     Hachoo!                         A       Yes + Encryption (key 2)
     Jitsuryoku!! Pro Yakyuu (Japan) A       Yes + Encryption (key 2)
     Plus Alpha                      A       Yes + Encryption (key 2)
     Saint Dragon                    A       Yes + Encryption (key 1)
-90  RodLand  (World, set 1) /       A             Encryption (key 3)
+90  RodLand  (World, set 1)         A             Encryption (key 3) - unknown custom markings for Encryption key 3
     RodLand  (World, set 2)         A             Encryption (key 2)
     RodLand  (Japan)                A             Encryption (key 2)
     R&T (Prototype?)                A             Encryption (key 2)
-    Phantasm        (Japan) /       A             Encryption (key 1)
-91  Avenging Spirit (World)         B       Inputs
-    Earth Defense Force (Prototype) A             Encryption (key 1)
-    Earth Defense Force             B       Inputs
+    Phantasm (Japan)                A             Encryption (key 1)
+91  Earth Defense Force (Prototype) A             Encryption (key 1)
     In Your Face (Prototype)        A             Encryption (key 1)
-    64th Street  (World) /          C       Inputs
-    64th Street  (Japan)            C       Inputs
 92  Soldam (Japan)                  A             Encryption (key 2)
-    Big Striker                     C       Inputs
+---------------------------------------------------------------------
+91  Avenging Spirit (World)         B       Inputs
+    Earth Defense Force             B       Inputs
+93  Hayaoshi Quiz Ouza Ketteisen    B       Inputs
+---------------------------------------------------------------------
+91  64th Street  (World)            C       Inputs
+    64th Street  (Japan)            C       Inputs
+92  Big Striker                     C       Inputs
 93  Chimera Beast                   C       Inputs
     Cybattler                       C       Inputs
-    Hayaoshi Quiz Ouza Ketteisen    B       Inputs
-    Peek-a-Boo!                     D       Inputs
+---------------------------------------------------------------------
+93  Peek-a-Boo!                     D       Inputs
 ---------------------------------------------------------------------
 
 NOTE: Chimera Beast PROM has not been dumped, but looks like it should match 64street based on game analysis.
@@ -211,9 +215,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(megasys1_state::megasys1A_iganinju_scanline)
 {
 	int scanline = param;
 
-	// TODO: there's more than one hint that MCU controls IRQ signals via work RAM buffers.
+	// TODO: there's more than one hint that UPD65006 controls IRQ signals via work RAM buffers.
 	//       This is a bare minimum guessing for this specific game, it definitely don't like neither lv 1 nor 2.
-	//       Of course MCU is probably doing a lot more to mask and probably set a specific line too.
+	//       Of course UPD65006 is probably doing a lot more to mask and probably set a specific line too.
 	if(m_ram[0] == 0)
 		return;
 
@@ -239,7 +243,7 @@ void megasys1_state::megasys_base_map(address_map &map)
 	map(0x084208, 0x08420d).rw("scroll1", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
 	map(0x084300, 0x084301).w(FUNC(megasys1_typez_state::screen_flag_w));
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x08e000, 0x08ffff).ram().share("objectram");
+	map(0x08c000, 0x08dfff).mirror(0x002000).ram().share("objectram"); // soldam relies on a mirror at 0x08c000, other games use 0x08e000
 	map(0x090000, 0x093fff).ram().w("scroll0", FUNC(megasys1_tilemap_device::write)).share("scroll0");
 	map(0x094000, 0x097fff).ram().w("scroll1", FUNC(megasys1_tilemap_device::write)).share("scroll1");
 	map(0x0f0000, 0x0fffff).ram().w(FUNC(megasys1_typez_state::ram_w)).share("ram");
@@ -343,7 +347,7 @@ void megasys1_state::megasys1B_map(address_map &map)
 	map(0x050000, 0x053fff).ram().w("scroll0", FUNC(megasys1_tilemap_device::write)).share("scroll0");
 	map(0x054000, 0x057fff).ram().w("scroll1", FUNC(megasys1_tilemap_device::write)).share("scroll1");
 	map(0x058000, 0x05bfff).ram().w("scroll2", FUNC(megasys1_tilemap_device::write)).share("scroll2");
-	map(0x060000, 0x07ffff).ram().w(FUNC(megasys1_state::ram_w)).share("ram");
+	map(0x060000, 0x06ffff).mirror(0x10000).ram().w(FUNC(megasys1_state::ram_w)).share("ram");
 	map(0x080000, 0x0bffff).rom();
 }
 
@@ -686,18 +690,10 @@ void megasys1_state::megasys1A_sound_map(address_map &map)
 	map(0x060000, 0x060001).w(m_soundlatch[1], FUNC(generic_latch_16_device::write));   // to main cpu
 	map(0x080000, 0x080003).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
 	map(0x0a0001, 0x0a0001).r(FUNC(megasys1_state::oki_status_r<0>));
-	map(0x0a0000, 0x0a0003).w(m_oki[0], FUNC(okim6295_device::write)).umask16(0x00ff);
+	map(0x0a0000, 0x0a0003).w(m_oki[0], FUNC(okim6295_device::write)).umask16(0x00ff).cswidth(16); // jitsupro writes oki commands to both the lsb and msb; it works because of byte smearing
 	map(0x0c0001, 0x0c0001).r(FUNC(megasys1_state::oki_status_r<1>));
-	map(0x0c0000, 0x0c0003).w(m_oki[1], FUNC(okim6295_device::write)).umask16(0x00ff);
-	map(0x0e0000, 0x0effff).ram().mirror(0x10000);
-}
-
-// jitsupro writes oki commands to both the lsb and msb; it works because of byte smearing
-void megasys1_state::megasys1A_jitsupro_sound_map(address_map &map)
-{
-	megasys1A_sound_map(map);
-	map(0x0a0000, 0x0a0003).w(m_oki[0], FUNC(okim6295_device::write)).umask16(0x00ff).cswidth(16);
 	map(0x0c0000, 0x0c0003).w(m_oki[1], FUNC(okim6295_device::write)).umask16(0x00ff).cswidth(16);
+	map(0x0e0000, 0x0effff).ram().mirror(0x10000);
 }
 
 void megasys1_state::kickoffb_sound_map(address_map &map)
@@ -1921,12 +1917,6 @@ void megasys1_state::system_A_soldam(machine_config &config)
 	m_tmap[1]->set_8x8_scroll_factor(4);
 }
 
-void megasys1_state::system_A_jitsupro(machine_config &config)
-{
-	system_A(config);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &megasys1_state::megasys1A_jitsupro_sound_map);
-}
-
 void megasys1_state::kickoffb(machine_config &config)
 {
 	system_A(config);
@@ -2355,8 +2345,8 @@ ROM_START( astyanax )  // EPROM version
 	ROM_LOAD16_BYTE( "astyan5.bin",  0x000000, 0x010000, CRC(11c74045) SHA1(00310a08a1c9a08050004e39b111b940142f8dea) )
 	ROM_LOAD16_BYTE( "astyan6.bin",  0x000001, 0x010000, CRC(eecd4b16) SHA1(2078e900b53347aad008a8ce7191f4e5541d4df0) )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
-	ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP )
+	// ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
+	// ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP ) // appears to be a UPD65006 gate array, not an MCU
 
 	ROM_REGION( 0x80000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "astyan11.bin", 0x000000, 0x020000, CRC(5593fec9) SHA1(8fa5bfa8921c6f03ddf485276207978e345887d5) )
@@ -2402,8 +2392,8 @@ ROM_START( astyanaxa ) // mask ROM version, same content as the EPROM version, h
 	ROM_LOAD16_BYTE( "astyan5.bin",  0x000000, 0x010000, CRC(11c74045) SHA1(00310a08a1c9a08050004e39b111b940142f8dea) )
 	ROM_LOAD16_BYTE( "astyan6.bin",  0x000001, 0x010000, CRC(eecd4b16) SHA1(2078e900b53347aad008a8ce7191f4e5541d4df0) )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) // M50747 MCU Code
-	ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP )
+	// ROM_REGION( 0x1000, "mcu", 0 ) // M50747 MCU Code
+	// ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP ) // appears to be a UPD65006 gate array, not an MCU
 
 	ROM_REGION( 0x80000, "scroll0", 0 )
 	ROM_LOAD( "14.bin", 0x00000, 0x80000, CRC(37388363) SHA1(13526b60cf1a1189c8783a4f802dcb63deacbed0) )
@@ -2440,8 +2430,8 @@ ROM_START( lordofk )
 	ROM_LOAD16_BYTE( "astyan5.bin",  0x000000, 0x010000, CRC(11c74045) SHA1(00310a08a1c9a08050004e39b111b940142f8dea) )
 	ROM_LOAD16_BYTE( "astyan6.bin",  0x000001, 0x010000, CRC(eecd4b16) SHA1(2078e900b53347aad008a8ce7191f4e5541d4df0) )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
-	ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP )
+	// ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
+	// ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP ) // appears to be a UPD65006 gate array, not an MCU
 
 	ROM_REGION( 0x80000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "astyan11.bin", 0x000000, 0x020000, CRC(5593fec9) SHA1(8fa5bfa8921c6f03ddf485276207978e345887d5) )
@@ -3278,8 +3268,8 @@ ROM_START( hachoo )
 	ROM_LOAD16_BYTE( "hacho05.rom", 0x000000, 0x010000, CRC(6271f74f) SHA1(2fe0f8adf3cdafe13a9107c36f24f1a525d06a05) )
 	ROM_LOAD16_BYTE( "hacho06.rom", 0x000001, 0x010000, CRC(db9e743c) SHA1(77a3691b48eed389bfcdead5f307415dce47247e) )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
-	ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP )
+	// ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
+	// ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP ) // appears to be a UPD65006 gate array, not an MCU
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "hacho14.rom", 0x000000, 0x080000, CRC(10188483) SHA1(43bf08ac777c42351b04e2c35b1a119f524b4388) )
@@ -3323,8 +3313,8 @@ ROM_START( hachooa )
 	ROM_LOAD16_BYTE( "hacho05.rom", 0x000000, 0x010000, CRC(6271f74f) SHA1(2fe0f8adf3cdafe13a9107c36f24f1a525d06a05) )
 	ROM_LOAD16_BYTE( "hacho06.rom", 0x000001, 0x010000, CRC(db9e743c) SHA1(77a3691b48eed389bfcdead5f307415dce47247e) )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
-	ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP )
+	// ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
+	// ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP ) // appears to be a UPD65006 gate array, not an MCU
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "hacho14.rom", 0x000000, 0x080000, CRC(10188483) SHA1(43bf08ac777c42351b04e2c35b1a119f524b4388) )
@@ -3459,8 +3449,8 @@ ROM_START( kazan )
 	ROM_LOAD16_BYTE( "iga_05.bin", 0x000000, 0x010000, CRC(13580868) SHA1(bfcd11b294b64af81a0403a3e9370c42a9859b6b) )
 	ROM_LOAD16_BYTE( "iga_06.bin", 0x000001, 0x010000, CRC(7904d5dd) SHA1(4cd9fdab601a90c997a041a9f7966a9a233e897b) )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
-	ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP )
+	// ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
+	// ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP ) // appears to be a UPD65006 gate array, not an MCU
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "kazan.11", 0x000000, 0x020000, CRC(08e54137) SHA1(1e3298a896ae0de64f0fc2dab6b32c8bf875f50b) )
@@ -3505,8 +3495,8 @@ ROM_START( iganinju )
 	ROM_LOAD16_BYTE( "iga_05.bin", 0x000000, 0x010000, CRC(13580868) SHA1(bfcd11b294b64af81a0403a3e9370c42a9859b6b) )
 	ROM_LOAD16_BYTE( "iga_06.bin", 0x000001, 0x010000, CRC(7904d5dd) SHA1(4cd9fdab601a90c997a041a9f7966a9a233e897b) )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
-	ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP )
+	// ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
+	// ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP ) // appears to be a UPD65006 gate array, not an MCU
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "iga_14.bin", 0x000000, 0x040000, CRC(c707d513) SHA1(b0067a444385809a7dfd11fea27b1add318d5225) )
@@ -3592,8 +3582,8 @@ ROM_START( inyourfa )
 	ROM_LOAD16_BYTE( "05.27c512", 0x000000, 0x010000, CRC(1737ed64) SHA1(20be59c43d7975fcc5048f1ee9ed5af893bdef85) )
 	ROM_LOAD16_BYTE( "06.27c512", 0x000001, 0x010000, CRC(9f12bcb9) SHA1(7c5faf6a295b2124e16823f50e57b234b6127a38) )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
-	ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP )
+	// ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
+	// ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP ) // appears to be a UPD65006 gate array, not an MCU
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "11.27c1001", 0x000000, 0x020000, CRC(451a1428) SHA1(c017ef4dd3dffd26a93f5b926d80fd5e7bd7dea1) )
@@ -3661,8 +3651,8 @@ ROM_START( jitsupro )
 	ROM_LOAD16_BYTE( "jp_5.bin", 0x000000, 0x010000, CRC(84454e9e) SHA1(a506d44349a670e57d9dba3ec6a9de2597ba2cdb) ) // 11xxxxxxxxxxxxxx = 0xFF
 	ROM_LOAD16_BYTE( "jp_6.bin", 0x000001, 0x010000, CRC(1fa9b75b) SHA1(d0e3640333f737658542ed4a8758d62f6d64ae05) ) // 11xxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
-	ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP )
+	// ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
+	// ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP ) // appears to be a UPD65006 gate array, not an MCU
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "jp_14.bin", 0x000000, 0x080000, CRC(db112abf) SHA1(fd8c510934241b7923660acca6122ca3e63bf934) )
@@ -4240,8 +4230,8 @@ ROM_START( peekaboo )
 	ROM_LOAD16_BYTE( "peek a boo j ver 1.1 - 3.ic29", 0x000000, 0x020000, CRC(f5f4cf33) SHA1(f135f2b627347255bb0811e9a4a213e3b447c199) )
 	ROM_LOAD16_BYTE( "peek a boo j ver 1.1 - 2.ic28", 0x000001, 0x020000, CRC(7b3d430d) SHA1(8b48101929da4938a61dfd0eda845368c4184831) )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) /* MCU Internal Code, M50747? */
-	ROM_LOAD( "mo-90233.mcu", 0x000000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x4000, "mcu", 0 ) /* MCU Internal Code - probably TMP91640 */
+	ROM_LOAD( "mo-90233.mcu", 0x000000, 0x4000, NO_DUMP )
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "5",       0x000000, 0x080000, CRC(34fa07bb) SHA1(0f688acf302fd56701ee4fcc1d692adb7bf86ce4) )
@@ -4264,8 +4254,8 @@ ROM_START( peekaboou )
 	ROM_LOAD16_BYTE( "pb92127a_3_ver1.0.ic29", 0x000000, 0x020000, CRC(4603176a) SHA1(bbdc3fa439b32bdaaef5ca374af89e25fc4d9c1a) )
 	ROM_LOAD16_BYTE( "pb92127a_2_ver1.0.ic28", 0x000001, 0x020000, CRC(7bf4716b) SHA1(f2c0bfa32426c9816d9d3fbd73560566a497912d) )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) /* MCU Internal Code, M50747? */
-	ROM_LOAD( "mo-90233.mcu", 0x000000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x4000, "mcu", 0 ) /* MCU Internal Code - probably TMP91640 */
+	ROM_LOAD( "mo-90233.mcu", 0x000000, 0x4000, NO_DUMP )
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "5",       0x000000, 0x080000, CRC(34fa07bb) SHA1(0f688acf302fd56701ee4fcc1d692adb7bf86ce4) )
@@ -4306,8 +4296,8 @@ ROM_START( plusalph )
 	ROM_LOAD16_BYTE( "pa-rom5.bin", 0x000000, 0x010000, CRC(ddc2739b) SHA1(dee31660428baea44c73dec238ed7f39a6771fe6) )
 	ROM_LOAD16_BYTE( "pa-rom6.bin", 0x000001, 0x010000, CRC(f6f8a167) SHA1(60d5c9db18d8f6704b68ccde5d026174679cec36) )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
-	ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP )
+	// ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
+	// ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP ) // appears to be a UPD65006 gate array, not an MCU
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "pa-rom11.bin", 0x000000, 0x020000, CRC(eb709ae7) SHA1(434c9da3c79a97ddd9be77908ce65e9efe6c8106) )
@@ -4644,8 +4634,8 @@ ROM_START( stdragon )
 	ROM_LOAD16_BYTE( "jsd-05.bin", 0x000000, 0x010000, CRC(8c04feaa) SHA1(57e86fd88dc72d123a41f0dee80a16be38ac2e81) )
 	ROM_LOAD16_BYTE( "jsd-06.bin", 0x000001, 0x010000, CRC(0bb62f3a) SHA1(68d9f161ba2568f8e046b1a40127bbb973d7a884) )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
-	ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP )
+	// ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
+	// ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP ) // appears to be a UPD65006 gate array, not an MCU
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "jsd-11.bin", 0x000000, 0x020000, CRC(2783b7b1) SHA1(4edde596cf26afb33b247cf5b1420d86f8f0c104) )
@@ -4712,8 +4702,8 @@ ROM_START( stdragona )
 	ROM_LOAD16_BYTE( "jsd-05.bin", 0x000000, 0x010000, CRC(8c04feaa) SHA1(57e86fd88dc72d123a41f0dee80a16be38ac2e81) )
 	ROM_LOAD16_BYTE( "jsd-06.bin", 0x000001, 0x010000, CRC(0bb62f3a) SHA1(68d9f161ba2568f8e046b1a40127bbb973d7a884) )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
-	ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP )
+	// ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
+	// ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP ) // appears to be a UPD65006 gate array, not an MCU
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 - scrambled */
 	ROM_LOAD( "e71-14.bin", 0x000000, 0x080000, CRC(8e26ff92) SHA1(06985056027facb1d3df08cf04277492c1be6102) )
@@ -4908,8 +4898,8 @@ ROM_START( tshingena )
 	ROM_LOAD16_BYTE( "takeda5.bin", 0x000000, 0x010000, CRC(fbdc51c0) SHA1(bc6036c556275f7eccd7741d23437a98b0aa13bb) )
 	ROM_LOAD16_BYTE( "takeda6.bin", 0x000001, 0x010000, CRC(8fa65b69) SHA1(23a2d60435f235366f877ac79ac1506a99cfae9c) )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
-	ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP )
+	// ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
+	// ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP ) // appears to be a UPD65006 gate array, not an MCU
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "takeda11.bin", 0x000000, 0x020000, CRC(bf0b40a6) SHA1(3634b8700b6cfb71d3796847eab50fd2714d4726) )
@@ -4951,8 +4941,8 @@ ROM_START( tshingen )
 	ROM_LOAD16_BYTE( "takeda5.bin", 0x000000, 0x010000, CRC(fbdc51c0) SHA1(bc6036c556275f7eccd7741d23437a98b0aa13bb) )
 	ROM_LOAD16_BYTE( "takeda6.bin", 0x000001, 0x010000, CRC(8fa65b69) SHA1(23a2d60435f235366f877ac79ac1506a99cfae9c) )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
-	ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP )
+	// ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
+	// ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP ) // appears to be a UPD65006 gate array, not an MCU
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "takeda11.bin", 0x000000, 0x020000, CRC(bf0b40a6) SHA1(3634b8700b6cfb71d3796847eab50fd2714d4726) )
@@ -5070,8 +5060,8 @@ void megasys1_state::stdragona_gfx_unmangle(const char *region)
 
 /*
     MCU handshake sequence:
-    the M50747 MCU can overlay 0x40 bytes of data inside the ROM space.
-    The offset where this happens is given by m68k to MCU write [0x8/2] << 6.
+    the UPD65006 gate array can overlay 0x40 bytes of data inside the ROM space.
+    The offset where this happens is given by m68k to UPD65006 write [0x8/2] << 6.
     For example stdragon writes 0x33e -> maps at 0xcf80-0xcfbf while stdragona writes 0x33f -> maps at 0xcfc0-0xcfff.
     Note: stdragona forgets to turn off the overlay before the ROM check in service mode (hence it reports an error).
 */
@@ -5084,7 +5074,172 @@ void megasys1_state::stdragona_gfx_unmangle(const char *region)
 		m_mcu_hs_ram[4/2] == _3_ && \
 		m_mcu_hs_ram[6/2] == _4_)
 
-void megasys1_bc_iosim_state::init_64street()
+u16 megasys1_state::gatearray_r(offs_t offset, u16 mem_mask)
+{
+	if(m_mcu_hs && ((m_mcu_hs_ram[8/2] << 6) & 0x3ffc0) == ((offset*2) & 0x3ffc0))
+	{
+		if(MCU_HS_LOG && !machine().side_effects_disabled())
+			printf("MCU HS R (%04x) <- [%02x]\n",mem_mask,offset*2);
+
+		if (m_gatearray_seq)
+			return m_gatearray_seq[4];
+		else
+			return 0;
+	}
+
+	return m_rom_maincpu[offset];
+}
+
+void megasys1_state::gatearray_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	// [0/2]: 0x0000
+	// [2/2]: 0x0055
+	// [4/2]: 0x00aa
+	// [6/2]: 0x00ff
+	// [8/2]: 0x0bc0
+	// expects 0x835d to be read at 0x2f000, does hs sequence until that happens
+
+	COMBINE_DATA(&m_mcu_hs_ram[offset]);
+
+	if (!m_gatearray_seq)
+		return;
+
+	if(MCU_HS_SEQ(m_gatearray_seq[0],m_gatearray_seq[1],m_gatearray_seq[2],m_gatearray_seq[3]) && offset == 0x8/2)
+		m_mcu_hs = 1;
+	else
+		m_mcu_hs = 0;
+
+	if(MCU_HS_LOG && !machine().side_effects_disabled())
+		printf("MCU HS W %04x (%04x) -> [%02x]\n",data,mem_mask,offset*2);
+}
+
+void megasys1_state::install_gatearray_overlay(uint32_t base_write, const uint16_t* sequence)
+{
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16s_delegate(*this, FUNC(megasys1_state::gatearray_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(base_write, base_write+0x9, write16s_delegate(*this, FUNC(megasys1_state::gatearray_w)));
+	m_gatearray_seq = sequence;
+	m_mcu_hs = 0;
+	memset(m_mcu_hs_ram, 0, sizeof(m_mcu_hs_ram));
+	save_item(NAME(m_mcu_hs));
+	save_item(NAME(m_mcu_hs_ram));
+}
+
+void megasys1_state::init_astyanax() // Type A
+{
+	astyanax_rom_decode(machine(), "maincpu");
+	install_gatearray_overlay(0x20000, hachoo_seq);
+}
+
+void megasys1_state::init_iganinju() // Type A
+{
+	phantasm_rom_decode(machine(), "maincpu");
+	install_gatearray_overlay(0x2f000, iga_seq);
+}
+
+void megasys1_state::init_stdragon() // Type A
+{
+	phantasm_rom_decode(machine(), "maincpu");
+	install_gatearray_overlay(0x23ff0, iga_seq);
+}
+
+void megasys1_state::init_jitsupro() // Type A
+{
+	init_astyanax();
+	// additional graphic scramble
+	jitsupro_gfx_unmangle("scroll0");   // Gfx
+	jitsupro_gfx_unmangle("sprites");
+}
+
+void megasys1_state::init_stdragona() // Type A
+{
+	init_stdragon();
+	// additional graphic scramble
+	stdragona_gfx_unmangle("scroll0");
+	stdragona_gfx_unmangle("sprites");
+}
+
+void megasys1_state::init_rodland() // Type A
+{
+	rodland_rom_decode(machine(), "maincpu");
+	// additional graphic scramble
+	rodland_gfx_unmangle("scroll0");
+	rodland_gfx_unmangle("sprites");
+}
+
+void megasys1_state::init_rodlandj() // Type A
+{
+	astyanax_rom_decode(machine(), "maincpu");
+	// additional graphic scramble
+	rodland_gfx_unmangle("scroll0");
+	rodland_gfx_unmangle("sprites");
+}
+
+void megasys1_state::init_phantasm() // Type A
+{
+	phantasm_rom_decode(machine(), "maincpu");
+}
+
+void megasys1_state::init_soldamj() // Type A
+{
+	astyanax_rom_decode(machine(), "maincpu");
+}
+
+void megasys1_state::init_stdragonb() // Type A
+{
+	stdragona_gfx_unmangle("scroll0");
+	stdragona_gfx_unmangle("sprites");
+}
+
+void megasys1_state::init_rodlandjb() // Type A, bootleg
+{
+	// no program scramble on bootleg
+	rodland_gfx_unmangle("scroll0");
+	rodland_gfx_unmangle("sprites");
+}
+
+void megasys1_bc_iosim_state::init_avspirit() // Type B
+{
+	m_ip_select_values[0] = 0x37;
+	m_ip_select_values[1] = 0x35;
+	m_ip_select_values[2] = 0x36;
+	m_ip_select_values[3] = 0x33;
+	m_ip_select_values[4] = 0x34;
+
+	m_ip_select_values[5] = 0xff;
+	m_ip_select_values[6] = 0x06;
+
+	save_item(NAME(m_ip_latched));
+}
+
+void megasys1_bc_iosim_state::init_edf() // Type B
+{
+	m_ip_select_values[0] = 0x20;
+	m_ip_select_values[1] = 0x21;
+	m_ip_select_values[2] = 0x22;
+	m_ip_select_values[3] = 0x23;
+	m_ip_select_values[4] = 0x24;
+
+	m_ip_select_values[5] = 0xf0;
+	m_ip_select_values[6] = 0x06;
+
+	save_item(NAME(m_ip_latched));
+}
+
+void megasys1_bc_iosim_state::init_hayaosi1() // Type B
+{
+	m_ip_select_values[0] = 0x51;
+	m_ip_select_values[1] = 0x52;
+	m_ip_select_values[2] = 0x53;
+	m_ip_select_values[3] = 0x54;
+	m_ip_select_values[4] = 0x55;
+
+	m_ip_select_values[5] = 0xfc;
+	m_ip_select_values[6] = 0x06;
+
+	save_item(NAME(m_ip_latched));
+}
+
+void megasys1_bc_iosim_state::init_64street() // Type C
 {
 //  u16 *ROM = (u16 *) memregion("maincpu")->base();
 //  ROM[0x006b8/2] = 0x6004;        // d8001 test
@@ -5103,97 +5258,9 @@ void megasys1_bc_iosim_state::init_64street()
 	save_item(NAME(m_sprite_bank));
 }
 
-u16 megasys1_state::megasys1A_mcu_hs_r(offs_t offset, u16 mem_mask)
+void megasys1_bc_iosim_state::init_chimerab() // Type C
 {
-	if(m_mcu_hs && ((m_mcu_hs_ram[8/2] << 6) & 0x3ffc0) == ((offset*2) & 0x3ffc0))
-	{
-		if(MCU_HS_LOG && !machine().side_effects_disabled())
-			printf("MCU HS R (%04x) <- [%02x]\n",mem_mask,offset*2);
-
-		return 0x889e;
-	}
-
-	return m_rom_maincpu[offset];
-}
-
-void megasys1_state::megasys1A_mcu_hs_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	// following is hachoo, other games differs slightly
-	// R 0x5f0, if bit 0 == 0 then skips hs seq (debug?)
-	// [0/2]: 0x00ff
-	// [2/2]: 0x0055
-	// [4/2]: 0x00aa
-	// [6/2]: 0x0000
-	// [8/2]: 0x0fff
-	// R 0x5f0, if bit 1 == 0 then goes further (debug again?)
-	// R 0x3ffc0, compares with seed 0x889e
-
-	COMBINE_DATA(&m_mcu_hs_ram[offset]);
-
-	if(MCU_HS_SEQ(0x00ff,0x0055,0x00aa,0x0000) && offset == 0x8/2)
-		m_mcu_hs = 1;
-	else
-		m_mcu_hs = 0;
-
-	if(MCU_HS_LOG && !machine().side_effects_disabled())
-		printf("MCU HS W %04x (%04x) -> [%02x]\n",data,mem_mask,offset*2);
-}
-
-void megasys1_state::init_astyanax()
-{
-	astyanax_rom_decode(machine(), "maincpu");
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16s_delegate(*this, FUNC(megasys1_state::megasys1A_mcu_hs_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20000, 0x20009, write16s_delegate(*this, FUNC(megasys1_state::megasys1A_mcu_hs_w)));
-
-	m_mcu_hs = 0;
-	memset(m_mcu_hs_ram, 0, sizeof(m_mcu_hs_ram));
-
-	save_item(NAME(m_mcu_hs));
-	save_item(NAME(m_mcu_hs_ram));
-}
-
-void megasys1_state::init_lordofkbp()
-{
-	uint8_t *rom = memregion("maincpu")->base();
-
-	for (int i = 0x20000; i < 0x40000; i += 2)
-	{
-		if (i & 0x02)
-			rom[i] = 0x51 - rom[i];
-		else
-			rom[i] = 0xc7 - rom[i];
-	}
-}
-
-void megasys1_bc_iosim_state::init_avspirit()
-{
-	m_ip_select_values[0] = 0x37;
-	m_ip_select_values[1] = 0x35;
-	m_ip_select_values[2] = 0x36;
-	m_ip_select_values[3] = 0x33;
-	m_ip_select_values[4] = 0x34;
-
-	m_ip_select_values[5] = 0xff;
-	m_ip_select_values[6] = 0x06;
-
-
-	// has half as much RAM
-	m_maincpu->space(AS_PROGRAM).unmap_readwrite(0x060000, 0x06ffff);
-	m_maincpu->space(AS_PROGRAM).install_ram(0x070000, 0x07ffff, m_ram);
-
-	save_item(NAME(m_ip_latched));
-}
-
-void megasys1_bc_iomcu_state::init_bigstrik()
-{
-	save_item(NAME(m_sprite_bank));
-	save_item(NAME(m_mcu_input_data));
-	save_item(NAME(m_mcu_io_data));
-}
-
-void megasys1_bc_iosim_state::init_chimerab()
-{
-	/* same as cybattlr */
+	/* same as cybattlr - was this a bootleg conversion? */
 	m_ip_select_values[0] = 0x56;
 	m_ip_select_values[1] = 0x52;
 	m_ip_select_values[2] = 0x53;
@@ -5207,7 +5274,7 @@ void megasys1_bc_iosim_state::init_chimerab()
 	save_item(NAME(m_sprite_bank));
 }
 
-void megasys1_bc_iosim_state::init_chimeraba()
+void megasys1_bc_iosim_state::init_chimeraba() // Type C
 {
 	m_ip_select_values[0] = 0x56;
 	m_ip_select_values[1] = 0x52;
@@ -5222,8 +5289,7 @@ void megasys1_bc_iosim_state::init_chimeraba()
 	save_item(NAME(m_sprite_bank));
 }
 
-
-void megasys1_bc_iosim_state::init_cybattlr()
+void megasys1_bc_iosim_state::init_cybattlr() // Type C
 {
 	m_ip_select_values[0] = 0x56;
 	m_ip_select_values[1] = 0x52;
@@ -5238,105 +5304,14 @@ void megasys1_bc_iosim_state::init_cybattlr()
 	save_item(NAME(m_sprite_bank));
 }
 
-void megasys1_bc_iosim_state::init_edf()
+void megasys1_bc_iomcu_state::init_bigstrik() // Type C
 {
-	m_ip_select_values[0] = 0x20;
-	m_ip_select_values[1] = 0x21;
-	m_ip_select_values[2] = 0x22;
-	m_ip_select_values[3] = 0x23;
-	m_ip_select_values[4] = 0x24;
-
-	m_ip_select_values[5] = 0xf0;
-	m_ip_select_values[6] = 0x06;
-
-	save_item(NAME(m_ip_latched));
+	save_item(NAME(m_sprite_bank));
+	save_item(NAME(m_mcu_input_data));
+	save_item(NAME(m_mcu_io_data));
 }
 
-void megasys1_state::init_edfp()
-{
-	phantasm_rom_decode(machine(), "maincpu");
-}
-
-void megasys1_bc_iosim_state::init_hayaosi1()
-{
-	m_ip_select_values[0] = 0x51;
-	m_ip_select_values[1] = 0x52;
-	m_ip_select_values[2] = 0x53;
-	m_ip_select_values[3] = 0x54;
-	m_ip_select_values[4] = 0x55;
-
-	m_ip_select_values[5] = 0xfc;
-	m_ip_select_values[6] = 0x06;
-
-	save_item(NAME(m_ip_latched));
-}
-
-u16 megasys1_state::iganinju_mcu_hs_r(offs_t offset, u16 mem_mask)
-{
-	if(m_mcu_hs && ((m_mcu_hs_ram[8/2] << 6) & 0x3ffc0) == ((offset*2) & 0x3ffc0))
-	{
-		if(MCU_HS_LOG && !machine().side_effects_disabled())
-			printf("MCU HS R (%04x) <- [%02x]\n",mem_mask,offset*2);
-
-		return 0x835d;
-	}
-
-	return m_rom_maincpu[offset];
-}
-
-void megasys1_state::iganinju_mcu_hs_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	// [0/2]: 0x0000
-	// [2/2]: 0x0055
-	// [4/2]: 0x00aa
-	// [6/2]: 0x00ff
-	// [8/2]: 0x0bc0
-	// expects 0x835d to be read at 0x2f000, does hs sequence until that happens
-
-	COMBINE_DATA(&m_mcu_hs_ram[offset]);
-
-	if(MCU_HS_SEQ(0x0000,0x0055,0x00aa,0x00ff) && offset == 0x8/2)
-		m_mcu_hs = 1;
-	else
-		m_mcu_hs = 0;
-
-	if(MCU_HS_LOG && !machine().side_effects_disabled())
-		printf("MCU HS W %04x (%04x) -> [%02x]\n",data,mem_mask,offset*2);
-}
-
-void megasys1_state::init_iganinju()
-{
-	phantasm_rom_decode(machine(), "maincpu");
-
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16s_delegate(*this, FUNC(megasys1_state::iganinju_mcu_hs_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x2f000, 0x2f009, write16s_delegate(*this, FUNC(megasys1_state::iganinju_mcu_hs_w)));
-
-	//m_rom_maincpu[0x00006e/2] = 0x0420; // the only game that does
-										// not like lev 3 interrupts
-
-	m_mcu_hs = 0;
-	memset(m_mcu_hs_ram, 0, sizeof(m_mcu_hs_ram));
-
-	save_item(NAME(m_mcu_hs));
-	save_item(NAME(m_mcu_hs_ram));
-}
-
-void megasys1_state::init_jitsupro()
-{
-	astyanax_rom_decode(machine(), "maincpu");      // Code
-
-	jitsupro_gfx_unmangle("scroll0");   // Gfx
-	jitsupro_gfx_unmangle("sprites");
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16s_delegate(*this, FUNC(megasys1_state::megasys1A_mcu_hs_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20000, 0x20009, write16s_delegate(*this, FUNC(megasys1_state::megasys1A_mcu_hs_w)));
-
-	m_mcu_hs = 0;
-	memset(m_mcu_hs_ram, 0, sizeof(m_mcu_hs_ram));
-
-	save_item(NAME(m_mcu_hs));
-	save_item(NAME(m_mcu_hs_ram));
-}
-
+// Type D
 void megasys1_state::init_peekaboo()
 {
 	u8 *ROM = memregion("oki1")->base();
@@ -5350,134 +5325,24 @@ void megasys1_state::init_peekaboo()
 	save_item(NAME(m_protection_val));
 }
 
-void megasys1_state::init_phantasm()
+// bootleg
+void megasys1_state::init_lordofkbp()
 {
-	phantasm_rom_decode(machine(), "maincpu");
-}
+	uint8_t *rom = memregion("maincpu")->base();
 
-void megasys1_state::init_rodland()
-{
-	rodland_gfx_unmangle("scroll0");
-	rodland_gfx_unmangle("sprites");
-
-	rodland_rom_decode(machine(), "maincpu");
-}
-
-void megasys1_state::init_rodlandj()
-{
-	rodland_gfx_unmangle("scroll0");
-	rodland_gfx_unmangle("sprites");
-
-	astyanax_rom_decode(machine(), "maincpu");
-}
-
-void megasys1_state::init_rodlandjb()
-{
-	rodland_gfx_unmangle("scroll0");
-	rodland_gfx_unmangle("sprites");
-}
-
-void megasys1_state::init_rittam()
-{
-	astyanax_rom_decode(machine(), "maincpu");
-}
-
-u16 megasys1_state::soldamj_spriteram16_r(offs_t offset)
-{
-	return m_spriteram[offset];
-}
-
-void megasys1_state::soldamj_spriteram16_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	if (offset < 0x800/2)   COMBINE_DATA(&m_spriteram[offset]);
-}
-
-void megasys1_state::init_soldamj()
-{
-	astyanax_rom_decode(machine(), "maincpu");
-	/* Sprite RAM is mirrored */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x8c000, 0x8cfff, read16sm_delegate(*this, FUNC(megasys1_state::soldamj_spriteram16_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x8c000, 0x8cfff, write16s_delegate(*this, FUNC(megasys1_state::soldamj_spriteram16_w)));
-}
-
-void megasys1_state::init_soldam()
-{
-	phantasm_rom_decode(machine(), "maincpu");
-	/* Sprite RAM is mirrored */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x8c000, 0x8cfff, read16sm_delegate(*this, FUNC(megasys1_state::soldamj_spriteram16_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x8c000, 0x8cfff, write16s_delegate(*this, FUNC(megasys1_state::soldamj_spriteram16_w)));
-}
-
-
-u16 megasys1_state::stdragon_mcu_hs_r(offs_t offset, u16 mem_mask)
-{
-	if(m_mcu_hs && ((m_mcu_hs_ram[8/2] << 6) & 0x3ffc0) == ((offset*2) & 0x3ffc0))
+	for (int i = 0x20000; i < 0x40000; i += 2)
 	{
-		if(MCU_HS_LOG && !machine().side_effects_disabled())
-			printf("MCU HS R (%04x) <- [%02x]\n",mem_mask,offset*2);
-
-		return 0x835d;
+		if (i & 0x02)
+			rom[i] = 0x51 - rom[i];
+		else
+			rom[i] = 0xc7 - rom[i];
 	}
-
-	return m_rom_maincpu[offset];
-}
-
-void megasys1_state::stdragon_mcu_hs_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	COMBINE_DATA(&m_mcu_hs_ram[offset]);
-
-	if(MCU_HS_SEQ(0x0000,0x0055,0x00aa,0x00ff) && offset == 0x8/2)
-		m_mcu_hs = 1;
-	else
-		m_mcu_hs = 0;
-
-	if(MCU_HS_LOG && !machine().side_effects_disabled())
-		printf("MCU HS W %04x (%04x) -> [%02x]\n",data,mem_mask,offset*2);
 }
 
 
-void megasys1_state::init_stdragon()
-{
-	phantasm_rom_decode(machine(), "maincpu");
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16s_delegate(*this, FUNC(megasys1_state::stdragon_mcu_hs_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x23ff0, 0x23ff9, write16s_delegate(*this, FUNC(megasys1_state::stdragon_mcu_hs_w)));
-
-	m_mcu_hs = 0;
-	memset(m_mcu_hs_ram, 0, sizeof(m_mcu_hs_ram));
-
-	save_item(NAME(m_mcu_hs));
-	save_item(NAME(m_mcu_hs_ram));
-}
-
-void megasys1_state::init_stdragona()
-{
-	phantasm_rom_decode(machine(), "maincpu");
-
-	stdragona_gfx_unmangle("scroll0");
-	stdragona_gfx_unmangle("sprites");
-
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16s_delegate(*this, FUNC(megasys1_state::stdragon_mcu_hs_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x23ff0, 0x23ff9, write16s_delegate(*this, FUNC(megasys1_state::stdragon_mcu_hs_w)));
-
-	m_mcu_hs = 0;
-	memset(m_mcu_hs_ram, 0, sizeof(m_mcu_hs_ram));
-
-	save_item(NAME(m_mcu_hs));
-	save_item(NAME(m_mcu_hs_ram));
-}
-
-void megasys1_state::init_stdragonb()
-{
-	stdragona_gfx_unmangle("scroll0");
-	stdragona_gfx_unmangle("sprites");
-}
-
+// bootleg
 void megasys1_state::init_monkelf()
 {
-	// has half as much RAM
-	m_maincpu->space(AS_PROGRAM).unmap_readwrite(0x060000, 0x06ffff);
-	m_maincpu->space(AS_PROGRAM).install_ram(0x070000, 0x07ffff, m_ram);
-
 	m_rom_maincpu[0x00744/2] = 0x4e71; // weird check, 0xe000e R is a port-based trap?
 
 	// convert bootleg priority format to standard
@@ -5519,7 +5384,7 @@ GAME( 1989, lordofkb,   astyanax, system_A,          astyanax, megasys1_state, e
 GAME( 1989, lordofkbp,  astyanax, system_A,          astyanax, megasys1_state, init_lordofkbp,ROT0,   "bootleg","The Lord of King (bootleg, protected)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, hachoo,     0,        system_A,          hachoo,   megasys1_hachoo_state, init_astyanax, ROT0,   "Jaleco", "Hachoo! (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, hachooa,    hachoo,   system_A,          hachoo,   megasys1_hachoo_state, init_astyanax, ROT0,   "Jaleco", "Hachoo! (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, jitsupro,   0,        system_A_jitsupro, jitsupro, megasys1_state, init_jitsupro, ROT0,   "Jaleco", "Jitsuryoku!! Pro Yakyuu (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, jitsupro,   0,        system_A,          jitsupro, megasys1_state, init_jitsupro, ROT0,   "Jaleco", "Jitsuryoku!! Pro Yakyuu (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, plusalph,   0,        system_A,          plusalph, megasys1_state, init_astyanax, ROT270, "Jaleco", "Plus Alpha", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, stdragon,   0,        system_A,          stdragon, megasys1_state, init_stdragon, ROT0,   "Jaleco", "Saint Dragon (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, stdragona,  stdragon, system_A,          stdragon, megasys1_state, init_stdragona,ROT0,   "Jaleco", "Saint Dragon (set 2)", MACHINE_SUPPORTS_SAVE )
@@ -5527,13 +5392,13 @@ GAME( 1989, stdragonb,  stdragon, system_A,          stdragon, megasys1_state, i
 GAME( 1990, rodland,    0,        system_A,          rodland,  megasys1_state, init_rodland,  ROT0,   "Jaleco", "Rod-Land (World, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, rodlanda,   rodland,  system_A,          rodland,  megasys1_state, init_rodlandj, ROT0,   "Jaleco", "Rod-Land (World, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, rodlandj,   rodland,  system_A,          rodland,  megasys1_state, init_rodlandj, ROT0,   "Jaleco", "Rod-Land (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, rittam,     rodland,  system_A,          rodland,  megasys1_state, init_rittam,   ROT0,   "Jaleco", "R&T (Rod-Land prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, rittam,     rodland,  system_A,          rodland,  megasys1_state, init_soldamj,  ROT0,   "Jaleco", "R&T (Rod-Land prototype)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, rodlandjb,  rodland,  system_A,          rodland,  megasys1_state, init_rodlandjb,ROT0,   "bootleg","Rod-Land (Japan bootleg with unencrypted program)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, rodlandjb2, rodland,  system_A,          rodland,  megasys1_state, empty_init,    ROT0,   "bootleg","Rod-Land (Japan bootleg with unencrypted program and GFX)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, phantasm,   avspirit, system_A,          phantasm, megasys1_state, init_phantasm, ROT0,   "Jaleco", "Phantasm (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, edfp,       edf,      system_A,          edfp,     megasys1_state, init_edfp,     ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (Japan, prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, edfp,       edf,      system_A,          edfp,     megasys1_state, init_phantasm, ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (Japan, prototype)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, inyourfa,   0,        system_A,          inyourfa, megasys1_state, init_iganinju, ROT0,   "Jaleco", "In Your Face (North America, prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, soldam,     0,        system_A_soldam,   soldam,   megasys1_state, init_soldam,   ROT0,   "Jaleco", "Soldam", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, soldam,     0,        system_A_soldam,   soldam,   megasys1_state, init_phantasm, ROT0,   "Jaleco", "Soldam", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, soldamj,    soldam,   system_A_soldam,   soldam,   megasys1_state, init_soldamj,  ROT0,   "Jaleco", "Soldam (Japan)", MACHINE_SUPPORTS_SAVE )
 
 // Type B
