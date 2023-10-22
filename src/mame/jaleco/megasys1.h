@@ -283,8 +283,6 @@ public:
 		m_iomcu(*this, "iomcu")
 	{ }
 
-	void init_bigstrik();
-
 	void system_C_bigstrik(machine_config &config);
 
 protected:

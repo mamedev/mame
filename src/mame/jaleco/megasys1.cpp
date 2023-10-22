@@ -5231,24 +5231,16 @@ void megasys1_bc_iosim_state::init_64street() // Type C
 //  ROM[0x006b8/2] = 0x6004;        // d8001 test
 //  ROM[0x10EDE/2] = 0x6012;        // watchdog
 	m_ip_select_values = street_seq;
-	save_item(NAME(m_sprite_bank));
 }
 
 void megasys1_bc_iosim_state::init_chimeraba() // Type C
 {
 	m_ip_select_values = chimeraba_seq;
-	save_item(NAME(m_sprite_bank));
 }
 
 void megasys1_bc_iosim_state::init_cybattlr() // Type C
 {
 	m_ip_select_values = cybattler_seq;
-	save_item(NAME(m_sprite_bank));
-}
-
-void megasys1_bc_iomcu_state::init_bigstrik() // Type C
-{
-	save_item(NAME(m_sprite_bank));
 }
 
 // Type D
@@ -5354,7 +5346,7 @@ GAME( 1993, hayaosi1,   0,        system_B_hayaosi1, hayaosi1, megasys1_bc_iosim
 GAME( 1991, 64street,   0,        system_C_iosim,          64street, megasys1_bc_iosim_state, init_64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, 64streetj,  64street, system_C_iosim,          64street, megasys1_bc_iosim_state, init_64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, 64streetja, 64street, system_C_iosim,          64street, megasys1_bc_iosim_state, init_64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, bigstrik,   0,        system_C_bigstrik,       bigstrik, megasys1_bc_iomcu_state, init_bigstrik, ROT0,   "Jaleco", "Big Striker", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, bigstrik,   0,        system_C_bigstrik,       bigstrik, megasys1_bc_iomcu_state, empty_init,    ROT0,   "Jaleco", "Big Striker", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, chimerab,   0,        system_C_iosim,          chimerab, megasys1_bc_iosim_state, init_cybattlr, ROT0,   "Jaleco", "Chimera Beast (Japan, prototype, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, chimeraba,  chimerab, system_C_iosim,          chimerab, megasys1_bc_iosim_state, init_chimeraba,ROT0,   "Jaleco", "Chimera Beast (Japan, prototype, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, cybattlr,   0,        system_C_iosim,          cybattlr, megasys1_bc_iosim_state, init_cybattlr, ROT90,  "Jaleco", "Cybattler", MACHINE_SUPPORTS_SAVE )

@@ -217,6 +217,7 @@ void megasys1_state::video_start()
 	save_item(NAME(m_screen_flag));
 	save_item(NAME(m_active_layers));
 	save_item(NAME(m_sprite_flag));
+	save_item(NAME(m_sprite_bank)); // only on type C
 }
 
 
