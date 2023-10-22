@@ -187,7 +187,7 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(megasys1A_iganinju_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(megasys1C_scanline);
 
-	void install_gatearray_overlay(uint32_t base_write, const uint16_t* sequence);
+	void install_gatearray_overlay(u32 base_write, const u16 *sequence);
 	void priority_create();
 	void rodland_gfx_unmangle(const char *region);
 	void jitsupro_gfx_unmangle(const char *region);

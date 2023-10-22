@@ -5115,13 +5115,14 @@ void megasys1_state::gatearray_w(offs_t offset, u16 data, u16 mem_mask)
 		printf("MCU HS W %04x (%04x) -> [%02x]\n",data,mem_mask,offset*2);
 }
 
-void megasys1_state::install_gatearray_overlay(uint32_t base_write, const uint16_t* sequence)
+void megasys1_state::install_gatearray_overlay(u32 base_write, const u16 *sequence)
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16s_delegate(*this, FUNC(megasys1_state::gatearray_r)));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(base_write, base_write+0x9, write16s_delegate(*this, FUNC(megasys1_state::gatearray_w)));
 	m_gatearray_seq = sequence;
 	m_mcu_hs = 0;
 	memset(m_mcu_hs_ram, 0, sizeof(m_mcu_hs_ram));
+
 	save_item(NAME(m_mcu_hs));
 	save_item(NAME(m_mcu_hs_ram));
 }
