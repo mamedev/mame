@@ -1153,19 +1153,19 @@ static INPUT_PORTS_START( yorijori )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( solitaire )
-	PORT_START("P1_P2")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) // L1 Button in test mode
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) // L2 Button in test mode
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) // L3 Button in test mode
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) // L4 Button in test mode
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) // L5 Button in test mode
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON6 ) // L6 Button in test mode
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON7 ) // L7 Button in test mode
+	PORT_START("P1_P2") // when you have no more moves, hold down “Turn Up Card” & “Register” and you get a count down to end that round / game
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_Z) PORT_NAME("Column 1 / 2 Credit Start") // L1 Button in test mode
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_X) PORT_NAME("Column 2 / 3 Credit Start") // L2 Button in test mode
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_C) PORT_NAME("Column 3 / 4 Credit Start") // L3 Button in test mode
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CODE(KEYCODE_V) PORT_NAME("Column 4") // L4 Button in test mode
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_B) PORT_NAME("Column 5") // L5 Button in test mode
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_CODE(KEYCODE_N) PORT_NAME("Column 6") // L6 Button in test mode
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_CODE(KEYCODE_M) PORT_NAME("Column 7") // L7 Button in test mode
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON8 ) // D1 Button in test mode
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON9 ) // D2 Button in test mode
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON10 ) // R1 Button in test mode
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON11 ) // Gift Button in test mode
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_CODE(KEYCODE_A) PORT_NAME("Turn Up Card") // D1 Button in test mode
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_CODE(KEYCODE_S) PORT_NAME("Select Turned Up Card") // D2 Button in test mode
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_CODE(KEYCODE_D) PORT_NAME("Register") // R1 Button in test mode
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_CODE(KEYCODE_F) PORT_NAME("Gift") // Gift Button in test mode
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
@@ -1985,38 +1985,6 @@ ROM_END
 
 /*
 
-Solitaire (c) 1999 F2 System
-
-   CPU: Hyperstone E1-16T
- Video: 2 x QuickLogic QL2003-XPL84C FPGA
- Sound: AD-65 (OKI 6295), KA51 (YM2151) & KA12 (YM3012)
-   OSC: 20MHz & 28MHz
-EEPROM: 93C46
-
-PCB: F-E1-16-004
-
-*/
-
-ROM_START( solitaire ) // Version 2.5
-	ROM_REGION32_BE( 0x100000, "maincpu", ROMREGION_ERASE00 ) // Hyperstone CPU Code
-	// 0 - 0x80000 empty
-	ROM_LOAD( "rom2-27c040.bin",                    0x080000, 0x080000, CRC(304e4338) SHA1(6b2817d7505c943ca7cdfa9176c9504e30936235) )
-
-	ROM_REGION32_BE( 0x800000, "gfx", 0 )  // gfx data
-	ROM_LOAD32_WORD_SWAP( "romu00-mx29f1610mc.bin", 0x000000, 0x200000, CRC(7fee63ac) SHA1(ef22145da9ce3100c8736e9a77e59da4f984aaba) )
-	ROM_LOAD32_WORD_SWAP( "roml00-mx29f1610mc.bin", 0x000002, 0x200000, CRC(0d973625) SHA1(b482a97732a6117d9c1c7507118e111ac4f7f3f1) )
-	ROM_LOAD32_WORD_SWAP( "romu01-mx29f1610mc.bin", 0x400000, 0x200000, CRC(f3f3f3e5) SHA1(9a0d91351903b70049fbbc76a9ccff1a382ecbfd) )
-	ROM_LOAD32_WORD_SWAP( "roml01-mx29f1610mc.bin", 0x400002, 0x200000, CRC(5bba95b8) SHA1(6d884a694cbbad6768e606afd5b234a07a3b5b50) )
-
-	ROM_REGION( 0x80000, "oki1", 0 ) // Oki Samples
-	ROM_LOAD( "vrom1-27c020.bin",                   0x000000, 0x040000, CRC(bbbf4ac8) SHA1(b37f945143a9ed7a372a953ef93dbea01c4fcce4) )
-
-	ROM_REGION( 0x2dd, "plds", 0 )
-	ROM_LOAD( "palce22v10.gal1",                    0x000000, 0x0002dd, NO_DUMP ) // Protected
-ROM_END
-
-/*
-
 Mr. Dig
 SUN, 2000
 
@@ -2076,6 +2044,71 @@ ROM_START( mrdig )
 
 	ROM_REGION( 0x40000, "oki1", 0 ) /* Oki Samples */
 	ROM_LOAD( "vrom1.bin", 0x00000, 0x40000, CRC(5fd9e1c6) SHA1(fef82ef816af69f31d12fc4634d06d825e8b7416) )
+ROM_END
+
+/*
+
+Solitaire
+F2 System, 1999
+
+F-E1-16-004
++-----------------------------------------------+
+| RESET                  KA12    VROM1  ROMU01  |
+| TEST                   KA51    AD-65  ROMU00  |
+|                CRAM2        28.000MHz ROML01  |
+|                CRAM1                  ROML00  |
+|                                               |
+|J                                  +----------+|
+|A      DRAM1  E1-16T ROM2          |          ||
+|M              50.000MHz           |Quicklogic||
+|M          PAL                     | QL2003-  ||
+|A              93C46               | XPL84C   ||
+|                             MEM1U +----------+|
+|                +----------+ MEM1L             |
+|         MOTOR3 |          | MEM3              |
+|         MOTOR2 |Quicklogic| MEM2              |
+|         MOTOR1 | QL2003-  | MEM7              |
+|  M01 L01 LIGHT | XPL84C   | MEM6              |
++----------------+----------+-------------------+
+
+   CPU: Hyperstone E1-16T
+ Video: 2 x QuickLogic QL2003-XPL84C FPGA
+ Sound: AD-65 (OKI 6295), KA51 (YM2151) & KA12 (YM3012)
+   OSC: 50MHz & 28MHz
+EEPROM: 93C46
+
+MOTOR1 - MOTOR3 are 4 pin headers
+LIGHT is a 4 pin header
+AAM01 & AAL01 are 10 pin headers
+RESET & TEST are push buttons
+
+RAM:
+     DRAM1 - LG Semi GM71C18163 1M x16 EDO DRAM (SOJ44)
+MEMx/CRAMx - NKK N341256SJ-15 32K x8 SRAM (SOJ28)
+
+ROMs:
+    ROMU00/L00 & ROMU01/L01 - Macronix MX29F1610MC-12 SOP44 16MBit FlashROM
+    ROM2  - AMD AM27C040 4MBit DIP32 EPROM
+    VROM1 - AMD AM27C020 2MBit DIP32 EPROM
+
+*/
+
+ROM_START( solitaire ) // Version 2.5
+	ROM_REGION32_BE( 0x100000, "maincpu", ROMREGION_ERASE00 ) // Hyperstone CPU Code
+	// 0 - 0x80000 empty
+	ROM_LOAD( "rom2.bin",               0x080000, 0x080000, CRC(304e4338) SHA1(6b2817d7505c943ca7cdfa9176c9504e30936235) ) // 27c040
+
+	ROM_REGION32_BE( 0x800000, "gfx", 0 )  // gfx data, all mx29f1610mc
+	ROM_LOAD32_WORD_SWAP( "romu00.bin", 0x000000, 0x200000, CRC(7fee63ac) SHA1(ef22145da9ce3100c8736e9a77e59da4f984aaba) )
+	ROM_LOAD32_WORD_SWAP( "roml00.bin", 0x000002, 0x200000, CRC(0d973625) SHA1(b482a97732a6117d9c1c7507118e111ac4f7f3f1) )
+	ROM_LOAD32_WORD_SWAP( "romu01.bin", 0x400000, 0x200000, CRC(f3f3f3e5) SHA1(9a0d91351903b70049fbbc76a9ccff1a382ecbfd) )
+	ROM_LOAD32_WORD_SWAP( "roml01.bin", 0x400002, 0x200000, CRC(5bba95b8) SHA1(6d884a694cbbad6768e606afd5b234a07a3b5b50) )
+
+	ROM_REGION( 0x80000, "oki1", 0 ) // Oki Samples
+	ROM_LOAD( "vrom1.bin",              0x000000, 0x040000, CRC(bbbf4ac8) SHA1(b37f945143a9ed7a372a953ef93dbea01c4fcce4) ) // 27c020
+
+	ROM_REGION( 0x2dd, "plds", 0 )
+	ROM_LOAD( "palce22v10.gal1",        0x000000, 0x0002dd, NO_DUMP ) // Protected
 ROM_END
 
 /*
