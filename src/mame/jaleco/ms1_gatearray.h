@@ -27,9 +27,8 @@ protected:
 	u16 gatearray_r(offs_t offset, u16 mem_mask = ~0);
 	void gatearray_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	// System A only
-	int m_mcu_hs = 0;
-	u16 m_mcu_hs_ram[0x8]{};
+	int m_gatearray_hs = 0;
+	u16 m_gatearray_hs_ram[0x8]{};
 
 	const u16* m_gatearray_seq = nullptr;
 
@@ -45,7 +44,7 @@ protected:
 class megasys1_gatearray_d65006_device : public megasys1_gatearray_device
 {
 public:
-	megasys1_gatearray_d65006_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	megasys1_gatearray_d65006_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	megasys1_gatearray_d65006_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
@@ -61,7 +60,7 @@ private:
 class megasys1_gatearray_gs88000_device : public megasys1_gatearray_device
 {
 public:
-	megasys1_gatearray_gs88000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	megasys1_gatearray_gs88000_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	megasys1_gatearray_gs88000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
@@ -78,7 +77,7 @@ private:
 class megasys1_gatearray_unkarray_device : public megasys1_gatearray_device
 {
 public:
-	megasys1_gatearray_unkarray_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	megasys1_gatearray_unkarray_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	megasys1_gatearray_unkarray_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);

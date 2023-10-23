@@ -4,6 +4,9 @@
 #include "emu.h"
 #include "ms1_gatearray.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
+
 DEFINE_DEVICE_TYPE(MEGASYS1_GATEARRAY_D65006, megasys1_gatearray_d65006_device, "ms1_d65005", "Mega System 1 Gate Array D65005")
 DEFINE_DEVICE_TYPE(MEGASYS1_GATEARRAY_GS88000, megasys1_gatearray_gs88000_device, "ms1_gs88000", "Mega System 1 Gate Array GS-88000")
 DEFINE_DEVICE_TYPE(MEGASYS1_GATEARRAY_UNKARRAY, megasys1_gatearray_unkarray_device, "ms1_unkarray", "Mega System 1 Gate Array UNKNOWN")
@@ -23,8 +26,8 @@ megasys1_gatearray_device::megasys1_gatearray_device(
 
 void megasys1_gatearray_device::device_start()
 {
-	save_item(NAME(m_mcu_hs));
-	save_item(NAME(m_mcu_hs_ram));
+	save_item(NAME(m_gatearray_hs));
+	save_item(NAME(m_gatearray_hs_ram));
 
 	install_gatearray_overlay();
 }
@@ -38,19 +41,19 @@ void megasys1_gatearray_device::device_reset()
 		m_cpu->reset();
 	}
 
-	m_mcu_hs = 0;
+	m_gatearray_hs = 0;
 }
 
 
 void megasys1_gatearray_d65006_device::rom_decode()
 {
-	uint16_t  *RAM    =   (uint16_t *)m_rom;
+	u16  *RAM    =   (u16 *)m_rom;
 	int i,      size    =   m_romsize;
 	if (size > 0x40000) size = 0x40000;
 
 	for (i = 0 ; i < size/2 ; i++)
 	{
-		uint16_t x,y;
+		u16 x,y;
 
 		x = RAM[i];
 
@@ -78,13 +81,13 @@ void megasys1_gatearray_d65006_device::rom_decode()
 
 void megasys1_gatearray_gs88000_device::rom_decode()
 {
-	uint16_t  *RAM    =   (uint16_t *)m_rom;
+	u16  *RAM    =   (u16 *)m_rom;
 	int i,      size    =   m_romsize;
 	if (size > 0x40000) size = 0x40000;
 
 	for (i = 0 ; i < size/2 ; i++)
 	{
-		uint16_t x,y;
+		u16 x,y;
 
 		x = RAM[i];
 
@@ -112,13 +115,13 @@ void megasys1_gatearray_gs88000_device::rom_decode()
 
 void megasys1_gatearray_unkarray_device::rom_decode()
 {
-	uint16_t  *RAM    =   (uint16_t *)m_rom;
+	u16  *RAM    =   (u16 *)m_rom;
 	int i,      size    =   m_romsize;
 	if (size > 0x40000) size = 0x40000;
 
 	for (i = 0 ; i < size/2 ; i++)
 	{
-		uint16_t x,y;
+		u16 x,y;
 
 		x = RAM[i];
 
@@ -146,28 +149,28 @@ void megasys1_gatearray_unkarray_device::rom_decode()
 
 
 /*
-    MCU handshake sequence:
+    Gate array handshake sequence:
     the UPD65006 gate array can overlay 0x40 bytes of data inside the ROM space.
     The offset where this happens is given by m68k to UPD65006 write [0x8/2] << 6.
     For example stdragon writes 0x33e -> maps at 0xcf80-0xcfbf while stdragona writes 0x33f -> maps at 0xcfc0-0xcfff.
     Note: stdragona forgets to turn off the overlay before the ROM check in service mode (hence it reports an error).
 */
 
-#define MCU_HS_LOG 0
+#define GATEARRAY_HS_LOG 0
 
-#define MCU_HS_SEQ(_1_,_2_,_3_,_4_) \
-	(m_mcu_hs_ram[0/2] == _1_ && \
-		m_mcu_hs_ram[2/2] == _2_ && \
-		m_mcu_hs_ram[4/2] == _3_ && \
-		m_mcu_hs_ram[6/2] == _4_)
+#define GATEARRAY_HS_SEQ(_1_,_2_,_3_,_4_) \
+	(m_gatearray_hs_ram[0/2] == _1_ && \
+		m_gatearray_hs_ram[2/2] == _2_ && \
+		m_gatearray_hs_ram[4/2] == _3_ && \
+		m_gatearray_hs_ram[6/2] == _4_)
 
 u16 megasys1_gatearray_device::gatearray_r(offs_t offset, u16 mem_mask)
 {
-	uint16_t *m_rom_maincpu = (uint16_t *)m_rom;
-	if(m_mcu_hs && ((m_mcu_hs_ram[8/2] << 6) & 0x3ffc0) == ((offset*2) & 0x3ffc0))
+	u16 *m_rom_maincpu = (u16 *)m_rom;
+	if(m_gatearray_hs && ((m_gatearray_hs_ram[8/2] << 6) & 0x3ffc0) == ((offset*2) & 0x3ffc0))
 	{
-		if(MCU_HS_LOG && !machine().side_effects_disabled())
-			printf("MCU HS R (%04x) <- [%02x]\n",mem_mask,offset*2);
+		if(GATEARRAY_HS_LOG && !machine().side_effects_disabled())
+			LOG("GATEARRAY HS R (%04x) <- [%02x]\n",mem_mask,offset*2);
 
 		if (m_gatearray_seq)
 			return m_gatearray_seq[4];
@@ -193,23 +196,23 @@ void megasys1_gatearray_device::gatearray_w(offs_t offset, u16 data, u16 mem_mas
 
 	offset &= 0x7;
 
-	COMBINE_DATA(&m_mcu_hs_ram[offset]);
+	COMBINE_DATA(&m_gatearray_hs_ram[offset]);
 
-	if(MCU_HS_SEQ(m_gatearray_seq[0],m_gatearray_seq[1],m_gatearray_seq[2],m_gatearray_seq[3]) && offset == 0x8/2)
-		m_mcu_hs = 1;
+	if(GATEARRAY_HS_SEQ(m_gatearray_seq[0],m_gatearray_seq[1],m_gatearray_seq[2],m_gatearray_seq[3]) && offset == 0x8/2)
+		m_gatearray_hs = 1;
 	else
-		m_mcu_hs = 0;
+		m_gatearray_hs = 0;
 
-	if(MCU_HS_LOG && !machine().side_effects_disabled())
-		printf("MCU HS W %04x (%04x) -> [%02x]\n",data,mem_mask,offset*2);
+	if(GATEARRAY_HS_LOG && !machine().side_effects_disabled())
+		LOG("GATEARRAY HS W %04x (%04x) -> [%02x]\n",data,mem_mask,offset*2);
 }
 
 void megasys1_gatearray_device::install_gatearray_overlay()
 {
 	m_cpu->space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16s_delegate(*this, FUNC(megasys1_gatearray_device::gatearray_r)));
 	m_cpu->space(AS_PROGRAM).install_write_handler(0x20000, 0x2ffff, write16s_delegate(*this, FUNC(megasys1_gatearray_device::gatearray_w)));
-	m_mcu_hs = 0;
-	memset(m_mcu_hs_ram, 0, sizeof(m_mcu_hs_ram));
+	m_gatearray_hs = 0;
+	memset(m_gatearray_hs_ram, 0, sizeof(m_gatearray_hs_ram));
 }
 
 
