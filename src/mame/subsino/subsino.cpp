@@ -4057,11 +4057,11 @@ ROM_START( sevenlnd )
 
 	ROM_REGION( 0x20000, "tilemap", 0 )
 	ROM_LOAD( "sevenlnd_tilemap_1.u25", 0x00000, 0x10000, NO_DUMP )
-	ROM_LOAD( "sevenlnd_tilemap_2.u24", 0x10000, 0x20000, NO_DUMP )
+	ROM_LOAD( "sevenlnd_tilemap_2.u24", 0x10000, 0x10000, NO_DUMP )
 
 	ROM_REGION( 0x20000, "reels", 0 )
 	ROM_LOAD( "sevenlnd_reels_1.u23", 0x00000, 0x10000, NO_DUMP )
-	ROM_LOAD( "sevenlnd_reels_2.u22", 0x10000, 0x20000, NO_DUMP )
+	ROM_LOAD( "sevenlnd_reels_2.u22", 0x10000, 0x10000, NO_DUMP )
 
 	ROM_REGION( 0x157, "plds", 0 )
 	ROM_LOAD( "gal16v8d_1.bin", 0x000, 0x117, NO_DUMP )
