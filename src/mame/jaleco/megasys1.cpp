@@ -150,7 +150,6 @@ RAM             RW      0e0000-0effff*        <               <
 void megasys1_state::machine_reset()
 {
 	m_ignore_oki_status = 1;    /* ignore oki status due 'protection' */
-	m_mcu_hs = 0;
 }
 
 void megasys1_bc_iosim_state::machine_start()
@@ -177,9 +176,17 @@ void megasys1_bc_iomcu_state::machine_start()
 	save_item(NAME(m_mcu_io_data));
 }
 
-void megasys1_hachoo_state::machine_reset()
+
+void megasys1_typea_state::machine_reset()
 {
 	megasys1_state::machine_reset();
+	m_mcu_hs = 0;
+}
+
+
+void megasys1_typea_hachoo_state::machine_reset()
+{
+	megasys1_typea_state::machine_reset();
 	m_ignore_oki_status = 0;    // strangely hachoo need real oki status
 }
 
@@ -194,7 +201,7 @@ void megasys1_hachoo_state::machine_reset()
                         [ Main CPU - System A / Z ]
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(megasys1_state::megasys1A_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(megasys1_state::megasys_base_scanline)
 {
 	int scanline = param;
 
@@ -221,7 +228,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(megasys1_state::megasys1A_scanline)
 		m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(megasys1_state::megasys1A_iganinju_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(megasys1_typea_state::megasys1A_iganinju_scanline)
 {
 	int scanline = param;
 
@@ -251,25 +258,25 @@ void megasys1_state::megasys_base_map(address_map &map)
 	map(0x080006, 0x080007).portr("DSW");
 	map(0x084200, 0x084205).rw("scroll0", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
 	map(0x084208, 0x08420d).rw("scroll1", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
-	map(0x084300, 0x084301).w(FUNC(megasys1_typez_state::screen_flag_w));
+	map(0x084300, 0x084301).w(FUNC(megasys1_state::screen_flag_w));
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x08c000, 0x08dfff).mirror(0x002000).ram().share("objectram"); // soldam relies on a mirror at 0x08c000, other games use 0x08e000
 	map(0x090000, 0x093fff).ram().w("scroll0", FUNC(megasys1_tilemap_device::write)).share("scroll0");
 	map(0x094000, 0x097fff).ram().w("scroll1", FUNC(megasys1_tilemap_device::write)).share("scroll1");
-	map(0x0f0000, 0x0fffff).ram().w(FUNC(megasys1_typez_state::ram_w)).share("ram");
+	map(0x0f0000, 0x0fffff).ram().w(FUNC(megasys1_state::ram_w)).share("ram");
 
 }
 
-void megasys1_state::megasys1A_map(address_map &map)
+void megasys1_typea_state::megasys1A_map(address_map &map)
 {
 	map.global_mask(0xfffff);
 	megasys_base_map(map);
 	map(0x000000, 0x07ffff).rom();
 	map(0x080008, 0x080009).r(m_soundlatch[1], FUNC(generic_latch_16_device::read));    /* from sound cpu */
-	map(0x084000, 0x084001).w(FUNC(megasys1_state::active_layers_w));
+	map(0x084000, 0x084001).w(FUNC(megasys1_typea_state::active_layers_w));
 	map(0x084008, 0x08400d).rw("scroll2", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
-	map(0x084100, 0x084101).rw(FUNC(megasys1_state::sprite_flag_r), FUNC(megasys1_state::sprite_flag_w));
-	map(0x084308, 0x084309).w(FUNC(megasys1_state::soundlatch_w));
+	map(0x084100, 0x084101).rw(FUNC(megasys1_typea_state::sprite_flag_r), FUNC(megasys1_typea_state::sprite_flag_w));
+	map(0x084308, 0x084309).w(FUNC(megasys1_typea_state::soundlatch_w));
 	map(0x098000, 0x09bfff).ram().w("scroll2", FUNC(megasys1_tilemap_device::write)).share("scroll2");
 }
 
@@ -681,7 +688,7 @@ u8 megasys1_state::oki_status_r()
 		return m_oki[Chip]->read();
 }
 
-void megasys1_state::p47b_adpcm_w(offs_t offset, u8 data)
+void megasys1_typea_state::p47b_adpcm_w(offs_t offset, u8 data)
 {
 	// bit 6 is always set
 	m_p47b_adpcm[offset]->reset_w(BIT(data, 7));
@@ -695,31 +702,31 @@ void megasys1_state::p47b_adpcm_w(offs_t offset, u8 data)
 ***************************************************************************/
 
 
-void megasys1_state::megasys1A_sound_map(address_map &map)
+void megasys1_typea_state::megasys1A_sound_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 	map(0x040000, 0x040001).r(m_soundlatch[0], FUNC(generic_latch_16_device::read));
 	map(0x060000, 0x060001).w(m_soundlatch[1], FUNC(generic_latch_16_device::write));   // to main cpu
 	map(0x080000, 0x080003).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
-	map(0x0a0001, 0x0a0001).r(FUNC(megasys1_state::oki_status_r<0>));
+	map(0x0a0001, 0x0a0001).r(FUNC(megasys1_typea_state::oki_status_r<0>));
 	map(0x0a0000, 0x0a0003).w(m_oki[0], FUNC(okim6295_device::write)).umask16(0x00ff).cswidth(16); // jitsupro writes oki commands to both the lsb and msb; it works because of byte smearing
-	map(0x0c0001, 0x0c0001).r(FUNC(megasys1_state::oki_status_r<1>));
+	map(0x0c0001, 0x0c0001).r(FUNC(megasys1_typea_state::oki_status_r<1>));
 	map(0x0c0000, 0x0c0003).w(m_oki[1], FUNC(okim6295_device::write)).umask16(0x00ff).cswidth(16);
 	map(0x0e0000, 0x0effff).ram().mirror(0x10000);
 }
 
-void megasys1_state::kickoffb_sound_map(address_map &map)
+void megasys1_typea_state::kickoffb_sound_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 	map(0x040000, 0x040001).r(m_soundlatch[0], FUNC(generic_latch_16_device::read));
 	map(0x060000, 0x060001).w(m_soundlatch[1], FUNC(generic_latch_16_device::write));   // to main cpu
 	map(0x080000, 0x080003).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write)).umask16(0x00ff);
-	map(0x0a0001, 0x0a0001).r(FUNC(megasys1_state::oki_status_r<0>));
+	map(0x0a0001, 0x0a0001).r(FUNC(megasys1_typea_state::oki_status_r<0>));
 	map(0x0a0000, 0x0a0003).w(m_oki[0], FUNC(okim6295_device::write)).umask16(0x00ff);
 	map(0x0e0000, 0x0fffff).ram();
 }
 
-void megasys1_state::p47b_sound_map(address_map &map)
+void megasys1_typea_state::p47b_sound_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 	map(0x040000, 0x040001).r(m_soundlatch[0], FUNC(generic_latch_16_device::read));
@@ -731,15 +738,15 @@ void megasys1_state::p47b_sound_map(address_map &map)
 	map(0x0e0000, 0x0fffff).ram();
 }
 
-void megasys1_state::p47b_extracpu_prg_map(address_map &map) // TODO
+void megasys1_typea_state::p47b_extracpu_prg_map(address_map &map) // TODO
 {
 	map(0x0000, 0xffff).rom().nopw();
 }
 
-void megasys1_state::p47b_extracpu_io_map(address_map &map)
+void megasys1_typea_state::p47b_extracpu_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x01).w(FUNC(megasys1_state::p47b_adpcm_w));
+	map(0x00, 0x01).w(FUNC(megasys1_typea_state::p47b_adpcm_w));
 	map(0x01, 0x01).r("soundlatch3", FUNC(generic_latch_8_device::read));
 }
 
@@ -1864,15 +1871,13 @@ GFXDECODE_END
 
 /* Provided by Jim Hernandez: 3.5MHz for FM, 30KHz (!) for ADPCM */
 
-void megasys1_state::system_A(machine_config &config)
+void megasys1_state::system_base(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, SYS_A_CPU_CLOCK); /* 6MHz verified */
-	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_state::megasys1A_map);
-	TIMER(config, m_scantimer).configure_scanline(FUNC(megasys1_state::megasys1A_scanline), m_screen, 0, 1);
+	TIMER(config, m_scantimer).configure_scanline(FUNC(megasys1_state::megasys_base_scanline), m_screen, 0, 1);
 
 	M68000(config, m_audiocpu, SOUND_CPU_CLOCK); /* 7MHz verified */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &megasys1_state::megasys1A_sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(120000));
 
@@ -1916,37 +1921,45 @@ void megasys1_state::system_A(machine_config &config)
 	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.30);
 }
 
-void megasys1_state::system_A_iganinju(machine_config &config)
+void megasys1_typea_state::system_A(machine_config &config)
 {
-	system_A(config);
-	TIMER(config.replace(), m_scantimer).configure_scanline(FUNC(megasys1_state::megasys1A_iganinju_scanline), m_screen, 0, 1);
+	system_base(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_typea_state::megasys1A_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &megasys1_typea_state::megasys1A_sound_map);
 }
 
-void megasys1_state::system_A_soldam(machine_config &config)
+
+void megasys1_typea_state::system_A_iganinju(machine_config &config)
+{
+	system_A(config);
+	TIMER(config.replace(), m_scantimer).configure_scanline(FUNC(megasys1_typea_state::megasys1A_iganinju_scanline), m_screen, 0, 1);
+}
+
+void megasys1_typea_state::system_A_soldam(machine_config &config)
 {
 	system_A(config);
 
 	m_tmap[1]->set_8x8_scroll_factor(4);
 }
 
-void megasys1_state::kickoffb(machine_config &config)
+void megasys1_typea_state::system_A_kickoffb(machine_config &config)
 {
 	system_A(config);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &megasys1_state::kickoffb_sound_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &megasys1_typea_state::kickoffb_sound_map);
 
 	config.device_remove("oki2");
 
 	ym2203_device &ymsnd(YM2203(config.replace(), "ymsnd", SOUND_CPU_CLOCK / 2));
-	ymsnd.irq_handler().set(FUNC(megasys1_state::sound_irq));
+	ymsnd.irq_handler().set(FUNC(megasys1_typea_state::sound_irq));
 	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 0.80);
 	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 0.80);
 }
 
-void megasys1_state::p47b(machine_config &config)
+void megasys1_typea_state::system_A_p47b(machine_config &config)
 {
-	kickoffb(config);
+	system_A_kickoffb(config);
 	m_audiocpu->set_clock(7.2_MHz_XTAL);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &megasys1_state::p47b_sound_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &megasys1_typea_state::p47b_sound_map);
 
 	config.device_remove("oki1");
 
@@ -1955,8 +1968,8 @@ void megasys1_state::p47b(machine_config &config)
 	// probably for driving the OKI M5205
 	z80_device &extracpu(Z80(config, "extracpu", 7.2_MHz_XTAL / 2)); // divisor not verified
 	extracpu.set_periodic_int(FUNC(megasys1_state::irq0_line_hold), attotime::from_hz(8000));
-	extracpu.set_addrmap(AS_PROGRAM, &megasys1_state::p47b_extracpu_prg_map);
-	extracpu.set_addrmap(AS_IO, &megasys1_state::p47b_extracpu_io_map);
+	extracpu.set_addrmap(AS_PROGRAM, &megasys1_typea_state::p47b_extracpu_prg_map);
+	extracpu.set_addrmap(AS_IO, &megasys1_typea_state::p47b_extracpu_io_map);
 
 	GENERIC_LATCH_8(config, "soundlatch3");
 
@@ -1974,7 +1987,7 @@ void megasys1_state::p47b(machine_config &config)
 
 void megasys1_bc_iosim_state::system_B(machine_config &config)
 {
-	system_A(config);
+	system_base(config);
 
 	/* basic machine hardware */
 
@@ -1987,7 +2000,7 @@ void megasys1_bc_iosim_state::system_B(machine_config &config)
 
 void megasys1_state::system_B_monkelf(machine_config &config)
 {
-	system_A(config);
+	system_base(config);
 
 	/* basic machine hardware */
 
@@ -2053,7 +2066,7 @@ void megasys1_bc_iosim_state::system_B_hayaosi1(machine_config &config)
 
 void megasys1_state::system_C(machine_config &config)
 {
-	system_A(config);
+	system_base(config);
 
 	/* basic machine hardware */
 	m_maincpu->set_clock(SYS_C_CPU_CLOCK); /* 12MHz */
@@ -2152,7 +2165,7 @@ void megasys1_typez_state::system_Z(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, SYS_A_CPU_CLOCK); /* 6MHz (12MHz / 2) */
 	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_typez_state::megasys1Z_map);
-	TIMER(config, m_scantimer).configure_scanline(FUNC(megasys1_typez_state::megasys1A_scanline), m_screen, 0, 1);
+	TIMER(config, m_scantimer).configure_scanline(FUNC(megasys1_typez_state::megasys_base_scanline), m_screen, 0, 1);
 
 	Z80(config, m_audiocpu, 3000000); /* OSC 12MHz divided by 4 ??? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &megasys1_typez_state::z80_sound_map);
@@ -4987,7 +5000,7 @@ ROM_START( tshingen )
 ROM_END
 
 
-void megasys1_state::rodland_gfx_unmangle(const char *region)
+void megasys1_typea_state::rodland_gfx_unmangle(const char *region)
 {
 	u8 *rom = memregion(region)->base();
 	u32 size = memregion(region)->bytes();
@@ -5016,7 +5029,7 @@ void megasys1_state::rodland_gfx_unmangle(const char *region)
 	}
 }
 
-void megasys1_state::jitsupro_gfx_unmangle(const char *region)
+void megasys1_typea_state::jitsupro_gfx_unmangle(const char *region)
 {
 	u8 *rom = memregion(region)->base();
 	u32 size = memregion(region)->bytes();
@@ -5040,7 +5053,7 @@ void megasys1_state::jitsupro_gfx_unmangle(const char *region)
 	}
 }
 
-void megasys1_state::stdragona_gfx_unmangle(const char *region)
+void megasys1_typea_state::stdragona_gfx_unmangle(const char *region)
 {
 	u8 *rom = memregion(region)->base();
 	u32 size = memregion(region)->bytes();
@@ -5086,7 +5099,7 @@ void megasys1_state::stdragona_gfx_unmangle(const char *region)
 		m_mcu_hs_ram[4/2] == _3_ && \
 		m_mcu_hs_ram[6/2] == _4_)
 
-u16 megasys1_state::gatearray_r(offs_t offset, u16 mem_mask)
+u16 megasys1_typea_state::gatearray_r(offs_t offset, u16 mem_mask)
 {
 	if(m_mcu_hs && ((m_mcu_hs_ram[8/2] << 6) & 0x3ffc0) == ((offset*2) & 0x3ffc0))
 	{
@@ -5102,7 +5115,7 @@ u16 megasys1_state::gatearray_r(offs_t offset, u16 mem_mask)
 	return m_rom_maincpu[offset];
 }
 
-void megasys1_state::gatearray_w(offs_t offset, u16 data, u16 mem_mask)
+void megasys1_typea_state::gatearray_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	// [0/2]: 0x0000
 	// [2/2]: 0x0055
@@ -5125,10 +5138,10 @@ void megasys1_state::gatearray_w(offs_t offset, u16 data, u16 mem_mask)
 		printf("MCU HS W %04x (%04x) -> [%02x]\n",data,mem_mask,offset*2);
 }
 
-void megasys1_state::install_gatearray_overlay(u32 base_write, const u16 *sequence)
+void megasys1_typea_state::install_gatearray_overlay(u32 base_write, const u16 *sequence)
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16s_delegate(*this, FUNC(megasys1_state::gatearray_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(base_write, base_write+0x9, write16s_delegate(*this, FUNC(megasys1_state::gatearray_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16s_delegate(*this, FUNC(megasys1_typea_state::gatearray_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(base_write, base_write+0x9, write16s_delegate(*this, FUNC(megasys1_typea_state::gatearray_w)));
 	m_gatearray_seq = sequence;
 	m_mcu_hs = 0;
 	memset(m_mcu_hs_ram, 0, sizeof(m_mcu_hs_ram));
@@ -5137,31 +5150,31 @@ void megasys1_state::install_gatearray_overlay(u32 base_write, const u16 *sequen
 	save_item(NAME(m_mcu_hs_ram));
 }
 
-void megasys1_state::init_astyanax() // Type A
+void megasys1_typea_state::init_astyanax() // Type A
 {
 	astyanax_rom_decode(machine(), "maincpu");
 	install_gatearray_overlay(0x20000, hachoo_seq);
 }
 
-void megasys1_state::init_iganinju() // Type A
+void megasys1_typea_state::init_iganinju() // Type A
 {
 	phantasm_rom_decode(machine(), "maincpu");
 	install_gatearray_overlay(0x2f000, iga_seq);
 }
 
-void megasys1_state::init_stdragon() // Type A
+void megasys1_typea_state::init_stdragon() // Type A
 {
 	phantasm_rom_decode(machine(), "maincpu");
 	install_gatearray_overlay(0x23ff0, iga_seq);
 }
 
-void megasys1_state::init_tshingen() // Type A
+void megasys1_typea_state::init_tshingen() // Type A
 {
 	phantasm_rom_decode(machine(), "maincpu");
 	install_gatearray_overlay(0x20c00, iga_seq); // protection check sometimes kicks in at the start of 2nd level, but not always
 }
 
-void megasys1_state::init_jitsupro() // Type A
+void megasys1_typea_state::init_jitsupro() // Type A
 {
 	init_astyanax();
 	// additional graphic scramble
@@ -5169,7 +5182,7 @@ void megasys1_state::init_jitsupro() // Type A
 	jitsupro_gfx_unmangle("sprites");
 }
 
-void megasys1_state::init_stdragona() // Type A
+void megasys1_typea_state::init_stdragona() // Type A
 {
 	init_stdragon();
 	// additional graphic scramble
@@ -5177,7 +5190,7 @@ void megasys1_state::init_stdragona() // Type A
 	stdragona_gfx_unmangle("sprites");
 }
 
-void megasys1_state::init_rodland() // Type A
+void megasys1_typea_state::init_rodland() // Type A
 {
 	rodland_rom_decode(machine(), "maincpu");
 	// additional graphic scramble
@@ -5185,7 +5198,7 @@ void megasys1_state::init_rodland() // Type A
 	rodland_gfx_unmangle("sprites");
 }
 
-void megasys1_state::init_rodlandj() // Type A
+void megasys1_typea_state::init_rodlandj() // Type A
 {
 	astyanax_rom_decode(machine(), "maincpu");
 	// additional graphic scramble
@@ -5193,29 +5206,44 @@ void megasys1_state::init_rodlandj() // Type A
 	rodland_gfx_unmangle("sprites");
 }
 
-void megasys1_state::init_phantasm() // Type A
+void megasys1_typea_state::init_phantasm() // Type A
 {
 	phantasm_rom_decode(machine(), "maincpu");
 }
 
-void megasys1_state::init_soldamj() // Type A
+void megasys1_typea_state::init_soldamj() // Type A
 {
 	astyanax_rom_decode(machine(), "maincpu");
 }
 
-void megasys1_state::init_stdragonb() // Type A, bootleg
+void megasys1_typea_state::init_stdragonb() // Type A, bootleg
 {
 	// no program scramble on bootleg
 	stdragona_gfx_unmangle("scroll0");
 	stdragona_gfx_unmangle("sprites");
 }
 
-void megasys1_state::init_rodlandjb() // Type A, bootleg
+void megasys1_typea_state::init_rodlandjb() // Type A, bootleg
 {
 	// no program scramble on bootleg
 	rodland_gfx_unmangle("scroll0");
 	rodland_gfx_unmangle("sprites");
 }
+
+// Type A, bootleg
+void megasys1_typea_state::init_lordofkbp()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int i = 0x20000; i < 0x40000; i += 2)
+	{
+		if (i & 0x02)
+			rom[i] = 0x51 - rom[i];
+		else
+			rom[i] = 0xc7 - rom[i];
+	}
+}
+
 
 void megasys1_bc_iosim_state::init_avspirit() // Type B
 {
@@ -5264,19 +5292,6 @@ void megasys1_state::init_peekaboo()
 	save_item(NAME(m_protection_val));
 }
 
-// bootleg
-void megasys1_state::init_lordofkbp()
-{
-	uint8_t *rom = memregion("maincpu")->base();
-
-	for (int i = 0x20000; i < 0x40000; i += 2)
-	{
-		if (i & 0x02)
-			rom[i] = 0x51 - rom[i];
-		else
-			rom[i] = 0xc7 - rom[i];
-	}
-}
 
 
 // bootleg
@@ -5305,40 +5320,40 @@ GAME( 1988, lomakai,    0,        system_Z,          lomakai,  megasys1_typez_st
 GAME( 1988, makaiden,   lomakai,  system_Z,          lomakai,  megasys1_typez_state, empty_init,    ROT0,   "Jaleco", "Makai Densetsu (Japan)", MACHINE_SUPPORTS_SAVE )
 
 // Type A
-GAME( 1988, p47,        0,        system_A,          p47,      megasys1_state, empty_init,    ROT0,   "Jaleco", "P-47 - The Phantom Fighter (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, p47j,       p47,      system_A,          p47,      megasys1_state, empty_init,    ROT0,   "Jaleco", "P-47 - The Freedom Fighter (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, p47je,      p47,      system_A,          p47,      megasys1_state, empty_init,    ROT0,   "Jaleco", "P-47 - The Freedom Fighter (Japan, Export)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, p47b,       p47,      p47b,              p47,      megasys1_state, empty_init,    ROT0,   "bootleg","P-47 - The Freedom Fighter (World, bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, kickoff,    0,        system_A,          kickoff,  megasys1_state, empty_init,    ROT0,   "Jaleco", "Kick Off - Jaleco Cup (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, kickoffb,   kickoff,  kickoffb,          kickoff,  megasys1_state, empty_init,    ROT0,   "bootleg (Comodo)", "Kick Off - World Cup (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // OKI needs to be checked
-GAME( 1988, tshingen,   0,        system_A,          tshingen, megasys1_state, init_tshingen, ROT0,   "Jaleco", "Shingen Samurai-Fighter (Japan, English)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tshingena,  tshingen, system_A,          tshingen, megasys1_state, init_tshingen, ROT0,   "Jaleco", "Takeda Shingen (Japan, Japanese)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, kazan,      0,        system_A_iganinju, kazan,    megasys1_state, init_iganinju, ROT0,   "Jaleco", "Ninja Kazan (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, iganinju,   kazan,    system_A_iganinju, kazan,    megasys1_state, init_iganinju, ROT0,   "Jaleco", "Iga Ninjyutsuden (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, iganinjub,  kazan,    system_A_iganinju, kazan,    megasys1_state, empty_init   , ROT0,   "bootleg","Iga Ninjyutsuden (Japan, bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, astyanax,   0,        system_A,          astyanax, megasys1_state, init_astyanax, ROT0,   "Jaleco", "The Astyanax (EPROM version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, astyanaxa,  astyanax, system_A,          astyanax, megasys1_state, init_astyanax, ROT0,   "Jaleco", "The Astyanax (mask ROM version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, lordofk,    astyanax, system_A,          astyanax, megasys1_state, init_astyanax, ROT0,   "Jaleco", "The Lord of King (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, lordofkb,   astyanax, system_A,          astyanax, megasys1_state, empty_init,    ROT0,   "bootleg","The Lord of King (bootleg, not protected)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, lordofkbp,  astyanax, system_A,          astyanax, megasys1_state, init_lordofkbp,ROT0,   "bootleg","The Lord of King (bootleg, protected)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, hachoo,     0,        system_A,          hachoo,   megasys1_hachoo_state, init_astyanax, ROT0,   "Jaleco", "Hachoo! (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, hachooa,    hachoo,   system_A,          hachoo,   megasys1_hachoo_state, init_astyanax, ROT0,   "Jaleco", "Hachoo! (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, jitsupro,   0,        system_A,          jitsupro, megasys1_state, init_jitsupro, ROT0,   "Jaleco", "Jitsuryoku!! Pro Yakyuu (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, plusalph,   0,        system_A,          plusalph, megasys1_state, init_astyanax, ROT270, "Jaleco", "Plus Alpha", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, stdragon,   0,        system_A,          stdragon, megasys1_state, init_stdragon, ROT0,   "Jaleco", "Saint Dragon (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, stdragona,  stdragon, system_A,          stdragon, megasys1_state, init_stdragona,ROT0,   "Jaleco", "Saint Dragon (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, stdragonb,  stdragon, system_A,          stdragon, megasys1_state, init_stdragonb,ROT0,   "bootleg","Saint Dragon (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, rodland,    0,        system_A,          rodland,  megasys1_state, init_rodland,  ROT0,   "Jaleco", "Rod-Land (World, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, rodlanda,   rodland,  system_A,          rodland,  megasys1_state, init_rodlandj, ROT0,   "Jaleco", "Rod-Land (World, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, rodlandj,   rodland,  system_A,          rodland,  megasys1_state, init_rodlandj, ROT0,   "Jaleco", "Rod-Land (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, rittam,     rodland,  system_A,          rodland,  megasys1_state, init_soldamj,  ROT0,   "Jaleco", "R&T (Rod-Land prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, rodlandjb,  rodland,  system_A,          rodland,  megasys1_state, init_rodlandjb,ROT0,   "bootleg","Rod-Land (Japan bootleg with unencrypted program)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, rodlandjb2, rodland,  system_A,          rodland,  megasys1_state, empty_init,    ROT0,   "bootleg","Rod-Land (Japan bootleg with unencrypted program and GFX)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, phantasm,   avspirit, system_A,          phantasm, megasys1_state, init_phantasm, ROT0,   "Jaleco", "Phantasm (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, edfp,       edf,      system_A,          edfp,     megasys1_state, init_phantasm, ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (Japan, prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, inyourfa,   0,        system_A,          inyourfa, megasys1_state, init_iganinju, ROT0,   "Jaleco", "In Your Face (North America, prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, soldam,     0,        system_A_soldam,   soldam,   megasys1_state, init_phantasm, ROT0,   "Jaleco", "Soldam", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, soldamj,    soldam,   system_A_soldam,   soldam,   megasys1_state, init_soldamj,  ROT0,   "Jaleco", "Soldam (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, p47,        0,        system_A,          p47,      megasys1_typea_state, empty_init,    ROT0,   "Jaleco", "P-47 - The Phantom Fighter (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, p47j,       p47,      system_A,          p47,      megasys1_typea_state, empty_init,    ROT0,   "Jaleco", "P-47 - The Freedom Fighter (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, p47je,      p47,      system_A,          p47,      megasys1_typea_state, empty_init,    ROT0,   "Jaleco", "P-47 - The Freedom Fighter (Japan, Export)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, p47b,       p47,      system_A_p47b,     p47,      megasys1_typea_state, empty_init,    ROT0,   "bootleg","P-47 - The Freedom Fighter (World, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, kickoff,    0,        system_A,          kickoff,  megasys1_typea_state, empty_init,    ROT0,   "Jaleco", "Kick Off - Jaleco Cup (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, kickoffb,   kickoff,  system_A_kickoffb, kickoff,  megasys1_typea_state, empty_init,    ROT0,   "bootleg (Comodo)", "Kick Off - World Cup (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // OKI needs to be checked
+GAME( 1988, tshingen,   0,        system_A,          tshingen, megasys1_typea_state, init_tshingen, ROT0,   "Jaleco", "Shingen Samurai-Fighter (Japan, English)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tshingena,  tshingen, system_A,          tshingen, megasys1_typea_state, init_tshingen, ROT0,   "Jaleco", "Takeda Shingen (Japan, Japanese)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, kazan,      0,        system_A_iganinju, kazan,    megasys1_typea_state, init_iganinju, ROT0,   "Jaleco", "Ninja Kazan (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, iganinju,   kazan,    system_A_iganinju, kazan,    megasys1_typea_state, init_iganinju, ROT0,   "Jaleco", "Iga Ninjyutsuden (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, iganinjub,  kazan,    system_A_iganinju, kazan,    megasys1_typea_state, empty_init   , ROT0,   "bootleg","Iga Ninjyutsuden (Japan, bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, astyanax,   0,        system_A,          astyanax, megasys1_typea_state, init_astyanax, ROT0,   "Jaleco", "The Astyanax (EPROM version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, astyanaxa,  astyanax, system_A,          astyanax, megasys1_typea_state, init_astyanax, ROT0,   "Jaleco", "The Astyanax (mask ROM version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, lordofk,    astyanax, system_A,          astyanax, megasys1_typea_state, init_astyanax, ROT0,   "Jaleco", "The Lord of King (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, lordofkb,   astyanax, system_A,          astyanax, megasys1_typea_state, empty_init,    ROT0,   "bootleg","The Lord of King (bootleg, not protected)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, lordofkbp,  astyanax, system_A,          astyanax, megasys1_typea_state, init_lordofkbp,ROT0,   "bootleg","The Lord of King (bootleg, protected)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, hachoo,     0,        system_A,          hachoo,   megasys1_typea_hachoo_state, init_astyanax, ROT0,   "Jaleco", "Hachoo! (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, hachooa,    hachoo,   system_A,          hachoo,   megasys1_typea_hachoo_state, init_astyanax, ROT0,   "Jaleco", "Hachoo! (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, jitsupro,   0,        system_A,          jitsupro, megasys1_typea_state, init_jitsupro, ROT0,   "Jaleco", "Jitsuryoku!! Pro Yakyuu (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, plusalph,   0,        system_A,          plusalph, megasys1_typea_state, init_astyanax, ROT270, "Jaleco", "Plus Alpha", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, stdragon,   0,        system_A,          stdragon, megasys1_typea_state, init_stdragon, ROT0,   "Jaleco", "Saint Dragon (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, stdragona,  stdragon, system_A,          stdragon, megasys1_typea_state, init_stdragona,ROT0,   "Jaleco", "Saint Dragon (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, stdragonb,  stdragon, system_A,          stdragon, megasys1_typea_state, init_stdragonb,ROT0,   "bootleg","Saint Dragon (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, rodland,    0,        system_A,          rodland,  megasys1_typea_state, init_rodland,  ROT0,   "Jaleco", "Rod-Land (World, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, rodlanda,   rodland,  system_A,          rodland,  megasys1_typea_state, init_rodlandj, ROT0,   "Jaleco", "Rod-Land (World, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, rodlandj,   rodland,  system_A,          rodland,  megasys1_typea_state, init_rodlandj, ROT0,   "Jaleco", "Rod-Land (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, rittam,     rodland,  system_A,          rodland,  megasys1_typea_state, init_soldamj,  ROT0,   "Jaleco", "R&T (Rod-Land prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, rodlandjb,  rodland,  system_A,          rodland,  megasys1_typea_state, init_rodlandjb,ROT0,   "bootleg","Rod-Land (Japan bootleg with unencrypted program)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, rodlandjb2, rodland,  system_A,          rodland,  megasys1_typea_state, empty_init,    ROT0,   "bootleg","Rod-Land (Japan bootleg with unencrypted program and GFX)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, phantasm,   avspirit, system_A,          phantasm, megasys1_typea_state, init_phantasm, ROT0,   "Jaleco", "Phantasm (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, edfp,       edf,      system_A,          edfp,     megasys1_typea_state, init_phantasm, ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (Japan, prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, inyourfa,   0,        system_A,          inyourfa, megasys1_typea_state, init_iganinju, ROT0,   "Jaleco", "In Your Face (North America, prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, soldam,     0,        system_A_soldam,   soldam,   megasys1_typea_state, init_phantasm, ROT0,   "Jaleco", "Soldam", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, soldamj,    soldam,   system_A_soldam,   soldam,   megasys1_typea_state, init_soldamj,  ROT0,   "Jaleco", "Soldam (Japan)", MACHINE_SUPPORTS_SAVE )
 
 // Type B
 GAME( 1991, avspirit,   0,        system_B,          avspirit, megasys1_bc_iosim_state, init_avspirit, ROT0,   "Jaleco", "Avenging Spirit", MACHINE_SUPPORTS_SAVE )

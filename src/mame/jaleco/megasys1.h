@@ -43,41 +43,23 @@ public:
 		m_io_dsw1(*this, "DSW1"),
 		m_io_dsw2(*this, "DSW2"),
 		m_scantimer(*this, "scantimer"),
+		m_rom_maincpu(*this, "maincpu"),
 		m_objectram(*this, "objectram"),
 		m_ymsnd(*this, "ymsnd"),
-		m_p47b_adpcm(*this, "msm%u", 1U),
-		m_rom_maincpu(*this, "maincpu"),
 		m_okibank(*this, "okibank")
 	{
 		m_hardware_type_z = 0;
 	}
 
-	void system_A_soldam(machine_config &config);
 	void system_B_monkelf(machine_config &config);
-	void system_A_iganinju(machine_config &config);
-	void kickoffb(machine_config &config);
-	void p47b(machine_config &config);
+
 	void system_D(machine_config &config);
 	void system_C(machine_config &config);
 	void system_Bbl(machine_config &config);
-	void system_A(machine_config &config);
+	void system_base(machine_config &config);
 
 	void init_peekaboo();
-	void init_soldam();
-	void init_astyanax();
-	void init_stdragon();
-	void init_soldamj();
-	void init_phantasm();
-	void init_tshingen();
-	void init_jitsupro();
-	void init_iganinju();
-	void init_rodlandj();
-	void init_rodlandjb();
 	void init_monkelf();
-	void init_rodland();
-	void init_stdragona();
-	void init_stdragonb();
-	void init_lordofkbp();
 
 protected:
 	virtual void machine_reset() override;
@@ -99,12 +81,13 @@ protected:
 	optional_ioport m_io_dsw1;
 	optional_ioport m_io_dsw2;
 	optional_device<timer_device> m_scantimer;
+	required_region_ptr<u16> m_rom_maincpu;
 
 	void megasys1B_map(address_map &map);
 	void megasys1C_map(address_map &map);
 
 	void megasys1c_handle_scanline_irq(int scanline);
-	TIMER_DEVICE_CALLBACK_MEMBER(megasys1A_scanline);
+	TIMER_DEVICE_CALLBACK_MEMBER(megasys_base_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(megasys1B_scanline);
 
 	void megasys_base_map(address_map &map);
@@ -115,8 +98,16 @@ protected:
 	void partial_clear_sprite_bitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u8 param);
 	inline void draw_16x16_priority_sprite(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect, s32 code, s32 color, s32 sx, s32 sy, s32 flipx, s32 flipy, u8 mosaic, u8 mosaicsol, s32 priority);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void sound_irq(int state);
 
 	void screen_flag_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void active_layers_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void sprite_bank_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 sprite_flag_r();
+	void sprite_flag_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void soundlatch_w(u16 data);
+	void soundlatch_c_w(u16 data);
+	template<int Chip> u8 oki_status_r();
 
 	int m_hardware_type_z = 0; // System Z
 
@@ -141,12 +132,84 @@ protected:
 private:
 	required_shared_ptr<u16> m_objectram;
 	optional_device<device_t> m_ymsnd;
-	optional_device_array<msm5205_device, 2> m_p47b_adpcm;
-	required_region_ptr<u16> m_rom_maincpu;
 	optional_memory_bank m_okibank;
 
 	// configuration
 	int m_layers_order[16]{};
+
+	// peekaboo
+	u16 m_protection_val = 0;
+
+	u16 protection_peekaboo_r();
+	void protection_peekaboo_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void monkelf_scroll0_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void monkelf_scroll1_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void ram_w(offs_t offset, u16 data);
+
+
+	void megasys1_palette(palette_device &palette);
+
+	void screen_vblank(int state);
+	INTERRUPT_GEN_MEMBER(megasys1D_irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(megasys1C_scanline);
+
+	void priority_create();
+
+	void megasys1B_edfbl_map(address_map &map);
+	void megasys1B_monkelf_map(address_map &map);
+	void megasys1D_map(address_map &map);
+	void megasys1D_oki_map(address_map &map);
+};
+
+class megasys1_typea_state : public megasys1_state
+{
+public:
+	megasys1_typea_state(const machine_config &mconfig, device_type type, const char *tag) :
+		megasys1_state(mconfig, type, tag),
+		m_p47b_adpcm(*this, "msm%u", 1U)
+	{ }
+
+	void system_A(machine_config &config);
+	void system_A_soldam(machine_config &config);
+	void system_A_iganinju(machine_config &config);
+	void system_A_kickoffb(machine_config &config);
+	void system_A_p47b(machine_config &config);
+
+	void init_astyanax();
+	void init_stdragon();
+	void init_soldamj();
+	void init_phantasm();
+	void init_tshingen();
+	void init_jitsupro();
+	void init_iganinju();
+	void init_rodlandj();
+	void init_rodlandjb();
+	void init_rodland();
+	void init_stdragona();
+	void init_stdragonb();
+	void init_lordofkbp();
+
+protected:
+	virtual void machine_reset() override;
+
+	void kickoffb_sound_map(address_map &map);
+	void p47b_sound_map(address_map &map);
+	void p47b_extracpu_prg_map(address_map &map);
+	void p47b_extracpu_io_map(address_map &map);
+	void megasys1A_map(address_map &map);
+	void megasys1A_sound_map(address_map &map);
+
+	void p47b_adpcm_w(offs_t offset, u8 data);
+
+
+private:
+	optional_device_array<msm5205_device, 2> m_p47b_adpcm;
+
+	TIMER_DEVICE_CALLBACK_MEMBER(megasys1A_iganinju_scanline);
+
+	void install_gatearray_overlay(u32 base_write, const u16 *sequence);
+	u16 gatearray_r(offs_t offset, u16 mem_mask = ~0);
+	void gatearray_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	// System A only
 	int m_mcu_hs = 0;
@@ -157,56 +220,16 @@ private:
 	static constexpr u16 iga_seq[5] =    { 0x0000,0x0055,0x00aa,0x00ff,  0x835d };
 	static constexpr u16 hachoo_seq[5] = { 0x00ff,0x0055,0x00aa,0x0000,  0x889e };
 
-	// peekaboo
-	u16 m_protection_val = 0;
-
-	void sound_irq(int state);
-	u16 protection_peekaboo_r();
-	void protection_peekaboo_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	u16 gatearray_r(offs_t offset, u16 mem_mask = ~0);
-	void gatearray_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void active_layers_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void sprite_bank_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	u16 sprite_flag_r();
-	void sprite_flag_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void soundlatch_w(u16 data);
-	void soundlatch_c_w(u16 data);
-	void monkelf_scroll0_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void monkelf_scroll1_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	template<int Chip> u8 oki_status_r();
-	void ram_w(offs_t offset, u16 data);
-	void p47b_adpcm_w(offs_t offset, u8 data);
-
-
-	void megasys1_palette(palette_device &palette);
-
-	void screen_vblank(int state);
-	INTERRUPT_GEN_MEMBER(megasys1D_irq);
-	TIMER_DEVICE_CALLBACK_MEMBER(megasys1A_iganinju_scanline);
-	TIMER_DEVICE_CALLBACK_MEMBER(megasys1C_scanline);
-
-	void install_gatearray_overlay(u32 base_write, const u16 *sequence);
-	void priority_create();
 	void rodland_gfx_unmangle(const char *region);
 	void jitsupro_gfx_unmangle(const char *region);
 	void stdragona_gfx_unmangle(const char *region);
-	void kickoffb_sound_map(address_map &map);
-	void p47b_sound_map(address_map &map);
-	void p47b_extracpu_prg_map(address_map &map);
-	void p47b_extracpu_io_map(address_map &map);
-	void megasys1A_map(address_map &map);
-	void megasys1A_sound_map(address_map &map);
-	void megasys1B_edfbl_map(address_map &map);
-	void megasys1B_monkelf_map(address_map &map);
-	void megasys1D_map(address_map &map);
-	void megasys1D_oki_map(address_map &map);
 };
 
-class megasys1_hachoo_state : public megasys1_state
+class megasys1_typea_hachoo_state : public megasys1_typea_state
 {
 public:
-	megasys1_hachoo_state(const machine_config &mconfig, device_type type, const char *tag) :
-		megasys1_state(mconfig, type, tag)
+	megasys1_typea_hachoo_state(const machine_config &mconfig, device_type type, const char *tag) :
+		megasys1_typea_state(mconfig, type, tag)
 	{ }
 
 protected:
