@@ -1677,6 +1677,17 @@ project "portaudio"
 			MAME_DIR .. "3rdparty/portaudio/src/hostapi/alsa/pa_linux_alsa.c",
 			MAME_DIR .. "3rdparty/portaudio/src/hostapi/oss/pa_unix_oss.c",
 		}
+		if _OPTIONS["NO_USE_PULSEAUDIO"]~="1" then
+			defines {
+				"PA_USE_PULSEAUDIO=1",
+			}
+			files {
+				MAME_DIR .. "3rdparty/portaudio/src/hostapi/pulseaudio/pa_linux_pulseaudio_block.c",
+				MAME_DIR .. "3rdparty/portaudio/src/hostapi/pulseaudio/pa_linux_pulseaudio.c",
+				MAME_DIR .. "3rdparty/portaudio/src/hostapi/pulseaudio/pa_linux_pulseaudio_cb.c",
+				MAME_DIR .. "3rdparty/portaudio/src/common/pa_ringbuffer.c",
+			}
+		end
 	end
 	if _OPTIONS["targetos"]=="macosx" then
 		defines {
