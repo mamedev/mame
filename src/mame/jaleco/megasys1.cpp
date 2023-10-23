@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Luca Elia
+// copyright-holders:Luca Elia, David Haywood
 /***************************************************************************
 
                             -= Jaleco Mega System 1 =-
@@ -1940,21 +1940,21 @@ void megasys1_typea_state::system_A_d65006(machine_config &config)
 	system_A(config);
 	MEGASYS1_GATEARRAY_D65006(config, m_gatearray, 0);
 	m_gatearray->set_cpu_tag(m_maincpu);
-}	
+}
 
 void megasys1_typea_state::system_A_gs88000(machine_config &config)
 {
 	system_A(config);
 	MEGASYS1_GATEARRAY_GS88000(config, m_gatearray, 0);
 	m_gatearray->set_cpu_tag(m_maincpu);
-}	
+}
 
 void megasys1_typea_state::system_A_unkarray(machine_config &config)
 {
 	system_A(config);
 	MEGASYS1_GATEARRAY_UNKARRAY(config, m_gatearray, 0);
 	m_gatearray->set_cpu_tag(m_maincpu);
-}	
+}
 
 void megasys1_typea_state::system_A_iganinju(machine_config &config)
 {
