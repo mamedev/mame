@@ -2678,7 +2678,7 @@ ROM_END
 void cischeat_state::init_bigrun()
 {
 	cischeat_untangle_sprites("sprites");   // Untangle sprites
-	phantasm_rom_decode(machine(), "soundcpu");                 // Decrypt sound cpu code
+	jaleco_d65006_rom_decode(machine(), "soundcpu");                 // Decrypt sound cpu code
 }
 
 
@@ -2797,7 +2797,7 @@ ROM_END
 void cischeat_state::init_cischeat()
 {
 	cischeat_untangle_sprites("sprites");   // Untangle sprites
-	astyanax_rom_decode(machine(), "soundcpu");                 // Decrypt sound cpu code
+	jaleco_gs88000_rom_decode(machine(), "soundcpu");                 // Decrypt sound cpu code
 }
 
 

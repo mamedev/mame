@@ -217,8 +217,8 @@ private:
 
 	const u16* m_gatearray_seq = nullptr;
 	//                                     write sequence                return value
-	static constexpr u16 iga_seq[5] =    { 0x0000,0x0055,0x00aa,0x00ff,  0x835d };
-	static constexpr u16 hachoo_seq[5] = { 0x00ff,0x0055,0x00aa,0x0000,  0x889e };
+	static constexpr u16 jaleco_d65006_unlock_sequence[5]  = { 0x0000,0x0055,0x00aa,0x00ff,  0x835d };
+	static constexpr u16 jaleco_gs88000_unlock_sequence[5] = { 0x00ff,0x0055,0x00aa,0x0000,  0x889e };
 
 	void rodland_gfx_unmangle(const char *region);
 	void jitsupro_gfx_unmangle(const char *region);

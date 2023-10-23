@@ -4,7 +4,7 @@
 #include "jalcrpt.h"
 
 
-void phantasm_rom_decode(running_machine &machine, const char *region)
+void jaleco_d65006_rom_decode(running_machine &machine, const char *region)
 {
 	uint16_t  *RAM    =   (uint16_t *) machine.root_device().memregion(region)->base();
 	int i,      size    =   machine.root_device().memregion(region)->bytes();
@@ -38,7 +38,7 @@ void phantasm_rom_decode(running_machine &machine, const char *region)
 
 }
 
-void astyanax_rom_decode(running_machine &machine, const char *region)
+void jaleco_gs88000_rom_decode(running_machine &machine, const char *region)
 {
 	uint16_t  *RAM    =   (uint16_t *) machine.root_device().memregion(region)->base();
 	int i,      size    =   machine.root_device().memregion(region)->bytes();

@@ -5152,26 +5152,26 @@ void megasys1_typea_state::install_gatearray_overlay(u32 base_write, const u16 *
 
 void megasys1_typea_state::init_astyanax() // Type A
 {
-	astyanax_rom_decode(machine(), "maincpu");
-	install_gatearray_overlay(0x20000, hachoo_seq);
+	jaleco_gs88000_rom_decode(machine(), "maincpu");
+	install_gatearray_overlay(0x20000, jaleco_gs88000_unlock_sequence);
 }
 
 void megasys1_typea_state::init_iganinju() // Type A
 {
-	phantasm_rom_decode(machine(), "maincpu");
-	install_gatearray_overlay(0x2f000, iga_seq);
+	jaleco_d65006_rom_decode(machine(), "maincpu");
+	install_gatearray_overlay(0x2f000, jaleco_d65006_unlock_sequence);
 }
 
 void megasys1_typea_state::init_stdragon() // Type A
 {
-	phantasm_rom_decode(machine(), "maincpu");
-	install_gatearray_overlay(0x23ff0, iga_seq);
+	jaleco_d65006_rom_decode(machine(), "maincpu");
+	install_gatearray_overlay(0x23ff0, jaleco_d65006_unlock_sequence);
 }
 
 void megasys1_typea_state::init_tshingen() // Type A
 {
-	phantasm_rom_decode(machine(), "maincpu");
-	install_gatearray_overlay(0x20c00, iga_seq); // protection check sometimes kicks in at the start of 2nd level, but not always
+	jaleco_d65006_rom_decode(machine(), "maincpu");
+	install_gatearray_overlay(0x20c00, jaleco_d65006_unlock_sequence); // protection check sometimes kicks in at the start of 2nd level, but not always
 }
 
 void megasys1_typea_state::init_jitsupro() // Type A
@@ -5200,7 +5200,7 @@ void megasys1_typea_state::init_rodland() // Type A
 
 void megasys1_typea_state::init_rodlandj() // Type A
 {
-	astyanax_rom_decode(machine(), "maincpu");
+	jaleco_gs88000_rom_decode(machine(), "maincpu");
 	// additional graphic scramble
 	rodland_gfx_unmangle("scroll0");
 	rodland_gfx_unmangle("sprites");
@@ -5208,12 +5208,12 @@ void megasys1_typea_state::init_rodlandj() // Type A
 
 void megasys1_typea_state::init_phantasm() // Type A
 {
-	phantasm_rom_decode(machine(), "maincpu");
+	jaleco_d65006_rom_decode(machine(), "maincpu");
 }
 
 void megasys1_typea_state::init_soldamj() // Type A
 {
-	astyanax_rom_decode(machine(), "maincpu");
+	jaleco_gs88000_rom_decode(machine(), "maincpu");
 }
 
 void megasys1_typea_state::init_stdragonb() // Type A, bootleg
