@@ -156,8 +156,6 @@ void megasys1_gatearray_unkarray_device::rom_decode()
     Note: stdragona forgets to turn off the overlay before the ROM check in service mode (hence it reports an error).
 */
 
-#define GATEARRAY_HS_LOG 0
-
 #define GATEARRAY_HS_SEQ(_1_,_2_,_3_,_4_) \
 	(m_gatearray_hs_ram[0/2] == _1_ && \
 		m_gatearray_hs_ram[2/2] == _2_ && \
@@ -169,8 +167,7 @@ u16 megasys1_gatearray_device::gatearray_r(offs_t offset, u16 mem_mask)
 	u16 *m_rom_maincpu = (u16 *)m_rom;
 	if(m_gatearray_hs && ((m_gatearray_hs_ram[8/2] << 6) & 0x3ffc0) == ((offset*2) & 0x3ffc0))
 	{
-		if(GATEARRAY_HS_LOG && !machine().side_effects_disabled())
-			LOG("GATEARRAY HS R (%04x) <- [%02x]\n",mem_mask,offset*2);
+		LOG("GATEARRAY HS R (%04x) <- [%02x]\n",mem_mask,offset*2);
 
 		if (m_gatearray_seq)
 			return m_gatearray_seq[4];
@@ -203,8 +200,7 @@ void megasys1_gatearray_device::gatearray_w(offs_t offset, u16 data, u16 mem_mas
 	else
 		m_gatearray_hs = 0;
 
-	if(GATEARRAY_HS_LOG && !machine().side_effects_disabled())
-		LOG("GATEARRAY HS W %04x (%04x) -> [%02x]\n",data,mem_mask,offset*2);
+	LOG("GATEARRAY HS W %04x (%04x) -> [%02x]\n",data,mem_mask,offset*2);
 }
 
 void megasys1_gatearray_device::install_gatearray_overlay()
