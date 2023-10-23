@@ -4040,6 +4040,37 @@ ROM_START( mtrainnv )
 	ROM_COPY( "maincpu", 0x000000, 0x00000, 0x10000 ) // just to show something
 ROM_END
 
+/*
+ Seven Land (Korea)
+   MCU Hitachi HD64180RP6.
+   Actel A40MX04-F.
+   Sound: U6612 (YM3812) + U6614 (YM3014) + 12.000 MHz xtal.
+   Four banks of 8 DIP switches labeled SW1 to SW4.
+   One unpopulated location on the PCB (near the sound chips) for another bank of 8 DIP switches, labeled SW0.
+   3.6V battery near the HD64180RP6
+   No bipolar PROMs on this PCB.
+*/
+
+ROM_START( sevenlnd )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "a_am27c512.u58", 0x00000, 0x10000, CRC(7abaca14) SHA1(48e4eb4ef7df09f29a382167291ee6385279d1f5) )
+
+	ROM_REGION( 0x20000, "tilemap", 0 )
+	ROM_LOAD( "sevenlnd_tilemap_1.u25", 0x00000, 0x10000, NO_DUMP )
+	ROM_LOAD( "sevenlnd_tilemap_2.u24", 0x10000, 0x20000, NO_DUMP )
+
+	ROM_REGION( 0x20000, "reels", 0 )
+	ROM_LOAD( "sevenlnd_reels_1.u23", 0x00000, 0x10000, NO_DUMP )
+	ROM_LOAD( "sevenlnd_reels_2.u22", 0x10000, 0x20000, NO_DUMP )
+
+	ROM_REGION( 0x157, "plds", 0 )
+	ROM_LOAD( "gal16v8d_1.bin", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_2.bin", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_3.bin", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_4.bin", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce20v8h.bin", 0x000, 0x157, NO_DUMP )
+ROM_END
+
 
 ROM_START( dinofmly ) // very similar PCB to the smoto set, but instead of 3 PROMs it has a RAMDAC.
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -4288,3 +4319,4 @@ GAMEL( 1996, smoto16,     smoto20, srider,     smoto16,  subsino_state, init_smo
 GAMEL( 1996, smoto13,     smoto20, srider,     smoto16,  subsino_state, init_smoto13,     ROT0, "Subsino",         "Super Rider (v1.3)",                          0,                   layout_smoto    )
 
 GAME(  1996, mtrainnv,    mtrain,  mtrainnv,   stbsub,   subsino_state, init_mtrainnv,    ROT0, "Subsino",         "Magic Train (Clear NVRAM ROM?)",              MACHINE_NOT_WORKING )
+GAME(  199?, sevenlnd,    mtrain,  mtrainnv,   stbsub,   subsino_state, init_mtrainnv,    ROT0, "bootleg?",        "Seven Land",                                  MACHINE_NOT_WORKING ) // Without layout until fully dumped
