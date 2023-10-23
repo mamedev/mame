@@ -4,9 +4,9 @@
 #include "emu.h"
 #include "ms1_gatearray.h"
 
-DEFINE_DEVICE_TYPE(MEGASYS1_GATEARRAY_D65006, megasys1_gatearray_d65006_device, "ms1_tmap", "Mega System 1 Gate Array D65005")
-DEFINE_DEVICE_TYPE(MEGASYS1_GATEARRAY_GS88000, megasys1_gatearray_gs88000_device, "ms1_tmap", "Mega System 1 Gate Array GS-88000")
-DEFINE_DEVICE_TYPE(MEGASYS1_GATEARRAY_UNKARRAY, megasys1_gatearray_unkarray_device, "ms1_tmap", "Mega System 1 Gate Array UNKNOWN")
+DEFINE_DEVICE_TYPE(MEGASYS1_GATEARRAY_D65006, megasys1_gatearray_d65006_device, "ms1_d65005", "Mega System 1 Gate Array D65005")
+DEFINE_DEVICE_TYPE(MEGASYS1_GATEARRAY_GS88000, megasys1_gatearray_gs88000_device, "ms1_gs88000", "Mega System 1 Gate Array GS-88000")
+DEFINE_DEVICE_TYPE(MEGASYS1_GATEARRAY_UNKARRAY, megasys1_gatearray_unkarray_device, "ms1_unkarray", "Mega System 1 Gate Array UNKNOWN")
 
 megasys1_gatearray_device::megasys1_gatearray_device(
 		machine_config const &mconfig,
