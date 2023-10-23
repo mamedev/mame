@@ -2,6 +2,13 @@
 // copyright-holders:David Haywood
 /*
 
+The lexitvsprt contains "W55V9x" strings, which appear to identify the tech used here as the following
+Nuvoton product
+http://e-tech.com.hk/pd_nuvo_at_game.html
+
+
+---
+
 Track & Field Challenge TV Game
 https://www.youtube.com/watch?v=wjn1lLylqog
 
