@@ -45,20 +45,17 @@ public:
 		m_scantimer(*this, "scantimer"),
 		m_rom_maincpu(*this, "maincpu"),
 		m_objectram(*this, "objectram"),
-		m_ymsnd(*this, "ymsnd"),
-		m_okibank(*this, "okibank")
+		m_ymsnd(*this, "ymsnd")
 	{
 		m_hardware_type_z = 0;
 	}
 
 	void system_B_monkelf(machine_config &config);
 
-	void system_D(machine_config &config);
 	void system_C(machine_config &config);
 	void system_Bbl(machine_config &config);
 	void system_base(machine_config &config);
 
-	void init_peekaboo();
 	void init_monkelf();
 
 protected:
@@ -93,12 +90,15 @@ protected:
 	void megasys_base_map(address_map &map);
 	void megasys1B_sound_map(address_map &map);
 
+	void megasys1_palette(palette_device &palette);
+
 	virtual void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void mix_sprite_bitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void partial_clear_sprite_bitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u8 param);
 	inline void draw_16x16_priority_sprite(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect, s32 code, s32 color, s32 sx, s32 sy, s32 flipx, s32 flipy, u8 mosaic, u8 mosaicsol, s32 priority);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void sound_irq(int state);
+	void screen_vblank(int state);
 
 	void screen_flag_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void active_layers_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -132,33 +132,21 @@ protected:
 private:
 	required_shared_ptr<u16> m_objectram;
 	optional_device<device_t> m_ymsnd;
-	optional_memory_bank m_okibank;
 
 	// configuration
 	int m_layers_order[16]{};
 
-	// peekaboo
-	u16 m_protection_val = 0;
-
-	u16 protection_peekaboo_r();
-	void protection_peekaboo_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void monkelf_scroll0_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void monkelf_scroll1_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void ram_w(offs_t offset, u16 data);
 
 
-	void megasys1_palette(palette_device &palette);
-
-	void screen_vblank(int state);
-	INTERRUPT_GEN_MEMBER(megasys1D_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(megasys1C_scanline);
 
 	void priority_create();
 
 	void megasys1B_edfbl_map(address_map &map);
 	void megasys1B_monkelf_map(address_map &map);
-	void megasys1D_map(address_map &map);
-	void megasys1D_oki_map(address_map &map);
 };
 
 class megasys1_typea_state : public megasys1_state
@@ -235,6 +223,34 @@ public:
 protected:
 	virtual void machine_reset() override;
 };
+
+class megasys1_typed_state : public megasys1_state
+{
+public:
+	megasys1_typed_state(const machine_config &mconfig, device_type type, const char *tag) :
+		megasys1_state(mconfig, type, tag),
+		m_okibank(*this, "okibank")
+	{ }
+
+	void system_D(machine_config &config);
+
+	void init_peekaboo();
+
+private:
+	required_memory_bank m_okibank;
+
+	// peekaboo
+	u16 m_protection_val = 0;
+
+	u16 protection_peekaboo_r();
+	void protection_peekaboo_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+
+	INTERRUPT_GEN_MEMBER(megasys1D_irq);
+
+	void megasys1D_map(address_map &map);
+	void megasys1D_oki_map(address_map &map);
+};
+
 
 class megasys1_typez_state : public megasys1_state
 {

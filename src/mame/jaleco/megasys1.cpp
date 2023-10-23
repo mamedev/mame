@@ -584,20 +584,20 @@ void megasys1_bc_iomcu_state::megasys1C_bigstrik_map(address_map &map)
                             [ Main CPU - System D ]
 ***************************************************************************/
 
-INTERRUPT_GEN_MEMBER(megasys1_state::megasys1D_irq)
+INTERRUPT_GEN_MEMBER(megasys1_typed_state::megasys1D_irq)
 {
 	device.execute().set_input_line(2, HOLD_LINE);
 }
 
-void megasys1_state::megasys1D_map(address_map &map)
+void megasys1_typed_state::megasys1D_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x0c2000, 0x0c2005).rw("scroll0", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
 	map(0x0c2008, 0x0c200d).rw("scroll1", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
-	map(0x0c2108, 0x0c2109).nopw(); //.w(FUNC(megasys1_state::sprite_bank_w));
-	map(0x0c2200, 0x0c2201).rw(FUNC(megasys1_state::sprite_flag_r), FUNC(megasys1_state::sprite_flag_w));
-	map(0x0c2208, 0x0c2209).w(FUNC(megasys1_state::active_layers_w));
-	map(0x0c2308, 0x0c2309).w(FUNC(megasys1_state::screen_flag_w));
+	map(0x0c2108, 0x0c2109).nopw(); //.w(FUNC(megasys1_typed_state::sprite_bank_w));
+	map(0x0c2200, 0x0c2201).rw(FUNC(megasys1_typed_state::sprite_flag_r), FUNC(megasys1_typed_state::sprite_flag_w));
+	map(0x0c2208, 0x0c2209).w(FUNC(megasys1_typed_state::active_layers_w));
+	map(0x0c2308, 0x0c2309).w(FUNC(megasys1_typed_state::screen_flag_w));
 	map(0x0ca000, 0x0cbfff).ram().share("objectram");
 	map(0x0d0000, 0x0d3fff).ram().w("scroll1", FUNC(megasys1_tilemap_device::write)).share("scroll1");
 	map(0x0d8000, 0x0d87ff).mirror(0x3000).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -606,10 +606,10 @@ void megasys1_state::megasys1D_map(address_map &map)
 	map(0x0f0000, 0x0f0001).portr("SYSTEM");
 	map(0x0f8001, 0x0f8001).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 //  map(0x100000, 0x100001); // protection
-	map(0x1f0000, 0x1fffff).ram() /*.w(FUNC(megasys1_state::ram_w))*/ .share("ram");
+	map(0x1f0000, 0x1fffff).ram() /*.w(FUNC(megasys1_typed_state::ram_w))*/ .share("ram");
 }
 
-void megasys1_state::megasys1D_oki_map(address_map &map)
+void megasys1_typed_state::megasys1D_oki_map(address_map &map)
 {
 	map(0x00000, 0x1ffff).rom();
 	map(0x20000, 0x3ffff).bankr("okibank");
@@ -1815,7 +1815,7 @@ INPUT_PORTS_END
 
 
 /* Read the input ports, through a protection device */
-u16 megasys1_state::protection_peekaboo_r()
+u16 megasys1_typed_state::protection_peekaboo_r()
 {
 	switch (m_protection_val)
 	{
@@ -1826,7 +1826,7 @@ u16 megasys1_state::protection_peekaboo_r()
 	}
 }
 
-void megasys1_state::protection_peekaboo_w(offs_t offset, u16 data, u16 mem_mask)
+void megasys1_typed_state::protection_peekaboo_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_protection_val);
 
@@ -2113,12 +2113,12 @@ void megasys1_bc_iomcu_state::system_C_bigstrik(machine_config &config)
 ***************************************************************************/
 
 
-void megasys1_state::system_D(machine_config &config)
+void megasys1_typed_state::system_D(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, SYS_D_CPU_CLOCK);    /* 8MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_state::megasys1D_map);
-	m_maincpu->set_vblank_int("screen", FUNC(megasys1_state::megasys1D_irq));
+	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_typed_state::megasys1D_map);
+	m_maincpu->set_vblank_int("screen", FUNC(megasys1_typed_state::megasys1D_irq));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -2126,12 +2126,12 @@ void megasys1_state::system_D(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(32*8, 32*8);
 	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	m_screen->set_screen_update(FUNC(megasys1_state::screen_update));
-	m_screen->screen_vblank().set(FUNC(megasys1_state::screen_vblank));
+	m_screen->set_screen_update(FUNC(megasys1_typed_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(megasys1_typed_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_abc);
-	PALETTE(config, m_palette, FUNC(megasys1_state::megasys1_palette)).set_format(palette_device::RGBx_555, 0x800/2);
+	PALETTE(config, m_palette, FUNC(megasys1_typed_state::megasys1_palette)).set_format(palette_device::RGBx_555, 0x800/2);
 
 	MEGASYS1_TILEMAP(config, m_tmap[0], m_palette, 256*0);
 	m_tmap[0]->set_screen_tag(m_screen);
@@ -2142,7 +2142,7 @@ void megasys1_state::system_D(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	OKIM6295(config, m_oki[0], SYS_D_CPU_CLOCK/4, okim6295_device::PIN7_HIGH);    /* 2MHz (8MHz / 4) */
-	m_oki[0]->set_addrmap(0, &megasys1_state::megasys1D_oki_map);
+	m_oki[0]->set_addrmap(0, &megasys1_typed_state::megasys1D_oki_map);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
@@ -5279,15 +5279,15 @@ void megasys1_bc_iosim_state::init_cybattlr() // Type C
 }
 
 // Type D
-void megasys1_state::init_peekaboo()
+void megasys1_typed_state::init_peekaboo()
 {
 	u8 *ROM = memregion("oki1")->base();
 
 	m_okibank->configure_entry(7, &ROM[0x20000]);
 	m_okibank->configure_entries(0, 7, &ROM[0x20000], 0x20000);
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x100000, 0x100001, read16smo_delegate(*this, FUNC(megasys1_state::protection_peekaboo_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x100000, 0x100001, write16s_delegate(*this, FUNC(megasys1_state::protection_peekaboo_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x100000, 0x100001, read16smo_delegate(*this, FUNC(megasys1_typed_state::protection_peekaboo_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x100000, 0x100001, write16s_delegate(*this, FUNC(megasys1_typed_state::protection_peekaboo_w)));
 
 	save_item(NAME(m_protection_val));
 }
@@ -5374,5 +5374,5 @@ GAME( 1993, chimeraba,  chimerab, system_C_iosim,          chimerab, megasys1_bc
 GAME( 1993, cybattlr,   0,        system_C_iosim,          cybattlr, megasys1_bc_iosim_state, init_cybattlr, ROT90,  "Jaleco", "Cybattler", MACHINE_SUPPORTS_SAVE )
 
 // Type D
-GAME( 1993, peekaboo,   0,        system_D,          peekaboo, megasys1_state, init_peekaboo, ROT0,   "Jaleco", "Peek-a-Boo! (Japan, ver. 1.1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, peekaboou,  peekaboo, system_D,          peekaboo, megasys1_state, init_peekaboo, ROT0,   "Jaleco", "Peek-a-Boo! (North America, ver 1.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, peekaboo,   0,        system_D,                peekaboo, megasys1_typed_state,    init_peekaboo, ROT0,   "Jaleco", "Peek-a-Boo! (Japan, ver. 1.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, peekaboou,  peekaboo, system_D,                peekaboo, megasys1_typed_state,    init_peekaboo, ROT0,   "Jaleco", "Peek-a-Boo! (North America, ver 1.0)", MACHINE_SUPPORTS_SAVE )
