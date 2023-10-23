@@ -4041,7 +4041,7 @@ ROM_START( mtrainnv )
 ROM_END
 
 /*
- Seven Land (Korea)
+ Seven Land (Korea, probably a bootleg of Super Treasure Island)
    MCU Hitachi HD64180RP6.
    Actel A40MX04-F.
    Sound: U6612 (YM3812) + U6614 (YM3014) + 12.000 MHz xtal.
@@ -4310,6 +4310,7 @@ GAMEL( 1995, stisub,      stbsub,  stbsub,     stbsub,   subsino_state, init_sti
 GAMEL( 1995, tesorone,    stbsub,  stbsub,     tesorone, subsino_state, init_tesorone,    ROT0, "Subsino",         "Tesorone Dell'Isola (Italy, v2.41)",          0,                   layout_stisub   )
 GAMEL( 1995, tesorone240, stbsub,  stbsub,     tesorone, subsino_state, init_tesorone,    ROT0, "Subsino",         "Tesorone Dell'Isola (Italy, v2.40)",          0,                   layout_stisub   )
 GAMEL( 1995, tesorone230, stbsub,  stbsub,     tesorone, subsino_state, init_tesorone230, ROT0, "Subsino",         "Tesorone Dell'Isola (Italy, v2.30)",          0,                   layout_stisub   )
+GAME(  199?, sevenlnd,    stbsub,  mtrainnv,   stbsub,   subsino_state, init_mtrainnv,    ROT0, "bootleg",         "Seven Land",                                  MACHINE_NOT_WORKING ) // Without layout until fully dumped
 
 GAMEL( 1996, sharkpy,     0,       sharkpy,    sharkpy,  subsino_state, init_sharkpy,     ROT0, "Subsino",         "Shark Party (Italy, v1.3)",                   0,                   layout_sharkpy  ) // missing POST messages?
 GAMEL( 1996, sharkpya,    sharkpy, sharkpy,    sharkpy,  subsino_state, init_sharkpy,     ROT0, "Subsino",         "Shark Party (Italy, v1.6)",                   0,                   layout_sharkpy  ) // missing POST messages?
@@ -4324,4 +4325,3 @@ GAMEL( 1996, smoto16,     smoto20, srider,     smoto16,  subsino_state, init_smo
 GAMEL( 1996, smoto13,     smoto20, srider,     smoto16,  subsino_state, init_smoto13,     ROT0, "Subsino",         "Super Rider (v1.3)",                          0,                   layout_smoto    )
 
 GAME(  1996, mtrainnv,    mtrain,  mtrainnv,   stbsub,   subsino_state, init_mtrainnv,    ROT0, "Subsino",         "Magic Train (Clear NVRAM ROM?)",              MACHINE_NOT_WORKING )
-GAME(  199?, sevenlnd,    mtrain,  mtrainnv,   stbsub,   subsino_state, init_mtrainnv,    ROT0, "bootleg?",        "Seven Land",                                  MACHINE_NOT_WORKING ) // Without layout until fully dumped
