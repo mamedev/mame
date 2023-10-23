@@ -462,7 +462,6 @@ VIDEO_START_MEMBER(subsino_state, reels)
 	m_reel_tilemap[0]->set_scroll_cols(64);
 	m_reel_tilemap[1]->set_scroll_cols(64);
 	m_reel_tilemap[2]->set_scroll_cols(64);
-
 }
 
 VIDEO_START_MEMBER(subsino_state,stbsub)
@@ -1025,6 +1024,7 @@ void subsino_state::newhunterb_map(address_map &map)
 	map(0x0f00c, 0x0f00d).w("ymsnd", FUNC(ym3812_device::write));
 	map(0x0f00e, 0x0f00e).portr("INC");
 	map(0x0f00f, 0x0f00f).w(FUNC(subsino_state::tiles_offset_w));
+	map(0x14000, 0x15fff).rom().region("program", 0x4000);
 }
 
 void subsino_state::ramdac_map(address_map &map)
@@ -4262,7 +4262,7 @@ GAMEL( 1992, tisuba,      tisub,   tisub,      tisub,    subsino_state, init_tis
 GAMEL( 1992, tisubb,      tisub,   tisub,      tisubb,   subsino_state, init_tisubb,      ROT0, "American Alpha",  "Treasure Island (American Alpha, v3.0N)",     0,                   layout_tisubb   )
 GAMEL( 1992, newhunter,   tisub,   tisub,      tisub,    subsino_state, init_tisubb,      ROT0, "Karam",           "New HUNTer",                                  0,                   layout_tisubb   ) // 1989 on screen, but this bootleg is from 1992
 GAMEL( 1993, newhunterb,  tisub,   newhunterb, tisub,    subsino_state, init_newhunterb,  ROT0, "bootleg",         "New HUNTer (bootleg, set 1)",                 0,                   layout_tisubb   )
-GAMEL( 1993, newhunterc,  tisub,   newhunterb, tisub,    subsino_state, init_newhunterc,  ROT0, "bootleg",         "New HUNTer (bootleg, set 2)",                 MACHINE_NOT_WORKING, layout_tisubb   ) // 1989 on screen, but "Copyright 1993 SubSino Corp. Taipei, Taiwan." on program ROM
+GAMEL( 1993, newhunterc,  tisub,   newhunterb, tisub,    subsino_state, init_newhunterc,  ROT0, "bootleg",         "New HUNTer (bootleg, set 2)",                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_COLORS, layout_tisubb   ) // 1989 on screen, but "Copyright 1993 SubSino Corp. Taipei, Taiwan." on program ROM
 
 GAMEL( 1991, crsbingo,    0,       crsbingo,   crsbingo, subsino_state, init_crsbingo,    ROT0, "Subsino",         "Poker Carnival",                              0,                   layout_crsbingo )
 
