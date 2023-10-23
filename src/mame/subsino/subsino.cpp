@@ -4055,13 +4055,17 @@ ROM_START( sevenlnd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "a_am27c512.u58", 0x00000, 0x10000, CRC(7abaca14) SHA1(48e4eb4ef7df09f29a382167291ee6385279d1f5) )
 
-	ROM_REGION( 0x20000, "tilemap", 0 )
-	ROM_LOAD( "sevenlnd_tilemap_1.u25", 0x00000, 0x10000, NO_DUMP )
-	ROM_LOAD( "sevenlnd_tilemap_2.u24", 0x10000, 0x10000, NO_DUMP )
+	ROM_REGION( 0x100000, "tilemap", 0 )
+	ROM_LOAD( "sevenlnd_tilemap_1.u30", 0x00000, 0x40000, NO_DUMP ) // A278308 
+	ROM_LOAD( "sevenlnd_tilemap_2.u29", 0x40000, 0x40000, NO_DUMP ) // A278308
+	ROM_LOAD( "sevenlnd_tilemap_2.u29", 0x80000, 0x40000, NO_DUMP ) // A278308
+	ROM_LOAD( "sevenlnd_tilemap_2.u29", 0xC0000, 0x40000, NO_DUMP ) // A278308
 
-	ROM_REGION( 0x20000, "reels", 0 )
-	ROM_LOAD( "sevenlnd_reels_1.u23", 0x00000, 0x10000, NO_DUMP )
-	ROM_LOAD( "sevenlnd_reels_2.u22", 0x10000, 0x10000, NO_DUMP )
+	ROM_REGION( 0x80000, "reels", 0 )
+	ROM_LOAD( "sevenlnd_reels_1.u25", 0x00000, 0x20000, NO_DUMP ) // 27C010
+	ROM_LOAD( "sevenlnd_reels_2.u24", 0x20000, 0x20000, NO_DUMP ) // 27C010
+	ROM_LOAD( "sevenlnd_reels_2.u23", 0x40000, 0x20000, NO_DUMP ) // 27C010
+	ROM_LOAD( "sevenlnd_reels_2.u22", 0x60000, 0x20000, NO_DUMP ) // 27C010
 
 	ROM_REGION( 0x157, "plds", 0 )
 	ROM_LOAD( "gal16v8d_1.bin", 0x000, 0x117, NO_DUMP )
