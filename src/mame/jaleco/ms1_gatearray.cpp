@@ -47,15 +47,14 @@ void megasys1_gatearray_device::device_reset()
 
 void megasys1_gatearray_d65006_device::rom_decode()
 {
-	u16  *RAM    =   (u16 *)m_rom;
-	int i,      size    =   m_romsize;
+	u16 *RAM = (u16 *)m_rom;
+	int size = m_romsize;
 	if (size > 0x40000) size = 0x40000;
 
-	for (i = 0 ; i < size/2 ; i++)
+	for (int i = 0 ; i < size/2 ; i++)
 	{
-		u16 x,y;
-
-		x = RAM[i];
+		u16 y;
+		u16 x = RAM[i];
 
 // [0] def0 189a bc56 7234
 // [1] fdb9 7531 eca8 6420
@@ -81,15 +80,14 @@ void megasys1_gatearray_d65006_device::rom_decode()
 
 void megasys1_gatearray_gs88000_device::rom_decode()
 {
-	u16  *RAM    =   (u16 *)m_rom;
-	int i,      size    =   m_romsize;
+	u16 *RAM = (u16 *)m_rom;
+	int size = m_romsize;
 	if (size > 0x40000) size = 0x40000;
 
-	for (i = 0 ; i < size/2 ; i++)
+	for (int i = 0 ; i < size/2 ; i++)
 	{
-		u16 x,y;
-
-		x = RAM[i];
+		u16 y;
+		u16 x = RAM[i];
 
 // [0] def0 a981 65cb 7234
 // [1] fdb9 7531 8ace 0246
@@ -115,15 +113,14 @@ void megasys1_gatearray_gs88000_device::rom_decode()
 
 void megasys1_gatearray_unkarray_device::rom_decode()
 {
-	u16  *RAM    =   (u16 *)m_rom;
-	int i,      size    =   m_romsize;
+	u16 *RAM = (u16 *)m_rom;
+	int size = m_romsize;
 	if (size > 0x40000) size = 0x40000;
 
-	for (i = 0 ; i < size/2 ; i++)
+	for (int i = 0 ; i < size/2 ; i++)
 	{
-		u16 x,y;
-
-		x = RAM[i];
+		u16 y;
+		u16 x = RAM[i];
 
 // [0] d0a9 6ebf 5c72 3814  [1] 4567 0123 ba98 fedc
 // [2] fdb9 ce07 5318 a246  [3] 4512 ed3b a967 08fc
