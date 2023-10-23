@@ -14,13 +14,16 @@
 
     Input can also come from the serial port.
 
-  TODO:
-    - INS8250 needs to implement "Set Break" (LCR, bit 6) before Break key
-      will function as expected.
-    - 49/50 row mode does not work when DOT clocks are programmed as documented
-      in the manual. It does work when DOT clock is fixed at the 20.282 MHz
-      rate.
-    - In 49/50 row mode, character descenders are cut off.
+  Known Issues:
+    - Break key does not send break on serial line
+        - INS8250 needs to implement "Set Break" (LCR, bit 6)
+    - With gp19 slot option
+      - 49/50 row mode only shows half the screen.
+      - In 49/50 row mode, character descenders are cut off.
+      - Screen saver does not disable the screen
+    - With superset slot option
+      - Screen menus not working properly
+
 ****************************************************************************/
 /***************************************************************************
   Memory Layout
@@ -105,7 +108,7 @@ device_heath_tlb_card_interface::device_heath_tlb_card_interface(const machine_c
 
 
 /**
- * base Heath h19 functionality
+ * original Heath h19 functionality
  */
 heath_tlb_device::heath_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	heath_tlb_device(mconfig, HEATH_TLB, tag, owner, clock)
@@ -1083,7 +1086,9 @@ void heath_superset_tlb_device::device_add_mconfig(machine_config &config)
 	// part of the Superset upgrade was to upgrade the CPU to 3 MHz.
 	m_maincpu->set_clock(H19_3MHZ);
 	m_maincpu->set_addrmap(AS_PROGRAM, &heath_superset_tlb_device::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &heath_superset_tlb_device::io_map);
 
+	m_crtc->set_begin_update_callback(FUNC(heath_superset_tlb_device::crtc_begin_update));
 	m_crtc->set_update_row_callback(FUNC(heath_superset_tlb_device::crtc_update_row));
 
 	// link up the serial port outputs to font chip.
@@ -1112,6 +1117,13 @@ void heath_superset_tlb_device::mem_map(address_map &map)
 	map(0x8000, 0x87ff).ram();
 }
 
+void heath_superset_tlb_device::io_map(address_map &map)
+{
+	heath_tlb_device::io_map(map);
+
+	map(0x61, 0x61).mirror(0x12).select(0x0c).rw(FUNC(heath_superset_tlb_device::crtc_reg_r), FUNC(heath_superset_tlb_device::crtc_reg_w));
+}
+
 const tiny_rom_entry *heath_superset_tlb_device::device_rom_region() const
 {
 	return ROM_NAME(superset);
@@ -1120,6 +1132,25 @@ const tiny_rom_entry *heath_superset_tlb_device::device_rom_region() const
 ioport_constructor heath_superset_tlb_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(superset);
+}
+
+uint8_t heath_superset_tlb_device::crtc_reg_r(offs_t reg)
+{
+	m_reverse_video_disabled = bool(BIT(reg, 3));
+
+	return heath_tlb_device::crtc_reg_r(reg);
+}
+
+void heath_superset_tlb_device::crtc_reg_w(offs_t reg, uint8_t val)
+{
+	m_reverse_video_disabled = bool(BIT(reg, 3));
+
+	heath_tlb_device::crtc_reg_w(reg, val);
+}
+
+MC6845_BEGIN_UPDATE(heath_superset_tlb_device::crtc_begin_update)
+{
+	bitmap.fill(rgb_t::black(), cliprect);
 }
 
 MC6845_UPDATE_ROW(heath_superset_tlb_device::crtc_update_row)
@@ -1133,15 +1164,25 @@ MC6845_UPDATE_ROW(heath_superset_tlb_device::crtc_update_row)
 		{
 			uint8_t inv = (x == cursor_x) ? 0xff : 0;
 			uint8_t chr = m_p_videoram[(ma + x) & 0x7ff];
+			uint16_t char_set_base_offset = (m_selected_char_set << 11);
 
 			if (chr & 0x80)
 			{
-				inv ^= 0xff;
+				if (m_reverse_video_disabled)
+				{
+					// set A13
+					char_set_base_offset |= 0x2000;
+				}
+				else
+				{
+					inv ^= 0xff;
+				}
+
 				chr &= 0x7f;
 			}
 
-			// get pattern of pixels for that character scanline
-			uint8_t const gfx = m_p_chargen[(m_selected_char_set << 12) | (chr << 4) | ra] ^ inv;
+			// get pattern of pixels for the character scanline
+			uint8_t const gfx = m_p_chargen[char_set_base_offset | (chr << 4) | ra] ^ inv;
 
 			// Display a scanline of a character (8 pixels)
 			for (int b = 0; 8 > b; ++b)
@@ -1156,19 +1197,22 @@ MC6845_UPDATE_ROW(heath_superset_tlb_device::crtc_update_row)
 	}
 }
 
+// DTR (pin 33) to A14 (pin 27) of 27256 ROM
 void heath_superset_tlb_device::dtr_internal(int data)
 {
-	m_selected_char_set = (m_selected_char_set & 0x03) | ((data & 0x01) << 2);
+	m_selected_char_set = (m_selected_char_set & 0x03) | ((data & 0x01) << 3);
 }
 
+// OUT1 (pin 34) to A12 (pin 2) of 27256 ROM
 void heath_superset_tlb_device::out1_internal(int data)
 {
-	m_selected_char_set = (m_selected_char_set & 0x05) | ((data & 0x01) << 1);
+	m_selected_char_set = (m_selected_char_set & 0x09) | ((data & 0x01) << 1);
 }
 
+// OUT2 (pin 31) to A11? on board
 void heath_superset_tlb_device::out2_internal(int data)
 {
-	m_selected_char_set = (m_selected_char_set & 0x06) | (data & 0x01);
+	m_selected_char_set = (m_selected_char_set & 0x0A) | (data & 0x01);
 }
 
 /**
