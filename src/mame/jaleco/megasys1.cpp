@@ -239,6 +239,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(megasys1_typea_state::megasys1A_iganinju_scanline)
 	// TODO: there's more than one hint that UPD65006 controls IRQ signals via work RAM buffers.
 	//       This is a bare minimum guessing for this specific game, it definitely don't like neither lv 1 nor 2.
 	//       Of course UPD65006 is probably doing a lot more to mask and probably set a specific line too.
+	//
+	// NOTE: above NOTE is very unlikely, the 65006 has a very specific purpose - encryption and ROM overlay
+	//       and is found on multiple boards.
 	if(m_ram[0] == 0)
 		return;
 
