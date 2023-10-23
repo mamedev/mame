@@ -163,16 +163,12 @@ public:
 	void system_A_kickoffb(machine_config &config);
 	void system_A_p47b(machine_config &config);
 
-	void init_astyanax();
-	void init_stdragon();
-	void init_soldamj();
-	void init_phantasm();
-	void init_tshingen();
+	void init_gs88000();
+	void init_d65006();
 	void init_jitsupro();
-	void init_iganinju();
 	void init_rodlandj();
 	void init_rodlandjb();
-	void init_rodland();
+	void init_unkgatearray();
 	void init_stdragona();
 	void init_stdragonb();
 	void init_lordofkbp();
@@ -195,13 +191,13 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(megasys1A_iganinju_scanline);
 
-	void install_gatearray_overlay(u32 base_write, const u16 *sequence);
+	void install_gatearray_overlay(const u16 *sequence);
 	u16 gatearray_r(offs_t offset, u16 mem_mask = ~0);
 	void gatearray_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	// System A only
 	int m_mcu_hs = 0;
-	u16 m_mcu_hs_ram[0x10]{};
+	u16 m_mcu_hs_ram[0x8]{};
 
 	const u16* m_gatearray_seq = nullptr;
 	//                                     write sequence                return value

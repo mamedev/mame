@@ -5117,12 +5117,13 @@ u16 megasys1_typea_state::gatearray_r(offs_t offset, u16 mem_mask)
 
 void megasys1_typea_state::gatearray_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	// [0/2]: 0x0000
-	// [2/2]: 0x0055
-	// [4/2]: 0x00aa
-	// [6/2]: 0x00ff
-	// [8/2]: 0x0bc0
-	// expects 0x835d to be read at 0x2f000, does hs sequence until that happens
+	// astyanax writes to 0x2000x
+	// iganinju writes to 0x2f00x
+	// stdragon writes to 0x23ffx
+	// tshingen writes to 0x20c0x
+	// assume writes mirror across the space
+
+	offset &= 0x7;
 
 	COMBINE_DATA(&m_mcu_hs_ram[offset]);
 
@@ -5138,10 +5139,10 @@ void megasys1_typea_state::gatearray_w(offs_t offset, u16 data, u16 mem_mask)
 		printf("MCU HS W %04x (%04x) -> [%02x]\n",data,mem_mask,offset*2);
 }
 
-void megasys1_typea_state::install_gatearray_overlay(u32 base_write, const u16 *sequence)
+void megasys1_typea_state::install_gatearray_overlay(const u16 *sequence)
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16s_delegate(*this, FUNC(megasys1_typea_state::gatearray_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(base_write, base_write+0x9, write16s_delegate(*this, FUNC(megasys1_typea_state::gatearray_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20000, 0x2ffff, write16s_delegate(*this, FUNC(megasys1_typea_state::gatearray_w)));
 	m_gatearray_seq = sequence;
 	m_mcu_hs = 0;
 	memset(m_mcu_hs_ram, 0, sizeof(m_mcu_hs_ram));
@@ -5150,33 +5151,21 @@ void megasys1_typea_state::install_gatearray_overlay(u32 base_write, const u16 *
 	save_item(NAME(m_mcu_hs_ram));
 }
 
-void megasys1_typea_state::init_astyanax() // Type A
+void megasys1_typea_state::init_gs88000() // Type A
 {
 	jaleco_gs88000_rom_decode(machine(), "maincpu");
-	install_gatearray_overlay(0x20000, jaleco_gs88000_unlock_sequence);
+	install_gatearray_overlay(jaleco_gs88000_unlock_sequence);
 }
 
-void megasys1_typea_state::init_iganinju() // Type A
+void megasys1_typea_state::init_d65006() // Type A
 {
 	jaleco_d65006_rom_decode(machine(), "maincpu");
-	install_gatearray_overlay(0x2f000, jaleco_d65006_unlock_sequence);
-}
-
-void megasys1_typea_state::init_stdragon() // Type A
-{
-	jaleco_d65006_rom_decode(machine(), "maincpu");
-	install_gatearray_overlay(0x23ff0, jaleco_d65006_unlock_sequence);
-}
-
-void megasys1_typea_state::init_tshingen() // Type A
-{
-	jaleco_d65006_rom_decode(machine(), "maincpu");
-	install_gatearray_overlay(0x20c00, jaleco_d65006_unlock_sequence); // protection check sometimes kicks in at the start of 2nd level, but not always
+	install_gatearray_overlay(jaleco_d65006_unlock_sequence);
 }
 
 void megasys1_typea_state::init_jitsupro() // Type A
 {
-	init_astyanax();
+	init_gs88000();
 	// additional graphic scramble
 	jitsupro_gfx_unmangle("scroll0");   // Gfx
 	jitsupro_gfx_unmangle("sprites");
@@ -5184,13 +5173,13 @@ void megasys1_typea_state::init_jitsupro() // Type A
 
 void megasys1_typea_state::init_stdragona() // Type A
 {
-	init_stdragon();
+	init_d65006();
 	// additional graphic scramble
 	stdragona_gfx_unmangle("scroll0");
 	stdragona_gfx_unmangle("sprites");
 }
 
-void megasys1_typea_state::init_rodland() // Type A
+void megasys1_typea_state::init_unkgatearray() // Type A
 {
 	rodland_rom_decode(machine(), "maincpu");
 	// additional graphic scramble
@@ -5200,21 +5189,12 @@ void megasys1_typea_state::init_rodland() // Type A
 
 void megasys1_typea_state::init_rodlandj() // Type A
 {
-	jaleco_gs88000_rom_decode(machine(), "maincpu");
+	init_gs88000();
 	// additional graphic scramble
 	rodland_gfx_unmangle("scroll0");
 	rodland_gfx_unmangle("sprites");
 }
 
-void megasys1_typea_state::init_phantasm() // Type A
-{
-	jaleco_d65006_rom_decode(machine(), "maincpu");
-}
-
-void megasys1_typea_state::init_soldamj() // Type A
-{
-	jaleco_gs88000_rom_decode(machine(), "maincpu");
-}
 
 void megasys1_typea_state::init_stdragonb() // Type A, bootleg
 {
@@ -5326,34 +5306,34 @@ GAME( 1988, p47je,      p47,      system_A,          p47,      megasys1_typea_st
 GAME( 1988, p47b,       p47,      system_A_p47b,     p47,      megasys1_typea_state, empty_init,    ROT0,   "bootleg","P-47 - The Freedom Fighter (World, bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, kickoff,    0,        system_A,          kickoff,  megasys1_typea_state, empty_init,    ROT0,   "Jaleco", "Kick Off - Jaleco Cup (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, kickoffb,   kickoff,  system_A_kickoffb, kickoff,  megasys1_typea_state, empty_init,    ROT0,   "bootleg (Comodo)", "Kick Off - World Cup (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // OKI needs to be checked
-GAME( 1988, tshingen,   0,        system_A,          tshingen, megasys1_typea_state, init_tshingen, ROT0,   "Jaleco", "Shingen Samurai-Fighter (Japan, English)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tshingena,  tshingen, system_A,          tshingen, megasys1_typea_state, init_tshingen, ROT0,   "Jaleco", "Takeda Shingen (Japan, Japanese)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, kazan,      0,        system_A_iganinju, kazan,    megasys1_typea_state, init_iganinju, ROT0,   "Jaleco", "Ninja Kazan (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, iganinju,   kazan,    system_A_iganinju, kazan,    megasys1_typea_state, init_iganinju, ROT0,   "Jaleco", "Iga Ninjyutsuden (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, iganinjub,  kazan,    system_A_iganinju, kazan,    megasys1_typea_state, empty_init   , ROT0,   "bootleg","Iga Ninjyutsuden (Japan, bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, astyanax,   0,        system_A,          astyanax, megasys1_typea_state, init_astyanax, ROT0,   "Jaleco", "The Astyanax (EPROM version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, astyanaxa,  astyanax, system_A,          astyanax, megasys1_typea_state, init_astyanax, ROT0,   "Jaleco", "The Astyanax (mask ROM version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, lordofk,    astyanax, system_A,          astyanax, megasys1_typea_state, init_astyanax, ROT0,   "Jaleco", "The Lord of King (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tshingen,   0,        system_A,          tshingen, megasys1_typea_state, init_d65006,   ROT0,   "Jaleco", "Shingen Samurai-Fighter (Japan, English)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tshingena,  tshingen, system_A,          tshingen, megasys1_typea_state, init_d65006,   ROT0,   "Jaleco", "Takeda Shingen (Japan, Japanese)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, kazan,      0,        system_A_iganinju, kazan,    megasys1_typea_state, init_d65006,   ROT0,   "Jaleco", "Ninja Kazan (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, iganinju,   kazan,    system_A_iganinju, kazan,    megasys1_typea_state, init_d65006,   ROT0,   "Jaleco", "Iga Ninjyutsuden (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, iganinjub,  kazan,    system_A_iganinju, kazan,    megasys1_typea_state, empty_init,    ROT0,   "bootleg","Iga Ninjyutsuden (Japan, bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, astyanax,   0,        system_A,          astyanax, megasys1_typea_state, init_gs88000,  ROT0,   "Jaleco", "The Astyanax (EPROM version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, astyanaxa,  astyanax, system_A,          astyanax, megasys1_typea_state, init_gs88000,  ROT0,   "Jaleco", "The Astyanax (mask ROM version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, lordofk,    astyanax, system_A,          astyanax, megasys1_typea_state, init_gs88000,  ROT0,   "Jaleco", "The Lord of King (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, lordofkb,   astyanax, system_A,          astyanax, megasys1_typea_state, empty_init,    ROT0,   "bootleg","The Lord of King (bootleg, not protected)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, lordofkbp,  astyanax, system_A,          astyanax, megasys1_typea_state, init_lordofkbp,ROT0,   "bootleg","The Lord of King (bootleg, protected)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, hachoo,     0,        system_A,          hachoo,   megasys1_typea_hachoo_state, init_astyanax, ROT0,   "Jaleco", "Hachoo! (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, hachooa,    hachoo,   system_A,          hachoo,   megasys1_typea_hachoo_state, init_astyanax, ROT0,   "Jaleco", "Hachoo! (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, hachoo,     0,        system_A,          hachoo,   megasys1_typea_hachoo_state, init_gs88000, ROT0,   "Jaleco", "Hachoo! (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, hachooa,    hachoo,   system_A,          hachoo,   megasys1_typea_hachoo_state, init_gs88000, ROT0,   "Jaleco", "Hachoo! (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, jitsupro,   0,        system_A,          jitsupro, megasys1_typea_state, init_jitsupro, ROT0,   "Jaleco", "Jitsuryoku!! Pro Yakyuu (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, plusalph,   0,        system_A,          plusalph, megasys1_typea_state, init_astyanax, ROT270, "Jaleco", "Plus Alpha", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, stdragon,   0,        system_A,          stdragon, megasys1_typea_state, init_stdragon, ROT0,   "Jaleco", "Saint Dragon (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, plusalph,   0,        system_A,          plusalph, megasys1_typea_state, init_gs88000,  ROT270, "Jaleco", "Plus Alpha", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, stdragon,   0,        system_A,          stdragon, megasys1_typea_state, init_d65006,   ROT0,   "Jaleco", "Saint Dragon (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, stdragona,  stdragon, system_A,          stdragon, megasys1_typea_state, init_stdragona,ROT0,   "Jaleco", "Saint Dragon (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, stdragonb,  stdragon, system_A,          stdragon, megasys1_typea_state, init_stdragonb,ROT0,   "bootleg","Saint Dragon (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, rodland,    0,        system_A,          rodland,  megasys1_typea_state, init_rodland,  ROT0,   "Jaleco", "Rod-Land (World, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, rodland,    0,        system_A,          rodland,  megasys1_typea_state, init_unkgatearray,  ROT0,   "Jaleco", "Rod-Land (World, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, rodlanda,   rodland,  system_A,          rodland,  megasys1_typea_state, init_rodlandj, ROT0,   "Jaleco", "Rod-Land (World, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, rodlandj,   rodland,  system_A,          rodland,  megasys1_typea_state, init_rodlandj, ROT0,   "Jaleco", "Rod-Land (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, rittam,     rodland,  system_A,          rodland,  megasys1_typea_state, init_soldamj,  ROT0,   "Jaleco", "R&T (Rod-Land prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, rittam,     rodland,  system_A,          rodland,  megasys1_typea_state, init_gs88000,  ROT0,   "Jaleco", "R&T (Rod-Land prototype)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, rodlandjb,  rodland,  system_A,          rodland,  megasys1_typea_state, init_rodlandjb,ROT0,   "bootleg","Rod-Land (Japan bootleg with unencrypted program)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, rodlandjb2, rodland,  system_A,          rodland,  megasys1_typea_state, empty_init,    ROT0,   "bootleg","Rod-Land (Japan bootleg with unencrypted program and GFX)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, phantasm,   avspirit, system_A,          phantasm, megasys1_typea_state, init_phantasm, ROT0,   "Jaleco", "Phantasm (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, edfp,       edf,      system_A,          edfp,     megasys1_typea_state, init_phantasm, ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (Japan, prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, inyourfa,   0,        system_A,          inyourfa, megasys1_typea_state, init_iganinju, ROT0,   "Jaleco", "In Your Face (North America, prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, soldam,     0,        system_A_soldam,   soldam,   megasys1_typea_state, init_phantasm, ROT0,   "Jaleco", "Soldam", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, soldamj,    soldam,   system_A_soldam,   soldam,   megasys1_typea_state, init_soldamj,  ROT0,   "Jaleco", "Soldam (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, phantasm,   avspirit, system_A,          phantasm, megasys1_typea_state, init_d65006,   ROT0,   "Jaleco", "Phantasm (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, edfp,       edf,      system_A,          edfp,     megasys1_typea_state, init_d65006,   ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (Japan, prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, inyourfa,   0,        system_A,          inyourfa, megasys1_typea_state, init_d65006,   ROT0,   "Jaleco", "In Your Face (North America, prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, soldam,     0,        system_A_soldam,   soldam,   megasys1_typea_state, init_d65006,   ROT0,   "Jaleco", "Soldam", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, soldamj,    soldam,   system_A_soldam,   soldam,   megasys1_typea_state, init_gs88000,  ROT0,   "Jaleco", "Soldam (Japan)", MACHINE_SUPPORTS_SAVE )
 
 // Type B
 GAME( 1991, avspirit,   0,        system_B,          avspirit, megasys1_bc_iosim_state, init_avspirit, ROT0,   "Jaleco", "Avenging Spirit", MACHINE_SUPPORTS_SAVE )
