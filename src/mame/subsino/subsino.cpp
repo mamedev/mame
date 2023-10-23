@@ -4046,6 +4046,7 @@ ROM_END
    Actel A40MX04-F.
    Sound: U6612 (YM3812) + U6614 (YM3014) + 12.000 MHz xtal.
    Four banks of 8 DIP switches labeled SW1 to SW4.
+   Reset switch near the DIP switches banks.
    One unpopulated location on the PCB (near the sound chips) for another bank of 8 DIP switches, labeled SW0.
    3.6V battery near the HD64180RP6
    No bipolar PROMs on this PCB.
