@@ -17,6 +17,7 @@
 #include "machine/timer.h"
 #include "sound/msm5205.h"
 #include "sound/okim6295.h"
+#include "ms1_gatearray.h"
 #include "ms1_tmap.h"
 #include "emupal.h"
 #include "screen.h"
@@ -154,26 +155,28 @@ class megasys1_typea_state : public megasys1_state
 public:
 	megasys1_typea_state(const machine_config &mconfig, device_type type, const char *tag) :
 		megasys1_state(mconfig, type, tag),
-		m_p47b_adpcm(*this, "msm%u", 1U)
+		m_p47b_adpcm(*this, "msm%u", 1U),
+		m_gatearray(*this, "gatearray")
 	{ }
 
 	void system_A(machine_config &config);
-	void system_A_soldam(machine_config &config);
+	void system_A_d65006_soldam(machine_config &config);
+	void system_A_gs88000_soldam(machine_config &config);
 	void system_A_iganinju(machine_config &config);
 	void system_A_kickoffb(machine_config &config);
 	void system_A_p47b(machine_config &config);
+	void system_A_d65006(machine_config &config);
+	void system_A_d65006_iganinju(machine_config &config);
+	void system_A_gs88000(machine_config &config);
+	void system_A_unkarray(machine_config &config);
 
-	void init_gs88000();
-	void init_d65006();
-	void init_jitsupro();
-	void init_rodlandj();
-	void init_rodlandjb();
-	void init_unkgatearray();
-	void init_stdragona();
-	void init_stdragonb();
+	void init_jitsupro_gfx();
+	void init_rodland_gfx();
+	void init_stdragon_gfx();
 	void init_lordofkbp();
 
 protected:
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	void kickoffb_sound_map(address_map &map);
@@ -188,21 +191,9 @@ protected:
 
 private:
 	optional_device_array<msm5205_device, 2> m_p47b_adpcm;
+	optional_device<megasys1_gatearray_device> m_gatearray;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(megasys1A_iganinju_scanline);
-
-	void install_gatearray_overlay(const u16 *sequence);
-	u16 gatearray_r(offs_t offset, u16 mem_mask = ~0);
-	void gatearray_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-
-	// System A only
-	int m_mcu_hs = 0;
-	u16 m_mcu_hs_ram[0x8]{};
-
-	const u16* m_gatearray_seq = nullptr;
-	//                                     write sequence                return value
-	static constexpr u16 jaleco_d65006_unlock_sequence[5]  = { 0x0000,0x0055,0x00aa,0x00ff,  0x835d };
-	static constexpr u16 jaleco_gs88000_unlock_sequence[5] = { 0x00ff,0x0055,0x00aa,0x0000,  0x889e };
 
 	void rodland_gfx_unmangle(const char *region);
 	void jitsupro_gfx_unmangle(const char *region);

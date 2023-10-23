@@ -1,0 +1,249 @@
+// license:BSD-3-Clause
+// copyright-holders:Angelo Salese, David Haywood
+
+#include "emu.h"
+#include "ms1_gatearray.h"
+
+DEFINE_DEVICE_TYPE(MEGASYS1_GATEARRAY_D65006, megasys1_gatearray_d65006_device, "ms1_tmap", "Mega System 1 Gate Array D65005")
+DEFINE_DEVICE_TYPE(MEGASYS1_GATEARRAY_GS88000, megasys1_gatearray_gs88000_device, "ms1_tmap", "Mega System 1 Gate Array GS-88000")
+DEFINE_DEVICE_TYPE(MEGASYS1_GATEARRAY_UNKARRAY, megasys1_gatearray_unkarray_device, "ms1_tmap", "Mega System 1 Gate Array UNKNOWN")
+
+megasys1_gatearray_device::megasys1_gatearray_device(
+		machine_config const &mconfig,
+		device_type type,
+		char const *tag,
+		device_t *owner,
+		u32 clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, m_cpu(*this, finder_base::DUMMY_TAG)
+{
+	m_has_decoded = false;
+}
+
+
+void megasys1_gatearray_device::device_start()
+{
+	save_item(NAME(m_mcu_hs));
+	save_item(NAME(m_mcu_hs_ram));
+
+	install_gatearray_overlay();
+}
+
+void megasys1_gatearray_device::device_reset()
+{
+	if (!m_has_decoded)
+	{
+		rom_decode();
+		m_has_decoded = true;
+		m_cpu->reset();
+	}
+
+	m_mcu_hs = 0;
+}
+
+
+void megasys1_gatearray_d65006_device::rom_decode()
+{
+	uint16_t  *RAM    =   (uint16_t *)m_rom;
+	int i,      size    =   m_romsize;
+	if (size > 0x40000) size = 0x40000;
+
+	for (i = 0 ; i < size/2 ; i++)
+	{
+		uint16_t x,y;
+
+		x = RAM[i];
+
+// [0] def0 189a bc56 7234
+// [1] fdb9 7531 eca8 6420
+// [2] 0123 4567 ba98 fedc
+#define BITSWAP_0   bitswap<16>(x,0xd,0xe,0xf,0x0,0x1,0x8,0x9,0xa,0xb,0xc,0x5,0x6,0x7,0x2,0x3,0x4)
+#define BITSWAP_1   bitswap<16>(x,0xf,0xd,0xb,0x9,0x7,0x5,0x3,0x1,0xe,0xc,0xa,0x8,0x6,0x4,0x2,0x0)
+#define BITSWAP_2   bitswap<16>(x,0x0,0x1,0x2,0x3,0x4,0x5,0x6,0x7,0xb,0xa,0x9,0x8,0xf,0xe,0xd,0xc)
+
+		if      (i < 0x08000/2) { if ( (i | (0x248/2)) != i ) {y = BITSWAP_0;} else {y = BITSWAP_1;} }
+		else if (i < 0x10000/2) { y = BITSWAP_2; }
+		else if (i < 0x18000/2) { if ( (i | (0x248/2)) != i ) {y = BITSWAP_0;} else {y = BITSWAP_1;} }
+		else if (i < 0x20000/2) { y = BITSWAP_1; }
+		else                    { y = BITSWAP_2; }
+
+#undef  BITSWAP_0
+#undef  BITSWAP_1
+#undef  BITSWAP_2
+
+		RAM[i] = y;
+	}
+
+}
+
+void megasys1_gatearray_gs88000_device::rom_decode()
+{
+	uint16_t  *RAM    =   (uint16_t *)m_rom;
+	int i,      size    =   m_romsize;
+	if (size > 0x40000) size = 0x40000;
+
+	for (i = 0 ; i < size/2 ; i++)
+	{
+		uint16_t x,y;
+
+		x = RAM[i];
+
+// [0] def0 a981 65cb 7234
+// [1] fdb9 7531 8ace 0246
+// [2] 4567 0123 ba98 fedc
+
+#define BITSWAP_0   bitswap<16>(x,0xd,0xe,0xf,0x0,0xa,0x9,0x8,0x1,0x6,0x5,0xc,0xb,0x7,0x2,0x3,0x4)
+#define BITSWAP_1   bitswap<16>(x,0xf,0xd,0xb,0x9,0x7,0x5,0x3,0x1,0x8,0xa,0xc,0xe,0x0,0x2,0x4,0x6)
+#define BITSWAP_2   bitswap<16>(x,0x4,0x5,0x6,0x7,0x0,0x1,0x2,0x3,0xb,0xa,0x9,0x8,0xf,0xe,0xd,0xc)
+
+		if      (i < 0x08000/2) { if ( (i | (0x248/2)) != i ) {y = BITSWAP_0;} else {y = BITSWAP_1;} }
+		else if (i < 0x10000/2) { y = BITSWAP_2; }
+		else if (i < 0x18000/2) { if ( (i | (0x248/2)) != i ) {y = BITSWAP_0;} else {y = BITSWAP_1;} }
+		else if (i < 0x20000/2) { y = BITSWAP_1; }
+		else                    { y = BITSWAP_2; }
+
+#undef  BITSWAP_0
+#undef  BITSWAP_1
+#undef  BITSWAP_2
+
+		RAM[i] = y;
+	}
+}
+
+void megasys1_gatearray_unkarray_device::rom_decode()
+{
+	uint16_t  *RAM    =   (uint16_t *)m_rom;
+	int i,      size    =   m_romsize;
+	if (size > 0x40000) size = 0x40000;
+
+	for (i = 0 ; i < size/2 ; i++)
+	{
+		uint16_t x,y;
+
+		x = RAM[i];
+
+// [0] d0a9 6ebf 5c72 3814  [1] 4567 0123 ba98 fedc
+// [2] fdb9 ce07 5318 a246  [3] 4512 ed3b a967 08fc
+#define BITSWAP_0   bitswap<16>(x,0xd,0x0,0xa,0x9,0x6,0xe,0xb,0xf,0x5,0xc,0x7,0x2,0x3,0x8,0x1,0x4);
+#define BITSWAP_1   bitswap<16>(x,0x4,0x5,0x6,0x7,0x0,0x1,0x2,0x3,0xb,0xa,0x9,0x8,0xf,0xe,0xd,0xc);
+#define BITSWAP_2   bitswap<16>(x,0xf,0xd,0xb,0x9,0xc,0xe,0x0,0x7,0x5,0x3,0x1,0x8,0xa,0x2,0x4,0x6);
+#define BITSWAP_3   bitswap<16>(x,0x4,0x5,0x1,0x2,0xe,0xd,0x3,0xb,0xa,0x9,0x6,0x7,0x0,0x8,0xf,0xc);
+
+		if      (i < 0x08000/2) {   if ( (i | (0x248/2)) != i ) {y = BITSWAP_0;} else {y = BITSWAP_1;} }
+		else if (i < 0x10000/2) {   if ( (i | (0x248/2)) != i ) {y = BITSWAP_2;} else {y = BITSWAP_3;} }
+		else if (i < 0x18000/2) {   if ( (i | (0x248/2)) != i ) {y = BITSWAP_0;} else {y = BITSWAP_1;} }
+		else if (i < 0x20000/2) { y = BITSWAP_1; }
+		else                    { y = BITSWAP_3; }
+
+#undef  BITSWAP_0
+#undef  BITSWAP_1
+#undef  BITSWAP_2
+#undef  BITSWAP_3
+
+		RAM[i] = y;
+	}
+}
+
+
+/*
+    MCU handshake sequence:
+    the UPD65006 gate array can overlay 0x40 bytes of data inside the ROM space.
+    The offset where this happens is given by m68k to UPD65006 write [0x8/2] << 6.
+    For example stdragon writes 0x33e -> maps at 0xcf80-0xcfbf while stdragona writes 0x33f -> maps at 0xcfc0-0xcfff.
+    Note: stdragona forgets to turn off the overlay before the ROM check in service mode (hence it reports an error).
+*/
+
+#define MCU_HS_LOG 0
+
+#define MCU_HS_SEQ(_1_,_2_,_3_,_4_) \
+	(m_mcu_hs_ram[0/2] == _1_ && \
+		m_mcu_hs_ram[2/2] == _2_ && \
+		m_mcu_hs_ram[4/2] == _3_ && \
+		m_mcu_hs_ram[6/2] == _4_)
+
+u16 megasys1_gatearray_device::gatearray_r(offs_t offset, u16 mem_mask)
+{
+	uint16_t *m_rom_maincpu = (uint16_t *)m_rom;
+	if(m_mcu_hs && ((m_mcu_hs_ram[8/2] << 6) & 0x3ffc0) == ((offset*2) & 0x3ffc0))
+	{
+		if(MCU_HS_LOG && !machine().side_effects_disabled())
+			printf("MCU HS R (%04x) <- [%02x]\n",mem_mask,offset*2);
+
+		if (m_gatearray_seq)
+			return m_gatearray_seq[4];
+		else
+			return 0;
+	}
+	return m_rom_maincpu[offset];
+}
+
+void megasys1_gatearray_device::gatearray_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	// astyanax writes to 0x2000x
+	// iganinju writes to 0x2f00x
+	// stdragon writes to 0x23ffx
+	// tshingen writes to 0x20c0x
+	// assume writes mirror across the space
+
+	if (!m_gatearray_seq)
+	{
+		logerror("Write to ROM area with no gatearray sequence");
+		return;
+	}
+
+	offset &= 0x7;
+
+	COMBINE_DATA(&m_mcu_hs_ram[offset]);
+
+	if(MCU_HS_SEQ(m_gatearray_seq[0],m_gatearray_seq[1],m_gatearray_seq[2],m_gatearray_seq[3]) && offset == 0x8/2)
+		m_mcu_hs = 1;
+	else
+		m_mcu_hs = 0;
+
+	if(MCU_HS_LOG && !machine().side_effects_disabled())
+		printf("MCU HS W %04x (%04x) -> [%02x]\n",data,mem_mask,offset*2);
+}
+
+void megasys1_gatearray_device::install_gatearray_overlay()
+{
+	m_cpu->space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16s_delegate(*this, FUNC(megasys1_gatearray_device::gatearray_r)));
+	m_cpu->space(AS_PROGRAM).install_write_handler(0x20000, 0x2ffff, write16s_delegate(*this, FUNC(megasys1_gatearray_device::gatearray_w)));
+	m_mcu_hs = 0;
+	memset(m_mcu_hs_ram, 0, sizeof(m_mcu_hs_ram));
+}
+
+
+megasys1_gatearray_d65006_device::megasys1_gatearray_d65006_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: megasys1_gatearray_d65006_device(mconfig, MEGASYS1_GATEARRAY_D65006, tag, owner, clock)
+{
+	m_gatearray_seq = jaleco_d65006_unlock_sequence;
+}
+
+megasys1_gatearray_d65006_device::megasys1_gatearray_d65006_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: megasys1_gatearray_device(mconfig, type, tag, owner, clock)
+{
+}
+
+megasys1_gatearray_gs88000_device::megasys1_gatearray_gs88000_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: megasys1_gatearray_gs88000_device(mconfig, MEGASYS1_GATEARRAY_GS88000, tag, owner, clock)
+{
+	m_gatearray_seq = jaleco_gs88000_unlock_sequence;
+}
+
+megasys1_gatearray_gs88000_device::megasys1_gatearray_gs88000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: megasys1_gatearray_device(mconfig, type, tag, owner, clock)
+{
+}
+
+
+megasys1_gatearray_unkarray_device::megasys1_gatearray_unkarray_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: megasys1_gatearray_unkarray_device(mconfig, MEGASYS1_GATEARRAY_UNKARRAY, tag, owner, clock)
+{
+	m_gatearray_seq = nullptr; // only used by rodland, which doesn't enable an overlay
+}
+
+megasys1_gatearray_unkarray_device::megasys1_gatearray_unkarray_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: megasys1_gatearray_device(mconfig, type, tag, owner, clock)
+{
+}
+
