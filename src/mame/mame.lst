@@ -34090,6 +34090,7 @@ ddrdismx
 ddrstraw
 dgun2500
 dgun2869
+dgun2959
 dgun851
 dgun853
 gprnrs1
@@ -44614,6 +44615,7 @@ jjstrip
 jouet
 knd
 lxspidaj
+lxairjet
 mattelcs                        //
 ordentv
 pballpup
@@ -44808,6 +44810,7 @@ trkfldch                        // (c) 2007 Konami
 my1stddr                        // (c) 2006 Konami
 abl4play
 shtscore
+lexitvsprt
 
 @source:tvgames/tvgame.cpp
 tvgame                          // 2011

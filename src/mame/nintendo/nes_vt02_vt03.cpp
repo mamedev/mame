@@ -79,6 +79,7 @@ public:
 	void nes_vt_pal_2mb(machine_config& config);
 	void nes_vt_pal_4mb(machine_config& config);
 	void nes_vt_pal_8mb(machine_config& config);
+	void nes_vt_pal_16mb(machine_config& config);
 
 	void nes_vt_512kb(machine_config& config);
 	void nes_vt_1mb(machine_config& config);
@@ -570,6 +571,14 @@ void nes_vt_state::nes_vt_pal_8mb(machine_config& config)
 	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_8mbyte);
 }
+
+void nes_vt_state::nes_vt_pal_16mb(machine_config& config)
+{
+	NES_VT02_VT03_SOC_PAL(config, m_soc, PAL_APU_CLOCK);
+	configure_soc(m_soc);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_16mbyte);
+}
+
 
 void nes_vt_waixing_state::nes_vt_waixing_512kb(machine_config &config)
 {
@@ -1293,6 +1302,11 @@ ROM_START( dgun2869 )
 	ROM_IGNORE(0x100)
 ROM_END
 
+ROM_START( dgun2959 )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "dgun2959.bin", 0x00000, 0x1000000, CRC(6e9b2f45) SHA1(abac2c1783e99b02f9c44f714d5184aea86661ae) )
+ROM_END
+
 
 
 void nes_vt_state::init_protpp()
@@ -1476,3 +1490,4 @@ CONS( 201?, ppgc200g,   0,         0,  nes_vt_pal_8mb, nes_vt, nes_vt_state, emp
 
 // unknown tech level, it's most likely a vt09 or vt369 but isn't using any of the extended features
 CONS( 201?, dgun2869,  0,         0,  nes_vt_16mb,     nes_vt, nes_vt_state, empty_init, "dreamGEAR", "My Arcade Retro Micro Controller - 220 Built-In Video Games (DGUN-2869)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 201?, dgun2959,  0,         0,  nes_vt_pal_16mb, nes_vt, nes_vt_state, empty_init, "dreamGEAR", "My Arcade Plug And Play 220 Game Retro Controller (DGUN-2959)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
