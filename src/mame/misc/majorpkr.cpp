@@ -1201,7 +1201,7 @@ ROM_END
 
 /*
   슈퍼 윷놀이 (Playing Super Yut / Super Yutnori).
-  Bootleg of Major Joker.
+  Bootleg of Major Poker.
   Four locations for DIP switches banks on the PCB, but only three were populated (one was missing).
   Also, none of the switches on the PCB (SW1 and SW2) were present on their PCB locations.
   Hardware:
