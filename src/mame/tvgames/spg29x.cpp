@@ -152,13 +152,13 @@ public:
 	void nand_init(int blocksize, int blocksize_stripped);
 	void nand_jak_bbh();
 	void nand_jak_bbsf();
-	void nand_zonefamf();
 
 protected:
 	void machine_reset() override;
 
-private:
 	std::vector<uint8_t> m_strippedrom;
+
+private:
 	int m_firstvector = 0;
 };
 
@@ -170,6 +170,21 @@ public:
 	{ }
 
 	void init_zone3d();
+
+protected:
+	void machine_reset() override;
+
+private:
+};
+
+class spg29x_zonefamf_game_state : public spg29x_nand_game_state
+{
+public:
+	spg29x_zonefamf_game_state(const machine_config& mconfig, device_type type, const char* tag) :
+		spg29x_nand_game_state(mconfig, type, tag)
+	{ }
+
+	void nand_zonefamf();
 
 protected:
 	void machine_reset() override;
@@ -430,6 +445,23 @@ void spg29x_zone3d_game_state::machine_reset()
 	m_maincpu->set_state_int(SCORE_PC, 0x1000);
 }
 
+void spg29x_zonefamf_game_state::machine_reset()
+{
+	spg29x_game_state::machine_reset();
+
+	uint32_t sourceaddr = 0x80000;
+	for (uint32_t addr = 0; addr <= 0x80000; addr++)
+	{
+		address_space& mem = m_maincpu->space(AS_PROGRAM);
+		uint8_t byte = m_strippedrom[sourceaddr];
+		mem.write_byte(addr, byte);
+		sourceaddr++;
+	}
+
+	m_maincpu->set_state_int(SCORE_PC, 0x4);
+}
+
+
 
 QUICKLOAD_LOAD_MEMBER(spg29x_game_state::quickload_hyper_exe)
 {
@@ -543,10 +575,10 @@ void spg29x_nand_game_state::nand_jak_bbsf()
 	m_firstvector = 0x8;
 }
 
-void spg29x_nand_game_state::nand_zonefamf()
+void spg29x_zonefamf_game_state::nand_zonefamf()
 {
 	nand_init(0x840, 0x800);
-	m_firstvector = 0x8;
+//	m_firstvector = 0x8;
 }
 
 void spg29x_zone3d_game_state::init_zone3d()
@@ -588,6 +620,8 @@ ROM_START( zonefamf )
 
 	ROM_REGION( 0x008000, "spg290", ROMREGION_32BIT | ROMREGION_LE )
 	ROM_LOAD32_DWORD("internal.rom", 0x000000, 0x008000, NO_DUMP)
+
+	//has 1x 48LC8M16A2 (128Mbit/16MByte SDRAM) for loading game into
 ROM_END
 
 
@@ -642,6 +676,6 @@ COMP( 2011, jak_bbsf,   0,      0,      spg29x, hyperscan, spg29x_nand_game_stat
 // 000011DC: br r8
 COMP( 201?, zone3d,    0,      0,      spg29x, hyperscan, spg29x_zone3d_game_state, init_zone3d,"Zone", "Zone 3D", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-COMP( 201?, zonefamf,  0,      0,      spg29x, hyperscan, spg29x_nand_game_state, nand_zonefamf,"Zone", "Zone Family Fit", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 201?, zonefamf,  0,      0,      spg29x, hyperscan, spg29x_zonefamf_game_state, nand_zonefamf,"Zone", "Zone Family Fit", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 // see also spg29x_lexibook_jg7425.cpp which may or may not belong here
