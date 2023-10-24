@@ -461,6 +461,13 @@
 #	define BX_CPP_NAME "C++Unknown"
 #endif // defined(__cplusplus)
 
+#if BX_CPU_ENDIAN_BIG
+static_assert(false, "\n\n"
+	"\t** IMPORTANT! **\n\n"
+	"\tThe code was not tested for big endian, and big endian CPU is considered unsupported.\n"
+	"\t\n");
+#endif // BX_CPU_ENDIAN_BIG
+
 #if BX_PLATFORM_BSD   \
  || BX_PLATFORM_HAIKU \
  || BX_PLATFORM_HURD
