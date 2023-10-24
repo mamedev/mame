@@ -25,7 +25,9 @@ TODO:
 - background color is wrong, this also causes it to scribble preset drawings on
   top of eachother, changing each screen_scanning(1) in video/ef9365.cpp to
   screen_scanning(0) makes it look ok
-- vectors on default splash screen should be thicker
+- vectors on default splash screen should be thicker, horizontal resolution is
+  probably 128 instead of 512, which also makes more sense with the amount of
+  RAM it has (compressing the width down to 128 crudely introduces other bugs)
 - palette is approximated from photos/videos
 
 *******************************************************************************/
