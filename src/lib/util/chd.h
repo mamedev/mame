@@ -361,11 +361,11 @@ public:
 	std::error_condition codec_configure(chd_codec_type codec, int param, void *config);
 
 	// typing
-	bool is_hd() const;
-	bool is_cd() const;
-	bool is_gd() const;
-	bool is_dvd() const;
-	bool is_av() const;
+	std::error_condition check_is_hd() const;
+	std::error_condition check_is_cd() const;
+	std::error_condition check_is_gd() const;
+	std::error_condition check_is_dvd() const;
+	std::error_condition check_is_av() const;
 
 private:
 	struct metadata_entry;
@@ -393,7 +393,7 @@ private:
 	void hunk_write_compressed(uint32_t hunknum, int8_t compression, const uint8_t *compressed, uint32_t complength, util::crc16_t crc16);
 	void hunk_copy_from_self(uint32_t hunknum, uint32_t otherhunk);
 	void hunk_copy_from_parent(uint32_t hunknum, uint64_t parentunit);
-	bool metadata_find(chd_metadata_tag metatag, int32_t metaindex, metadata_entry &metaentry, bool resume = false) const;
+	std::error_condition metadata_find(chd_metadata_tag metatag, int32_t metaindex, metadata_entry &metaentry, bool resume = false) const;
 	void metadata_set_previous_next(uint64_t prevoffset, uint64_t nextoffset);
 	void metadata_update_hash();
 	static int CLIB_DECL metadata_hash_compare(const void *elem1, const void *elem2);

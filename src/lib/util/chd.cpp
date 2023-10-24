@@ -1292,19 +1292,19 @@ std::error_condition chd_file::write_bytes(uint64_t offset, const void *buffer, 
  * @param   searchindex     The searchindex.
  * @param [in,out]  output  The output.
  *
- * @return  The metadata.
+ * @return  A std::error_condition.
  */
 
 std::error_condition chd_file::read_metadata(chd_metadata_tag searchtag, uint32_t searchindex, std::string &output)
 {
+	// if we didn't find it, just return
+	metadata_entry metaentry;
+	if (std::error_condition err = metadata_find(searchtag, searchindex, metaentry))
+		return err;
+
 	// wrap this for clean reporting
 	try
 	{
-		// if we didn't find it, just return
-		metadata_entry metaentry;
-		if (!metadata_find(searchtag, searchindex, metaentry))
-			return std::error_condition(error::METADATA_NOT_FOUND);
-
 		// read the metadata
 		output.assign(metaentry.length, '\0');
 		file_read(metaentry.offset + METADATA_HEADER_SIZE, &output[0], metaentry.length);
@@ -1329,19 +1329,19 @@ std::error_condition chd_file::read_metadata(chd_metadata_tag searchtag, uint32_
  * @param   searchindex     The searchindex.
  * @param [in,out]  output  The output.
  *
- * @return  The metadata.
+ * @return  A std::error_condition.
  */
 
 std::error_condition chd_file::read_metadata(chd_metadata_tag searchtag, uint32_t searchindex, std::vector<uint8_t> &output)
 {
+	// if we didn't find it, just return
+	metadata_entry metaentry;
+	if (std::error_condition err = metadata_find(searchtag, searchindex, metaentry))
+		return err;
+
 	// wrap this for clean reporting
 	try
 	{
-		// if we didn't find it, just return
-		metadata_entry metaentry;
-		if (!metadata_find(searchtag, searchindex, metaentry))
-			throw std::error_condition(error::METADATA_NOT_FOUND);
-
 		// read the metadata
 		output.resize(metaentry.length);
 		file_read(metaentry.offset + METADATA_HEADER_SIZE, &output[0], metaentry.length);
@@ -1368,19 +1368,19 @@ std::error_condition chd_file::read_metadata(chd_metadata_tag searchtag, uint32_
  * @param   outputlen           The outputlen.
  * @param [in,out]  resultlen   The resultlen.
  *
- * @return  The metadata.
+ * @return  A std::error_condition.
  */
 
 std::error_condition chd_file::read_metadata(chd_metadata_tag searchtag, uint32_t searchindex, void *output, uint32_t outputlen, uint32_t &resultlen)
 {
+	// if we didn't find it, just return
+	metadata_entry metaentry;
+	if (std::error_condition err = metadata_find(searchtag, searchindex, metaentry))
+		return err;
+
 	// wrap this for clean reporting
 	try
 	{
-		// if we didn't find it, just return
-		metadata_entry metaentry;
-		if (!metadata_find(searchtag, searchindex, metaentry))
-			throw std::error_condition(error::METADATA_NOT_FOUND);
-
 		// read the metadata
 		resultlen = metaentry.length;
 		file_read(metaentry.offset + METADATA_HEADER_SIZE, output, std::min(outputlen, resultlen));
@@ -1407,19 +1407,19 @@ std::error_condition chd_file::read_metadata(chd_metadata_tag searchtag, uint32_
  * @param [in,out]  resulttag   The resulttag.
  * @param [in,out]  resultflags The resultflags.
  *
- * @return  The metadata.
+ * @return  A std::error_condition.
  */
 
 std::error_condition chd_file::read_metadata(chd_metadata_tag searchtag, uint32_t searchindex, std::vector<uint8_t> &output, chd_metadata_tag &resulttag, uint8_t &resultflags)
 {
+	// if we didn't find it, just return
+	metadata_entry metaentry;
+	if (std::error_condition err = metadata_find(searchtag, searchindex, metaentry))
+		return err;
+
 	// wrap this for clean reporting
 	try
 	{
-		// if we didn't find it, just return
-		metadata_entry metaentry;
-		if (!metadata_find(searchtag, searchindex, metaentry))
-			throw std::error_condition(error::METADATA_NOT_FOUND);
-
 		// read the metadata
 		output.resize(metaentry.length);
 		file_read(metaentry.offset + METADATA_HEADER_SIZE, &output[0], metaentry.length);
@@ -1462,7 +1462,8 @@ std::error_condition chd_file::write_metadata(chd_metadata_tag metatag, uint32_t
 		// find the entry if it already exists
 		metadata_entry metaentry;
 		bool finished = false;
-		if (metadata_find(metatag, metaindex, metaentry))
+		std::error_condition err = metadata_find(metatag, metaindex, metaentry);
+		if (!err)
 		{
 			// if the new data fits over the old data, just overwrite
 			if (inputlen <= metaentry.length)
@@ -1485,6 +1486,8 @@ std::error_condition chd_file::write_metadata(chd_metadata_tag metatag, uint32_t
 			else
 				metadata_set_previous_next(metaentry.prev, metaentry.next);
 		}
+		else if (err != error::METADATA_NOT_FOUND)
+			throw err;
 
 		// if not yet done, create a new entry and append
 		if (!finished)
@@ -1533,14 +1536,14 @@ std::error_condition chd_file::write_metadata(chd_metadata_tag metatag, uint32_t
 
 std::error_condition chd_file::delete_metadata(chd_metadata_tag metatag, uint32_t metaindex)
 {
+	// find the entry
+	metadata_entry metaentry;
+	if (std::error_condition err = metadata_find(metatag, metaindex, metaentry))
+		return err;
+
 	// wrap this for clean reporting
 	try
 	{
-		// find the entry
-		metadata_entry metaentry;
-		if (!metadata_find(metatag, metaindex, metaentry))
-			throw std::error_condition(error::METADATA_NOT_FOUND);
-
 		// point the previous to the next, unlinking us
 		metadata_set_previous_next(metaentry.prev, metaentry.next);
 		return std::error_condition();
@@ -1568,34 +1571,37 @@ std::error_condition chd_file::delete_metadata(chd_metadata_tag metatag, uint32_
 
 std::error_condition chd_file::clone_all_metadata(chd_file &source)
 {
-	// wrap this for clean reporting
-	try
+	// iterate over metadata entries in the source
+	std::vector<uint8_t> filedata;
+	metadata_entry metaentry;
+	metaentry.metatag = 0;
+	metaentry.length = 0;
+	metaentry.next = 0;
+	metaentry.flags = 0;
+	std::error_condition err;
+	for (err = source.metadata_find(CHDMETATAG_WILDCARD, 0, metaentry); !err; err = source.metadata_find(CHDMETATAG_WILDCARD, 0, metaentry, true))
 	{
-		// iterate over metadata entries in the source
-		std::vector<uint8_t> filedata;
-		metadata_entry metaentry;
-		metaentry.metatag = 0;
-		metaentry.length = 0;
-		metaentry.next = 0;
-		metaentry.flags = 0;
-		for (bool has_data = source.metadata_find(CHDMETATAG_WILDCARD, 0, metaentry); has_data; has_data = source.metadata_find(CHDMETATAG_WILDCARD, 0, metaentry, true))
+		// wrap this for clean reporting
+		try
 		{
 			// read the metadata item
 			filedata.resize(metaentry.length);
 			source.file_read(metaentry.offset + METADATA_HEADER_SIZE, &filedata[0], metaentry.length);
-
-			// write it to the destination
-			std::error_condition err = write_metadata(metaentry.metatag, (uint32_t)-1, &filedata[0], metaentry.length, metaentry.flags);
-			if (err)
-				throw err;
 		}
+		catch (std::error_condition const &filerr)
+		{
+			return filerr;
+		}
+	
+		// write it to the destination
+		err = write_metadata(metaentry.metatag, (uint32_t)-1, &filedata[0], metaentry.length, metaentry.flags);
+		if (err)
+			return err;
+	}
+	if (err == error::METADATA_NOT_FOUND)
 		return std::error_condition();
-	}
-	catch (std::error_condition const &err)
-	{
-		// return any errors
+	else
 		return err;
-	}
 }
 
 /**
@@ -1621,7 +1627,8 @@ util::sha1_t chd_file::compute_overall_sha1(util::sha1_t rawsha1)
 	std::vector<uint8_t> filedata;
 	std::vector<metadata_hash> hasharray;
 	metadata_entry metaentry;
-	for (bool has_data = metadata_find(CHDMETATAG_WILDCARD, 0, metaentry); has_data; has_data = metadata_find(CHDMETATAG_WILDCARD, 0, metaentry, true))
+	std::error_condition err;
+	for (err = metadata_find(CHDMETATAG_WILDCARD, 0, metaentry); !err; err = metadata_find(CHDMETATAG_WILDCARD, 0, metaentry, true))
 	{
 		// if not checksumming, continue
 		if ((metaentry.flags & CHD_MDFLAGS_CHECKSUM) == 0)
@@ -1637,6 +1644,8 @@ util::sha1_t chd_file::compute_overall_sha1(util::sha1_t rawsha1)
 		hashentry.sha1 = util::sha1_creator::simple(&filedata[0], metaentry.length);
 		hasharray.push_back(hashentry);
 	}
+	if (err != error::METADATA_NOT_FOUND)
+		throw err;
 
 	// sort the array
 	if (!hasharray.empty())
@@ -2658,7 +2667,7 @@ void chd_file::hunk_copy_from_parent(uint32_t hunknum, uint64_t parentunit)
 }
 
 /**
- * @fn  bool chd_file::metadata_find(chd_metadata_tag metatag, int32_t metaindex, metadata_entry &metaentry, bool resume)
+ * @fn  std::error_condition chd_file::metadata_find(chd_metadata_tag metatag, int32_t metaindex, metadata_entry &metaentry, bool resume)
  *
  * @brief   -------------------------------------------------
  *            metadata_find - find a metadata entry
@@ -2669,10 +2678,10 @@ void chd_file::hunk_copy_from_parent(uint32_t hunknum, uint64_t parentunit)
  * @param [in,out]  metaentry   The metaentry.
  * @param   resume              true to resume.
  *
- * @return  true if it succeeds, false if it fails.
+ * @return  A std::error_condition (error::METADATA_NOT_FOUND if the search fails).
  */
 
-bool chd_file::metadata_find(chd_metadata_tag metatag, int32_t metaindex, metadata_entry &metaentry, bool resume) const
+std::error_condition chd_file::metadata_find(chd_metadata_tag metatag, int32_t metaindex, metadata_entry &metaentry, bool resume) const
 {
 	// start at the beginning unless we're resuming a previous search
 	if (!resume)
@@ -2686,31 +2695,40 @@ bool chd_file::metadata_find(chd_metadata_tag metatag, int32_t metaindex, metada
 		metaentry.offset = metaentry.next;
 	}
 
-	// loop until we run out of options
-	while (metaentry.offset != 0)
+	// wrap this for clean reporting
+	try
 	{
-		// read the raw header
-		uint8_t raw_meta_header[METADATA_HEADER_SIZE];
-		file_read(metaentry.offset, raw_meta_header, sizeof(raw_meta_header));
+		// loop until we run out of options
+		while (metaentry.offset != 0)
+		{
+			// read the raw header
+			uint8_t raw_meta_header[METADATA_HEADER_SIZE];
+			file_read(metaentry.offset, raw_meta_header, sizeof(raw_meta_header));
 
-		// extract the data
-		metaentry.metatag = get_u32be(&raw_meta_header[0]);
-		metaentry.flags = raw_meta_header[4];
-		metaentry.length = get_u24be(&raw_meta_header[5]);
-		metaentry.next = get_u64be(&raw_meta_header[8]);
+			// extract the data
+			metaentry.metatag = get_u32be(&raw_meta_header[0]);
+			metaentry.flags = raw_meta_header[4];
+			metaentry.length = get_u24be(&raw_meta_header[5]);
+			metaentry.next = get_u64be(&raw_meta_header[8]);
 
-		// if we got a match, proceed
-		if (metatag == CHDMETATAG_WILDCARD || metaentry.metatag == metatag)
-			if (metaindex-- == 0)
-				return true;
+			// if we got a match, proceed
+			if (metatag == CHDMETATAG_WILDCARD || metaentry.metatag == metatag)
+				if (metaindex-- == 0)
+					return std::error_condition();
 
-		// no match, fetch the next link
-		metaentry.prev = metaentry.offset;
-		metaentry.offset = metaentry.next;
+			// no match, fetch the next link
+			metaentry.prev = metaentry.offset;
+			metaentry.offset = metaentry.next;
+		}
+
+		// if we get here, we didn't find it
+		return error::METADATA_NOT_FOUND;
 	}
-
-	// if we get here, we didn't find it
-	return false;
+	catch (std::error_condition const &err)
+	{
+		// return any errors
+		return err;
+	}
 }
 
 /**
@@ -3344,71 +3362,40 @@ void chd_file_compressor::hashmap::add(uint64_t itemnum, util::crc16_t crc16, ut
 	m_map[crc16] = entry;
 }
 
-bool chd_file::is_hd() const
+std::error_condition chd_file::check_is_hd() const
 {
-	try
-	{
-		metadata_entry metaentry;
-		return metadata_find(HARD_DISK_METADATA_TAG, 0, metaentry);
-	}
-	catch (std::error_condition const &)
-	{
-		return false;
-	}
+	metadata_entry metaentry;
+	return metadata_find(HARD_DISK_METADATA_TAG, 0, metaentry);
 }
 
-bool chd_file::is_cd() const
+std::error_condition chd_file::check_is_cd() const
 {
-	try
-	{
-		metadata_entry metaentry;
-		return metadata_find(CDROM_OLD_METADATA_TAG, 0, metaentry)
-			|| metadata_find(CDROM_TRACK_METADATA_TAG, 0, metaentry)
-			|| metadata_find(CDROM_TRACK_METADATA2_TAG, 0, metaentry);
-	}
-	catch (std::error_condition const &)
-	{
-		return false;
-	}
+	metadata_entry metaentry;
+	std::error_condition err = metadata_find(CDROM_OLD_METADATA_TAG, 0, metaentry);
+	if (err == error::METADATA_NOT_FOUND)
+		err = metadata_find(CDROM_TRACK_METADATA_TAG, 0, metaentry);
+	if (err == error::METADATA_NOT_FOUND)
+		err = metadata_find(CDROM_TRACK_METADATA2_TAG, 0, metaentry);
+	return err;
 }
 
-bool chd_file::is_gd() const
+std::error_condition chd_file::check_is_gd() const
 {
-	try
-	{
-		metadata_entry metaentry;
-		return metadata_find(GDROM_OLD_METADATA_TAG, 0, metaentry)
-			|| metadata_find(GDROM_TRACK_METADATA_TAG, 0, metaentry);
-	}
-	catch (std::error_condition const &)
-	{
-		return false;
-	}
+	metadata_entry metaentry;
+	std::error_condition err = metadata_find(GDROM_OLD_METADATA_TAG, 0, metaentry);
+	if (err == error::METADATA_NOT_FOUND)
+		err = metadata_find(GDROM_TRACK_METADATA_TAG, 0, metaentry);
+	return err;
 }
 
-bool chd_file::is_dvd() const
+std::error_condition chd_file::check_is_dvd() const
 {
-	try
-	{
-		metadata_entry metaentry;
-		return metadata_find(DVD_METADATA_TAG, 0, metaentry);
-	}
-	catch (std::error_condition const &)
-	{
-		return false;
-	}
+	metadata_entry metaentry;
+	return metadata_find(DVD_METADATA_TAG, 0, metaentry);
 }
 
-bool chd_file::is_av() const
+std::error_condition chd_file::check_is_av() const
 {
-	try
-	{
-		metadata_entry metaentry;
-		return metadata_find(AV_METADATA_TAG, 0, metaentry);
-	}
-	catch (std::error_condition const &)
-	{
-		return false;
-	}
+	metadata_entry metaentry;
+	return metadata_find(AV_METADATA_TAG, 0, metaentry);
 }
-
