@@ -2813,7 +2813,7 @@ SYST( 1980, h2hsoccerc, 0,         0,      h2hsoccerc, h2hsoccerc, h2hbaskbc_sta
 
 SYST( 1981, einvaderc,  einvader,  0,      einvaderc,  einvaderc,  einvaderc_state, empty_init, "Entex", "Space Invader (Entex, COP444L version)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1980, lchicken,   0,         0,      lchicken,   lchicken,   lchicken_state,  empty_init, "LJN", "I Took a Lickin' From a Chicken", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_MECHANICAL )
+SYST( 1980, lchicken,   0,         0,      lchicken,   lchicken,   lchicken_state,  empty_init, "LJN Toys", "I Took a Lickin' From a Chicken", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_MECHANICAL )
 
 SYST( 1979, funjacks,   0,         0,      funjacks,   funjacks,   funjacks_state,  empty_init, "Mattel Electronics", "Funtronics: Jacks", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1979, funrlgl,    0,         0,      funrlgl,    funrlgl,    funrlgl_state,   empty_init, "Mattel Electronics", "Funtronics: Red Light Green Light", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

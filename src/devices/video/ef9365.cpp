@@ -857,7 +857,6 @@ void ef9365_device::dump_bitplanes_word()
 		{
 			m_readback_latch[p] = (value >> 4) & 0xf;
 		}
-
 	}
 
 	m_readback_latch_pix_offset = pixel_ptr & 3;

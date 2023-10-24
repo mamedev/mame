@@ -31904,6 +31904,9 @@ vcombat                         // (c) 1993 VR8 Inc.
 @source:misc/video21.cpp
 video21                         // Videogames GmbH 1980
 
+@source:misc/videoart.cpp
+videoart
+
 @source:misc/videosaa.cpp
 jokrlady                        //
 ladygum                         //
