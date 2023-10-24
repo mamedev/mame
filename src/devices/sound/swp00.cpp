@@ -1160,7 +1160,7 @@ template<size_t size> s32 swp00_device::delay_block<size>::rlfo2(int offreg, s32
 s32 swp00_device::lfo_get_step(int reg) const
 {
 	u32 e = (m_const[reg] >> 7) & 7;
-	return (m_const[reg] & 0x7f) << (e == 7 ? 15 : e);	
+	return (m_const[reg] & 0x7f) << (e == 7 ? 15 : e);
 }
 
 void swp00_device::lfo_step(u32 &phase, int reg) const
@@ -1410,7 +1410,7 @@ void swp00_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 		var_r = m7(var_r, 0x07);
 
 		//   Split depending on the variant selected
-		s32 var_out_l, var_out_r;
+		s32 var_out_l = 0, var_out_r = 0;
 
 		switch(m_meg_control & 0xc0) {
 		case 0x00: {
@@ -1428,7 +1428,7 @@ void swp00_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 			// Two stages of filtering
 			s32 var_filter_l_2 = m7(m_var_filter_l_1, 0x7e) + m7(var_l, 0x7f)          + m9(m_var_filter_l_2, 0x80);
 			s32 var_filtered_l = m7(m_var_filter_l_2, 0xa7) + m7(var_filter_l_2, 0xa8) + m9(m_var_filter_l_3, 0xa9);
-			
+
 			m_var_filter_l_1 = var_l;
 			m_var_filter_l_2 = var_filter_l_2;
 			m_var_filter_l_3 = var_filtered_l;
@@ -1487,7 +1487,7 @@ void swp00_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 			// Two stages of filtering
 			s32 var_filter_l_2 = m7(m_var_filter_l_1, 0x6d) + m7(var_l, 0x6e)          + m9(m_var_filter_l_2, 0x6f);
 			s32 var_filtered_l = m7(m_var_filter_l_2, 0x70) + m7(var_filter_l_2, 0x71) + m9(m_var_filter_l_3, 0x72);
-			
+
 			m_var_filter_l_1 = var_l;
 			m_var_filter_l_2 = var_filter_l_2;
 			m_var_filter_l_3 = var_filtered_l;
@@ -1622,7 +1622,7 @@ void swp00_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 
 			// Compute a center value
 			s32 var_m   = m9(var_l, 0x6d) + m9(var_r, 0x6e);
-			
+
 			// Two stages of filtering on the center value
 			s32 var_filter_2 = m7(m_var_filter_1, 0x6f) + m7(var_m, 0x70)        + m9(m_var_filter_2, 0x71);
 			s32 var_filtered = m7(m_var_filter_2, 0x72) + m7(var_filter_2, 0x73) + m9(m_var_filter_3, 0x74);
@@ -1678,7 +1678,7 @@ void swp00_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 			// Two stages of filtering
 			s32 var_filter_l_2 = m7(m_var_filter_l_1, 0x80) + m7(var_l, 0x81)          + m9(m_var_filter_l_2, 0x82);
 			s32 var_filtered_l = m7(m_var_filter_l_2, 0x83) + m7(var_filter_l_2, 0x84) + m9(m_var_filter_l_3, 0x85);
-			
+
 			m_var_filter_l_1 = var_l;
 			m_var_filter_l_2 = var_filter_l_2;
 			m_var_filter_l_3 = var_filtered_l;
@@ -1696,7 +1696,7 @@ void swp00_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 			// Amplitude LFO and filtering
 			lfo_step(m_var_lfo_phase, 0x7e);
 			s32 amp = alfo(m_var_lfo_phase, 0, 0x86, 0x87, true);
-			
+
 			m_var_filterp_l_1 = m9v(m9(m_var_filterp_l_1, 0x89) + m9(m_var_filterp_l_2, 0x8a) + var_w_l, amp) + m9(m_var_filterp_l_1, 0x8b);
 			m_var_filterp_l_2 = m9v(m_var_filterp_l_1, amp) + m9(m_var_filterp_l_2, 0x8d);
 
@@ -1796,7 +1796,7 @@ void swp00_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 		s32 rev_base_l = m9(brev.r(0x00) + brev.r(0x03) + brev.r(0x06) + brev.r(0x09), 0x1c) + m9(brev.r(0xbd), 0x1b);
 		brev.w(0x48, m9(brev.r(0x36), 0x45) + m9(rev_base_l, 0x46));
 		s32 rev_out_l = m7(brev.r(0x36), 0x47) + m7(rev_base_l, 0x48);
-			
+
 		s32 rev_base_r = m9(brev.r(0x0c) + brev.r(0x0f) + brev.r(0x12) + brev.r(0x15), 0x21) + m9(brev.r(0xbd), 0x20);
 		brev.w(0x48, m9(brev.r(0x36), 0x51) + m9(rev_base_r, 0x52));
 		s32 rev_out_r = m7(brev.r(0x36), 0x53) + m7(rev_base_r, 0x54);
