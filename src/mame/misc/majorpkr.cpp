@@ -1219,8 +1219,8 @@ ROM_START( syutnori )
 	ROM_LOAD( "2.bin", 0x80000, 0x80000, CRC(0ccd3ad7) SHA1(1b338d621c86fa931a776e3a3293d3034cf65959) )
 
 	ROM_REGION( 0x40000, "fg_gfx", 0 )
-	ROM_LOAD( "3.bin", 0x00000, 0x20000, CRC(c429786c) SHA1(39de9c6ac282fc3f19e469af216530e7e8998a4f) )
-	ROM_LOAD( "4.bin", 0x20000, 0x20000, CRC(03619b00) SHA1(f13732ff0022d611ea46f2a23ceac99ca88c581b) )
+	ROM_LOAD( "3.bin", 0x00000, 0x20000, CRC(03619b00) SHA1(f13732ff0022d611ea46f2a23ceac99ca88c581b) )
+	ROM_LOAD( "4.bin", 0x20000, 0x20000, CRC(c429786c) SHA1(39de9c6ac282fc3f19e469af216530e7e8998a4f) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "5.bin", 0x00000, 0x40000, CRC(4843858e) SHA1(27629829cf7753d7801a6eb42bb77ca2a467bebd) )
@@ -1251,4 +1251,4 @@ GAMEL( 1994, majorpkra, majorpkr, majorpkr, majorpkr, majorpkr_state, empty_init
 GAMEL( 1994, majorpkrb, majorpkr, majorpkr, majorpkr, majorpkr_state, empty_init, ROT0, "PAL System / Micro Manufacturing", "Major Poker (set 3, Micro Manufacturing intro)", MACHINE_SUPPORTS_SAVE, layout_majorpkr )
 GAMEL( 1994, majorpkrc, majorpkr, majorpkr, majorpkr, majorpkr_state, empty_init, ROT0, "PAL System / Micro Manufacturing", "Major Poker (set 4, Micro Manufacturing intro)", MACHINE_SUPPORTS_SAVE, layout_majorpkr )
 GAMEL( 1994, luckypkr,  majorpkr, majorpkr, majorpkr, majorpkr_state, empty_init, ROT0, "bootleg",                          "Lucky Poker (bootleg/hack of Major Poker)",      MACHINE_SUPPORTS_SAVE, layout_majorpkr )
-GAMEL( 1994, syutnori,  majorpkr, majorpkr, majorpkr, majorpkr_state, empty_init, ROT0, "bootleg",                          "Super Yutnori (bootleg of Major Poker)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_majorpkr ) // 슈퍼 윷놀이
+GAMEL( 1994, syutnori,  majorpkr, majorpkr, majorpkr, majorpkr_state, empty_init, ROT0, "bootleg",                          "Super Yutnori (bootleg of Major Poker)",         MACHINE_SUPPORTS_SAVE, layout_majorpkr ) // 슈퍼 윷놀이
