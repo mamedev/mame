@@ -20,9 +20,7 @@ Hardware notes:
 - RF NTSC video, no sound
 
 TODO:
-- pencil drawing/erasing doesn't work correctly and the cursor is not visible,
-  maybe related to upper bits of custom command? Somehow, "activity" works
-  differently than "disneysb" or no-cart, the latter ones draw 2 colors?
+- custom chip command upper bits meaning is unknown
 - palette is approximated from photos/videos
 
 *******************************************************************************/
@@ -178,6 +176,8 @@ void videoart_state::vram_w(offs_t offset, u8 data)
 
 	if (data)
 		m_vram[offset] = m_color & 0xf;
+	else
+		m_vram[offset] ^= 0xf;
 }
 
 void videoart_state::vram_map(address_map &map)
@@ -231,7 +231,7 @@ void videoart_state::portb_w(u8 data)
 	if (data & 2 && ~m_portb & 2)
 		m_romlatch = m_portc;
 
-	// B2: custom chip handling
+	// B2: custom chip command
 	if (~data & 4 && m_portb & 4)
 	{
 		m_command = (m_command << 2) | (m_porta & 3);
@@ -369,4 +369,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1987, videoart, 0,      0,      videoart, videoart, videoart_state, empty_init, "LJN Toys", "Video Art", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+SYST( 1987, videoart, 0,      0,      videoart, videoart, videoart_state, empty_init, "LJN Toys", "Video Art", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND_HW )
