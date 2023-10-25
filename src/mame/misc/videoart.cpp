@@ -9,6 +9,8 @@ It's a toy for drawing/coloring pictures on the tv, not a video game console.
 Picture libraries were available on separate cartridges.
 
 On the splash screen, press CLEAR to start drawing (no need to wait half a minute).
+To change the background color, choose one on the color slider and press CLEAR.
+Drawing with the same color as the picture outline is not allowed.
 
 Hardware notes:
 - EF6805R2P @ 3.57Mhz (14.318MHz XTAL)
@@ -56,8 +58,6 @@ public:
 
 	void videoart(machine_config &config);
 
-	void palette(palette_device &palette) const;
-
 protected:
 	virtual void machine_start() override;
 
@@ -70,12 +70,14 @@ private:
 	required_ioport_array<3> m_inputs;
 	output_finder<> m_led;
 
-	void vram_map(address_map &map);
-	void vram_w(offs_t offset, u8 data);
-
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
+
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline) { m_ef9367->update_scanline(param); }
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void palette(palette_device &palette) const;
+
+	void vram_map(address_map &map);
+	void vram_w(offs_t offset, u8 data);
 
 	void porta_w(u8 data);
 	u8 porta_r();
