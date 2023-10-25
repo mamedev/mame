@@ -525,6 +525,17 @@ void nl_convert_spice_t::process_line(const pstring &line)
 					add_term(tt[2], tt[0] + ".2");
 					add_term(tt[3], tt[0] + ".3");
 				}
+				else if (plib::startsWith(tt[0], "RA"))
+				{
+					val = get_sp_val(tt.back());
+					for( unsigned int res = 2; res < tt.size(); res++)
+					{
+						pstring devname = plib::pfmt("{}.{}")(tt[0], res);
+						add_device("RES", devname, val);
+						add_term(tt[1], devname);
+						add_term(tt[res], devname);
+					}					
+				}
 				else
 				{
 					val = get_sp_val(tt[3]);
