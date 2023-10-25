@@ -1170,34 +1170,27 @@ uint8_t ef9365_device::data_r(offs_t offset)
 				m_state |= 0x04;
 
 			if ((m_overflow_mask_x & get_x_reg()) || (m_overflow_mask_y & get_y_reg()))
-			{
 				m_state |= 0x08;
-			}
 
 			if (m_irq_vb || m_irq_lb || m_irq_rdy)
-			{
 				m_state |= 0x80;
-			}
 
 			if (m_irq_lb)
-			{
 				m_state |= 0x10;
-				m_irq_lb = 0;
-			}
 
 			if (m_irq_vb)
-			{
 				m_state |= 0x20;
-				m_irq_vb = 0;
-			}
 
 			if (m_irq_rdy)
-			{
 				m_state |= 0x40;
-				m_irq_rdy = 0;
-			}
 
-			update_interrupts();
+			if (!machine().side_effects_disabled())
+			{
+				m_irq_lb = 0;
+				m_irq_vb = 0;
+				m_irq_rdy = 0;
+				update_interrupts();
+			}
 
 			return_value = m_state;
 			break;

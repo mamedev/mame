@@ -14,7 +14,7 @@ Drawing with the same color as the picture outline is not allowed.
 
 Hardware notes:
 - EF6805R2P @ 3.57Mhz (14.318MHz XTAL)
-- EF9367P @ 1.507MHz
+- EF9367P @ 1.507MHz, 128*208 resolution (internally 512*208), 16 colors
 - TSGB01019ACP unknown 48-pin DIP, interfaces with EF9367P and DRAM
 - 2*D41416C-15 (16Kbit*4) DRAM
 - 36-pin cartridge slot, 8KB or 16KB ROM
