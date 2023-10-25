@@ -4040,6 +4040,43 @@ ROM_START( mtrainnv )
 	ROM_COPY( "maincpu", 0x000000, 0x00000, 0x10000 ) // just to show something
 ROM_END
 
+/*
+ Seven Land (Korea, probably a bootleg of Super Treasure Island)
+   MCU Hitachi HD64180RP6.
+   Actel A40MX04-F.
+   Sound: U6612 (YM3812) + U6614 (YM3014) + 12.000 MHz xtal.
+   HM86171-80 RAMDAC.
+   Four banks of 8 DIP switches labeled SW1 to SW4.
+   Reset switch near the DIP switches banks.
+   One unpopulated location on the PCB (near the sound chips) for another bank of 8 DIP switches, labeled SW0.
+   3.6V battery near the HD64180RP6
+   No bipolar PROMs on this PCB.
+*/
+
+ROM_START( sevenlnd )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "a_am27c512.u58", 0x00000, 0x10000, CRC(7abaca14) SHA1(48e4eb4ef7df09f29a382167291ee6385279d1f5) )
+
+	ROM_REGION( 0x100000, "tilemap", 0 )
+	ROM_LOAD( "sevenlnd_tilemap_1.u30", 0x00000, 0x40000, NO_DUMP ) // A278308 
+	ROM_LOAD( "sevenlnd_tilemap_2.u29", 0x40000, 0x40000, NO_DUMP ) // A278308
+	ROM_LOAD( "sevenlnd_tilemap_2.u29", 0x80000, 0x40000, NO_DUMP ) // A278308
+	ROM_LOAD( "sevenlnd_tilemap_2.u29", 0xC0000, 0x40000, NO_DUMP ) // A278308
+
+	ROM_REGION( 0x80000, "reels", 0 )
+	ROM_LOAD( "sevenlnd_reels_1.u25", 0x00000, 0x20000, NO_DUMP ) // 27C010
+	ROM_LOAD( "sevenlnd_reels_2.u24", 0x20000, 0x20000, NO_DUMP ) // 27C010
+	ROM_LOAD( "sevenlnd_reels_2.u23", 0x40000, 0x20000, NO_DUMP ) // 27C010
+	ROM_LOAD( "sevenlnd_reels_2.u22", 0x60000, 0x20000, NO_DUMP ) // 27C010
+
+	ROM_REGION( 0x157, "plds", 0 )
+	ROM_LOAD( "gal16v8d_1.bin", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_2.bin", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_3.bin", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_4.bin", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce20v8h.bin", 0x000, 0x157, NO_DUMP )
+ROM_END
+
 
 ROM_START( dinofmly ) // very similar PCB to the smoto set, but instead of 3 PROMs it has a RAMDAC.
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -4274,6 +4311,7 @@ GAMEL( 1995, stisub,      stbsub,  stbsub,     stbsub,   subsino_state, init_sti
 GAMEL( 1995, tesorone,    stbsub,  stbsub,     tesorone, subsino_state, init_tesorone,    ROT0, "Subsino",         "Tesorone Dell'Isola (Italy, v2.41)",          0,                   layout_stisub   )
 GAMEL( 1995, tesorone240, stbsub,  stbsub,     tesorone, subsino_state, init_tesorone,    ROT0, "Subsino",         "Tesorone Dell'Isola (Italy, v2.40)",          0,                   layout_stisub   )
 GAMEL( 1995, tesorone230, stbsub,  stbsub,     tesorone, subsino_state, init_tesorone230, ROT0, "Subsino",         "Tesorone Dell'Isola (Italy, v2.30)",          0,                   layout_stisub   )
+GAME(  199?, sevenlnd,    stbsub,  mtrainnv,   stbsub,   subsino_state, init_mtrainnv,    ROT0, "bootleg",         "Seven Land",                                  MACHINE_NOT_WORKING ) // Without layout until fully dumped
 
 GAMEL( 1996, sharkpy,     0,       sharkpy,    sharkpy,  subsino_state, init_sharkpy,     ROT0, "Subsino",         "Shark Party (Italy, v1.3)",                   0,                   layout_sharkpy  ) // missing POST messages?
 GAMEL( 1996, sharkpya,    sharkpy, sharkpy,    sharkpy,  subsino_state, init_sharkpy,     ROT0, "Subsino",         "Shark Party (Italy, v1.6)",                   0,                   layout_sharkpy  ) // missing POST messages?
