@@ -253,4 +253,4 @@ CONS(2019, bfspyhnt, 0, 0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi
 CONS(2019, bftetris, 0, 0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, init_fif, "Basic Fun", "Tetris (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // probably not identical hardware, encryption is different, but it does seem to still be a 'direct access' SPI ROM case
-CONS(201?, siddr,    0, 0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, init_siddr, "Super Impulse", "Dance Dance Revolution (Tiny Arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(201?, siddr,    0, 0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, init_siddr, "Super Impulse", "Dance Dance Revolution - Broadwalk Arcade", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
