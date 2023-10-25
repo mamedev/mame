@@ -174,7 +174,7 @@ void videoart_state::vram_w(offs_t offset, u8 data)
 {
 	u8 low = m_ef9367->get_msl() & 7;
 	data = BIT(data, low ^ 7);
-	offset = (offset << 1 & 0x7ffe) | (low >> 2 & 1);
+	offset = offset << 1 | BIT(low, 2);
 
 	if (data)
 		m_vram[offset] = m_color & 0xf;
@@ -270,7 +270,7 @@ u8 videoart_state::portd_r()
 	// D6,D7: multiplexed inputs
 	for (int i = 0; i < 3; i++)
 		if (!BIT(m_portb, 5 + i))
-			data |= m_inputs[i]->read();
+			data |= m_inputs[i]->read() & 0xc0;
 
 	return ~data;
 }
@@ -288,7 +288,7 @@ static INPUT_PORTS_START( videoart )
 
 	PORT_START("IN1")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Horizontal")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Verical")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Vertical")
 
 	PORT_START("IN2")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Draw")
