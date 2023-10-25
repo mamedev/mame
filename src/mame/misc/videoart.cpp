@@ -9,7 +9,7 @@ It's a toy for drawing/coloring pictures on the tv, not a video game console.
 Picture libraries were available on separate cartridges.
 
 On the splash screen, press CLEAR to start drawing (no need to wait half a minute).
-To change the background color, choose one on the color slider and press CLEAR.
+To change the background color, choose one from the color slider and press CLEAR.
 Drawing with the same color as the picture outline is not allowed.
 
 Hardware notes:
@@ -22,6 +22,8 @@ Hardware notes:
 - RF NTSC video, no sound
 
 TODO:
+- gaps in fast pencil drawing when the outline color is 0xf and background color
+  is 0x0 (eg. activity cartridge default), it works fine everywhere else
 - custom chip command upper bits meaning is unknown
 - palette is approximated from photos/videos
 
@@ -221,7 +223,7 @@ u8 videoart_state::porta_r()
 void videoart_state::portb_w(u8 data)
 {
 	// B0: EF9367 E
-	if (~data & 1 && m_portb & 1)
+	if (~data & m_portb & 1)
 	{
 		if (m_portc & 0x10)
 			m_rdata = m_ef9367->data_r(m_portc & 0xf);
@@ -230,11 +232,11 @@ void videoart_state::portb_w(u8 data)
 	}
 
 	// B1: clock ROM address latch
-	if (data & 2 && ~m_portb & 2)
+	if (data & ~m_portb & 2)
 		m_romlatch = m_portc;
 
 	// B2: custom chip command
-	if (~data & 4 && m_portb & 4)
+	if (~data & m_portb & 4)
 	{
 		m_command = (m_command << 2) | (m_porta & 3);
 
@@ -330,7 +332,7 @@ void videoart_state::videoart(machine_config &config)
 
 	EF9365(config, m_ef9367, (14.318181_MHz_XTAL * 2) / 19);
 	m_ef9367->set_addrmap(0, &videoart_state::vram_map);
-	m_ef9367->set_palette_tag("palette"); // unused
+	m_ef9367->set_palette_tag("palette"); // unused there
 	m_ef9367->set_nb_bitplanes(1);
 	m_ef9367->set_display_mode(ef9365_device::DISPLAY_MODE_512x256);
 	m_ef9367->irq_handler().set_inputline(m_maincpu, M6805_IRQ_LINE);
