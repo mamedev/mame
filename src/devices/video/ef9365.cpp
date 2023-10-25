@@ -202,19 +202,19 @@ ef9365_device::ef9365_device(const machine_config &mconfig, const char *tag, dev
 	m_palette(*this, finder_base::DUMMY_TAG),
 	m_irq_handler(*this)
 {
-	clock_freq = clock;
+	m_clock_freq = clock;
 }
 
 //-------------------------------------------------
-//  set_nb_of_bitplanes: Set the number of bitplanes
+//  set_nb_bitplanes: Set the number of bitplanes
 //-------------------------------------------------
 
 void ef9365_device::set_nb_bitplanes(int nb_bitplanes)
 {
 	if (nb_bitplanes > 0 && nb_bitplanes <= 8)
 	{
-		nb_of_bitplanes = nb_bitplanes;
-		nb_of_colors = pow(2, nb_bitplanes);
+		m_nb_of_bitplanes = nb_bitplanes;
+		m_nb_of_colors = pow(2, nb_bitplanes);
 	}
 }
 
@@ -227,54 +227,54 @@ void ef9365_device::set_display_mode(int display_mode)
 	switch(display_mode)
 	{
 	case DISPLAY_MODE_256x256:
-		bitplane_xres = 256;
-		bitplane_yres = 256;
-		vsync_scanline_pos = 250;
-		overflow_mask_x = 0xff00;
-		overflow_mask_y = 0xff00;
+		m_bitplane_xres = 256;
+		m_bitplane_yres = 256;
+		m_vsync_scanline_pos = 250;
+		m_overflow_mask_x = 0xff00;
+		m_overflow_mask_y = 0xff00;
 		break;
 	case DISPLAY_MODE_512x512:
-		bitplane_xres = 512;
-		bitplane_yres = 512;
-		vsync_scanline_pos = 506;
-		overflow_mask_x = 0xfe00;
-		overflow_mask_y = 0xfe00;
+		m_bitplane_xres = 512;
+		m_bitplane_yres = 512;
+		m_vsync_scanline_pos = 506;
+		m_overflow_mask_x = 0xfe00;
+		m_overflow_mask_y = 0xfe00;
 		break;
 	case DISPLAY_MODE_512x256:
-		bitplane_xres = 512;
-		bitplane_yres = 256;
-		vsync_scanline_pos = 250;
-		overflow_mask_x = 0xfe00;
-		overflow_mask_y = 0xff00;
+		m_bitplane_xres = 512;
+		m_bitplane_yres = 256;
+		m_vsync_scanline_pos = 250;
+		m_overflow_mask_x = 0xfe00;
+		m_overflow_mask_y = 0xff00;
 		break;
 	case DISPLAY_MODE_128x128:
-		bitplane_xres = 128;
-		bitplane_yres = 128;
-		vsync_scanline_pos = 124;
-		overflow_mask_x = 0xff80;
-		overflow_mask_y = 0xff80;
+		m_bitplane_xres = 128;
+		m_bitplane_yres = 128;
+		m_vsync_scanline_pos = 124;
+		m_overflow_mask_x = 0xff80;
+		m_overflow_mask_y = 0xff80;
 		break;
 	case DISPLAY_MODE_64x64:
-		bitplane_xres = 64;
-		bitplane_yres = 64;
-		vsync_scanline_pos = 62;
-		overflow_mask_x = 0xffc0;
-		overflow_mask_y = 0xffc0;
+		m_bitplane_xres = 64;
+		m_bitplane_yres = 64;
+		m_vsync_scanline_pos = 62;
+		m_overflow_mask_x = 0xffc0;
+		m_overflow_mask_y = 0xffc0;
 		break;
 	case DISPLAY_MODE_1024x512:
-		bitplane_xres = 1024;
-		bitplane_yres = 512;
-		vsync_scanline_pos = 506;
-		overflow_mask_x = 0xfc00;
-		overflow_mask_y = 0xfe00;
+		m_bitplane_xres = 1024;
+		m_bitplane_yres = 512;
+		m_vsync_scanline_pos = 506;
+		m_overflow_mask_x = 0xfc00;
+		m_overflow_mask_y = 0xfe00;
 		break;
 	default:
 		logerror("Invalid EF9365 Display mode: %02x\n", display_mode);
-		bitplane_xres = 256;
-		bitplane_yres = 256;
-		vsync_scanline_pos = 250;
-		overflow_mask_x = 0xff00;
-		overflow_mask_y = 0xff00;
+		m_bitplane_xres = 256;
+		m_bitplane_yres = 256;
+		m_vsync_scanline_pos = 250;
+		m_overflow_mask_x = 0xff00;
+		m_overflow_mask_y = 0xff00;
 		break;
 	}
 }
@@ -286,7 +286,7 @@ void ef9365_device::set_display_mode(int display_mode)
 
 void ef9365_device::set_color_entry(int index, uint8_t r, uint8_t g, uint8_t b)
 {
-	if (index < nb_of_colors)
+	if (index < m_nb_of_colors)
 	{
 		m_palette->set_pen_color(index, rgb_t(r, g, b));
 	}
@@ -322,12 +322,13 @@ void ef9365_device::device_start()
 	m_irq_rdy = 0;
 	m_irq_state = 0;
 
-	m_screen_out.allocate(bitplane_xres, screen().height());
+	m_screen_out.allocate(m_bitplane_xres, screen().height());
 
 	save_item(NAME(m_border));
 	save_item(NAME(m_registers));
 	save_item(NAME(m_bf));
 	save_item(NAME(m_state));
+	save_item(NAME(m_msl));
 
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_irq_vb));
@@ -449,7 +450,7 @@ void ef9365_device::set_y_reg(uint16_t y)
 
 void ef9365_device::set_video_mode(void)
 {
-	uint16_t new_width = bitplane_xres;
+	uint16_t new_width = m_bitplane_xres;
 
 	if (screen().width() != new_width)
 	{
@@ -473,7 +474,7 @@ uint8_t ef9365_device::get_last_readback_word(int bitplane_number, int *pixel_of
 	if (pixel_offset)
 		*pixel_offset = m_readback_latch_pix_offset;
 
-	if (bitplane_number < nb_of_bitplanes)
+	if (bitplane_number < m_nb_of_bitplanes)
 	{
 		return m_readback_latch[bitplane_number];
 	}
@@ -499,33 +500,35 @@ void ef9365_device::draw_border(uint16_t line)
 
 void ef9365_device::plot(int x_pos, int y_pos)
 {
-	if ((x_pos >= 0 && y_pos >= 0) && (x_pos < bitplane_xres && y_pos < bitplane_yres))
+	if ((x_pos >= 0 && y_pos >= 0) && (x_pos < m_bitplane_xres && y_pos < m_bitplane_yres))
 	{
 		if (m_registers[EF936X_REG_CTRL1] & 0x01)
 		{
-			y_pos = (bitplane_yres - 1) - y_pos;
+			y_pos = (m_bitplane_yres - 1) - y_pos;
+			m_msl = (x_pos & 7) | 8;
+			uint8_t mask = 0x80 >> (m_msl & 7);
 
 			if (m_registers[EF936X_REG_CTRL1] & 0x02)
 			{
 				// Pen
-				for (int p = 0; p < nb_of_bitplanes; p++)
+				for (int p = 0; p < m_nb_of_bitplanes; p++)
 				{
-					offs_t offset = BITPLANE_MAX_SIZE * p + ((y_pos * bitplane_xres + x_pos) >> 3);
+					offs_t offset = BITPLANE_MAX_SIZE * p + ((y_pos * m_bitplane_xres + x_pos) >> 3);
 					uint8_t current_pix = m_videoram->read_byte(offset);
 					if (BIT(m_current_color, p))
-						m_videoram->write_byte(offset, current_pix |  (0x80 >> ((y_pos * bitplane_xres + x_pos) & 7)));
+						m_videoram->write_byte(offset, current_pix | mask);
 					else
-						m_videoram->write_byte(offset, current_pix & ~(0x80 >> ((y_pos * bitplane_xres + x_pos) & 7)));
+						m_videoram->write_byte(offset, current_pix & ~mask);
 				}
 			}
 			else
 			{
 				// Eraser
-				for (int p = 0; p < nb_of_bitplanes; p++)
+				for (int p = 0; p < m_nb_of_bitplanes; p++)
 				{
-					offs_t offset = BITPLANE_MAX_SIZE * p + ((y_pos * bitplane_xres + x_pos) >> 3);
+					offs_t offset = BITPLANE_MAX_SIZE * p + ((y_pos * m_bitplane_xres + x_pos) >> 3);
 					uint8_t current_pix = m_videoram->read_byte(offset);
-					m_videoram->write_byte(offset, current_pix | (0x80 >> ((y_pos * bitplane_xres + x_pos) & 7)));
+					m_videoram->write_byte(offset, current_pix | mask);
 				}
 			}
 		}
@@ -617,7 +620,7 @@ int ef9365_device::draw_vector(uint16_t start_x, uint16_t start_y, int16_t delta
 		do
 		{
 			if (pen_state)
-				plot(y % bitplane_xres, x % bitplane_yres);
+				plot(y % m_bitplane_xres, x % m_bitplane_yres);
 
 			compute_cycles++;
 
@@ -661,7 +664,7 @@ int ef9365_device::draw_vector(uint16_t start_x, uint16_t start_y, int16_t delta
 		do
 		{
 			if (pen_state)
-				plot(x % bitplane_xres, y % bitplane_yres);
+				plot(x % m_bitplane_xres, y % m_bitplane_yres);
 
 			compute_cycles++;
 
@@ -831,7 +834,7 @@ int ef9365_device::draw_character(uint8_t c, bool block, bool smallblock)
 
 int ef9365_device::cycles_to_us(int cycles)
 {
-	return (int)(cycles * (1000000.f / clock_freq));
+	return (int)(cycles * (1000000.f / m_clock_freq));
 }
 
 //-------------------------------------------------
@@ -842,21 +845,17 @@ int ef9365_device::cycles_to_us(int cycles)
 
 void ef9365_device::dump_bitplanes_word()
 {
-	int pixel_ptr = (((bitplane_yres - 1) - (get_y_reg() & (bitplane_yres - 1))) * bitplane_xres) + (get_x_reg() & (bitplane_xres - 1));
+	int pixel_ptr = (((m_bitplane_yres - 1) - (get_y_reg() & (m_bitplane_yres - 1))) * m_bitplane_xres) + (get_x_reg() & (m_bitplane_xres - 1));
 
 	LOG("dump : x = %d , y = %d\n", get_x_reg(), get_y_reg());
 
-	for (int p = 0; p < nb_of_bitplanes; p++)
+	for (int p = 0; p < m_nb_of_bitplanes; p++)
 	{
 		const uint8_t value = m_videoram->read_byte(BITPLANE_MAX_SIZE * p + (pixel_ptr >> 3));
 		if (pixel_ptr & 0x4)
-		{
 			m_readback_latch[p] = value & 0xf;
-		}
 		else
-		{
 			m_readback_latch[p] = (value >> 4) & 0xf;
-		}
 	}
 
 	m_readback_latch_pix_offset = pixel_ptr & 3;
@@ -870,37 +869,39 @@ void ef9365_device::screen_scanning(bool force_clear)
 {
 	if ((m_registers[EF936X_REG_CTRL1] & 0x02) && !force_clear)
 	{
-		for (int y = 0; y < bitplane_yres; y++)
+		for (int y = 0; y < m_bitplane_yres; y++)
 		{
-			for (int x = 0; x < bitplane_xres; x++)
+			for (int x = 0; x < m_bitplane_xres; x++)
 			{
-				for (int p = 0; p < nb_of_bitplanes; p++)
+				m_msl = (x & 7) | 8;
+				uint8_t mask = 0x80 >> (m_msl & 7);
+
+				for (int p = 0; p < m_nb_of_bitplanes; p++)
 				{
-					offs_t offset = BITPLANE_MAX_SIZE * p + ((y * bitplane_xres + x) >> 3);
+					offs_t offset = BITPLANE_MAX_SIZE * p + ((y * m_bitplane_xres + x) >> 3);
 					uint8_t current_pix = m_videoram->read_byte(offset);
 					if (BIT(m_current_color, p))
-					{
-						m_videoram->write_byte(offset, current_pix |  (0x80 >> ((y * bitplane_xres + x) & 7)));
-					}
+						m_videoram->write_byte(offset, current_pix | mask);
 					else
-					{
-						m_videoram->write_byte(offset, current_pix & ~(0x80 >> ((y * bitplane_xres + x) & 7)));
-					}
+						m_videoram->write_byte(offset, current_pix & ~mask);
 				}
 			}
 		}
 	}
 	else
 	{
-		for (int y = 0; y < bitplane_yres; y++)
+		for (int y = 0; y < m_bitplane_yres; y++)
 		{
-			for (int x = 0; x < bitplane_xres; x++)
+			for (int x = 0; x < m_bitplane_xres; x++)
 			{
-				for (int p = 0; p < nb_of_bitplanes; p++)
+				m_msl = (x & 7) | 8;
+				uint8_t mask = 0x80 >> (m_msl & 7);
+
+				for (int p = 0; p < m_nb_of_bitplanes; p++)
 				{
-					offs_t offset = BITPLANE_MAX_SIZE * p + ((y * bitplane_xres + x) >> 3);
+					offs_t offset = BITPLANE_MAX_SIZE * p + ((y * m_bitplane_xres + x) >> 3);
 					uint8_t current_pix = m_videoram->read_byte(offset);
-					m_videoram->write_byte(offset, current_pix | (0x80 >> ((y * bitplane_xres + x) & 7)));
+					m_videoram->write_byte(offset, current_pix | mask);
 				}
 			}
 		}
@@ -937,7 +938,7 @@ void ef9365_device::ef9365_exec(uint8_t cmd)
 				break;
 			case 0x4: // Clear screen
 				screen_scanning(1);
-				busy_cycles = bitplane_xres * bitplane_yres;
+				busy_cycles = m_bitplane_xres * m_bitplane_yres;
 				break;
 			case 0x5: // X and Y registers reset to 0
 				set_x_reg(0);
@@ -947,12 +948,12 @@ void ef9365_device::ef9365_exec(uint8_t cmd)
 				set_x_reg(0);
 				set_y_reg(0);
 				screen_scanning(1);
-				busy_cycles = bitplane_xres * bitplane_yres;
+				busy_cycles = m_bitplane_xres * m_bitplane_yres;
 				break;
 			case 0x7: // Clear screen, set CSIZE to code "minsize". All other registers reset to 0
 				m_registers[EF936X_REG_CSIZE] = 0x11;
 				screen_scanning(1);
-				busy_cycles = bitplane_xres * bitplane_yres;
+				busy_cycles = m_bitplane_xres * m_bitplane_yres;
 				break;
 			case 0x8: // Light-pen initialization (/White forced low)
 				break;
@@ -966,7 +967,7 @@ void ef9365_device::ef9365_exec(uint8_t cmd)
 				break;
 			case 0xc: // Screen scanning : pen or Eraser as defined by CTRL1
 				screen_scanning(0);
-				busy_cycles = bitplane_xres * bitplane_yres;
+				busy_cycles = m_bitplane_xres * m_bitplane_yres;
 				break;
 			case 0xd: // X  reset to 0
 				set_x_reg(0);
@@ -1104,15 +1105,15 @@ void ef9365_device::ef9365_exec(uint8_t cmd)
 
 uint32_t ef9365_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	for (int j = 0; j < bitplane_yres; j++)
+	for (int j = 0; j < m_bitplane_yres; j++)
 	{
-		for (int i = 0; i < bitplane_xres; i++)
+		for (int i = 0; i < m_bitplane_xres; i++)
 		{
 			uint8_t color_index = 0x00;
 
-			int ptr = (bitplane_xres * j) + i;
+			int ptr = (m_bitplane_xres * j) + i;
 
-			for (int p = 0; p < nb_of_bitplanes; p++)
+			for (int p = 0; p < m_nb_of_bitplanes; p++)
 			{
 				if (BIT(m_videoram->read_byte(BITPLANE_MAX_SIZE * p + (ptr >> 3)), ~ptr & 7))
 				{
@@ -1134,7 +1135,7 @@ uint32_t ef9365_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 void ef9365_device::update_scanline(uint16_t scanline)
 {
-	if (scanline == vsync_scanline_pos)
+	if (scanline == m_vsync_scanline_pos)
 	{
 		m_state |= 0x02; // vsync
 		if (m_registers[EF936X_REG_CTRL1] & 0x20)
@@ -1168,7 +1169,7 @@ uint8_t ef9365_device::data_r(offs_t offset)
 			else
 				m_state |= 0x04;
 
-			if ((overflow_mask_x & get_x_reg()) || (overflow_mask_y & get_y_reg()))
+			if ((m_overflow_mask_x & get_x_reg()) || (m_overflow_mask_y & get_y_reg()))
 			{
 				m_state |= 0x08;
 			}
