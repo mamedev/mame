@@ -216,7 +216,7 @@ ROM_START( siddr )
 	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
 
 	ROM_REGION16_BE(0x800000, "maincpu:spidirect", ROMREGION_ERASE00)
-	ROM_LOAD16_WORD_SWAP( "ddr-Toy.bin", 0x0000, 0x400000, CRC(873cbcc8) SHA1(bdd3d12adb1284991a3f8aaa8e451e3a55931267) )
+	ROM_LOAD16_WORD_SWAP( "ddr-toy.bin", 0x0000, 0x400000, CRC(873cbcc8) SHA1(bdd3d12adb1284991a3f8aaa8e451e3a55931267) )
 ROM_END
 
 void generalplus_gpspi_direct_game_state::init_fif()
