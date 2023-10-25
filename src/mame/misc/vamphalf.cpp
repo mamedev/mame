@@ -180,6 +180,9 @@ protected:
 	u32 finalgdr_prot_r();
 	void finalgdr_prot_w(u32 data);
 
+	template <u32 Pc, u32 Wram_offs> u16 speedup_16_r();
+	template <u32 Pc, u32 Wram_offs> u32 speedup_32_r();
+
 private:
 	required_device<gfxdecode_device> m_gfxdecode;
 
@@ -197,29 +200,7 @@ private:
 	void boonggab_prize_w(offs_t offset, u16 data);
 	void boonggab_lamps_w(offs_t offset, u16 data);
 
-	u16 vamphalf_speedup_r();
-	u16 vamphalfr1_speedup_r();
-	u16 vamphafk_speedup_r();
-	u16 coolmini_speedup_r();
-	u16 coolminii_speedup_r();
-	u16 suplup_speedup_r();
-	u16 luplup_speedup_r();
-	u16 luplup29_speedup_r();
-	u16 luplup10_speedup_r();
-	u16 puzlbang_speedup_r();
-	u16 puzlbanga_speedup_r();
-	u16 mrkicker_speedup_r();
-	u16 dquizgo2_speedup_r();
 	u32 aoh_speedup_r();
-	u16 jmpbreak_speedup_r();
-	u16 jmpbreaka_speedup_r();
-	u16 poosho_speedup_r();
-	u16 newxpang_speedup_r();
-	u16 worldadv_speedup_r();
-	u16 mrdig_speedup_r();
-	u16 dtfamily_speedup_r();
-	u16 toyland_speedup_r();
-	u16 boonggab_speedup_r();
 
 	void aoh_oki_bank_w(u32 data);
 	void boonggab_oki_bank_w(offs_t offset, u16 data);
@@ -265,12 +246,6 @@ public:
 private:
 	required_device<i8052_device> m_qdsp_cpu;
 
-	u16 misncrft_speedup_r();
-	u16 misncrfta_speedup_r();
-	u32 wivernwg_speedup_r();
-	u32 wyvernwg_speedup_r();
-	u32 wyvernwga_speedup_r();
-
 	u32 wyvernwg_prot_r();
 	void wyvernwg_prot_w(u32 data);
 
@@ -309,9 +284,6 @@ private:
 	void finalgdr_backupram_bank_w(u32 data);
 	u32 finalgdr_backupram_r(offs_t offset);
 	void finalgdr_backupram_w(offs_t offset, u32 data);
-
-	u32 finalgdr_speedup_r();
-	u32 mrkickera_speedup_r();
 
 	void finalgdr_prize_w(u32 data);
 	void finalgdr_oki_bank_w(u32 data);
@@ -3115,9 +3087,10 @@ void vamphalf_state::banked_oki(int chip)
 		m_okibank->set_base(&ROM[0x20000]);
 }
 
-u16 vamphalf_state::vamphalf_speedup_r()
+template <u32 Pc, u32 Wram_offs>
+u16 vamphalf_state::speedup_16_r()
 {
-	if (m_maincpu->pc() == 0x82ec)
+	if (m_maincpu->pc() == Pc)
 	{
 		if (irq_active())
 			m_maincpu->spin_until_interrupt();
@@ -3125,12 +3098,13 @@ u16 vamphalf_state::vamphalf_speedup_r()
 			m_maincpu->eat_cycles(50);
 	}
 
-	return m_wram[0x4a7b8 / 2];
+	return m_wram[Wram_offs / 2];
 }
 
-u16 vamphalf_state::vamphalfr1_speedup_r()
+template <u32 Pc, u32 Wram_offs>
+u32 vamphalf_state::speedup_32_r()
 {
-	if (m_maincpu->pc() == 0x82ec)
+	if (m_maincpu->pc() == Pc)
 	{
 		if (irq_active())
 			m_maincpu->spin_until_interrupt();
@@ -3138,241 +3112,7 @@ u16 vamphalf_state::vamphalfr1_speedup_r()
 			m_maincpu->eat_cycles(50);
 	}
 
-	return m_wram[0x4a468 / 2];
-}
-
-u16 vamphalf_state::vamphafk_speedup_r()
-{
-	if (m_maincpu->pc() == 0x82ec)
-	{
-		if (irq_active())
-			m_maincpu->spin_until_interrupt();
-		else
-			m_maincpu->eat_cycles(50);
-	}
-
-	return m_wram[0x4a648 / 2];
-}
-
-u16 vamphalf_qdsp_state::misncrft_speedup_r()
-{
-	if (m_maincpu->pc() == 0xff5a)
-	{
-		if (irq_active())
-			m_maincpu->spin_until_interrupt();
-		else
-			m_maincpu->eat_cycles(50);
-	}
-
-	return m_wram[0x741e8 / 2];
-}
-
-u16 vamphalf_qdsp_state::misncrfta_speedup_r()
-{
-	if (m_maincpu->pc() == 0xecd6)
-	{
-		if (irq_active())
-			m_maincpu->spin_until_interrupt();
-		else
-			m_maincpu->eat_cycles(50);
-	}
-
-	return m_wram[0x72e2c / 2];
-}
-
-u16 vamphalf_state::coolmini_speedup_r()
-{
-	if (m_maincpu->pc() == 0x75f88)
-	{
-		if (irq_active())
-			m_maincpu->spin_until_interrupt();
-		else
-			m_maincpu->eat_cycles(50);
-	}
-
-	return m_wram[0xd2df8 / 2];
-}
-
-u16 vamphalf_state::coolminii_speedup_r()
-{
-	if (m_maincpu->pc() == 0x76024)
-	{
-		if (irq_active())
-			m_maincpu->spin_until_interrupt();
-		else
-			m_maincpu->eat_cycles(50);
-	}
-
-	return m_wram[0xd30a8 / 2];
-}
-
-u16 vamphalf_state::suplup_speedup_r()
-{
-	if (m_maincpu->pc() == 0xaf184)
-	{
-		if (irq_active())
-			m_maincpu->spin_until_interrupt();
-		else
-			m_maincpu->eat_cycles(50);
-	}
-
-	return m_wram[0x11605c / 2];
-}
-
-u16 vamphalf_state::luplup_speedup_r()
-{
-	if (m_maincpu->pc() == 0xaefac)
-	{
-		if (irq_active())
-			m_maincpu->spin_until_interrupt();
-		else
-			m_maincpu->eat_cycles(50);
-	}
-
-	return m_wram[0x115e84 / 2];
-}
-
-u16 vamphalf_state::luplup29_speedup_r()
-{
-	if (m_maincpu->pc() == 0xae6c0)
-	{
-		if (irq_active())
-			m_maincpu->spin_until_interrupt();
-		else
-			m_maincpu->eat_cycles(50);
-	}
-
-	return m_wram[0x113f08 / 2];
-}
-
-u16 vamphalf_state::luplup10_speedup_r()
-{
-	if (m_maincpu->pc() == 0xb1128)
-	{
-		if (irq_active())
-			m_maincpu->spin_until_interrupt();
-		else
-			m_maincpu->eat_cycles(50);
-	}
-
-	return m_wram[0x113b78 / 2];
-}
-
-u16 vamphalf_state::puzlbang_speedup_r()
-{
-	if (m_maincpu->pc() == 0xae6cc)
-	{
-		if (irq_active())
-			m_maincpu->spin_until_interrupt();
-		else
-			m_maincpu->eat_cycles(50);
-	}
-
-	return m_wram[0x113f14 / 2];
-}
-
-u16 vamphalf_state::puzlbanga_speedup_r()
-{
-	if (m_maincpu->pc() == 0xae6cc)
-	{
-		if (irq_active())
-			m_maincpu->spin_until_interrupt();
-		else
-			m_maincpu->eat_cycles(50);
-	}
-
-	return m_wram[0x113ecc / 2];
-}
-
-u32 vamphalf_qdsp_state::wivernwg_speedup_r()
-{
-	if (m_maincpu->pc() == 0x10766)
-	{
-		if (irq_active())
-			m_maincpu->spin_until_interrupt();
-		else
-			m_maincpu->eat_cycles(50);
-	}
-
-	return m_wram32[0xb4cc4 / 4];
-}
-
-u32 vamphalf_qdsp_state::wyvernwg_speedup_r()
-{
-	if (m_maincpu->pc() == 0x10766)
-	{
-		if (irq_active())
-			m_maincpu->spin_until_interrupt();
-		else
-			m_maincpu->eat_cycles(50);
-	}
-
-	return m_wram32[0xb56f4 / 4];
-}
-
-u32 vamphalf_qdsp_state::wyvernwga_speedup_r()
-{
-	if (m_maincpu->pc() == 0x10766)
-	{
-		if (irq_active())
-			m_maincpu->spin_until_interrupt();
-		else
-			m_maincpu->eat_cycles(50);
-	}
-
-	return m_wram32[0xb74f0 / 4];
-}
-
-u32 vamphalf_nvram_state::finalgdr_speedup_r()
-{
-	if (m_maincpu->pc() == 0x1c20c)
-	{
-		if (irq_active())
-			m_maincpu->spin_until_interrupt();
-		else
-			m_maincpu->eat_cycles(50);
-	}
-
-	return m_wram32[0x5e870 / 4];
-}
-
-u32 vamphalf_nvram_state::mrkickera_speedup_r()
-{
-	if (m_maincpu->pc() == 0x46a30)
-	{
-		if (irq_active())
-			m_maincpu->spin_until_interrupt();
-		else
-			m_maincpu->eat_cycles(50);
-	}
-
-	return m_wram32[0x701a0 / 4];
-}
-
-u16 vamphalf_state::mrkicker_speedup_r()
-{
-	if (m_maincpu->pc() == 0x41ec6)
-	{
-		if (irq_active())
-			m_maincpu->spin_until_interrupt();
-		else
-			m_maincpu->eat_cycles(50);
-	}
-
-	return m_wram[0x63fc0 / 2];
-}
-
-u16 vamphalf_state::dquizgo2_speedup_r()
-{
-	if (m_maincpu->pc() == 0xaa630)
-	{
-		if (irq_active())
-			m_maincpu->spin_until_interrupt();
-		else
-			m_maincpu->eat_cycles(50);
-	}
-
-	return m_wram[0xcdde8 / 2];
+	return m_wram32[Wram_offs / 4];
 }
 
 u32 vamphalf_state::aoh_speedup_r()
@@ -3385,126 +3125,9 @@ u32 vamphalf_state::aoh_speedup_r()
 	return m_wram32[0x28a09c / 4];
 }
 
-u16 vamphalf_state::jmpbreak_speedup_r()
-{
-	if (m_maincpu->pc() == 0x984a)
-	{
-		if (irq_active())
-			m_maincpu->spin_until_interrupt();
-		else
-			m_maincpu->eat_cycles(50);
-	}
-
-	return m_wram[0x906f4 / 2];
-}
-
-u16 vamphalf_state::jmpbreaka_speedup_r()
-{
-	if (m_maincpu->pc() == 0x909ac)
-	{
-		if (irq_active())
-			m_maincpu->spin_until_interrupt();
-		else
-			m_maincpu->eat_cycles(50);
-	}
-
-	return m_wram[0xe1dfc / 2];
-}
-
-u16 vamphalf_state::poosho_speedup_r()
-{
-	if (m_maincpu->pc() == 0xa8c78)
-	{
-		if (irq_active())
-			m_maincpu->spin_until_interrupt();
-		else
-			m_maincpu->eat_cycles(50);
-	}
-
-	return m_wram[0xc8b58 / 2];
-}
-
-u16 vamphalf_state::newxpang_speedup_r()
-{
-	if (m_maincpu->pc() == 0x8b8e)
-	{
-		if (irq_active())
-			m_maincpu->spin_until_interrupt();
-		else
-			m_maincpu->eat_cycles(50);
-	}
-
-	return m_wram[0x61218 / 2];
-}
-
-u16 vamphalf_state::worldadv_speedup_r()
-{
-	if (m_maincpu->pc() == 0x93ae)
-	{
-		if (irq_active())
-			m_maincpu->spin_until_interrupt();
-		else
-			m_maincpu->eat_cycles(50);
-	}
-
-	return m_wram[0xc5e78 / 2];
-}
-
-u16 vamphalf_state::mrdig_speedup_r()
-{
-	if (m_maincpu->pc() == 0xae38)
-	{
-		if (irq_active())
-			m_maincpu->spin_until_interrupt();
-		else
-			m_maincpu->eat_cycles(50);
-	}
-
-	return m_wram[0x0e0768 / 2];
-}
-
-u16 vamphalf_state::dtfamily_speedup_r()
-{
-	if (m_maincpu->pc() == 0x12fa6)
-	{
-		if (irq_active())
-			m_maincpu->spin_until_interrupt();
-		else
-			m_maincpu->eat_cycles(50);
-	}
-
-	return m_wram[0xcc2a8 / 2];
-}
-
-u16 vamphalf_state::toyland_speedup_r()
-{
-	if (m_maincpu->pc() == 0x130c2)
-	{
-		if (irq_active())
-			m_maincpu->spin_until_interrupt();
-		else
-			m_maincpu->eat_cycles(50);
-	}
-
-	return m_wram[0x780d8 / 2];
-}
-
-u16 vamphalf_state::boonggab_speedup_r()
-{
-	if (m_maincpu->pc() == 0x131a6)
-	{
-		if (irq_active())
-			m_maincpu->spin_until_interrupt();
-		else
-			m_maincpu->eat_cycles(50);
-	}
-
-	return m_wram[0xf1b74 / 2];
-}
-
 void vamphalf_state::init_vamphalf()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0004a7b8, 0x0004a7b9, read16smo_delegate(*this, FUNC(vamphalf_state::vamphalf_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0004a7b8, 0x0004a7b9, emu::rw_delegate(*this, NAME((&vamphalf_state::speedup_16_r<0x82ec, 0x4a7b8>))));
 
 	m_palshift = 0;
 	m_flip_bit = 0x80;
@@ -3512,7 +3135,7 @@ void vamphalf_state::init_vamphalf()
 
 void vamphalf_state::init_vamphalfr1()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0004a468, 0x0004a469, read16smo_delegate(*this, FUNC(vamphalf_state::vamphalfr1_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0004a468, 0x0004a469, emu::rw_delegate(*this, NAME((&vamphalf_state::speedup_16_r<0x82ec, 0x4a468>))));
 
 	m_palshift = 0;
 	m_flip_bit = 0x80;
@@ -3520,7 +3143,7 @@ void vamphalf_state::init_vamphalfr1()
 
 void vamphalf_state::init_vamphafk()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0004a648, 0x0004a649, read16smo_delegate(*this, FUNC(vamphalf_state::vamphafk_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0004a648, 0x0004a649, emu::rw_delegate(*this, NAME((&vamphalf_state::speedup_16_r<0x82ec, 0x4a648>))));
 
 	m_palshift = 0;
 	m_flip_bit = 0x80;
@@ -3528,8 +3151,8 @@ void vamphalf_state::init_vamphafk()
 
 void vamphalf_qdsp_state::init_misncrft()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x000741e8, 0x000741e9, read16smo_delegate(*this, FUNC(vamphalf_qdsp_state::misncrft_speedup_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00072e2c, 0x00072e2d, read16smo_delegate(*this, FUNC(vamphalf_qdsp_state::misncrfta_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x000741e8, 0x000741e9, emu::rw_delegate(*this, NAME((&vamphalf_qdsp_state::speedup_16_r<0xff5a, 0x741e8>))));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00072e2c, 0x00072e2d, emu::rw_delegate(*this, NAME((&vamphalf_qdsp_state::speedup_16_r<0xecd6, 0x72e2c>))));
 	m_palshift = 0;
 	m_flip_bit = 1;
 
@@ -3540,7 +3163,7 @@ void vamphalf_qdsp_state::init_misncrft()
 
 void vamphalf_state::init_coolmini()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x000d2df8, 0x000d2df9, read16smo_delegate(*this, FUNC(vamphalf_state::coolmini_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x000d2df8, 0x000d2df9, emu::rw_delegate(*this, NAME((&vamphalf_state::speedup_16_r<0x75f88, 0xd2df8>))));
 
 	m_palshift = 0;
 	m_flip_bit = 1;
@@ -3548,7 +3171,7 @@ void vamphalf_state::init_coolmini()
 
 void vamphalf_state::init_coolminii()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x000d30a8, 0x000d30a9, read16smo_delegate(*this, FUNC(vamphalf_state::coolminii_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x000d30a8, 0x000d30a9, emu::rw_delegate(*this, NAME((&vamphalf_state::speedup_16_r<0x76024, 0xd30a8>))));
 
 	m_palshift = 0;
 	m_flip_bit = 1;
@@ -3557,7 +3180,7 @@ void vamphalf_state::init_coolminii()
 void vamphalf_state::init_mrkicker()
 {
 	banked_oki(0);
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00063fc0, 0x00063fc1, read16smo_delegate(*this, FUNC(vamphalf_state::mrkicker_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00063fc0, 0x00063fc1, emu::rw_delegate(*this, NAME((&vamphalf_state::speedup_16_r<0x41ec6, 0x63fc0>))));
 
 	m_palshift = 0;
 	m_flip_bit = 1;
@@ -3565,7 +3188,7 @@ void vamphalf_state::init_mrkicker()
 
 void vamphalf_state::init_suplup()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0011605c, 0x0011605d, read16smo_delegate(*this, FUNC(vamphalf_state::suplup_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0011605c, 0x0011605d, emu::rw_delegate(*this, NAME((&vamphalf_state::speedup_16_r<0xaf184, 0x11605c>))));
 
 	m_palshift = 8;
 	/* no flipscreen */
@@ -3573,7 +3196,7 @@ void vamphalf_state::init_suplup()
 
 void vamphalf_state::init_luplup()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00115e84, 0x00115e85, read16smo_delegate(*this, FUNC(vamphalf_state::luplup_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00115e84, 0x00115e85, emu::rw_delegate(*this, NAME((&vamphalf_state::speedup_16_r<0xaefac, 0x115e84>))));
 
 	m_palshift = 8;
 	/* no flipscreen */
@@ -3581,7 +3204,7 @@ void vamphalf_state::init_luplup()
 
 void vamphalf_state::init_luplup29()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00113f08, 0x00113f09, read16smo_delegate(*this, FUNC(vamphalf_state::luplup29_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00113f08, 0x00113f09, emu::rw_delegate(*this, NAME((&vamphalf_state::speedup_16_r<0xae6c0, 0x113f08>))));
 
 	m_palshift = 8;
 	/* no flipscreen */
@@ -3589,7 +3212,7 @@ void vamphalf_state::init_luplup29()
 
 void vamphalf_state::init_luplup10()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00113b78, 0x00113b79, read16smo_delegate(*this, FUNC(vamphalf_state::luplup10_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00113b78, 0x00113b79, emu::rw_delegate(*this, NAME((&vamphalf_state::speedup_16_r<0xb1128, 0x113b78>))));
 
 	m_palshift = 8;
 	/* no flipscreen */
@@ -3597,8 +3220,8 @@ void vamphalf_state::init_luplup10()
 
 void vamphalf_state::init_puzlbang()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00113f14, 0x00113f15, read16smo_delegate(*this, FUNC(vamphalf_state::puzlbang_speedup_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00113ecc, 0x00113ecd, read16smo_delegate(*this, FUNC(vamphalf_state::puzlbanga_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00113f14, 0x00113f15, emu::rw_delegate(*this, NAME((&vamphalf_state::speedup_16_r<0xae6cc, 0x113f14>))));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00113ecc, 0x00113ecd, emu::rw_delegate(*this, NAME((&vamphalf_state::speedup_16_r<0xae6cc, 0x113ecc>))));
 
 	m_palshift = 8;
 	/* no flipscreen */
@@ -3606,9 +3229,9 @@ void vamphalf_state::init_puzlbang()
 
 void vamphalf_qdsp_state::init_wyvernwg()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00b4cc4, 0x00b4cc7, read32smo_delegate(*this, FUNC(vamphalf_qdsp_state::wivernwg_speedup_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00b56f4, 0x00b56f7, read32smo_delegate(*this, FUNC(vamphalf_qdsp_state::wyvernwg_speedup_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00b74f0, 0x00b74f3, read32smo_delegate(*this, FUNC(vamphalf_qdsp_state::wyvernwga_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00b4cc4, 0x00b4cc7, emu::rw_delegate(*this, NAME((&vamphalf_qdsp_state::speedup_32_r<0x10766, 0xb4cc4>))));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00b56f4, 0x00b56f7, emu::rw_delegate(*this, NAME((&vamphalf_qdsp_state::speedup_32_r<0x10766, 0xb56f4>))));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00b74f0, 0x00b74f3, emu::rw_delegate(*this, NAME((&vamphalf_qdsp_state::speedup_32_r<0x10766, 0xb74f0>))));
 	m_palshift = 0;
 	m_flip_bit = 1;
 
@@ -3650,7 +3273,7 @@ void vamphalf_nvram_state::init_finalgdr()
 	banked_oki(0);
 	m_finalgdr_backupram_bank = 1;
 	m_finalgdr_backupram = std::make_unique<u8[]>(0x80*0x100);
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x005e870, 0x005e873, read32smo_delegate(*this, FUNC(vamphalf_nvram_state::finalgdr_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x005e870, 0x005e873, emu::rw_delegate(*this, NAME((&vamphalf_nvram_state::speedup_32_r<0x1c20c, 0x5e870>))));
 	m_nvram->set_base(m_finalgdr_backupram.get(), 0x80*0x100);
 
 	m_palshift = 0;
@@ -3672,7 +3295,7 @@ void vamphalf_nvram_state::init_mrkickera()
 	// backup ram isn't used
 	m_finalgdr_backupram_bank = 1;
 	m_finalgdr_backupram = std::make_unique<u8[]>(0x80*0x100);
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00701a0, 0x00701a3, read32smo_delegate(*this, FUNC(vamphalf_nvram_state::mrkickera_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00701a0, 0x00701a3, emu::rw_delegate(*this, NAME((&vamphalf_nvram_state::speedup_32_r<0x46a30, 0x701a0>))));
 	m_nvram->set_base(m_finalgdr_backupram.get(), 0x80*0x100);
 
 	m_palshift = 0;
@@ -3688,7 +3311,7 @@ void vamphalf_nvram_state::init_mrkickera()
 
 void vamphalf_state::init_dquizgo2()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00cdde8, 0x00cdde9, read16smo_delegate(*this, FUNC(vamphalf_state::dquizgo2_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00cdde8, 0x00cdde9, emu::rw_delegate(*this, NAME((&vamphalf_state::speedup_16_r<0xaa630, 0xcdde8>))));
 
 	m_palshift = 0;
 	m_flip_bit = 1;
@@ -3697,7 +3320,7 @@ void vamphalf_state::init_dquizgo2()
 void vamphalf_state::init_dtfamily()
 {
 	banked_oki(0);
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xcc2a8, 0xcc2a9, read16smo_delegate(*this, FUNC(vamphalf_state::dtfamily_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xcc2a8, 0xcc2a9, emu::rw_delegate(*this, NAME((&vamphalf_state::speedup_16_r<0x12fa6, 0xcc2a8>))));
 
 	m_palshift = 0;
 	m_flip_bit = 1;
@@ -3706,7 +3329,7 @@ void vamphalf_state::init_dtfamily()
 
 void vamphalf_state::init_toyland()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x780d8, 0x780d9, read16smo_delegate(*this, FUNC(vamphalf_state::toyland_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x780d8, 0x780d9, emu::rw_delegate(*this, NAME((&vamphalf_state::speedup_16_r<0x130c2, 0x780d8>))));
 
 	m_palshift = 0;
 	m_flip_bit = 1;
@@ -3715,7 +3338,7 @@ void vamphalf_state::init_toyland()
 void vamphalf_state::init_aoh()
 {
 	banked_oki(1);
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x028a09c, 0x028a09f, read32smo_delegate(*this, FUNC(vamphalf_state::aoh_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x028a09c, 0x028a09f, emu::rw_delegate(*this, FUNC(vamphalf_state::aoh_speedup_r)));
 
 	m_palshift = 0;
 	/* no flipscreen */
@@ -3723,56 +3346,56 @@ void vamphalf_state::init_aoh()
 
 void vamphalf_state::init_jmpbreak()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00906f4, 0x00906f5, read16smo_delegate(*this, FUNC(vamphalf_state::jmpbreak_speedup_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe0000000, 0xe0000003, write16smo_delegate(*this, FUNC(vamphalf_state::jmpbreak_flipscreen_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00906f4, 0x00906f5, emu::rw_delegate(*this, NAME((&vamphalf_state::speedup_16_r<0x984a, 0x906f4>))));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe0000000, 0xe0000003, emu::rw_delegate(*this, FUNC(vamphalf_state::jmpbreak_flipscreen_w)));
 
 	m_palshift = 0;
 }
 
 void vamphalf_state::init_jmpbreaka()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00e1dfc, 0x00e1dfd, read16smo_delegate(*this, FUNC(vamphalf_state::jmpbreaka_speedup_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe0000000, 0xe0000003, write16smo_delegate(*this, FUNC(vamphalf_state::jmpbreak_flipscreen_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00e1dfc, 0x00e1dfd, emu::rw_delegate(*this, NAME((&vamphalf_state::speedup_16_r<0x909ac, 0xe1dfc>))));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe0000000, 0xe0000003, emu::rw_delegate(*this, FUNC(vamphalf_state::jmpbreak_flipscreen_w)));
 
 	m_palshift = 0;
 }
 
 void vamphalf_state::init_mrdig()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0e0768, 0x0e0769, read16smo_delegate(*this, FUNC(vamphalf_state::mrdig_speedup_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe0000000, 0xe0000003, write16smo_delegate(*this, FUNC(vamphalf_state::jmpbreak_flipscreen_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0e0768, 0x0e0769, emu::rw_delegate(*this, NAME((&vamphalf_state::speedup_16_r<0xae38, 0xe0768>))));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe0000000, 0xe0000003, emu::rw_delegate(*this, FUNC(vamphalf_state::jmpbreak_flipscreen_w)));
 
 	m_palshift = 0;
 }
 
 void vamphalf_state::init_poosho()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0c8b58, 0x0c8b59, read16smo_delegate(*this, FUNC(vamphalf_state::poosho_speedup_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe0000000, 0xe0000003, write16smo_delegate(*this, FUNC(vamphalf_state::jmpbreak_flipscreen_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0c8b58, 0x0c8b59, emu::rw_delegate(*this, NAME((&vamphalf_state::speedup_16_r<0xa8c78, 0xc8b58>))));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe0000000, 0xe0000003, emu::rw_delegate(*this, FUNC(vamphalf_state::jmpbreak_flipscreen_w)));
 
 	m_palshift = 0;
 }
 
 void vamphalf_state::init_newxpang()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x061218, 0x061219, read16smo_delegate(*this, FUNC(vamphalf_state::newxpang_speedup_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe0000000, 0xe0000003, write16smo_delegate(*this, FUNC(vamphalf_state::jmpbreak_flipscreen_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x061218, 0x061219, emu::rw_delegate(*this, NAME((&vamphalf_state::speedup_16_r<0x8b8e, 0x61218>))));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe0000000, 0xe0000003, emu::rw_delegate(*this, FUNC(vamphalf_state::jmpbreak_flipscreen_w)));
 
 	m_palshift = 0;
 }
 
 void vamphalf_state::init_newxpanga()
 {
-	// m_maincpu->space(AS_PROGRAM).install_read_handler(0x061218, 0x061219, read16smo_delegate(*this, FUNC(vamphalf_state::newxpanga_speedup_r))); // TODO
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe0000000, 0xe0000003, write16smo_delegate(*this, FUNC(vamphalf_state::jmpbreak_flipscreen_w)));
+	// m_maincpu->space(AS_PROGRAM).install_read_handler(0x061218, 0x061219, emu::rw_delegate(*this, NAME((&vamphalf_state::speedup_16_r<, >)))); // TODO
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe0000000, 0xe0000003, emu::rw_delegate(*this, FUNC(vamphalf_state::jmpbreak_flipscreen_w)));
 
 	m_palshift = 0;
 }
 
 void vamphalf_state::init_worldadv()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0c5e78, 0x0c5e79, read16smo_delegate(*this, FUNC(vamphalf_state::worldadv_speedup_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe0000000, 0xe0000003, write16smo_delegate(*this, FUNC(vamphalf_state::jmpbreak_flipscreen_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0c5e78, 0x0c5e79, emu::rw_delegate(*this, NAME((&vamphalf_state::speedup_16_r<0x93ae, 0xc5e78>))));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe0000000, 0xe0000003, emu::rw_delegate(*this, FUNC(vamphalf_state::jmpbreak_flipscreen_w)));
 
 	m_palshift = 0;
 }
@@ -3781,8 +3404,7 @@ void vamphalf_state::init_solitaire()
 {
 
 	// TODO: speedup
-	//m_maincpu->space(AS_PROGRAM).install_read_handler(0x0c5e78, 0x0c5e79, read16smo_delegate(*this, FUNC(vamphalf_state::worldadv_speedup_r)));
-	//m_maincpu->space(AS_PROGRAM).install_write_handler(0xe0000000, 0xe0000003, write16smo_delegate(*this, FUNC(vamphalf_state::jmpbreak_flipscreen_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x05d1c0, 0x05d1c1, emu::rw_delegate(*this, NAME((&vamphalf_state::speedup_16_r<0x8810, 0x5d1c0>))));
 
 	m_palshift = 0;
 }
@@ -3790,7 +3412,7 @@ void vamphalf_state::init_solitaire()
 void vamphalf_state::init_boonggab()
 {
 	banked_oki(0);
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x000f1b74, 0x000f1b75, read16smo_delegate(*this, FUNC(vamphalf_state::boonggab_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x000f1b74, 0x000f1b75, emu::rw_delegate(*this, NAME((&vamphalf_state::speedup_16_r<0x131a6, 0xf1b74>))));
 
 	m_palshift = 0;
 	m_has_extra_gfx = true;
