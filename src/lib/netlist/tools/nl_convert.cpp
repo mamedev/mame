@@ -8,6 +8,7 @@
 
 #include "nl_convert.h"
 
+#include <cstdio>
 #include <algorithm>
 #include <unordered_map>
 #include <vector>
@@ -332,8 +333,20 @@ double nl_convert_base_t::get_sp_val(const pstring &sin) const
 
 void nl_convert_spice_t::convert_block(const str_list &contents)
 {
+	int linenumber = 0;
 	for (const auto &line : contents)
-		process_line(line);
+	{
+		try 
+		{
+			process_line(line);
+		}
+		catch (plib::pexception &e)
+		{
+			fprintf(stderr, "Error on line: <%d>\n", linenumber);
+			throw(e);
+		}
+		linenumber++;
+	}
 }
 
 
