@@ -21,7 +21,8 @@ Hardware notes:
 
 TODO:
 - pencil drawing/erasing doesn't work correctly and the cursor is not visible,
-  maybe related to upper bits of custom command?
+  maybe related to upper bits of custom command? Somehow, "activity" works
+  differently than "disneysb" or no-cart, the latter ones draw 2 colors?
 - palette is approximated from photos/videos
 
 *******************************************************************************/
@@ -294,13 +295,13 @@ static INPUT_PORTS_START( videoart )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_NAME("Erase")
 
 	PORT_START("AN0")
-	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_CENTERDELTA(0) PORT_REVERSE PORT_PLAYER(2) PORT_NAME("Color")
+	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X) PORT_SENSITIVITY(50) PORT_KEYDELTA(2) PORT_CENTERDELTA(0) PORT_REVERSE PORT_PLAYER(2) PORT_NAME("Color")
 
 	PORT_START("AN1")
-	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X) PORT_SENSITIVITY(50) PORT_KEYDELTA(5)
+	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X) PORT_SENSITIVITY(50) PORT_KEYDELTA(4) PORT_CENTERDELTA(0)
 
 	PORT_START("AN2")
-	PORT_BIT(0xff, 0x80, IPT_AD_STICK_Y) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_REVERSE
+	PORT_BIT(0xff, 0x80, IPT_AD_STICK_Y) PORT_SENSITIVITY(50) PORT_KEYDELTA(4) PORT_CENTERDELTA(0) PORT_REVERSE
 INPUT_PORTS_END
 
 
