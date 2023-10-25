@@ -78,7 +78,7 @@ protected:
 	virtual uint8_t read_port_byte(uint16_t port) override;
 	virtual uint16_t read_port_word(uint16_t port) override;
 	virtual void write_port_byte(uint16_t port, uint8_t data) override;
-	void write_port_byte_al(uint16_t port);
+	virtual void write_port_byte_al(uint16_t port) override;
 	virtual void write_port_word(uint16_t port, uint16_t data) override;
 	virtual uint8_t read_byte(uint32_t addr) override;
 	virtual uint16_t read_word(uint32_t addr) override;
