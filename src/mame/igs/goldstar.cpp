@@ -16486,8 +16486,34 @@ ROM_START( cmast97 )
 	ROM_LOAD( "82s135.c9",  0x100, 0x100, CRC(85883486) SHA1(adcee60f6fc1e8a75c529951df9e5e1ee277e131) )
 ROM_END
 
-// DYNA D9105 PCB with Sharp LH0080B (Z80B) CPU and 2 customs (DYNA DC4000 and DYNA 22A078803), 5x 8-dips, XTAL 24 MHz. DYNA ELD3 V1.1TA in ROM.
-ROM_START( eldoradd )
+/* DYNA D9106C PCB:
+    -Zilog Z0840006.
+    -DYNA DC4000.
+    -DYNA 22A078803.
+    -24 MHz xtal.
+    -Winbond WF19054y.
+    -5 banks of 8 DIP switches, plus an unpopulated location on the PCB for a sixth one.
+*/
+ROM_START( eldoradd ) // String "DYNA ELD3 V5.1DR" on program ROM
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD16_WORD( "51d_el3_m27c512.15d", 0x00000, 0x10000, CRC(a7769d4a) SHA1(2ccd14be94a0b752113f529431b3dd4fadbf619b) )
+
+	ROM_REGION( 0x100000, "gfx", 0 )
+	ROM_LOAD( "2h_el3_tms27c040.2h", 0x080000, 0x080000, CRC(79a37ee1) SHA1(510e4ab168003d48173d5f8ddbf396668caf8e3e) )
+	ROM_LOAD( "1h_el3_tms27c040.1h", 0x000000, 0x080000, CRC(0ba677ac) SHA1(4492183cd01ba6f8ba3da233a6fd4fcb86447308) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "eh_82s135.15h", 0x000, 0x100, NO_DUMP )
+	ROM_LOAD( "eg_82s135.15g", 0x100, 0x100, NO_DUMP )
+
+	ROM_REGION( 0x600, "plds", 0 )
+	ROM_LOAD( "pal16l8.13f", 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "pal16l8.11e", 0x200, 0x104, NO_DUMP )
+	ROM_LOAD( "gal16v8.9f",  0x400, 0x104, NO_DUMP )
+ROM_END
+
+// DYNA D9105 PCB with Sharp LH0080B (Z80B) CPU and 2 customs (DYNA DC4000 and DYNA 22A078803), 5x 8-dips, XTAL 24 MHz.
+ROM_START( eldoraddo ) // String "DYNA ELD3 V1.1TA" on program ROM
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD16_WORD( "dyna nel 20t.c14", 0x00000, 0x10000, CRC(77b3b2ce) SHA1(e94b976ae9e5a899d916fffc8118486cbedab8b6) )
 
@@ -19894,9 +19920,9 @@ void cmaster_state::init_super7() // possibly incomplete decryption. Game appear
 
 /*********************************************
 *                Game Drivers                *
-**********************************************
+*********************************************/
 
-       YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT       ROT    COMPANY              FULLNAME                                      FLAGS              LAYOUT */
+//     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT            ROT   COMPANY              FULLNAME                                       FLAGS              LAYOUT
 GAMEL( 199?, goldstar,  0,        goldstar, goldstar, goldstar_state, init_goldstar,  ROT0, "IGS",               "Golden Star",                                 0,                 layout_goldstar )
 GAMEL( 199?, goldstbl,  goldstar, goldstbl, goldstar, goldstar_state, empty_init,     ROT0, "IGS",               "Golden Star (Blue version)",                  0,                 layout_goldstar )
 GAME(  199?, moonlght,  goldstar, moonlght, goldstar, goldstar_state, empty_init,     ROT0, "bootleg",           "Moon Light (v.0629, low program)",            0 )
@@ -19923,7 +19949,8 @@ GAMEL( 199?, cb3f,      ncb3,     ncb3,     ncb3,     cb3_state,      init_cb3f,
 GAMEL( 199?, chryglda,  ncb3,     cb3e,     chrygld,  cb3_state,      init_cb3e,      ROT0, "bootleg",           "Cherry Gold I (set 2, encrypted bootleg)",    0,                 layout_chrygld )  // Runs in CB3e hardware.
 GAME(  1994, chryangla, ncb3,     chryangla,ncb3,     cb3_state,      init_chryangl,  ROT0, "bootleg (G.C.I.)",  "Cherry Angel (encrypted, W-4 hardware)",      MACHINE_NOT_WORKING ) // DYNA CB3  V1.40 string, decrypted but only test screens work
 
-GAME(  1991, eldoradd,  0,        eldoradd, chrygld,  cb3_state,      empty_init,     ROT0, "Dyna",              "El Dorado",                                   MACHINE_NOT_WORKING) // everything
+GAME(  1991, eldoradd,  0,        eldoradd, chrygld,  cb3_state,      empty_init,     ROT0, "Dyna",              "El Dorado (V5.1DR)",                          MACHINE_NOT_WORKING) // everything
+GAME(  1991, eldoraddo, eldoradd, eldoradd, chrygld,  cb3_state,      empty_init,     ROT0, "Dyna",              "El Dorado (V1.1TA)",                          MACHINE_NOT_WORKING) // everything
 
 // looks like a hack of Cherry Bonus 3
 GAME(  1994, chryangl,  ncb3,     chryangl, chryangl,  cmaster_state, init_chryangl,  ROT0, "bootleg (G.C.I.)",  "Cherry Angel (set 1)",                                MACHINE_NOT_WORKING ) // SKY SUPERCB 1.0 string, decrypted but hangs when betting
