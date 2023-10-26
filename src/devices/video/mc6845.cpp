@@ -416,7 +416,7 @@ void mc6845_device::recompute_parameters(bool postload)
 	uint16_t horiz_pix_total = (m_horiz_char_total + 1) * m_hpixels_per_column;
 	uint16_t vert_pix_total = (m_vert_char_total + 1) * video_char_height + m_vert_total_adj;
 
-	// properly handle horizonal display of 0
+	// determine the visible area
 	uint16_t max_visible_x = m_horiz_disp ? m_horiz_disp * m_hpixels_per_column - 1 : 0;
 	uint16_t max_visible_y = m_vert_disp ? m_vert_disp * video_char_height - 1 : 0;
 
@@ -1065,7 +1065,7 @@ void mc6845_device::device_start()
 	m_vsync = m_hsync = 0;
 	m_cur = 0;
 	m_line_counter = 0;
-	m_horiz_disp = m_vert_disp = 0xff;
+	m_horiz_disp = m_vert_disp = 0x7f;
 	m_vert_sync_pos = 0;
 	m_vert_total_adj = 0;
 	m_cursor_start_ras = m_cursor_end_ras = m_cursor_addr = 0;
