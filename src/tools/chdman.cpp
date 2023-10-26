@@ -1660,9 +1660,7 @@ static void do_verify(parameters_map &params)
 		// fix it if requested; this also fixes the overall one so we don't need to do any more
 		if (params.find(OPTION_FIX) != params.end())
 		{
-			std::error_condition err = input_chd.set_raw_sha1(computed_sha1);
-			if (err)
-				report_error(1, "Error updating SHA-1: %s", err.message());
+			input_chd.set_raw_sha1(computed_sha1);
 			printf("SHA-1 updated to correct value in input CHD\n");
 		}
 	}
@@ -1684,9 +1682,7 @@ static void do_verify(parameters_map &params)
 				// fix it if requested
 				if (params.find(OPTION_FIX) != params.end())
 				{
-					std::error_condition err = input_chd.set_raw_sha1(computed_sha1);
-					if (err)
-						report_error(1, "Error updating SHA-1: %s", err.message());
+					input_chd.set_raw_sha1(computed_sha1);
 					printf("SHA-1 updated to correct value in input CHD\n");
 				}
 			}
