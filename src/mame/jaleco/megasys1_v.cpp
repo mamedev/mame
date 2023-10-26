@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Luca Elia
+// copyright-holders:Luca Elia, David Haywood
 /***************************************************************************
 
                             -= Jaleco Mega System 1 =-
@@ -201,8 +201,6 @@ actual code sent to the hardware.
 
 void megasys1_state::video_start()
 {
-	m_spriteram = &m_ram[0x8000/2];
-
 	m_buffer_objectram = std::make_unique<u16[]>(0x2000);
 	m_buffer_spriteram16 = std::make_unique<u16[]>(0x2000);
 	m_buffer2_objectram = std::make_unique<u16[]>(0x2000);
@@ -219,6 +217,7 @@ void megasys1_state::video_start()
 	save_item(NAME(m_screen_flag));
 	save_item(NAME(m_active_layers));
 	save_item(NAME(m_sprite_flag));
+	save_item(NAME(m_sprite_bank)); // only on type C
 }
 
 
@@ -427,7 +426,7 @@ inline void megasys1_state::draw_16x16_priority_sprite(screen_device &screen, bi
 void megasys1_typez_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	int color,code,sx,sy,flipx,flipy,attr,sprite;
-	u16 *spriteram16 = m_spriteram;
+	u16 *spriteram16 = &m_ram[0x8000/2];
 
 	/* MS1-Z just draws Sprite Data, and in reverse order */
 
@@ -871,7 +870,7 @@ void megasys1_state::screen_vblank(int state)
 		memcpy(m_buffer_objectram.get(), m_objectram, 0x2000);
 	//spriteram16
 		memcpy(m_buffer2_spriteram16.get(), m_buffer_spriteram16.get(), 0x2000);
-		memcpy(m_buffer_spriteram16.get(), m_spriteram, 0x2000);
+		memcpy(m_buffer_spriteram16.get(), &m_ram[0x8000/2], 0x2000);
 	}
 
 }

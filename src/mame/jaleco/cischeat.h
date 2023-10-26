@@ -12,6 +12,7 @@
 #include "machine/ticket.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"
+#include "ms1_gatearray.h"
 #include "ms1_tmap.h"
 #include "emupal.h"
 #include "screen.h"
@@ -39,6 +40,7 @@ public:
 		, m_palette(*this, "palette")
 		, m_soundlatch(*this, "soundlatch")
 		, m_soundlatch2(*this, "soundlatch2")
+		, m_gatearray(*this, "gatearray")
 		, m_leds(*this, "led%u", 0U)
 	{}
 
@@ -95,6 +97,9 @@ public:
 	void f1gpstr2(machine_config &config);
 	void f1gpstar(machine_config &config);
 	void bigrun(machine_config &config);
+	void bigrun_d65006(machine_config &config);
+	void cischeat_gs88000(machine_config &config);
+
 	void bigrun_map(address_map &map);
 	void bigrun_map2(address_map &map);
 	void bigrun_map3(address_map &map);
@@ -113,7 +118,11 @@ public:
 	void scudhamm_map(address_map &map);
 
 protected:
-	virtual void machine_start() override { m_leds.resolve(); m_scudhamm_motor_command = 0; }
+	virtual void machine_start() override
+	{
+		m_leds.resolve(); m_scudhamm_motor_command = 0;
+	}
+
 	virtual void video_start() override;
 
 	optional_device_array<megasys1_tilemap_device, 3> m_tmap;
@@ -152,7 +161,7 @@ protected:
 	required_device<palette_device> m_palette;
 	optional_device<generic_latch_16_device> m_soundlatch;
 	optional_device<generic_latch_16_device> m_soundlatch2;
-
+	optional_device<megasys1_gatearray_device> m_gatearray;
 	output_finder<5> m_leds;
 };
 
