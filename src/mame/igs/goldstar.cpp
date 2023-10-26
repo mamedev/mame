@@ -16530,7 +16530,7 @@ ROM_START( eldoraddo ) // String "DYNA ELD3 V1.1TA" on program ROM
 	ROM_LOAD( "pal16l8.e11", 0x200, 0x104, NO_DUMP )
 ROM_END
 
-ROM_START( sunspecke ) // "Suns Pecker" (also known as "Animal House"). Strings "SUNS PECKER V1.0" and "SUNS CO LTD." on program ROM
+ROM_START( sunspckr ) // "Suns Pecker" (also known as "Animal House"). Strings "SUNS PECKER V1.0" and "SUNS CO LTD." on program ROM
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD16_WORD( "1_am27512.l2", 0x00000, 0x10000, CRC(258208d7) SHA1(11a75963c535636ff1320a3d3c3b9867a1f169d4) )
 
@@ -19978,7 +19978,7 @@ GAME(  1994, chryangla, ncb3,     chryangla,ncb3,     cb3_state,      init_chrya
 
 GAME(  1991, eldoradd,  0,        eldoradd, chrygld,  cb3_state,      empty_init,     ROT0, "Dyna",              "El Dorado (V5.1DR)",                          MACHINE_NOT_WORKING) // everything
 GAME(  1991, eldoraddo, eldoradd, eldoradd, chrygld,  cb3_state,      empty_init,     ROT0, "Dyna",              "El Dorado (V1.1TA)",                          MACHINE_NOT_WORKING) // everything
-GAME(  1991, sunspecke, eldoradd, eldoradd, chrygld,  cb3_state,      empty_init,     ROT0, "Suns Co Ltd.",      "Suns Pecker (V1.0)",                          MACHINE_NOT_WORKING) // everything
+GAME(  1991, sunspckr,  eldoradd, eldoradd, chrygld,  cb3_state,      empty_init,     ROT0, "Suns Co Ltd.",      "Suns Pecker (V1.0)",                          MACHINE_NOT_WORKING) // everything
 
 
 // looks like a hack of Cherry Bonus 3
