@@ -21,7 +21,6 @@ megasys1_gatearray_device::megasys1_gatearray_device(
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_cpuregion(*this, finder_base::DUMMY_TAG)
 {
-	m_has_decoded = false;
 }
 
 

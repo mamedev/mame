@@ -35,7 +35,6 @@ protected:
 
 	required_device<cpu_device> m_cpu;
 	required_memory_region m_cpuregion;
-	bool m_has_decoded;
 
 	virtual void rom_decode() = 0;
 };
