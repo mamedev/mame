@@ -13,17 +13,8 @@
 DEFINE_DEVICE_TYPE(AP2010CPU, ap2010cpu_device, "ap2010cpu", "AP2010 CPU")
 
 ap2010cpu_device::ap2010cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: arm7_cpu_device(mconfig, AP2010CPU, tag, owner, clock, 4, ARCHFLAG_T, ENDIANNESS_BIG) { }
-
-void ap2010cpu_device::device_start()
-{
-	arm7_cpu_device::device_start();
-}
-
-void ap2010cpu_device::device_reset()
-{
-	arm7_cpu_device::device_reset();
-}
+	: arm7_cpu_device(mconfig, AP2010CPU, tag, owner, clock, 4, ARCHFLAG_T, ENDIANNESS_BIG)
+{ }
 
 void ap2010cpu_device::add_hotspot(offs_t pc)
 {

@@ -10,12 +10,13 @@
 
 **********************************************************************/
 
-#ifndef MAMESOUND_AP2010PCM_H
-#define MAMESOUND_AP2010PCM_H
+#ifndef MAME_SOUND_AP2010PCM_H
+#define MAME_SOUND_AP2010PCM_H
 
 #pragma once
 
-#include <queue>
+// FIXME: Games check this against 0x1ff, but samples are lost with that limit
+#define FIFO_MAX_SIZE 0x800
 
 class ap2010pcm_device : public device_t, public device_sound_interface
 {
@@ -28,20 +29,35 @@ public:
 protected:
 	// device_t implementation
 	virtual void device_start() override;
-	virtual void device_post_load() override;
 
 	// device_sound_interface implementation
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
+	uint16_t fifo_pop();
+	uint16_t fifo_fast_pop();
+	void fifo_push(uint16_t sample);
+	void fifo_fast_push(uint16_t sample);
+
 	std::unique_ptr<uint32_t[]> m_regs;
 
 	float m_volume;
+
 	uint32_t m_sample_rate;
-	std::queue<int16_t> m_fifo, m_fifo_fast;
-	sound_stream* m_stream;
+
+	uint16_t m_fifo_data[FIFO_MAX_SIZE]{};
+	uint16_t m_fifo_size = 0;
+	uint16_t m_fifo_head = 0;
+	uint16_t m_fifo_tail = 0;
+
+	uint16_t m_fifo_fast_data[FIFO_MAX_SIZE]{};
+	uint16_t m_fifo_fast_size = 0;
+	uint16_t m_fifo_fast_head = 0;
+	uint16_t m_fifo_fast_tail = 0;
+
+	sound_stream *m_stream;
 };
 
 DECLARE_DEVICE_TYPE(AP2010PCM, ap2010pcm_device)
 
-#endif // MAMESOUND_AP2010PCM_H
+#endif // MAME_SOUND_AP2010PCM_H

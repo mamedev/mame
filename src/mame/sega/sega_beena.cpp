@@ -160,6 +160,8 @@ namespace {
 #define ROM_FLASH_BASE 0xa0000000
 #define UNKNOWN_ADDR 0xffffffff
 
+#define MEMCACHE_FIFO_MAX_SIZE 0x100
+
 class sega_9h0_0008_state : public driver_device
 {
 public:
@@ -183,7 +185,6 @@ public:
 		, m_io_sensor_regs(*this, "io_sensor_regs")
 		, m_io_auxiliary_regs(*this, "io_auxiliary_regs")
 		, m_io_cpu_config(*this, "CPU_CONFIG")
-		, m_io_page_config(*this, "PAGE_CONFIG")
 		, m_io_video_config(*this, "VIDEO_CONFIG")
 	{ }
 
@@ -281,7 +282,6 @@ protected:
 	required_shared_ptr<uint32_t> m_io_auxiliary_regs;
 	uint32_t m_pen_previous_input;
 	uint32_t m_pen_target;
-	uint32_t m_pages_previous_input;
 	uint32_t m_effective_page;
 
 	uint16_t m_rtc[0x100/2]{};
@@ -290,11 +290,16 @@ protected:
 	uint32_t m_midi_busy_count;
 
 	required_ioport m_io_cpu_config;
-	required_ioport m_io_page_config;
 	required_ioport m_io_video_config;
 
 private:
+	uint8_t fifo_state_after_pop();
+	uint8_t fifo_events_pop();
+	void fifo_state_after_push(uint8_t state);
+	void fifo_events_push(uint8_t event);
+
 	uint8_t m_memcache[0x800]{};
+
 	enum memcache_seq : uint32_t
 	{
 		BITS_EMPTY = 0,
@@ -311,6 +316,7 @@ private:
 		BITS_ERR   = 0xffffffff,
 	};
 	uint32_t m_memcache_seq;
+
 	enum memcache_state : uint8_t
 	{
 		IDLE = 0,
@@ -325,8 +331,16 @@ private:
 	uint8_t m_memcache_data;
 	uint8_t m_memcache_i;
 	uint8_t m_memcache_state;
-	std::queue<uint8_t> m_memcache_state_after;
-	std::queue<uint8_t> m_memcache_events;
+
+	uint8_t m_fifo_state_after_data[MEMCACHE_FIFO_MAX_SIZE]{};
+	uint16_t m_fifo_state_after_size = 0;
+	uint16_t m_fifo_state_after_head = 0;
+	uint16_t m_fifo_state_after_tail = 0;
+
+	uint8_t m_fifo_events_data[MEMCACHE_FIFO_MAX_SIZE]{};
+	uint16_t m_fifo_events_size = 0;
+	uint16_t m_fifo_events_head = 0;
+	uint16_t m_fifo_events_tail = 0;
 };
 
 /*
@@ -371,14 +385,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(sega_9h0_0008_state::scanline)
 	request_fiq();
 }
 
-static const uint32_t irq_wait_signature[] = {
-   0xe3a03001,
-   0xe5c03000,
-   0xe5d03000,
-   0xe3530000,
-   0x1afffffc
-};
-
 void sega_9h0_0008_state::irq_wait_speedup()
 {
 	if ((m_io_cpu_config->read() & 0x10) == 0x10) {
@@ -415,15 +421,21 @@ void sega_9h0_0008_state::irq_wait_speedup()
 	*/
 	if (m_irq_wait_start_addr == UNKNOWN_ADDR) {
 		if (m_maincpu->pc() > 0xc00cc000 && m_maincpu->pc() < 0xc00fff80) {
+			const uint32_t IRQ_WAIT_SIGNATURE[] = {
+				0xe3a03001,
+				0xe5c03000,
+				0xe5d03000,
+				0xe3530000,
+				0x1afffffc
+			};
 			int8_t addr_delta = 8;
-			memory_share *shared = machine().root_device().memshare("workram");
-			uint32_t *shared32 = reinterpret_cast<uint32_t *>(shared->ptr());
+			uint32_t *shared32 = reinterpret_cast<uint32_t *>(m_workram.target());
 			uint32_t candidate_start_addr = m_maincpu->pc() - addr_delta;
 			uint32_t candidate_offset = (candidate_start_addr - 0xc00cc000) / 4;
 			for (size_t i = 0; i < addr_delta; i++) {
 				bool matched = true;
 				for (size_t sig_i = 0; sig_i < 5; sig_i++) {
-					if (irq_wait_signature[sig_i] != shared32[candidate_offset + i + sig_i]) {
+					if (IRQ_WAIT_SIGNATURE[sig_i] != shared32[candidate_offset + i + sig_i]) {
 						matched = false;
 						break;
 					}
@@ -460,7 +472,7 @@ void sega_9h0_0008_state::beena_arm7_map(address_map &map)
 
 	// FIXME: Need to confirm upper bounds / mirrored ranges on hardware, some return inconsistent reads
 	// Video (registers, palette, sprite data...)
-	map(0x40000000, 0x400000ff).rw(FUNC(sega_9h0_0008_state::video_reg_r), FUNC(sega_9h0_0008_state::video_reg_w)).mirror(0xff00);
+	map(0x40000000, 0x400000ff).mirror(0xff00).rw(FUNC(sega_9h0_0008_state::video_reg_r), FUNC(sega_9h0_0008_state::video_reg_w));
 	map(0x40010000, 0x400103ff).ram().share("tilemap_sprites");
 	map(0x40010400, 0x4001ffff).ram();
 	map(0x40020000, 0x400201ff).w(FUNC(sega_9h0_0008_state::pal_w)).share("paletteram");
@@ -469,8 +481,8 @@ void sega_9h0_0008_state::beena_arm7_map(address_map &map)
 	map(0x40030300, 0x4003ffff).ram();
 
 	// I/O (registers, pages, pads, pen...)
-	map(0x50000000, 0x5000000f).ram().mirror(0xfff0); // Unknown
-	map(0x50010000, 0x5001003f).lrw32(
+	map(0x50000000, 0x5000000f).mirror(0xfff0).ram(); // Unknown
+	map(0x50010000, 0x5001003f).mirror(0xffc0).lrw32(
 		NAME([this](offs_t offset) {
 			LOG("audio_pcm_reg_r @ %08x: addr=%08x data=%08x\n", m_maincpu->pc(), offset * 4, m_pcm->reg_r(offset));
 
@@ -488,9 +500,9 @@ void sega_9h0_0008_state::beena_arm7_map(address_map &map)
 			}
 
 			m_pcm->reg_w(offset, data, mem_mask);
-		})).mirror(0xffc0);
-	map(0x50020000, 0x5002007f).r(FUNC(sega_9h0_0008_state::io_sensors_r)).share("io_sensor_regs").mirror(0xff80);
-	map(0x50030000, 0x500300ff).lrw32(
+		}));
+	map(0x50020000, 0x5002007f).mirror(0xff80).r(FUNC(sega_9h0_0008_state::io_sensors_r)).share("io_sensor_regs");
+	map(0x50030000, 0x500300ff).mirror(0xff00).lrw32(
 		NAME([this](offs_t offset) {
 			LOG("m_io_auxiliary_regs_r @ %08x: addr=%08x\n", m_maincpu->pc(), offset * 4);
 
@@ -504,24 +516,24 @@ void sega_9h0_0008_state::beena_arm7_map(address_map &map)
 
 			COMBINE_DATA(&m_io_auxiliary_regs[offset]);
 			if (offset == 0xc0/4) {
-				m_memcache_events.push(data);
+				fifo_events_push(data);
 			}
-		})).share("io_auxiliary_regs").mirror(0xff00);
+		})).share("io_auxiliary_regs");
 
 	// Realtime clock
-	map(0x60000000, 0x600000ff).rw(FUNC(sega_9h0_0008_state::rtc_r), FUNC(sega_9h0_0008_state::rtc_w)).mirror(0xff00);
+	map(0x60000000, 0x600000ff).mirror(0xff00).rw(FUNC(sega_9h0_0008_state::rtc_r), FUNC(sega_9h0_0008_state::rtc_w));
 	map(0x60010000, 0x6003ffff).ram(); // Unknown
 
 	// MIDI
-	map(0x70000000, 0x7000001f).rw(FUNC(sega_9h0_0008_state::midi_reg_r), FUNC(sega_9h0_0008_state::midi_reg_w)).mirror(0xffe0);
+	map(0x70000000, 0x7000001f).mirror(0xffe0).rw(FUNC(sega_9h0_0008_state::midi_reg_r), FUNC(sega_9h0_0008_state::midi_reg_w));
 	map(0x70010000, 0x7003ffff).ram(); // Unknown
 
 	// Game Mask ROM
-	map(ROM_MASK_BASE, ROM_MASK_BASE + 0x7fffff).lr8(NAME([]() { return 0xff; })).mirror(0x800000);
+	map(ROM_MASK_BASE, ROM_MASK_BASE + 0x7fffff).mirror(0x800000).lr8(NAME([]() { return 0xff; }));
 
 	// Game NOR Flash ROM
 	// Some games have an unreferenced handler that jumps to 0xa0ffc000;
-	map(ROM_FLASH_BASE, ROM_FLASH_BASE + 0x7fffff).lr8(NAME([]() { return 0xff; })).mirror(0x800000);
+	map(ROM_FLASH_BASE, ROM_FLASH_BASE + 0x7fffff).mirror(0x800000).lr8(NAME([]() { return 0xff; }));
 
 	// Direct bitmap with 2-byte BGR555 colors per pixel, same as tile palettes. Scaling also applied.
 	// The bitmap size is checked by games to be `w * h <= 0x63000`, so we allocate `0x63000 * 2 = 0xc6000`.
@@ -551,7 +563,9 @@ void sega_9h0_0008_state::update_sensors(offs_t offset)
 
 uint32_t sega_9h0_0008_state::io_sensors_r(offs_t offset)
 {
-	update_sensors(offset);
+	if (!machine().side_effects_disabled()) {
+		update_sensors(offset);
+	}
 
 	return m_io_sensor_regs[offset];
 }
@@ -593,7 +607,7 @@ void sega_9h0_0008_state::video_reg_w(offs_t offset, uint32_t data, uint32_t mem
 
 uint32_t sega_9h0_0008_state::midi_reg_r(offs_t offset)
 {
-	if (offset == 0 && m_midi_busy_count > 0) {
+	if (!machine().side_effects_disabled() && offset == 0 && m_midi_busy_count > 0) {
 		m_midi_busy_count--;
 		return 0x2;
 	}
@@ -640,6 +654,16 @@ void sega_9h0_0008_state::machine_start()
 	save_item(NAME(m_requested_fiq));
 	save_item(NAME(m_irq_wait_start_addr));
 
+	save_item(NAME(m_fifo_state_after_data));
+	save_item(NAME(m_fifo_state_after_size));
+	save_item(NAME(m_fifo_state_after_head));
+	save_item(NAME(m_fifo_state_after_tail));
+
+	save_item(NAME(m_fifo_events_data));
+	save_item(NAME(m_fifo_events_size));
+	save_item(NAME(m_fifo_events_head));
+	save_item(NAME(m_fifo_events_tail));
+
 	m_video_regs = make_unique_clear<uint32_t[]>(0x100/4);
 	save_pointer(NAME(m_video_regs), 0x100/4);
 	save_item(NAME(m_scale));
@@ -650,7 +674,6 @@ void sega_9h0_0008_state::machine_start()
 
 	save_item(NAME(m_pen_previous_input));
 	save_item(NAME(m_pen_target));
-	save_item(NAME(m_pages_previous_input));
 	save_item(NAME(m_effective_page));
 
 	m_cache_layer.allocate(1024, 512);
@@ -698,7 +721,6 @@ void sega_9h0_0008_state::machine_reset()
 	m_io_sensor_regs[0x30/4] = 0x00ffffff; // Pages 5 to 6 are closed.
 	m_pen_previous_input = 0;
 	m_pen_target = 0;
-	m_pages_previous_input = 0;
 	m_effective_page = 0;
 
 	m_memcache_addr = 0;
@@ -706,7 +728,10 @@ void sega_9h0_0008_state::machine_reset()
 	m_memcache_i = 0;
 	m_memcache_seq = BITS_EMPTY;
 	m_memcache_state = IDLE;
-	m_memcache_state_after = {};
+
+	m_fifo_state_after_size = 0;
+	m_fifo_state_after_head = 0;
+	m_fifo_state_after_tail = 0;
 
 	update_rtc();
 }
@@ -717,14 +742,53 @@ void sega_9h0_0008_state::device_post_load()
 	m_gfxdecode->gfx(1)->mark_all_dirty();
 }
 
+uint8_t sega_9h0_0008_state::fifo_state_after_pop()
+{
+	uint8_t state = m_fifo_state_after_data[m_fifo_state_after_head];
+	m_fifo_state_after_head = (m_fifo_state_after_head + 1) & (MEMCACHE_FIFO_MAX_SIZE - 1);
+	m_fifo_state_after_size--;
+	return state;
+}
+
+uint8_t sega_9h0_0008_state::fifo_events_pop()
+{
+	uint8_t event = m_fifo_events_data[m_fifo_events_head];
+	m_fifo_events_head = (m_fifo_events_head + 1) & (MEMCACHE_FIFO_MAX_SIZE - 1);
+	m_fifo_events_size--;
+	return event;
+}
+
+void sega_9h0_0008_state::fifo_state_after_push(uint8_t state)
+{
+	// trash old data
+	if (m_fifo_state_after_size > MEMCACHE_FIFO_MAX_SIZE - 1) {
+		fifo_state_after_pop();
+	}
+
+	m_fifo_state_after_data[m_fifo_state_after_tail] = state;
+	m_fifo_state_after_tail = (m_fifo_state_after_tail + 1) & (MEMCACHE_FIFO_MAX_SIZE - 1);
+	m_fifo_state_after_size++;
+}
+
+void sega_9h0_0008_state::fifo_events_push(uint8_t event)
+{
+	// trash old data
+	if (m_fifo_events_size > MEMCACHE_FIFO_MAX_SIZE - 1) {
+		fifo_events_pop();
+	}
+
+	m_fifo_events_data[m_fifo_events_tail] = event;
+	m_fifo_events_tail = (m_fifo_events_tail + 1) & (MEMCACHE_FIFO_MAX_SIZE - 1);
+	m_fifo_events_size++;
+}
+
 void sega_9h0_0008_state::memcache_advance(uint32_t &status)
 {
-	uint8_t event = m_memcache_events.front();
-	m_memcache_events.pop();
+	uint8_t event = fifo_events_pop();
 
 	status = event == 6 ? 1 : 0;
 
-	switch(m_memcache_seq) {
+	switch (m_memcache_seq) {
 		case BITS_0:
 			m_memcache_seq = event == 1 ? BITS_0_1 : BITS_ERR;
 			break;
@@ -753,7 +817,7 @@ void sega_9h0_0008_state::memcache_parse_data_bit(uint32_t &status)
 		// After a command has been ack'd, we might reset instead of parse the command's data bits.
 		// Due to both sequences starting with the same prefix, we have to bailout on the shorter
 		// sequence if the lookahead matches the longer sequence.
-		if (!m_memcache_events.empty() && m_memcache_events.front() == 7) {
+		if (m_fifo_events_size && m_fifo_events_data[m_fifo_events_head] == 7) {
 			LOG("memcache READ_COMMAND 0 1 skipped\n");
 			return;
 		}
@@ -768,7 +832,9 @@ void sega_9h0_0008_state::memcache_parse_data_bit(uint32_t &status)
 		status = 1;
 		m_memcache_seq = BITS_EMPTY;
 		m_memcache_state = IDLE;
-		m_memcache_state_after = {};
+		m_fifo_state_after_size = 0;
+		m_fifo_state_after_head = 0;
+		m_fifo_state_after_tail = 0;
 		LOG("memcache READ_COMMAND 0 1 7 -> IDLE\n");
 	}
 }
@@ -811,7 +877,12 @@ uint32_t sega_9h0_0008_state::io_memcache_r()
 	    session. Always ends with the same sequence (BITS_0_1_7).
 	*/
 	uint32_t status = 0;
-	while (!m_memcache_events.empty()) {
+
+	if (machine().side_effects_disabled()) {
+		return status;
+	}
+
+	while (m_fifo_events_size) {
 		memcache_advance(status);
 
 		bool is_memcache_disabled = (m_io_cpu_config->read() & 0x40) == 0x40;
@@ -819,7 +890,7 @@ uint32_t sega_9h0_0008_state::io_memcache_r()
 			continue;
 		}
 
-		switch(m_memcache_state) {
+		switch (m_memcache_state) {
 			case IDLE:
 				if (m_memcache_seq == BITS_6) {
 					m_memcache_seq = BITS_EMPTY;
@@ -839,16 +910,18 @@ uint32_t sega_9h0_0008_state::io_memcache_r()
 					m_memcache_addr = (((m_memcache_data & 0xe) >> 1) << 8) | (m_memcache_addr & 0xff);
 					LOG("memcache READ_COMMAND addr & 0xf00 = %08x\n", m_memcache_addr);
 					if ((m_memcache_data & 0xa1) == 0xa0) {
-						m_memcache_state_after.push(READ_ADDRESS_BYTE);
-						m_memcache_state_after.push(READ_ACK);
-						m_memcache_state_after.push(READ_RAM_BYTE);
+						fifo_state_after_push(READ_ADDRESS_BYTE);
+						fifo_state_after_push(READ_ACK);
+						fifo_state_after_push(READ_RAM_BYTE);
 						LOG("memcache READ_COMMAND 0xa0 -> READ_ACK\n");
 					} else if ((m_memcache_data & 0xa1) == 0xa1) {
-						m_memcache_state_after.push(WRITE_RAM_BYTE);
+						fifo_state_after_push(WRITE_RAM_BYTE);
 						LOG("memcache READ_COMMAND 0xa1 -> READ_ACK\n");
 					} else {
 						m_memcache_state = CONSUME_UNTIL_IDLE;
-						m_memcache_state_after = {};
+						m_fifo_state_after_size = 0;
+						m_fifo_state_after_head = 0;
+						m_fifo_state_after_tail = 0;
 						LOG("memcache READ_COMMAND -> CONSUME_UNTIL_IDLE (unknown command?)\n");
 					}
 					m_memcache_data = 0;
@@ -858,8 +931,7 @@ uint32_t sega_9h0_0008_state::io_memcache_r()
 			case READ_ACK:
 				if (m_memcache_seq == BITS_6_7) {
 					m_memcache_seq = BITS_EMPTY;
-					m_memcache_state = m_memcache_state_after.front();
-					m_memcache_state_after.pop();
+					m_memcache_state = fifo_state_after_pop();
 					LOG("memcache READ_ACK\n");
 				}
 				break;
@@ -869,8 +941,7 @@ uint32_t sega_9h0_0008_state::io_memcache_r()
 					m_memcache_addr |= m_memcache_data;
 					m_memcache_data = 0;
 					m_memcache_i = 0;
-					m_memcache_state = m_memcache_state_after.front();
-					m_memcache_state_after.pop();
+					m_memcache_state = fifo_state_after_pop();
 					LOG("memcache READ_ADDRESS_BYTE addr = %08x\n", m_memcache_addr);
 				}
 				break;
@@ -893,8 +964,10 @@ uint32_t sega_9h0_0008_state::io_memcache_r()
 					// Later games (e.g. "Pocket Monsters Best Wishes") optimize reading the next RAM bytes
 					// and just store one after the other, skipping READ_COMMAND + READ_ADDRESS_BYTE sequences.
 					m_memcache_state = READ_ACK;
-					m_memcache_state_after = {};
-					m_memcache_state_after.push(READ_RAM_BYTE);
+					m_fifo_state_after_size = 0;
+					m_fifo_state_after_head = 0;
+					m_fifo_state_after_tail = 0;
+					fifo_state_after_push(READ_RAM_BYTE);
 					m_memcache_addr++;
 				}
 				break;
@@ -907,7 +980,7 @@ uint32_t sega_9h0_0008_state::io_memcache_r()
 					}
 				}
 				if (m_memcache_seq == BITS_0_1) {
-					if (!m_memcache_events.empty() && m_memcache_events.front() == 7) {
+					if (m_fifo_events_size && m_fifo_events_data[m_fifo_events_head] == 7) {
 						LOG("memcache WRITE_RAM_BYTE 0 1 skipped\n");
 						continue;
 					}
@@ -931,7 +1004,9 @@ uint32_t sega_9h0_0008_state::io_memcache_r()
 					m_memcache_i = 0;
 					m_memcache_seq = BITS_EMPTY;
 					m_memcache_state = IDLE;
-					m_memcache_state_after = {};
+					m_fifo_state_after_size = 0;
+					m_fifo_state_after_head = 0;
+					m_fifo_state_after_tail = 0;
 					LOG("memcache WRITE_RAM_BYTE 0 1 7 -> IDLE\n");
 				}
 				break;
@@ -955,7 +1030,9 @@ uint32_t sega_9h0_0008_state::io_memcache_r()
 			m_memcache_i = 0;
 			m_memcache_seq = BITS_EMPTY;
 			m_memcache_state = CONSUME_UNTIL_IDLE;
-			m_memcache_state_after = {};
+			m_fifo_state_after_size = 0;
+			m_fifo_state_after_head = 0;
+			m_fifo_state_after_tail = 0;
 			LOG("memcache BITS_ERR -> CONSUME_UNTIL_IDLE\n");
 		}
 	}
@@ -1124,8 +1201,7 @@ inline void sega_9h0_0008_state::drawgfxzoom_with_pixel_op(gfx_element *gfx, Bit
 
 		// apply left clip
 		int32_t srcx = 0;
-		if (destx < cliprect.left())
-		{
+		if (destx < cliprect.left()) {
 			srcx = (cliprect.left() - destx) * dx;
 			destx = cliprect.left();
 		}
@@ -1141,8 +1217,7 @@ inline void sega_9h0_0008_state::drawgfxzoom_with_pixel_op(gfx_element *gfx, Bit
 
 		// apply top clip
 		int32_t srcy = 0;
-		if (desty < cliprect.top())
-		{
+		if (desty < cliprect.top()) {
 			srcy = (cliprect.top() - desty) * dy;
 			desty = cliprect.top();
 		}
@@ -1152,15 +1227,13 @@ inline void sega_9h0_0008_state::drawgfxzoom_with_pixel_op(gfx_element *gfx, Bit
 			destendy = cliprect.bottom();
 
 		// apply X flipping
-		if (flipx)
-		{
+		if (flipx) {
 			srcx = (dstwidth - 1) * dx - srcx;
 			dx = -dx;
 		}
 
 		// apply Y flipping
-		if (flipy)
-		{
+		if (flipy) {
 			srcy = (dstheight - 1) * dy - srcy;
 			dy = -dy;
 		}
@@ -1173,16 +1246,14 @@ inline void sega_9h0_0008_state::drawgfxzoom_with_pixel_op(gfx_element *gfx, Bit
 		uint32_t leftovers = (destendx + 1 - destx) - 4 * numblocks;
 
 		// iterate over pixels in Y
-		for (int32_t cury = desty; cury <= destendy; cury++)
-		{
+		for (int32_t cury = desty; cury <= destendy; cury++) {
 			auto *destptr = &dest.pix(cury, destx);
 			const uint8_t *srcptr = srcdata + (srcy >> 16) * gfx->rowbytes();
 			int32_t cursrcx = srcx;
 			srcy += dy;
 
 			// iterate over unrolled blocks of 4
-			for (int32_t curx = 0; curx < numblocks; curx++)
-			{
+			for (int32_t curx = 0; curx < numblocks; curx++) {
 				pixel_op(cury, m_cache_palette, destptr[0], srcptr[cursrcx >> 16]);
 				cursrcx += dx;
 				pixel_op(cury, m_cache_palette, destptr[1], srcptr[cursrcx >> 16]);
@@ -1196,8 +1267,7 @@ inline void sega_9h0_0008_state::drawgfxzoom_with_pixel_op(gfx_element *gfx, Bit
 			}
 
 			// iterate over leftover pixels
-			for (int32_t curx = 0; curx < leftovers; curx++)
-			{
+			for (int32_t curx = 0; curx < leftovers; curx++) {
 				pixel_op(cury, m_cache_palette, destptr[0], srcptr[cursrcx >> 16]);
 				cursrcx += dx;
 				destptr++;
@@ -1637,6 +1707,7 @@ class sega_beena_state : public sega_9h0_0008_state
 public:
 	sega_beena_state(const machine_config &mconfig, device_type type, const char *tag)
 		: sega_9h0_0008_state(mconfig, type, tag)
+		, m_io_page_config(*this, "PAGE_CONFIG")
 		, m_io_page(*this, "PAGE")
 		, m_io_pad_left(*this, "PAD_LEFT")
 		, m_io_pad_right(*this, "PAD_RIGHT")
@@ -1651,14 +1722,12 @@ public:
 	virtual DECLARE_CROSSHAIR_MAPPER_MEMBER(pen_y_mapper);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	virtual void install_game_rom() override;
 	virtual void update_crosshair(screen_device &screen) override;
 	virtual void update_sensors(offs_t offset) override;
 
+	required_ioport m_io_page_config;
 	required_ioport m_io_page;
 	required_ioport m_io_pad_left;
 	required_ioport m_io_pad_right;
@@ -1668,19 +1737,9 @@ private:
 	required_ioport m_io_pen_y;
 };
 
-void sega_beena_state::machine_start()
-{
-	sega_9h0_0008_state::machine_start();
-}
-
-void sega_beena_state::machine_reset()
-{
-	sega_9h0_0008_state::machine_reset();
-}
-
 void sega_beena_state::sega_beena(machine_config &config)
 {
-	sega_9h0_0008_state::sega_9h0_0008(config);
+	sega_9h0_0008(config);
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "sega_beena_cart");
 	m_cart->set_endian(ENDIANNESS_BIG);
@@ -1817,16 +1876,10 @@ void sega_beena_state::update_sensors(offs_t offset)
 			if (is_test_mode) {
 				m_io_sensor_regs[offset] = 0xff00ff00;
 				m_effective_page = 6;
-			} else if ((m_pages_previous_input ^ io_page) != 0) {
-				m_pages_previous_input = io_page;
-
-				if (io_page == 1 && m_effective_page < 6) {
-					m_effective_page++;
-				} else if (io_page == 2 && m_effective_page > 0) {
-					m_effective_page--;
-				}
-
+			} else if ((m_effective_page ^ io_page) != 0) {
+				m_effective_page = io_page;
 				m_io_sensor_regs[offset] = (0xffffffffULL >> (m_effective_page * 8));
+				LOG("Selected page: %d\n", m_effective_page);
 			}
 
 			break;
@@ -1901,9 +1954,7 @@ public:
 		: sega_9h0_0008_state(mconfig, type, tag)
 		, m_io_buttons(*this, "BUTTONS")
 		, m_io_cards(*this, "CARDS")
-		{ }
-
-	void tvochken(machine_config &config);
+	{ }
 
 	virtual uint32_t io_expansion_r() override;
 
@@ -1957,29 +2008,6 @@ void tvochken_state::machine_reset()
 	m_card_status = 0;
 }
 
-void tvochken_state::tvochken(machine_config &config)
-{
-	sega_9h0_0008_state::sega_9h0_0008(config);
-}
-
-/**
- * Each scanned barcode is compared against these values taken from
- * an in-memory table at 0xc00d0f9c. Valid barcodes always have the
- * last bit set.
- */
-static const uint16_t card_barcodes[] = {
-	0x900a, 0xa05a, 0xb0aa, 0x90ca, 0x910a,
-	0x914a, 0x918a, 0x91ca, 0x920a, 0xa25a,
-	0x928a, 0x92ca, 0xa312, 0x934a, 0x938a,
-	0x93ca, 0xa41a, 0x944a, 0x948a, 0xb4da,
-	0xb512, 0xa55a, 0x958a, 0x95ca, 0x960a,
-	0x964a, 0xb69a, 0x96ca, 0x970a, 0x974a,
-	0x978a, 0x97ca, 0x980a, 0x984a, 0xa892,
-	0xa8da, 0xa91a, 0xa952, 0x998a, 0xb9da,
-	0xaa1a, 0x9a4a, 0x9a8a, 0x9aca, 0xab12,
-	0xab52, 0xbba2, 0xabd2, 0x9c0a, 0x9c4a
-};
-
 /**
  * Combines all inputs:
  * - Pressed buttons
@@ -1998,33 +2026,41 @@ static const uint16_t card_barcodes[] = {
  */
 uint32_t tvochken_state::io_expansion_r()
 {
-	if ((m_io_auxiliary_regs[0x8/4] & 0xff) != 0) {
+	if (machine().side_effects_disabled() || (m_io_auxiliary_regs[0x8/4] & 0xff) != 0) {
 		return 0x98 | m_io_buttons->read();
 	}
+
+	/**
+	 * Each scanned barcode is compared against these values taken from
+	 * an in-memory table at 0xc00d0f9c. Valid barcodes always have the
+	 * last bit set.
+	 */
+	const uint16_t CARD_BARCODES[] = {
+		0x900a, 0xa05a, 0xb0aa, 0x90ca, 0x910a,
+		0x914a, 0x918a, 0x91ca, 0x920a, 0xa25a,
+		0x928a, 0x92ca, 0xa312, 0x934a, 0x938a,
+		0x93ca, 0xa41a, 0x944a, 0x948a, 0xb4da,
+		0xb512, 0xa55a, 0x958a, 0x95ca, 0x960a,
+		0x964a, 0xb69a, 0x96ca, 0x970a, 0x974a,
+		0x978a, 0x97ca, 0x980a, 0x984a, 0xa892,
+		0xa8da, 0xa91a, 0xa952, 0x998a, 0xb9da,
+		0xaa1a, 0x9a4a, 0x9a8a, 0x9aca, 0xab12,
+		0xab52, 0xbba2, 0xabd2, 0x9c0a, 0x9c4a
+	};
 
 	const uint8_t data = m_io_cards->read();
 	if (m_card_previous_input != data) {
 		m_card_previous_input = data;
-		if (data == 0x1 || data == 0x2) {
-			if (data == 0x2) {
-				if (m_card_i < 49) {
-					m_card_i++;
-				} else {
-					m_card_i = 0;
-				}
-			} else if (data == 0x1) {
-				if (m_card_i > 0) {
-					m_card_i--;
-				} else {
-					m_card_i = 49;
-				}
-			}
+		if ((data & 0x80) == 0) {
+			m_card_i = data;
 			LOG("selected card: %d\n", m_card_i + 1);
-		} else if (m_card_state == IDLE && data == 0x4) {
-			m_card_data = card_barcodes[m_card_i];
-			m_card_hold_i = 10;
-			m_card_state = START_WRITE_DATA;
-			LOG("scanning card: %d -> %04x\n", m_card_i + 1, m_card_data);
+		} else {
+			if (m_card_state == IDLE) {
+				m_card_data = CARD_BARCODES[m_card_i];
+				m_card_hold_i = 10;
+				m_card_state = START_WRITE_DATA;
+				LOG("scanning card: %d -> %04x\n", m_card_i + 1, m_card_data);
+			}
 		}
 	}
 
@@ -2075,11 +2111,6 @@ static INPUT_PORTS_START( sega_9h0_0008 )
 	PORT_CONFSETTING( 0x00, DEF_STR( On ) )
 	PORT_CONFSETTING( 0x80, DEF_STR( Off ) )
 
-	PORT_START("PAGE_CONFIG")
-	PORT_CONFNAME( 0x80, 0x80, "Test Mode Pages" )
-	PORT_CONFSETTING( 0x00, DEF_STR( On ) )
-	PORT_CONFSETTING( 0x80, DEF_STR( Off ) )
-
 	PORT_START("CPU_CONFIG")
 	PORT_CONFNAME( 0x0f, 0x01, "IRQ Frequency" )
 	PORT_CONFSETTING( 0x01, "1 (Once every VBLANK)" )
@@ -2097,6 +2128,11 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( sega_beena )
 	PORT_INCLUDE( sega_9h0_0008 )
+
+	PORT_START("PAGE_CONFIG")
+	PORT_CONFNAME( 0x80, 0x80, "Test Mode Pages" )
+	PORT_CONFSETTING( 0x00, DEF_STR( On ) )
+	PORT_CONFSETTING( 0x80, DEF_STR( Off ) )
 
 	PORT_START("PAD_LEFT")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_8WAY PORT_PLAYER(1)
@@ -2121,8 +2157,7 @@ static INPUT_PORTS_START( sega_beena )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("Right Pen Target")
 
 	PORT_START("PAGE")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1) PORT_NAME("Decrement Page")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(1) PORT_NAME("Increment Page")
+	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(7) PORT_WRAPS PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CODE(JOYCODE_X) PORT_CODE_DEC(KEYCODE_HOME) PORT_CODE_INC(KEYCODE_END) PORT_FULL_TURN_COUNT(7) PORT_NAME("Selected Page")
 
 	PORT_START("PENX")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_MINMAX(0, 255) PORT_PLAYER(1) PORT_NAME("Pen X")
@@ -2140,9 +2175,9 @@ static INPUT_PORTS_START( tvochken )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("C")
 
 	PORT_START("CARDS")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("Previous Card")
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("Next Card")
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("Scan Card")
+	PORT_BIT( 0x7f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(50) PORT_WRAPS PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CODE(JOYCODE_X) PORT_CODE_DEC(KEYCODE_HOME) PORT_CODE_INC(KEYCODE_END) PORT_FULL_TURN_COUNT(50) PORT_NAME("Selected Card")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("Scan Card")
+
 INPUT_PORTS_END
 
 
@@ -2170,6 +2205,6 @@ ROM_END
 
 } // anonymous namespace
 
-//    year, name,     parent, compat, machine,    input,      class,            init,       company, fullname,              flags
-CONS( 2005, beena,    0,      0,      sega_beena, sega_beena, sega_beena_state, empty_init, "Sega",  "Advanced Pico BEENA", MACHINE_REQUIRES_ARTWORK|MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_TIMING|MACHINE_IMPERFECT_SOUND )
-CONS( 2005, tvochken, 0,      0,      tvochken,   tvochken,   tvochken_state,   empty_init, "Sega",  "TV Ocha-Ken",         MACHINE_REQUIRES_ARTWORK|MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_TIMING|MACHINE_IMPERFECT_SOUND )
+//    year, name,     parent, compat, machine,       input,      class,            init,       company, fullname,              flags
+CONS( 2005, beena,    0,      0,      sega_beena,    sega_beena, sega_beena_state, empty_init, "Sega",  "Advanced Pico BEENA", MACHINE_REQUIRES_ARTWORK|MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_TIMING|MACHINE_IMPERFECT_SOUND )
+CONS( 2005, tvochken, 0,      0,      sega_9h0_0008, tvochken,   tvochken_state,   empty_init, "Sega",  "TV Ocha-Ken",         MACHINE_REQUIRES_ARTWORK|MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_TIMING|MACHINE_IMPERFECT_SOUND )
