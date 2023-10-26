@@ -26,7 +26,7 @@ protected:
 	void install_overlay();
 	u16 gatearray_r(offs_t offset, u16 mem_mask = ~0);
 	void gatearray_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	bool hs_seq(u16 g1, u16 g2, u16 g3, u16 g4);
+	bool hs_seq() const;
 
 	virtual void rom_decode() = 0;
 
