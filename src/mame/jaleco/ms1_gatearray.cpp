@@ -19,6 +19,7 @@ megasys1_gatearray_device::megasys1_gatearray_device(
 		u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_cpu(*this, finder_base::DUMMY_TAG)
+	, m_cpuregion(*this, finder_base::DUMMY_TAG)
 {
 	m_has_decoded = false;
 }
@@ -28,27 +29,20 @@ void megasys1_gatearray_device::device_start()
 {
 	save_item(NAME(m_gatearray_hs));
 	save_item(NAME(m_gatearray_hs_ram));
-
+	rom_decode();
 	install_gatearray_overlay();
 }
 
 void megasys1_gatearray_device::device_reset()
 {
-	if (!m_has_decoded)
-	{
-		rom_decode();
-		m_has_decoded = true;
-		m_cpu->reset();
-	}
-
 	m_gatearray_hs = 0;
 }
 
 
 void megasys1_gatearray_d65006_device::rom_decode()
 {
-	u16 *RAM = (u16 *)m_rom;
-	int size = m_romsize;
+	u16 *RAM = (u16 *)m_cpuregion->base();
+	int size = m_cpuregion->bytes();
 	if (size > 0x40000) size = 0x40000;
 
 	for (int i = 0 ; i < size/2 ; i++)
@@ -73,8 +67,8 @@ void megasys1_gatearray_d65006_device::rom_decode()
 
 void megasys1_gatearray_gs88000_device::rom_decode()
 {
-	u16 *RAM = (u16 *)m_rom;
-	int size = m_romsize;
+	u16 *RAM = (u16 *)m_cpuregion->base();
+	int size = m_cpuregion->bytes();
 	if (size > 0x40000) size = 0x40000;
 
 	for (int i = 0 ; i < size/2 ; i++)
@@ -98,8 +92,8 @@ void megasys1_gatearray_gs88000_device::rom_decode()
 
 void megasys1_gatearray_unkarray_device::rom_decode()
 {
-	u16 *RAM = (u16 *)m_rom;
-	int size = m_romsize;
+	u16 *RAM = (u16 *)m_cpuregion->base();
+	int size = m_cpuregion->bytes();
 	if (size > 0x40000) size = 0x40000;
 
 	for (int i = 0 ; i < size/2 ; i++)
@@ -131,15 +125,17 @@ void megasys1_gatearray_unkarray_device::rom_decode()
     Note: stdragona forgets to turn off the overlay before the ROM check in service mode (hence it reports an error).
 */
 
-#define GATEARRAY_HS_SEQ(_1_,_2_,_3_,_4_) \
-	(m_gatearray_hs_ram[0/2] == _1_ && \
-		m_gatearray_hs_ram[2/2] == _2_ && \
-		m_gatearray_hs_ram[4/2] == _3_ && \
-		m_gatearray_hs_ram[6/2] == _4_)
+
+
+bool megasys1_gatearray_device::gatearray_hs_seq(u16 g1,u16 g2,u16 g3,u16 g4)
+{
+	return (m_gatearray_hs_ram[0/2] == g1 && m_gatearray_hs_ram[2/2] == g2 && m_gatearray_hs_ram[4/2] == g3 && m_gatearray_hs_ram[6/2] == g4);
+}
+
 
 u16 megasys1_gatearray_device::gatearray_r(offs_t offset, u16 mem_mask)
 {
-	u16 *m_rom_maincpu = (u16 *)m_rom;
+	u16 *rom_maincpu = (u16 *)m_cpuregion->base();
 	if(m_gatearray_hs && ((m_gatearray_hs_ram[8/2] << 6) & 0x3ffc0) == ((offset*2) & 0x3ffc0))
 	{
 		LOG("GATEARRAY HS R (%04x) <- [%02x]\n",mem_mask,offset*2);
@@ -149,7 +145,7 @@ u16 megasys1_gatearray_device::gatearray_r(offs_t offset, u16 mem_mask)
 		else
 			return 0;
 	}
-	return m_rom_maincpu[offset];
+	return rom_maincpu[offset];
 }
 
 void megasys1_gatearray_device::gatearray_w(offs_t offset, u16 data, u16 mem_mask)
@@ -170,7 +166,7 @@ void megasys1_gatearray_device::gatearray_w(offs_t offset, u16 data, u16 mem_mas
 
 	COMBINE_DATA(&m_gatearray_hs_ram[offset]);
 
-	if(GATEARRAY_HS_SEQ(m_gatearray_seq[0],m_gatearray_seq[1],m_gatearray_seq[2],m_gatearray_seq[3]) && offset == 0x8/2)
+	if (gatearray_hs_seq(m_gatearray_seq[0],m_gatearray_seq[1],m_gatearray_seq[2],m_gatearray_seq[3]) && offset == 0x8/2)
 		m_gatearray_hs = 1;
 	else
 		m_gatearray_hs = 0;

@@ -284,7 +284,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	const u8* m_ip_select_values = nullptr; // System B and C
+	const u8 *m_ip_select_values = nullptr; // System B and C
 
 	u16 m_ip_latched = 0;
 

@@ -10,7 +10,7 @@ class megasys1_gatearray_device : public device_t
 {
 public:
 	template <typename T> void set_cpu_tag(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
-	void set_rom(u8* rom, u32 size) { m_rom = rom; m_romsize = size; }
+	template <typename T> void set_cpuregion_tag(T &&tag) { m_cpuregion.set_tag(std::forward<T>(tag)); }
 
 protected:
 	megasys1_gatearray_device(
@@ -26,6 +26,7 @@ protected:
 	void install_gatearray_overlay();
 	u16 gatearray_r(offs_t offset, u16 mem_mask = ~0);
 	void gatearray_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	bool gatearray_hs_seq(u16 g1,u16 g2,u16 g3,u16 g4);
 
 	int m_gatearray_hs = 0;
 	u16 m_gatearray_hs_ram[0x8]{};
@@ -33,8 +34,7 @@ protected:
 	const u16* m_gatearray_seq = nullptr;
 
 	required_device<cpu_device> m_cpu;
-	u8* m_rom;
-	u32 m_romsize;
+	required_memory_region m_cpuregion;
 	bool m_has_decoded;
 
 	virtual void rom_decode() = 0;

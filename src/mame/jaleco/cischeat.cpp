@@ -2142,6 +2142,7 @@ void cischeat_state::bigrun_d65006(machine_config &config)
 	bigrun(config);
 	MEGASYS1_GATEARRAY_D65006(config, m_gatearray, 0);
 	m_gatearray->set_cpu_tag(m_soundcpu);
+	m_gatearray->set_cpuregion_tag("soundcpu");
 }
 
 void cischeat_state::cischeat(machine_config &config)
@@ -2179,6 +2180,7 @@ void cischeat_state::cischeat_gs88000(machine_config &config)
 	cischeat(config);
 	MEGASYS1_GATEARRAY_GS88000(config, m_gatearray, 0);
 	m_gatearray->set_cpu_tag(m_soundcpu);
+	m_gatearray->set_cpuregion_tag("soundcpu");
 }
 
 

@@ -121,8 +121,6 @@ protected:
 	virtual void machine_start() override
 	{
 		m_leds.resolve(); m_scudhamm_motor_command = 0;
-		if (m_gatearray)
-			m_gatearray->set_rom(memregion("soundcpu")->base(), memregion("soundcpu")->bytes());
 	}
 
 	virtual void video_start() override;
