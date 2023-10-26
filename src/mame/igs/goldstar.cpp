@@ -16499,8 +16499,8 @@ ROM_START( eldoradd ) // String "DYNA ELD3 V5.1DR" on program ROM
 	ROM_LOAD16_WORD( "51d_el3_m27c512.15d", 0x00000, 0x10000, CRC(a7769d4a) SHA1(2ccd14be94a0b752113f529431b3dd4fadbf619b) )
 
 	ROM_REGION( 0x100000, "gfx", 0 )
-	ROM_LOAD( "2h_el3_tms27c040.2h", 0x080000, 0x080000, CRC(79a37ee1) SHA1(510e4ab168003d48173d5f8ddbf396668caf8e3e) )
 	ROM_LOAD( "1h_el3_tms27c040.1h", 0x000000, 0x080000, CRC(0ba677ac) SHA1(4492183cd01ba6f8ba3da233a6fd4fcb86447308) )
+	ROM_LOAD( "2h_el3_tms27c040.2h", 0x080000, 0x080000, CRC(79a37ee1) SHA1(510e4ab168003d48173d5f8ddbf396668caf8e3e) )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "eh_82s135.15h", 0x000, 0x100, NO_DUMP )
@@ -16529,6 +16529,33 @@ ROM_START( eldoraddo ) // String "DYNA ELD3 V1.1TA" on program ROM
 	ROM_LOAD( "pal16l8.d13", 0x000, 0x104, NO_DUMP )
 	ROM_LOAD( "pal16l8.e11", 0x200, 0x104, NO_DUMP )
 ROM_END
+
+ROM_START( sunspecke ) // "Suns Pecker" (also known as "Animal House"). Strings "SUNS PECKER V1.0" and "SUNS CO LTD." on program ROM
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD16_WORD( "1_am27512.l2", 0x00000, 0x10000, CRC(258208d7) SHA1(11a75963c535636ff1320a3d3c3b9867a1f169d4) )
+
+	ROM_REGION( 0x40000, "gfx", 0 )
+	ROM_LOAD( "2_tms27c010.f6", 0x00000, 0x20000, CRC(8adb2cf7) SHA1(b5ba73e9e1ba9a443b33bd90579b05f143fef91a) )
+	ROM_LOAD( "3_tms27c010.c6", 0x20000, 0x20000, CRC(44a9ae66) SHA1(86db8fdebcb82b9114e16f91f4aaa1f9b733e9ae))
+
+	ROM_REGION( 0x300, "proms", 0 )
+	ROM_LOAD( "1_82s129.d5", 0x000, 0x100, NO_DUMP )
+	ROM_LOAD( "2_82s129.n6", 0x100, 0x100, NO_DUMP )
+	ROM_LOAD( "3_82s129.m6", 0x200, 0x100, NO_DUMP )
+
+	// The JEDECs were provided by the arcade PCB shop as "needed for repairs".
+	ROM_REGION( 0x400, "plds", 0 )
+	ROM_LOAD( "an_1_palce16v8.bin", 0x000, 0x117, CRC(16dac349) SHA1(793b90554baa1effc8de9298012b06f50d925560) )
+	ROM_LOAD( "an_2_palce16v8.bin", 0x000, 0x117, CRC(88e8ca22) SHA1(9033cd6905146ee67dbd802b10b8775254a6f00d) )
+	ROM_LOAD( "an_3_palce16v8.bin", 0x000, 0x117, CRC(0c360a96) SHA1(55c64511d0e6ab53875bc3f6de1b4146fb021cf3) )
+	ROM_LOAD( "an_4_palce16v8.bin", 0x000, 0x117, CRC(6fca48ea) SHA1(9254bcfc1e1a483cccf9efa6b6122f7ef78b0bbd) )
+	ROM_LOAD( "an_5_palce16v8.bin", 0x000, 0x117, CRC(7f163a81) SHA1(9b46be169e3e4bede092b7887586fd067f536fa1) )
+	ROM_LOAD( "an_6_hy18cv8.bin",   0x000, 0x117, CRC(b2cae264) SHA1(7e3b1e855e8cab0eb7b357668f3996ff431cec65) )
+	ROM_LOAD( "an_7_peel18cv8.bin", 0x000, 0x117, CRC(b2cae264) SHA1(7e3b1e855e8cab0eb7b357668f3996ff431cec65) ) // Same as "an_6"
+	ROM_LOAD( "ani_910_ep910.bin",  0x000, 0x117, CRC(446af3c9) SHA1(c38119c70d1b6e4a49bebcd59112437d9a2838ae) )
+ROM_END
+
+
 
 /*****************************************************************************************
 
@@ -19951,6 +19978,8 @@ GAME(  1994, chryangla, ncb3,     chryangla,ncb3,     cb3_state,      init_chrya
 
 GAME(  1991, eldoradd,  0,        eldoradd, chrygld,  cb3_state,      empty_init,     ROT0, "Dyna",              "El Dorado (V5.1DR)",                          MACHINE_NOT_WORKING) // everything
 GAME(  1991, eldoraddo, eldoradd, eldoradd, chrygld,  cb3_state,      empty_init,     ROT0, "Dyna",              "El Dorado (V1.1TA)",                          MACHINE_NOT_WORKING) // everything
+GAME(  1991, sunspecke, eldoradd, eldoradd, chrygld,  cb3_state,      empty_init,     ROT0, "Suns Co Ltd.",      "Suns Pecker (V1.0)",                          MACHINE_NOT_WORKING) // everything
+
 
 // looks like a hack of Cherry Bonus 3
 GAME(  1994, chryangl,  ncb3,     chryangl, chryangl,  cmaster_state, init_chryangl,  ROT0, "bootleg (G.C.I.)",  "Cherry Angel (set 1)",                                MACHINE_NOT_WORKING ) // SKY SUPERCB 1.0 string, decrypted but hangs when betting
