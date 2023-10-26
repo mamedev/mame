@@ -1,8 +1,71 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-/* Atronic Russian Video Fruit Machines */
+/* Atronic Video Fruit Machines */
 /*
  From 1999? (documentation is dated August 99)
+
+Atronic was a Austrian/German slot machine manufacturer. It later
+merged with Spielo.
+
+Atronic CashLine platform (~199x-2004?) - z80-based
+
+Atronic CashLine platform () is used in multiple cabinet form-factors:
+* Regular/Upright (?)
+* WBC - Wide Body Cabinet
+* AST - Atronic Slant Top
+* Titan (?)
+
+* CashLine hardware description:
+
+Backplane has room for 4 boards:
+1. Master board [z80]
+2. Graphic Board [TMS34020]
+3. Sound Board (optional?) [YMZ280B?]
+4. Communications board (optional) [m68k]
+
+CashLine PCB boards have EEPROM/EPROM slots for software installation:
+* Main software         - Master board, socket U2
+* Paytable software     - Master board, socket U6
+* Security device (PLA) - Master board, socket U35 (PLA)
+* Graphic software      - Graphic board, sockets U8 .. U15
+* Sound software        - Sound board, sockets U18 .. U21
+* Comm software         - Comm board, sockets U34 and U35
+
+Atronic platforms following z80-based CashLine:
+* "Hi(!)bility" platform (2001) - two 68k-based circuit boards for game control and external
+  communications running OSE (Enea?) operating system, and a customized PC mainboard
+  with Intel Celeron 566MHz running Windows CE and ATI Radeon Mobility M6 AGP graphics
+  card with dual outputs.
+* "Oxygen" platform - 3 board system, with two PowerPC-based for game control and
+  communications and customized PC mainboard based on Intel i855GM with integrated GPU
+  and Intel Pentium M CPU at 1.6GHz. All boards use Linux.
+* "Sensys" - single board system running Linux. Custom all-purpose board with Intel
+  i915GM chipset with integrated GPU and Intel Core2Duo CPU at 2.2GHz.
+* "Synergy" - direct successor of "Sensys" platform. Utilizing i965GME chipset (and possibly
+  newer CPU).
+
+CashLine-based slot machines were followed by Atronic Harmony, Atronic E-Motion and
+Atronic e^2-Motion slot machines.
+
+All product lines also featured a custom linked gaming products:
+* e-Motion: Cash Fever, King Kong Cash, The Game of Life, Mystery Magic, Hot Link, etc)
+* e^2-Motion: Mystery Magic, Hot Link
+
+Known Atronic E-Motion games:
+* Angels & Devils
+* Blastin Barrels
+* Bella Venezia
+* Deep Diamonds
+* Frenzy Fruits
+* Imperial Rome
+* Logic Goods
+* Sphinx Classic
+* The Game of Life - Career choices
+* Time for money
+* Wild Valley
+* Zodiac
+* ...
+
 
  There was PC software with these too, I think they're meant to connect to a PC for configuration?
  I've put what there was in an ISO, and converted it to a CHD for later inspection.
@@ -19,9 +82,7 @@
  'BLMOVE with unaligned src and aligned dst' from the 34020
  which softlocks MAME as the PC no longer advances, see "void tms340x0_device::blmove(uint16_t op)" in 34010ops.hxx
  this appears to be valid code, just unsupported in the 34020 core
-
 */
-
 
 /*---------------------------------------------------------------------------------------------------------------------------------------
     I C Money
@@ -134,8 +195,6 @@ OSZ2: 25.000MHz
 GFX board: 21 / QC 8129
 Color: Red
 Markings bottom: 6 470.5020 00.21
-
-
 */
 
 
@@ -197,13 +256,11 @@ U35: Bt477KPJ150  ;
 GFX board: 05 / QC 2053
 Markings bottom: 6 470.5020 00.05
 
-
 */
 
 /*---------------------------------------------------------------------------------------------------------------------------------------
     Bonus Poker
 -----------------------------------------------------------------------------------------------------------------------------------------
-
 
 -- CPU Board ---
 
@@ -310,9 +367,7 @@ OSZ2: 25MHz
 
 GFX board: 07 / QC 2286
 Markings bottom: 6 470.5020 00.07
-
 */
-
 
 #include "emu.h"
 #include "cpu/z180/z180.h"
@@ -323,7 +378,6 @@ Markings bottom: 6 470.5020 00.07
 #include "emupal.h"
 #include "screen.h"
 #include "video/ramdac.h"
-
 
 namespace {
 
@@ -1334,6 +1388,20 @@ ROM_END
 
 } // anonymous namespace
 
+/*
+ Possible CashLine games:
+ * Aphrodite
+ * Babooshka? (Alternate spelling)
+ * Chickendales (Alternate spelling?)
+ * Golden Glen (Alternate spelling?)
+ * Happy Happy Hippy
+ * Ice Mondey (Alternate spelling?)
+ * Isle of Fun
+ * Mystery Game
+ * Mystery Mask
+ * Sign of Zodiac
+ * Xanadu Magic
+ */
 
 GAME( 1999, atronic,   0,        atronic, atronic, atronic_state, empty_init, ROT0, "Atronic", "Atronic SetUp/Clear Chips (Russia, set 1)", MACHINE_IS_SKELETON)
 GAME( 1999, atronica,  atronic,  atronic, atronic, atronic_state, empty_init, ROT0, "Atronic", "Atronic SetUp/Clear Chips (Russia, set 2)", MACHINE_IS_SKELETON)
