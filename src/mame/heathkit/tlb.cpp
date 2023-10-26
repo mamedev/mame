@@ -340,7 +340,10 @@ void heath_tlb_device::crtc_addr_w(offs_t reg, uint8_t val)
 
 uint8_t heath_tlb_device::crtc_reg_r(offs_t reg)
 {
-	m_allow_vsync_nmi = bool(BIT(reg, 2));
+	if (!machine().side_effects_disabled())
+	{
+		m_allow_vsync_nmi = bool(BIT(reg, 2));
+	}
 
 	return m_crtc->register_r();
 }
@@ -1136,7 +1139,10 @@ ioport_constructor heath_superset_tlb_device::device_input_ports() const
 
 uint8_t heath_superset_tlb_device::crtc_reg_r(offs_t reg)
 {
-	m_reverse_video_disabled = bool(BIT(reg, 3));
+	if (!machine().side_effects_disabled())
+	{
+		m_reverse_video_disabled = bool(BIT(reg, 3));
+	}
 
 	return heath_tlb_device::crtc_reg_r(reg);
 }
