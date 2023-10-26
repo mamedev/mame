@@ -23,21 +23,20 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	void install_gatearray_overlay();
+	void install_overlay();
 	u16 gatearray_r(offs_t offset, u16 mem_mask = ~0);
 	void gatearray_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	bool gatearray_hs_seq(u16 g1,u16 g2,u16 g3,u16 g4);
+	bool hs_seq() const;
+
+	virtual void rom_decode() = 0;
 
 	int m_gatearray_hs = 0;
 	u16 m_gatearray_hs_ram[0x8]{};
 
-	const u16* m_gatearray_seq = nullptr;
+	const u16 *m_gatearray_seq = nullptr;
 
 	required_device<cpu_device> m_cpu;
 	required_memory_region m_cpuregion;
-	bool m_has_decoded;
-
-	virtual void rom_decode() = 0;
 };
 
 
@@ -54,7 +53,6 @@ protected:
 private:
 	//                                                         write sequence                return value
 	static constexpr u16 jaleco_d65006_unlock_sequence[5]  = { 0x0000,0x0055,0x00aa,0x00ff,  0x835d };
-
 };
 
 class megasys1_gatearray_gs88000_device : public megasys1_gatearray_device
@@ -69,9 +67,6 @@ protected:
 
 	//                                                         write sequence                return value
 	static constexpr u16 jaleco_gs88000_unlock_sequence[5] = { 0x00ff,0x0055,0x00aa,0x0000,  0x889e };
-
-private:
-
 };
 
 class megasys1_gatearray_unkarray_device : public megasys1_gatearray_device
@@ -83,9 +78,6 @@ protected:
 	megasys1_gatearray_unkarray_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	virtual void rom_decode() override;
-
-private:
-
 };
 
 // device type definition
