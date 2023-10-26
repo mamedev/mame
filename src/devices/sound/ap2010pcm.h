@@ -15,9 +15,6 @@
 
 #pragma once
 
-// FIXME: Games check this against 0x1ff, but samples are lost with that limit
-#define FIFO_MAX_SIZE 0x800
-
 class ap2010pcm_device : public device_t, public device_sound_interface
 {
 public:
@@ -38,6 +35,9 @@ private:
 	uint16_t fifo_fast_pop();
 	void fifo_push(uint16_t sample);
 	void fifo_fast_push(uint16_t sample);
+
+	// FIXME: Games check this against 0x1ff, but samples are lost with that limit
+	static inline constexpr uint16_t FIFO_MAX_SIZE = 0x800;
 
 	std::unique_ptr<uint32_t[]> m_regs;
 

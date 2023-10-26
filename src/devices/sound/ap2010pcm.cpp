@@ -159,7 +159,7 @@ void ap2010pcm_device::reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		// Volume control. When video output is disabled, it's possible to adjust volume
 		// using the 2 touch areas on the bottom-left of the Storyware. Range 0..345
 		case 0x18/4:
-			m_volume = std::max(((data & 0x1ff00000U) >> 20) / 345.0f, 1.0f);
+			m_volume = std::min(((data & 0x1ff00000U) >> 20) / 345.0f, 1.0f);
 			LOG("pcm vol = %08x -> %d\n", data, m_volume);
 			break;
 	}

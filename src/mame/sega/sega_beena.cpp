@@ -153,15 +153,6 @@
 
 namespace {
 
-#define SCREEN_W 704
-#define SCREEN_H 480
-
-#define ROM_MASK_BASE 0x80000000
-#define ROM_FLASH_BASE 0xa0000000
-#define UNKNOWN_ADDR 0xffffffff
-
-#define MEMCACHE_FIFO_MAX_SIZE 0x100
-
 class sega_9h0_0008_state : public driver_device
 {
 public:
@@ -224,8 +215,7 @@ protected:
 	void draw_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_blend(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	int32_t rescale_alpha_step(uint8_t step);
-	constexpr uint32_t alpha_blend_rgb_levels(uint32_t dst, uint32_t src, uint8_t level_b, uint8_t level_g, uint8_t level_r);
-	template <typename BitmapType, typename FunctionClass> void drawgfxzoom_with_pixel_op(gfx_element *gfx, BitmapType &dest, const rectangle &cliprect, uint32_t code, int flipx, int flipy, int32_t destx, int32_t desty, uint32_t scalex, uint32_t scaley, FunctionClass pixel_op);
+	template <typename BitmapType, typename FunctionClass> void drawgfxzoom_with_pixel_op(gfx_element *gfx, BitmapType &dest, const rectangle &cliprect, uint32_t code, int flipx, int flipy, int32_t destx, int32_t desty, uint32_t scalex, uint32_t scaley, FunctionClass &&pixel_op);
 
 	uint32_t io_sensors_r(offs_t offset);
 
@@ -250,6 +240,16 @@ protected:
 		// Rescaling (min-max normalization) from [min_x..max_x] to [a..b].
 		return a + (((x - min_x) * (b - a)) / (max_x - min_x));
 	}
+	static constexpr uint32_t alpha_blend_rgb_levels(uint32_t dst, uint32_t src, uint8_t level_b, uint8_t level_g, uint8_t level_r)
+	{
+		// Similar to drawgfx::alpha_blend_r32(), but distinct levels are applied to each channel.
+		return ((((src & 0x0000ff) * level_r + (dst & 0x0000ff) * int(256 - level_r)) >> 8)) |
+				((((src & 0x00ff00) * level_g + (dst & 0x00ff00) * int(256 - level_g)) >> 8) & 0x00ff00) |
+				((((src & 0xff0000) * level_b + (dst & 0xff0000) * int(256 - level_b)) >> 8) & 0xff0000);
+	}
+
+	static inline constexpr uint32_t ROM_MASK_BASE = 0x80000000;
+	static inline constexpr uint32_t ROM_FLASH_BASE = 0xa0000000;
 
 	required_device<ap2010cpu_device> m_maincpu;
 	required_shared_ptr<uint32_t> m_workram;
@@ -297,6 +297,13 @@ private:
 	uint8_t fifo_events_pop();
 	void fifo_state_after_push(uint8_t state);
 	void fifo_events_push(uint8_t event);
+
+	static inline constexpr uint16_t SCREEN_W = 704;
+	static inline constexpr uint16_t SCREEN_H = 480;
+
+	static inline constexpr uint32_t UNKNOWN_ADDR = 0xffffffff;
+
+	static inline constexpr uint16_t MEMCACHE_FIFO_MAX_SIZE = 0x100;
 
 	uint8_t m_memcache[0x800]{};
 
@@ -607,8 +614,10 @@ void sega_9h0_0008_state::video_reg_w(offs_t offset, uint32_t data, uint32_t mem
 
 uint32_t sega_9h0_0008_state::midi_reg_r(offs_t offset)
 {
-	if (!machine().side_effects_disabled() && offset == 0 && m_midi_busy_count > 0) {
-		m_midi_busy_count--;
+	if (offset == 0 && m_midi_busy_count > 0) {
+		if (!machine().side_effects_disabled()) {
+			m_midi_busy_count--;
+		}
 		return 0x2;
 	}
 
@@ -1174,7 +1183,7 @@ void sega_9h0_0008_state::draw_layer_tiles(bitmap_rgb32 &bitmap, const rectangle
  * as a parameter instead of being captured in the pixel_op lambda, to avoid degraded performance from large copies.
  */
 template <typename BitmapType, typename FunctionClass>
-inline void sega_9h0_0008_state::drawgfxzoom_with_pixel_op(gfx_element *gfx, BitmapType &dest, const rectangle &cliprect, uint32_t code, int flipx, int flipy, int32_t destx, int32_t desty, uint32_t scalex, uint32_t scaley, FunctionClass pixel_op)
+inline void sega_9h0_0008_state::drawgfxzoom_with_pixel_op(gfx_element *gfx, BitmapType &dest, const rectangle &cliprect, uint32_t code, int flipx, int flipy, int32_t destx, int32_t desty, uint32_t scalex, uint32_t scaley, FunctionClass &&pixel_op)
 {
 	do {
 		assert(dest.valid());
@@ -1633,16 +1642,6 @@ void sega_9h0_0008_state::screen_blend(bitmap_rgb32 &bitmap, const rectangle &cl
 int32_t sega_9h0_0008_state::rescale_alpha_step(uint8_t step)
 {
 	return step < 0x20 ? rescale(step, 0, 0x1f, 0xff, 0) : rescale(step, 0x20, 0x3f, 0, 0xff);
-}
-
-/**
- * Similar to drawgfx::alpha_blend_r32(), but distinct levels are applied to each channel.
- */
-constexpr uint32_t sega_9h0_0008_state::alpha_blend_rgb_levels(uint32_t dst, uint32_t src, uint8_t level_b, uint8_t level_g, uint8_t level_r)
-{
-	return ((((src & 0x0000ff) * level_r + (dst & 0x0000ff) * int(256 - level_r)) >> 8)) |
-			((((src & 0x00ff00) * level_g + (dst & 0x00ff00) * int(256 - level_g)) >> 8) & 0x00ff00) |
-			((((src & 0xff0000) * level_b + (dst & 0xff0000) * int(256 - level_b)) >> 8) & 0xff0000);
 }
 
 void sega_9h0_0008_state::request_irq()
