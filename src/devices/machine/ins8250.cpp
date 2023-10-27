@@ -179,7 +179,7 @@ static constexpr u8 INS8250_LCR_2STOP_BITS = 0x04;
 //static constexpr u8 INS8250_LCR_PEN = 0x08;
 //static constexpr u8 INS8250_LCR_EVEN_PAR = 0x10;
 //static constexpr u8 INS8250_LCR_PARITY = 0x20;
-//static constexpr u8 INS8250_LCR_BREAK = 0x40;
+static constexpr u8 INS8250_LCR_BREAK = 0x40;
 static constexpr u8 INS8250_LCR_DLAB = 0x80;
 
 /* ints will continue to be set for as long as there are ints pending */
@@ -568,6 +568,14 @@ void ins8250_uart_device::tra_complete()
 void ins8250_uart_device::tra_callback()
 {
 	m_txd = transmit_register_get_data_bit();
+
+	if (m_regs.lcr & INS8250_LCR_BREAK)
+	{
+		// if in break, set transmit bit to 0. Since the transmit_register_get_data_bit()
+		// has side effects(like transmit buffer empty), don't skip the call
+		m_txd = 0;
+	}
+
 	if (m_regs.mcr & INS8250_MCR_LOOPBACK)
 	{
 		device_serial_interface::rx_w(m_txd);
