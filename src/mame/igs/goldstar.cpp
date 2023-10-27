@@ -811,6 +811,28 @@ void goldstar_state::nfm_map(address_map &map)
 	map(0xfc80, 0xffff).ram();
 }
 
+void goldstar_state::sunspckr_map(address_map &map)
+{
+	map(0x0000, 0xb7ff).rom().nopw();
+
+	map(0xd000, 0xd7ff).ram().w(FUNC(goldstar_state::goldstar_fg_vidram_w)).share("fg_vidram");
+	map(0xd800, 0xdfff).ram().w(FUNC(goldstar_state::goldstar_fg_atrram_w)).share("fg_atrram");
+
+	map(0xe000, 0xe1ff).ram().w(FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xe200, 0xe3ff).ram().w(FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xe400, 0xe5ff).ram().w(FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xe600, 0xe7ff).ram();
+
+	map(0xe800, 0xe87f).ram().share("reel1_scroll");
+	map(0xe880, 0xe9ff).ram();
+	map(0xea00, 0xea7f).ram().share("reel2_scroll");
+	map(0xea80, 0xebff).ram();
+	map(0xec00, 0xec7f).ram().share("reel3_scroll");
+	map(0xec80, 0xefff).ram();
+
+	map(0xf000, 0xf7ff).ram().share("nvram");
+	map(0xf800, 0xffff).ram();
+}
 
 
 void goldstar_state::cm_coincount_w(uint8_t data)
@@ -936,6 +958,20 @@ void goldstar_state::pkrmast_portmap(address_map &map)
 	map(0x29, 0x29).portr("DSW4"); // actually it reads DSW4 and DSW5. Muxed?
 
 	map(0xf0, 0xf0).nopw();    /* Writing 0's and 1's constantly.  Watchdog feeder? */
+}
+
+void goldstar_state::sunspckr_portmap(address_map &map) // TODO: incomplete!
+{
+	map.global_mask(0xff);
+
+	map(0x01, 0x01).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x02, 0x02).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x03, 0x03).w("aysnd", FUNC(ay8910_device::address_w));
+	// map(0x10, 0x13) // DSW?
+	map(0x60, 0x60).portr("IN2");
+	map(0x61, 0x61).portr("IN0");
+	map(0x62, 0x62).portr("IN1");
+	map(0x63, 0x63).lr8(NAME([] () -> uint8_t { return 0xff; })); // checks battery level here, among other things
 }
 
 void goldstar_state::cmast91_portmap(address_map &map)
@@ -9727,6 +9763,14 @@ void goldstar_state::crazybonb(machine_config &config)
 	m_maincpu->set_addrmap(AS_OPCODES, &goldstar_state::super972_decrypted_opcodes_map);
 }
 
+void goldstar_state::sunspckr(machine_config &config)
+{
+	crazybonb(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldstar_state::sunspckr_map);
+	m_maincpu->set_addrmap(AS_IO, &goldstar_state::sunspckr_portmap);
+}
+
 void unkch_state::megaline(machine_config &config)
 {
 	/* basic machine hardware */
@@ -16534,14 +16578,18 @@ ROM_START( sunspckr ) // "Suns Pecker" (also known as "Animal House"). Strings "
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD16_WORD( "1_am27512.l2", 0x00000, 0x10000, CRC(258208d7) SHA1(11a75963c535636ff1320a3d3c3b9867a1f169d4) )
 
-	ROM_REGION( 0x40000, "gfx", 0 )
+	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "2_tms27c010.f6", 0x00000, 0x20000, CRC(8adb2cf7) SHA1(b5ba73e9e1ba9a443b33bd90579b05f143fef91a) )
-	ROM_LOAD( "3_tms27c010.c6", 0x20000, 0x20000, CRC(44a9ae66) SHA1(86db8fdebcb82b9114e16f91f4aaa1f9b733e9ae))
 
-	ROM_REGION( 0x300, "proms", 0 )
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "3_tms27c010.c6", 0x00000, 0x20000, CRC(44a9ae66) SHA1(86db8fdebcb82b9114e16f91f4aaa1f9b733e9ae))
+
+	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "1_82s129.d5", 0x000, 0x100, NO_DUMP )
 	ROM_LOAD( "2_82s129.n6", 0x100, 0x100, NO_DUMP )
-	ROM_LOAD( "3_82s129.m6", 0x200, 0x100, NO_DUMP )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "3_82s129.m6", 0x000, 0x100, NO_DUMP )
 
 	// The JEDECs were provided by the arcade PCB shop as "needed for repairs".
 	ROM_REGION( 0x400, "plds", 0 )
@@ -19944,6 +19992,14 @@ void cmaster_state::init_super7() // possibly incomplete decryption. Game appear
 	}
 }
 
+void goldstar_state::init_sunspckr()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int a = 0; a < 0xc000; a++)
+		m_decrypted_opcodes[a] = bitswap<8>(rom[a] ^ 0xff, 2, 3, 0, 1, 6, 7, 4, 5);
+}
+
 
 /*********************************************
 *                Game Drivers                *
@@ -19978,8 +20034,8 @@ GAME(  1994, chryangla, ncb3,     chryangla,ncb3,     cb3_state,      init_chrya
 
 GAME(  1991, eldoradd,  0,        eldoradd, chrygld,  cb3_state,      empty_init,     ROT0, "Dyna",              "El Dorado (V5.1DR)",                          MACHINE_NOT_WORKING) // everything
 GAME(  1991, eldoraddo, eldoradd, eldoradd, chrygld,  cb3_state,      empty_init,     ROT0, "Dyna",              "El Dorado (V1.1TA)",                          MACHINE_NOT_WORKING) // everything
-GAME(  1991, sunspckr,  eldoradd, eldoradd, chrygld,  cb3_state,      empty_init,     ROT0, "Suns Co Ltd.",      "Suns Pecker (V1.0)",                          MACHINE_NOT_WORKING) // everything
 
+GAME(  1991, sunspckr,  0,        sunspckr, cmv4,     goldstar_state, init_sunspckr,  ROT0, "Suns Co Ltd.",      "Animal House (V1.0)",                         MACHINE_NOT_WORKING) // correct GFX decode, I/O, etc
 
 // looks like a hack of Cherry Bonus 3
 GAME(  1994, chryangl,  ncb3,     chryangl, chryangl,  cmaster_state, init_chryangl,  ROT0, "bootleg (G.C.I.)",  "Cherry Angel (set 1)",                                MACHINE_NOT_WORKING ) // SKY SUPERCB 1.0 string, decrypted but hangs when betting
