@@ -15,15 +15,14 @@ Drawing with the same color as the picture outline is not allowed.
 Hardware notes:
 - EF6805R2P @ 3.57Mhz (14.318MHz XTAL)
 - EF9367P @ 1.507MHz, 128*208 resolution (internally 512*208), 16 colors
-- TSGB01019ACP unknown 48-pin DIP, interfaces with EF9367P and DRAM
+- TSGB01019ACP 48-pin DIP gate array (die label: MOSTEK (C) 1984, MK GB 1000 HAA),
+  interfaces with EF9367P and DRAM
 - 2*D41416C-15 (16Kbit*4) DRAM
 - 36-pin cartridge slot, 8KB or 16KB ROM
 - DB9 joystick port, no known peripherals other than the default analog joystick
 - RF NTSC video, no sound
 
 TODO:
-- gaps in fast pencil drawing when the outline color is 0xf and background color
-  is 0x0 (eg. activity cartridge default), it works fine everywhere else
 - custom chip command upper bits meaning is unknown
 - palette is approximated from photos/videos
 
@@ -80,6 +79,7 @@ private:
 
 	void vram_map(address_map &map);
 	void vram_w(offs_t offset, u8 data);
+	u8 vram_r(offs_t offset);
 
 	void porta_w(u8 data);
 	u8 porta_r();
@@ -90,11 +90,12 @@ private:
 	u8 m_porta = 0xff;
 	u8 m_portb = 0xff;
 	u8 m_portc = 0xff;
-	u8 m_rdata = 0xff;
+	u8 m_efdata = 0xff;
 	u8 m_romlatch = 0;
 	u8 m_ccount = 0;
 	u8 m_command = 0;
 	u8 m_color = 0;
+	u8 m_vramdata = 0;
 };
 
 
@@ -111,11 +112,12 @@ void videoart_state::machine_start()
 	save_item(NAME(m_porta));
 	save_item(NAME(m_portb));
 	save_item(NAME(m_portc));
-	save_item(NAME(m_rdata));
+	save_item(NAME(m_efdata));
 	save_item(NAME(m_romlatch));
 	save_item(NAME(m_ccount));
 	save_item(NAME(m_command));
 	save_item(NAME(m_color));
+	save_item(NAME(m_vramdata));
 }
 
 DEVICE_IMAGE_LOAD_MEMBER(videoart_state::cart_load)
@@ -167,7 +169,7 @@ u32 videoart_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	// width of 512 compressed down to 128
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
-			bitmap.pix(y, x) = m_vram[(y << 7 | x >> 2) & 0x7fff];
+			bitmap.pix(y, x) = m_vram[(y << 7 | x >> 2) & 0x7fff] & 0xf;
 
 	return 0;
 }
@@ -179,14 +181,26 @@ void videoart_state::vram_w(offs_t offset, u8 data)
 	offset = offset << 1 | BIT(low, 2);
 
 	if (data)
-		m_vram[offset] = m_color & 0xf;
+		m_vram[offset] = m_color;
 	else
 		m_vram[offset] ^= 0xf;
 }
 
+u8 videoart_state::vram_r(offs_t offset)
+{
+	int low = 0;
+	m_ef9367->get_last_readback_word(0, &low);
+	offset = offset << 1 | BIT(low, 2);
+
+	if (!machine().side_effects_disabled())
+		m_vramdata = m_vram[offset];
+
+	return 0;
+}
+
 void videoart_state::vram_map(address_map &map)
 {
-	map(0x0000, 0x3fff).w(FUNC(videoart_state::vram_w)).nopr();
+	map(0x0000, 0x3fff).rw(FUNC(videoart_state::vram_r), FUNC(videoart_state::vram_w));
 }
 
 
@@ -198,24 +212,31 @@ void videoart_state::vram_map(address_map &map)
 void videoart_state::porta_w(u8 data)
 {
 	// A0-A7: EF9367 data
-	// A0,A1: TSG command
+	// A0,A1: custom chip command data
 	m_porta = data;
 }
 
 u8 videoart_state::porta_r()
 {
-	u8 data = 0xff;
+	u8 data = 0;
+
+	// read EF9367 data
+	if (~m_portb & 1)
+		data |= m_efdata;
+
+	// read vram data
+	if (~m_portb & 4)
+	{
+		u8 shift = (m_ccount & 1) * 2;
+		data |= m_vramdata >> shift;
+	}
 
 	// read cartridge data
 	if (~m_portb & 0x10)
 	{
 		u16 offset = m_romlatch << 8 | m_portc;
-		data &= m_cart->read_rom(offset);
+		data |= m_cart->read_rom(offset);
 	}
-
-	// read EF9367 data
-	if (~m_portb & 1)
-		data &= m_rdata;
 
 	return data;
 }
@@ -226,7 +247,7 @@ void videoart_state::portb_w(u8 data)
 	if (~data & m_portb & 1)
 	{
 		if (m_portc & 0x10)
-			m_rdata = m_ef9367->data_r(m_portc & 0xf);
+			m_efdata = m_ef9367->data_r(m_portc & 0xf);
 		else
 			m_ef9367->data_w(m_portc & 0xf, m_porta);
 	}
@@ -235,7 +256,7 @@ void videoart_state::portb_w(u8 data)
 	if (data & ~m_portb & 2)
 		m_romlatch = m_portc;
 
-	// B2: custom chip command
+	// B2: shift custom chip command
 	if (~data & m_portb & 4)
 	{
 		m_command = (m_command << 2) | (m_porta & 3);
@@ -248,7 +269,7 @@ void videoart_state::portb_w(u8 data)
 		if (m_ccount == 3)
 			m_color = m_command & 0xf;
 
-		m_ccount++;
+		m_ccount = (m_ccount + 1) & 3;
 	}
 
 	// B3: erase led
@@ -305,7 +326,7 @@ static INPUT_PORTS_START( videoart )
 	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X) PORT_SENSITIVITY(50) PORT_KEYDELTA(4) PORT_CENTERDELTA(0)
 
 	PORT_START("AN2")
-	PORT_BIT(0xff, 0x80, IPT_AD_STICK_Y) PORT_SENSITIVITY(50) PORT_KEYDELTA(4) PORT_CENTERDELTA(0) PORT_REVERSE
+	PORT_BIT(0xff, 0x6a, IPT_AD_STICK_Y) PORT_SENSITIVITY(50) PORT_KEYDELTA(4) PORT_CENTERDELTA(0) PORT_REVERSE PORT_MINMAX(0x00, 0xd4)
 INPUT_PORTS_END
 
 

@@ -214,7 +214,7 @@ void ef9365_device::set_nb_bitplanes(int nb_bitplanes)
 	if (nb_bitplanes > 0 && nb_bitplanes <= 8)
 	{
 		m_nb_of_bitplanes = nb_bitplanes;
-		m_nb_of_colors = pow(2, nb_bitplanes);
+		m_nb_of_colors = 1 << nb_bitplanes;
 	}
 }
 
@@ -329,6 +329,7 @@ void ef9365_device::device_start()
 	save_item(NAME(m_bf));
 	save_item(NAME(m_state));
 	save_item(NAME(m_msl));
+	save_item(NAME(m_readback_latch_pix_offset));
 
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_irq_vb));
@@ -846,6 +847,7 @@ int ef9365_device::cycles_to_us(int cycles)
 void ef9365_device::dump_bitplanes_word()
 {
 	int pixel_ptr = (((m_bitplane_yres - 1) - (get_y_reg() & (m_bitplane_yres - 1))) * m_bitplane_xres) + (get_x_reg() & (m_bitplane_xres - 1));
+	m_readback_latch_pix_offset = pixel_ptr & 7;
 
 	LOG("dump : x = %d , y = %d\n", get_x_reg(), get_y_reg());
 
@@ -857,8 +859,6 @@ void ef9365_device::dump_bitplanes_word()
 		else
 			m_readback_latch[p] = (value >> 4) & 0xf;
 	}
-
-	m_readback_latch_pix_offset = pixel_ptr & 3;
 }
 
 //-------------------------------------------------
