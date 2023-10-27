@@ -41,12 +41,12 @@ license:CC0-1.0
 
 	<software name="jm3" supported="no">
 		<description>Jjangguneun Monmallyeo 3: Doraon Jjanggu (Korea)</description>
-		<info name="alt_title" value="짱구는 못말려 3: 돌아온 짱구" />
 		<year>2001</year>
 		<publisher>VM Labs, Inc.</publisher>
 		<notes><![CDATA[
 Region locked, will only work in Korea region players.
 ]]></notes>
+		<info name="alt_title" value="짱구는 못말려 3: 돌아온 짱구" />
 		<part interface="dvdrom" name="dvdrom">
 			<diskarea name="dvdrom">
 				<disk name="jjangguneun monmallyeo 3 - doraon jjanggu (korea)" sha1="ff2bfb2108643610969980112c5938491f3df3bb
