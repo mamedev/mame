@@ -182,6 +182,9 @@ public:
 	void sega_9h0_0008(machine_config &config);
 
 protected:
+	static inline constexpr uint32_t ROM_MASK_BASE = 0x80000000;
+	static inline constexpr uint32_t ROM_FLASH_BASE = 0xa0000000;
+
 	virtual void device_post_load() override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -215,7 +218,8 @@ protected:
 	void draw_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_blend(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	int32_t rescale_alpha_step(uint8_t step);
-	template <typename BitmapType, typename FunctionClass> void drawgfxzoom_with_pixel_op(gfx_element *gfx, BitmapType &dest, const rectangle &cliprect, uint32_t code, int flipx, int flipy, int32_t destx, int32_t desty, uint32_t scalex, uint32_t scaley, FunctionClass &&pixel_op);
+	template <typename BitmapType, typename FunctionClass>
+	void drawgfxzoom_with_pixel_op(gfx_element *gfx, BitmapType &dest, const rectangle &cliprect, uint32_t code, int flipx, int flipy, int32_t destx, int32_t desty, uint32_t scalex, uint32_t scaley, FunctionClass &&pixel_op);
 
 	uint32_t io_sensors_r(offs_t offset);
 
@@ -247,9 +251,6 @@ protected:
 				((((src & 0x00ff00) * level_g + (dst & 0x00ff00) * int(256 - level_g)) >> 8) & 0x00ff00) |
 				((((src & 0xff0000) * level_b + (dst & 0xff0000) * int(256 - level_b)) >> 8) & 0xff0000);
 	}
-
-	static inline constexpr uint32_t ROM_MASK_BASE = 0x80000000;
-	static inline constexpr uint32_t ROM_FLASH_BASE = 0xa0000000;
 
 	required_device<ap2010cpu_device> m_maincpu;
 	required_shared_ptr<uint32_t> m_workram;
@@ -293,19 +294,12 @@ protected:
 	required_ioport m_io_video_config;
 
 private:
-	uint8_t fifo_state_after_pop();
-	uint8_t fifo_events_pop();
-	void fifo_state_after_push(uint8_t state);
-	void fifo_events_push(uint8_t event);
-
 	static inline constexpr uint16_t SCREEN_W = 704;
 	static inline constexpr uint16_t SCREEN_H = 480;
 
 	static inline constexpr uint32_t UNKNOWN_ADDR = 0xffffffff;
 
 	static inline constexpr uint16_t MEMCACHE_FIFO_MAX_SIZE = 0x100;
-
-	uint8_t m_memcache[0x800]{};
 
 	enum memcache_seq : uint32_t
 	{
@@ -322,7 +316,6 @@ private:
 		BITS_7_1   = 0x00ff0701, // Start command
 		BITS_ERR   = 0xffffffff,
 	};
-	uint32_t m_memcache_seq;
 
 	enum memcache_state : uint8_t
 	{
@@ -334,6 +327,16 @@ private:
 		WRITE_RAM_BYTE,
 		CONSUME_UNTIL_IDLE,
 	};
+
+	uint8_t fifo_state_after_pop();
+	uint8_t fifo_events_pop();
+	void fifo_state_after_push(uint8_t state);
+	void fifo_events_push(uint8_t event);
+
+	uint8_t m_memcache[0x800]{};
+
+	uint32_t m_memcache_seq;
+
 	uint32_t m_memcache_addr;
 	uint8_t m_memcache_data;
 	uint8_t m_memcache_i;
@@ -1104,7 +1107,13 @@ void sega_9h0_0008_state::tiles_sprites_w(offs_t offset, uint8_t data)
 	}
 }
 
-void sega_9h0_0008_state::draw_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint16_t *tilemap, const uint8_t scroll_idx, const bool is_active, const bool is_overlay_rendered)
+void sega_9h0_0008_state::draw_layer(
+		bitmap_rgb32 &bitmap,
+		const rectangle &cliprect,
+		const uint16_t *tilemap,
+		const uint8_t scroll_idx,
+		const bool is_active,
+		const bool is_overlay_rendered)
 {
 	if (!is_active) {
 		return; // Disabled
@@ -1117,7 +1126,12 @@ void sega_9h0_0008_state::draw_layer(bitmap_rgb32 &bitmap, const rectangle &clip
 	}
 }
 
-void sega_9h0_0008_state::draw_layer_tiles(bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint16_t *tilemap, const uint8_t scroll_idx, const bool is_overlay_rendered)
+void sega_9h0_0008_state::draw_layer_tiles(
+		bitmap_rgb32 &bitmap,
+		const rectangle &cliprect,
+		const uint16_t *tilemap,
+		const uint8_t scroll_idx,
+		const bool is_overlay_rendered)
 {
 	// Bitplane area =  1024x512 (64x32 tiles), matches tile data mapping entries (64 * 32 = 0x800).
 	//  Visible area =   704x480 (44x30 tiles), offset by +10 tiles in x-axis and +2 tiles in y-axis.
@@ -1158,22 +1172,23 @@ void sega_9h0_0008_state::draw_layer_tiles(bitmap_rgb32 &bitmap, const rectangle
 		const pen_t *paldata = m_palette->pens() + gfx->colorbase() + gfx->granularity() * (7 % gfx->colors());
 		const uint8_t scale = m_scale;
 		drawgfxzoom_with_pixel_op(gfx, bitmap, cliprect,
-			tile_idx,
-			flip_x,
-			flip_y,
-			x * m_scale,
-			y * m_scale,
-			0x10000 * m_scale,
-			0x10000 * m_scale,
-			[scale, paldata](int32_t y, const std::unique_ptr<rgb_t[]> &palcache, uint32_t &destp, const uint8_t &srcp) {
-				if (srcp != 0) {
-					rgb_t color = palcache[y / scale * 0x100 + srcp];
-					if (color == 0) {
-						color = paldata[srcp];
+				tile_idx,
+				flip_x,
+				flip_y,
+				x * m_scale,
+				y * m_scale,
+				0x10000 * m_scale,
+				0x10000 * m_scale,
+				[scale, paldata] (int32_t y, const std::unique_ptr<rgb_t[]> &palcache, uint32_t &destp, const uint8_t &srcp)
+				{
+					if (srcp != 0) {
+						rgb_t color = palcache[y / scale * 0x100 + srcp];
+						if (color == 0) {
+							color = paldata[srcp];
+						}
+						destp = color;
 					}
-					destp = color;
-				}
-			});
+				});
 	}
 }
 
@@ -1183,7 +1198,19 @@ void sega_9h0_0008_state::draw_layer_tiles(bitmap_rgb32 &bitmap, const rectangle
  * as a parameter instead of being captured in the pixel_op lambda, to avoid degraded performance from large copies.
  */
 template <typename BitmapType, typename FunctionClass>
-inline void sega_9h0_0008_state::drawgfxzoom_with_pixel_op(gfx_element *gfx, BitmapType &dest, const rectangle &cliprect, uint32_t code, int flipx, int flipy, int32_t destx, int32_t desty, uint32_t scalex, uint32_t scaley, FunctionClass &&pixel_op)
+inline void sega_9h0_0008_state::drawgfxzoom_with_pixel_op(
+		gfx_element *gfx,
+		BitmapType &dest,
+		const rectangle &cliprect,
+		uint32_t code,
+		int flipx,
+		int flipy,
+		int32_t
+		destx,
+		int32_t desty,
+		uint32_t scalex,
+		uint32_t scaley,
+		FunctionClass &&pixel_op)
 {
 	do {
 		assert(dest.valid());
@@ -1325,7 +1352,12 @@ int32_t sega_9h0_0008_state::scroll_y(int32_t y, uint16_t i)
 	return y;
 }
 
-void sega_9h0_0008_state::draw_layer_scanlines(bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint16_t *tilemap, const uint8_t scroll_idx, const bool is_overlay_rendered)
+void sega_9h0_0008_state::draw_layer_scanlines(
+		bitmap_rgb32 &bitmap,
+		const rectangle &cliprect,
+		const uint16_t *tilemap,
+		const uint8_t scroll_idx,
+		const bool is_overlay_rendered)
 {
 	const rectangle cache_bitmap_bounds(0, m_cache_layer.width()-1, 0, m_cache_layer.height()-1);
 	m_cache_layer.fill(0, cache_bitmap_bounds);
@@ -1362,16 +1394,16 @@ void sega_9h0_0008_state::draw_layer_scanlines(bitmap_rgb32 &bitmap, const recta
 		bool is_sprite_tile_data_used = tile & 0x800;
 		gfx_element *gfx = m_gfxdecode->gfx(is_sprite_tile_data_used ? 1 : 0);
 		gfx->zoom_alpha(m_cache_layer, cache_bitmap_bounds,
-			tile_idx,
-			7,
-			flip_x,
-			flip_y,
-			x,
-			y,
-			0x10000,
-			0x10000,
-			0,
-			0xff);
+				tile_idx,
+				7,
+				flip_x,
+				flip_y,
+				x,
+				y,
+				0x10000,
+				0x10000,
+				0,
+				0xff);
 	}
 
 	// Apply x-scrolling + wrap-around on each cached scanline and draw to screen bitmap
@@ -1472,7 +1504,8 @@ void sega_9h0_0008_state::draw_bitmap(bitmap_rgb32 &bitmap, const rectangle &cli
 	}
 }
 
-void sega_9h0_0008_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, const bool is_overlay_rendered) {
+void sega_9h0_0008_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, const bool is_overlay_rendered)
+{
 	gfx_element *gfx = m_gfxdecode->gfx(1);
 
 	uint16_t *tilemap_data = reinterpret_cast<uint16_t *>(m_tilemap_sprites.target());
@@ -1526,16 +1559,16 @@ void sega_9h0_0008_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cl
 			for (size_t pattern_x : pattern_x_v) {
 				// FIXME: Can be transparent (e.g. pen cursor fade-in seen in "Kazoku Minna no Nouryoku Trainer")
 				gfx->zoom_alpha(bitmap, cliprect,
-					tile_idx + pattern_i++,
-					7,
-					flip_x,
-					flip_y,
-					(x + pattern_x * 16) * m_scale - (0x2c0 / 2) + delta_x,
-					(y + pattern_y * 16) * m_scale - (0x1e0 / 2) + delta_y,
-					0x10000 * m_scale,
-					0x10000 * m_scale,
-					0,
-					0xff);
+						tile_idx + pattern_i++,
+						7,
+						flip_x,
+						flip_y,
+						(x + pattern_x * 16) * m_scale - (0x2c0 / 2) + delta_x,
+						(y + pattern_y * 16) * m_scale - (0x1e0 / 2) + delta_y,
+						0x10000 * m_scale,
+						0x10000 * m_scale,
+						0,
+						0xff);
 			}
 		}
 	}
@@ -1751,7 +1784,7 @@ void sega_beena_state::install_game_rom()
 {
 	if (m_cart->exists()) {
 		std::string region_tag;
-		memory_region *cart_rom = memregion(region_tag.assign(m_cart->tag()).append(":cart:rom"));
+		memory_region *cart_rom = m_cart->memregion("cart:rom");
 		uint32_t *rom32 = reinterpret_cast<uint32_t *>(cart_rom->base());
 
 		/*
@@ -1958,6 +1991,13 @@ public:
 	virtual uint32_t io_expansion_r() override;
 
 private:
+	enum card_state : uint8_t
+	{
+		IDLE = 0,
+		START_WRITE_DATA,
+		WRITE_DATA,
+	};
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -1967,12 +2007,6 @@ private:
 	required_ioport m_io_cards;
 	uint8_t m_card_previous_input;
 
-	enum card_state : uint8_t
-	{
-		IDLE = 0,
-		START_WRITE_DATA,
-		WRITE_DATA,
-	};
 	uint8_t m_card_i;
 	uint16_t m_card_data;
 	uint8_t m_card_data_i;
@@ -2176,7 +2210,6 @@ static INPUT_PORTS_START( tvochken )
 	PORT_START("CARDS")
 	PORT_BIT( 0x7f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(50) PORT_WRAPS PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CODE(JOYCODE_X) PORT_CODE_DEC(KEYCODE_HOME) PORT_CODE_INC(KEYCODE_END) PORT_FULL_TURN_COUNT(50) PORT_NAME("Selected Card")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("Scan Card")
-
 INPUT_PORTS_END
 
 
