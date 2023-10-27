@@ -14613,11 +14613,12 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	</software>
 
 	<software name="tuntroll">
-		<description>Tunnels &amp; Trolls - Crusaders of Khazan</description>
+		<description>Tunnels &amp; Trolls: Crusaders of Khazan</description>
 		<year>1990</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<info name="alt_title" value="トンネルズ&amp;トロールズ カザンの戦士たち ~ Tunnels &amp; Trolls Khazan no Senshi tachi" />
 		<info name="release" value="19900616" />
+		<!-- TODO: likely similar user disk creation as per pc8801_flop.xml -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1 - Ki" />
 			<dataarea name="flop" size="1261824">
