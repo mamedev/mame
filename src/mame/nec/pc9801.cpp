@@ -643,7 +643,9 @@ void pc9801_state::pc9801_common_io(address_map &map)
 	map(0x0060, 0x0063).rw(m_hgdc[0], FUNC(upd7220_device::read), FUNC(upd7220_device::write)).umask16(0x00ff); //upd7220 character ports / <undefined>
 	map(0x0064, 0x0064).w(FUNC(pc9801_state::vrtc_clear_w));
 //  map(0x006c, 0x006f) border color / <undefined>
-	map(0x0070, 0x007f).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0xff00);
+	// TODO: PC-98Bible suggests that $73 timer #1 is unavailable on non-vanilla models (verify on HW)
+	// (can be accessed only thru the $3fdb alias)
+	map(0x0070, 0x0077).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0xff00);
 	map(0x0070, 0x007f).rw(FUNC(pc9801_state::txt_scrl_r), FUNC(pc9801_state::txt_scrl_w)).umask16(0x00ff); //display registers / i8253 pit
 	map(0x0090, 0x0093).rw(m_sio, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0xff00);
 	map(0x7fd8, 0x7fdf).rw(m_ppi_mouse, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00);
@@ -1418,21 +1420,21 @@ irq assignment (PC-9801F):
 ir0 PIT
 ir1 keyboard
 ir2 vblank
-ir3
+ir3 expansion bus INT0
 ir4 rs-232c
-ir5
-ir6
-ir7 slave irq
+ir5 expansion bus INT1
+ir6 expansion bus INT2
+ir7 PIC slave
 
 8259 slave:
 ir0 printer
-ir1 IDE?
-ir2 2dd floppy irq
-ir3 2hd floppy irq
-ir4 opn
-ir5 mouse
-ir6
-ir7
+ir1 expansion bus INT3 (HDD)
+ir2 expansion bus INT41 (2dd floppy irq)
+ir3 expansion bus INT42 (2hd floppy irq)
+ir4 expansion bus INT5 (usually FM sound board)
+ir5 expansion bus INT6 (mouse)
+ir6 NDP coprocessor (up to V30 CPU)
+ir7 <gnd>
 */
 
 
