@@ -12794,6 +12794,43 @@ ROM_START( nd8lines )
 ROM_END
 
 /*
+  Hambuger House (Cherry Master Clone). String "DYNA CM-1  V1.01" on program ROM.
+   -1 x LGS Z8400B
+   -1 x Lattice ispLSI 1024 80LJ
+   -3V Battery
+   -2 x D71055C
+   -1 x Jfc 95101
+   -3 banks of 8 DIP switches
+   -12.000 MHz xtal
+*/ 
+ROM_START( hamhouse )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "am27c512.u33",       0x00000, 0x10000, CRC(f4dd12e9) SHA1(b792ee549ecf5e446387cd5c7d78b2fc69b03f33) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "7_27c256.u43",       0x000000, 0x08000, CRC(31c419f0) SHA1(7c827af5c208bab0ca143558581a57b0b355a3ad) )
+	ROM_LOAD( "5_nmc27c256q.u28",   0x008000, 0x08000, CRC(e54f033e) SHA1(a3ec618109d7f7287c59199888ba92ead6396d1b) )
+	ROM_LOAD( "6_am27c256.u42",     0x010000, 0x08000, CRC(bfdfd613) SHA1(42476ec4b4cd29062fe4a2d8a3789614e7af2fdb) )
+
+	ROM_REGION( 0xE0000, "gfx2", 0 )
+	ROM_LOAD( "2_27c256.u11",       0x00000, 0x08000, CRC(fac9fe6c) SHA1(0c55c017957d65121b9cc876d914cca2dec5e94e) )
+	ROM_LOAD( "4_d27128a.u26",      0x08000, 0x02000, CRC(8cf3845e) SHA1(4f672d256548211c48e60ce89718c3c195f187d5) ) // 1ST AND 2ND HALF IDENTICAL
+        ROM_IGNORE( 0x2000 )
+	ROM_LOAD( "1_27c64-20.u10",     0xA0000, 0x2000, CRC(c4efc953) SHA1(da24c802d33be377ad6d6a357ed32d5214ca7a3f) )
+	ROM_LOAD( "3_hy27c64ad-15.u24", 0xC0000, 0x2000, CRC(7f9c41db) SHA1(64c5fb779ecc05eae3264c7767c571eb76fb389f) )
+
+	ROM_REGION( 0x600, "proms", 0 )
+        // EPROM on a small subboard wired to replace two bipolar PROMS
+	ROM_LOAD( "nm27c256.u55",       0x00000, 0x00400, CRC(f7c7c025) SHA1(f845dc960ed74f64bfff06e3766a1047a26e9de1) )
+	ROM_IGNORE( 0x7C00 )
+	ROM_LOAD( "am27s33pc.u39",      0x00400, 0x00200, NO_DUMP ) // Separated from the other two PROM sockets on the PCB
+
+	ROM_REGION( 0x400, "plds", 0 )
+	ROM_LOAD( "atf16v8b.u15",       0x0000, 0x0117, NO_DUMP )
+	ROM_LOAD( "atf16v8b.u35",       0x0200, 0x0117, NO_DUMP )
+ROM_END
+
+/*
   New Lucky 8 Lines / New Super 8 Lines.
 
   This set has a regular New Lucky 8 Lines, but allowing bets up to 64.
@@ -20057,6 +20094,7 @@ GAMEL( 1985, ns8linesa, ns8lines, lucky8,   lucky8b,  wingco_state,   empty_init
 GAMEL( 198?, ns8linew,  ns8lines, lucky8,   ns8linew, wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (F-5, Witch Bonus)", 0,                     layout_lucky8 )    // 2 control sets...
 GAMEL( 198?, ns8linewa, ns8lines, lucky8,   ns8linwa, wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (W-4, Witch Bonus)", 0,                     layout_lucky8p1 )  // only 1 control set...
 GAMEL( 1991, nd8lines,  lucky8,   nd8lines, nd8lines, wingco_state,   init_nd8lines,  ROT0, "Yamate (bootleg)",  "New Draw 8 Lines (Version 2.1)",                           MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND, layout_lucky8 ) // PROM decode wrong, SN emits terrible sound, inputs not done yet
+GAMEL( 199?, hamhouse,  cmaster,  nd8lines, nd8lines, wingco_state,   empty_init,     ROT0, "bootleg",           "Hamburger House",                                          MACHINE_NOT_WORKING,   layout_lucky8 )
 GAMEL( 198?, super972,  ns8lines, super972, ns8linwa, wingco_state,   init_super972,  ROT0, "<unknown>",         "Super 97-2 (Witch Bonus)",                                 MACHINE_NOT_WORKING,   layout_lucky8p1 )  // decrypted, needs correct inputs
 GAME(  198?, luckybar,  0,        lucky8,   ns8linew, wingco_state,   empty_init,     ROT0, "<unknown>",         "Lucky Bar (W-4 with mc68705 MCU)",                         MACHINE_NOT_WORKING )  // MC68705 MCU
 GAMEL( 198?, kkotnoli,  0,        kkotnoli, kkotnoli, goldstar_state, empty_init,     ROT0, "hack",              "Kkot No Li (Kill the Bees)",                               MACHINE_IMPERFECT_COLORS, layout_lucky8 )
