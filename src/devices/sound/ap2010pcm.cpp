@@ -10,6 +10,8 @@
 
 #include "ap2010pcm.h"
 
+#include <algorithm>
+
 #define VERBOSE (0)
 #include "logmacro.h"
 
@@ -19,18 +21,31 @@ DEFINE_DEVICE_TYPE(AP2010PCM, ap2010pcm_device, "ap2010pcm", "AP2010 PCM")
 ap2010pcm_device::ap2010pcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, AP2010PCM, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
+	, m_sample_rate(0)
+	, m_fifo_size(0)
+	, m_fifo_head(0)
+	, m_fifo_tail(0)
+	, m_fifo_fast_size(0)
+	, m_fifo_fast_head(0)
+	, m_fifo_fast_tail(0)
 	, m_stream(nullptr)
 { }
 
 void ap2010pcm_device::device_start()
 {
 	m_regs = make_unique_clear<uint32_t[]>(0x40/4);
+
+	m_sample_rate = 8000;
+
+	std::fill(std::begin(m_fifo_data), std::end(m_fifo_data), 0);
+	std::fill(std::begin(m_fifo_fast_data), std::end(m_fifo_fast_data), 0);
+
+	m_stream = stream_alloc(0, 1, m_sample_rate);
+
 	save_pointer(NAME(m_regs), 0x40/4);
-	memset(m_regs.get(), 0, 0x40);
 
 	save_item(NAME(m_volume));
 
-	m_sample_rate = 8000;
 	save_item(NAME(m_sample_rate));
 
 	save_item(NAME(m_fifo_data));
@@ -42,8 +57,6 @@ void ap2010pcm_device::device_start()
 	save_item(NAME(m_fifo_fast_size));
 	save_item(NAME(m_fifo_fast_head));
 	save_item(NAME(m_fifo_fast_tail));
-
-	m_stream = stream_alloc(0, 1, m_sample_rate);
 }
 
 void ap2010pcm_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
