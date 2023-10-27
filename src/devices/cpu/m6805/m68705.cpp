@@ -728,8 +728,6 @@ m68705r_device::m68705r_device(machine_config const &mconfig, char const *tag, d
 void m68705r_device::device_start()
 {
 	m68705u_device::device_start();
-
-	// TODO: ADC
 }
 
 std::unique_ptr<util::disasm_interface> m68705r_device::create_disassembler()

@@ -179,6 +179,7 @@ u32 videoart_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 void videoart_state::vram_w(offs_t offset, u8 data)
 {
+	// correct offset (by default, ef9365_device wants to write per byte)
 	data = BIT(data, ~m_pixel_offset & 7);
 	offset = offset << 1 | BIT(m_pixel_offset, 2);
 
@@ -190,6 +191,7 @@ void videoart_state::vram_w(offs_t offset, u8 data)
 
 u8 videoart_state::vram_r(offs_t offset)
 {
+	// correct offset (by default, ef9365_device wants to read per byte)
 	int pixel_offset = 0;
 	m_ef9367->get_last_readback_word(0, &pixel_offset);
 	offset = offset << 1 | BIT(pixel_offset, 2);
