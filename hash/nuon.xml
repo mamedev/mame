@@ -12,7 +12,7 @@ license:CC0-1.0
 		<publisher>VM Labs, Inc.</publisher>
 		<part interface="dvdrom" name="dvdrom">
 			<diskarea name="dvdrom">
-				<disk name="ballstic (usa, europe)" sha1="5371a3abfb92bc1841d3416938bc07b2619024f0" />
+				<disk name="ballistic (usa, europe)" sha1="5371a3abfb92bc1841d3416938bc07b2619024f0" />
 			</diskarea>
 		</part>
 	</software>
