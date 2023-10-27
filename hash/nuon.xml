@@ -6,7 +6,7 @@ license:CC0-1.0
 
 <softwarelist name="nuon" description="NUON DVD-ROMs">
 
-	<software name="ballstic">
+	<software name="ballstic" supported="no">
 		<description>Ballistic (USA, Europe)</description>
 		<year>2000</year>
 		<publisher>VM Labs, Inc.</publisher>
@@ -17,7 +17,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="freefall">
+	<software name="freefall" supported="no">
 		<description>FreeFall 3050 A.D. (USA, Europe)</description>
 		<year>2000</year>
 		<publisher>VM Labs, Inc.</publisher>
@@ -28,7 +28,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="is3">
+	<software name="is3" supported="no">
 		<description>Iron Soldier 3 (USA)</description>
 		<year>2001</year>
 		<publisher>VM Labs, Inc.</publisher>
@@ -39,8 +39,9 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="jm3">
+	<software name="jm3" supported="no">
 		<description>Jjangguneun Monmallyeo 3: Doraon Jjanggu (Korea)</description>
+		<info name="alt_title" value="짱구는 못말려 3: 돌아온 짱구" />
 		<year>2001</year>
 		<publisher>VM Labs, Inc.</publisher>
 		<notes><![CDATA[
@@ -54,7 +55,7 @@ Region locked, will only work in Korea region players.
 		</part>
 	</software>
 
-	<software name="merlinr">
+	<software name="merlinr" supported="no">
 		<description>Merlin Racing (USA, Europe)</description>
 		<year>2000</year>
 		<publisher>VM Labs, Inc.</publisher>
@@ -65,7 +66,7 @@ Region locked, will only work in Korea region players.
 		</part>
 	</software>
 
-	<software name="spacinvx">
+	<software name="spacinvx" supported="no">
 		<description>Space Invaders XL (USA)</description>
 		<year>2001</year>
 		<publisher>VM Labs, Inc.</publisher>
@@ -76,7 +77,7 @@ Region locked, will only work in Korea region players.
 		</part>
 	</software>
 
-	<software name="tempest3">
+	<software name="tempest3" supported="no">
 		<description>Tempest 3000 (USA, Europe)</description>
 		<year>2000</year>
 		<publisher>VM Labs, Inc.</publisher>
@@ -87,12 +88,12 @@ Region locked, will only work in Korea region players.
 		</part>
 	</software>
 
-	<software name="toshsamp">
+	<software name="toshsamp" supported="no">
 		<description>The Next Tetris / Toshiba Sampler (11-1-2000) (USA)</description>
 		<year>2000</year>
 		<publisher>Toshiba</publisher>
 		<notes><![CDATA[
-Bundled with Toshiba players. Disc also contains DVD Video content that will work on any standard DVD player.
+Bundled with Toshiba players. Disc also contains DVD Video content that will play on a standard DVD player.
 ]]></notes>
 		<part interface="dvdrom" name="dvdrom">
 			<diskarea name="dvdrom">
