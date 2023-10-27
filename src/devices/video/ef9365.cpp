@@ -3,7 +3,7 @@
 
 /*********************************************************************
 
-    ef9365.c
+    ef9365.cpp
 
     Thomson EF9365/EF9366/EF9367 video controller emulator code
 
@@ -162,7 +162,8 @@ const tiny_rom_entry *ef9365_device::device_rom_region() const
 // default address map
 // Up to 512*512 per bitplane, 8 bitplanes max.
 //-------------------------------------------------
-void ef9365_device::ef9365(address_map &map)
+
+void ef9365_device::ef9365_map(address_map &map)
 {
 	if (!has_configured_map(0))
 		map(0x00000, ef9365_device::BITPLANE_MAX_SIZE * ef9365_device::MAX_BITPLANES - 1).ram();
@@ -197,12 +198,15 @@ ef9365_device::ef9365_device(const machine_config &mconfig, const char *tag, dev
 	device_t(mconfig, EF9365, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
-	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 18, 0, address_map_constructor(FUNC(ef9365_device::ef9365), this)),
+	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 18, 0, address_map_constructor(FUNC(ef9365_device::ef9365_map), this)),
 	m_charset(*this, "ef9365"),
 	m_palette(*this, finder_base::DUMMY_TAG),
-	m_irq_handler(*this)
+	m_irq_handler(*this),
+	m_write_msl(*this)
 {
-	m_clock_freq = clock;
+	set_display_mode(DISPLAY_MODE_256x256);
+	set_nb_bitplanes(1);
+	set_color_filler(0);
 }
 
 //-------------------------------------------------
@@ -270,11 +274,7 @@ void ef9365_device::set_display_mode(int display_mode)
 		break;
 	default:
 		logerror("Invalid EF9365 Display mode: %02x\n", display_mode);
-		m_bitplane_xres = 256;
-		m_bitplane_yres = 256;
-		m_vsync_scanline_pos = 250;
-		m_overflow_mask_x = 0xff00;
-		m_overflow_mask_y = 0xff00;
+		set_display_mode(DISPLAY_MODE_256x256);
 		break;
 	}
 }
@@ -315,7 +315,6 @@ void ef9365_device::device_start()
 	m_busy_timer = timer_alloc(FUNC(ef9365_device::clear_busy_flag), this);
 
 	m_videoram = &space(0);
-	m_current_color = 0x00;
 
 	m_irq_vb = 0;
 	m_irq_lb = 0;
@@ -324,17 +323,19 @@ void ef9365_device::device_start()
 
 	m_screen_out.allocate(m_bitplane_xres, screen().height());
 
-	save_item(NAME(m_border));
-	save_item(NAME(m_registers));
-	save_item(NAME(m_bf));
-	save_item(NAME(m_state));
-	save_item(NAME(m_msl));
-	save_item(NAME(m_readback_latch_pix_offset));
-
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_irq_vb));
 	save_item(NAME(m_irq_lb));
 	save_item(NAME(m_irq_rdy));
+
+	save_item(NAME(m_current_color));
+	save_item(NAME(m_bf));
+	save_item(NAME(m_registers));
+	save_item(NAME(m_state));
+	save_item(NAME(m_border));
+
+	save_item(NAME(m_readback_latch));
+	save_item(NAME(m_readback_latch_pix_offset));
 
 	save_item(NAME(m_screen_out));
 }
@@ -345,16 +346,18 @@ void ef9365_device::device_start()
 
 void ef9365_device::device_reset()
 {
-	m_state = 0;
-
-	m_bf = 0;
 	m_irq_state = 0;
 	m_irq_vb = 0;
 	m_irq_lb = 0;
 	m_irq_rdy = 0;
+	m_bf = 0;
+	m_state = 0;
 
 	memset(m_registers, 0, sizeof(m_registers));
 	memset(m_border, 0, sizeof(m_border));
+
+	memset(m_readback_latch, 0, sizeof(m_readback_latch));
+	m_readback_latch_pix_offset = 0;
 
 	m_screen_out.fill(0);
 
@@ -401,10 +404,10 @@ TIMER_CALLBACK_MEMBER(ef9365_device::clear_busy_flag)
 //  timer to clear it
 //-------------------------------------------------
 
-void ef9365_device::set_busy_flag(int period)
+void ef9365_device::set_busy_flag(int cycles)
 {
 	m_bf = 1;
-	m_busy_timer->adjust(attotime::from_usec(period));
+	m_busy_timer->adjust(attotime::from_ticks(cycles, clock()));
 }
 
 //-------------------------------------------------
@@ -446,6 +449,16 @@ void ef9365_device::set_y_reg(uint16_t y)
 }
 
 //-------------------------------------------------
+//  set_msl_pins: Set the MSL pins
+//-------------------------------------------------
+
+void ef9365_device::set_msl_pins(uint16_t x, uint16_t y)
+{
+	y = (m_bitplane_yres == 512) ? (y & 1) : 1;
+	m_write_msl((x & 7) | y << 3);
+}
+
+//-------------------------------------------------
 //  set_video_mode: Set output screen format
 //-------------------------------------------------
 
@@ -461,7 +474,7 @@ void ef9365_device::set_video_mode(void)
 		screen().configure(new_width, screen().height(), visarea, screen().frame_period().attoseconds());
 	}
 
-	//border color
+	// border color
 	memset(m_border, 0, sizeof(m_border));
 }
 
@@ -506,8 +519,8 @@ void ef9365_device::plot(int x_pos, int y_pos)
 		if (m_registers[EF936X_REG_CTRL1] & 0x01)
 		{
 			y_pos = (m_bitplane_yres - 1) - y_pos;
-			m_msl = (x_pos & 7) | 8;
-			uint8_t mask = 0x80 >> (m_msl & 7);
+			set_msl_pins(x_pos, y_pos);
+			uint8_t mask = 0x80 >> (x_pos & 7);
 
 			if (m_registers[EF936X_REG_CTRL1] & 0x02)
 			{
@@ -830,15 +843,6 @@ int ef9365_device::draw_character(uint8_t c, bool block, bool smallblock)
 }
 
 //-------------------------------------------------
-//  cycles_to_us: Convert a number of clock cycles to us
-//-------------------------------------------------
-
-int ef9365_device::cycles_to_us(int cycles)
-{
-	return (int)(cycles * (1000000.f / m_clock_freq));
-}
-
-//-------------------------------------------------
 // dump_bitplanes_word: Latch the bitplane words
 // pointed by the x & y registers
 // (Memory read back function)
@@ -873,8 +877,8 @@ void ef9365_device::screen_scanning(bool force_clear)
 		{
 			for (int x = 0; x < m_bitplane_xres; x++)
 			{
-				m_msl = (x & 7) | 8;
-				uint8_t mask = 0x80 >> (m_msl & 7);
+				set_msl_pins(x, y);
+				uint8_t mask = 0x80 >> (x & 7);
 
 				for (int p = 0; p < m_nb_of_bitplanes; p++)
 				{
@@ -894,8 +898,8 @@ void ef9365_device::screen_scanning(bool force_clear)
 		{
 			for (int x = 0; x < m_bitplane_xres; x++)
 			{
-				m_msl = (x & 7) | 8;
-				uint8_t mask = 0x80 >> (m_msl & 7);
+				set_msl_pins(x, y);
+				uint8_t mask = 0x80 >> (x & 7);
 
 				for (int p = 0; p < m_nb_of_bitplanes; p++)
 				{
@@ -987,7 +991,7 @@ void ef9365_device::ef9365_exec(uint8_t cmd)
 
 		if (busy_cycles)
 		{
-			set_busy_flag(cycles_to_us(busy_cycles));
+			set_busy_flag(busy_cycles);
 		}
 	}
 	else
@@ -1041,7 +1045,7 @@ void ef9365_device::ef9365_exec(uint8_t cmd)
 					busy_cycles = draw_vector(get_x_reg(), get_y_reg(), -tmp_delta_x, 0);
 					break;
 			}
-			set_busy_flag(cycles_to_us(busy_cycles));
+			set_busy_flag(busy_cycles);
 		}
 		else
 		{
@@ -1084,7 +1088,7 @@ void ef9365_device::ef9365_exec(uint8_t cmd)
 						break;
 				}
 
-				set_busy_flag(cycles_to_us(busy_cycles));
+				set_busy_flag(busy_cycles);
 			}
 			else
 			{
@@ -1093,7 +1097,7 @@ void ef9365_device::ef9365_exec(uint8_t cmd)
 				LOG("EF9365 Command : [0x%.2X] %s\n", cmd, commands_names[0x12]);
 
 				int busy_cycles = draw_character(cmd - 0x20, false, false);
-				set_busy_flag(cycles_to_us(busy_cycles));
+				set_busy_flag(busy_cycles);
 			}
 		}
 	}

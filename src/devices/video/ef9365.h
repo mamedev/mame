@@ -42,9 +42,10 @@ public:
 
 	// configuration
 	template <typename T> void set_palette_tag(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }
-	void set_nb_bitplanes(int nb_bitplanes );
-	void set_display_mode(int display_mode );
-	auto irq_handler() { return m_irq_handler.bind(); }
+	void set_nb_bitplanes(int nb_bitplanes);
+	void set_display_mode(int display_mode);
+	auto irq_handler() { return m_irq_handler.bind(); } // IRQ pin
+	auto write_msl() { return m_write_msl.bind(); } // memory select during pixel write
 
 	// device interface
 	uint8_t data_r(offs_t offset);
@@ -53,8 +54,6 @@ public:
 	void update_scanline(uint16_t scanline);
 	void set_color_filler(uint8_t color);
 	void set_color_entry(int index, uint8_t r, uint8_t g, uint8_t b);
-
-	uint8_t get_msl() { return m_msl; } // during pixel write
 	uint8_t get_last_readback_word(int bitplane_number, int *pixel_offset);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -82,16 +81,16 @@ private:
 	uint16_t get_y_reg();
 	void set_x_reg(uint16_t x);
 	void set_y_reg(uint16_t y);
+	void set_msl_pins(uint16_t x, uint16_t y);
 	void screen_scanning(bool force_clear);
-	void set_busy_flag(int period);
+	void set_busy_flag(int cycles);
 	void set_video_mode();
 	void draw_border(uint16_t line);
 	void ef9365_exec(uint8_t cmd);
-	int cycles_to_us(int cycles);
 	void dump_bitplanes_word();
 	void update_interrupts();
 
-	void ef9365(address_map &map);
+	void ef9365_map(address_map &map);
 
 	// internal state
 	required_region_ptr<uint8_t> m_charset;
@@ -106,7 +105,6 @@ private:
 	uint8_t m_registers[0x10]; // registers
 	uint8_t m_state;           // status register
 	uint8_t m_border[80];      // border color
-	uint8_t m_msl;             // memory select signal
 
 	int m_nb_of_bitplanes;
 	int m_nb_of_colors;
@@ -119,7 +117,6 @@ private:
 	uint8_t m_readback_latch[MAX_BITPLANES]; // Last DRAM Readback buffer (Filled after a Direct Memory Access Request command)
 	int m_readback_latch_pix_offset;
 
-	uint32_t m_clock_freq;
 	bitmap_rgb32 m_screen_out;
 
 	// timers
@@ -127,6 +124,7 @@ private:
 
 	required_device<palette_device> m_palette;
 	devcb_write_line m_irq_handler;
+	devcb_write8 m_write_msl;
 };
 
 // device type definition

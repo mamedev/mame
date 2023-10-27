@@ -80,6 +80,7 @@ private:
 	void vram_map(address_map &map);
 	void vram_w(offs_t offset, u8 data);
 	u8 vram_r(offs_t offset);
+	void msl_w(u8 data) { m_pixel_offset = data & 7; }
 
 	void porta_w(u8 data);
 	u8 porta_r();
@@ -95,6 +96,7 @@ private:
 	u8 m_ccount = 0;
 	u8 m_command = 0;
 	u8 m_color = 0;
+	u8 m_pixel_offset = 0;
 	u8 m_vramdata = 0;
 };
 
@@ -117,6 +119,7 @@ void videoart_state::machine_start()
 	save_item(NAME(m_ccount));
 	save_item(NAME(m_command));
 	save_item(NAME(m_color));
+	save_item(NAME(m_pixel_offset));
 	save_item(NAME(m_vramdata));
 }
 
@@ -176,9 +179,8 @@ u32 videoart_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 void videoart_state::vram_w(offs_t offset, u8 data)
 {
-	u8 low = m_ef9367->get_msl() & 7;
-	data = BIT(data, low ^ 7);
-	offset = offset << 1 | BIT(low, 2);
+	data = BIT(data, ~m_pixel_offset & 7);
+	offset = offset << 1 | BIT(m_pixel_offset, 2);
 
 	if (data)
 		m_vram[offset] = m_color;
@@ -188,9 +190,9 @@ void videoart_state::vram_w(offs_t offset, u8 data)
 
 u8 videoart_state::vram_r(offs_t offset)
 {
-	int low = 0;
-	m_ef9367->get_last_readback_word(0, &low);
-	offset = offset << 1 | BIT(low, 2);
+	int pixel_offset = 0;
+	m_ef9367->get_last_readback_word(0, &pixel_offset);
+	offset = offset << 1 | BIT(pixel_offset, 2);
 
 	if (!machine().side_effects_disabled())
 		m_vramdata = m_vram[offset];
@@ -218,24 +220,24 @@ void videoart_state::porta_w(u8 data)
 
 u8 videoart_state::porta_r()
 {
-	u8 data = 0;
+	u8 data = 0xff;
 
 	// read EF9367 data
 	if (~m_portb & 1)
-		data |= m_efdata;
+		data &= m_efdata;
 
 	// read vram data
 	if (~m_portb & 4)
 	{
 		u8 shift = (m_ccount & 1) * 2;
-		data |= m_vramdata >> shift;
+		data &= m_vramdata >> shift | 0xfc;
 	}
 
 	// read cartridge data
 	if (~m_portb & 0x10)
 	{
 		u16 offset = m_romlatch << 8 | m_portc;
-		data |= m_cart->read_rom(offset);
+		data &= m_cart->read_rom(offset);
 	}
 
 	return data;
@@ -357,6 +359,7 @@ void videoart_state::videoart(machine_config &config)
 	m_ef9367->set_nb_bitplanes(1);
 	m_ef9367->set_display_mode(ef9365_device::DISPLAY_MODE_512x256);
 	m_ef9367->irq_handler().set_inputline(m_maincpu, M6805_IRQ_LINE);
+	m_ef9367->write_msl().set(FUNC(videoart_state::msl_w));
 
 	TIMER(config, "scanline").configure_scanline(FUNC(videoart_state::scanline), "screen", 0, 1);
 
