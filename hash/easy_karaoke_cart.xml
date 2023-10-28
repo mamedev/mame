@@ -31,6 +31,32 @@ license:CC0-1.0
 	</software>
 
 	<!--
+	My Way                                      Frank Sinatra
+	Daydream believer                           The Monkees
+	Build me up buttercup                       The Foundations
+	The Best                                    Tina Turner
+	How do I live                               Leanne Rimes
+	I will survive                              Gloria Gaynor
+	Candle in the wind 97                       Elton John
+	If tomorrow never comes                     Ronan Keating
+	Stand by me                                 Ben E. King
+	Words                                       Boyzone
+	-->
+	<software name="ekgg2" supported="no">
+		<description>Golden Greats Vol.2</description>
+		<year>2004</year>
+		<publisher>IVL Technologies</publisher>
+		<part name="cart" interface="easy_karaoke_cart">
+			<dataarea name="rom" size="0x80000">
+				<rom name="IVL_S033I.U3" size="0x80000" crc="e4b1e82e" sha1="2db2162e0a86fc82e1978a5f21ea46e5ccde5f6d" />
+			</dataarea>
+			<dataarea name="mcu" size="0x2000">
+				<rom name="IC89LV52A-24PQ.U1" size="0x2000" status="nodump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
 	Black velvet                                Alannah Myles
 	Hello                                       Lionel Richie
 	Hero                                        Mariah Carey
