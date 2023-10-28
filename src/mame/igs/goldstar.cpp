@@ -12846,24 +12846,27 @@ ROM_END
    -1 x Jfc 95101
    -3 banks of 8 DIP switches
    -12.000 MHz xtal
-*/ 
+*/
 ROM_START( hamhouse )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "am27c512.u33",       0x00000, 0x10000, CRC(f4dd12e9) SHA1(b792ee549ecf5e446387cd5c7d78b2fc69b03f33) )
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
-	ROM_LOAD( "7_27c256.u43",       0x00000, 0x08000, CRC(31c419f0) SHA1(7c827af5c208bab0ca143558581a57b0b355a3ad) )
-	ROM_LOAD( "5_nmc27c256q.u28",   0x08000, 0x08000, CRC(e54f033e) SHA1(a3ec618109d7f7287c59199888ba92ead6396d1b) )
-	ROM_LOAD( "6_am27c256.u42",     0x10000, 0x08000, CRC(bfdfd613) SHA1(42476ec4b4cd29062fe4a2d8a3789614e7af2fdb) )
+	ROM_LOAD( "5_nmc27c256q.u28",   0x00000, 0x08000, CRC(e54f033e) SHA1(a3ec618109d7f7287c59199888ba92ead6396d1b) )
+	ROM_LOAD( "6_am27c256.u42",     0x08000, 0x08000, CRC(bfdfd613) SHA1(42476ec4b4cd29062fe4a2d8a3789614e7af2fdb) )
+	ROM_LOAD( "7_27c256.u43",       0x10000, 0x08000, CRC(31c419f0) SHA1(7c827af5c208bab0ca143558581a57b0b355a3ad) )
 
-	ROM_REGION( 0xE0000, "gfx2", 0 )
-	ROM_LOAD( "2_27c256.u11",       0x00000, 0x08000, CRC(fac9fe6c) SHA1(0c55c017957d65121b9cc876d914cca2dec5e94e) )
-	ROM_LOAD( "4_d27128a.u26",      0x08000, 0x02000, CRC(8cf3845e) SHA1(4f672d256548211c48e60ce89718c3c195f187d5) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_REGION( 0x08000, "gfx2", 0 )
+	ROM_LOAD( "1_27c64-20.u10",     0x00000, 0x02000, CRC(c4efc953) SHA1(da24c802d33be377ad6d6a357ed32d5214ca7a3f) )
+	ROM_LOAD( "2_27c256.u11",       0x02000, 0x02000, CRC(fac9fe6c) SHA1(0c55c017957d65121b9cc876d914cca2dec5e94e) ) // BADADDR         --xxxxxxxxxxxxx
+	ROM_IGNORE( 0x6000 )
+	ROM_LOAD( "4_d27128a.u26",      0x06000, 0x02000, CRC(8cf3845e) SHA1(4f672d256548211c48e60ce89718c3c195f187d5) ) // 1ST AND 2ND HALF IDENTICAL
 	ROM_IGNORE( 0x2000 )
-	ROM_LOAD( "1_27c64-20.u10",     0xa0000, 0x02000, CRC(c4efc953) SHA1(da24c802d33be377ad6d6a357ed32d5214ca7a3f) )
-	ROM_LOAD( "3_hy27c64ad-15.u24", 0xc0000, 0x02000, CRC(7f9c41db) SHA1(64c5fb779ecc05eae3264c7767c571eb76fb389f) )
+	ROM_LOAD( "3_hy27c64ad-15.u24", 0x04000, 0x02000, CRC(7f9c41db) SHA1(64c5fb779ecc05eae3264c7767c571eb76fb389f) )
 
-	ROM_REGION( 0x600, "proms", 0 )
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x600, "proms", ROMREGION_ERASE00 )
 	// EPROM on a small subboard wired to replace two bipolar PROMS
 	ROM_LOAD( "nm27c256.u55",       0x00000, 0x00400, CRC(f7c7c025) SHA1(f845dc960ed74f64bfff06e3766a1047a26e9de1) )
 	ROM_IGNORE( 0x7c00 )
@@ -20111,6 +20114,7 @@ GAME ( 199?, wcat3a,    wcat3,    chryangl, cmaster,  cmaster_state,  init_wcat3
 GAMEL( 199?, ll3,       cmaster,  cm,       cmasterb, cmaster_state,  init_ll3,       ROT0, "bootleg",           "Lucky Line III",                              MACHINE_NOT_WORKING, layout_cmasterb )  // not looked at yet
 GAMEL( 199?, cmfb55,    cmaster,  cmfb55,   cmaster,  cmaster_state,  init_cmfb55,    ROT0, "bootleg",           "Cherry Master (bootleg, Game FB55 Ver.2)",    MACHINE_NOT_WORKING, layout_cmv4 ) // inputs not done
 GAMEL( 1991, srmagic,   cmv4,     cm,       cmv4,     cmaster_state,  empty_init,     ROT0, "bootleg",           "Super Real Magic (V6.3)",                     MACHINE_NOT_WORKING, layout_cmv4 ) // needs correct I/O
+GAMEL( 199?, hamhouse,  cmaster,  cm,       cmaster,  cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Hamburger House",                             MACHINE_NOT_WORKING, layout_cmaster ) // missing PROM dump, I/O
 
 GAMEL( 1991, tonypok,   0,        cm,       tonypok,  cmaster_state,  init_tonypok,   ROT0, "Corsica",           "Poker Master (Tony-Poker V3.A, hack?)",       0 ,                layout_tonypok )
 GAME(  1999, jkrmast,   0,        pkrmast,  pkrmast,  goldstar_state, init_jkrmast,   ROT0, "Pick-A-Party USA",  "Joker Master (V515)",                         MACHINE_NOT_WORKING ) // encryption broken, needs GFX and controls
@@ -20150,7 +20154,6 @@ GAMEL( 1985, ns8linesa, ns8lines, lucky8,   lucky8b,  wingco_state,   empty_init
 GAMEL( 198?, ns8linew,  ns8lines, lucky8,   ns8linew, wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (F-5, Witch Bonus)", 0,                     layout_lucky8 )    // 2 control sets...
 GAMEL( 198?, ns8linewa, ns8lines, lucky8,   ns8linwa, wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (W-4, Witch Bonus)", 0,                     layout_lucky8p1 )  // only 1 control set...
 GAMEL( 1991, nd8lines,  lucky8,   nd8lines, nd8lines, wingco_state,   init_nd8lines,  ROT0, "Yamate (bootleg)",  "New Draw 8 Lines (Version 2.1)",                           MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND, layout_lucky8 ) // PROM decode wrong, SN emits terrible sound, inputs not done yet
-GAMEL( 199?, hamhouse,  cmaster,  nd8lines, nd8lines, wingco_state,   empty_init,     ROT0, "bootleg",           "Hamburger House",                                          MACHINE_NOT_WORKING,   layout_lucky8 )
 GAMEL( 198?, super972,  ns8lines, super972, ns8linwa, wingco_state,   init_super972,  ROT0, "<unknown>",         "Super 97-2 (Witch Bonus)",                                 MACHINE_NOT_WORKING,   layout_lucky8p1 )  // decrypted, needs correct inputs
 GAME(  198?, luckybar,  0,        lucky8,   ns8linew, wingco_state,   empty_init,     ROT0, "<unknown>",         "Lucky Bar (W-4 with mc68705 MCU)",                         MACHINE_NOT_WORKING )  // MC68705 MCU
 GAMEL( 198?, kkotnoli,  0,        kkotnoli, kkotnoli, goldstar_state, empty_init,     ROT0, "hack",              "Kkot No Li (Kill the Bees)",                               MACHINE_IMPERFECT_COLORS, layout_lucky8 )
