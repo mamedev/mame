@@ -1307,6 +1307,11 @@ ROM_START( dgun2959 )
 	ROM_LOAD( "dgun2959.bin", 0x00000, 0x1000000, CRC(6e9b2f45) SHA1(abac2c1783e99b02f9c44f714d5184aea86661ae) )
 ROM_END
 
+ROM_START( 88in1joy )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "88in1joystick.bin", 0x00000, 0x400000, CRC(86b8d819) SHA1(6da387b2e6ce02a3ec203e2af8a961959ba1cf62) )
+ROM_END
+
 
 
 void nes_vt_state::init_protpp()
@@ -1475,6 +1480,9 @@ CONS( 201?, mc_89in1,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty
 
 // Works fine, uses ony VT02 features
 CONS( 201?, mc_tv200,   0,        0,  nes_vt_8mb,    nes_vt, nes_vt_state, empty_init, "Thumbs Up", "200 in 1 Retro TV Game", MACHINE_IMPERFECT_GRAPHICS )
+
+// TODO: add cart port and hook up nes_vt_cart.xml
+CONS( 201?, 88in1joy,   0,        0,  nes_vt_pal_4mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "88 in 1 Joystick", MACHINE_IMPERFECT_GRAPHICS )
 
 
 // Runs fine, non-sport 121 in 1 games perfect, but minor graphical issues in
