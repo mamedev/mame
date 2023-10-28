@@ -23,8 +23,6 @@ Hardware notes:
 - RF NTSC video, no sound
 
 TODO:
-- internal artwork for color picker? or instead, the user can just put the cursor
-  in a corner to check the color
 - palette is approximated from photos/videos
 
 *******************************************************************************/
@@ -40,6 +38,8 @@ TODO:
 #include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"
+
+#include "videoart.lh"
 
 
 namespace {
@@ -330,7 +330,7 @@ static INPUT_PORTS_START( videoart )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_NAME("Erase")
 
 	PORT_START("AN0")
-	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X) PORT_SENSITIVITY(50) PORT_KEYDELTA(2) PORT_CENTERDELTA(0) PORT_REVERSE PORT_PLAYER(2) PORT_NAME("Color")
+	PORT_BIT(0xff, 0x7b, IPT_AD_STICK_X) PORT_SENSITIVITY(50) PORT_KEYDELTA(2) PORT_CENTERDELTA(0) PORT_REVERSE PORT_MINMAX(0x00, 0xf6) PORT_PLAYER(2) PORT_NAME("Color")
 
 	PORT_START("AN1")
 	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X) PORT_SENSITIVITY(50) PORT_KEYDELTA(4) PORT_CENTERDELTA(0)
@@ -377,6 +377,8 @@ void videoart_state::videoart(machine_config &config)
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(0, 512-1, 48, 256-1);
 	m_screen->set_palette("palette");
+
+	config.set_default_layout(layout_videoart);
 
 	// cartridge
 	GENERIC_CARTSLOT(config, m_cart, generic_linear_slot, "videoart");
