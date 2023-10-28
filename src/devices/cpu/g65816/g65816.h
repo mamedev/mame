@@ -209,13 +209,13 @@ protected:
 	static const set_line_func s_g65816_set_line[5];
 	static const execute_func s_g65816_execute[5];
 
-	unsigned m_a;             /* Accumulator */
-	unsigned m_b;             /* holds high byte of accumulator */
-	unsigned m_x;             /* Index Register X */
-	unsigned m_y;             /* Index Register Y */
-	unsigned m_s;             /* Stack Pointer */
-	unsigned m_pc;            /* Program Counter */
-	unsigned m_ppc;           /* Previous Program Counter */
+	uint16_t m_a;             /* Accumulator */
+	uint16_t m_b;             /* holds high byte of accumulator */
+	uint16_t m_x;             /* Index Register X */
+	uint16_t m_y;             /* Index Register Y */
+	uint16_t m_s;             /* Stack Pointer */
+	uint16_t m_pc;            /* Program Counter */
+	uint16_t m_ppc;           /* Previous Program Counter */
 	unsigned m_pb;            /* Program Bank (shifted left 16) */
 	unsigned m_db;            /* Data Bank (shifted left 16) */
 	unsigned m_d;             /* Direct Register */
