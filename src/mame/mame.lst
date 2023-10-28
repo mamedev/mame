@@ -33140,6 +33140,9 @@ mini5sx                         // 1991
 @source:nec/ews4800.cpp
 ews4800_310                     // NEC EWS4800/310
 
+@source:nec/pc_h98.cpp
+pc_h98s                         // 1991
+
 @source:nec/pc100.cpp
 pc100                           //
 
