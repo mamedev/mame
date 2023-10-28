@@ -21,6 +21,10 @@ public:
 	{}
 
 	void pc_h98s(machine_config &config);
+
+protected:
+	DECLARE_MACHINE_START(pc_h98);
+	DECLARE_MACHINE_RESET(pc_h98);
 };
 
 // TODO: backported from pc9801_epson.cpp, needs mods
@@ -123,6 +127,19 @@ static INPUT_PORTS_START( pc_h98 )
 	PORT_CONFSETTING(    0x04, DEF_STR( No ) )
 INPUT_PORTS_END
 
+MACHINE_START_MEMBER(pc_hyper98_state,pc_h98)
+{
+	MACHINE_START_CALL_MEMBER(pc9801bx2);
+}
+
+MACHINE_RESET_MEMBER(pc_hyper98_state,pc_h98)
+{
+	MACHINE_RESET_CALL_MEMBER(pc9801bx2);
+
+	// boots with DMA > 1MB on.
+	m_dma_access_ctrl = 0xfb;
+}
+
 void pc_hyper98_state::pc_h98s(machine_config &config)
 {
 	pc9801bx2(config);
@@ -132,8 +149,8 @@ void pc_hyper98_state::pc_h98s(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pc_hyper98_state::pc9801bx2_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	MCFG_MACHINE_START_OVERRIDE(pc_hyper98_state, pc9801bx2)
-	MCFG_MACHINE_RESET_OVERRIDE(pc_hyper98_state, pc9801bx2)
+	MCFG_MACHINE_START_OVERRIDE(pc_hyper98_state, pc_h98)
+	MCFG_MACHINE_RESET_OVERRIDE(pc_hyper98_state, pc_h98)
 
 	m_ram->set_default_size("14M");
 	// TODO: extra options, 1.6MB up to 45.6MB

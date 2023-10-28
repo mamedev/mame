@@ -1538,6 +1538,63 @@ void pc9801_state::dma_write_byte(offs_t offset, uint8_t data)
 	program.write_byte(addr, data);
 }
 
+uint8_t pc9801vm_state::dma_read_byte(offs_t offset)
+{
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	offs_t addr = (m_dma_offset[m_dack] << 16) | offset;
+
+	if (BIT(m_dma_access_ctrl, 2))
+		addr &= 0xfffff;
+
+	if(offset == 0xffff)
+	{
+		switch(m_dma_autoinc[m_dack])
+		{
+			case 1:
+			{
+				uint8_t page = m_dma_offset[m_dack];
+				m_dma_offset[m_dack] = ((page + 1) & 0xf) | (page & 0xf0);
+				break;
+			}
+			case 3:
+				m_dma_offset[m_dack]++;
+				break;
+		}
+	}
+
+//  logerror("%08x %02x\n",addr, m_dma_access_ctrl);
+	return program.read_byte(addr);
+}
+
+
+void pc9801vm_state::dma_write_byte(offs_t offset, uint8_t data)
+{
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	offs_t addr = (m_dma_offset[m_dack] << 16) | offset;
+
+	if (BIT(m_dma_access_ctrl, 2))
+		addr &= 0xfffff;
+
+	if(offset == 0xffff)
+	{
+		switch(m_dma_autoinc[m_dack])
+		{
+			case 1:
+			{
+				uint8_t page = m_dma_offset[m_dack];
+				m_dma_offset[m_dack] = ((page + 1) & 0xf) | (page & 0xf0);
+				break;
+			}
+			case 3:
+				m_dma_offset[m_dack]++;
+				break;
+		}
+	}
+//  logerror("%08x %02x %02x\n",addr,data, m_dma_access_ctrl);
+
+	program.write_byte(addr, data);
+}
+
 void pc9801_state::set_dma_channel(int channel, int state)
 {
 	if (!state) m_dack = channel;
