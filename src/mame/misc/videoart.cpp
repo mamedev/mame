@@ -8,7 +8,7 @@ LJN Video Art
 It's a toy for drawing/coloring pictures on the tv, not a video game console.
 Picture libraries were available on separate cartridges.
 
-On the splash screen, press CLEAR to start drawing (no need to wait half a minute).
+On the title screen, press CLEAR to start drawing (no need to wait half a minute).
 To change the background color, choose one from the color slider and press CLEAR.
 Drawing with the same color as the picture outline is not allowed.
 
@@ -23,7 +23,8 @@ Hardware notes:
 - RF NTSC video, no sound
 
 TODO:
-- custom chip command upper bits meaning is unknown
+- internal artwork for color picker? or instead, the user can just put the cursor
+  in a corner to check the color
 - palette is approximated from photos/videos
 
 *******************************************************************************/
@@ -95,7 +96,6 @@ private:
 	u8 m_romlatch = 0;
 	u8 m_ccount = 0;
 	u8 m_command = 0;
-	u8 m_color = 0;
 	u8 m_pixel_offset = 0;
 	u8 m_vramdata = 0;
 };
@@ -118,7 +118,6 @@ void videoart_state::machine_start()
 	save_item(NAME(m_romlatch));
 	save_item(NAME(m_ccount));
 	save_item(NAME(m_command));
-	save_item(NAME(m_color));
 	save_item(NAME(m_pixel_offset));
 	save_item(NAME(m_vramdata));
 }
@@ -141,23 +140,23 @@ DEVICE_IMAGE_LOAD_MEMBER(videoart_state::cart_load)
 constexpr rgb_t videoart_colors[] =
 {
 	{ 0x00, 0x00, 0x00 }, // 2 black
-	{ 0x50, 0x20, 0x28 }, // b dark pink
-	{ 0x80, 0x80, 0x80 }, // 1 gray
-	{ 0xff, 0x78, 0xff }, // c pink
-
-	{ 0x20, 0x18, 0x90 }, // 7 blue
-	{ 0x40, 0x10, 0x50 }, // 8 purple
-	{ 0x68, 0xa8, 0xff }, // 6 cyan
-	{ 0xd8, 0x78, 0xff }, // 9 lilac
-
-	{ 0x00, 0x60, 0x00 }, // 3 dark green
-	{ 0x30, 0x28, 0x08 }, // a brown
-	{ 0x68, 0xb0, 0x18 }, // 4 lime green
-	{ 0xd0, 0x78, 0x20 }, // f orange
-
+	{ 0x08, 0x18, 0x88 }, // 7 blue
+	{ 0x18, 0x60, 0x00 }, // 3 dark green
 	{ 0xff, 0xff, 0xff }, // 0 white
-	{ 0x40, 0x10, 0x10 }, // d dark red
+
+	{ 0x50, 0x18, 0x48 }, // b dark pink
+	{ 0x40, 0x10, 0x60 }, // 8 purple
+	{ 0x30, 0x28, 0x08 }, // a brown
+	{ 0x60, 0x10, 0x10 }, // d dark red
+
+	{ 0x80, 0x80, 0x80 }, // 1 gray
+	{ 0x68, 0xa8, 0xff }, // 6 cyan
+	{ 0x78, 0xb0, 0x18 }, // 4 lime green
 	{ 0x48, 0xb0, 0x20 }, // 5 green
+
+	{ 0xff, 0x78, 0xff }, // c pink
+	{ 0xd8, 0x78, 0xff }, // 9 lilac
+	{ 0xd0, 0x78, 0x20 }, // f orange
 	{ 0xe0, 0x60, 0x58 }  // e light red
 };
 
@@ -169,10 +168,18 @@ void videoart_state::palette(palette_device &palette) const
 
 u32 videoart_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	// width of 512 compressed down to 128
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
-			bitmap.pix(y, x) = m_vram[(y << 7 | x >> 2) & 0x7fff] & 0xf;
+	if (m_command & 2)
+	{
+		// display gets blanked after a couple of minutes idle
+		bitmap.fill(0, cliprect);
+	}
+	else
+	{
+		// width of 512 compressed down to 128
+		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+				bitmap.pix(y, x) = m_vram[(y << 7 | x >> 2) & 0x7fff] & 0xf;
+	}
 
 	return 0;
 }
@@ -181,10 +188,10 @@ void videoart_state::vram_w(offs_t offset, u8 data)
 {
 	// correct offset (by default, ef9365_device wants to write per byte)
 	data = BIT(data, ~m_pixel_offset & 7);
-	offset = offset << 1 | BIT(m_pixel_offset, 2);
+	offset = (offset << 1 | BIT(m_pixel_offset, 2)) & 0x7fff;
 
 	if (data)
-		m_vram[offset] = m_color;
+		m_vram[offset] = m_command >> 4;
 	else
 		m_vram[offset] ^= 0xf;
 }
@@ -194,7 +201,7 @@ u8 videoart_state::vram_r(offs_t offset)
 	// correct offset (by default, ef9365_device wants to read per byte)
 	int pixel_offset = 0;
 	m_ef9367->get_last_readback_word(0, &pixel_offset);
-	offset = offset << 1 | BIT(pixel_offset, 2);
+	offset = (offset << 1 | BIT(pixel_offset, 2)) & 0x7fff;
 
 	if (!machine().side_effects_disabled())
 		m_vramdata = m_vram[offset];
@@ -229,11 +236,8 @@ u8 videoart_state::porta_r()
 		data &= m_efdata;
 
 	// read vram data
-	if (~m_portb & 4)
-	{
-		u8 shift = (m_ccount & 1) * 2;
-		data &= m_vramdata >> shift | 0xfc;
-	}
+	if (~m_portb & 4 && m_command & 1)
+		data &= m_vramdata >> (m_ccount & 2) | 0xfc;
 
 	// read cartridge data
 	if (~m_portb & 0x10)
@@ -263,17 +267,19 @@ void videoart_state::portb_w(u8 data)
 	// B2: shift custom chip command
 	if (~data & m_portb & 4)
 	{
-		m_command = (m_command << 2) | (m_porta & 3);
-
 		// reset count
 		if (~data & 2)
 			m_ccount = 0;
+		else
+			m_ccount = (m_ccount + 2) & 7;
 
-		// change color
-		if (m_ccount == 3)
-			m_color = m_command & 0xf;
-
-		m_ccount = (m_ccount + 1) & 3;
+		// bit 0: enable vram read
+		// bit 1: enable display
+		// bit 2: same as bit 0
+		// bit 3: always 1
+		// bit 4-7: color
+		u8 mask = 3 << m_ccount;
+		m_command = (m_command & ~mask) | (m_porta << m_ccount & mask);
 	}
 
 	// B3: erase led
