@@ -67,8 +67,8 @@
     if skew existed.  SockMaster has confirmed that scanlines are in
     fact 228 clock cycles.
 
-    The PAL emulation is little more than having more scanlines; surely
-    there are details that we are missing here.
+    The PAL emulation adds scanlines, comprised of a top and bottom
+    padding of black lines.  HS is turned off during the padding.
 
 **********************************************************************/
 
@@ -82,7 +82,7 @@
 #define LOG_FLUSH    (1U << 4)
 #define LOG_INPUT    (1U << 5)
 #define LOG_NEXTLINE (1U << 6)
-#define VERBOSE      (0)
+#define VERBOSE      (LOG_SCANLINE | LOG_HSYNC | LOG_FSYNC | LOG_NEXTLINE)
 #include "logmacro.h"
 
 //**************************************************************************
@@ -94,8 +94,16 @@ constexpr int LINES_TOP_BORDER                  = 25;
 constexpr int LINES_ACTIVE_VIDEO                = 192;
 constexpr int LINES_BOTTOM_BORDER               = 26;
 constexpr int LINES_VERTICAL_RETRACE            = 6;
-constexpr int LINES_UNTIL_RETRACE               = LINES_TOP_BORDER + LINES_ACTIVE_VIDEO + LINES_BOTTOM_BORDER;
-constexpr int LINES_UNTIL_VBLANK                = LINES_UNTIL_RETRACE + LINES_VERTICAL_RETRACE;
+
+constexpr int LINES_UNTIL_RETRACE_NTSC          = LINES_TOP_BORDER + LINES_ACTIVE_VIDEO + LINES_BOTTOM_BORDER;
+constexpr int LINES_UNTIL_VBLANK_NTSC           = LINES_UNTIL_RETRACE_NTSC + LINES_VERTICAL_RETRACE;
+constexpr int LINES_PADDING_TOP_PAL             = 25;
+constexpr int LINES_PADDING_BOTTOM_PAL          = 25;
+constexpr int LINES_UNTIL_PADDING_BOTTOM_PAL    = LINES_PADDING_TOP_PAL + LINES_TOP_BORDER + LINES_ACTIVE_VIDEO +
+												  LINES_BOTTOM_BORDER - 2;
+constexpr int LINES_UNTIL_RETRACE_PAL           = LINES_PADDING_TOP_PAL + LINES_TOP_BORDER + LINES_ACTIVE_VIDEO +
+												  LINES_BOTTOM_BORDER + LINES_PADDING_BOTTOM_PAL;
+constexpr int LINES_UNTIL_VBLANK_PAL            = LINES_UNTIL_RETRACE_PAL + LINES_VERTICAL_RETRACE;
 
 constexpr bool USE_HORIZONTAL_CLIP              = false;
 
@@ -150,7 +158,8 @@ const uint32_t mc6847_base_device::s_palette[mc6847_base_device::PALETTE_LENGTH]
 //-------------------------------------------------
 
 mc6847_friend_device::mc6847_friend_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock,
-		const uint8_t *fontdata, bool is_mc6847t1, double tpfs, int field_sync_falling_edge_scanline, int divider, bool supports_partial_body_scanlines)
+		const uint8_t *fontdata, bool is_mc6847t1, double tpfs, int field_sync_falling_edge_scanline, int divider,
+		bool supports_partial_body_scanlines, bool pal)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_write_hsync(*this)
@@ -160,9 +169,13 @@ mc6847_friend_device::mc6847_friend_device(const machine_config &mconfig, device
 	, m_tpfs(tpfs)
 	, m_divider(divider)
 	, m_supports_partial_body_scanlines(supports_partial_body_scanlines)
+	, m_pal(pal)
 {
 	// The MC6847 and the GIME apply field sync on different scanlines
-	m_field_sync_falling_edge_scanline = field_sync_falling_edge_scanline;
+	m_field_sync_falling_edge_scanline =
+		m_pal ?
+		field_sync_falling_edge_scanline + LINES_PADDING_TOP_PAL :
+		field_sync_falling_edge_scanline;
 }
 
 
@@ -191,7 +204,10 @@ void mc6847_friend_device::device_start()
 	m_logical_scanline_zone = 0;
 	m_field_sync = false;
 	m_horizontal_sync = false;
-	set_geometry(LINES_TOP_BORDER, LINES_ACTIVE_VIDEO, false);
+	set_geometry(
+		m_pal ? LINES_TOP_BORDER + LINES_PADDING_TOP_PAL : LINES_TOP_BORDER,
+		LINES_ACTIVE_VIDEO,
+		false);
 
 	/* save states */
 	save_item(NAME(m_physical_scanline));
@@ -355,8 +371,9 @@ TIMER_CALLBACK_MEMBER(mc6847_friend_device::change_horizontal_sync)
 		// log if apprpriate
 		LOGMASKED(LOG_HSYNC, "%s: change_horizontal_sync(): line=%d, (vpos,hpos)=(%d,%d), m_physical_scanline=%d\n", describe_context(), line ? 1 : 0, screen().vpos(), screen().hpos(), m_physical_scanline);
 
-		// invoke callback
-		m_write_hsync(line);
+		// invoke callback (to issue interrupt) if this isn't a PAL padding line
+		if (!is_pal_padding_line(m_physical_scanline))
+			m_write_hsync(line);
 
 		// call virtual function
 		horizontal_sync_changed(m_horizontal_sync);
@@ -408,13 +425,15 @@ inline void mc6847_friend_device::next_scanline()
 		m_logical_scanline = 0;
 		m_logical_scanline_zone = SCANLINE_ZONE_TOP_BORDER;
 	}
-	else if ((m_logical_scanline_zone < SCANLINE_ZONE_VBLANK) && (m_physical_scanline >= LINES_UNTIL_VBLANK))
+	else if ((m_logical_scanline_zone < SCANLINE_ZONE_VBLANK) &&
+		(m_physical_scanline >= (m_pal ? LINES_UNTIL_VBLANK_PAL : LINES_UNTIL_VBLANK_NTSC)))
 	{
 		/* we're now into vblank */
 		m_logical_scanline = 0;
 		m_logical_scanline_zone = SCANLINE_ZONE_VBLANK;
 	}
-	else if ((m_logical_scanline_zone < SCANLINE_ZONE_RETRACE) && (m_physical_scanline >= LINES_UNTIL_RETRACE))
+	else if ((m_logical_scanline_zone < SCANLINE_ZONE_RETRACE) &&
+		(m_physical_scanline >= (m_pal ? LINES_UNTIL_RETRACE_PAL : LINES_UNTIL_RETRACE_NTSC)))
 	{
 		/* we're now into retrace */
 		m_logical_scanline = 0;
@@ -434,16 +453,50 @@ inline void mc6847_friend_device::next_scanline()
 		enter_bottom_border();
 	}
 
-	LOGMASKED(\
-		LOG_NEXTLINE, \
-		"mc6847_friend_device::next_scanline(): (vpos,hpos)=(%d,%d), m_physical_scanline='%d', m_logical_scanline_zone='%s', m_logical_scanline='%d'\n", \
-		screen().vpos(), \
-		screen().hpos(), \
-		m_physical_scanline, \
-		scanline_zone_string((scanline_zone)m_logical_scanline_zone), \
+	LOGMASKED(
+		LOG_NEXTLINE,
+		"mc6847_friend_device::next_scanline(): (vpos,hpos)=(%d,%d), m_physical_scanline='%d', m_logical_scanline_zone='%s', m_logical_scanline='%d'\n",
+		screen().vpos(),
+		screen().hpos(),
+		m_physical_scanline,
+		scanline_zone_string((scanline_zone)m_logical_scanline_zone),
 		m_logical_scanline);
 }
 
+
+//-------------------------------------------------
+//  is_top_pal_padding_line
+//-------------------------------------------------
+
+inline bool mc6847_friend_device::is_top_pal_padding_line(int scanline)
+{
+	// PAL adds 25 padding scanlines before top border
+	return m_pal && scanline < LINES_PADDING_TOP_PAL;
+}
+
+
+//-------------------------------------------------
+//  is_bottom_pal_padding_line
+//-------------------------------------------------
+
+inline bool mc6847_friend_device::is_bottom_pal_padding_line(int scanline)
+{
+	// PAL adds 25 padding scanlines nested INSIDE the bottom border
+	// (just a couple lines up from the end of the bottom border).
+	return m_pal &&
+		LINES_UNTIL_PADDING_BOTTOM_PAL <= scanline &&
+		scanline < LINES_UNTIL_PADDING_BOTTOM_PAL + LINES_PADDING_BOTTOM_PAL;
+}
+
+
+//-------------------------------------------------
+//  is_pal_padding_line
+//-------------------------------------------------
+
+inline bool mc6847_friend_device::is_pal_padding_line(int scanline)
+{
+	return is_top_pal_padding_line(scanline) || is_bottom_pal_padding_line(scanline);
+}
 
 
 //-------------------------------------------------
@@ -549,8 +602,10 @@ std::string mc6847_friend_device::describe_context() const
 //  ctor
 //-------------------------------------------------
 
-mc6847_base_device::mc6847_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const uint8_t *fontdata, double tpfs) :
-	mc6847_friend_device(mconfig, type, tag, owner, clock, fontdata, (type == MC6847T1_NTSC) || (type == MC6847T1_PAL), tpfs, LINES_TOP_BORDER + LINES_ACTIVE_VIDEO - 1, 1, true),
+mc6847_base_device::mc6847_base_device(const machine_config &mconfig, device_type type, const char *tag,
+		device_t *owner, uint32_t clock, const uint8_t *fontdata, double tpfs, bool pal) :
+	mc6847_friend_device(mconfig, type, tag, owner, clock, fontdata, (type == MC6847T1_NTSC) || (type == MC6847T1_PAL),
+		tpfs, LINES_TOP_BORDER + LINES_ACTIVE_VIDEO - 1, 1, true, pal),
 	m_input_cb(*this, 0),
 	m_black_and_white(false),
 	m_fixed_mode(0),
@@ -600,18 +655,17 @@ void mc6847_base_device::device_config_complete()
 		// Multiplying the 6847's clock by 2 produces a pixel clock that allows
 		// 256 pixels of active video area per line, with apparently no roundoff
 		// error or drift.
-		//
-		// Note: This math is valid for NTSC.  If / when PAL is implemented, m_tpfs
-		// can be used to determine if this 6847 is PAL, and a different set_raw
-		// call can be made if helpful.
 		screen().set_raw(
 			(uint32_t)(clock() * 2),
-			456,                                        // htotal
-			0,                                          // hbend
-			BMP_L_OR_R_BORDER * 2 + BMP_ACTIVE_VIDEO,   // hbstart
-			m_tpfs,                                     // vtotal
-			0,                                          // vbend
-			LINES_UNTIL_RETRACE);                       // vbstart
+			456,                                                            // htotal
+			0,                                                              // hbend
+			BMP_L_OR_R_BORDER * 2 + BMP_ACTIVE_VIDEO,                       // hbstart
+			m_tpfs,                                                         // vtotal
+			0,                                                              // vbend
+			m_pal ? LINES_UNTIL_RETRACE_PAL : LINES_UNTIL_RETRACE_NTSC);    // vbstart
+
+		if (m_pal)
+			screen().set_physical_aspect(5, 4);
 	}
 
 	if (!screen().has_screen_update())
@@ -882,10 +936,10 @@ inline mc6847_base_device::pixel_t mc6847_base_device::border_value(uint8_t mode
 
 uint32_t mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int base_x = BMP_L_OR_R_BORDER;
-	int base_y = LINES_TOP_BORDER;
-	int x, x2, y, width;
 	bool is_mc6847t1 = (type() == MC6847T1_NTSC) || (type() == MC6847T1_PAL);
+	int base_x = BMP_L_OR_R_BORDER;
+	int base_y = m_pal ? LINES_TOP_BORDER + LINES_PADDING_TOP_PAL : LINES_TOP_BORDER;
+	int x, x2, y, width;
 	int min_x = USE_HORIZONTAL_CLIP ? cliprect.min_x : 0;
 	int max_x = USE_HORIZONTAL_CLIP ? cliprect.max_x : (base_x * 2 + BMP_ACTIVE_VIDEO - 1);
 	int min_y = cliprect.min_y;
@@ -899,9 +953,15 @@ uint32_t mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &
 	/* top border */
 	for (y = min_y; y < base_y; y++)
 	{
+		// PAL padding is always black, even when border isn't
+		pixel_t color =
+			is_top_pal_padding_line(y) ?
+			palette[8] :
+			border_value(m_data[0].m_mode[0], palette, is_mc6847t1);
+
 		for (x = min_x; x <= max_x; x++)
 		{
-			*bitmap_addr(bitmap, y, x) = border_value(m_data[0].m_mode[0], palette, is_mc6847t1);
+			*bitmap_addr(bitmap, y, x) = color;
 		}
 	}
 
@@ -958,9 +1018,21 @@ uint32_t mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &
 
 	/* bottom border */
 	if (width)
+	{
 		for (y = base_y + LINES_ACTIVE_VIDEO - 1; y <= max_y; y++)
+		{
+			// PAL padding is always black, even when border isn't
+			pixel_t color =
+				is_bottom_pal_padding_line(y) ?
+				palette[8] :
+				border_value(m_data[LINES_ACTIVE_VIDEO - 1].m_mode[width - 1], palette, is_mc6847t1);
+
 			for (x = min_x; x <= max_x; x++)
-				*bitmap_addr(bitmap, y, x) = border_value(m_data[LINES_ACTIVE_VIDEO - 1].m_mode[width - 1], palette, is_mc6847t1);
+			{
+				*bitmap_addr(bitmap, y, x) = color;
+			}
+		}
+	}
 
 	return 0;
 }
@@ -1682,7 +1754,7 @@ DEFINE_DEVICE_TYPE(M5C6847P1,     m5c6847p1_device,     "m5c6847p1",     "Mitsub
 //-------------------------------------------------
 
 mc6847_ntsc_device::mc6847_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6847_base_device(mconfig, MC6847_NTSC, tag, owner, clock, vdg_fontdata8x12, 262.0)
+	: mc6847_base_device(mconfig, MC6847_NTSC, tag, owner, clock, vdg_fontdata8x12, 262.0, false)
 {
 }
 
@@ -1693,7 +1765,7 @@ mc6847_ntsc_device::mc6847_ntsc_device(const machine_config &mconfig, const char
 //-------------------------------------------------
 
 mc6847_pal_device::mc6847_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6847_base_device(mconfig, MC6847_PAL, tag, owner, clock, vdg_fontdata8x12, 313.0)
+	: mc6847_base_device(mconfig, MC6847_PAL, tag, owner, clock, vdg_fontdata8x12, 313.0, true)
 {
 	m_artifacter.set_pal_artifacting(true);
 }
@@ -1705,7 +1777,7 @@ mc6847_pal_device::mc6847_pal_device(const machine_config &mconfig, const char *
 //-------------------------------------------------
 
 mc6847y_ntsc_device::mc6847y_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6847_base_device(mconfig, MC6847Y_NTSC, tag, owner, clock, vdg_fontdata8x12, 262.5)
+	: mc6847_base_device(mconfig, MC6847Y_NTSC, tag, owner, clock, vdg_fontdata8x12, 262.5, false)
 {
 }
 
@@ -1716,7 +1788,7 @@ mc6847y_ntsc_device::mc6847y_ntsc_device(const machine_config &mconfig, const ch
 //-------------------------------------------------
 
 mc6847y_pal_device::mc6847y_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6847_base_device(mconfig, MC6847Y_PAL, tag, owner, clock, vdg_fontdata8x12, 313.0)
+	: mc6847_base_device(mconfig, MC6847Y_PAL, tag, owner, clock, vdg_fontdata8x12, 313.0, true)
 {
 	m_artifacter.set_pal_artifacting(true);
 }
@@ -1728,7 +1800,7 @@ mc6847y_pal_device::mc6847y_pal_device(const machine_config &mconfig, const char
 //-------------------------------------------------
 
 mc6847t1_ntsc_device::mc6847t1_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6847_base_device(mconfig, MC6847T1_NTSC, tag, owner, clock, vdg_t1_fontdata8x12, 262.0)
+	: mc6847_base_device(mconfig, MC6847T1_NTSC, tag, owner, clock, vdg_t1_fontdata8x12, 262.0, false)
 {
 }
 
@@ -1739,7 +1811,7 @@ mc6847t1_ntsc_device::mc6847t1_ntsc_device(const machine_config &mconfig, const 
 //-------------------------------------------------
 
 mc6847t1_pal_device::mc6847t1_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6847_base_device(mconfig, MC6847T1_PAL, tag, owner, clock, vdg_t1_fontdata8x12, 313.0)
+	: mc6847_base_device(mconfig, MC6847T1_PAL, tag, owner, clock, vdg_t1_fontdata8x12, 313.0, true)
 {
 	m_artifacter.set_pal_artifacting(true);
 }
@@ -1751,7 +1823,7 @@ mc6847t1_pal_device::mc6847t1_pal_device(const machine_config &mconfig, const ch
 //-------------------------------------------------
 
 s68047_device::s68047_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6847_base_device(mconfig, S68047, tag, owner, clock, s68047_fontdata8x12, 262.0)
+	: mc6847_base_device(mconfig, S68047, tag, owner, clock, s68047_fontdata8x12, 262.0, false)
 {
 }
 
@@ -1800,6 +1872,6 @@ const uint32_t s68047_device::s_s68047_hack_palette[16] =
 //-------------------------------------------------
 
 m5c6847p1_device::m5c6847p1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6847_base_device(mconfig, M5C6847P1, tag, owner, clock, vdg_fontdata8x12, 262.5)
+	: mc6847_base_device(mconfig, M5C6847P1, tag, owner, clock, vdg_fontdata8x12, 262.5, false)
 {
 }

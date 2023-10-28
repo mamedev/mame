@@ -58,7 +58,8 @@ public:
 
 protected:
 	mc6847_friend_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock,
-			const uint8_t *fontdata, bool is_mc6847t1, double tpfs, int field_sync_falling_edge_scanline, int divider, bool supports_partial_body_scanlines);
+			const uint8_t *fontdata, bool is_mc6847t1, double tpfs, int field_sync_falling_edge_scanline, int divider,
+			bool supports_partial_body_scanlines, bool pal);
 
 	// fonts
 	static const uint8_t vdg_t1_fontdata8x12[];
@@ -478,6 +479,10 @@ private:
 	bool m_recording_scanline;
 	const bool m_supports_partial_body_scanlines;
 
+protected:
+	const bool m_pal;
+
+private:
 	// video state
 	uint16_t m_physical_scanline;
 	uint16_t m_logical_scanline;
@@ -495,6 +500,11 @@ private:
 
 	// debugging
 	std::string scanline_zone_string(scanline_zone zone) const;
+
+protected:
+	bool is_top_pal_padding_line(int scanline);
+	bool is_bottom_pal_padding_line(int scanline);
+	bool is_pal_padding_line(int scanline);
 };
 
 // actual base class for MC6847 family of devices
@@ -522,7 +532,7 @@ public:
 	void inv_w(int state)      { change_mode(MODE_INV, state); }
 
 protected:
-	mc6847_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const uint8_t *fontdata, double tpfs);
+	mc6847_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const uint8_t *fontdata, double tpfs, bool pal);
 
 	// device-level overrides
 	virtual void device_config_complete() override;
