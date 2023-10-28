@@ -299,9 +299,11 @@ void ins8250_uart_device::ins8250_w(offs_t offset, u8 data)
 			set_fcr(data);
 			break;
 		case 3:
+			{
+			bool break_state_changed = bool((m_regs.lcr ^ data) & INS8250_LCR_BREAK);
+
 			m_regs.lcr = data;
 
-			{
 			int data_bit_count = (m_regs.lcr & INS8250_LCR_BITCOUNT_MASK) + 5;
 			parity_t parity;
 			stop_bits_t stop_bits;
@@ -336,6 +338,19 @@ void ins8250_uart_device::ins8250_w(offs_t offset, u8 data)
 			else
 				stop_bits = STOP_BITS_2;
 
+			if (break_state_changed)
+			{
+				int new_out_val = (m_regs.lcr & INS8250_LCR_BREAK) ? 0 : m_txd;
+
+				if (m_regs.mcr & INS8250_MCR_LOOPBACK)
+				{
+					device_serial_interface::rx_w(new_out_val);
+				}
+				else
+				{
+					m_out_tx_cb(new_out_val);
+				}
+			}
 			set_data_frame(1, data_bit_count, parity, stop_bits);
 			}
 			break;
@@ -349,7 +364,10 @@ void ins8250_uart_device::ins8250_w(offs_t offset, u8 data)
 				if (m_regs.mcr & INS8250_MCR_LOOPBACK)
 				{
 					m_out_tx_cb(1);
-					device_serial_interface::rx_w(m_txd);
+					if ((m_regs.lcr & INS8250_LCR_BREAK) == 0)
+					{
+						device_serial_interface::rx_w(m_txd);
+					}
 					m_out_dtr_cb(1);
 					m_out_rts_cb(1);
 					m_out_out1_cb(1);
@@ -357,7 +375,10 @@ void ins8250_uart_device::ins8250_w(offs_t offset, u8 data)
 				}
 				else
 				{
-					m_out_tx_cb(m_txd);
+					if ((m_regs.lcr & INS8250_LCR_BREAK) == 0)
+					{
+						m_out_tx_cb(m_txd);
+					}
 					device_serial_interface::rx_w(m_rxd);
 					m_out_dtr_cb((m_regs.mcr & INS8250_MCR_DTR) ? 0 : 1);
 					m_out_rts_cb((m_regs.mcr & INS8250_MCR_RTS) ? 0 : 1);
@@ -571,9 +592,8 @@ void ins8250_uart_device::tra_callback()
 
 	if (m_regs.lcr & INS8250_LCR_BREAK)
 	{
-		// if in break, set transmit bit to 0. Since the transmit_register_get_data_bit()
-		// has side effects(like transmit buffer empty), don't skip the call
-		m_txd = 0;
+		// in break mode, don't change transmitted bit
+		return;
 	}
 
 	if (m_regs.mcr & INS8250_MCR_LOOPBACK)
