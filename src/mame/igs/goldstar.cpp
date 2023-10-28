@@ -12794,7 +12794,7 @@ ROM_START( nd8lines )
 ROM_END
 
 /*
-  Hambuger House (햄버거 하우스, Cherry Master Clone). String "DYNA CM-1  V1.01" on program ROM.
+  Hamburger House (햄버거 하우스, Cherry Master Clone). String "DYNA CM-1  V1.01" on program ROM.
    -1 x LGS Z8400B
    -1 x Lattice ispLSI 1024 80LJ
    -3V Battery
