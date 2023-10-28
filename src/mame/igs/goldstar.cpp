@@ -12820,9 +12820,9 @@ ROM_START( hamhouse )
 	ROM_LOAD( "3_hy27c64ad-15.u24", 0xc0000, 0x02000, CRC(7f9c41db) SHA1(64c5fb779ecc05eae3264c7767c571eb76fb389f) )
 
 	ROM_REGION( 0x600, "proms", 0 )
-        // EPROM on a small subboard wired to replace two bipolar PROMS
+	// EPROM on a small subboard wired to replace two bipolar PROMS
 	ROM_LOAD( "nm27c256.u55",       0x00000, 0x00400, CRC(f7c7c025) SHA1(f845dc960ed74f64bfff06e3766a1047a26e9de1) )
-	ROM_IGNORE( 0x7C00 )
+	ROM_IGNORE( 0x7c00 )
 	ROM_LOAD( "am27s33pc.u39",      0x00400, 0x00200, NO_DUMP ) // Separated from the other two PROM sockets on the PCB
 
 	ROM_REGION( 0x400, "plds", 0 )
