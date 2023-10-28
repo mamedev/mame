@@ -12794,7 +12794,7 @@ ROM_START( nd8lines )
 ROM_END
 
 /*
-  Hambuger House (Cherry Master Clone). String "DYNA CM-1  V1.01" on program ROM.
+  Hambuger House (햄버거 하우스, Cherry Master Clone). String "DYNA CM-1  V1.01" on program ROM.
    -1 x LGS Z8400B
    -1 x Lattice ispLSI 1024 80LJ
    -3V Battery
@@ -12808,16 +12808,16 @@ ROM_START( hamhouse )
 	ROM_LOAD( "am27c512.u33",       0x00000, 0x10000, CRC(f4dd12e9) SHA1(b792ee549ecf5e446387cd5c7d78b2fc69b03f33) )
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
-	ROM_LOAD( "7_27c256.u43",       0x000000, 0x08000, CRC(31c419f0) SHA1(7c827af5c208bab0ca143558581a57b0b355a3ad) )
-	ROM_LOAD( "5_nmc27c256q.u28",   0x008000, 0x08000, CRC(e54f033e) SHA1(a3ec618109d7f7287c59199888ba92ead6396d1b) )
-	ROM_LOAD( "6_am27c256.u42",     0x010000, 0x08000, CRC(bfdfd613) SHA1(42476ec4b4cd29062fe4a2d8a3789614e7af2fdb) )
+	ROM_LOAD( "7_27c256.u43",       0x00000, 0x08000, CRC(31c419f0) SHA1(7c827af5c208bab0ca143558581a57b0b355a3ad) )
+	ROM_LOAD( "5_nmc27c256q.u28",   0x08000, 0x08000, CRC(e54f033e) SHA1(a3ec618109d7f7287c59199888ba92ead6396d1b) )
+	ROM_LOAD( "6_am27c256.u42",     0x10000, 0x08000, CRC(bfdfd613) SHA1(42476ec4b4cd29062fe4a2d8a3789614e7af2fdb) )
 
 	ROM_REGION( 0xE0000, "gfx2", 0 )
 	ROM_LOAD( "2_27c256.u11",       0x00000, 0x08000, CRC(fac9fe6c) SHA1(0c55c017957d65121b9cc876d914cca2dec5e94e) )
 	ROM_LOAD( "4_d27128a.u26",      0x08000, 0x02000, CRC(8cf3845e) SHA1(4f672d256548211c48e60ce89718c3c195f187d5) ) // 1ST AND 2ND HALF IDENTICAL
         ROM_IGNORE( 0x2000 )
-	ROM_LOAD( "1_27c64-20.u10",     0xA0000, 0x2000, CRC(c4efc953) SHA1(da24c802d33be377ad6d6a357ed32d5214ca7a3f) )
-	ROM_LOAD( "3_hy27c64ad-15.u24", 0xC0000, 0x2000, CRC(7f9c41db) SHA1(64c5fb779ecc05eae3264c7767c571eb76fb389f) )
+	ROM_LOAD( "1_27c64-20.u10",     0xa0000, 0x02000, CRC(c4efc953) SHA1(da24c802d33be377ad6d6a357ed32d5214ca7a3f) )
+	ROM_LOAD( "3_hy27c64ad-15.u24", 0xc0000, 0x02000, CRC(7f9c41db) SHA1(64c5fb779ecc05eae3264c7767c571eb76fb389f) )
 
 	ROM_REGION( 0x600, "proms", 0 )
         // EPROM on a small subboard wired to replace two bipolar PROMS
@@ -12826,8 +12826,8 @@ ROM_START( hamhouse )
 	ROM_LOAD( "am27s33pc.u39",      0x00400, 0x00200, NO_DUMP ) // Separated from the other two PROM sockets on the PCB
 
 	ROM_REGION( 0x400, "plds", 0 )
-	ROM_LOAD( "atf16v8b.u15",       0x0000, 0x0117, NO_DUMP )
-	ROM_LOAD( "atf16v8b.u35",       0x0200, 0x0117, NO_DUMP )
+	ROM_LOAD( "atf16v8b.u15",       0x00000, 0x00117, NO_DUMP )
+	ROM_LOAD( "atf16v8b.u35",       0x00200, 0x00117, NO_DUMP )
 ROM_END
 
 /*
