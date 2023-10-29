@@ -44461,15 +44461,16 @@ tvbg6a
 tvbg6b
 
 @source:tvgames/elan_eu3a05.cpp
-rad_sinv
-rad_tetr
 airblsjs
 buzztime
-sudelan3
-sudelan
 carlecfg
 pvmilfin
 pvwwcas
+rad_sinv
+rad_tetr
+sudelan
+sudelan3
+sudoku2p
 
 @source:tvgames/elan_eu3a14.cpp
 rad_gtg
