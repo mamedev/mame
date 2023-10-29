@@ -33,7 +33,7 @@ static int scount = 0;
   per-channel values for AWM2, but parts are isolated and renumbered
   for MEG regisrers or for general control functions.
 
-  Names we'll use in th rest of the text:
+  Names we'll use in the rest of the text:
   - reg(y, x) is the register at address 2*(y*0x40 + x)
   - ch<nn>  is reg(channel, nn) for a given AWG2 channel
   - sy<nn>  is reg(nn/2, 0xe + (nn % 2))

@@ -33,6 +33,8 @@ public:
 protected:
 	sh2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cpu_type, address_map_constructor internal_map, int addrlines, uint32_t address_mask);
 
+	void check_pending_irq(const char *message);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -67,12 +69,13 @@ protected:
 	int8_t m_nmi_line_state;
 
 private:
-	virtual uint8_t RB(offs_t A) override;
-	virtual uint16_t RW(offs_t A) override;
-	virtual uint32_t RL(offs_t A) override;
-	virtual void WB(offs_t A, uint8_t V) override;
-	virtual void WW(offs_t A, uint16_t V) override;
-	virtual void WL(offs_t A, uint32_t V) override;
+	virtual uint8_t read_byte(offs_t A) override;
+	virtual uint16_t read_word(offs_t A) override;
+	virtual uint32_t read_long(offs_t A) override;
+	virtual uint16_t decrypted_read_word(offs_t offset) override;
+	virtual void write_byte(offs_t A, uint8_t V) override;
+	virtual void write_word(offs_t A, uint16_t V) override;
+	virtual void write_long(offs_t A, uint32_t V) override;
 
 	virtual void LDCMSR(const uint16_t opcode) override;
 	virtual void LDCSR(const uint16_t opcode) override;

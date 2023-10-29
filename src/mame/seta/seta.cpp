@@ -5719,8 +5719,10 @@ static INPUT_PORTS_START( rezon )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(5)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(5)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_SERVICE_NO_TOGGLE( 0x0008, IP_ACTIVE_LOW)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no taito logo
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_TILT1 )
+	PORT_CONFNAME( 0x0010, 0x0010, "Licensee" )
+	PORT_CONFSETTING(      0x0010, "Allumer" )
+	PORT_CONFSETTING(      0x0000, "Taito" )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -5769,14 +5771,6 @@ static INPUT_PORTS_START( rezon )
 	PORT_DIPSETTING(      0x6000, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x5000, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( rezont )
-
-	PORT_INCLUDE( rezon )
-
-	PORT_MODIFY("COINS")
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // gives the taito logo
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -6429,9 +6423,9 @@ static INPUT_PORTS_START( zingzip )
 	PORT_CONFNAME( 0x0040, 0x0040, "Unknown (bit 6)" )
 	PORT_CONFSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_CONFSETTING(      0x0000, DEF_STR( On ) )
-	PORT_CONFNAME( 0x0080, 0x0080, "Title Language" )       // Not listed in manual
+	PORT_CONFNAME( 0x0080, 0x0000, "Title Language" )       // Not listed in manual
 	PORT_CONFSETTING(      0x0080, "English and Chinese" )
-	PORT_CONFSETTING(      0x0000, "English only" )         // Without 真真急炮
+	PORT_CONFSETTING(      0x0000, "English only" )         // Without 真真急炮/Zhēn zhēn jí pào
 
 	PORT_START("DSW") //2 DSWs - $600001 & 3.b
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW2:1")
@@ -9453,10 +9447,11 @@ ROM_START( superbar ) // All roms had a "PROMAT" label with no other information
 	ROM_LOAD( "promat_1m-7.j21", 0x60000, 0x20000, CRC(734df92a) SHA1(0dfd58a3f47fa8dfa315df7adfad25ade97c2a3b) )
 ROM_END
 
+// note the ONLY byte that changes is the year, 1992 instead of 1991.
 ROM_START( rezon )
 	ROM_REGION( 0x200000, "maincpu", 0 )        // 68000 Code
 	ROM_LOAD16_BYTE( "us001001.u3",  0x000000, 0x020000, CRC(ab923052) SHA1(26761c228b63c300f635787e63e1276b6e3083f0) )
-	ROM_LOAD16_BYTE( "us001002.u4",  0x000001, 0x020000, CRC(3dafa0d5) SHA1(80cdff86b99d364acbbf1322c73b2f26b1a93167) )
+	ROM_LOAD16_BYTE( "rezon_1_p.u4", 0x000001, 0x020000, CRC(9ed32f8c) SHA1(68b926de4cb5f2632ab78b2cdf7409411fadbb1d) )
 	// empty gap
 	ROM_LOAD16_BYTE( "us001004.103", 0x100000, 0x020000, CRC(54871c7c) SHA1(2f807b15760b1e712fa69eee6f33cc8a36ee1c02) ) // 1xxxxxxxxxxxxxxxx = 0x00
 	ROM_LOAD16_BYTE( "us001003.102", 0x100001, 0x020000, CRC(1ac3d272) SHA1(0f19bc9c19e355dad5b463b0fa33127523bf141b) ) // 1xxxxxxxxxxxxxxxx = 0x00
@@ -9481,13 +9476,10 @@ ROM_START( rezon )
 	ROM_LOAD( "us-013.u76", 0x600, 0x104, NO_DUMP )
 ROM_END
 
-/* note the ONLY byte that changes is the year, 1992 instead of 1991.  The actual license is controlled by a jumper but
-   since Taito released the game in 1992 this is the Taito version and we hardcode the jumper in the input ports */
-
-ROM_START( rezont )
-	ROM_REGION( 0x200000, "maincpu", 0 )        // 68000 Code
+ROM_START( rezono )
+	ROM_REGION( 0x200000, "maincpu", 0 )        /* 68000 Code */
 	ROM_LOAD16_BYTE( "us001001.u3",  0x000000, 0x020000, CRC(ab923052) SHA1(26761c228b63c300f635787e63e1276b6e3083f0) )
-	ROM_LOAD16_BYTE( "rezon_1_p.u4", 0x000001, 0x020000, CRC(9ed32f8c) SHA1(68b926de4cb5f2632ab78b2cdf7409411fadbb1d) )
+	ROM_LOAD16_BYTE( "us001002.u4",  0x000001, 0x020000, CRC(3dafa0d5) SHA1(80cdff86b99d364acbbf1322c73b2f26b1a93167) )
 	// empty gap
 	ROM_LOAD16_BYTE( "us001004.103", 0x100000, 0x020000, CRC(54871c7c) SHA1(2f807b15760b1e712fa69eee6f33cc8a36ee1c02) ) // 1xxxxxxxxxxxxxxxx = 0x00
 	ROM_LOAD16_BYTE( "us001003.102", 0x100001, 0x020000, CRC(1ac3d272) SHA1(0f19bc9c19e355dad5b463b0fa33127523bf141b) ) // 1xxxxxxxxxxxxxxxx = 0x00
@@ -11337,8 +11329,8 @@ GAME( 1993, inttoote2, jockeyc,  jockeyc,   jockeyc,   jockeyc_state,  empty_ini
 GAME( 1998, inttoote,  jockeyc,  inttoote,  inttoote,  jockeyc_state,  init_inttoote,  ROT0,   "bootleg (Coinmaster)",      "International Toote (Germany, P523.V01)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_CLICKABLE_ARTWORK )
 GAME( 1990, gderby,    jockeyc,  jockeyc,   jockeyc,   jockeyc_state,  empty_init,     ROT0,   "hack (CODERE)",             "Gran Derby (Spanish hack of Jockey Club)", MACHINE_CLICKABLE_ARTWORK )
 
-GAME( 1991, rezon,     0,        rezon,     rezon,     seta_state,     empty_init,     ROT0,   "Allumer",                   "Rezon", 0 )
-GAME( 1992, rezont,    rezon,    rezon,     rezont,    seta_state,     empty_init,     ROT0,   "Allumer (Taito license)",   "Rezon (Taito)", 0 )
+GAME( 1992, rezon,     0,        rezon,     rezon,     seta_state,     empty_init,     ROT0,   "Allumer",                   "Rezon", 0 ) // License: Jumper
+GAME( 1991, rezono,    rezon,    rezon,     rezon,     seta_state,     empty_init,     ROT0,   "Allumer",                   "Rezon (earlier)", 0 ) // ""
 
 GAME( 1991, stg,       0,        stg,       stg,       seta_state,     empty_init,     ROT270, "Athena / Tecmo",            "Strike Gunner S.T.G", 0 )
 
@@ -11356,7 +11348,7 @@ GAME( 1992, neobattl,  0,        umanclub,  neobattl,  seta_state,     empty_ini
 
 GAME( 1992, umanclub,  0,        umanclub,  umanclub,  seta_state,     empty_init,     ROT0,   "Banpresto / Tsuburaya Productions", "Ultraman Club - Tatakae! Ultraman Kyoudai!!", 0 )
 
-GAME( 1992, zingzip,   0,        zingzip,   zingzip,   seta_state,     empty_init,     ROT270, "Allumer / Tecmo",           "Zing Zing Zip", 0 ) // This set has Chinese Characters in Title screen, it distributed for Chinese market/or Title: DSW?
+GAME( 1992, zingzip,   0,        zingzip,   zingzip,   seta_state,     empty_init,     ROT270, "Allumer / Tecmo",           "Zing Zing Zip (World) / Zhen Zhen Ji Pao (China?)", 0 ) // This set has Chinese Characters in Title screen, it distributed for Chinese market/or Title: DSW?
 GAME( 1992, zingzipbl, zingzip,  zingzipbl, zingzip,   seta_state,     empty_init,     ROT270, "bootleg",                   "Zing Zing Zip (bootleg)", MACHINE_NOT_WORKING )
 
 GAME( 1993, atehate,   0,        atehate,   atehate,   seta_state,     empty_init,     ROT0,   "Athena",                    "Athena no Hatena?", 0 )

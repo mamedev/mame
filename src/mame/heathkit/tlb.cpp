@@ -14,10 +14,6 @@
 
     Input can also come from the serial port.
 
-  TODO:
-    - INS8250 needs to implement "Set Break" (LCR, bit 6) before Break key
-      will function as expected.
-
 ****************************************************************************/
 /***************************************************************************
   Memory Layout

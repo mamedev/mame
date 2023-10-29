@@ -369,29 +369,28 @@ void rfslotsmcs48_state::main_p2_w(u8 data)
 u8 rfslotsmcs48_state::sound_io_r(offs_t offset)
 {
 	logerror("%s: Audio I/O Read Offs:%02X\n", machine().describe_context(), offset);
-	m_aysnd1->address_w(offset);
-	if(!BIT(m_sndbfcpu->p1_r(),0))
+	if(!BIT(m_sndbfcpu->p1_r(), 0))
 	{
 		m_aysnd1->address_w(offset);
 		return m_aysnd1->data_r();
 	}
-	if(!BIT(m_sndbfcpu->p1_r(),1))
+	if(!BIT(m_sndbfcpu->p1_r(), 1))
 	{
 		m_aysnd2->address_w(offset);
-		return m_aysnd1->data_r();
+		return m_aysnd2->data_r();
 	}
 	return 0xff;
 }
 
 void rfslotsmcs48_state::sound_io_w(offs_t offset, u8 data)
 {
-	if(!BIT(m_sndbfcpu->p1_r(),0))
+	if(!BIT(m_sndbfcpu->p1_r(), 0))
 	{
 		m_aysnd1->address_w(offset);
 		m_aysnd1->data_w(data);
 		// logerror("%s:m_aysnd1: read:%02X\n", machine().describe_context(), m_aysnd1->data_r());
 	}
-	if(!BIT(m_sndbfcpu->p1_r(),1))
+	if(!BIT(m_sndbfcpu->p1_r(), 1))
 	{
 		m_aysnd2->address_w(offset);
 		m_aysnd2->data_w(data);
@@ -403,7 +402,7 @@ void rfslotsmcs48_state::sound_io_w(offs_t offset, u8 data)
 
 void rfslotsmcs48_state::sound_p1_w(u8 data)
 {
-	if(!BIT(data,2))
+	if(!BIT(data, 2))
 	{
 		m_aysnd1->reset_w();
 		m_aysnd2->reset_w();
@@ -470,10 +469,10 @@ void rfslotsmcs48_state::aj_exp5_p6_w(u8 data)  // sound reset + int
 
 void rfslotsmcs48_state::exp2_p4_w(u8 data)  // coils and emcounters
 {
-	m_outbit[3] = !BIT(data,0); // coin lock
-	m_outbit[4] = BIT(data,1);  // unused
-	m_outbit[5] = BIT(data,2);  // coin-in counter
-	m_outbit[6] = BIT(data,3);  // coin-out counter
+	m_outbit[3] = !BIT(data, 0);  // coin lock
+	m_outbit[4] = BIT(data, 1);   // unused
+	m_outbit[5] = BIT(data, 2);   // coin-in counter
+	m_outbit[6] = BIT(data, 3);   // coin-out counter
 
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 2));  // EM counter: Coin In
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 3));  // EM counter: Coin Out
@@ -484,18 +483,18 @@ void rfslotsmcs48_state::exp2_p4_w(u8 data)  // coils and emcounters
 
 void rfslotsmcs48_state::exp2_p5_w(u8 data)  // game lights
 {
-	m_outbit[7] = BIT(data,0);   // insert coin lamp
-	m_outbit[8] = BIT(data,1);	 // fault lamp
-	m_outbit[9] = BIT(data,2);	 // start lamp
-	m_outbit[10] = BIT(data,3);  // unused
+	m_outbit[7] = BIT(data, 0);   // insert coin lamp
+	m_outbit[8] = BIT(data, 1);   // fault lamp
+	m_outbit[9] = BIT(data, 2);   // start lamp
+	m_outbit[10] = BIT(data, 3);  // unused
 }
 
 void rfslotsmcs48_state::exp2_p6_w(u8 data)  // push buttons lights
 {
-	m_outbit[11] = BIT(data,0);  // stop left lamp
-	m_outbit[12] = BIT(data,1);	 // stop center lamp
-	m_outbit[13] = BIT(data,2);	 // stop right lamp
-	m_outbit[14] = BIT(data,3);  // unused
+	m_outbit[11] = BIT(data, 0);  // stop left lamp
+	m_outbit[12] = BIT(data, 1);  // stop center lamp
+	m_outbit[13] = BIT(data, 2);  // stop right lamp
+	m_outbit[14] = BIT(data, 3);  // unused
 }
 
 void rfslotsmcs48_state::exp2_p7_w(u8 data)  // sound codes
@@ -520,7 +519,7 @@ void rfslotsmcs48_state::kbd_sl_w(u8 data)
 {
 //  Scan Line
 	m_kbd_sl = data;
-    // logerror("I8279: Scan Line: %02X\n", data);
+	// logerror("I8279: Scan Line: %02X\n", data);
 }
 
 void rfslotsmcs48_state::disp_w(u8 data)
@@ -616,30 +615,30 @@ static INPUT_PORTS_START(babyfrts)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("SWA")  // switches order from schematics...
-	PORT_DIPNAME(0x01, 0x01, DEF_STR(Unknown))	PORT_DIPLOCATION("SWA:4")
+	PORT_DIPNAME(0x01, 0x01, DEF_STR(Unknown))  PORT_DIPLOCATION("SWA:4")
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_DIPSETTING(0x01, DEF_STR(Off))
-	PORT_DIPNAME(0x02, 0x02, DEF_STR(Unknown))	PORT_DIPLOCATION("SWA:3")
+	PORT_DIPNAME(0x02, 0x02, DEF_STR(Unknown))  PORT_DIPLOCATION("SWA:3")
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_DIPSETTING(0x02, DEF_STR(Off))
-	PORT_DIPNAME(0x04, 0x04, DEF_STR(Unknown))	PORT_DIPLOCATION("SWA:2")
+	PORT_DIPNAME(0x04, 0x04, DEF_STR(Unknown))  PORT_DIPLOCATION("SWA:2")
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_DIPSETTING(0x04, DEF_STR(Off))
-	PORT_DIPNAME(0x08, 0x08, DEF_STR(Unknown))	PORT_DIPLOCATION("SWA:1")
+	PORT_DIPNAME(0x08, 0x08, DEF_STR(Unknown))  PORT_DIPLOCATION("SWA:1")
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_DIPSETTING(0x08, DEF_STR(Off))
 
 	PORT_START("SWB")  // switches order from schematics...
-	PORT_DIPNAME(0x01, 0x01, DEF_STR(Unknown))	PORT_DIPLOCATION("SWB:4")
+	PORT_DIPNAME(0x01, 0x01, DEF_STR(Unknown))  PORT_DIPLOCATION("SWB:4")
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_DIPSETTING(0x01, DEF_STR(Off))
-	PORT_DIPNAME(0x02, 0x02, DEF_STR(Unknown))	PORT_DIPLOCATION("SWB:1")
+	PORT_DIPNAME(0x02, 0x02, DEF_STR(Unknown))  PORT_DIPLOCATION("SWB:1")
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_DIPSETTING(0x02, DEF_STR(Off))
-	PORT_DIPNAME(0x04, 0x04, DEF_STR(Unknown))	PORT_DIPLOCATION("SWB:2")
+	PORT_DIPNAME(0x04, 0x04, DEF_STR(Unknown))  PORT_DIPLOCATION("SWB:2")
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_DIPSETTING(0x04, DEF_STR(Off))
-	PORT_DIPNAME(0x08, 0x08, DEF_STR(Unknown))	PORT_DIPLOCATION("SWB:3")
+	PORT_DIPNAME(0x08, 0x08, DEF_STR(Unknown))  PORT_DIPLOCATION("SWB:3")
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_DIPSETTING(0x08, DEF_STR(Off))
 INPUT_PORTS_END
@@ -831,7 +830,7 @@ void rfslotsmcs48_state::ajofrin(machine_config &config)
      .----------------------------------.
      |    .-------------------------.   |
      |    |·························|   |
-	 |    '-------------------------'   |
+     |    '-------------------------'   |
      |             Xtal                 |
      |            6.000 MHz             |
      |           .--------------------. |
@@ -850,10 +849,10 @@ void rfslotsmcs48_state::ajofrin(machine_config &config)
      |          | GI AY-3-8910       |  |
      |          |                    |  |
      |          '--------------------'  |
-	 | .-------.                        |
+     | .-------.                        |
      | |· · · ·|                        |
      | '-------'                        |
-	 '----------------------------------'
+     '----------------------------------'
 
 */
 ROM_START(babyfrts)

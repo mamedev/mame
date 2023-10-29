@@ -65,7 +65,6 @@ public:
 	void zenith(machine_config &config);
 	void eagle1600(machine_config &config);
 	void laser_turbo_xt(machine_config &config);
-	void ibm5550(machine_config &config);
 	void comport(machine_config &config);
 	void mpc1600(machine_config &config);
 	void ittxtra(machine_config &config);
@@ -86,15 +85,12 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 
-	u8 unk_r();
-
 	double m_turbo_off_speed = 0;
 
 	static void cfg_dual_720K(device_t *device);
 	static void cfg_single_360K(device_t *device);
 	static void cfg_single_720K(device_t *device);
 
-	void ibm5550_io(address_map &map);
 	void pc16_io(address_map &map);
 	void pc16_map(address_map &map);
 	void pc8_io(address_map &map);
@@ -126,11 +122,6 @@ void pc_state::pc16_io(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x00ff).m("mb", FUNC(ibm5160_mb_device::map));
 	map(0x0070, 0x007f).ram(); // needed for Poisk-2
-}
-
-u8 pc_state::unk_r()
-{
-	return 0;
 }
 
 INPUT_CHANGED_MEMBER(pc_state::pc_turbo_callback)
@@ -683,57 +674,6 @@ ROM_START( eppc )
 	ROM_LOAD( "eppcbios60605.bin",  0xc000, 0x04000, CRC(fe82e11b) SHA1(97ed48dc30f1ed0acce0a14b8085f13b84d4444b))
 ROM_END
 
-
-/***************************************************************** IBM 5550 ***
-
-Information can be found at http://homepage3.nifty.com/ibm5550/index-e.html
-It's a heavily modified IBM PC-XT machine, with a completely different
-video HW too.
-
-******************************************************************************/
-
-void pc_state::ibm5550_io(address_map &map)
-{
-	map.unmap_value_high();
-	map(0x0000, 0x00ff).m("mb", FUNC(ibm5160_mb_device::map));
-	map(0x00a0, 0x00a0).r(FUNC(pc_state::unk_r));
-}
-
-void pc_state::ibm5550(machine_config &config)
-{
-	/* basic machine hardware */
-	i8086_cpu_device &maincpu(I8086(config, "maincpu", 8000000));
-	maincpu.set_addrmap(AS_PROGRAM, &pc_state::pc16_map);
-	maincpu.set_addrmap(AS_IO, &pc_state::ibm5550_io);
-	maincpu.set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
-
-	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb"));
-	mb.set_cputag(m_maincpu);
-	mb.int_callback().set_inputline(m_maincpu, 0);
-	mb.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	mb.kbdclk_callback().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
-	mb.kbddata_callback().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
-	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(pccga));
-
-	// FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "cga", false);
-	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "fdc_xt", false);
-	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "lpt", false);
-	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, "com", false);
-
-	/* keyboard */
-	pc_kbdc_device &kbd(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83));
-	kbd.out_clock_cb().set("mb", FUNC(ibm5160_mb_device::keyboard_clock_w));
-	kbd.out_data_cb().set("mb", FUNC(ibm5160_mb_device::keyboard_data_w));
-
-	/* internal ram */
-	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
-}
-
-ROM_START( ibm5550 )
-	ROM_REGION16_LE(0x10000,"bios", 0)
-	ROM_LOAD("ipl5550.rom", 0xc000, 0x4000, CRC(40cf34c9) SHA1(d41f77fdfa787b0e97ed311e1c084b8699a5b197))
-ROM_END
 
 /***************************************************************** ITT XTRA ***
 
@@ -2482,7 +2422,6 @@ COMP( 1989, fraking,        ibm5150, 0,      fraking,        pccga,    pc_state,
 COMP( 198?, hyo88t,         ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Hyosung",                         "Topstar 88T",           MACHINE_NOT_WORKING )
 COMP( 1986, hyu16t,         ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Hyundai",                         "Super 16 T",            MACHINE_NOT_WORKING )
 COMP( 1987, hyu16te,        ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Hyundai",                         "Super 16 TE",           MACHINE_NOT_WORKING )
-COMP( 1983, ibm5550,        ibm5150, 0,      ibm5550,        pccga,    pc_state, empty_init,    "International Business Machines", "5550",                  MACHINE_NOT_WORKING )
 COMP( 1984, ittxtra,        ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "ITT Information Systems",         "ITT XTRA",              MACHINE_NOT_WORKING )
 COMP( 198?, juko8,          ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "JUKO",                            "NEST 8088 and V20",     MACHINE_NOT_WORKING )
 COMP( 198?, juko16,         ibm5150, 0,      juko16,         pccga,    pc_state, empty_init,    "JUKO",                            "NEST 8086 and V30",     MACHINE_NOT_WORKING )

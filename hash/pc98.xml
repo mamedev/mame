@@ -45302,11 +45302,12 @@ Abuses of [7220] pitch on title screen for a TV white noise effect
 	</software>
 
 	<software name="tuntroll">
-		<description>Tunnels &amp; Trolls - Crusaders of Khazan</description>
+		<description>Tunnels &amp; Trolls: Crusaders of Khazan</description>
 		<year>1990</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
-		<info name="alt_title" value="トンネルズ＆トロールズ" />
+		<info name="alt_title" value="トンネルズ&amp;トロールズ カザンの戦士たち"/>
 		<info name="release" value="19900309" />
+		<!-- TODO: likely similar user disk creation as per pc8801_flop.xml -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk"/>
 			<dataarea name="flop" size="1265664">
@@ -66705,7 +66706,7 @@ doujin?!?
 		<description>Five Gals Connection</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>   <!-- is this really a doujin soft? -->
-		<notes><![CDATA[ 
+		<notes><![CDATA[
 Black screen [FDC] 2DD disk
 Has XA and LT support according to spine card
 ]]></notes>

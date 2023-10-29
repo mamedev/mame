@@ -14,6 +14,29 @@ license:CC0-1.0
 
 <softwarelist name="spectrum_betadisc_flop" description="Sinclair ZX Spectrum Beta Disc / TR-DOS disk images">
 
+	<software name="bobcarot" supported="no"> <!-- won't load file? -->
+		<description>Bobby Carrot</description>
+		<year>2018</year>
+		<publisher>Aleksey Golubtsov</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="bc128.trd" size="655360" crc="56d6117c" sha1="187af2278b2c011ec4cc5b0ddc8d2c4b8471cd44"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="michelis">
+		<description>Carlos Michelis (demo)</description>
+		<year>2012</year>
+		<publisher>World XXI Soft</publisher>
+		<info name="language" value="English/Russian/Spanish" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="Carlos Michelis - Demo.trd" size="655360" crc="5295622a" sha1="6be8fb78a6d81a4e8a435ab2fabea760447e812a"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="alterego2">
 		<description>DreamWalker: Alter Ego 2 (v1.1)</description>
 		<year>2014</year>
@@ -34,6 +57,64 @@ license:CC0-1.0
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
 				<rom name="DreamWalker.trd" size="655360" crc="4395c7d0" sha1="74f525fdd6927d3da001ae14026ba51cfec0a85c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dune2">
+		<description>Dune II - Battle for Arrakis (Demige)</description>
+		<year>2019</year>
+		<publisher>Demige</publisher>
+		<info name="language" value="English/Russian" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="DuneII-BattleForArrakis(Demige)(Disk1).trd" size="655360" crc="4963b6a6" sha1="90ecaad11d34d7d6f5515f561ae6e5228f3da759"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="DuneII-BattleForArrakis(Demige)(Disk2).trd" size="655360" crc="d44f594b" sha1="a98fc28be3d945edfea1849acacb483a44366ca3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dune2_ru" cloneof="dune2">
+		<description>Dune II - Battle for Arrakis (Perestroika Software)</description>
+		<year>2014</year>
+		<publisher>Perestroika Software</publisher>
+		<info name="language" value="English/Russian" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="DuneIIBattleForArrakis_1.trd" size="655360" crc="5a3d3e29" sha1="8d72eeeb43adc3e0ed69d3e2fd67246385cbcd0d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="DuneIIBattleForArrakis_2.trd" size="655360" crc="78a363ce" sha1="0466fb38200d48c134b76b379944aeae1f2e60fb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ggdizzy">
+		<description>Ghastly Getaway Dizzy (English)</description>
+		<year>2020</year>
+		<publisher>Verm-V</publisher>
+		<info name="language" value="English" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="GhastlyGetawayDizzyV1_02_ENG.trd" size="655360" crc="dc6b5179" sha1="b3ca55f1aa8509a51504749b0eddded1192ab4cf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ggdizzy_ru" cloneof="ggdizzy">
+		<description>Ghastly Getaway Dizzy (Russian)</description>
+		<year>2020</year>
+		<publisher>Verm-V</publisher>
+		<info name="language" value="Russian" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="GhastlyGetawayDizzyV1_02_RUS.trd" size="655360" crc="598ee73c" sha1="63954dfb848603b2a607830a3e55b48c2b56378c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -148,6 +229,30 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="redshftt">
+		<description>Redshift (v1.1)</description>
+		<year>2020</year>
+		<publisher>World XXI Soft</publisher>
+		<info name="language" value="English/Spanish" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="redshift_1.1.trd" size="655360" crc="9f05e2a3" sha1="59599c2e1e58c16a16f3f293df5226112927bb16"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="redshftt_a" cloneof="redshftt">
+		<description>Redshift (v1.0)</description>
+		<year>2019</year>
+		<publisher>World XXI Soft</publisher>
+		<info name="language" value="English/Spanish" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="redshift_1.0.trd" size="655360" crc="3ce73e13" sha1="03d302feadd39e9123a807827c0000b77ba17245"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sectorin">
 		<description>Sector: Invasion</description>
 		<year>2014</year>
@@ -171,6 +276,29 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="thschool">
+		<description>Thieves School (demo)</description>
+		<year>2008</year>
+		<publisher>World XXI Soft</publisher>
+		<info name="language" value="English/Spanish" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="tsd.trd" size="655360" crc="90498cb1" sha1="1670708c070020d92e72a354647f15491910a867"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ttorto30">
+		<description>Turbo the Tortoise - 30th Anniversary Edition</description>
+		<year>2022</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="TurboTheTortoise-30thAnniversaryEdition.trd" size="655360" crc="059602da" sha1="14d70a77a89fc9616afa5995133128a5ba8b7deb"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="twinligh">
 		<description>Twinlight</description>
 		<year>2017</year>
@@ -178,28 +306,6 @@ license:CC0-1.0
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
 				<rom name="twinlight.trd" size="655360" crc="db941a5c" sha1="51300fc042515d68a5e0b68df997bbdca612e2db"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bobcarot" supported="no"> <!-- won't load file? -->
-		<description>Bobby Carrot</description>
-		<year>2018</year>
-		<publisher>Aleksey Golubtsov</publisher>
-		<part name="flop" interface="floppy_5_25">
-			<dataarea name="flop" size="655360">
-				<rom name="bc128.trd" size="655360" crc="56d6117c" sha1="187af2278b2c011ec4cc5b0ddc8d2c4b8471cd44"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="redshftt">
-		<description>Redshift</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop" interface="floppy_5_25">
-			<dataarea name="flop" size="655360">
-				<rom name="redshift.trd" size="655360" crc="3ce73e13" sha1="03d302feadd39e9123a807827c0000b77ba17245"/>
 			</dataarea>
 		</part>
 	</software>

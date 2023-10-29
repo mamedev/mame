@@ -112,7 +112,6 @@ if (SOUNDS["AC97"]~=null) then
 end
 
 
-
 ---------------------------------------------------
 -- Apple custom sound chips
 --@src/devices/sound/asc.h,SOUNDS["ASC"] = true
@@ -1466,6 +1465,18 @@ if (SOUNDS["LC82310"]~=null) then
 end
 
 ---------------------------------------------------
+-- NEC uPD933
+--@src/devices/sound/upd933.h,SOUNDS["UPD933"] = true
+---------------------------------------------------
+
+if (SOUNDS["UPD933"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/upd933.cpp",
+		MAME_DIR .. "src/devices/sound/upd933.h",
+	}
+end
+
+---------------------------------------------------
 -- NEC uPD934G
 --@src/devices/sound/upd934g.h,SOUNDS["UPD934G"] = true
 ---------------------------------------------------
@@ -1642,5 +1653,17 @@ if (SOUNDS["NN71003F"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/nn71003f.cpp",
 		MAME_DIR .. "src/devices/sound/nn71003f.h",
+	}
+end
+
+---------------------------------------------------
+-- AP2010
+--@src/devices/sound/ap2010pcm.h,SOUNDS["AP2010"] = true
+---------------------------------------------------
+
+if (SOUNDS["AP2010"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/ap2010pcm.cpp",
+		MAME_DIR .. "src/devices/sound/ap2010pcm.h",
 	}
 end

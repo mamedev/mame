@@ -52,8 +52,8 @@ private:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	u32 regs_r(offs_t offset);
-	void regs_w(offs_t offset, u32 data);
+	u8 regs_r(offs_t offset);
+	void regs_w(offs_t offset, u8 data);
 	u32 ramdac_r(offs_t offset);
 	void ramdac_w(offs_t offset, u32 data);
 	u32 vram_r(offs_t offset);

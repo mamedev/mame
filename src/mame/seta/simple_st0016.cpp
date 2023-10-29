@@ -583,7 +583,7 @@ void st0016_state::renju(machine_config &config)
  *************************************/
 
 /*
-Renjyu Kizoku
+KIRA KIRA 五目ならべ 連珠貴族 (KIRA KIRA Gomoku Narabe Renju Kizoku)
 Visco, 1994
 
 PCB Layout
@@ -619,6 +619,7 @@ ROM_START( renju ) // PCB E51-00001-A
 	ROM_LOAD( "rnj2.u32",     0x200000, 0x080000, CRC(2015289c) SHA1(5223b6d3dbe4657cd63cf5b527eaab84cf23587a) )
 ROM_END
 
+// ねらってチュー (Neratte Chū) / NERATTE CHU
 ROM_START( nratechu ) // PCB E56-00002 (almost identical to above)
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "sx012-01.u31", 0x000000, 0x080000, CRC(6ca01d57) SHA1(065848f19ecf2dc1f7bbc7ddd87bca502e4b8b16) )
@@ -643,6 +644,7 @@ ROM_START( dcrowna ) // PCB E51-00001 (almost identical to above)
 	ROM_LOAD( "dcn-3.u34", 0x180000, 0x080000, CRC(ec2e88bc) SHA1(2a8deee63e123dae411e2b834eca69be6f646d66) ) // U34 @ 1F
 ROM_END
 
+// 韓国花札 GO-STOP (Kankoku Hanafuda GO-STOP)
 ROM_START( gostop )
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "go-stop_rom1.u31",0x000000, 0x80000, CRC(93decaa2) SHA1(a30958b76dfe5752a341ecdc950119c10e864586) )
@@ -651,7 +653,7 @@ ROM_END
 
 
 /*
-Koi Koi Shimasho
+恋こいしましょ - スーパーリアル花札 (Koi Koi Shimasho - Super Real Hanafuda)
 Visco
 
 PCB Layout
@@ -802,11 +804,11 @@ void st0016_state::init_mayjisn2()
  *
  *************************************/
 
-GAME( 1994, renju,      0,      renju,    renju,    st0016_state, init_renju,    ROT0, "Visco",            "Renju Kizoku",             MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, nratechu,   0,      st0016,   nratechu, st0016_state, init_nratechu, ROT0, "Seta",             "Neratte Chu",              MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, mayjisn2,   0,      mayjinsn, mayjisn2, st0016_state, init_mayjisn2, ROT0, "Seta",             "Mayjinsen 2",              MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, koikois,    0,      st0016,   koikois,  st0016_state, init_renju,    ROT0, "Visco",            "Koi Koi Shimasho",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 2001, gostop,     0,      st0016,   gostop,   st0016_state, init_renju,    ROT0, "Visco",            "Kankoku Hanafuda Go-Stop", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, renju,      0,      renju,    renju,    st0016_state, init_renju,    ROT0, "Visco",            "Renju Kizoku - Kira Kira Gomoku Narabe", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, nratechu,   0,      st0016,   nratechu, st0016_state, init_nratechu, ROT0, "Seta",             "Neratte Chu",                            MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mayjisn2,   0,      mayjinsn, mayjisn2, st0016_state, init_mayjisn2, ROT0, "Seta",             "Mayjinsen 2",                            MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, koikois,    0,      st0016,   koikois,  st0016_state, init_renju,    ROT0, "Visco",            "Koi Koi Shimasho - Super Real Hanafuda", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, gostop,     0,      st0016,   gostop,   st0016_state, init_renju,    ROT0, "Visco",            "Kankoku Hanafuda Go-Stop",               MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 // Not working
 GAME( 1994, mayjinsn,   0,      mayjinsn, st0016,   st0016_state, init_mayjinsn, ROT0, "Seta",             "Mayjinsen",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

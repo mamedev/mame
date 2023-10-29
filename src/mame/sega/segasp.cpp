@@ -497,6 +497,28 @@ ROM_START( bingogal )
 	ROM_LOAD( "317-0513-jpn.ic15", 0, 0x800, BAD_DUMP CRC(778dc297) SHA1(a920ab31ea670cc5056c40baea3b832b7868bfe7) )
 ROM_END
 
+// This is installer of whole game machine.
+// CF card contains Main unit binary, as well as Satellite, which is sent and programmed from main to satellites via network.
+// There is also network board firmware update v1.19 and firmware for SH4-based I/O board.
+ROM_START( bingogalo )
+	SEGASP_BIOS
+	SEGASP_JP
+	SEGASP_MISC
+
+	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASE)
+
+	// BINGO GALAXY
+	// MDA-C0039
+	// REV. A
+	DISK_REGION( "cflash" )
+	DISK_IMAGE( "mda-c0039a", 0, SHA1(950c27cc0cd77b2dd4e6d510da83699d8b511907) )
+
+	ROM_PARAMETER( ":rom_board:id", "5502" )  // actually 8x 128Mbit FlashROMs
+
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-0513-jpn.ic15", 0, 0x800, BAD_DUMP CRC(778dc297) SHA1(a920ab31ea670cc5056c40baea3b832b7868bfe7) )
+ROM_END
+
 // Also was dumped 837-14789 PCB, which uses 2x 512Mbit Flash ROMs. Game contents is the same as joined IC 62-64 dumps below.
 ROM_START( bingogals )
 	SEGASP_BIOS
@@ -511,6 +533,25 @@ ROM_START( bingogals )
 	ROM_PARAMETER( ":rom_board:id", "5502" )  // actually 8x 128Mbit FlashROMs
 
 	ROM_REGION( 0x800, "pic_readout", ROMREGION_ERASEFF) // not populated
+ROM_END
+
+ROM_START( bingopar )
+	SEGASP_BIOS
+	SEGASP_JP
+	SEGASP_MISC
+
+	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASE)
+
+	// BINGO PARADE MAIN
+	// MDA-C0008
+	// REV. E
+	DISK_REGION( "cflash" )
+	DISK_IMAGE( "mda-c0008e", 0, SHA1(a825c4d98d35d8f3ebc3df9579ba42b29e53346b) )
+
+	ROM_PARAMETER( ":rom_board:id", "5502" )  // actually 8x 128Mbit FlashROMs
+
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-0407-jpn.ic15", 0, 0x800, CRC(186d9d36) SHA1(21e5576a603eb4d624528012112f9e483b71cbad) )
 ROM_END
 
 ROM_START( dinoking )
@@ -996,6 +1037,8 @@ GAME( 2009, tetgiant,segasp,     segasp,    segasp, segasp_state, init_segasp, R
 GAME( 2009, unomedal,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "UNO the Medal", GAME_FLAGS )
 GAME( 2009, westdrmg,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Western Dream Gold", GAME_FLAGS )
 // These use a CF card
+GAME( 2007, bingogalo,bingogal,  segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Bingo Galaxy (main) (MDA-C0039A)", GAME_FLAGS ) // 31.10.2007(main)/15.11.2007(satellite)
+GAME( 2005, bingopar,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Bingo Parade (main) (MDA-C0008E)", GAME_FLAGS ) // 31.10.2007(main)/15.11.2007(satellite)
 GAME( 2006, dinokior,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Dinosaur King - Operation: Dinosaur Rescue (USA, Export) (MDA-C0021)", GAME_FLAGS )
 GAME( 2008, dinoki25,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Dinosaur King - D-Team VS. the Alpha Fortress (Export, Ver 2.500) (MDA-C0047)", GAME_FLAGS )
 GAME( 2010, dinokich,dinoki25,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Konglongwang - D-Kids VS Alpha Yaosai (China, Ver 2.501) (MDA-C0081)", GAME_FLAGS ) // D-Kids VS 亚法要塞
