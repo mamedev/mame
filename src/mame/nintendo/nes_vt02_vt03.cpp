@@ -102,6 +102,7 @@ public:
 	void vt_external_space_map_1mbyte_majkon(address_map& map);
 
 	void init_protpp();
+	void init_gamezn2();
 
 protected:
 	required_device<nes_vt02_vt03_soc_device> m_soc;
@@ -1342,6 +1343,11 @@ ROM_START( 88in1joy )
 	ROM_LOAD( "88in1joystick.bin", 0x00000, 0x400000, CRC(86b8d819) SHA1(6da387b2e6ce02a3ec203e2af8a961959ba1cf62) )
 ROM_END
 
+ROM_START( gamezn2 )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD16_WORD_SWAP( "gamezone2.bin", 0x00000, 0x400000, CRC(f7b2d609) SHA1(7d2d8f6e822c4e6b97e9accaa524b7910c6b97bf) ) // byteswapped as protection?
+ROM_END
+
 
 
 void nes_vt_state::init_protpp()
@@ -1355,6 +1361,22 @@ void nes_vt_state::init_protpp()
 		for (int i = 0; i < len; i++)
 		{
 			buffer[i] = bitswap<8>(src[i],3,1,2,0,7,5,6,4);
+		}
+
+		std::copy(buffer.begin(), buffer.end(), &src[0]);
+	}
+}
+
+void nes_vt_state::init_gamezn2()
+{
+	u8 *src = memregion("mainrom")->base();
+	int len = memregion("mainrom")->bytes();
+
+	std::vector<u8> buffer(len);
+	{
+		for (int i = 0; i < len; i++)
+		{
+			buffer[i] = bitswap<8>(src[i],7,6,5,4,3,2,0,1); // bottom 2 bits are swapped?
 		}
 
 		std::copy(buffer.begin(), buffer.end(), &src[0]);
@@ -1442,6 +1464,8 @@ CONS( 2004, vsmaxxvd,  0,  0,  nes_vt_vh2009_8mb,        nes_vt, nes_vt_swap_op_
 CONS( 200?, vsmaxx77,  0,  0,  nes_vt_vh2009_8mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Senario / JungleTac",   "Vs Maxx Wireless 77-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 200?, joysti30,  0,  0,  nes_vt_vh2009_4mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "WinFun / JungleTac",    "Joystick 30", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // doesn't show WinFun onscreen, but packaging does
 
+// mostly bootleg NES games, but also has Frogger, Scramble and Asteroids in it
+CONS( 200?, gamezn2,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, init_gamezn2, "<unknown>", "Game Zone II 128-in-1", MACHINE_IMPERFECT_GRAPHICS ) // was this PAL? (lots of raster splits are broken at the moment either way)
 
 // die is marked as VH2009, as above, but no scrambled opcodes here
 CONS( 201?, techni4,   0,  0,  nes_vt_pal_2mb,           nes_vt, nes_vt_state,               empty_init, "Technigame", "Technigame Super 4-in-1 Sports (PAL)", MACHINE_IMPERFECT_GRAPHICS )
