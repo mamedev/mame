@@ -182,8 +182,8 @@ private:
 
 	template <typename... T>
 	auto make_notifier_adder(util::notifier<T...> &notifier, const char *desc);
-	template <typename R, typename T, typename D>
-	auto make_simple_callback_setter(void (T::*setter)(delegate<R ()> &&), D &&dflt, const char *name, const char *desc);
+	template <typename T, typename D, typename R, typename... A>
+	auto make_simple_callback_setter(void (T::*setter)(delegate<R (A...)> &&), D &&dflt, const char *name, const char *desc);
 
 	running_machine &machine() const { return *m_machine; }
 
