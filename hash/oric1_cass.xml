@@ -1753,7 +1753,7 @@ Only has the "Galaxy" game. Missing "Lunar", "Astro-War", "Space-Chase", "Astero
 ]]></notes>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="8134">
-				<rom name="galaxy.tap" size="8134" crc="a96b6f8e" sha1="bd4eafb53fab98d739868a341f83d45752d4c3b7"/>
+				<rom name="galaxy.tap" size="8134" crc="a96b6f8e" sha1="bd4eafb53fab98d739868a341f83d45752d4c3b7" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
