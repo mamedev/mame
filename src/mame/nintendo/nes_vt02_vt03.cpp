@@ -232,6 +232,7 @@ public:
 	{ }
 
 	void nes_vt_2mb_ablping(machine_config& config);
+	void nes_vt_2mb_vfootbal(machine_config& config);
 
 private:
 	uint8_t ablping_extraio_r();
@@ -682,6 +683,18 @@ void nes_vt_ablping_state::nes_vt_2mb_ablping(machine_config &config)
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_ablping_state::vt_external_space_map_2mbyte);
 	m_soc->set_201x_descramble(0x4, 0x7, 0x2, 0x6, 0x5, 0x3);
 	m_soc->set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x7, 0x8);
+
+	m_soc->extra_read_2_callback().set(FUNC(nes_vt_ablping_state::ablping_extraio_r));
+	m_soc->extra_read_3_callback().set(FUNC(nes_vt_ablping_state::ablping_extraio_r));
+	m_soc->extra_write_2_callback().set(FUNC(nes_vt_ablping_state::ablping_extraio_w));
+	m_soc->extra_write_3_callback().set(FUNC(nes_vt_ablping_state::ablping_extraio_w));
+}
+
+void nes_vt_ablping_state::nes_vt_2mb_vfootbal(machine_config &config)
+{
+	NES_VT02_VT03_SOC_PAL(config, m_soc, PAL_APU_CLOCK);
+	configure_soc(m_soc);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_ablping_state::vt_external_space_map_2mbyte);
 
 	m_soc->extra_read_2_callback().set(FUNC(nes_vt_ablping_state::ablping_extraio_r));
 	m_soc->extra_read_3_callback().set(FUNC(nes_vt_ablping_state::ablping_extraio_r));
@@ -1292,6 +1305,11 @@ ROM_START( protpp )
 	ROM_LOAD( "vpingpong_s29al008d70tfi02_0001225b.bin", 0x00000, 0x100000, CRC(8cf46272) SHA1(298a6341d26712ec1f282e7514e995a7af5ac012) )
 ROM_END
 
+ROM_START( vfootbal )
+	ROM_REGION( 0x200000, "mainrom", 0 )
+	ROM_LOAD( "vfootball.u3", 0x00000, 0x200000, CRC(3b586f64) SHA1(92ee41ccfad32f7629bd43503cfb15e9624283ce) )
+ROM_END
+
 ROM_START( zdog )
 	ROM_REGION( 0x400000, "mainrom", 0 )
 	ROM_LOAD( "zdog.bin", 0x00000, 0x400000, CRC(5ed3485b) SHA1(5ab0e9370d4ed1535205deb0456878c4e400dd81) )
@@ -1441,6 +1459,8 @@ CONS( 200?, mc_sp69,   0,  0,  nes_vt_4mb_sp69,    nes_vt, nes_vt_sp69_state, em
 // Super Ping Pong appears on the title screen, but not the box / product art which simply has "Ping Pong Plug & Play TV Game" on front/back/bottom/manual, and "Table Tennis Plug & Play TV Game" on left/right sides.  Product code is PP1100
 // PCB has PP1100-MB 061110 on it, possible date YYMMDD code? (pinball is 050329, guitar fever is 070516, air blaster 050423, kickboxing 061011 etc.)
 CONS( 2006, ablping,   0,        0,  nes_vt_2mb_ablping, nes_vt, nes_vt_ablping_state, empty_init, "Advance Bright Ltd", "Ping Pong / Table Tennis / Super Ping Pong (PP1100, ABL TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+CONS( 200?, vfootbal,  0,        0,  nes_vt_2mb_vfootbal,nes_vt, nes_vt_ablping_state, empty_init, "<unknown>", "Virtual Football (with 3 bonus games)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // Hummer systems, scrambled bank register
 CONS( 200?, mc_sam60,  0,  0,  nes_vt_hummer_2mb,    nes_vt, nes_vt_hum_state, empty_init, "Hummer Technology Co., Ltd.", "Samuri (60 in 1)", MACHINE_IMPERFECT_GRAPHICS  | MACHINE_IMPERFECT_SOUND )
