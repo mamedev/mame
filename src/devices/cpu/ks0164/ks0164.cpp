@@ -610,11 +610,12 @@ void ks0164_cpu_device::execute_run()
 				// Neg/not
 				// 1101 .rrr Ssss .101
 
-				u16 v = m_r[(opcode >> 4) & 7];
+				u16 v = m_r[(opcode >> 8) & 7];
 				if(opcode & 0x0080)
 					v = -s16(v);
 				else
 					v = ~v;
+				m_r[(opcode >> 8) & 7] = v;
 				m_r[R_PSW] = (m_r[R_PSW] & ~F_MASK) | (v ? v & 0x8000 ? F_N : 0 : F_Z);
 				break;
 			}
