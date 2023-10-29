@@ -282,7 +282,6 @@ void elan_ep3a19a_state::elan_ep3a19a(machine_config &config)
 	m_vid->set_entries(256);
 	m_vid->set_is_pvmilfin();
 	m_vid->set_use_spritepages();
-	m_vid->set_force_transpen_ff();
 	m_vid->set_force_basic_scroll();
 
 	/* sound hardware */
