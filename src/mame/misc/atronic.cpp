@@ -4,7 +4,7 @@
 /*
  From 1999? (documentation is dated August 99)
 
-Atronic was a Austrian/German slot machine manufacturer. It later
+Atronic was an Austrian/German slot machine manufacturer. It later
 merged with Spielo.
 
 Atronic CashLine platform (~199x-2004?) - z80-based
@@ -18,10 +18,10 @@ Atronic CashLine platform is used in multiple cabinet form-factors:
 * CashLine hardware description:
 
 Backplane has room for 4 boards:
-1. Master board [z80]
+1. Master board [Z80]
 2. Graphic Board [TMS34020]
 3. Sound Board (optional?) [YMZ280B?]
-4. Communications board (optional) [m68k]
+4. Communications board (optional) [M68k]
 
 CashLine PCB boards have EEPROM/EPROM slots for software installation:
 * Main software         - Master board, socket U2
@@ -31,7 +31,7 @@ CashLine PCB boards have EEPROM/EPROM slots for software installation:
 * Sound software        - Sound board, sockets U18 .. U21
 * Comm software         - Comm board, sockets U34 and U35
 
-Atronic platforms following z80-based CashLine:
+Atronic platforms following Z80-based CashLine:
 * "Hi(!)bility" platform (2001) - two 68k-based circuit boards for game control and external
   communications running OSE (Enea?) operating system, and a customized PC mainboard
   based on Intel 815 chipset and Intel Celeron 566MHz CPU running Windows CE.
@@ -146,7 +146,9 @@ CashLine:
  'BLMOVE with unaligned src and aligned dst' from the 34020
  which softlocks MAME as the PC no longer advances, see "void tms340x0_device::blmove(uint16_t op)" in 34010ops.hxx
  this appears to be valid code, just unsupported in the 34020 core
+
 */
+
 
 /*---------------------------------------------------------------------------------------------------------------------------------------
     I C Money
