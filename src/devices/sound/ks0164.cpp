@@ -328,7 +328,7 @@ void ks0164_device::voice_w(offs_t offset, u16 data, u16 mem_mask)
 	m_stream->update();
 	u16 old = m_sregs[m_voice_select & 0x1f][offset];
 	COMBINE_DATA(&m_sregs[m_voice_select & 0x1f][offset]);
-	if(1 && m_sregs[m_voice_select & 0x1f][offset] != old && offset == 0)
+	if(0 && m_sregs[m_voice_select & 0x1f][offset] != old && offset == 0)
 		logerror("voice %02x.%02x = %04x @ %04x (%04x)\n", m_voice_select & 0x1f, offset, m_sregs[m_voice_select & 0x1f][offset], mem_mask, m_cpu->pc());
 	if(offset == 0 && (data & 1) && !(old & 1))
 		logerror("keyon %02x mode=%04x (%s %c %c %c %c) cur=%02x%04x.%04x loop=%02x%04x.%04x end=%02x%04x.%04x pitch=%02x.%03x 10=%02x/%02x:%02x/%02x 14=%03x/%03x:%03x/%03x 18=%04x/%04x c=%04x   %04x %04x %04x %04x %04x  %04x %04x %04x %04x %04x\n",
@@ -463,29 +463,9 @@ void ks0164_device::cpu_map(address_map &map)
 
 void ks0164_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	static std::string rrx = "";
 	for(int sample = 0; sample != outputs[0].samples(); sample++) {
 		s32 suml = 0, sumr = 0;
-		std::string rrr = "";
 		for(int voice = 0; voice < 0x20; voice++) {
-			{
-				int adr = 0xe000 + 0x8e * voice;
-				u16 org = m_cpu->space(AS_PROGRAM).read_word(adr + 4);
-				if(org == 0x0000)
-					rrr += '?';
-				else if(org == 0xf1de)
-					rrr += '.';
-				else if(org == 0xf1e2)
-					rrr += '#';
-				else if(org == 0xf1ea)
-					rrr += '3';
-				else if(org == 0xf1e6)
-					rrr += '4';
-				else {
-					logerror("%04x\n", org);
-					exit(0);
-				}
-			}
 			u16 *regs = m_sregs[voice];
 			if(regs[0] & 0x0001) {
 				u64 current = (u64(regs[1]) << 32) | (u64(regs[2]) << 16) | regs[3];
@@ -519,8 +499,9 @@ void ks0164_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 				u64 end = (u64(regs[0xd]) << 32) | (u64(regs[0xe]) << 16) | regs[0xf];
 				if(current >= end) {
 					if (regs[0] & 8) {
-						u64 loop = (u64(regs[9]) << 32) | (regs[0xa] << 16) | regs[0xb];
-						current = current - end + loop;
+						u64 loop = (u64(regs[9]) << 32) | (u64(regs[0xa]) << 16) | regs[0xb];
+						while(current >= end)
+							current = current - end + loop;
 					} else {
 						regs[0] = ~1;
 						regs[0xc] = 0;
@@ -542,10 +523,6 @@ void ks0164_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 					regs[0xc] --;
 				}
 			}
-		}
-		if(rrr != rrx) {
-			logerror("inuse %s\n", rrr);
-			rrx = rrr;
 		}
 		outputs[0].put_int(sample, suml, 32768 * 32);
 		outputs[1].put_int(sample, sumr, 32768 * 32);
