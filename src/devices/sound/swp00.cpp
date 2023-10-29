@@ -720,7 +720,7 @@ void swp00_device::attack_speed_w(offs_t offset, u8 data)
 		return;
 	m_stream->update();
 	m_attack_speed[chan] = data;
-	//	logerror("attack_speed[%02x] = %02x\n", chan, m_attack_speed[chan]);
+	logerror("attack_speed[%02x] = %02x\n", chan, m_attack_speed[chan]);
 }
 
 u8 swp00_device::attack_speed_r(offs_t offset)
@@ -736,7 +736,7 @@ void swp00_device::attack_level_w(offs_t offset, u8 data)
 		return;
 	m_stream->update();
 	m_attack_level[chan] = data;
-	//	logerror("attack_level[%02x] = %02x\n", chan, m_attack_level[chan]);
+	logerror("attack_level[%02x] = %02x\n", chan, m_attack_level[chan]);
 }
 
 u8 swp00_device::attack_level_r(offs_t offset)
@@ -757,7 +757,7 @@ void swp00_device::decay_speed_w(offs_t offset, u8 data)
 	if(data & 0x80)
 		m_decay[chan] = true;
 
-	//	logerror("decay_speed[%02x] = %02x\n", chan, m_decay_speed[chan]);
+	logerror("decay_speed[%02x] = %02x\n", chan, m_decay_speed[chan]);
 }
 
 u8 swp00_device::decay_speed_r(offs_t offset)
@@ -773,7 +773,7 @@ void swp00_device::decay_level_w(offs_t offset, u8 data)
 		return;
 	m_stream->update();
 	m_decay_level[chan] = data;
-	//	logerror("decay_level[%02x] = %02x\n", chan, m_decay_level[chan]);
+	logerror("decay_level[%02x] = %02x\n", chan, m_decay_level[chan]);
 }
 
 u8 swp00_device::decay_level_r(offs_t offset)
@@ -900,7 +900,7 @@ u8 swp00_device::lfo_pmod_depth_r(offs_t offset)
 void swp00_device::keyon(int chan)
 {
 	m_stream->update();
-	//	logerror("keyon %02x a=%02x/%02x d=%02x/%02x\n", chan, m_attack_speed[chan], m_attack_level[chan], m_decay_speed[chan], m_decay_level[chan]);
+	logerror("keyon %02x a=%02x/%02x d=%02x/%02x glo=%02x pan=%02x [%x %x %x %x]\n", chan, m_attack_speed[chan], m_attack_level[chan], m_decay_speed[chan], m_decay_level[chan], m_glo_level[chan], m_panning[chan], m_sample_start[chan], m_sample_end[chan], m_sample_address[chan], m_sample_dec_and_format[chan]);
 	m_lfo_phase[chan] = 0;
 	m_sample_pos[chan] = -m_sample_start[chan] << 15;
 
@@ -1247,6 +1247,11 @@ s32 swp00_device::saturate(s32 value)
 		return 0x1ffff;
 	else
 		return value;
+}
+
+double v2f2(s32 value)
+{
+	return (1.0 - (value & 0xffffff) / 33554432.0) / (1 << (value >> 24));
 }
 
 void swp00_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
