@@ -168,7 +168,8 @@ public:
 	{ }
 
 	void nes_vt_waixing_alt_4mb_sporzpp(machine_config& config);
-
+	void nes_vt_pal_4mb_sporzbxa(machine_config& config);
+	
 private:
 	uint8_t in1_r() override
 	{
@@ -631,6 +632,12 @@ void nes_vt_waixing_alt_sporzpp_state::nes_vt_waixing_alt_4mb_sporzpp(machine_co
 	m_soc->set_8000_scramble(0x5, 0x4, 0x3, 0x2, 0x7, 0x6, 0x7, 0x8);
 }
 
+void nes_vt_waixing_alt_sporzpp_state::nes_vt_pal_4mb_sporzbxa(machine_config& config)
+{
+	NES_VT02_VT03_SOC_PAL(config, m_soc, PAL_APU_CLOCK);
+	configure_soc(m_soc);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_4mbyte);
+}
 
 void nes_vt_hum_state::nes_vt_hummer_2mb(machine_config& config)
 {
@@ -1081,6 +1088,11 @@ ROM_START( sporzbx )
 	ROM_LOAD( "sporzboxing.bin", 0x00000, 0x400000, CRC(8b832c0b) SHA1(8193955a81e894a01308a80d5153f2ecfe134da6) )
 ROM_END
 
+ROM_START( sporzbxa )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "wlboxing.bin", 0x00000, 0x400000, CRC(5df7beb9) SHA1(dadcec310e4a7b3ca061c6fe6be319cda2445b24) )
+ROM_END
+
 ROM_START( sporztn )
 	ROM_REGION( 0x400000, "mainrom", 0 )
 	ROM_LOAD( "wirelesstennis.bin", 0x00000, 0x400000, CRC(e60f5ee1) SHA1(838ba7f4e9dcd0101eaaef5be883206d8856f45c) )
@@ -1360,7 +1372,8 @@ CONS( 2005, ablpinb, 0,  0,  nes_vt_pal_2mb,    ablpinb, nes_vt_ablpinb_state, e
 // need to map 2 player controls for Ping Pong, 'Eat-Bean' (the PacMan hack) gets stuck during intermission? (same happens on hardware?)
 CONS( 2004, sporzpp,   0,  0,  nes_vt_waixing_alt_4mb_sporzpp,        sporzpp, nes_vt_waixing_alt_sporzpp_state, empty_init, "Macro Winners", "Game Sporz Wireless Duet Play Ping-Pong", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // has some longer than expected delays when sounds should play on the Boxing part, but NES hacks are all functional
-CONS( 2004, sporzbx,   0,  0,  nes_vt_waixing_alt_4mb_sporzpp,        sporzpp, nes_vt_waixing_alt_sporzpp_state, empty_init, "Macro Winners", "Game Sporz Wireless Boxing", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2004, sporzbx,   0,        0,  nes_vt_waixing_alt_4mb_sporzpp,        sporzpp, nes_vt_waixing_alt_sporzpp_state, empty_init, "Macro Winners",                       "Game Sporz Wireless Boxing", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2004, sporzbxa,  sporzbx,  0,  nes_vt_pal_4mb_sporzbxa,               sporzpp, nes_vt_waixing_alt_sporzpp_state, empty_init, "Macro Winners (Play Vision license)", "Wireless Boxing (PAL, Play Vision)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // has some longer than expected delays when sounds should play on the Tennis part, but NES hacks are all functional, US version is sold in DreamGear branded box.
 CONS( 2004, sporztn,   0,  0,  nes_vt_pal_4mb,        sporzpp, nes_vt_wldsoctv_state, empty_init, "Macro Winners (Play Vision license)", "Wireless Tennis (PAL, Play Vision)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // missing PCM audio, but regular APU SFX work
@@ -1482,7 +1495,7 @@ CONS( 201?, mc_89in1,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty
 CONS( 201?, mc_tv200,   0,        0,  nes_vt_8mb,    nes_vt, nes_vt_state, empty_init, "Thumbs Up", "200 in 1 Retro TV Game", MACHINE_IMPERFECT_GRAPHICS )
 
 // TODO: add cart port and hook up nes_vt_cart.xml
-CONS( 201?, 88in1joy,   0,        0,  nes_vt_pal_4mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "88 in 1 Joystick", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, 88in1joy,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "88 in 1 Joystick", MACHINE_IMPERFECT_GRAPHICS )
 
 
 // Runs fine, non-sport 121 in 1 games perfect, but minor graphical issues in
