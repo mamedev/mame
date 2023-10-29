@@ -26,10 +26,10 @@ license:CC0-1.0
 	<element name="color" defstate="0">
 		<rect><bounds x="0" y="0" width="300" height="1" /><color red="0.85" green="0.85" blue="0.86" /></rect>
 
-		<!-- palette taken from driver (except for black) -->
+		<!-- palette taken from driver -->
 		<rect><bounds x="16"  y="0" width="20" height="1" /><color red="1.00" green="1.00" blue="1.00" /></rect> <!-- 0 white -->
 		<rect><bounds x="32"  y="0" width="20" height="1" /><color red="0.50" green="0.50" blue="0.50" /></rect> <!-- 1 gray -->
-		<rect><bounds x="48"  y="0" width="20" height="1" /><color red="0.10" green="0.10" blue="0.10" /></rect> <!-- 2 black -->
+		<rect><bounds x="48"  y="0" width="20" height="1" /><color red="0.00" green="0.00" blue="0.00" /></rect> <!-- 2 black -->
 		<rect><bounds x="64"  y="0" width="20" height="1" /><color red="0.09" green="0.38" blue="0.00" /></rect> <!-- 3 dark green -->
 		<rect><bounds x="80"  y="0" width="20" height="1" /><color red="0.47" green="0.69" blue="0.09" /></rect> <!-- 4 lime green -->
 		<rect><bounds x="96"  y="0" width="20" height="1" /><color red="0.28" green="0.69" blue="0.13" /></rect> <!-- 5 green -->
@@ -47,7 +47,7 @@ license:CC0-1.0
 		<text string="×" align="1">
 			<bounds state="0" x="259" y="0" width="20" height="0.9" />
 			<bounds state="255" x="4" y="0" width="20" height="0.9" />
-			<color red="0" green="0" blue="0" />
+			<color red="1.0" green="0.1" blue="0.15" />
 		</text>
 	</element>
 
