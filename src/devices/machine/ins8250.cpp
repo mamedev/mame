@@ -469,7 +469,10 @@ u8 ins8250_uart_device::ins8250_r(offs_t offset)
 			}
 			break;
 		case 7:
-			data = m_regs.scr;
+			if (m_device_type >= dev_type::NS16450)
+			{
+				data = m_regs.scr;
+			}
 			break;
 	}
 	return data;
