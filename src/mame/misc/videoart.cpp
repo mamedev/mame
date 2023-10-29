@@ -23,7 +23,7 @@ Hardware notes:
 - RF NTSC video, no sound
 
 TODO:
-- palette is approximated from photos/videos
+- palette is approximated from photos/videos (there is no color prom)
 
 *******************************************************************************/
 
@@ -137,32 +137,32 @@ DEVICE_IMAGE_LOAD_MEMBER(videoart_state::cart_load)
     Video
 *******************************************************************************/
 
+// note: if palette gets tweaked, don't forget to update internal artwork too
 constexpr rgb_t videoart_colors[] =
 {
 	{ 0x00, 0x00, 0x00 }, // 2 black
-	{ 0x08, 0x18, 0x88 }, // 7 blue
-	{ 0x18, 0x60, 0x00 }, // 3 dark green
+	{ 0x10, 0x60, 0xe0 }, // 7 blue
+	{ 0x10, 0x60, 0x08 }, // 3 dark green
 	{ 0xff, 0xff, 0xff }, // 0 white
 
-	{ 0x50, 0x18, 0x48 }, // b dark pink
-	{ 0x40, 0x10, 0x60 }, // 8 purple
-	{ 0x30, 0x28, 0x08 }, // a brown
-	{ 0x60, 0x10, 0x10 }, // d dark red
+	{ 0x80, 0x20, 0x78 }, // b dark pink
+	{ 0x60, 0x20, 0x80 }, // 8 purple
+	{ 0x70, 0x40, 0x08 }, // a brown
+	{ 0x80, 0x20, 0x20 }, // d dark red
 
 	{ 0x80, 0x80, 0x80 }, // 1 gray
-	{ 0x68, 0xa8, 0xff }, // 6 cyan
-	{ 0x78, 0xb0, 0x18 }, // 4 lime green
-	{ 0x48, 0xb0, 0x20 }, // 5 green
+	{ 0x60, 0xc0, 0xff }, // 6 cyan
+	{ 0x80, 0xc0, 0x10 }, // 4 lime green
+	{ 0x40, 0xc0, 0x10 }, // 5 green
 
-	{ 0xff, 0x78, 0xff }, // c pink
-	{ 0xd8, 0x78, 0xff }, // 9 lilac
-	{ 0xd0, 0x78, 0x20 }, // f orange
-	{ 0xe0, 0x60, 0x58 }  // e light red
+	{ 0xff, 0x80, 0xff }, // c pink
+	{ 0xc0, 0x80, 0xff }, // 9 lilac
+	{ 0xe0, 0x80, 0x10 }, // f orange
+	{ 0xff, 0x60, 0x60 }  // e light red
 };
 
 void videoart_state::palette(palette_device &palette) const
 {
-	// initialize palette (there is no color prom)
 	palette.set_pen_colors(0, videoart_colors);
 }
 
@@ -372,7 +372,7 @@ void videoart_state::videoart(machine_config &config)
 	TIMER(config, "scanline").configure_scanline(FUNC(videoart_state::scanline), "screen", 0, 1);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
+	m_screen->set_refresh_hz(m_ef9367->clock() / (262.0 * 96.0));
 	m_screen->set_screen_update(FUNC(videoart_state::screen_update));
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(0, 512-1, 48, 256-1);
