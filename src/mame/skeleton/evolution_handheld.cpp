@@ -64,4 +64,4 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 200?, evolhh,      0,       0,      evolhh, evolhh, evolution_handheldgame_state, empty_init, "<unknown>", "Evolution", MACHINE_IS_SKELETON )
+CONS( 2006, evolhh,      0,       0,      evolhh, evolhh, evolution_handheldgame_state, empty_init, "Kidz Delight", "Evolution Max for Girls", MACHINE_IS_SKELETON )
