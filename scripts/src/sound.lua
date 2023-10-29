@@ -1526,13 +1526,13 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/sound/swp30.h,SOUNDS["SWP30"] = true
+--@src/devices/sound/meg.h,SOUNDS["MEG"] = true
 ---------------------------------------------------
 
-if (SOUNDS["SWP30"]~=null) then
+if (SOUNDS["MEG"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/sound/swp30.cpp",
-		MAME_DIR .. "src/devices/sound/swp30.h",
+		MAME_DIR .. "src/devices/sound/meg.cpp",
+		MAME_DIR .. "src/devices/sound/meg.h",
 	}
 end
 

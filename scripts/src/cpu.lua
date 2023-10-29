@@ -3370,20 +3370,20 @@ if opt_tool(CPUS, "HPC") then
 end
 
 --------------------------------------------------
--- Yamaha Multiple Effects Generator
---@src/devices/sound/meg.h,CPUS["MEG"] = true
+-- Yamaha SWP30
+--@src/devices/sound/swp30.h,CPUS["SWP30"] = true
 --------------------------------------------------
 
-if CPUS["MEG"] then
+if CPUS["SWP30"] then
 	files {
-		MAME_DIR .. "src/devices/sound/meg.cpp",
-		MAME_DIR .. "src/devices/sound/meg.h",
+		MAME_DIR .. "src/devices/sound/swp30.cpp",
+		MAME_DIR .. "src/devices/sound/swp30.h",
 	}
 end
 
-if opt_tool(CPUS, "MEG") then
-	table.insert(disasm_files , MAME_DIR .. "src/devices/sound/megd.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/sound/megd.h")
+if opt_tool(CPUS, "SWP30") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/sound/swp30d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/sound/swp30d.h")
 end
 
 --------------------------------------------------

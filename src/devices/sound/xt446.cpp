@@ -65,15 +65,15 @@ void xt446_device::xt446_map(address_map &map)
 
 void xt446_device::swp30_map(address_map &map)
 {
-	map(0x000000*4, 0x200000*4-1).rom().region("swp30",         0).mirror(4*0x200000);
-	map(0x400000*4, 0x500000*4-1).rom().region("swp30",  0x800000).mirror(4*0x300000);
-	map(0x800000*4, 0xa00000*4-1).rom().region("swp30", 0x1000000).mirror(4*0x200000);
+	map(0x000000, 0x1fffff).rom().region("swp30",         0).mirror(0x200000);
+	map(0x400000, 0x4fffff).rom().region("swp30",  0x800000).mirror(0x300000);
+	map(0x800000, 0x9fffff).rom().region("swp30", 0x1000000).mirror(0x200000);
 }
 
 void xt446_device::device_add_mconfig(machine_config &config)
 {
 	H8S2655(config, m_maincpu, 16_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &xt446_device::xt446_map);
+	m_maincpu->set_addrmap(AS_DATA, &xt446_device::xt446_map);
 	m_maincpu->read_adc<0>().set_constant(0);
 	m_maincpu->read_adc<1>().set_constant(0);
 	m_maincpu->read_adc<2>().set_constant(0);
