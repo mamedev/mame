@@ -64,4 +64,4 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 2006, evolhh,      0,       0,      evolhh, evolhh, evolution_handheldgame_state, empty_init, "Kidz Delight", "Evolution Max for Girls", MACHINE_IS_SKELETON )
+CONS( 2006, evolhh,      0,       0,      evolhh, evolhh, evolution_handheldgame_state, empty_init, "Kidz Delight", "Evolution Max", MACHINE_IS_SKELETON ) // from a pink 'for girls' unit, exists in other colours, software likely the same
