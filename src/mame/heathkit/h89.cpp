@@ -333,6 +333,39 @@ static INPUT_PORTS_START( h89 )
     PORT_DIPNAME( 0x80, 0x00, "Boot mode" )  PORT_DIPLOCATION("S1:8")
     PORT_DIPSETTING( 0x00, DEF_STR( Normal ) )
     PORT_DIPSETTING( 0x80, "Auto" )
+
+    // Settings for the Kres KMR-100
+
+    PORT_START("MTR90_SW501")
+    PORT_DIPNAME( 0x0f, 0x00, "Default Boot Device" )  PORT_DIPLOCATION("SW501:1,2,3,4")
+    PORT_DIPSETTING( 0x00, "H-17 hard-sectored 5\" floppy units 0-2" )
+    PORT_DIPSETTING( 0x01, "H-37 soft-sectored 5\" floppy units 0-3" )
+    PORT_DIPSETTING( 0x02, "Corvus hard disk/Magnolia interface, partitions 0-8" )
+    PORT_DIPSETTING( 0x03, "CDR 5\"/8\" double density floppy, units 0-3" )
+    PORT_DIPSETTING( 0x04, "H-47 8\" floppy at port 0x78/0170, units 0-3" )
+    PORT_DIPSETTING( 0x05, "H-47 8\" floppy at port 0x7c/0174, units 0-3" )
+    PORT_DIPSETTING( 0x06, "Reserved" )
+    PORT_DIPSETTING( 0x07, "Help - lists boot devices" )
+    PORT_DIPSETTING( 0x08, "Reserved" )
+    PORT_DIPSETTING( 0x09, "SASI controller or Z-67 at port 0x78/0170, units 0-7" )
+    PORT_DIPSETTING( 0x0a, "SASI controller or Z-67 at port 0x7c/0174, units 0-7" )
+    PORT_DIPSETTING( 0x0b, "Livingston 8\" single density floppy, units 0-3" )
+    PORT_DIPSETTING( 0x0c, "Magnolia 5\"/8\" double density floppy, units 0-3 (8\"), 4-7 (5\")" )
+    PORT_DIPSETTING( 0x0d, "Reserved" )
+    PORT_DIPSETTING( 0x0e, "Reserved" )
+    PORT_DIPSETTING( 0x0f, "Magnolia 128K pseudo disk, banks 0-1" )
+    PORT_DIPNAME( 0x10, 0x00, "Map ROM into RAM" )  PORT_DIPLOCATION("SW501:5")
+    PORT_DIPSETTING( 0x00, "Map to RAM" )
+    PORT_DIPSETTING( 0x10, "ROM" )
+    PORT_DIPNAME( 0x20, 0x20, "Perform memory test at start" )  PORT_DIPLOCATION("SW501:6")
+    PORT_DIPSETTING( 0x20, DEF_STR( Off ) )
+    PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x40, 0x00, "LLL controller" )  PORT_DIPLOCATION("SW501:7")
+    PORT_DIPSETTING( 0x00, "No LLL controller" )
+    PORT_DIPSETTING( 0x40, "LLL controller" )
+    PORT_DIPNAME( 0x80, 0x00, "Boot mode" )  PORT_DIPLOCATION("SW501:8")
+    PORT_DIPSETTING( 0x00, DEF_STR( Normal ) )
+    PORT_DIPSETTING( 0x80, "Auto" )
 */
 
 	PORT_START("CONFIG")
@@ -543,7 +576,11 @@ void h89_state::h89(machine_config & config)
 
 	// Connect the console port on CPU board to TLB connector
 	m_console->out_tx_callback().set(m_tlbc, FUNC(heath_tlb_connector::serial_in_w));
+	m_console->out_rts_callback().set(m_tlbc, FUNC(heath_tlb_connector::cts_in_w));
+	m_console->out_dtr_callback().set(m_tlbc, FUNC(heath_tlb_connector::dsr_in_w));
 	m_tlbc->serial_data_callback().set(m_console, FUNC(ins8250_uart_device::rx_w));
+	m_tlbc->rts_callback().set(m_console, FUNC(ins8250_uart_device::cts_w));
+	m_tlbc->dtr_callback().set(m_console, FUNC(ins8250_uart_device::dsr_w));
 
 	m_tlbc->reset_cb().set(FUNC(h89_state::reset_line));
 
@@ -580,11 +617,14 @@ ROM_START( h89 )
 	ROM_SYSTEM_BIOS(3, "mms84b", "MMS 84B")
 	ROMX_LOAD("2732_444_84b_mms.u518", 0x0000, 0x1000, CRC(7e75d6f4) SHA1(baf34e036388d1a191197e31f8a93209f04fc58b), ROM_BIOS(3))
 
-	ROM_SYSTEM_BIOS(4, "mtr90-84", "Heath's MTR-90 (444-84 - Superseded by 444-142)")
-	ROMX_LOAD("2732_444-84_mtr90.u518", 0x0000, 0x1000, CRC(f10fca03) SHA1(c4a978153af0f2dfcc9ba05be4c1033d33fee30b), ROM_BIOS(4))
+	ROM_SYSTEM_BIOS(4, "kmr-100_v3.a.02", "Kres KMR-100")
+	ROMX_LOAD("2732_kmr100_v3_a_02.u518", 0x0000, 0x1000, CRC(fd491592) SHA1(3d5803f95c38b237b07cd230353cd9ddc9858c13), ROM_BIOS(4))
 
-	ROM_SYSTEM_BIOS(5, "mms84a", "MMS 84A (Superseded by MMS 84B)")
-	ROMX_LOAD("2732_444_84a_mms.u518", 0x0000, 0x1000, CRC(0e541a7e) SHA1(b1deb620fc89c1068e2e663e14be69d1f337a4b9), ROM_BIOS(5))
+	ROM_SYSTEM_BIOS(5, "mtr90-84", "Heath's MTR-90 (444-84 - Superseded by 444-142)")
+	ROMX_LOAD("2732_444-84_mtr90.u518", 0x0000, 0x1000, CRC(f10fca03) SHA1(c4a978153af0f2dfcc9ba05be4c1033d33fee30b), ROM_BIOS(5))
+
+	ROM_SYSTEM_BIOS(6, "mms84a", "MMS 84A (Superseded by MMS 84B)")
+	ROMX_LOAD("2732_444_84a_mms.u518", 0x0000, 0x1000, CRC(0e541a7e) SHA1(b1deb620fc89c1068e2e663e14be69d1f337a4b9), ROM_BIOS(6))
 ROM_END
 
 } // anonymous namespace
