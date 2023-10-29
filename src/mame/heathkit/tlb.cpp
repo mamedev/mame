@@ -15,8 +15,6 @@
     Input can also come from the serial port.
 
   Known Issues:
-    - Break key does not send break on serial line
-        - INS8250 needs to implement "Set Break" (LCR, bit 6)
     - With gp19 slot option
       - 49/50 row mode only shows half the screen.
       - In 49/50 row mode, character descenders are cut off.

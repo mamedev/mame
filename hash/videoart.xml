@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+
+<!--
+
+Known released LJN Video Art Activity Cartridges (9 total):
+Titles taken from cartridge label/manual, title screen can differ a bit for some.
+
+A Trip To The Zoo!
+Activity Cartridge (pack-in)
+Disney Coloring Book
+Disney Story Book
+Looney Tunes
+Marvel Super Heroes
+My Dream Day
+My Favorite Doll
+On The Move
+
+-->
+
+<softwarelist name="videoart" description="LJN Video Art cartridges">
+
+	<software name="activity">
+		<description>Activity Cartridge</description>
+		<year>1987</year>
+		<publisher>LJN Toys</publisher>
+		<part name="cart" interface="videoart">
+			<dataarea name="rom" size="0x2000">
+				<rom name="ljn_act-1" size="0x2000" crc="8e3c03df" sha1="cb4e2e448eddc6a76673717f42d306cd3641dcfb" /> <!-- GI 9864DS-1217 -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="disneysb">
+		<description>Disney Story Book</description>
+		<year>1987</year>
+		<publisher>LJN Toys</publisher>
+		<part name="cart" interface="videoart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="ljn_story-9" size="0x4000" crc="59a02440" sha1="ea614d10f47b3955aaf07479fbe23cd3931b6e45" /> <!-- Sharp LH232659 -->
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

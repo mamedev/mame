@@ -6,7 +6,7 @@
  *
  * TODO
  *   - INT2 and miscellaneous register
- *   - A/D peripheral
+ *   - improve A/D peripheral
  *   - SPI peripheral
  *   - multiple timer variants
  */
@@ -24,8 +24,9 @@
 #define LOG_IOPORT  (1U << 2)
 #define LOG_TIMER   (1U << 3)
 #define LOG_EPROM   (1U << 4)
+#define LOG_AD      (1U << 5)
 
-//#define VERBOSE (LOG_GENERAL | LOG_IOPORT | LOG_TIMER | LOG_EPROM)
+//#define VERBOSE (LOG_GENERAL | LOG_IOPORT | LOG_TIMER | LOG_EPROM | LOG_AD)
 //#define LOG_OUTPUT_FUNC printf
 #include "logmacro.h"
 
@@ -33,6 +34,7 @@
 #define LOGIOPORT(...)  LOGMASKED(LOG_IOPORT, __VA_ARGS__)
 #define LOGTIMER(...)   LOGMASKED(LOG_TIMER,  __VA_ARGS__)
 #define LOGEPROM(...)   LOGMASKED(LOG_EPROM,  __VA_ARGS__)
+#define LOGAD(...)      LOGMASKED(LOG_AD,     __VA_ARGS__)
 
 
 namespace {
@@ -223,6 +225,7 @@ m6805_hmos_device::m6805_hmos_device(machine_config const &mconfig, char const *
 	, m_port_ddr{ 0x00, 0x00, 0x00, 0x00 }
 	, m_port_cb_r(*this, 0xff)
 	, m_port_cb_w(*this)
+	, m_portan_cb_r(*this, 0xff)
 	, m_ram_size(ram_size)
 {
 }
@@ -319,7 +322,7 @@ template <std::size_t N> void m6805_hmos_device::port_ddr_w(u8 data)
 
 template <std::size_t N> void m6805_hmos_device::port_cb_w()
 {
-	u8 const data(m_port_open_drain[N] ? m_port_latch[N] | ~m_port_ddr[N] : m_port_latch[N]);
+	u8 const data(m_port_open_drain[N] ? (m_port_latch[N] | ~m_port_ddr[N]) : m_port_latch[N]);
 	u8 const mask(m_port_open_drain[N] ? (~m_port_latch[N] & m_port_ddr[N]) : m_port_ddr[N]);
 	m_port_cb_w[N](0, data, mask);
 }
@@ -359,8 +362,7 @@ void m68705_device::pcr_w(u8 data)
 
 u8 m6805_hmos_device::acr_r()
 {
-	logerror("unsupported read ACR\n");
-	return 0xff;
+	return m_acr_mux | 0x80 | 0x78;
 }
 
 void m6805_hmos_device::acr_w(u8 data)
@@ -388,18 +390,27 @@ void m6805_hmos_device::acr_w(u8 data)
 	// on completion, ACR7 is set, result is placed in ARR, and new conversion starts
 	// writing to ACR aborts current conversion, clears ACR7, and starts new conversion
 
-	logerror("unsupported write ACR = %02X\n", data);
+	m_acr_mux = data & 7;
+	LOGAD("write ACR MUX = %d\n", m_acr_mux);
 }
 
 u8 m6805_hmos_device::arr_r()
 {
-	logerror("unsupported read ARR\n");
-	return 0xff;
+	if (m_acr_mux < 4)
+	{
+		u8 val = m_portan_cb_r[m_acr_mux]();
+		LOGAD("read ARR AN%d = %02X\n", m_acr_mux, val);
+		return val;
+	}
+	else
+	{
+		logerror("unsupported read ARR VR, MUX = %d\n", m_acr_mux);
+		return 0xff;
+	}
 }
 
 void m6805_hmos_device::arr_w(u8 data)
 {
-	logerror("unsupported write ARR = %02X\n", data);
 }
 
 void m6805_hmos_device::device_start()
@@ -409,6 +420,8 @@ void m6805_hmos_device::device_start()
 	save_item(NAME(m_port_input));
 	save_item(NAME(m_port_latch));
 	save_item(NAME(m_port_ddr));
+	save_item(NAME(m_acr_mux));
+	save_item(NAME(m_mr));
 
 	// initialise digital I/O
 	for (u8 &input : m_port_input) input = 0xff;
@@ -420,6 +433,10 @@ void m6805_hmos_device::device_start()
 	add_port_ddr_state<0>();
 	add_port_ddr_state<1>();
 	add_port_ddr_state<2>();
+
+	// initialise misc
+	m_acr_mux = 0;
+	m_mr = 0;
 
 	m_timer.start(M6805_PS);
 }
@@ -711,8 +728,6 @@ m68705r_device::m68705r_device(machine_config const &mconfig, char const *tag, d
 void m68705r_device::device_start()
 {
 	m68705u_device::device_start();
-
-	// TODO: ADC
 }
 
 std::unique_ptr<util::disasm_interface> m68705r_device::create_disassembler()
@@ -930,7 +945,7 @@ void m6805_mrom_device::internal_map(address_map &map)
 
 void m6805r2_device::internal_map(address_map &map)
 {
-	m6805_hmos_device::internal_map(map);
+	m6805_mrom_device::internal_map(map);
 
 	map(0x000e, 0x000e).rw(FUNC(m6805r2_device::acr_r), FUNC(m6805r2_device::acr_w));
 	map(0x000f, 0x000f).rw(FUNC(m6805r2_device::arr_r), FUNC(m6805r2_device::arr_w));
@@ -938,7 +953,7 @@ void m6805r2_device::internal_map(address_map &map)
 
 void m6805r3_device::internal_map(address_map &map)
 {
-	m6805_hmos_device::internal_map(map);
+	m6805_mrom_device::internal_map(map);
 
 	map(0x000e, 0x000e).rw(FUNC(m6805r3_device::acr_r), FUNC(m6805r3_device::acr_w));
 	map(0x000f, 0x000f).rw(FUNC(m6805r3_device::arr_r), FUNC(m6805r3_device::arr_w));

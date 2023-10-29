@@ -19703,6 +19703,7 @@ crazybon                        // (c) 199? Sang Ho
 crazybona                       // (c) 199? Sang Ho
 crazybonb                       // (c) 199? unknown
 eldoradd                        // (c) 1991 Dyna Electronics
+eldoraddo                       // (c) 1991 Dyna Electronics
 fb2010                          // (c) 2009 Amcoe
 fl7_3121                        // (c) 199? Cyberdyne Systems, Inc.
 fl7_50                          // (c) 199? Cyberdyne Systems, Inc.
@@ -19713,6 +19714,7 @@ fl7_tw                          // Taiwanese Hardware.
 goldfrui                        // bootleg
 goldstar                        // (c) 198? IGS
 goldstbl                        // (c) 198? IGS
+hamhouse                        // bootleg
 jkrmast                         // (c) 199? unknown
 jkrmasta                        // (c) 199? unknown
 kkotnoli                        // 198? south korean hack
@@ -19806,6 +19808,7 @@ skill98                         // (c) 1998 Amcoe
 srmagic                         // bootleg
 ss2001                          // bootleg / hack
 star100                         // (c) 199? Sang Ho
+sunspckr                        // (c) 1991 Suns Co Ltd.
 super7                          // bootleg (New Impeuropex?)
 super9                          // (c) 2001 Playmark
 super9a                         // (c) 2001 Playmark
@@ -30468,6 +30471,7 @@ majorpkra                       // (c) 1994 PAL System.
 majorpkrb                       // (c) 1994 PAL System.
 majorpkrc                       // (c) 1994 PAL System.
 luckypkr                        // bootleg/hack.
+syutnori                        // bootleg
 
 @source:misc/malzak.cpp
 malzak                          // (c) 1980? Kitronix
@@ -31903,6 +31907,9 @@ vcombat                         // (c) 1993 VR8 Inc.
 @source:misc/video21.cpp
 video21                         // Videogames GmbH 1980
 
+@source:misc/videoart.cpp
+videoart
+
 @source:misc/videosaa.cpp
 jokrlady                        //
 ladygum                         //
@@ -33132,6 +33139,9 @@ mini5sx                         // 1991
 
 @source:nec/ews4800.cpp
 ews4800_310                     // NEC EWS4800/310
+
+@source:nec/pc_h98.cpp
+pc_h98s                         // 1991
 
 @source:nec/pc100.cpp
 pc100                           //
@@ -34998,6 +35008,7 @@ ponpokov                        // (c) 1982 Sigma Ent. Inc. + Venture Line licen
 popeyeman                       // hack
 porky                           // (c) 1985 Shinkai Inc. (Magic Eletronics Inc. license)
 puckman                         // (c) 1980 Namco
+puckmana                        // bootleg (Alca)
 puckmanb                        // bootleg
 puckmanf                        // hack
 puckmanh                        // hack
@@ -39248,6 +39259,7 @@ sderby2                         // (c) 1985
 
 @source:sega/sega_beena.cpp
 beena                           //
+tvochken                        //
 
 @source:sega/sega_sawatte.cpp
 sawatte                         //
@@ -42277,6 +42289,7 @@ mtrainnv                        // (c) 1996 Subsino
 newhunter                       // (c) 1992 Karam
 newhunterb                      // bootleg
 newhunterc                      // bootleg
+sevenlnd                        // bootleg
 sharkpy                         // (c) 1996 Subsino
 sharkpya                        // (c) 1996 Subsino
 sharkpye                        // (c) 1996 Subsino (Alpha license)

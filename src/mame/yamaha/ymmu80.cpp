@@ -2,11 +2,17 @@
 // copyright-holders:R. Belmont, Olivier Galibert
 /*************************************************************************************
 
-    Yamaha MU-80 and MU-100 : 32-voice polyphonic/multitimbral General MIDI/GS/XG tone modules
+    Yamaha MU-80 : 32-part, 64-note polyphonic/multitimbral General MIDI/GS/XG
+                   tone module
     Preliminary driver by R. Belmont and O. Galibert
 
+    The first XG-capable module (mu15 and mu50 came out later).  Uses a distributed
+    structure of chips, with two chained SWP20 providing 32-notes each with a MEG
+    effects processor at the end of the chain followed by an EQ chip on the result.
+
     MU80 CPU: Hitachi H8/3002 (HD6413D02F16), strapped for mode 4, with a 12 MHz oscillator
-    Sound ASICs: 2x Yamaha YMM275-F/SWP20 + 2x YMM279-F/SWD wave decoders + HD62908 "MEG" effects processor
+    Sound ASICs: 2x Yamaha YMM275-F/SWP20 + 2x YMM279-F/SWD wave decoders + HD62908 "MEG"
+    effects processor
 
     I/O ports from service manual:
 
@@ -213,12 +219,19 @@ private:
 	u16 pb_r();
 
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	void mu80_map(address_map &map);
 };
 
 void mu80_state::machine_start()
 {
 	cur_p6 = cur_pa = cur_pb = cur_ic32 = 0xff;
+}
+
+void mu80_state::machine_reset()
+{
+	// Active-low, wired to gnd
+	m_mu80cpu->set_input_line(0, ASSERT_LINE);
 }
 
 void mu80_state::mu80_map(address_map &map)
