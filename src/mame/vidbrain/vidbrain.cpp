@@ -61,8 +61,6 @@ Using the system:
 #include "speaker.h"
 #include "uv201.h"
 
-#include "vidbrain.lh"
-
 //#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
@@ -479,17 +477,16 @@ void vidbrain_state::vidbrain(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback(m_smi, FUNC(f3853_device::int_acknowledge));
 
 	// video hardware
-	config.set_default_layout(layout_vidbrain);
-
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_screen_update(m_uv, FUNC(uv201_device::screen_update));
-	screen.set_raw(3636363, 232, 18, 232, 262, 21, 262);
-
 	UV201(config, m_uv, 3636363);
 	m_uv->set_screen("screen");
 	m_uv->ext_int_wr_callback().set(m_smi, FUNC(f3853_device::ext_int_w));
 	m_uv->hblank_wr_callback().set(FUNC(vidbrain_state::hblank_w));
 	m_uv->db_rd_callback().set(FUNC(vidbrain_state::memory_read_byte));
+
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_screen_update(m_uv, FUNC(uv201_device::screen_update));
+	screen.set_raw(3636363, 232, 18, 232, 262, 21, 262);
+	screen.set_physical_aspect(3, 2);
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
