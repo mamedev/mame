@@ -608,7 +608,7 @@ void ks0164_cpu_device::execute_run()
 
 			case 1: {
 				// Neg/not
-				// 1101 .rrr Ssss .101
+				// 1101 .rrr S... .101
 
 				u16 v = m_r[(opcode >> 8) & 7];
 				if(opcode & 0x0080)
