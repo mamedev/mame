@@ -3394,9 +3394,9 @@ ROM_START( newhunterc )
 	ROM_IGNORE(0xc000)
 
 	ROM_REGION( 0x00300, "proms", 0 )
-	ROM_LOAD( "n82s129an.u1",  0x00000, 0x00100, BAD_DUMP CRC(971843e5) SHA1(4cb5fc1085503dae2f2f02eb49cca051ac84b890) ) // Not dumped on this PCB
-	ROM_LOAD( "n82s129an.u2",  0x00100, 0x00100, BAD_DUMP CRC(b4bd872c) SHA1(c0f9fe68186636d6d6bc6f81415459631cf38edd) ) // Not dumped on this PCB
-	ROM_LOAD( "n82s129an.u3",  0x00200, 0x00100, BAD_DUMP CRC(db99f6da) SHA1(d281a2fa06f1890ef0b1c4d099e6828827db14fd) ) // Not dumped on this PCB
+	ROM_LOAD( "n82s129an.u1",  0x00000, 0x00100, CRC(69af17fc) SHA1(38546f5665cf731195ac384aca182c56884333f0) )
+	ROM_LOAD( "n82s129an.u2",  0x00100, 0x00100, CRC(4b5f288a) SHA1(b6b9f9067afe93bd13ea17311484e2a2af01a0ed) )
+	ROM_LOAD( "n82s129an.u3",  0x00200, 0x00100, CRC(a1c0d069) SHA1(794df68451525901ebd5895feb26fcda2c517c3f) )
 
 	ROM_REGION( 0x00045c, "plds", 0 )
 	ROM_LOAD( "gal16v8b.u41",  0x00000, 0x00117, NO_DUMP )
@@ -4299,7 +4299,7 @@ GAMEL( 1992, tisuba,      tisub,   tisub,      tisub,    subsino_state, init_tis
 GAMEL( 1992, tisubb,      tisub,   tisub,      tisubb,   subsino_state, init_tisubb,      ROT0, "American Alpha",  "Treasure Island (American Alpha, v3.0N)",     0,                   layout_tisubb   )
 GAMEL( 1992, newhunter,   tisub,   tisub,      tisub,    subsino_state, init_tisubb,      ROT0, "Karam",           "New HUNTer",                                  0,                   layout_tisubb   ) // 1989 on screen, but this bootleg is from 1992
 GAMEL( 1993, newhunterb,  tisub,   newhunterb, tisub,    subsino_state, init_newhunterb,  ROT0, "bootleg",         "New HUNTer (bootleg, set 1)",                 0,                   layout_tisubb   )
-GAMEL( 1993, newhunterc,  tisub,   newhunterb, tisub,    subsino_state, init_newhunterc,  ROT0, "bootleg",         "New HUNTer (bootleg, set 2)",                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_COLORS, layout_tisubb   ) // 1989 on screen, but "Copyright 1993 SubSino Corp. Taipei, Taiwan." on program ROM
+GAMEL( 1993, newhunterc,  tisub,   newhunterb, tisub,    subsino_state, init_newhunterc,  ROT0, "bootleg",         "New HUNTer (bootleg, set 2)",                 MACHINE_NOT_WORKING, layout_tisubb   ) // 1989 on screen, but "Copyright 1993 SubSino Corp. Taipei, Taiwan." on program ROM
 
 GAMEL( 1991, crsbingo,    0,       crsbingo,   crsbingo, subsino_state, init_crsbingo,    ROT0, "Subsino",         "Poker Carnival",                              0,                   layout_crsbingo )
 
