@@ -4041,7 +4041,7 @@ ROM_START( mtrainnv )
 ROM_END
 
 /*
- Seven Land (Korea, probably a bootleg of Super Treasure Island)
+ Seven Land (Korea, probably a bootleg of Super Treasure Island). String "KAM 1.2" on program ROM.
    MCU Hitachi HD64180RP6.
    Actel A40MX04-F.
    Sound: U6612 (YM3812) + U6614 (YM3014) + 12.000 MHz xtal.
@@ -4058,16 +4058,16 @@ ROM_START( sevenlnd )
 	ROM_LOAD( "a_am27c512.u58", 0x00000, 0x10000, CRC(7abaca14) SHA1(48e4eb4ef7df09f29a382167291ee6385279d1f5) )
 
 	ROM_REGION( 0x100000, "tilemap", 0 )
-	ROM_LOAD( "sevenlnd_tilemap_1.u30", 0x00000, 0x40000, NO_DUMP ) // A278308 
-	ROM_LOAD( "sevenlnd_tilemap_2.u29", 0x40000, 0x40000, NO_DUMP ) // A278308
-	ROM_LOAD( "sevenlnd_tilemap_3.u28", 0x80000, 0x40000, NO_DUMP ) // A278308
-	ROM_LOAD( "sevenlnd_tilemap_4.u27", 0xC0000, 0x40000, NO_DUMP ) // A278308
+	ROM_LOAD( "sevenlnd_tilemap_1.u30", 0x00000, 0x40000, CRC(17ebde1c) SHA1(8588830628ce09de57acf287b983bfcfcb0e35f2) ) // A278308
+	ROM_LOAD( "sevenlnd_tilemap_3.u28", 0x40000, 0x40000, CRC(615f6f8f) SHA1(e75e935fd7e5d1a68c0e22d8dddcb706278833db) ) // A278308
+	ROM_LOAD( "sevenlnd_tilemap_4.u27", 0x80000, 0x40000, CRC(f78b273e) SHA1(20bb58042db14af6c65804dfd24e5fb38ce68bd2) ) // A278308
+	ROM_LOAD( "sevenlnd_tilemap_2.u29", 0xc0000, 0x40000, CRC(be95e805) SHA1(8d920e4a04a1f53f3354b031d1cc3bda5f13df44) ) // A278308
 
 	ROM_REGION( 0x80000, "reels", 0 )
-	ROM_LOAD( "sevenlnd_reels_1.u25", 0x00000, 0x20000, NO_DUMP ) // 27C010
-	ROM_LOAD( "sevenlnd_reels_2.u24", 0x20000, 0x20000, NO_DUMP ) // 27C010
-	ROM_LOAD( "sevenlnd_reels_3.u23", 0x40000, 0x20000, NO_DUMP ) // 27C010
-	ROM_LOAD( "sevenlnd_reels_4.u22", 0x60000, 0x20000, NO_DUMP ) // 27C010
+	ROM_LOAD( "sevenlnd_reels_1.u25", 0x00000, 0x20000, CRC(49ce7fea) SHA1(eed75c012da5cbcee0762a5692f81b824e9715c4) ) // 27C010
+	ROM_LOAD( "sevenlnd_reels_2.u24", 0x20000, 0x20000, CRC(4d5c4550) SHA1(c78adf8ee38d82251bcb26d7b693a5155997c2d1) ) // 27C010
+	ROM_LOAD( "sevenlnd_reels_3.u23", 0x40000, 0x20000, CRC(31b7e157) SHA1(5e07725a91d5087e97b2299e5e81356b6d0fb5e9) ) // 27C010
+	ROM_LOAD( "sevenlnd_reels_4.u22", 0x60000, 0x20000, CRC(27d575bc) SHA1(e2a0164cf57f39554cace53b3d894c0e32ad2f56) ) // 27C010
 
 	ROM_REGION( 0x157, "plds", 0 )
 	ROM_LOAD( "gal16v8d_1.bin", 0x000, 0x117, NO_DUMP )
@@ -4311,7 +4311,7 @@ GAMEL( 1995, stisub,      stbsub,  stbsub,     stbsub,   subsino_state, init_sti
 GAMEL( 1995, tesorone,    stbsub,  stbsub,     tesorone, subsino_state, init_tesorone,    ROT0, "Subsino",         "Tesorone Dell'Isola (Italy, v2.41)",          0,                   layout_stisub   )
 GAMEL( 1995, tesorone240, stbsub,  stbsub,     tesorone, subsino_state, init_tesorone,    ROT0, "Subsino",         "Tesorone Dell'Isola (Italy, v2.40)",          0,                   layout_stisub   )
 GAMEL( 1995, tesorone230, stbsub,  stbsub,     tesorone, subsino_state, init_tesorone230, ROT0, "Subsino",         "Tesorone Dell'Isola (Italy, v2.30)",          0,                   layout_stisub   )
-GAME(  199?, sevenlnd,    stbsub,  mtrainnv,   stbsub,   subsino_state, init_mtrainnv,    ROT0, "bootleg",         "Seven Land",                                  MACHINE_NOT_WORKING ) // Without layout until fully dumped
+GAMEL( 1995, sevenlnd,    stbsub,  mtrainnv,   stbsub,   subsino_state, init_mtrainnv,    ROT0, "bootleg",         "Seven Land",                                  0,                   layout_stisub   )
 
 GAMEL( 1996, sharkpy,     0,       sharkpy,    sharkpy,  subsino_state, init_sharkpy,     ROT0, "Subsino",         "Shark Party (Italy, v1.3)",                   0,                   layout_sharkpy  ) // missing POST messages?
 GAMEL( 1996, sharkpya,    sharkpy, sharkpy,    sharkpy,  subsino_state, init_sharkpy,     ROT0, "Subsino",         "Shark Party (Italy, v1.6)",                   0,                   layout_sharkpy  ) // missing POST messages?
