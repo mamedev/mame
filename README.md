@@ -80,7 +80,7 @@ Some parts of the code follow [Allman style](https://en.wikipedia.org/wiki/Inden
 
 All contributors need to either add a standard header for license info (on new files) or inform us of their wishes regarding which of the following licenses they would like their code to be made available under: the [BSD-3-Clause](http://opensource.org/licenses/BSD-3-Clause) license, the [LGPL-2.1](http://opensource.org/licenses/LGPL-2.1), or the [GPL-2.0](http://opensource.org/licenses/GPL-2.0).
 
-See more specific [C++ Coding Guidelines](https://docs.mamedev.org/contributing/cxx.html) on our documentation web site.
+See more specific [C++ Coding Guidelines](https://docs.mamedev.org/contributing/cxx.html) on our documentation website.
 
 
 License
