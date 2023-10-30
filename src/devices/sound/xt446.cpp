@@ -73,7 +73,7 @@ void xt446_device::swp30_map(address_map &map)
 void xt446_device::device_add_mconfig(machine_config &config)
 {
 	H8S2655(config, m_maincpu, 16_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_DATA, &xt446_device::xt446_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &xt446_device::xt446_map);
 	m_maincpu->read_adc<0>().set_constant(0);
 	m_maincpu->read_adc<1>().set_constant(0);
 	m_maincpu->read_adc<2>().set_constant(0);
@@ -84,7 +84,7 @@ void xt446_device::device_add_mconfig(machine_config &config)
 	m_maincpu->read_adc<7>().set_constant(0x200);
 
 	SWP30(config, m_swp30);
-	m_swp30->set_addrmap(0, &xt446_device::swp30_map);
+	m_swp30->set_addrmap(AS_DATA, &xt446_device::swp30_map);
 	m_swp30->add_route(0, *this, 1.0, AUTO_ALLOC_INPUT, 0);
 	m_swp30->add_route(1, *this, 1.0, AUTO_ALLOC_INPUT, 1);
 }
