@@ -29,7 +29,7 @@ license:CC0-1.0
 		<sharedfeat name="requirement" value="rx78_cart:basic"/>
 		<part name="cass" interface="rx78_cass">
 			<dataarea name="cass" size="0x37242c">
-				<rom name="graphmaths.wav" size="0x37242c" crc="27ac7d0A" sha1="c3d2a05d2ca68d9fabc8f3cea839079ea432ba41"/>
+				<rom name="yellowcab.wav" size="0x37242c" crc="27ac7d0A" sha1="c3d2a05d2ca68d9fabc8f3cea839079ea432ba41"/>
 			</dataarea>
 		</part>
 	</software>
