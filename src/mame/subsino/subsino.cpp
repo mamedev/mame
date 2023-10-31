@@ -3311,7 +3311,7 @@ ROM_START( newhunter )
 	ROM_LOAD( "hu-3.bin",     0x00200, 0x00100, CRC(db99f6da) SHA1(d281a2fa06f1890ef0b1c4d099e6828827db14fd) )
 
 	ROM_REGION( 0x00100, "xtraprom", 0 )
-	ROM_LOAD( "82s129.u34",   0x00000, 0x00100, NO_DUMP ) // There's an (undumped) additional PROM near the MCU
+	ROM_LOAD( "82s129.u34",   0x00000, 0x00100, CRC(72d30ca3) SHA1(1054da8e0c18fac8d9fd93cfa441a17df430686b) ) // There's an additional PROM near the MCU
 
 	ROM_REGION( 0x00045c, "plds", 0 )
 	ROM_LOAD( "ht-1.bin",     0x00000, 0x00117, CRC(fdb4cd61) SHA1(f510077b707864b2536942db6157118ca15922de) )
