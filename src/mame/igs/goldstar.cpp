@@ -16624,12 +16624,13 @@ ROM_START( sunspckr ) // "Suns Pecker" (also known as "Animal House"). Strings "
 	ROM_REGION( 0x20000, "gfx2", 0 )
 	ROM_LOAD( "3_tms27c010.c6", 0x00000, 0x20000, CRC(44a9ae66) SHA1(86db8fdebcb82b9114e16f91f4aaa1f9b733e9ae))
 
-	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "1_82s129.d5", 0x000, 0x100, NO_DUMP )
-	ROM_LOAD( "2_82s129.n6", 0x100, 0x100, NO_DUMP )
+	ROM_REGION( 0x300, "proms", 0 )
+	ROM_LOAD( "4_82s129.p6", 0x000, 0x100, CRC(cf87cf21) SHA1(be33c0e0d9026e82a542143c114ab7fbf02cb68f) )
+	ROM_LOAD( "2_82s129.n6", 0x100, 0x100, CRC(459ff859) SHA1(6c9292f44b6092ac2c7fdfefde213bd635e22c5f) )
+	ROM_LOAD( "3_82s129.m6", 0x200, 0x100, CRC(e6f3a91b) SHA1(d5426e65fe47f3faebafbc2829f44c124d7219dc) )
 
 	ROM_REGION( 0x100, "proms2", 0 )
-	ROM_LOAD( "3_82s129.m6", 0x000, 0x100, NO_DUMP )
+	ROM_LOAD( "1_82s129.d5", 0x000, 0x100, CRC(209ccf78) SHA1(9f92875855702c7cc4d429ba5f463b698e0e91d3) )
 
 	// The JEDECs were provided by the arcade PCB shop as "needed for repairs".
 	ROM_REGION( 0x400, "plds", 0 )
