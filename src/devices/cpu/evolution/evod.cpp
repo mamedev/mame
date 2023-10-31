@@ -13,21 +13,18 @@ u32 evolution_disassembler::opcode_alignment() const
 
 // 3ea2 is table 4x2
 
+const char *const evolution_disassembler::regs[4] = { "a", "b", "c", "d" };
+
 const evolution_disassembler::instruction evolution_disassembler::instructions[] = {
 	{ 0x9100, 0xff00, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "bne %06x", (pc + 1 + s8(opcode)) & 0x1fffff); }},
 	{ 0x9000, 0xf000, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "bxx %x, %06x", (opcode >> 8) & 0xf, (pc + 1 + s8(opcode)) & 0x1fffff); }},
-	{ 0xa000, 0xff00, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "stb %02x", opcode & 0xff); }},
-	{ 0xa200, 0xff00, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "sta %02x", opcode & 0xff); }},
-	{ 0xb000, 0xff00, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "ldb %02x", opcode & 0xff); }},
-	{ 0xb200, 0xff00, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "lda %02x", opcode & 0xff); }},
-	{ 0xc000, 0xff00, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "ldbh #%02x", opcode & 0xff); }},
-	{ 0xc200, 0xff00, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "ldah #%02x", opcode & 0xff); }},
-	{ 0xd800, 0xff00, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "ldbl #%02x", opcode & 0xff); }},
-	{ 0xda00, 0xff00, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "ldal #%02x", opcode & 0xff); }},
-	{ 0xe804, 0xffff, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "dec b", opcode & 0xff); }},
-	{ 0xea44, 0xffff, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "dec a", opcode & 0xff); }},
-	{ 0xfc8d, 0xffff, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "push a"); }},
-	{ 0xfccd, 0xffff, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "pull a"); }},
+	{ 0xa000, 0xf900, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "move %s, %02x", regs[(opcode >> 9) & 3], opcode & 0xff); }},
+	{ 0xb000, 0xf900, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "move %02x, %s", opcode & 0xff, regs[(opcode >> 9) & 3]); }},
+	{ 0xc000, 0xf900, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "moveh #%02x, %s", opcode & 0xff, regs[(opcode >> 9) & 3]); }},
+	{ 0xd800, 0xf900, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "movel #%02x, %s", opcode & 0xff, regs[(opcode >> 9) & 3]); }},
+	{ 0xe804, 0xf93f, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "%s = %s - 1", regs[(opcode >> 9) & 3], regs[(opcode >> 6) & 3]); }},
+	{ 0xfc8d, 0xffff, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "push b"); }},
+	{ 0xfccd, 0xffff, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "pull b"); }},
 	{ 0xfd40, 0xffe0, 2, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "jsr %06x", ((opcode & 0x1f) << 16) | arg); }},
 	{ 0xfe40, 0xffe0, 2, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "jmp %06x", ((opcode & 0x1f) << 16) | arg); }},
 	{ 0xff41, 0xffff, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "rti"); }},
