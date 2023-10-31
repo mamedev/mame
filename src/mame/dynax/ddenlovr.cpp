@@ -11102,6 +11102,8 @@ ROM_END
   
   Most of the Dynax PCBs distributed in Korea are official licenses.
 
+  All ROMs are marked as 93419 (82s09 RAM nomenclature). Maybe to obfuscate the ID.
+
   quizchqk vs quizchql
 
   6 and 12 files
