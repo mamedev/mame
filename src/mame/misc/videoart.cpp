@@ -18,12 +18,15 @@ Hardware notes:
 - TSGB01019ACP 48-pin DIP gate array (die label: MOSTEK (C) 1984, MK GB 1000 HAA),
   interfaces with EF9367P and DRAM
 - 2*D41416C-15 (16Kbit*4) DRAM
-- 36-pin cartridge slot, 8KB or 16KB ROM
+- 36-pin cartridge slot, 8KB or 16KB ROM (can also boot without cartridge)
 - DB9 joystick port, no known peripherals other than the default analog joystick
 - RF NTSC video, no sound
 
+LJN also patented a video art system under US4782335, but the hardware doesn't
+match the final product. It has no CPU, and no cartridge slot.
+
 TODO:
-- palette is approximated from photos/videos (there is no color prom)
+- palette is approximated from photos/videos, there is no color prom
 
 *******************************************************************************/
 
@@ -141,24 +144,24 @@ DEVICE_IMAGE_LOAD_MEMBER(videoart_state::cart_load)
 constexpr rgb_t videoart_colors[] =
 {
 	{ 0x00, 0x00, 0x00 }, // 2 black
-	{ 0x10, 0x60, 0xe0 }, // 7 blue
-	{ 0x10, 0x60, 0x08 }, // 3 dark green
+	{ 0x40, 0x30, 0xbc }, // 7 blue
+	{ 0x14, 0x68, 0x14 }, // 3 dark green
 	{ 0xff, 0xff, 0xff }, // 0 white
 
-	{ 0x80, 0x20, 0x78 }, // b dark pink
-	{ 0x60, 0x20, 0x80 }, // 8 purple
-	{ 0x70, 0x40, 0x08 }, // a brown
-	{ 0x80, 0x20, 0x20 }, // d dark red
+	{ 0x78, 0x20, 0x38 }, // b dark red
+	{ 0x70, 0x20, 0x78 }, // 8 purple
+	{ 0x3c, 0x50, 0x00 }, // a moss green
+	{ 0x58, 0x34, 0x00 }, // d brown
 
 	{ 0x80, 0x80, 0x80 }, // 1 gray
-	{ 0x60, 0xc0, 0xff }, // 6 cyan
-	{ 0x80, 0xc0, 0x10 }, // 4 lime green
-	{ 0x40, 0xc0, 0x10 }, // 5 green
+	{ 0x98, 0xe8, 0xff }, // 6 cyan
+	{ 0xb4, 0xff, 0x38 }, // 4 lime green
+	{ 0x84, 0xff, 0x68 }, // 5 green
 
-	{ 0xff, 0x80, 0xff }, // c pink
-	{ 0xc0, 0x80, 0xff }, // 9 lilac
-	{ 0xe0, 0x80, 0x10 }, // f orange
-	{ 0xff, 0x60, 0x60 }  // e light red
+	{ 0xff, 0x90, 0xff }, // c pink
+	{ 0xfc, 0xa8, 0xff }, // 9 light pink
+	{ 0xff, 0xc4, 0x40 }, // f orange
+	{ 0xff, 0xa0, 0x80 }  // e light red
 };
 
 void videoart_state::palette(palette_device &palette) const

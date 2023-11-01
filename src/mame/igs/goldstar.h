@@ -148,6 +148,7 @@ protected:
 	uint8_t m_cmaster_girl_pal = 0U;
 	uint8_t m_cm_enable_reg = 0U;
 	uint8_t m_cm_girl_scroll = 0U;
+	uint8_t m_reel_bank = 0U;
 
 	required_device<cpu_device> m_maincpu;
 	optional_device_array<i8255_device, 3> m_ppi;

@@ -70,7 +70,6 @@ DEFINE_DEVICE_TYPE(FLOPPY_525_SSDD,     floppy_525_ssdd,     "floppy_525_ssdd", 
 DEFINE_DEVICE_TYPE(FLOPPY_525_DD,       floppy_525_dd,       "floppy_525_dd",       "5.25\" double density floppy drive")
 DEFINE_DEVICE_TYPE(FLOPPY_525_SSQD,     floppy_525_ssqd,     "floppy_525_ssqd",     "5.25\" single-sided quad density floppy drive")
 DEFINE_DEVICE_TYPE(FLOPPY_525_QD,       floppy_525_qd,       "floppy_525_qd",       "5.25\" quad density floppy drive")
-DEFINE_DEVICE_TYPE(FLOPPY_525_QD16,     floppy_525_qd16,     "floppy_525_qd16",     "5.25\" quad density 16 hard sector floppy drive")
 DEFINE_DEVICE_TYPE(FLOPPY_525_HD,       floppy_525_hd,       "floppy_525_hd",       "5.25\" high density floppy drive")
 
 // generic 8" drives
@@ -382,7 +381,7 @@ void floppy_image_device::set_rpm(float _rpm)
 		return;
 
 	rpm = _rpm;
-	rev_time = attotime::from_double(60.0/rpm);
+	rev_time = attotime::from_double(60/rpm);
 	angular_speed = rpm/60.0*2e8;
 }
 
@@ -915,20 +914,13 @@ TIMER_CALLBACK_MEMBER(floppy_image_device::index_resync)
 	}
 	int position = int(delta.as_double()*angular_speed + 0.5);
 
-	uint32_t last_index = 0, next_index = 200000000;
-	// if hard-sectored floppy, has extra IDX pulses
-	if(image)
-		image->find_index_hole(position, last_index, next_index);
-	bool new_idx = position - last_index < 2000000;
+	int new_idx = position < 2000000;
 
 	if(new_idx) {
-		uint32_t index_up = last_index + 2000000;
-		attotime index_up_time = attotime::from_double(index_up/angular_speed);
+		attotime index_up_time = attotime::from_double(2000000/angular_speed);
 		index_timer->adjust(index_up_time - delta);
-	} else {
-		attotime next_index_time = next_index >= 200000000 ? rev_time : attotime::from_double(next_index/angular_speed);
-		index_timer->adjust(next_index_time - delta);
-	}
+	} else
+		index_timer->adjust(rev_time - delta);
 
 	if(new_idx != idx) {
 		idx = new_idx;
@@ -968,9 +960,7 @@ void floppy_image_device::check_led()
 
 double floppy_image_device::get_pos()
 {
-	if(revolution_start_time.is_never())
-		return 0;
-	return (machine().time() - revolution_start_time).as_double();
+	return index_timer->elapsed().as_double();
 }
 
 bool floppy_image_device::twosid_r()
@@ -2198,32 +2188,6 @@ void floppy_525_qd::setup_characteristics()
 	variants.push_back(floppy_image::DSSD);
 	variants.push_back(floppy_image::DSDD);
 	variants.push_back(floppy_image::DSQD);
-}
-
-//-------------------------------------------------
-//  5.25" double-sided quad density 16 hard sector
-//-------------------------------------------------
-
-floppy_525_qd16::floppy_525_qd16(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	floppy_image_device(mconfig, FLOPPY_525_QD16, tag, owner, clock)
-{
-}
-
-floppy_525_qd16::~floppy_525_qd16()
-{
-}
-
-void floppy_525_qd16::setup_characteristics()
-{
-	form_factor = floppy_image::FF_525;
-	tracks = 84;
-	sides = 2;
-	set_rpm(300);
-
-	variants.push_back(floppy_image::SSDD16);
-	variants.push_back(floppy_image::SSQD16);
-	variants.push_back(floppy_image::DSDD16);
-	variants.push_back(floppy_image::DSQD16);
 }
 
 //-------------------------------------------------

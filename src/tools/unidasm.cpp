@@ -50,6 +50,7 @@ using util::BIT;
 #include "cpu/e132xs/32xsdasm.h"
 #include "cpu/es5510/es5510d.h"
 #include "cpu/esrip/esripdsm.h"
+#include "cpu/evolution/evod.h"
 #include "cpu/f2mc16/f2mc16d.h"
 #include "cpu/f8/f8dasm.h"
 #include "cpu/fr/frdasm.h"
@@ -442,6 +443,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "epg3231",         le, -1, []() -> util::disasm_interface * { return new epg3231_disassembler; } },
 //  { "es5510",          be,  0, []() -> util::disasm_interface * { return new es5510_disassembler; } }, // Currently does nothing
 	{ "esrip",           be,  0, []() -> util::disasm_interface * { return new esrip_disassembler; } },
+	{ "evo",             le, -1, []() -> util::disasm_interface * { return new evolution_disassembler; } },
 	{ "f2mc16",          le,  0, []() -> util::disasm_interface * { return new f2mc16_disassembler; } },
 	{ "f8",              be,  0, []() -> util::disasm_interface * { return new f8_disassembler; } },
 	{ "fr",              be,  0, []() -> util::disasm_interface * { return new fr_disassembler; } },

@@ -16687,6 +16687,7 @@ skullfngj                       // MCH (c) 1996 Data East Corporation (Japan)
 stadhr96                        // MCM (c) 1996 Data East Corporation (World)
 stadhr96j                       // MCM (c) 1996 Data East Corporation (Japan)
 stadhr96j2                      // MCM (c) 1996 Data East Corporation (Japan)
+stadhr96k                       // ??? (c) 1996 Data East Corporation
 stadhr96u                       // MCM (c) 1996 Data East Corporation (USA)
 
 @source:dataeast/decocass.cpp
@@ -17241,6 +17242,7 @@ quiz365                         // "78" (c) 1994 Nakanihon
 quiz365t                        // "78" (c) 1994 Nakanihon (Taiwan)
 quizchq                         // "73" (c) 1993 Nakanihon
 quizchql                        // "73" (c) 1993 Laxan
+quizchqk                        // "73" (c) 1993 KM Korea Co, Ltd
 rongrong                        // "80" (c) 1994 Nakanihon
 rongrongg                       // "80" (c) 1994 Nakanihon
 rongrongj                       // "80" (c) 1994 Nakanihon
@@ -17399,7 +17401,8 @@ twinbrata                       // (c) 1995
 twinbratb                       // (c) 1995
 
 @source:edevices/twins.cpp
-spider                          //
+spider                          // (c) 1994 Buena Vision
+spidern                         // (c) 1994 Buena Vision
 twins                           // (c) 1993 Ecogames
 twinsa                          // (c) 1993 Ecogames
 twinsed1                        // (c) 1994 Electronic Devices

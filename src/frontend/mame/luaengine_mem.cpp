@@ -26,7 +26,7 @@ T region_read(memory_region &region, offs_t address)
 	const offs_t lowmask = region.bytewidth() - 1;
 	for (int i = 0; i < sizeof(T); i++)
 	{
-		int addr = region.endianness() == ENDIANNESS_LITTLE ? address + sizeof(T) - 1 - i : address + i;
+		int addr = (region.endianness() == ENDIANNESS_LITTLE) ? (address + sizeof(T) - 1 - i) : (address + i);
 		if (addr < region.bytes())
 		{
 			if constexpr (sizeof(T) > 1)
@@ -52,7 +52,7 @@ void region_write(memory_region &region, offs_t address, T val)
 	const offs_t lowmask = region.bytewidth() - 1;
 	for (int i = 0; i < sizeof(T); i++)
 	{
-		int addr = region.endianness() == ENDIANNESS_BIG ? address + sizeof(T) - 1 - i : address + i;
+		int addr = (region.endianness() == ENDIANNESS_BIG) ? (address + sizeof(T) - 1 - i) : (address + i);
 		if (addr < region.bytes())
 		{
 			if (region.endianness() == ENDIANNESS_BIG)

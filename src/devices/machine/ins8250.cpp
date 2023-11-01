@@ -411,13 +411,16 @@ void ins8250_uart_device::ins8250_w(offs_t offset, u8 data)
 			 */
 			m_regs.msr = (m_regs.msr & 0xf0) | (data & 0x0f);
 
-			if ( m_regs.msr & 0x0f )
+			if (m_regs.msr & 0x0f)
 				trigger_int(COM_INT_PENDING_MODEM_STATUS_REGISTER);
 			else
 				clear_int(COM_INT_PENDING_MODEM_STATUS_REGISTER);
 			break;
 		case 7:
-			m_regs.scr = data;
+			if (m_device_type >= dev_type::INS8250A)
+			{
+				m_regs.scr = data;
+			}
 			break;
 	}
 }
@@ -490,7 +493,10 @@ u8 ins8250_uart_device::ins8250_r(offs_t offset)
 			}
 			break;
 		case 7:
-			data = m_regs.scr;
+			if (m_device_type >= dev_type::INS8250A)
+			{
+				data = m_regs.scr;
+			}
 			break;
 	}
 	return data;
