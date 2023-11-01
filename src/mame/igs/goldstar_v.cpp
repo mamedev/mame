@@ -69,7 +69,7 @@ void goldstar_state::goldstar_reel1_ram_w(offs_t offset, uint8_t data)
 TILE_GET_INFO_MEMBER(goldstar_state::get_goldstar_reel1_tile_info)
 {
 	tileinfo.set(1,
-			m_reel1_ram[tile_index],
+			m_reel1_ram[tile_index] | (m_reel_bank * 0x100),
 			m_bgcolor,
 			0);
 }
@@ -84,7 +84,7 @@ void goldstar_state::goldstar_reel2_ram_w(offs_t offset, uint8_t data)
 TILE_GET_INFO_MEMBER(goldstar_state::get_goldstar_reel2_tile_info)
 {
 	tileinfo.set(1,
-			m_reel2_ram[tile_index],
+			m_reel2_ram[tile_index] | (m_reel_bank * 0x100),
 			m_bgcolor,
 			0);
 }
@@ -98,7 +98,7 @@ void goldstar_state::goldstar_reel3_ram_w(offs_t offset, uint8_t data)
 TILE_GET_INFO_MEMBER(goldstar_state::get_goldstar_reel3_tile_info)
 {
 	tileinfo.set(1,
-			m_reel3_ram[tile_index],
+			m_reel3_ram[tile_index] | (m_reel_bank * 0x100),
 			m_bgcolor,
 			0);
 }

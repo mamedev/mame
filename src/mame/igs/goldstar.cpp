@@ -968,10 +968,10 @@ void goldstar_state::sunspckr_portmap(address_map &map) // TODO: incomplete!
 	map(0x02, 0x02).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x03, 0x03).w("aysnd", FUNC(ay8910_device::address_w));
 	// map(0x10, 0x13) // DSW?
-	map(0x60, 0x60).portr("IN2");
+	map(0x60, 0x60).portr("IN2").lw8(NAME([this] (uint8_t data) { m_reel_bank = (data & 0x30) >> 4; })); // TODO: other bits are used, too
 	map(0x61, 0x61).portr("IN0");
 	map(0x62, 0x62).portr("IN1");
-	map(0x63, 0x63).lr8(NAME([] () -> uint8_t { return 0xff; })); // checks battery level here, among other things
+	map(0x63, 0x63).lr8(NAME([] () -> uint8_t { return 0xff; })); // checks battery level here, among other things, writes should be lamps
 }
 
 void goldstar_state::cmast91_portmap(address_map &map)
@@ -8647,6 +8647,22 @@ static GFXDECODE_START( gfx_cm97 )
 	GFXDECODE_ENTRY( "gfx", 0x20000, cm97_layout32, 0x0, 32 )
 GFXDECODE_END
 
+static const gfx_layout sunspckr_tiles8x32_layout =
+{
+	8,32,
+	RGN_FRAC(1,1),
+	4,
+	{ STEP4(0,1) },
+	{ STEP8(0,4) },
+	{ STEP32(0,32) },
+	32*32
+};
+
+static GFXDECODE_START( gfx_sunspckr )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, sunspckr_tiles8x32_layout, 128+64, 4 )
+GFXDECODE_END
+
 
 void wingco_state::system_outputa_w(uint8_t data)
 {
@@ -9769,6 +9785,10 @@ void goldstar_state::sunspckr(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &goldstar_state::sunspckr_map);
 	m_maincpu->set_addrmap(AS_IO, &goldstar_state::sunspckr_portmap);
+
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(goldstar_state::screen_update_cmast91));
+	m_gfxdecode->set_info(gfx_sunspckr);
+	m_palette->set_init(FUNC(goldstar_state::cmast91_palette));
 }
 
 void unkch_state::megaline(machine_config &config)
@@ -12860,9 +12880,9 @@ ROM_START( hamhouse )
 	ROM_LOAD( "1_27c64-20.u10",     0x00000, 0x02000, CRC(c4efc953) SHA1(da24c802d33be377ad6d6a357ed32d5214ca7a3f) )
 	ROM_LOAD( "2_27c256.u11",       0x02000, 0x02000, CRC(fac9fe6c) SHA1(0c55c017957d65121b9cc876d914cca2dec5e94e) ) // BADADDR         --xxxxxxxxxxxxx
 	ROM_IGNORE( 0x6000 )
+	ROM_LOAD( "3_hy27c64ad-15.u24", 0x04000, 0x02000, CRC(7f9c41db) SHA1(64c5fb779ecc05eae3264c7767c571eb76fb389f) )
 	ROM_LOAD( "4_d27128a.u26",      0x06000, 0x02000, CRC(8cf3845e) SHA1(4f672d256548211c48e60ce89718c3c195f187d5) ) // 1ST AND 2ND HALF IDENTICAL
 	ROM_IGNORE( 0x2000 )
-	ROM_LOAD( "3_hy27c64ad-15.u24", 0x04000, 0x02000, CRC(7f9c41db) SHA1(64c5fb779ecc05eae3264c7767c571eb76fb389f) )
 
 	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
 
@@ -20076,7 +20096,7 @@ GAME(  1994, chryangla, ncb3,     chryangla,ncb3,     cb3_state,      init_chrya
 GAME(  1991, eldoradd,  0,        eldoradd, chrygld,  cb3_state,      empty_init,     ROT0, "Dyna",              "El Dorado (V5.1DR)",                          MACHINE_NOT_WORKING) // everything
 GAME(  1991, eldoraddo, eldoradd, eldoradd, chrygld,  cb3_state,      empty_init,     ROT0, "Dyna",              "El Dorado (V1.1TA)",                          MACHINE_NOT_WORKING) // everything
 
-GAME(  1991, sunspckr,  0,        sunspckr, cmv4,     goldstar_state, init_sunspckr,  ROT0, "Suns Co Ltd.",      "Animal House (V1.0)",                         MACHINE_NOT_WORKING) // correct GFX decode, I/O, etc
+GAME(  1991, sunspckr,  0,        sunspckr, cmv4,     goldstar_state, init_sunspckr,  ROT0, "Suns Co Ltd.",      "Animal House (V1.0)",                         MACHINE_NOT_WORKING) // improve GFX drawing, correct palette decode, I/O, etc
 
 // looks like a hack of Cherry Bonus 3
 GAME(  1994, chryangl,  ncb3,     chryangl, chryangl,  cmaster_state, init_chryangl,  ROT0, "bootleg (G.C.I.)",  "Cherry Angel (set 1)",                                MACHINE_NOT_WORKING ) // SKY SUPERCB 1.0 string, decrypted but hangs when betting
