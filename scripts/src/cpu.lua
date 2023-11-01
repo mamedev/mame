@@ -3894,13 +3894,18 @@ if opt_tool(CPUS, "DDP516") then
 end
 
 --------------------------------------------------
--- Whatever is in the Evolution, disassembler only
+-- Whatever is in the Evolution
 --@src/devices/cpu/evolution/evo.h,CPUS["EVOLUTION"] = true
 --------------------------------------------------
 
+if CPUS["EVOLUTION"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/evolution/evo.cpp",
+		MAME_DIR .. "src/devices/cpu/evolution/evo.h",
+	}
+end
+
 if opt_tool(CPUS, "EVOLUTION") then
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/evolution/evo.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/evolution/evo.h")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/evolution/evod.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/evolution/evod.h")
 end
