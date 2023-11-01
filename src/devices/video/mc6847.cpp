@@ -67,8 +67,24 @@
     if skew existed.  SockMaster has confirmed that scanlines are in
     fact 228 clock cycles.
 
-    The PAL emulation adds scanlines, comprised of a top and bottom
-    padding of black lines.  HS is turned off during the padding.
+    PAL info from chats with Ciaran (XRoar) and from his page
+    https://www.6809.org.uk/dragon/hardware.shtml :
+    The 6847 does not directly support PAL, but many PAL machines
+    with a 6847 add circuitry to stuff scalines into the frame,
+    to pad it out to be consistent with PAL CRTs.  This padding
+    consists of a top and bottom region of black lines.  Some
+    Dragon 64s turn off HS during the padding; other Dragons enable
+    HS all the way.  Some Dragons use the same 14.31818MHz crystal
+    as NTSC machines; other Dragons use 14.218MHz.  In either case,
+    the 6847, 6883 (SAM), and 6809 (CPU) base their timings on the
+    same crystal (divided appropriately).
+
+    Many of the cycle counts below were derived via experimentation
+    with coco_cart:drgnfire and with Stewart Orchard's highly
+    detailed tmgtest_v1_3 test suite.  Although Stewart's tests were
+    designed for Dragons, many apply to the NTSC CoCos, and in fact
+    tuning to those tests improved emulation of coco_cart:drgnfire on
+    NTSC CoCos.
 
 **********************************************************************/
 
@@ -82,7 +98,7 @@
 #define LOG_FLUSH    (1U << 4)
 #define LOG_INPUT    (1U << 5)
 #define LOG_NEXTLINE (1U << 6)
-#define VERBOSE      (LOG_SCANLINE | LOG_HSYNC | LOG_FSYNC | LOG_NEXTLINE)
+#define VERBOSE      (0)
 #include "logmacro.h"
 
 //**************************************************************************
@@ -94,6 +110,7 @@ constexpr int LINES_TOP_BORDER                  = 25;
 constexpr int LINES_ACTIVE_VIDEO                = 192;
 constexpr int LINES_BOTTOM_BORDER               = 26;
 constexpr int LINES_VERTICAL_RETRACE            = 6;
+constexpr int LINES_VBLANK                      = 13;
 
 constexpr int LINES_UNTIL_RETRACE_NTSC          = LINES_TOP_BORDER + LINES_ACTIVE_VIDEO + LINES_BOTTOM_BORDER;
 constexpr int LINES_UNTIL_VBLANK_NTSC           = LINES_UNTIL_RETRACE_NTSC + LINES_VERTICAL_RETRACE;
@@ -108,15 +125,12 @@ constexpr int LINES_UNTIL_VBLANK_PAL            = LINES_UNTIL_RETRACE_PAL + LINE
 constexpr bool USE_HORIZONTAL_CLIP              = false;
 
 constexpr int CLOCKS_HSYNC_PERIOD               = 228;
-constexpr int CLOCKS_FRONT_PORCH_DURATION       = 7;
 constexpr int CLOCKS_ACTIVE_VIDEO               = 128;
 constexpr int CLOCKS_L_OR_R_BORDER              = 29;
 constexpr int CLOCKS_ACTIVE_VIDEO_AND_BORDERS   = CLOCKS_ACTIVE_VIDEO + (2*CLOCKS_L_OR_R_BORDER);
-constexpr int TIMER_HSYNC_OFF_TIME              = CLOCKS_ACTIVE_VIDEO_AND_BORDERS + CLOCKS_FRONT_PORCH_DURATION;
-constexpr int TIMER_HSYNC_ON_TIME               = TIMER_HSYNC_OFF_TIME + 16;
-
-// FSYNC occurs just after active video, just before right border
-constexpr int TIMER_FSYNC_TIME                  = CLOCKS_ACTIVE_VIDEO + CLOCKS_L_OR_R_BORDER;
+constexpr int TIMER_HSYNC_OFF_TIME              = 212;
+constexpr int TIMER_HSYNC_ON_TIME               = 228;
+constexpr int TIMER_FSYNC_TIME                  = 212;
 
 // These units are the screen device's bitmap pixels.  Multiplied by 2 because
 // the pixel clock is the mc6847's clock * 2
@@ -187,12 +201,10 @@ mc6847_friend_device::mc6847_friend_device(const machine_config &mconfig, device
 void mc6847_friend_device::device_start()
 {
 	/* create the timers */
-	m_frame_timer = timer_alloc(FUNC(mc6847_friend_device::new_frame), this);
 	m_hsync_on_timer = timer_alloc(FUNC(mc6847_friend_device::change_horizontal_sync), this);
 	m_hsync_off_timer = timer_alloc(FUNC(mc6847_friend_device::change_horizontal_sync), this);
 	m_fsync_timer = timer_alloc(FUNC(mc6847_friend_device::change_field_sync), this);
 
-	m_frame_timer->adjust(clocks_to_attotime(0), 0, clocks_to_attotime(m_tpfs * CLOCKS_HSYNC_PERIOD * m_divider));
 	m_hsync_on_timer->adjust(clocks_to_attotime(TIMER_HSYNC_ON_TIME * m_divider), 1, clocks_to_attotime(CLOCKS_HSYNC_PERIOD * m_divider));
 	m_hsync_off_timer->adjust(clocks_to_attotime(TIMER_HSYNC_OFF_TIME * m_divider), 0, clocks_to_attotime(CLOCKS_HSYNC_PERIOD * m_divider));
 
@@ -261,9 +273,10 @@ void mc6847_friend_device::device_post_load()
 
 void mc6847_friend_device::update_field_sync_timer()
 {
-	// are we expecting field sync?
+	// field sync is expected high from the line before vblanking starts (i.e., from last
+	// vertical retracing line) until but excluding m_field_sync_falling_edge_scanline
 	bool expected_field_sync = (m_physical_scanline < m_field_sync_falling_edge_scanline)
-		|| (m_logical_scanline_zone == SCANLINE_ZONE_VBLANK);
+		|| (m_physical_scanline >= (m_pal ? LINES_UNTIL_VBLANK_PAL - 1 : LINES_UNTIL_VBLANK_NTSC - 1));
 
 	// do we need to adjust the timer?
 	if (expected_field_sync != m_field_sync)
@@ -274,19 +287,6 @@ void mc6847_friend_device::update_field_sync_timer()
 		// and reset the timer
 		m_fsync_timer->adjust(duration, expected_field_sync ? 1 : 0);
 	}
-}
-
-
-
-//-------------------------------------------------
-//  new_frame
-//-------------------------------------------------
-
-TIMER_CALLBACK_MEMBER(mc6847_friend_device::new_frame)
-{
-	m_physical_scanline = 0;
-	m_logical_scanline = 0;
-	m_logical_scanline_zone = SCANLINE_ZONE_FRAME_END;
 }
 
 
@@ -305,7 +305,6 @@ std::string mc6847_friend_device::scanline_zone_string(scanline_zone zone) const
 		case SCANLINE_ZONE_BOTTOM_BORDER:   result = "SCANLINE_ZONE_BOTTOM_BORDER"; break;
 		case SCANLINE_ZONE_RETRACE:         result = "SCANLINE_ZONE_RETRACE";       break;
 		case SCANLINE_ZONE_VBLANK:          result = "SCANLINE_ZONE_VBLANK";        break;
-		case SCANLINE_ZONE_FRAME_END:       result = "SCANLINE_ZONE_FRAME_END";     break;
 		default:
 			fatalerror("Should not get here\n");
 	}
@@ -349,7 +348,6 @@ TIMER_CALLBACK_MEMBER(mc6847_friend_device::change_horizontal_sync)
 
 				case SCANLINE_ZONE_RETRACE:
 				case SCANLINE_ZONE_VBLANK:
-				case SCANLINE_ZONE_FRAME_END:
 					// do nothing
 					break;
 			}
@@ -372,6 +370,9 @@ TIMER_CALLBACK_MEMBER(mc6847_friend_device::change_horizontal_sync)
 		LOGMASKED(LOG_HSYNC, "%s: change_horizontal_sync(): line=%d, (vpos,hpos)=(%d,%d), m_physical_scanline=%d\n", describe_context(), line ? 1 : 0, screen().vpos(), screen().hpos(), m_physical_scanline);
 
 		// invoke callback (to issue interrupt) if this isn't a PAL padding line
+		// TODO: Apparently HS is inhibited during PAL padding on Dragon 64, but
+		// not Dragon 32.  I do not know the behavior on other PAL 6847 machines.
+		// For now, inhibiting for all PAL machines
 		if (!is_pal_padding_line(m_physical_scanline))
 			m_write_hsync(line);
 
@@ -419,9 +420,11 @@ inline void mc6847_friend_device::next_scanline()
 	m_partial_scanline_clocks = 0;
 
 	/* check for movement into the next "zone" */
-	if (m_logical_scanline_zone == SCANLINE_ZONE_FRAME_END)
+	if ((m_logical_scanline_zone == SCANLINE_ZONE_VBLANK) &&
+		(m_logical_scanline >= LINES_VBLANK))
 	{
-		/* we're now in the top border */
+		/* new frame, starts at top border */
+		m_physical_scanline = 0;
 		m_logical_scanline = 0;
 		m_logical_scanline_zone = SCANLINE_ZONE_TOP_BORDER;
 	}
@@ -1765,7 +1768,7 @@ mc6847_ntsc_device::mc6847_ntsc_device(const machine_config &mconfig, const char
 //-------------------------------------------------
 
 mc6847_pal_device::mc6847_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6847_base_device(mconfig, MC6847_PAL, tag, owner, clock, vdg_fontdata8x12, 313.0, true)
+	: mc6847_base_device(mconfig, MC6847_PAL, tag, owner, clock, vdg_fontdata8x12, 312.0, true)
 {
 	m_artifacter.set_pal_artifacting(true);
 }
@@ -1788,7 +1791,7 @@ mc6847y_ntsc_device::mc6847y_ntsc_device(const machine_config &mconfig, const ch
 //-------------------------------------------------
 
 mc6847y_pal_device::mc6847y_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6847_base_device(mconfig, MC6847Y_PAL, tag, owner, clock, vdg_fontdata8x12, 313.0, true)
+	: mc6847_base_device(mconfig, MC6847Y_PAL, tag, owner, clock, vdg_fontdata8x12, 312.0, true)
 {
 	m_artifacter.set_pal_artifacting(true);
 }
@@ -1811,7 +1814,7 @@ mc6847t1_ntsc_device::mc6847t1_ntsc_device(const machine_config &mconfig, const 
 //-------------------------------------------------
 
 mc6847t1_pal_device::mc6847t1_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6847_base_device(mconfig, MC6847T1_PAL, tag, owner, clock, vdg_t1_fontdata8x12, 313.0, true)
+	: mc6847_base_device(mconfig, MC6847T1_PAL, tag, owner, clock, vdg_t1_fontdata8x12, 312.0, true)
 {
 	m_artifacter.set_pal_artifacting(true);
 }

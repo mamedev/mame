@@ -272,7 +272,6 @@ protected:
 	virtual void device_post_load() override;
 
 	// other overridables
-	virtual TIMER_CALLBACK_MEMBER(new_frame);
 	virtual TIMER_CALLBACK_MEMBER(horizontal_sync_changed);
 	virtual void field_sync_changed(bool line);
 	virtual void enter_bottom_border();
@@ -456,11 +455,9 @@ private:
 		SCANLINE_ZONE_BOTTOM_BORDER,
 		SCANLINE_ZONE_RETRACE,
 		SCANLINE_ZONE_VBLANK,
-		SCANLINE_ZONE_FRAME_END
 	};
 
 	// timers
-	emu_timer *m_frame_timer;
 	emu_timer *m_hsync_on_timer;
 	emu_timer *m_hsync_off_timer;
 	emu_timer *m_fsync_timer;
