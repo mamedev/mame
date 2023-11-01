@@ -50,6 +50,7 @@ u32 evolution_disassembler::opcode_alignment() const
 40309b: simple access?
 -> 4015c6
 
+406276: series of compares?
 */
 
 // 4005e9: 3e.3d = 5b1981 = address of a table of addresses
@@ -68,8 +69,9 @@ const evolution_disassembler::instruction evolution_disassembler::instructions[]
 	{ 0xc000, 0xf900, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "%s = %s + #%04x", regs[(opcode >> 9) & 3], regs[(opcode >> 9) & 3], (opcode & 0xff) << 8); }},
 	{ 0xc100, 0xf900, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "%s = %s - #%04x", regs[(opcode >> 9) & 3], regs[(opcode >> 9) & 3], (opcode & 0xff) << 8); }},
 	{ 0xd000, 0xf900, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "%s = %s + #%02x", regs[(opcode >> 9) & 3], regs[(opcode >> 9) & 3], opcode & 0xff); }},
-	{ 0xd800, 0xf900, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "%s = #%02x", regs[(opcode >> 9) & 3], opcode & 0xff); }},
-	{ 0xd900, 0xf900, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "%s = %s - #%02x", regs[(opcode >> 9) & 3], regs[(opcode >> 9) & 3], opcode & 0xff); }},
+	{ 0xd100, 0xf900, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "%s = %s - #%02x", regs[(opcode >> 9) & 3], regs[(opcode >> 9) & 3], opcode & 0xff); }},
+	{ 0xd800, 0xf900, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "%s = #%04x", regs[(opcode >> 9) & 3], opcode & 0xff); }},
+	{ 0xd900, 0xf900, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "%s = %s -2 #%04x", regs[(opcode >> 9) & 3], regs[(opcode >> 9) & 3], opcode & 0xff); }},
 	{ 0xe000, 0xf900, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "%02x <> %s", opcode & 0xff, regs[(opcode >> 9) & 3]); }},
 	{ 0xe100, 0xf900, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "%02x ?? %s", opcode & 0xff, regs[(opcode >> 9) & 3]); }},
 	{ 0xe800, 0xf93c, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "%s = %s + #%x", regs[(opcode >> 9) & 3], regs[(opcode >> 6) & 3], 1 << (opcode & 3)); }},
