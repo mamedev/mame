@@ -7,7 +7,7 @@
 
 /*
     Main Board number: P5GX-LG REV:1.1
-		A-22540 CPU Board Assembly
+        A-22540 CPU Board Assembly
 
     Components list on MAIN board, clockwise from top left.
     ----------------------------
@@ -30,8 +30,8 @@
     AD 706 (SOIC8)
     15 PIN VGA CONNECTOR (DSUB15, plugged into custom Atari board)
     25 PIN PARALLEL CONNECTOR (DSUB25, plugged into custom Atari board)
-			Data Signal bus with the Custom Atari board
-			* Only 17 pins used in manual, but appears to be a 25-pin connector
+            Data Signal bus with the Custom Atari board
+            * Only 17 pins used in manual, but appears to be a 25-pin connector
 
     ICS9120 (SOIC8)
     AD706 (SOIC8)
@@ -46,7 +46,7 @@
 
 
     Custom Atari board number: ATARI GAMES INC. 5772-15642-02 JAMMIT
-		04-11238 JAMMIT PCB Assembly
+        04-11238 JAMMIT PCB Assembly
 
     Components list on custom Atari board, clockwise from top left.
     -------------------------------------
@@ -56,8 +56,8 @@
     4 PIN POWER CONNECTOR for IDE Hard Drive
     15 PIN VGA CONNECTOR (DSUB15, plugged into MAIN board)
     25 PIN PARALLEL CONNECTOR (DSUB25, plugged into MAIN board)
-			Data Signal bus with the CPU (Main) Board Assembly
-			* Only 17 pins used in manual
+            Data Signal bus with the CPU (Main) Board Assembly
+            * Only 17 pins used in manual
 
     AD 813AR (x2, SOIC14)
     ST 084C P1S735 (x2, SOIC14)
@@ -67,10 +67,10 @@
     3 PIN JUMPER for SYNC (Set to -, alternative setting is +)
     OSC 14.31818MHz
     ACTEL A42MX09 (PLCC84, labelled 'JAMMINT U6 A-22505 (C)1996 ATARI')
-			Designation: 	U6
-			Part #: 			A-22505
-			Function: 		Gun control and security
-			Description: 	FPGA Assembly
+            Designation:    U6
+            Part #:             A-22505
+            Function:       Gun control and security
+            Description:    FPGA Assembly
     LS14 (SOIC14)
     74F244 (x2, SOIC20)
     ST ULN2064B (DIP16)
@@ -884,7 +884,7 @@ void mediagx_state::parallel_port_w(offs_t offset, uint32_t data, uint32_t mem_m
 {
 	// update parport registers together, DATA, STATUS, and CONTROL
 	// Can be seen like so: 0xCC SS DD
-	// 		where C = Control nibble, S = Status nibble, D = Data nibble
+	//      where C = Control nibble, S = Status nibble, D = Data nibble
 	COMBINE_DATA( &m_parport );
 
 	if (ACCESSING_BITS_0_7)
@@ -1108,9 +1108,9 @@ void mediagx_state::mediagx_map(address_map &map)
 
 // Maps address ranges to I/O Functions
 // These IO functions are defined for the MediaGX device specifically
-// Larger IO port list:				https://bochs.sourceforge.io/techspec/PORTS.LST
-// Programmaable Interrupt Timer:	https://wiki.osdev.org/PIT#I.2F0_Ports
-// Typical port usages: 			https://wiki.osdev.org/I/O_Ports
+// Larger IO port list:             https://bochs.sourceforge.io/techspec/PORTS.LST
+// Programmaable Interrupt Timer:   https://wiki.osdev.org/PIT#I.2F0_Ports
+// Typical port usages:             https://wiki.osdev.org/I/O_Ports
 void mediagx_state::mediagx_io(address_map &map)
 {
 	pcat32_io_common(map);
