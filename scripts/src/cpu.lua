@@ -3899,6 +3899,8 @@ end
 --------------------------------------------------
 
 if opt_tool(CPUS, "EVOLUTION") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/evolution/evo.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/evolution/evo.h")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/evolution/evod.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/evolution/evod.h")
 end
