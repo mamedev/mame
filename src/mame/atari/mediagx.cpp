@@ -594,13 +594,13 @@ uint16_t mk_parport_outval(uint8_t v) {
 	return v2 << 8;
 }
 
-int parPointerOutVal = 0x5;
+int par_pointer_out_val = 0x5;
 
 uint8_t previous_parport_state = 0;
 
-// used to control whether 2-bits for P2 lightgun X should be read
+// used to control whether 2-bits for P2 jgun X should be read
 // same value usually triggers system menu, so tracking when this is okay to read to avoid the overlap
-bool shouldReadP2X_HighBits = false;
+bool should_read_p2x_highbits = false;
 
 // Reads from the parallel port
 // 'offset' seems to be nearly constant in this case
@@ -612,7 +612,7 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 	if (ACCESSING_BITS_8_15)
 	{
 		uint32_t mp0 = 0;
-		uint8_t upperReg = m_parport_control_reg >> 4;
+		uint8_t upper_reg = m_parport_control_reg >> 4;
 
 		if(m_parport_control_reg == 0x10) {
 			r = mk_parport_outval(0);
@@ -630,7 +630,7 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 					// allow opening the System Menu (TEST)
 					r = mk_parport_outval(2);
 
-				} else if (p2x > 512 && shouldReadP2X_HighBits) {
+				} else if (p2x > 512 && should_read_p2x_highbits) {
 					// P2 X 3/3, only when we're allowed to read this (always a bit after a 0x5 has been seen)
 					r = mk_parport_outval(2);
 
@@ -644,41 +644,41 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 				}
 
 				// clear this flag
-				shouldReadP2X_HighBits = false;
+				should_read_p2x_highbits = false;
 
 			} else {
 				r = mk_parport_outval(0);
 			}
 
-		} else if(upperReg == 0x2) {
+		} else if(upper_reg == 0x2) {
 			// Tilt, Test, unused, Bill... 3rd option is unused, Bill is inverted by the way
 			uint8_t mp2 = m_ports[2].read_safe(0);
 			r = mk_parport_outval(mp2);
 
-		} else if(upperReg == 0x3) {
+		} else if(upper_reg == 0x3) {
 			// Coins
 			mp0 = m_ports[0].read_safe(0);
 			// @montymxb This toggles the appropriate coin switches 1-4, but does not actually cause a credit to show up.
 			// Instead we rely on 0x6 to actually put coins in, and this to toggle the switch correctly...not sure why yet
 			r = mk_parport_outval((mp0 & 0xf0) >> 4 ^ 0xe);
 
-		} else if(upperReg == 0x4) {
+		} else if(upper_reg == 0x4) {
 			// SVC (service credits 1 + 2), and Audio controls
 			uint32_t mp1 = m_ports[1].read_safe(0);
 			// Service Credits 1 + 2, along with Volume controls.
 			// Bit 4 has to be inverted (0x8), active low, done in inputs already
 			r = mk_parport_outval(mp1);
 
-		} else if(upperReg == 0x5) {
+		} else if(upper_reg == 0x5) {
 			// Start buttons
 			// P1 - P4 start buttons
-			// All start buttons lead to lightgun movements being registered, but in a different fashion?
+			// All start buttons lead to jgun movements being registered, but in a different fashion?
 			mp0 = m_ports[0].read_safe(0);
 			r = mk_parport_outval(mp0 >> 0x8);
 
 			// set flag that next time control reg is 0x18,
 			// we should read P2 X high bits
-			shouldReadP2X_HighBits = true;
+			should_read_p2x_highbits = true;
 
 		} else if(m_parport_control_reg == 0x60) {
 			// Reset watchdogs?
@@ -692,7 +692,7 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 				r = mk_parport_outval(0x1);
 			}
 
-		} else if(upperReg == 0xF) {
+		} else if(upper_reg == 0xF) {
 			// TODO Internal pointer advance?
 			mp0 = m_ports[0].read_safe(0);
 
@@ -703,13 +703,13 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 			int16_t p2y;
 			int16_t p2x;
 
-			uint8_t mpGen;
+			uint8_t mp_gen;
 
 			// JGun Analog Controls
 			switch (m_parallel_pointer) {
 				case 10:
 					// Related to enabling P2 Start, P1 start, and allows some basic controls as such
-					r = mk_parport_outval(parPointerOutVal);
+					r = mk_parport_outval(par_pointer_out_val);
 					break;
 				case 11:
 					// TRIGGERS (1 & 2)
@@ -717,8 +717,8 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 					// 0x2 = P2 Trigger
 					// TODO @montymxb Oct. 30th, 2022: Muzzle 'flash' shows up sporadically when shooting, random values of even 0/1 will trigger it as well.
 					// Seems to be connected to some other state machine? Unsure.
-					mpGen = m_ports[7].read_safe(0);
-					r = mk_parport_outval(mpGen);
+					mp_gen = m_ports[7].read_safe(0);
+					r = mk_parport_outval(mp_gen);
 					break;
 				case 12:
 					// P1 control select (but P2 as well?)
@@ -847,7 +847,7 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 			}
 
 
-		} else if(upperReg == 0x0) {
+		} else if(upper_reg == 0x0) {
 			// TODO some empty data written on start
 
 		}
