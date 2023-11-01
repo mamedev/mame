@@ -1216,7 +1216,7 @@ void heath_superset_tlb_device::out1_internal(int data)
 // OUT2 (pin 31) to A11? on board
 void heath_superset_tlb_device::out2_internal(int data)
 {
-	m_selected_char_set = (m_selected_char_set & 0x0A) | (data & 0x01);
+	m_selected_char_set = (m_selected_char_set & 0x0a) | (data & 0x01);
 }
 
 /**
