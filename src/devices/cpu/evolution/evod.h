@@ -27,7 +27,7 @@ private:
 		std::function<void (std::ostream &, u16, u16, u32)> fct;
 	};
 
-	static const char *const regs[4];
+	static const char *const regs[];
 	static const instruction instructions[];
 };
 
