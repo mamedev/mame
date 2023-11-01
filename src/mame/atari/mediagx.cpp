@@ -155,7 +155,7 @@ Keep pressed 9 and press reset to enter service mode.
 namespace {
 
 // no speed hacks, @montymxb...
-#define SPEEDUP_HACKS	1
+#define SPEEDUP_HACKS 1
 
 class mediagx_state : public pcat_base_state
 {
@@ -476,15 +476,17 @@ void mediagx_state::draw_cga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 	for (int j=0; j < 25; j++)
 	{
+		int j8 = j*8;
 		for (int i=0; i < 80; i+=2)
 		{
+			int i8 = i*8;
 			int const att0 = (cga[index] >> 8) & 0xff;
 			int const ch0 = (cga[index] >> 0) & 0xff;
 			int const att1 = (cga[index] >> 24) & 0xff;
 			int const ch1 = (cga[index] >> 16) & 0xff;
 
-			draw_char(bitmap, cliprect, gfx, ch0, att0, i*8, j*8);
-			draw_char(bitmap, cliprect, gfx, ch1, att1, (i*8)+8, j*8);
+			draw_char(bitmap, cliprect, gfx, ch0, att0, i8, j8);
+			draw_char(bitmap, cliprect, gfx, ch1, att1, i8+8, j8);
 			index++;
 		}
 	}
@@ -695,7 +697,7 @@ void mediagx_state::update_debug_controls() {
 		parallelPointMark--;
 		printf("Mark down to %d\n", parallelPointMark);
 		lock = true;
-		
+
 	} else if(mp3 == 0x2 && !lock) {
 		// bump 'up' & lock
 		parallelPointMark++;
@@ -931,7 +933,7 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 			mp0 = m_ports[0].read_safe(0);
 
 			#ifdef READ_0xFF_TEST
-			// test value regardless of the par pointer state 
+			// test value regardless of the par pointer state
 			//r = mk_parport_outval(mp0 >> 0x8);
 			r = mk_parport_outval(0x5);
 
@@ -944,15 +946,15 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 			// 11 does nothing
 			// here's what we got so far
 			// Combination of keys [1] and [3] held will lead this to do 'something', but only for the following range of 10-12, 9 too?
-			
+
 			// only need the one 'f' since we're just getting a nibble back I believe...not a lot of info, but yeah that's kinda how it works.
 
 			// Oct. 30th, 2022, Old code here, can remove as needed
 			// July 30th, Note, m_parallel_pointer ranges from 0x1 -> 0x17 (1 - 23)
-			// Oct. 13th, 2022: Removed this from IF below:: mp0 & 0xf00 && 
+			// Oct. 13th, 2022: Removed this from IF below:: mp0 & 0xf00 &&
 			// TODO this mp0 & 0xf00 removal makes coin insertion a double tap?
 			// TODO also removes 'debug' menu feature
-			// (mp0 & 0xf00) && 
+			// (mp0 & 0xf00) &&
 			// if (m_parallel_pointer == parallelPointMark) {
 			// 	// ....
 			// } else {
@@ -984,10 +986,10 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 					break;
 				case 10:
 					// July 30th, Note, m_parallel_pointer ranges from 0x1 -> 0x17 (1 - 23)
-					// Oct. 13th, 2022: Removed this from IF below:: mp0 & 0xf00 && 
+					// Oct. 13th, 2022: Removed this from IF below:: mp0 & 0xf00 &&
 					// TODO this mp0 & 0xf00 removal makes coin insertion a double tap?
 					// TODO also removes 'debug' menu feature
-					// (mp0 & 0xf00) && 
+					// (mp0 & 0xf00) &&
 					// Oct. 30th, 2022: NO LONGER REMOVES DEBUG FEATURE?
 
 					// Range of 10 is very important, w/out it, and w/out the below, a number of components (like volume menu access & start button pressing) don't work
@@ -1002,9 +1004,9 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 
 					// ENABLES P2 Start as well as P1 start and allows some basic controls as such
 					// TODO, was 0x5, but fixing this is NOT correct...trying other things here
-					if (mp0 & 0xf00) {
+					// if (mp0 & 0xf00) {
 						r = mk_parport_outval(parPointerOutVal);
-					}
+					// }
 
 					// P2 START is TRIGGERED here when 0x5 is set, in fact so is P1 (when (mp0 & 0xf00 && m_parallel_pointer == 10) == true)
 					/*
@@ -1036,13 +1038,13 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 					break;
 				case 13:
 					// P1, Y (LOW)
-					// 0x1 = 1 
+					// 0x1 = 1
 					// 0x2 = 2
 					// 0x4 = 4
 					// 0x8 = 8
 					// convert mouse Y
-					mp6 = int(float(m_ports[6].read_safe(0)) / 255.0 * 248.0);
-					mp6 = 124 - mp6;
+					mp6 = m_ports[6].read_safe(0);
+					mp6 = 128 - mp6;
 					r = mk_parport_outval(mp6 & 0xf);
 					break;
 				case 14:
@@ -1051,13 +1053,13 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 					// 0x2 = 32
 					// 0x4 = -64 (using this inverted approach, needs to be fixed?)
 					// 0x8 = +128
-					mp6 = int(float(m_ports[6].read_safe(0)) / 255.0 * 248.0);
-					mp6 = 124 - mp6;
+					mp6 = m_ports[6].read_safe(0);
+					mp6 = 128 - mp6;
 					if (mp6 >= 0 && mp6 < 64) {
 						// 2/4
 						r = mk_parport_outval(((mp6 >> 4) & 0x3));
 
-					} else if (mp6 <= -64) {
+					} else if (mp6 < -64) {
 						// 4/4
 						r = mk_parport_outval(((mp6 >> 4) & 0x3) | 0x8);
 
@@ -1077,9 +1079,9 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 					// 0x2 = ???
 					// 0x4 = ???
 					// 0x8 = ???
-					mp6 = int(float(m_ports[6].read_safe(0)) / 255.0 * 248.0);
+					mp6 = m_ports[6].read_safe(0);
 					// mp6 = 124 - mp6;
-					if (mp6 >= 0 || mp6 <= -64) {
+					if (mp6 >= 0 || mp6 < -64) {
 						r = mk_parport_outval(0x1);
 					}
 					break;
@@ -1089,23 +1091,8 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 					// 0x2 == 1
 					// 0x4 == 2
 					// 0x8 == 4
-					//r = mk_parport_outval(0x1);
-					// mp5 = m_ports[5].read_safe(0);
-					// r = mk_parport_outval(((mp5 & 0x7) << 1) | 0x1);
-
-					mp5 = int(float(m_ports[5].read_safe(0)) / 255.0 * 768.0) % 256;
+					mp5 = int(float(m_ports[5].read_safe(0)) * 3) % 256;
 					r = mk_parport_outval(mp5 & 0xf);
-
-
-					// // r = mk_parport_outval(((mp5 & 0x7) >> 1) & 1);
-					// if (mp5 < 64) {
-					// 	r = mk_parport_outval((mp5 & 0x3) << 2);
-					// } else if (mp5 < 296) {
-					// 	r = mk_parport_outval(0x1 | (mp5 & 0x7) << 1);
-					// } else {
-					// 	r = mk_parport_outval((mp5 & 0x3) << 2);
-					// }
-					// r = mk_parport_outval(rand() % 16);
 					break;
 				case 17:
 					// P1 X (Low + High)
@@ -1113,21 +1100,8 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 					// 0x2 == 16
 					// 0x4 == 32
 					// 0x8 == 63 ** (not 64 for some reason?)
-
-					// mp5 = int(float(m_ports[5].read_safe(0)) / 255.0 * 720.0) % 120;
-					// if (mp5 < 64) {
-					// 	r = mk_parport_outval((mp5 & 0b111100) >> 2);
-					// } else if (mp5 < 296) {
-					// 	r = mk_parport_outval((mp5 & 0b11110) >> 1);
-					// } else {
-					// 	r = mk_parport_outval((mp5 & 0b111100) >> 2);
-					// }
-					// r = mk_parport_outval(((mp5 & 0x78) >> 3));
-
-					mp5 = int(float(m_ports[5].read_safe(0)) / 255.0 * 768.0) % 256;
+					mp5 = int(float(m_ports[5].read_safe(0)) * 3) % 256;
 					r = mk_parport_outval((mp5 >> 4) & 0xf);
-
-					// r = mk_parport_outval(rand() % 16);
 					break;
 				case 18:
 					// P1, X (HH)
@@ -1135,11 +1109,10 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 					// 0x2 = last 3rd
 					// 0x4 nothing..
 					// 0x8 nothing..
-
-					mp5 = int(float(m_ports[5].read_safe(0)) / 255.0 * 384.0);
-					if (mp5 > 256) {
+					mp5 = int(float(m_ports[5].read_safe(0)) * 3);
+					if (mp5 > 512) {
 						r = mk_parport_outval(0x2);
-					} else if (mp5 > 128) {
+					} else if (mp5 > 256) {
 						r = mk_parport_outval(0x1);
 					}
 					break;
@@ -1181,7 +1154,7 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 					break;
 			}
 
-			#endif 
+			#endif
 
 
 		} else if(upperReg == 0x0) {
@@ -1199,8 +1172,8 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 		r = mk_parport_outval(mp0 >> 8);
 
 		#endif
-		
-		// record prior control register state for parport 
+
+		// record prior control register state for parport
 		// (used to help with distinguishing Sys Menu cmd from P2X high 2-bit inputs)
 		previous_parport_state = m_parport_control_reg;
 
@@ -1572,104 +1545,6 @@ static INPUT_PORTS_START(mediagx)
 	// PORT_BIT( 0x004, IP_ACTIVE_HIGH, IPT_SERVICE2 )
 	// PORT_BIT( 0x008, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN )
 
-	/*
-	- CREDIT
-	- VOL +
-	- VOL -
-	- TEST SWITCH
-
-	- START 1
-	- START 2
-
-	- COIN 1
-	- COIN 2
-
-	- JGUN 1 ?
-	- JGUN 2 ?
-	*/
-
-	/*
-	July 30th, recommended layout in the future
-
-	INPUT 0:
-	- Coin 1
-	- Coin 2
-	- Coin 3
-	- Coin 4
-
-	INPUT 1:
-	- Tilt
-	- Test (not sure if I've ever hit this before actually?)
-	- XXXX
-	- Bill
-
-	INPUT 2:
-	- SVC 	(service credit 1)
-	- SVC2  (service credit 2)
-	- VOL -
-	- VOL +
-
-	INPUT 3:
-	- P1ST
-	- P2ST
-	- P3ST
-	- P4ST
-
-	INPUT 4:
-	- P1UP
-	- P1DN
-	- P1LT
-	- P1RT
-
-	INPUT 5:
-	- P1A1
-	- P1A2
-	- P1A3
-	- P1A4
-
-	INPUT 6:
-	- P2UP
-	- P2DN
-	- P2LT
-	- P2RT
-
-	INPUT 7:
-	- P2A1
-	- P2A2
-	- P2A3
-	- P2A4
-
-	INPUT 8:
-	- P3UP
-	- P3DN
-	- P3LT
-	- P3RT
-
-	INPUT 9:
-	- P3A1
-	- P3A2
-	- P3A3
-	- P3A4
-
-	INPUT 10:
-	- P4UP
-	- P4DN
-	- P4LT
-	- P4RT
-
-	INPUT 11:
-	- P4A1
-	- P4A2
-	- P4A3
-	- P4A4
-
-	INPUT 12:
-	- P1 TRIG
-	- P2 TRIG
-	- XXXX
-	- XXXX
-	*/
-
 	// Coins
 	PORT_BIT( 0x010, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x020, IP_ACTIVE_HIGH, IPT_COIN2 )
@@ -1682,49 +1557,20 @@ static INPUT_PORTS_START(mediagx)
 	PORT_BIT( 0x400, IP_ACTIVE_HIGH, IPT_START3 )
 	PORT_BIT( 0x800, IP_ACTIVE_HIGH, IPT_START4 )
 
-	// 'Light' Gun X & Y idea pulled from Carnevil's implementation using the Seattle Driver
-	PORT_START("JGUN0_X") //fake analog X
+	// 'Light' Gun X & Y, idea pulled from Carnevil's implementation using the Seattle Driver
+	PORT_START("JGUN0_X") // fake analog X
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
-	PORT_START("JGUN0_Y") //fake analog Y
+	PORT_START("JGUN0_Y") // fake analog Y
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10)
 
-	PORT_START("JGUN1_X") //fake analog X
+	PORT_START("JGUN1_X") // fake analog X
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
-	PORT_START("JGUN1_Y") //fake analog Y
+	PORT_START("JGUN1_Y") // fake analog Y
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
 	PORT_START("JGUN") // fake switches
 	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Trigger")
 	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Trigger")
-
-	/*
-	TODO remove these DIP examples, unless I plan to use them
-	EXAMPLE from redclash.cpp driver for DIPs,
-	...since I found a couple of them floating around in mem that I can map
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, "Difficulty?" )
-	PORT_DIPSETTING(    0x03, "Easy?" )
-	PORT_DIPSETTING(    0x02, "Medium?" )
-	PORT_DIPSETTING(    0x01, "Hard?" )
-	PORT_DIPSETTING(    0x00, "Hardest?" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x10, 0x10, "High Score" )
-	PORT_DIPSETTING(    0x00, "0" )
-	PORT_DIPSETTING(    0x10, "10000" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x00, "1" )
-	PORT_DIPSETTING(    0xc0, "3" )
-	PORT_DIPSETTING(    0x80, "5" )
-	PORT_DIPSETTING(    0x40, "7" )
-	*/
 
 	// Service 1 + 2 & Volume controls
 	PORT_START("IN1")
@@ -1761,13 +1607,12 @@ static INPUT_PORTS_START(mediagx)
 	// JGun0 Y
 	PORT_START("IN6")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
-	
+
 	// JGun Triggers
 	PORT_START("IN7")
 	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Trigger")
 	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Trigger")
 
-	// TODO, as needed we can extend a couple more ports for JGun1 x & y
 	PORT_START("IN8")
 	PORT_BIT( 0x00f, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(3)
 	PORT_BIT( 0x0f0, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(3)
@@ -1807,7 +1652,7 @@ void mediagx_state::machine_reset()
 	m_maincpu->reset();
 
 	timer_device *sound_timer = subdevice<timer_device>("sound_timer");
-	sound_timer->adjust(attotime::from_msec(10));
+	sound_timer->adjust(attotime::from_msec(AD1847_SAMPLE_DELAY));
 
 	m_dmadac[0]->enable(1);
 	m_dmadac[1]->enable(1);
@@ -1818,15 +1663,38 @@ void mediagx_state::ramdac_map(address_map &map)
 	map(0x000, 0x3ff).rw(m_ramdac, FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
 }
 
+// TODO, Esc key still doesn't work for closing down the emulator, that should always exit out
+
 void mediagx_state::mediagx(machine_config &config)
 {
 	/* basic machine hardware */
 	//MEDIAGX(config, m_maincpu, 244000000);
-	//MEDIAGX(config, m_maincpu, 222000000);
+	// MEDIAGX(config, m_maincpu, 222000000);
 	// Speeds up the CPU execution speed...not necessarily what I want here, but could be nice
 	// tried 222000000, sped it up a lot,, but sound is borked :?
-	MEDIAGX(config, m_maincpu, 166000000);
-	// Program mapping?
+
+	// uint lvl = (166000000 - 38456666) / 2;
+	// MEDIAGX(config, m_maincpu, 166000000);
+	// tried this speed to match the DAC, which means that the inverse is likely true as well? Audio needs to be greatly changed?
+	// audio worked great, but the game was too fast
+	// 38456556 ~~~ good
+	// 38456666.6666667 ~~~ also good
+	MEDIAGX(config, m_maincpu, 38456666);
+
+	/*
+	...Some other notes here
+	Type raster, resolution 640×240@60 Hz, CRT 15kHz, gameplay box  (0,0)÷(640,240), display box  640×480, pixel clock @18.432 MHz
+Orientation:
+Horizontal
+Scrolling:
+Unknown
+Colors:
+-
+CPU:
+maincpu Cyrix MediaGX @166 MHz, dma8237_1 AM9517A @4.772727 MHz, dma8237_2 AM9517A @4.772727 MHz
+	*/
+
+	// Program mapping
 	m_maincpu->set_addrmap(AS_PROGRAM, &mediagx_state::mediagx_map);
 	// Map address regions to I/O
 	m_maincpu->set_addrmap(AS_IO, &mediagx_state::mediagx_io);
@@ -1853,14 +1721,51 @@ void mediagx_state::mediagx(machine_config &config)
 	// m_screen->set_refresh_hz(13.9); // 60
 	// somewhere between 13.9 and 13.9375 (maybe 14) is the sweet spot
 	// seems like something around 13.91 or 13.92 could be really on point.
-	m_screen->set_refresh_hz(13.9); // 60
+	// m_screen->set_refresh_hz(13.9); // 60
+	// m_screen->set_refresh_hz(73.9);
+	m_screen->set_refresh_hz(61);
+	// 120 hits a good spot for the main (with -afs)
+	// 120 does flash, which is quite cool actually
+	// 61 or 30 is good for minigames
+	// still 13.9 w/ full 166MHz
+
+	// fiddling with raw values, kinda working
+	// ~~~~ increasing pxl clock slowly here...fixing the rest
+	// m_screen->set_raw(17992, 3, 0, 360, 480, 240, 0);
+
+	// hbend should be 0
+	// hbstart should be 640
+	// vbend should also be 0
+	// vbstart should be 240
+	// TODO Use this
+	// m_screen->set_raw(18432000, 640, 0, 640, 480, 0, 240);
+	// 3 - 4 ?
+	// m_screen->set_raw(3100000, 640, 0, 640, 480, 0, 240);
+	// TODO VERY CLOSE! NEED BETTER TIMINGS ON THE SOUND TIMER DELAY TO PROCEED
+	// Nov. 18th, 2022: This was one of the closer times, rest is OK
+	// m_screen->set_raw(3611500, 640, 0, 640, 480, 0, 240);
+	// m_screen->set_raw(18432000/4.7, 640, 0, 360, 480, 0, 240);
+
+
+	// TODO leads to a flash with 166MHZ cpu as well!
+	// m_screen->set_raw(18432000 * 4, 640, 0, 640, 480, 0, 240);
+
+
+
+	// m_screen->set_raw(38456666, 3800, 0, 360, 480, 240, 0);
+	// m_screen->set_raw(18432000/2, 456, 42, 402, 262, 17, 257);
+	// slow but smooth
+	// m_screen->set_raw(18432000, 3800, 0, 360, 480, 0, 240);
+	// with flash!
+	// m_screen->set_raw(18432000, 500, 360, 0, 248, 248, 0);
 
 	// todo, just trying some little things here
-	//m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
-	//m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(5500)); // not accurate
+	// m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	// m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(5500)); // not accurate
 
-	m_screen->set_size(640, 480);
-	m_screen->set_visarea(0, 639, 0, 239);
+	// TODO blocked off this part, as it should be set in the 'set_raw' function instead
+	// m_screen->set_size(640, 480);
+	// m_screen->set_visarea(0, 639, 0, 239);
 
 	m_screen->set_screen_update(FUNC(mediagx_state::screen_update));
 
