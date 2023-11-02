@@ -25,6 +25,7 @@ public:
 	}
 
 	void init_fif();
+	void init_siddr();
 
 	void generalplus_gpspi_direct(machine_config &config);
 
@@ -210,6 +211,13 @@ ROM_START( bftetris )
 	ROM_LOAD16_WORD_SWAP( "arcadeclassicstetris_25q16ct_c84015.bin", 0x0000, 0x200000, CRC(a97e1bab) SHA1(400944d310d5d5fccb2c6d048d7bf0cb00da09de) )
 ROM_END
 
+ROM_START( siddr )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
+
+	ROM_REGION16_BE(0x800000, "maincpu:spidirect", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP( "ddr-toy.bin", 0x0000, 0x400000, CRC(873cbcc8) SHA1(bdd3d12adb1284991a3f8aaa8e451e3a55931267) )
+ROM_END
 
 void generalplus_gpspi_direct_game_state::init_fif()
 {
@@ -220,6 +228,17 @@ void generalplus_gpspi_direct_game_state::init_fif()
 			3, 1, 11, 9, 6, 14, 0, 2, 8, 7, 13, 15, 4, 5, 12, 10);
 	}
 }
+
+void generalplus_gpspi_direct_game_state::init_siddr()
+{
+	uint8_t* spirom8 = (uint8_t*)memregion("maincpu:spidirect")->base();
+	for (int i = 0x3000; i < 0x400000; i++)
+	{
+		spirom8[i] = bitswap<8>(spirom8[i] ^ 0x68,
+			3, 5, 0, 7,    1, 4, 2, 6);
+	}
+}
+
 
 } // anonymous namespace
 
@@ -232,3 +251,6 @@ CONS(2017, bfgalaga, 0, 0, generalplus_gpspi_direct, bfmpac, generalplus_gpspi_d
 CONS(2018, bfdigdug, 0, 0, generalplus_gpspi_direct, bfmpac, generalplus_gpspi_direct_game_state, init_fif, "Basic Fun", "Dig Dug (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2019, bfspyhnt, 0, 0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, init_fif, "Basic Fun", "Spy Hunter (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2019, bftetris, 0, 0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, init_fif, "Basic Fun", "Tetris (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
+// probably not identical hardware, encryption is different, but it does seem to still be a 'direct access' SPI ROM case
+CONS(201?, siddr,    0, 0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, init_siddr, "Super Impulse", "Dance Dance Revolution - Broadwalk Arcade", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

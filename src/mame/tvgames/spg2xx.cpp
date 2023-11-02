@@ -1968,6 +1968,11 @@ ROM_START( lxspidaj )
 	ROM_LOAD16_WORD_SWAP( "mx29lv320ct.u2", 0x000000, 0x400000, CRC(e7e03c62) SHA1(ab13452f0436efb767f01dff54dd48a528538e3f) )
 ROM_END
 
+ROM_START( lxairjet )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "w321tg.u5", 0x000000, 0x400000, CRC(105b226f) SHA1(2622678a8586ee6edae17715657037a5419e3321) )
+ROM_END
+
 
 ROM_START( fordrace )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
@@ -2205,6 +2210,8 @@ CONS( 2006, abltenni,   0,        0, spg2xx,    abltenni,  spg2xx_game_state,   
 CONS( 2006, ablkickb,   0,        0, ablkickb,  ablkickb,  spg2xx_game_albkickb_state, init_ablkickb, "Advance Bright Ltd / Coleco / V-Tac Technology Co Ltd.", "Kick Boxing (BJ8888, ABL TV Game)",                                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // 4 motion sensors, one for each limb
 
 CONS( 2007, lxspidaj,   0,        0, spg2xx_pal,lxspidaj,  spg2xx_game_albkickb_state, init_ablkickb, "Lexibook",                                               "Spider-Man Super TV Air Jet (Lexibook Junior, JG6000SP)",               MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 2007, lxairjet,   0,        0, spg2xx_pal,lxspidaj,  spg2xx_game_albkickb_state, init_ablkickb, "Lexibook",                                               "Super TV Air Jet 6-in-1 (Lexibook Junior)",                             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 2006, totspies,   0,        0, spg2xx_pal,totspies,  spg2xx_game_state,          empty_init,    "Senario / Marathon - Mystery Animation Inc.",            "Totally Spies! (France)",                                               MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
