@@ -9,9 +9,11 @@
 #include "emu.h"
 #include "fdc.h"
 
-#include "formats/nabupc_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
+
+#include "formats/nabupc_dsk.h"
+
 
 //**************************************************************************
 //  NABU PC FDC DEVICE
@@ -39,6 +41,7 @@ protected:
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
+
 private:
 	void ds_w(uint8_t data);
 

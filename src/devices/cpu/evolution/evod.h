@@ -24,7 +24,7 @@ private:
 		u16 value;
 		u16 mask;
 		int size;
-		std::function<void (std::ostream &, u16, u16, u32)> fct;
+		void (*fct)(std::ostream &, u16, u16, u32);
 	};
 
 	static const char *const regs[];
