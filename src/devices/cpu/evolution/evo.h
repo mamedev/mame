@@ -6,10 +6,6 @@
 
 #pragma once
 
-enum
-{
-	EVO_PC = STATE_GENPC
-};
 
 class evo_cpu_device : public cpu_device
 {
@@ -20,16 +16,13 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual uint32_t execute_min_cycles() const noexcept override { return 5; }
-	virtual uint32_t execute_max_cycles() const noexcept override { return 5; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 1; }
 	virtual uint32_t execute_input_lines() const noexcept override { return 0; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	virtual space_config_vector memory_space_config() const override;
-
-	virtual void state_import(const device_state_entry &entry) override;
-	virtual void state_export(const device_state_entry &entry) override;
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
@@ -38,10 +31,7 @@ private:
 
 	uint32_t m_pc;
 
-	address_space *m_program;
 	int m_icount;
-
-	uint32_t m_debugger_temp;
 };
 
 
