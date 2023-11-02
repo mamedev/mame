@@ -170,7 +170,7 @@ public:
 
 	void nes_vt_waixing_alt_4mb_sporzpp(machine_config& config);
 	void nes_vt_pal_4mb_sporzbxa(machine_config& config);
-	
+
 private:
 	uint8_t in1_r() override
 	{
