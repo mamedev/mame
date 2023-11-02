@@ -5,10 +5,11 @@
 
 #include "emu.h"
 
-#include "speaker.h"
-#include "screen.h"
-
 #include "cpu/evolution/evo.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 
 namespace {
 
