@@ -47,5 +47,6 @@ void evo_cpu_device::execute_set_input(int irqline, int state)
 
 void evo_cpu_device::execute_run()
 {
+	debugger_instruction_hook(m_pc);
 	m_icount = 0;
 }
