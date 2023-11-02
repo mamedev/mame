@@ -310,7 +310,7 @@ bool elan_eu3a05vid_device::get_tile_data(int base, int drawpri, int& tile, int 
 	else
 	{
 		attr = 0;
-	 	unk2 = 0;
+		unk2 = 0;
 	}
 
 	/* hack for phoenix title screens.. the have attr set to 0x3f which change the colour bank in ways we don't want
