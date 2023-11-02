@@ -41390,13 +41390,13 @@ esprit3                         // Hazeltine Esprit III
 @source:skeleton/eurit.cpp
 eurit30                         //
 
-@source:skeleton/evolution_handheld.cpp
-evolhh
-
 @source:skeleton/eurocom2.cpp
 eurocom2                        //
-waveterm                        //
 microtrol                       //
+waveterm                        //
+
+@source:skeleton/evolution_handheld.cpp
+evolhh
 
 @source:skeleton/fanucs15.cpp
 fanucs15                        // 1990
