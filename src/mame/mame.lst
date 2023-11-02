@@ -41398,8 +41398,11 @@ eurit30                         //
 
 @source:skeleton/eurocom2.cpp
 eurocom2                        //
-waveterm                        //
 microtrol                       //
+waveterm                        //
+
+@source:skeleton/evolution_handheld.cpp
+evolhh
 
 @source:skeleton/fanucs15.cpp
 fanucs15                        // 1990
