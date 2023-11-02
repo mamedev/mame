@@ -13,7 +13,6 @@ evo_cpu_device::evo_cpu_device(const machine_config &mconfig, const char *tag, d
 	: cpu_device(mconfig, EVOLUTION_CPU, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 24, -1)
 	, m_pc(0)
-	, m_program(nullptr)
 	, m_icount(0)
 {
 }
@@ -32,9 +31,6 @@ device_memory_interface::space_config_vector evo_cpu_device::memory_space_config
 
 void evo_cpu_device::device_start()
 {
-	m_pc = 0;
-	m_debugger_temp = 0;
-	m_program = &space(AS_PROGRAM);
 	state_add(STATE_GENPC,     "PC",    m_pc);
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).noshow();
 	set_icountptr(m_icount);
