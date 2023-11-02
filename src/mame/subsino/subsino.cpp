@@ -3279,10 +3279,15 @@ ROM_START( tisubb )
 ROM_END
 
 /* This bootleg shows year 1989 on title screen, but it's from 1992 (there are 1992 strings on the ROMs). Probably Karam
-   modified the New HUNTer set from Mecca, which also shows 1989, and was legally registered on Korea on 1989-8-25. */
+   modified the New HUNTer set from Mecca, which also shows 1989, and was legally registered on Korea on 1989-8-25.
+   Hardware:
+    - Sound: SM64 + SM64 + 12.000 MHz xtal (currently, the pitch is wrong, you have to overclock ymsnd to 112% to get the same as the PCB).
+    - Five positions for banks of eight DIP switches, but four of them unpopulated (only one present on the PCB).
+    - MCU with its surface scratched out, probably an HD647180X0CP8L + 12.000 MHz xtal.
+    - TI TPC1020AFN-084C.
+    - Unpopulated locations on the PCB for a battery and a reset switch. */
 ROM_START( newhunter )
-	// The MCU had its surface scratched out, but almost sure it's an HD647180X0CP8L
-	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_REGION( 0x4000, "maincpu", 0 ) 	// The MCU had its surface scratched out, but almost sure it's an HD647180X0CP8L
 	ROM_LOAD( "hd647180.bin", 0x00000, 0x04000, NO_DUMP )
 	HD647180X_FAKE_INTERNAL_ROM
 
@@ -3365,10 +3370,12 @@ ROM_END
      -One bank of 5 DIP switches soldered to another 74LS245.
      -A single switch button soldered to another 74LS245.
    And the usual hardware configuration:
+     -One 12.000 MHz xtal.
      -HD647180X0CP6.
      -12 MHz xtal.
      -One bank of 8 DIP switches, plus the other two banks described before.
-     -Sound: K-666 + K-664. */
+     -Sound: K-666 + K-664.
+     -TI TPC1020AFN-084C. */
 ROM_START( newhunterc )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	ROM_LOAD( "hd647180.bin", 0x00000, 0x04000, NO_DUMP ) // HD647180X0CP8L
