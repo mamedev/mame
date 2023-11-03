@@ -36,7 +36,7 @@ license:CC0-1.0
 		<rect><bounds x="112" y="0" width="20" height="1" /><color red="0.60" green="0.91" blue="1.00" /></rect> <!-- 6 cyan -->
 		<rect><bounds x="128" y="0" width="20" height="1" /><color red="0.25" green="0.19" blue="0.74" /></rect> <!-- 7 blue -->
 		<rect><bounds x="144" y="0" width="20" height="1" /><color red="0.44" green="0.13" blue="0.47" /></rect> <!-- 8 purple -->
-		<rect><bounds x="160" y="0" width="20" height="1" /><color red="0.99" green="0.66" blue="1.00" /></rect> <!-- 9 light pink -->
+		<rect><bounds x="160" y="0" width="20" height="1" /><color red="0.88" green="0.66" blue="1.00" /></rect> <!-- 9 lilac -->
 		<rect><bounds x="176" y="0" width="20" height="1" /><color red="0.24" green="0.31" blue="0.00" /></rect> <!-- a moss green -->
 		<rect><bounds x="192" y="0" width="20" height="1" /><color red="0.47" green="0.13" blue="0.22" /></rect> <!-- b dark red -->
 		<rect><bounds x="208" y="0" width="20" height="1" /><color red="1.00" green="0.56" blue="1.00" /></rect> <!-- c pink -->

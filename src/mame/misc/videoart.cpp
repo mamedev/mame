@@ -3,18 +3,19 @@
 // thanks-to:Sean Riddle
 /*******************************************************************************
 
-LJN Video Art
+LJN VideoArt
 
-It's a toy for drawing/coloring pictures on the tv, not a video game console.
-Picture libraries were available on separate cartridges.
+It's a system for drawing/coloring pictures on the tv, not a video game console.
+The cartridge ROMs contain no executable code, only data for a title screen and
+vector pictures.
 
 On the title screen, press CLEAR to start drawing (no need to wait half a minute).
-To change the background color, choose one from the color slider and press CLEAR.
-Drawing with the same color as the picture outline is not allowed.
+Drawing with the same color as the picture outline is not allowed. To change the
+background color, choose one from the color slider and press CLEAR.
 
 Hardware notes:
-- EF6805R2P @ 3.57Mhz (14.318MHz XTAL)
-- EF9367P @ 1.507MHz, 128*208 resolution (internally 512*208), 16 colors
+- Thomson EF6805R2P @ 3.57Mhz (14.318MHz XTAL)
+- Thomson EF9367P @ 1.507MHz, 128*208 resolution (512*208 internally), 16 colors
 - TSGB01019ACP 48-pin DIP gate array (die label: MOSTEK (C) 1984, MK GB 1000 HAA),
   interfaces with EF9367P and DRAM
 - 2*D41416C-15 (16Kbit*4) DRAM
@@ -159,7 +160,7 @@ constexpr rgb_t videoart_colors[] =
 	{ 0x84, 0xff, 0x68 }, // 5 green
 
 	{ 0xff, 0x90, 0xff }, // c pink
-	{ 0xfc, 0xa8, 0xff }, // 9 light pink
+	{ 0xe0, 0xa8, 0xff }, // 9 lilac
 	{ 0xff, 0xc4, 0x40 }, // f orange
 	{ 0xff, 0xa0, 0x80 }  // e light red
 };
@@ -410,4 +411,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1987, videoart, 0,      0,      videoart, videoart, videoart_state, empty_init, "LJN Toys", "Video Art", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND_HW )
+SYST( 1987, videoart, 0,      0,      videoart, videoart, videoart_state, empty_init, "LJN Toys", "VideoArt", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND_HW )
