@@ -7137,7 +7137,7 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
-	<software name="hbiv1">
+	<software name="hbiv1" supported="no">
 		<description>HBI-V1 Video Digitizer (Japan)</description>
 		<year>1989</year>
 		<publisher>Sony</publisher>
@@ -12289,7 +12289,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="sailorfk">
-		<description>Sailor Fuku Senshi Ferisu (Japan)</description>
+		<description>Sailor-fuku Senshi Felis (Japan)</description>
 		<year>1990</year>
 		<publisher>Cocktail Soft</publisher>
 		<info name="alt_title" value="セーラー服戦士フェリス"/>
@@ -12298,19 +12298,19 @@ The following floppies came with the machines.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
-				<rom name="sailor fuku senshi ferisu - cocktail soft (disk 1).dsk" size="737280" crc="4ec25130" sha1="c229ae13f091178efff5e13cc42bce3f3ef53bdf"/>
+				<rom name="sailor-fuku senshi felis - cocktail soft (disk 1).dsk" size="737280" crc="4ec25130" sha1="c229ae13f091178efff5e13cc42bce3f3ef53bdf"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="737280">
-				<rom name="sailor fuku senshi ferisu - cocktail soft (disk 2).dsk" size="737280" crc="438473c8" sha1="eeaaa334e77aece74958e4da8dac43af4bc8fd33"/>
+				<rom name="sailor-fuku senshi felis - cocktail soft (disk 2).dsk" size="737280" crc="438473c8" sha1="eeaaa334e77aece74958e4da8dac43af4bc8fd33"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk C"/>
 			<dataarea name="flop" size="737280">
-				<rom name="sailor fuku senshi ferisu - cocktail soft (disk 3).dsk" size="737280" crc="e1196cf7" sha1="814ac5cef29e4cacdc748b720f56b91dbb8ee34a"/>
+				<rom name="sailor-fuku senshi felis - cocktail soft (disk 3).dsk" size="737280" crc="e1196cf7" sha1="814ac5cef29e4cacdc748b720f56b91dbb8ee34a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13912,7 +13912,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="tominaga">
-		<description>Tominaga Koukou Tantei-Bu (Japan)</description>
+		<description>Tominaga Koukou Tantei-bu (Japan)</description>
 		<year>1993</year>
 		<publisher>Team Plankton</publisher>
 		<info name="alt_tile" value="富永高校探偵部"/>
@@ -14233,7 +14233,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="tulipich">
-		<description>Tulip Ichigo (Japan)</description>
+		<description>Tulip Ichigou (Japan)</description>
 		<year>1991</year>
 		<publisher>Tempin Software</publisher>
 		<info name="alt_title" value="チューリップ壱号"/>
@@ -15740,7 +15740,7 @@ The following floppies came with the machines.
 		<description>Yoshida Koumuten Data Library Vol. 1 (Japan)</description>
 		<year>1990</year>
 		<publisher>MSX Magazine</publisher>
-		<info name="alt_title" value="吉田工務店データ集全３巻 VOL.1"/>
+		<info name="alt_title" value="吉田工務店 Data Library Vol.1"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="yoshida koumuten data library vol. 1 (1990)(msx magazine)(jp).dsk" size="737280" crc="d6ecc4f1" sha1="2f557024ab15d02e753f56bda30ec529515eedb2"/>
@@ -15752,7 +15752,7 @@ The following floppies came with the machines.
 		<description>Yoshida Koumuten Data Library Vol. 2 (Japan)</description>
 		<year>1990</year>
 		<publisher>MSX Magazine</publisher>
-		<info name="alt_title" value="吉田工務店データ集全３巻 VOL.2"/>
+		<info name="alt_title" value="吉田工務店 Data Library Vol.2"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="yoshida koumuten data library vol. 2 - msx magazine.dsk" size="737280" crc="559c3ce2" sha1="bc83532e77326bdecbe1818f3c15b5f5de572a45"/>
@@ -15764,7 +15764,7 @@ The following floppies came with the machines.
 		<description>Yoshida Koumuten Data Library Vol. 3 (Japan)</description>
 		<year>1990</year>
 		<publisher>MSX Magazine</publisher>
-		<info name="alt_title" value="吉田工務店データ集全３巻 VOL.3"/>
+		<info name="alt_title" value="吉田工務店 Data Library Vol.3"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="yoshida koumuten data library vol. 3 - msx magazine.dsk" size="737280" crc="a4d68c19" sha1="85b75d7e64eb9f680aea6fb99da7315398d6ab0a"/>
@@ -16067,13 +16067,13 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="yuureikun">
-		<description>Yuurei-Kun (Japan)</description>
+		<description>Yuurei-kun (Japan)</description>
 		<year>1989</year>
 		<publisher>System Sacom</publisher>
 		<info name="alt_title" value="幽霊君"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="yuureikun - system sacom.dsk" size="737280" crc="b0401c5b" sha1="749f756c1fb8bf7f2e905011243d12c8a22dece7"/>
+				<rom name="yuurei-kun - system sacom.dsk" size="737280" crc="b0401c5b" sha1="749f756c1fb8bf7f2e905011243d12c8a22dece7"/>
 			</dataarea>
 		</part>
 	</software>
