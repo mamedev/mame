@@ -953,6 +953,7 @@ u16 swp30_device::internal_r()
 	u8 chan = m_internal_adr & 0x3f;
 	switch(m_internal_adr >> 8) {
 	case 0:
+		// Not certain about the two top bits though, the code seems to only care about 0/non-0
 		return m_envelope_mode[chan] == IDLE ? 0xffff : ((m_envelope_mode[chan] - 1) << 14) | (m_envelope_level[chan] >> (26-14));
 
 	case 4:
@@ -972,7 +973,7 @@ u16 swp30_device::internal_r()
 }
 
 
-// MEG registers forwarding
+// MEG registers
 
 template<int sel> u16 swp30_device::meg_const_r(offs_t offset)
 {
