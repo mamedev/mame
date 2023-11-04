@@ -20,10 +20,7 @@
 #	include <windows.h>
 #	include <psapi.h>
 #elif  BX_PLATFORM_ANDROID    \
-	|| BX_PLATFORM_BSD        \
 	|| BX_PLATFORM_EMSCRIPTEN \
-	|| BX_PLATFORM_HAIKU      \
-	|| BX_PLATFORM_HURD       \
 	|| BX_PLATFORM_IOS        \
 	|| BX_PLATFORM_LINUX      \
 	|| BX_PLATFORM_NX         \
@@ -31,9 +28,7 @@
 	|| BX_PLATFORM_PS4        \
 	|| BX_PLATFORM_RPI
 #	include <sched.h> // sched_yield
-#	if BX_PLATFORM_BSD       \
-	|| BX_PLATFORM_HAIKU     \
-	|| BX_PLATFORM_IOS       \
+#	if BX_PLATFORM_IOS       \
 	|| BX_PLATFORM_OSX       \
 	|| BX_PLATFORM_PS4
 #		include <pthread.h> // mach_port_t
@@ -51,14 +46,8 @@
 #		include <stdio.h>  // fopen
 #		include <unistd.h> // syscall
 #		include <sys/syscall.h>
-#	elif   BX_PLATFORM_HAIKU
-#		include <stdio.h>  // fopen
-#		include <unistd.h> // syscall
 #	elif BX_PLATFORM_OSX
 #		include <mach/mach.h> // mach_task_basic_info
-#	elif BX_PLATFORM_HURD
-#		include <stdio.h>           // fopen
-#		include <pthread/pthread.h> // pthread_self
 #	elif BX_PLATFORM_ANDROID
 #		include "debug.h" // getTid is not implemented...
 #	endif // BX_PLATFORM_ANDROID
@@ -105,10 +94,6 @@ namespace bx
 #elif  BX_PLATFORM_IOS \
 	|| BX_PLATFORM_OSX
 		return (mach_port_t)::pthread_mach_thread_np(pthread_self() );
-#elif BX_PLATFORM_BSD
-		return *(uint32_t*)::pthread_self();
-#elif BX_PLATFORM_HURD
-		return (pthread_t)::pthread_self();
 #else
 		debugOutput("getTid is not implemented"); debugBreak();
 		return 0;
@@ -120,8 +105,7 @@ namespace bx
 #if BX_PLATFORM_ANDROID
 		struct mallinfo mi = mallinfo();
 		return mi.uordblks;
-#elif  BX_PLATFORM_LINUX \
-	|| BX_PLATFORM_HURD
+#elif  BX_PLATFORM_LINUX
 		FILE* file = fopen("/proc/self/statm", "r");
 		if (NULL == file)
 		{
@@ -320,8 +304,7 @@ namespace bx
 
 	void* exec(const char* const* _argv)
 	{
-#if BX_PLATFORM_LINUX \
- || BX_PLATFORM_HURD
+#if BX_PLATFORM_LINUX
 		pid_t pid = fork();
 
 		if (0 == pid)
@@ -376,7 +359,7 @@ namespace bx
 #else
 		BX_UNUSED(_argv);
 		return NULL;
-#endif // BX_PLATFORM_LINUX || BX_PLATFORM_HURD
+#endif // BX_PLATFORM_LINUX
 	}
 
 	void exit(int32_t _exitCode)
