@@ -281,11 +281,11 @@ void pensebem2017_state::pensebem2017(machine_config &config)
 	m_maincpu->set_high_fuses(0xdd);
 	m_maincpu->set_extended_fuses(0xf9);
 	m_maincpu->set_lock_bits(0x0f);
-	m_maincpu->gpio_in<atmega88_device::GPIOB>().set(FUNC(pensebem2017_state::port_b_r));
-	m_maincpu->gpio_out<atmega88_device::GPIOB>().set(FUNC(pensebem2017_state::port_b_w));
-	m_maincpu->gpio_out<atmega88_device::GPIOC>().set(FUNC(pensebem2017_state::port_c_w));
-	m_maincpu->gpio_out<atmega88_device::GPIOD>().set(FUNC(pensebem2017_state::port_d_w));
-	m_maincpu->gpio_out<atmega88_device::GPIOE>().set(FUNC(pensebem2017_state::port_e_w));
+	m_maincpu->gpio_in<atmega168_device::GPIOB>().set(FUNC(pensebem2017_state::port_b_r));
+	m_maincpu->gpio_out<atmega168_device::GPIOB>().set(FUNC(pensebem2017_state::port_b_w));
+	m_maincpu->gpio_out<atmega168_device::GPIOC>().set(FUNC(pensebem2017_state::port_c_w));
+	m_maincpu->gpio_out<atmega168_device::GPIOD>().set(FUNC(pensebem2017_state::port_d_w));
+	m_maincpu->gpio_out<atmega168_device::GPIOE>().set(FUNC(pensebem2017_state::port_e_w));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
