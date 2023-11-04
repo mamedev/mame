@@ -81,6 +81,8 @@
 #include "screen.h"
 #include "softlist_dev.h"
 
+#include "multibyte.h"
+
 
 namespace {
 
@@ -405,9 +407,9 @@ void spg29x_nand_game_state::machine_reset()
 {
 	spg29x_game_state::machine_reset();
 
-	uint32_t bootstrap_ram_start = (m_strippedrom[m_firstvector+0] << 0) | (m_strippedrom[m_firstvector+1] << 8) | (m_strippedrom[m_firstvector+2] << 16) | (m_strippedrom[m_firstvector+3] << 24);
-	uint32_t bootstrap_ram_end   = (m_strippedrom[m_firstvector+4] << 0) | (m_strippedrom[m_firstvector+5] << 8) | (m_strippedrom[m_firstvector+6] << 16) | (m_strippedrom[m_firstvector+7] << 24);
-	uint32_t bootstrap_ram_boot  = (m_strippedrom[m_firstvector+8] << 0) | (m_strippedrom[m_firstvector+9] << 8) | (m_strippedrom[m_firstvector+10] << 16) | (m_strippedrom[m_firstvector+11] << 24);
+	uint32_t bootstrap_ram_start = get_u32le(&m_strippedrom[m_firstvector+0]);
+	uint32_t bootstrap_ram_end   = get_u32le(&m_strippedrom[m_firstvector+4]);
+	uint32_t bootstrap_ram_boot  = get_u32le(&m_strippedrom[m_firstvector+8]);
 
 	// there is a 0x01 at 0x26, possibly related to source location / block in NAND to copy from?
 
