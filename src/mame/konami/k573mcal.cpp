@@ -24,6 +24,8 @@
 
 #include "machine/timehelp.h"
 
+#include "multibyte.h"
+
 k573mcal_device::k573mcal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	jvs_device(mconfig, KONAMI_573_MASTER_CALENDAR, tag, owner, clock),
 	m_in1(*this, "IN1"),
@@ -122,7 +124,7 @@ int k573mcal_device::handle_message(const uint8_t* send_buffer, uint32_t send_si
 
 	case 0x7c: {
 		// msg: 7c 7f 00 04
-		const uint16_t val = (send_buffer[1] << 8) | send_buffer[2];
+		const uint16_t val = get_u16be(&send_buffer[1]);
 
 		if (val == 0x7f00) {
 			// Return main ID
@@ -152,11 +154,11 @@ int k573mcal_device::handle_message(const uint8_t* send_buffer, uint32_t send_si
 
 	case 0x7d: {
 		// msg: 7d 80 10 08 00 00 00 01 ff ff ff fe
-		const uint16_t val = (send_buffer[1] << 8) | send_buffer[2];
+		const uint16_t val = get_u16be(&send_buffer[1]);
 
 		if (val == 0x8010) {
 			// Set next sub ID
-			subId = (send_buffer[4] << 24) | (send_buffer[5] << 16) | (send_buffer[6] << 8) | send_buffer[7];
+			subId = get_u32be(&send_buffer[4]);
 
 			uint8_t resp[] = {
 				0x01, // status, must be 1
