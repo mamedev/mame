@@ -638,7 +638,7 @@ void karnov_state::playfield_w(offs_t offset, u16 data, u16 mem_mask)
 
 void karnov_state::vintctl_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	m_vint_en = bool((offset & 1)!=0);
+	m_vint_en = bool(offset & 1);
 	// writing to any position in the range will clear the line
 	m_maincpu->set_input_line(7, CLEAR_LINE);
 }
