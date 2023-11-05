@@ -8,7 +8,7 @@
 #include "segaai_slot.h"
 
 class segaai_rom_128_device : public device_t,
-								public device_segaai_card_interface
+								public segaai_card_interface
 {
 public:
 	segaai_rom_128_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);

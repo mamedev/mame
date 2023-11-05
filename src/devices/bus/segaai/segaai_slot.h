@@ -11,12 +11,12 @@
 DECLARE_DEVICE_TYPE(SEGAAI_CARD_SLOT, segaai_card_slot_device);
 
 
-class device_segaai_card_interface;
+class segaai_card_interface;
 
 
 class segaai_card_slot_device : public device_t,
 								public device_cartrom_image_interface,
-								public device_single_card_slot_interface<device_segaai_card_interface>
+								public device_single_card_slot_interface<segaai_card_interface>
 {
 public:
 	template <typename T>
@@ -50,15 +50,15 @@ protected:
 
 private:
 	optional_address_space m_address_space;
-	device_segaai_card_interface* m_cart;
+	segaai_card_interface* m_cart;
 };
 
 
-class device_segaai_card_interface : public device_interface
+class segaai_card_interface : public device_interface
 {
 public:
-	device_segaai_card_interface(const machine_config &mconfig, device_t &device);
-	virtual ~device_segaai_card_interface();
+	segaai_card_interface(const machine_config &mconfig, device_t &device);
+	virtual ~segaai_card_interface();
 
 	virtual void install_memory_handlers(address_space *space) { }
 

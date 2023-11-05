@@ -17,7 +17,7 @@ DEFINE_DEVICE_TYPE(SEGAAI_ROM_256, segaai_rom_256_device, "segaai_rom_256", "Seg
 
 segaai_rom_128_device::segaai_rom_128_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, device_segaai_card_interface(mconfig, *this)
+	, segaai_card_interface(mconfig, *this)
 {
 }
 

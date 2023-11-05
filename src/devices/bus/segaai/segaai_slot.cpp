@@ -21,14 +21,14 @@ enum
 DEFINE_DEVICE_TYPE(SEGAAI_CARD_SLOT, segaai_card_slot_device, "segaai_card_slot", "Sega AI Card Slot")
 
 
-device_segaai_card_interface::device_segaai_card_interface(const machine_config &mconfig, device_t &device)
+segaai_card_interface::segaai_card_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device, "segaai_card")
 	, m_slot(dynamic_cast<segaai_card_slot_device *>(device.owner()))
 {
 }
 
 
-device_segaai_card_interface::~device_segaai_card_interface()
+segaai_card_interface::~segaai_card_interface()
 {
 }
 
@@ -37,7 +37,7 @@ device_segaai_card_interface::~device_segaai_card_interface()
 segaai_card_slot_device::segaai_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 		: device_t(mconfig, SEGAAI_CARD_SLOT, tag, owner, clock)
 		, device_cartrom_image_interface(mconfig, *this)
-		, device_single_card_slot_interface<device_segaai_card_interface>(mconfig, *this)
+		, device_single_card_slot_interface<segaai_card_interface>(mconfig, *this)
 		, m_address_space(*this, finder_base::DUMMY_TAG, -1, 8)
 {
 }
@@ -50,7 +50,7 @@ segaai_card_slot_device::~segaai_card_slot_device()
 
 void segaai_card_slot_device::device_start()
 {
-	m_cart = dynamic_cast<device_segaai_card_interface *>(get_card_device());
+	m_cart = dynamic_cast<segaai_card_interface *>(get_card_device());
 }
 
 
