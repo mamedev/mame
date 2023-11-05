@@ -39274,6 +39274,9 @@ tvochken                        //
 @source:sega/sega_sawatte.cpp
 sawatte                         //
 
+@source:sega/segaai.cpp
+segaai                          // (c) 1986 Sega
+
 @source:sega/segaatom.cpp
 spongbob                        // (c) 200? Sega
 
