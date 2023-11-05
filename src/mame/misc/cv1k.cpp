@@ -236,7 +236,7 @@ protected:
 private:
 	required_device<sh34_base_device> m_maincpu;
 	required_device<epic12_device> m_blitter;
-	required_device<samsung_k9f1g08u0b_device> m_nand;
+	required_device<samsung_k9f1g08u0m_device> m_nand;
 	required_device<rtc9701_device> m_eeprom;
 
 	required_shared_ptr<uint64_t> m_ram;
@@ -482,7 +482,7 @@ void cv1k_state::cv1k(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(cv1k_state::irq2_line_hold)); // irq2 actually asserted at V-sync pulse, not at V-blank
 
 	RTC9701(config, m_eeprom);
-	SAMSUNG_K9F1G08U0B(config, m_nand, 0);
+	SAMSUNG_K9F1G08U0M(config, m_nand, 0);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
