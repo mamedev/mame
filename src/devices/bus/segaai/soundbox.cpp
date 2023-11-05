@@ -89,7 +89,6 @@ segaai_soundbox_device::segaai_soundbox_device(const machine_config &mconfig, co
 {
 }
 
-
 void segaai_soundbox_device::device_add_mconfig(machine_config &config)
 {
 	PIT8253(config, m_tmp8253);
@@ -119,18 +118,15 @@ void segaai_soundbox_device::device_add_mconfig(machine_config &config)
 	m_ym2151->add_route(1, "rspeaker", 1.00);
 }
 
-
 ROM_START(soundbox)
 	ROM_REGION(0x10000, "soundbox", 0)
 	ROM_LOAD("ai-snd-2002-cecb.bin", 0x0000, 0x10000, CRC(ef2dabc0) SHA1(b60cd9f6f46b6c77dba8610df6fd83368569e713))
 ROM_END
 
-
 const tiny_rom_entry *segaai_soundbox_device::device_rom_region() const
 {
 	return ROM_NAME(soundbox);
 }
-
 
 static INPUT_PORTS_START(soundbox)
 	PORT_START("ROW0")
@@ -144,14 +140,14 @@ static INPUT_PORTS_START(soundbox)
 	PORT_BIT(0x0080, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("ROW1")
-	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT(0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT(0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT(0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x0008, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x0040, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x0080, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("ROW2")
 	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -214,84 +210,30 @@ static INPUT_PORTS_START(soundbox)
 	PORT_BIT(0x0080, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-
 ioport_constructor segaai_soundbox_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(soundbox);
 }
 
-
 void segaai_soundbox_device::device_start()
 {
 	m_row = 0;
 	m_8255_portb = 0;
+	m_ram.resize(0x20000);
+
 	save_item(NAME(m_ram));
 	save_item(NAME(m_row));
 	save_item(NAME(m_8255_portb));
+
+	mem_space().install_ram(0x20000, 0x3ffff, &m_ram[0]);
+	mem_space().install_rom(0x80000, 0x8ffff, m_rom);
+	io_space().install_read_handler(0x20, 0x23, emu::rw_delegate(*m_ym2151, FUNC(ym2151_device::read)));
+	io_space().install_write_handler(0x20, 0x23, emu::rw_delegate(*m_ym2151, FUNC(ym2151_device::write)));
+	io_space().install_read_handler(0x24, 0x27, emu::rw_delegate(*m_tmp8253, FUNC(pit8253_device::read)));
+	io_space().install_write_handler(0x24, 0x27, emu::rw_delegate(*m_tmp8253, FUNC(pit8253_device::write)));
+	io_space().install_read_handler(0x28, 0x2b, emu::rw_delegate(*m_tmp8255, FUNC(i8255_device::read)));
+	io_space().install_write_handler(0x28, 0x2b, emu::rw_delegate(*m_tmp8255, FUNC(i8255_device::write)));
 }
-
-
-void segaai_soundbox_device::device_reset()
-{
-}
-
-
-u8 segaai_soundbox_device::read_lo(offs_t offset)
-{
-	return m_ram[offset & 0x1ffff];
-}
-
-
-void segaai_soundbox_device::write_lo(offs_t offset, u8 data)
-{
-	m_ram[offset & 0x1ffff] = data;
-}
-
-
-u8 segaai_soundbox_device::read_hi(offs_t offset)
-{
-	return m_rom[offset & 0xffff];
-}
-
-
-u8 segaai_soundbox_device::read_io(offs_t offset)
-{
-	switch (offset & 0x0c)
-	{
-		case 0x00:
-			return m_ym2151->read(offset & 0x01);
-
-		case 0x04:
-			return m_tmp8253->read(offset & 0x03);
-
-		case 0x08:
-			return m_tmp8255->read(offset & 0x03);
-	}
-	return 0xff;
-}
-
-
-void segaai_soundbox_device::write_io(offs_t offset, u8 data)
-{
-	switch (offset & 0x0c)
-	{
-		case 0x00:
-//			osd_printf_info("soundbox 8251 write $%02X, $%02X\n", offset & 0x01, data);
-			m_ym2151->write(offset & 0x01, data);
-			break;
-
-		case 0x04:
-			osd_printf_info("soundbox 8253 write $%02X, $%02X\n", offset & 0x03, data);
-			m_tmp8253->write(offset & 0x03, data);
-			break;
-
-		case 0x08:
-			osd_printf_info("soundbox 8255 write $%02X, $%02X\n", offset & 0x03, data);
-			m_tmp8255->write(offset & 0x03, data);
-			break;
-	}
-}
-
 
 u8 segaai_soundbox_device::tmp8255_porta_r()
 {

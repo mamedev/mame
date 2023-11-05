@@ -32,10 +32,8 @@ TODO:
   - The tape sometimes seeks back and forth for 5-15 seconds for the right
     voice clip, while the game and player (kids) wait
   "In these tapes, by the way, the left audio channel is the narration,
-  and the right channel the data bursts right before each one. If someone
-  figures out the data format, you could pare it down to one channel and
-  "simulate" the data portion as a binary stream in emulation."
-- Keyboard (there is probably an mcu inside it)
+  and the right channel the data bursts right before each one."
+- Keyboard?
 - SEGA Prolog? How to enter?
 
 - Sound box:
@@ -152,6 +150,7 @@ public:
 		, m_upd7759(*this, "upd7759")
 		, m_cassette(*this, "cassette")
 		, m_cardslot(*this, "cardslot")
+		, m_expslot(*this, "exp")
 		, m_port4(*this, "PORT4")
 		, m_port5(*this, "PORT5")
 		, m_port_tp(*this, "TP.%u", 0)
@@ -211,6 +210,7 @@ private:
 	required_device<upd7759_device> m_upd7759;
 	required_device<cassette_image_device> m_cassette;
 	required_device<segaai_card_slot_device> m_cardslot;
+	required_device<segaai_exp_slot_device> m_expslot;
 	required_ioport m_port4;
 	required_ioport m_port5;
 	required_ioport_array<TOUCHPAD_ROWS> m_port_tp;
@@ -233,8 +233,8 @@ private:
 void segaai_state::mem_map(address_map &map)
 {
 	map(0x00000, 0x1ffff).ram();
-	map(0x20000, 0x3ffff).rw("exp", FUNC(segaai_exp_slot_device::read_lo), FUNC(segaai_exp_slot_device::write_lo));
-	map(0x80000, 0x8ffff).rw("exp", FUNC(segaai_exp_slot_device::read_hi), FUNC(segaai_exp_slot_device::write_hi));
+	// 0x20000-0x3ffff - Dynamically mapped by expansion slot
+	// 0x80000-0x8ffff - Dynamically mapped by expansion slot
 	// 0xa0000-0xbffff - Dynamically mapped by cardslot
 	map(0xc0000, 0xdffff).rom();
 	map(0xe0000, 0xeffff).rom();
@@ -329,7 +329,7 @@ void segaai_state::io_map(address_map &map)
 	// 0x1f (w) - ??
 
 	// Expansion I/O
-	map(0x20, 0x3f).rw("exp", FUNC(segaai_exp_slot_device::read_io), FUNC(segaai_exp_slot_device::write_io));
+	// 0x20-0x3f - Dynamically mapped by expansion slot
 }
 
 
@@ -798,7 +798,9 @@ void segaai_state::segaai(machine_config &config)
 	SOFTWARE_LIST(config, "software").set_original("segaai");
 
 	// Expansion slot
-	SEGAAI_EXP_SLOT(config, "exp", segaai_exp, nullptr);
+	SEGAAI_EXP_SLOT(config, m_expslot, segaai_exp, nullptr);
+	m_expslot->set_mem_space(m_maincpu, AS_PROGRAM);
+	m_expslot->set_io_space(m_maincpu, AS_IO);
 
 	// Built-in cassette
 	CASSETTE(config, m_cassette);

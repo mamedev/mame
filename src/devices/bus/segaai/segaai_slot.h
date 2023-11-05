@@ -70,10 +70,6 @@ private:
 };
 
 
-#define MCFG_SEGAAI_CARD_ADD(_tag,_slot_intf,_def_slot) \
-	MCFG_DEVICE_ADD(_tag, SEGAAI_CARD_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) 
-
 void segaai_card(device_slot_interface &device);
 
 #endif

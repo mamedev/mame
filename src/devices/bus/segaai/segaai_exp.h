@@ -9,24 +9,6 @@
 DECLARE_DEVICE_TYPE(SEGAAI_EXP_SLOT, segaai_exp_slot_device);
 
 
-class device_segaai_exp_interface : public device_interface
-{
-public:
-	device_segaai_exp_interface(const machine_config &mconfig, device_t &device);
-	virtual ~device_segaai_exp_interface();
-
-	// 0x20000 - 0x3ffff
-	virtual u8 read_lo(offs_t offset) { return 0xff; }
-	virtual void write_lo(offs_t offset, u8 data) {}
-	// 0x80000 - 0x9ffff
-	virtual u8 read_hi(offs_t offset) { return 0xff; }
-	virtual void write_hi(offs_t offset, u8 data) {}
-	// I/O 0x20 - 0x3f
-	virtual u8 read_io(offs_t offset) { return 0xff; }
-	virtual void write_io(offs_t offset, u8 data) {}
-};
-
-
 class segaai_exp_slot_device : public device_t,
 								public device_slot_interface
 {
@@ -43,27 +25,35 @@ public:
 	segaai_exp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 	virtual ~segaai_exp_slot_device();
 
-	virtual void device_start();
+	template <typename T> void set_mem_space(T &&tag, int no) { m_mem_space.set_tag(std::forward<T>(tag), no); }
+	template <typename T> void set_io_space(T &&tag, int no) { m_io_space.set_tag(std::forward<T>(tag), no); }
 
-	virtual u8 read_lo(offs_t offset);
-	virtual void write_lo(offs_t offset, u8 data);
-	virtual u8 read_hi(offs_t offset);
-	virtual void write_hi(offs_t offset, u8 data);
-	virtual u8 read_io(offs_t offset);
-	virtual void write_io(offs_t offset, u8 data);
+	address_space& mem_space() { return *m_mem_space; }
+	address_space& io_space() { return *m_io_space; }
 
 protected:
-	device_segaai_exp_interface*       m_exp;
+	virtual void device_start() override { };
+
+private:
+	optional_address_space m_mem_space;
+	optional_address_space m_io_space;
 };
 
 
-/***************************************************************************
- DEVICE CONFIGURATION MACROS
- ***************************************************************************/
+class device_segaai_exp_interface : public device_interface
+{
+public:
+	device_segaai_exp_interface(const machine_config &mconfig, device_t &device);
+	virtual ~device_segaai_exp_interface();
 
-#define MCFG_SEGAAI_EXP_ADD(_tag,_slot_intf,_def_slot) \
-	MCFG_DEVICE_ADD(_tag, SEGAAI_EXP_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
+protected:
+	address_space& mem_space() { return m_slot->mem_space(); }
+	address_space& io_space() { return m_slot->io_space(); }
+
+private:
+	segaai_exp_slot_device* m_slot;
+};
+
 
 // slot interfaces
 void segaai_exp(device_slot_interface &device);
