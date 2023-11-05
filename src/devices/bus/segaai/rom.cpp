@@ -11,20 +11,26 @@
 #include "rom.h"
 
 
-DEFINE_DEVICE_TYPE(SEGAAI_ROM_128, segaai_rom_128_device, "segaai_rom_128", "Sega AI Card - 128KB")
-DEFINE_DEVICE_TYPE(SEGAAI_ROM_256, segaai_rom_256_device, "segaai_rom_256", "Sega AI Card - 256KB")
+namespace {
 
-
-segaai_rom_128_device::segaai_rom_128_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, type, tag, owner, clock)
-	, segaai_card_interface(mconfig, *this)
+class segaai_rom_128_device : public device_t,
+								public segaai_card_interface
 {
-}
+public:
+	segaai_rom_128_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: segaai_rom_128_device(mconfig, SEGAAI_ROM_128, tag, owner, clock)
+	{ }
 
-segaai_rom_128_device::segaai_rom_128_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: segaai_rom_128_device(mconfig, SEGAAI_ROM_128, tag, owner, clock)
-{
-}
+	virtual void install_memory_handlers(address_space *space) override;
+
+protected:
+	segaai_rom_128_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+		: device_t(mconfig, type, tag, owner, clock)
+		, segaai_card_interface(mconfig, *this)
+	{ }
+
+	virtual void device_start() override { };
+};
 
 void segaai_rom_128_device::install_memory_handlers(address_space *space)
 {
@@ -33,11 +39,23 @@ void segaai_rom_128_device::install_memory_handlers(address_space *space)
 
 
 
-segaai_rom_256_device::segaai_rom_256_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: segaai_rom_128_device(mconfig, SEGAAI_ROM_256, tag, owner, clock)
-	, m_rom_bank(*this, "rombank%u", 0U)
+class segaai_rom_256_device : public segaai_rom_128_device
 {
-}
+public:
+	segaai_rom_256_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: segaai_rom_128_device(mconfig, SEGAAI_ROM_256, tag, owner, clock)
+		, m_rom_bank(*this, "rombank%u", 0U)
+	{ }
+
+	virtual void install_memory_handlers(address_space *space) override;
+
+private:
+	template <int Bank> void bank_w(u8 data);
+	void unknown0_w(u8 data);
+	void unknown1_w(u8 data);
+
+	memory_bank_array_creator<2> m_rom_bank;
+};
 
 void segaai_rom_256_device::install_memory_handlers(address_space *space)
 {
@@ -68,3 +86,8 @@ void segaai_rom_256_device::unknown1_w(u8 data)
 {
 	// Unknown, upon start $00 is written
 }
+
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(SEGAAI_ROM_128, segaai_card_interface, segaai_rom_128_device, "segaai_rom_128", "Sega AI Card - 128KB")
+DEFINE_DEVICE_TYPE_PRIVATE(SEGAAI_ROM_256, segaai_card_interface, segaai_rom_256_device, "segaai_rom_256", "Sega AI Card - 256KB")
