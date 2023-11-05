@@ -11,10 +11,9 @@
 #include "machine/i8255.h"
 #include "sound/ymopm.h"
 
-// ======================> segaai_soundbox_device
 
 class segaai_soundbox_device : public device_t,
-						public device_segaai_exp_interface
+						public segaai_exp_interface
 {
 public:
 	segaai_soundbox_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);

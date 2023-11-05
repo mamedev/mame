@@ -17,14 +17,14 @@
 DEFINE_DEVICE_TYPE(SEGAAI_EXP_SLOT, segaai_exp_slot_device, "segaai_exp_slot", "Sega AI Expansion Slot")
 
 
-device_segaai_exp_interface::device_segaai_exp_interface(const machine_config &mconfig, device_t &device)
+segaai_exp_interface::segaai_exp_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device, "segaai_exp")
 	, m_slot(dynamic_cast<segaai_exp_slot_device *>(device.owner()))
 {
 }
 
 
-device_segaai_exp_interface::~device_segaai_exp_interface()
+segaai_exp_interface::~segaai_exp_interface()
 {
 }
 

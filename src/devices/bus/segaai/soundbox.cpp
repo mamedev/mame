@@ -78,7 +78,7 @@ DEFINE_DEVICE_TYPE(SEGAAI_SOUNDBOX, segaai_soundbox_device, "segaai_soundbox", "
 
 segaai_soundbox_device::segaai_soundbox_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, SEGAAI_SOUNDBOX, tag, owner, clock)
-	, device_segaai_exp_interface( mconfig, *this )
+	, segaai_exp_interface( mconfig, *this )
 	, m_tmp8253(*this, "tmp8253")
 	, m_tmp8255(*this, "tmp8255")
 	, m_ym2151(*this, "ym2151")

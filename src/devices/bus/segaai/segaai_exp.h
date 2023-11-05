@@ -40,11 +40,11 @@ private:
 };
 
 
-class device_segaai_exp_interface : public device_interface
+class segaai_exp_interface : public device_interface
 {
 public:
-	device_segaai_exp_interface(const machine_config &mconfig, device_t &device);
-	virtual ~device_segaai_exp_interface();
+	segaai_exp_interface(const machine_config &mconfig, device_t &device);
+	virtual ~segaai_exp_interface();
 
 protected:
 	address_space& mem_space() { return m_slot->mem_space(); }
