@@ -47,12 +47,12 @@ AI-8003  Pinpon Music Melody
 		<description>Alice World</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="AI-4051" />
-		<info name="alt_title" value="ありす・わーるど" />
+		<info name="serial" value="AI-4051"/>
+		<info name="alt_title" value="ありす・わーるど"/>
 		<part name="card" interface="segaai_card">
-			<feature name="slot" value="rom_128" />
-			<dataarea name="rom" size="131072">
-				<rom name="alice world.bin" size="131072" crc="1647d3a6" sha1="680033fb5d0e4b91cd0078d4ab12e5f4fe122119" offset="0" />
+			<feature name="slot" value="rom_128"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="alice world.bin" size="0x20000" crc="1647d3a6" sha1="680033fb5d0e4b91cd0078d4ab12e5f4fe122119"/>
 			</dataarea>
 		</part>
 	</software>
@@ -62,27 +62,25 @@ AI-8003  Pinpon Music Melody
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="AI-4052"/>
-		<info name="alt_title" value="ろびんそん・らんど" />
+		<info name="alt_title" value="ろびんそん・らんど"/>
 		<part name="card" interface="segaai_card">
-			<feature name="slot" value="rom_128" />
-			<dataarea name="rom" size="131072">
-				<rom name="robinson land.bin" size="131072" crc="60d22b3d" sha1="fa17ec899c8ed87681c110c3ef0e05d46fc9cdf3" offset="0" />
+			<feature name="slot" value="rom_128"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="robinson land.bin" size="0x20000" crc="60d22b3d" sha1="fa17ec899c8ed87681c110c3ef0e05d46fc9cdf3"/>
 			</dataarea>
 		</part>
 	</software>
 
-
-	<!-- The entered numbers should be spoken -->
-	<software name="cosmictr" supported="partial">
+	<software name="cosmictr">
 		<description>Cosmic Train</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="AI-4053"/>
-		<info name="alt_title" value="こずみっく・とれいん" />
+		<info name="alt_title" value="こずみっく・とれいん"/>
 		<part name="card" interface="segaai_card">
-			<feature name="slot" value="rom_128" />
-			<dataarea name="rom" size="131072">
-				<rom name="cosmic train.bin" size="131072" crc="cc70a670" sha1="38b8d458540ede5d91f2e1ea8e6dc9a7ed475d82" offset="0" />
+			<feature name="slot" value="rom_128"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="cosmic train.bin" size="0x20000" crc="cc70a670" sha1="38b8d458540ede5d91f2e1ea8e6dc9a7ed475d82"/>
 			</dataarea>
 		</part>
 	</software>
@@ -92,28 +90,25 @@ AI-8003  Pinpon Music Melody
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="AI-4054"/>
-		<info name="alt_title" value="しんでれら・らびりんす" />
+		<info name="alt_title" value="しんでれら・らびりんす"/>
 		<part name="card" interface="segaai_card">
-			<feature name="slot" value="rom_128" />
-			<dataarea name="rom" size="131072">
-				<rom name="cinderella labyrinth.bin" size="131072" crc="cc865679" sha1="49a4cdb6f775786285271f7ea07334a8fad7a7f9" offset="0" />
+			<feature name="slot" value="rom_128"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="cinderella labyrinth.bin" size="0x20000" crc="cc865679" sha1="49a4cdb6f775786285271f7ea07334a8fad7a7f9"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<!--
-		After entering a number it should be spoken
-	-->
-	<software name="gulliver" supported="partial">
+	<software name="gulliver">
 		<description>Gulliver Pocket</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="AI-4055"/>
-		<info name="alt_title" value="がりばー・ぽけっと" />
+		<info name="alt_title" value="がりばー・ぽけっと"/>
 		<part name="card" interface="segaai_card">
-			<feature name="slot" value="rom_128" />
-			<dataarea name="rom" size="131072">
-				<rom name="gulliver pocket.bin" size="131072" crc="766b1630" sha1="d186bbd6f6e1d4577efc820c80b2e492ac979c4c" offset="0" />
+			<feature name="slot" value="rom_128"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="gulliver pocket.bin" size="0x20000" crc="766b1630" sha1="d186bbd6f6e1d4577efc820c80b2e492ac979c4c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -123,11 +118,11 @@ AI-8003  Pinpon Music Melody
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="AI-4056"/>
-		<info name="alt_title" value="もーつぁると・あかでみー" />
+		<info name="alt_title" value="もーつぁると・あかでみー"/>
 		<part name="card" interface="segaai_card">
-			<feature name="slot" value="rom_128" />
-			<dataarea name="rom" size="131072">
-				<rom name="mozart academy.bin" size="131072" crc="09bbee0f" sha1="16df750fd7f1f1882768e0e6cee89b92863cf79e" offset="0" />
+			<feature name="slot" value="rom_128"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="mozart academy.bin" size="0x20000" crc="09bbee0f" sha1="16df750fd7f1f1882768e0e6cee89b92863cf79e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -137,11 +132,11 @@ AI-8003  Pinpon Music Melody
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="AI-4057"/>
-		<info name="alt_title" value="あらびあん・ないと" />
+		<info name="alt_title" value="あらびあん・ないと"/>
 		<part name="card" interface="segaai_card">
-			<feature name="slot" value="rom_256" />
-			<dataarea name="rom" size="262144">
-				<rom name="arabian night.bin" size="262144" crc="c47ca594" sha1="347d525de9a00da557b684caae7d75680aae50fd" offset="0" />
+			<feature name="slot" value="rom_256"/>
+			<dataarea name="rom" size="0x40000">
+				<rom name="arabian night.bin" size="0x40000" crc="c47ca594" sha1="347d525de9a00da557b684caae7d75680aae50fd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -151,11 +146,11 @@ AI-8003  Pinpon Music Melody
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="AI-4058"/>
-		<info name="alt_title" value="あんでるせん・どりーむ" />
+		<info name="alt_title" value="あんでるせん・どりーむ"/>
 		<part name="card" interface="segaai_card">
-			<feature name="slot" value="rom_128" />
-			<dataarea name="rom" size="131072">
-				<rom name="andersen dream.bin" size="131072" crc="ef23c880" sha1="9f78bd9c2e583fa258451a98db13ec2428cef242" offset="0" />
+			<feature name="slot" value="rom_128"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="andersen dream.bin" size="0x20000" crc="ef23c880" sha1="9f78bd9c2e583fa258451a98db13ec2428cef242"/>
 			</dataarea>
 		</part>
 	</software>
@@ -164,12 +159,12 @@ AI-8003  Pinpon Music Melody
 		<description>Ocean Fantasy</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="AI-4059" />
-		<info name="alt_title" value="おーしゃん・ふぁんたじー" />
+		<info name="serial" value="AI-4059"/>
+		<info name="alt_title" value="おーしゃん・ふぁんたじー"/>
 		<part name="card" interface="segaai_card">
-			<feature name="slot" value="rom_256" />
-			<dataarea name="rom" size="262144">
-				<rom name="ocean fantasy.bin" size="262144" crc="2fe2d406" sha1="eab433b27725b3ef884c66f2ec1ba04af9a61dc1" offset="0" />
+			<feature name="slot" value="rom_256"/>
+			<dataarea name="rom" size="0x40000">
+				<rom name="ocean fantasy.bin" size="0x40000" crc="2fe2d406" sha1="eab433b27725b3ef884c66f2ec1ba04af9a61dc1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -179,11 +174,11 @@ AI-8003  Pinpon Music Melody
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="AI-4060"/>
-		<info name="alt_title" value="ころんぶす・まっぷ" />
+		<info name="alt_title" value="ころんぶす・まっぷ"/>
 		<part name="card" interface="segaai_card">
-			<feature name="slot" value="rom_128" />
-			<dataarea name="rom" size="131072">
-				<rom name="columbus map.bin" size="131072" crc="c95cd4e3" sha1="7aafc37b81d524f046e62dd2e289d142b3c639a6" offset="0" />
+			<feature name="slot" value="rom_128"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="columbus map.bin" size="0x20000" crc="c95cd4e3" sha1="7aafc37b81d524f046e62dd2e289d142b3c639a6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -193,11 +188,11 @@ AI-8003  Pinpon Music Melody
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="AI-4114"/>
-		<info name="alt_title" value="るんるん・みゅーじっく" />
+		<info name="alt_title" value="るんるん・みゅーじっく"/>
 		<part name="card" interface="segaai_card">
-			<feature name="slot" value="rom_128" />
-			<dataarea name="rom" size="131072">
-				<rom name="runrun music.bin" size="131072" crc="9e8f5233" sha1="f0396cb16b6b5295eef71a4acda5c45d492313e1" offset="0" />
+			<feature name="slot" value="rom_128"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="runrun music.bin" size="0x20000" crc="9e8f5233" sha1="f0396cb16b6b5295eef71a4acda5c45d492313e1"/>
 			</dataarea>
 		</part> 
 	</software>
@@ -207,11 +202,11 @@ AI-8003  Pinpon Music Melody
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="AI-4115"/>
-		<info name="alt_title" value="たんたん・りずむ" />
+		<info name="alt_title" value="たんたん・りずむ"/>
 		<part name="card" interface="segaai_card">
-			<feature name="slot" value="rom_128" />
-			<dataarea name="rom" size="131072">
-				<rom name="tantan rhythm.bin" size="131072" crc="33059c56" sha1="8ee471bc616cd476b64dcd63eb493c980e0dd888" offset="0" />
+			<feature name="slot" value="rom_128"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="tantan rhythm.bin" size="0x20000" crc="33059c56" sha1="8ee471bc616cd476b64dcd63eb493c980e0dd888"/>
 			</dataarea>
 		</part>
 	</software>
@@ -221,11 +216,11 @@ AI-8003  Pinpon Music Melody
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="AI-4116"/>
-		<info name="alt_title" value="らんらん・めろでぃー" />
+		<info name="alt_title" value="らんらん・めろでぃー"/>
 		<part name="card" interface="segaai_card">
-			<feature name="slot" value="rom_128" />
-			<dataarea name="rom" size="131072">
-				<rom name="ranran melody.bin" size="131072" crc="6e7b1b27" sha1="d66eee759ac03bf877005d699e50af264f0f475b" offset="0" />
+			<feature name="slot" value="rom_128"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="ranran melody.bin" size="0x20000" crc="6e7b1b27" sha1="d66eee759ac03bf877005d699e50af264f0f475b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -236,11 +231,11 @@ AI-8003  Pinpon Music Melody
 		<year>198?</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="AI-4201"/>
-		<info name="alt_title" value="おけいこ　あいうえお" />
+		<info name="alt_title" value="おけいこ　あいうえお"/>
 		<part name="card" interface="segaai_card">
-			<feature name="slot" value="rom_128" />
-			<dataarea name="rom" size="131072">
-				<rom name="okeiko aiueo.bin" size="131072" crc="60bfd7c3" sha1="44fc802e66f086a3cb49e4fcde22ce6f704b405f" offset="0" />
+			<feature name="slot" value="rom_128"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="okeiko aiueo.bin" size="0x20000" crc="60bfd7c3" sha1="44fc802e66f086a3cb49e4fcde22ce6f704b405f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -254,8 +249,8 @@ AI-8003  Pinpon Music Melody
 		<info name="alt_title" value="はなまる　あいうえお" />
 		<part name="card" interface="segaai_card">
 			<feature name="slot" value="rom_128" />
-			<dataarea name="rom" size="131072">
-				<rom name="hanamaru aiueo.bin" size="131072" crc="252a0490" sha1="ab9d00a575bf0fb12557315fcd7c7e16caa8d802" offset="0" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="hanamaru aiueo.bin" size="0x20000" crc="252a0490" sha1="ab9d00a575bf0fb12557315fcd7c7e16caa8d802"/>
 			</dataarea>
 		</part>
 	</software>
@@ -266,9 +261,9 @@ AI-8003  Pinpon Music Melody
 		<publisher>Sega</publisher>
 		<info name="serial" value="AI-4202"/>
 		<part name="card" interface="segaai_card">
-			<feature name="slot" value="rom_256" />
-			<dataarea name="rom" size="262144">
-				<rom name="waku waku abc to 123.bin" size="262144" crc="de094c16" sha1="57e6c027004b2a4086d2a061c1373ee71c5f6faa" offset="0" />
+			<feature name="slot" value="rom_256"/>
+			<dataarea name="rom" size="0x40000">
+				<rom name="waku waku abc to 123.bin" size="0x40000" crc="de094c16" sha1="57e6c027004b2a4086d2a061c1373ee71c5f6faa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -279,9 +274,9 @@ AI-8003  Pinpon Music Melody
 		<publisher>Sega</publisher>
 		<info name="serial" value="AI-4203"/>
 		<part name="card" interface="segaai_card">
-			<feature name="slot" value="rom_256" />
-			<dataarea name="rom" size="262144">
-				<rom name="henshin kanji.bin" size="262144" crc="1248035d" sha1="920386cd72482a389217de9387a7ee39fc226be1" offset="0" />
+			<feature name="slot" value="rom_256"/>
+			<dataarea name="rom" size="0x40000">
+				<rom name="henshin kanji.bin" size="0x40000" crc="1248035d" sha1="920386cd72482a389217de9387a7ee39fc226be1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -292,9 +287,9 @@ AI-8003  Pinpon Music Melody
 		<publisher>Sega</publisher>
 		<info name="serial" value="AI-8001"/>
 		<part name="card" interface="segaai_card">
-			<feature name="slot" value="rom_128" />
-			<dataarea name="rom" size="131072">
-				<rom name="pinpon numbers.bin" size="131072" crc="8103d3b0" sha1="93ba9244bf6e07789617b2d182043da28aea0999" offset="0" />
+			<feature name="slot" value="rom_128"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="pinpon numbers.bin" size="0x20000" crc="8103d3b0" sha1="93ba9244bf6e07789617b2d182043da28aea0999"/>
 			</dataarea>
 		</part>
 	</software>
@@ -305,9 +300,9 @@ AI-8003  Pinpon Music Melody
 		<publisher>Sega</publisher>
 		<info name="serial" value="AI-8002"/>
 		<part name="card" interface="segaai_card">
-			<feature name="slot" value="rom_128" />
-			<dataarea name="rom" size="131072">
-				<rom name="pinpon music rhythm.bin" size="131072" crc="376195cb" sha1="709d53959082a3e5477fb15c187612c98b0baac5" offset="0" />
+			<feature name="slot" value="rom_128"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="pinpon music rhythm.bin" size="0x20000" crc="376195cb" sha1="709d53959082a3e5477fb15c187612c98b0baac5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -318,24 +313,25 @@ AI-8003  Pinpon Music Melody
 		<publisher>Sega</publisher>
 		<info name="serial" value="AI-8003"/>
 		<part name="card" interface="segaai_card">
-			<feature name="slot" value="rom_128" />
-			<dataarea name="rom" size="131072">
-				<rom name="pinpon music melody.bin" size="131072" crc="2deecb0c" sha1="3bddf3950921d09cf34e6def23cf491c8fa670c2" offset="0" />
+			<feature name="slot" value="rom_128"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="pinpon music melody.bin" size="0x20000" crc="2deecb0c" sha1="3bddf3950921d09cf34e6def23cf491c8fa670c2"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<!-- eigooha1 and eigogam1 sold in one package? -->
-	<software name="eigooha1">
+	<software name="eigooha1" supported="no">
 		<description>Eigo de Ohanashi 1</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="C-9532" />
-		<info name="alt_title" value="えいごわんだーすくーるー えいごでおはなし1" />
+		<notes>Cassette is not supported yet.</notes>
+		<info name="serial" value="C-9532"/>
+		<info name="alt_title" value="えいごわんだーすくーるー えいごでおはなし1"/>
 		<part name="card" interface="segaai_card">
-			<feature name="slot" value="rom_256" />
-			<dataarea name="rom" size="262144">
-				<rom name="eigo de ohanashi 1.bin" size="262144" crc="a43c79ba" sha1="2f69ea2b126803463f512c4b95c5586961214eaa" offset="0" />
+			<feature name="slot" value="rom_256"/>
+			<dataarea name="rom" size="0x40000">
+				<rom name="eigo de ohanashi 1.bin" size="0x40000" crc="a43c79ba" sha1="2f69ea2b126803463f512c4b95c5586961214eaa"/>
 			</dataarea>
 		</part> 
 		<part name="cassa" interface="flac_cass">
@@ -351,16 +347,17 @@ AI-8003  Pinpon Music Melody
 	</software>
 
 	<!-- eigooha1 and eigogam1 sold in one package? -->
-	<software name="eigogam1">
+	<software name="eigogam1" supported="no">
 		<description>Eigo de Game 1: Popo no Yume</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="C-9533" />
-		<info name="alt_title" value="えいごわんだーすくーるー えいごでげーむ1" />
+		<notes>Cassette is not supported yet.</notes>
+		<info name="serial" value="C-9533"/>
+		<info name="alt_title" value="えいごわんだーすくーるー えいごでげーむ1"/>
 		<part name="card" interface="segaai_card">
-			<feature name="slot" value="rom_256" />
-			<dataarea name="rom" size="262144">
-				<rom name="eigo de game 1 popo no yume.bin" size="262144" crc="096ed76a" sha1="c9ad9479b72c7b58c596feaab984697b6cc1aa9e" offset="0" />
+			<feature name="slot" value="rom_256"/>
+			<dataarea name="rom" size="0x40000">
+				<rom name="eigo de game 1 popo no yume.bin" size="0x40000" crc="096ed76a" sha1="c9ad9479b72c7b58c596feaab984697b6cc1aa9e"/>
 			</dataarea>
 		</part>
 		<part name="cass" interface="flac_cass">
@@ -371,16 +368,17 @@ AI-8003  Pinpon Music Melody
 	</software>
 
 	<!-- eigooha2 and eigogam2 sold in one package? -->
-	<software name="eigooha2">
+	<software name="eigooha2" supported="no">
 		<description>Eigo de Ohanashi 2</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="C-9535" />
-		<info name="alt_title" value="えいごわんだーすくーるー えいごでおはなし2" />
+		<notes>Cassette is not supported yet.</notes>
+		<info name="serial" value="C-9535"/>
+		<info name="alt_title" value="えいごわんだーすくーるー えいごでおはなし2"/>
 		<part name="card" interface="segaai_card">
-			<feature name="slot" value="rom_256" />
-			<dataarea name="rom" size="262144">
-				<rom name="eigo de ohanashi 2.bin" size="262144" crc="ce241ffb" sha1="6d903af3c7f7f98090228f011936132ddd4f2cc6" offset="0" />
+			<feature name="slot" value="rom_256"/>
+			<dataarea name="rom" size="0x40000">
+				<rom name="eigo de ohanashi 2.bin" size="0x40000" crc="ce241ffb" sha1="6d903af3c7f7f98090228f011936132ddd4f2cc6"/>
 			</dataarea>
 		</part> 
 		<part name="cassa" interface="flac_cass">
@@ -400,16 +398,17 @@ AI-8003  Pinpon Music Melody
 		The other menu entries hang waiting for the cassette.
 	-->
 	<!-- eigooha2 and eigogam2 sold in one package? -->
-	<software name="eigogam2" supported="partial">
+	<software name="eigogam2" supported="no">
 		<description>Eigo de Game 2: Popoland no Himitsu</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="C-9536" />
-		<info name="alt_title" value="えいごわんだーすくーるー えいごでげーむ2" />
+		<notes>Cassette is not supported yet.</notes>
+		<info name="serial" value="C-9536"/>
+		<info name="alt_title" value="えいごわんだーすくーるー えいごでげーむ2"/>
 		<part name="card" interface="segaai_card">
-			<feature name="slot" value="rom_256" />
-			<dataarea name="rom" size="262144">
-				<rom name="eigo de game 2 popoland no himitsu.bin" size="262144" crc="bd55f48c" sha1="8d25a2cbbf53844df94fc1becf461adc8b3f0190" offset="0" />
+			<feature name="slot" value="rom_256"/>
+			<dataarea name="rom" size="0x40000">
+				<rom name="eigo de game 2 popoland no himitsu.bin" size="0x40000" crc="bd55f48c" sha1="8d25a2cbbf53844df94fc1becf461adc8b3f0190"/>
 			</dataarea>
 		</part>
 		<part name="cass" interface="flac_cass">
@@ -423,11 +422,11 @@ AI-8003  Pinpon Music Melody
 		<description>AI Enikki</description>
 		<year>1989</year>
 		<publisher>Sega?</publisher>
-		<info name="alt_title" value="ＡＩえにっき" />
+		<info name="alt_title" value="ＡＩえにっき"/>
 		<part name="card" interface="segaai_card">
-			<feature name="slot" value="rom_128" />
-			<dataarea name="rom" size="131072">
-				<rom name="ai enikki.bin" size="131072" crc="79bcc160" sha1="6a4280af6d668b0047629ad64e2b85626805913a" offset="0" />
+			<feature name="slot" value="rom_128"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="ai enikki.bin" size="0x20000" crc="79bcc160" sha1="6a4280af6d668b0047629ad64e2b85626805913a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -437,11 +436,11 @@ AI-8003  Pinpon Music Melody
 		<description>AI Enikki (1986)</description>
 		<year>1986</year>
 		<publisher>Sega?</publisher>
-		<info name="alt_title" value="ＡＩえにっき" />
+		<info name="alt_title" value="ＡＩえにっき"/>
 		<part name="card" interface="segaai_card">
-			<feature name="slot" value="rom_128" />
-			<dataarea name="rom" size="131072">
-				<rom name="ai enikki 1986.bin" size="98304" crc="1849119c" sha1="2b04fe1ba0196ef24f2e1ea0270785cbbbf29c40" offset="0" />
+			<feature name="slot" value="rom_128"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="ai enikki 1986.bin" size="0x18000" crc="1849119c" sha1="2b04fe1ba0196ef24f2e1ea0270785cbbbf29c40"/>
 			</dataarea>
 		</part>
 	</software>
