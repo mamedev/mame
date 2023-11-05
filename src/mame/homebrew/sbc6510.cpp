@@ -94,7 +94,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
-	required_device<avr8_device> m_videocpu;
+	required_device<atmega88_device> m_videocpu;
 	required_device<generic_terminal_device> m_terminal;
 	required_ioport_array<9> m_keyboard;
 };
