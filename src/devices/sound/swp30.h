@@ -50,7 +50,7 @@ private:
 	static const std::array<s32, 0x20> decay_linear_step;
 	static const std::array<s32, 16> panmap;
 	std::array<s32,  0x80> m_global_step;
-	std::array<s16, 0x100> m_sample_log8;
+	std::array<s16, 0x100> m_dpcm;
 
 	std::array<s32,  0x40> m_sample_start;
 	std::array<s32,  0x40> m_sample_end;
@@ -74,6 +74,9 @@ private:
 	std::array<s32,  0x40> m_glo_level_cur;
 	std::array<s32,  0x40> m_pan_l;
 	std::array<s32,  0x40> m_pan_r;
+	std::array<s16,  0x40> m_dpcm_current;
+	std::array<s16,  0x40> m_dpcm_next;
+	std::array<u32,  0x40> m_dpcm_address;
 
 	std::array<u64, 0x180> m_meg_program;
 	std::array<s16, 0x180> m_meg_const;

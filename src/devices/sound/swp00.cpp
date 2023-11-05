@@ -1326,7 +1326,7 @@ void swp00_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 				val1 = (read_byte(base_address + spos + 1) << 8);
 				break;
 
-			case 3: { // 8-bits logarithmic
+			case 3: { // 8-bits delta-pcm
 				u32 target_address = base_address + spos + 1;
 				while(m_dpcm_address[chan] <= target_address) {
 					m_dpcm_current[chan] = m_dpcm_next[chan];
