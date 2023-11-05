@@ -121,7 +121,6 @@ public:
 	virtual void mon_w(int state);
 	bool ready_r();
 	void set_ready(bool state);
-	double get_pos();
 	virtual void tfsel_w(int state) { }    // 35SEL line for Apple Sony drives
 
 	virtual bool wpt_r(); // Mac sony drives using this for various reporting
@@ -131,6 +130,8 @@ public:
 	int mon_r() { return m_mon; }
 	bool ss_r() { return m_ss; }
 	bool twosid_r();
+	bool floppy_is_hd();
+	bool floppy_is_ed();
 
 	virtual bool writing_disabled() const;
 
@@ -270,35 +271,6 @@ protected:
 	// Sound
 	bool    m_make_sound;
 	floppy_sound_device* m_sound_out;
-
-	// Flux visualization
-	struct flux_per_pixel_info {
-		uint32_t m_position;      // 0-199999999 Angular position in the track, 0xffffffff if not in the floppy image
-		uint16_t m_r;             // Distance from the center
-		uint8_t m_combined_track; // No need to store head, it's y >= flux_screen_sy/2
-		uint8_t m_color;          // Computed gray level from the flux counts
-	};
-
-	struct flux_per_combined_track_info {
-		std::vector<flux_per_pixel_info *> m_pixels[2];
-		uint32_t m_span;
-		uint8_t m_track;
-		uint8_t m_subtrack;
-	};
-
-	std::vector<flux_per_pixel_info> m_flux_per_pixel_infos;
-	std::vector<flux_per_combined_track_info> m_flux_per_combined_track_infos;
-
-	optional_device<screen_device> m_flux_screen;
-
-	static constexpr int flux_screen_sx = 501;
-	static constexpr int flux_screen_sy = 1002;
-	static constexpr int flux_min_r     = 100;
-	static constexpr int flux_max_r     = 245;
-
-	void flux_image_prepare();
-	void flux_image_compute_for_track(int track, int head);
-	uint32_t flux_screen_update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 #define DECLARE_FLOPPY_IMAGE_DEVICE(Type, Name, Interface) \
@@ -327,6 +299,7 @@ DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_SSDD,     floppy_525_ssdd,     "floppy_5_
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_DD,       floppy_525_dd,       "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_SSQD,     floppy_525_ssqd,     "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_QD,       floppy_525_qd,       "floppy_5_25")
+DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_QD16,     floppy_525_qd16,     "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_HD,       floppy_525_hd,       "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_8_SSSD,       floppy_8_sssd,       "floppy_8")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_8_DSSD,       floppy_8_dssd,       "floppy_8")
