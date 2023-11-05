@@ -38319,6 +38319,10 @@ sage2
 @source:saitek/ccompan.cpp
 ccompan
 
+@source:saitek/ccompan2.cpp
+ccompan2
+expchess
+
 @source:saitek/chesstrv.cpp
 chesstrv
 chesstrvi
@@ -38334,8 +38338,8 @@ cp2000
 @source:saitek/delta1.cpp
 ccdelta1
 
-@source:saitek/exchess.cpp
-exchess
+@source:saitek/exechess.cpp
+exechess
 
 @source:saitek/intchess.cpp
 intchess
