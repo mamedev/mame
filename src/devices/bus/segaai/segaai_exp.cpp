@@ -10,10 +10,6 @@
 #include "emu.h"
 #include "segaai_exp.h"
 
-#define VERBOSE 0
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
-
-
 DEFINE_DEVICE_TYPE(SEGAAI_EXP_SLOT, segaai_exp_slot_device, "segaai_exp_slot", "Sega AI Expansion Slot")
 
 
