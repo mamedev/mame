@@ -31,8 +31,8 @@ Concord II:
 - rest is same as ccompan2, it just has the buttons/status leds at the bottom
   instead of at the right
 
-Explorer Chess and Chess Companion II / Concord are on the same MCU, pin P23 is
-either VCC or GND to distinguish between the two.
+Explorer Chess and Chess Companion II / Concord have the same MCU ROM, pin P23
+is either VCC or GND to distinguish between the two.
 
 0609V171 MCU is used in:
 - SciSys Chess Companion II (2 revisions)
@@ -189,7 +189,7 @@ void ccompan2_state::main_map(address_map &map)
 {
 	map(0x0000, 0x0014).m(m_maincpu, FUNC(hd6301v1_cpu_device::m6801_io));
 	map(0x0080, 0x00ff).ram(); // internal
-	map(0xf000, 0xffff).rom();
+	map(0xf000, 0xffff).rom(); // internal
 }
 
 
