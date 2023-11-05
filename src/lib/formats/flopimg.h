@@ -525,14 +525,18 @@ public:
 
 	//! Variants
 	enum {
-		SSSD  = 0x44535353, //!< "SSSD", Single-sided single-density
-		SSDD  = 0x44445353, //!< "SSDD", Single-sided double-density
-		SSQD  = 0x44515353, //!< "SSQD", Single-sided quad-density
-		DSSD  = 0x44535344, //!< "DSSD", Double-sided single-density
-		DSDD  = 0x44445344, //!< "DSDD", Double-sided double-density (720K in 3.5, 360K in 5.25)
-		DSQD  = 0x44515344, //!< "DSQD", Double-sided quad-density (720K in 5.25, means DD+80 tracks)
-		DSHD  = 0x44485344, //!< "DSHD", Double-sided high-density (1440K)
-		DSED  = 0x44455344  //!< "DSED", Double-sided extra-density (2880K)
+		SSSD   = 0x44535353, //!< "SSSD", Single-sided single-density
+		SSDD   = 0x44445353, //!< "SSDD", Single-sided double-density
+		SSDD16 = 0x36314453, //!< "SD16", Single-sided double-density 16 hard sector
+		SSQD   = 0x44515353, //!< "SSQD", Single-sided quad-density
+		SSQD16 = 0x36315153, //!< "SQ16", Single-sided quad-density 16 hard sector
+		DSSD   = 0x44535344, //!< "DSSD", Double-sided single-density
+		DSDD   = 0x44445344, //!< "DSDD", Double-sided double-density (720K in 3.5, 360K in 5.25)
+		DSDD16 = 0x36314444, //!< "DD16", Double-sided double-density 16 hard sector (360K in 5.25)
+		DSQD   = 0x44515344, //!< "DSQD", Double-sided quad-density (720K in 5.25, means DD+80 tracks)
+		DSQD16 = 0x36315144, //!< "DQ16", Double-sided quad-density 16 hard sector (720K in 5.25, means DD+80 tracks)
+		DSHD   = 0x44485344, //!< "DSHD", Double-sided high-density (1440K)
+		DSED   = 0x44455344  //!< "DSED", Double-sided extra-density (2880K)
 	};
 
 	//! Encodings
@@ -559,9 +563,20 @@ public:
 	//! @return the variant.
 	uint32_t get_variant() const noexcept { return variant; }
 	//! @param v the variant.
-	void set_variant(uint32_t v) { variant = v; }
+	void set_variant(uint32_t v);
 	//! @param v the variant.
-	void set_form_variant(uint32_t f, uint32_t v) { if(form_factor == FF_UNKNOWN) form_factor = f; variant = v; }
+	void set_form_variant(uint32_t f, uint32_t v) { if(form_factor == FF_UNKNOWN) form_factor = f; set_variant(v); }
+
+	//! Find most recent and next index hole for provided angular position.
+	//! The most recent hole may be equal to provided position. The next
+	//! hole will be 200000000 if all holes of the current rotation are in
+	//! the past.
+
+	/*! @param pos angular position
+	    @param last most recent index hole
+	    @param next next index hole
+	*/
+	void find_index_hole(uint32_t pos, uint32_t &last, uint32_t &next) const;
 
 	/*!
 	  @param track
@@ -621,6 +636,14 @@ private:
 	// track number multiplied by 4 then head
 	// last array size may be bigger than actual track size
 	std::vector<std::vector<track_info> > track_array;
+
+	// Additional index holes in increasing order. Entries are absolute
+	// positions of index holes in the same units as cell_data. The
+	// positions are the start of the hole, not the center of the hole. The
+	// hole at angular position 0 is implicit, so an empty list encodes a
+	// regular soft-sectored disk. Additional holes are found on
+	// hard-sectored disks.
+	std::vector<uint32_t> index_array;
 };
 
 #endif // MAME_FORMATS_FLOPIMG_H
