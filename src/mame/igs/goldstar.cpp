@@ -811,7 +811,7 @@ void goldstar_state::nfm_map(address_map &map)
 	map(0xfc80, 0xffff).ram();
 }
 
-void goldstar_state::sunspckr_map(address_map &map)
+void goldstar_state::animalhs_map(address_map &map)
 {
 	map(0x0000, 0xb7ff).rom().nopw();
 
@@ -960,7 +960,7 @@ void goldstar_state::pkrmast_portmap(address_map &map)
 	map(0xf0, 0xf0).nopw();    /* Writing 0's and 1's constantly.  Watchdog feeder? */
 }
 
-void goldstar_state::sunspckr_portmap(address_map &map) // TODO: incomplete!
+void goldstar_state::animalhs_portmap(address_map &map) // TODO: incomplete!
 {
 	map.global_mask(0xff);
 
@@ -8647,7 +8647,7 @@ static GFXDECODE_START( gfx_cm97 )
 	GFXDECODE_ENTRY( "gfx", 0x20000, cm97_layout32, 0x0, 32 )
 GFXDECODE_END
 
-static const gfx_layout sunspckr_tiles8x32_layout =
+static const gfx_layout animalhs_tiles8x32_layout =
 {
 	8,32,
 	RGN_FRAC(1,1),
@@ -8658,9 +8658,9 @@ static const gfx_layout sunspckr_tiles8x32_layout =
 	32*32
 };
 
-static GFXDECODE_START( gfx_sunspckr )
+static GFXDECODE_START( gfx_animalhs )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, sunspckr_tiles8x32_layout, 128+64, 4 )
+	GFXDECODE_ENTRY( "gfx2", 0, animalhs_tiles8x32_layout, 128+64, 4 )
 GFXDECODE_END
 
 
@@ -9779,15 +9779,15 @@ void goldstar_state::crazybonb(machine_config &config)
 	m_maincpu->set_addrmap(AS_OPCODES, &goldstar_state::super972_decrypted_opcodes_map);
 }
 
-void goldstar_state::sunspckr(machine_config &config)
+void goldstar_state::animalhs(machine_config &config)
 {
 	crazybonb(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &goldstar_state::sunspckr_map);
-	m_maincpu->set_addrmap(AS_IO, &goldstar_state::sunspckr_portmap);
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldstar_state::animalhs_map);
+	m_maincpu->set_addrmap(AS_IO, &goldstar_state::animalhs_portmap);
 
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(goldstar_state::screen_update_cmast91));
-	m_gfxdecode->set_info(gfx_sunspckr);
+	m_gfxdecode->set_info(gfx_animalhs);
 	m_palette->set_init(FUNC(goldstar_state::cmast91_palette));
 }
 
@@ -16634,7 +16634,7 @@ ROM_START( eldoraddo ) // String "DYNA ELD3 V1.1TA" on program ROM
 	ROM_LOAD( "pal16l8.e11", 0x200, 0x104, NO_DUMP )
 ROM_END
 
-ROM_START( sunspckr ) // "Suns Pecker" (also known as "Animal House"). Strings "SUNS PECKER V1.0" and "SUNS CO LTD." on program ROM
+ROM_START( animalhs ) // Animal House. Strings "SUNS PECKER V1.0" and "SUNS CO LTD." on program ROM
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD16_WORD( "1_am27512.l2", 0x00000, 0x10000, CRC(258208d7) SHA1(11a75963c535636ff1320a3d3c3b9867a1f169d4) )
 
@@ -16664,7 +16664,41 @@ ROM_START( sunspckr ) // "Suns Pecker" (also known as "Animal House"). Strings "
 	ROM_LOAD( "ani_910_ep910.bin",  0x000, 0x117, CRC(446af3c9) SHA1(c38119c70d1b6e4a49bebcd59112437d9a2838ae) )
 ROM_END
 
+/* Animal House (set 2). Strings "SUNS PECKER V1.0" and "SUNS CO LTD." on program ROM
+   Hardware:
+    -GS Z8400APS.
+    -6 banks of 8 DIP switches.
+    -40-pin DIP chip labeled 89C10 (AY8910 clone).
+    -12.000 MHz xtal.
+*/
+ROM_START( animalhsa )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD16_WORD( "1_tms27c512.u17", 0x00000, 0x10000, CRC(58303ab9) SHA1(f11f7337a8c353ba342412d7015337f16e6820b0) )
 
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "2_ds40986.u100", 0x00000, 0x20000, CRC(8adb2cf7) SHA1(b5ba73e9e1ba9a443b33bd90579b05f143fef91a) )
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "3_d27c010.u101", 0x00000, 0x20000, CRC(44a9ae66) SHA1(86db8fdebcb82b9114e16f91f4aaa1f9b733e9ae))
+
+	ROM_REGION( 0x300, "proms", 0 )
+	ROM_LOAD( "82s129.u47", 0x000, 0x100, CRC(1564bb12) SHA1(641a681866ac5d53d88752a076ad958c94e68a3a) )
+	ROM_LOAD( "82s129.u49", 0x100, 0x100, CRC(db31f7ac) SHA1(9f23d65dc0c43b1700093461d2c5277cc1d42f49) )
+	ROM_LOAD( "82s129.u48", 0x200, 0x100, CRC(49c4df77) SHA1(860fa207c74eab00ea6c7f3fa16aafba84195336) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "82s129.u24", 0x000, 0x100, CRC(209ccf78) SHA1(9f92875855702c7cc4d429ba5f463b698e0e91d3) )
+
+	ROM_REGION( 0x400, "plds", 0 )
+	ROM_LOAD( "palce20v8h.u28", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce20v8h.u29", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce20v8h.u45", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal20v8as.u46",  0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal20v8as.u55",  0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal20v8as.u50",  0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal20v8.u51",    0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce20v8h.u52", 0x000, 0x117, NO_DUMP )
+ROM_END
 
 /*****************************************************************************************
 
@@ -20053,7 +20087,7 @@ void cmaster_state::init_super7() // possibly incomplete decryption. Game appear
 	}
 }
 
-void goldstar_state::init_sunspckr()
+void goldstar_state::init_animalhs()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -20096,7 +20130,8 @@ GAME(  1994, chryangla, ncb3,     chryangla,ncb3,     cb3_state,      init_chrya
 GAME(  1991, eldoradd,  0,        eldoradd, chrygld,  cb3_state,      empty_init,     ROT0, "Dyna",              "El Dorado (V5.1DR)",                          MACHINE_NOT_WORKING) // everything
 GAME(  1991, eldoraddo, eldoradd, eldoradd, chrygld,  cb3_state,      empty_init,     ROT0, "Dyna",              "El Dorado (V1.1TA)",                          MACHINE_NOT_WORKING) // everything
 
-GAME(  1991, sunspckr,  0,        sunspckr, cmv4,     goldstar_state, init_sunspckr,  ROT0, "Suns Co Ltd.",      "Animal House (V1.0)",                         MACHINE_NOT_WORKING) // improve GFX drawing, correct palette decode, I/O, etc
+GAME(  1991, animalhs,  0,        animalhs, cmv4,     goldstar_state, init_animalhs,  ROT0, "Suns Co Ltd.",      "Animal House (V1.0, set 1)",                  MACHINE_NOT_WORKING) // improve GFX drawing, correct palette decode, I/O, etc
+GAME(  1991, animalhsa, animalhs, animalhs, cmv4,     goldstar_state, init_animalhs,  ROT0, "Suns Co Ltd.",      "Animal House (V1.0, set 2)",                  MACHINE_NOT_WORKING) // improve GFX drawing, correct palette decode, I/O, etc
 
 // looks like a hack of Cherry Bonus 3
 GAME(  1994, chryangl,  ncb3,     chryangl, chryangl,  cmaster_state, init_chryangl,  ROT0, "bootleg (G.C.I.)",  "Cherry Angel (set 1)",                                MACHINE_NOT_WORKING ) // SKY SUPERCB 1.0 string, decrypted but hangs when betting
