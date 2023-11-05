@@ -70,24 +70,55 @@ timer 1 - mode 2 - rate generator (0E90), gate involved
 
 #include "emu.h"
 #include "soundbox.h"
+#include "machine/pit8253.h"
+#include "machine/i8255.h"
+#include "sound/ymopm.h"
 #include "speaker.h"
 
 
-DEFINE_DEVICE_TYPE(SEGAAI_SOUNDBOX, segaai_soundbox_device, "segaai_soundbox", "Sega AI Expansion - Soundbox")
+namespace {
 
-
-segaai_soundbox_device::segaai_soundbox_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, SEGAAI_SOUNDBOX, tag, owner, clock)
-	, segaai_exp_interface( mconfig, *this )
-	, m_tmp8253(*this, "tmp8253")
-	, m_tmp8255(*this, "tmp8255")
-	, m_ym2151(*this, "ym2151")
-	, m_rom(*this, "soundbox")
-	, m_rows(*this, "ROW%u", 0U)
-	, m_row(0)
-	, m_8255_portb(0)
+class segaai_soundbox_device : public device_t,
+								public segaai_exp_interface
 {
-}
+public:
+	segaai_soundbox_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: device_t(mconfig, SEGAAI_SOUNDBOX, tag, owner, clock)
+		, segaai_exp_interface( mconfig, *this )
+		, m_tmp8253(*this, "tmp8253")
+		, m_tmp8255(*this, "tmp8255")
+		, m_ym2151(*this, "ym2151")
+		, m_rom(*this, "soundbox")
+		, m_rows(*this, "ROW%u", 0U)
+		, m_row(0)
+		, m_8255_portb(0)
+	{ }
+
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override;
+
+protected:
+	virtual void device_start() override;
+
+private:
+	u8 tmp8255_porta_r();
+	u8 tmp8255_portb_r();
+	void tmp8255_portb_w(u8 data);
+	void tmp8255_portc_w(u8 data);
+	void ym2151_irq_w(int state);
+	void tmp8253_out0_w(int state);
+	void tmp8253_out1_w(int state);
+
+	required_device<pit8253_device> m_tmp8253;
+	required_device<i8255_device> m_tmp8255;
+	required_device<ym2151_device> m_ym2151;
+	required_region_ptr<u8> m_rom;
+	required_ioport_array<8> m_rows;
+	std::vector<u8> m_ram;    // 128KB Expansion RAM
+	u8 m_row;
+	u8 m_8255_portb;
+};
 
 void segaai_soundbox_device::device_add_mconfig(machine_config &config)
 {
@@ -239,30 +270,21 @@ u8 segaai_soundbox_device::tmp8255_porta_r()
 {
 	// Read pressed keys on music keyboard row (see routine @0x82399)
 	u8 result = 0xff;
-	if (BIT(m_row, 0)) result &= m_rows[0]->read();
-	if (BIT(m_row, 1)) result &= m_rows[1]->read();
-	if (BIT(m_row, 2)) result &= m_rows[2]->read();
-	if (BIT(m_row, 3)) result &= m_rows[3]->read();
-	if (BIT(m_row, 4)) result &= m_rows[4]->read();
-	if (BIT(m_row, 5)) result &= m_rows[5]->read();
-	if (BIT(m_row, 6)) result &= m_rows[6]->read();
-	if (BIT(m_row, 7)) result &= m_rows[7]->read();
+	for (int i = 0; i < 8; i++)
+		if (BIT(m_row, i)) result &= m_rows[i]->read();
 	return result;
 }
-
 
 u8 segaai_soundbox_device::tmp8255_portb_r()
 {
 	return 0xff;
 }
 
-
 void segaai_soundbox_device::tmp8255_portb_w(u8 data)
 {
 	osd_printf_info("soundbox 8255 port B write $%02X\n", data);
 	m_tmp8253->write_gate1(BIT(data, 7));
 }
-
 
 void segaai_soundbox_device::tmp8255_portc_w(u8 data)
 {
@@ -271,20 +293,21 @@ void segaai_soundbox_device::tmp8255_portc_w(u8 data)
 	m_row = data;
 }
 
-
 void segaai_soundbox_device::ym2151_irq_w(int state)
 {
 	osd_printf_info("Soundbox: IRQ from ym2151 is '%s'\n", state ? "ASSERT" : "CLEAR");
 }
-
 
 void segaai_soundbox_device::tmp8253_out0_w(int state)
 {
 //	osd_printf_info("Soundbox: OUT0 from tmp8253 is '%s'\n", state ? "ASSERT" : "CLEAR");
 }
 
-
 void segaai_soundbox_device::tmp8253_out1_w(int state)
 {
 //	osd_printf_info("Soundbox: OUT1 from tmp8253 is '%s'\n", state ? "ASSERT" : "CLEAR");
 }
+
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(SEGAAI_SOUNDBOX, segaai_exp_interface, segaai_soundbox_device, "segaai_soundbox", "Sega AI Expansion - Soundbox")
