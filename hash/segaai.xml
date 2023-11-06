@@ -406,7 +406,7 @@ AI-8003  Pinpon Music Melody
 		<publisher>Sega</publisher>
 		<notes>Cassette is not supported yet. Only the first entry from the menu works, the color names and 'big' is spoken. The other menu entries hang waiting for the cassette.</notes>
 		<info name="serial" value="C-9536"/>
-		<info name="alt_title" value="えいごでげーむ2 Popelandのひみつ"/>
+		<info name="alt_title" value="えいごでげーむ2 Popolandのひみつ"/>
 		<part name="card" interface="segaai_card">
 			<feature name="slot" value="rom_256"/>
 			<dataarea name="rom" size="0x40000">
