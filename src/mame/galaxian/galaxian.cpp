@@ -15069,10 +15069,14 @@ ROM_END
 
 ROM_START( aracnisa )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "scorpio-1-2732.bin",      0x0000, 0x1000, CRC(8ff99c15) SHA1(c5609c50810636567664479c9e3dbd2ee6d354a2) )
-	ROM_LOAD( "scorpio-2-2732.bin",      0x1000, 0x1000, CRC(8682b604) SHA1(fc1d032ffb143e315f89458f14c0a900078d97da) )
-	ROM_LOAD( "scorpio-3-2732.bin",      0x2000, 0x1000, CRC(915223b2) SHA1(a3fb8a144b4a1b31912f0e421b6a030f4aecf221) )
-	ROM_LOAD( "scorpio-4-2732.bin",      0x3000, 0x1000, CRC(76eaae54) SHA1(51591d00e9711c82a917a97033d80be3e081fd86) )
+	ROM_LOAD( "scorpio-4-2732.bin",      0x0000, 0x0200, CRC(76eaae54) SHA1(51591d00e9711c82a917a97033d80be3e081fd86) )
+	ROM_CONTINUE(                        0x3200, 0x0e00 )
+	ROM_LOAD( "scorpio-3-2732.bin",      0x1000, 0x0200, CRC(915223b2) SHA1(a3fb8a144b4a1b31912f0e421b6a030f4aecf221) )
+	ROM_CONTINUE(                        0x2200, 0x0e00 )
+	ROM_LOAD( "scorpio-1-2732.bin",      0x2000, 0x0200, CRC(8ff99c15) SHA1(c5609c50810636567664479c9e3dbd2ee6d354a2) )
+	ROM_CONTINUE(                        0x0200, 0x0e00 )
+	ROM_LOAD( "scorpio-2-2732.bin",      0x3000, 0x0200, CRC(8682b604) SHA1(fc1d032ffb143e315f89458f14c0a900078d97da) )
+	ROM_CONTINUE(                        0x1200, 0x0e00 )
 	ROM_LOAD( "scorpio-5-2732.bin",      0x5000, 0x1000, CRC(f27ee3e4) SHA1(e034507b99705492b6a8aa34764a1e3222ba31b2) )
 	ROM_LOAD( "scorpio-6-2716.bin",      0x6000, 0x0800, CRC(fdfc2c82) SHA1(6b8914d6496c216de5bf160cd798b8f6facd44d2) )
 
@@ -16484,7 +16488,7 @@ GAME( 1982, scorpiona,   scorpion, scorpion,   scorpion,   zac_scorpion_state, i
 GAME( 1982, scorpionb,   scorpion, scorpion,   scorpion,   zac_scorpion_state, init_scorpion, ROT90,  "Zaccaria",           "Scorpion (set 3)",                                             MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
 GAME( 19??, scorpionmc,  scorpion, scorpnmc,   scorpnmc,   galaxian_state,     init_batman2,  ROT90,  "bootleg? (Dorneer)", "Scorpion (Moon Cresta hardware)",                              MACHINE_SUPPORTS_SAVE )
 GAME( 19??, aracnis,     scorpion, scorpnmc,   aracnis,    galaxian_state,     init_batman2,  ROT90,  "bootleg",            "Aracnis (bootleg of Scorpion on Moon Cresta hardware, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 19??, aracnisa,    scorpion, scorpnmc,   aracnis,    galaxian_state,     init_batman2,  ROT90,  "bootleg",            "Aracnis (bootleg of Scorpion on Moon Cresta hardware, set 2)", MACHINE_NOT_WORKING )
+GAME( 19??, aracnisa,    scorpion, scorpnmc,   aracnis,    galaxian_state,     init_batman2,  ROT90,  "bootleg",            "Aracnis (bootleg of Scorpion on Moon Cresta hardware, set 2)", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // colors need verifying, resets soon (some protection?)
 
 // SF-X hardware; based on Scramble with extra Z80 and 8255 driving a DAC-based sample player
 GAME( 1983, sfx,         0,        sfx,        sfx,        nihon_sfx_state, init_sfx,       ORIENTATION_FLIP_X, "Nihon Game (Nichibutsu license)",     "SF-X",         MACHINE_SUPPORTS_SAVE )
