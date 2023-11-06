@@ -310,8 +310,6 @@ void galaxold_state::scrambleo_map(address_map &map)
 
 
 
-
-
 void galaxold_state::_4in1_map(address_map &map)
 {
 	map(0x0000, 0x3fff).bankr("bank1");    // banked game code
@@ -2012,6 +2010,27 @@ ROM_START( scrambleo ) // MR-1A + MP-28 PCBs
 	ROM_LOAD( "sc_cprom.bin",      0x0000, 0x0020, CRC(413703bf) SHA1(66648b2b28d3dcbda5bdb2605d1977428939dd3c) )
 ROM_END
 
+/* Seems like a modification of the Okapi bootleg to add a "continue" option.
+   Probably was not done by Okapi itself, but by a Spanish bootlegger (the "continue" screen is in Spanish). */
+ROM_START( scrabbleo )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "scr-1-2716.bin",  0x0000, 0x0800, CRC(b363dcc9) SHA1(3803c71da0fe37081fc6d29af6188edfc4332dbb) )
+	ROM_LOAD( "scr-2-2716.bin",  0x0800, 0x0800, CRC(4f78a15d) SHA1(be5702354bfc070c29172e3dd902195442531b73) )
+	ROM_LOAD( "scr-3-2716.bin",  0x1000, 0x0800, CRC(cd31749a) SHA1(0250530e76cf5019df61bfe3e0a85969e011b8f9) )
+	ROM_LOAD( "scr-4-2716.bin",  0x1800, 0x0800, CRC(f055e1e3) SHA1(51eabb4915ceade37def5fe39129b15f0a37bd65) )
+	ROM_LOAD( "scr-5-2716.bin",  0x2000, 0x0800, CRC(15f10df7) SHA1(93c9abcd61fbe5c5dd33a9387527565af6117c40) )
+	ROM_LOAD( "scr-6-2716.bin",  0x2800, 0x0800, CRC(dd15f10e) SHA1(d7efd498ab7702127dc48c5ab57d207732924c38) )
+	ROM_LOAD( "scr-7-2716.bin",  0x3000, 0x0800, CRC(0bb49470) SHA1(05a6fe3010c2136284ca76352dac147797c79778) )
+	ROM_LOAD( "scr-8-2716.bin",  0x3800, 0x0800, CRC(6db9f380) SHA1(0678ffe16886ba76314ea14f15b4bb5752366dd5) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "scr-9-2716.bin",  0x0000, 0x0800, CRC(4708845b) SHA1(a8b1ad19a95a9d35050a2ab7194cc96fc5afcdc9) )
+	ROM_LOAD( "scr-10-2716.bin", 0x0800, 0x0800, CRC(11fd2887) SHA1(69844e48bb4d372cac7ae83c953df573c7ecbb7f) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "74s288.bin",      0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
+ROM_END
+
 ROM_START( 4in1 )
 	ROM_REGION( 0x20000, "maincpu", 0 )   // 64k for code  64k for banked code, encrypted
 	// Menu Code, Fixed at 0xc000 - 0xdfff
@@ -2448,8 +2467,6 @@ ROM_END
 
 
 
-
-
 /*
 Bulls Eye Darts conversion by Senko Industries Ltd (1984)
 
@@ -2507,6 +2524,7 @@ GAME( 1981, scramb2,   scramble, scramb2,   scramb2,   galaxold_state, empty_ini
 GAME( 1981, scramb3,   scramble, scramb3,   scramb2,   galaxold_state, empty_init,     ROT90,  "bootleg",                       "Scramble (bootleg, set 2)",                                MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, scrambler, scramble, scrambler, scrambler, galaxold_state, empty_init,     ROT90,  "bootleg (Reben S.A.)",          "Scramble (Reben S.A. Spanish bootleg)",                    MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, scrambleo, scramble, scrambleo, scrambleo, galaxold_state, empty_init,     ROT90,  "bootleg (Okapi)",               "Scramble (Okapi bootleg)",                                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, scrabbleo, scramble, scrambler, scrambler, galaxold_state, empty_init,     ROT90,  "bootleg (Okapi?)",              "Scrabble (Spanish bootleg of Scramble)",                   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, 4in1,      0,        _4in1,     4in1,      galaxold_state, init_4in1,      ROT90,  "Armenia / Food and Fun",        "4 Fun in 1",                                               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, dkongjrm,  dkongjr,  dkongjrm,  dkongjrm,  galaxold_state, empty_init,     ROT90,  "bootleg",                       "Donkey Kong Jr. (bootleg on Moon Cresta hardware, set 1)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, dkongjrmc, dkongjr,  dkongjrmc, dkongjrmc, galaxold_state, empty_init,     ROT90,  "bootleg (Centromatic)",         "Donkey Kong Jr. (bootleg on Moon Cresta hardware, set 2)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // sprites leave artifacts
