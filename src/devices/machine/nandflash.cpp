@@ -27,6 +27,7 @@ DEFINE_DEVICE_TYPE(SAMSUNG_K9F2808U0B,  samsung_k9f2808u0b_device,  "samsung_k9f
 DEFINE_DEVICE_TYPE(SAMSUNG_K9F1G08U0B,  samsung_k9f1g08u0b_device,  "samsung_k9f1g08u0b",  "Samsung K9F1G08U0B")
 DEFINE_DEVICE_TYPE(SAMSUNG_K9F1G08U0M,  samsung_k9f1g08u0m_device,  "samsung_k9f1g08u0m",  "Samsung K9F1G08U0M")
 DEFINE_DEVICE_TYPE(SAMSUNG_K9LAG08U0M,  samsung_k9lag08u0m_device,  "samsung_k9lag08u0m",  "Samsung K9LAG08U0M")
+DEFINE_DEVICE_TYPE(SAMSUNG_K9F2G08U0M,  samsung_k9f2g08u0m_device,  "samsung_k9f2g08u0m",  "Samsung K9F2G08U0M")
 
 nand_device::nand_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nand_device(mconfig, NAND, tag, owner, clock)
@@ -159,6 +160,23 @@ samsung_k9lag08u0m_device::samsung_k9lag08u0m_device(const machine_config &mconf
 	m_page_total_size = 2048 + 64;
 	m_log2_pages_per_block = compute_log2(128);
 	m_num_pages = 128 * 8192;
+	m_col_address_cycles = 2;
+	m_row_address_cycles = 3;
+	m_sequential_row_read = 0;
+}
+
+samsung_k9f2g08u0m_device::samsung_k9f2g08u0m_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: nand_device(mconfig, SAMSUNG_K9F2G08U0M, tag, owner, clock)
+{
+	m_id_len = 4;
+	m_id[0] = 0xec;
+	m_id[1] = 0xda;
+	m_id[2] = 0x00;
+	m_id[3] = 0x15;
+	m_page_data_size = 2048;
+	m_page_total_size = 2048 + 64;
+	m_log2_pages_per_block = compute_log2(64);
+	m_num_pages = 128 * 1024;
 	m_col_address_cycles = 2;
 	m_row_address_cycles = 3;
 	m_sequential_row_read = 0;
