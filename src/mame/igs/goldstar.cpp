@@ -960,14 +960,34 @@ void goldstar_state::pkrmast_portmap(address_map &map)
 	map(0xf0, 0xf0).nopw();    /* Writing 0's and 1's constantly.  Watchdog feeder? */
 }
 
-void goldstar_state::animalhs_portmap(address_map &map) // TODO: incomplete!
+void goldstar_state::eldoraddoa_portmap(address_map &map) // TODO: incomplete!
 {
 	map.global_mask(0xff);
 
 	map(0x01, 0x01).w("aysnd", FUNC(ay8910_device::data_w));
 	map(0x02, 0x02).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x03, 0x03).w("aysnd", FUNC(ay8910_device::address_w));
-	// map(0x10, 0x13) // DSW?
+	map(0x10, 0x10).portr("DSW1");
+	map(0x11, 0x11).portr("DSW2");
+	map(0x12, 0x12).portr("DSW3");
+	map(0x13, 0x13).portr("DSW4");
+	map(0x20, 0x20).portr("IN2").lw8(NAME([this] (uint8_t data) { m_reel_bank = (data & 0x30) >> 4; })); // TODO: other bits are used, too
+	map(0x21, 0x21).portr("IN0");
+	map(0x22, 0x22).portr("IN1");
+	map(0x23, 0x23).lr8(NAME([] () -> uint8_t { return 0xff; })); // checks battery level here, among other things, writes should be lamps
+}
+
+void goldstar_state::animalhs_portmap(address_map &map) // TODO: incomplete, maybe share base with above eldoraddoa_portmap once both have been verified
+{
+	map.global_mask(0xff);
+
+	map(0x01, 0x01).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x02, 0x02).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x03, 0x03).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0x10, 0x10).portr("DSW1");
+	map(0x11, 0x11).portr("DSW2");
+	map(0x12, 0x12).portr("DSW3");
+	map(0x13, 0x13).portr("DSW4");
 	map(0x60, 0x60).portr("IN2").lw8(NAME([this] (uint8_t data) { m_reel_bank = (data & 0x30) >> 4; })); // TODO: other bits are used, too
 	map(0x61, 0x61).portr("IN0");
 	map(0x62, 0x62).portr("IN1");
@@ -1905,6 +1925,36 @@ static INPUT_PORTS_START( cmv4 )
 	/* Display Of Doll At All Fr. Bonus not checked */
 	/* DSW5-7 listed as unused */
 	/* Test Mode For Disp. Of Doll not working */
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( animalhs )
+	PORT_INCLUDE( cmv4 )
+
+	PORT_START("DSW6")
+	PORT_DIPNAME( 0x01, 0x01, "DSW6" )                  PORT_DIPLOCATION("DSW6:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW6:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW6:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW6:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW6:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW6:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW6:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW6:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cmaster )
@@ -9789,6 +9839,16 @@ void goldstar_state::animalhs(machine_config &config)
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(goldstar_state::screen_update_cmast91));
 	m_gfxdecode->set_info(gfx_animalhs);
 	m_palette->set_init(FUNC(goldstar_state::cmast91_palette));
+
+	subdevice<ay8910_device>("aysnd")->port_a_read_callback().set_ioport("DSW5");
+	subdevice<ay8910_device>("aysnd")->port_b_read_callback().set_ioport("DSW6");
+}
+
+void goldstar_state::eldoraddoa(machine_config &config)
+{
+	animalhs(config);
+
+	m_maincpu->set_addrmap(AS_IO, &goldstar_state::eldoraddoa_portmap);
 }
 
 void unkch_state::megaline(machine_config &config)
@@ -16634,7 +16694,28 @@ ROM_START( eldoraddo ) // String "DYNA ELD3 V1.1TA" on program ROM
 	ROM_LOAD( "pal16l8.e11", 0x200, 0x104, NO_DUMP )
 ROM_END
 
-ROM_START( animalhs ) // Animal House. Strings "SUNS PECKER V1.0" and "SUNS CO LTD." on program ROM
+// DYNA D9101 PCB with Z0840006VSC CPU and 2 customs (scratched), AY38910A/P, 6x 8-dip banks, XTAL 12 MHz.
+ROM_START( eldoraddoa ) // String "DYNA ELD2  V1.4D" in program ROM. The two dumps are nearly identical, but preserving both for now until it can be determined what the (very small) differences are
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "alt_prg.h13", 0x00000, 0x10000, CRC(d1346eb6) SHA1(726a9e74180592f52aefd45a1665ec8a2d7d76ba) ) // 27c512
+	ROM_LOAD( "prg.h13",     0x00000, 0x10000, CRC(2f3ccab1) SHA1(a06adf129af388d0d3c3f1117939f772dc361a4c) ) // 27c512
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "9.d9", 0x00000, 0x20000, CRC(ee7b1537) SHA1(e10b2f3c9291d836782148c4ae388c94ee47a964) ) // 27c100
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "8.d8", 0x00000, 0x20000, CRC(d39c3cf2) SHA1(56a56ae7c931aa3f94643e1fbf33bfc6ac1c1b2b) ) // 27c100
+
+	ROM_REGION( 0x300, "proms", 0 )
+	ROM_LOAD( "82s129.e12", 0x000, 0x100, CRC(1564bb12) SHA1(641a681866ac5d53d88752a076ad958c94e68a3a) )
+	ROM_LOAD( "82s129.e10", 0x100, 0x100, CRC(db31f7ac) SHA1(9f23d65dc0c43b1700093461d2c5277cc1d42f49) )
+	ROM_LOAD( "82s129.e11", 0x200, 0x100, CRC(49c4df77) SHA1(860fa207c74eab00ea6c7f3fa16aafba84195336) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "82s129.h5", 0x000, 0x100, CRC(209ccf78) SHA1(9f92875855702c7cc4d429ba5f463b698e0e91d3) )
+ROM_END
+
+ROM_START( animalhs ) // Animal House. Strings "SUNS PECKER V1.0" and "SUNS CO LTD." on program ROM. Clearly derived from the eldoraddoa set above
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD16_WORD( "1_am27512.l2", 0x00000, 0x10000, CRC(258208d7) SHA1(11a75963c535636ff1320a3d3c3b9867a1f169d4) )
 
@@ -16642,7 +16723,7 @@ ROM_START( animalhs ) // Animal House. Strings "SUNS PECKER V1.0" and "SUNS CO L
 	ROM_LOAD( "2_tms27c010.f6", 0x00000, 0x20000, CRC(8adb2cf7) SHA1(b5ba73e9e1ba9a443b33bd90579b05f143fef91a) )
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
-	ROM_LOAD( "3_tms27c010.c6", 0x00000, 0x20000, CRC(44a9ae66) SHA1(86db8fdebcb82b9114e16f91f4aaa1f9b733e9ae))
+	ROM_LOAD( "3_tms27c010.c6", 0x00000, 0x20000, CRC(44a9ae66) SHA1(86db8fdebcb82b9114e16f91f4aaa1f9b733e9ae) )
 
 	ROM_REGION( 0x300, "proms", 0 )
 	ROM_LOAD( "4_82s129.p6", 0x000, 0x100, CRC(cf87cf21) SHA1(be33c0e0d9026e82a542143c114ab7fbf02cb68f) )
@@ -16679,7 +16760,7 @@ ROM_START( animalhsa )
 	ROM_LOAD( "2_ds40986.u100", 0x00000, 0x20000, CRC(8adb2cf7) SHA1(b5ba73e9e1ba9a443b33bd90579b05f143fef91a) )
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
-	ROM_LOAD( "3_d27c010.u101", 0x00000, 0x20000, CRC(44a9ae66) SHA1(86db8fdebcb82b9114e16f91f4aaa1f9b733e9ae))
+	ROM_LOAD( "3_d27c010.u101", 0x00000, 0x20000, CRC(44a9ae66) SHA1(86db8fdebcb82b9114e16f91f4aaa1f9b733e9ae) )
 
 	ROM_REGION( 0x300, "proms", 0 )
 	ROM_LOAD( "82s129.u47", 0x000, 0x100, CRC(1564bb12) SHA1(641a681866ac5d53d88752a076ad958c94e68a3a) )
@@ -20095,6 +20176,22 @@ void goldstar_state::init_animalhs()
 		m_decrypted_opcodes[a] = bitswap<8>(rom[a] ^ 0xff, 2, 3, 0, 1, 6, 7, 4, 5);
 }
 
+void goldstar_state::init_eldoraddoa()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	std::vector<uint8_t> buffer(0x10000);
+	memcpy(&buffer[0], rom, 0x10000);
+
+	// first swap 0x800 blocks around
+	for (int a = 0; a < 0x10000; a += 0x800)
+		memcpy(rom + a, &buffer[0xf800 - a], 0x800);
+
+	// then descramble the opcodes
+	for (int a = 0; a < 0x10000; a++)
+		m_decrypted_opcodes[a] = bitswap<8>(rom[a] ^ 0xff, 4, 5, 6, 7, 0, 1, 2, 3);
+}
+
 
 /*********************************************
 *                Game Drivers                *
@@ -20120,18 +20217,19 @@ GAMEL( 199?, ncb3,      0,        ncb3,     ncb3,     cb3_state,      empty_init
 GAMEL( 199?, cb3a,      ncb3,     ncb3,     cb3a,     cb3_state,      empty_init,     ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 2)",          0,                 layout_cherryb3 )
 GAMEL( 199?, cb3,       ncb3,     ncb3,     ncb3,     cb3_state,      init_cb3,       ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, encrypted)",      0,                 layout_cherryb3 )
 GAMEL( 199?, cb3b,      ncb3,     cherrys,  ncb3,     cb3_state,      init_cherrys,   ROT0, "Dyna",              "Cherry Bonus III (alt)",                      0,                 layout_cherryb3 )
-GAME(  199?, cb3c,      ncb3,     cb3c,     chrygld,  cb3_state,      init_cb3c,      ROT0, "bootleg",           "Cherry Bonus III (Ivanhoe V46-0799)",         MACHINE_NOT_WORKING) // decryption should be good, but different memory map
+GAME(  199?, cb3c,      ncb3,     cb3c,     chrygld,  cb3_state,      init_cb3c,      ROT0, "bootleg",           "Cherry Bonus III (Ivanhoe V46-0799)",         MACHINE_NOT_WORKING ) // decryption should be good, but different memory map
 GAMEL( 199?, cb3d,      ncb3,     ncb3,     ncb3,     cb3_state,      empty_init,     ROT0, "bootleg",           "Cherry Bonus III (set 3)",                    0,                 layout_cherryb3 )
 GAMEL( 199?, cb3e,      ncb3,     cb3e,     chrygld,  cb3_state,      init_cb3e,      ROT0, "bootleg",           "Cherry Bonus III (set 4, encrypted bootleg)", 0,                 layout_chrygld )
 GAMEL( 199?, cb3f,      ncb3,     ncb3,     ncb3,     cb3_state,      init_cb3f,      ROT0, "bootleg (Cleco)",   "Cherry Bonus III (set 5, encrypted bootleg)", MACHINE_NOT_WORKING, layout_chrygld ) // partially decrypted, stops at 'call attendant'
 GAMEL( 199?, chryglda,  ncb3,     cb3e,     chrygld,  cb3_state,      init_cb3e,      ROT0, "bootleg",           "Cherry Gold I (set 2, encrypted bootleg)",    0,                 layout_chrygld )  // Runs in CB3e hardware.
 GAME(  1994, chryangla, ncb3,     chryangla,ncb3,     cb3_state,      init_chryangl,  ROT0, "bootleg (G.C.I.)",  "Cherry Angel (encrypted, W-4 hardware)",      MACHINE_NOT_WORKING ) // DYNA CB3  V1.40 string, decrypted but only test screens work
 
-GAME(  1991, eldoradd,  0,        eldoradd, chrygld,  cb3_state,      empty_init,     ROT0, "Dyna",              "El Dorado (V5.1DR)",                          MACHINE_NOT_WORKING) // everything
-GAME(  1991, eldoraddo, eldoradd, eldoradd, chrygld,  cb3_state,      empty_init,     ROT0, "Dyna",              "El Dorado (V1.1TA)",                          MACHINE_NOT_WORKING) // everything
+GAME(  1991, eldoradd,  0,        eldoradd, chrygld,  cb3_state,      empty_init,     ROT0, "Dyna",              "El Dorado (V5.1DR)",                          MACHINE_NOT_WORKING ) // everything
+GAME(  1991, eldoraddo, eldoradd, eldoradd, chrygld,  cb3_state,      empty_init,     ROT0, "Dyna",              "El Dorado (V1.1TA)",                          MACHINE_NOT_WORKING ) // everything
 
-GAME(  1991, animalhs,  0,        animalhs, cmv4,     goldstar_state, init_animalhs,  ROT0, "Suns Co Ltd.",      "Animal House (V1.0, set 1)",                  MACHINE_NOT_WORKING) // improve GFX drawing, correct palette decode, I/O, etc
-GAME(  1991, animalhsa, animalhs, animalhs, cmv4,     goldstar_state, init_animalhs,  ROT0, "Suns Co Ltd.",      "Animal House (V1.0, set 2)",                  MACHINE_NOT_WORKING) // improve GFX drawing, correct palette decode, I/O, etc
+GAME(  1991, eldoraddoa,eldoradd, eldoraddoa,animalhs,cb3_state,      init_eldoraddoa,ROT0, "Dyna",              "El Dorado (V1.4D)",                           MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS ) // improve GFX drawing, correct palette decode, I/O, etc
+GAME(  1991, animalhs,  0,        animalhs, animalhs, goldstar_state, init_animalhs,  ROT0, "Suns Co Ltd.",      "Animal House (V1.0, set 1)",                  MACHINE_NOT_WORKING ) // improve GFX drawing, correct palette decode, I/O, etc
+GAME(  1991, animalhsa, animalhs, animalhs, animalhs, goldstar_state, init_animalhs,  ROT0, "Suns Co Ltd.",      "Animal House (V1.0, set 2)",                  MACHINE_NOT_WORKING ) // improve GFX drawing, correct palette decode, I/O, etc
 
 // looks like a hack of Cherry Bonus 3
 GAME(  1994, chryangl,  ncb3,     chryangl, chryangl,  cmaster_state, init_chryangl,  ROT0, "bootleg (G.C.I.)",  "Cherry Angel (set 1)",                                MACHINE_NOT_WORKING ) // SKY SUPERCB 1.0 string, decrypted but hangs when betting
@@ -20182,7 +20280,7 @@ GAME(  199?, chthree,   cmaster,  cm,       cmaster,  cmaster_state,  init_chthr
 
 GAME(  1991, cmast91,   0,        cmast91,  cmast91,  goldstar_state, init_cmast91,   ROT0, "Dyna",              "Cherry Master '91 (ver.1.30)",                0 )
 GAME(  1992, cmast92,   0,        cmast91,  cmast91,  goldstar_state, init_cmast91,   ROT0, "Dyna",              "Cherry Master '92",                           MACHINE_NOT_WORKING ) // no gfx roms are dumped
-GAME(  1996, cmast97,   0,        cm97,     cmv801,   cmaster_state,  empty_init,     ROT0, "Dyna",              "Cherry Master '97",                           MACHINE_NOT_WORKING) // fix prom decode, reels
+GAME(  1996, cmast97,   0,        cm97,     cmv801,   cmaster_state,  empty_init,     ROT0, "Dyna",              "Cherry Master '97",                           MACHINE_NOT_WORKING ) // fix prom decode, reels
 GAME(  1999, cmast99,   0,        cm,       cmast99,  cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master '99 (V9B.00)",                  MACHINE_NOT_WORKING )
 GAME(  1999, cmast99b,  cmast99,  cm,       cmast99,  cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Cherry Master '99 (V9B.00 bootleg / hack)",   MACHINE_NOT_WORKING )
 GAME(  1993, aplan,     0,        cm,       cmast99,  cmaster_state,  init_cmv4,      ROT0, "WeaShing H.K.",     "A-Plan",                                      MACHINE_NOT_WORKING )
@@ -20252,8 +20350,8 @@ GAME(  1990, bonusch,   0,        bonusch,  bonusch,  unkch_state,    empty_init
 GAME(  1992, magodds,   0,        magodds,  magodds,  wingco_state,   empty_init,     ROT0, "Pal Company / Micro Manufacturing Inc.", "Magical Odds (set 1)",                             MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
 GAME(  1992, magoddsa,  magodds,  magodds,  magodds,  wingco_state,   empty_init,     ROT0, "Pal Company / Micro Manufacturing Inc.", "Magical Odds (set 2)",                             MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
 GAME(  1992, magoddsb,  magodds,  magodds,  magodds,  wingco_state,   empty_init,     ROT0, "Pal Company / Micro Manufacturing Inc.", "Magical Odds (set 3)",                             MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
-GAME(  1991, magoddsc,  magodds,  magodds,  magoddsc, wingco_state,   init_magoddsc,  ROT0, "Pal Company",                            "Magical Odds (set 4, custom encrypted CPU block)", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING |MACHINE_NO_SOUND)
-GAME(  1991, magoddsd,  magodds,  magodds,  magoddsc, wingco_state,   init_magoddsc,  ROT0, "Pal Company",                            "Magical Odds (set 5, custom encrypted CPU block)", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING |MACHINE_NO_SOUND)
+GAME(  1991, magoddsc,  magodds,  magodds,  magoddsc, wingco_state,   init_magoddsc,  ROT0, "Pal Company",                            "Magical Odds (set 4, custom encrypted CPU block)", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME(  1991, magoddsd,  magodds,  magodds,  magoddsc, wingco_state,   init_magoddsc,  ROT0, "Pal Company",                            "Magical Odds (set 5, custom encrypted CPU block)", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 
 /* --- Amcoe games --- */
