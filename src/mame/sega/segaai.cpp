@@ -178,7 +178,7 @@ public:
 	void irq_select_w(offs_t offset, u8 data);
 
 protected:
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 private:
 	static constexpr u8 VECTOR_V9938 = 0xf8;
@@ -789,7 +789,7 @@ void segaai_state::segaai(machine_config &config)
 	m_sound->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	UPD7759(config, m_upd7759);
-	m_upd7759->add_route(ALL_OUTPUTS, "mono", 1.00);
+	m_upd7759->add_route(ALL_OUTPUTS, "mono", 0.70);
 	m_upd7759->drq().set(FUNC(segaai_state::upd7759_drq_w));
 
 	// Card slot
