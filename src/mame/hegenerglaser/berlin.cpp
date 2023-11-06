@@ -10,6 +10,7 @@ Undocumented buttons:
 - holding CLEAR on boot clears battery backed RAM
 
 TODO:
+- verify IRQ level and acknowledge
 - does it have ROM waitstates like modular.cpp?
 
 *******************************************************************************/
