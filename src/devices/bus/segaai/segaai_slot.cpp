@@ -10,7 +10,7 @@
 #include "emu.h"
 #include "segaai_slot.h"
 
-/* PCB */
+
 enum
 {
 	SEGAAI_CARD_ROM_128 = 0,

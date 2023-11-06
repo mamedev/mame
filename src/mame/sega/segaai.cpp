@@ -159,6 +159,10 @@ public:
 	
 	void segaai(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
+private:
 	void vdp_interrupt(int state);
 	void upd7759_drq_w(int state);
 	IRQ_CALLBACK_MEMBER(irq_callback);
@@ -172,15 +176,10 @@ public:
 	void port1d_w(offs_t offset, u8 data);
 	void port1e_w(offs_t offset, u8 data);
 	u8 port1e_r(offs_t offset);
-
 	u8 irq_enable_r(offs_t offset);
 	void irq_enable_w(offs_t offset, u8 data);
 	void irq_select_w(offs_t offset, u8 data);
 
-protected:
-	virtual void machine_start() override;
-
-private:
 	static constexpr u8 VECTOR_V9938 = 0xf8;
 	static constexpr u8 VECTOR_I8251_SEND = 0xf9;
 	static constexpr u8 VECTOR_I8251_RECEIVE = 0xfa;
@@ -508,7 +507,7 @@ u8 segaai_state::i8255_portb_r()
 {
 	m_i8255_portb = (m_i8255_portb & 0xf8) | (m_port5->read() & 0x01);
 
-	if (m_port_1d & 0x01)
+	if (BIT(m_port_1d, 0))
 	{
 		if (!get_touchpad_pressed())
 		{
@@ -651,7 +650,6 @@ void segaai_state::upd7759_ctrl_w(offs_t offset, u8 data)
 	m_upd7759->md_w((m_upd7759_ctrl & UPD7759_MODE) ? 0 : 1);
 
 	// bit1 selects which ROM should be used?
-	// TODO check if this is correct
 	m_upd7759->set_rom_bank((m_upd7759_ctrl & UPD7759_BANK) >> 1);
 }
 
@@ -686,7 +684,7 @@ void segaai_state::irq_enable_w(offs_t offet, u8 data)
 void segaai_state::irq_select_w(offs_t offset, u8 data)
 {
 	int pin = (data >> 1) & 0x07;
-	if (data & 1)
+	if (BIT(data, 0))
 	{
 		m_irq_enabled |= (1 << pin);
 	}
@@ -719,7 +717,7 @@ void segaai_state::port1e_w(offs_t offset, u8 data)
 
 u8 segaai_state::port1e_r(offs_t offset)
 {
-	if (m_port_1c & 0x01)
+	if (BIT(m_port_1c, 0))
 	{
 		return m_touchpad_y;
 	}
@@ -805,7 +803,7 @@ void segaai_state::segaai(machine_config &config)
 	// Built-in cassette
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
-//	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.70);
 
 	config.set_default_layout(layout_segaai);
 }
