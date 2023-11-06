@@ -226,10 +226,11 @@ AI-8003  Pinpon Music Melody
 	</software>
 
 	<!-- okeiko and hanamaru were sold as a single package -->
-	<software name="okeiko">
+	<software name="okeiko" supported="no">
 		<description>Okeiko Aiueo</description>
 		<year>198?</year>
 		<publisher>Sega</publisher>
+		<notes>Requires full touchpad emulation.</notes>
 		<info name="serial" value="AI-4201"/>
 		<info name="alt_title" value="おけいこ　あいうえお"/>
 		<part name="card" interface="segaai_card">
@@ -241,12 +242,13 @@ AI-8003  Pinpon Music Melody
 	</software>
 
 	<!-- okeiko and hanamaru were sold as a single package -->
-	<software name="hanamaru">
+	<software name="hanamaru" supported="no">
 		<description>Hanamaru Aiueo</description>
 		<year>198?</year>
 		<publisher>Sega</publisher>
+		<notes>Requires full touchpad emulation.</notes>
 		<info name="serial" value="AI-4201"/>
-		<info name="alt_title" value="はなまる　あいうえお" />
+		<info name="alt_title" value="はなまる　あいうえお"/>
 		<part name="card" interface="segaai_card">
 			<feature name="slot" value="rom_128" />
 			<dataarea name="rom" size="0x20000">
@@ -255,10 +257,11 @@ AI-8003  Pinpon Music Melody
 		</part>
 	</software>
 
-	<software name="wakuwaku">
+	<software name="wakuwaku" supported="no">
 		<description>Waku Waku ABC to 123</description>
 		<year>198?</year>
 		<publisher>Sega</publisher>
+		<notes>Requires full touchpad emulation.</notes>
 		<info name="serial" value="AI-4202"/>
 		<part name="card" interface="segaai_card">
 			<feature name="slot" value="rom_256"/>
@@ -268,10 +271,11 @@ AI-8003  Pinpon Music Melody
 		</part>
 	</software>
 
-	<software name="henshin">
+	<software name="henshin" supported="no">
 		<description>Henshin Kanji</description>
 		<year>198?</year>
 		<publisher>Sega</publisher>
+		<notes>Requires full touchpad emulation.</notes>
 		<info name="serial" value="AI-4203"/>
 		<part name="card" interface="segaai_card">
 			<feature name="slot" value="rom_256"/>
@@ -294,11 +298,12 @@ AI-8003  Pinpon Music Melody
 		</part>
 	</software>
 
-	<software name="pinponmr">
+	<software name="pinponmr" supported="no">
 		<description>Pinpon Music Rhythm</description>
 		<year>198?</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="AI-8002"/>
+		<info name="usage" value="Requires Soundbox. No sound and cannot start a game."/>
 		<part name="card" interface="segaai_card">
 			<feature name="slot" value="rom_128"/>
 			<dataarea name="rom" size="0x20000">
@@ -307,11 +312,12 @@ AI-8003  Pinpon Music Melody
 		</part>
 	</software>
 
-	<software name="pinponmm">
+	<software name="pinponmm" supported="no">
 		<description>Pinpon Music Melody</description>
 		<year>198?</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="AI-8003"/>
+		<info name="usage" value="Requires Soundbox. No sound and cannot start a game."/>
 		<part name="card" interface="segaai_card">
 			<feature name="slot" value="rom_128"/>
 			<dataarea name="rom" size="0x20000">
@@ -320,9 +326,9 @@ AI-8003  Pinpon Music Melody
 		</part>
 	</software>
 
-	<!-- eigooha1 and eigogam1 sold in one package? -->
+	<!-- eigooha1 and eigooha2 sold in one package: Eigo de Ohanashi: Folk & Fairy Tales -->
 	<software name="eigooha1" supported="no">
-		<description>Eigo de Ohanashi 1</description>
+		<description>English Wonder School - Eigo de Ohanashi 1</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<notes>Cassette is not supported yet.</notes>
@@ -346,30 +352,9 @@ AI-8003  Pinpon Music Melody
 		</part>
 	</software>
 
-	<!-- eigooha1 and eigogam1 sold in one package? -->
-	<software name="eigogam1" supported="no">
-		<description>Eigo de Game 1: Popo no Yume</description>
-		<year>1989</year>
-		<publisher>Sega</publisher>
-		<notes>Cassette is not supported yet.</notes>
-		<info name="serial" value="C-9533"/>
-		<info name="alt_title" value="えいごわんだーすくーるー えいごでげーむ1"/>
-		<part name="card" interface="segaai_card">
-			<feature name="slot" value="rom_256"/>
-			<dataarea name="rom" size="0x40000">
-				<rom name="eigo de game 1 popo no yume.bin" size="0x40000" crc="096ed76a" sha1="c9ad9479b72c7b58c596feaab984697b6cc1aa9e"/>
-			</dataarea>
-		</part>
-		<part name="cass" interface="flac_cass">
-			<dataarea name="cass" size="62294686">
-				<rom name="Eigo de Game T1.flac" size="62294686" crc="2a89cd04" sha1="7207aae9543744a198dafaa969a812ddaa667160"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- eigooha2 and eigogam2 sold in one package? -->
+	<!-- eigooha1 and eigooha2 sold in one package: Eigo de Ohanashi: Folk & Fairy Tales -->
 	<software name="eigooha2" supported="no">
-		<description>Eigo de Ohanashi 2</description>
+		<description>English Wonder School - Eigo de Ohanashi 2</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<notes>Cassette is not supported yet.</notes>
@@ -393,18 +378,35 @@ AI-8003  Pinpon Music Melody
 		</part>
 	</software>
 
-	<!--
-		Only the first entry from the menu works, the color names and 'big' is spoken.
-		The other menu entries hang waiting for the cassette.
-	-->
-	<!-- eigooha2 and eigogam2 sold in one package? -->
-	<software name="eigogam2" supported="no">
-		<description>Eigo de Game 2: Popoland no Himitsu</description>
+	<!-- eigogam2 and eigogam2 sold in one package: "Popo's Adventure" -->
+	<software name="eigogam1" supported="no">
+		<description>English Wonder School - Eigo de Game 1: Popo no Yume</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<notes>Cassette is not supported yet.</notes>
+		<info name="serial" value="C-9533"/>
+		<info name="alt_title" value="えいごわんだーすくーるー えいごでげーむ1 Popoのゆめ"/>
+		<part name="card" interface="segaai_card">
+			<feature name="slot" value="rom_256"/>
+			<dataarea name="rom" size="0x40000">
+				<rom name="eigo de game 1 popo no yume.bin" size="0x40000" crc="096ed76a" sha1="c9ad9479b72c7b58c596feaab984697b6cc1aa9e"/>
+			</dataarea>
+		</part>
+		<part name="cass" interface="flac_cass">
+			<dataarea name="cass" size="62294686">
+				<rom name="Eigo de Game T1.flac" size="62294686" crc="2a89cd04" sha1="7207aae9543744a198dafaa969a812ddaa667160"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- eigogam1 and eigogam2 sold in one package: "Popo's Adventure" -->
+	<software name="eigogam2" supported="no">
+		<description>English Wonder School - Eigo de Game 2: Popoland no Himitsu</description>
+		<year>1989</year>
+		<publisher>Sega</publisher>
+		<notes>Cassette is not supported yet. Only the first entry from the menu works, the color names and 'big' is spoken. The other menu entries hang waiting for the cassette.</notes>
 		<info name="serial" value="C-9536"/>
-		<info name="alt_title" value="えいごわんだーすくーるー えいごでげーむ2"/>
+		<info name="alt_title" value="えいごわんだーすくーるー えいごでげーむ2 Popelandのひみつ"/>
 		<part name="card" interface="segaai_card">
 			<feature name="slot" value="rom_256"/>
 			<dataarea name="rom" size="0x40000">
