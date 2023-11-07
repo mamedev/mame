@@ -29,7 +29,7 @@ public:
 		set_fixed(false);
 	}
 	segaai_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-	virtual ~segaai_card_slot_device();
+	virtual ~segaai_card_slot_device() { }
 
 	template <typename T> void set_address_space(T &&tag, int no) { m_address_space.set_tag(std::forward<T>(tag), no); }
 	virtual std::pair<std::error_condition, std::string> call_load() override;
@@ -58,7 +58,7 @@ class segaai_card_interface : public device_interface
 {
 public:
 	segaai_card_interface(const machine_config &mconfig, device_t &device);
-	virtual ~segaai_card_interface();
+	virtual ~segaai_card_interface() { }
 
 	virtual void install_memory_handlers(address_space *space) { }
 

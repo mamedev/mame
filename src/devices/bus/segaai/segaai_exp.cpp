@@ -20,21 +20,11 @@ segaai_exp_interface::segaai_exp_interface(const machine_config &mconfig, device
 }
 
 
-segaai_exp_interface::~segaai_exp_interface()
-{
-}
-
-
 segaai_exp_slot_device::segaai_exp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, SEGAAI_EXP_SLOT, tag, owner, clock)
 	, device_slot_interface(mconfig, *this)
 	, m_mem_space(*this, finder_base::DUMMY_TAG, -1)
 	, m_io_space(*this, finder_base::DUMMY_TAG, -1)
-{
-}
-
-
-segaai_exp_slot_device::~segaai_exp_slot_device()
 {
 }
 

@@ -23,7 +23,7 @@ public:
 		set_fixed(false);
 	}
 	segaai_exp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-	virtual ~segaai_exp_slot_device();
+	virtual ~segaai_exp_slot_device() { }
 
 	template <typename T> void set_mem_space(T &&tag, int no) { m_mem_space.set_tag(std::forward<T>(tag), no); }
 	template <typename T> void set_io_space(T &&tag, int no) { m_io_space.set_tag(std::forward<T>(tag), no); }
@@ -44,7 +44,7 @@ class segaai_exp_interface : public device_interface
 {
 public:
 	segaai_exp_interface(const machine_config &mconfig, device_t &device);
-	virtual ~segaai_exp_interface();
+	virtual ~segaai_exp_interface() { }
 
 protected:
 	address_space& mem_space() { return m_slot->mem_space(); }

@@ -28,11 +28,6 @@ segaai_card_interface::segaai_card_interface(const machine_config &mconfig, devi
 }
 
 
-segaai_card_interface::~segaai_card_interface()
-{
-}
-
-
 
 segaai_card_slot_device::segaai_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 		: device_t(mconfig, SEGAAI_CARD_SLOT, tag, owner, clock)
@@ -42,22 +37,15 @@ segaai_card_slot_device::segaai_card_slot_device(const machine_config &mconfig, 
 {
 }
 
-
-segaai_card_slot_device::~segaai_card_slot_device()
-{
-}
-
-
 void segaai_card_slot_device::device_start()
 {
 	m_cart = dynamic_cast<segaai_card_interface *>(get_card_device());
 }
 
-
 struct segaai_slot
 {
-	int                     pcb_id;
-	const char              *slot_option;
+	int pcb_id;
+	const char *slot_option;
 };
 
 static const segaai_slot slot_list[] =
@@ -65,7 +53,6 @@ static const segaai_slot slot_list[] =
 	{ SEGAAI_CARD_ROM_128, "rom_128" },
 	{ SEGAAI_CARD_ROM_256, "rom_256" }
 };
-
 
 static const char *segaai_get_slot(int type)
 {
@@ -77,7 +64,6 @@ static const char *segaai_get_slot(int type)
 
 	return slot_list[0].slot_option;
 }
-
 
 std::pair<std::error_condition, std::string> segaai_card_slot_device::call_load()
 {
@@ -105,12 +91,10 @@ std::pair<std::error_condition, std::string> segaai_card_slot_device::call_load(
 	return std::make_pair(std::error_condition(), std::string());
 }
 
-
 int segaai_card_slot_device::get_cart_type(u32 length)
 {
 	return length == 0x40000 ? SEGAAI_CARD_ROM_256 : SEGAAI_CARD_ROM_128;
 }
-
 
 std::string segaai_card_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
