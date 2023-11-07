@@ -563,22 +563,22 @@ TILE_GET_INFO_MEMBER(homedata_upd7807_state::lemnangl_get_info1_1)
 	lemnangl_info(tileinfo, tile_index, 1, 1, (m_blitter_bank & 2) >> 1, m_gfx_bank[0] >> 4);
 }
 
-
+// FIXME: not right and likely doesn't even exist for this
 inline void homedata_state::mirderby_info0(tile_data &tileinfo, int tile_index, int page, int gfxbank)
 {
 	int const addr  = tile_index * 2 + 0x2000 * page;
 	int const attr  = m_videoram[addr];
-	int const code  = m_videoram[addr + 1] + ((attr & 0x03) << 8) + 0x400;// + (gfxbank << 10);
-	int const color = (attr >> 2) + (gfxbank << 6);
+	int const code  = m_videoram[addr + 1] + ((attr & 0x03) << 8);// + (gfxbank << 10);
+	int const color = (attr >> 4) & 0xf;
 
-	tileinfo.set(0, code, color, m_flipscreen );
+	tileinfo.set(1, code, color, m_flipscreen );
 }
 inline void homedata_state::mirderby_info1(tile_data &tileinfo, int tile_index, int page, int gfxbank)
 {
 	int const addr  = tile_index * 2 + 0x1000 + 0x2000 * page;
 	int const attr  = m_videoram[addr];
-	int const code  = m_videoram[addr + 1] + ((attr & 0x07) << 8) + 0x400;//(gfxbank << 11);
-	int const color = (attr >> 3) + ((gfxbank & 3) << 6);
+	int const code  = m_videoram[addr + 1] + ((attr & 0x03) << 8) + 0x400;//(gfxbank << 11);
+	int const color = (attr >> 4) & 0xf;
 
 	tileinfo.set(1, code, color, m_flipscreen );
 }
@@ -672,7 +672,7 @@ VIDEO_START_MEMBER(homedata_state,mirderby)
 	m_bg_tilemap[1][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(homedata_state::mirderby_get_info1_0)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_bg_tilemap[1][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(homedata_state::mirderby_get_info1_1)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
-	m_bg_tilemap[0][1]->set_transparent_pen(0);
+//	m_bg_tilemap[0][1]->set_transparent_pen(0);
 	m_bg_tilemap[1][1]->set_transparent_pen(0);
 }
 
@@ -991,6 +991,10 @@ uint32_t homedata_upd7807_state::screen_update_pteacher(screen_device &screen, b
 
 uint32_t homedata_state::screen_update_mirderby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	bitmap.fill(m_palette->black_pen(), cliprect);
+
+	m_bg_tilemap[0][1]->draw(screen, bitmap, cliprect, 0, 0);
+
 	return 0;
 }
 

@@ -1430,13 +1430,16 @@ void homedata_state::cpu0_map(address_map &map)
 
 void homedata_state::cpu1_map(address_map &map)
 {
-	map(0x0000, 0x3fff).ram(); // video RAM
-	map(0x4000, 0x5fff).ram();
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).ram().share(m_videoram); // video RAM
+	map(0x4000, 0x5fff).ram().share("share1");
 	map(0x6000, 0x6fff).ram(); // work RAM
-	map(0x7000, 0x77ff).ram();
-	//0x7ff0 onward is the blitter
-	map(0x7ffe, 0x7ffe).nopr(); //watchdog
-	map(0x8000, 0xffff).rom();
+	map(0x7000, 0x77ff).ram().share("share2");
+	//0x7ff0 onward is the blitter?
+	map(0x7ff0, 0x7ffd).writeonly().share("vreg");
+	map(0x7ffe, 0x7ffe).nopr(); //watchdog?
+	map(0x8000, 0xffff).rom().region("cpu1", 0);
+	// TODO: $8000 writes (ROM bank? NMI enable? CPU comms?)
 }
 
 
@@ -1452,14 +1455,18 @@ void homedata_state::mirderby_prot_w(uint8_t data)
 }
 
 
+// tight loops at $4587 (from other CPU, indicating program flow) then $23c4 waiting for vblank?
+// other CPU is similar
 void homedata_state::cpu2_map(address_map &map)
 {
+//	map.unmap_value_high();
 	map(0x0000, 0x3fff).ram().w(FUNC(homedata_state::mrokumei_videoram_w)).share(m_videoram);
-	map(0x4000, 0x5fff).ram();
+	map(0x4000, 0x5fff).ram().share("share1");
 	map(0x6000, 0x6fff).ram(); /* work ram */
-	map(0x7000, 0x77ff).ram();
+	map(0x7000, 0x77ff).ram().share("share2");
 	map(0x7800, 0x7800).rw(FUNC(homedata_state::mirderby_prot_r), FUNC(homedata_state::mirderby_prot_w)); // protection check? (or sound comms?)
-	map(0x7ffe, 0x7ffe).nopr(); //watchdog
+	map(0x7ffe, 0x7ffe).nopr(); //watchdog?
+	//	0x7fff $e / $f writes -> DSW reads
 	map(0x8000, 0xffff).rom();
 }
 
@@ -1521,6 +1528,7 @@ void homedata_state::mirderby(machine_config &config)
 	/* basic machine hardware */
 	MC6809E(config, m_maincpu, 16000000/8);  /* 2 Mhz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &homedata_state::cpu2_map);
+	m_maincpu->set_vblank_int("screen", FUNC(homedata_state::homedata_irq));
 
 	z80_device &cpu0(Z80(config, "cpu0", 16000000/4));   /* 4 Mhz */
 	cpu0.set_disable();
@@ -1528,8 +1536,7 @@ void homedata_state::mirderby(machine_config &config)
 
 	mc6809e_device &cpu1(MC6809E(config, "cpu1", 16000000/8)); /* 2 Mhz */
 	cpu1.set_addrmap(AS_PROGRAM, &homedata_state::cpu1_map);
-	cpu1.set_disable();
-	//cpu1.set_vblank_int("screen", FUNC(homedata_state::mirderby_irq));
+	cpu1.set_vblank_int("screen", FUNC(homedata_state::homedata_irq));
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
@@ -1541,9 +1548,10 @@ void homedata_state::mirderby(machine_config &config)
 	screen.set_visarea(0*8, 54*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(homedata_state::screen_update_mirderby));
 	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(homedata_state::screen_vblank));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mirderby);
-	PALETTE(config, m_palette, FUNC(homedata_state::mirderby_palette), 0x8000);
+	PALETTE(config, m_palette, FUNC(homedata_state::mirderby_palette), 0x100);
 
 	MCFG_VIDEO_START_OVERRIDE(homedata_state,mirderby)
 
