@@ -336,94 +336,82 @@ AI-8003  Pinpon Music Melody
 		</part>
 	</software>
 
-	<!-- eigooha1 and eigooha2 sold in one package: Eigo de Ohanashi: Folk & Fairy Tales -->
-	<software name="eigooha1" supported="no">
-		<description>Eigo de Ohanashi 1</description>
+	<software name="eigoohan" supported="no">
+		<description>Eigo de Ohanashi: Folk &amp; Fairy Tales</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<notes>Cassette is not supported yet.</notes>
-		<info name="serial" value="C-9532"/>
-		<info name="alt_title" value="えいごでおはなし1"/>
-		<part name="card" interface="segaai_card">
+		<info name="alt_title" value="えいごでおはなし"/>
+		<info name="barcode" value="4974365242060"/>
+		<part name="card1" interface="segaai_card">
 			<feature name="slot" value="rom_256"/>
+			<feature name="part_id" value="C-9532 - えいごでおはなし1"/>
 			<dataarea name="rom" size="0x40000">
 				<rom name="eigo de ohanashi 1.bin" size="0x40000" crc="a43c79ba" sha1="2f69ea2b126803463f512c4b95c5586961214eaa"/>
 			</dataarea>
 		</part>
-		<part name="cassa" interface="flac_cass">
+		<part name="cass1a" interface="flac_cass">
+			<feature name="part_id" value="えいごでおはなし1 - Side A"/>
 			<dataarea name="cass" size="58086526">
 				<rom name="eigo de ohanashi 1 (side a).flac" size="58086526" crc="7a57c841" sha1="701013bcce40110e13ec3c2adfd2f65f6dfcf06b"/>
 			</dataarea>
 		</part>
-		<part name="cassb" interface="flac_cass">
+		<part name="cass1b" interface="flac_cass">
+			<feature name="part_id" value="えいごでおはなし1 - Side B"/>
 			<dataarea name="cass" size="55647160">
 				<rom name="eigo de ohanashi 1 (side b).flac" size="55647160" crc="bb1debfd" sha1="622b23180a21f55743a4864d446bc31007e287b5"/>
 			</dataarea>
 		</part>
-	</software>
-
-	<!-- eigooha1 and eigooha2 sold in one package: Eigo de Ohanashi: Folk & Fairy Tales -->
-	<software name="eigooha2" supported="no">
-		<description>Eigo de Ohanashi 2</description>
-		<year>1989</year>
-		<publisher>Sega</publisher>
-		<notes>Cassette is not supported yet.</notes>
-		<info name="serial" value="C-9535"/>
-		<info name="alt_title" value="えいごでおはなし2"/>
-		<part name="card" interface="segaai_card">
+		<part name="card2" interface="segaai_card">
 			<feature name="slot" value="rom_256"/>
+			<feature name="part_id" value="C-9535 - えいごでおはなし2"/>
 			<dataarea name="rom" size="0x40000">
 				<rom name="eigo de ohanashi 2.bin" size="0x40000" crc="ce241ffb" sha1="6d903af3c7f7f98090228f011936132ddd4f2cc6"/>
 			</dataarea>
 		</part>
-		<part name="cassa" interface="flac_cass">
+		<part name="cass2a" interface="flac_cass">
+			<feature name="part_id" value="えいごでおはなし2 - Side A"/>
 			<dataarea name="cass" size="60913103">
 				<rom name="eigo de ohanashi 2 (side a).flac" size="60913103" crc="2b3c496f" sha1="4d826c54b30c9e6df2f4275666cb932405a6cd1f"/>
 			</dataarea>
 		</part>
-		<part name="cassb" interface="flac_cass">
+		<part name="cass2b" interface="flac_cass">
+			<feature name="part_id" value="えいごでおはなし2 - Side B"/>
 			<dataarea name="cass" size="58812097">
 				<rom name="eigo de ohanashi 2 (side b).flac" size="58812097" crc="2cca36eb" sha1="393d1b6ed5318d07a9407644ed921e2b76569ffd"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- eigogam2 and eigogam2 sold in one package: "Popo's Adventure" -->
-	<software name="eigogam1" supported="no">
-		<description>Eigo de Game 1: Popo no Yume</description>
+	<software name="eigogame" supported="no">
+		<description>Eigo de Game: Popo's Adventure</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
-		<notes>Cassette is not supported yet.</notes>
-		<info name="serial" value="C-9533"/>
-		<info name="alt_title" value="えいごでげーむ1 Popoのゆめ"/>
-		<part name="card" interface="segaai_card">
+		<notes>Cassette is not supported yet. Eigo de Game 2: Only the first entry from the menu works, the color names and 'big' are spoken. The other menu entries hang waiting for the cassette.</notes>
+		<info name="alt_title" value="えいごでげーむ"/>
+		<info name="barcode" value="4974365242053"/>
+		<part name="card1" interface="segaai_card">
 			<feature name="slot" value="rom_256"/>
+			<feature name="part_id" value="C-9533 - えいごでげーむ1 Popoのゆめ"/>
 			<dataarea name="rom" size="0x40000">
 				<rom name="eigo de game 1 popo no yume.bin" size="0x40000" crc="096ed76a" sha1="c9ad9479b72c7b58c596feaab984697b6cc1aa9e"/>
 			</dataarea>
 		</part>
-		<part name="cass" interface="flac_cass">
+		<part name="cass1" interface="flac_cass">
+			<feature name="part_id" value="えいごでげーむ1 Popoのゆめ"/>
 			<dataarea name="cass" size="62294686">
 				<rom name="eigo de game 1.flac" size="62294686" crc="2a89cd04" sha1="7207aae9543744a198dafaa969a812ddaa667160"/>
 			</dataarea>
 		</part>
-	</software>
-
-	<!-- eigogam1 and eigogam2 sold in one package: "Popo's Adventure" -->
-	<software name="eigogam2" supported="no">
-		<description>Eigo de Game 2: Popoland no Himitsu</description>
-		<year>1989</year>
-		<publisher>Sega</publisher>
-		<notes>Cassette is not supported yet. Only the first entry from the menu works, the color names and 'big' is spoken. The other menu entries hang waiting for the cassette.</notes>
-		<info name="serial" value="C-9536"/>
-		<info name="alt_title" value="えいごでげーむ2 Popolandのひみつ"/>
-		<part name="card" interface="segaai_card">
+		<part name="card2" interface="segaai_card">
 			<feature name="slot" value="rom_256"/>
+			<feature name="part_id" value="C-9536 - えいごでげーむ2 Popolandのひみつ"/>
 			<dataarea name="rom" size="0x40000">
 				<rom name="eigo de game 2 popoland no himitsu.bin" size="0x40000" crc="bd55f48c" sha1="8d25a2cbbf53844df94fc1becf461adc8b3f0190"/>
 			</dataarea>
 		</part>
-		<part name="cass" interface="flac_cass">
+		<part name="cass2" interface="flac_cass">
+			<feature name="part_id" value="えいごでげーむ2 Popolandのひみつ"/>
 			<dataarea name="cass" size="71325328">
 				<rom name="eigo de game 2.flac" size="71325328" crc="f6bbee6c" sha1="c967cf013e7fc02aed7ad5d0979c05cf280fd30e"/>
 			</dataarea>
