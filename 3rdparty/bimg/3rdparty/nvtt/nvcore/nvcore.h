@@ -4,7 +4,7 @@
 #define NV_CORE_H
 
 #define NVCORE_SHARED 0
-#define NV_NO_ASSERT 0
+#define NV_NO_ASSERT 1
 
 // Function linkage
 #if NVCORE_SHARED
