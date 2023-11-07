@@ -1346,7 +1346,6 @@ void swp30_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 			}
 		}
 
-		int pmode = m_envelope_mode[chan];
 		//		if(chan == 3)
 		//			logerror("timer %d %08x\n", m_envelope_mode[chan], m_envelope_timer[chan]);
 		switch(m_envelope_mode[chan]) {
