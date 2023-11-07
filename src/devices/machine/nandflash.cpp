@@ -192,6 +192,7 @@ void nand_device::device_start()
 	save_item(NAME(m_pointer_mode));
 	save_item(NAME(m_page_addr));
 	save_item(NAME(m_byte_addr));
+	save_item(NAME(m_scratch_page_addr));
 	save_item(NAME(m_status));
 	save_item(NAME(m_accumulated_status));
 	save_item(NAME(m_mode_3065));
@@ -203,6 +204,7 @@ void nand_device::device_reset()
 	m_pointer_mode = SM_PM_A;
 	m_page_addr = 0;
 	m_byte_addr = 0;
+	m_scratch_page_addr = 0;
 	m_accumulated_status = 0;
 	m_mode_3065 = false;
 	m_status = 0xc0;
@@ -278,7 +280,7 @@ void nand_device::command_w(uint8_t data)
 	case 0x00: // Read (1st cycle)
 		m_mode = SM_M_READ;
 		m_pointer_mode = SM_PM_A;
-		m_page_addr = 0;
+		m_scratch_page_addr = 0;
 		m_addr_load_ptr = 0;
 		break;
 	case 0x01:
@@ -311,13 +313,14 @@ void nand_device::command_w(uint8_t data)
 		break;
 	case 0x80: // Page Program (1st cycle)
 		m_mode = SM_M_PROGRAM;
-		m_page_addr = 0;
+		m_scratch_page_addr = 0;
 		m_addr_load_ptr = 0;
 		m_program_byte_count = 0;
 		memset(m_pagereg.get(), 0xff, m_page_total_size);
 		break;
 	case 0x10: // Page Program (2nd cycle)
 	case 0x15:
+		m_page_addr = m_scratch_page_addr;
 		if ((m_mode != SM_M_PROGRAM) && (m_mode != SM_M_RANDOM_DATA_INPUT))
 		{
 			logerror("nandflash: illegal page program confirm command\n");
@@ -379,6 +382,7 @@ void nand_device::command_w(uint8_t data)
 	// case 0x91:
 	//   break;
 	case 0x30: // Read (2nd cycle)
+		m_page_addr = m_scratch_page_addr;
 		if (m_col_address_cycles == 1)
 		{
 			m_mode = SM_M_30;
@@ -496,8 +500,8 @@ void nand_device::address_w(uint8_t data)
 			}
 			else if (m_addr_load_ptr < m_col_address_cycles + m_row_address_cycles)
 			{
-				m_page_addr &= ~(0xFF << ((m_addr_load_ptr - m_col_address_cycles) * 8));
-				m_page_addr |= (data << ((m_addr_load_ptr - m_col_address_cycles) * 8));
+				m_scratch_page_addr &= ~(0xFF << ((m_addr_load_ptr - m_col_address_cycles) * 8));
+				m_scratch_page_addr |= (data << ((m_addr_load_ptr - m_col_address_cycles) * 8));
 			}
 		}
 		m_addr_load_ptr++;
