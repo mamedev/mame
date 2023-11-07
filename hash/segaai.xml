@@ -63,6 +63,7 @@ AI-8003  Pinpon Music Melody
 		<publisher>Sega</publisher>
 		<info name="serial" value="AI-4052"/>
 		<info name="alt_title" value="ろびんそん・らんど"/>
+		<info name="barcode" value="4974365240622"/>
 		<part name="card" interface="segaai_card">
 			<feature name="slot" value="rom_128"/>
 			<dataarea name="rom" size="0x20000">
@@ -77,6 +78,7 @@ AI-8003  Pinpon Music Melody
 		<publisher>Sega</publisher>
 		<info name="serial" value="AI-4053"/>
 		<info name="alt_title" value="こずみっく・とれいん"/>
+		<info name="barcode" value="4974365240639"/>
 		<part name="card" interface="segaai_card">
 			<feature name="slot" value="rom_128"/>
 			<dataarea name="rom" size="0x20000">
@@ -91,6 +93,7 @@ AI-8003  Pinpon Music Melody
 		<publisher>Sega</publisher>
 		<info name="serial" value="AI-4054"/>
 		<info name="alt_title" value="しんでれら・らびりんす"/>
+		<info name="barcode" value="4974365240646"/>
 		<part name="card" interface="segaai_card">
 			<feature name="slot" value="rom_128"/>
 			<dataarea name="rom" size="0x20000">
@@ -133,6 +136,7 @@ AI-8003  Pinpon Music Melody
 		<publisher>Sega</publisher>
 		<info name="serial" value="AI-4057"/>
 		<info name="alt_title" value="あらびあん・ないと"/>
+		<info name="barcode" value="4974365240677"/>
 		<part name="card" interface="segaai_card">
 			<feature name="slot" value="rom_256"/>
 			<dataarea name="rom" size="0x40000">
@@ -147,6 +151,7 @@ AI-8003  Pinpon Music Melody
 		<publisher>Sega</publisher>
 		<info name="serial" value="AI-4058"/>
 		<info name="alt_title" value="あんでるせん・どりーむ"/>
+		<info name="barcode" value="4974365240684"/>
 		<part name="card" interface="segaai_card">
 			<feature name="slot" value="rom_128"/>
 			<dataarea name="rom" size="0x20000">
@@ -161,6 +166,7 @@ AI-8003  Pinpon Music Melody
 		<publisher>Sega</publisher>
 		<info name="serial" value="AI-4059"/>
 		<info name="alt_title" value="おーしゃん・ふぁんたじー"/>
+		<info name="barcode" value="4974365240691"/>
 		<part name="card" interface="segaai_card">
 			<feature name="slot" value="rom_256"/>
 			<dataarea name="rom" size="0x40000">
@@ -175,6 +181,7 @@ AI-8003  Pinpon Music Melody
 		<publisher>Sega</publisher>
 		<info name="serial" value="AI-4060"/>
 		<info name="alt_title" value="ころんぶす・まっぷ"/>
+		<info name="barcode" value="4974365240707"/>
 		<part name="card" interface="segaai_card">
 			<feature name="slot" value="rom_128"/>
 			<dataarea name="rom" size="0x20000">
@@ -189,6 +196,7 @@ AI-8003  Pinpon Music Melody
 		<publisher>Sega</publisher>
 		<info name="serial" value="AI-4114"/>
 		<info name="alt_title" value="るんるん・みゅーじっく"/>
+		<info name="barcode" value="4974365241148"/>
 		<part name="card" interface="segaai_card">
 			<feature name="slot" value="rom_128"/>
 			<dataarea name="rom" size="0x20000">
@@ -203,6 +211,7 @@ AI-8003  Pinpon Music Melody
 		<publisher>Sega</publisher>
 		<info name="serial" value="AI-4115"/>
 		<info name="alt_title" value="たんたん・りずむ"/>
+		<info name="barcode" value="4974365241155"/>
 		<part name="card" interface="segaai_card">
 			<feature name="slot" value="rom_128"/>
 			<dataarea name="rom" size="0x20000">
@@ -217,6 +226,7 @@ AI-8003  Pinpon Music Melody
 		<publisher>Sega</publisher>
 		<info name="serial" value="AI-4116"/>
 		<info name="alt_title" value="らんらん・めろでぃー"/>
+		<info name="barcode" value="4974365241162"/>
 		<part name="card" interface="segaai_card">
 			<feature name="slot" value="rom_128"/>
 			<dataarea name="rom" size="0x20000">
