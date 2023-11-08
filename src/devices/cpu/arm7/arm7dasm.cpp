@@ -103,7 +103,7 @@ void arm7_disassembler::WriteShiftCount( std::ostream &stream, uint32_t opcode )
 {
 	if( opcode&0x10 ) /* Shift amount specified in bottom bits of RS */
 	{
-		util::stream_format( stream, "R%d", (opcode>>7)&0xf );
+		util::stream_format( stream, "R%d", (opcode>>8)&0xf );
 	}
 	else /* Shift amount immediate 5 bit unsigned integer */
 	{
