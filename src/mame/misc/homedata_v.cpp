@@ -378,20 +378,6 @@ void homedata_upd7807_state::pteacher_palette(palette_device &palette) const
 	}
 }
 
-void homedata_state::mirderby_palette(palette_device &palette) const
-{
-	uint8_t const *const color_prom = memregion("proms")->base();
-
-	for (int i = 0; i < 0x100; i++)
-	{
-		int const r = color_prom[0x000+i];
-		int const g = color_prom[0x100+i];
-		int const b = color_prom[0x200+i];
-
-		palette.set_pen_color(i,pal4bit(r),pal4bit(g),pal4bit(b));
-	}
-}
-
 /***************************************************************************
 
   Callbacks for the TileMap code
@@ -563,47 +549,6 @@ TILE_GET_INFO_MEMBER(homedata_upd7807_state::lemnangl_get_info1_1)
 	lemnangl_info(tileinfo, tile_index, 1, 1, (m_blitter_bank & 2) >> 1, m_gfx_bank[0] >> 4);
 }
 
-// FIXME: not right and likely doesn't even exist for this
-inline void homedata_state::mirderby_info0(tile_data &tileinfo, int tile_index, int page, int gfxbank)
-{
-	int const addr  = tile_index * 2 + 0x2000 * page;
-	int const attr  = m_videoram[addr];
-	int const code  = m_videoram[addr + 1] + ((attr & 0x03) << 8);// + (gfxbank << 10);
-	int const color = (attr >> 4) & 0xf;
-
-	tileinfo.set(1, code, color, m_flipscreen );
-}
-inline void homedata_state::mirderby_info1(tile_data &tileinfo, int tile_index, int page, int gfxbank)
-{
-	int const addr  = tile_index * 2 + 0x1000 + 0x2000 * page;
-	int const attr  = m_videoram[addr];
-	int const code  = m_videoram[addr + 1] + ((attr & 0x03) << 8) + 0x400;//(gfxbank << 11);
-	int const color = (attr >> 4) & 0xf;
-
-	tileinfo.set(1, code, color, m_flipscreen );
-}
-
-TILE_GET_INFO_MEMBER(homedata_state::mirderby_get_info0_0)
-{
-	mirderby_info0(tileinfo, tile_index, 0, 0);// m_blitter_bank & 0x03 );
-}
-
-TILE_GET_INFO_MEMBER(homedata_state::mirderby_get_info1_0)
-{
-	mirderby_info0(tileinfo, tile_index, 1, 0);// m_blitter_bank & 0x03 );
-}
-
-TILE_GET_INFO_MEMBER(homedata_state::mirderby_get_info0_1)
-{
-	mirderby_info1(tileinfo, tile_index, 0, 0);//(m_blitter_bank & 0x38) >> 3 );
-}
-
-TILE_GET_INFO_MEMBER(homedata_state::mirderby_get_info1_1)
-{
-	mirderby_info1(tileinfo, tile_index, 1, 0);//(m_blitter_bank & 0x38) >> 3 );
-}
-
-
 
 /***************************************************************************
 
@@ -663,17 +608,6 @@ VIDEO_START_MEMBER(homedata_upd7807_state,lemnangl)
 
 	m_bg_tilemap[0][1]->set_transparent_pen(0x0f);
 	m_bg_tilemap[1][1]->set_transparent_pen(0x0f);
-}
-
-VIDEO_START_MEMBER(homedata_state,mirderby)
-{
-	m_bg_tilemap[0][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(homedata_state::mirderby_get_info0_0)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_bg_tilemap[0][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(homedata_state::mirderby_get_info0_1)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_bg_tilemap[1][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(homedata_state::mirderby_get_info1_0)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_bg_tilemap[1][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(homedata_state::mirderby_get_info1_1)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-
-//	m_bg_tilemap[0][1]->set_transparent_pen(0);
-	m_bg_tilemap[1][1]->set_transparent_pen(0);
 }
 
 /***************************************************************************
@@ -988,16 +922,6 @@ uint32_t homedata_upd7807_state::screen_update_pteacher(screen_device &screen, b
 
 	return 0;
 }
-
-uint32_t homedata_state::screen_update_mirderby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	bitmap.fill(m_palette->black_pen(), cliprect);
-
-	m_bg_tilemap[0][1]->draw(screen, bitmap, cliprect, 0, 0);
-
-	return 0;
-}
-
 
 void homedata_state::screen_vblank(int state)
 {
