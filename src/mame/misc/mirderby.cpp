@@ -70,7 +70,7 @@ public:
 		, m_subcpu(*this, "subcpu")
 		, m_audiocpu(*this, "audiocpu")
 		, m_ymsnd(*this, "ymsnd")
-		, m_vreg(*this, "vreg")
+//		, m_vreg(*this, "vreg")
 		, m_videoram(*this, "videoram")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
@@ -91,7 +91,7 @@ private:
 	required_device<mc6809e_device> m_subcpu;
 	required_device<cpu_device> m_audiocpu;
 	optional_device<ym2203_device> m_ymsnd;
-	optional_shared_ptr<uint8_t> m_vreg;
+//	optional_shared_ptr<uint8_t> m_vreg;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -125,7 +125,7 @@ private:
 	tilemap_t *m_bg_tilemap{};
 //	int m_visible_page = 0;
 //	int m_priority = 0;
-	[[maybe_unused]] int m_flipscreen = 0;
+//	[[maybe_unused]] int m_flipscreen = 0;
 	u8 m_prot_data = 0;
 	u8 m_latch = 0;
 };
@@ -182,6 +182,8 @@ void mirderby_state::screen_vblank(int state)
 {
 	if (state)
 	{
+		// TODO: each irq routine pings a bit of $8000 for masking/acknowledge
+		// TODO: study FIRQ for main CPU
 		m_maincpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 		// FIRQ and IRQ same for sub CPU
 		m_subcpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
@@ -227,6 +229,12 @@ void mirderby_state::main_map(address_map &map)
 	map(0x6000, 0x6fff).ram(); /* work ram */
 	map(0x7000, 0x77ff).ram().share("share2");
 	map(0x7800, 0x7800).rw(FUNC(mirderby_state::prot_r), FUNC(mirderby_state::prot_w)); // protection check? (or sound comms?)
+	map(0x7ffd, 0x7ffd).lw8(
+		NAME([this] (u8 data) {
+			m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+			//logerror("%02x latch write\n", data);
+		})
+	);
 	map(0x7ffe, 0x7ffe).nopr(); //watchdog?
 	map(0x7ffe, 0x7ffe).lw8(
 		NAME([this] (u8 data) {
@@ -263,11 +271,17 @@ void mirderby_state::sub_map(address_map &map)
 	map(0x6000, 0x6fff).ram(); // work RAM
 	map(0x7000, 0x77ff).ram().share("share2");
 	//0x7ff0 onward seems CRTC
-	map(0x7ff0, 0x7ffd).writeonly().share("vreg");
+//	map(0x7ff0, 0x7ffd).writeonly().share("vreg");
 	map(0x7ff2, 0x7ff2).portr("IN0");
 	map(0x7ff9, 0x7ffa).lr8(
 		NAME([] (offs_t offset) {
 			return 0;
+		})
+	);
+	map(0x7ffd, 0x7ffd).lw8(
+		NAME([this] (u8 data) {
+			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+			//logerror("%02x latch write\n", data);
 		})
 	);
 	map(0x7ffe, 0x7ffe).nopr(); //watchdog?
@@ -275,7 +289,7 @@ void mirderby_state::sub_map(address_map &map)
 	// TODO: $8000 writes (ROM bank? NMI enable? CPU comms?)
 	map(0x8000, 0x8000).lw8(
 		NAME([this] (u8 data) {
-			m_subbank->set_entry((data & 1) ^ 1);
+			m_subbank->set_entry(BIT(data, 7) ? 1 : 0);
 		})
 	);
 }
@@ -373,7 +387,7 @@ void mirderby_state::machine_start()
 
 void mirderby_state::machine_reset()
 {
-	m_subbank->set_entry(1);
+	m_subbank->set_entry(0);
 }
 
 /* clocks are 16mhz and 9mhz */
