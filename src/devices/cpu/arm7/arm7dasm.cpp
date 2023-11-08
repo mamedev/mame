@@ -650,7 +650,7 @@ u32 arm7_disassembler::arm7_disasm( std::ostream &stream, uint32_t pc, uint32_t 
 			//hide zero offsets
 			if(opcode&0xfff) {
 				stream << ", #";
-				if( opcode&0x00800000 )
+				if( !(opcode&0x00800000 ))
 					stream << '-';
 				if( (opcode&0xfff) > 9)
 					stream << "0x";
