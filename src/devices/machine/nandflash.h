@@ -78,7 +78,6 @@ protected:
 	uint32_t m_page_addr; // page address pointer
 	uint32_t m_byte_addr;          // byte address pointer
 	uint32_t m_addr_load_ptr;      // address load pointer
-	uint32_t m_scratch_page_addr; // scratchpad to write address to during reads, before latched by second cycle
 
 	uint8_t m_status;             // current status
 	uint8_t m_accumulated_status; // accumulated status
