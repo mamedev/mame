@@ -30224,7 +30224,6 @@ jogakuen                        // (c) 1992 Windom corporation
 lastapos                        // (c) 1988 Home Data
 lemnangl                        // (c) 1990 Home Data
 mhgaiden                        // (c) 1987 Home Data
-mirderby                        // (c) 1988 Home Data?
 mjclinic                        // (c) 1988 Home Data
 mjclinica                       // (c) 1988 Home Data
 mjhokite                        // (c) 1988 Home Data
@@ -30566,6 +30565,9 @@ fiches12                        //
 @source:misc/mirax.cpp
 mirax                           // (c) 1985 Current Technologies
 miraxa                          // (c) 1985 Current Technologies
+
+@source:misc/mirderby.cpp
+mirderby                        // (c) 1988 Home Data?
 
 @source:misc/mjsenpu.cpp
 mjsenpu
