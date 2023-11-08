@@ -309,7 +309,8 @@ swp30_device::swp30_device(const machine_config &mconfig, const char *tag, devic
 	: cpu_device(mconfig, SWP30, tag, owner, clock),
 	  device_sound_interface(mconfig, *this),
 	  m_program_config("meg_program", ENDIANNESS_LITTLE, 64, 9, -3, address_map_constructor(FUNC(swp30_device::meg_prg_map), this)),
-	  m_rom_config("sample_rom", ENDIANNESS_LITTLE, 32, 25, -2)
+	  m_rom_config("sample_rom", ENDIANNESS_LITTLE, 32, 25, -2),
+	  m_reverb_config("reverb_ram", ENDIANNESS_LITTLE, 16, 18, -1, address_map_constructor(FUNC(swp30_device::meg_reverb_map), this))
 {
 }
 
@@ -317,7 +318,9 @@ void swp30_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
 	m_rom     = &space(AS_DATA);
+	m_reverb  = &space(AS_REVERB);
 	m_rom->cache(m_rom_cache);
+	m_reverb->cache(m_reverb_cache);
 
 	state_add(STATE_GENPC,     "GENPC",     m_meg_pc).noshow();
 	state_add(STATE_GENPCBASE, "CURPC",     m_meg_pc).noshow();
@@ -1109,6 +1112,11 @@ u64 swp30_device::meg_prg_map_r(offs_t address)
 	return m_meg_program[address];
 }
 
+void swp30_device::meg_reverb_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).ram();
+}
+
 u16 swp30_device::swp30d_const_r(u16 address) const
 {
 	return m_meg_const[address];
@@ -1124,6 +1132,7 @@ device_memory_interface::space_config_vector swp30_device::memory_space_config()
 	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_program_config),
 		std::make_pair(AS_DATA,    &m_rom_config),
+		std::make_pair(AS_REVERB,  &m_reverb_config),
 	};
 }
 
@@ -1174,7 +1183,7 @@ s32 swp30_device::meg_att(s32 sample, s32 att)
 
 void swp30_device::execute_run()
 {
-	while(m_icount) {
+	while(m_icount >= 0) {
 		if(m_meg_pc == 0) {
 			if(0) {
 				static std::array<mixer_slot, 0x80> mixer;
@@ -1481,6 +1490,7 @@ void swp30_device::execute_run()
 				// It looks like this could be turned into something generic, but not 100% clear
 				switch(route) {
 				case 0x000000000000:
+					// Incorrect, the program writes the outputs to m30/m31
 					m_meg_output[0] += meg_att(input, (vol[0] >> 8)   + (vol[1] >> 8));
 					m_meg_output[1] += meg_att(input, (vol[0] & 0xff) + (vol[1] >> 8));
 					break;

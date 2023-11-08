@@ -13,6 +13,8 @@
 class swp30_device : public cpu_device, public device_sound_interface, public swp30_disassembler::info
 {
 public:
+	enum { AS_REVERB = AS_IO };
+
 	swp30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 33868800);
 
 	void map(address_map &map);
@@ -46,9 +48,10 @@ private:
 		std::array<u16, 3> route;
 	};
 
-	address_space_config m_program_config, m_rom_config;
-	address_space *m_program, *m_rom;
+	address_space_config m_program_config, m_rom_config, m_reverb_config;
+	address_space *m_program, *m_rom, *m_reverb;
 	memory_access<25, 2, -2, ENDIANNESS_LITTLE>::cache m_rom_cache;
+	memory_access<18, 1, -1, ENDIANNESS_LITTLE>::cache m_reverb_cache;
 
 	sound_stream *m_stream;
 
@@ -212,6 +215,8 @@ private:
 
 	void meg_prg_map(address_map &map);
 	u64 meg_prg_map_r(offs_t address);
+
+	void meg_reverb_map(address_map &map);
 
 	virtual u16 swp30d_const_r(u16 address) const override;
 	virtual u16 swp30d_offset_r(u16 address) const override;
