@@ -24,6 +24,7 @@ protected:
 	virtual uint32_t execute_min_cycles() const noexcept override;
 	virtual uint32_t execute_max_cycles() const noexcept override;
 	virtual uint32_t execute_input_lines() const noexcept override;
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 1) / 2; }
 	virtual void execute_run() override;
 	virtual space_config_vector memory_space_config() const override;
 	virtual void state_import(const device_state_entry &entry) override;
@@ -38,6 +39,11 @@ private:
 		DECAY1,
 		DECAY2,
 		RELEASE
+	};
+
+	struct mixer_slot {
+		std::array<u16, 3> vol;
+		std::array<u16, 3> route;
 	};
 
 	address_space_config m_program_config, m_rom_config;
@@ -66,9 +72,6 @@ private:
 	std::array<u16,  0x40> m_decay1;
 	std::array<u16,  0x40> m_decay2;
 	std::array<u16,  0x40> m_release_glo;
-	std::array<u16,  0x40> m_pan;
-	std::array<u16,  0x40> m_dry_rev;
-	std::array<u16,  0x40> m_cho_var;
 	std::array<u16,  0x40> m_lfo_step_pmod;
 	std::array<u16,  0x40> m_lfo_amod;
 
@@ -92,6 +95,12 @@ private:
 	std::array<u16,  0x18> m_meg_lfo;
 	std::array<u16,     8> m_meg_map;
 
+	std::array<mixer_slot, 0x80> m_mixer;
+
+	std::array<s32,  0x40> m_meg_m;
+	std::array<s32,  0x10> m_melo;
+	std::array<s32,     2> m_meg_output;
+
 	s32 m_sample_history[0x40][2][2];
 
 	u32 m_waverom_adr, m_waverom_mode, m_waverom_val;
@@ -99,7 +108,6 @@ private:
 
 	u16 m_lpf_cutoff[0x40], m_lpf_cutoff_inc[0x40], m_lpf_reso[0x40], m_hpf_cutoff[0x40];
 	s16 m_eq_filter[0x40][6];
-	u16 m_routing[0x40][3];
 
 	u64 m_keyon_mask;
 	u16 m_internal_adr;
@@ -158,8 +166,10 @@ private:
 	u16 internal_adr_r();
 	void internal_adr_w(u16 data);
 	u16 internal_r();
-	template<int sel> u16 routing_r(offs_t offset);
-	template<int sel> void routing_w(offs_t offset, u16 data);
+	template<int sel> u16 route_r(offs_t offset);
+	template<int sel> void route_w(offs_t offset, u16 data);
+	template<int sel> u16 vol_r(offs_t offset);
+	template<int sel> void vol_w(offs_t offset, u16 data);
 
 	// Envelope control
 	void change_mode_attack_decay1(int chan);
@@ -170,6 +180,7 @@ private:
 	static s32 fpsub(s32 value, s32 step);
 	static s32 fpapply(s32 value, s32 sample);
 	static s32 lpffpapply(s32 value, s32 sample);
+	static s32 meg_att(s32 sample, s32 att);
 
 	// Control registers
 	template<int sel> u16 keyon_mask_r();
