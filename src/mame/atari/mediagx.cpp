@@ -3,13 +3,13 @@
 /*  Atari MediaGX
 
     Driver by Ville Linde
-
 */
 
 /*
     Main Board number: P5GX-LG REV:1.1
+        A-22540 CPU Board Assembly
 
-    Components list on mainboard, clockwise from top left.
+    Components list on MAIN board, clockwise from top left.
     ----------------------------
     SST29EE020 (2 Megabyte EEPROM, PLCC32, surface mounted, labelled 'PhoenixBIOS PENTIUM(tm) CPU (c)PHOENIX 1992-1993')
     Y1: XTAL KDS7M (To pin 122 of FDC37C932)
@@ -30,6 +30,9 @@
     AD 706 (SOIC8)
     15 PIN VGA CONNECTOR (DSUB15, plugged into custom Atari board)
     25 PIN PARALLEL CONNECTOR (DSUB25, plugged into custom Atari board)
+            Data Signal bus with the Custom Atari board
+            * Only 17 pins used in manual, but appears to be a 25-pin connector
+
     ICS9120 (SOIC8)
     AD706 (SOIC8)
     NE558 (SOIC16)
@@ -43,6 +46,7 @@
 
 
     Custom Atari board number: ATARI GAMES INC. 5772-15642-02 JAMMIT
+        04-11238 JAMMIT PCB Assembly
 
     Components list on custom Atari board, clockwise from top left.
     -------------------------------------
@@ -52,6 +56,9 @@
     4 PIN POWER CONNECTOR for IDE Hard Drive
     15 PIN VGA CONNECTOR (DSUB15, plugged into MAIN board)
     25 PIN PARALLEL CONNECTOR (DSUB25, plugged into MAIN board)
+            Data Signal bus with the CPU (Main) Board Assembly
+            * Only 17 pins used in manual
+
     AD 813AR (x2, SOIC14)
     ST 084C P1S735 (x2, SOIC14)
     74F244 (SOIC20)
@@ -60,6 +67,10 @@
     3 PIN JUMPER for SYNC (Set to -, alternative setting is +)
     OSC 14.31818MHz
     ACTEL A42MX09 (PLCC84, labelled 'JAMMINT U6 A-22505 (C)1996 ATARI')
+            Designation:    U6
+            Part #:             A-22505
+            Function:       Gun control and security
+            Description:    FPGA Assembly
     LS14 (SOIC14)
     74F244 (x2, SOIC20)
     ST ULN2064B (DIP16)
@@ -84,7 +95,7 @@
 
 namespace {
 
-#define SPEEDUP_HACKS   1
+#define SPEEDUP_HACKS 1
 
 class mediagx_state : public pcat_base_state
 {
@@ -125,13 +136,16 @@ private:
 	void memory_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t biu_ctrl_r(offs_t offset);
 	void biu_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+
 	uint32_t parallel_port_r(offs_t offset, uint32_t mem_mask = ~0);
 	void parallel_port_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+
 	uint32_t ad1847_r(offs_t offset);
 	void ad1847_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	[[maybe_unused]] void bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint8_t io20_r(offs_t offset);
 	void io20_w(offs_t offset, uint8_t data);
+
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	template <offs_t N> uint32_t speedup_r(address_space &space) { return generic_speedup(space, N); }
 	TIMER_DEVICE_CALLBACK_MEMBER(sound_timer_callback);
@@ -176,7 +190,7 @@ private:
 	required_device<palette_device> m_palette;
 	uint8_t m_pal[768];
 
-	optional_ioport_array<9> m_ports;   // but parallel_pointer takes values 0 -> 23
+	optional_ioport_array<11> m_ports; // but parallel_pointer takes values 0 -> 23
 
 	uint32_t m_disp_ctrl_reg[256/4]{};
 	int m_frame_width = 0;
@@ -185,20 +199,27 @@ private:
 	uint32_t m_memory_ctrl_reg[256/4]{};
 	int m_pal_index = 0;
 
+	// Bus Interface Unit (BIU) Control Register
 	uint32_t m_biu_ctrl_reg[256/4]{};
 
 	uint8_t m_mediagx_config_reg_sel = 0;
 	uint8_t m_mediagx_config_regs[256]{};
 
-	//uint8_t m_controls_data = 0;
+	// Parallel Port stuff
+	// Points to a port in the list of m_ports, allows selection of coin, inputs, controls, etc.
 	uint8_t m_parallel_pointer = 0;
+	// This latches the value retrieved from m_ports[m_parallel_pointer], allowing us to read it later
 	uint8_t m_parallel_latched = 0;
+	// The parallel port itself, data is read/written from here
 	uint32_t m_parport = 0;
-	//int m_control_num = 0;
-	//int m_control_num2 = 0;
-	//int m_control_read = 0;
+	// simple control register for the parallel port
+	// updates on writes, changing the state, and reflected in the subsequent reads
+	uint8_t m_parport_control_reg = 0;
+	//int m_control_num;
+	//int m_control_num2;
+	//int m_control_read;
 
-	uint32_t m_cx5510_regs[256/4]{};
+	uint32_t m_cx5510_regs[256/4];
 
 	std::unique_ptr<int16_t[]> m_dacl;
 	std::unique_ptr<int16_t[]> m_dacr;
@@ -390,15 +411,17 @@ void mediagx_state::draw_cga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 	for (int j=0; j < 25; j++)
 	{
+		int j8 = j*8;
 		for (int i=0; i < 80; i+=2)
 		{
+			int i8 = i*8;
 			int const att0 = (cga[index] >> 8) & 0xff;
 			int const ch0 = (cga[index] >> 0) & 0xff;
 			int const att1 = (cga[index] >> 24) & 0xff;
 			int const ch1 = (cga[index] >> 16) & 0xff;
 
-			draw_char(bitmap, cliprect, gfx, ch0, att0, i*8, j*8);
-			draw_char(bitmap, cliprect, gfx, ch1, att1, (i*8)+8, j*8);
+			draw_char(bitmap, cliprect, gfx, ch0, att0, i8, j8);
+			draw_char(bitmap, cliprect, gfx, ch1, att1, i8+8, j8);
 			index++;
 		}
 	}
@@ -446,14 +469,17 @@ void mediagx_state::disp_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 }
 
 
+// Read from memory, generally done at start/setup
 uint32_t mediagx_state::memory_ctrl_r(offs_t offset)
 {
 	return m_memory_ctrl_reg[offset];
 }
 
+
+// Write to memory, generally done at start/setup
 void mediagx_state::memory_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-//  printf("memory_ctrl_w %08X, %08X, %08X\n", data, offset*4, mem_mask);
+	// printf("memory_ctrl_w %08X, %08X, %08X\n", data, offset*4, mem_mask);
 	if (offset == 0x20/4)
 	{
 		if((m_disp_ctrl_reg[DC_GENERAL_CFG] & 0x00e00000) == 0x00400000)
@@ -463,11 +489,13 @@ void mediagx_state::memory_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mas
 		}
 		else if((m_disp_ctrl_reg[DC_GENERAL_CFG] & 0x00f00000) == 0x00000000)
 		{
+			// set index from data
 			m_pal_index = data;
 			m_ramdac->index_w(data);
 		}
 		else if((m_disp_ctrl_reg[DC_GENERAL_CFG] & 0x00f00000) == 0x00100000)
 		{
+			// write data at current index
 			m_pal[m_pal_index] = data & 0xff;
 			m_pal_index++;
 			if (m_pal_index >= 768)
@@ -508,74 +536,360 @@ void mediagx_state::bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 }
 
+/**
+ * The I/O locations 0x22 and 0x23 are used for MediaGX processor configuration register access.
+ * Reading occurs at 0x23, where a prior index was written on 0x22 to read from
+ */
 uint8_t mediagx_state::io20_r(offs_t offset)
 {
-	uint8_t r = 0;
-
 	// 0x22, 0x23, Cyrix configuration registers
-	if (offset == 0x00)
+	if (offset == 0x01)
 	{
+		// read only occurs over 0x23, assumes prior 0x22 has set the register index correctly
+		return m_mediagx_config_regs[m_mediagx_config_reg_sel];
 	}
-	else if (offset == 0x01)
-	{
-		r = m_mediagx_config_regs[m_mediagx_config_reg_sel];
-	}
-	return r;
+	return 0;
 }
 
+
+/**
+ * I/O locations 0x22 and 0x23 are used for MediaGX processor configuration register access.
+ * A write to 0x22 sets the index of the configuration register.
+ * A subsequent read on 0x23 should use this index
+ * Each operation on 0x23 should be proceeded by a valid index set on 0x22
+ */
 void mediagx_state::io20_w(offs_t offset, uint8_t data)
 {
 	// 0x22, 0x23, Cyrix configuration registers
 	if (offset == 0x00)
 	{
+		// Index of the configuration register is received on 0x22
 		m_mediagx_config_reg_sel = data;
 	}
 	else if (offset == 0x01)
 	{
+		// Data written through 0x23, assumes prior index set via write over 0x22
 		m_mediagx_config_regs[m_mediagx_config_reg_sel] = data;
 	}
 }
 
+// Takes an 8-bit input val, and converts it into an
+// appropriate output val for reading from IO 0x379 on the par port
+// Only interested in the low 4-bits
+uint16_t mk_parport_outval(uint8_t v) {
+	if(v >= 0x10) {
+		printf("[WARN] mk_parport_outval given too large a value: %08x\n", v);
+	}
+
+	uint16_t v2 = v << 3;
+	if(v2 & 0x40) {
+		// high bit is set, leave inverted bit low
+		// clear high bit
+		v2 ^= 0x40;
+	} else {
+		// high bit is not set, set inverted bit high
+		v2 |= 0x80;
+
+	}
+	return v2 << 8;
+}
+
+int par_pointer_out_val = 0x5;
+
+uint8_t previous_parport_state = 0;
+
+// used to control whether 2-bits for P2 jgun X should be read
+// same value usually triggers system menu, so tracking when this is okay to read to avoid the overlap
+bool should_read_p2x_highbits = false;
+
+// Reads from the parallel port
+// 'offset' seems to be nearly constant in this case
+// the 'mem_mask' changes between (L) 0000FF00 and (H) 00FF0000
 uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 
 	if (ACCESSING_BITS_8_15)
 	{
-		uint8_t nibble = m_parallel_latched;
-		r |= ((~nibble & 0x08) << 12) | ((nibble & 0x07) << 11);
-		logerror("%08X:parallel_port_r()\n", m_maincpu->pc());
-#if 0
-		if (m_controls_data == 0x18)
-		{
-			r |= m_ports[0]->read() << 8;
-		}
-		else if (m_controls_data == 0x60)
-		{
-			r |= m_ports[1]->read() << 8;
-		}
-		else if (m_controls_data == 0xff || m_controls_data == 0x50)
-		{
-			r |= m_ports[2]->read() << 8;
+		uint32_t mp0 = 0;
+		uint8_t upper_reg = m_parport_control_reg >> 4;
+
+		if(m_parport_control_reg == 0x10) {
+			r = mk_parport_outval(0);
+
+		} else if(m_parport_control_reg == 0x18) {
+			// Check for F2 to open the system menu
+			// TEST MODE switch, only works here on 0x18
+			mp0 = m_ports[0].read_safe(0);
+
+			// high 2-bits of P2X (controls thirds of X access)
+			int16_t p2x = m_ports[9].read_safe(0) * 3;
+			if ((previous_parport_state >> 4) == 0xF) {
+
+				if(mp0 & 1) {
+					// allow opening the System Menu (TEST)
+					r = mk_parport_outval(2);
+
+				} else if (p2x > 512 && should_read_p2x_highbits) {
+					// P2 X 3/3, only when we're allowed to read this (always a bit after a 0x5 has been seen)
+					r = mk_parport_outval(2);
+
+				} else if (p2x > 256) {
+					// P2 X 2/3
+					r = mk_parport_outval(1);
+
+				} else {
+					// regular response
+					r = mk_parport_outval(0);
+				}
+
+				// clear this flag
+				should_read_p2x_highbits = false;
+
+			} else {
+				r = mk_parport_outval(0);
+			}
+
+		} else if(upper_reg == 0x2) {
+			// Tilt, Test, unused, Bill... 3rd option is unused, Bill is inverted by the way
+			uint8_t mp2 = m_ports[2].read_safe(0);
+			r = mk_parport_outval(mp2);
+
+		} else if(upper_reg == 0x3) {
+			// Coins
+			mp0 = m_ports[0].read_safe(0);
+			// @montymxb This toggles the appropriate coin switches 1-4, but does not actually cause a credit to show up.
+			// Instead we rely on 0x6 to actually put coins in, and this to toggle the switch correctly...not sure why yet
+			r = mk_parport_outval((mp0 & 0xf0) >> 4 ^ 0xe);
+
+		} else if(upper_reg == 0x4) {
+			// SVC (service credits 1 + 2), and Audio controls
+			uint32_t mp1 = m_ports[1].read_safe(0);
+			// Service Credits 1 + 2, along with Volume controls.
+			// Bit 4 has to be inverted (0x8), active low, done in inputs already
+			r = mk_parport_outval(mp1);
+
+		} else if(upper_reg == 0x5) {
+			// Start buttons
+			// P1 - P4 start buttons
+			// All start buttons lead to jgun movements being registered, but in a different fashion?
+			mp0 = m_ports[0].read_safe(0);
+			r = mk_parport_outval(mp0 >> 0x8);
+
+			// set flag that next time control reg is 0x18,
+			// we should read P2 X high bits
+			should_read_p2x_highbits = true;
+
+		} else if(m_parport_control_reg == 0x60) {
+			// Reset watchdogs?
+			// coins & coin tracker only tripped together under 0x60
+			mp0 = m_ports[0].read_safe(0);
+
+			// keeping 0xf0 as the bitmask pushes the coin insertion to keys 5-8, which is desirable
+			if(mp0 & 0xf0) {
+				// this changes coin insertion to show up on 1-5, but it doesn't block the mode interestingly enough
+				// drops a coin in, but does not toggle the 'coin' switch itself
+				r = mk_parport_outval(0x1);
+			}
+
+		} else if(upper_reg == 0xF) {
+			// TODO Internal pointer advance?
+			mp0 = m_ports[0].read_safe(0);
+
+			r = mk_parport_outval(0);
+
+			int16_t mp5;
+			int8_t mp6; // TODO should be converted to 16-bit
+			int16_t p2y;
+			int16_t p2x;
+
+			uint8_t mp_gen;
+
+			// JGun Analog Controls
+			switch (m_parallel_pointer) {
+				case 10:
+					// Related to enabling P2 Start, P1 start, and allows some basic controls as such
+					r = mk_parport_outval(par_pointer_out_val);
+					break;
+				case 11:
+					// TRIGGERS (1 & 2)
+					// 0x1 = P1 Trigger
+					// 0x2 = P2 Trigger
+					// TODO @montymxb Oct. 30th, 2022: Muzzle 'flash' shows up sporadically when shooting, random values of even 0/1 will trigger it as well.
+					// Seems to be connected to some other state machine? Unsure.
+					mp_gen = m_ports[7].read_safe(0);
+					r = mk_parport_outval(mp_gen);
+					break;
+				case 12:
+					// P1 control select (but P2 as well?)
+					// 0x1 allows P1 gun (but P2 already works?)
+					// 0x2, nothing?
+					// 0x4, nothing?
+					// 0x8, nothing?
+					r = mk_parport_outval(0x1);
+					break;
+				case 13:
+					// P1, Y (LOW)
+					// 0x1 = 1
+					// 0x2 = 2
+					// 0x4 = 4
+					// 0x8 = 8
+					// convert mouse Y
+					mp6 = m_ports[6].read_safe(0);
+					mp6 = 128 - mp6;
+					r = mk_parport_outval(mp6 & 0xf);
+					break;
+				case 14:
+					// P1, Y, (HIGH)
+					// 0x1 = 16
+					// 0x2 = 32
+					// 0x4 = -64 (using this inverted approach, needs to be fixed?)
+					// 0x8 = +128
+					mp6 = m_ports[6].read_safe(0);
+					mp6 = 128 - mp6;
+					if (mp6 >= 0 && mp6 < 64) {
+						// 2/4
+						r = mk_parport_outval(((mp6 >> 4) & 0x3));
+
+					} else if (mp6 < -64) {
+						// 4/4
+						r = mk_parport_outval(((mp6 >> 4) & 0x3) | 0x8);
+
+					} else if (mp6 < 0) {
+						// 3/4
+						r = mk_parport_outval(((mp6 >> 4) & 0x3) | 0x4);
+
+					} else if (mp6 >= 64) {
+						// 1/4
+						r = mk_parport_outval(((mp6 >> 4) & 0x3) | 12);
+
+					}
+					break;
+				case 15:
+					// P1, Y (single high bit)
+					// 0x1 = -256
+					// 0x2 = ???
+					// 0x4 = ???
+					// 0x8 = ???
+					mp6 = m_ports[6].read_safe(0);
+					// mp6 = 124 - mp6;
+					if (mp6 >= 0 || mp6 < -64) {
+						r = mk_parport_outval(0x1);
+					}
+					break;
+				case 16:
+					// P1 X (LOW)
+					// 0x1 sets 0x2 as 1, otherwise 0x4 is 1? ** important to set
+					// 0x2 == 1
+					// 0x4 == 2
+					// 0x8 == 4
+					mp5 = int(float(m_ports[5].read_safe(0)) * 3) % 256;
+					r = mk_parport_outval(mp5 & 0xf);
+					break;
+				case 17:
+					// P1 X (Low + High)
+					// 0x1 == 8
+					// 0x2 == 16
+					// 0x4 == 32
+					// 0x8 == 63 ** (not 64 for some reason?)
+					mp5 = int(float(m_ports[5].read_safe(0)) * 3) % 256;
+					r = mk_parport_outval((mp5 >> 4) & 0xf);
+					break;
+				case 18:
+					// P1, X (HH)
+					// 0x1 = 2nd 3rd
+					// 0x2 = last 3rd
+					// 0x4 nothing..
+					// 0x8 nothing..
+					mp5 = int(float(m_ports[5].read_safe(0)) * 3);
+					if (mp5 > 512) {
+						r = mk_parport_outval(0x2);
+					} else if (mp5 > 256) {
+						r = mk_parport_outval(0x1);
+					}
+					break;
+				case 19:
+					// P2, Y (low 4 bits)
+					p2y = 256 - m_ports[10].read_safe(0);
+					r = mk_parport_outval(p2y & 0xf);
+					break;
+				case 20:
+					// P2, Y (high 4 bits)
+					p2y = 256 - m_ports[10].read_safe(0);
+					r = mk_parport_outval((p2y >> 4) & 0xf);
+					break;
+				case 21:
+					// P2, Y (high single bit)
+					// 0x1 = -256
+					// 0x2 = ??? (nothing)
+					// 0x4 = ??? (nothing)
+					// 0x8 = ??? (nothing)
+					r = mk_parport_outval(0x1);
+					break;
+				case 22:
+					// P2, X (lower nibble)
+					// 0x1 = 1
+					// 0x2 = 2
+					// 0x4 = 4
+					// 0x8 = 8
+					p2x = m_ports[9].read_safe(0) * 3 % 256;
+					r = mk_parport_outval(p2x & 0xf);
+					break;
+				case 23:
+					// P2, X (upper nibble)
+					// 0x1 = 16
+					// 0x2 = 32
+					// 0x4 = 64
+					// 0x8 = 128
+					p2x = m_ports[9].read_safe(0) * 3 % 256;
+					r = mk_parport_outval((p2x >> 4) & 0xf);
+					break;
+			}
+
+
+		} else if(upper_reg == 0x0) {
+			// TODO some empty data written on start
+
 		}
 
-		//r |= m_control_read << 8;
-#endif
+		// record prior control register state for parport
+		// (used to help with distinguishing Sys Menu cmd from P2 X high 2-bit inputs)
+		previous_parport_state = m_parport_control_reg;
+
 	}
-	if (ACCESSING_BITS_16_23)
+	else if (ACCESSING_BITS_16_23)
 	{
-		r |= m_parport & 0xff0000;
+		// Reading CONTROL
+		// 0x01 causes a busy spin
+		// 0x02 causes a slight shift in the overall access? (unsure what this really pertains to)
+		// negate bits 0,1, and 3, all are hardware inverted
+
+		// standard ctrl read, return what was set before
+		r = (m_parport & 0xff0000) ^ 0x0b0000;
+
+	} else if(ACCESSING_BITS_0_7) {
+		// Reading DATA
+		// only happens on boot, just return what was written to the parport before, if anything
+		r = m_parport & 0xff;
+
 	}
 
 	return r;
 }
 
+// Writes to m_parport and m_parallel_latched
+// Updates the m_parallel_pointer to the next port, but used only internally here
+// Uses a mask of 0x00FF0000 and 0x000000FF only, alternating
 void mediagx_state::parallel_port_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
+	// update parport registers together, DATA, STATUS, and CONTROL
+	// Can be seen like so: 0xCC SS DD
+	//      where C = Control nibble, S = Status nibble, D = Data nibble
 	COMBINE_DATA( &m_parport );
 
 	if (ACCESSING_BITS_0_7)
 	{
+		// Writing to DATA
 		/*
 		    Controls:
 
@@ -591,72 +905,96 @@ void mediagx_state::parallel_port_w(offs_t offset, uint32_t data, uint32_t mem_m
 		        7x..ff = advance pointer
 		*/
 
-		logerror("%08X:", m_maincpu->pc());
+		//logerror("%08X:", m_maincpu->pc());
 
-		m_parallel_latched = (m_ports[m_parallel_pointer / 3].read_safe(0) >> (4 * (m_parallel_pointer % 3))) & 15;
 		//parallel_pointer++;
 		//logerror("[%02X] Advance pointer to %d\n", data, parallel_pointer);
-		switch (data & 0xfc)
+
+		// update the control register by masking off the low bit
+		// this controls our parallel reads
+		m_parport_control_reg = data & 0xfc;
+
+		switch (m_parport_control_reg)
 		{
 			case 0x18:
+			//case 0x19: dropped anyways by 0xfc...
+			case 0x1a:
+			case 0x1b:
+				// 18 = reset internal pointer to 0
 				m_parallel_pointer = data & 3;
-				logerror("[%02X] Reset pointer to %d\n", data, m_parallel_pointer);
+				//printf("[%02X] Reset pointer to %d\n", data, m_parallel_pointer);
+				//logerror("[%02X] Reset pointer to %d\n", data, m_parallel_pointer);
 				break;
 
 			case 0x20:
 			case 0x24:
 			case 0x28:
 			case 0x2c:
-				logerror("[%02X] General purpose output = x%X\n", data, data & 0x0f);
+				//printf("[%02X] General purpose output (0x2) = x%X\n", data, data & 0x0f);
+				//logerror("[%02X] General purpose output = x%X\n", data, data & 0x0f);
 				break;
 
 			case 0x30:
 			case 0x34:
 			case 0x38:
 			case 0x3c:
-				logerror("[%02X] General purpose output = %Xx\n", data, data & 0x0f);
+				//printf("[%02X] General purpose output (0x3) = x%X\n", data, data & 0x0f);
+				//logerror("[%02X] General purpose output = %Xx\n", data, data & 0x0f);
 				break;
 
 			case 0x40:
 			case 0x44:
 			case 0x48:
 			case 0x4c:
-				logerror("[%02X] Coin counters = %d%d%d%d\n", data, (data >> 3) & 1, (data >> 2) & 1, (data >> 1) & 1, data & 1);
+				//printf("[%02X] Coin counters = %d%d%d%d\n", data, (data >> 3) & 1, (data >> 2) & 1, (data >> 1) & 1, data & 1);
+				//logerror("[%02X] Coin counters = %d%d%d%d\n", data, (data >> 3) & 1, (data >> 2) & 1, (data >> 1) & 1, data & 1);
 				break;
 
 			case 0x50:
 			case 0x54:
 			case 0x58:
 			case 0x5c:
-				logerror("[%02X] Kickers = %d%d\n", data, (data >> 1) & 1, data & 1);
+				//logerror("[%02X] Kickers = %d%d\n", data, (data >> 1) & 1, data & 1);
 				break;
 
 			case 0x60:
 			case 0x64:
 			case 0x68:
 			case 0x6c:
-				logerror("[%02X] Watchdog reset\n", data);
+				//logerror("[%02X] Watchdog reset\n", data);
 				break;
 
 			default:
 				if (data >= 0x70)
 				{
 					m_parallel_pointer++;
-					logerror("[%02X] Advance pointer to %d\n", data, m_parallel_pointer);
+					//logerror("[%02X] Advance pointer to %d\n", data, m_parallel_pointer);
 				}
 				else
-					logerror("[%02X] Unknown write\n", data);
+				{
+					//logerror("[%02X] Unknown write\n", data);
+				}
 				break;
 		}
+	} else if(ACCESSING_BITS_16_23) {
+		// Writing to CONTROL
+
+	} else if(ACCESSING_BITS_8_15) {
+		// Writing to STATUS
+		// this should never happen...
+
 	}
 }
 
 /* Analog Devices AD1847 Stereo DAC */
+#define AD1847_SAMPLE_DELAY 10
+#define AD1847_SAMPLE_SIZE 1000 / AD1847_SAMPLE_DELAY
 
+// TODO: What else uses this callback for sound, might find a good example to make the audio more stable across devices
 TIMER_DEVICE_CALLBACK_MEMBER(mediagx_state::sound_timer_callback)
 {
 	m_ad1847_sample_counter = 0;
-	timer.adjust(attotime::from_msec(10));
+	timer.adjust(attotime::from_msec(AD1847_SAMPLE_DELAY));
 
 	m_dmadac[0]->transfer(1, 0, 1, m_dacl_ptr, m_dacl.get());
 	m_dmadac[1]->transfer(1, 0, 1, m_dacr_ptr, m_dacr.get());
@@ -704,16 +1042,18 @@ void mediagx_state::ad1847_reg_write(int reg, uint8_t data)
 	}
 }
 
+// >> ANALOG DEVICES AD1847JP 'SOUNDPORT' (PLCC44, surface mounted)
 uint32_t mediagx_state::ad1847_r(offs_t offset)
 {
 	switch (offset)
 	{
 		case 0x14/4:
-			return ((m_ad1847_sample_rate) / 100) - m_ad1847_sample_counter;
+			return ((m_ad1847_sample_rate) / (AD1847_SAMPLE_SIZE)) - m_ad1847_sample_counter; // 1000 / 10, usually, so 100
 	}
 	return 0;
 }
 
+// >> ANALOG DEVICES AD1847JP 'SOUNDPORT' (PLCC44, surface mounted)
 void mediagx_state::ad1847_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (offset == 0)
@@ -743,27 +1083,73 @@ void mediagx_state::ad1847_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 void mediagx_state::mediagx_map(address_map &map)
 {
+	// region for the main ram
 	map(0x00000000, 0x0009ffff).ram().share(m_main_ram);
+	//  additional ram region, pad?
 	map(0x000a0000, 0x000affff).ram();
+	// CGA ram follows
 	map(0x000b0000, 0x000b7fff).ram().share(m_cga_ram);
+	// bios RAM follows after
 	map(0x000c0000, 0x000fffff).ram().share(m_bios_ram);
+
 	map(0x00100000, 0x00ffffff).ram();
+	// 256-bit region for BIU Control
 	map(0x40008000, 0x400080ff).rw(FUNC(mediagx_state::biu_ctrl_r), FUNC(mediagx_state::biu_ctrl_w));
+	// 256-bit region for Diplsay control
 	map(0x40008300, 0x400083ff).rw(FUNC(mediagx_state::disp_ctrl_r), FUNC(mediagx_state::disp_ctrl_w));
+	// 256-bit region for Memory Control
+	// Handles R/W to mem, loaded & written at boot
 	map(0x40008400, 0x400084ff).rw(FUNC(mediagx_state::memory_ctrl_r), FUNC(mediagx_state::memory_ctrl_w));
+	// Larger chunk for VRAM (Video Ram)
 	map(0x40800000, 0x40bfffff).ram().share(m_vram);
+	// BIOS itself lives at the end
 	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);    /* System BIOS */
 }
 
+// Maps address ranges to I/O Functions
+// These IO functions are defined for the MediaGX device specifically
+// Larger IO port list:             https://bochs.sourceforge.io/techspec/PORTS.LST
+// Programmaable Interrupt Timer:   https://wiki.osdev.org/PIT#I.2F0_Ports
+// Typical port usages:             https://wiki.osdev.org/I/O_Ports
 void mediagx_state::mediagx_io(address_map &map)
 {
 	pcat32_io_common(map);
+
+	// Access to the registers specific to Cyrix processors
+	// 2-bits
 	map(0x0022, 0x0023).rw(FUNC(mediagx_state::io20_r), FUNC(mediagx_state::io20_w));
-	map(0x00e8, 0x00eb).noprw();     // I/O delay port
+
+	// 0x40 -> 0x41 does something special but not sure?
+	// seems related to interrupts, fetching the result of something that was pressed perhaps?
+	// 0x40 programmable interrupt timer?
+	// See: https://wiki.osdev.org/PIT#I.2F0_Ports
+
+	// 4-bits for the I/O delay port
+	map(0x00e8, 0x00eb).noprw();
+
+	// IDE is an interface for connecting an HDD w/ the computer
+	// Primary Parallel ATA Hard Disk Controller
+	// 8-bits
 	map(0x01f0, 0x01f7).rw(m_ide, FUNC(ide_controller_32_device::cs0_r), FUNC(ide_controller_32_device::cs0_w));
+
+	// 4-bytes
+	// Maps parallel port R/W to an address range in this system, https://en.wikipedia.org/wiki/Parallel_port
+	// Was at 0x037b, but think it should go to 37f for full range?
+	// but keeping at 0x37b so it's the same as it was before, not sure how much it matters here
 	map(0x0378, 0x037b).rw(FUNC(mediagx_state::parallel_port_r), FUNC(mediagx_state::parallel_port_w));
+
+	// More Integrated Drive Electronics (IDE) controller stuff, for interfacing w/ external storage
+	// 8-bits
+	// Primary IDE controller
 	map(0x03f0, 0x03f7).rw(m_ide, FUNC(ide_controller_32_device::cs1_r), FUNC(ide_controller_32_device::cs1_w));
+
+	// AD1847 Audio stuff
+	// 256-bits
 	map(0x0400, 0x04ff).rw(FUNC(mediagx_state::ad1847_r), FUNC(mediagx_state::ad1847_w));
+
+	// PCI Configuration Space, https://en.wikipedia.org/wiki/PCI_configuration_space
+	// specifically for the Intel Pentium motherboard ("Neptune" chipset)
+	// 8-bits
 	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
 }
 
@@ -771,7 +1157,7 @@ void mediagx_state::mediagx_io(address_map &map)
 
 static const gfx_layout CGA_charlayout =
 {
-	8,8,                    /* 8 x 16 characters */
+	8,8,                    /* 8 x 16 characters .... but says 8 intead? */
 	256,                    /* 256 characters */
 	1,                      /* 1 bits per pixel */
 	{ 0 },                  /* no bitplanes; 1 bit per pixel */
@@ -793,58 +1179,90 @@ GFXDECODE_END
 
 static INPUT_PORTS_START(mediagx)
 	PORT_START("IN0")
-	PORT_SERVICE_NO_TOGGLE( 0x001, IP_ACTIVE_HIGH )
-	PORT_BIT( 0x002, IP_ACTIVE_HIGH, IPT_SERVICE1 )
-	PORT_BIT( 0x004, IP_ACTIVE_HIGH, IPT_SERVICE2 )
-	PORT_BIT( 0x008, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN )
+	// activates the debug service menu
+	PORT_SERVICE_NO_TOGGLE( 0x1, IP_ACTIVE_HIGH )
+
+	// Coins
 	PORT_BIT( 0x010, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x020, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x040, IP_ACTIVE_HIGH, IPT_COIN3 )
 	PORT_BIT( 0x080, IP_ACTIVE_HIGH, IPT_COIN4 )
+
+	// Start buttons
 	PORT_BIT( 0x100, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x200, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x400, IP_ACTIVE_HIGH, IPT_START3 )
 	PORT_BIT( 0x800, IP_ACTIVE_HIGH, IPT_START4 )
 
+	// 'Light' Gun X & Y, idea pulled from Carnevil's implementation using the Seattle Driver
+	PORT_START("JGUN0_X") // fake analog X
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
+	PORT_START("JGUN0_Y") // fake analog Y
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10)
+
+	PORT_START("JGUN1_X") // fake analog X
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
+	PORT_START("JGUN1_Y") // fake analog Y
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(2)
+
+	PORT_START("JGUN") // fake switches
+	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Trigger")
+	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Trigger")
+
+	// Service 1 + 2 & Volume controls
 	PORT_START("IN1")
-	PORT_BIT( 0x00f, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x0f0, IP_ACTIVE_HIGH, IPT_BUTTON2 )
-	PORT_BIT( 0xf00, IP_ACTIVE_HIGH, IPT_BUTTON3 )
+	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_SERVICE1 )
+	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_SERVICE2 )
+	PORT_BIT( 0x4, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN )
+	PORT_BIT( 0x8, IP_ACTIVE_LOW, IPT_VOLUME_UP )
 
+	// Tilt, Test, UNUSED, Bill
 	PORT_START("IN2")
-	PORT_BIT( 0x00f, IP_ACTIVE_HIGH, IPT_BUTTON4 )
-	PORT_BIT( 0x0f0, IP_ACTIVE_HIGH, IPT_BUTTON5 )
-	PORT_BIT( 0xf00, IP_ACTIVE_HIGH, IPT_BUTTON6 )
+	PORT_BIT(0x1, IP_ACTIVE_HIGH, IPT_TILT);
+	PORT_BIT(0x2, IP_ACTIVE_HIGH, IPT_SERVICE); // is this 'test' switch service mode?
+	PORT_BIT(0x4, IP_ACTIVE_HIGH, IPT_UNUSED); // unused
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_BILL1);
 
+	// ZX CV, for debugging
 	PORT_START("IN3")
-	PORT_BIT( 0x00f, IP_ACTIVE_HIGH, IPT_BUTTON7 )
-	PORT_BIT( 0x0f0, IP_ACTIVE_HIGH, IPT_BUTTON8 )
-	PORT_BIT( 0xf00, IP_ACTIVE_HIGH, IPT_BUTTON9 )
+	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON5 )
+	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON6 )
+	PORT_BIT( 0x4, IP_ACTIVE_HIGH, IPT_BUTTON7 )
+	PORT_BIT( 0x8, IP_ACTIVE_HIGH, IPT_BUTTON8 )
 
+	// BN M, for debugging
 	PORT_START("IN4")
-	PORT_BIT( 0x00f, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0f0, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0xf00, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON9 )
+	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON10 )
+	PORT_BIT( 0x4, IP_ACTIVE_HIGH, IPT_BUTTON11 )
+	PORT_BIT( 0x8, IP_ACTIVE_HIGH, IPT_BUTTON12 )
 
+	// JGun0 X
 	PORT_START("IN5")
-	PORT_BIT( 0x00f, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(3)
-	PORT_BIT( 0x0f0, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(3)
-	PORT_BIT( 0xf00, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(3)
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
 
+	// JGun0 Y
 	PORT_START("IN6")
-	PORT_BIT( 0x00f, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x0f0, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0xf00, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
 
+	// JGun Triggers
 	PORT_START("IN7")
-	PORT_BIT( 0x00f, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
-	PORT_BIT( 0x0f0, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
-	PORT_BIT( 0xf00, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Trigger")
+	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Trigger")
 
 	PORT_START("IN8")
 	PORT_BIT( 0x00f, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(3)
 	PORT_BIT( 0x0f0, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(3)
 	PORT_BIT( 0xf00, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(3)
+
+	// JGun1 X
+	PORT_START("IN9")
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(2)
+
+	// JGun1 Y
+	PORT_START("IN10")
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(2)
+
 INPUT_PORTS_END
 
 void mediagx_state::machine_start()
@@ -860,7 +1278,7 @@ void mediagx_state::machine_reset()
 	m_maincpu->reset();
 
 	timer_device *sound_timer = subdevice<timer_device>("sound_timer");
-	sound_timer->adjust(attotime::from_msec(10));
+	sound_timer->adjust(attotime::from_msec(AD1847_SAMPLE_DELAY));
 
 	m_dmadac[0]->enable(1);
 	m_dmadac[1]->enable(1);
@@ -873,9 +1291,11 @@ void mediagx_state::ramdac_map(address_map &map)
 
 void mediagx_state::mediagx(machine_config &config)
 {
-	/* basic machine hardware */
 	MEDIAGX(config, m_maincpu, 166000000);
+
+	// Program mapping
 	m_maincpu->set_addrmap(AS_PROGRAM, &mediagx_state::mediagx_map);
+	// Map address regions to I/O
 	m_maincpu->set_addrmap(AS_IO, &mediagx_state::mediagx_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
@@ -894,9 +1314,12 @@ void mediagx_state::mediagx(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
+	m_screen->set_refresh_hz(61);
+
+	// TODO should probably set this via set_raw instead
 	m_screen->set_size(640, 480);
 	m_screen->set_visarea(0, 639, 0, 239);
+
 	m_screen->set_screen_update(FUNC(mediagx_state::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cga);
@@ -917,9 +1340,16 @@ void mediagx_state::init_mediagx()
 {
 	m_frame_width = m_frame_height = 1;
 	m_parallel_pointer = 0;
+	// set these ranges to 0, keeps registers all zeroed out as well
+	// clears the display control register
 	std::fill(std::begin(m_disp_ctrl_reg), std::end(m_disp_ctrl_reg), 0);
+	// clears the 'BIU' control register
 	std::fill(std::begin(m_biu_ctrl_reg), std::end(m_biu_ctrl_reg), 0);
+
+	#if SPEEDUP_HACKS
+	// clears the 'speedup hits' registers, just a cache of some form
 	std::fill(std::begin(m_speedup_hits), std::end(m_speedup_hits), 0);
+	#endif
 }
 
 #if SPEEDUP_HACKS
@@ -1028,5 +1458,5 @@ ROM_END
 
 /*****************************************************************************/
 
-GAME( 1998, a51site4, 0       , mediagx, mediagx, mediagx_state, init_a51site4,  ROT0,   "Atari Games",  "Area 51: Site 4 (HD Rev 2.01, September 7, 1998)", MACHINE_NOT_WORKING )
+GAME( 1998, a51site4, 0       , mediagx, mediagx, mediagx_state, init_a51site4,  ROT0,   "Atari Games",  "Area 51: Site 4 (HD Rev 2.01, September 7, 1998)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_TIMING )
 GAME( 1998, a51site4a,a51site4, mediagx, mediagx, mediagx_state, init_a51site4,  ROT0,   "Atari Games",  "Area 51: Site 4 (HD Rev 2.0, September 11, 1998)", MACHINE_NOT_WORKING )
