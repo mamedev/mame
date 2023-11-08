@@ -278,7 +278,6 @@ void nand_device::command_w(uint8_t data)
 	case 0x00: // Read (1st cycle)
 		m_mode = SM_M_READ;
 		m_pointer_mode = SM_PM_A;
-		m_page_addr = 0;
 		m_addr_load_ptr = 0;
 		break;
 	case 0x01:
@@ -291,7 +290,6 @@ void nand_device::command_w(uint8_t data)
 		{
 			m_mode = SM_M_READ;
 			m_pointer_mode = SM_PM_B;
-			m_page_addr = 0;
 			m_addr_load_ptr = 0;
 		}
 		break;
@@ -305,13 +303,11 @@ void nand_device::command_w(uint8_t data)
 		{
 			m_mode = SM_M_READ;
 			m_pointer_mode = SM_PM_C;
-			m_page_addr = 0;
 			m_addr_load_ptr = 0;
 		}
 		break;
 	case 0x80: // Page Program (1st cycle)
 		m_mode = SM_M_PROGRAM;
-		m_page_addr = 0;
 		m_addr_load_ptr = 0;
 		m_program_byte_count = 0;
 		memset(m_pagereg.get(), 0xff, m_page_total_size);
@@ -468,6 +464,10 @@ void nand_device::address_w(uint8_t data)
 		break;
 	case SM_M_READ:
 	case SM_M_PROGRAM:
+		if (m_addr_load_ptr == 0)
+		{
+			m_page_addr = 0;
+		}
 		if ((m_addr_load_ptr == 0) && (m_col_address_cycles == 1))
 		{
 			switch (m_pointer_mode)
