@@ -9,7 +9,7 @@ Sound: Z80 YM3812 M6295
 OSC: 12.000MHz 16.000MHz 7.15909MHz
 
 
-ToDo:
+TODO:
  Clean up inputs (some missing dips)
  Some sprite flickers on attract mode
  totmejan: Are the "dots" behind the girls in attract mode correct?
@@ -96,6 +96,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
+		, m_screen(*this, "screen")
 		, m_crtc(*this, "crtc")
 		, m_sc0_vram(*this, "sc0_vram")
 		, m_sc1_vram(*this, "sc1_vram")
@@ -115,6 +116,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 	required_device<seibu_crtc_device> m_crtc;
 
 	required_shared_ptr<uint16_t> m_sc0_vram;
@@ -152,9 +154,9 @@ private:
 
 	void vblank_irq(int state);
 
-	void seibucrtc_sc0bank_w(uint16_t data);
-	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bool coordinate_format);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_totmejan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void common_io_map(address_map &map);
 	void goodejan_io_map(address_map &map);
@@ -234,12 +236,6 @@ void goodejan_state::seibucrtc_sc3vram_w(offs_t offset, uint16_t data, uint16_t 
 	m_sc3_tilemap->mark_tile_dirty(offset);
 }
 
-void goodejan_state::seibucrtc_sc0bank_w(uint16_t data)
-{
-	m_seibucrtc_sc0bank = data & 1;
-	m_sc0_tilemap->mark_all_dirty();
-}
-
 
 /*******************************
 *
@@ -251,7 +247,7 @@ TILE_GET_INFO_MEMBER( goodejan_state::seibucrtc_sc0_tile_info )
 {
 	int tile = m_sc0_vram[tile_index] & 0xfff;
 	int color = (m_sc0_vram[tile_index] >> 12) & 0x0f;
-	tile+=(m_seibucrtc_sc0bank<<12);
+	tile += (m_seibucrtc_sc0bank << 12);
 	tileinfo.set(1, tile, color, 0);
 }
 
@@ -276,42 +272,62 @@ TILE_GET_INFO_MEMBER( goodejan_state::seibucrtc_sc3_tile_info )
 	tileinfo.set(4, tile, color, 0);
 }
 
-void goodejan_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri)
+void goodejan_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bool coordinate_format)
 {
-	int offs,fx,fy,x,y,color,sprite;
-	int dx,dy,ax,ay;
-
-	for (offs = 0x400-4;offs >= 0;offs -= 4)
+	u32 pri_mask[4] = {
+		GFX_PMASK_8,
+		GFX_PMASK_8 | GFX_PMASK_4,
+		GFX_PMASK_8 | GFX_PMASK_4 | GFX_PMASK_2,
+		0
+	};
+	for (int offs = 0; offs < 0x400; offs += 4)
 	{
-		if ((m_spriteram16[offs+0]&0x8000)!=0x8000) continue;
-		sprite = m_spriteram16[offs+1];
-		if ((sprite>>14)!=pri) continue;
+		if ((m_spriteram16[offs + 0] & 0x8000) != 0x8000) continue;
+		u32 sprite = m_spriteram16[offs + 1];
+		u32 pri = pri_mask[(sprite >> 14) & 3];
 		sprite &= 0x1fff;
 
-		y = m_spriteram16[offs+3];
-		x = m_spriteram16[offs+2];
+		int y = m_spriteram16[offs + 3];
+		int x = m_spriteram16[offs + 2];
 
-		if (x&0x8000) x=0-(0x200-(x&0x1ff));
-		else x&=0x1ff;
-		if (y&0x8000) y=0-(0x200-(y&0x1ff));
-		else y&=0x1ff;
+		if (!coordinate_format) // SEI0210
+		{
+			if (x & 0x8000) x = 0 - (0x200 - (x & 0x1ff));
+			else x &= 0x1ff;
+			if (y & 0x8000) y = 0 - (0x200 - (y & 0x1ff));
+			else y &= 0x1ff;
+		}
+		else // SEI0211
+		{
+			x &= 0x1ff;
+			if (x >= 0x180) x -= 0x200;
+			y &= 0x1ff;
+			if (y >= 0x180) y -= 0x200;
+		}
 
-		color = m_spriteram16[offs+0]&0x3f;
-		fx = m_spriteram16[offs+0]&0x4000;
-		fy = m_spriteram16[offs+0]&0x2000;
-		dy=((m_spriteram16[offs+0]&0x0380)>>7)+1;
-		dx=((m_spriteram16[offs+0]&0x1c00)>>10)+1;
+		u32 color = m_spriteram16[offs + 0] & 0x3f;
+		bool fx = m_spriteram16[offs + 0] & 0x4000;
+		bool fy = m_spriteram16[offs + 0] & 0x2000;
+		u32 dy = ((m_spriteram16[offs + 0] & 0x0380) >> 7) + 1;
+		u32 dx = ((m_spriteram16[offs + 0] & 0x1c00) >> 10) + 1;
 
-		for (ax=0; ax<dx; ax++)
-			for (ay=0; ay<dy; ay++) {
+		for (int ax = 0; ax < dx; ax++)
+			for (int ay = 0; ay < dy; ay++) {
 				if (!fx)
-					m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(0)->prio_transpen(bitmap, cliprect,
 						sprite++,
-						color,fx,fy,x+ax*16,y+ay*16,15);
+						color,
+						fx, fy,
+						x + ax * 16, y + ay * 16,
+						screen.priority(), pri, 15);
 				else
-					m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(0)->prio_transpen(bitmap, cliprect,
 						sprite++,
-						color,fx,fy,x+(dx-1-ax)*16,y+ay*16,15);
+						color,
+						fx, fy, 
+						x + (dx - 1 - ax) * 16,
+						y + ay * 16,
+						screen.priority(), pri, 15);
 			}
 	}
 }
@@ -337,6 +353,7 @@ void goodejan_state::video_start()
 
 uint32_t goodejan_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	screen.priority().fill(0, cliprect);
 	bitmap.fill(m_palette->pen(0x7ff), cliprect); //black pen
 
 	m_sc0_tilemap->set_scrollx(0, (SEIBU_CRTC_SC0_SX) & 0x1ff );
@@ -345,30 +362,42 @@ uint32_t goodejan_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_sc2_tilemap->set_scrolly(0, (SEIBU_CRTC_SC2_SY) & 0x1ff );
 	m_sc1_tilemap->set_scrollx(0, (SEIBU_CRTC_SC1_SX) & 0x1ff );
 	m_sc1_tilemap->set_scrolly(0, (SEIBU_CRTC_SC1_SY) & 0x1ff );
-	m_sc3_tilemap->set_scrollx(0, (0) & 0x1ff );
-	m_sc3_tilemap->set_scrolly(0, (0) & 0x1ff );
 
-	if(SEIBU_CRTC_ENABLE_SC0) { m_sc0_tilemap->draw(screen, bitmap, cliprect, 0,0); }
-	if(SEIBU_CRTC_ENABLE_SPR) { draw_sprites(bitmap,cliprect, 2); }
-	if(SEIBU_CRTC_ENABLE_SC2) { m_sc2_tilemap->draw(screen, bitmap, cliprect, 0,0); }
-	if(SEIBU_CRTC_ENABLE_SPR) { draw_sprites(bitmap,cliprect, 1); }
-	if(SEIBU_CRTC_ENABLE_SC1) { m_sc1_tilemap->draw(screen, bitmap, cliprect, 0,0); }
-	if(SEIBU_CRTC_ENABLE_SPR) { draw_sprites(bitmap,cliprect, 0); }
-	if(SEIBU_CRTC_ENABLE_SC3) { m_sc3_tilemap->draw(screen, bitmap, cliprect, 0,0); }
-	if(SEIBU_CRTC_ENABLE_SPR) { draw_sprites(bitmap,cliprect, 3); }
+	if(SEIBU_CRTC_ENABLE_SC0) { m_sc0_tilemap->draw(screen, bitmap, cliprect, 0, 1); }
+	if(SEIBU_CRTC_ENABLE_SC2) { m_sc2_tilemap->draw(screen, bitmap, cliprect, 0, 2); }
+	if(SEIBU_CRTC_ENABLE_SC1) { m_sc1_tilemap->draw(screen, bitmap, cliprect, 0, 4); }
+	if(SEIBU_CRTC_ENABLE_SC3) { m_sc3_tilemap->draw(screen, bitmap, cliprect, 0, 8); }
+	if(SEIBU_CRTC_ENABLE_SPR) { draw_sprites(screen, bitmap, cliprect, true); }
+
+	return 0;
+}
+
+uint32_t goodejan_state::screen_update_totmejan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	screen.priority().fill(0, cliprect);
+	bitmap.fill(m_palette->pen(0x7ff), cliprect); //black pen
+
+	m_sc0_tilemap->set_scrollx(0, (SEIBU_CRTC_SC0_SX) & 0x1ff );
+	m_sc0_tilemap->set_scrolly(0, (SEIBU_CRTC_SC0_SY) & 0x1ff );
+	m_sc2_tilemap->set_scrollx(0, (SEIBU_CRTC_SC2_SX) & 0x1ff );
+	m_sc2_tilemap->set_scrolly(0, (SEIBU_CRTC_SC2_SY) & 0x1ff );
+	m_sc1_tilemap->set_scrollx(0, (SEIBU_CRTC_SC1_SX) & 0x1ff );
+	m_sc1_tilemap->set_scrolly(0, (SEIBU_CRTC_SC1_SY) & 0x1ff );
+
+	if(SEIBU_CRTC_ENABLE_SC0) { m_sc0_tilemap->draw(screen, bitmap, cliprect, 0, 1); }
+	if(SEIBU_CRTC_ENABLE_SC2) { m_sc2_tilemap->draw(screen, bitmap, cliprect, 0, 2); }
+	if(SEIBU_CRTC_ENABLE_SC1) { m_sc1_tilemap->draw(screen, bitmap, cliprect, 0, 4); }
+	if(SEIBU_CRTC_ENABLE_SC3) { m_sc3_tilemap->draw(screen, bitmap, cliprect, 0, 8); }
+	if(SEIBU_CRTC_ENABLE_SPR) { draw_sprites(screen, bitmap, cliprect, false); }
 
 	return 0;
 }
 
 
-#define GOODEJAN_MHZ1 7159090
-#define GOODEJAN_MHZ2 16000000
-#define GOODEJAN_MHZ3 12000000
-
-
 void goodejan_state::gfxbank_w(uint16_t data)
 {
-	seibucrtc_sc0bank_w((data & 0x100)>>8);
+	m_seibucrtc_sc0bank = BIT(data, 8);
+	m_sc0_tilemap->mark_all_dirty();
 }
 
 /* Multiplexer device for the mahjong panel */
@@ -607,6 +636,10 @@ void goodejan_state::layer_scroll_w(offs_t offset, uint16_t data, uint16_t mem_m
 
 void goodejan_state::goodejan(machine_config &config)
 {
+	constexpr XTAL GOODEJAN_MHZ1 = XTAL(7'159'090);
+	constexpr XTAL GOODEJAN_MHZ2 = XTAL(16'000'000);
+	constexpr XTAL GOODEJAN_MHZ3 = XTAL(12'000'000);
+
 	/* basic machine hardware */
 	V30(config, m_maincpu, GOODEJAN_MHZ2/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &goodejan_state::goodejan_map);
@@ -617,13 +650,13 @@ void goodejan_state::goodejan(machine_config &config)
 	audiocpu.set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// guess: assume ~59.61 Hz like toki, assume clock coming from the otherwise unused 12 MHz XTal
 	// (audio one don't give valid ranges for the provided HSync)
-	screen.set_raw(GOODEJAN_MHZ3/2, 390, 0, 256, 258, 16, 240);
-	screen.set_screen_update(FUNC(goodejan_state::screen_update));
-	screen.set_palette(m_palette);
-	screen.screen_vblank().set(FUNC(goodejan_state::vblank_irq));
+	m_screen->set_raw(GOODEJAN_MHZ3/2, 390, 0, 256, 258, 16, 240);
+	m_screen->set_screen_update(FUNC(goodejan_state::screen_update));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(goodejan_state::vblank_irq));
 
 	SEIBU_CRTC(config, m_crtc, 0);
 	m_crtc->layer_en_callback().set(FUNC(goodejan_state::layer_en_w));
@@ -654,6 +687,7 @@ void goodejan_state::totmejan(machine_config &config)
 {
 	goodejan(config);
 	m_maincpu->set_addrmap(AS_IO, &goodejan_state::totmejan_io_map);
+	m_screen->set_screen_update(FUNC(goodejan_state::screen_update_totmejan));
 }
 
 ROM_START( totmejan )
