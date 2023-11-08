@@ -125,7 +125,7 @@ private:
 	tilemap_t *m_bg_tilemap{};
 //	int m_visible_page = 0;
 //	int m_priority = 0;
-	int m_flipscreen = 0;
+	[[maybe_unused]] int m_flipscreen = 0;
 	u8 m_prot_data = 0;
 	u8 m_latch = 0;
 };
@@ -229,17 +229,17 @@ void mirderby_state::main_map(address_map &map)
 	map(0x7800, 0x7800).rw(FUNC(mirderby_state::prot_r), FUNC(mirderby_state::prot_w)); // protection check? (or sound comms?)
 	map(0x7ffe, 0x7ffe).nopr(); //watchdog?
 	map(0x7ffe, 0x7ffe).lw8(
-		NAME([this] (offs_t offset, u8 data) {
+		NAME([this] (u8 data) {
 			m_latch = data;
 			//logerror("%02x latch write\n", data);
 		})
 	);
 	map(0x7fff, 0x7fff).lrw8(
-		NAME([this] (offs_t offset) {
+		NAME([this] () {
 			//	0x7fff $e / $f writes -> DSW reads
 			return m_ymsnd->read(1);
 		}),
-		NAME([this] (offs_t offset, u8 data) {
+		NAME([this] (u8 data) {
 			//logerror("%s -> %02x\n", BIT(m_latch, 2) ? "address" : "data", data);
 			m_ymsnd->write(BIT(m_latch, 2) ? 0 : 1, data);
 		})
@@ -266,7 +266,7 @@ void mirderby_state::sub_map(address_map &map)
 	map(0x7ff0, 0x7ffd).writeonly().share("vreg");
 	map(0x7ff2, 0x7ff2).portr("IN0");
 	map(0x7ff9, 0x7ffa).lr8(
-		NAME([this] (offs_t offset) {
+		NAME([] (offs_t offset) {
 			return 0;
 		})
 	);
@@ -274,7 +274,7 @@ void mirderby_state::sub_map(address_map &map)
 	map(0x8000, 0xffff).bankr(m_subbank);
 	// TODO: $8000 writes (ROM bank? NMI enable? CPU comms?)
 	map(0x8000, 0x8000).lw8(
-		NAME([this] (offs_t offset, u8 data) {
+		NAME([this] (u8 data) {
 			m_subbank->set_entry((data & 1) ^ 1);
 		})
 	);
