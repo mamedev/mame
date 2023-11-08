@@ -41737,6 +41737,9 @@ scp300f                         // Seattle SCP-300F
 @source:skeleton/semcrossw.cpp
 semcrossw                       // Semaphore controller from Etra
 
+@source:skeleton/seoul88.cpp
+seoul88                         //
+
 @source:skeleton/sh4robot.cpp
 sh4robot                        //
 
