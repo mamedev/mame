@@ -59,6 +59,7 @@ public:
 	void init_wcherry();
 	void init_super9();
 	void init_animalhs();
+	void init_eldoraddoa();
 	void init_ladylinrb();
 	void init_ladylinrc();
 	void init_ladylinrd();
@@ -86,6 +87,7 @@ public:
 	void goldstar(machine_config &config);
 	void goldstbl(machine_config &config);
 	void animalhs(machine_config &config);
+	void eldoraddoa(machine_config &config);
 	void bonusch_portmap(address_map &map);
 	void feverch_portmap(address_map &map);
 	void cm_map(address_map &map);
@@ -107,6 +109,7 @@ public:
 	void ramdac_map(address_map &map);
 	void animalhs_map(address_map &map);
 	void animalhs_portmap(address_map &map);
+	void eldoraddoa_portmap(address_map &map);
 	void wcat3_map(address_map &map);
 	void wcherry_map(address_map &map);
 	void wcherry_readwriteport(address_map &map);

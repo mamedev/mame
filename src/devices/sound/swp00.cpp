@@ -359,7 +359,7 @@ void swp00_device::device_start()
 	// Delta-packed samples decompression.
 
 	for(int i=0; i<128; i++) {
-		s16 base = ((i & 0x1f) << (7+(i >> 5))) + (((1 << (i >> 5))-1) << 12);
+		s16 base = ((i & 0x1f) << (5+(i >> 5))) + (((1 << (i >> 5))-1) << 10);
 		m_dpcm[i | 0x80] = - base;
 		m_dpcm[i]        = + base;
 	}

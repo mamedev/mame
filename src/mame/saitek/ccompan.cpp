@@ -219,7 +219,7 @@ void ccompan_state::ccompan(machine_config &config)
 
 ROM_START( ccompan )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("2332n_y01a", 0x1000, 0x1000, CRC(a715d51c) SHA1(3e1bd9dc119c914b502f1433ee2d6ce3f477b99a) ) // 2332
+	ROM_LOAD("2332n_yo1a", 0x1000, 0x1000, CRC(a715d51c) SHA1(3e1bd9dc119c914b502f1433ee2d6ce3f477b99a) ) // 2332
 ROM_END
 
 } // anonymous namespace
