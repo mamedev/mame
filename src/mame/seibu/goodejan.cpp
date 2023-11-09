@@ -245,36 +245,36 @@ void goodejan_state::seibucrtc_sc3vram_w(offs_t offset, uint16_t data, uint16_t 
 
 TILE_GET_INFO_MEMBER( goodejan_state::seibucrtc_sc0_tile_info )
 {
-	int tile = m_sc0_vram[tile_index] & 0xfff;
-	int color = (m_sc0_vram[tile_index] >> 12) & 0x0f;
+	u32 tile = m_sc0_vram[tile_index] & 0xfff;
+	u32 color = (m_sc0_vram[tile_index] >> 12) & 0x0f;
 	tile += (m_seibucrtc_sc0bank << 12);
 	tileinfo.set(1, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER( goodejan_state::seibucrtc_sc2_tile_info )
 {
-	int tile = m_sc2_vram[tile_index] & 0xfff;
-	int color = (m_sc2_vram[tile_index] >> 12) & 0x0f;
+	u32 tile = m_sc2_vram[tile_index] & 0xfff;
+	u32 color = (m_sc2_vram[tile_index] >> 12) & 0x0f;
 	tileinfo.set(2, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER( goodejan_state::seibucrtc_sc1_tile_info )
 {
-	int tile = m_sc1_vram[tile_index] & 0xfff;
-	int color = (m_sc1_vram[tile_index] >> 12) & 0x0f;
+	u32 tile = m_sc1_vram[tile_index] & 0xfff;
+	u32 color = (m_sc1_vram[tile_index] >> 12) & 0x0f;
 	tileinfo.set(3, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER( goodejan_state::seibucrtc_sc3_tile_info )
 {
-	int tile = m_sc3_vram[tile_index] & 0xfff;
-	int color = (m_sc3_vram[tile_index] >> 12) & 0x0f;
+	u32 tile = m_sc3_vram[tile_index] & 0xfff;
+	u32 color = (m_sc3_vram[tile_index] >> 12) & 0x0f;
 	tileinfo.set(4, tile, color, 0);
 }
 
 void goodejan_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bool coordinate_format)
 {
-	u32 pri_mask[4] = {
+	constexpr u32 pri_mask[4] = {
 		GFX_PMASK_8,
 		GFX_PMASK_8 | GFX_PMASK_4,
 		GFX_PMASK_8 | GFX_PMASK_4 | GFX_PMASK_2,
@@ -403,12 +403,11 @@ void goodejan_state::gfxbank_w(uint16_t data)
 /* Multiplexer device for the mahjong panel */
 uint16_t goodejan_state::mahjong_panel_r()
 {
-	u16 ret;
-	ret = 0xffff;
+	u16 ret = 0xffff;
 
-	for (int i=0; i<5; i++)
+	for (int i = 0; i < 5; i++)
 	{
-		if (m_mux_data & (1 << i))
+		if (BIT(m_mux_data, i))
 			ret &= m_key[i]->read();
 	}
 
