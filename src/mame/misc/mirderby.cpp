@@ -119,6 +119,8 @@ private:
 	void main_map(address_map &map);
 	void sub_map(address_map &map);
 
+	void shared_map(address_map &map);
+
 	void audio_map(address_map &map);
 	void audio_io(address_map &map);
 
@@ -128,6 +130,7 @@ private:
 //	[[maybe_unused]] int m_flipscreen = 0;
 	u8 m_prot_data = 0;
 	u8 m_latch = 0;
+	u16 m_gfx_flip = 0;
 };
 
 void mirderby_state::palette_init(palette_device &palette) const
@@ -156,7 +159,7 @@ TILE_GET_INFO_MEMBER(mirderby_state::get_bg_tile_info)
 {
 	int const addr  = tile_index * 2;
 	int const attr  = m_videoram[addr];
-	int const code  = m_videoram[addr + 1] + ((attr & 0x03) << 8) + 0x400;//(gfxbank << 11);
+	int const code  = m_videoram[addr + 1] + ((attr & 0x03) << 8) + 0x400 + m_gfx_flip;
 	int const color = (attr >> 4) & 0xf;
 
 	tileinfo.set(1, code, color, 0 );
@@ -190,18 +193,7 @@ void mirderby_state::screen_vblank(int state)
 	}
 }
 
-void mirderby_state::audio_map(address_map &map)
-{
-	map(0x0000, 0x1fff).rom().region("audio_rom", 0);
-	map(0x8000, 0x87ff).ram();
-}
 
-void mirderby_state::audio_io(address_map &map)
-{
-	map.global_mask(0xff);
-//	map(0x00, 0x00) read in NMI, likely soundlatch
-//	Is this just a DAC player?
-}
 
 uint8_t mirderby_state::prot_r()
 {
@@ -215,12 +207,8 @@ void mirderby_state::prot_w(uint8_t data)
 }
 
 
-// tight loops at $4587 (from other CPU, indicating program flow) then $23c4 waiting for vblank?
-// other CPU is similar
-// Removing shared RAMs will actually make the service mode to be usable
-void mirderby_state::main_map(address_map &map)
+void mirderby_state::shared_map(address_map &map)
 {
-	map.unmap_value_high();
 	map(0x0000, 0x0fff).ram();
 	map(0x1000, 0x1fff).ram().w(FUNC(mirderby_state::videoram_w)).share(m_videoram);
 	map(0x2000, 0x2fff).ram().share("share3");
@@ -229,10 +217,12 @@ void mirderby_state::main_map(address_map &map)
 	map(0x6000, 0x6fff).ram(); /* work ram */
 	map(0x7000, 0x77ff).ram().share("share2");
 	map(0x7800, 0x7800).rw(FUNC(mirderby_state::prot_r), FUNC(mirderby_state::prot_w)); // protection check? (or sound comms?)
-	map(0x7ffd, 0x7ffd).lw8(
-		NAME([this] (u8 data) {
-			m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-			//logerror("%02x latch write\n", data);
+	//0x7ff0 onward seems CRTC
+//	map(0x7ff0, 0x7ff?).writeonly().share("vreg");
+	map(0x7ff2, 0x7ff2).portr("IN0");
+	map(0x7ff9, 0x7ffa).lr8(
+		NAME([] (offs_t offset) {
+			return 0;
 		})
 	);
 	map(0x7ffe, 0x7ffe).nopr(); //watchdog?
@@ -252,6 +242,18 @@ void mirderby_state::main_map(address_map &map)
 			m_ymsnd->write(BIT(m_latch, 2) ? 0 : 1, data);
 		})
 	);
+}
+
+void mirderby_state::main_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).m(*this, FUNC(mirderby_state::shared_map));
+	map(0x7ffd, 0x7ffd).lw8(
+		NAME([this] (u8 data) {
+			m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+			//logerror("%02x latch write\n", data);
+		})
+	);
 	map(0x8000, 0xffff).rom().region("main_rom", 0);
 //	map(0x8000, 0x8000).lw8(
 //		NAME([this] (offs_t offset, u8 data) {
@@ -263,21 +265,7 @@ void mirderby_state::main_map(address_map &map)
 void mirderby_state::sub_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x0fff).ram();
-	map(0x1000, 0x1fff).ram().w(FUNC(mirderby_state::videoram_w)).share(m_videoram);
-	map(0x2000, 0x2fff).ram().share("share3");
-	map(0x3000, 0x3fff).ram();
-	map(0x4000, 0x5fff).ram().share("share1");
-	map(0x6000, 0x6fff).ram(); // work RAM
-	map(0x7000, 0x77ff).ram().share("share2");
-	//0x7ff0 onward seems CRTC
-//	map(0x7ff0, 0x7ffd).writeonly().share("vreg");
-	map(0x7ff2, 0x7ff2).portr("IN0");
-	map(0x7ff9, 0x7ffa).lr8(
-		NAME([] (offs_t offset) {
-			return 0;
-		})
-	);
+	map(0x0000, 0x7fff).m(*this, FUNC(mirderby_state::shared_map));
 	map(0x7ffd, 0x7ffd).lw8(
 		NAME([this] (u8 data) {
 			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
@@ -286,15 +274,32 @@ void mirderby_state::sub_map(address_map &map)
 	);
 	map(0x7ffe, 0x7ffe).nopr(); //watchdog?
 	map(0x8000, 0xffff).bankr(m_subbank);
-	// TODO: $8000 writes (ROM bank? NMI enable? CPU comms?)
 	map(0x8000, 0x8000).lw8(
 		NAME([this] (u8 data) {
 			m_subbank->set_entry(BIT(data, 7) ? 1 : 0);
+			// TODO: other bits used
+			const u16 new_gfx_flip = BIT(data, 5) ? 0x800 : 0;
+			if (new_gfx_flip != m_gfx_flip)
+			{
+				m_gfx_flip = new_gfx_flip;
+				m_bg_tilemap->mark_all_dirty();
+			}
 		})
 	);
 }
 
+void mirderby_state::audio_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom().region("audio_rom", 0);
+	map(0x8000, 0x87ff).ram();
+}
 
+void mirderby_state::audio_io(address_map &map)
+{
+	map.global_mask(0xff);
+//	map(0x00, 0x00) read in NMI, likely soundlatch
+//	Is this just a DAC player?
+}
 
 static GFXDECODE_START( gfx_mirderby )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb, 0x0000, 0x10 )
@@ -328,54 +333,54 @@ static INPUT_PORTS_START( mirderby )
 	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(      0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(      0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(      0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(      0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(      0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(      0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(      0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(      0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(      0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(      0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(      0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(      0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -388,6 +393,7 @@ void mirderby_state::machine_start()
 void mirderby_state::machine_reset()
 {
 	m_subbank->set_entry(0);
+	m_gfx_flip = 0;
 }
 
 /* clocks are 16mhz and 9mhz */
@@ -416,7 +422,7 @@ void mirderby_state::mirderby(machine_config &config)
 	screen.set_refresh_hz(59);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(64*8, 32*8);
-	screen.set_visarea(0*8, 54*8-1, 2*8, 30*8-1);
+	screen.set_visarea(1*8, 49*8-1, 1*8, 31*8-1);
 	screen.set_screen_update(FUNC(mirderby_state::screen_update));
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set(FUNC(mirderby_state::screen_vblank));
@@ -461,4 +467,4 @@ ROM_START( mirderby )
 	ROM_LOAD( "x70a09.6l", 0x200, 0x100, CRC(d0187957) SHA1(6b36c1bccad24708cfa2fc78da08313f9bcfdbc0) )
 ROM_END
 
-GAME( 1988, mirderby,  0, mirderby, mirderby, mirderby_state, empty_init, ROT0, "Home Data?", "Miracle Derby - Ascot", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1988, mirderby,  0, mirderby, mirderby, mirderby_state, empty_init, ROT0, "Home Data? / Ascot", "Miracle Derby (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
