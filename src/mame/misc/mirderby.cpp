@@ -4,8 +4,15 @@
 
 Miracle Derby - Ascot
 
-- has the same GX61A01 custom (blitter?) as homedata.cpp and a 'similar' CPU setup (this has more CPUs)
- and similar board / rom numbering (X**-)
+TODO:
+- Game pukes if more than one key is pressed, and MAME input defaults for 2p side
+  clashes with the remapped p1 keys.
+  For now user has to workaround by mapping p2 keys manually,
+  actual fix would be to define a horse betting layout in MAME input defs.
+
+Old Haze note:
+- has the same GX61A01 custom (blitter?) as homedata.cpp and a 'similar' CPU setup
+  (this has more CPUs) and similar board / rom numbering (X**-)
 
 The drivers can probably be merged later, although the current per-game handling of the blitter in
 homedata.cpp should be looked at.
@@ -72,6 +79,7 @@ public:
 		, m_ymsnd(*this, "ymsnd")
 //		, m_vreg(*this, "vreg")
 		, m_videoram(*this, "videoram")
+		, m_spriteram(*this, "spriteram")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_subbank(*this, "subbank")
@@ -94,6 +102,7 @@ private:
 	optional_device<ym2203_device> m_ymsnd;
 //	optional_shared_ptr<uint8_t> m_vreg;
 	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_memory_bank m_subbank;
@@ -101,7 +110,7 @@ private:
 //	optional_device<generic_latch_8_device> m_mainlatch; // pteacher
 //	optional_device<sn76489a_device> m_sn; // mrokumei and pteacher
 
-	required_ioport_array<5> m_keys;
+	required_ioport_array<5 * 2> m_keys;
 	required_ioport_array<2> m_in;
 
 	virtual void machine_start() override;
@@ -162,8 +171,6 @@ void mirderby_state::videoram_w(offs_t offset, u8 data)
 	m_bg_tilemap->mark_tile_dirty((offset & 0xffe) >> 1);
 }
 
-
-
 TILE_GET_INFO_MEMBER(mirderby_state::get_bg_tile_info)
 {
 	int const addr  = tile_index * 2;
@@ -220,7 +227,7 @@ void mirderby_state::prot_w(uint8_t data)
 
 void mirderby_state::shared_map(address_map &map)
 {
-	map(0x0000, 0x0fff).ram();
+	map(0x0000, 0x0fff).ram().share(m_spriteram);
 	map(0x1000, 0x1fff).ram().w(FUNC(mirderby_state::videoram_w)).share(m_videoram);
 	map(0x2000, 0x2fff).ram().share("share3");
 	map(0x3000, 0x3fff).ram();
@@ -235,16 +242,12 @@ void mirderby_state::shared_map(address_map &map)
 		NAME([this] (offs_t offset) {
 			u8 res = 0x3f | (m_in[offset]->read() & 0xc0);
 
-			// TODO: P2 side, with a limited subset of keys (!)
-			if (offset == 1)
-				return res;
-
 			// tests KEY1-KEY4 then uses 0x1e
 			// read by main in service mode, by sub in gameplay
 			for (int i = 0; i < 5; i++)
 			{
 				if (BIT(m_key_matrix, i))
-					res &= m_keys[i]->read() & 0xff;
+					res &= m_keys[i + offset * 5]->read() & 0xff;
 			}
 
 			return res;
@@ -347,7 +350,6 @@ static GFXDECODE_START( gfx_mirderby )
 	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_packed_msb, 0x0000, 0x10 )
 GFXDECODE_END
 
-// TODO: payout rate from analyzer "henkyaku ritsu"
 static INPUT_PORTS_START( mirderby )
 	PORT_START("SYSTEM")
 	PORT_DIPNAME( 0x01, 0x01, "SYSTEM" )
@@ -373,6 +375,7 @@ static INPUT_PORTS_START( mirderby )
 	PORT_DIPSETTING(      0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
 
+	// bit 6-7 of key matrix, common for all the ports
 	PORT_START("IN0")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) // Medal
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE2 ) // Credit Clear
@@ -383,6 +386,8 @@ static INPUT_PORTS_START( mirderby )
 	PORT_DIPSETTING(      0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
 
+	// p1 side
+	// TODO: sketchy layout, derived from kingdrby.cpp
 	PORT_START("KEY0")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -420,16 +425,39 @@ static INPUT_PORTS_START( mirderby )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_NAME("1P Flip Flop")
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
+	// p2 side, with a limited subset of keys (!?)
+	PORT_START("KEY5")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("KEY6")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("KEY7")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("KEY8")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("KEY9")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("2P Screen Change") PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("2P 1-5") PORT_CODE(KEYCODE_R) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("2P 2-5") PORT_CODE(KEYCODE_D) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("2P 3-6") PORT_CODE(KEYCODE_Z) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("2P Payout") PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_NAME("2P Flip Flop") PORT_PLAYER(2)
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(      0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(      0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(      0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	// "henkyaku ritsu" in analyzer
+	PORT_DIPNAME( 0x07, 0x07, "Payout Rate" ) PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPSETTING(      0x00, "95%" )
+	PORT_DIPSETTING(      0x01, "90%" )
+	PORT_DIPSETTING(      0x02, "85%" )
+	PORT_DIPSETTING(      0x03, "80%" )
+	PORT_DIPSETTING(      0x04, "75%" )
+	PORT_DIPSETTING(      0x05, "70%" )
+	PORT_DIPSETTING(      0x06, "65%" )
+	PORT_DIPSETTING(      0x07, "60%" )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(      0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
