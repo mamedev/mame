@@ -9,14 +9,16 @@ The chess engine is LogiChess (ported from Z80 to 6800), by Kaare Danielsen.
 CXG Enterprise "S" / Star Chess is probably on similar hardware.
 
 TODO:
-- standby/battery save mode
+- add nvram (belongs in m6801.cpp, and it needs to save port $14 too)
+- verify SciSys MCU frequency, the only videos online (for hearing sound pitch)
+  are from the Tandy 1650 ones
 
 ********************************************************************************
 
 Hardware notes:
 
 Chess Companion II:
-- PCB label: Y01B-01 REV.B
+- PCB label: YO1B-01 REV.B
 - Hitachi HD6301V1 (0609V171) @ ~3MHz (LC oscillator)
 - chessboard buttons, 16+5 leds, piezo
 
@@ -27,7 +29,7 @@ Explorer Chess:
 
 Concord II:
 - PCB label: SCISYS ST3 REV.E
-- MCU clock frequency is twice higher than Concord
+- MCU clock frequency is twice higher than Concord, again no XTAL
 - rest is same as ccompan2, it just has the buttons/status leds at the bottom
   instead of at the right
 
@@ -70,26 +72,25 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_board(*this, "board"),
 		m_display(*this, "display"),
-		m_dac(*this, "dac"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	void ccompan2(machine_config &config);
 	void expchess(machine_config &config);
 
+	DECLARE_INPUT_CHANGED_MEMBER(power_off);
 	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq) { set_cpu_freq(); }
 
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override { set_cpu_freq(); }
-	DECLARE_MACHINE_RESET(expchess) { ; }
+	virtual void machine_reset() override;
+	DECLARE_MACHINE_RESET(ccompan2) { machine_reset(); set_cpu_freq(); }
 
 private:
 	// devices/pointers
 	required_device<hd6301v1_cpu_device> m_maincpu;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
-	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<8+1> m_inputs;
 
 	// address maps
@@ -98,19 +99,26 @@ private:
 	// I/O handlers
 	u8 input1_r();
 	u8 input2_r();
-	void speaker_w(u8 data);
 	void mux_w(u8 data);
-	u8 battery_r();
+	u8 power_r();
 	void led_w(u8 data);
 
 	void set_cpu_freq();
+	TIMER_CALLBACK_MEMBER(set_pin);
 
+	emu_timer *m_standbytimer;
+	emu_timer *m_nmitimer;
+	bool m_power = false;
 	u8 m_inp_mux = 0;
 };
 
 void ccompan2_state::machine_start()
 {
+	m_nmitimer = timer_alloc(FUNC(ccompan2_state::set_pin), this);
+	m_standbytimer = timer_alloc(FUNC(ccompan2_state::set_pin), this);
+
 	// register for savestates
+	save_item(NAME(m_power));
 	save_item(NAME(m_inp_mux));
 }
 
@@ -118,6 +126,39 @@ void ccompan2_state::set_cpu_freq()
 {
 	// Concord II MCU speed is twice higher
 	m_maincpu->set_unscaled_clock((ioport("FAKE")->read() & 1) ? 6000000 : 3000000);
+}
+
+
+
+/*******************************************************************************
+    Power
+*******************************************************************************/
+
+void ccompan2_state::machine_reset()
+{
+	m_power = true;
+	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+}
+
+TIMER_CALLBACK_MEMBER(ccompan2_state::set_pin)
+{
+	m_maincpu->set_input_line(param, ASSERT_LINE);
+}
+
+INPUT_CHANGED_MEMBER(ccompan2_state::power_off)
+{
+	if (newval && m_power)
+	{
+		m_power = false;
+
+		// when power switch is set to MEMORY, it triggers an NMI after a short delay
+		attotime delay = attotime::from_msec(100);
+		m_nmitimer->adjust(delay, INPUT_LINE_NMI);
+
+		// afterwards, MCU STBY pin is asserted after a short delay
+		delay += attotime::from_msec(10);
+		m_standbytimer->adjust(delay, INPUT_LINE_RESET);
+	}
 }
 
 
@@ -153,12 +194,6 @@ u8 ccompan2_state::input2_r()
 	return ~data;
 }
 
-void ccompan2_state::speaker_w(u8 data)
-{
-	// P20: speaker out
-	m_dac->write(data & 1);
-}
-
 void ccompan2_state::mux_w(u8 data)
 {
 	// P30-P37: input mux, led data
@@ -166,10 +201,10 @@ void ccompan2_state::mux_w(u8 data)
 	m_display->write_mx(m_inp_mux);
 }
 
-u8 ccompan2_state::battery_r()
+u8 ccompan2_state::power_r()
 {
-	// P40: battery status (only reads it at boot)
-	return 0;
+	// P40: power switch state
+	return m_power ? 0 : 1;
 }
 
 void ccompan2_state::led_w(u8 data)
@@ -197,48 +232,6 @@ void ccompan2_state::main_map(address_map &map)
 /*******************************************************************************
     Input Ports
 *******************************************************************************/
-
-static INPUT_PORTS_START( ccompan2 )
-	PORT_START("IN.0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("IN.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Sound")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("Level")
-
-	PORT_START("IN.2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_NAME("Color")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("Multi Move")
-
-	PORT_START("IN.3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("King")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Queen")
-
-	PORT_START("IN.4")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Rook")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_NAME("Play")
-
-	PORT_START("IN.5")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Bishop")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Enter Position")
-
-	PORT_START("IN.6")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Knight")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Take Back")
-
-	PORT_START("IN.7")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Pawn")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME("New Game")
-
-	PORT_START("IN.8")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_CUSTOM) // button config
-
-	PORT_START("FAKE")
-	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, ccompan2_state, change_cpu_freq, 0) // factory set
-	PORT_CONFSETTING(    0x00, "3MHz (original)" )
-	PORT_CONFSETTING(    0x01, "6MHz (Concord II)" )
-INPUT_PORTS_END
 
 static INPUT_PORTS_START( expchess )
 	PORT_START("IN.0")
@@ -275,6 +268,53 @@ static INPUT_PORTS_START( expchess )
 
 	PORT_START("IN.8")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM) // button config
+
+	PORT_START("POWER")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, ccompan2_state, power_off, 0) PORT_NAME("Power Off")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( ccompan2 )
+	PORT_INCLUDE( expchess )
+
+	PORT_MODIFY("IN.0")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_MODIFY("IN.1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Sound")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("Level")
+
+	PORT_MODIFY("IN.2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_NAME("Color")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("Multi Move")
+
+	PORT_MODIFY("IN.3")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("King")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Queen")
+
+	PORT_MODIFY("IN.4")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Rook")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_NAME("Play")
+
+	PORT_MODIFY("IN.5")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Bishop")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Enter Position")
+
+	PORT_MODIFY("IN.6")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Knight")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Take Back")
+
+	PORT_MODIFY("IN.7")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Pawn")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME("New Game")
+
+	PORT_MODIFY("IN.8")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_CUSTOM) // button config
+
+	PORT_START("FAKE")
+	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, ccompan2_state, change_cpu_freq, 0) // factory set
+	PORT_CONFSETTING(    0x00, "3MHz (original)" )
+	PORT_CONFSETTING(    0x01, "6MHz (Concord II)" )
 INPUT_PORTS_END
 
 
@@ -283,16 +323,16 @@ INPUT_PORTS_END
     Machine Configs
 *******************************************************************************/
 
-void ccompan2_state::ccompan2(machine_config &config)
+void ccompan2_state::expchess(machine_config &config)
 {
 	// basic machine hardware
 	HD6301V1(config, m_maincpu, 3000000); // approximation, no XTAL
 	m_maincpu->set_addrmap(AS_PROGRAM, &ccompan2_state::main_map);
 	m_maincpu->in_p1_cb().set(FUNC(ccompan2_state::input1_r));
 	m_maincpu->in_p2_cb().set(FUNC(ccompan2_state::input2_r));
-	m_maincpu->out_p2_cb().set(FUNC(ccompan2_state::speaker_w));
+	m_maincpu->out_p2_cb().set("dac", FUNC(dac_1bit_device::write)).bit(0);
 	m_maincpu->out_p3_cb().set(FUNC(ccompan2_state::mux_w));
-	m_maincpu->in_p4_cb().set(FUNC(ccompan2_state::battery_r));
+	m_maincpu->in_p4_cb().set(FUNC(ccompan2_state::power_r));
 	m_maincpu->out_p4_cb().set(FUNC(ccompan2_state::led_w));
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
@@ -302,19 +342,19 @@ void ccompan2_state::ccompan2(machine_config &config)
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(5+2, 8);
 	m_display->set_interpolation(0.25);
-	config.set_default_layout(layout_saitek_ccompan2);
+	config.set_default_layout(layout_saitek_expchess);
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	DAC_1BIT(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
-void ccompan2_state::expchess(machine_config &config)
+void ccompan2_state::ccompan2(machine_config &config)
 {
-	ccompan2(config);
+	expchess(config);
 
-	MCFG_MACHINE_RESET_OVERRIDE(ccompan2_state, expchess)
-	config.set_default_layout(layout_saitek_expchess);
+	MCFG_MACHINE_RESET_OVERRIDE(ccompan2_state, ccompan2)
+	config.set_default_layout(layout_saitek_ccompan2);
 }
 
 
