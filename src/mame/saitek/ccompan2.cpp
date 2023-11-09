@@ -104,9 +104,8 @@ private:
 	void led_w(u8 data);
 
 	void set_cpu_freq();
-	TIMER_CALLBACK_MEMBER(set_pin);
+	TIMER_CALLBACK_MEMBER(delayed_nmi);
 
-	emu_timer *m_standbytimer;
 	emu_timer *m_nmitimer;
 	bool m_power = false;
 	u8 m_inp_mux = 0;
@@ -114,8 +113,7 @@ private:
 
 void ccompan2_state::machine_start()
 {
-	m_nmitimer = timer_alloc(FUNC(ccompan2_state::set_pin), this);
-	m_standbytimer = timer_alloc(FUNC(ccompan2_state::set_pin), this);
+	m_nmitimer = timer_alloc(FUNC(ccompan2_state::delayed_nmi), this);
 
 	// register for savestates
 	save_item(NAME(m_power));
@@ -137,12 +135,11 @@ void ccompan2_state::set_cpu_freq()
 void ccompan2_state::machine_reset()
 {
 	m_power = true;
-	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-TIMER_CALLBACK_MEMBER(ccompan2_state::set_pin)
+TIMER_CALLBACK_MEMBER(ccompan2_state::delayed_nmi)
 {
-	m_maincpu->set_input_line(param, ASSERT_LINE);
+	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INPUT_CHANGED_MEMBER(ccompan2_state::power_off)
@@ -152,12 +149,8 @@ INPUT_CHANGED_MEMBER(ccompan2_state::power_off)
 		m_power = false;
 
 		// when power switch is set to MEMORY, it triggers an NMI after a short delay
-		attotime delay = attotime::from_msec(100);
-		m_nmitimer->adjust(delay, INPUT_LINE_NMI);
-
-		// afterwards, MCU STBY pin is asserted after a short delay
-		delay += attotime::from_msec(10);
-		m_standbytimer->adjust(delay, INPUT_LINE_RESET);
+		// (and shortly after that, MCU STBY is asserted)
+		m_nmitimer->adjust(attotime::from_msec(100));
 	}
 }
 
