@@ -5,10 +5,13 @@
 Miracle Derby - Ascot
 
 TODO:
+- sprites;
+- NVRAM;
 - Game pukes if more than one key is pressed, and MAME input defaults for 2p side
   clashes with the remapped p1 keys.
   For now user has to workaround by mapping p2 keys manually,
   actual fix would be to define a horse betting layout in MAME input defs.
+- Missing inputs, namely 10 and 100 Yen tokens;
 
 Old Haze note:
 - has the same GX61A01 custom (blitter?) as homedata.cpp and a 'similar' CPU setup
@@ -78,6 +81,7 @@ public:
 		, m_audiocpu(*this, "audiocpu")
 		, m_ymsnd(*this, "ymsnd")
 //		, m_vreg(*this, "vreg")
+		, m_screen(*this, "screen")
 		, m_videoram(*this, "videoram")
 		, m_spriteram(*this, "spriteram")
 		, m_gfxdecode(*this, "gfxdecode")
@@ -101,6 +105,7 @@ private:
 	required_device<cpu_device> m_audiocpu;
 	optional_device<ym2203_device> m_ymsnd;
 //	optional_shared_ptr<uint8_t> m_vreg;
+	required_device<screen_device> m_screen;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -149,6 +154,7 @@ private:
 	bool m_sub_nmi_enable = false;
 
 	u8 m_key_matrix = 0;
+	u16 m_scrollx = 0;
 };
 
 void mirderby_state::palette_init(palette_device &palette) const
@@ -178,6 +184,8 @@ TILE_GET_INFO_MEMBER(mirderby_state::get_bg_tile_info)
 	int const code  = m_videoram[addr + 1] + ((attr & 0x03) << 8) + m_gfx_bank + m_gfx_flip;
 	int const color = (attr >> 4) & 0xf;
 
+	tileinfo.category = BIT(attr, 3);
+
 	tileinfo.set(1, code, color, 0 );
 }
 
@@ -192,7 +200,16 @@ uint32_t mirderby_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	// category 1 is for scrolling elements, probably high priority too
+	// TODO: gets screwy on race result screen, may scroll disable somehow?
+	m_bg_tilemap->set_scrollx(0, m_scrollx & 0x1ff);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0), 0);
+
+	m_bg_tilemap->set_scrollx(0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0), 0);
+
+	m_bg_tilemap->set_scrollx(0, m_scrollx & 0x1ff);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1), 0);
 
 	return 0;
 }
@@ -212,7 +229,7 @@ void mirderby_state::screen_vblank(int state)
 }
 
 
-
+// protection check? sound comms? video beam sync?
 uint8_t mirderby_state::prot_r()
 {
 	m_prot_data&=0x7f;
@@ -234,7 +251,7 @@ void mirderby_state::shared_map(address_map &map)
 	map(0x4000, 0x5fff).ram().share("share1");
 	map(0x6000, 0x6fff).ram(); /* work ram */
 	map(0x7000, 0x77ff).ram().share("share2");
-	map(0x7800, 0x7800).rw(FUNC(mirderby_state::prot_r), FUNC(mirderby_state::prot_w)); // protection check? (or sound comms?)
+	map(0x7800, 0x7800).rw(FUNC(mirderby_state::prot_r), FUNC(mirderby_state::prot_w));
 	//0x7ff0 onward seems CRTC
 //	map(0x7ff0, 0x7ff?).writeonly().share("vreg");
 	map(0x7ff2, 0x7ff2).portr("SYSTEM");
@@ -257,6 +274,16 @@ void mirderby_state::shared_map(address_map &map)
 		NAME([] () {
 			// will prevent working inputs if non-zero on betting screen
 			return 0;
+		})
+	);
+	map(0x7ffb, 0x7ffc).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			// offset 0 bits 4-6 seems fractional scroll,
+			// but it first gets set up then quickly wiped by CLRA back to back
+			// (intentionally disabled? flip flop?)
+			// the working register gets written twice as well ...
+			if (offset & 1)
+				m_scrollx = data << 1;
 		})
 	);
 	map(0x7ffe, 0x7ffe).nopr(); //watchdog?
@@ -536,14 +563,14 @@ void mirderby_state::mirderby(machine_config &config)
 	config.set_perfect_quantum("maincpu");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(59);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(0*8, 50*8-1, 1*8, 31*8-1);
-	screen.set_screen_update(FUNC(mirderby_state::screen_update));
-	screen.set_palette(m_palette);
-	screen.screen_vblank().set(FUNC(mirderby_state::screen_vblank));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(59);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(0*8, 50*8-1, 1*8, 31*8-1);
+	m_screen->set_screen_update(FUNC(mirderby_state::screen_update));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(mirderby_state::screen_vblank));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mirderby);
 	PALETTE(config, m_palette, FUNC(mirderby_state::palette_init), 0x100);
