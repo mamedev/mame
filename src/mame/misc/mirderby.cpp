@@ -155,6 +155,7 @@ private:
 
 	u8 m_key_matrix = 0;
 	u16 m_scrollx = 0;
+	bool m_scrollx_enable = false;
 };
 
 void mirderby_state::palette_init(palette_device &palette) const
@@ -200,16 +201,24 @@ uint32_t mirderby_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	// category 1 is for scrolling elements, probably high priority too
-	// TODO: gets screwy on race result screen, may scroll disable somehow?
-	m_bg_tilemap->set_scrollx(0, m_scrollx & 0x1ff);
-	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0), 0);
+	if (m_scrollx_enable)
+	{
+		// category 1 is for scrolling elements, probably high priority wrt sprites too
+		m_bg_tilemap->set_scrollx(0, m_scrollx & 0x1ff);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0), 0);
 
-	m_bg_tilemap->set_scrollx(0, 0);
-	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0), 0);
+		m_bg_tilemap->set_scrollx(0, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0), 0);
 
-	m_bg_tilemap->set_scrollx(0, m_scrollx & 0x1ff);
-	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1), 0);
+		m_bg_tilemap->set_scrollx(0, m_scrollx & 0x1ff);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1), 0);
+	}
+	else
+	{
+		m_bg_tilemap->set_scrollx(0, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0), 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1), 0);
+	}
 
 	return 0;
 }
@@ -270,9 +279,16 @@ void mirderby_state::shared_map(address_map &map)
 			return res;
 		})
 	);
+	map(0x7ffa, 0x7ffa).lw8(
+		NAME([this] (u8 data) {
+			// TODO: other bits, hardly used so complete guess (0xb0 vs. 0x7c)
+			m_scrollx_enable = bool(BIT(data, 7));
+		})
+	);
 	map(0x7ffb, 0x7ffb).lr8(
 		NAME([] () {
 			// will prevent working inputs if non-zero on betting screen
+			// maps 100 Yen at least, with bit 4 + 7 off
 			return 0;
 		})
 	);
