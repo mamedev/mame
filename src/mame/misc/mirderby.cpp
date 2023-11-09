@@ -5,8 +5,9 @@
 Miracle Derby - Ascot
 
 TODO:
-- sprites;
+- complete sprites;
 - NVRAM;
+- Pinpoint actual NMI sources;
 - Game pukes if more than one key is pressed, and MAME input defaults for 2p side
   clashes with the remapped p1 keys.
   For now user has to workaround by mapping p2 keys manually,
@@ -128,6 +129,7 @@ private:
 	uint8_t prot_r();
 	void prot_w(uint8_t data);
 	void palette_init(palette_device &palette) const;
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void videoram_w(offs_t offset, u8 data);
@@ -178,6 +180,13 @@ void mirderby_state::videoram_w(offs_t offset, u8 data)
 	m_bg_tilemap->mark_tile_dirty((offset & 0xffe) >> 1);
 }
 
+void mirderby_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mirderby_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+
+//	m_bg_tilemap->set_transparent_pen(0);
+}
+
 TILE_GET_INFO_MEMBER(mirderby_state::get_bg_tile_info)
 {
 	int const addr  = tile_index * 2;
@@ -190,11 +199,48 @@ TILE_GET_INFO_MEMBER(mirderby_state::get_bg_tile_info)
 	tileinfo.set(1, code, color, 0 );
 }
 
-void mirderby_state::video_start()
+void mirderby_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mirderby_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	const u8 *source = m_spriteram;
+	const u8 * const finish = m_spriteram + m_spriteram.length();
 
-//	m_bg_tilemap->set_transparent_pen(0);
+	gfx_element * const gfx = m_gfxdecode->gfx(0);
+
+	// TODO: gets corrupted during gameplay, moving entries with an offset of $-2
+	// TODO: width/height is a complete mystery
+	// writes multiple identical entries to different places,
+	// cfr. pinballs in gameplay from $800 onward (tilecode=$c0)
+	for (; source < finish; source += 4 )
+	{
+		u16 code    = source[ 2 ] << 2;
+		u8 attr     = source[ 1 ];
+		int sx      = source[ 3 ];
+		int sy      = (0xf0 - source[ 0 ]) & 0xff;
+
+		u8 color = attr & 0xf;
+		if (attr & 0x10)
+			sx += 0x100;
+
+		//if (attr == 0)
+		//	continue;
+
+		gfx->transpen(bitmap,cliprect,
+			code, color,
+			0, 0, //flipx, flipy,
+			sx, sy, 0);
+		gfx->transpen(bitmap,cliprect,
+			code + 1, color,
+			0, 0, //flipx, flipy,
+			sx + 8, sy, 0);
+		gfx->transpen(bitmap,cliprect,
+			code + 0x10, color,
+			0, 0, //flipx, flipy,
+			sx, sy + 8, 0);
+		gfx->transpen(bitmap,cliprect,
+			code + 0x11, color,
+			0, 0, //flipx, flipy,
+			sx + 8, sy + 8, 0);
+	}
 }
 
 uint32_t mirderby_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -212,12 +258,17 @@ uint32_t mirderby_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 		m_bg_tilemap->set_scrollx(0, m_scrollx & 0x1ff);
 		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1), 0);
+
+		draw_sprites(bitmap, cliprect);
 	}
 	else
 	{
+		// result screen doesn't explicitly reset the scroll reg but instead
+		// just writes a 0x7c to $7ffa
 		m_bg_tilemap->set_scrollx(0, 0);
 		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0), 0);
 		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1), 0);
+		draw_sprites(bitmap, cliprect);
 	}
 
 	return 0;
