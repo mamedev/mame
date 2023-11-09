@@ -79,6 +79,7 @@ public:
 //		, m_mainlatch(*this, "mainlatch")
 //		, m_sn(*this, "snsnd")
 		, m_keys(*this, "KEY%u", 0U)
+		, m_in(*this, "IN%u", 0U)
 	{
 	}
 
@@ -100,7 +101,8 @@ private:
 //	optional_device<generic_latch_8_device> m_mainlatch; // pteacher
 //	optional_device<sn76489a_device> m_sn; // mrokumei and pteacher
 
-	optional_ioport_array<12> m_keys;
+	required_ioport_array<5> m_keys;
+	required_ioport_array<2> m_in;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -131,6 +133,13 @@ private:
 	u8 m_prot_data = 0;
 	u8 m_latch = 0;
 	u16 m_gfx_flip = 0;
+	u16 m_gfx_bank = 0;
+	bool m_main_irq_enable = false;
+	bool m_main_nmi_enable = false;
+	bool m_sub_irq_enable = false;
+	bool m_sub_nmi_enable = false;
+
+	u8 m_key_matrix = 0;
 };
 
 void mirderby_state::palette_init(palette_device &palette) const
@@ -159,7 +168,7 @@ TILE_GET_INFO_MEMBER(mirderby_state::get_bg_tile_info)
 {
 	int const addr  = tile_index * 2;
 	int const attr  = m_videoram[addr];
-	int const code  = m_videoram[addr + 1] + ((attr & 0x03) << 8) + 0x400 + m_gfx_flip;
+	int const code  = m_videoram[addr + 1] + ((attr & 0x03) << 8) + m_gfx_bank + m_gfx_flip;
 	int const color = (attr >> 4) & 0xf;
 
 	tileinfo.set(1, code, color, 0 );
@@ -187,9 +196,11 @@ void mirderby_state::screen_vblank(int state)
 	{
 		// TODO: each irq routine pings a bit of $8000 for masking/acknowledge
 		// TODO: study FIRQ for main CPU
-		m_maincpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
+		if (m_main_irq_enable)
+			m_maincpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 		// FIRQ and IRQ same for sub CPU
-		m_subcpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
+		if (m_sub_irq_enable)
+			m_subcpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 	}
 }
 
@@ -219,9 +230,29 @@ void mirderby_state::shared_map(address_map &map)
 	map(0x7800, 0x7800).rw(FUNC(mirderby_state::prot_r), FUNC(mirderby_state::prot_w)); // protection check? (or sound comms?)
 	//0x7ff0 onward seems CRTC
 //	map(0x7ff0, 0x7ff?).writeonly().share("vreg");
-	map(0x7ff2, 0x7ff2).portr("IN0");
+	map(0x7ff2, 0x7ff2).portr("SYSTEM");
 	map(0x7ff9, 0x7ffa).lr8(
-		NAME([] (offs_t offset) {
+		NAME([this] (offs_t offset) {
+			u8 res = 0x3f | (m_in[offset]->read() & 0xc0);
+
+			// TODO: P2 side, with a limited subset of keys (!)
+			if (offset == 1)
+				return res;
+
+			// tests KEY1-KEY4 then uses 0x1e
+			// read by main in service mode, by sub in gameplay
+			for (int i = 0; i < 5; i++)
+			{
+				if (BIT(m_key_matrix, i))
+					res &= m_keys[i]->read() & 0xff;
+			}
+
+			return res;
+		})
+	);
+	map(0x7ffb, 0x7ffb).lr8(
+		NAME([] () {
+			// will prevent working inputs if non-zero on betting screen
 			return 0;
 		})
 	);
@@ -244,22 +275,26 @@ void mirderby_state::shared_map(address_map &map)
 	);
 }
 
+// TODO: verify NMI sources
 void mirderby_state::main_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x7fff).m(*this, FUNC(mirderby_state::shared_map));
 	map(0x7ffd, 0x7ffd).lw8(
 		NAME([this] (u8 data) {
-			m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+			if (m_sub_nmi_enable)
+				m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 			//logerror("%02x latch write\n", data);
+			m_key_matrix = data;
 		})
 	);
 	map(0x8000, 0xffff).rom().region("main_rom", 0);
-//	map(0x8000, 0x8000).lw8(
-//		NAME([this] (offs_t offset, u8 data) {
-//			
-//		})
-//	);
+	map(0x8000, 0x8000).lw8(
+		NAME([this] (u8 data) {
+			m_main_nmi_enable = bool(BIT(data, 1));
+			m_main_irq_enable = bool(BIT(data, 0));
+		})
+	);
 }
 
 void mirderby_state::sub_map(address_map &map)
@@ -268,8 +303,9 @@ void mirderby_state::sub_map(address_map &map)
 	map(0x0000, 0x7fff).m(*this, FUNC(mirderby_state::shared_map));
 	map(0x7ffd, 0x7ffd).lw8(
 		NAME([this] (u8 data) {
-			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-			//logerror("%02x latch write\n", data);
+			if (m_main_nmi_enable)
+				m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+			m_key_matrix = data;
 		})
 	);
 	map(0x7ffe, 0x7ffe).nopr(); //watchdog?
@@ -277,13 +313,18 @@ void mirderby_state::sub_map(address_map &map)
 	map(0x8000, 0x8000).lw8(
 		NAME([this] (u8 data) {
 			m_subbank->set_entry(BIT(data, 7) ? 1 : 0);
-			// TODO: other bits used
 			const u16 new_gfx_flip = BIT(data, 5) ? 0x800 : 0;
-			if (new_gfx_flip != m_gfx_flip)
+			const u16 new_gfx_bank = BIT(data, 2) ? 0x400 : 0;
+			if (new_gfx_flip != m_gfx_flip || new_gfx_bank != m_gfx_bank)
 			{
 				m_gfx_flip = new_gfx_flip;
+				m_gfx_bank = new_gfx_bank;
 				m_bg_tilemap->mark_all_dirty();
 			}
+
+			// TODO: bits 3-2 used
+			m_sub_nmi_enable = bool(BIT(data, 1));
+			m_sub_irq_enable = bool(BIT(data, 0));
 		})
 	);
 }
@@ -306,10 +347,10 @@ static GFXDECODE_START( gfx_mirderby )
 	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_packed_msb, 0x0000, 0x10 )
 GFXDECODE_END
 
-
+// TODO: payout rate from analyzer "henkyaku ritsu"
 static INPUT_PORTS_START( mirderby )
-	PORT_START("IN0")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_START("SYSTEM")
+	PORT_DIPNAME( 0x01, 0x01, "SYSTEM" )
 	PORT_DIPSETTING(      0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -331,6 +372,53 @@ static INPUT_PORTS_START( mirderby )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+
+	PORT_START("IN0")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) // Medal
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE2 ) // Credit Clear
+
+	PORT_START("IN1")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 ) // analyzer
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) // hangs game if triggered?
+	PORT_DIPSETTING(      0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+
+	PORT_START("KEY0")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("KEY1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON15 ) PORT_NAME("1P 5-6") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("1P 1-3") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("1P 2-3") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("1P 3-4") PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE ) PORT_NAME("1P Take Score")
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("KEY2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON14 ) PORT_NAME("1P 4-6") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("1P 1-2") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("1P 1-6") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("1P 2-6") PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON13 ) PORT_NAME("1P 4-5") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("KEY3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("1P 1-4") PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("1P 2-4") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("1P 3-5") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP ) PORT_NAME("1P Double Up")
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("KEY4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON16 ) PORT_NAME("1P Screen Change")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("1P 1-5") PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("1P 2-5") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_NAME("1P 3-6") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("1P Payout")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_NAME("1P Flip Flop")
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:1")
@@ -359,12 +447,12 @@ static INPUT_PORTS_START( mirderby )
 	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:1")
-	PORT_DIPSETTING(      0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:2")
-	PORT_DIPSETTING(      0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	// Applies to Medal
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(      0x00, "1 Coin / 100 Credits" )
+	PORT_DIPSETTING(      0x01, "1 Coin / 50 Credits" )
+	PORT_DIPSETTING(      0x02, "1 Coin / 20 Credits" )
+	PORT_DIPSETTING(      0x03, "1 Coin / 10 Credits" )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(      0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
@@ -393,7 +481,9 @@ void mirderby_state::machine_start()
 void mirderby_state::machine_reset()
 {
 	m_subbank->set_entry(0);
-	m_gfx_flip = 0;
+	m_gfx_flip = m_gfx_bank = 0;
+	m_main_irq_enable = m_main_nmi_enable = false;
+	m_sub_irq_enable = m_sub_nmi_enable = false;
 }
 
 /* clocks are 16mhz and 9mhz */
@@ -422,7 +512,7 @@ void mirderby_state::mirderby(machine_config &config)
 	screen.set_refresh_hz(59);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(64*8, 32*8);
-	screen.set_visarea(1*8, 49*8-1, 1*8, 31*8-1);
+	screen.set_visarea(0*8, 50*8-1, 1*8, 31*8-1);
 	screen.set_screen_update(FUNC(mirderby_state::screen_update));
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set(FUNC(mirderby_state::screen_vblank));
