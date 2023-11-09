@@ -74,7 +74,15 @@
 #include "itech8.h"
 
 
-#define MINDY           100
+// configurable logging
+#define LOG_SENSOR     (1U << 1)
+
+//#define VERBOSE (LOG_GENERAL | LOG_SENSOR)
+
+#include "logmacro.h"
+
+#define LOGSENSOR(...)     LOGMASKED(LOG_SENSOR,     __VA_ARGS__)
+
 
 
 /*************************************
@@ -323,7 +331,7 @@ void slikshot_state::inters_to_words(u16 inter1, u16 inter2, u16 inter3, u8 *bea
 			*word2 = ((uint64_t)word2mod << 16) / 0x16553;
 		}
 		else
-			logerror("inters_to_words: unable to convert %04x %04x %04x %02x\n",
+			LOGSENSOR("inters_to_words: unable to convert %04x %04x %04x %02x\n",
 					(u32)inter1, (u32)inter2, (u32)inter3, (u32)*beams);
 	}
 
@@ -343,7 +351,7 @@ void slikshot_state::inters_to_words(u16 inter1, u16 inter2, u16 inter3, u8 *bea
 			*word2 = ((uint64_t)word2mod << 16) / 0x16553;
 		}
 		else
-			logerror("inters_to_words: unable to convert %04x %04x %04x %02x\n",
+			LOGSENSOR("inters_to_words: unable to convert %04x %04x %04x %02x\n",
 					(u32)inter1, (u32)inter2, (u32)inter3, (u32)*beams);
 	}
 }
@@ -399,7 +407,7 @@ void slikshot_state::compute_sensors()
 	inters_to_words(inter1, inter2, inter3, &beams, &word1, &word2, &word3);
 	words_to_sensors(word1, word2, word3, beams, &m_sensor0, &m_sensor1, &m_sensor2, &m_sensor3);
 
-	logerror("%15f: Sensor values: %04x %04x %04x %04x\n", machine().time().as_double(), m_sensor0, m_sensor1, m_sensor2, m_sensor3);
+	LOGSENSOR("%15f: Sensor values: %04x %04x %04x %04x\n", machine().time().as_double(), m_sensor0, m_sensor1, m_sensor2, m_sensor3);
 }
 
 
@@ -614,76 +622,3 @@ u32 slikshot_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 
 	return 0;
 }
-
-
-
-/*************************************
- *
- *  main
- *
- *  uncomment this to make a stand
- *  alone version for testing
- *
- *************************************/
-
-#ifdef STANDALONE
-
-int main(int argc, char *argv[])
-{
-	u16 word1, word2, word3;
-	u16 inter1, inter2, inter3;
-	u8 beams, x, vx, vy;
-
-	if (argc == 5)
-	{
-		u32 sens0, sens1, sens2, sens3;
-
-		sscanf(argv[1], "%x", &sens0);
-		sscanf(argv[2], "%x", &sens1);
-		sscanf(argv[3], "%x", &sens2);
-		sscanf(argv[4], "%x", &sens3);
-		osd_printf_debug("sensors: %04x %04x %04x %04x\n", sens0, sens1, sens2, sens3);
-		if (sens0 && sens1)
-		{
-			osd_printf_debug("error: sensor 0 or 1 must be 0\n");
-			return 1;
-		}
-
-		sensors_to_words(sens0, sens1, sens2, sens3, &word1, &word2, &word3, &beams);
-		osd_printf_debug("word1 = %04x  word2 = %04x  word3 = %04x  beams = %d\n",
-				(u32)word1, (u32)word2, (u32)word3, (u32)beams);
-
-		words_to_inters(word1, word2, word3, beams, &inter1, &inter2, &inter3);
-		osd_printf_debug("inter1 = %04x  inter2 = %04x  inter3 = %04x\n", (u32)inter1, (u32)inter2, (u32)inter3);
-
-		inters_to_vels(inter1, inter2, inter3, beams, &x, &vx, &vy);
-		osd_printf_debug("x = %02x  vx = %02x  vy = %02x\n", (u32)x, (u32)vx, (u32)vy);
-	}
-	else if (argc == 4)
-	{
-		u32 xin, vxin, vyin;
-		u16 sens0, sens1, sens2, sens3;
-
-		sscanf(argv[1], "%x", &xin);
-		sscanf(argv[2], "%x", &vxin);
-		sscanf(argv[3], "%x", &vyin);
-		x = xin;
-		vx = vxin;
-		vy = vyin;
-		osd_printf_debug("x = %02x  vx = %02x  vy = %02x\n", (u32)x, (u32)vx, (u32)vy);
-
-		vels_to_inters(x, vx, vy, &inter1, &inter2, &inter3, &beams);
-		osd_printf_debug("inter1 = %04x  inter2 = %04x  inter3 = %04x  beams = %d\n", (u32)inter1, (u32)inter2, (u32)inter3, (u32)beams);
-
-		inters_to_words(inter1, inter2, inter3, &beams, &word1, &word2, &word3);
-		osd_printf_debug("word1 = %04x  word2 = %04x  word3 = %04x  beams = %d\n",
-				(u32)word1, (u32)word2, (u32)word3, (u32)beams);
-
-		words_to_sensors(word1, word2, word3, beams, &sens0, &sens1, &sens2, &sens3);
-		osd_printf_debug("sensors: %04x %04x %04x %04x\n", sens0, sens1, sens2, sens3);
-	}
-
-	return 0;
-}
-
-#endif

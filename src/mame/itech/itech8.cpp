@@ -512,10 +512,24 @@
 #include "speaker.h"
 
 
-#define FULL_LOGGING    0
+// configurable logging
+#define LOG_PROT      (1U << 1)
+#define LOG_VIDEO     (1U << 2)
+#define LOG_CONTROL   (1U << 3)
 
-#define CLOCK_8MHz      (8000000)
-#define CLOCK_12MHz     (12000000)
+//#define VERBOSE (LOG_GENERAL | LOG_PROT | LOG_VIDEO | LOG_CONTROL)
+
+#include "logmacro.h"
+
+#define LOGPROT(...)      LOGMASKED(LOG_PROT,      __VA_ARGS__)
+#define LOGVIDEO(...)     LOGMASKED(LOG_VIDEO,     __VA_ARGS__)
+#define LOGCONTROL(...)   LOGMASKED(LOG_CONTROL,   __VA_ARGS__)
+
+
+
+
+static constexpr XTAL CLOCK_8MHz = XTAL(8'000'000);
+static constexpr XTAL CLOCK_12MHz = XTAL(12'000'000);
 
 
 
@@ -573,7 +587,7 @@ void itech8_state::generate_nmi(int state)
 		update_interrupts(1, -1, -1);
 		m_irq_off_timer->adjust(attotime::from_usec(1));
 
-		if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", m_screen->vpos());
+		LOGVIDEO("------------ VBLANK (%d) --------------\n", m_screen->vpos());
 	}
 }
 
@@ -748,14 +762,14 @@ int itech8_state::special_r()
 
 void itech8_state::pia_porta_out(u8 data)
 {
-	logerror("PIA port A write = %02x\n", data);
+	LOGCONTROL("PIA port A write = %02x\n", data);
 	m_pia_porta_data = data;
 }
 
 
 void itech8_state::pia_portb_out(u8 data)
 {
-	logerror("PIA port B write = %02x\n", data);
+	LOGCONTROL("PIA port B write = %02x\n", data);
 
 	/* bit 0 provides feedback to the main CPU */
 	/* bit 4 controls the ticket dispenser */
@@ -769,7 +783,7 @@ void itech8_state::pia_portb_out(u8 data)
 
 void itech8_state::ym2203_portb_out(u8 data)
 {
-	logerror("YM2203 port B write = %02x\n", data);
+	LOGCONTROL("YM2203 port B write = %02x\n", data);
 
 	/* bit 0 provides feedback to the main CPU */
 	/* bit 5 controls the coin counter */
@@ -816,7 +830,7 @@ void itech8_state::grom_bank_w(u8 data)
 u16 itech8_state::rom_constant_r(offs_t offset)
 {
 //  Ninja Clowns reads this area for program ROM checksum
-	logerror("Read ROM constant area %04x\n",offset*2+0x40000);
+	LOGPROT("Read ROM constant area %04x\n",offset*2+0x40000);
 	return 0xd840;
 }
 
@@ -1691,7 +1705,7 @@ void itech8_state::generate_tms34061_interrupt(int state)
 {
 	update_interrupts(-1, state, -1);
 
-	if (FULL_LOGGING && state) logerror("------------ DISPLAY INT (%d) --------------\n", m_screen->vpos());
+	if (state) LOGVIDEO("------------ DISPLAY INT (%d) --------------\n", m_screen->vpos());
 }
 
 /*************************************

@@ -100,8 +100,17 @@
  *
  *************************************/
 
-#define FULL_LOGGING            0
-#define BLIT_LOGGING            0
+// configurable logging
+#define LOG_BLITTER     (1U << 1)
+#define LOG_VIDEO     (1U << 2)
+
+//#define VERBOSE (LOG_GENERAL | LOG_BLITTER | LOG_VIDEO)
+
+#include "logmacro.h"
+
+#define LOGBLITTER(...)     LOGMASKED(LOG_BLITTER,     __VA_ARGS__)
+#define LOGVIDEO(...)     LOGMASKED(LOG_VIDEO,     __VA_ARGS__)
+
 
 
 
@@ -180,7 +189,7 @@ void itech8_state::palette_w(offs_t offset, u8 data)
 void itech8_state::page_w(u8 data)
 {
 	m_screen->update_partial(m_screen->vpos());
-	logerror("%s:display_page = %02X (%d)\n", machine().describe_context(), data, m_screen->vpos());
+	LOGVIDEO("%s:display_page = %02X (%d)\n", machine().describe_context(), data, m_screen->vpos());
 	m_page_select = data;
 }
 
@@ -276,8 +285,7 @@ void itech8_state::perform_blit()
 	int x, y;
 
 	/* debugging */
-	if (FULL_LOGGING)
-		logerror("Blit: scan=%d  src=%06x @ (%05x) for %dx%d ... flags=%02x\n",
+	LOGBLITTER("Blit: scan=%d  src=%06x @ (%05x) for %dx%d ... flags=%02x\n",
 				m_screen->vpos(),
 				(m_grom_bank << 16) | (BLITTER_ADDRHI << 8) | BLITTER_ADDRLO,
 				m_tms34061->xyaddress() | ((m_tms34061->xyoffset() & 0x300) << 8),
@@ -401,7 +409,7 @@ TIMER_CALLBACK_MEMBER(itech8_state::blitter_done)
 	m_blit_in_progress = 0;
 	update_interrupts(-1, -1, 1);
 
-	if (FULL_LOGGING) logerror("------------ BLIT DONE (%d) --------------\n", m_screen->vpos());
+	LOGBLITTER("------------ BLIT DONE (%d) --------------\n", m_screen->vpos());
 }
 
 
@@ -417,7 +425,7 @@ u8 itech8_state::blitter_r(offs_t offset)
 	int result = m_blitter_data[offset / 2];
 
 	/* debugging */
-	if (FULL_LOGGING) logerror("%s:blitter_r(%02x)\n", machine().describe_context(), offset / 2);
+	LOGBLITTER("%s:blitter_r(%02x)\n", machine().describe_context(), offset / 2);
 
 	/* low bit seems to be ignored */
 	offset /= 2;
@@ -450,14 +458,12 @@ void itech8_state::blitter_w(offs_t offset, u8 data)
 	if (offset == 3)
 	{
 		/* log to the blitter file */
-		if (BLIT_LOGGING)
-		{
-			logerror("Blit: XY=%1X%04X SRC=%02X%02X%02X SIZE=%3dx%3d FLAGS=%02x",
+		LOGBLITTER("Blit: XY=%1X%04X SRC=%02X%02X%02X SIZE=%3dx%3d FLAGS=%02x",
 						(m_tms34061->xyoffset() >> 8) & 0x0f, m_tms34061->xyaddress(),
 						m_grom_bank, m_blitter_data[0], m_blitter_data[1],
 						m_blitter_data[4], m_blitter_data[5],
 						m_blitter_data[2]);
-			logerror("   %02X %02X %02X [%02X] %02X %02X %02X [%02X]-%02X %02X %02X %02X [%02X %02X %02X %02X]\n",
+		LOGBLITTER("   %02X %02X %02X [%02X] %02X %02X %02X [%02X]-%02X %02X %02X %02X [%02X %02X %02X %02X]\n",
 						m_blitter_data[0], m_blitter_data[1],
 						m_blitter_data[2], m_blitter_data[3],
 						m_blitter_data[4], m_blitter_data[5],
@@ -466,7 +472,6 @@ void itech8_state::blitter_w(offs_t offset, u8 data)
 						m_blitter_data[10], m_blitter_data[11],
 						m_blitter_data[12], m_blitter_data[13],
 						m_blitter_data[14], m_blitter_data[15]);
-		}
 
 		/* perform the blit */
 		perform_blit();
@@ -477,7 +482,7 @@ void itech8_state::blitter_w(offs_t offset, u8 data)
 	}
 
 	/* debugging */
-	if (FULL_LOGGING) logerror("%s:blitter_w(%02x)=%02x\n", machine().describe_context(), offset, data);
+	LOGBLITTER("%s:blitter_w(%02x)=%02x\n", machine().describe_context(), offset, data);
 }
 
 
