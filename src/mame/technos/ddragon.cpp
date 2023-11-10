@@ -960,7 +960,7 @@ void ddragon_state::ddragon(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ddragon_state::ddragon_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(ddragon_state::ddragon_scanline), "screen", 0, 1);
 
-	hd63701y0_cpu_device &subcpu(HD63701Y0(config, m_subcpu, MAIN_CLOCK / 2));  /* HD63701YOP, 6 MHz / 4 internally */
+	hd63701y0_cpu_device &subcpu(HD63701Y0(config, m_subcpu, MAIN_CLOCK / 2));  /* HD63701Y0P, 6 MHz / 4 internally */
 	subcpu.set_addrmap(AS_PROGRAM, &ddragon_state::sub_map);
 	subcpu.out_p6_cb().set(FUNC(ddragon_state::sub_port6_w));
 

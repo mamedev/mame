@@ -80,7 +80,7 @@ protected:
 	uint8_t m_wai_state;      /* WAI opcode state (or sleep opcode state) */
 	uint8_t m_nmi_state;      /* NMI line state */
 	uint8_t m_nmi_pending;    /* NMI pending */
-	uint8_t m_irq_state[4];   /* IRQ line state [IRQ1,TIN,SC1,IS] */
+	uint8_t m_irq_state[3];   /* IRQ line state [IRQ1,TIN,IS3] */
 
 	/* Memory spaces */
 	memory_access<16, 0, 0, ENDIANNESS_BIG>::cache m_cprogram, m_copcodes;

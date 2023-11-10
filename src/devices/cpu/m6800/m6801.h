@@ -12,9 +12,9 @@
 enum
 {
 	M6801_IRQ_LINE = M6800_IRQ_LINE,
-	M6801_TIN_LINE, // P20/Tin Input Capture line (edge sense). Active edge is selectable by internal reg.
-	M6801_SC1_LINE,
-	M6801_IS_LINE // IS3(6801) or ISF(6301Y)
+	M6801_TIN_LINE, // P20/TIN Input Capture line (edge sense). Active edge is selectable by internal reg.
+	M6801_IS3_LINE, // SC1/IOS/IS3 (P54/IS on HD6301Y)
+	M6801_STBY_LINE // STBY pin, or internal standby
 };
 
 enum
@@ -57,6 +57,7 @@ public:
 
 	auto out_sc2_cb() { return m_out_sc2_func.bind(); }
 	auto out_ser_tx_cb() { return m_out_sertx_func.bind(); }
+	auto standby_cb() { return m_standby_func.bind(); } // notifier (not an output pin)
 
 	void m6801_io(address_map &map); // FIXME: privatize this
 
@@ -72,7 +73,8 @@ protected:
 	// device_execute_interface implementation
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 4 - 1) / 4; }
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 4); }
-	virtual uint32_t execute_input_lines() const noexcept override { return 5; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 6; }
+	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return m6800_cpu_device::execute_input_edge_triggered(inputnum) || inputnum == M6801_STBY_LINE; }
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_disasm_interface implementation
@@ -115,7 +117,7 @@ protected:
 	void sci_tdr_w(uint8_t data);
 
 	uint8_t rcr_r();
-	void rcr_w(uint8_t data);
+	virtual void rcr_w(uint8_t data);
 	uint8_t ff_r();
 
 	void m6803_mem(address_map &map);
@@ -125,6 +127,7 @@ protected:
 
 	devcb_write_line m_out_sc2_func;
 	devcb_write_line m_out_sertx_func;
+	devcb_write_line m_standby_func;
 
 	int m_sclk_divider;
 
@@ -147,15 +150,13 @@ protected:
 	int      m_rxbits, m_txbits, m_txstate, m_trcsr_read_tdre, m_trcsr_read_orfe, m_trcsr_read_rdrf, m_tx, m_ext_serclock;
 	bool     m_use_ext_serclock;
 
-	int      m_latch09;
+	bool     m_standby;
+	uint8_t  m_latch09;
+	int      m_is3_state;
 
 	PAIR     m_timer_over;
 	emu_timer *m_sci_timer;
-
-	/* point of next timer event */
-	uint32_t m_timer_next;
-
-	int      m_sc1_state;
+	uint32_t m_timer_next;     /* point of next timer event */
 
 	static const uint8_t cycles_6803[256];
 	static const uint8_t cycles_63701[256];
@@ -375,6 +376,7 @@ protected:
 	virtual void p6_data_w(uint8_t data) override;
 	uint8_t p6_csr_r();
 	void p6_csr_w(uint8_t data);
+	virtual void rcr_w(uint8_t data) override;
 
 	virtual void m6800_check_irq2() override;
 	void clear_pending_isf();

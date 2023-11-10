@@ -943,8 +943,8 @@ void adam_state::os3_w(int state)
 
 			//logerror("Master 6801 read from %04x data %02x\n", m_ba, m_data_out);
 
-			m_netcpu->set_input_line(M6801_SC1_LINE, ASSERT_LINE);
-			m_netcpu->set_input_line(M6801_SC1_LINE, CLEAR_LINE);
+			m_netcpu->set_input_line(M6801_IS3_LINE, ASSERT_LINE);
+			m_netcpu->set_input_line(M6801_IS3_LINE, CLEAR_LINE);
 		}
 	}
 }

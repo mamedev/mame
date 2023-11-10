@@ -319,6 +319,7 @@ m6801_cpu_device::m6801_cpu_device(const machine_config &mconfig, device_type ty
 	, m_out_port_func(*this)
 	, m_out_sc2_func(*this)
 	, m_out_sertx_func(*this)
+	, m_standby_func(*this)
 	, m_sclk_divider(8)
 {
 }
@@ -451,7 +452,7 @@ void hd6301y_cpu_device::m6800_check_irq2()
 {
 	if ((m_p6csr & 0xc0) == 0xc0)
 	{
-		standard_irq_callback(M6801_IS_LINE, m_pc.w.l);
+		standard_irq_callback(M6801_IS3_LINE, m_pc.w.l);
 		TAKE_ISI;
 	}
 	else
@@ -950,8 +951,20 @@ void m6801_cpu_device::execute_set_input(int irqline, int state)
 {
 	switch (irqline)
 	{
-	case M6801_SC1_LINE:
-		if (!m_sc1_state && (CLEAR_LINE != state))
+	case M6801_STBY_LINE:
+		if (!m_standby && state != CLEAR_LINE)
+		{
+			// clock stops, MCU goes into reset state, all pins except XTAL and STBY go high impedance
+			m_standby = true;
+			suspend(SUSPEND_REASON_CLOCK, true);
+			m_standby_func(1);
+
+			// once in standby, it can only recover from it after a reset
+		}
+		break;
+
+	case M6801_IS3_LINE:
+		if (!m_is3_state && state != CLEAR_LINE)
 		{
 			if (!m_port3_latched && (m_p3csr & M6801_P3CSR_LE))
 			{
@@ -968,7 +981,7 @@ void m6801_cpu_device::execute_set_input(int irqline, int state)
 				LOGPORT("Not latching Port 3 Data:%s%s", m_port3_latched ? " already latched" : "", (m_p3csr & M6801_P3CSR_LE) ? "" : " LE clear");
 			}
 		}
-		m_sc1_state = ASSERT_LINE == state;
+		m_is3_state = state;
 		break;
 
 	case M6801_TIN_LINE:
@@ -976,7 +989,7 @@ void m6801_cpu_device::execute_set_input(int irqline, int state)
 		{
 			m_irq_state[M6801_TIN_LINE] = state;
 			//edge = (state == CLEAR_LINE ) ? 2 : 0;
-			if (((m_tcsr&TCSR_IEDG) ^ (state==CLEAR_LINE ? TCSR_IEDG : 0)) == 0)
+			if (((m_tcsr & TCSR_IEDG) ^ (state == CLEAR_LINE ? TCSR_IEDG : 0)) == 0)
 				return;
 			/* active edge in */
 			m_tcsr |= TCSR_ICF;
@@ -996,15 +1009,15 @@ void hd6301y_cpu_device::execute_set_input(int irqline, int state)
 {
 	switch (irqline)
 	{
-	case M6801_IS_LINE:
+	case M6801_IS3_LINE:
 		// interrupt at falling edge
-		if (!state && m_irq_state[M6801_IS_LINE])
+		if (!state && m_irq_state[M6801_IS3_LINE])
 		{
 			m_p6csr |= 0x80; // IS flag
 			m_pending_isf_clear = false;
 		}
 
-		m_irq_state[M6801_IS_LINE] = state;
+		m_irq_state[M6801_IS3_LINE] = state;
 		break;
 
 	default:
@@ -1051,10 +1064,11 @@ void m6801_cpu_device::device_start()
 	m_ext_serclock = 0;
 	m_use_ext_serclock = false;
 
+	m_standby = false;
 	m_latch09 = 0;
+	m_is3_state = 0;
 	m_timer_over.d = 0;
 	m_timer_next = 0;
-	m_sc1_state = 0;
 
 	save_item(NAME(m_port_ddr));
 	save_item(NAME(m_port_data));
@@ -1087,10 +1101,11 @@ void m6801_cpu_device::device_start()
 	save_item(NAME(m_ext_serclock));
 	save_item(NAME(m_use_ext_serclock));
 
+	save_item(NAME(m_standby));
 	save_item(NAME(m_latch09));
+	save_item(NAME(m_is3_state));
 	save_item(NAME(m_timer_over.d));
 	save_item(NAME(m_timer_next));
-	save_item(NAME(m_sc1_state));
 }
 
 void hd6301x_cpu_device::device_start()
@@ -1134,8 +1149,10 @@ void m6801_cpu_device::device_reset()
 {
 	m6800_cpu_device::device_reset();
 
+	m_standby = false;
+	m_standby_func(0);
 	m_irq_state[M6801_TIN_LINE] = 0;
-	m_sc1_state = 0;
+	m_is3_state = 0;
 
 	m_port_ddr[0] = 0x00;
 	m_port_ddr[1] = 0x00;
@@ -1487,7 +1504,7 @@ uint8_t hd6301y_cpu_device::p5_data_r()
 	if (m_portx_ddr[0] == 0xff)
 		return m_portx_data[0];
 	else
-		return ((m_in_portx_func[0]() | ((m_irq_state[M6801_IS_LINE]) ? 0x10 : 0)) & (m_portx_ddr[0] ^ 0xff)) | (m_portx_data[0] & m_portx_ddr[0]);
+		return ((m_in_portx_func[0]() | ((m_irq_state[M6801_IS3_LINE]) ? 0x10 : 0)) & (m_portx_ddr[0] ^ 0xff)) | (m_portx_data[0] & m_portx_ddr[0]);
 }
 
 void hd6301y_cpu_device::p5_data_w(uint8_t data)
@@ -1948,6 +1965,15 @@ void m6801_cpu_device::rcr_w(uint8_t data)
 	LOG("RAM Control Register: %02x\n", data);
 
 	m_ram_ctrl = data;
+}
+
+void hd6301y_cpu_device::rcr_w(uint8_t data)
+{
+	m6801_cpu_device::rcr_w(data);
+
+	// software standby mode
+	if (~data & 0x20)
+		execute_set_input(M6801_STBY_LINE, ASSERT_LINE);
 }
 
 uint8_t m6801_cpu_device::ff_r()

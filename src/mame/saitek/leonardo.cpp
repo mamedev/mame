@@ -385,7 +385,7 @@ void leo_state::leonardo(machine_config &config)
 	m_maincpu->out_p6_cb().set(FUNC(leo_state::p6_w));
 
 	INPUT_MERGER_ANY_LOW(config, m_stb);
-	m_stb->output_handler().set_inputline(m_maincpu, M6801_IS_LINE);
+	m_stb->output_handler().set_inputline(m_maincpu, M6801_IS3_LINE);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
