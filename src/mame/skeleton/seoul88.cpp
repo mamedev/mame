@@ -145,4 +145,4 @@ ROM_END
 
 
 //    YEAR  NAME     PARENT  MACHINE  INPUT    CLASS          INIT        ROT   COMPANY  FULLNAME          FLAGS
-GAME( 20??, seoul88, 0,      seoul88, seoul88, seoul88_state, empty_init, ROT0, "Mecca", "Seoul 88 Fever", MACHINE_IS_SKELETON )
+GAME( 1989, seoul88, 0,      seoul88, seoul88, seoul88_state, empty_init, ROT0, "Mecca", "Seoul 88 Fever", MACHINE_IS_SKELETON )
