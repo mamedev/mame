@@ -2,7 +2,7 @@
 // copyright-holders:
 /***********************************************************************************************
 
- Skeleton driver for "Seoul 88", a Korean video slot from an unknown manufacturer.
+ Skeleton driver for "Seoul 88 Fever", a Korean video slot from Mecca.
 
   ____________________________________________________________________________________________________
  | ____      ____________________    ____________   _________   ________   _________  _________       |
@@ -144,5 +144,5 @@ ROM_END
 } // anonymous namespace
 
 
-//    YEAR  NAME     PARENT  MACHINE  INPUT    CLASS          INIT        ROT   COMPANY    FULLNAME    FLAGS
-GAME( 20??, seoul88, 0,      seoul88, seoul88, seoul88_state, empty_init, ROT0, "unknown", "Seoul 88", MACHINE_IS_SKELETON )
+//    YEAR  NAME     PARENT  MACHINE  INPUT    CLASS          INIT        ROT   COMPANY  FULLNAME          FLAGS
+GAME( 20??, seoul88, 0,      seoul88, seoul88, seoul88_state, empty_init, ROT0, "Mecca", "Seoul 88 Fever", MACHINE_IS_SKELETON )
