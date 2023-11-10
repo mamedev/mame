@@ -356,9 +356,13 @@ void mu80_state::mu80(machine_config &config)
 
 	SWP20(config, m_swp20_0);
 	m_swp20_0->set_device_rom_tag("swp20");
+	m_swp20_0->add_route(0, "lspeaker", 1.0);
+	m_swp20_0->add_route(1, "rspeaker", 1.0);
 
 	SWP20(config, m_swp20_1);
 	m_swp20_1->set_device_rom_tag("swp20");
+	m_swp20_1->add_route(0, "lspeaker", 1.0);
+	m_swp20_1->add_route(1, "rspeaker", 1.0);
 
 	MEG(config, m_meg);
 
