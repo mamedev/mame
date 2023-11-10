@@ -315,6 +315,7 @@ m6801_cpu_device::m6801_cpu_device(const machine_config &mconfig, const char *ta
 
 m6801_cpu_device::m6801_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const op_func *insn, const uint8_t *cycles, address_map_constructor internal)
 	: m6800_cpu_device(mconfig, type, tag, owner, clock, insn, cycles, internal)
+	, device_nvram_interface(mconfig, *this)
 	, m_in_port_func(*this, 0xff)
 	, m_out_port_func(*this)
 	, m_out_sc2_func(*this)
@@ -322,6 +323,8 @@ m6801_cpu_device::m6801_cpu_device(const machine_config &mconfig, device_type ty
 	, m_standby_func(*this)
 	, m_sclk_divider(8)
 {
+	// disable nvram by default (set to true if MCU is battery-backed when in standby mode)
+	nvram_enable_backup(false);
 }
 
 m6803_cpu_device::m6803_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -952,10 +955,9 @@ void m6801_cpu_device::execute_set_input(int irqline, int state)
 	switch (irqline)
 	{
 	case M6801_STBY_LINE:
-		if (!m_standby && state != CLEAR_LINE)
+		if (!standby() && state != CLEAR_LINE)
 		{
 			// clock stops, MCU goes into reset state, all pins except XTAL and STBY go high impedance
-			m_standby = true;
 			suspend(SUSPEND_REASON_CLOCK, true);
 			m_standby_func(1);
 
@@ -1064,7 +1066,6 @@ void m6801_cpu_device::device_start()
 	m_ext_serclock = 0;
 	m_use_ext_serclock = false;
 
-	m_standby = false;
 	m_latch09 = 0;
 	m_is3_state = 0;
 	m_timer_over.d = 0;
@@ -1101,7 +1102,6 @@ void m6801_cpu_device::device_start()
 	save_item(NAME(m_ext_serclock));
 	save_item(NAME(m_use_ext_serclock));
 
-	save_item(NAME(m_standby));
 	save_item(NAME(m_latch09));
 	save_item(NAME(m_is3_state));
 	save_item(NAME(m_timer_over.d));
@@ -1149,7 +1149,6 @@ void m6801_cpu_device::device_reset()
 {
 	m6800_cpu_device::device_reset();
 
-	m_standby = false;
 	m_standby_func(0);
 	m_irq_state[M6801_TIN_LINE] = 0;
 	m_is3_state = 0;
@@ -1213,6 +1212,32 @@ void hd6301y_cpu_device::device_reset()
 
 	m_p6csr = 7;
 }
+
+bool m6801_cpu_device::nvram_write(util::write_stream &file)
+{
+	size_t actual;
+
+	// upper bits of RAM control register
+	u8 ram_ctrl = m_ram_ctrl & 0xc0;
+	if (file.write(&ram_ctrl, sizeof(ram_ctrl), actual) || (sizeof(ram_ctrl) != actual))
+		return false;
+
+	return true;
+}
+
+bool m6801_cpu_device::nvram_read(util::read_stream &file)
+{
+	size_t actual;
+
+	// upper bits of RAM control register
+	u8 ram_ctrl = 0;
+	if (file.read(&ram_ctrl, sizeof(ram_ctrl), actual) || (sizeof(ram_ctrl) != actual))
+		return false;
+	m_ram_ctrl |= ram_ctrl & 0xc0;
+
+	return true;
+}
+
 
 
 void m6801_cpu_device::write_port2()

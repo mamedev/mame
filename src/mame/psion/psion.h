@@ -35,7 +35,6 @@ public:
 		, m_nvram2(*this, "nvram2")
 		, m_nvram3(*this, "nvram3")
 		, m_sys_register(*this, "sys_register")
-		, m_stby_pwr(1)
 		, m_ram(*this, "ram")
 		, m_kb_lines(*this, "K%u", 1U)
 	{ }
@@ -61,9 +60,8 @@ protected:
 	optional_device<nvram_device> m_nvram3;
 
 	uint16_t m_kb_counter = 0;
-	uint8_t m_enable_nmi = 0;
+	bool m_enable_nmi = false;
 	optional_shared_ptr<uint8_t> m_sys_register;
-	uint8_t m_stby_pwr;
 	uint8_t m_pulse = 0;
 
 	// RAM/ROM banks

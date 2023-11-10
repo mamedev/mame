@@ -40,7 +40,7 @@ enum
 };
 
 
-class m6801_cpu_device : public m6800_cpu_device
+class m6801_cpu_device : public m6800_cpu_device, public device_nvram_interface
 {
 public:
 	m6801_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -57,7 +57,9 @@ public:
 
 	auto out_sc2_cb() { return m_out_sc2_func.bind(); }
 	auto out_ser_tx_cb() { return m_out_sertx_func.bind(); }
+
 	auto standby_cb() { return m_standby_func.bind(); } // notifier (not an output pin)
+	bool standby() { return suspended(SUSPEND_REASON_CLOCK); }
 
 	void m6801_io(address_map &map); // FIXME: privatize this
 
@@ -69,6 +71,11 @@ protected:
 	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// device_nvram_interface implementation
+	virtual void nvram_default() override { ; }
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
 
 	// device_execute_interface implementation
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 4 - 1) / 4; }
@@ -150,7 +157,6 @@ protected:
 	int      m_rxbits, m_txbits, m_txstate, m_trcsr_read_tdre, m_trcsr_read_orfe, m_trcsr_read_rdrf, m_tx, m_ext_serclock;
 	bool     m_use_ext_serclock;
 
-	bool     m_standby;
 	uint8_t  m_latch09;
 	int      m_is3_state;
 
