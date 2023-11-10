@@ -42796,6 +42796,7 @@ kicknrun                        // A87 (c) 1986 Taito Corporation
 kicknrunu                       // A87 (c) 1986 Taito Corporation
 kikikai                         // A85 (c) 1986 Taito Corporation
 knightb                         // bootleg
+knightba                        // bootleg (Game Corporation)
 mexico86                        // bootleg (Micro Research)
 mexico86a                       // bootleg
 
@@ -43735,6 +43736,7 @@ xsleenaj                        // TA-0019 (c) 1986
 @source:tecmo/bombjack.cpp
 bombjack                        // (c) 1984 Tehkan
 bombjack2                       // (c) 1984 Tehkan
+bombjackbl                      // bootleg
 bombjackt                       // (c) 1984 Tehkan + Tecfri license
 
 @source:tecmo/gaiden.cpp
