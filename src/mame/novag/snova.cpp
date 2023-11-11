@@ -12,7 +12,6 @@ NVRAM won't work properly (supremo doesn't have NVRAM).
 TODO:
 - beeps are glitchy, as if interrupted for too long
 - if/when MAME supports an exit callback, hook up power-off NMI to that
-- nsnova MCU internal NVRAM belongs in m6801.cpp
 - nsnova serial port isn't working, MCU emulation problem?
 - nsnova unmapped reads from 0x33/0x34
 - is "Aquamarine / Super Nova" the same rom as nsnova and just a redesign?
@@ -247,9 +246,8 @@ void snova_state::supremo_map(address_map &map)
 
 void snova_state::snova_map(address_map &map)
 {
-	supremo_map(map);
-	map(0x0040, 0x013f).ram().share("internal"); // internal
 	map(0x4000, 0x5fff).ram().share("nvram");
+	map(0x8000, 0xffff).rom();
 }
 
 
@@ -352,7 +350,6 @@ void snova_state::snova(machine_config &config)
 	m_maincpu->nvram_enable_backup(true);
 	m_maincpu->standby_cb().set(FUNC(snova_state::standby));
 
-	NVRAM(config, "internal", nvram_device::DEFAULT_ALL_0);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	m_board->set_nvram_enable(true);
 
