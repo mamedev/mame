@@ -241,8 +241,6 @@ void snova_state::p6_w(u8 data)
 
 void snova_state::supremo_map(address_map &map)
 {
-	map(0x0000, 0x0027).m(m_maincpu, FUNC(hd6303y_cpu_device::hd6301y_io));
-	map(0x0040, 0x013f).ram(); // internal
 	map(0x4000, 0x47ff).ram();
 	map(0x8000, 0xffff).rom();
 }

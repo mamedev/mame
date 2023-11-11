@@ -401,8 +401,6 @@ void korg_dssmsrk_state::msrk_io_map(address_map &map)
 
 void korg_dss1_state::cpu2_map(address_map &map)
 {
-	map(0x0000, 0x001f).m(m_cpu2, FUNC(hd6303x_cpu_device::hd6301x_io)); // FIXME: internalize this
-	map(0x0040, 0x00ff).ram(); // FIXME: internalize this
 	map(0x0100, 0x0100).mirror(0x3cff).w(FUNC(korg_dss1_state::da_lsb_w));
 	map(0x0200, 0x0200).mirror(0x3cff).w(FUNC(korg_dss1_state::da_msb_w));
 	map(0x0300, 0x0300).mirror(0x3cff).r(m_latch[0], FUNC(generic_latch_8_device::read));

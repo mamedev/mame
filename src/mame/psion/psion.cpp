@@ -232,29 +232,18 @@ uint8_t psion1_state::switchoff_r()
 	return 0;
 }
 
-void psion_state::psion_int_reg(address_map &map)
-{
-	// FIXME: this should all be made internal to the CPU device
-	map(0x0000, 0x001f).m(m_maincpu, FUNC(hd6301x_cpu_device::hd6301x_io));
-}
-
 void psion1_state::psion1_mem(address_map &map)
 {
-	psion_int_reg(map);
-	map(0x0040, 0x00ff).ram().share("sys_register");
 	map(0x2000, 0x2001).mirror(0x07fe).rw(m_lcdc, FUNC(hd44780_device::read), FUNC(hd44780_device::write));
 	map(0x2800, 0x2800).r(FUNC(psion1_state::reset_kb_counter_r));
 	map(0x2e00, 0x2e00).r(FUNC(psion1_state::switchoff_r));
 	map(0x3000, 0x3000).r(FUNC(psion1_state::inc_kb_counter_r));
 	map(0x4000, 0x47ff).ram().share("ram");
-	map(0xf000, 0xffff).rom();
 }
 
 void psion_state::psioncm_mem(address_map &map)
 {
 	map.unmap_value_low();
-	psion_int_reg(map);
-	map(0x0040, 0x00ff).ram().share("sys_register");
 	map(0x0100, 0x03ff).rw(FUNC(psion_state::io_r), FUNC(psion_state::io_w));
 	map(0x2000, 0x3fff).ram().share("ram");
 	map(0x8000, 0xffff).rom();
@@ -263,8 +252,6 @@ void psion_state::psioncm_mem(address_map &map)
 void psion_state::psionla_mem(address_map &map)
 {
 	map.unmap_value_low();
-	psion_int_reg(map);
-	map(0x0040, 0x00ff).ram().share("sys_register");
 	map(0x0100, 0x03ff).rw(FUNC(psion_state::io_r), FUNC(psion_state::io_w));
 	map(0x0400, 0x5fff).ram().share("ram");
 	map(0x8000, 0xffff).rom();
@@ -273,8 +260,6 @@ void psion_state::psionla_mem(address_map &map)
 void psion_state::psionp350_mem(address_map &map)
 {
 	map.unmap_value_low();
-	psion_int_reg(map);
-	map(0x0040, 0x00ff).ram().share("sys_register");
 	map(0x0100, 0x03ff).rw(FUNC(psion_state::io_r), FUNC(psion_state::io_w));
 	map(0x0400, 0x3fff).ram().share("ram");
 	map(0x4000, 0x7fff).bankrw("rambank");
@@ -284,8 +269,6 @@ void psion_state::psionp350_mem(address_map &map)
 void psion_state::psionlam_mem(address_map &map)
 {
 	map.unmap_value_low();
-	psion_int_reg(map);
-	map(0x0040, 0x00ff).ram().share("sys_register");
 	map(0x0100, 0x03ff).rw(FUNC(psion_state::io_r), FUNC(psion_state::io_w));
 	map(0x0400, 0x7fff).ram().share("ram");
 	map(0x8000, 0xbfff).bankr("rombank");
@@ -295,8 +278,6 @@ void psion_state::psionlam_mem(address_map &map)
 void psion_state::psionlz_mem(address_map &map)
 {
 	map.unmap_value_low();
-	psion_int_reg(map);
-	map(0x0040, 0x00ff).ram().share("sys_register");
 	map(0x0100, 0x03ff).rw(FUNC(psion_state::io_r), FUNC(psion_state::io_w));
 	map(0x0400, 0x3fff).ram().share("ram");
 	map(0x4000, 0x7fff).bankrw("rambank");
@@ -469,7 +450,6 @@ void psion_state::machine_start()
 		membank("rambank")->set_entry(0);
 	}
 
-	m_nvram1->set_base(m_sys_register, 0xc0);
 	m_nvram2->set_base(m_ram, m_ram.bytes());
 	if (m_nvram3)
 		m_nvram3->set_base(m_paged_ram.get(), m_ram_bank_count * 0x4000);
@@ -575,7 +555,7 @@ void psion_state::psion_2lines(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, 3250).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	NVRAM(config, "nvram1"); // sys_regs
+	//NVRAM(config, "nvram1"); // sys_regs
 	NVRAM(config, "nvram2", nvram_device::DEFAULT_ALL_0); // RAM
 
 	TIMER(config, "nmi_timer").configure_periodic(FUNC(psion_state::nmi_timer), attotime::from_seconds(1));
@@ -670,9 +650,9 @@ void psion_state::psionlz(machine_config &config)
 /* ROM definition */
 
 ROM_START( psion1 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "v1", "Organiser I")
-	ROMX_LOAD( "psion1.rom",  0xf000, 0x1000, CRC(7e2609c1) SHA1(a3320ea8ac3ab9e0039ee16f7c571731adde5869), ROM_BIOS(0))
+	ROMX_LOAD( "psion1.rom",  0x0000, 0x1000, CRC(7e2609c1) SHA1(a3320ea8ac3ab9e0039ee16f7c571731adde5869), ROM_BIOS(0))
 ROM_END
 
 ROM_START( psioncm )

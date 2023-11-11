@@ -291,9 +291,7 @@ void leo_state::p6_w(u8 data)
 
 void leo_state::main_map(address_map &map)
 {
-	map(0x0000, 0x0027).m(m_maincpu, FUNC(hd6303y_cpu_device::hd6301y_io));
 	map(0x0002, 0x0002).rw(FUNC(leo_state::unk_r), FUNC(leo_state::unk_w)); // external
-	map(0x0040, 0x013f).ram().share("internal"); // internal
 	map(0x4000, 0x5fff).ram().share("nvram");
 	map(0x6000, 0x6000).w(FUNC(leo_state::mux_w));
 	map(0x7000, 0x7000).w(FUNC(leo_state::leds_w));

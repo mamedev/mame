@@ -73,7 +73,6 @@ private:
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 	void kicknrun_sub_cpu_map(address_map &map);
-	void mcu_map(address_map& map);
 	void knightba_main_map(address_map &map);
 
 	/* Kiki KaiKai / Kick 'n Run MCU */

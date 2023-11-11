@@ -53,10 +53,8 @@ void rvoice_state::init_rvoicepc()
 void rvoice_state::hd63701_main_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x0027).m(m_maincpu, FUNC(hd6301y_cpu_device::hd6301y_io)); // INTERNAL REGS
 	map(0x001e, 0x001e).nopr(); // FIXME: TRCSR2 needs implementation
 	map(0x0034, 0x0037).rw("acia65c51", FUNC(mos6551_device::read), FUNC(mos6551_device::write)); // ACIA 65C51
-	map(0x0040, 0x013f).ram(); // INTERNAL RAM
 	map(0x2000, 0x7fff).ram(); // EXTERNAL SRAM
 	map(0x8000, 0xffff).rom(); // 27512 EPROM
 }
@@ -96,7 +94,7 @@ INPUT_PORTS_END
 void rvoice_state::rvoicepc(machine_config &config)
 {
 	/* basic machine hardware */
-	HD63701Y0(config, m_maincpu, XTAL(7'372'800));
+	HD6303Y(config, m_maincpu, XTAL(7'372'800));
 	m_maincpu->set_addrmap(AS_PROGRAM, &rvoice_state::hd63701_main_mem);
 	m_maincpu->in_p5_cb().set_ioport("PARITY");
 	m_maincpu->in_p6_cb().set_ioport("BAUD");

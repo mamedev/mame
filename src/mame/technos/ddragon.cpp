@@ -544,10 +544,7 @@ void ddragon_state::dd2_map(address_map &map)
 
 void ddragon_state::sub_map(address_map &map)
 {
-	map(0x0000, 0x001f).m(m_subcpu, FUNC(hd63701y0_cpu_device::hd6301y_io));
-	map(0x0040, 0x013f).ram();
 	map(0x8000, 0x81ff).ram().share("comram");
-	map(0xc000, 0xffff).rom().region("sub", 0);
 }
 
 void ddragon_state::sub_6309_map(address_map &map)

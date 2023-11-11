@@ -246,18 +246,32 @@ void m6801_cpu_device::m6801_io(address_map &map)
 void m6801_cpu_device::m6803_mem(address_map &map)
 {
 	m6801_io(map);
-	map(0x0080, 0x00ff).ram();        /* 6803 internal RAM */
+	map(0x0080, 0x00ff).ram().share("internal");
 }
 
-void hd6301x_cpu_device::hd6301x_io(address_map &map)
+void m6801_cpu_device::m6801_mem(address_map &map)
+{
+	m6803_mem(map);
+	map(0xf800, 0xffff).rom().region(DEVICE_SELF, 0);
+}
+
+void m6801_cpu_device::m6801u4_mem(address_map &map)
+{
+	m6801_io(map);
+	map(0x0040, 0x00ff).ram().share("internal");
+	map(0xf000, 0xffff).rom().region(DEVICE_SELF, 0);
+}
+
+void m6801_cpu_device::hd6801_mem(address_map &map)
+{
+	m6803_mem(map);
+	map(0xf000, 0xffff).rom().region(DEVICE_SELF, 0);
+}
+
+void hd6301x_cpu_device::hd6303x_io(address_map &map)
 {
 	map(0x0001, 0x0001).rw(FUNC(hd6301x_cpu_device::ff_r), FUNC(hd6301x_cpu_device::p2_ddr_2bit_w));
-	map(0x0002, 0x0002).rw(FUNC(hd6301x_cpu_device::p1_data_r), FUNC(hd6301x_cpu_device::p1_data_w)); // TODO: external except in single-chip mode
 	map(0x0003, 0x0003).rw(FUNC(hd6301x_cpu_device::p2_data_r), FUNC(hd6301x_cpu_device::p2_data_w));
-	map(0x0004, 0x0004).rw(FUNC(hd6301x_cpu_device::ff_r), FUNC(hd6301x_cpu_device::p3_ddr_w)); // TODO: external except in single-chip mode
-	map(0x0005, 0x0005).rw(FUNC(hd6301x_cpu_device::ff_r), FUNC(hd6301x_cpu_device::p4_ddr_w)); // TODO: external except in single-chip mode
-	map(0x0006, 0x0006).rw(FUNC(hd6301x_cpu_device::p3_data_r), FUNC(hd6301x_cpu_device::p3_data_w));
-	map(0x0007, 0x0007).rw(FUNC(hd6301x_cpu_device::p4_data_r), FUNC(hd6301x_cpu_device::p4_data_w));
 	map(0x0008, 0x0008).rw(FUNC(hd6301x_cpu_device::tcsr_r), FUNC(hd6301x_cpu_device::tcsr_w));
 	map(0x0009, 0x0009).rw(FUNC(hd6301x_cpu_device::ch_r), FUNC(hd6301x_cpu_device::ch_w));
 	map(0x000a, 0x000a).rw(FUNC(hd6301x_cpu_device::cl_r), FUNC(hd6301x_cpu_device::cl_w));
@@ -274,7 +288,6 @@ void hd6301x_cpu_device::hd6301x_io(address_map &map)
 	map(0x0015, 0x0015).r(FUNC(hd6301x_cpu_device::p5_data_r));
 	map(0x0016, 0x0016).rw(FUNC(hd6301x_cpu_device::ff_r), FUNC(hd6301x_cpu_device::p6_ddr_w));
 	map(0x0017, 0x0017).rw(FUNC(hd6301x_cpu_device::p6_data_r), FUNC(hd6301x_cpu_device::p6_data_w));
-	map(0x0018, 0x0018).rw(FUNC(hd6301x_cpu_device::p7_data_r), FUNC(hd6301x_cpu_device::p7_data_w)); // TODO: external except in single-chip mode
 	map(0x0019, 0x0019).rw(FUNC(hd6301x_cpu_device::ocr2h_r), FUNC(hd6301x_cpu_device::ocr2h_w));
 	map(0x001a, 0x001a).rw(FUNC(hd6301x_cpu_device::ocr2l_r), FUNC(hd6301x_cpu_device::ocr2l_w));
 	map(0x001b, 0x001b).rw(FUNC(hd6301x_cpu_device::tcsr3_r), FUNC(hd6301x_cpu_device::tcsr3_w));
@@ -283,21 +296,74 @@ void hd6301x_cpu_device::hd6301x_io(address_map &map)
 	//map(0x001f, 0x001f).rw(FUNC(hd6301x_cpu_device::tstreg_r), FUNC(hd6301x_cpu_device::tstreg_w));
 }
 
-void hd6301y_cpu_device::hd6301y_io(address_map &map)
+void hd6301x_cpu_device::hd6301x_io(address_map &map)
+{
+	hd6303x_io(map);
+	map(0x0002, 0x0002).rw(FUNC(hd6301x_cpu_device::p1_data_r), FUNC(hd6301x_cpu_device::p1_data_w)); // external except in single-chip mode
+	map(0x0004, 0x0004).rw(FUNC(hd6301x_cpu_device::ff_r), FUNC(hd6301x_cpu_device::p3_ddr_w)); // external except in single-chip mode
+	map(0x0005, 0x0005).rw(FUNC(hd6301x_cpu_device::ff_r), FUNC(hd6301x_cpu_device::p4_ddr_w)); // external except in single-chip mode
+	map(0x0006, 0x0006).rw(FUNC(hd6301x_cpu_device::p3_data_r), FUNC(hd6301x_cpu_device::p3_data_w)); // external except in single-chip mode
+	map(0x0007, 0x0007).rw(FUNC(hd6301x_cpu_device::p4_data_r), FUNC(hd6301x_cpu_device::p4_data_w)); // external except in single-chip mode
+	map(0x0018, 0x0018).rw(FUNC(hd6301x_cpu_device::p7_data_r), FUNC(hd6301x_cpu_device::p7_data_w)); // external except in single-chip mode
+}
+
+void hd6301x_cpu_device::hd6303x_mem(address_map &map)
+{
+	hd6303x_io(map);
+	map(0x0040, 0x00ff).ram().share("internal");
+}
+
+void hd6301x_cpu_device::hd6301x_mem(address_map &map)
 {
 	hd6301x_io(map);
-	map(0x0000, 0x0000).rw(FUNC(hd6301y_cpu_device::ff_r), FUNC(hd6301y_cpu_device::p1_ddr_w)); // TODO: external except in single-chip mode
+	map(0x0040, 0x00ff).ram().share("internal");
+	map(0xf000, 0xffff).rom().region(DEVICE_SELF, 0);
+}
+
+void hd6301y_cpu_device::hd6303y_io(address_map &map)
+{
+	hd6303x_io(map);
 	map(0x0001, 0x0001).w(FUNC(hd6301y_cpu_device::p2_ddr_w));
 	map(0x0015, 0x0015).w(FUNC(hd6301y_cpu_device::p5_data_w));
 	//map(0x001e, 0x001e).rw(FUNC(hd6301y_cpu_device::sci_trcsr2_r), FUNC(hd6301y_cpu_device::sci_trcsr2_w));
 	map(0x0020, 0x0020).rw(FUNC(hd6301y_cpu_device::ff_r), FUNC(hd6301y_cpu_device::p5_ddr_w));
 	map(0x0021, 0x0021).rw(FUNC(hd6301y_cpu_device::p6_csr_r), FUNC(hd6301y_cpu_device::p6_csr_w));
+	//map(0x0022, 0x0027).noprw(); // reserved
+}
+
+void hd6301y_cpu_device::hd6301y_io(address_map &map)
+{
+	hd6303y_io(map);
+	map(0x0000, 0x0000).rw(FUNC(hd6301y_cpu_device::ff_r), FUNC(hd6301y_cpu_device::p1_ddr_w)); // external except in single-chip mode
+	map(0x0002, 0x0002).rw(FUNC(hd6301y_cpu_device::p1_data_r), FUNC(hd6301y_cpu_device::p1_data_w)); // external except in single-chip mode
+	map(0x0004, 0x0004).rw(FUNC(hd6301y_cpu_device::ff_r), FUNC(hd6301y_cpu_device::p3_ddr_w)); // external except in single-chip mode
+	map(0x0005, 0x0005).rw(FUNC(hd6301y_cpu_device::ff_r), FUNC(hd6301y_cpu_device::p4_ddr_w)); // external except in single-chip mode
+	map(0x0006, 0x0006).rw(FUNC(hd6301y_cpu_device::p3_data_r), FUNC(hd6301y_cpu_device::p3_data_w)); // external except in single-chip mode
+	map(0x0007, 0x0007).rw(FUNC(hd6301y_cpu_device::p4_data_r), FUNC(hd6301y_cpu_device::p4_data_w)); // external except in single-chip mode
+	map(0x0018, 0x0018).rw(FUNC(hd6301y_cpu_device::p7_data_r), FUNC(hd6301y_cpu_device::p7_data_w)); // external except in single-chip mode
+}
+
+void hd6301y_cpu_device::hd6303y_mem(address_map &map)
+{
+	hd6303y_io(map);
+	map(0x0040, 0x013f).ram().share("internal");
+}
+
+void hd6301y_cpu_device::hd6301y_mem(address_map &map)
+{
+	hd6301y_io(map);
+	map(0x0040, 0x013f).ram().share("internal");
+	map(0xc000, 0xffff).rom().region(DEVICE_SELF, 0);
 }
 
 
 DEFINE_DEVICE_TYPE(M6801, m6801_cpu_device, "m6801", "Motorola MC6801")
+DEFINE_DEVICE_TYPE(M6801U4, m6801u4_cpu_device, "m6801u4", "Motorola MC6801U4")
+DEFINE_DEVICE_TYPE(HD6801V0, hd6801v0_cpu_device, "hd6801v0", "Hitachi HD6801V0")
 DEFINE_DEVICE_TYPE(M6803, m6803_cpu_device, "m6803", "Motorola MC6803")
 DEFINE_DEVICE_TYPE(M6803E, m6803e_cpu_device, "m6803e", "Motorola MC6803E")
+DEFINE_DEVICE_TYPE(MC68120, mc68120_device, "mc68120", "Motorola MC68120 IPC")
+DEFINE_DEVICE_TYPE(MC68121, mc68121_device, "mc68121", "Motorola MC68121 IPC")
 DEFINE_DEVICE_TYPE(HD6301V1, hd6301v1_cpu_device, "hd6301v1", "Hitachi HD6301V1")
 DEFINE_DEVICE_TYPE(HD6301X0, hd6301x0_cpu_device, "hd6301x0", "Hitachi HD6301X0")
 DEFINE_DEVICE_TYPE(HD6301Y0, hd6301y0_cpu_device, "hd6301y0", "Hitachi HD6301Y0")
@@ -309,11 +375,11 @@ DEFINE_DEVICE_TYPE(HD6303X, hd6303x_cpu_device, "hd6303x", "Hitachi HD6303X")
 DEFINE_DEVICE_TYPE(HD6303Y, hd6303y_cpu_device, "hd6303y", "Hitachi HD6303Y")
 
 m6801_cpu_device::m6801_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m6801_cpu_device(mconfig, M6801, tag, owner, clock, m6803_insn, cycles_6803, address_map_constructor())
+	: m6801_cpu_device(mconfig, M6801, tag, owner, clock, m6803_insn, cycles_6803, address_map_constructor(FUNC(m6803_cpu_device::m6801_mem), this), 64)
 {
 }
 
-m6801_cpu_device::m6801_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const op_func *insn, const uint8_t *cycles, address_map_constructor internal)
+m6801_cpu_device::m6801_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const op_func *insn, const uint8_t *cycles, address_map_constructor internal, int standby_bytes)
 	: m6800_cpu_device(mconfig, type, tag, owner, clock, insn, cycles, internal)
 	, device_nvram_interface(mconfig, *this)
 	, m_in_port_func(*this, 0xff)
@@ -322,43 +388,70 @@ m6801_cpu_device::m6801_cpu_device(const machine_config &mconfig, device_type ty
 	, m_out_sertx_func(*this)
 	, m_standby_func(*this)
 	, m_sclk_divider(8)
+	, m_internal_ram(*this, "internal")
+	, m_standby_bytes(standby_bytes)
 {
 	// disable nvram by default (set to true if MCU is battery-backed when in standby mode)
 	nvram_enable_backup(false);
 }
 
+m6801u4_cpu_device::m6801u4_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: m6801_cpu_device(mconfig, M6801U4, tag, owner, clock, m6803_insn, cycles_6803, address_map_constructor(FUNC(m6801u4_cpu_device::m6801u4_mem), this), 32)
+{
+}
+
+hd6801v0_cpu_device::hd6801v0_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: m6801_cpu_device(mconfig, HD6801V0, tag, owner, clock, m6803_insn, cycles_6803, address_map_constructor(FUNC(hd6801v0_cpu_device::hd6801_mem), this), 64)
+{
+}
+
 m6803_cpu_device::m6803_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m6801_cpu_device(mconfig, M6803, tag, owner, clock, m6803_insn, cycles_6803, address_map_constructor(FUNC(m6803_cpu_device::m6803_mem), this))
+	: m6801_cpu_device(mconfig, M6803, tag, owner, clock, m6803_insn, cycles_6803, address_map_constructor(FUNC(m6803_cpu_device::m6803_mem), this), 64)
 {
 }
 
 m6803e_cpu_device::m6803e_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m6801_cpu_device(mconfig, M6803E, tag, owner, clock, m6803_insn, cycles_6803, address_map_constructor(FUNC(m6803e_cpu_device::m6803_mem), this))
+	: m6801_cpu_device(mconfig, M6803E, tag, owner, clock, m6803_insn, cycles_6803, address_map_constructor(FUNC(m6803e_cpu_device::m6803_mem), this), 64)
 {
 }
 
-hd6301_cpu_device::hd6301_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const m6800_cpu_device::op_func *insn, const uint8_t *cycles, address_map_constructor internal)
-	: m6801_cpu_device(mconfig, type, tag, owner, clock, hd63701_insn, cycles_63701, internal)
+mc68120_device::mc68120_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal)
+	: m6801_cpu_device(mconfig, type, tag, owner, clock, m6803_insn, cycles_6803, internal, 0)
+{
+}
+
+mc68120_device::mc68120_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mc68120_device(mconfig, MC68120, tag, owner, clock, address_map_constructor(FUNC(mc68120_device::m6801_mem), this))
+{
+}
+
+mc68121_device::mc68121_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mc68120_device(mconfig, MC68121, tag, owner, clock, address_map_constructor(FUNC(mc68121_device::m6803_mem), this))
+{
+}
+
+hd6301_cpu_device::hd6301_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const m6800_cpu_device::op_func *insn, const uint8_t *cycles, address_map_constructor internal, int standby_bytes)
+	: m6801_cpu_device(mconfig, type, tag, owner, clock, hd63701_insn, cycles_63701, internal, standby_bytes)
 {
 }
 
 hd6301v1_cpu_device::hd6301v1_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hd6301_cpu_device(mconfig, HD6301V1, tag, owner, clock, hd63701_insn, cycles_63701)
+	: hd6301_cpu_device(mconfig, HD6301V1, tag, owner, clock, hd63701_insn, cycles_63701, address_map_constructor(FUNC(hd6301v1_cpu_device::hd6801_mem), this), 128)
 {
 }
 
 hd63701v0_cpu_device::hd63701v0_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hd6301_cpu_device(mconfig, HD63701V0, tag, owner, clock, hd63701_insn, cycles_63701)
+	: hd6301_cpu_device(mconfig, HD63701V0, tag, owner, clock, hd63701_insn, cycles_63701, address_map_constructor(FUNC(hd63701v0_cpu_device::hd6801_mem), this), 128)
 {
 }
 
 hd6303r_cpu_device::hd6303r_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hd6301_cpu_device(mconfig, HD6303R, tag, owner, clock, m6803_insn, cycles_6803, address_map_constructor(FUNC(hd6303r_cpu_device::m6803_mem), this))
+	: hd6301_cpu_device(mconfig, HD6303R, tag, owner, clock, m6803_insn, cycles_6803, address_map_constructor(FUNC(hd6303r_cpu_device::m6803_mem), this), 128)
 {
 }
 
-hd6301x_cpu_device::hd6301x_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: hd6301_cpu_device(mconfig, type, tag, owner, clock, hd63701_insn, cycles_63701)
+hd6301x_cpu_device::hd6301x_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal, int standby_bytes)
+	: hd6301_cpu_device(mconfig, type, tag, owner, clock, hd63701_insn, cycles_63701, internal, standby_bytes)
 	, m_in_portx_func(*this, 0xff)
 	, m_out_portx_func(*this)
 {
@@ -366,37 +459,37 @@ hd6301x_cpu_device::hd6301x_cpu_device(const machine_config &mconfig, device_typ
 }
 
 hd6301x0_cpu_device::hd6301x0_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hd6301x_cpu_device(mconfig, HD6301X0, tag, owner, clock)
+	: hd6301x_cpu_device(mconfig, HD6301X0, tag, owner, clock, address_map_constructor(FUNC(hd6301x0_cpu_device::hd6301x_mem), this), 192)
 {
 }
 
 hd63701x0_cpu_device::hd63701x0_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hd6301x_cpu_device(mconfig, HD63701X0, tag, owner, clock)
+	: hd6301x_cpu_device(mconfig, HD63701X0, tag, owner, clock, address_map_constructor(FUNC(hd63701x0_cpu_device::hd6301x_mem), this), 192)
 {
 }
 
 hd6303x_cpu_device::hd6303x_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hd6301x_cpu_device(mconfig, HD6303X, tag, owner, clock)
+	: hd6301x_cpu_device(mconfig, HD6303X, tag, owner, clock, address_map_constructor(FUNC(hd6303x_cpu_device::hd6303x_mem), this), 192)
 {
 }
 
-hd6301y_cpu_device::hd6301y_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: hd6301x_cpu_device(mconfig, type, tag, owner, clock)
+hd6301y_cpu_device::hd6301y_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal, int standby_bytes)
+	: hd6301x_cpu_device(mconfig, type, tag, owner, clock, internal, standby_bytes)
 {
 }
 
 hd6301y0_cpu_device::hd6301y0_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hd6301y_cpu_device(mconfig, HD6301Y0, tag, owner, clock)
+	: hd6301y_cpu_device(mconfig, HD6301Y0, tag, owner, clock, address_map_constructor(FUNC(hd6301y0_cpu_device::hd6301y_mem), this), 256)
 {
 }
 
 hd63701y0_cpu_device::hd63701y0_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hd6301y_cpu_device(mconfig, HD63701Y0, tag, owner, clock)
+	: hd6301y_cpu_device(mconfig, HD63701Y0, tag, owner, clock, address_map_constructor(FUNC(hd63701y0_cpu_device::hd6301y_mem), this), 256)
 {
 }
 
 hd6303y_cpu_device::hd6303y_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hd6301y_cpu_device(mconfig, HD6303Y, tag, owner, clock)
+	: hd6301y_cpu_device(mconfig, HD6303Y, tag, owner, clock, address_map_constructor(FUNC(hd6303y_cpu_device::hd6303y_mem), this), 256)
 {
 }
 
@@ -1215,9 +1308,22 @@ void hd6301y_cpu_device::device_reset()
 	m_p6csr = 7;
 }
 
+uint8_t mc68120_device::dpram_r(offs_t offset)
+{
+	return m_internal_ram[offset & 0x7f];
+}
+
+void mc68120_device::dpram_w(offs_t offset, uint8_t data)
+{
+	m_internal_ram[offset & 0x7f] = data;
+}
+
 bool m6801_cpu_device::nvram_write(util::write_stream &file)
 {
 	size_t actual;
+
+	if (file.write(&m_internal_ram[0], m_standby_bytes, actual) || m_standby_bytes != actual)
+		return false;
 
 	// upper bits of RAM control register
 	u8 ram_ctrl = m_ram_ctrl & 0xc0;
@@ -1230,6 +1336,9 @@ bool m6801_cpu_device::nvram_write(util::write_stream &file)
 bool m6801_cpu_device::nvram_read(util::read_stream &file)
 {
 	size_t actual;
+
+	if (file.read(&m_internal_ram[0], m_standby_bytes, actual) || m_standby_bytes != actual)
+		return false;
 
 	// upper bits of RAM control register
 	u8 ram_ctrl = 0;

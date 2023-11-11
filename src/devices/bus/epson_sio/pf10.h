@@ -66,7 +66,7 @@ private:
 
 	void cpu_mem(address_map &map);
 
-	required_device<hd6303y_cpu_device> m_cpu;
+	required_device<hd6303x_cpu_device> m_cpu;
 	required_device<upd765a_device> m_fdc;
 	required_device<epson_sio_device> m_sio_output;
 	required_device<floppy_connector> m_floppy;

@@ -98,9 +98,6 @@ private:
 	required_device<pwm_display_device> m_display;
 	required_ioport_array<8+1> m_inputs;
 
-	// address maps
-	void main_map(address_map &map);
-
 	// I/O handlers
 	u8 input1_r();
 	u8 input2_r();
@@ -231,19 +228,6 @@ void ccompan2_state::led_w(u8 data)
 
 
 /*******************************************************************************
-    Address Maps
-*******************************************************************************/
-
-void ccompan2_state::main_map(address_map &map)
-{
-	map(0x0000, 0x0014).m(m_maincpu, FUNC(hd6301v1_cpu_device::m6801_io));
-	map(0x0080, 0x00ff).ram().share("internal"); // internal
-	map(0xf000, 0xffff).rom(); // internal
-}
-
-
-
-/*******************************************************************************
     Input Ports
 *******************************************************************************/
 
@@ -341,7 +325,6 @@ void ccompan2_state::expchess(machine_config &config)
 {
 	// basic machine hardware
 	HD6301V1(config, m_maincpu, 3000000); // approximation, no XTAL
-	m_maincpu->set_addrmap(AS_PROGRAM, &ccompan2_state::main_map);
 	m_maincpu->nvram_enable_backup(true);
 	m_maincpu->standby_cb().set(FUNC(ccompan2_state::standby));
 	m_maincpu->in_p1_cb().set(FUNC(ccompan2_state::input1_r));

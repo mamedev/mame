@@ -306,8 +306,6 @@ void ren_state::p6_w(u8 data)
 
 void ren_state::main_map(address_map &map)
 {
-	map(0x0000, 0x0027).m(m_maincpu, FUNC(hd6303y_cpu_device::hd6301y_io));
-	map(0x0040, 0x013f).ram().share("internal"); // internal
 	map(0x2000, 0x2000).w(FUNC(ren_state::mux_w));
 	map(0x2400, 0x2400).w(FUNC(ren_state::leds_w));
 	map(0x2600, 0x2600).rw(FUNC(ren_state::control_r), FUNC(ren_state::control_w));

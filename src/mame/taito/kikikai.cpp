@@ -224,13 +224,6 @@ void kikikai_state::kicknrun_sub_cpu_map(address_map &map)
 	map(0xc004, 0xc004).w(FUNC(kikikai_state::kicknrun_sub_output_w));
 }
 
-void kikikai_state::mcu_map(address_map &map)
-{
-	map(0x0000, 0x0007).m(m_mcu, FUNC(m6801_cpu_device::m6801_io));
-	map(0x0040, 0x00ff).ram(); // internal
-	map(0xf000, 0xffff).rom();
-}
-
 /*************************************
  *
  *  Input ports
@@ -742,8 +735,7 @@ void kikikai_state::kicknrun(machine_config& config)
 	m_maincpu->set_vblank_int("screen", FUNC(kikikai_state::kikikai_interrupt));
 	m_maincpu->set_irq_acknowledge_callback(FUNC(kikikai_state::mcram_vect_r));
 
-	M6801(config, m_mcu, XTAL(4'000'000)); // actually 6801U4 - xtal is 4MHz, divided by 4 internally
-	m_mcu->set_addrmap(AS_PROGRAM, &kikikai_state::mcu_map);
+	M6801U4(config, m_mcu, XTAL(4'000'000)); // xtal is 4MHz, divided by 4 internally
 	m_mcu->in_p1_cb().set_ioport("IN0");
 	m_mcu->out_p1_cb().set(FUNC(kikikai_state::kikikai_mcu_port1_w));
 	m_mcu->out_p2_cb().set(FUNC(kikikai_state::kikikai_mcu_port2_w));
@@ -817,9 +809,9 @@ ROM_START( kikikai )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a85-11.f6", 0x0000, 0x8000, CRC(cc3539db) SHA1(4239a40fdee65cba613e4b4ec54cf7899480e366) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )    /* 4k for the microcontroller (MC6801U4 type MCU) */
+	ROM_REGION( 0x1000, "mcu", 0 )    /* 4k for the microcontroller (MC6801U4 type MCU) */
 	/* MCU labeled TAITO A85 01,  JPH1020P, 185, PS4 */
-	ROM_LOAD( "a85-01.g8",    0x0000, 0x0800, NO_DUMP )
+	ROM_LOAD( "a85-01.g8",    0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x40000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "a85-15.a1", 0x00000, 0x10000, CRC(aebc8c32) SHA1(77347cf5780f084a77123eb636cd0bad672a39e8) )
@@ -888,8 +880,8 @@ ROM_START( kicknrun )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a87-06.f6", 0x0000, 0x8000, CRC(1625b587) SHA1(7336384e13c114915de5e439df5731ce3fc2054a) )
 
-	ROM_REGION( 0x10000, "mcu", 0 )    /* 4k for the microcontroller (MC6801U4 type MCU) */
-	ROM_LOAD( "a87-01_jph1021p.h8", 0xf000, 0x1000, CRC(9451e880) SHA1(e9a505296108645f99449d391d0ebe9ac1b9984e) ) /* MCU labeled TAITO A87-01,  JPH1021P, 185, PS4 */
+	ROM_REGION( 0x1000, "mcu", 0 )    /* 4k for the microcontroller (MC6801U4 type MCU) */
+	ROM_LOAD( "a87-01_jph1021p.h8", 0x0000, 0x1000, CRC(9451e880) SHA1(e9a505296108645f99449d391d0ebe9ac1b9984e) ) /* MCU labeled TAITO A87-01,  JPH1021P, 185, PS4 */
 
 	ROM_REGION( 0x10000, "sub", 0 )    /* 64k for the cpu on the sub board */
 	ROM_LOAD( "a87-09-1",  0x0000, 0x4000, CRC(6a2ad32f) SHA1(42d4b97b25d219902ad215793f1d2c006ffe94dc) )
@@ -919,8 +911,8 @@ ROM_START( kicknrunu )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a87-06.f6", 0x0000, 0x8000, CRC(1625b587) SHA1(7336384e13c114915de5e439df5731ce3fc2054a) )
 
-	ROM_REGION( 0x10000, "mcu", 0 )    /* 4k for the microcontroller (MC6801U4 type MCU) */
-	ROM_LOAD( "a87-01_jph1021p.h8", 0xf000, 0x1000, CRC(9451e880) SHA1(e9a505296108645f99449d391d0ebe9ac1b9984e) ) /* MCU labeled TAITO A87-01,  JPH1021P, 185, PS4 */
+	ROM_REGION( 0x1000, "mcu", 0 )    /* 4k for the microcontroller (MC6801U4 type MCU) */
+	ROM_LOAD( "a87-01_jph1021p.h8", 0x0000, 0x1000, CRC(9451e880) SHA1(e9a505296108645f99449d391d0ebe9ac1b9984e) ) /* MCU labeled TAITO A87-01,  JPH1021P, 185, PS4 */
 
 	ROM_REGION( 0x10000, "sub", 0 )    /* 64k for the cpu on the sub board */
 	ROM_LOAD( "a87-09-1",  0x0000, 0x4000, CRC(6a2ad32f) SHA1(42d4b97b25d219902ad215793f1d2c006ffe94dc) )
