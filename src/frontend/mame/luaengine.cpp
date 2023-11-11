@@ -17,6 +17,7 @@
 #include "ui/ui.h"
 
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 
 #include "debugger.h"
 #include "drivenum.h"
@@ -27,6 +28,10 @@
 #include "screen.h"
 #include "softlist.h"
 #include "uiinput.h"
+
+#include "ioprocsfill.h"
+#include "ioprocsvec.h"
+#include "formats/fsblk_vec.h"
 
 #include "corestr.h"
 
@@ -754,6 +759,64 @@ void lua_engine::attach_notifiers()
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(lua_engine::resume), this));
 }
 
+
+//-------------------------------------------------
+//  handle_fs_error - report FS errors to LUA
+//-------------------------------------------------
+
+static void handle_fs_error(sol::this_state s, fs::err_t err)
+{
+	std::string message;
+	switch (err)
+	{
+	case fs::ERR_OK:
+		break;
+
+	case fs::ERR_UNSUPPORTED:
+		message = "Unsupported action";
+		break;
+
+	case fs::ERR_INVALID:
+		message = "Invalid action";
+		break;
+
+	case fs::ERR_NOT_FOUND:
+		message = "File not found";
+		break;
+
+	case fs::ERR_NOT_EMPTY:
+		message = "Not empty";
+		break;
+
+	case fs::ERR_NO_SPACE:
+		message = "Not enough space on image";
+		break;
+
+	default:
+		message = util::string_format("Unknown error (%d)", (int)err);
+		break;
+	}
+	if (!message.empty())
+		luaL_error(s, message.c_str());
+}
+
+
+//-------------------------------------------------
+//  string_vec_from_table
+//-------------------------------------------------
+
+static std::vector<std::string> string_vec_from_table(const sol::table &table)
+{
+	std::vector<std::string> results;
+	for (const auto &x : table)
+	{
+		std::string value = x.second.as<std::string>();
+		results.push_back(std::move(value));
+	}
+	return results;
+}
+
+
 //-------------------------------------------------
 //  initialize - initialize lua hookup to emu engine
 //-------------------------------------------------
@@ -773,6 +836,21 @@ void lua_engine::initialize()
 		{ "set", SEEK_SET },
 		{ "cur", SEEK_CUR },
 		{ "end", SEEK_END }
+	};
+
+	static const enum_parser<uint32_t, 5> s_floppy_form_factor_parser =
+	{
+		{ "FF_UNKNOWN", floppy_image::FF_UNKNOWN },
+		{ "FF_3", floppy_image::FF_3 },
+		{ "FF_35", floppy_image::FF_35 },
+		{ "FF_525", floppy_image::FF_525 },
+		{ "FF_8", floppy_image::FF_8 }
+	};
+
+	static const enum_parser<fs::dir_entry_type, 2> s_dir_entry_type_parser =
+	{
+		{ "dir", fs::dir_entry_type::dir},
+		{ "file", fs::dir_entry_type::file}
 	};
 
 
@@ -970,6 +1048,9 @@ void lua_engine::initialize()
 	emu["cassette_enumerator"] = sol::overload(
 			[] (device_t &dev) { return devenum<cassette_device_enumerator>(dev); },
 			[] (device_t &dev, int maxdepth) { return devenum<cassette_device_enumerator>(dev, maxdepth); });
+	emu["floppy_enumerator"] = sol::overload(
+			[] (device_t &dev) { return devenum<floppy_interface_enumerator>(dev); },
+			[] (device_t &dev, int maxdepth) { return devenum<floppy_interface_enumerator>(dev, maxdepth); });
 	emu["image_enumerator"] = sol::overload(
 			[] (device_t &dev) { return devenum<image_interface_enumerator>(dev); },
 			[] (device_t &dev, int maxdepth) { return devenum<image_interface_enumerator>(dev, maxdepth); });
@@ -1460,6 +1541,7 @@ void lua_engine::initialize()
 	machine_type["palettes"] = sol::property([] (running_machine &m) { return devenum<palette_interface_enumerator>(m.root_device()); });
 	machine_type["screens"] = sol::property([] (running_machine &m) { return devenum<screen_device_enumerator>(m.root_device()); });
 	machine_type["cassettes"] = sol::property([] (running_machine &m) { return devenum<cassette_device_enumerator>(m.root_device()); });
+	machine_type["floppies"] = sol::property([](running_machine &m) { return devenum<floppy_interface_enumerator>(m.root_device()); });
 	machine_type["images"] = sol::property([] (running_machine &m) { return devenum<image_interface_enumerator>(m.root_device()); });
 	machine_type["slots"] = sol::property([](running_machine &m) { return devenum<slot_interface_enumerator>(m.root_device()); });
 
@@ -1829,6 +1911,186 @@ void lua_engine::initialize()
 	cass_type["position"] = sol::property(&cassette_image_device::get_position);
 	cass_type["length"] = sol::property([] (cassette_image_device &c) { return c.exists() ? c.get_length() : 0.0; });
 
+	auto floppy_image_type = sol().registry().new_usertype<floppy_image>("floppy_image", sol::no_constructor);
+	floppy_image_type["get_form_factor"] = [](const floppy_image &image)
+		{
+			uint32_t form_factor = image.get_form_factor();
+			return s_floppy_form_factor_parser(form_factor);
+		};
+
+	auto floppy_image_format_type = sol().registry().new_usertype<floppy_image_format_t>("floppy_image_format", sol::no_constructor);
+	floppy_image_format_type["name"] = sol::property(&floppy_image_format_t::name);
+	floppy_image_format_type["description"] = sol::property(&floppy_image_format_t::description);
+	floppy_image_format_type["extensions"] = sol::property(&floppy_image_format_t::extensions);
+	floppy_image_format_type["supports_save"] = sol::property(&floppy_image_format_t::supports_save);
+	floppy_image_format_type["load"] = [](floppy_image_format_t &format, const char *filename, std::string_view form_factor_str)
+		{
+			// DUMMY FOR NOW
+			util::random_read_write::ptr io = util::stdio_read_write(fopen(filename, "r"));
+			uint32_t form_factor = s_floppy_form_factor_parser(form_factor_str);
+
+			// floppy_image needs to be initialized with dummy values
+			std::unique_ptr<floppy_image> img = std::make_unique<floppy_image>(84, 2, floppy_image::FF_UNKNOWN);
+
+			// attempt the load, and if this fails, reset the unique_ptr
+			if (!format.load(*io, form_factor, std::vector<uint32_t>(), img.get()))
+				img.reset();
+			return img;
+		};
+	floppy_image_format_type["save"] = [](floppy_image_format_t &format, floppy_image &image)
+		{
+			std::vector<u8> sector_image;
+			util::random_read_write_fill_wrapper<util::vector_read_write_adapter<u8>, 0xff> io(sector_image);
+
+			bool success = format.save(io, std::vector<uint32_t>(), &image);
+			return success
+				? std::string((const char *)&sector_image[0], sector_image.size())
+				: std::optional<std::string>();
+		};
+
+	/*  FS meta_data
+	 *
+	 * emu.fs_meta_data()
+	 */
+	auto fs_meta_data_type = emu.new_usertype<fs::meta_data>("fs_meta_data", sol::call_constructor, sol::constructors<sol::types<>>());
+	fs_meta_data_type["set"] = [](fs::meta_data &meta, const char *name, const char *value)
+		{
+			std::optional<fs::meta_name> mname = fs::meta_data::from_entry_name(name);
+			if (mname)
+				meta.set(*mname, value);
+		};
+	fs_meta_data_type["get"] = [](const fs::meta_data &meta, const char *name)
+		{
+			std::optional<fs::meta_name> mname = fs::meta_data::from_entry_name(name);
+			return mname && meta.has(*mname) ? meta.get(*mname).as_string() : "";
+		};
+
+	auto fs_meta_description_type = sol().registry().new_usertype<fs::meta_description>("fs_meta_description", sol::no_constructor);
+	fs_meta_description_type["name"] = sol::property([](fs::meta_description const &desc)
+		{
+			return fs::meta_data::entry_name(desc.m_name);
+		});
+	fs_meta_description_type["type"] = sol::property([](fs::meta_description const &desc)
+		{
+			switch (desc.type())
+			{
+			case fs::meta_type::date:	return "date";
+			case fs::meta_type::flag:	return "flag";
+			case fs::meta_type::number:	return "number";
+			case fs::meta_type::string:	return "string";
+			default:					return "";
+			}
+		});
+	fs_meta_description_type["default"] = sol::property([](fs::meta_description const &desc)
+		{
+			return desc.m_default.as_string();
+		});
+	fs_meta_description_type["ro"] = sol::property([](fs::meta_description const &desc)
+		{
+			return desc.m_ro;
+		});
+	fs_meta_description_type["tooltip"] = sol::property([](fs::meta_description const &desc)
+		{
+			return desc.m_tooltip;
+		});
+
+	auto fs_manager_type = sol().registry().new_usertype<fs::manager_t>("fs_manager", sol::no_constructor);
+	fs_manager_type["name"] = sol::property(&fs::manager_t::name);
+	fs_manager_type["description"] = sol::property(&fs::manager_t::description);
+	fs_manager_type["can_format"] = sol::property(&fs::manager_t::can_format);
+	fs_manager_type["can_read"] = sol::property(&fs::manager_t::can_read);
+	fs_manager_type["can_write"] = sol::property(&fs::manager_t::can_write);
+	fs_manager_type["has_rsrc"] = sol::property(&fs::manager_t::has_rsrc);
+	fs_manager_type["directory_separator"] = sol::property(&fs::manager_t::directory_separator);
+	fs_manager_type["has_subdirectories"] = sol::property(&fs::manager_t::has_subdirectories);
+	fs_manager_type["volume_meta_description"] = sol::property(&fs::manager_t::volume_meta_description);
+	fs_manager_type["file_meta_description"] = sol::property(&fs::manager_t::file_meta_description);
+	fs_manager_type["directory_meta_description"] = sol::property(&fs::manager_t::directory_meta_description);
+	fs_manager_type["mount"] = &fs::manager_t::mount;
+
+	// HACK - putting this on emu
+	emu["fsblk_from_bytes"] = [](std::string_view sector_bytes)
+		{
+			std::vector<u8> vec;
+			vec.insert(vec.begin(), (const u8 *)&sector_bytes[0], (const u8 *)&sector_bytes[0] + sector_bytes.size());
+			std::shared_ptr<fs::fsblk_t> result = std::make_shared<fs::fsblk_vec_owned_t>(std::move(vec));
+			return result;
+		};
+
+	auto fs_filesystem_type = sol().registry().new_usertype<fs::filesystem_t>("filesystem_t", sol::no_constructor);
+	fs_filesystem_type["volume_metadata"] = sol::property(&fs::filesystem_t::volume_metadata);
+	fs_filesystem_type["volume_metadata_change"] = [](lua_State *L, fs::filesystem_t &fs, const fs::meta_data &meta)
+		{
+			fs::err_t err = fs.volume_metadata_change(meta);
+			handle_fs_error(L, err);
+		};
+	fs_filesystem_type["metadata"] = [](fs::filesystem_t &fs, sol::this_state s, const sol::table &path)
+		{
+			std::vector<std::string> path_vec = string_vec_from_table(path);
+			std::pair<fs::err_t, fs::meta_data> result = fs.metadata(path_vec);
+			handle_fs_error(s, result.first);
+			return std::move(result.second);
+		};
+	fs_filesystem_type["metadata_change"] = [](fs::filesystem_t &fs, sol::this_state s, const sol::table &path, const fs::meta_data &meta)
+		{
+			std::vector<std::string> path_vec = string_vec_from_table(path);
+			fs::err_t err = fs.metadata_change(path_vec, meta);
+			handle_fs_error(s, err);
+		};
+	fs_filesystem_type["directory_contents"] = [](fs::filesystem_t &fs, sol::this_state s, const sol::table &path)
+		{
+			std::vector<std::string> path_vec = string_vec_from_table(path);
+			std::pair<fs::err_t, std::vector<fs::dir_entry>> result = fs.directory_contents(path_vec);
+			handle_fs_error(s, result.first);
+			return std::move(result.second);
+		};
+
+	auto fs_dir_entry_type = sol().registry().new_usertype<fs::dir_entry>("dir_entry", sol::no_constructor);
+	fs_dir_entry_type["name"] = sol::property([](const fs::dir_entry &ent) { return std::string_view(ent.m_name); });
+	fs_dir_entry_type["type"] = sol::property([](const fs::dir_entry &ent) { return s_dir_entry_type_parser(ent.m_type); });
+	fs_dir_entry_type["meta"] = sol::property([](const fs::dir_entry &ent) { return ent.m_meta; });
+
+	auto floppy_fs_type = sol().registry().new_usertype<floppy_image_device::fs_info>("floppy_fs_info", sol::no_constructor);
+	floppy_fs_type["manager"] = sol::property(&floppy_image_device::fs_info::manager);
+	floppy_fs_type["type"] = sol::property(&floppy_image_device::fs_info::type);
+	floppy_fs_type["name"] = sol::property(&floppy_image_device::fs_info::name);
+	floppy_fs_type["description"] = sol::property(&floppy_image_device::fs_info::description);
+	floppy_fs_type["image_size"] = sol::property(&floppy_image_device::fs_info::image_size);
+
+	auto floppy_type = sol().registry().new_usertype<floppy_image_device>(
+		"floppy",
+		sol::no_constructor,
+		sol::base_classes, sol::bases<device_t, device_image_interface>());
+	floppy_type["set_rpm"] = &floppy_image_device::set_rpm;
+	floppy_type["formats"] = sol::property(
+		[this](floppy_image_device const &floppy)
+		{
+			int index = 1;
+			sol::table ret = sol().create_table();
+			for (const floppy_image_format_t *format : floppy.get_formats())
+				ret[index++] = format;
+			return ret;
+		});
+	floppy_type["fs"] = sol::property(
+		[this](floppy_image_device const &floppy)
+		{
+			int index = 1;
+			sol::table ret = sol().create_table();
+			for (floppy_image_device::fs_info const &fs : floppy.get_fs())
+				ret[index++] = &fs;
+			return ret;
+		});
+	floppy_type["load_format"] = sol::property(&floppy_image_device::get_load_format);
+	floppy_type["identify"] = &floppy_image_device::identify;
+	floppy_type["setup_write"] = &floppy_image_device::setup_write;
+	floppy_type["motor_on"] = sol::property([](floppy_image_device &floppy) { return floppy.mon_r() == 0; });
+	floppy_type["cylinder"] = sol::property(&floppy_image_device::cyl_r);
+	floppy_type["get_form_factor"] = [](floppy_image_device &floppy)
+		{
+			return s_floppy_form_factor_parser(floppy.get_form_factor());
+		};
+	floppy_type["finish_load"] = &floppy_image_device::finish_load;	// in src/frontends/mame/ui/floppycntrl.cpp, this function was described as a hack
+	floppy_type["init_fs"] = &floppy_image_device::init_fs;
 
 	auto image_type = sol().registry().new_usertype<device_image_interface>("image", sol::no_constructor);
 	image_type.set_function("load",

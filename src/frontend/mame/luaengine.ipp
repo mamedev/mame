@@ -569,6 +569,17 @@ public:
 		return iter->second;
 	}
 
+	std::string_view operator()(const T &val) const
+	{
+		auto iter = std::find_if(
+			m_map.begin() + 1,
+			m_map.end(),
+			[&val](const auto &x) { return val == x.second; });
+		if (iter == m_map.end())
+			iter = m_map.begin();
+		return iter->first;
+	}
+
 private:
 	std::array<std::pair<std::string_view, T>, Size> m_map;
 };

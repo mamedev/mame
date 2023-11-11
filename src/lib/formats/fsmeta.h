@@ -114,6 +114,8 @@ struct meta_description {
 		meta_description(name, meta_value(def), ro, std::move(validator), tooltip)
 	{}
 
+	meta_type type() const { return m_default.type(); }
+
 private:
 	meta_description(meta_name name, meta_value &&def, bool ro, std::function<void(meta_value)> &&validator, const char *tooltip) :
 		m_name(name), m_default(std::move(def)), m_ro(ro), m_validator(validator), m_tooltip(tooltip)

@@ -79,6 +79,12 @@ public:
 			m_key(key),
 			m_description(description)
 		{}
+
+		const fs::manager_t *manager() const { return m_manager; }
+		const floppy_image_format_t *type() { return m_type; }
+		const char *name() const { return m_name; }
+		const char *description() const { return m_description; }
+		u32 image_size() const { return m_image_size; }
 	};
 
 	// construction/destruction
@@ -130,6 +136,7 @@ public:
 	bool trk00_r() { return (has_trk00_sensor ? (cyl != 0) : 1); }
 	int idx_r() { return idx; }
 	int mon_r() { return mon; }
+	int cyl_r() { return cyl; }
 	bool ss_r() { return ss; }
 	bool twosid_r();
 
@@ -504,6 +511,9 @@ private:
 
 // device type definition
 DECLARE_DEVICE_TYPE(FLOPPY_CONNECTOR, floppy_connector)
+
+// device iterator
+typedef device_interface_enumerator<floppy_image_device> floppy_interface_enumerator;
 
 extern template class device_finder<floppy_connector, false>;
 extern template class device_finder<floppy_connector, true>;
