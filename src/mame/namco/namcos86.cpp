@@ -446,7 +446,7 @@ void namcos86_state::roishtar_mcu_map(address_map &map)
 	map(0x6021, 0x6021).portr("IN1");
 	map(0x6030, 0x6030).r(FUNC(namcos86_state::dsw0_r));
 	map(0x6031, 0x6031).r(FUNC(namcos86_state::dsw1_r));
-	map(0x8000, 0xbfff).rom().region("mcusub", 0); // external ROM
+	map(0x8000, 0xbfff).rom().region("mcusub", 0x4000); // external ROM
 	map(0x8000, 0x8000).nopw(); // ??? written (not always) at end of interrupt
 	map(0x9800, 0x9800).nopw(); // ??? written (not always) at end of interrupt
 }
@@ -1280,8 +1280,8 @@ ROM_START( roishtar )
 	ROM_REGION( 0x1000, "mcu", 0 )
 	ROM_LOAD( "cus60-60a1.mcu", 0x0000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) )  /* MCU internal code */
 
-	ROM_REGION( 0x4000, "mcusub", 0 )
-	ROM_LOAD( "ri1_4.6b",     0x0000, 0x4000, CRC(552172b8) SHA1(18b35cb116baba362831fc046241895198b07a53) )  /* subprogram for the MCU */
+	ROM_REGION( 0x8000, "mcusub", 0 )
+	ROM_LOAD( "ri1_4.6b",     0x0000, 0x8000, CRC(552172b8) SHA1(18b35cb116baba362831fc046241895198b07a53) )  /* subprogram for the MCU */
 
 	/* the ROM/voice expansion board is not present in this game */
 ROM_END
