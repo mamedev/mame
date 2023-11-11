@@ -54,7 +54,6 @@ is either VCC or GND to distinguish between the two.
 #include "emu.h"
 
 #include "cpu/m6800/m6801.h"
-#include "machine/nvram.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
 #include "video/pwm.h"

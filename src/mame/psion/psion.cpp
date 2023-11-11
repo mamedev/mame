@@ -450,9 +450,9 @@ void psion_state::machine_start()
 		membank("rambank")->set_entry(0);
 	}
 
-	m_nvram2->set_base(m_ram, m_ram.bytes());
-	if (m_nvram3)
-		m_nvram3->set_base(m_paged_ram.get(), m_ram_bank_count * 0x4000);
+	m_nvram1->set_base(m_ram, m_ram.bytes());
+	if (m_nvram2)
+		m_nvram2->set_base(m_paged_ram.get(), m_ram_bank_count * 0x4000);
 
 	save_item(NAME(m_kb_counter));
 	save_item(NAME(m_enable_nmi));
@@ -555,8 +555,7 @@ void psion_state::psion_2lines(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, 3250).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	//NVRAM(config, "nvram1"); // sys_regs
-	NVRAM(config, "nvram2", nvram_device::DEFAULT_ALL_0); // RAM
+	NVRAM(config, "nvram1", nvram_device::DEFAULT_ALL_0); // RAM
 
 	TIMER(config, "nmi_timer").configure_periodic(FUNC(psion_state::nmi_timer), attotime::from_seconds(1));
 
@@ -635,7 +634,7 @@ void psion_state::psionp350(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &psion_state::psionp350_mem);
 
-	NVRAM(config, "nvram3", nvram_device::DEFAULT_ALL_0); // paged RAM
+	NVRAM(config, "nvram2", nvram_device::DEFAULT_ALL_0); // paged RAM
 }
 
 void psion_state::psionlz(machine_config &config)
@@ -644,7 +643,7 @@ void psion_state::psionlz(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &psion_state::psionlz_mem);
 
-	NVRAM(config, "nvram3", nvram_device::DEFAULT_ALL_0); // paged RAM
+	NVRAM(config, "nvram2", nvram_device::DEFAULT_ALL_0); // paged RAM
 }
 
 /* ROM definition */
