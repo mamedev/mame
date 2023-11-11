@@ -708,7 +708,7 @@ namespace bx
 	template<typename Ty>
 	inline BX_CONSTEXPR_FUNC bool isAligned(Ty _a, int32_t _align)
 	{
-		const Ty mask = Ty(_align - 1);
+		const Ty mask = Ty(max(1, _align) - 1);
 		return 0 == (_a & mask);
 	}
 
@@ -727,9 +727,9 @@ namespace bx
 	}
 
 	template<typename Ty>
-	inline BX_CONSTEXPR_FUNC  Ty alignDown(Ty _a, int32_t _align)
+	inline BX_CONSTEXPR_FUNC Ty alignDown(Ty _a, int32_t _align)
 	{
-		const Ty mask = Ty(_align - 1);
+		const Ty mask = Ty(max(1, _align) - 1);
 		return Ty(_a & ~mask);
 	}
 
@@ -752,7 +752,7 @@ namespace bx
 	template<typename Ty>
 	inline BX_CONSTEXPR_FUNC Ty alignUp(Ty _a, int32_t _align)
 	{
-		const Ty mask = Ty(_align - 1);
+		const Ty mask = Ty(max(1, _align) - 1);
 		return Ty( (_a + mask) & ~mask);
 	}
 

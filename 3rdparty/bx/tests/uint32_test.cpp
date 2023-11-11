@@ -141,6 +141,13 @@ TEST_CASE("align", "[uint32_t]")
 	REQUIRE( bx::isAligned(64, 8) );
 	REQUIRE(!bx::isAligned(63, 8) );
 
+	for (int32_t ii = 0; ii < 1024; ++ii)
+	{
+		REQUIRE(bx::isAligned(ii, 0) );
+		REQUIRE(ii == bx::alignUp(ii, 0) );
+		REQUIRE(ii == bx::alignDown(ii, 0) );
+	}
+
 	REQUIRE(  0 == bx::alignUp(  0, 16) );
 	REQUIRE( 16 == bx::alignUp(  1, 16) );
 	REQUIRE( 16 == bx::alignUp( 15, 16) );
