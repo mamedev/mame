@@ -8,8 +8,12 @@ SciSys Chess Companion II family
 The chess engine is LogiChess (ported from Z80 to 6800), by Kaare Danielsen.
 CXG Enterprise "S" / Star Chess is probably on similar hardware.
 
+NOTE: It triggers an NMI when the power switch is changed from ON to MEMORY.
+If this is not done, NVRAM may fail on the next boot.
+
 TODO:
-- add nvram (belongs in m6801.cpp, and it needs to save port $14 too)
+- if/when MAME supports an exit callback, hook up power-off NMI to that
+- MCU internal NVRAM belongs in m6801.cpp
 - verify SciSys MCU frequency, the only videos online (for hearing sound pitch)
   are from the Tandy 1650 ones
 
@@ -51,6 +55,7 @@ is either VCC or GND to distinguish between the two.
 #include "emu.h"
 
 #include "cpu/m6800/m6801.h"
+#include "machine/nvram.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
 #include "video/pwm.h"
@@ -105,6 +110,7 @@ private:
 
 	void set_cpu_freq();
 	TIMER_CALLBACK_MEMBER(set_pin);
+	void standby(int state);
 
 	emu_timer *m_standbytimer;
 	emu_timer *m_nmitimer;
@@ -137,7 +143,15 @@ void ccompan2_state::set_cpu_freq()
 void ccompan2_state::machine_reset()
 {
 	m_power = true;
+
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	m_maincpu->set_input_line(M6801_STBY_LINE, CLEAR_LINE);
+}
+
+void ccompan2_state::standby(int state)
+{
+	if (state)
+		m_display->clear();
 }
 
 TIMER_CALLBACK_MEMBER(ccompan2_state::set_pin)
@@ -157,7 +171,7 @@ INPUT_CHANGED_MEMBER(ccompan2_state::power_off)
 
 		// afterwards, MCU STBY pin is asserted after a short delay
 		delay += attotime::from_msec(10);
-		m_standbytimer->adjust(delay, INPUT_LINE_RESET);
+		m_standbytimer->adjust(delay, M6801_STBY_LINE);
 	}
 }
 
@@ -223,7 +237,7 @@ void ccompan2_state::led_w(u8 data)
 void ccompan2_state::main_map(address_map &map)
 {
 	map(0x0000, 0x0014).m(m_maincpu, FUNC(hd6301v1_cpu_device::m6801_io));
-	map(0x0080, 0x00ff).ram(); // internal
+	map(0x0080, 0x00ff).ram().share("internal"); // internal
 	map(0xf000, 0xffff).rom(); // internal
 }
 
@@ -328,6 +342,8 @@ void ccompan2_state::expchess(machine_config &config)
 	// basic machine hardware
 	HD6301V1(config, m_maincpu, 3000000); // approximation, no XTAL
 	m_maincpu->set_addrmap(AS_PROGRAM, &ccompan2_state::main_map);
+	m_maincpu->nvram_enable_backup(true);
+	m_maincpu->standby_cb().set(FUNC(ccompan2_state::standby));
 	m_maincpu->in_p1_cb().set(FUNC(ccompan2_state::input1_r));
 	m_maincpu->in_p2_cb().set(FUNC(ccompan2_state::input2_r));
 	m_maincpu->out_p2_cb().set("dac", FUNC(dac_1bit_device::write)).bit(0);
@@ -335,9 +351,12 @@ void ccompan2_state::expchess(machine_config &config)
 	m_maincpu->in_p4_cb().set(FUNC(ccompan2_state::power_r));
 	m_maincpu->out_p4_cb().set(FUNC(ccompan2_state::led_w));
 
+	NVRAM(config, "internal", nvram_device::DEFAULT_ALL_0);
+
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
+	m_board->set_nvram_enable(true);
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(5+2, 8);
