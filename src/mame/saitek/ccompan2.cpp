@@ -334,8 +334,6 @@ void ccompan2_state::expchess(machine_config &config)
 	m_maincpu->in_p4_cb().set(FUNC(ccompan2_state::power_r));
 	m_maincpu->out_p4_cb().set(FUNC(ccompan2_state::led_w));
 
-	NVRAM(config, "internal", nvram_device::DEFAULT_ALL_0);
-
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));

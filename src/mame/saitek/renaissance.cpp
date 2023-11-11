@@ -399,7 +399,6 @@ void ren_state::ren(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
-	NVRAM(config, "internal", nvram_device::DEFAULT_ALL_0);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
