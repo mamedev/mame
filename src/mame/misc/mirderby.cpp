@@ -214,39 +214,41 @@ void mirderby_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	gfx_element * const gfx = m_gfxdecode->gfx(0);
 
 	// TODO: gets corrupted during gameplay, moving entries with an offset of $-2
-	// TODO: width/height is a complete mystery
-	// writes multiple identical entries to different places,
-	// cfr. pinballs in gameplay from $800 onward (tilecode=$c0)
 	for (; source < finish; source += 4 )
 	{
-		u16 code    = source[ 2 ] << 2;
+		const u8 tile = source[ 2 ];
+		// 0xc0 pinballs (0x300)
+		// 0xdf opaque box on title (0x36e)
+		// 0xd5 lower start gate (0x340 - 0x360)
+		// 0x37 jockey
+		u16 code    = (tile & 0xf8) << 2 | (tile & 0x07) << 1;
 		u8 attr     = source[ 1 ];
-		int sx      = source[ 3 ];
-		int sy      = (0xf0 - source[ 0 ]) & 0xff;
+		// TODO: bit 5 can't be flipx, it would cross top row horses on purple bet screen
+		// more like an internal copy they disabled with this?
+		int sx      = source[ 3 ] + ((attr & 0x30) << 4);
+		int sy      = (0xf1 - source[ 0 ]) & 0xff;
 
 		u8 color = attr & 0xf;
-		if (attr & 0x10)
-			sx += 0x100;
+
+		// TODO: missing sprites (signed wraparound?)
 
 		//if (attr == 0)
 		//	continue;
 
-		gfx->transpen(bitmap,cliprect,
-			code, color,
-			0, 0, //flipx, flipy,
-			sx, sy, 0);
-		gfx->transpen(bitmap,cliprect,
-			code + 1, color,
-			0, 0, //flipx, flipy,
-			sx + 8, sy, 0);
-		gfx->transpen(bitmap,cliprect,
-			code + 0x10, color,
-			0, 0, //flipx, flipy,
-			sx, sy + 8, 0);
-		gfx->transpen(bitmap,cliprect,
-			code + 0x11, color,
-			0, 0, //flipx, flipy,
-			sx + 8, sy + 8, 0);
+		// draws in block strips of 16x16
+		const u8 tile_offs[4] = { 0, 1, 0x10, 0x11 };
+		const int draw_x[4] = { -4, 4, -4, 4 };
+		const int draw_y[4] = { 0, 0, 8, 8 };
+
+		for (int block_i = 0; block_i < 4; block_i ++)
+		{
+			gfx->transpen(bitmap, cliprect,
+				code + tile_offs[block_i], color,
+				0, 0,
+				sx + draw_x[block_i],
+				sy + draw_y[block_i],
+				0);
+		}
 	}
 }
 
@@ -274,8 +276,8 @@ uint32_t mirderby_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		// just writes a 0x7c to $7ffa
 		m_bg_tilemap->set_scrollx(0, 0);
 		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0), 0);
-		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1), 0);
 		draw_sprites(bitmap, cliprect);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1), 0);
 	}
 
 	return 0;
@@ -486,7 +488,7 @@ static INPUT_PORTS_START( mirderby )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 ) // analyzer
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // hangs game if triggered, debug aid?
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // hangs game if triggered, break from external debugger?
 
 	// p1 side
 	// TODO: sketchy layout, derived from kingdrby.cpp
@@ -662,12 +664,11 @@ void mirderby_state::mirderby(machine_config &config)
 //	config.set_maximum_quantum(attotime::from_hz(6000));
 	config.set_perfect_quantum("maincpu");
 
-	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(59);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(64*8, 32*8);
-	m_screen->set_visarea(0*8, 50*8-1, 1*8, 31*8-1);
+	m_screen->set_visarea(1*8, 50*8-1, 2*8, 30*8-1);
 	m_screen->set_screen_update(FUNC(mirderby_state::screen_update));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(mirderby_state::screen_vblank));
@@ -675,7 +676,6 @@ void mirderby_state::mirderby(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mirderby);
 	PALETTE(config, m_palette, FUNC(mirderby_state::palette_init), 0x100);
 
-	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
 	YM2203(config, m_ymsnd, 2'000'000);
