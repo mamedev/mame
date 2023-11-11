@@ -163,8 +163,8 @@ INPUT_CHANGED_MEMBER(ren_state::go_button)
 {
 	if (newval && m_maincpu->standby())
 	{
-		machine_reset();
 		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+		machine_reset();
 	}
 }
 

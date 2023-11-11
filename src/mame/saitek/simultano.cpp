@@ -65,7 +65,6 @@ public:
 		m_out_lcd(*this, "s%u.%u", 0U, 0U)
 	{ }
 
-	DECLARE_INPUT_CHANGED_MEMBER(acl_button) { if (newval) power_off(); }
 	DECLARE_INPUT_CHANGED_MEMBER(go_button);
 
 	void simultano(machine_config &config);
@@ -300,7 +299,6 @@ static INPUT_PORTS_START( simultano )
 
 	PORT_START("RESET")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CHANGED_MEMBER(DEVICE_SELF, simultano_state, go_button, 0) PORT_NAME("Go")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, simultano_state, acl_button, 0) PORT_NAME("ACL")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cc2150 )
