@@ -55,7 +55,6 @@ to be upgraded with an EMI PCB (power supply related, meaningless for emulation)
 
 TODO:
 - OSA PC link, uses MCU serial interface
-- MCU internal NVRAM belongs in m6801.cpp
 
 *******************************************************************************/
 
@@ -109,7 +108,7 @@ private:
 	required_device<input_merger_device> m_stb;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
-	optional_device<speaker_sound_device> m_dac;
+	required_device<speaker_sound_device> m_dac;
 	required_ioport_array<9> m_inputs;
 
 	void main_map(address_map &map);

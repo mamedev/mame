@@ -25,8 +25,6 @@ TODO:
 - add 6802 nvram (only in case VCC STANDBY is connected to battery)
 - cleanups (difficult to do maintenance work right now)
 - improve 6801 and derivatives:
-  * make internal I/O map really internal
-  * add internal nvram where applicable
   * improve RAM control register
   * improve STBY pin? RES pin (reset) should be ineffective while STBY is low
   * IS3 interrupt for 6801 port 3 handshake (already implemented for 6301Y)

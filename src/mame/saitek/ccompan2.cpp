@@ -13,7 +13,6 @@ If this is not done, NVRAM may fail on the next boot.
 
 TODO:
 - if/when MAME supports an exit callback, hook up power-off NMI to that
-- MCU internal NVRAM belongs in m6801.cpp
 - verify SciSys MCU frequency, the only videos online (for hearing sound pitch)
   are from the Tandy 1650 ones
 
@@ -364,13 +363,13 @@ void ccompan2_state::ccompan2(machine_config &config)
 *******************************************************************************/
 
 ROM_START( ccompan2 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("1983_te-1_scisys-w_0609v171.u1", 0xf000, 0x1000, CRC(a26632fd) SHA1(fb83dc2476500acaabd949d749e58adca01012ea) )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD("1983_te-1_scisys-w_0609v171.u1", 0x0000, 0x1000, CRC(a26632fd) SHA1(fb83dc2476500acaabd949d749e58adca01012ea) )
 ROM_END
 
 ROM_START( expchess )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("1983_te-1_scisys-w_0609v171.u1", 0xf000, 0x1000, CRC(a26632fd) SHA1(fb83dc2476500acaabd949d749e58adca01012ea) )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD("1983_te-1_scisys-w_0609v171.u1", 0x0000, 0x1000, CRC(a26632fd) SHA1(fb83dc2476500acaabd949d749e58adca01012ea) )
 ROM_END
 
 } // anonymous namespace
