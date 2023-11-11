@@ -10,8 +10,9 @@ NOTE: nsnova does an NMI at power-off (or power-failure). If this isn't done,
 NVRAM won't work properly (supremo doesn't have NVRAM).
 
 TODO:
-- if/when MAME supports an exit callback, hook up power-off NMI to that
 - beeps are glitchy, as if interrupted for too long
+- if/when MAME supports an exit callback, hook up power-off NMI to that
+- nsnova MCU internal NVRAM belongs in m6801.cpp
 - nsnova serial port isn't working, MCU emulation problem?
 - nsnova unmapped reads from 0x33/0x34
 - is "Aquamarine / Super Nova" the same rom as nsnova and just a redesign?
