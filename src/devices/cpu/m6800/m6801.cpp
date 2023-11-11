@@ -998,6 +998,8 @@ void m6801_cpu_device::execute_set_input(int irqline, int state)
 			m_pending_tcsr |= TCSR_ICF;
 			m_input_capture = CT;
 			modified_tcsr();
+			if ((m_tcsr & TCSR_EICI) && (m_wai_state & M6800_SLP))
+				m_wai_state &= ~M6800_SLP;
 		}
 		break;
 
