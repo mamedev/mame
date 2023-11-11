@@ -12,7 +12,7 @@ TODO:
   clashes with the remapped p1 keys.
   For now user has to workaround by mapping p2 keys manually,
   actual fix would be to define a horse betting layout in MAME input defs.
-- Missing inputs, namely 10 and 100 Yen tokens;
+- Missing inputs, namely 10 and 100 Yen tokens. These comes from the Z80 x70coin subsystem.
 
 Old Haze note:
 - has the same GX61A01 custom (blitter?) as homedata.cpp and a 'similar' CPU setup
@@ -37,8 +37,13 @@ z80 = 4mhz
 YM2203 = 2mhz
 
 See included PCB pics.
-
-
+- uPD8253C-2 + uPD8255AC-2 near Z80
+- MB3730A audio power amplifier
+- Partially surface scratched GX61A01, "HOME DATA" pattern still kinda readable anyway (lol)
+- CXK5816PN-12L CMOS
+- unpopulated 2.5MHz + various "option" slots
+- two empty sockets, one near the Z80 (dev option?), another near A03 horse GFXs
+- several jumpers across the board
 
 Roms:
 
@@ -63,8 +68,11 @@ x70_c01.14e       65536    0xd79d072d    27c512
 #include "cpu/upd7810/upd7810.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
-#include "sound/dac.h"
-#include "sound/sn76496.h"
+#include "machine/i8255.h"
+#include "machine/nvram.h"
+#include "machine/pit8253.h"
+//#include "sound/dac.h"
+//#include "sound/sn76496.h"
 #include "sound/ymopn.h"
 
 #include "emupal.h"
@@ -79,7 +87,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_subcpu(*this, "subcpu")
-		, m_audiocpu(*this, "audiocpu")
+		, m_x70coincpu(*this, "audiocpu")
 		, m_ymsnd(*this, "ymsnd")
 //		, m_vreg(*this, "vreg")
 		, m_screen(*this, "screen")
@@ -88,11 +96,11 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_subbank(*this, "subbank")
-		, m_soundlatch(*this, "soundlatch")
-//		, m_mainlatch(*this, "mainlatch")
-//		, m_sn(*this, "snsnd")
+		, m_coinlatch(*this, "coinlatch")
 		, m_keys(*this, "KEY%u", 0U)
 		, m_in(*this, "IN%u", 0U)
+		, m_coin_ppi(*this, "coin_ppi")
+		, m_coin_pit(*this, "pit")
 	{
 	}
 
@@ -103,7 +111,7 @@ private:
 
 	required_device<mc6809e_device> m_maincpu;
 	required_device<mc6809e_device> m_subcpu;
-	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_x70coincpu;
 	optional_device<ym2203_device> m_ymsnd;
 //	optional_shared_ptr<uint8_t> m_vreg;
 	required_device<screen_device> m_screen;
@@ -112,19 +120,18 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_memory_bank m_subbank;
-	optional_device<generic_latch_8_device> m_soundlatch;
-//	optional_device<generic_latch_8_device> m_mainlatch; // pteacher
-//	optional_device<sn76489a_device> m_sn; // mrokumei and pteacher
+	optional_device<generic_latch_8_device> m_coinlatch;
 
 	required_ioport_array<5 * 2> m_keys;
 	required_ioport_array<2> m_in;
+	required_device<i8255_device> m_coin_ppi;
+	required_device<pit8253_device> m_coin_pit;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	void screen_vblank(int state);
 	virtual void video_start() override;
-
 
 	uint8_t prot_r();
 	void prot_w(uint8_t data);
@@ -139,8 +146,8 @@ private:
 
 	void shared_map(address_map &map);
 
-	void audio_map(address_map &map);
-	void audio_io(address_map &map);
+	void x70coin_map(address_map &map);
+	void x70coin_io(address_map &map);
 
 	tilemap_t *m_bg_tilemap{};
 //	int m_visible_page = 0;
@@ -279,7 +286,7 @@ void mirderby_state::screen_vblank(int state)
 	if (state)
 	{
 		// TODO: each irq routine pings a bit of $8000 for masking/acknowledge
-		// TODO: study FIRQ for main CPU
+		// FIRQ seems valid for main CPU, but cannot be triggered
 		if (m_main_irq_enable)
 			m_maincpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 		// FIRQ and IRQ same for sub CPU
@@ -306,11 +313,8 @@ void mirderby_state::shared_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram().share(m_spriteram);
 	map(0x1000, 0x1fff).ram().w(FUNC(mirderby_state::videoram_w)).share(m_videoram);
-	map(0x2000, 0x2fff).ram().share("share3");
-	map(0x3000, 0x3fff).ram();
-	map(0x4000, 0x5fff).ram().share("share1");
-	map(0x6000, 0x6fff).ram(); /* work ram */
-	map(0x7000, 0x77ff).ram().share("share2");
+	map(0x2000, 0x6fff).ram().share("share");
+	map(0x7000, 0x77ff).ram().share("nvram");
 	map(0x7800, 0x7800).rw(FUNC(mirderby_state::prot_r), FUNC(mirderby_state::prot_w));
 	//0x7ff0 onward seems CRTC
 //	map(0x7ff0, 0x7ff?).writeonly().share("vreg");
@@ -337,10 +341,11 @@ void mirderby_state::shared_map(address_map &map)
 		})
 	);
 	map(0x7ffb, 0x7ffb).lr8(
-		NAME([] () {
-			// will prevent working inputs if non-zero on betting screen
-			// maps 100 Yen at least, with bit 4 + 7 off
-			return 0;
+		NAME([this] () {
+			u8 res = m_coinlatch->read();
+			//m_coinlatch->clear_w();
+			// bit 4 will disable bet inputs if on, coin chute anti-tamper?
+			return res & 0xef;
 		})
 	);
 	map(0x7ffb, 0x7ffc).lw8(
@@ -356,8 +361,11 @@ void mirderby_state::shared_map(address_map &map)
 	map(0x7ffe, 0x7ffe).nopr(); //watchdog?
 	map(0x7ffe, 0x7ffe).lw8(
 		NAME([this] (u8 data) {
+			// bit 2 sound latch
+			// bit 1-0 chip select?
 			m_latch = data;
-			//logerror("%02x latch write\n", data);
+			if (data & 0xf8)
+				logerror("latch write %02x\n", data);
 		})
 	);
 	map(0x7fff, 0x7fff).lrw8(
@@ -372,13 +380,14 @@ void mirderby_state::shared_map(address_map &map)
 	);
 }
 
-// TODO: verify NMI sources
 void mirderby_state::main_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x7fff).m(*this, FUNC(mirderby_state::shared_map));
 	map(0x7ffd, 0x7ffd).lw8(
 		NAME([this] (u8 data) {
+			// TODO: bit 7 (after POST)
+			// TODO: cannot be NMI
 			if (m_sub_nmi_enable)
 				m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 			//logerror("%02x latch write\n", data);
@@ -388,6 +397,7 @@ void mirderby_state::main_map(address_map &map)
 	map(0x8000, 0xffff).rom().region("main_rom", 0);
 	map(0x8000, 0x8000).lw8(
 		NAME([this] (u8 data) {
+			// TODO: bit 5 (coin counter), bit 4 (enabled after first coin in)
 			m_main_nmi_enable = bool(BIT(data, 1));
 			m_main_irq_enable = bool(BIT(data, 0));
 		})
@@ -419,24 +429,24 @@ void mirderby_state::sub_map(address_map &map)
 				m_bg_tilemap->mark_all_dirty();
 			}
 
-			// TODO: bits 3-2 used
+			// TODO: bit 3 used
 			m_sub_nmi_enable = bool(BIT(data, 1));
 			m_sub_irq_enable = bool(BIT(data, 0));
 		})
 	);
 }
 
-void mirderby_state::audio_map(address_map &map)
+void mirderby_state::x70coin_map(address_map &map)
 {
-	map(0x0000, 0x1fff).rom().region("audio_rom", 0);
+	map(0x0000, 0x1fff).rom().region("x70coin_rom", 0);
 	map(0x8000, 0x87ff).ram();
 }
 
-void mirderby_state::audio_io(address_map &map)
+void mirderby_state::x70coin_io(address_map &map)
 {
 	map.global_mask(0xff);
-//	map(0x00, 0x00) read in NMI, likely soundlatch
-//	Is this just a DAC player?
+	map(0x00, 0x03).rw(m_coin_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x04, 0x07).rw(m_coin_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 }
 
 static GFXDECODE_START( gfx_mirderby )
@@ -476,9 +486,7 @@ static INPUT_PORTS_START( mirderby )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 ) // analyzer
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) // hangs game if triggered?
-	PORT_DIPSETTING(      0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // hangs game if triggered, debug aid?
 
 	// p1 side
 	// TODO: sketchy layout, derived from kingdrby.cpp
@@ -593,6 +601,17 @@ static INPUT_PORTS_START( mirderby )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+
+	PORT_START("SUB_COIN0")
+	// detected coin weight, currently hardwired at 100 Yen (cfr. analyzer),
+	// with a bit of input hold
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("SUB_COIN1")
+	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 void mirderby_state::machine_start()
@@ -612,20 +631,34 @@ void mirderby_state::machine_reset()
 void mirderby_state::mirderby(machine_config &config)
 {
 	/* basic machine hardware */
-	MC6809E(config, m_maincpu, 16000000/8);  /* 2 Mhz */
+	MC6809E(config, m_maincpu, 16000000/8);  /* MBL68B09E 2 Mhz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &mirderby_state::main_map);
 //	m_maincpu->set_vblank_int("screen", FUNC(mirderby_state::homedata_irq));
 
-	MC6809E(config, m_subcpu, 16000000/8); /* 2 Mhz */
+	MC6809E(config, m_subcpu, 16000000/8); /* MBL68B09E 2 Mhz */
 	m_subcpu->set_addrmap(AS_PROGRAM, &mirderby_state::sub_map);
 //	m_subcpu->set_vblank_int("screen", FUNC(mirderby_state::homedata_irq));
 
 	// im 0, doesn't bother in setting a vector table,
-	// should just require a NMI from either CPUs
-	Z80(config, m_audiocpu, 16000000/4);   /* 4 Mhz */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &mirderby_state::audio_map);
-	m_audiocpu->set_addrmap(AS_IO, &mirderby_state::audio_io);
+	// should just require a NMI from somewhere ...
+	Z80(config, m_x70coincpu, XTAL(16'000'000)/4);   /* 4 Mhz */
+	m_x70coincpu->set_addrmap(AS_PROGRAM, &mirderby_state::x70coin_map);
+	m_x70coincpu->set_addrmap(AS_IO, &mirderby_state::x70coin_io);
 
+	GENERIC_LATCH_8(config, m_coinlatch);
+
+	I8255A(config, m_coin_ppi);
+	m_coin_ppi->in_pa_callback().set_ioport("SUB_COIN0");
+	m_coin_ppi->out_pb_callback().set(m_coinlatch, FUNC(generic_latch_8_device::write));
+	m_coin_ppi->in_pc_callback().set_ioport("SUB_COIN1");
+
+	PIT8253(config, m_coin_pit, 0);
+	m_coin_pit->set_clk<0>(XTAL(16'000'000) / 8);
+	m_coin_pit->out_handler<0>().set_inputline(m_x70coincpu, INPUT_LINE_NMI);
+//	m_coin_pit->set_clk<1>(XTAL(16'000'000) / 8);
+//	m_coin_pit->set_clk<2>(XTAL(16'000'000) / 8);
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 //	config.set_maximum_quantum(attotime::from_hz(6000));
 	config.set_perfect_quantum("maincpu");
 
@@ -661,7 +694,7 @@ ROM_START( mirderby )
 	ROM_REGION( 0x10000, "sub_rom", 0 ) // M6809 code
 	ROM_LOAD( "x70_c01.14e", 0x00000, 0x10000, CRC(d79d072d) SHA1(8e189931de9c4eb520c1ec2d0898d8eaba0f01b5) )
 
-	ROM_REGION( 0x2000, "audio_rom", 0 ) // Z80 Code
+	ROM_REGION( 0x2000, "x70coin_rom", 0 ) // Z80 Code
 	ROM_LOAD( "x70_a11.1g", 0x0000, 0x2000, CRC(b394eef7) SHA1(a646596d09b90eda44aaf8ccbf8f3fccfd3d5dad) ) // first 0x6000 bytes are blank!
 	ROM_CONTINUE(0x0000, 0x2000)
 	ROM_CONTINUE(0x0000, 0x2000)
@@ -679,4 +712,4 @@ ROM_START( mirderby )
 	ROM_LOAD( "x70a09.6l", 0x200, 0x100, CRC(d0187957) SHA1(6b36c1bccad24708cfa2fc78da08313f9bcfdbc0) )
 ROM_END
 
-GAME( 1988, mirderby,  0, mirderby, mirderby, mirderby_state, empty_init, ROT0, "Home Data? / Ascot", "Miracle Derby (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1988, mirderby,  0, mirderby, mirderby, mirderby_state, empty_init, ROT0, "Home Data / Ascot", "Miracle Derby (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
