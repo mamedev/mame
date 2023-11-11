@@ -5362,3 +5362,19 @@ if (BUSES["MC68000_SYSBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/mc68000/ram.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/bus/sega_pico/pico_ps2.h,BUSES["PICO_PS2"] = true
+---------------------------------------------------
+
+if (BUSES["PICO_PS2"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/sega_pico/pico_ps2.cpp",
+		MAME_DIR .. "src/devices/bus/sega_pico/pico_ps2.h",
+		MAME_DIR .. "src/devices/bus/sega_pico/pico_doraemon.cpp",
+		MAME_DIR .. "src/devices/bus/sega_pico/pico_doraemon.h",
+		MAME_DIR .. "src/devices/bus/sega_pico/pico_kbd.cpp",
+		MAME_DIR .. "src/devices/bus/sega_pico/pico_kbd.h",
+	}
+end
