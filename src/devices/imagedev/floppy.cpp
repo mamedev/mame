@@ -1709,7 +1709,9 @@ void floppy_sound_device::sound_stream_update(sound_stream &stream, std::vector<
 		{
 			idx = m_spin_playback_sample;
 			sampleend = m_sample[idx].data.size();
-			out = m_sample[idx].data[m_spin_samplepos++];
+			if (m_spin_samplepos < sampleend)
+				out = m_sample[idx].data[m_spin_samplepos];
+			m_spin_samplepos++;
 
 			if (m_spin_samplepos >= sampleend)
 			{
@@ -1765,7 +1767,8 @@ void floppy_sound_device::sound_stream_update(sound_stream &stream, std::vector<
 			idx = m_step_base + m_seek_playback_sample;
 			sampleend = m_sample[idx].data.size();
 			// Mix it into the stream value
-			out += m_sample[idx].data[(int)m_seek_samplepos];
+			if (m_seek_samplepos < sampleend)
+				out += m_sample[idx].data[(int)m_seek_samplepos];
 			// By adding different values than 1, we can change the playback speed
 			// This will be used to adjust the seek sound
 			m_seek_samplepos += m_seek_pitch;
@@ -1783,7 +1786,10 @@ void floppy_sound_device::sound_stream_update(sound_stream &stream, std::vector<
 				sampleend = m_sample[idx].data.size();
 
 				// Mix it into the stream value
-				out += m_sample[idx].data[m_step_samplepos++];
+				if (m_step_samplepos < sampleend)
+					out += m_sample[idx].data[m_step_samplepos];
+				m_step_samplepos++;
+
 				if (m_step_samplepos >= sampleend)
 				{
 					// Step sample done
