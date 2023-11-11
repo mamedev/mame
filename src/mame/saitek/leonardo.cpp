@@ -14,10 +14,10 @@ The expansion modules are basically entire chesscomputers, making the whole
 thing combined a 'dual brain' chesscomputer. The embedded chess engine is by
 Julio Kaplan and Craig Barnes, same as the one in SciSys Turbo S-24K.
 
-NOTE: In order for nvram to work properly, press the STOP button to turn off
+NOTE: In order for NVRAM to work properly, press the STOP button to turn off
 the chesscomputer before exiting MAME. Other than ACL (which is an unemulated
 hardware button that disconnects the battery), there is no known method to
-force a cold boot. So if nvram somehow becomes broken, remove the nvram files.
+force a cold boot. So if NVRAM somehow becomes broken, remove the NVRAM files.
 
 Hardware notes:
 
@@ -55,7 +55,7 @@ to be upgraded with an EMI PCB (power supply related, meaningless for emulation)
 
 TODO:
 - OSA PC link, uses MCU serial interface
-- MCU internal nvram belongs in m6801.cpp
+- MCU internal NVRAM belongs in m6801.cpp
 
 *******************************************************************************/
 

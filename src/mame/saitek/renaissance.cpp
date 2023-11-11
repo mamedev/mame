@@ -8,7 +8,7 @@ Saitek Kasparov Renaissance
 Saitek's 2nd version modular chesscomputer. It accepts the same modules as
 Leonardo/Galileo. "OSA" version for Renaissance is 1.5.
 
-NOTE: In order for nvram to work properly, press the STOP button to turn off
+NOTE: In order for NVRAM to work properly, press the STOP button to turn off
 the chesscomputer before exiting MAME. Unlike Leonardo/Galileo, it looks like
 it will always do a cold boot if you reset without having pressed STOP.
 
