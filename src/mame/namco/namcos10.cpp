@@ -54,8 +54,8 @@ Puzz Ball (PZB1 Ver. A)                                          (C) Namco, 2002
 Seishun-Quiz Colorful High School (CHS1 Ver.A)                   (C) Namco, 2002
 Sekai Kaseki Hakken (Japan, SKH1 Ver.A)                          (C) Namco, 2004
 *Shamisen Brothers (KT-SB2 Ver.A + CDROM)                        (C) Kato/Konami, 2003
-*Slot no Oujisama / Slot Prince (SLO1 Ver.A)                     (C) Namco, 2002
-Slot no Oujisama / Slot Prince (SLO1 Ver.B)                      (C) Namco, 2002
+*Slot no Oujisama / Slot Prince (SLO1 Ver.A)                     (C) Namco, 2003
+Slot no Oujisama / Slot Prince (SLO1 Ver.B)                      (C) Namco, 2003
 Star Trigon (STT1 Ver.A)                                         (C) Namco, 2002
 Sugorotic Japan (STJ1 Ver.C)                                     (C) Namco, 2002
 *Taiko no Tatsujin  (with CDROM?)                                (C) Namco, 2001
@@ -3972,12 +3972,12 @@ GAME( 2002, gamshara,  0,        ns10_gamshara,  gamshara,     namcos10_memn_sta
 GAME( 2002, gamsharao, gamshara, ns10_gamshara,  gamshara,     namcos10_memn_state,  memn_driver_init, ROT0, "Mitchell",          "Gamshara (20020716A / 10021 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2002, panikuru,  0,        ns10_panikuru,  namcos10,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Panikuru Panekuru (Japan, PPA1 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2002, puzzball,  0,        ns10_puzzball,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Puzz Ball (Japan, PZB1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 2002, slotouji,  0,        ns10_slotouji,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Slot no Oujisama / Slot Prince (Japan, SLO1 Ver. B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // decrypter not done yet
 GAME( 2002, startrgn,  0,        ns10_startrgn,  startrgn,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Star Trigon (Japan, STT1 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2002, sugorotc,  0,        ns10_sugorotic, mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Sugorotic JAPAN (STJ1 Ver.C)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME( 2003, konotako,  0,        ns10_konotako,  konotako,     namcos10_memn_state,  memn_driver_init, ROT0, "Mitchell",          "Kono e Tako (10021 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2003, nflclsfb,  0,        ns10_nflclsfb,  nflclsfb,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco / Metro",     "NFL Classic Football (US, NCF3 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
 GAME( 2003, pacmball,  0,        ns10_pacmball,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Pacman BALL (PMB2 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2003, slotouji,  0,        ns10_slotouji,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Slot no Oujisama / Slot Prince (Japan, SLO1 Ver. B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // May 2 2003, decrypter not done yet
 GAME( 2004, sekaikh,   0,        ns10_sekaikh,   mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Sekai Kaseki Hakken (Japan, SKH1 Ver.B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
 GAME( 2004, sekaikha,  sekaikh,  ns10_sekaikh,   mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Sekai Kaseki Hakken (Japan, SKH1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
 GAME( 2005, ballpom,   0,        ns10_ballpom,   mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Ball Pom Line", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND ) // ROM VER. B0 FEB 09 2005 15:29:02 in test mode, boots but requires MGEXIO to proceed

@@ -32785,7 +32785,7 @@ ptblank3                        // 2000.12 Point Blank 3 (GNN2 Ver.A)
 puzzball                        // 2002.02 Puzz Ball (Japan, PZB1 Ver.A)
 sekaikh                         // 2004.03 Sekai Kaseki Hakken (Japan, SKH1 Ver.B)
 sekaikha                        // 2004.03 Sekai Kaseki Hakken (Japan, SKH1 Ver.A)
-slotouji                        // 2002.0? Sekai Kaseki Hakken (Japan, SKH1 Ver.A)
+slotouji                        // 2003.05 Slot no Oujisama / Slot Prince (Japan, SLO1 Ver. B)
 squizchs                        // 2003.03 Seishun-Quiz Colorful High School (CHS1 Ver.A)
 startrgn                        // 2002.07 Star Trigon (STT1 Ver.A)
 sugorotc                        // 2002.02 Sugorotic JAPAN (STJ1 Ver.C)
@@ -42570,6 +42570,7 @@ tabe22                          // (c) Tab Products
 
 @source:taito/40love.cpp
 40love                          // A30 (c) 1984 Taito
+40lovebl                        // bootleg
 40lovej                         // A30 (c) 1984 Taito
 fieldday                        // A23 (c) 1984 Taito
 undoukai                        // A17 (c) 1984 Taito
