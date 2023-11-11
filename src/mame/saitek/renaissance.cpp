@@ -8,6 +8,10 @@ Saitek Kasparov Renaissance
 Saitek's 2nd version modular chesscomputer. It accepts the same modules as
 Leonardo/Galileo. "OSA" version for Renaissance is 1.5.
 
+NOTE: In order for nvram to work properly, press the STOP button to turn off
+the chesscomputer before exiting MAME. Unlike Leonardo/Galileo, it looks like
+it will always do a cold boot if you reset without having pressed STOP.
+
 Hardware notes:
 - 6301Y0(mode 1) or HD6303YP MCU @ 10MHz
 - 8KB RAM, 32KB ROM
@@ -35,6 +39,7 @@ TODO:
 #include "bus/saitek_osa/expansion.h"
 #include "cpu/m6800/m6801.h"
 #include "machine/input_merger.h"
+#include "machine/nvram.h"
 #include "machine/sensorboard.h"
 #include "sound/spkrdev.h"
 #include "video/pwm.h"
@@ -68,8 +73,8 @@ public:
 	{ }
 
 	template <int N> DECLARE_INPUT_CHANGED_MEMBER(change_view);
+	DECLARE_INPUT_CHANGED_MEMBER(go_button);
 
-	// machine configs
 	void ren(machine_config &config);
 
 protected:
@@ -94,6 +99,7 @@ private:
 	void lcd_pwm_w(offs_t offset, u8 data);
 	void lcd_output_w(offs_t offset, u64 data);
 
+	void standby(int state);
 	void update_display();
 	void mux_w(u8 data);
 	void leds_w(u8 data);
@@ -124,11 +130,6 @@ void ren_state::machine_start()
 	save_item(NAME(m_led_data));
 }
 
-void ren_state::machine_reset()
-{
-	m_stb->in_clear<0>();
-}
-
 template <int N> INPUT_CHANGED_MEMBER(ren_state::change_view)
 {
 	if (oldval && !newval)
@@ -145,6 +146,29 @@ template <int N> INPUT_CHANGED_MEMBER(ren_state::change_view)
     I/O
 *******************************************************************************/
 
+// power
+
+void ren_state::machine_reset()
+{
+	m_stb->in_clear<0>();
+}
+
+void ren_state::standby(int state)
+{
+	if (state)
+		m_display->clear();
+}
+
+INPUT_CHANGED_MEMBER(ren_state::go_button)
+{
+	if (newval && m_maincpu->standby())
+	{
+		machine_reset();
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+	}
+}
+
+
 // LCD
 
 void ren_state::lcd_pwm_w(offs_t offset, u8 data)
@@ -154,7 +178,7 @@ void ren_state::lcd_pwm_w(offs_t offset, u8 data)
 
 void ren_state::lcd_output_w(offs_t offset, u64 data)
 {
-	m_lcd_pwm->write_row(offset, data);
+	m_lcd_pwm->write_row(offset, m_maincpu->standby() ? 0 : data);
 }
 
 
@@ -283,11 +307,11 @@ void ren_state::p6_w(u8 data)
 void ren_state::main_map(address_map &map)
 {
 	map(0x0000, 0x0027).m(m_maincpu, FUNC(hd6303y_cpu_device::hd6301y_io));
-	map(0x0040, 0x013f).ram(); // internal
+	map(0x0040, 0x013f).ram().share("internal"); // internal
 	map(0x2000, 0x2000).w(FUNC(ren_state::mux_w));
 	map(0x2400, 0x2400).w(FUNC(ren_state::leds_w));
 	map(0x2600, 0x2600).rw(FUNC(ren_state::control_r), FUNC(ren_state::control_w));
-	map(0x4000, 0x5fff).ram();
+	map(0x4000, 0x5fff).ram().share("nvram");
 	map(0x6000, 0x607f).w("lcd", FUNC(sed1502_device::write));
 	map(0x8000, 0xffff).rom();
 }
@@ -345,8 +369,7 @@ static INPUT_PORTS_START( ren )
 	PORT_CONFSETTING(    0x00, DEF_STR( Normal ) )
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("Go")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F1) PORT_NAME("ACL")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_CHANGED_MEMBER(DEVICE_SELF, ren_state, go_button, 0) PORT_NAME("Go")
 
 	PORT_START("VIEW")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CHANGED_MEMBER(DEVICE_SELF, ren_state, change_view<+1>, 0)
@@ -364,6 +387,8 @@ void ren_state::ren(machine_config &config)
 	// basic machine hardware
 	HD6303Y(config, m_maincpu, 10_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ren_state::main_map);
+	m_maincpu->nvram_enable_backup(true);
+	m_maincpu->standby_cb().set(FUNC(ren_state::standby));
 	m_maincpu->in_p2_cb().set(FUNC(ren_state::p2_r));
 	m_maincpu->out_p2_cb().set(FUNC(ren_state::p2_w));
 	m_maincpu->in_p5_cb().set(FUNC(ren_state::p5_r));
@@ -376,9 +401,13 @@ void ren_state::ren(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
+	NVRAM(config, "internal", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
+	m_board->set_nvram_enable(true);
 
 	// video hardware
 	SED1502(config, m_lcd, 32768).write_segs().set(FUNC(ren_state::lcd_output_w));

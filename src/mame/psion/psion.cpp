@@ -13,6 +13,7 @@
         Note:
         - 4 lines display has an custom LCD controller derived from an HD66780
         - NVRAM works only if the machine is turned off (with OFF menu) before closing MAME
+        - psion1 goes into standby right after a cold boot, so press the ON button
 
         More info:
             http://archive.psion2.org/org2/techref/index.htm
@@ -46,7 +47,7 @@ uint8_t psion_state::kb_read()
 	}
 	else
 	{
-		//Read all the input lines
+		// Read all the input lines
 		for (int line = 0; line < 7; line++)
 			data &= m_kb_lines[line]->read();
 	}
@@ -605,8 +606,8 @@ void psion1_state::psion1(machine_config &config)
 	psion_2lines(config);
 
 	HD6301X0(config.replace(), m_maincpu, 3.6864_MHz_XTAL);
-	m_maincpu->nvram_enable_backup(true);
 	m_maincpu->set_addrmap(AS_PROGRAM, &psion1_state::psion1_mem);
+	m_maincpu->nvram_enable_backup(true);
 	m_maincpu->in_p2_cb().set(FUNC(psion1_state::port2_r));
 	m_maincpu->out_p2_cb().set(FUNC(psion1_state::port2_w));
 	m_maincpu->in_p5_cb().set(FUNC(psion1_state::port5_r));
