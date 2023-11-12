@@ -379,7 +379,7 @@ TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info)
 
 TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info_text)
 {
-	int flags = 0;
+	u8 flags = 0;
 
 	const u16 vram_tile = (m_textram[tile_index] & 0xffff);
 
@@ -395,7 +395,7 @@ TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info_text)
 TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info_pixel)
 {
 	int col_off;
-	int flags = 0;
+	u8 flags = 0;
 	int y_offs = (m_control_1[5] & 0x1ff);
 	if (m_flipscreen) y_offs += 0x100;
 
@@ -555,7 +555,7 @@ void taito_f3_state::video_start()
 	m_gfxdecode->gfx(2)->set_granularity(16);
 	m_gfxdecode->gfx(3)->set_granularity(16);
 
-	m_flipscreen = 0;
+	m_flipscreen = false;
 	memset(m_spriteram16_buffered.get(), 0, 0x10000);
 	memset(&m_spriteram[0], 0, 0x10000);
 
@@ -804,7 +804,7 @@ void taito_f3_state::palette_24bit_w(offs_t offset, u32 data, u32 mem_mask)
 
 inline void taito_f3_state::alpha_set_level()
 {
-	const auto set_alpha_level = [](int &d, const int s)
+	const auto set_alpha_level = [](int &d, const u8 s)
 	{
 		if (s == 0)
 		{
@@ -901,188 +901,188 @@ inline void taito_f3_state::alpha_blend_3b_2(u32 s) { alpha_blend32_d(m_alpha_s_
 
 /*============================================================================*/
 
-inline int taito_f3_state::dpix_1_noalpha(u32 s_pix) { m_dval = s_pix; return 1; }
-inline int taito_f3_state::dpix_ret1(u32 s_pix) { return 1; }
-inline int taito_f3_state::dpix_ret0(u32 s_pix) { return 0; }
-inline int taito_f3_state::dpix_1_1(u32 s_pix) { if (s_pix) alpha_blend_1_1(s_pix); return 1; }
-inline int taito_f3_state::dpix_1_2(u32 s_pix) { if (s_pix) alpha_blend_1_2(s_pix); return 1; }
-inline int taito_f3_state::dpix_1_4(u32 s_pix) { if (s_pix) alpha_blend_1_4(s_pix); return 1; }
-inline int taito_f3_state::dpix_1_5(u32 s_pix) { if (s_pix) alpha_blend_1_5(s_pix); return 1; }
-inline int taito_f3_state::dpix_1_6(u32 s_pix) { if (s_pix) alpha_blend_1_6(s_pix); return 1; }
-inline int taito_f3_state::dpix_1_8(u32 s_pix) { if (s_pix) alpha_blend_1_8(s_pix); return 1; }
-inline int taito_f3_state::dpix_1_9(u32 s_pix) { if (s_pix) alpha_blend_1_9(s_pix); return 1; }
-inline int taito_f3_state::dpix_1_a(u32 s_pix) { if (s_pix) alpha_blend_1_a(s_pix); return 1; }
+inline bool taito_f3_state::dpix_1_noalpha(u32 s_pix) { m_dval = s_pix; return true; }
+constexpr bool taito_f3_state::dpix_ret1(u32 s_pix) { return true; }
+constexpr bool taito_f3_state::dpix_ret0(u32 s_pix) { return false; }
+inline bool taito_f3_state::dpix_1_1(u32 s_pix) { if (s_pix) alpha_blend_1_1(s_pix); return true; }
+inline bool taito_f3_state::dpix_1_2(u32 s_pix) { if (s_pix) alpha_blend_1_2(s_pix); return true; }
+inline bool taito_f3_state::dpix_1_4(u32 s_pix) { if (s_pix) alpha_blend_1_4(s_pix); return true; }
+inline bool taito_f3_state::dpix_1_5(u32 s_pix) { if (s_pix) alpha_blend_1_5(s_pix); return true; }
+inline bool taito_f3_state::dpix_1_6(u32 s_pix) { if (s_pix) alpha_blend_1_6(s_pix); return true; }
+inline bool taito_f3_state::dpix_1_8(u32 s_pix) { if (s_pix) alpha_blend_1_8(s_pix); return true; }
+inline bool taito_f3_state::dpix_1_9(u32 s_pix) { if (s_pix) alpha_blend_1_9(s_pix); return true; }
+inline bool taito_f3_state::dpix_1_a(u32 s_pix) { if (s_pix) alpha_blend_1_a(s_pix); return true; }
 
-int taito_f3_state::dpix_2a_0(u32 s_pix)
+bool taito_f3_state::dpix_2a_0(u32 s_pix)
 {
 	if (s_pix) alpha_blend_2a_0(s_pix);
 	else      m_dval = 0;
-	if (m_pdest_2a) { m_pval |= m_pdest_2a; return 0; }
-	return 1;
+	if (m_pdest_2a) { m_pval |= m_pdest_2a; return false; }
+	return true;
 }
-int taito_f3_state::dpix_2a_4(u32 s_pix)
+bool taito_f3_state::dpix_2a_4(u32 s_pix)
 {
 	if (s_pix) alpha_blend_2a_4(s_pix);
-	if (m_pdest_2a) { m_pval |= m_pdest_2a; return 0; }
-	return 1;
+	if (m_pdest_2a) { m_pval |= m_pdest_2a; return false; }
+	return true;
 }
-int taito_f3_state::dpix_2a_8(u32 s_pix)
+bool taito_f3_state::dpix_2a_8(u32 s_pix)
 {
 	if (s_pix) alpha_blend_2a_8(s_pix);
-	if (m_pdest_2a) { m_pval |= m_pdest_2a; return 0; }
-	return 1;
+	if (m_pdest_2a) { m_pval |= m_pdest_2a; return false; }
+	return true;
 }
 
-int taito_f3_state::dpix_3a_0(u32 s_pix)
+bool taito_f3_state::dpix_3a_0(u32 s_pix)
 {
 	if (s_pix) alpha_blend_3a_0(s_pix);
 	else      m_dval = 0;
-	if (m_pdest_3a) { m_pval |= m_pdest_3a; return 0; }
-	return 1;
+	if (m_pdest_3a) { m_pval |= m_pdest_3a; return false; }
+	return true;
 }
-int taito_f3_state::dpix_3a_1(u32 s_pix)
+bool taito_f3_state::dpix_3a_1(u32 s_pix)
 {
 	if (s_pix) alpha_blend_3a_1(s_pix);
-	if (m_pdest_3a) { m_pval |= m_pdest_3a; return 0; }
-	return 1;
+	if (m_pdest_3a) { m_pval |= m_pdest_3a; return false; }
+	return true;
 }
-int taito_f3_state::dpix_3a_2(u32 s_pix)
+bool taito_f3_state::dpix_3a_2(u32 s_pix)
 {
 	if (s_pix) alpha_blend_3a_2(s_pix);
-	if (m_pdest_3a) { m_pval |= m_pdest_3a; return 0; }
-	return 1;
+	if (m_pdest_3a) { m_pval |= m_pdest_3a; return false; }
+	return true;
 }
 
-int taito_f3_state::dpix_2b_0(u32 s_pix)
+bool taito_f3_state::dpix_2b_0(u32 s_pix)
 {
 	if (s_pix) alpha_blend_2b_0(s_pix);
 	else      m_dval = 0;
-	if (m_pdest_2b) { m_pval |= m_pdest_2b; return 0; }
-	return 1;
+	if (m_pdest_2b) { m_pval |= m_pdest_2b; return false; }
+	return true;
 }
-int taito_f3_state::dpix_2b_4(u32 s_pix)
+bool taito_f3_state::dpix_2b_4(u32 s_pix)
 {
 	if (s_pix) alpha_blend_2b_4(s_pix);
-	if (m_pdest_2b) { m_pval |= m_pdest_2b; return 0; }
-	return 1;
+	if (m_pdest_2b) { m_pval |= m_pdest_2b; return false; }
+	return true;
 }
-int taito_f3_state::dpix_2b_8(u32 s_pix)
+bool taito_f3_state::dpix_2b_8(u32 s_pix)
 {
 	if (s_pix) alpha_blend_2b_8(s_pix);
-	if (m_pdest_2b) { m_pval |= m_pdest_2b; return 0; }
-	return 1;
+	if (m_pdest_2b) { m_pval |= m_pdest_2b; return false; }
+	return true;
 }
 
-int taito_f3_state::dpix_3b_0(u32 s_pix)
+bool taito_f3_state::dpix_3b_0(u32 s_pix)
 {
 	if (s_pix) alpha_blend_3b_0(s_pix);
 	else      m_dval = 0;
-	if (m_pdest_3b) { m_pval |= m_pdest_3b; return 0; }
-	return 1;
+	if (m_pdest_3b) { m_pval |= m_pdest_3b; return false; }
+	return true;
 }
-int taito_f3_state::dpix_3b_1(u32 s_pix)
+bool taito_f3_state::dpix_3b_1(u32 s_pix)
 {
 	if (s_pix) alpha_blend_3b_1(s_pix);
-	if (m_pdest_3b) { m_pval |= m_pdest_3b; return 0; }
-	return 1;
+	if (m_pdest_3b) { m_pval |= m_pdest_3b; return false; }
+	return true;
 }
-int taito_f3_state::dpix_3b_2(u32 s_pix)
+bool taito_f3_state::dpix_3b_2(u32 s_pix)
 {
 	if (s_pix) alpha_blend_3b_2(s_pix);
-	if (m_pdest_3b) { m_pval |= m_pdest_3b; return 0; }
-	return 1;
+	if (m_pdest_3b) { m_pval |= m_pdest_3b; return false; }
+	return true;
 }
 
-int taito_f3_state::dpix_2_0(u32 s_pix)
+bool taito_f3_state::dpix_2_0(u32 s_pix)
 {
 	const u8 tr2 = m_tval & 1;
 	if (s_pix)
 	{
-		if (tr2 == m_tr_2b)      { alpha_blend_2b_0(s_pix); if (m_pdest_2b) m_pval |= m_pdest_2b; else return 1; }
-		else if (tr2 == m_tr_2a) { alpha_blend_2a_0(s_pix); if (m_pdest_2a) m_pval |= m_pdest_2a; else return 1; }
+		if (tr2 == m_tr_2b)      { alpha_blend_2b_0(s_pix); if (m_pdest_2b) m_pval |= m_pdest_2b; else return true; }
+		else if (tr2 == m_tr_2a) { alpha_blend_2a_0(s_pix); if (m_pdest_2a) m_pval |= m_pdest_2a; else return true; }
 	}
 	else
 	{
-		if (tr2 == m_tr_2b)      { m_dval = 0; if (m_pdest_2b) m_pval |= m_pdest_2b; else return 1; }
-		else if (tr2 == m_tr_2a) { m_dval = 0; if (m_pdest_2a) m_pval |= m_pdest_2a; else return 1; }
+		if (tr2 == m_tr_2b)      { m_dval = 0; if (m_pdest_2b) m_pval |= m_pdest_2b; else return true; }
+		else if (tr2 == m_tr_2a) { m_dval = 0; if (m_pdest_2a) m_pval |= m_pdest_2a; else return true; }
 	}
-	return 0;
+	return false;
 }
-int taito_f3_state::dpix_2_4(u32 s_pix)
+bool taito_f3_state::dpix_2_4(u32 s_pix)
 {
 	const u8 tr2 = m_tval & 1;
 	if (s_pix)
 	{
-		if (tr2 == m_tr_2b)      { alpha_blend_2b_4(s_pix); if (m_pdest_2b) m_pval |= m_pdest_2b; else return 1; }
-		else if (tr2 == m_tr_2a) { alpha_blend_2a_4(s_pix); if (m_pdest_2a) m_pval |= m_pdest_2a; else return 1; }
+		if (tr2 == m_tr_2b)      { alpha_blend_2b_4(s_pix); if (m_pdest_2b) m_pval |= m_pdest_2b; else return true; }
+		else if (tr2 == m_tr_2a) { alpha_blend_2a_4(s_pix); if (m_pdest_2a) m_pval |= m_pdest_2a; else return true; }
 	}
 	else
 	{
-		if (tr2 == m_tr_2b)      { if (m_pdest_2b) m_pval |= m_pdest_2b; else return 1; }
-		else if (tr2 == m_tr_2a) { if (m_pdest_2a) m_pval |= m_pdest_2a; else return 1; }
+		if (tr2 == m_tr_2b)      { if (m_pdest_2b) m_pval |= m_pdest_2b; else return true; }
+		else if (tr2 == m_tr_2a) { if (m_pdest_2a) m_pval |= m_pdest_2a; else return true; }
 	}
-	return 0;
+	return false;
 }
-int taito_f3_state::dpix_2_8(u32 s_pix)
+bool taito_f3_state::dpix_2_8(u32 s_pix)
 {
 	const u8 tr2 = m_tval & 1;
 	if (s_pix)
 	{
-		if (tr2 == m_tr_2b)      { alpha_blend_2b_8(s_pix); if (m_pdest_2b) m_pval |= m_pdest_2b; else return 1; }
-		else if (tr2 == m_tr_2a) { alpha_blend_2a_8(s_pix); if (m_pdest_2a) m_pval |= m_pdest_2a; else return 1; }
+		if (tr2 == m_tr_2b)      { alpha_blend_2b_8(s_pix); if (m_pdest_2b) m_pval |= m_pdest_2b; else return true; }
+		else if (tr2 == m_tr_2a) { alpha_blend_2a_8(s_pix); if (m_pdest_2a) m_pval |= m_pdest_2a; else return true; }
 	}
 	else
 	{
-		if (tr2 == m_tr_2b)      { if (m_pdest_2b) m_pval |= m_pdest_2b; else return 1; }
-		else if (tr2 == m_tr_2a) { if (m_pdest_2a) m_pval |= m_pdest_2a; else return 1; }
+		if (tr2 == m_tr_2b)      { if (m_pdest_2b) m_pval |= m_pdest_2b; else return true; }
+		else if (tr2 == m_tr_2a) { if (m_pdest_2a) m_pval |= m_pdest_2a; else return true; }
 	}
-	return 0;
+	return false;
 }
 
-int taito_f3_state::dpix_3_0(u32 s_pix)
+bool taito_f3_state::dpix_3_0(u32 s_pix)
 {
 	const u8 tr2 = m_tval & 1;
 	if (s_pix)
 	{
-		if (tr2 == m_tr_3b)      { alpha_blend_3b_0(s_pix); if (m_pdest_3b) m_pval |= m_pdest_3b; else return 1; }
-		else if (tr2 == m_tr_3a) { alpha_blend_3a_0(s_pix); if (m_pdest_3a) m_pval |= m_pdest_3a; else return 1; }
+		if (tr2 == m_tr_3b)      { alpha_blend_3b_0(s_pix); if (m_pdest_3b) m_pval |= m_pdest_3b; else return true; }
+		else if (tr2 == m_tr_3a) { alpha_blend_3a_0(s_pix); if (m_pdest_3a) m_pval |= m_pdest_3a; else return true; }
 	}
 	else
 	{
-		if (tr2 == m_tr_3b)      { m_dval = 0; if (m_pdest_3b) m_pval |= m_pdest_3b; else return 1; }
-		else if (tr2 == m_tr_3a) { m_dval = 0; if (m_pdest_3a) m_pval |= m_pdest_3a; else return 1; }
+		if (tr2 == m_tr_3b)      { m_dval = 0; if (m_pdest_3b) m_pval |= m_pdest_3b; else return true; }
+		else if (tr2 == m_tr_3a) { m_dval = 0; if (m_pdest_3a) m_pval |= m_pdest_3a; else return true; }
 	}
-	return 0;
+	return false;
 }
-int taito_f3_state::dpix_3_1(u32 s_pix)
+bool taito_f3_state::dpix_3_1(u32 s_pix)
 {
 	const u8 tr2 = m_tval & 1;
 	if (s_pix)
 	{
-		if (tr2 == m_tr_3b)      { alpha_blend_3b_1(s_pix); if (m_pdest_3b) m_pval |= m_pdest_3b; else return 1; }
-		else if (tr2 == m_tr_3a) { alpha_blend_3a_1(s_pix); if (m_pdest_3a) m_pval |= m_pdest_3a; else return 1; }
+		if (tr2 == m_tr_3b)      { alpha_blend_3b_1(s_pix); if (m_pdest_3b) m_pval |= m_pdest_3b; else return true; }
+		else if (tr2 == m_tr_3a) { alpha_blend_3a_1(s_pix); if (m_pdest_3a) m_pval |= m_pdest_3a; else return true; }
 	}
 	else
 	{
-		if (tr2 == m_tr_3b)      { if (m_pdest_3b) m_pval |= m_pdest_3b; else return 1; }
-		else if (tr2 == m_tr_3a) { if (m_pdest_3a) m_pval |= m_pdest_3a; else return 1; }
+		if (tr2 == m_tr_3b)      { if (m_pdest_3b) m_pval |= m_pdest_3b; else return true; }
+		else if (tr2 == m_tr_3a) { if (m_pdest_3a) m_pval |= m_pdest_3a; else return true; }
 	}
-	return 0;
+	return false;
 }
-int taito_f3_state::dpix_3_2(u32 s_pix)
+bool taito_f3_state::dpix_3_2(u32 s_pix)
 {
 	const u8 tr2 = m_tval & 1;
 	if (s_pix)
 	{
-		if (tr2 == m_tr_3b)      { alpha_blend_3b_2(s_pix); if (m_pdest_3b) m_pval |= m_pdest_3b; else return 1; }
-		else if (tr2 == m_tr_3a) { alpha_blend_3a_2(s_pix); if (m_pdest_3a) m_pval |= m_pdest_3a; else return 1; }
+		if (tr2 == m_tr_3b)      { alpha_blend_3b_2(s_pix); if (m_pdest_3b) m_pval |= m_pdest_3b; else return true; }
+		else if (tr2 == m_tr_3a) { alpha_blend_3a_2(s_pix); if (m_pdest_3a) m_pval |= m_pdest_3a; else return true; }
 	}
 	else
 	{
-		if (tr2 == m_tr_3b)      { if (m_pdest_3b) m_pval |= m_pdest_3b; else return 1; }
-		else if (tr2 == m_tr_3a) { if (m_pdest_3a) m_pval |= m_pdest_3a; else return 1; }
+		if (tr2 == m_tr_3b)      { if (m_pdest_3b) m_pval |= m_pdest_3b; else return true; }
+		else if (tr2 == m_tr_3a) { if (m_pdest_3a) m_pval |= m_pdest_3a; else return true; }
 	}
-	return 0;
+	return false;
 }
 
 inline void taito_f3_state::dpix_1_sprite(u32 s_pix)
@@ -1331,7 +1331,7 @@ void taito_f3_state::culc_pixmap_pointer(const int skip_layer_num)
 inline void taito_f3_state::draw_scanlines(
 							bitmap_rgb32 &bitmap, int xsize, s16 *draw_line_num,
 							const f3_playfield_line_inf **line_t,
-							const int *sprite,
+							const u8 *sprite,
 							u32 orient,
 							int skip_layer_num)
 {
@@ -1358,12 +1358,12 @@ inline void taito_f3_state::draw_scanlines(
 
 	m_pdest_2a = m_alpha_level_2ad ? 0x10 : 0;
 	m_pdest_2b = m_alpha_level_2bd ? 0x20 : 0;
-	m_tr_2a =(m_alpha_level_2as == 0 && m_alpha_level_2ad == 255) ? -1 : 0;
-	m_tr_2b =(m_alpha_level_2bs == 0 && m_alpha_level_2bd == 255) ? -1 : 1;
+	m_tr_2a =(m_alpha_level_2as == 0 && m_alpha_level_2ad == 255) ? 255 : 0;
+	m_tr_2b =(m_alpha_level_2bs == 0 && m_alpha_level_2bd == 255) ? 255 : 1;
 	m_pdest_3a = m_alpha_level_3ad ? 0x40 : 0;
 	m_pdest_3b = m_alpha_level_3bd ? 0x80 : 0;
-	m_tr_3a =(m_alpha_level_3as == 0 && m_alpha_level_3ad == 255) ? -1 : 0;
-	m_tr_3b =(m_alpha_level_3bs == 0 && m_alpha_level_3bd == 255) ? -1 : 1;
+	m_tr_3a =(m_alpha_level_3as == 0 && m_alpha_level_3ad == 255) ? 255 : 0;
+	m_tr_3b =(m_alpha_level_3bs == 0 && m_alpha_level_3bd == 255) ? 255 : 1;
 
 	{
 		u32 *dsti0 = &bitmap.pix(ty, x);
@@ -1437,7 +1437,7 @@ void taito_f3_state::visible_tile_check(
 						u32 x_index_fx,u32 y_index,
 						const u16 *pf_data_n)
 {
-	const int alpha_mode = line_t->alpha_mode[line];
+	const u8 alpha_mode = line_t->alpha_mode[line];
 	if (!alpha_mode)
 		return;
 
@@ -1457,7 +1457,7 @@ void taito_f3_state::visible_tile_check(
 
 	bool trans_all = true;
 	bool opaque_all = true;
-	int alpha_type = 0;
+	u8 alpha_type = 0;
 	for (int i = 0; i < tile_num; i++)
 	{
 		const u32 tile = (pf_base[(tile_index * 2 + 0) & m_twidth_mask] << 16) | (pf_base[(tile_index * 2 + 1) & m_twidth_mask]);
@@ -1502,7 +1502,7 @@ void taito_f3_state::visible_tile_check(
 
 /******************************************************************************/
 
-void taito_f3_state::calculate_clip(int y, u16 pri, u32 &clip_in, u32 &clip_ex, int &line_enable)
+void taito_f3_state::calculate_clip(int y, u16 pri, u32 &clip_in, u32 &clip_ex, u8 &line_enable)
 {
 	const f3_spritealpha_line_inf *sa_line = &m_sa_line_inf[0];
 
@@ -1564,7 +1564,7 @@ void taito_f3_state::get_spritealphaclip_info()
 	u16 sprite_clip = 0;
 	u16 clip0_low = 0, clip0_high = 0, clip1_low = 0;
 	u16 clip2_low = 0, clip2_high = 0, clip3_low = 0;
-	int alpha_level = 0;
+	u16 alpha_level = 0;
 	u16 sprite_alpha = 0;
 
 	if (m_flipscreen)
@@ -1641,7 +1641,7 @@ void taito_f3_state::get_spritealphaclip_info()
 		/* Evaluate sprite clipping */
 		if (sprite_clip & 0xf0)
 		{
-			int line_enable = 1;
+			u8 line_enable = 1;
 			calculate_clip(y, ((sprite_clip & 0x1ff) << 4), line_t->sprite_clip_in[y], line_t->sprite_clip_ex[y], line_enable);
 			if (line_enable == 0)
 				line_t->sprite_clip_in[y] = 0x7fff7fff;
@@ -1667,13 +1667,14 @@ void taito_f3_state::get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos,
 	int y_start, y_end, y_inc;
 	int line_base, zoom_base, col_base, pri_base, pal_add_base, inc;
 
-	int line_enable;
-	int colscroll = 0, x_offset = 0, line_zoom = 0;
+	u8 line_enable;
+	u16 colscroll = 0;
+	int x_offset = 0, line_zoom = 0;
 	u32 _y_zoom[256];
 	u16 pri = 0, pal_add = 0;
 	int bit_select = 1 << pos;
 
-	int _colscroll[256];
+	u16 _colscroll[256];
 	u32 _x_offset[256];
 	int y_index_fx;
 
@@ -1819,7 +1820,7 @@ void taito_f3_state::get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos,
 		   there's some seemingly unrelated issue with the timing of y scrolling,
 		   causing the pitch to scroll ahead of crowd areas
 		*/
-		const int cs = _colscroll[y];
+		const u16 cs = _colscroll[y];
 		if (cs & 0x200)
 		{
 			if (m_tilemap[4] && m_tilemap[5])
@@ -1884,11 +1885,11 @@ void taito_f3_state::get_vram_info(tilemap_t *vram_tilemap, tilemap_t *pixel_til
 	int y_start, y_end, y_inc;
 	int pri_base, inc;
 
-	int line_enable;
+	u8 line_enable;
 
 	u16 pri = 0;
 
-	const int vram_width_mask = 0x1ff;
+	const u16 vram_width_mask = 0x1ff;
 
 	if (m_flipscreen)
 	{
@@ -2022,14 +2023,15 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 	while (1)
 	{
 		int pos;
-		int pri[5],alpha_mode[5],alpha_mode_flag[5];
+		u16 pri[5];
+		u8 alpha_mode_flag[5], alpha_mode[5];
 		u8 sprite_alpha_check;
 		u8 sprite_alpha_all_2a;
-		int layer_tmp[5];
+		u8 layer_tmp[5];
 		f3_playfield_line_inf *pf_line_inf = m_pf_line_inf.get();
 		f3_spritealpha_line_inf *sa_line_inf = m_sa_line_inf.get();
 		int count_skip_layer = 0;
-		int sprite[6] = {0, 0, 0, 0, 0, 0};
+		u8 sprite[6] = {};
 		const f3_playfield_line_inf *line_t[5];
 
 		/* find same status of scanlines */
@@ -2043,8 +2045,8 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 		alpha_mode[2] = pf_line_inf[2].alpha_mode[y_start];
 		alpha_mode[3] = pf_line_inf[3].alpha_mode[y_start];
 		alpha_mode[4] = pf_line_inf[4].alpha_mode[y_start];
-		const int alpha_level = sa_line_inf[0].alpha_level[y_start];
-		const int spri = sa_line_inf[0].spri[y_start];
+		const u16 alpha_level = sa_line_inf[0].alpha_level[y_start];
+		const u16 spri = sa_line_inf[0].spri[y_start];
 		const u16 sprite_alpha = sa_line_inf[0].sprite_alpha[y_start];
 
 		draw_line[y_start] = 1;
@@ -2103,15 +2105,14 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 			/* set alpha level */
 			if (alpha_level != m_alpha_level_last)
 			{
-				int a = alpha_level;
-				const int b = (a >> 8) & 0xf;
-				const int c = (a >> 4) & 0xf;
-				const int d = (a >> 0) & 0xf;
-				a >>= 12;
+				const u8 a = alpha_level >> 12;
+				const u8 b = alpha_level >> 8 & 0xf;
+				const u8 c = alpha_level >> 4 & 0xf;
+				const u8 d = alpha_level >> 0 & 0xf;
 
 				/* b000 7000 */
-				int al_s = std::min(255, ((15 - d) * 256) / 8);
-				int al_d = std::min(255, ((15 - b) * 256) / 8);
+				u8 al_s = std::min(255, ((15 - d) * 256) / 8);
+				u8 al_d = std::min(255, ((15 - b) * 256) / 8);
 				m_alpha_level_3as = al_s;
 				m_alpha_level_3ad = al_d;
 				m_alpha_level_2as = al_d;
@@ -2180,7 +2181,7 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 			/* check alpha level */
 			for (i = 0; i < 5; i++)    /* i = playfield num (pos) */
 			{
-				const int alpha_type = (alpha_mode_flag[i] >> 4) & 3;
+				const u8 alpha_type = (alpha_mode_flag[i] >> 4) & 3;
 
 				if (alpha_mode[i] == 2)
 				{
@@ -2236,7 +2237,7 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 				(alpha_mode[4] == 1 || alpha_mode[4] == 2 || !alpha_mode[4]) &&
 				sprite_alpha_all_2a)
 			{
-				int alpha_type = (alpha_mode_flag[0] | alpha_mode_flag[1] | alpha_mode_flag[2] | alpha_mode_flag[3]) & 0x30;
+				const u8 alpha_type = (alpha_mode_flag[0] | alpha_mode_flag[1] | alpha_mode_flag[2] | alpha_mode_flag[3]) & 0x30;
 				if ((alpha_type == 0x10 && m_alpha_level_2as == 255) ||
 					(alpha_type == 0x20 && m_alpha_level_2as == 255 && m_alpha_level_2bs == 255) ||
 					(alpha_type == 0x30 && m_alpha_level_2as == 255 && m_alpha_level_2bs == 255))
@@ -2268,8 +2269,8 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 			int pri_max_opa = -1;
 			for (i = 0; i < 5; i++)    /* i = playfield num (pos) */
 			{
-				const int p0 = pri[i];
-				const int pri_sl1 = p0 & 0x0f;
+				const u16 p0 = pri[i];
+				const u8 pri_sl1 = p0 & 0x0f;
 
 				layer_tmp[i] = i + (pri_sl1 << 3);
 
@@ -2301,7 +2302,7 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 			{
 				if (layer_tmp[i] < layer_tmp[j])
 				{
-					const int temp = layer_tmp[i];
+					const u8 temp = layer_tmp[i];
 					layer_tmp[i] = layer_tmp[j];
 					layer_tmp[j] = temp;
 				}
@@ -2310,13 +2311,13 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 
 		/* check sprite & layer priority */
 		{
-			int pri_sp[5];
+			u8 pri_sp[5];
 
-			const int l0 = layer_tmp[0] >> 3;
-			const int l1 = layer_tmp[1] >> 3;
-			const int l2 = layer_tmp[2] >> 3;
-			const int l3 = layer_tmp[3] >> 3;
-			const int l4 = layer_tmp[4] >> 3;
+			const u8 l0 = layer_tmp[0] >> 3;
+			const u8 l1 = layer_tmp[1] >> 3;
+			const u8 l2 = layer_tmp[2] >> 3;
+			const u8 l3 = layer_tmp[3] >> 3;
+			const u8 l4 = layer_tmp[4] >> 3;
 
 			pri_sp[0] =  spri & 0xf;
 			pri_sp[1] = (spri >> 4) & 0xf;
@@ -2325,9 +2326,9 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 
 			for (i = 0; i < 4; i++)    /* i = sprite priority offset */
 			{
-				const int sflg = 1 << i;
+				const u8 sflg = 1 << i;
 				if (!(m_sprite_pri_usage & sflg)) continue;
-				int sp = pri_sp[i];
+				u8 sp = pri_sp[i];
 
 				/*
 				    sprite priority==playfield priority
@@ -2361,7 +2362,7 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 
 			if (alpha_mode[pos] > 1)
 			{
-				int alpha_type = (((alpha_mode_flag[pos] >> 4) & 3) - 1) * 2;
+				const u8 alpha_type = (((alpha_mode_flag[pos] >> 4) & 3) - 1) * 2;
 				m_dpix_lp[i] = m_dpix_n[alpha_mode[pos]+alpha_type];
 				alpha = true;
 			}
@@ -2384,8 +2385,8 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 inline void taito_f3_state::f3_drawgfx(bitmap_rgb32 &dest_bmp, const rectangle &clip,
 		gfx_element *gfx,
 		int code,
-		int color,
-		int flipx, int flipy,
+		u8 color,
+		bool flipx, bool flipy,
 		int sx, int sy,
 		u8 pri_dst)
 {
@@ -2529,10 +2530,10 @@ inline void taito_f3_state::f3_drawgfx(bitmap_rgb32 &dest_bmp, const rectangle &
 inline void taito_f3_state::f3_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangle &clip,
 		gfx_element *gfx,
 		int code,
-		int color,
-		int flipx, int flipy,
+		u8 color,
+		bool flipx, bool flipy,
 		int sx, int sy,
-		int scalex, int scaley,
+		u16 scalex, u16 scaley,
 		u8 pri_dst)
 {
 	rectangle myclip;
@@ -2638,7 +2639,7 @@ inline void taito_f3_state::f3_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectang
 
 void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 {
-	const auto calc_zoom = [](int &addition, int &addition_left, const int block_zoom)
+	const auto calc_zoom = [](u16 &addition, u8 &addition_left, const u8 block_zoom)
 	{
 		addition = 0x100 - block_zoom + addition_left;
 		addition_left = addition & 0xf;
@@ -2649,25 +2650,26 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 	const rectangle &visarea = m_screen->visible_area();
 	const int min_x = visarea.min_x, max_x = visarea.max_x;
 	const int min_y = visarea.min_y, max_y = visarea.max_y;
-	int global_x = 0,global_y = 0, subglobal_x = 0, subglobal_y = 0;
-	int block_x = 0, block_y = 0;
-	int last_color = 0, last_x = 0, last_y = 0,block_zoom_x = 0,block_zoom_y = 0;
-	int this_x, this_y;
-	int y_addition = 16, x_addition = 16;
-	int multi = 0;
+	s16 global_x = 0, global_y = 0, subglobal_x = 0, subglobal_y = 0; // 12-bit signed values, extended to 16 bits
+	s16 block_x = 0, block_y = 0;
+	s16 last_x = 0, last_y = 0;
+	u8 block_zoom_x = 0, block_zoom_y = 0;
+	s16 this_x, this_y; // 12-bit signed values, extended to 16 bits
+	u16 y_addition = 16, x_addition = 16;
+	bool multi = false;
 
-	int x_addition_left = 8, y_addition_left = 8;
+	u8 x_addition_left = 8, y_addition_left = 8;
 
 	tempsprite *sprite_ptr = &m_spritelist[0];
 
 	int total_sprites = 0;
 
-	int color = 0;
-	int flipx = 0, flipy = 0;
+	u8 color = 0, last_color = 0;
+	bool flipx = 0, flipy = 0;
 	//int old_x = 0;
-	int y = 0, x = 0;
+	s16 y = 0, x = 0;
 
-	int sprite_top = 0x2000;
+	u16 sprite_top = 0x2000;
 	for (int offs = 0; offs < sprite_top && (total_sprites < 0x400); offs += 8)
 	{
 		const int current_offs = offs; /* Offs can change during loop, current_offs cannot */
@@ -2738,7 +2740,7 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 
 		/* A real sprite to process! */
 		const int sprite = (spriteram16_ptr[current_offs + 0 + 0]) | ((spriteram16_ptr[current_offs + 4 + 1] & 1) << 16);
-		const int spritecont = spriteram16_ptr[current_offs + 4 + 0] >> 8;
+		const u8 spritecont = spriteram16_ptr[current_offs + 4 + 0] >> 8;
 
 /* These games either don't set the XY control bits properly (68020 bug?), or
     have some different mode from the others */
@@ -2751,7 +2753,7 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 		if (multi)
 		{
 			/* Bit 0x4 is 'use previous colour' for this block part */
-			if (spritecont & 0x4) color=last_color;
+			if (spritecont & 0x4) color = last_color;
 			else color = (spriteram16_ptr[current_offs + 4 + 0]) & 0xff;
 
 #ifdef DARIUSG_KLUDGE
@@ -2764,8 +2766,8 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 						x = block_x;
 					else
 					{
-						this_x = spriteram16_ptr[current_offs + 2 + 0];
-						if (this_x & 0x800) this_x = 0 - (0x800 - (this_x & 0x7ff)); else this_x &= 0x7ff;
+						this_x = spriteram16_ptr[current_offs + 2 + 0] & 0xfff;
+						if (this_x & 0x800) this_x -= 0x1000; // 12->16 sign extension
 
 						if ((spriteram16_ptr[current_offs + 2 + 0]) & 0x8000)
 							this_x += 0;
@@ -2774,7 +2776,8 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 						else /* Apply both scroll offsets */
 							this_x += global_x + subglobal_x;
 
-						x = block_x = this_x;
+						block_x = this_x;
+						x = this_x;
 					}
 					x_addition_left = 8;
 					calc_zoom(x_addition, x_addition_left, block_zoom_x);
@@ -2792,8 +2795,8 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 						y = block_y;
 					else
 					{
-						this_y = spriteram16_ptr[current_offs + 2 + 1] & 0xffff;
-						if (this_y & 0x800) this_y = 0 - (0x800 - (this_y & 0x7ff)); else this_y &= 0x7ff;
+						this_y = spriteram16_ptr[current_offs + 2 + 1] & 0xfff;
+						if (this_y & 0x800) this_y -= 0x1000; // 12->16 sign extension
 
 						if ((spriteram16_ptr[current_offs + 2 + 0]) & 0x8000)
 							this_y += 0;
@@ -2802,7 +2805,8 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 						else /* Apply both scroll offsets */
 							this_y += global_y + subglobal_y;
 
-						y = block_y = this_y;
+						block_y = this_y;
+						y = this_y;
 					}
 					y_addition_left = 8;
 					calc_zoom(y_addition, y_addition_left, block_zoom_y);
@@ -2850,10 +2854,10 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 			last_color = color;
 
 			/* Sprite positioning */
-			this_y = spriteram16_ptr[current_offs + 2 + 1] & 0xffff;
-			this_x = spriteram16_ptr[current_offs + 2 + 0] & 0xffff;
-			if (this_y & 0x800) this_y = 0 - (0x800 - (this_y & 0x7ff)); else this_y &= 0x7ff;
-			if (this_x & 0x800) this_x = 0 - (0x800 - (this_x & 0x7ff)); else this_x &= 0x7ff;
+			this_y = spriteram16_ptr[current_offs + 2 + 1] & 0xfff;
+			this_x = spriteram16_ptr[current_offs + 2 + 0] & 0xfff;
+			if (this_y & 0x800) this_y -= 0x1000; // 12->16 sign extension
+			if (this_x & 0x800) this_x -= 0x1000; // 12->16 sign extension
 
 			/* Ignore both scroll offsets for this block */
 			if ((spriteram16_ptr[current_offs + 2 + 0]) & 0x8000)
@@ -2872,12 +2876,13 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 				this_y += global_y + subglobal_y;
 			}
 
-			block_y = y = this_y;
-			block_x = x = this_x;
+			y = this_y;
+			block_y = this_y;
+			x = this_x;
+			block_x = this_x;
 
 			block_zoom_x = spriteram16_ptr[current_offs + 0 + 1];
-			block_zoom_y = (block_zoom_x >> 8) & 0xff;
-			block_zoom_x &= 0xff;
+			block_zoom_y = spriteram16_ptr[current_offs + 0 + 1] >> 8;
 
 			x_addition_left = 8;
 			calc_zoom(x_addition, x_addition_left, block_zoom_x);
@@ -2890,7 +2895,7 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 		flipx = spritecont & 0x1;
 		flipy = spritecont & 0x2;
 		multi = spritecont & 0x8;
-		last_x=x;
+		last_x = x;
 		last_y = y;
 
 		if (!sprite) continue;
@@ -2942,7 +2947,7 @@ void taito_f3_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 	{
 		sprite_ptr--;
 
-		const int pri = sprite_ptr->pri;
+		const u8 pri = sprite_ptr->pri;
 		m_sprite_pri_usage |= 1 << pri;
 
 		if (sprite_ptr->zoomx == 16 && sprite_ptr->zoomy == 16)
