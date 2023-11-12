@@ -802,47 +802,51 @@ void taito_f3_state::palette_24bit_w(offs_t offset, u32 data, u32 mem_mask)
 
 /*============================================================================*/
 
-#define SET_ALPHA_LEVEL(d, s)           \
-{                                       \
-	int level = s;                      \
-	if (level == 0) level = -1;         \
-	d = level + 1;                      \
-}
-
 inline void taito_f3_state::alpha_set_level()
 {
-//  SET_ALPHA_LEVEL(m_alpha_s_1_1, m_alpha_level_2ad)
-	SET_ALPHA_LEVEL(m_alpha_s_1_1, 255 - m_alpha_level_2as)
-//  SET_ALPHA_LEVEL(m_alpha_s_1_2, m_alpha_level_2bd)
-	SET_ALPHA_LEVEL(m_alpha_s_1_2, 255 - m_alpha_level_2bs)
-	SET_ALPHA_LEVEL(m_alpha_s_1_4, m_alpha_level_3ad)
-//  SET_ALPHA_LEVEL(m_alpha_s_1_5, m_alpha_level_3ad*m_alpha_level_2ad / 255)
-	SET_ALPHA_LEVEL(m_alpha_s_1_5, m_alpha_level_3ad * (255 - m_alpha_level_2as) / 255)
-//  SET_ALPHA_LEVEL(m_alpha_s_1_6, m_alpha_level_3ad*m_alpha_level_2bd / 255)
-	SET_ALPHA_LEVEL(m_alpha_s_1_6, m_alpha_level_3ad * (255 - m_alpha_level_2bs) / 255)
-	SET_ALPHA_LEVEL(m_alpha_s_1_8, m_alpha_level_3bd)
-//  SET_ALPHA_LEVEL(m_alpha_s_1_9, m_alpha_level_3bd*m_alpha_level_2ad / 255)
-	SET_ALPHA_LEVEL(m_alpha_s_1_9, m_alpha_level_3bd * (255 - m_alpha_level_2as) / 255)
-//  SET_ALPHA_LEVEL(m_alpha_s_1_a, m_alpha_level_3bd*m_alpha_level_2bd / 255)
-	SET_ALPHA_LEVEL(m_alpha_s_1_a, m_alpha_level_3bd * (255 - m_alpha_level_2bs) / 255)
+	const auto set_alpha_level = [](int &d, const int s)
+	{
+		if (s == 0)
+		{
+			d = 0;
+		}
+		else
+		{
+			d = s + 1;
+		}
+	};
 
-	SET_ALPHA_LEVEL(m_alpha_s_2a_0, m_alpha_level_2as)
-	SET_ALPHA_LEVEL(m_alpha_s_2a_4, m_alpha_level_2as * m_alpha_level_3ad / 255)
-	SET_ALPHA_LEVEL(m_alpha_s_2a_8, m_alpha_level_2as * m_alpha_level_3bd / 255)
+//  set_alpha_level(m_alpha_s_1_1, m_alpha_level_2ad);
+	set_alpha_level(m_alpha_s_1_1, 255 - m_alpha_level_2as);
+//  set_alpha_level(m_alpha_s_1_2, m_alpha_level_2bd);
+	set_alpha_level(m_alpha_s_1_2, 255 - m_alpha_level_2bs);
+	set_alpha_level(m_alpha_s_1_4, m_alpha_level_3ad);
+//  set_alpha_level(m_alpha_s_1_5, m_alpha_level_3ad*m_alpha_level_2ad / 255);
+	set_alpha_level(m_alpha_s_1_5, m_alpha_level_3ad * (255 - m_alpha_level_2as) / 255);
+//  set_alpha_level(m_alpha_s_1_6, m_alpha_level_3ad*m_alpha_level_2bd / 255);
+	set_alpha_level(m_alpha_s_1_6, m_alpha_level_3ad * (255 - m_alpha_level_2bs) / 255);
+	set_alpha_level(m_alpha_s_1_8, m_alpha_level_3bd);
+//  set_alpha_level(m_alpha_s_1_9, m_alpha_level_3bd*m_alpha_level_2ad / 255);
+	set_alpha_level(m_alpha_s_1_9, m_alpha_level_3bd * (255 - m_alpha_level_2as) / 255);
+//  set_alpha_level(m_alpha_s_1_a, m_alpha_level_3bd*m_alpha_level_2bd / 255);
+	set_alpha_level(m_alpha_s_1_a, m_alpha_level_3bd * (255 - m_alpha_level_2bs) / 255);
 
-	SET_ALPHA_LEVEL(m_alpha_s_2b_0, m_alpha_level_2bs)
-	SET_ALPHA_LEVEL(m_alpha_s_2b_4, m_alpha_level_2bs * m_alpha_level_3ad / 255)
-	SET_ALPHA_LEVEL(m_alpha_s_2b_8, m_alpha_level_2bs * m_alpha_level_3bd / 255)
+	set_alpha_level(m_alpha_s_2a_0, m_alpha_level_2as);
+	set_alpha_level(m_alpha_s_2a_4, m_alpha_level_2as * m_alpha_level_3ad / 255);
+	set_alpha_level(m_alpha_s_2a_8, m_alpha_level_2as * m_alpha_level_3bd / 255);
 
-	SET_ALPHA_LEVEL(m_alpha_s_3a_0, m_alpha_level_3as)
-	SET_ALPHA_LEVEL(m_alpha_s_3a_1, m_alpha_level_3as * m_alpha_level_2ad / 255)
-	SET_ALPHA_LEVEL(m_alpha_s_3a_2, m_alpha_level_3as * m_alpha_level_2bd / 255)
+	set_alpha_level(m_alpha_s_2b_0, m_alpha_level_2bs);
+	set_alpha_level(m_alpha_s_2b_4, m_alpha_level_2bs * m_alpha_level_3ad / 255);
+	set_alpha_level(m_alpha_s_2b_8, m_alpha_level_2bs * m_alpha_level_3bd / 255);
 
-	SET_ALPHA_LEVEL(m_alpha_s_3b_0, m_alpha_level_3bs)
-	SET_ALPHA_LEVEL(m_alpha_s_3b_1, m_alpha_level_3bs * m_alpha_level_2ad / 255)
-	SET_ALPHA_LEVEL(m_alpha_s_3b_2, m_alpha_level_3bs * m_alpha_level_2bd / 255)
+	set_alpha_level(m_alpha_s_3a_0, m_alpha_level_3as);
+	set_alpha_level(m_alpha_s_3a_1, m_alpha_level_3as * m_alpha_level_2ad / 255);
+	set_alpha_level(m_alpha_s_3a_2, m_alpha_level_3as * m_alpha_level_2bd / 255);
+
+	set_alpha_level(m_alpha_s_3b_0, m_alpha_level_3bs);
+	set_alpha_level(m_alpha_s_3b_1, m_alpha_level_3bs * m_alpha_level_2ad / 255);
+	set_alpha_level(m_alpha_s_3b_2, m_alpha_level_3bs * m_alpha_level_2bd / 255);
 }
-#undef SET_ALPHA_LEVEL
 
 /*============================================================================*/
 
@@ -1258,33 +1262,43 @@ void taito_f3_state::init_alpha_blend_func()
 
 /******************************************************************************/
 
-#define GET_PIXMAP_POINTER(pf_num) \
-{ \
-	const f3_playfield_line_inf *line_tmp = line_t[pf_num]; \
-	m_src[pf_num] = line_tmp->src[y]; \
-	m_src_s[pf_num] = line_tmp->src_s[y]; \
-	m_src_e[pf_num] = line_tmp->src_e[y]; \
-	m_tsrc[pf_num] = line_tmp->tsrc[y]; \
-	m_tsrc_s[pf_num] = line_tmp->tsrc_s[y]; \
-	m_x_count[pf_num] = line_tmp->x_count[y]; \
-	m_x_zoom[pf_num] = line_tmp->x_zoom[y]; \
-	m_clip_al[pf_num] = line_tmp->clip_in[y] & 0xffff; \
-	m_clip_ar[pf_num] = line_tmp->clip_in[y] >> 16; \
-	m_clip_bl[pf_num] = line_tmp->clip_ex[y] & 0xffff; \
-	m_clip_br[pf_num] = line_tmp->clip_ex[y] >> 16; \
-	m_pal_add[pf_num] = line_tmp->pal_add[y]; \
+void taito_f3_state::get_pixmap_pointer(const int skip_layer_num, const f3_playfield_line_inf **line_t, const int y)
+{
+	for(int pf_num = skip_layer_num; pf_num < 5; ++pf_num)
+	{
+		const f3_playfield_line_inf *line_tmp = line_t[pf_num];
+		m_src[pf_num] = line_tmp->src[y];
+		m_src_s[pf_num] = line_tmp->src_s[y];
+		m_src_e[pf_num] = line_tmp->src_e[y];
+		m_tsrc[pf_num] = line_tmp->tsrc[y];
+		m_tsrc_s[pf_num] = line_tmp->tsrc_s[y];
+		m_x_count[pf_num] = line_tmp->x_count[y];
+		m_x_zoom[pf_num] = line_tmp->x_zoom[y];
+		m_clip_al[pf_num] = line_tmp->clip_in[y] & 0xffff;
+		m_clip_ar[pf_num] = line_tmp->clip_in[y] >> 16;
+		m_clip_bl[pf_num] = line_tmp->clip_ex[y] & 0xffff;
+		m_clip_br[pf_num] = line_tmp->clip_ex[y] >> 16;
+		m_pal_add[pf_num] = line_tmp->pal_add[y];
+	}
 }
 
-#define CULC_PIXMAP_POINTER(pf_num) \
-{ \
-	m_x_count[pf_num] += m_x_zoom[pf_num]; \
-	if (m_x_count[pf_num] >> 16) \
-	{ \
-		m_x_count[pf_num] &= 0xffff; \
-		m_src[pf_num]++; \
-		m_tsrc[pf_num]++; \
-		if (m_src[pf_num] == m_src_e[pf_num]) { m_src[pf_num] = m_src_s[pf_num]; m_tsrc[pf_num] = m_tsrc_s[pf_num]; } \
-	} \
+void taito_f3_state::culc_pixmap_pointer(const int skip_layer_num)
+{
+	for (int pf_num = skip_layer_num; pf_num < 5; ++pf_num)
+	{
+		m_x_count[pf_num] += m_x_zoom[pf_num];
+		if (m_x_count[pf_num] >> 16)
+		{
+			m_x_count[pf_num] &= 0xffff;
+			m_src[pf_num]++;
+			m_tsrc[pf_num]++;
+			if (m_src[pf_num] == m_src_e[pf_num])
+			{
+				m_src[pf_num] = m_src_s[pf_num];
+				m_tsrc[pf_num] = m_tsrc_s[pf_num];
+			}
+		}
+	}
 }
 
 #define UPDATE_PIXMAP_SP(pf_num) \
@@ -1366,14 +1380,7 @@ inline void taito_f3_state::draw_scanlines(
 			u32 *dsti = dsti0;
 			u8 *dstp = dstp0;
 
-			switch (skip_layer_num)
-			{
-				case 0: GET_PIXMAP_POINTER(0) [[fallthrough]];
-				case 1: GET_PIXMAP_POINTER(1) [[fallthrough]];
-				case 2: GET_PIXMAP_POINTER(2) [[fallthrough]];
-				case 3: GET_PIXMAP_POINTER(3) [[fallthrough]];
-				case 4: GET_PIXMAP_POINTER(4)
-			}
+			get_pixmap_pointer(skip_layer_num, line_t, y);
 
 			while (1)
 			{
@@ -1400,14 +1407,7 @@ inline void taito_f3_state::draw_scanlines(
 				dstp++;
 				cx++;
 
-				switch (skip_layer_num)
-				{
-					case 0: CULC_PIXMAP_POINTER(0) [[fallthrough]];
-					case 1: CULC_PIXMAP_POINTER(1) [[fallthrough]];
-					case 2: CULC_PIXMAP_POINTER(2) [[fallthrough]];
-					case 3: CULC_PIXMAP_POINTER(3) [[fallthrough]];
-					case 4: CULC_PIXMAP_POINTER(4)
-				}
+				culc_pixmap_pointer(skip_layer_num);
 			}
 
 			i++;
@@ -1428,8 +1428,6 @@ inline void taito_f3_state::draw_scanlines(
 		}
 	}
 }
-#undef GET_PIXMAP_POINTER
-#undef CULC_PIXMAP_POINTER
 
 /******************************************************************************/
 
@@ -2383,31 +2381,6 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 
 /******************************************************************************/
 
-#define PSET_T                  \
-	c = *source & m_sprite_pen_mask; \
-	if (c)                       \
-	{                           \
-		p = *pri;                 \
-		if (!p || p == 0xff)       \
-		{                       \
-			*dest = pal[c];     \
-			*pri = pri_dst;     \
-		}                       \
-	}
-
-#define PSET_O                  \
-	p = *pri;                     \
-	if (!p || p == 0xff)           \
-	{                           \
-		*dest = pal[*source & m_sprite_pen_mask];    \
-		*pri = pri_dst;         \
-	}
-
-#define NEXT_P                  \
-	source += dx;               \
-	dest++;                     \
-	pri++;
-
 inline void taito_f3_state::f3_drawgfx(bitmap_rgb32 &dest_bmp, const rectangle &clip,
 		gfx_element *gfx,
 		int code,
@@ -2489,7 +2462,8 @@ inline void taito_f3_state::f3_drawgfx(bitmap_rgb32 &dest_bmp, const rectangle &
 //              if (dest_bmp.bpp == 32)
 				{
 					int y = ey - sy;
-					const int x = (ex - sx - 1) | (m_tile_opaque_sp[code % gfx->elements()] << 4);
+					// x_base range: 0-31
+					const int x_base = (ex - sx - 1) | (m_tile_opaque_sp[code % gfx->elements()] << 4);
 					const u8 *source0 = code_base + y_index * 16 + x_index_base;
 					u32 *dest0 = &dest_bmp.pix(sy, sx);
 					u8 *pri0 = &m_pri_alp_bitmap.pix(sy, sx);
@@ -2502,43 +2476,43 @@ inline void taito_f3_state::f3_drawgfx(bitmap_rgb32 &dest_bmp, const rectangle &
 						u32 *dest = dest0;
 						u8 *pri = pri0;
 
-						switch (x)
+						if (x_base > 15)
 						{
-							int c;
-							u8 p;
-							case 31: PSET_O NEXT_P [[fallthrough]];
-							case 30: PSET_O NEXT_P [[fallthrough]];
-							case 29: PSET_O NEXT_P [[fallthrough]];
-							case 28: PSET_O NEXT_P [[fallthrough]];
-							case 27: PSET_O NEXT_P [[fallthrough]];
-							case 26: PSET_O NEXT_P [[fallthrough]];
-							case 25: PSET_O NEXT_P [[fallthrough]];
-							case 24: PSET_O NEXT_P [[fallthrough]];
-							case 23: PSET_O NEXT_P [[fallthrough]];
-							case 22: PSET_O NEXT_P [[fallthrough]];
-							case 21: PSET_O NEXT_P [[fallthrough]];
-							case 20: PSET_O NEXT_P [[fallthrough]];
-							case 19: PSET_O NEXT_P [[fallthrough]];
-							case 18: PSET_O NEXT_P [[fallthrough]];
-							case 17: PSET_O NEXT_P [[fallthrough]];
-							case 16: PSET_O break;
+							// pset_o
+							for(int x = x_base & 0xf; x > -1; --x)
+							{
+								const u8 p = *pri;
+								if (!p || p == 0xff)
+								{
+									*dest = pal[*source & m_sprite_pen_mask];
+									*pri = pri_dst;
+								}
 
-							case 15: PSET_T NEXT_P [[fallthrough]];
-							case 14: PSET_T NEXT_P [[fallthrough]];
-							case 13: PSET_T NEXT_P [[fallthrough]];
-							case 12: PSET_T NEXT_P [[fallthrough]];
-							case 11: PSET_T NEXT_P [[fallthrough]];
-							case 10: PSET_T NEXT_P [[fallthrough]];
-							case  9: PSET_T NEXT_P [[fallthrough]];
-							case  8: PSET_T NEXT_P [[fallthrough]];
-							case  7: PSET_T NEXT_P [[fallthrough]];
-							case  6: PSET_T NEXT_P [[fallthrough]];
-							case  5: PSET_T NEXT_P [[fallthrough]];
-							case  4: PSET_T NEXT_P [[fallthrough]];
-							case  3: PSET_T NEXT_P [[fallthrough]];
-							case  2: PSET_T NEXT_P [[fallthrough]];
-							case  1: PSET_T NEXT_P [[fallthrough]];
-							case  0: PSET_T
+								source += dx;
+								dest++;
+								pri++;
+							}
+						}
+						else
+						{
+							//pset_t
+							for(int x = x_base; x > -1; --x)
+							{
+								const u8 c = *source & m_sprite_pen_mask;
+								if (c)
+								{
+									const u8 p = *pri;
+									if (!p || p == 0xff)
+									{
+										*dest = pal[c];
+										*pri = pri_dst;
+									}
+								}
+
+								source += dx;
+								dest++;
+								pri++;
+							}
 						}
 
 						if (!(--y)) break;
@@ -2551,10 +2525,6 @@ inline void taito_f3_state::f3_drawgfx(bitmap_rgb32 &dest_bmp, const rectangle &
 		}
 	}
 }
-#undef PSET_T
-#undef PSET_O
-#undef NEXT_P
-
 
 inline void taito_f3_state::f3_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangle &clip,
 		gfx_element *gfx,
@@ -2666,16 +2636,16 @@ inline void taito_f3_state::f3_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectang
 	}
 }
 
-
-#define CALC_ZOOM(p)    {                                       \
-	p##_addition = 0x100 - block_zoom_##p + p##_addition_left;  \
-	p##_addition_left = p##_addition & 0xf;                     \
-	p##_addition = p##_addition >> 4;                           \
-	/*zoom##p = p##_addition << 12; */                           \
-}
-
 void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 {
+	const auto calc_zoom = [](int &addition, int &addition_left, const int block_zoom)
+	{
+		addition = 0x100 - block_zoom + addition_left;
+		addition_left = addition & 0xf;
+		addition = addition >> 4;
+		// zoom = addition << 12;
+	};
+
 	const rectangle &visarea = m_screen->visible_area();
 	const int min_x = visarea.min_x, max_x = visarea.max_x;
 	const int min_y = visarea.min_y, max_y = visarea.max_y;
@@ -2807,12 +2777,12 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 						x = block_x = this_x;
 					}
 					x_addition_left = 8;
-					CALC_ZOOM(x)
+					calc_zoom(x_addition, x_addition_left, block_zoom_x);
 				}
 				else if ((spritecont & 0x80) != 0)
 				{
 					x = last_x + x_addition;
-					CALC_ZOOM(x)
+					calc_zoom(x_addition, x_addition_left, block_zoom_x);
 				}
 
 				/* Adjust Y Position */
@@ -2835,12 +2805,12 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 						y = block_y = this_y;
 					}
 					y_addition_left = 8;
-					CALC_ZOOM(y)
+					calc_zoom(y_addition, y_addition_left, block_zoom_y);
 				}
 				else if ((spritecont & 0x20) != 0)
 				{
 					y = last_y + y_addition;
-					CALC_ZOOM(y)
+					calc_zoom(y_addition, y_addition_left, block_zoom_y);
 				}
 			}
 			else
@@ -2851,24 +2821,24 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 				{
 					x = block_x;
 					x_addition_left = 8;
-					CALC_ZOOM(x)
+					calc_zoom(x_addition, x_addition_left, block_zoom_x);
 				}
 				else if ((spritecont & 0x80) != 0)
 				{
 					x = last_x + x_addition;
-					CALC_ZOOM(x)
+					calc_zoom(x_addition, x_addition_left, block_zoom_x);
 				}
 				/* Adjust Y Position */
 				if ((spritecont & 0x10) == 0)
 				{
 					y = block_y;
 					y_addition_left = 8;
-					CALC_ZOOM(y)
+					calc_zoom(y_addition, y_addition_left, block_zoom_y);
 				}
 				else if ((spritecont & 0x20) != 0)
 				{
 					y = last_y + y_addition;
-					CALC_ZOOM(y)
+					calc_zoom(y_addition, y_addition_left, block_zoom_y);
 				}
 				/* Both zero = reread block latch? */
 			}
@@ -2910,10 +2880,10 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 			block_zoom_x &= 0xff;
 
 			x_addition_left = 8;
-			CALC_ZOOM(x)
+			calc_zoom(x_addition, x_addition_left, block_zoom_x);
 
 			y_addition_left = 8;
-			CALC_ZOOM(y)
+			calc_zoom(y_addition, y_addition_left, block_zoom_y);
 		}
 
 		/* These features are common to sprite and block parts */
@@ -2956,8 +2926,6 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 	}
 	m_sprite_end = sprite_ptr;
 }
-#undef CALC_ZOOM
-
 
 void taito_f3_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {

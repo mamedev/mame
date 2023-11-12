@@ -369,6 +369,8 @@ protected:
 	void dpix_1_sprite(u32 s_pix);
 	void dpix_bg(u32 bgcolor);
 	void init_alpha_blend_func();
+	void get_pixmap_pointer(const int skip_layer_num, const f3_playfield_line_inf **line_t, const int y);
+	void culc_pixmap_pointer(const int skip_layer_num);
 	void draw_scanlines(bitmap_rgb32 &bitmap, int xsize, s16 *draw_line_num, const f3_playfield_line_inf **line_t, const int *sprite, u32 orient, int skip_layer_num);
 	void visible_tile_check(f3_playfield_line_inf *line_t, int line, u32 x_index_fx, u32 y_index, const u16 *pf_data_n);
 	void calculate_clip(int y, u16 pri, u32 &clip_in, u32 &clip_ex, int &line_enable);
