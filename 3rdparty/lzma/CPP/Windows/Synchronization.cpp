@@ -19,6 +19,30 @@ namespace NSynchronization {
 DWORD WaitForMultipleObjects(DWORD count, const HANDLE *handles, BOOL wait_all, DWORD timeout);
 */
 
+/* clang: we need to place some virtual functions in cpp file to rid off the warning:
+   'CBaseHandle_WFMO' has no out-of-line virtual method definitions;
+   its vtable will be emitted in every translation unit */
+CBaseHandle_WFMO::~CBaseHandle_WFMO()
+{
+}
+
+bool CBaseEvent_WFMO::IsSignaledAndUpdate()
+{
+  if (this->_state == false)
+    return false;
+  if (this->_manual_reset == false)
+    this->_state = false;
+  return true;
+}
+
+bool CSemaphore_WFMO::IsSignaledAndUpdate()
+{
+  if (this->_count == 0)
+    return false;
+  this->_count--;
+  return true;
+}
+
 DWORD WINAPI WaitForMultiObj_Any_Infinite(DWORD count, const CHandle_WFMO *handles)
 {
   if (count < 1)

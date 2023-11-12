@@ -1,7 +1,7 @@
 // List.h
 
-#ifndef __LIST_H
-#define __LIST_H
+#ifndef ZIP7_INC_LIST_H
+#define ZIP7_INC_LIST_H
 
 #include "../../../Common/Wildcard.h"
 
@@ -28,10 +28,10 @@ HRESULT ListArchives(
     bool processAltStreams, bool showAltStreams,
     const NWildcard::CCensorNode &wildcardCensor,
     bool enableHeaders, bool techMode,
-  #ifndef _NO_CRYPTO
+  #ifndef Z7_NO_CRYPTO
     bool &passwordEnabled, UString &password,
   #endif
-  #ifndef _SFX
+  #ifndef Z7_SFX
     const CObjectVector<CProperty> *props,
   #endif
     UInt64 &errors,

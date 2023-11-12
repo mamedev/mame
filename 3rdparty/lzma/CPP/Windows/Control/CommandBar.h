@@ -1,7 +1,7 @@
 // Windows/Control/CommandBar.h
   
-#ifndef __WINDOWS_CONTROL_COMMANDBAR_H
-#define __WINDOWS_CONTROL_COMMANDBAR_H
+#ifndef ZIP7_INC_WINDOWS_CONTROL_COMMANDBAR_H
+#define ZIP7_INC_WINDOWS_CONTROL_COMMANDBAR_H
 
 #ifdef UNDER_CE
 
@@ -26,12 +26,12 @@ public:
   // Macros
   // void Destroy() { CommandBar_Destroy(_window); }
   // bool AddButtons(UINT numButtons, LPTBBUTTON buttons) { return BOOLToBool(SendMsg(TB_ADDBUTTONS, (WPARAM)numButtons, (LPARAM)buttons)); }
-  bool InsertButton(int iButton, LPTBBUTTON button) { return BOOLToBool(SendMsg(TB_INSERTBUTTON, (WPARAM)iButton, (LPARAM)button)); }
-  BOOL AddToolTips(UINT numToolTips, LPTSTR toolTips) { return BOOLToBool(SendMsg(TB_SETTOOLTIPS, (WPARAM)numToolTips, (LPARAM)toolTips)); }
+  // bool InsertButton(unsigned iButton, LPTBBUTTON button) { return BOOLToBool(SendMsg(TB_INSERTBUTTON, (WPARAM)iButton, (LPARAM)button)); }
+  // BOOL AddToolTips(UINT numToolTips, LPTSTR toolTips) { return BOOLToBool(SendMsg(TB_SETTOOLTIPS, (WPARAM)numToolTips, (LPARAM)toolTips)); }
   void AutoSize() { SendMsg(TB_AUTOSIZE, 0, 0); }
 
-  bool AddAdornments(DWORD dwFlags) { return BOOLToBool(::CommandBar_AddAdornments(_window, dwFlags, 0)); }
-  int AddBitmap(HINSTANCE hInst, int idBitmap, int iNumImages, int iImageWidth, int iImageHeight) { return ::CommandBar_AddBitmap(_window, hInst, idBitmap, iNumImages, iImageWidth, iImageHeight); }
+  // bool AddAdornments(DWORD dwFlags) { return BOOLToBool(::CommandBar_AddAdornments(_window, dwFlags, 0)); }
+  // int AddBitmap(HINSTANCE hInst, int idBitmap, int iNumImages, int iImageWidth, int iImageHeight) { return ::CommandBar_AddBitmap(_window, hInst, idBitmap, iNumImages, iImageWidth, iImageHeight); }
   bool DrawMenuBar(WORD iButton) { return BOOLToBool(::CommandBar_DrawMenuBar(_window, iButton)); }
   HMENU GetMenu(WORD iButton) { return ::CommandBar_GetMenu(_window, iButton); }
   int Height() { return CommandBar_Height(_window); }

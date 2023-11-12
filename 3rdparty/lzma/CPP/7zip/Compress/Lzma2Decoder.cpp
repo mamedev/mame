@@ -21,7 +21,7 @@ CDecoder::CDecoder():
     , _finishMode(false)
     , _inBufSize(1 << 20)
     , _outStep(1 << 20)
-    #ifndef _7ZIP_ST
+    #ifndef Z7_ST
     , _tryMt(1)
     , _numThreads(1)
     , _memUsage((UInt64)(sizeof(size_t)) << 28)
@@ -34,10 +34,10 @@ CDecoder::~CDecoder()
     Lzma2DecMt_Destroy(_dec);
 }
 
-STDMETHODIMP CDecoder::SetInBufSize(UInt32 , UInt32 size) { _inBufSize = size; return S_OK; }
-STDMETHODIMP CDecoder::SetOutBufSize(UInt32 , UInt32 size) { _outStep = size; return S_OK; }
+Z7_COM7F_IMF(CDecoder::SetInBufSize(UInt32 , UInt32 size)) { _inBufSize = size; return S_OK; }
+Z7_COM7F_IMF(CDecoder::SetOutBufSize(UInt32 , UInt32 size)) { _outStep = size; return S_OK; }
 
-STDMETHODIMP CDecoder::SetDecoderProperties2(const Byte *prop, UInt32 size)
+Z7_COM7F_IMF(CDecoder::SetDecoderProperties2(const Byte *prop, UInt32 size))
 {
   if (size != 1)
     return E_NOTIMPL;
@@ -48,7 +48,7 @@ STDMETHODIMP CDecoder::SetDecoderProperties2(const Byte *prop, UInt32 size)
 }
 
 
-STDMETHODIMP CDecoder::SetFinishMode(UInt32 finishMode)
+Z7_COM7F_IMF(CDecoder::SetFinishMode(UInt32 finishMode))
 {
   _finishMode = (finishMode != 0);
   return S_OK;
@@ -56,7 +56,7 @@ STDMETHODIMP CDecoder::SetFinishMode(UInt32 finishMode)
 
 
 
-#ifndef _7ZIP_ST
+#ifndef Z7_ST
 
 static UInt64 Get_ExpectedBlockSize_From_Dict(UInt32 dictSize)
 {
@@ -81,8 +81,8 @@ static UInt64 Get_ExpectedBlockSize_From_Dict(UInt32 dictSize)
 #define RET_IF_WRAP_ERROR(wrapRes, sRes, sResErrorCode) \
   if (wrapRes != S_OK /* && (sRes == SZ_OK || sRes == sResErrorCode) */) return wrapRes;
 
-STDMETHODIMP CDecoder::Code(ISequentialInStream *inStream, ISequentialOutStream *outStream,
-    const UInt64 *inSize, const UInt64 *outSize, ICompressProgressInfo *progress)
+Z7_COM7F_IMF(CDecoder::Code(ISequentialInStream *inStream, ISequentialOutStream *outStream,
+    const UInt64 *inSize, const UInt64 *outSize, ICompressProgressInfo *progress))
 {
   _inProcessed = 0;
 
@@ -102,24 +102,24 @@ STDMETHODIMP CDecoder::Code(ISequentialInStream *inStream, ISequentialOutStream 
   props.inBufSize_ST = _inBufSize;
   props.outStep_ST = _outStep;
 
-  #ifndef _7ZIP_ST
+  #ifndef Z7_ST
   {
     props.numThreads = 1;
     UInt32 numThreads = _numThreads;
 
     if (_tryMt && numThreads >= 1)
     {
-      UInt64 useLimit = _memUsage;
-      UInt32 dictSize = LZMA2_DIC_SIZE_FROM_PROP_FULL(_prop);
-      UInt64 expectedBlockSize64 = Get_ExpectedBlockSize_From_Dict(dictSize);
-      size_t expectedBlockSize = (size_t)expectedBlockSize64;
-      size_t inBlockMax = expectedBlockSize + expectedBlockSize / 16;
+      const UInt64 useLimit = _memUsage;
+      const UInt32 dictSize = LZMA2_DIC_SIZE_FROM_PROP_FULL(_prop);
+      const UInt64 expectedBlockSize64 = Get_ExpectedBlockSize_From_Dict(dictSize);
+      const size_t expectedBlockSize = (size_t)expectedBlockSize64;
+      const size_t inBlockMax = expectedBlockSize + expectedBlockSize / 16;
       if (expectedBlockSize == expectedBlockSize64 && inBlockMax >= expectedBlockSize)
       {
         props.outBlockMax = expectedBlockSize;
         props.inBlockMax = inBlockMax;
         const size_t kOverheadSize = props.inBufSize_MT + (1 << 16);
-        UInt64 okThreads = useLimit / (props.outBlockMax + props.inBlockMax + kOverheadSize);
+        const UInt64 okThreads = useLimit / (props.outBlockMax + props.inBlockMax + kOverheadSize);
         if (numThreads > okThreads)
           numThreads = (UInt32)okThreads;
         if (numThreads == 0)
@@ -143,7 +143,7 @@ STDMETHODIMP CDecoder::Code(ISequentialInStream *inStream, ISequentialOutStream 
   UInt64 inProcessed = 0;
   int isMT = False;
 
-  #ifndef _7ZIP_ST
+  #ifndef Z7_ST
   isMT = _tryMt;
   #endif
 
@@ -162,7 +162,7 @@ STDMETHODIMP CDecoder::Code(ISequentialInStream *inStream, ISequentialOutStream 
   */
 
 
-  #ifndef _7ZIP_ST
+  #ifndef Z7_ST
   /* we reset _tryMt, only if p->props.numThreads was changed */
   if (props.numThreads > 1)
     _tryMt = isMT;
@@ -186,22 +186,22 @@ STDMETHODIMP CDecoder::Code(ISequentialInStream *inStream, ISequentialOutStream 
 }
 
 
-STDMETHODIMP CDecoder::GetInStreamProcessedSize(UInt64 *value)
+Z7_COM7F_IMF(CDecoder::GetInStreamProcessedSize(UInt64 *value))
 {
   *value = _inProcessed;
   return S_OK;
 }
 
 
-#ifndef _7ZIP_ST
+#ifndef Z7_ST
 
-STDMETHODIMP CDecoder::SetNumberOfThreads(UInt32 numThreads)
+Z7_COM7F_IMF(CDecoder::SetNumberOfThreads(UInt32 numThreads))
 {
   _numThreads = numThreads;
   return S_OK;
 }
 
-STDMETHODIMP CDecoder::SetMemLimit(UInt64 memUsage)
+Z7_COM7F_IMF(CDecoder::SetMemLimit(UInt64 memUsage))
 {
   _memUsage = memUsage;
   return S_OK;
@@ -210,9 +210,9 @@ STDMETHODIMP CDecoder::SetMemLimit(UInt64 memUsage)
 #endif
 
 
-#ifndef NO_READ_FROM_CODER
+#ifndef Z7_NO_READ_FROM_CODER
 
-STDMETHODIMP CDecoder::SetOutStreamSize(const UInt64 *outSize)
+Z7_COM7F_IMF(CDecoder::SetOutStreamSize(const UInt64 *outSize))
 {
   CLzma2DecMtProps props;
   Lzma2DecMtProps_Init(&props);
@@ -230,7 +230,7 @@ STDMETHODIMP CDecoder::SetOutStreamSize(const UInt64 *outSize)
 
   _inWrap.Init(_inStream);
 
-  SRes res = Lzma2DecMt_Init(_dec, _prop, &props, outSize, _finishMode, &_inWrap.vt);
+  const SRes res = Lzma2DecMt_Init(_dec, _prop, &props, outSize, _finishMode, &_inWrap.vt);
 
   if (res != SZ_OK)
     return SResToHRESULT(res);
@@ -238,11 +238,13 @@ STDMETHODIMP CDecoder::SetOutStreamSize(const UInt64 *outSize)
 }
 
 
-STDMETHODIMP CDecoder::SetInStream(ISequentialInStream *inStream) { _inStream = inStream; return S_OK; }
-STDMETHODIMP CDecoder::ReleaseInStream() { _inStream.Release(); return S_OK; }
+Z7_COM7F_IMF(CDecoder::SetInStream(ISequentialInStream *inStream))
+  { _inStream = inStream; return S_OK; }
+Z7_COM7F_IMF(CDecoder::ReleaseInStream())
+  { _inStream.Release(); return S_OK; }
   
 
-STDMETHODIMP CDecoder::Read(void *data, UInt32 size, UInt32 *processedSize)
+Z7_COM7F_IMF(CDecoder::Read(void *data, UInt32 size, UInt32 *processedSize))
 {
   if (processedSize)
     *processedSize = 0;
@@ -250,7 +252,7 @@ STDMETHODIMP CDecoder::Read(void *data, UInt32 size, UInt32 *processedSize)
   size_t size2 = size;
   UInt64 inProcessed = 0;
 
-  SRes res = Lzma2DecMt_Read(_dec, (Byte *)data, &size2, &inProcessed);
+  const SRes res = Lzma2DecMt_Read(_dec, (Byte *)data, &size2, &inProcessed);
 
   _inProcessed += inProcessed;
   if (processedSize)

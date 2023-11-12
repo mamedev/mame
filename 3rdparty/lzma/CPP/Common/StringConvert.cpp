@@ -534,6 +534,7 @@ AString UnicodeStringToMultiByte(const UString &src, UINT codePage)
 
 
 
+#if !defined(_WIN32) || defined(ENV_HAVE_LOCALE)
 
 #ifdef _WIN32
 #define U_to_A(a, b, c)  UnicodeStringToMultiByte2
@@ -543,8 +544,6 @@ AString UnicodeStringToMultiByte(const UString &src, UINT codePage)
 #define U_to_A(a, b, c)  UnicodeStringToMultiByte2_Native(a, b)
 // #define A_to_U(a, b, c)  MultiByteToUnicodeString2_Native(a, b)
 #endif
-
-#if !defined(_WIN32) || defined(ENV_HAVE_LOCALE)
 
 bool IsNativeUTF8()
 {

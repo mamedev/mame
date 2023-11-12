@@ -2,10 +2,10 @@ PROG = 7z.sfx
 MY_FIXED = 1
 
 CFLAGS = $(CFLAGS) \
-  -DNO_REGISTRY \
-  -DEXTRACT_ONLY \
-  -DNO_READ_FROM_CODER \
-  -D_SFX \
+  -DZ7_NO_REGISTRY \
+  -DZ7_EXTRACT_ONLY \
+  -DZ7_NO_READ_FROM_CODER \
+  -DZ7_SFX \
 
 !IFDEF UNDER_CE
 LIBS = $(LIBS) ceshell.lib Commctrl.lib
@@ -131,6 +131,7 @@ CRYPTO_OBJS = \
   $O\MyAes.obj \
   
 C_OBJS = \
+  $O\7zStream.obj \
   $O\Alloc.obj \
   $O\Bcj2.obj \
   $O\Bra.obj \

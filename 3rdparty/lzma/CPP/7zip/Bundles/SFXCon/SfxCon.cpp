@@ -3,9 +3,9 @@
 #include "StdAfx.h"
 
 #include "../../../../C/CpuArch.h"
+#include "../../../../C/DllSecur.h"
 
 #include "../../../Common/MyWindows.h"
-
 #include "../../../Common/MyInitGuid.h"
 
 #include "../../../Common/CommandLineParser.h"
@@ -28,7 +28,6 @@
 
 #include "../../MyVersion.h"
 
-#include "../../../../C/DllSecur.h"
 
 using namespace NWindows;
 using namespace NFile;
@@ -36,8 +35,12 @@ using namespace NDir;
 using namespace NCommandLineParser;
 
 #ifdef _WIN32
-HINSTANCE g_hInstance = 0;
+extern
+HINSTANCE g_hInstance;
+HINSTANCE g_hInstance = NULL;
 #endif
+extern
+int g_CodePage;
 int g_CodePage = -1;
 extern CStdOutStream *g_StdStream;
 
@@ -184,14 +187,14 @@ static void PrintHelp(void)
   g_StdOut << kHelpString;
 }
 
-MY_ATTR_NORETURN
+Z7_ATTR_NORETURN
 static void ShowMessageAndThrowException(const char *message, NExitCode::EEnum code)
 {
   g_StdOut << message << endl;
   throw code;
 }
 
-MY_ATTR_NORETURN
+Z7_ATTR_NORETURN
 static void PrintHelpAndExit() // yyy
 {
   PrintHelp();
@@ -370,12 +373,12 @@ int Main2(
     }
   }
 
-  bool yesToAll = parser[NKey::kYes].ThereIs;
+  const bool yesToAll = parser[NKey::kYes].ThereIs;
 
   // NExtractMode::EEnum extractMode;
   // bool isExtractGroupCommand = command.IsFromExtractGroup(extractMode);
 
-  bool passwordEnabled = parser[NKey::kPassword].ThereIs;
+  const bool passwordEnabled = parser[NKey::kPassword].ThereIs;
 
   UString password;
   if (passwordEnabled)
@@ -403,7 +406,7 @@ int Main2(
 
     CCodecs *codecs = new CCodecs;
     CMyComPtr<
-      #ifdef EXTERNAL_CODECS
+      #ifdef Z7_EXTERNAL_CODECS
       ICompressCodecsInfo
       #else
       IUnknown
@@ -421,7 +424,7 @@ int Main2(
       CMyComPtr<IFolderArchiveExtractCallback> extractCallback = ecs;
       ecs->Init(g_StdStream, &g_StdErr, g_StdStream);
 
-      #ifndef _NO_CRYPTO
+      #ifndef Z7_NO_CRYPTO
       ecs->PasswordIsDefined = passwordEnabled;
       ecs->Password = password;
       #endif
@@ -430,7 +433,7 @@ int Main2(
       COpenCallbackConsole openCallback;
       openCallback.Init(g_StdStream, g_StdStream);
 
-      #ifndef _NO_CRYPTO
+      #ifndef Z7_NO_CRYPTO
       openCallback.PasswordIsDefined = passwordEnabled;
       openCallback.Password = password;
       #endif
@@ -452,22 +455,33 @@ int Main2(
           codecs, CObjectVector<COpenType>(), CIntVector(),
           v1, v2,
           wildcardCensorHead,
-          eo, ecs, ecs,
+          eo,
+          ecs, ecs, ecs,
           // NULL, // hash
           errorMessage, stat);
+
+      ecs->ClosePercents();
+
       if (!errorMessage.IsEmpty())
       {
-        (*g_StdStream) << endl << "Error: " << errorMessage;;
+        (*g_StdStream) << endl << "Error: " << errorMessage;
         if (result == S_OK)
           result = E_FAIL;
       }
 
-      if (ecs->NumArcsWithError != 0 || ecs->NumFileErrors != 0)
+      if (   0 != ecs->NumCantOpenArcs
+          || 0 != ecs->NumArcsWithError
+          || 0 != ecs->NumFileErrors
+          || 0 != ecs->NumOpenArcErrors)
       {
+        if (ecs->NumCantOpenArcs != 0)
+          (*g_StdStream) << endl << "Can't open as archive" << endl;
         if (ecs->NumArcsWithError != 0)
           (*g_StdStream) << endl << "Archive Errors" << endl;
         if (ecs->NumFileErrors != 0)
           (*g_StdStream) << endl << "Sub items Errors: " << ecs->NumFileErrors << endl;
+        if (ecs->NumOpenArcErrors != 0)
+          (*g_StdStream) << endl << "Open Errors: " << ecs->NumOpenArcErrors << endl;
         return NExitCode::kFatalError;
       }
       if (result != S_OK)
@@ -489,7 +503,7 @@ int Main2(
           wildcardCensorHead,
           true, // enableHeaders
           false, // techMode
-          #ifndef _NO_CRYPTO
+          #ifndef Z7_NO_CRYPTO
           passwordEnabled, password,
           #endif
           numErrors, numWarnings);

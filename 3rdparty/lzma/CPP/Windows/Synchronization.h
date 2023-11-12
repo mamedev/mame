@@ -1,7 +1,7 @@
 // Windows/Synchronization.h
 
-#ifndef __WINDOWS_SYNCHRONIZATION_H
-#define __WINDOWS_SYNCHRONIZATION_H
+#ifndef ZIP7_INC_WINDOWS_SYNCHRONIZATION_H
+#define ZIP7_INC_WINDOWS_SYNCHRONIZATION_H
 
 #include "../../C/Threads.h"
 
@@ -32,14 +32,14 @@ public:
   WRes Create(bool manualReset, bool initiallyOwn, LPCTSTR name = NULL, LPSECURITY_ATTRIBUTES sa = NULL)
   {
     _object = ::CreateEvent(sa, BoolToBOOL(manualReset), BoolToBOOL(initiallyOwn), name);
-    if (name == NULL && _object != 0)
+    if (name == NULL && _object != NULL)
       return 0;
     return ::GetLastError();
   }
   WRes Open(DWORD desiredAccess, bool inheritHandle, LPCTSTR name)
   {
     _object = ::OpenEvent(desiredAccess, BoolToBOOL(inheritHandle), name);
-    if (_object != 0)
+    if (_object != NULL)
       return 0;
     return ::GetLastError();
   }
@@ -227,8 +227,8 @@ public:
   }
   WRes Create()
   {
-    RINOK(::pthread_mutex_init(&_mutex, 0));
-    WRes ret = ::pthread_cond_init(&_cond, 0);
+    RINOK(::pthread_mutex_init(&_mutex, NULL))
+    const WRes ret = ::pthread_cond_init(&_cond, NULL);
     _isValid = 1;
     return ret;
   }
@@ -246,8 +246,8 @@ public:
   }
   WRes LeaveAndSignal()
   {
-    WRes res1 = ::pthread_cond_broadcast(&_cond);
-    WRes res2 = ::pthread_mutex_unlock(&_mutex);
+    const WRes res1 = ::pthread_cond_broadcast(&_cond);
+    const WRes res2 = ::pthread_mutex_unlock(&_mutex);
     return (res2 ? res2 : res1);
   }
 };
@@ -268,6 +268,7 @@ struct CBaseHandle_WFMO  MY_UNCOPYABLE
   CSynchro *_sync;
 
   CBaseHandle_WFMO(): _sync(NULL) {}
+  virtual ~CBaseHandle_WFMO();
 
   operator CHandle_WFMO() { return this; }
   virtual bool IsSignaledAndUpdate() = 0;
@@ -283,7 +284,7 @@ public:
 
   // bool IsCreated()  { return (this->_sync != NULL); }
   // CBaseEvent_WFMO()  { ; }
-  ~CBaseEvent_WFMO() { Close(); }
+  // ~CBaseEvent_WFMO() Z7_override { Close(); }
 
   WRes Close() { this->_sync = NULL; return 0; }
 
@@ -299,37 +300,30 @@ public:
 
   WRes Set()
   {
-    RINOK(this->_sync->Enter());
+    RINOK(this->_sync->Enter())
     this->_state = true;
     return this->_sync->LeaveAndSignal();
   }
 
   WRes Reset()
   {
-    RINOK(this->_sync->Enter());
+    RINOK(this->_sync->Enter())
     this->_state = false;
     return this->_sync->Leave();
   }
   
-  virtual bool IsSignaledAndUpdate()
-  {
-    if (this->_state == false)
-      return false;
-    if (this->_manual_reset == false)
-      this->_state = false;
-    return true;
-  }
+  virtual bool IsSignaledAndUpdate() Z7_override;
 };
 
 
-class CManualResetEvent_WFMO: public CBaseEvent_WFMO
+class CManualResetEvent_WFMO Z7_final: public CBaseEvent_WFMO
 {
 public:
   WRes Create(CSynchro *sync, bool initiallyOwn = false) { return CBaseEvent_WFMO::Create(sync, true, initiallyOwn); }
 };
 
 
-class CAutoResetEvent_WFMO: public CBaseEvent_WFMO
+class CAutoResetEvent_WFMO Z7_final: public CBaseEvent_WFMO
 {
 public:
   WRes Create(CSynchro *sync) { return CBaseEvent_WFMO::Create(sync, false, false); }
@@ -340,7 +334,7 @@ public:
 };
 
 
-class CSemaphore_WFMO : public CBaseHandle_WFMO
+class CSemaphore_WFMO Z7_final: public CBaseHandle_WFMO
 {
   UInt32 _count;
   UInt32 _maxCount;
@@ -365,11 +359,11 @@ public:
     if (releaseCount < 1)
       return EINVAL;
 
-    RINOK(this->_sync->Enter());
+    RINOK(this->_sync->Enter())
     UInt32 newCount = this->_count + releaseCount;
     if (newCount > this->_maxCount)
     {
-      RINOK(this->_sync->Leave());
+      RINOK(this->_sync->Leave())
       return ERROR_TOO_MANY_POSTS; // EINVAL
     }
     this->_count = newCount;
@@ -377,13 +371,7 @@ public:
     return this->_sync->LeaveAndSignal();
   }
 
-  virtual bool IsSignaledAndUpdate()
-  {
-    if (this->_count == 0)
-      return false;
-    this->_count--;
-    return true;
-  }
+  virtual bool IsSignaledAndUpdate() Z7_override;
 };
 
 #endif // _WIN32

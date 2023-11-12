@@ -1,14 +1,19 @@
 // HashCon.h
 
-#ifndef __HASH_CON_H
-#define __HASH_CON_H
+#ifndef ZIP7_INC_HASH_CON_H
+#define ZIP7_INC_HASH_CON_H
 
 #include "../Common/HashCalc.h"
 
 #include "UpdateCallbackConsole.h"
 
-class CHashCallbackConsole: public IHashCallbackUI, public CCallbackConsoleBase
+class CHashCallbackConsole Z7_final:
+    public IHashCallbackUI,
+    public CCallbackConsoleBase
 {
+  Z7_IFACE_IMP(IDirItemsCallback)
+  Z7_IFACE_IMP(IHashCallbackUI)
+
   UString _fileName;
   AString _s;
 
@@ -33,9 +38,7 @@ class CHashCallbackConsole: public IHashCallbackUI, public CCallbackConsoleBase
 
 public:
   bool PrintNameInPercents;
-
   bool PrintHeaders;
-  
   // bool PrintSize;
   // bool PrintNewLine; // set it too (false), if you need only hash for single file without LF char.
   AString PrintFields;
@@ -48,10 +51,6 @@ public:
       // , PrintSize(true),
       // , PrintNewLine(true)
     {}
-  
-  virtual ~CHashCallbackConsole() {}
-
-  INTERFACE_IHashCallbackUI(;)
 };
 
 void PrintHashStat(CStdOutStream &so, const CHashBundle &hb);

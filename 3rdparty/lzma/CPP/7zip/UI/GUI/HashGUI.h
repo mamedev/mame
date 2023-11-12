@@ -1,7 +1,7 @@
 // HashGUI.h
 
-#ifndef __HASH_GUI_H
-#define __HASH_GUI_H
+#ifndef ZIP7_INC_HASH_GUI_H
+#define ZIP7_INC_HASH_GUI_H
 
 #include "../Common/HashCalc.h"
 #include "../Common/Property.h"

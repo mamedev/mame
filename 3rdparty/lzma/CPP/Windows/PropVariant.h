@@ -1,7 +1,7 @@
 // Windows/PropVariant.h
 
-#ifndef __WINDOWS_PROP_VARIANT_H
-#define __WINDOWS_PROP_VARIANT_H
+#ifndef ZIP7_INC_WINDOWS_PROP_VARIANT_H
+#define ZIP7_INC_WINDOWS_PROP_VARIANT_H
 
 #include "../Common/MyTypes.h"
 #include "../Common/MyWindows.h"
@@ -64,7 +64,7 @@ public:
     // wReserved2 = 0;
     // wReserved3 = 0;
     // uhVal.QuadPart = 0;
-    bstrVal = 0;
+    bstrVal = NULL;
   }
 
 
@@ -104,13 +104,13 @@ public:
     const unsigned ns100 = wReserved2;
     if (prec == 0
         && prec <= k_PropVar_TimePrec_1ns
-        && ns100 < 100 
+        && ns100 < 100
         && wReserved3 == 0)
       return ns100;
     return 0;
   }
 
-  ~CPropVariant();
+  ~CPropVariant() throw();
   CPropVariant(const PROPVARIANT &varSrc);
   CPropVariant(const CPropVariant &varSrc);
   CPropVariant(BSTR bstrSrc);

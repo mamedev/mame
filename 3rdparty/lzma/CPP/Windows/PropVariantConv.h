@@ -1,7 +1,7 @@
 // Windows/PropVariantConv.h
 
-#ifndef __PROP_VARIANT_CONV_H
-#define __PROP_VARIANT_CONV_H
+#ifndef ZIP7_INC_PROP_VARIANT_CONV_H
+#define ZIP7_INC_PROP_VARIANT_CONV_H
 
 #include "../Common/MyTypes.h"
 

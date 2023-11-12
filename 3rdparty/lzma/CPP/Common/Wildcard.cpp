@@ -125,8 +125,8 @@ static bool EnhancedMaskTest(const wchar_t *mask, const wchar_t *name)
 {
   for (;;)
   {
-    wchar_t m = *mask;
-    wchar_t c = *name;
+    const wchar_t m = *mask;
+    const wchar_t c = *name;
     if (m == 0)
       return (c == 0);
     if (m == '*')
@@ -526,12 +526,10 @@ int CCensor::FindPairForPrefix(const UString &prefix) const
 
 bool IsDriveColonName(const wchar_t *s)
 {
-  wchar_t c = s[0];
-  return c != 0
-    && s[1] == ':'
-    && s[2] == 0
-    && ((c >= 'a' && c <= 'z')
-     || (c >= 'A' && c <= 'Z'));
+  unsigned c = s[0];
+  c |= 0x20;
+  c -= 'a';
+  return c <= (unsigned)('z' - 'a') && s[1] == ':' && s[2] == 0;
 }
 
 unsigned GetNumPrefixParts_if_DrivePath(UStringVector &pathParts)

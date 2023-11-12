@@ -77,17 +77,17 @@ HRESULT COpenCallbackConsole::Open_Finished()
 }
 
 
-#ifndef _NO_CRYPTO
+#ifndef Z7_NO_CRYPTO
 
 HRESULT COpenCallbackConsole::Open_CryptoGetTextPassword(BSTR *password)
 {
   *password = NULL;
-  RINOK(CheckBreak2());
+  RINOK(CheckBreak2())
 
   if (!PasswordIsDefined)
   {
     ClosePercents();
-    RINOK(GetPassword_HRESULT(_so, Password));
+    RINOK(GetPassword_HRESULT(_so, Password))
     PasswordIsDefined = true;
   }
   return StringToBstr(Password, password);

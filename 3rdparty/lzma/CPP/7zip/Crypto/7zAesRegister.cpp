@@ -9,7 +9,7 @@
 namespace NCrypto {
 namespace N7z {
 
-REGISTER_FILTER_E(_7zAES,
+REGISTER_FILTER_E(SzAES,
     CDecoder,
     CEncoder,
     0x6F10701, "7zAES")
