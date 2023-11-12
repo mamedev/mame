@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:smf,windyfairy
+// copyright-holders:smf, windyfairy
 /***************************************************************************
 
 Namco System 10 - Arcade PSX Hardware
@@ -13,59 +13,60 @@ Guru Readme for Namco System 10 Hardware
 Note! This document is a Work-In-Progress and will be updated from time to time when more dumps are available.
 
 This document covers all the known Namco System 10 games, including....
-*Aim For Cash (AFC2 Ver.A)                                       (C) Namco, 2004
-Ball Pom Line  (no sticker, ROM VER. B0 FEB 09 2005 15:29:02)    (C) Namco, 2005
-*Dice ROM                                                        (C) Namco, 2004
-*Dokidoki! Flower                                                (C) Namco, 2004
-***Drum Master                                                   (C) Namco, 2001
-***Drum Master 2                                                 (C) Namco, 2001
-***Drum Master 3                                                 (C) Namco, 2002
-***Drum Master 4                                                 (C) Namco, 2003
-***Drum Master 5                                                 (C) Namco, 2003
-***Drum Master 6                                                 (C) Namco, 2004
-GAHAHA Ippatsu-dou (GID2 Ver.A)                                  (C) Namco/Metro, 2000
-GAHAHA Ippatsu-dou 2 (GIS1 Ver.A)                                (C) Namco/Metro, 2001
-Gamshara (10021 Ver.A)                                           (C) Mitchell, 2003
-Gegege no Kitaro Yokai Yokocho Matsuri de Battle Ja (GYM1 Ver.A) (C) Namco, 2007
-GekiToride-Jong Space (10011 Ver.A)                              (C) Namco/Metro, 2001
-Golgo 13 Juusei no Requiem (GLT1 Ver.A)                          (C) Namco/8ing/Raizing, 2001
-Gunbalina (GNN1 Ver. A)                                          (C) Namco, 2000
-*Hard Puncher Hajime no Ippo: The Fighting                       (C) Namco/Taito, 2001
-*Hard Puncher Hajime no Ippo 2: The Fighting Round 2 (VER.2.00J) (C) Namco/Taito, 2002
-*Honne Hakkenki                                                  (C) Namco, 2001
-Keroro Gunsou Pekopon Shinryaku Shirei De Arimasu! (KRG1 Ver.A)  (C) Namco, 2006
-**Knock Down 2001 / KO2001 (KD11 Ver.B)                          (C) Namco, 2001
-Kono e Tako (RAN Ver.A, 10021 Ver.A reprogrammed Gamshara PCB)   (C) Mitchell 2003
-Kotoba no Puzzle Mojipittan (KPM1 Ver.A)                         (C) Namco, 2001
-Medal no Tatsujin ((MTL1 SPR0B)                                  (C) Namco, 2005
-Medal no Tatsujin 2 (MTA1001 STMPR0A)                            (C) Namco, 2007
-Mr Driller 2 (DR21 Ver.A)                                        (C) Namco, 2000
-Mr Driller 2 (DR22 Ver.A)                                        (C) Namco, 2000
-Mr Driller 2 (DR23 Ver.A)                                        (C) Namco, 2000
-Mr Driller G (DRG1 Ver.A)                                        (C) Namco, 2001
-NFL Classic Football (NCF3 Ver.A)                                (C) Namco, 2003
-Pacman Ball (PMB2 Ver.A)                                         (C) Namco, 2003
-Panikuru Panekuru (PPA1 Ver.A)                                   (C) Namco, 2001
-*Peter The Shepherd                                              (C) Namco, 2003
-*Photo Battle (PBT1 Ver.B)                                       (C) Namco, 2001
-Point Blank 3 (GNN2 Ver. A)                                      (C) Namco, 2000
-Puzz Ball (PZB1 Ver. A)                                          (C) Namco, 2002
-*Puzz Cube                                                       (C) Namco, 2005
-Seishun-Quiz Colorful High School (CHS1 Ver.A)                   (C) Namco, 2002
-Sekai Kaseki Hakken (Japan, SKH1 Ver.A)                          (C) Namco, 2004
-*Shamisen Brothers (KT-SB2 Ver.A + CDROM)                        (C) Kato/Konami, 2003
-*Slot no Oujisama / Slot Prince (SLO1 Ver.A)                     (C) Namco, 2003
-Slot no Oujisama / Slot Prince (SLO1 Ver.B)                      (C) Namco, 2003
-Star Trigon (STT1 Ver.A)                                         (C) Namco, 2002
-Sugorotic Japan (STJ1 Ver.C)                                     (C) Namco, 2002
-*Taiko no Tatsujin  (with CDROM?)                                (C) Namco, 2001
-Taiko no Tatsujin 2 (TK21 Ver.C & CDROM NM-002 TK21-A)           (C) Namco, 2001
-Taiko no Tatsujin 3 (TK31 Ver.A & CDROM NM-003 TK31-A)           (C) Namco, 2002
-Taiko no Tatsujin 4 (TK41 Ver.A & CDROM TK-4)                    (C) Namco, 2003
-Taiko no Tatsujin 5 (TK51 Ver.A & CDROM TK-5)                    (C) Namco, 2003
-Taiko no Tatsujin 6 (TK61 Ver.A & CDROM TK-6)                    (C) Namco, 2004
-Tsukkomi Yousei Gips Nice Tsukkomi (NTK1 Ver.A)                  (C) Namco/Metro, 2002
-Uchuu Daisakusen Chocovader Contactee (CVC1 Ver.A)               (C) Namco, 2002
+*Aim For Cash (AFC2 Ver.A)                                         (C) Namco, 2004
+Ball Pom Line  (no sticker, ROM VER. B0 FEB 09 2005 15:29:02)      (C) Namco, 2005
+*Dice ROM                                                          (C) Namco, 2004
+*Dokidoki! Flower                                                  (C) Namco, 2004
+***Drum Master                                                     (C) Namco, 2001
+***Drum Master 2                                                   (C) Namco, 2001
+***Drum Master 3                                                   (C) Namco, 2002
+***Drum Master 4                                                   (C) Namco, 2003
+***Drum Master 5                                                   (C) Namco, 2003
+***Drum Master 6                                                   (C) Namco, 2004
+GAHAHA Ippatsu-dou (GID2 Ver.A)                                    (C) Namco/Metro, 2000
+GAHAHA Ippatsu-dou 2 (GIS1 Ver.A)                                  (C) Namco/Metro, 2001
+Gamshara (10021 Ver.A)                                             (C) Mitchell, 2003
+**Gegege no Kitaro Yokai Yokocho Matsuri de Battle Ja (GYM1 Ver.A) (C) Namco, 2007
+GekiToride-Jong Space (10011 Ver.A)                                (C) Namco/Metro, 2001
+Golgo 13 Juusei no Requiem (GLT1 Ver.A)                            (C) Namco/8ing/Raizing, 2001
+Gunbalina (GNN1 Ver. A)                                            (C) Namco, 2000
+*Hard Puncher Hajime no Ippo: The Fighting                         (C) Namco/Taito, 2001
+*Hard Puncher Hajime no Ippo 2: The Fighting Round 2 (VER.2.00J)   (C) Namco/Taito, 2002
+*Honne Hakkenki                                                    (C) Namco, 2001
+Keroro Gunsou Pekopon Shinryaku Shirei De Arimasu! (KRG1 Ver.A)    (C) Namco, 2006
+**Knock Down 2001 / KO2001 (KD11 Ver.B)                            (C) Namco, 2001
+Kono e Tako (RAN Ver.A, 10021 Ver.A reprogrammed Gamshara PCB)     (C) Mitchell 2003
+Kotoba no Puzzle Mojipittan (KPM1 Ver.A)                           (C) Namco, 2001
+Medal no Tatsujin ((MTL1 SPR0B)                                    (C) Namco, 2005
+Medal no Tatsujin 2 (MTA1001 STMPR0A)                              (C) Namco, 2007
+Mr Driller 2 (DR21 Ver.A)                                          (C) Namco, 2000
+Mr Driller 2 (DR22 Ver.A)                                          (C) Namco, 2000
+Mr Driller 2 (DR23 Ver.A)                                          (C) Namco, 2000
+Mr Driller G (DRG1 Ver.A)                                          (C) Namco, 2001
+NFL Classic Football (NCF3 Ver.A)                                  (C) Namco, 2003
+**Pacman Ball (PMB2 Ver.A)                                         (C) Namco, 2003
+Panikuru Panekuru (PPA1 Ver.A)                                     (C) Namco, 2001
+*Peter The Shepherd                                                (C) Namco, 2003
+*Photo Battle (PBT1 Ver.B)                                         (C) Namco, 2001
+Point Blank 3 (GNN2 Ver. A)                                        (C) Namco, 2000
+Puzz Ball (PZB1 Ver. A)                                            (C) Namco, 2002
+*Puzz Ball (PZB1 Ver. C)                                           (C) Namco, 2002
+*Puzz Cube                                                         (C) Namco, 2005
+Seishun-Quiz Colorful High School (CHS1 Ver.A)                     (C) Namco, 2002
+**Sekai Kaseki Hakken (Japan, SKH1 Ver.A)                          (C) Namco, 2004
+*Shamisen Brothers (KT-SB2 Ver.A + CDROM)                          (C) Kato/Konami, 2003
+*Slot no Oujisama / Slot Prince (SLO1 Ver.A)                       (C) Namco, 2003
+Slot no Oujisama / Slot Prince (SLO1 Ver.B)                        (C) Namco, 2003
+Star Trigon (STT1 Ver.A)                                           (C) Namco, 2002
+Sugorotic Japan (STJ1 Ver.C)                                       (C) Namco, 2002
+*Taiko no Tatsujin  (with CDROM?)                                  (C) Namco, 2001
+Taiko no Tatsujin 2 (TK21 Ver.C & CDROM NM-002 TK21-A)             (C) Namco, 2001
+Taiko no Tatsujin 3 (TK31 Ver.A & CDROM NM-003 TK31-A)             (C) Namco, 2002
+Taiko no Tatsujin 4 (TK41 Ver.A & CDROM TK-4)                      (C) Namco, 2003
+Taiko no Tatsujin 5 (TK51 Ver.A & CDROM TK-5)                      (C) Namco, 2003
+Taiko no Tatsujin 6 (TK61 Ver.A & CDROM TK-6)                      (C) Namco, 2004
+Tsukkomi Yousei Gips Nice Tsukkomi (NTK1 Ver.A)                    (C) Namco/Metro, 2002
+Uchuu Daisakusen Chocovader Contactee (CVC1 Ver.A)                 (C) Namco, 2002
 
 * - denotes not dumped yet. If a game code is listed a PCB has been seen.
 ** - denotes incomplete dump due to damaged ROMs. A redump is required.
