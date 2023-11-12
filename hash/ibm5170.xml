@@ -14551,6 +14551,7 @@ Bad Dump: the disks has an accessed file record and a modified OEM id
 		<description>HardBall 3 (3.5" DD)</description>
 		<year>1992</year>
 		<publisher>Accolade</publisher>
+		<info name="copy_protection" value="Codewheel required" />
 		<info name="developer" value="MindSpan" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
@@ -14573,6 +14574,7 @@ Bad Dump: the disks has an accessed file record and a modified OEM id
 		<description>HardBall 3 (5.25" HD)</description>
 		<year>1992</year>
 		<publisher>Accolade</publisher>
+		<info name="copy_protection" value="Codewheel required" />
 		<info name="developer" value="MindSpan" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
@@ -15237,6 +15239,7 @@ Add-on for Harpoon II and update patch to version 2.1.11
 		<year>1992</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="developer" value="Coktel Vision" />
+		<info name="region" value="Italy" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Inca [Sierra On-Line] [1992] [Italian] [3.5HD] [Disk 01 of 10].img" size="1474560" crc="124fe8c9" sha1="75f6a558c1950cbcc3dbec61084326656a772f65"/>
@@ -15539,6 +15542,7 @@ Add-on for Harpoon II and update patch to version 2.1.11
 		<description>Indiana Jones and the Fate of Atlantis - The Action Game</description>
 		<year>1992</year>
 		<publisher>LucasArts</publisher>
+		<info name="copy_protection" value="Codewheel required" />
 		<info name="developer" value="LucasArts" />
 		<info name="version" value="1.00" />
 		<part name="flop1" interface="floppy_3_5">
@@ -15902,6 +15906,7 @@ Add-on for Harpoon II and update patch to version 2.1.11
 		<description>Jurassic Park</description>
 		<year>1993</year>
 		<publisher>Ocean</publisher>
+		<info name="copy_protection" value="Copy protected floppy disk track" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="4016975">
 				<rom name="jurassic park disk1.mfm" size="4016975" crc="23f5a6fa" sha1="00bd7b7ea646dd7df262537f40c4670af0ce6ff5" status="baddump"/>
@@ -16649,6 +16654,7 @@ Add-on for Harpoon II and update patch to version 2.1.11
 		<description>Leisure Suit Larry 1: In the Land of the Lounge Lizards (3.5", VGA release, v2.1)</description>
 		<year>1991</year>
 		<publisher>Sierra On-Line</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Sierra On-Line" />
 		<info name="version" value="2.1, July 4, 1991" />
 		<part name="flop1" interface="floppy_3_5">
@@ -16701,6 +16707,7 @@ Add-on for Harpoon II and update patch to version 2.1.11
 		<description>Leisure Suit Larry 1: In the Land of the Lounge Lizards (5.25", VGA release, v2.1)</description>
 		<year>1991</year>
 		<publisher>Sierra On-Line</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Sierra On-Line" />
 		<info name="version" value="2.1, July 4, 1991" />
 		<part name="flop1" interface="floppy_5_25">
@@ -17034,6 +17041,7 @@ Add-on for Harpoon II and update patch to version 2.1.11
 		<description>Litil Divil</description>
 		<year>1993</year>
 		<publisher>Gremlin</publisher>
+		<info name="copy_protection" value="Codewheel required" />
 		<info name="developer" value="Gremlin Ireland" />
 		<info name="version" value="29_11" />
 		<part name="flop1" interface="floppy_3_5">
@@ -17324,6 +17332,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Maniac Mansion: Day of the Tentacle</description>
 		<year>1993</year>
 		<publisher>LucasArts</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="LucasArts" />
 		<info name="version" value="1.5" />
 		<part name="flop1" interface="floppy_3_5">
@@ -17362,6 +17371,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Maniac Mansion: Day of the Tentacle (France)</description>
 		<year>1993</year>
 		<publisher>LucasArts</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="LucasArts" />
 		<info name="language" value="French" />
 		<info name="region" value="France" />
@@ -17407,10 +17417,11 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Maniac Mansion: Day of the Tentacle (Germany)</description>
 		<year>1993</year>
 		<publisher>LucasArts</publisher>
-		<info name="version" value="1.1" />
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="LucasArts" />
 		<info name="language" value="German" />
 		<info name="region" value="Germany" />
+		<info name="version" value="1.1" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Day of the Tentacle (Germany) [LucasArts] [1993] [3.5HD] [Disk 1 of 7].img" size="1474560" crc="2cb5fbef" sha1="7a1f6ec7d03eb1dbb1c675063686316a697db5e1"/>
@@ -17452,6 +17463,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Mario Andretti's Racing Challenge</description>
 		<year>1991</year>
 		<publisher>Electronic Arts</publisher>
+		<info name="copy_protection" value="Code sheet required" />
 		<info name="developer" value="Distinctive Software" />
 		<info name="version" value="1.0" />
 		<part name="flop1" interface="floppy_3_5">
@@ -18055,6 +18067,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Monkey Island 2: LeChuck's Revenge (3.5")</description>
 		<year>1991</year>
 		<publisher>LucasArts</publisher>
+		<info name="copy_protection" value="Codewheel required" />
 		<info name="developer" value="LucasArts" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
@@ -18087,6 +18100,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Monkey Island 2: LeChuck's Revenge (3.5", Germany)</description>
 		<year>1992</year>
 		<publisher>LucasArts</publisher>
+		<info name="copy_protection" value="Codewheel required" />
 		<info name="developer" value="LucasArts" />
 		<info name="language" value="German" />
 		<info name="region" value="Germany" />
@@ -18154,6 +18168,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Monkey Island 2: LeChuck's Revenge (5.25")</description>
 		<year>1991</year>
 		<publisher>LucasArts</publisher>
+		<info name="copy_protection" value="Codewheel required" />
 		<info name="developer" value="LucasArts" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
@@ -18225,6 +18240,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Mortal Kombat</description>
 		<year>1993</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Midway" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
@@ -18247,6 +18263,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Mortal Kombat (Germany)</description>
 		<year>1993</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Midway" />
 		<info name="region" value="Germany" />
 		<part name="flop1" interface="floppy_3_5">
@@ -18371,6 +18388,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Nigel Mansell's World Championship Racing</description>
 		<year>1993</year>
 		<publisher>Gremlin Graphics</publisher>
+		<info name="copy_protection" value="Codewheel required" />
 		<info name="developer" value="Gremlin Graphics" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
@@ -18756,6 +18774,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Pinball Fantasies</description>
 		<year>1994</year>
 		<publisher>21st Century Entertainment</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Digital Illusions" />
 		<info name="ported by" value="FrontLine Design" />
 		<info name="version" value="V1.0" />
@@ -18974,6 +18993,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Prince of Persia 2 - The Shadow &amp; the Flame</description>
 		<year>1993</year>
 		<publisher>Brøderbund Software</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Prince of Persia 2 - The Shadow &amp; The Flame (USA) (Disk 1).img" size="1474560" crc="6d27f6de" sha1="1a2ceb2ec3a5da788b85f887ba5aa1cf9b36f9c4"/>
@@ -19033,6 +19053,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Prophecy of the Shadow (3.5")</description>
 		<year>1993</year>
 		<publisher>SSI</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Strategic Simulations, Inc." />
 		<info name="version" value="1.0" />
 		<part name="flop1" interface="floppy_3_5">
@@ -19056,6 +19077,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Prophecy of the Shadow (5.25")</description>
 		<year>1993</year>
 		<publisher>SSI</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Strategic Simulations, Inc." />
 		<info name="version" value="1.0" />
 		<part name="flop1" interface="floppy_5_25">
@@ -19135,6 +19157,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Quarantine</description>
 		<year>1994</year>
 		<publisher>GameTek</publisher>
+		<info name="copy_protection" value="Code sheet required" />
 		<info name="developer" value="Imagexcel" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
@@ -19730,6 +19753,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Roberta Williams' Laura Bow in "The Dagger of Amon Ra"</description>
 		<year>1992</year>
 		<publisher>Sierra On-Line</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Sierra On-Line" />
 		<info name="version" value="1.1" />
 		<part name="flop1" interface="floppy_3_5">
@@ -19763,6 +19787,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Roberta Williams' Laura Bow in "The Dagger of Amon Ra" (Germany)</description>
 		<year>1992</year>
 		<publisher>Sierra On-Line</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Sierra On-Line" />
 		<info name="language" value="German" />
 		<info name="region" value="Germany" />
@@ -19809,6 +19834,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Robocop 3</description>
 		<year>1992</year>
 		<publisher>Ocean</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Digital Image Design" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
@@ -19840,6 +19866,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>RoboSport (3.5" DD)</description>
 		<year>1992</year>
 		<publisher>Maxis</publisher>
+		<info name="copy_protection" value="Manual required on installation setup" />
 		<info name="developer" value="Maxis Software" />
 		<info name="usage" value="Requires Windows 3.x" />
 		<part name="flop1" interface="floppy_3_5">
@@ -19858,6 +19885,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>RoboSport (5.25" HD)</description>
 		<year>1992</year>
 		<publisher>Maxis</publisher>
+		<info name="copy_protection" value="Manual required on installation setup" />
 		<info name="developer" value="Maxis Software" />
 		<info name="usage" value="Requires Windows 3.x" />
 		<part name="flop1" interface="floppy_5_25">
@@ -20654,6 +20682,7 @@ Floppy disk 2 - Bad Dump Status: Modified OEM ID and modified root
 		<description>Sleepwalker</description>
 		<year>1993</year>
 		<publisher>Ocean</publisher>
+		<info name="copy_protection" value="Copy protected floppy disk track" />
 		<info name="developer" value="C.T.A. Developments" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "4215420">
@@ -21226,6 +21255,7 @@ Floppy disk 2 - Bad Dump Status: Modified OEM ID and modified root
 		<description>Star Trek - 25th Anniversary (USA, 5.25" HD, v1.00) (includes 'Out Of This World' demo)</description>
 		<year>1992</year>
 		<publisher>Interplay</publisher>
+		<info name="copy_protection" value="United Federation of Planets map required" />
 		<info name="developer" value="Interplay" />
 		<info name="version" value="Version 1.00" />
 		<part name="flop1" interface="floppy_5_25">
@@ -21259,6 +21289,7 @@ Floppy disk 2 - Bad Dump Status: Modified OEM ID and modified root
 		<description>Star Trek - 25th Anniversary (3.5" DD, v1.0)</description>
 		<year>1992</year>
 		<publisher>Interplay</publisher>
+		<info name="copy_protection" value="United Federation of Planets map required" />
 		<info name="developer" value="Interplay" />
 		<info name="version" value="Version 1.0" />
 		<part name="flop1" interface="floppy_3_5">
@@ -21307,6 +21338,7 @@ Floppy disk 2 - Bad Dump Status: Modified OEM ID and modified root
 		<description>Star Trek - 25th Anniversary (USA, 3.5" DD, v1.00) (includes 'Out Of This World' demo)</description>
 		<year>1992</year>
 		<publisher>Interplay</publisher>
+		<info name="copy_protection" value="United Federation of Planets map required" />
 		<info name="developer" value="Interplay" />
 		<info name="version" value="Version 1.00" />
 		<part name="flop1" interface="floppy_3_5">
@@ -21355,6 +21387,7 @@ Floppy disk 2 - Bad Dump Status: Modified OEM ID and modified root
 		<description>Star Wars: X-Wing - Space Combat Simulator</description>
 		<year>1993</year>
 		<publisher>LucasArts</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="version" value="Version 1.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
@@ -21388,6 +21421,7 @@ Floppy disk 2 - Bad Dump Status: Modified OEM ID and modified root
 		<description>Star Wars: X-Wing - Space Combat Simulator (Germany)</description>
 		<year>1993</year>
 		<publisher>LucasArts</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="region" value="Germany" />
 		<info name="version" value="Version 1.0" />
 		<part name="flop1" interface="floppy_3_5">
@@ -21422,6 +21456,7 @@ Floppy disk 2 - Bad Dump Status: Modified OEM ID and modified root
 		<description>Star Wars: X-Wing - Space Combat Simulator (Spain)</description>
 		<year>1993</year>
 		<publisher>LucasArts</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="region" value="Spain" />
 		<info name="version" value="Version 1.0" />
 		<part name="flop1" interface="floppy_3_5">
@@ -21480,6 +21515,7 @@ Floppy disk 2 - Bad Dump Status: Modified OEM ID and modified root
 		<description>Star Wars: TIE Fighter</description>
 		<year>1994</year>
 		<publisher>LucasArts</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="version" value="V1.0 06/15/94" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
@@ -21513,6 +21549,7 @@ Floppy disk 2 - Bad Dump Status: Modified OEM ID and modified root
 		<description>Star Wars: TIE Fighter (Germany)</description>
 		<year>1994</year>
 		<publisher>LucasArts</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="region" value="Germany" />
 		<info name="version" value="V1.0 06/15/94" />
 		<part name="flop1" interface="floppy_3_5">
@@ -21547,6 +21584,7 @@ Floppy disk 2 - Bad Dump Status: Modified OEM ID and modified root
 		<description>Star Wars: TIE Fighter (Spain)</description>
 		<year>1994</year>
 		<publisher>LucasArts</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="region" value="Spain" />
 		<info name="version" value="V1.0 06/15/94" />
 		<part name="flop1" interface="floppy_3_5">
@@ -22231,6 +22269,7 @@ Add-on pack to Syndicate. It requires the original game and includes 3 new weapo
 		<description>Ultimate Body Blows</description>
 		<year>1994</year>
 		<publisher>Team 17</publisher>
+		<info name="copy_protection" value="Code sheet required" />
 		<info name="developer" value="Team 17" />
 		<info name="ported by" value="WJS Design" />
 		<part name="flop1" interface="floppy_3_5">
