@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Fabio Priuli
+// copyright-holders:Fabio Priuli, Charles MacDonald, Wilbert Pol, Angelo Salese
 #ifndef MAME_BUS_PCE_PCE_ROM_H
 #define MAME_BUS_PCE_PCE_ROM_H
 
