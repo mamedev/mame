@@ -12,9 +12,9 @@
 enum
 {
 	M6801_IRQ_LINE = M6800_IRQ_LINE,
-	M6801_TIN_LINE, // P20/Tin Input Capture line (edge sense). Active edge is selectable by internal reg.
-	M6801_SC1_LINE,
-	M6801_IS_LINE // IS3(6801) or ISF(6301Y)
+	M6801_TIN_LINE, // P20/TIN Input Capture line (edge sense). Active edge is selectable by internal reg.
+	M6801_IS3_LINE, // SC1/IOS/IS3 (P54/IS on HD6301Y)
+	M6801_STBY_LINE // STBY pin, or internal standby
 };
 
 enum
@@ -40,7 +40,7 @@ enum
 };
 
 
-class m6801_cpu_device : public m6800_cpu_device
+class m6801_cpu_device : public m6800_cpu_device, public device_nvram_interface
 {
 public:
 	m6801_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -58,21 +58,28 @@ public:
 	auto out_sc2_cb() { return m_out_sc2_func.bind(); }
 	auto out_ser_tx_cb() { return m_out_sertx_func.bind(); }
 
-	void m6801_io(address_map &map); // FIXME: privatize this
+	auto standby_cb() { return m_standby_func.bind(); } // notifier (not an output pin)
+	bool standby() { return suspended(SUSPEND_REASON_CLOCK); }
 
 	void m6801_clock_serial();
 
 protected:
-	m6801_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const m6800_cpu_device::op_func *insn, const uint8_t *cycles, address_map_constructor internal = address_map_constructor());
+	m6801_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const m6800_cpu_device::op_func *insn, const uint8_t *cycles, address_map_constructor internal, int standby_bytes);
 
 	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// device_nvram_interface implementation
+	virtual void nvram_default() override { ; }
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
+
 	// device_execute_interface implementation
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 4 - 1) / 4; }
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 4); }
-	virtual uint32_t execute_input_lines() const noexcept override { return 5; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 6; }
+	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return m6800_cpu_device::execute_input_edge_triggered(inputnum) || inputnum == M6801_STBY_LINE; }
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_disasm_interface implementation
@@ -93,7 +100,6 @@ protected:
 	uint8_t p4_data_r();
 	void p4_data_w(uint8_t data);
 
-protected:
 	uint8_t tcsr_r();
 	void tcsr_w(uint8_t data);
 	uint8_t ch_r();
@@ -115,9 +121,13 @@ protected:
 	void sci_tdr_w(uint8_t data);
 
 	uint8_t rcr_r();
-	void rcr_w(uint8_t data);
+	virtual void rcr_w(uint8_t data);
 	uint8_t ff_r();
 
+	void m6801_io(address_map &map);
+	void m6801_mem(address_map &map);
+	void m6801u4_mem(address_map &map);
+	void hd6801_mem(address_map &map);
 	void m6803_mem(address_map &map);
 
 	devcb_read8::array<4> m_in_port_func;
@@ -125,8 +135,12 @@ protected:
 
 	devcb_write_line m_out_sc2_func;
 	devcb_write_line m_out_sertx_func;
+	devcb_write_line m_standby_func;
 
 	int m_sclk_divider;
+
+	required_shared_ptr<uint8_t> m_internal_ram;
+	const int m_standby_bytes;
 
 	/* internal registers */
 	uint8_t  m_port_ddr[4];
@@ -147,15 +161,12 @@ protected:
 	int      m_rxbits, m_txbits, m_txstate, m_trcsr_read_tdre, m_trcsr_read_orfe, m_trcsr_read_rdrf, m_tx, m_ext_serclock;
 	bool     m_use_ext_serclock;
 
-	int      m_latch09;
+	uint8_t  m_latch09;
+	int      m_is3_state;
 
 	PAIR     m_timer_over;
 	emu_timer *m_sci_timer;
-
-	/* point of next timer event */
-	uint32_t m_timer_next;
-
-	int      m_sc1_state;
+	uint32_t m_timer_next;     /* point of next timer event */
 
 	static const uint8_t cycles_6803[256];
 	static const uint8_t cycles_63701[256];
@@ -178,6 +189,20 @@ protected:
 	void serial_receive();
 	TIMER_CALLBACK_MEMBER( sci_tick );
 	void set_os3(int state);
+};
+
+
+class m6801u4_cpu_device : public m6801_cpu_device
+{
+public:
+	m6801u4_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
+class hd6801v0_cpu_device : public m6801_cpu_device
+{
+public:
+	hd6801v0_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
@@ -204,10 +229,31 @@ protected:
 };
 
 
+class mc68120_device : public m6801_cpu_device
+{
+public:
+	mc68120_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// dual-ported RAM access
+	uint8_t dpram_r(offs_t offset);
+	void dpram_w(offs_t offset, uint8_t data);
+
+protected:
+	mc68120_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal);
+};
+
+
+class mc68121_device : public mc68120_device
+{
+public:
+	mc68121_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
 class hd6301_cpu_device : public m6801_cpu_device
 {
 protected:
-	hd6301_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const m6800_cpu_device::op_func *insn, const uint8_t *cycles, address_map_constructor internal = address_map_constructor());
+	hd6301_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const m6800_cpu_device::op_func *insn, const uint8_t *cycles, address_map_constructor internal, int standby_bytes);
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
@@ -258,11 +304,13 @@ public:
 	auto out_p6_cb() { return m_out_portx_func[1].bind(); }
 	auto out_p7_cb() { return m_out_portx_func[2].bind(); }
 
-	// TODO: privatize eventually
-	void hd6301x_io(address_map &map);
-
 protected:
-	hd6301x_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	hd6301x_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal, int standby_bytes);
+
+	void hd6301x_io(address_map &map);
+	void hd6303x_io(address_map &map);
+	void hd6301x_mem(address_map &map);
+	void hd6303x_mem(address_map &map);
 
 	// device_t implementation
 	virtual void device_start() override;
@@ -354,12 +402,13 @@ public:
 
 class hd6301y_cpu_device : public hd6301x_cpu_device
 {
-public:
-	// TODO: privatize eventually
-	void hd6301y_io(address_map &map);
-
 protected:
-	hd6301y_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	hd6301y_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal, int standby_bytes);
+
+	void hd6301y_io(address_map &map);
+	void hd6303y_io(address_map &map);
+	void hd6301y_mem(address_map &map);
+	void hd6303y_mem(address_map &map);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -375,6 +424,7 @@ protected:
 	virtual void p6_data_w(uint8_t data) override;
 	uint8_t p6_csr_r();
 	void p6_csr_w(uint8_t data);
+	virtual void rcr_w(uint8_t data) override;
 
 	virtual void m6800_check_irq2() override;
 	void clear_pending_isf();
@@ -417,8 +467,12 @@ public:
 
 
 DECLARE_DEVICE_TYPE(M6801, m6801_cpu_device)
+DECLARE_DEVICE_TYPE(M6801U4, m6801u4_cpu_device)
+DECLARE_DEVICE_TYPE(HD6801V0, hd6801v0_cpu_device)
 DECLARE_DEVICE_TYPE(M6803, m6803_cpu_device)
 DECLARE_DEVICE_TYPE(M6803E, m6803e_cpu_device)
+DECLARE_DEVICE_TYPE(MC68120, mc68120_device)
+DECLARE_DEVICE_TYPE(MC68121, mc68121_device)
 DECLARE_DEVICE_TYPE(HD6301V1, hd6301v1_cpu_device)
 DECLARE_DEVICE_TYPE(HD6301X0, hd6301x0_cpu_device)
 DECLARE_DEVICE_TYPE(HD6301Y0, hd6301y0_cpu_device)

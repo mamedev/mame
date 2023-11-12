@@ -86,13 +86,13 @@ private:
 /*
 static const gfx_layout kanji_layout =
 {
-	32, 32,
-	RGN_FRAC(1,1),
-	1,
-	{ 0 },
-	{ STEP16(0,1), STEP16(16, 16) },
-	{ STEP16(0,16), STEP16(16*16, 16) },
-	32*32
+    32, 32,
+    RGN_FRAC(1,1),
+    1,
+    { 0 },
+    { STEP16(0,1), STEP16(16, 16) },
+    { STEP16(0,16), STEP16(16*16, 16) },
+    32*32
 };
 */
 
@@ -145,20 +145,20 @@ void ibm5550_state::main_map(address_map &map)
 void ibm5550_state::main_io(address_map &map)
 {
 	map.unmap_value_high();
-//	map(0x00?0, 0x00?7).rw(m_dma, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
+//  map(0x00?0, 0x00?7).rw(m_dma, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x0020, 0x0021).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 
 	// tested later, with bit 6 irq from PIC
-//	map(0x0040, 0x0047).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+//  map(0x0040, 0x0047).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 
-//	map(0x0060, 0x0060) / map(0x0064, 0x0064) standard XT keyboard
+//  map(0x0060, 0x0060) / map(0x0064, 0x0064) standard XT keyboard
 
-	// bit 0 on will punt before testing for $20-$21, 
+	// bit 0 on will punt before testing for $20-$21,
 	// but will be required on after $4c-$ec RAM holes above
 	// ... RAM protection?
 	map(0x00a0, 0x00a0).lrw8(
 		NAME([this] (offs_t offset) { return m_a0_unk; }),
-		NAME([this] (offs_t offset, u8 data) { 
+		NAME([this] (offs_t offset, u8 data) {
 			logerror("$a0 %02x\n", data);
 			m_a0_unk = BIT(data, 6);
 			if (data == 0xc0)
@@ -168,7 +168,7 @@ void ibm5550_state::main_io(address_map &map)
 			}
 		})
 	);
-//	map(0x00a1, 0x00a1) LED write?
+//  map(0x00a1, 0x00a1) LED write?
 	map(0x00a1, 0x00a1).lr8(
 		NAME([] (offs_t offset) {
 			// read thru NMI trap above, bit 3-0 must be low
@@ -176,7 +176,7 @@ void ibm5550_state::main_io(address_map &map)
 		})
 	);
 	map(0x00a2, 0x00a2).lw8(
-		NAME([this] (offs_t offset, u8 data) { 
+		NAME([this] (offs_t offset, u8 data) {
 			logerror("$a2 %02x\n", data);
 			m_a0_unk = 0;
 		})
@@ -238,7 +238,7 @@ void ibm5550_state::ibm5550(machine_config &config)
 	// HD46505SP-2, unknown pixel clock
 	HD6845S(config, m_crtc, XTAL(40'000'000) / 10);
 	m_crtc->set_screen(m_screen);
-//	m_crtc->set_show_border_area(true);
+//  m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(16);
 
 	// IBM6343870 / MN50015SPG
@@ -255,27 +255,27 @@ void ibm5550_state::ibm5550(machine_config &config)
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 
-//	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb"));
-//	mb.set_cputag(m_maincpu);
-//	mb.int_callback().set_inputline(m_maincpu, 0);
-//	mb.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
-//	mb.kbdclk_callback().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
-//	mb.kbddata_callback().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
-//	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(pccga));
+//  ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb"));
+//  mb.set_cputag(m_maincpu);
+//  mb.int_callback().set_inputline(m_maincpu, 0);
+//  mb.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+//  mb.kbdclk_callback().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
+//  mb.kbddata_callback().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
+//  mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(pccga));
 
 	// FIXME: determine ISA bus clock
-//	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "cga", false);
-//	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "fdc_xt", false);
-//	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "lpt", false);
-//	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, "com", false);
+//  ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "cga", false);
+//  ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "fdc_xt", false);
+//  ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "lpt", false);
+//  ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, "com", false);
 
 	/* keyboard */
-//	pc_kbdc_device &kbd(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83));
-//	kbd.out_clock_cb().set("mb", FUNC(ibm5160_mb_device::keyboard_clock_w));
-//	kbd.out_data_cb().set("mb", FUNC(ibm5160_mb_device::keyboard_data_w));
+//  pc_kbdc_device &kbd(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83));
+//  kbd.out_clock_cb().set("mb", FUNC(ibm5160_mb_device::keyboard_clock_w));
+//  kbd.out_data_cb().set("mb", FUNC(ibm5160_mb_device::keyboard_data_w));
 
 	/* internal ram */
-//	RAM(config, RAM_TAG).set_default_size("256K").set_extra_options("512K");
+//  RAM(config, RAM_TAG).set_default_size("256K").set_extra_options("512K");
 }
 
 ROM_START( ibm5550 )

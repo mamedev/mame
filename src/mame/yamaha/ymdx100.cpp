@@ -339,8 +339,6 @@ void yamaha_dx100_state::p22_w(int state)
 
 void yamaha_dx100_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x001f).m(m_maincpu, FUNC(hd6303x_cpu_device::hd6301x_io));
-	map(0x0040, 0x00ff).ram(); // internal RAM
 	map(0x0800, 0x0fff).ram().share("nvram");
 	map(0x1000, 0x17ff).ram();
 	map(0x2000, 0x2001).rw("lcdc", FUNC(hd44780_device::read), FUNC(hd44780_device::write));

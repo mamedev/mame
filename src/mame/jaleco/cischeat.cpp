@@ -186,7 +186,6 @@ Cisco Heat.
 
 #include "cpu/m68000/m68000.h"
 #include "machine/adc0804.h"
-#include "jalcrpt.h"
 #include "machine/nvram.h"
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
@@ -2138,6 +2137,13 @@ void cischeat_state::bigrun(machine_config &config)
 	m_oki2->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
 }
 
+void cischeat_state::bigrun_d65006(machine_config &config)
+{
+	bigrun(config);
+	MEGASYS1_GATEARRAY_D65006(config, m_gatearray, 0);
+	m_gatearray->set_cpu_tag(m_soundcpu);
+	m_gatearray->set_cpuregion_tag("soundcpu");
+}
 
 void cischeat_state::cischeat(machine_config &config)
 {
@@ -2167,6 +2173,14 @@ void cischeat_state::cischeat(machine_config &config)
 
 	m_tmap[2]->set_colorbase(0x6c00/2);
 	m_tmap[2]->set_bits_per_color_code(5);
+}
+
+void cischeat_state::cischeat_gs88000(machine_config &config)
+{
+	cischeat(config);
+	MEGASYS1_GATEARRAY_GS88000(config, m_gatearray, 0);
+	m_gatearray->set_cpu_tag(m_soundcpu);
+	m_gatearray->set_cpuregion_tag("soundcpu");
 }
 
 
@@ -2678,7 +2692,6 @@ ROM_END
 void cischeat_state::init_bigrun()
 {
 	cischeat_untangle_sprites("sprites");   // Untangle sprites
-	phantasm_rom_decode(machine(), "soundcpu");                 // Decrypt sound cpu code
 }
 
 
@@ -2797,9 +2810,7 @@ ROM_END
 void cischeat_state::init_cischeat()
 {
 	cischeat_untangle_sprites("sprites");   // Untangle sprites
-	astyanax_rom_decode(machine(), "soundcpu");                 // Decrypt sound cpu code
 }
-
 
 /***************************************************************************
 
@@ -4122,10 +4133,10 @@ void captflag_state::init_vscaptfl()
 
 ***************************************************************************/
 
-GAMEL( 1989, bigrun,    0,        bigrun,   bigrun,   cischeat_state,  init_bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version, Europe?)", MACHINE_NODEVICE_LAN, layout_cischeat ) // there's a 13th Rallye version (1991) (only on the SNES? Could just be updated title, 1989 -> 11th Paris-Dakar ...)
-GAMEL( 1989, bigrunu,   bigrun,   bigrun,   bigrun,   cischeat_state,  init_bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version, US?)",     MACHINE_NODEVICE_LAN, layout_cischeat )
+GAMEL( 1989, bigrun,    0,        bigrun_d65006,   bigrun,   cischeat_state,  init_bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version, Europe?)", MACHINE_NODEVICE_LAN, layout_cischeat ) // there's a 13th Rallye version (1991) (only on the SNES? Could just be updated title, 1989 -> 11th Paris-Dakar ...)
+GAMEL( 1989, bigrunu,   bigrun,   bigrun_d65006,   bigrun,   cischeat_state,  init_bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version, US?)",     MACHINE_NODEVICE_LAN, layout_cischeat )
 
-GAMEL( 1990, cischeat,  0,        cischeat, cischeat, cischeat_state,  init_cischeat, ROT0,   "Jaleco", "Cisco Heat",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cischeat )
+GAMEL( 1990, cischeat,  0,        cischeat_gs88000, cischeat, cischeat_state,  init_cischeat, ROT0,   "Jaleco", "Cisco Heat",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cischeat )
 
 GAMEL( 1992, f1gpstar,  0,        f1gpstar, f1gpstar, cischeat_state,  init_f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (ver 4.0)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
 GAMEL( 1991, f1gpstar3, f1gpstar, f1gpstar, f1gpstar, cischeat_state,  init_f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (ver 3.0)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )

@@ -203,7 +203,7 @@ void quakeat_state::quake(machine_config &config)
 {
 	PENTIUM2(config, m_maincpu, 233'000'000); /* Pentium II, 233MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &quakeat_state::quake_map);
-//	m_maincpu->set_disable();
+//  m_maincpu->set_disable();
 
 	PCI_ROOT(config, "pci", 0);
 	// ...
@@ -218,15 +218,15 @@ ROM_START(quake)
 	// 4N4XL0X0.86A.0011.P05
 	ROM_REGION32_LE(0x20000, "pc_bios", 0)  /* motherboard bios */
 	// TODO: compressed
-//	ROM_LOAD("p05-0011.bio", 0x000000, 0x10000, NO_DUMP )
-//	ROM_CONTINUE( 0x1ffff-0xa0, 0xa0 )
+//  ROM_LOAD("p05-0011.bio", 0x000000, 0x10000, NO_DUMP )
+//  ROM_CONTINUE( 0x1ffff-0xa0, 0xa0 )
 	ROM_LOAD("quakearcadetournament.pcbios", 0x000000, 0x20000, NO_DUMP )
 
 	// Hitachi DK237A-21 A/A0A0, IDE/ATA 2.5" 2.1GB 4000 RPM
 	// WS03131880
 	DISK_REGION( "disks" )
 	// wrong chs 263,255,63
-//	DISK_IMAGE( "quakeat", 0, BAD_DUMP SHA1(c44695b9d521273c9d3c0e18c88f0dca0185bd7b) )
+//  DISK_IMAGE( "quakeat", 0, BAD_DUMP SHA1(c44695b9d521273c9d3c0e18c88f0dca0185bd7b) )
 	// regenerated from above, with -chs 4200,16,63 as per reported HDD label
 	DISK_IMAGE( "quakeat", 0, BAD_DUMP SHA1(9a422ad342aeddd447514d0287efde49e3de5fa8) )
 ROM_END

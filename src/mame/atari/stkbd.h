@@ -56,8 +56,6 @@ private:
 	int m_joy_disabled;
 	emu_timer *m_mouse_timer;
 
-	void map(address_map &map);
-
 	TIMER_CALLBACK_MEMBER(mouse_tick);
 
 	uint8_t port1_r();

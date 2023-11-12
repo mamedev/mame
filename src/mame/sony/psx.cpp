@@ -27,6 +27,8 @@
 #include "softlist.h"
 #include "speaker.h"
 
+#include "multibyte.h"
+
 #include <zlib.h>
 
 
@@ -228,8 +230,8 @@ int psx1_state::load_cpe(std::vector<uint8_t> buffer)
 			case 1:
 				/* read bytes */
 				{
-					unsigned int address = buffer[offset] | (buffer[offset + 1] << 8) | (buffer[offset + 2] << 16) | (buffer[offset + 3] << 24);
-					unsigned int size = buffer[offset + 4] | (buffer[offset + 5] << 8) | (buffer[offset + 6] << 16) | (buffer[offset + 7] << 24);
+					uint32_t address = get_u32le(&buffer[offset]);
+					uint32_t size = get_u32le(&buffer[offset + 4]);
 
 					uint8_t *ram_pointer = m_ram->pointer();
 					uint32_t ram_size = m_ram->size();
@@ -251,7 +253,7 @@ int psx1_state::load_cpe(std::vector<uint8_t> buffer)
 			case 2:
 				/* run address: not tested */
 				{
-					unsigned int v = buffer[offset] | (buffer[offset + 1] << 8) | (buffer[offset + 2] << 16) | (buffer[offset + 3] << 24);
+					uint32_t v = get_u32le(&buffer[offset]);
 
 					offset += 4;
 
@@ -262,8 +264,8 @@ int psx1_state::load_cpe(std::vector<uint8_t> buffer)
 			case 3:
 				/* set reg to longword */
 				{
-					unsigned int r = buffer[offset] | (buffer[offset + 1] << 8);
-					unsigned int v = buffer[offset + 2] | (buffer[offset + 3] << 8) | (buffer[offset + 4] << 16) | (buffer[offset + 5] << 24);
+					uint16_t r = get_u16le(&buffer[offset]);
+					uint32_t v = get_u32le(&buffer[offset + 2]);
 
 					offset += 6;
 
@@ -274,8 +276,8 @@ int psx1_state::load_cpe(std::vector<uint8_t> buffer)
 			case 4:
 				/* set reg to word: not tested */
 				{
-					unsigned int r = buffer[offset] | (buffer[offset + 1] << 8);
-					unsigned int v = buffer[offset + 2] | (buffer[offset + 3] << 8);
+					uint16_t r = get_u16le(&buffer[offset]);
+					uint16_t v = get_u16le(&buffer[offset + 2]);
 
 					offset += 4;
 
@@ -286,8 +288,8 @@ int psx1_state::load_cpe(std::vector<uint8_t> buffer)
 			case 5:
 				/* set reg to byte: not tested */
 				{
-					unsigned int r = buffer[offset] | (buffer[offset + 1] << 8);
-					unsigned int v = buffer[offset + 2];
+					uint16_t r = get_u16le(&buffer[offset]);
+					uint8_t v = buffer[offset + 2];
 
 					offset += 3;
 
@@ -298,8 +300,8 @@ int psx1_state::load_cpe(std::vector<uint8_t> buffer)
 			case 6:
 				/* set reg to 3-byte: not tested */
 				{
-					unsigned int r = buffer[offset] | (buffer[offset + 1] << 8);
-					unsigned int v = buffer[offset + 2] | (buffer[offset + 3] << 8) | (buffer[offset + 4] << 16);
+					uint16_t r = get_u16le(&buffer[offset]);
+					uint32_t v = get_u24le(&buffer[offset + 2]);
 
 					offset += 5;
 

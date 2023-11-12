@@ -396,20 +396,10 @@ void arm7_cpu_device::HandleBranch(uint32_t insn, bool h_bit)
 	}
 
 	/* Sign-extend the 24-bit offset in our calculations */
-	if (off & 0x2000000u)
-	{
-		if (MODE32)
-			R15 -= ((~(off | 0xfc000000u)) + 1) - 8;
-		else
-			R15 = ((R15 - (((~(off | 0xfc000000u)) + 1) - 8)) & 0x03FFFFFC) | (R15 & ~0x03FFFFFC);
-	}
+	if (MODE32)
+		R15 += util::sext(off, 26) + 8;
 	else
-	{
-		if (MODE32)
-			R15 += off + 8;
-		else
-			R15 = ((R15 + (off + 8)) & 0x03FFFFFC) | (R15 & ~0x03FFFFFC);
-	}
+		R15 = ((R15 + (util::sext(off, 26) + 8)) & 0x03FFFFFC) | (R15 & ~0x03FFFFFC);
 }
 
 void arm7_cpu_device::HandleMemSingle(uint32_t insn)

@@ -335,16 +335,16 @@ void ks0164_cpu_device::execute_run()
 
 			case 1: {
 				// Min/max with immediate
-				// 1101 Mrrr Ssss 1000
-				u16 v1 = m_r[(opcode >> 4) & 7];
+				// 1101 Mrrr S000 1000
+				u16 v1 = m_r[(opcode >> 8) & 7];
 				u16 v2 = m_program_cache.read_word(m_r[R_PC]);
 				m_r[R_PC] += 2;
 				u16 res;
 				switch(bitswap<2>(opcode, 11, 7)) {
-				case 0: res = v1 > v2 ? v1 : v2; break;
-				case 1: res = s16(v1) > s16(v2) ? v1 : v2; break;
-				case 2: res = v1 < v2 ? v1 : v2; break;
-				case 3: default: res = s16(v1) < s16(v2) ? v1 : v2; break;
+				case 0: res = std::max<u16>(v1, v2); break;
+				case 1: res = std::max<s16>(v1, v2); break;
+				case 2: res = std::min<u16>(v1, v2); break;
+				case 3: default: res = std::min<s16>(v1, v2); break;
 				}
 				m_r[(opcode >> 8) & 7] = res;
 				break;
@@ -608,13 +608,14 @@ void ks0164_cpu_device::execute_run()
 
 			case 1: {
 				// Neg/not
-				// 1101 .rrr Ssss .101
+				// 1101 .rrr S... .101
 
-				u16 v = m_r[(opcode >> 4) & 7];
+				u16 v = m_r[(opcode >> 8) & 7];
 				if(opcode & 0x0080)
 					v = -s16(v);
 				else
 					v = ~v;
+				m_r[(opcode >> 8) & 7] = v;
 				m_r[R_PSW] = (m_r[R_PSW] & ~F_MASK) | (v ? v & 0x8000 ? F_N : 0 : F_Z);
 				break;
 			}

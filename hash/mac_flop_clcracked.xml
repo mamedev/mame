@@ -1330,8 +1330,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="pfsfrepa00">
-		<description>PFS File and Report (version A.00) (4am crack)</description>
+	<software name="pfsfra00">
+		<description>pfs: file &amp; pfs: report (version A.00) (4am crack)</description>
 		<year>1984</year>
 		<publisher>Software Publishing Corporation</publisher>
 		<info name="developer" value="Software Publishing Corporation" />

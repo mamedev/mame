@@ -784,8 +784,8 @@ macro jsr32 %opc %spreg
 		// p = -20, d = +3 -> q = -7, r =  1
 		// p = -20, d = -3 -> q =  7, r = -1
 		int q, r;
-		if(m_TMP2 < 0) {
-			if(m_TMP1 < 0) { // - -
+		if(m_TMP2 & 0x80000000) {
+			if(m_TMP1 & 0x80000000) { // - -
 				q = (-m_TMP1) / (-m_TMP2);
 				r = (-m_TMP1) % (-m_TMP2);
 				if(r) {
@@ -798,7 +798,7 @@ macro jsr32 %opc %spreg
 				r = -(m_TMP1 % (-m_TMP2));
 			}
 		} else {
-			if(m_TMP1 < 0) { // - +
+			if(m_TMP1 & 0x80000000) { // - +
 				m_CCR |= F_N;
 				q = -((-m_TMP1) / m_TMP2);
 				r = (-m_TMP1) % m_TMP2;
@@ -833,8 +833,8 @@ macro jsr32 %opc %spreg
 		// p = -20, d = +3 -> q = -7, r =  1
 		// p = -20, d = -3 -> q =  7, r = -1
 		int q, r;
-		if(m_TMP2 < 0) {
-			if(m_TMP1 < 0) { // - -
+		if(m_TMP2 & 0x80000000) {
+			if(m_TMP1 & 0x80000000) { // - -
 				q = (-m_TMP1) / (-m_TMP2);
 				r = (-m_TMP1) % (-m_TMP2);
 				if(r) {
@@ -847,7 +847,7 @@ macro jsr32 %opc %spreg
 				r = -(m_TMP1 % (-m_TMP2));
 			}
 		} else {
-			if(m_TMP1 < 0) { // - +
+			if(m_TMP1 & 0x80000000) { // - +
 				m_CCR |= F_N;
 				q = -((-m_TMP1) / m_TMP2);
 				r = (-m_TMP1) % m_TMP2;

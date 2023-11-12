@@ -17,7 +17,7 @@ license:CC0-1.0
 
 	<element name="led" defstate="0">
 		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
-		<disk state="0"><color red="0.2" green="0.02" blue="0.03" /></disk>
+		<disk state="0"><color red="0.1" green="0.01" blue="0.015" /></disk>
 	</element>
 
 	<element name="text_1">
@@ -578,11 +578,9 @@ license:CC0-1.0
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="-14" right="120" top="-1" bottom="88" />
+		<bounds left="-14" right="120" top="-2" bottom="88" />
 
-		<element ref="cwhite"><bounds x="-1" y="-1" width="88.5" height="89" /></element>
-
-		<element ref="cwhite"><bounds x="87" y="-1" width="33" height="89" /></element>
+		<element ref="cwhite"><bounds x="-1" y="-2" width="121" height="90" /></element>
 		<group ref="panel"><bounds x="88" y="28.7" width="31" height="59" /></group>
 
 		<element ref="black2"><bounds x="3.7" y="2.7" width="80.6" height="80.6" /></element>

@@ -81,6 +81,8 @@
 #include "screen.h"
 #include "softlist_dev.h"
 
+#include "multibyte.h"
+
 
 namespace {
 
@@ -156,8 +158,9 @@ public:
 protected:
 	void machine_reset() override;
 
-private:
 	std::vector<uint8_t> m_strippedrom;
+
+private:
 	int m_firstvector = 0;
 };
 
@@ -169,6 +172,21 @@ public:
 	{ }
 
 	void init_zone3d();
+
+protected:
+	void machine_reset() override;
+
+private:
+};
+
+class spg29x_zonefamf_game_state : public spg29x_nand_game_state
+{
+public:
+	spg29x_zonefamf_game_state(const machine_config& mconfig, device_type type, const char* tag) :
+		spg29x_nand_game_state(mconfig, type, tag)
+	{ }
+
+	void nand_zonefamf();
 
 protected:
 	void machine_reset() override;
@@ -389,9 +407,9 @@ void spg29x_nand_game_state::machine_reset()
 {
 	spg29x_game_state::machine_reset();
 
-	uint32_t bootstrap_ram_start = (m_strippedrom[m_firstvector+0] << 0) | (m_strippedrom[m_firstvector+1] << 8) | (m_strippedrom[m_firstvector+2] << 16) | (m_strippedrom[m_firstvector+3] << 24);
-	uint32_t bootstrap_ram_end   = (m_strippedrom[m_firstvector+4] << 0) | (m_strippedrom[m_firstvector+5] << 8) | (m_strippedrom[m_firstvector+6] << 16) | (m_strippedrom[m_firstvector+7] << 24);
-	uint32_t bootstrap_ram_boot  = (m_strippedrom[m_firstvector+8] << 0) | (m_strippedrom[m_firstvector+9] << 8) | (m_strippedrom[m_firstvector+10] << 16) | (m_strippedrom[m_firstvector+11] << 24);
+	uint32_t bootstrap_ram_start = get_u32le(&m_strippedrom[m_firstvector+0]);
+	uint32_t bootstrap_ram_end   = get_u32le(&m_strippedrom[m_firstvector+4]);
+	uint32_t bootstrap_ram_boot  = get_u32le(&m_strippedrom[m_firstvector+8]);
 
 	// there is a 0x01 at 0x26, possibly related to source location / block in NAND to copy from?
 
@@ -428,6 +446,23 @@ void spg29x_zone3d_game_state::machine_reset()
 
 	m_maincpu->set_state_int(SCORE_PC, 0x1000);
 }
+
+void spg29x_zonefamf_game_state::machine_reset()
+{
+	spg29x_game_state::machine_reset();
+
+	uint32_t sourceaddr = 0x80000;
+	for (uint32_t addr = 0; addr <= 0x80000; addr++)
+	{
+		address_space& mem = m_maincpu->space(AS_PROGRAM);
+		uint8_t byte = m_strippedrom[sourceaddr];
+		mem.write_byte(addr, byte);
+		sourceaddr++;
+	}
+
+	m_maincpu->set_state_int(SCORE_PC, 0x4);
+}
+
 
 
 QUICKLOAD_LOAD_MEMBER(spg29x_game_state::quickload_hyper_exe)
@@ -542,6 +577,12 @@ void spg29x_nand_game_state::nand_jak_bbsf()
 	m_firstvector = 0x8;
 }
 
+void spg29x_zonefamf_game_state::nand_zonefamf()
+{
+	nand_init(0x840, 0x800);
+//	m_firstvector = 0x8;
+}
+
 void spg29x_zone3d_game_state::init_zone3d()
 {
 
@@ -574,6 +615,17 @@ ROM_START( jak_bbsf )
 	ROM_REGION( 0x008000, "spg290", ROMREGION_32BIT | ROMREGION_LE )
 	ROM_LOAD32_DWORD("internal.rom", 0x000000, 0x008000, NO_DUMP)
 ROM_END
+
+ROM_START( zonefamf )
+	ROM_REGION( 0x21000000, "nand", 0 )
+	ROM_LOAD("hy27uf084g2m_withspare.u1", 0x000000, 0x21000000, CRC(ee12b689) SHA1(fd9c708b6bb2e7574173a140d8839869a8c9f51a) )
+
+	ROM_REGION( 0x008000, "spg290", ROMREGION_32BIT | ROMREGION_LE )
+	ROM_LOAD32_DWORD("internal.rom", 0x000000, 0x008000, NO_DUMP)
+
+	//has 1x 48LC8M16A2 (128Mbit/16MByte SDRAM) for loading game into
+ROM_END
+
 
 ROM_START( zone3d )
 	ROM_REGION( 0x100000, "spi", 0 )
@@ -620,9 +672,12 @@ COMP( 2006, hyprscan,   0,      0,      hyperscan, hyperscan, spg29x_game_state,
 COMP( 2009, jak_bbh,    0,      0,      spg29x, hyperscan, spg29x_nand_game_state, nand_jak_bbh, "JAKKS Pacific Inc", "Big Buck Hunter Pro (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) //has ISSI 404A (24C04)
 COMP( 2011, jak_bbsf,   0,      0,      spg29x, hyperscan, spg29x_nand_game_state, nand_jak_bbsf,"JAKKS Pacific Inc", "Big Buck Safari (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // has ISSI 416A (24C16)
 
-// ends up doing the fllowing, which causes a jump to 0xbf000024, where we have nothing mapped (internal ROM related, or thinks it's loaded code there?  This is the area Hyperscan uses as 'BIOS' not Internal ROM so could be RAM here)
+// ends up doing the following, which causes a jump to 0xbf000024, where we have nothing mapped (internal ROM related, or thinks it's loaded code there?  This is the area Hyperscan uses as 'BIOS' not Internal ROM so could be RAM here)
 // 000011D4: ldis r8, 0xbf00
 // 000011D8: ori r8, 0x0024
 // 000011DC: br r8
 COMP( 201?, zone3d,    0,      0,      spg29x, hyperscan, spg29x_zone3d_game_state, init_zone3d,"Zone", "Zone 3D", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
+COMP( 201?, zonefamf,  0,      0,      spg29x, hyperscan, spg29x_zonefamf_game_state, nand_zonefamf,"Zone", "Zone Family Fit", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+
+// see also spg29x_lexibook_jg7425.cpp which may or may not belong here

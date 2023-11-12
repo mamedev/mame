@@ -1648,4 +1648,4 @@ GAME( 1985, strivf,    striv,    striv,    striv,    jack_state, init_striv,    
 GAME( 1983, joinem,    0,        joinem,   joinem,   jack_state, init_zzyzzyxx, ROT90,  "Global Corporation", "Joinem", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, unclepoo,  0,        unclepoo, unclepoo, jack_state, init_zzyzzyxx, ROT90,  "Diatec", "Uncle Poo", MACHINE_SUPPORTS_SAVE ) // based on Joinem?
 GAME( 1983, loverboy,  0,        joinem,   loverboy, jack_state, init_loverboy, ROT90,  "G.T Enterprise Inc", "Lover Boy", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, trikitri,  loverboy, joinem,   loverboy, jack_state, init_loverboy, ROT90,  "bootleg (DDT Enterprise Inc)", "Triki Triki (Lover Boy bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, trikitri,  loverboy, joinem,   loverboy, jack_state, init_loverboy, ROT90,  "bootleg (DDT Enterprise Inc)", "Triki Triki (bootleg of Lover Boy)", MACHINE_SUPPORTS_SAVE )

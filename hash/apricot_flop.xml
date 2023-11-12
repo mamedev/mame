@@ -199,7 +199,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size="0">
+			<dataarea name="flop" size="1">
 				<rom name="dbase2_2.dsk" size="0" status="nodump"/>
 			</dataarea>
 		</part>
@@ -395,7 +395,7 @@ license:CC0-1.0
 		</part>
 		<part name="e" interface="floppy_3_5">
 			<feature name="part_id" value="Disk E (Server Backup)" />
-			<dataarea name="flop" size="0">
+			<dataarea name="flop" size="1">
 				<rom name="networks_13b_f_e.dsk" size="0" status="nodump"/>
 			</dataarea>
 		</part>
@@ -474,7 +474,7 @@ license:CC0-1.0
 		<publisher>ACT</publisher>
 		<part name="a" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A (Server Boot)" />
-			<dataarea name="flop" size="0">
+			<dataarea name="flop" size="1">
 				<rom name="networks_13b_xi_a.dsk" size="0" status="nodump"/>
 			</dataarea>
 		</part>
@@ -498,7 +498,7 @@ license:CC0-1.0
 		</part>
 		<part name="e" interface="floppy_3_5">
 			<feature name="part_id" value="Disk E (Server Backup)" />
-			<dataarea name="flop" size="0">
+			<dataarea name="flop" size="1">
 				<rom name="networks_13b_xi_e.dsk" size="0" status="nodump"/>
 			</dataarea>
 		</part>
@@ -511,7 +511,7 @@ license:CC0-1.0
 		<publisher>ACT</publisher>
 		<part name="a" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A (Server Boot)" />
-			<dataarea name="flop" size="0">
+			<dataarea name="flop" size="1">
 				<rom name="point32_11_a.dsk" size="0" status="nodump"/>
 			</dataarea>
 		</part>
@@ -523,13 +523,13 @@ license:CC0-1.0
 		</part>
 		<part name="c" interface="floppy_3_5">
 			<feature name="part_id" value="Disk C (Portable/F-Series Workstation)" />
-			<dataarea name="flop" size="0">
+			<dataarea name="flop" size="1">
 				<rom name="point32_11_c.dsk" size="0" status="nodump"/>
 			</dataarea>
 		</part>
 		<part name="d" interface="floppy_3_5">
 			<feature name="part_id" value="Disk D (Bank Boot)" />
-			<dataarea name="flop" size="0">
+			<dataarea name="flop" size="1">
 				<rom name="point32_11_d.dsk" size="0" status="nodump"/>
 			</dataarea>
 		</part>
@@ -542,7 +542,7 @@ license:CC0-1.0
 		<publisher>ACT</publisher>
 		<part name="a" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A (Server Boot)" />
-			<dataarea name="flop" size="0">
+			<dataarea name="flop" size="1">
 				<rom name="point32_12_a.dsk" size="0" status="nodump"/>
 			</dataarea>
 		</part>
@@ -554,19 +554,19 @@ license:CC0-1.0
 		</part>
 		<part name="c" interface="floppy_3_5">
 			<feature name="part_id" value="Disk C (Portable/F-Series Workstation)" />
-			<dataarea name="flop" size="0">
+			<dataarea name="flop" size="1">
 				<rom name="point32_12_c.dsk" size="0" status="nodump"/>
 			</dataarea>
 		</part>
 		<part name="d" interface="floppy_3_5">
 			<feature name="part_id" value="Disk D (Bank Boot)" />
-			<dataarea name="flop" size="0">
+			<dataarea name="flop" size="1">
 				<rom name="point32_12_d.dsk" size="0" status="nodump"/>
 			</dataarea>
 		</part>
 		<part name="e" interface="floppy_3_5">
 			<feature name="part_id" value="Disk E (Server Backup)" />
-			<dataarea name="flop" size="0">
+			<dataarea name="flop" size="1">
 				<rom name="point32_12_e.dsk" size="0" status="nodump"/>
 			</dataarea>
 		</part>
@@ -579,7 +579,7 @@ license:CC0-1.0
 		<publisher>ACT</publisher>
 		<part name="a" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A (Server Boot)" />
-			<dataarea name="flop" size="0">
+			<dataarea name="flop" size="1">
 				<rom name="point32_12b_a.dsk" size="0" status="nodump"/>
 			</dataarea>
 		</part>
@@ -603,7 +603,7 @@ license:CC0-1.0
 		</part>
 		<part name="e" interface="floppy_3_5">
 			<feature name="part_id" value="Disk E (Server Backup)" />
-			<dataarea name="flop" size="0">
+			<dataarea name="flop" size="1">
 				<rom name="point32_12b_e.dsk" size="0" status="nodump"/>
 			</dataarea>
 		</part>
@@ -754,7 +754,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size="0">
+			<dataarea name="flop" size="1">
 				<rom name="supercalc3_2.dsk" size="0" status="nodump"/>
 			</dataarea>
 		</part>

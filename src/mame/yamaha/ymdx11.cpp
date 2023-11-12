@@ -76,8 +76,6 @@ void yamaha_dx11_state::cartridge_bank_w(u8 data)
 
 void yamaha_dx11_state::main_map(address_map &map)
 {
-	map(0x0000, 0x0027).m(m_maincpu, FUNC(hd6301y_cpu_device::hd6301y_io));
-	map(0x0040, 0x013f).ram();
 	map(0x1400, 0x1400).mirror(0x3ff).w(FUNC(yamaha_dx11_state::cartridge_bank_w));
 	map(0x1800, 0x1801).mirror(0x3fe).rw("opz", FUNC(ym2414_device::read), FUNC(ym2414_device::write));
 	map(0x1c00, 0x1c01).mirror(0x3fe).rw("lcdc", FUNC(hd44780_device::read), FUNC(hd44780_device::write));

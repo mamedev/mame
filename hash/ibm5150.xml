@@ -17772,6 +17772,7 @@ Disk 1 has a modified "go.bat" file
 		<year>1990</year>
 		<publisher>New World Computing</publisher>
 		<info name="developer" value="StarCraft" />
+		<!-- TODO: should have manual copy protection -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Tunnels and Trolls - Crusaders of Khazan [New World Computing] [1990] [3.5DD] [Disk 1 of 3] [disks 1-2].img" size="737280" crc="409eb50d" sha1="09fc911aa66ca15b0f11b42ef663d0535c23f698"/>
