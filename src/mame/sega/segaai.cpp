@@ -763,9 +763,7 @@ void segaai_state::segaai(machine_config &config)
 	V20(config, m_maincpu, 20_MHz_XTAL/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segaai_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &segaai_state::io_map);
-	// TODO enough, or do we also need to add a vector callback?
 	m_maincpu->set_irq_acknowledge_callback(FUNC(segaai_state::irq_callback));
-//	m_maincpu->vector_cb().set(FUNC(segaai_state::get_vector));
 
 	V9938(config, m_v9938, 21.477272_MHz_XTAL);
 	m_v9938->set_screen_ntsc("screen");
