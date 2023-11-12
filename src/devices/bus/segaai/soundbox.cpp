@@ -33,6 +33,7 @@ IC ??      74HC139       TI      (near C44, closest)
 TODO:
 - Connections of the 8253
 - Keyboard matrix is scanned on a timer irq (#FC) from 8253??
+- LC7537N
 
 
 HC04
@@ -91,7 +92,6 @@ public:
 		, m_rom(*this, "soundbox")
 		, m_rows(*this, "ROW%u", 0U)
 		, m_row(0)
-		, m_8255_portb(0)
 	{ }
 
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -117,7 +117,6 @@ private:
 	required_ioport_array<8> m_rows;
 	std::vector<u8> m_ram;    // 128KB Expansion RAM
 	u8 m_row;
-	u8 m_8255_portb;
 };
 
 void segaai_soundbox_device::device_add_mconfig(machine_config &config)
@@ -132,11 +131,6 @@ void segaai_soundbox_device::device_add_mconfig(machine_config &config)
 
 	I8255(config, m_tmp8255);
 	m_tmp8255->in_pa_callback().set(FUNC(segaai_soundbox_device::tmp8255_porta_r));
-	// Port B is connected to LC7537N?
-	// b0 - pin20 DI
-	// b1 - pin21 CLK
-	// b2 - pin22 CE
-	// b7 - 8253 GATE1
 	m_tmp8255->in_pb_callback().set(FUNC(segaai_soundbox_device::tmp8255_portb_r));
 	m_tmp8255->out_pb_callback().set(FUNC(segaai_soundbox_device::tmp8255_portb_w));
 	m_tmp8255->out_pc_callback().set(FUNC(segaai_soundbox_device::tmp8255_portc_w));
@@ -249,12 +243,10 @@ ioport_constructor segaai_soundbox_device::device_input_ports() const
 void segaai_soundbox_device::device_start()
 {
 	m_row = 0;
-	m_8255_portb = 0;
 	m_ram.resize(0x20000);
 
 	save_item(NAME(m_ram));
 	save_item(NAME(m_row));
-	save_item(NAME(m_8255_portb));
 
 	mem_space().install_ram(0x20000, 0x3ffff, &m_ram[0]);
 	mem_space().install_rom(0x80000, 0x8ffff, m_rom);
@@ -280,6 +272,19 @@ u8 segaai_soundbox_device::tmp8255_portb_r()
 	return 0xff;
 }
 
+/*
+ 8255 port B
+
+ 76543210
+ +-------- 8253 GATE1
+  +------- 
+   +------ 
+    +----- 
+     +---- 
+      +--- LC7537N pin22 DI
+       +-- LC7537N pin21 CLK
+        +- LC7537N pin20 DI
+*/
 void segaai_soundbox_device::tmp8255_portb_w(u8 data)
 {
 	osd_printf_info("soundbox 8255 port B write $%02X\n", data);
