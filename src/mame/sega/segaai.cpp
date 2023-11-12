@@ -170,15 +170,15 @@ private:
 	u8 i8255_portb_r();
 	u8 i8255_portc_r();
 	void i8255_portc_w(u8 data);
-	void upd7759_ctrl_w(offs_t offset, u8 data);
-	void upd7759_data_w(offs_t offset, u8 data);
-	void port1c_w(offs_t offset, u8 data);
-	void port1d_w(offs_t offset, u8 data);
-	void port1e_w(offs_t offset, u8 data);
-	u8 port1e_r(offs_t offset);
-	u8 irq_enable_r(offs_t offset);
-	void irq_enable_w(offs_t offset, u8 data);
-	void irq_select_w(offs_t offset, u8 data);
+	void upd7759_ctrl_w(u8 data);
+	void upd7759_data_w(u8 data);
+	void port1c_w(u8 data);
+	void port1d_w(u8 data);
+	void port1e_w(u8 data);
+	u8 port1e_r();
+	u8 irq_enable_r();
+	void irq_enable_w(u8 data);
+	void irq_select_w(u8 data);
 
 	static constexpr u8 VECTOR_V9938 = 0xf8;
 	static constexpr u8 VECTOR_I8251_SEND = 0xf9;
@@ -632,7 +632,7 @@ void segaai_state::i8255_portc_w(u8 data)
 }
 
 
-void segaai_state::upd7759_data_w(offs_t offset, u8 data)
+void segaai_state::upd7759_data_w(u8 data)
 {
 	m_upd7759->start_w(ASSERT_LINE);
 	m_upd7759->port_w(data);
@@ -640,7 +640,7 @@ void segaai_state::upd7759_data_w(offs_t offset, u8 data)
 }
 
 
-void segaai_state::upd7759_ctrl_w(offs_t offset, u8 data)
+void segaai_state::upd7759_ctrl_w(u8 data)
 {
 	LOG("I/O Port $0b write: $%02x\n", data);
 
@@ -655,7 +655,7 @@ void segaai_state::upd7759_ctrl_w(offs_t offset, u8 data)
 
 
 // I/O Port 16 - IRQ Enable
-u8 segaai_state::irq_enable_r(offs_t offset)
+u8 segaai_state::irq_enable_r()
 {
 	return m_irq_enabled;
 }
@@ -671,7 +671,7 @@ u8 segaai_state::irq_enable_r(offs_t offset)
 //      +--- ???
 //       +-- ??? 8251 receive?
 //        +- V9938 IRQ enable
-void segaai_state::irq_enable_w(offs_t offet, u8 data)
+void segaai_state::irq_enable_w(u8 data)
 {
 	m_irq_enabled = data;
 	m_irq_active &= data;
@@ -681,7 +681,7 @@ void segaai_state::irq_enable_w(offs_t offet, u8 data)
 // I/O Port 17 - IRQ Enable selection
 // This port seems to be used to set or reset specific bits in the IRQ enable register.
 // Why 2 ways of setting/clearing irq enable bits?
-void segaai_state::irq_select_w(offs_t offset, u8 data)
+void segaai_state::irq_select_w(u8 data)
 {
 	int pin = (data >> 1) & 0x07;
 	if (BIT(data, 0))
@@ -697,25 +697,25 @@ void segaai_state::irq_select_w(offs_t offset, u8 data)
 }
 
 
-void segaai_state::port1c_w(offs_t offset, u8 data)
+void segaai_state::port1c_w(u8 data)
 {
 	m_port_1c = data;
 }
 
 
-void segaai_state::port1d_w(offs_t offset, u8 data)
+void segaai_state::port1d_w(u8 data)
 {
 	m_port_1d = data;
 }
 
 
-void segaai_state::port1e_w(offs_t offset, u8 data)
+void segaai_state::port1e_w(u8 data)
 {
 	m_port_1e = data;
 }
 
 
-u8 segaai_state::port1e_r(offs_t offset)
+u8 segaai_state::port1e_r()
 {
 	if (BIT(m_port_1c, 0))
 	{
