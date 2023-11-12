@@ -113,6 +113,7 @@ const int MODE_GDI = 2;
 #define OPTION_NUMPROCESSORS "numprocessors"
 #define OPTION_SIZE "size"
 #define OPTION_TEMPLATE "template"
+#define OPTION_GENIDENT "genident"
 
 
 //**************************************************************************
@@ -163,7 +164,7 @@ struct command_description
 	const char *name;
 	void (*handler)(parameters_map &);
 	const char *description;
-	const char *valid_options[16];
+	const char *valid_options[17];
 };
 
 
@@ -635,6 +636,7 @@ static const option_description s_options[] =
 	{ OPTION_VERBOSE,               "v",    false, ": output additional information" },
 	{ OPTION_SIZE,                  "s",    true, ": <bytes>: size of the output file" },
 	{ OPTION_TEMPLATE,              "tp",   true, ": <id>: use hard disk template (see listtemplates)" },
+	{ OPTION_GENIDENT,              "gi",   false, ": populate IDENT with generated string from template data" },
 };
 
 
@@ -689,7 +691,8 @@ static const command_description s_commands[] =
 			OPTION_CHS,
 			OPTION_SIZE,
 			OPTION_SECTOR_SIZE,
-			OPTION_NUMPROCESSORS
+			OPTION_NUMPROCESSORS,
+			OPTION_GENIDENT
 		}
 	},
 
@@ -1893,6 +1896,7 @@ static void do_create_hd(parameters_map &params)
 
 	// process template
 	auto template_str = params.find(OPTION_TEMPLATE);
+	std::string template_idnt_str;
 	if (template_str != params.end())
 	{
 		uint32_t id = parse_number(template_str->second->c_str());
@@ -1906,6 +1910,15 @@ static void do_create_hd(parameters_map &params)
 		sector_size = s_hd_templates[id].sector_size;
 
 		printf("Template:     %s %s\n", s_hd_templates[id].manufacturer, s_hd_templates[id].model);
+
+		auto genident_bool = params.find(OPTION_GENIDENT);
+		if (genident_bool != params.end())
+		{
+			std::string manuf_str(s_hd_templates[id].manufacturer);
+			std::transform(manuf_str.begin(), manuf_str.end(), manuf_str.begin(), ::toupper);
+			template_idnt_str = string_format("%-8s%-16s%4s", manuf_str.substr(0, 6), s_hd_templates[id].model, "1.00");
+			printf("Identifier:   %s\n", template_idnt_str.c_str());
+		}
 	}
 
 	// extract geometry from the parent if we have one
@@ -1981,6 +1994,12 @@ static void do_create_hd(parameters_map &params)
 			err = chd->write_metadata(HARD_DISK_IDENT_METADATA_TAG, 0, identdata);
 			if (err)
 				report_error(1, "Error adding hard disk metadata: %s", err.message());
+		}
+		else if (!template_idnt_str.empty())
+		{
+			err = chd->write_metadata(HARD_DISK_IDENT_METADATA_TAG, 0, template_idnt_str);
+			if (err != CHDERR_NONE)
+				report_error(1, "Error adding hard disk metadata: %s", chd_file::error_string(err));
 		}
 
 		// compress it generically
