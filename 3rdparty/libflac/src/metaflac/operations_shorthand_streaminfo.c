@@ -1,5 +1,6 @@
 /* metaflac - Command-line FLAC metadata editor
- * Copyright (C) 2001,2002,2003,2004,2005,2006,2007  Josh Coalson
+ * Copyright (C) 2001-2009  Josh Coalson
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -11,12 +12,12 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #  include <config.h>
 #endif
 
@@ -24,6 +25,7 @@
 #include "utils.h"
 #include "FLAC/assert.h"
 #include "FLAC/metadata.h"
+#include "share/compat.h"
 #include <string.h>
 #include "operations_shorthand.h"
 
@@ -45,7 +47,7 @@ FLAC__bool do_shorthand_operation__streaminfo(const char *filename, FLAC__bool p
 	FLAC__ASSERT(block->type == FLAC__METADATA_TYPE_STREAMINFO);
 
 	if(prefix_with_filename)
-		printf("%s:", filename);
+		flac_printf("%s:", filename);
 
 	switch(operation->type) {
 		case OP__SHOW_MD5SUM:
@@ -75,11 +77,7 @@ FLAC__bool do_shorthand_operation__streaminfo(const char *filename, FLAC__bool p
 			printf("%u\n", block->data.stream_info.bits_per_sample);
 			break;
 		case OP__SHOW_TOTAL_SAMPLES:
-#ifdef _MSC_VER
-			printf("%I64u\n", block->data.stream_info.total_samples);
-#else
-			printf("%llu\n", (unsigned long long)block->data.stream_info.total_samples);
-#endif
+			printf("%" PRIu64 "\n", block->data.stream_info.total_samples);
 			break;
 		case OP__SET_MD5SUM:
 			memcpy(block->data.stream_info.md5sum, operation->argument.streaminfo_md5.value, 16);

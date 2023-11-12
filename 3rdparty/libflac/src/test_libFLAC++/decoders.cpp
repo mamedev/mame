@@ -1,5 +1,6 @@
 /* test_libFLAC++ - Unit tester for libFLAC++
- * Copyright (C) 2002,2003,2004,2005,2006,2007  Josh Coalson
+ * Copyright (C) 2002-2009  Josh Coalson
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -11,12 +12,12 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #  include <config.h>
 #endif
 
@@ -24,17 +25,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#if defined _MSC_VER || defined __MINGW32__
-#if _MSC_VER <= 1600 /* @@@ [2G limit] */
-#define fseeko fseek
-#define ftello ftell
-#endif
-#endif
 #include "decoders.h"
 #include "FLAC/assert.h"
 #include "FLAC/metadata.h" // for ::FLAC__metadata_object_is_equal()
 #include "FLAC++/decoder.h"
 #include "share/grabbag.h"
+#include "share/compat.h"
 extern "C" {
 #include "test_libs_common/file_utils_flac.h"
 #include "test_libs_common/metadata_utils.h"
@@ -61,8 +57,8 @@ static const char * const LayerString[] = {
 
 static ::FLAC__StreamMetadata streaminfo_, padding_, seektable_, application1_, application2_, vorbiscomment_, cuesheet_, picture_, unknown_;
 static ::FLAC__StreamMetadata *expected_metadata_sequence_[9];
-static unsigned num_expected_;
-static off_t flacfilesize_;
+static uint32_t num_expected_;
+static FLAC__off_t flacfilesize_;
 
 static const char *flacfilename(bool is_ogg)
 {
@@ -84,7 +80,7 @@ static FLAC__bool die_s_(const char *msg, const FLAC::Decoder::Stream *decoder)
 	else
 		printf("FAILED");
 
-	printf(", state = %u (%s)\n", (unsigned)((::FLAC__StreamDecoderState)state), state.as_cstring());
+	printf(", state = %u (%s)\n", (uint32_t)((::FLAC__StreamDecoderState)state), state.as_cstring());
 
 	return false;
 }
@@ -124,11 +120,12 @@ static bool generate_file_(FLAC__bool is_ogg)
 class DecoderCommon {
 public:
 	Layer layer_;
-	unsigned current_metadata_number_;
+	uint32_t current_metadata_number_;
 	bool ignore_errors_;
 	bool error_occurred_;
 
 	DecoderCommon(Layer layer): layer_(layer), current_metadata_number_(0), ignore_errors_(false), error_occurred_(false) { }
+	virtual ~DecoderCommon(void) { }
 	::FLAC__StreamDecoderWriteStatus common_write_callback_(const ::FLAC__Frame *frame);
 	void common_metadata_callback_(const ::FLAC__StreamMetadata *metadata);
 	void common_error_callback_(::FLAC__StreamDecoderErrorStatus status);
@@ -155,7 +152,7 @@ void DecoderCommon::common_metadata_callback_(const ::FLAC__StreamMetadata *meta
 	if(error_occurred_)
 		return;
 
-	printf("%d... ", current_metadata_number_);
+	printf("%u... ", current_metadata_number_);
 	fflush(stdout);
 
 	if(current_metadata_number_ >= num_expected_) {
@@ -174,7 +171,7 @@ void DecoderCommon::common_metadata_callback_(const ::FLAC__StreamMetadata *meta
 void DecoderCommon::common_error_callback_(::FLAC__StreamDecoderErrorStatus status)
 {
 	if(!ignore_errors_) {
-		printf("ERROR: got error callback: err = %u (%s)\n", (unsigned)status, ::FLAC__StreamDecoderErrorStatusString[status]);
+		printf("ERROR: got error callback: err = %u (%s)\n", (uint32_t)status, ::FLAC__StreamDecoderErrorStatusString[status]);
 		error_occurred_ = true;
 	}
 }
@@ -197,6 +194,9 @@ public:
 	void error_callback(::FLAC__StreamDecoderErrorStatus status);
 
 	bool test_respond(bool is_ogg);
+private:
+	StreamDecoder(const StreamDecoder&);
+	StreamDecoder&operator=(const StreamDecoder&);
 };
 
 ::FLAC__StreamDecoderReadStatus StreamDecoder::read_callback(FLAC__byte buffer[], size_t *bytes)
@@ -234,7 +234,7 @@ public:
 	if(error_occurred_)
 		return ::FLAC__STREAM_DECODER_SEEK_STATUS_ERROR;
 
-	if(fseeko(file_, (off_t)absolute_byte_offset, SEEK_SET) < 0) {
+	if(fseeko(file_, (FLAC__off_t)absolute_byte_offset, SEEK_SET) < 0) {
 		error_occurred_ = true;
 		return ::FLAC__STREAM_DECODER_SEEK_STATUS_ERROR;
 	}
@@ -250,7 +250,7 @@ public:
 	if(error_occurred_)
 		return ::FLAC__STREAM_DECODER_TELL_STATUS_ERROR;
 
-	off_t offset = ftello(file_);
+	FLAC__off_t offset = ftello(file_);
 	*absolute_byte_offset = (FLAC__uint64)offset;
 
 	if(offset < 0) {
@@ -326,7 +326,7 @@ bool StreamDecoder::test_respond(bool is_ogg)
 	printf("testing process_until_end_of_stream()... ");
 	if(!process_until_end_of_stream()) {
 		State state = get_state();
-		printf("FAILED, returned false, state = %u (%s)\n", (unsigned)((::FLAC__StreamDecoderState)state), state.as_cstring());
+		printf("FAILED, returned false, state = %u (%s)\n", (uint32_t)((::FLAC__StreamDecoderState)state), state.as_cstring());
 		return false;
 	}
 	printf("OK\n");
@@ -334,7 +334,7 @@ bool StreamDecoder::test_respond(bool is_ogg)
 	printf("testing finish()... ");
 	if(!finish()) {
 		State state = get_state();
-		printf("FAILED, returned false, state = %u (%s)\n", (unsigned)((::FLAC__StreamDecoderState)state), state.as_cstring());
+		printf("FAILED, returned false, state = %u (%s)\n", (uint32_t)((::FLAC__StreamDecoderState)state), state.as_cstring());
 		return false;
 	}
 	printf("OK\n");
@@ -384,7 +384,7 @@ bool FileDecoder::test_respond(bool is_ogg)
 		case LAYER_FILE:
 			{
 				printf("opening %sFLAC file... ", is_ogg? "Ogg ":"");
-				FILE *file = ::fopen(flacfilename(is_ogg), "rb");
+				FILE *file = ::flac_fopen(flacfilename(is_ogg), "rb");
 				if(0 == file) {
 					printf("ERROR (%s)\n", strerror(errno));
 					return false;
@@ -412,7 +412,7 @@ bool FileDecoder::test_respond(bool is_ogg)
 	printf("testing process_until_end_of_stream()... ");
 	if(!process_until_end_of_stream()) {
 		State state = get_state();
-		printf("FAILED, returned false, state = %u (%s)\n", (unsigned)((::FLAC__StreamDecoderState)state), state.as_cstring());
+		printf("FAILED, returned false, state = %u (%s)\n", (uint32_t)((::FLAC__StreamDecoderState)state), state.as_cstring());
 		return false;
 	}
 	printf("OK\n");
@@ -420,7 +420,7 @@ bool FileDecoder::test_respond(bool is_ogg)
 	printf("testing finish()... ");
 	if(!finish()) {
 		State state = get_state();
-		printf("FAILED, returned false, state = %u (%s)\n", (unsigned)((::FLAC__StreamDecoderState)state), state.as_cstring());
+		printf("FAILED, returned false, state = %u (%s)\n", (uint32_t)((::FLAC__StreamDecoderState)state), state.as_cstring());
 		return false;
 	}
 	printf("OK\n");
@@ -459,6 +459,7 @@ static bool test_stream_decoder(Layer layer, bool is_ogg)
 	printf("testing is_valid()... ");
 	if(!decoder->is_valid()) {
 		printf("FAILED, returned false\n");
+		delete decoder;
 		return false;
 	}
 	printf("OK\n");
@@ -481,6 +482,7 @@ static bool test_stream_decoder(Layer layer, bool is_ogg)
 	printf("testing is_valid()... ");
 	if(!decoder->is_valid()) {
 		printf("FAILED, returned false\n");
+		delete decoder;
 		return false;
 	}
 	printf("OK\n");
@@ -504,6 +506,7 @@ static bool test_stream_decoder(Layer layer, bool is_ogg)
 			break;
 		default:
 			die_("internal error 006");
+			delete decoder;
 			return false;
 	}
 	if(init_status != ::FLAC__STREAM_DECODER_INIT_STATUS_OK)
@@ -531,6 +534,7 @@ static bool test_stream_decoder(Layer layer, bool is_ogg)
 	printf("testing is_valid()... ");
 	if(!decoder->is_valid()) {
 		printf("FAILED, returned false\n");
+		delete decoder;
 		return false;
 	}
 	printf("OK\n");
@@ -551,7 +555,7 @@ static bool test_stream_decoder(Layer layer, bool is_ogg)
 		case LAYER_STREAM:
 		case LAYER_SEEKABLE_STREAM:
 			printf("opening %sFLAC file... ", is_ogg? "Ogg ":"");
-			dynamic_cast<StreamDecoder*>(decoder)->file_ = ::fopen(flacfilename(is_ogg), "rb");
+			dynamic_cast<StreamDecoder*>(decoder)->file_ = ::flac_fopen(flacfilename(is_ogg), "rb");
 			if(0 == dynamic_cast<StreamDecoder*>(decoder)->file_) {
 				printf("ERROR (%s)\n", strerror(errno));
 				return false;
@@ -564,7 +568,7 @@ static bool test_stream_decoder(Layer layer, bool is_ogg)
 		case LAYER_FILE:
 			{
 				printf("opening FLAC file... ");
-				FILE *file = ::fopen(flacfilename(is_ogg), "rb");
+				FILE *file = ::flac_fopen(flacfilename(is_ogg), "rb");
 				if(0 == file) {
 					printf("ERROR (%s)\n", strerror(errno));
 					return false;
@@ -593,7 +597,7 @@ static bool test_stream_decoder(Layer layer, bool is_ogg)
 
 	printf("testing get_state()... ");
 	FLAC::Decoder::Stream::State state = decoder->get_state();
-	printf("returned state = %u (%s)... OK\n", (unsigned)((::FLAC__StreamDecoderState)state), state.as_cstring());
+	printf("returned state = %u (%s)... OK\n", (uint32_t)((::FLAC__StreamDecoderState)state), state.as_cstring());
 
 	dynamic_cast<DecoderCommon*>(decoder)->current_metadata_number_ = 0;
 	dynamic_cast<DecoderCommon*>(decoder)->ignore_errors_ = false;
@@ -654,7 +658,7 @@ static bool test_stream_decoder(Layer layer, bool is_ogg)
 
 	printf("testing get_channels()... ");
 	{
-		unsigned channels = decoder->get_channels();
+		uint32_t channels = decoder->get_channels();
 		if(channels != streaminfo_.data.stream_info.channels) {
 			printf("FAILED, returned %u, expected %u\n", channels, streaminfo_.data.stream_info.channels);
 			return false;
@@ -664,7 +668,7 @@ static bool test_stream_decoder(Layer layer, bool is_ogg)
 
 	printf("testing get_bits_per_sample()... ");
 	{
-		unsigned bits_per_sample = decoder->get_bits_per_sample();
+		uint32_t bits_per_sample = decoder->get_bits_per_sample();
 		if(bits_per_sample != streaminfo_.data.stream_info.bits_per_sample) {
 			printf("FAILED, returned %u, expected %u\n", bits_per_sample, streaminfo_.data.stream_info.bits_per_sample);
 			return false;
@@ -674,7 +678,7 @@ static bool test_stream_decoder(Layer layer, bool is_ogg)
 
 	printf("testing get_sample_rate()... ");
 	{
-		unsigned sample_rate = decoder->get_sample_rate();
+		uint32_t sample_rate = decoder->get_sample_rate();
 		if(sample_rate != streaminfo_.data.stream_info.sample_rate) {
 			printf("FAILED, returned %u, expected %u\n", sample_rate, streaminfo_.data.stream_info.sample_rate);
 			return false;
@@ -684,7 +688,7 @@ static bool test_stream_decoder(Layer layer, bool is_ogg)
 
 	printf("testing get_blocksize()... ");
 	{
-		unsigned blocksize = decoder->get_blocksize();
+		uint32_t blocksize = decoder->get_blocksize();
 		/* value could be anything since we're at the last block, so accept any reasonable answer */
 		printf("returned %u... %s\n", blocksize, blocksize>0? "OK" : "FAILED");
 		if(blocksize == 0)
@@ -694,7 +698,7 @@ static bool test_stream_decoder(Layer layer, bool is_ogg)
 	printf("testing get_channel_assignment()... ");
 	{
 		::FLAC__ChannelAssignment ca = decoder->get_channel_assignment();
-		printf("returned %u (%s)... OK\n", (unsigned)ca, ::FLAC__ChannelAssignmentString[ca]);
+		printf("returned %u (%s)... OK\n", (uint32_t)ca, ::FLAC__ChannelAssignmentString[ca]);
 	}
 
 	if(layer < LAYER_FILE) {
@@ -723,8 +727,8 @@ static bool test_stream_decoder(Layer layer, bool is_ogg)
 
 	printf("testing finish()... ");
 	if(!decoder->finish()) {
-		FLAC::Decoder::Stream::State state = decoder->get_state();
-		printf("FAILED, returned false, state = %u (%s)\n", (unsigned)((::FLAC__StreamDecoderState)state), state.as_cstring());
+		state = decoder->get_state();
+		printf("FAILED, returned false, state = %u (%s)\n", (uint32_t)((::FLAC__StreamDecoderState)state), state.as_cstring());
 		return false;
 	}
 	printf("OK\n");
@@ -741,11 +745,10 @@ static bool test_stream_decoder(Layer layer, bool is_ogg)
 	printf("OK\n");
 
 	num_expected_ = 0;
-	if(is_ogg) { /* encoder moves vorbis comment after streaminfo according to ogg mapping */
+	if(is_ogg) { /* encoder moves vorbis comment after streaminfo according to ogg mapping. Also removes the seektable */
 		expected_metadata_sequence_[num_expected_++] = &streaminfo_;
 		expected_metadata_sequence_[num_expected_++] = &vorbiscomment_;
 		expected_metadata_sequence_[num_expected_++] = &padding_;
-		expected_metadata_sequence_[num_expected_++] = &seektable_;
 		expected_metadata_sequence_[num_expected_++] = &application1_;
 		expected_metadata_sequence_[num_expected_++] = &application2_;
 		expected_metadata_sequence_[num_expected_++] = &cuesheet_;
@@ -804,7 +807,8 @@ static bool test_stream_decoder(Layer layer, bool is_ogg)
 	num_expected_ = 0;
 	expected_metadata_sequence_[num_expected_++] = &streaminfo_;
 	expected_metadata_sequence_[num_expected_++] = &padding_;
-	expected_metadata_sequence_[num_expected_++] = &seektable_;
+	if(!is_ogg) /* encoder removes seektable for ogg */
+		expected_metadata_sequence_[num_expected_++] = &seektable_;
 	expected_metadata_sequence_[num_expected_++] = &application1_;
 	expected_metadata_sequence_[num_expected_++] = &application2_;
 	expected_metadata_sequence_[num_expected_++] = &cuesheet_;
@@ -833,11 +837,10 @@ static bool test_stream_decoder(Layer layer, bool is_ogg)
 	printf("OK\n");
 
 	num_expected_ = 0;
-	if(is_ogg) { /* encoder moves vorbis comment after streaminfo according to ogg mapping */
+	if(is_ogg) { /* encoder moves vorbis comment after streaminfo according to ogg mapping. Also removes the seektable */
 		expected_metadata_sequence_[num_expected_++] = &streaminfo_;
 		expected_metadata_sequence_[num_expected_++] = &vorbiscomment_;
 		expected_metadata_sequence_[num_expected_++] = &padding_;
-		expected_metadata_sequence_[num_expected_++] = &seektable_;
 		expected_metadata_sequence_[num_expected_++] = &cuesheet_;
 		expected_metadata_sequence_[num_expected_++] = &picture_;
 		expected_metadata_sequence_[num_expected_++] = &unknown_;
@@ -874,11 +877,10 @@ static bool test_stream_decoder(Layer layer, bool is_ogg)
 	printf("OK\n");
 
 	num_expected_ = 0;
-	if(is_ogg) { /* encoder moves vorbis comment after streaminfo according to ogg mapping */
+	if(is_ogg) { /* encoder moves vorbis comment after streaminfo according to ogg mapping. Also removes the seektable */
 		expected_metadata_sequence_[num_expected_++] = &streaminfo_;
 		expected_metadata_sequence_[num_expected_++] = &vorbiscomment_;
 		expected_metadata_sequence_[num_expected_++] = &padding_;
-		expected_metadata_sequence_[num_expected_++] = &seektable_;
 		expected_metadata_sequence_[num_expected_++] = &application2_;
 		expected_metadata_sequence_[num_expected_++] = &cuesheet_;
 		expected_metadata_sequence_[num_expected_++] = &picture_;
@@ -924,11 +926,10 @@ static bool test_stream_decoder(Layer layer, bool is_ogg)
 	printf("OK\n");
 
 	num_expected_ = 0;
-	if(is_ogg) { /* encoder moves vorbis comment after streaminfo according to ogg mapping */
+	if(is_ogg) { /* encoder moves vorbis comment after streaminfo according to ogg mapping. Also removes seektable */
 		expected_metadata_sequence_[num_expected_++] = &streaminfo_;
 		expected_metadata_sequence_[num_expected_++] = &vorbiscomment_;
 		expected_metadata_sequence_[num_expected_++] = &padding_;
-		expected_metadata_sequence_[num_expected_++] = &seektable_;
 		expected_metadata_sequence_[num_expected_++] = &cuesheet_;
 		expected_metadata_sequence_[num_expected_++] = &picture_;
 		expected_metadata_sequence_[num_expected_++] = &unknown_;
@@ -1077,11 +1078,10 @@ static bool test_stream_decoder(Layer layer, bool is_ogg)
 	printf("OK\n");
 
 	num_expected_ = 0;
-	if(is_ogg) { /* encoder moves vorbis comment after streaminfo according to ogg mapping */
+	if(is_ogg) { /* encoder moves vorbis comment after streaminfo according to ogg mapping. Also removes the seektable */
 		expected_metadata_sequence_[num_expected_++] = &streaminfo_;
 		expected_metadata_sequence_[num_expected_++] = &vorbiscomment_;
 		expected_metadata_sequence_[num_expected_++] = &padding_;
-		expected_metadata_sequence_[num_expected_++] = &seektable_;
 		expected_metadata_sequence_[num_expected_++] = &application1_;
 		expected_metadata_sequence_[num_expected_++] = &cuesheet_;
 		expected_metadata_sequence_[num_expected_++] = &picture_;

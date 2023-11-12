@@ -1,5 +1,6 @@
 /* libFLAC - Free Lossless Audio Codec
- * Copyright (C) 2002,2003,2004,2005,2006,2007  Josh Coalson
+ * Copyright (C) 2002-2009  Josh Coalson
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -37,11 +38,8 @@
 #include "FLAC/assert.h"
 #include "private/ogg_decoder_aspect.h"
 #include "private/ogg_mapping.h"
+#include "private/macros.h"
 
-#ifdef max
-#undef max
-#endif
-#define max(x,y) ((x)>(y)?(x):(y))
 
 /***********************************************************************
  *
@@ -113,7 +111,7 @@ FLAC__OggDecoderAspectReadStatus FLAC__ogg_decoder_aspect_read_callback_wrapper(
 	 * decoder will eventually call the read callback to supply some data,
 	 * but how much it asks for depends on how much free space it has in
 	 * its internal buffer.  It does not try to grow its internal buffer
-	 * to accomodate a whole frame because then the internal buffer size
+	 * to accommodate a whole frame because then the internal buffer size
 	 * could not be limited, which is necessary in embedded applications.
 	 *
 	 * Ogg however grows its internal buffer until a whole page is present;
@@ -163,7 +161,7 @@ FLAC__OggDecoderAspectReadStatus FLAC__ogg_decoder_aspect_read_callback_wrapper(
 					/* if it is the first header packet, check for magic and a supported Ogg FLAC mapping version */
 					if (aspect->working_packet.bytes > 0 && aspect->working_packet.packet[0] == FLAC__OGG_MAPPING_FIRST_HEADER_PACKET_TYPE) {
 						const FLAC__byte *b = aspect->working_packet.packet;
-						const unsigned header_length =
+						const uint32_t header_length =
 							FLAC__OGG_MAPPING_PACKET_TYPE_LENGTH +
 							FLAC__OGG_MAPPING_MAGIC_LENGTH +
 							FLAC__OGG_MAPPING_VERSION_MAJOR_LENGTH +
@@ -175,9 +173,9 @@ FLAC__OggDecoderAspectReadStatus FLAC__ogg_decoder_aspect_read_callback_wrapper(
 						if (memcmp(b, FLAC__OGG_MAPPING_MAGIC, FLAC__OGG_MAPPING_MAGIC_LENGTH))
 							return FLAC__OGG_DECODER_ASPECT_READ_STATUS_NOT_FLAC;
 						b += FLAC__OGG_MAPPING_MAGIC_LENGTH;
-						aspect->version_major = (unsigned)(*b);
+						aspect->version_major = (uint32_t)(*b);
 						b += FLAC__OGG_MAPPING_VERSION_MAJOR_LENGTH;
-						aspect->version_minor = (unsigned)(*b);
+						aspect->version_minor = (uint32_t)(*b);
 						if (aspect->version_major != 1)
 							return FLAC__OGG_DECODER_ASPECT_READ_STATUS_UNSUPPORTED_MAPPING_VERSION;
 						aspect->working_packet.packet += header_length;
@@ -210,7 +208,7 @@ FLAC__OggDecoderAspectReadStatus FLAC__ogg_decoder_aspect_read_callback_wrapper(
 			}
 			else if (ret == 0) {
 				/* need more data */
-				const size_t ogg_bytes_to_read = max(bytes_requested - *bytes, OGG_BYTES_CHUNK);
+				const size_t ogg_bytes_to_read = flac_max(bytes_requested - *bytes, OGG_BYTES_CHUNK);
 				char *oggbuf = ogg_sync_buffer(&aspect->sync_state, ogg_bytes_to_read);
 
 				if(0 == oggbuf) {

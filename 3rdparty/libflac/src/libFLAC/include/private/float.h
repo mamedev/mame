@@ -1,5 +1,6 @@
 /* libFLAC - Free Lossless Audio Codec library
- * Copyright (C) 2004,2005,2006,2007  Josh Coalson
+ * Copyright (C) 2004-2009  Josh Coalson
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -39,18 +40,15 @@
 #include "FLAC/ordinals.h"
 
 /*
- * These typedefs make it easier to ensure that integer versions of
- * the library really only contain integer operations.  All the code
- * in libFLAC should use FLAC__float and FLAC__double in place of
- * float and double, and be protected by checks of the macro
+ * All the code in libFLAC that uses float and double
+ * should be protected by checks of the macro
  * FLAC__INTEGER_ONLY_LIBRARY.
  *
- * FLAC__real is the basic floating point type used in LPC analysis.
  */
 #ifndef FLAC__INTEGER_ONLY_LIBRARY
-typedef double FLAC__double;
-typedef float FLAC__float;
 /*
+ * FLAC__real is the basic floating point type used in LPC analysis.
+ *
  * WATCHOUT: changing FLAC__real will change the signatures of many
  * functions that have assembly language equivalents and break them.
  */
@@ -83,14 +81,14 @@ extern const FLAC__fixedpoint FLAC__FP_E;
  *	be < 32 and evenly divisible by 4 (0 is OK but not very precise).
  *
  *	'precision' roughly limits the number of iterations that are done;
- *	use (unsigned)(-1) for maximum precision.
+ *	use (uint32_t)(-1) for maximum precision.
  *
  *	If 'x' is less than one -- that is, x < (1<<fracbits) -- then this
  *	function will punt and return 0.
  *
  *	The return value will also have 'fracbits' fractional bits.
  */
-FLAC__uint32 FLAC__fixedpoint_log2(FLAC__uint32 x, unsigned fracbits, unsigned precision);
+FLAC__uint32 FLAC__fixedpoint_log2(FLAC__uint32 x, uint32_t fracbits, uint32_t precision);
 
 #endif
 

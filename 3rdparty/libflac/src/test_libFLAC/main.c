@@ -1,5 +1,6 @@
 /* test_libFLAC - Unit tester for libFLAC
- * Copyright (C) 2000,2001,2002,2003,2004,2005,2006,2007  Josh Coalson
+ * Copyright (C) 2000-2009  Josh Coalson
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -11,24 +12,38 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #  include <config.h>
 #endif
 
+#include "bitreader.h"
 #include "bitwriter.h"
+#include "crc.h"
 #include "decoders.h"
 #include "encoders.h"
+#include "endswap.h"
 #include "format.h"
 #include "metadata.h"
+#include "md5.h"
 
-int main(int argc, char *argv[])
+int main(void)
 {
-	(void)argc, (void)argv;
+	if(!test_endswap())
+		return 1;
+
+	if(!test_crc())
+		return 1;
+
+	if(!test_md5())
+		return 1;
+
+	if(!test_bitreader())
+		return 1;
 
 	if(!test_bitwriter())
 		return 1;

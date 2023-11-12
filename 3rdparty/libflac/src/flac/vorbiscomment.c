@@ -1,5 +1,6 @@
 /* flac - Command-line FLAC encoder/decoder
- * Copyright (C) 2002,2003,2004,2005,2006,2007  Josh Coalson
+ * Copyright (C) 2002-2009  Josh Coalson
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -11,12 +12,12 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #  include <config.h>
 #endif
 
@@ -29,6 +30,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "share/compat.h"
 
 
 /*
@@ -40,7 +42,7 @@ typedef struct {
 	char *field; /* the whole field as passed on the command line, i.e. "NAME=VALUE" */
 	char *field_name;
 	/* according to the vorbis spec, field values can contain \0 so simple C strings are not enough here */
-	unsigned field_value_length;
+	uint32_t field_value_length;
 	char *field_value;
 	FLAC__bool field_value_from_file; /* true if field_value holds a filename for the value, false for plain value */
 } Argument_VcField;
@@ -61,7 +63,7 @@ static char *local_strdup(const char *source)
 	return ret;
 }
 
-static FLAC__bool parse_vorbis_comment_field(const char *field_ref, char **field, char **name, char **value, unsigned *length, const char **violation)
+static FLAC__bool parse_vorbis_comment_field(const char *field_ref, char **field, char **name, char **value, uint32_t *length, const char **violation)
 {
 	static const char * const violations[] = {
 		"field name contains invalid character",
@@ -102,7 +104,7 @@ static FLAC__bool parse_vorbis_comment_field(const char *field_ref, char **field
 static FLAC__bool set_vc_field(FLAC__StreamMetadata *block, const Argument_VcField *field, FLAC__bool *needs_write, FLAC__bool raw, const char **violation)
 {
 	FLAC__StreamMetadata_VorbisComment_Entry entry;
-	char *converted;
+	char *converted = NULL;
 
 	FLAC__ASSERT(0 != block);
 	FLAC__ASSERT(block->type == FLAC__METADATA_TYPE_VORBIS_COMMENT);
@@ -113,7 +115,7 @@ static FLAC__bool set_vc_field(FLAC__StreamMetadata *block, const Argument_VcFie
 		/* read the file into 'data' */
 		FILE *f = 0;
 		char *data = 0;
-		const off_t size = grabbag__file_get_filesize(field->field_value);
+		const FLAC__off_t size = grabbag__file_get_filesize(field->field_value);
 		if(size < 0) {
 			*violation = "can't open file for tag value";
 			return false;
@@ -125,7 +127,7 @@ static FLAC__bool set_vc_field(FLAC__StreamMetadata *block, const Argument_VcFie
 		if(0 == (data = malloc(size+1)))
 			die("out of memory allocating tag value");
 		data[size] = '\0';
-		if(0 == (f = fopen(field->field_value, "rb")) || fread(data, 1, size, f) != (size_t)size) {
+		if(0 == (f = flac_fopen(field->field_value, "rb")) || fread(data, 1, size, f) != (size_t)size) {
 			free(data);
 			if(f)
 				fclose(f);
@@ -169,6 +171,9 @@ static FLAC__bool set_vc_field(FLAC__StreamMetadata *block, const Argument_VcFie
 	}
 	else {
 		FLAC__bool needs_free = false;
+#ifdef _WIN32 /* everything in UTF-8 already. Must not alter */
+		entry.entry = (FLAC__byte *)field->field;
+#else
 		if(raw) {
 			entry.entry = (FLAC__byte *)field->field;
 		}
@@ -180,6 +185,7 @@ static FLAC__bool set_vc_field(FLAC__StreamMetadata *block, const Argument_VcFie
 			*violation = "error converting comment to UTF-8";
 			return false;
 		}
+#endif
 		entry.length = strlen((const char *)entry.entry);
 		if(!FLAC__format_vorbiscomment_entry_is_legal(entry.entry, entry.length)) {
 			if(needs_free)
@@ -188,7 +194,7 @@ static FLAC__bool set_vc_field(FLAC__StreamMetadata *block, const Argument_VcFie
 			 * our previous parsing has already established that the field
 			 * name is OK, so it must be the field value
 			 */
-			*violation = "tag value for is not valid UTF-8";
+			*violation = "tag value is not valid UTF-8";
 			return false;
 		}
 
@@ -237,7 +243,7 @@ FLAC__bool flac__vorbiscomment_add(FLAC__StreamMetadata *block, const char *comm
 		return false;
 	}
 
-	if(!set_vc_field(block, &parsed, &dummy, raw, violation)) {
+	if(parsed.field_value_length > 0 && !set_vc_field(block, &parsed, &dummy, raw, violation)) {
 		free_field(&parsed);
 		return false;
 	}

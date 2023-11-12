@@ -1,7 +1,7 @@
 METADATA block #0
   type: 0 (STREAMINFO)
   is last: false
-  length: 34
+  length: XXX
   sample_rate: 8000 Hz
   channels: 1
   bits-per-sample: 8
@@ -10,13 +10,13 @@ METADATA block #0
 METADATA block #1
   type: 3 (SEEKTABLE)
   is last: false
-  length: 18
+  length: XXX
   seek points: 1
     point 0: sample_number=0
 METADATA block #2
   type: 4 (VORBIS_COMMENT)
   is last: false
-  length: 117
+  length: XXX
   comments: 4
     comment[0]: f=0123456789abcdefghij
     comment[1]: TITLE=Tittle
@@ -25,7 +25,7 @@ METADATA block #2
 METADATA block #3
   type: 5 (CUESHEET)
   is last: false
-  length: 480
+  length: XXX
   media catalog number: 1234567890123
   lead-in: 0
   is CD: false
@@ -46,7 +46,7 @@ METADATA block #3
 METADATA block #4
   type: 6 (PICTURE)
   is last: false
-  length: 141
+  length: XXX
   type: 3 (Cover (front))
   MIME type: image/gif
   description: 0.gif
@@ -54,12 +54,12 @@ METADATA block #4
   height: 24
   depth: 24
   colors: 2
-  data length: 95
+  data length: XXX
   data:
 METADATA block #5
   type: 6 (PICTURE)
   is last: false
-  length: 917
+  length: XXX
   type: 3 (Cover (front))
   MIME type: image/gif
   description: 1.gif
@@ -67,12 +67,12 @@ METADATA block #5
   height: 8
   depth: 24
   colors: 256
-  data length: 871
+  data length: XXX
   data:
 METADATA block #6
   type: 6 (PICTURE)
   is last: false
-  length: 578
+  length: XXX
   type: 3 (Cover (front))
   MIME type: image/gif
   description: 2.gif
@@ -80,12 +80,12 @@ METADATA block #6
   height: 14
   depth: 24
   colors: 128
-  data length: 532
+  data length: XXX
   data:
 METADATA block #7
   type: 6 (PICTURE)
   is last: false
-  length: 377
+  length: XXX
   type: 4 (Cover (back))
   MIME type: image/jpeg
   description: 0.jpg
@@ -93,12 +93,12 @@ METADATA block #7
   height: 20
   depth: 8
   colors: 0 (unindexed)
-  data length: 330
+  data length: XXX
   data:
 METADATA block #8
   type: 6 (PICTURE)
   is last: false
-  length: 614
+  length: XXX
   type: 4 (Cover (back))
   MIME type: image/jpeg
   description: 4.jpg
@@ -106,12 +106,12 @@ METADATA block #8
   height: 47
   depth: 24
   colors: 0 (unindexed)
-  data length: 567
+  data length: XXX
   data:
 METADATA block #9
   type: 6 (PICTURE)
   is last: false
-  length: 492
+  length: XXX
   type: 5 (Leaflet page)
   MIME type: image/png
   description: 0.png
@@ -119,12 +119,12 @@ METADATA block #9
   height: 20
   depth: 8
   colors: 0 (unindexed)
-  data length: 446
+  data length: XXX
   data:
 METADATA block #10
   type: 6 (PICTURE)
   is last: false
-  length: 508
+  length: XXX
   type: 5 (Leaflet page)
   MIME type: image/png
   description: 1.png
@@ -132,12 +132,12 @@ METADATA block #10
   height: 20
   depth: 8
   colors: 0 (unindexed)
-  data length: 462
+  data length: XXX
   data:
 METADATA block #11
   type: 6 (PICTURE)
   is last: false
-  length: 338
+  length: XXX
   type: 5 (Leaflet page)
   MIME type: image/png
   description: 2.png
@@ -145,12 +145,12 @@ METADATA block #11
   height: 20
   depth: 24
   colors: 7
-  data length: 292
+  data length: XXX
   data:
 METADATA block #12
   type: 6 (PICTURE)
   is last: false
-  length: 354
+  length: XXX
   type: 5 (Leaflet page)
   MIME type: image/png
   description: 3.png
@@ -158,9 +158,9 @@ METADATA block #12
   height: 20
   depth: 24
   colors: 7
-  data length: 308
+  data length: XXX
   data:
 METADATA block #13
   type: 1 (PADDING)
   is last: true
-  length: 43
+  length: XXX

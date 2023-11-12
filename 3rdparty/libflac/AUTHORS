@@ -1,8 +1,9 @@
 /* FLAC - Free Lossless Audio Codec
- * Copyright (C) 2001,2002,2003,2004,2005,2006,2007  Josh Coalson
+ * Copyright (C) 2001-2009  Josh Coalson
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * This file is part the FLAC project.  FLAC is comprised of several
- * components distributed under difference licenses.  The codec libraries
+ * components distributed under different licenses.  The codec libraries
  * are distributed under Xiph.Org's BSD-like license (see the file
  * COPYING.Xiph in this distribution).  All other programs, libraries, and
  * plugins are distributed under the GPL (see COPYING.GPL).  The documentation
@@ -16,11 +17,30 @@
  * distribution.
  */
 
+This file lists major contributors to the FLAC project. This list is not
+exhaustive. For an exhaustive list, run the command `git shortlog -s` on
+the git repo or visit https://gitlab.xiph.org/xiph/flac/-/graphs/master
 
-FLAC (http://flac.sourceforge.net/) is an Open Source lossless audio
-codec developed by Josh Coalson <jcoalson@users.sourceforge.net>.
+For a complete list of contributions, run the command `git log` on the
+git repo, visit https://github.com/xiph/flac/commits or visit
+https://gitlab.xiph.org/xiph/flac/commits
+
+Original author: Josh Coalson <jcoalson@users.sourceforge.net>
+Maintainer 2012-2020: Erik de Castro Lopo <erikd@mega-nerd.com>
+Maintainer from 2022: Martijn van Beurden <mvanb1@gmail.com>
+
+Website : https://www.xiph.org/flac/
 
 Other major contributors and their contributions:
+
+"lvqcl" <lvqcl@users.sourceforge.net>
+* Visual Studio build system.
+* Optimisations in the encoder and decoder.
+
+"Janne Hyvärinen" <cse@sci.fi>
+* Visual Studio build system.
+* Unicode handling on Windows.
+
 "Andrey Astafiev" <andrei@tvcell.ru>
 * Russian translation of the HTML documentation
 
@@ -38,4 +58,3 @@ Other major contributors and their contributions:
 
 "Matt Zimmerman" <mdz@debian.org>
 * Libtool/autoconf/automake make system, flac man page
-

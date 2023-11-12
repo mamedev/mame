@@ -1,5 +1,6 @@
 /* metaflac - Command-line FLAC metadata editor
- * Copyright (C) 2001,2002,2003,2004,2005,2006,2007  Josh Coalson
+ * Copyright (C) 2001-2009  Josh Coalson
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -11,25 +12,28 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #  include <config.h>
 #endif
 
+#include "utils.h"
 #include "usage.h"
 #include "FLAC/format.h"
 #include <stdarg.h>
 #include <stdio.h>
+#include "share/compat.h"
 
 static void usage_header(FILE *out)
 {
 	fprintf(out, "==============================================================================\n");
 	fprintf(out, "metaflac - Command-line FLAC metadata editor version %s\n", FLAC__VERSION_STRING);
-	fprintf(out, "Copyright (C) 2001,2002,2003,2004,2005,2006,2007  Josh Coalson\n");
+	fprintf(out, "Copyright (C) 2001-2009  Josh Coalson\n");
+	fprintf(out, "Copyright (C) 2011-2023  Xiph.Org Foundation\n");
 	fprintf(out, "\n");
 	fprintf(out, "This program is free software; you can redistribute it and/or\n");
 	fprintf(out, "modify it under the terms of the GNU General Public License\n");
@@ -41,9 +45,9 @@ static void usage_header(FILE *out)
 	fprintf(out, "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n");
 	fprintf(out, "GNU General Public License for more details.\n");
 	fprintf(out, "\n");
-	fprintf(out, "You should have received a copy of the GNU General Public License\n");
-	fprintf(out, "along with this program; if not, write to the Free Software\n");
-	fprintf(out, "Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.\n");
+	fprintf(out, "You should have received a copy of the GNU General Public License along\n");
+	fprintf(out, "with this program; if not, write to the Free Software Foundation, Inc.,\n");
+	fprintf(out, "51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.\n");
 	fprintf(out, "==============================================================================\n");
 }
 
@@ -58,7 +62,9 @@ static void usage_summary(FILE *out)
 	fprintf(out, "Options:\n");
 	fprintf(out, "--preserve-modtime    Preserve the original modification time in spite of edits\n");
 	fprintf(out, "--with-filename       Prefix each output line with the FLAC file name\n");
-	fprintf(out, "                      (the default if more than one FLAC file is specified)\n");
+	fprintf(out, "                      (the default if more than one FLAC file is specified).\n");
+	fprintf(out, "                      This option has no effect for options exporting to a\n");
+	fprintf(out, "                      file, like --export-tags-to.\n");
 	fprintf(out, "--no-filename         Do not prefix each output line with the FLAC file name\n");
 	fprintf(out, "                      (the default if only one FLAC file is specified)\n");
 	fprintf(out, "--no-utf8-convert     Do not convert tags from UTF-8 to local charset,\n");
@@ -83,9 +89,9 @@ int short_usage(const char *message, ...)
 
 	}
 	usage_header(stderr);
-	fprintf(stderr, "\n");
-	fprintf(stderr, "This is the short help; for full help use 'metaflac --help'\n");
-	fprintf(stderr, "\n");
+	flac_fprintf(stderr, "\n");
+	flac_fprintf(stderr, "This is the short help; for full help use 'metaflac --help'\n");
+	flac_fprintf(stderr, "\n");
 	usage_summary(stderr);
 
 	return message? 1 : 0;
@@ -120,10 +126,14 @@ int long_usage(const char *message, ...)
 	fprintf(out, "--show-total-samples  Show the total # of samples from the STREAMINFO block.\n");
 	fprintf(out, "\n");
 	fprintf(out, "--show-vendor-tag     Show the vendor string from the VORBIS_COMMENT block.\n");
-	fprintf(out, "--show-tag=NAME       Show all tags where the the field name matches 'NAME'.\n");
+	fprintf(out, "--show-tag=NAME       Show all tags where the field name matches 'NAME'.\n");
+	fprintf(out, "--show-all-tags       Show all tags. This is an alias for --export-tags-to=-.\n");
 	fprintf(out, "--remove-tag=NAME     Remove all tags whose field name is 'NAME'.\n");
 	fprintf(out, "--remove-first-tag=NAME  Remove first tag whose field name is 'NAME'.\n");
 	fprintf(out, "--remove-all-tags     Remove all tags, leaving only the vendor string.\n");
+	fprintf(out, "--remove-all-tags-except=NAME1[=NAME2[=...]] Remove all tags, except the vendor\n");
+	fprintf(out, "                      string and the tag names specified. Tag names must be\n");
+	fprintf(out, "                      separated by an = character.\n");
 	fprintf(out, "--set-tag=FIELD       Add a tag.  The FIELD must comply with the Vorbis comment\n");
 	fprintf(out, "                      spec, of the form \"NAME=VALUE\".  If there is currently\n");
 	fprintf(out, "                      no tag block, one will be created.\n");
@@ -189,7 +199,7 @@ int long_usage(const char *message, ...)
 	fprintf(out, "             mean that FILE is actually a URL to an image, though this use is\n");
 	fprintf(out, "             discouraged.\n");
 	fprintf(out, "           DESCRIPTION is optional; the default is an empty string\n");
-	fprintf(out, "           The next part specfies the resolution and color information.  If\n");
+	fprintf(out, "           The next part specifies the resolution and color information.  If\n");
 	fprintf(out, "             the MIME-TYPE is image/jpeg, image/png, or image/gif, you can\n");
 	fprintf(out, "             usually leave this empty and they can be detected from the file.\n");
 	fprintf(out, "             Otherwise, you must specify the width in pixels, height in pixels,\n");
@@ -213,8 +223,13 @@ int long_usage(const char *message, ...)
 	fprintf(out, "                      executed last, after all other operations have been\n");
 	fprintf(out, "                      completed and written to disk.  All FLAC files specified\n");
 	fprintf(out, "                      must have the same resolution, sample rate, and number\n");
-	fprintf(out, "                      of channels.  The sample rate must be one of 8, 11.025,\n");
-	fprintf(out, "                      12, 16, 22.05, 24, 32, 44.1, or 48 kHz.\n");
+	fprintf(out, "                      of channels.  Only mono and stereo files are allowed,\n");
+	fprintf(out, "                      and the sample rate must be 8, 11.025, 12, 16, 18.9,\n");
+	fprintf(out, "                      22.05, 24, 28, 32, 36, 37.8, 44.1, 48, 56, 64, 72, 75.6,\n");
+	fprintf(out, "                      88.2, 96, 112, 128, 144, 151.2, 176.4, 192, 224, 256,\n");
+	fprintf(out, "                      288, 302.4, 352.8, 384, 448, 512, 576, or 604.8 kHz.\n");
+	fprintf(out, "--scan-replay-gain    Like --add-replay-gain, but only analyzes the files\n");
+	fprintf(out, "                      rather than writing them to tags.\n");
 	fprintf(out, "--remove-replay-gain  Removes the ReplayGain tags.\n");
 	fprintf(out, "--add-seekpoint={#|X|#x|#s}  Add seek points to a SEEKTABLE block\n");
 	fprintf(out, "       #  : a specific sample number for a seek point\n");
@@ -262,23 +277,30 @@ int long_usage(const char *message, ...)
 	fprintf(out, "    NOTE: if both --block-number and --[except-]block-type are specified,\n");
 	fprintf(out, "          the result is the logical AND of both arguments.\n");
 	fprintf(out, "\n");
-#if 0
-	/*@@@ not implemented yet */
-	fprintf(out, "    --data-format=binary|text\n");
+	fprintf(out, "    --data-format=binary|binary-headerless|text\n");
 	fprintf(out, "    By default a human-readable text representation of the data is displayed.\n");
 	fprintf(out, "    You may specify --data-format=binary to dump the raw binary form of each\n");
-	fprintf(out, "    metadata block.  The output can be read in using a subsequent call to\n");
-	fprintf(out, "    "metaflac --append --from-file=..."\n");
+	fprintf(out, "    metadata block. Specify --data-format=binary-headerless to omit output of\n");
+	fprintf(out, "    metadata block headers, including the id of APPLICATION metadata blocks.\n");
+	fprintf(out, "    The output can be read in using a subsequent call to\n");
+	fprintf(out, "    \"metaflac --append\"\n");
 	fprintf(out, "\n");
-#endif
 	fprintf(out, "    --application-data-format=hexdump|text\n");
 	fprintf(out, "    If the application block you are displaying contains binary data but your\n");
 	fprintf(out, "    --data-format=text, you can display a hex dump of the application data\n");
 	fprintf(out, "    contents instead using --application-data-format=hexdump\n");
 	fprintf(out, "\n");
-#if 0
-	/*@@@ not implemented yet */
 	fprintf(out, "--append\n");
+	fprintf(out, "    Insert a metadata block from a file. This must be a binary block as\n");
+	fprintf(out, "    exported with --list --data-format=binary. The insertion point is\n");
+	fprintf(out, "    defined with --block-number=#.  The new block will be added after the\n");
+	fprintf(out, "    given block number.  This prevents the illegal insertion of a block\n");
+	fprintf(out, "    before the first STREAMINFO block.  You may not --append another\n");
+	fprintf(out, "    STREAMINFO block. It is possible to copy a metadata block from one\n");
+	fprintf(out, "    file to another with this option. For example use\n");
+	fprintf(out, "    metaflac --list --data-format=binary --block-number=6 file.flac > block\n");
+	fprintf(out, "    to export the block, and then import it with\n");
+	fprintf(out, "    metaflac --append anotherfile.flac < block\n");
 	fprintf(out, "    Insert a metadata block from a file.  The input file must be in the same\n");
 	fprintf(out, "    format as generated with --list.\n");
 	fprintf(out, "\n");
@@ -288,6 +310,8 @@ int long_usage(const char *message, ...)
 	fprintf(out, "    of a block before the first STREAMINFO block.  You may not --append another\n");
 	fprintf(out, "    STREAMINFO block.\n");
 	fprintf(out, "\n");
+#if 0
+	/*@@@ not implemented yet */
 	fprintf(out, "    --from-file=filename\n");
 	fprintf(out, "    Mandatory 'option' to specify the input file containing the block contents.\n");
 	fprintf(out, "\n");

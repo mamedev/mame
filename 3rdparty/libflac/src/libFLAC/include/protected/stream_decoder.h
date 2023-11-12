@@ -1,5 +1,6 @@
 /* libFLAC - Free Lossless Audio Codec library
- * Copyright (C) 2000,2001,2002,2003,2004,2005,2006,2007  Josh Coalson
+ * Copyright (C) 2000-2009  Josh Coalson
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -39,11 +40,12 @@
 
 typedef struct FLAC__StreamDecoderProtected {
 	FLAC__StreamDecoderState state;
-	unsigned channels;
+	FLAC__StreamDecoderInitStatus initstate;
+	uint32_t channels;
 	FLAC__ChannelAssignment channel_assignment;
-	unsigned bits_per_sample;
-	unsigned sample_rate; /* in Hz */
-	unsigned blocksize; /* in samples (per channel) */
+	uint32_t bits_per_sample;
+	uint32_t sample_rate; /* in Hz */
+	uint32_t blocksize; /* in samples (per channel) */
 	FLAC__bool md5_checking; /* if true, generate MD5 signature of decoded data and compare against signature in the STREAMINFO metadata block */
 #if FLAC__HAS_OGG
 	FLAC__OggDecoderAspect ogg_decoder_aspect;
@@ -51,8 +53,8 @@ typedef struct FLAC__StreamDecoderProtected {
 } FLAC__StreamDecoderProtected;
 
 /*
- * return the number of input bytes consumed
+ * Return the number of input bytes consumed
  */
-unsigned FLAC__stream_decoder_get_input_bytes_unconsumed(const FLAC__StreamDecoder *decoder);
+uint32_t FLAC__stream_decoder_get_input_bytes_unconsumed(const FLAC__StreamDecoder *decoder);
 
 #endif

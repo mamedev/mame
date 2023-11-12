@@ -1,5 +1,6 @@
 /* libFLAC - Free Lossless Audio Codec
- * Copyright (C) 2002,2003,2004,2005,2006,2007  Josh Coalson
+ * Copyright (C) 2002-2009  Josh Coalson
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -71,7 +72,7 @@ void FLAC__ogg_encoder_aspect_set_serial_number(FLAC__OggEncoderAspect *aspect, 
 	aspect->serial_number = value;
 }
 
-FLAC__bool FLAC__ogg_encoder_aspect_set_num_metadata(FLAC__OggEncoderAspect *aspect, unsigned value)
+FLAC__bool FLAC__ogg_encoder_aspect_set_num_metadata(FLAC__OggEncoderAspect *aspect, uint32_t value)
 {
 	if(value < (1u << FLAC__OGG_MAPPING_NUM_HEADERS_LEN)) {
 		aspect->num_metadata = value;
@@ -108,7 +109,7 @@ void FLAC__ogg_encoder_aspect_set_defaults(FLAC__OggEncoderAspect *aspect)
  * separate write callback for the fLaC magic, and then separate write
  * callbacks for each metadata block and audio frame.
  */
-FLAC__StreamEncoderWriteStatus FLAC__ogg_encoder_aspect_write_callback_wrapper(FLAC__OggEncoderAspect *aspect, const FLAC__byte buffer[], size_t bytes, unsigned samples, unsigned current_frame, FLAC__bool is_last_block, FLAC__OggEncoderAspectWriteCallbackProxy write_callback, void *encoder, void *client_data)
+FLAC__StreamEncoderWriteStatus FLAC__ogg_encoder_aspect_write_callback_wrapper(FLAC__OggEncoderAspect *aspect, const FLAC__byte buffer[], size_t bytes, uint32_t samples, uint32_t current_frame, FLAC__bool is_last_block, FLAC__OggEncoderAspectWriteCallbackProxy write_callback, void *encoder, void *client_data)
 {
 	/* WATCHOUT:
 	 * This depends on the behavior of FLAC__StreamEncoder that 'samples'
@@ -169,14 +170,14 @@ FLAC__StreamEncoderWriteStatus FLAC__ogg_encoder_aspect_write_callback_wrapper(F
 			/* add STREAMINFO */
 			memcpy(b, buffer, bytes);
 			FLAC__ASSERT(b + bytes - synthetic_first_packet_body == sizeof(synthetic_first_packet_body));
-			packet.packet = (unsigned char *)synthetic_first_packet_body;
+			packet.packet = (uint8_t *)synthetic_first_packet_body;
 			packet.bytes = sizeof(synthetic_first_packet_body);
 
 			packet.b_o_s = 1;
 			aspect->is_first_packet = false;
 		}
 		else {
-			packet.packet = (unsigned char *)buffer;
+			packet.packet = (uint8_t *)buffer;
 			packet.bytes = bytes;
 		}
 

@@ -4,238 +4,117 @@
  *
  * Buffer overflow checking added: Josh Coalson, 9/9/2007
  *
+ * Win32 part rewritten: lvqcl, 2/2/2016
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 /*
  * Convert a string between UTF-8 and the locale's charset.
  */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #  include <config.h>
 #endif
 
+#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 #include "share/alloc.h"
-#include "utf8.h"
-#include "charset.h"
-
+#include "share/utf8.h"
 
 #ifdef _WIN32
 
-	/* Thanks to Peter Harris <peter.harris@hummingbird.com> for this win32
-	 * code.
-	 */
-
-#include <stdio.h>
 #include <windows.h>
-
-static unsigned char *make_utf8_string(const wchar_t *unicode)
-{
-    size_t size = 0, n;
-    int index = 0, out_index = 0;
-    unsigned char *out;
-    unsigned short c;
-
-    /* first calculate the size of the target string */
-    c = unicode[index++];
-    while(c) {
-        if(c < 0x0080) {
-            n = 1;
-        } else if(c < 0x0800) {
-            n = 2;
-        } else {
-            n = 3;
-        }
-        if(size+n < size) /* overflow check */
-            return NULL;
-        size += n;
-        c = unicode[index++];
-    }
-
-    out = safe_malloc_add_2op_(size, /*+*/1);
-    if (out == NULL)
-        return NULL;
-    index = 0;
-
-    c = unicode[index++];
-    while(c)
-    {
-        if(c < 0x080) {
-            out[out_index++] = (unsigned char)c;
-        } else if(c < 0x800) {
-            out[out_index++] = 0xc0 | (c >> 6);
-            out[out_index++] = 0x80 | (c & 0x3f);
-        } else {
-            out[out_index++] = 0xe0 | (c >> 12);
-            out[out_index++] = 0x80 | ((c >> 6) & 0x3f);
-            out[out_index++] = 0x80 | (c & 0x3f);
-        }
-        c = unicode[index++];
-    }
-    out[out_index] = 0x00;
-
-    return out;
-}
-
-static wchar_t *make_unicode_string(const unsigned char *utf8)
-{
-    size_t size = 0;
-    int index = 0, out_index = 0;
-    wchar_t *out;
-    unsigned char c;
-
-    /* first calculate the size of the target string */
-    c = utf8[index++];
-    while(c) {
-        if((c & 0x80) == 0) {
-            index += 0;
-        } else if((c & 0xe0) == 0xe0) {
-            index += 2;
-        } else {
-            index += 1;
-        }
-        if(size + 1 == 0) /* overflow check */
-            return NULL;
-        size++;
-        c = utf8[index++];
-    }
-
-    if(size + 1 == 0) /* overflow check */
-        return NULL;
-    out = safe_malloc_mul_2op_(size+1, /*times*/sizeof(wchar_t));
-    if (out == NULL)
-        return NULL;
-    index = 0;
-
-    c = utf8[index++];
-    while(c)
-    {
-        if((c & 0x80) == 0) {
-            out[out_index++] = c;
-        } else if((c & 0xe0) == 0xe0) {
-            out[out_index] = (c & 0x1F) << 12;
-	        c = utf8[index++];
-            out[out_index] |= (c & 0x3F) << 6;
-	        c = utf8[index++];
-            out[out_index++] |= (c & 0x3F);
-        } else {
-            out[out_index] = (c & 0x3F) << 6;
-	        c = utf8[index++];
-            out[out_index++] |= (c & 0x3F);
-        }
-        c = utf8[index++];
-    }
-    out[out_index] = 0;
-
-    return out;
-}
 
 int utf8_encode(const char *from, char **to)
 {
-	wchar_t *unicode;
-	int wchars, err;
+	wchar_t *unicode = NULL;
+	char *utf8 = NULL;
+	int ret = -1;
 
-	wchars = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, from,
-			strlen(from), NULL, 0);
+	do {
+		int len;
 
-	if(wchars == 0)
-	{
-		fprintf(stderr, "Unicode translation error %d\n", GetLastError());
-		return -1;
-	}
+		len = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, from, -1, NULL, 0);
+		if(len == 0) break;
+		unicode = (wchar_t*) safe_malloc_mul_2op_((size_t)len, sizeof(wchar_t));
+		if(unicode == NULL) break;
+		len = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, from, -1, unicode, len);
+		if(len == 0) break;
 
-	if(wchars < 0) /* underflow check */
-		return -1;
+		len = WideCharToMultiByte(CP_UTF8, 0, unicode, -1, NULL, 0, NULL, NULL);
+		if(len == 0) break;
+		utf8 = (char*) safe_malloc_mul_2op_((size_t)len, sizeof(char));
+		if(utf8 == NULL) break;
+		len = WideCharToMultiByte(CP_UTF8, 0, unicode, -1, utf8, len, NULL, NULL);
+		if(len == 0) break;
 
-	unicode = safe_calloc_((size_t)wchars + 1, sizeof(unsigned short));
-	if(unicode == NULL) 
-	{
-		fprintf(stderr, "Out of memory processing string to UTF8\n");
-		return -1;
-	}
+		ret = 0;
 
-	err = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, from, 
-			strlen(from), unicode, wchars);
-	if(err != wchars)
-	{
-		free(unicode);
-		fprintf(stderr, "Unicode translation error %d\n", GetLastError());
-		return -1;
-	}
-
-	/* On NT-based windows systems, we could use WideCharToMultiByte(), but 
-	 * MS doesn't actually have a consistent API across win32.
-	 */
-	*to = make_utf8_string(unicode);
+	} while(0);
 
 	free(unicode);
-	return 0;
+
+	if(ret == 0) {
+		*to = utf8;
+	} else {
+		free(utf8);
+		*to = NULL;
+	}
+
+	return ret;
 }
 
 int utf8_decode(const char *from, char **to)
 {
-    wchar_t *unicode;
-    int chars, err;
+	wchar_t *unicode = NULL;
+	char *acp = NULL;
+	int ret = -1;
 
-    /* On NT-based windows systems, we could use MultiByteToWideChar(CP_UTF8), but 
-     * MS doesn't actually have a consistent API across win32.
-     */
-    unicode = make_unicode_string(from);
-    if(unicode == NULL) 
-    {
-        fprintf(stderr, "Out of memory processing string from UTF8 to UNICODE16\n");
-        return -1;
-    }
+	do {
+		int len;
 
-    chars = WideCharToMultiByte(GetConsoleCP(), WC_COMPOSITECHECK, unicode,
-            -1, NULL, 0, NULL, NULL);
+		len = MultiByteToWideChar(CP_UTF8, 0, from, -1, NULL, 0);
+		if(len == 0) break;
+		unicode = (wchar_t*) safe_malloc_mul_2op_((size_t)len, sizeof(wchar_t));
+		if(unicode == NULL) break;
+		len = MultiByteToWideChar(CP_UTF8, 0, from, -1, unicode, len);
+		if(len == 0) break;
 
-    if(chars < 0) /* underflow check */
-        return -1;
+		len = WideCharToMultiByte(CP_ACP, WC_COMPOSITECHECK, unicode, -1, NULL, 0, NULL, NULL);
+		if(len == 0) break;
+		acp = (char*) safe_malloc_mul_2op_((size_t)len, sizeof(char));
+		if(acp == NULL) break;
+		len = WideCharToMultiByte(CP_ACP, WC_COMPOSITECHECK, unicode, -1, acp, len, NULL, NULL);
+		if(len == 0) break;
 
-    if(chars == 0)
-    {
-        fprintf(stderr, "Unicode translation error %d\n", GetLastError());
-        free(unicode);
-        return -1;
-    }
+		ret = 0;
 
-    *to = safe_calloc_((size_t)chars + 1, sizeof(unsigned char));
-    if(*to == NULL) 
-    {
-        fprintf(stderr, "Out of memory processing string to local charset\n");
-        free(unicode);
-        return -1;
-    }
+	} while(0);
 
-    err = WideCharToMultiByte(GetConsoleCP(), WC_COMPOSITECHECK, unicode, 
-            -1, *to, chars, NULL, NULL);
-    if(err != chars)
-    {
-        fprintf(stderr, "Unicode translation error %d\n", GetLastError());
-        free(unicode);
-        free(*to);
-        *to = NULL;
-        return -1;
-    }
+	free(unicode);
 
-    free(unicode);
-    return 0;
+	if(ret == 0) {
+		*to = acp;
+	} else {
+		free(acp);
+		*to = NULL;
+	}
+
+	return ret;
 }
 
 #else /* End win32. Rest is for real operating systems */
@@ -245,7 +124,11 @@ int utf8_decode(const char *from, char **to)
 #include <langinfo.h>
 #endif
 
+#include <string.h>
+
+#include "share/safe_str.h"
 #include "iconvert.h"
+#include "charset.h"
 
 static const char *current_charset(void)
 {
@@ -298,7 +181,7 @@ static int convert_string(const char *fromcode, const char *tocode,
   s = safe_malloc_add_2op_(fromlen, /*+*/1);
   if (!s)
     return -1;
-  strcpy(s, from);
+  snprintf(s, fromlen + 1, "%s", from);
   *to = s;
   for (; *s; s++)
     if (*s & ~0x7f)

@@ -1,5 +1,6 @@
 /* grabbag - Convenience lib for various routines common to several tools
- * Copyright (C) 2002,2003,2004,2005,2006,2007  Josh Coalson
+ * Copyright (C) 2002-2009  Josh Coalson
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,7 +17,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #  include <config.h>
 #endif
 
@@ -26,9 +27,8 @@
 #include <fcntl.h> /* for _O_BINARY */
 #else
 #include <sys/types.h> /* some flavors of BSD (like OS X) require this to get time_t */
-#include <utime.h> /* for utime() */
 #endif
-#if defined __CYGWIN__ || defined __EMX__
+#if defined __EMX__
 #include <io.h> /* for setmode(), O_BINARY */
 #include <fcntl.h> /* for _O_BINARY */
 #endif
@@ -46,26 +46,33 @@
 #include <winbase.h>
 #endif
 #include "share/grabbag.h"
+#include "share/compat.h"
 
 
 void grabbag__file_copy_metadata(const char *srcpath, const char *destpath)
 {
-	struct stat srcstat;
-	struct utimbuf srctime;
+	struct flac_stat_s srcstat;
 
-	if(0 == stat(srcpath, &srcstat)) {
+	if(0 == flac_stat(srcpath, &srcstat)) {
+#if defined(_POSIX_C_SOURCE) && (_POSIX_C_SOURCE >= 200809L) && !defined(_WIN32)
+		struct timespec srctime[2] = {};
+		srctime[0].tv_sec = srcstat.st_atime;
+		srctime[1].tv_sec = srcstat.st_mtime;
+#else
+		struct utimbuf srctime;
 		srctime.actime = srcstat.st_atime;
 		srctime.modtime = srcstat.st_mtime;
-		(void)chmod(destpath, srcstat.st_mode);
-		(void)utime(destpath, &srctime);
+#endif
+		(void)flac_chmod(destpath, srcstat.st_mode);
+		(void)flac_utime(destpath, &srctime);
 	}
 }
 
-off_t grabbag__file_get_filesize(const char *srcpath)
+FLAC__off_t grabbag__file_get_filesize(const char *srcpath)
 {
-	struct stat srcstat;
+	struct flac_stat_s srcstat;
 
-	if(0 == stat(srcpath, &srcstat))
+	if(0 == flac_stat(srcpath, &srcstat))
 		return srcstat.st_size;
 	else
 		return -1;
@@ -77,8 +84,10 @@ const char *grabbag__file_get_basename(const char *srcpath)
 
 	p = strrchr(srcpath, '/');
 	if(0 == p) {
+#if defined _WIN32 && !defined __CYGWIN__
 		p = strrchr(srcpath, '\\');
 		if(0 == p)
+#endif
 			return srcpath;
 	}
 	return ++p;
@@ -86,9 +95,9 @@ const char *grabbag__file_get_basename(const char *srcpath)
 
 FLAC__bool grabbag__file_change_stats(const char *filename, FLAC__bool read_only)
 {
-	struct stat stats;
+	struct flac_stat_s stats;
 
-	if(0 == stat(filename, &stats)) {
+	if(0 == flac_stat(filename, &stats)) {
 #if !defined _MSC_VER && !defined __MINGW32__
 		if(read_only) {
 			stats.st_mode &= ~S_IWUSR;
@@ -104,7 +113,7 @@ FLAC__bool grabbag__file_change_stats(const char *filename, FLAC__bool read_only
 		else
 			stats.st_mode |= S_IWRITE;
 #endif
-		if(0 != chmod(filename, stats.st_mode))
+		if(0 != flac_chmod(filename, stats.st_mode))
 			return false;
 	}
 	else
@@ -115,9 +124,13 @@ FLAC__bool grabbag__file_change_stats(const char *filename, FLAC__bool read_only
 
 FLAC__bool grabbag__file_are_same(const char *f1, const char *f2)
 {
-#if defined _MSC_VER || defined __MINGW32__
+#if defined _WIN32 && !defined __CYGWIN__
+#if !defined(WINAPI_FAMILY_PARTITION)
+#define WINAPI_FAMILY_PARTITION(x) x
+#define WINAPI_PARTITION_DESKTOP 1
+#endif
 	/* see
-	 * http://www.hydrogenaudio.org/forums/index.php?showtopic=49439&pid=444300&st=0
+	 *  http://www.hydrogenaudio.org/forums/index.php?showtopic=49439&pid=444300&st=0
 	 *  http://msdn.microsoft.com/library/default.asp?url=/library/en-us/fileio/fs/getfileinformationbyhandle.asp
 	 *  http://msdn.microsoft.com/library/default.asp?url=/library/en-us/fileio/fs/by_handle_file_information_str.asp
 	 *  http://msdn.microsoft.com/library/default.asp?url=/library/en-us/fileio/fs/createfile.asp
@@ -127,10 +140,11 @@ FLAC__bool grabbag__file_are_same(const char *f1, const char *f2)
 	BY_HANDLE_FILE_INFORMATION info1, info2;
 	HANDLE h1, h2;
 	BOOL ok = 1;
-	h1 = CreateFile(f1, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	h2 = CreateFile(f2, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	h1 = CreateFile_utf8(f1, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	h2 = CreateFile_utf8(f2, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if(h1 == INVALID_HANDLE_VALUE || h2 == INVALID_HANDLE_VALUE)
 		ok = 0;
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 	ok &= GetFileInformationByHandle(h1, &info1);
 	ok &= GetFileInformationByHandle(h2, &info2);
 	if(ok)
@@ -139,20 +153,27 @@ FLAC__bool grabbag__file_are_same(const char *f1, const char *f2)
 			info1.nFileIndexHigh == info2.nFileIndexHigh &&
 			info1.nFileIndexLow == info2.nFileIndexLow
 		;
+#else // !WINAPI_PARTITION_DESKTOP
+	FILE_ID_INFO id_info1, id_info2;
+	same = GetFileInformationByHandleEx(h1, FileIdInfo, &id_info1, sizeof (id_info1)) &&
+	       GetFileInformationByHandleEx(h2, FileIdInfo, &id_info2, sizeof (id_info2)) &&
+	       id_info1.VolumeSerialNumber == id_info2.VolumeSerialNumber &&
+	       memcmp(&id_info1.FileId, &id_info2.FileId, sizeof(id_info1.FileId)) == 0;
+#endif // !WINAPI_PARTITION_DESKTOP
 	if(h1 != INVALID_HANDLE_VALUE)
 		CloseHandle(h1);
 	if(h2 != INVALID_HANDLE_VALUE)
 		CloseHandle(h2);
 	return same;
 #else
-	struct stat s1, s2;
-	return f1 && f2 && stat(f1, &s1) == 0 && stat(f2, &s2) == 0 && s1.st_ino == s2.st_ino && s1.st_dev == s2.st_dev;
+	struct flac_stat_s s1, s2;
+	return f1 && f2 && flac_stat(f1, &s1) == 0 && flac_stat(f2, &s2) == 0 && s1.st_ino == s2.st_ino && s1.st_dev == s2.st_dev;
 #endif
 }
 
 FLAC__bool grabbag__file_remove_file(const char *filename)
 {
-	return grabbag__file_change_stats(filename, /*read_only=*/false) && 0 == unlink(filename);
+	return grabbag__file_change_stats(filename, /*read_only=*/false) && 0 == flac_unlink(filename);
 }
 
 FILE *grabbag__file_get_binary_stdin(void)
@@ -163,9 +184,6 @@ FILE *grabbag__file_get_binary_stdin(void)
 	 */
 #if defined _MSC_VER || defined __MINGW32__
 	_setmode(_fileno(stdin), _O_BINARY);
-#elif defined __CYGWIN__
-	/* almost certainly not needed for any modern Cygwin, but let's be safe... */
-	setmode(_fileno(stdin), _O_BINARY);
 #elif defined __EMX__
 	setmode(fileno(stdin), O_BINARY);
 #endif
@@ -181,9 +199,6 @@ FILE *grabbag__file_get_binary_stdout(void)
 	 */
 #if defined _MSC_VER || defined __MINGW32__
 	_setmode(_fileno(stdout), _O_BINARY);
-#elif defined __CYGWIN__
-	/* almost certainly not needed for any modern Cygwin, but let's be safe... */
-	setmode(_fileno(stdout), _O_BINARY);
 #elif defined __EMX__
 	setmode(fileno(stdout), O_BINARY);
 #endif

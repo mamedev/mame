@@ -1,5 +1,6 @@
 /* libFLAC - Free Lossless Audio Codec library
- * Copyright (C) 2000,2001,2002,2003,2004,2005,2006,2007  Josh Coalson
+ * Copyright (C) 2000-2009  Josh Coalson
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -51,7 +52,7 @@
  * level idea of the structure and how to find the information you
  * need.  As a prerequisite you should have at least a basic
  * knowledge of the FLAC format, documented
- * <A HREF="../format.html">here</A>.
+ * <A HREF="https://xiph.org/flac/format.html">here</A>.
  *
  * \section c_api FLAC C API
  *
@@ -63,7 +64,7 @@
  *
  * By writing a little code and linking against libFLAC, it is
  * relatively easy to add FLAC support to another program.  The
- * library is licensed under <A HREF="../license.html">Xiph's BSD license</A>.
+ * library is licensed under <A HREF="https://xiph.org/flac/license.html">Xiph's BSD license</A>.
  * Complete source code of libFLAC as well as the command-line
  * encoder and plugins is available and is a useful source of
  * examples.
@@ -96,7 +97,7 @@
  * example /usr/include/FLAC++/...).
  *
  * libFLAC++ is also licensed under
- * <A HREF="../license.html">Xiph's BSD license</A>.
+ * <A HREF="https://xiph.org/flac/license.html">Xiph's BSD license</A>.
  *
  * \section getting_started Getting Started
  *
@@ -112,7 +113,7 @@
  * functions through the links in top bar across this page.
  *
  * If you prefer a more hands-on approach, you can jump right to some
- * <A HREF="../documentation_example_code.html">example code</A>.
+ * <A HREF="https://xiph.org/flac/documentation_example_code.html">example code</A>.
  *
  * \section porting_guide Porting Guide
  *
@@ -146,7 +147,7 @@
  * library.
  *
  * Also, there are several places in the libFLAC code with comments marked
- * with "OPT:" where a #define can be changed to enable code that might be
+ * with "OPT:" where a \#define can be changed to enable code that might be
  * faster on a specific platform.  Experimenting with these can yield faster
  * binaries.
  */
@@ -158,10 +159,10 @@
  * the libraries to newer versions of FLAC.
  *
  * One simple facility for making porting easier that has been added
- * in FLAC 1.1.3 is a set of \c #defines in \c export.h of each
+ * in FLAC 1.1.3 is a set of \#defines in \c export.h of each
  * library's includes (e.g. \c include/FLAC/export.h).  The
- * \c #defines mirror the libraries'
- * <A HREF="http://www.gnu.org/software/libtool/manual.html#Libtool-versioning">libtool version numbers</A>,
+ * \#defines mirror the libraries'
+ * <A HREF="http://www.gnu.org/software/libtool/manual/libtool.html#Libtool-versioning">libtool version numbers</A>,
  * e.g. in libFLAC there are \c FLAC_API_VERSION_CURRENT,
  * \c FLAC_API_VERSION_REVISION, and \c FLAC_API_VERSION_AGE.
  * These can be used to support multiple versions of an API during the
@@ -175,7 +176,7 @@
  * #endif
  * \endcode
  *
- * The the source will work for multiple versions and the legacy code can
+ * The source will work for multiple versions and the legacy code can
  * easily be removed when the transition is complete.
  *
  * Another available symbol is FLAC_API_SUPPORTS_OGG_FLAC (defined in
@@ -320,7 +321,7 @@
  *
  * The \a bytes parameter to FLAC__StreamDecoderReadCallback,
  * FLAC__StreamEncoderReadCallback, and FLAC__StreamEncoderWriteCallback
- * is now \c size_t instead of \c unsigned.
+ * is now \c size_t instead of \c uint32_t.
  */
 
 /** \defgroup porting_1_1_3_to_1_1_4 Porting from FLAC 1.1.3 to 1.1.4
@@ -354,6 +355,85 @@
  * FLAC frame header length has not changed, so to skip the proper
  * number of bits, use \c FLAC__FRAME_HEADER_RESERVED_LEN +
  * \c FLAC__FRAME_HEADER_BLOCKING_STRATEGY_LEN
+ */
+
+/** \defgroup porting_1_3_4_to_1_4_0 Porting from FLAC 1.3.4 to 1.4.0
+ *  \ingroup porting
+ *
+ *  \brief
+ *  This module describes porting from FLAC 1.3.4 to FLAC 1.4.0.
+ *
+ * \section porting_1_3_4_to_1_4_0_summary Summary
+ *
+ * Between FLAC 1.3.4 and FLAC 1.4.0, there have four breaking changes
+ * - the function get_client_data_from_decoder has been renamed to
+ *   FLAC__get_decoder_client_data
+ * - some data types in the FLAC__Frame struct have changed
+ * - all functions resizing metadata blocks now return the object
+ *   untouched if memory allocation fails, whereas previously the
+ *   handling varied and was more or less undefined
+ * - all functions accepting a filename now take UTF-8 encoded filenames
+ *   on Windows instead of filenames in the current codepage
+ *
+ * Furthermore, there have been the following additions
+ * - the functions FLAC__stream_encoder_set_limit_min_bitrate,
+ *   FLAC__stream_encoder_get_limit_min_bitrate,
+ *   FLAC::encoder::file::set_limit_min_bitrate() and
+ *   FLAC::encoder::file::get_limit_min_bitrate() have been added
+ * - Added FLAC__STREAM_DECODER_ERROR_STATUS_BAD_METADATA to the
+ *   FLAC__StreamDecoderErrorStatus enum
+ *
+ * \section porting_1_3_4_to_1_4_0_breaking Breaking changes
+ *
+ * The function \b get_client_data_from_decoder was added in FLAC 1.3.3
+ * but did not follow the API naming convention and was not properly
+ * exported. The function is now renamed and properly integrated as
+ * FLAC__stream_decoder_get_client_data
+ *
+ * To accomodate encoding and decoding 32-bit int PCM, some data types
+ * in the \b FLAC__frame struct were changed. Specifically, warmup
+ * in both the FLAC__Subframe_Fixed struc and the FLAC__Subframe_LPC
+ * struct is changed from FLAC__int32 to FLAC__int64. Also, value
+ * in the FLAC__Subframe_Constant is changed from FLAC__int32 to
+ * FLAC__int64. Finally, in FLAC__Subframe_Verbatim struct data is
+ * changes from a FLAC__int32 array to a union containing a FLAC__int32
+ * array and a FLAC__int64 array. Also, a new member is added,
+ * data_type, which clarifies whether the FLAC__int32 or FLAC__int64
+ * array is in use.
+ *
+ * Furthermore, the following functions now return the object untouched
+ * if memory allocation fails, whereas previously the handling varied
+ * and was more or less undefined
+ *
+ * - FLAC__metadata_object_seektable_resize_points
+ * - FLAC__metadata_object_vorbiscomment_resize_comments
+ * - FLAC__metadata_object_cuesheet_track_resize_indices
+ * - FLAC__metadata_object_cuesheet_resize_tracks
+ *
+ * The last breaking change is that all API functions taking a filename
+ * as an argument now, on Windows, must be supplied with that filename
+ * in the UTF-8 character encoding instead of using the current code
+ * page. libFLAC internally translates these UTF-8 encoded filenames to
+ * an appropriate representation to use with _wfopen. On all other
+ * systems, filename is passed to fopen without any translation, as it
+ * in libFLAC 1.3.4 and earlier.
+ *
+ * \section porting_1_3_4_to_1_4_0_additions Additions
+ *
+ * To aid in creating properly streamable FLAC files, a set of functions
+ * was added to make it possible to enfore a minimum bitrate to files
+ * created through libFLAC's stream_encoder.h interface. With this
+ * function enabled the resulting FLAC files have a minimum bitrate of
+ * 1bit/sample independent of the number of channels, i.e. 48kbit/s for
+ * 48kHz. This can be beneficial for streaming, as very low bitrates for
+ * silent sections compressed with 'constant' subframes can result in a
+ * bitrate of 1kbit/s, creating problems with clients that aren't aware
+ * of this possibility and buffer too much data.
+ *
+ * Finally, FLAC__STREAM_DECODER_ERROR_STATUS_BAD_METADATA was added to
+ * the FLAC__StreamDecoderErrorStatus enum to signal that the decoder
+ * encountered unreadable metadata.
+ *
  */
 
 /** \defgroup flac FLAC C API

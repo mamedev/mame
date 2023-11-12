@@ -1,5 +1,6 @@
 /* grabbag - Convenience lib for various routines common to several tools
- * Copyright (C) 2002,2003,2004,2005,2006,2007  Josh Coalson
+ * Copyright (C) 2002-2009  Josh Coalson
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -24,20 +25,21 @@
 #define GRABAG__FILE_H
 
 /* needed because of off_t */
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #  include <config.h>
 #endif
 
 #include <sys/types.h> /* for off_t */
 #include <stdio.h> /* for FILE */
 #include "FLAC/ordinals.h"
+#include "share/compat.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 void grabbag__file_copy_metadata(const char *srcpath, const char *destpath);
-off_t grabbag__file_get_filesize(const char *srcpath);
+FLAC__off_t grabbag__file_get_filesize(const char *srcpath);
 const char *grabbag__file_get_basename(const char *srcpath);
 
 /* read_only == false means "make file writable by user"

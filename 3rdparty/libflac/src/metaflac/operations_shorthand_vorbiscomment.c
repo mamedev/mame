@@ -1,5 +1,6 @@
 /* metaflac - Command-line FLAC metadata editor
- * Copyright (C) 2001,2002,2003,2004,2005,2006,2007  Josh Coalson
+ * Copyright (C) 2001-2009  Josh Coalson
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -11,12 +12,12 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #  include <config.h>
 #endif
 
@@ -29,8 +30,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include "operations_shorthand.h"
+#include "share/compat.h"
 
 static FLAC__bool remove_vc_all(const char *filename, FLAC__StreamMetadata *block, FLAC__bool *needs_write);
+static FLAC__bool remove_vc_all_except(const char *filename, FLAC__StreamMetadata *block, const char *field_name, FLAC__bool *needs_write);
 static FLAC__bool remove_vc_field(const char *filename, FLAC__StreamMetadata *block, const char *field_name, FLAC__bool *needs_write);
 static FLAC__bool remove_vc_firstfield(const char *filename, FLAC__StreamMetadata *block, const char *field_name, FLAC__bool *needs_write);
 static FLAC__bool set_vc_field(const char *filename, FLAC__StreamMetadata *block, const Argument_VcField *field, FLAC__bool *needs_write, FLAC__bool raw);
@@ -88,6 +91,9 @@ FLAC__bool do_shorthand_operation__vorbis_comment(const char *filename, FLAC__bo
 		case OP__REMOVE_VC_ALL:
 			ok = remove_vc_all(filename, block, needs_write);
 			break;
+		case OP__REMOVE_VC_ALL_EXCEPT:
+			ok = remove_vc_all_except(filename, block, operation->argument.vc_field_name.value, needs_write);
+			break;
 		case OP__REMOVE_VC_FIELD:
 			ok = remove_vc_field(filename, block, operation->argument.vc_field_name.value, needs_write);
 			break;
@@ -95,7 +101,11 @@ FLAC__bool do_shorthand_operation__vorbis_comment(const char *filename, FLAC__bo
 			ok = remove_vc_firstfield(filename, block, operation->argument.vc_field_name.value, needs_write);
 			break;
 		case OP__SET_VC_FIELD:
+#ifdef _WIN32 /* do not convert anything or things will break */
+			ok = set_vc_field(filename, block, &operation->argument.vc_field, needs_write, true);
+#else
 			ok = set_vc_field(filename, block, &operation->argument.vc_field, needs_write, raw);
+#endif
 			break;
 		case OP__IMPORT_VC_FROM:
 			ok = import_vc_from(filename, block, &operation->argument.filename, needs_write, raw);
@@ -126,13 +136,58 @@ FLAC__bool remove_vc_all(const char *filename, FLAC__StreamMetadata *block, FLAC
 	if(0 != block->data.vorbis_comment.comments) {
 		FLAC__ASSERT(block->data.vorbis_comment.num_comments > 0);
 		if(!FLAC__metadata_object_vorbiscomment_resize_comments(block, 0)) {
-			fprintf(stderr, "%s: ERROR: memory allocation failure\n", filename);
+			flac_fprintf(stderr, "%s: ERROR: memory allocation failure\n", filename);
 			return false;
 		}
 		*needs_write = true;
 	}
 	else {
 		FLAC__ASSERT(block->data.vorbis_comment.num_comments == 0);
+	}
+
+	return true;
+}
+
+FLAC__bool remove_vc_all_except(const char *filename, FLAC__StreamMetadata *block, const char *field_name, FLAC__bool *needs_write)
+{
+	char * field_names[200];
+	uint32_t field_name_length, i;
+	int j, num_field_names;
+
+	FLAC__ASSERT(0 != block);
+	FLAC__ASSERT(block->type == FLAC__METADATA_TYPE_VORBIS_COMMENT);
+	FLAC__ASSERT(0 != needs_write);
+
+	field_name_length = strlen(field_name);
+	field_names[0] = (void *)field_name;
+
+	for(num_field_names = 1; num_field_names < 200; num_field_names++) {
+		char * separator = strchr(field_names[num_field_names-1], '=');
+		if(separator == 0 || separator >= field_name + field_name_length)
+			break;
+		field_names[num_field_names] = separator+1;
+	}
+
+	if(num_field_names > 200) {
+		flac_fprintf(stderr, "%s: ERROR: too many field names\n", filename);
+		return false;
+	}
+
+	for(i = 0; i < block->data.vorbis_comment.num_comments; ) {
+		int field_name_found = false;
+		for(j = 0; j < num_field_names; j++) {
+			const uint32_t length = (j == (num_field_names - 1))?(uint32_t)strlen(field_names[j]):(uint32_t)(strchr(field_names[j],'=')-field_names[j]);
+			if(FLAC__metadata_object_vorbiscomment_entry_matches(block->data.vorbis_comment.comments[i], field_names[j], length)) {
+				field_name_found = true;
+				break;
+			}
+		}
+		if(!field_name_found) {
+			FLAC__metadata_object_vorbiscomment_delete_comment(block, i);
+			*needs_write = true;
+		}
+		else
+			i++;
 	}
 
 	return true;
@@ -147,7 +202,7 @@ FLAC__bool remove_vc_field(const char *filename, FLAC__StreamMetadata *block, co
 	n = FLAC__metadata_object_vorbiscomment_remove_entries_matching(block, field_name);
 
 	if(n < 0) {
-		fprintf(stderr, "%s: ERROR: memory allocation failure\n", filename);
+		flac_fprintf(stderr, "%s: ERROR: memory allocation failure\n", filename);
 		return false;
 	}
 	else if(n > 0)
@@ -165,7 +220,7 @@ FLAC__bool remove_vc_firstfield(const char *filename, FLAC__StreamMetadata *bloc
 	n = FLAC__metadata_object_vorbiscomment_remove_entry_matching(block, field_name);
 
 	if(n < 0) {
-		fprintf(stderr, "%s: ERROR: memory allocation failure\n", filename);
+		flac_fprintf(stderr, "%s: ERROR: memory allocation failure\n", filename);
 		return false;
 	}
 	else if(n > 0)
@@ -188,20 +243,20 @@ FLAC__bool set_vc_field(const char *filename, FLAC__StreamMetadata *block, const
 		/* read the file into 'data' */
 		FILE *f = 0;
 		char *data = 0;
-		const off_t size = grabbag__file_get_filesize(field->field_value);
+		const FLAC__off_t size = grabbag__file_get_filesize(field->field_value);
 		if(size < 0) {
-			fprintf(stderr, "%s: ERROR: can't open file '%s' for '%s' tag value\n", filename, field->field_value, field->field_name);
+			flac_fprintf(stderr, "%s: ERROR: can't open file '%s' for '%s' tag value\n", filename, field->field_value, field->field_name);
 			return false;
 		}
 		if(size >= 0x100000) { /* magic arbitrary limit, actual format limit is near 16MB */
-			fprintf(stderr, "%s: ERROR: file '%s' for '%s' tag value is too large\n", filename, field->field_value, field->field_name);
+			flac_fprintf(stderr, "%s: ERROR: file '%s' for '%s' tag value is too large\n", filename, field->field_value, field->field_name);
 			return false;
 		}
 		if(0 == (data = malloc(size+1)))
 			die("out of memory allocating tag value");
 		data[size] = '\0';
-		if(0 == (f = fopen(field->field_value, "rb")) || fread(data, 1, size, f) != (size_t)size) {
-			fprintf(stderr, "%s: ERROR: while reading file '%s' for '%s' tag value: %s\n", filename, field->field_value, field->field_name, strerror(errno));
+		if(0 == (f = flac_fopen(field->field_value, "rb")) || fread(data, 1, size, f) != (size_t)size) {
+			flac_fprintf(stderr, "%s: ERROR: while reading file '%s' for '%s' tag value: %s\n", filename, field->field_value, field->field_name, strerror(errno));
 			free(data);
 			if(f)
 				fclose(f);
@@ -210,7 +265,7 @@ FLAC__bool set_vc_field(const char *filename, FLAC__StreamMetadata *block, const
 		fclose(f);
 		if(strlen(data) != (size_t)size) {
 			free(data);
-			fprintf(stderr, "%s: ERROR: file '%s' for '%s' tag value has embedded NULs\n", filename, field->field_value, field->field_name);
+			flac_fprintf(stderr, "%s: ERROR: file '%s' for '%s' tag value has embedded NULs\n", filename, field->field_value, field->field_name);
 			return false;
 		}
 
@@ -223,19 +278,19 @@ FLAC__bool set_vc_field(const char *filename, FLAC__StreamMetadata *block, const
 		}
 		else {
 			free(data);
-			fprintf(stderr, "%s: ERROR: converting file '%s' contents to UTF-8 for tag value\n", filename, field->field_value);
+			flac_fprintf(stderr, "%s: ERROR: converting file '%s' contents to UTF-8 for tag value\n", filename, field->field_value);
 			return false;
 		}
 
 		/* create and entry and append it */
 		if(!FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair(&entry, field->field_name, converted)) {
 			free(converted);
-			fprintf(stderr, "%s: ERROR: file '%s' for '%s' tag value is not valid UTF-8\n", filename, field->field_value, field->field_name);
+			flac_fprintf(stderr, "%s: ERROR: file '%s' for '%s' tag value is not valid UTF-8\n", filename, field->field_value, field->field_name);
 			return false;
 		}
 		free(converted);
 		if(!FLAC__metadata_object_vorbiscomment_append_comment(block, entry, /*copy=*/false)) {
-			fprintf(stderr, "%s: ERROR: memory allocation failure\n", filename);
+			flac_fprintf(stderr, "%s: ERROR: memory allocation failure\n", filename);
 			return false;
 		}
 
@@ -244,6 +299,7 @@ FLAC__bool set_vc_field(const char *filename, FLAC__StreamMetadata *block, const
 	}
 	else {
 		FLAC__bool needs_free = false;
+		entry.entry = (FLAC__byte *)field->field;
 		if(raw) {
 			entry.entry = (FLAC__byte *)field->field;
 		}
@@ -252,7 +308,7 @@ FLAC__bool set_vc_field(const char *filename, FLAC__StreamMetadata *block, const
 			needs_free = true;
 		}
 		else {
-			fprintf(stderr, "%s: ERROR: converting comment '%s' to UTF-8\n", filename, field->field);
+			flac_fprintf(stderr, "%s: ERROR: converting comment '%s' to UTF-8\n", filename, field->field);
 			return false;
 		}
 		entry.length = strlen((const char *)entry.entry);
@@ -263,14 +319,14 @@ FLAC__bool set_vc_field(const char *filename, FLAC__StreamMetadata *block, const
 			 * our previous parsing has already established that the field
 			 * name is OK, so it must be the field value
 			 */
-			fprintf(stderr, "%s: ERROR: tag value for '%s' is not valid UTF-8\n", filename, field->field_name);
+			flac_fprintf(stderr, "%s: ERROR: tag value for '%s' is not valid UTF-8\n", filename, field->field_name);
 			return false;
 		}
 
 		if(!FLAC__metadata_object_vorbiscomment_append_comment(block, entry, /*copy=*/true)) {
 			if(needs_free)
 				free(converted);
-			fprintf(stderr, "%s: ERROR: memory allocation failure\n", filename);
+			flac_fprintf(stderr, "%s: ERROR: memory allocation failure\n", filename);
 			return false;
 		}
 
@@ -288,26 +344,25 @@ FLAC__bool import_vc_from(const char *filename, FLAC__StreamMetadata *block, con
 	FLAC__bool ret;
 
 	if(0 == vc_filename->value || strlen(vc_filename->value) == 0) {
-		fprintf(stderr, "%s: ERROR: empty import file name\n", filename);
+		flac_fprintf(stderr, "%s: ERROR: empty import file name\n", filename);
 		return false;
 	}
 	if(0 == strcmp(vc_filename->value, "-"))
 		f = stdin;
 	else
-		f = fopen(vc_filename->value, "r");
+		f = flac_fopen(vc_filename->value, "r");
 
 	if(0 == f) {
-		fprintf(stderr, "%s: ERROR: can't open import file %s: %s\n", filename, vc_filename->value, strerror(errno));
+		flac_fprintf(stderr, "%s: ERROR: can't open import file %s: %s\n", filename, vc_filename->value, strerror(errno));
 		return false;
 	}
 
 	ret = true;
-	while(ret && !feof(f)) {
-		fgets(line, sizeof(line), f);
+	while(ret && !feof(f) && fgets(line, sizeof(line), f) != NULL) {
 		if(!feof(f)) {
 			char *p = strchr(line, '\n');
 			if(0 == p) {
-				fprintf(stderr, "%s: ERROR: line too long, aborting\n", vc_filename->value);
+				flac_fprintf(stderr, "%s: ERROR: line too long, aborting\n", vc_filename->value);
 				ret = false;
 			}
 			else {
@@ -318,7 +373,7 @@ FLAC__bool import_vc_from(const char *filename, FLAC__StreamMetadata *block, con
 				field.field_value_from_file = false;
 				if(!parse_vorbis_comment_field(line, &field.field, &field.field_name, &field.field_value, &field.field_value_length, &violation)) {
 					FLAC__ASSERT(0 != violation);
-					fprintf(stderr, "%s: ERROR: malformed vorbis comment field \"%s\",\n       %s\n", vc_filename->value, line, violation);
+					flac_fprintf(stderr, "%s: ERROR: malformed vorbis comment field \"%s\",\n       %s\n", vc_filename->value, line, violation);
 					ret = false;
 				}
 				else {
@@ -345,16 +400,16 @@ FLAC__bool export_vc_to(const char *filename, FLAC__StreamMetadata *block, const
 	FLAC__bool ret;
 
 	if(0 == vc_filename->value || strlen(vc_filename->value) == 0) {
-		fprintf(stderr, "%s: ERROR: empty export file name\n", filename);
+		flac_fprintf(stderr, "%s: ERROR: empty export file name\n", filename);
 		return false;
 	}
 	if(0 == strcmp(vc_filename->value, "-"))
 		f = stdout;
 	else
-		f = fopen(vc_filename->value, "w");
+		f = flac_fopen(vc_filename->value, "w");
 
 	if(0 == f) {
-		fprintf(stderr, "%s: ERROR: can't open export file %s: %s\n", filename, vc_filename->value, strerror(errno));
+		flac_fprintf(stderr, "%s: ERROR: can't open export file %s: %s\n", filename, vc_filename->value, strerror(errno));
 		return false;
 	}
 
@@ -364,5 +419,12 @@ FLAC__bool export_vc_to(const char *filename, FLAC__StreamMetadata *block, const
 
 	if(f != stdout)
 		fclose(f);
+
+#ifdef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+	/* Delete output file when fuzzing */
+	if(f != stdout)
+		flac_unlink(vc_filename->value);
+#endif
+
 	return ret;
 }

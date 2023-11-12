@@ -1,7 +1,7 @@
 METADATA block #0
   type: 0 (STREAMINFO)
   is last: false
-  length: 34
+  length: XXX
   sample_rate: 8000 Hz
   channels: 1
   bits-per-sample: 8
@@ -10,13 +10,13 @@ METADATA block #0
 METADATA block #1
   type: 4 (VORBIS_COMMENT)
   is last: false
-  length: 40
+  length: XXX
   comments: 0
 METADATA block #2
   type: 1 (PADDING)
   is last: false
-  length: 0
+  length: XXX
 METADATA block #3
   type: 1 (PADDING)
   is last: true
-  length: 0
+  length: XXX
