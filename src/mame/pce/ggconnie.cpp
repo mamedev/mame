@@ -21,11 +21,13 @@
 #include "emu.h"
 #include "pcecommn.h"
 
+#include "sound/okim6295.h"
 #include "video/huc6270.h"
 #include "video/huc6260.h"
 #include "video/huc6202.h"
-#include "sound/okim6295.h"
+#include "machine/input_merger.h"
 #include "machine/msm6242.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -41,6 +43,7 @@ public:
 		, m_oki(*this, "oki")
 		, m_okibank(*this, "okibank")
 		, m_lamp(*this, "lamp")
+		, m_irqs(*this, "irqs")
 	{ }
 
 	void ggconnie(machine_config &config);
@@ -60,6 +63,7 @@ private:
 	required_device <okim6295_device> m_oki;
 	required_memory_bank m_okibank;
 	output_finder<> m_lamp;
+	required_device<input_merger_device> m_irqs;
 };
 
 
@@ -335,13 +339,15 @@ void ggconnie_state::ggconnie(machine_config &config)
 	m_huc6260->vsync_changed().set("huc6202", FUNC(huc6202_device::vsync_changed));
 	m_huc6260->hsync_changed().set("huc6202", FUNC(huc6202_device::hsync_changed));
 
+	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, 0);
+
 	huc6270_device &huc6270_0(HUC6270(config, "huc6270_0", 0));
 	huc6270_0.set_vram_size(0x10000);
-	huc6270_0.irq().set_inputline(m_maincpu, 0); // needs input merger?
+	huc6270_0.irq().set(m_irqs, FUNC(input_merger_device::in_w<0>));
 
 	huc6270_device &huc6270_1(HUC6270(config, "huc6270_1", 0));
 	huc6270_1.set_vram_size(0x10000);
-	huc6270_1.irq().set_inputline(m_maincpu, 0); // needs input merger?
+	huc6270_1.irq().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 
 	huc6202_device &huc6202(HUC6202(config, "huc6202", 0 ));
 	huc6202.next_pixel_0_callback().set("huc6270_0", FUNC(huc6270_device::next_pixel));
@@ -412,6 +418,6 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1996, ggconnie, 0, ggconnie, ggconnie, ggconnie_state, init_pce_common, ROT0, "Eighting", "Go! Go! Connie chan Jaka Jaka Janken", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1996, ggconnie, 0, ggconnie, ggconnie, ggconnie_state, init_pce_common, ROT0, "Eighting", "Go! Go! Connie chan Jaka Jaka Janken", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // Throws Hopper Empty when winning, sound banking
 GAME( 1997, smf,      0, ggconnie, smf,      ggconnie_state, init_pce_common, ROT0, "Eighting (Capcom license)", "Super Medal Fighters (Japan 970228)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1997, fishingm, 0, ggconnie, fishingm, ggconnie_state, init_pce_common, ROT0, "Capcom", "Fishing Master (971107 JPN)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // Hopper Jam Error
