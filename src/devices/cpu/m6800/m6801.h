@@ -58,20 +58,21 @@ public:
 	auto out_sc2_cb() { return m_out_sc2_func.bind(); }
 	auto out_ser_tx_cb() { return m_out_sertx_func.bind(); }
 
+	void nvram_set_default_value(uint8_t val) { m_nvram_defval = val; } // default is 0
 	auto standby_cb() { return m_standby_func.bind(); } // notifier (not an output pin)
 	bool standby() { return suspended(SUSPEND_REASON_CLOCK); }
 
 	void m6801_clock_serial();
 
 protected:
-	m6801_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const m6800_cpu_device::op_func *insn, const uint8_t *cycles, address_map_constructor internal, int standby_bytes);
+	m6801_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const m6800_cpu_device::op_func *insn, const uint8_t *cycles, address_map_constructor internal, int nvram_bytes);
 
 	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	// device_nvram_interface implementation
-	virtual void nvram_default() override { ; }
+	virtual void nvram_default() override;
 	virtual bool nvram_read(util::read_stream &file) override;
 	virtual bool nvram_write(util::write_stream &file) override;
 
@@ -137,10 +138,10 @@ protected:
 	devcb_write_line m_out_sertx_func;
 	devcb_write_line m_standby_func;
 
-	int m_sclk_divider;
-
 	required_shared_ptr<uint8_t> m_internal_ram;
-	const int m_standby_bytes;
+	const int m_nvram_bytes;
+	uint8_t m_nvram_defval;
+	int m_sclk_divider;
 
 	/* internal registers */
 	uint8_t  m_port_ddr[4];
@@ -253,7 +254,7 @@ public:
 class hd6301_cpu_device : public m6801_cpu_device
 {
 protected:
-	hd6301_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const m6800_cpu_device::op_func *insn, const uint8_t *cycles, address_map_constructor internal, int standby_bytes);
+	hd6301_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const m6800_cpu_device::op_func *insn, const uint8_t *cycles, address_map_constructor internal, int nvram_bytes);
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
@@ -305,7 +306,7 @@ public:
 	auto out_p7_cb() { return m_out_portx_func[2].bind(); }
 
 protected:
-	hd6301x_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal, int standby_bytes);
+	hd6301x_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal, int nvram_bytes);
 
 	void hd6301x_io(address_map &map);
 	void hd6303x_io(address_map &map);
@@ -403,7 +404,7 @@ public:
 class hd6301y_cpu_device : public hd6301x_cpu_device
 {
 protected:
-	hd6301y_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal, int standby_bytes);
+	hd6301y_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal, int nvram_bytes);
 
 	void hd6301y_io(address_map &map);
 	void hd6303y_io(address_map &map);

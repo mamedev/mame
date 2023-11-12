@@ -379,7 +379,7 @@ m6801_cpu_device::m6801_cpu_device(const machine_config &mconfig, const char *ta
 {
 }
 
-m6801_cpu_device::m6801_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const op_func *insn, const uint8_t *cycles, address_map_constructor internal, int standby_bytes)
+m6801_cpu_device::m6801_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const op_func *insn, const uint8_t *cycles, address_map_constructor internal, int nvram_bytes)
 	: m6800_cpu_device(mconfig, type, tag, owner, clock, insn, cycles, internal)
 	, device_nvram_interface(mconfig, *this)
 	, m_in_port_func(*this, 0xff)
@@ -387,9 +387,10 @@ m6801_cpu_device::m6801_cpu_device(const machine_config &mconfig, device_type ty
 	, m_out_sc2_func(*this)
 	, m_out_sertx_func(*this)
 	, m_standby_func(*this)
-	, m_sclk_divider(8)
 	, m_internal_ram(*this, "internal")
-	, m_standby_bytes(standby_bytes)
+	, m_nvram_bytes(nvram_bytes)
+	, m_nvram_defval(0)
+	, m_sclk_divider(8)
 {
 	// disable nvram by default (set to true if MCU is battery-backed when in standby mode)
 	nvram_enable_backup(false);
@@ -430,8 +431,8 @@ mc68121_device::mc68121_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-hd6301_cpu_device::hd6301_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const m6800_cpu_device::op_func *insn, const uint8_t *cycles, address_map_constructor internal, int standby_bytes)
-	: m6801_cpu_device(mconfig, type, tag, owner, clock, hd63701_insn, cycles_63701, internal, standby_bytes)
+hd6301_cpu_device::hd6301_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const m6800_cpu_device::op_func *insn, const uint8_t *cycles, address_map_constructor internal, int nvram_bytes)
+	: m6801_cpu_device(mconfig, type, tag, owner, clock, hd63701_insn, cycles_63701, internal, nvram_bytes)
 {
 }
 
@@ -450,8 +451,8 @@ hd6303r_cpu_device::hd6303r_cpu_device(const machine_config &mconfig, const char
 {
 }
 
-hd6301x_cpu_device::hd6301x_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal, int standby_bytes)
-	: hd6301_cpu_device(mconfig, type, tag, owner, clock, hd63701_insn, cycles_63701, internal, standby_bytes)
+hd6301x_cpu_device::hd6301x_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal, int nvram_bytes)
+	: hd6301_cpu_device(mconfig, type, tag, owner, clock, hd63701_insn, cycles_63701, internal, nvram_bytes)
 	, m_in_portx_func(*this, 0xff)
 	, m_out_portx_func(*this)
 {
@@ -473,8 +474,8 @@ hd6303x_cpu_device::hd6303x_cpu_device(const machine_config &mconfig, const char
 {
 }
 
-hd6301y_cpu_device::hd6301y_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal, int standby_bytes)
-	: hd6301x_cpu_device(mconfig, type, tag, owner, clock, internal, standby_bytes)
+hd6301y_cpu_device::hd6301y_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal, int nvram_bytes)
+	: hd6301x_cpu_device(mconfig, type, tag, owner, clock, internal, nvram_bytes)
 {
 }
 
@@ -1322,12 +1323,12 @@ bool m6801_cpu_device::nvram_write(util::write_stream &file)
 {
 	size_t actual;
 
-	if (file.write(&m_internal_ram[0], m_standby_bytes, actual) || m_standby_bytes != actual)
+	if (file.write(&m_internal_ram[0], m_nvram_bytes, actual) || m_nvram_bytes != actual)
 		return false;
 
 	// upper bits of RAM control register
-	u8 ram_ctrl = m_ram_ctrl & 0xc0;
-	if (file.write(&ram_ctrl, sizeof(ram_ctrl), actual) || (sizeof(ram_ctrl) != actual))
+	uint8_t ram_ctrl = m_ram_ctrl & 0xc0;
+	if (file.write(&ram_ctrl, 1, actual) || actual != 1)
 		return false;
 
 	return true;
@@ -1337,16 +1338,35 @@ bool m6801_cpu_device::nvram_read(util::read_stream &file)
 {
 	size_t actual;
 
-	if (file.read(&m_internal_ram[0], m_standby_bytes, actual) || m_standby_bytes != actual)
+	if (file.read(&m_internal_ram[0], m_nvram_bytes, actual) || m_nvram_bytes != actual)
 		return false;
 
 	// upper bits of RAM control register
-	u8 ram_ctrl = 0;
-	if (file.read(&ram_ctrl, sizeof(ram_ctrl), actual) || (sizeof(ram_ctrl) != actual))
+	uint8_t ram_ctrl = 0;
+	if (file.read(&ram_ctrl, 1, actual) || actual != 1)
 		return false;
 	m_ram_ctrl |= ram_ctrl & 0xc0;
 
 	return true;
+}
+
+void m6801_cpu_device::nvram_default()
+{
+	if (!nvram_backup_enabled() || m_nvram_bytes == 0)
+		return;
+
+	std::fill_n(&m_internal_ram[0], m_nvram_bytes, m_nvram_defval);
+
+	// default nvram from mytag:nvram region if it exists
+	memory_region *region = memregion("nvram");
+	if (region != nullptr)
+	{
+		if (region->bytes() != m_nvram_bytes)
+			fatalerror("%s: Wrong region size (expected 0x%x, found 0x%x)", region->name(), m_nvram_bytes, region->bytes());
+
+		std::copy_n(&region->as_u8(), m_nvram_bytes, &m_internal_ram[0]);
+		m_ram_ctrl |= 0x80;
+	}
 }
 
 
