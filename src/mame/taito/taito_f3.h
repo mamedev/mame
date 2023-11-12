@@ -225,13 +225,20 @@ protected:
 	u8 m_alpha_level_2bd = 0;
 	u8 m_alpha_level_3bs = 0;
 	u8 m_alpha_level_3bd = 0;
-	int m_alpha_level_last = 0;
+	u16 m_alpha_level_last = 0;
 	u16 m_width_mask = 0;
 	u8 m_twidth_mask = 0;
 	u8 m_twidth_mask_bit = 0;
 	std::unique_ptr<u8[]> m_tile_opaque_sp;
 	std::unique_ptr<u8[]> m_tile_opaque_pf[8];
-	u8 m_add_sat[256][256]{};
+	static constexpr std::array<std::array<u8, 256>, 256> m_add_sat = []
+	{
+		auto add_sat = std::array<std::array<u8, 256>, 256>{};
+		for (int i = 0; i < 256; i++)
+			for (int j = 0; j < 256; j++)
+				add_sat[i][j] = std::min(i + j, 255);
+		return add_sat;
+	}();
 	int m_alpha_s_1_1 = 0;
 	int m_alpha_s_1_2 = 0;
 	int m_alpha_s_1_4 = 0;
@@ -310,8 +317,7 @@ protected:
 
 	void tile_decode();
 
-	inline void f3_drawgfx(bitmap_rgb32 &dest_bmp, const rectangle &clip, gfx_element *gfx, int code, u8 color, bool flipx, bool flipy, int sx, int sy, u8 pri_dst);
-	inline void f3_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangle &clip, gfx_element *gfx, int code, u8 color, bool flipx, bool flipy, int sx, int sy, u16 scalex, u16 scaley, u8 pri_dst);
+	inline void f3_drawgfx(bitmap_rgb32 &dest_bmp, const rectangle &clip, gfx_element *gfx, const int code, const u8 color, const bool flipx, const bool flipy, int sx, int sy, u16 scalex, u16 scaley, u8 pri_dst);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void get_sprite_info(const u16 *spriteram16_ptr);
 	void print_debug_info(bitmap_rgb32 &bitmap);

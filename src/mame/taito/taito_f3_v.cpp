@@ -1254,10 +1254,6 @@ void taito_f3_state::init_alpha_blend_func()
 	m_dpix_n[7][0xd] = &taito_f3_state::dpix_ret0;
 	m_dpix_n[7][0xe] = &taito_f3_state::dpix_ret0;
 	m_dpix_n[7][0xf] = &taito_f3_state::dpix_ret0;
-
-	for (int i = 0; i < 256; i++)
-		for (int j = 0; j < 256; j++)
-			m_add_sat[i][j] = std::min(i + j, 255);
 }
 
 /******************************************************************************/
@@ -1999,7 +1995,7 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 {
 	int i, ys, ye;
 	int y_start, y_end, y_start_next, y_end_next;
-	u8 draw_line[256];
+	u8 draw_line[256] = {};
 	s16 draw_line_num[256];
 
 	u32 rot = 0;
@@ -2018,28 +2014,26 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 
 	y_start = ys;
 	y_end = ye;
-	std::fill(std::begin(draw_line), std::end(draw_line), 0);
 
 	while (1)
 	{
-		int pos;
-		u16 pri[5];
-		u8 alpha_mode_flag[5], alpha_mode[5];
+		u8 alpha_mode_flag[5];
 		u8 sprite_alpha_check;
 		u8 sprite_alpha_all_2a;
-		u8 layer_tmp[5];
 		f3_playfield_line_inf *pf_line_inf = m_pf_line_inf.get();
 		f3_spritealpha_line_inf *sa_line_inf = m_sa_line_inf.get();
-		int count_skip_layer = 0;
 		u8 sprite[6] = {};
 		const f3_playfield_line_inf *line_t[5];
 
 		/* find same status of scanlines */
+		u16 pri[5];
 		pri[0] = pf_line_inf[0].pri[y_start];
 		pri[1] = pf_line_inf[1].pri[y_start];
 		pri[2] = pf_line_inf[2].pri[y_start];
 		pri[3] = pf_line_inf[3].pri[y_start];
 		pri[4] = pf_line_inf[4].pri[y_start];
+
+		u8 alpha_mode[5];
 		alpha_mode[0] = pf_line_inf[0].alpha_mode[y_start];
 		alpha_mode[1] = pf_line_inf[1].alpha_mode[y_start];
 		alpha_mode[2] = pf_line_inf[2].alpha_mode[y_start];
@@ -2131,7 +2125,7 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 
 			/* set sprite alpha mode */
 			sprite_alpha_check = 0;
-			sprite_alpha_all_2a=1;
+			sprite_alpha_all_2a = 1;
 			m_dpix_sp[1] = nullptr;
 			m_dpix_sp[2] = nullptr;
 			m_dpix_sp[4] = nullptr;
@@ -2265,6 +2259,8 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 		}
 
 		/* set scanline priority */
+		std::array<u8, 5> layer_tmp;
+		int count_skip_layer = 0;
 		{
 			int pri_max_opa = -1;
 			for (i = 0; i < 5; i++)    /* i = playfield num (pos) */
@@ -2296,18 +2292,7 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 		}
 
 		/* sort layer_tmp */
-		for (i = 0; i < 4; i++)
-		{
-			for (int j = i + 1; j < 5; j++)
-			{
-				if (layer_tmp[i] < layer_tmp[j])
-				{
-					const u8 temp = layer_tmp[i];
-					layer_tmp[i] = layer_tmp[j];
-					layer_tmp[j] = temp;
-				}
-			}
-		}
+		std::sort(layer_tmp.begin(), layer_tmp.end(), std::greater<u8>());
 
 		/* check sprite & layer priority */
 		{
@@ -2354,7 +2339,7 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 		bool alpha = false;
 		for (i = count_skip_layer; i < 5; i++)
 		{
-			pos = layer_tmp[i] & 7;
+			const u8 pos = layer_tmp[i] & 7;
 			line_t[i] = &pf_line_inf[pos];
 
 			if (sprite[i] & sprite_alpha_check) alpha = true;
@@ -2384,154 +2369,9 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 
 inline void taito_f3_state::f3_drawgfx(bitmap_rgb32 &dest_bmp, const rectangle &clip,
 		gfx_element *gfx,
-		int code,
-		u8 color,
-		bool flipx, bool flipy,
-		int sx, int sy,
-		u8 pri_dst)
-{
-	rectangle myclip;
-
-	pri_dst = 1 << pri_dst;
-
-	/* KW 991012 -- Added code to force clip to bitmap boundary */
-	myclip = clip;
-	myclip &= dest_bmp.cliprect();
-
-	if (gfx)
-	{
-		const pen_t *pal = &m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
-		const u8 *code_base = gfx->get_data(code % gfx->elements());
-
-		{
-			/* compute sprite increment per screen pixel */
-			int dx = 1;
-			int dy = 1;
-
-			int ex = sx + 16;
-			int ey = sy + 16;
-
-			int x_index_base;
-			int y_index;
-
-			if (flipx)
-			{
-				x_index_base = 15;
-				dx = -1;
-			}
-			else
-			{
-				x_index_base = 0;
-			}
-
-			if (flipy)
-			{
-				y_index = 15;
-				dy = -1;
-			}
-			else
-			{
-				y_index = 0;
-			}
-
-			if (sx < myclip.min_x)
-			{ /* clip left */
-				int pixels = myclip.min_x - sx;
-				sx += pixels;
-				x_index_base += pixels * dx;
-			}
-			if (sy < myclip.min_y)
-			{ /* clip top */
-				int pixels = myclip.min_y - sy;
-				sy += pixels;
-				y_index += pixels * dy;
-			}
-			/* NS 980211 - fixed incorrect clipping */
-			if (ex > myclip.max_x + 1)
-			{ /* clip right */
-				int pixels = ex - myclip.max_x - 1;
-				ex -= pixels;
-			}
-			if (ey > myclip.max_y + 1)
-			{ /* clip bottom */
-				int pixels = ey - myclip.max_y - 1;
-				ey -= pixels;
-			}
-
-			if (ex > sx && ey > sy)
-			{ /* skip if inner loop doesn't draw anything */
-//              if (dest_bmp.bpp == 32)
-				{
-					int y = ey - sy;
-					// x_base range: 0-31
-					const int x_base = (ex - sx - 1) | (m_tile_opaque_sp[code % gfx->elements()] << 4);
-					const u8 *source0 = code_base + y_index * 16 + x_index_base;
-					u32 *dest0 = &dest_bmp.pix(sy, sx);
-					u8 *pri0 = &m_pri_alp_bitmap.pix(sy, sx);
-					const int yadv = dest_bmp.rowpixels();
-					const int yadvp = m_pri_alp_bitmap.rowpixels();
-					dy = dy * 16;
-					while (1)
-					{
-						const u8 *source = source0;
-						u32 *dest = dest0;
-						u8 *pri = pri0;
-
-						if (x_base > 15)
-						{
-							// pset_o
-							for(int x = x_base & 0xf; x > -1; --x)
-							{
-								const u8 p = *pri;
-								if (!p || p == 0xff)
-								{
-									*dest = pal[*source & m_sprite_pen_mask];
-									*pri = pri_dst;
-								}
-
-								source += dx;
-								dest++;
-								pri++;
-							}
-						}
-						else
-						{
-							//pset_t
-							for(int x = x_base; x > -1; --x)
-							{
-								const u8 c = *source & m_sprite_pen_mask;
-								if (c)
-								{
-									const u8 p = *pri;
-									if (!p || p == 0xff)
-									{
-										*dest = pal[c];
-										*pri = pri_dst;
-									}
-								}
-
-								source += dx;
-								dest++;
-								pri++;
-							}
-						}
-
-						if (!(--y)) break;
-						source0 += dy;
-						dest0 += yadv;
-						pri0 += yadvp;
-					}
-				}
-			}
-		}
-	}
-}
-
-inline void taito_f3_state::f3_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangle &clip,
-		gfx_element *gfx,
-		int code,
-		u8 color,
-		bool flipx, bool flipy,
+		const int code,
+		const u8 color,
+		const bool flipx, const bool flipy,
 		int sx, int sy,
 		u16 scalex, u16 scaley,
 		u8 pri_dst)
@@ -2688,7 +2528,7 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 		/* Check if special command bit is set */
 		if (spriteram16_ptr[current_offs + 2 + 1] & 0x8000)
 		{
-			const u32 cntrl = (spriteram16_ptr[current_offs + 4 + 1]) & 0xffff;
+			const u16 cntrl = spriteram16_ptr[current_offs + 4 + 1];
 			m_flipscreen = cntrl & 0x2000;
 
 			/*  cntrl & 0x1000 = disabled?  (From F2 driver, doesn't seem used anywhere)
@@ -2950,23 +2790,14 @@ void taito_f3_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 		const u8 pri = sprite_ptr->pri;
 		m_sprite_pri_usage |= 1 << pri;
 
-		if (sprite_ptr->zoomx == 16 && sprite_ptr->zoomy == 16)
-			f3_drawgfx(
-					bitmap, cliprect, sprite_gfx,
-					sprite_ptr->code,
-					sprite_ptr->color & (~m_sprite_extra_planes),
-					sprite_ptr->flipx, sprite_ptr->flipy,
-					sprite_ptr->x, sprite_ptr->y,
-					pri);
-		else
-			f3_drawgfxzoom(
-					bitmap, cliprect, sprite_gfx,
-					sprite_ptr->code,
-					sprite_ptr->color & (~m_sprite_extra_planes),
-					sprite_ptr->flipx, sprite_ptr->flipy,
-					sprite_ptr->x, sprite_ptr->y,
-					sprite_ptr->zoomx, sprite_ptr->zoomy,
-					pri);
+		f3_drawgfx(
+				bitmap, cliprect, sprite_gfx,
+				sprite_ptr->code,
+				sprite_ptr->color & (~m_sprite_extra_planes),
+				sprite_ptr->flipx, sprite_ptr->flipy,
+				sprite_ptr->x, sprite_ptr->y,
+				sprite_ptr->zoomx, sprite_ptr->zoomy,
+				pri);
 	}
 }
 
