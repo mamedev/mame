@@ -125,6 +125,8 @@ void seoul88_state::attribute_ram_w(offs_t offset, uint8_t data)
 
 uint32_t seoul88_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	bitmap.fill(rgb_t::black(), cliprect);
+
 	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
@@ -146,15 +148,17 @@ void seoul88_state::program_map(address_map &map)
 void seoul88_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
+	map.unmap_value_high();
 
-	map(0x00, 0x00).portr("DSW1");
-	map(0x01, 0x01).portr("DSW2");
-	map(0x02, 0x02).portr("DSW3");
 	map(0x10, 0x10).portr("IN0");
 	map(0x11, 0x11).portr("IN1");
+	// map(0x1f, 0x1f).portr(""); some dips in test mode are read from here, but test mode doesn't seem to match what's on PCB
+	map(0xb8, 0xb8).portr("DSW1");
+	map(0xb9, 0xb9).portr("DSW2");
+	map(0xba, 0xba).portr("DSW3");
 }
 
-static INPUT_PORTS_START( seoul88 )
+static INPUT_PORTS_START( seoul88 ) // there are 3 8-dip banks on PCB but test mode shows 5 (probably remnant of other previous games)
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -167,13 +171,13 @@ static INPUT_PORTS_START( seoul88 )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
 
 	PORT_START("DSW1")
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1")
