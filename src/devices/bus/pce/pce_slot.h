@@ -21,7 +21,8 @@ enum
 	PCE_CDSYS3U,
 	PCE_POPULOUS,
 	PCE_SF2,
-	PCE_TENNOKOE
+	PCE_TENNOKOE,
+	PCE_ACARD_PRO
 };
 
 
@@ -36,6 +37,10 @@ public:
 	// reading and writing
 	virtual uint8_t read_cart(offs_t offset) { return 0xff; }
 	virtual void write_cart(offs_t offset, uint8_t data) {}
+	virtual uint8_t read_ex(offs_t offset) { return 0xff; }
+	virtual void write_ex(offs_t offset, uint8_t data) {}
+	virtual uint8_t peripheral_r(offs_t offset) { return 0xff; }
+	virtual void peripheral_w(offs_t offset, uint8_t data) {}
 
 	void rom_alloc(uint32_t size);
 	void ram_alloc(uint32_t size);
@@ -99,6 +104,10 @@ public:
 	// reading and writing
 	uint8_t read_cart(offs_t offset);
 	void write_cart(offs_t offset, uint8_t data);
+	uint8_t read_ex(offs_t offset);
+	void write_ex(offs_t offset, uint8_t data);
+	uint8_t peripheral_r(offs_t offset);
+	void peripheral_w(offs_t offset, uint8_t data);
 
 protected:
 	// device_t implementation

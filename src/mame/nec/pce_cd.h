@@ -47,16 +47,18 @@ public:
 	// construction/destruction
 	pce_cd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	// configuration
+	template <typename T> void set_maincpu(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
+	auto irq() { return m_irq_cb.bind(); }
+
 	void update();
 
 	void late_setup();
 
 	void bram_w(offs_t offset, uint8_t data);
 	void intf_w(offs_t offset, uint8_t data);
-	void acard_w(offs_t offset, uint8_t data);
 	uint8_t bram_r(offs_t offset);
 	uint8_t intf_r(offs_t offset);
-	uint8_t acard_r(offs_t offset);
 
 protected:
 	// device-level overrides
@@ -135,6 +137,7 @@ private:
 	TIMER_CALLBACK_MEMBER(adpcm_dma_timer_callback);
 
 	required_device<cpu_device> m_maincpu;
+	devcb_write_line    m_irq_cb;
 
 	std::unique_ptr<uint8_t[]>   m_bram;
 	std::unique_ptr<uint8_t[]>   m_adpcm_ram;
@@ -174,16 +177,6 @@ private:
 	int     m_data_buffer_size = 0;
 	int     m_data_buffer_index = 0;
 	int     m_data_transferred = 0;
-
-	/* Arcade Card specific */
-	std::unique_ptr<uint8_t[]>  m_acard_ram;
-	uint8_t   m_acard_latch = 0;
-	uint8_t   m_acard_ctrl[4];
-	uint32_t  m_acard_base_addr[4];
-	uint16_t  m_acard_addr_offset[4];
-	uint16_t  m_acard_addr_inc[4];
-	uint32_t  m_acard_shift = 0;
-	uint8_t   m_acard_shift_reg = 0;
 
 	uint32_t  m_current_frame = 0;
 	uint32_t  m_end_frame = 0;

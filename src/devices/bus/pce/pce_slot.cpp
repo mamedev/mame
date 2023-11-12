@@ -181,6 +181,7 @@ static const pce_slot slot_list[] =
 	{ PCE_POPULOUS, "populous" },
 	{ PCE_SF2, "sf2" },
 	{ PCE_TENNOKOE, "tennokoe" },
+	{ PCE_ACARD_PRO, "acard_pro" },
 };
 
 static int pce_get_pcb_id(const char *slot)
@@ -260,7 +261,7 @@ std::pair<std::error_condition, std::string> pce_cart_slot_device::call_load()
 
 		if (m_type == PCE_POPULOUS)
 			m_cart->ram_alloc(0x8000);
-		if (m_type == PCE_CDSYS3J || m_type == PCE_CDSYS3U)
+		if (m_type == PCE_CDSYS3J || m_type == PCE_CDSYS3U || m_type == PCE_ACARD_PRO)
 			m_cart->ram_alloc(0x30000);
 	}
 
@@ -346,6 +347,22 @@ uint8_t pce_cart_slot_device::read_cart(offs_t offset)
 		return 0xff;
 }
 
+uint8_t pce_cart_slot_device::read_ex(offs_t offset)
+{
+	if (m_cart)
+		return m_cart->read_ex(offset);
+	else
+		return 0xff;
+}
+
+uint8_t pce_cart_slot_device::peripheral_r(offs_t offset)
+{
+	if (m_cart)
+		return m_cart->peripheral_r(offset);
+	else
+		return 0xff;
+}
+
 /*-------------------------------------------------
  write
  -------------------------------------------------*/
@@ -354,4 +371,16 @@ void pce_cart_slot_device::write_cart(offs_t offset, uint8_t data)
 {
 	if (m_cart)
 		m_cart->write_cart(offset, data);
+}
+
+void pce_cart_slot_device::write_ex(offs_t offset, uint8_t data)
+{
+	if (m_cart)
+		m_cart->write_ex(offset, data);
+}
+
+void pce_cart_slot_device::peripheral_w(offs_t offset, uint8_t data)
+{
+	if (m_cart)
+		m_cart->peripheral_w(offset, data);
 }

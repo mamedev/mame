@@ -34,14 +34,35 @@ protected:
 class pce_cdsys3_device : public pce_rom_device
 {
 public:
-	// construction/destruction
-	pce_cdsys3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
 	// reading and writing
 	virtual uint8_t read_cart(offs_t offset) override;
 	virtual void write_cart(offs_t offset, uint8_t data) override;
+	virtual uint8_t read_ex(offs_t offset) override;
+
+protected:
+	// construction/destruction
+	pce_cdsys3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool region);
+
+	bool m_region;
 };
 
+// ======================> pce_cdsys3j_device
+
+class pce_cdsys3j_device : public pce_cdsys3_device
+{
+public:
+	// construction/destruction
+	pce_cdsys3j_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+// ======================> pce_cdsys3u_device
+
+class pce_cdsys3u_device : public pce_cdsys3_device
+{
+public:
+	// construction/destruction
+	pce_cdsys3u_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
 
 // ======================> pce_populous_device
 
@@ -55,7 +76,6 @@ public:
 	virtual uint8_t read_cart(offs_t offset) override;
 	virtual void write_cart(offs_t offset, uint8_t data) override;
 };
-
 
 // ======================> pce_sf2_device
 
@@ -106,13 +126,45 @@ private:
 	uint8_t m_bram_locked;
 };
 
+// ======================> pce_acard_pro_device
+
+class pce_acard_pro_device : public pce_cdsys3_device
+{
+public:
+	// construction/destruction
+	pce_acard_pro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// reading and writing
+	virtual uint8_t read_cart(offs_t offset) override;
+	virtual void write_cart(offs_t offset, uint8_t data) override;
+	virtual uint8_t peripheral_r(offs_t offset) override;
+	virtual void peripheral_w(offs_t offset, uint8_t data) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+private:
+	/* Arcade Card specific */
+	std::unique_ptr<uint8_t[]>  m_dram;
+	uint8_t   m_ctrl[4];
+	uint32_t  m_base_addr[4];
+	uint16_t  m_addr_offset[4];
+	uint16_t  m_addr_inc[4];
+	uint32_t  m_shift = 0;
+	uint8_t   m_shift_reg = 0;
+	uint8_t   m_rotate_reg = 0;
+};
+
 
 // device type definition
-DECLARE_DEVICE_TYPE(PCE_ROM_STD,      pce_rom_device)
-DECLARE_DEVICE_TYPE(PCE_ROM_CDSYS3,   pce_cdsys3_device)
-DECLARE_DEVICE_TYPE(PCE_ROM_POPULOUS, pce_populous_device)
-DECLARE_DEVICE_TYPE(PCE_ROM_SF2,      pce_sf2_device)
-DECLARE_DEVICE_TYPE(PCE_ROM_TENNOKOE, pce_tennokoe_device)
+DECLARE_DEVICE_TYPE(PCE_ROM_STD,       pce_rom_device)
+DECLARE_DEVICE_TYPE(PCE_ROM_CDSYS3J,   pce_cdsys3j_device)
+DECLARE_DEVICE_TYPE(PCE_ROM_CDSYS3U,   pce_cdsys3u_device)
+DECLARE_DEVICE_TYPE(PCE_ROM_POPULOUS,  pce_populous_device)
+DECLARE_DEVICE_TYPE(PCE_ROM_SF2,       pce_sf2_device)
+DECLARE_DEVICE_TYPE(PCE_ROM_TENNOKOE,  pce_tennokoe_device)
+DECLARE_DEVICE_TYPE(PCE_ROM_ACARD_PRO, pce_acard_pro_device)
 
 
 #endif // MAME_BUS_PCE_PCE_ROM_H
