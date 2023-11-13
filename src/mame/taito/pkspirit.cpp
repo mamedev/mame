@@ -51,6 +51,7 @@ public:
 	pkspirit_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_mainio(*this, "mainio"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_fg_videoram(*this, "fg_videoram")
@@ -63,6 +64,7 @@ protected:
 
 private:
 	required_device<tmp68301_device> m_maincpu;
+	required_device<te7750_device> m_mainio;
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	required_shared_ptr<uint16_t> m_bg_videoram;
@@ -126,7 +128,7 @@ uint32_t pkspirit_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 void pkspirit_state::main_map(address_map &map) // TODO: verify everything
 {
 	map(0x000000, 0x01ffff).rom().region("maincpu", 0);
-	map(0x100000, 0x10001f).rw("te7750", FUNC(te7750_device::read), FUNC(te7750_device::write)).umask16(0x00ff); // maybe
+	map(0x100000, 0x10001f).rw(m_mainio, FUNC(te7750_device::read), FUNC(te7750_device::write)).umask16(0x00ff);
 	// map(0x200000, 0x200001).r //?
 	map(0x300000, 0x30ffff).ram(); // main RAM?
 	map(0x800001, 0x800001).w("ciu", FUNC(pc060ha_device::master_port_w));
@@ -134,7 +136,7 @@ void pkspirit_state::main_map(address_map &map) // TODO: verify everything
 	//map(0x900000, 0x900001).w // ?
 
 	map(0xa00000, 0xa0003f).ram();
-	map(0xa04000, 0xa057ff).ram();
+	map(0xa04000, 0xa057ff).ram(); // palette?
 	map(0xb00000, 0xb00fff).ram().w(FUNC(pkspirit_state::fg_videoram_w)).share(m_fg_videoram); // GFX chips RAM?
 	map(0xb01000, 0xb01fff).ram(); // GFX chips RAM?
 	map(0xb02000, 0xb02fff).ram().w(FUNC(pkspirit_state::bg_videoram_w)).share(m_bg_videoram); // GFX chips RAM?
@@ -157,26 +159,43 @@ void pkspirit_state::sound_map(address_map &map) // TODO: verify everything
 }
 
 
+// TODO: verify some of these labels means anything in normal English, remap accordingly
+// TODO: Opto labels are supposedly coin chutes
 static INPUT_PORTS_START( pkspirit )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("1 Bet SW")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Duabet SW")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("DE/DR SW")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP ) PORT_NAME("Double SW")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Payout SW")
+	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Opto2 (H)")
+	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Opto2 (L)")
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Opto1 (H)")
+	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Opto1 (L)")
+
+	PORT_START("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Reset Key")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Last Key")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Meter Key")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE4 ) PORT_NAME("All Clear SW")
+	PORT_SERVICE_NO_TOGGLE( 0x10, IP_ACTIVE_LOW )
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT (0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Hopper Rot") // "Hop Rot"?
+	PORT_BIT (0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Pay Out") // Hopper related?
+	PORT_BIT (0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Hopper Over") // "Hop Over"?
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1")
@@ -227,7 +246,13 @@ void pkspirit_state::pkspirit(machine_config &config)
 	z80_device &audiocpu(Z80(config, "audiocpu", 36_MHz_XTAL / 9)); // divider not verified, but marked as 4MHz on PCB
 	audiocpu.set_addrmap(AS_PROGRAM, &pkspirit_state::sound_map);
 
-	TE7750(config, "te7750");
+	TE7750(config, m_mainio);
+	// TODO: check me
+//	m_mainio->ios_cb().set_constant(7);
+	m_mainio->in_port1_cb().set_ioport("IN1");
+	m_mainio->in_port2_cb().set_ioport("IN2");
+	m_mainio->in_port3_cb().set_ioport("IN3");
+	m_mainio->in_port4_cb().set_ioport("IN4");
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: wrong
