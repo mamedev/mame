@@ -1,31 +1,39 @@
 // license:BSD-3-Clause
 // copyright-holders:
+/**************************************************************************************************
 
-/*
-    Poker Spirit (c) 1992 Taito
-    2 PCBs: Base PCB (stickered K11J0730A Poker Spirit) + video PCB (stickered K11X0731A Poker Spirit)
+Poker Spirit (c) 1992 Taito
 
-    Main components:
+TODO:
+- accesses unmapped range $e80 in TMP68303F for a sprite DMA $300ff2 -> $b10000
+- Palette, $a04000 looks the most likely candidate except it spawns 4-bits per gun in dword?
 
-    Base PCB:
-    1 x TMP68303F-16
-    2 x 84256A-10L CMOS 256K-bit low power SRAM
-    1 x TE7750 I/O expander
-    1 x M66011 serial bus controller
-    1 x 93C46 EEPROM
-    1 x 32.000MHz Osc (near the TMP)
-    2 x 8-dip banks
+===================================================================================================
 
-    Video PCB:
-    1 x TC0470LIN video custom
-    1 x TC0600OBT video custom
-    1 x TC0650FDA video custom
-    1 x Z8400BB1
-    1 x OKI M6295
-    1 x YM2203C
-    1 x PC060HA CIU
-    1 x 36.000MHz Osc (near the Z80)
-*/
+2 PCBs: Base PCB (stickered K11J0730A Poker Spirit) + video PCB (stickered K11X0731A Poker Spirit)
+
+Main components:
+
+Base PCB:
+1 x TMP68303F-16
+2 x 84256A-10L CMOS 256K-bit low power SRAM
+1 x TE7750 I/O expander
+1 x M66011 serial bus controller
+1 x 93C46 EEPROM
+1 x 32.000MHz Osc (near the TMP)
+2 x 8-dip banks
+
+Video PCB:
+1 x TC0470LIN video custom
+1 x TC0600OBT video custom
+1 x TC0650FDA video custom
+1 x Z8400BB1
+1 x OKI M6295
+1 x YM2203C
+1 x PC060HA CIU
+1 x 36.000MHz Osc (near the Z80)
+
+**************************************************************************************************/
 
 #include "emu.h"
 

@@ -1260,7 +1260,11 @@ void tmp68301_device::timer_sync(int ch)
 		}
 		if(ntctr >= max) {
 			if(m_tcr[ch] & TCR_INT)
-				interrupt_internal_trigger(4 + ch);
+			{
+				// T0 can't irq, so we compensate by -1
+				// (pkspirit cares for '7750 inputs)
+				interrupt_internal_trigger(3 + ch);
+			}
 			ntctr = ntctr % max;
 		}
 	}
