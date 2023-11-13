@@ -7,6 +7,9 @@ Poker Spirit (c) 1992 Taito
 TODO:
 - accesses unmapped range $e80 in TMP68303F for a sprite DMA $300ff2 -> $b10000
 - Palette, $a04000 looks the most likely candidate except it spawns 4-bits per gun in dword?
+- Opto coin chutes are non-canonical, need to press H then L in quick succession
+  (game will presumably draw a coin error if this isn't done right, needs Reset SW to fix)
+- EEPROM
 
 ===================================================================================================
 
@@ -158,7 +161,7 @@ void pkspirit_state::main_map(address_map &map) // TODO: verify everything
 
 void pkspirit_state::sound_map(address_map &map) // TODO: verify everything
 {
-	map(0x0000, 0x3fff).rom().region("audiocpu", 0); // banked?
+	map(0x0000, 0x7fff).rom().region("audiocpu", 0); // banked?
 	map(0x8000, 0x8fff).ram();
 	map(0xa000, 0xa000).w("ciu", FUNC(pc060ha_device::slave_port_w));
 	map(0xa001, 0xa001).rw("ciu", FUNC(pc060ha_device::slave_comm_r), FUNC(pc060ha_device::slave_comm_w));
@@ -174,7 +177,7 @@ static INPUT_PORTS_START( pkspirit )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("1 Bet SW")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Duabet SW")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("DE/DR SW")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal/Draw SW") // "DE/DR"
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP ) PORT_NAME("Double SW")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Payout SW")
 	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Opto2 (H)")
@@ -325,4 +328,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1992, pkspirit, 0, pkspirit, pkspirit, pkspirit_state, empty_init, ROT0, "Taito Corporation", "Poker Spirit", MACHINE_IS_SKELETON )
+GAME( 1992, pkspirit, 0, pkspirit, pkspirit, pkspirit_state, empty_init, ROT0, "Taito Corporation", "Poker Spirit", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
