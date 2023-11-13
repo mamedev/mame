@@ -2296,7 +2296,7 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 		}
 
 		/* sort layer_tmp */
-		std::sort(layer_tmp, layer_tmp + 5, std::greater<u8>());
+		std::sort(std::begin(layer_tmp), std::end(layer_tmp), std::greater<u8>());
 
 		/* check sprite & layer priority */
 		{
