@@ -55,7 +55,9 @@ Super System Card:
 #include "emu.h"
 #include "pce.h"
 
+#include "bus/pce/pce_acard.h"
 #include "bus/pce/pce_rom.h"
+#include "bus/pce/pce_scdsys.h"
 #include "cpu/h6280/h6280.h"
 #include "sound/cdda.h"
 #include "sound/msm5205.h"
@@ -80,7 +82,6 @@ INPUT_PORTS_END
 
 void pce_state::pce_mem(address_map &map)
 {
-	map(0x000000, 0x0FFFFF).rw(m_cartslot, FUNC(pce_cart_slot_device::read_cart), FUNC(pce_cart_slot_device::write_cart));
 	map(0x100000, 0x10FFFF).ram().share("cd_ram");
 	map(0x110000, 0x1EDFFF).noprw();
 	map(0x1EE000, 0x1EE7FF).rw(m_cd, FUNC(pce_cd_device::bram_r), FUNC(pce_cd_device::bram_w));
@@ -99,7 +100,6 @@ void pce_state::pce_io(address_map &map)
 
 void pce_state::sgx_mem(address_map &map)
 {
-	map(0x000000, 0x0FFFFF).rw(m_cartslot, FUNC(pce_cart_slot_device::read_cart), FUNC(pce_cart_slot_device::write_cart));
 	map(0x100000, 0x10FFFF).ram().share("cd_ram");
 	map(0x110000, 0x1EDFFF).noprw();
 	map(0x1EE000, 0x1EE7FF).rw(m_cd, FUNC(pce_cd_device::bram_r), FUNC(pce_cd_device::bram_w));
@@ -134,6 +134,7 @@ static void pce_cart(device_slot_interface &device)
 	device.option_add_internal("populous", PCE_ROM_POPULOUS);
 	device.option_add_internal("sf2", PCE_ROM_SF2);
 	device.option_add_internal("tennokoe", PCE_ROM_TENNOKOE);
+	device.option_add_internal("acard_duo", PCE_ROM_ACARD_DUO);
 	device.option_add_internal("acard_pro", PCE_ROM_ACARD_PRO);
 }
 

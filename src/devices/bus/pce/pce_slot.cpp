@@ -181,6 +181,7 @@ static const pce_slot slot_list[] =
 	{ PCE_POPULOUS, "populous" },
 	{ PCE_SF2, "sf2" },
 	{ PCE_TENNOKOE, "tennokoe" },
+	{ PCE_ACARD_DUO, "acard_duo" },
 	{ PCE_ACARD_PRO, "acard_pro" },
 };
 
@@ -347,6 +348,14 @@ uint8_t pce_cart_slot_device::read_cart(offs_t offset)
 		return 0xff;
 }
 
+uint8_t pce_cart_slot_device::read_ram(offs_t offset)
+{
+	if (m_cart)
+		return m_cart->read_ram(offset);
+	else
+		return 0xff;
+}
+
 uint8_t pce_cart_slot_device::read_ex(offs_t offset)
 {
 	if (m_cart)
@@ -371,6 +380,12 @@ void pce_cart_slot_device::write_cart(offs_t offset, uint8_t data)
 {
 	if (m_cart)
 		m_cart->write_cart(offset, data);
+}
+
+void pce_cart_slot_device::write_ram(offs_t offset, uint8_t data)
+{
+	if (m_cart)
+		m_cart->write_ram(offset, data);
 }
 
 void pce_cart_slot_device::write_ex(offs_t offset, uint8_t data)

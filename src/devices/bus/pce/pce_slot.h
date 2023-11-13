@@ -22,6 +22,7 @@ enum
 	PCE_POPULOUS,
 	PCE_SF2,
 	PCE_TENNOKOE,
+	PCE_ACARD_DUO,
 	PCE_ACARD_PRO
 };
 
@@ -37,6 +38,8 @@ public:
 	// reading and writing
 	virtual uint8_t read_cart(offs_t offset) { return 0xff; }
 	virtual void write_cart(offs_t offset, uint8_t data) {}
+	virtual uint8_t read_ram(offs_t offset) { return 0xff; }
+	virtual void write_ram(offs_t offset, uint8_t data) {}
 	virtual uint8_t read_ex(offs_t offset) { return 0xff; }
 	virtual void write_ex(offs_t offset, uint8_t data) {}
 	virtual uint8_t peripheral_r(offs_t offset) { return 0xff; }
@@ -104,6 +107,8 @@ public:
 	// reading and writing
 	uint8_t read_cart(offs_t offset);
 	void write_cart(offs_t offset, uint8_t data);
+	uint8_t read_ram(offs_t offset);
+	void write_ram(offs_t offset, uint8_t data);
 	uint8_t read_ex(offs_t offset);
 	void write_ex(offs_t offset, uint8_t data);
 	uint8_t peripheral_r(offs_t offset);
