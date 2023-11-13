@@ -423,9 +423,10 @@ license:CC0-1.0
 	  There are apparently no other differences between the editions. 
 	-->
 	<software name="ro355" supported="no">
-		<description>Great Standards / Jazz Standards (RO-355)</description>
+		<description>Great Standards (RO-355)</description>
 		<year>1984</year>
 		<publisher>Casio / Sight &amp; Sound International Inc. / HP Hal Leonard Publishing Corporation</publisher>
+		<info name="alt_title" value="Jazz Standards"/>
 		<part name="cart" interface="casio_rompack">
 			<dataarea name="rom" size="0x1800">
 				<rom name="ro355.bin" size="0x1800" crc="dc0624c8" sha1="13b6aea39843792d4195ed64a047c0bf681f9873"/> <!-- Dumped from a cart labeled "Jazz Standards" -->
