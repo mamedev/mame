@@ -247,7 +247,7 @@ GFXDECODE_END
 void pkspirit_state::pkspirit(machine_config &config)
 {
 	// basic machine hardware
-	TMP68301(config, m_maincpu, 32_MHz_XTAL / 2); // divider not verified, actually TMP68303F-16
+	TMP68303(config, m_maincpu, 32_MHz_XTAL / 2); // divider not verified, TMP68303F-16
 	m_maincpu->set_addrmap(AS_PROGRAM, &pkspirit_state::main_map);
 	m_maincpu->parallel_r_cb().set([this]() { logerror("%s par_r\n", machine().describe_context()); return 0xffff; });
 
