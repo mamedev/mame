@@ -6,7 +6,8 @@
 #                      \___/_/\_\ .__/ \__,_|\__|
 #                               |_| XML parser
 #
-# Copyright (c) 2019 Expat development team
+# Copyright (c) 2019-2021 Sebastian Pipping <sebastian@pipping.org>
+# Copyright (c) 2021      Tim Bray <tbray@textuality.com>
 # Licensed under the MIT license:
 #
 # Permission is  hereby granted,  free of charge,  to any  person obtaining
@@ -31,11 +32,25 @@
 import argparse
 
 epilog = """
+exit status:
+  0             the input files are well-formed and the output (if requested) was written successfully
+  1             could not allocate data structures, signals a serious problem with execution environment
+  2             one or more input files were not well-formed
+  3             could not create an output file
+  4             command-line argument error
+
 xmlwf of libexpat is software libre, licensed under the MIT license.
 Please report bugs at https://github.com/libexpat/libexpat/issues.  Thank you!
 """
 
+usage = """
+  %(prog)s [OPTIONS] [FILE ...]
+  %(prog)s -h
+  %(prog)s -v
+"""
+
 parser = argparse.ArgumentParser(prog='xmlwf', add_help=False,
+                                 usage=usage,
                                  description='xmlwf - Determines if an XML document is well-formed',
                                  formatter_class=argparse.RawTextHelpFormatter,
                                  epilog=epilog)
@@ -48,6 +63,7 @@ input_related.add_argument('-x', action='store_true', help='enable processing of
 input_related.add_argument('-e', action='store', metavar='ENCODING', help='override any in-document [e]ncoding declaration')
 input_related.add_argument('-w', action='store_true', help='enable support for [W]indows code pages')
 input_related.add_argument('-r', action='store_true', help='disable memory-mapping and use normal file [r]ead IO calls instead')
+input_related.add_argument('-k', action='store_true', help='when processing multiple files, [k]eep processing after first file with error')
 
 output_related = parser.add_argument_group('output control arguments')
 output_related.add_argument('-d', action='store', metavar='DIRECTORY', help='output [d]estination directory')
@@ -56,6 +72,14 @@ output_mode.add_argument('-c', action='store_true', help='write a [c]opy of inpu
 output_mode.add_argument('-m', action='store_true', help='write [m]eta XML, not canonical XML')
 output_mode.add_argument('-t', action='store_true', help='write no XML output for [t]iming of plain parsing')
 output_related.add_argument('-N', action='store_true', help='enable adding doctype and [n]otation declarations')
+
+billion_laughs = parser.add_argument_group('billion laughs attack protection',
+                                           description='NOTE: '
+                                                       'If you ever need to increase these values '
+                                                       'for non-attack payload, please file a bug report.')
+billion_laughs.add_argument('-a', metavar='FACTOR',
+                            help='set maximum tolerated [a]mplification factor (default: 100.0)')
+billion_laughs.add_argument('-b', metavar='BYTES', help='set number of output [b]ytes needed to activate (default: 8 MiB)')
 
 parser.add_argument('files', metavar='FILE', nargs='*', help='file to process (default: STDIN)')
 

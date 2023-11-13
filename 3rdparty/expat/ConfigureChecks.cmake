@@ -2,6 +2,7 @@ include(CheckCCompilerFlag)
 include(CheckCSourceCompiles)
 include(CheckIncludeFile)
 include(CheckIncludeFiles)
+include(CheckLibraryExists)
 include(CheckSymbolExists)
 include(TestBigEndian)
 
@@ -64,3 +65,5 @@ check_c_source_compiles("
 
 check_c_compiler_flag("-fno-strict-aliasing" FLAG_NO_STRICT_ALIASING)
 check_c_compiler_flag("-fvisibility=hidden" FLAG_VISIBILITY)
+
+check_library_exists(m cos "" _EXPAT_LIBM_FOUND)

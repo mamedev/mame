@@ -6,7 +6,9 @@
 #                      \___/_/\_\ .__/ \__,_|\__|
 #                               |_| XML parser
 #
-# Copyright (c) 2017 Expat development team
+# Copyright (c) 2017-2021 Sebastian Pipping <sebastian@pipping.org>
+# Copyright (c) 2018      KangLin <kl222@126.com>
+# Copyright (c) 2022      Johnny Jazeix <jazeix@gmail.com>
 # Licensed under the MIT license:
 #
 # Permission is  hereby granted,  free of charge,  to any  person obtaining
@@ -53,20 +55,36 @@ pkgconfig_DATA = expat.pc
 pkgconfigdir = $(libdir)/pkgconfig
 
 
+dist_cmake_DATA = \
+    cmake/autotools/expat.cmake
+
+nodist_cmake_DATA = \
+    cmake/autotools/expat-config-version.cmake \
+    cmake/autotools/expat-noconfig.cmake \
+    cmake/expat-config.cmake
+
+cmakedir = $(libdir)/cmake/expat-@PACKAGE_VERSION@
+
+
 _EXTRA_DIST_CMAKE = \
-    cmake/expat-config.cmake.in \
+    cmake/autotools/expat-noconfig__linux.cmake.in \
+    cmake/autotools/expat-noconfig__macos.cmake.in \
+    cmake/autotools/expat-noconfig__windows.cmake.in \
+    cmake/autotools/expat-package-init.cmake \
     cmake/mingw-toolchain.cmake \
     \
     CMakeLists.txt \
     CMake.README \
     ConfigureChecks.cmake \
+    expat.pc.cmake \
     expat_config.h.cmake
 
 _EXTRA_DIST_WINDOWS = \
     win32/build_expat_iss.bat \
     win32/expat.iss \
     win32/MANIFEST.txt \
-    win32/README.txt
+    win32/README.txt \
+    win32/version.rc
 
 EXTRA_DIST = \
     $(_EXTRA_DIST_CMAKE) \
@@ -74,11 +92,14 @@ EXTRA_DIST = \
     \
     conftools/expat.m4 \
     conftools/get-version.sh \
-    conftools/PrintPath \
+    \
+    fuzz/xml_parsebuffer_fuzzer.c \
+    fuzz/xml_parse_fuzzer.c \
     \
     xmlwf/xmlwf_helpgen.py \
     xmlwf/xmlwf_helpgen.sh \
     \
+    buildconf.sh \
     Changes \
     README.md \
     \

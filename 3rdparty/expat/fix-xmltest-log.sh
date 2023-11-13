@@ -6,7 +6,7 @@
 #                      \___/_/\_\ .__/ \__,_|\__|
 #                               |_| XML parser
 #
-# Copyright (c) 2019 Expat development team
+# Copyright (c) 2019-2022 Sebastian Pipping <sebastian@pipping.org>
 # Licensed under the MIT license:
 #
 # Permission is  hereby granted,  free of charge,  to any  person obtaining
@@ -42,6 +42,8 @@ sed \
         -e '/^Application tried to create a window, but no driver could be loaded.$/d' \
         -e '/^Make sure that your X server is running and that $DISPLAY is set correctly.$/d' \
         -e '/^err:systray:initialize_systray Could not create tray window$/d' \
+        -e '/^[0-9a-f]\+:err:/d' \
+        -e '/^wine client error:/d' \
         -e '/^In ibm\/invalid\/P49\/: Unhandled exception: unimplemented .\+/d' \
         \
         "${filename}" > "${tempfile}"

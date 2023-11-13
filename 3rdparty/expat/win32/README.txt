@@ -5,7 +5,7 @@ Expat can be built on Windows in two ways:
 * Cygwin:
   This follows the Unix build procedures.
 
-* MS Visual Studio 2008, 2010, 2013, 2015 and 2017:
+* MS Visual Studio 2013, 2015 and 2017:
   Use CMake to generate a solution file for Visual Studio, then use msbuild
   to compile.  For example:
 

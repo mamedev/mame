@@ -6,7 +6,9 @@
 #                      \___/_/\_\ .__/ \__,_|\__|
 #                               |_| XML parser
 #
-# Copyright (c) 2017 Expat development team
+# Copyright (c) 2017-2022 Sebastian Pipping <sebastian@pipping.org>
+# Copyright (c) 2017      Tomasz Kłoczko <kloczek@fedoraproject.org>
+# Copyright (c) 2019      David Loffredo <loffredo@steptools.com>
 # Licensed under the MIT license:
 #
 # Permission is  hereby granted,  free of charge,  to any  person obtaining
@@ -34,16 +36,25 @@ include_HEADERS = \
     expat_external.h
 
 lib_LTLIBRARIES = libexpat.la
+noinst_LTLIBRARIES = libexpatinternal.la
 
 libexpat_la_LDFLAGS = \
     @AM_LDFLAGS@ \
+    @LIBM@ \
     -no-undefined \
     -version-info @LIBCURRENT@:@LIBREVISION@:@LIBAGE@
 
-libexpat_la_SOURCES = \
+libexpat_la_SOURCES =
+
+# This layer of indirection allows
+# the test suite to access internal symbols
+# despite compiling with -fvisibility=hidden
+libexpatinternal_la_SOURCES = \
     xmlparse.c \
     xmltok.c \
     xmlrole.c
+
+libexpat_la_LIBADD = libexpatinternal.la
 
 doc_DATA = \
     ../AUTHORS \
@@ -63,8 +74,7 @@ EXTRA_DIST = \
     iasciitab.h \
     internal.h \
     latin1tab.h \
-    libexpat.def \
-    libexpatw.def \
+    libexpat.def.cmake \
     nametab.h \
     siphash.h \
     utf8tab.h \

@@ -10,8 +10,11 @@
                         \___/_/\_\ .__/ \__,_|\__|
                                  |_| XML parser
 
-   Copyright (c) 1997-2000 Thai Open Source Software Center Ltd
-   Copyright (c) 2000-2017 Expat development team
+   Copyright (c) 2004-2006 Fred L. Drake, Jr. <fdrake@users.sourceforge.net>
+   Copyright (c) 2016-2020 Sebastian Pipping <sebastian@pipping.org>
+   Copyright (c) 2017      Rhodri James <rhodri@wildebeest.org.uk>
+   Copyright (c) 2018      Marco Maggi <marco.maggi-ipsu@poste.it>
+   Copyright (c) 2019      David Loffredo <loffredo@steptools.com>
    Licensed under the MIT license:
 
    Permission is  hereby granted,  free of charge,  to any  person obtaining
@@ -141,11 +144,18 @@ _check_set_test_info(char const *function, char const *filename, int lineno) {
 }
 
 static void
-add_failure(SRunner *runner, int verbosity) {
-  runner->nfailures++;
+handle_success(int verbosity) {
   if (verbosity >= CK_VERBOSE) {
-    printf("%s:%d: %s\n", _check_current_filename, _check_current_lineno,
-           _check_current_function);
+    printf("PASS: %s\n", _check_current_function);
+  }
+}
+
+static void
+handle_failure(SRunner *runner, int verbosity, const char *phase_info) {
+  runner->nfailures++;
+  if (verbosity != CK_SILENT) {
+    printf("FAIL: %s (%s at %s:%d)\n", _check_current_function, phase_info,
+           _check_current_filename, _check_current_lineno);
   }
 }
 
@@ -164,14 +174,14 @@ srunner_run_all(SRunner *runner, int verbosity) {
       if (tc->setup != NULL) {
         /* setup */
         if (setjmp(env)) {
-          add_failure(runner, verbosity);
+          handle_failure(runner, verbosity, "during setup");
           continue;
         }
         tc->setup();
       }
       /* test */
       if (setjmp(env)) {
-        add_failure(runner, verbosity);
+        handle_failure(runner, verbosity, "during actual test");
         continue;
       }
       (tc->tests[i])();
@@ -179,15 +189,17 @@ srunner_run_all(SRunner *runner, int verbosity) {
       /* teardown */
       if (tc->teardown != NULL) {
         if (setjmp(env)) {
-          add_failure(runner, verbosity);
+          handle_failure(runner, verbosity, "during teardown");
           continue;
         }
         tc->teardown();
       }
+
+      handle_success(verbosity);
     }
     tc = tc->next_tcase;
   }
-  if (verbosity) {
+  if (verbosity != CK_SILENT) {
     int passed = runner->nchecks - runner->nfailures;
     double percentage = ((double)passed) / runner->nchecks;
     int display = (int)(percentage * 100);
@@ -203,8 +215,8 @@ _fail_unless(int condition, const char *file, int line, const char *msg) {
      it is.
   */
   UNUSED_P(condition);
-  UNUSED_P(file);
-  UNUSED_P(line);
+  _check_current_filename = file;
+  _check_current_lineno = line;
   if (msg != NULL) {
     const int has_newline = (msg[strlen(msg) - 1] == '\n');
     fprintf(stderr, "ERROR: %s%s", msg, has_newline ? "" : "\n");
