@@ -672,13 +672,28 @@ if _OPTIONS["vs"]=="intel-15" then
 		}
 end
 
-	configuration { "mingw-clang" }
-		buildoptions {
-			"-include stdint.h"
-		}
+	configuration { "arm64" }
+		defines { "FLAC__CPU_ARM64=1" }
+	configuration { "x64", "not arm64" }
+		defines { "FLAC__CPU_X86_64=1" }
+	configuration { "x32", "not arm32" }
+		defines { "FLAC__CPU_IA32=1" }
+
+
+	configuration { "vs*" }
+		defines { "FLAC__HAS_X86INTRIN=0" }
+	configuration { "not vs*" }
+		defines { "FLAC__HAS_X86INTRIN=1" }
+
+	configuration { "not windows" }
+		defines { "HAVE_LROUND=1" }
 
 	configuration { }
 		defines {
+			"SIZE_T_MAX=SIZE_MAX",
+			"ENABLE_64_BIT_WORDS=1",
+			"CPU_IS_BIG_ENDIAN=0",
+			"CPU_IS_LITTLE_ENDIAN=1",
 			"WORDS_BIGENDIAN=0",
 			"FLAC__NO_ASM",
 			"_LARGEFILE_SOURCE",
@@ -686,9 +701,13 @@ end
 			"FLAC__HAS_OGG=0",
 			"HAVE_CONFIG_H=1",
 		}
+		buildoptions {
+			"-include stdint.h"
+		}
 
 	configuration { "gmake or ninja" }
 		buildoptions_c {
+			"-Wno-bad-function-cast",
 			"-Wno-unused-function",
 			"-O0",
 		}
