@@ -84,7 +84,8 @@
     detailed tmgtest_v1_3 test suite.  Although Stewart's tests were
     designed for Dragons, many apply to the NTSC CoCos, and in fact
     tuning to those tests improved emulation of coco_cart:drgnfire on
-    NTSC CoCos.
+    NTSC CoCos.  There are still many tests in tmgtest_v1_3 that
+    fail and may require work in other components.
 
 **********************************************************************/
 
