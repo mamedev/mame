@@ -45798,6 +45798,9 @@ pcs30                           // 1984
 @source:yamaha/ymps400.cpp
 ps400                           // 1982
 
+@source:yamaha/ympsr11.cpp
+psr11                           // 1986
+
 @source:yamaha/ympsr16.cpp
 psr16                           // 1988 PSR-16
 psr36                           // 1988 PSR-36
