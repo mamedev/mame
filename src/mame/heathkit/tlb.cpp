@@ -95,7 +95,7 @@ DEFINE_DEVICE_TYPE(HEATH_SUPERSET, heath_superset_tlb_device, "heath_superset_tl
 DEFINE_DEVICE_TYPE(HEATH_ULTRA, heath_ultra_tlb_device, "heath_ultra_tlb", "Heath Terminal Logic Board w/Ultra ROM")
 DEFINE_DEVICE_TYPE(HEATH_WATZ, heath_watz_tlb_device, "heath_watz_tlb", "Heath Terminal Logic Board w/Watzman ROM")
 DEFINE_DEVICE_TYPE(HEATH_GP19, heath_gp19_tlb_device, "heath_gp19_tlb", "Heath Terminal Logic Board plus Northwest Digital Systems GP-19")
-DEFINE_DEVICE_TYPE(HEATH_IMAGINATOR, heath_imaginator_tlb_device, "heath_imaginator_tlb", "Heath Terminal Logic Board plus Cleveland Codonics Imaginator-100")
+DEFINE_DEVICE_TYPE(HEATH_IMAGINATOR, heath_imaginator_tlb_device, "heath_imaginator_tlb", "Heath Terminal Logic Board plus Cleveland Codonics Imaginator I-100")
 
 
 
