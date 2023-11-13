@@ -41,7 +41,7 @@ public:
 		: pce_common_state(mconfig, type, tag)
 		, m_rtc(*this, "rtc")
 		, m_oki(*this, "oki")
-		, m_okibank(*this, "okibank")
+		, m_okibank(*this, "okibank%u", 0U)
 		, m_lamp(*this, "lamp")
 		, m_irqs(*this, "irqs")
 	{ }
@@ -54,14 +54,14 @@ protected:
 private:
 	void lamp_w(uint8_t data);
 	void output_w(uint8_t data);
-	void oki_bank_w(uint8_t data);
+	void oki_bank_w(offs_t offset, uint8_t data);
 	void sgx_io(address_map &map);
 	void sgx_mem(address_map &map);
 	void oki_map(address_map &map);
 
 	required_device <msm6242_device> m_rtc;
 	required_device <okim6295_device> m_oki;
-	required_memory_bank m_okibank;
+	required_memory_bank_array<4> m_okibank;
 	output_finder<> m_lamp;
 	required_device<input_merger_device> m_irqs;
 };
@@ -71,7 +71,8 @@ void ggconnie_state::machine_start()
 {
 	m_lamp.resolve();
 
-	m_okibank->configure_entries(0, 8, memregion("oki")->base(), 0x10000);
+	for(auto &okibank : m_okibank)
+		okibank->configure_entries(0, 8, memregion("oki")->base(), 0x10000);
 }
 
 void ggconnie_state::lamp_w(uint8_t data)
@@ -84,10 +85,14 @@ void ggconnie_state::output_w(uint8_t data)
 	// written in "Output Test" in test mode
 }
 
-// TODO: banking not understood for ggconnie (writes to 0x01f7400-03 range, while smf only to 00). Is the ROM dumped correctly btw?
-void ggconnie_state::oki_bank_w(uint8_t data)
+// TODO: Cuts off voice samples for both ggconnie and smf.
+// - Never reads OKI status;
+// - It definitely uses 4 registers for sound, on a ROM that has 8x sound tables.
+// - Is the ROM dumped correctly? This arrangement can definitely make more sense with a $20000 granularity,
+//   where banks 1-3 just touches data instead.
+void ggconnie_state::oki_bank_w(offs_t offset, uint8_t data)
 {
-	m_okibank->set_entry(data & 0x07);
+	m_okibank[offset]->set_entry(data & 0x07);
 	// popmessage("offset: %02x, bank: %02x\n", offset, data);
 }
 
@@ -119,8 +124,10 @@ void ggconnie_state::sgx_io(address_map &map)
 
 void ggconnie_state::oki_map(address_map &map)
 {
-	map(0x00000, 0x0ffff).bankr(m_okibank);
-	map(0x10000, 0x3ffff).rom().region("oki", 0);
+	map(0x00000, 0x0ffff).bankr(m_okibank[0]);
+	map(0x10000, 0x1ffff).bankr(m_okibank[1]);
+	map(0x20000, 0x2ffff).bankr(m_okibank[2]);
+	map(0x30000, 0x3ffff).bankr(m_okibank[3]);
 }
 
 static INPUT_PORTS_START(ggconnie)
@@ -418,6 +425,6 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1996, ggconnie, 0, ggconnie, ggconnie, ggconnie_state, init_pce_common, ROT0, "Eighting", "Go! Go! Connie chan Jaka Jaka Janken", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // Throws Hopper Empty when winning, sound banking
-GAME( 1997, smf,      0, ggconnie, smf,      ggconnie_state, init_pce_common, ROT0, "Eighting (Capcom license)", "Super Medal Fighters (Japan 970228)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1996, ggconnie, 0, ggconnie, ggconnie, ggconnie_state, init_pce_common, ROT0, "Eighting", "Go! Go! Connie chan Jaka Jaka Janken", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // Throws Hopper Empty when winning, sound
+GAME( 1997, smf,      0, ggconnie, smf,      ggconnie_state, init_pce_common, ROT0, "Eighting (Capcom license)", "Super Medal Fighters (Japan 970228)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // Throws Hopper Jam when using COIN1, sound
 GAME( 1997, fishingm, 0, ggconnie, fishingm, ggconnie_state, init_pce_common, ROT0, "Capcom", "Fishing Master (971107 JPN)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // Hopper Jam Error
