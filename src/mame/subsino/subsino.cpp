@@ -3417,7 +3417,7 @@ ROM_END
     - 12.000 MHz xtal (only one xtal on the PCB).
     - Five positions for banks of eight DIP switches, but four of them unpopulated (only one present on the PCB).
     - MCU with its surface scratched out.
-   Direct recoding from PCB for reference: https://youtu.be/0cFNFCqEEQo */
+   Direct recording from PCB for reference: https://youtu.be/0cFNFCqEEQo */
 ROM_START( newhunterd )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	ROM_LOAD( "hd647180.bin",   0x00000, 0x04000, NO_DUMP )
