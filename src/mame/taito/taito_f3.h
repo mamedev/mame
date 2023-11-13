@@ -231,14 +231,7 @@ protected:
 	u8 m_twidth_mask_bit = 0;
 	std::unique_ptr<u8[]> m_tile_opaque_sp;
 	std::unique_ptr<u8[]> m_tile_opaque_pf[8];
-	static constexpr std::array<std::array<u8, 256>, 256> m_add_sat = []
-	{
-		auto add_sat = std::array<std::array<u8, 256>, 256>{};
-		for (int i = 0; i < 256; i++)
-			for (int j = 0; j < 256; j++)
-				add_sat[i][j] = std::min(i + j, 255);
-		return add_sat;
-	}();
+	u8 m_add_sat[256][256];
 	int m_alpha_s_1_1 = 0;
 	int m_alpha_s_1_2 = 0;
 	int m_alpha_s_1_4 = 0;
@@ -264,12 +257,12 @@ protected:
 	u8 m_tval = 0;
 	u8 m_pdest_2a = 0;
 	u8 m_pdest_2b = 0;
-	u8 m_tr_2a = 0;
-	u8 m_tr_2b = 0;
+	s8 m_tr_2a = 0;
+	s8 m_tr_2b = 0;
 	u8 m_pdest_3a = 0;
 	u8 m_pdest_3b = 0;
-	u8 m_tr_3a = 0;
-	u8 m_tr_3b = 0;
+	s8 m_tr_3a = 0;
+	s8 m_tr_3b = 0;
 	u16 *m_src[5]{};
 	u16 *m_src_s[5]{};
 	u16 *m_src_e[5]{};
@@ -345,8 +338,8 @@ protected:
 	inline void alpha_blend_3b_1(u32 s);
 	inline void alpha_blend_3b_2(u32 s);
 	bool dpix_1_noalpha(u32 s_pix);
-	constexpr bool dpix_ret1(u32 s_pix);
-	constexpr bool dpix_ret0(u32 s_pix);
+	inline bool dpix_ret1(u32 s_pix);
+	inline bool dpix_ret0(u32 s_pix);
 	bool dpix_1_1(u32 s_pix);
 	bool dpix_1_2(u32 s_pix);
 	bool dpix_1_4(u32 s_pix);

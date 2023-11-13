@@ -902,8 +902,8 @@ inline void taito_f3_state::alpha_blend_3b_2(u32 s) { alpha_blend32_d(m_alpha_s_
 /*============================================================================*/
 
 inline bool taito_f3_state::dpix_1_noalpha(u32 s_pix) { m_dval = s_pix; return true; }
-constexpr bool taito_f3_state::dpix_ret1(u32 s_pix) { return true; }
-constexpr bool taito_f3_state::dpix_ret0(u32 s_pix) { return false; }
+inline bool taito_f3_state::dpix_ret1(u32 s_pix) { return true; }
+inline bool taito_f3_state::dpix_ret0(u32 s_pix) { return false; }
 inline bool taito_f3_state::dpix_1_1(u32 s_pix) { if (s_pix) alpha_blend_1_1(s_pix); return true; }
 inline bool taito_f3_state::dpix_1_2(u32 s_pix) { if (s_pix) alpha_blend_1_2(s_pix); return true; }
 inline bool taito_f3_state::dpix_1_4(u32 s_pix) { if (s_pix) alpha_blend_1_4(s_pix); return true; }
@@ -1254,13 +1254,17 @@ void taito_f3_state::init_alpha_blend_func()
 	m_dpix_n[7][0xd] = &taito_f3_state::dpix_ret0;
 	m_dpix_n[7][0xe] = &taito_f3_state::dpix_ret0;
 	m_dpix_n[7][0xf] = &taito_f3_state::dpix_ret0;
+
+	for (int i = 0; i < 256; i++)
+		for (int j = 0; j < 256; j++)
+			m_add_sat[i][j] = std::min(i + j, 255);
 }
 
 /******************************************************************************/
 
 void taito_f3_state::get_pixmap_pointer(const int skip_layer_num, const f3_playfield_line_inf **line_t, const int y)
 {
-	for(int pf_num = skip_layer_num; pf_num < 5; ++pf_num)
+	for (int pf_num = skip_layer_num; pf_num < 5; ++pf_num)
 	{
 		const f3_playfield_line_inf *line_tmp = line_t[pf_num];
 		m_src[pf_num] = line_tmp->src[y];
@@ -1354,12 +1358,12 @@ inline void taito_f3_state::draw_scanlines(
 
 	m_pdest_2a = m_alpha_level_2ad ? 0x10 : 0;
 	m_pdest_2b = m_alpha_level_2bd ? 0x20 : 0;
-	m_tr_2a =(m_alpha_level_2as == 0 && m_alpha_level_2ad == 255) ? 255 : 0;
-	m_tr_2b =(m_alpha_level_2bs == 0 && m_alpha_level_2bd == 255) ? 255 : 1;
+	m_tr_2a =(m_alpha_level_2as == 0 && m_alpha_level_2ad == 255) ? -1 : 0;
+	m_tr_2b =(m_alpha_level_2bs == 0 && m_alpha_level_2bd == 255) ? -1 : 1;
 	m_pdest_3a = m_alpha_level_3ad ? 0x40 : 0;
 	m_pdest_3b = m_alpha_level_3bd ? 0x80 : 0;
-	m_tr_3a =(m_alpha_level_3as == 0 && m_alpha_level_3ad == 255) ? 255 : 0;
-	m_tr_3b =(m_alpha_level_3bs == 0 && m_alpha_level_3bd == 255) ? 255 : 1;
+	m_tr_3a =(m_alpha_level_3as == 0 && m_alpha_level_3ad == 255) ? -1 : 0;
+	m_tr_3b =(m_alpha_level_3bs == 0 && m_alpha_level_3bd == 255) ? -1 : 1;
 
 	{
 		u32 *dsti0 = &bitmap.pix(ty, x);
@@ -2099,10 +2103,10 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 			/* set alpha level */
 			if (alpha_level != m_alpha_level_last)
 			{
-				const u8 a = alpha_level >> 12;
-				const u8 b = alpha_level >> 8 & 0xf;
-				const u8 c = alpha_level >> 4 & 0xf;
-				const u8 d = alpha_level >> 0 & 0xf;
+				const u8 a = BIT(alpha_level, 12, 4);
+				const u8 b = BIT(alpha_level,  8, 4);
+				const u8 c = BIT(alpha_level,  4, 4);
+				const u8 d = BIT(alpha_level,  0, 4);
 
 				/* b000 7000 */
 				u8 al_s = std::min(255, ((15 - d) * 256) / 8);
@@ -2259,7 +2263,7 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 		}
 
 		/* set scanline priority */
-		std::array<u8, 5> layer_tmp;
+		u8 layer_tmp[5];
 		int count_skip_layer = 0;
 		{
 			int pri_max_opa = -1;
@@ -2292,7 +2296,7 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 		}
 
 		/* sort layer_tmp */
-		std::sort(layer_tmp.begin(), layer_tmp.end(), std::greater<u8>());
+		std::sort(layer_tmp, layer_tmp + 5, std::greater<u8>());
 
 		/* check sprite & layer priority */
 		{
@@ -2607,7 +2611,7 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 					else
 					{
 						this_x = spriteram16_ptr[current_offs + 2 + 0] & 0xfff;
-						if (this_x & 0x800) this_x -= 0x1000; // 12->16 sign extension
+						this_x = util::sext(this_x, 12);
 
 						if ((spriteram16_ptr[current_offs + 2 + 0]) & 0x8000)
 							this_x += 0;
@@ -2636,7 +2640,7 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 					else
 					{
 						this_y = spriteram16_ptr[current_offs + 2 + 1] & 0xfff;
-						if (this_y & 0x800) this_y -= 0x1000; // 12->16 sign extension
+						this_y = util::sext(this_y, 12);
 
 						if ((spriteram16_ptr[current_offs + 2 + 0]) & 0x8000)
 							this_y += 0;
@@ -2694,10 +2698,10 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 			last_color = color;
 
 			/* Sprite positioning */
-			this_y = spriteram16_ptr[current_offs + 2 + 1] & 0xfff;
 			this_x = spriteram16_ptr[current_offs + 2 + 0] & 0xfff;
-			if (this_y & 0x800) this_y -= 0x1000; // 12->16 sign extension
-			if (this_x & 0x800) this_x -= 0x1000; // 12->16 sign extension
+			this_y = spriteram16_ptr[current_offs + 2 + 1] & 0xfff;
+			this_x = util::sext(this_x, 12);
+			this_y = util::sext(this_y, 12);
 
 			/* Ignore both scroll offsets for this block */
 			if ((spriteram16_ptr[current_offs + 2 + 0]) & 0x8000)
