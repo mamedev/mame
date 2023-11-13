@@ -6,6 +6,8 @@
 #include "sound/ymopl.h"
 #include "speaker.h"
 
+namespace {
+
 class yamaha_psr11_state : public driver_device
 {
 public:
@@ -20,9 +22,11 @@ public:
 
 	void psr11(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	void map(address_map &map);
-	virtual void machine_start() override;
 
 	u8 p2_r();
 
@@ -31,12 +35,15 @@ private:
 	required_ioport_array<17> m_keys;
 	output_finder<> m_tempo_led;
 
-	u8 m_p5, m_p6;
+	u8 m_p5 = 0, m_p6 = 0;
 };
 
 void yamaha_psr11_state::machine_start()
 {
 	m_tempo_led.resolve();
+
+	save_item(NAME(m_p5));
+	save_item(NAME(m_p6));
 }
 
 void yamaha_psr11_state::map(address_map &map)
@@ -264,5 +271,6 @@ ROM_START(psr11)
 	ROM_LOAD("yamaha6301y0a72.ic1", 0x0000, 0x4000, CRC(83937c8a) SHA1(5e9263d010dddd2d90c4791f2260b5fc9ec50fd4))
 ROM_END
 
-SYST(1986, psr11, 0, 0, psr11, psr11, yamaha_psr11_state, empty_init, "Yamaha", "Portatone PSR-11", 0)
+} // anonymous namespace
 
+SYST(1986, psr11, 0, 0, psr11, psr11, yamaha_psr11_state, empty_init, "Yamaha", "Portatone PSR-11", MACHINE_SUPPORTS_SAVE)

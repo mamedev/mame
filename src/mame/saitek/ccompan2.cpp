@@ -127,7 +127,7 @@ void ccompan2_state::machine_start()
 
 void ccompan2_state::set_cpu_freq()
 {
-	// Concord II MCU speed is twice higher
+	// Concord II MCU speed is around twice higher
 	m_maincpu->set_unscaled_clock((ioport("FAKE")->read() & 1) ? 7200000 : 4000000);
 }
 
