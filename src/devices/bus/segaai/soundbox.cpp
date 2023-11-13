@@ -71,9 +71,11 @@ timer 1 - mode 2 - rate generator (0E90), gate involved
 
 #include "emu.h"
 #include "soundbox.h"
-#include "machine/pit8253.h"
+
 #include "machine/i8255.h"
+#include "machine/pit8253.h"
 #include "sound/ymopm.h"
+
 #include "speaker.h"
 
 
