@@ -1,5 +1,29 @@
 # utf8proc release history #
 
+## Version 2.9.0 ##
+
+2023-10-20
+
+ - Unicode 15.1 support ([#253]).
+
+## Version 2.8.0 ##
+
+2022-10-30
+
+ - Unicode 15 support ([#247]).
+
+## Version 2.7.0 ##
+
+2021-12-16
+
+ - Unicode 14 support ([#233]).
+
+ - Support `GNUInstallDirs` in CMake build ([#159]).
+
+ - `cmake` build now installs `pkg-config` file ([#224]).
+
+ - Various build and portability improvements.
+
 ## Version 2.6.1 ##
 
 2020-12-15
@@ -409,8 +433,13 @@ Release of version 1.0.1
 [#152]: https://github.com/JuliaStrings/utf8proc/issues/152
 [#154]: https://github.com/JuliaStrings/utf8proc/issues/154
 [#156]: https://github.com/JuliaStrings/utf8proc/issues/156
+[#159]: https://github.com/JuliaStrings/utf8proc/issues/159
 [#167]: https://github.com/JuliaStrings/utf8proc/issues/167
 [#173]: https://github.com/JuliaStrings/utf8proc/issues/173
 [#179]: https://github.com/JuliaStrings/utf8proc/issues/179
 [#196]: https://github.com/JuliaStrings/utf8proc/issues/196
 [#205]: https://github.com/JuliaStrings/utf8proc/issues/205
+[#224]: https://github.com/JuliaStrings/utf8proc/issues/224
+[#233]: https://github.com/JuliaStrings/utf8proc/issues/233
+[#247]: https://github.com/JuliaStrings/utf8proc/issues/247
+[#253]: https://github.com/JuliaStrings/utf8proc/issues/253

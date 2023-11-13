@@ -22,7 +22,7 @@ CharWidths.txt: charwidths.jl EastAsianWidth.txt
 	$(JULIA) charwidths.jl > $@
 
 # Unicode data version (must also update utf8proc_unicode_version function)
-UNICODE_VERSION=13.0.0
+UNICODE_VERSION=15.1.0
 
 UnicodeData.txt:
 	$(CURL) $(CURLFLAGS) -o $@ https://www.unicode.org/Public/$(UNICODE_VERSION)/ucd/UnicodeData.txt
