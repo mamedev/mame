@@ -21289,6 +21289,7 @@ sftm110                         // (c) 1995 Capcom/Incredible Technologies
 sftm111                         // (c) 1995 Capcom/Incredible Technologies
 sftmj114                        // (c) 1995 Capcom/Incredible Technologies
 sftmj112                        // (c) 1995 Capcom/Incredible Technologies
+sftmk112                        // (c) 1995 Capcom/Incredible Technologies
 shufshot                        // (c) Strata/Incredible Technologies
 shufshot135                     // (c) Strata/Incredible Technologies
 shufshot137                     // (c) Strata/Incredible Technologies
@@ -36641,6 +36642,7 @@ ufo_x                           //
 recel                           //
 r_alaska                        //
 r_blackm4                       //
+r_blackmag                      //
 r_cavalier                      //
 r_crzyrace                      //
 r_fairfght                      //
@@ -42323,6 +42325,7 @@ mtrainnv                        // (c) 1996 Subsino
 newhunter                       // (c) 1992 Karam
 newhunterb                      // bootleg
 newhunterc                      // bootleg
+newhunterd                      // bootleg
 sevenlnd                        // bootleg
 sharkpy                         // (c) 1996 Subsino
 sharkpya                        // (c) 1996 Subsino
@@ -45797,6 +45800,9 @@ pcs30                           // 1984
 
 @source:yamaha/ymps400.cpp
 ps400                           // 1982
+
+@source:yamaha/ympsr11.cpp
+psr11                           // 1986
 
 @source:yamaha/ympsr16.cpp
 psr16                           // 1988 PSR-16

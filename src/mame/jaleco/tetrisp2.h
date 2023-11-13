@@ -133,6 +133,13 @@ protected:
 	tilemap_t *m_tilemap_rot = nullptr;
 };
 
+class nndmseal_state : public tetrisp2_state
+{
+public:
+	using tetrisp2_state::tetrisp2_state;
+	static constexpr feature_type unemulated_features() { return feature::CAMERA | feature::PRINTER; }
+};
+
 class rocknms_state : public tetrisp2_state
 {
 public:
