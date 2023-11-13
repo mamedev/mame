@@ -283,7 +283,16 @@ function toolchain(_buildDir, _subDir)
 		}
 
 	configuration { "mingw*" }
-		defines { "WIN32" }
+		defines {
+			"_WIN32",
+			"WIN32",
+		}
+
+	configuration { "x64", "mingw*" }
+		defines {
+			"_WIN64",
+			"WIN64",
+		}
 
 	configuration { "x32", "mingw32-gcc" }
 		objdir (_buildDir .. "mingw-gcc" .. "/obj")
