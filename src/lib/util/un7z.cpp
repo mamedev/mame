@@ -329,7 +329,7 @@ m7z_file_impl::m7z_file_impl(std::string &&filename) noexcept
 	m_look_stream.realStream = &m_archive_stream;
 	m_look_stream.buf = m_look_stream_buf;
 	m_look_stream.bufSize = std::size(m_look_stream_buf);
-	LookToRead2_Init(&m_look_stream);
+	LookToRead2_INIT(&m_look_stream);
 }
 
 
