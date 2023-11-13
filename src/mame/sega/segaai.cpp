@@ -115,21 +115,21 @@ New JIS Keyboard Connector Pinout:
 */ 
 
 #include "emu.h"
+
+#include "bus/segaai/segaai_exp.h"
+#include "bus/segaai/segaai_slot.h"
 #include "cpu/nec/nec.h"
-#include "cpu/z80/z80.h"
+#include "imagedev/cassette.h"
+#include "machine/i8251.h"
+#include "machine/i8255.h"
 #include "sound/sn76496.h"
 #include "sound/upd7759.h"
 #include "video/v9938.h"
-#include "bus/segaai/segaai_slot.h"
-#include "bus/segaai/segaai_exp.h"
-#include "imagedev/cassette.h"
-#include "machine/i8255.h"
-#include "machine/i8251.h"
-#include "speaker.h"
+
 #include "softlist.h"
 #include "softlist_dev.h"
+#include "speaker.h"
 
-// Layout
 #include "segaai.lh"
 
 #define VERBOSE (LOG_GENERAL)
