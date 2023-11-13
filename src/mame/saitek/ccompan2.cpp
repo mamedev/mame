@@ -5,7 +5,7 @@
 
 SciSys Chess Companion II family
 
-The chess engine is LogiChess (ported from Z80 to 6800), by Kaare Danielsen.
+The chess engine is LogiChess (ported from Z80 to 6801), by Kaare Danielsen.
 CXG Enterprise "S" / Star Chess is probably on similar hardware.
 
 NOTE: It triggers an NMI when the power switch is changed from ON to MEMORY.
@@ -13,7 +13,7 @@ If this is not done, NVRAM may fail on the next boot.
 
 TODO:
 - if/when MAME supports an exit callback, hook up power-off NMI to that
-- verify SciSys MCU frequency, the only videos online (for hearing sound pitch)
+- verify Concord II MCU speed, the only videos online (for hearing sound pitch)
   are from the Tandy 1650 ones
 
 ********************************************************************************
@@ -22,7 +22,7 @@ Hardware notes:
 
 Chess Companion II:
 - PCB label: YO1B-01 REV.B
-- Hitachi HD6301V1 (0609V171) @ ~3MHz (LC oscillator)
+- Hitachi HD6301V1 (0609V171) @ ~4MHz (LC oscillator)
 - chessboard buttons, 16+5 leds, piezo
 
 Explorer Chess:
@@ -32,7 +32,7 @@ Explorer Chess:
 
 Concord II:
 - PCB label: SCISYS ST3 REV.E
-- MCU clock frequency is twice higher than Concord, again no XTAL
+- MCU clock frequency is around twice higher than Concord, again no XTAL
 - rest is same as ccompan2, it just has the buttons/status leds at the bottom
   instead of at the right
 
@@ -48,6 +48,8 @@ is either VCC or GND to distinguish between the two.
 - SciSys Electronic Chess Mark 8
 - Tandy 1650 Portable Sensory Chess (Tandy brand Explorer Chess)
 - Tandy 1650 Fast Response Time: Computerized Chess (Tandy brand Concord II)
+
+The Tandy clones run at a lower clock frequency, 3MHz and 6MHz respectively.
 
 *******************************************************************************/
 
@@ -126,7 +128,7 @@ void ccompan2_state::machine_start()
 void ccompan2_state::set_cpu_freq()
 {
 	// Concord II MCU speed is twice higher
-	m_maincpu->set_unscaled_clock((ioport("FAKE")->read() & 1) ? 6000000 : 3000000);
+	m_maincpu->set_unscaled_clock((ioport("FAKE")->read() & 1) ? 7200000 : 4000000);
 }
 
 
@@ -309,8 +311,8 @@ static INPUT_PORTS_START( ccompan2 )
 
 	PORT_START("FAKE")
 	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, ccompan2_state, change_cpu_freq, 0) // factory set
-	PORT_CONFSETTING(    0x00, "3MHz (original)" )
-	PORT_CONFSETTING(    0x01, "6MHz (Concord II)" )
+	PORT_CONFSETTING(    0x00, "4MHz (original)" )
+	PORT_CONFSETTING(    0x01, "7.2MHz (Concord II)" )
 INPUT_PORTS_END
 
 
@@ -322,7 +324,7 @@ INPUT_PORTS_END
 void ccompan2_state::expchess(machine_config &config)
 {
 	// basic machine hardware
-	HD6301V1(config, m_maincpu, 3000000); // approximation, no XTAL
+	HD6301V1(config, m_maincpu, 4000000); // approximation, no XTAL
 	m_maincpu->nvram_enable_backup(true);
 	m_maincpu->standby_cb().set(FUNC(ccompan2_state::standby));
 	m_maincpu->in_p1_cb().set(FUNC(ccompan2_state::input1_r));
@@ -339,7 +341,6 @@ void ccompan2_state::expchess(machine_config &config)
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(5+2, 8);
-	m_display->set_interpolation(0.25);
 	config.set_default_layout(layout_saitek_expchess);
 
 	// sound hardware
