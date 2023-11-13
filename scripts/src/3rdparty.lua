@@ -795,8 +795,8 @@ if _OPTIONS["vs"]=="intel-15" then
 end
 	configuration { }
 		defines {
-			"_7ZIP_PPMD_SUPPPORT",
-			"_7ZIP_ST",
+			"Z7_PPMD_SUPPORT",
+			"Z7_ST",
 		}
 
 	files {
