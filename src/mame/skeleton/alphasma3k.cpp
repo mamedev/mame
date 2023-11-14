@@ -58,9 +58,8 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_lcdc0(*this, "ks0066_0")
 		, m_lcdc1(*this, "ks0066_1")
-//		, m_ram(*this, RAM_TAG)
+		, m_ram(*this, RAM_TAG)
         , m_ipl(*this, "ipl")
-        , m_ram(*this, "ram")
 	{
 	}
 
@@ -70,34 +69,41 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc0;
 	required_device<hd44780_device> m_lcdc1;
-//  required_device<ram_device> m_ram;
-    required_region_ptr<u16> m_ipl;
-    required_shared_ptr<u16> m_ram;
+	required_device<ram_device> m_ram;
+	required_region_ptr<u16> m_ipl;
 
 	std::unique_ptr<bitmap_ind16> m_tmp_bitmap;
 
-    virtual void machine_reset() override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
     void main_map(address_map &map);
 };
 
+void alphasmart3k_state::machine_start()
+{
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	space.install_ram(0x00000000, m_ram->size() - 1, m_ram->pointer());
+}
+
+void alphasmart3k_state::machine_reset()
+{
+	// TODO: expects specific initialized 68k values, including registers?
+	// dc.w 1111 is vector $2c
+	memcpy(m_ram->pointer(), memregion("ipl")->base(), 0x100);
+}
+
 void alphasmart3k_state::main_map(address_map &map)
 {
-    map(0x0000'0000, 0x0003'ffff).ram().share("ram");
+//  map(0x0000'0000, 0x0003'ffff).ram().share("ram");
     map(0x0040'0000, 0x004f'ffff).rom().region("ipl", 0);
 }
 
 static INPUT_PORTS_START( alphasmart3k )
 INPUT_PORTS_END
 
-void alphasmart3k_state::machine_reset()
-{
-    // TODO: expects specific initialized 68k values, including registers?
-    // dc.w 1111 is vector $2c
-    for (int i = 0; i < 0x10; i++)
-        m_ram[i] = m_ipl[i];
-}
+
 
 void alphasmart3k_state::alphasmart3k(machine_config &config)
 {
@@ -112,7 +118,7 @@ void alphasmart3k_state::alphasmart3k(machine_config &config)
 	KS0066_F05(config, m_lcdc1, 0);
 	m_lcdc1->set_lcd_size(4, 40);
 
-//	RAM(config, RAM_TAG).set_default_size("256K");
+	RAM(config, RAM_TAG).set_default_size("256K");
 
 	SOFTWARE_LIST(config, "kapps_list").set_original("alphasmart_kapps");
 }
