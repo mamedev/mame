@@ -262,8 +262,6 @@ std::pair<std::error_condition, std::string> pce_cart_slot_device::call_load()
 
 		if (m_type == PCE_POPULOUS)
 			m_cart->ram_alloc(0x8000);
-		if (m_type == PCE_CDSYS3J || m_type == PCE_CDSYS3U || m_type == PCE_ACARD_PRO)
-			m_cart->ram_alloc(0x30000);
 	}
 
 	return std::make_pair(std::error_condition(), std::string());

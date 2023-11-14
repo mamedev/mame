@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Fabio Priuli, Wilbert Pol, Angelo Salese
+// copyright-holders:Fabio Priuli, Angelo Salese
 /***********************************************************************************************************
 
 
@@ -17,7 +17,7 @@
 
 
 //-------------------------------------------------
-//  pce_rom_device - constructor
+//  pce_acard_device - constructor
 //-------------------------------------------------
 
 DEFINE_DEVICE_TYPE(PCE_ROM_ACARD_DUO, pce_acard_duo_device, "pce_acard_duo", "Arcade Card Duo")
@@ -37,6 +37,7 @@ pce_acard_duo_device::pce_acard_duo_device(const machine_config &mconfig, const 
 
 pce_acard_pro_device::pce_acard_pro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pce_acard_duo_device(mconfig, PCE_ROM_ACARD_PRO, tag, owner, clock)
+	, m_cdsys3(*this, "cdsys3")
 {
 }
 
@@ -61,6 +62,11 @@ void pce_acard_duo_device::device_start()
 	save_item(NAME(m_rotate_reg));
 }
 
+void pce_acard_pro_device::device_add_mconfig(machine_config &config)
+{
+	PCE_ROM_CDSYS3_BASE(config, m_cdsys3, DERIVED_CLOCK(1,1)).set_region(false);
+}
+
 /*-------------------------------------------------
  mapper specific handlers
  -------------------------------------------------*/
@@ -81,8 +87,8 @@ void pce_acard_duo_device::write_ram(offs_t offset, uint8_t data)
 
 uint8_t pce_acard_pro_device::read_cart(offs_t offset)
 {
-	if (!m_ram.empty() && offset >= 0xd0000)
-		return m_ram[offset - 0xd0000];
+	if (offset >= 0xd0000)
+		return m_cdsys3->ram_r(offset - 0xd0000);
 
 	const int bank = offset / 0x20000;
 	return m_rom[rom_bank_map[bank] * 0x20000 + (offset & 0x1ffff)];
@@ -90,22 +96,13 @@ uint8_t pce_acard_pro_device::read_cart(offs_t offset)
 
 void pce_acard_pro_device::write_cart(offs_t offset, uint8_t data)
 {
-	if (!m_ram.empty() && offset >= 0xd0000)
-		m_ram[offset - 0xd0000] = data;
+	if (offset >= 0xd0000)
+		m_cdsys3->ram_w(offset - 0xd0000, data);
 }
 
 uint8_t pce_acard_pro_device::read_ex(offs_t offset)
 {
-	switch (offset & 0x0f)
-	{
-		case 0x1: return 0xaa;
-		case 0x2: return 0x55;
-		case 0x3: return 0x00;
-		case 0x5: return 0xaa;
-		case 0x6: return 0x55;
-		case 0x7: return 0x03;
-	}
-	return 0x00;
+	return m_cdsys3->register_r(offset);
 }
 
 uint8_t pce_acard_duo_device::peripheral_r(offs_t offset)

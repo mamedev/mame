@@ -1,10 +1,11 @@
 // license:BSD-3-Clause
-// copyright-holders:Fabio Priuli, Wilbert Pol, Angelo Salese
+// copyright-holders:Fabio Priuli, Angelo Salese
 #ifndef MAME_BUS_PCE_PCE_ACARD_H
 #define MAME_BUS_PCE_PCE_ACARD_H
 
 #pragma once
 
+#include "pce_scdsys.h"
 #include "pce_slot.h"
 
 
@@ -46,6 +47,7 @@ private:
 // ======================> pce_acard_duo_device
 
 class pce_acard_pro_device : public pce_acard_duo_device
+
 {
 public:
 	// construction/destruction
@@ -55,6 +57,12 @@ public:
 	virtual uint8_t read_cart(offs_t offset) override;
 	virtual void write_cart(offs_t offset, uint8_t data) override;
 	virtual uint8_t read_ex(offs_t offset) override;
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
+
+private:
+	required_device<pce_cdsys3_base_device> m_cdsys3;
 };
 
 

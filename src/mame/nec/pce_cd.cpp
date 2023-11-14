@@ -1307,10 +1307,12 @@ uint8_t pce_cd_device::irq_status_r()
 {
 	uint8_t res = m_irq_status & 0x6e;
 	// a read here locks the BRAM
-	m_bram_locked = 1;
+	if (!machine().side_effects_disabled())
+		m_bram_locked = 1;
 	res |= (m_cd_motor_on ? 0x10 : 0);
 	// TODO: gross hack, needs actual behaviour of CDDA data select
-	m_irq_status ^= 0x02;
+	if (!machine().side_effects_disabled())
+		m_irq_status ^= 0x02;
 	return res;
 }
 
@@ -1654,7 +1656,8 @@ uint8_t pce_cd_device::get_adpcm_ram_byte()
 {
 	if (m_adpcm_read_buf > 0)
 	{
-		m_adpcm_read_buf--;
+		if (!machine().side_effects_disabled())
+			m_adpcm_read_buf--;
 		return 0;
 	}
 	else
@@ -1662,7 +1665,8 @@ uint8_t pce_cd_device::get_adpcm_ram_byte()
 		uint8_t res;
 
 		res = m_adpcm_ram[m_adpcm_read_ptr];
-		m_adpcm_read_ptr = ((m_adpcm_read_ptr + 1) & 0xffff);
+		if (!machine().side_effects_disabled())
+			m_adpcm_read_ptr = ((m_adpcm_read_ptr + 1) & 0xffff);
 
 		return res;
 	}
