@@ -268,6 +268,7 @@ protected:
 
 	void display_enable_w(offs_t reg, uint8_t val);
 	void config_irq_w(offs_t reg, uint8_t val);
+	void nop_w(offs_t reg, uint8_t val);
 	virtual void set_irq_line() override;
 
 	memory_view m_mem_view;

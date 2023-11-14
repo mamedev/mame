@@ -1471,19 +1471,6 @@ void heath_imaginator_tlb_device::device_start()
 	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x8000, 0xbfff, "irq_update",
 		[this](offs_t offset, u8 &data, u8 mem_mask) { if (!machine().side_effects_disabled()) { tap_8000h(); } },
 		[this](offs_t offset, u8 &data, u8 mem_mask) { if (!machine().side_effects_disabled()) { tap_8000h(); } });
-
-	m_alphanumeric_mode_active = true;
-	m_graphics_mode_active = false;
-
-	m_allow_tlb_interrupts = true;
-	m_allow_imaginator_interrupts = false;
-	m_im2_d1_val = 1;
-
-	m_hsync_irq_raised = false;
-
-	m_mem_map = 1;
-
-	m_mem_view.select(m_mem_map);
 }
 
 void heath_imaginator_tlb_device::device_reset()
@@ -1491,6 +1478,13 @@ void heath_imaginator_tlb_device::device_reset()
 	m_mem_map = 1;
 
 	m_mem_view.select(m_mem_map);
+
+	m_alphanumeric_mode_active = true;
+	m_graphics_mode_active = false;
+
+	m_hsync_irq_raised = false;
+
+	allow_tlb_intr();
 }
 
 /*
@@ -1511,10 +1505,10 @@ void heath_imaginator_tlb_device::mem_map(address_map &map)
 	map(0x0000, 0x1fff).view(m_mem_view);
 
 	// H19 standard ROM
-	m_mem_view[0](0x0000, 0x1fff).rom().region("maincpu", 0).unmapw();
+	m_mem_view[0](0x0000, 0x1fff).rom().region("maincpu", 0);
 
 	// GCP ROM mapped to 0x0000 on power-up/reset
-	m_mem_view[1](0x0000, 0x1fff).rom().region("maincpu", 0x2000).unmapw();
+	m_mem_view[1](0x0000, 0x1fff).rom().region("maincpu", 0x2000);
 
 	// Normal spot of the GCP ROM
 	map(0x2000, 0x3fff).rom();
@@ -1583,8 +1577,8 @@ void heath_imaginator_tlb_device::io_map(address_map &map)
 	// display enabling (graphics or alphanumeric)
 	map(0x30, 0x30).select(0xc0).mirror(0x0f).w(FUNC(heath_imaginator_tlb_device::display_enable_w));
 
-	map(0x50, 0x50).mirror(0x0f); // Prevent mapping to TLB when a4 is high
-	map(0xd0, 0xd0).mirror(0x0f); // Prevent mapping to TLB when a4 is high
+	// Avoids writes to TLB when a4 is high on unused
+	map(0x50, 0x50).select(0x80).mirror(0x0f).w(FUNC(heath_imaginator_tlb_device::nop_w));
 }
 
 IRQ_CALLBACK_MEMBER(heath_imaginator_tlb_device::irq_ack_cb)
@@ -1612,6 +1606,9 @@ void heath_imaginator_tlb_device::display_enable_w(offs_t reg, uint8_t val)
 	m_graphics_mode_active = bool(BIT(reg, 6));
 }
 
+void heath_imaginator_tlb_device::nop_w(offs_t, uint8_t)
+{
+}
 
 const tiny_rom_entry *heath_imaginator_tlb_device::device_rom_region() const
 {
