@@ -337,7 +337,7 @@ AI-8003  Pinpon Music Melody
 	</software>
 
 	<software name="eigoohan" supported="no">
-		<description>Eigo de Ohanashi: Folk &amp; Fairy Tales</description>
+		<description>Eigo de Ohanashi - English Wonder School: Folk &amp; Fairy Tales</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<notes>Cassette is not supported yet.</notes>
@@ -384,7 +384,7 @@ AI-8003  Pinpon Music Melody
 	</software>
 
 	<software name="eigogame" supported="no">
-		<description>Eigo de Game: Popo's Adventure</description>
+		<description>Eigo de Game - English Wonder School: Popo's Adventure</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<notes>Cassette is not supported yet. Eigo de Game 2: Only the first entry from the menu works, the color names and 'big' are spoken. The other menu entries hang waiting for the cassette.</notes>
