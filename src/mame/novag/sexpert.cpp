@@ -3,7 +3,7 @@
 // thanks-to:Berger
 /*******************************************************************************
 
-Novag Super Expert (model 878/886/887/902) / Novag Super Forte
+Novag Super Expert (model 878/886/887/902) / Novag Super Forte (model 879/?/901)
 
 Hardware notes (Super Expert)
 - R65C02P4 or W65C802P-6 @ 5MHz/6MHz (10MHz/12MHz XTAL)
@@ -587,8 +587,8 @@ ROM_END
 
 ROM_START( sfortec1 ) // ID = F1.2
 	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD("sfl_c_iii.u13", 0x0000, 0x8000, CRC(f040cf30) SHA1(1fc1220b8ed67cdffa3866d230ce001721cf684f) ) // Toshiba TC57256AD-12
-	ROM_LOAD("sfh_c_iii.u11", 0x8000, 0x8000, CRC(0f926b32) SHA1(9c7270ecb3f41dd9172a9a7928e6e04e64b2a340) ) // NEC D27C256AD-12
+	ROM_LOAD("sfl_c_111.u13", 0x0000, 0x8000, CRC(f040cf30) SHA1(1fc1220b8ed67cdffa3866d230ce001721cf684f) ) // Toshiba TC57256AD-12
+	ROM_LOAD("sfh_c_111.u11", 0x8000, 0x8000, CRC(0f926b32) SHA1(9c7270ecb3f41dd9172a9a7928e6e04e64b2a340) ) // NEC D27C256AD-12
 	ROM_LOAD("h0_c_c26.u12", 0x10000, 0x8000, CRC(c6a1419a) SHA1(017a0ffa9aa59438c879624a7ddea2071d1524b8) ) // Toshiba TC57256AD-12
 ROM_END
 
