@@ -2558,26 +2558,26 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 		if (((spriteram16_ptr[current_offs + 2 + 0]) & 0xf000) == 0xa000)
 		{
 			global_x = (spriteram16_ptr[current_offs + 2 + 0]) & 0xfff;
-			if (global_x >= 0x800) global_x -= 0x1000;
+			global_x = util::sext(global_x, 12);
 			global_y = spriteram16_ptr[current_offs + 2 + 1] & 0xfff;
-			if (global_y >= 0x800) global_y -= 0x1000;
+			global_y = util::sext(global_y, 12);
 		}
 
 		/* And sub-global sprite scroll */
 		if (((spriteram16_ptr[current_offs + 2 + 0]) & 0xf000) == 0x5000)
 		{
 			subglobal_x = (spriteram16_ptr[current_offs + 2 + 0]) & 0xfff;
-			if (subglobal_x >= 0x800) subglobal_x -= 0x1000;
+			subglobal_x = util::sext(subglobal_x, 12);
 			subglobal_y = spriteram16_ptr[current_offs + 2 + 1] & 0xfff;
-			if (subglobal_y >= 0x800) subglobal_y -= 0x1000;
+			subglobal_y = util::sext(subglobal_y, 12);
 		}
 
 		if (((spriteram16_ptr[current_offs + 2 + 0]) & 0xf000) == 0xb000)
 		{
 			subglobal_x = (spriteram16_ptr[current_offs + 2 + 0]) & 0xfff;
-			if (subglobal_x >= 0x800) subglobal_x -= 0x1000;
+			subglobal_x = util::sext(subglobal_x, 12);
 			subglobal_y = spriteram16_ptr[current_offs + 2 + 1] & 0xfff;
-			if (subglobal_y >= 0x800) subglobal_y -= 0x1000;
+			subglobal_y = util::sext(subglobal_y, 12);
 			global_y = subglobal_y;
 			global_x = subglobal_x;
 		}
