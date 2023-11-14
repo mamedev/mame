@@ -8,7 +8,7 @@ driver by Angelo Salese and Roberto Zandona',
 based on early work by Pierpaolo Prazzoli and David Haywood
 
 TODO:
-- Map display is (almost) correct but color pens aren't;
+- 6845 refresh rate calculation is incorrect;
 - Flip screen support;
 
 =========================================================================================
@@ -159,14 +159,13 @@ namespace {
 class progolf_state : public driver_device
 {
 public:
-	progolf_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_videoram(*this, "videoram"),
-		m_fbram(*this, "fbram")
+	progolf_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_videoram(*this, "videoram")
 	{ }
 
 	void progolfa(machine_config &config);
@@ -184,15 +183,14 @@ private:
 	required_device<palette_device> m_palette;
 
 	required_shared_ptr<uint8_t> m_videoram;
-	required_shared_ptr<uint8_t> m_fbram;
 
 	uint8_t m_char_pen = 0;
-	uint8_t m_char_pen_vreg = 0;
-	std::unique_ptr<uint8_t[]> m_fg_fb;
+	std::unique_ptr<uint8_t[]> m_fbram{};
 	uint8_t m_scrollx_hi = 0;
 	uint8_t m_scrollx_lo = 0;
 	uint8_t m_gfx_switch = 0;
 
+	u8 charram_r(offs_t offset);
 	void charram_w(offs_t offset, uint8_t data);
 	void char_vregs_w(uint8_t data);
 	void scrollx_lo_w(uint8_t data);
@@ -213,11 +211,10 @@ void progolf_state::video_start()
 	m_scrollx_hi = 0;
 	m_scrollx_lo = 0;
 
-	m_fg_fb = std::make_unique<uint8_t[]>(0x2000*8);
+	m_fbram = std::make_unique<uint8_t[]>(0x2000 * 3);
 
 	save_item(NAME(m_char_pen));
-	save_item(NAME(m_char_pen_vreg));
-	save_pointer(NAME(m_fg_fb), 0x2000*8);
+	save_pointer(NAME(m_fbram), 0x2000 * 3);
 	save_item(NAME(m_scrollx_hi));
 	save_item(NAME(m_scrollx_lo));
 	save_item(NAME(m_gfx_switch));
@@ -231,41 +228,52 @@ uint32_t progolf_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 		int count = 0;
 
-		for(int x=0;x<128;x++)
+		// TODO: rewrite using standard tilemap
+		for(int x = 0; x < 128; x++)
 		{
-			for(int y=0;y<32;y++)
+			for(int y = 0; y < 32; y++)
 			{
 				int const tile = m_videoram[count];
 
-				m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,tile,1,0,0,(256-x*8)+scroll,y*8);
+				m_gfxdecode->gfx(0)->opaque(bitmap, cliprect, tile, 1, 0, 0, (256 - x * 8) + scroll, y * 8);
 				/* wrap-around */
-				m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,tile,1,0,0,(256-x*8)+scroll-1024,y*8);
+				m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, tile, 1, 0, 0, (256 - x * 8) + scroll -1024, y * 8);
 
 				count++;
 			}
 		}
 	}
 
-	// framebuffer is 8x8 chars arranged like a bitmap + a register that controls the pen handling.
+	// framebuffer is 8x8 chars arranged like a bitmap
 	{
-		int count = 0;
-
-		for(int y=0;y<256;y+=8)
+		const int pitch = 32;
+		for(int y = 0; y < 256; y+= 8)
 		{
-			for(int x=0;x<256;x+=8)
+			for(int x = 0; x < 256; x+= 8)
 			{
-				for (int yi=0;yi<8;yi++)
-				{
-					for (int xi=0;xi<8;xi++)
-					{
-						int const color = m_fg_fb[(xi+yi*8)+count*0x40];
+				u32 fb_offset = ((y >> 3) + (x >> 3) * pitch) << 3;
 
-						if(color != 0 && cliprect.contains(x+yi, 256-y+xi))
-							bitmap.pix(x+yi, 256-y+xi) = m_palette->pen((color & 0x7));
+				for (int xi = 0; xi < 8; xi ++)
+				{
+					for (int yi = 0; yi < 8; yi ++)
+					{
+						int res_x = 256 - x + xi ;
+						int res_y = y + yi;
+						if(!cliprect.contains(res_x, res_y))
+							continue;
+
+						u8 pen = 0;
+						pen |= BIT(m_fbram[fb_offset + (yi | 0x0000)], 7 - xi) << 0;
+						pen |= BIT(m_fbram[fb_offset + (yi | 0x2000)], 7 - xi) << 1;
+						pen |= BIT(m_fbram[fb_offset + (yi | 0x4000)], 7 - xi) << 2;
+						pen &= 7;
+
+						if (!pen)
+							continue;
+
+						bitmap.pix(res_y, res_x) = m_palette->pen(pen);
 					}
 				}
-
-				count++;
 			}
 		}
 	}
@@ -273,25 +281,30 @@ uint32_t progolf_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
+// Japanese RMW style framebuffer, where individual planes are joined together to form bitplanes
+// thru rudimentary OPs
+u8 progolf_state::charram_r(offs_t offset)
+{
+	u8 res = 0;
+
+	u8 plane = m_char_pen ^ 7;
+	for (int i = 0; i < 3; i++)
+		if (!BIT(plane, i))
+			res |= m_fbram[offset | (i * 0x2000)];
+	return res;
+}
+
 void progolf_state::charram_w(offs_t offset, uint8_t data)
 {
-	int i;
-	m_fbram[offset] = data;
+	u8 plane = m_char_pen ^ 7;
 
-	if(m_char_pen == 7)
+	for (int i = 0; i < 3; i++)
 	{
-		for(i=0;i<8;i++)
-			m_fg_fb[offset*8+i] = 0;
-	}
-	else
-	{
-		for(i=0;i<8;i++)
-		{
-			if(m_fg_fb[offset*8+i] == m_char_pen)
-				m_fg_fb[offset*8+i] = data & (1<<(7-i)) ? m_char_pen : 0;
-			else
-				m_fg_fb[offset*8+i] = data & (1<<(7-i)) ? m_fg_fb[offset*8+i]|m_char_pen : m_fg_fb[offset*8+i];
-		}
+		const u16 fb_offset = offset | (i * 0x2000);
+		if (m_char_pen == 0)
+			m_fbram[fb_offset] = 0;
+		else if (!BIT(plane, i))
+			m_fbram[fb_offset] = data;
 	}
 }
 
@@ -299,7 +312,6 @@ void progolf_state::char_vregs_w(uint8_t data)
 {
 	m_char_pen = data & 0x07;
 	m_gfx_switch = data & 0xf0;
-	m_char_pen_vreg = data & 0x30;
 }
 
 void progolf_state::scrollx_lo_w(uint8_t data)
@@ -354,7 +366,7 @@ void progolf_state::videoram_w(offs_t offset, uint8_t data)
 void progolf_state::main_cpu(address_map &map)
 {
 	map(0x0000, 0x5fff).ram();
-	map(0x6000, 0x7fff).ram().w(FUNC(progolf_state::charram_w)).share("fbram");
+	map(0x6000, 0x7fff).rw(FUNC(progolf_state::charram_r), FUNC(progolf_state::charram_w));
 	map(0x8000, 0x8fff).rw(FUNC(progolf_state::videoram_r), FUNC(progolf_state::videoram_w)).share("videoram");
 	map(0x9000, 0x9000).portr("IN2").w(FUNC(progolf_state::char_vregs_w));
 	map(0x9200, 0x9200).portr("P1").w(FUNC(progolf_state::scrollx_hi_w)); //p1 inputs
@@ -520,6 +532,7 @@ void progolf_state::progolf(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_progolf);
 	PALETTE(config, m_palette, FUNC(progolf_state::progolf_palette), 32 * 3);
 
+	// TODO: gives a 256x256 screen with 52 Hz as refresh rate, should be 57
 	mc6845_device &crtc(MC6845(config, "crtc", 10.595_MHz_XTAL / 16));
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
