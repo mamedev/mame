@@ -5,9 +5,25 @@
 
 #define CATCH_CONFIG_RUNNER
 #include "test.h"
+#include <bx/string.h>
+
+bool testAssertHandler(const bx::Location& _location, const char* _format, va_list _argList)
+{
+	bx::printf("%s(%d): ", _location.filePath, _location.line);
+	bx::vprintf(_format, _argList);
+	bx::printf("\n");
+
+	// Throwing exceptions is required for testing asserts being trigged.
+	// Use REQUIRE_THROWS to test asserts.
+	throw std::exception();
+
+	return true;
+}
 
 int runAllTests(int _argc, const char* _argv[])
 {
+	bx::setAssertHandler(testAssertHandler);
+
 	DBG("Compiler: " BX_COMPILER_NAME
 		", CPU: " BX_CPU_NAME
 		", Architecture: " BX_ARCH_NAME

@@ -302,22 +302,22 @@
 		}                                             \
 	BX_MACRO_BLOCK_END
 
-#define _BX_ASSERT(_condition, _format, ...)            \
-	BX_MACRO_BLOCK_BEGIN                                \
-		if (!BX_IGNORE_C4127(_condition) )              \
-		{                                               \
-			BX_TRACE("ASSERT " _format, ##__VA_ARGS__); \
-			bx::debugBreak();                           \
-		}                                               \
+#define _BX_ASSERT(_condition, _format, ...)                                                                   \
+	BX_MACRO_BLOCK_BEGIN                                                                                       \
+		if (!BX_IGNORE_C4127(_condition)                                                                       \
+		&&  bx::assertFunction(bx::Location::current(), "ASSERT " #_condition " -> " _format, ##__VA_ARGS__) ) \
+		{                                                                                                      \
+			bx::debugBreak();                                                                                  \
+		}                                                                                                      \
 	BX_MACRO_BLOCK_END
 
-#define _BX_ASSERT_LOC(_location, _condition, _format, ...)             \
-	BX_MACRO_BLOCK_BEGIN                                                \
-		if (!BX_IGNORE_C4127(_condition) )                              \
-		{                                                               \
-			_BX_TRACE_LOC(_location, "ASSERT " _format, ##__VA_ARGS__); \
-			bx::debugBreak();                                           \
-		}                                                               \
+#define _BX_ASSERT_LOC(_location, _condition, _format, ...)                                       \
+	BX_MACRO_BLOCK_BEGIN                                                                          \
+		if  (!BX_IGNORE_C4127(_condition)                                                         \
+		&&   bx::assertFunction(_location, "ASSERT " #_condition " -> " _format, ##__VA_ARGS__) ) \
+		{                                                                                         \
+			bx::debugBreak();                                                                     \
+		}                                                                                         \
 	BX_MACRO_BLOCK_END
 
 #define _BX_WARN_LOC(_location, _condition, _format, ...)             \

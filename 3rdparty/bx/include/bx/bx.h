@@ -113,6 +113,32 @@ namespace bx
 	/// Unknown source code location.
 	static constexpr LocationFull kUnknownLocationFull("Unknown?", "Unknown?", 0);
 
+	/// Assert handler function.
+	///
+	/// @param[in] _location Source code location where function is called.
+	/// @param[in] _format Printf style format.
+	/// @param[in] ... Arguments for `_format` specification.
+	///
+	/// @returns True if assert should stop code execution, otherwise returns false.
+	///
+	typedef bool (*AssertHandlerFn)(const Location& _location, const char* _format, va_list _argList);
+
+	/// Set assert handler function.
+	///
+	/// @param[in] _assertHandlerFn Pointer to AssertHandlerFn function.
+	///
+	void setAssertHandler(AssertHandlerFn _assertHandlerFn);
+
+	/// Assert function calls AssertHandlerFn.
+	///
+	/// @param[in] _location Source code location where function is called.
+	/// @param[in] _format Printf style format.
+	/// @param[in] ... Arguments for `_format` specification.
+	///
+	/// @returns True if assert should stop code execution, otherwise returns false.
+	///
+	bool assertFunction(const Location& _location, const char* _format, ...);
+
 	/// Arithmetic type `Ty` limits.
 	template<typename Ty, bool SignT = isSigned<Ty>()>
 	struct LimitsT;
