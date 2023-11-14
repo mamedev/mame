@@ -235,7 +235,7 @@ AI-8003  Pinpon Music Melody
 		</part>
 	</software>
 
-	<!-- okeiko and hanamaru were sold as a single package -->
+	<!-- okeiko and hanamaru were sold as a single package? -->
 	<software name="okeiko" supported="no">
 		<description>Okeiko Aiueo</description>
 		<year>198?</year>
@@ -251,7 +251,7 @@ AI-8003  Pinpon Music Melody
 		</part>
 	</software>
 
-	<!-- okeiko and hanamaru were sold as a single package -->
+	<!-- okeiko and hanamaru were sold as a single package? -->
 	<software name="hanamaru" supported="no">
 		<description>Hanamaru Aiueo</description>
 		<year>198?</year>
