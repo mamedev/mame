@@ -1665,29 +1665,20 @@ void taito_f3_state::get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos,
 	f3_playfield_line_inf *line_t = &m_pf_line_inf[pos];
 
 	int y_start, y_end, y_inc;
-	int line_base, zoom_base, col_base, pri_base, pal_add_base, inc;
-
-	u8 line_enable;
-	u16 colscroll = 0;
-	int x_offset = 0, line_zoom = 0;
-	u32 _y_zoom[256];
-	u16 pri = 0, pal_add = 0;
-	int bit_select = 1 << pos;
-
-	u16 _colscroll[256];
-	u32 _x_offset[256];
 	int y_index_fx;
+
+	u16 colscroll = 0;
+	u16 _colscroll[256];
+	int x_offset = 0;
+	u32 _x_offset[256];
+	u8 line_zoom_x = 0, line_zoom_y = 0;
+	u8 _y_zoom[256];
+	u16 pri = 0, pal_add = 0;
 
 	sx += ((46 << 16));
 
 	if (m_flipscreen)
 	{
-		line_base = 0xa1fe + (pos << 9);
-		zoom_base = 0x81fe;// + (pos << 9);
-		col_base = 0x41fe + (pos << 9);
-		pri_base = 0xb1fe + (pos << 9);
-		pal_add_base = 0x91fe + (pos << 9);
-		inc = -2;
 		y_start = 255;
 		y_end = -1;
 		y_inc = -1;
@@ -1702,12 +1693,6 @@ void taito_f3_state::get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos,
 	}
 	else
 	{
-		line_base = 0xa000 + (pos << 9);
-		zoom_base = 0x8000;// + (pos << 9);
-		col_base = 0x4000 + (pos << 9);
-		pri_base = 0xb000 + (pos << 9);
-		pal_add_base = 0x9000 + (pos << 9);
-		inc = 2;
 		y_start = 0;
 		y_end = 256;
 		y_inc = 1;
@@ -1719,35 +1704,49 @@ void taito_f3_state::get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos,
 
 	while (y != y_end)
 	{
+		const u16 col_base = (0x4000 + (pos << 9)) / 2;
+		const u16 zoom_base = 0x8000 / 2;
+		const u16 pal_add_base = (0x9000 + (pos << 9)) / 2;
+		const u16 line_base = (0xa000 + (pos << 9)) / 2;
+		const u16 pri_base = (0xb000 + (pos << 9)) / 2;
+
+		const u8 bit_select = 1 << pos;
+
 		/* The zoom, column and row values can latch according to control ram */
 		{
 			if (m_line_ram[0x600 + y] & bit_select)
-				x_offset = (m_line_ram[line_base / 2] & 0xffff) << 10;
+				x_offset = m_line_ram[line_base + y] << 10;
 			if (m_line_ram[0x700 + y] & bit_select)
-				pri = m_line_ram[pri_base / 2] & 0xffff;
+				pri = m_line_ram[pri_base + y];
 
 			// Zoom for playfields 1 & 3 is interleaved, as is the latch select
 			switch (pos)
 			{
 			case 0:
 				if (m_line_ram[0x400 + y] & bit_select)
-					line_zoom = m_line_ram[(zoom_base + 0x000) / 2] & 0xffff;
+				{
+					line_zoom_x = m_line_ram[zoom_base + y + 0x000 / 2] >> 8;
+					line_zoom_y = m_line_ram[zoom_base + y + 0x000 / 2] & 0xff;
+				}
 				break;
 			case 1:
 				if (m_line_ram[0x400 + y] & 0x2)
-					line_zoom = ((m_line_ram[(zoom_base + 0x200) / 2] & 0xffff) & 0xff00) | (line_zoom & 0x00ff);
+					line_zoom_x = m_line_ram[zoom_base + y + 0x200 / 2] >> 8;
 				if (m_line_ram[0x400 + y] & 0x8)
-					line_zoom = ((m_line_ram[(zoom_base + 0x600) / 2] & 0xffff) & 0x00ff) | (line_zoom & 0xff00);
+					line_zoom_y = m_line_ram[zoom_base + y + 0x600 / 2] & 0xff;
 				break;
 			case 2:
 				if (m_line_ram[0x400 + y] & bit_select)
-					line_zoom = m_line_ram[(zoom_base + 0x400) / 2] & 0xffff;
+				{
+					line_zoom_x = m_line_ram[zoom_base + y + 0x400 / 2] >> 8;
+					line_zoom_y = m_line_ram[zoom_base + y + 0x400 / 2] & 0xff;
+				}
 				break;
 			case 3:
 				if (m_line_ram[0x400 + y] & 0x8)
-					line_zoom = ((m_line_ram[(zoom_base + 0x600) / 2] & 0xffff) & 0xff00) | (line_zoom & 0x00ff);
+					line_zoom_x = m_line_ram[zoom_base + y + 0x600 / 2] >> 8;
 				if (m_line_ram[0x400 + y] & 0x2)
-					line_zoom = ((m_line_ram[(zoom_base + 0x200) / 2] & 0xffff) & 0x00ff) | (line_zoom & 0xff00);
+					line_zoom_y = m_line_ram[zoom_base + y + 0x200 / 2] & 0xff;
 				break;
 			default:
 				break;
@@ -1755,11 +1754,13 @@ void taito_f3_state::get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos,
 
 			// Column scroll only affects playfields 2 & 3
 			if (pos >= 2 && m_line_ram[0x000 + y] & bit_select)
-				colscroll = (m_line_ram[col_base / 2] >> 0) & 0x3ff;
+				colscroll = (m_line_ram[col_base + y] >> 0) & 0x3ff;
 
 			if (m_line_ram[0x500 + y] & bit_select)
-				pal_add = (m_line_ram[pal_add_base / 2] & 0x1ff) * 16;
+				pal_add = (m_line_ram[pal_add_base + y] & 0x1ff) * 16;
 		}
+
+		u8 line_enable;
 
 		if (!pri || (!m_flipscreen && y < 24) || (m_flipscreen && y > 231) ||
 			(pri & 0xc000) == 0xc000 || !(pri & 0x2000)/**/)
@@ -1773,7 +1774,7 @@ void taito_f3_state::get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos,
 
 		_colscroll[y] = colscroll;
 		_x_offset[y] = (x_offset & 0xffff0000) - (x_offset & 0x0000ffff);
-		_y_zoom[y] = (line_zoom & 0xff) << 9;
+		_y_zoom[y] = line_zoom_y;
 
 		/* Evaluate clipping */
 		if (pri & 0x0f00)
@@ -1788,16 +1789,12 @@ void taito_f3_state::get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos,
 			line_t->clip_ex[y] = 0;
 		}
 
-		line_t->x_zoom[y] = 0x10000 - (line_zoom & 0xff00);
+		line_t->x_zoom[y] = 0x10000 - (line_zoom_x << 8);
 		line_t->alpha_mode[y] = line_enable;
 		line_t->pri[y] = pri;
 		line_t->pal_add[y] = pal_add;
 
-		zoom_base += inc;
-		line_base += inc;
-		col_base += inc;
-		pri_base += inc;
-		pal_add_base += inc;
+		// zoom_base += inc;
 		y += y_inc;
 	}
 	// ignore the first zoom value from ram and use the default
@@ -1872,7 +1869,7 @@ void taito_f3_state::get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos,
 			line_t->tsrc[y] = &tsrc_s[x_index_fx >> 16];
 		}
 
-		y_index_fx += _y_zoom[y];
+		y_index_fx += _y_zoom[y] << 9;
 		y += y_inc;
 	}
 }
