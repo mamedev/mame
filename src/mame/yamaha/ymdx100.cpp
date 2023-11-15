@@ -7,7 +7,7 @@ Yamaha DX27 and DX100 digital synthesizers
 The DX27 and DX100 are mid-tier professional synthesizers released by Yamaha
 around 1985. The DX27 is a full-size keyboard with 61 full-size keys that can
 only run on AC power. The DX100 is a smaller, wearable keyboard with only 49
-small-size keys and can run on either AC power or batteries. Both keybaords have
+small-size keys and can run on either AC power or batteries. Both keyboards have
 full MIDI in/out/thru, and can also hook up to a Yamaha foot pedal and breath
 controller.
 
@@ -133,7 +133,7 @@ service manual, but is still readily available.
     1 2 3 4 5 6 7 8 9 0 - = -> 1 2 3 4 5 6 7 8 9 10 11 12
     Q W  T Y  O P -> PBend KeyShift  Store Func      BankA BankB
     E R  U I  [ ] -> -1    +1        Edit  Internal  BankC BankD
-    Octave 3 will be avaible over [Z S X D C  V G B H N J M]
+    Octave 3 will be available over [Z S X D C  V G B H N J M]
     Pitch bend will be ' /
     Mod wheel will be ; .
     Data entry slider will be L ,
@@ -622,7 +622,7 @@ void yamaha_dx100_state::dx100(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(yamaha_dx100_state::palette_init), 3);
 
-	hd44780_device &lcdc(HD44780(config, "lcdc", 0)); // HD44780RA00
+	hd44780_device &lcdc(HD44780(config, "lcdc", 250'000)); // HD44780RA00; TODO: clock not measured, datasheet typical clock used
 	lcdc.set_lcd_size(1, 16);
 	lcdc.set_pixel_update_cb(FUNC(yamaha_dx100_state::lcd_pixel_update));
 
