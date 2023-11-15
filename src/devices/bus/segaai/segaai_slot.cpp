@@ -14,7 +14,7 @@
 enum
 {
 	SEGAAI_CARD_ROM_128 = 0,
-	SEGAAI_CARD_ROM_256 
+	SEGAAI_CARD_ROM_256
 };
 
 
@@ -30,10 +30,10 @@ segaai_card_interface::segaai_card_interface(const machine_config &mconfig, devi
 
 
 segaai_card_slot_device::segaai_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-		: device_t(mconfig, SEGAAI_CARD_SLOT, tag, owner, clock)
-		, device_cartrom_image_interface(mconfig, *this)
-		, device_single_card_slot_interface<segaai_card_interface>(mconfig, *this)
-		, m_address_space(*this, finder_base::DUMMY_TAG, -1, 8)
+	: device_t(mconfig, SEGAAI_CARD_SLOT, tag, owner, clock)
+	, device_cartrom_image_interface(mconfig, *this)
+	, device_single_card_slot_interface<segaai_card_interface>(mconfig, *this)
+	, m_address_space(*this, finder_base::DUMMY_TAG, -1, 8)
 {
 }
 

@@ -2,10 +2,10 @@
 // copyright-holders:Wilbert Pol, Fabio Priuli
 // thanks-to:Chris Covell
 /*
- 
+
  Sega AI driver
 
- 
+
  Not much is known at this stage, except that the system was intended to be
  used for educational purposes in schools. Yet the audio chips seem much more
  powerful than what an educational computer requires...
@@ -20,7 +20,7 @@
  TV Output : RGB, Video, RF
  Keyboard : new JIS arrangement (Japanese input mapping)
 
- 
+
 TODO:
 - The artwork system has no support for a real touchpad device with
   selectable artwork, so the touchpad is emulated as a 24x20 matrix
@@ -47,72 +47,72 @@ TODO:
 ===========================================================================
 
  Sega AI Computer quick PCB overview by Chris Covell
- 
- Major ICs 
- 
- IC 1    D701080-5     (86/09?)  NEC V20 CPU       DIP40 
- IC 2    315-5200      (86/25)   SEGA          QFP100 
- IC 3    27C512-25     (86/15)   64K EPROM "E000  8/24" 
- IC 4    27C512-25     (86/06)   64K EPROM "F000  7/21" 
+
+ Major ICs
+
+ IC 1    D701080-5     (86/09?)  NEC V20 CPU       DIP40
+ IC 2    315-5200      (86/25)   SEGA          QFP100
+ IC 3    27C512-25     (86/15)   64K EPROM "E000  8/24"
+ IC 4    27C512-25     (86/06)   64K EPROM "F000  7/21"
  IC 5    MPR-7689      (86/22)   SEGA "264 AA E79" (ROM) DIP28
- IC 10   V9938                   Yamaha MSX2 VDP 
- IC 13   D7759C        (86/12)   NEC Speech Synthesizer   DIP40 
+ IC 10   V9938                   Yamaha MSX2 VDP
+ IC 13   D7759C        (86/12)   NEC Speech Synthesizer   DIP40
  IC 14   MPR-7619      (86/23)   SEGA (ROM)      DIP28
  IC 15   MPR-7620      (86/23)   SEGA (ROM)      DIP28
- IC 16   SN76489AN               TI PSG         DIP16 
- IC 17   D8251AFC      (86/09)   NEC Communications Interface DIP28 
- IC 18   315-5201      (86/25)   SEGA (bodge wire on pins 9,10) DIP20 
- IC 19   M5204A        (87?/01)  OKI 
- IC 20   D8255AC-2     (86/08)   NEC Peripheral Interface DIP40 
- 
- IC 6,7,8,9,11,12   D41464C-12   NEC 32K DRAMs - 128K RAM, 64K VRAM 
- 
- Crystals, etc 
- 
- X1   20.000           "KDS 6D" 
- X2   21.47727         "KDS" 
- X3   640kHz           "CSB 640 P" 
- 
- Connectors 
- 
- CN1   6-pin DIN Power connector 
- CN2   8-pin DIN "AUX" connector 
- CN3   Video phono jack 
- CN4   Audio phono jack 
- CN5   35-pin Sega MyCard connector 
- CN6   60-pin expansion connector A1..A30 Bottom, B1..B30 Top 
- CN7   9-pin header connector to "Joy, Button, LED" unit 
- CN8   13(?) pin flat flex connector to pressure pad 
- CN9   9-pin header connector to tape drive motor, etc. 
- CN10   13-pin header connector to tape heads 
- JP2   2-wire header to SW2 button board 
- PJ1   7-wire header to Keyboard / Mic connector board 
- MIC   2-wire header to mic on KB/Mic board 
- SW1   Reset Switch 
- 
- Power switch is on the AC Adaptor 
- 
- Joypad unit (by Mitsumi) has U/D/L/R, "PL" and "PR" buttons, and a power LED. 
- 
-Power Connector Pinout (Seen from AC Adaptor plug):                
-   1     5        1  12V COM    5   5V COM 
-      6           2  12V OUT    6   5V OUT 
-   2     4        3   5V COM        
-      3           4   5V OUT 
+ IC 16   SN76489AN               TI PSG         DIP16
+ IC 17   D8251AFC      (86/09)   NEC Communications Interface DIP28
+ IC 18   315-5201      (86/25)   SEGA (bodge wire on pins 9,10) DIP20
+ IC 19   M5204A        (87?/01)  OKI
+ IC 20   D8255AC-2     (86/08)   NEC Peripheral Interface DIP40
 
-AUX Connector Pinout: 
-   7   6          1 +5V(?)      5 csync 
-  3  8  1         2 GND         6 green 
-   5   4          3 blue        7 Audio out 
-     2            4 +5V(?)      8 red 
+ IC 6,7,8,9,11,12   D41464C-12   NEC 32K DRAMs - 128K RAM, 64K VRAM
 
-New JIS Keyboard Connector Pinout: 
-    1 2           1,2,3 data lines 
-  3 4   5         4 ??          5,8 data lines 
+ Crystals, etc
+
+ X1   20.000           "KDS 6D"
+ X2   21.47727         "KDS"
+ X3   640kHz           "CSB 640 P"
+
+ Connectors
+
+ CN1   6-pin DIN Power connector
+ CN2   8-pin DIN "AUX" connector
+ CN3   Video phono jack
+ CN4   Audio phono jack
+ CN5   35-pin Sega MyCard connector
+ CN6   60-pin expansion connector A1..A30 Bottom, B1..B30 Top
+ CN7   9-pin header connector to "Joy, Button, LED" unit
+ CN8   13(?) pin flat flex connector to pressure pad
+ CN9   9-pin header connector to tape drive motor, etc.
+ CN10   13-pin header connector to tape heads
+ JP2   2-wire header to SW2 button board
+ PJ1   7-wire header to Keyboard / Mic connector board
+ MIC   2-wire header to mic on KB/Mic board
+ SW1   Reset Switch
+
+ Power switch is on the AC Adaptor
+
+ Joypad unit (by Mitsumi) has U/D/L/R, "PL" and "PR" buttons, and a power LED.
+
+Power Connector Pinout (Seen from AC Adaptor plug):
+   1     5        1  12V COM    5   5V COM
+      6           2  12V OUT    6   5V OUT
+   2     4        3   5V COM
+      3           4   5V OUT
+
+AUX Connector Pinout:
+   7   6          1 +5V(?)      5 csync
+  3  8  1         2 GND         6 green
+   5   4          3 blue        7 Audio out
+     2            4 +5V(?)      8 red
+
+New JIS Keyboard Connector Pinout:
+    1 2           1,2,3 data lines
+  3 4   5         4 ??          5,8 data lines
    6 7 8          6 GND         7 +5V
- 
 
-*/ 
+
+*/
 
 #include "emu.h"
 
@@ -156,7 +156,7 @@ public:
 		, m_port_tp(*this, "TP.%u", 0)
 		, m_vector(0)
 	{ }
-	
+
 	void segaai(machine_config &config);
 
 protected:
@@ -246,7 +246,7 @@ Interesting combination of I/O actions from the BIOS:
 
 EC267: B0 03                mov     al,3h
 EC269: E6 17                out     17h,al
-EC26B: B0 FC                mov     al,0FCh		; 11111100
+EC26B: B0 FC                mov     al,0FCh     ; 11111100
 EC26D: E6 0F                out     0Fh,al
 EC26F: B0 FF                mov     al,0FFh
 EC271: E6 08                out     8h,al
@@ -254,7 +254,7 @@ EC271: E6 08                out     8h,al
 same code at ECDBE, ED2FC
 EC2D6: B0 05                mov     al,5h
 EC2D8: E6 17                out     17h,al
-EC2DA: B0 FA                mov     al,0FAh		; 11111010
+EC2DA: B0 FA                mov     al,0FAh     ; 11111010
 EC2DC: E6 0F                out     0Fh,al
 EC2DE: B0 00                mov     al,0h
 EC2E0: E4 08                in      al,8h
@@ -262,7 +262,7 @@ EC2E0: E4 08                in      al,8h
 same code at ECE08, ECE1D, ED282, EDBA8, EDD78
 EC319: B0 04                mov     al,4h
 EC31B: E6 17                out     17h,al
-EC31D: B0 FE                mov     al,0FEh		; 11111110
+EC31D: B0 FE                mov     al,0FEh     ; 11111110
 EC31F: E6 0F                out     0Fh,al
 
 ECB45: 80 FA 03             cmp     dl,3h
@@ -275,7 +275,7 @@ ECB51: E6 17                out     17h,al
 same code at ED02A, ED17E, ED1DC
 ECEE5: B0 03                mov     al,3h
 ECEE7: E6 17                out     17h,al
-ECEE9: B0 FC                mov     al,0FCh		; 11111100
+ECEE9: B0 FC                mov     al,0FCh     ; 11111100
 ECEEB: E6 0F                out     0Fh,al
 ECEED: B0 00                mov     al,0h
 ECEEF: E6 08                out     8h,al
@@ -283,7 +283,7 @@ ECEEF: E6 08                out     8h,al
 same code at ED0D9, ED120, EDB04, EDC8F
 ECF0D: B0 02                mov     al,2h
 ECF0F: E6 17                out     17h,al
-ECF11: B0 FE                mov     al,0FEh		; 11111110
+ECF11: B0 FE                mov     al,0FEh     ; 11111110
 ECF13: E6 0F                out     0Fh,al
 
 */
@@ -810,8 +810,8 @@ void segaai_state::segaai(machine_config &config)
 ROM_START(segaai)
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD("mpr-7689.ic5",  0xc0000, 0x20000, CRC(62402ac9) SHA1(bf52d22b119d54410dad4949b0687bb0edf3e143))
-	ROM_LOAD("e000 8_24.ic3", 0xe0000, 0x10000, CRC(c8b6a539) SHA1(cbf8473d1e3d8037ea98e9ca8b9aafdc8d16ff23))	// actual label is "e000 8/24"
-	ROM_LOAD("f000 7_21.ic4", 0xf0000, 0x10000, CRC(64d6cd8c) SHA1(68c130048f16d6a0abe1978e84440931470222d9))	// actual label is "f000 7/21"
+	ROM_LOAD("e000 8_24.ic3", 0xe0000, 0x10000, CRC(c8b6a539) SHA1(cbf8473d1e3d8037ea98e9ca8b9aafdc8d16ff23))   // actual label is "e000 8/24"
+	ROM_LOAD("f000 7_21.ic4", 0xf0000, 0x10000, CRC(64d6cd8c) SHA1(68c130048f16d6a0abe1978e84440931470222d9))   // actual label is "f000 7/21"
 
 	ROM_REGION(0x40000, "upd7759", 0)
 	ROM_LOAD("mpr-7619.ic14", 0x00000, 0x20000, CRC(d1aea002) SHA1(c8d5408bba65b17301f19cf9ebd2b635d642525a))

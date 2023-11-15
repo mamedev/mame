@@ -41,16 +41,16 @@ pin 1 A1   - PB7
 pin 2 Y1   -> HC04 pin 3 A2
 pin 3 A2   <- HC04 pin 2 Y1
 pin 4 Y2   -> 4th point, 1st row below HC04?
-pin 5 A3   - 
-pin 6 Y3   - 
+pin 5 A3   -
+pin 6 Y3   -
 pin 7 GND  -
-pin 8 Y4   -  1st point, 2nd row below HC04 
+pin 8 Y4   -  1st point, 2nd row below HC04
 pin 9 A4   -  1st point, 1st row below HC04
-pin 10 Y5  - 
+pin 10 Y5  -
 pin 11 A5  <- HC04 pin 12 Y6
 pin 12 Y6  -> HC04 pin 11 A5
 pin 13 A6  -  point just below C38 then continues to DRAMs
-pin 14 VCC - 
+pin 14 VCC -
 
 8255 PB7 - connected to HC04 pin 1?, pulled low
 
@@ -129,7 +129,7 @@ void segaai_soundbox_device::device_add_mconfig(machine_config &config)
 	// gate0 not connected
 	m_tmp8253->set_clk<1>(21.477272_MHz_XTAL/6);    // 5MHz or 3.58 MHz?
 	m_tmp8253->out_handler<1>().set(FUNC(segaai_soundbox_device::tmp8253_out1_w));
-    // timer 2 is not connected, also not set up by the code
+	// timer 2 is not connected, also not set up by the code
 
 	I8255(config, m_tmp8255);
 	m_tmp8255->in_pa_callback().set(FUNC(segaai_soundbox_device::tmp8255_porta_r));
@@ -279,10 +279,10 @@ u8 segaai_soundbox_device::tmp8255_portb_r()
 
  76543210
  +-------- 8253 GATE1
-  +------- 
-   +------ 
-    +----- 
-     +---- 
+  +-------
+   +------
+    +-----
+     +----
       +--- LC7537N pin22 DI
        +-- LC7537N pin21 CLK
         +- LC7537N pin20 DI
@@ -307,12 +307,12 @@ void segaai_soundbox_device::ym2151_irq_w(int state)
 
 void segaai_soundbox_device::tmp8253_out0_w(int state)
 {
-//	osd_printf_info("Soundbox: OUT0 from tmp8253 is '%s'\n", state ? "ASSERT" : "CLEAR");
+//  osd_printf_info("Soundbox: OUT0 from tmp8253 is '%s'\n", state ? "ASSERT" : "CLEAR");
 }
 
 void segaai_soundbox_device::tmp8253_out1_w(int state)
 {
-//	osd_printf_info("Soundbox: OUT1 from tmp8253 is '%s'\n", state ? "ASSERT" : "CLEAR");
+//  osd_printf_info("Soundbox: OUT1 from tmp8253 is '%s'\n", state ? "ASSERT" : "CLEAR");
 }
 
 } // anonymous namespace
