@@ -14,7 +14,7 @@ bool testAssertHandler(const bx::Location& _location, const char* _format, va_li
 	bx::printf("\n");
 
 	// Throwing exceptions is required for testing asserts being trigged.
-	// Use REQUIRE_THROWS to test asserts.
+	// Use REQUIRE_ASSERTS to test asserts.
 	throw std::exception();
 
 	return true;

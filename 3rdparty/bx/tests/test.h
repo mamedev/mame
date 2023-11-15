@@ -14,7 +14,12 @@ BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4312); // warning C4312 : 'reinterpret_cast' :
 BX_PRAGMA_DIAGNOSTIC_POP();
 
 #define TEST(_x) TEST_CASE(#_x, "")
-#define CHECK_EQUAL(_x, _y) REQUIRE(_x == _y)
+
+#if BX_CONFIG_DEBUG
+#	define REQUIRE_ASSERTS(_x) REQUIRE_THROWS(_x)
+#else
+#	define REQUIRE_ASSERTS(_x) BX_UNUSED(_x)
+#endif // BX_CONFIG_DEBUG
 
 #include "dbg.h"
 
