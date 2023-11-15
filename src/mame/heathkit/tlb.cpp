@@ -1457,7 +1457,7 @@ void heath_imaginator_tlb_device::device_start()
 	heath_tlb_device::device_start();
 
 	save_item(NAME(m_mem_map));
-	save_item(NAME(m_im2_d1_val));
+	save_item(NAME(m_im2_val));
 	save_item(NAME(m_alphanumeric_mode_active));
 	save_item(NAME(m_graphics_mode_active));
 	save_item(NAME(m_allow_tlb_interrupts));
@@ -1553,14 +1553,14 @@ void heath_imaginator_tlb_device::allow_tlb_intr()
 {
 	m_allow_tlb_interrupts = true;
 	m_allow_imaginator_interrupts = false;
-	m_im2_d1_val = 1;
+	m_im2_val = 0x02;
 }
 
 void heath_imaginator_tlb_device::allow_hsync_intr()
 {
 	m_allow_tlb_interrupts = false;
 	m_allow_imaginator_interrupts = true;
-	m_im2_d1_val = 0;
+	m_im2_val = 0x00;
 }
 
 /**
@@ -1583,7 +1583,7 @@ void heath_imaginator_tlb_device::io_map(address_map &map)
 
 IRQ_CALLBACK_MEMBER(heath_imaginator_tlb_device::irq_ack_cb)
 {
-	return m_im2_d1_val << 1;
+	return m_im2_val;
 }
 
 void heath_imaginator_tlb_device::config_irq_w(offs_t reg, uint8_t val)
@@ -1640,14 +1640,9 @@ MC6845_UPDATE_ROW(heath_imaginator_tlb_device::crtc_update_row)
 				output |= bitswap<8>(m_p_chargen[(chr << 4) | ra] ^ inv, 0, 1, 2, 3, 4, 5, 6, 7);
 			}
 
-			if (m_graphics_mode_active)
+			if (m_graphics_mode_active && (x > 7 ) && (x < 73))
 			{
-				if ((x > 7 ) && (x < 73))
-				{
-					uint16_t addr = (y * 64) + (x - 8);
-
-					output |= m_p_graphic_ram[addr & 0x3fff];
-				}
+				output |= m_p_graphic_ram[((y * 64) + (x - 8)) & 0x3fff];
 			}
 
 			for (int b = 0; 8 > b; ++b)

@@ -275,7 +275,7 @@ protected:
 	required_shared_ptr<uint8_t>    m_p_graphic_ram;
 
 	uint8_t m_mem_map;
-	uint8_t m_im2_d1_val;
+	uint8_t m_im2_val;
 
 	bool m_alphanumeric_mode_active;
 	bool m_graphics_mode_active;
