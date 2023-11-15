@@ -404,7 +404,7 @@ void progolf_state::main_map(address_map &map)
 	m_video_view1[1](0x8800, 0x8fff).rom().region("gfx1", 0x0800);
 	m_video_view1[2](0x8800, 0x8fff).rom().region("gfx1", 0x1800);
 	m_video_view1[3](0x8800, 0x8fff).rom().region("gfx1", 0x2800);
-	map(0x9000, 0x9000).portr("IN2").w(FUNC(progolf_state::video_bank_w));
+	map(0x9000, 0x9000).portr("COINS").w(FUNC(progolf_state::video_bank_w));
 	map(0x9200, 0x9200).portr("P1").w(FUNC(progolf_state::scrollx_hi_w));
 	map(0x9400, 0x9400).portr("P2").w(FUNC(progolf_state::scrollx_lo_w));
 	map(0x9600, 0x9600).portr("VBLANK").w(FUNC(progolf_state::flip_screen_w));
@@ -459,7 +459,7 @@ static INPUT_PORTS_START( progolf )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START2 )
 
-	PORT_START("IN2")
+	PORT_START("COINS")
 	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, progolf_state, coin_inserted, 0)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, progolf_state, coin_inserted, 0)
