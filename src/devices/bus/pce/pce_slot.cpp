@@ -218,47 +218,57 @@ std::pair<std::error_condition, std::string> pce_cart_slot_device::call_load()
 	{
 		uint32_t len = !loaded_through_softlist() ? length() : get_software_region_length("rom");
 
-		// From fullpath, check for presence of a header and skip it
-		if (!loaded_through_softlist() && (len % 0x4000) == 512)
+		if (len)
 		{
-			logerror("ROM header found, skipping\n");
-			uint32_t const offset = 512;
-			len -= offset;
-			fseek(offset, SEEK_SET);
+			// From fullpath, check for presence of a header and skip it
+			if (!loaded_through_softlist() && (len % 0x4000) == 512)
+			{
+				logerror("ROM header found, skipping\n");
+				uint32_t const offset = 512;
+				len -= offset;
+				fseek(offset, SEEK_SET);
+			}
+
+			m_cart->rom_alloc(len);
+			uint8_t *const ROM = m_cart->get_rom_base();
+
+			if (!loaded_through_softlist())
+				fread(ROM, len);
+			else
+				memcpy(ROM, get_software_region("rom"), len);
+
+			// check for bit-reversal (US carts)
+			if (ROM[0x1fff] < 0xe0)
+			{
+				// Initialize unscrambling table
+				uint8_t unscrambled[256];
+				for (int i = 0; i < 256; i++)
+					unscrambled[i] = bitswap<8>(i, 0, 1, 2, 3, 4, 5, 6, 7);
+
+				// Unscramble ROM image
+				for (int i = 0; i < len; i++)
+					ROM[i] = unscrambled[ROM[i]];
+			}
+
+			m_cart->rom_map_setup(len);
+
+			if (!loaded_through_softlist())
+				m_type = get_cart_type(ROM, len);
+			else
+			{
+				const char *pcb_name = get_feature("slot");
+				if (pcb_name)
+					m_type = pce_get_pcb_id(pcb_name);
+			}
+			//printf("Type: %s\n", pce_get_slot(m_type));
+
 		}
-
-		m_cart->rom_alloc(len);
-		uint8_t *const ROM = m_cart->get_rom_base();
-
-		if (!loaded_through_softlist())
-			fread(ROM, len);
-		else
-			memcpy(ROM, get_software_region("rom"), len);
-
-		// check for bit-reversal (US carts)
-		if (ROM[0x1fff] < 0xe0)
-		{
-			// Initialize unscrambling table
-			uint8_t unscrambled[256];
-			for (int i = 0; i < 256; i++)
-				unscrambled[i] = bitswap<8>(i, 0, 1, 2, 3, 4, 5, 6, 7);
-
-			// Unscramble ROM image
-			for (int i = 0; i < len; i++)
-				ROM[i] = unscrambled[ROM[i]];
-		}
-
-		m_cart->rom_map_setup(len);
-
-		if (!loaded_through_softlist())
-			m_type = get_cart_type(ROM, len);
 		else
 		{
 			const char *pcb_name = get_feature("slot");
 			if (pcb_name)
 				m_type = pce_get_pcb_id(pcb_name);
 		}
-		//printf("Type: %s\n", pce_get_slot(m_type));
 
 		if (m_type == PCE_POPULOUS)
 			m_cart->ram_alloc(0x8000);

@@ -4508,9 +4508,7 @@ https://mametesters.org/view.php?id=6597
 		<publisher>NEC</publisher>
 		<part name="cart" interface="pce_cart">
 			<feature name="slot" value="acard_duo" />
-			<dataarea name="rom" size="1">
-				<!-- bios not included -->
-			</dataarea>
+			<!-- bios not included -->
 		</part>
 	</software>
 
