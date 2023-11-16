@@ -815,7 +815,7 @@ void lua_engine::initialize()
 
 	sol::table emu = sol().create_named_table("emu");
 	emu["wait"] = sol::yielding(
-			[this] (sol::this_state s, sol::object duration)
+			[this] (sol::this_state s, sol::object duration, sol::variadic_args args)
 			{
 				attotime delay;
 				if (!duration)
@@ -848,22 +848,26 @@ void lua_engine::initialize()
 				if (m_waiting_tasks.begin() == pos)
 					m_timer->reset(delay);
 				m_waiting_tasks.emplace(pos, expiry, ref);
+
+				return sol::variadic_results(args.begin(), args.end());
 			});
 	emu["wait_next_update"] = sol::yielding(
-			[this] (sol::this_state s)
+			[this] (sol::this_state s, sol::variadic_args args)
 			{
 				int const ret = lua_pushthread(s);
 				if (ret == 1)
 					luaL_error(s, "cannot wait from outside coroutine");
 				m_update_tasks.emplace_back(luaL_ref(s, LUA_REGISTRYINDEX));
+				return sol::variadic_results(args.begin(), args.end());
 			});
 	emu["wait_next_frame"] = sol::yielding(
-			[this] (sol::this_state s)
+			[this] (sol::this_state s, sol::variadic_args args)
 			{
 				int const ret = lua_pushthread(s);
 				if (ret == 1)
 					luaL_error(s, "cannot wait from outside coroutine");
 				m_frame_tasks.emplace_back(luaL_ref(s, LUA_REGISTRYINDEX));
+				return sol::variadic_results(args.begin(), args.end());
 			});
 	emu.set_function("add_machine_reset_notifier", make_notifier_adder(m_notifiers->on_reset, "machine reset"));
 	emu.set_function("add_machine_stop_notifier", make_notifier_adder(m_notifiers->on_stop, "machine stop"));

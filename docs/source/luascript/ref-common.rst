@@ -58,21 +58,23 @@ classes are also available as properties of the emulator interface.
 Methods
 ~~~~~~~
 
-emu.wait(duration)
+emu.wait(duration, …)
     Yields for the specified duration in terms of emulated time.  The duration
     may be specified as an :ref:`attotime <luascript-ref-attotime>` or a number
-    in seconds.  Returns a Boolean indicating whether the duration expired
-    normally.
+    in seconds.  Any additional arguments are returned from the coroutine.
+    Returns a Boolean indicating whether the duration expired normally.
 
     All outstanding calls to ``emu.wait`` will return ``false`` immediately if a
     saved state is loaded or the emulation session ends.  Calling this function
     from callbacks that are not run as coroutines will raise an error.
-emu.wait_next_update()
-    Yields until the next video/UI update.  Calling this function from callbacks
-    that are not run as coroutines will raise an error.
-emu.wait_next_frame()
-    Yields until the next emulated frame completes.  Calling this function from
-    callbacks that are not run as coroutines will raise an error.
+emu.wait_next_update(…)
+    Yields until the next video/UI update.  Any arguments are returned from the
+    coroutine.  Calling this function from callbacks that are not run as coroutines
+    will raise an error.
+emu.wait_next_frame(…)
+    Yields until the next emulated frame completes.  Any arguments are returned
+    from the coroutine.  Calling this function from callbacks that are not run as
+    coroutines will raise an error.
 emu.add_machine_reset_notifier(callback)
     Add a callback to receive notifications when the emulated system is reset.
     Returns a :ref:`notifier subscription <luascript-ref-notifiersub>`.
