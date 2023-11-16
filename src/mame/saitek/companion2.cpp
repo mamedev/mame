@@ -28,12 +28,12 @@ Chess Companion II:
 Explorer Chess:
 - slightly different UI (12 buttons instead of 14, but same functionality)
 - portable, peg board instead of button board
-- rest is same as ccompan2
+- rest is same as compan2
 
 Concord II:
 - PCB label: SCISYS ST3 REV.E
 - MCU clock frequency is around twice higher than Concord, again no XTAL
-- rest is same as ccompan2, it just has the buttons/status leds at the bottom
+- rest is same as compan2, it just has the buttons/status leds at the bottom
   instead of at the right
 
 Explorer Chess and Chess Companion II / Concord have the same MCU ROM, pin P23
@@ -63,16 +63,16 @@ The Tandy clones run at a lower clock frequency, 3MHz and 6MHz respectively.
 #include "speaker.h"
 
 // internal artwork
-#include "saitek_ccompan2.lh"
+#include "saitek_companion2.lh"
 #include "saitek_expchess.lh"
 
 
 namespace {
 
-class ccompan2_state : public driver_device
+class compan2_state : public driver_device
 {
 public:
-	ccompan2_state(const machine_config &mconfig, device_type type, const char *tag) :
+	compan2_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_board(*this, "board"),
@@ -81,7 +81,7 @@ public:
 	{ }
 
 	void expchess(machine_config &config);
-	void ccompan2(machine_config &config);
+	void compan2(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(power_off);
 	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq) { set_cpu_freq(); }
@@ -89,7 +89,7 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_MACHINE_RESET(ccompan2) { machine_reset(); set_cpu_freq(); }
+	DECLARE_MACHINE_RESET(compan2) { machine_reset(); set_cpu_freq(); }
 
 private:
 	// devices/pointers
@@ -115,17 +115,17 @@ private:
 	u8 m_inp_mux = 0;
 };
 
-void ccompan2_state::machine_start()
+void compan2_state::machine_start()
 {
-	m_nmitimer = timer_alloc(FUNC(ccompan2_state::set_pin), this);
-	m_standbytimer = timer_alloc(FUNC(ccompan2_state::set_pin), this);
+	m_nmitimer = timer_alloc(FUNC(compan2_state::set_pin), this);
+	m_standbytimer = timer_alloc(FUNC(compan2_state::set_pin), this);
 
 	// register for savestates
 	save_item(NAME(m_power));
 	save_item(NAME(m_inp_mux));
 }
 
-void ccompan2_state::set_cpu_freq()
+void compan2_state::set_cpu_freq()
 {
 	// Concord II MCU speed is around twice higher
 	m_maincpu->set_unscaled_clock((ioport("FAKE")->read() & 1) ? 7200000 : 4000000);
@@ -137,7 +137,7 @@ void ccompan2_state::set_cpu_freq()
     Power
 *******************************************************************************/
 
-void ccompan2_state::machine_reset()
+void compan2_state::machine_reset()
 {
 	m_power = true;
 
@@ -145,18 +145,18 @@ void ccompan2_state::machine_reset()
 	m_maincpu->set_input_line(M6801_STBY_LINE, CLEAR_LINE);
 }
 
-void ccompan2_state::standby(int state)
+void compan2_state::standby(int state)
 {
 	if (state)
 		m_display->clear();
 }
 
-TIMER_CALLBACK_MEMBER(ccompan2_state::set_pin)
+TIMER_CALLBACK_MEMBER(compan2_state::set_pin)
 {
 	m_maincpu->set_input_line(param, ASSERT_LINE);
 }
 
-INPUT_CHANGED_MEMBER(ccompan2_state::power_off)
+INPUT_CHANGED_MEMBER(compan2_state::power_off)
 {
 	if (newval && m_power)
 	{
@@ -178,7 +178,7 @@ INPUT_CHANGED_MEMBER(ccompan2_state::power_off)
     I/O
 *******************************************************************************/
 
-u8 ccompan2_state::input1_r()
+u8 compan2_state::input1_r()
 {
 	u8 data = 0;
 
@@ -190,7 +190,7 @@ u8 ccompan2_state::input1_r()
 	return ~data;
 }
 
-u8 ccompan2_state::input2_r()
+u8 compan2_state::input2_r()
 {
 	u8 data = 0;
 
@@ -205,20 +205,20 @@ u8 ccompan2_state::input2_r()
 	return ~data;
 }
 
-void ccompan2_state::mux_w(u8 data)
+void compan2_state::mux_w(u8 data)
 {
 	// P30-P37: input mux, led data
 	m_inp_mux = data ^ 0xff;
 	m_display->write_mx(m_inp_mux);
 }
 
-u8 ccompan2_state::power_r()
+u8 compan2_state::power_r()
 {
 	// P40: power switch state
 	return m_power ? 0 : 1;
 }
 
-void ccompan2_state::led_w(u8 data)
+void compan2_state::led_w(u8 data)
 {
 	// P41-P45: direct leds
 	// P46,P47: board leds
@@ -253,10 +253,10 @@ static INPUT_PORTS_START( expchess )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM) // button config
 
 	PORT_START("POWER")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, ccompan2_state, power_off, 0) PORT_NAME("Power Off")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, compan2_state, power_off, 0) PORT_NAME("Power Off")
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( ccompan2 )
+static INPUT_PORTS_START( compan2 )
 	PORT_INCLUDE( expchess )
 
 	PORT_MODIFY("IN.0")
@@ -283,7 +283,7 @@ static INPUT_PORTS_START( ccompan2 )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_CUSTOM) // button config
 
 	PORT_START("FAKE")
-	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, ccompan2_state, change_cpu_freq, 0) // factory set
+	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, compan2_state, change_cpu_freq, 0) // factory set
 	PORT_CONFSETTING(    0x00, "4MHz (original)" )
 	PORT_CONFSETTING(    0x01, "7.2MHz (Concord II)" )
 INPUT_PORTS_END
@@ -294,18 +294,18 @@ INPUT_PORTS_END
     Machine Configs
 *******************************************************************************/
 
-void ccompan2_state::expchess(machine_config &config)
+void compan2_state::expchess(machine_config &config)
 {
 	// basic machine hardware
 	HD6301V1(config, m_maincpu, 4000000); // approximation, no XTAL
 	m_maincpu->nvram_enable_backup(true);
-	m_maincpu->standby_cb().set(FUNC(ccompan2_state::standby));
-	m_maincpu->in_p1_cb().set(FUNC(ccompan2_state::input1_r));
-	m_maincpu->in_p2_cb().set(FUNC(ccompan2_state::input2_r));
+	m_maincpu->standby_cb().set(FUNC(compan2_state::standby));
+	m_maincpu->in_p1_cb().set(FUNC(compan2_state::input1_r));
+	m_maincpu->in_p2_cb().set(FUNC(compan2_state::input2_r));
 	m_maincpu->out_p2_cb().set("dac", FUNC(dac_1bit_device::write)).bit(0);
-	m_maincpu->out_p3_cb().set(FUNC(ccompan2_state::mux_w));
-	m_maincpu->in_p4_cb().set(FUNC(ccompan2_state::power_r));
-	m_maincpu->out_p4_cb().set(FUNC(ccompan2_state::led_w));
+	m_maincpu->out_p3_cb().set(FUNC(compan2_state::mux_w));
+	m_maincpu->in_p4_cb().set(FUNC(compan2_state::power_r));
+	m_maincpu->out_p4_cb().set(FUNC(compan2_state::led_w));
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
@@ -321,12 +321,12 @@ void ccompan2_state::expchess(machine_config &config)
 	DAC_1BIT(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
-void ccompan2_state::ccompan2(machine_config &config)
+void compan2_state::compan2(machine_config &config)
 {
 	expchess(config);
 
-	MCFG_MACHINE_RESET_OVERRIDE(ccompan2_state, ccompan2)
-	config.set_default_layout(layout_saitek_ccompan2);
+	MCFG_MACHINE_RESET_OVERRIDE(compan2_state, compan2)
+	config.set_default_layout(layout_saitek_companion2);
 }
 
 
@@ -335,7 +335,7 @@ void ccompan2_state::ccompan2(machine_config &config)
     ROM Definitions
 *******************************************************************************/
 
-ROM_START( ccompan2 )
+ROM_START( compan2 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD("1983_te-1_scisys-w_0609v171.u1", 0x0000, 0x1000, CRC(a26632fd) SHA1(fb83dc2476500acaabd949d749e58adca01012ea) )
 ROM_END
@@ -353,6 +353,6 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1983, ccompan2, 0,        0,      ccompan2, ccompan2, ccompan2_state, empty_init, "SciSys", "Chess Companion II", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1983, expchess, ccompan2, 0,      expchess, expchess, ccompan2_state, empty_init, "SciSys", "Explorer Chess", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     CLASS          INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1983, compan2,  0,       0,      compan2,  compan2,  compan2_state, empty_init, "SciSys", "Chess Companion II", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1983, expchess, compan2, 0,      expchess, expchess, compan2_state, empty_init, "SciSys", "Explorer Chess", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

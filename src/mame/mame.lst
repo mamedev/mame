@@ -38332,11 +38332,11 @@ r9751                           // ROLM 9751 phone system
 @source:sage/sage2.cpp
 sage2
 
-@source:saitek/ccompan.cpp
-ccompan
+@source:saitek/companion.cpp
+compan
 
-@source:saitek/ccompan2.cpp
-ccompan2
+@source:saitek/companion2.cpp
+compan2
 expchess
 
 @source:saitek/chesstrv.cpp
