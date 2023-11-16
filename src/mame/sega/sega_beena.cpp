@@ -2228,5 +2228,5 @@ ROM_END
 } // anonymous namespace
 
 //    year, name,     parent, compat, machine,       input,      class,            init,       company, fullname,              flags
-CONS( 2005, beena,    0,      0,      sega_beena,    sega_beena, sega_beena_state, empty_init, "Sega",  "Advanced Pico BEENA", MACHINE_REQUIRES_ARTWORK|MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_TIMING|MACHINE_IMPERFECT_SOUND )
+CONS( 2005, beena,    0,      0,      sega_beena,    sega_beena, sega_beena_state, empty_init, "Sega",  "Advanced Pico BEENA", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_TIMING|MACHINE_IMPERFECT_SOUND )
 CONS( 2005, tvochken, 0,      0,      sega_9h0_0008, tvochken,   tvochken_state,   empty_init, "Sega",  "TV Ocha-Ken",         MACHINE_REQUIRES_ARTWORK|MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_TIMING|MACHINE_IMPERFECT_SOUND )

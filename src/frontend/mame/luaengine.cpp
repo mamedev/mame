@@ -679,8 +679,7 @@ void lua_engine::on_machine_frame()
 {
 	std::vector<int> tasks = std::move(m_frame_tasks);
 	m_frame_tasks.clear();
-	for (int ref : tasks)
-		resume(ref);
+	resume_tasks(m_lua_state, tasks, true); // TODO: doesn't need to return anything
 
 	m_notifiers->on_frame();
 
@@ -816,7 +815,7 @@ void lua_engine::initialize()
 
 	sol::table emu = sol().create_named_table("emu");
 	emu["wait"] = sol::yielding(
-			[this] (sol::this_state s, sol::object duration, sol::variadic_args args)
+			[this] (sol::this_state s, sol::object duration)
 			{
 				attotime delay;
 				if (!duration)
@@ -849,26 +848,22 @@ void lua_engine::initialize()
 				if (m_waiting_tasks.begin() == pos)
 					m_timer->reset(delay);
 				m_waiting_tasks.emplace(pos, expiry, ref);
-
-				return sol::variadic_results(args.begin(), args.end());
 			});
 	emu["wait_next_update"] = sol::yielding(
-			[this] (sol::this_state s, sol::variadic_args args)
+			[this] (sol::this_state s)
 			{
 				int const ret = lua_pushthread(s);
 				if (ret == 1)
 					luaL_error(s, "cannot wait from outside coroutine");
 				m_update_tasks.emplace_back(luaL_ref(s, LUA_REGISTRYINDEX));
-				return sol::variadic_results(args.begin(), args.end());
 			});
 	emu["wait_next_frame"] = sol::yielding(
-			[this] (sol::this_state s, sol::variadic_args args)
+			[this] (sol::this_state s)
 			{
 				int const ret = lua_pushthread(s);
 				if (ret == 1)
 					luaL_error(s, "cannot wait from outside coroutine");
 				m_frame_tasks.emplace_back(luaL_ref(s, LUA_REGISTRYINDEX));
-				return sol::variadic_results(args.begin(), args.end());
 			});
 	emu.set_function("add_machine_reset_notifier", make_notifier_adder(m_notifiers->on_reset, "machine reset"));
 	emu.set_function("add_machine_stop_notifier", make_notifier_adder(m_notifiers->on_stop, "machine stop"));
@@ -2144,8 +2139,7 @@ bool lua_engine::frame_hook()
 {
 	std::vector<int> tasks = std::move(m_update_tasks);
 	m_update_tasks.clear();
-	for (int ref : tasks)
-		resume(ref);
+	resume_tasks(m_lua_state, tasks, true); // TODO: doesn't need to return anything
 
 	return execute_function("LUA_ON_FRAME_DONE");
 }
