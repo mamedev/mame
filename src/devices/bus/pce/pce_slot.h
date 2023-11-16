@@ -35,15 +35,7 @@ public:
 	// construction/destruction
 	virtual ~device_pce_cart_interface();
 
-	// reading and writing
-	virtual uint8_t read_cart(offs_t offset) { return 0xff; }
-	virtual void write_cart(offs_t offset, uint8_t data) {}
-	virtual uint8_t read_ram(offs_t offset) { return 0xff; }
-	virtual void write_ram(offs_t offset, uint8_t data) {}
-	virtual uint8_t read_ex(offs_t offset) { return 0xff; }
-	virtual void write_ex(offs_t offset, uint8_t data) {}
-	virtual uint8_t peripheral_r(offs_t offset) { return 0xff; }
-	virtual void peripheral_w(offs_t offset, uint8_t data) {}
+	virtual void install_memory_handlers(address_space *space) { }
 
 	void rom_alloc(uint32_t size);
 	void ram_alloc(uint32_t size);
@@ -88,6 +80,9 @@ public:
 	pce_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~pce_cart_slot_device();
 
+	// configuration
+	template <typename T> void set_address_space(T &&tag, int no) { m_address_space.set_tag(std::forward<T>(tag), no); }
+
 	// device_image_interface implementation
 	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
@@ -104,17 +99,9 @@ public:
 
 	void set_intf(const char * interface) { m_interface = interface; }
 
-	// reading and writing
-	uint8_t read_cart(offs_t offset);
-	void write_cart(offs_t offset, uint8_t data);
-	uint8_t read_ram(offs_t offset);
-	void write_ram(offs_t offset, uint8_t data);
-	uint8_t read_ex(offs_t offset);
-	void write_ex(offs_t offset, uint8_t data);
-	uint8_t peripheral_r(offs_t offset);
-	void peripheral_w(offs_t offset, uint8_t data);
-
 protected:
+	required_address_space m_address_space;
+
 	// device_t implementation
 	virtual void device_start() override;
 

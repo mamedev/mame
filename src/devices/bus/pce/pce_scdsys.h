@@ -40,9 +40,7 @@ class pce_cdsys3_device : public device_t,
 {
 public:
 	// reading and writing
-	virtual uint8_t read_cart(offs_t offset) override;
-	virtual void write_cart(offs_t offset, uint8_t data) override;
-	virtual uint8_t read_ex(offs_t offset) override;
+	virtual void install_memory_handlers(address_space *space) override;
 
 protected:
 	// device-level overrides

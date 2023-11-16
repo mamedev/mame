@@ -23,31 +23,6 @@ void pce_state::init_tg16()
 
 void pce_state::machine_start()
 {
-	if (m_cartslot->exists())
-	{
-		// Install HuCard ROM
-		if ((m_cartslot->get_type() != PCE_ACARD_DUO))
-		{
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x000000, 0x0fffff, read8sm_delegate(m_cartslot, FUNC(pce_cart_slot_device::read_cart)), write8sm_delegate(m_cartslot, FUNC(pce_cart_slot_device::write_cart)));
-		}
-
-		// Install Super System Card registers
-		if ((m_cartslot->get_type() == PCE_CDSYS3J)
-			|| (m_cartslot->get_type() == PCE_CDSYS3U)
-			|| (m_cartslot->get_type() == PCE_ACARD_PRO))
-		{
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0x1ff8c0, 0x1ff8c7, 0, 0x330, 0, read8sm_delegate(m_cartslot, FUNC(pce_cart_slot_device::read_ex)));
-		}
-
-		// Install Arcade Card registers
-		if ((m_cartslot->get_type() == PCE_ACARD_DUO)
-			|| (m_cartslot->get_type() == PCE_ACARD_PRO))
-		{
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x080000, 0x087fff, read8sm_delegate(m_cartslot, FUNC(pce_cart_slot_device::read_ram)), write8sm_delegate(m_cartslot, FUNC(pce_cart_slot_device::write_ram)));
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1ffa00, 0x1ffbff, read8sm_delegate(m_cartslot, FUNC(pce_cart_slot_device::peripheral_r)), write8sm_delegate(m_cartslot, FUNC(pce_cart_slot_device::peripheral_w)));
-		}
-	}
-
 	if (m_cd)
 		m_cd->late_setup();
 

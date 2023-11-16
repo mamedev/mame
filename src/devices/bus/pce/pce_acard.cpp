@@ -71,7 +71,21 @@ void pce_acard_pro_device::device_add_mconfig(machine_config &config)
  mapper specific handlers
  -------------------------------------------------*/
 
-uint8_t pce_acard_duo_device::read_ram(offs_t offset)
+void pce_acard_duo_device::install_memory_handlers(address_space *space)
+{
+	space->install_readwrite_handler(0x080000, 0x087fff, emu::rw_delegate(*this, FUNC(pce_acard_duo_device::ram_r)), emu::rw_delegate(*this, FUNC(pce_acard_duo_device::ram_w)));
+	space->install_readwrite_handler(0x1ffa00, 0x1ffbff, emu::rw_delegate(*this, FUNC(pce_acard_duo_device::peripheral_r)), emu::rw_delegate(*this, FUNC(pce_acard_duo_device::peripheral_w)));
+}
+
+void pce_acard_pro_device::install_memory_handlers(address_space *space)
+{
+	space->install_rom(0x000000, 0x03ffff, m_rom); // TODO: actually 0x000000-0x07ffff
+	space->install_readwrite_handler(0x0d0000, 0x0fffff, emu::rw_delegate(m_cdsys3, FUNC(pce_cdsys3_base_device::ram_r)), emu::rw_delegate(m_cdsys3, FUNC(pce_cdsys3_base_device::ram_w)));
+	space->install_read_handler(0x1ff8c0, 0x1ff8c7, 0, 0x130, 0, emu::rw_delegate(m_cdsys3, FUNC(pce_cdsys3_base_device::register_r)));
+	pce_acard_duo_device::install_memory_handlers(space);
+}
+
+uint8_t pce_acard_duo_device::ram_r(offs_t offset)
 {
 	if (offset >= 0x0000 && offset < 0x8000)
 		return peripheral_r((offset & 0x6000) >> 9);
@@ -79,30 +93,10 @@ uint8_t pce_acard_duo_device::read_ram(offs_t offset)
 	return 0xff;
 }
 
-void pce_acard_duo_device::write_ram(offs_t offset, uint8_t data)
+void pce_acard_duo_device::ram_w(offs_t offset, uint8_t data)
 {
 	if (offset >= 0x0000 && offset < 0x8000)
 		peripheral_w((offset & 0x6000) >> 9, data);
-}
-
-uint8_t pce_acard_pro_device::read_cart(offs_t offset)
-{
-	if (offset >= 0xd0000)
-		return m_cdsys3->ram_r(offset - 0xd0000);
-
-	const int bank = offset / 0x20000;
-	return m_rom[rom_bank_map[bank] * 0x20000 + (offset & 0x1ffff)];
-}
-
-void pce_acard_pro_device::write_cart(offs_t offset, uint8_t data)
-{
-	if (offset >= 0xd0000)
-		m_cdsys3->ram_w(offset - 0xd0000, data);
-}
-
-uint8_t pce_acard_pro_device::read_ex(offs_t offset)
-{
-	return m_cdsys3->register_r(offset);
 }
 
 uint8_t pce_acard_duo_device::peripheral_r(offs_t offset)

@@ -19,10 +19,7 @@ public:
 	pce_acard_duo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual uint8_t read_ram(offs_t offset) override;
-	virtual void write_ram(offs_t offset, uint8_t data) override;
-	virtual uint8_t peripheral_r(offs_t offset) override;
-	virtual void peripheral_w(offs_t offset, uint8_t data) override;
+	virtual void install_memory_handlers(address_space *space) override;
 
 protected:
 	// construction/destruction
@@ -32,6 +29,11 @@ protected:
 	virtual void device_start() override;
 
 private:
+	uint8_t ram_r(offs_t offset);
+	void ram_w(offs_t offset, uint8_t data);
+	uint8_t peripheral_r(offs_t offset);
+	void peripheral_w(offs_t offset, uint8_t data);
+
 	/* Arcade Card specific */
 	std::unique_ptr<uint8_t[]>  m_dram;
 	uint8_t   m_ctrl[4]{};
@@ -54,9 +56,7 @@ public:
 	pce_acard_pro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual uint8_t read_cart(offs_t offset) override;
-	virtual void write_cart(offs_t offset, uint8_t data) override;
-	virtual uint8_t read_ex(offs_t offset) override;
+	virtual void install_memory_handlers(address_space *space) override;
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;

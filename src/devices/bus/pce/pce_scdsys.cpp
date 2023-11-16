@@ -89,21 +89,6 @@ void pce_cdsys3_base_device::ram_w(offs_t offset, uint8_t data)
 		m_ram[offset] = data;
 }
 
-uint8_t pce_cdsys3_device::read_cart(offs_t offset)
-{
-	if (offset >= 0xd0000)
-		return m_cdsys3->ram_r(offset - 0xd0000);
-
-	const int bank = offset / 0x20000;
-	return m_rom[rom_bank_map[bank] * 0x20000 + (offset & 0x1ffff)];
-}
-
-void pce_cdsys3_device::write_cart(offs_t offset, uint8_t data)
-{
-	if (offset >= 0xd0000)
-		m_cdsys3->ram_w(offset - 0xd0000, data);
-}
-
 uint8_t pce_cdsys3_base_device::register_r(offs_t offset)
 {
 	switch (offset & 0x0f)
@@ -118,8 +103,10 @@ uint8_t pce_cdsys3_base_device::register_r(offs_t offset)
 	return 0x00;
 }
 
-uint8_t pce_cdsys3_device::read_ex(offs_t offset)
-{
-	return m_cdsys3->register_r(offset);
-}
 
+void pce_cdsys3_device::install_memory_handlers(address_space *space)
+{
+	space->install_rom(0x000000, 0x03ffff, m_rom);
+	space->install_readwrite_handler(0x0d0000, 0x0fffff, emu::rw_delegate(m_cdsys3, FUNC(pce_cdsys3_base_device::ram_r)), emu::rw_delegate(m_cdsys3, FUNC(pce_cdsys3_base_device::ram_w)));
+	space->install_read_handler(0x1ff8c0, 0x1ff8c7, 0, 0x330, 0, emu::rw_delegate(m_cdsys3, FUNC(pce_cdsys3_base_device::register_r)));
+}

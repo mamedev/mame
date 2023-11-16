@@ -138,8 +138,10 @@ pce_cart_slot_device::pce_cart_slot_device(const machine_config &mconfig, const 
 	device_t(mconfig, PCE_CART_SLOT, tag, owner, clock),
 	device_cartrom_image_interface(mconfig, *this),
 	device_single_card_slot_interface<device_pce_cart_interface>(mconfig, *this),
+	m_address_space(*this, finder_base::DUMMY_TAG, -1, 8),
 	m_interface("pce_cart"),
-	m_type(PCE_STD), m_cart(nullptr)
+	m_type(PCE_STD),
+	m_cart(nullptr)
 {
 }
 
@@ -218,60 +220,52 @@ std::pair<std::error_condition, std::string> pce_cart_slot_device::call_load()
 	{
 		uint32_t len = !loaded_through_softlist() ? length() : get_software_region_length("rom");
 
-		if (len)
+		// From fullpath, check for presence of a header and skip it
+		if (!loaded_through_softlist() && (len % 0x4000) == 512)
 		{
-			// From fullpath, check for presence of a header and skip it
-			if (!loaded_through_softlist() && (len % 0x4000) == 512)
-			{
-				logerror("ROM header found, skipping\n");
-				uint32_t const offset = 512;
-				len -= offset;
-				fseek(offset, SEEK_SET);
-			}
-
-			m_cart->rom_alloc(len);
-			uint8_t *const ROM = m_cart->get_rom_base();
-
-			if (!loaded_through_softlist())
-				fread(ROM, len);
-			else
-				memcpy(ROM, get_software_region("rom"), len);
-
-			// check for bit-reversal (US carts)
-			if (ROM[0x1fff] < 0xe0)
-			{
-				// Initialize unscrambling table
-				uint8_t unscrambled[256];
-				for (int i = 0; i < 256; i++)
-					unscrambled[i] = bitswap<8>(i, 0, 1, 2, 3, 4, 5, 6, 7);
-
-				// Unscramble ROM image
-				for (int i = 0; i < len; i++)
-					ROM[i] = unscrambled[ROM[i]];
-			}
-
-			m_cart->rom_map_setup(len);
-
-			if (!loaded_through_softlist())
-				m_type = get_cart_type(ROM, len);
-			else
-			{
-				const char *pcb_name = get_feature("slot");
-				if (pcb_name)
-					m_type = pce_get_pcb_id(pcb_name);
-			}
-			//printf("Type: %s\n", pce_get_slot(m_type));
-
+			logerror("ROM header found, skipping\n");
+			uint32_t const offset = 512;
+			len -= offset;
+			fseek(offset, SEEK_SET);
 		}
+
+		m_cart->rom_alloc(len);
+		uint8_t *const ROM = m_cart->get_rom_base();
+
+		if (!loaded_through_softlist())
+			fread(ROM, len);
+		else
+			memcpy(ROM, get_software_region("rom"), len);
+
+		// check for bit-reversal (US carts)
+		if (ROM[0x1fff] < 0xe0)
+		{
+			// Initialize unscrambling table
+			uint8_t unscrambled[256];
+			for (int i = 0; i < 256; i++)
+				unscrambled[i] = bitswap<8>(i, 0, 1, 2, 3, 4, 5, 6, 7);
+
+			// Unscramble ROM image
+			for (int i = 0; i < len; i++)
+				ROM[i] = unscrambled[ROM[i]];
+		}
+
+		m_cart->rom_map_setup(len);
+
+		if (!loaded_through_softlist())
+			m_type = get_cart_type(ROM, len);
 		else
 		{
 			const char *pcb_name = get_feature("slot");
 			if (pcb_name)
 				m_type = pce_get_pcb_id(pcb_name);
 		}
+		//printf("Type: %s\n", pce_get_slot(m_type));
 
 		if (m_type == PCE_POPULOUS)
 			m_cart->ram_alloc(0x8000);
+
+		m_cart->install_memory_handlers(m_address_space.target());
 	}
 
 	return std::make_pair(std::error_condition(), std::string());
@@ -342,68 +336,4 @@ std::string pce_cart_slot_device::get_default_card_software(get_default_card_sof
 	}
 
 	return software_get_default_slot("rom");
-}
-
-/*-------------------------------------------------
- read
- -------------------------------------------------*/
-
-uint8_t pce_cart_slot_device::read_cart(offs_t offset)
-{
-	if (m_cart)
-		return m_cart->read_cart(offset);
-	else
-		return 0xff;
-}
-
-uint8_t pce_cart_slot_device::read_ram(offs_t offset)
-{
-	if (m_cart)
-		return m_cart->read_ram(offset);
-	else
-		return 0xff;
-}
-
-uint8_t pce_cart_slot_device::read_ex(offs_t offset)
-{
-	if (m_cart)
-		return m_cart->read_ex(offset);
-	else
-		return 0xff;
-}
-
-uint8_t pce_cart_slot_device::peripheral_r(offs_t offset)
-{
-	if (m_cart)
-		return m_cart->peripheral_r(offset);
-	else
-		return 0xff;
-}
-
-/*-------------------------------------------------
- write
- -------------------------------------------------*/
-
-void pce_cart_slot_device::write_cart(offs_t offset, uint8_t data)
-{
-	if (m_cart)
-		m_cart->write_cart(offset, data);
-}
-
-void pce_cart_slot_device::write_ram(offs_t offset, uint8_t data)
-{
-	if (m_cart)
-		m_cart->write_ram(offset, data);
-}
-
-void pce_cart_slot_device::write_ex(offs_t offset, uint8_t data)
-{
-	if (m_cart)
-		m_cart->write_ex(offset, data);
-}
-
-void pce_cart_slot_device::peripheral_w(offs_t offset, uint8_t data)
-{
-	if (m_cart)
-		m_cart->peripheral_w(offset, data);
 }
