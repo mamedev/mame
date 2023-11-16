@@ -16,9 +16,6 @@
 
     Thanks to Franklin Bowen for bug fixes, ideas
 
-    Please send all bug reports, update ideas and data files to:
-    sriddle@ionet.net and tlindner@ix.netcom.com
-
 *****************************************************************************/
 
 #include "emu.h"
