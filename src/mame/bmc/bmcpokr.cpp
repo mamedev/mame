@@ -13,16 +13,21 @@ Video:  BMC VDB40817 + BMC SYA70521
 Sound:  M6295 + UM3567
 Other:  BMC B816140 (CPLD)
 
+// TODO: dips for fengyunh and shendeng. Some are shown in test mode,
+         in Chinese
+
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m68000/m68000.h"
-#include "video/ramdac.h"
-#include "sound/okim6295.h"
-#include "sound/ymopl.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "machine/timer.h"
+#include "sound/okim6295.h"
+#include "sound/ymopl.h"
+#include "video/ramdac.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -44,20 +49,25 @@ public:
 		m_priority(*this, "priority"),
 		m_layerctrl(*this, "layerctrl"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_dsw(*this, "DSW%u", 1U),
+		m_key(*this, "KEY%u", 1U),
+		m_inputs(*this, "INPUTS")
 	{ }
 
 	int hopper_r();
 
 	void bmcpokr(machine_config &config);
+	void fengyunh(machine_config &config);
 	void mjmaglmp(machine_config &config);
+	void shendeng(machine_config &config);
 
 protected:
 	virtual void device_post_load() override;
+	virtual void machine_start() override;
+	virtual void video_start() override;
 
 private:
-	virtual void machine_start() override;
-
 	// Devices
 	required_device<m68000_device> m_maincpu;
 	required_device<ticket_dispenser_device> m_hopper;
@@ -71,18 +81,23 @@ private:
 
 	// Protection
 	uint16_t m_prot_val = 0;
-	uint16_t prot_r();
+	uint16_t bmcpokr_prot_r();
+	uint16_t fengyunh_prot_r();
+	uint16_t shendeng_prot_r();
 	void prot_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t unk_r();
 
 	// I/O
 	uint8_t m_mux = 0;
+	required_ioport_array<4> m_dsw;
+	optional_ioport_array<5> m_key;
+	required_ioport m_inputs;
 	void mux_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
 	uint16_t dsw_r();
 	uint16_t mjmaglmp_dsw_r();
 	uint16_t mjmaglmp_key_r();
 
-	// Interrrupts
+	// Interrupts
 	uint8_t m_irq_enable = 0;
 	void irq_enable_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
 	void irq_ack_w(uint8_t data);
@@ -99,13 +114,14 @@ private:
 	void pixram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void pixpal_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
 
-	virtual void video_start() override;
 	void draw_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void bmcpokr_mem(address_map &map);
+	void fengyunh_map(address_map &map);
 	void mjmaglmp_map(address_map &map);
 	void ramdac_map(address_map &map);
+	void shendeng_map(address_map &map);
 };
 
 /***************************************************************************
@@ -297,8 +313,9 @@ uint16_t bmcpokr_state::unk_r()
 }
 
 // Hack!
-uint16_t bmcpokr_state::prot_r()
+uint16_t bmcpokr_state::bmcpokr_prot_r()
 {
+	logerror("unk prot r %x %x\n", m_prot_val, m_maincpu->pcbase());
 	switch (m_prot_val >> 8)
 	{
 		case 0x00:  return 0x1d << 8;
@@ -306,6 +323,31 @@ uint16_t bmcpokr_state::prot_r()
 	}
 	return 0x00 << 8;
 }
+
+uint16_t bmcpokr_state::fengyunh_prot_r()
+{
+	logerror("unk prot r %x %x\n", m_prot_val, m_maincpu->pcbase());
+	switch (m_prot_val >> 8)
+	{
+		case 0x00:  return 0x7a << 8;
+		case 0x18:  return 0x69 << 8;
+		// TODO: other cases, if they exist
+	}
+	return 0x00 << 8;
+}
+
+uint16_t bmcpokr_state::shendeng_prot_r()
+{
+	logerror("unk prot r %x %x\n", m_prot_val, m_maincpu->pcbase());
+	switch (m_prot_val >> 8)
+	{
+		case 0x00:  return 0x59 << 8;
+		case 0x18:  return 0x5c << 8;
+		// TODO: other cases, if they exist
+	}
+	return 0x00 << 8;
+}
+
 void bmcpokr_state::prot_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_prot_val);
@@ -331,17 +373,17 @@ uint16_t bmcpokr_state::dsw_r()
 {
 	switch ((m_mux >> 5) & 3)
 	{
-		case 0: return ioport("DSW4")->read() << 8;
-		case 1: return ioport("DSW3")->read() << 8;
-		case 2: return ioport("DSW2")->read() << 8;
-		case 3: return ioport("DSW1")->read() << 8;
+		case 0: return m_dsw[3]->read() << 8;
+		case 1: return m_dsw[2]->read() << 8;
+		case 2: return m_dsw[1]->read() << 8;
+		case 3: return m_dsw[0]->read() << 8;
 	}
 	return 0xff << 8;
 }
 
 int bmcpokr_state::hopper_r()
 {
-	// motor off should clear the sense bit (I guess ticket.c should actually do this).
+	// motor off should clear the sense bit (I guess ticket.cpp should actually do this).
 	// Otherwise a hopper bit stuck low will prevent several keys from being registered.
 	return (m_mux & 0x01) ? m_hopper->line_r() : 1;
 }
@@ -366,26 +408,26 @@ void bmcpokr_state::bmcpokr_mem(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x210000, 0x21ffff).ram().share("nvram");
 
-	map(0x280000, 0x287fff).ram().w(FUNC(bmcpokr_state::videoram_w<0>)).share("videoram_1");
-	map(0x288000, 0x28ffff).ram().w(FUNC(bmcpokr_state::videoram_w<1>)).share("videoram_2");
+	map(0x280000, 0x287fff).ram().w(FUNC(bmcpokr_state::videoram_w<0>)).share(m_videoram[0]);
+	map(0x288000, 0x28ffff).ram().w(FUNC(bmcpokr_state::videoram_w<1>)).share(m_videoram[1]);
 	map(0x290000, 0x297fff).ram();
 
-	map(0x2a0000, 0x2dffff).ram().w(FUNC(bmcpokr_state::pixram_w)).share("pixram");
+	map(0x2a0000, 0x2dffff).ram().w(FUNC(bmcpokr_state::pixram_w)).share(m_pixram);
 
-	map(0x2ff800, 0x2ff9ff).ram().share("scrollram_1");
-	map(0x2ffa00, 0x2ffbff).ram().share("scrollram_2");
-	map(0x2ffc00, 0x2ffdff).ram().share("scrollram_3");
+	map(0x2ff800, 0x2ff9ff).ram().share(m_scrollram[0]);
+	map(0x2ffa00, 0x2ffbff).ram().share(m_scrollram[1]);
+	map(0x2ffc00, 0x2ffdff).ram().share(m_scrollram[2]);
 	map(0x2ffe00, 0x2fffff).ram();
 
-	map(0x320000, 0x320003).ram().share("layerctrl");
+	map(0x320000, 0x320003).ram().share(m_layerctrl);
 
-	map(0x330000, 0x330001).rw(FUNC(bmcpokr_state::prot_r), FUNC(bmcpokr_state::prot_w));
+	map(0x330000, 0x330001).rw(FUNC(bmcpokr_state::bmcpokr_prot_r), FUNC(bmcpokr_state::prot_w));
 
 	map(0x340000, 0x340001).ram(); // 340001.b, rw
 	map(0x340002, 0x340003).ram(); // 340003.b, w(9d)
 	map(0x340007, 0x340007).w(FUNC(bmcpokr_state::irq_ack_w));
 	map(0x340009, 0x340009).w(FUNC(bmcpokr_state::irq_enable_w));
-	map(0x34000e, 0x34000f).ram().share("priority");    // 34000f.b, w (priority?)
+	map(0x34000e, 0x34000f).ram().share(m_priority);    // 34000f.b, w (priority?)
 	map(0x340017, 0x340017).w(FUNC(bmcpokr_state::pixpal_w));
 	map(0x340018, 0x340019).ram(); // 340019.b, w
 	map(0x34001a, 0x34001b).r(FUNC(bmcpokr_state::unk_r)).nopw();
@@ -412,10 +454,10 @@ uint16_t bmcpokr_state::mjmaglmp_dsw_r()
 {
 	switch ((m_mux >> 4) & 7)
 	{
-		case 7: return ioport("DSW1")->read() << 8;
-		case 6: return ioport("DSW2")->read() << 8;
-		case 5: return ioport("DSW3")->read() << 8;
-		case 3: return ioport("DSW4")->read() << 8;
+		case 7: return m_dsw[0]->read() << 8;
+		case 6: return m_dsw[1]->read() << 8;
+		case 5: return m_dsw[2]->read() << 8;
+		case 3: return m_dsw[3]->read() << 8;
 	}
 	return 0xff << 8;
 }
@@ -425,13 +467,13 @@ uint16_t bmcpokr_state::mjmaglmp_key_r()
 	uint16_t key = 0x3f;
 	switch ((m_mux >> 4) & 7)
 	{
-		case 0: key = ioport("KEY1")->read(); break;
-		case 1: key = ioport("KEY2")->read(); break;
-		case 2: key = ioport("KEY3")->read(); break;
-		case 3: key = ioport("KEY4")->read(); break;
-		case 4: key = ioport("KEY5")->read(); break;
+		case 0: key = m_key[0]->read(); break;
+		case 1: key = m_key[1]->read(); break;
+		case 2: key = m_key[2]->read(); break;
+		case 3: key = m_key[3]->read(); break;
+		case 4: key = m_key[4]->read(); break;
 	}
-	return ioport("INPUTS")->read() | (key & 0x3f);
+	return m_inputs->read() | (key & 0x3f);
 }
 
 void bmcpokr_state::mjmaglmp_map(address_map &map)
@@ -439,18 +481,18 @@ void bmcpokr_state::mjmaglmp_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x210000, 0x21ffff).ram().share("nvram");
 
-	map(0x280000, 0x287fff).ram().w(FUNC(bmcpokr_state::videoram_w<0>)).share("videoram_1");
-	map(0x288000, 0x28ffff).ram().w(FUNC(bmcpokr_state::videoram_w<1>)).share("videoram_2");
+	map(0x280000, 0x287fff).ram().w(FUNC(bmcpokr_state::videoram_w<0>)).share(m_videoram[0]);
+	map(0x288000, 0x28ffff).ram().w(FUNC(bmcpokr_state::videoram_w<1>)).share(m_videoram[1]);
 	map(0x290000, 0x297fff).ram();
 
-	map(0x2a0000, 0x2dffff).ram().w(FUNC(bmcpokr_state::pixram_w)).share("pixram");
+	map(0x2a0000, 0x2dffff).ram().w(FUNC(bmcpokr_state::pixram_w)).share(m_pixram);
 
-	map(0x2ff800, 0x2ff9ff).ram().share("scrollram_1");
-	map(0x2ffa00, 0x2ffbff).ram().share("scrollram_2");
-	map(0x2ffc00, 0x2ffdff).ram().share("scrollram_3");
+	map(0x2ff800, 0x2ff9ff).ram().share(m_scrollram[0]);
+	map(0x2ffa00, 0x2ffbff).ram().share(m_scrollram[1]);
+	map(0x2ffc00, 0x2ffdff).ram().share(m_scrollram[2]);
 	map(0x2ffe00, 0x2fffff).ram();
 
-	map(0x320000, 0x320003).ram().share("layerctrl");
+	map(0x320000, 0x320003).ram().share(m_layerctrl);
 
 	map(0x388001, 0x388001).w(FUNC(bmcpokr_state::mux_w));
 
@@ -469,11 +511,55 @@ void bmcpokr_state::mjmaglmp_map(address_map &map)
 	map(0x3ca002, 0x3ca003).ram(); // 3ca003.b, w(9d)
 	map(0x3ca007, 0x3ca007).w(FUNC(bmcpokr_state::irq_ack_w));
 	map(0x3ca009, 0x3ca009).w(FUNC(bmcpokr_state::irq_enable_w));
-	map(0x3ca00e, 0x3ca00f).ram().share("priority");    // 3ca00f.b, w (priority?)
+	map(0x3ca00e, 0x3ca00f).ram().share(m_priority);    // 3ca00f.b, w (priority?)
 	map(0x3ca017, 0x3ca017).w(FUNC(bmcpokr_state::pixpal_w));
 	map(0x3ca018, 0x3ca019).ram(); // 3ca019.b, w
 	map(0x3ca01a, 0x3ca01b).r(FUNC(bmcpokr_state::unk_r)).nopw();
 	map(0x3ca01c, 0x3ca01d).ram(); // 3ca01d.b, w(0)
+}
+
+void bmcpokr_state::shendeng_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x210000, 0x21ffff).ram().share("nvram");
+
+	map(0x280000, 0x287fff).ram().w(FUNC(bmcpokr_state::videoram_w<0>)).share(m_videoram[0]);
+	map(0x288000, 0x28ffff).ram().w(FUNC(bmcpokr_state::videoram_w<1>)).share(m_videoram[1]);
+	map(0x290000, 0x297fff).ram();
+
+	map(0x2a0000, 0x2dffff).ram().w(FUNC(bmcpokr_state::pixram_w)).share(m_pixram);
+
+	map(0x2ff800, 0x2ff9ff).ram().share(m_scrollram[0]);
+	map(0x2ffa00, 0x2ffbff).ram().share(m_scrollram[1]);
+	map(0x2ffc00, 0x2ffdff).ram().share(m_scrollram[2]);
+	map(0x2ffe00, 0x2fffff).ram();
+
+	map(0x320000, 0x320003).ram().share(m_layerctrl);
+	map(0x330000, 0x330001).rw(FUNC(bmcpokr_state::shendeng_prot_r), FUNC(bmcpokr_state::prot_w));
+	map(0x340000, 0x340001).r(FUNC(bmcpokr_state::mjmaglmp_key_r));
+	map(0x350000, 0x350001).r(FUNC(bmcpokr_state::mjmaglmp_dsw_r));
+	map(0x360001, 0x360001).w(FUNC(bmcpokr_state::mux_w));
+	map(0x370000, 0x370001).ram(); // 370001.b, rw
+	map(0x370002, 0x370003).ram(); // 370003.b, w(9d)
+	map(0x370007, 0x370007).w(FUNC(bmcpokr_state::irq_ack_w));
+	map(0x370009, 0x370009).w(FUNC(bmcpokr_state::irq_enable_w));
+	map(0x37000e, 0x37000f).ram().share(m_priority);    // 37000f.b, w (priority?)
+	map(0x370017, 0x370017).w(FUNC(bmcpokr_state::pixpal_w));
+	map(0x370018, 0x370019).ram(); // 370019.b, w
+	map(0x37001a, 0x37001b).r(FUNC(bmcpokr_state::unk_r)).nopw();
+	map(0x37001c, 0x37001d).ram(); // 3ca01d.b, w(0)
+	map(0x380001, 0x380001).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x380003, 0x380003).w("ramdac", FUNC(ramdac_device::pal_w));
+	map(0x380005, 0x380005).w("ramdac", FUNC(ramdac_device::mask_w));
+	map(0x390000, 0x390003).w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff);
+	map(0x3a0001, 0x3a0001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
+
+void bmcpokr_state::fengyunh_map(address_map &map)
+{
+	shendeng_map(map);
+
+	map(0x330000, 0x330001).r(FUNC(bmcpokr_state::fengyunh_prot_r));
 }
 
 /***************************************************************************
@@ -525,7 +611,7 @@ static INPUT_PORTS_START( bmcpokr )
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("DIP1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
-	PORT_DIPNAME( 0x02, 0x00, "Doube-Up Game" ) PORT_DIPLOCATION("DIP1:2")
+	PORT_DIPNAME( 0x02, 0x00, "Double-Up Game" ) PORT_DIPLOCATION("DIP1:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( No ) )
 	PORT_DIPNAME( 0x04, 0x00, "Slot Machine" ) PORT_DIPLOCATION("DIP1:3")
@@ -664,7 +750,7 @@ static INPUT_PORTS_START( mjmaglmp )
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("DIP1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
-	PORT_DIPNAME( 0x02, 0x00, "Doube-Up Game" )             PORT_DIPLOCATION("DIP1:2")
+	PORT_DIPNAME( 0x02, 0x00, "Double-Up Game" )             PORT_DIPLOCATION("DIP1:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( No ) )
 	PORT_DIPNAME( 0x04, 0x04, "Coin Sw. Function" )         PORT_DIPLOCATION("DIP1:3")
@@ -772,7 +858,7 @@ GFXDECODE_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(bmcpokr_state::interrupt)
 {
-	int scanline = param;
+	int const scanline = param;
 
 	if (scanline == 240)
 		if (BIT(m_irq_enable, 2)) m_maincpu->set_input_line(2, ASSERT_LINE);
@@ -806,7 +892,7 @@ void bmcpokr_state::bmcpokr(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh(HZ_TO_ATTOSECONDS(58.935));    // HSync - 15.440kHz, VSync - 58.935Hz
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_screen_update(FUNC(bmcpokr_state::screen_update));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 60*8-1, 0*8, 30*8-1);
@@ -829,7 +915,13 @@ void bmcpokr_state::bmcpokr(machine_config &config)
 
 	YM2413(config, "ymsnd", XTAL(42'000'000) / 12).add_route(ALL_OUTPUTS, "mono", 1.00);    // UM3567 @3.50MHz (42/12)
 
-	OKIM6295(config, "oki", XTAL(42'000'000) / 40, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.00);   // M6295 @1.05MHz (42/40), pin 7 not verified
+	OKIM6295(config, "oki", XTAL(42'000'000) / 40, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.00);   // M6295 @1.05MHz (42/40)
+}
+
+void bmcpokr_state::fengyunh(machine_config &config)
+{
+	bmcpokr(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bmcpokr_state::fengyunh_map);
 }
 
 void bmcpokr_state::mjmaglmp(machine_config &config)
@@ -838,11 +930,156 @@ void bmcpokr_state::mjmaglmp(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &bmcpokr_state::mjmaglmp_map);
 }
 
+void bmcpokr_state::shendeng(machine_config &config)
+{
+	bmcpokr(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bmcpokr_state::shendeng_map);
+}
+
 /***************************************************************************
                                 ROMs Loading
 ***************************************************************************/
 
 /***************************************************************************
+
+
+Fengyun Hui (BMC 1998)
+Hardware Info by Guru
+--------------------------
+
+BMC-A80508
+|---------------------------------------------|
+|SW   U27             M6295    U20            |-|
+|     U28                      U3567   LM324    |
+|                                               |
+|                              HM86171     VOL  |
+|   6116         VDB40817            UPC1241H |-|
+|   6116                                      |
+|                SYA70521                7805 |
+|                                             |-|
+|       MDT51C4160                              |
+|1uF    |--|                                    |
+|       |6 |   42MHz                            |
+|       |8 |                                    |
+|       |0 |        CPLD          ULN2003       |
+|555    |0 | U18                                |
+|       |0 |                                    |
+|T518A  |--| U17                  2561        |-|
+|                                             |
+|DIP4 DIP3 DIP2 DIP1                          |
+|-----------------|       MAHJONG          |--|
+                  |------------------------|
+Notes:
+       68000 - Clock 10.5MHz [42/4]
+       U3567 - Equivalent to Yamaha YM2413 OPLL FM synthesis sound chip. Clock input 3.5MHz [42/12]
+       M6295 - Oki M6295 4-Channel ADPCM voice synthesis LSI. Clock input 1.05MHz [42/40]. Pin 7 HIGH.
+  MDT51C4160 - 256kB x 16-bit EDO DRAM (SOJ40)
+        6116 - 6116 2kB x8-bit SRAM (both powered by 1uF Supercap i.e. battery-backed)
+          SW - NVRAM Clear Toggle Switch
+     HM86171 - HMC 86171-80 Color RAMDAC
+        CPLD - PLCC44 CPLD (surface scratched)
+       T518A - Mitsumi PST518A Master Reset IC (TO92)
+         555 - 555 Timer
+    VDB40817 - Custom IC (QFP100)
+    SYA70521 - Custom IC (QFP100)
+    UPC1241H - NEC uPC1241H Power Amplifier IC
+     ULN2003 - NPN Darlington Transistor Array
+        2561 - NEC PS2561 Opto-Isolator
+        7805 - LM7805 5V Linear Regulator
+       LM324 - LM324 Quad Operational Amplifier
+         1uF - 1uF Super Capacitor
+      DIP1-4 - 8-position DIP switches
+         U27 \
+         U28 / MX27C8100 (graphics)
+         U20 - MX27C2000 (sound)
+         U18 \
+         U17 / MX28F1000 (68000 program)
+
+***************************************************************************/
+
+ROM_START( fengyunh )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 Code
+	ROM_LOAD16_BYTE( "ch-a-604.u17", 0x000000, 0x20000, CRC(d1e4836d) SHA1(9e09892fa9d6ec765bd3c7a129cb5089d2c8ea71) )
+	ROM_LOAD16_BYTE( "ch-a-504.u18", 0x000001, 0x20000, CRC(3d54297f) SHA1(5bba9f7ef3f5f5ffde2f6d9ae96b7673c1202b7a) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD( "ch-a-101.u27", 0x000000, 0x100000, CRC(565fdba5) SHA1(1c4adb52e4b07e72ae79d685aca1b10012435a03) )
+	ROM_LOAD( "ch-a-201.u28", 0x100000, 0x100000, CRC(390cf9e9) SHA1(88a809ea10db76d6557d9c6da53438a0d385b66d) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) // Samples
+	ROM_LOAD( "ch-a-704.u20", 0x00000, 0x40000, CRC(fd4e1dd7) SHA1(87453918f0a8ae79fe406b4e79d97bb8efbba83a) )
+ROM_END
+
+/***************************************************************************
+
+
+Pili Shen Deng (BMC 1998)
+Hardware Info by Guru
+--------------------------
+
+BMC-A90408
+|---------------------------------------------|
+|SW   U27             M6295    U20            |-|
+|     U28                      U3567   LM324    |
+|                                               |
+|                              HM86171     VOL  |
+|   6116         VDB40817            UPC1241H |-|
+|   6116                                      |
+|                SYA70521                7805 |
+|                                             |
+|       MDT51C4160                            |-|
+|1uF    |--|                                    |
+|       |6 |   42MHz        DIP1                |
+|       |8 |                DIP2     ULN2003    |
+|       |0 |        CPLD    DIP3  2561          |
+|555    |0 |                DIP4                |
+|       |0 | U18                                |
+|T518A  |--|                                    |
+|            U17                              |-|
+|---------------------------------------------|
+Notes:
+       68000 - Clock 10.5MHz [42/4]
+       U3567 - Equivalent to Yamaha YM2413 OPLL FM synthesis sound chip. Clock input 3.5MHz [42/12]
+       M6295 - Oki M6295 4-Channel ADPCM voice synthesis LSI. Clock input 1.05MHz [42/40]. Pin 7 HIGH.
+  MDT51C4160 - 256kB x 16-bit EDO DRAM (SOJ40)
+        6116 - 6116 2kB x8-bit SRAM (both powered by 1uF Supercap i.e. battery-backed)
+          SW - NVRAM Clear Toggle Switch
+     HM86171 - HMC 86171-80 Color RAMDAC
+        CPLD - PLCC44 CPLD (surface scratched)
+       T518A - Mitsumi PST518A Master Reset IC (TO92)
+         555 - 555 Timer
+    VDB40817 - Custom IC (QFP100)
+    SYA70521 - Custom IC (QFP100)
+    UPC1241H - NEC uPC1241H Power Amplifier IC
+     ULN2003 - NPN Darlington Transistor Array
+        2561 - NEC PS2561 Opto-Isolator
+        7805 - LM7805 5V Linear Regulator
+       LM324 - LM324 Quad Operational Amplifier
+         1uF - 1uF Super Capacitor
+      DIP1-4 - 8-position DIP switches
+         U27 \
+         U28 / MX27C8100 (graphics)
+         U20 - MX27C2000 (sound)
+         U18 \
+         U17 / MX28F1000 (68000 program)
+
+***************************************************************************/
+
+ROM_START( shendeng )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 Code
+	ROM_LOAD16_BYTE( "bmc_mj-s-9804-p-6.u17", 0x000000, 0x20000, CRC(d0e436e7) SHA1(57aaba600a9bb473b817d3998c79203252d520bf) )
+	ROM_LOAD16_BYTE( "bmc_mj-s-9804-p-5.u18", 0x000001, 0x20000, CRC(67e58474) SHA1(389f605c30c11ed7987d7337c4933f93e99242ea) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD( "bmc_mj-s-9804-g-1.u27", 0x000000, 0x100000, CRC(b5f241c5) SHA1(31713347e8a0df19b6686e05c276bec293e55ce0) )
+	ROM_LOAD( "bmc_mj-s-9804-g-2.u28", 0x100000, 0x100000, CRC(30598702) SHA1(432498c4a3a2667d1ad1b4f687a1dd943d4bbe35) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) // Samples
+	ROM_LOAD( "bmc_mj-s-9804-v-7.u20", 0x00000, 0x40000, CRC(8887034c) SHA1(bc7d55190bd638fef9177666a3c8a5cf7db27622) )
+ROM_END
+
+/***************************************************************************
+
 
 Dongfang Shenlong ("Eastern Dragon")
 BMC 1999
@@ -882,7 +1119,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( bmcpokr )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 Code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 Code
 	ROM_LOAD16_BYTE( "ch-m-605.u13", 0x000000, 0x20000, CRC(c5c3fcd1) SHA1(b77fef734c290d52ae877a24bb3ee42b24eb5cb8) )
 	ROM_LOAD16_BYTE( "ch-m-505.u12", 0x000001, 0x20000, CRC(d6effaf1) SHA1(b446d3beb3393bc8b3bcd0d543945e6fb6a375b9) )
 
@@ -892,13 +1129,13 @@ ROM_START( bmcpokr )
 	ROM_LOAD16_BYTE( "ch-m-301.u45", 0x100000, 0x80000, CRC(daba09c3) SHA1(e5d2f92b63288c36faa367a3306d1999264843e8) )
 	ROM_LOAD16_BYTE( "ch-a-401.u29", 0x100001, 0x80000, CRC(5ee5d39f) SHA1(f6881aa5c755831d885f7adf35a5a094f7302205) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x40000, "oki", 0 ) // Samples
 	ROM_LOAD( "ch-m-701.u10", 0x00000, 0x40000,  CRC(e01be644) SHA1(b68682786d5b40cb5672cfd7f717adcfb8fac7d3) )
 ROM_END
 
 /***************************************************************************
 
-Mahjong Magic Lamp (BMC, 2000)
+Mahou no Lamp (BMC, 2000)
 
 PCB Layout
 ----------
@@ -936,7 +1173,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( mjmaglmp )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 Code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 Code
 	ROM_LOAD16_BYTE( "ja-a-602.u10", 0x000000, 0x20000, CRC(b69e235c) SHA1(04e5d0d667de29680e4a35d0d98b587447e54ce3) )
 	ROM_LOAD16_BYTE( "ja-a-502.u11", 0x000001, 0x20000, CRC(bb609da3) SHA1(ffadc20912e0a9ebe0d1a1f7f94dfaccb48be5c1) )
 
@@ -946,12 +1183,13 @@ ROM_START( mjmaglmp )
 	ROM_LOAD16_BYTE( "ja-a-301.u43", 0x100000, 0x80000, CRC(2bbaf65e) SHA1(d792054671671a2e479b89ad29bc7b3f935804f9) )
 	ROM_LOAD16_BYTE( "ja-a-401.u44", 0x100001, 0x80000, CRC(9292acb1) SHA1(01ce7997305dd5fdc5dc2b801046303a4d8a89c0) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x40000, "oki", 0 ) // Samples
 	ROM_LOAD( "ja-a-901.u6", 0x00000, 0x40000, CRC(25f36d00) SHA1(c182348340ca67ad69d1a67c58b47d6371a725c9) )
 ROM_END
 
 } // anonymous namespace
 
-
-GAME( 1999, bmcpokr,  0, bmcpokr,  bmcpokr,  bmcpokr_state, empty_init, ROT0, "BMC", "Dongfang Shenlong",             MACHINE_SUPPORTS_SAVE )
-GAME( 2000, mjmaglmp, 0, mjmaglmp, mjmaglmp, bmcpokr_state, empty_init, ROT0, "BMC", "Mahjong Magic Lamp (v. JAA02)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, fengyunh, 0,        fengyunh, mjmaglmp, bmcpokr_state, empty_init, ROT0, "BMC", "Fengyun Hui",              MACHINE_SUPPORTS_SAVE )
+GAME( 1998, shendeng, mjmaglmp, shendeng, mjmaglmp, bmcpokr_state, empty_init, ROT0, "BMC", "Pili Shen Deng",           MACHINE_SUPPORTS_SAVE )
+GAME( 1999, bmcpokr,  0,        bmcpokr,  bmcpokr,  bmcpokr_state, empty_init, ROT0, "BMC", "Dongfang Shenlong",        MACHINE_SUPPORTS_SAVE )
+GAME( 2000, mjmaglmp, 0,        mjmaglmp, mjmaglmp, bmcpokr_state, empty_init, ROT0, "BMC", "Mahou no Lamp (v. JAA02)", MACHINE_SUPPORTS_SAVE )

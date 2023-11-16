@@ -14899,7 +14899,9 @@ bmcbowl                         // (c) 1994 BMC
 
 @source:bmc/bmcpokr.cpp
 bmcpokr                         // (c) 1999 BMC
+fengyunh                        // (c) 1998 BMC
 mjmaglmp                        // (c) 2000 BMC
+shendeng                        // (c) 1998 BMC
 
 @source:bmc/koftball.cpp
 koftball                        // (c) 1995 BMC
