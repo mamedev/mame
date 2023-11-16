@@ -13,9 +13,6 @@ Video:  BMC VDB40817 + BMC SYA70521
 Sound:  M6295 + UM3567
 Other:  BMC B816140 (CPLD)
 
-// TODO: dips for fengyunh and shendeng. Some are shown in test mode,
-         in Chinese
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -362,8 +359,8 @@ void bmcpokr_state::mux_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	COMBINE_DATA(&m_mux);
 	m_hopper->motor_w(BIT(data, 0)); // hopper motor
-	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));                // coin-in / key-in
-	machine().bookkeeping().coin_counter_w(2, BIT(data, 2));                // pay-out
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));  // coin-in / key-in
+	machine().bookkeeping().coin_counter_w(2, BIT(data, 2));  // pay-out
 	//                           data & 0x60                  // DSW mux
 	//                           data & 0x80                  // ? always on
 
@@ -371,14 +368,7 @@ void bmcpokr_state::mux_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 }
 uint16_t bmcpokr_state::dsw_r()
 {
-	switch ((m_mux >> 5) & 3)
-	{
-		case 0: return m_dsw[3]->read() << 8;
-		case 1: return m_dsw[2]->read() << 8;
-		case 2: return m_dsw[1]->read() << 8;
-		case 3: return m_dsw[0]->read() << 8;
-	}
-	return 0xff << 8;
+	return m_dsw[BIT(~m_mux, 5, 2)]->read() << 8;
 }
 
 int bmcpokr_state::hopper_r()
@@ -748,11 +738,11 @@ static INPUT_PORTS_START( mjmaglmp )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("DIP1:1")
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
-	PORT_DIPNAME( 0x02, 0x00, "Double-Up Game" )             PORT_DIPLOCATION("DIP1:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x02, 0x00, "Double-Up Game" )            PORT_DIPLOCATION("DIP1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x04, 0x04, "Coin Sw. Function" )         PORT_DIPLOCATION("DIP1:3")
 	PORT_DIPSETTING(    0x00, "Coin" )
 	PORT_DIPSETTING(    0x04, "Note" )
@@ -760,11 +750,11 @@ static INPUT_PORTS_START( mjmaglmp )
 	PORT_DIPSETTING(    0x00, "Pay-Out" )
 	PORT_DIPSETTING(    0x08, "Key-Down" )
 	PORT_DIPNAME( 0x10, 0x10, "Game Hint" )                 PORT_DIPLOCATION("DIP1:5")
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
-	PORT_DIPNAME( 0x20, 0x20, "Direct Double" )             PORT_DIPLOCATION("DIP1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x20, 0x20, "Direct Double" )             PORT_DIPLOCATION("DIP1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x40, 0x40, "Coin Acceptor" )             PORT_DIPLOCATION("DIP1:7")
 	PORT_DIPSETTING(    0x00, "Mechanical" )
 	PORT_DIPSETTING(    0x40, "Electronic" )
@@ -832,6 +822,204 @@ static INPUT_PORTS_START( mjmaglmp )
 	PORT_DIPSETTING(    0x00, "100" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DIP4:8" )
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( fengyunh )
+	PORT_INCLUDE(mjmaglmp)
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, "Max Bet" )                   PORT_DIPLOCATION("DIP4:1")     // 最大押分
+	PORT_DIPSETTING(    0x01, "10" )
+	PORT_DIPSETTING(    0x00, "20" )
+	PORT_DIPNAME( 0x06, 0x06, "Min Bet" )                   PORT_DIPLOCATION("DIP4:2,3")   // 最小押分
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x06, "6" )
+	PORT_DIPSETTING(    0x02, "9" )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Coinage ) )          PORT_DIPLOCATION("DIP4:4,5")   // 投幣單位
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )
+	PORT_DIPNAME( 0x60, 0x60, "Credits Per Key-In" )        PORT_DIPLOCATION("DIP4:6,7")   // 開分單位
+	PORT_DIPSETTING(    0x40, "5" )
+	PORT_DIPSETTING(    0x60, "10" )
+	PORT_DIPSETTING(    0x20, "50" )
+	PORT_DIPSETTING(    0x00, "100" )
+	PORT_DIPNAME( 0x80, 0x80, "Score Display Mode" )        PORT_DIPLOCATION("DIP4:8")     // 計分方式 (sets how points, credits, bets, etc. are displayed)
+	PORT_DIPSETTING(    0x80, "Numbers" )                                                  // 數字 (Arabic numerals)
+	PORT_DIPSETTING(    0x00, "Circle Tiles" )                                             // 筒子 (tong mahjong tiles representing digits)
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x03, 0x03, "Pay-Out Rate" )              PORT_DIPLOCATION("DIP3:1,2")   // 遊戲機率
+	PORT_DIPSETTING(    0x02, "75" )
+	PORT_DIPSETTING(    0x01, "78" )
+	PORT_DIPSETTING(    0x03, "80" )
+	PORT_DIPSETTING(    0x00, "85" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Double-Up Rate" )            PORT_DIPLOCATION("DIP3:3,4")   // 比倍機率
+	PORT_DIPSETTING(    0x08, "95" )
+	PORT_DIPSETTING(    0x04, "96" )
+	PORT_DIPSETTING(    0x00, "97" )
+	PORT_DIPSETTING(    0x0c, "98" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DIP3:5" )                                         // 出牌方式
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DIP3:6" )                                         // "
+	PORT_DIPNAME( 0xc0, 0xc0, "Credit Limit" )              PORT_DIPLOCATION("DIP3:7,8")
+	PORT_DIPSETTING(    0x80, "500" )
+	PORT_DIPSETTING(    0x40, "1000" )
+	PORT_DIPSETTING(    0xc0, "2000" )
+	PORT_DIPSETTING(    0x00, "3000" )
+
+	PORT_MODIFY("DSW3")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "DIP2:1" )                                         // not displayed in test mode
+	PORT_DIPNAME( 0x02, 0x02, "Key-In Limit" )              PORT_DIPLOCATION("DIP2:2")     // 開分限制
+	PORT_DIPSETTING(    0x02, "1000" )
+	PORT_DIPSETTING(    0x00, "5000" )
+	PORT_DIPNAME( 0x04, 0x04, "Jackpot" )                   PORT_DIPLOCATION("DIP2:3")     // 累積彩金
+	PORT_DIPSETTING(    0x00, "50" )
+	PORT_DIPSETTING(    0x04, "100" )
+	PORT_DIPNAME( 0x18, 0x18, "Double Over / Round Bonus" ) PORT_DIPLOCATION("DIP2:4,5")
+	PORT_DIPSETTING(    0x10, "100 / 10" )
+	PORT_DIPSETTING(    0x18, "200 / 10" )
+	PORT_DIPSETTING(    0x08, "300 / 15" )
+	PORT_DIPSETTING(    0x00, "500 / 25" )
+	PORT_DIPNAME( 0x60, 0x60, "Credits Per Key-Out" )       PORT_DIPLOCATION("DIP2:6,7")   // 洗分洗分
+	PORT_DIPSETTING(    0x40, "10" )
+	PORT_DIPSETTING(    0x20, "20" )
+	PORT_DIPSETTING(    0x60, "30" )
+	PORT_DIPSETTING(    0x00, "50" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DIP2:8" )                                         // not displayed in test mode
+
+	PORT_MODIFY("DSW4")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("DIP1:1")     // not displayed in test mode
+	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x02, 0x00, "Double-Up Game" )            PORT_DIPLOCATION("DIP1:2")     // 比倍遊戲
+	PORT_DIPSETTING(    0x02, DEF_STR( No ) )                                              // 無
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )                                             // 有
+	PORT_DIPNAME( 0x04, 0x04, "Credit Mode" )               PORT_DIPLOCATION("DIP1:3")     // 進分方式 (sets coin input function)
+	PORT_DIPSETTING(    0x04, "Key-In" )                                                   // 開分
+	PORT_DIPSETTING(    0x00, "Coin" )                                                     // 投幣
+	PORT_DIPNAME( 0x08, 0x08, "Payout Mode" )               PORT_DIPLOCATION("DIP1:4")     // 退分方式
+	PORT_DIPSETTING(    0x08, "Key-Out" )                                                  // 洗分 (Pay Out key pays out score at Key-Out rate)
+	PORT_DIPSETTING(    0x00, "Return Coins" )                                             // 退幣 (Pay Out key pays out score at rate set for coin input)
+	PORT_DIPNAME( 0x10, 0x10, "Game Hint" )                 PORT_DIPLOCATION("DIP1:5")     // 吃碰提示
+	PORT_DIPSETTING(    0x10, DEF_STR( No ) )                                              // 無
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )                                             // 有
+	PORT_DIPNAME( 0x20, 0x20, "Direct Double" )             PORT_DIPLOCATION("DIP1:6")     // 直接比倍
+	PORT_DIPSETTING(    0x20, DEF_STR( No ) )                                              // 無
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )                                             // 有
+	PORT_DIPNAME( 0x40, 0x40, "Coin Acceptor" )             PORT_DIPLOCATION("DIP1:7")     // 投幣器
+	PORT_DIPSETTING(    0x00, "Mechanical" )                                               // 機械式
+	PORT_DIPSETTING(    0x40, "Electronic" )                                               // 電子式
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DIP1:8" )                                         // not displayed in test mode
+
+	// Credit Mode    Payout Mode   | Pay Out Rate    Key Out Rate
+	// -----------------------------+------------------------------
+	// Key-In         Key-Out       | Key-Out         Key-Out
+	// Coin           Key-Out       | Key-Out         Key-Out
+	// Key-In         Return Coins  | Key-In          Key-Out
+	// Coin           Return Coins  | Coin            Key-Out
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( shendeng )
+	PORT_INCLUDE(mjmaglmp)
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, "Max Bet" )                   PORT_DIPLOCATION("DIP4:1")     // 最大押分
+	PORT_DIPSETTING(    0x01, "10" )
+	PORT_DIPSETTING(    0x00, "20" )
+	PORT_DIPNAME( 0x06, 0x06, "Min Bet" )                   PORT_DIPLOCATION("DIP4:2,3")   // 最小押分
+	PORT_DIPSETTING(    0x06, "1" )
+	PORT_DIPSETTING(    0x04, "2" )
+	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Coinage ) )          PORT_DIPLOCATION("DIP4:4,5")   // 投幣單位
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_3C ) )
+	PORT_DIPNAME( 0x60, 0x60, "Credits Per Key-In" )        PORT_DIPLOCATION("DIP4:6,7")   // 開分單位
+	PORT_DIPSETTING(    0x40, "5" )
+	PORT_DIPSETTING(    0x60, "10" )
+	PORT_DIPSETTING(    0x20, "50" )
+	PORT_DIPSETTING(    0x00, "100" )
+	PORT_DIPNAME( 0x80, 0x80, "Score Display Mode" )        PORT_DIPLOCATION("DIP4:8")     // 計分方式 (sets how points, credits, bets, etc. are displayed)
+	PORT_DIPSETTING(    0x80, "Numbers" )                                                  // 數字 (Arabic numerals)
+	PORT_DIPSETTING(    0x00, "Bamboo Tiles" )                                             // 索子 (suo mahjong tiles representing digits)
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x03, 0x03, "Pay-Out Rate" )              PORT_DIPLOCATION("DIP3:1,2")   // 遊戲機率
+	PORT_DIPSETTING(    0x02, "82" )
+	PORT_DIPSETTING(    0x01, "88" )
+	PORT_DIPSETTING(    0x03, "90" )
+	PORT_DIPSETTING(    0x00, "93" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Double-Up Rate" )            PORT_DIPLOCATION("DIP3:3,4")   // 比倍機率
+	PORT_DIPSETTING(    0x08, "93" )
+	PORT_DIPSETTING(    0x04, "94" )
+	PORT_DIPSETTING(    0x00, "95" )
+	PORT_DIPSETTING(    0x0c, "96" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DIP3:5" )                                         // 出牌方式
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DIP3:6" )                                         // "
+	PORT_DIPNAME( 0xc0, 0xc0, "Credit Limit" )              PORT_DIPLOCATION("DIP3:7,8")
+	PORT_DIPSETTING(    0x80, "500" )
+	PORT_DIPSETTING(    0xc0, "1000" )
+	PORT_DIPSETTING(    0x40, "2000" )
+	PORT_DIPSETTING(    0x00, "3000" )
+
+	PORT_MODIFY("DSW3")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "DIP2:1" )                                         // not displayed in test mode
+	PORT_DIPNAME( 0x02, 0x02, "Key-In Limit" )              PORT_DIPLOCATION("DIP2:2")     // 開分限制
+	PORT_DIPSETTING(    0x02, "1000" )
+	PORT_DIPSETTING(    0x00, "5000" )
+	PORT_DIPNAME( 0x04, 0x04, "Jackpot" )                   PORT_DIPLOCATION("DIP2:3")     // 累積彩金
+	PORT_DIPSETTING(    0x00, "50" )
+	PORT_DIPSETTING(    0x04, "100" )
+	PORT_DIPNAME( 0x18, 0x18, "Double Over / Round Bonus" ) PORT_DIPLOCATION("DIP2:4,5")
+	PORT_DIPSETTING(    0x10, "100 / 10" )
+	PORT_DIPSETTING(    0x18, "200 / 10" )
+	PORT_DIPSETTING(    0x08, "300 / 15" )
+	PORT_DIPSETTING(    0x00, "500 / 25" )
+	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DIP2:6,7,8") // 彩票單位
+	PORT_DIPSETTING(    0xe0, "1" )
+	PORT_DIPSETTING(    0xc0, "2" )
+	PORT_DIPSETTING(    0xa0, "5" )
+	PORT_DIPSETTING(    0x80, "6" )
+	PORT_DIPSETTING(    0x60, "7" )
+	PORT_DIPSETTING(    0x40, "8" )
+	PORT_DIPSETTING(    0x20, "9" )
+	PORT_DIPSETTING(    0x00, "10" )
+
+	PORT_MODIFY("DSW4")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("DIP1:1")     // not displayed in test mode
+	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x02, 0x00, "Double-Up Game" )            PORT_DIPLOCATION("DIP1:2")     // 比倍遊戲
+	PORT_DIPSETTING(    0x02, DEF_STR( No ) )                                              // 無
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )                                             // 有
+	PORT_DIPNAME( 0x04, 0x04, "Credit Mode" )               PORT_DIPLOCATION("DIP1:3")     // 進分方式 (sets coin input function)
+	PORT_DIPSETTING(    0x04, "Key-In" )                                                   // 開分
+	PORT_DIPSETTING(    0x00, "Coin" )                                                     // 投幣
+	PORT_DIPNAME( 0x08, 0x08, "Payout Mode" )               PORT_DIPLOCATION("DIP1:4")     // 退分方式
+	PORT_DIPSETTING(    0x08, "Key-Out" )                                                  // 洗分 (Pay Out key pays out score at rate set for coin input)
+	PORT_DIPSETTING(    0x00, "Return Coins" )                                             // 退幣 (Pay Out key pays out score at 1:1)
+	PORT_DIPNAME( 0x10, 0x10, "Game Hint" )                 PORT_DIPLOCATION("DIP1:5")     // 吃碰提示
+	PORT_DIPSETTING(    0x10, DEF_STR( No ) )                                              // 無
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )                                             // 有
+	PORT_DIPNAME( 0x20, 0x20, "Direct Double" )             PORT_DIPLOCATION("DIP1:6")     // 直接比倍
+	PORT_DIPSETTING(    0x20, DEF_STR( No ) )                                              // 無
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )                                             // 有
+	PORT_DIPNAME( 0x40, 0x40, "Coin Acceptor" )             PORT_DIPLOCATION("DIP1:7")     // 投幣器
+	PORT_DIPSETTING(    0x00, "Mechanical" )                                               // 機械式
+	PORT_DIPSETTING(    0x40, "Electronic" )                                               // 電子式
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DIP1:8" )                                         // not displayed in test mode
+
+	// Credit Mode    Payout Mode   | Pay Out Rate    Key Out Rate
+	// -----------------------------+------------------------------
+	// Key-In         Key-Out       | Key-In          Key-In
+	// Coin           Key-Out       | Coin            Coin
+	// Key-In         Return Coins  | 1:1             Key-In
+	// Coin           Return Coins  | 1:1             Coin
+INPUT_PORTS_END
+
 
 /***************************************************************************
                                 Graphics Layout
@@ -1189,7 +1377,7 @@ ROM_END
 
 } // anonymous namespace
 
-GAME( 1998, fengyunh, 0,        fengyunh, mjmaglmp, bmcpokr_state, empty_init, ROT0, "BMC", "Fengyun Hui",              MACHINE_SUPPORTS_SAVE )
-GAME( 1998, shendeng, mjmaglmp, shendeng, mjmaglmp, bmcpokr_state, empty_init, ROT0, "BMC", "Pili Shen Deng",           MACHINE_SUPPORTS_SAVE )
+GAME( 1998, fengyunh, 0,        fengyunh, fengyunh, bmcpokr_state, empty_init, ROT0, "BMC", "Fengyun Hui",              MACHINE_SUPPORTS_SAVE )
+GAME( 1998, shendeng, mjmaglmp, shendeng, shendeng, bmcpokr_state, empty_init, ROT0, "BMC", "Pili Shen Deng",           MACHINE_SUPPORTS_SAVE )
 GAME( 1999, bmcpokr,  0,        bmcpokr,  bmcpokr,  bmcpokr_state, empty_init, ROT0, "BMC", "Dongfang Shenlong",        MACHINE_SUPPORTS_SAVE )
 GAME( 2000, mjmaglmp, 0,        mjmaglmp, mjmaglmp, bmcpokr_state, empty_init, ROT0, "BMC", "Mahou no Lamp (v. JAA02)", MACHINE_SUPPORTS_SAVE )
