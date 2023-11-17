@@ -29,7 +29,6 @@ public:
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(switch_cpu_freq) { set_cpu_freq(); }
-	DECLARE_INPUT_CHANGED_MEMBER(acl_button) { if (newval) power_off(); }
 	DECLARE_INPUT_CHANGED_MEMBER(go_button);
 
 protected:

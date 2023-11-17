@@ -36,9 +36,10 @@
 #include "emu.h"
 #include "8lc.h"
 
+#include "video/tms34061.h"
+
 #include "emupal.h"
 #include "screen.h"
-#include "video/tms34061.h"
 
 #define LOG_REGISTERS (1U << 1)
 #define LOG_RAMDAC (1U << 2)

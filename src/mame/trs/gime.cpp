@@ -84,7 +84,6 @@
 
 #include "emu.h"
 #include "gime.h"
-#include "6883sam.h"
 #include "bus/coco/cococart.h"
 #include "machine/ram.h"
 
@@ -989,7 +988,7 @@ inline void gime_device::write_gime_register(offs_t offset, uint8_t data)
 			// alone won't affect the MMU; writes to $FFAx are required to "latch"
 			// in the $FF9B value.
 			//
-			// The reason that $FF9B is not mentioned in offical documentation
+			// The reason that $FF9B is not mentioned in official documentation
 			// is because it is only meaningful in CoCo 3's with the 2MB upgrade
 			break;
 
@@ -1197,7 +1196,7 @@ void gime_device::change_gime_firq(uint8_t data)
 //  ignored in lo-res mode.  Specifically, $FF9D is masked with $E0, and
 //  $FF9E is masked with $3F
 //
-//  John Kowalski confirms this behavior
+//  John Kowalski confirms this behaviour
 //-------------------------------------------------
 
 inline offs_t gime_device::get_video_base()

@@ -591,15 +591,12 @@ uint8_t baraduke_state::soundkludge_r()
 
 void baraduke_state::mcu_map(address_map &map)
 {
-	map(0x0000, 0x001f).m("mcu", FUNC(hd63701v0_cpu_device::m6801_io)); // internal registers
-	map(0x0080, 0x00ff).ram(); // built in RAM
 	map(0x1000, 0x13ff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w)); // PSG device, shared RAM
 	map(0x1105, 0x1105).r(FUNC(baraduke_state::soundkludge_r)); // cures speech
-	map(0x8000, 0xbfff).rom();  // MCU external ROM
+	map(0x8000, 0xbfff).rom().region("mcusub", 0);  // MCU external ROM
 	map(0x8000, 0x8000).nopw(); // watchdog reset?
 	map(0x8800, 0x8800).nopw(); // IRQ acknowledge?
 	map(0xc000, 0xc7ff).ram();
-	map(0xf000, 0xffff).rom();  // MCU internal ROM
 }
 
 
@@ -803,9 +800,11 @@ ROM_START( aliensec )
 	ROM_LOAD( "bd2_1.9a", 0x8000, 0x04000, CRC(9a0a9a87) SHA1(6d88fb5b443c822ede4884d4452e333834b16aca) )
 	ROM_LOAD( "bd2_2.9b", 0xc000, 0x04000, CRC(383e5458) SHA1(091f25e287f0a81649c9a4fa196ebe4112a82295) )
 
-	ROM_REGION(  0x10000 , "mcu", 0 )
-	ROM_LOAD( "bd1_4.3b",       0x8000, 0x4000, CRC(abda0fe7) SHA1(f7edcb5f9fa47bb38a8207af5678cf4ccc243547) )  // subprogram for the MCU
-	ROM_LOAD( "cus60-60a1.mcu", 0xf000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) )  // MCU internal code
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "cus60-60a1.mcu", 0x0000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) )  // MCU internal code
+
+	ROM_REGION( 0x4000, "mcusub", 0 )
+	ROM_LOAD( "bd1_4.3b", 0x0000, 0x4000, CRC(abda0fe7) SHA1(f7edcb5f9fa47bb38a8207af5678cf4ccc243547) )  // subprogram for the MCU
 
 	ROM_REGION( 0x02000, "chars", 0 )
 	ROM_LOAD( "bd1_5.3j", 0x00000, 0x2000, CRC(706b7fee) SHA1(e5694289bd4346c1a3a004feaa940710cea755c6) )
@@ -833,9 +832,11 @@ ROM_START( baraduke )
 	ROM_LOAD( "bd1_1.9a", 0x8000, 0x04000, CRC(4e9f2bdc) SHA1(bc6e71d4d3b2064e662a105c1a77d2731070d58e) )
 	ROM_LOAD( "bd1_2.9b", 0xc000, 0x04000, CRC(40617fcd) SHA1(51d17f3a2fc96e13c8ef5952efece526e0fb33f4) )
 
-	ROM_REGION(  0x10000 , "mcu", 0 )
-	ROM_LOAD( "bd1_4b.3b",      0x8000, 0x4000, CRC(a47ecd32) SHA1(a2a75e65deb28224a5729ed134ee4d5ea8c50706) )  // subprogram for the MCU
-	ROM_LOAD( "cus60-60a1.mcu", 0xf000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) )  // MCU internal code
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "cus60-60a1.mcu", 0x0000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) )  // MCU internal code
+
+	ROM_REGION( 0x4000, "mcusub", 0 )
+	ROM_LOAD( "bd1_4b.3b", 0x0000, 0x4000, CRC(a47ecd32) SHA1(a2a75e65deb28224a5729ed134ee4d5ea8c50706) )  // subprogram for the MCU
 
 	ROM_REGION( 0x02000, "chars", 0 )
 	ROM_LOAD( "bd1_5.3j", 0x00000, 0x2000, CRC(706b7fee) SHA1(e5694289bd4346c1a3a004feaa940710cea755c6) )
@@ -863,9 +864,11 @@ ROM_START( metrocrs )
 	ROM_LOAD( "mc1-1.9a",   0x8000, 0x04000, CRC(10b0977e) SHA1(6266d173b55075da1f252092bf38185880bc4969) )
 	ROM_LOAD( "mc1-2.9b",   0xc000, 0x04000, CRC(5c846f35) SHA1(3c98a0f1131f2e2477fc75a588123c57ff5350ad) )
 
-	ROM_REGION(  0x10000 , "mcu", 0 )
-	ROM_LOAD( "mc1-4.3b",       0x8000, 0x2000, CRC(9c88f898) SHA1(d6d0345002b70c5aca41c664f34181715cd87669) )  // subprogram for the MCU
-	ROM_LOAD( "cus60-60a1.mcu", 0xf000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) )  // MCU internal code
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "cus60-60a1.mcu", 0x0000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) )  // MCU internal code
+
+	ROM_REGION( 0x4000, "mcusub", 0 )
+	ROM_LOAD( "mc1-4.3b", 0x0000, 0x2000, CRC(9c88f898) SHA1(d6d0345002b70c5aca41c664f34181715cd87669) )  // subprogram for the MCU
 
 	ROM_REGION( 0x02000, "chars", 0 )
 	ROM_LOAD( "mc1-5.3j",   0x00000, 0x2000, CRC(9b5ea33a) SHA1(a8108e71e3440b645ebdb5cdbd87712151299789) )
@@ -891,9 +894,11 @@ ROM_START( metrocrsa )
 	ROM_LOAD( "mc2-1.9a",   0x8000, 0x04000, CRC(05a239ea) SHA1(3e7c7d305d0f48e2431d60b176a0cb451ddc4637) )
 	ROM_LOAD( "mc2-2.9a",   0xc000, 0x04000, CRC(db9b0e6d) SHA1(2772b59fe7dc0e78ee29dd001a6bba75b94e0334) )
 
-	ROM_REGION(  0x10000 , "mcu", 0 )
-	ROM_LOAD( "mc1-4.3b",       0x8000, 0x2000, CRC(9c88f898) SHA1(d6d0345002b70c5aca41c664f34181715cd87669) )  // subprogram for the MCU
-	ROM_LOAD( "cus60-60a1.mcu", 0xf000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) )  // MCU internal code
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "cus60-60a1.mcu", 0x0000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) )  // MCU internal code
+
+	ROM_REGION( 0x4000, "mcusub", 0 )
+	ROM_LOAD( "mc1-4.3b",   0x0000, 0x2000, CRC(9c88f898) SHA1(d6d0345002b70c5aca41c664f34181715cd87669) )  // subprogram for the MCU
 
 	ROM_REGION( 0x02000, "chars", 0 )
 	ROM_LOAD( "mc1-5.3j",   0x00000, 0x2000, CRC(9b5ea33a) SHA1(a8108e71e3440b645ebdb5cdbd87712151299789) )

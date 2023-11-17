@@ -281,7 +281,6 @@ protected:
 
 	required_shared_ptr<uint32_t> m_io_sensor_regs;
 	required_shared_ptr<uint32_t> m_io_auxiliary_regs;
-	uint32_t m_pen_previous_input;
 	uint32_t m_pen_target;
 	uint32_t m_effective_page;
 
@@ -684,7 +683,6 @@ void sega_9h0_0008_state::machine_start()
 	save_pointer(NAME(m_midi_regs), 0x20/4);
 	save_item(NAME(m_midi_busy_count));
 
-	save_item(NAME(m_pen_previous_input));
 	save_item(NAME(m_pen_target));
 	save_item(NAME(m_effective_page));
 
@@ -731,7 +729,6 @@ void sega_9h0_0008_state::machine_reset()
 	m_io_sensor_regs[0] = 7; // Pen is making contact with the target surface.
 	m_io_sensor_regs[0x2c/4] = 0xffffffff; // Pages 1 to 4 are closed.
 	m_io_sensor_regs[0x30/4] = 0x00ffffff; // Pages 5 to 6 are closed.
-	m_pen_previous_input = 0;
 	m_pen_target = 0;
 	m_effective_page = 0;
 
@@ -1813,7 +1810,7 @@ void sega_beena_state::install_game_rom()
 void sega_beena_state::update_crosshair(screen_device &screen)
 {
 	// Show crosshair on single screen with storyware pen target
-	machine().crosshair().get_crosshair(0).set_screen(m_pen_target == 0 ? CROSSHAIR_SCREEN_NONE : &screen);
+	machine().crosshair().get_crosshair(0).set_screen(m_pen_target ? CROSSHAIR_SCREEN_NONE : &screen);
 }
 
 void sega_beena_state::update_sensors(offs_t offset)
@@ -1831,7 +1828,6 @@ void sega_beena_state::update_sensors(offs_t offset)
 	int16_t pen_y_max = io_pen_y_max;
 	uint32_t pen_pressed = 0;
 	uint32_t pen_data = 0;
-	uint8_t pen_target = 0;
 
 	bool is_tablet = true;
 	bool is_test_mode = m_io_page_config->read() == 0;
@@ -1860,13 +1856,7 @@ void sega_beena_state::update_sensors(offs_t offset)
 			io_pen_x = m_io_pen_x->read();
 			io_pen_y = m_io_pen_y->read();
 
-			pen_target = (m_io_pen_left->read() & 2) >> 1;
-			if ((m_pen_previous_input ^ pen_target) != 0) {
-				m_pen_previous_input = pen_target;
-				if (pen_target == 1) {
-					m_pen_target ^= 1;
-				}
-			}
+			m_pen_target = BIT(m_io_pen_left->read(), 1);
 
 			// The y-position is used to distinguish between pen targets:
 			// - Tablet:    0x338..0x248
@@ -2183,11 +2173,11 @@ static INPUT_PORTS_START( sega_beena )
 
 	PORT_START("PEN_LEFT")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("Left Pen Button")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("Left Pen Target")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_TOGGLE PORT_PLAYER(1) PORT_NAME("Left Pen Target")
 
 	PORT_START("PEN_RIGHT")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("Right Pen Button")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("Right Pen Target")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_TOGGLE PORT_PLAYER(1) PORT_NAME("Right Pen Target")
 
 	PORT_START("PAGE")
 	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(7) PORT_WRAPS PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CODE(JOYCODE_X) PORT_CODE_DEC(KEYCODE_HOME) PORT_CODE_INC(KEYCODE_END) PORT_FULL_TURN_COUNT(7) PORT_NAME("Selected Page")
@@ -2238,5 +2228,5 @@ ROM_END
 } // anonymous namespace
 
 //    year, name,     parent, compat, machine,       input,      class,            init,       company, fullname,              flags
-CONS( 2005, beena,    0,      0,      sega_beena,    sega_beena, sega_beena_state, empty_init, "Sega",  "Advanced Pico BEENA", MACHINE_REQUIRES_ARTWORK|MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_TIMING|MACHINE_IMPERFECT_SOUND )
+CONS( 2005, beena,    0,      0,      sega_beena,    sega_beena, sega_beena_state, empty_init, "Sega",  "Advanced Pico BEENA", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_TIMING|MACHINE_IMPERFECT_SOUND )
 CONS( 2005, tvochken, 0,      0,      sega_9h0_0008, tvochken,   tvochken_state,   empty_init, "Sega",  "TV Ocha-Ken",         MACHINE_REQUIRES_ARTWORK|MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_TIMING|MACHINE_IMPERFECT_SOUND )

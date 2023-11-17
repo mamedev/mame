@@ -50,7 +50,6 @@ protected:
 	u16 start() const { return m_start; }
 	u8 u7() const { return m_u7; }
 
-private:
 	u8 nvram_recall();
 	void nvram_store(u8 data);
 
@@ -62,6 +61,7 @@ private:
 
 	required_device_array<rs232_port_device, 4> m_serial;
 
+private:
 	required_ioport m_e4;
 	memory_view m_mbus;
 

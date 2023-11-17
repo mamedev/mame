@@ -1,9 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders: Roberto Fresca, Grull Osgo
-/***************************************************************************
+/******************************************************************************************
 
-    Driver for MCS48-based slots by Recreativos Franco.
 
+  Driver for MCS48-based slots by Recreativos Franco.
+
+
+*******************************************************************************************
 
   Recreativos Franco PCB "RF-3115"
   .--------------------------------------------------------------------------------------.
@@ -32,18 +35,21 @@
   '--------------------------------------------------------------------------------------'
 
 
-****************************************************************************
+*******************************************************************************************
 
   TODO:
 
-  - Discover and emulate 100 Pts. coin in action, done by an owner hack in mainboard with a 74ls164.
-    This 100 Pts. hack accepts this coin and gives back three 25 Pts. coins as change, then only plays 25 Pts. as bet.
+  - Discover and emulate 100 Pts. coin in action, done by an owner hack in mainboard
+    with a 74ls164. This 100 Pts. hack accepts this coin and gives back three 25 Pts.
+	coins as change, then only plays 25 Pts. as bet.
 
-  - Complete Baby Fruits 25 pts. emulation, partially emulated due to a bad dump of the main CPU ROM.
-  - Complete Ajofrin emulation, partially emulated due to a bad dump of of the main CPU ROM.
+  - Complete Baby Fruits 25 pts. emulation, partially emulated due to a bad dump of the
+    main CPU ROM.
+
+  - Complete Ajofrin emulation, partially emulated due to a bad dump of the main CPU ROM.
 
 
-***************************************************************************/
+******************************************************************************************/
 
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
@@ -739,26 +745,26 @@ void rfslotsmcs48_state::babyfrts(machine_config &config)
 	m_sndbfcpu->p1_out_cb().set(FUNC(rfslotsmcs48_state::sound_p1_w));
 	m_sndbfcpu->p2_in_cb().set(FUNC(rfslotsmcs48_state::sound_p2_r));
 
-	I8243(config.replace(), m_ioexp[0]);  // PIA 1: fruits projectors
+//	I8243, m_ioexp[0];  PIA 1: fruits projectors
 	m_ioexp[0]->p4_out_cb().set(FUNC(rfslotsmcs48_state::proy_1_w));   // left
 	m_ioexp[0]->p5_out_cb().set(FUNC(rfslotsmcs48_state::proy_2_w));   // center
 	m_ioexp[0]->p6_out_cb().set(FUNC(rfslotsmcs48_state::proy_3_w));   // right
 	m_ioexp[0]->p7_out_cb().set(FUNC(rfslotsmcs48_state::exp1_p7_w));  // sound Reset + Int
 
-	I8243(config.replace(), m_ioexp[1]);  // PIA 2
+//	I8243, m_ioexp[1];  PIA 2
 	m_ioexp[1]->p4_out_cb().set(FUNC(rfslotsmcs48_state::exp2_p4_w));  // coils and EM counters
 	m_ioexp[1]->p5_out_cb().set(FUNC(rfslotsmcs48_state::exp2_p5_w));  // game lights
 	m_ioexp[1]->p6_out_cb().set(FUNC(rfslotsmcs48_state::exp2_p6_w));  // push buttons lights
 	m_ioexp[1]->p7_out_cb().set(FUNC(rfslotsmcs48_state::exp2_p7_w));  // sound codes
 	m_ioexp[1]->p7_in_cb().set(FUNC(rfslotsmcs48_state::exp2_p7_r));   // sound handshake
 
-	I8243(config.replace(), m_ioexp[3]);  // PIA 4
+//	I8243, m_ioexp[3];  PIA 4
 	m_ioexp[3]->p4_in_cb().set_ioport("IN0");
 	m_ioexp[3]->p5_in_cb().set_ioport("IN1");
 	m_ioexp[3]->p6_in_cb().set_ioport("IN4");  // SWA
 	m_ioexp[3]->p7_in_cb().set_ioport("IN2");
 
-	I8243(config.replace(), m_ioexp[4]);  // PIA 5
+//	I8243, m_ioexp[4];  PIA 5
 	m_ioexp[4]->p4_out_cb().set(FUNC(rfslotsmcs48_state::exp5_p4_w));  // Selector 1-16
 	m_ioexp[4]->p5_in_cb().set_ioport("IN5");  // SWB
 	m_ioexp[4]->p7_in_cb().set_ioport("IN3");
@@ -781,26 +787,26 @@ void rfslotsmcs48_state::ajofrin(machine_config &config)
 	m_sndajcpu->p1_out_cb().set("dac", FUNC(dac_byte_interface::data_w));
 	m_sndajcpu->p2_in_cb().set(FUNC(rfslotsmcs48_state::sound_p2_r));
 
-	I8243(config.replace(), m_ioexp[0]);       // PIA 1
+//	I8243, m_ioexp[0];  PIA 1
 	m_ioexp[0]->p4_out_cb().set(FUNC(rfslotsmcs48_state::proy_1_w));  // to verify left projector
 	m_ioexp[0]->p5_out_cb().set(FUNC(rfslotsmcs48_state::proy_2_w));  // to verify center projector
 	m_ioexp[0]->p6_out_cb().set(FUNC(rfslotsmcs48_state::proy_3_w));  // to verify right projector - There is an extra projector. To be found.
-	m_ioexp[0]->p7_out_cb().set(FUNC(rfslotsmcs48_state::aj_exp1_p7_w));  // sound+int to verify
+	m_ioexp[0]->p7_out_cb().set(FUNC(rfslotsmcs48_state::aj_exp1_p7_w));  // sound + int to verify
 
-	I8243(config.replace(), m_ioexp[1]);       // PIA 2
+//	I8243, m_ioexp[1];  PIA 2
 	m_ioexp[1]->p4_out_cb().set(FUNC(rfslotsmcs48_state::exp2_p4_w));  // coils and EM counters - idem bfr
 	m_ioexp[1]->p5_out_cb().set(FUNC(rfslotsmcs48_state::exp2_p5_w));  // game lights - idem bfr
 
-	I8243(config.replace(), m_ioexp[2]);       // PIA 3
+//	I8243, m_ioexp[2];  PIA 3
 	m_ioexp[2]->p7_in_cb().set_ioport("IN0");
 
-	I8243(config.replace(), m_ioexp[3]);       // PIA 4
+//	I8243, m_ioexp[3];  PIA 4
 	m_ioexp[3]->p4_in_cb().set_ioport("IN1");
 	m_ioexp[3]->p5_in_cb().set_ioport("IN2");
 	m_ioexp[3]->p6_in_cb().set_ioport("IN3");
 	m_ioexp[3]->p7_in_cb().set_ioport("IN4");
 
-	I8243(config.replace(), m_ioexp[4]);       // PIA 5
+//	I8243, m_ioexp[4];  PIA 5
 	m_ioexp[4]->p5_in_cb().set_ioport("IN5");
 	m_ioexp[4]->p6_out_cb().set(FUNC(rfslotsmcs48_state::aj_exp5_p6_w));
 

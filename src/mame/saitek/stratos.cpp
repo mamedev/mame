@@ -11,19 +11,19 @@ SciSys/Saitek Stratos chesscomputer family (1987-1990)
 - Corona --> corona.cpp
 
 IMPORTANT: The user is expected to press the STOP button to turn off the computer.
-When not using -autosave, press that button before exiting MAME, or NVRAM can get corrupt.
-If that happens, the chesscomputer will become unresponsive on next boot. To force a
-cold boot, press ACL, then hold the PLAY button and press GO.
+When not using -autosave, press that button before exiting MAME, or NVRAM can get
+corrupt. If that happens, the chesscomputer will become unresponsive on next boot.
+To force a cold boot, hold the PLAY button and power on/reset (F3).
 
 TODO:
 - emulate LCD at lower level, probably an MCU with embedded LCDC
-- LCD status bit handling is guessed. stratos expects it to be high after lcd command 0xf,
-  but tking2 won't work if it's done that way, and corona is different too
-- irq timing is derived from the main XTAL, but result should be similar with 5MHz and 5.67MHz,
-  there are a couple of "FREQ. SEL" nodes on the PCB, maybe related (not the ones in input ports).
-  irq source should be from HELIOS pin 2
-- tking(old revisions) and stratos slow responsive buttons, related to irq timing, but if that's changed,
-  the led blinking and in-game clock is too fast
+- LCD status bit handling is guessed. stratos expects it to be high after lcd
+  command 0xf, but tking2 won't work if it's done that way, and corona differs too
+- irq timing is derived from the main XTAL, but result should be similar with 5MHz
+  and 5.67MHz, there are a couple of "FREQ. SEL" nodes on the PCB, maybe related
+  (not the ones in input ports). irq source should be from HELIOS pin 2
+- tking(old revisions) and stratos slow responsive buttons, related to irq timing,
+  but if that's changed, the led blinking and in-game clock is too fast
 - does nvram.u7 work? it's cleared during boot, but not used after
 
 ================================================================================
@@ -39,13 +39,15 @@ Hardware notes:
 Stratos/Turbo King are identical.
 Corona has magnet sensors and two HELIOS chips.
 
-There is no official Saitek program versioning for these. The D/D+ versions are known since
-they're the same chess engine as later Saitek modules, such as the Analyst module.
-Likewise, officially there isn't a "Turbo King II" or "Corona II", these 'sequels' are titled
-as such by the chesscomputer community. Saitek simply advertised them as an improved program.
+There is no official Saitek program versioning for these. The D/D+ versions are
+known since they're the same chess engine as later Saitek modules, such as the
+Analyst module. Likewise, officially there isn't a "Turbo King II" or "Corona II",
+these 'sequels' are titled as such by the chesscomputer community. Saitek simply
+advertised them as an improved program.
 
-The initial Stratos/Turbo King (PRG ROM labels known: M,K,L,P) are probably engine version B,
-very few bytes difference between revisions. The first Corona is engine version C.
+The initial Stratos/Turbo King (PRG ROM labels known: M,K,L,P) are probably
+engine version B, very few bytes difference between revisions. The first Corona
+is engine version C.
 
 *******************************************************************************/
 
@@ -417,7 +419,6 @@ INPUT_PORTS_START( saitek_stratos )
 
 	PORT_START("RESET")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_CHANGED_MEMBER(DEVICE_SELF, saitek_stratos_state, go_button, 0) PORT_NAME("Go")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, saitek_stratos_state, acl_button, 0) PORT_NAME("ACL")
 
 	PORT_START("FAKE")
 	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, saitek_stratos_state, switch_cpu_freq, 0) // factory set

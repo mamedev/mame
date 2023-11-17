@@ -30,19 +30,19 @@ license:CC0-1.0
 		<rect><bounds x="16"  y="0" width="20" height="1" /><color red="1.00" green="1.00" blue="1.00" /></rect> <!-- 0 white -->
 		<rect><bounds x="32"  y="0" width="20" height="1" /><color red="0.50" green="0.50" blue="0.50" /></rect> <!-- 1 gray -->
 		<rect><bounds x="48"  y="0" width="20" height="1" /><color red="0.00" green="0.00" blue="0.00" /></rect> <!-- 2 black -->
-		<rect><bounds x="64"  y="0" width="20" height="1" /><color red="0.06" green="0.38" blue="0.03" /></rect> <!-- 3 dark green -->
-		<rect><bounds x="80"  y="0" width="20" height="1" /><color red="0.50" green="0.75" blue="0.06" /></rect> <!-- 4 lime green -->
-		<rect><bounds x="96"  y="0" width="20" height="1" /><color red="0.25" green="0.75" blue="0.06" /></rect> <!-- 5 green -->
-		<rect><bounds x="112" y="0" width="20" height="1" /><color red="0.38" green="0.75" blue="1.00" /></rect> <!-- 6 cyan -->
-		<rect><bounds x="128" y="0" width="20" height="1" /><color red="0.06" green="0.38" blue="0.88" /></rect> <!-- 7 blue -->
-		<rect><bounds x="144" y="0" width="20" height="1" /><color red="0.38" green="0.13" blue="0.50" /></rect> <!-- 8 purple -->
-		<rect><bounds x="160" y="0" width="20" height="1" /><color red="0.75" green="0.50" blue="1.00" /></rect> <!-- 9 lilac -->
-		<rect><bounds x="176" y="0" width="20" height="1" /><color red="0.44" green="0.25" blue="0.03" /></rect> <!-- a brown -->
-		<rect><bounds x="192" y="0" width="20" height="1" /><color red="0.50" green="0.13" blue="0.47" /></rect> <!-- b dark pink -->
-		<rect><bounds x="208" y="0" width="20" height="1" /><color red="1.00" green="0.50" blue="1.00" /></rect> <!-- c pink -->
-		<rect><bounds x="224" y="0" width="20" height="1" /><color red="0.50" green="0.13" blue="0.13" /></rect> <!-- d dark red -->
-		<rect><bounds x="240" y="0" width="20" height="1" /><color red="1.00" green="0.38" blue="0.38" /></rect> <!-- e light red -->
-		<rect><bounds x="256" y="0" width="16" height="1" /><color red="0.88" green="0.50" blue="0.06" /></rect> <!-- f orange -->
+		<rect><bounds x="64"  y="0" width="20" height="1" /><color red="0.08" green="0.41" blue="0.08" /></rect> <!-- 3 dark green -->
+		<rect><bounds x="80"  y="0" width="20" height="1" /><color red="0.71" green="1.00" blue="0.22" /></rect> <!-- 4 lime green -->
+		<rect><bounds x="96"  y="0" width="20" height="1" /><color red="0.52" green="1.00" blue="0.41" /></rect> <!-- 5 green -->
+		<rect><bounds x="112" y="0" width="20" height="1" /><color red="0.60" green="0.91" blue="1.00" /></rect> <!-- 6 cyan -->
+		<rect><bounds x="128" y="0" width="20" height="1" /><color red="0.25" green="0.19" blue="0.74" /></rect> <!-- 7 blue -->
+		<rect><bounds x="144" y="0" width="20" height="1" /><color red="0.44" green="0.13" blue="0.47" /></rect> <!-- 8 purple -->
+		<rect><bounds x="160" y="0" width="20" height="1" /><color red="0.88" green="0.66" blue="1.00" /></rect> <!-- 9 lilac -->
+		<rect><bounds x="176" y="0" width="20" height="1" /><color red="0.24" green="0.31" blue="0.00" /></rect> <!-- a moss green -->
+		<rect><bounds x="192" y="0" width="20" height="1" /><color red="0.47" green="0.13" blue="0.22" /></rect> <!-- b dark red -->
+		<rect><bounds x="208" y="0" width="20" height="1" /><color red="1.00" green="0.56" blue="1.00" /></rect> <!-- c pink -->
+		<rect><bounds x="224" y="0" width="20" height="1" /><color red="0.35" green="0.20" blue="0.00" /></rect> <!-- d brown -->
+		<rect><bounds x="240" y="0" width="20" height="1" /><color red="1.00" green="0.63" blue="0.50" /></rect> <!-- e light red -->
+		<rect><bounds x="256" y="0" width="16" height="1" /><color red="1.00" green="0.77" blue="0.25" /></rect> <!-- f orange -->
 
 		<text string="×" align="1">
 			<bounds state="0" x="259" y="0" width="20" height="0.9" />

@@ -2,6 +2,13 @@
 // copyright-holders:David Haywood
 /*
 
+The lexitvsprt contains "W55V9x" strings, which appear to identify the tech used here as the following
+Nuvoton product
+http://e-tech.com.hk/pd_nuvo_at_game.html
+
+
+---
+
 Track & Field Challenge TV Game
 https://www.youtube.com/watch?v=wjn1lLylqog
 
@@ -67,6 +74,9 @@ protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
+	virtual uint8_t unkregs_r(offs_t offset);
+	virtual void unkregs_w(offs_t offset, uint8_t data);
+
 private:
 
 	required_device<cpu_device> m_maincpu;
@@ -122,15 +132,36 @@ private:
 
 	uint8_t m_unkregs[0x90]{};
 
-	uint8_t unkregs_r(offs_t offset);
-	void unkregs_w(offs_t offset, uint8_t data);
-
 	uint8_t m_tmapscroll_window[2][0x12]{};
 
 	uint8_t m_unkdata[0x100000]{};
 	int m_unkdata_addr = 0;
 
 };
+
+class trkfldch_lexi_state : public trkfldch_state
+{
+public:
+	trkfldch_lexi_state(const machine_config &mconfig, device_type type, const char *tag) :
+		trkfldch_state(mconfig, type, tag),
+		m_extra(*this, "EXTRA")
+	{ }
+
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	uint8_t unkregs_r(offs_t offset) override;
+	void unkregs_w(offs_t offset, uint8_t data) override;
+
+private:
+	required_ioport m_extra;
+	uint8_t m_input_bit;
+	uint8_t m_iopos;
+};
+
+
 
 void trkfldch_state::video_start()
 {
@@ -600,11 +631,6 @@ void trkfldch_state::dmaregs_w(offs_t offset, uint8_t data)
 			int readoffset = 0;
 			int readdo = m_dmaregs[0x09];
 
-			if ((m_dmaregs[0x08] != 0x00) || (m_dmaregs[0x0c] != 0x00))
-			{
-				fatalerror("unhandled dma params\n");
-			}
-
 			for (uint32_t j = 0; j < dmalength; j++)
 			{
 				uint8_t byte = mem.read_byte(dmasource + readoffset);
@@ -612,7 +638,7 @@ void trkfldch_state::dmaregs_w(offs_t offset, uint8_t data)
 				if (readdo < 0)
 				{
 					readdo = m_dmaregs[0x09];
-					readoffset += m_dmaregs[0x07];
+					readoffset += m_dmaregs[0x07] | (m_dmaregs[0x08] << 8);
 				}
 				else
 				{
@@ -624,7 +650,7 @@ void trkfldch_state::dmaregs_w(offs_t offset, uint8_t data)
 				if (writedo < 0)
 				{
 					writedo = m_dmaregs[0x0d];
-					writeoffset += m_dmaregs[0xb];
+					writeoffset += m_dmaregs[0xb] | (m_dmaregs[0x0c] << 8);
 				}
 				else
 				{
@@ -1017,6 +1043,30 @@ static INPUT_PORTS_START( shtscore )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( lexi )
+	PORT_START("IN0")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN1")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN3")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("EXTRA")
+	PORT_BIT( 0x00008, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x00020, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x00080, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x00200, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x00800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x02000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x08000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x20000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+INPUT_PORTS_END
+
 static const gfx_layout tiles8x8x8_layout =
 {
 	8,8,
@@ -1362,6 +1412,63 @@ void trkfldch_state::unkregs_w(offs_t offset, uint8_t data)
 
 }
 
+
+void trkfldch_lexi_state::machine_start()
+{
+	trkfldch_state::machine_start();
+	save_item(NAME(m_input_bit));
+	save_item(NAME(m_iopos));
+}
+
+void trkfldch_lexi_state::machine_reset()
+{
+	trkfldch_state::machine_reset();
+	m_input_bit = 0;
+	m_iopos = 0;
+}
+
+uint8_t trkfldch_lexi_state::unkregs_r(offs_t offset)
+{
+	switch (offset)
+	{
+
+	case 0x00:
+	{
+		uint8_t ret = m_input_bit;
+		logerror("%s: unkregs_r %04x (returning %02x) (Player 1 inputs)\n", machine().describe_context(), offset, ret);
+		return ret;
+	}
+
+	default:
+		return trkfldch_state::unkregs_r(offset);
+	}
+}
+
+
+void trkfldch_lexi_state::unkregs_w(offs_t offset, uint8_t data)
+{
+	switch (offset)
+	{
+	case 0x03:
+		logerror("%s: unkregs_w %04x %02x (io strobe?)\n", machine().describe_context(), offset, data);
+		if (data == 0x03)
+		{
+			m_iopos = 0;
+		}
+		else
+		{
+			m_iopos++;
+		}
+
+		m_input_bit = (m_extra->read() >> m_iopos) & 1;
+		break;
+
+	default:
+		trkfldch_state::unkregs_w(offset, data);
+		break;
+	}
+}
+
 void trkfldch_state::machine_start()
 {
 	save_item(NAME(m_unkdata_addr));
@@ -1469,10 +1576,17 @@ ROM_START( shtscore )
 	ROM_LOAD( "shootnscore.bin", 0x000000, 0x400000, CRC(37aa16bd) SHA1(609d0191301480c51ec1188c67101a4e88a5170f) )
 ROM_END
 
+ROM_START( lexitvsprt )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "29l3211.u2a", 0x000000, 0x400000, CRC(65e5223c) SHA1(13eae6e34100fb9761335e87a3cf728bb31e860f) )
+ROM_END
+
+
 } // anonymous namespace
 
 
-CONS( 2007, trkfldch,  0,          0,  trkfldch, trkfldch,trkfldch_state,      empty_init,    "Konami",             "Track & Field Challenge", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-CONS( 2006, my1stddr,  0,          0,  trkfldch, my1stddr,trkfldch_state,      empty_init,    "Konami",             "My First Dance Dance Revolution (US)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Japan version has different songs
-CONS( 200?, abl4play,  0,          0,  trkfldch, abl4play,trkfldch_state,      empty_init,    "Advance Bright Ltd", "4 Player System - 10 in 1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 2007, trkfldch,  0,          0,  trkfldch, trkfldch,trkfldch_state,      empty_init,    "Konami",                                     "Track & Field Challenge", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 2006, my1stddr,  0,          0,  trkfldch, my1stddr,trkfldch_state,      empty_init,    "Konami",                                     "My First Dance Dance Revolution (US)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Japan version has different songs
+CONS( 200?, abl4play,  0,          0,  trkfldch, abl4play,trkfldch_state,      empty_init,    "Advance Bright Ltd",                         "4 Player System - 10 in 1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 CONS( 200?, shtscore,  0,          0,  trkfldch, shtscore,trkfldch_state,      empty_init,    "Halsall / time4toys.com / Electronic Games", "Shoot n' Score", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 200?, lexitvsprt,0,          0,  trkfldch, lexi,    trkfldch_lexi_state, empty_init,    "Lexibook",                                   "TV Sports Plug & Play 5-in-1 (JG7000)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

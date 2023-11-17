@@ -62,8 +62,6 @@ c64_nl10_interface_device::c64_nl10_interface_device(const machine_config &mconf
 
 void c64_nl10_interface_device::mem_map(address_map &map)
 {
-	map(0x0000, 0x0027).m("bufcpu", FUNC(hd6303y_cpu_device::hd6301y_io)); // TODO: internalize this
-	map(0x0040, 0x013f).ram(); // TODO: internalize this
 	map(0x6000, 0x7fff).ram();
 	map(0x8000, 0xffff).rom().region("rom", 0);
 }

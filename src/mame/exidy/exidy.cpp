@@ -1885,7 +1885,7 @@ ROM_START( spectar )
 
 	ROM_REGION( 0x0140, "proms", 0 )
 	ROM_LOAD( "spl5c-2.5c",   0x0000, 0x0100, CRC(9ca2e061) SHA1(4111325b00a1017042d55c59308d41e8333ba627) ) // 6301 according to the Spectar manual, also seen as IM 5623CPE on PCB
-	ROM_LOAD( "prom.6d",      0x0100, 0x0020, BAD_DUMP CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // screen controller PROM, 6331 according to the Spectar manual, dumped from a bootleg
+	ROM_LOAD( "hrl6d-1.6d",   0x0100, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // screen controller PROM, 6331 according to the Spectar manual, also seen as IM 5610CPE on PCB
 	ROM_LOAD( "hrl14h-1.14h", 0x0120, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) ) // 6331 according to the Spectar manual
 ROM_END
 
@@ -1899,13 +1899,13 @@ ROM_START( spectar1 )
 	ROM_LOAD( "spl7a-1.7a",   0x3000, 0x0800, CRC(e08b0d8d) SHA1(6ffd6f8fb50c9fc09c38f56da7d6d005b66e78cc) )
 	ROM_LOAD( "spl6a-1.6a",   0x3800, 0x0800, CRC(f0e4e71a) SHA1(5487a94650c964a7ab07f30aacab0b470dcb3b40) )
 
-	ROM_REGION( 0x0400, "gfx1", 0 ) // some PCBs were seen with hrl11d-1
+	ROM_REGION( 0x0400, "gfx1", 0 ) // some PCBs were seen with hrl11d-1 (CRC(9f03513e) SHA1(aa4763e49df65e5686a96431543580b8d8285893))
 	ROM_LOAD( "hrl11d-2.11d", 0x0000, 0x0400, CRC(c55b645d) SHA1(0c18277939d74e3e1281a7f114a34781d30c2baf) )  /* this is actually not used (all FF) */
 	ROM_CONTINUE(             0x0000, 0x0400 )  /* overwrite with the real one */
 
 	ROM_REGION( 0x0140, "proms", 0 )
 	ROM_LOAD( "spl5c-2.5c",   0x0000, 0x0100, CRC(9ca2e061) SHA1(4111325b00a1017042d55c59308d41e8333ba627) ) // 6301 according to the Spectar manual, also seen as IM 5623CPE on PCB
-	ROM_LOAD( "prom.6d",      0x0100, 0x0020, BAD_DUMP CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // screen controller PROM, 6331 according to the Spectar manual, dumped from a bootleg
+	ROM_LOAD( "hrl6d-1.6d",   0x0100, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // screen controller PROM, 6331 according to the Spectar manual, also seen as IM 5610CPE on PCB
 	ROM_LOAD( "hrl14h-1.14h", 0x0120, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) ) // 6331 according to the Spectar manual
 ROM_END
 

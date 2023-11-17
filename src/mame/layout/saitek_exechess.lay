@@ -42,6 +42,7 @@ license:CC0-1.0
 	<element name="text_l12"><text string="BACK"><color red="0.75" green="0.25" blue="0.2" /></text></element>
 	<element name="text_l13"><text string="MM"><color red="0.75" green="0.25" blue="0.2" /></text></element>
 
+
 <!-- display -->
 
 	<element name="lcd_bg1"><rect><color red="0.4" green="1.0" blue="0.75" /></rect></element>

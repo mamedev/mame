@@ -27,7 +27,7 @@ public:
 	typedef device_delegate<void (bitmap_ind16 &bitmap, u8 line, u8 pos, u8 y, u8 x, int state)> pixel_update_delegate;
 
 	// construction/destruction
-	hd44780_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	hd44780_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
 	void set_lcd_size(int lines, int chars) { m_lines = lines; m_chars = chars; }
@@ -58,6 +58,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_validity_check(validity_checker &valid) const override;
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;

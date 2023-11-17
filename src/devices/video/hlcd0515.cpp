@@ -30,9 +30,13 @@ DEFINE_DEVICE_TYPE(HLCD0601, hlcd0601_device, "hlcd0601", "Hughes HLCD 0601 LCD 
 
 hlcd0515_device::hlcd0515_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 colmax) :
 	device_t(mconfig, type, tag, owner, clock),
+	device_nvram_interface(mconfig, *this),
 	m_colmax(colmax),
 	m_write_cols(*this), m_write_data(*this)
-{ }
+{
+	// disable nvram by default
+	nvram_enable_backup(false);
+}
 
 hlcd0515_device::hlcd0515_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	hlcd0515_device(mconfig, HLCD0515, tag, owner, clock, 25)
@@ -56,18 +60,9 @@ hlcd0601_device::hlcd0601_device(const machine_config &mconfig, const char *tag,
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void hlcd0515_device::device_start()
+void hlcd0515_device::internal_clear()
 {
-	// timer
-	m_lcd_timer = timer_alloc(FUNC(hlcd0515_device::scan_lcd), this);
-	attotime period = attotime::from_hz(clock() / 2);
-	m_lcd_timer->adjust(period, 0, period);
-
-	// zerofill
-	m_cs = 0;
-	m_clk = 0;
-	m_data = 0;
-	m_dataout = 0;
+	// clear internal registers and RAM
 	m_count = 0;
 	m_control = 0;
 	m_blank = false;
@@ -76,6 +71,21 @@ void hlcd0515_device::device_start()
 	m_rowsel = 0;
 	m_buffer = 0;
 	memset(m_ram, 0, sizeof(m_ram));
+}
+
+void hlcd0515_device::device_start()
+{
+	// timer
+	m_lcd_timer = timer_alloc(FUNC(hlcd0515_device::scan_lcd), this);
+	attotime period = attotime::from_hz(clock() / 2);
+	m_lcd_timer->adjust(period, 0, period);
+
+	// zerofill
+	internal_clear();
+	m_cs = 0;
+	m_clk = 0;
+	m_data = 0;
+	m_dataout = 0;
 
 	// register for savestates
 	save_item(NAME(m_cs));
@@ -95,7 +105,63 @@ void hlcd0515_device::device_start()
 
 
 //-------------------------------------------------
-//  scan_lcd -
+//  nvram (when VDD is battery-backed, rare occurence)
+//-------------------------------------------------
+
+bool hlcd0515_device::nvram_write(util::write_stream &file)
+{
+	size_t actual;
+
+	// misc internal registers
+	u8 buf[6];
+	buf[0] = m_count;
+	buf[1] = m_control;
+	buf[2] = m_blank ? 1 : 0;
+	buf[3] = m_rowmax;
+	buf[4] = m_rowout;
+	buf[5] = m_rowsel;
+
+	if (file.write(&buf, sizeof(buf), actual) || (sizeof(buf) != actual))
+		return false;
+
+	// shift register and RAM
+	if (file.write(&m_buffer, sizeof(m_buffer), actual) || (sizeof(m_buffer) != actual))
+		return false;
+	if (file.write(&m_ram, sizeof(m_ram), actual) || (sizeof(m_ram) != actual))
+		return false;
+
+	return true;
+}
+
+bool hlcd0515_device::nvram_read(util::read_stream &file)
+{
+	size_t actual;
+
+	// misc internal registers
+	u8 buf[6];
+	if (file.read(&buf, sizeof(buf), actual) || (sizeof(buf) != actual))
+		return false;
+
+	m_count = buf[0];
+	m_control = buf[1];
+	m_blank = bool(buf[2]);
+	m_rowmax = buf[3] & 7;
+	m_rowout = buf[4] & 7;
+	m_rowsel = buf[5] & 7;
+
+	// shift register and RAM
+	if (file.read(&m_buffer, sizeof(m_buffer), actual) || (sizeof(m_buffer) != actual))
+		return false;
+	if (file.read(&m_ram, sizeof(m_ram), actual) || (sizeof(m_ram) != actual))
+		return false;
+
+	return true;
+}
+
+
+
+//-------------------------------------------------
+//  I/O handlers
 //-------------------------------------------------
 
 TIMER_CALLBACK_MEMBER(hlcd0515_device::scan_lcd)
@@ -108,11 +174,6 @@ TIMER_CALLBACK_MEMBER(hlcd0515_device::scan_lcd)
 	m_rowout++;
 }
 
-
-
-//-------------------------------------------------
-//  handlers
-//-------------------------------------------------
 
 void hlcd0515_device::set_control()
 {
@@ -178,7 +239,6 @@ void hlcd0515_device::clock_w(int state)
 			if (m_count == 4)
 				set_control();
 		}
-
 		else
 			clock_data(m_count - 5);
 
