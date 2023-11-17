@@ -107,28 +107,28 @@ protected:
 	required_device<wswan_sound_device> m_sound;
 	required_device<ws_cart_slot_device> m_cart;
 
-	u16 m_ws_portram[128];
-	u8 m_internal_eeprom[INTERNAL_EEPROM_SIZE * 2];
-	u8 m_system_type;
+	u16 m_ws_portram[128] = { };
+	u8 m_internal_eeprom[INTERNAL_EEPROM_SIZE * 2] = { };
+	u8 m_system_type = 0;
 	sound_dma_t m_sound_dma;
-	u16 m_dma_source_offset;
-	u16 m_dma_source_segment;
-	u16 m_dma_destination;
-	u16 m_dma_length;
-	u16 m_dma_control;
-	u8 m_bios_disabled;
-	u8 m_rotate;
-	u32 m_vector;
-	u8 m_sys_control;
-	u8 m_irq_vector_base;
-	u8 m_serial_data;
-	u8 m_serial_control;
-	u8 m_irq_enable;
-	u8 m_irq_active;
-	u16 m_internal_eeprom_data;
-	u16 m_internal_eeprom_address;
-	u8 m_internal_eeprom_command;
-	u8 m_keypad;
+	u16 m_dma_source_offset = 0;
+	u16 m_dma_source_segment = 0;
+	u16 m_dma_destination = 0;
+	u16 m_dma_length = 0;
+	u16 m_dma_control = 0;
+	u8 m_bios_disabled = 0;
+	u8 m_rotate = 0;
+	u32 m_vector = 0;
+	u8 m_sys_control = 0;
+	u8 m_irq_vector_base = 0;
+	u8 m_serial_data = 0;
+	u8 m_serial_control = 0;
+	u8 m_irq_enable = 0;
+	u8 m_irq_active = 0;
+	u16 m_internal_eeprom_data = 0;
+	u16 m_internal_eeprom_address = 0;
+	u8 m_internal_eeprom_command = 0;
+	u8 m_keypad = 0;
 
 	required_memory_region m_region_maincpu;
 	required_ioport m_cursx;
@@ -204,15 +204,15 @@ void wswan_state::snd_map(address_map &map)
 
 static INPUT_PORTS_START(wswan)
 	PORT_START("CURSX")
-	PORT_BIT( 0x8, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_NAME("X4 - Left")
-	PORT_BIT( 0x4, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_NAME("X3 - Down")
-	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("X2 - Right")
-	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_NAME("X1 - Up")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_NAME("X4 - Left")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_NAME("X3 - Down")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("X2 - Right")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_NAME("X1 - Up")
 
 	PORT_START("BUTTONS")
-	PORT_BIT( 0x8, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Button B")
-	PORT_BIT( 0x4, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Button A")
-	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Button B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Button A")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("Start")
 
 	PORT_START("CURSY")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Y4 - Left") PORT_CODE(KEYCODE_A)
@@ -911,41 +911,48 @@ void wswan_state::port_w(offs_t offset, u16 data, u16 mem_mask)
 }
 
 
-void wswan_state::set_icons(u8 data) {
+void wswan_state::set_icons(u8 data)
+{
 	// Bit 0 - LCD sleep icon enable
 	// Bit 1 - Vertical position icon enable
 	// Bit 2 - Horizontal position icon enable
 	// Bit 3 - Dot 1 icon enable
 	// Bit 4 - Dot 2 icon enable
 	// Bit 5 - Dot 3 icon enable
-	for (int i = 0; i < 6; i++) {
+	for (int i = 0; i < 6; i++)
+	{
 		m_icons[i] = BIT(data, i);
 	}
 
 	u8 old_rotate = m_rotate;
 
-	if ((!BIT(data, 2) && BIT(data, 1)) || (BIT(data, 2) && !BIT(data, 1))) {
+	if ((!BIT(data, 2) && BIT(data, 1)) || (BIT(data, 2) && !BIT(data, 1)))
+	{
 		m_rotate = (!BIT(data, 2) && BIT(data, 1)) ? 1 : 0;
 
-		if (old_rotate != m_rotate) {
+		if (old_rotate != m_rotate)
+		{
 				set_rotate_view();
 		}
 	}
 }
 
 
-void wswan_state::set_rotate_view() {
+void wswan_state::set_rotate_view()
+{
 	render_target *target = machine().render().first_target();
 	target->set_view(m_rotate);
 }
 
 
-u16 wswan_state::get_internal_eeprom_address() {
+u16 wswan_state::get_internal_eeprom_address()
+{
 	return (m_internal_eeprom_address & 0x3f) << 1;
 }
 
 
-u16 wscolor_state::get_internal_eeprom_address() {
+u16 wscolor_state::get_internal_eeprom_address()
+{
 	return (m_internal_eeprom_address & 0x1ff) << 1;
 }
 

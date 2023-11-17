@@ -216,7 +216,7 @@ void mmtm_state::mmtm_v(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mmtm_state::mmtm_2m_map);
 
 	const attotime irq_period = attotime::from_hz(12.288_MHz_XTAL / 0x8000); // through 4060, 375Hz
-	m_maincpu->set_periodic_int(FUNC(mmtm_state::irq2_line_hold), irq_period);
+	m_maincpu->set_periodic_int(FUNC(mmtm_state::irq3_line_hold), irq_period);
 
 	TIMER(config, "disable_bootrom").configure_generic(FUNC(mmtm_state::disable_bootrom));
 

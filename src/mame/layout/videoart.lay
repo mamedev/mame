@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="white"><rect><color red="0.85" green="0.85" blue="0.86" /></rect></element>
+	<element name="nothing" defstate="0"><rect><color alpha="0" /></rect></element>
+
+	<element name="text_erase">
+		<rect><color red="1" green="1" blue="1" /></rect>
+		<text string="ERASE" align="1"><color red="0.66" green="0.66" blue="0.66" /></text>
+	</element>
+	<element name="text_color">
+		<rect><color red="1" green="1" blue="1" /></rect>
+		<text string="COLOR" align="1"><color red="0.66" green="0.66" blue="0.66" /></text>
+	</element>
+
+	<element name="led" defstate="0">
+		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
+		<disk state="0"><color red="0.1" green="0.01" blue="0.015" /></disk>
+	</element>
+
+	<element name="color" defstate="0">
+		<rect><bounds x="0" y="0" width="300" height="1" /><color red="0.85" green="0.85" blue="0.86" /></rect>
+
+		<!-- palette taken from driver -->
+		<rect><bounds x="16"  y="0" width="20" height="1" /><color red="1.00" green="1.00" blue="1.00" /></rect> <!-- 0 white -->
+		<rect><bounds x="32"  y="0" width="20" height="1" /><color red="0.50" green="0.50" blue="0.50" /></rect> <!-- 1 gray -->
+		<rect><bounds x="48"  y="0" width="20" height="1" /><color red="0.00" green="0.00" blue="0.00" /></rect> <!-- 2 black -->
+		<rect><bounds x="64"  y="0" width="20" height="1" /><color red="0.08" green="0.41" blue="0.08" /></rect> <!-- 3 dark green -->
+		<rect><bounds x="80"  y="0" width="20" height="1" /><color red="0.71" green="1.00" blue="0.22" /></rect> <!-- 4 lime green -->
+		<rect><bounds x="96"  y="0" width="20" height="1" /><color red="0.52" green="1.00" blue="0.41" /></rect> <!-- 5 green -->
+		<rect><bounds x="112" y="0" width="20" height="1" /><color red="0.60" green="0.91" blue="1.00" /></rect> <!-- 6 cyan -->
+		<rect><bounds x="128" y="0" width="20" height="1" /><color red="0.25" green="0.19" blue="0.74" /></rect> <!-- 7 blue -->
+		<rect><bounds x="144" y="0" width="20" height="1" /><color red="0.44" green="0.13" blue="0.47" /></rect> <!-- 8 purple -->
+		<rect><bounds x="160" y="0" width="20" height="1" /><color red="0.88" green="0.66" blue="1.00" /></rect> <!-- 9 lilac -->
+		<rect><bounds x="176" y="0" width="20" height="1" /><color red="0.24" green="0.31" blue="0.00" /></rect> <!-- a moss green -->
+		<rect><bounds x="192" y="0" width="20" height="1" /><color red="0.47" green="0.13" blue="0.22" /></rect> <!-- b dark red -->
+		<rect><bounds x="208" y="0" width="20" height="1" /><color red="1.00" green="0.56" blue="1.00" /></rect> <!-- c pink -->
+		<rect><bounds x="224" y="0" width="20" height="1" /><color red="0.35" green="0.20" blue="0.00" /></rect> <!-- d brown -->
+		<rect><bounds x="240" y="0" width="20" height="1" /><color red="1.00" green="0.63" blue="0.50" /></rect> <!-- e light red -->
+		<rect><bounds x="256" y="0" width="16" height="1" /><color red="1.00" green="0.77" blue="0.25" /></rect> <!-- f orange -->
+
+		<text string="×" align="1">
+			<bounds state="0" x="259" y="0" width="20" height="0.9" />
+			<bounds state="255" x="4" y="0" width="20" height="0.9" />
+			<color red="1.0" green="0.1" blue="0.15" />
+		</text>
+	</element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="0" right="400" top="0" bottom="312" />
+
+		<element ref="white"><bounds x="0" y="0" width="400" height="12" /></element>
+
+		<element ref="text_erase" blend="multiply"><bounds x="47.5" yc="6" width="30" height="6" /></element>
+		<element name="led" ref="led"><bounds x="64" yc="6" width="4" height="4" /></element>
+
+		<element ref="nothing" inputtag="AN0" inputmask="0x00" inputraw="yes"><bounds x="128" y="2" width="150" height="8" /></element> <!-- block clickable input -->
+		<element ref="color" inputtag="AN0" inputmask="0xff" inputraw="yes"><bounds x="128" y="2" width="150" height="8" /></element>
+		<element ref="text_color" blend="multiply"><bounds x="118" yc="6" width="30" height="6" /></element>
+
+		<screen index="0"><bounds x="0" y="12" width="400" height="300" /></screen>
+	</view>
+
+</mamelayout>

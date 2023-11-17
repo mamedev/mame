@@ -57,9 +57,10 @@
 #include "nes_vt_soc.h"
 
 
-DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC,          nes_vt02_vt03_soc_device,          "nes_vt02_vt03_soc",       "VT02/03 series System on a Chip (NTSC)")
-DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_PAL,      nes_vt02_vt03_soc_pal_device,      "nes_vt02_vt03_soc_pal",   "VT02/03 series System on a Chip (PAL)")
-DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_SCRAMBLE, nes_vt02_vt03_soc_scramble_device, "nes_vt02_vt03_soc_scram", "VT02/03 series System on a Chip (NTSC, with simple Opcode scrambling)")
+DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC,              nes_vt02_vt03_soc_device,          "nes_vt02_vt03_soc",       "VT02/03 series System on a Chip (NTSC)")
+DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_PAL,          nes_vt02_vt03_soc_pal_device,      "nes_vt02_vt03_soc_pal",   "VT02/03 series System on a Chip (PAL)")
+DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_SCRAMBLE,     nes_vt02_vt03_soc_scramble_device, "nes_vt02_vt03_soc_scram", "VT02/03 series System on a Chip (NTSC, with simple Opcode scrambling)")
+DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_SCRAMBLE_PAL, nes_vt02_vt03_soc_scramble_pal_device, "nes_vt02_vt03_soc_pal_scram", "VT02/03 series System on a Chip (PAL, with simple Opcode scrambling)")
 
 void nes_vt02_vt03_soc_device::program_map(address_map &map)
 {
@@ -124,6 +125,11 @@ nes_vt02_vt03_soc_pal_device::nes_vt02_vt03_soc_pal_device(const machine_config&
 
 nes_vt02_vt03_soc_scramble_device::nes_vt02_vt03_soc_scramble_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
 	nes_vt02_vt03_soc_device(mconfig, NES_VT02_VT03_SOC_SCRAMBLE, tag, owner, clock)
+{
+}
+
+nes_vt02_vt03_soc_scramble_pal_device::nes_vt02_vt03_soc_scramble_pal_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+	nes_vt02_vt03_soc_device(mconfig, NES_VT02_VT03_SOC_SCRAMBLE_PAL, tag, owner, clock)
 {
 }
 
@@ -1148,4 +1154,13 @@ void nes_vt02_vt03_soc_scramble_device::device_add_mconfig(machine_config& confi
 
 	RP2A03_CORE_SWAP_OP_D5_D6(config.replace(), m_maincpu, NTSC_APU_CLOCK); // Insect Chase in polmega confirms RP2A03 core type, not 6502
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt02_vt03_soc_scramble_device::nes_vt_map);
+}
+
+void nes_vt02_vt03_soc_scramble_pal_device::device_add_mconfig(machine_config& config)
+{
+	nes_vt02_vt03_soc_device::device_add_mconfig(config);
+
+	RP2A03_CORE_SWAP_OP_D5_D6(config.replace(), m_maincpu, PAL_APU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt02_vt03_soc_scramble_pal_device::nes_vt_map);
+	do_pal_timings_and_ppu_replacement(config);
 }

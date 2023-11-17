@@ -29249,11 +29249,11 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Tunnels &amp; Trolls - Crusaders of Khazan (Japan) (Track 13).bin" size="7408800" crc="2d6dfc54" sha1="e882c93c6639116f01aab8317f3aefdd603deb27"/>
 		<rom name="Tunnels &amp; Trolls - Crusaders of Khazan (Japan).cue" size="1815" crc="0877d1eb" sha1="7fd7aa51c6634e6081fece496240b3d854f66403"/>
 		-->
-		<description>Tunnels &amp; Trolls - Crusaders of Khazan</description>
+		<description>Tunnels &amp; Trolls: Crusaders of Khazan</description>
 		<year>1990</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<info name="serial" value="HMB-196"/>
-		<info name="alt_title" value="トンネルズ・アンド・トロールズ カザンの戦士たち" />
+		<info name="alt_title" value="トンネルズ＆トロールズ カザンの戦士たち" />
 		<info name="release" value="199011xx" />
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="cdrom" interface="fmt_cdrom">

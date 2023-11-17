@@ -7499,7 +7499,7 @@ u32 skywriter_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 		for (int j = 0; j < 3; j++)
 		{
-			if (cliprect.contains(dx, dy))
+			if (cliprect.contains(dx, dy + j))
 				bitmap.pix(dy + j, dx) = red << 16 | green << 8 | blue;
 		}
 

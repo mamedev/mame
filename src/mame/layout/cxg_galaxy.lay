@@ -8,7 +8,11 @@ license:CC0-1.0
 
 	<element name="led" defstate="0">
 		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
-		<disk state="0"><color red="0.17" green="0.015" blue="0.02" /></disk>
+		<disk state="0"><color red="0.1" green="0.01" blue="0.015" /></disk>
+	</element>
+	<element name="led2" defstate="0">
+		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
+		<disk state="0"><color red="0.14" green="0.014" blue="0.02" /></disk>
 	</element>
 
 	<element name="text_10">
@@ -574,15 +578,15 @@ license:CC0-1.0
 
 		<element ref="cwhite" blend="multiply"><bounds x="0" y="0" width="50" height="100" /></element>
 
-		<element name="7.6" ref="led"><bounds x="1.7" yc="16.2" width="1.5" height="1.5" /></element>
-		<element name="6.6" ref="led"><bounds x="1.7" yc="19.9" width="1.5" height="1.5" /></element>
+		<element name="7.6" ref="led2"><bounds x="1.7" yc="16.2" width="1.5" height="1.5" /></element>
+		<element name="6.6" ref="led2"><bounds x="1.7" yc="19.9" width="1.5" height="1.5" /></element>
 
-		<element name="5.6" ref="led"><bounds x="1.7" y="69.75" width="1.5" height="1.5" /></element>
-		<element name="4.6" ref="led"><bounds x="1.7" y="74.75" width="1.5" height="1.5" /></element>
-		<element name="3.6" ref="led"><bounds x="1.7" y="79.75" width="1.5" height="1.5" /></element>
-		<element name="2.6" ref="led"><bounds x="1.7" y="84.75" width="1.5" height="1.5" /></element>
-		<element name="1.6" ref="led"><bounds x="1.7" y="89.75" width="1.5" height="1.5" /></element>
-		<element name="0.6" ref="led"><bounds x="1.7" y="94.75" width="1.5" height="1.5" /></element>
+		<element name="5.6" ref="led2"><bounds x="1.7" y="69.75" width="1.5" height="1.5" /></element>
+		<element name="4.6" ref="led2"><bounds x="1.7" y="74.75" width="1.5" height="1.5" /></element>
+		<element name="3.6" ref="led2"><bounds x="1.7" y="79.75" width="1.5" height="1.5" /></element>
+		<element name="2.6" ref="led2"><bounds x="1.7" y="84.75" width="1.5" height="1.5" /></element>
+		<element name="1.6" ref="led2"><bounds x="1.7" y="89.75" width="1.5" height="1.5" /></element>
+		<element name="0.6" ref="led2"><bounds x="1.7" y="94.75" width="1.5" height="1.5" /></element>
 
 		<group ref="lcd1"><bounds x="4.5" y="37.8" width="11.5" height="5.4" /></group>
 		<group ref="lcd2"><bounds x="4.5" y="50" width="11.5" height="5.4" /></group>
@@ -609,13 +613,14 @@ license:CC0-1.0
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="-6.5" right="123.5" top="6" bottom="94" />
+		<bounds left="-7" right="123.5" top="6" bottom="94" />
 
 		<group ref="panel"><bounds x="92.5" y="-5.6" width="50" height="100" /></group>
 
+		<element ref="cblack"><bounds x="6" y="9.5" width="84.5" height="84.5" /></element>
 		<element ref="cwhite"><bounds x="9.5" y="9.5" width="81" height="81" /></element>
 		<group ref="sb_board"><bounds x="10" y="10" width="80" height="80" /></group>
-		<group ref="sb_ui"><bounds x="-4.5" y="10" width="10" height="80" /></group>
+		<group ref="sb_ui"><bounds x="-5.5" y="10" width="10" height="80" /></group>
 
 		<!-- leds -->
 		<repeat count="8">

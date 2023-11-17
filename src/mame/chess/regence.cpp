@@ -16,8 +16,11 @@ Hardware notes:
 - 2KB battery-backed RAM (MSM5128-15RS), 3 sockets, only middle one used
 - TTL, piezo, 8*8+4 LEDs, magnetic sensors
 
-The hardware triggers an NMI on power-off (or power-failure). If this isn't done,
-NVRAM fails at next power-on.
+NOTE: The hardware triggers an NMI on power-off (or power-failure). If this isn't
+done, NVRAM fails at next power-on.
+
+TODO:
+- if/when MAME supports an exit callback, hook up power-off NMI to that
 
 *******************************************************************************/
 
@@ -49,7 +52,7 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	DECLARE_INPUT_CHANGED_MEMBER(power) { if (newval && m_power) power_off(); }
+	DECLARE_INPUT_CHANGED_MEMBER(power_off);
 
 	// machine configs
 	void regence(machine_config &config);
@@ -75,9 +78,7 @@ private:
 	void leds_w(u8 data);
 	u8 input_r();
 
-	void power_off();
 	bool m_power = false;
-
 	u8 m_inp_mux = 0;
 	u8 m_led_data = 0;
 };
@@ -90,11 +91,14 @@ void regence_state::machine_start()
 	save_item(NAME(m_led_data));
 }
 
-void regence_state::power_off()
+INPUT_CHANGED_MEMBER(regence_state::power_off)
 {
 	// NMI at power-off (it prepares nvram for next power-on)
-	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-	m_power = false;
+	if (newval && m_power)
+	{
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+		m_power = false;
+	}
 }
 
 
@@ -187,7 +191,7 @@ static INPUT_PORTS_START( regence )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("POWER") // needs to be triggered for nvram to work
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, regence_state, power, 0) PORT_NAME("Power Off")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, regence_state, power_off, 0) PORT_NAME("Power Off")
 INPUT_PORTS_END
 
 

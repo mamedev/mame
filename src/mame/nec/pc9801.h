@@ -259,6 +259,9 @@ protected:
 	uint8_t m_dma_autoinc[4];
 	int m_dack;
 
+	virtual uint8_t dma_read_byte(offs_t offset);
+	virtual void dma_write_byte(offs_t offset, uint8_t data);
+
 private:
 	void dmapg4_w(offs_t offset, uint8_t data);
 
@@ -266,8 +269,7 @@ private:
 
 	void dma_hrq_changed(int state);
 	void tc_w(int state);
-	uint8_t dma_read_byte(offs_t offset);
-	void dma_write_byte(offs_t offset, uint8_t data);
+
 	void dack0_w(int state);
 	void dack1_w(int state);
 	void dack2_w(int state);
@@ -423,8 +425,14 @@ protected:
 	u8 m_dma_access_ctrl = 0;
 	u8 m_ide_sel = 0;
 
+	virtual uint8_t dma_read_byte(offs_t offset) override;
+	virtual void dma_write_byte(offs_t offset, uint8_t data) override;
+
 	// starting from PC9801VF/U buzzer is substituted with a DAC1BIT
 	bool m_dac1bit_disable;
+
+	uint8_t pc9801rs_knjram_r(offs_t offset);
+	void pc9801rs_knjram_w(offs_t offset, uint8_t data);
 
 	required_ioport m_dsw3;
 private:
@@ -432,9 +440,6 @@ private:
 //  optional_device<dac_1bit_device> m_dac1bit;
 	required_device<speaker_sound_device> m_dac1bit;
 
-
-	uint8_t pc9801rs_knjram_r(offs_t offset);
-	void pc9801rs_knjram_w(offs_t offset, uint8_t data);
 	void pc9801rs_bank_w(offs_t offset, uint8_t data);
 	uint8_t midi_r();
 

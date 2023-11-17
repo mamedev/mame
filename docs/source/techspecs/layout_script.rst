@@ -484,6 +484,10 @@ providing what’s needed:
   creating :ref:`attotime <luascript-ref-attotime>`, :ref:`bounds
   <luascript-ref-renderbounds>` and :ref:`colour <luascript-ref-rendercolor>`
   objects.
+* ``emu.bitmap_ind8``, ``emu.bitmap_ind16``, ``emu.bitmap_ind32``,
+  ``emu.bitmap_ind64``, ``emu.bitmap_yuy16``, ``emu.bitmap_rgb32`` and
+  ``emu.bitmap_argb32`` objects for creating
+  :ref:`bitmaps <luascript-ref-bitmap>`.
 * ``emu.print_verbose``, ``emu.print_error``, ``emu.print_warning``,
   ``emu.print_info`` and ``emu.print_debug`` functions for diagnostic output.
 * Standard Lua ``tonumber``, ``tostring``, ``pairs`` and ``ipairs`` functions,
@@ -667,3 +671,21 @@ Get item vertical scroll position
     item; larger values pan down.  Call with ``nil`` as the argument to restore
     the default vertical scroll position handler (based on bindings in the
     ``yscroll`` child element).
+
+.. _layscript-events-element:
+
+Layout element events
+~~~~~~~~~~~~~~~~~~~~~
+
+Layout element events apply to an individual visual element definition.
+
+Draw
+    ``element:set_draw_callback(cb)``
+
+    Set callback for additional drawing after the element’s components have been
+    drawn.  This gives the script direct control over the final texture when an
+    element item is drawn.
+
+    The callback is passed two arguments: the element state (an integer) and the
+    32-bit ARGB bitmap at the required size.  The callback must not attempt to
+    resize the bitmap.

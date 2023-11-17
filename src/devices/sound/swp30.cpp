@@ -4,6 +4,7 @@
 // Yamaha SWP30/30B, rompler/dsp combo
 
 #include "emu.h"
+#include "debugger.h"
 #include "swp30.h"
 
 static int scount = 0;
@@ -33,7 +34,7 @@ static int scount = 0;
   per-channel values for AWM2, but parts are isolated and renumbered
   for MEG regisrers or for general control functions.
 
-  Names we'll use in th rest of the text:
+  Names we'll use in the rest of the text:
   - reg(y, x) is the register at address 2*(y*0x40 + x)
   - ch<nn>  is reg(channel, nn) for a given AWG2 channel
   - sy<nn>  is reg(nn/2, 0xe + (nn % 2))
@@ -64,10 +65,10 @@ static int scount = 0;
   ch03       40ff at startup, 5010 always afterwards?
   ch04       fixed LPF resonance level
   ch05       unknown
-  ch06       attack,  bit 14-8 = step, bit 7 = skip
-  ch07       decay,   bit 14-8 = step, bit 7-0 = target attenuation (top 8 bits)
-  ch08       release, bit 14-8 = step, bit 7-0 = target attenuation (top 8 bits)
-  ch09       base volume  bit 15 = activate release, bit 14-8 unknown, bit 7-0 = initial attenuation
+  ch06       attack, bit 14-8 = step, bit 7 = mode
+  ch07       decay1, bit 14-8 = step, bit 7-0 = target attenuation (top 8 bits)
+  ch08       decay2, bit 14-8 = step, bit 7-0 = target attenuation (top 8 bits)
+  ch09       base volume  bit 15 = activate decay2, bit 14-8 unknown, bit 7-0 = initial attenuation
 
   ch0a-0d    unknown, probably something to do with pitch eg
   ch10       unknown
@@ -98,13 +99,6 @@ static int scount = 0;
   giving a value between 8 and 0x78000.  This value is added or
   substracted after each sample.
 
-  For attack the actual range of steps is 8..119, giving an increment
-  of 0x10 to 0x3c000, and a full sweep from -96dB to 0 in 95s (8) to
-  6.2ms (119).
-
-  For decay and release the range is 1..120, e.g. 9 to 0x40000, or
-  169s to 5.8ms for a full sweep.
-
 
     MEG:
 
@@ -123,7 +117,7 @@ static int scount = 0;
   Every 44100th of a second the 384 program steps are run once in
   order (no branches) to compute everything.
 
-  24 LFO registers are available (possibly more).  The LFO registers
+  24 LFO registers are available.  The LFO registers
   internal counters are 22 bits wide.  The LSB of the register gives
   the increment per sample, encoded in a special 3.5 format.
   With scale = 3bits and v = 5bits,
@@ -132,14 +126,16 @@ static int scount = 0;
     shift = { 0,  0,  1,   2,   3,   4,     5,    6 }
 
   The 21th bit of the counter inverts bits 20-0 on read, those are
-  interpreted as a 0-1 value, giving a sawtooth wave.
+  interpreted as a 0-1 value, giving a sawtooth wave.  When an
+  instruction uses the lfo, which one is selected by using pc/16.
 
   8 mappings can be setup, which allow to manage rotating buffers in
   the samples ram easily by automating masking and offset adding.  The
-  register format is: tttttsss oooooooo.  't' is not understood
-  yet. 's' is the sub-buffer size, defined as 1 << (10+s).  The base
-  offset is o << 10.  There are no alignment issues, e.g. you can have
-  a buffer at 0x28000 which is 0x10000 samples long.
+  register format is: pppppsss oooooooo.  'p' is the base pc/12 at
+  which the map starts to be used.  's' is the sub-buffer size,
+  defined as 1 << (10+s).  The base offset is o << 10.  There are no
+  alignment issues, e.g. you can have a buffer at 0x28000 which is
+  0x10000 samples long.
 
 
   fp<nnn>    fixed point 2.14 value associated with instruction nnn
@@ -165,136 +161,299 @@ static int scount = 0;
   ch35-37    routing for an AWM2 channel
 
 
-
 */
 
 
 DEFINE_DEVICE_TYPE(SWP30, swp30_device, "swp30", "Yamaha SWP30 sound chip")
 
-swp30_device::swp30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SWP30, tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-	  device_rom_interface(mconfig, *this),
-	  m_meg(*this, "meg")
+bool swp30_device::istep(s32 &value, s32 limit, s32 step)
 {
-	(void)m_map;
+	//  fprintf(stderr, "istep(%x, %x, %x)\n", value, limit, step);
+	if(value < limit) {
+		value += step;
+		if(value >= limit) {
+			value = limit;
+			return true;
+		}
+		return false;
+	}
+
+	if(value > limit) {
+		value -= step;
+		if(value <= limit) {
+			value = limit;
+			return true;
+		}
+		return false;
+	}
+
+	return true;
 }
 
-void swp30_device::device_add_mconfig(machine_config &config)
+s32 swp30_device::fpadd(s32 value, s32 step)
 {
-	MEGEMB(config, m_meg);
+	s32 e = value >> 24;
+	s32 m = value & 0xffffff;
+
+	m += step << e;
+	if(m & 0xfe000000)
+		return 0xfffffff;
+
+	while(m & 0x01000000) {
+		m <<= 1;
+		e ++;
+	}
+	if(e >= 16)
+		return 0xfffffff;
+	return (e << 24) | (m & 0xffffff);
+}
+
+s32 swp30_device::fpsub(s32 value, s32 step)
+{
+	s32 e = value >> 24;
+	s32 m = (value & 0xffffff) | 0xfe000000;
+	m = e < 0xc ? m - (step << e) : (m >> (e - 0xb)) - (step << 0xb);
+	if(m >= 0)
+		return 0;
+	if(e >= 0xc)
+		e = 0xb;
+	while(m < 0xfe000000) {
+		if(!e)
+			return 0;
+		e --;
+		m >>= 1;
+	}
+	while(e != 0xf && (m >= 0xff000000)) {
+		e ++;
+		m <<= 1;
+	}
+
+	return (e << 24) | (m & 0xffffff);
+}
+
+bool swp30_device::fpstep(s32 &value, s32 limit, s32 step)
+{
+	// value, limit and step are 4.24 but step has its exponent and
+	// top four bits zero
+
+	if(value == limit)
+		return true;
+	if(value < limit) {
+		value = fpadd(value, step);
+		if(value >= limit) {
+			value = limit;
+			return true;
+		}
+		return false;
+	}
+
+	value = fpsub(value, step);
+	if(value <= limit) {
+		value = limit;
+		return true;
+	}
+	return false;
+}
+
+// sample is signed 24.8
+s32 swp30_device::fpapply(s32 value, s32 sample)
+{
+	if(value >= 0x10000000)
+		return 0;
+	return (s64(sample) - ((s64(sample) * ((value >> 9) & 0x7fff)) >> 16)) >> (value >> 24);
+}
+
+// sample is signed 24.8
+s32 swp30_device::lpffpapply(s32 value, s32 sample)
+{
+	return ((((value >> 7) & 0x7fff) | 0x8000) * s64(sample)) >> (31 - (value >> 22));
+}
+
+// Some tables we picked up from the swp00.  May be different, may not be.
+
+const std::array<s32, 0x80> swp30_device::attack_linear_step = {
+	0x00027, 0x0002b, 0x0002f, 0x00033, 0x00037, 0x0003d, 0x00042, 0x00048,
+	0x0004d, 0x00056, 0x0005e, 0x00066, 0x0006f, 0x0007a, 0x00085, 0x00090,
+	0x0009b, 0x000ac, 0x000bd, 0x000cc, 0x000de, 0x000f4, 0x00109, 0x00120,
+	0x00135, 0x00158, 0x00179, 0x00199, 0x001bc, 0x001e7, 0x00214, 0x00240,
+	0x0026b, 0x002af, 0x002f2, 0x00332, 0x00377, 0x003d0, 0x0042c, 0x00480,
+	0x004dc, 0x0055e, 0x005e9, 0x0066e, 0x006f4, 0x007a4, 0x00857, 0x0090b,
+	0x009c3, 0x00acb, 0x00bd6, 0x00ce6, 0x00e00, 0x00f5e, 0x010d2, 0x01234,
+	0x0139e, 0x015d0, 0x017f3, 0x01a20, 0x01c4a, 0x01f52, 0x02232, 0x0250f,
+	0x027ff, 0x02c72, 0x03109, 0x0338b, 0x039c4, 0x04038, 0x04648, 0x04c84,
+	0x05262, 0x05c1c, 0x065af, 0x06f5c, 0x07895, 0x0866f, 0x09470, 0x0a19e,
+	0x0ae4c, 0x0c566, 0x0db8d, 0x0f00f, 0x10625, 0x12937, 0x14954, 0x16c17,
+	0x1886e, 0x1c71c, 0x20000, 0x239e1, 0x2647c, 0x2aaab, 0x2ecfc, 0x3241f,
+	0x35e51, 0x3a83b, 0x40000, 0x4325c, 0x47dc1, 0x4c8f9, 0x50505, 0x55555,
+	0x58160, 0x5d174, 0x60606, 0x62b2e, 0x67b24, 0x6a63c, 0x6d3a0, 0x6eb3e,
+	0x71c72, 0x73616, 0x75075, 0x76b98, 0x78788, 0x78788, 0x7a44c, 0x7a44c,
+	0x7a44c, 0x7a44c, 0x7a44c, 0x7a44c, 0x7a44c, 0x7a44c, 0x7a44c, 0x7a44c,
+};
+
+const std::array<s32, 0x20> swp30_device::decay_linear_step = {
+	0x15083, 0x17ad2, 0x1a41a, 0x1cbe7, 0x1f16d, 0x22ef1, 0x26a44, 0x2a1e4,
+	0x2da35, 0x34034, 0x3a197, 0x40000, 0x45b82, 0x4b809, 0x51833, 0x57262,
+	0x5d9f7, 0x6483f, 0x6b15c, 0x71c72, 0x77976, 0x7d119, 0x83127, 0x88889,
+	0x8d3dd, 0x939a8, 0x991f2, 0x9d89e, 0xa0a0a, 0xa57eb, 0xa72f0, 0xac769,
+};
+
+// Actual shape of the lfos unknown, since the hardware accepts 4 and
+// 3 are in use (0, 1 and 3) and no recording are currently available
+
+const std::array<u32, 4> swp30_device::lfo_shape_centered_saw = { 0x00000000, 0x00000000, 0xfff00000, 0xfff00000 }; // --////--
+const std::array<u32, 4> swp30_device::lfo_shape_centered_tri = { 0x00000000, 0x0007ffff, 0xfff7ffff, 0xfff00000 }; // --/\/\--
+const std::array<u32, 4> swp30_device::lfo_shape_offset_saw   = { 0x00000000, 0x00000000, 0x00000000, 0x00000000 }; // __////__
+const std::array<u32, 4> swp30_device::lfo_shape_offset_tri   = { 0x00000000, 0x00000000, 0x000fffff, 0x000fffff }; // __/\/\__
+
+swp30_device::swp30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: cpu_device(mconfig, SWP30, tag, owner, clock),
+	  device_sound_interface(mconfig, *this),
+	  m_program_config("meg_program", ENDIANNESS_LITTLE, 64, 9, -3, address_map_constructor(FUNC(swp30_device::meg_prg_map), this)),
+	  m_rom_config("sample_rom", ENDIANNESS_LITTLE, 32, 25, -2),
+	  m_reverb_config("reverb_ram", ENDIANNESS_LITTLE, 16, 18, -1, address_map_constructor(FUNC(swp30_device::meg_reverb_map), this))
+{
 }
 
 void swp30_device::device_start()
 {
+	m_program = &space(AS_PROGRAM);
+	m_rom     = &space(AS_DATA);
+	m_reverb  = &space(AS_REVERB);
+	m_rom->cache(m_rom_cache);
+	m_reverb->cache(m_reverb_cache);
+
+	state_add(STATE_GENPC,     "GENPC",     m_meg_pc).noshow();
+	state_add(STATE_GENPCBASE, "CURPC",     m_meg_pc).noshow();
+	state_add(0,               "PC",        m_meg_pc);
+
+	set_icountptr(m_icount);
+
 	m_stream = stream_alloc(0, 2, 44100, STREAM_SYNCHRONOUS);
 
-	// Attenuation for panning is 4.4 floating point.  That means 0
-	// to -96.3dB.  Since it's a nice range, we assume it's the same
-	// for other attenuation values.  Computed value is 1.16
-	// format, to avoid overflow
-
-	for(int i=0; i<256; i++)
-		m_linear_attenuation[i] = ((32 - (i & 15)) << (0xf ^ (i >> 4))) >> 4;
-
-	// Relative playback frequency of a sample is encoded on signed 14
-	// bits.  The scale is logarithmic, with 0x400 = 1 octave (e.g. *2
-	// or /2).
-
-	for(int i=-0x2000; i<0x2000; i++)
-		m_sample_increment[i & 0x3fff] = 256 * pow(2, i/1024.0);
-
-	// Log to linear 8-bits sample decompression.  Statistics say
-	// that's what it should look like.  Note that 0 can be encoded
-	// both as 0x00 and 0x80, and as it happens 0x80 is never used in
-	// these samples.  Ends up with a 55dB dynamic range, to compare
-	// with 8bits 48dB, 12bits 72dB and 16bits 96dB.
-
-	//  Rescale so that it's roughly 16 bits.  Range ends up being +/- 78c0.
-
-	for(int i=0; i<32; i++) {
-		m_sample_log8[     i] =  i << 0;
-		m_sample_log8[0x20|i] = (i << 1) + 0x21;
-		m_sample_log8[0x40|i] = (i << 2) + 0x62;
-		m_sample_log8[0x60|i] = (i << 3) + 0xe3;
+	for(int i=0; i != 128; i++) {
+		u32 v = 0;
+		switch(i >> 3) {
+		default:  v = ((i & 7) + 8) << (1 + (i >> 3)); break;
+		case 0xb: v = ((i & 7) + 4) << 13; break;
+		case 0xc: v = ((i & 6) + 6) << 14; break;
+		case 0xd: v = ((i & 4) + 7) << 15; break;
+		case 0xe: v = 15 << 15; break;
+		case 0xf: v = 31 << 15; break;
+		}
+		m_global_step[i] = v;
 	}
+
+	// Delta-packed samples decompression.
+
 	for(int i=0; i<128; i++) {
-		m_sample_log8[i] =  m_sample_log8[i] << 6;
-		m_sample_log8[i | 0x80] = -m_sample_log8[i];
+		s16 base = ((i & 0x1f) << (5+(i >> 5))) + (((1 << (i >> 5))-1) << 10);
+		m_dpcm[i | 0x80] = - base;
+		m_dpcm[i]        = + base;
 	}
-
-	save_item(NAME(m_program));
 
 	save_item(NAME(m_keyon_mask));
 
-	save_item(NAME(m_pre_size));
-	save_item(NAME(m_post_size));
-	save_item(NAME(m_address));
+	save_item(NAME(m_sample_start));
+	save_item(NAME(m_sample_end));
+	save_item(NAME(m_sample_address));
+	save_item(NAME(m_pitch));
 
+	save_item(NAME(m_release_glo));
+
+	save_item(NAME(m_lfo_step_pmod));
+	save_item(NAME(m_lfo_amod));
+
+	save_item(NAME(m_attack));
+	save_item(NAME(m_decay1));
+	save_item(NAME(m_decay2));
+
+	save_item(NAME(m_lfo_phase));
 	save_item(NAME(m_sample_pos));
+	save_item(NAME(m_envelope_level));
+	save_item(NAME(m_envelope_on_timer));
+	save_item(NAME(m_envelope_timer));
+	save_item(NAME(m_decay2_done));
+	save_item(NAME(m_envelope_mode));
+	save_item(NAME(m_glo_level_cur));
+
+	save_item(NAME(m_dpcm_current));
+	save_item(NAME(m_dpcm_next));
+	save_item(NAME(m_dpcm_address));
+
 	save_item(NAME(m_sample_history));
 
-	save_item(NAME(m_program_pfp));
-	save_item(NAME(m_program_pint));
-	save_item(NAME(m_program_plfo));
-
-	save_item(NAME(m_base_volume));
-	save_item(NAME(m_current_volume));
-	save_item(NAME(m_mode));
-	save_item(NAME(m_freq));
-	save_item(NAME(m_pan));
-	save_item(NAME(m_attack));
-	save_item(NAME(m_decay));
-	save_item(NAME(m_release));
 	save_item(NAME(m_lpf_cutoff));
 	save_item(NAME(m_lpf_cutoff_inc));
 	save_item(NAME(m_lpf_reso));
 	save_item(NAME(m_hpf_cutoff));
 	save_item(NAME(m_eq_filter));
-	save_item(NAME(m_routing));
 
 	save_item(NAME(m_internal_adr));
 
-	save_item(NAME(m_program_address));
+	save_item(NAME(m_meg_program_address));
 	save_item(NAME(m_waverom_adr));
 	save_item(NAME(m_waverom_mode));
 	save_item(NAME(m_waverom_access));
 	save_item(NAME(m_waverom_val));
+
+	save_item(NAME(m_meg_program));
+	save_item(NAME(m_meg_const));
+	save_item(NAME(m_meg_offset));
+	save_item(NAME(m_meg_lfo));
+	save_item(NAME(m_meg_map));
+
+	save_item(STRUCT_MEMBER(m_mixer, vol));
+	save_item(STRUCT_MEMBER(m_mixer, route));
 }
 
 void swp30_device::device_reset()
 {
-	memset(m_program, 0, sizeof(m_program));
-
 	m_keyon_mask = 0;
 
-	memset(m_pre_size, 0, sizeof(m_pre_size));
-	memset(m_post_size, 0, sizeof(m_post_size));
-	memset(m_address, 0, sizeof(m_address));
+	std::fill(m_sample_start.begin(), m_sample_start.end(), 0);
+	std::fill(m_sample_end.begin(), m_sample_end.end(), 0);
+	std::fill(m_sample_address.begin(), m_sample_address.end(), 0);
+	std::fill(m_pitch.begin(), m_pitch.end(), 0);
 
-	memset(m_sample_pos, 0, sizeof(m_sample_pos));
+	std::fill(m_release_glo.begin(), m_release_glo.end(), 0);
+
+	std::fill(m_lfo_step_pmod.begin(), m_lfo_step_pmod.end(), 0);
+	std::fill(m_lfo_amod.begin(), m_lfo_amod.end(), 0);
+
+	std::fill(m_attack.begin(), m_attack.end(), 0);
+	std::fill(m_decay1.begin(), m_decay1.end(), 0);
+	std::fill(m_decay2.begin(), m_decay2.end(), 0);
+
+	std::fill(m_lfo_phase.begin(), m_lfo_phase.end(), 0);
+	std::fill(m_sample_pos.begin(), m_sample_pos.end(), 0);
+	std::fill(m_envelope_level.begin(), m_envelope_level.end(), 0);
+	std::fill(m_envelope_timer.begin(), m_envelope_timer.end(), 0);
+	std::fill(m_envelope_on_timer.begin(), m_envelope_on_timer.end(), false);
+	std::fill(m_decay2_done.begin(), m_decay2_done.end(), false);
+	std::fill(m_envelope_mode.begin(), m_envelope_mode.end(), IDLE);
+	std::fill(m_glo_level_cur.begin(), m_glo_level_cur.end(), 0);
+
+	std::fill(m_dpcm_current.begin(), m_dpcm_current.end(), false);
+	std::fill(m_dpcm_next.begin(), m_dpcm_next.end(), false);
+	std::fill(m_dpcm_address.begin(), m_dpcm_address.end(), false);
+
+	std::fill(m_meg_program.begin(), m_meg_program.end(), 0);
+	std::fill(m_meg_const.begin(), m_meg_const.end(), 0);
+	std::fill(m_meg_offset.begin(), m_meg_offset.end(), 0);
+	std::fill(m_meg_lfo.begin(), m_meg_lfo.end(), 0);
+	std::fill(m_meg_map.begin(), m_meg_map.end(), 0);
+
+	std::fill(m_mixer.begin(), m_mixer.end(), mixer_slot());
+
 	memset(m_sample_history, 0, sizeof(m_sample_history));
 
-	memset(m_program_pfp, 0, sizeof(m_program_pfp));
-	memset(m_program_pint, 0, sizeof(m_program_pint));
-	memset(m_program_plfo, 0, sizeof(m_program_plfo));
-
-	memset(m_base_volume, 0, sizeof(m_base_volume));
-	memset(m_current_volume, 0, sizeof(m_current_volume));
-	memset(m_mode, IDLE, sizeof(m_mode));
-	memset(m_freq, 0, sizeof(m_freq));
-	memset(m_pan, 0, sizeof(m_pan));
-	memset(m_attack, 0, sizeof(m_attack));
-	memset(m_decay, 0, sizeof(m_decay));
-	memset(m_release, 0, sizeof(m_release));
 	memset(m_lpf_cutoff, 0, sizeof(m_lpf_cutoff));
 	memset(m_lpf_cutoff_inc, 0, sizeof(m_lpf_cutoff_inc));
 	memset(m_lpf_reso, 0, sizeof(m_lpf_reso));
 	memset(m_hpf_cutoff, 0, sizeof(m_hpf_cutoff));
 	memset(m_eq_filter, 0, sizeof(m_eq_filter));
-	memset(m_routing, 0, sizeof(m_routing));
 
-	m_program_address = 0;
+	m_meg_program_address = 0;
 	m_waverom_adr = 0;
 	m_waverom_mode = 0;
 	m_waverom_access = 0;
@@ -310,20 +469,21 @@ void swp30_device::map(address_map &map)
 	rchan(map, 0x02).rw(FUNC(swp30_device::hpf_cutoff_r), FUNC(swp30_device::hpf_cutoff_w));
 	// 03 seems to always get 5010 except at startup where it's 40ff
 	rchan(map, 0x04).rw(FUNC(swp30_device::lpf_reso_r), FUNC(swp30_device::lpf_reso_w));
-	// 05 missing
+	rchan(map, 0x05).rw(FUNC(swp30_device::lfo_amod_r), FUNC(swp30_device::lfo_amod_w));
 	rchan(map, 0x06).rw(FUNC(swp30_device::attack_r), FUNC(swp30_device::attack_w));
-	rchan(map, 0x07).rw(FUNC(swp30_device::decay_r), FUNC(swp30_device::decay_w));
-	rchan(map, 0x08).rw(FUNC(swp30_device::release_r), FUNC(swp30_device::release_w));
-	rchan(map, 0x09).rw(FUNC(swp30_device::base_volume_r), FUNC(swp30_device::base_volume_w));
-	// 0a-0d missing
+	rchan(map, 0x07).rw(FUNC(swp30_device::decay1_r), FUNC(swp30_device::decay1_w));
+	rchan(map, 0x08).rw(FUNC(swp30_device::decay2_r), FUNC(swp30_device::decay2_w));
+	rchan(map, 0x09).rw(FUNC(swp30_device::release_glo_r), FUNC(swp30_device::release_glo_w));
+	rchan(map, 0x0a).rw(FUNC(swp30_device::lfo_step_pmod_r), FUNC(swp30_device::lfo_step_pmod_w));
+	// 0b-0d missing
 	// 10 missing
-	rchan(map, 0x11).rw(FUNC(swp30_device::freq_r), FUNC(swp30_device::freq_w));
-	rchan(map, 0x12).rw(FUNC(swp30_device::pre_size_h_r), FUNC(swp30_device::pre_size_h_w));
-	rchan(map, 0x13).rw(FUNC(swp30_device::pre_size_l_r), FUNC(swp30_device::pre_size_l_w));
-	rchan(map, 0x14).rw(FUNC(swp30_device::post_size_h_r), FUNC(swp30_device::post_size_h_w));
-	rchan(map, 0x15).rw(FUNC(swp30_device::post_size_l_r), FUNC(swp30_device::post_size_l_w));
-	rchan(map, 0x16).rw(FUNC(swp30_device::address_h_r), FUNC(swp30_device::address_h_w));
-	rchan(map, 0x17).rw(FUNC(swp30_device::address_l_r), FUNC(swp30_device::address_l_w));
+	rchan(map, 0x11).rw(FUNC(swp30_device::pitch_r), FUNC(swp30_device::pitch_w));
+	rchan(map, 0x12).rw(FUNC(swp30_device::sample_start_h_r), FUNC(swp30_device::sample_start_h_w));
+	rchan(map, 0x13).rw(FUNC(swp30_device::sample_start_l_r), FUNC(swp30_device::sample_start_l_w));
+	rchan(map, 0x14).rw(FUNC(swp30_device::sample_end_h_r), FUNC(swp30_device::sample_end_h_w));
+	rchan(map, 0x15).rw(FUNC(swp30_device::sample_end_l_r), FUNC(swp30_device::sample_end_l_w));
+	rchan(map, 0x16).rw(FUNC(swp30_device::sample_address_h_r), FUNC(swp30_device::sample_address_h_w));
+	rchan(map, 0x17).rw(FUNC(swp30_device::sample_address_l_r), FUNC(swp30_device::sample_address_l_w));
 	rchan(map, 0x20).rw(FUNC(swp30_device::eq_filter_r<0>), FUNC(swp30_device::eq_filter_w<0>));
 	rchan(map, 0x22).rw(FUNC(swp30_device::eq_filter_r<1>), FUNC(swp30_device::eq_filter_w<1>));
 	rchan(map, 0x24).rw(FUNC(swp30_device::eq_filter_r<2>), FUNC(swp30_device::eq_filter_w<2>));
@@ -331,13 +491,6 @@ void swp30_device::map(address_map &map)
 	rchan(map, 0x28).rw(FUNC(swp30_device::eq_filter_r<4>), FUNC(swp30_device::eq_filter_w<4>));
 	rchan(map, 0x2a).rw(FUNC(swp30_device::eq_filter_r<5>), FUNC(swp30_device::eq_filter_w<5>));
 	// 2c-2f missing
-	rchan(map, 0x32).rw(FUNC(swp30_device::pan_r), FUNC(swp30_device::pan_w));
-	rchan(map, 0x33).rw(FUNC(swp30_device::dry_rev_r), FUNC(swp30_device::dry_rev_w));
-	rchan(map, 0x34).rw(FUNC(swp30_device::cho_var_r), FUNC(swp30_device::cho_var_w));
-	rchan(map, 0x35).rw(FUNC(swp30_device::routing_r<0>), FUNC(swp30_device::routing_w<0>));
-	rchan(map, 0x36).rw(FUNC(swp30_device::routing_r<1>), FUNC(swp30_device::routing_w<1>));
-	rchan(map, 0x37).rw(FUNC(swp30_device::routing_r<2>), FUNC(swp30_device::routing_w<2>));
-	// 38-3d missing, are special
 
 	// Control registers
 	// These appear as channel slots 0x0e and 0x0f
@@ -358,32 +511,46 @@ void swp30_device::map(address_map &map)
 	rctrl(map, 0x0f).rw(FUNC(swp30_device::keyon_mask_r<0>), FUNC(swp30_device::keyon_mask_w<0>));
 	rctrl(map, 0x10).rw(FUNC(swp30_device::keyon_r), FUNC(swp30_device::keyon_w));
 	// 11-20 missing
-	rctrl(map, 0x21).rw(FUNC(swp30_device::prg_address_r), FUNC(swp30_device::prg_address_w));
-	rctrl(map, 0x22).rw(FUNC(swp30_device::prg_r<0>), FUNC(swp30_device::prg_w<0>));
-	rctrl(map, 0x23).rw(FUNC(swp30_device::prg_r<1>), FUNC(swp30_device::prg_w<1>));
-	rctrl(map, 0x24).rw(FUNC(swp30_device::prg_r<2>), FUNC(swp30_device::prg_w<2>));
-	rctrl(map, 0x25).rw(FUNC(swp30_device::prg_r<3>), FUNC(swp30_device::prg_w<3>));
+	rctrl(map, 0x21).rw(FUNC(swp30_device::meg_prg_address_r), FUNC(swp30_device::meg_prg_address_w));
+	rctrl(map, 0x22).rw(FUNC(swp30_device::meg_prg_r<0>), FUNC(swp30_device::meg_prg_w<0>));
+	rctrl(map, 0x23).rw(FUNC(swp30_device::meg_prg_r<1>), FUNC(swp30_device::meg_prg_w<1>));
+	rctrl(map, 0x24).rw(FUNC(swp30_device::meg_prg_r<2>), FUNC(swp30_device::meg_prg_w<2>));
+	rctrl(map, 0x25).rw(FUNC(swp30_device::meg_prg_r<3>), FUNC(swp30_device::meg_prg_w<3>));
 	// 26-7f missing
-	rctrl(map, 0x30).rw(FUNC(swp30_device::map_r<0>), FUNC(swp30_device::map_w<0>));
-	rctrl(map, 0x32).rw(FUNC(swp30_device::map_r<1>), FUNC(swp30_device::map_w<1>));
-	rctrl(map, 0x34).rw(FUNC(swp30_device::map_r<2>), FUNC(swp30_device::map_w<2>));
-	rctrl(map, 0x36).rw(FUNC(swp30_device::map_r<3>), FUNC(swp30_device::map_w<3>));
-	rctrl(map, 0x38).rw(FUNC(swp30_device::map_r<4>), FUNC(swp30_device::map_w<4>));
-	rctrl(map, 0x3a).rw(FUNC(swp30_device::map_r<5>), FUNC(swp30_device::map_w<5>));
-	rctrl(map, 0x3c).rw(FUNC(swp30_device::map_r<6>), FUNC(swp30_device::map_w<6>));
-	rctrl(map, 0x3e).rw(FUNC(swp30_device::map_r<7>), FUNC(swp30_device::map_w<7>));
+	rctrl(map, 0x30).rw(FUNC(swp30_device::meg_map_r<0>), FUNC(swp30_device::meg_map_w<0>));
+	rctrl(map, 0x32).rw(FUNC(swp30_device::meg_map_r<1>), FUNC(swp30_device::meg_map_w<1>));
+	rctrl(map, 0x34).rw(FUNC(swp30_device::meg_map_r<2>), FUNC(swp30_device::meg_map_w<2>));
+	rctrl(map, 0x36).rw(FUNC(swp30_device::meg_map_r<3>), FUNC(swp30_device::meg_map_w<3>));
+	rctrl(map, 0x38).rw(FUNC(swp30_device::meg_map_r<4>), FUNC(swp30_device::meg_map_w<4>));
+	rctrl(map, 0x3a).rw(FUNC(swp30_device::meg_map_r<5>), FUNC(swp30_device::meg_map_w<5>));
+	rctrl(map, 0x3c).rw(FUNC(swp30_device::meg_map_r<6>), FUNC(swp30_device::meg_map_w<6>));
+	rctrl(map, 0x3e).rw(FUNC(swp30_device::meg_map_r<7>), FUNC(swp30_device::meg_map_w<7>));
 
 	// MEG registers
-	rchan(map, 0x21).rw(FUNC(swp30_device::prg_fp_r<0>), FUNC(swp30_device::prg_fp_w<0>));
-	rchan(map, 0x23).rw(FUNC(swp30_device::prg_fp_r<1>), FUNC(swp30_device::prg_fp_w<1>));
-	rchan(map, 0x25).rw(FUNC(swp30_device::prg_fp_r<2>), FUNC(swp30_device::prg_fp_w<2>));
-	rchan(map, 0x27).rw(FUNC(swp30_device::prg_fp_r<3>), FUNC(swp30_device::prg_fp_w<3>));
-	rchan(map, 0x29).rw(FUNC(swp30_device::prg_fp_r<4>), FUNC(swp30_device::prg_fp_w<4>));
-	rchan(map, 0x2b).rw(FUNC(swp30_device::prg_fp_r<5>), FUNC(swp30_device::prg_fp_w<5>));
-	rchan(map, 0x30).rw(FUNC(swp30_device::prg_off_r<0>), FUNC(swp30_device::prg_off_w<0>));
-	rchan(map, 0x31).rw(FUNC(swp30_device::prg_off_r<1>), FUNC(swp30_device::prg_off_w<1>));
-	rchan(map, 0x3e).rw(FUNC(swp30_device::prg_lfo_r<0>), FUNC(swp30_device::prg_lfo_w<0>));
-	rchan(map, 0x3f).rw(FUNC(swp30_device::prg_lfo_r<1>), FUNC(swp30_device::prg_lfo_w<1>));
+	rchan(map, 0x21).rw(FUNC(swp30_device::meg_const_r<0>), FUNC(swp30_device::meg_const_w<0>));
+	rchan(map, 0x23).rw(FUNC(swp30_device::meg_const_r<1>), FUNC(swp30_device::meg_const_w<1>));
+	rchan(map, 0x25).rw(FUNC(swp30_device::meg_const_r<2>), FUNC(swp30_device::meg_const_w<2>));
+	rchan(map, 0x27).rw(FUNC(swp30_device::meg_const_r<3>), FUNC(swp30_device::meg_const_w<3>));
+	rchan(map, 0x29).rw(FUNC(swp30_device::meg_const_r<4>), FUNC(swp30_device::meg_const_w<4>));
+	rchan(map, 0x2b).rw(FUNC(swp30_device::meg_const_r<5>), FUNC(swp30_device::meg_const_w<5>));
+	rchan(map, 0x30).rw(FUNC(swp30_device::meg_offset_r<0>), FUNC(swp30_device::meg_offset_w<0>));
+	rchan(map, 0x31).rw(FUNC(swp30_device::meg_offset_r<1>), FUNC(swp30_device::meg_offset_w<1>));
+	rchan(map, 0x3e).rw(FUNC(swp30_device::meg_lfo_r<0>), FUNC(swp30_device::meg_lfo_w<0>));
+	rchan(map, 0x3f).rw(FUNC(swp30_device::meg_lfo_r<1>), FUNC(swp30_device::meg_lfo_w<1>));
+
+	// Mixer registers
+	rchan(map, 0x32).rw(FUNC(swp30_device::vol_r  <0x00|0>), FUNC(swp30_device::vol_w  <0x00|0>));
+	rchan(map, 0x33).rw(FUNC(swp30_device::vol_r  <0x00|1>), FUNC(swp30_device::vol_w  <0x00|1>));
+	rchan(map, 0x34).rw(FUNC(swp30_device::vol_r  <0x00|2>), FUNC(swp30_device::vol_w  <0x00|2>));
+	rchan(map, 0x35).rw(FUNC(swp30_device::route_r<0x00|0>), FUNC(swp30_device::route_w<0x00|0>));
+	rchan(map, 0x36).rw(FUNC(swp30_device::route_r<0x00|1>), FUNC(swp30_device::route_w<0x00|1>));
+	rchan(map, 0x37).rw(FUNC(swp30_device::route_r<0x00|2>), FUNC(swp30_device::route_w<0x00|2>));
+	rchan(map, 0x38).rw(FUNC(swp30_device::vol_r  <0x40|0>), FUNC(swp30_device::vol_w  <0x40|0>));
+	rchan(map, 0x39).rw(FUNC(swp30_device::vol_r  <0x40|1>), FUNC(swp30_device::vol_w  <0x40|1>));
+	rchan(map, 0x3a).rw(FUNC(swp30_device::vol_r  <0x40|2>), FUNC(swp30_device::vol_w  <0x40|2>));
+	rchan(map, 0x3b).rw(FUNC(swp30_device::route_r<0x40|0>), FUNC(swp30_device::route_w<0x40|0>));
+	rchan(map, 0x3c).rw(FUNC(swp30_device::route_r<0x40|1>), FUNC(swp30_device::route_w<0x40|1>));
+	rchan(map, 0x3d).rw(FUNC(swp30_device::route_r<0x40|2>), FUNC(swp30_device::route_w<0x40|2>));
 }
 
 // Control registers
@@ -404,63 +571,88 @@ u16 swp30_device::keyon_r()
 
 void swp30_device::keyon_w(u16)
 {
-	for(int i=0; i<64; i++) {
-		u64 mask = u64(1) << i;
+	for(int chan=0; chan<64; chan++) {
+		u64 mask = u64(1) << chan;
 		if(m_keyon_mask & mask) {
-			m_sample_pos[i] = -s32(m_pre_size[i] << 8);
-			m_current_volume[i] = (m_base_volume[i] & 0xff) << (26-8);
-			change_mode(i, m_base_volume[i] & 0x8000 ? RELEASE : m_attack[i] & 0x80 ? DECAY : ATTACK);
+			m_sample_pos[chan] = -(m_sample_start[chan] & 0xffffff) << 8;
+			if(m_release_glo[chan] & 0x8000) {
+				m_envelope_level[chan] = 0;
+				m_envelope_on_timer[chan] = false;
+				m_envelope_mode[chan] = RELEASE;
+			} else if(m_attack[chan] & 0x80) {
+				m_envelope_level[chan] = 0x8000000;
+				m_envelope_on_timer[chan] = false;
+				m_envelope_mode[chan] = ATTACK;
+			} else {
+				m_envelope_level[chan] = 0;
+				m_envelope_on_timer[chan] = true;
+				m_envelope_timer[chan] = 0x8000000;
+				m_envelope_mode[chan] = ATTACK;
+			}
+
+			m_decay2_done[chan] = false;
+			m_glo_level_cur[chan] = (m_release_glo[chan] & 0xff) << 4;
+
+			m_dpcm_current[chan] = 0;
+			m_dpcm_next[chan] = 0;
+			s32 dt = m_sample_start[chan] & 0xffffff;
+			if(m_sample_end[chan] & 0x80000000)
+				dt = -dt;
+			m_dpcm_address[chan] = ((m_sample_address[chan] & 0xffffff) << 2) - dt;
+
+			m_lfo_phase[chan] = 0;
 
 			if(1)
-				logerror("[%08d] keyon %02x %08x %08x %08x vol %04x env %04x %04x %04x pan %04x disp %04x %04x\n", scount, i, m_pre_size[i], m_post_size[i], m_address[i], m_base_volume[i], m_attack[i], m_decay[i], m_release[i], m_pan[i], m_dry_rev[i], m_cho_var[i]);
+				logerror("[%08d] keyon %02x %08x %08x %08x vol %04x env %04x %04x %04x\n", scount, chan, m_sample_start[chan], m_sample_end[chan], m_sample_address[chan], m_release_glo[chan], m_attack[chan], m_decay1[chan], m_decay2[chan]);
 		}
 	}
 	m_keyon_mask = 0;
 }
 
 
-u16 swp30_device::prg_address_r()
+u16 swp30_device::meg_prg_address_r()
 {
-	return m_program_address;
+	return m_meg_program_address;
 }
 
-void swp30_device::prg_address_w(u16 data)
+void swp30_device::meg_prg_address_w(u16 data)
 {
-	m_program_address = data;
-	if(m_program_address >= 0x180)
-		m_program_address = 0;
+	m_meg_program_address = data;
+	if(m_meg_program_address >= 0x180)
+		m_meg_program_address = 0;
 }
 
-template<int sel> u16 swp30_device::prg_r()
+template<int sel> u16 swp30_device::meg_prg_r()
 {
 	constexpr offs_t shift = 48-16*sel;
-	return m_meg->prg_r(m_program_address) >> shift;
+	return m_meg_program[m_meg_program_address] >> shift;
 }
 
-template<int sel> void swp30_device::prg_w(u16 data)
+template<int sel> void swp30_device::meg_prg_w(u16 data)
 {
 	constexpr offs_t shift = 48-16*sel;
 	constexpr u64 mask = ~(u64(0xffff) << shift);
-	m_meg->prg_w(m_program_address, (m_meg->prg_r(m_program_address) & mask) | (u64(data) << shift));
+	m_meg_program[m_meg_program_address] = (m_meg_program[m_meg_program_address] & mask) | (u64(data) << shift);
 
 	if(sel == 3) {
 		if(0)
-			logerror("program %03x %016x\n", m_program_address, m_program[m_program_address]);
-		m_program_address ++;
-		if(m_program_address == 0x180)
-			m_program_address = 0;
+			logerror("program %03x %016x\n", m_meg_program_address, m_meg_program[m_meg_program_address]);
+		m_meg_program_address ++;
+		if(m_meg_program_address == 0x180)
+			m_meg_program_address = 0;
 	}
 }
 
 
-template<int sel> u16 swp30_device::map_r()
+template<int sel> u16 swp30_device::meg_map_r()
 {
-	return m_meg->map_r(sel);
+	return m_meg_map[sel];
 }
 
-template<int sel> void swp30_device::map_w(u16 data)
+template<int sel> void swp30_device::meg_map_w(u16 data)
 {
-	m_meg->map_w(sel, data);
+	m_meg_map[sel] = data;
+	logerror("map %x  pc = %03x  base = %05x  size = %05x\n", sel, 12*(data >> 11), (data & 0xff) << 10, 0x400 << ((data >> 8) & 7));
 }
 
 
@@ -494,7 +686,7 @@ void swp30_device::waverom_access_w(u16 data)
 {
 	m_waverom_access = data;
 	if(data == 0x8000) {
-		m_waverom_val = read_dword(m_waverom_adr << 2);
+		m_waverom_val = m_rom_cache.read_dword(m_waverom_adr);
 		logerror("waverom read adr=%08x mode=%08x -> %08x\n", m_waverom_adr, m_waverom_mode, m_waverom_val);
 	}
 }
@@ -579,84 +771,54 @@ template<int coef> void swp30_device::eq_filter_w(offs_t offset, u16 data)
 	m_eq_filter[offset >> 6][coef] = data;
 }
 
-template<int sel> u16 swp30_device::routing_r(offs_t offset)
+template<int sel> u16 swp30_device::vol_r(offs_t offset)
 {
-	return m_routing[offset >> 6][sel];
+	return m_mixer[(sel & 0x40) | (offset >> 6)].vol[sel & 3];
 }
 
-template<int sel> void swp30_device::routing_w(offs_t offset, u16 data)
+template<int sel> void swp30_device::vol_w(offs_t offset, u16 data)
 {
-	m_routing[offset >> 6][sel] = data;
+	m_mixer[(sel & 0x40) | (offset >> 6)].vol[sel & 3] = data;
 }
 
-u16 swp30_device::base_volume_r(offs_t offset)
+template<int sel> u16 swp30_device::route_r(offs_t offset)
 {
-	return m_base_volume[offset >> 6];
+	return m_mixer[(sel & 0x40) | (offset >> 6)].route[sel & 3];
 }
 
-void swp30_device::base_volume_w(offs_t offset, u16 data)
+template<int sel> void swp30_device::route_w(offs_t offset, u16 data)
 {
-	u8 chan = offset >> 6;
-	if(1 && m_base_volume[chan] != data)
-		logerror("snd chan %02x volume %02x %02x\n", chan, data >> 8, data & 0xff);
-	m_base_volume[chan] = data;
-	if((data & 0x8000) && m_mode[chan] != IDLE && m_mode[chan] != RELEASE)
-		change_mode(chan, RELEASE);
+	m_mixer[(sel & 0x40) | (offset >> 6)].route[sel & 3] = data;
 }
 
-
-u16 swp30_device::pan_r(offs_t offset)
+u16 swp30_device::release_glo_r(offs_t offset)
 {
-	return m_pan[offset >> 6];
+	return m_release_glo[offset >> 6];
 }
 
-void swp30_device::pan_w(offs_t offset, u16 data)
+void swp30_device::release_glo_w(offs_t offset, u16 data)
 {
 	u8 chan = offset >> 6;
-	if(0 && m_pan[chan] != data)
-		logerror("snd chan %02x pan l %02x r %02x\n", chan, data >> 8, data & 0xff);
-	m_pan[chan] = data;
+	if(1 && m_release_glo[chan] != data)
+		logerror("snd chan %02x rel/glo %02x %02x\n", chan, data >> 8, data & 0xff);
+	m_release_glo[chan] = data;
+	if((data & 0x8000) && m_envelope_mode[chan] != IDLE && m_envelope_mode[chan] != RELEASE)
+		m_envelope_mode[chan] = RELEASE;
 }
 
-u16 swp30_device::dry_rev_r(offs_t offset)
+u16 swp30_device::pitch_r(offs_t offset)
 {
-	return m_dry_rev[offset >> 6];
+	return m_pitch[offset >> 6];
 }
 
-void swp30_device::dry_rev_w(offs_t offset, u16 data)
-{
-	u8 chan = offset >> 6;
-	if(0 && m_dry_rev[chan] != data)
-		logerror("snd chan %02x dry %02x rev %02x\n", chan, data >> 8, data & 0xff);
-	m_dry_rev[chan] = data;
-}
-
-u16 swp30_device::cho_var_r(offs_t offset)
-{
-	return m_cho_var[offset >> 6];
-}
-
-void swp30_device::cho_var_w(offs_t offset, u16 data)
-{
-	u8 chan = offset >> 6;
-	if(0 && m_cho_var[chan] != data)
-		logerror("snd chan %02x cho %02x var %02x\n", chan, data >> 8, data & 0xff);
-	m_cho_var[chan] = data;
-}
-
-u16 swp30_device::freq_r(offs_t offset)
-{
-	return m_freq[offset >> 6];
-}
-
-void swp30_device::freq_w(offs_t offset, u16 data)
+void swp30_device::pitch_w(offs_t offset, u16 data)
 {
 	u8 chan = offset >> 6;
 	//  delta is 4*256 per octave, positive means higher freq, e.g 4.10 format.
 	s16 v = data & 0x2000 ? data | 0xc000 : data;
-	if(0 && m_freq[chan] != data)
-		logerror("snd chan %02x freq %c%c %d.%03x\n", chan, data & 0x8000 ? '#' : '.', data & 0x4000 ? '#' : '.', v / 1024, (v < 0 ? -v : v) & 0x3ff);
-	m_freq[chan] = data;
+	if(0 && m_pitch[chan] != data)
+		logerror("snd chan %02x pitch %c%c %d.%03x\n", chan, data & 0x8000 ? '#' : '.', data & 0x4000 ? '#' : '.', v / 1024, (v < 0 ? -v : v) & 0x3ff);
+	m_pitch[chan] = data;
 }
 
 u16 swp30_device::attack_r(offs_t offset)
@@ -666,100 +828,124 @@ u16 swp30_device::attack_r(offs_t offset)
 
 void swp30_device::attack_w(offs_t offset, u16 data)
 {
+	if(data != m_attack[offset >> 6])
+		logerror("attack[%02x] = %04x\n", offset >> 6, data);
 	m_attack[offset >> 6] = data;
 }
 
-u16 swp30_device::decay_r(offs_t offset)
+u16 swp30_device::decay1_r(offs_t offset)
 {
-	return m_decay[offset >> 6];
+	return m_decay1[offset >> 6];
 }
 
-void swp30_device::decay_w(offs_t offset, u16 data)
+void swp30_device::decay1_w(offs_t offset, u16 data)
 {
-	m_decay[offset >> 6] = data;
+	logerror("decay1[%02x] = %04x\n", offset >> 6, data);
+	m_decay1[offset >> 6] = data;
 }
 
-u16 swp30_device::release_r(offs_t offset)
+u16 swp30_device::decay2_r(offs_t offset)
 {
-	return m_release[offset >> 6];
+	return m_decay2[offset >> 6];
 }
 
-void swp30_device::release_w(offs_t offset, u16 data)
+void swp30_device::decay2_w(offs_t offset, u16 data)
 {
-	m_release[offset >> 6] = data;
+	logerror("decay2[%02x] = %04x\n", offset >> 6, data);
+	m_decay2[offset >> 6] = data;
 }
 
-u16 swp30_device::pre_size_h_r(offs_t offset)
+u16 swp30_device::lfo_step_pmod_r(offs_t offset)
 {
-	return m_pre_size[offset >> 6] >> 16;
+	return m_lfo_step_pmod[offset >> 6];
 }
 
-u16 swp30_device::pre_size_l_r(offs_t offset)
+void swp30_device::lfo_step_pmod_w(offs_t offset, u16 data)
 {
-	return m_pre_size[offset >> 6];
+	//	logerror("lfo_step_pmod[%02x] = %04x\n", offset >> 6, data);
+	m_lfo_step_pmod[offset >> 6] = data;
 }
 
-void swp30_device::pre_size_h_w(offs_t offset, u16 data)
+u16 swp30_device::lfo_amod_r(offs_t offset)
+{
+	return m_lfo_amod[offset >> 6];
+}
+
+void swp30_device::lfo_amod_w(offs_t offset, u16 data)
+{
+	//	logerror("lfo_amod[%02x] = %04x\n", offset >> 6, data);
+	m_lfo_amod[offset >> 6] = data;
+}
+
+u16 swp30_device::sample_start_h_r(offs_t offset)
+{
+	return m_sample_start[offset >> 6] >> 16;
+}
+
+u16 swp30_device::sample_start_l_r(offs_t offset)
+{
+	return m_sample_start[offset >> 6];
+}
+
+void swp30_device::sample_start_h_w(offs_t offset, u16 data)
 {
 	u8 chan = offset >> 6;
-	m_pre_size[chan] = (m_pre_size[chan] & 0x0000ffff) | (data << 16);
+	m_sample_start[chan] = (m_sample_start[chan] & 0x0000ffff) | (data << 16);
 }
 
-void swp30_device::pre_size_l_w(offs_t offset, u16 data)
+void swp30_device::sample_start_l_w(offs_t offset, u16 data)
 {
 	u8 chan = offset >> 6;
-	m_pre_size[chan] = (m_pre_size[chan] & 0xffff0000) | data;
+	m_sample_start[chan] = (m_sample_start[chan] & 0xffff0000) | data;
+}
+
+u16 swp30_device::sample_end_h_r(offs_t offset)
+{
+	return m_sample_end[offset >> 6] >> 16;
+}
+
+u16 swp30_device::sample_end_l_r(offs_t offset)
+{
+	return m_sample_end[offset >> 6];
+}
+
+void swp30_device::sample_end_h_w(offs_t offset, u16 data)
+{
+	u8 chan = offset >> 6;
+	m_sample_end[chan] = (m_sample_end[chan] & 0x0000ffff) | (data << 16);
+}
+
+void swp30_device::sample_end_l_w(offs_t offset, u16 data)
+{
+	u8 chan = offset >> 6;
+	m_sample_end[chan] = (m_sample_end[chan] & 0xffff0000) | data;
 	if(0)
-		logerror("snd chan %02x pre-size %02x %06x\n", chan, m_pre_size[chan] >> 24, m_pre_size[chan] & 0xffffff);
+		logerror("snd chan %02x post-size %02x %06x\n", chan, m_sample_end[chan] >> 24, m_sample_end[chan] & 0xffffff);
 }
 
-u16 swp30_device::post_size_h_r(offs_t offset)
+u16 swp30_device::sample_address_h_r(offs_t offset)
 {
-	return m_post_size[offset >> 6] >> 16;
+	return m_sample_address[offset >> 6] >> 16;
 }
 
-u16 swp30_device::post_size_l_r(offs_t offset)
+u16 swp30_device::sample_address_l_r(offs_t offset)
 {
-	return m_post_size[offset >> 6];
+	return m_sample_address[offset >> 6];
 }
 
-void swp30_device::post_size_h_w(offs_t offset, u16 data)
-{
-	u8 chan = offset >> 6;
-	m_post_size[chan] = (m_post_size[chan] & 0x0000ffff) | (data << 16);
-}
-
-void swp30_device::post_size_l_w(offs_t offset, u16 data)
+void swp30_device::sample_address_h_w(offs_t offset, u16 data)
 {
 	u8 chan = offset >> 6;
-	m_post_size[chan] = (m_post_size[chan] & 0xffff0000) | data;
-	if(0)
-		logerror("snd chan %02x post-size %02x %06x\n", chan, m_post_size[chan] >> 24, m_post_size[chan] & 0xffffff);
+	m_sample_address[chan] = (m_sample_address[chan] & 0x0000ffff) | (data << 16);
 }
 
-u16 swp30_device::address_h_r(offs_t offset)
-{
-	return m_address[offset >> 6] >> 16;
-}
-
-u16 swp30_device::address_l_r(offs_t offset)
-{
-	return m_address[offset >> 6];
-}
-
-void swp30_device::address_h_w(offs_t offset, u16 data)
-{
-	u8 chan = offset >> 6;
-	m_address[chan] = (m_address[chan] & 0x0000ffff) | (data << 16);
-}
-
-void swp30_device::address_l_w(offs_t offset, u16 data)
+void swp30_device::sample_address_l_w(offs_t offset, u16 data)
 {
 	u8 chan = offset >> 6;
 	static const char *const formats[4] = { "l16", "l12", "l8", "x8" };
-	m_address[chan] = (m_address[chan] & 0xffff0000) | data;
+	m_sample_address[chan] = (m_sample_address[chan] & 0xffff0000) | data;
 	if(0)
-		logerror("snd chan %02x format %s flags %02x address %06x\n", chan, formats[m_address[chan] >> 30], (m_address[chan] >> 24) & 0x3f, m_address[chan] & 0xffffff);
+		logerror("snd chan %02x format %s flags %02x address %06x\n", chan, formats[m_sample_address[chan] >> 30], (m_sample_address[chan] >> 24) & 0x3f, m_sample_address[chan] & 0xffffff);
 }
 
 u16 swp30_device::internal_adr_r()
@@ -777,19 +963,17 @@ u16 swp30_device::internal_r()
 	u8 chan = m_internal_adr & 0x3f;
 	switch(m_internal_adr >> 8) {
 	case 0:
-		return m_mode[chan] == IDLE ? 0xffff : m_current_volume[chan] >> (26-14);
+		// Not certain about the two top bits though, the code seems to only care about 0/non-0
+		return m_envelope_mode[chan] == IDLE ? 0xffff : ((m_envelope_mode[chan] - 1) << 14) | (m_envelope_level[chan] >> (28-14));
 
 	case 4:
 		// used at 44c4
 		// tests & 0x4000 only
 		//      logerror("read %02x.4\n", chan);
-		return 0xffff;
+		return 0x0000;
 
 	case 6:
-		// used at 3e7c
-		// tests & 0x8000 only, keyoff?
-		logerror("read %02x.6\n", chan);
-		return 0x0000;
+		return m_decay2_done[chan] ? 0x0000 : 0x8000;
 	}
 
 	logerror("%s internal_r port %x channel %02x sample %d\n", machine().time().to_string(), m_internal_adr >> 8, m_internal_adr & 0x1f, scount);
@@ -799,36 +983,44 @@ u16 swp30_device::internal_r()
 }
 
 
-// MEG registers forwarding
+// MEG registers
 
-template<int sel> u16 swp30_device::prg_fp_r(offs_t offset)
+template<int sel> u16 swp30_device::meg_const_r(offs_t offset)
 {
-	return m_meg->fp_r((offset >> 6)*6 + sel);
+	return m_meg_const[(offset >> 6)*6 + sel];
 }
 
-template<int sel> void swp30_device::prg_fp_w(offs_t offset, u16 data)
+template<int sel> void swp30_device::meg_const_w(offs_t offset, u16 data)
 {
-	m_meg->fp_w((offset >> 6)*6 + sel, data);
+	m_meg_const[(offset >> 6)*6 + sel] = data;
 }
 
-template<int sel> u16 swp30_device::prg_off_r(offs_t offset)
+template<int sel> u16 swp30_device::meg_offset_r(offs_t offset)
 {
-	return m_meg->offset_r((offset >> 6)*2 + sel);
+	return m_meg_offset[(offset >> 6)*2 + sel];
 }
 
-template<int sel> void swp30_device::prg_off_w(offs_t offset, u16 data)
+template<int sel> void swp30_device::meg_offset_w(offs_t offset, u16 data)
 {
-	m_meg->offset_w((offset >> 6)*2 + sel, data);
+	m_meg_offset[(offset >> 6)*2 + sel] =  data;
 }
 
-template<int sel> u16 swp30_device::prg_lfo_r(offs_t offset)
+template<int sel> u16 swp30_device::meg_lfo_r(offs_t offset)
 {
-	return m_meg->lfo_r((offset >> 6)*2 + sel);
+	return m_meg_lfo[(offset >> 6)*2 + sel];
 }
 
-template<int sel> void swp30_device::prg_lfo_w(offs_t offset, u16 data)
+template<int sel> void swp30_device::meg_lfo_w(offs_t offset, u16 data)
 {
-	m_meg->lfo_w((offset >> 6)*2 + sel, data);
+	int slot = (offset >> 6)*2 + sel; 
+	m_meg_lfo[slot] = data;
+
+	static const int dt[8] = { 0, 32, 64, 128, 256, 512,  1024, 2048 };
+	static const int sh[8] = { 0,  0,  1,   2,   3,   4,     5,    6 };
+
+	int scale = (data >> 5) & 7;
+	int step = ((data & 31) << sh[scale]) + dt[scale];
+	logerror("lfo_w %02x %04x freq=%5.2f phase=%6.4f\n", slot, m_meg_lfo[slot], step * 44100.0/4194304, (data >> 8)/256.0);
 }
 
 
@@ -853,8 +1045,6 @@ u16 swp30_device::snd_r(offs_t offset)
 			preg = util::string_format("%02x.%02x", chan, slot);
 		logerror("snd_r [%04x %04x] %-5s, %04x\n", offset, offset*2, preg, rr[offset]);
 	}
-	if(0 && offset == 0x080f)
-		machine().debug_break();
 	if(offset == 0x080f)
 		return 0;
 	return rr[offset];
@@ -873,9 +1063,6 @@ void swp30_device::snd_w(offs_t offset, u16 data)
 	if(offset == 0x04e)
 		return;
 
-	if(0 && slot == 0x03)
-		machine().debug_break();
-
 	std::string preg = "-";
 	if(slot >= 0x21 && slot <= 0x2b && (slot & 1))
 		preg = util::string_format("fp%03x", (slot-0x21)/2 + 6*chan);
@@ -883,210 +1070,490 @@ void swp30_device::snd_w(offs_t offset, u16 data)
 		preg = util::string_format("sy%02x", (slot-0x0e) + 2*chan);
 	else if(slot == 0x30 || slot == 0x31)
 		preg = util::string_format("dt%02x", (slot-0x30) + 2*chan);
-	else if(slot == 0x38)
-		preg = util::string_format("vl%02x", chan);
+	else if(slot >= 0x38 && slot <= 0x3a)
+		preg = util::string_format("mix[%x, %02x]", slot - 0x38, chan);
+	else if(slot >= 0x3b && slot <= 0x3d)
+		preg = util::string_format("route[%x, %02x]", slot - 0x3b, chan);
 	else if(slot == 0x3e || slot == 0x3f)
-		preg = util::string_format("lf%02x", (slot-0x3e) + 2*chan);
+		preg = util::string_format("lfo[%02x]", (slot-0x3e) + 2*chan);
 	else
 		preg = util::string_format("%02x.%02x", chan, slot);
-	//  if((slot >= 0xa && slot <= 0xd) || (slot >= 0x2c && slot <= 0x2f))
-	//      machine().debug_break();
 
 	logerror("snd_w [%04x %04x] %-5s, %04x\n", offset, offset*2, preg, data);
 }
 
 
 
-// Synthesis
+// Synthesis and meg
 
-void swp30_device::change_mode(int channel, u8 mode)
+uint32_t swp30_device::execute_min_cycles() const noexcept
 {
-	if(1)
-		logerror("[%08d] channel %02x mode %s\n", scount, channel,
-				 mode == IDLE ? "idle" :
-				 mode == ATTACK ? "attack" :
-				 mode == DECAY ? "decay" :
-				 mode == SUSTAIN ? "sustain" :
-				 mode == RELEASE ? "release" :
-				 "?");
+	return 1;
+}
 
-	m_mode[channel] = mode;
-	if(mode == IDLE || mode == SUSTAIN) {
-		m_step_volume[channel] = 0;
-		return;
-	}
+uint32_t swp30_device::execute_max_cycles() const noexcept
+{
+	return 1;
+}
 
-	u16 reg = mode == ATTACK ? m_attack[channel] & 0xff00 : mode == DECAY ? m_decay[channel] : m_release[channel];
-	u32 target = (reg & 0xff) << (26-8);
-	s32 step = (8 + ((reg >> 8) & 7)) << ((reg >> 11) & 15);
-	if(mode != ATTACK)
-		step *= 8;
-	if(target < m_current_volume[channel])
-		step = -step;
-	m_target_volume[channel] = target;
-	m_step_volume[channel] = step;
+uint32_t swp30_device::execute_input_lines() const noexcept
+{
+	return 0;
+}
 
-	if(1) {
-		double delay = (double(target) - double(m_current_volume[channel])) / (44100*step);
-		logerror("    -> time until hit %f seconds\n", delay);
-	}
+
+void swp30_device::meg_prg_map(address_map &map)
+{
+	map(0x000, 0x1bf).r(FUNC(swp30_device::meg_prg_map_r));
+}
+
+u64 swp30_device::meg_prg_map_r(offs_t address)
+{
+	return m_meg_program[address];
+}
+
+void swp30_device::meg_reverb_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).ram();
+}
+
+u16 swp30_device::swp30d_const_r(u16 address) const
+{
+	return m_meg_const[address];
+}
+
+u16 swp30_device::swp30d_offset_r(u16 address) const
+{
+	return m_meg_offset[address];
+}
+
+device_memory_interface::space_config_vector swp30_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_rom_config),
+		std::make_pair(AS_REVERB,  &m_reverb_config),
+	};
+}
+
+std::unique_ptr<util::disasm_interface> swp30_device::create_disassembler()
+{
+	return std::make_unique<swp30_disassembler>(this);
+}
+
+void swp30_device::state_import(const device_state_entry &entry)
+{
+}
+
+void swp30_device::state_export(const device_state_entry &entry)
+{
+}
+
+void swp30_device::state_string_export(const device_state_entry &entry, std::string &str) const
+{
 }
 
 void swp30_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	if(outputs[0].samples() != 1)
-		fatalerror("Sync stream not sync?\n");
+	outputs[0].put_int_clamp(0, m_meg_output[0], 32768);
+	outputs[1].put_int_clamp(0, m_meg_output[1], 32768);
+}
 
-	scount++;
+void swp30_device::change_mode_attack_decay1(int chan)
+{
+	m_envelope_mode[chan] = DECAY1;
+	m_envelope_timer[chan] = 0x8000000;
+	m_envelope_on_timer[chan] = (m_decay1[chan] & 0xff) == 0;
+}
 
-	// Accumulate on 64 bits, shift/clamp at the end
-	s64 dry_left = 0, dry_right = 0;
+void swp30_device::change_mode_decay1_decay2(int chan)
+{
+	m_envelope_mode[chan] = DECAY2;
+	m_envelope_timer[chan] = 0x8000000;
+	m_envelope_on_timer[chan] = (m_decay2[chan] & 0xff) == (m_decay1[chan] & 0xff);
+}
 
-	// Loop on channels
-	for(int channel = 0; channel < 64; channel++)
-		if(m_mode[channel] != IDLE) {
-			// First, read the sample
+s32 swp30_device::meg_att(s32 sample, s32 att)
+{
+	if(att >= 0xff)
+		return 0;
+	return (sample - ((sample * (att & 0xf)) >> 4)) >> (att >> 4);
 
-			// - Find the base sample index and base address
-			s32 spos = m_sample_pos[channel] >> 8;
-			offs_t base_address = (m_address[channel] & 0x1ffffff) << 2;
-			// - Read/decompress the sample
-			s16 samp = 0;
-			switch(m_address[channel] >> 30) {
-			case 0: { // 16-bits linear
-				offs_t adr = base_address + (spos << 1);
-				samp = read_word(adr);
-				break;
-			}
+}
 
-			case 1: { // 12-bits linear
-				offs_t adr = base_address + (spos >> 2)*6;
-				switch(spos & 3) {
-				case 0: { // .abc .... ....
-					u16 w0 = read_word(adr);
-					samp = (w0 & 0x0fff) << 4;
-					break;
-				}
-				case 1: { // C... ..AB ....
-					u16 w0 = read_word(adr);
-					u16 w1 = read_word(adr+2);
-					samp = ((w0 & 0xf000) >> 8) | ((w1 & 0x00ff) << 8);
-					break;
-				}
-				case 2: { // .... bc.. ...a
-					u16 w0 = read_word(adr+2);
-					u16 w1 = read_word(adr+4);
-					samp = ((w0 & 0xff00) >> 4) | ((w1 & 0x000f) << 12);
-					break;
-				}
-				case 3: { // .... .... ABC.
-					u16 w1 = read_word(adr+4);
-					samp = w1 & 0xfff0;
-					break;
-				}
-				}
-				break;
-			}
-
-			case 2:   // 8-bits linear
-				samp = read_byte(base_address + spos) << 8;
-				break;
-
-			case 3:   // 8-bits logarithmic
-				samp = m_sample_log8[read_byte(base_address + spos)];
-				break;
-			}
-
-			//logerror("sample %02x %06x [%d] %+5d %04x  %04x %04x\n", channel, base_address >> 2, m_address[channel] >> 30, spos, samp & 0xffff, m_volume[channel], m_pan[channel]);
-
-			// Second, step the sample pos, loop/deactivate as needed
-			m_sample_pos[channel] += m_sample_increment[m_freq[channel] & 0x3fff];
-			s32 loop_size = (m_post_size[channel] << 8) | ((m_address[channel] >> 22) & 0xf8);
-			if(m_sample_pos[channel] >= loop_size) {
-				// We reached the loop point, stop if loop size is zero,
-				// otherwise loop
-				if(!loop_size)
-					change_mode(channel, IDLE);
-				else
-					do
-						m_sample_pos[channel] -= loop_size;
-					while(m_sample_pos[channel] >= loop_size);
-			}
-
-			// Third, filter the sample
-			// - missing lpf_cutoff, lpf_reso, hpf_cutoff
-
-			// - eq lowpass
-			s32 samp1 = (samp  * m_eq_filter[channel][2] + m_sample_history[channel][0][0] * m_eq_filter[channel][1] + m_sample_history[channel][0][1] * m_eq_filter[channel][0]) >> 13;
-			m_sample_history[channel][0][1] = m_sample_history[channel][0][0];
-			m_sample_history[channel][0][0] = samp;
-
-			// - eq highpass
-			s32 samp2 = (samp1 * m_eq_filter[channel][5] + m_sample_history[channel][1][0] * m_eq_filter[channel][4] + m_sample_history[channel][1][1] * m_eq_filter[channel][3]) >> 13;
-			m_sample_history[channel][1][1] = m_sample_history[channel][1][0];
-			m_sample_history[channel][1][0] = samp1;
-
-			// Fourth, establish the 8 volumes (only 2 for now, need the MEG) and update the envelope
-			u32 raw_vol = m_current_volume[channel];
-			u32 vol = raw_vol >> (26-8);
-
-			u32 base_l = vol + (m_pan[channel] >> 8);
-			u32 base_r = vol + (m_pan[channel] & 0xff);
-
-			u32 dry_l = base_l + (m_dry_rev[channel] >> 8);
-			u32 dry_r = base_r + (m_dry_rev[channel] >> 8);
-
-			s32 step = m_step_volume[channel];
-			u32 target = m_target_volume[channel];
-
+void swp30_device::execute_run()
+{
+	while(m_icount >= 0) {
+		if(m_meg_pc == 0) {
 			if(0) {
-				u8 mode = m_mode[channel];
-				logerror("[%08d] channel %02x state %s vol=%07x step=%c%07x target=%07x\n",
-						 scount,
-						 channel,
-						 mode == IDLE ? "idle" :
-						 mode == ATTACK ? "attack" :
-						 mode == DECAY ? "decay" :
-						 mode == SUSTAIN ? "sustain" :
-						 mode == RELEASE ? "release" :
-						 "?",
-						 raw_vol,
-						 step < 0 ? '-' : '+',
-						 step < 0 ? -step : step,
-						 target);
-			}
-			if(step) {
-				raw_vol += step;
-				if((step < 0 && (raw_vol <= target || raw_vol & 0x80000000)) ||
-				   (step > 0 && raw_vol >= target)) {
-					raw_vol = target;
-					m_current_volume[channel] = raw_vol;
-
-					// IDLE and SUSTAIN have zero step.
-					// current volume must be updated before calling change_mode
-
-					switch(m_mode[channel]) {
-					case ATTACK:  change_mode(channel, DECAY);   break;
-					case DECAY:   change_mode(channel, SUSTAIN); break;
-					case RELEASE: change_mode(channel, IDLE);    break;
+				static std::array<mixer_slot, 0x80> mixer;
+				if(memcmp(mixer.data(), m_mixer.data(), sizeof(mixer))) {
+					mixer = m_mixer;
+					for(int i=0; i != 0x20; i++) {
+						logerror("mixer %02x %04x.%04x.%04x %04x.%04x.%04x  %02x %04x.%04x.%04x %04x.%04x.%04x  %02x %04x.%04x.%04x %04x.%04x.%04x  %02x %04x.%04x.%04x %04x.%04x.%04x\n",
+								 0x00 | i, m_mixer[0x00|i].vol[0], m_mixer[0x00|i].vol[1], m_mixer[0x00|i].vol[2], m_mixer[0x00|i].route[0], m_mixer[0x00|i].route[1], m_mixer[0x00|i].route[2],
+								 0x20 | i, m_mixer[0x20|i].vol[0], m_mixer[0x20|i].vol[1], m_mixer[0x20|i].vol[2], m_mixer[0x20|i].route[0], m_mixer[0x20|i].route[1], m_mixer[0x20|i].route[2],
+								 0x40 | i, m_mixer[0x40|i].vol[0], m_mixer[0x40|i].vol[1], m_mixer[0x40|i].vol[2], m_mixer[0x40|i].route[0], m_mixer[0x40|i].route[1], m_mixer[0x40|i].route[2],
+								 0x60 | i, m_mixer[0x60|i].vol[0], m_mixer[0x60|i].vol[1], m_mixer[0x60|i].vol[2], m_mixer[0x60|i].route[0], m_mixer[0x60|i].route[1], m_mixer[0x60|i].route[2]);
 					}
-				} else
-					m_current_volume[channel] = raw_vol;
+				}
 			}
 
-			// Fifth, add to the (dry) accumulators
-			dry_left  += samp2 * m_linear_attenuation[std::min(0xffu, dry_l)];
-			dry_right += samp2 * m_linear_attenuation[std::min(0xffu, dry_r)];
 
-			// Missing: reverb, chorus, effects in general
+			//  AWM2 synthesis
+			s32 samples_per_chan[0x40];
+			for(int chan = 0; chan != 0x40; chan++) {
+				if(m_envelope_mode[chan] == IDLE) {
+					samples_per_chan[chan] = 0;
+					continue;
+				}
+
+				// There actually are three shapes (0000, 4000 and c000) but
+				// we're not sure what they are
+
+				u32 lfo_phase = m_lfo_phase[chan] >> 7;
+				s32 lfo_p_phase = lfo_phase ^ (m_lfo_step_pmod[chan] & 0xc000 ? lfo_shape_centered_tri : lfo_shape_centered_saw)[lfo_phase >> 18];
+				s32 lfo_a_phase = lfo_phase ^ (m_lfo_step_pmod[chan] & 0xc000 ? lfo_shape_offset_tri   : lfo_shape_offset_saw  )[lfo_phase >> 18];
+
+				lfo_p_phase = lfo_a_phase = 0;
+
+				// First, read the sample
+		
+				// - Find the base sample index and base address
+				s32 sample_pos = m_sample_pos[chan];
+				if(m_sample_end[chan] & 0x80000000)
+					sample_pos = -sample_pos;
+
+				s32 spos = sample_pos >> 8;
+				offs_t base_address = m_sample_address[chan] & 0x1ffffff;
+		
+				// - Read/decompress the sample
+				s16 val0, val1;
+				switch(m_sample_address[chan] >> 30) {
+				case 0: { // 16-bits linear
+					offs_t adr = base_address + (spos >> 1);
+					switch(spos & 1) {
+					case 0: { // ABCDabcd ........
+						u32 l0 = m_rom_cache.read_dword(adr);
+						val0 = l0;
+						val1 = l0 >> 16;
+						break;
+					}
+					case 1: { // abcd.... ....ABCD
+						u32 l0 = m_rom_cache.read_dword(adr);
+						u32 l1 = m_rom_cache.read_dword(adr+1);
+						val0 = l0 >> 16;
+						val1 = l1;
+						break;
+					}
+					}
+					break;
+				}
+
+				case 1: { // 12-bits linear
+					offs_t adr = base_address + (spos >> 3)*3;
+					switch(spos & 7) {
+					case 0: { // ..ABCabc ........ ........ ........
+						u32 l0 = m_rom_cache.read_dword(adr);
+						val0 =  (l0 & 0x00000fff) << 4;
+						val1 =  (l0 & 0x00fff000) >> 8;
+						break;
+					}
+					case 1: { // BCabc... .......A ........ ........
+						u32 l0 = m_rom_cache.read_dword(adr);
+						u32 l1 = m_rom_cache.read_dword(adr+1);
+						val0 =  (l0 & 0x00fff000) >> 8;
+						val1 = ((l0 & 0xff000000) >> 20) | ((l1 & 0x0000000f) << 12);
+						break;
+					}
+					case 2: { // bc...... ....ABCa ........ ........
+						u32 l0 = m_rom_cache.read_dword(adr);
+						u32 l1 = m_rom_cache.read_dword(adr+1);
+						val0 = ((l0 & 0xff000000) >> 20) | ((l1 & 0x0000000f) << 12);
+						val1 =   l1 & 0x0000fff0;
+						break;
+					}
+					case 3: { // ........ .ABCabc. ........ ........
+						u32 l1 = m_rom_cache.read_dword(adr+1);
+						val0 =   l1 & 0x0000fff0;
+						val1 =  (l1 & 0x0fff0000) >> 12;
+						break;
+					}
+					case 4: { // ........ Cabc.... ......AB ........
+						u32 l1 = m_rom_cache.read_dword(adr+1);
+						u32 l2 = m_rom_cache.read_dword(adr+2);
+						val0 =  (l1 & 0x0fff0000) >> 12;
+						val1 = ((l1 & 0xf0000000) >> 24) | ((l2 & 0x000000ff) << 8);
+						break;
+					}
+					case 5: { // ........ c....... ...ABCab ........
+						u32 l1 = m_rom_cache.read_dword(adr+1);
+						u32 l2 = m_rom_cache.read_dword(adr+2);
+						val0 = ((l1 & 0xf0000000) >> 24) | ((l2 & 0x000000ff) << 8);
+						val1 =  (l2 & 0x000fff00) >> 4;
+						break;
+					}
+					case 6: { // ........ ........ ABCabc.. ........
+						u32 l2 = m_rom_cache.read_dword(adr+2);
+						val0 =  (l2 & 0x000fff00) >> 4;
+						val1 =  (l2 & 0xfff00000) >> 16;
+						break;
+					}
+					case 7: { // ........ ........ abc..... .....ABC
+						u32 l2 = m_rom_cache.read_dword(adr+2);
+						u32 l3 = m_rom_cache.read_dword(adr+3);
+						val0 =  (l2 & 0xfff00000) >> 16;
+						val1 =  (l3 & 0x00000fff) << 4;
+						break;
+					}
+					}
+					break;
+				}
+
+				case 2: { // 8-bits linear
+					offs_t adr = base_address + (spos >> 2);
+					switch(spos & 3) {
+					case 0: { // ....ABab ........
+						u32 l0 = m_rom_cache.read_dword(adr);
+						val0 = (l0 & 0x000000ff) << 8;
+						val1 =  l0 & 0x0000ff00;
+						break;
+					}
+					case 1: { // ..ABab.. ........
+						u32 l0 = m_rom_cache.read_dword(adr);
+						val0 =  l0 & 0x0000ff00;
+						val1 = (l0 & 0x00ff0000) >> 8;
+						break;
+					}
+					case 2: { // ABab.... ........
+						u32 l0 = m_rom_cache.read_dword(adr);
+						val0 = (l0 & 0x00ff0000) >> 8;
+						val1 = (l0 & 0xff000000) >> 16;
+						break;
+					}
+					case 3: { // ab...... ......AB
+						u32 l0 = m_rom_cache.read_dword(adr);
+						u32 l1 = m_rom_cache.read_dword(adr+1);
+						val0 = (l0 & 0xff000000) >> 16;
+						val1 = (l1 & 0x000000ff) << 8;
+						break;
+					}
+					}
+					break;
+				}
+
+				case 3: { // 8-bits delta-pcm
+					offs_t adr = m_dpcm_address[chan];
+					if(m_sample_end[chan] & 0x80000000) {
+						u32 target_address = (base_address << 2) + spos - 1;
+						while(adr >= target_address) {
+							m_dpcm_current[chan] = m_dpcm_next[chan];
+							s32 sample = m_dpcm_next[chan] + m_dpcm[(m_rom_cache.read_dword(adr >> 2) >> (8*(adr & 3))) & 0xff];
+							adr --;
+							if(sample < -0x8000)
+								sample = -0x8000;
+							else if(sample > 0x7fff)
+								sample = 0x7fff;
+							m_dpcm_next[chan] = sample;
+						}
+					} else {
+						u32 target_address = (base_address << 2) + spos + 1;
+						while(adr <= target_address) {
+							m_dpcm_current[chan] = m_dpcm_next[chan];
+							s32 sample = m_dpcm_next[chan] + m_dpcm[(m_rom_cache.read_dword(adr >> 2) >> (8*(adr & 3))) & 0xff];
+							adr ++;
+							if(sample < -0x8000)
+								sample = -0x8000;
+							else if(sample > 0x7fff)
+								sample = 0x7fff;
+							m_dpcm_next[chan] = sample;
+						}
+					}
+					m_dpcm_address[chan] = adr;
+					val0 = m_dpcm_current[chan];
+					val1 = m_dpcm_next[chan];
+					break;
+				}
+				}
+
+				s32 mul = sample_pos & 0xff;
+				s32 sample = val1 * mul + val0 * (0x100 - mul);
+
+#if 0
+				// Third, filter the sample
+				// - missing lpf_cutoff, lpf_reso, hpf_cutoff
+
+				// - eq lowpass
+				s32 samp1 = (samp  * m_eq_filter[chan][2] + m_sample_history[chan][0][0] * m_eq_filter[chan][1] + m_sample_history[chan][0][1] * m_eq_filter[chan][0]) >> 13;
+				m_sample_history[chan][0][1] = m_sample_history[chan][0][0];
+				m_sample_history[chan][0][0] = samp;
+
+				// - eq highpass
+				s32 samp2 = (samp1 * m_eq_filter[chan][5] + m_sample_history[chan][1][0] * m_eq_filter[chan][4] + m_sample_history[chan][1][1] * m_eq_filter[chan][3]) >> 13;
+				m_sample_history[chan][1][1] = m_sample_history[chan][1][0];
+				m_sample_history[chan][1][0] = samp1;
+
+#endif
+
+				s32 tremolo_level = (lfo_a_phase * (m_lfo_amod[chan] & 0x1f)) << ((m_lfo_step_pmod[chan] & 0xc000) ? 3 : 2);
+
+				samples_per_chan[chan] = fpapply(m_envelope_level[chan] + (m_glo_level_cur[chan] << 16) + tremolo_level, sample) >> 8;
+
+				istep(m_glo_level_cur[chan], (m_release_glo[chan] & 0x00ff) << 4, 1);
+
+				m_lfo_phase[chan] = (m_lfo_phase[chan] + m_global_step[0x20 + ((m_lfo_step_pmod[chan] >> 8) & 0x3f)]) & 0x7ffffff;
+
+				u32 sample_increment = (((m_pitch[chan] & 0x3ff) | 0x400) << (8 + (s16(m_pitch[chan] << 2) >> 12))) >> 10;
+				m_sample_pos[chan] += (sample_increment * (0x800 + ((lfo_p_phase * (m_lfo_step_pmod[chan] & 0xff)) >> (m_lfo_step_pmod[chan] & 0xc000 ? 18 : 19)))) >> 11;
+				if((m_sample_pos[chan] >> 8) >= (m_sample_end[chan] & 0xffffff)) {
+					if(!(m_sample_end[chan] & 0xffffff))
+						m_envelope_mode[chan] = IDLE;
+					else {
+						s32 prev = m_sample_pos[chan];
+						do
+							m_sample_pos[chan] = m_sample_pos[chan] - ((m_sample_end[chan] & 0xffffff) << 8) + ((m_sample_address[chan] >> 22) & 0xfc);
+						while((m_sample_pos[chan] >> 8) >= (m_sample_end[chan] & 0xffffff));
+						if(m_sample_end[chan] & 0x80000000)
+							m_dpcm_address[chan] -= (m_sample_pos[chan] >> 8) - (prev >> 8);
+						else
+							m_dpcm_address[chan] += (m_sample_pos[chan] >> 8) - (prev >> 8);
+					}
+				}
+
+				switch(m_envelope_mode[chan]) {
+				case ATTACK:
+					if(m_envelope_on_timer[chan]) {
+						if(istep(m_envelope_timer[chan], 0, m_global_step[(m_attack[chan] >> 8) & 0x7f] << 1))
+							change_mode_attack_decay1(chan);
+					} else {
+						if(fpstep(m_envelope_level[chan], 0, attack_linear_step[(m_attack[chan] >> 8) & 0x7f]))
+							change_mode_attack_decay1(chan);
+					}
+					break;
+
+				case DECAY1:
+					if(m_envelope_on_timer[chan]) {
+						if(istep(m_envelope_timer[chan], 0, m_global_step[(m_decay1[chan] >> 8) & 0x7f] << 1))
+							change_mode_decay1_decay2(chan);
+					} else if((m_decay1[chan] & 0x6000) == 0x6000) {
+						if(fpstep(m_envelope_level[chan], (m_decay1[chan] & 0xff) << 20, decay_linear_step[(m_decay1[chan] >> 8) & 0x1f]))
+							change_mode_decay1_decay2(chan);
+					} else {
+						if(fpstep(m_envelope_level[chan], (m_decay1[chan] & 0xff) << 20, m_global_step[(m_decay1[chan] >> 8) & 0x7f]))
+							change_mode_decay1_decay2(chan);
+					}
+					break;
+
+				case DECAY2:
+					if(m_envelope_on_timer[chan])
+						m_decay2_done[chan] = istep(m_envelope_timer[chan], 0, m_global_step[(m_decay1[chan] >> 8) & 0x7f] << 1);
+					else if((m_decay2[chan] & 0x6000) == 0x6000)
+						m_decay2_done[chan] = fpstep(m_envelope_level[chan], (m_decay2[chan] & 0xff) << 20, decay_linear_step[(m_decay2[chan] >> 8) & 0x1f]);
+					else
+						m_decay2_done[chan] = fpstep(m_envelope_level[chan], (m_decay2[chan] & 0xff) << 20, m_global_step[(m_decay2[chan] >> 8) & 0x7f]);
+					break;
+					
+				case RELEASE:
+					if((m_release_glo[chan] & 0x6000) == 0x6000) {
+						if(fpstep(m_envelope_level[chan], 0x8000000, decay_linear_step[(m_release_glo[chan] >> 8) & 0x1f]))
+							m_envelope_mode[chan] = IDLE;
+					} else {
+						if(fpstep(m_envelope_level[chan], 0x8000000, m_global_step[(m_release_glo[chan] >> 8) & 0x7f]))
+							m_envelope_mode[chan] = IDLE;
+					}
+					break;
+				}
+			}
+
+			// Mixer
+			std::array<s32, 0x10> out_samples;
+			std::copy(m_meg_m.begin() + 0x20, m_meg_m.begin() + 0x30, out_samples.begin());
+			std::fill(m_meg_m.begin() + 0x20, m_meg_m.begin() + 0x30, 0);
+			std::fill(m_melo.begin(), m_melo.end(), 0);
+			std::fill(m_meg_output.begin(), m_meg_output.end(), 0);
+
+			for(int mix = 0; mix != 0x60; mix++) {
+				s32 input;
+				if(mix  < 0x40)
+					input = samples_per_chan[mix];
+				else if(mix < 0x50)
+					input = out_samples[mix & 0xf];
+				else
+					input = 0; // Audio input not yet supported in Mame (meli 0-7)
+
+				if(input == 0)
+					continue;
+
+				u64 route = (u64(m_mixer[mix].route[0]) << 32) | (u64(m_mixer[mix].route[1]) << 16) | m_mixer[mix].route[2];
+				const std::array<u16, 3> &vol = m_mixer[mix].vol;
+
+				// It looks like this could be turned into something generic, but not 100% clear
+				switch(route) {
+				case 0x000000000000:
+					// Incorrect, the program writes the outputs to m30/m31
+					m_meg_output[0] += meg_att(input, (vol[0] >> 8)   + (vol[1] >> 8));
+					m_meg_output[1] += meg_att(input, (vol[0] & 0xff) + (vol[1] >> 8));
+					break;
+
+				case 0x010000000000:
+					m_meg_m[0x20] += meg_att(input, (vol[0] >> 8)   + (vol[1] >> 8));
+					m_meg_m[0x21] += meg_att(input, (vol[0] & 0xff) + (vol[1] >> 8));
+					break;
+
+				case 0x020000000000:
+					m_meg_m[0x22] += meg_att(input, (vol[0] >> 8)   + (vol[1] >> 8));
+					m_meg_m[0x23] += meg_att(input, (vol[0] & 0xff) + (vol[1] >> 8));
+					break;
+
+				case 0x050000000400:
+					m_meg_m[0x20] += meg_att(input, (vol[0] >> 8)   + (vol[1] >> 8));
+					m_meg_m[0x21] += meg_att(input, (vol[0] & 0xff) + (vol[1] >> 8));
+					m_meg_m[0x24] += meg_att(input, (vol[0] >> 8)   + (vol[1] & 0xff));
+					m_meg_m[0x25] += meg_att(input, (vol[0] & 0xff) + (vol[1] & 0xff));
+					break;
+
+
+				case 0x0d0008000400:
+					m_meg_m[0x20] += meg_att(input, (vol[0] >> 8)   + (vol[1] >> 8));
+					m_meg_m[0x21] += meg_att(input, (vol[0] & 0xff) + (vol[1] >> 8));
+					m_meg_m[0x24] += meg_att(input, (vol[0] >> 8)   + (vol[1] & 0xff));
+					m_meg_m[0x25] += meg_att(input, (vol[0] & 0xff) + (vol[1] & 0xff));
+					m_meg_m[0x26] += meg_att(input, (vol[0] >> 8)   + (vol[2] >> 8));
+					m_meg_m[0x27] += meg_att(input, (vol[0] & 0xff) + (vol[2] >> 8));
+					break;
+
+				case 0x100010001000:
+					m_meg_m[0x28] += meg_att(input, (vol[0] >> 8)   + (vol[1] >> 8));
+					m_meg_m[0x29] += meg_att(input, (vol[0] & 0xff) + (vol[1] >> 8));
+					break;
+
+				case 0x200020002000:
+					m_meg_m[0x2a] += meg_att(input, (vol[0] >> 8)   + (vol[1] >> 8));
+					m_meg_m[0x2b] += meg_att(input, (vol[0] & 0xff) + (vol[1] >> 8));
+					break;
+
+				case 0x4d0048004400:
+					m_meg_m[0x20] += meg_att(input, (vol[0] >> 8)   + (vol[1] >> 8));
+					m_meg_m[0x21] += meg_att(input, (vol[0] & 0xff) + (vol[1] >> 8));
+					m_meg_m[0x24] += meg_att(input, (vol[0] >> 8)   + (vol[1] & 0xff));
+					m_meg_m[0x25] += meg_att(input, (vol[0] & 0xff) + (vol[1] & 0xff));
+					m_meg_m[0x26] += meg_att(input, (vol[0] >> 8)   + (vol[2] >> 8));
+					m_meg_m[0x27] += meg_att(input, (vol[0] & 0xff) + (vol[2] >> 8));
+					m_meg_m[0x2c] += meg_att(input, (vol[0] >> 8)   + (vol[2] & 0xff));
+					m_meg_m[0x2d] += meg_att(input, (vol[0] & 0xff) + (vol[2] & 0xff));
+					break;
+
+				default:
+					logerror("Unhandled route %012x\n", route);
+					break;
+				}
+			}
 		}
-
-	// Samples are 16 bits, there are up to 64 of them, and the accumulators are fixed-point signed 48.16
-	// Global EQ is missing (it's done in the MEG)
-
-	dry_left >>= 14;
-	outputs[0].put_int_clamp(0, dry_left, 32768);
-
-	dry_right >>= 14;
-	outputs[1].put_int_clamp(0, dry_right, 32768);
+			
+		debugger_instruction_hook(m_meg_pc);
+		m_icount --;
+		m_meg_pc ++;
+		if(m_meg_pc == 0x180)
+			m_meg_pc = 0;
+	}
 }

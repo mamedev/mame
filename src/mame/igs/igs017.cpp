@@ -64,6 +64,8 @@ Notes:
 #include "screen.h"
 #include "speaker.h"
 
+#include "multibyte.h"
+
 #include "igspoker.lh"
 #include "igsslot.lh"
 
@@ -1054,10 +1056,9 @@ void igs017_state::tjsb_decrypt_sprites()
 	// data lines swap
 	for (int i = 0; i < rom_size; i += 2)
 	{
-		u16 data = (rom[i+1] << 8) | rom[i+0]; // x-22222-11111-00000
+		u16 data = get_u16le(&rom[i]); // x-22222-11111-00000
 		data = bitswap<16>(data, 15, 14,13,12,11,10, 9,1,7,6,5, 4,3,2,8,0);
-		rom[i+0] = data;
-		rom[i+1] = data >> 8;
+		put_u16le(&rom[i], data);
 	}
 }
 
@@ -1142,7 +1143,7 @@ void igs017_state::mgcs_flip_sprites()
 
 	for (int i = 0; i < rom_size; i+=2)
 	{
-		u16 pixels = (rom[i+1] << 8) | rom[i+0];
+		u16 pixels = get_u16le(&rom[i]);
 
 		// flip bits
 		pixels = bitswap<16>(pixels,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
@@ -1150,8 +1151,7 @@ void igs017_state::mgcs_flip_sprites()
 		// flip pixels
 		pixels = bitswap<16>(pixels,15, 0,1,2,3,4, 5,6,7,8,9, 10,11,12,13,14);
 
-		rom[i+0] = pixels;
-		rom[i+1] = pixels >> 8;
+		put_u16le(&rom[i], pixels);
 	}
 }
 
@@ -1590,10 +1590,9 @@ void igs017_state::lhzb2_decrypt_sprites()
 	// data lines swap
 	for (int i = 0; i < rom_size; i+=2)
 	{
-		u16 data = (rom[i+1] << 8) | rom[i+0]; // x-22222-11111-00000
+		u16 data = get_u16le(&rom[i]); // x-22222-11111-00000
 		data = bitswap<16>(data, 15, 7,6,5,4,3, 2,1,0,14,13, 12,11,10,9,8);
-		rom[i+0] = data;
-		rom[i+1] = data >> 8;
+		put_u16le(&rom[i], data);
 	}
 }
 
@@ -2327,7 +2326,7 @@ void igs017_state::mgcs_igs029_run()
 	{
 		LOGMASKED(LOG_PROT_IGS029, "SET LONG\n");
 
-		m_igs029_mgcs_long = (m_igs029_send_buf[2] << 24) | (m_igs029_send_buf[3] << 16) | (m_igs029_send_buf[4] << 8) | m_igs029_send_buf[5];
+		m_igs029_mgcs_long = get_u32be(&m_igs029_send_buf[2]);
 
 		m_igs029_recv_len = 0;
 		m_igs029_recv_buf[m_igs029_recv_len++] = 0x01;
@@ -2337,10 +2336,8 @@ void igs017_state::mgcs_igs029_run()
 		LOGMASKED(LOG_PROT_IGS029, "GET LONG\n");
 
 		m_igs029_recv_len = 0;
-		m_igs029_recv_buf[m_igs029_recv_len++] = (m_igs029_mgcs_long >>  0) & 0xff;
-		m_igs029_recv_buf[m_igs029_recv_len++] = (m_igs029_mgcs_long >>  8) & 0xff;
-		m_igs029_recv_buf[m_igs029_recv_len++] = (m_igs029_mgcs_long >> 16) & 0xff;
-		m_igs029_recv_buf[m_igs029_recv_len++] = (m_igs029_mgcs_long >> 24) & 0xff;
+		put_u32le(&m_igs029_recv_buf[m_igs029_recv_len], m_igs029_mgcs_long);
+		m_igs029_recv_len += 4;
 		m_igs029_recv_buf[m_igs029_recv_len++] = 0x05;
 	}
 	else

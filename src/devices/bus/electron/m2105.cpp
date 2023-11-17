@@ -49,8 +49,8 @@ ROM_START( m2105 )
 	ROMX_LOAD("sk01-pc-207l-1.ic24", 0x8000, 0x4000, CRC(0850bcea) SHA1(270e7a31e69e1454cfb70ced23a50f5d97efe4d5), ROM_BIOS(2))
 	ROMX_LOAD("sk02-pc-207l-1.ic24", 0xc000, 0x4000, CRC(d8b9143f) SHA1(4e132c7a6dae4caf7203139b51882706d508c449), ROM_BIOS(2))
 
-	ROM_REGION(0x4000, "tms6100", 0)
-	ROM_LOAD("phroma.bin", 0x0000, 0x4000, CRC(98e1bf9e) SHA1(b369809275cb67dfd8a749265e91adb2d2558ae6))
+	ROM_REGION(0x40000, "vsm", ROMREGION_ERASE00)
+	ROM_LOAD("cm62024.bin", 0x3c000, 0x4000, CRC(98e1bf9e) SHA1(b369809275cb67dfd8a749265e91adb2d2558ae6))
 ROM_END
 
 
@@ -65,9 +65,9 @@ void electron_m2105_device::device_add_mconfig(machine_config &config)
 	INPUT_MERGER_ANY_HIGH(config, "irqs").output_handler().set(DEVICE_SELF_OWNER, FUNC(electron_expansion_slot_device::irq_w));
 
 	MOS6522(config, m_via[0], DERIVED_CLOCK(1, 16));
-	m_via[0]->readpa_handler().set("tms5220", FUNC(tms5220_device::status_r));
-	m_via[0]->writepa_handler().set("tms5220", FUNC(tms5220_device::data_w));
-	m_via[0]->writepb_handler().set("tms5220", FUNC(tms5220_device::combined_rsq_wsq_w)).mask(0x03);
+	m_via[0]->readpa_handler().set("vsp", FUNC(tms5220_device::status_r));
+	m_via[0]->writepa_handler().set("vsp", FUNC(tms5220_device::data_w));
+	m_via[0]->writepb_handler().set("vsp", FUNC(tms5220_device::combined_rsq_wsq_w)).mask(0x03);
 	//m_via[0]->writepb_handler().set().bit(5); SPK ENABLE
 	//m_via[0]->writepb_handler().set().bit(6); SND ENABLE
 	m_via[0]->cb1_handler().set(m_via[0], FUNC(via6522_device::write_pb4));
@@ -114,19 +114,15 @@ void electron_m2105_device::device_add_mconfig(machine_config &config)
 	output_latch_device &latch(OUTPUT_LATCH(config, "cent_data_out"));
 	centronics.set_output_latch(latch);
 
-	TMS6100(config, "tms6100", 640000/4);
+	SPEECHROM(config, "vsm", 0).set_reverse_bit_order(true);
 
-	tms5220_device &tms(TMS5220(config, "tms5220", 640000));
+	tms5220_device &tms(TMS5220(config, "vsp", 640000));
+	tms.set_speechrom_tag("vsm");
 	tms.ready_cb().set(m_via[0], FUNC(via6522_device::write_ca1));
 	tms.ready_cb().append(m_via[0], FUNC(via6522_device::write_pb2));
 	tms.irq_cb().set(m_via[0], FUNC(via6522_device::write_ca2));
 	tms.irq_cb().append(m_via[0], FUNC(via6522_device::write_pb3));
-	tms.m0_cb().set("tms6100", FUNC(tms6100_device::m0_w));
-	tms.m1_cb().set("tms6100", FUNC(tms6100_device::m1_w));
-	tms.addr_cb().set("tms6100", FUNC(tms6100_device::add_w));
-	tms.data_cb().set("tms6100", FUNC(tms6100_device::data_line_r));
-	tms.romclk_cb().set("tms6100", FUNC(tms6100_device::clk_w));
-	tms.add_route(ALL_OUTPUTS, "mono", 1.0);
+	tms.add_route(ALL_OUTPUTS, "mono", 0.5);
 
 	SPEAKER(config, "mono").front_center();
 }
@@ -261,7 +257,7 @@ void electron_m2105_device::expbus_w(offs_t offset, uint8_t data)
 			break;
 
 		case 0xfe:
-			if (offset == 0xfe05)
+			if ((offset == 0xfe05) && !(data & 0xf0))
 			{
 				m_romsel = data & 0x0f;
 			}

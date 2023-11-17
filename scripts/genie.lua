@@ -1530,7 +1530,7 @@ function generate_has_header(hashname, hash)
    file:write(string.format("#ifndef GENERATED_HAS_%s_H\n", hashname))
    file:write(string.format("#define GENERATED_HAS_%s_H\n", hashname))
    file:write("\n")
-   for k, v in pairs(hash) do
+   for k, v in ipairs(hash) do
 	  if v then
 		 file:write(string.format("#define HAS_%s_%s\n", hashname, k))
 	  end

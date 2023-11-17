@@ -115,7 +115,7 @@ INPUT_PORTS_END
 
 void bingowav_state::bingowav(machine_config &config)
 {
-	TMP68301(config, m_maincpu, 12000000); // actually TMP63803F-16
+	TMP68303(config, m_maincpu, 12000000); // TMP63803F-16
 	m_maincpu->set_addrmap(AS_PROGRAM, &bingowav_state::bingowav_main_map);
 
 	te7750_device &mainioh(TE7750(config, "mainioh"));

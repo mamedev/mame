@@ -9,9 +9,6 @@ see eag68k.cpp for 68000-based EAG hardware
 NOTE: To start a new game in EAS/PC, press Game Control (aka Reset), activate
 the D6 square, and then press CL. See below for more info.
 
-TODO:
-- verify fpres/feas irq active time
-
 BTANB:
 - feasglab locks up at boot if it was powered off in the middle of the game.
   To resolve this, hold the Game Control button while booting to clear nvram.
@@ -44,8 +41,8 @@ a 4MHz XTAL.
 A condensator/battery keeps RAM contents alive for a while when powered off.
 
 Note that EAS/PC doesn't have a "new game" button, it is done through game options:
-Press GAME CONTROL, then place/lift a piece on D6 to restart, or D8 to reset
-with default settings, then press CL.
+Press GAME CONTROL, then place/lift a piece on D6 to restart with user settings
+intact, or D8 to reset and clear memory, then press CL.
 
 Anecdote from Ron Nelson regarding the new game issue (Sid Samole was the CEO):
 "The next year I designed it into a wooden housing, and Kathy said she wanted to
@@ -56,17 +53,17 @@ presses as I recall) and explained about Kathy. He said, don't let them do it ag
 
 Prestige Challenger (PC) hardware is very similar. It was released before EAS,
 it doesn't have the 8255 PPI, but has more RAM(7*TMM2016P). Some were released at
-3.6MHz instead of 4MHz, perhaps due to hardware instability? Opening module PC16 was
+3.6MHz instead of 4MHz, maybe due to hardware instability? Opening module PC16 was
 included by default, this module is the same as CB16 but at different form factor.
 
 Elite Avant Garde (models 6081,6088,6089) is on similar hardware as EAS. Level B8
 starts a self-test and displays ROM checksums, press CL to advance.
 
 Fidelity Elite Private Line were EAS/EAG conversions released by Fidelity Deutschland.
-The "Elite Privat" was probably for the local market and the "Private Line" for export.
-They took out the motherboard and leds and placed them inside a little box separate
-from a (ledless) magnetic chessboard. The ROMs were unmodified, that makes them
-uninteresting to emulate as separate drivers.
+The "Elite Privat" was probably for the local market and the "Private Line" for
+export. They took out the motherboard and leds and placed them inside a little box
+separate from a (ledless) magnetic chessboard. The ROMs were unmodified, that makes
+them uninteresting to emulate as separate drivers.
 
 *******************************************************************************/
 
@@ -478,7 +475,7 @@ void elite_state::pc(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &elite_state::pc_map);
 
 	auto &irq_clock(CLOCK(config, "irq_clock", 38.4_kHz_XTAL/64)); // through 4060 IC, 600Hz
-	irq_clock.set_pulse_width(attotime::from_usec(10)); // active for ~10us
+	irq_clock.set_pulse_width(attotime::from_nsec(13700)); // active for 13.7us
 	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);

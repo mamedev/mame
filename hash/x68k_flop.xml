@@ -1483,6 +1483,26 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		<info name="release" value="19910620" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="3444339">
+				<rom name="armored_trooper_votoms_dead_ash_disk_a.mfm" size="3444339" crc="b20e1476" sha1="dccc9fb160793595314abbb5e670cee8861037d7" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="3443871">
+				<rom name="armored_trooper_votoms_dead_ash_disk_b.mfm" size="3443871" crc="b463e7b4" sha1="469db2ccef1c69fe46f5c496a8b5bb61793afc18" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="votomsc" cloneof="votoms">
+		<description>Armored Trooper Votoms - Dead Ash (cracked)</description>
+		<year>1991</year>
+		<publisher>ファミリーソフト (Family Soft)</publisher>
+		<info name="alt_title" value="装甲騎兵ボトムズ DEAD ASH ~ Soukou Kihei Votoms Dead Ash" />
+		<info name="release" value="19910620" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">
 				<rom name="armored trooper votoms dead ash (1991)(family soft)(disk 1 of 2)(disk a).dim" size="1261824" crc="542dc750" sha1="5a7a6064dedbbbd5d0a861bd58ad4b6a6afc03b2" />
 			</dataarea>
@@ -2991,13 +3011,47 @@ No "get ready" [ADPCM] sample on first life/first stage? (btanb)
 		</part>
 	</software>
 
-	<software name="cntinent">
+	<software name="cntinent" supported="no">
 		<description>Continental</description>
+		<year>1992</year>
+		<publisher>GAMEテクノポリス (Game Technopolis)</publisher>
+		<notes>Hangs after the Game Technopolis logo</notes>
+		<info name="alt_title" value="コンチネンタル" />
+		<info name="release" value="19920320" />
+		<info name="usage" value="Requires Disk A and Disk C mounted to boot" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="3444518">
+				<rom name="continental_disk_a.mfm" size="3444518" crc="e4f470a1" sha1="1f4452bf7c9a5a89a51650bf8bab1e58ca533b89" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="3444480">
+				<rom name="continental_disk_b.mfm" size="3444480" crc="ef65bdaa" sha1="3e3fdf0e01382c21b6858098eb245ff813e568ac" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C" />
+			<dataarea name="flop" size="3444506">
+				<rom name="continental_disk_c.mfm" size="3444506" crc="b12acfcc" sha1="8c373c9a8fddfa3191d555649b9cec3ecfa8fcf2" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk D" />
+			<dataarea name="flop" size="3444495">
+				<rom name="continental_disk_d.mfm" size="3444495" crc="abff8359" sha1="778d9a2fc5cdebbbaf9af7a65388977faccb06a0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cntinentc" cloneof="cntinent">
+		<description>Continental (cracked)</description>
 		<year>1992</year>
 		<publisher>GAMEテクノポリス (Game Technopolis)</publisher>
 		<info name="alt_title" value="コンチネンタル" />
 		<info name="release" value="19920320" />
-		<info name="usage" value="Requires Disk 1 and Disk 3 mounted to boot" />
+		<info name="usage" value="Requires Disk A and Disk C mounted to boot" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">
@@ -3816,8 +3870,52 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<software name="diebahn" supported="no">
-		<description>Die Banhwelt</description>
+	<software name="diebahn">
+		<description>Die Bahnwelt</description>
+		<year>1992</year>
+		<publisher>グローディア (Glodia)</publisher>
+		<info name="alt_title" value="バーンウェルト" />
+		<info name="release" value="19921030" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System Disk" />
+			<dataarea name="flop" size="3442528">
+				<rom name="die_bahnwelt_system_disk.mfm" size="3442528" crc="d7c56366" sha1="545fc9ceb76f7621b87ae49c62efe4ab7503cc81" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk A" />
+			<dataarea name="flop" size="3433320">
+				<rom name="die_bahnwelt_data_disk_a.mfm" size="3433320" crc="f7b2251c" sha1="012a2570cd38697ca0b12c37127b1fb71efeac58" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk B" />
+			<dataarea name="flop" size="3379433">
+				<rom name="die_bahnwelt_data_disk_b.mfm" size="3379433" crc="c1ab6bdb" sha1="3012af1359cdb34f149d85393bf5f5b5349cd7ba" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk C" />
+			<dataarea name="flop" size="3413587">
+				<rom name="die_bahnwelt_data_disk_c.mfm" size="3413587" crc="c385c836" sha1="039d033b607c303ed0aa3f75283b173c7e5136f8" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Opening Disk" />
+			<dataarea name="flop" size="3403961">
+				<rom name="die_bahnwelt_opening_disk.mfm" size="3403961" crc="420779eb" sha1="851dc412f08b32d4fd68acf39bd061ea397482ab" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Ending Disk" />
+			<dataarea name="flop" size="3412617">
+				<rom name="die_bahnwelt_ending_disk.mfm" size="3412617" crc="559a369b" sha1="006ab534aba1dea9982a7abfb6f343ff0ffb23dc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="diebahnc" cloneof="diebahn">
+		<description>Die Bahnwelt (cracked)</description>
 		<year>1992</year>
 		<publisher>グローディア (Glodia)</publisher>
 		<info name="alt_title" value="バーンウェルト" />
@@ -5805,19 +5903,45 @@ Has sprite masking issue with elevators and blocks in stage 1-04
 		<info name="alt_title" value="ガウディ バルセロナの風" />
 		<info name="release" value="19890831" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1" />
+			<feature name="part_id" value="Disk I" />
+			<dataarea name="flop" size="3402035">
+				<rom name="gaudi_disk_i.mfm" size="3402035" crc="d4c74e01" sha1="741b8e468059c55869214b3bb5829765c8b81db9" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk II" />
+			<dataarea name="flop" size="3408814">
+				<rom name="gaudi_disk_ii.mfm" size="3408814" crc="db3a03e6" sha1="bc28bd8bc99751fbc848f7b8f0b2f86fb31a17b7" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk III" />
+			<dataarea name="flop" size="3423830">
+				<rom name="gaudi_disk_iii.mfm" size="3423830" crc="cf04cca2" sha1="4f80b480791d48bd0e51bb1d6ced22fc1de4dc95" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gaudic" cloneof="gaudi">
+		<description>Gaudi - Barcelona no Kaze (cracked)</description>
+		<year>1989</year>
+		<publisher>ウルフチーム (Wolf Team)</publisher>
+		<info name="alt_title" value="ガウディ バルセロナの風" />
+		<info name="release" value="19890831" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk I" />
 			<dataarea name="flop" size="1261824">
 				<rom name="gaudi barcelona no kaze (19xx)(wolf team)(disk 1 of 3).dim" size="1261824" crc="4189f78b" sha1="15c54cc35f2d1d0939ca43980a40b260988a4a74" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2" />
+			<feature name="part_id" value="Disk II" />
 			<dataarea name="flop" size="1261824">
 				<rom name="gaudi barcelona no kaze (19xx)(wolf team)(disk 2 of 3).dim" size="1261824" crc="2f345803" sha1="bf548444c9015b553aa5a26b91749f8811c42784" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3" />
+			<feature name="part_id" value="Disk III" />
 			<dataarea name="flop" size="1261824">
 				<rom name="gaudi barcelona no kaze (19xx)(wolf team)(disk 3 of 3).dim" size="1261824" crc="963650da" sha1="bb929c0edf275e60f5e6ed7aa3116fd6c7df0367" />
 			</dataarea>
@@ -6529,6 +6653,26 @@ Sometimes turning doesn't work (verify)
 
 	<software name="hanahour">
 		<description>Hanafuda Hourouki</description>
+		<year>1988</year>
+		<publisher>ドット企画 (Dot Kikaku)</publisher>
+		<info name="alt_title" value="花札放浪記" />
+		<info name="release" value="198808xx" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="3436002">
+				<rom name="hanafuda_hourouki_disk_a.mfm" size="3436002" crc="6c712a07" sha1="765df403f8bd43c7de460dbb85852b4b24ca13cd" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="3420468">
+				<rom name="hanafuda_hourouki_disk_b.mfm" size="3420468" crc="4e9faa7d" sha1="e4fcbea1516f9886dcbcb4bea1f0883131b7b43b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hanahourc" cloneof="hanahour">
+		<description>Hanafuda Hourouki (cracked)</description>
 		<year>1988</year>
 		<publisher>ドット企画 (Dot Kikaku)</publisher>
 		<info name="alt_title" value="花札放浪記" />
@@ -7913,6 +8057,26 @@ Sometimes turning doesn't work (verify)
 		<info name="release" value="19891208" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="3440540">
+				<rom name="knight_arms_disk_a.mfm" size="3440540" crc="b300b244" sha1="195a0f34de864c99557546accd17486a41dd4b2a" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="3417157">
+				<rom name="knight_arms_disk_b.mfm" size="3417157" crc="f9a71730" sha1="795074656fc7abbeaf5fc2b35e0ae2be41db5558" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="knghtarmc" cloneof="knghtarm">
+		<description>Knight Arms - The Hyblid Framer (cracked)</description>
+		<year>1989</year>
+		<publisher>アルシスソフトウェア (Arsys Software)</publisher>
+		<info name="alt_title" value="ナイトアームズ" />
+		<info name="release" value="19891208" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">
 				<rom name="knight arms the hyblid framer (1989)(arsys)(disk 1 of 2)(disk a).dim" size="1261824" crc="dccb9e79" sha1="30799db8e90a8f778046b660a03bc8eb14fb7dfd" />
 			</dataarea>
@@ -8305,10 +8469,38 @@ Sometimes turning doesn't work (verify)
 		</part>
 	</software>
 
-	<software name="laplace">
+	<software name="laplace" supported="no">
 		<description>Laplace no Ma</description>
 		<year>1990</year>
 		<publisher>ハミングバード (HummingBird)</publisher>
+		<notes>The user disk creation process doesn't recognize the data disk</notes>
+		<info name="alt_title" value="ラプラスの魔" />
+		<info name="release" value="19901221" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System Disk" />
+			<dataarea name="flop" size="3417753">
+				<rom name="laplace_no_ma_system_disk.mfm" size="3417753" crc="8c56ffac" sha1="cf774f64df320ada24f847cd54e14f78043683e6" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Game Disk" />
+			<dataarea name="flop" size="3443500">
+				<rom name="laplace_no_ma_game_disk.mfm" size="3443500" crc="25b463ea" sha1="c939221426e0fbc11b93d04ab1e01cb22554f670" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk" />
+			<dataarea name="flop" size="3432819">
+				<rom name="laplace_no_ma_data_disk.mfm" size="3432819" crc="29c76ff5" sha1="f876cf30c33c4a54b8b57a8e2ba8be55c9916d79" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="laplacec" cloneof="laplace" supported="no">
+		<description>Laplace no Ma (cracked)</description>
+		<year>1990</year>
+		<publisher>ハミングバード (HummingBird)</publisher>
+		<notes>The user disk creation process doesn't recognize the data disk</notes>
 		<info name="alt_title" value="ラプラスの魔" />
 		<info name="release" value="19901221" />
 		<part name="flop1" interface="floppy_5_25">
@@ -11346,20 +11538,20 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<info name="release" value="199104xx" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
-			<dataarea name="flop" size="1261824">
-				<rom name="pretty doll (1991)(system house oh)(disk 1 of 3).dim" size="1261824" crc="65d34713" sha1="c6e78274231f19225632a1e6657eee8cd4120542" />
+			<dataarea name="flop" size="3444672">
+				<rom name="pretty_doll_disk_1.mfm" size="3444672" crc="8f5ebae5" sha1="08df833d3725a23f2db7d45aa89cf8aee33dfa01" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2" />
-			<dataarea name="flop" size="1261824">
-				<rom name="pretty doll (1991)(system house oh)(disk 2 of 3).dim" size="1261824" crc="0624a794" sha1="2d08d95804530874798aeafc0698353fd78a388f" />
+			<dataarea name="flop" size="3420184">
+				<rom name="pretty_doll_disk_2.mfm" size="3420184" crc="11beb534" sha1="0f5d4964ab4eb4a911e2e788a0851c21f8573c35" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 3" />
-			<dataarea name="flop" size="1261824">
-				<rom name="pretty doll (1991)(system house oh)(disk 3 of 3).dim" size="1261824" crc="f53d16f2" sha1="124fe85889282d5a663b6fde9bd332e930eae9ff" />
+			<dataarea name="flop" size="3425951">
+				<rom name="pretty_doll_disk_3.mfm" size="3425951" crc="dca805c2" sha1="f0926194633233327e2886aab3b02d2f9fb27abb" />
 			</dataarea>
 		</part>
 	</software>
@@ -13226,6 +13418,26 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<info name="release" value="19890414" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="3441616">
+				<rom name="star_cruiser_disk_a.mfm" size="3441616" crc="86138b36" sha1="d4e54218a79a352218b0b07b05d57dcadb62ca0b" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="3440090">
+				<rom name="star_cruiser_disk_b.mfm" size="3440090" crc="fb9f289c" sha1="03310488a386f36bf1c0fd8d8305a643953c5bc3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scruiserc" cloneof="scruiser">
+		<description>Star Cruiser (cracked)</description>
+		<year>1989</year>
+		<publisher>アルシスソフトウェア (Arsys Software)</publisher>
+		<info name="alt_title" value="スタークルーザー" />
+		<info name="release" value="19890414" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">
 				<rom name="star cruiser (1989)(arsys)(disk 1 of 2)(disk a).dim" size="1261824" crc="8d1fea6a" sha1="9205559d3d4a683a73c9d7bff2a7f1f558fbb3b0" />
 			</dataarea>
@@ -14613,11 +14825,12 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	</software>
 
 	<software name="tuntroll">
-		<description>Tunnels &amp; Trolls - Crusaders of Khazan</description>
+		<description>Tunnels &amp; Trolls: Crusaders of Khazan</description>
 		<year>1990</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
-		<info name="alt_title" value="トンネルズ&amp;トロールズ カザンの戦士たち ~ Tunnels &amp; Trolls Khazan no Senshi tachi" />
+		<info name="alt_title" value="トンネルズ＆トロールズ カザンの戦士たち" />
 		<info name="release" value="19900616" />
+		<!-- TODO: likely similar user disk creation as per pc8801_flop.xml -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1 - Ki" />
 			<dataarea name="flop" size="1261824">
@@ -25419,11 +25632,25 @@ No sound (verify)
 		</part>
 	</software>
 
-	<!-- boot OK -->
-	<software name="fcrisis" supported="yes">
-		<description>First Crisis ma Jin no Toubou</description>
+	<software name="fcrisis">
+		<description>First Crisis - Ma-Jin no Toubou (v1.00)</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
+		<info name="alt_title" value="ふぁーすと・くらいしす　魔ＪＩＮの逃亡" />
+		<info name="developer" value="Minkey Soft" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="3424960">
+				<rom name="first_crisis.mfm" size="3424960" crc="0b976471" sha1="9432cdfa2f319cc2fe1f5afc633c44d2bd86fd02" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- boot OK -->
+	<software name="fcrisiso" cloneof="fcrisis" supported="yes">
+		<description>First Crisis - Ma-Jin no Toubou (v0.91)</description>
+		<year>1992</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="alt_title" value="ふぁーすと・くらいしす　魔ＪＩＮの逃亡" />
 		<info name="developer" value="Minkey Soft" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">

@@ -9,7 +9,8 @@
 #include "pci.h"
 #include "machine/i82439hx.h"
 
-class i82443bx_host_device : public i82439hx_host_device {
+class i82443bx_host_device : public i82439hx_host_device
+{
 public:
 	template <typename T>
 	i82443bx_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, int ram_size)
@@ -21,6 +22,8 @@ public:
 	i82443bx_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	i82443bx_host_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void config_map(address_map &map) override;
 
 	virtual void device_start() override;
@@ -42,6 +45,19 @@ private:
 	void bspad_w(offs_t offset, u8 data);
 };
 
+class i82443lx_host_device : public i82443bx_host_device
+{
+public:
+	template <typename T>
+	i82443lx_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, int ram_size)
+		: i82443lx_host_device(mconfig, tag, owner, clock)
+	{
+		set_cpu_tag(std::forward<T>(cpu_tag));
+		set_ram_size(ram_size);
+	}
+	i82443lx_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
 class i82443bx_bridge_device : public pci_bridge_device
 {
 public:
@@ -59,6 +75,8 @@ public:
 	i82443bx_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	i82443bx_bridge_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -71,8 +89,17 @@ private:
 	virtual void bridge_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 };
 
+class i82443lx_bridge_device : public i82443bx_bridge_device
+{
+public:
+	i82443lx_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
 DECLARE_DEVICE_TYPE(I82443BX_HOST, i82443bx_host_device)
+DECLARE_DEVICE_TYPE(I82443LX_HOST, i82443lx_host_device)
+
 DECLARE_DEVICE_TYPE(I82443BX_BRIDGE, i82443bx_bridge_device)
+DECLARE_DEVICE_TYPE(I82443LX_BRIDGE, i82443lx_bridge_device)
 
 
 #endif // MAME_MACHINE_I82443BX_HOST_H

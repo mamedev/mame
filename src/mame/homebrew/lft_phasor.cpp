@@ -48,7 +48,7 @@ protected:
 	void video_update();
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	required_device<avr8_device> m_maincpu;
+	required_device<atmega88_device> m_maincpu;
 	required_device<dac_byte_interface> m_dac;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -206,10 +206,10 @@ void lft_phasor_state::phasor(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &lft_phasor_state::prg_map);
 	m_maincpu->set_addrmap(AS_DATA, &lft_phasor_state::data_map);
 	m_maincpu->set_eeprom_tag("eeprom");
-	m_maincpu->gpio_in<AVR8_IO_PORTB>().set([this]() { return m_gpio_b; });
-	m_maincpu->gpio_out<AVR8_IO_PORTB>().set(FUNC(lft_phasor_state::port_b_w));
-	m_maincpu->gpio_out<AVR8_IO_PORTC>().set([this](uint8_t data) { m_dac->write(data & 0x3f); });
-	m_maincpu->gpio_out<AVR8_IO_PORTD>().set([this](uint8_t data) { m_latched_sample = data; });
+	m_maincpu->gpio_in<atmega88_device::GPIOB>().set([this]() { return m_gpio_b; });
+	m_maincpu->gpio_out<atmega88_device::GPIOB>().set(FUNC(lft_phasor_state::port_b_w));
+	m_maincpu->gpio_out<atmega88_device::GPIOC>().set([this](uint8_t data) { m_dac->write(data & 0x3f); });
+	m_maincpu->gpio_out<atmega88_device::GPIOD>().set([this](uint8_t data) { m_latched_sample = data; });
 
 	PALETTE(config, m_palette, FUNC(lft_phasor_state::init_palette), 0x10);
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

@@ -329,7 +329,7 @@ void spcforce_state::spcforce(machine_config &config)
 	I8085A(config, m_maincpu, 8'000'000 * 2);        // 4.00 MHz???
 	m_maincpu->set_addrmap(AS_PROGRAM, &spcforce_state::main_map);
 
-	I8035(config, m_audiocpu, 6'144'000);        /* divisor ??? */
+	I8035(config, m_audiocpu, 6.144_MHz_XTAL);       // divisor ???
 	m_audiocpu->set_addrmap(AS_PROGRAM, &spcforce_state::sound_map);
 	m_audiocpu->bus_in_cb().set("soundlatch", FUNC(generic_latch_8_device::read));
 	m_audiocpu->p1_out_cb().set(FUNC(spcforce_state::sn76496_latch_w));

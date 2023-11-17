@@ -104,7 +104,7 @@ uint8_t electron_pwrjoy_device::expbus_r(offs_t offset)
 
 void electron_pwrjoy_device::expbus_w(offs_t offset, uint8_t data)
 {
-	if (offset == 0xfe05)
+	if ((offset == 0xfe05) && !(data & 0xf0))
 	{
 		m_romsel = data & 0x0f;
 	}

@@ -115,6 +115,9 @@ static int parse_options(int argc, char *argv[], int minunnamed, int maxunnamed,
 					goto error; /* Too few unnamed */
 
 				util::option_resolution::entry *entry = resolution->find(name);
+				if (entry == nullptr)
+					goto error; /* Unknown option */
+
 				if (entry->option_type() == util::option_guide::entry::option_type::ENUM_BEGIN)
 				{
 					const util::option_guide::entry *enum_value;

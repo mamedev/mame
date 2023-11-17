@@ -70,15 +70,13 @@ public:
 	// machine configs
 	void micro2(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(cpu_freq) { set_cpu_freq(); }
+	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq) { set_cpu_freq(); }
 
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override { set_cpu_freq(); }
 
 private:
-	void set_cpu_freq();
-
 	// devices/pointers
 	required_device<mcs48_cpu_device> m_maincpu;
 	required_device<pwm_display_device> m_display;
@@ -91,6 +89,8 @@ private:
 	void mux_w(u8 data);
 	void control_w(u8 data);
 	u8 input_r();
+
+	void set_cpu_freq();
 
 	bool m_kp_select = false;
 	u8 m_inp_mux = 0;
@@ -181,7 +181,7 @@ static INPUT_PORTS_START( micro2 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("Go")
 
 	PORT_START("FAKE")
-	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, micro2_state, cpu_freq, 0) // factory set
+	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, micro2_state, change_cpu_freq, 0) // factory set
 	PORT_CONFSETTING(    0x00, "6MHz (original)" )
 	PORT_CONFSETTING(    0x01, "12MHz (Octo)" )
 INPUT_PORTS_END

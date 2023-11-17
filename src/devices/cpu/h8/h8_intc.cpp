@@ -117,7 +117,7 @@ uint8_t h8_intc_device::ier_r()
 void h8_intc_device::ier_w(uint8_t data)
 {
 	m_ier = data;
-	//	logerror("ier = %02x\n", data);
+	//  logerror("ier = %02x\n", data);
 	update_irq_state();
 }
 
