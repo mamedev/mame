@@ -988,4 +988,4 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                        FULLNAME     FLAGS
-COMP( 1989, samcoupe, 0,      0,      samcoupe, samcoupe, samcoupe_state, empty_init, "Miles Gordon Technology plc", "SAM Coupe", MACHINE_SUPPORTS_SAVE )
+COMP( 1989, samcoupe, 0,      0,      samcoupe, samcoupe, samcoupe_state, empty_init, "Miles Gordon Technology plc", u8"SAM Coupé", MACHINE_SUPPORTS_SAVE )

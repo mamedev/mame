@@ -28,12 +28,13 @@ public:
 
 	void base(machine_config &config);
 	void kicknrun(machine_config &config);
+	void knightba(machine_config &config);
 
 protected:
 	required_device<cpu_device>         m_maincpu;
 	required_device<cpu_device>         m_audiocpu;
 	required_device<screen_device>      m_screen;
-	required_shared_ptr<u8> m_mcu_sharedram;
+	optional_shared_ptr<u8> m_mcu_sharedram;
 
 	u32 screen_update_kicknrun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_kikikai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -72,7 +73,7 @@ private:
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 	void kicknrun_sub_cpu_map(address_map &map);
-	void mcu_map(address_map& map);
+	void knightba_main_map(address_map &map);
 
 	/* Kiki KaiKai / Kick 'n Run MCU */
 	uint8_t    m_port3_in = 0U;

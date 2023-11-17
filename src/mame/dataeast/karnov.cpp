@@ -153,6 +153,7 @@ private:
 
 	void videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void playfield_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void vintctl_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fix_tile_info);
 	DECLARE_VIDEO_START(karnov);
@@ -167,6 +168,7 @@ private:
 	void karnov_sound_map(address_map &map);
 	void karnovjbl_sound_map(address_map &map);
 
+	void screen_vblank(int state);
 	// protection mcu
 	void mcu_coin_irq(int state);
 	void mcu_ack_w(uint16_t data);
@@ -187,6 +189,7 @@ private:
 	uint16_t m_mcu_to_maincpu = 0;
 	uint16_t m_maincpu_to_mcu = 0;
 	bool m_coin_state = false;
+	bool m_vint_en = false;
 };
 
 
@@ -323,7 +326,7 @@ void karnov_state::karnov_map(address_map &map)
 	map(0x0c0004, 0x0c0005).portr("DSW").w(m_spriteram, FUNC(buffered_spriteram16_device::write));
 	map(0x0c0006, 0x0c0007).rw(FUNC(karnov_state::mcu_r), FUNC(karnov_state::mcu_w));
 	map(0x0c0008, 0x0c000b).writeonly().share("scroll");
-	map(0x0c000e, 0x0c000f).nopr().lw16([this](u16 data) { m_maincpu->set_input_line(7, CLEAR_LINE); }, "vint_ack_w");
+	map(0x0c000c, 0x0c000f).nopr().w(FUNC(karnov_state::vintctl_w));
 }
 
 void karnov_state::karnovjbl_map(address_map &map)
@@ -633,6 +636,13 @@ void karnov_state::playfield_w(offs_t offset, u16 data, u16 mem_mask)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
+void karnov_state::vintctl_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	m_vint_en = bool(offset & 1);
+	// writing to any position in the range will clear the line
+	m_maincpu->set_input_line(7, CLEAR_LINE);
+}
+
 VIDEO_START_MEMBER(karnov_state, karnov)
 {
 	/* Allocate bitmap & tilemap */
@@ -651,6 +661,14 @@ VIDEO_START_MEMBER(karnov_state, wndrplnt)
 	m_fix_tilemap->set_transparent_pen(0);
 }
 
+void karnov_state::screen_vblank(int state)
+{
+	// rising edge
+	if (state && m_vint_en)
+	{
+		m_maincpu->set_input_line(7, ASSERT_LINE);
+	}
+}
 
 /*************************************
  *
@@ -702,6 +720,7 @@ void karnov_state::machine_start()
 	save_item(NAME(m_mcu_to_maincpu));
 	save_item(NAME(m_maincpu_to_mcu));
 	save_item(NAME(m_coin_state));
+	save_item(NAME(m_vint_en));
 }
 
 void karnov_state::machine_reset()
@@ -745,7 +764,7 @@ void karnov_state::karnov(machine_config &config)
 	m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
 	m_screen->set_screen_update(FUNC(karnov_state::screen_update));
 	m_screen->set_palette(m_palette);
-	m_screen->screen_vblank().set_inputline(m_maincpu, 7, ASSERT_LINE);
+	m_screen->screen_vblank().set(FUNC(karnov_state::screen_vblank));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_karnov);
 	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting

@@ -3313,18 +3313,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/serflash.h,MACHINES["SERFLASH"] = true
----------------------------------------------------
-
-if (MACHINES["SERFLASH"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/serflash.cpp",
-		MAME_DIR .. "src/devices/machine/serflash.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/smc91c9x.h,MACHINES["SMC91C9X"] = true
 ---------------------------------------------------
 

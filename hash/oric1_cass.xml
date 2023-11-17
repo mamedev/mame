@@ -419,17 +419,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="bataille">
-		<description>La Bataille Des Couleurs</description>
-		<year>1983</year>
-		<publisher>P &amp; A Jablonka</publisher>
-		<part name="cass" interface="oric1_cass">
-			<dataarea name="cass" size="20579">
-				<rom name="Bataille Des Couleurs, La (1983)(Jablonka, PA)(FR).tap" size="20579" crc="5aa120ef" sha1="844aff7ae19214850750b3207406e8870c6c8ba1"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="battle">
 		<description>Battle Flight 4</description>
 		<year>1983</year>
@@ -891,7 +880,7 @@ Type-in from magazine
 		<year>1984</year>
 		<publisher>Alligata Software</publisher>
 		<notes><![CDATA[
-Side A: The game is recorded onde at slow speed
+Side A: The game is recorded at slow speed
 Side B: An instruction program is recorded at fast speed
 ]]></notes>
 		<part name="cass1" interface="oric1_cass">
@@ -1755,6 +1744,20 @@ Tape 2 Side B - VOYAGES: Which is loaded when you go from one town to another
 		</part>
 	</software>
 
+	<software name="galaxy5">
+		<description>Galaxy 5</description>
+		<year>1983</year>
+		<publisher>Durell Software</publisher>
+		<notes><![CDATA[
+Only has the "Galaxy" game. Missing "Lunar", "Astro-War", "Space-Chase", "Asteroids".
+]]></notes>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="8134">
+				<rom name="galaxy.tap" size="8134" crc="a96b6f8e" sha1="bd4eafb53fab98d739868a341f83d45752d4c3b7" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gastronon">
 		<description>Gastronon</description>
 		<year>1983</year>
@@ -1766,13 +1769,35 @@ Tape 2 Side B - VOYAGES: Which is loaded when you go from one town to another
 		</part>
 	</software>
 
-	<software name="ghosts">
-		<description>Ghosts and Ghouls</description>
-		<year>19??</year>
-		<publisher>Simon Overy</publisher>
+	<software name="general">
+		<description>Le General</description>
+		<year>1984</year>
+		<publisher>Loriciels</publisher>
+		<info name="language" value="French" />
+		<info name="region" value="France" />
+		<part name="cass1" interface="oric1_cass">
+			<feature name="part_id" value="ORIC-1" />
+			<dataarea name="cass" size="49108">
+				<rom name="general_oric1.tap" size="49108" crc="80820831" sha1="fa621841db536d560451906d087b70542a4b2e11"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="oric1_cass">
+			<feature name="part_id" value="ATMOS" />
+			<dataarea name="cass" size="49109">
+				<rom name="general_atmos.tap" size="49109" crc="98343da8" sha1="5f07f703daf5594bbc9e34ead60a8689b7c80518"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gencar" supported="no">
+		<description>Gencar</description>
+		<year>1983</year>
+		<publisher>Loriciels</publisher>
+		<info name="language" value="French" />
+		<info name="region" value="France" />
 		<part name="cass" interface="oric1_cass">
-			<dataarea name="cass" size="4438">
-				<rom name="Ghosts and Ghouls (19xx)(Overy, Simon).tap" size="4438" crc="1ac22b7b" sha1="c54015923fe1306c28051b8db0325a55d60eaac2"/>
+			<dataarea name="cass" size="8675">
+				<rom name="gencar.tap" size="8675" crc="9b145d1f" sha1="bc8a694461bae3349bb6ad1f6aa78cd2b97c6a19"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1792,6 +1817,7 @@ Tape 2 Side B - VOYAGES: Which is loaded when you go from one town to another
 		<description>Ghostman</description>
 		<year>1984</year>
 		<publisher>Severn Software</publisher>
+		<info name="region" value="UK" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="16986">
 				<rom name="Ghostman (1984)(Severn Software)(GB).tap" size="16986" crc="5da8b19b" sha1="0879e02444a5288f2ca38aef13d928c1178a2295"/>
@@ -1802,7 +1828,8 @@ Tape 2 Side B - VOYAGES: Which is loaded when you go from one town to another
 	<software name="ghostman1" cloneof="ghostman">
 		<description>Ghostman (Infogrames)</description>
 		<year>1984</year>
-		<publisher>Infogrames, Severn Software</publisher>
+		<publisher>Infogrames</publisher>
+		<info name="region" value="France" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="16974">
 				<rom name="Ghostman (1984)(Infogrames - Severn Software)(FR).tap" size="16974" crc="cd890bce" sha1="aa2ef0d8c7c15c4423851ede1cee9e453a628d8d"/>
@@ -1810,10 +1837,49 @@ Tape 2 Side B - VOYAGES: Which is loaded when you go from one town to another
 		</part>
 	</software>
 
+	<software name="ghosts">
+		<description>Ghosts and Ghouls</description>
+		<year>19??</year>
+		<publisher>Simon Overy</publisher>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="4438">
+				<rom name="Ghosts and Ghouls (19xx)(Overy, Simon).tap" size="4438" crc="1ac22b7b" sha1="c54015923fe1306c28051b8db0325a55d60eaac2"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="godilloric">
-		<description>Godilloric</description>
+		<description>Godilloric (Oric-1/Atmos release)</description>
 		<year>1983</year>
 		<publisher>Loriciels</publisher>
+		<info name="language" value="French" />
+		<info name="region" value="France" />
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="13970">
+				<rom name="godill_a.tap" size="13970" crc="5b0d6af5" sha1="38d771d0fad8768cb2ed4c7c88146422af8b7054"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="godilloric_a" cloneof="godilloric">
+		<description>Godilloric (Oric-1 release)</description>
+		<year>1983</year>
+		<publisher>Loriciels</publisher>
+		<info name="language" value="French" />
+		<info name="region" value="France" />
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="13880">
+				<rom name="godill_o.tap" size="13880" crc="46b04492" sha1="dd2c74a99afa33a03df337b8573b214c71598d33"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="godilloric_b" cloneof="godilloric">
+		<description>Godilloric (alt)</description>
+		<year>1983</year>
+		<publisher>Loriciels</publisher>
+		<info name="language" value="French" />
+		<info name="region" value="France" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="11801">
 				<rom name="Godilloric (1983)(Loriciels)(FR).tap" size="11801" crc="f3e05b29" sha1="7077c3017dea00f8658f717b623ee2b321b36896"/>
@@ -1853,6 +1919,36 @@ Tape 2 Side B - VOYAGES: Which is loaded when you go from one town to another
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="34892">
 				<rom name="gubbie.tap" size="34892" crc="1128a00c" sha1="108097afa4269f05be0e033d4afd8fc166e89d54"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="guerrecl">
+		<description>Guerre des Couleurs</description>
+		<year>1983</year>
+		<publisher>A.S.N. Diffusion</publisher>
+		<info name="alt_title" value="La Bataille des Couleurs"/>
+		<info name="developer" value="P &amp; A Jablonka" />
+		<info name="language" value="French" />
+		<info name="region" value="France" />
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="20905">
+				<rom name="guercoul.tap" size="20905" crc="b949514f" sha1="8326877c4199b560d379dff0367be2e95ad4f2c8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="guerrecl_a" cloneof="guerrecl">
+		<description>Guerre des Couleurs (alt)</description>
+		<year>1983</year>
+		<publisher>A.S.N. Diffusion</publisher>
+		<info name="alt_title" value="La Bataille des Couleurs"/>
+		<info name="developer" value="P &amp; A Jablonka" />
+		<info name="language" value="French" />
+		<info name="region" value="France" />
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="20579">
+				<rom name="Bataille Des Couleurs, La (1983)(Jablonka, PA)(FR).tap" size="20579" crc="5aa120ef" sha1="844aff7ae19214850750b3207406e8870c6c8ba1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2561,7 +2657,7 @@ The cassette stops during the game loading
 	</software>
 
 	<software name="manicminer">
-		<description>Manic Miner</description>
+		<description>Manic Miner (cracked)</description>
 		<year>1985</year>
 		<publisher>Software Projects</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -2651,7 +2747,7 @@ The cassette stops during the game loading
 	</software>
 
 	<software name="minedout">
-		<description>Mined Out</description>
+		<description>Mined Out (cracked)</description>
 		<year>1984</year>
 		<publisher>Quicksilva</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -2755,7 +2851,7 @@ The cassette stops during the game loading
 		</part>
 		<part name="cass2" interface="oric1_cass">
 			<feature name="part_id" value="FACE B - ATMOS"/>
-			<dataarea name="cass" size="0">
+			<dataarea name="cass" size="1">
 				<rom name="Mission Impossible - Face B.tap" size="0" status="nodump"/>
 			</dataarea>
 		</part>
@@ -3460,13 +3556,24 @@ The cassette stops during the game loading
 		</part>
 	</software>
 
-	<software name="questof">
+	<software name="grail">
 		<description>The Quest of the Holy Grail</description>
 		<year>1983</year>
 		<publisher>Severn Software</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="9757">
 				<rom name="Quest of the Holy Grail, The (1983)(Severn Software)(GB).tap" size="9757" crc="daf2c180" sha1="930363aabd140368331777ed7606ebda6f8112de"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grail_a" cloneof="grail">
+		<description>The Quest of the Holy Grail (alt)</description>
+		<year>1983</year>
+		<publisher>Severn Software</publisher>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="9762">
+				<rom name="grail.tap" size="9762" crc="67af9a5f" sha1="62ea326b7f9d116fbfe07dc46b8ca00a94e0e67c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4522,9 +4629,12 @@ Side A with the game's rule, side B with the game.
 	</software>
 
 	<software name="warlord">
-		<description>Warlord</description>
+		<description>Warlord (cracked)</description>
 		<year>1983</year>
 		<publisher>M.C. Lothlorien</publisher>
+		<notes><![CDATA[
+Works only on Oric Atmos
+]]></notes>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="30919">
 				<rom name="Warlord (1983)(M.C. Lothlorien)(Atmos)(GB)[cr GBG Hacker's].tap" size="30919" crc="a384bccc" sha1="93c549c553deaf1368d694b0ad856edceef194af"/>

@@ -2808,7 +2808,7 @@ GAME( 1981, ckong,       0,        cclimber,  ckong,     cclimber_state, empty_i
 GAME( 1981, ckongalc,    ckong,    cclimber,  ckong,     cclimber_state, empty_init,     ROT270, "bootleg (Alca)", "Crazy Kong (Alca bootleg)",                MACHINE_SUPPORTS_SAVE )
 GAME( 1981, monkeyd,     ckong,    cclimber,  ckong,     cclimber_state, empty_init,     ROT270, "bootleg",        "Monkey Donkey",                            MACHINE_SUPPORTS_SAVE )
 GAME( 1981, dking,       ckong,    cclimber,  ckong,     cclimber_state, init_dking,     ROT270, "bootleg",        "Donkey King",                              MACHINE_SUPPORTS_SAVE ) // supposedly, possibly by Hafasonic?
-GAME( 1981, ckongdks,    ckong,    cclimber,  ckong,     cclimber_state, init_dking,     ROT270, "bootleg",        "Donkey Kong (Spanish Crazy Kong bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ckongdks,    ckong,    cclimber,  ckong,     cclimber_state, init_dking,     ROT270, "bootleg",        "Donkey Kong (Spanish bootleg of Crazy Kong)", MACHINE_SUPPORTS_SAVE )
 
 /* these sets have correct colours, and also contain the graphics used for the extra attract screen in the BG roms, but it is unused
  - the Falcon logo in the text roms is still unused
@@ -2829,10 +2829,10 @@ GAME( 1981, ckongpt2b2,  ckongpt2, cclimber,  ckongb2,   cclimber_state, empty_i
 // see bagman.cpp for parent
 GAME( 1982, bagmanf,     bagman,   bagmanf,   bagmanf,   cclimber_state, empty_init,     ROT270, "bootleg", "Le Bagnard (bootleg on Crazy Kong hardware)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1981, rpatrol,     0,        rpatrol,   rpatrol,   cclimber_state, init_rpatrol,   ROT0,   "Orca",    "River Patrol (Japan)",              MACHINE_SUPPORTS_SAVE)
-GAME( 1981, rpatroln,    rpatrol,  rpatrol,   rpatrol,   cclimber_state, empty_init,     ROT0,   "Orca",    "River Patrol (Japan, unprotected)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, rpatrolb,    rpatrol,  rpatrol,   rpatrol,   cclimber_state, empty_init,     ROT0,   "bootleg", "River Patrol (bootleg)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1981, silvland,    rpatrol,  rpatrol,   rpatrol,   cclimber_state, empty_init,     ROT0,   "Falcon",  "Silver Land",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1981, rpatrol,     0,        rpatrol,   rpatrol,   cclimber_state, init_rpatrol,   ROT0,   "Orca",    "River Patrol (Japan)",               MACHINE_SUPPORTS_SAVE)
+GAME( 1981, rpatroln,    rpatrol,  rpatrol,   rpatrol,   cclimber_state, empty_init,     ROT0,   "Orca",    "River Patrol (Japan, unprotected)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1981, rpatrolb,    rpatrol,  rpatrol,   rpatrol,   cclimber_state, empty_init,     ROT0,   "bootleg", "River Patrol (bootleg)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1981, silvland,    rpatrol,  rpatrol,   rpatrol,   cclimber_state, empty_init,     ROT0,   "Falcon",  "Silver Land (hack of River Patrol)", MACHINE_SUPPORTS_SAVE )
 
 // see pacman.cpp for parent
 GAME( 1985, cannonb,     cannonbp, cannonb,   cannonb,   cclimber_state, init_cannonb,   ROT90,  "bootleg (Soft)",              "Cannon Ball (bootleg on Crazy Kong hardware) (set 1, buggy)" ,        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // bootleggers missed protection after bonus game

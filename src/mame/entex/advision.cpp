@@ -168,7 +168,7 @@ u32 advision_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 
 			for (int i = 0; i < led_height; i++)
 			{
-				if (cliprect.contains(x, dy))
+				if (cliprect.contains(x, dy + i))
 					bitmap.pix(dy + i, x) = red << 16 | green << 8 | blue;
 			}
 		}

@@ -590,10 +590,20 @@ static INPUT_PORTS_START( taikodp )
 	PORT_INCLUDE(xavix_an)
 
 	PORT_MODIFY("AN0") // 00  (read by one type of function, handled in timer interrupt at 0x1d92 in RAM)
+#if 0 // should be more correct, but causes multiple hits to register
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
+#else
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNUSED )
+#endif
 
 	PORT_MODIFY("AN1") // 01  (read by identical function to 00 but with different addresses, handled in timer interrupt at 0x1dbd in RAM)
+#if 0 // should be more correct, but causes multiple hits to register
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
+#else
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNUSED )
+#endif
 
 	PORT_MODIFY("AN5") // 11  (read by different function, handled in timer interrupt at 0x1de8) (battery status related?)
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )

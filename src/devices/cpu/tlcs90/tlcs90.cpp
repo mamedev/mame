@@ -16,7 +16,7 @@
 #include "tlcs90.h"
 #include "tlcs90d.h"
 
-#define VERBOSE     1
+#define VERBOSE     0
 #include "logmacro.h"
 
 ALLOW_SAVE_TYPE(tlcs90_device::e_mode); // allow save_item on a non-fundamental type
@@ -1103,7 +1103,7 @@ uint16_t tlcs90_device::r8( const uint16_t r )
 		case L: return m_hl.b.l;
 
 		default:
-			fatalerror("%04x: unimplemented r8 register index = %d\n",m_pc.w.l,r);
+			fatalerror("%04x: unimplemented r8 register index = %d\n",m_prvpc.w.l,r);
 	}
 }
 
@@ -1120,7 +1120,7 @@ void tlcs90_device::w8( const uint16_t r, uint16_t value )
 		case L: m_hl.b.l = value;   return;
 
 		default:
-			fatalerror("%04x: unimplemented w8 register index = %d\n",m_pc.w.l,r);
+			fatalerror("%04x: unimplemented w8 register index = %d\n",m_prvpc.w.l,r);
 	}
 }
 
@@ -1141,7 +1141,7 @@ uint16_t tlcs90_device::r16( const uint16_t r )
 		case PC:    return m_pc.w.l;
 
 		default:
-			fatalerror("%04x: unimplemented r16 register index = %d\n",m_pc.w.l,r);
+			fatalerror("%04x: unimplemented r16 register index = %d\n",m_prvpc.w.l,r);
 	}
 }
 
@@ -1160,7 +1160,7 @@ void tlcs90_device::w16( const uint16_t r, uint16_t value )
 		case PC:    m_pc.d = value; return;
 
 		default:
-			fatalerror("%04x: unimplemented w16 register index = %d\n",m_pc.w.l,r);
+			fatalerror("%04x: unimplemented w16 register index = %d\n",m_prvpc.w.l,r);
 	}
 }
 
@@ -1293,7 +1293,7 @@ int tlcs90_device::Test( uint8_t cond )
 		case NZ:    return !(F & ZF);
 		case NC:    return !(F & CF);
 		default:
-			fatalerror("%04x: unimplemented condition = %d\n",m_pc.w.l,cond);
+			fatalerror("%04x: unimplemented condition = %d\n",m_prvpc.w.l,cond);
 	}
 
 	// never executed
@@ -1348,7 +1348,7 @@ INT2        P82         Rising Edge     -
 
 void tlcs90_device::halt()
 {
-	LOG("%04X: halt\n", m_pc.w.l);
+	LOG("%04X: halt\n", m_prvpc.w.l);
 	m_halt = 1;
 }
 
@@ -1379,9 +1379,6 @@ void tlcs90_device::take_interrupt(tlcs90_e_irq irq)
 
 	leave_halt();
 
-	if (!(F & IF))
-		return;
-
 	Push( PC );
 	Push( AF );
 
@@ -1396,6 +1393,9 @@ void tlcs90_device::check_interrupts()
 {
 	tlcs90_e_irq irq;
 	int mask;
+
+	if (!(F & IF))
+		return;
 
 	for (irq = INTSWI; irq < INTMAX; ++irq)
 	{
@@ -1463,12 +1463,11 @@ void tlcs90_device::execute_run()
 	{
 		check_interrupts();
 
-		// when in HALT state, the fetched opcode is not dispatched (aka a NOP)
+		// when in HALT state, the fetched opcode is not dispatched (aka a NOP) and the PC is not increased
 		if (m_halt)
-		{
 			m_op = NOP;
-		}
-		else {
+		else
+		{
 			m_prvpc.d = m_pc.d;
 			debugger_instruction_hook(m_pc.d);
 
@@ -1649,10 +1648,10 @@ void tlcs90_device::execute_run()
 				Cyc();
 				break;
 
-            case HALT:
+			case HALT:
 				halt();
-                Cyc();
-                break;
+				Cyc();
+				break;
 			case DI:
 				m_after_EI = 0;
 				F &= ~IF;
@@ -2413,7 +2412,7 @@ uint8_t tlcs90_device::p1_r()
 	if ((m_p01cr & 0x04) != 0)
 	{
 		if (!machine().side_effects_disabled())
-			logerror("%04X: Read from P1 but it's configured as part of address bus\n", m_pc.w.l);
+			logerror("%04X: Read from P1 but it's configured as part of address bus\n", m_prvpc.w.l);
 
 		return 0;
 	}
@@ -2421,12 +2420,12 @@ uint8_t tlcs90_device::p1_r()
 	if ((m_p01cr & 0x02) != 0)
 	{
 		if (!machine().side_effects_disabled())
-			logerror("%04X: Read from P1 but it's configured as output\n", m_pc.w.l);
+			logerror("%04X: Read from P1 but it's configured as output\n", m_prvpc.w.l);
 
 		return 0;
 	}
 
-	return (m_port_latch[1] & 0xf0) | (m_port_read_cb[1]() & 0x0f);
+	return m_port_read_cb[1]();
 }
 
 void tlcs90_device::p1_w(uint8_t data)
@@ -2434,7 +2433,7 @@ void tlcs90_device::p1_w(uint8_t data)
 	if ((m_p01cr & 0x04) != 0)
 	{
 		if (!machine().side_effects_disabled())
-			logerror("%04X: Read from P1 but it's configured as part of address bus\n", m_pc.w.l);
+			logerror("%04X: Read from P1 but it's configured as part of address bus\n", m_prvpc.w.l);
 
 		return;
 	}
@@ -2442,7 +2441,7 @@ void tlcs90_device::p1_w(uint8_t data)
 	if ((m_p01cr & 0x02) == 0)
 	{
 		if (!machine().side_effects_disabled())
-			logerror("%04X: Write to P1 but it's configured as input\n", m_pc.w.l);
+			logerror("%04X: Write to P1 but it's configured as input\n", m_prvpc.w.l);
 
 		return;
 	}
@@ -2460,12 +2459,12 @@ uint8_t tlcs90_device::p2_r()
 	if ((m_p01cr & 0x04) != 0)
 	{
 		if (!machine().side_effects_disabled())
-			logerror("%04X: Read from P2 but it's configured as part of address bus\n", m_pc.w.l);
+			logerror("%04X: Read from P2 but it's configured as part of address bus\n", m_prvpc.w.l);
 
 		return 0;
 	}
 
-	return (m_port_latch[2] & 0xf0) | (m_port_read_cb[2]() & 0x0f);
+	return m_port_read_cb[2]();
 }
 
 void tlcs90_device::p2_w(uint8_t data)
@@ -2473,7 +2472,7 @@ void tlcs90_device::p2_w(uint8_t data)
 	if ((m_p01cr & 0x04) != 0)
 	{
 		if (!machine().side_effects_disabled())
-			logerror("%04X: Read from P1 but it's configured as part of address bus\n", m_pc.w.l);
+			logerror("%04X: Read from P1 but it's configured as part of address bus\n", m_prvpc.w.l);
 
 		return;
 	}
@@ -2779,14 +2778,14 @@ uint8_t tlcs90_device::reserved_r(offs_t offset)
 {
 	uint16_t iobase = 0xffc0;
 	if (!machine().side_effects_disabled())
-		logerror("%04X: Read from unimplemented SFR at %04X\n", m_pc.w.l, iobase + offset);
+		logerror("%04X: Read from unimplemented SFR at %04X\n", m_prvpc.w.l, iobase + offset);
 	return 0;
 }
 
 void tlcs90_device::reserved_w(offs_t offset, uint8_t data)
 {
 	uint16_t iobase = 0xffc0;
-	logerror("%04X: Write %02X to unimplemented SFR at %04X\n", m_pc.w.l, data, iobase + offset);
+	logerror("%04X: Write %02X to unimplemented SFR at %04X\n", m_prvpc.w.l, data, iobase + offset);
 }
 
 void tlcs90_device::t90_start_timer(int i)

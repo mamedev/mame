@@ -13,7 +13,7 @@
     Tiger-Heli
 
   TODO:
-  - proper MCU emulation (mame/machine/slapfght.cpp)
+  - proper MCU emulation (see slapfght_m.cpp)
 
 ****************************************************************************
 

@@ -43,6 +43,7 @@ Undocumented buttons:
 - holding CLEAR on boot will clear the battery backed RAM
 
 TODO:
+- verify IRQ level for 32bit modules, and how IRQ is acknowledged
 - match I/S= diag speed test with real hardware (good test for proper waitstates?)
 - gen32 waitstates emulation is preliminary (without it, sound pitch is way too high
   and lcd write speed too fast). Real gen32 sound is a bit lower pitched than MAME.
@@ -421,7 +422,7 @@ void mmodular_state::alm16(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mmodular_state::alm16_mem);
 
 	const attotime irq_period = attotime::from_hz(12.288_MHz_XTAL / 10 / 0x800); // 600Hz
-	m_maincpu->set_periodic_int(FUNC(mmodular_state::irq2_line_hold), irq_period);
+	m_maincpu->set_periodic_int(FUNC(mmodular_state::irq3_line_hold), irq_period);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -458,7 +459,7 @@ void mmodular_state::alm32(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mmodular_state::alm32_mem);
 
 	const attotime irq_period = attotime::from_hz(12.288_MHz_XTAL / 0x4000); // 750Hz
-	m_maincpu->set_periodic_int(FUNC(mmodular_state::irq2_line_hold), irq_period);
+	m_maincpu->set_periodic_int(FUNC(mmodular_state::irq3_line_hold), irq_period);
 
 	config.set_default_layout(layout_mephisto_alm32);
 }
@@ -484,7 +485,7 @@ void mmodular_state::gen32(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mmodular_state::gen32_mem);
 
 	const attotime irq_period = attotime::from_hz(6.144_MHz_XTAL / 0x4000); // through 4060, 375Hz
-	m_maincpu->set_periodic_int(FUNC(mmodular_state::irq2_line_hold), irq_period);
+	m_maincpu->set_periodic_int(FUNC(mmodular_state::irq3_line_hold), irq_period);
 
 	config.set_default_layout(layout_mephisto_gen32);
 }

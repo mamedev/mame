@@ -300,7 +300,7 @@ void labtam_vducom_device_base::device_add_mconfig(machine_config &config)
 	m_com[1]->out_rtsa_callback().set(m_serial[2], FUNC(rs232_port_device::write_rts));
 	m_com[1]->out_txda_callback().set(m_serial[2], FUNC(rs232_port_device::write_txd));
 
-	RS232_PORT(config, m_serial[3], default_rs232_devices, type() == LABTAM_VDUCOM ? "keyboard" : nullptr);
+	RS232_PORT(config, m_serial[3], default_rs232_devices, nullptr);
 	m_serial[3]->dcd_handler().set(m_com[1], FUNC(upd7201_device::dcdb_w));
 	m_serial[3]->cts_handler().set(m_com[1], FUNC(upd7201_device::ctsb_w));
 	m_serial[3]->rxd_handler().set(m_com[1], FUNC(upd7201_device::rxb_w));
@@ -312,9 +312,16 @@ void labtam_vducom_device_base::device_add_mconfig(machine_config &config)
 	X2212(config, m_nvram[1]);
 }
 
+static DEVICE_INPUT_DEFAULTS_START(keyboard_defaults)
+	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_110)
+DEVICE_INPUT_DEFAULTS_END
+
 void labtam_vducom_device::device_add_mconfig(machine_config &config)
 {
 	labtam_vducom_device_base::device_add_mconfig(config);
+
+	m_serial[3]->set_default_option("keyboard");
+	m_serial[3]->set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(keyboard_defaults));
 
 	MC6845(config, m_crtc, 16_MHz_XTAL / 16);
 	m_crtc->set_show_border_area(false);

@@ -81,7 +81,6 @@ public:
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
-	DECLARE_INPUT_CHANGED_MEMBER(acl_button) { if (newval) power_off(); }
 	DECLARE_INPUT_CHANGED_MEMBER(on_button);
 
 	void risc2500(machine_config &config);
@@ -398,7 +397,6 @@ static INPUT_PORTS_START( risc2500 )
 
 	PORT_START("RESET")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("ON")       PORT_CODE(KEYCODE_I) PORT_CHANGED_MEMBER(DEVICE_SELF, risc2500_state, on_button, 0)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("ACL")      PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, risc2500_state, acl_button, 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( montreux ) // on/off buttons have different labels

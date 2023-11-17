@@ -374,8 +374,7 @@ license:CC0-1.0
 		<group ref="sb_board"><bounds x="3" y="3" width="80" height="80" /></group>
 		<group ref="sb_ui"><bounds x="-14.5" y="3" width="10" height="80" /></group>
 
-	<!-- chessboard coords -->
-
+		<!-- chessboard coords -->
 		<element ref="text_8"><bounds x="83.5" y="7" width="2" height="2" /></element>
 		<element ref="text_7"><bounds x="83.5" y="17" width="2" height="2" /></element>
 		<element ref="text_6"><bounds x="83.5" y="27" width="2" height="2" /></element>
@@ -394,8 +393,7 @@ license:CC0-1.0
 		<element ref="text_g"><bounds x="67" y="0.4" width="2" height="2" /></element>
 		<element ref="text_h"><bounds x="77" y="0.4" width="2" height="2" /></element>
 
-	<!-- chessboard leds, labels -->
-
+		<!-- chessboard leds, labels -->
 		<element name="0.7" ref="ledr"><bounds x="0.5" y="7.25" width="1.5" height="1.5" /></element>
 		<element name="0.6" ref="ledr"><bounds x="0.5" y="17.25" width="1.5" height="1.5" /></element>
 		<element name="0.5" ref="ledr"><bounds x="0.5" y="27.25" width="1.5" height="1.5" /></element>
@@ -429,8 +427,7 @@ license:CC0-1.0
 		<element ref="text_l7"><bounds x="54.5" y="86.8" width="8" height="2" /></element>
 		<element ref="text_l8"><bounds x="74.5" y="86.8" width="8" height="2" /></element>
 
-	<!-- bottom side buttons -->
-
+		<!-- bottom side buttons -->
 		<element ref="whitew"><bounds x="-1" y="90" width="88" height="16.5" /></element>
 
 		<element ref="text_b1"><bounds x="3" y="92.5" width="10" height="2" /></element>

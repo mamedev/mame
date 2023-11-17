@@ -4,114 +4,736 @@ license:CC0-1.0
 -->
 
 <mamelayout version="2">
+	<element name="bg"><rect><color red="0.1" green="0.1" blue="0.1" /></rect></element>
+	<element name="black"><rect><color red="0" green="0" blue="0" /></rect></element>
+	<element name="grey"><rect><color red="0.18" green="0.18" blue="0.18" /></rect></element>
+	<element name="white"><rect><color red="1" green="1" blue="1" /></rect></element>
+	<element name="blue"><rect><color red="0.29" green="0.38" blue="0.82" /></rect></element>
+
+	<!-- text elements -->
+	<element name="effect">
+		<rect><color red="0.18" green="0.18" blue="0.18" /></rect>
+		<text string="EFFECT"><color red="1" green="0.9" blue="0.4" /></text>
+	</element>
+	<element name="bend"><rect><color red="0.18" green="0.18" blue="0.18" /></rect><text string="BEND" /></element>
+	<element name="range"><rect><color red="0.18" green="0.18" blue="0.18" /></rect><text string="RANGE" /></element>
+	<element name="vibrato"><rect><color red="0.18" green="0.18" blue="0.18" /></rect><text string="VIBRATO" /></element>
+	<element name="on_off"><rect><color red="0.18" green="0.18" blue="0.18" /></rect><text string="ON/OFF" /></element>
+	<element name="portamento"><rect><color red="0.18" green="0.18" blue="0.18" /></rect><text string="PORTAMENTO" /></element>
+	<element name="time"><rect><color red="0.18" green="0.18" blue="0.18" /></rect><text string="TIME" /></element>
+
+	<element name="programmer">
+		<rect><color red="0.18" green="0.18" blue="0.18" /></rect>
+		<text string="PROGRAMMER"><color red="1" green="0.9" blue="0.4" /></text>
+	</element>
+	<element name="preset"><rect><color red="0.18" green="0.18" blue="0.18" /></rect><text string="PRESET" /></element>
+	<element name="internal"><rect><color red="0.18" green="0.18" blue="0.18" /></rect><text string="INTERNAL" /></element>
+	<element name="cartridge"><rect><color red="0.18" green="0.18" blue="0.18" /></rect><text string="CARTRIDGE" /></element>
+	<element name="memory"><rect><color red="0.18" green="0.18" blue="0.18" /></rect><text string="MEMORY" align="1" /></element>
+	<element name="compare"><rect><color red="0.18" green="0.18" blue="0.18" /></rect><text string="COMPARE" align="1" /></element>
+	<element name="recall"><rect><color red="0.18" green="0.18" blue="0.18" /></rect><text string="/RECALL" align="2" /></element>
+
+	<element name="mono"><rect><color red="0.18" green="0.18" blue="0.18" /></rect><text string="MONO" align="2" /></element>
+	<element name="solo"><rect><color red="0.18" green="0.18" blue="0.18" /></rect><text string="SOLO" /></element>
+	<element name="tone_mix"><rect><color red="0.18" green="0.18" blue="0.18" /></rect><text string="TONE MIX" /></element>
+	<element name="key_transpose"><rect><color red="0.18" green="0.18" blue="0.18" /></rect><text string="KEY TRANSPOSE" align="1" /></element>
+	<element name="write"><rect><color red="0.18" green="0.18" blue="0.18" /></rect><text string="WRITE" /></element>
+	<element name="midi"><rect><color red="0.18" green="0.18" blue="0.18" /></rect><text string="MIDI" /></element>
+
+	<element name="digital"><text string="DIGITAL SYNTHESIZER"><color red="0.29" green="0.38" blue="0.82" /></text></element>
+	<element name="data_entry">
+		<rect><color red="0.18" green="0.18" blue="0.18" /></rect>
+		<text string="DATA ENTRY"><color red="1" green="0.9" blue="0.4" /></text>
+	</element>
+	<element name="value"><rect><color red="0.18" green="0.18" blue="0.18" /></rect><text string="VALUE" /></element>
+	<element name="cursor"><rect><color red="0.18" green="0.18" blue="0.18" /></rect><text string="CURSOR" /></element>
+	<element name="save"><rect><color red="0.18" green="0.18" blue="0.18" /></rect><text string="SAVE" /></element>
+	<element name="load"><rect><color red="0.18" green="0.18" blue="0.18" /></rect><text string="LOAD" /></element>
+
+	<element name="parameter">
+		<rect><color red="0.18" green="0.18" blue="0.18" /></rect>
+		<text string="PARAMETER"><color red="1" green="0.9" blue="0.4" /></text>
+	</element>
+	<element name="env_step"><rect><color red="0.18" green="0.18" blue="0.18" /></rect><text string="ENV STEP" /></element>
+	<element name="down"><rect><color red="0.18" green="0.18" blue="0.18" /></rect><text string="DOWN" /></element>
+	<element name="up"><rect><color red="0.18" green="0.18" blue="0.18" /></rect><text string="UP" /></element>
+	<element name="env_point"><rect><color red="0.18" green="0.18" blue="0.18" /></rect><text string="ENV POINT" /></element>
+	<element name="sustain"><rect><color red="0.18" green="0.18" blue="0.18" /></rect><text string="SUSTAIN" /></element>
+	<element name="end"><rect><color red="0.18" green="0.18" blue="0.18" /></rect><text string="END" /></element>
+	<element name="initialize"><rect><color red="0.18" green="0.18" blue="0.18" /></rect><text string="INITIALIZE" /></element>
+	<element name="octave"><rect><color red="0.18" green="0.18" blue="0.18" /></rect><text string="OCTAVE" /></element>
+	<element name="wave_form"><rect><color red="0.18" green="0.18" blue="0.18" /></rect><text string="WAVE FORM" /></element>
+	<element name="key_follow"><rect><color red="0.18" green="0.18" blue="0.18" /></rect><text string="KEY FOLLOW" /></element>
+	<element name="env"><rect><color red="0.18" green="0.18" blue="0.18" /></rect><text string="ENV" /></element>
+	<element name="detune"><rect><color red="0.18" green="0.18" blue="0.18" /></rect><text string="DETUNE" /></element>
+	<element name="line_select"><rect><color red="0.18" green="0.18" blue="0.18" /></rect><text string="LINE SELECT" /></element>
+	<element name="ring"><rect><color red="0.18" green="0.18" blue="0.18" /></rect><text string="RING" /></element>
+	<element name="noise"><rect><color red="0.18" green="0.18" blue="0.18" /></rect><text string="NOISE" /></element>
+	<element name="modulation"><rect><color red="0.18" green="0.18" blue="0.18" /></rect><text string="MODULATION" /></element>
+
+	<element name="dco1"><rect><color red="0.29" green="0.38" blue="0.82" /></rect><text string="DCO 1" /></element>
+	<element name="dco2"><rect><color red="0.29" green="0.38" blue="0.82" /></rect><text string="DCO 2" /></element>
+	<element name="dcw1"><rect><color red="0.29" green="0.38" blue="0.82" /></rect><text string="DCW 1" /></element>
+	<element name="dcw2"><rect><color red="0.29" green="0.38" blue="0.82" /></rect><text string="DCW 2" /></element>
+	<element name="dca1"><rect><color red="0.29" green="0.38" blue="0.82" /></rect><text string="DCA 1" /></element>
+	<element name="dca2"><rect><color red="0.29" green="0.38" blue="0.82" /></rect><text string="DCA 2" /></element>
+
+	<element name="line1"><rect><color red="0.18" green="0.18" blue="0.18" /></rect><text string="1" /></element>
+	<element name="line2"><rect><color red="0.18" green="0.18" blue="0.18" /></rect><text string="2" /></element>
+	<element name="line12"><rect><color red="0.18" green="0.18" blue="0.18" /></rect><text string="1+2&apos;" /></element>
+	<element name="line11"><rect><color red="0.18" green="0.18" blue="0.18" /></rect><text string="1+1&apos;" /></element>
+
+	<element name="master_tune"><text string="MASTER TUNE"><color red="1" green="0.9" blue="0.4" /></text></element>
+
+	<element name="power">
+		<rect><color red="0.18" green="0.18" blue="0.18" /></rect>
+		<text string="POWER"><color red="1" green="0.9" blue="0.4" /></text>
+	</element>
+
+	<!-- LED primitives -->
 	<element name="led" defstate="0">
+		<rect state="0"><color red="0.2" green="0" blue="0" /></rect>
+		<rect state="1"><color red="1" green="0.1" blue="0" /></rect>
+	</element>
+
+	<element name="led_g" defstate="0">
+		<rect state="0"><color red="0" green="0.2" blue="0" /></rect>
+		<rect state="1"><color red="0" green="1" blue="0.1" /></rect>
+	</element>
+
+	<!-- button primitives -->
+	<element name="button_grey" defstate="0">
+		<rect>
+			<color red="0.05" green="0.05" blue="0.05" />
+			<bounds x="0" y="0" width="15" height="10" />
+		</rect>
 		<rect state="0">
-			<color red="0" green="0.2" blue="0" />
+			<color red="0.1" green="0.1" blue="0.1" />
+			<bounds xc="7.5" yc="5" width="13.5" height="8.5" />
 		</rect>
 		<rect state="1">
-			<color red="0" green="0.8" blue="0" />
+			<color red="0.07" green="0.07" blue="0.07" />
+			<bounds xc="7.5" yc="5" width="13.5" height="8.5" />
 		</rect>
 	</element>
-	<view name="Debugging Lamps">
-		<bounds x="0" y="0" width="776" height="200" />
-		<screen index="0">
-			<bounds left="0" top="0" right="776" bottom="152" />
-		</screen>
-		<element name="led_0" ref="led">
-			<bounds x="10" y="160" width="10" height="10" />
+
+	<element name="button_down" defstate="0">
+		<rect>
+			<color red="0.05" green="0.05" blue="0.05" />
+			<bounds x="0" y="0" width="15" height="10" />
+		</rect>
+		<rect state="0">
+			<color red="0.1" green="0.1" blue="0.1" />
+			<bounds xc="7.5" yc="5" width="13.5" height="8.5" />
+		</rect>
+		<rect state="1">
+			<color red="0.07" green="0.07" blue="0.07" />
+			<bounds xc="7.5" yc="5" width="13.5" height="8.5" />
+		</rect>
+		<image>
+			<bounds xc="7.5" yc="5" width="10" height="10" />
+			<data><![CDATA[
+				<?xml version="1.0" standalone="no"?>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10" version="1.1">
+					<polygon points="2,2 5,8 8,2" fill="none" stroke="white" stroke-width="0.4" />
+				</svg>
+			]]></data>
+		</image>
+	</element>
+
+	<element name="button_up" defstate="0">
+		<rect>
+			<color red="0.05" green="0.05" blue="0.05" />
+			<bounds x="0" y="0" width="15" height="10" />
+		</rect>
+		<rect state="0">
+			<color red="0.1" green="0.1" blue="0.1" />
+			<bounds xc="7.5" yc="5" width="13.5" height="8.5" />
+		</rect>
+		<rect state="1">
+			<color red="0.07" green="0.07" blue="0.07" />
+			<bounds xc="7.5" yc="5" width="13.5" height="8.5" />
+		</rect>
+		<image>
+			<bounds xc="7.5" yc="5" width="10" height="10" />
+			<data><![CDATA[
+				<?xml version="1.0" standalone="no"?>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10" version="1.1">
+					<polygon points="2,8 5,2 8,8" fill="none" stroke="white" stroke-width="0.4" />
+				</svg>
+			]]></data>
+		</image>
+	</element>
+
+	<element name="button_left" defstate="0">
+		<rect>
+			<color red="0.05" green="0.05" blue="0.05" />
+			<bounds x="0" y="0" width="15" height="10" />
+		</rect>
+		<rect state="0">
+			<color red="0.1" green="0.1" blue="0.1" />
+			<bounds xc="7.5" yc="5" width="13.5" height="8.5" />
+		</rect>
+		<rect state="1">
+			<color red="0.07" green="0.07" blue="0.07" />
+			<bounds xc="7.5" yc="5" width="13.5" height="8.5" />
+		</rect>
+		<image>
+			<bounds xc="7.5" yc="5" width="10" height="10" />
+			<data><![CDATA[
+				<?xml version="1.0" standalone="no"?>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10" version="1.1">
+					<polygon points="2,5 8,2 8,8" fill="none" stroke="white" stroke-width="0.4" />
+				</svg>
+			]]></data>
+		</image>
+	</element>
+
+	<element name="button_right" defstate="0">
+		<rect>
+			<color red="0.05" green="0.05" blue="0.05" />
+			<bounds x="0" y="0" width="15" height="10" />
+		</rect>
+		<rect state="0">
+			<color red="0.1" green="0.1" blue="0.1" />
+			<bounds xc="7.5" yc="5" width="13.5" height="8.5" />
+		</rect>
+		<rect state="1">
+			<color red="0.07" green="0.07" blue="0.07" />
+			<bounds xc="7.5" yc="5" width="13.5" height="8.5" />
+		</rect>
+		<image>
+			<bounds xc="7.5" yc="5" width="10" height="10" />
+			<data><![CDATA[
+				<?xml version="1.0" standalone="no"?>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10" version="1.1">
+					<polygon points="8,5 2,2 2,8" fill="none" stroke="white" stroke-width="0.4" />
+				</svg>
+			]]></data>
+		</image>
+	</element>
+
+	<element name="button_grey_red" defstate="0">
+		<rect>
+			<color red="0.05" green="0.05" blue="0.05" />
+			<bounds x="0" y="0" width="15" height="10" />
+		</rect>
+		<rect state="0">
+			<color red="0.1" green="0.1" blue="0.1" />
+			<bounds xc="7.5" yc="5" width="13.5" height="8.5" />
+		</rect>
+		<rect state="0">
+			<color red="0.6" green="0.1" blue="0" />
+			<bounds xc="7.5" yc="5" width="11" height="6" />
+		</rect>
+		<rect state="1">
+			<color red="0.07" green="0.07" blue="0.07" />
+			<bounds xc="7.5" yc="5" width="13.5" height="8.5" />
+		</rect>
+		<rect state="1">
+			<color red="0.4" green="0" blue="0" />
+			<bounds xc="7.5" yc="5" width="11" height="6" />
+		</rect>
+	</element>
+
+	<element name="button_tone" defstate="0">
+		<rect>
+			<color red="0.05" green="0.05" blue="0.05" />
+			<bounds x="0" y="0" width="15" height="10" />
+		</rect>
+		<rect state="0">
+			<color red="0.9" green="0.9" blue="0.8" />
+			<bounds xc="7.5" yc="5" width="13.5" height="8.5" />
+		</rect>
+		<rect state="1">
+			<color red="0.5" green="0.5" blue="0.42" />
+			<bounds xc="7.5" yc="5" width="13.5" height="8.5" />
+		</rect>
+	</element>
+
+	<repeat count="8">
+		<param name="num" start="1" increment="1" />
+		<param name="num2" start="9" increment="1" />
+
+		<element name="button_tone_~num~" defstate="0">
+			<rect>
+				<color red="0.05" green="0.05" blue="0.05" />
+				<bounds x="0" y="0" width="15" height="10" />
+			</rect>
+			<rect state="0">
+				<color red="0.9" green="0.9" blue="0.8" />
+				<bounds xc="7.5" yc="5" width="13.5" height="8.5" />
+			</rect>
+			<rect state="1">
+				<color red="0.5" green="0.5" blue="0.42" />
+				<bounds xc="7.5" yc="5" width="13.5" height="8.5" />
+			</rect>
+			<text string="~num~"><bounds xc="7.5" yc="5" width="15" height="6" /><color red="0" green="0" blue="0" /></text>
 		</element>
-		<element name="led_1" ref="led">
-			<bounds x="30" y="160" width="10" height="10" />
+
+		<element name="num_~num2~">
+			<rect><color red="0.29" green="0.38" blue="0.82" /></rect>
+			<text string="~num2~" />
 		</element>
-		<element name="led_2" ref="led">
-			<bounds x="50" y="160" width="10" height="10" />
-		</element>
-		<element name="led_3" ref="led">
-			<bounds x="70" y="160" width="10" height="10" />
-		</element>
-		<element name="led_4" ref="led">
-			<bounds x="90" y="160" width="10" height="10" />
-		</element>
-		<element name="led_5" ref="led">
-			<bounds x="110" y="160" width="10" height="10" />
-		</element>
-		<element name="led_6" ref="led">
-			<bounds x="130" y="160" width="10" height="10" />
-		</element>
-		<element name="led_7" ref="led">
-			<bounds x="150" y="160" width="10" height="10" />
-		</element>
-		<element name="led_8" ref="led">
-			<bounds x="170" y="160" width="10" height="10" />
-		</element>
-		<element name="led_9" ref="led">
-			<bounds x="190" y="160" width="10" height="10" />
-		</element>
-		<element name="led_10" ref="led">
-			<bounds x="210" y="160" width="10" height="10" />
-		</element>
-		<element name="led_11" ref="led">
-			<bounds x="230" y="160" width="10" height="10" />
-		</element>
-		<element name="led_12" ref="led">
-			<bounds x="250" y="160" width="10" height="10" />
-		</element>
-		<element name="led_13" ref="led">
-			<bounds x="270" y="160" width="10" height="10" />
-		</element>
-		<element name="led_14" ref="led">
-			<bounds x="290" y="160" width="10" height="10" />
-		</element>
-		<element name="led_15" ref="led">
-			<bounds x="310" y="160" width="10" height="10" />
-		</element>
-		<element name="led_16" ref="led">
-			<bounds x="330" y="160" width="10" height="10" />
-		</element>
-		<element name="led_17" ref="led">
-			<bounds x="350" y="160" width="10" height="10" />
-		</element>
-		<element name="led_18" ref="led">
-			<bounds x="370" y="160" width="10" height="10" />
-		</element>
-		<element name="led_19" ref="led">
-			<bounds x="390" y="160" width="10" height="10" />
-		</element>
-		<element name="led_20" ref="led">
-			<bounds x="410" y="160" width="10" height="10" />
-		</element>
-		<element name="led_21" ref="led">
-			<bounds x="430" y="160" width="10" height="10" />
-		</element>
-		<element name="led_22" ref="led">
-			<bounds x="450" y="160" width="10" height="10" />
-		</element>
-		<element name="led_23" ref="led">
-			<bounds x="470" y="160" width="10" height="10" />
-		</element>
-		<element name="led_24" ref="led">
-			<bounds x="10" y="180" width="10" height="10" />
-		</element>
-		<element name="led_25" ref="led">
-			<bounds x="30" y="180" width="10" height="10" />
-		</element>
-		<element name="led_26" ref="led">
-			<bounds x="50" y="180" width="10" height="10" />
-		</element>
-		<element name="led_27" ref="led">
-			<bounds x="70" y="180" width="10" height="10" />
-		</element>
-		<element name="led_28" ref="led">
-			<bounds x="90" y="180" width="10" height="10" />
-		</element>
-		<element name="led_29" ref="led">
-			<bounds x="110" y="180" width="10" height="10" />
-		</element>
-		<element name="led_30" ref="led">
-			<bounds x="130" y="180" width="10" height="10" />
-		</element>
-		<element name="led_31" ref="led">
-			<bounds x="150" y="180" width="10" height="10" />
-		</element>
+	</repeat>
+
+	<element name="button_select" defstate="0">
+		<rect>
+			<color red="0.05" green="0.05" blue="0.05" />
+			<bounds x="0" y="0" width="15" height="10" />
+		</rect>
+		<rect state="0">
+			<color red="0.9" green="0.9" blue="0.8" />
+			<bounds xc="7.5" yc="5" width="13.5" height="8.5" />
+		</rect>
+		<rect state="1">
+			<color red="0.5" green="0.5" blue="0.42" />
+			<bounds xc="7.5" yc="5" width="13.5" height="8.5" />
+		</rect>
+		<text string="SELECT"><bounds xc="7.5" yc="5" width="15" height="4" /><color red="0" green="0" blue="0" /></text>
+	</element>
+
+	<element name="button_power" defstate="0">
+		<rect>
+			<color red="0.05" green="0.05" blue="0.05" />
+			<bounds x="0" y="0" width="11" height="22" />
+		</rect>
+		<rect state="0">
+			<color red="0.1" green="0.1" blue="0.1" />
+			<bounds xc="5.5" yc="11" width="9" height="20" />
+		</rect>
+		<rect state="0">
+			<color red="0.6" green="0.1" blue="0" />
+			<bounds xc="5.5" y="3" width="7" height="3" />
+		</rect>
+		<rect state="1">
+			<color red="0.07" green="0.07" blue="0.07" />
+			<bounds xc="5.5" yc="11" width="9" height="20" />
+		</rect>
+		<rect state="1">
+			<color red="0.4" green="0" blue="0" />
+			<bounds xc="5.5" y="3" width="7" height="3" />
+		</rect>
+	</element>
+
+	<!-- effect group -->
+	<group name="effect">
+		<element ref="grey"><bounds x="0" y="0" width="64" height="93" /></element>
+		<element ref="white"><bounds x="1" y="1" width="0.75" height="85" /></element>
+
+		<element ref="effect"><bounds xc="32" y="3" width="40" height="5" /></element>
+
+		<element ref="button_grey" inputtag="kc9" inputmask="0x08"><bounds x="14" y="30" width="15" height="10" /></element>
+		<element ref="bend"><bounds xc="21.5" y="40" width="20" height="4" /></element>
+		<element ref="range"><bounds xc="21.5" y="44" width="20" height="4" /></element>
+		<element ref="led" name="led_14"><bounds x="38.5" y="25" width="6" height="3" /></element>
+		<element ref="button_grey" inputtag="kc9" inputmask="0x04"><bounds x="34" y="30" width="15" height="10" /></element>
+		<element ref="vibrato"><bounds xc="41.5" y="40" width="20" height="4" /></element>
+		<element ref="on_off"><bounds xc="41.5" y="44" width="20" height="4" /></element>
+		<element ref="button_grey" inputtag="kc9" inputmask="0x02"><bounds x="14" y="67" width="15" height="10" /></element>
+		<element ref="time"><bounds xc="21.5" y="77" width="20" height="4" /></element>
+		<element ref="led" name="led_15"><bounds x="38.5" y="62" width="6" height="3" /></element>
+		<element ref="button_grey" inputtag="kc9" inputmask="0x01"><bounds x="34" y="67" width="15" height="10" /></element>
+		<element ref="on_off"><bounds xc="41.5" y="77" width="20" height="4" /></element>
+		<element ref="portamento"><bounds xc="31.5" y="82" width="30" height="4" /></element>
+	</group>
+
+	<!-- programmer group -->
+	<group name="programmer">
+		<element ref="grey"><bounds x="0" y="0" width="174" height="93" /></element>
+		<element ref="white"><bounds x="1" y="1" width="0.75" height="85" /></element>
+
+		<element ref="programmer"><bounds xc="87" y="3" width="64" height="5" /></element>
+
+		<!-- preset, internal, cartridge, compare/recall -->
+		<element ref="white"><bounds x="46.5" y="28" width="0.75" height="6" /></element>
+		<element ref="white"><bounds x="66.5" y="28" width="0.75" height="6" /></element>
+		<element ref="white"><bounds x="46.5" yc="34" width="30" height="0.75" /></element>
+
+		<element ref="led" name="led_11"><bounds x="23.5" y="12" width="6" height="3" /></element>
+		<element ref="button_grey" inputtag="kc9" inputmask="0x10"><bounds x="19" y="17" width="15" height="10" /></element>
+		<element ref="preset"><bounds xc="26.5" y="27" width="20" height="4" /></element>
+		<element ref="led" name="led_10"><bounds x="43.5" y="12" width="6" height="3" /></element>
+		<element ref="button_grey" inputtag="kc9" inputmask="0x20"><bounds x="39" y="17" width="15" height="10" /></element>
+		<element ref="internal"><bounds xc="46.5" y="27" width="20" height="4" /></element>
+		<element ref="led" name="led_9"><bounds x="63.5" y="12" width="6" height="3" /></element>
+		<element ref="button_grey" inputtag="kc9" inputmask="0x40"><bounds x="59" y="17" width="15" height="10" /></element>
+		<element ref="cartridge"><bounds xc="66.5" y="27" width="20" height="4" /></element>
+		<element ref="memory"><bounds x="79" y="31" width="20" height="4" /></element>
+
+		<element ref="led" name="led_8"><bounds x="121.5" y="12" width="6" height="3" /></element>
+		<element ref="button_grey_red" inputtag="kc9" inputmask="0x80"><bounds x="117" y="17" width="15" height="10" /></element>
+		<element ref="compare"><bounds xc="124.5" y="27" width="20" height="4" /></element>
+		<element ref="recall"><bounds xc="124.5" y="31" width="20" height="4" /></element>
+
+		<!-- tone select -->
+		<element ref="led" name="led_tone2.0"><bounds x="16.5" y="37" width="6" height="3" /></element>
+		<element ref="button_tone_1" inputtag="kc11" inputmask="0x01"><bounds x="12" y="42" width="15" height="10" /></element>
+		<element ref="num_9"><bounds xc="19.5" yc="55.5" width="13" height="4" /></element>
+
+		<element ref="led" name="led_tone1.0"><bounds x="31.5" y="37" width="6" height="3" /></element>
+		<element ref="button_tone_2" inputtag="kc11" inputmask="0x02"><bounds x="27" y="42" width="15" height="10" /></element>
+		<element ref="num_10"><bounds xc="34.5" yc="55.5" width="13" height="4" /></element>
+
+		<element ref="led" name="led_tone0.0"><bounds x="46.5" y="37" width="6" height="3" /></element>
+		<element ref="button_tone_3" inputtag="kc11" inputmask="0x04"><bounds x="42" y="42" width="15" height="10" /></element>
+		<element ref="num_11"><bounds xc="49.5" yc="55.5" width="13" height="4" /></element>
+
+		<element ref="led" name="led_tone0.2"><bounds x="61.5" y="37" width="6" height="3" /></element>
+		<element ref="button_tone_4" inputtag="kc11" inputmask="0x08"><bounds x="57" y="42" width="15" height="10" /></element>
+		<element ref="num_12"><bounds xc="64.5" yc="55.5" width="13" height="4" /></element>
+
+		<element ref="led" name="led_tone2.1"><bounds x="76.5" y="37" width="6" height="3" /></element>
+		<element ref="button_tone_5" inputtag="kc11" inputmask="0x10"><bounds x="72" y="42" width="15" height="10" /></element>
+		<element ref="num_13"><bounds xc="79.5" yc="55.5" width="13" height="4" /></element>
+
+		<element ref="led" name="led_tone1.1"><bounds x="91.5" y="37" width="6" height="3" /></element>
+		<element ref="button_tone_6" inputtag="kc11" inputmask="0x20"><bounds x="87" y="42" width="15" height="10" /></element>
+		<element ref="num_14"><bounds xc="94.5" yc="55.5" width="13" height="4" /></element>
+
+		<element ref="led" name="led_tone0.1"><bounds x="106.5" y="37" width="6" height="3" /></element>
+		<element ref="button_tone_7" inputtag="kc11" inputmask="0x40"><bounds x="102" y="42" width="15" height="10" /></element>
+		<element ref="num_15"><bounds xc="109.5" yc="55.5" width="13" height="4" /></element>
+
+		<element ref="led" name="led_tone1.2"><bounds x="121.5" y="37" width="6" height="3" /></element>
+		<element ref="button_tone_8" inputtag="kc11" inputmask="0x80"><bounds x="117" y="42" width="15" height="10" /></element>
+		<element ref="num_16"><bounds xc="124.5" yc="55.5" width="13" height="4" /></element>
+
+		<element ref="button_select" inputtag="kc10" inputmask="0x40"><bounds x="143" y="42" width="15" height="10" /></element>
+		<element ref="blue"><bounds x="133" y="53.5" width="24" height="4" /></element>
+		<element ref="led_g" name="led_7"><bounds x="147.5" y="54" width="6" height="3" /></element>
+		<element ref="white"><bounds left="13" right="157" top="58.5" bottom="59.25" /></element>
+
+		<!-- solo/mix/transpose -->
+		<element ref="white"><bounds x="26.5" y="79" width="0.75" height="6" /></element>
+		<element ref="white"><bounds x="46.5" y="79" width="0.75" height="6" /></element>
+		<element ref="white"><bounds x="20" yc="85" width="27.25" height="0.75" /></element>
+
+		<element ref="mono"><bounds x="3" y="82" width="15" height="4" /></element>
+		<element ref="led" name="led_13"><bounds x="23.5" y="62" width="6" height="3" /></element>
+		<element ref="button_grey" inputtag="kc10" inputmask="0x01"><bounds x="19" y="67" width="15" height="10" /></element>
+		<element ref="solo"><bounds xc="26.5" y="77" width="20" height="4" /></element>
+		<element ref="led" name="led_12"><bounds x="43.5" y="62" width="6" height="3" /></element>
+		<element ref="button_grey" inputtag="kc10" inputmask="0x02"><bounds x="39" y="67" width="15" height="10" /></element>
+		<element ref="tone_mix"><bounds xc="46.5" y="77" width="20" height="4" /></element>
+		<element ref="button_grey" inputtag="kc10" inputmask="0x04"><bounds x="59" y="67" width="15" height="10" /></element>
+		<element ref="key_transpose"><bounds x="58" y="77" width="30" height="4" /></element>
+
+		<!-- write/midi -->
+		<element ref="button_grey_red" inputtag="kc10" inputmask="0x08"><bounds x="117" y="67" width="15" height="10" /></element>
+		<element ref="write"><bounds xc="124.5" y="77" width="20" height="4" /></element>
+		<element ref="button_grey" inputtag="kc10" inputmask="0x10"><bounds x="143" y="67" width="15" height="10" /></element>
+		<element ref="midi"><bounds xc="150.5" y="77" width="20" height="4" /></element>
+	</group>
+
+	<!-- data entry group -->
+	<group name="data">
+		<element ref="black"><bounds x="0" y="0" width="106" height="40" /></element>
+		<element ref="blue"><bounds xc="53" y="6" width="96" height="31" /></element>
+		<element ref="black"><bounds xc="53" y="6.75" width="94.5" height="29.5" /></element>
+		<screen index="0"><bounds xc="53" yc="20" width="85.5" height="16.5" /></screen>
+
+		<element ref="grey"><bounds x="0" y="41" width="106" height="52" /></element>
+
+		<element ref="digital"><bounds xc="53" y="30" width="64" height="5" /></element>
+		<element ref="data_entry"><bounds xc="53" y="82" width="64" height="5" /></element>
+
+		<!-- value down/up -->
+		<element ref="value"><bounds xc="26.5" y="62" width="20" height="4" /></element>
+		<element ref="button_down" inputtag="kc12" inputmask="0x01"><bounds x="9" y="67" width="15" height="10" /></element>
+		<element ref="save"><bounds xc="16.5" y="77.5" width="10" height="3.5" /></element>
+		<element ref="button_up" inputtag="kc12" inputmask="0x02"><bounds x="29" y="67" width="15" height="10" /></element>
+		<element ref="load"><bounds xc="36.5" y="77.5" width="10" height="3.5" /></element>
+
+		<!-- cursor left/right -->
+		<element ref="cursor"><bounds xc="79.5" y="62" width="20" height="4" /></element>
+		<element ref="button_left" inputtag="kc12" inputmask="0x04"><bounds x="62" y="67" width="15" height="10" /></element>
+		<element ref="button_right" inputtag="kc12" inputmask="0x08"><bounds x="82" y="67" width="15" height="10" /></element>
+	</group>
+
+	<!-- parameter group -->
+	<group name="parameter">
+		<element ref="grey"><bounds x="0" y="0" width="279" height="93" /></element>
+
+		<element ref="parameter"><bounds xc="139.5" y="3" width="64" height="5" /></element>
+
+		<!-- env step down/up -->
+		<element ref="env_step"><bounds xc="24.5" y="12" width="20" height="4" /></element>
+		<element ref="button_down" inputtag="kc12" inputmask="0x10"><bounds x="7" y="17" width="15" height="10" /></element>
+		<element ref="down"><bounds xc="14.5" y="27" width="20" height="4" /></element>
+		<element ref="button_up" inputtag="kc12" inputmask="0x20"><bounds x="27" y="17" width="15" height="10" /></element>
+		<element ref="up"><bounds xc="34.5" y="27" width="20" height="4" /></element>
+
+		<!-- sustain/end -->
+		<element ref="env_point"><bounds xc="24.5" y="37" width="20" height="4" /></element>
+		<element ref="button_grey" inputtag="kc12" inputmask="0x40"><bounds x="7" y="42" width="15" height="10" /></element>
+		<element ref="sustain"><bounds xc="14.5" y="52" width="20" height="4" /></element>
+		<element ref="button_grey" inputtag="kc12" inputmask="0x80"><bounds x="27" y="42" width="15" height="10" /></element>
+		<element ref="end"><bounds xc="34.5" y="52" width="20" height="4" /></element>
+
+		<!-- initialize -->
+		<element ref="button_grey_red" inputtag="kc14" inputmask="0x01"><bounds x="17" y="67" width="15" height="10" /></element>
+		<element ref="initialize"><bounds xc="24.5" y="77" width="20" height="4" /></element>
+
+		<!-- vibrato, octave -->
+		<element ref="button_tone" inputtag="kc13" inputmask="0x02"><bounds x="53" y="30" width="15" height="10" /></element>
+		<element ref="vibrato"><bounds xc="60.5" y="40" width="20" height="4" /></element>
+		<element ref="button_tone" inputtag="kc14" inputmask="0x02"><bounds x="53" y="67" width="15" height="10" /></element>
+		<element ref="octave"><bounds xc="60.5" y="77" width="20" height="4" /></element>
+
+		<!-- DCO 1 -->
+		<element ref="dco1"><bounds xc="95.5" y="15" width="40" height="5" /></element>
+		<element ref="led" name="led_env2.3"><bounds x="84.5" y="25" width="6" height="3" /></element>
+		<element ref="button_tone" inputtag="kc13" inputmask="0x04"><bounds x="80" y="30" width="15" height="10" /></element>
+		<element ref="wave_form"><bounds xc="87.5" y="40" width="20" height="4" /></element>
+		<element ref="led" name="led_env1.3"><bounds x="100.5" y="25" width="6" height="3" /></element>
+		<element ref="button_tone" inputtag="kc13" inputmask="0x08"><bounds x="96" y="30" width="15" height="10" /></element>
+		<element ref="env"><bounds xc="103.5" y="40" width="10" height="4" /></element>
+
+		<!-- DCW 1 -->
+		<element ref="dcw1"><bounds xc="138.5" y="15" width="40" height="5" /></element>
+		<element ref="led" name="led_env0.3"><bounds x="127.5" y="25" width="6" height="3" /></element>
+		<element ref="button_tone" inputtag="kc13" inputmask="0x10"><bounds x="123" y="30" width="15" height="10" /></element>
+		<element ref="key_follow"><bounds xc="130.5" y="40" width="20" height="4" /></element>
+		<element ref="led" name="led_env2.2"><bounds x="143.5" y="25" width="6" height="3" /></element>
+		<element ref="button_tone" inputtag="kc13" inputmask="0x20"><bounds x="139" y="30" width="15" height="10" /></element>
+		<element ref="env"><bounds xc="146.5" y="40" width="10" height="4" /></element>
+
+		<!-- DCA 1 -->
+		<element ref="dca1"><bounds xc="181.5" y="15" width="40" height="5" /></element>
+		<element ref="led" name="led_env1.2"><bounds x="170.5" y="25" width="6" height="3" /></element>
+		<element ref="button_tone" inputtag="kc13" inputmask="0x40"><bounds x="166" y="30" width="15" height="10" /></element>
+		<element ref="key_follow"><bounds xc="173.5" y="40" width="20" height="4" /></element>
+		<element ref="led" name="led_env0.2"><bounds x="186.5" y="25" width="6" height="3" /></element>
+		<element ref="button_tone" inputtag="kc13" inputmask="0x80"><bounds x="182" y="30" width="15" height="10" /></element>
+		<element ref="env"><bounds xc="189.5" y="40" width="10" height="4" /></element>
+
+		<!-- DCO 2 -->
+		<element ref="dco2"><bounds xc="95.5" y="52" width="40" height="5" /></element>
+		<element ref="led" name="led_env2.1"><bounds x="84.5" y="62" width="6" height="3" /></element>
+		<element ref="button_tone" inputtag="kc14" inputmask="0x04"><bounds x="80" y="67" width="15" height="10" /></element>
+		<element ref="wave_form"><bounds xc="87.5" y="77" width="20" height="4" /></element>
+		<element ref="led" name="led_env1.1"><bounds x="100.5" y="62" width="6" height="3" /></element>
+		<element ref="button_tone" inputtag="kc14" inputmask="0x08"><bounds x="96" y="67" width="15" height="10" /></element>
+		<element ref="env"><bounds xc="103.5" y="77" width="10" height="4" /></element>
+
+		<!-- DCW 2 -->
+		<element ref="dcw2"><bounds xc="138.5" y="52" width="40" height="5" /></element>
+		<element ref="led" name="led_env0.1"><bounds x="127.5" y="62" width="6" height="3" /></element>
+		<element ref="button_tone" inputtag="kc14" inputmask="0x10"><bounds x="123" y="67" width="15" height="10" /></element>
+		<element ref="key_follow"><bounds xc="130.5" y="77" width="20" height="4" /></element>
+		<element ref="led" name="led_env2.0"><bounds x="143.5" y="62" width="6" height="3" /></element>
+		<element ref="button_tone" inputtag="kc14" inputmask="0x20"><bounds x="139" y="67" width="15" height="10" /></element>
+		<element ref="env"><bounds xc="146.5" y="77" width="10" height="4" /></element>
+
+		<!-- DCA 2 -->
+		<element ref="dca2"><bounds xc="181.5" y="52" width="40" height="5" /></element>
+		<element ref="led" name="led_env1.0"><bounds x="170.5" y="62" width="6" height="3" /></element>
+		<element ref="button_tone" inputtag="kc14" inputmask="0x40"><bounds x="166" y="67" width="15" height="10" /></element>
+		<element ref="key_follow"><bounds xc="173.5" y="77" width="20" height="4" /></element>
+		<element ref="led" name="led_env0.0"><bounds x="186.5" y="62" width="6" height="3" /></element>
+		<element ref="button_tone" inputtag="kc14" inputmask="0x80"><bounds x="182" y="67" width="15" height="10" /></element>
+		<element ref="env"><bounds xc="189.5" y="77" width="10" height="4" /></element>
+
+		<!-- detune, line select -->
+		<element ref="white"><bounds xc="275" yc="45" width="0.75" height="37.75" /></element>
+		<element ref="white"><bounds left="261.5" right="275" yc="26.5" height="0.75" /></element>
+		<element ref="white"><bounds left="237.5" right="275" yc="63.5" height="0.75" /></element>
+
+		<element ref="button_tone" inputtag="kc15" inputmask="0x01"><bounds x="212" y="30" width="15" height="10" /></element>
+		<element ref="detune"><bounds xc="219.5" y="40" width="20" height="4" /></element>
+		<element ref="line1"><bounds xc="243.5" y="20" width="10" height="4" /></element>
+		<element ref="led" name="led_6"><bounds x="240.5" y="25" width="6" height="3" /></element>
+		<element ref="line2"><bounds xc="252.5" y="20" width="10" height="4" /></element>
+		<element ref="led" name="led_5"><bounds x="249.5" y="25" width="6" height="3" /></element>
+		<element ref="line12"><bounds xc="261.5" y="20" width="10" height="4" /></element>
+		<element ref="led" name="led_4"><bounds x="258.5" y="25" width="6" height="3" /></element>
+		<element ref="line11"><bounds xc="270.5" y="20" width="10" height="4" /></element>
+		<element ref="led" name="led_3"><bounds x="267.5" y="25" width="6" height="3" /></element>
+		<element ref="button_grey_red" inputtag="kc15" inputmask="0x02"><bounds x="250" y="30" width="15" height="10" /></element>
+		<element ref="line_select"><bounds xc="257.5" y="40" width="20" height="4" /></element>
+
+		<!-- ring/noise modulation -->
+		<element ref="led" name="led_1"><bounds x="234.5" y="62" width="6" height="3" /></element>
+		<element ref="button_grey" inputtag="kc15" inputmask="0x04"><bounds x="230" y="67" width="15" height="10" /></element>
+		<element ref="ring"><bounds xc="237.5" y="77" width="20" height="4" /></element>
+		<element ref="led" name="led_2"><bounds x="254.5" y="62" width="6" height="3" /></element>
+		<element ref="button_grey" inputtag="kc15" inputmask="0x08"><bounds x="250" y="67" width="15" height="10" /></element>
+		<element ref="noise"><bounds xc="257.5" y="77" width="20" height="4" /></element>
+		<element ref="modulation"><bounds xc="247.5" y="82" width="30" height="4" /></element>
+	</group>
+
+	<!-- keyboard primitives -->
+	<element name="keyfill"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
+	<element name="whitekey" defstate="0">
+		<rect state="0"><bounds x="0" y="0" width="79" height="252" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="0" y="0" width="79" height="252" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+	</element>
+	<element name="whitekey-l" defstate="0">
+		<rect state="0"><bounds x="0" y="0" width="45" height="252" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="0"><bounds x="0" y="252" width="79" height="172" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="0" y="0" width="45" height="252" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<rect state="1"><bounds x="0" y="252" width="79" height="172" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+	</element>
+	<element name="whitekey-m" defstate="0">
+		<rect state="0"><bounds x="13" y="0" width="53" height="252" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="0"><bounds x="0" y="252" width="79" height="172" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="13" y="0" width="53" height="252" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<rect state="1"><bounds x="0" y="252" width="79" height="172" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+	</element>
+	<element name="whitekey-lm" defstate="0">
+		<rect state="0"><bounds x="10" y="0" width="44" height="252" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="0"><bounds x="0" y="252" width="79" height="172" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="10" y="0" width="44" height="252" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<rect state="1"><bounds x="0" y="252" width="79" height="172" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+	</element>
+	<element name="whitekey-rm" defstate="0">
+		<rect state="0"><bounds x="22" y="0" width="44" height="252" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="0"><bounds x="0" y="252" width="79" height="172" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="22" y="0" width="44" height="252" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<rect state="1"><bounds x="0" y="252" width="79" height="172" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+	</element>
+	<element name="whitekey-r" defstate="0">
+		<rect state="0"><bounds x="34" y="0" width="45" height="252" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="0"><bounds x="0" y="252" width="79" height="172" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="34" y="0" width="45" height="252" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<rect state="1"><bounds x="0" y="252" width="79" height="172" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+	</element>
+	<element name="blackkey" defstate="0">
+		<rect state="0"><bounds x="0" y="0" width="44" height="252" /><color red="0.0" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><bounds x="4" y="0" width="36" height="248" /><color red="0.1" green="0.1" blue="0.1" /></rect>
+		<rect state="1"><bounds x="0" y="0" width="44" height="252" /><color red="0.1" green="0.1" blue="0.1" /></rect>
+		<rect state="1"><bounds x="4" y="0" width="36" height="248" /><color red="0.1" green="0.1" blue="0.1" /></rect>
+	</element>
+
+	<!-- keyboard group -->
+	<group name="keyboard">
+		<element ref="keyfill"><bounds x="72" y="98" width="2396" height="444" /></element>
+
+		<!-- octave 1 -->
+		<element ref="blackkey"    inputtag="kc0" inputmask="0x02"><bounds x="130" y="108" width="44" height="252" /></element>
+		<element ref="blackkey"    inputtag="kc0" inputmask="0x08"><bounds x="233" y="108" width="44" height="252" /></element>
+		<element ref="blackkey"    inputtag="kc1" inputmask="0x01"><bounds x="373" y="108" width="44" height="252" /></element>
+		<element ref="blackkey"    inputtag="kc1" inputmask="0x04"><bounds x="467" y="108" width="44" height="252" /></element>
+		<element ref="blackkey"    inputtag="kc1" inputmask="0x10"><bounds x="561" y="108" width="44" height="252" /></element>
+		<element ref="whitekey-l"  inputtag="kc0" inputmask="0x01"><bounds x="82" y="108" width="79" height="424" /></element>
+		<element ref="whitekey-m"  inputtag="kc0" inputmask="0x04"><bounds x="164" y="108" width="79" height="424" /></element>
+		<element ref="whitekey-r"  inputtag="kc0" inputmask="0x10"><bounds x="246" y="108" width="79" height="424" /></element>
+		<element ref="whitekey-l"  inputtag="kc0" inputmask="0x20"><bounds x="328" y="108" width="79" height="424" /></element>
+		<element ref="whitekey-lm" inputtag="kc1" inputmask="0x02"><bounds x="410" y="108" width="79" height="424" /></element>
+		<element ref="whitekey-rm" inputtag="kc1" inputmask="0x08"><bounds x="492" y="108" width="79" height="424" /></element>
+		<element ref="whitekey-r"  inputtag="kc1" inputmask="0x20"><bounds x="574" y="108" width="79" height="424" /></element>
+
+		<!-- octave 2 -->
+		<element ref="blackkey"    inputtag="kc2" inputmask="0x02"><bounds x="704" y="108" width="44" height="252" /></element>
+		<element ref="blackkey"    inputtag="kc2" inputmask="0x08"><bounds x="807" y="108" width="44" height="252" /></element>
+		<element ref="blackkey"    inputtag="kc3" inputmask="0x01"><bounds x="947" y="108" width="44" height="252" /></element>
+		<element ref="blackkey"    inputtag="kc3" inputmask="0x04"><bounds x="1041" y="108" width="44" height="252" /></element>
+		<element ref="blackkey"    inputtag="kc3" inputmask="0x10"><bounds x="1135" y="108" width="44" height="252" /></element>
+		<element ref="whitekey-l"  inputtag="kc2" inputmask="0x01"><bounds x="656" y="108" width="79" height="424" /></element>
+		<element ref="whitekey-m"  inputtag="kc2" inputmask="0x04"><bounds x="738" y="108" width="79" height="424" /></element>
+		<element ref="whitekey-r"  inputtag="kc2" inputmask="0x10"><bounds x="820" y="108" width="79" height="424" /></element>
+		<element ref="whitekey-l"  inputtag="kc2" inputmask="0x20"><bounds x="902" y="108" width="79" height="424" /></element>
+		<element ref="whitekey-lm" inputtag="kc3" inputmask="0x02"><bounds x="984" y="108" width="79" height="424" /></element>
+		<element ref="whitekey-rm" inputtag="kc3" inputmask="0x08"><bounds x="1066" y="108" width="79" height="424" /></element>
+		<element ref="whitekey-r"  inputtag="kc3" inputmask="0x20"><bounds x="1148" y="108" width="79" height="424" /></element>
+
+		<!-- octave 3 -->
+		<element ref="blackkey"    inputtag="kc4" inputmask="0x02"><bounds x="1278" y="108" width="44" height="252" /></element>
+		<element ref="blackkey"    inputtag="kc4" inputmask="0x08"><bounds x="1381" y="108" width="44" height="252" /></element>
+		<element ref="blackkey"    inputtag="kc5" inputmask="0x01"><bounds x="1521" y="108" width="44" height="252" /></element>
+		<element ref="blackkey"    inputtag="kc5" inputmask="0x04"><bounds x="1615" y="108" width="44" height="252" /></element>
+		<element ref="blackkey"    inputtag="kc5" inputmask="0x10"><bounds x="1709" y="108" width="44" height="252" /></element>
+		<element ref="whitekey-l"  inputtag="kc4" inputmask="0x01"><bounds x="1230" y="108" width="79" height="424" /></element>
+		<element ref="whitekey-m"  inputtag="kc4" inputmask="0x04"><bounds x="1312" y="108" width="79" height="424" /></element>
+		<element ref="whitekey-r"  inputtag="kc4" inputmask="0x10"><bounds x="1394" y="108" width="79" height="424" /></element>
+		<element ref="whitekey-l"  inputtag="kc4" inputmask="0x20"><bounds x="1476" y="108" width="79" height="424" /></element>
+		<element ref="whitekey-lm" inputtag="kc5" inputmask="0x02"><bounds x="1558" y="108" width="79" height="424" /></element>
+		<element ref="whitekey-rm" inputtag="kc5" inputmask="0x08"><bounds x="1640" y="108" width="79" height="424" /></element>
+		<element ref="whitekey-r"  inputtag="kc5" inputmask="0x20"><bounds x="1722" y="108" width="79" height="424" /></element>
+
+		<!-- octave 4 -->
+		<element ref="blackkey"    inputtag="kc6" inputmask="0x02"><bounds x="1852" y="108" width="44" height="252" /></element>
+		<element ref="blackkey"    inputtag="kc6" inputmask="0x08"><bounds x="1955" y="108" width="44" height="252" /></element>
+		<element ref="blackkey"    inputtag="kc7" inputmask="0x01"><bounds x="2095" y="108" width="44" height="252" /></element>
+		<element ref="blackkey"    inputtag="kc7" inputmask="0x04"><bounds x="2189" y="108" width="44" height="252" /></element>
+		<element ref="blackkey"    inputtag="kc7" inputmask="0x10"><bounds x="2283" y="108" width="44" height="252" /></element>
+		<element ref="whitekey-l"  inputtag="kc6" inputmask="0x01"><bounds x="1804" y="108" width="79" height="424" /></element>
+		<element ref="whitekey-m"  inputtag="kc6" inputmask="0x04"><bounds x="1886" y="108" width="79" height="424" /></element>
+		<element ref="whitekey-r"  inputtag="kc6" inputmask="0x10"><bounds x="1968" y="108" width="79" height="424" /></element>
+		<element ref="whitekey-l"  inputtag="kc6" inputmask="0x20"><bounds x="2050" y="108" width="79" height="424" /></element>
+		<element ref="whitekey-lm" inputtag="kc7" inputmask="0x02"><bounds x="2132" y="108" width="79" height="424" /></element>
+		<element ref="whitekey-rm" inputtag="kc7" inputmask="0x08"><bounds x="2214" y="108" width="79" height="424" /></element>
+		<element ref="whitekey-r"  inputtag="kc7" inputmask="0x20"><bounds x="2296" y="108" width="79" height="424" /></element>
+
+		<!-- final key -->
+		<element ref="whitekey"    inputtag="kc8" inputmask="0x01"><bounds x="2378" y="108" width="79" height="424" /></element>
+	</group>
+
+	<group name="left">
+		<group ref="effect"><bounds x="0" y="0" width="64" height="93" /></group>
+		<group ref="programmer"><bounds x="58" y="0" width="174" height="93" /></group>
+		<element ref="blue"><bounds left="1" right="231" top="88" bottom="91" /></element>
+		<group ref="data"><bounds x="234" y="0" width="106" height="93" /></group>
+		<element ref="blue"><bounds left="235" right="339" top="88" bottom="91" /></element>
+	</group>
+
+	<group name="right">
+		<group ref="parameter"><bounds x="0" y="0" width="278" height="93" /></group>
+		<element ref="blue"><bounds left="1" right="270" top="88" bottom="91" /></element>
+	</group>
+
+	<group name="tune">
+		<element ref="master_tune"><bounds xc="16.5" y="0" width="30" height="4" /></element>
+		<element ref="button_down" inputtag="kc15" inputmask="0x10"><bounds x="0" y="5" width="13" height="8" /></element>
+		<element ref="button_up" inputtag="kc15" inputmask="0x20"><bounds x="20" y="5" width="13" height="8" /></element>
+	</group>
+
+	<group name="power">
+		<element ref="led" name="led_0"><bounds xc="5.5" y="0" width="6" height="3" /></element>
+		<element ref="button_power" inputtag="PB" inputmask="0x80"><bounds x="0" y="15" width="11" height="22" /></element>
+
+		<element ref="power"><bounds xc="5.5" y="38" width="20" height="5" /></element>
+	</group>
+
+	<view name="Keyboard">
+		<bounds x="0" y="0" width="656" height="202" />
+		<element ref="bg"><bounds x="0" y="21" width="656" height="181" /></element>
+		<element ref="grey"><bounds x="0" y="23" width="200" height="179" /></element>
+		<element ref="grey"><bounds x="378" y="23" width="278" height="179" /></element>
+
+		<group ref="left"><bounds x="36" y="23" width="340" height="93" /></group>
+		<group ref="right"><bounds x="378" y="23" width="278" height="93" /></group>
+
+		<group ref="keyboard"><bounds xc="328" y="116" width="584" height="86" /></group>
+
+		<group ref="tune"><bounds x="602" yc="10" width="33" height="13" /></group>
+		<group ref="power"><bounds xc="638" y="130" width="20" height="43" /></group>
+	</view>
+
+	<view name="No Keyboard (Parameters at Bottom)">
+		<bounds x="0" y="21" width="340" height="190" />
+		<element ref="bg"><bounds x="0" y="21" width="340" height="190" /></element>
+		<element ref="grey"><bounds x="0" y="118" width="60" height="93" /></element>
+
+		<group ref="left"><bounds x="0" y="23" width="340" height="93" /></group>
+		<group ref="right"><bounds x="62" y="118" width="278" height="93" /></group>
+		<group ref="power"><bounds xc="31" y="130" width="20" height="43" /></group>
+
+		<element ref="black"><bounds x="0" y="195" width="60" height="16" /></element>
+		<group ref="tune"><bounds xc="32" yc="203" width="33" height="13" /></group>
+	</view>
+
+	<view name="No Keyboard (Parameters at Top)">
+		<bounds x="0" y="21" width="340" height="190" />
+		<element ref="bg"><bounds x="0" y="21" width="340" height="190" /></element>
+		<element ref="grey"><bounds x="0" y="23" width="60" height="93" /></element>
+
+		<group ref="left"><bounds x="0" y="118" width="340" height="93" /></group>
+		<group ref="right"><bounds x="62" y="23" width="278" height="93" /></group>
+		<group ref="power"><bounds xc="31" y="50" width="20" height="43" /></group>
+
+		<element ref="black"><bounds x="0" y="20" width="60" height="16" /></element>
+		<group ref="tune"><bounds xc="32" yc="28" width="33" height="13" /></group>
 	</view>
 </mamelayout>

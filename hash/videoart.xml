@@ -1,0 +1,115 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+
+LJN VideoArt Activity Cartridges.
+All known cartridges are dumped (9 total).
+
+Titles taken from cartridge label/manual, title screen can differ a bit for some.
+
+-->
+
+<softwarelist name="videoart" description="LJN VideoArt cartridges">
+
+	<software name="tripzoo">
+		<description>A Trip To The Zoo!</description>
+		<year>1987</year>
+		<publisher>LJN Toys</publisher>
+		<part name="cart" interface="videoart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="ljn-zoo-2" size="0x4000" crc="e1d62cd6" sha1="a1ce41f5336a546ac3d656f65a5b16e553034735" /> <!-- GI 9128B-1418 -->
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- pack-in cartridge, contains 2 pictures each from favdoll, tripzoo, dreamday, onmove -->
+	<software name="activity">
+		<description>Activity Cartridge</description>
+		<year>1987</year>
+		<publisher>LJN Toys</publisher>
+		<part name="cart" interface="videoart">
+			<dataarea name="rom" size="0x2000">
+				<rom name="ljn_act-1" size="0x2000" crc="8e3c03df" sha1="cb4e2e448eddc6a76673717f42d306cd3641dcfb" /> <!-- GI 9864DS-1217 -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="disneycb">
+		<description>Disney Coloring Book</description>
+		<year>1987</year>
+		<publisher>LJN Toys</publisher>
+		<part name="cart" interface="videoart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="ljn_color-8" size="0x4000" crc="a812d0f3" sha1="e08f63250c292a0506b53d06971792af33a34bea" /> <!-- Sharp LH232661 -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="disneysb">
+		<description>Disney Story Book</description>
+		<year>1987</year>
+		<publisher>LJN Toys</publisher>
+		<part name="cart" interface="videoart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="ljn_story-9" size="0x4000" crc="59a02440" sha1="ea614d10f47b3955aaf07479fbe23cd3931b6e45" /> <!-- Sharp LH232659 -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="looney">
+		<description>Looney Tunes</description>
+		<year>1987</year>
+		<publisher>LJN Toys</publisher>
+		<part name="cart" interface="videoart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="ljn_tunes-5" size="0x4000" crc="bf1bb0f6" sha1="00f232fc2250996cf7f64d0dce5abd3f54e66b6e" /> <!-- Sharp LH232660 -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvel">
+		<description>Marvel Super Heroes</description>
+		<year>1987</year>
+		<publisher>LJN Toys</publisher>
+		<part name="cart" interface="videoart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="ljn_marvel-4" size="0x4000" crc="38541469" sha1="647fe34d4c1307dea181a323fdd7633c0b1c28fd" /> <!-- Sharp LH232662 -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dreamday">
+		<description>My Dream Day</description>
+		<year>1987</year>
+		<publisher>LJN Toys</publisher>
+		<part name="cart" interface="videoart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="ljn_day-6" size="0x4000" crc="c55356e7" sha1="147fc7232cb3d330519c26381ef5aac701b874d9" /> <!-- Sharp LH232652 -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="favdoll">
+		<description>My Favorite Doll</description>
+		<year>1987</year>
+		<publisher>LJN Toys</publisher>
+		<part name="cart" interface="videoart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="ljn_doll-3" size="0x4000" crc="4a8d5739" sha1="a09d818d64c9d3ba2c6907e92c12c554481a25c6" /> <!-- GI 9128DS-1 -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="onmove">
+		<description>On The Move</description>
+		<year>1987</year>
+		<publisher>LJN Toys</publisher>
+		<part name="cart" interface="videoart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="ljn_move-7" size="0x4000" crc="c2767465" sha1="bfed0bf2d306cdeaf63c0769f3097787f0c8c59a" /> <!-- Sharp LH232653 -->
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

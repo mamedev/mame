@@ -3,12 +3,12 @@
 // thanks-to:Berger
 /*******************************************************************************
 
-Novag Super Expert (model 878/886/887/902) / Novag Super Forte
+Novag Super Expert (model 878/886/887/902) / Novag Super Forte (model 879/?/901)
 
 Hardware notes (Super Expert)
 - R65C02P4 or W65C802P-6 @ 5MHz/6MHz (10MHz/12MHz XTAL)
 - 8KB RAM battery-backed, 3*32KB ROM
-- HD44780 LCD controller (16x1)
+- HD44780A00 LCD controller (16x1)
 - beeper(32KHz/32), IRQ(32KHz/128) via MC14060
 - optional R65C51P2 ACIA @ 1.8432MHz, for IBM PC interface (only works in version C)
 - printer port, magnetic sensors, 8*8 chessboard leds
@@ -445,7 +445,7 @@ void sexpert_state::sexpert(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(sexpert_state::lcd_palette), 3);
 
-	HD44780(config, m_lcd, 0);
+	HD44780(config, m_lcd, 270'000); // OSC = 91K resistor
 	m_lcd->set_lcd_size(2, 8);
 	m_lcd->set_pixel_update_cb(FUNC(sexpert_state::lcd_pixel_update));
 
@@ -587,8 +587,8 @@ ROM_END
 
 ROM_START( sfortec1 ) // ID = F1.2
 	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD("sfl_c_iii.u13", 0x0000, 0x8000, CRC(f040cf30) SHA1(1fc1220b8ed67cdffa3866d230ce001721cf684f) ) // Toshiba TC57256AD-12
-	ROM_LOAD("sfh_c_iii.u11", 0x8000, 0x8000, CRC(0f926b32) SHA1(9c7270ecb3f41dd9172a9a7928e6e04e64b2a340) ) // NEC D27C256AD-12
+	ROM_LOAD("sfl_c_111.u13", 0x0000, 0x8000, CRC(f040cf30) SHA1(1fc1220b8ed67cdffa3866d230ce001721cf684f) ) // Toshiba TC57256AD-12
+	ROM_LOAD("sfh_c_111.u11", 0x8000, 0x8000, CRC(0f926b32) SHA1(9c7270ecb3f41dd9172a9a7928e6e04e64b2a340) ) // NEC D27C256AD-12
 	ROM_LOAD("h0_c_c26.u12", 0x10000, 0x8000, CRC(c6a1419a) SHA1(017a0ffa9aa59438c879624a7ddea2071d1524b8) ) // Toshiba TC57256AD-12
 ROM_END
 

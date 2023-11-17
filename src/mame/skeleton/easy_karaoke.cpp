@@ -173,6 +173,24 @@ void easy_karaoke_state::easy_karaoke(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list").set_original("easy_karaoke_cart");
 }
 
+/*
+The 'easykara' set has the following songs built in.
+
+One Step Closer                             S Club Juniors     
+S Club Party                                S Club 7        
+Automatic High                              S Club Juniors       
+Don't Stop Movin'                           S Club 7                  
+Get the Party Started                       Pink                    
+Feel                                        Robbie Williams                 
+Complicated                                 Avril Lavigne            
+One love                                    Blue                    
+If you're not the one                       Daniel Bedingfield      
+Sound of the Underground                    Girls Aloud                 
+
+There are regional variants of the product sold under different names, for example
+there appears to be a French Lexibook unit based on this tech with different songs.
+
+*/
 ROM_START( easykara )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "ics0303-b.bin", 0x000000, 0x400000, CRC(43d86ae8) SHA1(219dcbf72b92d1b7e00f78f237194ab47dc08f1b) )

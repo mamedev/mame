@@ -391,6 +391,7 @@ void kikikai_state::kikikai_mcu_port2_w(uint8_t data)
 			{
 				m_port3_in = ioport(portnames[address & 1])->read();
 			}
+			m_mcu->pulse_input_line(M6801_IS3_LINE, attotime::from_usec(1));
 		}
 		else
 		{
