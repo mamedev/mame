@@ -231,7 +231,6 @@ protected:
 	u8 m_twidth_mask_bit = 0;
 	std::unique_ptr<u8[]> m_tile_opaque_sp;
 	std::unique_ptr<u8[]> m_tile_opaque_pf[8];
-	u8 m_add_sat[256][256];
 	int m_alpha_s_1_1 = 0;
 	int m_alpha_s_1_2 = 0;
 	int m_alpha_s_1_4 = 0;
@@ -310,7 +309,7 @@ protected:
 
 	void tile_decode();
 
-	inline void f3_drawgfx(bitmap_rgb32 &dest_bmp, const rectangle &clip, gfx_element *gfx, const int code, const u8 color, const bool flipx, const bool flipy, int sx, int sy, u16 scalex, u16 scaley, u8 pri_dst);
+	inline void f3_drawgfx(bitmap_rgb32 &dest_bmp, const rectangle &clip, gfx_element *gfx, int code, u8 color, bool flipx, bool flipy, int sx, int sy, u16 scalex, u16 scaley, u8 pri_dst);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void get_sprite_info(const u16 *spriteram16_ptr);
 	void print_debug_info(bitmap_rgb32 &bitmap);
@@ -369,8 +368,8 @@ protected:
 	void dpix_1_sprite(u32 s_pix);
 	void dpix_bg(u32 bgcolor);
 	void init_alpha_blend_func();
-	void get_pixmap_pointer(const int skip_layer_num, const f3_playfield_line_inf **line_t, const int y);
-	void culc_pixmap_pointer(const int skip_layer_num);
+	void get_pixmap_pointer(int skip_layer_num, const f3_playfield_line_inf **line_t, int y);
+	void culc_pixmap_pointer(int skip_layer_num);
 	void draw_scanlines(bitmap_rgb32 &bitmap, int xsize, s16 *draw_line_num, const f3_playfield_line_inf **line_t, const u8 *sprite, u32 orient, int skip_layer_num);
 	void visible_tile_check(f3_playfield_line_inf *line_t, int line, u32 x_index_fx, u32 y_index, const u16 *pf_data_n);
 	void calculate_clip(int y, u16 pri, u32 &clip_in, u32 &clip_ex, u8 &line_enable);

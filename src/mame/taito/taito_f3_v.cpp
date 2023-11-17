@@ -867,9 +867,9 @@ inline void taito_f3_state::alpha_blend32_d(int alphas, u32 s)
 {
 	u8 *sc = (u8 *)&s;
 	u8 *dc = (u8 *)&m_dval;
-	dc[COLOR1] = m_add_sat[dc[COLOR1]][(alphas * sc[COLOR1]) >> 8];
-	dc[COLOR2] = m_add_sat[dc[COLOR2]][(alphas * sc[COLOR2]) >> 8];
-	dc[COLOR3] = m_add_sat[dc[COLOR3]][(alphas * sc[COLOR3]) >> 8];
+	dc[COLOR1] = std::min<unsigned>(dc[COLOR1] + ((alphas * sc[COLOR1]) >> 8), 255U);
+	dc[COLOR2] = std::min<unsigned>(dc[COLOR2] + ((alphas * sc[COLOR2]) >> 8), 255U);
+	dc[COLOR3] = std::min<unsigned>(dc[COLOR3] + ((alphas * sc[COLOR3]) >> 8), 255U);
 }
 
 /*============================================================================*/
@@ -1254,15 +1254,11 @@ void taito_f3_state::init_alpha_blend_func()
 	m_dpix_n[7][0xd] = &taito_f3_state::dpix_ret0;
 	m_dpix_n[7][0xe] = &taito_f3_state::dpix_ret0;
 	m_dpix_n[7][0xf] = &taito_f3_state::dpix_ret0;
-
-	for (int i = 0; i < 256; i++)
-		for (int j = 0; j < 256; j++)
-			m_add_sat[i][j] = std::min(i + j, 255);
 }
 
 /******************************************************************************/
 
-void taito_f3_state::get_pixmap_pointer(const int skip_layer_num, const f3_playfield_line_inf **line_t, const int y)
+void taito_f3_state::get_pixmap_pointer(int skip_layer_num, const f3_playfield_line_inf **line_t, int y)
 {
 	for (int pf_num = skip_layer_num; pf_num < 5; ++pf_num)
 	{
@@ -1282,7 +1278,7 @@ void taito_f3_state::get_pixmap_pointer(const int skip_layer_num, const f3_playf
 	}
 }
 
-void taito_f3_state::culc_pixmap_pointer(const int skip_layer_num)
+void taito_f3_state::culc_pixmap_pointer(int skip_layer_num)
 {
 	for (int pf_num = skip_layer_num; pf_num < 5; ++pf_num)
 	{
@@ -2370,9 +2366,9 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 
 inline void taito_f3_state::f3_drawgfx(bitmap_rgb32 &dest_bmp, const rectangle &clip,
 		gfx_element *gfx,
-		const int code,
-		const u8 color,
-		const bool flipx, const bool flipy,
+		int code,
+		u8 color,
+		bool flipx, bool flipy,
 		int sx, int sy,
 		u16 scalex, u16 scaley,
 		u8 pri_dst)
@@ -2480,7 +2476,7 @@ inline void taito_f3_state::f3_drawgfx(bitmap_rgb32 &dest_bmp, const rectangle &
 
 void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 {
-	const auto calc_zoom = [](u16 &addition, u8 &addition_left, const u8 block_zoom)
+	const auto calc_zoom = [](u16 &addition, u8 &addition_left, u8 block_zoom)
 	{
 		addition = 0x100 - block_zoom + addition_left;
 		addition_left = addition & 0xf;
