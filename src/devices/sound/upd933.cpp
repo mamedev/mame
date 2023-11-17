@@ -9,6 +9,7 @@
 #include "upd933.h"
 
 #include <algorithm>
+#include <climits>
 #include <cmath>
 
 DEFINE_DEVICE_TYPE(UPD933, upd933_device, "upd933", "NEC uPD933")
