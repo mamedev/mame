@@ -564,6 +564,8 @@ if (BUSES["BBC_ANALOGUE"]~=null) then
 		MAME_DIR .. "src/devices/bus/bbc/analogue/joystick.h",
 		MAME_DIR .. "src/devices/bus/bbc/analogue/cfa3000a.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/analogue/cfa3000a.h",
+		MAME_DIR .. "src/devices/bus/bbc/analogue/quinkey.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/analogue/quinkey.h",
 	}
 end
 
