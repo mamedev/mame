@@ -41,10 +41,10 @@
 
 #include "emu.h"
 
-#include "6883sam.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
+#include "machine/6883sam.h"
 #include "machine/ram.h"
 #include "video/mc6847.h"
 #include "screen.h"

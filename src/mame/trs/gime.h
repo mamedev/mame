@@ -15,7 +15,7 @@
 #pragma once
 
 #include "video/mc6847.h"
-#include "6883sam.h"
+#include "machine/6883sam.h"
 #include "machine/ram.h"
 
 
