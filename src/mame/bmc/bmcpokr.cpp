@@ -13,6 +13,11 @@ Video:  BMC VDB40817 + BMC SYA70521
 Sound:  M6295 + UM3567
 Other:  BMC B816140 (CPLD)
 
+TODO:
+ * Hopper hookup doesn't work properly.  MAME counts far more "tickets
+   dispensed" than the number of coins/tickets the games are suppoed to
+   pay out.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -900,7 +905,7 @@ static INPUT_PORTS_START( fengyunh )
 	PORT_DIPSETTING(    0x00, "Coin" )                                                     // 投幣
 	PORT_DIPNAME( 0x08, 0x08, "Payout Mode" )               PORT_DIPLOCATION("DIP1:4")     // 退分方式
 	PORT_DIPSETTING(    0x08, "Key-Out" )                                                  // 洗分 (Pay Out key pays out score at Key-Out rate)
-	PORT_DIPSETTING(    0x00, "Return Coins" )                                             // 退幣 (Pay Out key pays out score at rate set for coin input)
+	PORT_DIPSETTING(    0x00, "Cash Out" )                                                 // 退幣 (Pay Out key pays out score at rate set for coin input)
 	PORT_DIPNAME( 0x10, 0x10, "Game Hint" )                 PORT_DIPLOCATION("DIP1:5")     // 吃碰提示
 	PORT_DIPSETTING(    0x10, DEF_STR( No ) )                                              // 無
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )                                             // 有
@@ -916,8 +921,8 @@ static INPUT_PORTS_START( fengyunh )
 	// -----------------------------+------------------------------
 	// Key-In         Key-Out       | Key-Out         Key-Out
 	// Coin           Key-Out       | Key-Out         Key-Out
-	// Key-In         Return Coins  | Key-In          Key-Out
-	// Coin           Return Coins  | Coin            Key-Out
+	// Key-In         Cash Out      | Key-In          Key-Out
+	// Coin           Cash Out      | Coin            Key-Out
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( shendeng )
@@ -978,7 +983,7 @@ static INPUT_PORTS_START( shendeng )
 	PORT_DIPSETTING(    0x18, "200 / 10" )
 	PORT_DIPSETTING(    0x08, "300 / 15" )
 	PORT_DIPSETTING(    0x00, "500 / 25" )
-	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DIP2:6,7,8") // 彩票單位
+	PORT_DIPNAME( 0xe0, 0xe0, "Cash Out Per Credit" )       PORT_DIPLOCATION("DIP2:6,7,8") // 彩票單位 (sets coins/tickets paid out per credit in cash out mode)
 	PORT_DIPSETTING(    0xe0, "1" )
 	PORT_DIPSETTING(    0xc0, "2" )
 	PORT_DIPSETTING(    0xa0, "5" )
@@ -1000,7 +1005,7 @@ static INPUT_PORTS_START( shendeng )
 	PORT_DIPSETTING(    0x00, "Coin" )                                                     // 投幣
 	PORT_DIPNAME( 0x08, 0x08, "Payout Mode" )               PORT_DIPLOCATION("DIP1:4")     // 退分方式
 	PORT_DIPSETTING(    0x08, "Key-Out" )                                                  // 洗分 (Pay Out key pays out score at rate set for coin input)
-	PORT_DIPSETTING(    0x00, "Return Coins" )                                             // 退幣 (Pay Out key pays out score at 1:1)
+	PORT_DIPSETTING(    0x00, "Cash Out" )                                                 // 退幣 (Pay Out key pays out score at cash out rate)
 	PORT_DIPNAME( 0x10, 0x10, "Game Hint" )                 PORT_DIPLOCATION("DIP1:5")     // 吃碰提示
 	PORT_DIPSETTING(    0x10, DEF_STR( No ) )                                              // 無
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )                                             // 有
@@ -1016,8 +1021,8 @@ static INPUT_PORTS_START( shendeng )
 	// -----------------------------+------------------------------
 	// Key-In         Key-Out       | Key-In          Key-In
 	// Coin           Key-Out       | Coin            Coin
-	// Key-In         Return Coins  | 1:1             Key-In
-	// Coin           Return Coins  | 1:1             Coin
+	// Key-In         Cash Out      | Cash Out        Key-In
+	// Coin           Cash Out      | Cash Out        Coin
 INPUT_PORTS_END
 
 
