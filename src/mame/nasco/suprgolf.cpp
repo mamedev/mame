@@ -1,27 +1,33 @@
 // license:LGPL-2.1+
 // copyright-holders:Angelo Salese, Tomasz Slanina
-/************************************************************************************
+/**************************************************************************************************
 
  Super Crowns Golf (c) 1989 Nasco Japan
 
  driver by Tomasz Slanina & Angelo Salese
 
  TODO:
- - remove the rom patch and understand what needs to be modified for the gfxs,
-   it reads from 0x06(PPI1 port C) and then fails to fill bg vram correctly.
-   PPI1 ports configuration is very standard, so it's not a 8255 device bug;
- - Some weird framebuffer vertical gaps with some object, namely the green and the
-   trees (zooming?)
+ - framebuffer handling is exotic and definitely not right, it is unknown how the HW really
+   arranges for RMW drawing, and how the pens really mix/if they are readable:
+ \- Polygons won't fill properly without a ROM patch (which actually sets up BG bank & 0x08,
+    readback correction?). Note that wrong handling of the area will make the game to crash.
+ \- Uneven vertical gaps with some object, namely the green and the trees (RMW extension? Wrong
+    readback?)
+ \- Map display arrow direction (transparency) and ball plot tracing;
+ \- Mixing, map display may as well go above tilemap but that normally breaks club / ball
+ \- Color of the ball (green) during attract mode how to play screen;
+ \- Display in cocktail mode;
  - not sure if the analog inputs are handled correctly;
- - Fix the framebuffer display in cocktail mode;
+ - Confirm ADPCM hookup.
  - Albatross: controls.
+
 
  Notes:
  - The game uses special control panel with 1 golf club shaped device to select shot
    strength (0,1,2,3), and 6 buttons (direction L&R, select angle of club head, club
    select, shot, and power to use items). -YO
 
-************************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -76,10 +82,11 @@ private:
 	std::unique_ptr<uint16_t[]> m_bg_fb;
 	std::unique_ptr<uint16_t[]> m_fg_fb;
 	uint8_t m_bg_bank = 0;
-	uint8_t m_msm5205next = 0;
-	bool m_msm_nmi_enable = 0;
 	uint8_t m_vreg_pen = 0;
-	uint8_t m_toggle = 0;
+
+	uint8_t m_adpcm_data = 0;
+	bool m_adpcm_nmi_enable = 0;
+	uint8_t m_adpcm_available_data = 0;
 
 	void paletteram_w(offs_t offset, uint8_t data);
 	void videoram_w(offs_t offset, uint8_t data);
@@ -259,15 +266,18 @@ void suprgolf_state::pen_w(uint8_t data)
 
 void suprgolf_state::adpcm_data_w(uint8_t data)
 {
-	m_msm5205next = data;
+	m_adpcm_data = data;
+	m_adpcm_available_data = 2;
 }
 
 void suprgolf_state::rom_bank_select_w(uint8_t data)
 {
 	membank("bank2")->set_entry(data & 0x3f);
 
-	m_msm_nmi_enable = bool(BIT(data, 6));
+	m_adpcm_nmi_enable = bool(BIT(data, 6));
 	flip_screen_set(BIT(data, 7));
+	// assuming a reset is triggered if NMI is off
+	m_msm->reset_w(!m_adpcm_nmi_enable);
 }
 
 void suprgolf_state::rom2_bank_select_w(uint8_t data)
@@ -403,15 +413,20 @@ static INPUT_PORTS_START( suprgolf )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SW2:8" )
 INPUT_PORTS_END
 
+// guesswork, assume played back from VCLK control
+// 0 -> 1 clocks NMI, 1 -> 0 pushes data to the ADPCM if available from the bus.
 void suprgolf_state::adpcm_int(int state)
 {
-	m_msm->reset_w(0);
-	m_toggle ^= 1;
-	m_msm->data_w(m_msm5205next & 0x0f);
-	if(m_toggle && m_msm_nmi_enable)
-		 m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+	if (!state && m_adpcm_available_data)
+	{
+		m_msm->data_w(m_adpcm_data >> 4);
+		m_adpcm_data <<= 4;
+		m_adpcm_available_data --;
+		return;
+	}
 
-	m_msm5205next >>= 4;
+	if (state && m_adpcm_available_data == 0 && m_adpcm_nmi_enable)
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 static GFXDECODE_START( gfx_suprgolf )
@@ -423,15 +438,15 @@ void suprgolf_state::machine_start()
 	membank("bank1")->configure_entries(0, 16, memregion("user2")->base(), 0x4000);
 	membank("bank2")->configure_entries(0, 64, memregion("user1")->base(), 0x4000);
 
-	save_item(NAME(m_msm5205next));
-	save_item(NAME(m_msm_nmi_enable));
-	save_item(NAME(m_toggle));
+	save_item(NAME(m_adpcm_data));
+	save_item(NAME(m_adpcm_nmi_enable));
+	save_item(NAME(m_adpcm_available_data));
 }
 
 void suprgolf_state::machine_reset()
 {
-	m_msm_nmi_enable = 0;
-	m_toggle = 0;
+	m_adpcm_nmi_enable = 0;
+	m_adpcm_available_data = 0;
 	m_vram_palette_view.select(0);
 }
 
@@ -477,10 +492,9 @@ void suprgolf_state::suprgolf(machine_config &config)
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MSM5205(config, m_msm, XTAL(384'000)); /* guess */
-	m_msm->vck_legacy_callback().set(FUNC(suprgolf_state::adpcm_int));
-	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 4KHz 4-bit */
+	m_msm->vck_callback().set(FUNC(suprgolf_state::adpcm_int));
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);
 	m_msm->add_route(ALL_OUTPUTS, "mono", 1.0);
-	// TODO: noticeable aliasing, high-pass filtered? Different frequency?
 }
 
 ROM_START( suprgolf )
