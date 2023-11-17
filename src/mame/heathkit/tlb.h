@@ -89,8 +89,8 @@ protected:
 	required_ioport                 m_config;
 	required_device<ins8250_device> m_ace;
 
-private:
-	void set_irq_line();
+//private:
+	virtual void set_irq_line();
 	void check_for_reset();
 
 	void key_click_w(uint8_t data);
@@ -237,8 +237,59 @@ protected:
 	bool m_reverse_video;
 };
 
+/**
+ *  Heath TLB plus Cleveland Codonics Imaginator-100
+ */
+class heath_imaginator_tlb_device : public heath_tlb_device
+{
+public:
+	heath_imaginator_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	void mem_map(address_map &map);
+	void io_map(address_map &map);
+
+	virtual MC6845_UPDATE_ROW(crtc_update_row) override;
+	void crtc_hsync_w(int val);
+
+	IRQ_CALLBACK_MEMBER(irq_ack_cb);
+
+	void tap_6000h();
+	void tap_8000h();
+
+	void allow_tlb_intr();
+	void allow_hsync_intr();
+
+	void display_enable_w(offs_t reg, uint8_t val);
+	void config_irq_w(offs_t reg, uint8_t val);
+	void nop_w(offs_t reg, uint8_t val);
+	virtual void set_irq_line() override;
+
+	memory_view m_mem_view;
+	required_shared_ptr<uint8_t>    m_p_graphic_ram;
+
+	uint8_t m_mem_map;
+	uint8_t m_im2_val;
+
+	bool m_alphanumeric_mode_active;
+	bool m_graphics_mode_active;
+
+	bool m_allow_tlb_interrupts;
+	bool m_allow_imaginator_interrupts;
+
+	bool m_hsync_irq_raised;
+};
+
+
 DECLARE_DEVICE_TYPE(HEATH_TLB, heath_tlb_device)
 DECLARE_DEVICE_TYPE(HEATH_GP19, heath_gp19_tlb_device)
+DECLARE_DEVICE_TYPE(HEATH_IMAGINATOR, heath_imaginator_tlb_device)
 DECLARE_DEVICE_TYPE(HEATH_SUPER19, heath_super19_tlb_device)
 DECLARE_DEVICE_TYPE(HEATH_SUPERSET, heath_superset_tlb_device)
 DECLARE_DEVICE_TYPE(HEATH_WATZ, heath_watz_tlb_device)
