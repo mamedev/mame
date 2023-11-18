@@ -1520,6 +1520,8 @@ void heath_imaginator_tlb_device::device_start()
 
 void heath_imaginator_tlb_device::device_reset()
 {
+	heath_tlb_device::device_reset();
+
 	m_mem_map = 1;
 
 	m_mem_view.select(m_mem_map);
