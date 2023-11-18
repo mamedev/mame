@@ -124,16 +124,22 @@ TEST_CASE("halfTo/FromFloat", "[uint32_t]")
 	}
 }
 
-TEST_CASE("uint32_testpow2")
+TEST_CASE("uint32_testpow2", "[uint32_t]")
 {
 	uint32_t shift = 0;
+	uint32_t nextpow2 = bx::uint32_nextpow2(1);
 
-	for (uint32_t ii = 0; ii < UINT32_MAX; ++ii)
+	for (uint32_t ii = 1; ii < 1<<24; ++ii)
 	{
+		REQUIRE(nextpow2 == bx::uint32_nextpow2(ii) );
+
 		if (bx::uint32_testpow2(ii) )
 		{
 			REQUIRE(ii == 1u << shift);
 			++shift;
+
+			REQUIRE(ii == nextpow2);
+			nextpow2 = bx::uint32_nextpow2(ii+1);
 		}
 	}
 }

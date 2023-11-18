@@ -239,6 +239,15 @@ namespace bx
 	///
 	BX_CONSTEXPR_FUNC uint64_t uint64_mul(uint64_t _a, uint64_t _b);
 
+	///
+	BX_CONSTEXPR_FUNC uint32_t uint64_cntbits(uint64_t _val);
+
+	///
+	BX_CONSTEXPR_FUNC uint32_t uint64_cntlz(uint64_t _val);
+
+	///
+	BX_CONSTEXPR_FUNC uint32_t uint64_cnttz(uint64_t _val);
+
 	/// Greatest common divisor.
 	///
 	BX_CONSTEXPR_FUNC uint32_t uint32_gcd(uint32_t _a, uint32_t _b);
