@@ -1200,7 +1200,7 @@ ROM_START( fengyunh )
 	ROM_LOAD( "ch-a-201.u28", 0x100000, 0x100000, CRC(390cf9e9) SHA1(88a809ea10db76d6557d9c6da53438a0d385b66d) )
 
 	ROM_REGION( 0x40000, "oki", 0 ) // Samples
-	ROM_LOAD( "ch-a-704.u20", 0x00000, 0x40000, CRC(fd4e1dd7) SHA1(87453918f0a8ae79fe406b4e79d97bb8efbba83a) )
+	ROM_LOAD( "ch-a-701.u20", 0x00000, 0x40000, CRC(fd4e1dd7) SHA1(87453918f0a8ae79fe406b4e79d97bb8efbba83a) )
 ROM_END
 
 /***************************************************************************
