@@ -453,6 +453,13 @@ namespace bx
 	template<> inline BX_CONSTEXPR_FUNC uint32_t uint32_cnttz(int32_t  _val) { return              uint32_cnttz<uint32_t>(_val);   }
 	template<> inline BX_CONSTEXPR_FUNC uint32_t uint32_cnttz(int64_t  _val) { return              uint32_cnttz<uint64_t>(_val);   }
 
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_ffs(Ty _x)
+	{
+		return Ty(0) == _x ? uint32_t(0) : uint32_cnttz<Ty>(_x) + 1;
+	}
+
+
 	inline BX_CONSTEXPR_FUNC uint32_t uint32_part1by1(uint32_t _a)
 	{
 		// shuffle:

@@ -162,6 +162,11 @@ namespace bx
 	template<typename Ty>
 	BX_CONSTEXPR_FUNC uint32_t uint32_cnttz(Ty _val);
 
+	/// Find first set.
+	///
+	template<typename Ty>
+	BX_CONSTEXPR_FUNC uint32_t uint32_ffs(Ty _val);
+
 	///
 	BX_CONSTEXPR_FUNC uint32_t uint32_part1by1(uint32_t _a);
 
