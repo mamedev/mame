@@ -197,9 +197,10 @@ void upd933_device::update_pending_irq()
 /**************************************************************************/
 void upd933_device::update_irq()
 {
-	if (m_irq_state != (m_cs & m_id & m_irq_pending))
+	u8 const irq_state = m_cs & m_id & m_irq_pending;
+	if (irq_state != m_irq_state)
 	{
-		m_irq_state ^= 1;
+		m_irq_state = irq_state;
 		m_irq_cb(m_irq_state);
 	}
 }
