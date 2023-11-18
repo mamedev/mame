@@ -1117,7 +1117,6 @@ void heath_superset_tlb_device::device_add_mconfig(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &heath_superset_tlb_device::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &heath_superset_tlb_device::io_map);
 
-	m_crtc->set_begin_update_callback(FUNC(heath_superset_tlb_device::crtc_begin_update));
 	m_crtc->set_update_row_callback(FUNC(heath_superset_tlb_device::crtc_update_row));
 
 	// link up the serial port outputs to font chip.
@@ -1178,11 +1177,6 @@ void heath_superset_tlb_device::crtc_reg_w(offs_t reg, uint8_t val)
 	m_reverse_video_disabled = bool(BIT(reg, 3));
 
 	heath_tlb_device::crtc_reg_w(reg, val);
-}
-
-MC6845_BEGIN_UPDATE(heath_superset_tlb_device::crtc_begin_update)
-{
-	bitmap.fill(rgb_t::black(), cliprect);
 }
 
 MC6845_UPDATE_ROW(heath_superset_tlb_device::crtc_update_row)
