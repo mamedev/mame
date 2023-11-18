@@ -229,7 +229,7 @@ INPUT_PORTS_END
 static const gfx_layout charlayout =
 {
 	8,8,        /* 8*8 characters */
-	RGN_FRAC(1,2),
+	RGN_FRAC(1,1),
 	4,          /* 4 bits per pixel */
 	{ STEP4_INV(0, 4) },
 	{ STEP4(0, 1), STEP4(4*4, 1) },
