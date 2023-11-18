@@ -186,4 +186,30 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!--
+	17 ans                                      Claude François
+	Complicated                                 Avril Lavigne
+	Don't Know Why                              Norah Jones
+	Etoile des neiges                           Line Renaud
+	Je me voyais déjà                           Charles Aznavour
+	L'idole des jeunes                          Johnny Hallyday
+	Ma meilleure amie                           Laurie
+	Mambo No. 5  (A Little Bit Of...)           Lou Bega
+	Sail On                                     Lionel Richie
+	What's Going On                             Marvin Gaye
+	-->
+	<software name="karamsc1" supported="no">
+		<description>KaraokeMicro Star Cartouche 1</description>
+		<year>2003</year>
+		<publisher>IVL Technologies / Lexibook</publisher>
+		<part name="cart" interface="easy_karaoke_cart">
+			<dataarea name="rom" size="0x80000">
+				<rom name="ics0321-a.u3" size="0x80000" crc="b0c76017" sha1="1a645b83528f58b8c3e8d8950c05babc37411b49" />
+			</dataarea>
+			<dataarea name="mcu" size="0x2000">
+				<rom name="IC89LV52A-24PQ.U1" size="0x2000" status="nodump" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

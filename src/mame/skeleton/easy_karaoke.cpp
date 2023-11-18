@@ -51,6 +51,20 @@
 
     presumably manages a serial protocol to send data to the main unit
 
+
+    -----------------
+
+    Lexibook's KaraokeMicro Star version uses
+
+    Clarity 4.1 ARM
+    SV11180
+    NV0093  0246
+    Sound Vision Inc.
+
+    ------------------
+
+    Units also contain 'On-Key Karaoke' logo on box, maybe this is the original US / Canada product name?
+
 *******************************************************************************/
 
 #include "emu.h"
@@ -142,7 +156,7 @@ uint32_t easy_karaoke_state::a000004_r()
 void easy_karaoke_state::arm_map(address_map &map)
 {
 	map(0x00000000, 0x007fffff).ram();
-	map(0x04000000, 0x043fffff).rom().region("maincpu", 0);
+	map(0x04000000, 0x047fffff).rom().region("maincpu", 0);
 	map(0x0a000004, 0x0a000007).r(FUNC(easy_karaoke_state::a000004_r));
 }
 
@@ -174,29 +188,88 @@ void easy_karaoke_state::easy_karaoke(machine_config &config)
 }
 
 /*
-The 'easykara' set has the following songs built in.
+The 'easykara' set has the following 10 songs built in.
 
-One Step Closer                             S Club Juniors     
-S Club Party                                S Club 7        
-Automatic High                              S Club Juniors       
-Don't Stop Movin'                           S Club 7                  
-Get the Party Started                       Pink                    
-Feel                                        Robbie Williams                 
-Complicated                                 Avril Lavigne            
-One love                                    Blue                    
-If you're not the one                       Daniel Bedingfield      
-Sound of the Underground                    Girls Aloud                 
-
-There are regional variants of the product sold under different names, for example
-there appears to be a French Lexibook unit based on this tech with different songs.
+One Step Closer                             S Club Juniors
+S Club Party                                S Club 7
+Automatic High                              S Club Juniors
+Don't Stop Movin'                           S Club 7
+Get the Party Started                       Pink
+Feel                                        Robbie Williams
+Complicated                                 Avril Lavigne
+One love                                    Blue
+If you're not the one                       Daniel Bedingfield
+Sound of the Underground                    Girls Aloud
 
 */
 ROM_START( easykara )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "ics0303-b.bin", 0x000000, 0x400000, CRC(43d86ae8) SHA1(219dcbf72b92d1b7e00f78f237194ab47dc08f1b) )
+ROM_END
+
+/*
+The 'karams' set has the following 50 songs built in.
+
+...Baby One More Time                       Britney Spears
+Alexandrie Alexandra                        Claude François
+All By Myself                               Celine Dion
+Allumer le feu                              Johnny Hallyday
+Alors regarde                               Patrick Bruel
+Always On My Mind                           Elvis Presley (R)
+Au soleil                                   Jennifer
+Auprès de ma blonde                         Enfant
+Believe                                     Cher
+Bye Bye Bye                                 'N Sync
+Can't Get You Out Of My Head                Kylie Minogue
+Cette année là                              Claude François
+Don't Let Me Get Me                         Pink
+Déshabillez-moi                             Juliette Greco
+Elle te rend dingue                         Nuttea
+Embrasse-moi idiot                          Forban
+Fallin'                                     Alicia Keys
+Fame                                        Irene Cara
+Femmes je vous aime                         Julien Clerc
+Frère Jacques                               Enfant
+I Love Rock and Roll                        Joan Jett
+I Will Survive                              Gloria Gaynor
+I'll Be There                               Mariah Carey
+Il était un petit navire                    Enfant
+It's Raining Men                            Geri Halliwell
+Juste quelqu'un de bien                     Enzo Enzo
+La Bohème                                   Charles Aznavour
+La Cucaracha                                Standard
+La Marseillaise                             Popular
+La musique                                  Star Academy 1
+Lady Marmalade                              Christina Aguilera
+Laissons entrer le soleil                   A la recherche de la Nouvelle Star
+Le bon roi Dagobert                         Enfant
+Le pénitencier                              Johnny Halliday
+London Bridge                               Children
+Magnolias forever                           Claude François
+My Girl                                     Temptations
+New York New York                           Frank Sinatra
+Noir c'est noir                             Johnny Hallyday
+Oops!...I Did It Again                      Britney Spears
+Pour le plaisir                             Herbert Léonard
+Qui est l'exemple?                          Rohf
+Silent Night                                Christmas
+That's The Way (I Like It)                  KC And The Sunshine Band
+That's The Way It Is                        Celine Dion
+The Loco-Motion                             Kylie Minogue
+Toute seule                                 Lorie
+Vieille canaille                            Gainsbourg
+We Wish You A Merry Christmas               Standard
+When The Saints Go Marchin' In              Louis Armstrong
+
+*/
+
+ROM_START( karams )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "ics0300-a.u9", 0x000000, 0x800000, CRC(32a7a429) SHA1(ed219bc9201b45f67c5e7dbe3fb3db70823c59f0) )
 ROM_END
 
 } // anonymous namespace
 
 
-CONS( 2004, easykara,      0,       0,      easy_karaoke, easy_karaoke, easy_karaoke_state, empty_init, "IVL Technologies", "Easy Karaoke Groove Station", MACHINE_IS_SKELETON )
+CONS( 2004, easykara,      0,              0,      easy_karaoke, easy_karaoke, easy_karaoke_state, empty_init, "IVL Technologies",                    "Easy Karaoke Groove Station (UK)", MACHINE_IS_SKELETON )
+CONS( 2003, karams,        easykara,       0,      easy_karaoke, easy_karaoke, easy_karaoke_state, empty_init, "IVL Technologies (Lexibook license)", "KaraokeMicro Star (France)", MACHINE_IS_SKELETON )
