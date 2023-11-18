@@ -21,6 +21,7 @@
       - Screen saver does not disable the screen
     - With superset slot option
       - Screen menus not working properly
+      - Screensaver freezes the screen instead of blanking the screen	
 
 ****************************************************************************/
 /***************************************************************************

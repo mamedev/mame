@@ -202,8 +202,8 @@ protected:
 	/* These computed are used to define the screen parameters for a driver */
 	uint16_t  m_horiz_pix_total;
 	uint16_t  m_vert_pix_total;
-	uint16_t  m_visible_width;
-	uint16_t  m_visible_height;
+	uint16_t  m_max_visible_x;
+	uint16_t  m_max_visible_y;
 	uint16_t  m_hsync_on_pos;
 	uint16_t  m_hsync_off_pos;
 	uint16_t  m_vsync_on_pos;
