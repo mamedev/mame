@@ -428,6 +428,7 @@ inline void mc6847_friend_device::next_scanline()
 		m_physical_scanline = 0;
 		m_logical_scanline = 0;
 		m_logical_scanline_zone = SCANLINE_ZONE_TOP_BORDER;
+		new_frame();
 	}
 	else if ((m_logical_scanline_zone < SCANLINE_ZONE_VBLANK) &&
 		(m_physical_scanline >= (m_pal ? LINES_UNTIL_VBLANK_PAL : LINES_UNTIL_VBLANK_NTSC)))
@@ -500,6 +501,15 @@ inline bool mc6847_friend_device::is_bottom_pal_padding_line(int scanline)
 inline bool mc6847_friend_device::is_pal_padding_line(int scanline)
 {
 	return is_top_pal_padding_line(scanline) || is_bottom_pal_padding_line(scanline);
+}
+
+
+//-------------------------------------------------
+//  new_frame
+//-------------------------------------------------
+
+void mc6847_friend_device::new_frame()
+{
 }
 
 

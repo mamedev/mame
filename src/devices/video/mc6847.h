@@ -272,6 +272,7 @@ protected:
 	virtual void device_post_load() override;
 
 	// other overridables
+	virtual void new_frame();
 	virtual TIMER_CALLBACK_MEMBER(horizontal_sync_changed);
 	virtual void field_sync_changed(bool line);
 	virtual void enter_bottom_border();
