@@ -10,6 +10,7 @@
 #include "video/bufsprite.h"
 
 #include "emupal.h"
+#include "screen.h"
 #include "tilemap.h"
 
 
@@ -25,9 +26,9 @@ public:
 		m_palette(*this, "palette"),
 		m_spriteram(*this, "spriteram") ,
 		m_scroll_ram(*this, "scroll_ram"),
-		m_videoram(*this, "videoram"),
-		m_back_data(*this, "back_data"),
-		m_fore_data(*this, "fore_data")
+		m_text_ram(*this, "text_ram"),
+		m_bg_ram(*this, "bg_ram"),
+		m_fg_ram(*this, "fg_ram")
 	{ }
 
 	void dynduke(machine_config &config);
@@ -41,28 +42,28 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<buffered_spriteram16_device> m_spriteram;
 
-	required_shared_ptr<uint16_t> m_scroll_ram;
-	required_shared_ptr<uint16_t> m_videoram;
-	required_shared_ptr<uint16_t> m_back_data;
-	required_shared_ptr<uint16_t> m_fore_data;
+	required_shared_ptr<u16> m_scroll_ram;
+	required_shared_ptr<u16> m_text_ram;
+	required_shared_ptr<u16> m_bg_ram;
+	required_shared_ptr<u16> m_fg_ram;
 
 	tilemap_t *m_bg_layer = nullptr;
 	tilemap_t *m_fg_layer = nullptr;
 	tilemap_t *m_tx_layer = nullptr;
-	int m_back_bankbase = 0;
-	int m_fore_bankbase = 0;
-	int m_back_enable = 0;
-	int m_fore_enable = 0;
-	int m_sprite_enable = 0;
-	int m_txt_enable = 0;
-	int m_old_back = 0;
-	int m_old_fore = 0;
+	u32 m_back_bankbase = 0;
+	u32 m_fore_bankbase = 0;
+	bool m_back_enable = false;
+	bool m_fore_enable = false;
+	bool m_sprite_enable = false;
+	bool m_txt_enable = false;
+	u32 m_old_back = 0;
+	u32 m_old_fore = 0;
 
-	void background_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void foreground_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void text_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void gfxbank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void background_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void foreground_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void text_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void gfxbank_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void control_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -70,9 +71,9 @@ private:
 
 	virtual void video_start() override;
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
-	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, u32 pri_mask);
 
 	void vblank_irq(int state);
 	void master_map(address_map &map);
