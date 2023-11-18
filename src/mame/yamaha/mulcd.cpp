@@ -77,7 +77,7 @@ void mulcd_device::render_w(int state)
 
 void mulcd_device::device_add_mconfig(machine_config &config)
 {
-	HD44780(config, m_lcd);
+	HD44780(config, m_lcd, 250'000); // TODO: Wrong device type, should be a custom mask part of unknown mask number; clock not measured, datasheet typical clock used
 	m_lcd->set_lcd_size(4, 20);
 
 	auto &screen = SCREEN(config, "screen", SCREEN_TYPE_SVG);

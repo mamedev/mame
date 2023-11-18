@@ -155,8 +155,6 @@ void tceptor_state::m68k_map(address_map &map)
 
 void tceptor_state::mcu_map(address_map &map)
 {
-	map(0x0000, 0x001f).m("mcu", FUNC(hd63701v0_cpu_device::m6801_io));
-	map(0x0080, 0x00ff).ram();
 	map(0x1000, 0x13ff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w));
 	map(0x1400, 0x154d).ram();
 	map(0x17c0, 0x17ff).ram();
@@ -167,10 +165,9 @@ void tceptor_state::mcu_map(address_map &map)
 	map(0x2201, 0x2201).r(FUNC(tceptor_state::input1_r));
 	map(0x8000, 0x8000).w(FUNC(tceptor_state::mcu_irq_disable_w));
 	map(0x8800, 0x8800).w(FUNC(tceptor_state::mcu_irq_enable_w));
-	map(0x8000, 0xbfff).rom();
+	map(0x8000, 0xbfff).rom().region("mcusub", 0);
 	map(0xc000, 0xc7ff).ram();
 	map(0xc800, 0xdfff).ram().share("nvram"); // Battery Backup
-	map(0xf000, 0xffff).rom();
 }
 
 
@@ -376,9 +373,11 @@ ROM_START( tceptor )
 	ROM_LOAD16_BYTE( "tc1-3.10c",    0x000001, 0x08000, CRC(779a4b25) SHA1(8563213a1f1caee0eb88aa4bbd37c6004f16b309) )
 	// socket 8d and 10d are emtpy
 
-	ROM_REGION( 0x10000, "mcu", 0 )         // Custom 60A1
-	ROM_LOAD( "tc1-2.3a",       0x08000, 0x4000, CRC(b6def610) SHA1(d0eada92a25d0243206fb8239374f5757caaea47) ) /* subprogram for the mcu */
-	ROM_LOAD( "cus60-60a1.mcu", 0x0f000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) ) /* mcu internal code */
+	ROM_REGION( 0x1000, "mcu", 0 )         // Custom 60A1
+	ROM_LOAD( "cus60-60a1.mcu", 0x0000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) ) /* mcu internal code */
+
+	ROM_REGION( 0x4000, "mcusub", 0 )
+	ROM_LOAD( "tc1-2.3a",       0x0000, 0x4000, CRC(b6def610) SHA1(d0eada92a25d0243206fb8239374f5757caaea47) ) /* subprogram for the mcu */
 
 	ROM_REGION( 0x02000, "gfx1", 0 )    // text tilemap
 	ROM_LOAD( "tc1-18.6b",  0x00000, 0x02000, CRC(662b5650) SHA1(ba82fe5efd1011854a6d0d7d87075475b65c0601) )
@@ -433,9 +432,11 @@ ROM_START( tceptor2 )
 	ROM_LOAD16_BYTE( "tc2-6.8d",     0x100000, 0x08000, CRC(20711f14) SHA1(39623592bb4be3b3be2bff4b3219ac16ba612761) )
 	ROM_LOAD16_BYTE( "tc2-5.10d",    0x100001, 0x08000, CRC(925f2560) SHA1(81fcef6a9c7e9dfb6884043cf2266854bc87cd69) )
 
-	ROM_REGION( 0x10000, "mcu", 0 )         // Custom 60A1
-	ROM_LOAD( "tc1-2.3a",       0x08000, 0x4000, CRC(b6def610) SHA1(d0eada92a25d0243206fb8239374f5757caaea47) ) /* subprogram for the mcu */
-	ROM_LOAD( "cus60-60a1.mcu", 0x0f000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) ) /* mcu internal code */
+	ROM_REGION( 0x1000, "mcu", 0 )         // Custom 60A1
+	ROM_LOAD( "cus60-60a1.mcu", 0x0000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) ) /* mcu internal code */
+
+	ROM_REGION( 0x4000, "mcusub", 0 )
+	ROM_LOAD( "tc1-2.3a",       0x0000, 0x4000, CRC(b6def610) SHA1(d0eada92a25d0243206fb8239374f5757caaea47) ) /* subprogram for the mcu */
 
 	ROM_REGION( 0x02000, "gfx1", 0 )    // text tilemap
 	ROM_LOAD( "tc1-18.6b",  0x00000, 0x02000, CRC(662b5650) SHA1(ba82fe5efd1011854a6d0d7d87075475b65c0601) )

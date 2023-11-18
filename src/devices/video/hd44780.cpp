@@ -189,6 +189,14 @@ void hd44780_device::device_reset()
 	set_busy_flag(1520);
 }
 
+//-------------------------------------------------
+//  device validity check
+//-------------------------------------------------
+void hd44780_device::device_validity_check(validity_checker &valid) const
+{
+	if (clock() == 0)
+		osd_printf_error("LCDC clock cannot be zero!\n");
+}
 
 //-------------------------------------------------
 //  timer events

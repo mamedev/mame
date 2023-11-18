@@ -16,17 +16,9 @@ ROM_END
 const int st_kbd_device::mouse_xya[3][4] = { { 0, 0, 0, 0 }, { 1, 1, 0, 0 }, { 0, 1, 1, 0 } };
 const int st_kbd_device::mouse_xyb[3][4] = { { 0, 0, 0, 0 }, { 0, 1, 1, 0 }, { 1, 1, 0, 0 } };
 
-void st_kbd_device::map(address_map &map)
-{
-	map(0x0000, 0x001f).m(m_cpu, FUNC(hd6301_cpu_device::m6801_io));
-	map(0x0080, 0x00ff).ram();
-	map(0xf000, 0xffff).rom().region("cpu", 0);
-}
-
 void st_kbd_device::device_add_mconfig(machine_config &config)
 {
 	HD6301V1(config, m_cpu, 4_MHz_XTAL);
-	m_cpu->set_addrmap(AS_PROGRAM, &st_kbd_device::map);
 	m_cpu->in_p1_cb().set(FUNC(st_kbd_device::port1_r));
 	m_cpu->in_p2_cb().set(FUNC(st_kbd_device::port2_r));
 	m_cpu->out_p2_cb().set(FUNC(st_kbd_device::port2_w));

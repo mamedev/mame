@@ -1357,13 +1357,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2e_state::apple2_interrupt)
 		{
 			const u32 uFkeys = m_franklin_fkeys->read();
 
-			if (uFkeys ^ m_franklin_last_fkeys)
+			if ((uFkeys ^ m_franklin_last_fkeys) && uFkeys)
 			{
 				m_transchar = count_leading_zeros_32(uFkeys) + 0x20;
 				m_strobe = 0x80;
 				m_franklin_strobe = 0;
-				m_franklin_last_fkeys = uFkeys;
 			}
+			m_franklin_last_fkeys = uFkeys;
 		}
 	}
 }

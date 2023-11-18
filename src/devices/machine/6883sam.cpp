@@ -167,7 +167,7 @@ uint8_t sam6883_device::read(offs_t offset)
 	if (offset < (mode_64k && (m_sam_state & SAM_STATE_TY) ? 0xff00 : 0x8000))
 	{
 		// RAM reads: 0000–7FFF or 0000–FEFF
-		if (mode_64k && (m_sam_state & (SAM_STATE_TY|SAM_STATE_P1)) == SAM_STATE_P1)
+		if (mode_64k && (m_sam_state & (SAM_STATE_TY | SAM_STATE_P1)) == SAM_STATE_P1)
 			offset |= 0x8000;
 		return m_ram_space.read_byte(offset);
 	}
@@ -204,7 +204,7 @@ void sam6883_device::write(offs_t offset, uint8_t data)
 	if (offset < 0x8000)
 	{
 		// RAM write space: 0000–7FFF (nominally space 7)
-		if (mode_64k && (m_sam_state & (SAM_STATE_TY|SAM_STATE_P1)) == SAM_STATE_P1)
+		if (mode_64k && (m_sam_state & (SAM_STATE_TY | SAM_STATE_P1)) == SAM_STATE_P1)
 			offset |= 0x8000;
 		m_ram_space.write_byte(offset, data);
 	}

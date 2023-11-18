@@ -10,7 +10,8 @@ license:CC0-1.0
 		<description>Graphics Mathematics</description>
 		<year>1983</year>
 		<publisher>Bandai</publisher>
-		<info name="usage" value="MON then L then GRM. After loading, RUN" />
+		<info name="usage" value="Type MON, press Return; type L, press Return; type GRM, press Return. Start the tape playback. Type RUN after it finishes loading." />
+		<info name="alt_title" value="グラフィック数学" />
 		<sharedfeat name="requirement" value="rx78_cart:basic"/>
 		<part name="cass" interface="rx78_cass">
 			<dataarea name="cass" size="0x23ca2c">
@@ -18,4 +19,19 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="yellowcab">
+		<description>Yellow Cab</description>
+		<year>1983</year>
+		<publisher>Bandai</publisher>
+		<info name="usage" value="Type MON, press Return; type L, press Return; type CAB, press Return. Start the tape playback. Game will start automatically." />
+		<info name="alt_title" value="イェロー・キャフ" />
+		<sharedfeat name="requirement" value="rx78_cart:basic"/>
+		<part name="cass" interface="rx78_cass">
+			<dataarea name="cass" size="0x37242c">
+				<rom name="yellowcab.wav" size="0x37242c" crc="27ac7d0A" sha1="c3d2a05d2ca68d9fabc8f3cea839079ea432ba41"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

@@ -3279,10 +3279,15 @@ ROM_START( tisubb )
 ROM_END
 
 /* This bootleg shows year 1989 on title screen, but it's from 1992 (there are 1992 strings on the ROMs). Probably Karam
-   modified the New HUNTer set from Mecca, which also shows 1989, and was legally registered on Korea on 1989-8-25. */
+   modified the New HUNTer set from Mecca, which also shows 1989, and was legally registered on Korea on 1989-8-25.
+   Hardware:
+    - Sound: SM64 + SM65 + 12.000 MHz xtal (currently, the pitch is wrong, you have to overclock ymsnd to 112% to get the same as the PCB).
+    - Five positions for banks of eight DIP switches, but four of them unpopulated (only one present on the PCB).
+    - MCU with its surface scratched out, probably an HD647180X0CP8L + 12.000 MHz xtal.
+    - TI TPC1020AFN-084C.
+    - Unpopulated locations on the PCB for a battery and a reset switch. */
 ROM_START( newhunter )
-	// The MCU had its surface scratched out, but almost sure it's an HD647180X0CP8L
-	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_REGION( 0x4000, "maincpu", 0 ) 	// The MCU had its surface scratched out, but almost sure it's an HD647180X0CP8L
 	ROM_LOAD( "hd647180.bin", 0x00000, 0x04000, NO_DUMP )
 	HD647180X_FAKE_INTERNAL_ROM
 
@@ -3311,7 +3316,7 @@ ROM_START( newhunter )
 	ROM_LOAD( "hu-3.bin",     0x00200, 0x00100, CRC(db99f6da) SHA1(d281a2fa06f1890ef0b1c4d099e6828827db14fd) )
 
 	ROM_REGION( 0x00100, "xtraprom", 0 )
-	ROM_LOAD( "82s129.u34",   0x00000, 0x00100, NO_DUMP ) // There's an (undumped) additional PROM near the MCU
+	ROM_LOAD( "82s129.u34",   0x00000, 0x00100, CRC(72d30ca3) SHA1(1054da8e0c18fac8d9fd93cfa441a17df430686b) ) // There's an additional PROM near the MCU
 
 	ROM_REGION( 0x00045c, "plds", 0 )
 	ROM_LOAD( "ht-1.bin",     0x00000, 0x00117, CRC(fdb4cd61) SHA1(f510077b707864b2536942db6157118ca15922de) )
@@ -3365,10 +3370,12 @@ ROM_END
      -One bank of 5 DIP switches soldered to another 74LS245.
      -A single switch button soldered to another 74LS245.
    And the usual hardware configuration:
+     -One 12.000 MHz xtal.
      -HD647180X0CP6.
      -12 MHz xtal.
      -One bank of 8 DIP switches, plus the other two banks described before.
-     -Sound: K-666 + K-664. */
+     -Sound: K-666 + K-664.
+     -TI TPC1020AFN-084C. */
 ROM_START( newhunterc )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	ROM_LOAD( "hd647180.bin", 0x00000, 0x04000, NO_DUMP ) // HD647180X0CP8L
@@ -3394,17 +3401,60 @@ ROM_START( newhunterc )
 	ROM_IGNORE(0xc000)
 
 	ROM_REGION( 0x00300, "proms", 0 )
-	ROM_LOAD( "n82s129an.u1",  0x00000, 0x00100, BAD_DUMP CRC(971843e5) SHA1(4cb5fc1085503dae2f2f02eb49cca051ac84b890) ) // Not dumped on this PCB
-	ROM_LOAD( "n82s129an.u2",  0x00100, 0x00100, BAD_DUMP CRC(b4bd872c) SHA1(c0f9fe68186636d6d6bc6f81415459631cf38edd) ) // Not dumped on this PCB
-	ROM_LOAD( "n82s129an.u3",  0x00200, 0x00100, BAD_DUMP CRC(db99f6da) SHA1(d281a2fa06f1890ef0b1c4d099e6828827db14fd) ) // Not dumped on this PCB
+	ROM_LOAD( "n82s129an.u1",  0x00000, 0x00100, CRC(69af17fc) SHA1(38546f5665cf731195ac384aca182c56884333f0) )
+	ROM_LOAD( "n82s129an.u2",  0x00100, 0x00100, CRC(4b5f288a) SHA1(b6b9f9067afe93bd13ea17311484e2a2af01a0ed) )
+	ROM_LOAD( "n82s129an.u3",  0x00200, 0x00100, CRC(a1c0d069) SHA1(794df68451525901ebd5895feb26fcda2c517c3f) )
 
 	ROM_REGION( 0x00045c, "plds", 0 )
-	ROM_LOAD( "gal16v8b.u41",  0x00000, 0x00117, NO_DUMP )
-	ROM_LOAD( "gal16v8b.s63",  0x00117, 0x00117, NO_DUMP )
-	ROM_LOAD( "gal16v8b.u42",  0x0022e, 0x00117, NO_DUMP )
-	ROM_LOAD( "gal16v8b.u9",   0x00345, 0x00117, NO_DUMP )
+	ROM_LOAD( "gal16v8b.u41",  0x00000, 0x00117, CRC(fdb4cd61) SHA1(f510077b707864b2536942db6157118ca15922de) )
+	ROM_LOAD( "gal16v8b.s63",  0x00117, 0x00117, CRC(f4f78925) SHA1(738281c05c0f51c0edcf65bacc18ebc87c2408c1) )
+	ROM_LOAD( "gal16v8b.u42",  0x0022e, 0x00117, CRC(0cf55cec) SHA1(845395ca0587627331b9ac48777f7cb6b54b9401) )
+	ROM_LOAD( "gal16v8b.u9",   0x00345, 0x00117, CRC(8272668f) SHA1(9037f0d9c7625d05d2087e6f2d159dece934a945) )
 ROM_END
 
+/* Hardware:
+    - Sound: SM64 + SM65.
+    - 12.000 MHz xtal (only one xtal on the PCB).
+    - Five positions for banks of eight DIP switches, but four of them unpopulated (only one present on the PCB).
+    - MCU with its surface scratched out.
+   Direct recording from PCB for reference: https://youtu.be/0cFNFCqEEQo */
+ROM_START( newhunterd )
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	ROM_LOAD( "hd647180.bin",   0x00000, 0x04000, NO_DUMP )
+	HD647180X_FAKE_INTERNAL_ROM
+
+	ROM_REGION( 0x10000, "program", 0 )
+	ROM_LOAD( "1_am27c512.u44", 0x00000, 0x10000, CRC(456bdb88) SHA1(7135584576f7761b4a0b4c66318cd0cb649eeb93) )
+
+	ROM_REGION( 0x40000, "tilemap", 0 )
+	ROM_LOAD( "4_d27c010a.u42", 0x00000, 0x08000, CRC(c1daa20f) SHA1(c46278a00b6cbbd79c4184db910bf2770d77d92f) )
+	ROM_CONTINUE(               0x10000, 0x08000 )
+	ROM_CONTINUE(               0x08000, 0x08000 )
+	ROM_CONTINUE(               0x18000, 0x08000 )
+	ROM_LOAD( "5_am27c010.u41", 0x20000, 0x08000, CRC(b1f7bdde) SHA1(1b258450e8e73fd35feb2048a19659546cdceabd) )
+	ROM_CONTINUE(               0x30000, 0x08000 )
+	ROM_CONTINUE(               0x28000, 0x08000 )
+	ROM_CONTINUE(               0x38000, 0x08000 )
+
+	ROM_REGION( 0x08000, "reels", 0 )
+	ROM_LOAD( "2_27c512.u3",    0x00000, 0x04000, CRC(bafd35ef) SHA1(5ef297e03d11faa97a79ed87eb73debf81af2b91) )
+	ROM_IGNORE(0xc000)
+	ROM_LOAD( "3_m27512.u43",   0x04000, 0x04000, CRC(44933beb) SHA1(a19ed785cc3b38c2a2a6a08e9d639361ee118343) )
+	ROM_IGNORE(0xc000)
+
+	ROM_REGION( 0x00300, "proms", 0 )
+	ROM_LOAD( "n82s129an.u67",  0x00000, 0x00100, BAD_DUMP CRC(69af17fc) SHA1(38546f5665cf731195ac384aca182c56884333f0) ) // Not dumped on this set
+	ROM_LOAD( "n82s129an.u68",  0x00100, 0x00100, BAD_DUMP CRC(4b5f288a) SHA1(b6b9f9067afe93bd13ea17311484e2a2af01a0ed) ) // Not dumped on this set
+	ROM_LOAD( "n82s129an.u69",  0x00200, 0x00100, BAD_DUMP CRC(a1c0d069) SHA1(794df68451525901ebd5895feb26fcda2c517c3f) ) // Not dumped on this set
+
+	ROM_REGION( 0x00045c, "plds", 0 )
+	ROM_LOAD( "palce16v8h.u61", 0x00000, 0x00117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u6",  0x00117, 0x00117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u30", 0x0022e, 0x00117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u59", 0x00345, 0x00117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u29", 0x00000, 0x00117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u35", 0x00000, 0x00117, NO_DUMP )
+ROM_END
 
 /***************************************************************************
 
@@ -4041,7 +4091,7 @@ ROM_START( mtrainnv )
 ROM_END
 
 /*
- Seven Land (Korea, probably a bootleg of Super Treasure Island)
+ Seven Land (Korea, probably a bootleg of Super Treasure Island). String "KAM 1.2" on program ROM.
    MCU Hitachi HD64180RP6.
    Actel A40MX04-F.
    Sound: U6612 (YM3812) + U6614 (YM3014) + 12.000 MHz xtal.
@@ -4051,6 +4101,10 @@ ROM_END
    One unpopulated location on the PCB (near the sound chips) for another bank of 8 DIP switches, labeled SW0.
    3.6V battery near the HD64180RP6
    No bipolar PROMs on this PCB.
+ Known issues:
+   When setting "Clear Ticket Unit" DIP switch to 100, the game resets after betting 120.
+   Lamps aren't working properly.
+   There's a gray stripe on the title screen that isn't present on the real hardware.
 */
 
 ROM_START( sevenlnd )
@@ -4058,16 +4112,16 @@ ROM_START( sevenlnd )
 	ROM_LOAD( "a_am27c512.u58", 0x00000, 0x10000, CRC(7abaca14) SHA1(48e4eb4ef7df09f29a382167291ee6385279d1f5) )
 
 	ROM_REGION( 0x100000, "tilemap", 0 )
-	ROM_LOAD( "sevenlnd_tilemap_1.u30", 0x00000, 0x40000, NO_DUMP ) // A278308 
-	ROM_LOAD( "sevenlnd_tilemap_2.u29", 0x40000, 0x40000, NO_DUMP ) // A278308
-	ROM_LOAD( "sevenlnd_tilemap_3.u28", 0x80000, 0x40000, NO_DUMP ) // A278308
-	ROM_LOAD( "sevenlnd_tilemap_4.u27", 0xC0000, 0x40000, NO_DUMP ) // A278308
+	ROM_LOAD( "sevenlnd_tilemap_1.u30", 0x00000, 0x40000, CRC(17ebde1c) SHA1(8588830628ce09de57acf287b983bfcfcb0e35f2) ) // A278308
+	ROM_LOAD( "sevenlnd_tilemap_3.u28", 0x40000, 0x40000, CRC(615f6f8f) SHA1(e75e935fd7e5d1a68c0e22d8dddcb706278833db) ) // A278308
+	ROM_LOAD( "sevenlnd_tilemap_4.u27", 0x80000, 0x40000, CRC(f78b273e) SHA1(20bb58042db14af6c65804dfd24e5fb38ce68bd2) ) // A278308
+	ROM_LOAD( "sevenlnd_tilemap_2.u29", 0xc0000, 0x40000, CRC(be95e805) SHA1(8d920e4a04a1f53f3354b031d1cc3bda5f13df44) ) // A278308
 
 	ROM_REGION( 0x80000, "reels", 0 )
-	ROM_LOAD( "sevenlnd_reels_1.u25", 0x00000, 0x20000, NO_DUMP ) // 27C010
-	ROM_LOAD( "sevenlnd_reels_2.u24", 0x20000, 0x20000, NO_DUMP ) // 27C010
-	ROM_LOAD( "sevenlnd_reels_3.u23", 0x40000, 0x20000, NO_DUMP ) // 27C010
-	ROM_LOAD( "sevenlnd_reels_4.u22", 0x60000, 0x20000, NO_DUMP ) // 27C010
+	ROM_LOAD( "sevenlnd_reels_1.u25", 0x00000, 0x20000, CRC(49ce7fea) SHA1(eed75c012da5cbcee0762a5692f81b824e9715c4) ) // 27C010
+	ROM_LOAD( "sevenlnd_reels_2.u24", 0x20000, 0x20000, CRC(4d5c4550) SHA1(c78adf8ee38d82251bcb26d7b693a5155997c2d1) ) // 27C010
+	ROM_LOAD( "sevenlnd_reels_3.u23", 0x40000, 0x20000, CRC(31b7e157) SHA1(5e07725a91d5087e97b2299e5e81356b6d0fb5e9) ) // 27C010
+	ROM_LOAD( "sevenlnd_reels_4.u22", 0x60000, 0x20000, CRC(27d575bc) SHA1(e2a0164cf57f39554cace53b3d894c0e32ad2f56) ) // 27C010
 
 	ROM_REGION( 0x157, "plds", 0 )
 	ROM_LOAD( "gal16v8d_1.bin", 0x000, 0x117, NO_DUMP )
@@ -4297,9 +4351,13 @@ GAMEL( 1991, victor5a,    victor5, victor5,    victor5,  subsino_state, init_vic
 GAMEL( 1992, tisub,       0,       tisub,      tisub,    subsino_state, init_tisub,       ROT0, "Subsino",         "Treasure Island (Subsino, set 1)",            0,                   layout_tisub    )
 GAMEL( 1992, tisuba,      tisub,   tisub,      tisub,    subsino_state, init_tisub,       ROT0, "Subsino",         "Treasure Island (Subsino, set 2)",            0,                   layout_tisub    )
 GAMEL( 1992, tisubb,      tisub,   tisub,      tisubb,   subsino_state, init_tisubb,      ROT0, "American Alpha",  "Treasure Island (American Alpha, v3.0N)",     0,                   layout_tisubb   )
-GAMEL( 1992, newhunter,   tisub,   tisub,      tisub,    subsino_state, init_tisubb,      ROT0, "Karam",           "New HUNTer",                                  0,                   layout_tisubb   ) // 1989 on screen, but this bootleg is from 1992
-GAMEL( 1993, newhunterb,  tisub,   newhunterb, tisub,    subsino_state, init_newhunterb,  ROT0, "bootleg",         "New HUNTer (bootleg, set 1)",                 0,                   layout_tisubb   )
-GAMEL( 1993, newhunterc,  tisub,   newhunterb, tisub,    subsino_state, init_newhunterc,  ROT0, "bootleg",         "New HUNTer (bootleg, set 2)",                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_COLORS, layout_tisubb   ) // 1989 on screen, but "Copyright 1993 SubSino Corp. Taipei, Taiwan." on program ROM
+
+// tilemaps, lamps and inputs troubles.
+GAMEL( 1992, newhunter,   tisub,   tisub,      tisub,    subsino_state, init_tisubb,      ROT0, "Karam",           "New HUNTer",                                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING, layout_tisubb   ) // 1989 on screen, but this bootleg is from 1992
+GAMEL( 1993, newhunterb,  tisub,   newhunterb, tisub,    subsino_state, init_newhunterb,  ROT0, "bootleg",         "New HUNTer (bootleg, set 1)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING, layout_tisubb   )
+
+GAMEL( 1993, newhunterc,  tisub,   newhunterb, tisub,    subsino_state, init_newhunterc,  ROT0, "bootleg",         "New HUNTer (bootleg, set 2)",                 MACHINE_NOT_WORKING, layout_tisubb   ) // 1989 on screen, but "Copyright 1993 SubSino Corp. Taipei, Taiwan." on program ROM
+GAMEL( 1993, newhunterd,  tisub,   newhunterb, tisub,    subsino_state, init_newhunterc,  ROT0, "bootleg",         "New HUNTer (bootleg, set 3)",                 MACHINE_NOT_WORKING, layout_tisubb   )
 
 GAMEL( 1991, crsbingo,    0,       crsbingo,   crsbingo, subsino_state, init_crsbingo,    ROT0, "Subsino",         "Poker Carnival",                              0,                   layout_crsbingo )
 
@@ -4311,7 +4369,7 @@ GAMEL( 1995, stisub,      stbsub,  stbsub,     stbsub,   subsino_state, init_sti
 GAMEL( 1995, tesorone,    stbsub,  stbsub,     tesorone, subsino_state, init_tesorone,    ROT0, "Subsino",         "Tesorone Dell'Isola (Italy, v2.41)",          0,                   layout_stisub   )
 GAMEL( 1995, tesorone240, stbsub,  stbsub,     tesorone, subsino_state, init_tesorone,    ROT0, "Subsino",         "Tesorone Dell'Isola (Italy, v2.40)",          0,                   layout_stisub   )
 GAMEL( 1995, tesorone230, stbsub,  stbsub,     tesorone, subsino_state, init_tesorone230, ROT0, "Subsino",         "Tesorone Dell'Isola (Italy, v2.30)",          0,                   layout_stisub   )
-GAME(  199?, sevenlnd,    stbsub,  mtrainnv,   stbsub,   subsino_state, init_mtrainnv,    ROT0, "bootleg",         "Seven Land",                                  MACHINE_NOT_WORKING ) // Without layout until fully dumped
+GAMEL( 1995, sevenlnd,    stbsub,  mtrainnv,   stbsub,   subsino_state, init_mtrainnv,    ROT0, "bootleg",         "Seven Land",                                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING, layout_stisub   )
 
 GAMEL( 1996, sharkpy,     0,       sharkpy,    sharkpy,  subsino_state, init_sharkpy,     ROT0, "Subsino",         "Shark Party (Italy, v1.3)",                   0,                   layout_sharkpy  ) // missing POST messages?
 GAMEL( 1996, sharkpya,    sharkpy, sharkpy,    sharkpy,  subsino_state, init_sharkpy,     ROT0, "Subsino",         "Shark Party (Italy, v1.6)",                   0,                   layout_sharkpy  ) // missing POST messages?

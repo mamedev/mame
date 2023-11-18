@@ -14,16 +14,28 @@
 
     Input can also come from the serial port.
 
+  Known Issues:
+    - With gp19 slot option
+      - 49/50 row mode only shows half the screen.
+      - In 49/50 row mode, character descenders are cut off.
+      - Screen saver does not disable the screen
+    - With superset slot option
+      - Screen menus not working properly
+      - Screensaver freezes the screen instead of blanking the screen	
+
 ****************************************************************************/
 /***************************************************************************
+
   Memory Layout
 
     The U435 three-to-eight line decoder uses A14 and A15 to generate
-    three memory addresses:
+    three memory address spaces:
 
-      1.   Program ROM        0x0000
-      2.   Scratchpad RAM     0x4000
-      3.   Display Memory     0xF800
+    Address             Description
+    ----------------------------------------------------
+      0x0000            Program ROM
+      0x4000            Scratchpad RAM
+      0xF800 (0xC000)   Display Memory
 
 
   Port Layout
@@ -81,12 +93,13 @@ static constexpr uint8_t KB_STATUS_KEYBOARD_STROBE_MASK = 0x80;
 
 DEFINE_DEVICE_TYPE(HEATH_TLB_CONNECTOR, heath_tlb_connector, "heath_tlb_connector", "Heath Terminal Logic board connector abstraction")
 
-DEFINE_DEVICE_TYPE(HEATH_TLB, heath_tlb_device, "heath_tlb", "Heath Terminal Logic Board");
-DEFINE_DEVICE_TYPE(HEATH_SUPER19, heath_super19_tlb_device, "heath_super19_tlb", "Heath Terminal Logic Board w/Super19 ROM");
-DEFINE_DEVICE_TYPE(HEATH_SUPERSET, heath_superset_tlb_device, "heath_superset_tlb", "Heath Terminal Logic Board w/Superset ROM");
-DEFINE_DEVICE_TYPE(HEATH_ULTRA, heath_ultra_tlb_device, "heath_ultra_tlb", "Heath Terminal Logic Board w/Ultra ROM");
-DEFINE_DEVICE_TYPE(HEATH_WATZ, heath_watz_tlb_device, "heath_watz_tlb", "Heath Terminal Logic Board w/Watzman ROM");
+DEFINE_DEVICE_TYPE(HEATH_TLB, heath_tlb_device, "heath_tlb", "Heath Terminal Logic Board")
+DEFINE_DEVICE_TYPE(HEATH_SUPER19, heath_super19_tlb_device, "heath_super19_tlb", "Heath Terminal Logic Board w/Super19 ROM")
+DEFINE_DEVICE_TYPE(HEATH_SUPERSET, heath_superset_tlb_device, "heath_superset_tlb", "Heath Terminal Logic Board w/Superset ROM")
+DEFINE_DEVICE_TYPE(HEATH_ULTRA, heath_ultra_tlb_device, "heath_ultra_tlb", "Heath Terminal Logic Board w/Ultra ROM")
+DEFINE_DEVICE_TYPE(HEATH_WATZ, heath_watz_tlb_device, "heath_watz_tlb", "Heath Terminal Logic Board w/Watzman ROM")
 DEFINE_DEVICE_TYPE(HEATH_GP19, heath_gp19_tlb_device, "heath_gp19_tlb", "Heath Terminal Logic Board plus Northwest Digital Systems GP-19")
+DEFINE_DEVICE_TYPE(HEATH_IMAGINATOR, heath_imaginator_tlb_device, "heath_imaginator_tlb", "Heath Terminal Logic Board plus Cleveland Codonics Imaginator I-100")
 
 
 
@@ -98,7 +111,7 @@ device_heath_tlb_card_interface::device_heath_tlb_card_interface(const machine_c
 
 
 /**
- * base Heath h19 functionality
+ * original Heath H19 functionality
  */
 heath_tlb_device::heath_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	heath_tlb_device(mconfig, HEATH_TLB, tag, owner, clock)
@@ -149,8 +162,14 @@ TIMER_CALLBACK_MEMBER(heath_tlb_device::bell_off)
 void heath_tlb_device::mem_map(address_map &map)
 {
 	map.unmap_value_high();
+
+	// H19 ROM
 	map(0x0000, 0x0fff).mirror(0x3000).rom();
+
+	// Scratchpad memory
 	map(0x4000, 0x40ff).mirror(0x3f00).ram();
+
+	// Video Memory
 	map(0xc000, 0xc7ff).mirror(0x3800).ram().share(m_p_videoram);
 }
 
@@ -227,7 +246,7 @@ void heath_tlb_device::device_reset()
 	}
 
 	// Set screen color
-	switch (BIT(cfg,2, 2))
+	switch (BIT(cfg, 2, 2))
 	{
 	case 0x01:
 		m_screen->set_color(rgb_t::white());
@@ -330,7 +349,10 @@ void heath_tlb_device::crtc_addr_w(offs_t reg, uint8_t val)
 
 uint8_t heath_tlb_device::crtc_reg_r(offs_t reg)
 {
-	m_allow_vsync_nmi = bool(BIT(reg, 2));
+	if (!machine().side_effects_disabled())
+	{
+		m_allow_vsync_nmi = bool(BIT(reg, 2));
+	}
 
 	return m_crtc->register_r();
 }
@@ -934,6 +956,23 @@ ROM_START( gp19 )
 	ROM_LOAD( "2716_444-37_h19keyb.u445", 0x0000, 0x0800, CRC(5c3e6972) SHA1(df49ce64ae48652346a91648c58178a34fb37d3c))
 ROM_END
 
+ROM_START( imaginator )
+	// Program code
+	ROM_REGION( 0x4000, "maincpu", ROMREGION_ERASEFF )
+	// Original terminal code
+	ROM_LOAD( "2732_444-46_h19code.u437", 0x0000, 0x1000, CRC(f4447da0) SHA1(fb4093d5b763be21a9580a0defebed664b1f7a7b))
+	// Imaginator ROMs
+	ROM_LOAD( "2732_imaginator_gpc_rev_1.2_pn_9000_0002.u9a", 0x2000, 0x1000, CRC(507bb13f) SHA1(5b210f8d77e22fdf063f611eb5c29636cdb01250))
+
+	// Original font
+	ROM_REGION( 0x0800, "chargen", 0 )
+	ROM_LOAD( "2716_444-29_h19font.u420", 0x0000, 0x0800, CRC(d595ac1d) SHA1(130fb4ea8754106340c318592eec2d8a0deaf3d0))
+
+	// Original keyboard
+	ROM_REGION( 0x0800, "keyboard", 0 )
+	ROM_LOAD( "2716_444-37_h19keyb.u445", 0x0000, 0x0800, CRC(5c3e6972) SHA1(df49ce64ae48652346a91648c58178a34fb37d3c))
+ROM_END
+
 
 ioport_constructor heath_tlb_device::device_input_ports() const
 {
@@ -1076,6 +1115,7 @@ void heath_superset_tlb_device::device_add_mconfig(machine_config &config)
 	// part of the Superset upgrade was to upgrade the CPU to 3 MHz.
 	m_maincpu->set_clock(H19_3MHZ);
 	m_maincpu->set_addrmap(AS_PROGRAM, &heath_superset_tlb_device::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &heath_superset_tlb_device::io_map);
 
 	m_crtc->set_update_row_callback(FUNC(heath_superset_tlb_device::crtc_update_row));
 
@@ -1105,6 +1145,13 @@ void heath_superset_tlb_device::mem_map(address_map &map)
 	map(0x8000, 0x87ff).ram();
 }
 
+void heath_superset_tlb_device::io_map(address_map &map)
+{
+	heath_tlb_device::io_map(map);
+
+	map(0x61, 0x61).mirror(0x12).select(0x0c).rw(FUNC(heath_superset_tlb_device::crtc_reg_r), FUNC(heath_superset_tlb_device::crtc_reg_w));
+}
+
 const tiny_rom_entry *heath_superset_tlb_device::device_rom_region() const
 {
 	return ROM_NAME(superset);
@@ -1113,6 +1160,23 @@ const tiny_rom_entry *heath_superset_tlb_device::device_rom_region() const
 ioport_constructor heath_superset_tlb_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(superset);
+}
+
+uint8_t heath_superset_tlb_device::crtc_reg_r(offs_t reg)
+{
+	if (!machine().side_effects_disabled())
+	{
+		m_reverse_video_disabled = bool(BIT(reg, 3));
+	}
+
+	return heath_tlb_device::crtc_reg_r(reg);
+}
+
+void heath_superset_tlb_device::crtc_reg_w(offs_t reg, uint8_t val)
+{
+	m_reverse_video_disabled = bool(BIT(reg, 3));
+
+	heath_tlb_device::crtc_reg_w(reg, val);
 }
 
 MC6845_UPDATE_ROW(heath_superset_tlb_device::crtc_update_row)
@@ -1126,15 +1190,25 @@ MC6845_UPDATE_ROW(heath_superset_tlb_device::crtc_update_row)
 		{
 			uint8_t inv = (x == cursor_x) ? 0xff : 0;
 			uint8_t chr = m_p_videoram[(ma + x) & 0x7ff];
+			uint16_t char_set_base_offset = (m_selected_char_set << 11);
 
 			if (chr & 0x80)
 			{
-				inv ^= 0xff;
+				if (m_reverse_video_disabled)
+				{
+					// set A13
+					char_set_base_offset |= 0x2000;
+				}
+				else
+				{
+					inv ^= 0xff;
+				}
+
 				chr &= 0x7f;
 			}
 
-			// get pattern of pixels for that character scanline
-			uint8_t const gfx = m_p_chargen[(m_selected_char_set << 12) | (chr << 4) | ra] ^ inv;
+			// get pattern of pixels for the character scanline
+			uint8_t const gfx = m_p_chargen[char_set_base_offset | (chr << 4) | ra] ^ inv;
 
 			// Display a scanline of a character (8 pixels)
 			for (int b = 0; 8 > b; ++b)
@@ -1149,19 +1223,22 @@ MC6845_UPDATE_ROW(heath_superset_tlb_device::crtc_update_row)
 	}
 }
 
+// DTR (pin 33) to A14 (pin 27) of 27256 ROM
 void heath_superset_tlb_device::dtr_internal(int data)
 {
-	m_selected_char_set = (m_selected_char_set & 0x03) | ((data & 0x01) << 2);
+	m_selected_char_set = (m_selected_char_set & 0x03) | ((data & 0x01) << 3);
 }
 
+// OUT1 (pin 34) to A12 (pin 2) of 27256 ROM
 void heath_superset_tlb_device::out1_internal(int data)
 {
-	m_selected_char_set = (m_selected_char_set & 0x05) | ((data & 0x01) << 1);
+	m_selected_char_set = (m_selected_char_set & 0x09) | ((data & 0x01) << 1);
 }
 
+// OUT2 (pin 31) to A11? on board
 void heath_superset_tlb_device::out2_internal(int data)
 {
-	m_selected_char_set = (m_selected_char_set & 0x06) | (data & 0x01);
+	m_selected_char_set = (m_selected_char_set & 0x0a) | (data & 0x01);
 }
 
 /**
@@ -1389,6 +1466,261 @@ ioport_constructor heath_gp19_tlb_device::device_input_ports() const
 	return INPUT_PORTS_NAME(gp19);
 }
 
+
+/**
+ * Cleveland Codonics Imaginator-100 (I-100) add-in board
+ *
+ *    Memory Range     Description
+ *   -----------------------------------------------------------------
+ *    0x0000-0x1fff    Program ROM (Heath TLB board)
+ *    0x2000-0x3fff    Graphics Command Processor(GCP) ROM (I-100)
+ *    0x4000-0x5fff    Scratchpad RAM (Heath TLB board)
+ *    0x6000-0x7fff    Graphics Scratchpad  R/W RAM (I-100)
+ *    0x8000-0xbfff    Graphics Display R/W RAM(I-100)
+ *    0xc000-0xdfff    Optional Graphics Command Processor memory (I-100)
+ *    0xe000-0xffff    Display Memory (Heath TLB board)
+ *
+ * New interrupt source
+ *   - horizontal retrace interrupt
+ *
+ */
+heath_imaginator_tlb_device::heath_imaginator_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	heath_tlb_device(mconfig, HEATH_IMAGINATOR, tag, owner, clock),
+	m_mem_view(*this, "memmap"),
+	m_p_graphic_ram(*this, "graphicram")
+{
+}
+
+void heath_imaginator_tlb_device::device_add_mconfig(machine_config &config)
+{
+	heath_tlb_device::device_add_mconfig(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &heath_imaginator_tlb_device::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &heath_imaginator_tlb_device::io_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(heath_imaginator_tlb_device::irq_ack_cb));
+
+	m_crtc->out_hsync_callback().set(FUNC(heath_imaginator_tlb_device::crtc_hsync_w));
+}
+
+void heath_imaginator_tlb_device::device_start()
+{
+	heath_tlb_device::device_start();
+
+	save_item(NAME(m_mem_map));
+	save_item(NAME(m_im2_val));
+	save_item(NAME(m_alphanumeric_mode_active));
+	save_item(NAME(m_graphics_mode_active));
+	save_item(NAME(m_allow_tlb_interrupts));
+	save_item(NAME(m_allow_imaginator_interrupts));
+	save_item(NAME(m_hsync_irq_raised));
+
+	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x6000, 0x7fff, "mem_map_update",
+		[this](offs_t offset, u8 &data, u8 mem_mask) { if (!machine().side_effects_disabled()) { tap_6000h(); } },
+		[this](offs_t offset, u8 &data, u8 mem_mask) { if (!machine().side_effects_disabled()) { tap_6000h(); } });
+
+	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x8000, 0xbfff, "irq_update",
+		[this](offs_t offset, u8 &data, u8 mem_mask) { if (!machine().side_effects_disabled()) { tap_8000h(); } },
+		[this](offs_t offset, u8 &data, u8 mem_mask) { if (!machine().side_effects_disabled()) { tap_8000h(); } });
+}
+
+void heath_imaginator_tlb_device::device_reset()
+{
+	m_mem_map = 1;
+
+	m_mem_view.select(m_mem_map);
+
+	m_alphanumeric_mode_active = true;
+	m_graphics_mode_active = false;
+
+	m_hsync_irq_raised = false;
+
+	allow_tlb_intr();
+}
+
+/*
+ *  Memory map for the I-100
+ *
+ *    0x0000-0x1fff    Program ROM (Heath TLB board)
+ *    0x2000-0x3fff    Graphics Command Processor(GCP) ROM (I-100)
+ *    0x4000-0x5fff    Scratchpad RAM (Heath TLB board)
+ *    0x6000-0x7fff    Graphics Scratchpad  R/W RAM (I-100)
+ *    0x8000-0xbfff    Graphics Display R/W RAM(I-100)
+ *    0xc000-0xdfff    Optional Graphics Command Processor memory (I-100)
+ *    0xe000-0xffff    Display Memory (Heath TLB board)
+ */
+void heath_imaginator_tlb_device::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+
+	map(0x0000, 0x1fff).view(m_mem_view);
+
+	// H19 standard ROM
+	m_mem_view[0](0x0000, 0x1fff).rom().region("maincpu", 0);
+
+	// GCP ROM mapped to 0x0000 on power-up/reset
+	m_mem_view[1](0x0000, 0x1fff).rom().region("maincpu", 0x2000);
+
+	// Normal spot of the GCP ROM
+	map(0x2000, 0x3fff).rom();
+
+	// TLB Scratchpad
+	map(0x4000, 0x40ff).mirror(0x1f00).ram();
+
+	// GCP Scratchpad
+	map(0x6000, 0x607f).mirror(0x1f80).ram();
+
+	// Graphics RAM
+	map(0x8000, 0xbfff).ram().share(m_p_graphic_ram);
+
+	// optional Graphics Command Processor (GCP)
+	// map(0xc000, 0xdfff);
+
+	// Alphanumeric RAM
+	map(0xe000, 0xe7ff).mirror(0x1800).ram().share(m_p_videoram);
+
+}
+
+void heath_imaginator_tlb_device::tap_6000h()
+{
+	if (m_mem_map != 0)
+	{
+		m_mem_map = 0;
+		m_mem_view.select(m_mem_map);
+	}
+}
+
+void heath_imaginator_tlb_device::tap_8000h()
+{
+	if (!m_allow_tlb_interrupts)
+	{
+		allow_tlb_intr();
+
+		set_irq_line();
+	}
+}
+
+void heath_imaginator_tlb_device::allow_tlb_intr()
+{
+	m_allow_tlb_interrupts = true;
+	m_allow_imaginator_interrupts = false;
+	m_im2_val = 0x02;
+}
+
+void heath_imaginator_tlb_device::allow_hsync_intr()
+{
+	m_allow_tlb_interrupts = false;
+	m_allow_imaginator_interrupts = true;
+	m_im2_val = 0x00;
+}
+
+/**
+ * An input/output request (IORQ) is sent to the TERMINAL LOGIC board only when
+ * both IORQ (pin 20 of U7) AND A4 are low.
+ */
+void heath_imaginator_tlb_device::io_map(address_map &map)
+{
+	heath_tlb_device::io_map(map);
+
+	// interrupt routing
+	map(0x10, 0x10).select(0x08).mirror(0x07).w(FUNC(heath_imaginator_tlb_device::config_irq_w));
+
+	// display enabling (graphics or alphanumeric)
+	map(0x30, 0x30).select(0xc0).mirror(0x0f).w(FUNC(heath_imaginator_tlb_device::display_enable_w));
+
+	// Avoids writes to TLB when a4 is high on unused
+	map(0x50, 0x50).select(0x80).mirror(0x0f).w(FUNC(heath_imaginator_tlb_device::nop_w));
+}
+
+IRQ_CALLBACK_MEMBER(heath_imaginator_tlb_device::irq_ack_cb)
+{
+	return m_im2_val;
+}
+
+void heath_imaginator_tlb_device::config_irq_w(offs_t reg, uint8_t val)
+{
+	if (BIT(reg,3))
+	{
+		allow_tlb_intr();
+	}
+	else
+	{
+		allow_hsync_intr();
+	}
+
+	set_irq_line();
+}
+
+void heath_imaginator_tlb_device::display_enable_w(offs_t reg, uint8_t val)
+{
+	m_alphanumeric_mode_active = bool(BIT(reg, 7));
+	m_graphics_mode_active = bool(BIT(reg, 6));
+}
+
+void heath_imaginator_tlb_device::nop_w(offs_t, uint8_t)
+{
+}
+
+const tiny_rom_entry *heath_imaginator_tlb_device::device_rom_region() const
+{
+	return ROM_NAME(imaginator);
+}
+
+MC6845_UPDATE_ROW(heath_imaginator_tlb_device::crtc_update_row)
+{
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint32_t *p = &bitmap.pix(y);
+
+	if (de)
+	{
+		for (int x = 0; x < x_count; x++)
+		{
+			uint8_t output = 0x00;
+
+			if (m_alphanumeric_mode_active)
+			{
+				uint8_t inv = (x == cursor_x) ? 0xff : 0;
+				uint8_t chr = m_p_videoram[(ma + x) & 0x7ff];
+
+				if (chr & 0x80)
+				{
+					inv ^= 0xff;
+					chr &= 0x7f;
+				}
+
+				output |= bitswap<8>(m_p_chargen[(chr << 4) | ra] ^ inv, 0, 1, 2, 3, 4, 5, 6, 7);
+			}
+
+			if (m_graphics_mode_active && (x > 7 ) && (x < 73))
+			{
+				output |= m_p_graphic_ram[((y * 64) + (x - 8)) & 0x3fff];
+			}
+
+			for (int b = 0; 8 > b; ++b)
+			{
+				*p++ = palette[BIT(output, b)];
+			}
+		}
+	}
+	else
+	{
+		std::fill_n(p, x_count * 8, palette[0]);
+	}
+}
+
+void heath_imaginator_tlb_device::crtc_hsync_w(int val)
+{
+	m_hsync_irq_raised = bool(val);
+
+	set_irq_line();
+}
+
+void heath_imaginator_tlb_device::set_irq_line()
+{
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0,
+		(m_allow_imaginator_interrupts && m_hsync_irq_raised) ||
+		(m_allow_tlb_interrupts && (m_keyboard_irq_raised || m_serial_irq_raised || m_break_key_irq_raised)) ?
+		 ASSERT_LINE : CLEAR_LINE);
+}
 
 heath_tlb_connector::heath_tlb_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, HEATH_TLB_CONNECTOR, tag, owner, clock),

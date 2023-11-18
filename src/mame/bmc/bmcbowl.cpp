@@ -14,7 +14,7 @@ BMC Bowling (c) 1994.05 BMC, Ltd
  press START(1) OR BUTTON1 to start game , also START(1) or BUTTON1 to bowl / start
         ( 5 to insert coin(s) , B to bet , D to pay out (?)  etc...)
 
- press ANALIZER(0) durning boot to enter test menu, then :
+ press ANALIZER(0) during boot to enter test menu, then :
             STOP1+STOP2 - sound test menu
         BIG(G) - cycle options ,
         DOUBLE(H) - play

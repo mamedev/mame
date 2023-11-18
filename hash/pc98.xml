@@ -13564,7 +13564,7 @@ Missing [7220] text selector for choices
 		</part>
 	</software>
 
-	<software name="darwin">
+	<software name="darwin" supported="yes">
 		<description>Darwin's Dilemma - The Solution is Evolution</description>
 		<year>1991</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
@@ -21387,11 +21387,12 @@ Missing [7220] text selector for choices
 		</part>
 	</software>
 
-	<software name="gaogaoom">
+	<software name="gaogaoom" supported="yes">
 		<description>Gao Gao! Omake Disk</description>
 		<year>19??</year>
 		<publisher>フォア・ナイン (Fournine)</publisher>
 		<info name="alt_title" value="がおがお おまけディスク" />
+		<info name="usage" value="Boot from a DOS system, run START.EXE" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1265664">
@@ -30470,16 +30471,18 @@ TODO: to install to HDD should be "INST1.BAT B: A:<folder>" but it fails recogni
 		<publisher>マキシマ (Maxima)</publisher>
 		<info name="alt_title" value="マーキュリー ザ プライムマスター" />
 		<info name="release" value="19901208" />
+		<!-- disk labels confirmed from auction image -->
+		<!-- baddump: both disks contains later '91 files, including non-factory saves -->
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
+			<feature name="part_id" value="System Disk"/>
 			<dataarea name="flop" size="1281968">
-				<rom name="mercurya.d88" size="1281968" crc="274cab39" sha1="4b90d472a09da75e06b9ed5d3ae882331712a3e3" offset="0" />
+				<rom name="mercurys.d88" size="1281968" crc="15557763" sha1="6f1adde92d4321974b0ac421268592f21f341cb6" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
+			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1281968">
-				<rom name="mercurys.d88" size="1281968" crc="15557763" sha1="6f1adde92d4321974b0ac421268592f21f341cb6" offset="0" />
+				<rom name="mercurya.d88" size="1281968" crc="274cab39" sha1="4b90d472a09da75e06b9ed5d3ae882331712a3e3" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -45305,7 +45308,7 @@ Abuses of [7220] pitch on title screen for a TV white noise effect
 		<description>Tunnels &amp; Trolls: Crusaders of Khazan</description>
 		<year>1990</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
-		<info name="alt_title" value="トンネルズ&amp;トロールズ カザンの戦士たち"/>
+		<info name="alt_title" value="トンネルズ＆トロールズ カザンの戦士たち"/>
 		<info name="release" value="19900309" />
 		<!-- TODO: likely similar user disk creation as per pc8801_flop.xml -->
 		<part name="flop1" interface="floppy_5_25">
@@ -48350,10 +48353,15 @@ Abuses of [7220] pitch on title screen for a TV white noise effect
 		</part>
 	</software>
 
-	<software name="xanadu">
+	<software name="xanadu" supported="no">
 		<description>Xanadu</description>
 		<year>1986</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<notes><![CDATA[
+Shows a title screen on vanilla class, black screen afterwards
+Black screen on VM class
+Is this a data disk for missing main game dump?
+]]></notes>
 		<info name="alt_title" value="ザナドゥ" />
 		<info name="release" value="198602xx" />
 		<part name="flop1" interface="floppy_5_25">
@@ -48363,10 +48371,15 @@ Abuses of [7220] pitch on title screen for a TV white noise effect
 		</part>
 	</software>
 
-	<software name="xanadu2">
+	<software name="xanadu2" supported="no">
 		<description>Xanadu Scenario II - The Resurrection of Dragon</description>
 		<year>1986</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<notes><![CDATA[
+Shows a title screen on vanilla and VM class, black screen afterwards
+No sound on VM class [DAC1BIT]
+Is this a data disk for missing main game dump?
+]]></notes>
 		<info name="alt_title" value="ザナドゥ シナリオ２ Ｔｈｅ Ｒｅｓｕｒｒｅｃｔｉｏｎ ｏｆ Ｄｒａｇｏｎ" />
 		<info name="release" value="19861004" />
 		<part name="flop1" interface="floppy_5_25">
@@ -54712,7 +54725,7 @@ unsupported .fix format
 		</part>
 	</software>
 
-	<software name="rinneten" supported="no">
+	<software name="rinneten" supported="yes">
 		<description>Rinne Tensei Reversible Game Tanba</description>
 		<year>1988</year>
 		<publisher>マイクロネット (Micronet)</publisher>
@@ -60955,8 +60968,13 @@ Has [GS] and [CD] options, latter requiring a redbook?
 		<description>Kuroneko Kan</description>
 		<year>1993</year>
 		<publisher>フェアリーダスト (Fairy Dust)</publisher>
+		<notes><![CDATA[
+Acts weird on [FDC] disk swaps when run thru floppies, where it needs to remove then readd the same disk to make it continue
+Untested on [HDD] install
+]]></notes>
 		<info name="alt_title" value="黒猫館" />
 		<info name="release" value="19930709" />
+		<info name="usage" value="Needs DOS installed on HDD" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1166332">
@@ -65777,36 +65795,33 @@ Cutoff [kanji] LR right side
 		</part>
 	</software>
 
-	<!-- This probably requires 3.5" floppy emulation -->
 	<software name="crayshot" supported="no">
 		<description>Cray Shoot</description>
 		<year>19??</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1478656">
 				<rom name="cray shoot (bio 100).fdi" size="1478656" crc="e37e85d7" sha1="0deb3e1eaa4e917c4110c9901a35a17f12919603" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- MAME fails to mount the image with "Fatal error: Incorrect layout on track 0 head 0, expected_size=166666, current_size=167648" error -->
 	<software name="dynamo" supported="no">
 		<description>Dynamo</description>
 		<year>1991</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1461756">
 				<rom name="dynamo (1991)(marka project).fdd" size="1461756" crc="c0935bcc" sha1="78c52f0ee6c85a3504ff37b71a2a48d2f9754781" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Fatal error: Incorrect layout on track 0 head 0, expected_size=166666, current_size=167648 -->
 	<software name="f1grandp" supported="no">
 		<description>F1 Grandprix</description>
 		<year>1992</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1478656">
 				<rom name="f1 grandprix (1992)(bio 100).fdi" size="1478656" crc="8fa46fda" sha1="146ee288486174095297be074feb3d1007ec0de4" offset="0" />
 			</dataarea>
@@ -65835,7 +65850,7 @@ Cutoff [kanji] LR right side
 		</part>
 	</software>
 
-	<software name="geminis">
+	<software name="geminis" supported="no">
 		<description>Gemini Snake</description>
 		<year>1990</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
@@ -66186,11 +66201,13 @@ Cutoff [kanji] LR right side
 		</part>
 	</software>
 
-	<!-- This game is supposed to play sound effects through the beeper, but in MAME it just outputs a constant beep -->
-	<software name="dynamite" supported="partial">
+	<software name="dynamite" supported="yes">
 		<description>Dynamite Girl</description>
 		<year>19??</year>
 		<publisher>&lt;unofficial&gt;</publisher>
+		<notes><![CDATA[
+Uses [DAC1BIT]
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="dynamite_girl.fdi" size="1265664" crc="315095c4" sha1="99a60478839c424c4f60962615feba8ecd9316ce" offset="0" />
@@ -68716,9 +68733,11 @@ Has XA and LT support according to spine card
 		</part>
 	</software>
 
-	<software name="serena">
+	<software name="serena" supported="yes">
 		<description>Serena</description>
-		<year>19??</year>
+		<!-- 1995 on title screen, SERENA.DOC has a 1996.2 date -->
+		<year>1996</year>
+		<!-- ＹＯＲＯＺＵＹＡ on title screen and SERENA.DOC -->
 		<publisher>&lt;doujin&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">

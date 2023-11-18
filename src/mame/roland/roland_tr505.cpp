@@ -32,19 +32,9 @@ public:
 	void tr505(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
-
 	required_device<hd6301y0_cpu_device> m_maincpu;
 	required_device<mb63h114_device> m_mac;
 };
-
-
-void roland_tr505_state::mem_map(address_map &map)
-{
-	map(0x0000, 0x0027).m(m_maincpu, FUNC(hd6301y0_cpu_device::hd6301y_io));
-	map(0x0040, 0x013f).ram(); // internal RAM
-	map(0xc000, 0xffff).rom().region("maincpu", 0); // internal ROM
-}
 
 
 static INPUT_PORTS_START(tr505)
@@ -53,7 +43,6 @@ INPUT_PORTS_END
 void roland_tr505_state::tr505(machine_config &config)
 {
 	HD6301Y0(config, m_maincpu, 4_MHz_XTAL); // HD6301Y0A in single chip mode (MP0 = MP1 = +5V)
-	m_maincpu->set_addrmap(AS_PROGRAM, &roland_tr505_state::mem_map);
 	m_maincpu->set_disable();
 
 	//NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // TC5517APL + battery

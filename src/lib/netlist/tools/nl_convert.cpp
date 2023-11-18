@@ -333,17 +333,17 @@ double nl_convert_base_t::get_sp_val(const pstring &sin) const
 
 void nl_convert_spice_t::convert_block(const str_list &contents)
 {
-	int linenumber = 0;
+	int linenumber = 1;
 	for (const auto &line : contents)
 	{
 		try 
 		{
 			process_line(line);
 		}
-		catch (plib::pexception &e)
+		catch (const plib::pexception &e)
 		{
 			fprintf(stderr, "Error on line: <%d>\n", linenumber);
-			throw(e);
+			throw;
 		}
 		linenumber++;
 	}
@@ -528,13 +528,13 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				else if (plib::startsWith(tt[0], "RA"))
 				{
 					val = get_sp_val(tt.back());
-					for( unsigned int res = 2; res < tt.size(); res++)
+					for (unsigned int res = 2; res < tt.size(); res++)
 					{
 						pstring devname = plib::pfmt("{}.{}")(tt[0], res);
 						add_device("RES", devname, val);
 						add_term(tt[1], devname);
 						add_term(tt[res], devname);
-					}					
+					}
 				}
 				else
 				{

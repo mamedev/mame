@@ -567,6 +567,9 @@ NO_USE_PORTAUDIO
 NO_USE_PULSEAUDIO
     Set to **1** to disable building the PulseAudio sound output module on
     Linux.
+USE_WAYLAND
+    Set to **1** to include support for bgfx video output with the Wayland
+    display server.
 USE_TAPTUN
     Set to **1** to include the tap/tun network module, or set to **0** to
     disable building the tap/tun network module.  The tap/tun network module is

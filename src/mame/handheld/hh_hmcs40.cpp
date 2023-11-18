@@ -91,7 +91,7 @@ known chips:
 
  *A04     HD44868  1984, SciSys Rapier
  *A07     HD44868  1984, Chess King Pocket Micro Deluxe
- *A12     HD44868  1985, SciSys MK 10 / Pocket Chess
+ *A12     HD44868  1985, SciSys MK 10 / Pocket Chess / Electronic Trio
  *A14     HD44868  1985, SciSys Kasparov Plus
  *A16     HD44868  1988, Saitek Pocket Checkers
 

@@ -2136,7 +2136,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="ehagaki" supported="no">
-		<description>Ehagaki-yō Wāpuro (Japan)</description>
+		<description>Ehagaki-you Waapuro (Japan)</description>
 		<year>1985</year>
 		<publisher>Hitachi</publisher>
 		<notes>Included with Hitachi MB-H3. The MB-H3 touchpad is not emulated.</notes>
@@ -2144,7 +2144,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
-				<rom name="ehagaki-yo wapuro - hitachi.rom" size="0x8000" crc="2517f94d" sha1="f625afc51ac52b27a7345d2cf6ff1b4aa39c8e2b" status="baddump"/>
+				<rom name="ehagaki-you waapuro - hitachi.rom" size="0x8000" crc="2517f94d" sha1="f625afc51ac52b27a7345d2cf6ff1b4aa39c8e2b" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>

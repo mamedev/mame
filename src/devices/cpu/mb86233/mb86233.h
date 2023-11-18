@@ -105,7 +105,6 @@ private:
 
 	bool m_stall;
 
-	static s32 s24_32(u32 val);
 	static u32 set_exp(u32 val, u32 exp);
 	static u32 set_mant(u32 val, u32 mant);
 	static u32 get_exp(u32 val);
