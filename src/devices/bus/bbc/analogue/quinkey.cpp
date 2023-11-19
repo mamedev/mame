@@ -100,8 +100,8 @@ uint8_t bbc_quinkey_intf_device::ch_r(int channel)
 
 device_bbc_quinkey_interface::device_bbc_quinkey_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device, "bbcquinkey")
+	, m_slot(dynamic_cast<bbc_quinkey_slot_device *>(device.owner()))
 {
-	m_slot = dynamic_cast<bbc_quinkey_slot_device *>(device.owner());
 }
 
 

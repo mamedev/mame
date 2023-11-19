@@ -23,6 +23,8 @@ TODO:
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "softlist_dev.h"
 
+namespace {
+
 class teradrive_state : public driver_device
 {
 public:
@@ -142,6 +144,8 @@ ROM_START( teradrive )
 	ROM_REGION16_BE(0x4000, "tmss", ROMREGION_ERASEFF)
 	ROM_LOAD( "tera_tmss.bin", 0x0000,  0x1000, CRC(424a9d11) SHA1(1c470a9a8d0b211c5feea1c1c2376aa1f7934b16) )
 ROM_END
+
+} // anonymous namespace
 
 COMP( 1991, teradrive, 0, 0,       teradrive, 0, teradrive_state, empty_init, "Sega / International Business Machines", "TeraDrive (Japan)", MACHINE_NOT_WORKING )
 
