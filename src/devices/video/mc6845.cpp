@@ -408,8 +408,6 @@ void mc6845_device::recompute_parameters(bool postload)
 {
 	bool zero_horizontal_width = (m_horiz_disp == 0);
 	bool zero_vertical_height = (m_vert_disp == 0);
-	bool maintain_visible_area = zero_horizontal_width || zero_vertical_height;
-	uint8_t visual_adjustment = maintain_visible_area ? 0 : 1;
 
 	uint16_t hsync_on_pos, hsync_off_pos, vsync_on_pos, vsync_off_pos;
 
@@ -422,21 +420,20 @@ void mc6845_device::recompute_parameters(bool postload)
 	uint16_t vert_pix_total = (m_vert_char_total + 1) * video_char_height + m_vert_total_adj;
 
 	/* determine the visible area, avoid division by 0 */
-	uint16_t visible_width = m_horiz_disp * m_hpixels_per_column;
-	uint16_t visible_height = m_vert_disp * video_char_height;
+	uint16_t visible_width = zero_horizontal_width ? m_visible_width : m_horiz_disp * m_hpixels_per_column;
+	uint16_t visible_height = zero_vertical_height ? m_visible_height : m_vert_disp * video_char_height;
 
-	if (maintain_visible_area)
+	// Check to see visual width or height needs to be adjusted due to changes with total
+	if (zero_horizontal_width || zero_vertical_height)
 	{
 		if (visible_width > horiz_pix_total)
 		{
 			visible_width = horiz_pix_total;
-			maintain_visible_area = false;
 		}
 
 		if (visible_height > vert_pix_total)
 		{
 			visible_height = vert_pix_total;
-			maintain_visible_area = false;
 		}
 	}
 
@@ -470,11 +467,11 @@ void mc6845_device::recompute_parameters(bool postload)
 		vsync_off_pos = vert_pix_total;
 
 	/* update only if screen parameters changed, unless we are coming here after loading the saved state */
-	if ((postload ||
+	if (postload ||
 		(horiz_pix_total != m_horiz_pix_total) || (vert_pix_total != m_vert_pix_total) ||
 		(visible_width != m_visible_width) || (visible_height != m_visible_height) ||
 		(hsync_on_pos != m_hsync_on_pos) || (vsync_on_pos != m_vsync_on_pos) ||
-		(hsync_off_pos != m_hsync_off_pos) || (vsync_off_pos != m_vsync_off_pos)) && !maintain_visible_area)
+		(hsync_off_pos != m_hsync_off_pos) || (vsync_off_pos != m_vsync_off_pos))
 	{
 		/* update the screen if we have valid data */
 		if ((horiz_pix_total > 0) && (visible_width <= horiz_pix_total) &&
@@ -498,21 +495,26 @@ void mc6845_device::recompute_parameters(bool postload)
 			}
 
 			if(m_show_border_area)
+			{
 				visarea.set(0, horiz_pix_total-2, 0, vert_pix_total-2);
+			}
 			else
-				visarea.set(0 + m_visarea_adjust_min_x, visible_width + m_visarea_adjust_max_x, 0 + m_visarea_adjust_min_y, visible_height + m_visarea_adjust_max_y);
+			{
+				visarea.set(0 + m_visarea_adjust_min_x, visible_width - 1 + m_visarea_adjust_max_x, 0 + m_visarea_adjust_min_y,
+				 visible_height - 1 + m_visarea_adjust_max_y);
+			}
 
 			LOGCONF("M6845 config screen: HTOTAL: %d  VTOTAL: %d  VIS_WIDTH: %d  VIS_HEIGHT: %d  HSYNC: %d-%d  VSYNC: %d-%d  Freq: %ffps\n",
 				 horiz_pix_total, vert_pix_total, visible_width, visible_height, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1, refresh.as_hz());
 
 			if (has_screen())
 			{
-				screen().configure(horiz_pix_total - visual_adjustment, vert_pix_total - visual_adjustment, visarea, refresh.as_attoseconds());
+				screen().configure(horiz_pix_total, vert_pix_total, visarea, refresh.as_attoseconds());
 			}
 
 			if(!m_reconfigure_cb.isnull())
 			{
-				m_reconfigure_cb(horiz_pix_total - visual_adjustment, vert_pix_total - visual_adjustment, visarea, refresh.as_attoseconds());
+				m_reconfigure_cb(horiz_pix_total, vert_pix_total, visarea, refresh.as_attoseconds());
 			}
 
 			m_has_valid_parameters = true;
