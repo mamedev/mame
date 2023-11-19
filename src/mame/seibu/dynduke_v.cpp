@@ -3,7 +3,6 @@
 #include "emu.h"
 #include "dynduke.h"
 
-#include "screen.h"
 
 
 /******************************************************************************/
@@ -88,8 +87,8 @@ void dynduke_state::gfxbank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_back_bankbase = BIT(data, 0) ? 0x1000 : 0;
-		m_fore_bankbase = BIT(data, 4) ? 0x1000 : 0;
+		if (data&0x01) m_back_bankbase=0x1000; else m_back_bankbase=0;
+		if (data&0x10) m_fore_bankbase=0x1000; else m_fore_bankbase=0;
 
 		if (m_back_bankbase!=m_old_back)
 			m_bg_layer->mark_all_dirty();
@@ -115,60 +114,53 @@ void dynduke_state::control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		// bit 0x02 is used on the map screen (fore disable?)
 		// bit 0x01 set when inserting coin.. bg disable?
 
-		m_back_enable = BIT(~data, 0);
-		m_fore_enable = BIT(~data, 1);
-		m_txt_enable = BIT(~data, 2);
-		m_sprite_enable = BIT(~data, 3);
+		if (data&0x1) m_back_enable = 0; else m_back_enable = 1;
+		if (data&0x2) m_fore_enable=0; else m_fore_enable=1;
+		if (data&0x4) m_txt_enable = 0; else m_txt_enable = 1;
+		if (data&0x8) m_sprite_enable=0; else m_sprite_enable=1;
 
-		flip_screen_set(BIT(data, 6));
+		flip_screen_set(data & 0x40);
 	}
 }
 
-void dynduke_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void dynduke_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri)
 {
-	uint16_t const *const buffered_spriteram16 = m_spriteram->buffer();
+	uint16_t *buffered_spriteram16 = m_spriteram->buffer();
+	int offs,fx,fy,x,y,color,sprite;
 
 	if (!m_sprite_enable) return;
 
-	constexpr uint32_t pri_mask[4] = {
-		GFX_PMASK_8 | GFX_PMASK_4 | GFX_PMASK_2, // Untested: does anything use it? Could be behind background
-		GFX_PMASK_8 | GFX_PMASK_4 | GFX_PMASK_2,
-		GFX_PMASK_8 | GFX_PMASK_4,
-		GFX_PMASK_8,
-	};
-
-	for (int offs = 0;offs < 0x800;offs += 4)
+	for (offs = 0x800-4;offs >= 0;offs -= 4)
 	{
 		/* Don't draw empty sprite table entries */
 		if ((buffered_spriteram16[offs+3] >> 8)!=0xf) continue;
-		uint32_t pri = pri_mask[((buffered_spriteram16[offs+2]>>13)&3)];
+		if (((buffered_spriteram16[offs+2]>>13)&3)!=pri) continue;
 
-		bool fx = BIT(buffered_spriteram16[offs+0], 13);
-		bool fy = BIT(buffered_spriteram16[offs+0], 14);
-		int32_t y = buffered_spriteram16[offs+0] & 0xff;
-		int32_t x = buffered_spriteram16[offs+2] & 0xff;
+		fx= buffered_spriteram16[offs+0]&0x2000;
+		fy= buffered_spriteram16[offs+0]&0x4000;
+		y = buffered_spriteram16[offs+0] & 0xff;
+		x = buffered_spriteram16[offs+2] & 0xff;
 
 		if (buffered_spriteram16[offs+2]&0x100) x=0-(0x100-x);
 
-		uint32_t const color = (buffered_spriteram16[offs+0]>>8)&0x1f;
-		uint32_t sprite = buffered_spriteram16[offs+1];
+		color = (buffered_spriteram16[offs+0]>>8)&0x1f;
+		sprite = buffered_spriteram16[offs+1];
 		sprite &= 0x3fff;
 
 		if (flip_screen()) {
 			x=240-x;
 			y=240-y;
-			fx=!fx;
-			fy=!fy;
+			if (fx) fx=0; else fx=1;
+			if (fy) fy=0; else fy=1;
 		}
 
-		m_gfxdecode->gfx(3)->prio_transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
 				sprite,
-				color,fx,fy,x,y,
-				screen.priority(),pri,15);
+				color,fx,fy,x,y,15);
 	}
 }
 
-void dynduke_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, uint32_t pri_mask)
+void dynduke_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
 {
 	/* The transparency / palette handling on the background layer is very strange */
 	bitmap_ind16 &bm = m_bg_layer->pixmap();
@@ -188,17 +180,16 @@ void dynduke_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap,
 		scrollx = 256 - scrollx;
 	}
 
-	for (int y=cliprect.top();y<=cliprect.bottom();y++)
+	for (int y=0;y<256;y++)
 	{
-		int const realy = (y + scrolly) & 0x1ff;
+		int realy = (y + scrolly) & 0x1ff;
 		uint16_t const *const src = &bm.pix(realy);
 		uint16_t *const dst = &bitmap.pix(y);
-		uint8_t *const pdst = &screen.priority().pix(y);
 
 
-		for (int x=cliprect.left();x<=cliprect.right();x++)
+		for (int x=0;x<256;x++)
 		{
-			int const realx = (x + scrollx) & 0x1ff;
+			int realx = (x + scrollx) & 0x1ff;
 			uint16_t srcdat = src[realx];
 
 			/* 0x01 - data bits
@@ -217,7 +208,6 @@ void dynduke_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap,
 
 				srcdat = (srcdat & 0x000f) | ((srcdat & 0xffc0) >> 2);
 				dst[x] = srcdat;
-				pdst[x] |= pri_mask;
 			}
 
 
@@ -233,11 +223,16 @@ uint32_t dynduke_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	m_fg_layer->enable(m_fore_enable);
 	m_tx_layer->enable(m_txt_enable);
 
-	draw_background(screen, bitmap, cliprect, 0x00, 1);
-	draw_background(screen, bitmap, cliprect, 0x20, 2);
-	m_fg_layer->draw(screen, bitmap, cliprect, 0,4);
-	m_tx_layer->draw(screen, bitmap, cliprect, 0,8);
-	draw_sprites(screen, bitmap, cliprect);
+
+	draw_background(bitmap, cliprect,0x00);
+	draw_sprites(bitmap,cliprect,0); // Untested: does anything use it? Could be behind background
+	draw_sprites(bitmap,cliprect,1);
+	draw_background(bitmap, cliprect,0x20);
+
+	draw_sprites(bitmap,cliprect,2);
+	m_fg_layer->draw(screen, bitmap, cliprect, 0,0);
+	draw_sprites(bitmap,cliprect,3);
+	m_tx_layer->draw(screen, bitmap, cliprect, 0,0);
 
 	return 0;
 }
