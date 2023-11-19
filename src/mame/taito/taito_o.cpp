@@ -31,8 +31,11 @@ TODO:
 - Opto coin chutes, similar if not same as taito/pkspirit.cpp
 - parentj: throws "MESSAGE ERROR" on boot, hold SERVICE1 and SERVICE4 at boot.
   Notice that holding SERVICE1 (reset) implicitly means no NVRAM restore.
-- sprite priorities
-- interrupts (sources) - valid levels 4 (vblank), 5 (timer or from I/O), 6 (hopper signal)
+- both games throws "HOPPER EMPTY" if pressing payout button after some time.
+- parentj: lower part of dealer arm GFX is x flipped,
+  is it even supposed to be shown but rather be masked by the text layer?
+- eibise: middle reel shows sprite wraparound glitch;
+- interrupts (sources) - valid levels 4 (vblank), 5 (timer or from I/O), 6 (hopper signal?)
 
 Notes:
 - Press SERVICE1 to reset errors;
@@ -86,17 +89,19 @@ private:
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
+	u32 draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, u32 start_offset);
 	void prg_map(address_map &map);
 };
 
 
-void taitoo_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
+u32 taitoo_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, u32 start_offset)
 {
-	for (int offs = 0x03f8 / 2; offs >= 0; offs -= 0x008 / 2)
+	for (int offs = start_offset; offs >= 0; offs -= 0x008 / 2)
 	{
-		if (offs <  0x01b0 && priority == 0)    continue;
-		if (offs >= 0x01b0 && priority == 1)    continue;
+		// cfr. taito/taitoair_v.cpp, eibise cares
+		if (m_tc0080vco->sprram_r(offs + 0) == 0xc00 ||
+			m_tc0080vco->sprram_r(offs + 0) == 0xcff)
+			return offs - 8/2;
 
 		m_tc0080vco->get_sprite_params(offs, true);
 
@@ -105,6 +110,8 @@ void taitoo_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 			m_tc0080vco->draw_single_sprite(bitmap, cliprect);
 		}
 	}
+
+	return 0;
 }
 
 
@@ -116,11 +123,12 @@ u32 taitoo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 
 	m_tc0080vco->tilemap_draw(screen, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
 
-	draw_sprites(bitmap, cliprect, 0);
-	draw_sprites(bitmap, cliprect, 1);
+	u32 sprite_ptr = draw_sprites(bitmap, cliprect, 0x3f8 / 2);
 
 	m_tc0080vco->tilemap_draw(screen, bitmap, cliprect, 1, 0, 0);
 	m_tc0080vco->tilemap_draw(screen, bitmap, cliprect, 2, 0, 0);
+
+	draw_sprites(bitmap, cliprect, sprite_ptr);
 
 	return 0;
 }
