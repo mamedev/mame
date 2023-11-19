@@ -149,7 +149,7 @@ void taitoo_state::prg_map(address_map &map)
 		})
 	);
 	map(0x200002, 0x200003).portr("IN1").lw16(
-		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+		NAME([] (offs_t offset, u16 data, u16 mem_mask) {
 			// m_hop_stop_coil = BIT(data, 14);
 			// m_divider = BIT(data, 12); active low
 			// lamps & 0x370f
