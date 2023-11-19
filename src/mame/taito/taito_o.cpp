@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Tomasz Slanina
-/***************************************************************
+// copyright-holders:Tomasz Slanina, Angelo Salese
+/**************************************************************************************************
 
 Taito 'O System'
 ----------------
@@ -28,12 +28,16 @@ Eibise       (C) 1990 Taito
 
 TODO:
 
-- inputs (coins)
-- NVRAM
+- Opto coin chutes, similar if not same as taito/pkspirit.cpp
+- parentj: throws "MESSAGE ERROR" on boot, hold SERVICE1 and SERVICE4 at boot.
+  Notice that holding SERVICE1 (reset) implicitly means no NVRAM restore.
 - sprite priorities
-- interrupts (sources) - valid levels 4,5,6(hop empty?)
+- interrupts (sources) - valid levels 4 (vblank), 5 (timer or from I/O), 6 (hopper signal)
 
-*****************************************************************/
+Notes:
+- Press SERVICE1 to reset errors;
+
+**************************************************************************************************/
 
 #include "emu.h"
 
@@ -41,6 +45,7 @@ TODO:
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/nvram.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/ymopn.h"
@@ -60,7 +65,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_watchdog(*this, "watchdog"),
 		m_tc0080vco(*this, "tc0080vco"),
+		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_nvram(*this, "nvram"),
 		m_io_in(*this, "IN%u", 0U)
 	{ }
 
@@ -71,12 +78,12 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<tc0080vco_device> m_tc0080vco;
+	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<nvram_device> m_nvram;
 
 	required_ioport_array<2> m_io_in;
 
-	void io_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	u16 io_r(offs_t offset, u16 mem_mask = ~0);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
@@ -118,37 +125,32 @@ u32 taitoo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 	return 0;
 }
 
-
-static const int clear_hack = 1;
-
-void taitoo_state::io_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	switch (offset)
-	{
-		case 2: m_watchdog->watchdog_reset(); break;
-
-		default: logerror("IO W %x %x %x\n", offset, data, mem_mask);
-	}
-}
-
-u16 taitoo_state::io_r(offs_t offset, u16 mem_mask)
-{
-	u16 retval = 0;
-
-	switch (offset)
-	{
-		case 0: retval = m_io_in[0]->read() & (clear_hack ? 0xf7ff : 0xffff); break;
-		case 1: retval = m_io_in[1]->read() & (clear_hack ? 0xfff7 : 0xffff); break;
-		default: logerror("IO R %x %x = %x @ %x\n", offset, mem_mask, retval, m_maincpu->pc());
-	}
-	return retval;
-}
-
 void taitoo_state::prg_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
-	map(0x100000, 0x10ffff).mirror(0x010000).ram();
-	map(0x200000, 0x20000f).rw(FUNC(taitoo_state::io_r), FUNC(taitoo_state::io_w)); // TC0220IOC ?
+	// unconfirmed mirror, presumed from taito_h
+	map(0x100000, 0x10ffff).mirror(0x010000).ram().share("nvram");
+	// Unknown, definitely not TC0220IOC
+	map(0x200000, 0x200001).portr("IN0").lw16(
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+			if (ACCESSING_BITS_8_15)
+				machine().bookkeeping().coin_lockout_w(0, !BIT(data, 11));
+			// BIT(data, 10); goes high when "coin in reversed" is detected,
+			//                denoted as "bell" in eibise
+			// m_hopper_io = BIT(data, 9);
+		})
+	);
+	map(0x200002, 0x200003).portr("IN1").lw16(
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+			// m_hop_stop_coil = BIT(data, 14);
+			// m_divider = BIT(data, 12); active low
+			// lamps & 0x370f
+			// \- bet & 0x000f, not present in eibise
+			// \- deal & 0x1000
+			// \- double/payout & 0x2400
+		})
+	);
+	map(0x200004, 0x200005).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 	map(0x300000, 0x300003).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write)).umask16(0x00ff);
 	map(0x400000, 0x420fff).rw(m_tc0080vco, FUNC(tc0080vco_device::word_r), FUNC(tc0080vco_device::word_w));
 	map(0x500800, 0x500fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -156,69 +158,36 @@ void taitoo_state::prg_map(address_map &map)
 
 static INPUT_PORTS_START( parentj )
 	PORT_START("IN0")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_Z) PORT_NAME("Bet 1")
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_X) PORT_NAME("Bet 2")
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_C) PORT_NAME("Bet 3")
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CODE(KEYCODE_V) PORT_NAME("Bet 4")
-
-	PORT_DIPNAME(0x0010,  0x10, "IN0 4")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_CODE(KEYCODE_F) PORT_NAME("Payout")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Bet 1")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Bet 2")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Bet 3")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Bet 4")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Payout Button")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_CODE(KEYCODE_D) PORT_NAME("Check")
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_A) PORT_NAME("Deal/Hit")
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_CODE(KEYCODE_S) PORT_NAME("Double")
-	PORT_DIPNAME(0x000400,  0x400, "IN0 a")
-	PORT_DIPSETTING(    0x400, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x000, DEF_STR( On ) )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_J) PORT_NAME("Reset")
-
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_Q) PORT_NAME("Last Key")
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_W) PORT_NAME("Meter Key")
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_E) PORT_NAME("Opto 1H")
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_R) PORT_NAME("Opto 1L")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE ) PORT_NAME("Check")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal/Hit")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Reset Key")
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Last Key")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Meter Key")
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Opto 1H")
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Opto 1L")
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_U) PORT_NAME("Hop Over")
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_T) PORT_NAME("Opto 2H")
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_Y) PORT_NAME("Opto 2L")
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_I) PORT_NAME("All Clear")
-
+	PORT_BIT (0x0001, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hopper Over") // "Hop Over"?
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Opto 2H")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Opto 2L")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE4 ) PORT_NAME("All Clear SW")
 	PORT_SERVICE_NO_TOGGLE(0x0010, IP_ACTIVE_LOW )
-	PORT_DIPNAME(0x0020,  0x20, "IN1 5")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME(0x0040,  0x40, "IN1 6")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME(0x0080,  0x80, "IN1 7")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME(0x000100,  0x000, "Battery test?")
-	PORT_DIPSETTING(    0x000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x100, DEF_STR( On ) )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_O) PORT_NAME("Pay Out")
-	PORT_DIPNAME(0x000400,  0x400, "IN1 a")
-	PORT_DIPSETTING(    0x400, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x000, DEF_STR( On ) )
-	PORT_DIPNAME(0x000800,  0x800, "IN1 b")
-	PORT_DIPSETTING(    0x800, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x000, DEF_STR( On ) )
-	PORT_DIPNAME(0x001000,  0x1000, "IN1 c")
-	PORT_DIPSETTING(    0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME(0x002000,  0x2000, "IN1 d")
-	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME(0x004000,  0x4000, "IN1 e")
-	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME(0x008000,  0x8000, "IN1 f")
-	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x00e0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // battery error if '1'
+	PORT_BIT (0x0200, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Pay Out") // Hopper related?
+	PORT_BIT( 0xfc00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	// dip descriptions and defaults taken from dip sheet
+	// NOTE: bit 0 = loc 8, bit 7 = loc 1
 	PORT_START("DSWA")
 	PORT_DIPNAME(0x80, 0x80, "Credit")           PORT_DIPLOCATION("DSWA:1")
 	PORT_DIPSETTING(   0x00, DEF_STR( No ) )
@@ -243,25 +212,105 @@ static INPUT_PORTS_START( parentj )
 	PORT_DIPSETTING(   0x01, "0" )
 
 	PORT_START("DSWB") // not used according to the dip sheet
-	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "DSWB:1" )
-	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "DSWB:2" )
-	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "DSWB:3" )
-	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "DSWB:4" )
-	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "DSWB:5" )
-	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "DSWB:6" )
-	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "DSWB:7" )
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "DSWB:8" )
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "DSWB:8" )
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "DSWB:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "DSWB:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "DSWB:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "DSWB:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "DSWB:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "DSWB:2" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "DSWB:1" )
 INPUT_PORTS_END
 
-// unknown sources ...
+static INPUT_PORTS_START( eibise )
+	PORT_START("IN0")
+	PORT_BIT( 0x001f, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Payout Button")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("1 Bet")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE ) PORT_NAME("Max Bet")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Reset Key")
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Last Key")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Meter Key")
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Opto 1H")
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Opto 1L")
+
+	PORT_START("IN1")
+	PORT_BIT (0x0001, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hopper Over") // "Hop Over"?
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Opto 2H")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Opto 2L")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE4 ) PORT_NAME("All Clear SW")
+	PORT_SERVICE_NO_TOGGLE(0x0010, IP_ACTIVE_LOW )
+	PORT_BIT( 0x00e0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // battery error if '1'
+	PORT_BIT (0x0200, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Pay Out") // Hopper related? NOTE: reversed compared to parentj
+	PORT_BIT( 0xfc00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSWA")
+	PORT_DIPNAME(0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSWA:1")
+	PORT_DIPSETTING(   0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(   0x00, DEF_STR( On ) )
+	PORT_DIPNAME(0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSWA:2")
+	PORT_DIPSETTING(   0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(   0x00, DEF_STR( On ) )
+	PORT_DIPNAME(0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSWA:3")
+	PORT_DIPSETTING(   0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(   0x00, DEF_STR( On ) )
+	PORT_DIPNAME(0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSWA:4")
+	PORT_DIPSETTING(   0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(   0x00, DEF_STR( On ) )
+	PORT_DIPNAME(0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSWA:5")
+	PORT_DIPSETTING(   0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(   0x00, DEF_STR( On ) )
+	PORT_DIPNAME(0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSWA:6")
+	PORT_DIPSETTING(   0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(   0x00, DEF_STR( On ) )
+	PORT_DIPNAME(0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSWA:7")
+	PORT_DIPSETTING(   0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(   0x00, DEF_STR( On ) )
+	PORT_DIPNAME(0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSWA:8")
+	PORT_DIPSETTING(   0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(   0x00, DEF_STR( On ) )
+
+	PORT_START("DSWB")
+	PORT_DIPNAME(0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSWB:1")
+	PORT_DIPSETTING(   0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(   0x00, DEF_STR( On ) )
+	PORT_DIPNAME(0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSWB:2")
+	PORT_DIPSETTING(   0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(   0x00, DEF_STR( On ) )
+	PORT_DIPNAME(0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSWB:3")
+	PORT_DIPSETTING(   0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(   0x00, DEF_STR( On ) )
+	PORT_DIPNAME(0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSWB:4")
+	PORT_DIPSETTING(   0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(   0x00, DEF_STR( On ) )
+	PORT_DIPNAME(0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSWB:5")
+	PORT_DIPSETTING(   0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(   0x00, DEF_STR( On ) )
+	PORT_DIPNAME(0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSWB:6")
+	PORT_DIPSETTING(   0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(   0x00, DEF_STR( On ) )
+	PORT_DIPNAME(0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSWB:7")
+	PORT_DIPSETTING(   0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(   0x00, DEF_STR( On ) )
+	PORT_DIPNAME(0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSWB:8")
+	PORT_DIPSETTING(   0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(   0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
 TIMER_DEVICE_CALLBACK_MEMBER(taitoo_state::interrupt)
 {
 	int scanline = param;
 
+	// vblank irq
 	if(scanline == 448)
 		m_maincpu->set_input_line(4, HOLD_LINE);
 
-	if(scanline == 0)
+	// reads I/O
+	if (scanline == 0)
 		m_maincpu->set_input_line(5, HOLD_LINE);
 }
 
@@ -273,13 +322,15 @@ void taitoo_state::parentj(machine_config &config)
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*16, 64*16);
-	screen.set_visarea(0*16, 32*16-1, 3*16, 31*16-1);
-	screen.set_screen_update(FUNC(taitoo_state::screen_update));
-	screen.set_palette(m_palette);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_size(64*16, 64*16);
+	m_screen->set_visarea(0*16, 32*16-1, 3*16, 31*16-1);
+	m_screen->set_screen_update(FUNC(taitoo_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 33*16);
 
@@ -341,5 +392,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1989, parentj, 0, parentj,  parentj, taitoo_state, empty_init, ROT0, "Taito", "Parent Jack (Japan)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, eibise,  0, parentj,  parentj, taitoo_state, empty_init, ROT0, "Taito", "Eibise (Japan)",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, parentj, 0, parentj,  parentj, taitoo_state, empty_init, ROT0, "Taito", "Parent Jack (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, eibise,  0, parentj,  eibise,  taitoo_state, empty_init, ROT0, "Taito", "Eibise (Japan)",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
