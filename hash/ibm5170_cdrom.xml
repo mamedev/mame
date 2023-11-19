@@ -4475,7 +4475,7 @@ Untested multiplayer options
 	<!-- <rom name="Jurassic Park (Germany) (En,Fr,De,Es,It) (Hit Squad, Soft Price) (Track 12).bin" size="50466864" crc="a59453c3" sha1="27a0ea8ee777e7ede65fc747e255af9a530856ed"/> -->
 	<!-- <rom name="Jurassic Park (Germany) (En,Fr,De,Es,It) (Hit Squad, Soft Price) (Track 13).bin" size="5289648" crc="09dd3c76" sha1="db1d9c89070c9b48eded6a91b72b6177fab70287"/> -->
 	<software name="jpark_de" cloneof="jpark">
-		<description>Jurassic Park (Germany)</description>
+		<description>Jurassic Park (Germany, Soft Price release)</description>
 		<year>1993</year>
 		<publisher>Ocean</publisher>
 		<info name="developer" value="Ocean" />
