@@ -79,13 +79,16 @@
          the box must contain at least a Z80
 
 DASM Notes:
-- main CPU currently stalls with a RAM buffer check ($63fe), then it
-tries to see if $612c onward has a "MASTERJ" string on it, resets itself
-otherwise.
-During irq routines it also checks if bit 7 is active for $640a-$6415,
-modifies this area if condition is true.
-Neither of above matches what we have in the ROM data banks, so it's either
-protected or a snippet should do the aforementioned string copy.
+- Main CPU currently stalls with a RAM buffer check ($63fe), then it
+  tries to see if $612c onward has a "MASTERJ" string on it, resets itself
+  otherwise.
+- During irq routines it also checks if bit 7 is active for $640a-$6415,
+  modifies this area if condition is true.
+- Afterwards it seems to expect RAM "blitting" tasks at $6000-$63ff;
+- Neither of above matches what we have in the ROM data banks, so something
+  must provide those;
+- Otherwise HW more or less matches base crgolf, including VRAM
+  banking, screen enable/disable etc. It doesn't seem worth of a driver split;
 
 ***************************************************************************/
 
@@ -979,6 +982,9 @@ ROM_START( mastrglf )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) // next to large module
 	ROM_LOAD( "m-gf_a10.12k.27256", 0x00000, 0x08000, CRC(d145b144) SHA1(52370d56106f0280c52266b5a727493a3396a8e3) )
 
+	ROM_REGION( 0x4000, "mcu", 0 ) // unknown part/device, living inside the epoxy blob
+	ROM_LOAD( "epoxy.bin", 0x0000, 0x4000, NO_DUMP )
+
 	ROM_REGION( 0x10000, "adpcm", 0 ) // MSM5205 samples
 	ROM_LOAD( "m-gf_a8.15a.27256",  0x00000, 0x08000, CRC(9ea9183b) SHA1(55f54575cd662b6194f69532baa25c9b2272760f) )
 	ROM_LOAD( "m-gf_a9.16a.27256",  0x08000, 0x08000, CRC(61ab715f) SHA1(6b9cccaa83a9a9e44a46bae796e2f9eaa9f9c951) )
@@ -1005,4 +1011,4 @@ GAME( 1984, crgolfc,  crgolf, crgolf,   crgolfb, crgolf_state,   empty_init, ROT
 GAME( 1984, crgolfbt, crgolf, crgolf,   crgolfb, crgolf_state,   empty_init, ROT0, "bootleg",     "Champion Golf (bootleg)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1985, crgolfhi, 0,      crgolfhi, crgolfa, crgolfhi_state, empty_init, ROT0, "Nasco Japan", "Crowns Golf in Hawaii",     MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, mastrglf, 0,      mastrglf, crgolf,  mastrglf_state, empty_init, ROT0, "Nasco",       "Master's Golf",             MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1985, mastrglf, 0,      mastrglf, crgolf,  mastrglf_state, empty_init, ROT0, "Nasco",       "Master's Golf",             MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // shared RAM with an undumped device or CPU, cfr. notes on top
