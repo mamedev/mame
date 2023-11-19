@@ -1,5 +1,6 @@
 /* example_cpp_encode_file - Simple FLAC file encoder using libFLAC
- * Copyright (C) 2007  Josh Coalson
+ * Copyright (C) 2007-2009  Josh Coalson
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -11,9 +12,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 /*
@@ -21,31 +22,35 @@
  * file.  It only supports 16-bit stereo files in canonical WAVE format.
  *
  * Complete API documentation can be found at:
- *   http://flac.sourceforge.net/api/
+ *   http://xiph.org/flac/api/
  */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #  include <config.h>
 #endif
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
 #include "FLAC++/metadata.h"
 #include "FLAC++/encoder.h"
+#include "share/compat.h"
+
+#include <cstring>
 
 class OurEncoder: public FLAC::Encoder::File {
 public:
 	OurEncoder(): FLAC::Encoder::File() { }
 protected:
-	virtual void progress_callback(FLAC__uint64 bytes_written, FLAC__uint64 samples_written, unsigned frames_written, unsigned total_frames_estimate);
+	virtual void progress_callback(FLAC__uint64 bytes_written, FLAC__uint64 samples_written, uint32_t frames_written, uint32_t total_frames_estimate);
 };
 
 #define READSIZE 1024
 
-static unsigned total_samples = 0; /* can use a 32-bit number due to WAVE size limitations */
+static uint32_t total_samples = 0; /* can use a 32-bit number due to WAVE size limitations */
 static FLAC__byte buffer[READSIZE/*samples*/ * 2/*bytes_per_sample*/ * 2/*channels*/]; /* we read the WAVE data into here */
 static FLAC__int32 pcm[READSIZE/*samples*/ * 2/*channels*/];
-static FLAC__int32 *pcm_[2] = { pcm, pcm+READSIZE };
 
 int main(int argc, char *argv[])
 {
@@ -55,9 +60,9 @@ int main(int argc, char *argv[])
 	FLAC__StreamMetadata *metadata[2];
 	FLAC__StreamMetadata_VorbisComment_Entry entry;
 	FILE *fin;
-	unsigned sample_rate = 0;
-	unsigned channels = 0;
-	unsigned bps = 0;
+	uint32_t sample_rate = 0;
+	uint32_t channels = 0;
+	uint32_t bps = 0;
 
 	if(argc != 3) {
 		fprintf(stderr, "usage: %s infile.wav outfile.flac\n", argv[0]);
@@ -80,11 +85,11 @@ int main(int argc, char *argv[])
 		fclose(fin);
 		return 1;
 	}
-	sample_rate = ((((((unsigned)buffer[27] << 8) | buffer[26]) << 8) | buffer[25]) << 8) | buffer[24];
+	sample_rate = ((((((uint32_t)buffer[27] << 8) | buffer[26]) << 8) | buffer[25]) << 8) | buffer[24];
 	channels = 2;
 	bps = 16;
-	total_samples = (((((((unsigned)buffer[43] << 8) | buffer[42]) << 8) | buffer[41]) << 8) | buffer[40]) / 4;
-   
+	total_samples = (((((((uint32_t)buffer[43] << 8) | buffer[42]) << 8) | buffer[41]) << 8) | buffer[40]) / 4;
+
 	/* check the encoder */
 	if(!encoder) {
 		fprintf(stderr, "ERROR: allocating encoder\n");
@@ -112,11 +117,13 @@ int main(int argc, char *argv[])
 		) {
 			fprintf(stderr, "ERROR: out of memory or tag error\n");
 			ok = false;
-		}
+		} else {
 
-		metadata[1]->length = 1234; /* set the padding length */
+			metadata[1]->length = 1234; /* set the padding length */
 
-		ok = encoder.set_metadata(metadata, 2);
+			ok = encoder.set_metadata(metadata, 2);
+
+                }
 	}
 
 	/* initialize encoder */
@@ -165,11 +172,7 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
-void OurEncoder::progress_callback(FLAC__uint64 bytes_written, FLAC__uint64 samples_written, unsigned frames_written, unsigned total_frames_estimate)
+void OurEncoder::progress_callback(FLAC__uint64 bytes_written, FLAC__uint64 samples_written, uint32_t frames_written, uint32_t total_frames_estimate)
 {
-#ifdef _MSC_VER
-	fprintf(stderr, "wrote %I64u bytes, %I64u/%u samples, %u/%u frames\n", bytes_written, samples_written, total_samples, frames_written, total_frames_estimate);
-#else
-	fprintf(stderr, "wrote %llu bytes, %llu/%u samples, %u/%u frames\n", bytes_written, samples_written, total_samples, frames_written, total_frames_estimate);
-#endif
+	fprintf(stderr, "wrote %" PRIu64 " bytes, %" PRIu64 "/%u samples, %u/%u frames\n", bytes_written, samples_written, total_samples, frames_written, total_frames_estimate);
 }

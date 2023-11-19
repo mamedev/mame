@@ -1,5 +1,6 @@
 /* flac - Command-line FLAC encoder/decoder
- * Copyright (C) 2002,2003,2004,2005,2006,2007  Josh Coalson
+ * Copyright (C) 2002-2009  Josh Coalson
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -11,23 +12,36 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #  include <config.h>
 #endif
 
-#include "utils.h"
-#include "FLAC/assert.h"
-#include "FLAC/metadata.h"
 #include <math.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "utils.h"
+#include "FLAC/assert.h"
+#include "FLAC/metadata.h"
+#include "share/compat.h"
+#ifndef _WIN32
+#ifndef _XOPEN_SOURCE
+#define _XOPEN_SOURCE
+#endif
+#include <wchar.h>
+#ifdef HAVE_TERMIOS_H
+# include <termios.h>
+#endif
+#ifdef HAVE_SYS_IOCTL_H
+# include <sys/ioctl.h>
+#endif
+#endif
 
 const char *CHANNEL_MASK_TAG = "WAVEFORMATEXTENSIBLE_CHANNEL_MASK";
 
@@ -42,8 +56,18 @@ static FLAC__bool local__parse_uint64_(const char *s, FLAC__uint64 *value)
 		return false;
 
 	while('\0' != (c = *s++))
-		if(c >= '0' && c <= '9')
-			ret = ret * 10 + (c - '0');
+		if(c >= '0' && c <= '9') {
+			if(ret > UINT64_MAX / 10) /* check for overflow */
+				return false;
+			else if(ret == UINT64_MAX / 10) {
+				FLAC__uint64 tmp = ret;
+				ret = ret * 10 + (c - '0');
+				if(ret < tmp)
+					return false;
+			}
+			else
+				ret = ret * 10 + (c - '0');
+		}
 		else
 			return false;
 
@@ -54,8 +78,8 @@ static FLAC__bool local__parse_uint64_(const char *s, FLAC__uint64 *value)
 static FLAC__bool local__parse_timecode_(const char *s, double *value)
 {
 	double ret;
-	unsigned i;
-	char c;
+	uint32_t i;
+	char c, *endptr;
 
 	/* parse [0-9][0-9]*: */
 	c = *s++;
@@ -74,21 +98,18 @@ static FLAC__bool local__parse_timecode_(const char *s, double *value)
 	/* parse [0-9]*[.,]?[0-9]* i.e. a sign-less rational number (. or , OK for fractional seconds, to support different locales) */
 	if(strspn(s, "1234567890.,") != strlen(s))
 		return false;
-	{
-		const char *p = strpbrk(s, ".,");
-		if(p && 0 != strpbrk(++p, ".,"))
-			return false;
-	}
-	ret += atof(s);
+	ret += strtod(s, &endptr);
+	if (endptr == s || *endptr)
+		return false;
 
 	*value = ret;
 	return true;
 }
 
-static FLAC__bool local__parse_cue_(const char *s, const char *end, unsigned *track, unsigned *index)
+static FLAC__bool local__parse_cue_(const char *s, const char *end, uint32_t *track, uint32_t *indx)
 {
 	FLAC__bool got_track = false, got_index = false;
-	unsigned t = 0, i = 0;
+	uint32_t t = 0, i = 0;
 	char c;
 
 	while(end? s < end : *s != '\0') {
@@ -112,7 +133,7 @@ static FLAC__bool local__parse_cue_(const char *s, const char *end, unsigned *tr
 			return false;
 	}
 	*track = t;
-	*index = i;
+	*indx = i;
 	return got_track && got_index;
 }
 
@@ -121,20 +142,20 @@ static FLAC__bool local__parse_cue_(const char *s, const char *end, unsigned *tr
  * does not require sorted cuesheets).  but if it's not sorted, picking a
  * nearest cue point has no significance.
  */
-static FLAC__uint64 local__find_closest_cue_(const FLAC__StreamMetadata_CueSheet *cuesheet, unsigned track, unsigned index, FLAC__uint64 total_samples, FLAC__bool look_forward)
+static FLAC__uint64 local__find_closest_cue_(const FLAC__StreamMetadata_CueSheet *cuesheet, uint32_t track, uint32_t indx, FLAC__uint64 total_samples, FLAC__bool look_forward)
 {
 	int t, i;
 	if(look_forward) {
 		for(t = 0; t < (int)cuesheet->num_tracks; t++)
 			for(i = 0; i < (int)cuesheet->tracks[t].num_indices; i++)
-				if(cuesheet->tracks[t].number > track || (cuesheet->tracks[t].number == track && cuesheet->tracks[t].indices[i].number >= index))
+				if(cuesheet->tracks[t].number > track || (cuesheet->tracks[t].number == track && cuesheet->tracks[t].indices[i].number >= indx))
 					return cuesheet->tracks[t].offset + cuesheet->tracks[t].indices[i].offset;
 		return total_samples;
 	}
 	else {
 		for(t = (int)cuesheet->num_tracks - 1; t >= 0; t--)
 			for(i = (int)cuesheet->tracks[t].num_indices - 1; i >= 0; i--)
-				if(cuesheet->tracks[t].number < track || (cuesheet->tracks[t].number == track && cuesheet->tracks[t].indices[i].number <= index))
+				if(cuesheet->tracks[t].number < track || (cuesheet->tracks[t].number == track && cuesheet->tracks[t].indices[i].number <= indx))
 					return cuesheet->tracks[t].offset + cuesheet->tracks[t].indices[i].offset;
 		return 0;
 	}
@@ -149,9 +170,109 @@ void flac__utils_printf(FILE *stream, int level, const char *format, ...)
 
 		va_start(args, format);
 
-		(void) vfprintf(stream, format, args);
+		(void) flac_vfprintf(stream, format, args);
 
 		va_end(args);
+
+#ifdef _MSC_VER
+		if(stream == stderr)
+			fflush(stream); /* for some reason stderr is buffered in at least some if not all MSC libs */
+#endif
+	}
+}
+
+/* variables and functions for console status output */
+static FLAC__bool is_name_printed;
+static int stats_char_count = 0;
+static int console_width;
+static int console_chars_left;
+
+int get_console_width(void)
+{
+	int width = 0;
+#if defined _WIN32
+	width = win_get_console_width();
+#elif defined __EMX__
+	int s[2];
+	_scrsize (s);
+	width = s[0];
+#elif defined TIOCGWINSZ
+	struct winsize w;
+	if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &w) != -1)
+		width = w.ws_col;
+#endif
+	if (width <= 0)
+		width = 80;
+	return width;
+}
+
+size_t strlen_console(const char *text)
+{
+#ifdef _WIN32
+	return strlen_utf8(text);
+#elif defined(__DJGPP__) /* workaround for DJGPP missing wcswidth() */
+	return strlen(text);
+#else
+	size_t len;
+	wchar_t *wtmp;
+
+	len = strlen(text)+1;
+	wtmp = (wchar_t *)malloc(len*sizeof(wchar_t));
+	if (wtmp == NULL) return len-1;
+	mbstowcs(wtmp, text, len);
+	len = wcswidth(wtmp, len);
+	free(wtmp);
+
+	return len;
+#endif
+}
+
+void stats_new_file(void)
+{
+	is_name_printed = false;
+}
+
+void stats_clear(void)
+{
+	while (stats_char_count > 0 && stats_char_count--)
+		fprintf(stderr, "\b");
+}
+
+void stats_print_name(int level, const char *name)
+{
+	int len;
+
+	if (flac__utils_verbosity_ >= level) {
+		stats_clear();
+		if(is_name_printed) return;
+
+		console_width = get_console_width();
+		len = strlen_console(name)+2;
+		console_chars_left = console_width  - (len % console_width);
+		flac_fprintf(stderr, "%s: ", name);
+		is_name_printed = true;
+	}
+}
+
+void stats_print_info(int level, const char *format, ...)
+{
+	char tmp[80];
+	int len, clear_len;
+
+	if (flac__utils_verbosity_ >= level) {
+		va_list args;
+		va_start(args, format);
+		len = flac_vsnprintf(tmp, sizeof(tmp), format, args);
+		va_end(args);
+		stats_clear();
+		if (len >= console_chars_left) {
+			clear_len = console_chars_left;
+			while (clear_len > 0 && clear_len--) fprintf(stderr, " ");
+			fprintf(stderr, "\n");
+			console_chars_left = console_width;
+		}
+		stats_char_count = fprintf(stderr, "%s", tmp);
+		fflush(stderr);
 	}
 }
 
@@ -189,6 +310,8 @@ FLAC__bool flac__utils_parse_skip_until_specification(const char *s, utils__Skip
 
 		if(local__parse_uint64_(s, &val)) {
 			spec->value_is_samples = true;
+			if(val > INT64_MAX)
+				return false;
 			spec->value.samples = (FLAC__int64)val;
 			if(is_negative)
 				spec->value.samples = -(spec->value.samples);
@@ -207,13 +330,17 @@ FLAC__bool flac__utils_parse_skip_until_specification(const char *s, utils__Skip
 	return true;
 }
 
-void flac__utils_canonicalize_skip_until_specification(utils__SkipUntilSpecification *spec, unsigned sample_rate)
+FLAC__bool flac__utils_canonicalize_skip_until_specification(utils__SkipUntilSpecification *spec, uint32_t sample_rate)
 {
 	FLAC__ASSERT(0 != spec);
 	if(!spec->value_is_samples) {
-		spec->value.samples = (FLAC__int64)(spec->value.seconds * (double)sample_rate);
+		double samples = spec->value.seconds * (double)sample_rate;
+		if(samples >= (double)INT64_MAX || samples <= (double)INT64_MIN)
+			return false;
+		spec->value.samples = (FLAC__int64)(samples);
 		spec->value_is_samples = true;
 	}
+	return true;
 }
 
 FLAC__bool flac__utils_parse_cue_specification(const char *s, utils__CueSpecification *spec)
@@ -281,13 +408,9 @@ FLAC__bool flac__utils_set_channel_mask_tag(FLAC__StreamMetadata *object, FLAC__
 
 	FLAC__ASSERT(object);
 	FLAC__ASSERT(object->type == FLAC__METADATA_TYPE_VORBIS_COMMENT);
-	FLAC__ASSERT(strlen(CHANNEL_MASK_TAG+1+2+16+1) <= sizeof(tag)); /* +1 for =, +2 for 0x, +16 for digits, +1 for NUL */
+	FLAC__ASSERT(strlen(CHANNEL_MASK_TAG)+1+2+16+1 <= sizeof(tag)); /* +1 for =, +2 for 0x, +16 for digits, +1 for NUL */
 	entry.entry = (FLAC__byte*)tag;
-#if defined _MSC_VER || defined __MINGW32__
-	if((entry.length = _snprintf(tag, sizeof(tag), "%s=0x%04X", CHANNEL_MASK_TAG, (unsigned)channel_mask)) >= sizeof(tag))
-#else
-	if((entry.length = snprintf(tag, sizeof(tag), "%s=0x%04X", CHANNEL_MASK_TAG, (unsigned)channel_mask)) >= sizeof(tag))
-#endif
+	if((entry.length = flac_snprintf(tag, sizeof(tag), "%s=0x%04X", CHANNEL_MASK_TAG, (uint32_t)channel_mask)) >= sizeof(tag))
 		return false;
 	if(!FLAC__metadata_object_vorbiscomment_replace_comment(object, entry, /*all=*/true, /*copy=*/true))
 		return false;
@@ -297,7 +420,7 @@ FLAC__bool flac__utils_set_channel_mask_tag(FLAC__StreamMetadata *object, FLAC__
 FLAC__bool flac__utils_get_channel_mask_tag(const FLAC__StreamMetadata *object, FLAC__uint32 *channel_mask)
 {
 	int offset;
-	unsigned val;
+	uint32_t val;
 	char *p;
 	FLAC__ASSERT(object);
 	FLAC__ASSERT(object->type == FLAC__METADATA_TYPE_VORBIS_COMMENT);
@@ -307,7 +430,7 @@ FLAC__bool flac__utils_get_channel_mask_tag(const FLAC__StreamMetadata *object, 
 		return false;
 	if(0 == (p = strchr((const char *)object->data.vorbis_comment.comments[offset].entry, '='))) /* should never happen, but just in case */
 		return false;
-	if(strncmp(p, "=0x", 3))
+	if(FLAC__STRNCASECMP(p, "=0x", 3))
 		return false;
 	if(sscanf(p+3, "%x", &val) != 1)
 		return false;

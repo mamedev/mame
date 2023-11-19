@@ -1,8 +1,9 @@
 #  FLAC - Free Lossless Audio Codec
-#  Copyright (C) 2006,2007  Josh Coalson
+#  Copyright (C) 2006-2009  Josh Coalson
+#  Copyright (C) 2011-2023  Xiph.Org Foundation
 #
 #  This file is part the FLAC project.  FLAC is comprised of several
-#  components distributed under difference licenses.  The codec libraries
+#  components distributed under different licenses.  The codec libraries
 #  are distributed under Xiph.Org's BSD-like license (see the file
 #  COPYING.Xiph in this distribution).  All other programs, libraries, and
 #  plugins are distributed under the GPL (see COPYING.GPL).  The documentation
@@ -78,7 +79,12 @@ EXTRA_DIST = \
 	case59-expect.meta \
 	case60-expect.meta \
 	case61-expect.meta \
-	case62-expect.meta
+	case62-expect.meta \
+	case63-expect.meta \
+	case64-expect.meta \
+	case65-expect.meta \
+	case66-expect.meta \
+	case67-expect.meta
 
 clean-local:
 	-rm -f out.*

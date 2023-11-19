@@ -1,5 +1,6 @@
 /* grabbag - Convenience lib for various routines common to several tools
- * Copyright (C) 2006,2007  Josh Coalson
+ * Copyright (C) 2006-2009  Josh Coalson
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -11,12 +12,12 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #  include <config.h>
 #endif
 
@@ -26,11 +27,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "share/compat.h"
+#include "share/safe_str.h"
 
 /* slightly different that strndup(): this always copies 'size' bytes starting from s into a NUL-terminated string. */
 static char *local__strndup_(const char *s, size_t size)
 {
-	char *x = (char*)safe_malloc_add_2op_(size, /*+*/1);
+	char *x = safe_malloc_add_2op_(size, /*+*/1);
 	if(x) {
 		memcpy(x, s, size);
 		x[size] = '\0';
@@ -139,8 +142,11 @@ static FLAC__bool local__extract_resolution_color_info_(FLAC__StreamMetadata_Pic
 		len -= 8;
 		while(len > 12) { /* every PNG chunk must be at least 12 bytes long */
 			const FLAC__uint32 clen = (FLAC__uint32)data[0] << 24 | (FLAC__uint32)data[1] << 16 | (FLAC__uint32)data[2] << 8 | (FLAC__uint32)data[3];
-			if(0 == memcmp(data+4, "IHDR", 4) && clen == 13) {
-				unsigned color_type = data[17];
+			/* First check whether clen makes sense or causes overflow in this bit of code */
+			if(clen + 12 <= clen || clen + 12 > len)
+				return false;
+			else if(0 == memcmp(data+4, "IHDR", 4) && clen == 13) {
+				uint32_t color_type = data[17];
 				picture->width = (FLAC__uint32)data[8] << 24 | (FLAC__uint32)data[9] << 16 | (FLAC__uint32)data[10] << 8 | (FLAC__uint32)data[11];
 				picture->height = (FLAC__uint32)data[12] << 24 | (FLAC__uint32)data[13] << 16 | (FLAC__uint32)data[14] << 8 | (FLAC__uint32)data[15];
 				if(color_type == 3) {
@@ -170,8 +176,6 @@ static FLAC__bool local__extract_resolution_color_info_(FLAC__StreamMetadata_Pic
 				picture->colors = clen / 3u;
 				return true;
 			}
-			else if(clen + 12 > len)
-				return false;
 			else {
 				data += 12 + clen;
 				len -= 12 + clen;
@@ -259,22 +263,72 @@ static FLAC__bool local__extract_resolution_color_info_(FLAC__StreamMetadata_Pic
 	return false;
 }
 
+static const char *error_messages[] = {
+	"memory allocation error",
+	"invalid picture specification",
+	"invalid picture specification: can't parse resolution/color part",
+	"unable to extract resolution and color info from URL, user must set explicitly",
+	"unable to extract resolution and color info from file, user must set explicitly",
+	"error opening picture file",
+	"error reading picture file",
+	"invalid picture type",
+	"unable to guess MIME type from file, user must set explicitly",
+	"type 1 icon must be a 32x32 pixel PNG",
+	"file not found", /* currently unused */
+	"file is too large",
+	"empty file"
+};
+
+static const char * read_file (const char * filepath, FLAC__StreamMetadata * obj)
+{
+	const FLAC__off_t size = grabbag__file_get_filesize(filepath);
+	FLAC__byte *buffer;
+	FILE *file;
+	const char *error_message=NULL;
+
+	if (size < 0)
+		return error_messages[5];
+
+	if (size == 0)
+		return error_messages[12];
+
+	if (size >= (FLAC__off_t)(1u << FLAC__STREAM_METADATA_LENGTH_LEN)) /* actual limit is less because of other fields in the PICTURE metadata block */
+		return error_messages[11];
+
+	if ((buffer = safe_malloc_(size)) == NULL)
+		return error_messages[0];
+
+	if ((file = flac_fopen(filepath, "rb")) == NULL) {
+		free(buffer);
+		return error_messages[5];
+	}
+
+	if (fread(buffer, 1, size, file) != (size_t) size) {
+		fclose(file);
+		free(buffer);
+		return error_messages[6];
+	}
+	fclose(file);
+
+	if (!FLAC__metadata_object_picture_set_data(obj, buffer, (FLAC__uint32)size, /*copy=*/false))
+		error_message = error_messages[6];
+	/* try to extract MIME type if user left it blank */
+	else if (*obj->data.picture.mime_type == '\0' && !local__extract_mime_type_(obj))
+		error_message = error_messages[8];
+	/* try to extract resolution/color info if user left it blank */
+	else if ((obj->data.picture.width == 0 || obj->data.picture.height == 0 || obj->data.picture.depth == 0) && !local__extract_resolution_color_info_(&obj->data.picture))
+		error_message = error_messages[4];
+	/* check metadata block size */
+	else if (obj->length >= (1u << FLAC__STREAM_METADATA_LENGTH_LEN))
+		error_message = error_messages[11];
+
+	return error_message;
+}
+
 FLAC__StreamMetadata *grabbag__picture_parse_specification(const char *spec, const char **error_message)
 {
 	FLAC__StreamMetadata *obj;
 	int state = 0;
-	static const char *error_messages[] = {
-		"memory allocation error",
-		"invalid picture specification",
-		"invalid picture specification: can't parse resolution/color part",
-		"unable to extract resolution and color info from URL, user must set explicitly",
-		"unable to extract resolution and color info from file, user must set explicitly",
-		"error opening picture file",
-		"error reading picture file",
-		"invalid picture type",
-		"unable to guess MIME type from file, user must set explicitly",
-		"type 1 icon must be a 32x32 pixel PNG"
-	};
 
 	FLAC__ASSERT(0 != spec);
 	FLAC__ASSERT(0 != error_message);
@@ -287,8 +341,10 @@ FLAC__StreamMetadata *grabbag__picture_parse_specification(const char *spec, con
 
 	*error_message = 0;
 
-	if(0 == (obj = FLAC__metadata_object_new(FLAC__METADATA_TYPE_PICTURE)))
+	if(0 == (obj = FLAC__metadata_object_new(FLAC__METADATA_TYPE_PICTURE))) {
 		*error_message = error_messages[0];
+		return obj;
+	}
 
 	if(strchr(spec, '|')) { /* full format */
 		const char *p;
@@ -348,47 +404,22 @@ FLAC__StreamMetadata *grabbag__picture_parse_specification(const char *spec, con
 			*error_message = error_messages[1];
 		else { /* 'spec' points to filename/URL */
 			if(0 == strcmp(obj->data.picture.mime_type, "-->")) { /* magic MIME type means URL */
-				if(!FLAC__metadata_object_picture_set_data(obj, (FLAC__byte*)spec, strlen(spec), /*copy=*/true))
+				if(strlen(spec) == 0)
+					*error_message = error_messages[1];
+				else if(!FLAC__metadata_object_picture_set_data(obj, (FLAC__byte*)spec, strlen(spec), /*copy=*/true))
 					*error_message = error_messages[0];
 				else if(obj->data.picture.width == 0 || obj->data.picture.height == 0 || obj->data.picture.depth == 0)
 					*error_message = error_messages[3];
 			}
 			else { /* regular picture file */
-				const off_t size = grabbag__file_get_filesize(spec);
-				if(size < 0)
-					*error_message = error_messages[5];
-				else {
-					FLAC__byte *buffer = (FLAC__byte*)safe_malloc_(size);
-					if(0 == buffer)
-						*error_message = error_messages[0];
-					else {
-						FILE *f = fopen(spec, "rb");
-						if(0 == f)
-							*error_message = error_messages[5];
-						else {
-							if(fread(buffer, 1, size, f) != (size_t)size)
-								*error_message = error_messages[6];
-							fclose(f);
-							if(0 == *error_message) {
-								if(!FLAC__metadata_object_picture_set_data(obj, buffer, size, /*copy=*/false))
-									*error_message = error_messages[6];
-								/* try to extract MIME type if user left it blank */
-								else if(*obj->data.picture.mime_type == '\0' && !local__extract_mime_type_(obj))
-									*error_message = error_messages[8];
-								/* try to extract resolution/color info if user left it blank */
-								else if((obj->data.picture.width == 0 || obj->data.picture.height == 0 || obj->data.picture.depth == 0) && !local__extract_resolution_color_info_(&obj->data.picture))
-									*error_message = error_messages[4];
-							}
-						}
-					}
-				}
+				*error_message = read_file (spec, obj);
 			}
 		}
 	}
 
 	if(*error_message == 0) {
 		if(
-			obj->data.picture.type == FLAC__STREAM_METADATA_PICTURE_TYPE_FILE_ICON_STANDARD && 
+			obj->data.picture.type == FLAC__STREAM_METADATA_PICTURE_TYPE_FILE_ICON_STANDARD &&
 			(
 				(strcmp(obj->data.picture.mime_type, "image/png") && strcmp(obj->data.picture.mime_type, "-->")) ||
 				obj->data.picture.width != 32 ||
@@ -399,6 +430,83 @@ FLAC__StreamMetadata *grabbag__picture_parse_specification(const char *spec, con
 	}
 
 	if(*error_message && obj) {
+		FLAC__metadata_object_delete(obj);
+		obj = 0;
+	}
+
+	return obj;
+}
+
+FLAC__StreamMetadata *grabbag__picture_from_specification(int type, const char *mime_type_in, const char * description,
+		const PictureResolution * res, const char * filepath, const char **error_message)
+{
+
+	FLAC__StreamMetadata *obj;
+	char mime_type [64] ;
+
+	if (error_message == 0)
+		return 0;
+
+	safe_strncpy(mime_type, mime_type_in, sizeof (mime_type));
+
+	*error_message = 0;
+
+	if ((obj = FLAC__metadata_object_new(FLAC__METADATA_TYPE_PICTURE)) == 0) {
+		*error_message = error_messages[0];
+		return obj;
+	}
+
+	/* Picture type if known. */
+	obj->data.picture.type = type >= 0 ? type : FLAC__STREAM_METADATA_PICTURE_TYPE_FRONT_COVER;
+
+	/* Mime type if known. */
+	if (mime_type_in && ! FLAC__metadata_object_picture_set_mime_type(obj, mime_type, /*copy=*/true)) {
+		*error_message = error_messages[0];
+		return obj;
+	}
+
+	/* Description if present. */
+	if (description && ! FLAC__metadata_object_picture_set_description(obj, (FLAC__byte*) description, /*copy=*/true)) {
+		*error_message = error_messages[0];
+		return obj;
+	}
+
+	if (res == NULL) {
+		obj->data.picture.width = 0;
+		obj->data.picture.height = 0;
+		obj->data.picture.depth = 0;
+		obj->data.picture.colors = 0;
+	}
+	else {
+		obj->data.picture.width = res->width;
+		obj->data.picture.height = res->height;
+		obj->data.picture.depth = res->depth;
+		obj->data.picture.colors = res->colors;
+	}
+
+	if (strcmp(obj->data.picture.mime_type, "-->") == 0) { /* magic MIME type means URL */
+		if (!FLAC__metadata_object_picture_set_data(obj, (FLAC__byte*)filepath, strlen(filepath), /*copy=*/true))
+			*error_message = error_messages[0];
+		else if (obj->data.picture.width == 0 || obj->data.picture.height == 0 || obj->data.picture.depth == 0)
+			*error_message = error_messages[3];
+	}
+	else {
+		*error_message = read_file (filepath, obj);
+	}
+
+	if (*error_message == NULL) {
+		if (
+			obj->data.picture.type == FLAC__STREAM_METADATA_PICTURE_TYPE_FILE_ICON_STANDARD &&
+			(
+				(strcmp(obj->data.picture.mime_type, "image/png") && strcmp(obj->data.picture.mime_type, "-->")) ||
+				obj->data.picture.width != 32 ||
+				obj->data.picture.height != 32
+			)
+		)
+			*error_message = error_messages[9];
+	}
+
+	if (*error_message && obj) {
 		FLAC__metadata_object_delete(obj);
 		obj = 0;
 	}

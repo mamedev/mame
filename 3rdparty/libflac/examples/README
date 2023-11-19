@@ -3,7 +3,7 @@ ways.
 
 The "c" directory has programs that are all in C and use libFLAC.
 
-The "cpp" directory has analogous programs that are all in C++ and use libFLAC++. 
+The "cpp" directory has analogous programs that are all in C++ and use libFLAC++.
 
 The programs are:
 c/decode/file/ - example_c_decode_file - Simple FLAC file decoder using libFLAC

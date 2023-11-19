@@ -1,5 +1,6 @@
 /* replaygain_synthesis - Routines for applying ReplayGain to a signal
- * Copyright (C) 2002,2003,2004,2005,2006,2007  Josh Coalson
+ * Copyright (C) 2002-2009  Josh Coalson
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,9 +21,9 @@
 #define FLAC__SHARE__REPLAYGAIN_SYNTHESIS_H
 
 #include <stdlib.h> /* for size_t */
-#include "FLAC/ordinals.h"
+#include "FLAC/format.h"
 
-#define FLAC_SHARE__MAX_SUPPORTED_CHANNELS 2
+#define FLAC_SHARE__MAX_SUPPORTED_CHANNELS FLAC__MAX_CHANNELS
 
 typedef enum {
 	NOISE_SHAPING_NONE = 0,
@@ -46,6 +47,6 @@ typedef struct {
 void FLAC__replaygain_synthesis__init_dither_context(DitherContext *dither, int bits, int shapingtype);
 
 /* scale = (float) pow(10., (double)replaygain * 0.05); */
-size_t FLAC__replaygain_synthesis__apply_gain(FLAC__byte *data_out, FLAC__bool little_endian_data_out, FLAC__bool unsigned_data_out, const FLAC__int32 * const input[], unsigned wide_samples, unsigned channels, const unsigned source_bps, const unsigned target_bps, const double scale, const FLAC__bool hard_limit, FLAC__bool do_dithering, DitherContext *dither_context);
+size_t FLAC__replaygain_synthesis__apply_gain(FLAC__byte *data_out, FLAC__bool little_endian_data_out, FLAC__bool unsigned_data_out, const FLAC__int32 * const input[], uint32_t wide_samples, uint32_t channels, const uint32_t source_bps, const uint32_t target_bps, const double scale, const FLAC__bool hard_limit, FLAC__bool do_dithering, DitherContext *dither_context);
 
 #endif

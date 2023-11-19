@@ -1,5 +1,6 @@
 /* example_c_decode_file - Simple FLAC file decoder using libFLAC
- * Copyright (C) 2007  Josh Coalson
+ * Copyright (C) 2007-2009  Josh Coalson
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -11,9 +12,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 /*
@@ -21,15 +22,16 @@
  * file.  It only supports 16-bit stereo files.
  *
  * Complete API documentation can be found at:
- *   http://flac.sourceforge.net/api/
+ *   http://xiph.org/flac/api/
  */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #  include <config.h>
 #endif
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "share/compat.h"
 #include "FLAC/stream_decoder.h"
 
 static FLAC__StreamDecoderWriteStatus write_callback(const FLAC__StreamDecoder *decoder, const FLAC__Frame *frame, const FLAC__int32 * const buffer[], void *client_data);
@@ -123,6 +125,18 @@ FLAC__StreamDecoderWriteStatus write_callback(const FLAC__StreamDecoder *decoder
 		fprintf(stderr, "ERROR: this example only supports 16bit stereo streams\n");
 		return FLAC__STREAM_DECODER_WRITE_STATUS_ABORT;
 	}
+	if(frame->header.channels != 2) {
+		fprintf(stderr, "ERROR: This frame contains %u channels (should be 2)\n", frame->header.channels);
+		return FLAC__STREAM_DECODER_WRITE_STATUS_ABORT;
+	}
+	if(buffer [0] == NULL) {
+		fprintf(stderr, "ERROR: buffer [0] is NULL\n");
+		return FLAC__STREAM_DECODER_WRITE_STATUS_ABORT;
+	}
+	if(buffer [1] == NULL) {
+		fprintf(stderr, "ERROR: buffer [1] is NULL\n");
+		return FLAC__STREAM_DECODER_WRITE_STATUS_ABORT;
+	}
 
 	/* write WAVE header before we write the first frame */
 	if(frame->header.number.sample_number == 0) {
@@ -174,11 +188,7 @@ void metadata_callback(const FLAC__StreamDecoder *decoder, const FLAC__StreamMet
 		fprintf(stderr, "sample rate    : %u Hz\n", sample_rate);
 		fprintf(stderr, "channels       : %u\n", channels);
 		fprintf(stderr, "bits per sample: %u\n", bps);
-#ifdef _MSC_VER
-		fprintf(stderr, "total samples  : %I64u\n", total_samples);
-#else
-		fprintf(stderr, "total samples  : %llu\n", total_samples);
-#endif
+		fprintf(stderr, "total samples  : %" PRIu64 "\n", total_samples);
 	}
 }
 

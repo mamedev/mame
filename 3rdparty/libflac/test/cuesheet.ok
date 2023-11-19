@@ -91,3 +91,4 @@ POSITIVE cuesheets/good.001.cue
 POSITIVE cuesheets/good.002.dos_format.cue
 POSITIVE cuesheets/good.003.missing_final_newline.cue
 POSITIVE cuesheets/good.004.dos_format.missing_final_newline.cue
+POSITIVE cuesheets/good.005.quoted.isrc.cue

@@ -1,5 +1,6 @@
 #  test_libs_common - Common code to library unit tests
-#  Copyright (C) 2000,2001,2002,2003,2004,2005,2006,2007  Josh Coalson
+#  Copyright (C) 2000-2009  Josh Coalson
+#  Copyright (C) 2011-2023  Xiph.Org Foundation
 #
 #  This program is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU General Public License
@@ -11,11 +12,11 @@
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
 #
-#  You should have received a copy of the GNU General Public License
-#  along with this program; if not, write to the Free Software
-#  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+#  You should have received a copy of the GNU General Public License along
+#  with this program; if not, write to the Free Software Foundation, Inc.,
+#  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-INCLUDES = -I$(top_srcdir)/include
+AM_CPPFLAGS = -I$(top_builddir) -I$(srcdir)/include -I$(top_srcdir)/include
 
 noinst_LTLIBRARIES = libtest_libs_common.la
 
@@ -24,7 +25,5 @@ libtest_libs_common_la_SOURCES = \
 	metadata_utils.c
 
 EXTRA_DIST = \
-	Makefile.lite \
-	README \
-	test_libs_common_static.dsp \
-	test_libs_common_static.vcproj
+	CMakeLists.txt \
+	README

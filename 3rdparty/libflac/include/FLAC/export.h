@@ -1,5 +1,6 @@
 /* libFLAC - Free Lossless Audio Codec library
- * Copyright (C) 2000,2001,2002,2003,2004,2005,2006,2007  Josh Coalson
+ * Copyright (C) 2000-2009  Josh Coalson
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -35,7 +36,7 @@
 /** \file include/FLAC/export.h
  *
  *  \brief
- *  This module contains #defines and symbols for exporting function
+ *  This module contains \#defines and symbols for exporting function
  *  calls, and providing version information and compiled-in features.
  *
  *  See the \link flac_export export \endlink module.
@@ -45,35 +46,58 @@
  *  \ingroup flac
  *
  *  \brief
- *  This module contains #defines and symbols for exporting function
+ *  This module contains \#defines and symbols for exporting function
  *  calls, and providing version information and compiled-in features.
  *
- *  If you are compiling with MSVC and will link to the static library
- *  (libFLAC.lib) you should define FLAC__NO_DLL in your project to
- *  make sure the symbols are exported properly.
+ *  If you are compiling for Windows (with Visual Studio or MinGW for
+ *  example) and will link to the static library (libFLAC++.lib) you
+ *  should define FLAC__NO_DLL in your project to make sure the symbols
+ *  are exported properly.
  *
  * \{
  */
 
-#if defined(FLAC__NO_DLL) || !defined(_MSC_VER)
+/** This \#define is used internally in libFLAC and its headers to make
+ * sure the correct symbols are exported when working with shared
+ * libraries. On Windows, this \#define is set to __declspec(dllexport)
+ * when compiling libFLAC into a library and to __declspec(dllimport)
+ * when the headers are used to link to that DLL. On non-Windows systems
+ * it is used to set symbol visibility.
+ *
+ * Because of this, the define FLAC__NO_DLL must be defined when linking
+ * to libFLAC statically or linking will fail.
+ */
+/* This has grown quite complicated. FLAC__NO_DLL is used by MSVC sln
+ * files and CMake, which build either static or shared. autotools can
+ * build static, shared or **both**. Therefore, DLL_EXPORT, which is set
+ * by libtool, must override FLAC__NO_DLL on building shared components
+ */
+#if defined(_WIN32)
+
+#if defined(FLAC__NO_DLL) && !(defined(DLL_EXPORT))
+#define FLAC_API
+#else
+#ifdef FLAC_API_EXPORTS
+#define	FLAC_API __declspec(dllexport)
+#else
+#define FLAC_API __declspec(dllimport)
+#endif
+#endif
+
+#elif defined(FLAC__USE_VISIBILITY_ATTR)
+#define FLAC_API __attribute__ ((visibility ("default")))
+
+#else
 #define FLAC_API
 
-#else
-
-#ifdef FLAC_API_EXPORTS
-#define	FLAC_API	_declspec(dllexport)
-#else
-#define FLAC_API	_declspec(dllimport)
-
-#endif
 #endif
 
-/** These #defines will mirror the libtool-based library version number, see
- * http://www.gnu.org/software/libtool/manual.html#Libtool-versioning
+/** These \#defines will mirror the libtool-based library version number, see
+ * http://www.gnu.org/software/libtool/manual/libtool.html#Libtool-versioning
  */
-#define FLAC_API_VERSION_CURRENT 10
+#define FLAC_API_VERSION_CURRENT 13
 #define FLAC_API_VERSION_REVISION 0 /**< see above */
-#define FLAC_API_VERSION_AGE 2 /**< see above */
+#define FLAC_API_VERSION_AGE 1 /**< see above */
 
 #ifdef __cplusplus
 extern "C" {

@@ -1,5 +1,6 @@
 /* libFLAC - Free Lossless Audio Codec library
- * Copyright (C) 2004,2005,2006,2007  Josh Coalson
+ * Copyright (C) 2004-2009  Josh Coalson
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -89,7 +90,9 @@ typedef void* FLAC__IOHandle;
 
 /** Signature for the read callback.
  *  The signature and semantics match POSIX fread() implementations
- *  and can generally be used interchangeably.
+ *  and can generally be used interchangeably. Note that the global
+ *  variable errno from errno.h is read by some libFLAC functions to
+ *  detect read errors.
  *
  * \param  ptr      The address of the read buffer.
  * \param  size     The size of the records to be read.
@@ -164,15 +167,18 @@ typedef int (*FLAC__IOCallback_Close) (FLAC__IOHandle handle);
  *  required may be set to NULL.
  *
  *  If the seek requirement for an interface is optional, you can signify that
- *  a data sorce is not seekable by setting the \a seek field to \c NULL.
+ *  a data source is not seekable by setting the \a seek field to \c NULL.
+ *
+ *  See the detailed documentation for callbacks in the
+ *  \link flac_callbacks callbacks \endlink module.
  */
 typedef struct {
-	FLAC__IOCallback_Read read;
-	FLAC__IOCallback_Write write;
-	FLAC__IOCallback_Seek seek;
-	FLAC__IOCallback_Tell tell;
-	FLAC__IOCallback_Eof eof;
-	FLAC__IOCallback_Close close;
+	FLAC__IOCallback_Read read;   /**< See FLAC__IOCallbacks */
+	FLAC__IOCallback_Write write; /**< See FLAC__IOCallbacks */
+	FLAC__IOCallback_Seek seek;   /**< See FLAC__IOCallbacks */
+	FLAC__IOCallback_Tell tell;   /**< See FLAC__IOCallbacks */
+	FLAC__IOCallback_Eof eof;     /**< See FLAC__IOCallbacks */
+	FLAC__IOCallback_Close close; /**< See FLAC__IOCallbacks */
 } FLAC__IOCallbacks;
 
 /* \} */

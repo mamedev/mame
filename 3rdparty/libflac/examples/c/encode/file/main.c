@@ -1,5 +1,6 @@
 /* example_c_encode_file - Simple FLAC file encoder using libFLAC
- * Copyright (C) 2007  Josh Coalson
+ * Copyright (C) 2007-2009  Josh Coalson
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -11,9 +12,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 /*
@@ -21,16 +22,17 @@
  * file.  It only supports 16-bit stereo files in canonical WAVE format.
  *
  * Complete API documentation can be found at:
- *   http://flac.sourceforge.net/api/
+ *   http://xiph.org/flac/api/
  */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #  include <config.h>
 #endif
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "share/compat.h"
 #include "FLAC/metadata.h"
 #include "FLAC/stream_encoder.h"
 
@@ -79,7 +81,7 @@ int main(int argc, char *argv[])
 	channels = 2;
 	bps = 16;
 	total_samples = (((((((unsigned)buffer[43] << 8) | buffer[42]) << 8) | buffer[41]) << 8) | buffer[40]) / 4;
-   
+
 	/* allocate the encoder */
 	if((encoder = FLAC__stream_encoder_new()) == NULL) {
 		fprintf(stderr, "ERROR: allocating encoder\n");
@@ -107,11 +109,13 @@ int main(int argc, char *argv[])
 		) {
 			fprintf(stderr, "ERROR: out of memory or tag error\n");
 			ok = false;
-		}
+		} else {
 
-		metadata[1]->length = 1234; /* set the padding length */
+			metadata[1]->length = 1234; /* set the padding length */
 
-		ok = FLAC__stream_encoder_set_metadata(encoder, metadata, 2);
+			ok = FLAC__stream_encoder_set_metadata(encoder, metadata, 2);
+
+                }
 	}
 
 	/* initialize encoder */
@@ -165,9 +169,5 @@ void progress_callback(const FLAC__StreamEncoder *encoder, FLAC__uint64 bytes_wr
 {
 	(void)encoder, (void)client_data;
 
-#ifdef _MSC_VER
-	fprintf(stderr, "wrote %I64u bytes, %I64u/%u samples, %u/%u frames\n", bytes_written, samples_written, total_samples, frames_written, total_frames_estimate);
-#else
-	fprintf(stderr, "wrote %llu bytes, %llu/%u samples, %u/%u frames\n", bytes_written, samples_written, total_samples, frames_written, total_frames_estimate);
-#endif
+	fprintf(stderr, "wrote %" PRIu64 " bytes, %" PRIu64 "/%u samples, %u/%u frames\n", bytes_written, samples_written, total_samples, frames_written, total_frames_estimate);
 }

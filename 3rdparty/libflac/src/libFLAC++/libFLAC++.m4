@@ -51,19 +51,16 @@ dnl
 dnl Now check if the installed libFLAC++ is sufficiently new.
 dnl
       rm -f conf.libFLAC++test
-      AC_TRY_RUN([
+      AC_RUN_IFELSE([AC_LANG_PROGRAM([[
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <FLAC++/decoder.h>
-
-int main ()
-{
+]],[[
   system("touch conf.libFLAC++test");
   return 0;
-}
+]])],[],[no_libFLACPP=yes],[echo $ac_n "cross compiling; assumed OK... $ac_c"])
 
-],, no_libFLACPP=yes,[echo $ac_n "cross compiling; assumed OK... $ac_c"])
        CFLAGS="$ac_save_CFLAGS"
        CXXFLAGS="$ac_save_CXXFLAGS"
        LIBS="$ac_save_LIBS"
@@ -97,7 +94,7 @@ int main ()
        echo "*** If you have an old version installed, it is best to remove it, although"
        echo "*** you may also be able to get things to work by modifying LD_LIBRARY_PATH"],
        [ echo "*** The test program failed to compile or link. See the file config.log for the"
-       echo "*** exact error that occured. This usually means libFLAC++ was incorrectly installed"
+       echo "*** exact error that occurred. This usually means libFLAC++ was incorrectly installed"
        echo "*** or that you have moved libFLAC++ since it was installed. In the latter case, you"
        echo "*** may want to edit the libFLAC++-config script: $LIBFLACPP_CONFIG" ])
        CFLAGS="$ac_save_CFLAGS"

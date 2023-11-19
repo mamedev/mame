@@ -1,5 +1,6 @@
 /* test_libFLAC++ - Unit tester for libFLAC++
- * Copyright (C) 2002,2003,2004,2005,2006,2007  Josh Coalson
+ * Copyright (C) 2002-2009  Josh Coalson
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -11,10 +12,14 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 #include "encoders.h"
 #include "FLAC/assert.h"
@@ -28,6 +33,12 @@ extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "share/compat.h"
+
+#ifdef _MSC_VER
+// warning C4800: 'int' : forcing to bool 'true' or 'false' (performance warning)
+#pragma warning ( disable : 4800 )
+#endif
 
 typedef enum {
 	LAYER_STREAM = 0, /* FLAC__stream_encoder_init_stream() without seeking */
@@ -45,7 +56,7 @@ static const char * const LayerString[] = {
 
 static ::FLAC__StreamMetadata streaminfo_, padding_, seektable_, application1_, application2_, vorbiscomment_, cuesheet_, picture_, unknown_;
 static ::FLAC__StreamMetadata *metadata_sequence_[] = { &vorbiscomment_, &padding_, &seektable_, &application1_, &application2_, &cuesheet_, &picture_, &unknown_ };
-static const unsigned num_metadata_ = sizeof(metadata_sequence_) / sizeof(metadata_sequence_[0]);
+static const uint32_t num_metadata_ = sizeof(metadata_sequence_) / sizeof(metadata_sequence_[0]);
 
 static const char *flacfilename(bool is_ogg)
 {
@@ -67,10 +78,10 @@ static bool die_s_(const char *msg, const FLAC::Encoder::Stream *encoder)
 	else
 		printf("FAILED");
 
-	printf(", state = %u (%s)\n", (unsigned)((::FLAC__StreamEncoderState)state), state.as_cstring());
+	printf(", state = %u (%s)\n", (uint32_t)((::FLAC__StreamEncoderState)state), state.as_cstring());
 	if(state == ::FLAC__STREAM_ENCODER_VERIFY_DECODER_ERROR) {
 		FLAC::Decoder::Stream::State dstate = encoder->get_verify_decoder_state();
-		printf("      verify decoder state = %u (%s)\n", (unsigned)((::FLAC__StreamDecoderState)dstate), dstate.as_cstring());
+		printf("      verify decoder state = %u (%s)\n", (uint32_t)((::FLAC__StreamDecoderState)dstate), dstate.as_cstring());
 	}
 
 	return false;
@@ -96,10 +107,13 @@ public:
 
 	// from FLAC::Encoder::Stream
 	::FLAC__StreamEncoderReadStatus read_callback(FLAC__byte buffer[], size_t *bytes);
-	::FLAC__StreamEncoderWriteStatus write_callback(const FLAC__byte buffer[], size_t bytes, unsigned samples, unsigned current_frame);
+	::FLAC__StreamEncoderWriteStatus write_callback(const FLAC__byte buffer[], size_t bytes, uint32_t samples, uint32_t current_frame);
 	::FLAC__StreamEncoderSeekStatus seek_callback(FLAC__uint64 absolute_byte_offset);
 	::FLAC__StreamEncoderTellStatus tell_callback(FLAC__uint64 *absolute_byte_offset);
 	void metadata_callback(const ::FLAC__StreamMetadata *metadata);
+private:
+	StreamEncoder(const StreamEncoder&);
+	StreamEncoder&operator=(const StreamEncoder&);
 };
 
 ::FLAC__StreamEncoderReadStatus StreamEncoder::read_callback(FLAC__byte buffer[], size_t *bytes)
@@ -117,7 +131,7 @@ public:
 		return ::FLAC__STREAM_ENCODER_READ_STATUS_ABORT;
 }
 
-::FLAC__StreamEncoderWriteStatus StreamEncoder::write_callback(const FLAC__byte buffer[], size_t bytes, unsigned samples, unsigned current_frame)
+::FLAC__StreamEncoderWriteStatus StreamEncoder::write_callback(const FLAC__byte buffer[], size_t bytes, uint32_t samples, uint32_t current_frame)
 {
 	(void)samples, (void)current_frame;
 
@@ -131,7 +145,7 @@ public:
 {
 	if(layer_==LAYER_STREAM)
 		return ::FLAC__STREAM_ENCODER_SEEK_STATUS_UNSUPPORTED;
-	else if(fseek(file_, (long)absolute_byte_offset, SEEK_SET) < 0)
+	else if(fseeko(file_, (FLAC__off_t)absolute_byte_offset, SEEK_SET) < 0)
 		return FLAC__STREAM_ENCODER_SEEK_STATUS_ERROR;
 	else
 		return FLAC__STREAM_ENCODER_SEEK_STATUS_OK;
@@ -139,10 +153,10 @@ public:
 
 ::FLAC__StreamEncoderTellStatus StreamEncoder::tell_callback(FLAC__uint64 *absolute_byte_offset)
 {
-	long pos;
+	FLAC__off_t pos;
 	if(layer_==LAYER_STREAM)
 		return ::FLAC__STREAM_ENCODER_TELL_STATUS_UNSUPPORTED;
-	else if((pos = ftell(file_)) < 0)
+	else if((pos = ftello(file_)) < 0)
 		return FLAC__STREAM_ENCODER_TELL_STATUS_ERROR;
 	else {
 		*absolute_byte_offset = (FLAC__uint64)pos;
@@ -163,10 +177,10 @@ public:
 	~FileEncoder() { }
 
 	// from FLAC::Encoder::File
-	void progress_callback(FLAC__uint64 bytes_written, FLAC__uint64 samples_written, unsigned frames_written, unsigned total_frames_estimate);
+	void progress_callback(FLAC__uint64 bytes_written, FLAC__uint64 samples_written, uint32_t frames_written, uint32_t total_frames_estimate);
 };
 
-void FileEncoder::progress_callback(FLAC__uint64 bytes_written, FLAC__uint64 samples_written, unsigned frames_written, unsigned total_frames_estimate)
+void FileEncoder::progress_callback(FLAC__uint64 bytes_written, FLAC__uint64 samples_written, uint32_t frames_written, uint32_t total_frames_estimate)
 {
 	(void)bytes_written, (void)samples_written, (void)frames_written, (void)total_frames_estimate;
 }
@@ -186,7 +200,7 @@ static bool test_stream_encoder(Layer layer, bool is_ogg)
 	FILE *file = 0;
 	FLAC__int32 samples[1024];
 	FLAC__int32 *samples_array[1] = { samples };
-	unsigned i;
+	uint32_t i;
 
 	printf("\n+++ libFLAC++ unit test: FLAC::Encoder::%s (layer: %s, format: %s)\n\n", layer<LAYER_FILE? "Stream":"File", LayerString[layer], is_ogg? "Ogg FLAC":"FLAC");
 
@@ -201,6 +215,7 @@ static bool test_stream_encoder(Layer layer, bool is_ogg)
 	printf("testing is_valid()... ");
 	if(!encoder->is_valid()) {
 		printf("FAILED, returned false\n");
+		delete encoder;
 		return false;
 	}
 	printf("OK\n");
@@ -238,7 +253,7 @@ static bool test_stream_encoder(Layer layer, bool is_ogg)
 	printf("OK\n");
 
 	printf("testing set_compression_level()... ");
-	if(!encoder->set_compression_level((unsigned)(-1)))
+	if(!encoder->set_compression_level((uint32_t)(-1)))
 		return die_s_("returned false", encoder);
 	printf("OK\n");
 
@@ -307,9 +322,14 @@ static bool test_stream_encoder(Layer layer, bool is_ogg)
 		return die_s_("returned false", encoder);
 	printf("OK\n");
 
+	printf("testing set_limit_min_bitrate()... ");
+	if(!encoder->set_limit_min_bitrate(true))
+		return die_s_("returned false", encoder);
+	printf("OK\n");
+
 	if(layer < LAYER_FILENAME) {
 		printf("opening file for FLAC output... ");
-		file = ::fopen(flacfilename(is_ogg), "w+b");
+		file = ::flac_fopen(flacfilename(is_ogg), "w+b");
 		if(0 == file) {
 			printf("ERROR (%s)\n", strerror(errno));
 			return false;
@@ -347,17 +367,17 @@ static bool test_stream_encoder(Layer layer, bool is_ogg)
 
 	printf("testing get_state()... ");
 	FLAC::Encoder::Stream::State state = encoder->get_state();
-	printf("returned state = %u (%s)... OK\n", (unsigned)((::FLAC__StreamEncoderState)state), state.as_cstring());
+	printf("returned state = %u (%s)... OK\n", (uint32_t)((::FLAC__StreamEncoderState)state), state.as_cstring());
 
 	printf("testing get_verify_decoder_state()... ");
 	FLAC::Decoder::Stream::State dstate = encoder->get_verify_decoder_state();
-	printf("returned state = %u (%s)... OK\n", (unsigned)((::FLAC__StreamDecoderState)dstate), dstate.as_cstring());
+	printf("returned state = %u (%s)... OK\n", (uint32_t)((::FLAC__StreamDecoderState)dstate), dstate.as_cstring());
 
 	{
 		FLAC__uint64 absolute_sample;
-		unsigned frame_number;
-		unsigned channel;
-		unsigned sample;
+		uint32_t frame_number;
+		uint32_t channel;
+		uint32_t sample;
 		FLAC__int32 expected;
 		FLAC__int32 got;
 
@@ -424,7 +444,7 @@ static bool test_stream_encoder(Layer layer, bool is_ogg)
 
 	printf("testing get_max_lpc_order()... ");
 	if(encoder->get_max_lpc_order() != 0) {
-		printf("FAILED, expected %u, got %u\n", 0, encoder->get_max_lpc_order());
+		printf("FAILED, expected %d, got %u\n", 0, encoder->get_max_lpc_order());
 		return false;
 	}
 	printf("OK\n");
@@ -457,32 +477,35 @@ static bool test_stream_encoder(Layer layer, bool is_ogg)
 
 	printf("testing get_min_residual_partition_order()... ");
 	if(encoder->get_min_residual_partition_order() != 0) {
-		printf("FAILED, expected %u, got %u\n", 0, encoder->get_min_residual_partition_order());
+		printf("FAILED, expected %d, got %u\n", 0, encoder->get_min_residual_partition_order());
 		return false;
 	}
 	printf("OK\n");
 
 	printf("testing get_max_residual_partition_order()... ");
 	if(encoder->get_max_residual_partition_order() != 0) {
-		printf("FAILED, expected %u, got %u\n", 0, encoder->get_max_residual_partition_order());
+		printf("FAILED, expected %d, got %u\n", 0, encoder->get_max_residual_partition_order());
 		return false;
 	}
 	printf("OK\n");
 
 	printf("testing get_rice_parameter_search_dist()... ");
 	if(encoder->get_rice_parameter_search_dist() != 0) {
-		printf("FAILED, expected %u, got %u\n", 0, encoder->get_rice_parameter_search_dist());
+		printf("FAILED, expected %d, got %u\n", 0, encoder->get_rice_parameter_search_dist());
 		return false;
 	}
 	printf("OK\n");
 
 	printf("testing get_total_samples_estimate()... ");
 	if(encoder->get_total_samples_estimate() != streaminfo_.data.stream_info.total_samples) {
-#ifdef _MSC_VER
-		printf("FAILED, expected %I64u, got %I64u\n", streaminfo_.data.stream_info.total_samples, encoder->get_total_samples_estimate());
-#else
-		printf("FAILED, expected %llu, got %llu\n", (unsigned long long)streaminfo_.data.stream_info.total_samples, (unsigned long long)encoder->get_total_samples_estimate());
-#endif
+		printf("FAILED, expected %" PRIu64 ", got %" PRIu64 "\n", streaminfo_.data.stream_info.total_samples, encoder->get_total_samples_estimate());
+		return false;
+	}
+	printf("OK\n");
+	
+	printf("testing get_limit_min_bitrate()... ");
+	if(encoder->get_limit_min_bitrate() != true) {
+		printf("FAILED, expected true, got false\n");
 		return false;
 	}
 	printf("OK\n");
@@ -503,8 +526,8 @@ static bool test_stream_encoder(Layer layer, bool is_ogg)
 
 	printf("testing finish()... ");
 	if(!encoder->finish()) {
-		FLAC::Encoder::Stream::State state = encoder->get_state();
-		printf("FAILED, returned false, state = %u (%s)\n", (unsigned)((::FLAC__StreamEncoderState)state), state.as_cstring());
+		state = encoder->get_state();
+		printf("FAILED, returned false, state = %u (%s)\n", (uint32_t)((::FLAC__StreamEncoderState)state), state.as_cstring());
 		return false;
 	}
 	printf("OK\n");

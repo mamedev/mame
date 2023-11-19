@@ -1,5 +1,6 @@
 #  libFLAC++ - Free Lossless Audio Codec library
-#  Copyright (C) 2002,2003,2004,2005,2006,2007  Josh Coalson
+#  Copyright (C) 2002-2009  Josh Coalson
+#  Copyright (C) 2011-2023  Xiph.Org Foundation
 #
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions
@@ -29,27 +30,39 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 lib_LTLIBRARIES = libFLAC++.la
+noinst_LTLIBRARIES = libFLAC++-static.la
 
 m4datadir = $(datadir)/aclocal
 m4data_DATA = libFLAC++.m4
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = flac++.pc
-
+AM_CPPFLAGS = -I$(top_builddir) -I$(srcdir)/include -I$(top_srcdir)/include
 EXTRA_DIST = \
-	Makefile.lite \
+	CMakeLists.txt \
 	flac++.pc.in \
-	libFLAC++_dynamic.dsp \
-	libFLAC++_dynamic.vcproj \
-	libFLAC++_static.dsp \
-	libFLAC++_static.vcproj \
-	libFLAC++.m4
+	libFLAC++.m4 \
+	version.rc
 
-# see 'http://www.gnu.org/software/libtool/manual.html#Libtool-versioning' for numbering convention
-libFLAC___la_LDFLAGS = -version-info 8:0:2
-libFLAC___la_LIBADD = ../libFLAC/libFLAC.la
-
-libFLAC___la_SOURCES = \
+libFLAC___sources = \
 	metadata.cpp \
 	stream_decoder.cpp \
 	stream_encoder.cpp
+
+if OS_IS_WINDOWS
+if HAVE_WINDRES
+libFLAC___la_DEPENDENCIES = version.o
+windows_resource_link = -Wl,version.o
+endif
+endif
+
+# see 'http://www.gnu.org/software/libtool/manual/libtool.html#Libtool-versioning' for numbering convention
+libFLAC___la_LDFLAGS = $(AM_LDFLAGS) -no-undefined -version-info 10:1:0 $(windows_resource_link)
+libFLAC___la_LIBADD = ../libFLAC/libFLAC.la
+libFLAC___la_SOURCES = $(libFLAC___sources)
+
+libFLAC___static_la_SOURCES = $(libFLAC___sources)
+libFLAC___static_la_LIBADD = ../libFLAC/libFLAC-static.la
+
+.rc.o:
+	$(RC) $(AM_CPPFLAGS) $< $@

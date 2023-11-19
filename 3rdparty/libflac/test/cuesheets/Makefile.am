@@ -1,8 +1,9 @@
 #  FLAC - Free Lossless Audio Codec
-#  Copyright (C) 2001,2002,2003,2004,2005,2006,2007  Josh Coalson
+#  Copyright (C) 2001-2009  Josh Coalson
+#  Copyright (C) 2011-2023  Xiph.Org Foundation
 #
 #  This file is part the FLAC project.  FLAC is comprised of several
-#  components distributed under difference licenses.  The codec libraries
+#  components distributed under different licenses.  The codec libraries
 #  are distributed under Xiph.Org's BSD-like license (see the file
 #  COPYING.Xiph in this distribution).  All other programs, libraries, and
 #  plugins are distributed under the GPL (see COPYING.GPL).  The documentation
@@ -64,4 +65,5 @@ EXTRA_DIST = \
 	good.001.cue \
 	good.002.dos_format.cue \
 	good.003.missing_final_newline.cue \
-	good.004.dos_format.missing_final_newline.cue
+	good.004.dos_format.missing_final_newline.cue \
+	good.005.quoted.isrc.cue

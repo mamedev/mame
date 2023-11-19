@@ -1,5 +1,6 @@
 #  libFLAC - Free Lossless Audio Codec library
-#  Copyright (C) 2001,2002,2003,2004,2005,2006,2007  Josh Coalson
+#  Copyright (C) 2001-2009  Josh Coalson
+#  Copyright (C) 2011-2023  Xiph.Org Foundation
 #
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions
@@ -39,6 +40,7 @@ noinst_HEADERS = \
 	float.h \
 	format.h \
 	lpc.h \
+	macros.h \
 	md5.h \
 	memory.h \
 	metadata.h \
@@ -46,5 +48,6 @@ noinst_HEADERS = \
 	ogg_encoder_aspect.h \
 	ogg_helper.h \
 	ogg_mapping.h \
+	stream_encoder.h \
 	stream_encoder_framing.h \
 	window.h

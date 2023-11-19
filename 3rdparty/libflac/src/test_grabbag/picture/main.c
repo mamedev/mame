@@ -1,5 +1,6 @@
 /* test_picture - Simple tester for picture routines in grabbag
- * Copyright (C) 2006,2007  Josh Coalson
+ * Copyright (C) 2006-2009  Josh Coalson
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -11,12 +12,12 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #  include <config.h>
 #endif
 
@@ -56,34 +57,30 @@ static FLAC__bool debug_ = false;
 
 static FLAC__bool failed_(const char *msg)
 {
-    if(msg)
-        printf("FAILED, %s\n", msg);
-    else
-        printf("FAILED\n");
+	if(msg)
+		printf("FAILED, %s\n", msg);
+	else
+		printf("FAILED\n");
 
-    return false;
+	return false;
 }
 
-static FLAC__bool test_one_picture(const char *prefix, const PictureFile *pf, const char *res, FLAC__bool fn_only)
+static FLAC__bool test_one_picture(const char *prefix, const PictureFile *pf, const PictureResolution * res, FLAC__bool fn_only)
 {
 	FLAC__StreamMetadata *obj;
 	const char *error;
 	char s[4096];
 	if(fn_only)
-#if defined _MSC_VER || defined __MINGW32__
-		_snprintf(s, sizeof(s)-1, "%s/%s", prefix, pf->path);
-#else
-		snprintf(s, sizeof(s)-1, "%s/%s", prefix, pf->path);
-#endif
+		flac_snprintf(s, sizeof(s), "pictures/%s", pf->path);
+	else if (res == NULL)
+		flac_snprintf(s, sizeof(s), "%u|%s|%s||pictures/%s", (uint32_t)pf->type, pf->mime_type, pf->description, pf->path);
 	else
-#if defined _MSC_VER || defined __MINGW32__
-		_snprintf(s, sizeof(s)-1, "%u|%s|%s|%s|%s/%s", (unsigned)pf->type, pf->mime_type, pf->description, res, prefix, pf->path);
-#else
-		snprintf(s, sizeof(s)-1, "%u|%s|%s|%s|%s/%s", (unsigned)pf->type, pf->mime_type, pf->description, res, prefix, pf->path);
-#endif
+		flac_snprintf(s, sizeof(s), "%u|%s|%s|%dx%dx%d/%d|pictures/%s", (uint32_t)pf->type, pf->mime_type, pf->description, res->width, res->height, res->depth, res->colors, pf->path);
 
 	printf("testing grabbag__picture_parse_specification(\"%s\")... ", s);
-	if(0 == (obj = grabbag__picture_parse_specification(s, &error)))
+
+	flac_snprintf(s, sizeof(s), "%s/%s", prefix, pf->path);
+	if((obj = grabbag__picture_from_specification(fn_only? FLAC__STREAM_METADATA_PICTURE_TYPE_FRONT_COVER : pf->type, pf->mime_type, pf->description, res, s, &error)) == 0)
 		return failed_(error);
 	if(debug_) {
 		printf("\ntype=%u (%s)\nmime_type=%s\ndescription=%s\nwidth=%u\nheight=%u\ndepth=%u\ncolors=%u\ndata_length=%u\n",
@@ -121,10 +118,11 @@ static FLAC__bool test_one_picture(const char *prefix, const PictureFile *pf, co
 static FLAC__bool do_picture(const char *prefix)
 {
 	FLAC__StreamMetadata *obj;
+	PictureResolution res;
 	const char *error;
 	size_t i;
 
-    printf("\n+++ grabbag unit test: picture\n\n");
+	printf("\n+++ grabbag unit test: picture\n\n");
 
 	/* invalid spec: no filename */
 	printf("testing grabbag__picture_parse_specification(\"\")... ");
@@ -188,19 +186,19 @@ static FLAC__bool do_picture(const char *prefix)
 
 	/* test automatic parsing of picture files from only the file name */
 	for(i = 0; i < sizeof(picturefiles)/sizeof(picturefiles[0]); i++)
-		if(!test_one_picture(prefix, picturefiles+i, "", /*fn_only=*/true))
+		if(!test_one_picture(prefix, picturefiles+i, NULL, /*fn_only=*/true))
 			return false;
 
 	/* test automatic parsing of picture files to get resolution/color info */
 	for(i = 0; i < sizeof(picturefiles)/sizeof(picturefiles[0]); i++)
-		if(!test_one_picture(prefix, picturefiles+i, "", /*fn_only=*/false))
+		if(!test_one_picture(prefix, picturefiles+i, NULL, /*fn_only=*/false))
 			return false;
 
-	picturefiles[0].width = 320;
-	picturefiles[0].height = 240;
-	picturefiles[0].depth = 3;
-	picturefiles[0].colors = 2;
-	if(!test_one_picture(prefix, picturefiles+0, "320x240x3/2", /*fn_only=*/false))
+	res.width = picturefiles[0].width = 320;
+	res.height = picturefiles[0].height = 240;
+	res.depth = picturefiles[0].depth = 3;
+	res.colors = picturefiles[0].colors = 2;
+	if(!test_one_picture(prefix, picturefiles+0, &res, /*fn_only=*/false))
 		return false;
 
 	return true;
@@ -211,12 +209,12 @@ int main(int argc, char *argv[])
 	const char *usage = "usage: test_pictures path_prefix\n";
 
 	if(argc > 1 && 0 == strcmp(argv[1], "-h")) {
-		printf(usage);
+		puts(usage);
 		return 0;
 	}
 
 	if(argc != 2) {
-		fprintf(stderr, usage);
+		fputs(usage, stderr);
 		return 255;
 	}
 

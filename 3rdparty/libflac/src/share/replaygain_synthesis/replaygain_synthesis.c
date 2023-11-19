@@ -1,5 +1,6 @@
 /* replaygain_synthesis - Routines for applying ReplayGain to a signal
- * Copyright (C) 2002,2003,2004,2005,2006,2007  Josh Coalson
+ * Copyright (C) 2002-2009  Josh Coalson
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -34,26 +35,17 @@
  * Additional code by Magnus Holmgren and Gian-Carlo Pascutto
  */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #  include <config.h>
 #endif
 
 #include <string.h> /* for memset() */
 #include <math.h>
-#include "private/fast_float_math_hack.h"
-#include "replaygain_synthesis.h"
+#include "share/compat.h"
+#include "share/replaygain_synthesis.h"
 #include "FLAC/assert.h"
 
-#ifndef FLaC__INLINE
-#define FLaC__INLINE
-#endif
-
-/* adjust for compilers that can't understand using LL suffix for int64_t literals */
-#ifdef _MSC_VER
-#define FLAC__I64L(x) x
-#else
 #define FLAC__I64L(x) x##LL
-#endif
 
 
 /*
@@ -88,9 +80,9 @@
  *  XORed values of both generators.
  */
 
-static unsigned int random_int_(void)
+static uint32_t random_int_(void)
 {
-	static const unsigned char parity_[256] = {
+	static const uint8_t parity_[256] = {
 		0,1,1,0,1,0,0,1,1,0,0,1,0,1,1,0,1,0,0,1,0,1,1,0,0,1,1,0,1,0,0,1,
 		1,0,0,1,0,1,1,0,0,1,1,0,1,0,0,1,0,1,1,0,1,0,0,1,1,0,0,1,0,1,1,0,
 		1,0,0,1,0,1,1,0,0,1,1,0,1,0,0,1,0,1,1,0,1,0,0,1,1,0,0,1,0,1,1,0,
@@ -100,10 +92,10 @@ static unsigned int random_int_(void)
 		0,1,1,0,1,0,0,1,1,0,0,1,0,1,1,0,1,0,0,1,0,1,1,0,0,1,1,0,1,0,0,1,
 		1,0,0,1,0,1,1,0,0,1,1,0,1,0,0,1,0,1,1,0,1,0,0,1,1,0,0,1,0,1,1,0
 	};
-	static unsigned int r1_ = 1;
-	static unsigned int r2_ = 1;
+	static uint32_t r1_ = 1;
+	static uint32_t r2_ = 1;
 
-	unsigned int t1, t2, t3, t4;
+	uint32_t t1, t2, t3, t4;
 
 	/* Parity calculation is done via table lookup, this is also available
 	 * on CPUs without parity, can be implemented in C and avoid unpredictable
@@ -210,17 +202,17 @@ static double scalar16_(const float* x, const float* y)
 
 void FLAC__replaygain_synthesis__init_dither_context(DitherContext *d, int bits, int shapingtype)
 {
-	static unsigned char default_dither [] = { 92, 92, 88, 84, 81, 78, 74, 67,  0,  0 };
+	static uint8_t default_dither [] = { 92, 92, 88, 84, 81, 78, 74, 67,  0,  0 };
 	static const float*               F [] = { F44_0, F44_1, F44_2, F44_3 };
 
-	int index;
+	int indx;
 
 	if (shapingtype < 0) shapingtype = 0;
 	if (shapingtype > 3) shapingtype = 3;
 	d->ShapingType = (NoiseShaping)shapingtype;
-	index = bits - 11 - shapingtype;
-	if (index < 0) index = 0;
-	if (index > 9) index = 9;
+	indx = bits - 11 - shapingtype;
+	if (indx < 0) indx = 0;
+	if (indx > 9) indx = 9;
 
 	memset ( d->ErrorHistory , 0, sizeof (d->ErrorHistory ) );
 	memset ( d->DitherHistory, 0, sizeof (d->DitherHistory) );
@@ -228,24 +220,31 @@ void FLAC__replaygain_synthesis__init_dither_context(DitherContext *d, int bits,
 	d->FilterCoeff = F [shapingtype];
 	d->Mask   = ((FLAC__uint64)-1) << (32 - bits);
 	d->Add    = 0.5     * ((1L << (32 - bits)) - 1);
-	d->Dither = 0.01f*default_dither[index] / (((FLAC__int64)1) << bits);
+	d->Dither = 0.01f*default_dither[indx] / (((FLAC__int64)1) << bits);
 	d->LastHistoryIndex = 0;
+}
+
+static inline int64_t
+ROUND64 (DitherContext *d, double x)
+{
+	union {
+		double d;
+		int64_t i;
+	} doubletmp;
+
+    doubletmp.d = x + d->Add + (int64_t)FLAC__I64L(0x001FFFFD80000000);
+
+    return doubletmp.i - (int64_t)FLAC__I64L(0x433FFFFD80000000);
 }
 
 /*
  * the following is based on parts of wavegain.c
  */
 
-static FLaC__INLINE FLAC__int64 dither_output_(DitherContext *d, FLAC__bool do_dithering, int shapingtype, int i, double Sum, int k)
+static int64_t dither_output_(DitherContext *d, FLAC__bool do_dithering, int shapingtype, int i, double Sum, int k)
 {
-	union {
-		double d;
-		FLAC__int64 i;
-	} doubletmp;
 	double Sum2;
-	FLAC__int64 val;
-
-#define ROUND64(x)   ( doubletmp.d = (x) + d->Add + (FLAC__int64)FLAC__I64L(0x001FFFFD80000000), doubletmp.i - (FLAC__int64)FLAC__I64L(0x433FFFFD80000000) )
+	int64_t val;
 
 	if(do_dithering) {
 		if(shapingtype == 0) {
@@ -253,21 +252,19 @@ static FLaC__INLINE FLAC__int64 dither_output_(DitherContext *d, FLAC__bool do_d
 			Sum2 = tmp - d->LastRandomNumber [k];
 			d->LastRandomNumber [k] = (int)tmp;
 			Sum2 = Sum += Sum2;
-			val = ROUND64(Sum2) & d->Mask;
+			val = ROUND64(d, Sum2) & d->Mask;
 		}
 		else {
 			Sum2 = random_triangular_(d->Dither) - scalar16_(d->DitherHistory[k], d->FilterCoeff + i);
 			Sum += d->DitherHistory [k] [(-1-i)&15] = (float)Sum2;
 			Sum2 = Sum + scalar16_(d->ErrorHistory [k], d->FilterCoeff + i);
-			val = ROUND64(Sum2) & d->Mask;
+			val = ROUND64(d, Sum2) & d->Mask;
 			d->ErrorHistory [k] [(-1-i)&15] = (float)(Sum - val);
 		}
 		return val;
 	}
-	else
-		return ROUND64(Sum);
 
-#undef ROUND64
+	return ROUND64(d, Sum);
 }
 
 #if 0
@@ -301,43 +298,8 @@ static FLaC__INLINE FLAC__int64 dither_output_(DitherContext *d, FLAC__bool do_d
 #endif
 
 
-size_t FLAC__replaygain_synthesis__apply_gain(FLAC__byte *data_out, FLAC__bool little_endian_data_out, FLAC__bool unsigned_data_out, const FLAC__int32 * const input[], unsigned wide_samples, unsigned channels, const unsigned source_bps, const unsigned target_bps, const double scale, const FLAC__bool hard_limit, FLAC__bool do_dithering, DitherContext *dither_context)
+size_t FLAC__replaygain_synthesis__apply_gain(FLAC__byte *data_out, FLAC__bool little_endian_data_out, FLAC__bool uint32_t_data_out, const FLAC__int32 * const input[], uint32_t wide_samples, uint32_t channels, const uint32_t source_bps, const uint32_t target_bps, const double scale, const FLAC__bool hard_limit, FLAC__bool do_dithering, DitherContext *dither_context)
 {
-	static const FLAC__int32 conv_factors_[33] = {
-		-1, /* 0 bits-per-sample (not supported) */
-		-1, /* 1 bits-per-sample (not supported) */
-		-1, /* 2 bits-per-sample (not supported) */
-		-1, /* 3 bits-per-sample (not supported) */
-		268435456, /* 4 bits-per-sample */
-		134217728, /* 5 bits-per-sample */
-		67108864, /* 6 bits-per-sample */
-		33554432, /* 7 bits-per-sample */
-		16777216, /* 8 bits-per-sample */
-		8388608, /* 9 bits-per-sample */
-		4194304, /* 10 bits-per-sample */
-		2097152, /* 11 bits-per-sample */
-		1048576, /* 12 bits-per-sample */
-		524288, /* 13 bits-per-sample */
-		262144, /* 14 bits-per-sample */
-		131072, /* 15 bits-per-sample */
-		65536, /* 16 bits-per-sample */
-		32768, /* 17 bits-per-sample */
-		16384, /* 18 bits-per-sample */
-		8192, /* 19 bits-per-sample */
-		4096, /* 20 bits-per-sample */
-		2048, /* 21 bits-per-sample */
-		1024, /* 22 bits-per-sample */
-		512, /* 23 bits-per-sample */
-		256, /* 24 bits-per-sample */
-		128, /* 25 bits-per-sample */
-		64, /* 26 bits-per-sample */
-		32, /* 27 bits-per-sample */
-		16, /* 28 bits-per-sample */
-		8, /* 29 bits-per-sample */
-		4, /* 30 bits-per-sample */
-		2, /* 31 bits-per-sample */
-		1 /* 32 bits-per-sample */
-	};
 	static const FLAC__int64 hard_clip_factors_[33] = {
 		0, /* 0 bits-per-sample (not supported) */
 		0, /* 1 bits-per-sample (not supported) */
@@ -373,7 +335,7 @@ size_t FLAC__replaygain_synthesis__apply_gain(FLAC__byte *data_out, FLAC__bool l
 		-1073741824, /* 31 bits-per-sample */
 		(FLAC__int64)(-1073741824) * 2 /* 32 bits-per-sample */
 	};
-	const FLAC__int32 conv_factor = conv_factors_[target_bps];
+	const FLAC__int32 conv_shift = 32 - target_bps;
 	const FLAC__int64 hard_clip_factor = hard_clip_factors_[target_bps];
 	/*
 	 * The integer input coming in has a varying range based on the
@@ -384,11 +346,11 @@ size_t FLAC__replaygain_synthesis__apply_gain(FLAC__byte *data_out, FLAC__bool l
 	const double multi_scale = scale / (double)(1u << (source_bps-1));
 
 	FLAC__byte * const start = data_out;
-	unsigned i, channel;
+	uint32_t i, channel;
 	const FLAC__int32 *input_;
 	double sample;
-	const unsigned bytes_per_sample = target_bps / 8;
-	const unsigned last_history_index = dither_context->LastHistoryIndex;
+	const uint32_t bytes_per_sample = target_bps / 8;
+	const uint32_t last_history_index = dither_context->LastHistoryIndex;
 	NoiseShaping noise_shaping = dither_context->ShapingType;
 	FLAC__int64 val64;
 	FLAC__int32 val32;
@@ -403,7 +365,7 @@ size_t FLAC__replaygain_synthesis__apply_gain(FLAC__byte *data_out, FLAC__bool l
 	FLAC__ASSERT((target_bps & 7) == 0);
 
 	for(channel = 0; channel < channels; channel++) {
-		const unsigned incr = bytes_per_sample * channels;
+		const uint32_t incr = bytes_per_sample * channels;
 		data_out = start + bytes_per_sample * channel;
 		input_ = input[channel];
 		for(i = 0; i < wide_samples; i++, data_out += incr) {
@@ -416,9 +378,9 @@ size_t FLAC__replaygain_synthesis__apply_gain(FLAC__byte *data_out, FLAC__bool l
 				else if(sample > 0.5)
 					sample = tanh((sample - 0.5) / (1-0.5)) * (1-0.5) + 0.5;
 			}
-			sample *= 2147483647.f;
+			sample *= 2147483647.;
 
-			val64 = dither_output_(dither_context, do_dithering, noise_shaping, (i + last_history_index) % 32, sample, channel) / conv_factor;
+			val64 = dither_output_(dither_context, do_dithering, noise_shaping, (i + last_history_index) % 32, sample, channel) >> conv_shift;
 
 			val32 = (FLAC__int32)val64;
 			if(val64 >= -hard_clip_factor)
@@ -427,7 +389,7 @@ size_t FLAC__replaygain_synthesis__apply_gain(FLAC__byte *data_out, FLAC__bool l
 				val32 = (FLAC__int32)hard_clip_factor;
 
 			uval32 = (FLAC__uint32)val32;
-			if (unsigned_data_out)
+			if (uint32_t_data_out)
 				uval32 ^= twiggle;
 
 			if (little_endian_data_out) {

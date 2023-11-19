@@ -1,5 +1,6 @@
 /* libFLAC - Free Lossless Audio Codec library
- * Copyright (C) 2000,2001,2002,2003,2004,2005,2006,2007  Josh Coalson
+ * Copyright (C) 2000-2009  Josh Coalson
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -49,7 +50,6 @@ void FLAC__bitwriter_delete(FLAC__BitWriter *bw);
 FLAC__bool FLAC__bitwriter_init(FLAC__BitWriter *bw);
 void FLAC__bitwriter_free(FLAC__BitWriter *bw); /* does not 'free(buffer)' */
 void FLAC__bitwriter_clear(FLAC__BitWriter *bw);
-void FLAC__bitwriter_dump(const FLAC__BitWriter *bw, FILE *out);
 
 /*
  * CRC functions
@@ -63,7 +63,7 @@ FLAC__bool FLAC__bitwriter_get_write_crc8(FLAC__BitWriter *bw, FLAC__byte *crc);
  * info functions
  */
 FLAC__bool FLAC__bitwriter_is_byte_aligned(const FLAC__BitWriter *bw);
-unsigned FLAC__bitwriter_get_input_bits_unconsumed(const FLAC__BitWriter *bw); /* can be called anytime, returns total # of bits unconsumed */
+uint32_t FLAC__bitwriter_get_input_bits_unconsumed(const FLAC__BitWriter *bw); /* can be called anytime, returns total # of bits unconsumed */
 
 /*
  * direct buffer access
@@ -78,23 +78,24 @@ void FLAC__bitwriter_release_buffer(FLAC__BitWriter *bw);
 /*
  * write functions
  */
-FLAC__bool FLAC__bitwriter_write_zeroes(FLAC__BitWriter *bw, unsigned bits);
-FLAC__bool FLAC__bitwriter_write_raw_uint32(FLAC__BitWriter *bw, FLAC__uint32 val, unsigned bits);
-FLAC__bool FLAC__bitwriter_write_raw_int32(FLAC__BitWriter *bw, FLAC__int32 val, unsigned bits);
-FLAC__bool FLAC__bitwriter_write_raw_uint64(FLAC__BitWriter *bw, FLAC__uint64 val, unsigned bits);
+FLAC__bool FLAC__bitwriter_write_zeroes(FLAC__BitWriter *bw, uint32_t bits);
+FLAC__bool FLAC__bitwriter_write_raw_uint32(FLAC__BitWriter *bw, FLAC__uint32 val, uint32_t bits);
+FLAC__bool FLAC__bitwriter_write_raw_int32(FLAC__BitWriter *bw, FLAC__int32 val, uint32_t bits);
+FLAC__bool FLAC__bitwriter_write_raw_uint64(FLAC__BitWriter *bw, FLAC__uint64 val, uint32_t bits);
+FLAC__bool FLAC__bitwriter_write_raw_int64(FLAC__BitWriter *bw, FLAC__int64 val, uint32_t bits);
 FLAC__bool FLAC__bitwriter_write_raw_uint32_little_endian(FLAC__BitWriter *bw, FLAC__uint32 val); /*only for bits=32*/
-FLAC__bool FLAC__bitwriter_write_byte_block(FLAC__BitWriter *bw, const FLAC__byte vals[], unsigned nvals);
-FLAC__bool FLAC__bitwriter_write_unary_unsigned(FLAC__BitWriter *bw, unsigned val);
-unsigned FLAC__bitwriter_rice_bits(FLAC__int32 val, unsigned parameter);
+FLAC__bool FLAC__bitwriter_write_byte_block(FLAC__BitWriter *bw, const FLAC__byte vals[], uint32_t nvals);
+FLAC__bool FLAC__bitwriter_write_unary_unsigned(FLAC__BitWriter *bw, uint32_t val);
 #if 0 /* UNUSED */
-unsigned FLAC__bitwriter_golomb_bits_signed(int val, unsigned parameter);
-unsigned FLAC__bitwriter_golomb_bits_unsigned(unsigned val, unsigned parameter);
+uint32_t FLAC__bitwriter_rice_bits(FLAC__int32 val, uint32_t parameter);
+uint32_t FLAC__bitwriter_golomb_bits_signed(int val, uint32_t parameter);
+uint32_t FLAC__bitwriter_golomb_bits_unsigned(uint32_t val, uint32_t parameter);
+FLAC__bool FLAC__bitwriter_write_rice_signed(FLAC__BitWriter *bw, FLAC__int32 val, uint32_t parameter);
 #endif
-FLAC__bool FLAC__bitwriter_write_rice_signed(FLAC__BitWriter *bw, FLAC__int32 val, unsigned parameter);
-FLAC__bool FLAC__bitwriter_write_rice_signed_block(FLAC__BitWriter *bw, const FLAC__int32 *vals, unsigned nvals, unsigned parameter);
+FLAC__bool FLAC__bitwriter_write_rice_signed_block(FLAC__BitWriter *bw, const FLAC__int32 *vals, uint32_t nvals, uint32_t parameter);
 #if 0 /* UNUSED */
-FLAC__bool FLAC__bitwriter_write_golomb_signed(FLAC__BitWriter *bw, int val, unsigned parameter);
-FLAC__bool FLAC__bitwriter_write_golomb_unsigned(FLAC__BitWriter *bw, unsigned val, unsigned parameter);
+FLAC__bool FLAC__bitwriter_write_golomb_signed(FLAC__BitWriter *bw, int val, uint32_t parameter);
+FLAC__bool FLAC__bitwriter_write_golomb_unsigned(FLAC__BitWriter *bw, uint32_t val, uint32_t parameter);
 #endif
 FLAC__bool FLAC__bitwriter_write_utf8_uint32(FLAC__BitWriter *bw, FLAC__uint32 val);
 FLAC__bool FLAC__bitwriter_write_utf8_uint64(FLAC__BitWriter *bw, FLAC__uint64 val);

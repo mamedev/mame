@@ -14,14 +14,18 @@ AC_ARG_WITH(libFLAC-includes,[  --with-libFLAC-includes=DIR   Directory where li
 AC_ARG_ENABLE(libFLACtest, [  --disable-libFLACtest       Do not try to compile and run a test libFLAC program],, enable_libFLACtest=yes)
 
   if test "x$libFLAC_libraries" != "x" ; then
-    LIBFLAC_LIBDIR="$libFLAC_libraries"
+    LIBFLAC_LIBS="-L$libFLAC_libraries"
+  elif test "x$libFLAC_prefix" = "xno" || test "x$libFLAC_prefix" = "xyes" ; then
+    LIBFLAC_LIBS=""
   elif test "x$libFLAC_prefix" != "x" ; then
-    LIBFLAC_LIBDIR="$libFLAC_prefix/lib"
-  elif test "x$prefix" != "xNONE" ; then
-    LIBFLAC_LIBDIR="$libdir"
+    LIBFLAC_LIBS="-L$libFLAC_prefix/lib"
+  elif test "x$prefix" != "xNONE"; then
+    LIBFLAC_LIBS="-L$prefix/lib"
   fi
 
-  LIBFLAC_LIBS="-L$LIBFLAC_LIBDIR -lFLAC $OGG_LIBS -lm"
+  if test "x$libFLAC_prefix" != "xno" ; then
+    LIBFLAC_LIBS="$LIBFLAC_LIBS -lFLAC $OGG_LIBS -lm"
+  fi
 
   if test "x$libFLAC_includes" != "x" ; then
     LIBFLAC_CFLAGS="-I$libFLAC_includes"
@@ -48,19 +52,15 @@ dnl
 dnl Now check if the installed libFLAC is sufficiently new.
 dnl
       rm -f conf.libFLACtest
-      AC_TRY_RUN([
+      AC_RUN_IFELSE([AC_LANG_PROGRAM([[
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <FLAC/format.h>
-
-int main ()
-{
+]],[[
   system("touch conf.libFLACtest");
   return 0;
-}
-
-],, no_libFLAC=yes,[echo $ac_n "cross compiling; assumed OK... $ac_c"])
+]])],[],[no_libFLAC=yes],[echo $ac_n "cross compiling; assumed OK... $ac_c"])
        CFLAGS="$ac_save_CFLAGS"
        CXXFLAGS="$ac_save_CXXFLAGS"
        LIBS="$ac_save_LIBS"
@@ -94,7 +94,7 @@ int main ()
        echo "*** If you have an old version installed, it is best to remove it, although"
        echo "*** you may also be able to get things to work by modifying LD_LIBRARY_PATH"],
        [ echo "*** The test program failed to compile or link. See the file config.log for the"
-       echo "*** exact error that occured. This usually means libFLAC was incorrectly installed"
+       echo "*** exact error that occurred. This usually means libFLAC was incorrectly installed"
        echo "*** or that you have moved libFLAC since it was installed. In the latter case, you"
        echo "*** may want to edit the libFLAC-config script: $LIBFLAC_CONFIG" ])
        CFLAGS="$ac_save_CFLAGS"

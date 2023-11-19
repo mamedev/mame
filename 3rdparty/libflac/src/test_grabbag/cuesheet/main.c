@@ -1,5 +1,6 @@
 /* test_cuesheet - Simple tester for cuesheet routines in grabbag
- * Copyright (C) 2002,2003,2004,2005,2006,2007  Josh Coalson
+ * Copyright (C) 2002-2009  Josh Coalson
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -11,12 +12,12 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #  include <config.h>
 #endif
 
@@ -28,12 +29,12 @@
 #include "FLAC/metadata.h"
 #include "share/grabbag.h"
 
-static int do_cuesheet(const char *infilename, FLAC__bool is_cdda, FLAC__uint64 lead_out_offset)
+static int do_cuesheet(const char *infilename, uint32_t sample_rate, FLAC__bool is_cdda, FLAC__uint64 lead_out_offset)
 {
 	FILE *fin, *fout;
-	const char *error_message;
+	const char *error_message, *tmpfilenamebase;
 	char tmpfilename[4096];
-	unsigned last_line_read;
+	uint32_t last_line_read;
 	FLAC__StreamMetadata *cuesheet;
 
 	FLAC__ASSERT(strlen(infilename) + 2 < sizeof(tmpfilename));
@@ -44,11 +45,11 @@ static int do_cuesheet(const char *infilename, FLAC__bool is_cdda, FLAC__uint64 
 	if(0 == strcmp(infilename, "-")) {
 		fin = stdin;
 	}
-	else if(0 == (fin = fopen(infilename, "r"))) {
+	else if(0 == (fin = flac_fopen(infilename, "r"))) {
 		fprintf(stderr, "can't open file %s for reading: %s\n", infilename, strerror(errno));
 		return 255;
 	}
-	if(0 != (cuesheet = grabbag__cuesheet_parse(fin, &error_message, &last_line_read, is_cdda, lead_out_offset))) {
+	if(0 != (cuesheet = grabbag__cuesheet_parse(fin, &error_message, &last_line_read, sample_rate, is_cdda, lead_out_offset))) {
 		if(fin != stdin)
 			fclose(fin);
 	}
@@ -63,8 +64,12 @@ static int do_cuesheet(const char *infilename, FLAC__bool is_cdda, FLAC__uint64 
 		FLAC__metadata_object_delete(cuesheet);
 		return 1;
 	}
-	sprintf(tmpfilename, "%s.1", infilename);
-	if(0 == (fout = fopen(tmpfilename, "w"))) {
+
+	tmpfilenamebase = strstr(infilename, "cuesheets/");
+	tmpfilenamebase = tmpfilenamebase == NULL ? infilename : tmpfilenamebase;
+
+	flac_snprintf(tmpfilename, sizeof (tmpfilename), "%s.1", tmpfilenamebase);
+	if(0 == (fout = flac_fopen(tmpfilename, "w"))) {
 		fprintf(stderr, "can't open file %s for writing: %s\n", tmpfilename, strerror(errno));
 		FLAC__metadata_object_delete(cuesheet);
 		return 255;
@@ -76,11 +81,11 @@ static int do_cuesheet(const char *infilename, FLAC__bool is_cdda, FLAC__uint64 
 	/*
 	 * pass 2
 	 */
-	if(0 == (fin = fopen(tmpfilename, "r"))) {
+	if(0 == (fin = flac_fopen(tmpfilename, "r"))) {
 		fprintf(stderr, "can't open file %s for reading: %s\n", tmpfilename, strerror(errno));
 		return 255;
 	}
-	if(0 != (cuesheet = grabbag__cuesheet_parse(fin, &error_message, &last_line_read, is_cdda, lead_out_offset))) {
+	if(0 != (cuesheet = grabbag__cuesheet_parse(fin, &error_message, &last_line_read, sample_rate, is_cdda, lead_out_offset))) {
 		if(fin != stdin)
 			fclose(fin);
 	}
@@ -95,8 +100,8 @@ static int do_cuesheet(const char *infilename, FLAC__bool is_cdda, FLAC__uint64 
 		FLAC__metadata_object_delete(cuesheet);
 		return 1;
 	}
-	sprintf(tmpfilename, "%s.2", infilename);
-	if(0 == (fout = fopen(tmpfilename, "w"))) {
+	flac_snprintf(tmpfilename, sizeof (tmpfilename), "%s.2", tmpfilenamebase);
+	if(0 == (fout = flac_fopen(tmpfilename, "w"))) {
 		fprintf(stderr, "can't open file %s for writing: %s\n", tmpfilename, strerror(errno));
 		FLAC__metadata_object_delete(cuesheet);
 		return 255;
@@ -111,28 +116,32 @@ static int do_cuesheet(const char *infilename, FLAC__bool is_cdda, FLAC__uint64 
 int main(int argc, char *argv[])
 {
 	FLAC__uint64 lead_out_offset;
+	uint32_t sample_rate = 48000;
 	FLAC__bool is_cdda = false;
-	const char *usage = "usage: test_cuesheet cuesheet_file lead_out_offset [ cdda ]\n";
+	const char *usage = "usage: test_cuesheet cuesheet_file lead_out_offset [ [ sample_rate ] cdda ]\n";
 
 	if(argc > 1 && 0 == strcmp(argv[1], "-h")) {
-		printf(usage);
+		puts(usage);
 		return 0;
 	}
 
-	if(argc < 3 || argc > 4) {
-		fprintf(stderr, usage);
+	if(argc < 3 || argc > 5) {
+		fputs(usage, stderr);
 		return 255;
 	}
 
 	lead_out_offset = (FLAC__uint64)strtoul(argv[2], 0, 10);
-	if(argc == 4) {
-		if(0 == strcmp(argv[3], "cdda"))
-			is_cdda = true;
-		else {
-			fprintf(stderr, usage);
-			return 255;
+	if(argc >= 4) {
+		sample_rate = (uint32_t)atoi(argv[3]);
+		if(argc >= 5) {
+			if(0 == strcmp(argv[4], "cdda"))
+				is_cdda = true;
+			else {
+				fputs(usage, stderr);
+				return 255;
+			}
 		}
 	}
 
-	return do_cuesheet(argv[1], is_cdda, lead_out_offset);
+	return do_cuesheet(argv[1], sample_rate, is_cdda, lead_out_offset);
 }

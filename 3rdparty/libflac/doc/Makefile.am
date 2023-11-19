@@ -1,5 +1,6 @@
 #  flac - Command-line FLAC encoder/decoder
-#  Copyright (C) 2002,2003,2004,2005,2006,2007  Josh Coalson
+#  Copyright (C) 2002-2009  Josh Coalson
+#  Copyright (C) 2011-2023  Xiph.Org Foundation
 #
 #  This program is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU General Public License
@@ -11,33 +12,51 @@
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
 #
-#  You should have received a copy of the GNU General Public License
-#  along with this program; if not, write to the Free Software
-#  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+#  You should have received a copy of the GNU General Public License along
+#  with this program; if not, write to the Free Software Foundation, Inc.,
+#  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-AUTOMAKE_OPTIONS = foreign
-
-SUBDIRS = . html
+SUBDIRS = . images
 
 if FLaC__HAS_DOXYGEN
+all-local: Doxyfile
 FLAC.tag: Doxyfile
 	doxygen Doxyfile
-	rm -rf html/api
-	mv doxytmp/html html/api
+	rm -rf api
+	mv doxytmp/html api
 	rm -rf doxytmp
-else
-FLAC.tag:
-	echo "*** Warning: Doxygen not found; documentation will not be built."
-	touch $@
-	mkdir -p html/api
-endif
-
-docdir = $(datadir)/doc/$(PACKAGE)-$(VERSION)
 
 doc_DATA = \
 	FLAC.tag
+else
+if FLaC__HAS_PREBUILT_DOXYGEN
+doc_DATA = \
+	FLAC.tag
+endif
+endif
 
-EXTRA_DIST = Doxyfile Makefile.lite doxygen.footer.html doxygen.header.html $(doc_DATA)
+EXTRA_DIST = Doxyfile.in doxygen.footer.html \
+	isoflac.txt $(doc_DATA) CMakeLists.txt \
+	api
 
-maintainer-clean-local:
-	rm -rf FLAC.tag html/api doxytmp
+if FLaC__HAS_DOXYGEN
+# The install targets don't copy whole directories so we have to
+# handle 'api/' specially:
+install-data-local:
+	$(mkinstalldirs) $(DESTDIR)$(docdir)/api
+	(cd $(builddir)/api && $(INSTALL_DATA) * $(DESTDIR)$(docdir)/api)
+uninstall-local:
+	rm -rf $(DESTDIR)$(docdir)/api
+distclean-local:
+	rm -rf FLAC.tag api doxytmp
+endif
+
+if FLaC__HAS_PREBUILT_DOXYGEN
+# The install targets don't copy whole directories so we have to
+# handle 'api/' specially:
+install-data-local:
+	$(mkinstalldirs) $(DESTDIR)$(docdir)/api
+	(cd $(srcdir)/api && $(INSTALL_DATA) * $(DESTDIR)$(docdir)/api)
+uninstall-local:
+	rm -rf $(DESTDIR)$(docdir)/api
+endif
