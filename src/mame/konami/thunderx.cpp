@@ -365,10 +365,7 @@ this is the data written to internal ram on startup:
 
 void thunderx_state::run_collisions( int s0, int e0, int s1, int e1, int cm, int hm )
 {
-	uint8_t* p0;
-	uint8_t* p1;
-
-	for ( p0 = &m_pmcram[s0]; p0 < &m_pmcram[e0]; p0 += 5)
+	for (uint8_t* p0 = &m_pmcram[s0]; p0 < &m_pmcram[e0]; p0 += 5)
 	{
 		int l0, r0, b0, t0;
 
@@ -382,7 +379,7 @@ void thunderx_state::run_collisions( int s0, int e0, int s1, int e1, int cm, int
 		t0 = p0[4] - p0[2];
 		b0 = p0[4] + p0[2];
 
-		for ( p1 = &m_pmcram[s1]; p1 < &m_pmcram[e1]; p1 += 5)
+		for (uint8_t* p1 = &m_pmcram[s1]; p1 < &m_pmcram[e1]; p1 += 5)
 		{
 			int l1,r1,b1,t1;
 
@@ -415,9 +412,7 @@ void thunderx_state::run_collisions( int s0, int e0, int s1, int e1, int cm, int
 
 void thunderx_state::calculate_collisions()
 {
-	int s0,e0;
-	int s1,e1;
-	int cm,hm;
+	int s0, s1;
 
 	// the data at 0x00 to 0x06 defines the operation
 	//
@@ -438,9 +433,8 @@ void thunderx_state::calculate_collisions()
 	// hit mask is 40 to set bit on object 0 and object 1
 	// hit mask is 20 to set bit on object 1 only
 
-	e0 = m_pmcram[0];
-	e0 = (e0 << 8) + m_pmcram[1];
-	e1 = m_pmcram[2];
+	const int e0 = (m_pmcram[0]<<8) | m_pmcram[1];
+	const int e1 = m_pmcram[2];
 
 	if (m_pmcram[5] < 16)
 	{
@@ -456,8 +450,8 @@ void thunderx_state::calculate_collisions()
 		s1 = m_pmcram[6];
 	}
 
-	cm = m_pmcram[3];
-	hm = m_pmcram[4];
+	const int cm = m_pmcram[3];
+	const int hm = m_pmcram[4];
 
 	run_collisions(s0, e0, s1, e1, cm, hm);
 }
