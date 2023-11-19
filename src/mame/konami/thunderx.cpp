@@ -367,10 +367,8 @@ void thunderx_state::run_collisions( int s0, int e0, int s1, int e1, int cm, int
 {
 	uint8_t* p0;
 	uint8_t* p1;
-	int ii, jj;
 
-	p0 = &m_pmcram[16 + 5 * s0];
-	for (ii = s0; ii < e0; ii++, p0 += 5)
+	for ( p0 = &m_pmcram[s0]; p0 < &m_pmcram[e0]; p0 += 5)
 	{
 		int l0, r0, b0, t0;
 
@@ -384,8 +382,7 @@ void thunderx_state::run_collisions( int s0, int e0, int s1, int e1, int cm, int
 		t0 = p0[4] - p0[2];
 		b0 = p0[4] + p0[2];
 
-		p1 = &m_pmcram[16 + 5 * s1];
-		for (jj = s1; jj < e1; jj++,p1 += 5)
+		for ( p1 = &m_pmcram[s1]; p1 < &m_pmcram[e1]; p1 += 5)
 		{
 			int l1,r1,b1,t1;
 
@@ -406,8 +403,8 @@ void thunderx_state::run_collisions( int s0, int e0, int s1, int e1, int cm, int
 			if (t0 >= b1) continue;
 
 			// set flags
-			p0[0] = (p0[0] & 0x9f) | (p1[0] & 0x04) | 0x10;
-			p1[0] = (p1[0] & 0x9f) | 0x10;
+			p0[0] = (p0[0] & 0x8f) | (p1[0] & 0x04) | 0x10;
+			p1[0] = (p1[0] & 0x8f) | 0x10;
 		}
 	}
 }
@@ -418,9 +415,9 @@ void thunderx_state::run_collisions( int s0, int e0, int s1, int e1, int cm, int
 
 void thunderx_state::calculate_collisions()
 {
-	int X0,Y0;
-	int X1,Y1;
-	int CM,HM;
+	int s0,e0;
+	int s1,e1;
+	int cm,hm;
 
 	// the data at 0x00 to 0x06 defines the operation
 	//
@@ -441,30 +438,28 @@ void thunderx_state::calculate_collisions()
 	// hit mask is 40 to set bit on object 0 and object 1
 	// hit mask is 20 to set bit on object 1 only
 
-	Y0 = m_pmcram[0];
-	Y0 = (Y0 << 8) + m_pmcram[1];
-	Y0 = (Y0 - 15) / 5;
-	Y1 = (m_pmcram[2] - 15) / 5;
+	e0 = m_pmcram[0];
+	e0 = (e0 << 8) + m_pmcram[1];
+	e1 = m_pmcram[2];
 
 	if (m_pmcram[5] < 16)
 	{
 		// US Thunder Cross uses this form
-		X0 = m_pmcram[5];
-		X0 = (X0 << 8) + m_pmcram[6];
-		X0 = (X0 - 16) / 5;
-		X1 = (m_pmcram[7] - 16) / 5;
+		s0 = m_pmcram[5];
+		s0 = (s0 << 8) + m_pmcram[6];
+		s1 = m_pmcram[7];
 	}
 	else
 	{
 		// Japan Thunder Cross uses this form
-		X0 = (m_pmcram[5] - 16) / 5;
-		X1 = (m_pmcram[6] - 16) / 5;
+		s0 = m_pmcram[5];
+		s1 = m_pmcram[6];
 	}
 
-	CM = m_pmcram[3];
-	HM = m_pmcram[4];
+	cm = m_pmcram[3];
+	hm = m_pmcram[4];
 
-	run_collisions(X0, Y0, X1, Y1, CM, HM);
+	run_collisions(s0, e0, s1, e1, cm, hm);
 }
 
 void thunderx_state_base::scontra_1f98_w(uint8_t data)
