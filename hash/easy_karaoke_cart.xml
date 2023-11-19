@@ -212,4 +212,56 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!--
+	Ain't It Funny                              Jennifer Lopez
+	Just Like A Pill                            Pink
+	I'm A Slave 4 U                             Britney Spears
+	Three Times A Lady                          Lionel Richie
+	You Can't Hurry Love                        Diana Ross And The Supremes
+	Banana Split                                Lio
+	J'attendrai                                 Claude François
+	Tout tout pour ma chérie                    Michel Polnareff
+	Bienvenue à Paris                           Bill Baxter
+	Vacances j'oublie tout                      Elegance
+	-->
+	<software name="karamsc2" supported="no">
+		<description>KaraokeMicro Star Cartouche 2</description>
+		<year>2003</year>
+		<publisher>IVL Technologies / Lexibook</publisher>
+		<part name="cart" interface="easy_karaoke_cart">
+			<dataarea name="rom" size="0x80000">
+				<rom name="ics0322-a.u3" size="0x80000" crc="d6cb51fe" sha1="98a819487ae8b25459e102710ce4325fbd39ce10" />
+			</dataarea>
+			<dataarea name="mcu" size="0x2000">
+				<rom name="IC89LV52A-24PQ.U1" size="0x2000" status="nodump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	Come Away With Me                           Norah Jones
+	Donne-moi le temps                          Jenifer
+	Encore                                      Diadems
+	J'attendrai                                 Belle Belle Belle
+	L'orange                                    Star Academy 3
+	La Bamba                                    Star Academy 3
+	Rien ne me changera                         Jonatan Cerrada
+	Tant que c'est toi                          Natasha St Pier
+	Tchouk Tchouk Musik                         Priscilla
+	Toutes les femmes de ta vie                 L5
+	-->
+	<software name="karamsc3" supported="no">
+		<description>KaraokeMicro Star Cartouche 3</description>
+		<year>2004</year>
+		<publisher>IVL Technologies / Lexibook</publisher>
+		<part name="cart" interface="easy_karaoke_cart">
+			<dataarea name="rom" size="0x80000">
+				<rom name="27V40.u3" size="0x80000" crc="33047ac7" sha1="bea9197646ba5a9f8c842363149b1b1ec7b9aada" />
+			</dataarea>
+			<dataarea name="mcu" size="0x2000">
+				<rom name="IC89LV52A-24PQ.U1" size="0x2000" status="nodump" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
