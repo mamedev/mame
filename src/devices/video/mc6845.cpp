@@ -420,8 +420,8 @@ void mc6845_device::recompute_parameters(bool postload)
 	uint16_t vert_pix_total = (m_vert_char_total + 1) * video_char_height + m_vert_total_adj;
 
 	/* determine the visible area, avoid division by 0 */
-	uint16_t visible_width = zero_horizontal_width ? m_visible_width : m_horiz_disp * m_hpixels_per_column;
-	uint16_t visible_height = zero_vertical_height ? m_visible_height : m_vert_disp * video_char_height;
+	uint16_t visible_width = zero_horizontal_width ? m_visible_width : (m_horiz_disp * m_hpixels_per_column);
+	uint16_t visible_height = zero_vertical_height ? m_visible_height : (m_vert_disp * video_char_height);
 
 	// Check to see visual width or height needs to be adjusted due to changes with total
 	if (zero_horizontal_width || zero_vertical_height)
@@ -500,8 +500,9 @@ void mc6845_device::recompute_parameters(bool postload)
 			}
 			else
 			{
-				visarea.set(0 + m_visarea_adjust_min_x, visible_width - 1 + m_visarea_adjust_max_x, 0 + m_visarea_adjust_min_y,
-				 visible_height - 1 + m_visarea_adjust_max_y);
+				visarea.set(
+						0 + m_visarea_adjust_min_x, visible_width - 1 + m_visarea_adjust_max_x,
+						0 + m_visarea_adjust_min_y, visible_height - 1 + m_visarea_adjust_max_y);
 			}
 
 			LOGCONF("M6845 config screen: HTOTAL: %d  VTOTAL: %d  VIS_WIDTH: %d  VIS_HEIGHT: %d  HSYNC: %d-%d  VSYNC: %d-%d  Freq: %ffps\n",
@@ -799,7 +800,7 @@ TIMER_CALLBACK_MEMBER(mc6845_device::handle_line_timer)
 
 	/* Set VSYNC and DE signals */
 	set_vsync( new_vsync );
-	set_de( m_line_enable_ff && nonzero_horizontal_width ? true : false );
+	set_de( (m_line_enable_ff && nonzero_horizontal_width) ? true : false );
 }
 
 
