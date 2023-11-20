@@ -9,13 +9,15 @@
 DECLARE_DEVICE_TYPE(SEGAAI_EXP_SLOT, segaai_exp_slot_device);
 
 
+class segaai_exp_interface;
+
 class segaai_exp_slot_device : public device_t,
-								public device_slot_interface
+								public device_single_card_slot_interface<segaai_exp_interface>
 {
 public:
 	template <typename T>
-	segaai_exp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
-		: segaai_exp_slot_device(mconfig, tag, owner, u32(0))
+	segaai_exp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt, u32 clock)
+		: segaai_exp_slot_device(mconfig, tag, owner, clock)
 	{
 		option_reset();
 		opts(*this);
@@ -23,7 +25,7 @@ public:
 		set_fixed(false);
 	}
 	segaai_exp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-	virtual ~segaai_exp_slot_device() { }
+	virtual ~segaai_exp_slot_device();
 
 	template <typename T> void set_mem_space(T &&tag, int no) { m_mem_space.set_tag(std::forward<T>(tag), no); }
 	template <typename T> void set_io_space(T &&tag, int no) { m_io_space.set_tag(std::forward<T>(tag), no); }
@@ -32,7 +34,7 @@ public:
 	address_space& io_space() { return *m_io_space; }
 
 protected:
-	virtual void device_start() override { };
+	virtual void device_start() override { }
 
 private:
 	optional_address_space m_mem_space;
@@ -44,14 +46,14 @@ class segaai_exp_interface : public device_interface
 {
 public:
 	segaai_exp_interface(const machine_config &mconfig, device_t &device);
-	virtual ~segaai_exp_interface() { }
+	virtual ~segaai_exp_interface();
 
 protected:
 	address_space& mem_space() { return m_slot->mem_space(); }
 	address_space& io_space() { return m_slot->io_space(); }
 
 private:
-	segaai_exp_slot_device* m_slot;
+	segaai_exp_slot_device *const m_slot;
 };
 
 

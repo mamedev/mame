@@ -29,7 +29,7 @@ protected:
 		, segaai_card_interface(mconfig, *this)
 	{ }
 
-	virtual void device_start() override { };
+	virtual void device_start() override { }
 };
 
 void segaai_rom_128_device::install_memory_handlers(address_space *space)

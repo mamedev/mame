@@ -11,19 +11,20 @@
 #include "segaai_slot.h"
 
 
-enum
-{
-	SEGAAI_CARD_ROM_128 = 0,
-	SEGAAI_CARD_ROM_256
-};
-
-
 DEFINE_DEVICE_TYPE(SEGAAI_CARD_SLOT, segaai_card_slot_device, "segaai_card_slot", "Sega AI Card Slot")
+
+
+static char const *const ROM_128 = "rom_128";
+static char const *const ROM_256 = "rom_256";
 
 
 segaai_card_interface::segaai_card_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device, "segaai_card")
 	, m_slot(dynamic_cast<segaai_card_slot_device *>(device.owner()))
+{
+}
+
+segaai_card_interface::~segaai_card_interface()
 {
 }
 
@@ -37,32 +38,13 @@ segaai_card_slot_device::segaai_card_slot_device(const machine_config &mconfig, 
 {
 }
 
-void segaai_card_slot_device::device_start()
+segaai_card_slot_device::~segaai_card_slot_device()
 {
-	m_cart = dynamic_cast<segaai_card_interface *>(get_card_device());
 }
 
-struct segaai_slot
+void segaai_card_slot_device::device_start()
 {
-	int pcb_id;
-	const char *slot_option;
-};
-
-static const segaai_slot slot_list[] =
-{
-	{ SEGAAI_CARD_ROM_128, "rom_128" },
-	{ SEGAAI_CARD_ROM_256, "rom_256" }
-};
-
-static const char *segaai_get_slot(int type)
-{
-	for (int i = 0; i < std::size(slot_list); i++)
-	{
-		if (slot_list[i].pcb_id == type)
-			return slot_list[i].slot_option;
-	}
-
-	return slot_list[0].slot_option;
+	m_cart = get_card_device();
 }
 
 std::pair<std::error_condition, std::string> segaai_card_slot_device::call_load()
@@ -73,7 +55,7 @@ std::pair<std::error_condition, std::string> segaai_card_slot_device::call_load(
 
 		if (length != 0x20000 && length != 0x40000)
 		{
-			return std::pair(image_error::INVALIDIMAGE, "Invalid card size. Allowed sizes are: 128KB, 256KB");
+			return std::make_pair(image_error::INVALIDIMAGE, "Invalid card size. Supported sizes are: 128KB, 256KB");
 		}
 
 		if (!loaded_through_softlist())
@@ -91,11 +73,6 @@ std::pair<std::error_condition, std::string> segaai_card_slot_device::call_load(
 	return std::make_pair(std::error_condition(), std::string());
 }
 
-int segaai_card_slot_device::get_cart_type(u32 length)
-{
-	return length == 0x40000 ? SEGAAI_CARD_ROM_256 : SEGAAI_CARD_ROM_128;
-}
-
 std::string segaai_card_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
 	if (hook.image_file())
@@ -103,12 +80,10 @@ std::string segaai_card_slot_device::get_default_card_software(get_default_card_
 		uint64_t length;
 		hook.image_file()->length(length);
 
-		int type = get_cart_type(length);
-
-		return std::string(segaai_get_slot(type));
+		return std::string(length == 0x40000 ? ROM_256 : ROM_128);
 	}
 
-	return software_get_default_slot("rom_128");
+	return software_get_default_slot(ROM_128);
 }
 
 
@@ -117,8 +92,8 @@ std::string segaai_card_slot_device::get_default_card_software(get_default_card_
 #include "rom.h"
 
 
-void segaai_card(device_slot_interface &device)
+void segaai_cards(device_slot_interface &device)
 {
-	device.option_add_internal("rom_128",  SEGAAI_ROM_128);
-	device.option_add_internal("rom_256",  SEGAAI_ROM_256);
+	device.option_add_internal(ROM_128, SEGAAI_ROM_128);
+	device.option_add_internal(ROM_256, SEGAAI_ROM_256);
 }

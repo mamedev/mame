@@ -78,6 +78,9 @@ timer 1 - mode 2 - rate generator (0E90), gate involved
 
 #include "speaker.h"
 
+//#define VERBOSE (LOG_GENERAL)
+#include "logmacro.h"
+
 
 namespace {
 
@@ -87,7 +90,7 @@ class segaai_soundbox_device : public device_t,
 public:
 	segaai_soundbox_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 		: device_t(mconfig, SEGAAI_SOUNDBOX, tag, owner, clock)
-		, segaai_exp_interface( mconfig, *this )
+		, segaai_exp_interface(mconfig, *this)
 		, m_tmp8253(*this, "tmp8253")
 		, m_tmp8255(*this, "tmp8255")
 		, m_ym2151(*this, "ym2151")
@@ -96,16 +99,18 @@ public:
 		, m_row(0)
 	{ }
 
+	static constexpr feature_type unemulated_features() { return feature::KEYBOARD; }
+
+protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual ioport_constructor device_input_ports() const override;
-
-protected:
 	virtual void device_start() override;
 
 private:
+	static constexpr u32 EXPANSION_RAM_SIZE = 0x20000;
+
 	u8 tmp8255_porta_r();
-	u8 tmp8255_portb_r();
 	void tmp8255_portb_w(u8 data);
 	void tmp8255_portc_w(u8 data);
 	void ym2151_irq_w(int state);
@@ -117,29 +122,29 @@ private:
 	required_device<ym2151_device> m_ym2151;
 	required_region_ptr<u8> m_rom;
 	required_ioport_array<8> m_rows;
-	std::vector<u8> m_ram;    // 128KB Expansion RAM
+	std::unique_ptr<u8[]> m_ram;
 	u8 m_row;
 };
 
 void segaai_soundbox_device::device_add_mconfig(machine_config &config)
 {
 	PIT8253(config, m_tmp8253);
-	m_tmp8253->set_clk<0>(21.477272_MHz_XTAL/6);    // ~3.58 MHz, seems to be tied to pin 24 in ym2151
+	m_tmp8253->set_clk<0>(clock());    // ~3.58 MHz, seems to be tied to pin 24 in ym2151
 	m_tmp8253->out_handler<0>().set(FUNC(segaai_soundbox_device::tmp8253_out0_w));
 	// gate0 not connected
-	m_tmp8253->set_clk<1>(21.477272_MHz_XTAL/6);    // 5MHz or 3.58 MHz?
+	m_tmp8253->set_clk<1>(clock());    // 3.58 MHz?
 	m_tmp8253->out_handler<1>().set(FUNC(segaai_soundbox_device::tmp8253_out1_w));
 	// timer 2 is not connected, also not set up by the code
 
 	I8255(config, m_tmp8255);
 	m_tmp8255->in_pa_callback().set(FUNC(segaai_soundbox_device::tmp8255_porta_r));
-	m_tmp8255->in_pb_callback().set(FUNC(segaai_soundbox_device::tmp8255_portb_r));
+	m_tmp8255->in_pb_callback().set_constant(0xff);
 	m_tmp8255->out_pb_callback().set(FUNC(segaai_soundbox_device::tmp8255_portb_w));
 	m_tmp8255->out_pc_callback().set(FUNC(segaai_soundbox_device::tmp8255_portc_w));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	YM2151(config, m_ym2151, 21.477272_MHz_XTAL/6);   // ~3.58MHz
+	YM2151(config, m_ym2151, DERIVED_CLOCK(1,1));   // ~3.58MHz
 	m_ym2151->irq_handler().set(FUNC(segaai_soundbox_device::ym2151_irq_w));
 	m_ym2151->add_route(0, "lspeaker", 1.00);
 	m_ym2151->add_route(1, "rspeaker", 1.00);
@@ -245,9 +250,9 @@ ioport_constructor segaai_soundbox_device::device_input_ports() const
 void segaai_soundbox_device::device_start()
 {
 	m_row = 0;
-	m_ram.resize(0x20000);
+	m_ram = std::make_unique<u8[]>(EXPANSION_RAM_SIZE);
 
-	save_item(NAME(m_ram));
+	save_pointer(NAME(m_ram), EXPANSION_RAM_SIZE);
 	save_item(NAME(m_row));
 
 	mem_space().install_ram(0x20000, 0x3ffff, &m_ram[0]);
@@ -269,11 +274,6 @@ u8 segaai_soundbox_device::tmp8255_porta_r()
 	return result;
 }
 
-u8 segaai_soundbox_device::tmp8255_portb_r()
-{
-	return 0xff;
-}
-
 /*
  8255 port B
 
@@ -289,30 +289,30 @@ u8 segaai_soundbox_device::tmp8255_portb_r()
 */
 void segaai_soundbox_device::tmp8255_portb_w(u8 data)
 {
-	osd_printf_info("soundbox 8255 port B write $%02X\n", data);
+	LOG("soundbox 8255 port B write $%02X\n", data);
 	m_tmp8253->write_gate1(BIT(data, 7));
 }
 
 void segaai_soundbox_device::tmp8255_portc_w(u8 data)
 {
 	// Selects music keyboard row to scan (see routine @0x82399)
-	osd_printf_info("soundbox m_row = $%02X\n", data);
+	LOG("soundbox m_row = $%02X\n", data);
 	m_row = data;
 }
 
 void segaai_soundbox_device::ym2151_irq_w(int state)
 {
-	osd_printf_info("Soundbox: IRQ from ym2151 is '%s'\n", state ? "ASSERT" : "CLEAR");
+	LOG("Soundbox: IRQ from ym2151 is '%s'\n", state ? "ASSERT" : "CLEAR");
 }
 
 void segaai_soundbox_device::tmp8253_out0_w(int state)
 {
-//  osd_printf_info("Soundbox: OUT0 from tmp8253 is '%s'\n", state ? "ASSERT" : "CLEAR");
+//  LOG("Soundbox: OUT0 from tmp8253 is '%s'\n", state ? "ASSERT" : "CLEAR");
 }
 
 void segaai_soundbox_device::tmp8253_out1_w(int state)
 {
-//  osd_printf_info("Soundbox: OUT1 from tmp8253 is '%s'\n", state ? "ASSERT" : "CLEAR");
+//  LOG("Soundbox: OUT1 from tmp8253 is '%s'\n", state ? "ASSERT" : "CLEAR");
 }
 
 } // anonymous namespace

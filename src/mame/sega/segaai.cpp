@@ -132,7 +132,7 @@ New JIS Keyboard Connector Pinout:
 
 #include "segaai.lh"
 
-#define VERBOSE (LOG_GENERAL)
+//#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
 
@@ -789,12 +789,12 @@ void segaai_state::segaai(machine_config &config)
 	m_upd7759->drq().set(FUNC(segaai_state::upd7759_drq_w));
 
 	// Card slot
-	SEGAAI_CARD_SLOT(config, m_cardslot, segaai_card, nullptr);
+	SEGAAI_CARD_SLOT(config, m_cardslot, segaai_cards, nullptr);
 	m_cardslot->set_address_space(m_maincpu, AS_PROGRAM);
 	SOFTWARE_LIST(config, "software").set_original("segaai");
 
 	// Expansion slot
-	SEGAAI_EXP_SLOT(config, m_expslot, segaai_exp, nullptr);
+	SEGAAI_EXP_SLOT(config, m_expslot, segaai_exp, nullptr, 21'477'272/6);  // not verified, assuming 3.58MHz
 	m_expslot->set_mem_space(m_maincpu, AS_PROGRAM);
 	m_expslot->set_io_space(m_maincpu, AS_IO);
 
