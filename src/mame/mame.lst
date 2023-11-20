@@ -35681,6 +35681,9 @@ t1000tl                         // 1988 Tandy 1000 TL
 t1000tl2                        // 1989 Tandy 1000 TL/2
 t1000tx                         // 1987 Tandy 1000 TX
 
+@source:pc/teradrive.cpp
+teradrive
+
 @source:pc/tosh1000.cpp
 tosh1000
 

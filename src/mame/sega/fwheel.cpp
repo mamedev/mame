@@ -196,8 +196,8 @@ void fwheel_state::fwheel(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(XTAL(10'738'000) / 2, \
-			sega315_5124_device::WIDTH , sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH - 2, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256 + 10, \
+	m_screen->set_raw(XTAL(10'738'000) / 2,
+			sega315_5124_device::WIDTH , sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH - 2, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256 + 10,
 			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT + 224);
 	m_screen->set_refresh_hz(XTAL(10'738'000) / 2 / (sega315_5124_device::WIDTH * sega315_5124_device::HEIGHT_NTSC));
 	m_screen->set_screen_update(m_vdp, FUNC(sega315_5246_device::screen_update));

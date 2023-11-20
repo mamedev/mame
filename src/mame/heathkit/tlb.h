@@ -89,7 +89,6 @@ protected:
 	required_ioport                 m_config;
 	required_device<ins8250_device> m_ace;
 
-//private:
 	virtual void set_irq_line();
 	void check_for_reset();
 
@@ -110,8 +109,8 @@ protected:
 	void mm5740_data_ready_w(int state);
 
 	void crtc_addr_w(offs_t reg, uint8_t val);
-	uint8_t crtc_reg_r(offs_t reg);
-	void crtc_reg_w(offs_t reg, uint8_t val);
+	virtual uint8_t crtc_reg_r(offs_t reg);
+	virtual void crtc_reg_w(offs_t reg, uint8_t val);
 	void crtc_vsync_w(int val);
 
 	TIMER_CALLBACK_MEMBER(key_click_off);
@@ -168,6 +167,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	void mem_map(address_map &map);
+	void io_map(address_map &map);
 
 	virtual MC6845_UPDATE_ROW(crtc_update_row) override;
 
@@ -175,7 +175,11 @@ protected:
 	void out1_internal(int data);
 	void out2_internal(int data);
 
+	virtual uint8_t crtc_reg_r(offs_t reg) override;
+	virtual void crtc_reg_w(offs_t reg, uint8_t val) override;
+
 	uint8_t m_selected_char_set;
+	bool m_reverse_video_disabled;
 };
 
 /**
