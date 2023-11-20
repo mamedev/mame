@@ -29,15 +29,15 @@ Hardware notes:
 #include "speaker.h"
 
 // internal artwork
-#include "saitek_ccompan.lh"
+#include "saitek_companion.lh"
 
 
 namespace {
 
-class ccompan_state : public driver_device
+class compan_state : public driver_device
 {
 public:
-	ccompan_state(const machine_config &mconfig, device_type type, const char *tag) :
+	compan_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_pia(*this, "pia"),
@@ -47,7 +47,7 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	void ccompan(machine_config &config);
+	void compan(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -76,7 +76,7 @@ private:
 	u8 m_led_direct = 0;
 };
 
-void ccompan_state::machine_start()
+void compan_state::machine_start()
 {
 	// register for savestates
 	save_item(NAME(m_inp_mux));
@@ -90,26 +90,26 @@ void ccompan_state::machine_start()
     I/O
 *******************************************************************************/
 
-void ccompan_state::update_display()
+void compan_state::update_display()
 {
 	m_display->matrix((1 << m_inp_mux & 0x3ff) | (m_led_direct << 10), m_led_data);
 }
 
-void ccompan_state::sled_w(int state)
+void compan_state::sled_w(int state)
 {
 	// CA2: "sides swapped" led
 	m_led_direct = (m_led_direct & ~2) | (state ? 2 : 0);
 	update_display();
 }
 
-void ccompan_state::cled_w(int state)
+void compan_state::cled_w(int state)
 {
 	// CB2: "color" led
 	m_led_direct = (m_led_direct & ~1) | (state ? 1 : 0);
 	update_display();
 }
 
-void ccompan_state::control_w(u8 data)
+void compan_state::control_w(u8 data)
 {
 	// PB0-PB3: input mux, led select
 	m_inp_mux = data & 0xf;
@@ -122,7 +122,7 @@ void ccompan_state::control_w(u8 data)
 	m_dac->write(BIT(data, 7));
 }
 
-u8 ccompan_state::input_r()
+u8 compan_state::input_r()
 {
 	u8 data = 0;
 
@@ -144,7 +144,7 @@ u8 ccompan_state::input_r()
     Address Maps
 *******************************************************************************/
 
-void ccompan_state::main_map(address_map &map)
+void compan_state::main_map(address_map &map)
 {
 	map.global_mask(0x1fff);
 	map(0x0000, 0x03ff).ram();
@@ -158,7 +158,7 @@ void ccompan_state::main_map(address_map &map)
     Input Ports
 *******************************************************************************/
 
-static INPUT_PORTS_START( ccompan )
+static INPUT_PORTS_START( compan )
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Pawn")
@@ -186,17 +186,17 @@ INPUT_PORTS_END
     Machine Configs
 *******************************************************************************/
 
-void ccompan_state::ccompan(machine_config &config)
+void compan_state::compan(machine_config &config)
 {
 	// basic machine hardware
 	M6504(config, m_maincpu, 1000000); // approximation, no XTAL
-	m_maincpu->set_addrmap(AS_PROGRAM, &ccompan_state::main_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &compan_state::main_map);
 
 	PIA6821(config, m_pia);
-	m_pia->readpa_handler().set(FUNC(ccompan_state::input_r));
-	m_pia->writepb_handler().set(FUNC(ccompan_state::control_w));
-	m_pia->ca2_handler().set(FUNC(ccompan_state::sled_w));
-	m_pia->cb2_handler().set(FUNC(ccompan_state::cled_w));
+	m_pia->readpa_handler().set(FUNC(compan_state::input_r));
+	m_pia->writepb_handler().set(FUNC(compan_state::control_w));
+	m_pia->ca2_handler().set(FUNC(compan_state::sled_w));
+	m_pia->cb2_handler().set(FUNC(compan_state::cled_w));
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
@@ -204,7 +204,7 @@ void ccompan_state::ccompan(machine_config &config)
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10+2, 3);
-	config.set_default_layout(layout_saitek_ccompan);
+	config.set_default_layout(layout_saitek_companion);
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
@@ -217,7 +217,7 @@ void ccompan_state::ccompan(machine_config &config)
     ROM Definitions
 *******************************************************************************/
 
-ROM_START( ccompan )
+ROM_START( compan )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("2332n_yo1a", 0x1000, 0x1000, CRC(a715d51c) SHA1(3e1bd9dc119c914b502f1433ee2d6ce3f477b99a) ) // 2332
 ROM_END
@@ -230,5 +230,5 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1982, ccompan, 0,      0,      ccompan, ccompan, ccompan_state, empty_init, "SciSys", "Chess Companion", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1982, compan, 0,      0,      compan,  compan, compan_state, empty_init, "SciSys", "Chess Companion", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

@@ -429,7 +429,7 @@ void psr150_state::psr190_base(machine_config &config)
 	m_maincpu->port_in_cb<2>().set_ioport("PC_R");
 	m_maincpu->port_out_cb<2>().set_ioport("PC_W");
 
-	HD44780(config, m_lcdc);
+	HD44780(config, m_lcdc, 250'000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 8);
 
 	screen_device& screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));

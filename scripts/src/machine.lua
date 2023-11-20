@@ -379,6 +379,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/6883sam.h,MACHINES["6883SAM"] = true
+---------------------------------------------------
+
+if (MACHINES["6883SAM"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/6883sam.cpp",
+		MAME_DIR .. "src/devices/machine/6883sam.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/68153bim.h,MACHINES["BIM68153"] = true
 ---------------------------------------------------
 
@@ -3308,18 +3320,6 @@ if (MACHINES["SENSORBOARD"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/sensorboard.cpp",
 		MAME_DIR .. "src/devices/machine/sensorboard.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/serflash.h,MACHINES["SERFLASH"] = true
----------------------------------------------------
-
-if (MACHINES["SERFLASH"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/serflash.cpp",
-		MAME_DIR .. "src/devices/machine/serflash.h",
 	}
 end
 

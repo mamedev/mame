@@ -162,4 +162,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1995, vicshoot, 0, vicshoot, vicshoot, vicshoot_state, empty_init, ROT0, "Taito Corporation", "Victory Shoot", MACHINE_IS_SKELETON ) // a website lists it as 1994, but it was publicized on 1995 magazines. Going with the latter for now
+GAME( 1995, vicshoot, 0, vicshoot, vicshoot, vicshoot_state, empty_init, ROT0, "Taito Corporation", "Victory Shoot", MACHINE_NOT_WORKING | MACHINE_REQUIRES_ARTWORK ) // a website lists it as 1994, but it was publicized on 1995 magazines. Going with the latter for now

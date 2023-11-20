@@ -315,16 +315,16 @@ void pico_base_state::pico_68k_io_write(offs_t offset, uint16_t data, uint16_t m
 	switch (offset)
 	{
 		case 0x10/2:
-			if (mem_mask & 0xFF00)
-				m_sega_315_5641_pcm->port_w((data >> 8) & 0xFF);
-			if (mem_mask & 0x00FF)
-				m_sega_315_5641_pcm->port_w((data >> 0) & 0xFF);
+			if (mem_mask & 0xff00)
+				m_sega_315_5641_pcm->port_w((data >> 8) & 0xff);
+			if (mem_mask & 0x00ff)
+				m_sega_315_5641_pcm->port_w((data >> 0) & 0xff);
 			break;
 		case 0x12/2: // guess
 			// Note about uPD7759 lines:
 			//  reset line: 1 - normal, 1->0 - reset chip, 0 - playback disabled
 			//  start line: 0->1 - start playback
-			if (mem_mask & 0xFF00)
+			if (mem_mask & 0xff00)
 			{
 				// I assume that:
 				// value 8000 resets the FIFO? (always used with low reset line)
@@ -713,15 +713,15 @@ void copera_state::copera_io_write(offs_t offset, uint16_t data, uint16_t mem_ma
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		m_ext_regs[offset] = (data & mem_mask) | (m_ext_regs[offset] & 0x00FF);
+		m_ext_regs[offset] = (data & mem_mask) | (m_ext_regs[offset] & 0x00ff);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		m_ext_regs[offset] = (data & mem_mask) | (m_ext_regs[offset] & 0xFF00);
+		m_ext_regs[offset] = (data & mem_mask) | (m_ext_regs[offset] & 0xff00);
 	}
 
 	// TODO: We only enable EXT handler callback 3.
-	if (((m_ext_regs[0x4/2] & 0xFF) == 0xd) && ((m_ext_regs[0x2/2] & 0xff) == 0x3f))
+	if (((m_ext_regs[0x4/2] & 0xff) == 0xd) && ((m_ext_regs[0x2/2] & 0xff) == 0x3f))
 	{
 		m_ext_regs[0] |= 1 << 3;
 	}

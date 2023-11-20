@@ -10,7 +10,7 @@ Hardware notes (Diablo):
 - M68000 @ 16MHz, IPL1 256Hz, IPL2 from ACIA IRQ(always high)
 - 2*8KB RAM TC5565 battery-backed, 2*32KB hashtable RAM TC55257
 - 3*32KB ROM (27C256 or equivalent)
-- HD44780 LCD controller (16x1)
+- HD44780A00 LCD controller (16x1)
 - R65C51P2 ACIA @ 1.8432MHz, RS232
 - magnetic sensors, 8*8 chessboard leds
 
@@ -301,7 +301,7 @@ void diablo_state::diablo68k(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(diablo_state::lcd_palette), 3);
 
-	HD44780(config, m_lcd, 0);
+	HD44780(config, m_lcd, 270'000); // OSC = 91K resistor
 	m_lcd->set_lcd_size(2, 8);
 	m_lcd->set_pixel_update_cb(FUNC(diablo_state::lcd_pixel_update));
 

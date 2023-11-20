@@ -221,7 +221,11 @@ void ks0164_device::mpu401_ctrl_w(u8 data)
 
 u8 ks0164_device::mpu401_data_r()
 {
-	//  logerror("mpu pop %02x\n", m_mpu_out);
+	if (!machine().side_effects_disabled())
+	{
+		m_mpu_status &= ~MPUS_TX_FULL;
+		//  logerror("mpu pop %02x\n", m_mpu_out);
+	}
 	return m_mpu_out;
 }
 
@@ -251,9 +255,12 @@ void ks0164_device::mpu401_istatus_w(u8 data)
 
 u8 ks0164_device::mpu401_r()
 {
-	m_mpu_status &= ~MPUS_RX_FULL;
-	m_cpu->set_input_line(11, CLEAR_LINE);
-	//  logerror("mpu_r %02x (%04x)\n", m_mpu_in, m_cpu->pc());
+	if (!machine().side_effects_disabled())
+	{
+		m_mpu_status &= ~MPUS_RX_FULL;
+		m_cpu->set_input_line(11, CLEAR_LINE);
+		//  logerror("mpu_r %02x (%04x)\n", m_mpu_in, m_cpu->pc());
+	}
 	return m_mpu_in;
 }
 

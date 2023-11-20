@@ -156,7 +156,10 @@ void ren_state::machine_reset()
 void ren_state::standby(int state)
 {
 	if (state)
+	{
 		m_display->clear();
+		m_lcd_pwm->clear();
+	}
 }
 
 INPUT_CHANGED_MEMBER(ren_state::go_button)

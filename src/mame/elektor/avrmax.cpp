@@ -263,7 +263,7 @@ void avrmax_state::avrmax(machine_config &config)
 	base(config);
 
 	// basic machine hardware
-	m_maincpu->set_clock(8000000); // internal R/C clock
+	m_maincpu->set_clock(8'000'000); // internal R/C clock
 	m_maincpu->gpio_out<atmega88_device::GPIOC>().set(FUNC(avrmax_state::digit_w));
 	m_maincpu->gpio_out<atmega88_device::GPIOD>().set(FUNC(avrmax_state::segment_w));
 
@@ -287,7 +287,7 @@ void avrmax_state::atm18mcc(machine_config &config)
 	screen.set_visarea_full();
 	screen.set_screen_update(FUNC(avrmax_state::screen_update));
 
-	HD44780(config, m_lcd, 0);
+	HD44780(config, m_lcd, 270'000); // TODO: Wrong device type, should be HD44780U_A00; clock not measured, datasheet typical clock used
 	config.set_default_layout(layout_atm18mcc);
 }
 

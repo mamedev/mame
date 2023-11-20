@@ -172,7 +172,7 @@ void eurit_state::eurit30(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(eurit_state::palette_init), 2);
 
-	hd44780_device &lcdc(SED1278_0B(config, "lcdc", 0));
+	hd44780_device &lcdc(SED1278_0B(config, "lcdc", 250'000)); // TODO: clock not measured, datasheet typical clock used
 	lcdc.set_lcd_size(2, 20);
 	lcdc.set_pixel_update_cb(FUNC(eurit_state::lcd_pixel_update));
 }
