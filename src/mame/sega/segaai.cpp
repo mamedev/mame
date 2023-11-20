@@ -221,8 +221,8 @@ private:
 	u8 m_port_1c;
 	u8 m_port_1d;
 	u8 m_port_1e;
-	int m_prev_v9938_irq;
-	int m_prev_upd7759_irq;
+	u32 m_prev_v9938_irq;
+	u32 m_prev_upd7759_irq;
 	u8 m_touchpad_x;
 	u8 m_touchpad_y;
 	u8 m_irq_active;
