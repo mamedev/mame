@@ -2125,6 +2125,10 @@ ROM_START( tiktokmm )
 	ROM_LOAD16_WORD_SWAP( "webcamthingy.bin", 0x000000, 0x800000, CRC(54c0d4a9) SHA1(709ee607ca447baa6f7e686268df1998372fe617) )
 ROM_END
 
+ROM_START( jeuint )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jeuinteractiftv.bin", 0x000000, 0x800000, CRC(27103086) SHA1(d1313f416ae8ec85e523fefd523d6f4b7970eaf3) )
+ROM_END
 
 ROM_START( hotwhl2p )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
@@ -2186,6 +2190,15 @@ void spg2xx_game_ordentv_state::init_ordentv()
 	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
 	rom[0x4fef8] = 0xee07;
 }
+
+void spg2xx_game_ordentv_state::init_jeuint()
+{
+	// the game will die by jumping to an infinite loop if this check fails, what is it checking?
+	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
+	rom[0x53376] = 0xee07;
+}
+
+
 
 void spg2xx_game_state::init_itvphone()
 {
@@ -2279,9 +2292,12 @@ CONS( 2005, mattelcs,   0,        0, rad_skat,  mattelcs,  spg2xx_game_state,   
 // there's also a single player Hot Wheels Plug and Play that uses a wheel style controller
 CONS( 2006, hotwhl2p,   0,        0, hotwheels, hotwheels, spg2xx_game_hotwheels_state,empty_init,    "Mattel",                                                 "Hot Wheels (2 player, pad controllers)",                                MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
+// there is probably an English langauge version of this too - what is it called?
 CONS( 2007, ordentv,    0,        0, ordentv,   ordentv,   spg2xx_game_ordentv_state,  init_ordentv,  "Taikee / V-Tac",                                         "Ordenador-TV (Spain)",                                                  MACHINE_NOT_WORKING )
-
+CONS( 2007, jeuint,     ordentv,  0, ordentv,   ordentv,   spg2xx_game_ordentv_state,  init_jeuint,   "Taikee / V-Tac",                                         u8"Jeu Intéractif TV",                                                   MACHINE_NOT_WORKING)
+ 
 CONS( 200?, wfcentro,   0,        0, wfcentro,  spg2xx,    spg2xx_game_wfcentro_state, empty_init,    "WinFun",                                                 "Centro TV de Diseno Artistico (Spain)",                                 MACHINE_NOT_WORKING )
 
 // set 2862 to 0003 (irq enable) when it stalls on boot to show something (doesn't turn on IRQs again otherwise?) needs camera emulating
 CONS( 200?, tiktokmm,   0,        0, spg2xx,    spg2xx,    spg2xx_game_wfcentro_state, empty_init,    "TikTokTech Ltd. / 3T Games / Senario",                   "Moving Music (MM-TV110)",                                 MACHINE_NOT_WORKING )
+

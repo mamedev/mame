@@ -307,6 +307,7 @@ public:
 	void ordentv(machine_config &config);
 
 	void init_ordentv();
+	void init_jeuint();
 
 protected:
 
