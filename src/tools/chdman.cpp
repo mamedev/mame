@@ -57,9 +57,18 @@ const uint32_t IDE_SECTOR_SIZE = 512;
 const uint32_t TEMP_BUFFER_SIZE = 32 * 1024 * 1024;
 
 // modes
-const int MODE_NORMAL = 0;
-const int MODE_CUEBIN = 1;
-const int MODE_GDI = 2;
+enum cd_mode
+{
+	MODE_NORMAL,
+	MODE_CUEBIN,
+	MODE_GDI,
+	MODE_CUEBIN_SPLIT,
+};
+
+static inline bool split_mode(cd_mode mode) { return mode == MODE_CUEBIN_SPLIT || mode == MODE_GDI; }
+static inline bool normal_mode(cd_mode mode) { return mode == MODE_NORMAL; }
+static inline bool cuebin_mode(cd_mode mode) { return mode == MODE_CUEBIN || mode == MODE_CUEBIN_SPLIT; }
+static inline bool gdi_mode(cd_mode mode) { return mode == MODE_GDI; }
 
 // command modifier
 #define REQUIRED "~"
@@ -88,6 +97,7 @@ const int MODE_GDI = 2;
 #define OPTION_INPUT "input"
 #define OPTION_OUTPUT "output"
 #define OPTION_OUTPUT_BIN "outputbin"
+#define OPTION_OUTPUT_SPLITCUE "splitcue"
 #define OPTION_OUTPUT_FORCE "force"
 #define OPTION_INPUT_START_BYTE "inputstartbyte"
 #define OPTION_INPUT_START_HUNK "inputstarthunk"
@@ -611,7 +621,8 @@ static const option_description s_options[] =
 	{ OPTION_INPUT_PARENT,          "ip",   true, " <filename>: parent file name for input CHD" },
 	{ OPTION_OUTPUT,                "o",    true, " <filename>: output file name" },
 	{ OPTION_OUTPUT_BIN,            "ob",   true, " <filename>: output file name for binary data" },
-	{ OPTION_OUTPUT_FORCE,          "f",    false, ": force overwriting an existing file" },
+	{ OPTION_OUTPUT_SPLITCUE,       "os",   false, ": Write CDRWIN .bin/.cue format with individual data files for each track, using -ob as a base name and extension if provided." },
+	{ OPTION_OUTPUT_FORCE,          "f",    false, ": force overwriting existing files" },
 	{ OPTION_OUTPUT_PARENT,         "op",   true, " <filename>: parent file name for output CHD" },
 	{ OPTION_INPUT_START_BYTE,      "isb",  true, " <offset>: starting byte offset within the input" },
 	{ OPTION_INPUT_START_HUNK,      "ish",  true, " <offset>: starting hunk offset within the input" },
@@ -759,6 +770,7 @@ static const command_description s_commands[] =
 		{
 			REQUIRED OPTION_OUTPUT,
 			OPTION_OUTPUT_BIN,
+			OPTION_OUTPUT_SPLITCUE,
 			OPTION_OUTPUT_FORCE,
 			REQUIRED OPTION_INPUT,
 			OPTION_INPUT_PARENT,
@@ -768,7 +780,6 @@ static const command_description s_commands[] =
 	{ COMMAND_EXTRACT_DVD, do_extract_dvd, ": extract DVD file from a CHD input file",
 		{
 			REQUIRED OPTION_OUTPUT,
-			OPTION_OUTPUT_BIN,
 			OPTION_OUTPUT_FORCE,
 			REQUIRED OPTION_INPUT,
 			OPTION_INPUT_PARENT,
@@ -1317,62 +1328,62 @@ static void compress_common(chd_file_compressor &chd)
 //  to a CUE file
 //-------------------------------------------------
 
-void output_track_metadata(int mode, util::core_file &file, int tracknum, const cdrom_file::track_info &info, const std::string &filename, uint32_t frameoffs, uint64_t discoffs)
+void output_track_metadata(cd_mode mode, util::core_file &file, int tracknum, const cdrom_file::track_info &info, const std::string &filename, uint32_t frameoffs, uint64_t discoffs)
 {
-	if (mode == MODE_GDI)
+	if (gdi_mode(mode))
 	{
-		int mode = 0, size = 2048;
+		int trkmode = 0, size = 2048;
 
 		switch (info.trktype)
 		{
 			case cdrom_file::CD_TRACK_MODE1:
-				mode = 4;
+				trkmode = 4;
 				size = 2048;
 				break;
 
 			case cdrom_file::CD_TRACK_MODE1_RAW:
-				mode = 4;
+				trkmode = 4;
 				size = 2352;
 				break;
 
 			case cdrom_file::CD_TRACK_MODE2:
-				mode = 4;
+				trkmode = 4;
 				size = 2336;
 				break;
 
 			case cdrom_file::CD_TRACK_MODE2_FORM1:
-				mode = 4;
+				trkmode = 4;
 				size = 2048;
 				break;
 
 			case cdrom_file::CD_TRACK_MODE2_FORM2:
-				mode = 4;
+				trkmode = 4;
 				size = 2324;
 				break;
 
 			case cdrom_file::CD_TRACK_MODE2_FORM_MIX:
-				mode = 4;
+				trkmode = 4;
 				size = 2336;
 				break;
 
 			case cdrom_file::CD_TRACK_MODE2_RAW:
-				mode = 4;
+				trkmode = 4;
 				size = 2352;
 				break;
 
 			case cdrom_file::CD_TRACK_AUDIO:
-				mode = 0;
+				trkmode = 0;
 				size = 2352;
 				break;
 		}
 		const bool needquote = filename.find(' ') != std::string::npos;
 		const char *const quotestr = needquote ? "\"" : "";
-		file.printf("%d %d %d %d %s%s%s %d\n", tracknum+1, frameoffs, mode, size, quotestr, filename, quotestr, discoffs);
+		file.printf("%d %d %d %d %s%s%s %d\n", tracknum+1, frameoffs, trkmode, size, quotestr, filename, quotestr, discoffs);
 	}
-	else if (mode == MODE_CUEBIN)
+	else if (cuebin_mode(mode))
 	{
 		// first track specifies the file
-		if (tracknum == 0)
+		if (split_mode(mode) || tracknum == 0)
 			file.printf("FILE \"%s\" BINARY\n", filename);
 
 		// determine submode
@@ -1401,21 +1412,22 @@ void output_track_metadata(int mode, util::core_file &file, int tracknum, const 
 		file.printf("  TRACK %02d %s\n", tracknum + 1, tempstr);
 
 		// output PREGAP tag if pregap sectors are not in the file
+		uint32_t offset = split_mode(mode) ? 0 : frameoffs;
 		if ((info.pregap > 0) && (info.pgdatasize == 0))
 		{
 			file.printf("    PREGAP %s\n", msf_string_from_frames(info.pregap));
-			file.printf("    INDEX 01 %s\n", msf_string_from_frames(frameoffs));
+			file.printf("    INDEX 01 %s\n", msf_string_from_frames(offset));
 		}
 		else if ((info.pregap > 0) && (info.pgdatasize > 0))
 		{
-			file.printf("    INDEX 00 %s\n", msf_string_from_frames(frameoffs));
-			file.printf("    INDEX 01 %s\n", msf_string_from_frames(frameoffs+info.pregap));
+			file.printf("    INDEX 00 %s\n", msf_string_from_frames(offset));
+			file.printf("    INDEX 01 %s\n", msf_string_from_frames(offset+info.pregap));
 		}
 
 		// if no pregap at all, output index 01 only
 		if (info.pregap == 0)
 		{
-			file.printf("    INDEX 01 %s\n", msf_string_from_frames(frameoffs));
+			file.printf("    INDEX 01 %s\n", msf_string_from_frames(offset));
 		}
 
 		// output POSTGAP
@@ -1423,7 +1435,7 @@ void output_track_metadata(int mode, util::core_file &file, int tracknum, const 
 			file.printf("    POSTGAP %s\n", msf_string_from_frames(info.postgap));
 	}
 	// non-CUE mode
-	else if (mode == MODE_NORMAL)
+	else if (normal_mode(mode))
 	{
 		file.printf("// Track %d\n", tracknum + 1);
 
@@ -2525,60 +2537,82 @@ static void do_extract_cd(parameters_map &params)
 	cdrom_file *cdrom = new cdrom_file(&input_chd);
 	const cdrom_file::toc &toc = cdrom->get_toc();
 
-	// verify output file doesn't exist
+	// verify output TOC file doesn't exist
 	auto output_file_str = params.find(OPTION_OUTPUT);
 	if (output_file_str != params.end())
 		check_existing_output_file(params, output_file_str->second->c_str());
 
-	// verify output BIN file doesn't exist
-	auto output_bin_file_fnd = params.find(OPTION_OUTPUT_BIN);
-	std::string default_name(*output_file_str->second);
-	int chop = default_name.find_last_of('.');
-	if (chop != -1)
-		default_name.erase(chop, default_name.size());
-	std::string basename = default_name;
-	default_name.append(".bin");
-	std::string *output_bin_file_str;
-	if (output_bin_file_fnd == params.end())
-		output_bin_file_str = &default_name;
-	else
-		output_bin_file_str = output_bin_file_fnd->second;
+	// decide mode of output
+	cd_mode mode = MODE_NORMAL;
+	if (params.find(OPTION_OUTPUT_SPLITCUE) != params.end())
+	{
+		mode = MODE_CUEBIN_SPLIT;
+		if (!core_filename_ends_with(*output_file_str->second, ".cue"))
+			printf("Warning: --splitcue is forcing output to be in CDRWIN .bin/.cue format.\n");
+	}
+	else if (core_filename_ends_with(*output_file_str->second, ".cue"))
+		mode = MODE_CUEBIN;
+	else if (core_filename_ends_with(*output_file_str->second, ".gdi"))
+		mode = MODE_GDI;
 
-	check_existing_output_file(params, output_bin_file_str->c_str());
+	// get output BIN file basename and extension
+	auto output_bin_file_fnd = params.find(OPTION_OUTPUT_BIN);
+	std::string basename;
+	std::string fileext = ".bin";
+	if (output_bin_file_fnd == params.end())
+	{
+		basename = *output_file_str->second;
+		int chop = basename.find_last_of('.');
+		if (chop != -1)
+			basename.erase(chop, basename.size());
+	}
+	else
+	{
+		basename = *output_bin_file_fnd->second;
+		int chop = basename.find_last_of('.');
+		if (chop != -1)
+		{
+			fileext = basename.substr(chop);
+			basename.erase(chop, basename.size());
+		}
+	}
+
+	// verify output BIN files don't exist
+	std::vector<std::string> output_bin_file_vec;
+	bool multi_bin = split_mode(mode) && toc.numtrks > 1;
+	output_bin_file_vec.reserve(multi_bin ? toc.numtrks : 1);
+	if (multi_bin)
+	{
+		std::string fmt = (toc.numtrks > 9) ? " (Track %02d)" : " (Track %d)";
+		for (int tracknum = 0; tracknum < toc.numtrks; tracknum++)
+		{
+			std::string trackname = basename + string_format(fmt, tracknum + 1) + fileext;
+			check_existing_output_file(params, trackname.c_str());
+			output_bin_file_vec.push_back(trackname);
+		}
+	}
+	else
+	{
+		std::string trackname = basename + fileext;
+		check_existing_output_file(params, trackname.c_str());
+		output_bin_file_vec.push_back(trackname);
+	}
 
 	// print some info
 	printf("Output TOC:   %s\n", output_file_str->second->c_str());
-	printf("Output Data:  %s\n", output_bin_file_str->c_str());
+	for (std::string output_bin_file_str : output_bin_file_vec)
+		printf("Output Data:  %s\n", output_bin_file_str.c_str());
 	printf("Input CHD:    %s\n", params.find(OPTION_INPUT)->second->c_str());
 
-	// catch errors so we can close & delete the output file
+	// catch errors so we can close & delete the output files
 	util::core_file::ptr output_bin_file;
 	util::core_file::ptr output_toc_file;
 	try
 	{
-		int mode = MODE_NORMAL;
-
-		if (output_file_str->second->find(".cue") != -1)
-		{
-			mode = MODE_CUEBIN;
-		}
-		else if (output_file_str->second->find(".gdi") != -1)
-		{
-			mode = MODE_GDI;
-		}
-
-		// process output file
+		// process output TOC file
 		std::error_condition filerr = util::core_file::open(*output_file_str->second, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_NO_BOM, output_toc_file);
 		if (filerr)
 			report_error(1, "Unable to open file (%s): %s", *output_file_str->second, filerr.message());
-
-		// process output BIN file
-		if (mode != MODE_GDI)
-		{
-			filerr = util::core_file::open(*output_bin_file_str, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, output_bin_file);
-			if (filerr)
-				report_error(1, "Unable to open file (%s): %s", *output_bin_file_str, filerr.message());
-		}
 
 		// determine total frames
 		uint64_t total_bytes = 0;
@@ -2586,11 +2620,11 @@ static void do_extract_cd(parameters_map &params)
 			total_bytes += toc.tracks[tracknum].frames * (toc.tracks[tracknum].datasize + toc.tracks[tracknum].subsize);
 
 		// GDI must start with the # of tracks
-		if (mode == MODE_GDI)
+		if (gdi_mode(mode))
 		{
 			output_toc_file->printf("%d\n", toc.numtrks);
 		}
-		else if (mode == MODE_NORMAL)
+		else if (normal_mode(mode))
 		{
 			bool mode1 = false;
 			bool mode2 = false;
@@ -2629,44 +2663,34 @@ static void do_extract_cd(parameters_map &params)
 
 		// iterate over tracks and copy all data
 		uint64_t outputoffs = 0;
+		uint64_t outputstart = 0;
 		uint32_t discoffs = 0;
 		std::vector<uint8_t> buffer;
 		for (int tracknum = 0; tracknum < toc.numtrks; tracknum++)
 		{
-			std::string trackbin_name = basename;
+			std::string trackbin_name;
 
-			if (mode == MODE_GDI)
+			if (split_mode(mode) || tracknum == 0)
 			{
-				trackbin_name += util::string_format("%02d", tracknum+1);
-				if (toc.tracks[tracknum].trktype == cdrom_file::CD_TRACK_AUDIO)
-					trackbin_name += ".raw";
-				else
-					trackbin_name += ".bin";
-
+				// process output BIN file
+				trackbin_name = output_bin_file_vec[tracknum];
 				output_bin_file.reset();
-
 				filerr = util::core_file::open(trackbin_name, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, output_bin_file);
 				if (filerr)
 					report_error(1, "Unable to open file (%s): %s", trackbin_name, filerr.message());
 
+				outputstart += outputoffs;
 				outputoffs = 0;
 			}
 
 			// output the metadata about the track to the TOC file
 			const cdrom_file::track_info &trackinfo = toc.tracks[tracknum];
-			if (mode == MODE_GDI)
-			{
-				output_track_metadata(mode, *output_toc_file, tracknum, trackinfo, std::string(core_filename_extract_base(trackbin_name)), discoffs, outputoffs);
-			}
-			else
-			{
-				output_track_metadata(mode, *output_toc_file, tracknum, trackinfo, std::string(core_filename_extract_base(*output_bin_file_str)), discoffs, outputoffs);
-			}
+			output_track_metadata(mode, *output_toc_file, tracknum, trackinfo, std::string(core_filename_extract_base(trackbin_name)), discoffs, outputoffs);
 
 			// If this is bin/cue output and the CHD contains subdata, warn the user and don't include
 			// the subdata size in the buffer calculation.
 			uint32_t output_frame_size = trackinfo.datasize + ((trackinfo.subtype != cdrom_file::CD_SUB_NONE) ? trackinfo.subsize : 0);
-			if (trackinfo.subtype != cdrom_file::CD_SUB_NONE && ((mode == MODE_CUEBIN) || (mode == MODE_GDI)))
+			if (trackinfo.subtype != cdrom_file::CD_SUB_NONE && (cuebin_mode(mode) || gdi_mode(mode)))
 			{
 				printf("Warning: Track %d has subcode data.  bin/cue and gdi formats cannot contain subcode data and it will be omitted.\n", tracknum+1);
 				printf("       : This may affect usage of the output image.  Use bin/toc output to keep all data.\n");
@@ -2681,14 +2705,14 @@ static void do_extract_cd(parameters_map &params)
 			uint32_t actualframes = trackinfo.frames - trackinfo.padframes;
 			for (uint32_t frame = 0; frame < actualframes; frame++)
 			{
-				progress(false, "Extracting, %.1f%% complete... \r", 100.0 * double(outputoffs) / double(total_bytes));
+				progress(false, "Extracting, %.1f%% complete... \r", 100.0 * double(outputstart + outputoffs) / double(total_bytes));
 
 				// read the data
 				cdrom->read_data(cdrom->get_track_start_phys(tracknum) + frame, &buffer[bufferoffs], trackinfo.trktype, true);
 
 				// for CDRWin and GDI audio tracks must be reversed
 				// in the case of GDI and CHD version < 5 we assuming source CHD image is GDROM so audio tracks is already reversed
-				if (((mode == MODE_GDI && input_chd.version() > 4) || (mode == MODE_CUEBIN)) && (trackinfo.trktype == cdrom_file::CD_TRACK_AUDIO))
+				if (((gdi_mode(mode) && input_chd.version() > 4) || cuebin_mode(mode)) && (trackinfo.trktype == cdrom_file::CD_TRACK_AUDIO))
 					for (int swapindex = 0; swapindex < trackinfo.datasize; swapindex += 2)
 					{
 						uint8_t swaptemp = buffer[bufferoffs + swapindex];
@@ -2699,7 +2723,7 @@ static void do_extract_cd(parameters_map &params)
 				discoffs++;
 
 				// read the subcode data
-				if (trackinfo.subtype != cdrom_file::CD_SUB_NONE && (mode == MODE_NORMAL))
+				if (trackinfo.subtype != cdrom_file::CD_SUB_NONE && normal_mode(mode))
 				{
 					cdrom->read_subcode(cdrom->get_track_start_phys(tracknum) + frame, &buffer[bufferoffs], true);
 					bufferoffs += trackinfo.subsize;
@@ -2731,7 +2755,8 @@ static void do_extract_cd(parameters_map &params)
 		// delete the output files
 		output_bin_file.reset();
 		output_toc_file.reset();
-		osd_file::remove(*output_bin_file_str);
+		for (std::string output_bin_file_str : output_bin_file_vec)
+			osd_file::remove(output_bin_file_str);
 		osd_file::remove(*output_file_str->second);
 		throw;
 	}
