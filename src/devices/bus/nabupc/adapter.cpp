@@ -9,10 +9,10 @@
 #include "emu.h"
 #include "adapter.h"
 
-#include "client_http.hpp"
 #include "diserial.h"
 #include "emuopts.h"
-#include "hashing.h"
+
+#include "client_http.hpp"
 #include "unzip.h"
 
 #define VERBOSE 0
@@ -513,29 +513,26 @@ void network_adapter_base::channel_request(uint8_t byte)
 
 void network_adapter_base::segment_request(uint8_t byte)
 {
-	static uint32_t segment_id = 0;
-
 	if (m_substate == 0) {
+		m_segment = 0;
 		m_packet = byte;
 	} else if (m_substate == 1) {
-		segment_id = (segment_id & 0xffff00) | (byte);
+		m_segment = (m_segment & 0xffff00) | (byte);
 	} else if (m_substate == 2) {
-		segment_id = (segment_id & 0xff00ff) | (byte << 8);
+		m_segment = (m_segment & 0xff00ff) | (byte << 8);
 	} else if (m_substate == 3) {
-		segment_id = (segment_id & 0xffff) | (byte << 16);
+		m_segment = (m_segment & 0xffff) | (byte << 16);
 		transmit_byte(0xe4);
-		if (!load_segment(segment_id)) {
+		if (!load_segment(m_segment)) {
 			transmit_byte(0x91);
 			m_state = state::SEND_SEGMENT;
 			m_substate = 0;
-			m_segment = segment_id;
 			LOG("Segment: 0x%06X, Packet: 0x%02X\n", m_segment, m_packet);
 			return;
 		} else {
 			transmit_byte(0x90);
 			m_state = state::IDLE;
-			LOG("Segment 0x%06X not found\n", segment_id);
-			m_segment = 0;
+			LOG("Segment 0x%06X not found\n", m_segment);
 		}
 	}
 	++m_substate;
@@ -632,6 +629,11 @@ std::error_condition network_adapter_local::load_segment(uint32_t segment_id)
 
 	if ((m_segment_length != 0 && (segment_id == m_segment)) || segment_id == 0x7fffff) {
 		return std::error_condition();
+	}
+
+	if (!is_loaded()) {
+		m_segment_length = 0;
+		return std::errc::invalid_argument;
 	}
 
 	err = util::core_file::open_proxy(image_core_file(), proxy);
@@ -741,7 +743,13 @@ std::error_condition network_adapter_remote::load_segment(uint32_t segment_id)
 		url = util::string_format("/cycle%%202%%20raw/%s", segment_filename);
 	}
 
-	resp = m_httpclient->request("GET", url);
+	try {
+		resp = m_httpclient->request("GET", url);
+	} catch(const std::system_error &e) {
+		m_segment_length = 0;
+		return std::errc::no_such_file_or_directory;
+	}
+
 	if (resp->status_code != "200 OK") {
 		m_segment_length = 0;
 		return std::errc::no_such_file_or_directory;
