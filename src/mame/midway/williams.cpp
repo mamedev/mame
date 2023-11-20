@@ -2179,6 +2179,27 @@ ROM_START( defence )
 	ROM_LOAD( "defcmnda.snd", 0xf800, 0x0800, CRC(f122d9c9) SHA1(70092fc354a2efbe7365be922fa36309b50d5c6f) )
 ROM_END
 
+ROM_START( defenderom )
+	ROM_REGION( 0x19000, "maincpu", 0 )
+	ROM_LOAD( "rom1.bin",  0x0d000, 0x1000, CRC(8c04602b) SHA1(a8ed5afd0b276cebb479b1717666eaabbf75c6a5) )
+	ROM_LOAD( "rom2.bin",  0x0e000, 0x1000, CRC(89b75984) SHA1(a9481478da38f99efb67f0ecf82d084e14b93b42) )
+	ROM_LOAD( "rom3.bin",  0x0f000, 0x1000, CRC(94f51e9b) SHA1(a24cfc55de56a72758c76fe2a55f1ec6c353b16f) )
+	ROM_LOAD( "rom10.bin", 0x10000, 0x0800, CRC(12e2bd1c) SHA1(c2fdf2fced003a0acf037aa6fab141b04c1c81bd) )
+	ROM_LOAD( "rom7.bin",  0x10800, 0x0800, CRC(19e1ac79) SHA1(02925bbfab103304d097d778bda1b169b5f98d9c) )
+	ROM_LOAD( "rom9.bin",  0x11000, 0x0800, CRC(b8ac5966) SHA1(df9ff8c6585f67dc55e54f07f6ec51158aa35ac3) )
+	ROM_LOAD( "rom6.bin",  0x11800, 0x0800, CRC(3b46fb44) SHA1(43a6a22184218338d801146b89d2d85f1ca33297) )
+	ROM_LOAD( "rom8.bin",  0x12000, 0x0800, CRC(9b1fd97d) SHA1(b5befbbc8e989c59cf98d3b3fb1307776101b19a) )
+	ROM_LOAD( "rom5.bin",  0x12800, 0x0800, CRC(871f75a0) SHA1(4ded757dbb375a703e930bd0c46281c0d8479a0c) )
+	ROM_LOAD( "rom4.bin",  0x16000, 0x0800, CRC(65f4efd1) SHA1(a960fd1559ed74b81deba434391e49fc6ec389ca) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "rom12.bin", 0xf800, 0x0800, CRC(f122d9c9) SHA1(70092fc354a2efbe7365be922fa36309b50d5c6f) )
+
+	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_LOAD( "7641-1.bin", 0x0000, 0x0200, CRC(25de5d85) SHA1(826f78c2fe847f594d261c280dd10b9e776bf4fd) )
+	ROM_LOAD( "7641-2.bin", 0x0200, 0x0200, CRC(c3f45f70) SHA1(d19036cbc46b130548873597b44b8b70758f25c4) )
+ROM_END
+
 // 2-PCB stack: BB10A + BB10B
 ROM_START( defenseb )
 	ROM_REGION( 0x19000, "maincpu", 0 ) // All ROMs but 2 identical to defenderj
@@ -3804,16 +3825,17 @@ void wms_muxed_state::init_alienar()
  *************************************/
 
 // Defender hardware games
-GAME( 1980, defender,   0,        defender,       defender, defender_state,  empty_init,    ROT0,   "Williams",                             "Defender (Red label)",               MACHINE_SUPPORTS_SAVE ) // developers left Williams in 1981 and formed Vid Kidz
-GAME( 1980, defenderg,  defender, defender,       defender, defender_state,  empty_init,    ROT0,   "Williams",                             "Defender (Green label)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1980, defenderb,  defender, defender,       defender, defender_state,  empty_init,    ROT0,   "Williams",                             "Defender (Blue label)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1980, defenderw,  defender, defender,       defender, defender_state,  empty_init,    ROT0,   "Williams",                             "Defender (White label)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1980, defenderj,  defender, defender,       defender, defender_state,  empty_init,    ROT0,   "Williams (Taito Corporation license)", "T.T Defender",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1980, defndjeu,   defender, defender,       defender, defender_state,  init_defndjeu, ROT0,   "bootleg (Jeutel)",                     "Defender (bootleg)",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, defender,   0,        defender,       defender, defender_state,  empty_init,    ROT0,   "Williams",                             "Defender (Red label)",                  MACHINE_SUPPORTS_SAVE ) // developers left Williams in 1981 and formed Vid Kidz
+GAME( 1980, defenderg,  defender, defender,       defender, defender_state,  empty_init,    ROT0,   "Williams",                             "Defender (Green label)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1980, defenderb,  defender, defender,       defender, defender_state,  empty_init,    ROT0,   "Williams",                             "Defender (Blue label)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1980, defenderw,  defender, defender,       defender, defender_state,  empty_init,    ROT0,   "Williams",                             "Defender (White label)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1980, defenderj,  defender, defender,       defender, defender_state,  empty_init,    ROT0,   "Williams (Taito Corporation license)", "T.T Defender",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1980, defndjeu,   defender, defender,       defender, defender_state,  init_defndjeu, ROT0,   "bootleg (Jeutel)",                     "Defender (bootleg)",                    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, tornado1,   defender, defender,       defender, defender_state,  init_defndjeu, ROT0,   "bootleg (Jeutel)",                     "Tornado (bootleg of Defender, set 1)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1980, tornado2,   defender, defender,       defender, defender_state,  init_defndjeu, ROT0,   "bootleg (Jeutel)",                     "Tornado (bootleg of Defender, set 2)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // bad dump?
 GAME( 1980, zero,       defender, defender,       defender, defender_state,  init_defndjeu, ROT0,   "bootleg (Jeutel)",                     "Zero (bootleg of Defender, set 1)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1980, zero2,      defender, defender,       defender, defender_state,  init_defndjeu, ROT0,   "bootleg (Amtec)",                      "Zero (bootleg of Defender, set 2)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1981, defenderom, defender, defender,       defender, defender_state,  empty_init,    ROT0,   "bootleg (Operamatic)",                 "Defender (Operamatic bootleg)",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, defcmnd,    defender, defender,       defender, defender_state,  empty_init,    ROT0,   "bootleg",                              "Defense Command (bootleg of Defender)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, defence,    defender, defender,       defender, defender_state,  empty_init,    ROT0,   "bootleg (Outer Limits)",               "Defence Command (bootleg of Defender)", MACHINE_SUPPORTS_SAVE )
 GAME( 198?, defenseb,   defender, defender,       defender, defender_state,  empty_init,    ROT0,   "bootleg",                              "Defense (bootleg of Defender)",         MACHINE_SUPPORTS_SAVE )
