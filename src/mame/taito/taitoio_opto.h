@@ -13,26 +13,22 @@ public:
 	// construction/destruction
 	taitoio_opto_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	int opto_h_r();
-	int opto_l_r();
-	DECLARE_INPUT_CHANGED_MEMBER(coin_sense_cb);
+	void coin_sense_w(int state);
+	int opto_h_r() const { return m_opto_h ? 1 : 0; }
+	int opto_l_r() const { return m_opto_l ? 1 : 0; }
 
 protected:
-	virtual ioport_constructor device_input_ports() const override;
-
-	// device-level overrides
-//  virtual void device_validity_check(validity_checker &valid) const;
+	// device_t implementation
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 private:
-	required_ioport m_coin_in;
+	emu_timer *m_opto_timer;
+	bool m_coin_sense;
+	bool m_opto_h;
+	bool m_opto_l;
+	attotime m_opto_start;
+	attotime m_opto_end;
 
-	bool m_opto_h = false;
-	bool m_opto_l = false;
-	emu_timer *m_opto_timer = nullptr;
-	attotime m_opto_start = attotime::never;
-	attotime m_opto_end = attotime::never;
 	TIMER_CALLBACK_MEMBER(opto_clear_cb);
 };
 

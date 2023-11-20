@@ -54,8 +54,8 @@ TILE_GET_INFO_MEMBER(dynduke_state::get_fg_tile_info)
 
 TILE_GET_INFO_MEMBER(dynduke_state::get_tx_tile_info)
 {
-	uint32_t tile=m_videoram[tile_index];
-	uint32_t const color=(tile >> 8) & 0x0f;
+	uint32_t tile = m_videoram[tile_index];
+	uint32_t const color = (tile >> 8) & 0x0f;
 
 	tile = (tile & 0xff) | ((tile & 0xc000) >> 6);
 
@@ -126,9 +126,10 @@ void dynduke_state::control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 void dynduke_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint16_t const *const buffered_spriteram16 = m_spriteram->buffer();
+	if (!m_sprite_enable)
+		return;
 
-	if (!m_sprite_enable) return;
+	uint16_t const *const buffered_spriteram16 = m_spriteram->buffer();
 
 	constexpr uint32_t pri_mask[4] = {
 		GFX_PMASK_8 | GFX_PMASK_4 | GFX_PMASK_2, // Untested: does anything use it? Could be behind background
@@ -137,34 +138,34 @@ void dynduke_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 		GFX_PMASK_8,
 	};
 
-	for (int offs = 0;offs < 0x800;offs += 4)
+	for (int offs = 0; offs < 0x800; offs += 4)
 	{
-		/* Don't draw empty sprite table entries */
-		if ((buffered_spriteram16[offs+3] >> 8)!=0xf) continue;
-		uint32_t pri = pri_mask[((buffered_spriteram16[offs+2]>>13)&3)];
+		// Don't draw empty sprite table entries
+		if ((buffered_spriteram16[offs + 3] >> 8) != 0xf)
+			continue;
 
-		bool fx = BIT(buffered_spriteram16[offs+0], 13);
-		bool fy = BIT(buffered_spriteram16[offs+0], 14);
-		int32_t y = buffered_spriteram16[offs+0] & 0xff;
-		int32_t x = buffered_spriteram16[offs+2] & 0xff;
+		uint32_t const pri = pri_mask[(buffered_spriteram16[offs + 2] >> 13) & 3];
 
-		if (buffered_spriteram16[offs+2]&0x100) x=0-(0x100-x);
+		bool fx = BIT(buffered_spriteram16[offs + 0], 13);
+		bool fy = BIT(buffered_spriteram16[offs + 0], 14);
+		int32_t y = buffered_spriteram16[offs + 0] & 0xff;
+		int32_t x = util::sext(buffered_spriteram16[offs + 2], 9);
 
-		uint32_t const color = (buffered_spriteram16[offs+0]>>8)&0x1f;
-		uint32_t sprite = buffered_spriteram16[offs+1];
-		sprite &= 0x3fff;
+		uint32_t const color = (buffered_spriteram16[offs + 0] >> 8) & 0x1f;
+		uint32_t const sprite = buffered_spriteram16[offs + 1] & 0x3fff;
 
-		if (flip_screen()) {
-			x=240-x;
-			y=240-y;
-			fx=!fx;
-			fy=!fy;
+		if (flip_screen())
+		{
+			x = 240 - x;
+			y = 240 - y;
+			fx = !fx;
+			fy = !fy;
 		}
 
-		m_gfxdecode->gfx(3)->prio_transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(3)->prio_transpen(bitmap, cliprect,
 				sprite,
-				color,fx,fy,x,y,
-				screen.priority(),pri,15);
+				color, fx, fy, x, y,
+				screen.priority(), pri, 15);
 	}
 }
 
@@ -179,8 +180,8 @@ void dynduke_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap,
 		return;
 	}
 
-	int scrolly = ((m_scroll_ram[0x01]&0x30)<<4)+((m_scroll_ram[0x02]&0x7f)<<1)+((m_scroll_ram[0x02]&0x80)>>7);
-	int scrollx = ((m_scroll_ram[0x09]&0x30)<<4)+((m_scroll_ram[0x0a]&0x7f)<<1)+((m_scroll_ram[0x0a]&0x80)>>7);
+	int scrolly = ((m_scroll_ram[0x01] & 0x30) << 4) +((m_scroll_ram[0x02] & 0x7f) << 1) + ((m_scroll_ram[0x02] & 0x80) >> 7);
+	int scrollx = ((m_scroll_ram[0x09] & 0x30) << 4) +((m_scroll_ram[0x0a] & 0x7f) << 1) + ((m_scroll_ram[0x0a] & 0x80) >> 7);
 
 	if (flip_screen())
 	{
@@ -196,7 +197,7 @@ void dynduke_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap,
 		uint8_t *const pdst = &screen.priority().pix(y);
 
 
-		for (int x=cliprect.left();x<=cliprect.right();x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			int const realx = (x + scrollx) & 0x1ff;
 			uint16_t srcdat = src[realx];
@@ -229,8 +230,8 @@ uint32_t dynduke_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 {
 	screen.priority().fill(0, cliprect);
 	/* Setup the tilemaps */
-	m_fg_layer->set_scrolly(0, ((m_scroll_ram[0x11]&0x30)<<4)+((m_scroll_ram[0x12]&0x7f)<<1)+((m_scroll_ram[0x12]&0x80)>>7) );
-	m_fg_layer->set_scrollx(0, ((m_scroll_ram[0x19]&0x30)<<4)+((m_scroll_ram[0x1a]&0x7f)<<1)+((m_scroll_ram[0x1a]&0x80)>>7) );
+	m_fg_layer->set_scrolly(0, ((m_scroll_ram[0x11] & 0x30) << 4) + ((m_scroll_ram[0x12] & 0x7f) << 1) + ((m_scroll_ram[0x12] & 0x80) >> 7));
+	m_fg_layer->set_scrollx(0, ((m_scroll_ram[0x19] & 0x30) << 4) + ((m_scroll_ram[0x1a] & 0x7f) << 1) + ((m_scroll_ram[0x1a] & 0x80) >> 7));
 	m_fg_layer->enable(m_fore_enable);
 	m_tx_layer->enable(m_txt_enable);
 
