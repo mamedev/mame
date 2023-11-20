@@ -227,6 +227,7 @@ void dynduke_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap,
 
 uint32_t dynduke_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	screen.priority().fill(0, cliprect);
 	/* Setup the tilemaps */
 	m_fg_layer->set_scrolly(0, ((m_scroll_ram[0x11]&0x30)<<4)+((m_scroll_ram[0x12]&0x7f)<<1)+((m_scroll_ram[0x12]&0x80)>>7) );
 	m_fg_layer->set_scrollx(0, ((m_scroll_ram[0x19]&0x30)<<4)+((m_scroll_ram[0x1a]&0x7f)<<1)+((m_scroll_ram[0x1a]&0x80)>>7) );
