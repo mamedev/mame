@@ -117,8 +117,17 @@ ROM_START( lx_aven )
 	DISK_IMAGE( "sd-card", 0, SHA1(911da7bf7dac391e3329e17e3f411caafac52f0f) )
 ROM_END
 
+ROM_START( lx_frozen )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_32BIT | ROMREGION_LE )
+	ROM_LOAD32_DWORD( "29lv800.bin", 0x000000, 0x100000, CRC(7b107f6c) SHA1(3a8e37e51dab5cab9977261e0ac17ba5194a9370) )
+
+	DISK_REGION( "ata:0:hdd" ) /* 4GB SD Card */
+	DISK_IMAGE( "sdcard", 0, SHA1(0d727815ba06d7bfe8e092007e24d4931b302ef9) )
+ROM_END
+
 } // anonymous namespace
 
 
-CONS( 2015, lx_jg7425,   0,         0,      lexibook_jg7425,   lexibook_jg7425, lexibook_jg7425_state, empty_init, "Lexibook", "Lexibook JG7425 221-in-1", MACHINE_IS_SKELETON )
-CONS( 201?, lx_aven,     0,         0,      lexibook_jg7425,   lexibook_jg7425, lexibook_jg7425_state, empty_init, "Lexibook", "Marvel Avengers TV Game Console (32-bit) (Lexibook)", MACHINE_IS_SKELETON )
+CONS( 2015, lx_jg7425,   0,         0,     lexibook_jg7425,   lexibook_jg7425, lexibook_jg7425_state, empty_init, "Lexibook", "Lexibook JG7425 221-in-1", MACHINE_IS_SKELETON )
+CONS( 2016, lx_aven,     0,         0,     lexibook_jg7425,   lexibook_jg7425, lexibook_jg7425_state, empty_init, "Lexibook", "Marvel Avengers TV Game Console (32-bit, Lexibook)", MACHINE_IS_SKELETON )
+CONS( 2016, lx_frozen,   0,         0,     lexibook_jg7425,   lexibook_jg7425, lexibook_jg7425_state, empty_init, "Lexibook", "Disney Frozen TV Game Console (32-bit, Lexibook, JG7420FZ)", MACHINE_IS_SKELETON )

@@ -44652,8 +44652,9 @@ zone3d
 zonefamf
 
 @source:tvgames/spg29x_lexibook_jg7425.cpp
-lx_jg7425
 lx_aven
+lx_frozen
+lx_jg7425
 
 @source:tvgames/spg2xx.cpp
 ablkickb
