@@ -1497,7 +1497,7 @@ GAME( 1980, rallyx,    0,        rallyx,   rallyx,   rallyx_state, empty_init, R
 GAME( 1980, rallyxa,   rallyx,   rallyx,   rallyx,   rallyx_state, empty_init, ROT0,  "Namco",                              "Rally X",                           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, rallyxm,   rallyx,   rallyx,   rallyx,   rallyx_state, empty_init, ROT0,  "Namco (Midway license)",             "Rally X (Midway)",                  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, rallyxmr,  rallyx,   rallyx,   rallyx,   rallyx_state, empty_init, ROT0,  "bootleg (Model Racing)",             "Rally X (Model Racing bootleg)",    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, rallyxeg,  rallyx,   rallyx,   rallyxeg, rallyx_state, empty_init, ROT90, "bootleg (Video Game / Electrogame)", "Rally X (Video Game bootleg)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, rallyxeg,  rallyx,   rallyx,   rallyxeg, rallyx_state, empty_init, ROT90, "bootleg (Video Game / Electrogame)", "Rally X (Video Game bootleg)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, dngrtrck,  rallyx,   rallyx,   dngrtrck, rallyx_state, empty_init, ROT0,  "bootleg (Petaco)",                   "Danger Track (bootleg of Rally X)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, nrallyx,   0,        rallyx,   nrallyx,  rallyx_state, empty_init, ROT0,  "Namco",                              "New Rally X",                       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, nrallyxb,  nrallyx,  rallyx,   nrallyx,  rallyx_state, empty_init, ROT0,  "Namco",                              "New Rally X (bootleg?)",            MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
