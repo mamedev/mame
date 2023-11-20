@@ -139,6 +139,8 @@ New JIS Keyboard Connector Pinout:
 #define TOUCHPAD_ROWS 20
 
 
+namespace {
+
 class segaai_state : public driver_device
 {
 public:
@@ -818,5 +820,6 @@ ROM_START(segaai)
 	ROM_LOAD("mpr-7620.ic15", 0x20000, 0x20000, CRC(e042754b) SHA1(02aede7a3e2fda9cbca621b530afa4520cf16610))
 ROM_END
 
+} // anonymous namespace
 
 COMP(1986, segaai,     0,         0,      segaai,   ai_kbd, segaai_state,   empty_init,    "Sega",   "AI", MACHINE_NOT_WORKING)
