@@ -8,6 +8,7 @@ Detects coin weight tied to a non-JAMMA harness.
 Parent Jack pinout has two input pins, labeled "in medal sen(sor?)" and "coin drop".
 
 Used by Taito gambling/medal games:
+- taito/cchance.cpp
 - taito/pkspirit.cpp
 - taito/sbmjb.cpp
 - taito/taito_o.cpp

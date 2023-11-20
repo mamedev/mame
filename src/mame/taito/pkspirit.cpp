@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders:Angelo Salese
 /**************************************************************************************************
 
 Poker Spirit (c) 1992 Taito
@@ -48,6 +48,8 @@ Video PCB:
 #include "sound/okim6295.h"
 #include "sound/ymopn.h"
 
+#include "taitoio_opto.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -59,14 +61,15 @@ namespace {
 class pkspirit_state : public driver_device
 {
 public:
-	pkspirit_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_mainio(*this, "mainio"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_bg_videoram(*this, "bg_videoram"),
-		m_fg_videoram(*this, "fg_videoram"),
-		m_audiobank(*this, "audiobank")
+	pkspirit_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_mainio(*this, "mainio")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_bg_videoram(*this, "bg_videoram")
+		, m_fg_videoram(*this, "fg_videoram")
+		, m_audiobank(*this, "audiobank")
+		, m_opto(*this, "opto%u", 1U)
 	{ }
 
 	void pkspirit(machine_config &config);
@@ -83,6 +86,8 @@ private:
 	required_shared_ptr<uint16_t> m_bg_videoram;
 	required_shared_ptr<uint16_t> m_fg_videoram;
 	required_memory_bank m_audiobank;
+
+	required_device_array<taitoio_opto_device, 2> m_opto;
 
 	tilemap_t *m_bg_tilemap = nullptr;
 	tilemap_t *m_fg_tilemap = nullptr;
@@ -180,8 +185,12 @@ void pkspirit_state::sound_map(address_map &map) // TODO: verify everything
 
 
 // TODO: verify some of these labels means anything in normal English, remap accordingly
-// TODO: Opto labels are supposedly coin chutes
 static INPUT_PORTS_START( pkspirit )
+	PORT_START("COIN")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER("opto1", taitoio_opto_device, coin_sense_w)
+	// FIXME: check error triggered if pressed for too long once video emulation is better
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_WRITE_LINE_DEVICE_MEMBER("opto2", taitoio_opto_device, coin_sense_w)
+
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("1 Bet SW")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Duabet SW")
@@ -189,8 +198,8 @@ static INPUT_PORTS_START( pkspirit )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal/Draw SW") // "DE/DR"
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP ) PORT_NAME("Double SW")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Payout SW")
-	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Opto2 (H)")
-	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Opto2 (L)")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto2", taitoio_opto_device, opto_h_r)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto2", taitoio_opto_device, opto_l_r)
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
@@ -199,8 +208,8 @@ static INPUT_PORTS_START( pkspirit )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Opto1 (H)")
-	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Opto1 (L)")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto1", taitoio_opto_device, opto_h_r)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto1", taitoio_opto_device, opto_l_r)
 
 	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Reset Key")
@@ -264,6 +273,7 @@ static INPUT_PORTS_START( pkspirit )
 	PORT_DIPNAME( 0x4000, 0x4000, "Bell" ) PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(      0x4000, DEF_STR( On ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	// debug/cheat option
 	PORT_DIPNAME( 0x8000, 0x8000, "Credit Pool 500" ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -304,6 +314,9 @@ void pkspirit_state::pkspirit(machine_config &config)
 	m_mainio->in_port2_cb().set_ioport("IN2");
 	m_mainio->in_port3_cb().set_ioport("IN3");
 	m_mainio->in_port4_cb().set_ioport("IN4");
+
+	for (auto & opto : m_opto)
+		TAITOIO_OPTO(config, opto, 0);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: wrong
