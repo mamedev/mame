@@ -2985,7 +2985,7 @@ The other is an MPEG decoder board (837-10835 171-6814D PC BD MPEG) containing..
 -A curious PLCC44 marked SEGA MPR-17610A-H. The MPR-xxxxx suggests it's a PLCC mask ROM, but type unknown????)
 
 The CD-ROM unit is an Hitachi CDD-150SG with a custom flat connector (like the Saturn
-unit, but you cannot use a Saturn unit on the STV, as it lacks tray control.
+unit, but you cannot use a Saturn unit on the STV, as it lacks tray control).
 */
 
 ROM_START( sfish2 )
