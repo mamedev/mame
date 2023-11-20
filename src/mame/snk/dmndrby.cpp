@@ -700,7 +700,9 @@ void dmndrby_state::dderby(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, 0, HOLD_LINE);
+	// NOTE: do not HOLD_LINE here, otherwise audio CPU won't have time to read the command
+	// cfr. MT#08792
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	AY8910(config, "ay1", 1'789'750).add_route(ALL_OUTPUTS, "mono", 0.35); // frequency guessed
 }

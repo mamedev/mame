@@ -163,6 +163,9 @@ static INPUT_PORTS_START( honooinv ) // no dips on PCB, game options selectable 
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4) PORT_NAME("Rail Max") // in shot test
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4) PORT_NAME("Open-L") // in pinpanel test
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(4) PORT_NAME("Open-R") // in pinpanel test
+
+	PORT_START("COIN")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER("opto", taitoio_opto_device, coin_sense_w)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bubbroul )
@@ -185,6 +188,9 @@ static INPUT_PORTS_START( bubbroul )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto", taitoio_opto_device, opto_l_r)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+
+	PORT_START("COIN")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER("opto", taitoio_opto_device, coin_sense_w)
 INPUT_PORTS_END
 
 
@@ -210,6 +216,9 @@ static INPUT_PORTS_START( sbmjb ) // no dips on PCB, game options selectable in 
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto", taitoio_opto_device, opto_l_r)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN ) // No effect in test mode
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN ) // No effect in test mode
+
+	PORT_START("COIN")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER("opto", taitoio_opto_device, coin_sense_w)
 INPUT_PORTS_END
 
 
@@ -351,4 +360,3 @@ ROM_END
 GAME( 1997, honooinv, 0, honooinv, honooinv, sbmjb_state, empty_init, ROT0, "Taito Corporation", "Honoo no Invader (Japan, main ver. 1.35, video ver. 1.35)",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1997, bubbroul, 0, sbmjb,    bubbroul, sbmjb_state, empty_init, ROT0, "Taito Corporation", "Bubblen Roulette (Japan, main ver. 1.8, video ver. 1.3)",                MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1998, sbmjb,    0, sbmjb,    sbmjb,    sbmjb_state, empty_init, ROT0, "Taito Corporation", "Sonic Blast Man's Janken Battle (Japan, main ver. 1.1, video ver. 1.0)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-

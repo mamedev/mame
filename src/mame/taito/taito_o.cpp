@@ -53,6 +53,8 @@ Notes:
 #include "machine/watchdog.h"
 #include "sound/ymopn.h"
 
+#include "taitoio_opto.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -71,7 +73,8 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_nvram(*this, "nvram"),
-		m_io_in(*this, "IN%u", 0U)
+		m_io_in(*this, "IN%u", 0U),
+		m_opto(*this, "opto%u", 1U)
 	{ }
 
 	void parentj(machine_config &config);
@@ -86,6 +89,7 @@ private:
 	required_device<nvram_device> m_nvram;
 
 	required_ioport_array<2> m_io_in;
+	required_device_array<taitoio_opto_device, 2> m_opto;
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
@@ -140,18 +144,20 @@ void taitoo_state::prg_map(address_map &map)
 	map(0x100000, 0x10ffff).mirror(0x010000).ram().share("nvram");
 	// Unknown, definitely not TC0220IOC
 	map(0x200000, 0x200001).portr("IN0").lw16(
-		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
-			if (ACCESSING_BITS_8_15)
-				machine().bookkeeping().coin_lockout_w(0, !BIT(data, 11));
+		NAME([] (offs_t offset, u16 data, u16 mem_mask) {
+			//if (ACCESSING_BITS_8_15) {
+			// TODO: custom signal to opto's (will block input trigger in service mode)
+			//	machine().bookkeeping().coin_lockout_w(0, !BIT(data, 11));
+			// }
 			// BIT(data, 10); goes high when "coin in reversed" is detected,
-			//                denoted as "bell" in eibise
+			//                denoted as "bell" in eibise (physical one?)
 			// m_hopper_io = BIT(data, 9);
 		})
 	);
 	map(0x200002, 0x200003).portr("IN1").lw16(
 		NAME([] (offs_t offset, u16 data, u16 mem_mask) {
 			// m_hop_stop_coil = BIT(data, 14);
-			// m_divider = BIT(data, 12); active low
+			// m_coin_divider = BIT(data, 12); active low
 			// lamps & 0x370f
 			// \- bet & 0x000f, not present in eibise
 			// \- deal & 0x1000
@@ -165,6 +171,11 @@ void taitoo_state::prg_map(address_map &map)
 }
 
 static INPUT_PORTS_START( parentj )
+	PORT_START("COIN")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER("opto1", taitoio_opto_device, coin_sense_w)
+	// FIXME: never triggers
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_WRITE_LINE_DEVICE_MEMBER("opto2", taitoio_opto_device, coin_sense_w)
+
 	PORT_START("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Bet 1")
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Bet 2")
@@ -180,13 +191,13 @@ static INPUT_PORTS_START( parentj )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Reset Key")
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Last Key")
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Meter Key")
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Opto 1H")
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Opto 1L")
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto1", taitoio_opto_device, opto_h_r)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto1", taitoio_opto_device, opto_l_r)
 
 	PORT_START("IN1")
 	PORT_BIT (0x0001, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hopper Over") // "Hop Over"?
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Opto 2H")
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Opto 2L")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto2", taitoio_opto_device, opto_h_r)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto2", taitoio_opto_device, opto_l_r)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE4 ) PORT_NAME("All Clear SW")
 	PORT_SERVICE_NO_TOGGLE(0x0010, IP_ACTIVE_LOW )
 	PORT_BIT( 0x00e0, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -231,6 +242,10 @@ static INPUT_PORTS_START( parentj )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( eibise )
+	PORT_START("COIN")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER("opto1", taitoio_opto_device, coin_sense_w)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_WRITE_LINE_DEVICE_MEMBER("opto2", taitoio_opto_device, coin_sense_w)
+
 	PORT_START("IN0")
 	PORT_BIT( 0x001f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Payout Button")
@@ -242,13 +257,13 @@ static INPUT_PORTS_START( eibise )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Reset Key")
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Last Key")
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Meter Key")
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Opto 1H")
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Opto 1L")
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto1", taitoio_opto_device, opto_h_r)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto1", taitoio_opto_device, opto_l_r)
 
 	PORT_START("IN1")
 	PORT_BIT (0x0001, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hopper Over") // "Hop Over"?
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Opto 2H")
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Opto 2L")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto2", taitoio_opto_device, opto_h_r)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto2", taitoio_opto_device, opto_l_r)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE4 ) PORT_NAME("All Clear SW")
 	PORT_SERVICE_NO_TOGGLE(0x0010, IP_ACTIVE_LOW )
 	PORT_BIT( 0x00e0, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -331,6 +346,9 @@ void taitoo_state::parentj(machine_config &config)
 	WATCHDOG_TIMER(config, m_watchdog);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	for (auto & opto : m_opto)
+		TAITOIO_OPTO(config, opto, 0);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
