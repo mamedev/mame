@@ -28,8 +28,8 @@ void dynduke_state::text_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 TILE_GET_INFO_MEMBER(dynduke_state::get_bg_tile_info)
 {
-	int tile=m_back_data[tile_index];
-	int color=tile >> 12;
+	uint32_t tile=m_back_data[tile_index];
+	uint32_t const color=tile >> 12;
 
 	tile=tile&0xfff;
 
@@ -41,8 +41,8 @@ TILE_GET_INFO_MEMBER(dynduke_state::get_bg_tile_info)
 
 TILE_GET_INFO_MEMBER(dynduke_state::get_fg_tile_info)
 {
-	int tile=m_fore_data[tile_index];
-	int color=tile >> 12;
+	uint32_t tile=m_fore_data[tile_index];
+	uint32_t const color=tile >> 12;
 
 	tile=tile&0xfff;
 
@@ -54,8 +54,8 @@ TILE_GET_INFO_MEMBER(dynduke_state::get_fg_tile_info)
 
 TILE_GET_INFO_MEMBER(dynduke_state::get_tx_tile_info)
 {
-	int tile=m_videoram[tile_index];
-	int color=(tile >> 8) & 0x0f;
+	uint32_t tile=m_videoram[tile_index];
+	uint32_t const color=(tile >> 8) & 0x0f;
 
 	tile = (tile & 0xff) | ((tile & 0xc000) >> 6);
 
