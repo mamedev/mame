@@ -125,27 +125,27 @@ void sbmjb_state::tc0091lvc_map(address_map &map) // TODO: copy-pasted from othe
 
 static INPUT_PORTS_START( honooinv ) // no dips on PCB, game options selectable in test mode
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("Separator") // in I/O test; also seems to have effect on 'Hopper Rotation'. Effects shown also in the shot test
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("Separator") // in I/O test; also seems to have effect on 'Hopper Rotation'. Effects shown also in the shot test
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("Select Sw") // in I/O test
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("Enter Sw") // in I/O test
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("Wait")  // in shot test; seems to have effect on 'Show Power Level', too
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("Charge Solenoid") // in shot test
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("Shoot Solenoid") // in shot test
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("Charge Solenoid") // in shot test
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("Shoot Solenoid") // in shot test
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) // seems to have no effect in test mode
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) // "
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) // in pinpanel test
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("Start Close") // in pinpanel test
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("Start Close") // in pinpanel test
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("Win-L") // in pinpanel test
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("Win-R") // in pinpanel test
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("Lucky-L") // in pinpanel test
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_NAME("Lucky-C") // in pinpanel test
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2) PORT_NAME("Lucky-R") // in pinpanel test
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(2) PORT_NAME("Lucky Close") // in pinpanel test
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_PLAYER(2) PORT_NAME("Lucky Close") // in pinpanel test
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3) PORT_NAME("Pay Out Sen") // in I/O test
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(3) PORT_NAME("Pay Out Sen") // in I/O test
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3) PORT_NAME("Reset-Key") // in I/O test; seems to have effect on 'Lock Out Coil', too
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3) PORT_NAME("Crt-Key") // in I/O test
 	PORT_SERVICE( 0x08, IP_ACTIVE_LOW ) // 'Operate Sw' in test mode
@@ -348,7 +348,7 @@ ROM_END
 
 } // anonymous namespace
 
-GAME( 1997, honooinv, 0, honooinv, honooinv, sbmjb_state, empty_init, ROT0, "Taito Corporation", "Honoo no Invader (main ver. 1.35, video ver. 1.35)",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, bubbroul, 0, sbmjb,    bubbroul, sbmjb_state, empty_init, ROT0, "Taito Corporation", "Bubblen Roulette (main ver. 1.8, video ver. 1.3)",                MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, sbmjb,    0, sbmjb,    sbmjb,    sbmjb_state, empty_init, ROT0, "Taito Corporation", "Sonic Blast Man's Janken Battle (main ver. 1.1, video ver. 1.0)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, honooinv, 0, honooinv, honooinv, sbmjb_state, empty_init, ROT0, "Taito Corporation", "Honoo no Invader (Japan, main ver. 1.35, video ver. 1.35)",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, bubbroul, 0, sbmjb,    bubbroul, sbmjb_state, empty_init, ROT0, "Taito Corporation", "Bubblen Roulette (Japan, main ver. 1.8, video ver. 1.3)",                MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, sbmjb,    0, sbmjb,    sbmjb,    sbmjb_state, empty_init, ROT0, "Taito Corporation", "Sonic Blast Man's Janken Battle (Japan, main ver. 1.1, video ver. 1.0)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
