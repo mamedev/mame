@@ -270,7 +270,6 @@ public:
 	{ }
 
 	void init_avspirit();
-	void init_64street();
 	void init_chimeraba();
 	void init_cybattlr();
 	void init_hayaosi1();
@@ -291,7 +290,6 @@ protected:
 	static constexpr u8 avspirit_seq[7] =    { 0x37,0x35,0x36,0x33,0x34,  0xff,0x06 };
 	static constexpr u8 edf_seq[7] =         { 0x20,0x21,0x22,0x23,0x24,  0xf0,0x06 };
 	static constexpr u8 hayaosi1_seq[7] =    { 0x51,0x52,0x53,0x54,0x55,  0xfc,0x06 };
-	static constexpr u8 street_seq[7]   =    { 0x57,0x53,0x54,0x55,0x56,  0xfa,0x06 };
 	static constexpr u8 chimeraba_seq[7]   = { 0x56,0x52,0x53,0x55,0x54,  0xfa,0x06 };
 	static constexpr u8 cybattler_seq[7]   = { 0x56,0x52,0x53,0x54,0x55,  0xf2,0x06 };
 
@@ -310,7 +308,7 @@ public:
 		m_iomcu(*this, "iomcu")
 	{ }
 
-	void system_C_bigstrik(machine_config &config);
+	void system_C_iomcu(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -319,8 +317,8 @@ protected:
 private:
 	required_device<tlcs90_device> m_iomcu;
 
-	u16 ip_select_bigstrik_r();
-	void ip_select_bigstrik_w(u16 data);
+	u16 ip_select_iomcu_r();
+	void ip_select_iomcu_w(u16 data);
 	u8 mcu_capture_inputs_r(offs_t offset);
 	u8 mcu_port1_r();
 	void mcu_port2_w(u8 data);
@@ -329,10 +327,10 @@ private:
 	u8 m_mcu_input_data;
 	u8 m_mcu_io_data;
 
-	void megasys1C_bigstrik_map(address_map &map);
+	void megasys1C_iomcu_map(address_map &map);
 	void iomcu_map(address_map &map);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(megasys1C_bigstrik_scanline);
+	TIMER_DEVICE_CALLBACK_MEMBER(megasys1C_iomcu_scanline);
 };
 
 #endif // MAME_JALECO_MEGASYS1_H
