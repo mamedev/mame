@@ -105,6 +105,7 @@ private:
 	tilemap_t *m_fix_tilemap = nullptr;
 	tilemap_t *m_racetrack_tilemap = nullptr;
 	TILE_GET_INFO_MEMBER(get_fix_tile_info);
+	TILEMAP_MAPPER_MEMBER(racetrack_scan_rows);
 	TILE_GET_INFO_MEMBER(get_racetrack_tile_info);
 	void fix_vram_w(offs_t offset, u8 data);
 	void fix_attr_w(offs_t offset, u8 data);
@@ -129,8 +130,15 @@ TILE_GET_INFO_MEMBER(dmndrby_state::get_fix_tile_info)
 	u8 attr = m_vidattribs[tile_index];
 	const u16 code = m_vidchars[tile_index] | (BIT(m_vidattribs[tile_index], 5) << 8);
 	const u8 color = attr & 0x1f;
+	// dmndrbybl, in Cocktail mode
+	int const flipxy = ((attr & 0x40) >> 6) * 3;
 
-	tileinfo.set(0, code, color, 0);
+	tileinfo.set(0, code, color, TILE_FLIPYX(flipxy));
+}
+
+TILEMAP_MAPPER_MEMBER(dmndrby_state::racetrack_scan_rows)
+{
+	return (col & 0xf) | ((row & 0xf) << 4) | ((col & 0x70) << 4) | ((row & 0xf0) << 7);
 }
 
 TILE_GET_INFO_MEMBER(dmndrby_state::get_racetrack_tile_info)
@@ -141,6 +149,8 @@ TILE_GET_INFO_MEMBER(dmndrby_state::get_racetrack_tile_info)
 	int const col = attr & 0x1f;
 	int const flipx = (attr & 0x40) >> 6;
 
+	tileinfo.category = BIT(attr, 7);
+
 	tileinfo.set(2, code, col, TILE_FLIPYX(flipx));
 }
 
@@ -150,10 +160,11 @@ void dmndrby_state::video_start()
 	m_bg = 0;
 
 	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dmndrby_state::get_fix_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_racetrack_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dmndrby_state::get_racetrack_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 16, 512);
+	m_racetrack_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dmndrby_state::get_racetrack_tile_info)), tilemap_mapper_delegate(*this, FUNC(dmndrby_state::racetrack_scan_rows)), 16, 16, 128, 64);
 	m_racetrack_tilemap->mark_all_dirty();
 
 	m_fix_tilemap->set_transparent_pen(0);
+	m_racetrack_tilemap->set_transparent_pen(0);
 }
 
 void dmndrby_state::fix_vram_w(offs_t offset, u8 data)
@@ -172,7 +183,7 @@ uint32_t dmndrby_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 {
 //	gfx_element *gfx = m_gfxdecode->gfx(0);
 	gfx_element *sprites = m_gfxdecode->gfx(1);
-	gfx_element *track = m_gfxdecode->gfx(2);
+	//gfx_element *track = m_gfxdecode->gfx(2);
 
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
@@ -187,35 +198,18 @@ can we draw it with the tilemap? maybe not, the layout is a little strange
 	const bool track_enable = BIT(m_scroll_ram[4], 2);
 	const bool sprite_enable = BIT(m_scroll_ram[4], 1);
 	const bool fix_enable = BIT(m_scroll_ram[4], 0);
+	// Track layer has a narrower window drawing, there's no text tilemap attribute that would
+	// suggest otherwise.
+	rectangle overlay_rect;
+	overlay_rect.set(cliprect.min_x, cliprect.max_x, std::max(40, cliprect.min_y), std::min(215, cliprect.max_y));
+
+	m_racetrack_tilemap->set_scrollx(0, m_scroll_ram[0] + m_scroll_ram[1] * 0x100);
+	m_racetrack_tilemap->set_scrolly(0, m_scroll_ram[2] + m_scroll_ram[3] * 0x100);
 
 	if (track_enable)
 	{
-		// Track layer has a narrower window drawing, there's no text tilemap attribute that would
-		// suggest otherwise.
-		// TODO: priority with sprites
-		rectangle overlay_rect;
-		overlay_rect.set(cliprect.min_x, cliprect.max_x, std::max(40, cliprect.min_y), std::min(215, cliprect.max_y));
-
-		int off = 0x1900 - (m_bg * 0x100) + m_scroll_ram[1] * 0x100;
-		int const scrolly = 0xff - m_scroll_ram[0];
-		if (m_scroll_ram[1] == 0xff) off = 0x1800;
-		for (int x = 0; x < 16; x++)
-		{
-			for (int y = 0; y < 16; y++)
-			{
-				int chr = m_racetrack_tilemap_rom[off];
-				int col = m_racetrack_tilemap_rom[off + 0x2000] & 0x1f;
-				int flipx = m_racetrack_tilemap_rom[off + 0x2000] & 0x40;
-				track->opaque(bitmap, overlay_rect, chr, col, flipx, 0, y * 16 + scrolly, x * 16);
-				// draw another bit of track
-				// a rubbish way of doing it
-				chr = m_racetrack_tilemap_rom[off - 0x100];
-				col = m_racetrack_tilemap_rom[off + 0x1f00] & 0x1f;
-				flipx = m_racetrack_tilemap_rom[off + 0x1f00] & 0x40;
-				track->opaque(bitmap, overlay_rect, chr, col, flipx, 0, y * 16 - 256 + scrolly, x * 16);
-				off++;
-			}
-		}
+		m_racetrack_tilemap->draw(screen, bitmap, overlay_rect, TILEMAP_DRAW_CATEGORY(0) | TILEMAP_DRAW_OPAQUE, 0);
+		m_racetrack_tilemap->draw(screen, bitmap, overlay_rect, TILEMAP_DRAW_CATEGORY(1) | TILEMAP_DRAW_OPAQUE, 0);
 	}
 
 /* draw sprites
@@ -236,7 +230,7 @@ wouldn't like to say it's the most effective way though...
 			int const spry = m_sprite_ram[base + 2];
 			//m_sprite_ram[base + 1];
 			int const col = (m_sprite_ram[base + 1] & 0x1f);
-			int const anim = (m_sprite_ram[base] & 0x3) * 0x40; // animation frame - probably wrong but seems right
+			int const anim = (m_sprite_ram[base] & 0x3f) * 0x40; // animation frame - probably wrong but seems right
 			int const horse = (m_sprite_ram[base + 1] & 0x7) * 8 + 7;  // horse label from 1 - 6
 
 			for (a = 0; a < 8 ; a++)
@@ -248,6 +242,12 @@ wouldn't like to say it's the most effective way though...
 			b = 3;
 			sprites->transpen(bitmap, cliprect, anim + horse, col, 0, 0, sprx + a * 8, spry + b * 8, 0);
 		}
+	}
+
+	// draw higher priority categories above sprites
+	if (track_enable)
+	{
+		m_racetrack_tilemap->draw(screen, bitmap, overlay_rect, TILEMAP_DRAW_CATEGORY(1), 0);
 	}
 
 	if (fix_enable)
@@ -596,6 +596,7 @@ static INPUT_PORTS_START( dderbybl )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 ) // augments 'meter' 10 at a time, 'credit up' in book-keeping
 
 	PORT_START("DSW1")
+	// more like Upright/Cocktail switch
 	PORT_DIPNAME( 0x01, 0x00, "Show Title" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -705,7 +706,7 @@ void dmndrby_state::dderby(machine_config &config)
 	Z80(config, m_maincpu, 4'000'000);         // ? MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &dmndrby_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(dmndrby_state::irq));
-	m_maincpu->set_periodic_int(FUNC(dmndrby_state::timer_irq), attotime::from_hz(244 / 2));
+	m_maincpu->set_periodic_int(FUNC(dmndrby_state::timer_irq), attotime::from_hz(90));
 
 	Z80(config, m_audiocpu, 4'000'000);  // verified on schematics
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dmndrby_state::sound_map);
