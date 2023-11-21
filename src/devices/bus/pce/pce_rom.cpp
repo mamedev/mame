@@ -58,10 +58,6 @@ pce_tennokoe_device::pce_tennokoe_device(const machine_config &mconfig, const ch
 //-------------------------------------------------
 
 
-void pce_sf2_device::device_start()
-{
-}
-
 void pce_sf2_device::device_reset()
 {
 	m_rom_bank->set_entry(0);
@@ -128,16 +124,16 @@ uint8_t pce_rom_device::rom_r(offs_t offset)
 	return m_rom[rom_bank_map[bank] * 0x20000 + (offset & 0x1ffff)];
 }
 
-void pce_rom_device::install_memory_handlers(address_space *space)
+void pce_rom_device::install_memory_handlers(address_space &space)
 {
-	space->install_read_handler(0x00000, 0xfffff, emu::rw_delegate(*this, FUNC(pce_rom_device::rom_r)));
+	space.install_read_handler(0x00000, 0xfffff, emu::rw_delegate(*this, FUNC(pce_rom_device::rom_r)));
 }
 
 
-void pce_populous_device::install_memory_handlers(address_space *space)
+void pce_populous_device::install_memory_handlers(address_space &space)
 {
 	pce_rom_device::install_memory_handlers(space);
-	space->install_ram(0x80000, 0x87fff, &m_ram[0]);
+	space.install_ram(0x80000, 0x87fff, &m_ram[0]);
 }
 
 
@@ -147,12 +143,12 @@ void pce_sf2_device::bank_w(offs_t offset, uint8_t data)
 }
 
 
-void pce_sf2_device::install_memory_handlers(address_space *space)
+void pce_sf2_device::install_memory_handlers(address_space &space)
 {
 	m_rom_bank->configure_entries(0, 4, m_rom + 0x80000, 0x80000);
-	space->install_rom(0x00000, 0x7ffff, m_rom);
-	space->install_read_bank(0x80000, 0xfffff, m_rom_bank);
-	space->install_write_handler(0x1ff0, 0x1ff3, emu::rw_delegate(*this, FUNC(pce_sf2_device::bank_w)));
+	space.install_rom(0x000000, 0x07ffff, m_rom);
+	space.install_read_bank(0x080000, 0x0fffff, m_rom_bank);
+	space.install_write_handler(0x001ff0, 0x001ff3, emu::rw_delegate(*this, FUNC(pce_sf2_device::bank_w)));
 }
 
 
@@ -176,11 +172,11 @@ void pce_tennokoe_device::bram_lock_w(offs_t offset, uint8_t data)
 	m_bram_locked = (data == 0);
 }
 
-void pce_tennokoe_device::install_memory_handlers(address_space *space)
+void pce_tennokoe_device::install_memory_handlers(address_space &space)
 {
-	space->install_rom(0x00000, 0x7ffff, m_rom);
-	space->install_readwrite_handler(0x80000, 0x81fff, 0, 0xe000, 0, emu::rw_delegate(*this, FUNC(pce_tennokoe_device::bram_r)), emu::rw_delegate(*this, FUNC(pce_tennokoe_device::bram_w)));
+	space.install_rom(0x000000, 0x07ffff, m_rom);
+	space.install_readwrite_handler(0x080000, 0x081fff, 0, 0x00e000, 0, emu::rw_delegate(*this, FUNC(pce_tennokoe_device::bram_r)), emu::rw_delegate(*this, FUNC(pce_tennokoe_device::bram_w)));
 	// (writes to ports $c0000, $d0000, $f0000)
-	space->install_write_handler(0xf0000, 0xf0000, 0, 0xffff, 0, emu::rw_delegate(*this, FUNC(pce_tennokoe_device::bram_lock_w)));
+	space.install_write_handler(0x0f0000, 0x0f0000, 0, 0x00ffff, 0, emu::rw_delegate(*this, FUNC(pce_tennokoe_device::bram_lock_w)));
 }
 

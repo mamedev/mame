@@ -20,16 +20,16 @@ public:
 	void set_region(bool region) { m_region = region; }
 
 	// reading and writing
-	uint8_t ram_r(offs_t offset);
-	void ram_w(offs_t offset, uint8_t data);
 	uint8_t register_r(offs_t offset);
+
+	uint8_t *ram() { return m_ram; }
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override { }
 
 private:
-	std::unique_ptr<uint8_t[]> m_ram; // internal RAM
+	memory_share_creator<uint8_t> m_ram; // internal RAM
 	bool m_region = false; // Cartridge region
 };
 
@@ -40,7 +40,7 @@ class pce_cdsys3_device : public device_t,
 {
 public:
 	// reading and writing
-	virtual void install_memory_handlers(address_space *space) override;
+	virtual void install_memory_handlers(address_space &space) override;
 
 protected:
 	// device-level overrides

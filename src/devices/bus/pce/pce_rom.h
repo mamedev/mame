@@ -19,7 +19,7 @@ public:
 	pce_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual void install_memory_handlers(address_space *space) override;
+	virtual void install_memory_handlers(address_space &space) override;
 
 protected:
 	pce_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -38,7 +38,7 @@ public:
 	pce_populous_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual void install_memory_handlers(address_space *space) override;
+	virtual void install_memory_handlers(address_space &space) override;
 };
 
 // ======================> pce_sf2_device
@@ -50,11 +50,10 @@ public:
 	pce_sf2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual void install_memory_handlers(address_space *space) override;
+	virtual void install_memory_handlers(address_space &space) override;
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
 	virtual void device_reset() override;
 
 private:
@@ -73,7 +72,7 @@ public:
 	pce_tennokoe_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual void install_memory_handlers(address_space *space) override;
+	virtual void install_memory_handlers(address_space &space) override;
 
 protected:
 	// device-level overrides

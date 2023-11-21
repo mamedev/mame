@@ -265,7 +265,7 @@ std::pair<std::error_condition, std::string> pce_cart_slot_device::call_load()
 		if (m_type == PCE_POPULOUS)
 			m_cart->ram_alloc(0x8000);
 
-		m_cart->install_memory_handlers(m_address_space.target());
+		m_cart->install_memory_handlers(*m_address_space.target());
 	}
 
 	return std::make_pair(std::error_condition(), std::string());

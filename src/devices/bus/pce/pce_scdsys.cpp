@@ -25,6 +25,7 @@ DEFINE_DEVICE_TYPE(PCE_ROM_CDSYS3U,     pce_cdsys3u_device,     "pce_cdsys3u",  
 
 pce_cdsys3_base_device::pce_cdsys3_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PCE_ROM_CDSYS3_BASE, tag, owner, clock)
+	, m_ram(*this, "ram", 0x30000, ENDIANNESS_LITTLE)
 	, m_region(false)
 {
 }
@@ -52,14 +53,6 @@ pce_cdsys3u_device::pce_cdsys3u_device(const machine_config &mconfig, const char
 //-------------------------------------------------
 
 
-void pce_cdsys3_base_device::device_start()
-{
-	/* Set up Arcade Card RAM buffer */
-	m_ram = make_unique_clear<uint8_t[]>(0x30000);
-
-	save_pointer(NAME(m_ram), 0x30000);
-}
-
 void pce_cdsys3_device::device_add_mconfig(machine_config &config)
 {
 	PCE_ROM_CDSYS3_BASE(config, m_cdsys3, DERIVED_CLOCK(1,1)).set_region(false);
@@ -74,20 +67,6 @@ void pce_cdsys3u_device::device_add_mconfig(machine_config &config)
 /*-------------------------------------------------
  mapper specific handlers
  -------------------------------------------------*/
-
-uint8_t pce_cdsys3_base_device::ram_r(offs_t offset)
-{
-	if (offset < 0x30000)
-		return m_ram[offset];
-
-	return 0xff;
-}
-
-void pce_cdsys3_base_device::ram_w(offs_t offset, uint8_t data)
-{
-	if (offset < 0x30000)
-		m_ram[offset] = data;
-}
 
 uint8_t pce_cdsys3_base_device::register_r(offs_t offset)
 {
@@ -104,9 +83,9 @@ uint8_t pce_cdsys3_base_device::register_r(offs_t offset)
 }
 
 
-void pce_cdsys3_device::install_memory_handlers(address_space *space)
+void pce_cdsys3_device::install_memory_handlers(address_space &space)
 {
-	space->install_rom(0x000000, 0x03ffff, m_rom);
-	space->install_readwrite_handler(0x0d0000, 0x0fffff, emu::rw_delegate(m_cdsys3, FUNC(pce_cdsys3_base_device::ram_r)), emu::rw_delegate(m_cdsys3, FUNC(pce_cdsys3_base_device::ram_w)));
-	space->install_read_handler(0x1ff8c0, 0x1ff8c7, 0, 0x330, 0, emu::rw_delegate(m_cdsys3, FUNC(pce_cdsys3_base_device::register_r)));
+	space.install_rom(0x000000, 0x03ffff, m_rom);
+	space.install_ram(0x0d0000, 0x0fffff, m_cdsys3->ram());
+	space.install_read_handler(0x1ff8c0, 0x1ff8c7, 0, 0x330, 0, emu::rw_delegate(m_cdsys3, FUNC(pce_cdsys3_base_device::register_r)));
 }

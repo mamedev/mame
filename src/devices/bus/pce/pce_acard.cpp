@@ -27,6 +27,7 @@ DEFINE_DEVICE_TYPE(PCE_ROM_ACARD_PRO, pce_acard_pro_device, "pce_acard_pro", "Ar
 pce_acard_duo_device::pce_acard_duo_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_pce_cart_interface( mconfig, *this )
+	, m_ram(*this, "ram", 0x200000, ENDIANNESS_LITTLE)
 {
 }
 
@@ -49,10 +50,6 @@ pce_acard_pro_device::pce_acard_pro_device(const machine_config &mconfig, const 
 
 void pce_acard_duo_device::device_start()
 {
-	/* Set up Arcade Card RAM buffer */
-	m_dram = make_unique_clear<uint8_t[]>(0x200000);
-
-	save_pointer(NAME(m_dram), 0x200000);
 	save_item(NAME(m_ctrl));
 	save_item(NAME(m_base_addr));
 	save_item(NAME(m_addr_offset));
@@ -71,17 +68,17 @@ void pce_acard_pro_device::device_add_mconfig(machine_config &config)
  mapper specific handlers
  -------------------------------------------------*/
 
-void pce_acard_duo_device::install_memory_handlers(address_space *space)
+void pce_acard_duo_device::install_memory_handlers(address_space &space)
 {
-	space->install_readwrite_handler(0x080000, 0x087fff, emu::rw_delegate(*this, FUNC(pce_acard_duo_device::ram_r)), emu::rw_delegate(*this, FUNC(pce_acard_duo_device::ram_w)));
-	space->install_readwrite_handler(0x1ffa00, 0x1ffbff, emu::rw_delegate(*this, FUNC(pce_acard_duo_device::peripheral_r)), emu::rw_delegate(*this, FUNC(pce_acard_duo_device::peripheral_w)));
+	space.install_readwrite_handler(0x080000, 0x087fff, emu::rw_delegate(*this, FUNC(pce_acard_duo_device::ram_r)), emu::rw_delegate(*this, FUNC(pce_acard_duo_device::ram_w)));
+	space.install_readwrite_handler(0x1ffa00, 0x1ffbff, emu::rw_delegate(*this, FUNC(pce_acard_duo_device::peripheral_r)), emu::rw_delegate(*this, FUNC(pce_acard_duo_device::peripheral_w)));
 }
 
-void pce_acard_pro_device::install_memory_handlers(address_space *space)
+void pce_acard_pro_device::install_memory_handlers(address_space &space)
 {
-	space->install_rom(0x000000, 0x03ffff, m_rom); // TODO: actually 0x000000-0x07ffff
-	space->install_readwrite_handler(0x0d0000, 0x0fffff, emu::rw_delegate(m_cdsys3, FUNC(pce_cdsys3_base_device::ram_r)), emu::rw_delegate(m_cdsys3, FUNC(pce_cdsys3_base_device::ram_w)));
-	space->install_read_handler(0x1ff8c0, 0x1ff8c7, 0, 0x130, 0, emu::rw_delegate(m_cdsys3, FUNC(pce_cdsys3_base_device::register_r)));
+	space.install_rom(0x000000, 0x03ffff, 0x040000, m_rom); // TODO: actually 0x000000-0x07ffff
+	space.install_ram(0x0d0000, 0x0fffff, m_cdsys3->ram());
+	space.install_read_handler(0x1ff8c0, 0x1ff8c7, 0, 0x130, 0, emu::rw_delegate(m_cdsys3, FUNC(pce_cdsys3_base_device::register_r)));
 	pce_acard_duo_device::install_memory_handlers(space);
 }
 
@@ -129,9 +126,9 @@ uint8_t pce_acard_duo_device::peripheral_r(offs_t offset)
 		{
 			uint8_t res;
 			if (m_ctrl[r_num] & 2)
-				res = m_dram[(m_base_addr[r_num] + m_addr_offset[r_num]) & 0x1fffff];
+				res = m_ram[(m_base_addr[r_num] + m_addr_offset[r_num]) & 0x1fffff];
 			else
-				res = m_dram[m_base_addr[r_num] & 0x1fffff];
+				res = m_ram[m_base_addr[r_num] & 0x1fffff];
 
 			if ((!machine().side_effects_disabled()) && (m_ctrl[r_num] & 0x1))
 			{
@@ -173,7 +170,6 @@ void pce_acard_duo_device::peripheral_w(offs_t offset, uint8_t data)
 			case 2: m_shift = (data << 16)  | (m_shift & 0xff00ffff); break;
 			case 3: m_shift = (data << 24)  | (m_shift & 0x00ffffff); break;
 			case 4:
-			{
 				m_shift_reg = data & 0x0f;
 
 				if (m_shift_reg != 0)
@@ -182,10 +178,8 @@ void pce_acard_duo_device::peripheral_w(offs_t offset, uint8_t data)
 					(m_shift << m_shift_reg)
 					: (m_shift >> (16 - m_shift_reg));
 				}
-			}
 				break;
 			case 5:
-			{
 				m_rotate_reg = data;
 
 				if (m_rotate_reg != 0)
@@ -194,7 +188,6 @@ void pce_acard_duo_device::peripheral_w(offs_t offset, uint8_t data)
 					((m_shift << m_rotate_reg) | (m_shift >> (32 - m_rotate_reg)))
 					: ((m_shift >> (16 - m_rotate_reg)) | (m_shift << (32 - (16 - m_rotate_reg))));
 				}
-			}
 				break;
 		}
 	}
@@ -207,9 +200,9 @@ void pce_acard_duo_device::peripheral_w(offs_t offset, uint8_t data)
 			case 0x00:
 			case 0x01:
 				if (m_ctrl[w_num] & 2)
-					m_dram[(m_base_addr[w_num] + m_addr_offset[w_num]) & 0x1fffff] = data;
+					m_ram[(m_base_addr[w_num] + m_addr_offset[w_num]) & 0x1fffff] = data;
 				else
-					m_dram[m_base_addr[w_num] & 0x1FFFFF] = data;
+					m_ram[m_base_addr[w_num] & 0x1fffff] = data;
 
 				if (m_ctrl[w_num] & 0x1)
 				{
@@ -226,10 +219,10 @@ void pce_acard_duo_device::peripheral_w(offs_t offset, uint8_t data)
 
 				break;
 
-			case 0x02: m_base_addr[w_num] = (data & 0xff) | (m_base_addr[w_num] & 0xffff00);  break;
-			case 0x03: m_base_addr[w_num] = (data << 8) | (m_base_addr[w_num] & 0xff00ff);        break;
-			case 0x04: m_base_addr[w_num] = (data << 16) | (m_base_addr[w_num] & 0x00ffff);   break;
-			case 0x05: m_addr_offset[w_num] = (data & 0xff) | (m_addr_offset[w_num] & 0xff00);    break;
+			case 0x02: m_base_addr[w_num] = (data & 0xff) | (m_base_addr[w_num] & 0xffff00); break;
+			case 0x03: m_base_addr[w_num] = (data << 8) | (m_base_addr[w_num] & 0xff00ff); break;
+			case 0x04: m_base_addr[w_num] = (data << 16) | (m_base_addr[w_num] & 0x00ffff); break;
+			case 0x05: m_addr_offset[w_num] = (data & 0xff) | (m_addr_offset[w_num] & 0xff00); break;
 			case 0x06:
 				m_addr_offset[w_num] = (data << 8) | (m_addr_offset[w_num] & 0x00ff);
 
@@ -239,9 +232,9 @@ void pce_acard_duo_device::peripheral_w(offs_t offset, uint8_t data)
 					m_base_addr[w_num] &= 0xffffff;
 				}
 				break;
-			case 0x07: m_addr_inc[w_num] = (data & 0xff) | (m_addr_inc[w_num] & 0xff00);      break;
-			case 0x08: m_addr_inc[w_num] = (data << 8) | (m_addr_inc[w_num] & 0x00ff);            break;
-			case 0x09: m_ctrl[w_num] = data & 0x7f;                                              break;
+			case 0x07: m_addr_inc[w_num] = (data & 0xff) | (m_addr_inc[w_num] & 0xff00); break;
+			case 0x08: m_addr_inc[w_num] = (data << 8) | (m_addr_inc[w_num] & 0x00ff); break;
+			case 0x09: m_ctrl[w_num] = data & 0x7f; break;
 			case 0x0a:
 				if ((m_ctrl[w_num] & 0x60) == 0x60)
 				{

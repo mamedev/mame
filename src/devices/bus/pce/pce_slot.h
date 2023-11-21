@@ -35,7 +35,7 @@ public:
 	// construction/destruction
 	virtual ~device_pce_cart_interface();
 
-	virtual void install_memory_handlers(address_space *space) { }
+	virtual void install_memory_handlers(address_space &space) { }
 
 	void rom_alloc(uint32_t size);
 	void ram_alloc(uint32_t size);
