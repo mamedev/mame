@@ -854,24 +854,24 @@ void spacefb_state::spacefb(machine_config &config)
  *
  *************************************/
 
-// pcb is revision 04 and has roms with suffix 'u'
+// PCB is revision 04 and has ROMs with suffix 'u'
 ROM_START( spacefb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "tst-c-u.5e",      0x0000, 0x0800, CRC(79c3527e) SHA1(5f2d9f3a8b573333e40e78222996f556ed6686ea) )
-	ROM_LOAD( "tst-c-u.5f",      0x0800, 0x0800, CRC(c0973965) SHA1(f0dcd820c0e0766368ef5d58c29ef090fc5cfdef) )
-	ROM_LOAD( "tst-c-u.5h",      0x1000, 0x0800, CRC(02c60ec5) SHA1(43b8553076c7c0e22e0708797c8f3d30fccf82ec) )
-	ROM_LOAD( "tst-c-u.5i",      0x1800, 0x0800, CRC(76fd18c7) SHA1(2db271269b8f810eb93e5e86d59251fe1f43769a) )
-	ROM_LOAD( "tst-c-u.5j",      0x2000, 0x0800, CRC(df52c97c) SHA1(54032c1ed694911079ffa45545b1e63ec8107fc4) )
-	ROM_LOAD( "tst-c-u.5k",      0x2800, 0x0800, CRC(1713300c) SHA1(9a7b6cc0d79cccadd4988e0e791c1598813b6552) )
-	ROM_LOAD( "tst-c-u.5m",      0x3000, 0x0800, CRC(6286f534) SHA1(c47d0df85a52c774a4bc26351fdae18795062b6e) )
-	ROM_LOAD( "tst-c-u.5n",      0x3800, 0x0800, CRC(1c9f91ee) SHA1(481a309fe9aa9ce6fd18d7d908c18790f594057d) )
+	ROM_LOAD( "tst-c-u.5e",  0x0000, 0x0800, CRC(79c3527e) SHA1(5f2d9f3a8b573333e40e78222996f556ed6686ea) )
+	ROM_LOAD( "tst-c-u.5f",  0x0800, 0x0800, CRC(c0973965) SHA1(f0dcd820c0e0766368ef5d58c29ef090fc5cfdef) )
+	ROM_LOAD( "tst-c-u.5h",  0x1000, 0x0800, CRC(02c60ec5) SHA1(43b8553076c7c0e22e0708797c8f3d30fccf82ec) )
+	ROM_LOAD( "tst-c-u.5i",  0x1800, 0x0800, CRC(76fd18c7) SHA1(2db271269b8f810eb93e5e86d59251fe1f43769a) )
+	ROM_LOAD( "tst-c-u.5j",  0x2000, 0x0800, CRC(df52c97c) SHA1(54032c1ed694911079ffa45545b1e63ec8107fc4) )
+	ROM_LOAD( "tst-c-u.5k",  0x2800, 0x0800, CRC(1713300c) SHA1(9a7b6cc0d79cccadd4988e0e791c1598813b6552) )
+	ROM_LOAD( "tst-c-u.5m",  0x3000, 0x0800, CRC(6286f534) SHA1(c47d0df85a52c774a4bc26351fdae18795062b6e) )
+	ROM_LOAD( "tst-c-u.5n",  0x3800, 0x0800, CRC(1c9f91ee) SHA1(481a309fe9aa9ce6fd18d7d908c18790f594057d) )
 
 	ROM_REGION( 0x1000, "audiocpu", 0 )
 	ROM_LOAD( "ic20.snd",    0x0000, 0x0400, CRC(1c8670b3) SHA1(609124caa11498fc6a6bdf6cdbb8003bbc249dd8) )
 
 	ROM_REGION( 0x1000, "sprites", 0 )
-	ROM_LOAD( "tst-v-a.5k",      0x0000, 0x0800, CRC(236e1ff7) SHA1(575b8ed9ab054a864207e0fde3ae93cdcafbebf2) )
-	ROM_LOAD( "tst-v-a.6k",      0x0800, 0x0800, CRC(bf901a4e) SHA1(71207ad1ca60aa617dbbc3cd2e4e42520b7c8513) )
+	ROM_LOAD( "tst-v-a.5k",  0x0000, 0x0800, CRC(236e1ff7) SHA1(575b8ed9ab054a864207e0fde3ae93cdcafbebf2) )
+	ROM_LOAD( "tst-v-a.6k",  0x0800, 0x0800, CRC(bf901a4e) SHA1(71207ad1ca60aa617dbbc3cd2e4e42520b7c8513) )
 
 	ROM_REGION( 0x0100, "bullets", 0 )
 	ROM_LOAD( "4i.vid",      0x0000, 0x0100, CRC(528e8533) SHA1(8e41eee1016c98a4f08acbd902daf8e32aa9d9ab) )
@@ -880,24 +880,24 @@ ROM_START( spacefb )
 	ROM_LOAD( "mb7051.3n",   0x0000, 0x0020, CRC(465d07af) SHA1(25e246f7674c25d05e5f6e68db88c15aaa10cee1) )
 ROM_END
 
-// pcb is revision 03 and has roms with suffix 'e'
+// PCB is revision 03 and has ROMs with suffix 'e'
 ROM_START( spacefbe )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "tst-c-e.5e",      0x0000, 0x0800, CRC(77dda05b) SHA1(b8a42632587260509ba023c7e05d252972f90363) )
-	ROM_LOAD( "tst-c-e.5f",      0x0800, 0x0800, CRC(89f0c34a) SHA1(4d8652fb7c4f22ddbac8c2d7ca7df675eaa2a447) )
-	ROM_LOAD( "tst-c-e.5h",      0x1000, 0x0800, CRC(c4bcac3e) SHA1(5364d6fc9d3402b2def163dee7c39fe3fe57eea3) )
-	ROM_LOAD( "tst-c-e.5i",      0x1800, 0x0800, CRC(61c00a65) SHA1(afc93e320478c70b3ddca8375fd648c9f2572dab) )
-	ROM_LOAD( "tst-c-e.5j",      0x2000, 0x0800, CRC(598420b9) SHA1(92ea695177c7297699d1d18f166e98392ef0e0f9) )
-	ROM_LOAD( "tst-c-e.5k",      0x2800, 0x0800, CRC(1713300c) SHA1(9a7b6cc0d79cccadd4988e0e791c1598813b6552) )
-	ROM_LOAD( "tst-c-e.5m",      0x3000, 0x0800, CRC(6286f534) SHA1(c47d0df85a52c774a4bc26351fdae18795062b6e) )
-	ROM_LOAD( "tst-c-e.5n",      0x3800, 0x0800, CRC(1c9f91ee) SHA1(481a309fe9aa9ce6fd18d7d908c18790f594057d) )
+	ROM_LOAD( "tst-c-e.5e",  0x0000, 0x0800, CRC(77dda05b) SHA1(b8a42632587260509ba023c7e05d252972f90363) )
+	ROM_LOAD( "tst-c-e.5f",  0x0800, 0x0800, CRC(89f0c34a) SHA1(4d8652fb7c4f22ddbac8c2d7ca7df675eaa2a447) )
+	ROM_LOAD( "tst-c-e.5h",  0x1000, 0x0800, CRC(c4bcac3e) SHA1(5364d6fc9d3402b2def163dee7c39fe3fe57eea3) )
+	ROM_LOAD( "tst-c-e.5i",  0x1800, 0x0800, CRC(61c00a65) SHA1(afc93e320478c70b3ddca8375fd648c9f2572dab) )
+	ROM_LOAD( "tst-c-e.5j",  0x2000, 0x0800, CRC(598420b9) SHA1(92ea695177c7297699d1d18f166e98392ef0e0f9) )
+	ROM_LOAD( "tst-c-e.5k",  0x2800, 0x0800, CRC(1713300c) SHA1(9a7b6cc0d79cccadd4988e0e791c1598813b6552) )
+	ROM_LOAD( "tst-c-e.5m",  0x3000, 0x0800, CRC(6286f534) SHA1(c47d0df85a52c774a4bc26351fdae18795062b6e) )
+	ROM_LOAD( "tst-c-e.5n",  0x3800, 0x0800, CRC(1c9f91ee) SHA1(481a309fe9aa9ce6fd18d7d908c18790f594057d) )
 
 	ROM_REGION( 0x1000, "audiocpu", 0 )
 	ROM_LOAD( "ic20.snd",    0x0000, 0x0400, CRC(1c8670b3) SHA1(609124caa11498fc6a6bdf6cdbb8003bbc249dd8) )
 
 	ROM_REGION( 0x1000, "sprites", 0 )
-	ROM_LOAD( "tst-v-a.5k",      0x0000, 0x0800, CRC(236e1ff7) SHA1(575b8ed9ab054a864207e0fde3ae93cdcafbebf2) )
-	ROM_LOAD( "tst-v-a.6k",      0x0800, 0x0800, CRC(bf901a4e) SHA1(71207ad1ca60aa617dbbc3cd2e4e42520b7c8513) )
+	ROM_LOAD( "tst-v-a.5k",  0x0000, 0x0800, CRC(236e1ff7) SHA1(575b8ed9ab054a864207e0fde3ae93cdcafbebf2) )
+	ROM_LOAD( "tst-v-a.6k",  0x0800, 0x0800, CRC(bf901a4e) SHA1(71207ad1ca60aa617dbbc3cd2e4e42520b7c8513) )
 
 	ROM_REGION( 0x0100, "bullets", 0 )
 	ROM_LOAD( "4i.vid",      0x0000, 0x0100, CRC(528e8533) SHA1(8e41eee1016c98a4f08acbd902daf8e32aa9d9ab) )
@@ -909,20 +909,20 @@ ROM_END
 ROM_START( spacefbe2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "5e.cpu",      0x0000, 0x0800, CRC(2d406678) SHA1(9dff1980fc5267313f99f9f67d2d83eda8aae00e) ) // only 5e differs to above set, by 2 bytes.
-	ROM_LOAD( "tst-c-e.5f",      0x0800, 0x0800, CRC(89f0c34a) SHA1(4d8652fb7c4f22ddbac8c2d7ca7df675eaa2a447) )
-	ROM_LOAD( "tst-c-e.5h",      0x1000, 0x0800, CRC(c4bcac3e) SHA1(5364d6fc9d3402b2def163dee7c39fe3fe57eea3) )
-	ROM_LOAD( "tst-c-e.5i",      0x1800, 0x0800, CRC(61c00a65) SHA1(afc93e320478c70b3ddca8375fd648c9f2572dab) )
-	ROM_LOAD( "tst-c-e.5j",      0x2000, 0x0800, CRC(598420b9) SHA1(92ea695177c7297699d1d18f166e98392ef0e0f9) )
-	ROM_LOAD( "tst-c-e.5k",      0x2800, 0x0800, CRC(1713300c) SHA1(9a7b6cc0d79cccadd4988e0e791c1598813b6552) )
-	ROM_LOAD( "tst-c-e.5m",      0x3000, 0x0800, CRC(6286f534) SHA1(c47d0df85a52c774a4bc26351fdae18795062b6e) )
-	ROM_LOAD( "tst-c-e.5n",      0x3800, 0x0800, CRC(1c9f91ee) SHA1(481a309fe9aa9ce6fd18d7d908c18790f594057d) )
+	ROM_LOAD( "tst-c-e.5f",  0x0800, 0x0800, CRC(89f0c34a) SHA1(4d8652fb7c4f22ddbac8c2d7ca7df675eaa2a447) )
+	ROM_LOAD( "tst-c-e.5h",  0x1000, 0x0800, CRC(c4bcac3e) SHA1(5364d6fc9d3402b2def163dee7c39fe3fe57eea3) )
+	ROM_LOAD( "tst-c-e.5i",  0x1800, 0x0800, CRC(61c00a65) SHA1(afc93e320478c70b3ddca8375fd648c9f2572dab) )
+	ROM_LOAD( "tst-c-e.5j",  0x2000, 0x0800, CRC(598420b9) SHA1(92ea695177c7297699d1d18f166e98392ef0e0f9) )
+	ROM_LOAD( "tst-c-e.5k",  0x2800, 0x0800, CRC(1713300c) SHA1(9a7b6cc0d79cccadd4988e0e791c1598813b6552) )
+	ROM_LOAD( "tst-c-e.5m",  0x3000, 0x0800, CRC(6286f534) SHA1(c47d0df85a52c774a4bc26351fdae18795062b6e) )
+	ROM_LOAD( "tst-c-e.5n",  0x3800, 0x0800, CRC(1c9f91ee) SHA1(481a309fe9aa9ce6fd18d7d908c18790f594057d) )
 
 	ROM_REGION( 0x1000, "audiocpu", 0 )
 	ROM_LOAD( "ic20.snd",    0x0000, 0x0400, CRC(1c8670b3) SHA1(609124caa11498fc6a6bdf6cdbb8003bbc249dd8) )
 
 	ROM_REGION( 0x1000, "sprites", 0 )
-	ROM_LOAD( "tst-v-a.5k",      0x0000, 0x0800, CRC(236e1ff7) SHA1(575b8ed9ab054a864207e0fde3ae93cdcafbebf2) )
-	ROM_LOAD( "tst-v-a.6k",      0x0800, 0x0800, CRC(bf901a4e) SHA1(71207ad1ca60aa617dbbc3cd2e4e42520b7c8513) )
+	ROM_LOAD( "tst-v-a.5k",  0x0000, 0x0800, CRC(236e1ff7) SHA1(575b8ed9ab054a864207e0fde3ae93cdcafbebf2) )
+	ROM_LOAD( "tst-v-a.6k",  0x0800, 0x0800, CRC(bf901a4e) SHA1(71207ad1ca60aa617dbbc3cd2e4e42520b7c8513) )
 
 	ROM_REGION( 0x0100, "bullets", 0 )
 	ROM_LOAD( "4i.vid",      0x0000, 0x0100, CRC(528e8533) SHA1(8e41eee1016c98a4f08acbd902daf8e32aa9d9ab) )
@@ -931,30 +931,30 @@ ROM_START( spacefbe2 )
 	ROM_LOAD( "mb7051.3n",   0x0000, 0x0020, CRC(465d07af) SHA1(25e246f7674c25d05e5f6e68db88c15aaa10cee1) )
 ROM_END
 
-// cpu pcb is revision 02, video pcb is revision 03. roms with handwritten suffix 'a'
+// CPU PCB is revision 02, video PCB is revision 03. ROMs with handwritten suffix 'a'
 ROM_START( spacefba )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "tst-c-a.5e",      0x0000, 0x0800, CRC(5657bd2f) SHA1(0e615a7dd5efbbf6f543480bc150f45089c41d32) )
-	ROM_LOAD( "tst-c-a.5f",      0x0800, 0x0800, CRC(303b0294) SHA1(a2f5637e201739b440e7ea0868d2d5745fbb4f5b) )
-	ROM_LOAD( "tst-c-a.5h",      0x1000, 0x0800, CRC(49a26fe5) SHA1(851f62df651aa180b6fa236f4c54ed7791d92a21) )
-	ROM_LOAD( "tst-c-a.5i",      0x1800, 0x0800, CRC(c23025da) SHA1(ccc73ca9754b04e49733661cbd9e788b13163100) )
-	ROM_LOAD( "tst-c-a.5j",      0x2000, 0x0800, CRC(946bee5d) SHA1(6e668cec5986af3d319bf9aa8962a3d9008d0156) )
-	ROM_LOAD( "tst-c-a.5k",      0x2800, 0x0800, CRC(1713300c) SHA1(9a7b6cc0d79cccadd4988e0e791c1598813b6552) )
-	ROM_LOAD( "tst-c-a.5m",      0x3000, 0x0800, CRC(4cbe92fc) SHA1(903b617e42f740e94a6edb6a973dc0d57ac0abee) )
-	ROM_LOAD( "tst-c-a.5n",      0x3800, 0x0800, CRC(1a798fbf) SHA1(65ff2fe91c2037378314c4a68b2bd21fd167c64a) )
+	ROM_LOAD( "tst-c-a.5e",  0x0000, 0x0800, CRC(5657bd2f) SHA1(0e615a7dd5efbbf6f543480bc150f45089c41d32) )
+	ROM_LOAD( "tst-c-a.5f",  0x0800, 0x0800, CRC(303b0294) SHA1(a2f5637e201739b440e7ea0868d2d5745fbb4f5b) )
+	ROM_LOAD( "tst-c-a.5h",  0x1000, 0x0800, CRC(49a26fe5) SHA1(851f62df651aa180b6fa236f4c54ed7791d92a21) )
+	ROM_LOAD( "tst-c-a.5i",  0x1800, 0x0800, CRC(c23025da) SHA1(ccc73ca9754b04e49733661cbd9e788b13163100) )
+	ROM_LOAD( "tst-c-a.5j",  0x2000, 0x0800, CRC(946bee5d) SHA1(6e668cec5986af3d319bf9aa8962a3d9008d0156) )
+	ROM_LOAD( "tst-c-a.5k",  0x2800, 0x0800, CRC(1713300c) SHA1(9a7b6cc0d79cccadd4988e0e791c1598813b6552) )
+	ROM_LOAD( "tst-c-a.5m",  0x3000, 0x0800, CRC(4cbe92fc) SHA1(903b617e42f740e94a6edb6a973dc0d57ac0abee) )
+	ROM_LOAD( "tst-c-a.5n",  0x3800, 0x0800, CRC(1a798fbf) SHA1(65ff2fe91c2037378314c4a68b2bd21fd167c64a) )
 
 	ROM_REGION( 0x1000, "audiocpu", 0 )
-	ROM_LOAD( "tst-e-20.bin",    0x0000, 0x0400, CRC(f7a59492) SHA1(22bdc02c72086c38acd9d9675da54ce6ba3f80a3) )
+	ROM_LOAD( "tst-e-20.bin",0x0000, 0x0400, CRC(f7a59492) SHA1(22bdc02c72086c38acd9d9675da54ce6ba3f80a3) )
 
 	ROM_REGION( 0x1000, "sprites", 0 )
-	ROM_LOAD( "tst-v-a.5k",      0x0000, 0x0800, CRC(236e1ff7) SHA1(575b8ed9ab054a864207e0fde3ae93cdcafbebf2) )
-	ROM_LOAD( "tst-v-a.6k",      0x0800, 0x0800, CRC(bf901a4e) SHA1(71207ad1ca60aa617dbbc3cd2e4e42520b7c8513) )
+	ROM_LOAD( "tst-v-a.5k",  0x0000, 0x0800, CRC(236e1ff7) SHA1(575b8ed9ab054a864207e0fde3ae93cdcafbebf2) )
+	ROM_LOAD( "tst-v-a.6k",  0x0800, 0x0800, CRC(bf901a4e) SHA1(71207ad1ca60aa617dbbc3cd2e4e42520b7c8513) )
 
 	ROM_REGION( 0x0100, "bullets", 0 )
-	ROM_LOAD( "mb7052-a.4i",     0x0000, 0x0100, CRC(528e8533) SHA1(8e41eee1016c98a4f08acbd902daf8e32aa9d9ab) )
+	ROM_LOAD( "mb7052-a.4i", 0x0000, 0x0100, CRC(528e8533) SHA1(8e41eee1016c98a4f08acbd902daf8e32aa9d9ab) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "mb7051-a.3n",     0x0000, 0x0020, CRC(465d07af) SHA1(25e246f7674c25d05e5f6e68db88c15aaa10cee1) )
+	ROM_LOAD( "mb7051-a.3n", 0x0000, 0x0020, CRC(465d07af) SHA1(25e246f7674c25d05e5f6e68db88c15aaa10cee1) )
 ROM_END
 
 
@@ -1084,6 +1084,32 @@ ROM_START( starwarr )
 	ROM_LOAD( "mb7051.3n",   0x0000, 0x0020, CRC(465d07af) SHA1(25e246f7674c25d05e5f6e68db88c15aaa10cee1) )
 ROM_END
 
+// Found on Niemer PCB
+ROM_START( redbird )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1721.e5",     0x0000, 0x0800, CRC(12926811) SHA1(6c8ea1dac9286aefcd07a9886eaf8143c9aa267d) )
+	ROM_LOAD( "1722.fg5",    0x0800, 0x0800, CRC(30ab3872) SHA1(fe78314090012ecd937e25bfdd4dddf557cbfb6c) )
+	ROM_LOAD( "1723.gh5",    0x1000, 0x0800, CRC(89740d35) SHA1(1f34ad07b526d08f88bd5cb87df1755f9c18176b) )
+	ROM_LOAD( "1724.i5",     0x1800, 0x0800, CRC(61c00a65) SHA1(afc93e320478c70b3ddca8375fd648c9f2572dab) )
+	ROM_LOAD( "2725.j5",     0x2000, 0x0800, CRC(ac3fc251) SHA1(27313028bf453981c7605be6e4568b4ffe3edee0) )
+	ROM_LOAD( "3726.k5",     0x2800, 0x0800, CRC(cd6ced71) SHA1(b3bd6c7cbd8a05920f06b515499943bbb76ba563) )
+	ROM_LOAD( "2727.lm5",    0x3000, 0x0800, CRC(6286f534) SHA1(c47d0df85a52c774a4bc26351fdae18795062b6e) )
+	ROM_LOAD( "2728.mn5",    0x3800, 0x0800, CRC(1c9f91ee) SHA1(481a309fe9aa9ce6fd18d7d908c18790f594057d) )
+
+	ROM_REGION( 0x1000, "audiocpu", 0 )
+	ROM_LOAD( "ic20.snd",    0x0000, 0x0400, BAD_DUMP CRC(1c8670b3) SHA1(609124caa11498fc6a6bdf6cdbb8003bbc249dd8) ) // Not dumped on this set
+
+	ROM_REGION( 0x1000, "sprites", 0 )
+	ROM_LOAD( "4711.k5",     0x0000, 0x0800, CRC(236e1ff7) SHA1(575b8ed9ab054a864207e0fde3ae93cdcafbebf2) )
+	ROM_LOAD( "4712.k6",     0x0800, 0x0800, CRC(bf901a4e) SHA1(71207ad1ca60aa617dbbc3cd2e4e42520b7c8513) )
+
+	ROM_REGION( 0x0100, "bullets", 0 )
+	ROM_LOAD( "7052.i4",     0x0000, 0x0100, CRC(feccde96) SHA1(4b2b38e89d8d4e035cddeed4c91bd23e13fe23e8) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "6331.m3",     0x0000, 0x0020, CRC(465d07af) SHA1(25e246f7674c25d05e5f6e68db88c15aaa10cee1) )
+ROM_END
+
 } // anonymouse namespace
 
 /*************************************
@@ -1092,12 +1118,14 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, spacefb,  0,       spacefb, spacefb,  spacefb_state, empty_init, ROT270, "Nintendo", "Space Firebird (rev. 04-u)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spacefbe, spacefb, spacefb, spacefb,  spacefb_state, empty_init, ROT270, "Nintendo", "Space Firebird (rev. 03-e set 1)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spacefbe2,spacefb, spacefb, spacefb,  spacefb_state, empty_init, ROT270, "Nintendo", "Space Firebird (rev. 03-e set 2)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spacefba, spacefb, spacefb, spacefb,  spacefb_state, empty_init, ROT270, "Nintendo", "Space Firebird (rev. 02-a)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spacefbg, spacefb, spacefb, spacefb,  spacefb_state, empty_init, ROT270, "Nintendo (Gremlin license)", "Space Firebird (Gremlin)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spacebrd, spacefb, spacefb, spacefb,  spacefb_state, empty_init, ROT270, "bootleg (Karateco)", "Space Bird (bootleg)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spacefbb, spacefb, spacefb, spacefb,  spacefb_state, empty_init, ROT270, "bootleg", "Space Firebird (bootleg)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spacedem, spacefb, spacefb, spacedem, spacefb_state, empty_init, ROT270, "Nintendo (Fortrek license)", "Space Demon", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, starwarr, spacefb, spacefb, spacefb,  spacefb_state, empty_init, ROT270, "bootleg (Potomac Mortgage)", "Star Warrior", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT   MACHINE  INPUT     CLASS          INIT        ROT     COMPANY                       FULLNAME                                FLAGS
+GAME( 1980, spacefb,   0,       spacefb, spacefb,  spacefb_state, empty_init, ROT270, "Nintendo",                   "Space Firebird (rev. 04-u)",           MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacefbe,  spacefb, spacefb, spacefb,  spacefb_state, empty_init, ROT270, "Nintendo",                   "Space Firebird (rev. 03-e set 1)",     MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacefbe2, spacefb, spacefb, spacefb,  spacefb_state, empty_init, ROT270, "Nintendo",                   "Space Firebird (rev. 03-e set 2)",     MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacefba,  spacefb, spacefb, spacefb,  spacefb_state, empty_init, ROT270, "Nintendo",                   "Space Firebird (rev. 02-a)",           MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacefbg,  spacefb, spacefb, spacefb,  spacefb_state, empty_init, ROT270, "Nintendo (Gremlin license)", "Space Firebird (Gremlin)",             MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacebrd,  spacefb, spacefb, spacefb,  spacefb_state, empty_init, ROT270, "bootleg (Karateco)",         "Space Bird (bootleg)",                 MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacefbb,  spacefb, spacefb, spacefb,  spacefb_state, empty_init, ROT270, "bootleg",                    "Space Firebird (bootleg)",             MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacedem,  spacefb, spacefb, spacedem, spacefb_state, empty_init, ROT270, "Nintendo (Fortrek license)", "Space Demon",                          MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, starwarr,  spacefb, spacefb, spacefb,  spacefb_state, empty_init, ROT270, "bootleg (Potomac Mortgage)", "Star Warrior",                         MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, redbird,   spacefb, spacefb, spacefb,  spacefb_state, empty_init, ROT270, "bootleg (Codematic)",        "Red Bird (bootleg of Space Firebird)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
