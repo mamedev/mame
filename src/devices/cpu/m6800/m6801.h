@@ -61,7 +61,7 @@ public:
 	void nvram_set_battery(int state) { m_nvram_battery = bool(state); } // default is 1 (nvram_enable_backup needs to be true)
 	void nvram_set_default_value(uint8_t val) { m_nvram_defval = val; } // default is 0
 	auto standby_cb() { return m_standby_func.bind(); } // notifier (not an output pin)
-	bool standby() { return suspended(SUSPEND_REASON_CLOCK); }
+	int standby() { return suspended(SUSPEND_REASON_CLOCK) ? 1 : 0; }
 
 	void m6801_clock_serial();
 

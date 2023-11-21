@@ -1168,6 +1168,7 @@ void m6801_cpu_device::device_start()
 	m_timer_over.d = 0;
 	m_timer_next = 0;
 
+	save_item(NAME(m_nvram_battery));
 	save_item(NAME(m_port_ddr));
 	save_item(NAME(m_port_data));
 	save_item(NAME(m_p3csr));

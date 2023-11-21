@@ -4,12 +4,12 @@
 /*******************************************************************************
 
 SciSys Chess Companion II family
+CXG Enterprise "S" family
 
 The chess engine is LogiChess (ported from Z80 to 6801), by Kaare Danielsen.
-CXG Enterprise "S" / Star Chess is probably on similar hardware.
 
 NOTE: It triggers an NMI when the power switch is changed from ON to MEMORY.
-If this is not done, NVRAM may fail on the next boot.
+If this is not done, NVRAM won't save properly.
 
 TODO:
 - if/when MAME supports an exit callback, hook up power-off NMI to that
@@ -51,6 +51,26 @@ is either VCC or GND to distinguish between the two.
 
 The Tandy clones run at a lower clock frequency, 3MHz and 6MHz respectively.
 
+********************************************************************************
+
+CXG Enterprise "S" / Star Chess is on very similar hardware, so it's emulated
+in this driver too.
+
+Hardware notes:
+- Hitachi HD6301V1 (HD6301V1C42P), 7.15909MHz XTAL
+- port 2 I/O is changed a bit, rest is same as compan2
+
+HD6301V1C42P MCU is used in:
+- CXG Enterprise "S" (black/brown/blue)
+- CXG Star Chess (black/gray)
+- CXG Computachess III
+- CXG Super Computachess
+- CXG Crown
+- CXG Sphinx Galaxy 2 (suspected)
+- Fidelity Genesis (Fidelity brand Computachess III)
+- Mephisto Merlin 4K (H+G brand Computachess III)
+- Multitech Enterprise (Multitech brand Super Computachess)
+
 *******************************************************************************/
 
 #include "emu.h"
@@ -63,6 +83,7 @@ The Tandy clones run at a lower clock frequency, 3MHz and 6MHz respectively.
 #include "speaker.h"
 
 // internal artwork
+#include "cxg_enterprise.lh"
 #include "saitek_companion2.lh"
 #include "saitek_expchess.lh"
 
@@ -80,6 +101,7 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
+	void enterp(machine_config &config);
 	void expchess(machine_config &config);
 	void compan2(machine_config &config);
 
@@ -101,6 +123,7 @@ private:
 	// I/O handlers
 	u8 input1_r();
 	u8 input2_r();
+	u8 input2c_r();
 	void mux_w(u8 data);
 	u8 power_r();
 	void led_w(u8 data);
@@ -171,6 +194,8 @@ INPUT_CHANGED_MEMBER(compan2_state::power_off)
     I/O
 *******************************************************************************/
 
+// common
+
 u8 compan2_state::input1_r()
 {
 	u8 data = 0;
@@ -219,20 +244,62 @@ void compan2_state::led_w(u8 data)
 }
 
 
+// enterp-specific
+
+u8 compan2_state::input2c_r()
+{
+	// P20,P21: read buttons
+	u8 data = input2_r() >> 1 & 3;
+
+	// P24: power switch state
+	return data | (power_r() << 4) | 0xec;
+}
+
+
 
 /*******************************************************************************
     Input Ports
 *******************************************************************************/
 
-static INPUT_PORTS_START( expchess )
+static INPUT_PORTS_START( enterp )
 	PORT_START("IN.0")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_NAME("Hint")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Enter Position")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("King")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Rook")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Bishop")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Knight")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Pawn")
+
+	PORT_START("IN.1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_NAME("Move")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("Multi Move")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Queen")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("Level")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Sound/Color")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Take Back")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME("New Game")
+
+	PORT_START("IN.2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("POWER")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, compan2_state, power_off, 0) PORT_NAME("Power Off")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( expchess )
+	PORT_INCLUDE( enterp )
+
+	PORT_MODIFY("IN.0")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("White/Black")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME("New Game / Clear Board")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_NAME("2nd F")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("King")
 	PORT_BIT(0x63, IP_ACTIVE_HIGH, IPT_UNUSED)
 
-	PORT_START("IN.1")
+	PORT_MODIFY("IN.1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Rook")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Bishop")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Take Back")
@@ -242,35 +309,21 @@ static INPUT_PORTS_START( expchess )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Pawn")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Queen")
 
-	PORT_START("IN.2")
+	PORT_MODIFY("IN.2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM) // button config
-
-	PORT_START("POWER")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, compan2_state, power_off, 0) PORT_NAME("Power Off")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( compan2 )
-	PORT_INCLUDE( expchess )
+	PORT_INCLUDE( enterp )
 
 	PORT_MODIFY("IN.0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Sound")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_NAME("Color")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("King")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Rook")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Bishop")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Knight")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Pawn")
 
 	PORT_MODIFY("IN.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("Level")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("Multi Move")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Queen")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_NAME("Play")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Enter Position")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Take Back")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME("New Game")
 
 	PORT_MODIFY("IN.2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_CUSTOM) // button config
@@ -287,18 +340,17 @@ INPUT_PORTS_END
     Machine Configs
 *******************************************************************************/
 
-void compan2_state::expchess(machine_config &config)
+void compan2_state::enterp(machine_config &config)
 {
 	// basic machine hardware
-	HD6301V1(config, m_maincpu, 4000000); // approximation, no XTAL
+	HD6301V1(config, m_maincpu, 7.15909_MHz_XTAL);
 	m_maincpu->nvram_enable_backup(true);
 	m_maincpu->standby_cb().set(m_maincpu, FUNC(hd6301v1_cpu_device::nvram_set_battery));
 	m_maincpu->standby_cb().append([this](int state) { if (state) m_display->clear(); });
 	m_maincpu->in_p1_cb().set(FUNC(compan2_state::input1_r));
-	m_maincpu->in_p2_cb().set(FUNC(compan2_state::input2_r));
-	m_maincpu->out_p2_cb().set("dac", FUNC(dac_1bit_device::write)).bit(0);
+	m_maincpu->in_p2_cb().set(FUNC(compan2_state::input2c_r));
+	m_maincpu->out_p2_cb().set("dac", FUNC(dac_1bit_device::write)).bit(2);
 	m_maincpu->out_p3_cb().set(FUNC(compan2_state::mux_w));
-	m_maincpu->in_p4_cb().set(FUNC(compan2_state::power_r));
 	m_maincpu->out_p4_cb().set(FUNC(compan2_state::led_w));
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
@@ -308,17 +360,31 @@ void compan2_state::expchess(machine_config &config)
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(5+2, 8);
-	config.set_default_layout(layout_saitek_expchess);
+	config.set_default_layout(layout_cxg_enterprise);
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
+void compan2_state::expchess(machine_config &config)
+{
+	enterp(config);
+
+	// basic machine hardware
+	m_maincpu->set_clock(4000000); // approximation, no XTAL
+	m_maincpu->in_p2_cb().set(FUNC(compan2_state::input2_r));
+	m_maincpu->out_p2_cb().set("dac", FUNC(dac_1bit_device::write)).bit(0);
+	m_maincpu->in_p4_cb().set(FUNC(compan2_state::power_r));
+
+	config.set_default_layout(layout_saitek_expchess);
+}
+
 void compan2_state::compan2(machine_config &config)
 {
 	expchess(config);
 
+	// basic machine hardware
 	MCFG_MACHINE_RESET_OVERRIDE(compan2_state, compan2)
 	config.set_default_layout(layout_saitek_companion2);
 }
@@ -339,6 +405,11 @@ ROM_START( expchess )
 	ROM_LOAD("1983_te-1_scisys-w_0609v171.u1", 0x0000, 0x1000, CRC(a26632fd) SHA1(fb83dc2476500acaabd949d749e58adca01012ea) )
 ROM_END
 
+ROM_START( enterp )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD("1984nc208_newcrest_hd6301v1c42p", 0x0000, 0x1000, CRC(b9cc7da7) SHA1(ca07ba072cc101aabeb0853f518053f48cc73a4d) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -350,3 +421,5 @@ ROM_END
 //    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     CLASS          INIT        COMPANY, FULLNAME, FLAGS
 SYST( 1983, compan2,  0,       0,      compan2,  compan2,  compan2_state, empty_init, "SciSys", "Chess Companion II", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1983, expchess, compan2, 0,      expchess, expchess, compan2_state, empty_init, "SciSys", "Explorer Chess", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+
+SYST( 1984, enterp,   0,       0,      enterp,   enterp,   compan2_state, empty_init, "CXG Systems / Newcrest Technology", "Enterprise \"S\"", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
