@@ -52,7 +52,7 @@ void swp30_disassembler::append(std::string &r, const std::string &e)
 // XLB----- -rrrrrrr rxlmmmmm m-MM---- -P-----* -----Arr rrrrrrmm mmmm----
 
 // m = low is read port, high is write port, memory register
-// r = low is read port, high is high port, rotating register
+// r = low is read port, high is write port, rotating register
 
 // X = used for lo-fi variation only
 // L = lfo read for memory offset
@@ -71,7 +71,7 @@ offs_t swp30_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 	std::string r;
 
 	if(b(opc, 62, 1))
-		append(r, util::string_format("lfo.%02x", pc >> 4));
+		append(r, util::string_format("m%02x = lfo.%02x", b(opc, 4, 6), pc >> 4));
 
 	if(b(opc, 23, 1))
 		switch(b(opc, 24, 2)) {
@@ -95,27 +95,31 @@ offs_t swp30_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 			break;
 		}
 
-	std::string source;
-	if(b(opc, 30, 1))
-		source = "p";
-	else if(!b(opc, 45, 1))
-		source = util::string_format("lfo.%02x", pc >> 4);
+	if(b(opc, 62, 1))
+		append(r, util::string_format("idx = p*4000"));
 
-	if(!source.empty()) {
-		if(b(opc, 61, 1))
-			append(r, util::string_format("mb = %s", source));
-		else if(b(opc, 46, 1) == 1)
-			append(r, util::string_format("m%02x = %s", b(opc, 39, 6), source));
-		else
-			append(r, util::string_format("r%02x = %s", b(opc, 47, 8), source));
-	}
+	if(b(opc, 30, 1) == 1 && b(opc, 61, 1) == 1)
+		append(r, util::string_format("mw = p"));
+
+	if(b(opc, 30, 1) == 1 && b(opc, 61, 1) == 0 && b(opc, 46, 1) == 1 && b(opc, 62, 1) == 0)
+		append(r, util::string_format("m%02x = p", b(opc, 39, 6)));
+
+	if(b(opc, 30, 1) == 1 && b(opc, 61, 1) == 0 && b(opc, 46, 1) == 0)
+		append(r, util::string_format("r%02x = p", b(opc, 47, 8)));
+
+	if(b(opc, 30, 1) == 0 && b(opc, 45, 2) == 2)
+		append(r, util::string_format("m%02x = lfo.%02x", b(opc, 39, 6), pc >> 4));
+
+	if(b(opc, 30, 1) == 0 && b(opc, 45, 2) == 3)
+		append(r, util::string_format("m%02x = unk", b(opc, 39, 6)));
+
+	if(b(opc, 46, 2) == 2)
+		append(r, util::string_format("m%02x = mr", b(opc, 39, 6)));
 
 	u32 memmode = b(opc, 36, 2);
 	if(memmode) {
-		static const char *modes[4] = { nullptr, "w", "r", "rr" };
-
+		static const char *modes[4] = { nullptr, "w", "r", "1r" };
 		append(r, util::string_format("mem_%s %x +%s", modes[memmode], b(opc, 33, 3), goffset(pc/3)));
-		r += util::string_format("-> m%02x", b(opcodes.r64(pc+2), 39, 6));
 	}
 
 	stream << r;

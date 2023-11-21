@@ -78,7 +78,7 @@ protected:
 
 private:
 	// devices/pointers
-	required_device<avr8_device> m_maincpu;
+	required_device<atmega88_device> m_maincpu;
 	optional_device<pwm_display_device> m_digit_pwm;
 	optional_device<hd44780_device> m_lcd;
 	required_ioport_array<4> m_inputs;
@@ -254,8 +254,8 @@ void avrmax_state::base(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &avrmax_state::main_map);
 	m_maincpu->set_addrmap(AS_DATA, &avrmax_state::data_map);
 	m_maincpu->set_eeprom_tag("eeprom");
-	m_maincpu->gpio_in<AVR8_IO_PORTB>().set(FUNC(avrmax_state::input_r));
-	m_maincpu->gpio_out<AVR8_IO_PORTC>().set(FUNC(avrmax_state::input_w));
+	m_maincpu->gpio_in<atmega88_device::GPIOB>().set(FUNC(avrmax_state::input_r));
+	m_maincpu->gpio_out<atmega88_device::GPIOC>().set(FUNC(avrmax_state::input_w));
 }
 
 void avrmax_state::avrmax(machine_config &config)
@@ -263,9 +263,9 @@ void avrmax_state::avrmax(machine_config &config)
 	base(config);
 
 	// basic machine hardware
-	m_maincpu->set_clock(8000000); // internal R/C clock
-	m_maincpu->gpio_out<AVR8_IO_PORTC>().set(FUNC(avrmax_state::digit_w));
-	m_maincpu->gpio_out<AVR8_IO_PORTD>().set(FUNC(avrmax_state::segment_w));
+	m_maincpu->set_clock(8'000'000); // internal R/C clock
+	m_maincpu->gpio_out<atmega88_device::GPIOC>().set(FUNC(avrmax_state::digit_w));
+	m_maincpu->gpio_out<atmega88_device::GPIOD>().set(FUNC(avrmax_state::segment_w));
 
 	// video hardware
 	PWM_DISPLAY(config, m_digit_pwm).set_size(4, 8);
@@ -278,7 +278,7 @@ void avrmax_state::atm18mcc(machine_config &config)
 	base(config);
 
 	// basic machine hardware
-	m_maincpu->gpio_out<AVR8_IO_PORTD>().set(FUNC(avrmax_state::lcd_w));
+	m_maincpu->gpio_out<atmega88_device::GPIOD>().set(FUNC(avrmax_state::lcd_w));
 
 	// video hardware
 	auto &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
@@ -287,7 +287,9 @@ void avrmax_state::atm18mcc(machine_config &config)
 	screen.set_visarea_full();
 	screen.set_screen_update(FUNC(avrmax_state::screen_update));
 
-	HD44780(config, m_lcd, 0);
+	// HD44780UA02 is required for certain international characters in cc2schach,
+	// the others can optionally use a more standard HD44780[U]A00 display
+	HD44780U_A02(config, m_lcd, 270'000); // TODO: clock not measured, datasheet typical clock used
 	config.set_default_layout(layout_atm18mcc);
 }
 

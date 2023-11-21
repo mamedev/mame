@@ -122,7 +122,7 @@ void recel_state::recel_io(address_map &map) // to be done
 
 static INPUT_PORTS_START( recel )
 	PORT_START("X0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD)     PORT_NAME("Play/Test")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Play/Test")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("INP10")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("INP20")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("INP30")
@@ -262,7 +262,7 @@ void recel_state::switches_w(offs_t offset, u8 data) // to be done
 
 void recel_state::display_w(offs_t offset, u8 data) // to be tested
 {
-	static const uint8_t patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0 }; // 7448
+	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7448
 	data ^= 0xff;  // It was stored in the 10788 inverted
 	u8 a = patterns[BIT(data, 0, 4)];
 	u8 b = patterns[BIT(data, 4, 4)];
@@ -361,7 +361,7 @@ void recel_state::recel(machine_config & config)
 
 	ra17xx_device &u5(RA17XX(config, "b2", 0));
 	u5.iord_cb().set(FUNC(recel_state::nvram_r));
-	u5.iowr_cb().set(FUNC(recel_state::nvram_w));     // control nvram, printer
+	u5.iowr_cb().set(FUNC(recel_state::nvram_w));     // control NVRAM, printer
 	u5.set_cpu_tag(m_maincpu);
 
 	ra17xx_device &u4(RA17XX(config, "b1", 0));
@@ -493,6 +493,13 @@ ROM_START(r_flipper)
 	ROM_LOAD("fl.c5",   0x0000, 0x0800, CRC(76ee0370) SHA1(f2a835a0b76f7258d5e65390c239f5456e30e87a) )
 ROM_END
 
+ROM_START(r_blackmag)
+	RECEL_BIOS
+
+	ROM_REGION( 0x0800, "module", ROMREGION_ERASEFF )
+	ROM_LOAD("bm_1065_1.bin", 0x0000, 0x0800, CRC(a917718c) SHA1(0b4fdf270560df902e95b34c25cca20e91f1071c) )
+ROM_END
+
 ROM_START(r_blackm4)
 	RECEL_BIOS
 
@@ -517,4 +524,5 @@ GAME(1979,  r_cavalier,  recel,   recel, recel,     recel_state, empty_init, ROT
 GAME(1979,  r_swash,     recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "SwashBuckler",     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1979,  r_quijote,   recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Don Quijote",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1980,  r_flipper,   recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "The Flipper Game", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  r_blackmag,  recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Black Magic",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1980,  r_blackm4,   recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Black Magic 4",    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

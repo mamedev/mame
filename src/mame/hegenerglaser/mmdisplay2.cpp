@@ -3,8 +3,8 @@
 /*******************************************************************************
 
 Hegener + Glaser Mephisto Display Module for modular chesscomputers, the 2nd
-version with 2 LCD lines. The 16/32bit module also includes 8KB NVRAM, but that
-part is emulated in the driver.
+version with 2 LCD lines (HD44780A00 + HD44100H or Sanyo LC7930). The 16/32bit
+module also includes 8KB NVRAM, but that part is emulated in the driver.
 
 *******************************************************************************/
 
@@ -46,7 +46,7 @@ void mephisto_display2_device::device_add_mconfig(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(mephisto_display2_device::lcd_palette), 3);
 
-	HD44780(config, m_lcd, 0);
+	HD44780(config, m_lcd, 270'000); // OSC = 91K resistor
 	m_lcd->set_lcd_size(2, 16);
 	m_lcd->set_pixel_update_cb(FUNC(mephisto_display2_device::lcd_pixel_update));
 

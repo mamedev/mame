@@ -25,7 +25,26 @@ public:
 protected:
 	DECLARE_MACHINE_START(pc_h98);
 	DECLARE_MACHINE_RESET(pc_h98);
+
+	void pc_h98_map(address_map &map);
+	void pc_h98_io(address_map &map);
 };
+
+void pc_hyper98_state::pc_h98_map(address_map &map)
+{
+	pc_hyper98_state::pc9801bx2_map(map);
+//	map(0x080000, 0x0bffff).unmaprw(); // RAM window
+	// TODO: bigger, needs fn mods
+	map(0x0c0000, 0x0dffff).rw(FUNC(pc_hyper98_state::grcg_gvram0_r), FUNC(pc_hyper98_state::grcg_gvram0_w));
+	map(0x0e0000, 0x0e3fff).rw(FUNC(pc_hyper98_state::tvram_r), FUNC(pc_hyper98_state::tvram_w));
+	map(0x0e4000, 0x0e4fff).rw(FUNC(pc_hyper98_state::pc9801rs_knjram_r), FUNC(pc_hyper98_state::pc9801rs_knjram_w));
+}
+
+void pc_hyper98_state::pc_h98_io(address_map &map)
+{
+	pc_hyper98_state::pc9801bx2_io(map);
+	// ...
+}
 
 // TODO: backported from pc9801_epson.cpp, needs mods
 static INPUT_PORTS_START( pc_h98 )
@@ -145,8 +164,8 @@ void pc_hyper98_state::pc_h98s(machine_config &config)
 	pc9801bx2(config);
 	const XTAL xtal = XTAL(20'000'000);
 	I486(config.replace(), m_maincpu, xtal); // i486sx
-	m_maincpu->set_addrmap(AS_PROGRAM, &pc_hyper98_state::pc9801bx2_map);
-	m_maincpu->set_addrmap(AS_IO, &pc_hyper98_state::pc9801bx2_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc_hyper98_state::pc_h98_map);
+	m_maincpu->set_addrmap(AS_IO, &pc_hyper98_state::pc_h98_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	MCFG_MACHINE_START_OVERRIDE(pc_hyper98_state, pc_h98)

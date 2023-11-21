@@ -5,6 +5,10 @@
 
 CXG Sphinx Dominator, chess computer.
 
+The chess engine is by Frans Morsch, older versions (before 2.05) were buggy.
+Hold Pawn + Knight buttons at boot for test mode, it will tell the version number.
+This engine was also used in the newer Mephisto Modena.
+
 Hardware notes:
 - R65C02P4 @ 4MHz
 - 32KB ROM, 8KB RAM battery-backed
@@ -15,19 +19,17 @@ Sphinx Commander also uses the Dominator program, and is on similar hardware,
 but with a Chess 3008 housing (wooden chessboard, magnet sensors).
 Sphinx Galaxy is on similar hardware too, with less leds.
 
-The chess engine is by Frans Morsch, older versions (before 2.05) were buggy.
-Hold Pawn + Knight buttons at boot for test mode, it will tell the version number.
-This engine was also used in the newer Mephisto Modena.
-
 *******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6502/r65c02.h"
 #include "machine/nvram.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
 #include "video/pwm.h"
 #include "video/lc7582.h"
+
 #include "speaker.h"
 
 // internal artwork

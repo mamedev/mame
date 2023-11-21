@@ -183,7 +183,7 @@
 
   TODO:
 
-  - Set a common sampleset for all games and clones.
+  - Nothing... :)
 
 
 *******************************************************************************************************************************************************
@@ -897,7 +897,7 @@ void interflip8035_state::audio_p2_w(u8 data)
 	}
 	else
 	{
-		if(BIT(m_sample_flags,0) && change)
+		if(BIT(m_sample_flags, 0) && change)
 		{
 			m_sample_flags &= 0xfe;
 			m_samples->start(1, 3, false);
@@ -1105,9 +1105,9 @@ int interflip8035_state::reel_opto_r()
 *                 Sound Samples                  *
 *************************************************/
 
-static const char *const interflip8035_sample_names[] =
+static const char *const ifslots_sample_names[] =
 {
-	"*samples",
+	"*ifslots",
 	"ringbellm",
 	"coin_in",
 	"rattle_forth",
@@ -1246,7 +1246,7 @@ void interflip8035_state::interflip(machine_config &config)
 
 	SAMPLES(config, m_samples);
 	m_samples->set_channels(2);
-	m_samples->set_samples_names(interflip8035_sample_names);
+	m_samples->set_samples_names(ifslots_sample_names);
 	m_samples->add_route(ALL_OUTPUTS, "mono", 2.0);
 
 }

@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_TRS_6883SAM_H
-#define MAME_TRS_6883SAM_H
+#ifndef MAME_MACHINE_6883SAM_H
+#define MAME_MACHINE_6883SAM_H
 
 #pragma once
 
@@ -129,7 +129,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 private:
-	// memory space configuratino
+	// memory space configuration
 	address_space_config        m_ram_config;
 	address_space_config        m_rom0_config;
 	address_space_config        m_rom1_config;
@@ -216,4 +216,4 @@ private:
 
 DECLARE_DEVICE_TYPE(SAM6883, sam6883_device)
 
-#endif // MAME_TRS_6883SAM_H
+#endif // MAME_MACHINE_6883SAM_H

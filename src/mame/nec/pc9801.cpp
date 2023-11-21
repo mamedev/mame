@@ -360,12 +360,12 @@ Keyboard TX commands:
 
 void pc98_base_state::rtc_w(uint8_t data)
 {
-	m_rtc->c0_w((data & 0x01) >> 0);
-	m_rtc->c1_w((data & 0x02) >> 1);
-	m_rtc->c2_w((data & 0x04) >> 2);
-	m_rtc->stb_w((data & 0x08) >> 3);
-	m_rtc->clk_w((data & 0x10) >> 4);
-	m_rtc->data_in_w(((data & 0x20) >> 5));
+	m_rtc->c0_w(BIT(data, 0));
+	m_rtc->c1_w(BIT(data, 1));
+	m_rtc->c2_w(BIT(data, 2));
+	m_rtc->stb_w(BIT(data, 3));
+	m_rtc->clk_w(BIT(data, 4));
+	m_rtc->data_in_w(BIT(data, 5));
 	if(data & 0xc0)
 		logerror("RTC write to undefined bits %02x\n",data & 0xc0);
 }
@@ -635,11 +635,12 @@ void pc9801_state::pc9801_common_io(address_map &map)
 	map(0x0000, 0x001f).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask16(0xff00);
 	map(0x0000, 0x001f).rw(FUNC(pc9801_state::pic_r), FUNC(pc9801_state::pic_w)).umask16(0x00ff); // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
 	map(0x0020, 0x002f).w(FUNC(pc9801_state::rtc_w)).umask16(0x00ff);
-	map(0x0030, 0x0037).rw(m_ppi_sys, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00); //i8251 RS232c / i8255 system port
+	map(0x0030, 0x0037).rw(m_ppi_sys, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00);
+	map(0x0030, 0x0033).rw(m_sio, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff); //i8251 RS232c / i8255 system port
 	map(0x0040, 0x0047).rw(m_ppi_prn, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x0040, 0x0047).rw(m_keyb, FUNC(pc9801_kbd_device::rx_r), FUNC(pc9801_kbd_device::tx_w)).umask16(0xff00); //i8255 printer port / i8251 keyboard
-	map(0x0050, 0x0057).rw("ppi8255_fdd", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00);
-	map(0x0050, 0x0053).w(FUNC(pc9801_state::nmi_ctrl_w)).umask16(0x00ff); // NMI FF / i8255 floppy port (2d?)
+	map(0x0050, 0x0057).lr8(NAME([] (offs_t offset) { return 0xff; })).umask16(0xff00);
+	map(0x0050, 0x0053).w(FUNC(pc9801_state::nmi_ctrl_w)).umask16(0x00ff); // NMI FF / host FDD 2d (PC-80S31K)
 	map(0x0060, 0x0063).rw(m_hgdc[0], FUNC(upd7220_device::read), FUNC(upd7220_device::write)).umask16(0x00ff); //upd7220 character ports / <undefined>
 	map(0x0064, 0x0064).w(FUNC(pc9801_state::vrtc_clear_w));
 //  map(0x006c, 0x006f) border color / <undefined>
@@ -647,7 +648,7 @@ void pc9801_state::pc9801_common_io(address_map &map)
 	// (can be accessed only thru the $3fdb alias)
 	map(0x0070, 0x0077).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0xff00);
 	map(0x0070, 0x007f).rw(FUNC(pc9801_state::txt_scrl_r), FUNC(pc9801_state::txt_scrl_w)).umask16(0x00ff); //display registers / i8253 pit
-	map(0x0090, 0x0093).rw(m_sio, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0xff00);
+//	map(0x0090, 0x0093).rw(m_sio, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0xff00); // CMT SIO (optional, C-Bus)
 	map(0x7fd8, 0x7fdf).rw(m_ppi_mouse, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00);
 }
 
@@ -1647,8 +1648,8 @@ u8 pc9801_state::ppi_sys_portb_r()
 {
 	u8 res = 0;
 
-	res |= m_rtc->data_out_r();
 	res |= BIT(m_dsw1->read(), 0) << 3;
+	res |= m_rtc->data_out_r();
 
 	return res;
 }
@@ -2282,12 +2283,6 @@ void pc9801_state::pc9801_common(machine_config &config)
 	m_fdc_2hd->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq2_w)).invert();
 	FLOPPY_CONNECTOR(config, "upd765_2hd:0", pc9801_floppies, "525hd", pc9801_state::floppy_formats);//.enable_sound(true);
 	FLOPPY_CONNECTOR(config, "upd765_2hd:1", pc9801_floppies, "525hd", pc9801_state::floppy_formats);//.enable_sound(true);
-
-	i8255_device &ppi_fdd(I8255(config, "ppi8255_fdd"));
-	ppi_fdd.in_pa_callback().set_constant(0xff);
-	ppi_fdd.in_pb_callback().set_constant(0xff);
-	ppi_fdd.in_pc_callback().set_constant(0xff);
-	//ppi_fdd.out_pc_callback().set(FUNC(pc9801_state::ppi_fdd_portc_w));
 
 	SOFTWARE_LIST(config, "disk_list").set_original("pc98");
 

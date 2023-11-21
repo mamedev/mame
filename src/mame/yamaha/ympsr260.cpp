@@ -82,7 +82,7 @@ void psr260_state::psr260(machine_config &config)
 	// TODO: MIDI in/out
 
 	// LCD
-	HD44780(config, m_lcdc, 0);
+	HD44780(config, m_lcdc, 250'000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 8);
 	m_lcdc->set_pixel_update_cb(FUNC(psr260_state::lcd_update));
 	// code never checks the busy flag, it just delays for a fixed amount and assumes it's ready

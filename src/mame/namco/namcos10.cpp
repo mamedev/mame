@@ -54,7 +54,8 @@ Puzz Ball (PZB1 Ver. A)                                          (C) Namco, 2002
 Seishun-Quiz Colorful High School (CHS1 Ver.A)                   (C) Namco, 2002
 Sekai Kaseki Hakken (Japan, SKH1 Ver.A)                          (C) Namco, 2004
 *Shamisen Brothers (KT-SB2 Ver.A + CDROM)                        (C) Kato/Konami, 2003
-*Slot no Oujisama / Slot Prince (SLO1 Ver.A),(SLO1 Ver.B)        (C) Namco, 2002
+*Slot no Oujisama / Slot Prince (SLO1 Ver.A)                     (C) Namco, 2003
+Slot no Oujisama / Slot Prince (SLO1 Ver.B)                      (C) Namco, 2003
 Star Trigon (STT1 Ver.A)                                         (C) Namco, 2002
 Sugorotic Japan (STJ1 Ver.C)                                     (C) Namco, 2002
 *Taiko no Tatsujin  (with CDROM?)                                (C) Namco, 2001
@@ -307,6 +308,7 @@ Panikuru Panekuru                                   PPA1  Ver.A   KC017A   8E, 8
 Point Blank 3                                       GNN2  Ver.A   KC002A   8E, 8D               N/A           also has a Namco System10 EXIO(G) 8906961602 (8906970602) PCB. TMP95C061 and RAM not populated
 Puzz Ball                                           PZB1  Ver.A   KC013A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB, unverified title
 Sekai Kaseki Hakken                                 SKH1  Ver.A   KC035A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB, unverified title
+Slot no Oujisama/Slot Prince                        SLO1  Ver.B   KC023A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB
 Star Trigon                                         STT1  Ver.A   KC019A   8E, 8D               N/A           I/O board = none
 Sugorotic Japan                                     STJ1  Ver.C   KC014A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB
 Taiko no Tatsujin 2                                 TK21  Ver.C   KC010A   8E, 8D, 7E           NM-002        KEYCUS is marked KC007A, KC010A is a sticker on top. I/O board = ?. For all TK* games see note 2 and 3
@@ -319,7 +321,6 @@ Utyuu Daisakusen Chocovader Contactee               CVC1  Ver.A   KC022A   8E, 8
 Other games verified to use this PCB but NOT DUMPED (move into list above when dumped)
 Shamisen Brothers                                   KT-SB2Ver.A   KC038A   8E                   not dumped    I/O board = none
 Photo Battle                                        PBT1  Ver.B   KC006A   1D-8E (16)           N/A           also has a Namco System10 EXIO(G) 8906961602 (8906970602) PCB. TMP95C061 and RAM not populated
-Slot no Oujisama/Slot Prince (Ver.A & Ver.B seen)   SLO1  Ver.B   KC023A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB
 
       Notes:
       1. The ROM PCB has locations for 16x 128Mbit FlashROMs (Total capacity = 2048Mbits) but usually only a few are populated.
@@ -639,6 +640,7 @@ Known issues:
 - nicetsuk: Hangs on boot due to suspected issues with the PSX's timers
 - knpuzzle: Audio/sound effects can be glitchy, sound glitches on the difficulty select screen for a moment
 - panikuru: Audio/sound effects can be glitchy
+- slotouji: Not decrypted yet
 - Fix medal games I/O and refactor code to separate MGEXIO states from namcos10_state
 
 
@@ -850,6 +852,7 @@ public:
 	void ns10_ptblank3(machine_config &config);
 	void ns10_puzzball(machine_config &config);
 	void ns10_sekaikh(machine_config &config);
+	void ns10_slotouji(machine_config &config);
 	void ns10_startrgn(machine_config &config);
 	void ns10_sugorotic(machine_config &config);
 	void ns10_taiko2(machine_config &config);
@@ -2366,6 +2369,17 @@ void namcos10_memn_state::ns10_sekaikh(machine_config &config)
 	});
 }
 
+void namcos10_memn_state::ns10_slotouji(machine_config &config)
+{
+	namcos10_memn_base(config);
+	namcos10_mgexio(config);
+	namcos10_nand_k9f2808u0b(config, 2);
+
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xd, 0xc, 0xf, 0xa, 0xb, 0x8, 0x9, 0x6, 0x5, 0x4, 0x7, 0x1, 0x0, 0x2, 0x3); };
+
+	// TODO: decrypter
+}
+
 void namcos10_memn_state::ns10_startrgn(machine_config &config)
 {
 	namcos10_memn_base(config);
@@ -3696,6 +3710,17 @@ ROM_START( sekaikha )
 	ROM_LOAD( "m48z35y.ic11", 0x0000, 0x8000, CRC(e0e52ffc) SHA1(557490e2f286773a945851f44ed0214de731cd75) )
 ROM_END
 
+ROM_START( slotouji )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
+	ROM_LOAD( "k9f2808u0b.8e", 0x0000000, 0x1080000, CRC(26bbbd8c) SHA1(3976e6fe98d6f6e7b5af99825db7c3c46233ce2c) )
+
+	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
+	ROM_LOAD( "k9f2808u0b.8d", 0x0000000, 0x1080000, CRC(7f3744fe) SHA1(5ad4d700a274a4d5b87dff3706a9b958c1aa4763) )
+ROM_END
+
 ROM_START( startrgn )
 	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
@@ -3952,6 +3977,7 @@ GAME( 2002, sugorotc,  0,        ns10_sugorotic, mgexio_medal, namcos10_memn_sta
 GAME( 2003, konotako,  0,        ns10_konotako,  konotako,     namcos10_memn_state,  memn_driver_init, ROT0, "Mitchell",          "Kono e Tako (10021 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2003, nflclsfb,  0,        ns10_nflclsfb,  nflclsfb,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco / Metro",     "NFL Classic Football (US, NCF3 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
 GAME( 2003, pacmball,  0,        ns10_pacmball,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Pacman BALL (PMB2 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2003, slotouji,  0,        ns10_slotouji,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Slot no Oujisama / Slot Prince (Japan, SLO1 Ver. B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // May 2 2003, decrypter not done yet
 GAME( 2004, sekaikh,   0,        ns10_sekaikh,   mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Sekai Kaseki Hakken (Japan, SKH1 Ver.B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
 GAME( 2004, sekaikha,  sekaikh,  ns10_sekaikh,   mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Sekai Kaseki Hakken (Japan, SKH1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
 GAME( 2005, ballpom,   0,        ns10_ballpom,   mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Ball Pom Line", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND ) // ROM VER. B0 FEB 09 2005 15:29:02 in test mode, boots but requires MGEXIO to proceed

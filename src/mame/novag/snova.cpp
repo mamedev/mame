@@ -6,10 +6,12 @@
 Novag Super Nova & related chess computers. I believe the series started with
 Primo. The chess engine is by David Kittinger.
 
+NOTE: nsnova does an NMI at power-off (or power-failure). If this isn't done,
+NVRAM won't work properly (supremo doesn't have NVRAM).
+
 TODO:
-- NMI on power-off switch, it sets 0x14 bit 7 for standby power (see below)
-- add nvram, MCU is missing standby power emulation
 - beeps are glitchy, as if interrupted for too long
+- if/when MAME supports an exit callback, hook up power-off NMI to that
 - nsnova serial port isn't working, MCU emulation problem?
 - nsnova unmapped reads from 0x33/0x34
 - is "Aquamarine / Super Nova" the same rom as nsnova and just a redesign?
@@ -50,6 +52,7 @@ The model number is still 881, ROM is the same as the standard fake-wood version
 
 #include "bus/rs232/rs232.h"
 #include "cpu/m6800/m6801.h"
+#include "machine/nvram.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
 #include "video/pwm.h"
@@ -79,6 +82,8 @@ public:
 		m_out_lcd(*this, "s%u.%u", 0U, 0U)
 	{ }
 
+	DECLARE_INPUT_CHANGED_MEMBER(power_off);
+
 	// machine configs
 	void snova(machine_config &config);
 	void supremo(machine_config &config);
@@ -100,6 +105,7 @@ private:
 	void snova_map(address_map &map);
 	void supremo_map(address_map &map);
 
+	void standby(int state);
 	void lcd_pwm_w(offs_t offset, u8 data);
 	void update_leds();
 
@@ -130,6 +136,26 @@ void snova_state::machine_start()
 /*******************************************************************************
     I/O
 *******************************************************************************/
+
+// power
+
+void snova_state::standby(int state)
+{
+	// clear display
+	if (state)
+	{
+		m_lcd_pwm->clear();
+		m_led_pwm->clear();
+	}
+}
+
+INPUT_CHANGED_MEMBER(snova_state::power_off)
+{
+	// NMI at power-off, which will trigger standby mode
+	if (newval && !m_maincpu->standby())
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+}
+
 
 // misc
 
@@ -214,16 +240,14 @@ void snova_state::p6_w(u8 data)
 
 void snova_state::supremo_map(address_map &map)
 {
-	map(0x0000, 0x0027).m(m_maincpu, FUNC(hd6303y_cpu_device::hd6301y_io));
-	map(0x0040, 0x013f).ram(); // internal
 	map(0x4000, 0x47ff).ram();
 	map(0x8000, 0xffff).rom();
 }
 
 void snova_state::snova_map(address_map &map)
 {
-	supremo_map(map);
-	map(0x4000, 0x5fff).ram();
+	map(0x4000, 0x5fff).ram().share("nvram");
+	map(0x8000, 0xffff).rom();
 }
 
 
@@ -252,6 +276,9 @@ static INPUT_PORTS_START( snova )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Set Up / Verify")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("Random / Auto Clock")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME("New Game")
+
+	PORT_START("POWER") // needs to be triggered for nvram to work
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, snova_state, power_off, 0) PORT_NAME("Power Off")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( supremo )
@@ -282,11 +309,11 @@ INPUT_PORTS_END
     Machine Configs
 *******************************************************************************/
 
-void snova_state::snova(machine_config &config)
+void snova_state::supremo(machine_config &config)
 {
 	// basic machine hardware
-	HD6303Y(config, m_maincpu, 16_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &snova_state::snova_map);
+	HD6303Y(config, m_maincpu, 8_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &snova_state::supremo_map);
 	m_maincpu->in_p2_cb().set(FUNC(snova_state::p2_r));
 	m_maincpu->out_p2_cb().set(FUNC(snova_state::p2_w));
 	m_maincpu->out_p5_cb().set(FUNC(snova_state::p5_w));
@@ -306,27 +333,31 @@ void snova_state::snova(machine_config &config)
 	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_led_pwm).set_size(2, 8);
-	config.set_default_layout(layout_novag_snova);
+	config.set_default_layout(layout_novag_supremo);
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+}
+
+void snova_state::snova(machine_config &config)
+{
+	supremo(config);
+
+	// basic machine hardware
+	m_maincpu->set_clock(16_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &snova_state::snova_map);
+	m_maincpu->nvram_enable_backup(true);
+	m_maincpu->standby_cb().set(m_maincpu, FUNC(hd6303y_cpu_device::nvram_set_battery));
+	m_maincpu->standby_cb().append(FUNC(snova_state::standby));
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	m_board->set_nvram_enable(true);
+
+	config.set_default_layout(layout_novag_snova);
 
 	// rs232 (configure after video)
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
-}
-
-void snova_state::supremo(machine_config &config)
-{
-	snova(config);
-
-	// basic machine hardware
-	m_maincpu->set_clock(8_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &snova_state::supremo_map);
-
-	config.set_default_layout(layout_novag_supremo);
-
-	config.device_remove("rs232");
 }
 
 

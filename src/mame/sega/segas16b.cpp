@@ -8118,10 +8118,14 @@ ROM_END
 //
 ROM_START( riotcity )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
-	ROM_LOAD16_BYTE( "epr-14612.a7", 0x000000, 0x20000, CRC(a1b331ec) SHA1(49136ffed35ecc9e5e9a6ea7acbe534e6ccc9dd8) )
-	ROM_LOAD16_BYTE( "epr-14610.a5", 0x000001, 0x20000, CRC(cd4f2c50) SHA1(c7a7e95901c664a72195c202b50a159db8d5981d) )
-	ROM_LOAD16_BYTE( "epr-14613.a8", 0x040000, 0x20000, CRC(0659df4c) SHA1(a24005ce354113732306c318de373c818400a9c8) )
-	ROM_LOAD16_BYTE( "epr-14611.a6", 0x040001, 0x20000, CRC(d9e6f80b) SHA1(5ac56b3685bb121a4f07be3d81209807436e76ec) )
+	// https://mametesters.org/view.php?id=8782
+	// maps a7-a5 to $00000, a8-a6 to $80000
+	// slightly fails sum16 for latter at PC=29d6 while having compare values at $3fff6-$a,
+	// is this actually a franken-romset of two separate board revs?
+	ROM_LOAD16_BYTE( "epr-14612.a7", 0x000000, 0x20000, BAD_DUMP CRC(a1b331ec) SHA1(49136ffed35ecc9e5e9a6ea7acbe534e6ccc9dd8) )
+	ROM_LOAD16_BYTE( "epr-14610.a5", 0x000001, 0x20000, BAD_DUMP CRC(cd4f2c50) SHA1(c7a7e95901c664a72195c202b50a159db8d5981d) )
+	ROM_LOAD16_BYTE( "epr-14613.a8", 0x040000, 0x20000, BAD_DUMP CRC(0659df4c) SHA1(a24005ce354113732306c318de373c818400a9c8) )
+	ROM_LOAD16_BYTE( "epr-14611.a6", 0x040001, 0x20000, BAD_DUMP CRC(d9e6f80b) SHA1(5ac56b3685bb121a4f07be3d81209807436e76ec) )
 
 	ROM_REGION( 0xc0000, "gfx1", 0 ) // tiles
 	ROM_LOAD( "epr-14616.a14", 0x00000, 0x20000, CRC(46d30368) SHA1(a791ef0e881345b6be0b28f32af17127edb5b590) ) // plane 1

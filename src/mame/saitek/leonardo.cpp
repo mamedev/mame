@@ -14,6 +14,11 @@ The expansion modules are basically entire chesscomputers, making the whole
 thing combined a 'dual brain' chesscomputer. The embedded chess engine is by
 Julio Kaplan and Craig Barnes, same as the one in SciSys Turbo S-24K.
 
+NOTE: In order for NVRAM to work properly, press the STOP button to turn off
+the chesscomputer before exiting MAME. Other than ACL (which is an unemulated
+hardware button that disconnects the battery), there is no known method to
+force a cold boot. So if NVRAM somehow becomes broken, remove the NVRAM files.
+
 Hardware notes:
 
 Leonardo (1986):
@@ -50,8 +55,6 @@ to be upgraded with an EMI PCB (power supply related, meaningless for emulation)
 
 TODO:
 - OSA PC link, uses MCU serial interface
-- add nvram (MCU port $14?)
-- add power-off, not useful with missing nvram support
 
 *******************************************************************************/
 
@@ -60,6 +63,7 @@ TODO:
 #include "bus/saitek_osa/expansion.h"
 #include "cpu/m6800/m6801.h"
 #include "machine/input_merger.h"
+#include "machine/nvram.h"
 #include "machine/sensorboard.h"
 #include "sound/spkrdev.h"
 #include "video/pwm.h"
@@ -87,6 +91,8 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
+	DECLARE_INPUT_CHANGED_MEMBER(go_button);
+
 	void leonardo(machine_config &config);
 	void leonardoa(machine_config &config);
 	void galileo(machine_config &config);
@@ -102,7 +108,7 @@ private:
 	required_device<input_merger_device> m_stb;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
-	optional_device<speaker_sound_device> m_dac;
+	required_device<speaker_sound_device> m_dac;
 	required_ioport_array<9> m_inputs;
 
 	void main_map(address_map &map);
@@ -135,16 +141,28 @@ void leo_state::machine_start()
 	save_item(NAME(m_led_data));
 }
 
-void leo_state::machine_reset()
-{
-	m_stb->in_clear<0>();
-}
-
 
 
 /*******************************************************************************
     I/O
 *******************************************************************************/
+
+// power
+
+void leo_state::machine_reset()
+{
+	m_stb->in_clear<0>();
+}
+
+INPUT_CHANGED_MEMBER(leo_state::go_button)
+{
+	if (newval && m_maincpu->standby())
+	{
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+		machine_reset();
+	}
+}
+
 
 // misc
 
@@ -265,10 +283,8 @@ void leo_state::p6_w(u8 data)
 
 void leo_state::main_map(address_map &map)
 {
-	map(0x0000, 0x0027).m(m_maincpu, FUNC(hd6303y_cpu_device::hd6301y_io));
 	map(0x0002, 0x0002).rw(FUNC(leo_state::unk_r), FUNC(leo_state::unk_w)); // external
-	map(0x0040, 0x013f).ram(); // internal
-	map(0x4000, 0x5fff).ram();
+	map(0x4000, 0x5fff).ram().share("nvram");
 	map(0x6000, 0x6000).w(FUNC(leo_state::mux_w));
 	map(0x7000, 0x7000).w(FUNC(leo_state::leds_w));
 	map(0x8000, 0xffff).rom();
@@ -329,8 +345,7 @@ static INPUT_PORTS_START( leonardo )
 	PORT_CONFSETTING(    0x04, DEF_STR( Normal ) )
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("Go")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F1) PORT_NAME("ACL")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_CHANGED_MEMBER(DEVICE_SELF, leo_state, go_button, 0) PORT_NAME("Go")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( galileo ) // same buttons, but different locations
@@ -363,7 +378,7 @@ static INPUT_PORTS_START( galileo ) // same buttons, but different locations
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_NAME("Set Up")
 
 	PORT_MODIFY("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("Go")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_CHANGED_MEMBER(DEVICE_SELF, leo_state, go_button, 0) PORT_NAME("Go")
 INPUT_PORTS_END
 
 
@@ -377,6 +392,9 @@ void leo_state::leonardo(machine_config &config)
 	// basic machine hardware
 	HD6303Y(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &leo_state::main_map);
+	m_maincpu->nvram_enable_backup(true);
+	m_maincpu->standby_cb().set(m_maincpu, FUNC(hd6303y_cpu_device::nvram_set_battery));
+	m_maincpu->standby_cb().append([this](int state) { if (state) m_display->clear(); });
 	m_maincpu->in_p2_cb().set(FUNC(leo_state::p2_r));
 	m_maincpu->out_p2_cb().set(FUNC(leo_state::p2_w));
 	m_maincpu->in_p5_cb().set(FUNC(leo_state::p5_r));
@@ -385,13 +403,16 @@ void leo_state::leonardo(machine_config &config)
 	m_maincpu->out_p6_cb().set(FUNC(leo_state::p6_w));
 
 	INPUT_MERGER_ANY_LOW(config, m_stb);
-	m_stb->output_handler().set_inputline(m_maincpu, M6801_IS_LINE);
+	m_stb->output_handler().set_inputline(m_maincpu, M6801_IS3_LINE);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
+	m_board->set_nvram_enable(true);
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(8+2, 8+2);

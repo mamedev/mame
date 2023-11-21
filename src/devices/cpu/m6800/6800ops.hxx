@@ -191,7 +191,7 @@ OP_HANDLER( tba )
 	CLR_NZV; SET_NZ8(A);
 }
 
-/* $18 XGDX inherent ----- */ /* HD63701YO only */
+/* $18 XGDX inherent ----- */ /* HD63701Y0 only */
 OP_HANDLER( xgdx )
 {
 	uint16_t t = X;
@@ -216,7 +216,7 @@ OP_HANDLER( daa )
 
 /* $1a ILLEGAL */
 
-/* $1a SLP */ /* HD63701YO only */
+/* $1a SLP */ /* HD63701Y0 only */
 OP_HANDLER( slp )
 {
 	/* wait for next IRQ (same as waiting of wai) */
@@ -682,7 +682,7 @@ OP_HANDLER( neg_ix )
 	WM(EAD,r);
 }
 
-/* $61 AIM --**0- */ /* HD63701YO only */
+/* $61 AIM --**0- */ /* HD63701Y0 only */
 OP_HANDLER( aim_ix )
 {
 	uint8_t t, r;
@@ -693,7 +693,7 @@ OP_HANDLER( aim_ix )
 	WM(EAD,r);
 }
 
-/* $62 OIM --**0- */ /* HD63701YO only */
+/* $62 OIM --**0- */ /* HD63701Y0 only */
 OP_HANDLER( oim_ix )
 {
 	uint8_t t, r;
@@ -723,7 +723,7 @@ OP_HANDLER( lsr_ix )
 	WM(EAD,t);
 }
 
-/* $65 EIM --**0- */ /* HD63701YO only */
+/* $65 EIM --**0- */ /* HD63701Y0 only */
 OP_HANDLER( eim_ix )
 {
 	uint8_t t, r;
@@ -783,7 +783,7 @@ OP_HANDLER( dec_ix )
 	WM(EAD,t);
 }
 
-/* $6b TIM --**0- */ /* HD63701YO only */
+/* $6b TIM --**0- */ /* HD63701Y0 only */
 OP_HANDLER( tim_ix )
 {
 	uint8_t t, r;
@@ -831,7 +831,7 @@ OP_HANDLER( neg_ex )
 	WM(EAD,r);
 }
 
-/* $71 AIM --**0- */ /* HD63701YO only */
+/* $71 AIM --**0- */ /* HD63701Y0 only */
 OP_HANDLER( aim_di )
 {
 	uint8_t t, r;
@@ -842,7 +842,7 @@ OP_HANDLER( aim_di )
 	WM(EAD,r);
 }
 
-/* $72 OIM --**0- */ /* HD63701YO only */
+/* $72 OIM --**0- */ /* HD63701Y0 only */
 OP_HANDLER( oim_di )
 {
 	uint8_t t, r;
@@ -875,7 +875,7 @@ OP_HANDLER( lsr_ex )
 	WM(EAD,t);
 }
 
-/* $75 EIM --**0- */ /* HD63701YO only */
+/* $75 EIM --**0- */ /* HD63701Y0 only */
 OP_HANDLER( eim_di )
 {
 	uint8_t t, r;
@@ -935,7 +935,7 @@ OP_HANDLER( dec_ex )
 	WM(EAD,t);
 }
 
-/* $7b TIM --**0- */ /* HD63701YO only */
+/* $7b TIM --**0- */ /* HD63701Y0 only */
 OP_HANDLER( tim_di )
 {
 	uint8_t t, r;

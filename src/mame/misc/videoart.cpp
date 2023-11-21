@@ -3,18 +3,19 @@
 // thanks-to:Sean Riddle
 /*******************************************************************************
 
-LJN Video Art
+LJN VideoArt
 
-It's a toy for drawing/coloring pictures on the tv, not a video game console.
-Picture libraries were available on separate cartridges.
+It's a system for drawing/coloring pictures on the tv, not a video game console.
+The cartridge ROMs contain no executable code, only data for a title screen and
+vector pictures.
 
 On the title screen, press CLEAR to start drawing (no need to wait half a minute).
-To change the background color, choose one from the color slider and press CLEAR.
-Drawing with the same color as the picture outline is not allowed.
+Drawing with the same color as the picture outline is not allowed. To change the
+background color, choose one from the color slider and press CLEAR.
 
 Hardware notes:
-- EF6805R2P @ 3.57Mhz (14.318MHz XTAL)
-- EF9367P @ 1.507MHz, 128*208 resolution (internally 512*208), 16 colors
+- Thomson EF6805R2P @ 3.57Mhz (14.318MHz XTAL)
+- Thomson EF9367P @ 1.507MHz, 128*208 resolution (512*208 internally), 16 colors
 - TSGB01019ACP 48-pin DIP gate array (die label: MOSTEK (C) 1984, MK GB 1000 HAA),
   interfaces with EF9367P and DRAM
 - 2*D41416C-15 (16Kbit*4) DRAM
@@ -72,7 +73,7 @@ private:
 	memory_share_creator<u8> m_vram;
 	required_device<screen_device> m_screen;
 	required_device<generic_slot_device> m_cart;
-	required_ioport_array<3> m_inputs;
+	required_ioport_array<4> m_inputs;
 	output_finder<> m_led;
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
@@ -159,7 +160,7 @@ constexpr rgb_t videoart_colors[] =
 	{ 0x84, 0xff, 0x68 }, // 5 green
 
 	{ 0xff, 0x90, 0xff }, // c pink
-	{ 0xfc, 0xa8, 0xff }, // 9 light pink
+	{ 0xe0, 0xa8, 0xff }, // 9 lilac
 	{ 0xff, 0xc4, 0x40 }, // f orange
 	{ 0xff, 0xa0, 0x80 }  // e light red
 };
@@ -322,7 +323,7 @@ u8 videoart_state::portd_r()
 static INPUT_PORTS_START( videoart )
 	PORT_START("IN0")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_NAME("Page")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_NAME("Clear") // actually 2 buttons
+	PORT_BIT(0x80, 0x80, IPT_CUSTOM) PORT_CONDITION("IN3", 0x03, EQUALS, 0x03) // clear
 
 	PORT_START("IN1")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Horizontal")
@@ -332,14 +333,18 @@ static INPUT_PORTS_START( videoart )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Draw")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_NAME("Erase")
 
+	PORT_START("IN3") // clear is actually 2 buttons
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_NAME("Clear (1/2)")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON7) PORT_NAME("Clear (2/2)")
+
 	PORT_START("AN0")
 	PORT_BIT(0xff, 0x7b, IPT_AD_STICK_X) PORT_SENSITIVITY(50) PORT_KEYDELTA(2) PORT_CENTERDELTA(0) PORT_REVERSE PORT_MINMAX(0x00, 0xf6) PORT_PLAYER(2) PORT_NAME("Color")
 
 	PORT_START("AN1")
-	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X) PORT_SENSITIVITY(50) PORT_KEYDELTA(4) PORT_CENTERDELTA(0)
+	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X) PORT_SENSITIVITY(50) PORT_KEYDELTA(4) PORT_CENTERDELTA(0) // joystick does not autocenter
 
 	PORT_START("AN2")
-	PORT_BIT(0xff, 0x6a, IPT_AD_STICK_Y) PORT_SENSITIVITY(50) PORT_KEYDELTA(4) PORT_CENTERDELTA(0) PORT_REVERSE PORT_MINMAX(0x00, 0xd4)
+	PORT_BIT(0xff, 0x6a, IPT_AD_STICK_Y) PORT_SENSITIVITY(50) PORT_KEYDELTA(4) PORT_CENTERDELTA(0) PORT_REVERSE PORT_MINMAX(0x00, 0xd4) // "
 INPUT_PORTS_END
 
 
@@ -410,4 +415,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1987, videoart, 0,      0,      videoart, videoart, videoart_state, empty_init, "LJN Toys", "Video Art", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND_HW )
+SYST( 1987, videoart, 0,      0,      videoart, videoart, videoart_state, empty_init, "LJN Toys", "VideoArt", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND_HW )

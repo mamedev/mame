@@ -201,6 +201,7 @@ void bublbobl_state::bublbobl_mcu_port2_w(uint8_t data)
 			else if ((address & 0x0c00) == 0x0c00)
 				m_port3_in = m_mcu_sharedram[address & 0x03ff];
 			// logerror("reading %02x from shared RAM %04x\n", m_port3_in, address);
+			m_mcu->pulse_input_line(M6801_IS3_LINE, attotime::from_usec(1));
 		}
 		else
 		{

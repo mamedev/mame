@@ -54,8 +54,8 @@ public:
 	void cm6127(machine_config &config);
 
 private:
-	required_device<hd6301v1_cpu_device> m_maincpu;
-	required_device<hd6301v1_cpu_device> m_subcpu;
+	required_device<hd6301_cpu_device> m_maincpu;
+	required_device<hd6301_cpu_device> m_subcpu;
 	required_device<mc146818_device> m_rtc;
 	required_device_array<upd7227_device, 6> m_lcdc;
 	required_device<speaker_sound_device> m_speaker;
@@ -119,7 +119,6 @@ private:
 	int m_sio_pin = 0;
 
 	void hx20_mem(address_map &map);
-	void hx20_sub_mem(address_map &map);
 	void cm6032_mem(address_map &map);
 	void cm6127_mem(address_map &map);
 };

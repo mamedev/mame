@@ -419,6 +419,12 @@ manager.machine.devices[tag]:memregion(tag)
 Methods
 ~~~~~~~
 
+region:read(offs, len)
+    Reads up to the specified length in bytes from the specified offset in the
+    memory region.  The bytes read will be returned as a string.  If the
+    specified length extends beyond the end of the memory region, the returned
+    string will be shorter than requested.  Note that the data will be in host
+    byte order.
 region:read_i{8,16,32,64}(offs)
     Reads a signed integer value of the size in bits from the specified offset
     in the memory region.  The offset is specified in bytes.  Reading beyond the

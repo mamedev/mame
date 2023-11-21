@@ -36,6 +36,7 @@ static void tlb_options(device_slot_interface &device)
 {
 	device.option_add("heath", HEATH_TLB);
 	device.option_add("gp19", HEATH_GP19);
+	device.option_add("imaginator", HEATH_IMAGINATOR);
 	device.option_add("super19", HEATH_SUPER19);
 	device.option_add("superset", HEATH_SUPERSET);
 	device.option_add("ultrarom", HEATH_ULTRA);

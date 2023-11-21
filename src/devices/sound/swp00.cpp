@@ -359,7 +359,7 @@ void swp00_device::device_start()
 	// Delta-packed samples decompression.
 
 	for(int i=0; i<128; i++) {
-		s16 base = ((i & 0x1f) << (7+(i >> 5))) + (((1 << (i >> 5))-1) << 12);
+		s16 base = ((i & 0x1f) << (5+(i >> 5))) + (((1 << (i >> 5))-1) << 10);
 		m_dpcm[i | 0x80] = - base;
 		m_dpcm[i]        = + base;
 	}
@@ -1326,7 +1326,7 @@ void swp00_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 				val1 = (read_byte(base_address + spos + 1) << 8);
 				break;
 
-			case 3: { // 8-bits logarithmic
+			case 3: { // 8-bits delta-pcm
 				u32 target_address = base_address + spos + 1;
 				while(m_dpcm_address[chan] <= target_address) {
 					m_dpcm_current[chan] = m_dpcm_next[chan];

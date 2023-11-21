@@ -679,8 +679,7 @@ void lua_engine::on_machine_frame()
 {
 	std::vector<int> tasks = std::move(m_frame_tasks);
 	m_frame_tasks.clear();
-	for (int ref : tasks)
-		resume(ref);
+	resume_tasks(m_lua_state, tasks, true); // TODO: doesn't need to return anything
 
 	m_notifiers->on_frame();
 
@@ -2144,8 +2143,7 @@ bool lua_engine::frame_hook()
 {
 	std::vector<int> tasks = std::move(m_update_tasks);
 	m_update_tasks.clear();
-	for (int ref : tasks)
-		resume(ref);
+	resume_tasks(m_lua_state, tasks, true); // TODO: doesn't need to return anything
 
 	return execute_function("LUA_ON_FRAME_DONE");
 }
