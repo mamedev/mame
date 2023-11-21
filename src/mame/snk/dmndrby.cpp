@@ -102,21 +102,209 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
+	tilemap_t *m_fix_tilemap = nullptr;
 	tilemap_t *m_racetrack_tilemap = nullptr;
-	uint8_t m_io_port[8]{}; // TODO: written to but never used?
+	TILE_GET_INFO_MEMBER(get_fix_tile_info);
+	TILE_GET_INFO_MEMBER(get_racetrack_tile_info);
+	void fix_vram_w(offs_t offset, u8 data);
+	void fix_attr_w(offs_t offset, u8 data);
 	uint8_t m_bg = 0; // TODO: set to 0 and never updated?
 
-	void output_w(offs_t offset, uint8_t data);
-	TILE_GET_INFO_MEMBER(get_tile_info);
-	void palette(palette_device &palette) const;
+	void palette_init(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(irq);
 	INTERRUPT_GEN_MEMBER(timer_irq);
+
+	uint8_t m_io_port[8]{}; // TODO: written to but never used?
+
+	void output_w(offs_t offset, uint8_t data);
 
 	void main_map(address_map &map);
 	void bootleg_main_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+TILE_GET_INFO_MEMBER(dmndrby_state::get_fix_tile_info)
+{
+	u8 attr = m_vidattribs[tile_index];
+	const u16 code = m_vidchars[tile_index] | (BIT(m_vidattribs[tile_index], 5) << 8);
+	const u8 color = attr & 0x1f;
+
+	tileinfo.set(0, code, color, 0);
+}
+
+TILE_GET_INFO_MEMBER(dmndrby_state::get_racetrack_tile_info)
+{
+	int const code = m_racetrack_tilemap_rom[tile_index];
+	int const attr = m_racetrack_tilemap_rom[tile_index + 0x2000];
+
+	int const col = attr & 0x1f;
+	int const flipx = (attr & 0x40) >> 6;
+
+	tileinfo.set(2, code, col, TILE_FLIPYX(flipx));
+}
+
+
+void dmndrby_state::video_start()
+{
+	m_bg = 0;
+
+	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dmndrby_state::get_fix_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_racetrack_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dmndrby_state::get_racetrack_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 16, 512);
+	m_racetrack_tilemap->mark_all_dirty();
+
+	m_fix_tilemap->set_transparent_pen(0);
+}
+
+void dmndrby_state::fix_vram_w(offs_t offset, u8 data)
+{
+	m_vidchars[offset] = data;
+	m_fix_tilemap->mark_tile_dirty(offset);
+}
+
+void dmndrby_state::fix_attr_w(offs_t offset, u8 data)
+{
+	m_vidattribs[offset] = data;
+	m_fix_tilemap->mark_tile_dirty(offset);
+}
+
+uint32_t dmndrby_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+//	gfx_element *gfx = m_gfxdecode->gfx(0);
+	gfx_element *sprites = m_gfxdecode->gfx(1);
+	gfx_element *track = m_gfxdecode->gfx(2);
+
+	bitmap.fill(m_palette->black_pen(), cliprect);
+
+/* Draw racetrack
+
+racetrack seems to be stored in 4th and 5th PROM.
+can we draw it with the tilemap? maybe not, the layout is a little strange
+
+*/
+//  base = m_scroll_ram[0];
+
+	const bool track_enable = BIT(m_scroll_ram[4], 2);
+	const bool sprite_enable = BIT(m_scroll_ram[4], 1);
+	const bool fix_enable = BIT(m_scroll_ram[4], 0);
+
+	if (track_enable)
+	{
+		// Track layer has a narrower window drawing, there's no text tilemap attribute that would
+		// suggest otherwise.
+		// TODO: priority with sprites
+		rectangle overlay_rect;
+		overlay_rect.set(cliprect.min_x, cliprect.max_x, std::max(40, cliprect.min_y), std::min(215, cliprect.max_y));
+
+		int off = 0x1900 - (m_bg * 0x100) + m_scroll_ram[1] * 0x100;
+		int const scrolly = 0xff - m_scroll_ram[0];
+		if (m_scroll_ram[1] == 0xff) off = 0x1800;
+		for (int x = 0; x < 16; x++)
+		{
+			for (int y = 0; y < 16; y++)
+			{
+				int chr = m_racetrack_tilemap_rom[off];
+				int col = m_racetrack_tilemap_rom[off + 0x2000] & 0x1f;
+				int flipx = m_racetrack_tilemap_rom[off + 0x2000] & 0x40;
+				track->opaque(bitmap, overlay_rect, chr, col, flipx, 0, y * 16 + scrolly, x * 16);
+				// draw another bit of track
+				// a rubbish way of doing it
+				chr = m_racetrack_tilemap_rom[off - 0x100];
+				col = m_racetrack_tilemap_rom[off + 0x1f00] & 0x1f;
+				flipx = m_racetrack_tilemap_rom[off + 0x1f00] & 0x40;
+				track->opaque(bitmap, overlay_rect, chr, col, flipx, 0, y * 16 - 256 + scrolly, x * 16);
+				off++;
+			}
+		}
+	}
+
+/* draw sprites
+
+ guess work  again! seems to work fine and horse labels match up
+wouldn't like to say it's the most effective way though...
+ -- maybe they should be decoded as 'big sprites' instead?
+
+*/
+	if (sprite_enable)
+	{
+		for (int count = 5; count >= 0; count--)
+		{
+			int a = 0;
+			int b = 0;
+			int const base = count * 4;
+			int const sprx = m_sprite_ram[base + 3];
+			int const spry = m_sprite_ram[base + 2];
+			//m_sprite_ram[base + 1];
+			int const col = (m_sprite_ram[base + 1] & 0x1f);
+			int const anim = (m_sprite_ram[base] & 0x3) * 0x40; // animation frame - probably wrong but seems right
+			int const horse = (m_sprite_ram[base + 1] & 0x7) * 8 + 7;  // horse label from 1 - 6
+
+			for (a = 0; a < 8 ; a++)
+				for(b = 0; b < 7; b++)
+					sprites->transpen(bitmap, cliprect, anim + a * 8 + b, col, 0, 0, sprx + a * 8, spry + b * 8, 0);
+
+			// draw the horse number
+			a = 3;
+			b = 3;
+			sprites->transpen(bitmap, cliprect, anim + horse, col, 0, 0, sprx + a * 8, spry + b * 8, 0);
+		}
+	}
+
+	if (fix_enable)
+		m_fix_tilemap->draw(screen, bitmap, cliprect, track_enable ? 0 : TILEMAP_DRAW_OPAQUE, 0);
+
+	return 0;
+}
+
+// copied from elsewhere. Surely incorrect
+void dmndrby_state::palette_init(palette_device &palette) const
+{
+	const uint8_t *color_prom = memregion("proms")->base();
+	static constexpr int resistances_rg[3] = { 1000, 470, 220 };
+	static constexpr int resistances_b [2] = { 470, 220 };
+
+	// compute the color output resistor weights
+	double rweights[3], gweights[3], bweights[2];
+	compute_resistor_weights(0, 255, -1.0,
+			3, &resistances_rg[0], rweights, 470, 0,
+			3, &resistances_rg[0], gweights, 470, 0,
+			2, &resistances_b[0],  bweights, 470, 0);
+
+	// create a lookup table for the palette
+	for (int i = 0; i < 0x20; i++)
+	{
+		int bit0, bit1, bit2;
+
+		// red component */
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const r = combine_weights(rweights, bit0, bit1, bit2);
+
+		// green component
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
+		int const g = combine_weights(gweights, bit0, bit1, bit2);
+
+		// blue component
+		bit0 = BIT(color_prom[i], 6);
+		bit1 = BIT(color_prom[i], 7);
+		int const b = combine_weights(bweights, bit0, bit1);
+
+		palette.set_indirect_color(i, rgb_t(r, g, b));
+	}
+
+	// color_prom now points to the beginning of the lookup table
+	color_prom = memregion("proms2")->base();
+
+	// normal tiles use colors 0-15
+	for (int i = 0x000; i < 0x300; i++)
+	{
+		uint8_t ctabentry = color_prom[i];
+		palette.set_pen_indirect(i, ctabentry);
+	}
+}
 
 
 void dmndrby_state::output_w(offs_t offset, uint8_t data)
@@ -157,8 +345,8 @@ void dmndrby_state::main_map(address_map &map)
 	map(0xca03, 0xca03).nopw();//(timer_irq_w) //???
 	map(0xcc00, 0xcc05).ram().share(m_scroll_ram);
 	map(0xce08, 0xce1f).ram().share(m_sprite_ram); // horse sprites
-	map(0xd000, 0xd3ff).ram().share(m_vidchars); // char ram
-	map(0xd400, 0xd7ff).ram().share(m_vidattribs); // colours/ attrib ram
+	map(0xd000, 0xd3ff).ram().w(FUNC(dmndrby_state::fix_vram_w)).share(m_vidchars);
+	map(0xd400, 0xd7ff).ram().w(FUNC(dmndrby_state::fix_attr_w)).share(m_vidattribs);
 }
 
 void dmndrby_state::bootleg_main_map(address_map &map)
@@ -182,8 +370,8 @@ void dmndrby_state::bootleg_main_map(address_map &map)
 	map(0xca03, 0xca03).nopw();//(timer_irq_w) //???
 	map(0xcc00, 0xcc05).ram().share(m_scroll_ram);
 	map(0xce08, 0xce1f).ram().share(m_sprite_ram); // horse sprites
-	map(0xd000, 0xd3ff).ram().share(m_vidchars); // char ram
-	map(0xd400, 0xd7ff).ram().share(m_vidattribs); // colours/ attrib ram
+	map(0xd000, 0xd3ff).ram().w(FUNC(dmndrby_state::fix_vram_w)).share(m_vidchars);
+	map(0xd400, 0xd7ff).ram().w(FUNC(dmndrby_state::fix_attr_w)).share(m_vidattribs);
 }
 
 void dmndrby_state::sound_map(address_map &map)
@@ -481,7 +669,6 @@ static const gfx_layout tiles16x16_layout =
 	{ 0, 1, 2, 3, 4, 5, 6, 7,  16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
 	32*8    // every sprite takes 32 consecutive bytes
-
 };
 
 static const gfx_layout tiles8x8_layout2 =
@@ -500,166 +687,6 @@ static GFXDECODE_START( gfx_dmndrby )
 	GFXDECODE_ENTRY( "horses", 0, tiles8x8_layout2, 0, 8)
 	GFXDECODE_ENTRY( "track", 0, tiles16x16_layout, 16*16, 32 )
 GFXDECODE_END
-
-TILE_GET_INFO_MEMBER(dmndrby_state::get_tile_info)
-{
-	int const code = m_racetrack_tilemap_rom[tile_index];
-	int const attr = m_racetrack_tilemap_rom[tile_index + 0x2000];
-
-	int const col = attr & 0x1f;
-	int const flipx = (attr & 0x40) >> 6;
-
-	tileinfo.set(2, code, col, TILE_FLIPYX(flipx));
-}
-
-
-void dmndrby_state::video_start()
-{
-	m_bg = 0;
-
-	m_racetrack_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dmndrby_state::get_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 16, 512);
-	m_racetrack_tilemap->mark_all_dirty();
-}
-
-uint32_t dmndrby_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	gfx_element *gfx = m_gfxdecode->gfx(0);
-	gfx_element *sprites = m_gfxdecode->gfx(1);
-	gfx_element *track = m_gfxdecode->gfx(2);
-
-	bitmap.fill(m_palette->black_pen(), cliprect);
-
-
-/* Draw racetrack
-
-racetrack seems to be stored in 4th and 5th PROM.
-can we draw it with the tilemap? maybe not, the layout is a little strange
-
-*/
-//  base = m_scroll_ram[0];
-
-	int off = 0x1900 - (m_bg * 0x100) + m_scroll_ram[1] * 0x100;
-	int const scrolly = 0xff - m_scroll_ram[0];
-	if (m_scroll_ram[1] == 0xff) off = 0x1800;
-	for (int x = 0; x < 16; x++)
-	{
-		for (int y = 0; y < 16; y++)
-		{
-			int chr = m_racetrack_tilemap_rom[off];
-			int col = m_racetrack_tilemap_rom[off + 0x2000] & 0x1f;
-			int flipx = m_racetrack_tilemap_rom[off + 0x2000] & 0x40;
-			track->opaque(bitmap, cliprect, chr, col, flipx, 0, y * 16 + scrolly, x * 16);
-			// draw another bit of track
-			// a rubbish way of doing it
-			chr = m_racetrack_tilemap_rom[off - 0x100];
-			col = m_racetrack_tilemap_rom[off + 0x1f00] & 0x1f;
-			flipx = m_racetrack_tilemap_rom[off + 0x1f00] & 0x40;
-			track->opaque(bitmap, cliprect, chr, col, flipx, 0, y * 16 - 256 + scrolly, x * 16);
-			off++;
-		}
-	}
-
-
-//return 0;
-
-/* draw sprites
-
- guess work  again! seems to work fine and horse labels match up
-wouldn't like to say it's the most effective way though...
- -- maybe they should be decoded as 'big sprites' instead?
-
-*/
-	for (int count = 5; count >= 0; count--)
-	{
-		int a = 0;
-		int b = 0;
-		int const base = count * 4;
-		int const sprx = m_sprite_ram[base + 3];
-		int const spry = m_sprite_ram[base + 2];
-		//m_sprite_ram[base + 1];
-		int const col = (m_sprite_ram[base + 1] & 0x1f);
-		int const anim = (m_sprite_ram[base] & 0x3) * 0x40; // animation frame - probably wrong but seems right
-		int const horse = (m_sprite_ram[base + 1] & 0x7) * 8 + 7;  // horse label from 1 - 6
-
-		for (a = 0; a < 8 ; a++)
-			for(b = 0; b < 7; b++)
-				sprites->transpen(bitmap, cliprect, anim + a * 8 + b, col, 0, 0, sprx + a * 8, spry + b * 8, 0);
-
-		// draw the horse number
-		a = 3;
-		b = 3;
-		sprites->transpen(bitmap, cliprect, anim + horse, col, 0, 0, sprx + a * 8, spry + b * 8, 0);
-	}
-
-	// TODO: Fix / understand how the transparency works properly.
-	int count = 0;
-	for (int y = 0; y < 32; y++)
-	{
-		for(int x = 0; x < 32; x++)
-		{
-			int tileno = m_vidchars[count];
-			int const bank = (m_vidattribs[count] & 0x20) >> 5;
-			tileno |= bank << 8;
-			int const color = m_vidattribs[count] & 0x1f;
-
-			gfx->transpen(bitmap,cliprect,tileno,color,0,0,x*8,y*8,(tileno == 0x38) ? 0 : -1);
-
-			count++;
-		}
-	}
-
-	return 0;
-}
-
-// copied from elsewhere. Surely incorrect
-void dmndrby_state::palette(palette_device &palette) const
-{
-	const uint8_t *color_prom = memregion("proms")->base();
-	static constexpr int resistances_rg[3] = { 1000, 470, 220 };
-	static constexpr int resistances_b [2] = { 470, 220 };
-
-	// compute the color output resistor weights
-	double rweights[3], gweights[3], bweights[2];
-	compute_resistor_weights(0, 255, -1.0,
-			3, &resistances_rg[0], rweights, 470, 0,
-			3, &resistances_rg[0], gweights, 470, 0,
-			2, &resistances_b[0],  bweights, 470, 0);
-
-	// create a lookup table for the palette
-	for (int i = 0; i < 0x20; i++)
-	{
-		int bit0, bit1, bit2;
-
-		// red component */
-		bit0 = BIT(color_prom[i], 0);
-		bit1 = BIT(color_prom[i], 1);
-		bit2 = BIT(color_prom[i], 2);
-		int const r = combine_weights(rweights, bit0, bit1, bit2);
-
-		// green component
-		bit0 = BIT(color_prom[i], 3);
-		bit1 = BIT(color_prom[i], 4);
-		bit2 = BIT(color_prom[i], 5);
-		int const g = combine_weights(gweights, bit0, bit1, bit2);
-
-		// blue component
-		bit0 = BIT(color_prom[i], 6);
-		bit1 = BIT(color_prom[i], 7);
-		int const b = combine_weights(bweights, bit0, bit1);
-
-		palette.set_indirect_color(i, rgb_t(r, g, b));
-	}
-
-	// color_prom now points to the beginning of the lookup table
-	color_prom = memregion("proms2")->base();
-
-	// normal tiles use colors 0-15
-	for (int i = 0x000; i < 0x300; i++)
-	{
-		uint8_t ctabentry = color_prom[i];
-		palette.set_pen_indirect(i, ctabentry);
-	}
-}
 
 //Main Z80 is IM 0, HW-latched irqs.
 INTERRUPT_GEN_MEMBER(dmndrby_state::irq)
@@ -696,12 +723,10 @@ void dmndrby_state::dderby(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dmndrby);
-	PALETTE(config, m_palette, FUNC(dmndrby_state::palette), 0x300, 0x20);
+	PALETTE(config, m_palette, FUNC(dmndrby_state::palette_init), 0x300, 0x20);
 
 	SPEAKER(config, "mono").front_center();
 
-	// NOTE: do not HOLD_LINE here, otherwise audio CPU won't have time to read the command
-	// cfr. MT#08792
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	AY8910(config, "ay1", 1'789'750).add_route(ALL_OUTPUTS, "mono", 0.35); // frequency guessed
