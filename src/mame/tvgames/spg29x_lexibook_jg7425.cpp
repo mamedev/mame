@@ -84,17 +84,22 @@ void lexibook_jg7425_state::machine_reset()
 
 	*/
 
-	uint32_t loadaddr = 0xa05001fc;
+	uint32_t loadaddr = (m_romregion[0x0c] << 0) | (m_romregion[0x0d] << 8) | (m_romregion[0x0e] << 16) | (m_romregion[0x0f] << 24);
+	uint32_t endaddr  = (m_romregion[0x10] << 0) | (m_romregion[0x11] << 8) | (m_romregion[0x12] << 16) | (m_romregion[0x13] << 24);
+	uint32_t entry    = (m_romregion[0x14] << 0) | (m_romregion[0x15] << 8) | (m_romregion[0x16] << 16) | (m_romregion[0x17] << 24);
+
+	printf("entries %08x %08x %08x\n", loadaddr, endaddr, entry);
+
 	uint8_t* rom = (uint8_t*)&m_romregion[0];
 
-	for (int i = 0; i < 0x6dbd4; i++)
+	for (int i = 0; i < endaddr-loadaddr; i++)
 	{
 		uint32_t data = rom[0x20 + i];
 
 		m_maincpu->space(AS_PROGRAM).write_byte(loadaddr+i, data);
 	}
 
-	m_maincpu->set_state_int(SCORE_PC, 0xa0501000);
+	m_maincpu->set_state_int(SCORE_PC, entry);
 }
 
 static INPUT_PORTS_START( lexibook_jg7425 )
@@ -108,7 +113,7 @@ uint32_t lexibook_jg7425_state::screen_update(screen_device &screen, bitmap_rgb3
 
 void lexibook_jg7425_state::map(address_map &map)
 {
-	map(0xa0500000, 0xa0ffffff).ram();
+	map(0xa0000000, 0xa0ffffff).ram();
 
 	map(0x9f000000, 0x9fffffff).ram().share("mainram");
 
@@ -153,9 +158,44 @@ ROM_START( lx_frozen )
 	DISK_IMAGE( "sdcard", 0, SHA1(0d727815ba06d7bfe8e092007e24d4931b302ef9) )
 ROM_END
 
+ROM_START( zone3d )
+	ROM_REGION( 0x100000, "extrom", 0 ) // SPI ROM in this case
+	ROM_LOAD("zone_25l8006e_c22014.bin", 0x000000, 0x100000, CRC(8c571771) SHA1(cdb46850286d31bf58d45b75ffc396ed774ac4fd) )
+
+	/*
+	model: Lexar SD
+	revision: LX01
+	serial number: 00000000XL10
+
+	size: 362.00 MiB (741376 sectors * 512 bytes)
+	unk1: 0000000000000007
+	unk2: 00000000000000fa
+	unk3: 01
+
+	The SD card has no label, but there's some printing on the back:
+	MMAGF0380M3085-WY
+	TC00201106 by Taiwan
+
+	--
+	Dumped with hardware write blocker, so this image is correct, and hasn't been corrupted by Windows
+
+	Image contains a FAT filesystem with a number of compressed? programs that presumably get loaded into RAM by
+	the bootloader in the serial flash ROM
+	*/
+
+	DISK_REGION( "cfcard" )
+	DISK_IMAGE( "zone3d", 0, SHA1(77971e2dbfb2ceac12f482d72539c2e042fd9108) )
+
+	ROM_REGION( 0x008000, "spg290", ROMREGION_32BIT | ROMREGION_LE )
+	ROM_LOAD32_DWORD("internal.rom", 0x000000, 0x008000, NO_DUMP)
+ROM_END
+
 } // anonymous namespace
 
 
 CONS( 2015, lx_jg7425,   0,         0,     lexibook_jg7425,   lexibook_jg7425, lexibook_jg7425_state, empty_init, "Lexibook", "Lexibook JG7425 221-in-1", MACHINE_IS_SKELETON )
 CONS( 2016, lx_aven,     0,         0,     lexibook_jg7425,   lexibook_jg7425, lexibook_jg7425_state, empty_init, "Lexibook", "Marvel Avengers TV Game Console (32-bit, Lexibook)", MACHINE_IS_SKELETON )
 CONS( 2016, lx_frozen,   0,         0,     lexibook_jg7425,   lexibook_jg7425, lexibook_jg7425_state, empty_init, "Lexibook", "Disney Frozen TV Game Console (32-bit, Lexibook, JG7420FZ)", MACHINE_IS_SKELETON )
+
+// slightly different, same basic structore of the external ROM
+COMP( 201?, zone3d,      0,         0,      lexibook_jg7425,  lexibook_jg7425, lexibook_jg7425_state, empty_init,"Zone", "Zone 3D", MACHINE_IS_SKELETON )
