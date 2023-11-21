@@ -68,6 +68,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="chess">
+		<description>Chess</description>
+		<year>1992</year>
+		<publisher>Psion</publisher>
+		<sharedfeat name="compatibility" value="S3"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="131072">
+				<rom name="Chess.rom" size="131072" crc="3cb59e6d" sha1="c6f8e420da3a5d709444235dca6ced60678a5e5e"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="datadeluxe">
 		<description>DataDeLuxe</description>
 		<year>1994</year>
@@ -325,14 +337,26 @@ license:CC0-1.0
 
 	<!-- Pocket Book -->
 
-	<software name="plotter">
-		<description>Plotter</description>
+	<software name="opl">
+		<description>OPL Programming Language</description>
 		<year>1992</year>
 		<publisher>Acorn</publisher>
 		<sharedfeat name="compatibility" value="S3"/>
 		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="65536">
+				<rom name="Acorn_OPL.rom" size="65536" crc="fd8f284f" sha1="4e3fb2f5d0f59d77f6f72ebbf4880155cb811ade"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="plotter">
+		<description>Plotter</description>
+		<year>1993</year>
+		<publisher>Acorn</publisher>
+		<sharedfeat name="compatibility" value="S3"/>
+		<part name="cart" interface="psion_ssd">
 			<dataarea name="rom" size="131072">
-				<rom name="Plotter.rom" size="131072" crc="16467037" sha1="bac48caa15192f8e385fcc9b9904721cbbf745e0"/>
+				<rom name="Acorn_Plotter.rom" size="131072" crc="16467037" sha1="bac48caa15192f8e385fcc9b9904721cbbf745e0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -344,7 +368,7 @@ license:CC0-1.0
 		<sharedfeat name="compatibility" value="S3"/>
 		<part name="cart" interface="psion_ssd">
 			<dataarea name="rom" size="524288">
-				<rom name="Schedule.rom" size="524288" crc="7e5684b4" sha1="3fb4ff3764ac5e9104c3a20a8bdf45cf40ea09ea"/>
+				<rom name="Acorn_Schedule.rom" size="524288" crc="7e5684b4" sha1="3fb4ff3764ac5e9104c3a20a8bdf45cf40ea09ea"/>
 			</dataarea>
 		</part>
 	</software>
@@ -356,7 +380,7 @@ license:CC0-1.0
 		<sharedfeat name="compatibility" value="S3"/>
 		<part name="cart" interface="psion_ssd">
 			<dataarea name="rom" size="524288">
-				<rom name="Spell.rom" size="524288" crc="2e55032a" sha1="560a425a19b3f3d12da9a0e2127f2c67aa829082"/>
+				<rom name="Acorn_Spell.rom" size="524288" crc="2e55032a" sha1="560a425a19b3f3d12da9a0e2127f2c67aa829082"/>
 			</dataarea>
 		</part>
 	</software>
