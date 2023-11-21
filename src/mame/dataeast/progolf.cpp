@@ -203,7 +203,6 @@ private:
 	void scrollx_lo_w(uint8_t data);
 	void scrollx_hi_w(uint8_t data);
 	void flip_screen_w(uint8_t data);
-	template <unsigned N> uint8_t videoram_r(offs_t offset);
 	void videoram_w(offs_t offset, uint8_t data);
 
 	void palette_init(palette_device &palette) const;
@@ -263,9 +262,9 @@ uint32_t progolf_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		int count = 0;
 
 		// TODO: rewrite using standard tilemap
-		for(int x = 0; x < 128; x++)
+		for (int x = 0; x < 128; x++)
 		{
-			for(int y = 0; y < 32; y++)
+			for (int y = 0; y < 32; y++)
 			{
 				int const tile = m_videoram[count];
 
@@ -281,31 +280,28 @@ uint32_t progolf_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	// framebuffer is 8x8 chars arranged like a bitmap
 	{
 		const int pitch = 32;
-		for(int y = 0; y < 256; y+= 8)
+		for (int y = 0; y < 256; y+= 8)
 		{
-			for(int x = 0; x < 256; x+= 8)
+			for (int x = 0; x < 256; x+= 8)
 			{
-				u32 fb_offset = ((y >> 3) + (x >> 3) * pitch) << 3;
+				const u32 fb_offset = ((y >> 3) + (x >> 3) * pitch) << 3;
 
 				for (int xi = 0; xi < 8; xi ++)
 				{
 					for (int yi = 0; yi < 8; yi ++)
 					{
-						int res_x = 256 - x + xi;
-						int res_y = y + yi;
-						if(!cliprect.contains(res_x, res_y))
+						const int res_x = 256 - x + xi;
+						const int res_y = y + yi;
+						if (!cliprect.contains(res_x, res_y))
 							continue;
 
-						u8 pen = 0;
-						pen |= BIT(m_fbram[fb_offset + (yi | 0x0000)], 7 - xi) << 0;
-						pen |= BIT(m_fbram[fb_offset + (yi | 0x2000)], 7 - xi) << 1;
-						pen |= BIT(m_fbram[fb_offset + (yi | 0x4000)], 7 - xi) << 2;
-						pen &= 7;
+						const u8 pen =
+								(BIT(m_fbram[fb_offset + (yi | 0x0000)], 7 - xi) << 0) |
+								(BIT(m_fbram[fb_offset + (yi | 0x2000)], 7 - xi) << 1) |
+								(BIT(m_fbram[fb_offset + (yi | 0x4000)], 7 - xi) << 2);
 
-						if (!pen)
-							continue;
-
-						bitmap.pix(res_y, res_x) = m_palette->pen(pen);
+						if (pen)
+							bitmap.pix(res_y, res_x) = m_palette->pen(pen);
 					}
 				}
 			}
@@ -379,11 +375,6 @@ void progolf_state::flip_screen_w(uint8_t data)
 		logerror("$9600: with data = %02x used\n",data);
 }
 
-template <unsigned N> uint8_t progolf_state::videoram_r(offs_t offset)
-{
-	return m_videoram[offset | (0x800 * N)];
-}
-
 void progolf_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
@@ -393,14 +384,14 @@ void progolf_state::main_map(address_map &map)
 {
 	map(0x0000, 0x5fff).ram();
 	map(0x6000, 0x7fff).rw(FUNC(progolf_state::charram_r), FUNC(progolf_state::charram_w));
-	map(0x8000, 0x8fff).w(FUNC(progolf_state::videoram_w)).share("videoram");
+	map(0x8000, 0x8fff).ram().w(FUNC(progolf_state::videoram_w)).share("videoram");
 	map(0x8000, 0x87ff).view(m_video_view0);
-	m_video_view0[0](0x8000, 0x87ff).r(FUNC(progolf_state::videoram_r<0>));
+	m_video_view0[0]; // falls through to RAM read
 	m_video_view0[1](0x8000, 0x87ff).rom().region("gfx1", 0x0000);
 	m_video_view0[2](0x8000, 0x87ff).rom().region("gfx1", 0x1000);
 	m_video_view0[3](0x8000, 0x87ff).rom().region("gfx1", 0x2000);
 	map(0x8800, 0x8fff).view(m_video_view1);
-	m_video_view1[0](0x8800, 0x8fff).r(FUNC(progolf_state::videoram_r<1>));
+	m_video_view1[0]; // falls through to RAM read
 	m_video_view1[1](0x8800, 0x8fff).rom().region("gfx1", 0x0800);
 	m_video_view1[2](0x8800, 0x8fff).rom().region("gfx1", 0x1800);
 	m_video_view1[3](0x8800, 0x8fff).rom().region("gfx1", 0x2800);

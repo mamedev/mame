@@ -17,20 +17,19 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class bbc_pms64k_device:
-	public device_t,
-	public device_bbc_1mhzbus_interface
+class bbc_pms64k_device : public device_t, public device_bbc_1mhzbus_interface
 {
 public:
 	// construction/destruction
 	bbc_pms64k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	// device-level overrides
+	// device_t overrides
 	virtual void device_start() override;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	virtual void fred_w(offs_t offset, uint8_t data) override;
 	virtual uint8_t jim_r(offs_t offset) override;
@@ -48,4 +47,4 @@ private:
 DECLARE_DEVICE_TYPE(BBC_PMS64K, bbc_pms64k_device);
 
 
-#endif /* MAME_BUS_BBC_1MHZBUS_PMS64K_H */
+#endif // MAME_BUS_BBC_1MHZBUS_PMS64K_H

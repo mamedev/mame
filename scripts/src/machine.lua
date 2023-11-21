@@ -379,6 +379,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/6883sam.h,MACHINES["6883SAM"] = true
+---------------------------------------------------
+
+if (MACHINES["6883SAM"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/6883sam.cpp",
+		MAME_DIR .. "src/devices/machine/6883sam.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/68153bim.h,MACHINES["BIM68153"] = true
 ---------------------------------------------------
 

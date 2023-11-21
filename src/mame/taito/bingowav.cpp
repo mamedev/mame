@@ -138,7 +138,7 @@ void bingowav_state::bingowav(machine_config &config)
 	tc0140syt.set_master_tag(m_maincpu);
 	tc0140syt.set_slave_tag("audiocpu");
 
-	m68000_device &termcpu(M68000(config, "termcpu", 12000000)); // actually TMP63803F-16
+	m68000_device &termcpu(TMP68303(config, "termcpu", 12000000)); // actually TMP63803F-16
 	termcpu.set_addrmap(AS_PROGRAM, &bingowav_state::bingowav_drive_map);
 	termcpu.set_disable();
 

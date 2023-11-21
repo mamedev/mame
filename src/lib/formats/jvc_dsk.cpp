@@ -178,7 +178,10 @@ bool jvc_format::parse_header(util::random_read &io, int &header_size, int &trac
 int jvc_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	int header_size, tracks, heads, sectors, sector_size, sector_base_id;
-	return parse_header(io, header_size, tracks, heads, sectors, sector_size, sector_base_id) ? FIFID_STRUCT|FIFID_SIZE : 0;
+	if (parse_header(io, header_size, tracks, heads, sectors, sector_size, sector_base_id))
+		return header_size ? (FIFID_STRUCT | FIFID_SIZE) : FIFID_SIZE;
+	else
+		return 0;
 }
 
 bool jvc_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const

@@ -348,7 +348,8 @@ void snova_state::snova(machine_config &config)
 	m_maincpu->set_clock(16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &snova_state::snova_map);
 	m_maincpu->nvram_enable_backup(true);
-	m_maincpu->standby_cb().set(FUNC(snova_state::standby));
+	m_maincpu->standby_cb().set(m_maincpu, FUNC(hd6303y_cpu_device::nvram_set_battery));
+	m_maincpu->standby_cb().append(FUNC(snova_state::standby));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	m_board->set_nvram_enable(true);

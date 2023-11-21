@@ -19655,6 +19655,7 @@ fts2in1
 3cdpokera                       // hack?
 animalhs                        // (c) 1991 Suns Co Ltd.
 animalhsa                       // (c) 1991 Suns Co Ltd.
+animalhsb                       // bootleg
 animalw                         // bootleg
 aplan                           // bootleg (WeaShing)
 bingowng                        // (c) 1993 Wing Co. Ltd
@@ -19837,6 +19838,7 @@ wcherry                         // bootleg
 
 @source:igs/igs009.cpp
 gp98                            // (c) 1998
+gp98a                           // (c) 1998
 jingbell                        // (c) 1997
 jingbella                       // (c) 1997
 jingbellb                       // (c) 1997
@@ -27115,6 +27117,7 @@ maze                            // 611 [1976]
 phantom2                        // 652 [1979]
 roadrunm                        // 618 [1977]
 seawolf                         // 596 [1976]
+seawolfa                        // 596 [1976]
 seawolfo                        // 596 [1976]
 shuffle                         // 643 [1978]
 spacwalk                        // 640 [1978]
@@ -28492,6 +28495,7 @@ magibombf                       // (c) 2002  Astro Corp.
 magibombg                       // (c) 2004  Astro Corp.
 magibombh                       // (c) 2001? Astro Corp.
 magibombi                       // (c) 2001? Astro Corp.
+magibombj                       // (c) 2005  Astro Corp.
 showhanc                        // (c) 2000  Astro Corp.
 showhand                        // (c) 2000  Astro Corp.
 skilldrp                        // (c) 2002  Astro Corp.
@@ -33043,6 +33047,7 @@ nrallyx                         // (c) 1981 Namco
 nrallyxb                        // (c) 1981 Namco
 rallyx                          // (c) 1980 Namco
 rallyxa                         // (c) 1980 Namco
+rallyxeg                        // Video Game / Electrogame bootleg
 rallyxm                         // (c) 1980 Midway
 rallyxmr                        // Model Racing bootleg
 savanna                         // Olympia (c) 1982 (Jungler bootleg)
@@ -34403,6 +34408,7 @@ snes4sl
 snes4sln
 
 @source:nintendo/spacefb.cpp
+redbird                         // bootleg (Codematic)
 spacebrd                        // bootleg
 spacedem                        // (c) 1980 Fortrek + made by Nintendo
 spacefb                         // (c) [1980?] Nintendo
@@ -35679,6 +35685,9 @@ t1000sx                         // 1987 Tandy 1000 SX (similiar to PCJr)
 t1000tl                         // 1988 Tandy 1000 TL
 t1000tl2                        // 1989 Tandy 1000 TL/2
 t1000tx                         // 1987 Tandy 1000 TX
+
+@source:pc/teradrive.cpp
+teradrive
 
 @source:pc/tosh1000.cpp
 tosh1000
@@ -38339,6 +38348,7 @@ compan
 
 @source:saitek/companion2.cpp
 compan2
+enterp
 expchess
 
 @source:saitek/chesstrv.cpp
