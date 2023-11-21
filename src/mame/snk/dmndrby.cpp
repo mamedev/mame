@@ -1,21 +1,19 @@
 // license:BSD-3-Clause
 // copyright-holders: Angelo Salese, David Haywood, Mike Green
+/**************************************************************************************************
 
-/*******************************************************************************************
-
-Diamond Derby - G4001 board (c) 1986 Electrocoin
-
-driver by David Haywood,Mike Green & Angelo Salese
+Diamond Derby - G4001 board (c) 1986 SNK / Electrocoin
 
 Notes:
--Press Collect Button to "get the money";
+- Press Collect Button to "get the money";
 
 TODO:
--Enters into Service Mode (?) if you let it go in attract mode after some time;
--Fix remaining graphic issues;
--Fix colors (check bar test on the first Service Mode menu);
--The bootleg has been modified quite a lot, differences need to be taken into account.
-============================================================================================
+- Fix colors (check bar test on the first Service Mode menu);
+- dmndrbybl Quinella style inputs (game seems based over an original set we don't have yet);
+- Enters into Service Mode (?) if you let it go in attract mode after some time (cannot reproduce);
+- When booted up game disallows coin inputs (including setting with lockout disabled) for a couple timer seconds. Is this intentional?
+
+===================================================================================================
 
 G4001
 Diamond Derby - Electrocoin on an SNK board
@@ -51,13 +49,14 @@ DD10 DD14  DD18     H5            DD21
  2114                  2148 2148
  2114              H10
 
-*******************************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
 
@@ -72,17 +71,17 @@ namespace {
 class dmndrby_state : public driver_device
 {
 public:
-	dmndrby_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_scroll_ram(*this, "scroll_ram"),
-		m_sprite_ram(*this, "sprite_ram"),
-		m_vidchars(*this, "vidchars"),
-		m_vidattribs(*this, "vidattribs"),
-		m_racetrack_tilemap_rom(*this, "racetrack_data"),
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+	dmndrby_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_scroll_ram(*this, "scroll_ram")
+		, m_sprite_ram(*this, "sprite_ram")
+		, m_fix_vram(*this, "fix_vram")
+		, m_fix_attr(*this, "fix_attr")
+		, m_racetrack_tilemap_rom(*this, "racetrack_data")
 	{ }
 
 	void dderby(machine_config &config);
@@ -92,15 +91,15 @@ protected:
 	virtual void video_start() override;
 
 private:
-	required_shared_ptr<uint8_t> m_scroll_ram;
-	required_shared_ptr<uint8_t> m_sprite_ram;
-	required_shared_ptr<uint8_t> m_vidchars;
-	required_shared_ptr<uint8_t> m_vidattribs;
-	required_region_ptr<uint8_t> m_racetrack_tilemap_rom;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_shared_ptr<uint8_t> m_scroll_ram;
+	required_shared_ptr<uint8_t> m_sprite_ram;
+	required_shared_ptr<uint8_t> m_fix_vram;
+	required_shared_ptr<uint8_t> m_fix_attr;
+	required_region_ptr<uint8_t> m_racetrack_tilemap_rom;
 
 	tilemap_t *m_fix_tilemap = nullptr;
 	tilemap_t *m_racetrack_tilemap = nullptr;
@@ -109,12 +108,10 @@ private:
 	TILE_GET_INFO_MEMBER(get_racetrack_tile_info);
 	void fix_vram_w(offs_t offset, u8 data);
 	void fix_attr_w(offs_t offset, u8 data);
-	uint8_t m_bg = 0; // TODO: set to 0 and never updated?
 
 	void palette_init(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(irq);
-	INTERRUPT_GEN_MEMBER(timer_irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
 
 	uint8_t m_io_port[8]{}; // TODO: written to but never used?
 
@@ -127,8 +124,8 @@ private:
 
 TILE_GET_INFO_MEMBER(dmndrby_state::get_fix_tile_info)
 {
-	u8 attr = m_vidattribs[tile_index];
-	const u16 code = m_vidchars[tile_index] | (BIT(m_vidattribs[tile_index], 5) << 8);
+	u8 attr = m_fix_attr[tile_index];
+	const u16 code = m_fix_vram[tile_index] | (BIT(m_fix_attr[tile_index], 5) << 8);
 	const u8 color = attr & 0x1f;
 	// dmndrbybl, in Cocktail mode
 	int const flipxy = ((attr & 0x40) >> 6) * 3;
@@ -157,8 +154,6 @@ TILE_GET_INFO_MEMBER(dmndrby_state::get_racetrack_tile_info)
 
 void dmndrby_state::video_start()
 {
-	m_bg = 0;
-
 	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dmndrby_state::get_fix_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_racetrack_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dmndrby_state::get_racetrack_tile_info)), tilemap_mapper_delegate(*this, FUNC(dmndrby_state::racetrack_scan_rows)), 16, 16, 128, 64);
 	m_racetrack_tilemap->mark_all_dirty();
@@ -169,13 +164,13 @@ void dmndrby_state::video_start()
 
 void dmndrby_state::fix_vram_w(offs_t offset, u8 data)
 {
-	m_vidchars[offset] = data;
+	m_fix_vram[offset] = data;
 	m_fix_tilemap->mark_tile_dirty(offset);
 }
 
 void dmndrby_state::fix_attr_w(offs_t offset, u8 data)
 {
-	m_vidattribs[offset] = data;
+	m_fix_attr[offset] = data;
 	m_fix_tilemap->mark_tile_dirty(offset);
 }
 
@@ -186,14 +181,6 @@ uint32_t dmndrby_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	//gfx_element *track = m_gfxdecode->gfx(2);
 
 	bitmap.fill(m_palette->black_pen(), cliprect);
-
-/* Draw racetrack
-
-racetrack seems to be stored in 4th and 5th PROM.
-can we draw it with the tilemap? maybe not, the layout is a little strange
-
-*/
-//  base = m_scroll_ram[0];
 
 	const bool track_enable = BIT(m_scroll_ram[4], 2);
 	const bool sprite_enable = BIT(m_scroll_ram[4], 1);
@@ -214,7 +201,7 @@ can we draw it with the tilemap? maybe not, the layout is a little strange
 
 /* draw sprites
 
- guess work  again! seems to work fine and horse labels match up
+ guess work! Seems to work fine and horse labels match up
 wouldn't like to say it's the most effective way though...
  -- maybe they should be decoded as 'big sprites' instead?
 
@@ -230,7 +217,7 @@ wouldn't like to say it's the most effective way though...
 			int const spry = m_sprite_ram[base + 2];
 			//m_sprite_ram[base + 1];
 			int const col = (m_sprite_ram[base + 1] & 0x1f);
-			int const anim = (m_sprite_ram[base] & 0x3f) * 0x40; // animation frame - probably wrong but seems right
+			int const anim = (m_sprite_ram[base] & 0x3f) * 0x40; // animation frame
 			int const horse = (m_sprite_ram[base + 1] & 0x7) * 8 + 7;  // horse label from 1 - 6
 
 			for (a = 0; a < 8 ; a++)
@@ -342,11 +329,11 @@ void dmndrby_state::main_map(address_map &map)
 	map(0xca00, 0xca00).nopw();//(vblank_irq_w) //???
 	map(0xca01, 0xca01).nopw(); //watchdog
 	map(0xca02, 0xca02).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xca03, 0xca03).nopw();//(timer_irq_w) //???
+	map(0xca03, 0xca03).w("soundlatch2", FUNC(generic_latch_8_device::write));
 	map(0xcc00, 0xcc05).ram().share(m_scroll_ram);
 	map(0xce08, 0xce1f).ram().share(m_sprite_ram); // horse sprites
-	map(0xd000, 0xd3ff).ram().w(FUNC(dmndrby_state::fix_vram_w)).share(m_vidchars);
-	map(0xd400, 0xd7ff).ram().w(FUNC(dmndrby_state::fix_attr_w)).share(m_vidattribs);
+	map(0xd000, 0xd3ff).ram().w(FUNC(dmndrby_state::fix_vram_w)).share(m_fix_vram);
+	map(0xd400, 0xd7ff).ram().w(FUNC(dmndrby_state::fix_attr_w)).share(m_fix_attr);
 }
 
 void dmndrby_state::bootleg_main_map(address_map &map)
@@ -367,11 +354,11 @@ void dmndrby_state::bootleg_main_map(address_map &map)
 	map(0xca00, 0xca00).nopw();//(vblank_irq_w) //???
 	map(0xca01, 0xca01).nopw(); //watchdog
 	map(0xca02, 0xca02).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xca03, 0xca03).nopw();//(timer_irq_w) //???
+	map(0xca03, 0xca03).w("soundlatch2", FUNC(generic_latch_8_device::write));
 	map(0xcc00, 0xcc05).ram().share(m_scroll_ram);
 	map(0xce08, 0xce1f).ram().share(m_sprite_ram); // horse sprites
-	map(0xd000, 0xd3ff).ram().w(FUNC(dmndrby_state::fix_vram_w)).share(m_vidchars);
-	map(0xd400, 0xd7ff).ram().w(FUNC(dmndrby_state::fix_attr_w)).share(m_vidattribs);
+	map(0xd000, 0xd3ff).ram().w(FUNC(dmndrby_state::fix_vram_w)).share(m_fix_vram);
+	map(0xd400, 0xd7ff).ram().w(FUNC(dmndrby_state::fix_attr_w)).share(m_fix_attr);
 }
 
 void dmndrby_state::sound_map(address_map &map)
@@ -380,7 +367,8 @@ void dmndrby_state::sound_map(address_map &map)
 	map(0x1000, 0x1000).ram(); //???
 	map(0x4000, 0x4001).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0x4000, 0x4000).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0x4001, 0x4001).r("ay1", FUNC(ay8910_device::data_r));
+	map(0x4001, 0x4001).r("soundlatch2", FUNC(generic_latch_8_device::read));
+//	map(0x4000, 0x4000).r("ay1", FUNC(ay8910_device::data_r));
 	map(0x6000, 0x67ff).ram();
 }
 
@@ -663,18 +651,18 @@ static const gfx_layout tiles8x8_layout =
 
 static const gfx_layout tiles16x16_layout =
 {
-	16,16,  // 16*16 sprites
+	16,16,
 	RGN_FRAC(1,3),  // 256 sprites
-	3,      // 3 bits per pixel
-	{ 0, RGN_FRAC(1,3), RGN_FRAC(2,3) },    // the three bitplanes are separated
+	3,
+	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7,  16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	32*8    // every sprite takes 32 consecutive bytes
+	32*8
 };
 
 static const gfx_layout tiles8x8_layout2 =
 {
-	8,8, // 8x8 chars
+	8,8,
 	RGN_FRAC(1,3),
 	3,
 	{ 0,RGN_FRAC(1,3),RGN_FRAC(2,3) },
@@ -689,15 +677,18 @@ static GFXDECODE_START( gfx_dmndrby )
 	GFXDECODE_ENTRY( "track", 0, tiles16x16_layout, 16*16, 32 )
 GFXDECODE_END
 
-//Main Z80 is IM 0, HW-latched irqs.
-INTERRUPT_GEN_MEMBER(dmndrby_state::irq)
+// Main Z80 is IM0, HW-latched irqs
+TIMER_DEVICE_CALLBACK_MEMBER(dmndrby_state::scanline_cb)
 {
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); // Z80 - RST 10h
-}
+	int scanline = param;
 
-INTERRUPT_GEN_MEMBER(dmndrby_state::timer_irq)
-{
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); // Z80 - RST 08h
+	// vblank irq
+	if(scanline == 224)
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); // Z80 - RST 10h
+
+	// timer irq, will throw token error if fired at wrong time
+	if(scanline == 32)
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); // Z80 - RST 08h
 }
 
 void dmndrby_state::dderby(machine_config &config)
@@ -705,11 +696,11 @@ void dmndrby_state::dderby(machine_config &config)
 	// basic machine hardware
 	Z80(config, m_maincpu, 4'000'000);         // ? MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &dmndrby_state::main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(dmndrby_state::irq));
-	m_maincpu->set_periodic_int(FUNC(dmndrby_state::timer_irq), attotime::from_hz(90));
+	TIMER(config, "scantimer").configure_scanline(FUNC(dmndrby_state::scanline_cb), "screen", 0, 1);
 
 	Z80(config, m_audiocpu, 4'000'000);  // verified on schematics
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dmndrby_state::sound_map);
+	m_audiocpu->set_periodic_int(FUNC(dmndrby_state::irq0_line_hold), attotime::from_hz(60));
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -717,7 +708,7 @@ void dmndrby_state::dderby(machine_config &config)
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(256, 256);
 	screen.set_visarea(0, 256-1, 16, 256-16-1);
 	screen.set_screen_update(FUNC(dmndrby_state::screen_update));
@@ -728,9 +719,10 @@ void dmndrby_state::dderby(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, 0);
+	GENERIC_LATCH_8(config, "soundlatch");
+	GENERIC_LATCH_8(config, "soundlatch2");
 
-	AY8910(config, "ay1", 1'789'750).add_route(ALL_OUTPUTS, "mono", 0.35); // frequency guessed
+	AY8910(config, "ay1", 4'000'000 / 2).add_route(ALL_OUTPUTS, "mono", 0.35); // frequency guessed, tied with sound timer irq above
 }
 
 void dmndrby_state::dderbybl(machine_config &config)
@@ -883,6 +875,6 @@ ROM_END
 
 
 //    YEAR, NAME,      PARENT,  MACHINE,  INPUT,    STATE,         INIT,       MONITOR, COMPANY,                    FULLNAME                                  FLAGS
-GAME( 1994, dmndrby,   0,       dderby,   dderby,   dmndrby_state, empty_init, ROT0,    "Electrocoin",              "Diamond Derby (newer)",                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hack?
-GAME( 1986, dmndrbya,  dmndrby, dderby,   dderbya,  dmndrby_state, empty_init, ROT0,    "Electrocoin",              "Diamond Derby (original)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, dmndrbybl, dmndrby, dderbybl, dderbybl, dmndrby_state, empty_init, ROT0,    "bootleg (EDG Impeuropex)", "Diamond Derby (EDG Impeuropex bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, dmndrby,   0,       dderby,   dderby,   dmndrby_state, empty_init, ROT0,    "Electrocoin",              "Diamond Derby (Win bet, newer)",                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hack?
+GAME( 1986, dmndrbya,  dmndrby, dderby,   dderbya,  dmndrby_state, empty_init, ROT0,    "Electrocoin",              "Diamond Derby (Win bet, original)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, dmndrbybl, dmndrby, dderbybl, dderbybl, dmndrby_state, empty_init, ROT0,    "bootleg (EDG Impeuropex)", "Diamond Derby (Quinella bet, EDG Impeuropex bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
