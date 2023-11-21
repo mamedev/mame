@@ -1,3 +1,4 @@
+
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
@@ -59,7 +60,26 @@ void lexibook_jg7425_state::machine_start()
 {
 	// I think this code should be running from RAM at least, probably some kind of bootstrap / internal ROM to copy it? (hyperscan.cpp indicates that SoC can have internal ROM at least)
 
-	// first 0x20 bytes are probably pointers, code starts at 0x20 and is offset, maps at 0x500000
+	/*
+
+	the first 0x20 bytes of the ROM seem to be some pointers
+
+	F7 FF FE FF
+	FF FF FF FF
+	FF FF FF FF
+	FC 01 50 A0 (address A05001FC) - load address for the main program
+	FC 01 70 A0 (address A07001FC) - maybe top of program to copy?
+	00 10 50 A0 (address A0501000) - entry point??
+	20 00 00 98 (address 98000020)
+	00 00 00 00 
+
+	then there is a program which loads at A05001FC between 0x20 - 0x6DBD3
+	this program is then partially repeated until it is abruptly cut off
+	with a block of 00 at 0x7ff20
+	the 2nd half of the ROM (0x80000+) is just 0xff fill
+
+	*/
+
 
 	for (int i = 0; i < 0x80000 / 4; i++)
 	{

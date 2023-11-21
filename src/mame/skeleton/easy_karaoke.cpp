@@ -63,7 +63,7 @@
 
     ------------------
 
-    Units also contain 'On-Key Karaoke' logo on box, maybe this is the original US / Canada product name?
+    Packaging also shows 'On-Key Karaoke' logo on box, maybe this is the original US / Canada product name?
 
 *******************************************************************************/
 
