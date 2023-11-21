@@ -41488,6 +41488,9 @@ hprotr8a                        //
 @source:skeleton/ht68k.cpp
 ht68k                           //
 
+@source:skeleton/hudson_poems.cpp
+marimba                         //
+
 @source:skeleton/i7000.cpp
 i7000                           //
 
