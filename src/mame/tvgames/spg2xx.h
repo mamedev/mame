@@ -347,6 +347,7 @@ public:
 	{ }
 
 	void doraphone(machine_config &config);
+	void doraphonep(machine_config &config);
 
 private:
 	uint16_t porta_r(offs_t offset, uint16_t mem_mask = ~0);
