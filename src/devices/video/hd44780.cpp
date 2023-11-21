@@ -24,7 +24,7 @@
 
 DEFINE_DEVICE_TYPE(HD44780,      hd44780_device,      "hd44780_a00",  "Hitachi HD44780A00 LCD Controller")
 DEFINE_DEVICE_TYPE(HD44780U_A00, hd44780u_a00_device, "hd44780u_a00", "Hitachi HD44780UA00 LCD Controller")
-//DEFINE_DEVICE_TYPE(HD44780U_A02, hd44780u_a02_device, "hd44780u_a02", "Hitachi HD44780UA02 LCD Controller")
+DEFINE_DEVICE_TYPE(HD44780U_A02, hd44780u_a02_device, "hd44780u_a02", "Hitachi HD44780UA02 LCD Controller")
 DEFINE_DEVICE_TYPE(SED1278_0B,   sed1278_0b_device,   "sed1278_0b",   "Epson SED1278-0B LCD Controller") // packaged as either SED1278F0B or SED1278D0B
 DEFINE_DEVICE_TYPE(KS0066_F00,   ks0066_f00_device,   "ks0066_f00",   "Samsung KS0066 F00 LCD Controller")
 DEFINE_DEVICE_TYPE(KS0066_F05,   ks0066_f05_device,   "ks0066_f05",   "Samsung KS0066 F05 LCD Controller")
@@ -49,18 +49,18 @@ ROM_END
 
 // Note the HD44780UA01 font does exist in the 1994 M24T026 Hitachi LCD Controller Driver LSI Data Book on bitsavers as well
 
-/*ROM_START( hd44780u_a02 )
+ROM_START( hd44780u_a02 )
 	ROM_REGION( 0x1000, "cgrom", 0 )
 	ROM_LOAD( "hd44780u_a02.bin",    0x0000, 0x1000,  BAD_DUMP CRC(6d522b42) SHA1(db8f59573c81933cfc9d3232d419406f0896e60b)) // from page 18 of the 1999 HD44780U datasheet
 	// this differs slightly (see the '7') from the HD44780UA02 font in the 1994 M24T026 Hitachi LCD Controller Driver LSI Data Book on bitsavers
 	// and needs confirmation from a real device as to which is correct
-ROM_END*/
+ROM_END
 
-// TODO: SED1278_0A uses the exact same font as the hd44780a00
+// TODO: SED1278_0A is 100% identical to hd44780a00, see page 9-32 of the SED1278 datasheet
 
 ROM_START( sed1278_0b )
 	ROM_REGION( 0x1000, "cgrom", 0 )
-	ROM_LOAD( "sed1278_0b.bin",    0x0000, 0x1000,  BAD_DUMP CRC(eef342fa) SHA1(d6ac58a48e428e7cff26fb9c8ea9b4eeaa853038)) // from page 9-33 of the SED1278 datasheet
+	ROM_LOAD( "sed1278_0b.bin",    0x0000, 0x1000,  BAD_DUMP CRC(962498b7) SHA1(41866836ab4ed7bd4c3539bc8df492ba7d7ff42a)) // from page 9-33 of the SED1278 datasheet
 ROM_END
 
 // TODO: many other SED1278 variants, documented in the datasheet
@@ -113,11 +113,11 @@ hd44780u_a00_device::hd44780u_a00_device(const machine_config &mconfig, const ch
 	set_charset_type(CHARSET_HD44780U_A00);
 }
 
-/*hd44780u_a02_device::hd44780u_a02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+hd44780u_a02_device::hd44780u_a02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	hd44780_device(mconfig, HD44780U_A02, tag, owner, clock)
 {
 	set_charset_type(CHARSET_HD44780U_A02);
-}*/
+}
 
 sed1278_0b_device::sed1278_0b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	hd44780_device(mconfig, SED1278_0B, tag, owner, clock)
@@ -147,8 +147,8 @@ const tiny_rom_entry *hd44780_device::device_rom_region() const
 	switch (m_charset_type)
 	{
 		case CHARSET_HD44780_A00:   return ROM_NAME( hd44780_a00 );
-		case CHARSET_HD44780U_A00:   return ROM_NAME( hd44780u_a00 );
-		//case CHARSET_HD44780U_A02:   return ROM_NAME( hd44780u_a02 );
+		case CHARSET_HD44780U_A00:  return ROM_NAME( hd44780u_a00 );
+		case CHARSET_HD44780U_A02:  return ROM_NAME( hd44780u_a02 );
 		case CHARSET_SED1278_0B:    return ROM_NAME( sed1278_0b );
 		case CHARSET_KS0066_F00:    return ROM_NAME( ks0066_f00 );
 		case CHARSET_KS0066_F05:    return ROM_NAME( ks0066_f05 );

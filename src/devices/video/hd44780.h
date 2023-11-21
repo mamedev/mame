@@ -71,7 +71,7 @@ protected:
 	{
 		CHARSET_HD44780_A00,
 		CHARSET_HD44780U_A00,
-		//CHARSET_HD44780U_A02,
+		CHARSET_HD44780U_A02,
 		CHARSET_SED1278_0B,
 		CHARSET_KS0066_F00,
 		CHARSET_KS0066_F05 /*,
@@ -154,12 +154,12 @@ public:
 
 // ======================> hd44780u_a02_device
 
-/*class hd44780u_a02_device :  public hd44780_device
+class hd44780u_a02_device :  public hd44780_device
 {
 public:
 	// construction/destruction
 	hd44780u_a02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-};*/
+};
 
 // ======================> sed1278_0b_device
 
@@ -191,7 +191,7 @@ public:
 // device type definition
 DECLARE_DEVICE_TYPE(HD44780,      hd44780_device)
 DECLARE_DEVICE_TYPE(HD44780U_A00, hd44780u_a00_device)
-//DECLARE_DEVICE_TYPE(HD44780U_A02, hd44780u_a02_device)
+DECLARE_DEVICE_TYPE(HD44780U_A02, hd44780u_a02_device)
 DECLARE_DEVICE_TYPE(SED1278_0B,   sed1278_0b_device)
 DECLARE_DEVICE_TYPE(KS0066_F00,   ks0066_f00_device)
 DECLARE_DEVICE_TYPE(KS0066_F05,   ks0066_f05_device)
