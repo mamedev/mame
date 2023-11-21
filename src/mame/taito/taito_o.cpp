@@ -102,6 +102,7 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(parentj_int);
 	u32 draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, u32 start_offset);
 	void prg_map(address_map &map);
+
 	u16 m_hoppff = 0x0000;
 };
 
@@ -341,7 +342,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(taitoo_state::parentj_int)
 	int scanline = param;
 
 	// vblank irq
-	if(scanline == 448)
+	if (scanline == 448)
 		m_maincpu->set_input_line(4, HOLD_LINE);
 
 	// reads I/O
@@ -349,17 +350,17 @@ TIMER_DEVICE_CALLBACK_MEMBER(taitoo_state::parentj_int)
 		m_maincpu->set_input_line(5, HOLD_LINE);
 	
 	// add a flip flop to coin_out sensor, to interrupt once per coin
-	bool hopper_sw = BIT(ioport("IN1")->read(),9);
+	bool hopper_sw = BIT(ioport("IN1")->read(), 9);
 	bool bit_dwn = 0;
 	bool change = 0;
-	change = m_hoppff ^ hopper_sw ;  // detect change
+	change = m_hoppff ^ hopper_sw;     // detect change
 	bit_dwn = change && !hopper_sw;    // detect fall down change
 	logerror("timer: m_hoppff:%01x - bit_up:%01x - change:%01x - hopper_sw:%01x\n", m_hoppff, bit_dwn, change, hopper_sw);
-	if( bit_dwn )
+	if (bit_dwn)
 	{
 		logerror("timer: coin out interrupt\n");
 		m_maincpu->set_input_line(6, HOLD_LINE);
-	};
+	}
 	m_hoppff = hopper_sw;  // keep ff state
 }
 
@@ -368,7 +369,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(taitoo_state::eibise_int)
 	int scanline = param;
 
 	// vblank irq
-	if(scanline == 448)
+	if (scanline == 448)
 		m_maincpu->set_input_line(4, HOLD_LINE);
 
 	// reads I/O
@@ -376,17 +377,17 @@ TIMER_DEVICE_CALLBACK_MEMBER(taitoo_state::eibise_int)
 		m_maincpu->set_input_line(5, HOLD_LINE);
 	
 	// add a flip flop to coin_out sensor, to interrupt once per coin
-	bool hopper_sw = BIT(ioport("IN1")->read(),9);
+	bool hopper_sw = BIT(ioport("IN1")->read(), 9);
 	bool bit_up = 0;
 	bool change = 0;
-	change = m_hoppff ^ hopper_sw ;  // detect change
+	change = m_hoppff ^ hopper_sw;  // detect change
 	bit_up = change && hopper_sw;    // detect rise up change
 	logerror("timer: m_hoppff:%01x - bit_up:%01x - change:%01x - hopper_sw:%01x\n", m_hoppff, bit_up, change, hopper_sw);
-	if( bit_up )
+	if(bit_up)
 	{
 		logerror("timer: coin out interrupt\n");
 		m_maincpu->set_input_line(6, HOLD_LINE);
-	};
+	}
 	m_hoppff = hopper_sw;  // keep ff state
 }
 
