@@ -107,7 +107,6 @@ private:
 
 	void set_cpu_freq();
 	TIMER_CALLBACK_MEMBER(set_pin);
-	void standby(int state);
 
 	emu_timer *m_standbytimer;
 	emu_timer *m_nmitimer;
@@ -143,12 +142,6 @@ void compan2_state::machine_reset()
 
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	m_maincpu->set_input_line(M6801_STBY_LINE, CLEAR_LINE);
-}
-
-void compan2_state::standby(int state)
-{
-	if (state)
-		m_display->clear();
 }
 
 TIMER_CALLBACK_MEMBER(compan2_state::set_pin)
@@ -299,7 +292,8 @@ void compan2_state::expchess(machine_config &config)
 	// basic machine hardware
 	HD6301V1(config, m_maincpu, 4000000); // approximation, no XTAL
 	m_maincpu->nvram_enable_backup(true);
-	m_maincpu->standby_cb().set(FUNC(compan2_state::standby));
+	m_maincpu->standby_cb().set(m_maincpu, FUNC(hd6301v1_cpu_device::nvram_set_battery));
+	m_maincpu->standby_cb().append([this](int state) { if (state) m_display->clear(); });
 	m_maincpu->in_p1_cb().set(FUNC(compan2_state::input1_r));
 	m_maincpu->in_p2_cb().set(FUNC(compan2_state::input2_r));
 	m_maincpu->out_p2_cb().set("dac", FUNC(dac_1bit_device::write)).bit(0);

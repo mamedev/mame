@@ -390,6 +390,7 @@ m6801_cpu_device::m6801_cpu_device(const machine_config &mconfig, device_type ty
 	, m_internal_ram(*this, "internal")
 	, m_nvram_bytes(nvram_bytes)
 	, m_nvram_defval(0)
+	, m_nvram_battery(true)
 	, m_sclk_divider(8)
 {
 	// disable nvram by default (set to true if MCU is battery-backed when in standby mode)
@@ -1321,6 +1322,11 @@ void mc68120_device::dpram_w(offs_t offset, uint8_t data)
 
 bool m6801_cpu_device::nvram_write(util::write_stream &file)
 {
+	// if it's currently not battery-backed, reinitialize nvram
+	// so it won't load the previous nvram file on the next boot
+	if (!m_nvram_battery)
+		nvram_default();
+
 	size_t actual;
 
 	if (file.write(&m_internal_ram[0], m_nvram_bytes, actual) || m_nvram_bytes != actual)
@@ -1355,8 +1361,6 @@ void m6801_cpu_device::nvram_default()
 	if (!nvram_backup_enabled() || m_nvram_bytes == 0)
 		return;
 
-	std::fill_n(&m_internal_ram[0], m_nvram_bytes, m_nvram_defval);
-
 	// default nvram from mytag:nvram region if it exists
 	memory_region *region = memregion("nvram");
 	if (region != nullptr)
@@ -1366,6 +1370,11 @@ void m6801_cpu_device::nvram_default()
 
 		std::copy_n(&region->as_u8(), m_nvram_bytes, &m_internal_ram[0]);
 		m_ram_ctrl |= 0x80;
+	}
+	else
+	{
+		std::fill_n(&m_internal_ram[0], m_nvram_bytes, m_nvram_defval);
+		m_ram_ctrl &= 0x3f;
 	}
 }
 

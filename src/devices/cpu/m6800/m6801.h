@@ -58,6 +58,7 @@ public:
 	auto out_sc2_cb() { return m_out_sc2_func.bind(); }
 	auto out_ser_tx_cb() { return m_out_sertx_func.bind(); }
 
+	void nvram_set_battery(int state) { m_nvram_battery = bool(state); } // default is 1 (nvram_enable_backup needs to be true)
 	void nvram_set_default_value(uint8_t val) { m_nvram_defval = val; } // default is 0
 	auto standby_cb() { return m_standby_func.bind(); } // notifier (not an output pin)
 	bool standby() { return suspended(SUSPEND_REASON_CLOCK); }
@@ -141,6 +142,7 @@ protected:
 	required_shared_ptr<uint8_t> m_internal_ram;
 	const int m_nvram_bytes;
 	uint8_t m_nvram_defval;
+	bool m_nvram_battery;
 	int m_sclk_divider;
 
 	/* internal registers */
