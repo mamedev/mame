@@ -197,5 +197,5 @@ CONS( 2015, lx_jg7425,   0,         0,     lexibook_jg7425,   lexibook_jg7425, l
 CONS( 2016, lx_aven,     0,         0,     lexibook_jg7425,   lexibook_jg7425, lexibook_jg7425_state, empty_init, "Lexibook", "Marvel Avengers TV Game Console (32-bit, Lexibook)", MACHINE_IS_SKELETON )
 CONS( 2016, lx_frozen,   0,         0,     lexibook_jg7425,   lexibook_jg7425, lexibook_jg7425_state, empty_init, "Lexibook", "Disney Frozen TV Game Console (32-bit, Lexibook, JG7420FZ)", MACHINE_IS_SKELETON )
 
-// slightly different, same basic structore of the external ROM
+// slightly different, but same basic structure of the external ROM
 COMP( 201?, zone3d,      0,         0,      lexibook_jg7425,  lexibook_jg7425, lexibook_jg7425_state, empty_init,"Zone", "Zone 3D", MACHINE_IS_SKELETON )
