@@ -830,7 +830,7 @@ offs_t xtensa_disassembler::disassemble(std::ostream &stream, offs_t pc, const x
 			case 0b0000: case 0b0001: case 0b0010: case 0b0011: // DPFR, DPFW, DPFRO, DPFWO (with Data Cache Option)
 			case 0b0100: case 0b0101: case 0b0110: case 0b0111: // DHWB, DHWBI, DHI, DII (with Data Cache Option)
 			case 0b1100: case 0b1110: case 0b1111: // IPF, IHI, III (with Instruction Cache Option)
-				util::stream_format(stream, "%-8sa%d, ", s_cache_ops[BIT(inst, 12, 4)], BIT(inst, 8, 4));
+				util::stream_format(stream, "%-8sa%d, ", s_cache_ops[BIT(inst, 4, 4)], BIT(inst, 8, 4));
 				format_imm(stream, (inst >> 16) * 4);
 				break;
 
