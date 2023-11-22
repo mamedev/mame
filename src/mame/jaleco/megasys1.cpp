@@ -436,7 +436,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(megasys1_state::megasys1C_scanline)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 
 }
-TIMER_DEVICE_CALLBACK_MEMBER(megasys1_bc_iomcu_state::megasys1C_bigstrik_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(megasys1_bc_iomcu_state::megasys1C_iomcu_scanline)
 {
 	int scanline = param;
 
@@ -444,13 +444,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(megasys1_bc_iomcu_state::megasys1C_bigstrik_scanlin
 
 	if(scanline == 0+16) // end of vblank (rising edge)
 	{
-		LOG("%s: megasys1C_bigstrik_scanline: Send INT1 to MCU: (scanline %03d)\n", machine().describe_context(), scanline);
+		LOG("%s: megasys1C_iomcu_scanline: Send INT1 to MCU: (scanline %03d)\n", machine().describe_context(), scanline);
 		m_iomcu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 	}
 
 	if(scanline == 224+16) // start of vblank (falling edge)
 	{
-		LOG("%s: megasys1C_bigstrik_scanline: Clear INT1 to MCU: (scanline %03d)\n", machine().describe_context(), scanline);
+		LOG("%s: megasys1C_iomcu_scanline: Clear INT1 to MCU: (scanline %03d)\n", machine().describe_context(), scanline);
 		m_iomcu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
 	}
 }
@@ -553,9 +553,9 @@ void megasys1_bc_iomcu_state::mcu_port6_w(u8 data)
 /*
   Read handler triggered by the main CPU at some specific address. Used to read data from port 2 of IO MCU
 */
-u16 megasys1_bc_iomcu_state::ip_select_bigstrik_r() // FROM MCU
+u16 megasys1_bc_iomcu_state::ip_select_iomcu_r() // FROM MCU
 {
-	LOG("%s: ip_select_bigstrik_r: Read data from MCU: (data %02x)\n", machine().describe_context(), m_mcu_io_data);
+	LOG("%s: ip_select_iomcu_r: Read data from MCU: (data %02x)\n", machine().describe_context(), m_mcu_io_data);
 
 	return m_mcu_io_data;
 }
@@ -563,9 +563,9 @@ u16 megasys1_bc_iomcu_state::ip_select_bigstrik_r() // FROM MCU
 /*
   Write handler triggered by the main CPU at some specific address. Used to write data to port 1 of IO MCU and send irq0
 */
-void megasys1_bc_iomcu_state::ip_select_bigstrik_w(u16 data) // TO MCU
+void megasys1_bc_iomcu_state::ip_select_iomcu_w(u16 data) // TO MCU
 {
-	LOG("%s: ip_select_bigstrik_w: Send data to MCU: (data %02x)\n", machine().describe_context(), data);
+	LOG("%s: ip_select_iomcu_w: Send data to MCU: (data %02x)\n", machine().describe_context(), data);
 
 	m_mcu_input_data = data;
 
@@ -578,10 +578,10 @@ void megasys1_bc_iomcu_state::iomcu_map(address_map &map)
 	map(0x000000, 0x0fffff).r(FUNC(megasys1_bc_iomcu_state::mcu_capture_inputs_r));
 }
 
-void megasys1_bc_iomcu_state::megasys1C_bigstrik_map(address_map &map)
+void megasys1_bc_iomcu_state::megasys1C_iomcu_map(address_map &map)
 {
 	megasys1C_map(map);
-	map(0x0d8000, 0x0d8001).rw(FUNC(megasys1_bc_iomcu_state::ip_select_bigstrik_r), FUNC(megasys1_bc_iomcu_state::ip_select_bigstrik_w));
+	map(0x0d8000, 0x0d8001).rw(FUNC(megasys1_bc_iomcu_state::ip_select_iomcu_r), FUNC(megasys1_bc_iomcu_state::ip_select_iomcu_w));
 }
 
 
@@ -2128,12 +2128,12 @@ void megasys1_bc_iosim_state::system_C_iosim(machine_config &config)
 
 
 
-void megasys1_bc_iomcu_state::system_C_bigstrik(machine_config &config)
+void megasys1_bc_iomcu_state::system_C_iomcu(machine_config &config)
 {
 	system_C(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_bc_iomcu_state::megasys1C_bigstrik_map);
-	m_scantimer->set_callback(FUNC(megasys1_bc_iomcu_state::megasys1C_bigstrik_scanline));
+	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_bc_iomcu_state::megasys1C_iomcu_map);
+	m_scantimer->set_callback(FUNC(megasys1_bc_iomcu_state::megasys1C_iomcu_scanline));
 
 	TMP91640(config, m_iomcu, SYS_C_CPU_CLOCK); // Toshiba TMP91640, with 16Kbyte internal ROM, 512bytes internal RAM
 	m_iomcu->set_addrmap(AS_PROGRAM, &megasys1_bc_iomcu_state::iomcu_map);
@@ -2294,7 +2294,7 @@ ROM_START( 64street )
 	ROM_LOAD16_BYTE( "64th_07.rom", 0x000001, 0x010000, CRC(13595d01) SHA1(e730a530ca232aab883217fa12804075cb2aa640) )
 
 	ROM_REGION( 0x4000, "iomcu", 0 ) /* TMP91640 Internal Code */
-	ROM_LOAD( "64street.mcu", 0x00000, 0x04000, NO_DUMP )
+	ROM_LOAD( "mo-91009.mcu", 0x00000, 0x04000, CRC(c6f509ac) SHA1(6920bfed0df68452497ae755f0e031387360f356) )
 
 	ROM_REGION( 0x80000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "64th_01.rom", 0x000000, 0x080000, CRC(06222f90) SHA1(52b6cb88b9d2209c16d1633c83c0224b6ebf29dc) )
@@ -2329,7 +2329,7 @@ ROM_START( 64streetja )
 	ROM_LOAD16_BYTE( "64th_07.rom", 0x000001, 0x010000, CRC(13595d01) SHA1(e730a530ca232aab883217fa12804075cb2aa640) )
 
 	ROM_REGION( 0x4000, "iomcu", 0 ) /* TMP91640 Internal Code */
-	ROM_LOAD( "64street.mcu", 0x00000, 0x04000, NO_DUMP )
+	ROM_LOAD( "mo-91009.mcu", 0x00000, 0x04000, CRC(c6f509ac) SHA1(6920bfed0df68452497ae755f0e031387360f356) )
 
 	ROM_REGION( 0x80000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "64th_01.rom", 0x000000, 0x080000, CRC(06222f90) SHA1(52b6cb88b9d2209c16d1633c83c0224b6ebf29dc) )
@@ -2364,7 +2364,7 @@ ROM_START( 64streetj )
 	ROM_LOAD16_BYTE( "64th_07.rom", 0x000001, 0x010000, CRC(13595d01) SHA1(e730a530ca232aab883217fa12804075cb2aa640) )
 
 	ROM_REGION( 0x4000, "iomcu", 0 ) /* TMP91640 Internal Code */
-	ROM_LOAD( "64street.mcu", 0x00000, 0x04000, NO_DUMP )
+	ROM_LOAD( "mo-91009.mcu", 0x00000, 0x04000, CRC(c6f509ac) SHA1(6920bfed0df68452497ae755f0e031387360f356) )
 
 	ROM_REGION( 0x80000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "64th_01.rom", 0x000000, 0x080000, CRC(06222f90) SHA1(52b6cb88b9d2209c16d1633c83c0224b6ebf29dc) )
@@ -3055,7 +3055,7 @@ ROM_START( cybattlr )
 	ROM_LOAD16_BYTE( "cb_07.rom", 0x000001, 0x010000, CRC(85d219d7) SHA1(a9628efc5eddefad739363ff0b2f37a2d095df86) )
 
 	ROM_REGION( 0x4000, "iomcu", 0 ) /* TMP91640 Internal Code */
-	ROM_LOAD( "cybattlr.mcu", 0x00000, 0x04000, NO_DUMP )
+	ROM_LOAD( "mo-91028.mcu", 0x00000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "cb_m01.rom", 0x000000, 0x080000, CRC(1109337f) SHA1(ab294d87c9b4eb54401da5ad6ea171e4c0a700b5) )
@@ -4207,7 +4207,7 @@ Jaleco board no. PB-92127A
   CPU: Motorola 68000P10
 Sound: OKI M6295
   OSC: 8Mhz
-  MCU: MO-90233 (unknown type with internal rom)
+  MCU: MO-92033 (unknown type with internal rom)
 
 interrupts:
     1]      506>    rte
@@ -4296,7 +4296,7 @@ ROM_START( peekaboo )
 	ROM_LOAD16_BYTE( "peek a boo j ver 1.1 - 2.ic28", 0x000001, 0x020000, CRC(7b3d430d) SHA1(8b48101929da4938a61dfd0eda845368c4184831) )
 
 	ROM_REGION( 0x4000, "mcu", 0 ) /* MCU Internal Code - probably TMP91640 */
-	ROM_LOAD( "mo-90233.mcu", 0x000000, 0x4000, NO_DUMP )
+	ROM_LOAD( "mo-92033.mcu", 0x000000, 0x4000, NO_DUMP )
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "5",       0x000000, 0x080000, CRC(34fa07bb) SHA1(0f688acf302fd56701ee4fcc1d692adb7bf86ce4) )
@@ -4320,7 +4320,7 @@ ROM_START( peekaboou )
 	ROM_LOAD16_BYTE( "pb92127a_2_ver1.0.ic28", 0x000001, 0x020000, CRC(7bf4716b) SHA1(f2c0bfa32426c9816d9d3fbd73560566a497912d) )
 
 	ROM_REGION( 0x4000, "mcu", 0 ) /* MCU Internal Code - probably TMP91640 */
-	ROM_LOAD( "mo-90233.mcu", 0x000000, 0x4000, NO_DUMP )
+	ROM_LOAD( "mo-92033.mcu", 0x000000, 0x4000, NO_DUMP )
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "5",       0x000000, 0x080000, CRC(34fa07bb) SHA1(0f688acf302fd56701ee4fcc1d692adb7bf86ce4) )
@@ -5174,14 +5174,6 @@ void megasys1_bc_iosim_state::init_hayaosi1() // Type B
 	m_ip_select_values = hayaosi1_seq;
 }
 
-void megasys1_bc_iosim_state::init_64street() // Type C
-{
-//  u16 *ROM = (u16 *) memregion("maincpu")->base();
-//  ROM[0x006b8/2] = 0x6004;        // d8001 test
-//  ROM[0x10EDE/2] = 0x6012;        // watchdog
-	m_ip_select_values = street_seq;
-}
-
 void megasys1_bc_iosim_state::init_chimeraba() // Type C
 {
 	m_ip_select_values = chimeraba_seq;
@@ -5279,10 +5271,10 @@ GAME( 1991, edfbl,      edf,      system_Bbl,        edf,      megasys1_state,  
 GAME( 1993, hayaosi1,   0,        system_B_hayaosi1, hayaosi1, megasys1_bc_iosim_state, init_hayaosi1, ROT0,   "Jaleco", "Hayaoshi Quiz Ouza Ketteisen - The King Of Quiz", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 // Type C
-GAME( 1991, 64street,   0,        system_C_iosim,          64street, megasys1_bc_iosim_state, init_64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, 64streetj,  64street, system_C_iosim,          64street, megasys1_bc_iosim_state, init_64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, 64streetja, 64street, system_C_iosim,          64street, megasys1_bc_iosim_state, init_64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, bigstrik,   0,        system_C_bigstrik,       bigstrik, megasys1_bc_iomcu_state, empty_init,    ROT0,   "Jaleco", "Big Striker", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, 64street,   0,        system_C_iomcu,          64street, megasys1_bc_iomcu_state, empty_init,    ROT0,   "Jaleco", "64th. Street - A Detective Story (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, 64streetj,  64street, system_C_iomcu,          64street, megasys1_bc_iomcu_state, empty_init,    ROT0,   "Jaleco", "64th. Street - A Detective Story (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, 64streetja, 64street, system_C_iomcu,          64street, megasys1_bc_iomcu_state, empty_init,    ROT0,   "Jaleco", "64th. Street - A Detective Story (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, bigstrik,   0,        system_C_iomcu,          bigstrik, megasys1_bc_iomcu_state, empty_init,    ROT0,   "Jaleco", "Big Striker", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, chimerab,   0,        system_C_iosim,          chimerab, megasys1_bc_iosim_state, init_cybattlr, ROT0,   "Jaleco", "Chimera Beast (Japan, prototype, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, chimeraba,  chimerab, system_C_iosim,          chimerab, megasys1_bc_iosim_state, init_chimeraba,ROT0,   "Jaleco", "Chimera Beast (Japan, prototype, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, cybattlr,   0,        system_C_iosim,          cybattlr, megasys1_bc_iosim_state, init_cybattlr, ROT90,  "Jaleco", "Cybattler", MACHINE_SUPPORTS_SAVE )

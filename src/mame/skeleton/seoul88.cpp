@@ -210,9 +210,20 @@ static INPUT_PORTS_START( seoul88 ) // there are 3 8-dip banks on PCB but test m
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW3:8")
 INPUT_PORTS_END
 
+const gfx_layout gfx_8x32x4 =
+{
+	8,32,
+	RGN_FRAC(1,4),
+	4,
+	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
+	{ STEP8(0,1) },
+	{ STEP32(0,8) },
+	32*8
+};
+
 static GFXDECODE_START( gfx_seoul88 )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_planar,   0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_planar, 128,  8 )  // TODO
+	GFXDECODE_ENTRY( "fgtiles", 0, gfx_8x8x4_planar,    0, 16 )
+	GFXDECODE_ENTRY( "reels",   0, gfx_8x32x4,        128,  8 )  // TODO: decode may be not 100% correct
 GFXDECODE_END
 
 void seoul88_state::seoul88(machine_config &config)
@@ -250,10 +261,10 @@ ROM_START( seoul88 )
 	ROM_REGION( 0x4000, "mcu", 0 )
 	ROM_LOAD( "at89c2051-24pc.u1",   0x0000, 0x4000, NO_DUMP ) // 2 Kbytes internal ROM
 
-	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_REGION( 0x20000, "fgtiles", 0 )
 	ROM_LOAD( "amic_a277308-90.u07", 0x00000, 0x20000, CRC(ea0aafdc) SHA1(232fc5a542d7b61f466e82bc0a8e14b3f2f81e1d) )
 
-	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_REGION( 0x20000, "reels", 0 )
 	ROM_LOAD( "mx_28f1000ppc.u43",   0x00000, 0x20000, CRC(b824f1c6) SHA1(a390e7cc4e5705770f4f8d9c604ad304982aabf8) )
 
 	ROM_REGION( 0x0700, "proms", 0 )

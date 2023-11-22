@@ -113,7 +113,6 @@ private:
 
 	void main_map(address_map &map);
 
-	void standby(int state);
 	void update_display();
 	void mux_w(u8 data);
 	void leds_w(u8 data);
@@ -153,12 +152,6 @@ void leo_state::machine_start()
 void leo_state::machine_reset()
 {
 	m_stb->in_clear<0>();
-}
-
-void leo_state::standby(int state)
-{
-	if (state)
-		m_display->clear();
 }
 
 INPUT_CHANGED_MEMBER(leo_state::go_button)
@@ -400,7 +393,8 @@ void leo_state::leonardo(machine_config &config)
 	HD6303Y(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &leo_state::main_map);
 	m_maincpu->nvram_enable_backup(true);
-	m_maincpu->standby_cb().set(FUNC(leo_state::standby));
+	m_maincpu->standby_cb().set(m_maincpu, FUNC(hd6303y_cpu_device::nvram_set_battery));
+	m_maincpu->standby_cb().append([this](int state) { if (state) m_display->clear(); });
 	m_maincpu->in_p2_cb().set(FUNC(leo_state::p2_r));
 	m_maincpu->out_p2_cb().set(FUNC(leo_state::p2_w));
 	m_maincpu->in_p5_cb().set(FUNC(leo_state::p5_r));

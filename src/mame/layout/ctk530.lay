@@ -325,8 +325,8 @@ license:CC0-1.0
 		<element ref="blackkey"    inputtag="maincpu:kbd:FI6" inputmask="0x02"><bounds x="2426" y="108" width="44" height="324" /></element>
 		<element ref="blackkey"    inputtag="maincpu:kbd:FI6" inputmask="0x08"><bounds x="2529" y="108" width="44" height="324" /></element>
 		<element ref="blackkey"    inputtag="maincpu:kbd:FI6" inputmask="0x40"><bounds x="2669" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="maincpu:kbd:FI7" inputmask="0x04"><bounds x="2857" y="108" width="44" height="324" /></element>
 		<element ref="blackkey"    inputtag="maincpu:kbd:FI7" inputmask="0x01"><bounds x="2763" y="108" width="44" height="324" /></element>
+		<element ref="blackkey"    inputtag="maincpu:kbd:FI7" inputmask="0x04"><bounds x="2857" y="108" width="44" height="324" /></element>
 		<element ref="whitekey-l"  inputtag="maincpu:kbd:FI6" inputmask="0x01"><bounds x="2378" y="108" width="79" height="504" /></element>
 		<element ref="whitekey-m"  inputtag="maincpu:kbd:FI6" inputmask="0x04"><bounds x="2460" y="108" width="79" height="504" /></element>
 		<element ref="whitekey-r"  inputtag="maincpu:kbd:FI6" inputmask="0x10"><bounds x="2542" y="108" width="79" height="504" /></element>

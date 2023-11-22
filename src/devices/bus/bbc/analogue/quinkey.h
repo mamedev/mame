@@ -83,7 +83,7 @@ public:
 protected:
 	device_bbc_quinkey_interface(const machine_config &mconfig, device_t &device);
 
-	bbc_quinkey_slot_device *m_slot;
+	bbc_quinkey_slot_device *const m_slot;
 };
 
 
