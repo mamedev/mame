@@ -1235,7 +1235,7 @@ ROM_START( syutnori )
 	ROM_LOAD( "7_atf16v8b.bin",    0x0c00, 0x0117, NO_DUMP ) // protected
 	ROM_LOAD( "8_atf16v8b.bin",    0x0e00, 0x0117, CRC(651d1414) SHA1(5df95529abcbf9104437082eee52648d9eabb99d) )
 	ROM_LOAD( "9_palce20v8h.bin",  0x1000, 0x0157, NO_DUMP ) // protected
-	ROM_LOAD( "10_palce20v8h.bin", 0x1200, 0x0157, CRC(81fe0f0e) SHA1(b5a6c96cfe0ce1694ed84328f8262ee998e53407) )
+	ROM_LOAD( "10_palce20v8h.bin", 0x1200, 0x0157, NO_DUMP ) // protected
 ROM_END
 
 } // anonymous namespace
