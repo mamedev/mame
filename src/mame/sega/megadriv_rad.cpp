@@ -534,6 +534,11 @@ ROM_START( rad_md1 )
 	ROM_LOAD16_WORD_SWAP( "radica_megadrive_vol1_blue_europe.bin", 0x000000, 0x400000, CRC(85867db1) SHA1(ddc596e2e68dc872bc0679a2de7a295b4c6d6b8e) )
 ROM_END
 
+ROM_START( rad_md1uk )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "radicauk.u2", 0x000000, 0x400000, CRC(03a6734b) SHA1(255048d46b593bc975b3a6c44e8b8e35917511c7) )
+ROM_END
+
 ROM_START( rad_gen2 )
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "radica_genesis_vol2_red_usa.bin", 0x000000, 0x400000, CRC(7c1a0f0e) SHA1(a6441f75a4cd48f1563aeafdfbdde00202d4067c) )
@@ -703,7 +708,7 @@ void megadriv_ra145_state::init_ra145()
 
 CONS( 2004, rad_gen1,  0,        0, megadriv_radica_3button_ntsc, radica_3button_1player, megadriv_radica_state, init_megadriv, "Radica / Sega",                     "Genesis Collection Volume 1 (Radica, Arcade Legends) (USA)", 0)
 CONS( 2004, rad_md1,   rad_gen1, 0, megadriv_radica_3button_pal,  radica_3button_1player, megadriv_radica_state, init_megadrie, "Radica / Sega",                     "Mega Drive Collection Volume 1 (Radica, Arcade Legends) (Europe)", 0)
-// A UK version exists, showing the Radica UK boot screen
+CONS( 2004, rad_md1uk, rad_gen1, 0, megadriv_radica_3button_pal,  radica_3button_1player, megadriv_radica_state, init_megadrie, "Radica / Sega",                     "Mega Drive Collection Volume 1 (Radica, Arcade Legends) (UK)", 0)
 
 CONS( 2004, rad_gen2,  0,        0, megadriv_radica_3button_ntsc, radica_3button_1player, megadriv_radica_state, init_megadriv, "Radica / Sega",                     "Genesis Collection Volume 2 (Radica, Arcade Legends) (USA)", 0)
 CONS( 2004, rad_md2,   rad_gen2, 0, megadriv_radica_3button_pal,  radica_3button_1player, megadriv_radica_state, init_megadrie, "Radica / Sega",                     "Mega Drive Collection Volume 2 (Radica, Arcade Legends) (UK)", 0)
