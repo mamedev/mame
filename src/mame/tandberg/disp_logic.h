@@ -32,10 +32,11 @@ protected:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	required_device<screen_device>  m_screen;
-	required_device<palette_device> m_palette;
-	required_memory_region          m_font;
-	memory_share_creator<uint8_t>   m_vram;
+	required_device<screen_device>  	m_screen;
+	required_device<palette_device> 	m_palette;
+	required_memory_region          	m_font;
+	memory_share_creator<uint8_t>   	m_vram;
+	required_device<beep_device>		m_beep;
 
 private:
 	uint8_t attribute;
@@ -56,7 +57,13 @@ private:
 	bool underline_input;
 	bool cursor_x_input;
 	bool cursor_y_input;
-	
+
+	bool speed_check;
+	emu_timer *m_beep_trigger;
+	emu_timer *m_speed_ctrl;
+	TIMER_CALLBACK_MEMBER(expire_speed_check);
+	TIMER_CALLBACK_MEMBER(end_beep);
+
 	void data_to_display(uint8_t byte);
 	void char_to_display(uint8_t byte);
 	void advance_cursor();

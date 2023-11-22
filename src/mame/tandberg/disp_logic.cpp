@@ -75,7 +75,6 @@
 	    * Add UART
 	    * Add keyboard w/indicators
 	    * Add reset
-	    * Add beeps
 	    * Add CPU interface
 	    * Add interrupts
 	    * Make DIP switches selectable
@@ -94,8 +93,11 @@ tandberg_disp_logic_device::tandberg_disp_logic_device(const machine_config &mco
 	m_screen(*this, "screen"),
 	m_palette(*this, "palette"),
 	m_font(*this, "display_font_rom"),
-	m_vram(*this, "video_ram", 0x800, ENDIANNESS_LITTLE)
+	m_vram(*this, "video_ram", 0x800, ENDIANNESS_LITTLE),
+	m_beep(*this, "beep")
 {
+	speed_check = false;
+	
 	attribute = 0;
 	frame_counter = 0;
 	cursor_x = 0;
@@ -266,7 +268,8 @@ void tandberg_disp_logic_device::char_to_display(uint8_t byte){
 
 				// BEL, Sound beeper
 				case 0x07:
-					// TODO
+					m_beep->set_state(1);
+					m_beep_trigger->adjust(attotime::from_usec(70000));
 					break;
 
 				// ENQ, Light ENQIRY indicator
@@ -315,7 +318,10 @@ void tandberg_disp_logic_device::data_to_display(uint8_t byte){
 void tandberg_disp_logic_device::advance_cursor()
 {
 	cursor_x++;
-	if(cursor_x > 79)
+	if(cursor_x == 72 && !speed_check){
+		char_to_display(0x07);
+	}
+	else if(cursor_x > 79)
 	{
 		if(auto_cr_lf)
 		{
@@ -327,9 +333,27 @@ void tandberg_disp_logic_device::advance_cursor()
 			cursor_x = 79;
 		}
 	}
+	speed_check = true;
+	m_speed_ctrl->adjust(attotime::from_usec(16121));
+}
+
+TIMER_CALLBACK_MEMBER(tandberg_disp_logic_device::end_beep)
+{
+	m_beep->set_state(0);
+}
+
+TIMER_CALLBACK_MEMBER(tandberg_disp_logic_device::expire_speed_check)
+{
+	speed_check = false;
 }
 
 void tandberg_disp_logic_device::device_start()
+{
+	m_beep_trigger = timer_alloc(FUNC(tandberg_disp_logic_device::end_beep), this);
+	m_speed_ctrl = timer_alloc(FUNC(tandberg_disp_logic_device::expire_speed_check), this);
+}
+
+void tandberg_disp_logic_device::device_reset()
 {
 	uint8_t attribute_chars[6] = {' ', '0', 'A', 'Q', 'a', 'q'};
 	char_to_display(0x19);
@@ -360,10 +384,8 @@ void tandberg_disp_logic_device::device_start()
 	char_to_display(23);
 	char_to_display(20);
 	for(char c: "Testing random cursor position") char_to_display(c);
-}
 
-void tandberg_disp_logic_device::device_reset()
-{
+	char_to_display(0x07);
 }
 
 uint32_t tandberg_disp_logic_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -488,11 +510,16 @@ uint32_t tandberg_disp_logic_device::screen_update(screen_device &screen, bitmap
 
 void tandberg_disp_logic_device::device_add_mconfig(machine_config &config)
 {
-	/* video hardware */
+	/* Video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
 	m_screen->set_raw(DOT_CLOCK, 999, 0, 783, 402, 0, 350);
 	m_screen->set_screen_update(FUNC(tandberg_disp_logic_device::screen_update));
 	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
+
+	/* Sound */
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, m_beep, 2000);
+	m_beep->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 ROM_START(tdv2115l)

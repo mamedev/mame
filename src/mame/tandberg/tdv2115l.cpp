@@ -70,4 +70,4 @@ ROM_END
 
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY     FULLNAME     FLAGS
-COMP( 1976, tdv2115l, 0,      0,      tdv2115l, tdv2115l, tdv2115l_state, empty_init, "Tandberg", "TDV-2115L", MACHINE_NO_SOUND )
+COMP( 1976, tdv2115l, 0,      0,      tdv2115l, tdv2115l, tdv2115l_state, empty_init, "Tandberg", "TDV-2115L", 0 )
