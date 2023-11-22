@@ -1117,7 +1117,7 @@ void heath_superset_tlb_device::device_add_mconfig(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &heath_superset_tlb_device::io_map);
 
 	// per line updates are needed for onscreen menu to display properly
-	m_screen->scanline().set([](int scanline) {});
+	m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);
 
 	m_crtc->set_update_row_callback(FUNC(heath_superset_tlb_device::crtc_update_row));
 
