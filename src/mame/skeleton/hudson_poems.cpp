@@ -16,12 +16,12 @@
 
    Known PLAY-POEMS devices (all from Konami)
 
-   2004/11/11   熱血パワプロチャンプ									(Baseball game)
-   2004/11/11   爽快ゴルフチャンプ										(Golf game)
-   2004/12/09   絶体絶命でんぢゃらすじーさん ミニゲームで対決じゃっ!		(Mini-Game Collection)
-   2005/09/15   マリンバ天国											(Marimba Tengoku)
-   2005/11/17   絶体絶命でんぢゃらすじーさん パーティーじゃっ!全員集合!!	(Mini-Game Collection)
-   2005/11/24   ぐ〜チョコランタン スプーだいすき!プレイマット				(Kid's Floor Mat)
+   2004/11/11   熱血パワプロチャンプ                                  (Baseball game)
+   2004/11/11   爽快ゴルフチャンプ                                       (Golf game)
+   2004/12/09   絶体絶命でんぢゃらすじーさん ミニゲームで対決じゃっ!     (Mini-Game Collection)
+   2005/09/15   マリンバ天国                                          (Marimba Tengoku)
+   2005/11/17   絶体絶命でんぢゃらすじーさん パーティーじゃっ!全員集合!!  (Mini-Game Collection)
+   2005/11/24   ぐ〜チョコランタン スプーだいすき!プレイマット                (Kid's Floor Mat)
 
  */
 

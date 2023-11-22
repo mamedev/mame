@@ -65,8 +65,8 @@
 
     Packaging also shows 'On-Key Karaoke' logo on box, maybe this is the original US / Canada product name?
 
-	"Karaoke TV Star" appears to be a US product using this technology - advertises 50 built in songs, but
-	also a downloadable service.  It has a 2002 date on the box / product.  Another version offers 35 songs
+    "Karaoke TV Star" appears to be a US product using this technology - advertises 50 built in songs, but
+    also a downloadable service.  It has a 2002 date on the box / product.  Another version offers 35 songs
 
 *******************************************************************************/
 

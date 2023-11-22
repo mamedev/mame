@@ -1,4 +1,3 @@
-
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
@@ -75,7 +74,7 @@ void lexibook_jg7425_state::machine_reset()
 	FC 01 70 A0 (address A07001FC) - maybe top of program to copy?
 	00 10 50 A0 (address A0501000) - entry point??
 	20 00 00 98 (address 98000020)
-	00 00 00 00 
+	00 00 00 00
 
 	then there is a program which loads at A05001FC between 0x20 - 0x6DBD3
 	this program is then partially repeated until it is abruptly cut off
@@ -87,8 +86,6 @@ void lexibook_jg7425_state::machine_reset()
 	uint32_t loadaddr = (m_romregion[0x0c] << 0) | (m_romregion[0x0d] << 8) | (m_romregion[0x0e] << 16) | (m_romregion[0x0f] << 24);
 	uint32_t endaddr  = (m_romregion[0x10] << 0) | (m_romregion[0x11] << 8) | (m_romregion[0x12] << 16) | (m_romregion[0x13] << 24);
 	uint32_t entry    = (m_romregion[0x14] << 0) | (m_romregion[0x15] << 8) | (m_romregion[0x16] << 16) | (m_romregion[0x17] << 24);
-
-	printf("entries %08x %08x %08x\n", loadaddr, endaddr, entry);
 
 	uint8_t* rom = (uint8_t*)&m_romregion[0];
 
@@ -113,9 +110,11 @@ uint32_t lexibook_jg7425_state::screen_update(screen_device &screen, bitmap_rgb3
 
 void lexibook_jg7425_state::map(address_map &map)
 {
-	map(0xa0000000, 0xa0ffffff).ram();
+
+	map(0xa0000000, 0xa0ffffff).ram().share("mainram");
 
 	map(0x9f000000, 0x9fffffff).ram().share("mainram");
+	map(0xbf000000, 0xbfffffff).ram().share("mainram");
 
 	// it quickly ends up jumping to BF000024, which is probably internal ROM - can we simulate what it wants?
 }

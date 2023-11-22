@@ -546,7 +546,7 @@ void spg29x_nand_game_state::nand_jak_bbsf()
 void spg29x_zonefamf_game_state::nand_zonefamf()
 {
 	nand_init(0x840, 0x800);
-//	m_firstvector = 0x8;
+//  m_firstvector = 0x8;
 }
 
 /* ROM definition */
