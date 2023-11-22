@@ -9,12 +9,21 @@
    https://web.archive.org/web/20021207035427/http://www.tensilica.com/html/pr_2002_10_15.html
 
    The above links mention Konami using this hardware for a PLAY-POEMS plug and play sports
-   device, so it is likely Marimba Tengoku uses the same.
-
-   this likely means this is using an Xtensa instruction set (needs verifiecation)
+   devices, and indicate it is based around the Xtensa instruction set, which has been confirmed
+   for the single dumped device.
 
    https://0x04.net/~mwk/doc/xtensa.pdf
-*/
+
+   Known PLAY-POEMS devices (all from Konami)
+
+   2004/11/11   熱血パワプロチャンプ									(Baseball game)
+   2004/11/11   爽快ゴルフチャンプ										(Golf game)
+   2004/12/09   絶体絶命でんぢゃらすじーさん ミニゲームで対決じゃっ!		(Mini-Game Collection)
+   2005/09/15   マリンバ天国											(Marimba Tengoku)
+   2005/11/17   絶体絶命でんぢゃらすじーさん パーティーじゃっ!全員集合!!	(Mini-Game Collection)
+   2005/11/24   ぐ〜チョコランタン スプーだいすき!プレイマット				(Kid's Floor Mat)
+
+ */
 
 #include "emu.h"
 
@@ -60,7 +69,7 @@ uint32_t hudsom_poems::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 void hudsom_poems::hudson_poems(machine_config &config)
 {
 	// 27Mhz XTAL
-	
+
 	// Xtensa based CPU?
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
