@@ -19,8 +19,6 @@
       - 49/50 row mode only shows half the screen.
       - In 49/50 row mode, character descenders are cut off.
       - Screen saver does not disable the screen
-    - With superset slot option
-      - Screensaver freezes the screen instead of blanking the screen	
 
 ****************************************************************************/
 /***************************************************************************
