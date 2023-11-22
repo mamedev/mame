@@ -2957,6 +2957,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/psion_condor.h,MACHINES["PSION_CONDOR"] = true
+---------------------------------------------------
+
+if (MACHINES["PSION_CONDOR"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/psion_condor.cpp",
+		MAME_DIR .. "src/devices/machine/psion_condor.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/psion_ssd.h,MACHINES["PSION_SSD"] = true
 ---------------------------------------------------
 
