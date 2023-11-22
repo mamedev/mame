@@ -723,7 +723,7 @@ void segaai_state::segaai(machine_config &config)
 	SOFTWARE_LIST(config, "software").set_original("segaai");
 
 	// Expansion slot
-	SEGAAI_EXP_SLOT(config, m_expslot, segaai_exp, nullptr, 21'477'272/6);  // not verified, assuming 3.58MHz
+	SEGAAI_EXP_SLOT(config, m_expslot, 21'477'272/6, segaai_exp, nullptr);  // not verified, assuming 3.58MHz
 	m_expslot->set_mem_space(m_maincpu, AS_PROGRAM);
 	m_expslot->set_io_space(m_maincpu, AS_IO);
 
