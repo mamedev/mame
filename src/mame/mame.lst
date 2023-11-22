@@ -45468,15 +45468,15 @@ gjrstar2                        // Genius Junior Redstar 2 (Germany)
 gjrstar3                        // Genius Junior Redstar 3 (Germany)
 gln                             // Genius Leader Notebook
 gls                             // Genius Leader Select
-pitagor                         // Pitagorin
 pcompelr                        // Prekomputer Elektronik (Russia)
 pitagjr                         // Pitagorin Junior
+pitagor                         // Pitagorin
 scientus                        // Scientus (France, from C.Q.F.D)
 
 @source:vtech/gkidabc.cpp
+gjrprofi                        // Genius Junior Profi (Germany)
 gkidabc                         // Genius KID ABC Fan (Germany)
 miprimlec                       // Mis Primeras Lecciones (Spain)
-gjrprofi                        // Genius Junior Profi (Germany)
 
 @source:vtech/glcx.cpp
 bs9009cx                        // 1999 BrainStation 9009 CXL (Germany)

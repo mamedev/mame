@@ -432,7 +432,7 @@ COMP( 1993,  gjmovie,  0,       0,      gjmovie,  geniusjr, geniusjr_state, empt
 COMP( 199?,  pitagjr,  gjmovie, 0,      gjmovie,  geniusjr, geniusjr_state, empty_init, "VTech",   "Pitagorin Junior",                  MACHINE_IS_SKELETON )
 COMP( 1996,  gjrstar,  0,       0,      gjrstar,  geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Junior Redstar (Germany)",   MACHINE_IS_SKELETON )
 COMP( 1996,  gjrstar2, gjrstar, 0,      gjrstar,  geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Junior Redstar 2 (Germany)", MACHINE_IS_SKELETON )
-COMP( 1995,  pcompelr, gjrstar, 0,      gjrstar,  geniusjr, geniusjr_state, empty_init, "VTech",   "Prekomputer Elektronik (Russia)",   MACHINE_IS_SKELETON ) // Прекомпьютер Электроник
+COMP( 1995,  pcompelr, gjrstar, 0,      gjrstar,  geniusjr, geniusjr_state, empty_init, "VTech",   "Precomputer Elektronik (Russia)",   MACHINE_IS_SKELETON ) // Прекомпьютер Электроник
 COMP( 1998,  gjrstar3, 0,       0,      gjrstar,  geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Junior Redstar 3 (Germany)", MACHINE_IS_SKELETON )
 COMP( 1998,  gj5000,   0,       0,      gj5000,   geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Junior 5000 (Germany)",      MACHINE_IS_SKELETON )
 COMP( 1993,  gln,      0,       0,      gln,      geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Leader Notebook",            MACHINE_IS_SKELETON )
