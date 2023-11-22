@@ -30,7 +30,7 @@ Eibise                 (C) 1990 Taito.
 TODO:
 
 - Opto coin chutes, similar if not same as taito/pkspirit.cpp
-- parentj: throws "MESSAGE ERROR" on boot, hold BOOKS and SERVICE (keys 9 and 0) at boot.
+- parentj: throws "MESSAGE ERROR" on boot, hold ALL CLEAR SW and RESET (keys 9 and R) for a little while.
   Notice that holding SERVICE1 (reset) implicitly means no NVRAM restore.
 - parentj: lower part of dealer arm GFX is x flipped,
   is it even supposed to be shown but rather be masked by the text layer?
@@ -81,8 +81,7 @@ public:
 		m_hopper(*this, "hopper")
 	{ }
 
-	void parentj(machine_config &config);
-	void eibise(machine_config &config);
+	void taitoo(machine_config &config);
 
 private:
 	// devices
@@ -98,11 +97,11 @@ private:
 	required_device<hopper_device> m_hopper;
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(eibise_int);
-	TIMER_DEVICE_CALLBACK_MEMBER(parentj_int);
+	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 	u32 draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, u32 start_offset);
 	void prg_map(address_map &map);
-
+	void taitoo_hopper_int_cb(int state);
+	
 	u16 m_hoppff = 0x0000;
 };
 
@@ -337,7 +336,7 @@ static INPUT_PORTS_START( eibise )
 INPUT_PORTS_END
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(taitoo_state::parentj_int)
+TIMER_DEVICE_CALLBACK_MEMBER(taitoo_state::interrupt)
 {
 	int scanline = param;
 
@@ -348,54 +347,22 @@ TIMER_DEVICE_CALLBACK_MEMBER(taitoo_state::parentj_int)
 	// reads I/O
 	if (scanline == 0)
 		m_maincpu->set_input_line(5, HOLD_LINE);
-	
-	// add a flip flop to coin_out sensor, to interrupt once per coin
-	bool hopper_sw = BIT(ioport("IN1")->read(), 9);
-	bool bit_dwn = 0;
-	bool change = 0;
-	change = m_hoppff ^ hopper_sw;     // detect change
-	bit_dwn = change && !hopper_sw;    // detect fall down change
-	logerror("timer: m_hoppff:%01x - bit_up:%01x - change:%01x - hopper_sw:%01x\n", m_hoppff, bit_dwn, change, hopper_sw);
-	if (bit_dwn)
-	{
-		logerror("timer: coin out interrupt\n");
-		m_maincpu->set_input_line(6, HOLD_LINE);
-	}
-	m_hoppff = hopper_sw;  // keep ff state
+
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(taitoo_state::eibise_int)
+void taitoo_state::taitoo_hopper_int_cb(int state)
 {
-	int scanline = param;
-
-	// vblank irq
-	if (scanline == 448)
-		m_maincpu->set_input_line(4, HOLD_LINE);
-
-	// reads I/O
-	if (scanline == 0)
-		m_maincpu->set_input_line(5, HOLD_LINE);
-	
-	// add a flip flop to coin_out sensor, to interrupt once per coin
-	bool hopper_sw = BIT(ioport("IN1")->read(), 9);
-	bool bit_up = 0;
-	bool change = 0;
-	change = m_hoppff ^ hopper_sw;  // detect change
-	bit_up = change && hopper_sw;    // detect rise up change
-	logerror("timer: m_hoppff:%01x - bit_up:%01x - change:%01x - hopper_sw:%01x\n", m_hoppff, bit_up, change, hopper_sw);
-	if(bit_up)
-	{
-		logerror("timer: coin out interrupt\n");
+	// Add a flip flop to coin_out sensor, to interrupt once per coin
+	if ((m_hoppff != state) && !state)	
 		m_maincpu->set_input_line(6, HOLD_LINE);
-	}
-	m_hoppff = hopper_sw;  // keep ff state
+	m_hoppff = state;  // keep ff state	
 }
 
-void taitoo_state::parentj(machine_config &config)
+void taitoo_state::taitoo(machine_config &config)
 {
 	M68000(config, m_maincpu, 12000000);       //?? MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitoo_state::prg_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(taitoo_state::parentj_int), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(taitoo_state::interrupt), "screen", 0, 1);
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
@@ -420,6 +387,7 @@ void taitoo_state::parentj(machine_config &config)
 	m_tc0080vco->set_palette(m_palette);
 
 	HOPPER(config, m_hopper, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	m_hopper->dispense_handler().set(FUNC(taitoo_state::taitoo_hopper_int_cb));
 	
 	SPEAKER(config, "mono").front_center();
 
@@ -429,11 +397,6 @@ void taitoo_state::parentj(machine_config &config)
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-void taitoo_state::eibise(machine_config &config)
-{
-	parentj(config);
-	TIMER(config.replace(), "scantimer").configure_scanline(FUNC(taitoo_state::eibise_int), "screen", 0, 1);
-}	
 
 ROM_START( parentj )
 	ROM_REGION( 0x20000, "maincpu", 0 ) // 68000 Code
@@ -480,5 +443,5 @@ ROM_END
 } // anonymous namespace
 
 //    YEAR  NAME      PARENT   MACHINE   INPUT     CLASS         INIT        ROT    COMPANY  FULLNAME              FLAGS
-GAME( 1989, parentj,  0,       parentj,  parentj,  taitoo_state, empty_init, ROT0, "Taito", "Parent Jack (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, eibise,   0,       eibise,   eibise,   taitoo_state, empty_init, ROT0, "Taito", "Eibise (Japan)",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, parentj,  0,       taitoo,   parentj,  taitoo_state, empty_init, ROT0, "Taito", "Parent Jack (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, eibise,   0,       taitoo,   eibise,   taitoo_state, empty_init, ROT0, "Taito", "Eibise (Japan)",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
