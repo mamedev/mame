@@ -417,15 +417,15 @@ INPUT_PORTS_END
 // 0 -> 1 clocks NMI, 1 -> 0 pushes data to the ADPCM if available from the bus.
 void suprgolf_state::adpcm_int(int state)
 {
-	if (!state && m_adpcm_available_data)
+	if(!state && m_adpcm_available_data)
 	{
 		m_msm->data_w(m_adpcm_data >> 4);
 		m_adpcm_data <<= 4;
-		m_adpcm_available_data --;
+		m_adpcm_available_data--;
 		return;
 	}
 
-	if (state && m_adpcm_available_data == 0 && m_adpcm_nmi_enable)
+	if(state && m_adpcm_available_data == 0 && m_adpcm_nmi_enable)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 

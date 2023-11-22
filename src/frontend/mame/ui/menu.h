@@ -278,7 +278,7 @@ protected:
 		float maxwidth(origwidth);
 		for (Iter it = begin; it != end; ++it)
 		{
-			std::string_view const line(*it);
+			std::string_view const &line(*it);
 			if (!line.empty())
 			{
 				text_layout layout(*ui().get_font(), text_size * m_last_aspect, text_size, 1.0, justify, wrap);

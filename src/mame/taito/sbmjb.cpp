@@ -48,6 +48,8 @@
 #include "sound/okim6295.h"
 #include "sound/ymopn.h"
 
+#include "taitoio_opto.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -60,7 +62,8 @@ public:
 	sbmjb_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_vdpcpu(*this, "vdpcpu")
+		m_vdpcpu(*this, "vdpcpu"),
+		m_opto(*this, "opto")
 	{ }
 
 	void honooinv(machine_config &config);
@@ -69,6 +72,7 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<tc0091lvc_device> m_vdpcpu;
+	required_device<taitoio_opto_device> m_opto;
 
 	void screen_vblank(int state);
 
@@ -121,33 +125,33 @@ void sbmjb_state::tc0091lvc_map(address_map &map) // TODO: copy-pasted from othe
 
 static INPUT_PORTS_START( honooinv ) // no dips on PCB, game options selectable in test mode
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("Separator") // in I/O test; also seems to have effect on 'Hopper Rotation'. Effects shown also in the shot test
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("Separator") // in I/O test; also seems to have effect on 'Hopper Rotation'. Effects shown also in the shot test
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("Select Sw") // in I/O test
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("Enter Sw") // in I/O test
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("Wait")  // in shot test; seems to have effect on 'Show Power Level', too
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("Charge Solenoid") // in shot test
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("Shoot Solenoid") // in shot test
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("Charge Solenoid") // in shot test
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("Shoot Solenoid") // in shot test
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) // seems to have no effect in test mode
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) // "
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) // in pinpanel test
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("Start Close") // in pinpanel test
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("Start Close") // in pinpanel test
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("Win-L") // in pinpanel test
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("Win-R") // in pinpanel test
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("Lucky-L") // in pinpanel test
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_NAME("Lucky-C") // in pinpanel test
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2) PORT_NAME("Lucky-R") // in pinpanel test
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(2) PORT_NAME("Lucky Close") // in pinpanel test
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_PLAYER(2) PORT_NAME("Lucky Close") // in pinpanel test
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3) PORT_NAME("Pay Out Sen") // in I/O test
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(3) PORT_NAME("Pay Out Sen") // in I/O test
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3) PORT_NAME("Reset-Key") // in I/O test; seems to have effect on 'Lock Out Coil', too
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3) PORT_NAME("Crt-Key") // in I/O test
 	PORT_SERVICE( 0x08, IP_ACTIVE_LOW ) // 'Operate Sw' in test mode
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(3) PORT_NAME("All Clear Sw") // in I/O test
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 ) // in I/O test;  TODO: active high works correctly in I/O test but not in-game?
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) // in I/O test;  TODO: active high works correctly in I/O test but not in-game?
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto", taitoio_opto_device, opto_h_r)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto", taitoio_opto_device, opto_l_r)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) // in I/O test
 
 	PORT_START("IN3")
@@ -159,6 +163,9 @@ static INPUT_PORTS_START( honooinv ) // no dips on PCB, game options selectable 
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4) PORT_NAME("Rail Max") // in shot test
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4) PORT_NAME("Open-L") // in pinpanel test
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(4) PORT_NAME("Open-R") // in pinpanel test
+
+	PORT_START("COIN")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER("opto", taitoio_opto_device, coin_sense_w)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bubbroul )
@@ -177,11 +184,17 @@ static INPUT_PORTS_START( bubbroul )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM )
 	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_BUTTON7 ) PORT_NAME("100 Yen Switch")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto", taitoio_opto_device, opto_h_r)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto", taitoio_opto_device, opto_l_r)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+
+	PORT_START("COIN")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER("opto", taitoio_opto_device, coin_sense_w)
 INPUT_PORTS_END
+
+
+
 
 static INPUT_PORTS_START( sbmjb ) // no dips on PCB, game options selectable in test mode
 	PORT_START("IN0")
@@ -199,10 +212,13 @@ static INPUT_PORTS_START( sbmjb ) // no dips on PCB, game options selectable in 
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) // Hopper Sensor, active high or it will stop booting due to hopper related problems
 	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_BUTTON7 ) PORT_NAME("100 Yen Switch")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 ) // TODO: active high doesn't allow coining in but it also doesn't cause the medal in error
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 ) // TODO: active high doesn't allow coining in but it also doesn't cause the medal in error
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto", taitoio_opto_device, opto_h_r)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto", taitoio_opto_device, opto_l_r)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN ) // No effect in test mode
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN ) // No effect in test mode
+
+	PORT_START("COIN")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER("opto", taitoio_opto_device, coin_sense_w)
 INPUT_PORTS_END
 
 
@@ -220,7 +236,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(sbmjb_state::scanline_callback) // TODO: copy-paste
 		m_vdpcpu->set_input_line_and_vector(0, HOLD_LINE, m_vdpcpu->irq_vector(1));
 	}
 }
-
 
 void sbmjb_state::sbmjb(machine_config &config)
 {
@@ -241,6 +256,8 @@ void sbmjb_state::sbmjb(machine_config &config)
 	io.in_port1_cb().set_ioport("IN0");
 	io.in_port2_cb().set_ioport("IN1");
 	// TODO: rest of ports. port9 medal / hopper?
+
+	TAITOIO_OPTO(config, "opto", 0);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // all wrong
@@ -340,7 +357,6 @@ ROM_END
 
 } // anonymous namespace
 
-GAME( 1997, honooinv, 0, honooinv, honooinv, sbmjb_state, empty_init, ROT0, "Taito Corporation", "Honoo no Invader (main ver. 1.35, video ver. 1.35)",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, bubbroul, 0, sbmjb,    bubbroul, sbmjb_state, empty_init, ROT0, "Taito Corporation", "Bubblen Roulette (main ver. 1.8, video ver. 1.3)",                MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, sbmjb,    0, sbmjb,    sbmjb,    sbmjb_state, empty_init, ROT0, "Taito Corporation", "Sonic Blast Man's Janken Battle (main ver. 1.1, video ver. 1.0)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-
+GAME( 1997, honooinv, 0, honooinv, honooinv, sbmjb_state, empty_init, ROT0, "Taito Corporation", "Honoo no Invader (Japan, main ver. 1.35, video ver. 1.35)",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, bubbroul, 0, sbmjb,    bubbroul, sbmjb_state, empty_init, ROT0, "Taito Corporation", "Bubblen Roulette (Japan, main ver. 1.8, video ver. 1.3)",                MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, sbmjb,    0, sbmjb,    sbmjb,    sbmjb_state, empty_init, ROT0, "Taito Corporation", "Sonic Blast Man's Janken Battle (Japan, main ver. 1.1, video ver. 1.0)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

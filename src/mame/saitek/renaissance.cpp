@@ -389,7 +389,8 @@ void ren_state::ren(machine_config &config)
 	HD6303Y(config, m_maincpu, 10_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ren_state::main_map);
 	m_maincpu->nvram_enable_backup(true);
-	m_maincpu->standby_cb().set(FUNC(ren_state::standby));
+	m_maincpu->standby_cb().set(m_maincpu, FUNC(hd6303y_cpu_device::nvram_set_battery));
+	m_maincpu->standby_cb().append(FUNC(ren_state::standby));
 	m_maincpu->in_p2_cb().set(FUNC(ren_state::p2_r));
 	m_maincpu->out_p2_cb().set(FUNC(ren_state::p2_w));
 	m_maincpu->in_p5_cb().set(FUNC(ren_state::p5_r));
