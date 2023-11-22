@@ -238,7 +238,7 @@ AI-8003  Pinpon Music Melody
 	<!-- okeiko and hanamaru were sold as a single package? -->
 	<software name="okeiko" supported="no">
 		<description>Okeiko Aiueo</description>
-		<year>198?</year>
+		<year>1988</year>
 		<publisher>Sega</publisher>
 		<notes>Requires full touchpad emulation.</notes>
 		<info name="serial" value="AI-4201"/>
@@ -254,7 +254,7 @@ AI-8003  Pinpon Music Melody
 	<!-- okeiko and hanamaru were sold as a single package? -->
 	<software name="hanamaru" supported="no">
 		<description>Hanamaru Aiueo</description>
-		<year>198?</year>
+		<year>1988</year>
 		<publisher>Sega</publisher>
 		<notes>Requires full touchpad emulation.</notes>
 		<info name="serial" value="AI-4201"/>
@@ -269,10 +269,11 @@ AI-8003  Pinpon Music Melody
 
 	<software name="wakuwaku" supported="no">
 		<description>Waku Waku ABC to 123</description>
-		<year>198?</year>
+		<year>1988</year>
 		<publisher>Sega</publisher>
 		<notes>Requires full touchpad emulation.</notes>
 		<info name="serial" value="AI-4202"/>
+		<info name="alt_title" value="わくわく　ＡＢＣと１２３"/>
 		<part name="card" interface="segaai_card">
 			<feature name="slot" value="rom_256"/>
 			<dataarea name="rom" size="0x40000">
@@ -283,10 +284,11 @@ AI-8003  Pinpon Music Melody
 
 	<software name="henshin" supported="no">
 		<description>Henshin Kanji</description>
-		<year>198?</year>
+		<year>1988</year>
 		<publisher>Sega</publisher>
 		<notes>Requires full touchpad emulation.</notes>
 		<info name="serial" value="AI-4203"/>
+		<info name="alt_title" value="へんしんかんじ"/>
 		<part name="card" interface="segaai_card">
 			<feature name="slot" value="rom_256"/>
 			<dataarea name="rom" size="0x40000">
@@ -297,9 +299,10 @@ AI-8003  Pinpon Music Melody
 
 	<software name="pinponnm">
 		<description>Pinpon Numbers</description>
-		<year>198?</year>
+		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="AI-8001"/>
+		<info name="alt_title" value="ピンポン　ナンバーズ"/>
 		<part name="card" interface="segaai_card">
 			<feature name="slot" value="rom_128"/>
 			<dataarea name="rom" size="0x20000">
@@ -310,10 +313,11 @@ AI-8003  Pinpon Music Melody
 
 	<software name="pinponmr" supported="no">
 		<description>Pinpon Music Rhythm</description>
-		<year>198?</year>
+		<year>1987</year>
 		<publisher>Sega</publisher>
 		<notes>No sound and cannot start a game.</notes>
 		<info name="serial" value="AI-8002"/>
+		<info name="alt_title" value="ピンポン　ミュージック　リズム"/>
 		<info name="usage" value="Requires Soundbox."/>
 		<part name="card" interface="segaai_card">
 			<feature name="slot" value="rom_128"/>
@@ -325,10 +329,11 @@ AI-8003  Pinpon Music Melody
 
 	<software name="pinponmm" supported="no">
 		<description>Pinpon Music Melody</description>
-		<year>198?</year>
+		<year>1987</year>
 		<publisher>Sega</publisher>
 		<notes>No sound and cannot start a game.</notes>
 		<info name="serial" value="AI-8003"/>
+		<info name="alt_title" value="ピンポン　ミュージック　メロディー"/>
 		<info name="usage" value="Requires Soundbox."/>
 		<part name="card" interface="segaai_card">
 			<feature name="slot" value="rom_128"/>
