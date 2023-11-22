@@ -519,7 +519,7 @@ ROM_START( rad_sf2 )
 	ROM_LOAD16_WORD_SWAP( "radica_megadrive_streetfighter2_usa.bin", 0x000000, 0x400000, CRC(a4426df8) SHA1(091f2a95ebd091141de5bcb83562c6087708cb32) )
 ROM_END
 
-ROM_START( rad_sf2p )
+ROM_START( rad_sf2uk )
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "radica_megadrive_streetfighter2_uk.bin", 0x000000, 0x400000,  CRC(868afb44) SHA1(f4339e36272c18b1d49aa4095127ed18e0961df6) )
 ROM_END
@@ -544,7 +544,7 @@ ROM_START( rad_gen2 )
 	ROM_LOAD16_WORD_SWAP( "radica_genesis_vol2_red_usa.bin", 0x000000, 0x400000, CRC(7c1a0f0e) SHA1(a6441f75a4cd48f1563aeafdfbdde00202d4067c) )
 ROM_END
 
-ROM_START( rad_md2 )
+ROM_START( rad_md2uk )
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "radica_megadrive_vol2_red_uk.bin", 0x000000, 0x400000, CRC(b68fd025) SHA1(b8f9c505653d6dd2b62840f078f828360faf8abc) )
 ROM_END
@@ -559,7 +559,7 @@ ROM_START( rad_sonic )
 	ROM_LOAD16_WORD_SWAP( "radica_supersonicgold_usa.bin", 0x000000, 0x400000, CRC(853c9140) SHA1(cf70a9cdd3be4d8d1b6195698db3a941f4908791) )
 ROM_END
 
-ROM_START( rad_sonicp )
+ROM_START( rad_sonicuk )
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "radica_supersonicgold_uk.bin", 0x000000, 0x400000, CRC(ed774018) SHA1(cc2f7183e128c947463e3a43a0184b835ea16db8) )
 ROM_END
@@ -704,23 +704,23 @@ void megadriv_ra145_state::init_ra145()
 // US versions show 'Genesis' on the menu,    show a www.radicagames.com splash screen, and use NTSC versions of the ROMs, sometimes region locked
 // EU versions show 'Mega Drive' on the menu, show a www.radicagames.com splash screen, and use PAL versions of the ROMs, sometimes region locked
 // UK versions show "Mega Drive' on the menu, show a www.radicauk.com splash screen,    and use PAL versions of the ROMs, sometimes region locked
-
+// Japanese releases have been seen for at least one of these Radica collections (SF2), those presumably have a different ROM too (NTSC, locked to Japan?)
 
 CONS( 2004, rad_gen1,  0,        0, megadriv_radica_3button_ntsc, radica_3button_1player, megadriv_radica_state, init_megadriv, "Radica / Sega",                     "Genesis Collection Volume 1 (Radica, Arcade Legends) (USA)", 0)
 CONS( 2004, rad_md1,   rad_gen1, 0, megadriv_radica_3button_pal,  radica_3button_1player, megadriv_radica_state, init_megadrie, "Radica / Sega",                     "Mega Drive Collection Volume 1 (Radica, Arcade Legends) (Europe)", 0)
 CONS( 2004, rad_md1uk, rad_gen1, 0, megadriv_radica_3button_pal,  radica_3button_1player, megadriv_radica_state, init_megadrie, "Radica / Sega",                     "Mega Drive Collection Volume 1 (Radica, Arcade Legends) (UK)", 0)
 
 CONS( 2004, rad_gen2,  0,        0, megadriv_radica_3button_ntsc, radica_3button_1player, megadriv_radica_state, init_megadriv, "Radica / Sega",                     "Genesis Collection Volume 2 (Radica, Arcade Legends) (USA)", 0)
-CONS( 2004, rad_md2,   rad_gen2, 0, megadriv_radica_3button_pal,  radica_3button_1player, megadriv_radica_state, init_megadrie, "Radica / Sega",                     "Mega Drive Collection Volume 2 (Radica, Arcade Legends) (UK)", 0)
+CONS( 2004, rad_md2uk, rad_gen2, 0, megadriv_radica_3button_pal,  radica_3button_1player, megadriv_radica_state, init_megadrie, "Radica / Sega",                     "Mega Drive Collection Volume 2 (Radica, Arcade Legends) (UK)", 0)
 // is there a Europe version with Radica Games boot screen and Mega Drive text?
 
 // box calls this Volume 3
-CONS( 2004, rad_sonic, 0,        0, megadriv_radica_3button_ntsc, radica_3button_1player, megadriv_radica_state, init_megadriv, "Radica / Sega",                     "Super Sonic Gold (Radica Plug & Play) (USA)", 0)
-CONS( 2004, rad_sonicp,rad_sonic,0, megadriv_radica_3button_pal,  radica_3button_1player, megadriv_radica_state, init_megadrie, "Radica / Sega",                     "Super Sonic Gold (Radica Plug & Play) (UK)", 0)
+CONS( 2004, rad_sonic,  0,        0, megadriv_radica_3button_ntsc, radica_3button_1player, megadriv_radica_state, init_megadriv, "Radica / Sega",                     "Super Sonic Gold (Radica Plug & Play) (USA)", 0)
+CONS( 2004, rad_sonicuk,rad_sonic,0, megadriv_radica_3button_pal,  radica_3button_1player, megadriv_radica_state, init_megadrie, "Radica / Sega",                     "Super Sonic Gold (Radica Plug & Play) (UK)", 0)
 // is there a Europe version with Radica Games boot screen and Mega Drive text?
 
 CONS( 2004, rad_sf2,   0,        0, megadriv_radica_6button_ntsc, radica_6button,         megadriv_radica_state, init_megadriv, "Radica / Capcom / Sega",            "Street Fighter II: Special Champion Edition [Ghouls'n Ghosts] (Radica, Arcade Legends) (USA)", 0)
-CONS( 2004, rad_sf2p,  rad_sf2,  0, megadriv_radica_6button_pal,  radica_6button,         megadriv_radica_state, init_megadrie, "Radica / Capcom / Sega",            "Street Fighter II: Special Champion Edition [Ghouls'n Ghosts] (Radica, Arcade Legends) (UK)", 0)
+CONS( 2004, rad_sf2uk, rad_sf2,  0, megadriv_radica_6button_pal,  radica_6button,         megadriv_radica_state, init_megadrie, "Radica / Capcom / Sega",            "Street Fighter II: Special Champion Edition [Ghouls'n Ghosts] (Radica, Arcade Legends) (UK)", 0)
 // is there a Europe version with Radica Games boot screen and Mega Drive text?
 
 // still branded as Arcade Legends even if none of these were ever arcade games, European exclusive
