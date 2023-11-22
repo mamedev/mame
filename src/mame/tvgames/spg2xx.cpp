@@ -1194,6 +1194,7 @@ static INPUT_PORTS_START( doraphonep )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_CUSTOM ) // PAL mode
 INPUT_PORTS_END
 
+
 static INPUT_PORTS_START( doraglobe )
 	PORT_START("P1")
 	PORT_CONFNAME( 0x0070, 0x0060, "On/Off Mode Slider" )
@@ -1934,6 +1935,7 @@ void spg2xx_game_doraphone_state::doraphonep(machine_config &config)
 	m_screen->set_refresh_hz(50);
 }
 
+
 ROM_START( rad_skat )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "skateboarder.bin", 0x000000, 0x400000, CRC(08b9ab91) SHA1(6665edc4740804956136c68065890925a144626b) )
@@ -2216,8 +2218,6 @@ void spg2xx_game_ordentv_state::init_jeuint()
 	rom[0x53376] = 0xee07;
 }
 
-
-
 void spg2xx_game_state::init_itvphone()
 {
 	// the game will die by jumping to an infinite loop if this check fails, what is it checking?
@@ -2319,4 +2319,3 @@ CONS( 200?, wfcentro,   0,        0, wfcentro,  spg2xx,    spg2xx_game_wfcentro_
 
 // set 2862 to 0003 (irq enable) when it stalls on boot to show something (doesn't turn on IRQs again otherwise?) needs camera emulating
 CONS( 200?, tiktokmm,   0,        0, spg2xx,    spg2xx,    spg2xx_game_wfcentro_state, empty_init,    "TikTokTech Ltd. / 3T Games / Senario",                   "Moving Music (MM-TV110)",                                 MACHINE_NOT_WORKING )
-
