@@ -22,11 +22,8 @@
 
 
 TODO:
-- The artwork system has no support for a real touchpad device with
-  selectable artwork, so the touchpad is emulated as a 24x20 matrix
-  of clickable buttons. This is currently good enough to make most
-  games playable. Eventually this should behave like a real touchpad
-  so also drawing apps can work.
+- Fix the touchpad support; somehow the cursor is not displaying on
+  the touchpad.
 - Cassette, playback is controlled by the computer. Games with cassette
   spin up the cassette for about 2 seconds
   - The tape sometimes seeks back and forth for 5-15 seconds for the right
@@ -126,6 +123,7 @@ New JIS Keyboard Connector Pinout:
 #include "sound/upd7759.h"
 #include "video/v9938.h"
 
+#include "crsshair.h"
 #include "softlist.h"
 #include "softlist_dev.h"
 #include "speaker.h"
@@ -136,9 +134,6 @@ New JIS Keyboard Connector Pinout:
 #include "logmacro.h"
 
 
-#define TOUCHPAD_ROWS 20
-
-
 namespace {
 
 class segaai_state : public driver_device
@@ -147,15 +142,20 @@ public:
 	segaai_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
 		, m_sound(*this, "sn76489a")
 		, m_v9938(*this, "v9938")
 		, m_upd7759(*this, "upd7759")
+		, m_i8251(*this, "i8251")
+		, m_i8255(*this, "i8255")
 		, m_cassette(*this, "cassette")
 		, m_cardslot(*this, "cardslot")
 		, m_expslot(*this, "exp")
 		, m_port4(*this, "PORT4")
 		, m_port5(*this, "PORT5")
-		, m_port_tp(*this, "TP.%u", 0)
+		, m_touch(*this, "TOUCH")
+		, m_touchpadx(*this, "TOUCHPADX")
+		, m_touchpady(*this, "TOUCHPADY")
 		, m_vector(0)
 	{ }
 
@@ -165,23 +165,6 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	void vdp_interrupt(int state);
-	void upd7759_drq_w(int state);
-	IRQ_CALLBACK_MEMBER(irq_callback);
-	u8 i8255_porta_r();
-	u8 i8255_portb_r();
-	u8 i8255_portc_r();
-	void i8255_portc_w(u8 data);
-	void upd7759_ctrl_w(u8 data);
-	void upd7759_data_w(u8 data);
-	void port1c_w(u8 data);
-	void port1d_w(u8 data);
-	void port1e_w(u8 data);
-	u8 port1e_r();
-	u8 irq_enable_r();
-	void irq_enable_w(u8 data);
-	void irq_select_w(u8 data);
-
 	static constexpr u8 VECTOR_V9938 = 0xf8;
 	static constexpr u8 VECTOR_I8251_SEND = 0xf9;
 	static constexpr u8 VECTOR_I8251_RECEIVE = 0xfa;
@@ -202,19 +185,39 @@ private:
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
 	void update_irq_state();
-	bool get_touchpad_pressed();
 	u32 get_vector() { return m_vector; }
+	void vdp_interrupt(int state);
+	void upd7759_drq_w(int state);
+	IRQ_CALLBACK_MEMBER(irq_callback);
+	u8 i8255_porta_r();
+	u8 i8255_portb_r();
+	u8 i8255_portc_r();
+	void i8255_portc_w(u8 data);
+	void upd7759_ctrl_w(u8 data);
+	void upd7759_data_w(u8 data);
+	void port1c_w(u8 data);
+	void port1d_w(u8 data);
+	void port1e_w(u8 data);
+	u8 port1e_r();
+	u8 irq_enable_r();
+	void irq_enable_w(u8 data);
+	void irq_select_w(u8 data);
 
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<sn76489a_device> m_sound;
 	required_device<v9938_device> m_v9938;
 	required_device<upd7759_device> m_upd7759;
+	required_device<i8251_device> m_i8251;
+	required_device<i8255_device> m_i8255;
 	required_device<cassette_image_device> m_cassette;
 	required_device<segaai_card_slot_device> m_cardslot;
 	required_device<segaai_exp_slot_device> m_expslot;
 	required_ioport m_port4;
 	required_ioport m_port5;
-	required_ioport_array<TOUCHPAD_ROWS> m_port_tp;
+	required_ioport m_touch;
+	required_ioport m_touchpadx;
+	required_ioport m_touchpady;
 
 	u8 m_i8255_portb;
 	u8 m_upd7759_ctrl;
@@ -293,11 +296,11 @@ ECF13: E6 0F                out     0Fh,al
 void segaai_state::io_map(address_map &map)
 {
 	map(0x00, 0x03).rw(m_v9938, FUNC(v9938_device::read), FUNC(v9938_device::write));
-	map(0x04, 0x07).rw("tmp8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x04, 0x07).rw(m_i8255, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	// port 7, bit 7, engages tape?
 
-	map(0x08, 0x08).rw("i8251", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x09, 0x09).rw("i8251", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x08, 0x08).rw(m_i8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x09, 0x09).rw(m_i8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 
 	// 0x0a (w) - ??
 	// 0a: 00 written during boot
@@ -334,33 +337,6 @@ void segaai_state::io_map(address_map &map)
 }
 
 
-#define INPUT_TP_ROW(row) \
-	PORT_START(row) \
-	PORT_BIT(0x000001, IP_ACTIVE_HIGH, IPT_OTHER) \
-	PORT_BIT(0x000002, IP_ACTIVE_HIGH, IPT_OTHER) \
-	PORT_BIT(0x000004, IP_ACTIVE_HIGH, IPT_OTHER) \
-	PORT_BIT(0x000008, IP_ACTIVE_HIGH, IPT_OTHER) \
-	PORT_BIT(0x000010, IP_ACTIVE_HIGH, IPT_OTHER) \
-	PORT_BIT(0x000020, IP_ACTIVE_HIGH, IPT_OTHER) \
-	PORT_BIT(0x000040, IP_ACTIVE_HIGH, IPT_OTHER) \
-	PORT_BIT(0x000080, IP_ACTIVE_HIGH, IPT_OTHER) \
-	PORT_BIT(0x000100, IP_ACTIVE_HIGH, IPT_OTHER) \
-	PORT_BIT(0x000200, IP_ACTIVE_HIGH, IPT_OTHER) \
-	PORT_BIT(0x000400, IP_ACTIVE_HIGH, IPT_OTHER) \
-	PORT_BIT(0x000800, IP_ACTIVE_HIGH, IPT_OTHER) \
-	PORT_BIT(0x001000, IP_ACTIVE_HIGH, IPT_OTHER) \
-	PORT_BIT(0x002000, IP_ACTIVE_HIGH, IPT_OTHER) \
-	PORT_BIT(0x004000, IP_ACTIVE_HIGH, IPT_OTHER) \
-	PORT_BIT(0x008000, IP_ACTIVE_HIGH, IPT_OTHER) \
-	PORT_BIT(0x010000, IP_ACTIVE_HIGH, IPT_OTHER) \
-	PORT_BIT(0x020000, IP_ACTIVE_HIGH, IPT_OTHER) \
-	PORT_BIT(0x040000, IP_ACTIVE_HIGH, IPT_OTHER) \
-	PORT_BIT(0x080000, IP_ACTIVE_HIGH, IPT_OTHER) \
-	PORT_BIT(0x100000, IP_ACTIVE_HIGH, IPT_OTHER) \
-	PORT_BIT(0x200000, IP_ACTIVE_HIGH, IPT_OTHER) \
-	PORT_BIT(0x400000, IP_ACTIVE_HIGH, IPT_OTHER) \
-	PORT_BIT(0x800000, IP_ACTIVE_HIGH, IPT_OTHER)
-
 static INPUT_PORTS_START(ai_kbd)
 	PORT_START("PORT4")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_8WAY
@@ -375,27 +351,14 @@ static INPUT_PORTS_START(ai_kbd)
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("Grey Button")
 	PORT_BIT(0xfe, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	// Touchpad
-	INPUT_TP_ROW("TP.0")
-	INPUT_TP_ROW("TP.1")
-	INPUT_TP_ROW("TP.2")
-	INPUT_TP_ROW("TP.3")
-	INPUT_TP_ROW("TP.4")
-	INPUT_TP_ROW("TP.5")
-	INPUT_TP_ROW("TP.6")
-	INPUT_TP_ROW("TP.7")
-	INPUT_TP_ROW("TP.8")
-	INPUT_TP_ROW("TP.9")
-	INPUT_TP_ROW("TP.10")
-	INPUT_TP_ROW("TP.11")
-	INPUT_TP_ROW("TP.12")
-	INPUT_TP_ROW("TP.13")
-	INPUT_TP_ROW("TP.14")
-	INPUT_TP_ROW("TP.15")
-	INPUT_TP_ROW("TP.16")
-	INPUT_TP_ROW("TP.17")
-	INPUT_TP_ROW("TP.18")
-	INPUT_TP_ROW("TP.19")
+	PORT_START("TOUCH")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_NAME("Press touchpad")
+
+	PORT_START("TOUCHPADX")
+	PORT_BIT(0xff, 0x80, IPT_LIGHTGUN_X) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_MINMAX(0, 255) PORT_PLAYER(1) PORT_NAME("Touchpad X")
+
+	PORT_START("TOUCHPADY")
+	PORT_BIT(0xff, 0x80, IPT_LIGHTGUN_Y) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_MINMAX(0, 255) PORT_PLAYER(1) PORT_NAME("Touchpad Y")
 INPUT_PORTS_END
 
 
@@ -511,7 +474,7 @@ u8 segaai_state::i8255_portb_r()
 
 	if (BIT(m_port_1d, 0))
 	{
-		if (!get_touchpad_pressed())
+		if (!BIT(m_touch->read(), 0))
 		{
 			m_i8255_portb |= TOUCH_PAD_PRESSED;
 		}
@@ -540,46 +503,6 @@ u8 segaai_state::i8255_portb_r()
 	//m_i8255_portb ^= 0x80;
 
 	return m_i8255_portb;
-}
-
-
-bool segaai_state::get_touchpad_pressed()
-{
-	static const u8 tp_x[24] =
-	{
-		  5,  15,  26,  37,  47,  58,  69,  79,  90, 101, 111, 122,
-		133, 143, 154, 165, 175, 186, 197, 207, 218, 229, 239, 250
-	};
-
-	static const u8 tp_y[20] =
-	{
-		  6,  18,  31,  44,  57,  70,  82,  95, 108, 121,
-		134, 146, 159, 172, 185, 198, 210, 223, 236, 249
-	};
-
-	for (int row = 0; row < TOUCHPAD_ROWS; row++)
-	{
-		u32 port = m_port_tp[row]->read();
-
-		if (port)
-		{
-			int bit = -1;
-			while (port)
-			{
-				bit++;
-				port >>= 1;
-			}
-
-			if (bit >= 0 && bit < std::size(tp_x))
-			{
-				m_touchpad_x = tp_x[bit];
-				m_touchpad_y = tp_y[row];
-				return true;
-			}
-		}
-	}
-
-	return false;
 }
 
 
@@ -721,11 +644,11 @@ u8 segaai_state::port1e_r()
 {
 	if (BIT(m_port_1c, 0))
 	{
-		return m_touchpad_y;
+		return m_touchpady->read();
 	}
 	else
 	{
-		return m_touchpad_x;
+		return m_touchpadx->read();
 	}
 }
 
@@ -757,6 +680,9 @@ void segaai_state::machine_start()
 	save_item(NAME(m_irq_active));
 	save_item(NAME(m_irq_enabled));
 	save_item(NAME(m_vector));
+
+	// TODO: Disable the regular crosshair when the animated touchpad cursor works.
+//	machine().crosshair().get_crosshair(0).set_screen(CROSSHAIR_SCREEN_NONE);
 }
 
 
@@ -768,18 +694,19 @@ void segaai_state::segaai(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback(FUNC(segaai_state::irq_callback));
 
 	V9938(config, m_v9938, 21.477272_MHz_XTAL);
-	m_v9938->set_screen_ntsc("screen");
+	m_v9938->set_screen_ntsc(m_screen);
 	m_v9938->set_vram_size(0x10000);
 	m_v9938->int_cb().set(FUNC(segaai_state::vdp_interrupt));
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	i8255_device &tmp8255(I8255(config, "tmp8255"));
-	tmp8255.in_pa_callback().set(FUNC(segaai_state::i8255_porta_r));
-	tmp8255.in_pb_callback().set(FUNC(segaai_state::i8255_portb_r));
-	tmp8255.in_pc_callback().set(FUNC(segaai_state::i8255_portc_r));
-	tmp8255.out_pc_callback().set(FUNC(segaai_state::i8255_portc_w));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 
-	I8251(config, "i8251", 0);
+	I8255(config, m_i8255);
+	m_i8255->in_pa_callback().set(FUNC(segaai_state::i8255_porta_r));
+	m_i8255->in_pb_callback().set(FUNC(segaai_state::i8255_portb_r));
+	m_i8255->in_pc_callback().set(FUNC(segaai_state::i8255_portc_r));
+	m_i8255->out_pc_callback().set(FUNC(segaai_state::i8255_portc_w));
+
+	I8251(config, m_i8251, 0);
 
 	SPEAKER(config, "mono").front_center();
 
