@@ -22,8 +22,8 @@ TEST_CASE("isFinite, isInfinite, isNan", "[math]")
 		REQUIRE(::__isfinitef(u.f) == bx::isFinite(u.f) );
 		REQUIRE(::__isinff(u.f)    == bx::isInfinite(u.f) );
 #elif BX_COMPILER_MSVC
-		REQUIRE(!!::_isnanf(u.f)  == bx::isNan(u.f));
-		REQUIRE(!!::_finitef(u.f) == bx::isFinite(u.f));
+		REQUIRE(!!::isnan(u.f)    == bx::isNan(u.f));
+		REQUIRE(!!::isfinite(u.f) == bx::isFinite(u.f));
 		REQUIRE(!!::isinf(u.f)    == bx::isInfinite(u.f));
 #else
 		REQUIRE(::isnanf(u.f)  == bx::isNan(u.f) );
@@ -75,14 +75,14 @@ TEST_CASE("ceilLog2", "[math]")
 			REQUIRE(ii == bx::ceilLog2(uint8_t(1<<ii) ) );
 			REQUIRE(ii == bx::ceilLog2(uint16_t(1<<ii) ) );
 			REQUIRE(ii == bx::ceilLog2(uint32_t(1<<ii) ) );
-			REQUIRE(ii == bx::ceilLog2(uint64_t(1<<ii) ) );
+			REQUIRE(ii == bx::ceilLog2(uint64_t(1llu<<ii) ) );
 		}
 
 		for (; ii < 16; ++ii)
 		{
 			REQUIRE(ii == bx::ceilLog2(uint16_t(1<<ii) ) );
 			REQUIRE(ii == bx::ceilLog2(uint32_t(1<<ii) ) );
-			REQUIRE(ii == bx::ceilLog2(uint64_t(1<<ii) ) );
+			REQUIRE(ii == bx::ceilLog2(uint64_t(1llu<<ii) ) );
 		}
 
 		for (; ii < 32; ++ii)

@@ -96,13 +96,13 @@ namespace bx
 
 		DiyFp Normalize() const
 		{
-			uint32_t s = uint64_cntlz(f);
+			uint8_t s = countLeadingZeros(f);
 			return DiyFp(f << s, e - s);
 		}
 
 		DiyFp NormalizeBoundary() const
 		{
-			uint32_t index = uint64_cntlz(f);
+			uint8_t index = countLeadingZeros(f);
 			return DiyFp (f << index, e - index);
 		}
 

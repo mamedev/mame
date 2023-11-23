@@ -241,7 +241,7 @@ namespace bx
 		const uint32_t tmpF   = uint32_add(tmpD, tmpE);
 		const uint32_t result = uint32_and(tmpF, 0x3f);
 
-		return result;
+		return uint8_t(result);
 #endif // BX_COMPILER_*
 	}
 
@@ -254,8 +254,8 @@ namespace bx
 		const uint32_t lo = uint32_t(_val&UINT32_MAX);
 		const uint32_t hi = uint32_t(_val>>32);
 
-		return uint32_cntbits(lo)
-			+  uint32_cntbits(hi)
+		return countBits<uint32_t>(lo)
+			+  countBits<uint32_t>(hi)
 			;
 #endif // BX_COMPILER_*
 	}
@@ -292,7 +292,7 @@ namespace bx
 		const uint32_t tmpA   = uint32_not(tmp9);
 		const uint32_t result = uint32_cntbits(tmpA);
 
-		return result;
+		return uint8_t(result);
 #endif // BX_COMPILER_*
 	}
 
@@ -303,8 +303,8 @@ namespace bx
 		return 0 == _val ? 64 : __builtin_clzll(_val);
 #else
 		return _val & UINT64_C(0xffffffff00000000)
-			 ? uint32_cntlz(uint32_t(_val>>32) )
-			 : uint32_cntlz(uint32_t(_val) ) + 32
+			 ? countLeadingZeros<uint32_t>(uint32_t(_val>>32) )
+			 : countLeadingZeros<uint32_t>(uint32_t(_val) ) + 32
 			 ;
 #endif // BX_COMPILER_*
 	}
@@ -333,7 +333,7 @@ namespace bx
 		const uint32_t tmp2   = uint32_and(tmp0, tmp1);
 		const uint32_t result = uint32_cntbits(tmp2);
 
-		return result;
+		return uint8_t(result);
 #endif // BX_COMPILER_*
 	}
 
@@ -344,8 +344,8 @@ namespace bx
 		return 0 == _val ? 64 : __builtin_ctzll(_val);
 #else
 		return _val & UINT64_C(0xffffffff)
-			? uint32_cnttz(uint32_t(_val) )
-			: uint32_cnttz(uint32_t(_val>>32) ) + 32
+			? countTrailingZeros<uint32_t>(uint32_t(_val) )
+			: countTrailingZeros<uint32_t>(uint32_t(_val>>32) ) + 32
 			;
 #endif // BX_COMPILER_*
 	}
@@ -356,12 +356,12 @@ namespace bx
 		return countTrailingZeros<unsigned long long>(_val);
 	}
 
-	template<> inline BX_CONSTEXPR_FUNC uint8_t countTrailingZeros(uint8_t  _val) { return bx::min(8u,  countTrailingZeros<uint32_t>(_val) ); }
-	template<> inline BX_CONSTEXPR_FUNC uint8_t countTrailingZeros(int8_t   _val) { return              countTrailingZeros<uint8_t >(_val);   }
-	template<> inline BX_CONSTEXPR_FUNC uint8_t countTrailingZeros(uint16_t _val) { return bx::min(16u, countTrailingZeros<uint32_t>(_val) ); }
-	template<> inline BX_CONSTEXPR_FUNC uint8_t countTrailingZeros(int16_t  _val) { return              countTrailingZeros<uint16_t>(_val);   }
-	template<> inline BX_CONSTEXPR_FUNC uint8_t countTrailingZeros(int32_t  _val) { return              countTrailingZeros<uint32_t>(_val);   }
-	template<> inline BX_CONSTEXPR_FUNC uint8_t countTrailingZeros(int64_t  _val) { return              countTrailingZeros<uint64_t>(_val);   }
+	template<> inline BX_CONSTEXPR_FUNC uint8_t countTrailingZeros(uint8_t  _val) { return bx::min<uint8_t>(8,  countTrailingZeros<uint32_t>(_val) ); }
+	template<> inline BX_CONSTEXPR_FUNC uint8_t countTrailingZeros(int8_t   _val) { return             countTrailingZeros<uint8_t >(_val);   }
+	template<> inline BX_CONSTEXPR_FUNC uint8_t countTrailingZeros(uint16_t _val) { return bx::min<uint8_t>(16, countTrailingZeros<uint32_t>(_val) ); }
+	template<> inline BX_CONSTEXPR_FUNC uint8_t countTrailingZeros(int16_t  _val) { return             countTrailingZeros<uint16_t>(_val);   }
+	template<> inline BX_CONSTEXPR_FUNC uint8_t countTrailingZeros(int32_t  _val) { return             countTrailingZeros<uint32_t>(_val);   }
+	template<> inline BX_CONSTEXPR_FUNC uint8_t countTrailingZeros(int64_t  _val) { return             countTrailingZeros<uint64_t>(_val);   }
 
 	template<typename Ty>
 	inline BX_CONSTEXPR_FUNC uint8_t findFirstSet(Ty _x)

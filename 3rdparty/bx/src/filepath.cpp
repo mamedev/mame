@@ -217,16 +217,15 @@ namespace bx
 			*_inOutSize = uint32_t(result);
 			return true;
 		}
+
+		return false;
 #elif BX_PLATFORM_OSX
 		uint32_t len = *_inOutSize;
 		bool result = _NSGetExecutablePath(_out, &len);
-		if (0 == result)
-		{
-			return true;
-		}
-#endif // BX_PLATFORM_*
-
+		return 0 == result;
+#else
 		return false;
+#endif // BX_PLATFORM_*
 	}
 
 	static bool getHomePath(char* _out, uint32_t* _inOutSize)
