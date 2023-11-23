@@ -164,21 +164,6 @@ private:
 	int m_firstvector = 0;
 };
 
-class spg29x_zone3d_game_state : public spg29x_game_state
-{
-public:
-	spg29x_zone3d_game_state(const machine_config& mconfig, device_type type, const char* tag) :
-		spg29x_game_state(mconfig, type, tag)
-	{ }
-
-	void init_zone3d();
-
-protected:
-	void machine_reset() override;
-
-private:
-};
-
 class spg29x_zonefamf_game_state : public spg29x_nand_game_state
 {
 public:
@@ -428,25 +413,6 @@ void spg29x_nand_game_state::machine_reset()
 	m_maincpu->set_state_int(SCORE_PC, bootstrap_ram_boot);
 }
 
-
-void spg29x_zone3d_game_state::machine_reset()
-{
-	spg29x_game_state::machine_reset();
-
-	uint8_t* rom = memregion("spi")->base();
-	int size = memregion("spi")->bytes();
-
-	uint32_t destaddr = 0x1dc;
-	for (uint32_t addr = 0; addr < size; addr++)
-	{
-		address_space& mem = m_maincpu->space(AS_PROGRAM);
-		uint8_t byte = rom[addr];
-		mem.write_byte(addr+destaddr, byte);
-	}
-
-	m_maincpu->set_state_int(SCORE_PC, 0x1000);
-}
-
 void spg29x_zonefamf_game_state::machine_reset()
 {
 	spg29x_game_state::machine_reset();
@@ -580,14 +546,8 @@ void spg29x_nand_game_state::nand_jak_bbsf()
 void spg29x_zonefamf_game_state::nand_zonefamf()
 {
 	nand_init(0x840, 0x800);
-//	m_firstvector = 0x8;
+//  m_firstvector = 0x8;
 }
-
-void spg29x_zone3d_game_state::init_zone3d()
-{
-
-}
-
 
 /* ROM definition */
 ROM_START( hyprscan )
@@ -626,39 +586,6 @@ ROM_START( zonefamf )
 	//has 1x 48LC8M16A2 (128Mbit/16MByte SDRAM) for loading game into
 ROM_END
 
-
-ROM_START( zone3d )
-	ROM_REGION( 0x100000, "spi", 0 )
-	ROM_LOAD("zone_25l8006e_c22014.bin", 0x000000, 0x100000, CRC(8c571771) SHA1(cdb46850286d31bf58d45b75ffc396ed774ac4fd) )
-
-	/*
-	model: Lexar SD
-	revision: LX01
-	serial number: 00000000XL10
-
-	size: 362.00 MiB (741376 sectors * 512 bytes)
-	unk1: 0000000000000007
-	unk2: 00000000000000fa
-	unk3: 01
-
-	The SD card has no label, but there's some printing on the back:
-	MMAGF0380M3085-WY
-	TC00201106 by Taiwan
-
-	--
-	Dumped with hardware write blocker, so this image is correct, and hasn't been corrupted by Windows
-
-	Image contains a FAT filesystem with a number of compressed? programs that presumably get loaded into RAM by
-	the bootloader in the serial flash ROM
-	*/
-
-	DISK_REGION( "cfcard" )
-	DISK_IMAGE( "zone3d", 0, SHA1(77971e2dbfb2ceac12f482d72539c2e042fd9108) )
-
-	ROM_REGION( 0x008000, "spg290", ROMREGION_32BIT | ROMREGION_LE )
-	ROM_LOAD32_DWORD("internal.rom", 0x000000, 0x008000, NO_DUMP)
-ROM_END
-
 } // anonymous namespace
 
 
@@ -671,12 +598,6 @@ COMP( 2006, hyprscan,   0,      0,      hyperscan, hyperscan, spg29x_game_state,
 // If they differ, it is currently uncertain which versions these ROMs are from
 COMP( 2009, jak_bbh,    0,      0,      spg29x, hyperscan, spg29x_nand_game_state, nand_jak_bbh, "JAKKS Pacific Inc", "Big Buck Hunter Pro (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) //has ISSI 404A (24C04)
 COMP( 2011, jak_bbsf,   0,      0,      spg29x, hyperscan, spg29x_nand_game_state, nand_jak_bbsf,"JAKKS Pacific Inc", "Big Buck Safari (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // has ISSI 416A (24C16)
-
-// ends up doing the following, which causes a jump to 0xbf000024, where we have nothing mapped (internal ROM related, or thinks it's loaded code there?  This is the area Hyperscan uses as 'BIOS' not Internal ROM so could be RAM here)
-// 000011D4: ldis r8, 0xbf00
-// 000011D8: ori r8, 0x0024
-// 000011DC: br r8
-COMP( 201?, zone3d,    0,      0,      spg29x, hyperscan, spg29x_zone3d_game_state, init_zone3d,"Zone", "Zone 3D", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 COMP( 201?, zonefamf,  0,      0,      spg29x, hyperscan, spg29x_zonefamf_game_state, nand_zonefamf,"Zone", "Zone Family Fit", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 

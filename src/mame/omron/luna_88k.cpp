@@ -492,7 +492,7 @@ void luna_88k_state_base::common_config(machine_config &config, XTAL clock)
 
 	BT458(config, m_ramdac, 108'992'000);
 
-	KS0066_F00(config, m_lcdc, 250'000);
+	KS0066_F00(config, m_lcdc, 270'000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_function_set_at_any_time(true);
 	m_lcdc->set_lcd_size(2, 16);
 

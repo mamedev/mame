@@ -205,6 +205,7 @@ using util::BIT;
 #include "cpu/vt61/vt61dasm.h"
 #include "cpu/we32000/we32100d.h"
 #include "cpu/xavix2/xavix2d.h"
+#include "cpu/xtensa/xtensad.h"
 #include "cpu/z180/z180dasm.h"
 #include "cpu/z8/z8dasm.h"
 #include "cpu/z80/z80dasm.h"
@@ -714,6 +715,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "xavix2000",       le,  0, []() -> util::disasm_interface * { return new xavix2000_disassembler; } },
 	{ "xavix2",          le,  0, []() -> util::disasm_interface * { return new xavix2_disassembler; } },
 	{ "xerox530",        be, -1, []() -> util::disasm_interface * { return new xerox530_disassembler; } },
+	{ "xtensa",          le,  0, []() -> util::disasm_interface * { return new xtensa_disassembler; } },
 	{ "z180",            le,  0, []() -> util::disasm_interface * { return new z180_disassembler; } },
 	{ "z8",              be,  0, []() -> util::disasm_interface * { return new z8_disassembler; } },
 	{ "z80",             le,  0, []() -> util::disasm_interface * { return new z80_disassembler; } },

@@ -19838,6 +19838,7 @@ wcherry                         // bootleg
 
 @source:igs/igs009.cpp
 gp98                            // (c) 1998
+gp98a                           // (c) 1998
 jingbell                        // (c) 1997
 jingbella                       // (c) 1997
 jingbellb                       // (c) 1997
@@ -27116,6 +27117,7 @@ maze                            // 611 [1976]
 phantom2                        // 652 [1979]
 roadrunm                        // 618 [1977]
 seawolf                         // 596 [1976]
+seawolfa                        // 596 [1976]
 seawolfo                        // 596 [1976]
 shuffle                         // 643 [1978]
 spacwalk                        // 640 [1978]
@@ -34406,6 +34408,7 @@ snes4sl
 snes4sln
 
 @source:nintendo/spacefb.cpp
+redbird                         // bootleg (Codematic)
 spacebrd                        // bootleg
 spacedem                        // (c) 1980 Fortrek + made by Nintendo
 spacefb                         // (c) [1980?] Nintendo
@@ -38345,6 +38348,7 @@ compan
 
 @source:saitek/companion2.cpp
 compan2
+enterp
 expchess
 
 @source:saitek/chesstrv.cpp
@@ -38712,14 +38716,15 @@ twinktmb
 
 @source:sega/megadriv_rad.cpp
 rad_sf2                         // (c)2004 Radica
-rad_sf2p                        // (c)2004 Radica
+rad_sf2uk                       // (c)2004 Radica
 rad_gen1                        // (c)2004 Radica
 rad_gen2                        // (c)2004 Radica
 rad_md1
-rad_md2
+rad_md1uk
+rad_md2uk
 rad_ssoc                        // (c)2004 Radica
 rad_sonic
-rad_sonicp
+rad_sonicuk
 rad_orun
 msi_sf2
 dgunl3227
@@ -41408,6 +41413,7 @@ e100                            //
 
 @source:skeleton/easy_karaoke.cpp
 easykara
+karams
 
 @source:skeleton/elcirculo.cpp
 elcirculo                       // (c) 1980 Inder
@@ -41492,6 +41498,9 @@ hprotr8a                        //
 
 @source:skeleton/ht68k.cpp
 ht68k                           //
+
+@source:skeleton/hudson_poems.cpp
+marimba                         //
 
 @source:skeleton/i7000.cpp
 i7000                           //
@@ -44653,12 +44662,13 @@ sstarkar
 hyprscan                        //
 jak_bbh
 jak_bbsf
-zone3d
 zonefamf
 
 @source:tvgames/spg29x_lexibook_jg7425.cpp
-lx_jg7425
 lx_aven
+lx_frozen
+lx_jg7425
+zone3d
 
 @source:tvgames/spg2xx.cpp
 ablkickb
@@ -44669,6 +44679,7 @@ decathlna
 doraglob                        // (c) 2007 VTech
 doraglobg
 doraphon                        // (c) 2006 VTech
+doraphonf
 dreamlss
 fordrace
 gssytts
@@ -44677,6 +44688,7 @@ guitarss
 guitarssa
 hotwhl2p
 itvphone
+jeuint
 jjstrip
 jouet
 knd
@@ -45547,15 +45559,16 @@ gjrstar                         // Genius Junior Redstar (Germany)
 gjrstar2                        // Genius Junior Redstar 2 (Germany)
 gjrstar3                        // Genius Junior Redstar 3 (Germany)
 gln                             // Genius Leader Notebook
-pitagor                         // Pitagorin
 gls                             // Genius Leader Select
+pcompelr                        // Prekomputer Elektronik (Russia)
 pitagjr                         // Pitagorin Junior
+pitagor                         // Pitagorin
 scientus                        // Scientus (France, from C.Q.F.D)
 
 @source:vtech/gkidabc.cpp
+gjrprofi                        // Genius Junior Profi (Germany)
 gkidabc                         // Genius KID ABC Fan (Germany)
 miprimlec                       // Mis Primeras Lecciones (Spain)
-gjrprofi                        // Genius Junior Profi (Germany)
 
 @source:vtech/glcx.cpp
 bs9009cx                        // 1999 BrainStation 9009 CXL (Germany)

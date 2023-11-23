@@ -3909,3 +3909,13 @@ if opt_tool(CPUS, "EVOLUTION") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/evolution/evod.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/evolution/evod.h")
 end
+
+--------------------------------------------------
+-- Tensilica Xtensa, disassembler only
+--@src/devices/cpu/xtensa/xtensa.h,CPUS["XTENSA"] = true
+--------------------------------------------------
+
+if opt_tool(CPUS, "XTENSA") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/xtensa/xtensad.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/xtensa/xtensad.h")
+end

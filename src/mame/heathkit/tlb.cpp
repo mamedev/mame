@@ -20,7 +20,6 @@
       - In 49/50 row mode, character descenders are cut off.
       - Screen saver does not disable the screen
     - With superset slot option
-      - Screen menus not working properly
       - Screensaver freezes the screen instead of blanking the screen	
 
 ****************************************************************************/
@@ -1116,6 +1115,9 @@ void heath_superset_tlb_device::device_add_mconfig(machine_config &config)
 	m_maincpu->set_clock(H19_3MHZ);
 	m_maincpu->set_addrmap(AS_PROGRAM, &heath_superset_tlb_device::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &heath_superset_tlb_device::io_map);
+
+	// per line updates are needed for onscreen menu to display properly
+	m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);
 
 	m_crtc->set_update_row_callback(FUNC(heath_superset_tlb_device::crtc_update_row));
 

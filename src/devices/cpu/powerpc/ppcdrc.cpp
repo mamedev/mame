@@ -2257,26 +2257,14 @@ bool ppc_device::generate_opcode(drcuml_block &block, compiler_state *compiler, 
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IMMU(op));                                // mapvar  dsisr,DSISR_IMMU(op)
 			UML_MOV(block, mem(&m_core->tempaddr), R32Z(G_RA(op)));                  // mov     [tempaddr],ra
 
-			if (G_RD(op) <= G_RA(op) && !(m_cap & PPCCAP_4XX) && m_flavor != PPC_MODEL_601)
+			for (int regnum = G_RD(op); regnum < 32; regnum++)
 			{
-				// RA being in the range is an invalid form
-				// 403 and 405 manual allows writes where regnum != RA || regnum == 31, regnum == RA is skipped
-				// 601 user manual lists no special rules for R31 being valid but regnum == RA is skipped
-				// 603 and above just says it's an invalid form
-				// tropchnc (403GA) is known to use this behavior
-				UML_EXH(block, *m_exception[EXCEPTION_PROGRAM], 0x80000);          // exh    exception_program,0x80000
-			}
-			else
-			{
-				for (int regnum = G_RD(op); regnum < 32; regnum++)
-				{
-					UML_ADD(block, I0, mem(&m_core->tempaddr), (int16_t)G_SIMM(op) + 4 * (regnum - G_RD(op)));
-																								// add     i0,[tempaddr],simm + 4*(regnum-rd)
-					UML_CALLH(block, *m_read32align[m_core->mode]);         // callh   read32align
+				UML_ADD(block, I0, mem(&m_core->tempaddr), (int16_t)G_SIMM(op) + 4 * (regnum - G_RD(op)));
+																							// add     i0,[tempaddr],simm + 4*(regnum-rd)
+				UML_CALLH(block, *m_read32align[m_core->mode]);         // callh   read32align
 
-					if (regnum != G_RA(op) || ((m_cap & PPCCAP_4XX) && regnum == 31))
-						UML_MOV(block, R32(regnum), I0);                                        // mov     regnum,i0
-				}
+				if (regnum != G_RA(op) || ((m_cap & PPCCAP_4XX) && regnum == 31))
+					UML_MOV(block, R32(regnum), I0);                                        // mov     regnum,i0
 			}
 			generate_update_cycles(block, compiler, desc->pc + 4, true);           // <update cycles>
 			return true;
