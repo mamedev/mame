@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
 
+#include "emu.h"
+
 #include "bus/midi/midiinport.h"
 #include "bus/midi/midioutport.h"
 #include "cpu/sh/sh7014.h"
