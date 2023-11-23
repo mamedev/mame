@@ -45866,6 +45866,9 @@ psr340                          // 1999 PSR-340
 @source:yamaha/ympsr400.cpp
 psr500                          // 1991 PSR-500
 
+@source:yamaha/ympsr540.cpp
+psr540                          // 1999 PSR-540
+
 @source:yamaha/ymqy70.cpp
 qy70                            // 1997 QY-70
 
