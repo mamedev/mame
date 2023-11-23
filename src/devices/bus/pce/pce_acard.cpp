@@ -178,7 +178,7 @@ void pce_acard_duo_device::peripheral_w(offs_t offset, uint8_t data)
 				}
 				break;
 			case 5:
-				m_rotate_reg = data;
+				m_rotate_reg = data & 0x0f;
 
 				if (m_rotate_reg != 0)
 				{
