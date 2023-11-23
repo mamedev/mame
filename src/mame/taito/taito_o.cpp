@@ -45,6 +45,7 @@ Notes:
 
 #include "emu.h"
 
+#include "taitoio_opto.h"
 #include "tc0080vco.h"
 
 #include "cpu/m68000/m68000.h"
@@ -54,8 +55,6 @@ Notes:
 #include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/ymopn.h"
-
-#include "taitoio_opto.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -96,13 +95,13 @@ private:
 	required_device_array<taitoio_opto_device, 2> m_opto;
 	required_device<hopper_device> m_hopper;
 
+	u16 m_hoppff = 0x0000;
+
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 	u32 draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, u32 start_offset);
 	void prg_map(address_map &map);
 	void taitoo_hopper_int_cb(int state);
-
-	u16 m_hoppff = 0x0000;
 };
 
 
@@ -377,7 +376,7 @@ void taitoo_state::taitoo(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	for (auto & opto : m_opto)
+	for (auto &opto : m_opto)
 		TAITOIO_OPTO(config, opto, 0);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
