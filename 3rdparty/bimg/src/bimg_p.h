@@ -31,13 +31,13 @@
 		}                                             \
 	BX_MACRO_BLOCK_END
 
-#define _BIMG_ASSERT(_condition, _format, ...)          \
-	BX_MACRO_BLOCK_BEGIN                                \
-		if (!BX_IGNORE_C4127(_condition) )              \
-		{                                               \
-			BX_TRACE("ASSERT " _format, ##__VA_ARGS__); \
-			bx::debugBreak();                           \
-		}                                               \
+#define _BIMG_ASSERT(_condition, _format, ...)                                                                 \
+	BX_MACRO_BLOCK_BEGIN                                                                                       \
+		if (!BX_IGNORE_C4127(_condition)                                                                       \
+		&&  bx::assertFunction(bx::Location::current(), "ASSERT " #_condition " -> " _format, ##__VA_ARGS__) ) \
+		{                                                                                                      \
+			bx::debugBreak();                                                                                  \
+		}                                                                                                      \
 	BX_MACRO_BLOCK_END
 
 #include <bimg/bimg.h>
@@ -85,7 +85,7 @@ namespace bimg
 		if (_hasMips)
 		{
 			const uint32_t max = bx::max(_width, _height, _depth);
-			const uint32_t num = 1 + uint32_t(bx::log2((int32_t)max) );
+			const uint32_t num = 1 + bx::ceilLog2(max);
 
 			return uint8_t(num);
 		}
