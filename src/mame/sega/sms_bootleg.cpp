@@ -10,9 +10,24 @@ for Sono Corp Japan
 this is an SMS multi-game bootleg with 32 games
 
 
+smssgame
+|# | game name | mapper | QA notes |
+|--|--|--|--|
+|01| Super Bubble | 08| |
+|02| Tetris       | 01| |
+|03| Wonder Boy   | 00| |
+|04| Alex Kidd    | 82| |
+|06| Hello Kang Si| 02| boots as Ghost House |
+|07| Solomon Key  | 84| |
+|08| Buk Doo Gun  | 02| boots as Lode Runner |
+
+smssgamea
+- Different banking, TBD
 
 there are also empty k9/k10/k11/k12 positions, but they were clearly never used.
 
+
+====================================================================
 
 Games ordered by MENU
 
@@ -287,9 +302,11 @@ void smsbootleg_state::machine_reset()
 
 void smsbootleg_state::sms_supergame_map(address_map &map)
 {
+	map.unmap_value_high();
 	map(0x0000, 0xbfff).view(m_rom_view);
 	m_rom_view[0](0x0000, 0xbfff).rom().region("maincpu", 0);
 	m_rom_view[1](0x0000, 0x7fff).bankr("game_bank");
+	m_rom_view[1](0x8000, 0xbfff).bankr("game_bank"); // Super Mario accesses this
 	map(0xc000, 0xfff7).ram();
 //  map(0xfffc, 0xffff).rw(FUNC(smsbootleg_state::sms_mapper_r), FUNC(smsbootleg_state::sms_mapper_w));       // Bankswitch control
 	map(0xfffe, 0xfffe).lw8(
