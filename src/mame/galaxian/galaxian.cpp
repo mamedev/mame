@@ -9517,7 +9517,7 @@ void galaxian_state::init_ghostmun()
 	//galaxian_sprite_clip_end = 250;
 }
 
-void galaxian_state::init_crazeym()
+void galaxian_state::init_crazym()
 {
 	init_nolock();
 
@@ -9816,7 +9816,7 @@ The marquee says
 TM. EAGLE CONVERTIONS
 MADE UNDER LICENCE FROM EAGLE CONVERTIONS INC ©1982
 */
-ROM_START( crazeym )
+ROM_START( crazym )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "cm.7f", 0x0000, 0x0800, CRC(d1f2e906) SHA1(794d6a0816722973d6a782a3d8a3c52586525b39) )
 	ROM_CONTINUE(      0x2000, 0x0800 )
@@ -16327,7 +16327,7 @@ GAME( 1981, pacmanblc,   puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_
 GAME( 1981, pacmanblci,  puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_pacmanbl,   ROT270, "bootleg (Cirsa)",              "Pac-Man (Cirsa, Spanish bootleg on Galaxian hardware)",      MACHINE_SUPPORTS_SAVE )
 GAME( 199?, komemokos,   puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_pacmanbl,   ROT270, "hack",                         "Komemokos (hack of 'Pac-Man (Cirsa, Spanish bootleg)')",     MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pacmanblv,   puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_pacmanbl,   ROT270, "bootleg (Video Dens)",         "Pac-Man (Video Dens, Spanish bootleg on Galaxian hardware)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, crazeym,     puckman,  galaxian,   pacmanblb,  galaxian_state, init_crazeym,    ROT90,  "bootleg (GAT)",                "Crazey Mazey",                                               MACHINE_SUPPORTS_SAVE )
+GAME( 1982, crazym,      puckman,  galaxian,   pacmanblb,  galaxian_state, init_crazym,     ROT90,  "bootleg (GAT)",                "Crazy Mazey",                                                MACHINE_SUPPORTS_SAVE )
 GAME( 1981, ghostmun,    puckman,  pacmanbl,   streakng,   galaxian_state, init_ghostmun,   ROT90,  "bootleg (Leisure and Allied)", "Ghost Muncher",                                              MACHINE_SUPPORTS_SAVE )
 GAME( 1981, phoenxp2,    phoenix,  pisces,     phoenxp2,   pisces_state,   init_batman2,    ROT270, "bootleg",                      "Phoenix Part 2",                                             MACHINE_SUPPORTS_SAVE )
 GAME( 1981, batman2,     phoenix,  pisces,     batman2,    pisces_state,   init_batman2,    ROT270, "bootleg",                      "Batman Part 2",                                              MACHINE_SUPPORTS_SAVE ) // Similar to pisces, but with different video banking characteristics
