@@ -40,9 +40,9 @@ private:
 	uint32_t  m_base_addr[4]{};
 	uint16_t  m_addr_offset[4]{};
 	uint16_t  m_addr_inc[4]{};
-	uint32_t  m_shift = 0;
-	uint8_t   m_shift_reg = 0;
-	uint8_t   m_rotate_reg = 0;
+	uint32_t  m_shift;
+	uint8_t   m_shift_reg;
+	uint8_t   m_rotate_reg;
 };
 
 

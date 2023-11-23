@@ -28,6 +28,9 @@ pce_acard_duo_device::pce_acard_duo_device(const machine_config &mconfig, device
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_pce_cart_interface( mconfig, *this )
 	, m_ram(*this, "ram", 0x200000, ENDIANNESS_LITTLE)
+	, m_shift(0)
+	, m_shift_reg(0)
+	, m_rotate_reg(0)
 {
 }
 
@@ -76,7 +79,7 @@ void pce_acard_duo_device::install_memory_handlers(address_space &space)
 
 void pce_acard_pro_device::install_memory_handlers(address_space &space)
 {
-	space.install_rom(0x000000, 0x03ffff, 0x040000, m_rom); // TODO: actually 0x000000-0x07ffff
+	space.install_rom(0x000000, 0x03ffff, 0x040000, m_rom); // TODO: underdumped or mirrored?
 	space.install_ram(0x0d0000, 0x0fffff, m_cdsys3->ram());
 	space.install_read_handler(0x1ff8c0, 0x1ff8c7, 0, 0x130, 0, emu::rw_delegate(m_cdsys3, FUNC(pce_cdsys3_base_device::register_r)));
 	pce_acard_duo_device::install_memory_handlers(space);
@@ -84,22 +87,16 @@ void pce_acard_pro_device::install_memory_handlers(address_space &space)
 
 uint8_t pce_acard_duo_device::ram_r(offs_t offset)
 {
-	if (offset >= 0x0000 && offset < 0x8000)
-		return peripheral_r((offset & 0x6000) >> 9);
-	
-	return 0xff;
+	return peripheral_r((offset & 0x6000) >> 9);
 }
 
 void pce_acard_duo_device::ram_w(offs_t offset, uint8_t data)
 {
-	if (offset >= 0x0000 && offset < 0x8000)
-		peripheral_w((offset & 0x6000) >> 9, data);
+	peripheral_w((offset & 0x6000) >> 9, data);
 }
 
 uint8_t pce_acard_duo_device::peripheral_r(offs_t offset)
 {
-	uint8_t r_num;
-
 	if ((offset & 0xe0) == 0xe0)
 	{
 		switch (offset & 0xef)
@@ -117,7 +114,7 @@ uint8_t pce_acard_duo_device::peripheral_r(offs_t offset)
 		return 0;
 	}
 
-	r_num = (offset & 0x30) >> 4;
+	uint8_t const r_num = (offset & 0x30) >> 4;
 
 	switch (offset & 0x0f)
 	{
@@ -130,16 +127,19 @@ uint8_t pce_acard_duo_device::peripheral_r(offs_t offset)
 			else
 				res = m_ram[m_base_addr[r_num] & 0x1fffff];
 
-			if ((!machine().side_effects_disabled()) && (m_ctrl[r_num] & 0x1))
+			if (!machine().side_effects_disabled())
 			{
-				if (m_ctrl[r_num] & 0x10)
+				if (m_ctrl[r_num] & 0x1)
 				{
-					m_base_addr[r_num] += m_addr_inc[r_num];
-					m_base_addr[r_num] &= 0xffffff;
-				}
-				else
-				{
-					m_addr_offset[r_num] += m_addr_inc[r_num];
+					if (m_ctrl[r_num] & 0x10)
+					{
+						m_base_addr[r_num] += m_addr_inc[r_num];
+						m_base_addr[r_num] &= 0xffffff;
+					}
+					else
+					{
+						m_addr_offset[r_num] += m_addr_inc[r_num];
+					}
 				}
 			}
 
@@ -159,8 +159,6 @@ uint8_t pce_acard_duo_device::peripheral_r(offs_t offset)
 
 void pce_acard_duo_device::peripheral_w(offs_t offset, uint8_t data)
 {
-	uint8_t w_num;
-
 	if ((offset & 0xe0) == 0xe0)
 	{
 		switch (offset & 0x0f)
@@ -193,7 +191,7 @@ void pce_acard_duo_device::peripheral_w(offs_t offset, uint8_t data)
 	}
 	else
 	{
-		w_num = (offset & 0x30) >> 4;
+		uint8_t const w_num = (offset & 0x30) >> 4;
 
 		switch (offset & 0x0f)
 		{
