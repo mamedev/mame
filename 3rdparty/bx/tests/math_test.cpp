@@ -11,7 +11,6 @@
 #include <stdint.h> // intXX_t
 #include <limits.h> // UCHAR_*
 
-#if !BX_PLATFORM_BSD
 TEST_CASE("isFinite, isInfinite, isNan", "[math]")
 {
 	for (uint64_t ii = 0; ii < UINT32_MAX; ii += rand()%(1<<13)+1)
@@ -19,7 +18,6 @@ TEST_CASE("isFinite, isInfinite, isNan", "[math]")
 		union { uint32_t ui; float f; } u = { uint32_t(ii) };
 
 #if BX_PLATFORM_OSX
-		BX_UNUSED(u);
 		REQUIRE(::__isnanf(u.f)    == bx::isNan(u.f) );
 		REQUIRE(::__isfinitef(u.f) == bx::isFinite(u.f) );
 		REQUIRE(::__isinff(u.f)    == bx::isInfinite(u.f) );
@@ -34,7 +32,6 @@ TEST_CASE("isFinite, isInfinite, isNan", "[math]")
 #endif // BX_PLATFORM_OSX
 	}
 }
-#endif // !BX_PLATFORM_BSD
 
 bool log2_test(float _a)
 {
@@ -47,31 +44,125 @@ TEST_CASE("log2", "[math][libm]")
 	log2_test(256.0f);
 
 	REQUIRE(0.0f == bx::log2(1.0f) );
-	REQUIRE(0 == bx::log2(1) );
-
 	REQUIRE(1.0f == bx::log2(2.0f) );
-	REQUIRE(1 == bx::log2(2) );
-
 	REQUIRE(2.0f == bx::log2(4.0f) );
-	REQUIRE(2 == bx::log2(4) );
-
 	REQUIRE(3.0f == bx::log2(8.0f) );
-	REQUIRE(3 == bx::log2(8) );
-
 	REQUIRE(4.0f == bx::log2(16.0f) );
-	REQUIRE(4 == bx::log2(16) );
-
 	REQUIRE(5.0f == bx::log2(32.0f) );
-	REQUIRE(5 == bx::log2(32) );
-
 	REQUIRE(6.0f == bx::log2(64.0f) );
-	REQUIRE(6 == bx::log2(64) );
-
 	REQUIRE(7.0f == bx::log2(128.0f) );
-	REQUIRE(7 == bx::log2(128) );
-
 	REQUIRE(8.0f == bx::log2(256.0f) );
-	REQUIRE(8 == bx::log2(256) );
+}
+
+TEST_CASE("ceilLog2", "[math]")
+{
+	REQUIRE(0 == bx::ceilLog2(-1) );
+	REQUIRE(0 == bx::ceilLog2(0) );
+	REQUIRE(0 == bx::ceilLog2(1) );
+	REQUIRE(1 == bx::ceilLog2(2) );
+	REQUIRE(2 == bx::ceilLog2(4) );
+	REQUIRE(3 == bx::ceilLog2(8) );
+	REQUIRE(4 == bx::ceilLog2(16) );
+	REQUIRE(5 == bx::ceilLog2(32) );
+	REQUIRE(6 == bx::ceilLog2(64) );
+	REQUIRE(7 == bx::ceilLog2(128) );
+	REQUIRE(8 == bx::ceilLog2(256) );
+
+	{
+		uint32_t ii = 0;
+		for (; ii < 8; ++ii)
+		{
+			REQUIRE(ii == bx::ceilLog2(uint8_t(1<<ii) ) );
+			REQUIRE(ii == bx::ceilLog2(uint16_t(1<<ii) ) );
+			REQUIRE(ii == bx::ceilLog2(uint32_t(1<<ii) ) );
+			REQUIRE(ii == bx::ceilLog2(uint64_t(1<<ii) ) );
+		}
+
+		for (; ii < 16; ++ii)
+		{
+			REQUIRE(ii == bx::ceilLog2(uint16_t(1<<ii) ) );
+			REQUIRE(ii == bx::ceilLog2(uint32_t(1<<ii) ) );
+			REQUIRE(ii == bx::ceilLog2(uint64_t(1<<ii) ) );
+		}
+
+		for (; ii < 32; ++ii)
+		{
+			REQUIRE(ii == bx::ceilLog2(uint32_t(1<<ii) ) );
+			REQUIRE(ii == bx::ceilLog2(uint64_t(1llu<<ii) ) );
+		}
+
+		for (; ii < 64; ++ii)
+		{
+			REQUIRE(ii == bx::ceilLog2(uint64_t(1llu<<ii) ) );
+		}
+	}
+
+	for (uint32_t ii = 1; ii < INT32_MAX; ii += rand()%(1<<13)+1)
+	{
+//		DBG("%u: %u %u", ii, bx::uint32_nextpow2(ii), bx::nextPow2(ii) );
+		REQUIRE(bx::nextPow2(ii) == bx::uint32_nextpow2(ii) );
+	}
+}
+
+TEST_CASE("countTrailingZeros", "[math]")
+{
+	REQUIRE( 0 == bx::countTrailingZeros<uint8_t >(1) );
+	REQUIRE( 7 == bx::countTrailingZeros<uint8_t >(1<<7) );
+	REQUIRE( 8 == bx::countTrailingZeros<uint8_t >(0) );
+	REQUIRE( 1 == bx::countTrailingZeros<uint8_t >(0x3e) );
+	REQUIRE( 0 == bx::countTrailingZeros<uint16_t>(1) );
+	REQUIRE(15 == bx::countTrailingZeros<uint16_t>(1<<15) );
+	REQUIRE(16 == bx::countTrailingZeros<uint16_t>(0) );
+	REQUIRE( 0 == bx::countTrailingZeros<uint32_t>(1) );
+	REQUIRE(32 == bx::countTrailingZeros<uint32_t>(0) );
+	REQUIRE(31 == bx::countTrailingZeros<uint32_t>(1u<<31) );
+	REQUIRE( 0 == bx::countTrailingZeros<uint64_t>(1) );
+	REQUIRE(64 == bx::countTrailingZeros<uint64_t>(0) );
+}
+
+TEST_CASE("countLeadingZeros", "[math]")
+{
+	REQUIRE( 7 == bx::countLeadingZeros<uint8_t >(1) );
+	REQUIRE( 8 == bx::countLeadingZeros<uint8_t >(0) );
+	REQUIRE( 2 == bx::countLeadingZeros<uint8_t >(0x3e) );
+	REQUIRE(15 == bx::countLeadingZeros<uint16_t>(1) );
+	REQUIRE(16 == bx::countLeadingZeros<uint16_t>(0) );
+	REQUIRE(31 == bx::countLeadingZeros<uint32_t>(1) );
+	REQUIRE(32 == bx::countLeadingZeros<uint32_t>(0) );
+	REQUIRE(63 == bx::countLeadingZeros<uint64_t>(1) );
+	REQUIRE(64 == bx::countLeadingZeros<uint64_t>(0) );
+}
+
+TEST_CASE("countBits", "[math]")
+{
+	REQUIRE( 0 == bx::countBits(0) );
+	REQUIRE( 1 == bx::countBits(1) );
+
+	REQUIRE( 4 == bx::countBits<uint8_t>(0x55) );
+	REQUIRE( 8 == bx::countBits<uint16_t>(0x5555) );
+	REQUIRE(16 == bx::countBits<uint32_t>(0x55555555) );
+	REQUIRE(32 == bx::countBits<uint64_t>(0x5555555555555555) );
+
+	REQUIRE( 8 == bx::countBits(UINT8_MAX) );
+	REQUIRE(16 == bx::countBits(UINT16_MAX) );
+	REQUIRE(32 == bx::countBits(UINT32_MAX) );
+	REQUIRE(64 == bx::countBits(UINT64_MAX) );
+}
+
+TEST_CASE("findFirstSet", "[math]")
+{
+	REQUIRE( 1 == bx::findFirstSet<uint8_t >(1) );
+	REQUIRE( 8 == bx::findFirstSet<uint8_t >(1<<7) );
+	REQUIRE( 0 == bx::findFirstSet<uint8_t >(0) );
+	REQUIRE( 2 == bx::findFirstSet<uint8_t >(0x3e) );
+	REQUIRE( 1 == bx::findFirstSet<uint16_t>(1) );
+	REQUIRE(16 == bx::findFirstSet<uint16_t>(1<<15) );
+	REQUIRE( 0 == bx::findFirstSet<uint16_t>(0) );
+	REQUIRE( 1 == bx::findFirstSet<uint32_t>(1) );
+	REQUIRE( 0 == bx::findFirstSet<uint32_t>(0) );
+	REQUIRE(32 == bx::findFirstSet<uint32_t>(1u<<31) );
+	REQUIRE( 1 == bx::findFirstSet<uint64_t>(1) );
+	REQUIRE( 0 == bx::findFirstSet<uint64_t>(0) );
 }
 
 BX_PRAGMA_DIAGNOSTIC_PUSH();

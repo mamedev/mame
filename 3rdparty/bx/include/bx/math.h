@@ -270,8 +270,37 @@ namespace bx
 
 	/// Returns the base 2 logarithm of _a.
 	///
+	BX_CONST_FUNC float log2(float _a);
+
+	/// Count number of bits set.
+	///
 	template<typename Ty>
-	BX_CONST_FUNC Ty log2(Ty _a);
+	BX_CONSTEXPR_FUNC uint8_t countBits(Ty _val);
+
+	/// Count number of leading zeros.
+	///
+	template<typename Ty>
+	BX_CONSTEXPR_FUNC uint8_t countLeadingZeros(Ty _val);
+
+	/// Count number of trailing zeros.
+	///
+	template<typename Ty>
+	BX_CONSTEXPR_FUNC uint8_t countTrailingZeros(Ty _val);
+
+	/// Find first set.
+	///
+	template<typename Ty>
+	BX_CONSTEXPR_FUNC uint8_t findFirstSet(Ty _val);
+
+	/// Returns the next smallest integer base 2 logarithm of _a.
+	///
+	template<typename Ty>
+	BX_CONSTEXPR_FUNC uint8_t ceilLog2(Ty _a);
+
+	/// Returns the next smallest power of two value.
+	///
+	template<typename Ty>
+	BX_CONSTEXPR_FUNC Ty nextPow2(Ty _a);
 
 	/// Returns the square root of _a.
 	///

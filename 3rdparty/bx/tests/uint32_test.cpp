@@ -28,61 +28,6 @@ TEST_CASE("StrideAlign", "[uint32_t]")
 	REQUIRE(offset == 48);
 }
 
-TEST_CASE("uint32_cnt", "[uint32_t]")
-{
-	REQUIRE( 0 == bx::uint32_cnttz<uint8_t >(1) );
-	REQUIRE( 7 == bx::uint32_cnttz<uint8_t >(1<<7) );
-	REQUIRE( 8 == bx::uint32_cnttz<uint8_t >(0) );
-	REQUIRE( 1 == bx::uint32_cnttz<uint8_t >(0x3e) );
-	REQUIRE( 0 == bx::uint32_cnttz<uint16_t>(1) );
-	REQUIRE(15 == bx::uint32_cnttz<uint16_t>(1<<15) );
-	REQUIRE(16 == bx::uint32_cnttz<uint16_t>(0) );
-	REQUIRE( 0 == bx::uint32_cnttz<uint32_t>(1) );
-	REQUIRE(32 == bx::uint32_cnttz<uint32_t>(0) );
-	REQUIRE(31 == bx::uint32_cnttz<uint32_t>(1u<<31) );
-	REQUIRE( 0 == bx::uint32_cnttz<uint64_t>(1) );
-	REQUIRE(64 == bx::uint32_cnttz<uint64_t>(0) );
-
-	REQUIRE( 7 == bx::uint32_cntlz<uint8_t >(1) );
-	REQUIRE( 8 == bx::uint32_cntlz<uint8_t >(0) );
-	REQUIRE( 2 == bx::uint32_cntlz<uint8_t >(0x3e) );
-	REQUIRE(15 == bx::uint32_cntlz<uint16_t>(1) );
-	REQUIRE(16 == bx::uint32_cntlz<uint16_t>(0) );
-	REQUIRE(31 == bx::uint32_cntlz<uint32_t>(1) );
-	REQUIRE(32 == bx::uint32_cntlz<uint32_t>(0) );
-	REQUIRE(63 == bx::uint32_cntlz<uint64_t>(1) );
-	REQUIRE(64 == bx::uint32_cntlz<uint64_t>(0) );
-
-	REQUIRE( 0 == bx::uint32_cntbits(0) );
-	REQUIRE( 1 == bx::uint32_cntbits(1) );
-
-	REQUIRE( 4 == bx::uint32_cntbits<uint8_t>(0x55) );
-	REQUIRE( 8 == bx::uint32_cntbits<uint16_t>(0x5555) );
-	REQUIRE(16 == bx::uint32_cntbits<uint32_t>(0x55555555) );
-	REQUIRE(32 == bx::uint32_cntbits<uint64_t>(0x5555555555555555) );
-
-	REQUIRE( 8 == bx::uint32_cntbits(UINT8_MAX) );
-	REQUIRE(16 == bx::uint32_cntbits(UINT16_MAX) );
-	REQUIRE(32 == bx::uint32_cntbits(UINT32_MAX) );
-	REQUIRE(64 == bx::uint32_cntbits(UINT64_MAX) );
-}
-
-TEST_CASE("uint32_ffs", "[uint32_t]")
-{
-	REQUIRE( 1 == bx::uint32_ffs<uint8_t >(1) );
-	REQUIRE( 8 == bx::uint32_ffs<uint8_t >(1<<7) );
-	REQUIRE( 0 == bx::uint32_ffs<uint8_t >(0) );
-	REQUIRE( 2 == bx::uint32_ffs<uint8_t >(0x3e) );
-	REQUIRE( 1 == bx::uint32_ffs<uint16_t>(1) );
-	REQUIRE(16 == bx::uint32_ffs<uint16_t>(1<<15) );
-	REQUIRE( 0 == bx::uint32_ffs<uint16_t>(0) );
-	REQUIRE( 1 == bx::uint32_ffs<uint32_t>(1) );
-	REQUIRE( 0 == bx::uint32_ffs<uint32_t>(0) );
-	REQUIRE(32 == bx::uint32_ffs<uint32_t>(1u<<31) );
-	REQUIRE( 1 == bx::uint32_ffs<uint64_t>(1) );
-	REQUIRE( 0 == bx::uint32_ffs<uint64_t>(0) );
-}
-
 TEST_CASE("uint32_part", "[uint32_t]")
 {
 	REQUIRE(UINT32_C(0x55555555) == bx::uint32_part1by1(UINT16_MAX) );

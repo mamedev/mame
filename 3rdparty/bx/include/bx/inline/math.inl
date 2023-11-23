@@ -212,16 +212,180 @@ namespace bx
 		return pow(2.0f, _a);
 	}
 
-	template<>
 	inline BX_CONST_FUNC float log2(float _a)
 	{
 		return log(_a) * kInvLogNat2;
 	}
 
 	template<>
-	inline BX_CONST_FUNC int32_t log2(int32_t _a)
+	inline BX_CONSTEXPR_FUNC uint8_t countBits(uint32_t _val)
 	{
-		return 31 - uint32_cntlz(_a);
+#if BX_COMPILER_GCC || BX_COMPILER_CLANG
+		return __builtin_popcount(_val);
+#else
+		const uint32_t tmp0   = uint32_srl(_val, 1);
+		const uint32_t tmp1   = uint32_and(tmp0, 0x55555555);
+		const uint32_t tmp2   = uint32_sub(_val, tmp1);
+		const uint32_t tmp3   = uint32_and(tmp2, 0xc30c30c3);
+		const uint32_t tmp4   = uint32_srl(tmp2, 2);
+		const uint32_t tmp5   = uint32_and(tmp4, 0xc30c30c3);
+		const uint32_t tmp6   = uint32_srl(tmp2, 4);
+		const uint32_t tmp7   = uint32_and(tmp6, 0xc30c30c3);
+		const uint32_t tmp8   = uint32_add(tmp3, tmp5);
+		const uint32_t tmp9   = uint32_add(tmp7, tmp8);
+		const uint32_t tmpA   = uint32_srl(tmp9, 6);
+		const uint32_t tmpB   = uint32_add(tmp9, tmpA);
+		const uint32_t tmpC   = uint32_srl(tmpB, 12);
+		const uint32_t tmpD   = uint32_srl(tmpB, 24);
+		const uint32_t tmpE   = uint32_add(tmpB, tmpC);
+		const uint32_t tmpF   = uint32_add(tmpD, tmpE);
+		const uint32_t result = uint32_and(tmpF, 0x3f);
+
+		return result;
+#endif // BX_COMPILER_*
+	}
+
+	template<>
+	inline BX_CONSTEXPR_FUNC uint8_t countBits(unsigned long long _val)
+	{
+#if BX_COMPILER_GCC || BX_COMPILER_CLANG
+		return __builtin_popcountll(_val);
+#else
+		const uint32_t lo = uint32_t(_val&UINT32_MAX);
+		const uint32_t hi = uint32_t(_val>>32);
+
+		return uint32_cntbits(lo)
+			+  uint32_cntbits(hi)
+			;
+#endif // BX_COMPILER_*
+	}
+
+	template<>
+	inline BX_CONSTEXPR_FUNC uint8_t countBits(unsigned long _val)
+	{
+		return countBits<unsigned long long>(_val);
+	}
+
+	template<> inline BX_CONSTEXPR_FUNC uint8_t countBits(uint8_t  _val) { return countBits<uint32_t>(_val); }
+	template<> inline BX_CONSTEXPR_FUNC uint8_t countBits(int8_t   _val) { return countBits<uint8_t >(_val); }
+	template<> inline BX_CONSTEXPR_FUNC uint8_t countBits(uint16_t _val) { return countBits<uint32_t>(_val); }
+	template<> inline BX_CONSTEXPR_FUNC uint8_t countBits(int16_t  _val) { return countBits<uint16_t>(_val); }
+	template<> inline BX_CONSTEXPR_FUNC uint8_t countBits(int32_t  _val) { return countBits<uint32_t>(_val); }
+	template<> inline BX_CONSTEXPR_FUNC uint8_t countBits(int64_t  _val) { return countBits<uint64_t>(_val); }
+
+	template<>
+	inline BX_CONSTEXPR_FUNC uint8_t countLeadingZeros(uint32_t _val)
+	{
+#if BX_COMPILER_GCC || BX_COMPILER_CLANG
+		return 0 == _val ? 32 : __builtin_clz(_val);
+#else
+		const uint32_t tmp0   = uint32_srl(_val, 1);
+		const uint32_t tmp1   = uint32_or(tmp0, _val);
+		const uint32_t tmp2   = uint32_srl(tmp1, 2);
+		const uint32_t tmp3   = uint32_or(tmp2, tmp1);
+		const uint32_t tmp4   = uint32_srl(tmp3, 4);
+		const uint32_t tmp5   = uint32_or(tmp4, tmp3);
+		const uint32_t tmp6   = uint32_srl(tmp5, 8);
+		const uint32_t tmp7   = uint32_or(tmp6, tmp5);
+		const uint32_t tmp8   = uint32_srl(tmp7, 16);
+		const uint32_t tmp9   = uint32_or(tmp8, tmp7);
+		const uint32_t tmpA   = uint32_not(tmp9);
+		const uint32_t result = uint32_cntbits(tmpA);
+
+		return result;
+#endif // BX_COMPILER_*
+	}
+
+	template<>
+	inline BX_CONSTEXPR_FUNC uint8_t countLeadingZeros(unsigned long long _val)
+	{
+#if BX_COMPILER_GCC || BX_COMPILER_CLANG
+		return 0 == _val ? 64 : __builtin_clzll(_val);
+#else
+		return _val & UINT64_C(0xffffffff00000000)
+			 ? uint32_cntlz(uint32_t(_val>>32) )
+			 : uint32_cntlz(uint32_t(_val) ) + 32
+			 ;
+#endif // BX_COMPILER_*
+	}
+
+	template<>
+	inline BX_CONSTEXPR_FUNC uint8_t countLeadingZeros(unsigned long _val)
+	{
+		return countLeadingZeros<unsigned long long>(_val);
+	}
+
+	template<> inline BX_CONSTEXPR_FUNC uint8_t countLeadingZeros(uint8_t  _val) { return countLeadingZeros<uint32_t>(_val)-24; }
+	template<> inline BX_CONSTEXPR_FUNC uint8_t countLeadingZeros(int8_t   _val) { return countLeadingZeros<uint8_t >(_val);    }
+	template<> inline BX_CONSTEXPR_FUNC uint8_t countLeadingZeros(uint16_t _val) { return countLeadingZeros<uint32_t>(_val)-16; }
+	template<> inline BX_CONSTEXPR_FUNC uint8_t countLeadingZeros(int16_t  _val) { return countLeadingZeros<uint16_t>(_val);    }
+	template<> inline BX_CONSTEXPR_FUNC uint8_t countLeadingZeros(int32_t  _val) { return countLeadingZeros<uint32_t>(_val);    }
+	template<> inline BX_CONSTEXPR_FUNC uint8_t countLeadingZeros(int64_t  _val) { return countLeadingZeros<uint64_t>(_val);    }
+
+	template<>
+	inline BX_CONSTEXPR_FUNC uint8_t countTrailingZeros(uint32_t _val)
+	{
+#if BX_COMPILER_GCC || BX_COMPILER_CLANG
+		return 0 == _val ? 32 : __builtin_ctz(_val);
+#else
+		const uint32_t tmp0   = uint32_not(_val);
+		const uint32_t tmp1   = uint32_dec(_val);
+		const uint32_t tmp2   = uint32_and(tmp0, tmp1);
+		const uint32_t result = uint32_cntbits(tmp2);
+
+		return result;
+#endif // BX_COMPILER_*
+	}
+
+	template<>
+	inline BX_CONSTEXPR_FUNC uint8_t countTrailingZeros(unsigned long long _val)
+	{
+#if BX_COMPILER_GCC || BX_COMPILER_CLANG
+		return 0 == _val ? 64 : __builtin_ctzll(_val);
+#else
+		return _val & UINT64_C(0xffffffff)
+			? uint32_cnttz(uint32_t(_val) )
+			: uint32_cnttz(uint32_t(_val>>32) ) + 32
+			;
+#endif // BX_COMPILER_*
+	}
+
+	template<>
+	inline BX_CONSTEXPR_FUNC uint8_t countTrailingZeros(unsigned long _val)
+	{
+		return countTrailingZeros<unsigned long long>(_val);
+	}
+
+	template<> inline BX_CONSTEXPR_FUNC uint8_t countTrailingZeros(uint8_t  _val) { return bx::min(8u,  countTrailingZeros<uint32_t>(_val) ); }
+	template<> inline BX_CONSTEXPR_FUNC uint8_t countTrailingZeros(int8_t   _val) { return              countTrailingZeros<uint8_t >(_val);   }
+	template<> inline BX_CONSTEXPR_FUNC uint8_t countTrailingZeros(uint16_t _val) { return bx::min(16u, countTrailingZeros<uint32_t>(_val) ); }
+	template<> inline BX_CONSTEXPR_FUNC uint8_t countTrailingZeros(int16_t  _val) { return              countTrailingZeros<uint16_t>(_val);   }
+	template<> inline BX_CONSTEXPR_FUNC uint8_t countTrailingZeros(int32_t  _val) { return              countTrailingZeros<uint32_t>(_val);   }
+	template<> inline BX_CONSTEXPR_FUNC uint8_t countTrailingZeros(int64_t  _val) { return              countTrailingZeros<uint64_t>(_val);   }
+
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC uint8_t findFirstSet(Ty _x)
+	{
+		return Ty(0) == _x ? uint8_t(0) : countTrailingZeros<Ty>(_x) + 1;
+	}
+
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC uint8_t ceilLog2(Ty _a)
+	{
+		BX_STATIC_ASSERT(isInteger<Ty>(), "Type Ty must be of integer type!");
+		return Ty(_a) < Ty(1) ? Ty(0) : sizeof(Ty)*8 - countLeadingZeros<Ty>(_a - 1);
+	}
+
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC Ty nextPow2(Ty _a)
+	{
+		const uint8_t log2 = ceilLog2(_a);
+		BX_ASSERT(log2 < sizeof(Ty)*8
+			, "Type Ty cannot represent the next power-of-two value (1<<%u is larger than %u-bit type)."
+			, log2
+			, sizeof(Ty)*8
+			);
+		return Ty(1)<<log2;
 	}
 
 	inline BX_CONST_FUNC float rsqrtRef(float _a)
