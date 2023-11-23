@@ -681,8 +681,7 @@ void segaai_state::machine_start()
 	save_item(NAME(m_irq_enabled));
 	save_item(NAME(m_vector));
 
-	// TODO: Disable the regular crosshair when the animated touchpad cursor works.
-//	machine().crosshair().get_crosshair(0).set_screen(CROSSHAIR_SCREEN_NONE);
+	machine().crosshair().get_crosshair(0).set_screen(CROSSHAIR_SCREEN_NONE);
 }
 
 
