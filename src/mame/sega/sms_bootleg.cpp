@@ -10,9 +10,24 @@ for Sono Corp Japan
 this is an SMS multi-game bootleg with 32 games
 
 
+smssgame
+|# | game name | mapper | QA notes |
+|--|--|--|--|
+|01| Super Bubble | 08| |
+|02| Tetris       | 01| |
+|03| Wonder Boy   | 00| |
+|04| Alex Kidd    | 82| |
+|06| Hello Kang Si| 02| boots as Ghost House |
+|07| Solomon Key  | 84| |
+|08| Buk Doo Gun  | 02| boots as Lode Runner |
+
+smssgamea
+- Different banking, TBD
 
 there are also empty k9/k10/k11/k12 positions, but they were clearly never used.
 
+
+====================================================================
 
 Games ordered by MENU
 
@@ -234,6 +249,10 @@ A Korean version has been seen too (unless this can be switched?)
 #include "cpu/z80/z80.h"
 #include "speaker.h"
 
+#define VERBOSE 1
+//#define LOG_OUTPUT_FUNC osd_printf_info
+
+#include "logmacro.h"
 
 namespace {
 
@@ -242,13 +261,24 @@ class smsbootleg_state : public sms_state
 public:
 	smsbootleg_state(const machine_config &mconfig, device_type type, const char *tag)
 		: sms_state(mconfig, type, tag)
+		, m_rom_view(*this, "rom_view")
+		, m_game_bank(*this, "game_bank")
+		, m_game_data(*this, "game_data")
 	{}
 
 	void sms_supergame(machine_config &config);
 
 	void init_sms_supergame();
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
+	memory_view m_rom_view;
+	required_memory_bank m_game_bank;
+	required_memory_region m_game_data;
+
 	void port08_w(uint8_t data);
 	void port18_w(uint8_t data);
 
@@ -256,17 +286,53 @@ private:
 	void sms_supergame_map(address_map &map);
 };
 
+void smsbootleg_state::machine_start()
+{
+	sms_state::machine_start();
+	m_game_bank->configure_entries(0, 0x40, m_game_data->base(), 0x8000);
+
+}
+
+void smsbootleg_state::machine_reset()
+{
+	sms_state::machine_reset();
+	m_rom_view.select(0);
+	m_game_bank->set_entry(0);
+}
 
 void smsbootleg_state::sms_supergame_map(address_map &map)
 {
-	map(0x0000, 0xbfff).rom();
+	map.unmap_value_high();
+	map(0x0000, 0xbfff).view(m_rom_view);
+	m_rom_view[0](0x0000, 0xbfff).rom().region("maincpu", 0);
+	m_rom_view[1](0x0000, 0x7fff).bankr("game_bank");
+	m_rom_view[1](0x8000, 0xbfff).bankr("game_bank"); // Super Mario accesses this
 	map(0xc000, 0xfff7).ram();
 //  map(0xfffc, 0xffff).rw(FUNC(smsbootleg_state::sms_mapper_r), FUNC(smsbootleg_state::sms_mapper_w));       // Bankswitch control
+	map(0xfffe, 0xfffe).lw8(
+		NAME([this] (u8 data) {
+			m_rom_view.select(BIT(data, 0));
+			if (data & 0xfe)
+				throw emu_fatalerror("ROM view select %02x\n", data);
+		})
+	);
+	map(0xffff, 0xffff).lw8(
+		NAME([] (u8 data) {
+			if (data != 2)
+				throw emu_fatalerror("ROM mapper select %02x\n", data);
+		})
+	);
 }
 
 void smsbootleg_state::port08_w(uint8_t data)
 {
 //  logerror("port08_w %02x\n", data);
+//	m_bank->set_entry(BIT(data, 3));
+	// TODO: different for smssgamea
+	u8 rom_select = bitswap<6>(data & 0x3f, 3, 2, 1, 0, 5, 4);
+	rom_select += ((data >> 6) & 3) << 2;
+	LOG("%02x %08x\n", data, rom_select * 0x8000);
+	m_game_bank->set_entry(rom_select & 0x3f);
 }
 
 void smsbootleg_state::port18_w(uint8_t data)
@@ -393,57 +459,70 @@ void smsbootleg_state::sms_supergame(machine_config &config)
 void smsbootleg_state::init_sms_supergame()
 {
 	uint8_t* rom = memregion("maincpu")->base();
+	uint8_t* game_roms = memregion("game_data")->base();
+
 	size_t size = memregion("maincpu")->bytes();
 
 	for (int i = 0; i < size; i++)
 	{
 		rom[i] ^= 0x80;
 	}
+
+	size = memregion("game_data")->bytes();
+	for (int i = 0; i < size; i++)
+	{
+		game_roms[i] ^= 0x80;
+	}
 }
 
 
 ROM_START( smssgame )
-	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rom1.bin", 0x00000, 0x10000, CRC(0e1f258e) SHA1(9240dc0d01e3061c0c8807c07c0a1d033ebe9116) ) // yes, this rom is smaller (menu rom)
-	ROM_LOAD( "rom2.bin",0x020000, 0x20000, CRC(c1478323) SHA1(27b524a234f072e81ef41fb89a5fff5617e9b951) ) // Buk Doo Sun
-	ROM_LOAD( "rom3.bin",0x040000, 0x20000, CRC(96c8705d) SHA1(ba4f4af0cfdad1d63a08201ed186c79aea062b95) ) // ? Kung Fu game (Hello Kang Si?)
+
+	ROM_REGION( 0x200000, "game_data", ROMREGION_ERASEFF )
+	ROM_LOAD( "k2.bin",  0x000000, 0x20000, CRC(a12439f4) SHA1(e957d4fe275e982bedef28af8cc2957da27dc512) ) // Final Bubble Bobble (1/2)
+	ROM_LOAD( "k1.bin",  0x020000, 0x20000, CRC(dadffecd) SHA1(68ebb968539049a9e193da5200856b9f956f7e02) ) // Final Bubble Bobble (2/2)
+	ROM_LOAD( "k3.bin",  0x040000, 0x20000, CRC(9bb92096) SHA1(3ca17b7a9aa20b97cac1f78ba13f70bed1b37463) ) // Solomon's Key
+	ROM_LOAD( "k4.bin",  0x060000, 0x20000, CRC(e5903942) SHA1(d0c02f4b37c8a02142868459af14ba8ed0340ccd) ) // Magical Tree / Chustle Chumy / Congo Bongo / Charlie Circus
+	ROM_LOAD( "k5.bin",  0x080000, 0x20000, CRC(a7b64d1c) SHA1(7c37ac3f37699c49492d4f4ea4e213670413041c) ) // Flicky / Galaxian / King's Valley / Pippos
+	ROM_LOAD( "k6.bin",  0x0a0000, 0x20000, CRC(d78ce5ba) SHA1(06065cec3865ff3a2bb2f56702b24427487964e2) ) // Dragon Story / Spy Vs Spy / Teddyboy Blues / Pitfall II
+	ROM_LOAD( "k7.bin",  0x0c0000, 0x20000, CRC(d24da417) SHA1(2ef5e55748e412157e55e7a62355fd66bf792d8e) ) // Drol / Pit Pot / Hyper Sports II / Super Tank
+	ROM_LOAD( "k8.bin",  0x0e0000, 0x20000, CRC(eb1e8693) SHA1(3283cdcfc25f34a43f317093cd39e10a52bc3ae7) ) // Alex Kidd in Miracle World
+	ROM_LOAD( "rom2.bin",0x100000, 0x20000, CRC(c1478323) SHA1(27b524a234f072e81ef41fb89a5fff5617e9b951) ) // Buk Doo Sun
+	ROM_LOAD( "rom3.bin",0x120000, 0x20000, CRC(96c8705d) SHA1(ba4f4af0cfdad1d63a08201ed186c79aea062b95) ) // ? Kung Fu game (Hello Kang Si?)
+	// this mask rom appears to be taken straight from an SMS multi-game cart, bank 0 of it is even a menu just for the games in this ROM! same style, so presumably the same developer (Seo Jin 1990 copyright)
+	ROM_LOAD( "sg11004a 79st0086end 9045.rom4",0x180000, 0x080000, CRC(cdbfe86e) SHA1(83d6f261471dca20f8d2e33b9807d670e9b4eb9c) ) // Invaders, Astro, Super Mario, Ghost House, Bomb Jack, Galaga, Goonies, Road Runner I, Road Fighter, Tetris, Wonder Boy
+
 	// k12 unpopulated
 	// k11 unpopulated
 	// k10 unpopulated
 	// k9 unpopulated
-	ROM_LOAD( "k8.bin",  0x060000, 0x20000, CRC(eb1e8693) SHA1(3283cdcfc25f34a43f317093cd39e10a52bc3ae7) ) // Alex Kidd in Miracle World
-	ROM_LOAD( "k7.bin",  0x080000, 0x20000, CRC(d24da417) SHA1(2ef5e55748e412157e55e7a62355fd66bf792d8e) ) // Drol / Pit Pot / Hyper Sports II / Super Tank
-	ROM_LOAD( "k6.bin",  0x0a0000, 0x20000, CRC(d78ce5ba) SHA1(06065cec3865ff3a2bb2f56702b24427487964e2) ) // Dragon Story / Spy Vs Spy / Teddyboy Blues / Pitfall II
-	ROM_LOAD( "k5.bin",  0x0c0000, 0x20000, CRC(a7b64d1c) SHA1(7c37ac3f37699c49492d4f4ea4e213670413041c) ) // Flicky / Galaxian / King's Valley / Pippos
-	ROM_LOAD( "k4.bin",  0x0e0000, 0x20000, CRC(e5903942) SHA1(d0c02f4b37c8a02142868459af14ba8ed0340ccd) ) // Magical Tree / Chustle Chumy / Congo Bongo / Charlie Circus
-	ROM_LOAD( "k3.bin",  0x100000, 0x20000, CRC(9bb92096) SHA1(3ca17b7a9aa20b97cac1f78ba13f70bed1b37463) ) // Solomon's Key
-	ROM_LOAD( "k2.bin",  0x120000, 0x20000, CRC(a12439f4) SHA1(e957d4fe275e982bedef28af8cc2957da27dc512) ) // Final Bubble Bobble (1/2)
-	ROM_LOAD( "k1.bin",  0x140000, 0x20000, CRC(dadffecd) SHA1(68ebb968539049a9e193da5200856b9f956f7e02) ) // Final Bubble Bobble (2/2)
-	// this mask rom appears to be taken straight from an SMS multi-game cart, bank 0 of it is even a menu just for the games in this ROM! same style, so presumably the same developer (Seo Jin 1990 copyright)
-	ROM_LOAD( "sg11004a 79st0086end 9045.rom4",0x180000, 0x080000, CRC(cdbfe86e) SHA1(83d6f261471dca20f8d2e33b9807d670e9b4eb9c) ) // Invaders, Astro, Super Mario, Ghost House, Bomb Jack, Galaga, Goonies, Road Runner I, Road Fighter, Tetris, Wonder Boy
 
 	// there seems to be some kind of MCU for the timer?
 ROM_END
 
 
 ROM_START( smssgamea )
-	ROM_REGION( 0x280000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "02.k2",   0x000000, 0x10000, CRC(66ed320e) SHA1(e838cb98fbd295259707f8f7ce433b28baa846e3) ) // menu is here on this one
-	ROM_LOAD( "01.k1",   0x020000, 0x20000, CRC(18fd8607) SHA1(f24fbe863e19b513369858bf1260355e92444071) ) // Tri-Formation
-	ROM_LOAD( "03.k3",   0x040000, 0x20000, CRC(9bb92096) SHA1(3ca17b7a9aa20b97cac1f78ba13f70bed1b37463) ) // Solomon's Key
-	ROM_LOAD( "04.k4",   0x060000, 0x20000, CRC(28f6f4a9) SHA1(87809d93b8393b3186672c217fa1dec8b152af16) ) // Maisc Tree, Mouse, Invaders, Astro
-	ROM_LOAD( "05.k5",   0x080000, 0x20000, CRC(350591a4) SHA1(ceb3c4a0fc85c5fbc5a045e9c83c3e7ec4d535cc) ) // Congo Bongo, Circus, Super Mario, Ghost House
-	ROM_LOAD( "06.k6",   0x0a0000, 0x20000, CRC(9c5e7cc7) SHA1(4613928e30b7faaa41d550fa41906e13a6059513) ) // Flicky, Galaxian, Bomb Jack, Galaga
-	ROM_LOAD( "07.k7",   0x0c0000, 0x20000, CRC(8046a2c0) SHA1(c80298dd56db8c09cac5263e4c01a627ab1a4cda) ) // Kings Vally, Pippols, Goonies, Road Runner I
-	ROM_LOAD( "08.k8",   0x0e0000, 0x20000, CRC(ee366e0f) SHA1(3770aa71372e7dbdfd357b239a0fbdf8880dc135) ) // Dragon Story, Spy Vs Spy, Road Fighter
-	ROM_LOAD( "09.k9",   0x100000, 0x20000, CRC(50a66ef6) SHA1(8eb8d1a7ecca99d1722534be269a6264d49b9dd4) ) // Tetris, Teddy Boy, Pitfall 2
-	ROM_LOAD( "10.k10",  0x120000, 0x10000, CRC(ca7ab2df) SHA1(11a85f03ec21d481c5cdfcfb749da20b8569d09a) ) // Drol, Pit Pot
-	ROM_LOAD( "11.k11",  0x140000, 0x10000, CRC(b03b612f) SHA1(537b7d72e1e06e17db6206a37f2480c14f46b9fc) ) // Hyper Sports, Super Tank
-	ROM_LOAD( "12.k12",  0x160000, 0x20000, CRC(eb1e8693) SHA1(3283cdcfc25f34a43f317093cd39e10a52bc3ae7) ) // Alex Kidd
-	ROM_LOAD( "13.rom4", 0x180000, 0x20000, CRC(8767f1c9) SHA1(683cedb001e859c2c7ccde2571104f1eb9f09c2f) ) // Wonderboy
-	ROM_LOAD( "14.rom3", 0x1a0000, 0x20000, CRC(889bb269) SHA1(0a92b339c19240bfea29ee24fee3e7d780b0cd5c) ) // Hello Kang Si
-	ROM_LOAD( "15.rom2", 0x1c0000, 0x20000, CRC(c1478323) SHA1(27b524a234f072e81ef41fb89a5fff5617e9b951) ) // Buk Doo Gun
-	ROM_FILL(            0x200000, 0x80000, 0xff) // ROM1 position not populated
+
+	ROM_REGION( 0x200000, "game_data", ROMREGION_ERASEFF )
+	ROM_LOAD( "01.k1",   0x000000, 0x20000, CRC(18fd8607) SHA1(f24fbe863e19b513369858bf1260355e92444071) ) // Tri-Formation
+	ROM_LOAD( "03.k3",   0x020000, 0x20000, CRC(9bb92096) SHA1(3ca17b7a9aa20b97cac1f78ba13f70bed1b37463) ) // Solomon's Key
+	ROM_LOAD( "04.k4",   0x040000, 0x20000, CRC(28f6f4a9) SHA1(87809d93b8393b3186672c217fa1dec8b152af16) ) // Maisc Tree, Mouse, Invaders, Astro
+	ROM_LOAD( "05.k5",   0x060000, 0x20000, CRC(350591a4) SHA1(ceb3c4a0fc85c5fbc5a045e9c83c3e7ec4d535cc) ) // Congo Bongo, Circus, Super Mario, Ghost House
+	ROM_LOAD( "06.k6",   0x080000, 0x20000, CRC(9c5e7cc7) SHA1(4613928e30b7faaa41d550fa41906e13a6059513) ) // Flicky, Galaxian, Bomb Jack, Galaga
+	ROM_LOAD( "07.k7",   0x0a0000, 0x20000, CRC(8046a2c0) SHA1(c80298dd56db8c09cac5263e4c01a627ab1a4cda) ) // Kings Vally, Pippols, Goonies, Road Runner I
+	ROM_LOAD( "08.k8",   0x0c0000, 0x20000, CRC(ee366e0f) SHA1(3770aa71372e7dbdfd357b239a0fbdf8880dc135) ) // Dragon Story, Spy Vs Spy, Road Fighter
+	ROM_LOAD( "09.k9",   0x0e0000, 0x20000, CRC(50a66ef6) SHA1(8eb8d1a7ecca99d1722534be269a6264d49b9dd4) ) // Tetris, Teddy Boy, Pitfall 2
+	ROM_LOAD( "10.k10",  0x100000, 0x10000, CRC(ca7ab2df) SHA1(11a85f03ec21d481c5cdfcfb749da20b8569d09a) ) // Drol, Pit Pot
+	ROM_LOAD( "11.k11",  0x120000, 0x10000, CRC(b03b612f) SHA1(537b7d72e1e06e17db6206a37f2480c14f46b9fc) ) // Hyper Sports, Super Tank
+	ROM_LOAD( "12.k12",  0x140000, 0x20000, CRC(eb1e8693) SHA1(3283cdcfc25f34a43f317093cd39e10a52bc3ae7) ) // Alex Kidd
+	ROM_LOAD( "13.rom4", 0x160000, 0x20000, CRC(8767f1c9) SHA1(683cedb001e859c2c7ccde2571104f1eb9f09c2f) ) // Wonderboy
+	ROM_LOAD( "14.rom3", 0x180000, 0x20000, CRC(889bb269) SHA1(0a92b339c19240bfea29ee24fee3e7d780b0cd5c) ) // Hello Kang Si
+	ROM_LOAD( "15.rom2", 0x1a0000, 0x20000, CRC(c1478323) SHA1(27b524a234f072e81ef41fb89a5fff5617e9b951) ) // Buk Doo Gun
+//	ROM_FILL(            0x200000, 0x80000, 0xff) // ROM1 position not populated
 
 	// there seems to be some kind of MCU for the timer?
 ROM_END
