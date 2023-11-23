@@ -317,7 +317,7 @@ void smsbootleg_state::sms_supergame_map(address_map &map)
 		})
 	);
 	map(0xffff, 0xffff).lw8(
-		NAME([this] (u8 data) {
+		NAME([] (u8 data) {
 			if (data != 2)
 				throw emu_fatalerror("ROM mapper select %02x\n", data);
 		})
