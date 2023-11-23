@@ -17,6 +17,7 @@ smssgame
 |02| Tetris       | 01| |
 |03| Wonder Boy   | 00| |
 |04| Alex Kidd    | 82| |
+|05| Super Mario  | 02| accesses $8000-$bfff |
 |06| Hello Kang Si| 02| boots as Ghost House |
 |07| Solomon Key  | 84| |
 |08| Buk Doo Gun  | 02| boots as Lode Runner |
@@ -263,6 +264,7 @@ public:
 		: sms_state(mconfig, type, tag)
 		, m_rom_view(*this, "rom_view")
 		, m_game_bank(*this, "game_bank")
+		, m_sub_bank(*this, "sub_bank")
 		, m_game_data(*this, "game_data")
 	{}
 
@@ -277,7 +279,11 @@ protected:
 private:
 	memory_view m_rom_view;
 	required_memory_bank m_game_bank;
+	required_memory_bank m_sub_bank;
 	required_memory_region m_game_data;
+
+	u8 m_rom_select = 0;
+	u8 m_sub_bank_mailbox = 0;
 
 	void port08_w(uint8_t data);
 	void port18_w(uint8_t data);
@@ -290,6 +296,7 @@ void smsbootleg_state::machine_start()
 {
 	sms_state::machine_start();
 	m_game_bank->configure_entries(0, 0x40, m_game_data->base(), 0x8000);
+	m_sub_bank->configure_entries(0, 0x80, m_game_data->base(), 0x4000);
 
 }
 
@@ -298,6 +305,8 @@ void smsbootleg_state::machine_reset()
 	sms_state::machine_reset();
 	m_rom_view.select(0);
 	m_game_bank->set_entry(0);
+	m_sub_bank_mailbox = 2;
+	m_sub_bank->set_entry(2);
 }
 
 void smsbootleg_state::sms_supergame_map(address_map &map)
@@ -306,7 +315,7 @@ void smsbootleg_state::sms_supergame_map(address_map &map)
 	map(0x0000, 0xbfff).view(m_rom_view);
 	m_rom_view[0](0x0000, 0xbfff).rom().region("maincpu", 0);
 	m_rom_view[1](0x0000, 0x7fff).bankr("game_bank");
-	m_rom_view[1](0x8000, 0xbfff).bankr("game_bank"); // Super Mario accesses this
+	m_rom_view[1](0x8000, 0xbfff).bankr("sub_bank");
 	map(0xc000, 0xfff7).ram();
 //  map(0xfffc, 0xffff).rw(FUNC(smsbootleg_state::sms_mapper_r), FUNC(smsbootleg_state::sms_mapper_w));       // Bankswitch control
 	map(0xfffe, 0xfffe).lw8(
@@ -316,10 +325,17 @@ void smsbootleg_state::sms_supergame_map(address_map &map)
 				throw emu_fatalerror("ROM view select %02x\n", data);
 		})
 	);
-	map(0xffff, 0xffff).lw8(
-		NAME([] (u8 data) {
-			if (data != 2)
-				throw emu_fatalerror("ROM mapper select %02x\n", data);
+	map(0xffff, 0xffff).lrw8(
+		NAME([this] () {
+			return m_sub_bank_mailbox;
+		}),
+		NAME([this] (u8 data) {
+			m_sub_bank_mailbox = data;
+			// Need to clamp for Tetris (which goes out of bounds?)
+			// TODO: Super Mario broke with this (is bit 7 a modifier?)
+			// Solomon Key relies on being able to set bank independent from bit 7 ...
+			const u8 bank_num = std::min(0x7f, (m_rom_select << 1) + (data & 0xf));
+			m_sub_bank->set_entry(bank_num);
 		})
 	);
 }
@@ -329,10 +345,11 @@ void smsbootleg_state::port08_w(uint8_t data)
 //  logerror("port08_w %02x\n", data);
 //	m_bank->set_entry(BIT(data, 3));
 	// TODO: different for smssgamea
-	u8 rom_select = bitswap<6>(data & 0x3f, 3, 2, 1, 0, 5, 4);
-	rom_select += ((data >> 6) & 3) << 2;
-	LOG("%02x %08x\n", data, rom_select * 0x8000);
-	m_game_bank->set_entry(rom_select & 0x3f);
+	m_rom_select = bitswap<6>(data & 0x3f, 3, 2, 1, 0, 5, 4);
+	m_rom_select += ((data >> 6) & 3) << 2;
+	LOG("I/O $08: %02x %08x\n", data, m_rom_select * 0x8000);
+	m_game_bank->set_entry(m_rom_select & 0x3f);
+	m_sub_bank->set_entry(m_rom_select << 1);
 }
 
 void smsbootleg_state::port18_w(uint8_t data)
