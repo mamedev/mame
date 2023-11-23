@@ -622,7 +622,7 @@ void yamaha_dx100_state::dx100(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(yamaha_dx100_state::palette_init), 3);
 
-	hd44780_device &lcdc(HD44780(config, "lcdc", 250'000)); // HD44780RA00; TODO: clock not measured, datasheet typical clock used
+	hd44780_device &lcdc(HD44780(config, "lcdc", 270'000)); // HD44780RA00, 91K resistor
 	lcdc.set_lcd_size(1, 16);
 	lcdc.set_pixel_update_cb(FUNC(yamaha_dx100_state::lcd_pixel_update));
 
