@@ -163,10 +163,10 @@ INPUT_PORTS_END
 void mondial_state::mondial(machine_config &config)
 {
 	// basic machine hardware
-	M65SC02(config, m_maincpu, 2000000);
+	M65SC02(config, m_maincpu, 2'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mondial_state::mondial_mem);
 
-	const attotime irq_period = attotime::from_hz(2000000 / 0x1000);
+	const attotime irq_period = attotime::from_hz(2'000'000 / 0x1000);
 	m_maincpu->set_periodic_int(FUNC(mondial_state::irq0_line_assert), irq_period);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);

@@ -684,7 +684,7 @@ void su9_state::su9(machine_config &config)
 void csc_state::rsc(machine_config &config)
 {
 	// basic machine hardware
-	M6502(config, m_maincpu, 1800000); // measured approx 1.81MHz
+	M6502(config, m_maincpu, 1'800'000); // measured approx 1.81MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &csc_state::rsc_map);
 
 	auto &irq_clock(CLOCK(config, "irq_clock", 546)); // from 555 timer, measured

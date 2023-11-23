@@ -198,10 +198,10 @@ INPUT_PORTS_END
 void star_state::sstar28k(machine_config &config)
 {
 	// basic machine hardware
-	M6502(config, m_maincpu, 2000000); // no XTAL
+	M6502(config, m_maincpu, 2'000'000); // no XTAL
 	m_maincpu->set_addrmap(AS_PROGRAM, &star_state::sstar28k_map);
 
-	const attotime nmi_period = attotime::from_hz(2000000 / 0x2000); // 4020 Q13
+	const attotime nmi_period = attotime::from_hz(2'000'000 / 0x2000); // 4020 Q13
 	m_maincpu->set_periodic_int(FUNC(star_state::nmi_line_pulse), nmi_period);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);

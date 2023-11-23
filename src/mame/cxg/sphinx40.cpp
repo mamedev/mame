@@ -273,10 +273,10 @@ INPUT_PORTS_END
 void sphinx40_state::sphinx40(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 8000000);
+	M68000(config, m_maincpu, 8'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sphinx40_state::main_map);
 
-	const attotime irq_period = attotime::from_hz(8000000 / 0x1000);
+	const attotime irq_period = attotime::from_hz(8'000'000 / 0x1000);
 	m_maincpu->set_periodic_int(FUNC(sphinx40_state::irq4_line_hold), irq_period);
 
 	PIA6821(config, m_pia);

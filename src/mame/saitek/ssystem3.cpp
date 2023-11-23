@@ -488,7 +488,7 @@ void ssystem3_state::ssystem3(machine_config &config)
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &ssystem3_state::ssystem3_map);
 
-	M6808(config, m_subcpu, 6800000); // LC circuit, measured
+	M6808(config, m_subcpu, 6'800'000); // LC circuit, measured
 	m_subcpu->set_addrmap(AS_PROGRAM, &ssystem3_state::chessunit_map);
 
 	config.set_perfect_quantum(m_maincpu);

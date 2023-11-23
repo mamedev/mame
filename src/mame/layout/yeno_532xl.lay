@@ -432,8 +432,8 @@ license:CC0-1.0
 		<element name="digit1" ref="digit"><bounds x="42.75" y="91" width="4" height="6" /></element>
 		<element name="digit0" ref="digit"><bounds x="47.75" y="91" width="4" height="6" /></element>
 
-		<element name="lcd7" ref="ldot"><bounds x="42.13" y="92.55" width="0.6" height="0.6" /></element>
-		<element name="lcd7" ref="ldot"><bounds x="41.97" y="94.75" width="0.6" height="0.6" /></element>
+		<element name="lcd7" ref="ldot"><bounds xc="42.45" yc="92.25" width="0.6" height="0.6" /></element>
+		<element name="lcd7" ref="ldot"><bounds xc="42.15" yc="95.65" width="0.6" height="0.6" /></element>
 	</group>
 
 	<group name="lcd2">
@@ -444,8 +444,8 @@ license:CC0-1.0
 		<element name="digit5" ref="digit"><bounds x="42.75" y="91" width="4" height="6" /></element>
 		<element name="digit4" ref="digit"><bounds x="47.75" y="91" width="4" height="6" /></element>
 
-		<element name="lcd39" ref="ldot"><bounds x="42.13" y="92.55" width="0.6" height="0.6" /></element>
-		<element name="lcd39" ref="ldot"><bounds x="41.97" y="94.75" width="0.6" height="0.6" /></element>
+		<element name="lcd39" ref="ldot"><bounds xc="42.45" yc="92.25" width="0.6" height="0.6" /></element>
+		<element name="lcd39" ref="ldot"><bounds xc="42.15" yc="95.65" width="0.6" height="0.6" /></element>
 	</group>
 
 

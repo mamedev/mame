@@ -243,11 +243,11 @@ INPUT_PORTS_END
 void chesstrv_state::chesstrv(machine_config &config)
 {
 	// basic machine hardware
-	F8(config, m_maincpu, 4500000/2); // approximation
+	F8(config, m_maincpu, 4'500'000/2); // approximation
 	m_maincpu->set_addrmap(AS_PROGRAM, &chesstrv_state::chesstrv_mem);
 	m_maincpu->set_addrmap(AS_IO, &chesstrv_state::chesstrv_io);
 
-	f38t56_device &psu(F38T56(config, "psu", 4500000/2));
+	f38t56_device &psu(F38T56(config, "psu", 4'500'000/2));
 	psu.read_a().set(FUNC(chesstrv_state::ram_data_r));
 	psu.write_a().set(FUNC(chesstrv_state::ram_data_w));
 	psu.read_b().set(FUNC(chesstrv_state::input_r));
@@ -264,8 +264,8 @@ void chesstrv_state::chesstrvi(machine_config &config)
 	chesstrv(config);
 
 	// basic machine hardware
-	m_maincpu->set_clock(6000000/2); // approximation
-	subdevice<f38t56_device>("psu")->set_clock(6000000/2);
+	m_maincpu->set_clock(6'000'000/2); // approximation
+	subdevice<f38t56_device>("psu")->set_clock(6'000'000/2);
 
 	TIMER(config, m_comp_timer).configure_generic(FUNC(chesstrv_state::computing));
 	config.set_default_layout(layout_saitek_chesstrvi);

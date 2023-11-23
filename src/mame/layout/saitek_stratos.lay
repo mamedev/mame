@@ -486,16 +486,16 @@ license:CC0-1.0
 		<element name="digit3" ref="digit"><bounds x="30" y="0" width="4" height="6" /></element>
 		<element name="digit4" ref="digit"><bounds x="34" y="0" width="4" height="6" /></element>
 
-		<element name="lcd0.0.0" ref="ldot"><bounds x="28.91" y="1.8" width="0.6" height="0.6" /></element>
-		<element name="lcd0.0.0" ref="ldot"><bounds x="28.69" y="3.65" width="0.6" height="0.6" /></element>
+		<element name="lcd0.0.0" ref="ldot"><bounds x="28.91" y="1.4" width="0.6" height="0.6" /></element>
+		<element name="lcd0.0.0" ref="ldot"><bounds x="28.69" y="4.05" width="0.6" height="0.6" /></element>
 
 		<element name="digit5" ref="digit"><bounds x="20" y="8" width="4" height="6" /></element>
 		<element name="digit6" ref="digit"><bounds x="24" y="8" width="4" height="6" /></element>
 		<element name="digit7" ref="digit"><bounds x="30" y="8" width="4" height="6" /></element>
 		<element name="digit8" ref="digit"><bounds x="34" y="8" width="4" height="6" /></element>
 
-		<element name="lcd1.0.0" ref="ldot"><bounds x="28.91" y="9.8" width="0.6" height="0.6" /></element>
-		<element name="lcd1.0.0" ref="ldot"><bounds x="28.69" y="11.65" width="0.6" height="0.6" /></element>
+		<element name="lcd1.0.0" ref="ldot"><bounds x="28.91" y="9.4" width="0.6" height="0.6" /></element>
+		<element name="lcd1.0.0" ref="ldot"><bounds x="28.69" y="12.05" width="0.6" height="0.6" /></element>
 	</group>
 
 	<group name="lcd2">
