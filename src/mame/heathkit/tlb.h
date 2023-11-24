@@ -275,10 +275,9 @@ protected:
 	void nop_w(offs_t reg, uint8_t val);
 	virtual void set_irq_line() override;
 
-	required_memory_bank    		m_mem_bank;
+	required_memory_bank            m_mem_bank;
 	required_shared_ptr<uint8_t>    m_p_graphic_ram;
 
-	uint8_t m_bank_num;
 	uint8_t m_im2_val;
 
 	bool m_alphanumeric_mode_active;

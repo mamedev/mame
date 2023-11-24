@@ -20,7 +20,7 @@
       - In 49/50 row mode, character descenders are cut off.
       - Screen saver does not disable the screen
     - With superset slot option
-      - Screensaver freezes the screen instead of blanking the screen	
+      - Screensaver freezes the screen instead of blanking the screen
 
 ****************************************************************************/
 /***************************************************************************
@@ -1503,7 +1503,6 @@ void heath_imaginator_tlb_device::device_start()
 {
 	heath_tlb_device::device_start();
 
-	save_item(NAME(m_bank_num));
 	save_item(NAME(m_im2_val));
 	save_item(NAME(m_alphanumeric_mode_active));
 	save_item(NAME(m_graphics_mode_active));
@@ -1511,8 +1510,7 @@ void heath_imaginator_tlb_device::device_start()
 	save_item(NAME(m_allow_imaginator_interrupts));
 	save_item(NAME(m_hsync_irq_raised));
 
-	m_mem_bank->configure_entry(0, memregion("maincpu")->base());
-	m_mem_bank->configure_entry(1, memregion("maincpu")->base() + 0x2000);
+	m_mem_bank->configure_entries(0, 2, memregion("maincpu")->base(), 0x2000);
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x6000, 0x7fff, "mem_map_update",
 		[this](offs_t offset, u8 &data, u8 mem_mask) { if (!machine().side_effects_disabled()) { tap_6000h(); } },
@@ -1527,9 +1525,7 @@ void heath_imaginator_tlb_device::device_reset()
 {
 	heath_tlb_device::device_reset();
 
-	m_bank_num = 1;
-
-	m_mem_bank->set_entry(m_bank_num);
+	m_mem_bank->set_entry(1);
 
 	m_alphanumeric_mode_active = true;
 	m_graphics_mode_active = false;
@@ -1578,12 +1574,7 @@ void heath_imaginator_tlb_device::mem_map(address_map &map)
 
 void heath_imaginator_tlb_device::tap_6000h()
 {
-	if (m_bank_num != 0)
-	{
-		m_bank_num = 0;
-
-		m_mem_bank->set_entry(m_bank_num);
-	}
+	m_mem_bank->set_entry(0);
 }
 
 void heath_imaginator_tlb_device::tap_8000h()
