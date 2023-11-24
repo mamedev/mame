@@ -36,10 +36,10 @@ private:
 
 	/* Arcade Card specific */
 	memory_share_creator<uint8_t> m_ram;
-	uint8_t   m_ctrl[4]{};
-	uint32_t  m_base_addr[4]{};
-	uint16_t  m_addr_offset[4]{};
-	uint16_t  m_addr_inc[4]{};
+	uint8_t   m_ctrl[4];
+	uint32_t  m_base_addr[4];
+	uint16_t  m_addr_offset[4];
+	uint16_t  m_addr_inc[4];
 	uint32_t  m_shift;
 	uint8_t   m_shift_reg;
 	uint8_t   m_rotate_reg;

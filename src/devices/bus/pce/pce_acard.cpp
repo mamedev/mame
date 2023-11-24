@@ -28,6 +28,10 @@ pce_acard_duo_device::pce_acard_duo_device(const machine_config &mconfig, device
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_pce_cart_interface( mconfig, *this )
 	, m_ram(*this, "ram", 0x200000, ENDIANNESS_LITTLE)
+	, m_ctrl{0, 0, 0, 0}
+	, m_base_addr{0, 0, 0, 0}
+	, m_addr_offset{0, 0, 0, 0}
+	, m_addr_inc{0, 0, 0, 0}
 	, m_shift(0)
 	, m_shift_reg(0)
 	, m_rotate_reg(0)
