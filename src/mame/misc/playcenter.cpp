@@ -95,15 +95,6 @@ void playcenter_state::playcenter(machine_config &config)
 	// ...
 }
 
-// 'Epox' version. Windows 98 SE.
-ROM_START(plycntre3)
-	ROM_REGION32_LE(0x40000, "bios", 0) // BIOS date: 03/13/2001
-	ROM_LOAD("vp4f1313.bin", 0x00000, 0x40000, CRC(bd4b155f) SHA1(3eafe71e89bf84b72a42e933187676fe08db0492))
-
-	DISK_REGION( "ide:0:hdd" )
-	DISK_IMAGE("playcenter_e_14_0_t", 0, SHA1(b7c7fce1522e64fc5132f223d8a73555c24002a9)) // From an operator, may contain user data. Contains a BIOS for a Trident card (C:\videorom.bin), probably a Trident Blade 3D (PCIR 1023:9880)
-ROM_END
-
 // 'Epox' version.
 ROM_START(plycntrchtr)
 	ROM_REGION32_LE(0x40000, "bios", 0) // BIOS date: 03/13/2001
@@ -131,6 +122,15 @@ ROM_START(plycntrchtrc)
 
 	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE("playcenter_celeron_9.3_tournament", 0, SHA1(eb98f6af20a98d4bf6dc7311035431467ad56605))
+ROM_END
+
+// 'Epox' version. Windows 98 SE.
+ROM_START(plycntre3)
+	ROM_REGION32_LE(0x40000, "bios", 0) // BIOS date: 03/13/2001
+	ROM_LOAD("vp4f1313.bin", 0x00000, 0x40000, CRC(bd4b155f) SHA1(3eafe71e89bf84b72a42e933187676fe08db0492))
+
+	DISK_REGION( "ide:0:hdd" )
+	DISK_IMAGE("playcenter_e_14_0_t", 0, SHA1(b7c7fce1522e64fc5132f223d8a73555c24002a9)) // From an operator, may contain user data. Contains a BIOS for a Trident card (C:\videorom.bin), probably a Trident Blade 3D (PCIR 1023:9880)
 ROM_END
 
 } // Anonymous namespace
