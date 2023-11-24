@@ -1033,7 +1033,7 @@ uint32_t mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &
 	/* bottom border */
 	if (width)
 	{
-		for (y = base_y + LINES_ACTIVE_VIDEO - 1; y <= max_y; y++)
+		for (y = base_y + LINES_ACTIVE_VIDEO; y <= max_y; y++)
 		{
 			// PAL padding is always black, even when border isn't
 			pixel_t color =
