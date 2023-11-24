@@ -1512,13 +1512,9 @@ void heath_imaginator_tlb_device::device_start()
 
 	m_mem_bank->configure_entries(0, 2, memregion("maincpu")->base(), 0x2000);
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x6000, 0x7fff, "mem_map_update",
-		[this](offs_t offset, u8 &data, u8 mem_mask) { if (!machine().side_effects_disabled()) { tap_6000h(); } },
-		[this](offs_t offset, u8 &data, u8 mem_mask) { if (!machine().side_effects_disabled()) { tap_6000h(); } });
-
 	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x8000, 0xbfff, "irq_update",
-		[this](offs_t offset, u8 &data, u8 mem_mask) { if (!machine().side_effects_disabled()) { tap_8000h(); } },
-		[this](offs_t offset, u8 &data, u8 mem_mask) { if (!machine().side_effects_disabled()) { tap_8000h(); } });
+			[this] (offs_t offset, u8 &data, u8 mem_mask) { if (!machine().side_effects_disabled()) { tap_8000h(); } },
+			[this] (offs_t offset, u8 &data, u8 mem_mask) { if (!machine().side_effects_disabled()) { tap_8000h(); } });
 }
 
 void heath_imaginator_tlb_device::device_reset()
@@ -1526,6 +1522,10 @@ void heath_imaginator_tlb_device::device_reset()
 	heath_tlb_device::device_reset();
 
 	m_mem_bank->set_entry(1);
+	m_tap_6000h.remove();
+	m_tap_6000h = m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x6000, 0x7fff, "mem_map_update",
+			[this] (offs_t offset, u8 &data, u8 mem_mask) { if (!machine().side_effects_disabled()) { tap_6000h(); } },
+			[this] (offs_t offset, u8 &data, u8 mem_mask) { if (!machine().side_effects_disabled()) { tap_6000h(); } });
 
 	m_alphanumeric_mode_active = true;
 	m_graphics_mode_active = false;
@@ -1575,6 +1575,7 @@ void heath_imaginator_tlb_device::mem_map(address_map &map)
 void heath_imaginator_tlb_device::tap_6000h()
 {
 	m_mem_bank->set_entry(0);
+	m_tap_6000h.remove();
 }
 
 void heath_imaginator_tlb_device::tap_8000h()

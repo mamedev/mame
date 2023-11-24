@@ -277,6 +277,7 @@ protected:
 
 	required_memory_bank            m_mem_bank;
 	required_shared_ptr<uint8_t>    m_p_graphic_ram;
+	memory_passthrough_handler      m_tap_6000h;
 
 	uint8_t m_im2_val;
 
