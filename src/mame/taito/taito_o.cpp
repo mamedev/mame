@@ -62,6 +62,7 @@ Notes:
 #include "speaker.h"
 
 #include "parentj.lh"
+#include "eibise.lh"
 
 
 namespace {
@@ -219,10 +220,9 @@ Bit 14 : paid lamp? (one short pulse after all is paid)
 
 
 */
-		for (u8 i = 0; i < 16; i++)
-//			m_lamps[i + 16] = BIT(data, i);
-			m_lamps[i] = BIT(data, i);
-//		logerror("Port b:lamps: data:%04x\n", data);
+	for (u8 i = 0; i < 16; i++)
+		m_lamps[i] = BIT(data, i);
+//	logerror("Port b:lamps: data:%04x\n", data);
 }
 
 
@@ -240,12 +240,12 @@ void taitoo_state::prg_map(address_map &map)
 	map(0x500800, 0x500fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 }
 
+
 INPUT_CHANGED_MEMBER(taitoo_state::all_clear_cb)
 {
 	if (oldval && !newval)
 		m_maincpu->set_input_line(7, HOLD_LINE);
 }
-
 
 
 static INPUT_PORTS_START( parentj )
@@ -269,12 +269,12 @@ static INPUT_PORTS_START( parentj )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_OTHER )         PORT_NAME("Init NVRAM") PORT_CODE(KEYCODE_7) PORT_CHANGED_MEMBER(DEVICE_SELF, taitoo_state, all_clear_cb, 0)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE1 )      PORT_NAME("Reset Key")  PORT_CODE(KEYCODE_R)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE2 )      PORT_NAME("Last Key")   PORT_CODE(KEYCODE_8)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )   PORT_NAME("Meter Key")  // PORT_TOGGLE
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )   PORT_NAME("Meter Key")
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto1", taitoio_opto_device, opto_h_r)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto1", taitoio_opto_device, opto_l_r)
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OTHER )         PORT_NAME("Hopper Over")  // Hopper overload sensor to activate diverter coil
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OTHER )         PORT_NAME("Hopper Over")  // hopper overload sensor to activate diverter coil
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto2", taitoio_opto_device, opto_h_r)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto2", taitoio_opto_device, opto_l_r)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )   PORT_NAME("All Clear SW")
@@ -337,12 +337,12 @@ static INPUT_PORTS_START( eibise )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE1 )      PORT_NAME("Reset Key") PORT_CODE(KEYCODE_R)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE2 )      PORT_NAME("Last Key")  PORT_CODE(KEYCODE_8)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )   PORT_NAME("Meter Key") // PORT_TOGGLE
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )   PORT_NAME("Meter Key")
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto1", taitoio_opto_device, opto_h_r)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto1", taitoio_opto_device, opto_l_r)
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OTHER )         PORT_NAME("Hopper Over")  // Hopper overload sensor to activate diverter coil
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OTHER )         PORT_NAME("Hopper Over")  // hopper overload sensor to activate diverter coil
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto2", taitoio_opto_device, opto_h_r)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto2", taitoio_opto_device, opto_l_r)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )   PORT_NAME("All Clear SW")
@@ -512,6 +512,6 @@ ROM_END
 
 } // anonymous namespace
 
-//     YEAR  NAME      PARENT   MACHINE   INPUT     CLASS         INIT        ROT    COMPANY  FULLNAME              FLAGS                                                                     LAYOUT
-GAMEL( 1989, parentj,  0,       taitoo,   parentj,  taitoo_state, empty_init, ROT0, "Taito", "Parent Jack (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_parentj )
-GAME(  1990, eibise,   0,       taitoo,   eibise,   taitoo_state, empty_init, ROT0, "Taito", "Eibise (Japan)",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+//     YEAR  NAME      PARENT   MACHINE   INPUT     CLASS         INIT        ROT    COMPANY  FULLNAME              FLAGS                                               LAYOUT
+GAMEL( 1989, parentj,  0,       taitoo,   parentj,  taitoo_state, empty_init, ROT0, "Taito", "Parent Jack (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_parentj )
+GAMEL( 1990, eibise,   0,       taitoo,   eibise,   taitoo_state, empty_init, ROT0, "Taito", "Eibise (Japan)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_eibise )
