@@ -47,7 +47,7 @@
 #define LOG_REGS    (1U << 2)
 #define LOG_CONF    (1U << 3)
 
-//#define VERBOSE (LOG_SETUP|LOG_CONF|LOG_REGS)
+#define VERBOSE (LOG_SETUP|LOG_CONF|LOG_REGS)
 //#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
@@ -76,6 +76,7 @@ DEFINE_DEVICE_TYPE(AMS40489, ams40489_device, "ams40489", "AMS40489 ASIC (CRTC)"
 #define MODE_CURSOR_SKEW            ((m_mode_control & 0x20) != 0)
 #define MODE_DISPLAY_ENABLE_SKEW    ((m_mode_control & 0x10) != 0)
 #define MODE_ROW_COLUMN_ADDRESSING  ((m_mode_control & 0x04) != 0)
+#define MODE_INTERLACE              ((m_mode_control & 0x03) == 1)
 #define MODE_INTERLACE_AND_VIDEO    ((m_mode_control & 0x03) == 3)
 
 
@@ -687,10 +688,23 @@ TIMER_CALLBACK_MEMBER(mc6845_device::handle_line_timer)
 		}
 	}
 
+// temporary test code
+//     1 == original code plus some minor changes (still runs but is drawing)
+//     0 == new code for alternating lines (locks up gp-19 and apricot pc)
+#define ORIGINAL 0
+
+#if ORIGINAL
 	// For rudimentary 'interlace and video' support, m_raster_counter increments by 1 rather than the correct 2.
 	// The correct test would be:
 	// if ( m_raster_counter == (MODE_INTERLACE_AND_VIDEO ? m_max_ras_addr + 1 : m_max_ras_addr) )
 	if ( m_raster_counter == m_max_ras_addr + (MODE_INTERLACE_AND_VIDEO ? m_interlace_adjust : m_noninterlace_adjust) - 1 )
+#else
+	if (!m_adjust_active && ((!MODE_INTERLACE_AND_VIDEO && m_raster_counter == m_max_ras_addr + m_noninterlace_adjust - 1) ||
+		(MODE_INTERLACE_AND_VIDEO && ((m_odd_field && (m_raster_counter == m_max_ras_addr + m_interlace_adjust - 1)) ||
+			(!m_odd_field && (m_raster_counter == m_max_ras_addr + m_interlace_adjust - 2)))
+		))
+	)
+#endif
 	{
 		/* Check if we have reached the end of the vertical area */
 		if ( m_line_counter == m_vert_char_total )
@@ -699,7 +713,18 @@ TIMER_CALLBACK_MEMBER(mc6845_device::handle_line_timer)
 			m_adjust_active = 1;
 		}
 
+#if ORIGINAL
 		m_raster_counter = 0;
+#else
+		if (MODE_INTERLACE_AND_VIDEO && m_odd_field)
+		{
+			m_raster_counter = 1;
+		}
+		else
+		{
+			m_raster_counter = 0;
+		}
+#endif
 		m_line_counter = ( m_line_counter + 1 ) & 0x7F;
 		m_line_address = ( m_line_address + m_horiz_disp ) & 0x3fff;
 
@@ -708,15 +733,22 @@ TIMER_CALLBACK_MEMBER(mc6845_device::handle_line_timer)
 	}
 	else
 	{
-		// For rudimentary 'interlace and video' support, m_raster_counter increments by 1 rather than the correct 2.
-		// m_raster_counter = ( m_raster_counter + (MODE_INTERLACE_AND_VIDEO ? 2 : 1) ) & 0x1F;
+#if ORIGINAL
 		m_raster_counter = ( m_raster_counter + 1 ) & 0x1F;
+#else
+		m_raster_counter = ( m_raster_counter + (MODE_INTERLACE_AND_VIDEO ? 2 : 1) ) & 0x1F;
+#endif
 	}
 
 	if ( m_adjust_active )
 	{
 		/* Check if we have reached the end of a full cycle */
+#if ORIGINAL
 		if ( m_adjust_counter == m_vert_total_adj )
+#else
+		if ((!MODE_INTERLACE_AND_VIDEO && (m_adjust_counter == m_vert_total_adj )) ||
+			(MODE_INTERLACE_AND_VIDEO && ((m_adjust_counter + 1) >= m_vert_total_adj)))
+#endif
 		{
 			m_adjust_active = 0;
 			m_raster_counter = 0;
@@ -727,7 +759,13 @@ TIMER_CALLBACK_MEMBER(mc6845_device::handle_line_timer)
 			if (m_supports_vert_sync_width)
 			{
 				if (match_line())
+				{
 					new_vsync = true;
+					if (MODE_INTERLACE_AND_VIDEO)
+					{
+						m_odd_field = !m_odd_field;
+					}
+				}
 			}
 
 			/* also update the cursor state now */
@@ -738,7 +776,11 @@ TIMER_CALLBACK_MEMBER(mc6845_device::handle_line_timer)
 		}
 		else
 		{
+#if ORIGINAL
 			m_adjust_counter = ( m_adjust_counter + 1 ) & 0x1F;
+#else
+			m_adjust_counter = ( m_adjust_counter + (MODE_INTERLACE_AND_VIDEO ? 2 : 1) ) & 0x1F;
+#endif
 		}
 	}
 
@@ -919,16 +961,6 @@ uint8_t mc6845_device::draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangl
 	// displayable area, not relative to the screen bitmap origin.
 	int8_t cursor_x = cursor_visible ? (m_cursor_addr - m_current_disp_addr) : -1;
 	int de = (y <= m_max_visible_y) ? 1 : 0;
-	bool call_update_row = true;
-
-	if (MODE_INTERLACE_AND_VIDEO)
-	{
-		if ((m_odd_frame && ((y & 0x01) == 0x01)) ||
-			(!m_odd_frame && ((y & 0x01) == 0x00)))
-		{
-			call_update_row = false;
-		}
-	}
 
 	int vbp = m_vert_pix_total - m_vsync_off_pos;
 	if (vbp < 0) vbp = 0;
@@ -942,17 +974,11 @@ uint8_t mc6845_device::draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangl
 		uint8_t cr = y / (m_max_ras_addr + (MODE_INTERLACE_AND_VIDEO ? m_interlace_adjust : m_noninterlace_adjust));
 		uint16_t ma = (cr << 8) | cc;
 
-		if (call_update_row)
-		{
-			m_update_row_cb(bitmap, cliprect, ma + m_disp_start_addr, ra, y, m_horiz_disp, cursor_x, de, hbp, vbp);
-		}
+		m_update_row_cb(bitmap, cliprect, ma + m_disp_start_addr, ra, y, m_horiz_disp, cursor_x, de, hbp, vbp);
 	}
 	else
 	{
-		if (call_update_row)
-		{
-			m_update_row_cb(bitmap, cliprect, m_current_disp_addr, ra, y, m_horiz_disp, cursor_x, de, hbp, vbp);
-		}
+		m_update_row_cb(bitmap, cliprect, m_current_disp_addr, ra, y, m_horiz_disp, cursor_x, de, hbp, vbp);
 	}
 
 	/* update MA if the last raster address */
@@ -1012,7 +1038,6 @@ uint32_t mc6845_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		{
 			this->draw_scanline(y, bitmap, cliprect);
 		}
-		m_odd_frame = !m_odd_frame;
 
 		/* call the tear down function if any */
 		m_end_update_cb(bitmap, cliprect);
@@ -1068,7 +1093,7 @@ void mc6845_device::device_start()
 	m_double_r6_in_interlace_video_mode = true;
 	m_has_valid_parameters = false;
 	m_display_disabled_msg_shown = false;
-	m_odd_frame = true;
+	m_odd_field = false;
 	m_line_enable_ff = false;
 	m_vsync_ff = 0;
 	m_raster_counter = 0;
@@ -1140,7 +1165,7 @@ void mc6845_device::device_start()
 	save_item(NAME(m_line_address));
 	save_item(NAME(m_cursor_x));
 	save_item(NAME(m_has_valid_parameters));
-	save_item(NAME(m_odd_frame));
+	save_item(NAME(m_odd_field));
 }
 
 

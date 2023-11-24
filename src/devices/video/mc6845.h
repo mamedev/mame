@@ -182,7 +182,8 @@ protected:
 	uint8_t   m_adjust_counter;
 	uint8_t   m_vsync_width_counter;
 
-	bool    m_line_enable_ff;       /* Internal flip flop which is set when the line_counter is reset and reset when vert_disp is reached */
+	bool      m_line_enable_ff;       /* Internal flip flop which is set when the line_counter is reset and reset when vert_disp is reached */
+	bool      m_odd_field;
 	uint8_t   m_vsync_ff;
 	uint8_t   m_adjust_active;
 	uint16_t  m_line_address;
@@ -211,7 +212,6 @@ protected:
 	uint16_t  m_vsync_off_pos;
 	bool    m_has_valid_parameters;
 	bool    m_display_disabled_msg_shown;
-	bool    m_odd_frame;
 
 	uint16_t   m_current_disp_addr;   /* the display address currently drawn (used only in mc6845_update) */
 
