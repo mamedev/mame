@@ -142,7 +142,7 @@ void sc9c_state::sc9c_set_cpu_freq()
 {
 	// SC9(C01) was released with 1.5MHz, 1.6MHz, or 1.9MHz CPU
 	u8 inp = ioport("FAKE")->read();
-	m_maincpu->set_unscaled_clock((inp & 2) ? 1900000 : ((inp & 1) ? 1600000 : 1500000));
+	m_maincpu->set_unscaled_clock((inp & 2) ? 1'900'000 : ((inp & 1) ? 1'600'000 : 1'500'000));
 }
 
 
@@ -289,7 +289,7 @@ void sc9_state::sc9b(machine_config &config)
 	sc9d(config);
 
 	// basic machine hardware
-	m_maincpu->set_clock(1500000); // from ceramic resonator "681 JSA", measured
+	m_maincpu->set_clock(1'500'000); // from ceramic resonator "681 JSA", measured
 	m_maincpu->set_addrmap(AS_PROGRAM, &sc9_state::sc9_map);
 }
 

@@ -237,7 +237,7 @@ INPUT_PORTS_END
 void cchess2_state::cncchess2(machine_config &config)
 {
 	// basic machine hardware
-	M6504(config, m_maincpu, 1000000); // approximation, no XTAL
+	M6504(config, m_maincpu, 1'000'000); // approximation, no XTAL
 	m_maincpu->set_addrmap(AS_PROGRAM, &cchess2_state::main_map);
 
 	PIA6821(config, m_pia[0]);

@@ -1488,9 +1488,11 @@ void swp30_device::execute_run()
 				const std::array<u16, 3> &vol = m_mixer[mix].vol;
 
 				// It looks like this could be turned into something generic, but not 100% clear
+				// routes 000100010001, 000200020002 etc seem to target the melo ports
 				switch(route) {
 				case 0x000000000000:
-					// Incorrect, the program writes the outputs to m30/m31
+					// Incorrect, the program writes the outputs to
+					// m30/m31, but right now the program doesn't run.
 					m_meg_output[0] += meg_att(input, (vol[0] >> 8)   + (vol[1] >> 8));
 					m_meg_output[1] += meg_att(input, (vol[0] & 0xff) + (vol[1] >> 8));
 					break;

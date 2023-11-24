@@ -189,7 +189,7 @@ INPUT_PORTS_END
 void compan_state::compan(machine_config &config)
 {
 	// basic machine hardware
-	M6504(config, m_maincpu, 1000000); // approximation, no XTAL
+	M6504(config, m_maincpu, 1'000'000); // approximation, no XTAL
 	m_maincpu->set_addrmap(AS_PROGRAM, &compan_state::main_map);
 
 	PIA6821(config, m_pia);

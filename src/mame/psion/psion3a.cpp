@@ -8,13 +8,16 @@
     - sound devices, replace fake Psion Codec device with M7542 and M7702-03
     - serial ports
     - fix RAM detection for 3mx
+    - 3mx speed switch using CTRL+Diamond
+    - 3c/3mx backlight using Psion+Space
+    - 3c/3mx IrDA
 
 ******************************************************************************/
 
 #include "emu.h"
 #include "machine/nvram.h"
 #include "machine/psion_asic9.h"
-//#include "machine/psion_condor.h"
+#include "machine/psion_condor.h"
 #include "machine/psion_ssd.h"
 #include "machine/ram.h"
 #include "sound/spkrdev.h"
@@ -145,7 +148,7 @@ class psion3c_state : public psion3a_base_state
 public:
 	psion3c_state(const machine_config &mconfig, device_type type, const char *tag)
 		: psion3a_base_state(mconfig, type, tag)
-		//, m_condor(*this, "condor")
+		, m_condor(*this, "condor")
 		, m_honda(*this, "honda")
 	{ }
 
@@ -155,7 +158,7 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	//required_device<psion_condor_device> m_condor;
+	required_device<psion_condor_device> m_condor;
 	required_device<psion_honda_slot_device> m_honda;
 };
 
@@ -181,7 +184,7 @@ void psion3a_base_state::machine_start()
 
 void psion3c_state::machine_reset()
 {
-	//m_asic9->io_space().install_readwrite_handler(0x0100, 0x011f, read8sm_delegate(*m_condor, FUNC(psion_condor_device::read)), write8sm_delegate(*m_condor, FUNC(psion_condor_device::write)), 0x00ff);
+	m_asic9->io_space().install_readwrite_handler(0x0100, 0x011f, read8sm_delegate(*m_condor, FUNC(psion_condor_device::read)), write8sm_delegate(*m_condor, FUNC(psion_condor_device::write)), 0x00ff);
 }
 
 
@@ -458,18 +461,18 @@ void psion3c_state::psion3c(machine_config &config)
 	PSION_S3A_CODEC(config, m_codec).add_route(ALL_OUTPUTS, "mono", 1.00); // TODO: M7702-03
 	m_asic9->pcm_out().set(m_codec, FUNC(psion3a_codec_device::pcm_in));
 
-	//PSION_CONDOR(config, m_condor);
-	//m_condor->txd_handler().set(m_honda, FUNC(psion_honda_slot_device::write_txd));
-	//m_condor->rts_handler().set(m_honda, FUNC(psion_honda_slot_device::write_rts));
-	//m_condor->dtr_handler().set(m_honda, FUNC(psion_honda_slot_device::write_dtr));
-	//m_condor->int_handler().set(m_asic9, FUNC(psion_asic9_device::eint1_w));
+	PSION_CONDOR(config, m_condor);
+	m_condor->txd_handler().set(m_honda, FUNC(psion_honda_slot_device::write_txd));
+	m_condor->rts_handler().set(m_honda, FUNC(psion_honda_slot_device::write_rts));
+	m_condor->dtr_handler().set(m_honda, FUNC(psion_honda_slot_device::write_dtr));
+	m_condor->int_handler().set(m_asic9, FUNC(psion_asic9_device::eint1_w));
 
 	// Honda expansion port
 	PSION_HONDA_SLOT(config, m_honda, psion_honda_devices, nullptr);
-	//m_honda->rxd_handler().set(m_condor, FUNC(psion_condor_device::write_rxd));
-	//m_honda->dcd_handler().set(m_condor, FUNC(psion_condor_device::write_dcd));
-	//m_honda->dsr_handler().set(m_condor, FUNC(psion_condor_device::write_dsr));
-	//m_honda->cts_handler().set(m_condor, FUNC(psion_condor_device::write_cts));
+	m_honda->rxd_handler().set(m_condor, FUNC(psion_condor_device::write_rxd));
+	m_honda->dcd_handler().set(m_condor, FUNC(psion_condor_device::write_dcd));
+	m_honda->dsr_handler().set(m_condor, FUNC(psion_condor_device::write_dsr));
+	m_honda->cts_handler().set(m_condor, FUNC(psion_condor_device::write_cts));
 	m_honda->sdoe_handler().set(m_asic9, FUNC(psion_asic9_device::medchng_w)); // TODO: verify input line
 	m_asic9->data_r<4>().set(m_honda, FUNC(psion_honda_slot_device::data_r));
 	m_asic9->data_w<4>().set(m_honda, FUNC(psion_honda_slot_device::data_w));
@@ -548,10 +551,10 @@ ROM_END
 
 
 //    YEAR  NAME          PARENT    COMPAT  MACHINE    INPUT        CLASS           INIT         COMPANY             FULLNAME                    FLAGS
-COMP( 1993, psion3a,      0,        0,      psion3a,   psion3a,     psion3a_state,  empty_init,  "Psion",            "Series 3a",                0 )
-COMP( 1994, pocketbk2,    psion3a,  0,      psion3a,   pocketbk2,   psion3a_state,  empty_init,  "Acorn Computers",  "Pocket Book II",           0 )
-COMP( 1995, psion3a2,     psion3a,  0,      psion3a2,  psion3a,     psion3a_state,  empty_init,  "Psion",            "Series 3a (2M)",           0 )
-COMP( 1995, psion3a2_de,  psion3a,  0,      psion3a2,  psion3a_de,  psion3a_state,  empty_init,  "Psion",            "Series 3a (2M) (German)",  0 )
-COMP( 1997, psion3a2_ru,  psion3a,  0,      psion3a2,  psion3a,     psion3a_state,  empty_init,  "Psion",            "Series 3a (2M) (Russian)", 0 )
-COMP( 1996, psion3c,      0,        0,      psion3c,   psion3c,     psion3c_state,  empty_init,  "Psion",            "Series 3c",                0 )
-COMP( 1998, psion3mx,     0,        0,      psion3mx,  psion3c,     psion3mx_state, empty_init,  "Psion",            "Series 3mx",               0 )
+COMP( 1993, psion3a,      0,        0,      psion3a,   psion3a,     psion3a_state,  empty_init,  "Psion",            "Series 3a",                MACHINE_SUPPORTS_SAVE )
+COMP( 1994, pocketbk2,    psion3a,  0,      psion3a,   pocketbk2,   psion3a_state,  empty_init,  "Acorn Computers",  "Pocket Book II",           MACHINE_SUPPORTS_SAVE )
+COMP( 1995, psion3a2,     psion3a,  0,      psion3a2,  psion3a,     psion3a_state,  empty_init,  "Psion",            "Series 3a (2M)",           MACHINE_SUPPORTS_SAVE )
+COMP( 1995, psion3a2_de,  psion3a,  0,      psion3a2,  psion3a_de,  psion3a_state,  empty_init,  "Psion",            "Series 3a (2M) (German)",  MACHINE_SUPPORTS_SAVE )
+COMP( 1997, psion3a2_ru,  psion3a,  0,      psion3a2,  psion3a,     psion3a_state,  empty_init,  "Psion",            "Series 3a (2M) (Russian)", MACHINE_SUPPORTS_SAVE )
+COMP( 1996, psion3c,      0,        0,      psion3c,   psion3c,     psion3c_state,  empty_init,  "Psion",            "Series 3c",                MACHINE_SUPPORTS_SAVE )
+COMP( 1998, psion3mx,     0,        0,      psion3mx,  psion3c,     psion3mx_state, empty_init,  "Psion",            "Series 3mx",               MACHINE_SUPPORTS_SAVE )

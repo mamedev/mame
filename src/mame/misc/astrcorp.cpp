@@ -26,6 +26,7 @@ Year + Game             PCB ID                    CPU                Video      
 04  Zoo                 M1.1                      ASTRO V102PX-005?  ASTRO V06      ASTRO F02 2005-02-18                       Encrypted
 04  Magic Bomb (NB6.1)  J (CS350P001 + CS350P033) ASTRO V102PX-014?  ASTRO V07      ?,                                         Encrypted, select CGA / VGA via jumper
 04  Go & Stop           K2 (CS350P011)            no markings        ASTRO V05      ASTRO F01 2007-06-03                       Encrypted
+04  Magic Bomb (AA.72C) M1.1                      ASTRO V102PX-014?  ASTRO V05      ASTRO F02 2005-02-18                       Encrypted
 05  Dino Dino           T-3802A                   ASTRO V102PX-010?  ASTRO V05      ASTRO F02 2003-03-12                       Encrypted
 05  Stone Age           L1                        ASTRO V102PX-012?  ASTRO V05(x2)  ASTRO F02 2004-09-04                       Encrypted
 05? Hacher (hack)       M1.2                      ?                  ?              ASTRO F02 2005-02-18                       Encrypted
@@ -1751,15 +1752,15 @@ ROM_END
 
 ROM_START( magibombj )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "rom1", 0x00000, 0x10000, CRC(7faa57c3) SHA1(6176848354f90b819d4ffe2d91cdd9cca36ff58f) )
-	ROM_LOAD16_BYTE( "rom2", 0x00001, 0x10000, CRC(987c3e4e) SHA1(d2ffac771dc1d30f0598c79cad0691753e4945f7) )
-	ROM_FILL(                0x20000, 0x20000, 0xff )
+	ROM_LOAD16_BYTE( "1_mb_aa72c.u26", 0x00000, 0x10000, CRC(7faa57c3) SHA1(6176848354f90b819d4ffe2d91cdd9cca36ff58f) )
+	ROM_LOAD16_BYTE( "2_mb_aa72c.u25", 0x00001, 0x10000, CRC(987c3e4e) SHA1(d2ffac771dc1d30f0598c79cad0691753e4945f7) )
+	ROM_FILL(                          0x20000, 0x20000, 0xff )
 
 	ROM_REGION( 0x200000, "sprites", 0 )
-	ROM_LOAD( "mx29f1610ml.u26", 0x000000, 0x200000, CRC(c120f256) SHA1(f7468fb73b2f7453c950256880c0b8db24849a4e) )
+	ROM_LOAD( "mx29f1610ml.u26", 0x000000, 0x200000, CRC(c120f256) SHA1(f7468fb73b2f7453c950256880c0b8db24849a4e) ) // the "U26" marking is present twice
 
 	ROM_REGION( 0x80000, "oki", 0 )
-	ROM_LOAD( "rom5", 0x00000, 0x80000, CRC(c9edbf1b) SHA1(8e3a96a38aea23950d6add66a5a3d079013bc217) )
+	ROM_LOAD( "5_mb_e1.0", 0x00000, 0x80000, CRC(c9edbf1b) SHA1(8e3a96a38aea23950d6add66a5a3d079013bc217) )
 
 	ROM_REGION16_LE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "93c46.u6", 0x00, 0x80, CRC(7278d581) SHA1(c0851466b669e42c657ca5517c00c44d76e559f4) ) // factory default

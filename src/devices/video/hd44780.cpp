@@ -22,62 +22,69 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(HD44780,      hd44780_device,      "hd44780_a00",  "Hitachi HD44780A00 LCD Controller")
-DEFINE_DEVICE_TYPE(HD44780U_A00, hd44780u_a00_device, "hd44780u_a00", "Hitachi HD44780UA00 LCD Controller")
-DEFINE_DEVICE_TYPE(HD44780U_A02, hd44780u_a02_device, "hd44780u_a02", "Hitachi HD44780UA02 LCD Controller")
-DEFINE_DEVICE_TYPE(SED1278_0B,   sed1278_0b_device,   "sed1278_0b",   "Epson SED1278-0B LCD Controller") // packaged as either SED1278F0B or SED1278D0B
-DEFINE_DEVICE_TYPE(KS0066_F00,   ks0066_f00_device,   "ks0066_f00",   "Samsung KS0066 F00 LCD Controller")
-DEFINE_DEVICE_TYPE(KS0066_F05,   ks0066_f05_device,   "ks0066_f05",   "Samsung KS0066 F05 LCD Controller")
+DEFINE_DEVICE_TYPE(HD44780,  hd44780_device,  "hd44780",  "Hitachi HD44780 LCD Controller")
+DEFINE_DEVICE_TYPE(HD44780U, hd44780u_device, "hd44780u", "Hitachi HD44780U LCD Controller")
+DEFINE_DEVICE_TYPE(SED1278,  sed1278_device,  "sed1278",  "Epson SED1278 LCD Controller") // packaged as either SED1278F0B or SED1278D0B
+DEFINE_DEVICE_TYPE(KS0066,   ks0066_device,   "ks0066",   "Samsung KS0066 LCD Controller")
 
 
 //-------------------------------------------------
 //  ROM( hd44780 )
 //-------------------------------------------------
 
-ROM_START( hd44780_a00 )
+ROM_START( hd44780 )
+	ROM_DEFAULT_BIOS("a00")
+	ROM_SYSTEM_BIOS(0, "a00", "A00")
+
 	ROM_REGION( 0x1000, "cgrom", 0 )
-	ROM_LOAD( "hd44780_a00.bin",    0x0000, 0x1000,  BAD_DUMP CRC(e459877c) SHA1(65cf075a988cdcbb316b9afdd0529b374a1a65ec)) // from page 97 of the 1985 HD44780 datasheet from crystalfontz
+	ROMX_LOAD( "hd44780_a00.bin",    0x0000, 0x1000,  BAD_DUMP CRC(e459877c) SHA1(65cf075a988cdcbb316b9afdd0529b374a1a65ec), ROM_BIOS(0)) // from page 97 of the 1985 HD44780 datasheet from crystalfontz
 ROM_END
 
-ROM_START( hd44780u_a00 )
+ROM_START( hd44780u )
+	ROM_DEFAULT_BIOS("a00")
+	ROM_SYSTEM_BIOS(0, "a00", "A00")
+	ROM_SYSTEM_BIOS(1, "a02", "A02")
+	// Note the HD44780UA01 font does exist in the 1994 M24T026 Hitachi LCD Controller Driver LSI Data Book on bitsavers as well
+
 	ROM_REGION( 0x1000, "cgrom", 0 )
-	ROM_LOAD( "hd44780u_a00.bin",    0x0000, 0x1000,  BAD_DUMP CRC(8494cb6b) SHA1(2d4f9cf5ff81f20d2f4e4640f5b8a697a3781eef)) // from page 17 of the 1999 HD44780U datasheet
+	ROMX_LOAD( "hd44780u_a00.bin",    0x0000, 0x1000,  BAD_DUMP CRC(8494cb6b) SHA1(2d4f9cf5ff81f20d2f4e4640f5b8a697a3781eef), ROM_BIOS(0)) // from page 17 of the 1999 HD44780U datasheet
 	// this has 6 characters different from the HD44780A00
 	// this differs slightly (see the '7') from the HD44780UA00 font in the 1994 M24T026 Hitachi LCD Controller Driver LSI Data Book on bitsavers
 	// and needs confirmation from a real device as to which is correct; confirmation on the horizontal offset of the '[' would also be helpful
-ROM_END
-
-// Note the HD44780UA01 font does exist in the 1994 M24T026 Hitachi LCD Controller Driver LSI Data Book on bitsavers as well
-
-ROM_START( hd44780u_a02 )
-	ROM_REGION( 0x1000, "cgrom", 0 )
-	ROM_LOAD( "hd44780u_a02.bin",    0x0000, 0x1000,  BAD_DUMP CRC(6d522b42) SHA1(db8f59573c81933cfc9d3232d419406f0896e60b)) // from page 18 of the 1999 HD44780U datasheet
+	ROMX_LOAD( "hd44780u_a02.bin",    0x0000, 0x1000,  BAD_DUMP CRC(6d522b42) SHA1(db8f59573c81933cfc9d3232d419406f0896e60b), ROM_BIOS(1)) // from page 18 of the 1999 HD44780U datasheet
 	// this differs slightly (see the '7') from the HD44780UA02 font in the 1994 M24T026 Hitachi LCD Controller Driver LSI Data Book on bitsavers
 	// and needs confirmation from a real device as to which is correct
 ROM_END
 
-// TODO: SED1278_0A is 100% identical to hd44780a00, see page 9-32 of the SED1278 datasheet
 
-ROM_START( sed1278_0b )
+ROM_START( sed1278 )
+	ROM_DEFAULT_BIOS("0a")
+	ROM_SYSTEM_BIOS(0, "0a", "0A")
+	ROM_SYSTEM_BIOS(1, "0b", "0B")
+
 	ROM_REGION( 0x1000, "cgrom", 0 )
-	ROM_LOAD( "sed1278_0b.bin",    0x0000, 0x1000,  BAD_DUMP CRC(962498b7) SHA1(41866836ab4ed7bd4c3539bc8df492ba7d7ff42a)) // from page 9-33 of the SED1278 datasheet
+	ROMX_LOAD( "sed1278_0a.bin",    0x0000, 0x1000,  BAD_DUMP CRC(e459877c) SHA1(65cf075a988cdcbb316b9afdd0529b374a1a65ec), ROM_BIOS(0)) // from page 9-32 of the SED1278 datasheet (100% identical to hd44780a00)
+	ROMX_LOAD( "sed1278_0b.bin",    0x0000, 0x1000,  BAD_DUMP CRC(962498b7) SHA1(41866836ab4ed7bd4c3539bc8df492ba7d7ff42a), ROM_BIOS(1)) // from page 9-33 of the SED1278 datasheet
 ROM_END
 
 // TODO: many other SED1278 variants, documented in the datasheet
 
 // ks0066_f00 is 100% identical to hd44780a00, see page 61 of the KS0066 non-U datasheet
 // later ks0066 masks may be different, see page 48 of the other KS0066 datasheet
-ROM_START( ks0066_f00 )
+ROM_START( ks0066 )
+	ROM_DEFAULT_BIOS("f00")
+	ROM_SYSTEM_BIOS(0, "f00", "F00")
+	//ROM_SYSTEM_BIOS(?, "f03", "F03")
+	//ROM_SYSTEM_BIOS(?, "f04", "F04")
+	ROM_SYSTEM_BIOS(1, "f05", "F05")
+	//ROM_SYSTEM_BIOS(?, "f06", "F06")
+	//ROM_SYSTEM_BIOS(?, "f59", "F59")
+
 	ROM_REGION( 0x1000, "cgrom", 0 )
-	ROM_LOAD( "ks0066_f00.bin",    0x0000, 0x1000,  BAD_DUMP CRC(e459877c) SHA1(65cf075a988cdcbb316b9afdd0529b374a1a65ec)) // from page 61 of the KS0066 non-U datasheet
+	ROMX_LOAD( "ks0066_f00.bin",    0x0000, 0x1000,  BAD_DUMP CRC(e459877c) SHA1(65cf075a988cdcbb316b9afdd0529b374a1a65ec), ROM_BIOS(0)) // from page 61 of the KS0066 non-U datasheet
+	ROMX_LOAD( "ks0066_f05.bin",    0x0000, 0x1000,  BAD_DUMP CRC(af9e7bd6) SHA1(0196e871584ee5d370856e7307c0f9d1466e3e51), ROM_BIOS(1)) // from page 51 of the KS0066 datasheet
 ROM_END
 
-ROM_START( ks0066_f05 )
-	ROM_REGION( 0x1000, "cgrom", 0 )
-	ROM_LOAD( "ks0066_f05.bin",    0x0000, 0x1000,  BAD_DUMP CRC(af9e7bd6) SHA1(0196e871584ee5d370856e7307c0f9d1466e3e51)) // from page 51 of the KS0066 datasheet
-ROM_END
-
-// TODO: many other KS0066 variants, documented in the datasheet
 
 //**************************************************************************
 //  live device
@@ -90,7 +97,6 @@ ROM_END
 hd44780_device::hd44780_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hd44780_device(mconfig, HD44780, tag, owner, clock)
 {
-	set_charset_type(CHARSET_HD44780_A00);
 }
 
 hd44780_device::hd44780_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
@@ -107,34 +113,19 @@ hd44780_device::hd44780_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-hd44780u_a00_device::hd44780u_a00_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	hd44780_device(mconfig, HD44780U_A00, tag, owner, clock)
+hd44780u_device::hd44780u_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	hd44780_device(mconfig, HD44780U, tag, owner, clock)
 {
-	set_charset_type(CHARSET_HD44780U_A00);
 }
 
-hd44780u_a02_device::hd44780u_a02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	hd44780_device(mconfig, HD44780U_A02, tag, owner, clock)
+sed1278_device::sed1278_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	hd44780_device(mconfig, SED1278, tag, owner, clock)
 {
-	set_charset_type(CHARSET_HD44780U_A02);
 }
 
-sed1278_0b_device::sed1278_0b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	hd44780_device(mconfig, SED1278_0B, tag, owner, clock)
+ks0066_device::ks0066_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	hd44780_device(mconfig, KS0066, tag, owner, clock)
 {
-	set_charset_type(CHARSET_SED1278_0B);
-}
-
-ks0066_f00_device::ks0066_f00_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	hd44780_device(mconfig, KS0066_F00, tag, owner, clock)
-{
-	set_charset_type(CHARSET_KS0066_F00);
-}
-
-ks0066_f05_device::ks0066_f05_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	hd44780_device(mconfig, KS0066_F05, tag, owner, clock)
-{
-	set_charset_type(CHARSET_KS0066_F05);
 }
 
 
@@ -144,17 +135,22 @@ ks0066_f05_device::ks0066_f05_device(const machine_config &mconfig, const char *
 
 const tiny_rom_entry *hd44780_device::device_rom_region() const
 {
-	switch (m_charset_type)
-	{
-		case CHARSET_HD44780_A00:   return ROM_NAME( hd44780_a00 );
-		case CHARSET_HD44780U_A00:  return ROM_NAME( hd44780u_a00 );
-		case CHARSET_HD44780U_A02:  return ROM_NAME( hd44780u_a02 );
-		case CHARSET_SED1278_0B:    return ROM_NAME( sed1278_0b );
-		case CHARSET_KS0066_F00:    return ROM_NAME( ks0066_f00 );
-		case CHARSET_KS0066_F05:    return ROM_NAME( ks0066_f05 );
-	}
+	return ROM_NAME(hd44780);
+}
 
-	return nullptr;
+const tiny_rom_entry *hd44780u_device::device_rom_region() const
+{
+	return ROM_NAME(hd44780u);
+}
+
+const tiny_rom_entry *sed1278_device::device_rom_region() const
+{
+	return ROM_NAME(sed1278);
+}
+
+const tiny_rom_entry *ks0066_device::device_rom_region() const
+{
+	return ROM_NAME(ks0066);
 }
 
 //-------------------------------------------------
@@ -257,11 +253,6 @@ TIMER_CALLBACK_MEMBER(hd44780_device::blink_tick)
 //**************************************************************************
 //  HELPERS
 //**************************************************************************
-
-void hd44780_device::set_charset_type(int type)
-{
-	m_charset_type = type;
-}
 
 void hd44780_device::set_busy_flag(uint16_t usec)
 {

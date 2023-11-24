@@ -19,7 +19,12 @@
 #define HD44780_PIXEL_UPDATE(name) void name(bitmap_ind16 &bitmap, u8 line, u8 pos, u8 y, u8 x, int state)
 
 
-// ======================> hd44780_device
+// device type declarations
+DECLARE_DEVICE_TYPE(HD44780,  hd44780_device)
+DECLARE_DEVICE_TYPE(HD44780U, hd44780u_device)
+DECLARE_DEVICE_TYPE(SED1278,  sed1278_device)
+DECLARE_DEVICE_TYPE(KS0066,   ks0066_device)
+
 
 class hd44780_device : public device_t
 {
@@ -55,43 +60,23 @@ public:
 protected:
 	hd44780_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_validity_check(validity_checker &valid) const override;
-
-	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	TIMER_CALLBACK_MEMBER(clear_busy_flag);
 	TIMER_CALLBACK_MEMBER(blink_tick);
-
-	// charset
-	enum
-	{
-		CHARSET_HD44780_A00,
-		CHARSET_HD44780U_A00,
-		CHARSET_HD44780U_A02,
-		CHARSET_SED1278_0B,
-		CHARSET_KS0066_F00,
-		CHARSET_KS0066_F05 /*,
-		CHARSET_HD44780U_A01,
-		CHARSET_SED1278_0A,
-		CHARSET_KS0066_F03,
-		CHARSET_KS0066_F04,
-		CHARSET_KS0066_F06,
-		CHARSET_KS0066_F59
-		*/
-	};
 
 	virtual void control_write(u8 data);
 	virtual u8 control_read();
 	virtual void data_write(u8 data);
 	virtual u8 data_read();
 
-	void set_charset_type(int type);
-
 private:
+	enum        { DDRAM, CGRAM };
+
 	// internal helper
 	void set_busy_flag(uint16_t usec);
 	void correct_ac();
@@ -136,64 +121,50 @@ private:
 	int         m_rs_state;
 	int         m_rw_state;
 	bool        m_nibble;
-	int         m_charset_type;
 	u8          m_render_buf[80 * 16];
 	bool        m_function_set_at_any_time;
-
-	enum        { DDRAM, CGRAM };
 };
 
-// ======================> hd44780u_a00_device
 
-class hd44780u_a00_device :  public hd44780_device
+class hd44780u_device : public hd44780_device
 {
 public:
 	// construction/destruction
-	hd44780u_a00_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hd44780u_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	static auto parent_rom_device_type() { return &HD44780; }
+
+protected:
+	// device_t implementation
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
-// ======================> hd44780u_a02_device
 
-class hd44780u_a02_device :  public hd44780_device
+class sed1278_device : public hd44780_device
 {
 public:
 	// construction/destruction
-	hd44780u_a02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sed1278_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	static auto parent_rom_device_type() { return &HD44780; }
+
+protected:
+	// device_t implementation
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
-// ======================> sed1278_0b_device
 
-class sed1278_0b_device :  public hd44780_device
+class ks0066_device : public hd44780_device
 {
 public:
 	// construction/destruction
-	sed1278_0b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ks0066_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	static auto parent_rom_device_type() { return &HD44780; }
+
+protected:
+	// device_t implementation
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
-
-// ======================> ks0066_f00_device
-
-class ks0066_f00_device : public hd44780_device
-{
-public:
-	// construction/destruction
-	ks0066_f00_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-};
-
-// ======================> ks0066_f05_device
-
-class ks0066_f05_device :  public hd44780_device
-{
-public:
-	// construction/destruction
-	ks0066_f05_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-};
-
-// device type definition
-DECLARE_DEVICE_TYPE(HD44780,      hd44780_device)
-DECLARE_DEVICE_TYPE(HD44780U_A00, hd44780u_a00_device)
-DECLARE_DEVICE_TYPE(HD44780U_A02, hd44780u_a02_device)
-DECLARE_DEVICE_TYPE(SED1278_0B,   sed1278_0b_device)
-DECLARE_DEVICE_TYPE(KS0066_F00,   ks0066_f00_device)
-DECLARE_DEVICE_TYPE(KS0066_F05,   ks0066_f05_device)
 
 #endif // MAME_VIDEO_HD44780_H

@@ -150,7 +150,7 @@ void compan2_state::machine_start()
 void compan2_state::set_cpu_freq()
 {
 	// Concord II MCU speed is around twice higher
-	m_maincpu->set_unscaled_clock((ioport("FAKE")->read() & 1) ? 7200000 : 4000000);
+	m_maincpu->set_unscaled_clock((ioport("FAKE")->read() & 1) ? 7'200'000 : 4'000'000);
 }
 
 
@@ -372,7 +372,7 @@ void compan2_state::expchess(machine_config &config)
 	enterp(config);
 
 	// basic machine hardware
-	m_maincpu->set_clock(4000000); // approximation, no XTAL
+	m_maincpu->set_clock(4'000'000); // approximation, no XTAL
 	m_maincpu->in_p2_cb().set(FUNC(compan2_state::input2_r));
 	m_maincpu->out_p2_cb().set("dac", FUNC(dac_1bit_device::write)).bit(0);
 	m_maincpu->in_p4_cb().set(FUNC(compan2_state::power_r));

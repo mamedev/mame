@@ -18302,6 +18302,7 @@ ckongis                         //
 ckongmc                         // 1981 bootleg
 ckongmc2                        // 1981 bootleg
 ckongs                          // bootleg
+crazym                          // (c) 1982 GAT (bootleg)
 devilfshg                       // (c) 1982 Artic (bootleg?)
 devilfshgb                      // (c) 1984 Vision / Artic (bootleg?)
 dingo                           // (c) 1983 Ashby Computers and Graphics LTD. + Jaleco license
@@ -33022,6 +33023,7 @@ polepos2b                       // bootleg
 polepos2bi                      // bootleg
 polepos2bs                      // 1984, BCN Internacional S.A. (bootleg)
 poleposa1                       // 136014   (c) 1982 Atari
+poleposa1n                      //
 poleposa2                       // 136014   (c) 1982 + Atari license
 poleposj                        // (c) 1982
 ppspeed                         // bootleg
@@ -38716,14 +38718,15 @@ twinktmb
 
 @source:sega/megadriv_rad.cpp
 rad_sf2                         // (c)2004 Radica
-rad_sf2p                        // (c)2004 Radica
+rad_sf2uk                       // (c)2004 Radica
 rad_gen1                        // (c)2004 Radica
 rad_gen2                        // (c)2004 Radica
 rad_md1
-rad_md2
+rad_md1uk
+rad_md2uk
 rad_ssoc                        // (c)2004 Radica
 rad_sonic
-rad_sonicp
+rad_sonicuk
 rad_orun
 msi_sf2
 dgunl3227
@@ -41412,6 +41415,7 @@ e100                            //
 
 @source:skeleton/easy_karaoke.cpp
 easykara
+karams
 
 @source:skeleton/elcirculo.cpp
 elcirculo                       // (c) 1980 Inder
@@ -41496,6 +41500,9 @@ hprotr8a                        //
 
 @source:skeleton/ht68k.cpp
 ht68k                           //
+
+@source:skeleton/hudson_poems.cpp
+marimba                         //
 
 @source:skeleton/i7000.cpp
 i7000                           //
@@ -44657,12 +44664,13 @@ sstarkar
 hyprscan                        //
 jak_bbh
 jak_bbsf
-zone3d
 zonefamf
 
 @source:tvgames/spg29x_lexibook_jg7425.cpp
-lx_jg7425
 lx_aven
+lx_frozen
+lx_jg7425
+zone3d
 
 @source:tvgames/spg2xx.cpp
 ablkickb
@@ -44673,6 +44681,7 @@ decathlna
 doraglob                        // (c) 2007 VTech
 doraglobg
 doraphon                        // (c) 2006 VTech
+doraphonf
 dreamlss
 fordrace
 gssytts
@@ -44681,6 +44690,7 @@ guitarss
 guitarssa
 hotwhl2p
 itvphone
+jeuint
 jjstrip
 jouet
 knd
@@ -45551,15 +45561,16 @@ gjrstar                         // Genius Junior Redstar (Germany)
 gjrstar2                        // Genius Junior Redstar 2 (Germany)
 gjrstar3                        // Genius Junior Redstar 3 (Germany)
 gln                             // Genius Leader Notebook
-pitagor                         // Pitagorin
 gls                             // Genius Leader Select
+pcompelr                        // Prekomputer Elektronik (Russia)
 pitagjr                         // Pitagorin Junior
+pitagor                         // Pitagorin
 scientus                        // Scientus (France, from C.Q.F.D)
 
 @source:vtech/gkidabc.cpp
+gjrprofi                        // Genius Junior Profi (Germany)
 gkidabc                         // Genius KID ABC Fan (Germany)
 miprimlec                       // Mis Primeras Lecciones (Spain)
-gjrprofi                        // Genius Junior Profi (Germany)
 
 @source:vtech/glcx.cpp
 bs9009cx                        // 1999 BrainStation 9009 CXL (Germany)
@@ -45856,6 +45867,9 @@ psr340                          // 1999 PSR-340
 
 @source:yamaha/ympsr400.cpp
 psr500                          // 1991 PSR-500
+
+@source:yamaha/ympsr540.cpp
+psr540                          // 1999 PSR-540
 
 @source:yamaha/ymqy70.cpp
 qy70                            // 1997 QY-70

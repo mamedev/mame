@@ -213,7 +213,7 @@ INPUT_PORTS_END
 void intel02_state::intel02(machine_config &config)
 {
 	// basic machine hardware
-	I8080A(config, m_maincpu, 1500000); // measured (no XTAL)
+	I8080A(config, m_maincpu, 1'500'000); // measured (no XTAL)
 	m_maincpu->set_addrmap(AS_PROGRAM, &intel02_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &intel02_state::main_io);
 
