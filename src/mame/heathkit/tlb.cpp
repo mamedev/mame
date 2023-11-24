@@ -20,7 +20,7 @@
       - In 49/50 row mode, character descenders are cut off.
       - Screen saver does not disable the screen
     - With superset slot option
-      - Screensaver freezes the screen instead of blanking the screen	
+      - Screensaver freezes the screen instead of blanking the screen
 
 ****************************************************************************/
 /***************************************************************************
@@ -1483,7 +1483,7 @@ ioport_constructor heath_gp19_tlb_device::device_input_ports() const
  */
 heath_imaginator_tlb_device::heath_imaginator_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	heath_tlb_device(mconfig, HEATH_IMAGINATOR, tag, owner, clock),
-	m_mem_view(*this, "memmap"),
+	m_mem_bank(*this, "membank"),
 	m_p_graphic_ram(*this, "graphicram")
 {
 }
@@ -1503,13 +1503,14 @@ void heath_imaginator_tlb_device::device_start()
 {
 	heath_tlb_device::device_start();
 
-	save_item(NAME(m_mem_map));
 	save_item(NAME(m_im2_val));
 	save_item(NAME(m_alphanumeric_mode_active));
 	save_item(NAME(m_graphics_mode_active));
 	save_item(NAME(m_allow_tlb_interrupts));
 	save_item(NAME(m_allow_imaginator_interrupts));
 	save_item(NAME(m_hsync_irq_raised));
+
+	m_mem_bank->configure_entries(0, 2, memregion("maincpu")->base(), 0x2000);
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x6000, 0x7fff, "mem_map_update",
 		[this](offs_t offset, u8 &data, u8 mem_mask) { if (!machine().side_effects_disabled()) { tap_6000h(); } },
@@ -1524,9 +1525,7 @@ void heath_imaginator_tlb_device::device_reset()
 {
 	heath_tlb_device::device_reset();
 
-	m_mem_map = 1;
-
-	m_mem_view.select(m_mem_map);
+	m_mem_bank->set_entry(1);
 
 	m_alphanumeric_mode_active = true;
 	m_graphics_mode_active = false;
@@ -1551,13 +1550,7 @@ void heath_imaginator_tlb_device::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 
-	map(0x0000, 0x1fff).view(m_mem_view);
-
-	// H19 standard ROM
-	m_mem_view[0](0x0000, 0x1fff).rom().region("maincpu", 0);
-
-	// GCP ROM mapped to 0x0000 on power-up/reset
-	m_mem_view[1](0x0000, 0x1fff).rom().region("maincpu", 0x2000);
+	map(0x0000, 0x1fff).bankr(m_mem_bank);
 
 	// Normal spot of the GCP ROM
 	map(0x2000, 0x3fff).rom();
@@ -1581,11 +1574,7 @@ void heath_imaginator_tlb_device::mem_map(address_map &map)
 
 void heath_imaginator_tlb_device::tap_6000h()
 {
-	if (m_mem_map != 0)
-	{
-		m_mem_map = 0;
-		m_mem_view.select(m_mem_map);
-	}
+	m_mem_bank->set_entry(0);
 }
 
 void heath_imaginator_tlb_device::tap_8000h()
