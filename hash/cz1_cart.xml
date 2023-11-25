@@ -17,6 +17,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="rc20">
+		<description>Piano / Guitar / Percussion (RC-20)</description>
+		<year>1986</year>
+		<publisher>Casio</publisher>
+		<info name="serial" value="RC-20" />
+		<part name="cart" interface="cz_cart">
+			<dataarea name="rom" size="0x4000"> <!-- restored from a sysex dump -->
+				<rom name="rc20.bin" size="0x4000" crc="c0ae5b20" sha1="38df0703d469a53f2f2af00eb94de018d7f95a73" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rc30">
 		<description>Organ / Synth. Sound / Sound Effect (RC-30)</description>
 		<year>1986</year>
