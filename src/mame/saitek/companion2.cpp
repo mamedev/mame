@@ -61,12 +61,12 @@ Hardware notes:
 - port 2 I/O is changed a bit, rest is same as compan2
 
 HD6301V1C42P MCU is used in:
-- CXG Enterprise "S" (black/brown/blue)
-- CXG Star Chess (black/gray)
-- CXG Computachess III
-- CXG Super Computachess
-- CXG Crown
-- CXG Sphinx Galaxy 2 (suspected)
+- CXG Enterprise "S" (model 208, black/brown/blue)
+- CXG Star Chess (model 209, black/gray)
+- CXG Computachess III (model 008)
+- CXG Super Computachess (model 009)
+- CXG Crown (model 228)
+- CXG Sphinx Galaxy 2 (model 628, suspected)
 - Fidelity Genesis (Fidelity brand Computachess III)
 - Mephisto Merlin 4K (H+G brand Computachess III)
 - Multitech Enterprise (Multitech brand Super Computachess)
@@ -226,7 +226,7 @@ u8 compan2_state::input2_r()
 void compan2_state::mux_w(u8 data)
 {
 	// P30-P37: input mux, led data
-	m_inp_mux = data ^ 0xff;
+	m_inp_mux = ~data;
 	m_display->write_mx(m_inp_mux);
 }
 
@@ -278,7 +278,7 @@ static INPUT_PORTS_START( enterp )
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("Multi Move")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Queen")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("Level")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Sound/Color")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_CODE(KEYCODE_C) PORT_NAME("Sound/Color")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Take Back")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME("New Game")
 
