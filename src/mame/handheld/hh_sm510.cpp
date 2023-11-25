@@ -6754,8 +6754,8 @@ protected:
 
 private:
 	// R2 connects to a single LED behind the screen
-	void led_w(u8 data) { m_led_out = data >> 1 & 1; }
 	output_finder<> m_led_out;
+	void led_w(u8 data) { m_led_out = data >> 1 & 1; }
 };
 
 void tgaiden_state::machine_start()

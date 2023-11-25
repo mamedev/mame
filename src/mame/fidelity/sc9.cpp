@@ -94,6 +94,9 @@ protected:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport m_inputs;
 
+	u8 m_inp_mux = 0;
+	u8 m_led_data = 0;
+
 	// address maps
 	void sc9_map(address_map &map);
 	void sc9d_map(address_map &map);
@@ -104,9 +107,6 @@ protected:
 	void led_w(offs_t offset, u8 data);
 	u8 input_r();
 	u8 input_d7_r(offs_t offset);
-
-	u8 m_inp_mux = 0;
-	u8 m_led_data = 0;
 };
 
 void sc9_state::machine_start()

@@ -82,6 +82,12 @@ private:
 	required_shared_ptr<u8> m_nvram;
 	required_ioport_array<3> m_inputs;
 
+	bool m_wait_in = false;
+	u8 m_inp_mux = 0;
+	u8 m_databus = 0;
+	u8 m_control = 0;
+	u64 m_lcd_data = 0;
+
 	// address maps
 	void main_map(address_map &map);
 	void main_io(address_map &map);
@@ -104,12 +110,6 @@ private:
 	void control_w(u8 data);
 	void lcd_w(u8 data);
 	u8 input_r();
-
-	bool m_wait_in = false;
-	u8 m_inp_mux = 0;
-	u8 m_databus = 0;
-	u8 m_control = 0;
-	u64 m_lcd_data = 0;
 };
 
 void savant_state::machine_start()

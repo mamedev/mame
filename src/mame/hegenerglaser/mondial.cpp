@@ -57,13 +57,13 @@ private:
 	required_device<beep_device> m_beeper;
 	required_ioport_array<2> m_keys;
 
+	u8 m_inp_mux = 0;
+
 	void mondial_mem(address_map &map);
 
 	void control_w(u8 data);
 	u8 irq_ack_r();
 	u8 input_r(offs_t offset);
-
-	u8 m_inp_mux = 0;
 };
 
 void mondial_state::machine_start()

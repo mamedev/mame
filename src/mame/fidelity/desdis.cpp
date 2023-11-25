@@ -88,6 +88,9 @@ protected:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport m_inputs;
 
+	u8 m_select = 0;
+	u32 m_lcd_data = 0;
+
 	// address maps
 	void fdes2100d_map(address_map &map);
 
@@ -96,9 +99,6 @@ protected:
 	virtual void control_w(offs_t offset, u8 data);
 	virtual void lcd_w(offs_t offset, u8 data);
 	virtual u8 input_r(offs_t offset);
-
-	u8 m_select = 0;
-	u32 m_lcd_data = 0;
 };
 
 void desdis_state::init_fdes2100d()

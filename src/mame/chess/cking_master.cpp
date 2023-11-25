@@ -66,6 +66,8 @@ private:
 	required_device<address_map_bank_device> m_mainmap;
 	required_ioport_array<2> m_inputs;
 
+	u8 m_inp_mux = 0;
+
 	// address maps
 	void main_map(address_map &map);
 	void main_trampoline(address_map &map);
@@ -75,8 +77,6 @@ private:
 	// I/O handlers
 	u8 input_r();
 	void control_w(u8 data);
-
-	u8 m_inp_mux = 0;
 };
 
 

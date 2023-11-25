@@ -987,13 +987,13 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	void write_r(u32 data);
-	void write_o(u16 data);
-	u8 read_k();
-
 	output_finder<> m_motor1;
 	output_finder<> m_motor2_left;
 	output_finder<> m_motor2_right;
+
+	void write_r(u32 data);
+	void write_o(u16 data);
+	u8 read_k();
 };
 
 void bcheetah_state::machine_start()
@@ -1873,12 +1873,13 @@ private:
 	required_device<filter_volume_device> m_volume;
 	required_device<timer_device> m_tempo_timer;
 
+	double m_speaker_volume = 0.0;
+
 	void write_o(u16 data);
 	void write_r(u32 data);
 	u8 read_k();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
-	double m_speaker_volume = 0.0;
 };
 
 void cchime_state::machine_start()
@@ -3097,8 +3098,8 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	u16 m_pinout = 0x07; // cartridge R pins
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	void update_display();
 	void write_r(u32 data);
@@ -3288,8 +3289,8 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	u8 m_pinout = 0xf; // cartridge K pins
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	void update_display();
 	void write_r(u32 data);
@@ -3471,12 +3472,13 @@ protected:
 private:
 	required_device<filter_volume_device> m_volume;
 
+	double m_speaker_volume = 0.0;
+
 	void write_o(u16 data);
 	void write_r(u32 data);
 	u8 read_k();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
-	double m_speaker_volume = 0.0;
 };
 
 void litelrn_state::machine_start()
@@ -4026,6 +4028,7 @@ public:
 
 private:
 	required_device<ds8874_device> m_ds8874;
+
 	void ds8874_output_w(u16 data);
 
 	void update_display();
@@ -5994,13 +5997,14 @@ private:
 	required_device<filter_volume_device> m_volume;
 	required_device<timer_device> m_speed_timer;
 
+	double m_speaker_volume = 0.0;
+
 	void update_display();
 	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
-	double m_speaker_volume = 0.0;
 };
 
 void mmarvin_state::machine_start()
@@ -7005,6 +7009,7 @@ public:
 
 private:
 	required_device<tms1024_device> m_expander;
+
 	void expander_w(offs_t offset, u8 data);
 
 	void update_display();
@@ -7458,17 +7463,17 @@ protected:
 	virtual void machine_start() override;
 
 private:
+	std::unique_ptr<u16[]> m_display;
+	u8 m_led_data[2] = { };
+	u16 m_wand_pos[2] = { };
+	attotime m_shake;
+
 	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(check_pos);
-
-	std::unique_ptr<u16[]> m_display;
-	u8 m_led_data[2] = { };
-	u16 m_wand_pos[2] = { };
-	attotime m_shake;
 };
 
 void skywriter_state::machine_start()
@@ -9679,20 +9684,21 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	void update_speaker();
-	void write_r(u32 data);
-	void write_o(u16 data);
-	u8 read_k();
-
-	TIMER_DEVICE_CALLBACK_MEMBER(gearbox_sim_tick);
-	bool sensor_state() { return m_gearbox_pos < 0 && m_display->element_on(0, 0); }
-	int m_gearbox_pos = 0;
-
 	output_finder<> m_left_motor_forward;
 	output_finder<> m_left_motor_reverse;
 	output_finder<> m_right_motor_forward;
 	output_finder<> m_right_motor_reverse;
 	output_finder<> m_ext_out;
+
+	int m_gearbox_pos = 0;
+
+	TIMER_DEVICE_CALLBACK_MEMBER(gearbox_sim_tick);
+	bool sensor_state() { return m_gearbox_pos < 0 && m_display->element_on(0, 0); }
+
+	void update_speaker();
+	void write_r(u32 data);
+	void write_o(u16 data);
+	u8 read_k();
 };
 
 void bigtrak_state::machine_start()
@@ -9903,9 +9909,6 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	void update_display();
-	bool sensor_led_on() { return m_display->element_on(0, 0); }
-
 	output_finder<> m_motor_pos_out;
 	output_finder<> m_card_pos_out;
 	output_finder<> m_motor_on_out;
@@ -9915,6 +9918,9 @@ private:
 	int m_motor_decay = 0;
 	bool m_motor_on = false;
 	bool m_sensor_blind = false;
+
+	void update_display();
+	bool sensor_led_on() { return m_display->element_on(0, 0); }
 
 	TIMER_DEVICE_CALLBACK_MEMBER(motor_sim_tick);
 
@@ -12325,15 +12331,15 @@ private:
 	required_device<tms5110_device> m_tms5100;
 	required_device<tms6100_device> m_tms6100;
 
+	attotime m_pulse;
+	u8 m_dial = 0;
+	u8 m_ram_address = 0;
+
 	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(sense_weight);
-
-	attotime m_pulse;
-	u8 m_dial = 0;
-	u8 m_ram_address = 0;
 };
 
 void wtalker_state::machine_start()
@@ -15225,8 +15231,8 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	u8 m_notch = 0; // cartridge K1/K2
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	void update_display();
 	void write_r(u32 data);
@@ -16254,6 +16260,7 @@ protected:
 private:
 	required_device<tms1025_device> m_expander;
 	u8 m_exp_port[7] = { };
+
 	void expander_w(offs_t offset, u8 data);
 
 	void set_clock();
@@ -16693,6 +16700,7 @@ public:
 
 private:
 	required_device<tms1024_device> m_expander;
+
 	void expander_w(offs_t offset, u8 data);
 
 	void update_display();

@@ -90,6 +90,10 @@ private:
 	output_finder<4> m_out_digit;
 	required_ioport m_inputs;
 
+	u8 m_latch[5] = { };
+	u8 m_dac_data = 0;
+	u8 m_lcd_update = 0;
+
 	// address maps
 	void main_map(address_map &map);
 	void main_io(address_map &map);
@@ -99,10 +103,6 @@ private:
 	u8 input_r(offs_t offset);
 	void latch_w(offs_t offset, u8 data);
 	void lcd_update_w(int state);
-
-	u8 m_latch[5] = { };
-	u8 m_dac_data = 0;
-	u8 m_lcd_update = 0;
 };
 
 void debut_state::machine_start()

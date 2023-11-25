@@ -17,8 +17,8 @@ TODO:
 
 Hardware notes:
 - PCB label (Super Crown): CXG 218-600-001
-- Hitachi HD6301Y0 @ 8MHz
-- 2KB battery-backed RAM
+- Hitachi HD6301Y0 (mode 2), 8MHz XTAL
+- 2KB battery-backed RAM (HM6116LP-3)
 - chessboard buttons, 24 LEDs, piezo
 
 210 MCU is used in:
@@ -76,6 +76,8 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<2> m_inputs;
 
+	u8 m_inp_mux = 0;
+
 	void main_map(address_map &map);
 
 	// I/O handlers
@@ -83,8 +85,6 @@ private:
 	u8 input2_r();
 	void control_w(u8 data);
 	void mux_w(u8 data);
-
-	u8 m_inp_mux = 0;
 };
 
 void senterp_state::machine_start()

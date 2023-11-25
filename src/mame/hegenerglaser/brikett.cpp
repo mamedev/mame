@@ -135,6 +135,11 @@ private:
 	required_device<timer_device> m_speaker_off;
 	optional_ioport_array<4+2> m_inputs;
 
+	bool m_reset = false;
+	u8 m_esb_led = 0;
+	u8 m_esb_row = 0;
+	u8 m_esb_select = 0;
+
 	// address maps
 	void mephisto_map(address_map &map);
 	void mephistoj_map(address_map &map);
@@ -156,11 +161,6 @@ private:
 	int esb_r();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_off) { m_dac->write(0); }
-
-	bool m_reset = false;
-	u8 m_esb_led = 0;
-	u8 m_esb_row = 0;
-	u8 m_esb_select = 0;
 };
 
 

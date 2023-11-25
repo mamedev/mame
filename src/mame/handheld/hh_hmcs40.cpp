@@ -2433,13 +2433,14 @@ protected:
 private:
 	required_device<filter_volume_device> m_volume;
 
+	double m_speaker_volume = 0.0;
+
 	void update_display();
 	void plate_w(offs_t offset, u8 data);
 	void grid_w(u16 data);
 
 	void speaker_update();
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
-	double m_speaker_volume = 0.0;
 };
 
 void cdkong_state::machine_start()
@@ -3355,6 +3356,8 @@ protected:
 
 	required_device<cop411_cpu_device> m_audiocpu;
 
+	u8 m_cop_irq = 0;
+
 	void set_clock();
 	void update_int();
 	virtual void update_display();
@@ -3365,8 +3368,6 @@ protected:
 	void cop_irq_w(u8 data);
 	u8 cop_latch_r();
 	u8 cop_ack_r();
-
-	u8 m_cop_irq = 0;
 };
 
 void eturtles_state::machine_start()

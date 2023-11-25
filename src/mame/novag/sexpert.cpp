@@ -102,6 +102,11 @@ protected:
 	required_device<beep_device> m_beeper;
 	required_ioport_array<8> m_inputs;
 
+	u8 m_inp_mux = 0;
+	u8 m_led_data = 0;
+	u8 m_lcd_control = 0;
+	u8 m_lcd_data = 0;
+
 	void sexpert_set_cpu_freq();
 
 	// address maps
@@ -118,11 +123,6 @@ protected:
 
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
 	void lcd_palette(palette_device &palette) const;
-
-	u8 m_inp_mux = 0;
-	u8 m_led_data = 0;
-	u8 m_lcd_control = 0;
-	u8 m_lcd_data = 0;
 };
 
 void sexpert_state::machine_start()
@@ -168,6 +168,8 @@ protected:
 	virtual void machine_start() override;
 
 private:
+	emu_timer *m_beeptimer = nullptr;
+
 	// address maps
 	void sforte_map(address_map &map);
 
@@ -176,7 +178,6 @@ private:
 	virtual void lcd_data_w(u8 data) override;
 
 	TIMER_CALLBACK_MEMBER(beep) { m_beeper->set_state(param); }
-	emu_timer *m_beeptimer = nullptr;
 };
 
 void sforte_state::machine_start()

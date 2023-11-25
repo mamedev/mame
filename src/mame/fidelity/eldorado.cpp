@@ -56,6 +56,10 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport m_inputs;
 
+	bool m_kp_select = false;
+	u16 m_inp_mux = 0;
+	u8 m_led_select = 0;
+
 	// I/O handlers
 	void update_display();
 	void mux_w(u8 data);
@@ -63,10 +67,6 @@ private:
 	void control_w(u8 data);
 	int t0_r();
 	u8 input_r();
-
-	bool m_kp_select = false;
-	u16 m_inp_mux = 0;
-	u8 m_led_select = 0;
 };
 
 void eldorado_state::machine_start()

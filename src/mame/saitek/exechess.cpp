@@ -58,6 +58,10 @@ private:
 	output_finder<> m_battery;
 	required_ioport_array<4> m_inputs;
 
+	std::unique_ptr<u8[]> m_ram;
+	u8 m_ram_address[2] = { };
+	u64 m_lcd_data[2] = { };
+
 	// address maps
 	void main_map(address_map &map);
 	void main_io(address_map &map);
@@ -71,10 +75,6 @@ private:
 	template<int N> void ram_address_w(u8 data);
 	u8 ram_data_r();
 	void ram_data_w(u8 data);
-
-	std::unique_ptr<u8[]> m_ram;
-	u8 m_ram_address[2] = { };
-	u64 m_lcd_data[2] = { };
 };
 
 void exechess_state::machine_start()

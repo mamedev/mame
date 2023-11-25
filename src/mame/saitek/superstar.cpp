@@ -88,6 +88,8 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<2> m_inputs;
 
+	u8 m_inp_mux = 0;
+
 	// address maps
 	void sstar28k_map(address_map &map);
 	void tstar432_map(address_map &map);
@@ -95,8 +97,6 @@ private:
 	// I/O handlers
 	void control_w(u8 data);
 	u8 input_r();
-
-	u8 m_inp_mux = 0;
 };
 
 void star_state::machine_start()

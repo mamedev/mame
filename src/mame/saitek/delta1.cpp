@@ -67,6 +67,13 @@ private:
 	required_device<pwm_display_device> m_display;
 	required_ioport_array<5> m_inputs;
 
+	u8 m_mux_data = 0;
+	u8 m_led_select = 0;
+	u8 m_inp_mux = 0;
+	u8 m_7seg_data = 0;
+	bool m_7seg_rc = false;
+	bool m_blink = false;
+
 	// address maps
 	void main_map(address_map &map);
 	void main_io(address_map &map);
@@ -78,13 +85,6 @@ private:
 	void mux_w(u8 data);
 	void digit_w(u8 data);
 	u8 input_r();
-
-	u8 m_mux_data = 0;
-	u8 m_led_select = 0;
-	u8 m_inp_mux = 0;
-	u8 m_7seg_data = 0;
-	bool m_7seg_rc = false;
-	bool m_blink = false;
 };
 
 void delta1_state::machine_start()

@@ -66,6 +66,8 @@ private:
 	required_ioport_array<8> m_inputs;
 	output_finder<12> m_digits;
 
+	u8 m_inp_mux = 0;
+
 	void main_map(address_map &map);
 	void main_io(address_map &map);
 
@@ -76,8 +78,6 @@ private:
 	u8 input_r();
 	void input_w(u8 data);
 	void update_pa();
-
-	u8 m_inp_mux = 0;
 };
 
 void bridgeb_state::machine_start()

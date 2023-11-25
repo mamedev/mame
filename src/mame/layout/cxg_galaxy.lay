@@ -516,23 +516,23 @@ license:CC0-1.0
 		<rect state="1"><color red="0.65" green="0.65" blue="0.66" /></rect>
 	</element>
 
-	<element name="text_l1"><text string="NEW GAME" align="2"><color red="1" green="1" blue="1" /></text></element>
-	<element name="text_l2"><text string="ENTER POSITION" align="2"><color red="1" green="1" blue="1" /></text></element>
-	<element name="text_l3"><text string="SOUND/COLOR" align="2"><color red="1" green="1" blue="1" /></text></element>
-	<element name="text_l4"><text string="LIBRARY/CLEARBOARD" align="2"><color red="1" green="1" blue="1" /></text></element>
-	<element name="text_l5"><text string="REPLAY" align="2"><color red="1" green="1" blue="1" /></text></element>
-	<element name="text_l6"><text string="HINT" align="2"><color red="1" green="1" blue="1" /></text></element>
-	<element name="text_l7"><text string="LEVEL" align="2"><color red="1" green="1" blue="1" /></text></element>
-	<element name="text_l8"><text string="MULTI MOVE" align="2"><color red="1" green="1" blue="1" /></text></element>
-	<element name="text_l9"><text string="TAKE BACK" align="2"><color red="1" green="1" blue="1" /></text></element>
-	<element name="text_l10"><text string="MOVE" align="2"><color red="1" green="1" blue="1" /></text></element>
+	<element name="text_l1"><text string="NEW GAME" align="2"></text></element>
+	<element name="text_l2"><text string="ENTER POSITION" align="2"></text></element>
+	<element name="text_l3"><text string="SOUND/COLOR" align="2"></text></element>
+	<element name="text_l4"><text string="LIBRARY/CLEARBOARD" align="2"></text></element>
+	<element name="text_l5"><text string="REPLAY" align="2"></text></element>
+	<element name="text_l6"><text string="HINT" align="2"></text></element>
+	<element name="text_l7"><text string="LEVEL" align="2"></text></element>
+	<element name="text_l8"><text string="MULTI MOVE" align="2"></text></element>
+	<element name="text_l9"><text string="TAKE BACK" align="2"></text></element>
+	<element name="text_l10"><text string="MOVE" align="2"></text></element>
 
-	<element name="text_l11"><text string="ERROR" align="2"><color red="1" green="1" blue="1" /></text></element>
-	<element name="text_l12"><text string="CHECK" align="2"><color red="1" green="1" blue="1" /></text></element>
-	<element name="text_l13"><text string="MATE" align="2"><color red="1" green="1" blue="1" /></text></element>
-	<element name="text_l14"><text string="DRAW" align="2"><color red="1" green="1" blue="1" /></text></element>
-	<element name="text_l15"><text string="3RD REPET" align="2"><color red="1" green="1" blue="1" /></text></element> <!-- sic -->
-	<element name="text_l16"><text string="RESIGN" align="2"><color red="1" green="1" blue="1" /></text></element>
+	<element name="text_l11"><text string="ERROR" align="2"></text></element>
+	<element name="text_l12"><text string="CHECK" align="2"></text></element>
+	<element name="text_l13"><text string="MATE" align="2"></text></element>
+	<element name="text_l14"><text string="DRAW" align="2"></text></element>
+	<element name="text_l15"><text string="3RD REPET" align="2"></text></element> <!-- sic -->
+	<element name="text_l16"><text string="RESIGN" align="2"></text></element>
 
 	<element name="text_p1"><image file="chess/wk.svg"/></element>
 	<element name="text_p2"><image file="chess/wq.svg"/></element>

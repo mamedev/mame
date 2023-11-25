@@ -104,6 +104,9 @@ private:
 	optional_device<timer_device> m_delay;
 	required_ioport_array<2> m_inputs;
 
+	u8 m_led_select = 0;
+	u8 m_7seg_data = 0;
+
 	// address maps
 	void main_map(address_map &map);
 	void main_io(address_map &map);
@@ -114,9 +117,6 @@ private:
 	u8 ppi_porta_r();
 	void ppi_portb_w(u8 data);
 	void ppi_portc_w(u8 data);
-
-	u8 m_led_select = 0;
-	u8 m_7seg_data = 0;
 };
 
 void cc1_state::machine_start()

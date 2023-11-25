@@ -114,6 +114,12 @@ private:
 	required_ioport_array<3> m_row;
 	required_ioport m_special;
 
+	int m_sync_state = 0;
+	bool m_k7 = false;
+	uint8_t m_u2_port_b = 0;
+	uint8_t m_311_output = 0;
+	uint32_t m_cassette_high_count = 0;
+
 	void mem_map(address_map &map);
 	void sync_map(address_map &map);
 
@@ -126,12 +132,6 @@ private:
 	void u2_write_b(uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(cassette_input);
-
-	int m_sync_state = 0;
-	bool m_k7 = false;
-	uint8_t m_u2_port_b = 0;
-	uint8_t m_311_output = 0;
-	uint32_t m_cassette_high_count = 0;
 };
 
 void kim1_state::machine_start()

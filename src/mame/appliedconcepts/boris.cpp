@@ -56,6 +56,9 @@ private:
 	required_device<pwm_display_device> m_display;
 	required_ioport_array<4> m_inputs;
 
+	u8 m_io[2] = { };
+	u8 m_4042 = 0;
+
 	void main_map(address_map &map);
 	void main_io(address_map &map);
 
@@ -65,9 +68,6 @@ private:
 	void mux_w(u8 data);
 	void digit_w(u8 data);
 	u8 input_r();
-
-	u8 m_io[2] = { };
-	u8 m_4042 = 0;
 };
 
 void boris_state::machine_start()

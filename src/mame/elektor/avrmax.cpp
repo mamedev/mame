@@ -83,6 +83,10 @@ private:
 	optional_device<hd44780_device> m_lcd;
 	required_ioport_array<4> m_inputs;
 
+	u8 m_inp_mux = 0;
+	u8 m_shift_reg = 0;
+	int m_shift_clk = 0;
+
 	// address maps
 	void main_map(address_map &map);
 	void data_map(address_map &map);
@@ -95,10 +99,6 @@ private:
 	void lcd_w(u8 data);
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	u8 m_inp_mux = 0;
-	u8 m_shift_reg = 0;
-	int m_shift_clk = 0;
 };
 
 void avrmax_state::machine_start()

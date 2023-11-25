@@ -52,6 +52,15 @@ private:
 	required_device<pwm_display_device> m_display;
 	required_ioport_array<4> m_inputs;
 
+	u8 m_ram[0x100] = { };
+	u8 m_ram_address = 0;
+	u8 m_ram_data = 0;
+	u8 m_ram_control = 0;
+
+	u8 m_inp_mux = 0;
+	u8 m_led_select = 0;
+	u8 m_7seg_data = 0;
+
 	// I/O handlers
 	void update_display();
 	void segsel_w(u8 data);
@@ -63,15 +72,6 @@ private:
 	void rama0_w(u8 data);
 	void rama1_w(u8 data);
 	u8 input_r();
-
-	u8 m_ram[0x100] = { };
-	u8 m_ram_address = 0;
-	u8 m_ram_data = 0;
-	u8 m_ram_control = 0;
-
-	u8 m_inp_mux = 0;
-	u8 m_led_select = 0;
-	u8 m_7seg_data = 0;
 };
 
 void cr_state::machine_start()

@@ -84,6 +84,10 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport m_inputs;
 
+	bool m_kp_select = false;
+	u8 m_inp_mux = 0;
+	u8 m_led_select = 0;
+
 	// I/O handlers
 	void update_display();
 	void mux_w(u8 data);
@@ -91,10 +95,6 @@ private:
 	u8 input_r();
 
 	void set_cpu_freq();
-
-	bool m_kp_select = false;
-	u8 m_inp_mux = 0;
-	u8 m_led_select = 0;
 };
 
 void micro2_state::machine_start()

@@ -266,6 +266,11 @@ protected:
 	optional_region_ptr<u8> m_language;
 	optional_ioport_array<9> m_inputs;
 
+	u8 m_led_data = 0;
+	u8 m_7seg_data = 0;
+	u8 m_inp_mux = 0;
+	u8 m_speech_bank = 0;
+
 	// address maps
 	void csc_map(address_map &map);
 	void csce_map(address_map &map);
@@ -287,11 +292,6 @@ protected:
 	void pia1_pb_w(u8 data);
 	u8 pia1_pb_r();
 	void pia1_ca2_w(int state);
-
-	u8 m_led_data = 0;
-	u8 m_7seg_data = 0;
-	u8 m_inp_mux = 0;
-	u8 m_speech_bank = 0;
 };
 
 void csc_state::machine_start()

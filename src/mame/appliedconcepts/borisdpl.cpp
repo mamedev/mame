@@ -52,6 +52,11 @@ private:
 	required_device<pwm_display_device> m_display;
 	required_ioport_array<4> m_inputs;
 
+	std::unique_ptr<u8[]> m_ram;
+	u8 m_ram_address = 0;
+	u8 m_matrix = 0;
+	u8 m_digit_data = 0;
+
 	void main_map(address_map &map);
 	void main_io(address_map &map);
 
@@ -65,11 +70,6 @@ private:
 	void ram_address_w(u8 data) { m_ram_address = data; }
 	u8 ram_data_r() { return m_ram[m_ram_address]; }
 	void ram_data_w(u8 data) { m_ram[m_ram_address] = data; }
-
-	std::unique_ptr<u8[]> m_ram;
-	u8 m_ram_address = 0;
-	u8 m_matrix = 0;
-	u8 m_digit_data = 0;
 };
 
 void borisdpl_state::machine_start()

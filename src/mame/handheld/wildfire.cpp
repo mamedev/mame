@@ -73,16 +73,17 @@ private:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<filter_volume_device> m_volume;
 
+	u16 m_a = 0;
+	u8 m_d = 0;
+
+	double m_speaker_volume = 0.0;
+
 	void update_display();
 	void write_d(u8 data);
 	void write_a(u16 data);
 
 	void speaker_update();
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
-	double m_speaker_volume = 0.0;
-
-	u16 m_a = 0;
-	u8 m_d = 0;
 };
 
 void wildfire_state::machine_start()

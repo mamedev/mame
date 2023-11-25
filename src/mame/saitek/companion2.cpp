@@ -120,6 +120,11 @@ private:
 	required_device<pwm_display_device> m_display;
 	required_ioport_array<3> m_inputs;
 
+	emu_timer *m_standbytimer;
+	emu_timer *m_nmitimer;
+	bool m_power = false;
+	u8 m_inp_mux = 0;
+
 	// I/O handlers
 	u8 input1_r();
 	u8 input2_r();
@@ -130,11 +135,6 @@ private:
 
 	void set_cpu_freq();
 	TIMER_CALLBACK_MEMBER(set_pin);
-
-	emu_timer *m_standbytimer;
-	emu_timer *m_nmitimer;
-	bool m_power = false;
-	u8 m_inp_mux = 0;
 };
 
 void compan2_state::machine_start()

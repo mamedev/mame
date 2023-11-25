@@ -358,6 +358,7 @@ public:
 
 private:
 	required_device<ds8874_device> m_ds8874;
+
 	void ds8874_output_w(u16 data);
 
 	void update_display();
@@ -710,6 +711,7 @@ public:
 
 private:
 	required_device<ds8874_device> m_ds8874;
+
 	void ds8874_output_w(u16 data);
 
 	void update_display();

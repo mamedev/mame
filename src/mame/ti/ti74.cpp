@@ -110,6 +110,16 @@ protected:
 	virtual void machine_start() override;
 
 private:
+	required_device<tms70c46_device> m_maincpu;
+	required_memory_bank m_sysbank;
+	required_device<generic_slot_device> m_cart;
+	required_ioport_array<8> m_key_matrix;
+	required_ioport m_battery_inp;
+	output_finder<80> m_segs;
+
+	u8 m_key_select = 0;
+	u8 m_power = 0;
+
 	void update_lcd_indicator(u8 y, u8 x, int state);
 	void update_battery_status(int state);
 
@@ -122,16 +132,6 @@ private:
 	HD44780_PIXEL_UPDATE(ti74_pixel_update);
 	HD44780_PIXEL_UPDATE(ti95_pixel_update);
 	void main_map(address_map &map);
-
-	required_device<tms70c46_device> m_maincpu;
-	required_memory_bank m_sysbank;
-	required_device<generic_slot_device> m_cart;
-	required_ioport_array<8> m_key_matrix;
-	required_ioport m_battery_inp;
-	output_finder<80> m_segs;
-
-	u8 m_key_select = 0;
-	u8 m_power = 0;
 };
 
 

@@ -93,6 +93,10 @@ private:
 	output_finder<8> m_out_digit;
 	output_finder<64> m_out_lcd;
 
+	u8 m_cb_mux = 0;
+	u8 m_led_data = 0;
+	u8 m_inp_mux = 0;
+
 	// address maps
 	void main_map(address_map &map);
 
@@ -110,10 +114,6 @@ private:
 
 	u8 nvram_r(offs_t offset) { return m_nvram[offset]; }
 	void nvram_w(offs_t offset, u8 data) { m_nvram[offset] = data; }
-
-	u8 m_cb_mux = 0;
-	u8 m_led_data = 0;
-	u8 m_inp_mux = 0;
 };
 
 void sphinx40_state::machine_start()

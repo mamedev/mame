@@ -112,6 +112,8 @@ private:
 	required_device<beep_device> m_beeper;
 	required_ioport_array<2> m_inputs;
 
+	u8 m_inp_mux = 0;
+
 	// address maps
 	void main_map(address_map &map);
 
@@ -120,8 +122,6 @@ private:
 	u8 input_r();
 	void leds_w(offs_t offset, u8 data);
 	void sound_w(u8 data);
-
-	u8 m_inp_mux = 0;
 };
 
 void conchess_state::machine_start()

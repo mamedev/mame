@@ -151,6 +151,11 @@ private:
 	optional_device<beep_device> m_beeper;
 	required_ioport_array<4> m_inputs;
 
+	u8 m_inp_mux = 0;
+	u8 m_digit_select = 0;
+	u8 m_digit_data = 0;
+	bool m_blink = false;
+
 	// address maps
 	void main_map(address_map &map);
 	void main_io(address_map &map);
@@ -173,11 +178,6 @@ private:
 
 	void input_digit_select_w(u8 data) { input_w(data); digit_select_w(data); }
 	void input_digit_data_w(u8 data) { input_w(data); digit_data_w(data); }
-
-	u8 m_inp_mux = 0;
-	u8 m_digit_select = 0;
-	u8 m_digit_data = 0;
-	bool m_blink = false;
 };
 
 

@@ -110,6 +110,12 @@ private:
 	required_ioport_array<4> m_inputs;
 	output_finder<2> m_out_leds;
 
+	bool m_bootrom_enabled = false;
+
+	u32 m_control = 0;
+	u32 m_prev_pc = 0;
+	u64 m_prev_cycle = 0;
+
 	void main_map(address_map &map);
 
 	// I/O handlers
@@ -123,11 +129,6 @@ private:
 	void set_cpu_freq();
 	void install_bootrom(bool enable);
 	TIMER_DEVICE_CALLBACK_MEMBER(disable_bootrom) { install_bootrom(false); }
-	bool m_bootrom_enabled = false;
-
-	u32 m_control = 0;
-	u32 m_prev_pc = 0;
-	u64 m_prev_cycle = 0;
 };
 
 void tasc_state::machine_start()

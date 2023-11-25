@@ -95,6 +95,14 @@ private:
 	optional_device<speaker_sound_device> m_speaker;
 	required_ioport_array<8> m_inputs;
 
+	bool m_power_on = false;
+	u32 m_r = 0;
+	u16 m_grid = 0;
+	u16 m_plate = 0;
+	u16 m_sub_o = 0;
+	u16 m_sub_r = 0;
+	u8 m_rev1_ctl = 0;
+
 	void power_off();
 	void power_subcpu();
 	void update_display();
@@ -111,14 +119,6 @@ private:
 
 	void rev2_write_o(u16 data);
 	void rev2_write_r(u32 data);
-
-	bool m_power_on = false;
-	u32 m_r = 0;
-	u16 m_grid = 0;
-	u16 m_plate = 0;
-	u16 m_sub_o = 0;
-	u16 m_sub_r = 0;
-	u8 m_rev1_ctl = 0;
 };
 
 void spellb_state::machine_start()

@@ -59,6 +59,10 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport m_inputs;
 
+	u8 m_led_data = 0;
+	u8 m_control = 0;
+	u8 m_inp_mux = 0;
+
 	// address maps
 	void main_map(address_map &map);
 	void main_io(address_map &map);
@@ -70,10 +74,6 @@ private:
 	void control_w(u8 data);
 	u8 control_r();
 	void led_w(u8 data);
-
-	u8 m_led_data = 0;
-	u8 m_control = 0;
-	u8 m_inp_mux = 0;
 };
 
 void micro_state::machine_start()

@@ -98,13 +98,13 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport m_inputs;
 
+	u8 m_inp_mux = 0;
+	u8 m_led_data = 0;
+
 	void update_display();
 	template<int N> void mux_w(u8 data);
 	void leds_w(u16 data);
 	u16 input_r();
-
-	u8 m_inp_mux = 0;
-	u8 m_led_data = 0;
 };
 
 void scptchess_state::machine_start()

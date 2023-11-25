@@ -104,6 +104,10 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<8+2> m_inputs;
 
+	u8 m_select = 0;
+	u8 m_control = 0;
+	u8 m_led_data = 0;
+
 	void main_map(address_map &map);
 
 	// I/O handlers
@@ -116,10 +120,6 @@ private:
 	void control_w(u8 data);
 	u8 lcd_data_r();
 	u8 extrom_r(offs_t offset);
-
-	u8 m_select = 0;
-	u8 m_control = 0;
-	u8 m_led_data = 0;
 };
 
 // saitek_stratos_state

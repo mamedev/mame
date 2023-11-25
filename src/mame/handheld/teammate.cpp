@@ -56,6 +56,12 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<3> m_inputs;
 
+	u8 m_inp_sel = 0;
+	u8 m_input = 0;
+	u8 m_sound = 0;
+	u8 m_select = 0;
+	u8 m_led_data = 0;
+
 	void main_map(address_map &map);
 	void main_io(address_map &map);
 
@@ -67,12 +73,6 @@ private:
 	u8 input_r();
 	void sound_w(u8 data);
 	u8 sound_r();
-
-	u8 m_inp_sel = 0;
-	u8 m_input = 0;
-	u8 m_sound = 0;
-	u8 m_select = 0;
-	u8 m_led_data = 0;
 };
 
 void teammate_state::machine_start()

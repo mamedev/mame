@@ -73,6 +73,10 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<8> m_inputs;
 
+	u8 m_inp_mux = 0;
+	u8 m_led_data = 0;
+	int m_dac_on = 0;
+
 	// address maps
 	void main_map(address_map &map);
 
@@ -84,10 +88,6 @@ private:
 	u8 pia1_pa_r();
 	u8 pia1_pb_r();
 	void pia1_pb_w(u8 data);
-
-	u8 m_inp_mux = 0;
-	u8 m_led_data = 0;
-	int m_dac_on = 0;
 };
 
 void cchess2_state::machine_start()

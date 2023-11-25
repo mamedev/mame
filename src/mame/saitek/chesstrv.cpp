@@ -85,6 +85,11 @@ private:
 	output_finder<> m_computing;
 	required_ioport_array<4> m_inputs;
 
+	std::unique_ptr<u8[]> m_ram;
+	u8 m_ram_address = 0;
+	u8 m_inp_mux = 0;
+	u8 m_7seg_data = 0;
+
 	void chesstrv_mem(address_map &map);
 	void chesstrv_io(address_map &map);
 
@@ -100,11 +105,6 @@ private:
 	void ram_address_w(u8 data) { m_ram_address = data; }
 	u8 ram_data_r() { return m_ram[m_ram_address]; }
 	void ram_data_w(u8 data) { m_ram[m_ram_address] = data; }
-
-	std::unique_ptr<u8[]> m_ram;
-	u8 m_ram_address = 0;
-	u8 m_inp_mux = 0;
-	u8 m_7seg_data = 0;
 };
 
 void chesstrv_state::machine_start()

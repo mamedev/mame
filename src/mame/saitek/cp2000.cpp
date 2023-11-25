@@ -67,6 +67,10 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<4> m_inputs;
 
+	u16 m_inp_mux = 0;
+	u8 m_select = 0;
+	u8 m_7seg_data = 0;
+
 	// address maps
 	void main_map(address_map &map);
 	void main_io(address_map &map);
@@ -76,10 +80,6 @@ private:
 	void control_w(u8 data);
 	void digit_w(u8 data);
 	u8 input_r();
-
-	u16 m_inp_mux = 0;
-	u8 m_select = 0;
-	u8 m_7seg_data = 0;
 };
 
 void cp2000_state::machine_start()

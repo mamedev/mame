@@ -61,6 +61,10 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<2> m_inputs;
 
+	u8 m_inp_mux = 0;
+	u8 m_led_data = 0;
+	u8 m_led_direct = 0;
+
 	// address maps
 	void main_map(address_map &map);
 
@@ -70,10 +74,6 @@ private:
 	u8 input_r();
 	void sled_w(int state);
 	void cled_w(int state);
-
-	u8 m_inp_mux = 0;
-	u8 m_led_data = 0;
-	u8 m_led_direct = 0;
 };
 
 void compan_state::machine_start()

@@ -128,6 +128,15 @@ private:
 	optional_ioport_array<4+3> m_inputs;
 	output_finder<8, 48> m_out_lcd2;
 
+	u8 m_inp_mux = 0;
+	u8 m_control = 0;
+	u8 m_shift = 0;
+	u32 m_lcd1_data = 0;
+	u64 m_lcd2_data = 0;
+	u8 m_lcd2_select = 0;
+
+	bool m_xor_kludge = false;
+
 	// address maps
 	void ssystem3_map(address_map &map);
 	void ssystem4_map(address_map &map);
@@ -150,14 +159,6 @@ private:
 	u8 cu_pia_a_r();
 	void cu_pia_b_w(u8 data);
 	u8 cu_pia_b_r();
-
-	u8 m_inp_mux = 0;
-	u8 m_control = 0;
-	u8 m_shift = 0;
-	u32 m_lcd1_data = 0;
-	u64 m_lcd2_data = 0;
-	u8 m_lcd2_select = 0;
-	bool m_xor_kludge = false;
 };
 
 void ssystem3_state::machine_start()
