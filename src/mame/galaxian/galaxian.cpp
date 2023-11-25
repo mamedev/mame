@@ -1639,6 +1639,7 @@ void sbhoei_state::sbhoei_soundlatch_w(uint8_t data)
 {
 	m_soundlatch->write(data & 0x7f);
 	m_8039->set_input_line(0, (data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+	machine().scheduler().perfect_quantum(attotime::from_usec(50)); // main CPU polls for response from 8039
 }
 
 void sbhoei_state::p2_w(uint8_t data)
