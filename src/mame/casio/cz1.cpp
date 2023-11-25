@@ -4,24 +4,24 @@
 
     Casio CZ-1 Digital Synthesizer
 
-	Also includes support for the MZ-1, an unreleased rack mount version supported by
-	the same ROM. This has no key/wheel/pedal inputs and never sends the corresponding
-	MIDI messages, but otherwise works identically to the CZ-1.
+    Also includes support for the MZ-1, an unreleased rack mount version supported by
+    the same ROM. This has no key/wheel/pedal inputs and never sends the corresponding
+    MIDI messages, but otherwise works identically to the CZ-1.
 
-	Misc. notes:
+    Misc. notes:
 
-	Hold all three Line 1 envelope buttons (DCO/DCW/DCA) on boot to perform a RAM test.
+    Hold all three Line 1 envelope buttons (DCO/DCW/DCA) on boot to perform a RAM test.
 
-	Afterwards, the firmware will attempt to load and run a program from cartridge
-	if a valid 5-byte header is detected at the beginning:
-	- bytes 0-1: ignored
-	- bytes 2-3: program load address (valid within 0x8000-9fff, includes this header)
-	- byte 4: constant 0xD1
-	- bytes 5+: start of program
+    Afterwards, the firmware will attempt to load and run a program from cartridge
+    if a valid 5-byte header is detected at the beginning:
+    - bytes 0-1: ignored
+    - bytes 2-3: program load address (valid within 0x8000-9fff, includes this header)
+    - byte 4: constant 0xD1
+    - bytes 5+: start of program
 
-	TODO:
+    TODO:
 
-	Both machines have MACHINE_IMPERFECT_SOUND due to unemulated stereo chorus.
+    Both machines have MACHINE_IMPERFECT_SOUND due to unemulated stereo chorus.
 
 ***************************************************************************/
 
@@ -327,7 +327,7 @@ static INPUT_PORTS_START( mz1 )
 	PORT_BIT(0x01, IP_ACTIVE_LOW,  IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("cart", casio_ram_cart_device, present)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_CUSTOM) // low = MZ-1, high = CZ-1
 	PORT_BIT(0xfc, IP_ACTIVE_LOW,  IPT_UNUSED)
-		
+
 	PORT_START("MAIN_PB")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(cz1_state, sync_r)
 	PORT_BIT(0xfe, IP_ACTIVE_LOW,  IPT_UNUSED)

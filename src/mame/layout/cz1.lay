@@ -10,7 +10,7 @@ license:CC0-1.0
 	<element name="white"><rect><color red="1" green="1" blue="1" /></rect></element>
 	<element name="blue"><rect><color red="0.35" green="0.45" blue="0.92" /></rect></element>
 	<element name="green"><rect><color red="0.2" green="0.8" blue="0.6" /></rect></element>
-	
+
 	<!-- text elements -->
 	<element name="total_control">
 		<rect><color red="0.9" green="0.85" blue="0.45" /></rect>
@@ -25,7 +25,7 @@ license:CC0-1.0
 	<element name="portamento"><rect><color red="0.06" green="0.06" blue="0.06" /></rect><text string="PORTAMENTO" /></element>
 	<element name="glide"><rect><color red="0.06" green="0.06" blue="0.06" /></rect><text string="GLIDE" /></element>
 	<element name="on_off"><rect><color red="0.06" green="0.06" blue="0.06" /></rect><text string="ON/OFF" /></element>
-	
+
 	<element name="mode">
 		<rect><color red="0.9" green="0.85" blue="0.45" /></rect>
 		<text string="MODE"><color red="0" green="0" blue="0" /></text>
@@ -65,7 +65,7 @@ license:CC0-1.0
 		<text string="DATA SAVE/LOAD"><color red="0" green="0" blue="0" /></text>
 	</element>
 	<element name="cart_midi"><rect><color red="0.06" green="0.06" blue="0.06" /></rect><text string="CARTRIDGE / MIDI" align="1" /></element>
-	
+
 	<element name="effect">
 		<rect><color red="0.9" green="0.85" blue="0.45" /></rect>
 		<text string="EFFECT"><color red="0" green="0" blue="0" /></text>
@@ -88,7 +88,7 @@ license:CC0-1.0
 	<element name="noise"><rect><color red="0.06" green="0.06" blue="0.06" /></rect><text string="NOISE" /></element>
 	<element name="param_copy"><rect><color red="0.06" green="0.06" blue="0.06" /></rect><text string="PARAM COPY" /></element>
 	<element name="initialize"><rect><color red="0.06" green="0.06" blue="0.06" /></rect><text string="INITIALIZE" /></element>
-	
+
 	<element name="vibrato"><rect><color red="0.06" green="0.06" blue="0.06" /></rect><text string="VIBRATO" /></element>
 	<element name="octave"><rect><color red="0.06" green="0.06" blue="0.06" /></rect><text string="OCTAVE" /></element>
 	<element name="wave"><rect><color red="0.06" green="0.06" blue="0.06" /></rect><text string="WAVE" /></element>
@@ -97,7 +97,7 @@ license:CC0-1.0
 	<element name="level"><rect><color red="0.06" green="0.06" blue="0.06" /></rect><text string="LEVEL" /></element>
 	<element name="velocity"><rect><color red="0.06" green="0.06" blue="0.06" /></rect><text string="VELOCITY" /></element>
 	<element name="detune"><rect><color red="0.06" green="0.06" blue="0.06" /></rect><text string="DETUNE" align="1" /></element>
-	
+
 	<element name="dco1"><rect><color red="0.35" green="0.45" blue="0.92" /></rect><text string="DCO 1"><color red="0" green="0" blue="0" /></text></element>
 	<element name="dco2"><rect><color red="0.2" green="0.8" blue="0.6" /></rect><text string="DCO 2"><color red="0" green="0" blue="0" /></text></element>
 	<element name="dcw1"><rect><color red="0.35" green="0.45" blue="0.92" /></rect><text string="DCW 1"><color red="0" green="0" blue="0" /></text></element>
@@ -201,7 +201,7 @@ license:CC0-1.0
 		<rect state="1"><color red="0.07" green="0.07" blue="0.07" /><bounds xc="6" yc="5" width="10.5" height="8.5" /></rect>
 		<text string="END"><bounds xc="6" yc="5" width="10.5" height="4" /></text>
 	</element>
-	
+
 	<element name="button_red" defstate="0">
 		<rect><color red="0.05" green="0.05" blue="0.05" /><bounds x="0" y="0" width="15" height="15" /></rect>
 		<rect state="0"><color red="0.8" green="0.2" blue="0.1" /><bounds xc="7.5" yc="7.5" width="13.5" height="13.5" /></rect>
@@ -324,7 +324,7 @@ license:CC0-1.0
 		<element ref="led" name="led_4.4"><bounds xc="19.5" yc="14.5" width="6" height="3" /></element>
 		<element ref="button_red" inputtag="KC11" inputmask="0x01"><bounds x="12" y="17" width="15" height="15" /></element>
 		<element ref="midi_on_off"><bounds xc="19.5" y="33" width="20" height="4" /></element>
-		
+
 		<!-- tune, transpose -->
 		<element ref="led" name="led_1.3"><bounds xc="17" yc="46.5" width="6" height="3" /></element>
 		<element ref="button_black" inputtag="KC1" inputmask="0x08"><bounds x="12" y="49" width="10" height="15" /></element>
@@ -334,7 +334,7 @@ license:CC0-1.0
 		<element ref="button_black" inputtag="KC1" inputmask="0x04"><bounds x="28" y="49" width="10" height="15" /></element>
 		<element ref="key"><bounds xc="33" y="65" width="20" height="4" /></element>
 		<element ref="transpose"><bounds xc="33" y="69" width="20" height="4" /></element>
-		
+
 		<!-- modulation, portamento, glide-->
 		<element ref="led" name="led_4.5"><bounds xc="19.5" yc="78.5" width="6" height="3" /></element>
 		<element ref="button_black" inputtag="KC11" inputmask="0x08"><bounds x="12" y="81" width="15" height="15" /></element>
@@ -357,7 +357,7 @@ license:CC0-1.0
 		<element ref="grey"><bounds x="0" y="81" width="215" height="15" /></element>
 
 		<element ref="mode"><bounds xc="95" y="3" width="188" height="4" /></element>
-		
+
 		<!-- normal, tone mix, key split -->
 		<element ref="led" name="led_0.0"><bounds xc="15.5" yc="14.5" width="6" height="3" /></element>
 		<element ref="button_blue" inputtag="KC0" inputmask="0x01"><bounds x="8" y="17" width="15" height="15" /></element>
@@ -381,12 +381,12 @@ license:CC0-1.0
 		<element ref="midi"><bounds xc="167.5" y="33" width="25" height="4" /></element>
 
 		<element ref="programmer"><bounds xc="95" yc="41" width="188" height="4" /></element>
-		
+
 		<!-- cartridge -->
 		<element ref="led" name="led_1.5"><bounds xc="15.5" yc="46.5" width="6" height="3" /></element>
 		<element ref="button_blue" inputtag="KC1" inputmask="0x20"><bounds x="8" y="49" width="15" height="15" /></element>
 		<element ref="cartridge"><bounds xc="15.5" y="65" width="25" height="4" /></element>
-		
+
 		<!-- bank select -->
 		<element ref="led" name="led_bank0"><bounds xc="42" yc="46.5" width="6" height="3" /></element>
 		<element ref="button_bank_A" inputtag="KC2" inputmask="0x01"><bounds x="37" y="49" width="10" height="15" /></element>
@@ -446,7 +446,7 @@ license:CC0-1.0
 		<element ref="grey"><bounds x="0" y="17" width="91" height="15" /></element>
 		<element ref="grey"><bounds x="0" y="49" width="91" height="15" /></element>
 		<element ref="grey"><bounds x="0" y="81" width="91" height="15" /></element>
-		
+
 		<element ref="data_entry"><bounds xc="45" y="3" width="88" height="4" /></element>
 
 		<element ref="black"><bounds xc="45" y="14" width="85" height="87" /></element>
@@ -471,7 +471,7 @@ license:CC0-1.0
 		<element ref="no"><bounds xc="63" y="68" width="12" height="4" /></element>
 		<element ref="button_right" inputtag="KC4" inputmask="0x02"><bounds x="70" y="57" width="12" height="10" /></element>
 		<element ref="yes"><bounds xc="75" y="68" width="12" height="4" /></element>
-		
+
 		<!-- page down/up -->
 		<element ref="page"><bounds xc="19" y="78" width="30" height="4" /></element>
 		<element ref="button_down" inputtag="KC5" inputmask="0x01"><bounds x="8" y="84" width="12" height="10" /></element>
@@ -528,7 +528,7 @@ license:CC0-1.0
 		<element ref="led" name="led_2.4"><bounds xc="60.5" yc="14.5" width="6" height="3" /></element>
 		<element ref="button_grey" inputtag="KC6" inputmask="0x10"><bounds x="53" y="17" width="15" height="15" /></element>
 		<element ref="name"><bounds xc="60.5" y="33" width="25" height="4" /></element>
-		
+
 		<element ref="line1"><bounds xc="96" yc="10" width="10" height="4" /></element>
 		<element ref="led" name="led_3.0"><bounds xc="96" yc="14.5" width="6" height="3" /></element>
 		<element ref="line2"><bounds xc="105" yc="10" width="10" height="4" /></element>
@@ -679,7 +679,7 @@ license:CC0-1.0
 		<rect state="1"><bounds x="0" y="0" width="44" height="324" /><color red="0.1" green="0.1" blue="0.1" /></rect>
 		<rect state="1"><bounds x="4" y="0" width="36" height="320" /><color red="0.1" green="0.1" blue="0.1" /></rect>
 	</element>
-	
+
 	<!-- keyboard group -->
 	<group name="keyboard">
 		<element ref="keyfill"><bounds x="72" y="98" width="2970" height="524" /></element>

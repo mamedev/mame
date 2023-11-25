@@ -8,7 +8,6 @@
 #include "ra3.h"
 
 #include "emuopts.h"
-#include "opresolv.h"
 
 #include <algorithm>
 
