@@ -29,17 +29,16 @@ public:
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);
 
-	bool present() { return is_loaded() || loaded_through_softlist(); }
-
 protected:
-	casio_ram_cart_device(const machine_config &mconfig, device_type type, unsigned max_size, const char *tag, device_t *owner, uint32_t clock = 0);
+	casio_ram_cart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, unsigned max_size);
 
 	virtual void device_start() override;
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 private:
 	std::vector<u8> m_ram;
-	unsigned m_max_size, m_size, m_mask;
+	const unsigned m_max_size;
+	unsigned m_size, m_mask;
 };
 
 class casio_ra3_device : public casio_ram_cart_device

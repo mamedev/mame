@@ -78,9 +78,6 @@ public:
 	void mz1(machine_config &config);
 	void cz1(machine_config &config);
 
-	void cz1_palette(palette_device &palette) const;
-	HD44780_PIXEL_UPDATE(lcd_pixel_update);
-
 	int cont_r();
 	int sync_r();
 
@@ -92,6 +89,9 @@ protected:
 	virtual void machine_reset() override;
 
 private:
+	void cz1_palette(palette_device &palette) const;
+	HD44780_PIXEL_UPDATE(lcd_pixel_update);
+
 	void mz1_main_map(address_map &map);
 	void cz1_main_map(address_map &map);
 	void sub_map(address_map &map);
@@ -121,13 +121,17 @@ private:
 
 	// main/sub CPU comm methods
 	void main_to_sub_0_w(u8 data);
+	TIMER_CALLBACK_MEMBER(main_to_sub_0_cb);
 	u8 main_to_sub_0_r();
 	void main_to_sub_1_w(u8 data);
+	TIMER_CALLBACK_MEMBER(main_to_sub_1_cb);
 	u8 main_to_sub_1_r();
 	void sub_to_main_w(u8 data);
+	TIMER_CALLBACK_MEMBER(sub_to_main_cb);
 	u8 sub_to_main_r();
 
 	void sync_clr_w(u8);
+	TIMER_CALLBACK_MEMBER(sync_clr_cb);
 
 	void main_irq_w(u8);
 	void main_irq_ack_w(u8);
@@ -324,7 +328,7 @@ static INPUT_PORTS_START( mz1 )
 	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("KC12")
-	PORT_BIT(0x01, IP_ACTIVE_LOW,  IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("cart", casio_ram_cart_device, present)
+	PORT_BIT(0x01, IP_ACTIVE_LOW,  IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("cart", casio_ram_cart_device, exists)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_CUSTOM) // low = MZ-1, high = CZ-1
 	PORT_BIT(0xfc, IP_ACTIVE_LOW,  IPT_UNUSED)
 
@@ -632,11 +636,13 @@ void cz1_state::sub_pa_w(u8 data)
 /**************************************************************************/
 void cz1_state::sub_pb_w(u8 data)
 {
-	m_upd933[0]->id_w(BIT(data, 5));
-	m_upd933[1]->id_w(BIT(data, 5));
+	for (int i = 0; i < 2; i++)
+	{
+		m_upd933[i]->id_w(BIT(data, 5));
+		m_upd933[i]->cs_w(BIT(data, 2 + i));
 
-	m_upd933[0]->cs_w(BIT(data, 2));
-	m_upd933[1]->cs_w(BIT(data, 3));
+		m_upd933[i]->set_output_gain(ALL_OUTPUTS, BIT(data, 6) ? 0.0 : 1.0);
+	}
 }
 
 /**************************************************************************/
@@ -649,8 +655,13 @@ void cz1_state::sub_pc_w(u8 data)
 /**************************************************************************/
 void cz1_state::main_to_sub_0_w(u8 data)
 {
-	machine().scheduler().synchronize();
-	m_main_to_sub[0] = data;
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(cz1_state::main_to_sub_0_cb), this), data);
+}
+
+/**************************************************************************/
+TIMER_CALLBACK_MEMBER(cz1_state::main_to_sub_0_cb)
+{
+	m_main_to_sub[0] = param;
 	m_sync = 1;
 }
 
@@ -665,8 +676,13 @@ u8 cz1_state::main_to_sub_0_r()
 /**************************************************************************/
 void cz1_state::main_to_sub_1_w(u8 data)
 {
-	machine().scheduler().synchronize();
-	m_main_to_sub[1] = data;
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(cz1_state::main_to_sub_1_cb), this), data);
+}
+
+/**************************************************************************/
+TIMER_CALLBACK_MEMBER(cz1_state::main_to_sub_1_cb)
+{
+	m_main_to_sub[1] = param;
 }
 
 /**************************************************************************/
@@ -678,8 +694,13 @@ u8 cz1_state::main_to_sub_1_r()
 /**************************************************************************/
 void cz1_state::sub_to_main_w(u8 data)
 {
-	machine().scheduler().synchronize();
-	m_sub_to_main = data;
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(cz1_state::sub_to_main_cb), this), data);
+}
+
+/**************************************************************************/
+TIMER_CALLBACK_MEMBER(cz1_state::sub_to_main_cb)
+{
+	m_sub_to_main = param;
 }
 
 /**************************************************************************/
@@ -703,7 +724,12 @@ int cz1_state::sync_r()
 /**************************************************************************/
 void cz1_state::sync_clr_w(u8)
 {
-	machine().scheduler().synchronize();
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(cz1_state::sync_clr_cb), this), 0);
+}
+
+/**************************************************************************/
+TIMER_CALLBACK_MEMBER(cz1_state::sync_clr_cb)
+{
 	m_sync = 0;
 }
 
@@ -764,6 +790,9 @@ void cz1_state::machine_start()
 	for (int i = 0; i < 0x40; i++)
 		m_volume[i] = pow(2, (float)i / 0x3f) - 1.0;
 
+	m_main_port[0] = m_main_port[1] = m_main_port[2] = 0xff;
+	m_mcu_p2 = 0xff;
+
 	// register for save states
 	save_item(NAME(m_main_port));
 	save_item(NAME(m_mcu_p2));
@@ -778,9 +807,6 @@ void cz1_state::machine_start()
 /**************************************************************************/
 void cz1_state::machine_reset()
 {
-	m_main_port[0] = m_main_port[1] = m_main_port[2] = 0xff;
-	m_mcu_p2 = 0xff;
-
 	m_main_to_sub[0] = m_main_to_sub[1] = 0;
 	m_sub_to_main = 0;
 	m_sync = 0;

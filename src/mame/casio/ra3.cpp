@@ -16,24 +16,27 @@ DEFINE_DEVICE_TYPE(CASIO_RA3, casio_ra3_device, "casio_ra3", "Casio RA-3 RAM car
 DEFINE_DEVICE_TYPE(CASIO_RA6, casio_ra6_device, "casio_ra6", "Casio RA-6 RAM cartridge")
 
 /**************************************************************************/
-casio_ram_cart_device::casio_ram_cart_device(const machine_config &mconfig, device_type type, unsigned max_size, const char *tag, device_t *owner, uint32_t clock)
+casio_ram_cart_device::casio_ram_cart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, unsigned max_size)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_memcard_image_interface(mconfig, *this)
+	, m_max_size(max_size)
 {
-	m_max_size = max_size;
 	m_mask = max_size - 1;
 	m_size = 0;
+
+	// only power-of-two sizes are supported
+	assert(!(m_max_size & m_mask));
 }
 
 /**************************************************************************/
 casio_ra3_device::casio_ra3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: casio_ram_cart_device(mconfig, CASIO_RA3, 0x1000, tag, owner, clock)
+	: casio_ram_cart_device(mconfig, CASIO_RA3, tag, owner, clock, 0x1000)
 {
 }
 
 /**************************************************************************/
 casio_ra6_device::casio_ra6_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: casio_ram_cart_device(mconfig, CASIO_RA6, 0x4000, tag, owner, clock)
+	: casio_ram_cart_device(mconfig, CASIO_RA6, tag, owner, clock, 0x4000)
 {
 }
 
@@ -43,8 +46,6 @@ void casio_ram_cart_device::device_start()
 	m_ram.resize(m_max_size, 0xff);
 
 	save_item(NAME(m_ram));
-	save_item(NAME(m_size));
-	save_item(NAME(m_mask));
 }
 
 /**************************************************************************/
