@@ -194,22 +194,23 @@ void shtzone_state::prg_map(address_map &map)
 
 static INPUT_PORTS_START( shtzone )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) // called Select button 1 in test mode
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) // " 2
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) // " 3
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) // " 4
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) // " 5
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Select Game 1") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Select Game 2") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Select Game 3") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Select Game 4") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Select Game 5") PORT_CODE(KEYCODE_B)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_SERVICE_NO_TOGGLE(0x80, IP_ACTIVE_LOW)
+	PORT_SERVICE_NO_TOGGLE(0x80, IP_ACTIVE_LOW )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1  )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) // does nothing in test mode
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) // "
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) // "
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON6 ) // called gun 1 in test mode
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON7 ) // " 2
+	// directly tied from Light Phaser TL pins?
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Gun Trigger") PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 Gun Trigger") PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // does nothing in test mode
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // active high or nothing on screen (?)
 
@@ -339,6 +340,9 @@ void shtzone_state::shtzone(machine_config &config)
 
 	for (int i = 1; i < 5; i++)
 		SMS_CART_SLOT(config, m_slots[i], sms_cart, nullptr);
+
+	m_port_ctrl1->set_default_option("lphaser");
+	m_port_ctrl2->set_default_option("lphaser");
 
 	m_has_bios_full = false;
 	m_has_pwr_led = false;
