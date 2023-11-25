@@ -89,7 +89,7 @@ void cowtipping_state::cowtipping(machine_config &config)
 
 	PIC16C56(config, "pic", 4000000);  // Actually PIC12C508/P, clock not verified
 
-//	TODO: AMD_29LV640MB (64 MBit with Boot Sector)
+//  TODO: AMD_29LV640MB (64 MBit with Boot Sector)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));  // wrong
 	screen.set_refresh_hz(60);

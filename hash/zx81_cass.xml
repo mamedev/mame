@@ -245,15 +245,15 @@ Known dumps not yet added (as of 2023-06-14):
 
 	<software name="8progs">
 		<!--
-			Programs included:
-			- FAI             LOAD "A"
-			- Geodrifter      LOAD "B"
-			- RA+DEC          LOAD "C"
-			- Moontrack       LOAD "D"
-			- Yankee Clipper  LOAD "E"
-			- Tensat          LOAD "F"
-			- Oscar10         LOAD "G"
-			- TenPlan         LOAD "H"
+		    Programs included:
+		    - FAI             LOAD "A"
+		    - Geodrifter      LOAD "B"
+		    - RA+DEC          LOAD "C"
+		    - Moontrack       LOAD "D"
+		    - Yankee Clipper  LOAD "E"
+		    - Tensat          LOAD "F"
+		    - Oscar10         LOAD "G"
+		    - TenPlan         LOAD "H"
 		-->
 		<description>8 Programmes by GM4IHJ</description>
 		<year>198?</year>

@@ -741,8 +741,8 @@ void nes_clone_afbm7800_state::handle_mmc3chr_banks(uint16_t* selected_chrbanks)
 	/* not correct? desert falcon
 	if (m_extraregs[0] & 0x80)
 	{
-		bankmask = 0x0f;
-		outerchrbank = (m_extraregs[0] & 0x38) << 1;
+	    bankmask = 0x0f;
+	    outerchrbank = (m_extraregs[0] & 0x38) << 1;
 	}
 	else
 	*/
@@ -809,7 +809,7 @@ void nes_clone_taikee_new_state::handle_mmc3chr_banks(uint16_t* selected_chrbank
 	else if (m_extraregs[0] == 0xe8)
 		outerchrbank = 0x80; // 1f mask, but no sprites?? (hot racing)
 	// 1111 0010
-	else if (m_extraregs[0] == 0xf2) 
+	else if (m_extraregs[0] == 0xf2)
 		outerchrbank = 0x100; // (winter race)
 	// 1111 1011
 	else if (m_extraregs[0] == 0xfb)

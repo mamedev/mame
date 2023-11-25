@@ -53,7 +53,7 @@ void psr540_state::map(address_map &map)
 {
 	map(0x0000000, 0x003ffff).ram().share(m_boot).unmapw();
 	map(0x0400000, 0x07fffff).rom().region("program_rom", 0);
-	map(0x1000000, 0x13fffff).ram(); // dram	
+	map(0x1000000, 0x13fffff).ram(); // dram
 }
 
 static INPUT_PORTS_START( psr540 )
@@ -67,5 +67,5 @@ ROM_START( psr540 )
 	ROM_LOAD16_WORD_SWAP( "xw25320.ic310", 0, 0x400000, CRC(c7c4736d) SHA1(ff1052eb076557071ed8652e6c2fc0925144fbd5))
 	ROM_LOAD16_WORD_SWAP( "xw25320.ic310", 0, 0x200000, CRC(9ef56c4e) SHA1(f26b588f9bcfd7bdbf1c0b38e4a1ea57e2f29f10))
 ROM_END
-	
+
 SYST( 1999, psr540, 0, 0, psr540, psr540, psr540_state, empty_init, "Yamaha", "PSR540", MACHINE_IS_SKELETON )

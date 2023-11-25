@@ -520,12 +520,12 @@ protected:
 	// lock bit masks
 	enum : uint8_t
 	{
-		LB1		= (1 << 0),
-		LB2		= (1 << 1),
-		BLB01	= (1 << 2),
-		BLB02	= (1 << 3),
-		BLB11	= (1 << 4),
-		BLB12	= (1 << 5)
+		LB1     = (1 << 0),
+		LB2     = (1 << 1),
+		BLB01   = (1 << 2),
+		BLB02   = (1 << 3),
+		BLB11   = (1 << 4),
+		BLB12   = (1 << 5)
 	};
 
 	// extended fuses bit masks
@@ -539,27 +539,27 @@ protected:
 	// high fuses bit masks
 	enum : uint8_t
 	{
-		BOOTRST	= (1 << 0),
+		BOOTRST = (1 << 0),
 		BOOTSZ0 = (1 << 1),
 		BOOTSZ1 = (1 << 2),
-		EESAVE	= (1 << 3),
-		WDTON	= (1 << 4),
-		SPIEN	= (1 << 5),
-		JTAGEN	= (1 << 6),
-		OCDEN	= (1 << 7)
+		EESAVE  = (1 << 3),
+		WDTON   = (1 << 4),
+		SPIEN   = (1 << 5),
+		JTAGEN  = (1 << 6),
+		OCDEN   = (1 << 7)
 	};
 
 	// low fuses bit masks
 	enum : uint8_t
 	{
-		CKSEL0	= (1 << 0),
-		CKSEL1	= (1 << 1),
-		CKSEL2	= (1 << 2),
-		CKSEL3	= (1 << 3),
-		SUT0	= (1 << 4),
-		SUT1	= (1 << 5),
-		CKOUT	= (1 << 6),
-		CKDIV8	= (1 << 7)
+		CKSEL0  = (1 << 0),
+		CKSEL1  = (1 << 1),
+		CKSEL2  = (1 << 2),
+		CKSEL3  = (1 << 3),
+		SUT0    = (1 << 4),
+		SUT1    = (1 << 5),
+		CKOUT   = (1 << 6),
+		CKDIV8  = (1 << 7)
 	};
 
 	enum : uint8_t

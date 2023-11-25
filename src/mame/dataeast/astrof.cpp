@@ -1052,7 +1052,7 @@ ROM_START( astrof3 )
 ROM_END
 
 // from an original Taito PCB with silkscreen
-ROM_START( astroft ) 
+ROM_START( astroft )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "as_19.bin",       0xd000, 0x0800, CRC(fa9e5607) SHA1(246a3591196939ecca9088f44035cceb4ee3531e) )
 	ROM_LOAD( "as_18.bin",       0xd800, 0x0800, CRC(1c104d3d) SHA1(20015808ad87421e90c0eac806bb39dee5226b51) )

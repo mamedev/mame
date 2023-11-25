@@ -183,7 +183,7 @@ Bit 15 : ?
 		machine().bookkeeping().coin_counter_w(2, BIT(data, 2));  //
 		machine().bookkeeping().coin_counter_w(3, BIT(data, 3));  // Games
 		m_hopper->motor_w(BIT(data, 9));
-		//logerror("Port a:lines: data:%04x\n", data);	
+		//logerror("Port a:lines: data:%04x\n", data);
 	}
 }
 
@@ -221,7 +221,7 @@ Bit 14 : paid lamp? (one short pulse after all is paid)
 */
 	for (u8 i = 0; i < 16; i++)
 		m_lamps[i] = BIT(data, i);
-//	logerror("Port b:lamps: data:%04x\n", data);
+//  logerror("Port b:lamps: data:%04x\n", data);
 }
 
 

@@ -3021,7 +3021,7 @@ Terminal Velocity: incompatible with Windows 95 (verify), has unsupported option
 		<description>Dune II - Battle for Arrakis (Netherlands)</description>
 		<year>1995</year>
 		<publisher>Hit Squad</publisher>
-		<info name="developer" value=" 	Westwood Studios" />
+		<info name="developer" value="Westwood Studios" />
 		<info name="language" value="English/French/German" />
 		<info name="region" value="Netherlands" />
 		<info name="version" value="V1.07" />
@@ -3041,7 +3041,7 @@ Terminal Velocity: incompatible with Windows 95 (verify), has unsupported option
 		<description>Dune II - Battle for Arrakis (Germany, PC Games Collection 2 release)</description>
 		<year>2001</year>
 		<publisher>Electronic Arts / Infogrames</publisher>
-		<info name="developer" value=" 	Westwood Studios" />
+		<info name="developer" value="Westwood Studios" />
 		<info name="language" value="English/French/German" />
 		<info name="version" value="V1.07" />
 		<sharedfeat name="platform" value="DOS" />
@@ -3060,7 +3060,7 @@ Terminal Velocity: incompatible with Windows 95 (verify), has unsupported option
 		<description>Dune II - The Building of a Dynasty (USA, Gold Medal 12 CD Pack)</description>
 		<year>1995</year>
 		<publisher>Virgin Games</publisher>
-		<info name="developer" value=" 	Westwood Studios" />
+		<info name="developer" value="Westwood Studios" />
 		<info name="language" value="English" />
 		<info name="region" value="USA" />
 		<info name="version" value="V1.07" />

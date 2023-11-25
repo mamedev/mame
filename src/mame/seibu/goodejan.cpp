@@ -324,7 +324,7 @@ void goodejan_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 					m_gfxdecode->gfx(0)->prio_transpen(bitmap, cliprect,
 						sprite++,
 						color,
-						fx, fy, 
+						fx, fy,
 						x + (dx - 1 - ax) * 16,
 						y + ay * 16,
 						screen.priority(), pri, 15);
