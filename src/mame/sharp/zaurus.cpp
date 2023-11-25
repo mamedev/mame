@@ -1505,15 +1505,7 @@ void zaurus_sa_state::main_map(address_map &map)
 void zaurus_pxa_state::main_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).rom().region("firmware", 0);
-	map(0x40000000, 0x400002ff).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::dma_r), FUNC(pxa255_periphs_device::dma_w));
-	map(0x40400000, 0x40400083).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::i2s_r), FUNC(pxa255_periphs_device::i2s_w));
-	map(0x40900000, 0x4090000f).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::rtc_r), FUNC(pxa255_periphs_device::rtc_w));
-	map(0x40a00000, 0x40a0001f).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::ostimer_r), FUNC(pxa255_periphs_device::ostimer_w));
-	map(0x40d00000, 0x40d00017).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::intc_r), FUNC(pxa255_periphs_device::intc_w));
-	map(0x40e00000, 0x40e0006b).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::gpio_r), FUNC(pxa255_periphs_device::gpio_w));
-	map(0x40f00000, 0x40f00037).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::power_r), FUNC(pxa255_periphs_device::power_w));
-	map(0x41300000, 0x4130000b).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::clocks_r), FUNC(pxa255_periphs_device::clocks_w));
-	map(0x44000000, 0x4400021f).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::lcd_r), FUNC(pxa255_periphs_device::lcd_w));
+	map(0x40000000, 0x47ffffff).m(m_pxa_periphs, FUNC(pxa255_periphs_device::map));
 	map(0xa0000000, 0xa07fffff).ram().share("ram");
 }
 
@@ -1527,7 +1519,7 @@ void zaurus_sa_state::device_reset_after_children()
 
 INPUT_CHANGED_MEMBER( zaurus_pxa_state::system_start )
 {
-	m_pxa_periphs->gpio_bit_w(10, m_power->read());
+	m_pxa_periphs->gpio_in<10>(BIT(m_power->read(), 0));
 }
 
 static INPUT_PORTS_START( zaurus_sa )
