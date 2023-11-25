@@ -511,6 +511,9 @@ void smsbootleg_state::init_sms_supergame()
 ROM_START( smssgame )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 
+	ROM_REGION( 0x8000, "mcu", ROMREGION_ERASEFF )
+	ROM_LOAD( "mcu.bin", 0x0000, 0x8000, NO_DUMP )
+
 	ROM_REGION( 0x800000, "game_data", ROMREGION_ERASEFF )
 	ROM_LOAD( "k2.bin",  0x000000, 0x20000, CRC(a12439f4) SHA1(e957d4fe275e982bedef28af8cc2957da27dc512) ) // Final Bubble Bobble (1/2)
 	ROM_LOAD( "k1.bin",  0x020000, 0x20000, CRC(dadffecd) SHA1(68ebb968539049a9e193da5200856b9f956f7e02) ) // Final Bubble Bobble (2/2)
@@ -539,6 +542,9 @@ ROM_END
 // On this version some games gets loaded from space mirrors (particularly the ones that were using mask roms on the other set)
 ROM_START( smssgamea )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x8000, "mcu", ROMREGION_ERASEFF )
+	ROM_LOAD( "mcu.bin", 0x0000, 0x8000, NO_DUMP )
 
 	ROM_REGION( 0x800000, "game_data", ROMREGION_ERASEFF )
 	ROM_LOAD( "02.k2",   0x000000, 0x10000, CRC(66ed320e) SHA1(e838cb98fbd295259707f8f7ce433b28baa846e3) ) // menu is here on this one
@@ -570,5 +576,5 @@ ROM_END
 
 
 // these haven't been set as clones because they contain different games
-GAME( 199?, smssgame,  0,    sms_supergame, sms_supergame, smsbootleg_state, init_sms_supergame, ROT0, "Sono Corp Japan", "Super Game (Sega Master System Multi-game bootleg, 01 Final Bubble Bobble)", MACHINE_NOT_WORKING )
-GAME( 1990, smssgamea, 0,    sms_supergame, sms_supergame, smsbootleg_a_state, init_sms_supergame, ROT0, "Seo Jin (TV-Tuning license)", "Super Game (Sega Master System Multi-game bootleg, 01 Tri Formation)", MACHINE_NOT_WORKING ) // for German market?
+GAME( 199?, smssgame,  0,           sms_supergame, sms_supergame, smsbootleg_state, init_sms_supergame, ROT0, "Sono Corp Japan", "Super Game (Sega Master System Multi-game bootleg, 01 Final Bubble Bobble)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1990, smssgamea, smssgame,    sms_supergame, sms_supergame, smsbootleg_a_state, init_sms_supergame, ROT0, "Seo Jin (TV-Tuning license)", "Super Game (Sega Master System Multi-game bootleg, 01 Tri Formation)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // for German market?
