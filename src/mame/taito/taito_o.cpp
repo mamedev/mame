@@ -92,7 +92,6 @@ protected:
 	virtual void machine_start() override { m_lamps.resolve(); };
 
 private:
-	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<tc0080vco_device> m_tc0080vco;
@@ -105,6 +104,8 @@ private:
 	required_device<hopper_device> m_hopper;
 	output_finder<32> m_lamps;
 
+	u16 m_hoppff = 0x0000;
+
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 	u32 draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, u32 start_offset);
@@ -112,8 +113,6 @@ private:
 	void taitoo_hopper_int_cb(int state);
 	void taito_outa_w(offs_t offs, u16 data, u16 mem_mask);
 	void taito_outb_w(offs_t offs, u16 data, u16 mem_mask);
-
-	u16 m_hoppff = 0x0000;
 };
 
 
