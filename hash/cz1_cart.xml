@@ -12,7 +12,7 @@ license:CC0-1.0
 		<info name="serial" value="RC-10" />
 		<part name="cart" interface="cz_cart">
 			<dataarea name="rom" size="0x8000">
-				<rom name="casio_cz1_cartridge_rc10.bin" size="0x8000" crc="cda19120" sha1="0c71b0d93fc48b4707b362ce2ead574865ebe1e1" />
+				<rom name="casio_cz1_cartridge_rc10.bin" size="0x8000" crc="d1f1c6a6" sha1="c97c8f101d76142b400fa6c466e5d3546d33eea9" />
 			</dataarea>
 		</part>
 	</software>
