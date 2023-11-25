@@ -14,8 +14,7 @@ cfr. ALex Kidd with autofire or Solomon's Key title (that actually hasn't been r
 
 TODO:
 smssgame
-- 01 Super Bubble: writes 0x08 to $fffe, likely shuffles banks around.
-- 05 Super Mario: crashes, seemingly expects $8000-$bfff to be a copy of $0000-$3fff, open bus?
+- 05 Super Mario: crashes, seemingly expects $8000-$bfff to be a copy of $0000-$3fff, open bus? btanb?
 - 29 Goonies: either boots (with bad title screen GFXs) or outright crashes (similar to Super Mario?)
 - SG-1000 "newer" conversions all sports dimmed main sprite, cfr. 15 Bomb Jack or 20 Pitfall II
 
@@ -278,6 +277,7 @@ protected:
 	required_memory_region m_game_data;
 
 	u8 m_rom_select = 0;
+	u8 m_main_bank_mailbox = 0;
 	u8 m_sub_bank_mailbox = 0;
 private:
 
@@ -308,14 +308,17 @@ void smsbootleg_state::machine_reset()
 void smsbootleg_state::refresh_banks()
 {
 	const u16 base_rom_bank = ((m_rom_select & 0xf) << 5) + ((m_rom_select & 0xf0) >> 3);
-	const u8 sub_bank = m_sub_bank_mailbox & 0xf;
+	const u8 main_bank = (m_main_bank_mailbox & 0x7) + ((m_main_bank_mailbox & 8) << 2);
+	const u8 sub_bank = (m_sub_bank_mailbox & 0x7) + ((m_sub_bank_mailbox & 8) << 2);
 
-	LOG("$0000-$7fff %08x $8000-$bfff %08x\n"
+	LOG("$0000-$3fff %08x $4000-$7fff %08x $8000-$bfff %08x\n"
 		, base_rom_bank * 0x4000
+		, (base_rom_bank + main_bank) * 0x4000
 		, (base_rom_bank + sub_bank) * 0x4000
 	);
 	m_game_bank[0]->set_entry(base_rom_bank);
-	m_game_bank[1]->set_entry(base_rom_bank + 1);
+	// Final Bubble Bobble uses $fffe to bank this area, all other games sets 0x01
+	m_game_bank[1]->set_entry(base_rom_bank + main_bank);
 	// TODO: Goonies and Super Mario
 	// (expects a default bank of 0 here, is bit 7 set a signal for bank unlock?)
 	m_game_bank[2]->set_entry(base_rom_bank + sub_bank);
@@ -333,9 +336,9 @@ void smsbootleg_state::sms_supergame_map(address_map &map)
 //  map(0xfffc, 0xffff).rw(FUNC(smsbootleg_state::sms_mapper_r), FUNC(smsbootleg_state::sms_mapper_w));       // Bankswitch control
 	map(0xfffe, 0xfffe).lw8(
 		NAME([this] (u8 data) {
-			m_rom_view.select(BIT(data, 0));
-			if (data & 0xfe)
-				throw emu_fatalerror("ROM view select %02x\n", data);
+			m_main_bank_mailbox = data;
+			LOG("map $fffe: %02x\n", data);
+			refresh_banks();
 		})
 	);
 	map(0xffff, 0xffff).lrw8(
@@ -350,9 +353,10 @@ void smsbootleg_state::sms_supergame_map(address_map &map)
 	);
 }
 
-// this port is likely disabled when booting into games
 void smsbootleg_state::port08_w(uint8_t data)
 {
+	// TODO: the MCU definitely controls this, including switch back to attract menu once timer expires
+	m_rom_view.select(1);
 	m_rom_select = data;
 	LOG("I/O $08: %02x\n", data);
 	refresh_banks();
