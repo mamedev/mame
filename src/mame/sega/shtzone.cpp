@@ -84,6 +84,9 @@ public:
 
 	void shtzone(machine_config &config);
 
+	DECLARE_CUSTOM_INPUT_MEMBER(gun_tl_p1_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(gun_tl_p2_r);
+
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -191,6 +194,15 @@ void shtzone_state::prg_map(address_map &map)
 	map(0xdc00, 0xdc00).portr("IN1");
 }
 
+CUSTOM_INPUT_MEMBER(shtzone_state::gun_tl_p1_r)
+{
+	return BIT(m_port_ctrl1->in_r(), 4);
+}
+
+CUSTOM_INPUT_MEMBER(shtzone_state::gun_tl_p2_r)
+{
+	return BIT(m_port_ctrl2->in_r(), 4);
+}
 
 static INPUT_PORTS_START( shtzone )
 	PORT_START("IN0")
@@ -208,9 +220,9 @@ static INPUT_PORTS_START( shtzone )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) // does nothing in test mode
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) // "
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) // "
-	// directly tied from Light Phaser TL pins?
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Gun Trigger") PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 Gun Trigger") PORT_PLAYER(2)
+	// directly tied from Light Phaser TL pins
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(shtzone_state, gun_tl_p1_r)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(shtzone_state, gun_tl_p2_r)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // does nothing in test mode
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // active high or nothing on screen (?)
 
