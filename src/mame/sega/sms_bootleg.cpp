@@ -14,10 +14,13 @@ cfr. ALex Kidd with autofire or Solomon's Key title (that actually hasn't been r
 
 TODO:
 smssgame
-- 05 Super Mario: crashes, seemingly expects $8000-$bfff to be a copy of $0000-$3fff, open bus? btanb?
-- 29 Goonies: either boots (with bad title screen GFXs) or outright crashes (similar to Super Mario?)
-- SG-1000 "newer" conversions all sports dimmed main sprite, cfr. 15 Bomb Jack or 20 Pitfall II
-- 03 Wonder Boy: minor GFX glitch on stage start screen for a split second, is the MCU also capable of VDP reset?
+- 05 Super Mario: crashes, seemingly expects $8000-$bfff to be a copy of $0000-$3fff,
+  extra MCU control? btanb?
+- 29 Goonies: either boots (with bad title screen GFXs) or outright crashes again btanb?
+- SG-1000 "newer" conversions all sports dimmed main sprite
+  cfr. 15 Bomb Jack or 20 Pitfall II;
+- 03 Wonder Boy: minor GFX glitch on stage start screen for a split second,
+  is the MCU also capable of VDP reset?
 
 smssgamea
 - Same issues as smssgame
@@ -315,7 +318,6 @@ void smsbootleg_state::machine_reset()
 	refresh_banks();
 }
 
-// TODO: different for smssgamea, to be virtualized later
 void smsbootleg_state::refresh_banks()
 {
 	const u16 base_rom_bank = ((m_rom_select & 0xf) << 5) + ((m_rom_select & 0xf0) >> 3);
@@ -330,8 +332,9 @@ void smsbootleg_state::refresh_banks()
 	m_game_bank[0]->set_entry(base_rom_bank);
 	// Final Bubble Bobble uses $fffe to bank this area, all other games sets 0x01
 	m_game_bank[1]->set_entry(base_rom_bank + main_bank);
-	// TODO: Goonies and Super Mario
-	// (expects a default bank of 0 here, is bit 7 set a signal for bank unlock?)
+	// TODO: Super Mario
+	// (expects a default bank of 0 here?)
+	// TODO: some games sets bit 7 for ROM write enable, doesn't seem to make a difference?
 	m_game_bank[2]->set_entry(base_rom_bank + sub_bank);
 }
 
@@ -402,60 +405,9 @@ void smsbootleg_state::sms_supergame_io(address_map &map)
 static INPUT_PORTS_START( sms_supergame )
 	PORT_START("PAUSE")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
+	// TODO: are games really supposed to not have a way to pause?
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )// PORT_NAME(DEF_STR(Pause)) PORT_CODE(KEYCODE_1) PORT_WRITE_LINE_DEVICE_MEMBER("sms_vdp", sega315_5124_device, n_nmi_in_write)
-#if 0
-	PORT_START("IN0")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IN1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-#endif
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
@@ -534,8 +486,6 @@ ROM_START( smssgame )
 	ROM_LOAD( "sg11004a 79st0086end 9045.rom4",0x600000, 0x080000, CRC(cdbfe86e) SHA1(83d6f261471dca20f8d2e33b9807d670e9b4eb9c) ) // Invaders, Astro, Super Mario, Ghost House, Bomb Jack, Galaga, Goonies, Road Runner I, Road Fighter, Tetris, Wonder Boy
 	ROM_LOAD( "rom3.bin",0x680000, 0x20000, CRC(96c8705d) SHA1(ba4f4af0cfdad1d63a08201ed186c79aea062b95) ) // ? Kung Fu game (Hello Kang Si?)
 	ROM_LOAD( "rom2.bin",0x700000, 0x20000, CRC(c1478323) SHA1(27b524a234f072e81ef41fb89a5fff5617e9b951) ) // Buk Doo Sun
-
-	// there seems to be some kind of MCU for the timer?
 ROM_END
 
 
@@ -568,13 +518,10 @@ ROM_START( smssgamea )
 	ROM_LOAD( "14.rom3", 0x680000, 0x20000, CRC(889bb269) SHA1(0a92b339c19240bfea29ee24fee3e7d780b0cd5c) ) // Hello Kang Si
 	ROM_LOAD( "15.rom2", 0x700000, 0x20000, CRC(c1478323) SHA1(27b524a234f072e81ef41fb89a5fff5617e9b951) ) // Buk Doo Gun
 //  ROM_FILL(            0x780000, 0x80000, 0xff) // ROM1 position not populated
-
-	// there seems to be some kind of MCU for the timer?
 ROM_END
 
 } // Anonymous namespace
 
 
-// these haven't been set as clones because they contain different games
 GAME( 199?, smssgame,  0,           sms_supergame, sms_supergame, smsbootleg_state, init_sms_supergame, ROT0, "Sono Corp Japan", "Super Game (Sega Master System Multi-game bootleg, 01 Final Bubble Bobble)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 1990, smssgamea, smssgame,    sms_supergame, sms_supergame, smsbootleg_a_state, init_sms_supergame, ROT0, "Seo Jin (TV-Tuning license)", "Super Game (Sega Master System Multi-game bootleg, 01 Tri Formation)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // for German market?
