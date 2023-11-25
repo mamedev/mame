@@ -190,22 +190,19 @@ copyright-holders: Roberto Fresca, Grull Osgo
 			<bounds x="0.62" y="3.10" width="0.36" height="0.20" />
 		</element>
 
-
-		<element name="lamp9" ref="maxbet_b" inputtag="IN0" inputmask="0x80">
+		<element name="lamp8" ref="bet_b" inputtag="IN0" inputmask="0x40">
 			<bounds x="1.30" y="3.08" width="0.40" height="0.24" />
 		</element>
-		<element name="lamp9" ref="maxbet" inputtag="IN0" inputmask="0x80">
+		<element name="lamp8" ref="bet" inputtag="IN0" inputmask="0x40">
 			<bounds x="1.32" y="3.10" width="0.36" height="0.20" />
 		</element>
 
-
-		<element name="lamp8" ref="bet_b" inputtag="IN0" inputmask="0x40">
+		<element name="lamp9" ref="maxbet_b" inputtag="IN0" inputmask="0x80">
 			<bounds x="1.80" y="3.08" width="0.40" height="0.24" />
 		</element>
-		<element name="lamp8" ref="bet" inputtag="IN0" inputmask="0x40">
+		<element name="lamp9" ref="maxbet" inputtag="IN0" inputmask="0x80">
 			<bounds x="1.82" y="3.10" width="0.36" height="0.20" />
 		</element>
-
 
 		<element name="lamp10" ref="dup_b" inputtag="IN0" inputmask="0x200">
 			<bounds x="2.50" y="3.08" width="0.40" height="0.24" />
