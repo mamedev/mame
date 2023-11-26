@@ -34,17 +34,19 @@
 ***********************************************************************************************************/
 
 #include "emu.h"
+
 #include "bus/ata/atadev.h"
 #include "bus/ata/atapicdr.h"
 #include "bus/ata/ataintf.h"
 #include "cpu/h8/h83002.h"
 #include "cpu/m68000/tmp68301.h"
 #include "machine/nvram.h"
+#include "machine/tc9223.h"
 #include "machine/timer.h"
 #include "sound/nn71003f.h"
 #include "video/v9938.h"
 #include "video/zr36110.h"
-#include "machine/tc9223.h"
+
 #include "nichisnd.h"
 
 class hrdvd_ata_controller_device : public abstract_ata_interface_device
