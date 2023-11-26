@@ -169,6 +169,7 @@ protected:
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
 
+	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	virtual MC6845_UPDATE_ROW(crtc_update_row) override;
 
 	void dtr_internal(int data);
