@@ -274,7 +274,6 @@ void hd44780_device::device_start()
 
 	m_busy_timer = timer_alloc(FUNC(hd44780_device::clear_busy_flag), this);
 	m_blink_timer = timer_alloc(FUNC(hd44780_device::blink_tick), this);
-	m_blink_timer->adjust(attotime::from_ticks(102400, clock()), 0, attotime::from_ticks(102400, clock())); // blink happens every 102400 cycles
 
 	// state saving
 	save_item(NAME(m_busy_factor));
@@ -336,8 +335,22 @@ void hd44780_device::device_reset()
 }
 
 //-------------------------------------------------
+//  device_clock_changed
+//-------------------------------------------------
+
+void hd44780_device::device_clock_changed()
+{
+	// (re)adjust blink timer
+	attotime period = attotime::from_ticks(102400, clock()); // blink happens every 102400 cycles
+	attotime remain = m_blink_timer->remaining();
+
+	m_blink_timer->adjust((remain > period) ? period : remain, 0, period);
+}
+
+//-------------------------------------------------
 //  device validity check
 //-------------------------------------------------
+
 void hd44780_device::device_validity_check(validity_checker &valid) const
 {
 	if (clock() == 0)

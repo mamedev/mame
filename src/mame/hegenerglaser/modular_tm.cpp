@@ -141,7 +141,7 @@ void mmtm_state::set_cpu_freq()
 	m_maincpu->set_unscaled_clock(xtal[val]);
 
 	// lcd busy flag timing problem when overclocked
-	subdevice<hd44780_device>("display:hd44780")->set_busy_factor((val > 1) ? 0.75 : 1.0);
+	subdevice<hd44780_device>("display:hd44780")->set_clock((val > 1) ? 350'000 : 270'000);
 }
 
 
