@@ -112,7 +112,7 @@ static const char *const s_st1_ops[16] =
 static const char *const s_tlb_ops[16] =
 {
 	"", "", "", "ritlb0",
-	"iitlb", "pitlb", "witlb", "ritlb1"
+	"iitlb", "pitlb", "witlb", "ritlb1",
 	"", "", "", "rdtlb0",
 	"idtlb", "pdtlb", "wdtlb", "rdtlb1"
 };
