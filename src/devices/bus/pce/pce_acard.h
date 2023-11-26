@@ -27,6 +27,7 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	uint8_t ram_r(offs_t offset);
@@ -36,10 +37,45 @@ private:
 
 	/* Arcade Card specific */
 	memory_share_creator<uint8_t> m_ram;
-	uint8_t   m_ctrl[4];
-	uint32_t  m_base_addr[4];
-	uint16_t  m_addr_offset[4];
-	uint16_t  m_addr_inc[4];
+
+	struct dram_port
+	{
+		inline uint32_t ram_addr()
+		{
+			if (BIT(m_ctrl, 1))
+				return (m_base_addr + m_addr_offset + (BIT(m_ctrl, 3) ? 0xff0000 : 0)) & 0x1fffff;
+			else
+				return m_base_addr & 0x1fffff;
+		}
+
+		inline void addr_increment()
+		{
+			if (BIT(m_ctrl, 0))
+			{
+				if (BIT(m_ctrl, 4))
+				{
+					m_base_addr += m_addr_inc;
+					m_base_addr &= 0xffffff;
+				}
+				else
+				{
+					m_addr_offset += m_addr_inc;
+				}
+			}
+		}
+
+		inline void adjust_addr()
+		{
+			m_base_addr += m_addr_offset + (BIT(m_ctrl, 3) ? 0xff0000 : 0);
+			m_base_addr &= 0xffffff;
+		}
+		uint8_t  m_ctrl;
+		uint32_t m_base_addr;
+		uint16_t m_addr_offset;
+		uint16_t m_addr_inc;
+	};
+
+	dram_port m_port[4];
 	uint32_t  m_shift;
 	uint8_t   m_shift_reg;
 	uint8_t   m_rotate_reg;

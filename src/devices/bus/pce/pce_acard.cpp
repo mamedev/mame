@@ -28,10 +28,6 @@ pce_acard_duo_device::pce_acard_duo_device(const machine_config &mconfig, device
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_pce_cart_interface( mconfig, *this )
 	, m_ram(*this, "ram", 0x200000, ENDIANNESS_LITTLE)
-	, m_ctrl{0, 0, 0, 0}
-	, m_base_addr{0, 0, 0, 0}
-	, m_addr_offset{0, 0, 0, 0}
-	, m_addr_inc{0, 0, 0, 0}
 	, m_shift(0)
 	, m_shift_reg(0)
 	, m_rotate_reg(0)
@@ -57,13 +53,27 @@ pce_acard_pro_device::pce_acard_pro_device(const machine_config &mconfig, const 
 
 void pce_acard_duo_device::device_start()
 {
-	save_item(NAME(m_ctrl));
-	save_item(NAME(m_base_addr));
-	save_item(NAME(m_addr_offset));
-	save_item(NAME(m_addr_inc));
+	save_item(STRUCT_MEMBER(m_port, m_ctrl));
+	save_item(STRUCT_MEMBER(m_port, m_base_addr));
+	save_item(STRUCT_MEMBER(m_port, m_addr_offset));
+	save_item(STRUCT_MEMBER(m_port, m_addr_inc));
 	save_item(NAME(m_shift));
 	save_item(NAME(m_shift_reg));
 	save_item(NAME(m_rotate_reg));
+}
+
+void pce_acard_duo_device::device_reset()
+{
+	for (auto &port : m_port)
+	{
+		port.m_ctrl = 0;
+		port.m_base_addr = 0;
+		port.m_addr_offset = 0;
+		port.m_addr_inc = 0;
+	}
+	m_shift = 0;
+	m_shift_reg = 0;
+	m_rotate_reg = 0;
 }
 
 void pce_acard_pro_device::device_add_mconfig(machine_config &config)
@@ -78,7 +88,8 @@ void pce_acard_pro_device::device_add_mconfig(machine_config &config)
 void pce_acard_duo_device::install_memory_handlers(address_space &space)
 {
 	space.install_readwrite_handler(0x080000, 0x087fff, emu::rw_delegate(*this, FUNC(pce_acard_duo_device::ram_r)), emu::rw_delegate(*this, FUNC(pce_acard_duo_device::ram_w)));
-	space.install_readwrite_handler(0x1ffa00, 0x1ffbff, emu::rw_delegate(*this, FUNC(pce_acard_duo_device::peripheral_r)), emu::rw_delegate(*this, FUNC(pce_acard_duo_device::peripheral_w)));
+	// TODO: mirrored?
+	space.install_readwrite_handler(0x1ffa00, 0x1ffaff, 0, 0x100, 0, emu::rw_delegate(*this, FUNC(pce_acard_duo_device::peripheral_r)), emu::rw_delegate(*this, FUNC(pce_acard_duo_device::peripheral_w)));
 }
 
 void pce_acard_pro_device::install_memory_handlers(address_space &space)
@@ -103,61 +114,46 @@ uint8_t pce_acard_duo_device::peripheral_r(offs_t offset)
 {
 	if ((offset & 0xe0) == 0xe0)
 	{
-		switch (offset & 0xef)
+		switch (offset & 0x1f)
 		{
-			case 0xe0: return (m_shift >> 0)  & 0xff;
-			case 0xe1: return (m_shift >> 8)  & 0xff;
-			case 0xe2: return (m_shift >> 16) & 0xff;
-			case 0xe3: return (m_shift >> 24) & 0xff;
-			case 0xe4: return m_shift_reg;
-			case 0xe5: return m_rotate_reg;
-			case 0xee: return 0x10;
-			case 0xef: return 0x51;
+			case 0x00: return (m_shift >> 0)  & 0xff;
+			case 0x01: return (m_shift >> 8)  & 0xff;
+			case 0x02: return (m_shift >> 16) & 0xff;
+			case 0x03: return (m_shift >> 24) & 0xff;
+			case 0x04: return m_shift_reg;
+			case 0x05: return m_rotate_reg;
+			case 0x1c: return 0x00;
+			case 0x1d: return 0x00;
+			case 0x1e: return 0x10; // Version number (MSB?)
+			case 0x1f: return 0x51; // Arcade Card ID
 		}
 
-		return 0;
+		return 0xff;
 	}
 
-	uint8_t const r_num = (offset & 0x30) >> 4;
+	dram_port &port = m_port[(offset & 0x30) >> 4];
 
-	switch (offset & 0x0f)
+	switch (offset & 0x8f)
 	{
 		case 0x00:
 		case 0x01:
 		{
-			uint8_t res;
-			if (m_ctrl[r_num] & 2)
-				res = m_ram[(m_base_addr[r_num] + m_addr_offset[r_num]) & 0x1fffff];
-			else
-				res = m_ram[m_base_addr[r_num] & 0x1fffff];
+			uint8_t const res = m_ram[port.ram_addr()];
 
 			if (!machine().side_effects_disabled())
-			{
-				if (m_ctrl[r_num] & 0x1)
-				{
-					if (m_ctrl[r_num] & 0x10)
-					{
-						m_base_addr[r_num] += m_addr_inc[r_num];
-						m_base_addr[r_num] &= 0xffffff;
-					}
-					else
-					{
-						m_addr_offset[r_num] += m_addr_inc[r_num];
-					}
-				}
-			}
+				port.addr_increment();
 
 			return res;
 		}
-		case 0x02: return (m_base_addr[r_num] >> 0) & 0xff;
-		case 0x03: return (m_base_addr[r_num] >> 8) & 0xff;
-		case 0x04: return (m_base_addr[r_num] >> 16) & 0xff;
-		case 0x05: return (m_addr_offset[r_num] >> 0) & 0xff;
-		case 0x06: return (m_addr_offset[r_num] >> 8) & 0xff;
-		case 0x07: return (m_addr_inc[r_num] >> 0) & 0xff;
-		case 0x08: return (m_addr_inc[r_num] >> 8) & 0xff;
-		case 0x09: return m_ctrl[r_num];
-		default:   return 0;
+		case 0x02: return (port.m_base_addr >> 0) & 0xff;
+		case 0x03: return (port.m_base_addr >> 8) & 0xff;
+		case 0x04: return (port.m_base_addr >> 16) & 0xff;
+		case 0x05: return (port.m_addr_offset >> 0) & 0xff;
+		case 0x06: return (port.m_addr_offset >> 8) & 0xff;
+		case 0x07: return (port.m_addr_inc >> 0) & 0xff;
+		case 0x08: return (port.m_addr_inc >> 8) & 0xff;
+		case 0x09: return port.m_ctrl;
+		default:   return 0xff;
 	}
 }
 
@@ -195,54 +191,38 @@ void pce_acard_duo_device::peripheral_w(offs_t offset, uint8_t data)
 	}
 	else
 	{
-		uint8_t const w_num = (offset & 0x30) >> 4;
+		dram_port &port = m_port[(offset & 0x30) >> 4];
 
-		switch (offset & 0x0f)
+		switch (offset & 0x8f)
 		{
 			case 0x00:
 			case 0x01:
-				if (m_ctrl[w_num] & 2)
-					m_ram[(m_base_addr[w_num] + m_addr_offset[w_num]) & 0x1fffff] = data;
-				else
-					m_ram[m_base_addr[w_num] & 0x1fffff] = data;
+				m_ram[port.ram_addr()] = data;
 
-				if (m_ctrl[w_num] & 0x1)
-				{
-					if (m_ctrl[w_num] & 0x10)
-					{
-						m_base_addr[w_num] += m_addr_inc[w_num];
-						m_base_addr[w_num] &= 0xffffff;
-					}
-					else
-					{
-						m_addr_offset[w_num] += m_addr_inc[w_num];
-					}
-				}
-
+				port.addr_increment();
 				break;
 
-			case 0x02: m_base_addr[w_num] = (data & 0xff) | (m_base_addr[w_num] & 0xffff00); break;
-			case 0x03: m_base_addr[w_num] = (data << 8) | (m_base_addr[w_num] & 0xff00ff); break;
-			case 0x04: m_base_addr[w_num] = (data << 16) | (m_base_addr[w_num] & 0x00ffff); break;
-			case 0x05: m_addr_offset[w_num] = (data & 0xff) | (m_addr_offset[w_num] & 0xff00); break;
+			case 0x02: port.m_base_addr = (data & 0xff) | (port.m_base_addr & 0xffff00); break;
+			case 0x03: port.m_base_addr = (data << 8) | (port.m_base_addr & 0xff00ff); break;
+			case 0x04: port.m_base_addr = (data << 16) | (port.m_base_addr & 0x00ffff); break;
+			case 0x05:
+				port.m_addr_offset = (data & 0xff) | (port.m_addr_offset & 0xff00);
+
+				if ((port.m_ctrl & 0x60) == 0x20)
+					port.adjust_addr();
+				break;
 			case 0x06:
-				m_addr_offset[w_num] = (data << 8) | (m_addr_offset[w_num] & 0x00ff);
+				port.m_addr_offset = (data << 8) | (port.m_addr_offset & 0x00ff);
 
-				if ((m_ctrl[w_num] & 0x60) == 0x40)
-				{
-					m_base_addr[w_num] += m_addr_offset[w_num] + ((m_ctrl[w_num] & 0x08) ? 0xff0000 : 0);
-					m_base_addr[w_num] &= 0xffffff;
-				}
+				if ((port.m_ctrl & 0x60) == 0x40)
+					port.adjust_addr();
 				break;
-			case 0x07: m_addr_inc[w_num] = (data & 0xff) | (m_addr_inc[w_num] & 0xff00); break;
-			case 0x08: m_addr_inc[w_num] = (data << 8) | (m_addr_inc[w_num] & 0x00ff); break;
-			case 0x09: m_ctrl[w_num] = data & 0x7f; break;
+			case 0x07: port.m_addr_inc = (data & 0xff) | (port.m_addr_inc & 0xff00); break;
+			case 0x08: port.m_addr_inc = (data << 8) | (port.m_addr_inc & 0x00ff); break;
+			case 0x09: port.m_ctrl = data & 0x7f; break;
 			case 0x0a:
-				if ((m_ctrl[w_num] & 0x60) == 0x60)
-				{
-					m_base_addr[w_num] += m_addr_offset[w_num];
-					m_base_addr[w_num] &= 0xffffff;
-				}
+				if ((port.m_ctrl & 0x60) == 0x60)
+					port.adjust_addr();
 				break;
 		}
 	}
