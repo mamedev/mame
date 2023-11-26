@@ -327,4 +327,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1987, cchance, 0, cchance, cchance, cchance_state, empty_init, ROT0, "Taito Corporation", "Cherry Chance", MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // year/manufacturer assumed from GFX dump (not displayed)
+GAME( 1987, cchance, 0, cchance, cchance, cchance_state, empty_init, ROT0, "Taito Corporation", "Cherry Chance", MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // year/manufacturer confirmed from Taito old page
