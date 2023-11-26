@@ -2,15 +2,13 @@
 // copyright-holders:David Haywood, Angelo Salese
 /***************************************************************************************************************************
 
-Cherry Chance (c) 1987 Taito Corporation
+Cherry Chance / チェリーチャンス (c) 1987 Taito Corporation
 
-driver by David Haywood & Angelo Salese
-
-A cherry-type game that uses the tnzs video chip,might be a modified board as well.
+A cherry-type game that uses the tnzs video chip.
 
 TODO:
-- hopper emulation, similar to the other Taito gamblers;
 - Undumped color proms -> ugly colors;
+- Complete I/O, requires manual for DIPs and (likely non-)JAMMA pinout;
 - Verify clock dividers for Z80 and YM2149;
 
 ============================================================================================================================
@@ -38,6 +36,7 @@ cha3    $10d8
 #include "tnzs_video.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/ticket.h"
 #include "machine/timer.h"
 #include "sound/ay8910.h"
 
@@ -54,6 +53,7 @@ public:
 	cchance_state(const machine_config &mconfig, device_type type, const char *tag)
 		: tnzs_video_state_base(mconfig, type, tag)
 		, m_opto(*this, "opto")
+		, m_hopper(*this, "hopper")
 		, m_dswc(*this, "DSWC")
 	{ }
 
@@ -65,15 +65,13 @@ protected:
 
 private:
 	required_device<taitoio_opto_device> m_opto;
+	required_device<hopper_device> m_hopper;
 	required_ioport m_dswc;
 
 	void output_0_w(uint8_t data);
 	void output_1_w(uint8_t data);
 
 	void main_map(address_map &map) ATTR_COLD;
-
-//  uint8_t m_hop_io = 0;
-//  uint8_t m_bell_io = 0;
 
 	bool m_vblank_irq = false, m_io_irq = false;
 	uint8_t m_irq_ack = 0;
@@ -83,15 +81,18 @@ private:
 
 void cchance_state::output_0_w(uint8_t data)
 {
-	//---- --x- divider?
-//  machine().bookkeeping().coin_lockout_w(0, ~data & 1);
+	// -x-- ---- slottle sol[enoid]
+	// ---- x--- Enabled on payout, untested by service mode
+	// ---- -x-- Coin counter
+	// ---- --x- divider / diverter
+//  machine().bookkeeping().coin_lockout_w(0, BIT(data, 0));
 
-//  machine().bookkeeping().coin_counter_w(0, ~data & 1);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 2));
 }
 
 void cchance_state::output_1_w(uint8_t data)
 {
-//  m_hop_io = (data & 0x40) >>4;
+	m_hopper->motor_w(BIT(data, 6));
 //  m_bell_io = (data & 0x80) >>4;
 }
 
@@ -145,7 +146,7 @@ static INPUT_PORTS_START( cchance )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto", taitoio_opto_device, opto_h_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto", taitoio_opto_device, opto_l_r)
 	// Hopper related? Goes "hopper time out" if IP_ACTIVE_LOW as suggested by service mode (buggy?)
-	PORT_BIT (0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Pay Out")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
 	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hopper Over") // "Hop Over"?
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Slottle")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Drop SW") // "Coin Drop SW" as per other Taito gamblers?
@@ -284,6 +285,7 @@ void cchance_state::cchance(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(cchance_state::scanline_cb), "screen", 0, 1);
 
 	TAITOIO_OPTO(config, "opto", 0);
+	HOPPER(config, m_hopper, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
 	X1_001(config, m_spritegen, 12_MHz_XTAL, m_palette, gfx_cchance);
 	m_spritegen->set_fg_yoffsets(-0x12, 0x0e);
@@ -327,4 +329,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1987, cchance, 0, cchance, cchance, cchance_state, empty_init, ROT0, "Taito Corporation", "Cherry Chance", MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // year/manufacturer confirmed from Taito old page
+GAME( 1987, cchance, 0, cchance, cchance, cchance_state, empty_init, ROT0, "Taito Corporation", "Cherry Chance", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // year/manufacturer confirmed from Taito old "Arcade Game History" page

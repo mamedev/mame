@@ -104,13 +104,13 @@ private:
 	required_device<hopper_device> m_hopper;
 	output_finder<32> m_lamps;
 
-	u16 m_hoppff = 0x0000;
+	u16 m_hopper_ff_state = 0x0000;
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 	u32 draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, u32 start_offset);
 	void prg_map(address_map &map);
-	void taitoo_hopper_int_cb(int state);
+	void hopper_int_cb(int state);
 	void taito_outa_w(offs_t offs, u16 data, u16 mem_mask);
 	void taito_outb_w(offs_t offs, u16 data, u16 mem_mask);
 };
@@ -419,12 +419,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(taitoo_state::interrupt)
 
 }
 
-void taitoo_state::taitoo_hopper_int_cb(int state)
+void taitoo_state::hopper_int_cb(int state)
 {
 	// Add a flip flop to coin_out sensor, to interrupt once per coin
-	if ((m_hoppff != state) && !state)
+	if ((m_hopper_ff_state != state) && !state)
 		m_maincpu->set_input_line(6, HOLD_LINE);
-	m_hoppff = state;  // keep ff state
+	m_hopper_ff_state = state;  // keep ff state
 }
 
 void taitoo_state::taitoo(machine_config &config)
@@ -456,7 +456,7 @@ void taitoo_state::taitoo(machine_config &config)
 	m_tc0080vco->set_palette(m_palette);
 
 	HOPPER(config, m_hopper, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
-	m_hopper->dispense_handler().set(FUNC(taitoo_state::taitoo_hopper_int_cb));
+	m_hopper->dispense_handler().set(FUNC(taitoo_state::hopper_int_cb));
 
 	SPEAKER(config, "mono").front_center();
 
