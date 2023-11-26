@@ -501,96 +501,96 @@ void sforte_state::sforteb(machine_config &config)
     ROM Definitions
 *******************************************************************************/
 
-ROM_START( sexperta ) // from model 886
+ROM_START( sexperta )
 	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD("se_lo_608.u3", 0x0000, 0x8000, CRC(5c98264c) SHA1(fbbe0d0cf64944fd3a90a7e9711b1deef8b9b51d) )
-	ROM_LOAD("se_hi1_608.u1", 0x8000, 0x8000, CRC(68009cb4) SHA1(ae8d1b5058eff72d3fcfd6a011608ae7b3de5060) )
+	ROM_LOAD("se_lo_608.u3",     0x00000, 0x8000, CRC(5c98264c) SHA1(fbbe0d0cf64944fd3a90a7e9711b1deef8b9b51d) )
+	ROM_LOAD("se_hi1_608.u1",    0x08000, 0x8000, CRC(68009cb4) SHA1(ae8d1b5058eff72d3fcfd6a011608ae7b3de5060) )
 	ROM_LOAD("se_sf_hi0_c22.u2", 0x10000, 0x8000, CRC(3e42cf7c) SHA1(b2faa36a127e08e5755167a25ed4a07f12d62957) )
 ROM_END
 
-ROM_START( sexperta1 ) // from model 878
+ROM_START( sexperta1 )
 	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD("se_202_l.u3", 0x0000, 0x8000, CRC(d51fed16) SHA1(01aaddab36a721a4b9efde94979256d397cd1953) ) // NEC D27C256AD-12
-	ROM_LOAD("se_202_h1.u1", 0x8000, 0x8000, CRC(933eafa8) SHA1(293f63a5bc7d760ad675522c98f9f0a49e61aef5) ) // "
+	ROM_LOAD("se_202_l.u3",  0x00000, 0x8000, CRC(d51fed16) SHA1(01aaddab36a721a4b9efde94979256d397cd1953) ) // NEC D27C256AD-12
+	ROM_LOAD("se_202_h1.u1", 0x08000, 0x8000, CRC(933eafa8) SHA1(293f63a5bc7d760ad675522c98f9f0a49e61aef5) ) // "
 	ROM_LOAD("se_c22_h0.u2", 0x10000, 0x8000, CRC(3e42cf7c) SHA1(b2faa36a127e08e5755167a25ed4a07f12d62957) ) // "
 ROM_END
 
-ROM_START( sexperta2 ) // from model 878
+ROM_START( sexperta2 )
 	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD("se_lo_b15.u3", 0x0000, 0x8000, CRC(6cc9527c) SHA1(29bab809399f2863a88a9c41535ecec0a4fd65ea) )
-	ROM_LOAD("se_hi1_b15.u1", 0x8000, 0x8000, CRC(6e57f0c0) SHA1(ea44769a6f54721fd4543366bda932e86e497d43) )
+	ROM_LOAD("se_lo_b15.u3",     0x00000, 0x8000, CRC(6cc9527c) SHA1(29bab809399f2863a88a9c41535ecec0a4fd65ea) )
+	ROM_LOAD("se_hi1_b15.u1",    0x08000, 0x8000, CRC(6e57f0c0) SHA1(ea44769a6f54721fd4543366bda932e86e497d43) )
 	ROM_LOAD("se_sf_hi0_a23.u2", 0x10000, 0x8000, CRC(7d4e1528) SHA1(53c7d458a5571afae402f00ae3d0f5066634b068) )
 ROM_END
 
-ROM_START( sexpertb ) // from model 887
+ROM_START( sexpertb )
 	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD("se_lo_619.u3", 0x0000, 0x8000, CRC(92002eb6) SHA1(ed8ca16701e00b48fa55c856fa4a8c6613079c02) )
-	ROM_LOAD("se_hi1_619.u1", 0x8000, 0x8000, CRC(814b4420) SHA1(c553e6a8c048dcc1cf48d410111a86e06b99d356) )
+	ROM_LOAD("se_lo_619.u3",    0x00000, 0x8000, CRC(92002eb6) SHA1(ed8ca16701e00b48fa55c856fa4a8c6613079c02) )
+	ROM_LOAD("se_hi1_619.u1",   0x08000, 0x8000, CRC(814b4420) SHA1(c553e6a8c048dcc1cf48d410111a86e06b99d356) )
 	ROM_LOAD("se_f_hi0_605.u2", 0x10000, 0x8000, CRC(bb07ad52) SHA1(30cf9005021ab2d7b03facdf2d3588bc94dc68a6) )
 ROM_END
 
 ROM_START( sexpertc ) // ID = E3.6
 	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD("se_lo_v3.6.u3", 0x0000, 0x8000, CRC(5a29105e) SHA1(be37bb29b530dbba847a5e8d27d81b36525e47f7) )
-	ROM_LOAD("se_hi1.u1", 0x8000, 0x8000, CRC(0085c2c4) SHA1(d84bf4afb022575db09dd9dc12e9b330acce35fa) )
-	ROM_LOAD("se_hi0.u2", 0x10000, 0x8000, CRC(2d085064) SHA1(76162322aa7d23a5c07e8356d0bbbb33816419af) )
+	ROM_LOAD("se_lo_v3.6.u3", 0x00000, 0x8000, CRC(5a29105e) SHA1(be37bb29b530dbba847a5e8d27d81b36525e47f7) )
+	ROM_LOAD("se_hi1.u1",     0x08000, 0x8000, CRC(0085c2c4) SHA1(d84bf4afb022575db09dd9dc12e9b330acce35fa) )
+	ROM_LOAD("se_hi0.u2",     0x10000, 0x8000, CRC(2d085064) SHA1(76162322aa7d23a5c07e8356d0bbbb33816419af) )
 ROM_END
 
-ROM_START( sexpertc1 ) // from model 902, ID = E3.0
+ROM_START( sexpertc1 ) // ID = E3.0
 	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD("se_c24_l.u3", 0x0000, 0x8000, CRC(43ed7a9e) SHA1(273c485e5be6b107b6c5c448003ba7686d4a6d06) )
-	ROM_LOAD("se_c23_h1.u1", 0x8000, 0x8000, CRC(0085c2c4) SHA1(d84bf4afb022575db09dd9dc12e9b330acce35fa) )
+	ROM_LOAD("se_c24_l.u3",  0x00000, 0x8000, CRC(43ed7a9e) SHA1(273c485e5be6b107b6c5c448003ba7686d4a6d06) )
+	ROM_LOAD("se_c23_h1.u1", 0x08000, 0x8000, CRC(0085c2c4) SHA1(d84bf4afb022575db09dd9dc12e9b330acce35fa) )
 	ROM_LOAD("se_c22_h0.u2", 0x10000, 0x8000, CRC(2d085064) SHA1(76162322aa7d23a5c07e8356d0bbbb33816419af) )
 ROM_END
 
 ROM_START( sexpertc2 ) // ID = E1.2
 	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD("se_l_corfix.u3", 0x0000, 0x8000, CRC(d0f65341) SHA1(e8ebbfdbcf8ad613cc68acdb0db011eed855cb9f) ) // NEC D27C256AD-12
-	ROM_LOAD("se_h_corfix.u1", 0x8000, 0x8000, CRC(59dc112b) SHA1(e1031648da8fc9479d1134d3fd205af254610c1d) ) // Toshiba TC57256AD-12
-	ROM_LOAD("sef_h0_corfix.u2", 0x10000, 0x8000, CRC(c6a1419a) SHA1(017a0ffa9aa59438c879624a7ddea2071d1524b8) ) // Toshiba TC57256AD-15
+	ROM_LOAD("e_111_black.u3", 0x00000, 0x8000, CRC(d0f65341) SHA1(e8ebbfdbcf8ad613cc68acdb0db011eed855cb9f) ) // Toshiba TC57256AD-12
+	ROM_LOAD("e_111_red.u1",   0x08000, 0x8000, CRC(59dc112b) SHA1(e1031648da8fc9479d1134d3fd205af254610c1d) ) // "
+	ROM_LOAD("c26_green.u2",   0x10000, 0x8000, CRC(c6a1419a) SHA1(017a0ffa9aa59438c879624a7ddea2071d1524b8) ) // "
 ROM_END
 
 
 ROM_START( sfortea )
 	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD("sf_lo_609.u13", 0x0000, 0x8000, CRC(88138075) SHA1(bc1f3a2829f7299c81b48202c651cde9b8831157) )
-	ROM_LOAD("sf_hi1_609.u11", 0x8000, 0x8000, CRC(ccd35d09) SHA1(9101cbdecdec00aa4de6d72c96ecdffbcf3359f6) )
+	ROM_LOAD("sf_lo_609.u13",    0x00000, 0x8000, CRC(88138075) SHA1(bc1f3a2829f7299c81b48202c651cde9b8831157) )
+	ROM_LOAD("sf_hi1_609.u11",   0x08000, 0x8000, CRC(ccd35d09) SHA1(9101cbdecdec00aa4de6d72c96ecdffbcf3359f6) )
 	ROM_LOAD("se_f_hi0_c22.u12", 0x10000, 0x8000, CRC(3e42cf7c) SHA1(b2faa36a127e08e5755167a25ed4a07f12d62957) )
 ROM_END
 
 ROM_START( sfortea1 )
 	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD("sfa_lo_204.u13", 0x0000, 0x8000, CRC(78734bfd) SHA1(b6d8e9efccee6f6d0b0cd257a82162bf8ccec719) )
-	ROM_LOAD("sfa_hi1_204.u11", 0x8000, 0x8000, CRC(e5e84580) SHA1(bae55c3da7b720bf6ccfb450e383c53cebd5e9ef) )
+	ROM_LOAD("sfa_lo_204.u13",  0x00000, 0x8000, CRC(78734bfd) SHA1(b6d8e9efccee6f6d0b0cd257a82162bf8ccec719) )
+	ROM_LOAD("sfa_hi1_204.u11", 0x08000, 0x8000, CRC(e5e84580) SHA1(bae55c3da7b720bf6ccfb450e383c53cebd5e9ef) )
 	ROM_LOAD("sfa_hi0_c22.u12", 0x10000, 0x8000, CRC(3e42cf7c) SHA1(b2faa36a127e08e5755167a25ed4a07f12d62957) )
 ROM_END
 
 ROM_START( sfortea2 )
 	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD("sfalo.u13", 0x0000, 0x8000, CRC(86e0230a) SHA1(0d6e18a17e636b8c7292c8f331349d361892d1a8) )
-	ROM_LOAD("sfahi.u11", 0x8000, 0x8000, CRC(81c02746) SHA1(0bf68b68ade5a3263bead88da0a8965fc71483c1) )
+	ROM_LOAD("sfalo.u13",   0x00000, 0x8000, CRC(86e0230a) SHA1(0d6e18a17e636b8c7292c8f331349d361892d1a8) )
+	ROM_LOAD("sfahi.u11",   0x08000, 0x8000, CRC(81c02746) SHA1(0bf68b68ade5a3263bead88da0a8965fc71483c1) )
 	ROM_LOAD("sfabook.u12", 0x10000, 0x8000, CRC(3e42cf7c) SHA1(b2faa36a127e08e5755167a25ed4a07f12d62957) )
 ROM_END
 
 ROM_START( sforteb )
 	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD("forte_b_lo.u13", 0x0000, 0x8000, CRC(48bfe5d6) SHA1(323642686b6d2fb8db2b7d50c6cd431058078ce1) )
-	ROM_LOAD("forte_b_hi1.u11", 0x8000, 0x8000, CRC(9778ca2c) SHA1(d8b88b9768a1a9171c68cbb0892b817d68d78351) )
+	ROM_LOAD("forte_b_lo.u13",  0x00000, 0x8000, CRC(48bfe5d6) SHA1(323642686b6d2fb8db2b7d50c6cd431058078ce1) )
+	ROM_LOAD("forte_b_hi1.u11", 0x08000, 0x8000, CRC(9778ca2c) SHA1(d8b88b9768a1a9171c68cbb0892b817d68d78351) )
 	ROM_LOAD("forte_b_hi0.u12", 0x10000, 0x8000, CRC(bb07ad52) SHA1(30cf9005021ab2d7b03facdf2d3588bc94dc68a6) )
 ROM_END
 
 ROM_START( sfortec ) // ID = F3.6
 	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD("sfl_124.u13", 0x0000, 0x8000, CRC(c0cba797) SHA1(c630c3552178854a46275c18b0741b0ad1ae3c75) ) // Toshiba TC57256AD-12
-	ROM_LOAD("sfh_b15.u11", 0x8000, 0x8000, CRC(e129ec69) SHA1(76feb0d3110a1c7746233cd89c0b2aaae9d0e427) ) // "
+	ROM_LOAD("sfl_124.u13", 0x00000, 0x8000, CRC(c0cba797) SHA1(c630c3552178854a46275c18b0741b0ad1ae3c75) ) // Toshiba TC57256AD-12
+	ROM_LOAD("sfh_b15.u11", 0x08000, 0x8000, CRC(e129ec69) SHA1(76feb0d3110a1c7746233cd89c0b2aaae9d0e427) ) // "
 	ROM_LOAD("sef_b07.u12", 0x10000, 0x8000, CRC(2d085064) SHA1(76162322aa7d23a5c07e8356d0bbbb33816419af) ) // NEC D27C256AD-12
 ROM_END
 
 ROM_START( sfortec1 ) // ID = F1.2
 	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD("sfl_c_111.u13", 0x0000, 0x8000, CRC(f040cf30) SHA1(1fc1220b8ed67cdffa3866d230ce001721cf684f) ) // Toshiba TC57256AD-12
-	ROM_LOAD("sfh_c_111.u11", 0x8000, 0x8000, CRC(0f926b32) SHA1(9c7270ecb3f41dd9172a9a7928e6e04e64b2a340) ) // NEC D27C256AD-12
-	ROM_LOAD("h0_c_c26.u12", 0x10000, 0x8000, CRC(c6a1419a) SHA1(017a0ffa9aa59438c879624a7ddea2071d1524b8) ) // Toshiba TC57256AD-12
+	ROM_LOAD("sfl_c_111.u13", 0x00000, 0x8000, CRC(f040cf30) SHA1(1fc1220b8ed67cdffa3866d230ce001721cf684f) ) // Toshiba TC57256AD-12
+	ROM_LOAD("sfh_c_111.u11", 0x08000, 0x8000, CRC(0f926b32) SHA1(9c7270ecb3f41dd9172a9a7928e6e04e64b2a340) ) // NEC D27C256AD-12
+	ROM_LOAD("h0_c_c26.u12",  0x10000, 0x8000, CRC(c6a1419a) SHA1(017a0ffa9aa59438c879624a7ddea2071d1524b8) ) // Toshiba TC57256AD-12
 ROM_END
 
 } // anonymous namespace
@@ -606,9 +606,9 @@ SYST( 1988, sexperta,  0,        0,      sexpert,  sexpert,  sexpert_state, init
 SYST( 1987, sexperta1, sexperta, 0,      sexpert,  sexpert,  sexpert_state, init_sexpert, "Novag", "Super Expert (version A, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 878
 SYST( 1987, sexperta2, sexperta, 0,      sexpert,  sexpert,  sexpert_state, init_sexpert, "Novag", "Super Expert (version A, set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 878
 SYST( 1988, sexpertb,  sexperta, 0,      sexpertb, sexpertb, sexpert_state, init_sexpert, "Novag", "Super Expert (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 887
-SYST( 1990, sexpertc,  sexperta, 0,      sexpertb, sexpertb, sexpert_state, init_sexpert, "Novag", "Super Expert (version C, v3.6)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, sexpertc,  sexperta, 0,      sexpertb, sexpertb, sexpert_state, init_sexpert, "Novag", "Super Expert (version C, v3.6)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 902
 SYST( 1990, sexpertc1, sexperta, 0,      sexpertb, sexpertb, sexpert_state, init_sexpert, "Novag", "Super Expert (version C, v3.0)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 902
-SYST( 1990, sexpertc2, sexperta, 0,      sexpertb, sexpertb, sexpert_state, init_sexpert, "Novag", "Super Expert (version C, v1.2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, sexpertc2, sexperta, 0,      sexpertb, sexpertb, sexpert_state, init_sexpert, "Novag", "Super Expert (version C, v1.2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 902
 
 SYST( 1987, sfortea,   0,        0,      sforte,   sexpert,  sforte_state,  init_sexpert, "Novag", "Super Forte (version A, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1987, sfortea1,  sfortea,  0,      sforte,   sexpert,  sforte_state,  init_sexpert, "Novag", "Super Forte (version A, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
