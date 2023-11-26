@@ -72,6 +72,7 @@ public:
 		, m_io1(*this, "io1")
 		, m_io2(*this, "io2")
 		, m_soundlatch(*this, "soundlatch")
+		, m_soundlatch2(*this, "soundlatch2")
 	{
 	}
 
@@ -97,6 +98,7 @@ private:
 	required_device<ym3438_device> m_ym;
 	required_device<sega_315_5296_device> m_io1, m_io2;
 	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<generic_latch_8_device> m_soundlatch2;
 
 	void machine_start() override;
 
@@ -165,17 +167,19 @@ u32 systemm1_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	return 0;
 }
 
+// NOTE: both irqs calls tas to work RAM buffers prior to SR flag disable
 TIMER_DEVICE_CALLBACK_MEMBER(systemm1_state::scan_irq)
 {
 	const int scanline = param;
 
 	if (scanline == 384)
 	{
-		m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
+		m_maincpu->set_input_line(M68K_IRQ_4, HOLD_LINE);
 	}
 	else if (scanline == 0)
 	{
-		m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
+		// TODO: unchecked source
+		m_maincpu->set_input_line(M68K_IRQ_2, HOLD_LINE);
 	}
 }
 
@@ -240,7 +244,7 @@ void systemm1_state::mem_map(address_map &map)
 
 	map(0xe00000, 0xe0003f).rw(m_io1, FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask16(0x00ff);
 	map(0xe40000, 0xe40001).portr("DIP1");
-	map(0xe40005, 0xe40005).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xe40005, 0xe40005).r(m_soundlatch2, FUNC(generic_latch_8_device::read)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xe80000, 0xe8003f).rw(m_io2, FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask16(0x00ff);
 
 	map(0xf00000, 0xf03fff).mirror(0x0fc000).ram().share("nvram");
@@ -270,7 +274,7 @@ void systemm1_state::z80_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x80, 0x83).mirror(0x0c).rw(m_ym, FUNC(ym3438_device::read), FUNC(ym3438_device::write));
 	map(0xa0, 0xa0).w(FUNC(systemm1_state::sound_bank_w));
-	map(0xc0, 0xc0).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xc0, 0xc0).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(m_soundlatch2, FUNC(generic_latch_8_device::write));
 }
 
 void systemm1_state::machine_start()
@@ -293,31 +297,100 @@ void systemm1_state::comm_map(address_map &map)
 }
 
 static INPUT_PORTS_START(tinkerbl)
-	PORT_START("PC")
+	PORT_START("IN1_PA")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Small")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN1_PB")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )
+
+	PORT_START("IN1_PC")
+	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Reset Switch") PORT_CODE(KEYCODE_F1)
-	PORT_DIPNAME( 0x01, 0x01, "DIPC1" )
+	PORT_SERVICE_NO_TOGGLE( 0x40, IP_ACTIVE_LOW )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Analyzer")
+
+	PORT_START("IN1_PD")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("All Reset")
+	PORT_BIT( 0x38, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN1_PE")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hopper")
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN1_PF")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("DIP1")
+	PORT_DIPNAME( 0x03, 0x03, "Expected Payout" ) PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING( 0x02, "86%" )
+	PORT_DIPSETTING( 0x01, "89%" )
+	PORT_DIPSETTING( 0x03, "92%" )
+	PORT_DIPSETTING( 0x00, "96%" )
+	PORT_DIPNAME( 0x04, 0x04, "10 Bet Royal" ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING( 0x04, "5000" )
+	PORT_DIPSETTING( 0x00, "3000" )
+	PORT_DIPNAME( 0x08, 0x08, "Double Up Limit" ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING( 0x08, "10000" )
+	PORT_DIPSETTING( 0x00, "5000" )
+	PORT_DIPNAME( 0x10, 0x10, "Hopper" ) PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING( 0x10, DEF_STR( Yes ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( No ) )
+	PORT_DIPNAME( 0x20, 0x20, "Hopper Pay Max" ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING( 0x20, "400" )
+	PORT_DIPSETTING( 0x00, "800" )
+	PORT_DIPNAME( 0x40, 0x40, "Credit Max" ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING( 0x40, "5000" )
+	PORT_DIPSETTING( 0x00, "100000" )
+	PORT_DIPNAME( 0x80, 0x80, "Use Joker" ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING( 0x80, DEF_STR( Yes ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( No ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(bingpty)
+	PORT_START("IN1_PA")
+	PORT_DIPNAME( 0x01, 0x01, "DIPA1" )
 	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DIPC2" )
+	PORT_DIPNAME( 0x02, 0x02, "DIPA2" )
 	PORT_DIPSETTING( 0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DIPC3" )
+	PORT_DIPNAME( 0x04, 0x04, "DIPA3" )
 	PORT_DIPSETTING( 0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "DIPC4" )
+	PORT_DIPNAME( 0x08, 0x08, "DIPA4" )
 	PORT_DIPSETTING( 0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "DIPC5" )
+	PORT_DIPNAME( 0x10, 0x10, "DIPA5" )
 	PORT_DIPSETTING( 0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "DIPC7" )
+	PORT_DIPNAME( 0x20, 0x20, "DIPA6" )
+	PORT_DIPSETTING( 0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "DIPA7" )
 	PORT_DIPSETTING( 0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "DIPC8" )
+	PORT_DIPNAME( 0x80, 0x80, "DIPA8" )
 	PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
-	PORT_START("PB")
+	PORT_START("IN1_PB")
 	PORT_DIPNAME( 0x01, 0x01, "DIPB1" )
 	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
@@ -343,113 +416,7 @@ static INPUT_PORTS_START(tinkerbl)
 	PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
-	PORT_START("PD")
-	PORT_DIPNAME( 0x01, 0x01, "DIPD1" )
-	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DIPD2" )
-	PORT_DIPSETTING( 0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DIPD3" )
-	PORT_DIPSETTING( 0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "DIPD4" )
-	PORT_DIPSETTING( 0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "DIPD5" )
-	PORT_DIPSETTING( 0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "DIPD6" )
-	PORT_DIPSETTING( 0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
-
-	PORT_DIPNAME( 0x80, 0x80, "DIPD8" )
-	PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-
-	PORT_START("PE")
-	PORT_DIPNAME( 0x01, 0x01, "DIPE1" )
-	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DIPE2" )
-	PORT_DIPSETTING( 0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DIPE3" )
-	PORT_DIPSETTING( 0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "DIPE4" )
-	PORT_DIPSETTING( 0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "DIPE5" )
-	PORT_DIPSETTING( 0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "DIPE6" )
-	PORT_DIPSETTING( 0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "DIPE7" )
-	PORT_DIPSETTING( 0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "DIPE8" )
-	PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-
-	PORT_START("PF")
-	PORT_DIPNAME( 0x01, 0x01, "DIPF1" )
-	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DIPF2" )
-	PORT_DIPSETTING( 0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DIPF3" )
-	PORT_DIPSETTING( 0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "DIPF4" )
-	PORT_DIPSETTING( 0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "DIPF5" )
-	PORT_DIPSETTING( 0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "DIPF6" )
-	PORT_DIPSETTING( 0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "DIPF7" )
-	PORT_DIPSETTING( 0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "DIPF8" )
-	PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-
-	PORT_START("DIP1")
-	PORT_DIPNAME( 0x01, 0x01, "DIP1-1" )
-	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DIP1-2" )
-	PORT_DIPSETTING( 0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DIP1-3" )
-	PORT_DIPSETTING( 0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "DIP1-4" )
-	PORT_DIPSETTING( 0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "DIP1-5" )
-	PORT_DIPSETTING( 0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "DIP1-6" )
-	PORT_DIPSETTING( 0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "DIP1-7" )
-	PORT_DIPSETTING( 0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "DIP1-8" )
-	PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START(bingpty)
-	PORT_START("PC")
+	PORT_START("IN1_PC")
 	PORT_DIPNAME( 0x01, 0x01, "DIPC1" )
 	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
@@ -475,33 +442,7 @@ static INPUT_PORTS_START(bingpty)
 	PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
-	PORT_START("PB")
-	PORT_DIPNAME( 0x01, 0x01, "DIPB1" )
-	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DIPB2" )
-	PORT_DIPSETTING( 0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DIPB3" )
-	PORT_DIPSETTING( 0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "DIPB4" )
-	PORT_DIPSETTING( 0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "DIPB5" )
-	PORT_DIPSETTING( 0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "DIPB6" )
-	PORT_DIPSETTING( 0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "DIPB7" )
-	PORT_DIPSETTING( 0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "DIPB8" )
-	PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-
-	PORT_START("PD")
+	PORT_START("IN1_PD")
 	PORT_DIPNAME( 0x01, 0x01, "DIPD1" )
 	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
@@ -527,7 +468,7 @@ static INPUT_PORTS_START(bingpty)
 	PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
-	PORT_START("PE")
+	PORT_START("IN1_PE")
 	PORT_DIPNAME( 0x01, 0x01, "DIPE1" )
 	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
@@ -553,7 +494,7 @@ static INPUT_PORTS_START(bingpty)
 	PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
-	PORT_START("PF")
+	PORT_START("IN1_PF")
 	PORT_DIPNAME( 0x01, 0x01, "DIPF1" )
 	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
@@ -647,17 +588,20 @@ void systemm1_state::m1base(machine_config &config)
 	m_ym->add_route(1, "rspeaker", 0.40);
 
 	SEGA_315_5296(config, m_io1, XTAL(16'000'000));
-	m_io1->in_pb_callback().set_ioport("PB");
-	m_io1->in_pc_callback().set_ioport("PC");
-	m_io1->in_pd_callback().set_ioport("PD");
-	m_io1->in_pe_callback().set_ioport("PE");
-	m_io1->in_pf_callback().set_ioport("PF");
+	m_io1->in_pa_callback().set_ioport("IN1_PA");
+	m_io1->in_pb_callback().set_ioport("IN1_PB");
+	m_io1->in_pc_callback().set_ioport("IN1_PC");
+	m_io1->in_pd_callback().set_ioport("IN1_PD");
+	m_io1->in_pe_callback().set_ioport("IN1_PE");
+	m_io1->in_pf_callback().set_ioport("IN1_PF");
 
 	SEGA_315_5296(config, m_io2, XTAL(16'000'000));
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 	m_soundlatch->set_separate_acknowledge(false);
+
+	GENERIC_LATCH_8(config, m_soundlatch2);
 }
 
 void systemm1_state::m1comm(machine_config &config)
