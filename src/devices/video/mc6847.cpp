@@ -183,14 +183,15 @@ mc6847_friend_device::mc6847_friend_device(const machine_config &mconfig, device
 	, m_character_map(fontdata, is_mc6847t1)
 	, m_tpfs(tpfs)
 	, m_divider(divider)
+	, m_field_sync_falling_edge_scanline(pal ? field_sync_falling_edge_scanline + LINES_PADDING_TOP_PAL : field_sync_falling_edge_scanline)
 	, m_supports_partial_body_scanlines(supports_partial_body_scanlines)
 	, m_pal(pal)
+	, m_lines_top_border(pal ? LINES_TOP_BORDER + LINES_PADDING_TOP_PAL : LINES_TOP_BORDER)
+	, m_lines_until_vblank(pal ? LINES_UNTIL_VBLANK_PAL : LINES_UNTIL_VBLANK_NTSC)
+	, m_lines_until_retrace(pal ? LINES_UNTIL_RETRACE_PAL : LINES_UNTIL_RETRACE_NTSC)
 {
-	// The MC6847 and the GIME apply field sync on different scanlines
-	m_field_sync_falling_edge_scanline =
-		m_pal ?
-		field_sync_falling_edge_scanline + LINES_PADDING_TOP_PAL :
-		field_sync_falling_edge_scanline;
+	// Note: field_sync_falling_edge_scanline is parameterized because the MC6847
+	// and the GIME apply field sync on different scanlines
 }
 
 
@@ -217,10 +218,9 @@ void mc6847_friend_device::device_start()
 	m_logical_scanline_zone = 0;
 	m_field_sync = false;
 	m_horizontal_sync = false;
-	set_geometry(
-		m_pal ? LINES_TOP_BORDER + LINES_PADDING_TOP_PAL : LINES_TOP_BORDER,
-		LINES_ACTIVE_VIDEO,
-		false);
+	set_geometry(m_lines_top_border, LINES_ACTIVE_VIDEO, false);
+
+
 
 	/* save states */
 	save_item(NAME(m_physical_scanline));
@@ -277,7 +277,7 @@ void mc6847_friend_device::update_field_sync_timer()
 	// field sync is expected high from the line before vblanking starts (i.e., from last
 	// vertical retracing line) until but excluding m_field_sync_falling_edge_scanline
 	bool expected_field_sync = (m_physical_scanline < m_field_sync_falling_edge_scanline)
-		|| (m_physical_scanline >= (m_pal ? LINES_UNTIL_VBLANK_PAL - 1 : LINES_UNTIL_VBLANK_NTSC - 1));
+		|| (m_physical_scanline >= m_lines_until_vblank - 1);
 
 	// do we need to adjust the timer?
 	if (expected_field_sync != m_field_sync)
@@ -430,15 +430,13 @@ inline void mc6847_friend_device::next_scanline()
 		m_logical_scanline_zone = SCANLINE_ZONE_TOP_BORDER;
 		new_frame();
 	}
-	else if ((m_logical_scanline_zone < SCANLINE_ZONE_VBLANK) &&
-		(m_physical_scanline >= (m_pal ? LINES_UNTIL_VBLANK_PAL : LINES_UNTIL_VBLANK_NTSC)))
+	else if ((m_logical_scanline_zone < SCANLINE_ZONE_VBLANK) && (m_physical_scanline >= m_lines_until_vblank))
 	{
 		/* we're now into vblank */
 		m_logical_scanline = 0;
 		m_logical_scanline_zone = SCANLINE_ZONE_VBLANK;
 	}
-	else if ((m_logical_scanline_zone < SCANLINE_ZONE_RETRACE) &&
-		(m_physical_scanline >= (m_pal ? LINES_UNTIL_RETRACE_PAL : LINES_UNTIL_RETRACE_NTSC)))
+	else if ((m_logical_scanline_zone < SCANLINE_ZONE_RETRACE) && (m_physical_scanline >= m_lines_until_retrace))
 	{
 		/* we're now into retrace */
 		m_logical_scanline = 0;
@@ -676,7 +674,7 @@ void mc6847_base_device::device_config_complete()
 			BMP_L_OR_R_BORDER * 2 + BMP_ACTIVE_VIDEO,                       // hbstart
 			m_tpfs,                                                         // vtotal
 			0,                                                              // vbend
-			m_pal ? LINES_UNTIL_RETRACE_PAL : LINES_UNTIL_RETRACE_NTSC);    // vbstart
+			m_lines_until_retrace);                                         // vbstart
 
 		if (m_pal)
 			screen().set_physical_aspect(5, 4);
@@ -952,7 +950,7 @@ uint32_t mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &
 {
 	bool is_mc6847t1 = (type() == MC6847T1_NTSC) || (type() == MC6847T1_PAL);
 	int base_x = BMP_L_OR_R_BORDER;
-	int base_y = m_pal ? LINES_TOP_BORDER + LINES_PADDING_TOP_PAL : LINES_TOP_BORDER;
+	int base_y = m_lines_top_border;
 	int x, x2, y, width;
 	int min_x = USE_HORIZONTAL_CLIP ? cliprect.min_x : 0;
 	int max_x = USE_HORIZONTAL_CLIP ? cliprect.max_x : (base_x * 2 + BMP_ACTIVE_VIDEO - 1);

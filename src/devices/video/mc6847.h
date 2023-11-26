@@ -469,7 +469,7 @@ protected:
 private:
 	// incidentals
 	const int m_divider;
-	int m_field_sync_falling_edge_scanline;
+	const int m_field_sync_falling_edge_scanline;
 	bool m_wide;
 	bool m_video_changed;
 	uint16_t m_top_border_scanlines;
@@ -479,6 +479,9 @@ private:
 
 protected:
 	const bool m_pal;
+	const uint16_t m_lines_top_border;
+	const uint16_t m_lines_until_vblank;
+	const uint16_t m_lines_until_retrace;
 
 private:
 	// video state
