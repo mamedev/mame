@@ -169,6 +169,7 @@ protected:
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
 
+	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	virtual MC6845_UPDATE_ROW(crtc_update_row) override;
 
 	void dtr_internal(int data);
@@ -275,10 +276,10 @@ protected:
 	void nop_w(offs_t reg, uint8_t val);
 	virtual void set_irq_line() override;
 
-	memory_view m_mem_view;
+	required_memory_bank            m_mem_bank;
 	required_shared_ptr<uint8_t>    m_p_graphic_ram;
+	memory_passthrough_handler      m_tap_6000h;
 
-	uint8_t m_mem_map;
 	uint8_t m_im2_val;
 
 	bool m_alphanumeric_mode_active;

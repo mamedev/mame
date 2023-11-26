@@ -40,6 +40,7 @@ Video PCB:
 
 #include "emu.h"
 
+#include "taitoio_opto.h"
 #include "taitosnd.h"
 
 #include "cpu/m68000/tmp68301.h"
@@ -47,8 +48,6 @@ Video PCB:
 #include "machine/te7750.h"
 #include "sound/okim6295.h"
 #include "sound/ymopn.h"
-
-#include "taitoio_opto.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -315,7 +314,7 @@ void pkspirit_state::pkspirit(machine_config &config)
 	m_mainio->in_port3_cb().set_ioport("IN3");
 	m_mainio->in_port4_cb().set_ioport("IN4");
 
-	for (auto & opto : m_opto)
+	for (auto &opto : m_opto)
 		TAITOIO_OPTO(config, opto, 0);
 
 	// video hardware

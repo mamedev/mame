@@ -27,57 +27,74 @@
 
 #include "emu.h"
 
+#include "cpu/xtensa/xtensa.h"
+
 #include "screen.h"
 #include "speaker.h"
 
 
 namespace {
 
-class hudsom_poems : public driver_device
+class hudson_poems_state : public driver_device
 {
 public:
-	hudsom_poems(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag)
+	hudson_poems_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu")
 	{ }
 
 	void hudson_poems(machine_config &config);
 
-private:
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	void mem_map(address_map &map);
+
+	required_device<cpu_device> m_maincpu;
 };
 
-void hudsom_poems::machine_start()
+void hudson_poems_state::machine_start()
 {
 }
 
-void hudsom_poems::machine_reset()
+void hudson_poems_state::machine_reset()
 {
+	m_maincpu->set_pc(0x20010058);
 }
 
 static INPUT_PORTS_START( hudson_poems )
 INPUT_PORTS_END
 
 
-uint32_t hudsom_poems::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t hudson_poems_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
 
-void hudsom_poems::hudson_poems(machine_config &config)
+void hudson_poems_state::mem_map(address_map &map)
+{
+	map(0x20000000, 0x207fffff).rom().region("maincpu", 0);
+	map(0x2c000000, 0x2c7fffff).ram();
+}
+
+void hudson_poems_state::hudson_poems(machine_config &config)
 {
 	// 27Mhz XTAL
 
 	// Xtensa based CPU?
+	XTENSA(config, m_maincpu, 27_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hudson_poems_state::mem_map);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(320, 240); // resolution not confirmed
 	screen.set_visarea(0, 320-1, 0, 240-1);
-	screen.set_screen_update(FUNC(hudsom_poems::screen_update));
+	screen.set_screen_update(FUNC(hudson_poems_state::screen_update));
 
 	SPEAKER(config, "speaker").front_center();
 }
@@ -93,4 +110,4 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 2005, marimba,      0,       0,      hudson_poems, hudson_poems, hudsom_poems, empty_init, "Konami", "Marimba Tengoku (Japan)", MACHINE_IS_SKELETON )
+CONS( 2005, marimba,      0,       0,      hudson_poems, hudson_poems, hudson_poems_state, empty_init, "Konami", "Marimba Tengoku (Japan)", MACHINE_IS_SKELETON )

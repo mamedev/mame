@@ -62,15 +62,15 @@ private:
 	required_ioport_array<4> m_inputs;
 	output_finder<2, 8, 22> m_out_x;
 
+	u8 m_inp_mux = 0;
+	u8 m_lcd_control = 0;
+
 	// I/O handlers
 	template<int Sel> void lcd_output_w(offs_t offset, u32 data);
 	void input_w(u8 data);
 	u8 input_r();
 	void lcd_w(u8 data);
 	u8 lcd_r();
-
-	u8 m_inp_mux = 0;
-	u8 m_lcd_control = 0;
 };
 
 void mchess_state::machine_start()

@@ -59,6 +59,10 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport m_inputs;
 
+	u8 m_led_data = 0;
+	u8 m_control = 0;
+	u8 m_inp_mux = 0;
+
 	// address maps
 	void main_map(address_map &map);
 	void main_io(address_map &map);
@@ -70,10 +74,6 @@ private:
 	void control_w(u8 data);
 	u8 control_r();
 	void led_w(u8 data);
-
-	u8 m_led_data = 0;
-	u8 m_control = 0;
-	u8 m_inp_mux = 0;
 };
 
 void micro_state::machine_start()
@@ -197,11 +197,11 @@ INPUT_PORTS_END
 void micro_state::micro(machine_config &config)
 {
 	// basic machine hardware
-	F8(config, m_maincpu, 4500000/2); // matches video reference
+	F8(config, m_maincpu, 4'500'000/2); // matches video reference
 	m_maincpu->set_addrmap(AS_PROGRAM, &micro_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &micro_state::main_io);
 
-	f38t56_device &psu(F38T56(config, "psu", 4500000/2));
+	f38t56_device &psu(F38T56(config, "psu", 4'500'000/2));
 	psu.read_a().set(FUNC(micro_state::control_r));
 	psu.write_a().set(FUNC(micro_state::control_w));
 	psu.write_b().set(FUNC(micro_state::led_w));

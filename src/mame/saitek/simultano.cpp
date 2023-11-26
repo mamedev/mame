@@ -86,6 +86,10 @@ private:
 	required_ioport_array<8+1> m_inputs;
 	output_finder<16, 34> m_out_lcd;
 
+	bool m_power = false;
+	u8 m_select = 0;
+	u8 m_control = 0;
+
 	void simultano_map(address_map &map);
 	void cc2150_map(address_map &map);
 
@@ -98,10 +102,6 @@ private:
 	void sound_w(u8 data);
 	u8 control_r();
 	void control_w(u8 data);
-
-	bool m_power = false;
-	u8 m_select = 0;
-	u8 m_control = 0;
 };
 
 void simultano_state::machine_start()

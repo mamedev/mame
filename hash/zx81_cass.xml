@@ -3,9 +3,30 @@
 <!--
 license:CC0-1.0
 
-Sinclair ZX81 Cassettes
+Sinclair ZX81 cassettes
 
-This list was compiled from the archive at http://www.zx81stuff.org.uk/. Updated to 22/08/2016
+Loading instructions:
+
+At the prompt, press the following sequence to execute the LOAD "" command: J, Shift+P, Shift+P, Enter
+Enable UI controls (Scroll Lock) and start the tape (F2).
+If the program doesn't start automatically after loading, execute the RUN command by pressing: R, Enter
+
+Notes about the dumps:
+
+Due to the way the ZX81 saves to tape, different recordings of identical data (such as those in both sides of a cassette)
+might be stored along with a few different bytes in them. Additional dumps of the same releases should match those differences.
+TZX files for ZX81 are just the .P dumps with an additional header on top, so they may not be the cleanest format for archival.
+
+Known dumps not yet added (as of 2023-06-14):
+- Accounts [zx81stuff.org.uk]
+- Adventure (G Barker) [zx81stuff.org.uk]
+- Nowotnik Puzzle [Mr. Strudwick, zx81stuff.org.uk]
+- Purchases [zx81stuff.org.uk]
+- RacehorseTrainer [zx81stuff.org.uk]
+- Star Trek and 3D Os and Xs [zx81stuff.org.uk]
+- Tutor (French) [zx81stuff.org.uk]
+- Zor [zx81stuff.org.uk]
+
 -->
 
 <softwarelist name="zx81_cass" description="Sinclair ZX81 cassettes">
@@ -223,9 +244,21 @@ This list was compiled from the archive at http://www.zx81stuff.org.uk/. Updated
 	</software>
 
 	<software name="8progs">
-		<description>8 Programs by GM4IHJ</description>
+		<!--
+		    Programs included:
+		    - FAI             LOAD "A"
+		    - Geodrifter      LOAD "B"
+		    - RA+DEC          LOAD "C"
+		    - Moontrack       LOAD "D"
+		    - Yankee Clipper  LOAD "E"
+		    - Tensat          LOAD "F"
+		    - Oscar10         LOAD "G"
+		    - TenPlan         LOAD "H"
+		-->
+		<description>8 Programmes by GM4IHJ</description>
 		<year>198?</year>
-		<publisher>Amsat-UK Software Service</publisher>
+		<publisher>AMSAT-UK Software Service</publisher>
+		<info name="usage" value="Load with LOAD &quot;A&quot;, LOAD &quot;B&quot;, etc"/>
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="56578">
 				<rom name="8Programs.tzx" size="56578" crc="bb788390" sha1="e2185c5962d8c89bb020028a22e25470405bef0f"/>
@@ -401,6 +434,25 @@ This list was compiled from the archive at http://www.zx81stuff.org.uk/. Updated
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="11252">
 				<rom name="Alphaprobe.tzx" size="11252" crc="7b7603f0" sha1="a71fdaec9225187ad0724bdaaab65b2860e994fb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ams81">
+		<!-- Code in both sides is identical. -->
+		<description>AMSAT AMS-81 Tracking System (Version N5BF 1.4)</description>
+		<year>1983</year>
+		<publisher>The Radio Amateur Satellite Corporation</publisher>
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="A"/>
+			<dataarea name="cass" size="13817">
+				<rom name="ams81a.p" size="13817" crc="c1e1ba56" sha1="da0fefb2db6e2000937301123186abc54db334be" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="B"/>
+			<dataarea name="cass" size="13817">
+				<rom name="ams81b.p" size="13817" crc="c87bbd26" sha1="dc7db398a10655df89897b9d4f5801764cb9008d" />
 			</dataarea>
 		</part>
 	</software>

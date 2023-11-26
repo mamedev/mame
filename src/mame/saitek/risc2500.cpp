@@ -105,6 +105,13 @@ private:
 	output_finder<14> m_syms;
 	output_finder<16> m_leds;
 
+	bool m_power = false;
+	u32 m_control = 0;
+	u32 m_prev_pc = 0;
+	u64 m_prev_cycle = 0;
+
+	bool m_bootrom_enabled = false;
+
 	void risc2500_mem(address_map &map);
 
 	void lcd_palette(palette_device &palette) const;
@@ -117,12 +124,6 @@ private:
 	u32 disable_boot_rom_r();
 	void install_bootrom(bool enable);
 	TIMER_DEVICE_CALLBACK_MEMBER(disable_bootrom) { install_bootrom(false); }
-	bool m_bootrom_enabled = false;
-
-	bool m_power = false;
-	u32 m_control = 0;
-	u32 m_prev_pc = 0;
-	u64 m_prev_cycle = 0;
 };
 
 void risc2500_state::machine_start()

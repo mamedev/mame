@@ -199,6 +199,13 @@ private:
 	required_region_ptr<u8> m_language;
 	required_ioport_array<2> m_inputs;
 
+	u8 m_led_data = 0;
+	u8 m_7seg_data = 0;
+	u8 m_cb_mux = 0;
+	u8 m_kp_mux = 0;
+	bool m_lan_switch = false;
+	u8 m_speech_bank = 0;
+
 	// address maps
 	void main_map(address_map &map);
 	void main_io(address_map &map);
@@ -214,13 +221,6 @@ private:
 	u8 pio_porta_r();
 	u8 pio_portb_r();
 	void pio_portb_w(u8 data);
-
-	u8 m_led_data = 0;
-	u8 m_7seg_data = 0;
-	u8 m_cb_mux = 0;
-	u8 m_kp_mux = 0;
-	bool m_lan_switch = false;
-	u8 m_speech_bank = 0;
 };
 
 void vsc_state::machine_start()

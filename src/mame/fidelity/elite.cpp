@@ -137,6 +137,12 @@ protected:
 	required_region_ptr<u8> m_language;
 	required_ioport_array<2> m_inputs;
 
+	bool m_rotate = false;
+	u8 m_led_data = 0;
+	u8 m_7seg_data = 0;
+	u8 m_inp_mux = 0;
+	u8 m_speech_bank = 0;
+
 	// address maps
 	void eas_map(address_map &map);
 	void pc_map(address_map &map);
@@ -150,12 +156,6 @@ protected:
 	void ppi_porta_w(u8 data);
 	u8 ppi_portb_r();
 	void ppi_portc_w(u8 data);
-
-	bool m_rotate = false;
-	u8 m_led_data = 0;
-	u8 m_7seg_data = 0;
-	u8 m_inp_mux = 0;
-	u8 m_speech_bank = 0;
 };
 
 void elite_state::machine_start()

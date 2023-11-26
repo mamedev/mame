@@ -72,16 +72,16 @@ private:
 	optional_device<generic_slot_device> m_cart;
 	required_ioport m_inputs;
 
+	bool m_power_on = false;
+	u16 m_inp_mux = 0;
+	u32 m_r = 0;
+
 	void power_off();
 	u8 read_k();
 	void write_o(u16 data);
 	void write_r(u32 data);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
-
-	bool m_power_on = false;
-	u16 m_inp_mux = 0;
-	u32 m_r = 0;
 };
 
 void bingobear_state::machine_start()

@@ -132,7 +132,7 @@ void changyu_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(changyu_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
-//	m_bg_tilemap->set_transparent_pen(0);
+//  m_bg_tilemap->set_transparent_pen(0);
 }
 
 uint32_t changyu_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -229,7 +229,7 @@ void changyu_state::changyu(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &changyu_state::main_map);
 
 	I8751(config, m_mcu, XTAL(8'000'000));
-//	m_mcu->set_disable();
+//  m_mcu->set_disable();
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -261,7 +261,7 @@ void changyu_state::changyu2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &changyu_state::main2_map);
 
 	I87C51(config.replace(), m_mcu, XTAL(8'000'000));
-//	m_mcu->set_disable();
+//  m_mcu->set_disable();
 
 	YM2413(config, "ymsnd", 3.579545_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 1.0);
 }

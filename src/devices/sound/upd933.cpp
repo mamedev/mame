@@ -115,6 +115,9 @@ void upd933_device::device_reset()
 
 	m_sample_count = 0;
 	m_last_sample = 0;
+
+	m_irq_timer->adjust(attotime::never);
+	m_irq_cb(0);
 }
 
 /**************************************************************************/
@@ -153,23 +156,35 @@ void upd933_device::id_w(int state)
 }
 
 /**************************************************************************/
-u8 upd933_device::irq_data() const
+u8 upd933_device::irq_data()
 {
 	// TODO: do these have the correct priority?
 	for (int i = 0; i < 8; i++)
 	{
 		if (m_dco[i].m_irq)
+		{
+			if (!machine().side_effects_disabled())
+				m_dco[i].m_irq = false;
 			return 4 | (i << 3);
+		}
 	}
 	for (int i = 0; i < 8; i++)
 	{
 		if (m_dcw[i].m_irq)
+		{
+			if (!machine().side_effects_disabled())
+				m_dcw[i].m_irq = false;
 			return 2 | (i << 2);
+		}
 	}
 	for (int i = 0; i < 8; i++)
 	{
 		if (m_dca[i].m_irq)
+		{
+			if (!machine().side_effects_disabled())
+				m_dca[i].m_irq = false;
 			return 1 | (i << 1);
+		}
 	}
 	return 0;
 }
@@ -184,14 +199,14 @@ void upd933_device::update_pending_irq()
 	for (int i = 0; i < 8; i++)
 	{
 		env_active |= (m_dca[i].calc_timeout(new_time)
-		           |   m_dco[i].calc_timeout(new_time)
-		           |   m_dcw[i].calc_timeout(new_time));
+				   |   m_dco[i].calc_timeout(new_time)
+				   |   m_dcw[i].calc_timeout(new_time));
 	}
 
-	if (!new_time)
-		m_irq_pending = 1;
-	else if (env_active)
+	if (env_active)
 		m_irq_timer->adjust(clocks_to_attotime((u64)new_time * CLOCKS_PER_SAMPLE));
+	else
+		m_irq_timer->adjust(attotime::never);
 }
 
 /**************************************************************************/
@@ -223,6 +238,7 @@ void upd933_device::write(u8 data)
 	{
 		m_stream->update();
 
+		bool ok = true;
 		const u8 reg = m_sound_data[0];
 		const u16 value = m_sound_regs[reg] = (m_sound_data[1] << 8) | data;
 
@@ -310,10 +326,13 @@ void upd933_device::write(u8 data)
 			else
 				voice.m_wave[1]     = voice.m_wave[0];
 			voice.m_window          = BIT(value, 6, 3);
-			// see earlier comment - these bits actually control a different voice
-			mod_voice.m_ring_mod    = BIT(value, 5);
-			mod_voice.m_pitch_mod   = BIT(value, 3, 2);
-			mod_voice.m_mute_other  = BIT(value, 2);
+			if (!BIT(vnum, 0))
+			{
+				// see earlier comment - these bits actually control a different voice
+				mod_voice.m_ring_mod    = BIT(value, 5);
+				mod_voice.m_pitch_mod   = BIT(value, 3, 2);
+				mod_voice.m_mute_other  = BIT(value, 2);
+			}
 			break;
 
 		case 0x13: // 98-9f: phase counter
@@ -324,11 +343,20 @@ void upd933_device::write(u8 data)
 			voice.m_position = value << (PITCH_SHIFT - 4);
 			break;
 
+		case 0x17: // b8-bb: pitch modulator (probably - cz1 sets to zero when disabling noise)
+			if (vnum < 4)
+				m_voice[vnum << 1].m_pm_level = (s16)value;
+			else
+				ok = false;
+			break;
+
 		default:
-			logerror("%s: unknown sound reg write: %02x %04x\n",
-				machine().describe_context(), reg, value);
+			ok = false;
 			break;
 		}
+
+		if (!ok)
+			logerror("%s: unknown sound reg write: %02x %04x\n", machine().describe_context(), reg, value);
 	}
 	else
 	{
@@ -554,19 +582,19 @@ void upd933_device::env_t::update()
 	}
 
 	if (!m_sustain && (m_current == m_target))
-		m_irq = true;
+		m_irq = m_sustain = true; // set sustain too to make sure this only causes an interrupt once
 }
 
 /**************************************************************************/
 bool upd933_device::env_t::calc_timeout(unsigned &samples)
 {
-	if (m_sustain || !m_rate)
-	{
-		return false;
-	}
-	else if (m_irq)
+	if (m_irq)
 	{
 		samples = 0;
+	}
+	else if (m_sustain || !m_rate)
+	{
+		return false;
 	}
 	else
 	{

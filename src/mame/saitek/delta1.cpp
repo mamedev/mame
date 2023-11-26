@@ -67,6 +67,13 @@ private:
 	required_device<pwm_display_device> m_display;
 	required_ioport_array<5> m_inputs;
 
+	u8 m_mux_data = 0;
+	u8 m_led_select = 0;
+	u8 m_inp_mux = 0;
+	u8 m_7seg_data = 0;
+	bool m_7seg_rc = false;
+	bool m_blink = false;
+
 	// address maps
 	void main_map(address_map &map);
 	void main_io(address_map &map);
@@ -78,13 +85,6 @@ private:
 	void mux_w(u8 data);
 	void digit_w(u8 data);
 	u8 input_r();
-
-	u8 m_mux_data = 0;
-	u8 m_led_select = 0;
-	u8 m_inp_mux = 0;
-	u8 m_7seg_data = 0;
-	bool m_7seg_rc = false;
-	bool m_blink = false;
 };
 
 void delta1_state::machine_start()
@@ -217,12 +217,12 @@ INPUT_PORTS_END
 void delta1_state::delta1(machine_config &config)
 {
 	// basic machine hardware
-	F8(config, m_maincpu, 2000000); // LC circuit, measured 2MHz
+	F8(config, m_maincpu, 2'000'000); // LC circuit, measured 2MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &delta1_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &delta1_state::main_io);
 	m_maincpu->set_irq_acknowledge_callback("f3853", FUNC(f3853_device::int_acknowledge));
 
-	f3853_device &f3853(F3853(config, "f3853", 2000000));
+	f3853_device &f3853(F3853(config, "f3853", 2'000'000));
 	f3853.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
 
 	// video hardware

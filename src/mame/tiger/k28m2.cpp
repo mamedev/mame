@@ -72,6 +72,11 @@ private:
 	required_ioport_array<9> m_inputs;
 	output_finder<8> m_digits;
 
+	bool m_power_on = false;
+	u16 m_inp_mux = 0;
+	u32 m_r = 0;
+	u32 m_digit_data[4] = { };
+
 	void power_off();
 	u8 read_k();
 	void write_o(u16 data);
@@ -81,11 +86,6 @@ private:
 	void write_segs(offs_t offset, u32 data);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
-
-	bool m_power_on = false;
-	u16 m_inp_mux = 0;
-	u32 m_r = 0;
-	u32 m_digit_data[4] = { };
 };
 
 void k28m2_state::machine_start()

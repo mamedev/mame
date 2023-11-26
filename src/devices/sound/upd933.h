@@ -67,7 +67,7 @@ private:
 	TIMER_CALLBACK_MEMBER(timer_tick);
 
 	s16 update(int vnum);
-	u8 irq_data() const;
+	u8 irq_data();
 	void update_pending_irq();
 	void update_irq();
 

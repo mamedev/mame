@@ -59,7 +59,7 @@ public:
 		, m_lcdc0(*this, "ks0066_0")
 		, m_lcdc1(*this, "ks0066_1")
 		, m_ram(*this, RAM_TAG)
-        , m_ipl(*this, "ipl")
+		, m_ipl(*this, "ipl")
 	{
 	}
 
@@ -78,7 +78,7 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-    void main_map(address_map &map);
+	void main_map(address_map &map);
 };
 
 void alphasmart3k_state::machine_start()
@@ -97,7 +97,7 @@ void alphasmart3k_state::machine_reset()
 void alphasmart3k_state::main_map(address_map &map)
 {
 //  map(0x0000'0000, 0x0003'ffff).ram().share("ram");
-    map(0x0040'0000, 0x004f'ffff).rom().region("ipl", 0);
+	map(0x0040'0000, 0x004f'ffff).rom().region("ipl", 0);
 }
 
 static INPUT_PORTS_START( alphasmart3k )
@@ -109,13 +109,15 @@ void alphasmart3k_state::alphasmart3k(machine_config &config)
 {
 	// Basic machine hardware
 	MC68EZ328(config, m_maincpu, 16'000'000); // MC68EZ328PU16V, clock unverified
-    m_maincpu->set_addrmap(AS_PROGRAM, &alphasmart3k_state::main_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &alphasmart3k_state::main_map);
 
 	// Values from AlphaSmart 2000, not confirmed for AlphaSmart 3000
 	// AlphaSmart 3000 uses a Data Image CM4040 LCD display, LCD is 40x4 according to ref
-	KS0066_F05(config, m_lcdc0, 270'000); // TODO: Possibly wrong device type, needs confirmation; clock not measured, datasheet typical clock used
+	KS0066(config, m_lcdc0, 270'000); // TODO: Possibly wrong device type, needs confirmation; clock not measured, datasheet typical clock used
+	m_lcdc0->set_default_bios_tag("f05");
 	m_lcdc0->set_lcd_size(4, 40);
-	KS0066_F05(config, m_lcdc1, 270'000); // TODO: Possibly wrong device type, needs confirmation; clock not measured, datasheet typical clock used
+	KS0066(config, m_lcdc1, 270'000); // TODO: Possibly wrong device type, needs confirmation; clock not measured, datasheet typical clock used
+	m_lcdc1->set_default_bios_tag("f05");
 	m_lcdc1->set_lcd_size(4, 40);
 
 	RAM(config, RAM_TAG).set_default_size("256K");

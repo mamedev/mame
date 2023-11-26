@@ -84,6 +84,10 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport m_inputs;
 
+	bool m_kp_select = false;
+	u8 m_inp_mux = 0;
+	u8 m_led_select = 0;
+
 	// I/O handlers
 	void update_display();
 	void mux_w(u8 data);
@@ -91,10 +95,6 @@ private:
 	u8 input_r();
 
 	void set_cpu_freq();
-
-	bool m_kp_select = false;
-	u8 m_inp_mux = 0;
-	u8 m_led_select = 0;
 };
 
 void micro2_state::machine_start()
@@ -108,8 +108,8 @@ void micro2_state::machine_start()
 void micro2_state::set_cpu_freq()
 {
 	// known CPU speeds: 6MHz(XTAL), 6MHz(LC), 12MHz(LC)
-	u32 clock = (ioport("FAKE")->read() & 1) ? 12000000 : 6000000;
-	m_board->set_delay(attotime::from_ticks(2000000, clock)); // see TODO
+	u32 clock = (ioport("FAKE")->read() & 1) ? 12'000'000 : 6'000'000;
+	m_board->set_delay(attotime::from_ticks(2'000'000, clock)); // see TODO
 	m_maincpu->set_unscaled_clock(clock);
 }
 

@@ -81,6 +81,9 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<cassette_image_device> m_cass;
 
+	u8 m_select = 0;
+	u8 m_7seg_data = 0;
+
 	// address maps
 	void main_map(address_map &map);
 
@@ -95,9 +98,6 @@ private:
 	void vram_w(offs_t offset, u8 data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(cass_input);
-
-	u8 m_select = 0;
-	u8 m_7seg_data = 0;
 };
 
 void intchess_state::machine_start()

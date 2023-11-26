@@ -88,6 +88,8 @@ private:
 	required_device<timer_device> m_disable_bootrom;
 	optional_ioport m_fake;
 
+	bool m_bootrom_enabled = false;
+
 	// address maps
 	void mmtm_2m_map(address_map &map);
 	void mmtm_8m_map(address_map &map);
@@ -97,7 +99,6 @@ private:
 
 	void install_bootrom(bool enable);
 	TIMER_DEVICE_CALLBACK_MEMBER(disable_bootrom) { install_bootrom(false); }
-	bool m_bootrom_enabled = false;
 
 	void set_cpu_freq();
 };

@@ -68,12 +68,12 @@ TODO:
      - Chibi Maruko-chan Aim Fuji Nippon Ichi! (c) 2008
  *   - Donkey Kong Banana Kingdom (c) 2006
  *   - Super Mario Fushigi no Korokoro Party (c) 2004
- !   - Super Mario Fushigi no Korokoro Party 2 (c) 2005
+ *   - Super Mario Fushigi no Korokoro Party 2 (c) 2005
 
     Single player medal machines:
     Medalusion:
  *   - Chibi Maruko-chan ~Minna de Sugoroku Asobi~ no Maki (c) 2003
-     - Donkey Kong: Jungle Fever (c) 2005 Capcom / Nintendo / Namco
+ *   - Donkey Kong: Jungle Fever (c) 2005
      - Rockman EXE The Medal Operation (c) 2005
  *   - Super Mario Fushigi No JanJanLand (c) 2005
 
@@ -521,11 +521,10 @@ ROM_START( masmarios )
 	ROM_COPY( "ymz770_flash1", 0, 0, 0x800000 )
 ROM_END
 
-// CF card only dumped, boot ROMs is missing
 ROM_START( masmario2 )
 	ROM_REGION32_LE( 0x1000000, "maincpu", 0 ) // BIOS code
-	ROM_LOAD32_WORD( "ic30", 0x000000, 0x400000, BAD_DUMP CRC(6b2d2ef1) SHA1(0db6490b40c5716c1271b7f99608e8c7ad916516) ) //
-	ROM_LOAD32_WORD( "ic33", 0x000002, 0x400000, BAD_DUMP CRC(64049fc3) SHA1(b373b2c8cb4d66b9c700e0542bd26444484fae40) ) // modified boot roms from dkbanans
+	ROM_LOAD32_WORD( "mpv_s04.ic30", 0x000000, 0x400000, CRC(1217f923) SHA1(5b0c2331ce6bec6d5239c0a04c22e67ec16383c4) )
+	ROM_LOAD32_WORD( "mpv_s05.ic33", 0x000002, 0x400000, CRC(63d59b97) SHA1(8d2ef35c0776b296cc7d3b37df5a996f6fb33bc1) )
 
 	ROM_REGION( 0x800100, "ymz770_flash1", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "flash1", 0x000000, 0x800000, BAD_DUMP CRC(30a7c77e) SHA1(3764a096ae22ecad4fba37ec62dc39c5381c5825) )
@@ -545,7 +544,22 @@ ROM_END
 // Medalusion 1 platform
 ////////////////////////
 
-// uses main board with 1 GPU populated and AMT-02012-01 upper I/O board
+// uses main board with 1 GPU populated and AMT-02012-01 I/O board
+
+ROM_START( dkjfever )
+	ROM_REGION32_LE( 0x1000000, "maincpu", 0 ) // BIOS and game code/data
+	ROM_LOAD32_WORD( "spd_04.ic30", 0x000000, 0x400000, CRC(76c91374) SHA1(4d1157fbbe46becd4182f948203816809ae792b6) )
+	ROM_LOAD32_WORD( "spd_05.ic33", 0x000002, 0x400000, CRC(94722aca) SHA1(cf2e1d43b490a96ba4ca69d9865c6ea94ca6962d) )
+	ROM_LOAD32_WORD( "spd_06.ic39", 0x800000, 0x400000, CRC(4db2f154) SHA1(e1bdefc95af70f7f697cc938e235d102b7afa18d) )
+	ROM_LOAD32_WORD( "spd_07.ic42", 0x800002, 0x400000, CRC(074ccd84) SHA1(6a2d59d21de4d73febd29d4bfb5ba71f6015b40e) )
+
+	ROM_REGION( 0x800100, "ymz770_flash1", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "spd_01.ic31", 0x000000, 0x400000, CRC(672d5db8) SHA1(b57f0c4826b03bc6c5bcc7875a3807e7ce58b564) )
+	ROM_LOAD16_WORD_SWAP( "spd_02.ic38", 0x400000, 0x400000, CRC(ea79aebf) SHA1(c7e607c205f6364798932f982d067b245a5355a0) )
+
+	ROM_REGION( 0x800000, "ymz770", 0 )
+	ROM_COPY( "ymz770_flash1", 0, 0, 0x800000 )
+ROM_END
 
 ROM_START( mariojjl )
 	ROM_REGION32_LE( 0x1000000, "maincpu", 0 )
@@ -645,6 +659,7 @@ GAME( 2004, masmario,  0,        alien,     alien,   alien_state, empty_init,   
 GAME( 2004, masmarios, 0,        alien,     alien,   alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Super Mario Fushigi no Korokoro Party (satellite)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2005, masmario2, 0,        masmario2, alien,   alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Super Mario Fushigi no Korokoro Party 2", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 // Medalusion 1
+GAME( 2005, dkjfever,  0,        alien,     alien,   alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Donkey Kong Jungle Fever (Ver.1.000, 2005/08/03)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // ドンキーコングジャングルフィーバー
 GAME( 2006, mariojjl,  0,        alien,     alien,   alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Super Mario Fushigi no JanJanLand (Ver.1.00C, 2006/08/29)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2005, mmaruchan, 0,        alien,     alien,   alien_state, empty_init,    ROT0, "Capcom",               "Chibi Maruko-chan ~Minna de Sugoroku Asobi~ no Maki (Ver.1.00B, 2005/06/22)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // ちびまる子ちゃん「みんなですごろく遊び」の巻
 GAME( 2004, mmaruchana,mmaruchan,alien,     alien,   alien_state, empty_init,    ROT0, "Capcom",               "Chibi Maruko-chan ~Minna de Sugoroku Asobi~ no Maki (Ver.1.00A, 2004/04/20)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // ちびまる子ちゃん「みんなですごろく遊び」の巻

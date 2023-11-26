@@ -52,6 +52,11 @@ private:
 	required_device<pwm_display_device> m_display;
 	required_ioport_array<4> m_inputs;
 
+	std::unique_ptr<u8[]> m_ram;
+	u8 m_ram_address = 0;
+	u8 m_matrix = 0;
+	u8 m_digit_data = 0;
+
 	void main_map(address_map &map);
 	void main_io(address_map &map);
 
@@ -65,11 +70,6 @@ private:
 	void ram_address_w(u8 data) { m_ram_address = data; }
 	u8 ram_data_r() { return m_ram[m_ram_address]; }
 	void ram_data_w(u8 data) { m_ram[m_ram_address] = data; }
-
-	std::unique_ptr<u8[]> m_ram;
-	u8 m_ram_address = 0;
-	u8 m_matrix = 0;
-	u8 m_digit_data = 0;
 };
 
 void borisdpl_state::machine_start()
@@ -183,12 +183,12 @@ INPUT_PORTS_END
 void borisdpl_state::borisdpl(machine_config &config)
 {
 	// basic machine hardware
-	F8(config, m_maincpu, 3000000/2); // frequency approximated from video reference
+	F8(config, m_maincpu, 3'000'000/2); // frequency approximated from video reference
 	m_maincpu->set_addrmap(AS_PROGRAM, &borisdpl_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &borisdpl_state::main_io);
 	m_maincpu->set_irq_acknowledge_callback("psu", FUNC(f38t56_device::int_acknowledge));
 
-	f38t56_device &psu(F38T56(config, "psu", 3000000/2));
+	f38t56_device &psu(F38T56(config, "psu", 3'000'000/2));
 	psu.set_int_vector(0x5020);
 	psu.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
 	psu.read_a().set(FUNC(borisdpl_state::ram_data_r));

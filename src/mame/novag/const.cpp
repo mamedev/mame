@@ -127,6 +127,10 @@ private:
 	required_device<beep_device> m_beeper;
 	required_ioport_array<8> m_inputs;
 
+	bool m_power = false;
+	u8 m_inp_mux = 0;
+	u8 m_led_select = 0;
+
 	// address maps
 	void const_map(address_map &map);
 	void ssensor4_map(address_map &map);
@@ -138,10 +142,6 @@ private:
 	void control_w(u8 data);
 	u8 input1_r();
 	u8 input2_r();
-
-	bool m_power = false;
-	u8 m_inp_mux = 0;
-	u8 m_led_select = 0;
 };
 
 void const_state::machine_start()

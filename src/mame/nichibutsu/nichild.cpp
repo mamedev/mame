@@ -6,7 +6,7 @@
 
     TODO:
     - Understand how MMU works (both games jumps to invalid areas, probably
-      port A remaps memory for the whole space!);
+      port A remaps memory for the whole space);
     - (if ld check patched) memory error printed by ldquiz4, most likely
       related to above;
     - Unknown LaserDisc type;
@@ -32,6 +32,7 @@
 #include "emu.h"
 #include "cpu/z80/tmpz84c011.h"
 #include "video/v9938.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -49,15 +50,24 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_v9938(*this, "v9938")
 		, m_gfxrom(*this, "gfx")
+		, m_p1_keymatrix(*this, { "P1_KEY0", "P1_KEY1", "P1_KEY2", "P1_KEY3", "P1_KEY4" })
+		, m_p2_keymatrix(*this, { "P2_KEY0", "P2_KEY1", "P2_KEY2", "P2_KEY3", "P2_KEY4" })
 	{
 	}
 
 	void nichild(machine_config &config);
 
 private:
+	required_device<tmpz84c011_device> m_maincpu;
+	required_device<v9938_device> m_v9938;
+	required_region_ptr<uint8_t> m_gfxrom;
+	required_ioport_array<5> m_p1_keymatrix;
+	required_ioport_array<5> m_p2_keymatrix;
+
 	uint8_t gfx_r(offs_t offset);
-	uint8_t mux_r();
-	void mux_w(uint8_t data);
+	uint8_t p1_keymatrix_r();
+	uint8_t p2_keymatrix_r();
+	void key_select_w(uint8_t data);
 	void porta_w(uint8_t data);
 	void portb_w(uint8_t data);
 	void portc_w(uint8_t data);
@@ -71,10 +81,8 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	required_device<tmpz84c011_device> m_maincpu;
-	required_device<v9938_device> m_v9938;
-	required_region_ptr<uint8_t> m_gfxrom;
 	uint32_t m_gfx_bank = 0;
+	uint8_t m_key_select = 0;
 };
 
 
@@ -86,7 +94,7 @@ uint8_t nichild_state::gfx_r(offs_t offset)
 	gfx_offset |= ((offset & 0xff00) >> 8);
 	gfx_offset |= m_gfx_bank;
 
-	//printf("%08x %02x\n",gfx_offset,m_gfx_bank);
+	//logerror("%08x %02x\n",gfx_offset,m_gfx_bank);
 
 	return m_gfxrom[gfx_offset];
 }
@@ -95,23 +103,23 @@ uint8_t nichild_state::gfx_r(offs_t offset)
 
 void nichild_state::porta_w(uint8_t data)
 {
-	printf("PORTA %02x\n",data);
+	logerror("PORTA %02x\n",data);
 //  machine().debug_break();
 }
 
 void nichild_state::portb_w(uint8_t data)
 {
-	printf("PORTB %02x\n",data);
+	logerror("PORTB %02x\n",data);
 }
 
 void nichild_state::portc_w(uint8_t data)
 {
-	printf("PORTC %02x\n",data);
+	logerror("PORTC %02x\n",data);
 }
 
 void nichild_state::portd_w(uint8_t data)
 {
-	printf("PORTD %02x\n",data);
+	logerror("PORTD %02x\n",data);
 }
 
 void nichild_state::gfxbank_w(uint8_t data)
@@ -120,20 +128,36 @@ void nichild_state::gfxbank_w(uint8_t data)
 	m_gfx_bank = data * 0x8000;
 }
 
-uint8_t nichild_state::mux_r()
+uint8_t nichild_state::p1_keymatrix_r()
 {
-	// TODO
-	return 0xff;
+	uint8_t result = 0xff;
+	for (unsigned i = 0; m_p1_keymatrix.size() > i; ++i)
+	{
+		if (!BIT(m_key_select, i))
+			result &= m_p1_keymatrix[i]->read();
+	}
+	return result;
 }
 
-void nichild_state::mux_w(uint8_t data)
+uint8_t nichild_state::p2_keymatrix_r()
 {
-	// ...
+	uint8_t result = 0xff;
+	for (unsigned i = 0; m_p2_keymatrix.size() > i; ++i)
+	{
+		if (!BIT(m_key_select, i))
+			result &= m_p2_keymatrix[i]->read();
+	}
+	return result;
+}
+
+void nichild_state::key_select_w(uint8_t data)
+{
+	m_key_select = (data & 0x1f);
 }
 
 void nichild_state::nichild_map(address_map &map)
 {
-	// TODO: MMU :/
+	// TODO: identify ROM banks
 	map(0x0000, 0x1fff).rom().region("ipl", 0x0000);
 	map(0x2000, 0x3fff).rom().region("ipl", 0x2000);
 	map(0x4000, 0x5fff).rom().region("ipl", 0x4000);
@@ -146,43 +170,118 @@ void nichild_state::nichild_map(address_map &map)
 void nichild_state::nichild_io(address_map &map)
 {
 //  map.global_mask(0xff);
-	map(0x60, 0x60).mirror(0xff00).w(FUNC(nichild_state::mux_w));
+	map(0x60, 0x60).mirror(0xff00).w(FUNC(nichild_state::key_select_w));
+	// Not nichisnd?
+//	map(0x64, 0x64).mirror(0xff00).w(m_nichisnd, FUNC(nichisnd_device::sound_host_command_w));
 	// shabdama accesses 0x70-0x73, ldquiz4 0x7c-0x7f
 	map(0x70, 0x73).mirror(0xff0c).rw(m_v9938, FUNC(v9938_device::read), FUNC(v9938_device::write));
 	map(0x80, 0xff).select(0xff00).r(FUNC(nichild_state::gfx_r));
 }
 
 static INPUT_PORTS_START( nichild )
-	/* dummy active high structure */
-	PORT_START("SYSA")
-	PORT_DIPNAME( 0x01, 0x00, "SYSA" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	// mahjong panels are virtually identical to nb1413m3
+	PORT_START("P1_KEY0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_M )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_I )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_E )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_A )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	/* dummy active low structure */
-	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
+	PORT_START("P1_KEY1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_N )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_J )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_F )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_B )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P1_KEY2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_K )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_G )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_C )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P1_KEY3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_L )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_H )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_D )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P1_KEY4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P2_KEY0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_KAN ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_M ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_I ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_E ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_A ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P2_KEY1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_BET ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_REACH ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_N ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_J ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_F ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_B ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P2_KEY2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_RON ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_CHI ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_K ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_G ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_C ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P2_KEY3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_PON ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_L ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_H ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_D ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P2_KEY4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_BIG ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("PORTD")
+	PORT_DIPNAME( 0x01, 0x01, "PORTD" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -194,12 +293,8 @@ static INPUT_PORTS_START( nichild )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -226,19 +321,19 @@ static const z80_daisy_config daisy_chain_main[] =
 
 void nichild_state::nichild(machine_config &config)
 {
-	/* basic machine hardware */
 	TMPZ84C011(config, m_maincpu, MAIN_CLOCK/4);
 	m_maincpu->set_daisy_config(daisy_chain_main);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nichild_state::nichild_map);
 	m_maincpu->set_addrmap(AS_IO, &nichild_state::nichild_io);
-	m_maincpu->in_pb_callback().set(FUNC(nichild_state::mux_r));
+	m_maincpu->in_pb_callback().set(FUNC(nichild_state::p1_keymatrix_r));
+	m_maincpu->in_pc_callback().set(FUNC(nichild_state::p2_keymatrix_r));
+	m_maincpu->in_pd_callback().set_ioport("PORTD");
 	m_maincpu->out_pa_callback().set(FUNC(nichild_state::porta_w));
 	m_maincpu->out_pb_callback().set(FUNC(nichild_state::portb_w));
 	m_maincpu->out_pc_callback().set(FUNC(nichild_state::portc_w));
 	m_maincpu->out_pd_callback().set(FUNC(nichild_state::portd_w));
 	m_maincpu->out_pe_callback().set(FUNC(nichild_state::gfxbank_w));
 
-	/* video hardware */
 	V9938(config, m_v9938, MAIN_CLOCK);
 	m_v9938->set_screen_ntsc("screen");
 	m_v9938->set_vram_size(0x40000);
@@ -246,9 +341,10 @@ void nichild_state::nichild(machine_config &config)
 
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-//  YM3812(config, "fmsnd", SOUND_CLOCK).add_route(ALL_OUTPUTS, "speaker", 0.7);
+//	NICHISND(config, m_nichisnd, 0);
+
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 }
 
 
@@ -314,5 +410,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1991, shabdama, 0,   nichild, nichild, nichild_state, empty_init, ROT0, "Nichibutsu", "LD Mahjong #4 Shabon-Dama (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1991, shabdama, 0,   nichild, nichild, nichild_state, empty_init, ROT0, "Nichibutsu / AV Japan", "LD Mahjong #4 Shabon-Dama (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 1992, ldquiz4,  0,   nichild, nichild, nichild_state, empty_init, ROT0, "Nichibutsu", "LD Quiz dai 4-dan - Kotaetamon Gachi! (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

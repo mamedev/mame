@@ -151,6 +151,11 @@ private:
 	optional_device<beep_device> m_beeper;
 	required_ioport_array<4> m_inputs;
 
+	u8 m_inp_mux = 0;
+	u8 m_digit_select = 0;
+	u8 m_digit_data = 0;
+	bool m_blink = false;
+
 	// address maps
 	void main_map(address_map &map);
 	void main_io(address_map &map);
@@ -173,11 +178,6 @@ private:
 
 	void input_digit_select_w(u8 data) { input_w(data); digit_select_w(data); }
 	void input_digit_data_w(u8 data) { input_w(data); digit_data_w(data); }
-
-	u8 m_inp_mux = 0;
-	u8 m_digit_select = 0;
-	u8 m_digit_data = 0;
-	bool m_blink = false;
 };
 
 
@@ -216,7 +216,7 @@ void cmpchess_state::update_reset(ioport_value state)
 void cmpchess_state::update_cpu_freq(ioport_value state)
 {
 	// 2 MK I versions, 2nd one was a lot faster
-	const u32 freq = state ? 3500000 : 2250000;
+	const u32 freq = state ? 3'500'000 : 2'250'000;
 	m_maincpu->set_unscaled_clock(freq);
 	subdevice<f3853_device>("smi")->set_unscaled_clock(freq);
 }
@@ -443,8 +443,8 @@ void cmpchess_state::mk1(machine_config &config)
 	cmpchess(config);
 
 	// basic machine hardware
-	m_maincpu->set_clock(2250000); // see notes
-	subdevice<f3853_device>("smi")->set_clock(2250000);
+	m_maincpu->set_clock(2'250'000); // see notes
+	subdevice<f3853_device>("smi")->set_clock(2'250'000);
 
 	config.set_default_layout(layout_novag_mk1);
 }
@@ -454,11 +454,11 @@ void cmpchess_state::cncchess(machine_config &config)
 	cmpchess2(config);
 
 	// basic machine hardware
-	m_maincpu->set_clock(2000000); // LC circuit, measured 2MHz
+	m_maincpu->set_clock(2'000'000); // LC circuit, measured 2MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &cmpchess_state::cncchess_map);
 	m_maincpu->set_addrmap(AS_IO, &cmpchess_state::cncchess_io);
 
-	subdevice<f3853_device>("smi")->set_clock(2000000);
+	subdevice<f3853_device>("smi")->set_clock(2'000'000);
 
 	config.set_default_layout(layout_conic_cchess);
 

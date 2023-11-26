@@ -58,6 +58,10 @@ private:
 	output_finder<> m_battery;
 	required_ioport_array<4> m_inputs;
 
+	std::unique_ptr<u8[]> m_ram;
+	u8 m_ram_address[2] = { };
+	u64 m_lcd_data[2] = { };
+
 	// address maps
 	void main_map(address_map &map);
 	void main_io(address_map &map);
@@ -71,10 +75,6 @@ private:
 	template<int N> void ram_address_w(u8 data);
 	u8 ram_data_r();
 	void ram_data_w(u8 data);
-
-	std::unique_ptr<u8[]> m_ram;
-	u8 m_ram_address[2] = { };
-	u64 m_lcd_data[2] = { };
 };
 
 void exechess_state::machine_start()
@@ -213,12 +213,12 @@ INPUT_PORTS_END
 void exechess_state::exechess(machine_config &config)
 {
 	// basic machine hardware
-	F8(config, m_maincpu, 4500000/2); // measured
+	F8(config, m_maincpu, 4'500'000/2); // measured
 	m_maincpu->set_addrmap(AS_PROGRAM, &exechess_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &exechess_state::main_io);
 	m_maincpu->set_irq_acknowledge_callback("psu", FUNC(f38t56_device::int_acknowledge));
 
-	f38t56_device &psu(F38T56(config, "psu", 4500000/2));
+	f38t56_device &psu(F38T56(config, "psu", 4'500'000/2));
 	psu.set_int_vector(0x0020);
 	psu.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
 	psu.read_a().set(FUNC(exechess_state::ram_data_r));

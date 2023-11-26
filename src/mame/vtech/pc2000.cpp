@@ -745,6 +745,7 @@ void pc2000_state::pc2000gen(machine_config &config)
 void pc2000_state::pc2000(machine_config &config)
 {
 	pc2000gen(config);
+
 	HD44780(config, m_lcdc, 250'000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 20);
 }
@@ -752,7 +753,9 @@ void pc2000_state::pc2000(machine_config &config)
 void pc2000_state::pc2000eur(machine_config &config)
 {
 	pc2000gen(config);
-	SED1278_0B(config, m_lcdc, 250'000); // TODO: clock not measured, datasheet typical clock used
+
+	SED1278(config, m_lcdc, 250'000); // TODO: clock not measured, datasheet typical clock used
+	m_lcdc->set_default_bios_tag("0b");
 	m_lcdc->set_lcd_size(2, 20);
 }
 

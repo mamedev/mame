@@ -76,6 +76,12 @@ private:
 	required_device<beep_device> m_beeper;
 	required_ioport_array<8> m_inputs;
 
+	u8 m_inp_mux = 0;
+	u8 m_led_data = 0;
+	u8 m_led_side = 0;
+	u8 m_lcd_control = 0;
+	u8 m_lcd_data = 0;
+
 	// address maps
 	void diablo68k_map(address_map &map);
 	void scorpio68k_map(address_map &map);
@@ -90,12 +96,6 @@ private:
 
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
 	void lcd_palette(palette_device &palette) const;
-
-	u8 m_inp_mux = 0;
-	u8 m_led_data = 0;
-	u8 m_led_side = 0;
-	u8 m_lcd_control = 0;
-	u8 m_lcd_data = 0;
 };
 
 void diablo_state::machine_start()

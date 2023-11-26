@@ -219,7 +219,7 @@ private:
 	TIMER_CALLBACK_MEMBER(delayed_z80_control_w);
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	
+
 	void mem_hi_map(address_map &map);
 	void mem_lo_map(address_map &map);
 	void z80_io_map(address_map &map);
