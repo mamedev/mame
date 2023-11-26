@@ -78,7 +78,7 @@ private:
 	enum        { DDRAM, CGRAM };
 
 	// internal helper
-	void set_busy_flag(uint16_t usec);
+	void set_busy_flag(uint16_t cycles);
 	void correct_ac();
 	void update_ac(int direction);
 	void update_nibble(int rs, int rw);
@@ -86,8 +86,8 @@ private:
 	void pixel_update(bitmap_ind16 &bitmap, u8 line, u8 pos, u8 y, u8 x, int state);
 
 	// internal state
-	emu_timer * m_blink_timer;
 	emu_timer * m_busy_timer;
+	emu_timer * m_blink_timer;
 
 	u8           m_lines;          // number of lines
 	u8           m_chars;          // chars for line
