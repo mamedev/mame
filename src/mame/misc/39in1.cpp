@@ -49,8 +49,6 @@
 #include "machine/eepromser.h"
 #include "machine/pxa255.h"
 
-#define VERBOSE (1)
-#include "logmacro.h"
 
 namespace {
 
