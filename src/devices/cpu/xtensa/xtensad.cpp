@@ -709,12 +709,12 @@ offs_t xtensa_disassembler::disassemble(std::ostream &stream, offs_t pc, const x
 			{
 			case 0b0000: // L32E
 				util::stream_format(stream, "%-8sa%d, a%d, ", "l32e", BIT(inst, 4, 4), BIT(inst, 8, 4));
-				format_imm(stream, int(BIT(inst, 12, 4)) * -4);
+				format_imm(stream, int(BIT(inst, 12, 4)) * 4 - 64);
 				break;
 
 			case 0b0100: // S32E
 				util::stream_format(stream, "%-8sa%d, a%d, ", "s32e", BIT(inst, 4, 4), BIT(inst, 8, 4));
-				format_imm(stream, int(BIT(inst, 12, 4)) * -4);
+				format_imm(stream, int(BIT(inst, 12, 4)) * 4 - 64);
 				break;
 
 			default:
