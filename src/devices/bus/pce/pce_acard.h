@@ -69,6 +69,7 @@ private:
 			m_base_addr += m_addr_offset + (BIT(m_ctrl, 3) ? 0xff0000 : 0);
 			m_base_addr &= 0xffffff;
 		}
+
 		uint8_t  m_ctrl;
 		uint32_t m_base_addr;
 		uint16_t m_addr_offset;
