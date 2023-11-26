@@ -19,10 +19,11 @@
     To get past the boot error on Tinker Bell, F1 is mapped to the cabinet reset switch.
 
     TODO:
-    - Inputs (inserting a coin freezes some of the text on screen, what's next?)
-    - Verify sound latch location on Tinker Bell vs. the comms games
+    - Hopper
+    - tinkerbl, blicks: throws with "RAM data is BAD" at each soft reset, EEPROM?
     - Bingo Party puts up a message about ROM version mismatch with the RAM and says to press the reset switch.
       However, when this is done, the code simply locks up (BRA to itself) and doesn't initialize the RAM.
+    - Verify sound latch locations on Tinker Bell vs. the comms games
 
     Network version notes:
     Based on Caribbean Boule the following hardware setup is used:
@@ -296,7 +297,7 @@ void systemm1_state::comm_map(address_map &map)
 	map(0xe003, 0xe003).nopw(); // ???
 }
 
-static INPUT_PORTS_START(tinkerbl)
+static INPUT_PORTS_START( tinkerbl )
 	PORT_START("IN1_PA")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big")
@@ -324,7 +325,9 @@ static INPUT_PORTS_START(tinkerbl)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Analyzer")
 
 	PORT_START("IN1_PD")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	// Following can't be IPT_SERVICE1, it will collide with IPT_GAMBLE_SERVICE
+	// TODO: verify what's for (doesn't increment credits)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Service Switch")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("All Reset")
 	PORT_BIT( 0x38, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -363,7 +366,32 @@ static INPUT_PORTS_START(tinkerbl)
 	PORT_DIPSETTING( 0x00, DEF_STR( No ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START(bingpty)
+static INPUT_PORTS_START( blicks )
+	PORT_INCLUDE( tinkerbl )
+
+	PORT_MODIFY("DIP1")
+	PORT_DIPNAME( 0x03, 0x03, "Set Payout Ratio" ) PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING( 0x02, "84%" )
+	PORT_DIPSETTING( 0x01, "88%" )
+	PORT_DIPSETTING( 0x03, "92%" )
+	PORT_DIPSETTING( 0x00, "96%" )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW1:3")
+	PORT_DIPNAME( 0x08, 0x08, "Double Up Limit" ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING( 0x08, "10000" )
+	PORT_DIPSETTING( 0x00, "5000" )
+	PORT_DIPNAME( 0x10, 0x10, "Hopper" ) PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING( 0x10, DEF_STR( Yes ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( No ) )
+	PORT_DIPNAME( 0x20, 0x20, "Hopper Pay Max" ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING( 0x20, "400" )
+	PORT_DIPSETTING( 0x00, "800" )
+	PORT_DIPNAME( 0x40, 0x40, "Credit Max" ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING( 0x40, "2000" )
+	PORT_DIPSETTING( 0x00, "10000" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW1:8")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( bingpty )
 	PORT_START("IN1_PA")
 	PORT_DIPNAME( 0x01, 0x01, "DIPA1" )
 	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
@@ -619,7 +647,7 @@ void systemm1_state::m1comm(machine_config &config)
 	dpram.intl_callback().set_inputline("m1comm", 0);
 }
 
-ROM_START(tinkerbl)
+ROM_START( tinkerbl )
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD16_BYTE("epr-a13637.ic8", 0x000000, 0x040000, CRC(de270e16) SHA1(e77fedbd11a698b1f7ed03feec64204f712c3cad))
 	ROM_LOAD16_BYTE("epr-a13639.ic7", 0x000001, 0x040000, CRC(56ade038) SHA1(c807b63e1ff7cc9577dc45689ebc67ede396f7b6))
@@ -631,6 +659,21 @@ ROM_START(tinkerbl)
 
 	ROM_REGION(0x40000, "gals", 0)
 	ROM_LOAD("gal18v8a_315-5391.ic103", 0x000000, 0x040000, CRC(29480530) SHA1(d3d629fb4c2a4ae851f14b1d9e5b72b37b567f0b))
+ROM_END
+
+ROM_START( blicks )
+	ROM_REGION(0x100000, "maincpu", 0)
+	ROM_LOAD16_BYTE("epr-14163.ic8", 0x000000, 0x040000, CRC(19bc94fa) SHA1(b81a61394a853dda6ed157cfcb3cb40ecd103c3d) )
+	ROM_LOAD16_BYTE("epr-14165.ic7", 0x000001, 0x040000, CRC(61b8d395) SHA1(452b718d7ce9cbec913eeb6f2758e8dbecced6b1) )
+	ROM_LOAD16_BYTE("epr.14164.ic10", 0x080000, 0x040000, CRC(5d3ccf3b) SHA1(31db63c87bf8417d58ae829759d2014ef140e891))
+	ROM_LOAD16_BYTE("epr-14166.ic9", 0x080001, 0x040000, CRC(5e63db91) SHA1(1d754675a2ca9d4e945c314ce2a42e7ed86a9ecf) )
+
+	ROM_REGION(0x20000, "soundcpu", 0)
+	ROM_LOAD( "epr-14167.ic104", 0x000000, 0x020000, CRC(305a9afe) SHA1(5b27d50797c6048e92b86f3748dfff3c873bbf13) )
+
+	ROM_REGION(0x40000, "gals", 0)
+	ROM_LOAD( "gal18v8a_315-5391.ic103", 0x000000, 0x040000, CRC(29480530) SHA1(d3d629fb4c2a4ae851f14b1d9e5b72b37b567f0b) )
+	ROM_LOAD( "315-5391.jed", 0x000000, 0x00038e, CRC(9918d5c8) SHA1(2d599573c716ec840b98dff44c167a15117ba824) )
 ROM_END
 
 ROM_START( bingpty ) // 1994/05/01 string
@@ -663,26 +706,11 @@ ROM_START( carboule ) // 1992.01.31 string
 	// dumps of the X-Board part, and the LINK PCB are missing.
 ROM_END
 
-ROM_START( blicks )
-	ROM_REGION(0x100000, "maincpu", 0)
-	ROM_LOAD16_BYTE("epr-14163.ic8", 0x000000, 0x040000, CRC(19bc94fa) SHA1(b81a61394a853dda6ed157cfcb3cb40ecd103c3d) )
-	ROM_LOAD16_BYTE("epr-14165.ic7", 0x000001, 0x040000, CRC(61b8d395) SHA1(452b718d7ce9cbec913eeb6f2758e8dbecced6b1) )
-	ROM_LOAD16_BYTE("epr.14164.ic10", 0x080000, 0x040000, CRC(5d3ccf3b) SHA1(31db63c87bf8417d58ae829759d2014ef140e891))
-	ROM_LOAD16_BYTE("epr-14166.ic9", 0x080001, 0x040000, CRC(5e63db91) SHA1(1d754675a2ca9d4e945c314ce2a42e7ed86a9ecf) )
-
-	ROM_REGION(0x20000, "soundcpu", 0)
-	ROM_LOAD( "epr-14167.ic104", 0x000000, 0x020000, CRC(305a9afe) SHA1(5b27d50797c6048e92b86f3748dfff3c873bbf13) )
-
-	ROM_REGION(0x40000, "gals", 0)
-	ROM_LOAD( "gal18v8a_315-5391.ic103", 0x000000, 0x040000, CRC(29480530) SHA1(d3d629fb4c2a4ae851f14b1d9e5b72b37b567f0b) )
-	ROM_LOAD( "315-5391.jed", 0x000000, 0x00038e, CRC(9918d5c8) SHA1(2d599573c716ec840b98dff44c167a15117ba824) )
-ROM_END
-
 } // anonymous namespace
 
 // Standalone M1 games
 GAME(1990, tinkerbl, 0, m1base, tinkerbl, systemm1_state, empty_init, ROT0, "Sega", "Tinker Bell", MACHINE_NOT_WORKING)
-GAME(1990, blicks, 0, m1base, tinkerbl, systemm1_state, empty_init, ROT0, "Sega", "Blicks", MACHINE_NOT_WORKING)
+GAME(1990, blicks,   0, m1base, blicks,   systemm1_state, empty_init, ROT0, "Sega", "Blicks (Japan)", MACHINE_NOT_WORKING)
 
 // M1 comm multi-board games
 GAME(1994, bingpty,  0, m1comm, bingpty, systemm1_state, empty_init, ROT0, "Sega", "Bingo Party Multicart (Rev B) (M1 Satellite board)", MACHINE_NOT_WORKING)
