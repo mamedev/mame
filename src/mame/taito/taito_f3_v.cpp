@@ -8,7 +8,7 @@
 
 Brief overview:
 
-    4 scrolling layers (512x512 or 1024x512) of 4/5/6 bpp tiles.
+    4 scrolling layers (512x512 or 1024x512) of 4, 5, or 6 bpp tiles.
     1 scrolling text layer (512x512, characters generated in vram), 4bpp chars.
     1 scrolling pixel layer (512x256 pixels generated in pivot ram), 4bpp pixels.
     2 sprite banks (for double buffering of sprites)
@@ -31,10 +31,9 @@ Notes:
     priority and VRAM/pivot layers.
 
     However - at the start of line ram there are also sets of 256 values
-    controlling each effect - effects can be selectively applied to individual
-    playfields or only certain lines out of the 256 can be active - in which
-    case the last allowed value can be latched (typically used so a game can
-    use one zoom or row value over the whole playfield).
+    with bits controlling each effect subsection, which cause the last allowed
+    value to be latched (typically used so a game can use one zoom or row value
+    over the whole playfield).
 
     The programmers of some of these games made strange use of flipscreen -
     some games have all their graphics flipped in ROM, and use the flipscreen
@@ -49,91 +48,109 @@ Line ram memory map:
 
     Here 'playfield 1' refers to the first playfield in memory, etc
 
-    0x0000: Column line control ram (256 lines)
-        100x:   Where bit 0 of x enables effect on playfield 1
-                Where bit 1 of x enables effect on playfield 2
-                Where bit 2 of x enables effect on playfield 3
-                Where bit 3 of x enables effect on playfield 4
-    0x0200: Line control ram for 0x5000 section.
-    0x0400: Line control ram for 0x6000 section.
-        180x:   Where bit 0 of x latches sprite alpha value
-                Where bit 1 of x latches tilemap alpha value
-    0x0600: Sprite control ram
-        1c0x:   Where x enables sprite control word for that line
-    0x0800: Zoom line control ram (256 lines)
-        200x:   Where bit 0 of x enables effect on playfield 1
-                Where bit 1 of x enables effect on playfield 2
-                Where bit 2 of x enables effect on playfield 3
-                Where bit 3 of x enables effect on playfield 4
-    0x0a00: Palette add line control ram (256 lines)
-    0x0c00: Rowscroll line control ram (256 lines)
-        280x:   Where bit 0 of x enables effect on playfield 1
-                Where bit 1 of x enables effect on playfield 2
-                Where bit 2 of x enables effect on playfield 3
-                Where bit 3 of x enables effect on playfield 4
-    0x0e00: Priority line control ram (256 lines)
-        2c0x:   Where bit 0 of x enables effect on playfield 1
-                Where bit 1 of x enables effect on playfield 2
-                Where bit 2 of x enables effect on playfield 3
-                Where bit 3 of x enables effect on playfield 4
+  Line set ram: (one word per line, 256 lines per section)
+    Each enable bit corresponds to a subsection, e.g. bit 0 sets/latches
+    a line in 0x...000-1fe, bit 1 latches a line in 0x...200-3fe, etc.
+    Latch enable bits 4,5,6,7 for potential subsections or alternate
+    subsections 800,a00,c00,e00 are known to be enabled in rare cases
 
+    0x0000: Line set ram for 4000 (column scroll, alt tilemap, clip) section
+        100x
+    0x0200: Line set ram for 5000 (clip planes) section
+        140x
+    0x0400: Line set ram for 6000 (blending) section
+        180x
+    0x0600: Line set ram for 7000 (pivot and sprite layer mixing) section
+        1c0x
+    0x0800: Line set ram for 8000 (zoom) section
+        200x
+    0x0a00: Line set ram for 9000 (palette add) section
+        240x
+    0x0c00: Line set ram for a000 (row scroll) section
+        280x
+    0x0e00: Line set ram for b000 (playfield mixing info) section
+        2c0x
+
+  "Pivot port" (0x1000-2fff) has only one known used address.
     0x1000: Unknown control word?
         (usually 0x00f0; gseeker, spcinvdj, twinqix, puchicar set 0x0000)
 
-    0x4000: Column scroll & clipping info
+
+  Line data ram (8 sections, 4 normal subsections, 256 lines each):
+
+    0x4000: Column scroll (playfield 3/4) & clipping
       4400 Bits: RLrl --Ts ssss ssss
-        s = playfield 3 column scroll (0-511)
-        T = use alternate tilemap (+0x2000) - kirameki, kaiserkn, hthero
-        - = unused?
-        l = clip 0 left high bit
-        r = clip 0 right high bit
-        L = clip 1 left high bit
-        R = clip 1 right high bit
+          s = playfield 3 column scroll (0-511)
+          T = use alternate tilemap (+0x2000) - kirameki, kaiserkn, hthero
+          - = unused?
+          l = clip 0 left high bit
+          r = clip 0 right high bit
+          L = clip 1 left high bit
+          R = clip 1 right high bit
       4600: as 4400, for playfield 4 / clip plane 2 and 3
 
     0x5000: Clip plane 0 (low bits (high in 4400))
-    0x5200: Clip plane 1 (low bits (high in 4400))
-    0x5400: Clip plane 2 (low bits (high in 4600))
-    0x5600: Clip plane 3 (low bits (high in 4600))
+      5200: Clip plane 1 (low bits (high in 4400))
+      5400: Clip plane 2 (low bits (high in 4600))
+      5600: Clip plane 3 (low bits (high in 4600))
+        Bits:  rrrr rrrr llll llll
 
     0x6000: Sync register
-    0x6004: Sprite alpha control
+    0x6004: Sprite alpha control  (+ pivot-related bits?)
         0xff00: VRAM/Pixel layer control
+          Bits: B?p? o???
             0xa000 enables pixel layer for this line (Disables VRAM layer)
             0x2000 enables garbage pixels for this line (maybe another pixel bank?) [unemulated]
             0x0800 seems to set the vram layer to be opaque [unemulated]
             Effect of other bits is unknown.
-        0x00c0: Alpha mode for sprites with pri value 0x00
-        0x0030: Alpha mode for sprites with pri value 0x00
-        0x000c: Alpha mode for sprites with pri value 0x00
-        0x0003: Alpha mode for sprites with pri value 0x00
-    0x6200: Alpha blending control
+        0x00ff: Bits: DdCc BbAa
+        0x00ff: Bits: DdCc BbAa
+            Dd = Alpha mode for sprites with pri value 0xc0
+            Cc = Alpha mode for sprites with pri value 0x80
+            Bb = Alpha mode for sprites with pri value 0x40
+            Aa = Alpha mode for sprites with pri value 0x00
 
-    0x6400 - controls X zoom of tile - each tile collapses to 16 single colour lines
-        xxx1 - affects bottom playfield
-        xxx2 -
-        xxx4 -
-        xxx8 - affects top playfield
-        xxfx - x zoom - 0 = 1st pixel 16 times
-                        1 = 1st pixel 8, then 2nd 8
-                        8 = 2 per pixel
+    0x6200: Alpha blend values
+        Bits: AAAA BBBB CCCC DDDD
 
-        (these effects only known to be used on spcinvdj title screen and riding fight - not emulated)
+    0x6400: forward repeat [unemulated]
+        0x00ff: x repeat / mosaic - each tile collapses to 16 single colour lines [unemulated]
+          Bits: mmmm 4321
+            4321 = enable effect for respective playfield
+            mmmm = x repeat - 0 = repeat 1st pixel 16 times (sample every 16)
+                              1 = repeat 1st pixel 15 times (sample every 15)
+                              f = repeat 1st pixel  1 times (sample every pixel)
+            (spcinvdj title screen, riding fight)
 
+       0xff00: previous pixel response? and palette ram format?? [unemulated]
+        x1xx = ? (bubsymph, commandw, ridingf)
+        3xxx = ? (arabianm, ridingf)
+        4xxx = blend forward with next pixel on line (after layer mixing) (gseeker intro)
+        7xxx = ? (bubsymph, commandw)
+        (old comment:)
         1xxx = interpret palette ram for this playfield line as 15 bit and bilinear filter framebuffer(??)
         3xxx = interpret palette ram for this playfield line as 15 bit
         7xxx = interpret palette ram for this playfield line as 24 bit palette
         8xxx = interpret palette ram for this playfield line as 21 bit palette
 
-        (effect not emulated)
-
     0x6600: Background - background palette entry (under all tilemaps) (takes part in alpha blending)
 
         (effect not emulated)
 
-    0x7000: Pivot/vram layer enable
-    0x7200: Cram layer priority
-    0x7400: Sprite clipping (like playfield priority clip bits but shifted)
+    0x7000: Pivot/vram layer enable ? [unemulated?]
+        0x0001 - ? (pbobble4)
+        0x00ff - ? (quizhuhu)
+        0xc000 - ? (commandw, ridingf)
+    0x7200: VRAM layer mixing info (incl. priority)
+        Bits: BAEI cccc iiii pppp  (see 0xb000)
+    0x7400: Sprite mixing info (without priority, like playfield priority clip bits but shifted)
+        Bits: ???? ??EI cccc iiii  (see 0xb000)
+              ^^^^ ^ set by arabianm, bubsymph, bubblem, cleopatr, commandw, cupfinal, gseeker, spcinv95, twinqix
+              ||||
+              |||| 0x1000 enable brightness for sprite prio group 0x00 ?
+              ||| 0x2000 enable brightness for sprite prio group 0x40 ? (see puchicar vs win/loss)
+              || 0x4000 enable brightness for sprite prio group 0x80 ? (see puchicar vs win/loss)
+              | 0x8000 enable brightness for sprite prio group 0xc0 ? (see puchicar vs win/loss)
     0x7600: Sprite priority values
         0xf000: Relative priority for sprites with pri value 0xc0
         0x0f00: Relative priority for sprites with pri value 0x80
@@ -151,27 +168,27 @@ Line ram memory map:
         expect playfield 4 y zoom to be and vice versa.
 
     0x9000: Palette add (can affect opacity)
+      9200: Playfield 2 palette add
+      9400: Playfield 2 palette add
+      9600: Playfield 2 palette add
 
     0xa000: Playfield 1 rowscroll (1 word per line, 256 lines)
-    0xa200: Playfield 2 rowscroll
-    0xa400: Playfield 3 rowscroll
-    0xa600: Playfield 4 rowscroll
+      a200: Playfield 2 rowscroll
+      a400: Playfield 3 rowscroll
+      a600: Playfield 4 rowscroll
 
-    0xb000: Playfield 1 priority (1 word per line, 256 lines)
-    0xb200: Playfield 2 priority
-    0xb400: Playfield 3 priority
-    0xb600: Playfield 4 priority
-        0x000f = Layer priority
-        0x0010 = Clip inverse mode for plane 0
-        0x0020 = Clip inverse mode for plane 1
-        0x0040 = Clip inverse mode for plane 2
-        0x0080 = Clip inverse mode for plane 3
-        0x0100 = If set enable clip plane 0
-        0x0200 = If set enable clip plane 1
-        0x0400 = If set enable clip plane 2
-        0x0800 = If set enable clip plane 3
-        0x1000 = Affects interpretation of inverse mode bits. If on, 1 = invert. if off, 0 = invert.
-        0xe000 = Blend mode, 0x3000 = Normal, 0x7000 = Alpha A, 0xb000 = Alpha B, others disable line
+    0xb000: Playfield 1 mixing info (layer compositing information)
+      b200: Playfield 2 mixing info
+      b400: Playfield 3 mixing info
+      b600: Playfield 4 mixing info
+        Bits: BAEI cccc iiii pppp
+          p = Layer priority
+          i = Clip inverse mode for corresponding plane
+          c = If set, enable corresponding clip plane
+          I = Affects interpretation of inverse mode bits. if on, 1 = invert. if off, 0 = invert.
+          E = Enable line
+          A = Blend alpha mode A (?)
+          B = Blend alpha mode B (?)
 
     0xc000 - 0xffff: Unused.
 
@@ -184,15 +201,22 @@ Line ram memory map:
     Word 0: 0xffff      Tile number (LSB)
     Word 1: 0xff00      X zoom
             0x00ff      Y zoom
-    Word 2: 0x03ff      X position
-    Word 3: 0x03ff      Y position
-    Word 4: 0xf000      Sprite block controls
-            0x0800      Sprite block start
-            0x0400      Use same colour on this sprite as block start
+    Word 2: 0x0fff      X position (12 bits signed)
+    Word 3: 0x0fff      Y position (12 bits signed)
+    Word 4: 0xf000      Sprite block position controls 
+            0x0800      Is child
+            0x0400      Reuse prev color
             0x0200      Y flip
             0x0100      X flip
             0x00ff      Colour
-    Word 5: 0xffff      Tile number (MSB), probably only low bits used
+    Word 5: 0xc000      ? Unknown/unused?
+            0x2000      Flipscreen...?
+            0x1000      Sprite is disabled? (check Riding Fight)
+            0x0c00      ? Unknown/unused?
+            0x0300      Extra planes enable (00 = 4bpp, 01 = 5bpp, 11 = 6bpp)
+            0x00fc      ? Unknown/unused?
+            0x0002      Set during darius gaiden sprite trails (disable unblitting?)
+            0x0001      Tile number (MSB/bankswitch)
     Word 6: 0x8000      If set, jump to sprite location in low bits
             0x03ff      Location to jump to.
     Word 7: 0xffff      Unused?  Always zero?
@@ -225,6 +249,7 @@ Playfield tile info:
 #include "render.h"
 
 #include <algorithm>
+#include <variant>
 
 #define VERBOSE 0
 #define DARIUSG_KLUDGE
@@ -453,6 +478,7 @@ void taito_f3_state::video_start()
 
 	m_spritelist = nullptr;
 	m_spriteram16_buffered = nullptr;
+	m_line_inf = nullptr;
 	m_pf_line_inf = nullptr;
 	m_tile_opaque_sp = nullptr;
 
@@ -528,6 +554,7 @@ void taito_f3_state::video_start()
 	m_sprite_end = &m_spritelist[0];
 	m_vram_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taito_f3_state::get_tile_info_text)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_pixel_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taito_f3_state::get_tile_info_pixel)), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
+	m_line_inf = std::make_unique<f3_line_inf[]>(256);
 	m_pf_line_inf = std::make_unique<f3_playfield_line_inf[]>(5);
 	m_sa_line_inf = std::make_unique<f3_spritealpha_line_inf[]>(1);
 	m_screen->register_screen_bitmap(m_pri_alp_bitmap);
@@ -700,29 +727,6 @@ u16 taito_f3_state::lineram_r(offs_t offset)
 
 void taito_f3_state::lineram_w(offs_t offset, u16 data, u16 mem_mask)
 {
-#if 0
-	/* DariusGX has an interesting bug at the start of Round D - the clearing of lineram
-	(0xa000->0x0xa7ff) overflows into priority RAM (0xb000) and creates garbage priority
-	values.  I'm not sure what the real machine would do with these values, and this
-	emulation certainly doesn't like it, so I've chosen to catch the bug here, and prevent
-	the trashing of priority ram.  If anyone has information on what the real machine does,
-	please let me know! */
-	/* Update: this doesn't seem to occur anymore, I'll leave this snippet in but commented out.
-	 *         fwiw PC=0x1768a0/0x1768a4 is where the game clears lineram in round D, which is a
-	 *         move.w Dn, (An,D7.w*2) , a kind of opcode that could've been bugged back then.
-	 */
-	if (m_game == DARIUSG)
-	{
-		if (m_f3_skip_this_frame)
-			return;
-		if (offset == 0xb000 / 2 && data == 0x003f)
-		{
-			m_f3_skip_this_frame = 1;
-			return;
-		}
-	}
-#endif
-
 	COMBINE_DATA(&m_line_ram[offset]);
 }
 
@@ -1285,7 +1289,7 @@ void taito_f3_state::culc_pixmap_pointer(int skip_layer_num)
 }
 
 #define UPDATE_PIXMAP_SP(pf_num) \
-	if (cx >= clip_als && cx < clip_ars && !(cx >= clip_bls && cx < clip_brs)) \
+	if (cx > clip_als && cx < clip_ars && !(cx > clip_bls && cx < clip_brs)) \
 	{ \
 		sprite_pri = sprite[pf_num] & m_pval; \
 		if (sprite_pri) \
@@ -1301,7 +1305,7 @@ void taito_f3_state::culc_pixmap_pointer(int skip_layer_num)
 	}
 
 #define UPDATE_PIXMAP_LP(pf_num) \
-	if (cx >= m_clip_al[pf_num] && cx < m_clip_ar[pf_num] && !(cx >= m_clip_bl[pf_num] && cx < m_clip_br[pf_num])) \
+	if (cx > m_clip_al[pf_num] && cx < m_clip_ar[pf_num] && !(cx > m_clip_bl[pf_num] && cx < m_clip_br[pf_num])) \
 	{ \
 		m_tval = *m_tsrc[pf_num]; \
 		if (m_tval & 0xf0) \
@@ -1535,6 +1539,288 @@ void taito_f3_state::calculate_clip(int y, u16 pri, u32 &clip_in, u32 &clip_ex, 
 		clip_ex = clipl | (clipr << 16);
 }
 
+// line: [latched] line info from previous call, will modify in-place
+// y should be called 0->255 for non-flipscreen, 255->0 for flipscreen
+void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
+{
+	const auto this_line = [=] (unsigned section)
+	{
+		return m_line_ram[section/2 + y];
+	};
+	// 4000 **********************************
+	if (this_line(0x000) & 4) {
+		u16 line_4400 = this_line(0x4400);
+		line.pf[2].colscroll   = line_4400 & 0x1ff;
+		line.pf[2].alt_tilemap = line_4400 & 0x200;
+		line.clip[0].set_upper(BIT(line_4400, 12), BIT(line_4400, 13));
+		line.clip[1].set_upper(BIT(line_4400, 14), BIT(line_4400, 15));
+	}
+	if (this_line(0x000) & 8) {
+		u16 line_4600 = this_line(0x4600);
+		line.pf[3].colscroll   = line_4600 & 0x1ff;
+		line.pf[3].alt_tilemap = line_4600 & 0x200;
+		line.clip[2].set_upper(BIT(line_4600, 12), BIT(line_4600, 13));
+		line.clip[3].set_upper(BIT(line_4600, 14), BIT(line_4600, 15));
+	}
+
+	// 5000 **********************************
+	// renderer needs to adjust by -48
+	if (this_line(0x200) & 1) {
+		u16 clip0_lows = this_line(0x5000);
+		line.clip[0].set_lower(BIT(clip0_lows, 0, 8), BIT(clip0_lows, 8, 8));
+	}
+	if (this_line(0x200) & 2) {
+		u16 clip1_lows = this_line(0x5200);
+		line.clip[1].set_lower(BIT(clip1_lows, 0, 8), BIT(clip1_lows, 8, 8));
+	}
+	if (this_line(0x200) & 4) {
+		u16 clip2_lows = this_line(0x5400);
+		line.clip[2].set_lower(BIT(clip2_lows, 0, 8), BIT(clip2_lows, 8, 8));
+	}
+	if (this_line(0x200) & 8) {
+		u16 clip3_lows = this_line(0x5600);
+		line.clip[3].set_lower(BIT(clip3_lows, 0, 8), BIT(clip3_lows, 8, 8));
+	}
+
+	// 6000 **********************************
+	if (this_line(0x400) & 1) {
+		// first value is sync register, special handling unnecessary?
+		u16 line_6000 = this_line(0x6000);
+
+		line.pivot.pivot_control = BIT(line_6000, 8, 8);
+		if (line.pivot.pivot_control & 0b01010111) // check if unknown pivot control bits set
+			logerror("unknown pivot ctrl bits: %02x__ at %04x\n", line.pivot.pivot_control, 0x6000 + y*2);
+
+		for (int sp_group = 0; sp_group < NUM_SPRITEGROUPS; sp_group++) {
+			line.sp[sp_group].mix_value = (line.sp[sp_group].mix_value & 0x3fff)
+				| BIT(line_6000, sp_group * 2, 2) << 14;
+		}
+	}
+	if (this_line(0x400) & 2) {
+		line.blend = this_line(0x6200);
+	}
+	if (this_line(0x400) & 4) {
+		u16 x_mosaic = this_line(0x6400);
+
+		for (int pf_num = 0; pf_num < NUM_PLAYFIELDS; pf_num++)
+			line.pf[pf_num].x_sample_enable = BIT(x_mosaic, pf_num);
+
+		line.x_sample = (x_mosaic & 0xf0) >> 4;
+
+		line.fx_6400 = (x_mosaic & 0xff00) >> 8;
+		if (line.fx_6400 && line.fx_6400 != 0x70) // check if unknown effect bits set
+			logerror("unknown fx bits: %02x__ at %04x\n", line.fx_6400, 0x6400 + y*2);
+	}
+	if (this_line(0x400) & 8) {
+		line.bg_palette = this_line(0x6600);
+	}
+	// bubblem writes these seemingly intentionally
+	if (this_line(0x400) & 0x10) {
+		u16 line_6800 = this_line(0x6800);
+		if (line_6800) // check if mystery subsection 6800 used
+			logerror("mystery subsection 6800: %04x at %04x\n", line_6800, 0x6800 + y*2);
+	}
+	if (this_line(0x400) & 0x20) {
+		u16 line_6a00 = this_line(0x6a00);
+		if (line_6a00) // check if mystery subsection 6a00 used
+			logerror("mystery subsection 6a00: %04x at %04x\n", line_6a00, 0x6a00 + y*2);
+	}
+
+	// 7000 **********************************
+	if (this_line(0x600) & 1) {
+		u16 line_7000 = this_line(0x7000);
+		line.pivot.pivot_enable = line_7000;
+		if (line_7000) // check if confusing pivot enable bits are set
+			logerror("unknown 'pivot enable' bits: %04x at %04x\n", line_7000, 0x7000 + y*2);
+	}
+	if (this_line(0x600) & 2) {
+		line.pivot.mix_value = this_line(0x7200);
+	}
+	if (this_line(0x600) & 4) {
+		u16 sprite_mix = this_line(0x7400);
+		for (int group = 0; group < NUM_SPRITEGROUPS; group++) {
+			// watch out for blend bit combine bugs here
+			line.sp[group].mix_value = (line.sp[group].mix_value & 0xc00f)
+				| sprite_mix << 4;
+			line.sp[group].brightness = BIT(sprite_mix, 12 + group, 1);
+		}
+	}
+	if (this_line(0x600) & 8) {
+		u16 sprite_prio = this_line(0x7600);
+		for (int group = 0; group < NUM_SPRITEGROUPS; group++) {
+			line.sp[group].mix_value = (line.sp[group].mix_value & 0xfff0)
+				| BIT(sprite_prio, group * 4, 4);
+		}
+	}
+
+	if (this_line(0x600) & 0x10) {
+		u16 line_7800 = this_line(0x7800);
+		if (line_7800) // check if mystery subsection 6800 used
+			logerror("mystery subsection 7800: %04x at %04x\n", line_7800, 0x7800 + y*2);
+	}
+	if (this_line(0x600) & 0x20) {
+		u16 line_7a00 = this_line(0x7a00);
+		if (line_7a00) // check if mystery subsection 6a00 used
+			logerror("mystery subsection 7a00: %04x at %04x\n", line_7a00, 0x7a00 + y*2);
+	}
+
+	// 8000 **********************************
+	// TODO: ignore first scaling offset, somewhere
+	if (this_line(0x800) & 1) {
+		u16 pf0x0y_scale = this_line(0x8000);
+		line.pf[0].x_scale = BIT(pf0x0y_scale, 8, 8);
+		line.pf[0].y_scale = BIT(pf0x0y_scale, 0, 8);
+	}
+	if (this_line(0x800) & 2) {
+		u16 pf1x3y_scale = this_line(0x8200);
+		line.pf[1].x_scale = BIT(pf1x3y_scale, 8, 8);
+		line.pf[3].y_scale = BIT(pf1x3y_scale, 0, 8);
+	}
+	if (this_line(0x800) & 4) {
+		u16 pf2x2y_scale = this_line(0x8400);
+		line.pf[2].x_scale = BIT(pf2x2y_scale, 8, 8);
+		line.pf[2].y_scale = BIT(pf2x2y_scale, 0, 8);
+	}
+	if (this_line(0x800) & 8) {
+		u16 pf3x1y_scale = this_line(0x8600);
+		line.pf[3].x_scale = BIT(pf3x1y_scale, 8, 8);
+		line.pf[1].y_scale = BIT(pf3x1y_scale, 0, 8);
+	}
+
+	// 9000 **********************************
+	if (this_line(0xa00) & 1) {
+		u16 pf1_pal_add = this_line(0x9000);
+		line.pf[0].pal_add = pf1_pal_add * 16;
+	}
+	if (this_line(0xa00) & 2) {
+		u16 pf2_pal_add = this_line(0x9200);
+		line.pf[1].pal_add = pf2_pal_add * 16;
+	}
+	if (this_line(0xa00) & 4) {
+		u16 pf3_pal_add = this_line(0x9400);
+		line.pf[2].pal_add = pf3_pal_add * 16;
+	}
+	if (this_line(0xa00) & 8) {
+		u16 pf4_pal_add = this_line(0x9600);
+		line.pf[3].pal_add = pf4_pal_add * 16;
+	}
+
+	// A000 **********************************
+	if (this_line(0xc00) & 1) {
+		u16 pf1_rowscroll = this_line(0xa000);
+		line.pf[0].rowscroll = pf1_rowscroll << 10;
+	}
+	if (this_line(0xc00) & 2) {
+		u16 pf2_rowscroll = this_line(0xa200);
+		line.pf[1].rowscroll = pf2_rowscroll << 10;
+	}
+	if (this_line(0xc00) & 4) {
+		u16 pf3_rowscroll = this_line(0xa400);
+		line.pf[2].rowscroll = pf3_rowscroll << 10;
+	}
+	if (this_line(0xc00) & 8) {
+		u16 pf4_rowscroll = this_line(0xa600);
+		line.pf[3].rowscroll = pf4_rowscroll << 10;
+	}
+	// why is this shift here ... _x_offset is 16.16
+	// but then the lineram word must be 10.6 ?
+	// i think to conform to the layer scroll regs which are 16.16
+
+
+	// B000 **********************************
+	if (this_line(0xe00) & 1) {
+		line.pf[0].mix_value = this_line(0xb000);
+	}
+	if (this_line(0xe00) & 2) {
+		line.pf[1].mix_value = this_line(0xb200);
+	}
+	if (this_line(0xe00) & 4) {
+		line.pf[2].mix_value = this_line(0xb400);
+	}
+	if (this_line(0xe00) & 8) {
+		line.pf[3].mix_value = this_line(0xb600);
+	}
+}
+
+
+void taito_f3_state::sprite_inf::draw(u32* dst, int y, int x)
+{
+	u32 col = srcbitmap.pix(y, x);
+	if (col)
+		printf("%04x ", col);
+	*dst = srcbitmap.pix(y, x);
+}
+
+void taito_f3_state::scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	int y_start, y_end, y_inc; // actual start and end, not same-efx grouping
+	if (m_flipscreen) {
+		y_start = 255;
+		y_end = -1;
+		y_inc = -1;
+	} else {
+		y_start = 0;
+		y_end = 256;
+		y_inc = 1;
+	}
+
+	f3_line_inf line_data{};
+	bitmap_rgb32 sp[NUM_SPRITEGROUPS] =	{
+		bitmap_rgb32(bitmap.width(), bitmap.height()),
+		bitmap_rgb32(bitmap.width(), bitmap.height()),
+		bitmap_rgb32(bitmap.width(), bitmap.height()),
+		bitmap_rgb32(bitmap.width(), bitmap.height())
+	};
+
+	{
+		const tempsprite *sprite_ptr;
+		gfx_element *sprite_gfx = m_gfxdecode->gfx(2);
+
+		sprite_ptr = m_sprite_end;
+		while (sprite_ptr != &m_spritelist[0])
+			{
+				sprite_ptr--;
+				const u8 pri = sprite_ptr->pri;
+
+				f3_drawgfx(
+						   sp[pri], cliprect, sprite_gfx,
+						   sprite_ptr->code,
+						   sprite_ptr->color & (~m_sprite_extra_planes),
+						   sprite_ptr->flipx, sprite_ptr->flipy,
+						   sprite_ptr->x, sprite_ptr->y,
+						   sprite_ptr->zoomx, sprite_ptr->zoomy,
+						   pri);
+			}
+	}
+
+	for (int y = y_start; y != y_end; y += y_inc) {
+		read_line_ram(line_data, y);
+
+		std::array<mixable, NUM_SPRITEGROUPS + NUM_TILEMAPS> layers = {
+			line_data.sp[3], line_data.sp[2], line_data.sp[1], line_data.sp[0],
+			line_data.pivot,
+			line_data.pf[3], line_data.pf[2], line_data.pf[1], line_data.pf[0]
+		};
+		std::stable_sort(layers.begin(), layers.end(),
+						 [](auto a, auto b){ return a < b; });
+
+		for (int x = 46; x < 46 + 320; ++x) {
+			if (sp[0].pix(y,x))
+				bitmap.pix(y,x) = sp[0].pix(y,x);
+			if (sp[1].pix(y,x))
+				bitmap.pix(y,x) = sp[1].pix(y,x);
+			if (sp[2].pix(y,x))
+				bitmap.pix(y,x) = sp[2].pix(y,x);
+			if (sp[3].pix(y,x))
+				bitmap.pix(y,x) = sp[3].pix(y,x);
+			//for (auto gfx : layers) {
+				//gfx.draw(&bitmap.pix(y, x), y, x);
+			//}
+		}
+	}
+}
+
+
 void taito_f3_state::get_spritealphaclip_info()
 {
 	f3_spritealpha_line_inf *line_t = &m_sa_line_inf[0];
@@ -1604,13 +1890,13 @@ void taito_f3_state::get_spritealphaclip_info()
 		line_t->alpha_level[y] = alpha_level;
 		line_t->spri[y] = spri;
 		line_t->sprite_alpha[y] = sprite_alpha;
-		line_t->clip_l[0][y] = ((clip0_low & 0xff) | ((clip0_high & 0x1000) >> 4)) - 47;
+		line_t->clip_l[0][y] = ((clip0_low & 0xff) | ((clip0_high & 0x1000) >> 4)) - 48;
 		line_t->clip_r[0][y] = (((clip0_low & 0xff00) >> 8) | ((clip0_high & 0x2000) >> 5)) - 48;
-		line_t->clip_l[1][y] = ((clip1_low & 0xff) | ((clip0_high & 0x4000) >> 6)) - 47;
+		line_t->clip_l[1][y] = ((clip1_low & 0xff) | ((clip0_high & 0x4000) >> 6)) - 48;
 		line_t->clip_r[1][y] = (((clip1_low & 0xff00) >> 8) | ((clip0_high & 0x8000) >> 7)) - 48;
-		line_t->clip_l[2][y] = ((clip2_low & 0xff) | ((clip2_high & 0x1000) >> 4)) - 47;
+		line_t->clip_l[2][y] = ((clip2_low & 0xff) | ((clip2_high & 0x1000) >> 4)) - 48;
 		line_t->clip_r[2][y] = (((clip2_low & 0xff00) >> 8) | ((clip2_high & 0x2000) >> 5)) - 48;
-		line_t->clip_l[3][y] = ((clip3_low & 0xff) | ((clip2_high & 0x4000) >> 6)) - 47;
+		line_t->clip_l[3][y] = ((clip3_low & 0xff) | ((clip2_high & 0x4000) >> 6)) - 48;
 		line_t->clip_r[3][y] = (((clip3_low & 0xff00) >> 8) | ((clip2_high & 0x8000) >> 7)) - 48;
 		if (line_t->clip_l[0][y] < 0) line_t->clip_l[0][y] = 0;
 		if (line_t->clip_r[0][y] < 0) line_t->clip_r[0][y] = 0;
@@ -2522,6 +2808,23 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 			                     Notice that sprites also completely disappear due of a bug/missing feature in the
 			             alpha routines.
 			*/
+			// 0x0001 - bank select
+			// 0x0002 - ?sprites trail/don't unblit?
+			// 0x0004 - ?
+			// 0x0008 - ?
+			// 0x0010 - ?
+			// 0x0020 - ?
+			// 0x0040 - ?
+			// 0x0080 - ?
+			// 0x0300 - extra plane enable
+			// 0x0c00 - ??
+			// 0x1000 - ?disabled?
+			// 0x2000 - flipscreen
+			// 0x4000 - ?
+			// 0x8000 - ?
+			if (cntrl & 0xdcfc)
+				logerror("unknown spriteram ctrl bits: %04x at %06x\n",
+						 cntrl & 0xdcfc, 0x600000 + current_offs + 4 + 1);
 
 			m_sprite_extra_planes = (cntrl & 0x0300) >> 8;   // 0 = 4bpp, 1 = 5bpp, 2 = unused?, 3 = 6bpp
 			m_sprite_pen_mask = (m_sprite_extra_planes << 4) | 0x0f;
@@ -2824,6 +3127,7 @@ u32 taito_f3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 		sy_fix[4] = -sy_fix[4];
 	}
 
+	bitmap.fill(0, cliprect);
 	m_pri_alp_bitmap.fill(0, cliprect);
 
 	/* sprites */
@@ -2831,7 +3135,7 @@ u32 taito_f3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 		get_sprite_info(m_spriteram.target());
 
 	/* Update sprite buffer */
-	draw_sprites(bitmap, cliprect);
+	//draw_sprites(bitmap, cliprect);
 
 	/* Parse sprite, alpha & clipping parts of lineram */
 	get_spritealphaclip_info();
@@ -2844,7 +3148,8 @@ u32 taito_f3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	get_vram_info(m_vram_layer, m_pixel_layer, sx_fix[4], sy_fix[4]);
 
 	/* Draw final framebuffer */
-	scanline_draw(bitmap, cliprect);
+	//scanline_draw(bitmap, cliprect);
+	scanline_draw_TWO(bitmap, cliprect);
 
 	if (VERBOSE)
 		print_debug_info(bitmap);

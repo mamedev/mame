@@ -12,6 +12,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
+#include <bitset>
 
 class taito_f3_state : public driver_device
 {
@@ -177,6 +178,98 @@ protected:
 		u8 pri = 0;
 	};
 
+	static const int NUM_PLAYFIELDS = 4;
+	static const int NUM_TILEMAPS = 5;
+	static const int NUM_SPRITEGROUPS = 4; // high 2 bits of color
+	static const int NUM_CLIPPLANES = 4;
+	typedef struct {
+		u16 l;
+		u16 r;
+		auto set_upper(u8 left, u8 right) {
+			l = (l & 0xff) | left<<8;
+			r = (r & 0xff) | right<<8;
+			return this;
+		}
+		auto set_lower(u8 left, u8 right) {
+			l = (l & 0x100) | left;
+			r = (r & 0x100) | right;
+			return this;
+		}
+	} clip_plane_inf;
+
+	typedef struct mixable {// layer compositing information
+		u16 mix_value;
+		u8 prio() const { return mix_value & 0x000f; };
+		auto clip_inv() const { return std::bitset<4>(mix_value >> 4); };
+		auto clip_enable() const { return std::bitset<4>(mix_value >> 8); };
+		bool clip_inv_mode() const { return mix_value & 0x1000; };
+		bool layer_enable() const { return mix_value & 0x2000; };
+		bool blend_a() const { return mix_value & 0x4000; };
+		bool blend_b() const  { return mix_value & 0x8000; };
+
+		inline bool operator<(const mixable& rhs) const noexcept { return this->prio() < rhs.prio(); };
+		inline bool operator>(const mixable& rhs) const noexcept { return this->prio() > rhs.prio(); };
+		virtual void draw(u32* dst, int x, int y) {};
+	} mixable;
+
+	typedef struct : mixable {
+		// alpha mode in 6000
+		// line enable, clip settings in 7400
+		// priority in 7600
+
+		// TODO: change to ind16 when rewriting draw_sprites
+		bitmap_rgb32 srcbitmap{};
+
+		bool brightness; // 7400 0xf000
+		void draw(u32* dst, int x, int y) override;
+	} sprite_inf;
+
+	typedef struct : mixable {
+		bitmap_ind16* srcbitmap_pixel;
+		bitmap_ind8*  flagsbitmap_pixel;
+		bitmap_ind16* srcbitmap_vram;
+		bitmap_ind8*  flagsbitmap_vram;
+
+		u8 pivot_control; // 6000
+		u16 pivot_enable; // 7000
+		// mix info from 7200
+		bool use_pix() const { return pivot_control & 0xa0; };
+	} pivot_inf;
+
+	typedef struct : mixable {
+		bitmap_ind16* srcbitmap;
+		bitmap_ind8*  flagsbitmap;
+
+		int colscroll;        // 4000
+		bool alt_tilemap;     // 4000
+		bool x_sample_enable; // 6400 x_sample_mask
+		u8 x_scale;           // 8000
+		u8 y_scale;           // 8000
+		u16 pal_add;          // 9000
+		u16 rowscroll;        // a000
+	} playfield_inf;
+
+	typedef struct f3_line_inf {
+		// 5000/4000
+		clip_plane_inf clip[NUM_CLIPPLANES];
+		// 6000 - don't store sync reg ?
+		// pivot_control, sprite alpha
+		// 6200 - define this type better
+		u16 blend;
+		// 6400
+		u8 x_sample; // mosaic effect
+		u8 fx_6400; // unemulated other effects
+		// 6600
+		u16 bg_palette; // unemulated, needs investigation, bad name?
+		// 7000
+		// pivot_enable here // what is in this word?
+		// 7200
+		pivot_inf pivot;
+		sprite_inf sp[NUM_SPRITEGROUPS];
+		playfield_inf pf[NUM_PLAYFIELDS];
+	} f3_line_inf;
+
+
 	struct f3_playfield_line_inf
 	{
 		u8 alpha_mode[256]{};
@@ -276,6 +369,7 @@ protected:
 	u16 m_pal_add[5]{};
 	std::unique_ptr<tempsprite[]> m_spritelist;
 	const tempsprite *m_sprite_end = nullptr;
+	std::unique_ptr<f3_line_inf[]> m_line_inf;
 	std::unique_ptr<f3_playfield_line_inf[]> m_pf_line_inf;
 	std::unique_ptr<f3_spritealpha_line_inf[]> m_sa_line_inf;
 	const F3config *m_game_config = nullptr;
@@ -373,10 +467,12 @@ protected:
 	void draw_scanlines(bitmap_rgb32 &bitmap, int xsize, s16 *draw_line_num, const f3_playfield_line_inf **line_t, const u8 *sprite, u32 orient, int skip_layer_num);
 	void visible_tile_check(f3_playfield_line_inf *line_t, int line, u32 x_index_fx, u32 y_index, const u16 *pf_data_n);
 	void calculate_clip(int y, u16 pri, u32 &clip_in, u32 &clip_ex, u8 &line_enable);
+	void read_line_ram(f3_line_inf &line, int y);
 	void get_spritealphaclip_info();
 	void get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos, const u16 *pf_data_n);
 	void get_vram_info(tilemap_t *vram_tilemap, tilemap_t *pixel_tilemap, int sx, int sy);
 	void scanline_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
 	optional_device<taito_en_device> m_taito_en;
