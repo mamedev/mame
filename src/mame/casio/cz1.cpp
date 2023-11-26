@@ -594,7 +594,7 @@ void cz1_state::main_pb_w(u8 data)
 	if (BIT(data ^ m_main_port[1], 2))
 		m_subcpu->set_input_line(UPD7810_INTF1, BIT(data, 2));
 
-	if (!BIT(data, 6) && BIT(m_main_port[1], 6) && !BIT(m_main_port[2], 2))
+	if (BIT(data, 4) && !BIT(m_main_port[1], 4) && BIT(m_main_port[1], 6))
 		m_cart->write(m_cart_addr, m_main_port[0]);
 
 	m_hd44780->e_w(BIT(~data, 7));
