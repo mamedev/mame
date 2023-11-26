@@ -19,8 +19,6 @@
       - 49/50 row mode only shows half the screen.
       - In 49/50 row mode, character descenders are cut off.
       - Screen saver does not disable the screen
-    - With superset slot option
-      - Screensaver freezes the screen instead of blanking the screen
 
 ****************************************************************************/
 /***************************************************************************
@@ -873,6 +871,7 @@ ROM_START( h19 )
 	ROM_LOAD( "2716_444-37_h19keyb.u445", 0x0000, 0x0800, CRC(5c3e6972) SHA1(df49ce64ae48652346a91648c58178a34fb37d3c))
 ROM_END
 
+
 ROM_START( super19 )
 	// Super-19 ROM
 	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASEFF )
@@ -886,6 +885,7 @@ ROM_START( super19 )
 	ROM_REGION( 0x0800, "keyboard", 0 )
 	ROM_LOAD( "2716_444-37_h19keyb.u445", 0x0000, 0x0800, CRC(5c3e6972) SHA1(df49ce64ae48652346a91648c58178a34fb37d3c))
 ROM_END
+
 
 ROM_START( superset )
 	// SuperSet ROM
@@ -904,6 +904,7 @@ ROM_START( superset )
 	ROM_REGION( 0x0800, "keyboard", 0 )
 	ROM_LOAD( "2716_101-422_superset_kbd.u445", 0x0000, 0x0800, CRC(549d15b3) SHA1(981962e5e05bbdc5a66b0e86870853ce5596e877))
 ROM_END
+
 
 ROM_START( watz19 )
 	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASEFF )
@@ -925,6 +926,7 @@ ROM_START( watz19 )
 	ROM_LOAD( "keybd.u445", 0x0000, 0x0800, CRC(58dc8217) SHA1(1b23705290bdf9fc6342065c6a528c04bff67b13))
 ROM_END
 
+
 ROM_START( ultra19 )
 	// Ultra ROM
 	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASEFF )
@@ -938,6 +940,7 @@ ROM_START( ultra19 )
 	ROM_REGION( 0x0800, "keyboard", 0 )
 	ROM_LOAD( "2716_h19_ultra_keyboard.u445", 0x0000, 0x0800, CRC(76130c92) SHA1(ca39c602af48505139d2750a084b5f8f0e662ff7))
 ROM_END
+
 
 ROM_START( gp19 )
 	// GP-19 ROMs
@@ -954,6 +957,7 @@ ROM_START( gp19 )
 	ROM_REGION( 0x0800, "keyboard", 0 )
 	ROM_LOAD( "2716_444-37_h19keyb.u445", 0x0000, 0x0800, CRC(5c3e6972) SHA1(df49ce64ae48652346a91648c58178a34fb37d3c))
 ROM_END
+
 
 ROM_START( imaginator )
 	// Program code
@@ -1096,6 +1100,7 @@ ioport_constructor heath_super19_tlb_device::device_input_ports() const
 	return INPUT_PORTS_NAME(super19);
 }
 
+
 /**
  * Superset ROM
  *
@@ -1119,6 +1124,7 @@ void heath_superset_tlb_device::device_add_mconfig(machine_config &config)
 	// per line updates are needed for onscreen menu to display properly
 	m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);
 
+	m_crtc->set_begin_update_callback(FUNC(heath_superset_tlb_device::crtc_begin_update));
 	m_crtc->set_update_row_callback(FUNC(heath_superset_tlb_device::crtc_update_row));
 
 	// link up the serial port outputs to font chip.
@@ -1179,6 +1185,11 @@ void heath_superset_tlb_device::crtc_reg_w(offs_t reg, uint8_t val)
 	m_reverse_video_disabled = bool(BIT(reg, 3));
 
 	heath_tlb_device::crtc_reg_w(reg, val);
+}
+
+MC6845_BEGIN_UPDATE(heath_superset_tlb_device::crtc_begin_update)
+{
+	bitmap.fill(rgb_t::black(), cliprect);
 }
 
 MC6845_UPDATE_ROW(heath_superset_tlb_device::crtc_update_row)
@@ -1243,6 +1254,7 @@ void heath_superset_tlb_device::out2_internal(int data)
 	m_selected_char_set = (m_selected_char_set & 0x0a) | (data & 0x01);
 }
 
+
 /**
  * Watzman ROM
  *
@@ -1262,6 +1274,7 @@ ioport_constructor heath_watz_tlb_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(watz19);
 }
+
 
 /**
  * UltraROM
@@ -1300,6 +1313,7 @@ ioport_constructor heath_ultra_tlb_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(ultra19);
 }
+
 
 /**
  * Northwest Digital Systems GP-19 add-in board
@@ -1396,7 +1410,6 @@ void heath_gp19_tlb_device::latch_u5_w(uint8_t data)
 		m_crtc->set_clock(GP19_DOT_CLOCK_2 / 8);
 	}
 }
-
 
 MC6845_UPDATE_ROW(heath_gp19_tlb_device::crtc_update_row)
 {
