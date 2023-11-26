@@ -14,9 +14,9 @@
        For 5V power, Frequency in Hz = 1 / (2 * PI * Rf * 6.5pF)
        For 3V power, Frequency in Hz = 1 / (2 * PI * Rf * 7.86pF)
       The vast majority of devices use the internal oscillator with an Rf
-       resistor of 91KOhms, for ~270KHz clock speed.
+       resistor of 91kOhms, for ~270kHz clock speed.
       However, a few Hitachi-made LCD modules use an Rf resistor of
-       200KOhms instead, for a ~122Khz clock speed, and it isn't clear
+       200kOhms instead, for a ~122.4kHz clock speed, and it isn't clear
        why they did this, as it is lower than the minimum intended clock
        speed on the datasheet.
     DONE
@@ -79,9 +79,12 @@
      6-pixel character width modes)
     Samsung S6A0073 (equivalent to KS0073)
     Novatek NT7603 (clocked at twice the speed, has different LCD driver
-    waveforms, and has 16 Common/80 Segment drivers)
+     waveforms, and has 16 Common/80 Segment drivers)
     Novatek NT7605 (clocked at twice the speed, has different LCD driver
-    waveforms, and has 16 Common/100 Segment drivers)
+     waveforms, and has 16 Common/100 Segment drivers)
+    Solomon Systech SSD1803 (2.7-3.45V only, 34 Common/100 Segment drivers,
+     has a 6-pixel character width mode, and when in 4-line mode, has a
+     memory map like KS0073; has two unique CGROMs)
 
 
     Character set equivalency:
@@ -271,7 +274,7 @@ void hd44780_device::device_start()
 
 	m_busy_timer = timer_alloc(FUNC(hd44780_device::clear_busy_flag), this);
 	m_blink_timer = timer_alloc(FUNC(hd44780_device::blink_tick), this);
-	m_blink_timer->adjust(attotime::from_hz(double(clock() / 102400)), 0, attotime::from_hz(double(clock() / 102400))); // blink happens every 102400 cycles
+	m_blink_timer->adjust(attotime::from_ticks(102400, clock()), 0, attotime::from_ticks(102400, clock())); // blink happens every 102400 cycles
 
 	// state saving
 	save_item(NAME(m_busy_factor));
@@ -363,7 +366,7 @@ TIMER_CALLBACK_MEMBER(hd44780_device::blink_tick)
 void hd44780_device::set_busy_flag(uint16_t cycles)
 {
 	m_busy_flag = true;
-	m_busy_timer->adjust(attotime::from_hz(double(clock() / cycles) * m_busy_factor));
+	m_busy_timer->adjust(attotime::from_ticks(cycles, clock() / m_busy_factor));
 }
 
 void hd44780_device::correct_ac()
