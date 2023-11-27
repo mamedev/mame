@@ -7463,7 +7463,7 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	std::unique_ptr<u16[]> m_display;
+	std::unique_ptr<u16[]> m_pixbuf;
 	u8 m_led_data[2] = { };
 	u16 m_wand_pos[2] = { };
 	attotime m_shake;
@@ -7480,8 +7480,8 @@ void skywriter_state::machine_start()
 {
 	hh_tms1k_state::machine_start();
 
-	m_display = make_unique_clear<u16[]>(7 * SKYWRITER_WIDTH);
-	save_pointer(NAME(m_display), 7 * SKYWRITER_WIDTH);
+	m_pixbuf = make_unique_clear<u16[]>(7 * SKYWRITER_WIDTH);
+	save_pointer(NAME(m_pixbuf), 7 * SKYWRITER_WIDTH);
 
 	save_item(NAME(m_led_data));
 	save_item(NAME(m_wand_pos));
@@ -7498,7 +7498,7 @@ u32 skywriter_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 		int dy = (i / SKYWRITER_WIDTH) * 4 + 1;
 
 		// write current led state to pixels
-		u8 red = std::clamp<u16>(m_display[i], 0, 0xff);
+		u8 red = std::clamp<u16>(m_pixbuf[i], 0, 0xff);
 		u8 green = red / 16;
 		u8 blue = red / 12;
 
@@ -7510,7 +7510,7 @@ u32 skywriter_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 		// decay led brightness
 		const double rate = 1.15;
-		m_display[i] /= rate;
+		m_pixbuf[i] /= rate;
 	}
 
 	return 0;
@@ -7530,11 +7530,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(skywriter_state::check_pos)
 		m_wand_pos[0] = pos;
 	}
 
-	// write lit leds to display
+	// write lit leds to pixel buffer
 	for (int i = 0; i < 7; i++)
 	{
 		if (BIT(m_led_data[0] | m_led_data[1], i))
-			m_display[i * SKYWRITER_WIDTH + pos] = 0x180;
+			m_pixbuf[i * SKYWRITER_WIDTH + pos] = 0x180;
 	}
 
 	m_led_data[1] = m_led_data[0];
