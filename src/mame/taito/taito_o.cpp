@@ -287,7 +287,7 @@ static INPUT_PORTS_START( parentj )
 	// dip descriptions and defaults taken from dip sheet
 	// NOTE: bit 0 = loc 8, bit 7 = loc 1
 	PORT_START("DSWA")
-	PORT_DIPNAME(0x01, 0x00, "Credits at start") PORT_DIPLOCATION("DSWA:8")
+	PORT_DIPNAME(0x01, 0x01, "Credits at start") PORT_DIPLOCATION("DSWA:8")
 	PORT_DIPSETTING(   0x00, "500" )
 	PORT_DIPSETTING(   0x01, "0" )
 	PORT_DIPNAME(0x02, 0x02, "Key Up / Clear")   PORT_DIPLOCATION("DSWA:7")
