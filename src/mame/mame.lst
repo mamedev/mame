@@ -42807,7 +42807,7 @@ gunbustrj                       // D27 (c) 1992 Taito Corporation (Japan)
 gunbustru                       // D27 (c) 1992 Taito America Corporation (US)
 
 @source:taito/halleys.cpp
-benberob                        // A26
+benberob                        // A26 (c) 1985 Taito
 halleysc                        // A62 (c) 1986 Taito America Corporation + Coin It (US)
 halleysc87                      // A62 (c) 1986 Taito Corporation (Japan)
 halleyscj                       // A62 (c) 1986 Taito Corporation (Japan, rev 1)
