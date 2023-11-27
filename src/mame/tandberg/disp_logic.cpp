@@ -3,7 +3,7 @@
 /***************************************************************************
 
 	Tandberg TDV-2115 Terminal module, "Display Logic" version
-	
+
 	The "Display Logic" module provided the terminal functionality for
 	most of Tandbergs TDV-2100 series products. Most notably, standalone
 	it was available as the digital portion of the TDV-2115L terminal.
@@ -31,7 +31,7 @@
 	logic keyboard toggles a relay, the Key-Tronics keyboard has a buzzer),
 	the terminal module itself has circuit to beep a dynamic speaker. The
 	volume is selectable using a potentiometer on the front.
-	
+
 	For characters, the terminal uses up to four font-ROM, each containing
 	sixteen 14x8 bitmaps. Typically three of these ROM slots will be filled,
 	for ASCII character 0x20 to 0x7F. There is also two PROM used as logic-
@@ -72,8 +72,9 @@
 
 	TODO:
 
-	    * Add UART
 	    * Add keyboard w/indicators
+	    * Add selectable BAUD rate (110, 300, 600, 1200, 2400, 4800, 9600, 19200)
+	    * Add missing DIP switches
 	    * Add reset
 	    * Add CPU interface
 	    * Add interrupts
@@ -85,19 +86,23 @@
 #include "disp_logic.h"
 
 static constexpr XTAL DOT_CLOCK = XTAL(20'275'200);
+static constexpr XTAL DOT_CLOCK_3 = DOT_CLOCK/3;
 
 DEFINE_DEVICE_TYPE(TANDBERG_DISPLAY_LOGIC, tandberg_disp_logic_device, "tandberg_display_logic", "Tandberg TDV-2100 series Display Logic terminal module");
 
-tandberg_disp_logic_device::tandberg_disp_logic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+tandberg_disp_logic_device::tandberg_disp_logic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
 	device_t(mconfig, TANDBERG_DISPLAY_LOGIC, tag, owner, clock),
 	m_screen(*this, "screen"),
 	m_palette(*this, "palette"),
 	m_font(*this, "display_font_rom"),
 	m_vram(*this, "video_ram", 0x800, ENDIANNESS_LITTLE),
-	m_beep(*this, "beep")
+	m_beep(*this, "beep"),
+	m_uart(*this, "uart"),
+	m_uart_clock(*this, "uart_clock"),
+	m_rs232(*this, "serial")
 {
 	speed_check = false;
-	
+
 	attribute = 0;
 	frame_counter = 0;
 	cursor_x = 0;
@@ -107,16 +112,173 @@ tandberg_disp_logic_device::tandberg_disp_logic_device(const machine_config &mco
 	cursor_x_input = false;
 	cursor_y_input = false;
 
-	auto_roll_up = true;         // Set by DIP switch U39-9 on real hardware
-	extend_dot7 = true;          // Set by DIP switches U61-1/2 on real hardware
-	auto_cr_lf = true;           // Set by DIP switch U61-3 on real hardware
-	underline_mode = false;      // Set by DIP switch U61-4 on real hardware
-	blinking_cursor = false;     // Set by DIP switches U61-5/6 on real hardware
-	blank_attr_chars = true;     // Set by DIP switch U61-7 real hardware
-	blank_ctrl_chars = true;     // Set by DIP switch U61-9 on real hardware
-	block_cursor = false;        // Set by DIP switch U61-10 on real hardware
-	full_inverse_video = false;  // Toggle with push-button on real hardware
+	data_terminal_ready = false;
+	request_to_send = false;
+	rx_handshake = false;
+	tx_handshake = false;
+	break_key_held = false;
+
+	                                  // Device settings
+	                                  //
+	no_parity = true;                 // Rear switch 1
+	                                  //    If true, disables parity checking.
+	                                  //
+	even_parity = false;              // Rear switch 2
+	                                  //    If true and Parity enabled, use even parity instead
+	                                  //    of odd parity. No effect if parity disabled.
+	                                  //
+	two_stop_bits = false;            // Rear switch 3
+	                                  //    If true, expect two stop bits instead of one.
+	                                  //
+	ext_echo = false;                 // Rear switch 4
+	                                  //    If true, blocks local echo on DTR.
+	                                  //
+	auto_rx_handshake = true;         // Rear switch 5
+	                                  //    If true, DTR loops to Rx handshake.
+	                                  //
+	auto_tx_handshake = true;         // Rear switch 6
+	                                  //    If true, RTS loops to Tx handshake.
+	                                  //
+	full_inverse_video = false;       // Push-button toggle
+	                                  //    Inverts the entire display if activated.
+
+	                                  // Display 1 Settings
+	                                  //
+	// TODO: add keyboard             // DIP switches U39-1/2
+	                                  //    Defines if ASCII handshake signal indicators will be
+	                                  //    reset with the clear key, or the SYN control-character.
+	                                  //
+	dcd_handshake = false;            // DIP switches U39-3/4
+	                                  //    Expect DCD as handshake for DTR. Otherwise, the
+	                                  //    DSR signal will be expected instead.
+	                                  //
+	// TODO: Add CPU interface        // DIP switch U39-5
+	                                  //    Enables CPU-mode. If enabled, automatic data-paths
+	                                  //    in the module itself will be disabled.
+	                                  //
+	force_on_line = true;             // DIP switch U39-6
+	                                  //    If enabled, DTR and RTS will be permanent active.
+	                                  //    Otherwise toggled using the LINE and TRANS keys.
+	                                  //
+	need_tx_for_on_line_led = false;  // DIP switches U39-7/8
+	                                  //    DTR + Handshake is needed for ON-LINE LED to light,
+	                                  //    but if this is enabled RTS + CTS is needed too.
+	                                  //
+	auto_roll_up = true;              // DIP switch U39-9
+	                                  //    Rolls text one line up if NewLine on lowest line.
+	                                  //    If disabled, NewLine has no effect in this case.
+	                                  //
+	eight_bit_uart = true;            // DIP switch U39-10
+	                                  //    If true, UART use 7 bits of data instead of 8.
+	                                  //
+	hold_line_key_for_rts = false;    // DIP switches U71-1/2
+	                                  //    Pressing the LINE key will first raise DTR, and
+	                                  //    immediately after handshake RTS will be raised if
+	                                  //    the key is still held.
+	                                  //
+	                                  // DIP switches U71-2/3
+	                                  //    Sets current-loop hardware voltage-clamping strategy.
+
+	                                  // Display 2 Settings
+	                                  //
+	extend_dot7 = true;               // DIP switches U61-1/2
+	                                  //    If true, the 9th column will be a copy of the 8th
+	                                  //    column of each character. If false, the 9th column
+	                                  //    will use the background colour.
+	                                  //
+	auto_cr_lf = true;                // DIP switch U61-3
+	                                  //    Automatic CR/NL if a line is over-typed. Cursor will
+	                                  //    stop on the 80th character of a line if disabled.
+	                                  //
+	underline_mode = false;           // DIP switch U61-4
+	                                  //    If enabled, attributes will be disabled but each
+	                                  //    value in video-ram will have a dedicated flag for
+	                                  //    immediate underline. Otherwise underline will have
+	                                  //    to be enabled using attribute-changes.
+	                                  //
+	blinking_cursor = false;          // DIP switches U61-5/6
+	                                  //    Decides if the cursor is static or blinking.
+	                                  //
+	blank_attr_chars = true;          // DIP switch U61-7
+	                                  //    Decides if attribute-change or underline characters
+	                                  //    in underline-mode will be hidden or not.
+	                                  //
+	                                  // DIP switch U61-8
+	                                  //    Unused.
+	                                  //
+	blank_ctrl_chars = true;          // DIP switch U61-9
+	                                  //    Decides if control-character values are to be
+	                                  //    hidden or not. (These characters can only be put on
+	                                  //    the screen using raw writes over the CPU interface.)
+	                                  //
+	block_cursor = false;             // DIP switch U61-10
+	                                  //    Decide if the cursor will be in the form of a block
+	                                  //    or an underline.
 }
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// General machine state
+//
+
+void tandberg_disp_logic_device::device_start()
+{
+	m_beep_trigger = timer_alloc(FUNC(tandberg_disp_logic_device::end_beep), this);
+	m_speed_ctrl = timer_alloc(FUNC(tandberg_disp_logic_device::expire_speed_check), this);
+
+	m_uart->write_cs(true);
+	m_uart->write_nb1(eight_bit_uart);
+	m_uart->write_nb2(true);
+	m_uart->write_np(no_parity);
+	m_uart->write_eps(even_parity);
+	m_uart->write_tsb(two_stop_bits);
+
+	if(force_on_line)
+	{
+		rs232_dtr_toggle();
+		rs232_rts_toggle();
+	}
+}
+
+void tandberg_disp_logic_device::device_reset()
+{
+	uint8_t attribute_chars[6] = {' ', '0', 'A', 'Q', 'a', 'q'};
+	char_to_display(0x19);
+	for(char c: "TDV-2115") char_to_display(c);
+	char_to_display(0x0A);
+	for(int l=0; l<2; l++){
+		char_to_display(0x0A);
+		for(int j=0; j<8; j++){
+			char_to_display(0x0D);
+			char_to_display(0x18);
+			for(int k=0; k<3; k++){
+				char_to_display(0x0E);
+				char_to_display(attribute_chars[l*3 + k]);
+				char_to_display(0x0F);
+				for(int i=0; i<16; i++) data_to_display(16*j+i);
+				char_to_display(0x18);
+				char_to_display(0x18);
+				char_to_display(0x18);
+				char_to_display(0x0E);
+				char_to_display(attribute_chars[5]);
+				char_to_display(0x0F);
+				char_to_display(0x18);
+			}
+			char_to_display(0x0A);
+		}
+	}
+	char_to_display(0x10);
+	char_to_display(23);
+	char_to_display(20);
+	for(char c: "Testing random cursor position") char_to_display(c);
+
+	char_to_display(0x07);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Graphics and character data
+//
 
 void tandberg_disp_logic_device::char_to_display(uint8_t byte){
 	if(cursor_y_input)
@@ -286,7 +448,7 @@ void tandberg_disp_logic_device::char_to_display(uint8_t byte){
 				case 0x15:
 					// TODO
 					break;
-					
+
 				// SYN, Clear ENQIRY/ACK/NACK indicators if DIP switches set accordingly
 				case 0x16:
 					// TODO
@@ -345,47 +507,6 @@ TIMER_CALLBACK_MEMBER(tandberg_disp_logic_device::end_beep)
 TIMER_CALLBACK_MEMBER(tandberg_disp_logic_device::expire_speed_check)
 {
 	speed_check = false;
-}
-
-void tandberg_disp_logic_device::device_start()
-{
-	m_beep_trigger = timer_alloc(FUNC(tandberg_disp_logic_device::end_beep), this);
-	m_speed_ctrl = timer_alloc(FUNC(tandberg_disp_logic_device::expire_speed_check), this);
-}
-
-void tandberg_disp_logic_device::device_reset()
-{
-	uint8_t attribute_chars[6] = {' ', '0', 'A', 'Q', 'a', 'q'};
-	char_to_display(0x19);
-	for(char c: "TDV-2115") char_to_display(c);
-	char_to_display(0x0A);
-	for(int l=0; l<2; l++){
-		char_to_display(0x0A);
-		for(int j=0; j<8; j++){
-			char_to_display(0x0D);
-			char_to_display(0x18);
-			for(int k=0; k<3; k++){
-				char_to_display(0x0E);
-				char_to_display(attribute_chars[l*3 + k]);
-				char_to_display(0x0F);
-				for(int i=0; i<16; i++) data_to_display(16*j+i);
-				char_to_display(0x18);
-				char_to_display(0x18);
-				char_to_display(0x18);
-				char_to_display(0x0E);
-				char_to_display(attribute_chars[5]);
-				char_to_display(0x0F);
-				char_to_display(0x18);
-			}
-			char_to_display(0x0A);
-		}
-	}
-	char_to_display(0x10);
-	char_to_display(23);
-	char_to_display(20);
-	for(char c: "Testing random cursor position") char_to_display(c);
-
-	char_to_display(0x07);
 }
 
 uint32_t tandberg_disp_logic_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -484,7 +605,7 @@ uint32_t tandberg_disp_logic_device::screen_update(screen_device &screen, bitmap
 							}
 						}
 					}
-					
+
 					if(draw_cursor && (line == 12 || block_cursor) && (!blinking_cursor || blink_strobe))
 					{
 						data = ~data;
@@ -508,18 +629,156 @@ uint32_t tandberg_disp_logic_device::screen_update(screen_device &screen, bitmap
 	return 0;
 }
 
-void tandberg_disp_logic_device::device_add_mconfig(machine_config &config)
+///////////////////////////////////////////////////////////////////////////////
+//
+// UART
+//
+
+void tandberg_disp_logic_device::rs232_rxd_w(int state)
+{
+	m_uart->write_si(state && data_terminal_ready && rx_handshake);
+}
+
+void tandberg_disp_logic_device::rs232_dcd_w(int state)
+{
+	if(dcd_handshake && !auto_rx_handshake)
+	{
+		rx_handshake = (bool)state;
+	}
+	// TODO: Update lamps
+}
+
+void tandberg_disp_logic_device::rs232_dsr_w(int state)
+{
+	if(!dcd_handshake && !auto_rx_handshake)
+	{
+		rx_handshake = (bool)state;
+	}
+	// TODO: Update lamps
+}
+
+void tandberg_disp_logic_device::rs232_cts_w(int state)
+{
+	if(!auto_tx_handshake)
+	{
+		tx_handshake = (bool)state;
+	}
+	// TODO: Update lamps
+}
+
+void tandberg_disp_logic_device::rs232_txd_w(int state)
+{
+	m_rs232->write_txd(state && request_to_send && tx_handshake && !break_key_held);
+	m_uart->write_si(state && !(ext_echo && data_terminal_ready));
+}
+
+void tandberg_disp_logic_device::rs232_dtr_toggle()
+{
+	if(force_on_line)
+	{
+		data_terminal_ready = true;
+	}
+	else
+	{
+		if(rx_handshake)
+		{
+			data_terminal_ready = false;
+		}
+		else
+		{
+			data_terminal_ready = !data_terminal_ready;
+		}
+	}
+
+	if(!data_terminal_ready)
+	{
+		request_to_send = false;
+		m_rs232->write_rts(request_to_send);
+	}
+	m_rs232->write_dtr(data_terminal_ready);
+
+	if(auto_rx_handshake)
+	{
+		rx_handshake = data_terminal_ready;
+	}
+	if(data_terminal_ready && hold_line_key_for_rts)
+	{
+		rs232_rts_toggle();
+	}
+	// TODO: Update lamps
+}
+
+void tandberg_disp_logic_device::rs232_rts_toggle()
+{
+	if(force_on_line)
+	{
+		request_to_send = true;
+	}
+	else
+	{
+		if(tx_handshake)
+		{
+			request_to_send = false;
+		}
+		else
+		{
+			request_to_send = !request_to_send;
+		}
+	}
+	m_rs232->write_rts(request_to_send);
+
+	if(auto_tx_handshake)
+	{
+		tx_handshake = request_to_send;
+	}
+	// TODO: Update lamps
+}
+
+void tandberg_disp_logic_device::rs232_ri_w(int state)
+{
+	// TODO: Ring indicator for CPU interface
+}
+
+void tandberg_disp_logic_device::uart_rx(int state)
+{
+	// TODO: Changed behaviour if CPU-mode DIP switch
+	if(state)
+	{
+		char_to_display(m_uart->receive());
+		m_uart->write_rdav(0);
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Driver config
+//
+
+void tandberg_disp_logic_device::device_add_mconfig(machine_config &mconfig)
 {
 	/* Video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
+	SCREEN(mconfig, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
 	m_screen->set_raw(DOT_CLOCK, 999, 0, 783, 402, 0, 350);
 	m_screen->set_screen_update(FUNC(tandberg_disp_logic_device::screen_update));
-	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
+	PALETTE(mconfig, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 
 	/* Sound */
-	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beep, 2000);
+	SPEAKER(mconfig, "mono").front_center();
+	BEEP(mconfig, m_beep, 2000);
 	m_beep->add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	RS232_PORT(mconfig, m_rs232, default_rs232_devices, nullptr);
+	m_rs232->rxd_handler().set(FUNC(tandberg_disp_logic_device::rs232_rxd_w));
+	m_rs232->dcd_handler().set(FUNC(tandberg_disp_logic_device::rs232_dcd_w));
+	m_rs232->dsr_handler().set(FUNC(tandberg_disp_logic_device::rs232_dsr_w));
+	m_rs232->cts_handler().set(FUNC(tandberg_disp_logic_device::rs232_cts_w));
+	m_rs232->ri_handler().set(FUNC(tandberg_disp_logic_device::rs232_ri_w));
+	AY51013(mconfig, m_uart);
+	m_uart->write_so_callback().set(FUNC(tandberg_disp_logic_device::rs232_txd_w));
+	m_uart->write_dav_callback().set(FUNC(tandberg_disp_logic_device::uart_rx));
+	CLOCK(mconfig, m_uart_clock, DOT_CLOCK_3 / (11 * 4));
+	m_uart_clock->signal_handler().set(m_uart, FUNC(ay51013_device::write_rcp));
+	m_uart_clock->signal_handler().append(m_uart, FUNC(ay51013_device::write_tcp));
 }
 
 ROM_START(tdv2115l)

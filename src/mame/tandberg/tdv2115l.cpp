@@ -3,7 +3,7 @@
 /***************************************************************************
 
 	Tandberg TDV-2115L Terminal
-	
+
 	This driver uses the TDV-21xx series Display Logic module as a regular
 	dumb-terminal, being the simplest configuration in the TDV-21xx series.
 
