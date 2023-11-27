@@ -274,32 +274,23 @@ AI-8003  Pinpon Music Melody
 		</part>
 	</software>
 
-	<!-- okeiko and hanamaru were sold as a single package? -->
-	<software name="okeiko" supported="no">
-		<description>Okeiko Aiueo</description>
+	<software name="okeihana" supported="no">
+		<description>Okeiko Hanamaru Aiueo</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
-		<notes>Requires full touchpad emulation.</notes>
+		<notes>Hard to draw characters in the right place; missing overlays?</notes>
 		<info name="serial" value="AI-4201"/>
-		<info name="alt_title" value="おけいこ　あいうえお"/>
-		<part name="card" interface="segaai_card">
+		<info name="alt_title" value="おけいこ・はなまる　あいえうお"/>
+		<part name="card1" interface="segaai_card">
 			<feature name="slot" value="rom_128"/>
+			<feature name="part_id" value="Okeiko Aiueo"/>
 			<dataarea name="rom" size="0x20000">
 				<rom name="okeiko aiueo.bin" size="0x20000" crc="60bfd7c3" sha1="44fc802e66f086a3cb49e4fcde22ce6f704b405f"/>
 			</dataarea>
 		</part>
-	</software>
-
-	<!-- okeiko and hanamaru were sold as a single package? -->
-	<software name="hanamaru" supported="no">
-		<description>Hanamaru Aiueo</description>
-		<year>1988</year>
-		<publisher>Sega</publisher>
-		<notes>Requires full touchpad emulation.</notes>
-		<info name="serial" value="AI-4201"/>
-		<info name="alt_title" value="はなまる　あいうえお"/>
-		<part name="card" interface="segaai_card">
+		<part name="card2" interface="segaai_card">
 			<feature name="slot" value="rom_128" />
+			<feature name="part_id" value="Hanamaru Aiueo"/>
 			<dataarea name="rom" size="0x20000">
 				<rom name="hanamaru aiueo.bin" size="0x20000" crc="252a0490" sha1="ab9d00a575bf0fb12557315fcd7c7e16caa8d802"/>
 			</dataarea>
@@ -310,7 +301,7 @@ AI-8003  Pinpon Music Melody
 		<description>Waku Waku ABC to 123</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
-		<notes>Requires full touchpad emulation.</notes>
+		<notes>Hard to draw characters in the right place; missing overlay?</notes>
 		<info name="serial" value="AI-4202"/>
 		<info name="alt_title" value="わくわく　ＡＢＣと１２３"/>
 		<part name="card" interface="segaai_card">
@@ -325,7 +316,7 @@ AI-8003  Pinpon Music Melody
 		<description>Henshin Kanji</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
-		<notes>Requires full touchpad emulation.</notes>
+		<notes>Hard to draw characters in the right place; missing overlay?</notes>
 		<info name="serial" value="AI-4203"/>
 		<info name="alt_title" value="へんしんかんじ"/>
 		<part name="card" interface="segaai_card">

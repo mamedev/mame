@@ -22,8 +22,6 @@
 
 
 TODO:
-- Fix the touchpad support; somehow the cursor is not displaying on
-  the touchpad.
 - Cassette, playback is controlled by the computer. Games with cassette
   spin up the cassette for about 2 seconds
   - The tape sometimes seeks back and forth for 5-15 seconds for the right
