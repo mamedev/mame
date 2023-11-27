@@ -1,10 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:AJR
+#ifndef MAME_AMPEX_AMPEX210_KBD_H
+#define MAME_AMPEX_AMPEX210_KBD_H
 
-#ifndef MAME_SKELETON_AMPEX210_KBD_H
-#define MAME_SKELETON_AMPEX210_KBD_H
+#pragma once
 
 #include "cpu/mcs48/mcs48.h"
+
 
 class ampex230_keyboard_device : public device_t
 {
@@ -46,4 +48,4 @@ private:
 // device type declaration
 DECLARE_DEVICE_TYPE(AMPEX230_KEYBOARD, ampex230_keyboard_device)
 
-#endif // MAME_SKELETON_AMPEX210_KBD_H
+#endif // MAME_AMPEX_AMPEX210_KBD_H

@@ -17,6 +17,7 @@
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
@@ -25,7 +26,9 @@
 #include "machine/scn_pci.h"
 #include "machine/x2212.h"
 #include "video/i8275.h"
+
 #include "screen.h"
+
 
 namespace {
 
@@ -95,11 +98,14 @@ I8275_DRAW_CHARACTER_MEMBER(t7000_state::display_character)
 	rgb_t fg = rgb_t::white();
 	rgb_t bg = rgb_t::black();
 	if (m_outlatch->q2_r())
-		std::swap(fg, bg);
+	{
+		using std::swap;
+		swap(fg, bg);
+	}
 
 	for (int i = 0; i < 10; i++)
 	{
-		bitmap.pix(y, x + i) = (dots & 0x300) != 0 ? fg : bg;
+		bitmap.pix(y, x + i) = ((dots & 0x300) != 0) ? fg : bg;
 		dots <<= 1;
 	}
 }
@@ -258,4 +264,4 @@ ROM_END
 
 } // anonymous namespace
 
-SYST(1982, t7000, 0, 0, t7000, t7000, t7000_state, empty_init, "Wicat Systems", "T7000 Video Terminal", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)
+SYST(1982, t7000, 0, 0, t7000, t7000, t7000_state, empty_init, "Wicat Systems", "T7000 Video Terminal", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)

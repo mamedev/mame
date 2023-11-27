@@ -5,9 +5,8 @@
     Micro Craft Dimension 68000 84-key keyboard
 
 **********************************************************************/
-
-#ifndef MAME_SKELETON_DIM68K_KBD_H
-#define MAME_SKELETON_DIM68K_KBD_H
+#ifndef MAME_MICROCRAFT_DIM68K_KBD_H
+#define MAME_MICROCRAFT_DIM68K_KBD_H
 
 #pragma once
 
@@ -30,7 +29,7 @@ public:
 	auto txd_callback() { return m_txd_callback.bind(); }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual ioport_constructor device_input_ports() const override;
@@ -64,4 +63,4 @@ private:
 // device type declarations
 DECLARE_DEVICE_TYPE(DIM68K_KEYBOARD, dim68k_keyboard_device)
 
-#endif // MAME_SKELETON_DIM68K_KBD_H
+#endif // MAME_MICROCRAFT_DIM68K_KBD_H
