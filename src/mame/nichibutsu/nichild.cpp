@@ -11,7 +11,7 @@ TODO:
   the only place it clears it is at snippet 0x0ED6);
 - V9938 has issues with layer clears, implicitly cleared by superimposing or irq timing?
 - Complete audio section, SFXs keeps ringing;
-- DIP Switches, flip-flop driven;
+- Document meaning of DIP switches
 
 ===================================================================================================
 
@@ -30,6 +30,7 @@ TODO:
 #include "emu.h"
 
 #include "cpu/z80/tmpz84c011.h"
+#include "machine/74166.h"
 #include "machine/gen_latch.h"
 #include "sound/dac.h"
 #include "sound/ymopl.h"
@@ -55,6 +56,7 @@ public:
 		, m_gfxrom(*this, "gfx")
 		, m_p1_keymatrix(*this, { "P1_KEY0", "P1_KEY1", "P1_KEY2", "P1_KEY3", "P1_KEY4" })
 		, m_p2_keymatrix(*this, { "P2_KEY0", "P2_KEY1", "P2_KEY2", "P2_KEY3", "P2_KEY4" })
+		, m_dsw_shifter(*this, "ttl166_%u", 1U)
 		, m_sound_rom(*this, "audiorom")
 		, m_soundbank(*this, "soundbank")
 		, m_soundlatch(*this, "soundlatch")
@@ -71,6 +73,7 @@ private:
 
 	required_ioport_array<5> m_p1_keymatrix;
 	required_ioport_array<5> m_p2_keymatrix;
+	required_device_array<ttl166_device, 2> m_dsw_shifter;
 
 	required_region_ptr<uint8_t> m_sound_rom;
 	required_memory_bank m_soundbank;
@@ -80,6 +83,7 @@ private:
 	uint8_t p1_keymatrix_r();
 	uint8_t p2_keymatrix_r();
 	void key_select_w(uint8_t data);
+	uint8_t porta_r();
 	void porta_w(uint8_t data);
 	void portb_w(uint8_t data);
 	void portc_w(uint8_t data);
@@ -100,6 +104,7 @@ private:
 
 	uint32_t m_gfx_bank = 0;
 	uint8_t m_key_select = 0;
+	int m_dsw_data = 0;
 };
 
 
@@ -116,13 +121,27 @@ uint8_t nichild_state::gfx_r(offs_t offset)
 	return m_gfxrom[gfx_offset];
 }
 
-/*
- * -x-- ---- 1 -> 0 clock DIPSW (moves to the next bit)
- * --x- ---- 0 -> 1 reset DIPSW
- */
+uint8_t nichild_state::porta_r()
+{
+	// 7-------  dipswitch 74166 qh
+	// -6543210  output (see below)
+
+	return m_dsw_data << 7;
+}
+
 void nichild_state::porta_w(uint8_t data)
 {
+	// 7-------  input (see above)
+	// -6------  dipswitch 74166 clock
+	// --5-----  dipswitch 74166 shift/load
+	// ---43210  unknown
+
 	logerror("PORTA %02x\n",data);
+
+	m_dsw_shifter[0]->shift_load_w(BIT(data, 5));
+	m_dsw_shifter[1]->shift_load_w(BIT(data, 5));
+	m_dsw_shifter[0]->clock_w(BIT(data, 6));
+	m_dsw_shifter[1]->clock_w(BIT(data, 6));
 }
 
 void nichild_state::portb_w(uint8_t data)
@@ -340,6 +359,26 @@ static INPUT_PORTS_START( nichild )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSWA")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSWA:8")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSWA:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSWA:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSWA:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSWA:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSWA:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSWA:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSWA:1")
+
+	PORT_START("DSWB")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSWB:8")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSWB:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSWB:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSWB:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSWB:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSWB:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSWB:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSWB:1")
 INPUT_PORTS_END
 
 
@@ -366,7 +405,7 @@ void nichild_state::nichild(machine_config &config)
 	m_maincpu->set_daisy_config(daisy_chain_main);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nichild_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &nichild_state::main_io);
-//  m_maincpu->in_pa_callback() DIPSW f/f read (bit 7)
+	m_maincpu->in_pa_callback().set(FUNC(nichild_state::porta_r));
 	m_maincpu->in_pb_callback().set(FUNC(nichild_state::p1_keymatrix_r));
 	m_maincpu->in_pc_callback().set(FUNC(nichild_state::p2_keymatrix_r));
 	m_maincpu->in_pd_callback().set_ioport("PORTD");
@@ -380,6 +419,14 @@ void nichild_state::nichild(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nichild_state::audio_map);
 	m_audiocpu->set_addrmap(AS_IO, &nichild_state::audio_io);
 	m_audiocpu->set_periodic_int(FUNC(nichild_state::irq0_line_hold), attotime::from_hz(XTAL(SOUND_CLOCK)/512)); // ?
+
+	TTL166(config, m_dsw_shifter[0]);
+	m_dsw_shifter[0]->data_callback().set_ioport("DSWB");
+	m_dsw_shifter[0]->qh_callback().set(m_dsw_shifter[1], FUNC(ttl166_device::serial_w));
+
+	TTL166(config, m_dsw_shifter[1]);
+	m_dsw_shifter[1]->data_callback().set_ioport("DSWA");
+	m_dsw_shifter[1]->qh_callback().set([this](int state) { m_dsw_data = state; });
 
 	V9938(config, m_v9938, MAIN_CLOCK);
 	m_v9938->set_screen_ntsc("screen");
