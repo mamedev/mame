@@ -42207,14 +42207,14 @@ doapp                           // Dead Or Alive ++ (JAPAN)
 doappk                          // Dead Or Alive ++ (Korea)
 flamegun                        // Flame Gunner (USA)
 flamegunj                       // Flame Gunner (JAPAN)
-ftimpact                        // Fighters' Impact (Ver 2.02O)
-ftimpactj                       // Fighters' Impact (Ver 2.02J)
-ftimpactu                       // Fighters' Impact (Ver 2.02A)
-ftimpcta                        // Fighters' Impact A (Ver 2.00J)
-gdarius                         // G-Darius (Ver 2.02O)
-gdarius2                        // G-Darius Ver.2 (Ver 2.03J)
-gdariusj                        // G-Darius (Ver 2.01J)
-gdariusu                        // G-Darius (Ver 2.02A)
+ftimpact                        // Fighters' Impact (Ver 2.02O) E25 (c) 1996 Taito
+ftimpactj                       // Fighters' Impact (Ver 2.02J) E25 (c) 1996 Taito
+ftimpactu                       // Fighters' Impact (Ver 2.02A) E25 (c) 1996 Taito
+ftimpcta                        // Fighters' Impact A (Ver 2.00J) E25 (c) 1997 Taito
+gdarius                         // G-Darius (Ver 2.02O) E39 (c) 1997 Taito
+gdarius2                        // G-Darius Ver.2 (Ver 2.03J) E39 (c) 1997 Taito
+gdariusj                        // G-Darius (Ver 2.01J) E39 (c) 1997 Taito
+gdariusu                        // G-Darius (Ver 2.02A) E39 (c) 1997 Taito
 glpracr                         // Gallop Racer (English Ver 10.17.K)
 glpracr2                        // Gallop Racer 2 (USA)
 glpracr2j                       // Gallop Racer 2 (JAPAN)
@@ -42230,27 +42230,27 @@ jgakuen1                        // Justice Gakuen (JAPAN 971117)
 kikaioh                         // Kikaioh (JAPAN 980914)
 lpadv                           // Logic Pro Adventure (JAPAN)
 mfjump                          // Monster Farm Jump (JAPAN)
-mgcldate                        // Magical Date (JAPAN Ver 2.02J)
-mgcldtex                        // Magical Date EX (JAPAN Ver 2.01J)
+mgcldate                        // Magical Date (JAPAN Ver 2.02J) E32 (c) 1996 Taito
+mgcldtex                        // Magical Date EX (JAPAN Ver 2.01J) E32 (c) 1997 Taito
 nbajamex                        // NBA Jam Extreme (ver. 1.10I)
 nbajamexa                       // NBA Jam Extreme (ver. 1.04)
 plsmaswd                        // Plasma Sword (USA 980316)
 plsmaswda                       // Plasma Sword (ASIA 980316)
 primrag2                        // Primal Rage 2
-psyforce                        // Psychic Force (Ver 2.4O)
-psyforcej                       // Psychic Force (Ver 2.4J)
-psyforcex                       // Psychic Force EX (Ver 2.0J)
-raystorm                        // Ray Storm (Ver 2.06A)
-raystormj                       // Ray Storm (Ver 2.05J)
-raystormo                       // Ray Storm (Ver 2.05O)
-raystormu                       // Ray Storm (Ver 2.05A)
+psyforce                        // Psychic Force (Ver 2.4O) E22 (c) 1995 Taito
+psyforcej                       // Psychic Force (Ver 2.4J) E22 (c) 1995 Taito
+psyforcex                       // Psychic Force EX (Ver 2.0J) E22 (c) 1996 Taito
+raystorm                        // Ray Storm (Ver 2.06A) E24 (c) 1996 Taito
+raystormj                       // Ray Storm (Ver 2.05J) E24 (c) 1996 Taito
+raystormo                       // Ray Storm (Ver 2.05O) E24 (c) 1996 Taito
+raystormu                       // Ray Storm (Ver 2.05A) E24 (c) 1996 Taito
 rvschool                        // Rival Schools (EURO 971117)
 rvschoola                       // Rival Schools (ASIA 971117)
 rvschoolu                       // Rival Schools (USA 971117)
-sfchamp                         // Super Football Champ (Ver 2.5O)
-sfchampj                        // Super Football Champ (Ver 2.4J)
-sfchampo                        // Super Football Champ (Ver 2.4O)
-sfchampu                        // Super Football Champ (Ver 2.4A)
+sfchamp                         // Super Football Champ (Ver 2.5O) E18 (c) 1995 Taito
+sfchampj                        // Super Football Champ (Ver 2.4J) E18 (c) 1995 Taito
+sfchampo                        // Super Football Champ (Ver 2.4O) E18 (c) 1995 Taito
+sfchampu                        // Super Football Champ (Ver 2.4A) E18 (c) 1995 Taito
 sfex                            // Street Fighter EX (EURO 961219)
 sfex2                           // Street Fighter EX 2 (EURO 980312)
 sfex2a                          // Street Fighter EX 2 (ASIA 980312)
@@ -42597,7 +42597,7 @@ alphatron                       //
 tabe22                          // (c) Tab Products
 
 @source:taito/2mindril.cpp
-2mindril                        // (c) 1993 Taito
+2mindril                        // D58 (c) 1993 Taito America Corporation
 
 @source:taito/40love.cpp
 40love                          // A30 (c) 1984 Taito
@@ -42675,7 +42675,7 @@ bigevglf                        // A67 (c) 1986 Taito America Corporation (US)
 bigevglfj                       // A67 (c) 1986 Taito Corporation (Japan)
 
 @source:taito/bingowav.cpp
-bingowav                        // (c) 1994 Taito
+bingowav                        // ??? (c) 1994 Taito
 
 @source:taito/bking.cpp
 bking                           // DM  (c) 1982 Taito Corporation
@@ -42715,13 +42715,13 @@ buggychl                        // A22 (c) 1984 Taito Corporation
 buggychlt                       // A22 (c) 1984 Taito Corporation + Tefri license
 
 @source:taito/capr1.cpp
-cspin2                          //
+cspin2                          // E30 (c) 1996 Taito
 
 @source:taito/caprcyc.cpp
-caprcyc                         //
+caprcyc                         // E69 (c) 1999 Taito
 
 @source:taito/cchance.cpp
-cchance                         // (c)1987 Taito?
+cchance                         // ??? (c) 1987 Taito Corporation
 
 @source:taito/chaknpop.cpp
 chaknpop                        // AO4 (c) 1983 Taito Corporation
@@ -42735,16 +42735,16 @@ doraemon                        // Sunsoft / Epoch / Fujiko - Shogakukan - TV As
 changela                        // ??? (c) 1983 Taito Corporation
 
 @source:taito/cpzodiac.cpp
-cpzodiac                        //
-cpzodiacj                       //
+cpzodiac                        // ??? (c) 1993 Taito Corporation (World)
+cpzodiacj                       // D52 (c) 1993 Taito Corporation
 
 @source:taito/crbaloon.cpp
 crbaloon                        // CL  (c) 1980 Taito Corporation
 crbaloon2                       // CL  (c) 1980 Taito Corporation
 
 @source:taito/cucaracha.cpp
-cucaracha                       // (c) 1992 Taito
-cucaracha2                      // (c) 1992 Taito
+cucaracha                       // D33? (c) 1992 Taito (World)
+cucaracha2                      // D33? (c) 1992 Taito (World)
 
 @source:taito/cyclemb.cpp
 cyclemb                         // P0  (c) 1984 Taito Corporation [+ Seta]
@@ -42758,8 +42758,8 @@ dariuso                         // A96 (c) 1986 Taito Corporation (Japan)
 dariusu                         // A96 (c) 1986 Taito America Corporation (US)
 
 @source:taito/dinoking.cpp
-dkbattle                        //
-dkkids                          //
+dkbattle                        // F39 (c) 2004 Taito Corporation
+dkkids                          // F54 (c) 2005 Taito Corporation
 
 @source:taito/exzisus.cpp
 exzisus                         // B12 (c) 1987 Taito Corporation (Japan)
@@ -42837,8 +42837,8 @@ mexico86a                       // bootleg
 ksayakyu                        // ??? (c) 1985 Taito Corporation
 
 @source:taito/lgp.cpp
-lgp                             // (c) 1983 Taito
-lgpalt                          // (c) 1983 Taito
+lgp                             // A02 (c) 1983 Taito
+lgpalt                          // A02 (c) 1983 Taito
 
 @source:taito/lkage.cpp
 bygone                          // A53 (c) 1985 Taito Corporation - prototype ?
@@ -42847,7 +42847,7 @@ lkageb                          // bootleg
 lkageb2                         // bootleg
 lkageb3                         // bootleg
 lkageb4                         // bootleg
-lkagem                          //
+lkagem                          // A51 (c) 1984 Taito Corporation
 lkageo                          // A54 (c) 1984 Taito Corporation
 lkageo2                         // A54 (c) 1984 Taito Corporation
 
@@ -42911,7 +42911,7 @@ pitnruna                        // PR  (c) 1984 Taito Corporation
 pitnrunb                        // PR  (c) 1984 Taito Corporation
 
 @source:taito/pkspirit.cpp
-pkspirit                        // D41
+pkspirit                        // D41 (c) 1992 Taito Corporation
 
 @source:taito/qix.cpp
 complexx                        // CX  (c) 1984 Taito America Corporation
@@ -43496,7 +43496,7 @@ undrfirej                       // D67 (c) 1993 Taito Corporation (Japan)
 undrfireu                       // D67 (c) 1993 Taito America Corporation (US)
 
 @source:taito/vicshoot.cpp
-vicshoot                        // D97
+vicshoot                        // D97 (c) 1995 Taito Corporation
 
 @source:taito/volfied.cpp
 volfied                         // C04 (c) 1989 Taito Corporation Japan (World)
