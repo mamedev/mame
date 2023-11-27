@@ -2,15 +2,26 @@
 // copyright-holders:AJR
 /****************************************************************************
 
-    Skeleton driver for Wicat T7000 terminal.
+    Preliminary driver for Wicat T7000 terminal.
+
+    This fairly typical ASCII video display terminal was sold for use with
+    the Wicat System 100. It shows a basic 80x25 monochrome text display
+    with an optional status line, and supports the VT52 and ANSI command
+    sets. Keytronic Model L2207 is the specified keyboard. Settings can be
+    saved to nonvolatile memory by typing "PERM" (all caps) in Set-Up mode.
+
+    Currently the cursor display and attributes are not provided due to
+    8276 emulation not supporting the dual configuration used here. The
+    optional touch panel is also not supported.
 
 ****************************************************************************/
 
 #include "emu.h"
-//#include "bus/rs232/rs232.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
 #include "machine/input_merger.h"
+#include "machine/keytronic_l2207.h"
 #include "machine/scn_pci.h"
 #include "machine/x2212.h"
 #include "video/i8275.h"
@@ -29,9 +40,11 @@ public:
 		, m_pci(*this, "pci%u", 0U)
 		, m_crtc(*this, "crtc%u", 0U)
 		, m_vram(*this, "vram")
+		, m_attr_vram(*this, "attr_vram", 0x4000, ENDIANNESS_LITTLE)
 		, m_vram_view(*this, "vram")
 		, m_chargen(*this, "chargen")
 		, m_vblint(false)
+		, m_attr_latch(0)
 	{
 	}
 
@@ -43,7 +56,9 @@ protected:
 private:
 	I8275_DRAW_CHARACTER_MEMBER(display_character);
 
+	void vram_w(offs_t offset, u8 data);
 	u8 vram_dma_r(offs_t offset);
+	void attr_latch_w(u8 data);
 	u8 vblint_status_r();
 	void vblint_enable_w(int state);
 	void dma_enable_w(int state);
@@ -59,27 +74,56 @@ private:
 	required_device_array<scn_pci_device, 2> m_pci;
 	required_device_array<i8275_device, 2> m_crtc;
 	required_shared_ptr<u8> m_vram;
+	memory_share_creator<u8> m_attr_vram;
 	memory_view m_vram_view;
 	required_region_ptr<u8> m_chargen;
 
 	bool m_vblint;
+	u8 m_attr_latch;
 };
 
 void t7000_state::machine_start()
 {
 	save_item(NAME(m_vblint));
+	save_item(NAME(m_attr_latch));
 }
 
 I8275_DRAW_CHARACTER_MEMBER(t7000_state::display_character)
 {
+	u16 dots = vsp ? 0 : m_chargen[(charcode << 4) | linecount];
+
+	rgb_t fg = rgb_t::white();
+	rgb_t bg = rgb_t::black();
+	if (m_outlatch->q2_r())
+		std::swap(fg, bg);
+
+	for (int i = 0; i < 10; i++)
+	{
+		bitmap.pix(y, x + i) = (dots & 0x300) != 0 ? fg : bg;
+		dots <<= 1;
+	}
+}
+
+void t7000_state::vram_w(offs_t offset, u8 data)
+{
+	m_vram[offset] = data;
+	m_attr_vram[offset] = m_attr_latch;
 }
 
 u8 t7000_state::vram_dma_r(offs_t offset)
 {
 	u8 data = m_vram[offset];
 	if (!machine().side_effects_disabled())
+	{
 		m_crtc[0]->dack_w(data);
+		m_crtc[1]->dack_w(m_attr_vram[offset]);
+	}
 	return data;
+}
+
+void t7000_state::attr_latch_w(u8 data)
+{
+	m_attr_latch = data;
 }
 
 u8 t7000_state::vblint_status_r()
@@ -123,7 +167,7 @@ void t7000_state::crtc_combined_w(offs_t offset, u8 data)
 void t7000_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom().region("program", 0);
-	map(0x4000, 0x7fff).ram().share(m_vram);
+	map(0x4000, 0x7fff).ram().share(m_vram).w(FUNC(t7000_state::vram_w));
 	map(0x4000, 0x7fff).view(m_vram_view);
 	m_vram_view[0](0x4000, 0x7fff).r(FUNC(t7000_state::vram_dma_r));
 	map(0x8000, 0x803f).rw("novram", FUNC(x2210_device::read), FUNC(x2210_device::write));
@@ -133,13 +177,13 @@ void t7000_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x80, 0x80).r(FUNC(t7000_state::vblint_status_r));
-	map(0xa1, 0xa1).nopr(); // ?
+	map(0xa1, 0xa1).nopr(); // touch panel status?
 	map(0xb0, 0xb1).w(FUNC(t7000_state::crtc_combined_w));
 	map(0xb2, 0xb3).rw(m_crtc[0], FUNC(i8275_device::read), FUNC(i8275_device::write));
 	map(0xb4, 0xb5).rw(m_crtc[1], FUNC(i8275_device::read), FUNC(i8275_device::write));
 	map(0xc0, 0xc3).rw(m_pci[0], FUNC(scn_pci_device::read), FUNC(scn_pci_device::write));
 	map(0xd0, 0xd3).rw(m_pci[1], FUNC(scn_pci_device::read), FUNC(scn_pci_device::write));
-	map(0xe0, 0xe0).nopw(); // ?
+	map(0xe0, 0xe0).w(FUNC(t7000_state::attr_latch_w));
 	map(0xf0, 0xf7).w("outlatch", FUNC(ls259_device::write_d0));
 }
 
@@ -158,19 +202,28 @@ void t7000_state::t7000(machine_config &config)
 	X2210(config, "novram"); // U39
 
 	SCN2651(config, m_pci[0], 5.0688_MHz_XTAL);
+	m_pci[0]->txd_handler().set("serial", FUNC(rs232_port_device::write_txd));
+	m_pci[0]->rts_handler().set("serial", FUNC(rs232_port_device::write_rts));
+	m_pci[0]->dtr_handler().set("serial", FUNC(rs232_port_device::write_dtr));
 	m_pci[0]->txrdy_handler().set(m_mainint, FUNC(input_merger_device::in_w<0>));
 	m_pci[0]->rxrdy_handler().set(m_mainint, FUNC(input_merger_device::in_w<1>));
 
 	SCN2651(config, m_pci[1], 5.0688_MHz_XTAL);
+	m_pci[1]->txd_handler().set("keyboard", FUNC(keytronic_l2207_device::ser_in_w));
 	m_pci[1]->txrdy_handler().set(m_mainint, FUNC(input_merger_device::in_w<2>));
 	m_pci[1]->rxrdy_handler().set(m_mainint, FUNC(input_merger_device::in_w<3>));
+
+	KEYTRONIC_L2207(config, "keyboard").ser_out_callback().set(m_pci[1], FUNC(scn_pci_device::rxd_w));
 
 	LS259(config, m_outlatch); // U43
 	m_outlatch->q_out_cb<0>().set(FUNC(t7000_state::vblint_enable_w));
 	m_outlatch->q_out_cb<1>().set(FUNC(t7000_state::dma_enable_w));
+	m_outlatch->q_out_cb<5>().set("novram", FUNC(x2210_device::recall)).invert();
 	m_outlatch->q_out_cb<6>().set("mainnmi", FUNC(input_merger_device::in_w<0>));
+	m_outlatch->q_out_cb<7>().set("novram", FUNC(x2210_device::store));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_color(rgb_t::green()); // "Phospher Type...P31-green (mediam persistence)" (manual p. 6-2)
 	screen.set_raw(19.6608_MHz_XTAL, 1020, 0, 800, 324, 0, 300);
 	screen.set_screen_update(m_crtc[0], FUNC(i8275_device::screen_update));
 
@@ -184,6 +237,12 @@ void t7000_state::t7000(machine_config &config)
 	I8276(config, m_crtc[1], 19.6608_MHz_XTAL / 10);
 	m_crtc[1]->set_character_width(10);
 	m_crtc[1]->set_screen("screen");
+
+	rs232_port_device &serial(RS232_PORT(config, "serial", default_rs232_devices, nullptr));
+	serial.rxd_handler().set(m_pci[0], FUNC(scn_pci_device::rxd_w));
+	serial.cts_handler().set(m_pci[0], FUNC(scn_pci_device::cts_w));
+
+	// TODO: RS232C printer port ("same as above except SEND only")
 }
 
 ROM_START(t7000)
@@ -199,4 +258,4 @@ ROM_END
 
 } // anonymous namespace
 
-SYST(1982, t7000, 0, 0, t7000, t7000, t7000_state, empty_init, "Wicat Systems", "T7000 Video Terminal", MACHINE_IS_SKELETON)
+SYST(1982, t7000, 0, 0, t7000, t7000, t7000_state, empty_init, "Wicat Systems", "T7000 Video Terminal", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)
