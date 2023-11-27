@@ -13,7 +13,6 @@ TODO:
 - V9938 has issues with layer clears, has an hard time sending a vblank irq (the only one enabled)
   at the right time. Removing the invert() from the int_cb will "fix" it at the expense of being
   excruciatingly slow.
-- Complete audio section, SFXs keeps ringing;
 - Document meaning of DIP switches
 
 ===================================================================================================
@@ -114,6 +113,7 @@ private:
 
 	uint32_t m_gfx_bank = 0;
 	uint8_t m_key_select = 0;
+	uint8_t m_soundlatch_ack = 0;
 	int m_dsw_data = 0;
 };
 
@@ -222,7 +222,12 @@ void nichild_state::main_io(address_map &map)
 void nichild_state::soundbank_w(uint8_t data)
 {
 	m_soundbank->set_entry(data & 0x03);
-	// TODO: bit 7 used often with 0 -> 1 transitions
+	// 1 -> 0 -> 1 transitions clears the soundlatch
+	if (!BIT(data, 7) && BIT(m_soundlatch_ack, 7))
+		m_soundlatch->clear_w();
+
+	m_soundlatch_ack = data & 0x80;
+
 	if (data & 0x7c)
 		logerror("soundbank_w: %02x\n", data);
 }
