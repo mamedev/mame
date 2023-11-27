@@ -673,6 +673,13 @@ upscope                         // (c) 1986 Grand products
 @source:amirix/wxstar4000.cpp
 wxstar4k                        // 1990 Applied Microelectronics Research (Amirix) / The Weather Channel
 
+@source:ampex/ampex.cpp
+dialog80                        // Ampex Dialogue 80
+
+@source:ampex/ampex210.cpp
+ampex210p                       //
+ampex230p                       //
+
 @source:ampro/ampro.cpp
 ampro                           //
 
@@ -26927,6 +26934,9 @@ tmpdoki                         // (c) 1998 Media Syouji
 @source:mg1/mg1.cpp
 mg1                             // Whitechapel Computer Works MG-1
 
+@source:microcraft/dim68k.cpp
+dim68k                          //
+
 @source:microkey/primo.cpp
 primoa32                        // Primo A-32
 primoa48                        // Primo A-48
@@ -33163,6 +33173,9 @@ hmxpro                          // 1994 Network Computing Devices
 
 @source:ncd/ncdppc.cpp
 explorapro                      // 1995 Network Computing Devices
+
+@source:ncr/dmv.cpp
+dmv                             //
 
 @source:nec/apc.cpp
 apc                             //
@@ -41250,13 +41263,6 @@ asma3k                          // (c) 2000 AlphaSmart, Inc.
 @source:skeleton/am1000.cpp
 am1000                          // (c) 1988 Alpha Micro
 
-@source:skeleton/ampex.cpp
-dialog80                        // Ampex Dialogue 80
-
-@source:skeleton/ampex210.cpp
-ampex210p                       //
-ampex230p                       //
-
 @source:skeleton/antonelli_hd6305.cpp
 anto2495                        //
 anto2614                        //
@@ -41398,16 +41404,10 @@ digilog400                      //
 @source:skeleton/digitech_gsp5.cpp
 gsp5                            //
 
-@source:skeleton/dim68k.cpp
-dim68k                          //
-
 @source:skeleton/dm7000.cpp
 dm500                           //
 dm5620                          //
 dm7000                          //
-
-@source:skeleton/dmv.cpp
-dmv                             //
 
 @source:skeleton/dps1.cpp
 dps1                            //
@@ -41915,9 +41915,6 @@ vp60                            //
 
 @source:skeleton/vsmilepro.cpp
 vsmilpro
-
-@source:skeleton/wicat.cpp
-wicat                           //
 
 @source:skeleton/xbase09.cpp
 xbase09                         //
@@ -45713,6 +45710,12 @@ jupiter3                        //
 
 @source:westinghouse/testconsole.cpp
 whousetc                        //
+
+@source:wicat/t7000.cpp
+t7000                           //
+
+@source:wicat/wicat.cpp
+wicat                           //
 
 @source:wing/luckgrln.cpp
 7smash                          // (c) 1993 Sovic
