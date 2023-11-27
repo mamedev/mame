@@ -44,6 +44,8 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	static constexpr u32 INTERNAL_OSC = 3686400;
+
 	// DMA Hardware
 	void dma_irq_check();
 	void dma_load_descriptor_and_start(int channel);
@@ -177,6 +179,8 @@ protected:
 	// Timer Hardware
 	void ostimer_irq_check();
 	TIMER_CALLBACK_MEMBER(ostimer_match_tick);
+	template <int Which> void ostimer_update_interrupts();
+	void ostimer_update_count();
 
 	template <int Which> u32 tmr_osmr_r(offs_t offset, u32 mem_mask);
 	template <int Which> void tmr_osmr_w(offs_t offset, u32 data, u32 mem_mask);
@@ -211,6 +215,7 @@ protected:
 		u32 oier;
 
 		emu_timer* timer[4];
+		attotime last_count_sync;
 	};
 
 	ostmr_regs m_ostimer_regs;

@@ -767,6 +767,31 @@ TIMER_CALLBACK_MEMBER(pxa255_periphs_device::ostimer_match_tick)
 }
 
 template <int Which>
+void pxa255_periphs_device::ostimer_update_interrupts()
+{
+	if ((m_ostimer_regs.oier & (OIER_E0 << Which)) && Which != 3)
+	{
+		m_ostimer_regs.timer[Which]->adjust(attotime::from_hz(3846400) * (m_ostimer_regs.osmr[Which] - m_ostimer_regs.oscr), Which);
+	}
+}
+
+void pxa255_periphs_device::ostimer_update_count()
+{
+	const attotime time_delta = machine().time() - m_ostimer_regs.last_count_sync;
+	const uint64_t ticks_elapsed = time_delta.as_ticks(INTERNAL_OSC);
+	if (ticks_elapsed == 0ULL) // Accrue time until we can tick at least once
+		return;
+
+	const uint32_t wrapped_ticks = (uint32_t)ticks_elapsed;
+	m_ostimer_regs.oscr += wrapped_ticks;
+	m_ostimer_regs.last_count_sync = machine().time();
+	ostimer_update_interrupts<0>();
+	ostimer_update_interrupts<1>();
+	ostimer_update_interrupts<2>();
+	ostimer_update_interrupts<3>();
+}
+
+template <int Which>
 u32 pxa255_periphs_device::tmr_osmr_r(offs_t offset, u32 mem_mask)
 {
 	const u32 data = m_ostimer_regs.osmr[Which];
@@ -778,19 +803,17 @@ template <int Which>
 void pxa255_periphs_device::tmr_osmr_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	LOGMASKED(LOG_OSTIMER, "%s: pxa255_ostimer_w: OS Timer Match Register %d = %08x & %08x\n", machine().describe_context(), Which, data, mem_mask);
+	ostimer_update_count();
 	m_ostimer_regs.osmr[Which] = data;
-	if ((m_ostimer_regs.oier & (OIER_E0 << Which)) && Which != 3)
-	{
-		m_ostimer_regs.timer[Which]->adjust(attotime::from_hz(3846400) * (m_ostimer_regs.osmr[Which] - m_ostimer_regs.oscr), Which);
-	}
+	ostimer_update_count();
+	ostimer_update_interrupts<Which>();
 }
 
 u32 pxa255_periphs_device::tmr_oscr_r(offs_t offset, u32 mem_mask)
 {
+	ostimer_update_count();
 	const u32 data = m_ostimer_regs.oscr;
 	LOGMASKED(LOG_OSTIMER, "%s: tmr_oscr_r: OS Timer Count Register: %08x & %08x\n", machine().describe_context(), data, mem_mask);
-	// free-running 3.something MHz counter.  this is a complete hack.
-	m_ostimer_regs.oscr += 0x300;
 	return m_ostimer_regs.oscr;
 }
 
@@ -798,6 +821,7 @@ void pxa255_periphs_device::tmr_oscr_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	LOGMASKED(LOG_OSTIMER, "%s: tmr_oscr_w: OS Timer Count Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 	m_ostimer_regs.oscr = data;
+	m_ostimer_regs.last_count_sync = machine().time();
 }
 
 u32 pxa255_periphs_device::tmr_ossr_r(offs_t offset, u32 mem_mask)
@@ -838,13 +862,6 @@ void pxa255_periphs_device::tmr_oier_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	LOGMASKED(LOG_OSTIMER, "%s: tmr_oier_w: OS Timer Interrupt Enable Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 	m_ostimer_regs.oier = data & 0x0000000f;
-	for (int index = 0; index < 4; index++)
-	{
-		if (m_ostimer_regs.oier & (1 << index))
-		{
-			//m_ostimer_regs.timer[index]->adjust(attotime::from_hz(200000000) * m_ostimer_regs.osmr[index], index);
-		}
-	}
 }
 
 
