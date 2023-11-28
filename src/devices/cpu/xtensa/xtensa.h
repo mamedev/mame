@@ -50,7 +50,6 @@ private:
 
 	// formatting helpers
 	static std::string format_imm(u32 imm);
-//	static std::string special_reg(u8 n, bool wsr);
 };
 
 DECLARE_DEVICE_TYPE(XTENSA, xtensa_device)
