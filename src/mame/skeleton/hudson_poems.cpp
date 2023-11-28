@@ -83,9 +83,7 @@ void hudson_poems_state::mem_map(address_map &map)
 
 void hudson_poems_state::hudson_poems(machine_config &config)
 {
-	// 27Mhz XTAL
-
-	// Xtensa based CPU?
+	// 27Mhz XTAL, Xtensa based CPU
 	XTENSA(config, m_maincpu, 27_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &hudson_poems_state::mem_map);
 
