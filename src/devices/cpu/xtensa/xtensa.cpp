@@ -63,32 +63,6 @@ void xtensa_device::device_reset()
 	// TODO: Reset state
 }
 
-std::string xtensa_device::format_imm(u32 imm)
-{
-	if (s32(imm) < 0)
-	{
-		if (s32(imm < -9))
-		{
-			return util::string_format("-0x%X", -imm);
-		}
-		else
-		{
-			return util::string_format("-%X", -imm);
-		}
-	}
-	else
-	{
-		if (imm > 9)
-		{
-			return util::string_format("0x%X", imm);
-		}
-		else
-		{
-			return util::string_format("%X", imm);
-		}
-	}
-}
-
 void xtensa_device::handle_reserved(u32 inst)
 {
 	LOG("%-8s0x%02X ; reserved\n", "db", inst & 0xff);

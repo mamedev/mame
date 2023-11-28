@@ -51,9 +51,6 @@ private:
 	s32 m_icount;
 
 	u32 m_nextpc;
-
-	// formatting helpers
-	static std::string format_imm(u32 imm);
 };
 
 DECLARE_DEVICE_TYPE(XTENSA, xtensa_device)

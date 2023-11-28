@@ -30,18 +30,6 @@ u32 xtensa_disassembler::opcode_alignment() const
 	return 1;
 }
 
-void xtensa_disassembler::format_imm(std::ostream &stream, u32 imm)
-{
-	if (s32(imm) < 0)
-	{
-		stream << '-';
-		imm = -imm;
-	}
-	if (imm > 9)
-		stream << "0x";
-	util::stream_format(stream, "%X", imm);
-}
-
 offs_t xtensa_disassembler::disassemble(std::ostream &stream, offs_t pc, const xtensa_disassembler::data_buffer &opcodes, const xtensa_disassembler::data_buffer &params)
 {
 	u32 inst = opcodes.r16(pc);
@@ -507,13 +495,11 @@ offs_t xtensa_disassembler::disassemble(std::ostream &stream, offs_t pc, const x
 			switch (BIT(inst, 20, 4))
 			{
 			case 0b0000: // L32E
-				util::stream_format(stream, "%-8sa%d, a%d, ", "l32e", BIT(inst, 4, 4), BIT(inst, 8, 4));
-				format_imm(stream, int(BIT(inst, 12, 4)) * 4 - 64);
+				util::stream_format(stream, "%-8sa%d, a%d, %s", "l32e", BIT(inst, 4, 4), BIT(inst, 8, 4), format_imm(int(BIT(inst, 12, 4)) * 4 - 64));
 				break;
 
 			case 0b0100: // S32E
-				util::stream_format(stream, "%-8sa%d, a%d, ", "s32e", BIT(inst, 4, 4), BIT(inst, 8, 4));
-				format_imm(stream, int(BIT(inst, 12, 4)) * 4 - 64);
+				util::stream_format(stream, "%-8sa%d, a%d, %s", "s32e", BIT(inst, 4, 4), BIT(inst, 8, 4), format_imm(int(BIT(inst, 12, 4)) * 4 - 64));
 				break;
 
 			default:
@@ -607,20 +593,17 @@ offs_t xtensa_disassembler::disassemble(std::ostream &stream, offs_t pc, const x
 		switch (BIT(inst, 12, 4))
 		{
 		case 0b0000: case 0b0100: // L8UI, S8I
-			util::stream_format(stream, "%-8sa%d, a%d, ", s_lsai_ops[BIT(inst, 12, 4)], BIT(inst, 4, 4), BIT(inst, 8, 4));
-			format_imm(stream, inst >> 16);
+			util::stream_format(stream, "%-8sa%d, a%d, %s", s_lsai_ops[BIT(inst, 12, 4)], BIT(inst, 4, 4), BIT(inst, 8, 4), format_imm(inst >> 16));
 			break;
 
 		case 0b0001: case 0b0101: case 0b1001: // L16UI, S16I, L16SI
-			util::stream_format(stream, "%-8sa%d, a%d, ", s_lsai_ops[BIT(inst, 12, 4)], BIT(inst, 4, 4), BIT(inst, 8, 4));
-			format_imm(stream, (inst >> 16) * 2);
+			util::stream_format(stream, "%-8sa%d, a%d, %s", s_lsai_ops[BIT(inst, 12, 4)], BIT(inst, 4, 4), BIT(inst, 8, 4), format_imm((inst >> 16) * 2));
 			break;
 
 		case 0b0010: case 0b0110: // L32I, S32I
 		case 0b1011: case 0b1111: // L32AI, S32RI (with Multiprocessor Synchronization Option)
 		case 0b1110: // S32C1I (with Conditional Store Option)
-			util::stream_format(stream, "%-8sa%d, a%d, ", s_lsai_ops[BIT(inst, 12, 4)], BIT(inst, 4, 4), BIT(inst, 8, 4));
-			format_imm(stream, (inst >> 16) * 4);
+			util::stream_format(stream, "%-8sa%d, a%d, %s", s_lsai_ops[BIT(inst, 12, 4)], BIT(inst, 4, 4), BIT(inst, 8, 4), format_imm((inst >> 16) * 4));
 			break;
 
 		case 0b0111: // CACHE
@@ -629,36 +612,30 @@ offs_t xtensa_disassembler::disassemble(std::ostream &stream, offs_t pc, const x
 			case 0b0000: case 0b0001: case 0b0010: case 0b0011: // DPFR, DPFW, DPFRO, DPFWO (with Data Cache Option)
 			case 0b0100: case 0b0101: case 0b0110: case 0b0111: // DHWB, DHWBI, DHI, DII (with Data Cache Option)
 			case 0b1100: case 0b1110: case 0b1111: // IPF, IHI, III (with Instruction Cache Option)
-				util::stream_format(stream, "%-8sa%d, ", s_cache_ops[BIT(inst, 4, 4)], BIT(inst, 8, 4));
-				format_imm(stream, (inst >> 16) * 4);
+				util::stream_format(stream, "%-8sa%d, %s", s_cache_ops[BIT(inst, 4, 4)], BIT(inst, 8, 4), format_imm((inst >> 16) * 4));
 				break;
 
 			case 0b1000: // DCE (with Data Cache Option)
 				switch (BIT(inst, 16, 4))
 				{
 				case 0b0000: // DPFL (with Data Cache Index Lock Option)
-					util::stream_format(stream, "%-8sa%d, ", "dpfl", BIT(inst, 8, 4));
-					format_imm(stream, (inst >> 20) * 4);
+					util::stream_format(stream, "%-8sa%d, %s", "dpfl", BIT(inst, 8, 4), format_imm((inst >> 20) * 4));
 					break;
 
 				case 0b0010: // DHU (with Data Cache Index Lock Option)
-					util::stream_format(stream, "%-8sa%d, ", "dhu", BIT(inst, 8, 4));
-					format_imm(stream, (inst >> 20) * 4);
+					util::stream_format(stream, "%-8sa%d, %s", "dhu", BIT(inst, 8, 4), format_imm((inst >> 20) * 4));
 					break;
 
 				case 0b0011: // DIU (with Data Cache Index Lock Option)
-					util::stream_format(stream, "%-8sa%d, ", "diu", BIT(inst, 8, 4));
-					format_imm(stream, (inst >> 20) * 4);
+					util::stream_format(stream, "%-8sa%d, %s", "diu", BIT(inst, 8, 4), format_imm((inst >> 20) * 4));	
 					break;
 
 				case 0b0100: // DIWB (added in T1050)
-					util::stream_format(stream, "%-8sa%d, ", "diwb", BIT(inst, 8, 4));
-					format_imm(stream, (inst >> 20) * 4);
+					util::stream_format(stream, "%-8sa%d, %s", "diwb", BIT(inst, 8, 4), format_imm((inst >> 20) * 4));
 					break;
 
 				case 0b0101: // DIWBI (added in T1050)
-					util::stream_format(stream, "%-8sa%d, ", "diwbi", BIT(inst, 8, 4));
-					format_imm(stream, (inst >> 20) * 4);
+					util::stream_format(stream, "%-8sa%d, %s", "diwbi", BIT(inst, 8, 4), format_imm((inst >> 20) * 4));
 					break;
 				}
 				break;
@@ -667,18 +644,15 @@ offs_t xtensa_disassembler::disassemble(std::ostream &stream, offs_t pc, const x
 				switch (BIT(inst, 16, 4))
 				{
 				case 0b0000: // IPFL
-					util::stream_format(stream, "%-8sa%d, ", "ipfl", BIT(inst, 8, 4));
-					format_imm(stream, (inst >> 20) * 4);
+					util::stream_format(stream, "%-8sa%d, %s", "ipfl", BIT(inst, 8, 4), format_imm((inst >> 20) * 4));
 					break;
 
 				case 0b0010: // IHU
-					util::stream_format(stream, "%-8sa%d, ", "ihu", BIT(inst, 8, 4));
-					format_imm(stream, (inst >> 20) * 4);
+					util::stream_format(stream, "%-8sa%d, %s", "ihu", BIT(inst, 8, 4), format_imm((inst >> 20) * 4));
 					break;
 
 				case 0b0011: // IIU
-					util::stream_format(stream, "%-8sa%d, ", "iiu", BIT(inst, 8, 4));
-					format_imm(stream, (inst >> 20) * 4);
+					util::stream_format(stream, "%-8sa%d, %s", "iiu", BIT(inst, 8, 4), format_imm((inst >> 20) * 4));
 					break;
 
 				default:
@@ -694,13 +668,11 @@ offs_t xtensa_disassembler::disassemble(std::ostream &stream, offs_t pc, const x
 			break;
 
 		case 0b1010: // MOVI
-			util::stream_format(stream, "%-8sa%d, ", "movi", BIT(inst, 4, 4));
-			format_imm(stream, util::sext((inst & 0x000f00) + (inst >> 16), 12));
+			util::stream_format(stream, "%-8sa%d, %s", "movi", BIT(inst, 4, 4), format_imm(util::sext((inst & 0x000f00) + (inst >> 16), 12)));
 			break;
 
 		case 0b1100: case 0b1101: // ADDI, ADDMI
-			util::stream_format(stream, "%-8sa%d, a%d, ", s_lsai_ops[BIT(inst, 12, 4)], BIT(inst, 8, 4), BIT(inst, 4, 4));
-			format_imm(stream, s8(u8(inst >> 16)) * (BIT(inst, 12) ? 256 : 1));
+			util::stream_format(stream, "%-8sa%d, a%d, %s", s_lsai_ops[BIT(inst, 12, 4)], BIT(inst, 8, 4), BIT(inst, 4, 4), format_imm(s8(u8(inst >> 16)) * (BIT(inst, 12) ? 256 : 1)));
 			break;
 
 		default:
@@ -713,8 +685,7 @@ offs_t xtensa_disassembler::disassemble(std::ostream &stream, offs_t pc, const x
 		if (BIT(inst, 12, 2) == 0)
 		{
 			// LSI, SSI, LSIU, SSIU
-			util::stream_format(stream, "%-8sf%d, a%d, ", s_lsci_ops[BIT(inst, 14, 2)], BIT(inst, 4, 4), BIT(inst, 8, 4));
-			format_imm(stream, BIT(inst, 16, 8) * 4);
+			util::stream_format(stream, "%-8sf%d, a%d, %s", s_lsci_ops[BIT(inst, 14, 2)], BIT(inst, 4, 4), BIT(inst, 8, 4), format_imm(BIT(inst, 16, 8) * 4));	
 			return 3 | SUPPORTED;
 		}
 		else
@@ -829,17 +800,14 @@ offs_t xtensa_disassembler::disassemble(std::ostream &stream, offs_t pc, const x
 			return 3 | STEP_COND | SUPPORTED;
 
 		case 0b10: // BI0
-			util::stream_format(stream, "%-8sa%d, ", s_bi0_ops[BIT(inst, 6, 2)], BIT(inst, 8, 4));
-			format_imm(stream, s_b4const[BIT(inst, 12, 4)]);
-			util::stream_format(stream, ", 0x%08X", pc + 4 + s8(u8(inst >> 16)));
+			util::stream_format(stream, "%-8sa%d, %s, 0x%08X", s_bi0_ops[BIT(inst, 6, 2)], BIT(inst, 8, 4), format_imm(s_b4const[BIT(inst, 12, 4)]), pc + 4 + s8(u8(inst >> 16)));
 			return 3 | STEP_COND | SUPPORTED;
 
 		case 0b11: // BI1
 			switch (BIT(inst, 6, 2))
 			{
 			case 0b00: // ENTRY
-				util::stream_format(stream, "%-8sa%d, ", "entry", BIT(inst, 8, 4));
-				format_imm(stream, (inst >> 12) * 4);
+				util::stream_format(stream, "%-8sa%d, %s", "entry", BIT(inst, 8, 4), format_imm((inst >> 12) * 4));
 				break;
 
 			case 0b01: // B1
@@ -868,9 +836,7 @@ offs_t xtensa_disassembler::disassemble(std::ostream &stream, offs_t pc, const x
 				break;
 
 			case 0b10: case 0b11: // BLTUI, BGEUI
-				util::stream_format(stream, "%-8sa%d, ", BIT(inst, 6) ? "bgeui" : "bltui", BIT(inst, 8, 4));
-				format_imm(stream, s_b4constu[BIT(inst, 4, 4)]);
-				util::stream_format(stream, ", 0x%08X", pc + 4 + s8(u8(inst >> 16)));
+				util::stream_format(stream, "%-8sa%d, %s, 0x%08X", BIT(inst, 6) ? "bgeui" : "bltui", BIT(inst, 8, 4), format_imm(s_b4constu[BIT(inst, 4, 4)]), pc + 4 + s8(u8(inst >> 16)));
 				return 3 | STEP_COND | SUPPORTED;
 			}
 			break;
@@ -891,8 +857,7 @@ offs_t xtensa_disassembler::disassemble(std::ostream &stream, offs_t pc, const x
 		return 3 | STEP_COND | SUPPORTED;
 
 	case 0b1000: case 0b1001: // L32I.N (with Code Density Option)
-		util::stream_format(stream, "%-8sa%d, a%d, ", BIT(inst, 0) ? "s32i.n" : "l32i.n", BIT(inst, 4, 4), BIT(inst, 8, 4));
-		format_imm(stream, BIT(inst, 12, 4) * 4);
+		util::stream_format(stream, "%-8sa%d, a%d, %s", BIT(inst, 0) ? "s32i.n" : "l32i.n", BIT(inst, 4, 4), BIT(inst, 8, 4), format_imm(BIT(inst, 12, 4) * 4));
 		return 2 | SUPPORTED;
 
 	case 0b1010: // ADD.N (with Code Density Option)
@@ -907,8 +872,7 @@ offs_t xtensa_disassembler::disassemble(std::ostream &stream, offs_t pc, const x
 		if (!BIT(inst, 7))
 		{
 			// 7-bit immediate field uses asymmetric sign extension (range is -32..95)
-			util::stream_format(stream, "%-8sa%d, ", "movi.n", BIT(inst, 8, 4));
-			format_imm(stream, int((inst & 0x0070) + BIT(inst, 12, 4) - (BIT(inst, 5, 2) == 0b11 ? 128 : 0)));
+			util::stream_format(stream, "%-8sa%d, %s", "movi.n", BIT(inst, 8, 4), format_imm(int((inst & 0x0070) + BIT(inst, 12, 4) - (BIT(inst, 5, 2) == 0b11 ? 128 : 0))));
 			return 2 | SUPPORTED;
 		}
 		else

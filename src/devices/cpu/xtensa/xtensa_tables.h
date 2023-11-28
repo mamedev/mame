@@ -189,6 +189,33 @@ static const char *const s_b_ops[16] =
 	"bany", "bne", "bge", "bgeu", "bnall", "bbs", "bbsi", "bbsih"
 };
 
+static std::string format_imm(u32 imm)
+{
+	if (s32(imm) < 0)
+	{
+		if (s32(imm < -9))
+		{
+			return util::string_format("-0x%X", -imm);
+		}
+		else
+		{
+			return util::string_format("-%X", -imm);
+		}
+	}
+	else
+	{
+		if (imm > 9)
+		{
+			return util::string_format("0x%X", imm);
+		}
+		else
+		{
+			return util::string_format("%X", imm);
+		}
+	}
+}
+
+
 static std::string special_reg(u8 n, bool wsr)
 {
 	if (n == 226 && !wsr)
