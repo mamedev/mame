@@ -3919,6 +3919,7 @@ if CPUS["XTENSA"] then
 	files {
 		MAME_DIR .. "src/devices/cpu/xtensa/xtensa.cpp",
 		MAME_DIR .. "src/devices/cpu/xtensa/xtensa.h",
+		MAME_DIR .. "src/devices/cpu/xtensa/xtensa_tables.h",
 	}
 end
 

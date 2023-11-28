@@ -21,7 +21,7 @@ private:
 	// formatting helpers
 	static void format_imm(std::ostream &stream, u32 imm);
 
-	static std::string special_reg(u8 n, bool wsr);
+	//static std::string special_reg(u8 n, bool wsr);
 };
 
 #endif // MAME_CPU_XTENSA_XTENSAD_H

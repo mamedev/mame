@@ -41,10 +41,16 @@ private:
 	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache m_cache;
 	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::specific m_space;
 
+	void getop_and_execute();
+
 	// internal state
-	u32 m_a[16];
+	u32 m_a[16]; // actually 32 or 64 physical registers with Windowed extension
 	u32 m_pc;
 	s32 m_icount;
+
+	// formatting helpers
+	static std::string format_imm(u32 imm);
+//	static std::string special_reg(u8 n, bool wsr);
 };
 
 DECLARE_DEVICE_TYPE(XTENSA, xtensa_device)
