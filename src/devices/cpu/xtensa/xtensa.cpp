@@ -93,7 +93,7 @@ std::string xtensa_device::format_imm(u32 imm)
 
 void xtensa_device::getop_and_execute()
 {
-	u8 length = 2;
+	u32 nextpc = m_pc + 2;;
 	u32 inst = m_cache.read_byte(m_pc);
 	inst |= m_cache.read_byte(m_pc+1)<<8;
 
@@ -101,7 +101,7 @@ void xtensa_device::getop_and_execute()
 	if (op0 < 0b1000)
 	{
 		inst |= u32(m_cache.read_byte(m_pc+2)) << 16;
-		length = 3;
+		nextpc = m_pc + 3;
 	}
 
 	switch (op0)
@@ -873,8 +873,12 @@ void xtensa_device::getop_and_execute()
 		switch (BIT(inst, 4, 2))
 		{
 		case 0b00: // J
-			LOG("%-8s0x%08X\n", "j", m_pc + 4 + util::sext(inst >> 6, 18));
+		{
+			u32 newpc = m_pc + 4 + util::sext(inst >> 6, 18);
+			LOG("%-8s0x%08X\n", "j", newpc);
+			nextpc = newpc;
 			break;
+		}
 
 		case 0b01: // BZ
 			LOG("%-8sa%d, 0x%08X\n", s_bz_ops[BIT(inst, 6, 2)], BIT(inst, 8, 4), m_pc + 4 + util::sext(inst >> 12, 12));
@@ -1010,7 +1014,7 @@ void xtensa_device::getop_and_execute()
 		break;
 	}
 
-	m_pc += length;
+	m_pc = nextpc;
 }
 
 
