@@ -995,10 +995,14 @@ void xtensa_device::getop_and_execute()
 		break;
 
 	case 0b0111: // B
-		if (BIT(inst, 9, 2) == 0b11)
+		if (BIT(inst, 13, 2) == 0b11)
 		{
 			// BBCI, BBSI
-			LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, %d, 0x%08X\n", BIT(inst, 11) ? "bbsi" : "bbci", BIT(inst, 8, 4), BIT(inst, 4, 4) + (BIT(inst, 12) ? 4 : 0), m_pc + 4 + s8(u8(inst >> 16)));
+			u8 reg = BIT(inst, 8, 4);
+			u8 imm =  BIT(inst, 4, 4) + (BIT(inst, 12) ? 16 : 0);
+			u32 addr = m_pc + 4 + s8(u8(inst >> 16));
+			LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, %d, 0x%08X\n", BIT(inst, 15) ? "bbsi" : "bbci", reg, imm, addr);
+			break;
 		}
 		else
 		{
@@ -1030,8 +1034,10 @@ void xtensa_device::getop_and_execute()
 				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, 0x%08X\n", "bbc", as, at, addr);
 				break;
 			//case 0b0110:// bbci
+			//	LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, 0x%08X\n", "bbci", as, at, addr);
 			//	break;
 			//case 0b0111:// bbci
+			//	LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, 0x%08X\n", "bbci", as, at, addr);
 			//	break;
 			case 0b1000:// bany
 				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, 0x%08X\n", "bany", as, at, addr);
@@ -1052,8 +1058,10 @@ void xtensa_device::getop_and_execute()
 				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, 0x%08X\n", "bbs", as, at, addr);
 				break;
 			//case 0b1110:// bbsi
+			//	LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, 0x%08X\n", "bbsi", as, at, addr);
 			//	break;
 			//case 0b1111:// bbsih
+			//	LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, 0x%08X\n", "bbsih", as, at, addr);
 			//	break;
 			default:
 				break;

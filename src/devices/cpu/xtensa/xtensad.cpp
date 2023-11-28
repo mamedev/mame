@@ -844,10 +844,10 @@ offs_t xtensa_disassembler::disassemble(std::ostream &stream, offs_t pc, const x
 		return 3 | SUPPORTED;
 
 	case 0b0111: // B
-		if (BIT(inst, 9, 2) == 0b11)
+		if (BIT(inst, 13, 2) == 0b11)
 		{
 			// BBCI, BBSI
-			util::stream_format(stream, "%-8sa%d, %d, 0x%08X", BIT(inst, 11) ? "bbsi" : "bbci", BIT(inst, 8, 4), BIT(inst, 4, 4) + (BIT(inst, 12) ? 4 : 0), pc + 4 + s8(u8(inst >> 16)));
+			util::stream_format(stream, "%-8sa%d, %d, 0x%08X", BIT(inst, 15) ? "bbsi" : "bbci", BIT(inst, 8, 4), BIT(inst, 4, 4) + (BIT(inst, 12) ? 16 : 0), pc + 4 + s8(u8(inst >> 16)));
 		}
 		else
 		{
