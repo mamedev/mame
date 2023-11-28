@@ -89,11 +89,15 @@ std::string xtensa_device::format_imm(u32 imm)
 	}
 }
 
-
+void xtensa_device::handle_reserved(u32 inst)
+{
+	LOG("%-8s0x%02X ; reserved\n", "db", inst & 0xff);
+	m_nextpc = m_pc + 1;
+}
 
 void xtensa_device::getop_and_execute()
 {
-	u32 nextpc = m_pc + 2;;
+	m_nextpc = m_pc + 2;
 	u32 inst = m_cache.read_byte(m_pc);
 	inst |= m_cache.read_byte(m_pc+1)<<8;
 
@@ -101,7 +105,7 @@ void xtensa_device::getop_and_execute()
 	if (op0 < 0b1000)
 	{
 		inst |= u32(m_cache.read_byte(m_pc+2)) << 16;
-		nextpc = m_pc + 3;
+		m_nextpc = m_pc + 3;
 	}
 
 	switch (op0)
@@ -140,7 +144,7 @@ void xtensa_device::getop_and_execute()
 						break;
 
 					default:
-						LOG("%-8s0x%02X ; reserved\n", "db", inst & 0xff);
+						handle_reserved(inst);
 						break;
 					}
 					break;
@@ -185,7 +189,7 @@ void xtensa_device::getop_and_execute()
 						break;
 
 					default:
-						LOG("%-8s0x%02X ; reserved\n", "db", inst & 0xff);
+						handle_reserved(inst);
 						break;
 					}
 					break;
@@ -217,7 +221,7 @@ void xtensa_device::getop_and_execute()
 							break;
 
 						default:
-							LOG("%-8s0x%02X ; reserved\n", "db", inst & 0xff);
+							handle_reserved(inst);
 							break;
 						}
 						break;
@@ -231,7 +235,7 @@ void xtensa_device::getop_and_execute()
 						break;
 
 					default:
-						LOG("%-8s0x%02X ; reserved\n", "db", inst & 0xff);
+						handle_reserved(inst);
 						break;
 					}
 					break;
@@ -269,7 +273,7 @@ void xtensa_device::getop_and_execute()
 					break;
 
 				default:
-					LOG("%-8s0x%02X ; reserved\n", "db", inst & 0xff);
+					handle_reserved(inst);
 					break;
 				}
 				break;
@@ -314,7 +318,7 @@ void xtensa_device::getop_and_execute()
 					break;
 
 				default:
-					LOG("%-8s0x%02X ; reserved\n", "db", inst & 0xff);
+					handle_reserved(inst);
 					break;
 				}
 				break;
@@ -332,7 +336,7 @@ void xtensa_device::getop_and_execute()
 					break;
 
 				default:
-					LOG("%-8s0x%02X ; reserved\n", "db", inst & 0xff);
+					handle_reserved(inst);
 					break;
 				}
 				break;
@@ -349,7 +353,7 @@ void xtensa_device::getop_and_execute()
 					break;
 
 				default:
-					LOG("%-8s0x%02X ; reserved\n", "db", inst & 0xff);
+					handle_reserved(inst);
 					break;
 				}
 				break;
@@ -364,7 +368,7 @@ void xtensa_device::getop_and_execute()
 				break;
 
 			default:
-				LOG("%-8s0x%02X ; reserved\n", "db", inst & 0xff);
+				handle_reserved(inst);
 				break;
 			}
 			break;
@@ -400,7 +404,7 @@ void xtensa_device::getop_and_execute()
 					break;
 
 				default:
-					LOG("%-8s0x%02X ; reserved\n", "db", inst & 0xff);
+					handle_reserved(inst);
 					break;
 				}
 				break;
@@ -468,19 +472,19 @@ void xtensa_device::getop_and_execute()
 						break;
 
 					default:
-						LOG("%-8s0x%02X ; reserved\n", "db", inst & 0xff);
+						handle_reserved(inst);
 						break;
 					}
 					break;
 
 				default:
-					LOG("%-8s0x%02X ; reserved\n", "db", inst & 0xff);
+					handle_reserved(inst);
 					break;
 				}
 				break;
 
 			default:
-				LOG("%-8s0x%02X ; reserved\n", "db", inst & 0xff);
+				handle_reserved(inst);
 				break;
 			}
 			break;
@@ -498,7 +502,7 @@ void xtensa_device::getop_and_execute()
 				break;
 
 			default:
-				LOG("%-8s0x%02X ; reserved\n", "db", inst & 0xff);
+				handle_reserved(inst);
 				break;
 			}
 			break;
@@ -535,6 +539,7 @@ void xtensa_device::getop_and_execute()
 
 		case 0b0110: case 0b0111: // CUST0, CUST1
 			LOG("%-8s0x%02X ; cust%d?\n", "db", inst & 0xff, BIT(inst, 16));
+			m_nextpc = m_pc + 1;
 			break;
 
 		case 0b1000: // LSCX (with Floating-Point Coprocessor Option)
@@ -557,7 +562,7 @@ void xtensa_device::getop_and_execute()
 				break;
 
 			default:
-				LOG("%-8s0x%02X ; reserved\n", "db", inst & 0xff);
+				handle_reserved(inst);
 				break;
 			}
 			break;
@@ -574,7 +579,7 @@ void xtensa_device::getop_and_execute()
 				break;
 
 			default:
-				LOG("%-8s0x%02X ; reserved\n", "db", inst & 0xff);
+				handle_reserved(inst);
 				break;
 			}
 			break;
@@ -618,13 +623,13 @@ void xtensa_device::getop_and_execute()
 					break;
 
 				default:
-					LOG("%-8s0x%02X ; reserved\n", "db", inst & 0xff);
+					handle_reserved(inst);
 					break;
 				}
 				break;
 
 			default:
-				LOG("%-8s0x%02X ; reserved\n", "db", inst & 0xff);
+				handle_reserved(inst);
 				break;
 			}
 			break;
@@ -645,13 +650,13 @@ void xtensa_device::getop_and_execute()
 				break;
 
 			default:
-				LOG("%-8s0x%02X ; reserved\n", "db", inst & 0xff);
+				handle_reserved(inst);
 				break;
 			}
 			break;
 
 		default:
-			LOG("%-8s0x%02X ; reserved\n", "db", inst & 0xff);
+			handle_reserved(inst);
 			break;
 		}
 		break;
@@ -727,13 +732,13 @@ void xtensa_device::getop_and_execute()
 					break;
 
 				default:
-					LOG("%-8s0x%02X ; reserved\n", "db", inst & 0xff);
+					handle_reserved(inst);
 					break;
 				}
 				break;
 
 			default:
-				LOG("%-8s0x%02X ; reserved\n", "db", inst & 0xff);
+				handle_reserved(inst);
 				break;
 			}
 			break;
@@ -747,7 +752,7 @@ void xtensa_device::getop_and_execute()
 			break;
 
 		default:
-			LOG("%-8s0x%02X ; reserved\n", "db", inst & 0xff);
+			handle_reserved(inst);
 			break;
 		}
 		break;
@@ -761,7 +766,7 @@ void xtensa_device::getop_and_execute()
 		}
 		else
 		{
-			LOG("%-8s0x%02X ; reserved\n", "db", inst & 0xff);
+			handle_reserved(inst);
 			break;
 		}
 
@@ -779,7 +784,7 @@ void xtensa_device::getop_and_execute()
 			}
 			else
 			{
-				LOG("%-8s0x%02X ; reserved\n", "db", inst & 0xff);
+				handle_reserved(inst);
 				break;
 			}
 			break;
@@ -795,7 +800,7 @@ void xtensa_device::getop_and_execute()
 			}
 			else
 			{
-				LOG("%-8s0x%02X ; reserved\n", "db", inst & 0xff);
+				handle_reserved(inst);
 				break;
 			}
 			break;
@@ -807,7 +812,7 @@ void xtensa_device::getop_and_execute()
 			}
 			else
 			{
-				LOG("%-8s0x%02X ; reserved\n", "db", inst & 0xff);
+				handle_reserved(inst);
 				break;
 			}
 			break;
@@ -819,7 +824,7 @@ void xtensa_device::getop_and_execute()
 			}
 			else
 			{
-				LOG("%-8s0x%02X ; reserved\n", "db", inst & 0xff);
+				handle_reserved(inst);
 				break;
 			}
 			break;
@@ -831,7 +836,7 @@ void xtensa_device::getop_and_execute()
 			}
 			else
 			{
-				LOG("%-8s0x%02X ; reserved\n", "db", inst & 0xff);
+				handle_reserved(inst);
 				break;
 			}
 			break;
@@ -848,13 +853,13 @@ void xtensa_device::getop_and_execute()
 				break;
 
 			default:
-				LOG("%-8s0x%02X ; reserved\n", "db", inst & 0xff);
+				handle_reserved(inst);
 				break;
 			}
 			break;
 
 		default:
-			LOG("%-8s0x%02X ; reserved\n", "db", inst & 0xff);
+			handle_reserved(inst);
 			break;
 		}
 		break;
@@ -876,7 +881,7 @@ void xtensa_device::getop_and_execute()
 		{
 			u32 newpc = m_pc + 4 + util::sext(inst >> 6, 18);
 			LOG("%-8s0x%08X\n", "j", newpc);
-			nextpc = newpc;
+			m_nextpc = newpc;
 			break;
 		}
 
@@ -915,7 +920,7 @@ void xtensa_device::getop_and_execute()
 					break;
 
 				default:
-					LOG("%-8s0x%02X ; reserved\n", "db", inst & 0xff);
+					handle_reserved(inst);
 					break;
 				}
 				break;
@@ -998,23 +1003,23 @@ void xtensa_device::getop_and_execute()
 				break;
 
 			default:
-				LOG("%-8s0x%02X ; reserved\n", "db", inst & 0xff);
+				handle_reserved(inst);
 				break;
 			}
 			break;
 
 		default:
-			LOG("%-8s0x%02X ; reserved\n", "db", inst & 0xff);
+			handle_reserved(inst);
 			break;
 		}
 		break;
 
 	default:
-		LOG("%-8s0x%02X ; reserved\n", "db", inst & 0xff);
+		handle_reserved(inst);
 		break;
 	}
 
-	m_pc = nextpc;
+	m_pc = m_nextpc;
 }
 
 

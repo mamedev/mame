@@ -43,10 +43,14 @@ private:
 
 	void getop_and_execute();
 
+	void handle_reserved(u32 inst);
+
 	// internal state
 	u32 m_a[16]; // actually 32 or 64 physical registers with Windowed extension
 	u32 m_pc;
 	s32 m_icount;
+
+	u32 m_nextpc;
 
 	// formatting helpers
 	static std::string format_imm(u32 imm);
