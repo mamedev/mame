@@ -90,17 +90,17 @@ void xtensa_device::set_reg(u8 reg, u32 value)
 u32 xtensa_device::get_mem32(u32 addr)
 {
 	if (addr & 3)
-		fatalerror("get_mem32 unaligned");
+		logerror("get_mem32 unaligned\n");
 
-	return m_space.read_dword(addr);
+	return m_space.read_dword(addr & ~3);
 }
 
 void xtensa_device::set_mem32(u32 addr, u32 data)
 {
 	if (addr & 3)
-		fatalerror("set_mem32 unaligned");
+		logerror("set_mem32 unaligned\n");
 
-	return m_space.write_dword(addr, data);
+	return m_space.write_dword(addr &~ 3, data);
 }
 
 
@@ -985,14 +985,20 @@ void xtensa_device::getop_and_execute()
 		u8 dstreg = BIT(inst, 4, 4);
 		u8 basereg = BIT(inst, 8, 4);
 		u32 imm = BIT(inst, 12, 4) * 4;
-		LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, %s\n", BIT(inst, 0) ? "s32i.n" : "l32i.n", dstreg, basereg, format_imm(imm));
+		LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, %s\n", "l32i.n", dstreg, basereg, format_imm(imm));
 		set_reg(dstreg, get_mem32(get_reg(basereg) + imm));
 		break;
 	}
 
 	case 0b1001: // S32I.N (with Code Density Option)
-		LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, %s\n", BIT(inst, 0) ? "s32i.n" : "l32i.n", BIT(inst, 4, 4), BIT(inst, 8, 4), format_imm(BIT(inst, 12, 4) * 4));
+	{
+		u8 srcreg = BIT(inst, 4, 4);
+		u8 basereg = BIT(inst, 8, 4);
+		u32 imm = BIT(inst, 12, 4) * 4;
+		LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, %s\n", "s32i.n", srcreg, basereg, format_imm(imm));
+		set_mem32(get_reg(basereg) + imm, get_reg(srcreg));
 		break;
+	}
 
 	case 0b1010: // ADD.N (with Code Density Option)
 		LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, a%d\n", "add.n", BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
