@@ -2,14 +2,16 @@
 // copyright-holders:Angelo Salese
 /**************************************************************************************************
 
-'Nichibutsu LD' HW (c) 199? Nichibutsu
+'Nichibutsu LD' HW (c) 1990? Nichibutsu
 
 TODO:
 - ldquiz4: spins on "memory test error 13", implying a missing ROM dump
   (other GFXs will return further errors if missing, returning the label there).
   To bypass: bp 18d,1,{hl=34bf;g}
+  or alternatively patch location $40 in ROM with a 0x00 (which looks a debug switch)
 - Unknown LaserDisc type;
-- Unknown irq vector for LaserDisc strobe;
+- Unknown irq vector for LaserDisc strobe, unless it's really supposed to execute code with trg0
+  irq service (which spins for nothing in both games)
 - V9938 has issues with layer clears, has an hard time sending a vblank irq (the only one enabled)
   at the right time. Removing the invert() from the int_cb will "fix" it at the expense of being
   excruciatingly slow.
@@ -612,6 +614,24 @@ ROM_END
 
 } // anonymous namespace
 
-
-GAME( 1991, shabdama, 0,   nichild, nichild_mj,   nichild_state, empty_init, ROT0, "Nichibutsu / AV Japan", "LD Mahjong #4 Shabon-Dama (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 1992, ldquiz4,  0,   nichild, nichild_quiz, nichild_state, empty_init, ROT0, "Nichibutsu / AV Japan", "LD Quiz dai 4-dan - Kotaetamon Gachi! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+// 1990
+// LD花札 花のクリスマスイブ (LD version of nbmj8891.cpp hnxmasev?)
+// 1991
+// LD麻雀 第1弾 マリンブルーの瞳
+// LD麻雀 第2弾 マリンブルーの瞳2
+// LD麻雀 第3弾 泊まりにおいでよ
+GAME( 1991, shabdama, 0,   nichild, nichild_mj,   nichild_state, empty_init, ROT0, "Nichibutsu / AV Japan", "LD Mahjong #4 Shabon-Dama (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // LD麻雀 第4弾 シャボン玉
+// LDQUIZ クイズDEデート
+// LDQUIZ ミラクルQ 日本物産
+// LDQUIZ もう答えずにはいられない
+// 1992
+GAME( 1992, ldquiz4,  0,   nichild, nichild_quiz, nichild_state, empty_init, ROT0, "Nichibutsu / AV Japan", "LD Quiz dai 4-dan - Kotaetamon Gachi! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // LDQUIZ 答えたもん勝ち
+// LD麻雀 第5弾 夜明けのカフェテラス
+// LD麻雀 第6弾 ティファニー
+// 1993
+// LD麻雀 第7弾 ジェラシー
+// LD麻雀 第8弾 ブルセラ
+// 1994
+// LD麻雀 第9弾 ポケベル1919
+// LD麻雀 第10弾 ボディコン総集編
+// LD麻雀 第11弾 エロスの館
