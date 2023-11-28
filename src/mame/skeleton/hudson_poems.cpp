@@ -77,7 +77,7 @@ uint32_t hudson_poems_state::screen_update(screen_device &screen, bitmap_rgb32 &
 
 void hudson_poems_state::mem_map(address_map &map)
 {
-	map(0x20000000, 0x207fffff).rom().region("maincpu", 0);
+	map(0x00000000, 0x007fffff).mirror(0x20000000).rom().region("maincpu", 0);
 	map(0x2c000000, 0x2c7fffff).ram();
 }
 

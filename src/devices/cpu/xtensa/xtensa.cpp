@@ -14,8 +14,11 @@
 
 #include "xtensa_tables.h"
 
-#define LOG_UNHANDLED_OPS   (1U << 1)
-#define LOG_HANDLED_OPS     (1U << 2)
+#define LOG_UNHANDLED_OPS       (1U << 1)
+#define LOG_HANDLED_OPS         (1U << 2)
+#define LOG_UNHANDLED_CACHE_OPS (1U << 3)
+#define LOG_UNHANDLED_SYNC_OPS  (1U << 4)
+
 
 #define VERBOSE LOG_UNHANDLED_OPS
 #include "logmacro.h"
@@ -163,35 +166,35 @@ void xtensa_device::getop_and_execute()
 					switch (BIT(inst, 4, 8))
 					{
 					case 0b00000000: // ISYNC
-						LOGMASKED(LOG_UNHANDLED_OPS, "isync\n");
+						LOGMASKED(LOG_UNHANDLED_SYNC_OPS, "isync\n");
 						break;
 
 					case 0b00000001: // RSYNC
-						LOGMASKED(LOG_UNHANDLED_OPS, "rsync\n");
+						LOGMASKED(LOG_UNHANDLED_SYNC_OPS, "rsync\n");
 						break;
 
 					case 0b00000010: // ESYNC
-						LOGMASKED(LOG_UNHANDLED_OPS, "esync\n");
+						LOGMASKED(LOG_UNHANDLED_SYNC_OPS, "esync\n");
 						break;
 
 					case 0b00000011: // DSYNC
-						LOGMASKED(LOG_UNHANDLED_OPS, "dsync\n");
+						LOGMASKED(LOG_UNHANDLED_SYNC_OPS, "dsync\n");
 						break;
 
 					case 0b00001000: // EXCW (with Exception Option)
-						LOGMASKED(LOG_UNHANDLED_OPS, "excw\n");
+						LOGMASKED(LOG_UNHANDLED_SYNC_OPS, "excw\n");
 						break;
 
 					case 0b00001100: // MEMW
-						LOGMASKED(LOG_UNHANDLED_OPS, "memw\n");
+						LOGMASKED(LOG_UNHANDLED_SYNC_OPS, "memw\n");
 						break;
 
 					case 0b00001101: // EXTW (added in RA-2004.1)
-						LOGMASKED(LOG_UNHANDLED_OPS, "extw\n");
+						LOGMASKED(LOG_UNHANDLED_SYNC_OPS, "extw\n");
 						break;
 
 					case 0b00001111: // NOP (added in RA-2004.1; was assembly macro previously)
-						LOGMASKED(LOG_UNHANDLED_OPS, "nop\n");
+						LOGMASKED(LOG_HANDLED_OPS, "nop\n");
 						break;
 
 					default:
@@ -719,30 +722,30 @@ void xtensa_device::getop_and_execute()
 			case 0b0000: case 0b0001: case 0b0010: case 0b0011: // DPFR, DPFW, DPFRO, DPFWO (with Data Cache Option)
 			case 0b0100: case 0b0101: case 0b0110: case 0b0111: // DHWB, DHWBI, DHI, DII (with Data Cache Option)
 			case 0b1100: case 0b1110: case 0b1111: // IPF, IHI, III (with Instruction Cache Option)
-				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, %s\n", s_cache_ops[BIT(inst, 4, 4)], BIT(inst, 8, 4), format_imm((inst >> 16) * 4));
+				LOGMASKED(LOG_UNHANDLED_CACHE_OPS, "%-8sa%d, %s\n", s_cache_ops[BIT(inst, 4, 4)], BIT(inst, 8, 4), format_imm((inst >> 16) * 4));
 				break;
 
 			case 0b1000: // DCE (with Data Cache Option)
 				switch (BIT(inst, 16, 4))
 				{
 				case 0b0000: // DPFL (with Data Cache Index Lock Option)
-					LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, %s\n", "dpfl", BIT(inst, 8, 4), format_imm((inst >> 20) * 4));
+					LOGMASKED(LOG_UNHANDLED_CACHE_OPS, "%-8sa%d, %s\n", "dpfl", BIT(inst, 8, 4), format_imm((inst >> 20) * 4));
 					break;
 
 				case 0b0010: // DHU (with Data Cache Index Lock Option)
-					LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, %s\n", "dhu", BIT(inst, 8, 4), format_imm((inst >> 20) * 4));
+					LOGMASKED(LOG_UNHANDLED_CACHE_OPS, "%-8sa%d, %s\n", "dhu", BIT(inst, 8, 4), format_imm((inst >> 20) * 4));
 					break;
 
 				case 0b0011: // DIU (with Data Cache Index Lock Option)
-					LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, %s\n", "diu", BIT(inst, 8, 4), format_imm((inst >> 20) * 4));
+					LOGMASKED(LOG_UNHANDLED_CACHE_OPS, "%-8sa%d, %s\n", "diu", BIT(inst, 8, 4), format_imm((inst >> 20) * 4));
 					break;
 
 				case 0b0100: // DIWB (added in T1050)
-					LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, %s\n", "diwb", BIT(inst, 8, 4), format_imm((inst >> 20) * 4));
+					LOGMASKED(LOG_UNHANDLED_CACHE_OPS, "%-8sa%d, %s\n", "diwb", BIT(inst, 8, 4), format_imm((inst >> 20) * 4));
 					break;
 
 				case 0b0101: // DIWBI (added in T1050)
-					LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, %s\n", "diwbi", BIT(inst, 8, 4), format_imm((inst >> 20) * 4));
+					LOGMASKED(LOG_UNHANDLED_CACHE_OPS, "%-8sa%d, %s\n", "diwbi", BIT(inst, 8, 4), format_imm((inst >> 20) * 4));
 					break;
 				}
 				break;
@@ -751,15 +754,15 @@ void xtensa_device::getop_and_execute()
 				switch (BIT(inst, 16, 4))
 				{
 				case 0b0000: // IPFL
-					LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, %s\n", "ipfl", BIT(inst, 8, 4), format_imm((inst >> 20) * 4));
+					LOGMASKED(LOG_UNHANDLED_CACHE_OPS, "%-8sa%d, %s\n", "ipfl", BIT(inst, 8, 4), format_imm((inst >> 20) * 4));
 					break;
 
 				case 0b0010: // IHU
-					LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, %s\n", "ihu", BIT(inst, 8, 4), format_imm((inst >> 20) * 4));
+					LOGMASKED(LOG_UNHANDLED_CACHE_OPS, "%-8sa%d, %s\n", "ihu", BIT(inst, 8, 4), format_imm((inst >> 20) * 4));
 					break;
 
 				case 0b0011: // IIU
-					LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, %s\n", "iiu", BIT(inst, 8, 4), format_imm((inst >> 20) * 4));
+					LOGMASKED(LOG_UNHANDLED_CACHE_OPS, "%-8sa%d, %s\n", "iiu", BIT(inst, 8, 4), format_imm((inst >> 20) * 4));
 					break;
 
 				default:
@@ -977,7 +980,17 @@ void xtensa_device::getop_and_execute()
 		}
 		break;
 
-	case 0b1000: case 0b1001: // L32I.N (with Code Density Option)
+	case 0b1000: // L32I.N (with Code Density Option)
+	{
+		u8 dstreg = BIT(inst, 4, 4);
+		u8 basereg = BIT(inst, 8, 4);
+		u32 imm = BIT(inst, 12, 4) * 4;
+		LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, %s\n", BIT(inst, 0) ? "s32i.n" : "l32i.n", dstreg, basereg, format_imm(imm));
+		set_reg(dstreg, get_mem32(get_reg(basereg) + imm));
+		break;
+	}
+
+	case 0b1001: // S32I.N (with Code Density Option)
 		LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, %s\n", BIT(inst, 0) ? "s32i.n" : "l32i.n", BIT(inst, 4, 4), BIT(inst, 8, 4), format_imm(BIT(inst, 12, 4) * 4));
 		break;
 
@@ -1026,7 +1039,7 @@ void xtensa_device::getop_and_execute()
 				break;
 
 			case 0b0011: // NOP.N
-				LOGMASKED(LOG_UNHANDLED_OPS, "nop.n\n");
+				LOGMASKED(LOG_HANDLED_OPS, "nop.n\n");
 				break;
 
 			case 0b0110: // ILL.N
