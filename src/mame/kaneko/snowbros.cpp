@@ -1661,7 +1661,7 @@ INPUT_PORTS_END
 
 /* SnowBros */
 
-static GFXDECODE_START( gfx_snowbros )
+static GFXDECODE_START( gfx_snowbros_spr )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0, 16 )
 GFXDECODE_END
 
@@ -1740,7 +1740,7 @@ static GFXDECODE_START( gfx_sb3 )
 	GFXDECODE_ENTRY( "gfx2", 0, sb3_tilebglayout,                   0,  2 )
 GFXDECODE_END
 
-static GFXDECODE_START( gfx_hyperpac )
+static GFXDECODE_START( gfx_hyperpac_spr )
 	GFXDECODE_ENTRY( "gfx1", 0, hyperpac_tilelayout, 0, 16 )
 GFXDECODE_END
 
@@ -1784,11 +1784,9 @@ void snowbros_state::snowbros(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(snowbros_state::screen_vblank_snowbros));
 	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_snowbros);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 256);
 
-	KANEKO_PANDORA(config, m_pandora, 0);
-	m_pandora->set_gfxdecode_tag(m_gfxdecode);
+	KANEKO_PANDORA(config, m_pandora, 0, m_palette, gfx_snowbros_spr);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1814,7 +1812,7 @@ void snowbros_state::wintbob(machine_config &config)
 	config.device_remove("pandora");
 
 	/* video hardware */
-	m_gfxdecode->set_info(gfx_wb);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wb);
 
 	m_screen->set_screen_update(FUNC(snowbros_state::screen_update_wintbob));
 	m_screen->screen_vblank().set_nop();
@@ -1832,7 +1830,7 @@ void snowbros_state::semicom(machine_config &config)
 	m_soundcpu->set_addrmap(AS_PROGRAM, &snowbros_state::hyperpac_sound_map);
 	m_soundcpu->set_addrmap(AS_IO, address_map_constructor());
 
-	m_gfxdecode->set_info(gfx_hyperpac);
+	m_pandora->set_gfxinfo(gfx_hyperpac_spr);
 
 	m_soundlatch->data_pending_callback().set_nop();
 
@@ -1987,7 +1985,7 @@ void snowbros_state::_4in1(machine_config &config)
 	semicom(config);
 
 	/* basic machine hardware */
-	m_gfxdecode->set_info(gfx_snowbros);
+	m_pandora->set_gfxinfo(gfx_snowbros_spr);
 }
 
 void snowbros_state::snowbro3(machine_config &config) /* PCB has 16MHz & 12MHz OSCs */
@@ -2036,11 +2034,9 @@ void snowbros_state::yutnori(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(snowbros_state::screen_vblank_snowbros));
 	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hyperpac);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 256);
 
-	KANEKO_PANDORA(config, m_pandora, 0);
-	m_pandora->set_gfxdecode_tag(m_gfxdecode);
+	KANEKO_PANDORA(config, m_pandora, 0, m_palette, gfx_hyperpac_spr);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
