@@ -489,7 +489,7 @@ void towns_state::towns_dma_w(offs_t offset, uint8_t data)
  *  Floppy Disc Controller (MB8877A)
  */
 
-WRITE_LINE_MEMBER( towns_state::mb8877a_irq_w )
+void towns_state::mb8877a_irq_w(int state)
 {
 	if(m_towns_fdc_irq6mask == 0)
 		state = 0;
@@ -497,7 +497,7 @@ WRITE_LINE_MEMBER( towns_state::mb8877a_irq_w )
 	if(IRQ_LOG) logerror("PIC: IRQ6 (FDC) set to %i\n",state);
 }
 
-WRITE_LINE_MEMBER( towns_state::mb8877a_drq_w )
+void towns_state::mb8877a_drq_w(int state)
 {
 	m_dma[0]->dmarq(state, 0);
 }
@@ -901,8 +901,11 @@ void towns_state::towns_sound_ctrl_w(offs_t offset, uint8_t data)
 // Joysticks are multiplexed, with fire buttons available when bits 0 and 1 of port 0x4d6 are high. (bits 2 and 3 for second port)
 uint8_t towns_state::towns_padport_r(offs_t offset)
 {
+	// Documentation indicates bit 7 is unused and should be ignored.
+	// Tatsujin Ou expects it to read as zero to navigate menus.
+	// Unclear whether it always reads as zero, or it's affected by something undocumented.
 	unsigned const pad = BIT(offset, 1);
-	return m_pad_ports[pad]->read() & (0x8f | (bitswap<3>(m_towns_pad_mask, pad + 4, (pad * 2) + 1, pad * 2) << 4));
+	return m_pad_ports[pad]->read() & (0x0f | (bitswap<3>(m_towns_pad_mask, pad + 4, (pad * 2) + 1, pad * 2) << 4));
 }
 
 void towns_state::towns_pad_mask_w(uint8_t data)
@@ -1724,41 +1727,41 @@ void towns_state::towns_rtc_select_w(uint8_t data)
 	m_rtc->address_write_w(BIT(data, 0));
 }
 
-WRITE_LINE_MEMBER(towns_state::rtc_d0_w)
+void towns_state::rtc_d0_w(int state)
 {
 	m_rtc_d = (m_rtc_d & ~1) | (state ? 1 : 0);
 }
 
-WRITE_LINE_MEMBER(towns_state::rtc_d1_w)
+void towns_state::rtc_d1_w(int state)
 {
 	m_rtc_d = (m_rtc_d & ~2) | (state ? 2 : 0);
 }
 
-WRITE_LINE_MEMBER(towns_state::rtc_d2_w)
+void towns_state::rtc_d2_w(int state)
 {
 	m_rtc_d = (m_rtc_d & ~4) | (state ? 4 : 0);
 }
 
-WRITE_LINE_MEMBER(towns_state::rtc_d3_w)
+void towns_state::rtc_d3_w(int state)
 {
 	m_rtc_d = (m_rtc_d & ~8) | (state ? 8 : 0);
 }
 
-WRITE_LINE_MEMBER(towns_state::rtc_busy_w)
+void towns_state::rtc_busy_w(int state)
 {
 	// active low output
 	m_rtc_busy = !state;
 }
 
 // SCSI controller - I/O ports 0xc30 and 0xc32
-WRITE_LINE_MEMBER(towns_state::towns_scsi_irq)
+void towns_state::towns_scsi_irq(int state)
 {
 	m_pic_slave->ir0_w(state);
 	if(IRQ_LOG)
 		logerror("PIC: IRQ8 (SCSI) set to %i\n",state);
 }
 
-WRITE_LINE_MEMBER(towns_state::towns_scsi_drq)
+void towns_state::towns_scsi_drq(int state)
 {
 	m_dma[0]->dmarq(state, 1);  // SCSI HDs use channel 1
 }
@@ -1836,7 +1839,7 @@ uint8_t towns_state::towns_41ff_r()
 }
 
 // YM3438 interrupt (IRQ 13)
-WRITE_LINE_MEMBER(towns_state::towns_fm_irq)
+void towns_state::towns_fm_irq(int state)
 {
 	if(state)
 	{
@@ -1867,7 +1870,7 @@ RF5C68_SAMPLE_END_CB_MEMBER(towns_state::towns_pcm_irq)
 	}
 }
 
-WRITE_LINE_MEMBER(towns_state::towns_pit_out0_changed)
+void towns_state::towns_pit_out0_changed(int state)
 {
 	m_pit_out0 = state;
 
@@ -1882,7 +1885,7 @@ WRITE_LINE_MEMBER(towns_state::towns_pit_out0_changed)
 	m_pic_master->ir0_w(m_timer0 || m_timer1);
 }
 
-WRITE_LINE_MEMBER(towns_state::towns_pit_out1_changed)
+void towns_state::towns_pit_out1_changed(int state)
 {
 	m_pit_out1 = state;
 
@@ -1897,13 +1900,13 @@ WRITE_LINE_MEMBER(towns_state::towns_pit_out1_changed)
 	m_pic_master->ir0_w(m_timer0 || m_timer1);
 }
 
-WRITE_LINE_MEMBER( towns_state::pit_out2_changed )
+void towns_state::pit_out2_changed(int state)
 {
 	m_pit_out2 = state ? 1 : 0;
 	m_speaker->level_w(speaker_get_spk());
 }
 
-WRITE_LINE_MEMBER( towns_state::pit2_out1_changed )
+void towns_state::pit2_out1_changed(int state)
 {
 	m_i8251->write_rxc(state);
 	m_i8251->write_txc(state);
@@ -1940,26 +1943,26 @@ uint8_t towns_state::towns_serial_r(offs_t offset)
 	}
 }
 
-WRITE_LINE_MEMBER( towns_state::towns_serial_irq )
+void towns_state::towns_serial_irq(int state)
 {
 	m_serial_irq_source = state ? 0x01 : 0x00;
 	m_pic_master->ir2_w(state);
 	popmessage("Serial IRQ state: %i\n",state);
 }
 
-WRITE_LINE_MEMBER( towns_state::towns_rxrdy_irq )
+void towns_state::towns_rxrdy_irq(int state)
 {
 	if(m_serial_irq_enable & RXRDY_IRQ_ENABLE)
 		towns_serial_irq(state);
 }
 
-WRITE_LINE_MEMBER( towns_state::towns_txrdy_irq )
+void towns_state::towns_txrdy_irq(int state)
 {
 	if(m_serial_irq_enable & TXRDY_IRQ_ENABLE)
 		towns_serial_irq(state);
 }
 
-WRITE_LINE_MEMBER( towns_state::towns_syndet_irq )
+void towns_state::towns_syndet_irq(int state)
 {
 	if(m_serial_irq_enable & SYNDET_IRQ_ENABLE)
 		towns_serial_irq(state);

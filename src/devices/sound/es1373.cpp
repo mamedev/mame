@@ -99,12 +99,6 @@ es1373_device::es1373_device(const machine_config &mconfig, const char *tag, dev
 	set_ids(0x12741371, 0x04, 0x040100, 0x12741371);
 }
 
-void es1373_device::device_resolve_objects()
-{
-	pci_device::device_resolve_objects();
-	m_irq_handler.resolve_safe();
-}
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------

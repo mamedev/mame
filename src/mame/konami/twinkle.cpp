@@ -296,11 +296,18 @@ public:
 		m_ata(*this, "ata"),
 		m_dpram(*this, "dpram"),
 		m_waveram(*this, "rfsnd"),
+		m_in(*this, "IN%u", 0U),
 		m_led_displays(*this, "led%u", 0U),
 		m_spotlights(*this, "spotlight%u", 0U),
 		m_main_leds(*this, "main_led%u", 0U),
 		m_key_leds(*this, "key%u-%u", 1U, 1U),
 		m_spu_leds(*this, "spu_led%u", 0U),
+		m_player_lamps(*this, "%up", 1U),
+		m_vefx_lamp(*this, "vefx"),
+		m_effect_lamp(*this, "effect"),
+		m_credit_lamp(*this, "credit"),
+		m_neon_lamp(*this, "neonlamp"),
+		m_unknown_outputs(*this, "unknown%u", 1U),
 		m_spu_ata_dma(0),
 		m_spu_ata_dmarq(0),
 		m_wave_bank(0)
@@ -330,10 +337,10 @@ private:
 	void twinkle_waveram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void spu_led_w(uint16_t data);
 	void spu_wavebank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(spu_ata_irq);
-	DECLARE_WRITE_LINE_MEMBER(spu_ata_dmarq);
-	void scsi_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
-	void scsi_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
+	void spu_ata_irq(int state);
+	void spu_ata_dmarq(int state);
+	void scsi_dma_read(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size);
+	void scsi_dma_write(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size);
 
 	void main_map(address_map &map);
 	void rf5c400_map(address_map &map);
@@ -346,11 +353,19 @@ private:
 	required_device<cy7c131_device> m_dpram;
 	required_shared_ptr<uint16_t> m_waveram;
 
+	required_ioport_array<6> m_in;
+
 	output_finder<9> m_led_displays;
 	output_finder<8> m_spotlights;
 	output_finder<9> m_main_leds;
 	output_finder<2, 7> m_key_leds;
 	output_finder<8> m_spu_leds;
+	output_finder<2> m_player_lamps;
+	output_finder<> m_vefx_lamp;
+	output_finder<> m_effect_lamp;
+	output_finder<> m_credit_lamp;
+	output_finder<> m_neon_lamp;
+	output_finder<4> m_unknown_outputs;
 
 	uint16_t m_spu_ctrl = 0;      // SPU board control register
 	uint32_t m_spu_ata_dma = 0;
@@ -545,6 +560,12 @@ void twinkle_state::machine_start()
 	m_main_leds.resolve();
 	m_key_leds.resolve();
 	m_spu_leds.resolve();
+	m_player_lamps.resolve();
+	m_vefx_lamp.resolve();
+	m_effect_lamp.resolve();
+	m_credit_lamp.resolve();
+	m_neon_lamp.resolve();
+	m_unknown_outputs.resolve();
 
 	save_item(NAME(m_spu_ctrl));
 	save_item(NAME(m_spu_ata_dma));
@@ -591,11 +612,11 @@ void twinkle_state::twinkle_io_w(offs_t offset, uint8_t data)
 				break;
 
 			case 0x37:
-				output().set_value("1p", (~data >> 0) & 1);
-				output().set_value("2p", (~data >> 1) & 1);
-				output().set_value("vefx", (~data >> 2) & 1);
-				output().set_value("effect", (~data >> 3) & 1);
-				output().set_value("credit", (~data >> 4) & 1);
+				m_player_lamps[0] = BIT(~data, 0);
+				m_player_lamps[1] = BIT(~data, 1);
+				m_vefx_lamp = BIT(~data, 2);
+				m_effect_lamp = BIT(~data, 3);
+				m_credit_lamp = BIT(~data, 4);
 
 				if ((data & 0xe0) != 0xe0)
 				{
@@ -627,9 +648,9 @@ void twinkle_state::twinkle_io_w(offs_t offset, uint8_t data)
 				break;
 
 			case 0x8f:
-				output().set_value( "neonlamp", ( ~data >> 0 ) & 1 );
-				output().set_value( "unknown1", ( ~data >> 1 ) & 1 );
-				output().set_value( "unknown2", ( ~data >> 2 ) & 1 );
+				m_neon_lamp = BIT(~data, 0);
+				m_unknown_outputs[0] = BIT(~data, 1);
+				m_unknown_outputs[1] = BIT(~data, 2);
 
 				if( ( data & 0xf8 ) != 0xf8 )
 				{
@@ -660,27 +681,27 @@ uint8_t twinkle_state::twinkle_io_r(offs_t offset)
 		switch( m_io_offset )
 		{
 			case 0x07:
-				data = ioport( "IN0" )->read();
+				data = m_in[0]->read();
 				break;
 
 			case 0x0f:
-				data = ioport( "IN1" )->read();
+				data = m_in[1]->read();
 				break;
 
 			case 0x17:
-				data = ioport( "IN2" )->read();
+				data = m_in[2]->read();
 				break;
 
 			case 0x1f:
-				data = ioport( "IN3" )->read();
+				data = m_in[3]->read();
 				break;
 
 			case 0x27:
-				data = ioport( "IN4" )->read();
+				data = m_in[4]->read();
 				break;
 
 			case 0x2f:
-				data = ioport( "IN5" )->read();
+				data = m_in[5]->read();
 				break;
 
 			default:
@@ -840,8 +861,8 @@ void twinkle_state::key_led_w(uint16_t data)
 	m_key_leds[1][4] = BIT(data, 11);
 	m_key_leds[1][5] = BIT(data, 12);
 	m_key_leds[1][6] = BIT(data, 13);
-	output().set_value("unknown3", (data >> 14) & 1);
-	output().set_value("unknown4", (data >> 15) & 1);
+	m_unknown_outputs[2] = BIT(data, 14);
+	m_unknown_outputs[3] = BIT(data, 15);
 }
 
 void twinkle_state::serial_w(uint16_t data)
@@ -896,7 +917,7 @@ void twinkle_state::main_map(address_map &map)
 
 /* SPU board */
 
-WRITE_LINE_MEMBER(twinkle_state::spu_ata_irq)
+void twinkle_state::spu_ata_irq(int state)
 {
 	if ((state) && (m_spu_ctrl & 0x0400))
 	{
@@ -948,7 +969,7 @@ void twinkle_state::spu_ata_dma_high_w(uint16_t data)
 	//printf("DMA now %x\n", m_spu_ata_dma);
 }
 
-WRITE_LINE_MEMBER(twinkle_state::spu_ata_dmarq)
+void twinkle_state::spu_ata_dmarq(int state)
 {
 	if (m_spu_ata_dmarq != state)
 	{

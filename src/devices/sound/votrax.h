@@ -17,8 +17,6 @@ class votrax_sc01_device :  public device_t,
 							public device_sound_interface
 {
 public:
-	static constexpr feature_type imperfect_features() { return feature::SOUND; }
-
 	// construction/destruction
 	votrax_sc01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -26,7 +24,7 @@ public:
 
 	void write(uint8_t data);
 	void inflection_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER(request) { m_stream->update(); return m_ar_state; }
+	int request() { m_stream->update(); return m_ar_state; }
 
 protected:
 	// overridable type for subclass

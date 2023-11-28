@@ -70,7 +70,7 @@ Overall, the hardware has similarities with Wacky Gator, see wacky_gator.cpp.
 #include "speaker.h"
 
 // internal artwork
-#include "cgang.lh" // clickable
+#include "cgang.lh"
 
 
 namespace {
@@ -154,11 +154,11 @@ private:
 	void sound_map(address_map &map);
 
 	// I/O handlers
-	DECLARE_WRITE_LINE_MEMBER(main_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(main_firq_w);
+	void main_irq_w(int state);
+	void main_firq_w(int state);
 	void main_irq_clear_w(u8 data);
 	void main_firq_clear_w(u8 data);
-	template<int N> DECLARE_WRITE_LINE_MEMBER(motor_clock_w);
+	template<int N> void motor_clock_w(int state);
 	void cg_motor_tick(int i);
 	TIMER_DEVICE_CALLBACK_MEMBER(door_motor_tick);
 	void refresh_motor_output();
@@ -192,9 +192,9 @@ private:
 	u8 m_cg_motor_on = 0;
 	u8 m_cg_motor_dir = 0;
 
-	int m_cg_motor_clk[5];
-	int m_cg_motor_pos[5];
-	int m_en_pos[5];
+	int m_cg_motor_clk[5] = { };
+	int m_cg_motor_pos[5] = { };
+	int m_en_pos[5] = { };
 
 	emu_timer *m_sol_filter[5];
 	TIMER_CALLBACK_MEMBER(output_sol) { m_en_sol[param >> 1] = param & 1; }
@@ -259,7 +259,7 @@ void cgang_state::machine_reset()
 
 // maincpu (misc)
 
-WRITE_LINE_MEMBER(cgang_state::main_irq_w)
+void cgang_state::main_irq_w(int state)
 {
 	// irq on rising edge
 	if (state && !m_main_irq)
@@ -268,7 +268,7 @@ WRITE_LINE_MEMBER(cgang_state::main_irq_w)
 	m_main_irq = state;
 }
 
-WRITE_LINE_MEMBER(cgang_state::main_firq_w)
+void cgang_state::main_firq_w(int state)
 {
 	// firq on rising edge
 	if (state && !m_main_firq)
@@ -288,7 +288,7 @@ void cgang_state::main_firq_clear_w(u8 data)
 }
 
 template<int N>
-WRITE_LINE_MEMBER(cgang_state::motor_clock_w)
+void cgang_state::motor_clock_w(int state)
 {
 	// clock stepper motors
 	if (state && !m_cg_motor_clk[N] && BIT(m_cg_motor_on, N))
@@ -849,7 +849,7 @@ ROM_START( cgang )
 	ROM_LOAD("cg2_9c_e02a.9c", 0x00000, 0x20000, CRC(f9a3f8a0) SHA1(5ad8b408d36397227019afd15c3516f85488c6df) ) // handwritten label seen on one PCB
 
 	ROM_REGION( 0x20000, "adpcm1", 0 )
-	ROM_LOAD("cg2_9e_586e.9e", 0x00000, 0x20000, CRC(40e7f60b) SHA1(af641b0562db1ae033cee67df583d178fd8c93f3) ) // handwritten label seen on one PCB
+	ROM_LOAD("cg2_9e_586e.9e", 0x00000, 0x20000, CRC(40e7f60b) SHA1(af641b0562db1ae033cee67df583d178fd8c93f3) ) // "
 ROM_END
 
 } // anonymous namespace

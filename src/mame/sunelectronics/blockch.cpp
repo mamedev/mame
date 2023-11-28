@@ -75,6 +75,11 @@ private:
 	required_shared_ptr<u8> m_vram;
 	required_ioport_array<5> m_inputs;
 
+	u8 m_sound = 0;
+	u8 m_ball_x = 0;
+	u8 m_ball_y = 0;
+	u8 m_vctrl = 0;
+
 	void main_map(address_map &map);
 	void io_map(address_map &map);
 
@@ -86,11 +91,6 @@ private:
 	void ppi1_b_w(u8 data);
 	void ppi1_c_w(u8 data);
 	u8 ppi1_c_r();
-
-	u8 m_sound = 0;
-	u8 m_ball_x = 0;
-	u8 m_ball_y = 0;
-	u8 m_vctrl = 0;
 };
 
 void blockch_state::machine_start()

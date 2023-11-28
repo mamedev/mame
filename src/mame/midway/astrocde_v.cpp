@@ -398,7 +398,7 @@ TIMER_CALLBACK_MEMBER(astrocde_state::interrupt_off)
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(astrocde_state::lightpen_trigger_w)
+void astrocde_state::lightpen_trigger_w(int state)
 {
 	if (state)
 	{
@@ -578,7 +578,7 @@ void astrocde_state::video_register_w(offs_t offset, uint8_t data)
 	case 0x17:  /* noise volume register */
 	case 0x18:  /* sound block transfer */
 		if (m_video_config & AC_SOUND_PRESENT)
-			m_astrocade_sound1->write(space, offset, data);
+			m_astrocade_sound[0]->write(space, offset, data);
 		break;
 #endif
 	}

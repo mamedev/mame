@@ -64,8 +64,3 @@ Choose **Save Configuration** to create the ``mame.ini`` file with default
 settings. From here, you can either continue to configure things from the
 graphical user interface or edit the ``mame.ini`` file in your favorite
 text editor.
-
-
-Configuring MAME
-----------------
-

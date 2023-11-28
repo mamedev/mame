@@ -200,16 +200,8 @@ void am9516_device::device_start()
 	save_item(STRUCT_MEMBER(m_channel, cmh));
 	save_item(STRUCT_MEMBER(m_channel, iv));
 
-	m_int.resolve_safe();
-	m_eop.resolve_safe();
-
 	for (channel &ch : m_channel)
 	{
-		ch.flyby_byte_r.resolve_safe(0);
-		ch.flyby_byte_w.resolve_safe();
-		ch.flyby_word_r.resolve_safe(0);
-		ch.flyby_word_w.resolve_safe();
-
 		ch.cabl = 0;
 		ch.babl = 0;
 		ch.caal = 0;
@@ -497,13 +489,13 @@ void am9516_device::command(u8 data)
 	}
 }
 
-WRITE_LINE_MEMBER(am9516_device::eop_w)
+void am9516_device::eop_w(int state)
 {
 	LOGMASKED(LOG_DMA, "eop %s\n", state ? "cleared" : "asserted");
 	m_eop_in_state = !state;
 }
 
-template <unsigned Channel> WRITE_LINE_MEMBER(am9516_device::dreq_w)
+template <unsigned Channel> void am9516_device::dreq_w(int state)
 {
 	LOGMASKED(LOG_DMA, "channel %d dreq %s\n", Channel, state ? "cleared" : "asserted");
 	channel &ch = m_channel[Channel];

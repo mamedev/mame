@@ -47,13 +47,7 @@ void psxsio_device::device_post_load()
 
 void psxsio_device::device_start()
 {
-	m_irq_handler.resolve_safe();
-	m_sck_handler.resolve_safe();
-	m_txd_handler.resolve_safe();
-	m_dtr_handler.resolve_safe();
-	m_rts_handler.resolve_safe();
-
-	m_timer = timer_alloc( FUNC( psxsio_device::sio_tick ), this );
+	m_timer = timer_alloc(FUNC( psxsio_device::sio_tick ), this);
 	m_mode = 0;
 	m_control = 0;
 	m_baud = 0;
@@ -64,22 +58,22 @@ void psxsio_device::device_start()
 	m_rx_bits = 0;
 	m_tx_bits = 0;
 
-	save_item( NAME( m_status ) );
-	save_item( NAME( m_mode ) );
-	save_item( NAME( m_control ) );
-	save_item( NAME( m_baud ) );
-	save_item( NAME( m_rxd ) );
-	save_item( NAME( m_rx_data ) );
-	save_item( NAME( m_tx_data ) );
-	save_item( NAME( m_rx_shift ) );
-	save_item( NAME( m_tx_shift ) );
-	save_item( NAME( m_rx_bits ) );
-	save_item( NAME( m_tx_bits ) );
+	save_item(NAME(m_status));
+	save_item(NAME(m_mode));
+	save_item(NAME(m_control));
+	save_item(NAME(m_baud));
+	save_item(NAME(m_rxd));
+	save_item(NAME(m_rx_data));
+	save_item(NAME(m_tx_data));
+	save_item(NAME(m_rx_shift));
+	save_item(NAME(m_tx_shift));
+	save_item(NAME(m_rx_bits));
+	save_item(NAME(m_tx_bits));
 }
 
 void psxsio_device::sio_interrupt()
 {
-	LOG( "sio_interrupt\n" );
+	LOG("sio_interrupt\n");
 	m_status |= SIO_STATUS_IRQ;
 	m_irq_handler(1);
 }
@@ -328,12 +322,12 @@ uint32_t psxsio_device::read(offs_t offset, uint32_t mem_mask)
 	return data;
 }
 
-WRITE_LINE_MEMBER(psxsio_device::write_rxd)
+void psxsio_device::write_rxd(int state)
 {
 	m_rxd = state;
 }
 
-WRITE_LINE_MEMBER(psxsio_device::write_dsr)
+void psxsio_device::write_dsr(int state)
 {
 	if (state)
 	{

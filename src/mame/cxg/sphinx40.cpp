@@ -3,7 +3,7 @@
 // thanks-to:Berger
 /*******************************************************************************
 
-CXG Sphinx 40 / 50
+CXG "Adversary" Sphinx 40 / 50
 
 This is a modular chesscomputer, similar to Mephisto's 3-drawers one.
 Chesscomputer on the right, LCD in the middle, and future expansion on the left.
@@ -54,7 +54,7 @@ LCD module
 #include "speaker.h"
 
 // internal artwork
-#include "cxg_sphinx40.lh" // clickable
+#include "cxg_sphinx40.lh"
 
 
 namespace {
@@ -93,6 +93,10 @@ private:
 	output_finder<8> m_out_digit;
 	output_finder<64> m_out_lcd;
 
+	u8 m_cb_mux = 0;
+	u8 m_led_data = 0;
+	u8 m_inp_mux = 0;
+
 	// address maps
 	void main_map(address_map &map);
 
@@ -110,10 +114,6 @@ private:
 
 	u8 nvram_r(offs_t offset) { return m_nvram[offset]; }
 	void nvram_w(offs_t offset, u8 data) { m_nvram[offset] = data; }
-
-	u8 m_cb_mux = 0;
-	u8 m_led_data = 0;
-	u8 m_inp_mux = 0;
 };
 
 void sphinx40_state::machine_start()
@@ -273,13 +273,13 @@ INPUT_PORTS_END
 void sphinx40_state::sphinx40(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 8000000);
+	M68000(config, m_maincpu, 8'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sphinx40_state::main_map);
 
-	const attotime irq_period = attotime::from_hz(8000000 / 0x1000);
+	const attotime irq_period = attotime::from_hz(8'000'000 / 0x1000);
 	m_maincpu->set_periodic_int(FUNC(sphinx40_state::irq4_line_hold), irq_period);
 
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->writepa_handler().set(FUNC(sphinx40_state::cb_mux_w));
 	m_pia->writepb_handler().set(FUNC(sphinx40_state::cb_leds_w));
 	m_pia->cb2_handler().set("dac", FUNC(dac_bit_interface::write));
@@ -324,4 +324,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1987, sphinx40, 0,      0,      sphinx40, sphinx40, sphinx40_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx 40", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1987, sphinx40, 0,      0,      sphinx40, sphinx40, sphinx40_state, empty_init, "CXG Systems / Newcrest Technology / Intelligent Software", "Sphinx 40", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

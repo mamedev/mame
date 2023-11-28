@@ -118,10 +118,102 @@
 */
 
 #include "emu.h"
-#include "micronic.h"
+
+#include "cpu/z80/z80.h"
+#include "video/hd61830.h"
+#include "machine/mc146818.h"
+#include "machine/ram.h"
+#include "machine/nvram.h"
+#include "sound/beep.h"
+#include "imagedev/cassette.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
+namespace {
+
+#define SCREEN_TAG      "screen"
+#define Z80_TAG         "z80"
+#define MC146818_TAG    "mc146818"
+#define HD61830_TAG     "hd61830"
+
+class micronic_state : public driver_device
+{
+public:
+	micronic_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, Z80_TAG),
+		m_lcdc(*this, HD61830_TAG),
+		m_beep(*this, "beeper"),
+		m_rtc(*this, MC146818_TAG),
+		m_nvram1(*this, "nvram1"),
+		m_nvram2(*this, "nvram2"),
+		m_ram(*this, RAM_TAG),
+		m_ram_base(*this, "ram_base"),
+		m_status_flag(1),
+		m_bank1(*this, "bank1"),
+		m_bit0(*this, "BIT0"),
+		m_bit1(*this, "BIT1"),
+		m_bit2(*this, "BIT2"),
+		m_bit3(*this, "BIT3"),
+		m_bit4(*this, "BIT4"),
+		m_bit5(*this, "BIT5"),
+		m_backbattery(*this, "BACKBATTERY"),
+		m_mainbattery(*this, "MAINBATTERY"),
+		m_cassette(*this, "cassette")
+	{ }
+
+	void micronic(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	void nvram_init(nvram_device &nvram, void *data, size_t size);
+
+	uint8_t keypad_r();
+	uint8_t status_flag_r();
+	void status_flag_w(uint8_t data);
+	void kp_matrix_w(uint8_t data);
+	void beep_w(uint8_t data);
+	uint8_t irq_flag_r();
+	void port_2c_w(uint8_t data);
+	void bank_select_w(uint8_t data);
+	void lcd_contrast_w(uint8_t data);
+	void mc146818_irq(int state);
+
+	void micronic_palette(palette_device &palette) const;
+
+	void micronic_io(address_map &map);
+	void micronic_mem(address_map &map);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<hd61830_device> m_lcdc;
+	required_device<beep_device> m_beep;
+	required_device<mc146818_device> m_rtc;
+	required_device<nvram_device> m_nvram1;
+	required_device<nvram_device> m_nvram2;
+	required_device<ram_device> m_ram;
+
+	required_shared_ptr<uint8_t> m_ram_base;
+	uint8_t m_banks_num = 0;
+	uint8_t m_kp_matrix = 0;
+	uint8_t m_lcd_contrast = 0;
+	int m_lcd_backlight = 0;
+	uint8_t m_status_flag = 0;
+
+	required_memory_bank m_bank1;
+	required_ioport m_bit0;
+	required_ioport m_bit1;
+	required_ioport m_bit2;
+	required_ioport m_bit3;
+	required_ioport m_bit4;
+	required_ioport m_bit5;
+	required_ioport m_backbattery;
+	required_ioport m_mainbattery;
+	optional_device<cassette_image_device> m_cassette;
+};
 
 uint8_t micronic_state::keypad_r()
 {
@@ -200,25 +292,6 @@ void micronic_state::port_2c_w(uint8_t data)
 
 
 /***************************************************************************
-    RTC-146818
-***************************************************************************/
-
-void micronic_state::rtc_address_w(uint8_t data)
-{
-	m_rtc->write(0, data);
-}
-
-uint8_t micronic_state::rtc_data_r()
-{
-	return m_rtc->read(1);
-}
-
-void micronic_state::rtc_data_w(uint8_t data)
-{
-	m_rtc->write(1, data);
-}
-
-/***************************************************************************
     Machine
 ***************************************************************************/
 
@@ -241,8 +314,8 @@ void micronic_state::micronic_io(address_map &map)
 	map(0x23, 0x23).rw(m_lcdc, FUNC(hd61830_device::status_r), FUNC(hd61830_device::control_w));
 
 	/* rtc-146818 */
-	map(0x08, 0x08).w(FUNC(micronic_state::rtc_address_w));
-	map(0x28, 0x28).rw(FUNC(micronic_state::rtc_data_r), FUNC(micronic_state::rtc_data_w));
+	map(0x08, 0x08).w(m_rtc, FUNC(mc146818_device::address_w));
+	map(0x28, 0x28).rw(m_rtc, FUNC(mc146818_device::data_r), FUNC(mc146818_device::data_w));
 
 	/* sound */
 	map(0x2b, 0x2b).w(FUNC(micronic_state::beep_w));
@@ -348,7 +421,7 @@ void micronic_state::machine_reset()
 }
 
 
-WRITE_LINE_MEMBER( micronic_state::mc146818_irq )
+void micronic_state::mc146818_irq(int state)
 {
 	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
@@ -396,6 +469,8 @@ ROM_START( micronic )
 	ROM_SYSTEM_BIOS(1, "test", "Micronic 1000 LCD monitor")
 	ROMX_LOAD("monitor2.bin", 0x0000, 0x8000, CRC(c6ae2bbf) SHA1(1f2e3a3d4720a8e1bb38b37f4ab9e0e32676d030), ROM_BIOS(1))
 ROM_END
+
+} // anonymous namespace
 
 /* Driver */
 

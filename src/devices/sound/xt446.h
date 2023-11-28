@@ -20,7 +20,7 @@ class xt446_device : public device_t, public device_mixer_interface
 public:
 	xt446_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	void midi_w(int state) { m_midi_serial->rx_w(state); }
+	void midi_w(int state) { m_maincpu->sci_rx_w<0>(state); }
 
 protected:
 	virtual void device_start() override;
@@ -31,9 +31,7 @@ protected:
 private:
 	required_device<h8s2655_device> m_maincpu;
 	required_device<swp30_device> m_swp30;
-	required_device<h8_sci_device> m_midi_serial;
 
-	void xt446_iomap(address_map &map);
 	void xt446_map(address_map &map);
 	void swp30_map(address_map &map);
 };

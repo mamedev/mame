@@ -20,7 +20,10 @@
 #include "mactoolbox.h"
 #include "v8.h"
 
+#include "bus/nscsi/cd.h"
 #include "bus/nscsi/devices.h"
+#include "bus/nubus/cards.h"
+#include "bus/nubus/nubus.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68020.h"
 #include "cpu/m68000/m68030.h"
@@ -109,7 +112,7 @@ private:
 		m_maincpu->pulse_input_line(M68K_LINE_BUSERROR, attotime::zero);
 	}
 
-	WRITE_LINE_MEMBER(cuda_reset_w)
+	void cuda_reset_w(int state)
 	{
 		m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 		m_maincpu->set_input_line(INPUT_LINE_RESET, state);
@@ -122,15 +125,15 @@ private:
 	void devsel_w(uint8_t devsel);
 	uint16_t swim_r(offs_t offset, u16 mem_mask);
 	void swim_w(offs_t offset, u16 data, u16 mem_mask);
-	WRITE_LINE_MEMBER(hdsel_w);
+	void hdsel_w(int state);
 
-	WRITE_LINE_MEMBER(egret_reset_w)
+	void egret_reset_w(int state)
 	{
 		m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 		m_maincpu->set_input_line(INPUT_LINE_RESET, state);
 	}
 
-	WRITE_LINE_MEMBER(set_hmmu)
+	void set_hmmu(int state)
 	{
 		m_maincpu->set_hmmu_enable((state == ASSERT_LINE) ? M68K_HMMU_DISABLE : M68K_HMMU_ENABLE_LC);
 	}
@@ -273,7 +276,7 @@ void maclc_state::devsel_w(uint8_t devsel)
 		m_cur_floppy->ss_w(m_hdsel);
 }
 
-WRITE_LINE_MEMBER(maclc_state::hdsel_w)
+void maclc_state::hdsel_w(int state)
 {
 	if (state != m_hdsel)
 	{
@@ -308,8 +311,13 @@ void maclc_state::maclc_base(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:0", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:1", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:3", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, "cdrom");
+	NSCSI_CONNECTOR(config, "scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config(
+		[](device_t *device)
+		{
+			device->subdevice<cdda_device>("cdda")->add_route(0, "^^v8:lspeaker", 1.0);
+			device->subdevice<cdda_device>("cdda")->add_route(1, "^^v8:rspeaker", 1.0);
+		});
+	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", mac_scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr5380", NCR53C80).machine_config([this](device_t *device)
@@ -327,6 +335,7 @@ void maclc_state::maclc_base(machine_config &config)
 	m_scsihelp->timeout_error_callback().set(FUNC(maclc_state::scsi_berr_w));
 
 	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
+	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("MC68020");
 	SOFTWARE_LIST(config, "flop35hd_list").set_original("mac_hdflop");
 
 	SCC85C30(config, m_scc, C7M);
@@ -351,9 +360,17 @@ void maclc_state::maclc_base(machine_config &config)
 	m_v8->hdsel_callback().set(FUNC(maclc_state::hdsel_w));
 	m_v8->hmmu_enable_callback().set(FUNC(maclc_state::set_hmmu));
 
+	nubus_device &nubus(NUBUS(config, "pds", 0));
+	nubus.set_space(m_maincpu, AS_PROGRAM);
+	nubus.set_address_mask(0x80ffffff);
+	// V8 supports interrupts for slots $C, $D, and $E, but the LC, LC II, and Color Classic
+	// only hook the slot $E IRQ up to the PDS slot.
+	nubus.out_irqe_callback().set(m_v8, FUNC(v8_device::slot_irq_w<0x20>));
+
 	MACADB(config, m_macadb, C15M);
 
-	EGRET(config, m_egret, EGRET_341S0850);
+	EGRET(config, m_egret, XTAL(32'768));
+	m_egret->set_default_bios_tag("341s0850");
 	m_egret->reset_callback().set(FUNC(maclc_state::egret_reset_w));
 	m_egret->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
 	m_egret->via_clock_callback().set(m_v8, FUNC(v8_device::cb1_w));
@@ -378,6 +395,8 @@ void maclc_state::maclc(machine_config &config)
 {
 	maclc_base(config);
 
+	NUBUS_SLOT(config, "lcpds", "pds", mac_pdslc_orig_cards, nullptr);
+
 	m_ram->set_default_size("2M");
 	m_ram->set_extra_options("4M,6M,10M");
 	m_v8->set_baseram_is_4M(false);
@@ -387,6 +406,8 @@ void maclc_state::maclc2(machine_config &config)
 {
 	maclc_base(config);
 
+	NUBUS_SLOT(config, "lcpds", "pds", mac_pdslc_cards, nullptr);
+
 	M68030(config.replace(), m_maincpu, C15M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &maclc_state::maclc_map);
 	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
@@ -394,6 +415,8 @@ void maclc_state::maclc2(machine_config &config)
 	m_ram->set_default_size("4M");
 	m_ram->set_extra_options("6M,8M,10M");
 	m_v8->set_baseram_is_4M(true);
+
+	SOFTWARE_LIST(config.replace(), "cd_list").set_original("mac_cdrom").set_filter("MC68030");
 }
 
 void maclc_state::maccclas(machine_config &config)
@@ -407,7 +430,8 @@ void maclc_state::maccclas(machine_config &config)
 	config.device_remove("egret");
 	config.device_remove("fdc");
 
-	CUDA(config, m_cuda, CUDA_341S0788);  // should be 0417, but that version won't sync up properly with the '030
+	CUDA_V2XX(config, m_cuda, XTAL(32'768));
+	m_cuda->set_default_bios_tag("341s0788");
 	m_cuda->reset_callback().set(FUNC(maclc_state::egret_reset_w));
 	m_cuda->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
 	m_cuda->via_clock_callback().set(m_v8, FUNC(v8_device::cb1_w));
@@ -424,9 +448,13 @@ void maclc_state::maccclas(machine_config &config)
 	m_v8->pb5_callback().set(m_cuda, FUNC(cuda_device::set_tip));
 	m_v8->cb2_callback().set(m_cuda, FUNC(cuda_device::set_via_data));
 
+	NUBUS_SLOT(config, "lcpds", "pds", mac_pdslc_cards, nullptr);
+
 	m_ram->set_default_size("4M");
 	m_ram->set_extra_options("6M,8M,10M");
 	m_v8->set_baseram_is_4M(true);
+
+	SOFTWARE_LIST(config.replace(), "cd_list").set_original("mac_cdrom").set_filter("MC68030");
 }
 
 void maclc_state::macclas2(machine_config &config)
@@ -446,9 +474,14 @@ void maclc_state::macclas2(machine_config &config)
 	m_v8->pb5_callback().set(m_egret, FUNC(egret_device::set_sys_session));
 	m_v8->cb2_callback().set(m_egret, FUNC(egret_device::set_via_data));
 
+	// Classic II doesn't have an LC PDS slot (and its ROM has the Slot Manager disabled)
+	config.device_remove("pds");
+
 	m_ram->set_default_size("4M");
 	m_ram->set_extra_options("6M,8M,10M");
 	m_v8->set_baseram_is_4M(true);
+
+	SOFTWARE_LIST(config.replace(), "cd_list").set_original("mac_cdrom").set_filter("MC68030");
 }
 
 ROM_START(maclc)
@@ -479,7 +512,7 @@ ROM_END
 
 } // anonymous namespace
 
-COMP(1990, maclc,  0, 0, maclc,  maclc, maclc_state, empty_init, "Apple Computer", "Macintosh LC", MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_SOUND)
-COMP(1991, maclc2, 0, 0, maclc2, maclc, maclc_state, empty_init, "Apple Computer", "Macintosh LC II", MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_SOUND)
-COMP(1991, macclas2, 0, 0, macclas2, maclc, maclc_state, empty_init, "Apple Computer", "Macintosh Classic II", MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_SOUND )
-COMP(1993, maccclas, 0, 0, maccclas, maclc, maclc_state, empty_init, "Apple Computer", "Macintosh Color Classic", MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_SOUND)
+COMP(1990, maclc,  0, 0, maclc,  maclc, maclc_state, empty_init, "Apple Computer", "Macintosh LC", MACHINE_SUPPORTS_SAVE)
+COMP(1991, maclc2, 0, 0, maclc2, maclc, maclc_state, empty_init, "Apple Computer", "Macintosh LC II", MACHINE_SUPPORTS_SAVE)
+COMP(1991, macclas2, 0, 0, macclas2, maclc, maclc_state, empty_init, "Apple Computer", "Macintosh Classic II", MACHINE_SUPPORTS_SAVE)
+COMP(1993, maccclas, 0, 0, maccclas, maclc, maclc_state, empty_init, "Apple Computer", "Macintosh Color Classic", MACHINE_SUPPORTS_SAVE)

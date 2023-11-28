@@ -1,680 +1,555 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
-/**********************************************************************
 
-    SGI HPC1 "High-performance Peripheral Controller" emulation
-
-**********************************************************************/
+/*
+ * Silicon Graphics High Performance Peripheral Controller (HPC1).
+ *
+ * TODO:
+ *  - hpc1.5 (second-generation, includes little-endian support)
+ *  - clean up ethernet interface, interrupt delay
+ *  - pbus and dsp
+ */
 
 #include "emu.h"
-#include "cpu/mips/mips3.h"
-#include "bus/rs232/rs232.h"
-#include "bus/rs232/hlemouse.h"
-#include "machine/nscsi_bus.h"
-#include "bus/nscsi/cd.h"
-#include "bus/nscsi/hd.h"
-#include "kbd.h"
 #include "hpc1.h"
-#include "speaker.h"
 
-#define LOG_UNKNOWN     (1U << 1)
-#define LOG_READS       (1U << 2)
-#define LOG_WRITES      (1U << 3)
-#define LOG_INT         (1U << 4)
-#define LOG_EEPROM      (1U << 5)
-#define LOG_SCSI        (1U << 6)
-#define LOG_SCSI_DMA    (1U << 7)
-#define LOG_DUART0      (1U << 8)
-#define LOG_DUART1      (1U << 9)
-#define LOG_DUART2      (1U << 10)
-#define LOG_PIT         (1U << 11)
-#define LOG_CHAIN       (1U << 12)
-#define LOG_REGS        (LOG_UNKNOWN | LOG_READS | LOG_WRITES)
-#define LOG_DUART       (LOG_DUART0 | LOG_DUART1 | LOG_DUART2)
-#define LOG_ALL         (LOG_REGS | LOG_INT | LOG_EEPROM | LOG_SCSI | LOG_SCSI_DMA | LOG_DUART | LOG_PIT | LOG_CHAIN)
+#define LOG_SCSI        (1U << 1)
+#define LOG_ENET        (1U << 2)
 
-#define VERBOSE         (LOG_UNKNOWN)
+//#define VERBOSE         (LOG_SCSI | LOG_ENET)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(SGI_HPC1, hpc1_device, "hpc1", "SGI HPC1")
 
-/*static*/ char const *const hpc1_device::RS232A_TAG = "rs232a";
-/*static*/ char const *const hpc1_device::RS232B_TAG = "rs232b";
+enum enet_rxs_mask : u32
+{
+	ENET_RXSTAT = 0x0000'bf00, // receive status
+	ENET_SRXDMA = 0x0000'4000, // start receiver dma
+};
 
-/*static*/ const XTAL hpc1_device::SCC_PCLK = 10_MHz_XTAL;
-/*static*/ const XTAL hpc1_device::SCC_RXA_CLK = 3.6864_MHz_XTAL; // Needs verification
-/*static*/ const XTAL hpc1_device::SCC_TXA_CLK = XTAL(0);
-/*static*/ const XTAL hpc1_device::SCC_RXB_CLK = 3.6864_MHz_XTAL; // Needs verification
-/*static*/ const XTAL hpc1_device::SCC_TXB_CLK = XTAL(0);
+enum enet_txs_mask : u32
+{
+	ENET_TXSTAT = 0x00bf'0000, // transmit status
+	ENET_STXDMA = 0x0040'0000, // start transmitter dma
+};
+
+enum enet_ctrl_mask : u32
+{
+	ENET_RESET   = 0x01, // channel reset
+	ENET_CLRINT  = 0x02, // interrupt pending
+	ENET_MODNORM = 0x04, // 0=loopback
+	ENET_RBO     = 0x08, // receive buffer overflow
+};
+
+enum scsi_ctrl_mask : u32
+{
+	SCSI_RESET    = 0x01,
+	SCSI_FLUSH    = 0x02,
+	SCSI_TO_MEM   = 0x10,
+	SCSI_STARTDMA = 0x80,
+};
+
+enum scsi_cbp_mask : u32
+{
+	SCSI_CBP_BUFADDR = 0x0fff'ffff,
+	SCSI_CBP_EOX     = 0x8000'0000,
+};
 
 hpc1_device::hpc1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SGI_HPC1, tag, owner, clock)
-	, m_maincpu(*this, finder_base::DUMMY_TAG)
-	, m_eeprom(*this, finder_base::DUMMY_TAG)
-	, m_wd33c93(*this, "scsibus:0:wd33c93")
-	, m_scc(*this, "scc%u", 0U)
-	, m_pit(*this, "pit")
-	, m_rtc(*this, "rtc")
+	, device_memory_interface(mconfig, *this)
+	, m_pbus("pbus", ENDIANNESS_BIG, 16, 20, -1, address_map_constructor(FUNC(hpc1_device::pbus_map), this))
+	, m_gio(*this, finder_base::DUMMY_TAG, -1)
+	, m_enet(*this, finder_base::DUMMY_TAG)
+	, m_int_w(*this)
+	, m_eeprom_dati(*this, 0)
+	, m_dma_r(*this, 0)
+	, m_dma_w(*this)
+	, m_eeprom_out(*this)
 {
 }
 
 void hpc1_device::device_start()
 {
-	save_item(NAME(m_misc_status));
-	save_item(NAME(m_cpu_aux_ctrl));
-	save_item(NAME(m_parbuf_ptr));
-	save_item(NAME(m_local_int_status));
-	save_item(NAME(m_local_int_mask));
-	save_item(NAME(m_int_status));
-	save_item(NAME(m_vme_int_mask));
+	save_item(NAME(m_drq));
 
-	save_item(NAME(m_scsi_dma.m_desc));
-	save_item(NAME(m_scsi_dma.m_addr));
-	save_item(NAME(m_scsi_dma.m_ctrl));
-	save_item(NAME(m_scsi_dma.m_length));
-	save_item(NAME(m_scsi_dma.m_next));
-	save_item(NAME(m_scsi_dma.m_irq));
-	save_item(NAME(m_scsi_dma.m_drq));
-	save_item(NAME(m_scsi_dma.m_to_mem));
-	save_item(NAME(m_scsi_dma.m_active));
+	save_item(NAME(m_enet_cxbp));
+	save_item(NAME(m_enet_nxbdp));
+	save_item(NAME(m_enet_xbc));
+	save_item(NAME(m_enet_cxbdp));
+	save_item(NAME(m_enet_cpfxbdp));
+	save_item(NAME(m_enet_ppfxbdp));
+	save_item(NAME(m_enet_intdelay));
+	save_item(NAME(m_enet_txs));
+	save_item(NAME(m_enet_rxs));
+	save_item(NAME(m_enet_ctrl));
+	save_item(NAME(m_enet_rbc));
+	save_item(NAME(m_enet_crbp));
+	save_item(NAME(m_enet_nrbdp));
+	save_item(NAME(m_enet_crbdp));
 
-	save_item(NAME(m_duart_int_status));
+	save_item(NAME(m_scsi_bc));
+	save_item(NAME(m_scsi_cbp));
+	save_item(NAME(m_scsi_nbdp));
+	save_item(NAME(m_scsi_ctrl));
+
+	save_item(NAME(m_dsp_bc));
+
+	save_item(NAME(m_aux));
+
+	m_drq = 0;
 }
 
 void hpc1_device::device_reset()
 {
-	m_misc_status = 0;
-	m_cpu_aux_ctrl = 0;
-	m_parbuf_ptr = 0;
-	memset(m_local_int_status, 0, sizeof(uint32_t) * 2);
-	memset(m_local_int_mask, 0, sizeof(uint32_t) * 2);
-	memset(m_int_status, 0, sizeof(bool) * 2);
-	memset(m_vme_int_mask, 0, sizeof(uint32_t) * 2);
+	m_enet_rxs = 0;
+	m_enet_txs = 0;
+	m_enet_ctrl = 0;
 
-	m_scsi_dma.m_desc = 0;
-	m_scsi_dma.m_addr = 0;
-	m_scsi_dma.m_ctrl = 0;
-	m_scsi_dma.m_length = 0;
-	m_scsi_dma.m_next = 0;
-	m_scsi_dma.m_irq = false;
-	m_scsi_dma.m_drq = false;
-	m_scsi_dma.m_to_mem = false;
-	m_scsi_dma.m_active = false;
-
-	m_duart_int_status = 0;
-
-	m_cpu_space = &m_maincpu->space(AS_PROGRAM);
+	m_scsi_nbdp = 0;
+	m_scsi_ctrl = 0;
 }
 
-//**************************************************************************
-//  DEVICE HARDWARE
-//**************************************************************************
-
-void hpc1_device::cdrom_config(device_t *device)
+device_memory_interface::space_config_vector hpc1_device::memory_space_config() const
 {
-	//  cdda_device *cdda = device->subdevice<cdda_device>("cdda");
-	//  cdda->add_route(ALL_OUTPUTS, "^^mono", 1.0);
+	return space_config_vector{ std::make_pair(0, &m_pbus) };
 }
 
-void hpc1_device::indigo_mice(device_slot_interface &device)
+void hpc1_device::map(address_map &map)
 {
-	device.option_add("sgimouse", SGI_HLE_SERIAL_MOUSE);
+	// xcount
+	map(0x000c, 0x000f).rw(FUNC(hpc1_device::cxbp_r), FUNC(hpc1_device::cxbp_w));
+	map(0x0010, 0x0013).rw(FUNC(hpc1_device::nxbdp_r), FUNC(hpc1_device::nxbdp_w));
+	map(0x0014, 0x0017).rw(FUNC(hpc1_device::xbc_r), FUNC(hpc1_device::xbc_w));
+	// xpntr
+	// xfifo
+	map(0x0020, 0x0023).rw(FUNC(hpc1_device::cxbdp_r), FUNC(hpc1_device::cxbdp_w));
+	map(0x0024, 0x0027).rw(FUNC(hpc1_device::cpfxbdp_r), FUNC(hpc1_device::cpfxbdp_w));
+	map(0x0028, 0x002b).rw(FUNC(hpc1_device::ppfxbdp_r), FUNC(hpc1_device::ppfxbdp_w));
+	map(0x002c, 0x002f).rw(FUNC(hpc1_device::intdelay_r), FUNC(hpc1_device::intdelay_w));
+	//
+	map(0x0034, 0x0037).rw(FUNC(hpc1_device::trstat_r), FUNC(hpc1_device::trstat_w));
+	map(0x0038, 0x003b).rw(FUNC(hpc1_device::rcvstat_r), FUNC(hpc1_device::rcvstat_w));
+	map(0x003c, 0x003f).rw(FUNC(hpc1_device::ctl_r), FUNC(hpc1_device::ctl_w));
+	//
+	// rcount
+	map(0x0048, 0x004b).rw(FUNC(hpc1_device::rbc_r), FUNC(hpc1_device::rbc_w));
+	map(0x004c, 0x004f).rw(FUNC(hpc1_device::crbp_r), FUNC(hpc1_device::crbp_w));
+	map(0x0050, 0x0053).rw(FUNC(hpc1_device::nrbdp_r), FUNC(hpc1_device::nrbdp_w));
+	map(0x0054, 0x0057).rw(FUNC(hpc1_device::crbdp_r), FUNC(hpc1_device::crbdp_w));
+	// rpntr
+	// rfifo
+
+	//map(0x0084, 0x0087).rw(FUNC(hpc1_device::scsi_count_r), FUNC(hpc1_device::scsi_count_w));
+	map(0x0088, 0x008b).rw(FUNC(hpc1_device::scsi_bc_r), FUNC(hpc1_device::scsi_bc_w));
+	map(0x008c, 0x008f).rw(FUNC(hpc1_device::scsi_cbp_r), FUNC(hpc1_device::scsi_cbp_w));
+	map(0x0090, 0x0093).rw(FUNC(hpc1_device::scsi_nbdp_r), FUNC(hpc1_device::scsi_nbdp_w));
+	map(0x0094, 0x0097).rw(FUNC(hpc1_device::scsi_ctrl_r), FUNC(hpc1_device::scsi_ctrl_w));
+	//map(0x0098, 0x009b); // scsi pointer register
+	//map(0x009c, 0x009f); // scsi fifo data register
+
+	map(0x00a8, 0x00af).ram(); // parallel
+	//map(0x00a8, 0x00ab); // parallel byte count and ie (bc)
+	//map(0x00ac, 0x00af); // parallel current buf ptr (cbp)
+	//map(0x00b0, 0x00b3); // parallel next buffer descriptor (nbdp)
+	//map(0x00b4, 0x00b7); // parallel control (ctrl)
+
+	map(0x0180, 0x01b7).ram(); // dsp interface
+	map(0x0180, 0x0183).rw(FUNC(hpc1_device::dsp_bc_r), FUNC(hpc1_device::dsp_bc_w)).umask32(0xffff);
+
+	map(0x01bc, 0x01bf).rw(FUNC(hpc1_device::aux_r), FUNC(hpc1_device::aux_w)).umask32(0xff);
 }
 
-void hpc1_device::scsi_devices(device_slot_interface &device)
+void hpc1_device::pbus_map(address_map &map)
 {
-	device.option_add("cdrom", NSCSI_CDROM_SGI);
-	device.option_add("harddisk", NSCSI_HARDDISK);
+/*
+ * Peripheral Bus (P-Bus): 20 bit address, 16-bit data
+ *  - PROM
+ *  - DUARTS
+ *  - Real Time Clock
+ *  - DSP (P-Bus master)
+ *  - Audio SRAM
+ * Ethernet
+ * SCSI
+ * Parallel
+ * INT2
+ *
+ * hpc1 pbus has 20 bit address space (1MB)
+ * 0x1fb8'0000-0x1fbf'ffff hpc i/o space  (512KB)
+ * 0x1fc0'0000-0x1fc3'ffff hpc prom space (256KB)
+ *
+ * Indigo PROM is 256k, dsp ram is 128k
+
+    DSP Y bus is 24 bit data, 16 bit address, word addressed
+    PBUS is 16 bit data, 20 bit address, word addressed
+
+    #define HPC1DMAWDCNT    0x1fb80180  // DMA transfer size (SRAM words)
+    #define HPC1GIOADDL     0x1fb80184  // GIO-bus address, LSB (16 bit)
+    #define HPC1GIOADDM     0x1fb80188  // GIO-bus address, MSB (16 bit)
+    #define HPC1PBUSADD     0x1fb8018c  // PBUS address (16 bit)
+    #define HPC1DMACTRL     0x1fb80190  // DMA Control (2 bit)
+    #define HPC1COUNTER     0x1fb80194  // Counter (24 bits) (ro)
+    #define HPC1HANDTX      0x1fb80198  // Handshake transmit (16 bit)
+    #define HPC1HANDRX      0x1fb8019c  // Handshake receive (16 bit)
+    #define HPC1CINTSTAT    0x1fb801a0  // CPU Interrupt status (3 bit)
+    #define HPC1CINTMASK    0x1fb801a4  // CPU Interrupt masks (3 bit)
+    #define HPC1MISCSR      0x1fb801b0  // Misc. control and status (8 bit)
+    #define HPC1BURSTCTL    0x1fb801b4  // DMA Ballistics register (16 bit)
+
+    ; DSP-HPC addresses
+    DSP_HPC_BYTECNT     equ y:$ffe0     ; DMA transfer size
+    DSP_HPC_GIOADDL     equ y:$ffe1     ; GIO-bus address, LSB
+    DSP_HPC_GIOADDM     equ y:$ffe2     ; GIO-bus address, MSB
+    DSP_HPC_PBUSADD     equ y:$ffe3     ; Pbus address
+    DSP_HPC_DMACTRL     equ y:$ffe4     ; DMA control
+    DSP_HPC_HANDTX      equ y:$ffe6     ; handshake transmit
+    DSP_HPC_HANDRX      equ y:$ffe7     ; handshake receive
+    DSP_HPC_INTSTAT     equ y:$ffe8     ; interrupt status
+    DSP_HPC_INTMASK     equ y:$ffe9     ; interrupt mask
+    DSP_HPC_INTCONF     equ y:$ffea     ; interrupt configuration
+    DSP_HPC_INTPOL      equ y:$ffeb     ; interrupt polarity
+    DSP_HPC_MISCSR      equ y:$ffec     ; miscellaneous control and status
+    DSP_HPC_BURSTCTL    equ y:$ffed     ; dma burst control register
+
+    # p: == x:
+    p:8000-8fff == x:8000-8fff
+    p:e000-efff == x:e000-efff
+
+    # p: ^ 0x4000 == y:
+    p:8000-8fff == y:c000-cfff
+      9=d
+      a=e
+      b=f
+      c=8
+      d=9
+    p:e000-efff == y:a000-afff
+      f=b
+
+    HEADPHONE_MDAC_L equ        y:$fffc
+    HEADPHONE_MDAC_R equ        y:$fffd
+
+    32k x 24bit dsp ram
+    ram at c000
+*/
+	map(0xffe0, 0xffe0).rw(FUNC(hpc1_device::dsp_bc_r), FUNC(hpc1_device::dsp_bc_w));
 }
 
-void hpc1_device::wd33c93(device_t *device)
+void hpc1_device::scsi_nbdp_w(u32 data)
 {
-	device->set_clock(10000000);
-	downcast<wd33c93_device *>(device)->irq_cb().set(*this, FUNC(hpc1_device::scsi_irq));
-	downcast<wd33c93_device *>(device)->drq_cb().set(*this, FUNC(hpc1_device::scsi_drq));
+	LOGMASKED(LOG_SCSI, "nbdp_w 0x%08x\n", data);
+	m_scsi_nbdp = data & 0x0fff'ffffU;
+
+	scsi_chain();
 }
 
-void hpc1_device::device_add_mconfig(machine_config &config)
+void hpc1_device::scsi_ctrl_w(u32 data)
 {
-	SCC85C30(config, m_scc[0], SCC_PCLK);
-	m_scc[0]->configure_channels(SCC_RXA_CLK.value(), SCC_TXA_CLK.value(), SCC_RXB_CLK.value(), SCC_TXB_CLK.value());
-	m_scc[0]->out_int_callback().set(FUNC(hpc1_device::duart0_int_w));
-	m_scc[0]->out_txda_callback().set("keyboard_port", FUNC(sgi_kbd_port_device::write_txd));
+	m_scsi_ctrl = data & ~(SCSI_FLUSH | SCSI_RESET);
 
-	SCC85C30(config, m_scc[1], SCC_PCLK);
-	m_scc[1]->configure_channels(SCC_RXA_CLK.value(), SCC_TXA_CLK.value(), SCC_RXB_CLK.value(), SCC_TXB_CLK.value());
-	m_scc[1]->out_txda_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_txd));
-	m_scc[1]->out_dtra_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_dtr));
-	m_scc[1]->out_rtsa_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_rts));
-	m_scc[1]->out_txdb_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_txd));
-	m_scc[1]->out_dtrb_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_dtr));
-	m_scc[1]->out_rtsb_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_rts));
-	m_scc[1]->out_int_callback().set(FUNC(hpc1_device::duart1_int_w));
-
-	SCC85C30(config, m_scc[2], SCC_PCLK);
-	m_scc[2]->configure_channels(SCC_RXA_CLK.value(), SCC_TXA_CLK.value(), SCC_RXB_CLK.value(), SCC_TXB_CLK.value());
-	m_scc[2]->out_int_callback().set(FUNC(hpc1_device::duart2_int_w));
-
-	SGI_KBD_PORT(config, "keyboard_port", default_sgi_kbd_devices, "keyboard").rxd_handler().set(m_scc[0], FUNC(z80scc_device::rxa_w));
-
-	rs232_port_device &mouseport(RS232_PORT(config, "mouse_port", indigo_mice, "sgimouse"));
-	mouseport.set_fixed(true);
-	mouseport.rxd_handler().set(m_scc[0], FUNC(scc85c30_device::rxb_w));
-	mouseport.cts_handler().set(m_scc[0], FUNC(scc85c30_device::ctsb_w));
-	mouseport.dcd_handler().set(m_scc[0], FUNC(scc85c30_device::dcdb_w));
-
-	rs232_port_device &rs232a(RS232_PORT(config, RS232A_TAG, default_rs232_devices, nullptr));
-	rs232a.cts_handler().set(m_scc[1], FUNC(scc85c30_device::ctsa_w));
-	rs232a.dcd_handler().set(m_scc[1], FUNC(scc85c30_device::dcda_w));
-	rs232a.rxd_handler().set(m_scc[1], FUNC(scc85c30_device::rxa_w));
-
-	rs232_port_device &rs232b(RS232_PORT(config, RS232B_TAG, default_rs232_devices, nullptr));
-	rs232b.cts_handler().set(m_scc[1], FUNC(scc85c30_device::ctsb_w));
-	rs232b.dcd_handler().set(m_scc[1], FUNC(scc85c30_device::dcdb_w));
-	rs232b.rxd_handler().set(m_scc[1], FUNC(scc85c30_device::rxb_w));
-
-	NSCSI_BUS(config, "scsibus", 0);
-	NSCSI_CONNECTOR(config, "scsibus:0").option_set("wd33c93", WD33C93)
-		.machine_config([this](device_t *device) { wd33c93(device); });
-	NSCSI_CONNECTOR(config, "scsibus:1", scsi_devices, "harddisk", false);
-	NSCSI_CONNECTOR(config, "scsibus:2", scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsibus:3", scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsibus:4", scsi_devices, "cdrom", false);
-	NSCSI_CONNECTOR(config, "scsibus:5", scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsibus:6", scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsibus:7", scsi_devices, nullptr, false);
-
-	DP8573(config, m_rtc).set_use_utc(true);
-
-	PIT8254(config, m_pit, 0);
-	m_pit->set_clk<0>(1000000);
-	m_pit->set_clk<1>(1000000);
-	m_pit->set_clk<2>(1000000);
-	m_pit->out_handler<0>().set(FUNC(hpc1_device::timer0_int));
-	m_pit->out_handler<1>().set(FUNC(hpc1_device::timer1_int));
-	m_pit->out_handler<2>().set(FUNC(hpc1_device::timer2_int));
-
-	SPEAKER(config, "mono").front_center();
+	if (BIT(m_drq, 0) && (m_scsi_ctrl & SCSI_STARTDMA))
+		scsi_dma();
 }
 
-//**************************************************************************
-//  REGISTER ACCESS
-//**************************************************************************
-
-uint32_t hpc1_device::read(offs_t offset, uint32_t mem_mask)
+void hpc1_device::scsi_chain()
 {
-	if (offset >= 0x0e00/4 && offset <= 0x0e7c/4)
-		return m_rtc->read(offset - 0xe00/4);
+	u32 const bdp = m_scsi_nbdp;
 
-	switch (offset)
-	{
-	case 0x005c/4:
-		LOGMASKED(LOG_UNKNOWN, "%s: HPC Unknown Read: %08x & %08x\n",
-			machine().describe_context(), 0x1fb80000 + offset*4, mem_mask);
-		return 0;
-	case 0x0094/4:
-		LOGMASKED(LOG_SCSI_DMA, "%s: HPC SCSI DMA Control Register Read: %08x & %08x\n", machine().describe_context(), m_scsi_dma.m_ctrl, mem_mask);
-		return m_scsi_dma.m_ctrl;
-	case 0x00ac/4:
-		LOGMASKED(LOG_READS, "%s: HPC Parallel Buffer Pointer Read: %08x & %08x\n", machine().describe_context(), m_parbuf_ptr, mem_mask);
-		return m_parbuf_ptr;
-	case 0x00c0/4:
-		LOGMASKED(LOG_READS, "%s: HPC Endianness Read: %08x & %08x\n", machine().describe_context(), 0x00000000, mem_mask);
-		return 0x00000000;
-	case 0x0120/4:
-	{
-		uint32_t ret = m_wd33c93->indir_addr_r() << 8;
-		LOGMASKED(LOG_SCSI, "%s: HPC SCSI Offset 0 Read: %08x & %08x\n", machine().describe_context(), ret, mem_mask);
-		return ret;
-	}
-	case 0x0124/4:
-	{
-		uint32_t ret = m_wd33c93->indir_reg_r() << 8;
-		LOGMASKED(LOG_SCSI, "%s: HPC SCSI Offset 1 Read: %08x & %08x\n", machine().describe_context(), ret, mem_mask);
-		return ret;
-	}
-	case 0x01b0/4:
-		LOGMASKED(LOG_READS, "%s: HPC Misc. Status Read: %08x & %08x\n", machine().describe_context(), m_misc_status, mem_mask);
-		return m_misc_status;
-	case 0x01bc/4:
-	{
-		uint32_t ret = (m_cpu_aux_ctrl & ~0x10) | m_eeprom->do_read() << 4;
-		LOGMASKED(LOG_EEPROM, "%s: HPC Serial EEPROM Read: %08x & %08x\n", machine().describe_context(), ret, mem_mask);
-		return ret;
-	}
-	case 0x01c0/4:
-		LOGMASKED(LOG_INT, "%s: HPC Local Interrupt 0 Status Read: %08x & %08x\n", machine().describe_context(), m_local_int_status[0], mem_mask);
-		return m_local_int_status[0];
-	case 0x01c4/4:
-		LOGMASKED(LOG_INT, "%s: HPC Local Interrupt 0 Mask Read: %08x & %08x\n", machine().describe_context(), m_local_int_mask[0], mem_mask);
-		return m_local_int_mask[0];
-	case 0x01c8/4:
-		LOGMASKED(LOG_INT, "%s: HPC Local Interrupt 1 Status Read: %08x & %08x\n", machine().describe_context(), m_local_int_status[1], mem_mask);
-		return m_local_int_status[1];
-	case 0x01cc/4:
-		LOGMASKED(LOG_INT, "%s: HPC Local Interrupt 1 Mask Read: %08x & %08x\n", machine().describe_context(), m_local_int_mask[1], mem_mask);
-		return m_local_int_mask[1];
-	case 0x01d4/4:
-		LOGMASKED(LOG_INT, "%s: HPC VME Interrupt Mask 0 Read: %08x & %08x\n", machine().describe_context(), m_vme_int_mask[0], mem_mask);
-		return m_vme_int_mask[0];
-	case 0x01d8/4:
-		LOGMASKED(LOG_INT, "%s: HPC VME Interrupt Mask 1 Read: %08x & %08x\n", machine().describe_context(), m_vme_int_mask[1], mem_mask);
-		return m_vme_int_mask[1];
-	case 0x01f0/4:
-	{
-		const uint8_t data = m_pit->read(0);
-		LOGMASKED(LOG_PIT, "%s: Read Timer Count0 Register: %02x & %08x\n", machine().describe_context(), data, mem_mask);
-		return data;
-	}
-	case 0x01f4/4:
-	{
-		const uint8_t data = m_pit->read(1);
-		LOGMASKED(LOG_PIT, "%s: Read Timer Count1 Register: %02x & %08x\n", machine().describe_context(), data, mem_mask);
-		return data;
-	}
-	case 0x01f8/4:
-	{
-		const uint8_t data = m_pit->read(2);
-		LOGMASKED(LOG_PIT, "%s: Read Timer Count2 Register: %02x & %08x\n", machine().describe_context(), data, mem_mask);
-		return data;
-	}
-	case 0x01fc/4:
-	{
-		const uint8_t data = m_pit->read(3);
-		LOGMASKED(LOG_PIT, "%s: Read Timer Control Register: %02x & %08x\n", machine().describe_context(), data, mem_mask);
-		return data;
-	}
-	case 0x0d00/4:
-	case 0x0d10/4:
-	case 0x0d20/4:
-	{
-		const uint32_t index = (offset >> 2) & 3;
-		uint32_t ret = m_scc[index]->ab_dc_r(0);
-		LOGMASKED(LOG_DUART0 << index, "%s: HPC DUART%d Channel B Control Read: %08x & %08x\n", machine().describe_context(), index, ret, mem_mask);
-		return ret;
-	}
-	case 0x0d04/4:
-	case 0x0d14/4:
-	case 0x0d24/4:
-	{
-		const uint32_t index = (offset >> 2) & 3;
-		const uint32_t ret = m_scc[index]->ab_dc_r(1);
-		LOGMASKED(LOG_DUART0 << index, "%s: HPC DUART%d Channel B Data Read: %08x & %08x\n", machine().describe_context(), index, ret, mem_mask);
-		return ret;
-	}
-	case 0x0d08/4:
-	case 0x0d18/4:
-	case 0x0d28/4:
-	{
-		const uint32_t index = (offset >> 2) & 3;
-		const uint32_t ret = m_scc[index]->ab_dc_r(2);
-		LOGMASKED(LOG_DUART0 << index, "%s: HPC DUART%d Channel A Control Read: %08x & %08x\n", machine().describe_context(), index, ret, mem_mask);
-		return ret;
-	}
-	case 0x0d0c/4:
-	case 0x0d1c/4:
-	case 0x0d2c/4:
-	{
-		const uint32_t index = (offset >> 2) & 3;
-		const uint32_t ret = m_scc[index]->ab_dc_r(3);
-		LOGMASKED(LOG_DUART0 << index, "%s: HPC DUART%d Channel A Data Read: %08x & %08x\n", machine().describe_context(), index, ret, mem_mask);
-		return ret;
-	}
-	default:
-		LOGMASKED(LOG_UNKNOWN, "%s: Unknown HPC Read: %08x & %08x\n", machine().describe_context(), 0x1fb80000 + offset*4, mem_mask);
-		return 0;
-	}
-	return 0;
+	m_scsi_bc = m_gio->read_dword(bdp + 0) & 0x1fffU;
+	m_scsi_cbp = m_gio->read_dword(bdp + 4) & (SCSI_CBP_EOX | SCSI_CBP_BUFADDR);
+	m_scsi_nbdp = m_gio->read_dword(bdp + 8) & 0x0fff'ffffU;
+
+	LOGMASKED(LOG_SCSI, "bdp 0x%08x bc 0x%04x cbp 0x%08x nbdp 0x%08x\n", bdp, m_scsi_bc, m_scsi_cbp, m_scsi_nbdp);
 }
 
-void hpc1_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
+template <unsigned N> void hpc1_device::write_drq(int state)
 {
-	if (offset >= 0x0e00/4 && offset <= 0x0e7c/4)
+	if (state)
 	{
-		m_rtc->write(offset - 0xe00/4, (uint8_t)data);
-		return;
+		m_drq |= 1U << N;
+
+		if (N == 0 && (m_scsi_ctrl & SCSI_STARTDMA))
+			scsi_dma();
+		else if (N == 1)
+			enet_dma();
 	}
+	else
+		m_drq &= ~(1U << N);
+}
 
-	switch (offset)
+template void hpc1_device::write_drq<0>(int state);
+template void hpc1_device::write_drq<1>(int state);
+
+void hpc1_device::write_int(int state)
+{
+	u8 const rxs = m_enet->read(6);
+	u8 const txs = m_enet->read(7);
+
+	// update status registers
+	m_enet_rxs = (m_enet_rxs & ~ENET_RXSTAT) | ((u32(rxs) << 8) & ENET_RXSTAT);
+	m_enet_txs = (m_enet_txs & ~ENET_TXSTAT) | ((u32(txs) << 16) & ENET_TXSTAT);
+
+	LOGMASKED(LOG_ENET, "write_int %d rxs 0x%02x txs 0x%02x\n", state, rxs, txs);
+
+	if (state)
 	{
-	case 0x0090/4:
-		LOGMASKED(LOG_SCSI_DMA, "%s: HPC SCSI DMA Descriptor Pointer Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
-		m_scsi_dma.m_desc = data;
-		fetch_chain();
-		break;
+		bool interrupt = false;
 
-	case 0x0094/4:
-		LOGMASKED(LOG_SCSI_DMA, "%s: HPC SCSI DMA Control Register Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
-		m_scsi_dma.m_ctrl = data &~ (HPC_DMACTRL_FLUSH | HPC_DMACTRL_RESET);
-		m_scsi_dma.m_to_mem = (m_scsi_dma.m_ctrl & HPC_DMACTRL_TO_MEM);
-		m_scsi_dma.m_active = (m_scsi_dma.m_ctrl & HPC_DMACTRL_ENABLE);
-		if (m_scsi_dma.m_drq && m_scsi_dma.m_active)
-			do_scsi_dma();
-		break;
-
-	case 0x00ac/4:
-		LOGMASKED(LOG_WRITES, "%s: HPC Parallel Buffer Pointer Write: %08x (%08x)\n", machine().describe_context(), data, mem_mask);
-		m_parbuf_ptr = data;
-		break;
-	case 0x0120/4:
-		if (ACCESSING_BITS_8_15)
+		// receive interrupt
+		if (BIT(m_enet_rxs, 8, 6))
 		{
-			LOGMASKED(LOG_SCSI, "%s: HPC SCSI Controller Address Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
-			m_wd33c93->indir_addr_w((uint8_t)(data >> 8));
+			// seeq receive fifo overflow or receive buffer overflow?
+			if (BIT(m_enet_rxs, 8) || (m_enet_ctrl & ENET_RBO))
+				m_enet_rxs &= ~ENET_SRXDMA;
+
+			interrupt = true;
 		}
-		break;
-	case 0x0124/4:
-		if (ACCESSING_BITS_8_15)
+
+		// transmit interrupt
+		if (BIT(m_enet_txs, 16, 3) || (BIT(m_enet_txs, 19) && BIT(m_enet_xbc, 15)))
 		{
-			LOGMASKED(LOG_SCSI, "%s: HPC SCSI Controller Data Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
-			m_wd33c93->indir_reg_w((uint8_t)(data >> 8));
+			m_enet_txs &= ~ENET_STXDMA;
+
+			interrupt = true;
 		}
-		break;
-	case 0x01b0/4:
-		LOGMASKED(LOG_WRITES, "%s: HPC Misc. Status Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
-		if (BIT(data, 0))
-			LOGMASKED(LOG_WRITES, "    Force DSP hard reset\n" );
 
-		if (BIT(data, 1))
-			LOGMASKED(LOG_WRITES, "    Force IRQA\n" );
+		// TODO: interrupt delay
+		if (interrupt)
+		{
+			m_enet_ctrl |= ENET_CLRINT;
+			m_int_w(1);
+		}
+	}
+}
 
-		if (BIT(data, 2))
-			LOGMASKED(LOG_WRITES, "    Set IRQA polarity high\n" );
+void hpc1_device::scsi_dma()
+{
+	if (m_scsi_bc)
+	{
+		if (m_scsi_ctrl & SCSI_TO_MEM)
+			m_gio->write_byte(m_scsi_cbp & SCSI_CBP_BUFADDR, m_dma_r[0]());
 		else
-			LOGMASKED(LOG_WRITES, "    Set IRQA polarity low\n" );
+			m_dma_w[0](m_gio->read_byte(m_scsi_cbp &SCSI_CBP_BUFADDR));
 
-		if (BIT(data, 3))
-			LOGMASKED(LOG_WRITES, "    SRAM size: 32K\n" );
+		m_scsi_cbp++;
+		m_scsi_bc--;
+
+		if (m_scsi_bc == 0)
+		{
+			if (m_scsi_cbp & SCSI_CBP_EOX)
+				m_scsi_ctrl &= ~SCSI_STARTDMA;
+			else
+				scsi_chain();
+		}
+	}
+}
+
+void hpc1_device::enet_dma()
+{
+	// transmit
+	while (m_enet_txs & ENET_STXDMA)
+	{
+		m_enet_xbc = m_gio->read_dword(BIT(m_enet_cxbdp, 0, 30) + 0);
+		m_enet_cxbp = m_gio->read_dword(BIT(m_enet_cxbdp, 0, 30) + 4);
+		m_enet_nxbdp = m_gio->read_dword(BIT(m_enet_cxbdp, 0, 30) + 8);
+
+		LOGMASKED(LOG_ENET, "transmit cxbdp 0x%08x cxbp 0x%08x xbc 0x%08x count %d nxbdp 0x%08x\n",
+			m_enet_cxbdp, m_enet_cxbp, m_enet_xbc, BIT(m_enet_xbc, 0, 13), m_enet_nxbdp);
+		for (unsigned i = 0; i < BIT(m_enet_xbc, 0, 13); i++)
+			m_dma_w[1](m_gio->read_byte(BIT(m_enet_cxbp, 0, 28) + i));
+
+		// eoxp: end of packet
+		if (BIT(m_enet_xbc, 31))
+		{
+			LOGMASKED(LOG_ENET, "transmit end of packet\n");
+			m_enet->txeof_w(1);
+		}
+
+		// eox: last descriptor
+		if (BIT(m_enet_cxbp, 31))
+		{
+			LOGMASKED(LOG_ENET, "transmit stop\n");
+			m_enet_txs &= ~ENET_STXDMA;
+		}
 		else
-			LOGMASKED(LOG_WRITES, "    SRAM size:  8K\n" );
+			m_enet_cxbdp = m_enet_nxbdp;
+	}
 
-		m_misc_status = data;
-		break;
-	case 0x01bc/4:
-		m_cpu_aux_ctrl = data;
-		LOGMASKED(LOG_EEPROM, "%s: HPC Serial EEPROM Write: %08x & %08x\n", machine().describe_context(), data, mem_mask );
-		if (BIT(data, 0))
+	// receive
+	while (m_enet_rxs & ENET_SRXDMA)
+	{
+		// check rxrdy
+		if (!BIT(m_drq, 1))
+			break;
+
+		m_enet_crbdp = m_enet_nrbdp;
+
+		m_enet_rbc = m_gio->read_dword(BIT(m_enet_crbdp, 0, 30) + 0);
+		m_enet_crbp = m_gio->read_dword(BIT(m_enet_crbdp, 0, 30) + 4);
+		m_enet_nrbdp = m_gio->read_dword(BIT(m_enet_crbdp, 0, 30) + 8);
+
+		LOGMASKED(LOG_ENET, "receive crbdp 0x%08x crbp 0x%08x rbc 0x%08x count %d nrbdp 0x%08x\n",
+			m_enet_crbdp, m_enet_crbp, m_enet_rbc, BIT(m_enet_rbc, 0, 13), m_enet_nrbdp);
+
+		// rown?
+		if (BIT(m_enet_rbc, 31))
 		{
-			LOGMASKED(LOG_EEPROM, "    CPU board LED on\n");
+			unsigned count = 2;
+			while (!m_enet->rxeof_r())
+				m_gio->write_byte(BIT(m_enet_crbp, 0, 28) + count++, m_dma_r[1]());
+
+			// FIXME: store rxstatus byte in receive buffer
+			logerror("rx status 0x%02x\n", (m_enet_rxs & ENET_RXSTAT) >> 8);
+			m_gio->write_byte(BIT(m_enet_crbp, 0, 28) + count++, 0x30);
+
+			LOGMASKED(LOG_ENET, "receive data length %d\n", count - 3);
+			m_gio->write_dword(BIT(m_enet_crbdp, 0, 28) + 0, BIT(m_enet_rbc, 0, 13) - count);
 		}
-		m_eeprom->di_write(BIT(data, 3));
-		m_eeprom->cs_write(BIT(data, 1));
-		m_eeprom->clk_write(BIT(data, 2));
-		break;
-	case 0x01c0/4:
-		LOGMASKED(LOG_INT, "%s: HPC Local Interrupt 0 Status Write (Ignored): %08x & %08x\n", machine().describe_context(), data, mem_mask);
-		break;
-	case 0x01c4/4:
-	{
-		LOGMASKED(LOG_INT, "%s: HPC Local Interrupt 0 Mask Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
-		const uint32_t old_mask = m_local_int_mask[0];
-		m_local_int_mask[0] = data;
-		if (old_mask != m_local_int_mask[0])
-			update_irq(0);
-		break;
-	}
-	case 0x01c8/4:
-		LOGMASKED(LOG_INT, "%s: HPC Local Interrupt 1 Status Write (Ignored): %08x & %08x\n", machine().describe_context(), data, mem_mask);
-		break;
-	case 0x01cc/4:
-	{
-		LOGMASKED(LOG_INT, "%s: HPC Local Interrupt 1 Mask Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
-		const uint32_t old_mask = m_local_int_mask[1];
-		m_local_int_mask[1] = data;
-		if (old_mask != m_local_int_mask[1])
-			update_irq(1);
-		break;
-	}
-	case 0x01d4/4:
-		LOGMASKED(LOG_INT, "%s: HPC VME Interrupt Mask 0 Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
-		m_vme_int_mask[0] = data;
-		break;
-	case 0x01d8/4:
-		LOGMASKED(LOG_INT, "%s: HPC VME Interrupt Mask 1 Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
-		m_vme_int_mask[1] = data;
-		break;
-	case 0x01e0/4:
-		LOGMASKED(LOG_PIT, "%s: HPC Write Timer Interrupt Clear Register: %08x\n", machine().describe_context(), data);
-		set_timer_int_clear(data);
-		break;
-	case 0x01f0/4:
-		LOGMASKED(LOG_PIT, "%s: HPC Write Timer Count0 Register: %08x & %08x\n", machine().describe_context(), data, mem_mask);
-		if (ACCESSING_BITS_24_31)
-			m_pit->write(0, (uint8_t)(data >> 24));
-		else if (ACCESSING_BITS_0_7)
-			m_pit->write(0, (uint8_t)data);
-		return;
-	case 0x01f4/4:
-		LOGMASKED(LOG_PIT, "%s: HPC Write Timer Count1 Register: %08x & %08x\n", machine().describe_context(), data, mem_mask);
-		m_pit->write(1, (uint8_t)data);
-		return;
-	case 0x01f8/4:
-		LOGMASKED(LOG_PIT, "%s: HPC Write Timer Count2 Register: %08x & %08x\n", machine().describe_context(), data, mem_mask);
-		m_pit->write(2, (uint8_t)data);
-		return;
-	case 0x01fc/4:
-		LOGMASKED(LOG_PIT, "%s: HPC Write Timer Control Register: %08x & %08x\n", machine().describe_context(), data, mem_mask);
-		m_pit->write(3, (uint8_t)data);
-		return;
-	case 0x0d00/4:
-	case 0x0d10/4:
-	case 0x0d20/4:
-	{
-		const uint32_t index = (offset >> 2) & 3;
-		m_scc[index]->ab_dc_w(0, (uint8_t)data);
-		LOGMASKED(LOG_DUART0 << index, "%s: HPC DUART%d Channel B Control Write: %08x & %08x\n", machine().describe_context(), index, data, mem_mask);
-		break;
-	}
-	case 0x0d04/4:
-	case 0x0d14/4:
-	case 0x0d24/4:
-	{
-		const uint32_t index = (offset >> 2) & 3;
-		m_scc[index]->ab_dc_w(1, (uint8_t)data);
-		LOGMASKED(LOG_DUART0 << index, "%s: HPC DUART%d Channel B Data Write: %08x & %08x\n", machine().describe_context(), index, data, mem_mask);
-		break;
-	}
-	case 0x0d08/4:
-	case 0x0d18/4:
-	case 0x0d28/4:
-	{
-		const uint32_t index = (offset >> 2) & 3;
-		m_scc[index]->ab_dc_w(2, (uint8_t)data);
-		LOGMASKED(LOG_DUART0 << index, "%s: HPC DUART%d Channel A Control Write: %08x & %08x\n", machine().describe_context(), index, data, mem_mask);
-		break;
-	}
-	case 0x0d0c/4:
-	case 0x0d1c/4:
-	case 0x0d2c/4:
-	{
-		const uint32_t index = (offset >> 2) & 3;
-		m_scc[index]->ab_dc_w(3, (uint8_t)data);
-		LOGMASKED(LOG_DUART0 << index, "%s: HPC DUART%d Channel A Data Write: %08x & %08x\n", machine().describe_context(), index, data, mem_mask);
-		break;
-	}
-	default:
-		LOGMASKED(LOG_UNKNOWN, "%s: Unknown HPC write: %08x = %08x & %08x\n", machine().describe_context(), 0x1fb80000 + offset*4, data, mem_mask);
-		break;
-	}
-}
 
-//**************************************************************************
-//  SCSI DMA
-//**************************************************************************
-
-void hpc1_device::dump_chain(uint32_t base)
-{
-	const uint32_t addr = m_cpu_space->read_dword(base);
-	const uint32_t ctrl = m_cpu_space->read_dword(base+4);
-	const uint32_t next = m_cpu_space->read_dword(base+8);
-
-	LOGMASKED(LOG_CHAIN, "Chain Node:\n");
-	LOGMASKED(LOG_CHAIN, "    Addr: %08x\n", addr);
-	LOGMASKED(LOG_CHAIN, "    Ctrl: %08x\n", ctrl);
-	LOGMASKED(LOG_CHAIN, "    Next: %08x\n", next);
-
-	if (next != 0 && !BIT(addr, 31))
-	{
-		dump_chain(next & 0x0fffffff);
-	}
-}
-void hpc1_device::fetch_chain()
-{
-	m_scsi_dma.m_ctrl = m_cpu_space->read_dword(m_scsi_dma.m_desc);
-	m_scsi_dma.m_addr = m_cpu_space->read_dword(m_scsi_dma.m_desc+4);
-	m_scsi_dma.m_next = m_cpu_space->read_dword(m_scsi_dma.m_desc+8);
-	m_scsi_dma.m_length = m_scsi_dma.m_ctrl & 0x1fff;
-
-	LOGMASKED(LOG_CHAIN, "Fetching chain from %08x:\n", m_scsi_dma.m_desc);
-	LOGMASKED(LOG_CHAIN, "    Addr: %08x\n", m_scsi_dma.m_addr);
-	LOGMASKED(LOG_CHAIN, "    Ctrl: %08x\n", m_scsi_dma.m_ctrl);
-	LOGMASKED(LOG_CHAIN, "    Next: %08x\n", m_scsi_dma.m_next);
-}
-
-void hpc1_device::decrement_chain()
-{
-	m_scsi_dma.m_length--;
-	if (m_scsi_dma.m_length == 0)
-	{
-		if (BIT(m_scsi_dma.m_addr, 31))
+		// eor: last descriptor
+		if (BIT(m_enet_crbp, 31))
 		{
-			m_scsi_dma.m_active = false;
-			m_scsi_dma.m_ctrl &= ~HPC_DMACTRL_ENABLE;
-			return;
+			LOGMASKED(LOG_ENET, "receive stop\n");
+			m_enet_rxs &= ~ENET_SRXDMA;
 		}
-		m_scsi_dma.m_desc = m_scsi_dma.m_next & 0x0fffffff;
-		fetch_chain();
 	}
 }
 
-WRITE_LINE_MEMBER(hpc1_device::scsi_drq)
+u32 hpc1_device::trstat_r()
 {
-	m_scsi_dma.m_drq = state;
+	LOGMASKED(LOG_ENET, "trstat_r 0x%08x\n", m_enet_txs);
 
-	if (m_scsi_dma.m_drq && m_scsi_dma.m_active)
-	{
-		do_scsi_dma();
-	}
+	return m_enet_txs;
 }
 
-void hpc1_device::do_scsi_dma()
+u32 hpc1_device::rcvstat_r()
 {
-	if (m_scsi_dma.m_to_mem)
-		m_cpu_space->write_byte(m_scsi_dma.m_addr & 0x0fffffff, m_wd33c93->dma_r());
+	LOGMASKED(LOG_ENET, "rcvstat_r 0x%08x\n", m_enet_rxs);
+
+	return m_enet_rxs;
+}
+
+u8 hpc1_device::aux_r()
+{
+	if (m_eeprom_dati())
+		return m_aux | 0x10;
 	else
-		m_wd33c93->dma_w(m_cpu_space->read_byte(m_scsi_dma.m_addr & 0x0fffffff));
+		return m_aux & ~0x10;
+}
 
-	m_scsi_dma.m_addr++;
-	decrement_chain();
+void hpc1_device::cxbp_w(u32 data)
+{
+	LOGMASKED(LOG_ENET, "cxbp_w 0x%08x\n", data);
+	m_enet_cxbp = data;
+}
 
-	if (!m_scsi_dma.m_active)
+void hpc1_device::nxbdp_w(u32 data)
+{
+	LOGMASKED(LOG_ENET, "nxbdp_w 0x%08x\n", data);
+	m_enet_nxbdp = data;
+}
+
+void hpc1_device::xbc_w(u32 data)
+{
+	LOGMASKED(LOG_ENET, "xbc_w 0x%08x\n", data);
+	m_enet_xbc = data;
+}
+
+void hpc1_device::cxbdp_w(u32 data)
+{
+	LOGMASKED(LOG_ENET, "cxbdp_w 0x%08x\n", data);
+	m_enet_cxbdp = data;
+}
+
+void hpc1_device::cpfxbdp_w(u32 data)
+{
+	LOGMASKED(LOG_ENET, "cpfxbdp_w 0x%08x\n", data);
+	m_enet_cpfxbdp = data;
+}
+
+void hpc1_device::ppfxbdp_w(u32 data)
+{
+	LOGMASKED(LOG_ENET, "ppfxbdp_w 0x%08x\n", data);
+	m_enet_ppfxbdp = data;
+}
+
+void hpc1_device::intdelay_w(u32 data)
+{
+	LOGMASKED(LOG_ENET, "intdelay_w 0x%08x\n", data);
+	m_enet_intdelay = data;
+}
+
+void hpc1_device::trstat_w(u32 data)
+{
+	LOGMASKED(LOG_ENET, "trstat_w 0x%08x (%s)\n", data, machine().describe_context());
+	m_enet_txs = (m_enet_txs & ~ENET_STXDMA) | (data & ENET_STXDMA);
+
+	if (data & ENET_STXDMA)
+		enet_dma();
+}
+
+void hpc1_device::rcvstat_w(u32 data)
+{
+	LOGMASKED(LOG_ENET, "rcvstat_w 0x%08x\n", data);
+	m_enet_rxs = (m_enet_rxs & ~ENET_SRXDMA) | (data & ENET_SRXDMA);
+
+	if (data & ENET_SRXDMA)
+		enet_dma();
+}
+
+
+void hpc1_device::ctl_w(u32 data)
+{
+	LOGMASKED(LOG_ENET, "ctl_w 0x%08x (%s)\n", data, machine().describe_context());
+
+	// reset
+	if (m_enet)
+		m_enet->reset_w(!(data & ENET_RESET));
+
+	// clear interrupt
+	if (data & ENET_CLRINT)
 	{
-		// clear HPC3 DMA active flag
-		m_scsi_dma.m_ctrl &= ~HPC_DMACTRL_ENABLE;
+		m_enet_ctrl &= ~ENET_CLRINT;
+		m_int_w(0);
 	}
+
+	// loopback
+	if (m_enet)
+		m_enet->set_loopback(!(data & ENET_MODNORM));
+
+	// receive buffer overflow
+	if (data & ENET_RBO)
+		m_enet_ctrl &= ~ENET_RBO;
+
+	m_enet_ctrl = (m_enet_ctrl & ~(ENET_MODNORM | ENET_RESET)) | (data & (ENET_MODNORM | ENET_RESET));
 }
 
-//**************************************************************************
-//  PIT TIMERS
-//**************************************************************************
-
-void hpc1_device::set_timer_int_clear(uint32_t data)
+void hpc1_device::rbc_w(u32 data)
 {
-	if (BIT(data, 0))
-	{
-		LOGMASKED(LOG_PIT | LOG_INT, "Clearing Timer 0 Interrupt: %d\n", data);
-		m_maincpu->set_input_line(MIPS3_IRQ2, CLEAR_LINE);
-	}
-	if (BIT(data, 1))
-	{
-		LOGMASKED(LOG_PIT | LOG_INT, "Clearing Timer 1 Interrupt: %d\n", data);
-		m_maincpu->set_input_line(MIPS3_IRQ3, CLEAR_LINE);
-	}
+	LOGMASKED(LOG_ENET, "rbc_w 0x%08x\n", data);
+	m_enet_rbc = data;
 }
 
-WRITE_LINE_MEMBER(hpc1_device::timer0_int)
+void hpc1_device::crbp_w(u32 data)
 {
-	LOGMASKED(LOG_PIT, "Timer0 Interrupt: %d\n", state);
-	if (state)
-		m_maincpu->set_input_line(MIPS3_IRQ2, ASSERT_LINE);
+	LOGMASKED(LOG_ENET, "crbp_w 0x%08x\n", data);
+	m_enet_crbp = data;
 }
 
-WRITE_LINE_MEMBER(hpc1_device::timer1_int)
+void hpc1_device::nrbdp_w(u32 data)
 {
-	LOGMASKED(LOG_PIT, "Timer2 Interrupt: %d\n", state);
-	if (state)
-		m_maincpu->set_input_line(MIPS3_IRQ3, ASSERT_LINE);
+	LOGMASKED(LOG_ENET, "nrbdp_w 0x%08x\n", data);
+	m_enet_nrbdp = data;
 }
 
-WRITE_LINE_MEMBER(hpc1_device::timer2_int)
+void hpc1_device::crbdp_w(u32 data)
 {
-	LOGMASKED(LOG_PIT, "Timer2 Interrupt (Disabled): %d\n", state);
+	LOGMASKED(LOG_ENET, "crbdp_w 0x%08x\n", data);
+	m_enet_crbdp = data;
 }
 
-//**************************************************************************
-//  SERIAL DUARTS
-//**************************************************************************
-
-WRITE_LINE_MEMBER(hpc1_device::duart0_int_w) { duart_int_w(0, state); }
-WRITE_LINE_MEMBER(hpc1_device::duart1_int_w) { duart_int_w(1, state); }
-WRITE_LINE_MEMBER(hpc1_device::duart2_int_w) { duart_int_w(2, state); }
-
-void hpc1_device::duart_int_w(int channel, int state)
+void hpc1_device::aux_w(u8 data)
 {
-	m_duart_int_status &= ~(1 << channel);
-	m_duart_int_status |= state << channel;
+	m_eeprom_out(data);
 
-	if (m_duart_int_status)
-	{
-		LOGMASKED(LOG_DUART0 << channel, "Raising DUART Interrupt: %02x\n", m_duart_int_status);
-		raise_local_irq(0, LOCAL0_DUART);
-	}
-	else
-	{
-		LOGMASKED(LOG_DUART0 << channel, "Lowering DUART Interrupt\n");
-		lower_local_irq(0, LOCAL0_DUART);
-	}
-}
-
-//**************************************************************************
-//  INTERRUPTS
-//**************************************************************************
-
-void hpc1_device::raise_local_irq(int channel, uint8_t source_mask)
-{
-	m_local_int_status[channel] |= source_mask;
-	update_irq(channel);
-}
-
-void hpc1_device::lower_local_irq(int channel, uint8_t source_mask)
-{
-	m_local_int_status[channel] &= ~source_mask;
-	update_irq(channel);
-}
-
-void hpc1_device::update_irq(int channel)
-{
-	bool old_status = m_int_status[channel];
-	m_int_status[channel] = (m_local_int_status[channel] & m_local_int_mask[channel]);
-
-	if (old_status != m_int_status[channel])
-	{
-		LOGMASKED(LOG_INT, "%s IRQ%d: %02x & %02x\n", m_int_status[channel] ? "Asserting" : "Clearing", channel,
-			m_local_int_status[channel], m_local_int_mask[channel]);
-		m_maincpu->set_input_line(MIPS3_IRQ0 + channel, m_int_status[channel] ? ASSERT_LINE : CLEAR_LINE);
-	}
-}
-
-WRITE_LINE_MEMBER(hpc1_device::scsi_irq)
-{
-	if (state)
-	{
-		LOGMASKED(LOG_SCSI, "SCSI: Set IRQ\n");
-		raise_local_irq(0, LOCAL0_SCSI);
-	}
-	else
-	{
-		LOGMASKED(LOG_SCSI, "SCSI: Clear IRQ\n");
-		lower_local_irq(0, LOCAL0_SCSI);
-	}
+	m_aux = data;
 }

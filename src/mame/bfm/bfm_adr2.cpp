@@ -219,7 +219,7 @@ uint32_t bfm_adder2_device::screen_update(screen_device &screen, bitmap_ind16 &b
 }
 
 
-WRITE_LINE_MEMBER(bfm_adder2_device::vbl_w)
+void bfm_adder2_device::vbl_w(int state)
 {
 	if (state && BIT(m_c101, 0))
 	{

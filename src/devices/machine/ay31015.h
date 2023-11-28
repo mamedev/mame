@@ -32,27 +32,27 @@ public:
 	auto write_eoc_callback() { return m_write_eoc_cb.bind(); }
 
 	/* Set an input pin */
-	DECLARE_WRITE_LINE_MEMBER(write_swe) { set_input_pin(SWE, state); }
-	DECLARE_WRITE_LINE_MEMBER(write_rcp) { set_input_pin(RCP, state); }
-	DECLARE_WRITE_LINE_MEMBER(write_rdav) { set_input_pin(RDAV, state); }
-	DECLARE_WRITE_LINE_MEMBER(write_si) { set_input_pin(SI, state); }
-	DECLARE_WRITE_LINE_MEMBER(write_xr) { set_input_pin(XR, state); }
-	DECLARE_WRITE_LINE_MEMBER(write_cs) { set_input_pin(CS, state); }
-	DECLARE_WRITE_LINE_MEMBER(write_np) { set_input_pin(NP, state); }
-	DECLARE_WRITE_LINE_MEMBER(write_tsb) { set_input_pin(TSB, state); }
-	DECLARE_WRITE_LINE_MEMBER(write_nb2) { set_input_pin(NB2, state); }
-	DECLARE_WRITE_LINE_MEMBER(write_nb1) { set_input_pin(NB1, state); }
-	DECLARE_WRITE_LINE_MEMBER(write_eps) { set_input_pin(EPS, state); }
-	DECLARE_WRITE_LINE_MEMBER(write_tcp) { set_input_pin(TCP, state); }
+	void write_swe(int state) { set_input_pin(SWE, state); }
+	void write_rcp(int state) { set_input_pin(RCP, state); }
+	void write_rdav(int state) { set_input_pin(RDAV, state); }
+	void write_si(int state) { set_input_pin(SI, state); }
+	void write_xr(int state) { set_input_pin(XR, state); }
+	void write_cs(int state) { set_input_pin(CS, state); }
+	void write_np(int state) { set_input_pin(NP, state); }
+	void write_tsb(int state) { set_input_pin(TSB, state); }
+	void write_nb2(int state) { set_input_pin(NB2, state); }
+	void write_nb1(int state) { set_input_pin(NB1, state); }
+	void write_eps(int state) { set_input_pin(EPS, state); }
+	void write_tcp(int state) { set_input_pin(TCP, state); }
 
 	/* Get an output pin */
-	DECLARE_READ_LINE_MEMBER(pe_r) { return get_output_pin(PE); }
-	DECLARE_READ_LINE_MEMBER(fe_r) { return get_output_pin(FE); }
-	DECLARE_READ_LINE_MEMBER(or_r) { return get_output_pin(OR); }
-	DECLARE_READ_LINE_MEMBER(dav_r) { return get_output_pin(DAV); }
-	DECLARE_READ_LINE_MEMBER(tbmt_r) { return get_output_pin(TBMT); }
-	DECLARE_READ_LINE_MEMBER(eoc_r) { return get_output_pin(EOC); }
-	DECLARE_READ_LINE_MEMBER(so_r) { return get_output_pin(SO); }
+	int pe_r() { return get_output_pin(PE); }
+	int fe_r() { return get_output_pin(FE); }
+	int or_r() { return get_output_pin(OR); }
+	int dav_r() { return get_output_pin(DAV); }
+	int tbmt_r() { return get_output_pin(TBMT); }
+	int eoc_r() { return get_output_pin(EOC); }
+	int so_r() { return get_output_pin(SO); }
 
 	/* Read the received data */
 	/* The received data is available on RD8-RD1 (pins 5-12) */
@@ -103,8 +103,7 @@ protected:
 
 	ay31015_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

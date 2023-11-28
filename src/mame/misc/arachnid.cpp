@@ -133,7 +133,7 @@ THE OFF POSIION UNLESS THE COINAGES
     - Test Mode Won't Activate
     - Layout with Lamps
     - Default monitor is yellow/amber, no colour (board does have an extra
-      composite-out connector though, allowing a standard tv)
+      composite-out connector though, allowing a standard TV)
 */
 
 #include "emu.h"
@@ -178,18 +178,18 @@ private:
 	virtual void machine_start() override;
 	uint8_t pia_u4_pa_r();
 	uint8_t pia_u4_pb_r();
-	DECLARE_READ_LINE_MEMBER( pia_u4_pca_r );
-	DECLARE_READ_LINE_MEMBER( pia_u4_pcb_r );
+	int pia_u4_pca_r();
+	int pia_u4_pcb_r();
 	void pia_u4_pa_w(uint8_t data);
 	void pia_u4_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( pia_u4_pca_w );
-	DECLARE_WRITE_LINE_MEMBER( pia_u4_pcb_w );
+	void pia_u4_pca_w(int state);
+	void pia_u4_pcb_w(int state);
 
 	uint8_t pia_u17_pa_r();
 	void pia_u17_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( pia_u17_pcb_w );
+	void pia_u17_pcb_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(ptm_o1_callback);
+	void ptm_o1_callback(int state);
 
 	uint8_t read_keyboard(int pa);
 	void arachnid_map(address_map &map);
@@ -334,7 +334,7 @@ INPUT_PORTS_END
     ptm6840_interface ptm_intf
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER(arachnid_state::ptm_o1_callback)
+void arachnid_state::ptm_o1_callback(int state)
 {
 	m_speaker->level_w(state);
 }
@@ -402,7 +402,7 @@ uint8_t arachnid_state::pia_u4_pb_r()
 	return data;
 }
 
-READ_LINE_MEMBER( arachnid_state::pia_u4_pca_r )
+int arachnid_state::pia_u4_pca_r()
 {
 	// CA1 - SW1 Coin In (Coin Door)
 
@@ -412,7 +412,7 @@ READ_LINE_MEMBER( arachnid_state::pia_u4_pca_r )
 	return data;
 }
 
-READ_LINE_MEMBER( arachnid_state::pia_u4_pcb_r )
+int arachnid_state::pia_u4_pcb_r()
 {
 	// CB1 - SW2 Test Mode (Coin Door)
 
@@ -446,12 +446,12 @@ void arachnid_state::pia_u4_pb_w(uint8_t data)
 	// PA0 thru PA7 Pulses to Switch Matrix Part II
 }
 
-WRITE_LINE_MEMBER( arachnid_state::pia_u4_pca_w )
+void arachnid_state::pia_u4_pca_w(int state)
 {
 	// CA1 - Remove Darts Lamp
 }
 
-WRITE_LINE_MEMBER( arachnid_state::pia_u4_pcb_w )
+void arachnid_state::pia_u4_pcb_w(int state)
 {
 	// CB2 - Throw Darts Lamp
 }
@@ -468,7 +468,7 @@ void arachnid_state::pia_u17_pb_w(uint8_t data)
 	// PB7 - N/C
 }
 
-WRITE_LINE_MEMBER( arachnid_state::pia_u17_pcb_w )
+void arachnid_state::pia_u17_pcb_w(int state)
 {
 	// CB2 - Target Lamp
 }
@@ -502,7 +502,7 @@ void arachnid_state::arachnid(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // MK48Z02 (or DS1220Y)
 
 	// devices
-	PIA6821(config, m_pia_u4, 0);
+	PIA6821(config, m_pia_u4);
 	m_pia_u4->readpa_handler().set(FUNC(arachnid_state::pia_u4_pa_r));
 	m_pia_u4->readpb_handler().set(FUNC(arachnid_state::pia_u4_pb_r));
 	m_pia_u4->readca1_handler().set(FUNC(arachnid_state::pia_u4_pca_r));
@@ -512,7 +512,7 @@ void arachnid_state::arachnid(machine_config &config)
 	m_pia_u4->ca2_handler().set(FUNC(arachnid_state::pia_u4_pca_w));
 	m_pia_u4->cb2_handler().set(FUNC(arachnid_state::pia_u4_pcb_w));
 
-	PIA6821(config, m_pia_u17, 0);
+	PIA6821(config, m_pia_u17);
 	m_pia_u17->readpa_handler().set(FUNC(arachnid_state::pia_u17_pa_r));
 	m_pia_u17->ca1_w(1); // CA1 - 1000 HZ Input
 	m_pia_u17->writepb_handler().set(FUNC(arachnid_state::pia_u17_pb_w));
@@ -538,14 +538,19 @@ void arachnid_state::arachnid(machine_config &config)
     ROMS
 ***************************************************************************/
 
-ROM_START( arac6000 )
+ROM_START( arac6k33 )
+	ROM_REGION( 0x8000, M6809_TAG, 0 )
+	ROM_LOAD( "arachnid_6300t_v33.u15",         0x0000, 0x8000, CRC(6c1b12df) SHA1(a78f19aaa4f3d1f2786cbaf0f19b1b36839a1be0) )
+ROM_END
+
+ROM_START( arac6k27 )
 	ROM_REGION( 0x8000, M6809_TAG, 0 )
 	ROM_LOAD( "01-0140-6300-v2.7-19910208.u15", 0x0000, 0x8000, CRC(f1c4412d) SHA1(6ff9a8f25f315c2df5c0785043521d036ec0964e) )
 ROM_END
 
-ROM_START( arac6spa )
+ROM_START( arac6k28sp )
 	ROM_REGION( 0x8000, M6809_TAG, 0 )
-	ROM_LOAD( "1.u15", 0x0000, 0x8000, CRC(397e890e) SHA1(5b532b046f36dcfbd7118bd5a0fab3436b0b8dc1) )
+	ROM_LOAD( "1.u15",                          0x0000, 0x8000, CRC(397e890e) SHA1(5b532b046f36dcfbd7118bd5a0fab3436b0b8dc1) )
 ROM_END
 
 } // anonymous namespace
@@ -555,6 +560,7 @@ ROM_END
     SYSTEM DRIVERS
 ***************************************************************************/
 
-//    YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT        MONITOR  COMPANY     FULLNAME
-GAME( 1990, arac6000, 0,        arachnid, arachnid, arachnid_state, empty_init, ROT0,    "Arachnid", "Super Six Plus II English Mark Darts",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // 6300 v2.7
-GAME( 1990, arac6spa, arac6000, arachnid, arachnid, arachnid_state, empty_init, ROT0,    "Arachnid", "Super Six Plus II English Mark Darts (Spanish)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // 6307 v2.8
+//    YEAR  NAME        PARENT    MACHINE   INPUT     STATE           INIT        MONITOR  COMPANY     FULLNAME
+GAME( 1994, arac6k33,   0,        arachnid, arachnid, arachnid_state, empty_init, ROT0,    "Arachnid", "Super Six Plus II English Mark Darts (v3.3)",          MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // 6300T v3.3
+GAME( 1990, arac6k27,   arac6k33, arachnid, arachnid, arachnid_state, empty_init, ROT0,    "Arachnid", "Super Six Plus II English Mark Darts (v2.7)",          MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // 6300 v2.7
+GAME( 1990, arac6k28sp, arac6k33, arachnid, arachnid, arachnid_state, empty_init, ROT0,    "Arachnid", "Super Six Plus II English Mark Darts (v2.8, Spanish)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // 6307 v2.8

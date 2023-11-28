@@ -75,11 +75,6 @@ void tdc1008_device::device_start()
 	save_item(NAME(m_x.u));
 	save_item(NAME(m_y.u));
 	save_item(NAME(m_p_out.u));
-
-	m_xtp.resolve_safe();
-	m_msp.resolve_safe();
-	m_lsp.resolve_safe();
-	m_p.resolve_safe();
 }
 
 void tdc1008_device::device_reset()
@@ -121,21 +116,21 @@ void tdc1008_device::y_w(uint8_t data)
 	m_y_in = data;
 }
 
-WRITE_LINE_MEMBER(tdc1008_device::tsx_w)
+void tdc1008_device::tsx_w(int state)
 {
 	m_tsx = (bool)state;
 	if (m_prel && m_tsx)
 		m_p_out.u = (m_p_out.u & 0x0ffff) | (m_xtp_in << 16);
 }
 
-WRITE_LINE_MEMBER(tdc1008_device::tsm_w)
+void tdc1008_device::tsm_w(int state)
 {
 	m_tsm = (bool)state;
 	if (m_prel && m_tsm)
 		m_p_out.u = (m_p_out.u & 0x700ff) | (m_msp_in << 8);
 }
 
-WRITE_LINE_MEMBER(tdc1008_device::tsl_w)
+void tdc1008_device::tsl_w(int state)
 {
 	m_tsl = (bool)state;
 	if (m_prel && m_tsl)
@@ -168,7 +163,7 @@ void tdc1008_device::output_w(uint32_t data)
 	m_p_in = data;
 }
 
-WRITE_LINE_MEMBER(tdc1008_device::clk_x_w)
+void tdc1008_device::clk_x_w(int state)
 {
 	bool old = m_clk_x;
 	m_clk_x = (bool)state;
@@ -179,7 +174,7 @@ WRITE_LINE_MEMBER(tdc1008_device::clk_x_w)
 	}
 }
 
-WRITE_LINE_MEMBER(tdc1008_device::clk_y_w)
+void tdc1008_device::clk_y_w(int state)
 {
 	bool old = m_clk_y;
 	m_clk_y = (bool)state;
@@ -190,7 +185,7 @@ WRITE_LINE_MEMBER(tdc1008_device::clk_y_w)
 	}
 }
 
-WRITE_LINE_MEMBER(tdc1008_device::clk_p_w)
+void tdc1008_device::clk_p_w(int state)
 {
 	bool old = m_clk_p;
 	m_clk_p = (bool)state;
@@ -245,7 +240,7 @@ WRITE_LINE_MEMBER(tdc1008_device::clk_p_w)
 	}
 }
 
-WRITE_LINE_MEMBER(tdc1008_device::prel_w)
+void tdc1008_device::prel_w(int state)
 {
 	m_prel = (bool)state;
 	if (m_prel)
@@ -259,22 +254,22 @@ WRITE_LINE_MEMBER(tdc1008_device::prel_w)
 	}
 }
 
-WRITE_LINE_MEMBER(tdc1008_device::rnd_w)
+void tdc1008_device::rnd_w(int state)
 {
 	m_rnd_in = (bool)state;
 }
 
-WRITE_LINE_MEMBER(tdc1008_device::tc_w)
+void tdc1008_device::tc_w(int state)
 {
 	m_tc_in = (bool)state;
 }
 
-WRITE_LINE_MEMBER(tdc1008_device::acc_w)
+void tdc1008_device::acc_w(int state)
 {
 	m_acc_in = (bool)state;
 }
 
-WRITE_LINE_MEMBER(tdc1008_device::sub_w)
+void tdc1008_device::sub_w(int state)
 {
 	m_sub_in = (bool)state;
 }

@@ -35,7 +35,7 @@ Notes:
   (a situation similar to Bubble Bobble): collision detection is imperfect, the
   player can't be killed by some enemies.
   I think the bootleggers put the custom mcu in a test rig, examined its bus
-  activity and replicated the behaviour inaccurately because they coudln't
+  activity and replicated the behaviour inaccurately because they couldn't
   figure it all out. Indeed, the 68705 code reads all the memory locations
   related to the missing collision detection, but does nothing with them.
 
@@ -181,7 +181,19 @@ void kikikai_state::main_map(address_map &map)
 	map(0xf008, 0xf008).w(FUNC(kikikai_state::main_f008_w));          /* cpu reset lines + other unknown stuff */
 	map(0xf010, 0xf010).portr("IN3");
 	map(0xf018, 0xf018).nopw();                        /* watchdog? */
-	map(0xf800, 0xffff).ram().share("subram");          /* communication ram - to connect 4 players's subboard */
+	map(0xf800, 0xffff).ram().share("subram");          /* communication ram - to connect 4 players' subboard */
+}
+
+void kikikai_state::knightba_main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");                /* banked roms */
+	map(0xc000, 0xe7ff).ram().share("mainram");         /* shared with sound cpu */
+	map(0xe800, 0xefff).ram();
+	map(0xf000, 0xf000).w(FUNC(kikikai_state::main_bankswitch_w));    /* program and gfx ROM banks */
+	map(0xf010, 0xf010).portr("IN3");
+	map(0xf018, 0xf018).nopw();                        /* watchdog? */
+	map(0xf019, 0xf019).portr("IN1");
 }
 
 void kikikai_state::sound_map(address_map &map)
@@ -210,13 +222,6 @@ void kikikai_state::kicknrun_sub_cpu_map(address_map &map)
 	map(0xc002, 0xc002).portr("IN6");
 	map(0xc003, 0xc003).portr("IN7");
 	map(0xc004, 0xc004).w(FUNC(kikikai_state::kicknrun_sub_output_w));
-}
-
-void kikikai_state::mcu_map(address_map &map)
-{
-	map(0x0000, 0x0007).m(m_mcu, FUNC(m6801_cpu_device::m6801_io));
-	map(0x0040, 0x00ff).ram(); // internal
-	map(0xf000, 0xffff).rom();
 }
 
 /*************************************
@@ -583,6 +588,15 @@ static INPUT_PORTS_START( kikikai )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( knightba )
+
+	PORT_INCLUDE(kikikai)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+INPUT_PORTS_END
+
 
 
 /*************************************
@@ -721,8 +735,7 @@ void kikikai_state::kicknrun(machine_config& config)
 	m_maincpu->set_vblank_int("screen", FUNC(kikikai_state::kikikai_interrupt));
 	m_maincpu->set_irq_acknowledge_callback(FUNC(kikikai_state::mcram_vect_r));
 
-	M6801(config, m_mcu, XTAL(4'000'000)); // actually 6801U4 - xtal is 4MHz, divided by 4 internally
-	m_mcu->set_addrmap(AS_PROGRAM, &kikikai_state::mcu_map);
+	M6801U4(config, m_mcu, XTAL(4'000'000)); // xtal is 4MHz, divided by 4 internally
 	m_mcu->in_p1_cb().set_ioport("IN0");
 	m_mcu->out_p1_cb().set(FUNC(kikikai_state::kikikai_mcu_port1_w));
 	m_mcu->out_p2_cb().set(FUNC(kikikai_state::kikikai_mcu_port2_w));
@@ -768,6 +781,18 @@ void mexico86_state::knightb(machine_config &config)
 	m_screen->set_screen_update(FUNC(mexico86_state::screen_update_kikikai));
 }
 
+void kikikai_state::knightba(machine_config &config)
+{
+	base(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &kikikai_state::knightba_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(kikikai_state::irq0_line_hold));
+
+	config.device_remove("sub");
+
+	m_screen->set_screen_update(FUNC(kikikai_simulation_state::screen_update_kikikai));
+}
+
 
 /*************************************
  *
@@ -784,9 +809,9 @@ ROM_START( kikikai )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a85-11.f6", 0x0000, 0x8000, CRC(cc3539db) SHA1(4239a40fdee65cba613e4b4ec54cf7899480e366) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )    /* 4k for the microcontroller (MC6801U4 type MCU) */
+	ROM_REGION( 0x1000, "mcu", 0 )    /* 4k for the microcontroller (MC6801U4 type MCU) */
 	/* MCU labeled TAITO A85 01,  JPH1020P, 185, PS4 */
-	ROM_LOAD( "a85-01.g8",    0x0000, 0x0800, NO_DUMP )
+	ROM_LOAD( "a85-01.g8",    0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x40000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "a85-15.a1", 0x00000, 0x10000, CRC(aebc8c32) SHA1(77347cf5780f084a77123eb636cd0bad672a39e8) )
@@ -824,6 +849,28 @@ ROM_START( knightb )
 	ROM_LOAD( "a85-09.g14", 0x0200, 0x0100, CRC(b931c94d) SHA1(fb554084f34c602d1ff7806fb945a06cf14332af) )
 ROM_END
 
+ROM_START( knightba ) // similar to the bootleg above but without MCU. Only different ROM is 7, where the comms with the MCU have been patched out.
+	ROM_REGION( 0x28000, "maincpu", 0 )
+	ROM_LOAD( "7.bin", 0x00000, 0x08000, CRC(f1d90e89) SHA1(d2e4a036aca9b84189d74b09e53fea9fa0abe959) ) /* 1st half, main code        */
+	ROM_CONTINUE(      0x18000, 0x08000 )               /* 2nd half, banked at 0x8000 */
+	ROM_LOAD( "6.bin", 0x08000, 0x10000, CRC(4094d750) SHA1(05e0ad177a3eb144b203784ecb6242a0fc5c4d4d) ) /* banked at 0x8000           */
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "5.bin", 0x0000, 0x8000, CRC(9ba79d96) SHA1(33b570f0baad6bd417b4dd6389e6263b691906e2) )
+	ROM_IGNORE(                0x8000 ) // 1ST AND 2ND HALF IDENTICAL
+
+	ROM_REGION( 0x40000, "gfx1", ROMREGION_INVERT )
+	ROM_LOAD( "4.bin", 0x00000, 0x10000, CRC(53ecdb3f) SHA1(f8b4822926f3712a426c014759b1cf382a7ad9d1) )
+	ROM_LOAD( "3.bin", 0x10000, 0x10000, CRC(a9df0453) SHA1(a5e9cd6266ab3ae46cd1b35a4603e13a2ca023fb) )
+	ROM_LOAD( "2.bin", 0x20000, 0x10000, CRC(63ad7df3) SHA1(8ce149b63032bcdd596a3fa52baba2f2c154e84e) )
+	ROM_LOAD( "1.bin", 0x30000, 0x10000,  CRC(91e58067) SHA1(c7eb9bf650039254fb7664758938b1012eacc597) )
+
+	ROM_REGION( 0x0300, "proms", 0 ) // not dumped for this set, but they are almost surely correct
+	ROM_LOAD( "a85-08.g15", 0x0000, 0x0100, CRC(d15f61a8) SHA1(945c8aa26c85269c10373218bef13e04e25eb1e4) )
+	ROM_LOAD( "a85-10.g12", 0x0100, 0x0100, CRC(8fc3fa86) SHA1(d4d86f8e147bbf2a370de428ac20a28b0f146782) )
+	ROM_LOAD( "a85-09.g14", 0x0200, 0x0100, CRC(b931c94d) SHA1(fb554084f34c602d1ff7806fb945a06cf14332af) )
+ROM_END
+
 ROM_START( kicknrun )
 	ROM_REGION( 0x28000, "maincpu", 0 )
 	ROM_LOAD( "a87-08.h16", 0x00000, 0x08000, CRC(715e1b04) SHA1(60b7259758ec73f1cc945556e9c2b25766b745a8) ) /* 1st half, main code        */
@@ -833,8 +880,8 @@ ROM_START( kicknrun )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a87-06.f6", 0x0000, 0x8000, CRC(1625b587) SHA1(7336384e13c114915de5e439df5731ce3fc2054a) )
 
-	ROM_REGION( 0x10000, "mcu", 0 )    /* 4k for the microcontroller (MC6801U4 type MCU) */
-	ROM_LOAD( "a87-01_jph1021p.h8", 0xf000, 0x1000, CRC(9451e880) SHA1(e9a505296108645f99449d391d0ebe9ac1b9984e) ) /* MCU labeled TAITO A87-01,  JPH1021P, 185, PS4 */
+	ROM_REGION( 0x1000, "mcu", 0 )    /* 4k for the microcontroller (MC6801U4 type MCU) */
+	ROM_LOAD( "a87-01_jph1021p.h8", 0x0000, 0x1000, CRC(9451e880) SHA1(e9a505296108645f99449d391d0ebe9ac1b9984e) ) /* MCU labeled TAITO A87-01,  JPH1021P, 185, PS4 */
 
 	ROM_REGION( 0x10000, "sub", 0 )    /* 64k for the cpu on the sub board */
 	ROM_LOAD( "a87-09-1",  0x0000, 0x4000, CRC(6a2ad32f) SHA1(42d4b97b25d219902ad215793f1d2c006ffe94dc) )
@@ -864,8 +911,8 @@ ROM_START( kicknrunu )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a87-06.f6", 0x0000, 0x8000, CRC(1625b587) SHA1(7336384e13c114915de5e439df5731ce3fc2054a) )
 
-	ROM_REGION( 0x10000, "mcu", 0 )    /* 4k for the microcontroller (MC6801U4 type MCU) */
-	ROM_LOAD( "a87-01_jph1021p.h8", 0xf000, 0x1000, CRC(9451e880) SHA1(e9a505296108645f99449d391d0ebe9ac1b9984e) ) /* MCU labeled TAITO A87-01,  JPH1021P, 185, PS4 */
+	ROM_REGION( 0x1000, "mcu", 0 )    /* 4k for the microcontroller (MC6801U4 type MCU) */
+	ROM_LOAD( "a87-01_jph1021p.h8", 0x0000, 0x1000, CRC(9451e880) SHA1(e9a505296108645f99449d391d0ebe9ac1b9984e) ) /* MCU labeled TAITO A87-01,  JPH1021P, 185, PS4 */
 
 	ROM_REGION( 0x10000, "sub", 0 )    /* 64k for the cpu on the sub board */
 	ROM_LOAD( "a87-09-1",  0x0000, 0x4000, CRC(6a2ad32f) SHA1(42d4b97b25d219902ad215793f1d2c006ffe94dc) )
@@ -920,12 +967,12 @@ ROM_END
 ROM_START( mexico86a )
 	ROM_REGION( 0x28000, "maincpu", 0 )
 	ROM_LOAD( "2.bin",    0x00000, 0x08000, CRC(397c93ad) SHA1(6b28d284cafb86f3efd13033984caa1a221a8a14) ) /* 1st half, main code        */
-	ROM_CONTINUE(           0x18000, 0x08000 )             /* 2nd half, banked at 0x8000 */
+	ROM_CONTINUE(         0x18000, 0x08000 )             /* 2nd half, banked at 0x8000 */
 	ROM_LOAD( "1.bin",    0x08000, 0x10000, CRC(0b93e68e) SHA1(c6fbcce83103e3e71a7a1ef9f18a10622ed6b951) ) /* banked at 0x8000           */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "3x.bin", 0x0000, 0x8000, CRC(abbbf6c4) SHA1(27456d8607e0a246f0c2ad1bc57ee7e4ec37b278) ) // 0x1FEF is 0x2f instead of 0x0f, causes checksum failure, bad?
-	ROM_LOAD( "3.bin", 0x0000, 0x8000, CRC(1625b587) SHA1(7336384e13c114915de5e439df5731ce3fc2054a) )
+	ROM_LOAD( "3.bin",  0x0000, 0x8000, CRC(1625b587) SHA1(7336384e13c114915de5e439df5731ce3fc2054a) )
 
 	ROM_REGION( 0x0800, "68705mcu", 0 )    /* 2k for the microcontroller */
 	ROM_LOAD( "68_h.bin",   0x0000, 0x0800, CRC(ff92f816) SHA1(0015c3f2ed014052b3fa376409e3a7cca36fac72) ) // missing in this set, not dumped or never present??
@@ -935,13 +982,13 @@ ROM_START( mexico86a )
 
 	ROM_REGION( 0x40000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "4.bin",    0x08000, 0x08000, CRC(57cfdbca) SHA1(89c305c380c3de14a956ee4bc85d3a0d343b638e) )
-	ROM_CONTINUE(           0x00000, 0x08000 )
+	ROM_CONTINUE(         0x00000, 0x08000 )
 	ROM_LOAD( "5.bin",    0x10000, 0x08000, CRC(e42fa143) SHA1(02d7e0e01af1cecc3952f6355987118098d346c3) )
-	ROM_RELOAD(             0x18000, 0x08000 )
+	ROM_RELOAD(           0x18000, 0x08000 )
 	ROM_LOAD( "6.bin",    0x28000, 0x08000, CRC(a4607989) SHA1(6832147603a146c34cc1809e839c8e034d0dacc5) )
-	ROM_CONTINUE(           0x20000, 0x08000 )
+	ROM_CONTINUE(         0x20000, 0x08000 )
 	ROM_LOAD( "7.bin",    0x30000, 0x08000, CRC(245036b1) SHA1(108d9959de869b4fdf766abeade1486acec13bf2) )
-	ROM_RELOAD(             0x38000, 0x08000 )
+	ROM_RELOAD(           0x38000, 0x08000 )
 
 	ROM_REGION( 0x0300, "proms", 0 )
 	ROM_LOAD( "n82s129n.1.bin", 0x0000, 0x0100, CRC(be6eb1f0) SHA1(f4d00e9b12bf116bf84edb2ff6caab158094b668) ) /* all proms are 63S141AN or compatible type */
@@ -968,10 +1015,11 @@ ROM_END
  *
  *************************************/
 
-GAME( 1986, kikikai,  0,        kikikai,        kikikai,  kikikai_simulation_state, empty_init, ROT90, "Taito Corporation",  "KiKi KaiKai",                                 MACHINE_SUPPORTS_SAVE )
-GAME( 1986, knightb,  kikikai,  knightb,        kikikai,  mexico86_state,           empty_init, ROT90, "bootleg",            "Knight Boy",                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1986, kikikai,  0,        kikikai,        kikikai,  kikikai_simulation_state, empty_init, ROT90, "Taito Corporation",          "KiKi KaiKai",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1986, knightb,  kikikai,  knightb,        kikikai,  mexico86_state,           empty_init, ROT90, "bootleg",                    "Knight Boy",                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1986, knightba, kikikai,  knightba,       knightba, kikikai_state,            empty_init, ROT90, "bootleg (Game Corporation)", "Knight Boy (Game Corporation bootleg)",       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // missing coins, can be played using service to coin
 
-GAME( 1986, kicknrun, 0,        kicknrun,       kicknrun, kikikai_state,            empty_init, ROT0,  "Taito Corporation",  "Kick and Run (World)",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1986, kicknrunu,kicknrun, kicknrun,       kicknrun, kikikai_state,            empty_init, ROT0,  "Taito America Corp", "Kick and Run (US)",                           MACHINE_SUPPORTS_SAVE )
-GAME( 1986, mexico86, kicknrun, mexico86_68705, mexico86, mexico86_state,           empty_init, ROT0,  "bootleg",            "Mexico 86 (bootleg of Kick and Run) (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, mexico86a,kicknrun, mexico86_68705, mexico86, mexico86_state,           empty_init, ROT0,  "bootleg",            "Mexico 86 (bootleg of Kick and Run) (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, kicknrun, 0,        kicknrun,       kicknrun, kikikai_state,            empty_init, ROT0,  "Taito Corporation",          "Kick and Run (World)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1986, kicknrunu,kicknrun, kicknrun,       kicknrun, kikikai_state,            empty_init, ROT0,  "Taito America Corp",         "Kick and Run (US)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1986, mexico86, kicknrun, mexico86_68705, mexico86, mexico86_state,           empty_init, ROT0,  "bootleg",                    "Mexico 86 (bootleg of Kick and Run) (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, mexico86a,kicknrun, mexico86_68705, mexico86, mexico86_state,           empty_init, ROT0,  "bootleg",                    "Mexico 86 (bootleg of Kick and Run) (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

@@ -13,6 +13,7 @@
 #include "cpu/m6809/m6809.h"
 #include "machine/i8291a.h"
 #include "machine/wd_fdc.h"
+#include "formats/flopimg.h"
 #include "hp9122c.lh"
 
 DEFINE_DEVICE_TYPE(HP9122C, hp9122c_device, "hp9122c", "HP9122C Dual High density disk drive")
@@ -155,65 +156,65 @@ void hp9122c_device::ieee488_ren(int state)
 	m_i8291a->ren_w(state);
 }
 
-WRITE_LINE_MEMBER(hp9122c_device::i8291a_eoi_w)
+void hp9122c_device::i8291a_eoi_w(int state)
 {
 	m_bus->eoi_w(this, state);
 }
 
-WRITE_LINE_MEMBER(hp9122c_device::i8291a_dav_w)
+void hp9122c_device::i8291a_dav_w(int state)
 {
 	m_bus->dav_w(this, state);
 }
 
-WRITE_LINE_MEMBER(hp9122c_device::i8291a_nrfd_w)
+void hp9122c_device::i8291a_nrfd_w(int state)
 {
 	m_bus->nrfd_w(this, state);
 }
 
-WRITE_LINE_MEMBER(hp9122c_device::i8291a_ndac_w)
+void hp9122c_device::i8291a_ndac_w(int state)
 {
 	m_bus->ndac_w(this, state);
 }
 
-WRITE_LINE_MEMBER(hp9122c_device::i8291a_ifc_w)
+void hp9122c_device::i8291a_ifc_w(int state)
 {
 	m_bus->ifc_w(this, state);
 }
 
-WRITE_LINE_MEMBER(hp9122c_device::i8291a_srq_w)
+void hp9122c_device::i8291a_srq_w(int state)
 {
 	m_bus->srq_w(this, state);
 }
 
-WRITE_LINE_MEMBER(hp9122c_device::i8291a_atn_w)
+void hp9122c_device::i8291a_atn_w(int state)
 {
 	m_bus->atn_w(this, state);
 }
 
-WRITE_LINE_MEMBER(hp9122c_device::i8291a_ren_w)
+void hp9122c_device::i8291a_ren_w(int state)
 {
 	m_bus->ren_w(this, state);
 }
 
-WRITE_LINE_MEMBER(hp9122c_device::i8291a_int_w)
+void hp9122c_device::i8291a_int_w(int state)
 {
 	m_i8291a_irq = state;
 	update_intsel();
 }
 
-WRITE_LINE_MEMBER(hp9122c_device::i8291a_dreq_w)
+void hp9122c_device::i8291a_dreq_w(int state)
 {
 	m_i8291a_drq = state;
 	update_intsel();
 }
 
-WRITE_LINE_MEMBER(hp9122c_device::fdc_intrq_w)
+void hp9122c_device::fdc_intrq_w(int state)
 {
 	m_fdc_irq = state;
 	update_intsel();
 }
 
-WRITE_LINE_MEMBER(hp9122c_device::fdc_drq_w)
+void hp9122c_device::fdc_drq_w(int state)
 {
 	m_fdc_drq = state;
 	update_intsel();

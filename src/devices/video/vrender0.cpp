@@ -125,8 +125,6 @@ void vr0video_device::flip_count_w(offs_t offset, uint16_t data, uint16_t mem_ma
 
 void vr0video_device::device_start()
 {
-	m_idleskip_cb.resolve_safe();
-
 	save_item(NAME(m_InternalPalette));
 	save_item(NAME(m_LastPalUpdate));
 

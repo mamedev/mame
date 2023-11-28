@@ -36,7 +36,7 @@ epic12_device::epic12_device(const machine_config &mconfig, const char *tag, dev
 	, m_ram16(nullptr), m_gfx_size(0), m_bitmaps(nullptr), m_use_ram(nullptr)
 	, m_main_ramsize(0), m_main_rammask(0), m_ram16_copy(nullptr), m_work_queue(nullptr)
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
-	, m_port_r_cb(*this)
+	, m_port_r_cb(*this, 0)
 {
 	m_blitter_request = nullptr;
 	m_blitter_delay_timer = nullptr;
@@ -61,8 +61,6 @@ TIMER_CALLBACK_MEMBER(epic12_device::blitter_delay_callback)
 
 void epic12_device::device_start()
 {
-	m_port_r_cb.resolve_safe(0);
-
 	m_gfx_size = 0x2000 * 0x1000;
 	m_bitmaps = std::make_unique<bitmap_rgb32>(0x2000, 0x1000);
 	m_clip = m_bitmaps->cliprect();
@@ -435,6 +433,18 @@ inline void epic12_device::gfx_draw_shadow_copy(address_space &space, offs_t *ad
 		idle_blitter(EP1C_DRAW_OPERATION_SIZE_BYTES);
 		return;
 	}
+
+	// Clip the blitter operations, to have the calculations only respect the area being written.
+	// It's not 100% clear this is how this is performed, but it is clear that there should be some amount of clipping
+	// applied here to match the hardware. This way seems most likely, and maps well to the delays seen on hardware.
+	// One example of this being utilized heavily is the transparent fog in Mushihimesama Futari Stage 1. This is drawn as
+	// 256x256 sprites, with large parts clipped away.
+	dst_x_start = std::max(dst_x_start, (u16)m_clip.min_x);
+	dst_y_start = std::max(dst_y_start, (u16)m_clip.min_y);
+	dst_x_end = std::min(dst_x_end, (u16)m_clip.max_x);
+	dst_y_end = std::min(dst_y_end, (u16)m_clip.max_y);
+	src_dimx = dst_x_end - dst_x_start + 1;
+	src_dimy = dst_y_end - dst_y_start + 1;
 
 	m_blit_idle_op_bytes = 0;  // Blitter no longer idle.
 

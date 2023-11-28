@@ -100,42 +100,42 @@ u16 taitoio_yoke_device::throttle_r()
 	return m_throttle->read();
 }
 
-READ_LINE_MEMBER( taitoio_yoke_device::slot_down_r )
+int taitoio_yoke_device::slot_down_r()
 {
 	uint16_t throttle = m_throttle->read();
 
 	return (throttle & 0xe00) == 0x600;
 }
 
-READ_LINE_MEMBER( taitoio_yoke_device::slot_up_r )
+int taitoio_yoke_device::slot_up_r()
 {
 	uint16_t throttle = m_throttle->read();
 
 	return (throttle & 0xe00) == 0x800;
 }
 
-READ_LINE_MEMBER( taitoio_yoke_device::handle_left_r )
+int taitoio_yoke_device::handle_left_r()
 {
 	uint16_t x = m_stick_x->read();
 
 	return (x & 0xe00) == 0x800;
 }
 
-READ_LINE_MEMBER( taitoio_yoke_device::handle_right_r )
+int taitoio_yoke_device::handle_right_r()
 {
 	uint16_t x = m_stick_x->read();
 
 	return (x & 0xe00) == 0x600;
 }
 
-READ_LINE_MEMBER( taitoio_yoke_device::handle_up_r )
+int taitoio_yoke_device::handle_up_r()
 {
 	uint16_t y = m_stick_y->read();
 
 	return (y & 0xe00) == 0x800;
 }
 
-READ_LINE_MEMBER( taitoio_yoke_device::handle_down_r )
+int taitoio_yoke_device::handle_down_r()
 {
 	uint16_t y = m_stick_y->read();
 

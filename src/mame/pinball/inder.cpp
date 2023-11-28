@@ -107,9 +107,9 @@ private:
 	void sndcmd_lapbylap_w(u8 data);
 	void lamp_w(offs_t offset, u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[8U+offset*8+i] = BIT(data, i); }
 	void disp_w(offs_t offset, u8 data);
-	DECLARE_WRITE_LINE_MEMBER(qc7a_w);
-	DECLARE_WRITE_LINE_MEMBER(q9a_w);
-	DECLARE_WRITE_LINE_MEMBER(qc9b_w);
+	void qc7a_w(int state);
+	void q9a_w(int state);
+	void qc9b_w(int state);
 	void update_mus();
 	void brvteam_map(address_map &map);
 	void canasta_map(address_map &map);
@@ -1280,19 +1280,19 @@ void inder_state::update_mus()
 		m_13->ba_w(0);
 }
 
-WRITE_LINE_MEMBER( inder_state::qc7a_w )
+void inder_state::qc7a_w(int state)
 {
 	m_msm->reset_w(state);
 	m_9a->clear_w(!state);
 	m_9b->clear_w(!state);
 }
 
-WRITE_LINE_MEMBER( inder_state::q9a_w )
+void inder_state::q9a_w(int state)
 {
 	m_pc0 = state;
 }
 
-WRITE_LINE_MEMBER( inder_state::qc9b_w )
+void inder_state::qc9b_w(int state)
 {
 	m_9a->d_w(state);
 	m_9b->d_w(state);

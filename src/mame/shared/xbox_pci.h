@@ -153,22 +153,22 @@ public:
 	void dma2_iow2_w(uint8_t data) { send_dma_word(6, (m_dma_high_byte << 8) | data); }
 	void dma2_iow3_w(uint8_t data) { send_dma_word(7, (m_dma_high_byte << 8) | data); }
 
-	DECLARE_WRITE_LINE_MEMBER(irq1);
-	DECLARE_WRITE_LINE_MEMBER(irq3);
-	DECLARE_WRITE_LINE_MEMBER(irq11);
-	DECLARE_WRITE_LINE_MEMBER(irq10);
-	DECLARE_WRITE_LINE_MEMBER(irq14);
-	DECLARE_WRITE_LINE_MEMBER(irq15);
-	DECLARE_WRITE_LINE_MEMBER(dma2_hreq_w) { m_dma8237_2->hack_w(state); }
-	DECLARE_WRITE_LINE_MEMBER(dma1_eop_w) { m_dma_eop = state; if (m_dma_channel != -1) signal_dma_end(m_dma_channel, state & 1); }
-	DECLARE_WRITE_LINE_MEMBER(dma1_dack0_w) { set_dma_channel(0, state); }
-	DECLARE_WRITE_LINE_MEMBER(dma1_dack1_w) { set_dma_channel(1, state); }
-	DECLARE_WRITE_LINE_MEMBER(dma1_dack2_w) { set_dma_channel(2, state); }
-	DECLARE_WRITE_LINE_MEMBER(dma1_dack3_w) { set_dma_channel(3, state); }
-	DECLARE_WRITE_LINE_MEMBER(dma2_dack0_w) { m_dma8237_1->hack_w(state ? 0 : 1); }
-	DECLARE_WRITE_LINE_MEMBER(dma2_dack1_w) { set_dma_channel(5, state); }
-	DECLARE_WRITE_LINE_MEMBER(dma2_dack2_w) { set_dma_channel(6, state); }
-	DECLARE_WRITE_LINE_MEMBER(dma2_dack3_w) { set_dma_channel(7, state); }
+	void irq1(int state);
+	void irq3(int state);
+	void irq11(int state);
+	void irq10(int state);
+	void irq14(int state);
+	void irq15(int state);
+	void dma2_hreq_w(int state) { m_dma8237_2->hack_w(state); }
+	void dma1_eop_w(int state) { m_dma_eop = state; if (m_dma_channel != -1) signal_dma_end(m_dma_channel, state & 1); }
+	void dma1_dack0_w(int state) { set_dma_channel(0, state); }
+	void dma1_dack1_w(int state) { set_dma_channel(1, state); }
+	void dma1_dack2_w(int state) { set_dma_channel(2, state); }
+	void dma1_dack3_w(int state) { set_dma_channel(3, state); }
+	void dma2_dack0_w(int state) { m_dma8237_1->hack_w(state ? 0 : 1); }
+	void dma2_dack1_w(int state) { set_dma_channel(5, state); }
+	void dma2_dack2_w(int state) { set_dma_channel(6, state); }
+	void dma2_dack3_w(int state) { set_dma_channel(7, state); }
 
 protected:
 	virtual void device_start() override;
@@ -178,10 +178,10 @@ protected:
 		uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
 	uint8_t get_slave_ack(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(interrupt_ouptut_changed);
-	DECLARE_WRITE_LINE_MEMBER(pit8254_out0_changed);
-	DECLARE_WRITE_LINE_MEMBER(pit8254_out1_changed);
-	DECLARE_WRITE_LINE_MEMBER(pit8254_out2_changed);
+	void interrupt_ouptut_changed(int state);
+	void pit8254_out0_changed(int state);
+	void pit8254_out1_changed(int state);
+	void pit8254_out2_changed(int state);
 
 private:
 	void internal_io_map(address_map &map);
@@ -459,13 +459,13 @@ public:
 	mcpx_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	template <typename T> void set_bus_master_space(T &&bmtag, int bmspace)
 	{
-		subdevice<bus_master_ide_controller_device>(m_pri.finder_tag())->set_bus_master_space(bmtag, bmspace);
-		subdevice<bus_master_ide_controller_device>(m_sec.finder_tag())->set_bus_master_space(bmtag, bmspace);
+		m_pri.lookup()->set_bus_master_space(bmtag, bmspace);
+		m_sec.lookup()->set_bus_master_space(bmtag, bmspace);
 	}
 	template <bool R> void set_bus_master_space(const address_space_finder<R> &finder)
 	{
-		subdevice<bus_master_ide_controller_device>(m_pri.finder_tag())->set_bus_master_space(finder);
-		subdevice<bus_master_ide_controller_device>(m_sec.finder_tag())->set_bus_master_space(finder);
+		m_pri.lookup()->set_bus_master_space(finder);
+		m_sec.lookup()->set_bus_master_space(finder);
 	}
 
 	auto pri_interrupt_handler() { return m_pri_interrupt_handler.bind(); }
@@ -496,8 +496,8 @@ private:
 	void ide_sec_command(address_map &map);
 	void ide_sec_control(address_map &map);
 	void ide_io(address_map &map);
-	DECLARE_WRITE_LINE_MEMBER(ide_pri_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(ide_sec_interrupt);
+	void ide_pri_interrupt(int state);
+	void ide_sec_interrupt(int state);
 	uint8_t minimum_grant_r() { return 3; }
 	uint8_t maximum_latency_r() { return 1; }
 };

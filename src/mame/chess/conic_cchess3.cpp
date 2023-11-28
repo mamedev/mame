@@ -31,7 +31,7 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-//#include "conic_cchess3.lh" // clickable
+//#include "conic_cchess3.lh"
 
 
 namespace {

@@ -22,6 +22,9 @@
 #include "emu.h"
 #include "c1571.h"
 
+#include "formats/d64_dsk.h"
+#include "formats/g64_dsk.h"
+#include "formats/d71_dsk.h"
 
 
 //**************************************************************************
@@ -172,7 +175,7 @@ void mini_chief_device::mini_chief_mem(address_map &map)
 }
 
 
-WRITE_LINE_MEMBER( c1571_device::via0_irq_w )
+void c1571_device::via0_irq_w(int state)
 {
 	m_via0_irq = state;
 
@@ -400,7 +403,7 @@ void c1571_device::via1_w(offs_t offset, uint8_t data)
 	m_ga->ted_w(1);
 }
 
-WRITE_LINE_MEMBER( c1571_device::via1_irq_w )
+void c1571_device::via1_irq_w(int state)
 {
 	m_via1_irq = state;
 
@@ -470,14 +473,14 @@ void c1571_device::via1_pb_w(uint8_t data)
 //  MOS6526_INTERFACE( cia_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( c1571_device::cia_irq_w )
+void c1571_device::cia_irq_w(int state)
 {
 	m_cia_irq = state;
 
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, (m_via0_irq || m_via1_irq || m_cia_irq) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( c1571_device::cia_pc_w )
+void c1571_device::cia_pc_w(int state)
 {
 	if (m_other != nullptr)
 	{
@@ -485,14 +488,14 @@ WRITE_LINE_MEMBER( c1571_device::cia_pc_w )
 	}
 }
 
-WRITE_LINE_MEMBER( c1571_device::cia_cnt_w )
+void c1571_device::cia_cnt_w(int state)
 {
 	m_cnt_out = state;
 
 	update_iec();
 }
 
-WRITE_LINE_MEMBER( c1571_device::cia_sp_w )
+void c1571_device::cia_sp_w(int state)
 {
 	m_sp_out = state;
 
@@ -552,7 +555,7 @@ void mini_chief_device::cia_pb_w(uint8_t data)
 //  C64H156_INTERFACE( ga_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( c1571_device::byte_w )
+void c1571_device::byte_w(int state)
 {
 	m_via1->write_ca1(state);
 

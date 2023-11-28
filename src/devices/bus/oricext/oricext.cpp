@@ -21,8 +21,6 @@ oricext_connector::~oricext_connector()
 
 void oricext_connector::device_start()
 {
-	irq_handler.resolve_safe();
-	reset_handler.resolve_safe();
 }
 
 void oricext_connector::irq_w(int state)
@@ -68,12 +66,12 @@ void device_oricext_interface::interface_pre_start()
 	connector = downcast<oricext_connector *>(device().owner());
 }
 
-WRITE_LINE_MEMBER(device_oricext_interface::irq_w)
+void device_oricext_interface::irq_w(int state)
 {
 	connector->irq_w(state);
 }
 
-WRITE_LINE_MEMBER(device_oricext_interface::reset_w)
+void device_oricext_interface::reset_w(int state)
 {
 	connector->reset_w(state);
 }

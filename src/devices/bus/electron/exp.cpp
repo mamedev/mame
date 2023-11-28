@@ -57,10 +57,6 @@ electron_expansion_slot_device::electron_expansion_slot_device(const machine_con
 void electron_expansion_slot_device::device_start()
 {
 	m_card = get_card_device();
-
-	// resolve callbacks
-	m_irq_handler.resolve_safe();
-	m_nmi_handler.resolve_safe();
 }
 
 

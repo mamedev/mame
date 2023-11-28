@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /*********************************************************************
 
-    formats/dim_dsk.c
+    formats/dim_dsk.cpp
 
     DIM disk images
 
@@ -18,17 +18,17 @@ dim_format::dim_format()
 {
 }
 
-const char *dim_format::name() const
+const char *dim_format::name() const noexcept
 {
 	return "dim";
 }
 
-const char *dim_format::description() const
+const char *dim_format::description() const noexcept
 {
 	return "DIM disk image";
 }
 
-const char *dim_format::extensions() const
+const char *dim_format::extensions() const noexcept
 {
 	return "dim";
 }
@@ -46,7 +46,7 @@ int dim_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	return 0;
 }
 
-bool dim_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool dim_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	size_t actual;
 	int offset = 0x100;
@@ -126,7 +126,7 @@ bool dim_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 }
 
 
-bool dim_format::supports_save() const
+bool dim_format::supports_save() const noexcept
 {
 	return false;
 }

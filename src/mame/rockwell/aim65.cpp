@@ -50,8 +50,8 @@ void aim65_state::mem_map(address_map &map)
 	map(0x4000, 0x7fff).rom(); /* 4 ROM sockets in 16K PROM/ROM module */
 	map(0x8000, 0x9fff).noprw(); /* User available expansions */
 	map(0xa000, 0xa00f).mirror(0x3f0).m(m_via1, FUNC(via6522_device::map)); // user via
-	map(0xa400, 0xa47f).m(m_riot, FUNC(mos6532_new_device::ram_map));
-	map(0xa480, 0xa497).m(m_riot, FUNC(mos6532_new_device::io_map));
+	map(0xa400, 0xa47f).m(m_riot, FUNC(mos6532_device::ram_map));
+	map(0xa480, 0xa497).m(m_riot, FUNC(mos6532_device::io_map));
 	map(0xa498, 0xa7ff).noprw(); /* Not available */
 	map(0xa800, 0xa80f).mirror(0x3f0).m(m_via0, FUNC(via6522_device::map)); // system via
 	map(0xac00, 0xac03).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
@@ -246,7 +246,7 @@ void aim65_state::aim65(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	/* other devices */
-	MOS6532_NEW(config, m_riot, AIM65_CLOCK);
+	MOS6532(config, m_riot, AIM65_CLOCK);
 	m_riot->pa_wr_callback().set([this] (u8 data) { m_riot_port_a = data; });
 	m_riot->pb_rd_callback().set([this] () { return aim65_state::z33_pb_r(); });
 	m_riot->irq_wr_callback().set_inputline(m_maincpu, M6502_IRQ_LINE);
@@ -267,7 +267,7 @@ void aim65_state::aim65(machine_config &config)
 	MOS6522(config, m_via1, AIM65_CLOCK);
 	m_via1->irq_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->writepa_handler().set([this] (u8 data) { aim65_state::u1_pa_w(data); });
 	m_pia->writepb_handler().set([this] (u8 data) { aim65_state::u1_pb_w(data); });
 

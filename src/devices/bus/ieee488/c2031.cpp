@@ -9,6 +9,8 @@
 #include "emu.h"
 #include "c2031.h"
 
+#include "formats/d64_dsk.h"
+#include "formats/g64_dsk.h"
 
 
 //**************************************************************************
@@ -70,7 +72,7 @@ void c2031_device::c2031_mem(address_map &map)
 }
 
 
-WRITE_LINE_MEMBER( c2031_device::via0_irq_w )
+void c2031_device::via0_irq_w(int state)
 {
 	m_via0_irq = state;
 
@@ -202,7 +204,7 @@ void c2031_device::via0_pb_w(uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER( c2031_device::via1_irq_w )
+void c2031_device::via1_irq_w(int state)
 {
 	m_via1_irq = state;
 
@@ -272,7 +274,7 @@ void c2031_device::via1_pb_w(uint8_t data)
 //  C64H156_INTERFACE( ga_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( c2031_device::byte_w )
+void c2031_device::byte_w(int state)
 {
 	m_maincpu->set_input_line(M6502_SET_OVERFLOW, state);
 

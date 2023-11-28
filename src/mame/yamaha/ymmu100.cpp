@@ -2,8 +2,13 @@
 // copyright-holders:R. Belmont, Olivier Galibert
 /*************************************************************************************
 
-    Yamaha MU-80 and MU-100 : 32-voice polyphonic/multitimbral General MIDI/GS/XG tone modules
+    Yamaha MU-100 : 32-part, 64-voice polyphonic/multitimbral General MIDI/GS/XG
+                    tone module
     Preliminary driver by R. Belmont and O. Galibert
+
+    The successor to the mu90, uses the same one-chip SWP30 with a better sample rom.
+    Exists in rackable (mu100r) and screenless (mu100b), and single board (xt446)
+    variants.
 
     MU100 CPU: Hitachi H8S/2655 (HD6432655F), strapped for mode 4 (24-bit address, 16-bit data, no internal ROM)
     Sound ASIC: Yamaha XS725A0/SWP30
@@ -280,7 +285,6 @@ private:
 	u8 cur_p1, cur_p2, cur_p3, cur_p5, cur_p6, cur_pa, cur_pb, cur_pc, cur_pf, cur_pg;
 	u8 cur_ic32;
 
-	u16 adc_zero_r();
 	u16 adc_ar_r();
 	u16 adc_al_r();
 	u16 adc_midisw_r();
@@ -301,7 +305,6 @@ private:
 	void pg_w(u16 data);
 
 	virtual void machine_start() override;
-	void mu100_iomap(address_map &map);
 	void mu100_map(address_map &map);
 	void swp30_map(address_map &map);
 };
@@ -535,12 +538,6 @@ void mu100_state::mu100_map(address_map &map)
 	map(0x400000, 0x401fff).m(m_swp30, FUNC(swp30_device::map));
 }
 
-// Grounded adc input
-u16 mu100_state::adc_zero_r()
-{
-	return 0;
-}
-
 // Analog input right (also sent to the swp)
 u16 mu100_state::adc_ar_r()
 {
@@ -671,38 +668,36 @@ void mu100_state::pg_w(u16 data)
 	logerror("pbsel3 %d\n", data & 1);
 }
 
-void mu100_state::mu100_iomap(address_map &map)
-{
-	map(h8_device::PORT_1, h8_device::PORT_1).rw(FUNC(mu100_state::p1_r), FUNC(mu100_state::p1_w));
-	map(h8_device::PORT_2, h8_device::PORT_2).w(FUNC(mu100_state::p2_w));
-	map(h8_device::PORT_3, h8_device::PORT_3).w(FUNC(mu100_state::p3_w));
-	map(h8_device::PORT_5, h8_device::PORT_5).w(FUNC(mu100_state::p5_w));
-	map(h8_device::PORT_6, h8_device::PORT_6).rw(FUNC(mu100_state::p6_r), FUNC(mu100_state::p6_w));
-	map(h8_device::PORT_A, h8_device::PORT_A).rw(FUNC(mu100_state::pa_r), FUNC(mu100_state::pa_w));
-	map(h8_device::PORT_F, h8_device::PORT_F).w(FUNC(mu100_state::pf_w));
-	map(h8_device::PORT_G, h8_device::PORT_G).w(FUNC(mu100_state::pg_w));
-	map(h8_device::ADC_0, h8_device::ADC_0).r(FUNC(mu100_state::adc_ar_r));
-	map(h8_device::ADC_1, h8_device::ADC_1).r(FUNC(mu100_state::adc_zero_r));
-	map(h8_device::ADC_2, h8_device::ADC_2).r(FUNC(mu100_state::adc_al_r));
-	map(h8_device::ADC_1, h8_device::ADC_3).r(FUNC(mu100_state::adc_zero_r));
-	map(h8_device::ADC_4, h8_device::ADC_4).r(FUNC(mu100_state::adc_midisw_r));
-	map(h8_device::ADC_5, h8_device::ADC_5).r(FUNC(mu100_state::adc_zero_r));
-	map(h8_device::ADC_6, h8_device::ADC_6).r(FUNC(mu100_state::adc_battery_r));
-	map(h8_device::ADC_7, h8_device::ADC_7).r(FUNC(mu100_state::adc_type_r));
-}
-
 void mu100_state::swp30_map(address_map &map)
 {
-	map(0x000000*4, 0x200000*4-1).rom().region("swp30",         0).mirror(4*0x200000);
-	map(0x400000*4, 0x500000*4-1).rom().region("swp30",  0x800000).mirror(4*0x300000);
-	map(0x800000*4, 0xa00000*4-1).rom().region("swp30", 0x1000000).mirror(4*0x200000);
+	map(0x000000, 0x1fffff).rom().region("swp30",         0).mirror(0x200000);
+	map(0x400000, 0x4fffff).rom().region("swp30",  0x800000).mirror(0x300000);
+	map(0x800000, 0x9fffff).rom().region("swp30", 0x1000000).mirror(0x200000);
 }
 
 void mu100_state::mu100(machine_config &config)
 {
 	H8S2655(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mu100_state::mu100_map);
-	m_maincpu->set_addrmap(AS_IO, &mu100_state::mu100_iomap);
+	m_maincpu->read_adc<0>().set(FUNC(mu100_state::adc_ar_r));
+	m_maincpu->read_adc<1>().set_constant(0);
+	m_maincpu->read_adc<2>().set(FUNC(mu100_state::adc_al_r));
+	m_maincpu->read_adc<3>().set_constant(0);
+	m_maincpu->read_adc<4>().set(FUNC(mu100_state::adc_midisw_r));
+	m_maincpu->read_adc<5>().set_constant(0);
+	m_maincpu->read_adc<6>().set(FUNC(mu100_state::adc_battery_r));
+	m_maincpu->read_adc<7>().set(FUNC(mu100_state::adc_type_r));
+	m_maincpu->read_port1().set(FUNC(mu100_state::p1_r));
+	m_maincpu->write_port1().set(FUNC(mu100_state::p1_w));
+	m_maincpu->write_port2().set(FUNC(mu100_state::p2_w));
+	m_maincpu->write_port3().set(FUNC(mu100_state::p3_w));
+	m_maincpu->write_port5().set(FUNC(mu100_state::p5_w));
+	m_maincpu->read_port6().set(FUNC(mu100_state::p6_r));
+	m_maincpu->write_port6().set(FUNC(mu100_state::p6_w));
+	m_maincpu->read_porta().set(FUNC(mu100_state::pa_r));
+	m_maincpu->write_porta().set(FUNC(mu100_state::pa_w));
+	m_maincpu->write_portf().set(FUNC(mu100_state::pf_w));
+	m_maincpu->write_portg().set(FUNC(mu100_state::pg_w));
 
 	MULCD(config, m_lcd);
 
@@ -710,21 +705,21 @@ void mu100_state::mu100(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	SWP30(config, m_swp30);
-	m_swp30->set_addrmap(0, &mu100_state::swp30_map);
+	m_swp30->set_addrmap(AS_DATA, &mu100_state::swp30_map);
 	m_swp30->add_route(0, "lspeaker", 1.0);
 	m_swp30->add_route(1, "rspeaker", 1.0);
 
 	auto &mdin_a(MIDI_PORT(config, "mdin_a"));
 	midiin_slot(mdin_a);
-	mdin_a.rxd_handler().set("maincpu:sci1", FUNC(h8_sci_device::rx_w));
+	mdin_a.rxd_handler().set(m_maincpu, FUNC(h8s2655_device::sci_rx_w<1>));
 
 	auto &mdin_b(MIDI_PORT(config, "mdin_b"));
 	midiin_slot(mdin_b);
-	mdin_b.rxd_handler().set("maincpu:sci0", FUNC(h8_sci_device::rx_w));
+	mdin_b.rxd_handler().set(m_maincpu, FUNC(h8s2655_device::sci_rx_w<0>));
 
 	auto &mdout(MIDI_PORT(config, "mdout"));
 	midiout_slot(mdout);
-	m_maincpu->subdevice<h8_sci_device>("sci0")->tx_handler().set(mdout, FUNC(midi_port_device::write_txd));
+	m_maincpu->write_sci_tx<0>().set(mdout, FUNC(midi_port_device::write_txd));
 }
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
@@ -739,7 +734,7 @@ ROM_START( mu100 )
 	ROM_SYSTEM_BIOS( 2, "bios2", "xt714e0 (v1.03, Jul. 25, 1997)" )
 	ROM_LOAD16_WORD_SWAP_BIOS( 2, "xt714e0.ic11", 0x000000, 0x200000, CRC(2d8cf9fc) SHA1(a81f988a315efe92106f1e7d407cd3626c4f843f) )
 
-	ROM_REGION( 0x1800000, "swp30", ROMREGION_ERASE00 )
+	ROM_REGION32_LE( 0x1800000, "swp30", ROMREGION_ERASE00 )
 	ROM_LOAD32_WORD( "sx518b0.ic34", 0x0000000, 0x400000, CRC(2550d44f) SHA1(fd3cce228c7d389a2fde25c808a5b26080588cba) )
 	ROM_LOAD32_WORD( "sx743b0.ic35", 0x0000002, 0x400000, CRC(a9109a6c) SHA1(a67bb49378a38a2d809bd717d286e18bc6496db0) )
 	ROM_LOAD32_WORD( "xt445a0-828.ic36", 0x0800000, 0x200000, CRC(225c2280) SHA1(23b5e046fd2e2ac01af3e6dc6357c5c6547b286b) )
@@ -758,7 +753,7 @@ ROM_START( mu100r )
 	ROM_SYSTEM_BIOS( 2, "bios2", "xt714e0 (v1.03, Jul. 25, 1997)" )
 	ROM_LOAD16_WORD_SWAP_BIOS( 2, "xt714e0.ic11", 0x000000, 0x200000, CRC(2d8cf9fc) SHA1(a81f988a315efe92106f1e7d407cd3626c4f843f) )
 
-	ROM_REGION( 0x1800000, "swp30", ROMREGION_ERASE00 )
+	ROM_REGION32_LE( 0x1800000, "swp30", ROMREGION_ERASE00 )
 	ROM_LOAD32_WORD( "sx518b0.ic34", 0x000000, 0x400000, CRC(2550d44f) SHA1(fd3cce228c7d389a2fde25c808a5b26080588cba) )
 	ROM_LOAD32_WORD( "sx743b0.ic35", 0x000002, 0x400000, CRC(a9109a6c) SHA1(a67bb49378a38a2d809bd717d286e18bc6496db0) )
 	ROM_LOAD32_WORD( "xt445a0-828.ic36", 0x800000, 0x200000, CRC(225c2280) SHA1(23b5e046fd2e2ac01af3e6dc6357c5c6547b286b) )
@@ -772,7 +767,7 @@ ROM_START( mu100b )
 	// MU-100B v1.08 (Nov. 28, 1997)
 	ROM_LOAD16_WORD_SWAP( "xu50710-m27c160.bin", 0x000000, 0x200000, CRC(4b10bd27) SHA1(12d7c6e1bce7974b34916e1bfa5057ab55867476) )
 
-	ROM_REGION( 0x1800000, "swp30", ROMREGION_ERASE00 )
+	ROM_REGION32_LE( 0x1800000, "swp30", ROMREGION_ERASE00 )
 	ROM_LOAD32_WORD( "sx518b0.ic34", 0x0000000, 0x400000, CRC(2550d44f) SHA1(fd3cce228c7d389a2fde25c808a5b26080588cba) )
 	ROM_LOAD32_WORD( "sx743b0.ic35", 0x0000002, 0x400000, CRC(a9109a6c) SHA1(a67bb49378a38a2d809bd717d286e18bc6496db0) )
 	ROM_LOAD32_WORD( "xt445a0-828.ic36", 0x0800000, 0x200000, CRC(225c2280) SHA1(23b5e046fd2e2ac01af3e6dc6357c5c6547b286b) )

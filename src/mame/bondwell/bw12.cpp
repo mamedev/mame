@@ -96,29 +96,29 @@ TIMER_DEVICE_CALLBACK_MEMBER(bw12_state::floppy_motor_off_tick)
 	m_motor_on = 0;
 }
 
-WRITE_LINE_MEMBER(bw12_state::ls138_a0_w)
+void bw12_state::ls138_a0_w(int state)
 {
 	m_curbank = (m_curbank & 0x02) | state;
 	bankswitch();
 }
 
-WRITE_LINE_MEMBER(bw12_state::ls138_a1_w)
+void bw12_state::ls138_a1_w(int state)
 {
 	m_curbank = (state << 1) | (m_curbank & 0x01);
 	bankswitch();
 }
 
-WRITE_LINE_MEMBER(bw12_state::init_w)
+void bw12_state::init_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER(bw12_state::motor0_w)
+void bw12_state::motor0_w(int state)
 {
 	m_motor0 = state;
 	floppy_motor_on_off();
 }
 
-WRITE_LINE_MEMBER(bw12_state::motor1_w)
+void bw12_state::motor1_w(int state)
 {
 	m_motor1 = state;
 	floppy_motor_on_off();
@@ -330,17 +330,17 @@ MC6845_UPDATE_ROW( bw12_state::crtc_update_row )
 
 /* PIA6821 Interface */
 
-WRITE_LINE_MEMBER( bw12_state::write_centronics_busy )
+void bw12_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
 
-WRITE_LINE_MEMBER( bw12_state::write_centronics_fault )
+void bw12_state::write_centronics_fault(int state)
 {
 	m_centronics_fault = state;
 }
 
-WRITE_LINE_MEMBER( bw12_state::write_centronics_perror )
+void bw12_state::write_centronics_perror(int state)
 {
 	m_centronics_perror = state;
 }
@@ -376,7 +376,7 @@ uint8_t bw12_state::pia_pa_r()
 	return data;
 }
 
-WRITE_LINE_MEMBER( bw12_state::pia_cb2_w )
+void bw12_state::pia_cb2_w(int state)
 {
 	if (state)
 	{
@@ -392,24 +392,24 @@ WRITE_LINE_MEMBER( bw12_state::pia_cb2_w )
 
 /* PIT8253 Interface */
 
-WRITE_LINE_MEMBER( bw12_state::pit_out2_w )
+void bw12_state::pit_out2_w(int state)
 {
 	m_pit_out2 = state;
 }
 
 /* AY-5-3600-PRO-002 Interface */
 
-READ_LINE_MEMBER( bw12_state::ay3600_shift_r )
+int bw12_state::ay3600_shift_r()
 {
 	return BIT(m_modifiers->read(), 0);
 }
 
-READ_LINE_MEMBER( bw12_state::ay3600_control_r )
+int bw12_state::ay3600_control_r()
 {
 	return BIT(m_modifiers->read(), 1);
 }
 
-WRITE_LINE_MEMBER( bw12_state::ay3600_data_ready_w )
+void bw12_state::ay3600_data_ready_w(int state)
 {
 	m_key_stb = state;
 
@@ -550,7 +550,7 @@ void bw12_state::common(machine_config &config)
 	TIMER(config, FLOPPY_TIMER_TAG).configure_generic(FUNC(bw12_state::floppy_motor_off_tick));
 	UPD765A(config, m_fdc, 16_MHz_XTAL / 4, false, true);
 
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->readpa_handler().set(FUNC(bw12_state::pia_pa_r));
 	m_pia->writepb_handler().set("cent_data_out", FUNC(output_latch_device::write));
 	m_pia->ca2_handler().set(CENTRONICS_TAG, FUNC(centronics_device::write_strobe));

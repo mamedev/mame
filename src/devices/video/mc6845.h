@@ -96,16 +96,16 @@ public:
 	void register_w(uint8_t data);
 
 	// read display enable line state
-	DECLARE_READ_LINE_MEMBER( de_r );
+	int de_r();
 
 	// read cursor line state
-	DECLARE_READ_LINE_MEMBER( cursor_r );
+	int cursor_r();
 
 	// read horizontal sync line state
-	DECLARE_READ_LINE_MEMBER( hsync_r );
+	int hsync_r();
 
 	// read vertical sync line state
-	DECLARE_READ_LINE_MEMBER( vsync_r );
+	int vsync_r();
 
 	/* return the current value on the MA0-MA13 pins */
 	uint16_t get_ma();
@@ -202,8 +202,8 @@ protected:
 	/* These computed are used to define the screen parameters for a driver */
 	uint16_t  m_horiz_pix_total;
 	uint16_t  m_vert_pix_total;
-	uint16_t  m_max_visible_x;
-	uint16_t  m_max_visible_y;
+	uint16_t  m_visible_width;
+	uint16_t  m_visible_height;
 	uint16_t  m_hsync_on_pos;
 	uint16_t  m_hsync_off_pos;
 	uint16_t  m_vsync_on_pos;

@@ -46,8 +46,8 @@ public:
 	void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t read(offs_t offset, uint32_t mem_mask = ~0);
 
-	DECLARE_WRITE_LINE_MEMBER(write_rxd);
-	DECLARE_WRITE_LINE_MEMBER(write_dsr);
+	void write_rxd(int state);
+	void write_dsr(int state);
 
 protected:
 	psxsio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

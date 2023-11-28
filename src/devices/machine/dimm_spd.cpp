@@ -39,8 +39,8 @@ constexpr int STATE_WAIT_ACK = 4;
 //  dimm_spd_device - constructor
 //-------------------------------------------------
 
-dimm_spd_device::dimm_spd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, DIMM_SPD, tag, owner, clock),
+dimm_spd_device::dimm_spd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, DIMM_SPD, tag, owner, clock),
 	write_sda(*this)
 {
 	m_data_offset = 0;
@@ -56,7 +56,6 @@ dimm_spd_device::dimm_spd_device(const machine_config &mconfig, const char *tag,
 
 void dimm_spd_device::device_start()
 {
-	write_sda.resolve_safe();
 	std::fill(std::begin(m_data), std::end(m_data), 0);
 
 	m_data[0] = 128;    // # of bytes in EEPROM

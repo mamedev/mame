@@ -50,13 +50,14 @@ public:
 	enum { B, H, S };
 
 	h8_watchdog_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	h8_watchdog_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *intc, int irq, int type)
+	template<typename T, typename U> h8_watchdog_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu, U &&intc, int irq, int type)
 		: h8_watchdog_device(mconfig, tag, owner, 0)
 	{
-		set_info(intc, irq, type);
+		m_cpu.set_tag(std::forward<T>(cpu));
+		m_intc.set_tag(std::forward<U>(intc));
+		m_irq = irq;
+		m_type = type;
 	}
-
-	void set_info(const char *intc, int irq, int type);
 
 	uint64_t internal_update(uint64_t current_time);
 
@@ -87,8 +88,7 @@ private:
 	static const int div_s[8];
 
 	required_device<h8_device> m_cpu;
-	h8_intc_device *m_intc;
-	const char *m_intc_tag;
+	required_device<h8_intc_device> m_intc;
 	int m_irq;
 	int m_type;
 	uint8_t m_tcnt, m_tcsr, m_rst;

@@ -40,6 +40,7 @@
 #include "rendfont.h"
 #include "romload.h"
 #include "screen.h"
+#include "speaker.h"
 #include "uiinput.h"
 
 // FIXME: allow OSD module headers to be included in a less ugly way
@@ -740,15 +741,15 @@ float mame_ui_manager::get_line_height(float scale)
 	if (raw_font_pixel_height < 24)
 	{
 		// do we want to scale smaller? only do so if we exceed the threshold
-		if (scale_factor <= 1.0F)
+		if (scale_factor <= 1.0f)
 		{
 			if (one_to_one_line_height < UI_MAX_FONT_HEIGHT || raw_font_pixel_height < 12)
-				scale_factor = 1.0F;
+				scale_factor = 1.0f;
 		}
 		else
 		{
 			// otherwise, just ensure an integral scale factor
-			scale_factor = floor(scale_factor);
+			scale_factor = floorf(scale_factor);
 		}
 	}
 	else
@@ -1477,11 +1478,16 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 	mixer_input info;
 	for (int item = 0; machine.sound().indexed_mixer_input(item, info); item++)
 	{
-		int32_t maxval = 2000;
-		int32_t defval = 1000;
-
 		std::string str = string_format(_("%1$s Volume"), info.stream->input(info.inputnum).name());
-		slider_alloc(std::move(str), 0, defval, maxval, 20, std::bind(&mame_ui_manager::slider_mixervol, this, item, _1, _2));
+		slider_alloc(std::move(str), 0, 1000, 4000, 20, std::bind(&mame_ui_manager::slider_mixervol, this, item, _1, _2));
+	}
+
+	// add speaker panning
+	for (speaker_device &speaker : speaker_device_enumerator(machine.root_device()))
+	{
+		int defpan = floorf(speaker.defpan() * 1000.0f + 0.5f);
+		std::string str = string_format(_("%s '%s' Panning"), speaker.name(), speaker.tag());
+		slider_alloc(std::move(str), -1000, defpan, 1000, 20, std::bind(&mame_ui_manager::slider_panning, this, std::ref(speaker), _1, _2));
 	}
 
 	// add analog adjusters
@@ -1491,8 +1497,7 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 		{
 			if (field.type() == IPT_ADJUSTER)
 			{
-				slider_alloc(field.name(), field.minval(), field.defvalue(), field.maxval(), 1,
-							std::bind(&mame_ui_manager::slider_adjuster, this, std::ref(field), _1, _2));
+				slider_alloc(field.name(), field.minval(), field.defvalue(), field.maxval(), 1, std::bind(&mame_ui_manager::slider_adjuster, this, std::ref(field), _1, _2));
 			}
 		}
 	}
@@ -1520,10 +1525,10 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 	screen_device_enumerator scriter(machine.root_device());
 	for (screen_device &screen : scriter)
 	{
-		int defxscale = floor(screen.xscale() * 1000.0f + 0.5f);
-		int defyscale = floor(screen.yscale() * 1000.0f + 0.5f);
-		int defxoffset = floor(screen.xoffset() * 1000.0f + 0.5f);
-		int defyoffset = floor(screen.yoffset() * 1000.0f + 0.5f);
+		int defxscale = floorf(screen.xscale() * 1000.0f + 0.5f);
+		int defyscale = floorf(screen.yscale() * 1000.0f + 0.5f);
+		int defxoffset = floorf(screen.xoffset() * 1000.0f + 0.5f);
+		int defyoffset = floorf(screen.yoffset() * 1000.0f + 0.5f);
 		std::string screen_desc = machine_info().get_screen_desc(screen);
 
 		// add refresh rate tweaker
@@ -1558,20 +1563,18 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 		{
 			laserdisc_overlay_config config;
 			laserdisc.get_overlay_config(config);
-			int defxscale = floor(config.m_overscalex * 1000.0f + 0.5f);
-			int defyscale = floor(config.m_overscaley * 1000.0f + 0.5f);
-			int defxoffset = floor(config.m_overposx * 1000.0f + 0.5f);
-			int defyoffset = floor(config.m_overposy * 1000.0f + 0.5f);
+			int defxscale = floorf(config.m_overscalex * 1000.0f + 0.5f);
+			int defyscale = floorf(config.m_overscaley * 1000.0f + 0.5f);
+			int defxoffset = floorf(config.m_overposx * 1000.0f + 0.5f);
+			int defyoffset = floorf(config.m_overposy * 1000.0f + 0.5f);
 
 			// add scale and offset controls per-overlay
 			std::string str = string_format(_("Laserdisc '%1$s' Horiz Stretch"), laserdisc.tag());
-			slider_alloc(std::move(str), 500, (defxscale == 0) ? 1000 : defxscale, 1500, 2,
-						std::bind(&mame_ui_manager::slider_overxscale, this, std::ref(laserdisc), _1, _2));
+			slider_alloc(std::move(str), 500, (defxscale == 0) ? 1000 : defxscale, 1500, 2, std::bind(&mame_ui_manager::slider_overxscale, this, std::ref(laserdisc), _1, _2));
 			str = string_format(_("Laserdisc '%1$s' Horiz Position"), laserdisc.tag());
 			slider_alloc(std::move(str), -500, defxoffset, 500, 2, std::bind(&mame_ui_manager::slider_overxoffset, this, std::ref(laserdisc), _1, _2));
 			str = string_format(_("Laserdisc '%1$s' Vert Stretch"), laserdisc.tag());
-			slider_alloc(std::move(str), 500, (defyscale == 0) ? 1000 : defyscale, 1500, 2,
-						std::bind(&mame_ui_manager::slider_overyscale, this, std::ref(laserdisc), _1, _2));
+			slider_alloc(std::move(str), 500, (defyscale == 0) ? 1000 : defyscale, 1500, 2, std::bind(&mame_ui_manager::slider_overyscale, this, std::ref(laserdisc), _1, _2));
 			str = string_format(_("Laserdisc '%1$s' Vert Position"), laserdisc.tag());
 			slider_alloc(std::move(str), -500, defyoffset, 500, 2, std::bind(&mame_ui_manager::slider_overyoffset, this, std::ref(laserdisc), _1, _2));
 		}
@@ -1628,9 +1631,12 @@ int32_t mame_ui_manager::slider_volume(std::string *str, int32_t newval)
 {
 	if (newval != SLIDER_NOCHANGE)
 		machine().sound().set_attenuation(newval);
+
+	int32_t curval = machine().sound().attenuation();
 	if (str)
-		*str = string_format(_("%1$3ddB"), machine().sound().attenuation());
-	return machine().sound().attenuation();
+		*str = string_format(_("%1$3d" UTF8_NBSP "dB"), curval);
+
+	return curval;
 }
 
 
@@ -1644,15 +1650,61 @@ int32_t mame_ui_manager::slider_mixervol(int item, std::string *str, int32_t new
 	mixer_input info;
 	if (!machine().sound().indexed_mixer_input(item, info))
 		return 0;
+
 	if (newval != SLIDER_NOCHANGE)
-	{
-		int32_t curval = floor(info.stream->input(info.inputnum).user_gain() * 1000.0f + 0.5f);
-		if (newval > curval && (newval - curval) <= 4) newval += 4; // round up on increment
-		info.stream->input(info.inputnum).set_user_gain((float)newval * 0.001f);
-	}
+		info.stream->input(info.inputnum).set_user_gain(float(newval) * 0.001f);
+
+	int32_t curval = floorf(info.stream->input(info.inputnum).user_gain() * 1000.0f + 0.5f);
 	if (str)
-		*str = string_format("%4.2f", info.stream->input(info.inputnum).user_gain());
-	return floorf(info.stream->input(info.inputnum).user_gain() * 1000.0f + 0.5f);
+	{
+		if (curval == 0)
+			*str = _("Mute");
+		else if (curval % 10)
+			*str = string_format(_("%1$.1f%%"), float(curval) * 0.1f);
+		else
+			*str = string_format(_("%1$3d%%"), curval / 10);
+	}
+
+	return curval;
+}
+
+
+//-------------------------------------------------
+//  slider_panning - speaker panning slider
+//  callback
+//-------------------------------------------------
+
+int32_t mame_ui_manager::slider_panning(speaker_device &speaker, std::string *str, int32_t newval)
+{
+	if (newval != SLIDER_NOCHANGE)
+		speaker.set_pan(float(newval) * 0.001f);
+
+	int32_t curval = floorf(speaker.pan() * 1000.0f + 0.5f);
+	if (str)
+	{
+		switch (curval)
+		{
+			// preset strings for exact center/left/right
+			case 0:
+				*str = _("Center");
+				break;
+
+			case -1000:
+				*str = _("Left");
+				break;
+
+			case 1000:
+				*str = _("Right");
+				break;
+
+			// otherwise show as floating point
+			default:
+				*str = string_format(_("%1$.3f"), float(curval) * 0.001f);
+				break;
+		}
+	}
+
+	return curval;
 }
 
 
@@ -1672,7 +1724,7 @@ int32_t mame_ui_manager::slider_adjuster(ioport_field &field, std::string *str, 
 		field.set_user_settings(settings);
 	}
 	if (str)
-		*str = string_format(_("%1$d%%"), settings.value);
+		*str = string_format(_("%1$3d%%"), settings.value);
 	return settings.value;
 }
 
@@ -1685,10 +1737,18 @@ int32_t mame_ui_manager::slider_adjuster(ioport_field &field, std::string *str, 
 int32_t mame_ui_manager::slider_overclock(device_t &device, std::string *str, int32_t newval)
 {
 	if (newval != SLIDER_NOCHANGE)
-		device.set_clock_scale((float)newval * 0.001f);
+		device.set_clock_scale(double(newval) * 0.001);
+
+	int32_t curval = floor(device.clock_scale() * 1000.0 + 0.5);
 	if (str)
-		*str = string_format(_("%1$3.0f%%"), floor(device.clock_scale() * 100.0 + 0.5));
-	return floor(device.clock_scale() * 1000.0 + 0.5);
+	{
+		if (curval % 10)
+			*str = string_format(_("%1$.1f%%"), float(curval) * 0.1f);
+		else
+			*str = string_format(_("%1$3d%%"), curval / 10);
+	}
+
+	return curval;
 }
 
 
@@ -1706,7 +1766,7 @@ int32_t mame_ui_manager::slider_refresh(screen_device &screen, std::string *str,
 		int width = screen.width();
 		int height = screen.height();
 		const rectangle &visarea = screen.visible_area();
-		screen.configure(width, height, visarea, HZ_TO_ATTOSECONDS(defrefresh + (double)newval * 0.001));
+		screen.configure(width, height, visarea, HZ_TO_ATTOSECONDS(defrefresh + double(newval) * 0.001));
 	}
 
 	if (str)
@@ -1726,12 +1786,12 @@ int32_t mame_ui_manager::slider_brightness(screen_device &screen, std::string *s
 	render_container::user_settings settings = screen.container().get_user_settings();
 	if (newval != SLIDER_NOCHANGE)
 	{
-		settings.m_brightness = (float)newval * 0.001f;
+		settings.m_brightness = float(newval) * 0.001f;
 		screen.container().set_user_settings(settings);
 	}
 	if (str)
 		*str = string_format(_("%1$.3f"), settings.m_brightness);
-	return floor(settings.m_brightness * 1000.0f + 0.5f);
+	return floorf(settings.m_brightness * 1000.0f + 0.5f);
 }
 
 
@@ -1745,12 +1805,12 @@ int32_t mame_ui_manager::slider_contrast(screen_device &screen, std::string *str
 	render_container::user_settings settings = screen.container().get_user_settings();
 	if (newval != SLIDER_NOCHANGE)
 	{
-		settings.m_contrast = (float)newval * 0.001f;
+		settings.m_contrast = float(newval) * 0.001f;
 		screen.container().set_user_settings(settings);
 	}
 	if (str)
 		*str = string_format(_("%1$.3f"), settings.m_contrast);
-	return floor(settings.m_contrast * 1000.0f + 0.5f);
+	return floorf(settings.m_contrast * 1000.0f + 0.5f);
 }
 
 
@@ -1763,12 +1823,12 @@ int32_t mame_ui_manager::slider_gamma(screen_device &screen, std::string *str, i
 	render_container::user_settings settings = screen.container().get_user_settings();
 	if (newval != SLIDER_NOCHANGE)
 	{
-		settings.m_gamma = (float)newval * 0.001f;
+		settings.m_gamma = float(newval) * 0.001f;
 		screen.container().set_user_settings(settings);
 	}
 	if (str)
 		*str = string_format(_("%1$.3f"), settings.m_gamma);
-	return floor(settings.m_gamma * 1000.0f + 0.5f);
+	return floorf(settings.m_gamma * 1000.0f + 0.5f);
 }
 
 
@@ -1782,12 +1842,12 @@ int32_t mame_ui_manager::slider_xscale(screen_device &screen, std::string *str, 
 	render_container::user_settings settings = screen.container().get_user_settings();
 	if (newval != SLIDER_NOCHANGE)
 	{
-		settings.m_xscale = (float)newval * 0.001f;
+		settings.m_xscale = float(newval) * 0.001f;
 		screen.container().set_user_settings(settings);
 	}
 	if (str)
 		*str = string_format(_("%1$.3f"), settings.m_xscale);
-	return floor(settings.m_xscale * 1000.0f + 0.5f);
+	return floorf(settings.m_xscale * 1000.0f + 0.5f);
 }
 
 
@@ -1801,12 +1861,12 @@ int32_t mame_ui_manager::slider_yscale(screen_device &screen, std::string *str, 
 	render_container::user_settings settings = screen.container().get_user_settings();
 	if (newval != SLIDER_NOCHANGE)
 	{
-		settings.m_yscale = (float)newval * 0.001f;
+		settings.m_yscale = float(newval) * 0.001f;
 		screen.container().set_user_settings(settings);
 	}
 	if (str)
 		*str = string_format(_("%1$.3f"), settings.m_yscale);
-	return floor(settings.m_yscale * 1000.0f + 0.5f);
+	return floorf(settings.m_yscale * 1000.0f + 0.5f);
 }
 
 
@@ -1820,12 +1880,12 @@ int32_t mame_ui_manager::slider_xoffset(screen_device &screen, std::string *str,
 	render_container::user_settings settings = screen.container().get_user_settings();
 	if (newval != SLIDER_NOCHANGE)
 	{
-		settings.m_xoffset = (float)newval * 0.001f;
+		settings.m_xoffset = float(newval) * 0.001f;
 		screen.container().set_user_settings(settings);
 	}
 	if (str)
 		*str = string_format(_("%1$.3f"), settings.m_xoffset);
-	return floor(settings.m_xoffset * 1000.0f + 0.5f);
+	return floorf(settings.m_xoffset * 1000.0f + 0.5f);
 }
 
 
@@ -1839,12 +1899,12 @@ int32_t mame_ui_manager::slider_yoffset(screen_device &screen, std::string *str,
 	render_container::user_settings settings = screen.container().get_user_settings();
 	if (newval != SLIDER_NOCHANGE)
 	{
-		settings.m_yoffset = (float)newval * 0.001f;
+		settings.m_yoffset = float(newval) * 0.001f;
 		screen.container().set_user_settings(settings);
 	}
 	if (str)
 		*str = string_format(_("%1$.3f"), settings.m_yoffset);
-	return floor(settings.m_yoffset * 1000.0f + 0.5f);
+	return floorf(settings.m_yoffset * 1000.0f + 0.5f);
 }
 
 
@@ -1860,12 +1920,12 @@ int32_t mame_ui_manager::slider_overxscale(laserdisc_device &laserdisc, std::str
 	laserdisc.get_overlay_config(settings);
 	if (newval != SLIDER_NOCHANGE)
 	{
-		settings.m_overscalex = (float)newval * 0.001f;
+		settings.m_overscalex = float(newval) * 0.001f;
 		laserdisc.set_overlay_config(settings);
 	}
 	if (str)
 		*str = string_format(_("%1$.3f"), settings.m_overscalex);
-	return floor(settings.m_overscalex * 1000.0f + 0.5f);
+	return floorf(settings.m_overscalex * 1000.0f + 0.5f);
 }
 
 
@@ -1881,12 +1941,12 @@ int32_t mame_ui_manager::slider_overyscale(laserdisc_device &laserdisc, std::str
 	laserdisc.get_overlay_config(settings);
 	if (newval != SLIDER_NOCHANGE)
 	{
-		settings.m_overscaley = (float)newval * 0.001f;
+		settings.m_overscaley = float(newval) * 0.001f;
 		laserdisc.set_overlay_config(settings);
 	}
 	if (str)
 		*str = string_format(_("%1$.3f"), settings.m_overscaley);
-	return floor(settings.m_overscaley * 1000.0f + 0.5f);
+	return floorf(settings.m_overscaley * 1000.0f + 0.5f);
 }
 
 
@@ -1902,12 +1962,12 @@ int32_t mame_ui_manager::slider_overxoffset(laserdisc_device &laserdisc, std::st
 	laserdisc.get_overlay_config(settings);
 	if (newval != SLIDER_NOCHANGE)
 	{
-		settings.m_overposx = (float)newval * 0.001f;
+		settings.m_overposx = float(newval) * 0.001f;
 		laserdisc.set_overlay_config(settings);
 	}
 	if (str)
 		*str = string_format(_("%1$.3f"), settings.m_overposx);
-	return floor(settings.m_overposx * 1000.0f + 0.5f);
+	return floorf(settings.m_overposx * 1000.0f + 0.5f);
 }
 
 
@@ -1923,12 +1983,12 @@ int32_t mame_ui_manager::slider_overyoffset(laserdisc_device &laserdisc, std::st
 	laserdisc.get_overlay_config(settings);
 	if (newval != SLIDER_NOCHANGE)
 	{
-		settings.m_overposy = (float)newval * 0.001f;
+		settings.m_overposy = float(newval) * 0.001f;
 		laserdisc.set_overlay_config(settings);
 	}
 	if (str)
 		*str = string_format(_("%1$.3f"), settings.m_overposy);
-	return floor(settings.m_overposy * 1000.0f + 0.5f);
+	return floorf(settings.m_overposy * 1000.0f + 0.5f);
 }
 
 
@@ -1940,10 +2000,10 @@ int32_t mame_ui_manager::slider_overyoffset(laserdisc_device &laserdisc, std::st
 int32_t mame_ui_manager::slider_flicker([[maybe_unused]] screen_device &screen, std::string *str, int32_t newval)
 {
 	if (newval != SLIDER_NOCHANGE)
-		vector_options::s_flicker = (float)newval * 0.001f;
+		vector_options::s_flicker = float(newval) * 0.001f;
 	if (str)
 		*str = string_format(_("%1$1.2f"), vector_options::s_flicker);
-	return floor(vector_options::s_flicker * 1000.0f + 0.5f);
+	return floorf(vector_options::s_flicker * 1000.0f + 0.5f);
 }
 
 
@@ -1955,10 +2015,10 @@ int32_t mame_ui_manager::slider_flicker([[maybe_unused]] screen_device &screen, 
 int32_t mame_ui_manager::slider_beam_width_min([[maybe_unused]] screen_device &screen, std::string *str, int32_t newval)
 {
 	if (newval != SLIDER_NOCHANGE)
-		vector_options::s_beam_width_min = std::min((float)newval * 0.01f, vector_options::s_beam_width_max);
+		vector_options::s_beam_width_min = std::min(float(newval) * 0.01f, vector_options::s_beam_width_max);
 	if (str != nullptr)
 		*str = string_format(_("%1$1.2f"), vector_options::s_beam_width_min);
-	return floor(vector_options::s_beam_width_min * 100.0f + 0.5f);
+	return floorf(vector_options::s_beam_width_min * 100.0f + 0.5f);
 }
 
 
@@ -1970,10 +2030,10 @@ int32_t mame_ui_manager::slider_beam_width_min([[maybe_unused]] screen_device &s
 int32_t mame_ui_manager::slider_beam_width_max([[maybe_unused]] screen_device &screen, std::string *str, int32_t newval)
 {
 	if (newval != SLIDER_NOCHANGE)
-		vector_options::s_beam_width_max = std::max((float)newval * 0.01f, vector_options::s_beam_width_min);
+		vector_options::s_beam_width_max = std::max(float(newval) * 0.01f, vector_options::s_beam_width_min);
 	if (str != nullptr)
 		*str = string_format(_("%1$1.2f"), vector_options::s_beam_width_max);
-	return floor(vector_options::s_beam_width_max * 100.0f + 0.5f);
+	return floorf(vector_options::s_beam_width_max * 100.0f + 0.5f);
 }
 
 
@@ -1985,10 +2045,10 @@ int32_t mame_ui_manager::slider_beam_width_max([[maybe_unused]] screen_device &s
 int32_t mame_ui_manager::slider_beam_dot_size([[maybe_unused]] screen_device &screen, std::string *str, int32_t newval)
 {
 	if (newval != SLIDER_NOCHANGE)
-		vector_options::s_beam_dot_size = std::max((float)newval * 0.01f, 0.1f);
+		vector_options::s_beam_dot_size = std::max(float(newval) * 0.01f, 0.1f);
 	if (str != nullptr)
 		*str = string_format(_("%1$1.2f"), vector_options::s_beam_dot_size);
-	return floor(vector_options::s_beam_dot_size * 100.0f + 0.5f);
+	return floorf(vector_options::s_beam_dot_size * 100.0f + 0.5f);
 }
 
 
@@ -2000,10 +2060,10 @@ int32_t mame_ui_manager::slider_beam_dot_size([[maybe_unused]] screen_device &sc
 int32_t mame_ui_manager::slider_beam_intensity_weight([[maybe_unused]] screen_device &screen, std::string *str, int32_t newval)
 {
 	if (newval != SLIDER_NOCHANGE)
-		vector_options::s_beam_intensity_weight = (float)newval * 0.001f;
+		vector_options::s_beam_intensity_weight = float(newval) * 0.001f;
 	if (str != nullptr)
 		*str = string_format(_("%1$1.2f"), vector_options::s_beam_intensity_weight);
-	return floor(vector_options::s_beam_intensity_weight * 1000.0f + 0.5f);
+	return floorf(vector_options::s_beam_intensity_weight * 1000.0f + 0.5f);
 }
 
 
@@ -2019,7 +2079,7 @@ int32_t mame_ui_manager::slider_crossscale(ioport_field &field, std::string *str
 		field.set_crosshair_scale(float(newval) * 0.001);
 	if (str)
 		*str = string_format((field.crosshair_axis() == CROSSHAIR_AXIS_X) ? _("Crosshair Scale X %1$1.3f") :  _("Crosshair Scale Y %1$1.3f"), float(newval) * 0.001f);
-	return floor(field.crosshair_scale() * 1000.0f + 0.5f);
+	return floorf(field.crosshair_scale() * 1000.0f + 0.5f);
 }
 #endif
 

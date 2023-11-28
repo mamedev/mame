@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "pc_joy.h"
+#include "pc_joy_magnum6.h"
 #include "pc_joy_sw.h"
 
 DEFINE_DEVICE_TYPE(PC_JOY, pc_joy_device, "pc_joy", "PC joystick port")
@@ -84,8 +85,8 @@ ioport_constructor pc_basic_joy_device::device_input_ports() const
 
 DEFINE_DEVICE_TYPE(PC_BASIC_JOY, pc_basic_joy_device, "pc_basic_joy", "PC basic joystick")
 
-pc_basic_joy_device::pc_basic_joy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, PC_BASIC_JOY, tag, owner, clock),
+pc_basic_joy_device::pc_basic_joy_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_pc_joy_interface(mconfig, *this),
 	m_btn(*this, "btn"),
 	m_x1(*this, "x1"),
@@ -95,8 +96,14 @@ pc_basic_joy_device::pc_basic_joy_device(const machine_config &mconfig, const ch
 {
 }
 
+pc_basic_joy_device::pc_basic_joy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	pc_basic_joy_device(mconfig, PC_BASIC_JOY, tag, owner, clock)
+{
+}
+
 void pc_joysticks(device_slot_interface &device)
 {
-	device.option_add("basic_joy", PC_BASIC_JOY);
-	device.option_add("mssw_pad", PC_MSSW_PAD);
+	device.option_add("basic_joy",   PC_BASIC_JOY);
+	device.option_add("magnum6_pad", PC_MAGNUM6_PAD);
+	device.option_add("mssw_pad",    PC_MSSW_PAD);
 }

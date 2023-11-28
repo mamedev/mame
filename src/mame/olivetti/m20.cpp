@@ -57,7 +57,6 @@ E I1     Vectored interrupt error
 #include "softlist_dev.h"
 
 #include "formats/m20_dsk.h"
-#include "formats/pc_dsk.h"
 
 
 namespace {
@@ -104,10 +103,10 @@ private:
 	void i8259_w(offs_t offset, uint16_t data);
 	uint16_t port21_r();
 	void port21_w(uint16_t data);
-	DECLARE_WRITE_LINE_MEMBER(tty_clock_tick_w);
-	DECLARE_WRITE_LINE_MEMBER(kbd_clock_tick_w);
-	DECLARE_WRITE_LINE_MEMBER(timer_tick_w);
-	DECLARE_WRITE_LINE_MEMBER(int_w);
+	void tty_clock_tick_w(int state);
+	void kbd_clock_tick_w(int state);
+	void timer_tick_w(int state);
+	void int_w(int state);
 	MC6845_UPDATE_ROW(update_row);
 
 	void m20_data_mem(address_map &map);
@@ -213,19 +212,19 @@ void m20_state::i8259_w(offs_t offset, uint16_t data)
 	m_i8259->write(offset, (data>>1));
 }
 
-WRITE_LINE_MEMBER( m20_state::tty_clock_tick_w )
+void m20_state::tty_clock_tick_w(int state)
 {
 	m_ttyi8251->write_txc(state);
 	m_ttyi8251->write_rxc(state);
 }
 
-WRITE_LINE_MEMBER( m20_state::kbd_clock_tick_w )
+void m20_state::kbd_clock_tick_w(int state)
 {
 	m_kbdi8251->write_txc(state);
 	m_kbdi8251->write_rxc(state);
 }
 
-WRITE_LINE_MEMBER( m20_state::timer_tick_w )
+void m20_state::timer_tick_w(int state)
 {
 	/* The output of the 8253 is connected to a 74LS74 flop chip.
 	 * The output of the flop chip is connected to NVI CPU input.
@@ -695,7 +694,7 @@ uint16_t m20_state::nviack_r()
 	return 0xffff;
 }
 
-WRITE_LINE_MEMBER(m20_state::int_w)
+void m20_state::int_w(int state)
 {
 	if(m_apb && !m_apb->halted())
 		m_apb->vi_w(state);

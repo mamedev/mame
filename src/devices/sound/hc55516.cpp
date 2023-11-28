@@ -40,7 +40,7 @@ cvsd_device_base::cvsd_device_base(const machine_config &mconfig, device_type ty
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_clock_state_push_cb(*this)
-	, m_digin_pull_cb(*this)
+	, m_digin_pull_cb(*this, 1)
 	, m_digout_push_cb(*this)
 	, m_active_clock_edge(active_clock_edge)
 	, m_shiftreg_mask(shiftreg_mask)
@@ -88,7 +88,7 @@ void cvsd_device_base::device_reset()
     //m_stream->set_sample_rate(clock());
 }*/
 
-READ_LINE_MEMBER( cvsd_device_base::clock_r )
+int cvsd_device_base::clock_r()
 {
 	// prevent debugger from changing the internal state
 	if (!machine().side_effects_disabled())
@@ -96,12 +96,12 @@ READ_LINE_MEMBER( cvsd_device_base::clock_r )
 	return clock_state_r();
 }
 
-WRITE_LINE_MEMBER( cvsd_device_base::mclock_w )
+void cvsd_device_base::mclock_w(int state)
 {
 	clock_w(state);
 }
 
-WRITE_LINE_MEMBER( cvsd_device_base::digin_w )
+void cvsd_device_base::digin_w(int state)
 {
 	digit_w(state);
 }
@@ -112,12 +112,12 @@ WRITE_LINE_MEMBER( cvsd_device_base::digin_w )
     assert(0);
 }*/
 
-WRITE_LINE_MEMBER( cvsd_device_base::dec_encq_w )
+void cvsd_device_base::dec_encq_w(int state)
 {
 	assert(0);
 }
 
-READ_LINE_MEMBER( cvsd_device_base::digout_r )
+int cvsd_device_base::digout_r()
 {
 	return 0;
 }
@@ -224,7 +224,7 @@ hc55516_device::hc55516_device(const machine_config &mconfig, const char *tag, d
 hc55516_device::hc55516_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t sylmask, int32_t sylshift, int32_t syladd, int32_t intshift)
 	: cvsd_device_base(mconfig, type, tag, owner, clock, RISING, 0x7)
 	, m_agc_push_cb(*this)
-	, m_fzq_pull_cb(*this)
+	, m_fzq_pull_cb(*this, 1)
 	, m_sylmask(sylmask)
 	, m_sylshift(sylshift)
 	, m_syladd(syladd)
@@ -243,14 +243,11 @@ hc55516_device::hc55516_device(const machine_config &mconfig, device_type type, 
 void hc55516_device::device_start()
 {
 	cvsd_device_base::device_start();
+
 	save_item(NAME(m_sylfilter));
 	save_item(NAME(m_intfilter));
 	save_item(NAME(m_agc));
 	save_item(NAME(m_buffered_fzq));
-
-	/* resolve lines */
-	m_agc_push_cb.resolve();
-	m_fzq_pull_cb.resolve();
 }
 
 //-------------------------------------------------
@@ -269,12 +266,12 @@ void hc55516_device::device_reset()
 
 // device specific functions
 
-WRITE_LINE_MEMBER( hc55516_device::fzq_w )
+void hc55516_device::fzq_w(int state)
 {
 	m_buffered_fzq = state;
 }
 
-READ_LINE_MEMBER( hc55516_device::agc_r )
+int hc55516_device::agc_r()
 {
 	// prevent debugger from changing the internal state
 	if (!machine().side_effects_disabled())
@@ -292,7 +289,7 @@ void hc55516_device::process_bit(bool bit, bool clock_state)
 	{
 		// grab the /FZ state; if the callback is present, use that, otherwise use the buffered state
 		bool fzq_state = false;
-		if (!m_fzq_pull_cb.isnull())
+		if (!m_fzq_pull_cb.isunset())
 			fzq_state = m_fzq_pull_cb();
 		else
 			fzq_state = m_buffered_fzq;
@@ -355,8 +352,7 @@ void hc55516_device::process_bit(bool bit, bool clock_state)
 		m_agc = true;
 
 	// push agc state if a callback is present
-	if (!m_agc_push_cb.isnull())
-		m_agc_push_cb(m_agc);
+	m_agc_push_cb(m_agc);
 }
 
 //-------------------------------------------------

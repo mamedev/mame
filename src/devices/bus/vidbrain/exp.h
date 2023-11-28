@@ -89,8 +89,8 @@ class videobrain_expansion_slot_device : public device_t,
 public:
 	// construction/destruction
 	template <typename T>
-	videobrain_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, char const* dflt)
-		: videobrain_expansion_slot_device(mconfig, tag, owner, 0)
+	videobrain_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, char const* dflt) :
+		videobrain_expansion_slot_device(mconfig, tag, owner, 0)
 	{
 		option_reset();
 		opts(*this);
@@ -109,11 +109,11 @@ public:
 	void cs1_w(offs_t offset, uint8_t data) { bo_w(offset + 0x1000, data, 0, 1); }
 	uint8_t cs2_r(offs_t offset) { return bo_r(offset + 0x1800, 1, 0); }
 	void cs2_w(offs_t offset, uint8_t data) { bo_w(offset + 0x1800, data, 1, 0); }
-	uint8_t unmap_r(offs_t offset) { return bo_r(offset + 0x3000, 1, 0); }
-	void unmap_w(offs_t offset, uint8_t data) { bo_w(offset + 0x3000, data, 1, 0); }
+	uint8_t unmap_r(offs_t offset) { return bo_r(offset + 0x3000, 1, 1); }
+	void unmap_w(offs_t offset, uint8_t data) { bo_w(offset + 0x3000, data, 1, 1); }
 
 	// cartridge interface
-	DECLARE_WRITE_LINE_MEMBER( extres_w ) { m_write_extres(state); }
+	void extres_w(int state) { m_write_extres(state); }
 
 protected:
 	// device_t implementation
@@ -129,7 +129,7 @@ protected:
 	// device_slot_interface implementation
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
-	devcb_write_line   m_write_extres;
+	devcb_write_line m_write_extres;
 
 	device_videobrain_expansion_card_interface *m_cart;
 };

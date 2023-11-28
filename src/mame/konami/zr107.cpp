@@ -249,8 +249,8 @@ protected:
 	void ccu_w(uint32_t data);
 	void sound_ctrl_w(uint8_t data);
 
-	WRITE_LINE_MEMBER(vblank);
-	WRITE_LINE_MEMBER(k054539_irq_gen);
+	void vblank(int state);
+	void k054539_irq_gen(int state);
 	double adc0838_callback(uint8_t input);
 
 	void sharc_memmap(address_map &map);
@@ -444,8 +444,7 @@ void zr107_state::sysreg_w(offs_t offset, uint8_t data)
 			/*
 			    0x01 = AFE
 			*/
-			if (data & 0x01)
-				m_watchdog->watchdog_reset();
+			m_watchdog->reset_line_w(data & 0x01);
 			break;
 
 		default:
@@ -704,7 +703,7 @@ double zr107_state::adc0838_callback(uint8_t input)
 
 
 
-WRITE_LINE_MEMBER(zr107_state::k054539_irq_gen)
+void zr107_state::k054539_irq_gen(int state)
 {
 	if (m_sound_ctrl & 1)
 	{
@@ -724,7 +723,7 @@ WRITE_LINE_MEMBER(zr107_state::k054539_irq_gen)
     DMA0
 
 */
-WRITE_LINE_MEMBER(zr107_state::vblank)
+void zr107_state::vblank(int state)
 {
 	if (state)
 	{

@@ -195,46 +195,46 @@ void macio_device::config_map(address_map &map)
 //  macio_device - constructor
 //-------------------------------------------------
 
-macio_device::macio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: pci_device(mconfig, type, tag, owner, clock),
-	  write_irq(*this),
-	  write_pb4(*this),
-	  write_pb5(*this),
-	  write_cb2(*this),
-	  read_pb3(*this),
-	  read_codec(*this),
-	  write_codec(*this),
-	  m_maincpu(*this, finder_base::DUMMY_TAG),
-	  m_via1(*this, "via1"),
-	  m_fdc(*this, "fdc"),
-	  m_floppy(*this, "fdc:%d", 0U),
-	  m_scc(*this, "scc"),
-	  m_dma_scsi(*this, "dma_scsi0"),
-	  m_dma_floppy(*this, "dma_floppy"),
-	  m_dma_sccatx(*this, "dma_scca_tx"),
-	  m_dma_sccarx(*this, "dma_scca_rx"),
-	  m_dma_sccbtx(*this, "dma_sccb_tx"),
-	  m_dma_sccbrx(*this, "dma_sccb_rx"),
-	  m_dma_audio_in(*this, "dma_audin"),
-	  m_dma_audio_out(*this, "dma_audout"),
-	  m_pci_memory(*this, ":pci:00.0", AS_DATA),
-	  m_cur_floppy(nullptr),
-	  m_hdsel(0)
+macio_device::macio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
+	pci_device(mconfig, type, tag, owner, clock),
+	write_irq(*this),
+	write_pb4(*this),
+	write_pb5(*this),
+	write_cb2(*this),
+	read_pb3(*this, 0),
+	read_codec(*this, 0),
+	write_codec(*this),
+	m_maincpu(*this, finder_base::DUMMY_TAG),
+	m_via1(*this, "via1"),
+	m_fdc(*this, "fdc"),
+	m_floppy(*this, "fdc:%d", 0U),
+	m_scc(*this, "scc"),
+	m_dma_scsi(*this, "dma_scsi0"),
+	m_dma_floppy(*this, "dma_floppy"),
+	m_dma_sccatx(*this, "dma_scca_tx"),
+	m_dma_sccarx(*this, "dma_scca_rx"),
+	m_dma_sccbtx(*this, "dma_sccb_tx"),
+	m_dma_sccbrx(*this, "dma_sccb_rx"),
+	m_dma_audio_in(*this, "dma_audin"),
+	m_dma_audio_out(*this, "dma_audout"),
+	m_pci_memory(*this, ":pci:00.0", AS_DATA),
+	m_cur_floppy(nullptr),
+	m_hdsel(0)
 {
 	m_toggle = 0;
 }
 
-grandcentral_device::grandcentral_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: macio_device(mconfig, GRAND_CENTRAL, tag, owner, clock),
+grandcentral_device::grandcentral_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	macio_device(mconfig, GRAND_CENTRAL, tag, owner, clock),
 	m_dma_scsi1(*this, "dma_scsi1")
 {
 }
 
-ohare_device::ohare_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: macio_device(mconfig, type, tag, owner, clock),
-	  device_nvram_interface(mconfig, *this),
-	  m_dma_ata0(*this, "dma_ata0"),
-	  m_dma_ata1(*this, "dma_ata1")
+ohare_device::ohare_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
+	macio_device(mconfig, type, tag, owner, clock),
+	device_nvram_interface(mconfig, *this),
+	m_dma_ata0(*this, "dma_ata0"),
+	m_dma_ata1(*this, "dma_ata1")
 {
 }
 
@@ -264,14 +264,6 @@ paddington_device::paddington_device(const machine_config &mconfig, const char *
 
 void macio_device::common_init()
 {
-	write_irq.resolve_safe();
-	write_pb4.resolve_safe();
-	write_pb5.resolve_safe();
-	write_cb2.resolve_safe();
-	read_pb3.resolve_safe(0);
-	read_codec.resolve_safe(0);
-	write_codec.resolve_safe();
-
 	m_dma_scsi->set_address_space(m_pci_memory);
 	m_dma_floppy->set_address_space(m_pci_memory);
 	m_dma_sccatx->set_address_space(m_pci_memory);
@@ -353,7 +345,7 @@ u8 macio_device::via_in_b()
 	return read_pb3() << 3;
 }
 
-WRITE_LINE_MEMBER(macio_device::via_out_cb2)
+void macio_device::via_out_cb2(int state)
 {
 	write_cb2(state & 1);
 }
@@ -377,12 +369,12 @@ void macio_device::via_out_b(u8 data)
 	write_pb5(BIT(data, 5));
 }
 
-WRITE_LINE_MEMBER(macio_device::cb1_w)
+void macio_device::cb1_w(int state)
 {
 	m_via1->write_cb1(state);
 }
 
-WRITE_LINE_MEMBER(macio_device::cb2_w)
+void macio_device::cb2_w(int state)
 {
 	m_via1->write_cb2(state);
 }
@@ -575,7 +567,7 @@ void macio_device::recalc_irqs()
 	}
 }
 
-template<int bit> WRITE_LINE_MEMBER(macio_device::set_irq_line)
+template<int bit> void macio_device::set_irq_line(int state)
 {
 	if (bit < 32)
 	{

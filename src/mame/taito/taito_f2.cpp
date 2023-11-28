@@ -3627,16 +3627,16 @@ void taitof2_state::driveout(machine_config &config)
 
 ROM_START( finalb )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 256k for 68000 code */
-	ROM_LOAD16_BYTE( "b82-09.10",  0x00000, 0x20000, CRC(632f1ecd) SHA1(aa3d1c2059b0dd619d1f6e3e0705b65b4f4be74e) )
-	ROM_LOAD16_BYTE( "b82-17.11",  0x00001, 0x20000, CRC(e91b2ec9) SHA1(c854104b8d48d20ab9278ecd122c987c3d886a26) )
+	ROM_LOAD16_BYTE( "b82-09.ic23",  0x00000, 0x20000, CRC(632f1ecd) SHA1(aa3d1c2059b0dd619d1f6e3e0705b65b4f4be74e) )
+	ROM_LOAD16_BYTE( "b82-17.ic11",  0x00001, 0x20000, CRC(e91b2ec9) SHA1(c854104b8d48d20ab9278ecd122c987c3d886a26) )
 
 	ROM_REGION( 0x040000, "tc0100scn_1", 0 )   /* SCR */
-	ROM_LOAD16_BYTE( "b82-06.19",  0x00001, 0x20000, CRC(fc450a25) SHA1(6929bd2d47549cab037e8807b778741b3c215788) )
-	ROM_LOAD16_BYTE( "b82-07.18",  0x00000, 0x20000, CRC(ec3df577) SHA1(37a0bb87a12f0332c8e67b22f91c24584f3d46ce) )
+	ROM_LOAD16_BYTE( "b82-06.ic33", 0x00001, 0x20000, CRC(fc450a25) SHA1(6929bd2d47549cab037e8807b778741b3c215788) )
+	ROM_LOAD16_BYTE( "b82-07.ic34", 0x00000, 0x20000, CRC(ec3df577) SHA1(37a0bb87a12f0332c8e67b22f91c24584f3d46ce) )
 
 	ROM_REGION( 0x100000, "sprites", 0 )   /* OBJ */
-	ROM_LOAD16_BYTE( "b82-04.4",   0x000001, 0x80000, CRC(6346f98e) SHA1(3fac5ea56b5ae280cd7ca0e0c6c308376056e1ba) ) /* sprites 4-bit format*/
-	ROM_LOAD16_BYTE( "b82-03.5",   0x000000, 0x80000, CRC(daa11561) SHA1(81dd596c1b36138904971c36466ec29d08d4fd84) ) /* sprites 4-bit format*/
+	ROM_LOAD16_BYTE( "b82-04.ic8", 0x000001, 0x80000, CRC(6346f98e) SHA1(3fac5ea56b5ae280cd7ca0e0c6c308376056e1ba) ) /* sprites 4-bit format*/
+	ROM_LOAD16_BYTE( "b82-03.ic9", 0x000000, 0x80000, CRC(daa11561) SHA1(81dd596c1b36138904971c36466ec29d08d4fd84) ) /* sprites 4-bit format*/
 
 	/* Note: this is intentional to load at 0x180000, not at 0x100000
 	   because finalb_driver_init will move some bits around before data
@@ -3644,16 +3644,16 @@ ROM_START( finalb )
 	   while above is 4bits-packed format, for a total of 6 bits per pixel. */
 
 	ROM_REGION( 0x080000, "sprites_hi", 0 )
-	ROM_LOAD       ( "b82-05.3",   0x000000, 0x80000, CRC(aa90b93a) SHA1(06f41052659959c58d72c9f68f9f6069cb835672) ) /* sprites 2-bit format */
+	ROM_LOAD ( "b82-05.ic7", 0x000000, 0x80000, CRC(aa90b93a) SHA1(06f41052659959c58d72c9f68f9f6069cb835672) ) /* sprites 2-bit format */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
-	ROM_LOAD( "b82_10.16",   0x00000, 0x10000, CRC(a38aaaed) SHA1(d476ea516a797e71e0306da54c17ed1759fe1ccd) )
+	ROM_LOAD( "b82_10.ic5", 0x00000, 0x10000, CRC(a38aaaed) SHA1(d476ea516a797e71e0306da54c17ed1759fe1ccd) )
 
 	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
-	ROM_LOAD( "b82-02.1",    0x00000, 0x80000, CRC(5dd06bdd) SHA1(6eeaec6743805ba429b0ef58a530bc0740646324) )
+	ROM_LOAD( "b82-02.ic1", 0x00000, 0x80000, CRC(5dd06bdd) SHA1(6eeaec6743805ba429b0ef58a530bc0740646324) )
 
 	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
-	ROM_LOAD( "b82-01.2",    0x00000, 0x80000, CRC(f0eb6846) SHA1(4697c3fd61ac0d55c0d2a4354ff74719947397c5) )
+	ROM_LOAD( "b82-01.ic2", 0x00000, 0x80000, CRC(f0eb6846) SHA1(4697c3fd61ac0d55c0d2a4354ff74719947397c5) )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
 	ROM_LOAD( "tibpal16l8.ic41", 0x0000, 0x0104, CRC(11a0a19a) SHA1(0c195a1808dad21130dd377531ed5b8228981581) )
@@ -3665,16 +3665,16 @@ ROM_END
 
 ROM_START( finalbj )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 256k for 68000 code */
-	ROM_LOAD16_BYTE( "b82-09.10",  0x00000, 0x20000, CRC(632f1ecd) SHA1(aa3d1c2059b0dd619d1f6e3e0705b65b4f4be74e) )
-	ROM_LOAD16_BYTE( "b82-08.11",  0x00001, 0x20000, CRC(07154fe5) SHA1(4772362375c8c2984a305c3bb0320ea80a2e9a40) )
+	ROM_LOAD16_BYTE( "b82-09.ic23",  0x00000, 0x20000, CRC(632f1ecd) SHA1(aa3d1c2059b0dd619d1f6e3e0705b65b4f4be74e) )
+	ROM_LOAD16_BYTE( "b82-08.ic11",  0x00001, 0x20000, CRC(07154fe5) SHA1(4772362375c8c2984a305c3bb0320ea80a2e9a40) )
 
 	ROM_REGION( 0x040000, "tc0100scn_1", 0 )   /* SCR */
-	ROM_LOAD16_BYTE( "b82-06.19",  0x00001, 0x20000, CRC(fc450a25) SHA1(6929bd2d47549cab037e8807b778741b3c215788) )
-	ROM_LOAD16_BYTE( "b82-07.18",  0x00000, 0x20000, CRC(ec3df577) SHA1(37a0bb87a12f0332c8e67b22f91c24584f3d46ce) )
+	ROM_LOAD16_BYTE( "b82-06.ic33", 0x00001, 0x20000, CRC(fc450a25) SHA1(6929bd2d47549cab037e8807b778741b3c215788) )
+	ROM_LOAD16_BYTE( "b82-07.ic34", 0x00000, 0x20000, CRC(ec3df577) SHA1(37a0bb87a12f0332c8e67b22f91c24584f3d46ce) )
 
 	ROM_REGION( 0x100000, "sprites", 0 )   /* OBJ */
-	ROM_LOAD16_BYTE( "b82-04.4",   0x000001, 0x80000, CRC(6346f98e) SHA1(3fac5ea56b5ae280cd7ca0e0c6c308376056e1ba) ) /* sprites 4-bit format*/
-	ROM_LOAD16_BYTE( "b82-03.5",   0x000000, 0x80000, CRC(daa11561) SHA1(81dd596c1b36138904971c36466ec29d08d4fd84) ) /* sprites 4-bit format*/
+	ROM_LOAD16_BYTE( "b82-04.ic8", 0x000001, 0x80000, CRC(6346f98e) SHA1(3fac5ea56b5ae280cd7ca0e0c6c308376056e1ba) ) /* sprites 4-bit format*/
+	ROM_LOAD16_BYTE( "b82-03.ic9", 0x000000, 0x80000, CRC(daa11561) SHA1(81dd596c1b36138904971c36466ec29d08d4fd84) ) /* sprites 4-bit format*/
 
 	/* Note: this is intentional to load at 0x180000, not at 0x100000
 	   because finalb_driver_init will move some bits around before data
@@ -3682,16 +3682,16 @@ ROM_START( finalbj )
 	   while above is 4bits-packed format, for a total of 6 bits per pixel. */
 
 	ROM_REGION( 0x080000, "sprites_hi", 0 )
-	ROM_LOAD       ( "b82-05.3",   0x000000, 0x80000, CRC(aa90b93a) SHA1(06f41052659959c58d72c9f68f9f6069cb835672) ) /* sprites 2-bit format */
+	ROM_LOAD ( "b82-05.ic7", 0x000000, 0x80000, CRC(aa90b93a) SHA1(06f41052659959c58d72c9f68f9f6069cb835672) ) /* sprites 2-bit format */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
-	ROM_LOAD( "b82_10.16",   0x00000, 0x10000, CRC(a38aaaed) SHA1(d476ea516a797e71e0306da54c17ed1759fe1ccd) )
+	ROM_LOAD( "b82_10.ic5", 0x00000, 0x10000, CRC(a38aaaed) SHA1(d476ea516a797e71e0306da54c17ed1759fe1ccd) )
 
 	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
-	ROM_LOAD( "b82-02.1",    0x00000, 0x80000, CRC(5dd06bdd) SHA1(6eeaec6743805ba429b0ef58a530bc0740646324) )
+	ROM_LOAD( "b82-02.ic1", 0x00000, 0x80000, CRC(5dd06bdd) SHA1(6eeaec6743805ba429b0ef58a530bc0740646324) )
 
 	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
-	ROM_LOAD( "b82-01.2",    0x00000, 0x80000, CRC(f0eb6846) SHA1(4697c3fd61ac0d55c0d2a4354ff74719947397c5) )
+	ROM_LOAD( "b82-01.ic2", 0x00000, 0x80000, CRC(f0eb6846) SHA1(4697c3fd61ac0d55c0d2a4354ff74719947397c5) )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
 	ROM_LOAD( "tibpal16l8.ic41", 0x0000, 0x0104, CRC(11a0a19a) SHA1(0c195a1808dad21130dd377531ed5b8228981581) )
@@ -3704,16 +3704,16 @@ ROM_END
 ROM_START( finalbu )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 256k for 68000 code */
 	/* are these even good dumps / legit ? there are some strange changes around 0x00fxx as well as the region byte */
-	ROM_LOAD16_BYTE( "b82-09-1",  0x00000, 0x20000, CRC(66729cb9) SHA1(f265c07966cf3930a9b5e2dd63d49554705c60f7) )
-	ROM_LOAD16_BYTE( "b82-6-14",  0x00001, 0x20000, CRC(879387fa) SHA1(9d7aa8ece6cfc66e7c131d9c7a3db792a0336e09) )
+	ROM_LOAD16_BYTE( "b82-09-1.ic23",  0x00000, 0x20000, CRC(66729cb9) SHA1(f265c07966cf3930a9b5e2dd63d49554705c60f7) )
+	ROM_LOAD16_BYTE( "b82-16-1.ic11",  0x00001, 0x20000, CRC(879387fa) SHA1(9d7aa8ece6cfc66e7c131d9c7a3db792a0336e09) )
 
 	ROM_REGION( 0x040000, "tc0100scn_1", 0 )   /* SCR */
-	ROM_LOAD16_BYTE( "b82-06.19",  0x00001, 0x20000, CRC(fc450a25) SHA1(6929bd2d47549cab037e8807b778741b3c215788) )
-	ROM_LOAD16_BYTE( "b82-07.18",  0x00000, 0x20000, CRC(ec3df577) SHA1(37a0bb87a12f0332c8e67b22f91c24584f3d46ce) )
+	ROM_LOAD16_BYTE( "b82-06.ic33", 0x00001, 0x20000, CRC(fc450a25) SHA1(6929bd2d47549cab037e8807b778741b3c215788) )
+	ROM_LOAD16_BYTE( "b82-07.ic34", 0x00000, 0x20000, CRC(ec3df577) SHA1(37a0bb87a12f0332c8e67b22f91c24584f3d46ce) )
 
 	ROM_REGION( 0x100000, "sprites", 0 )   /* OBJ */
-	ROM_LOAD16_BYTE( "b82-04.4",   0x000001, 0x80000, CRC(6346f98e) SHA1(3fac5ea56b5ae280cd7ca0e0c6c308376056e1ba) ) /* sprites 4-bit format*/
-	ROM_LOAD16_BYTE( "b82-03.5",   0x000000, 0x80000, CRC(daa11561) SHA1(81dd596c1b36138904971c36466ec29d08d4fd84) ) /* sprites 4-bit format*/
+	ROM_LOAD16_BYTE( "b82-04.ic8", 0x000001, 0x80000, CRC(6346f98e) SHA1(3fac5ea56b5ae280cd7ca0e0c6c308376056e1ba) ) /* sprites 4-bit format*/
+	ROM_LOAD16_BYTE( "b82-03.ic9", 0x000000, 0x80000, CRC(daa11561) SHA1(81dd596c1b36138904971c36466ec29d08d4fd84) ) /* sprites 4-bit format*/
 
 	/* Note: this is intentional to load at 0x180000, not at 0x100000
 	   because finalb_driver_init will move some bits around before data
@@ -3721,16 +3721,16 @@ ROM_START( finalbu )
 	   while above is 4bits-packed format, for a total of 6 bits per pixel. */
 
 	ROM_REGION( 0x080000, "sprites_hi", 0 )
-	ROM_LOAD       ( "b82-05.3",   0x000000, 0x80000, CRC(aa90b93a) SHA1(06f41052659959c58d72c9f68f9f6069cb835672) ) /* sprites 2-bit format */
+	ROM_LOAD ( "b82-05.ic7", 0x000000, 0x80000, CRC(aa90b93a) SHA1(06f41052659959c58d72c9f68f9f6069cb835672) ) /* sprites 2-bit format */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
-	ROM_LOAD( "b82_10.16",   0x00000, 0x10000, CRC(a38aaaed) SHA1(d476ea516a797e71e0306da54c17ed1759fe1ccd) )
+	ROM_LOAD( "b82_10.ic5", 0x00000, 0x10000, CRC(a38aaaed) SHA1(d476ea516a797e71e0306da54c17ed1759fe1ccd) )
 
 	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
-	ROM_LOAD( "b82-02.1",    0x00000, 0x80000, CRC(5dd06bdd) SHA1(6eeaec6743805ba429b0ef58a530bc0740646324) )
+	ROM_LOAD( "b82-02.ic1", 0x00000, 0x80000, CRC(5dd06bdd) SHA1(6eeaec6743805ba429b0ef58a530bc0740646324) )
 
 	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
-	ROM_LOAD( "b82-01.2",    0x00000, 0x80000, CRC(f0eb6846) SHA1(4697c3fd61ac0d55c0d2a4354ff74719947397c5) )
+	ROM_LOAD( "b82-01.ic2", 0x00000, 0x80000, CRC(f0eb6846) SHA1(4697c3fd61ac0d55c0d2a4354ff74719947397c5) )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
 	ROM_LOAD( "tibpal16l8.ic41", 0x0000, 0x0104, CRC(11a0a19a) SHA1(0c195a1808dad21130dd377531ed5b8228981581) )

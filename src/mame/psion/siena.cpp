@@ -4,13 +4,12 @@
 
     Psion Siena
 
-    TODO:
-    - battery backed RAM
-
 ******************************************************************************/
 
 #include "emu.h"
+#include "machine/nvram.h"
 #include "machine/psion_asic9.h"
+#include "machine/psion_condor.h"
 #include "machine/ram.h"
 #include "sound/spkrdev.h"
 #include "bus/psion/honda/slot.h"
@@ -31,9 +30,11 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_asic9(*this, "asic9")
 		, m_ram(*this, "ram")
+		, m_nvram(*this, "nvram")
 		, m_palette(*this, "palette")
 		, m_keyboard(*this, "COL%u", 0U)
 		, m_speaker(*this, "speaker")
+		, m_condor(*this, "condor")
 		, m_honda(*this, "honda")
 	{ }
 
@@ -48,9 +49,11 @@ protected:
 private:
 	required_device<psion_asic9_device> m_asic9;
 	required_device<ram_device> m_ram;
+	required_device<nvram_device> m_nvram;
 	required_device<palette_device> m_palette;
 	required_ioport_array<8> m_keyboard;
 	required_device<speaker_sound_device> m_speaker;
+	required_device<psion_condor_device> m_condor;
 	required_device<psion_honda_slot_device> m_honda;
 
 	void palette_init(palette_device &palette);
@@ -63,10 +66,12 @@ private:
 
 void siena_state::machine_start()
 {
+	m_nvram->set_base(m_ram->pointer(), m_ram->size());
 }
 
 void siena_state::machine_reset()
 {
+	m_asic9->io_space().install_readwrite_handler(0x0100, 0x011f, read8sm_delegate(*m_condor, FUNC(psion_condor_device::read)), write8sm_delegate(*m_condor, FUNC(psion_condor_device::write)), 0x00ff);
 }
 
 
@@ -200,6 +205,7 @@ void siena_state::palette_init(palette_device &palette)
 void siena_state::siena(machine_config &config)
 {
 	PSION_ASIC9(config, m_asic9, 7.68_MHz_XTAL);
+	m_asic9->set_screen("screen");
 	m_asic9->set_ram_rom("ram", "rom");
 	m_asic9->port_ab_r().set(FUNC(siena_state::kbd_r));
 	m_asic9->buz_cb().set(m_speaker, FUNC(speaker_sound_device::level_w));
@@ -217,12 +223,21 @@ void siena_state::siena(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00); // Piezo buzzer
 
 	RAM(config, m_ram).set_default_size("512K").set_extra_options("1M");
+	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
-	// TODO: unknown Temic device, likely provides RS232/Parallel to Honda port
+	PSION_CONDOR(config, m_condor);
+	m_condor->txd_handler().set(m_honda, FUNC(psion_honda_slot_device::write_txd));
+	m_condor->rts_handler().set(m_honda, FUNC(psion_honda_slot_device::write_rts));
+	m_condor->dtr_handler().set(m_honda, FUNC(psion_honda_slot_device::write_dtr));
+	m_condor->int_handler().set(m_asic9, FUNC(psion_asic9_device::eint1_w));
 
 	// Honda expansion port
 	PSION_HONDA_SLOT(config, m_honda, psion_honda_devices, "ssd");
-	m_honda->int_cb().set(m_asic9, FUNC(psion_asic9_device::medchng_w)); // TODO: verify interrupt line
+	m_honda->rxd_handler().set(m_condor, FUNC(psion_condor_device::write_rxd));
+	m_honda->dcd_handler().set(m_condor, FUNC(psion_condor_device::write_dcd));
+	m_honda->dsr_handler().set(m_condor, FUNC(psion_condor_device::write_dsr));
+	m_honda->cts_handler().set(m_condor, FUNC(psion_condor_device::write_cts));
+	m_honda->sdoe_handler().set(m_asic9, FUNC(psion_asic9_device::medchng_w));
 	m_asic9->data_r<4>().set(m_honda, FUNC(psion_honda_slot_device::data_r));
 	m_asic9->data_w<4>().set(m_honda, FUNC(psion_honda_slot_device::data_w));
 
@@ -240,4 +255,4 @@ ROM_END
 
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT    CLASS          INIT         COMPANY   FULLNAME        FLAGS
-COMP( 1996, siena,    0,      0,      siena,    siena,   siena_state,   empty_init,  "Psion",  "Siena",        MACHINE_NOT_WORKING )
+COMP( 1996, siena,    0,      0,      siena,    siena,   siena_state,   empty_init,  "Psion",  "Siena",        MACHINE_SUPPORTS_SAVE )

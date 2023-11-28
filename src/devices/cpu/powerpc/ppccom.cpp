@@ -876,15 +876,15 @@ void ppc_device::device_start()
 	for (int regnum = 0; regnum < 32; regnum++)
 	{
 		char buf[10];
-		sprintf(buf, "r%d", regnum);
+		snprintf(buf, 10, "r%d", regnum);
 		m_drcuml->symbol_add(&m_core->r[regnum], sizeof(m_core->r[regnum]), buf);
-		sprintf(buf, "fpr%d", regnum);
+		snprintf(buf, 10, "fpr%d", regnum);
 		m_drcuml->symbol_add(&m_core->f[regnum], sizeof(m_core->f[regnum]), buf);
 	}
 	for (int regnum = 0; regnum < 8; regnum++)
 	{
 		char buf[10];
-		sprintf(buf, "cr%d", regnum);
+		snprintf(buf, 10, "cr%d", regnum);
 		m_drcuml->symbol_add(&m_core->cr[regnum], sizeof(m_core->cr[regnum]), buf);
 	}
 	m_drcuml->symbol_add(&m_core->xerso, sizeof(m_core->xerso), "xerso");

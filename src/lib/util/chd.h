@@ -19,6 +19,8 @@
 #include "osdcore.h"
 
 #include <atomic>
+#include <functional>
+#include <memory>
 #include <string>
 #include <string_view>
 #include <system_error>
@@ -292,22 +294,25 @@ public:
 		COMPRESSING
 	};
 
+	using open_parent_func = std::function<std::unique_ptr<chd_file> (util::sha1_t const &)>;
+
 	// construction/destruction
 	chd_file();
 	virtual ~chd_file();
 
 	// getters
 	util::random_read &file();
-	bool opened() const { return bool(m_file); }
-	uint32_t version() const { return m_version; }
-	uint64_t logical_bytes() const { return m_logicalbytes; }
-	uint32_t hunk_bytes() const { return m_hunkbytes; }
-	uint32_t hunk_count() const { return m_hunkcount; }
-	uint32_t unit_bytes() const { return m_unitbytes; }
-	uint64_t unit_count() const { return m_unitcount; }
+	bool opened() const noexcept { return bool(m_file); }
+	uint32_t version() const noexcept { return m_version; }
+	uint64_t logical_bytes() const noexcept { return m_logicalbytes; }
+	uint32_t hunk_bytes() const noexcept { return m_hunkbytes; }
+	uint32_t hunk_count() const noexcept { return m_hunkcount; }
+	uint32_t unit_bytes() const noexcept { return m_unitbytes; }
+	uint64_t unit_count() const noexcept { return m_unitcount; }
 	bool compressed() const { return (m_compression[0] != CHD_CODEC_NONE); }
-	chd_codec_type compression(int index) const { return m_compression[index]; }
-	chd_file *parent() const { return m_parent; }
+	chd_codec_type compression(int index) const noexcept { return m_compression[index]; }
+	chd_file *parent() const noexcept { return m_parent.get(); }
+	bool parent_missing() const noexcept;
 	util::sha1_t sha1();
 	util::sha1_t raw_sha1();
 	util::sha1_t parent_sha1();
@@ -324,8 +329,8 @@ public:
 	std::error_condition create(util::random_read_write::ptr &&file, uint64_t logicalbytes, uint32_t hunkbytes, chd_codec_type compression[4], chd_file &parent);
 
 	// file open
-	std::error_condition open(std::string_view filename, bool writeable = false, chd_file *parent = nullptr);
-	std::error_condition open(util::random_read_write::ptr &&file, bool writeable = false, chd_file *parent = nullptr);
+	std::error_condition open(std::string_view filename, bool writeable = false, chd_file *parent = nullptr, const open_parent_func &open_parent = nullptr);
+	std::error_condition open(util::random_read_write::ptr &&file, bool writeable = false, chd_file *parent = nullptr, const open_parent_func &open_parent = nullptr);
 
 	// file close
 	void close();
@@ -367,8 +372,6 @@ private:
 	struct metadata_hash;
 
 	// inline helpers
-	uint64_t be_read(const uint8_t *base, int numbytes) const;
-	void be_write(uint8_t *base, uint64_t value, int numbytes);
 	util::sha1_t be_read_sha1(const uint8_t *base) const;
 	void be_write_sha1(uint8_t *base, util::sha1_t value);
 	void file_read(uint64_t offset, void *dest, uint32_t length) const;
@@ -384,7 +387,7 @@ private:
 	std::error_condition compress_v5_map();
 	void decompress_v5_map();
 	std::error_condition create_common();
-	std::error_condition open_common(bool writeable);
+	std::error_condition open_common(bool writeable, const open_parent_func &open_parent);
 	void create_open_common();
 	void verify_proper_compression_append(uint32_t hunknum);
 	void hunk_write_compressed(uint32_t hunknum, int8_t compression, const uint8_t *compressed, uint32_t complength, util::crc16_t crc16);
@@ -410,7 +413,7 @@ private:
 	uint32_t                m_unitbytes;        // size of each unit in bytes
 	uint64_t                m_unitcount;        // number of units represented
 	chd_codec_type          m_compression[4];   // array of compression types used
-	chd_file *              m_parent;           // pointer to parent file, or nullptr if none
+	std::shared_ptr<chd_file> m_parent;           // pointer to parent file, or nullptr if none
 	bool                    m_parent_missing;   // are we missing our parent?
 
 	// key offsets within the header

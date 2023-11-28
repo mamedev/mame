@@ -138,7 +138,7 @@ private:
 	uint8_t irq_vector_r();
 	void unk_w(uint8_t data);
 	uint8_t frame_number_r();
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 
 	uint8_t timer_r();
 	uint16_t version_r();
@@ -586,7 +586,7 @@ void igt_gameking_state::machine_reset()
 	m_quart1->ip2_w(1); // needs to be high
 }
 
-WRITE_LINE_MEMBER(igt_gameking_state::vblank_irq)
+void igt_gameking_state::vblank_irq(int state)
 {
 	if (state && BIT(m_irq_enable, 3))
 	{
@@ -695,6 +695,26 @@ ROM_START( ms72c )
 
 	ROM_REGION( 0x20000, "nvram", 0 )
 	ROM_LOAD( "nvram",        0x000000, 0x020000, CRC(b5e42dbc) SHA1(f6afadb6877bca2cef40725b001c7918f9c99359) )
+ROM_END
+
+ROM_START( bmoonii )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "base-2b5146ax.u8", 0x00000, 0x80000, CRC(a56e625f) SHA1(f58714dad1788a28acfa0e315730516dc91d60ae) )
+
+	ROM_REGION32_LE( 0x200000, "game", 0 )
+	ROM_LOAD16_BYTE( "gme1-ca5017ax.u21", 0x000000, 0x100000, CRC(bab3994f) SHA1(4ec2cbe92e2f2019970d6bb7fa9fbd767b3001b2) )
+	ROM_LOAD16_BYTE( "gme2-ca5017ax.u5",  0x000001, 0x100000, CRC(f1898f14) SHA1(9bcd4ebe09d6f982cb12dc9a6d070cd1195e3320) )
+
+	ROM_REGION( 0x80000, "cg", 0 )
+	ROM_LOAD16_BYTE( "cg1-265069ax.u48", 0x000000, 0x40000, CRC(75188c21) SHA1(5e2ff760d68e66369d164c66a97e0fa4edeba101) ) // 1xxxxxxxxxxxxxxxxx = 0x00
+	ROM_LOAD16_BYTE( "cg2-265069ax.u47", 0x000001, 0x40000, CRC(cab7ef14) SHA1(5f904230f41ebf40c138c3d58d4dcf80e631b500) ) // 1xxxxxxxxxxxxxxxxx = 0x00
+
+	ROM_REGION32_LE( 0x200000, "plx", 0 )
+	ROM_LOAD16_BYTE( "px1-265069ax.u20", 0x000000, 0x080000, CRC(5a5191f4) SHA1(fafc1587b3186f5ecc4cb04529f0fa5d05c3a306) )
+	ROM_LOAD16_BYTE( "px2-265069ax.u4",  0x000001, 0x080000, CRC(65d51a0f) SHA1(487be168f94c815dd3e0a871f1b657795ecf0186) )
+
+	ROM_REGION32_LE( 0x200000, "snd", 0 )
+	ROM_LOAD( "sound-1h5025ax.u6", 0x000000, 0x080000, CRC(2502d6f6) SHA1(efe1177a6c02778df8ed62e52d1083c105ebe2ce) )
 ROM_END
 
 ROM_START( gkigt4 )
@@ -909,6 +929,7 @@ ROM_END
 
 GAME( 1994, ms3,       0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Multistar 3",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 1994, ms72c,     0,      igt_ms72c,    igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Multistar 7 2c",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1998, bmoonii,   0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Blue Moon II",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2003, gkigt4,    0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (v4.x)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2003, gkigt4ms,  gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (v4.x, MS)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2003, gkigt43,   gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (v4.3)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

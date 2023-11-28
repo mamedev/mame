@@ -122,7 +122,8 @@ protected:
 	required_device<acia6850_device> m_acia;
 
 	void sh_bankswitch_w(uint8_t data);
-	uint8_t command_pending_r();
+	uint8_t soundlatch_pending_r();
+	void soundlatch_pending_w(int state);
 	void rozvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void fgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void fgscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -467,10 +468,19 @@ void f1gp_state::sh_bankswitch_w(uint8_t data)
 	m_z80bank->set_entry(data & 0x01);
 }
 
-
-uint8_t f1gp_state::command_pending_r()
+uint8_t f1gp_state::soundlatch_pending_r()
 {
 	return (m_soundlatch->pending_r() ? 0xff : 0);
+}
+
+void f1gp_state::soundlatch_pending_w(int state)
+{
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
+
+	// sound comms is 2-way (see soundlatch_pending_r),
+	// NMI routine is very short, so briefly set perfect_quantum to make sure that the timing is right
+	if (state)
+		machine().scheduler().perfect_quantum(attotime::from_usec(100));
 }
 
 
@@ -495,7 +505,7 @@ void f1gp_state::f1gp_cpu1_map(address_map &map)
 	map(0xfff004, 0xfff005).portr("DSW1");
 	map(0xfff002, 0xfff005).w(FUNC(f1gp_state::fgscroll_w));
 	map(0xfff006, 0xfff007).portr("DSW2");
-	map(0xfff009, 0xfff009).r(FUNC(f1gp_state::command_pending_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
+	map(0xfff009, 0xfff009).r(FUNC(f1gp_state::soundlatch_pending_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
 	map(0xfff020, 0xfff023).w("gga", FUNC(vsystem_gga_device::write)).umask16(0x00ff);
 	map(0xfff040, 0xfff05f).w(m_k053936, FUNC(k053936_device::ctrl_w));
 	map(0xfff050, 0xfff051).portr("DSW3");
@@ -518,7 +528,7 @@ void f1gp2_state::f1gp2_cpu1_map(address_map &map)
 	map(0xfff002, 0xfff003).portr("WHEEL");
 	map(0xfff004, 0xfff005).portr("DSW1");
 	map(0xfff006, 0xfff007).portr("DSW2");
-	map(0xfff009, 0xfff009).r(FUNC(f1gp2_state::command_pending_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
+	map(0xfff009, 0xfff009).r(FUNC(f1gp2_state::soundlatch_pending_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
 	map(0xfff00a, 0xfff00b).portr("DSW3");
 	map(0xfff020, 0xfff03f).w(m_k053936, FUNC(k053936_device::ctrl_w));
 	map(0xfff044, 0xfff047).w(FUNC(f1gp2_state::fgscroll_w));
@@ -844,7 +854,7 @@ void f1gp_state::f1gp(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_soundlatch->data_pending_callback().set(FUNC(f1gp_state::soundlatch_pending_w));
 	m_soundlatch->set_separate_acknowledge(true);
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(8'000'000)));

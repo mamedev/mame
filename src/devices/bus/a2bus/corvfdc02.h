@@ -16,7 +16,6 @@
 #include "a2bus.h"
 #include "imagedev/floppy.h"
 #include "machine/upd765.h"
-#include "formats/imd_dsk.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -52,8 +51,8 @@ protected:
 	required_device<floppy_connector> m_con4;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(drq_w);
+	void intrq_w(int state);
+	void drq_w(int state);
 
 	static void corv_floppy_formats(format_registration &fr);
 

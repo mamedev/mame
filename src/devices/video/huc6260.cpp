@@ -51,14 +51,14 @@ void huc6260_device::palette_init()
 DEFINE_DEVICE_TYPE(HUC6260, huc6260_device, "huc6260", "Hudson HuC6260 VCE")
 
 
-huc6260_device::huc6260_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	:   device_t(mconfig, HUC6260, tag, owner, clock),
-		device_palette_interface(mconfig, *this),
-		device_video_interface(mconfig, *this),
-		m_next_pixel_data_cb(*this),
-		m_time_til_next_event_cb(*this),
-		m_vsync_changed_cb(*this),
-		m_hsync_changed_cb(*this)
+huc6260_device::huc6260_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, HUC6260, tag, owner, clock),
+	device_palette_interface(mconfig, *this),
+	device_video_interface(mconfig, *this),
+	m_next_pixel_data_cb(*this, 0),
+	m_time_til_next_event_cb(*this, 1),
+	m_vsync_changed_cb(*this),
+	m_hsync_changed_cb(*this)
 {
 }
 
@@ -257,17 +257,9 @@ void huc6260_device::device_start()
 	m_timer = timer_alloc(FUNC(huc6260_device::update_events), this);
 	m_bmp = std::make_unique<bitmap_ind16>(WPF, LPF);
 
-	/* Resolve callbacks */
-	m_hsync_changed_cb.resolve();
-	m_vsync_changed_cb.resolve();
-	m_next_pixel_data_cb.resolve();
-	m_time_til_next_event_cb.resolve();
-
 	/* We want to have a valid screen and valid callbacks */
-	assert( ! m_hsync_changed_cb.isnull() );
-	assert( ! m_vsync_changed_cb.isnull() );
-	assert( ! m_next_pixel_data_cb.isnull() );
-	assert( ! m_time_til_next_event_cb.isnull() );
+	assert(!m_next_pixel_data_cb.isunset());
+	assert(!m_time_til_next_event_cb.isunset());
 
 	palette_init();
 

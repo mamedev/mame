@@ -46,7 +46,7 @@ spectrum_expansion_slot_device::spectrum_expansion_slot_device(const machine_con
 	m_card(nullptr),
 	m_irq_handler(*this),
 	m_nmi_handler(*this),
-	m_fb_r_handler(*this)
+	m_fb_r_handler(*this, 0xff)
 {
 }
 
@@ -58,18 +58,13 @@ spectrum_expansion_slot_device::spectrum_expansion_slot_device(const machine_con
 void spectrum_expansion_slot_device::device_start()
 {
 	m_card = get_card_device();
-
-	// resolve callbacks
-	m_irq_handler.resolve_safe();
-	m_nmi_handler.resolve_safe();
-	m_fb_r_handler.resolve_safe(0xff);
 }
 
 //-------------------------------------------------
 //  romcs
 //-------------------------------------------------
 
-READ_LINE_MEMBER(spectrum_expansion_slot_device::romcs)
+int spectrum_expansion_slot_device::romcs()
 {
 	if (m_card)
 		return m_card->romcs();

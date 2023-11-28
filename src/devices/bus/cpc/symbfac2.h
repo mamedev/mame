@@ -27,8 +27,6 @@ public:
 	void ide_cs0_w(offs_t offset, uint8_t data);
 	uint8_t ide_cs1_r(offs_t offset);
 	void ide_cs1_w(offs_t offset, uint8_t data);
-	uint8_t rtc_r(offs_t offset);
-	void rtc_w(offs_t offset, uint8_t data);
 	uint8_t mouse_r();
 	uint8_t rom_rewrite_r();
 	void rom_rewrite_w(uint8_t data);

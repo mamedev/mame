@@ -321,7 +321,7 @@
 #include "windy2.h"
 
 #include "bus/ata/ataintf.h"
-#include "bus/ata/idehd.h"
+#include "bus/ata/hdd.h"
 #include "cpu/powerpc/ppc.h"
 #include "machine/lpci.h"
 #include "machine/timekpr.h"
@@ -579,7 +579,7 @@ public:
 
 	void sub_jvs_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
+	void ide_interrupt(int state);
 
 	std::unique_ptr<cobra_renderer> m_renderer;
 
@@ -2891,7 +2891,7 @@ void cobra_state::cobra_gfx_map(address_map &map)
 INPUT_PORTS_START( cobra )
 INPUT_PORTS_END
 
-WRITE_LINE_MEMBER(cobra_state::ide_interrupt)
+void cobra_state::ide_interrupt(int state)
 {
 	if (state == CLEAR_LINE)
 	{

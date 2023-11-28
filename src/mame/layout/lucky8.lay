@@ -1,6 +1,13 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+copyright-holders: Roberto Fresca
+
+**********************************************
+
+  Lucky 8 Lines control panel.
+
+**********************************************
 -->
 <mamelayout version="2">
 
@@ -84,31 +91,28 @@ license:CC0-1.0
 	</element>
 
 
-	<element name="cpanel" />
-
-	<element name="cpanel1">
-		<rect><color red="0.20" green="0.20" blue="0.20" /></rect>
+	<element name="cpanel">
+		<rect><color red="0.0" green="0.0" blue="0.0" /></rect>
 	</element>
 
-	<element name="cpanel2">
+	<element name="cpanel1">
 		<rect><color red="0.15" green="0.15" blue="0.15" /></rect>
 	</element>
 
-	<element name="cpanel3">
+	<element name="cpanel2">
 		<rect><color red="0.10" green="0.10" blue="0.10" /></rect>
 	</element>
 
-	<element name="cpanel4">
+	<element name="cpanel3">
 		<rect><color red="0.05" green="0.05" blue="0.05" /></rect>
 	</element>
 
 	<group name="p1lamps">
 		<element ref="cpanel"><bounds left="0" right="4" top="0" bottom="0.40" /></element>
 
-		<element ref="cpanel1"><bounds left="0" right="4" top="0.01" bottom="0.39" /></element>
-		<element ref="cpanel2"><bounds left="0" right="4" top="0.02" bottom="0.38" /></element>
-		<element ref="cpanel3"><bounds left="0" right="4" top="0.03" bottom="0.37" /></element>
-		<element ref="cpanel4"><bounds left="0" right="4" top="0.04" bottom="0.36" /></element>
+		<element ref="cpanel1"><bounds left="0" right="4" top="0.02" bottom="0.38" /></element>
+		<element ref="cpanel2"><bounds left="0" right="4" top="0.03" bottom="0.37" /></element>
+		<element ref="cpanel3"><bounds left="0" right="4" top="0.04" bottom="0.36" /></element>
 		<element ref="cpanel"><bounds left="0" right="4" top="0.05" bottom="0.35" /></element>
 
 
@@ -158,10 +162,9 @@ license:CC0-1.0
 	<group name="p2lamps">
 		<element ref="cpanel"><bounds left="0" right="4" top="0" bottom="0.40" /></element>
 
-		<element ref="cpanel1"><bounds left="0" right="4" top="0.01" bottom="0.39" /></element>
-		<element ref="cpanel2"><bounds left="0" right="4" top="0.02" bottom="0.38" /></element>
-		<element ref="cpanel3"><bounds left="0" right="4" top="0.03" bottom="0.37" /></element>
-		<element ref="cpanel4"><bounds left="0" right="4" top="0.04" bottom="0.36" /></element>
+		<element ref="cpanel1"><bounds left="0" right="4" top="0.02" bottom="0.38" /></element>
+		<element ref="cpanel2"><bounds left="0" right="4" top="0.03" bottom="0.37" /></element>
+		<element ref="cpanel3"><bounds left="0" right="4" top="0.04" bottom="0.36" /></element>
 		<element ref="cpanel"><bounds left="0" right="4" top="0.05" bottom="0.35" /></element>
 
 

@@ -31427,7 +31427,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="toystory" supported="no">
+	<software name="toystory">
 		<description>Toy Story (Europe)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
@@ -31870,7 +31870,7 @@ Alternate board (XL-1)
 	</software>
 <!-- wip-v -->
 	<software name="valdiser">
-		<description>Val d'Isere Championship (Europe)</description>
+		<description>Val d'Isère Championship (Europe)</description>
 		<year>1994</year>
 		<publisher>Mindscape</publisher>
 		<info name="serial" value="SNSP-8Z-EUR" />
@@ -31889,7 +31889,7 @@ Alternate board (XL-1)
 	</software>
 
 	<software name="valdiserf" cloneof="valdiser">
-		<description>Val d'Isere Championship (France)</description>
+		<description>Val d'Isère Championship (France)</description>
 		<year>1994</year>
 		<publisher>Mindscape</publisher>
 		<info name="serial" value="SNSP-8V-FAH" />
@@ -64521,7 +64521,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="valdiserfp" cloneof="valdiser">
-		<description>Val d'Isere Championship (France, prototype 19931027)</description>
+		<description>Val d'Isère Championship (France, prototype 19931027)</description>
 		<year>1994</year>
 		<publisher>Mindscape</publisher>
 		<part name="cart" interface="snes_cart">

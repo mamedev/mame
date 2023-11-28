@@ -18,8 +18,8 @@ x68k_crtc_device::x68k_crtc_device(const machine_config &mconfig, device_type ty
 	, m_vdisp_callback(*this)
 	, m_rint_callback(*this)
 	, m_hsync_callback(*this)
-	, m_tvram_read_callback(*this)
-	, m_gvram_read_callback(*this)
+	, m_tvram_read_callback(*this, 0)
+	, m_gvram_read_callback(*this, 0)
 	, m_tvram_write_callback(*this)
 	, m_gvram_write_callback(*this)
 	, m_clock_69m(0)
@@ -53,17 +53,6 @@ vinas_device::vinas_device(const machine_config &mconfig, const char *tag, devic
 vicon_device::vicon_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: x68k_crtc_device(mconfig, VICON, tag, owner, clock)
 {
-}
-
-void x68k_crtc_device::device_resolve_objects()
-{
-	m_vdisp_callback.resolve_safe();
-	m_rint_callback.resolve_safe();
-	m_hsync_callback.resolve_safe();
-	m_tvram_read_callback.resolve_safe(0);
-	m_gvram_read_callback.resolve_safe(0);
-	m_tvram_write_callback.resolve_safe();
-	m_gvram_write_callback.resolve_safe();
 }
 
 void x68k_crtc_device::device_start()
@@ -187,7 +176,7 @@ void x68k_crtc_device::refresh_mode()
 
 //  LOG("CRTC regs - %i %i %i %i  - %i %i %i %i - %i - %i\n", m_reg[0], m_reg[1], m_reg[2], m_reg[3],
 //      m_reg[4], m_reg[5], m_reg[6], m_reg[7], m_reg[8], m_reg[9]);
-	int div;
+	double div;
 	switch (m_reg[20] & 0x1f)
 	{
 		case 0:
@@ -208,6 +197,9 @@ void x68k_crtc_device::refresh_mode()
 			break;
 		case 0x15:
 			div = 3;
+			break;
+		case 0x19:
+			div = 1.5;
 			break;
 	}
 	attotime refresh = attotime::from_hz((BIT(m_reg[20], 4) ? clock_69m() : clock_39m()) / div) * (scr.max_x * scr.max_y);
@@ -420,54 +412,54 @@ void x68k_crtc_device::crtc_w(offs_t offset, u16 data, u16 mem_mask)
 		break;
 	case 576:  // operation register
 		m_operation = data & ~2;
-		if (data & 0x02)  // high-speed graphic screen clear
+		if ((data & 0x02) && (m_reg[21] & 0xf))  // high-speed graphic screen clear
 		{
 			// this is based on the docs except for the higher color depth modes which isn't
 			// explicitly described this way but is likely based on how the plane scroll works
 			// XXX: not sufficiently tested especially in hires modes
+			// it seems that it only uses the 0 page scroll registers for where to clear see atomrobo
+			uint16_t xscr = xscr_gfx(0) & 0x1ff;
+			uint16_t yscr = yscr_gfx(0) & 0x1ff;
+			uint16_t mask = 0;
 			for (int page = 0; page < 4; page++)
 			{
 				if (!(m_reg[21] & (1 << page)))
-					continue;
-				uint16_t xscr = xscr_gfx(page) & 0x1ff;
-				uint16_t yscr = yscr_gfx(page) & 0x1ff;
-				uint16_t mask = ~(0xf << (page * 4));
-				for (int y = yscr; y < (m_height + yscr); y++)
+					mask |= (0xf << (page * 4));
+			}
+			for (int y = yscr; y < (m_height + yscr); y++)
+			{
+				if (is_1024x1024())
 				{
-					if (is_1024x1024())
+					if (m_width > 256)
 					{
-						if (m_width > 256)
-						{
-							for (int x = 0; x < 512; x++)
-							{
-								uint16_t data = m_gvram_read_callback(((y * 512) + x) & 0x3ffff, 0xffff);
-								m_gvram_write_callback(((y * 512) + x) & 0x3ffff, data & mask, 0xffff);
-							}
-						}
-						else
-						{
-							for (int x = 0; x < 256; x++)
-							{
-								uint16_t data = m_gvram_read_callback(((y * 512) + x + xscr) & 0x3ffff, 0xffff);
-								m_gvram_write_callback(((y * 512) + x + xscr) & 0x3ffff, data & mask, 0xffff);
-								data = m_gvram_read_callback(((y * 512) + x + xscr + 256) & 0x3ffff, 0xffff);
-								m_gvram_write_callback(((y * 512) + x + xscr + 256) & 0x3ffff, data & mask, mask);
-							}
-						}
-					}
-					else
-					{
-						for (int x = 0; x < m_width; x++)
+						for (int x = 0; x < 512; x++)
 						{
 							uint16_t data = m_gvram_read_callback(((y * 512) + x) & 0x3ffff, 0xffff);
 							m_gvram_write_callback(((y * 512) + x) & 0x3ffff, data & mask, 0xffff);
 						}
 					}
+					else
+					{
+						for (int x = 0; x < 256; x++)
+						{
+							uint16_t data = m_gvram_read_callback(((y * 512) + x + xscr) & 0x3ffff, 0xffff);
+							m_gvram_write_callback(((y * 512) + x + xscr) & 0x3ffff, data & mask, 0xffff);
+							data = m_gvram_read_callback(((y * 512) + x + xscr + 256) & 0x3ffff, 0xffff);
+							m_gvram_write_callback(((y * 512) + x + xscr + 256) & 0x3ffff, data & mask, mask);
+						}
+					}
 				}
-
+				else
+				{
+					for (int x = 0; x < m_width; x++)
+					{
+						uint16_t data = m_gvram_read_callback(((y * 512) + x + xscr) & 0x3ffff, 0xffff);
+						m_gvram_write_callback(((y * 512) + x + xscr) & 0x3ffff, data & mask, 0xffff);
+					}
+				}
 			}
-			m_operation_end_timer->adjust(attotime::from_msec(5), 0x02);  // time taken to do operation is a complete guess.
 		}
+		if (data & 0x02) m_operation_end_timer->adjust(attotime::from_msec(5), 0x02);  // time taken to do operation is a complete guess.
 		break;
 	}
 //  LOG("%s CRTC: Wrote %04x to CRTC register %i\n",machine().describe_context(), data, offset);

@@ -415,7 +415,6 @@ Notes: (all ICs shown)
 #include "sound/cdda.h"
 #include "video/psx.h"
 
-#include "romload.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -457,7 +456,7 @@ public:
 	void send_packet(uint8_t *data, int length);
 	int received_packet(uint8_t *buffer);
 
-	DECLARE_READ_LINE_MEMBER( jvs_sense_r );
+	int jvs_sense_r();
 
 private:
 	int output_buffer_size = 0;
@@ -471,7 +470,7 @@ sys573_jvs_host::sys573_jvs_host(const machine_config &mconfig, const char *tag,
 	output_buffer_size = 0;
 }
 
-READ_LINE_MEMBER( sys573_jvs_host::jvs_sense_r )
+int sys573_jvs_host::jvs_sense_r()
 {
 	return !get_address_set_line();
 }
@@ -612,45 +611,45 @@ public:
 	void init_hyperbbc();
 	void init_drmn();
 
-	DECLARE_READ_LINE_MEMBER( gunmania_tank_shutter_sensor );
-	DECLARE_READ_LINE_MEMBER( gunmania_cable_holder_sensor );
+	int gunmania_tank_shutter_sensor();
+	int gunmania_cable_holder_sensor();
 
-	DECLARE_READ_LINE_MEMBER( h8_d0_r );
-	DECLARE_READ_LINE_MEMBER( h8_d1_r );
-	DECLARE_READ_LINE_MEMBER( h8_d2_r );
-	DECLARE_READ_LINE_MEMBER( h8_d3_r );
+	int h8_d0_r();
+	int h8_d1_r();
+	int h8_d2_r();
+	int h8_d3_r();
 
-	template<int N> DECLARE_READ_LINE_MEMBER( pccard_cd_r );
+	template<int N> int pccard_cd_r();
 
-	DECLARE_WRITE_LINE_MEMBER( gtrfrks_lamps_b7 );
-	DECLARE_WRITE_LINE_MEMBER( gtrfrks_lamps_b6 );
-	DECLARE_WRITE_LINE_MEMBER( gtrfrks_lamps_b5 );
-	DECLARE_WRITE_LINE_MEMBER( gtrfrks_lamps_b4 );
-	DECLARE_WRITE_LINE_MEMBER( dmx_lamps_b0 );
-	DECLARE_WRITE_LINE_MEMBER( dmx_lamps_b1 );
-	DECLARE_WRITE_LINE_MEMBER( dmx_lamps_b2 );
-	DECLARE_WRITE_LINE_MEMBER( dmx_lamps_b3 );
-	DECLARE_WRITE_LINE_MEMBER( dmx_lamps_b4 );
-	DECLARE_WRITE_LINE_MEMBER( dmx_lamps_b5 );
-	DECLARE_WRITE_LINE_MEMBER( mamboagg_lamps_b3 );
-	DECLARE_WRITE_LINE_MEMBER( mamboagg_lamps_b4 );
-	DECLARE_WRITE_LINE_MEMBER( mamboagg_lamps_b5 );
-	DECLARE_WRITE_LINE_MEMBER( serial_lamp_reset );
-	DECLARE_WRITE_LINE_MEMBER( serial_lamp_data );
-	DECLARE_WRITE_LINE_MEMBER( stepchmp_lamp_clock );
-	DECLARE_WRITE_LINE_MEMBER( animechmp_lamp_clock );
-	DECLARE_WRITE_LINE_MEMBER( salarymc_lamp_clock );
-	DECLARE_WRITE_LINE_MEMBER( hyperbbc_lamp_red );
-	DECLARE_WRITE_LINE_MEMBER( hyperbbc_lamp_green );
-	DECLARE_WRITE_LINE_MEMBER( hyperbbc_lamp_blue );
-	DECLARE_WRITE_LINE_MEMBER( hyperbbc_lamp_start );
-	DECLARE_WRITE_LINE_MEMBER( hyperbbc_lamp_strobe1 );
-	DECLARE_WRITE_LINE_MEMBER( hyperbbc_lamp_strobe2 );
-	DECLARE_WRITE_LINE_MEMBER( hyperbbc_lamp_strobe3 );
+	void gtrfrks_lamps_b7(int state);
+	void gtrfrks_lamps_b6(int state);
+	void gtrfrks_lamps_b5(int state);
+	void gtrfrks_lamps_b4(int state);
+	void dmx_lamps_b0(int state);
+	void dmx_lamps_b1(int state);
+	void dmx_lamps_b2(int state);
+	void dmx_lamps_b3(int state);
+	void dmx_lamps_b4(int state);
+	void dmx_lamps_b5(int state);
+	void mamboagg_lamps_b3(int state);
+	void mamboagg_lamps_b4(int state);
+	void mamboagg_lamps_b5(int state);
+	void serial_lamp_reset(int state);
+	void serial_lamp_data(int state);
+	void stepchmp_lamp_clock(int state);
+	void animechmp_lamp_clock(int state);
+	void salarymc_lamp_clock(int state);
+	void hyperbbc_lamp_red(int state);
+	void hyperbbc_lamp_green(int state);
+	void hyperbbc_lamp_blue(int state);
+	void hyperbbc_lamp_start(int state);
+	void hyperbbc_lamp_strobe1(int state);
+	void hyperbbc_lamp_strobe2(int state);
+	void hyperbbc_lamp_strobe3(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( h8_clk_w );
+	void h8_clk_w(int state);
 
-	DECLARE_READ_LINE_MEMBER( jvs_rx_r );
+	int jvs_rx_r();
 
 protected:
 	using gx700pwfbf_output_delegate = delegate<void (offs_t, uint8_t)>;
@@ -690,7 +689,7 @@ private:
 	void gx700pwbk_io_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void gunmania_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t gunmania_r(offs_t offset, uint16_t mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER( ata_interrupt );
+	void ata_interrupt(int state);
 
 	TIMER_CALLBACK_MEMBER( atapi_xfer_end );
 	void ddrsolo_output_callback(offs_t offset, uint8_t data);
@@ -1039,7 +1038,7 @@ uint16_t ksys573_state::port_in2_jvs_r(offs_t offset, uint16_t mem_mask)
 	return data;
 }
 
-READ_LINE_MEMBER( ksys573_state::jvs_rx_r )
+int ksys573_state::jvs_rx_r()
 {
 	if (m_jvs_output_len_w <= 0) {
 		m_jvs_output_len_w = m_sys573_jvs_host->received_packet(m_jvs_output_buffer);
@@ -1088,7 +1087,7 @@ TIMER_CALLBACK_MEMBER( ksys573_state::atapi_xfer_end )
 	}
 }
 
-WRITE_LINE_MEMBER( ksys573_state::ata_interrupt )
+void ksys573_state::ata_interrupt(int state)
 {
 	m_psxirq->intin10( state );
 }
@@ -1137,7 +1136,7 @@ uint16_t ksys573_state::security_r(offs_t offset, uint16_t mem_mask)
 }
 
 template<int N>
-READ_LINE_MEMBER( ksys573_state::pccard_cd_r )
+int ksys573_state::pccard_cd_r()
 {
 	return m_pccard_cd[N];
 }
@@ -1176,7 +1175,7 @@ void ksys573_state::machine_reset()
 
 // H8 check at startup (JVS related)
 
-WRITE_LINE_MEMBER( ksys573_state::h8_clk_w )
+void ksys573_state::h8_clk_w(int state)
 {
 	if( m_h8_clk != state )
 	{
@@ -1192,22 +1191,22 @@ WRITE_LINE_MEMBER( ksys573_state::h8_clk_w )
 	}
 }
 
-READ_LINE_MEMBER( ksys573_state::h8_d0_r )
+int ksys573_state::h8_d0_r()
 {
 	return ( m_h8_response[ m_h8_index ] >> 0 ) & 1;
 }
 
-READ_LINE_MEMBER( ksys573_state::h8_d1_r )
+int ksys573_state::h8_d1_r()
 {
 	return ( m_h8_response[ m_h8_index ] >> 1 ) & 1;
 }
 
-READ_LINE_MEMBER( ksys573_state::h8_d2_r )
+int ksys573_state::h8_d2_r()
 {
 	return ( m_h8_response[ m_h8_index ] >> 2 ) & 1;
 }
 
-READ_LINE_MEMBER( ksys573_state::h8_d3_r )
+int ksys573_state::h8_d3_r()
 {
 	return ( m_h8_response[ m_h8_index ] >> 3 ) & 1;
 }
@@ -1590,22 +1589,22 @@ void ddr_state::init_ddr()
 
 /* Guitar freaks */
 
-WRITE_LINE_MEMBER( ksys573_state::gtrfrks_lamps_b7 )
+void ksys573_state::gtrfrks_lamps_b7(int state)
 {
 	output().set_value( "spot left", state );
 }
 
-WRITE_LINE_MEMBER( ksys573_state::gtrfrks_lamps_b6 )
+void ksys573_state::gtrfrks_lamps_b6(int state)
 {
 	output().set_value( "spot right", state );
 }
 
-WRITE_LINE_MEMBER( ksys573_state::gtrfrks_lamps_b5 )
+void ksys573_state::gtrfrks_lamps_b5(int state)
 {
 	m_lamps[0] = state ? 1 : 0; // start left
 }
 
-WRITE_LINE_MEMBER( ksys573_state::gtrfrks_lamps_b4 )
+void ksys573_state::gtrfrks_lamps_b4(int state)
 {
 	m_lamps[1] = state ? 1 : 0; // start right
 }
@@ -1856,38 +1855,38 @@ void ksys573_state::dmx_output_callback(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER( ksys573_state::dmx_lamps_b0 )
+void ksys573_state::dmx_lamps_b0(int state)
 {
 	output().set_value( "left 2p", state );
 }
 
-WRITE_LINE_MEMBER( ksys573_state::dmx_lamps_b1 )
+void ksys573_state::dmx_lamps_b1(int state)
 {
 	m_lamps[1] = state ? 1 : 0; // start 1p
 }
 
-WRITE_LINE_MEMBER( ksys573_state::dmx_lamps_b2 )
+void ksys573_state::dmx_lamps_b2(int state)
 {
 	output().set_value( "right 2p", state );
 }
 
-WRITE_LINE_MEMBER( ksys573_state::dmx_lamps_b3 )
+void ksys573_state::dmx_lamps_b3(int state)
 {
 	output().set_value( "left 1p", state );
 }
 
-WRITE_LINE_MEMBER( ksys573_state::dmx_lamps_b4 )
+void ksys573_state::dmx_lamps_b4(int state)
 {
 	m_lamps[0] = state ? 1 : 0; // start 2p
 }
 
-WRITE_LINE_MEMBER( ksys573_state::dmx_lamps_b5 )
+void ksys573_state::dmx_lamps_b5(int state)
 {
 	output().set_value( "right 1p", state );
 }
 
 /* step champ */
-WRITE_LINE_MEMBER( ksys573_state::stepchmp_lamp_clock )
+void ksys573_state::stepchmp_lamp_clock(int state)
 {
 	if( state && !m_serial_lamp_clock )
 	{
@@ -1924,7 +1923,7 @@ void ksys573_state::stepchmp_cassette_install(device_t* device)
 }
 
 /* anime champ */
-WRITE_LINE_MEMBER( ksys573_state::animechmp_lamp_clock )
+void ksys573_state::animechmp_lamp_clock(int state)
 {
 	if( state && !m_serial_lamp_clock )
 	{
@@ -1974,7 +1973,7 @@ void ksys573_state::animechmp_cassette_install(device_t *device)
 }
 
 /* salary man champ */
-WRITE_LINE_MEMBER( ksys573_state::serial_lamp_reset )
+void ksys573_state::serial_lamp_reset(int state)
 {
 	if( state )
 	{
@@ -1983,12 +1982,12 @@ WRITE_LINE_MEMBER( ksys573_state::serial_lamp_reset )
 	}
 }
 
-WRITE_LINE_MEMBER( ksys573_state::serial_lamp_data )
+void ksys573_state::serial_lamp_data(int state)
 {
 	m_serial_lamp_data = state;
 }
 
-WRITE_LINE_MEMBER( ksys573_state::salarymc_lamp_clock )
+void ksys573_state::salarymc_lamp_clock(int state)
 {
 	if( state && !m_serial_lamp_clock )
 	{
@@ -2044,27 +2043,27 @@ void ksys573_state::init_serlamp()
 
 /* Hyper Bishi Bashi Champ */
 
-WRITE_LINE_MEMBER( ksys573_state::hyperbbc_lamp_red )
+void ksys573_state::hyperbbc_lamp_red(int state)
 {
 	m_hyperbbc_lamp_red = state;
 }
 
-WRITE_LINE_MEMBER( ksys573_state::hyperbbc_lamp_green )
+void ksys573_state::hyperbbc_lamp_green(int state)
 {
 	m_hyperbbc_lamp_green = state;
 }
 
-WRITE_LINE_MEMBER( ksys573_state::hyperbbc_lamp_blue )
+void ksys573_state::hyperbbc_lamp_blue(int state)
 {
 	m_hyperbbc_lamp_blue = state;
 }
 
-WRITE_LINE_MEMBER( ksys573_state::hyperbbc_lamp_start )
+void ksys573_state::hyperbbc_lamp_start(int state)
 {
 	m_hyperbbc_lamp_start = state;
 }
 
-WRITE_LINE_MEMBER( ksys573_state::hyperbbc_lamp_strobe1 )
+void ksys573_state::hyperbbc_lamp_strobe1(int state)
 {
 	if( state && !m_hyperbbc_lamp_strobe1 )
 	{
@@ -2077,7 +2076,7 @@ WRITE_LINE_MEMBER( ksys573_state::hyperbbc_lamp_strobe1 )
 	m_hyperbbc_lamp_strobe1 = state;
 }
 
-WRITE_LINE_MEMBER( ksys573_state::hyperbbc_lamp_strobe2 )
+void ksys573_state::hyperbbc_lamp_strobe2(int state)
 {
 	if( state && !m_hyperbbc_lamp_strobe2 )
 	{
@@ -2090,7 +2089,7 @@ WRITE_LINE_MEMBER( ksys573_state::hyperbbc_lamp_strobe2 )
 	m_hyperbbc_lamp_strobe2 = state;
 }
 
-WRITE_LINE_MEMBER( ksys573_state::hyperbbc_lamp_strobe3 )
+void ksys573_state::hyperbbc_lamp_strobe3(int state)
 {
 	if( state && !m_hyperbbc_lamp_strobe3 )
 	{
@@ -2176,17 +2175,17 @@ void ksys573_state::mamboagg_output_callback(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER( ksys573_state::mamboagg_lamps_b3 )
+void ksys573_state::mamboagg_lamps_b3(int state)
 {
 	m_lamps[0] = state ? 1 : 0; // start 1p
 }
 
-WRITE_LINE_MEMBER( ksys573_state::mamboagg_lamps_b4 )
+void ksys573_state::mamboagg_lamps_b4(int state)
 {
 	output().set_value( "select right", state );
 }
 
-WRITE_LINE_MEMBER( ksys573_state::mamboagg_lamps_b5 )
+void ksys573_state::mamboagg_lamps_b5(int state)
 {
 	output().set_value( "select left", state );
 }
@@ -2382,7 +2381,7 @@ void ksys573_state::gunmania_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	LOGIOBOARD( "gunmania_w %08x %08x %08x\n", offset, mem_mask, data );
 }
 
-READ_LINE_MEMBER( ksys573_state::gunmania_tank_shutter_sensor )
+int ksys573_state::gunmania_tank_shutter_sensor()
 {
 	if( m_tank_shutter_position == 0 )
 	{
@@ -2392,7 +2391,7 @@ READ_LINE_MEMBER( ksys573_state::gunmania_tank_shutter_sensor )
 	return 0;
 }
 
-READ_LINE_MEMBER( ksys573_state::gunmania_cable_holder_sensor )
+int ksys573_state::gunmania_cable_holder_sensor()
 {
 	return m_cable_holder_release;
 }
@@ -3818,31 +3817,34 @@ ROM_END
 ROM_START( ddrjb )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, "cassette:game:eeprom", 0 )
+	ROM_REGION( 0x0000224, "cassette:game:eeprom", 0 ) // game doesn't try reading at all. not needed?
 	ROM_LOAD( "gc845ja.u1",   0x000000, 0x000224, NO_DUMP )
 
 	ROM_REGION( 0x200000, "29f016a.31m", 0 ) /* onboard flash */
-	ROM_LOAD( "gc845jab.31m",  0x000000, 0x200000, NO_DUMP )
+	ROM_LOAD( "gc845jab.31m",  0x000000, 0x200000, CRC(7acbc2ef) SHA1(64cd25ee3060399bf072346e4e6383f77755188b) )
 	ROM_REGION( 0x200000, "29f016a.27m", 0 ) /* onboard flash */
-	ROM_LOAD( "gc845jab.27m",  0x000000, 0x200000, NO_DUMP )
+	ROM_LOAD( "gc845jab.27m",  0x000000, 0x200000, CRC(67608bb7) SHA1(42f0203342b913b6ff433bcaf6cf44a471294032) )
 	ROM_REGION( 0x200000, "29f016a.31l", 0 ) /* onboard flash */
-	ROM_LOAD( "gc845jab.31l",  0x000000, 0x200000, NO_DUMP )
+	ROM_LOAD( "gc845jab.31l",  0x000000, 0x200000, CRC(c15ad83c) SHA1(79b401ff58ed84a60647531f94852b70cd86aea0) )
 	ROM_REGION( 0x200000, "29f016a.27l", 0 ) /* onboard flash */
-	ROM_LOAD( "gc845jab.27l",  0x000000, 0x200000, NO_DUMP )
+	ROM_LOAD( "gc845jab.27l",  0x000000, 0x200000, CRC(4a712a01) SHA1(e9716c6750adff78bd6c85f406fa61ae2981a1c0) )
 	ROM_REGION( 0x200000, "29f016a.31j", 0 ) /* onboard flash */
-	ROM_LOAD( "gc845jab.31j",  0x000000, 0x200000, NO_DUMP )
+	ROM_LOAD( "gc845jab.31j",  0x000000, 0x200000, CRC(4fb5437e) SHA1(21a892d0c63fa146a89bcc0e83244549f55fe4fb) )
 	ROM_REGION( 0x200000, "29f016a.27j", 0 ) /* onboard flash */
-	ROM_LOAD( "gc845jab.27j",  0x000000, 0x200000, NO_DUMP )
+	ROM_LOAD( "gc845jab.27j",  0x000000, 0x200000, CRC(3b281fa3) SHA1(05cfa8d09d6da56e4438b6d19f9bbdb5c17b651b) )
 	ROM_REGION( 0x200000, "29f016a.31h", 0 ) /* onboard flash */
-	ROM_LOAD( "gc845jab.31h",  0x000000, 0x200000, NO_DUMP )
+	ROM_LOAD( "gc845jab.31h",  0x000000, 0x200000, CRC(724b373b) SHA1(157f879fc4f4d3f4021d40aa8e2fdd464fc2b0e3) )
 	ROM_REGION( 0x200000, "29f016a.27h", 0 ) /* onboard flash */
-	ROM_LOAD( "gc845jab.27h",  0x000000, 0x200000, NO_DUMP )
+	ROM_LOAD( "gc845jab.27h",  0x000000, 0x200000, CRC(43294c4b) SHA1(ebaa32495a50c78560eb4988587220ed535d0dc2) )
 
 	DISK_REGION( "runtime" )
-	DISK_IMAGE_READONLY( "845jab02", 0, SHA1(bac74acaffd9d00e4105e13f32492f5d0fc5a2e1) )
+	DISK_IMAGE_READONLY( "845jab02", 0, SHA1(bfaeff41ec0dac281fd40567309e0bb1c22354fa) )
 
 	DISK_REGION( "install" )
 	DISK_IMAGE_READONLY( "845jab01", 0, NO_DUMP ) // if this even exists
+
+	ROM_REGION( 0x002000, "m48t58", 0 ) // dummy file with required header to allow game to boot
+	ROM_LOAD( "gc845jab.22h",  0x000000, 0x002000, BAD_DUMP CRC(b20d341e) SHA1(ed423e2ec66924ac4fada83d70dda6be75e5e85c) )
 ROM_END
 
 ROM_START( ddra )
@@ -6333,7 +6335,7 @@ GAME( 1999, dstagea,   dstage,   ddr,        ddr,       ddr_state,     init_ddr,
 GAME( 1999, ddru,      dstage,   ddr,        ddr,       ddr_state,     init_ddr,      ROT0,  "Konami", "Dance Dance Revolution (GN845 VER. UAA)", MACHINE_IMPERFECT_SOUND )
 GAME( 1998, ddrj,      dstage,   ddr,        ddr,       ddr_state,     init_ddr,      ROT0,  "Konami", "Dance Dance Revolution - Internet Ranking Ver (GC845 VER. JBA)", MACHINE_IMPERFECT_SOUND )
 GAME( 1998, ddrja,     dstage,   ddr,        ddr,       ddr_state,     init_ddr,      ROT0,  "Konami", "Dance Dance Revolution (GC845 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1998, ddrjb,     dstage,   ddr,        ddr,       ddr_state,     init_ddr,      ROT0,  "Konami", "Dance Dance Revolution (GC845 VER. JAB)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1998, ddrjb,     dstage,   ddr,        ddr,       ddr_state,     init_ddr,      ROT0,  "Konami", "Dance Dance Revolution (GC845 VER. JAB)", MACHINE_IMPERFECT_SOUND )
 GAME( 1999, ddra,      dstage,   ddr,        ddr,       ddr_state,     init_ddr,      ROT0,  "Konami", "Dance Dance Revolution (GN845 VER. AAA)", MACHINE_IMPERFECT_SOUND )
 GAME( 1999, ddrkara,   sys573,   ddrk,       ddrkara,   ddr_state,     init_ddr,      ROT0,  "Konami", "Dance Dance Revolution Karaoke Mix (GQ921 VER. JBB)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1998, fbait2bc,  sys573,   fbaitbc,    fbaitbc,   ksys573_state, empty_init,    ROT0,  "Konami", "Fisherman's Bait 2 - A Bass Challenge (GE865 VER. UAB)", MACHINE_IMPERFECT_SOUND )

@@ -306,9 +306,6 @@ vc2_device::vc2_device(const machine_config &mconfig, const char *tag, device_t 
 
 void vc2_device::device_start()
 {
-	m_vert_int.resolve_safe();
-	m_screen_timing_changed.resolve_safe();
-
 	m_ram = std::make_unique<uint16_t[]>(RAM_SIZE);
 	m_vt_table = make_unique_clear<uint32_t[]>(2048 * 2048);
 
@@ -816,7 +813,7 @@ uint8_t vc2_device::get_cursor_pixel(int x, int y)
 	}
 }
 
-WRITE_LINE_MEMBER(vc2_device::vblank_w)
+void vc2_device::vblank_w(int state)
 {
 	if (state)
 	{
@@ -1092,7 +1089,7 @@ newport_base_device::newport_base_device(const machine_config &mconfig, device_t
 	, m_draw_flags_w(*this)
 	, m_set_address(*this)
 	, m_write_pixel(*this)
-	, m_read_pixel(*this)
+	, m_read_pixel(*this, 0)
 {
 }
 
@@ -1203,12 +1200,6 @@ void newport_base_device::device_start()
 	save_item(NAME(m_ramdac_lut_g));
 	save_item(NAME(m_ramdac_lut_b));
 	save_item(NAME(m_ramdac_lut_index));
-
-	m_write_mask_w.resolve_safe();
-	m_draw_flags_w.resolve_safe();
-	m_set_address.resolve_safe();
-	m_write_pixel.resolve_safe();
-	m_read_pixel.resolve_safe(0);
 }
 
 //-------------------------------------------------
@@ -1706,7 +1697,7 @@ void newport_base_device::ramdac_write(uint32_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(newport_base_device::vrint_w)
+void newport_base_device::vrint_w(int state)
 {
 	if (state)
 	{
@@ -1716,7 +1707,7 @@ WRITE_LINE_MEMBER(newport_base_device::vrint_w)
 }
 
 // TOOD: Figure out a better way of doing this
-WRITE_LINE_MEMBER(newport_base_device::update_screen_size)
+void newport_base_device::update_screen_size(int state)
 {
 	const int x_start = m_vc2->readout_x0();
 	const int y_start = m_vc2->readout_y0();

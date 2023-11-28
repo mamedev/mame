@@ -100,7 +100,7 @@ void a2_video_device::device_reset()
 	m_monochrome = 0; // TODO: never set, but if left uninitialized could cause the emulation to start in monochrome by accident. Default to color for now
 }
 
-WRITE_LINE_MEMBER(a2_video_device::txt_w)
+void a2_video_device::txt_w(int state)
 {
 	if (m_graphics == state) // avoid flickering from II+ refresh polling
 	{
@@ -110,14 +110,14 @@ WRITE_LINE_MEMBER(a2_video_device::txt_w)
 	}
 }
 
-WRITE_LINE_MEMBER(a2_video_device::mix_w)
+void a2_video_device::mix_w(int state)
 {
 	// select mixed mode or nomix
 	screen().update_now();
 	m_mix = state;
 }
 
-WRITE_LINE_MEMBER(a2_video_device::scr_w)
+void a2_video_device::scr_w(int state)
 {
 	// select primary or secondary page
 	if (!m_80col)
@@ -125,14 +125,14 @@ WRITE_LINE_MEMBER(a2_video_device::scr_w)
 	m_page2 = state;
 }
 
-WRITE_LINE_MEMBER(a2_video_device::res_w)
+void a2_video_device::res_w(int state)
 {
 	// select lo-res or hi-res
 	screen().update_now();
 	m_hires = state;
 }
 
-WRITE_LINE_MEMBER(a2_video_device::dhires_w)
+void a2_video_device::dhires_w(int state)
 {
 	// select double hi-res
 	screen().update_now();
@@ -147,7 +147,7 @@ WRITE_LINE_MEMBER(a2_video_device::dhires_w)
 	m_dhires = !state;
 }
 
-WRITE_LINE_MEMBER(a2_video_device::an2_w)
+void a2_video_device::an2_w(int state)
 {
 	m_an2 = state;
 }
@@ -655,7 +655,6 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	endrow = (std::min)(endrow, cliprect.bottom());
 	int const startcol = (cliprect.left() / 14);
 	int const stopcol = (cliprect.right() / 14) + 1;
-	const bool bIsRGBMonitor = rgb_monitor();
 
 	uint8_t const *const vram = &m_ram_ptr[page];
 	uint8_t const *const vaux = (m_aux_ptr ? m_aux_ptr : vram) + page;
@@ -703,8 +702,9 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 				words[col] = (vaux_row[col] & 0x7f) + ((vram_row[col] & 0x7f) << 7);
 			}
 
-			if (monochrome)
+			if (rgbmode < 0 || monochrome)
 			{
+				// Composite or monochrome, use the renderer that supports artifact rendering.
 				render_line(p, words, startcol, stopcol, monochrome, true);
 			}
 			else
@@ -730,7 +730,7 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 				{
 					unsigned const w = words[col] + (words[col+1] << 14);
 
-					unsigned const color_mask = (rgbmode == 3 || !bIsRGBMonitor) ? -1u :
+					unsigned const color_mask = (rgbmode == 3) ? -1u :
 							(vaux_row[col] >> 7) * 0x7f + (vram_row[col] >> 7) * 0x3f80
 							+ (vaux_row[col+1] >> 7) * 0x1fc000 + (vram_row[col+1] >> 7) * 0xfe00000;
 

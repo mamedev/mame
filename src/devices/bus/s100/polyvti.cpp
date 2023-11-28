@@ -54,7 +54,7 @@ private:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void kbd_put(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(kbd_int_w);
+	void kbd_int_w(int state);
 
 	// object finders
 	required_device<i8212_device> m_kbdlatch;
@@ -206,7 +206,7 @@ void poly_vti_device::kbd_put(u8 data)
 	}
 }
 
-WRITE_LINE_MEMBER(poly_vti_device::kbd_int_w)
+void poly_vti_device::kbd_int_w(int state)
 {
 	m_kbd_int = !state;
 

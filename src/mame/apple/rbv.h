@@ -29,10 +29,8 @@ public:
 	auto via6015_callback() { return write_6015.bind(); }
 	auto irq_callback() { return write_irq.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER(slot0_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(slot1_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(slot2_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(asc_irq_w);
+	template <u8 mask> void slot_irq_w(int state);
+	void asc_irq_w(int state);
 
 protected:
 	// device-level overrides
@@ -59,7 +57,6 @@ private:
 	void pseudovia_recalc_irqs();
 
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
-	WRITE_LINE_MEMBER(vbl_w);
 
 	u8 dac_r(offs_t offset);
 	void dac_w(offs_t offset, u8 data);

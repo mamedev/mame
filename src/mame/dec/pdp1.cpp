@@ -619,11 +619,6 @@ pdp1_readtape_image_device::pdp1_readtape_image_device(const machine_config &mco
 {
 }
 
-void pdp1_readtape_image_device::device_resolve_objects()
-{
-	m_st_ptr.resolve_safe();
-}
-
 void pdp1_readtape_image_device::device_start()
 {
 	m_timer = timer_alloc(FUNC(pdp1_readtape_image_device::reader_callback), this);
@@ -640,11 +635,6 @@ pdp1_punchtape_image_device::pdp1_punchtape_image_device(const machine_config &m
 	, m_st_ptp(*this)
 	, m_timer(nullptr)
 {
-}
-
-void pdp1_punchtape_image_device::device_resolve_objects()
-{
-	m_st_ptp.resolve_safe();
 }
 
 void pdp1_punchtape_image_device::device_start()
@@ -665,12 +655,6 @@ pdp1_typewriter_device::pdp1_typewriter_device(const machine_config &mconfig, co
 	, m_st_tyi(*this)
 	, m_tyo_timer(nullptr)
 {
-}
-
-void pdp1_typewriter_device::device_resolve_objects()
-{
-	m_st_tyo.resolve_safe();
-	m_st_tyi.resolve_safe();
 }
 
 void pdp1_typewriter_device::device_start()
@@ -1472,7 +1456,7 @@ void pdp1_state::iot_cks(int op2, int nac, int mb, int &io, int ac)
 }
 
 template <int Mask>
-WRITE_LINE_MEMBER(pdp1_state::io_status_w)
+void pdp1_state::io_status_w(int state)
 {
 	if (state)
 		m_io_status |= Mask;

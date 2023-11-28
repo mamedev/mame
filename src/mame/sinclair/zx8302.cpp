@@ -144,9 +144,9 @@ zx8302_device::zx8302_device(const machine_config &mconfig, const char *tag, dev
 		m_out_mdrdw_cb(*this),
 		m_out_erase_cb(*this),
 		m_out_raw1_cb(*this),
-		m_in_raw1_cb(*this),
+		m_in_raw1_cb(*this, 0),
 		m_out_raw2_cb(*this),
-		m_in_raw2_cb(*this),
+		m_in_raw2_cb(*this, 0),
 		m_dtr1(0),
 		m_cts2(0),
 		m_idr(1),
@@ -171,22 +171,6 @@ zx8302_device::zx8302_device(const machine_config &mconfig, const char *tag, dev
 
 void zx8302_device::device_start()
 {
-	// resolve callbacks
-	m_out_ipl1l_cb.resolve_safe();
-	m_out_baudx4_cb.resolve_safe();
-	m_out_comdata_cb.resolve_safe();
-	m_out_txd1_cb.resolve_safe();
-	m_out_txd2_cb.resolve_safe();
-	m_out_netout_cb.resolve_safe();
-	m_out_mdselck_cb.resolve_safe();
-	m_out_mdseld_cb.resolve_safe();
-	m_out_mdrdw_cb.resolve_safe();
-	m_out_erase_cb.resolve_safe();
-	m_out_raw1_cb.resolve_safe();
-	m_in_raw1_cb.resolve_safe(0);
-	m_out_raw2_cb.resolve_safe();
-	m_in_raw2_cb.resolve_safe(0);
-
 	// allocate timers
 	m_baudx4_timer = timer_alloc(FUNC(zx8302_device::baudx4_tick), this);
 	m_rtc_timer = timer_alloc(FUNC(zx8302_device::rtc_tick), this);
@@ -529,7 +513,7 @@ void zx8302_device::data_w(uint8_t data)
 //  vsync_w - vertical sync
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( zx8302_device::vsync_w )
+void zx8302_device::vsync_w(int state)
 {
 	if (state)
 	{
@@ -544,7 +528,7 @@ WRITE_LINE_MEMBER( zx8302_device::vsync_w )
 //  comctl_w - IPC COMCTL
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( zx8302_device::comctl_w )
+void zx8302_device::comctl_w(int state)
 {
 	if (LOG) logerror("ZX8302 '%s' COMCTL: %x\n", tag(), state);
 
@@ -562,7 +546,7 @@ WRITE_LINE_MEMBER( zx8302_device::comctl_w )
 // IPC writing comdata to CPU
 //
 
-WRITE_LINE_MEMBER( zx8302_device::comdata_w )
+void zx8302_device::comdata_w(int state)
 {
 	if (LOG) logerror("ZX8302 '%s' COMDATA->CPU(pending): %x\n", tag(), state);
 
@@ -574,7 +558,7 @@ WRITE_LINE_MEMBER( zx8302_device::comdata_w )
 //  extint_w - external interrupt
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( zx8302_device::extint_w )
+void zx8302_device::extint_w(int state)
 {
 	if (LOG) logerror("ZX8302 '%s' EXTINT: %x\n", tag(), state);
 
@@ -584,18 +568,18 @@ WRITE_LINE_MEMBER( zx8302_device::extint_w )
 	}
 }
 
-WRITE_LINE_MEMBER( zx8302_device::write_netin )
+void zx8302_device::write_netin(int state)
 {
 	m_rs232_rx = state;
 	device_serial_interface::rx_w(state);
 }
 
-WRITE_LINE_MEMBER( zx8302_device::write_dtr1 )
+void zx8302_device::write_dtr1(int state)
 {
 	m_dtr1 = state;
 }
 
-WRITE_LINE_MEMBER( zx8302_device::write_cts2 )
+void zx8302_device::write_cts2(int state)
 {
 	m_cts2 = state;
 }

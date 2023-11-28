@@ -743,7 +743,7 @@ public:
 	INPUT_CHANGED_MEMBER(coin_start);
 	CUSTOM_INPUT_MEMBER(coin_r);
 	CUSTOM_INPUT_MEMBER(coin_usa_r);
-	DECLARE_READ_LINE_MEMBER(hopper_r);
+	int hopper_r();
 
 private:
 	void Ns5w48(uint32_t data);
@@ -1237,7 +1237,7 @@ void aristmk5_state::aristmk5_drame_map(address_map &map)
 }
 
 
-READ_LINE_MEMBER(aristmk5_state::hopper_r)
+int aristmk5_state::hopper_r()
 {
 	return (m_hopper_test && m_hopper->line_r()) ? 0 : 1;
 }

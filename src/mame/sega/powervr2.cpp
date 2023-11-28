@@ -3912,8 +3912,6 @@ powervr2_device::powervr2_device(const machine_config &mconfig, const char *tag,
 
 void powervr2_device::device_start()
 {
-	irq_cb.resolve_safe();
-
 	grab = std::make_unique<receiveddata[]>(NUM_BUFFERS);
 
 	pvr_build_parameterconfig();

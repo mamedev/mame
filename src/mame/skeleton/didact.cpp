@@ -177,7 +177,7 @@ protected:
 	void pia2_kbA_w(uint8_t data);
 	uint8_t pia2_kbB_r();
 	void pia2_kbB_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( pia2_ca2_w );
+	void pia2_ca2_w(int state);
 
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
@@ -251,7 +251,7 @@ void  md6802_state::pia2_kbB_w(uint8_t data)
 	m_segments = bitswap<8>(data, 0, 4, 5, 3, 2, 1, 7, 6);
 }
 
-WRITE_LINE_MEMBER( md6802_state::pia2_ca2_w )
+void md6802_state::pia2_ca2_w(int state)
 {
 	LOGKBD("--->%s(%02x) LED is connected through resisitor to +5v so logical 0 will lit it\n", FUNCNAME, state);
 	m_led = state ? 0 :1;
@@ -354,7 +354,7 @@ class mp68a_state : public didact_state
 	void pia2_kbA_w(uint8_t data);
 	uint8_t pia2_kbB_r();
 	void pia2_kbB_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER( pia2_cb1_r );
+	int pia2_cb1_r();
 	template <unsigned N> void digit_w(uint8_t data) { m_7segs[N] = data; }
 
 	virtual void machine_reset() override;
@@ -453,7 +453,7 @@ void mp68a_state::pia2_kbB_w(uint8_t data)
 	m_cass->output(BIT(data, 4) ? -1.0 : +1.0);
 }
 
-READ_LINE_MEMBER( mp68a_state::pia2_cb1_r )
+int mp68a_state::pia2_cb1_r()
 {
 	for (unsigned i = 0U; 4U > i; ++i)
 		m_lines[i] = m_io_lines[i]->read();
@@ -556,7 +556,7 @@ class modulab_state : public didact_state
 protected:
 	uint8_t io_r(offs_t offset);
 	void io_w(offs_t offset, u8 data);
-	DECLARE_WRITE_LINE_MEMBER( da_w );
+	void da_w(int state);
 private:
 	void modulab_map(address_map &map);
 	// Offsets for display and keyboard i/o
@@ -582,7 +582,7 @@ private:
 	uint8_t m_da;
 };
 
-WRITE_LINE_MEMBER( modulab_state::da_w )
+void modulab_state::da_w(int state)
 {
 	LOG("--->%s()\n", FUNCNAME);
 	m_da = state == CLEAR_LINE ? 0 : 1; // Capture data available signal
@@ -816,10 +816,10 @@ void md6802_state::md6802(machine_config &config)
 	/* Devices */
 	TTL74145(config, m_tb16_74145, 0);
 	/* PIA #1 0xA000-0xA003 - used differently by laborations and loaded software */
-	PIA6821(config, m_pia1, 0);
+	PIA6821(config, m_pia1);
 
 	/* PIA #2 Keyboard & Display 0xC000-0xC003 */
-	PIA6821(config, m_pia2, 0);
+	PIA6821(config, m_pia2);
 	/* --PIA init----------------------- */
 	/* 0xE007 0xC002 (DDR B)     = 0xFF - Port B all outputs and set to 0 (zero) */
 	/* 0xE00B 0xC000 (DDR A)     = 0x70 - Port A three outputs and set to 0 (zero) */

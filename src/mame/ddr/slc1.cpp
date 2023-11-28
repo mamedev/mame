@@ -95,14 +95,14 @@ private:
 	required_device<pwm_display_device> m_display;
 	output_finder<> m_busyled;
 
+	u8 m_select = 0;
+	u8 m_segment = 0;
+
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
 
 	u8 input_r();
 	void control_w(offs_t offset, u8 data);
-
-	u8 m_select = 0;
-	u8 m_segment = 0;
 };
 
 void slc1_state::machine_start()

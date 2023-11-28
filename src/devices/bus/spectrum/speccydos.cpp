@@ -30,6 +30,8 @@
 #include "emu.h"
 #include "speccydos.h"
 
+#include "formats/sdd_dsk.h"
+
 
 /***************************************************************************
     DEVICE DEFINITIONS
@@ -168,7 +170,7 @@ void spectrum_speccydos_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ_LINE_MEMBER(spectrum_speccydos_device::romcs)
+int spectrum_speccydos_device::romcs()
 {
 	return m_romcs | m_exp->romcs();
 }

@@ -29,14 +29,13 @@ DEFINE_DEVICE_TYPE(K057714, k057714_device, "k057714", "k057714_device GCU")
 k057714_device::k057714_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K057714, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
+	, m_irqctrl(0)
 	, m_irq(*this)
 {
 }
 
 void k057714_device::device_start()
 {
-	m_irq.resolve_safe();
-
 	m_vram = std::make_unique<uint32_t[]>(VRAM_SIZE/4);
 
 	save_pointer(NAME(m_vram), VRAM_SIZE/4);
@@ -227,12 +226,16 @@ void k057714_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 		case 0x10:
 			/* IRQ clear/enable; ppd writes bit off then on in response to interrupt */
 			/* it enables bits 0x41, but 0x01 seems to be the one it cares about */
-			if (ACCESSING_BITS_16_31 && (data & 0x00010000) == 0)
+			if (ACCESSING_BITS_16_31)
 			{
-				if (!m_irq.isnull())
+				data >>= 16;
+
+				if (!BIT(data, 0))
 				{
 					m_irq(CLEAR_LINE);
 				}
+
+				m_irqctrl = data;
 			}
 			if (ACCESSING_BITS_0_15)
 			{
@@ -517,6 +520,14 @@ void k057714_device::draw_frame(int frame, bitmap_ind16 &bitmap, const rectangle
 	}
 }
 
+void k057714_device::vblank_w(int state)
+{
+	if ((state) && (m_irqctrl & 1))
+	{
+		m_irq(ASSERT_LINE);
+	}
+}
+
 int k057714_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
@@ -620,14 +631,6 @@ void k057714_device::draw_object(uint32_t *cmd)
 	{
 		return;
 	}
-
-	int fb_width = m_frame[0].width + 1;
-	int fb_height = m_frame[0].height + 1;
-
-	if (width > fb_width)
-		width = fb_width;
-	if (height > fb_height)
-		height = fb_height;
 
 	int fb_pitch = 1024;
 

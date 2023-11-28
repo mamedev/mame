@@ -77,7 +77,6 @@ ioport_constructor midiin_device::device_input_ports() const
 
 void midiin_device::device_start()
 {
-	m_input_cb.resolve_safe();
 	m_timer = timer_alloc(FUNC(midiin_device::midi_update), this);
 	m_midi.reset();
 	m_timer->enable(false);
@@ -471,10 +470,8 @@ std::error_condition midiin_device::midi_sequence::parse(util::random_read &stre
 	// catch errors to make parsing easier
 	try
 	{
-		// if not a RIFF-encoed MIDI, just parse as-is
-		if (buffer.dword_le() != fourcc_le("RIFF"))
-			parse_midi_data(buffer.reset());
-		else
+		const u32 type = buffer.dword_le();
+		if (type == fourcc_le("RIFF"))
 		{
 			// check the RIFF type and size
 			u32 riffsize = buffer.dword_le();
@@ -496,6 +493,11 @@ std::error_condition midiin_device::midi_sequence::parse(util::random_read &stre
 				}
 			}
 		}
+		else if ((u8)type == 0xf0)
+			parse_sysex_data(buffer.reset());
+		else
+			parse_midi_data(buffer.reset());
+
 		m_iterator = m_list.begin();
 		return std::error_condition();
 	}
@@ -639,4 +641,28 @@ u32 midiin_device::midi_sequence::parse_track_data(midi_parser &buffer, u32 star
 		}
 	}
 	return curtick;
+}
+
+//-------------------------------------------------
+//  parse_sysex_data - parse a sysex dump into a
+//  single MIDI event
+//-------------------------------------------------
+
+void midiin_device::midi_sequence::parse_sysex_data(midi_parser &buffer)
+{
+	u32 msg = 0;
+	attotime curtime;
+	while (!buffer.eob())
+	{
+		midi_event &event = event_at(msg++);
+		event.set_time(curtime);
+
+		u8 data = 0;
+		while (!buffer.eob() && data != 0xf7)
+			event.append(data = buffer.byte());
+
+		// add 100 ms between the end of this sysex and the start of the next one, if there is one
+		curtime += attotime::from_ticks((u64)10 * event.data().size(), 31250)
+			+ attotime::from_msec(100);
+	}
 }

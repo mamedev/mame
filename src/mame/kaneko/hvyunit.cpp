@@ -161,7 +161,7 @@ private:
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	void master_io(address_map &map);
@@ -232,7 +232,7 @@ uint32_t hvyunit_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-WRITE_LINE_MEMBER(hvyunit_state::screen_vblank)
+void hvyunit_state::screen_vblank(int state)
 {
 	// rising edge
 	if (state)

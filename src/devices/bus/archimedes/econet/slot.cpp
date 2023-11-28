@@ -57,9 +57,6 @@ archimedes_econet_slot_device::archimedes_econet_slot_device(const machine_confi
 void archimedes_econet_slot_device::device_start()
 {
 	m_device = get_card_device();
-
-	// resolve callbacks
-	m_efiq_handler.resolve_safe();
 }
 
 

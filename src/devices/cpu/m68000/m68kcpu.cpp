@@ -922,7 +922,7 @@ void m68000_musashi_device::execute_run()
 					tmp_dar[i] = REG_DA()[i];
 				}
 
-				m_mmu_tmp_buserror_occurred = 0;
+				m_mmu_tmp_buserror_occurred = false;
 
 				/* Read an instruction and call its handler */
 				m_ir = m68ki_read_imm_16();
@@ -938,7 +938,7 @@ void m68000_musashi_device::execute_run()
 				{
 					u32 sr;
 
-					m_mmu_tmp_buserror_occurred = 0;
+					m_mmu_tmp_buserror_occurred = false;
 
 					// restore cpu address registers to value at start of instruction
 					for (i = 15; i >= 0; i--)
@@ -951,39 +951,47 @@ void m68000_musashi_device::execute_run()
 						}
 					}
 
-					sr = m68ki_init_exception(EXCEPTION_BUS_ERROR);
-
-					m_run_mode = RUN_MODE_BERR_AERR_RESET;
-
-					if (!CPU_TYPE_IS_020_PLUS())
+					// for a simple restart request, simply back up the program counter
+					if (m_restart_instruction)
 					{
-						if (CPU_TYPE_IS_010())
-						{
-							m68ki_stack_frame_1000(m_ppc, sr, EXCEPTION_BUS_ERROR, m_mmu_tmp_buserror_address);
-						}
-						else
-						{
-							/* Note: This is implemented for 68000 only! */
-							m68ki_stack_frame_buserr(sr);
-						}
-					}
-					else if(!CPU_TYPE_IS_040_PLUS()) {
-						if (m_mmu_tmp_buserror_address == m_ppc)
-						{
-							m68ki_stack_frame_1010(sr, EXCEPTION_BUS_ERROR, m_ppc, m_mmu_tmp_buserror_address);
-						}
-						else
-						{
-							m68ki_stack_frame_1011(sr, EXCEPTION_BUS_ERROR, m_ppc, m_mmu_tmp_buserror_address);
-						}
+						m_restart_instruction = false;
+						m_pc = m_ppc;
 					}
 					else
 					{
-						m68ki_stack_frame_0111(sr, EXCEPTION_BUS_ERROR, m_ppc, m_mmu_tmp_buserror_address, true);
+						sr = m68ki_init_exception(EXCEPTION_BUS_ERROR);
+
+						m_run_mode = RUN_MODE_BERR_AERR_RESET;
+
+						if (!CPU_TYPE_IS_020_PLUS())
+						{
+							if (CPU_TYPE_IS_010())
+							{
+								m68ki_stack_frame_1000(m_ppc, sr, EXCEPTION_BUS_ERROR, m_mmu_tmp_buserror_address);
+							}
+							else
+							{
+								/* Note: This is implemented for 68000 only! */
+								m68ki_stack_frame_buserr(sr);
+							}
+						}
+						else if(!CPU_TYPE_IS_040_PLUS()) {
+							if (m_mmu_tmp_buserror_address == m_ppc)
+							{
+								m68ki_stack_frame_1010(sr, EXCEPTION_BUS_ERROR, m_ppc, m_mmu_tmp_buserror_address);
+							}
+							else
+							{
+								m68ki_stack_frame_1011(sr, EXCEPTION_BUS_ERROR, m_ppc, m_mmu_tmp_buserror_address);
+							}
+						}
+						else
+						{
+							m68ki_stack_frame_0111(sr, EXCEPTION_BUS_ERROR, m_ppc, m_mmu_tmp_buserror_address, true);
+						}
+
+						m68ki_jump_vector(EXCEPTION_BUS_ERROR);
 					}
-
-					m68ki_jump_vector(EXCEPTION_BUS_ERROR);
-
 					// TODO:
 					/* Use up some clock cycles and undo the instruction's cycles */
 					// m_icount -= m_cyc_exception[EXCEPTION_BUS_ERROR] - m_cyc_instruction[m_ir];
@@ -1025,12 +1033,12 @@ void m68000_musashi_device::init_cpu_common(void)
 	m_cpu_space = &space(m_cpu_space_id);
 
 	/* disable all MMUs */
-	m_has_pmmu         = 0;
-	m_has_hmmu         = 0;
-	m_pmmu_enabled     = 0;
+	m_has_pmmu         = false;
+	m_has_hmmu         = false;
+	m_pmmu_enabled     = false;
 	m_hmmu_enabled     = 0;
-	m_emmu_enabled     = 0;
-	m_instruction_restart = 0;
+	m_emmu_enabled     = false;
+	m_instruction_restart = false;
 
 	/* The first call to this function initializes the opcode handler jump table */
 	if(!emulation_initialized)
@@ -1066,6 +1074,7 @@ void m68000_musashi_device::init_cpu_common(void)
 	save_item(NAME(m_hmmu_enabled));
 	save_item(NAME(m_emmu_enabled));
 	save_item(NAME(m_instruction_restart));
+	save_item(NAME(m_restart_instruction));
 
 	save_item(NAME(m_mmu_crp_aptr));
 	save_item(NAME(m_mmu_crp_limit));
@@ -1100,10 +1109,10 @@ void m68000_musashi_device::init_cpu_common(void)
 void m68000_musashi_device::device_reset()
 {
 	/* Disable the PMMU/HMMU on reset, if any */
-	m_pmmu_enabled = 0;
+	m_pmmu_enabled = false;
 	m_hmmu_enabled = 0;
-	m_emmu_enabled = 0;
-	m_instruction_restart = 0;
+	m_emmu_enabled = false;
+	m_instruction_restart = false;
 
 	m_mmu_tc = 0;
 	m_mmu_tt0 = 0;
@@ -1304,13 +1313,13 @@ void m68000_musashi_device::set_hmmu_enable(int enable)
 }
 
 /* set for external MMU and instruction restart */
-void m68000_musashi_device::set_emmu_enable(int enable)
+void m68000_musashi_device::set_emmu_enable(bool enable)
 {
 	m_emmu_enabled = enable;
 	m_instruction_restart = m_pmmu_enabled || m_emmu_enabled;
 }
 
-void m68000_musashi_device::set_fpu_enable(int enable)
+void m68000_musashi_device::set_fpu_enable(bool enable)
 {
 	m_has_fpu = enable;
 }
@@ -1679,7 +1688,7 @@ void m68000_musashi_device::init32hmmu(address_space &space, address_space &ospa
 //         do not call set_input_line(M68K_LINE_BUSERROR) when using rerun flag
 void m68000_musashi_device::set_buserror_details(u32 fault_addr, u8 rw, u8 fc, bool rerun)
 {
-	if (m_instruction_restart && rerun) m_mmu_tmp_buserror_occurred = 1; // hack for external MMU
+	if (m_instruction_restart && rerun) m_mmu_tmp_buserror_occurred = true; // hack for external MMU
 
 	// save values for 68000 specific bus error
 	m_aerr_address = fault_addr;
@@ -1691,6 +1700,12 @@ void m68000_musashi_device::set_buserror_details(u32 fault_addr, u8 rw, u8 fc, b
 	m_mmu_tmp_buserror_rw = m_mmu_tmp_rw;
 	m_mmu_tmp_buserror_fc = m_mmu_tmp_fc;
 	m_mmu_tmp_buserror_sz = m_mmu_tmp_sz;
+}
+
+void m68000_musashi_device::restart_this_instruction()
+{
+	m_mmu_tmp_buserror_occurred = true;
+	m_restart_instruction = true;
 }
 
 u16 m68000_musashi_device::get_fc() const noexcept
@@ -1816,7 +1831,7 @@ void m68000_musashi_device::init_cpu_m68000(void)
 	m_cyc_shift        = 2;
 	m_cyc_reset        = 132;
 	m_has_pmmu         = 0;
-	m_has_hmmu         = 0;
+	m_has_hmmu         = false;
 	m_has_fpu          = 0;
 
 	define_state();
@@ -1925,7 +1940,7 @@ void m68000_musashi_device::init_cpu_m68020hmmu(void)
 {
 	init_cpu_m68020();
 
-	m_has_hmmu = 1;
+	m_has_hmmu = true;
 	m_has_fpu  = 1;
 
 
@@ -2317,12 +2332,12 @@ void m68000_musashi_device::clear_all()
 	m_sr_mask= 0;
 	m_instr_mode= 0;
 	m_run_mode= 0;
-	m_has_pmmu= 0;
-	m_has_hmmu= 0;
-	m_pmmu_enabled= 0;
+	m_has_pmmu= false;
+	m_has_hmmu= false;
+	m_pmmu_enabled= false;
 	m_hmmu_enabled= 0;
-	m_emmu_enabled= 0;
-	m_instruction_restart= 0;
+	m_emmu_enabled= false;
+	m_instruction_restart= false;
 	m_has_fpu= 0;
 	m_fpu_just_reset= 0;
 
@@ -2383,7 +2398,8 @@ void m68000_musashi_device::clear_all()
 	m_mmu_tmp_fc = 0;
 	m_mmu_tmp_rw = 0;
 	m_mmu_tmp_buserror_address = 0;
-	m_mmu_tmp_buserror_occurred = 0;
+	m_mmu_tmp_buserror_occurred = false;
+	m_restart_instruction = false;
 	m_mmu_tmp_buserror_fc = 0;
 	m_mmu_tmp_buserror_rw = 0;
 
@@ -2399,7 +2415,6 @@ void m68000_musashi_device::clear_all()
 
 void m68000_musashi_device::device_start()
 {
-	m_reset_cb.resolve_safe();
 }
 
 void m68000_musashi_device::device_stop()

@@ -107,13 +107,13 @@ private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(kbd_scan);
 
-	DECLARE_WRITE_LINE_MEMBER(crtc_lrc_w);
-	DECLARE_WRITE_LINE_MEMBER(crtc_vblank_w);
-	DECLARE_WRITE_LINE_MEMBER(crtc_vsync_w);
+	void crtc_lrc_w(int state);
+	void crtc_vblank_w(int state);
+	void crtc_vsync_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(external_txc_w);
-	DECLARE_WRITE_LINE_MEMBER(external_rxc_w);
-	DECLARE_WRITE_LINE_MEMBER(internal_txc_rxc_w);
+	void external_txc_w(int state);
+	void external_rxc_w(int state);
+	void internal_txc_rxc_w(int state);
 
 	void main_io_map(address_map &map);
 	void main_mem_map(address_map &map);
@@ -356,19 +356,19 @@ void sbrain_state::ppi_pc_w(u8 data)
 	m_busak = BIT(data, 5);
 }
 
-WRITE_LINE_MEMBER(sbrain_state::external_txc_w)
+void sbrain_state::external_txc_w(int state)
 {
 	if (!BIT(m_serial_sw->read(), 0))
 		m_usart[1]->write_txc(state);
 }
 
-WRITE_LINE_MEMBER(sbrain_state::external_rxc_w)
+void sbrain_state::external_rxc_w(int state)
 {
 	if (!BIT(m_serial_sw->read(), 2))
 		m_usart[1]->write_rxc(state);
 }
 
-WRITE_LINE_MEMBER(sbrain_state::internal_txc_rxc_w)
+void sbrain_state::internal_txc_rxc_w(int state)
 {
 	if (!BIT(m_serial_sw->read(), 1))
 		m_usart[1]->write_txc(state);
@@ -564,20 +564,20 @@ TIMER_DEVICE_CALLBACK_MEMBER(sbrain_state::kbd_scan)
 	m_key_data = 0xff;
 }
 
-WRITE_LINE_MEMBER(sbrain_state::crtc_lrc_w)
+void sbrain_state::crtc_lrc_w(int state)
 {
 	// TODO: actually triggered by BUSACK and taken after DMA burst finishes
 	if (state && !m_crtc->lbre_r() && !m_crtc->vblank_r())
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(sbrain_state::crtc_vblank_w)
+void sbrain_state::crtc_vblank_w(int state)
 {
 	if (state)
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(sbrain_state::crtc_vsync_w)
+void sbrain_state::crtc_vsync_w(int state)
 {
 	// TODO: internal to the CRT8002
 	if (!state)
@@ -659,22 +659,21 @@ u32 sbrain_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 					{
 						chr &= 0x7f;
 
-						if (chr)
-							gfx = m_p_chargen[(chr<<4) | (ra - 1)]; // ra hacked for incorrect character generator
+						gfx = m_p_chargen[(chr<<4) | ra];
 					}
 				}
 
 				if (((x + ma) & 0xfff) == cr)
-					gfx ^= 0x7f;
+					gfx ^= 0xfe;
 
 				/* Display a scanline of a character */
+				*p++ = BIT(gfx, 7) ? rgb_t::white() : rgb_t::black();
 				*p++ = BIT(gfx, 6) ? rgb_t::white() : rgb_t::black();
 				*p++ = BIT(gfx, 5) ? rgb_t::white() : rgb_t::black();
 				*p++ = BIT(gfx, 4) ? rgb_t::white() : rgb_t::black();
 				*p++ = BIT(gfx, 3) ? rgb_t::white() : rgb_t::black();
 				*p++ = BIT(gfx, 2) ? rgb_t::white() : rgb_t::black();
 				*p++ = BIT(gfx, 1) ? rgb_t::white() : rgb_t::black();
-				*p++ = BIT(gfx, 0) ? rgb_t::white() : rgb_t::black();
 			}
 		}
 		ma = (ma + 80) & 0xfff;
@@ -775,9 +774,8 @@ ROM_START( sbrain )
 	ROMX_LOAD("qd_3_05.z69", 0x0000, 0x0800, CRC(aedbe777) SHA1(9ee9ca3f05e11ceb80896f06c3a3ae352db214dc), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS( 4, "4_2_50", "4.2 (50Hz hack)")
 	ROMX_LOAD("sbii_sb4_2_50hz.z69", 0x0000, 0x0800, CRC(285a894b) SHA1(694fef446fe19c0962f79951aa4d464489a9d161), ROM_BIOS(4))
-	// Using the chargen from 'c10' for now.
-	ROM_REGION( 0x2000, "chargen", 0 )
-	ROM_LOAD("c10_char.bin", 0x0000, 0x2000, BAD_DUMP CRC(cb530b6f) SHA1(95590bbb433db9c4317f535723b29516b9b9fcbf))
+	ROM_REGION( 0x0800, "chargen", 0 )
+	ROM_LOAD("crt8002-003.bin", 0x0000, 0x0800, BAD_DUMP CRC(5181d324) SHA1(7aa2d084947bcc0e3d31568f4de84c23b84abfff)) // hand-crafted
 ROM_END
 
 ROM_START( sagafox )

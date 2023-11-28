@@ -209,7 +209,7 @@ void quizard_state::machine_reset()
 
 	m_boot_press = false;
 	m_boot_timer->adjust(attotime::from_seconds(13), 1);
-	m_mcu_p3 = 0x04;
+	m_mcu_p3 = 0x05; // RTS|RXD
 }
 
 
@@ -458,7 +458,8 @@ void cdi_state::cdimono1_base(machine_config &config)
 	CDI_SLAVE_HLE(config, m_slave_hle, 0);
 	m_slave_hle->int_callback().set(m_maincpu, FUNC(scc68070_device::in2_w));
 
-	CDROM(config, "cdrom").set_interface("cdi_cdrom");
+	CDROM(config, m_cdrom);
+	m_cdrom->set_interface("cdi_cdrom");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -502,7 +503,7 @@ void cdi_state::cdimono2(machine_config &config)
 	M68HC05C8(config, m_servo, 4_MHz_XTAL);
 	M68HC05C8(config, m_slave, 4_MHz_XTAL);
 
-	CDROM(config, "cdrom").set_interface("cdi_cdrom");
+	CDROM(config, m_cdrom).set_interface("cdi_cdrom");
 	SOFTWARE_LIST(config, "cd_list").set_original("cdi").set_filter("!DVC");
 
 	/* sound hardware */
@@ -577,6 +578,8 @@ void cdi_state::cdimono1(machine_config &config)
 void quizard_state::quizard(machine_config &config)
 {
 	cdimono1_base(config);
+	m_cdrom->add_region("cdrom");
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &quizard_state::cdimono1_mem);
 	m_maincpu->uart_rtsn_callback().set(FUNC(quizard_state::mcu_rtsn_from_cpu));
 	m_maincpu->uart_tx_callback().set(FUNC(quizard_state::mcu_rx_from_cpu));
@@ -885,6 +888,17 @@ ROM_START( quizard4_40 ) /* CD-ROM printed 07/97 */
 	ROM_LOAD( "de_142_d3.bin", 0x0000, 0x1000, CRC(77be0b40) SHA1(113b5c239480a2259f55e411ba8fb3972e6d4301) ) // German language
 ROM_END
 
+// only the CD was dumped, MCU not available
+ROM_START( quizardff ) /* CD-ROM printed 01/96 */
+	QUIZARD_BIOS_ROM
+
+	DISK_REGION( "cdrom" )
+	DISK_IMAGE_READONLY( "quizardff", 0, SHA1(ac533040379c1350066e778e3a86d1beb11c6f71) )
+
+	ROM_REGION(0x1000, "mcu", 0) // Intel D8751H MCU
+	ROM_LOAD( "8751.bin", 0x0000, 0x1000, NO_DUMP )
+ROM_END
+
 
 /*************************
 *      Game driver(s)    *
@@ -922,3 +936,5 @@ GAME( 1998, quizard4,    cdibios,  quizard,       quizard,  quizard_state, empty
 GAME( 1998, quizard4cz,  quizard4, quizard,       quizard,  quizard_state, empty_init,  ROT0, "TAB Austria",  "Quizard 4 Rainbow (v4.2, Czech, i8751 TS142 CZ1)", MACHINE_IMPERFECT_SOUND )
 GAME( 1998, quizard4_41, quizard4, quizard,       quizard,  quizard_state, empty_init,  ROT0, "TAB Austria",  "Quizard 4 Rainbow (v4.1, German, i8751 DE 142 D3)", MACHINE_IMPERFECT_SOUND )
 GAME( 1997, quizard4_40, quizard4, quizard,       quizard,  quizard_state, empty_init,  ROT0, "TAB Austria",  "Quizard 4 Rainbow (v4.0, German, i8751 DE 142 D3)", MACHINE_IMPERFECT_SOUND )
+
+GAME( 1996, quizardff,   cdibios,  quizard,       quizard,  quizard_state, empty_init,  ROT0, "TAB Austria",  "Quizard Fun and Fascination (French Edition V1 - 01/96)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

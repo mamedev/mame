@@ -55,12 +55,6 @@ pccard_slot_device::pccard_slot_device(const machine_config &mconfig, const char
 void pccard_slot_device::device_start()
 {
 	m_pccard = get_card_device();
-
-	// resolve callbacks
-	m_card_detect_cb.resolve_safe();
-	m_battery_voltage_1_cb.resolve_safe();
-	m_battery_voltage_2_cb.resolve_safe();
-	m_write_protect_cb.resolve_safe();
 }
 
 uint16_t pccard_slot_device::read_memory(offs_t offset, uint16_t mem_mask)

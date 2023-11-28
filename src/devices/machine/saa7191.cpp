@@ -28,8 +28,8 @@ DEFINE_DEVICE_TYPE(SAA7191, saa7191_device, "saa7191", "Philips SAA7191 DMSD")
 
 saa7191_device::saa7191_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SAA7191, tag, owner, clock)
-	, m_chr_in(*this)
-	, m_cvbs_in(*this)
+	, m_chr_in(*this, 0)
+	, m_cvbs_in(*this, 0)
 	, m_y_out(*this)
 	, m_uv_out(*this)
 	, m_hs_out(*this)
@@ -45,14 +45,6 @@ void saa7191_device::device_start()
 	save_item(NAME(m_i2c_read_addr));
 	save_item(NAME(m_i2c_subaddr));
 	save_item(NAME(m_i2c_state));
-
-	m_chr_in.resolve_safe(0);
-	m_cvbs_in.resolve_safe(0);
-
-	m_y_out.resolve_safe();
-	m_uv_out.resolve_safe();
-	m_hs_out.resolve_safe();
-	m_vs_out.resolve_safe();
 }
 
 void saa7191_device::device_reset()
@@ -120,13 +112,13 @@ uint8_t saa7191_device::i2c_data_r()
 	return 0;
 }
 
-WRITE_LINE_MEMBER(saa7191_device::i2c_stop_w)
+void saa7191_device::i2c_stop_w(int state)
 {
 	if (state)
 		m_i2c_state = I2C_STATE_IDLE;
 }
 
-WRITE_LINE_MEMBER(saa7191_device::iicsa_w)
+void saa7191_device::iicsa_w(int state)
 {
 	m_i2c_write_addr = state ? 0x8e : 0x8a;
 	m_i2c_read_addr = m_i2c_write_addr | 1;

@@ -52,9 +52,6 @@ device_memory_interface::space_config_vector rtpc_iocc_device::memory_space_conf
 
 void rtpc_iocc_device::device_start()
 {
-	m_out_int.resolve_safe();
-	m_out_rst.resolve_safe();
-
 	save_item(NAME(m_csr));
 	save_item(NAME(m_ccr));
 	save_item(NAME(m_dbr));

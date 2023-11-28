@@ -45,7 +45,6 @@ void altos2_keyboard_device::device_resolve_objects()
 	m_insline_led.resolve();
 	m_inschar_led.resolve();
 	m_calc_led.resolve();
-	m_txd_callback.resolve_safe();
 }
 
 void altos2_keyboard_device::device_start()
@@ -53,7 +52,7 @@ void altos2_keyboard_device::device_start()
 	save_item(NAME(m_key_row));
 }
 
-WRITE_LINE_MEMBER(altos2_keyboard_device::rxd_w)
+void altos2_keyboard_device::rxd_w(int state)
 {
 	m_mcu->set_input_line(MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -76,7 +75,7 @@ void altos2_keyboard_device::p2_w(u8 data)
 	m_txd_callback(BIT(data, 4));
 }
 
-WRITE_LINE_MEMBER(altos2_keyboard_device::prog_w)
+void altos2_keyboard_device::prog_w(int state)
 {
 	if (state)
 		m_key_row = m_mcu->p2_r() & 0x0f;

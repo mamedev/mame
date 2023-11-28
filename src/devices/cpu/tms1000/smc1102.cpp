@@ -5,7 +5,7 @@
   Suwa Seikosha (now Seiko Epson) SMC1102, SMC1112
 
 SMC1102 is a CMOS MCU based on TMS1100, keeping the same ALU and opcode mnemonics.
-The stack(CALL/RETN) works a bit differently. They added a timer, interrupts,
+The stack(CALL/RETN) works a bit differently. They also added a timer, interrupts,
 and a built-in LCD controller.
 
 In the USA, it was marketed by S-MOS Systems, an affiliate of Seiko Group.
@@ -60,8 +60,6 @@ void smc1102_cpu_device::device_start()
 {
 	tms1100_cpu_device::device_start();
 
-	m_write_segs.resolve_safe();
-
 	// zerofill
 	memset(m_lcd_ram, 0, sizeof(m_lcd_ram));
 	m_lcd_sr = 0;
@@ -112,16 +110,16 @@ void smc1102_cpu_device::device_reset()
 	m_timeout = false;
 
 	// changed/added fixed instructions (mostly handled in op_extra)
-	m_fixed_decode[0x0a] = F_EXTRA;
-	m_fixed_decode[0x71] = F_EXTRA;
-	m_fixed_decode[0x74] = F_EXTRA;
-	m_fixed_decode[0x75] = F_EXTRA;
-	m_fixed_decode[0x76] = F_RETN;
-	m_fixed_decode[0x78] = F_EXTRA;
-	m_fixed_decode[0x7b] = F_EXTRA;
+	m_fixed_decode[0x0a] = F_EXTRA; // TASR
+	m_fixed_decode[0x71] = F_EXTRA; // HALT
+	m_fixed_decode[0x74] = F_EXTRA; // INTEN
+	m_fixed_decode[0x75] = F_EXTRA; // INTDIS
+	m_fixed_decode[0x76] = F_RETN; // INTRTN
+	m_fixed_decode[0x78] = F_EXTRA; // SELIN
+	m_fixed_decode[0x7b] = F_EXTRA; // TMSET
 
-	m_fixed_decode[0x72] = m_fixed_decode[0x73] = F_EXTRA;
-	m_fixed_decode[0x7c] = m_fixed_decode[0x7d] = F_EXTRA;
+	m_fixed_decode[0x72] = m_fixed_decode[0x73] = F_EXTRA; // TSG
+	m_fixed_decode[0x7c] = m_fixed_decode[0x7d] = F_EXTRA; // "
 }
 
 u32 smc1102_cpu_device::decode_micro(offs_t offset)

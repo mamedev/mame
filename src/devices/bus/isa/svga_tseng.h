@@ -6,8 +6,11 @@
 #pragma once
 
 #include "isa.h"
+
 #include "video/pc_vga_tseng.h"
+
 #include "screen.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -37,6 +40,8 @@ protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
+
+	void io_isa_map(address_map &map);
 
 private:
 	void map_io();

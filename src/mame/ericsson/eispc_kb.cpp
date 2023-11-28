@@ -261,18 +261,18 @@ eispc_keyboard_device::eispc_keyboard_device(
 {
 }
 
-WRITE_LINE_MEMBER(eispc_keyboard_device::rxd_w)
+void eispc_keyboard_device::rxd_w(int state)
 {
 	LOGBITS("KBD bit presented: %d\n", state);
 	m_rxd_high = CLEAR_LINE != state;
 }
 
-WRITE_LINE_MEMBER(eispc_keyboard_device::hold_w)
+void eispc_keyboard_device::hold_w(int state)
 {
 	m_hold = CLEAR_LINE == state;
 }
 
-WRITE_LINE_MEMBER(eispc_keyboard_device::rst_line_w)
+void eispc_keyboard_device::rst_line_w(int state)
 {
 	if (state == CLEAR_LINE)
 	{
@@ -292,11 +292,6 @@ WRITE_LINE_MEMBER(eispc_keyboard_device::rst_line_w)
 
 void eispc_keyboard_device::device_start()
 {
-	m_txd_cb.resolve_safe();
-	m_led_caps_cb.resolve_safe();
-	m_led_num_cb.resolve_safe();
-	m_led_scroll_cb.resolve_safe();
-
 	save_item(NAME(m_rxd_high));
 	save_item(NAME(m_txd_high));
 	save_item(NAME(m_col_select));
@@ -315,7 +310,6 @@ void eispc_keyboard_device::device_start()
 void eispc_keyboard_device::device_add_mconfig(machine_config &config)
 {
 	M6801(config, m_mcu, XTAL(4'915'200)); // Crystal verified from schematics and visual inspection
-	m_mcu->set_addrmap(AS_PROGRAM, &eispc_keyboard_device::eispc_kb_mem);
 
 	m_mcu->in_p1_cb().set([this]
 	{
@@ -398,17 +392,6 @@ void eispc_keyboard_device::device_add_mconfig(machine_config &config)
 ioport_constructor eispc_keyboard_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( eispc_kb );
-}
-
-//-------------------------------------------------
-//  ADDRESS_MAP( eispc_kb_mem )
-//-------------------------------------------------
-
-void eispc_keyboard_device::eispc_kb_mem(address_map &map)
-{
-	map(0x0000, 0x001f).m(M6801_TAG, FUNC(m6801_cpu_device::m6801_io));
-	map(0x0080, 0x00ff).ram();
-	map(0xf800, 0xffff).rom().region(M6801_TAG, 0);
 }
 
 //-------------------------------------------------

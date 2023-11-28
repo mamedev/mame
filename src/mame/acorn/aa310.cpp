@@ -143,7 +143,6 @@
 #include "formats/acorn_dsk.h"
 #include "formats/apd_dsk.h"
 #include "formats/jfd_dsk.h"
-#include "formats/pc_dsk.h"
 #include "formats/st_dsk.h"
 #include "screen.h"
 #include "softlist.h"
@@ -1095,7 +1094,7 @@ void aa500_state::aa500(machine_config &config)
 	//m_ioc->gpio_r<2>().set("rtc", FUNC(pcf8573_device::min_r));
 	//m_ioc->gpio_r<3>().set("rtc", FUNC(pcf8573_device::sec_r));
 	m_ioc->gpio_r<4>().set([this] { return m_selected_floppy ? m_selected_floppy->dskchg_r() : 1; });
-	//m_ioc->gpio_w<5>().set_log("Sound Mute");
+	//m_ioc->gpio_w<5>().set([this] (int state) { logerror("%s: Sound Mute %d", machine().describe_context(), state); });
 
 	ACORN_VIDC1(config.replace(), m_vidc, 24_MHz_XTAL);
 	m_vidc->set_screen("screen");
@@ -1188,9 +1187,9 @@ void aa310_state::aa310(machine_config &config)
 	m_ioc->gpio_w<0>().set("i2cmem", FUNC(pcf8583_device::sda_w));
 	m_ioc->gpio_w<1>().set("i2cmem", FUNC(pcf8583_device::scl_w));
 	m_ioc->gpio_r<2>().set([this] { return m_selected_floppy ? !m_selected_floppy->ready_r() : 0; });
-	//m_ioc->gpio_r<3>().set_log("Reserved");
-	//m_ioc->gpio_r<4>().set_log("Aux IO connector");
-	//m_ioc->gpio_w<5>().set_log("Sound Mute");
+	//m_ioc->gpio_r<3>().set([this] () { logerror("%s: Reserved", machine().describe_context()); return 0; });
+	//m_ioc->gpio_r<4>().set([this] () { logerror("%s: Aux IO connector", machine().describe_context()); return 0; });
+	//m_ioc->gpio_w<5>().set([this] (int state) { logerror("%s: Sound Mute %s", machine().describe_context(), state); });
 
 	m_ram->set_default_size("1M");
 
@@ -1470,12 +1469,12 @@ void aa4000_state::aa3010(machine_config &config)
 	m_maincpu->set_clock(72_MHz_XTAL / 6); // ARM250
 
 	m_ioc->baud_w().set("upc:serial1", FUNC(ns16450_device::clock_w));
-	m_ioc->peripheral_r<1>().set_log("IOC: Peripheral Select 1 R");
-	m_ioc->peripheral_w<1>().set_log("IOC: Peripheral Select 1 W");
+	m_ioc->peripheral_r<1>().set([this] () { logerror("%s: IOC: Peripheral Select 1 R", machine().describe_context()); return 0; });
+	m_ioc->peripheral_w<1>().set([this] (int state) { logerror("%s: IOC: Peripheral Select 1 W %d", machine().describe_context(), state); });
 	m_ioc->peripheral_r<2>().set("econet", FUNC(archimedes_econet_slot_device::read));
 	m_ioc->peripheral_w<2>().set("econet", FUNC(archimedes_econet_slot_device::write));
-	m_ioc->peripheral_r<3>().set_log("IOC: Peripheral Select 3 R");
-	m_ioc->peripheral_w<3>().set_log("IOC: Peripheral Select 3 W");
+	m_ioc->peripheral_r<3>().set([this] () { logerror("%s: IOC: Peripheral Select 3 R", machine().describe_context()); return 0; });
+	m_ioc->peripheral_w<3>().set([this] (int state) { logerror("%s: IOC: Peripheral Select 3 W %d", machine().describe_context(), state); });
 	m_ioc->peripheral_r<5>().set(FUNC(aa4000_state::ioeb_r));
 	m_ioc->peripheral_w<5>().set(FUNC(aa4000_state::ioeb_w));
 	m_ioc->gpio_r<0>().set(m_i2cmem, FUNC(pcf8583_device::sda_r));
@@ -1485,7 +1484,7 @@ void aa4000_state::aa3010(machine_config &config)
 	m_ioc->gpio_r<3>().set("idrom", FUNC(ds2401_device::read));
 	m_ioc->gpio_w<3>().set("idrom", FUNC(ds2401_device::write));
 	m_ioc->gpio_r<4>().set_constant(1); // Sintr
-	//m_ioc->gpio_w<5>().set_log("Sound Mute");
+	//m_ioc->gpio_w<5>().set([this] (int state) { logerror("%s: Sound Mute %d", machine().describe_context(), state); });
 
 	m_ram->set_default_size("1M").set_extra_options("2M");
 
@@ -1554,12 +1553,12 @@ void aa5000_state::aa5000(machine_config &config)
 	m_maincpu->set_copro_type(arm_cpu_device::copro_type::VL86C020);
 
 	m_ioc->baud_w().set("upc:serial", FUNC(ns16450_device::clock_w));
-	m_ioc->peripheral_r<1>().set_log("IOC: Peripheral Select 1 R");
-	m_ioc->peripheral_w<1>().set_log("IOC: Peripheral Select 1 W");
+	m_ioc->peripheral_r<1>().set([this] () { logerror("%s: IOC: Peripheral Select 1 R", machine().describe_context()); return 0; });
+	m_ioc->peripheral_w<1>().set([this] (int state) { logerror("%s: IOC: Peripheral Select 1 W %d", machine().describe_context(), state); });
 	m_ioc->peripheral_r<2>().set("econet", FUNC(archimedes_econet_slot_device::read));
 	m_ioc->peripheral_w<2>().set("econet", FUNC(archimedes_econet_slot_device::write));
-	m_ioc->peripheral_r<3>().set_log("IOC: Peripheral Select 3 R");
-	m_ioc->peripheral_w<3>().set_log("IOC: Peripheral Select 3 W");
+	m_ioc->peripheral_r<3>().set([this] () { logerror("%s: IOC: Peripheral Select 3 R", machine().describe_context()); return 0; });
+	m_ioc->peripheral_w<3>().set([this] (int state) { logerror("%s: IOC: Peripheral Select 3 W %d", machine().describe_context(), state); });
 	m_ioc->peripheral_r<5>().set(FUNC(aa5000_state::ioeb_r));
 	m_ioc->peripheral_w<5>().set(FUNC(aa5000_state::ioeb_w));
 	m_ioc->gpio_r<0>().set("i2cmem", FUNC(pcf8583_device::sda_r));
@@ -1569,7 +1568,7 @@ void aa5000_state::aa5000(machine_config &config)
 	m_ioc->gpio_r<3>().set("idrom", FUNC(ds2401_device::read));
 	m_ioc->gpio_w<3>().set("idrom", FUNC(ds2401_device::write));
 	m_ioc->gpio_r<4>().set_constant(1); // Sintr
-	//m_ioc->gpio_w<5>().set_log("Sound Mute");
+	//m_ioc->gpio_w<5>().set([this] (int state) { logerror("%s: Sound Mute %d", machine().describe_context(), state); });
 
 	m_ram->set_default_size("2M").set_extra_options("4M");
 

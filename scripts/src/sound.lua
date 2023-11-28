@@ -112,7 +112,6 @@ if (SOUNDS["AC97"]~=null) then
 end
 
 
-
 ---------------------------------------------------
 -- Apple custom sound chips
 --@src/devices/sound/asc.h,SOUNDS["ASC"] = true
@@ -1442,6 +1441,18 @@ if (SOUNDS["LC7535"]~=null) then
 end
 
 ---------------------------------------------------
+-- Sanyo LC78836M
+--@src/devices/sound/lc78836m.h,SOUNDS["LC78836M"] = true
+---------------------------------------------------
+
+if (SOUNDS["LC78836M"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/lc78836m.cpp",
+		MAME_DIR .. "src/devices/sound/lc78836m.h",
+	}
+end
+
+---------------------------------------------------
 -- Sanyo LC82310
 --@src/devices/sound/lc82310.h,SOUNDS["LC82310"] = true
 ---------------------------------------------------
@@ -1450,6 +1461,18 @@ if (SOUNDS["LC82310"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/lc82310.cpp",
 		MAME_DIR .. "src/devices/sound/lc82310.h",
+	}
+end
+
+---------------------------------------------------
+-- NEC uPD933
+--@src/devices/sound/upd933.h,SOUNDS["UPD933"] = true
+---------------------------------------------------
+
+if (SOUNDS["UPD933"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/upd933.cpp",
+		MAME_DIR .. "src/devices/sound/upd933.h",
 	}
 end
 
@@ -1503,13 +1526,13 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/sound/swp30.h,SOUNDS["SWP30"] = true
+--@src/devices/sound/meg.h,SOUNDS["MEG"] = true
 ---------------------------------------------------
 
-if (SOUNDS["SWP30"]~=null) then
+if (SOUNDS["MEG"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/sound/swp30.cpp",
-		MAME_DIR .. "src/devices/sound/swp30.h",
+		MAME_DIR .. "src/devices/sound/meg.cpp",
+		MAME_DIR .. "src/devices/sound/meg.h",
 	}
 end
 
@@ -1630,5 +1653,17 @@ if (SOUNDS["NN71003F"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/nn71003f.cpp",
 		MAME_DIR .. "src/devices/sound/nn71003f.h",
+	}
+end
+
+---------------------------------------------------
+-- AP2010
+--@src/devices/sound/ap2010pcm.h,SOUNDS["AP2010"] = true
+---------------------------------------------------
+
+if (SOUNDS["AP2010"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/ap2010pcm.cpp",
+		MAME_DIR .. "src/devices/sound/ap2010pcm.h",
 	}
 end

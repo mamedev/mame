@@ -199,9 +199,9 @@ pokey_device::pokey_device(const machine_config &mconfig, const char *tag, devic
 	device_state_interface(mconfig, *this),
 	m_icount(0),
 	m_stream(nullptr),
-	m_pot_r_cb(*this),
-	m_allpot_r_cb(*this),
-	m_serin_r_cb(*this),
+	m_pot_r_cb(*this, 0),
+	m_allpot_r_cb(*this, 0),
+	m_serin_r_cb(*this, 0),
 	m_serout_w_cb(*this),
 	m_irq_w_cb(*this),
 	m_keyboard_r(*this),
@@ -227,7 +227,7 @@ void pokey_device::device_start()
 	m_channel[CHAN2].m_INTMask = IRQ_TIMR2;
 	m_channel[CHAN4].m_INTMask = IRQ_TIMR4;
 
-	// bind callbacks
+	// bind delegates
 	m_keyboard_r.resolve();
 
 	/* calculate the A/D times
@@ -283,12 +283,6 @@ void pokey_device::device_start()
 	/* reset more internal state */
 	std::fill(std::begin(m_clock_cnt), std::end(m_clock_cnt), 0);
 	std::fill(std::begin(m_POTx), std::end(m_POTx), 0);
-
-	m_pot_r_cb.resolve_all();
-	m_allpot_r_cb.resolve();
-	m_serin_r_cb.resolve();
-	m_serout_w_cb.resolve_safe();
-	m_irq_w_cb.resolve_safe();
 
 	m_stream = stream_alloc(0, 1, clock());
 
@@ -439,9 +433,12 @@ TIMER_CALLBACK_MEMBER(pokey_device::sync_pot)
 
 TIMER_CALLBACK_MEMBER(pokey_device::sync_set_irqst)
 {
-	LOG_IRQ("POKEY TIMR%d IRQ raised\n", param);
-	m_IRQST |=  (param & 0xff);
-	m_irq_w_cb(ASSERT_LINE);
+	if (m_IRQEN & param)
+	{
+		LOG_IRQ("POKEY TIMR%d IRQ raised\n", param);
+		m_IRQST |=  (param & 0xff);
+		m_irq_w_cb(ASSERT_LINE);
+	}
 }
 
 void pokey_device::execute_run()
@@ -508,7 +505,7 @@ void pokey_device::step_keyboard()
 			{
 				if (ret & 1)
 				{
-					m_KBCODE = m_kbd_latch;
+					m_KBCODE = (m_SKCTL & SK_DEBOUNCE) ? m_kbd_latch : (m_kbd_latch & 0xc0) | m_kbd_cnt;
 					m_SKSTAT |= SK_KEYBD;
 					if (m_IRQEN & IRQ_KEYBD)
 					{
@@ -831,7 +828,7 @@ uint8_t pokey_device::read(offs_t offset)
 			data = m_ALLPOT;
 			LOG("%s: POKEY ALLPOT internal $%02x (reset)\n", machine().describe_context(), data);
 		}
-		else if (!m_allpot_r_cb.isnull())
+		else if (!m_allpot_r_cb.isunset())
 		{
 			m_ALLPOT = data = m_allpot_r_cb(offset);
 			LOG("%s: POKEY ALLPOT callback $%02x\n", machine().describe_context(), data);
@@ -861,7 +858,7 @@ uint8_t pokey_device::read(offs_t offset)
 		break;
 
 	case SERIN_C:
-		if (!m_serin_r_cb.isnull())
+		if (!m_serin_r_cb.isunset())
 			m_SERIN = m_serin_r_cb(offset);
 		data = m_SERIN;
 		LOG("%s: POKEY SERIN  $%02x\n", machine().describe_context(), data);
@@ -1072,7 +1069,7 @@ void pokey_device::write_internal(offs_t offset, uint8_t data)
 
 }
 
-WRITE_LINE_MEMBER( pokey_device::sid_w )
+void pokey_device::sid_w(int state)
 {
 	if (state)
 	{
@@ -1120,7 +1117,7 @@ void pokey_device::pokey_potgo()
 	for (int pot = 0; pot < 8; pot++)
 	{
 		m_POTx[pot] = 228;
-		if (!m_pot_r_cb[pot].isnull())
+		if (!m_pot_r_cb[pot].isunset())
 		{
 			int r = m_pot_r_cb[pot](pot);
 

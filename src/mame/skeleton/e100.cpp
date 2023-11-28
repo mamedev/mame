@@ -176,8 +176,8 @@ private:
 	void pia1_kbA_w(uint8_t data);
 	uint8_t pia1_kbB_r();
 	void pia1_kbB_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( pia1_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER( pia1_cb2_w);
+	void pia1_ca2_w(int state);
+	void pia1_cb2_w(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(rtc_w);
 	void e100_map(address_map &map);
 
@@ -393,12 +393,12 @@ uint8_t e100_state::pia1_kbB_r()
 	return m_pia1_B;
 }
 
-WRITE_LINE_MEMBER(e100_state::pia1_ca2_w)
+void e100_state::pia1_ca2_w(int state)
 {
 	// TODO: Make this a slot device to trigger time meassurements
 }
 
-WRITE_LINE_MEMBER(e100_state::pia1_cb2_w)
+void e100_state::pia1_cb2_w(int state)
 {
 	m_rs232->write_txd(!state);
 }
@@ -547,7 +547,7 @@ void e100_state::e100(machine_config &config)
 	/* 0xF894 0xC818 (PIA2 Control A) = 0x34 - CA2 is low and lock DDRA */
 	/* 0xF896 0xC818 (PIA1 Control B) = 0x34 - CB2 is low and lock DDRB */
 	/* 0xF896 0xC818 (PIA2 Control B) = 0x34 - CB2 is low and lock DDRB */
-	PIA6821(config, m_pia1, 0);
+	PIA6821(config, m_pia1);
 	m_pia1->writepa_handler().set(FUNC(e100_state::pia1_kbA_w));
 	m_pia1->readpa_handler().set(FUNC(e100_state::pia1_kbA_r));
 	m_pia1->writepb_handler().set(FUNC(e100_state::pia1_kbB_w));
@@ -557,7 +557,7 @@ void e100_state::e100(machine_config &config)
 	m_pia1->cb2_handler().set(FUNC(e100_state::pia1_cb2_w));
 
 	/* The optional second PIA enables the expansion port on CA1 and a software RTC with 50Hz resolution */
-	PIA6821(config, m_pia2, 0);
+	PIA6821(config, m_pia2);
 	m_pia2->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 
 	/* Serial port support */

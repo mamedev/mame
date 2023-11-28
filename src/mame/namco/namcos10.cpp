@@ -54,7 +54,8 @@ Puzz Ball (PZB1 Ver. A)                                          (C) Namco, 2002
 Seishun-Quiz Colorful High School (CHS1 Ver.A)                   (C) Namco, 2002
 Sekai Kaseki Hakken (Japan, SKH1 Ver.A)                          (C) Namco, 2004
 *Shamisen Brothers (KT-SB2 Ver.A + CDROM)                        (C) Kato/Konami, 2003
-*Slot no Oujisama / Slot Prince (SLO1 Ver.A),(SLO1 Ver.B)        (C) Namco, 2002
+*Slot no Oujisama / Slot Prince (SLO1 Ver.A)                     (C) Namco, 2003
+Slot no Oujisama / Slot Prince (SLO1 Ver.B)                      (C) Namco, 2003
 Star Trigon (STT1 Ver.A)                                         (C) Namco, 2002
 Sugorotic Japan (STJ1 Ver.C)                                     (C) Namco, 2002
 *Taiko no Tatsujin  (with CDROM?)                                (C) Namco, 2001
@@ -307,6 +308,7 @@ Panikuru Panekuru                                   PPA1  Ver.A   KC017A   8E, 8
 Point Blank 3                                       GNN2  Ver.A   KC002A   8E, 8D               N/A           also has a Namco System10 EXIO(G) 8906961602 (8906970602) PCB. TMP95C061 and RAM not populated
 Puzz Ball                                           PZB1  Ver.A   KC013A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB, unverified title
 Sekai Kaseki Hakken                                 SKH1  Ver.A   KC035A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB, unverified title
+Slot no Oujisama/Slot Prince                        SLO1  Ver.B   KC023A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB
 Star Trigon                                         STT1  Ver.A   KC019A   8E, 8D               N/A           I/O board = none
 Sugorotic Japan                                     STJ1  Ver.C   KC014A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB
 Taiko no Tatsujin 2                                 TK21  Ver.C   KC010A   8E, 8D, 7E           NM-002        KEYCUS is marked KC007A, KC010A is a sticker on top. I/O board = ?. For all TK* games see note 2 and 3
@@ -319,7 +321,6 @@ Utyuu Daisakusen Chocovader Contactee               CVC1  Ver.A   KC022A   8E, 8
 Other games verified to use this PCB but NOT DUMPED (move into list above when dumped)
 Shamisen Brothers                                   KT-SB2Ver.A   KC038A   8E                   not dumped    I/O board = none
 Photo Battle                                        PBT1  Ver.B   KC006A   1D-8E (16)           N/A           also has a Namco System10 EXIO(G) 8906961602 (8906970602) PCB. TMP95C061 and RAM not populated
-Slot no Oujisama/Slot Prince (Ver.A & Ver.B seen)   SLO1  Ver.B   KC023A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB
 
       Notes:
       1. The ROM PCB has locations for 16x 128Mbit FlashROMs (Total capacity = 2048Mbits) but usually only a few are populated.
@@ -639,6 +640,7 @@ Known issues:
 - nicetsuk: Hangs on boot due to suspected issues with the PSX's timers
 - knpuzzle: Audio/sound effects can be glitchy, sound glitches on the difficulty select screen for a moment
 - panikuru: Audio/sound effects can be glitchy
+- slotouji: Not decrypted yet
 - Fix medal games I/O and refactor code to separate MGEXIO states from namcos10_state
 
 
@@ -748,8 +750,8 @@ private:
 	template <int N> uint16_t exio_lightgun_io_r();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(io_update_interrupt_callback);
-	DECLARE_WRITE_LINE_MEMBER(cdrom_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(cdrom_dmarq);
+	void cdrom_interrupt(int state);
+	void cdrom_dmarq(int state);
 
 	devcb_write_line m_io_update_interrupt;
 
@@ -850,6 +852,7 @@ public:
 	void ns10_ptblank3(machine_config &config);
 	void ns10_puzzball(machine_config &config);
 	void ns10_sekaikh(machine_config &config);
+	void ns10_slotouji(machine_config &config);
 	void ns10_startrgn(machine_config &config);
 	void ns10_sugorotic(machine_config &config);
 	void ns10_taiko2(machine_config &config);
@@ -857,6 +860,7 @@ public:
 	void ns10_taiko4(machine_config &config);
 	void ns10_taiko5(machine_config &config);
 	void ns10_taiko6(machine_config &config);
+	void ns10_taikort(machine_config &config);
 
 	void memn_driver_init();
 
@@ -1039,7 +1043,6 @@ void namcos10_state::machine_reset()
 
 void namcos10_state::device_resolve_objects()
 {
-	m_io_update_interrupt.resolve_safe();
 	m_mgexio_outputs.resolve();
 }
 
@@ -1086,7 +1089,7 @@ void namcos10_state::namcos10_base(machine_config &config)
 	m_ata->dmarq_handler().set(FUNC(namcos10_state::cdrom_dmarq));
 }
 
-WRITE_LINE_MEMBER(namcos10_state::cdrom_interrupt)
+void namcos10_state::cdrom_interrupt(int state)
 {
 	if (state)
 		m_int |= 4;
@@ -1096,7 +1099,7 @@ WRITE_LINE_MEMBER(namcos10_state::cdrom_interrupt)
 	m_io_update_interrupt(state);
 }
 
-WRITE_LINE_MEMBER(namcos10_state::cdrom_dmarq)
+void namcos10_state::cdrom_dmarq(int state)
 {
 	if (!state)
 		return;
@@ -2366,6 +2369,17 @@ void namcos10_memn_state::ns10_sekaikh(machine_config &config)
 	});
 }
 
+void namcos10_memn_state::ns10_slotouji(machine_config &config)
+{
+	namcos10_memn_base(config);
+	namcos10_mgexio(config);
+	namcos10_nand_k9f2808u0b(config, 2);
+
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xd, 0xc, 0xf, 0xa, 0xb, 0x8, 0x9, 0x6, 0x5, 0x4, 0x7, 0x1, 0x0, 0x2, 0x3); };
+
+	// TODO: decrypter
+}
+
 void namcos10_memn_state::ns10_startrgn(machine_config &config)
 {
 	namcos10_memn_base(config);
@@ -2565,6 +2579,36 @@ void namcos10_memn_state::ns10_taiko6(machine_config &config)
 		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 			return (1 & (previous_masks>>13) & (gf2_reduce(previous_cipherwords & 0x86000000ULL) ^ gf2_reduce(previous_plainwords & 0x8a000000ULL))) << 15;
+		}
+	});
+}
+
+void namcos10_memn_state::ns10_taikort(machine_config &config)
+{
+	namcos10_memn_base(config);
+	namcos10_exio(config);
+	namcos10_nand_k9f2808u0b(config, 3);
+
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xc, 0xf, 0xd, 0x8, 0xb, 0xa, 0x9, 0x5, 0x7, 0x4, 0x6, 0x2, 0x3, 0x0, 0x1); };
+
+	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
+		{
+			0x0000000014020804ULL, 0x000000000000c080ULL, 0x0000000080140400ULL, 0x0000000030102218ULL,
+			0x0000704018840801ULL, 0x0000000000002210ULL, 0x00008c0102000080ULL, 0x0000000000846000ULL,
+			0x00000000b1120202ULL, 0x0000000000001000ULL, 0x0000000000000640ULL, 0x00000000000040a0ULL,
+			0x0000000090009200ULL, 0x0000000000000908ULL, 0x000000000c0c0000ULL, 0x0000201810000000ULL
+		}, {
+			0x0000000010060824ULL, 0x000000000000e000ULL, 0x0000000080570000ULL, 0x0000000038382210ULL,
+			0x0000404011800001ULL, 0x0000000000002600ULL, 0x00001600b0080288ULL, 0x0000000000944000ULL,
+			0x00000000393a0280ULL, 0x0000000000001820ULL, 0x0000000000008440ULL, 0x00000000000000a0ULL,
+			0x0000000098619241ULL, 0x0000000000004808ULL, 0x000000000f201040ULL, 0x0000a0d290820001ULL
+		},
+		0x0000,
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+			return ((((previous_plainwords >> 25) & (gf2_reduce(previous_cipherwords & 0x40a000000001ULL) ^ gf2_reduce(previous_plainwords & 0xa000200001ULL))) ^
+					((previous_plainwords >> 27) & (gf2_reduce(previous_cipherwords & 0x2400440ULL) ^ gf2_reduce(previous_plainwords & 0x80400440ULL))) ^
+					((previous_cipherwords >> 19) & (gf2_reduce(previous_cipherwords & 0x18000201ULL) ^ gf2_reduce(previous_plainwords & 0x10000201ULL))) ^
+					((previous_cipherwords ^ previous_plainwords ^ (previous_cipherwords >> 27) ^ (previous_plainwords >> 21)) & ((previous_cipherwords^previous_plainwords) >> 6 ^ (previous_cipherwords^previous_plainwords) >> 26)) ) & 1) * 0x4010;
 		}
 	});
 }
@@ -2988,7 +3032,7 @@ static INPUT_PORTS_START( namcos10 )
 
 	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE // Test SW, almost all games expect this to be a slide type and the medal games explicitly say "slide on and off test to restart"
+	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_TOGGLE // Test SW, almost all games expect this to be a slide type and the medal games explicitly say "slide on and off test to restart"
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
 	PORT_START("EXIO_IN1")
@@ -3666,6 +3710,17 @@ ROM_START( sekaikha )
 	ROM_LOAD( "m48z35y.ic11", 0x0000, 0x8000, CRC(e0e52ffc) SHA1(557490e2f286773a945851f44ed0214de731cd75) )
 ROM_END
 
+ROM_START( slotouji )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
+	ROM_LOAD( "k9f2808u0b.8e", 0x0000000, 0x1080000, CRC(26bbbd8c) SHA1(3976e6fe98d6f6e7b5af99825db7c3c46233ce2c) )
+
+	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
+	ROM_LOAD( "k9f2808u0b.8d", 0x0000000, 0x1080000, CRC(7f3744fe) SHA1(5ad4d700a274a4d5b87dff3706a9b958c1aa4763) )
+ROM_END
+
 ROM_START( startrgn )
 	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
@@ -3771,6 +3826,27 @@ ROM_START( taiko6 )
 
 	DISK_REGION( "ata:0:cdrom" )
 	DISK_IMAGE_READONLY( "tk-6", 0, SHA1(ca8b8dfccc2022094c428b5e0b6391a77ec351f4) )
+ROM_END
+
+ROM_START( taikort )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
+	ROM_LOAD( "tkn1vera_0.8e", 0x0000000, 0x1080000, CRC(8d4a0234) SHA1(25128ba304a4f89e83720912b756854d370e8af3) )
+
+	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
+	ROM_LOAD( "tkn1vera_1.8d", 0x0000000, 0x1080000, CRC(66ac3551) SHA1(91b5af4c9ce0e1e9da0435d31d055eea41cde04d) )
+
+	ROM_REGION32_LE( 0x1080000, "nand2", 0 )
+	ROM_LOAD( "tkn1vera_2.7e", 0x0000000, 0x1080000, CRC(ac0b5f03) SHA1(f617a5bf4589edef8e1cef527dd0308be1ca9a46) )
+
+	// This is a recreated CD image using UltraISO based on the loose files from the CD since a proper image wasn't
+	// made in the past when the dumper had the chance.
+	// All 20 songs have been tested in-game to make sure the provided data actually works.
+	// A proper image of the TK-N CD must be made if there is ever a chance.
+	DISK_REGION( "ata:0:cdrom" )
+	DISK_IMAGE_READONLY( "tk-n", 0, BAD_DUMP SHA1(3987d163a47dd8616b7c15dbbbaea75f0762cce3) )
 ROM_END
 
 
@@ -3883,39 +3959,41 @@ GAME( 2000, mrdrilr2j, mrdrilr2, ns10_mrdrilr2,  mrdrilr2,     namcos10_memm_sta
 GAME( 2000, mrdrilr2u, mrdrilr2, ns10_mrdrilr2,  mrdrilr2,     namcos10_memm_state,  init_mrdrilr2,    ROT0, "Namco", "Mr. Driller 2 (US, DR23 Ver.A)", MACHINE_IMPERFECT_SOUND )
 
 // MEM(N)
-GAME( 2000, gahaha,    0,        ns10_gahaha,    gahaha,       namcos10_memn_state,  memn_driver_init, ROT0, "Namco / Metro", "GAHAHA Ippatsudou (World, GID2 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2000, ptblank3,  0,        ns10_ptblank3,  ptblank3,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco", "Point Blank 3 (World, GNN2 Ver.A)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2000, gunbalina, ptblank3, ns10_ptblank3,  ptblank3,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco", "Gunbalina (Japan, GNN1 Ver.A)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2001, gahaha2,   0,        ns10_gahaha2,   gahaha,       namcos10_memn_state,  memn_driver_init, ROT0, "Namco / Metro", "GAHAHA Ippatsudou 2 (Japan, GIS1 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2001, gjspace,   0,        ns10_gjspace,   gjspace,      namcos10_memn_state,  memn_driver_init, ROT0, "Namco / Metro", "GekiToride-Jong Space (10011 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2001, kd2001,    0,        ns10_kd2001,    namcos10,     namcos10_memn_state,  empty_init,       ROT0, "Namco", "Knock Down 2001 (Japan, KD11 Ver. B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2001, knpuzzle,  0,        ns10_knpuzzle,  namcos10,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco", "Kotoba no Puzzle Mojipittan (Japan, KPM1 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2001, mrdrilrg,  0,        ns10_mrdrilrg,  mrdrilr2,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco", "Mr. Driller G (Japan, DRG1 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2002, chocovdr,  0,        ns10_chocovdr,  namcos10,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco", "Uchuu Daisakusen: Chocovader Contactee (Japan, CVC1 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2002, gamshara,  0,        ns10_gamshara,  gamshara,     namcos10_memn_state,  memn_driver_init, ROT0, "Mitchell", "Gamshara (20020912A / 10021 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2002, gamsharao, gamshara, ns10_gamshara,  gamshara,     namcos10_memn_state,  memn_driver_init, ROT0, "Mitchell", "Gamshara (20020716A / 10021 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2002, panikuru,  0,        ns10_panikuru,  namcos10,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco", "Panikuru Panekuru (Japan, PPA1 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2002, puzzball,  0,        ns10_puzzball,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco", "Puzz Ball (Japan, PZB1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 2002, startrgn,  0,        ns10_startrgn,  startrgn,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco", "Star Trigon (Japan, STT1 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2002, sugorotc,  0,        ns10_sugorotic, mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco", "Sugorotic JAPAN (STJ1 Ver.C)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 2003, konotako,  0,        ns10_konotako,  konotako,     namcos10_memn_state,  memn_driver_init, ROT0, "Mitchell", "Kono e Tako (10021 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2003, nflclsfb,  0,        ns10_nflclsfb,  nflclsfb,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco / Metro", "NFL Classic Football (US, NCF3 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
-GAME( 2003, pacmball,  0,        ns10_pacmball,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco", "Pacman BALL (PMB2 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 2004, sekaikh,   0,        ns10_sekaikh,   mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco", "Sekai Kaseki Hakken (Japan, SKH1 Ver.B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
-GAME( 2004, sekaikha,  sekaikh,  ns10_sekaikh,   mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco", "Sekai Kaseki Hakken (Japan, SKH1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
-GAME( 2005, ballpom,   0,        ns10_ballpom,   mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco", "Ball Pom Line", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND ) // ROM VER. B0 FEB 09 2005 15:29:02 in test mode, boots but requires MGEXIO to proceed
-GAME( 2005, medalnt,   0,        ns10_medalnt,   namcos10,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco", "Medal no Tatsujin Doki! Ooatari-Darake no Sugoroku Matsuri (MTL1 SPR0B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2000, gahaha,    0,        ns10_gahaha,    gahaha,       namcos10_memn_state,  memn_driver_init, ROT0, "Namco / Metro",     "GAHAHA Ippatsudou (World, GID2 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2000, ptblank3,  0,        ns10_ptblank3,  ptblank3,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Point Blank 3 (World, GNN2 Ver.A)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2000, gunbalina, ptblank3, ns10_ptblank3,  ptblank3,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Gunbalina (Japan, GNN1 Ver.A)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2001, gahaha2,   0,        ns10_gahaha2,   gahaha,       namcos10_memn_state,  memn_driver_init, ROT0, "Namco / Metro",     "GAHAHA Ippatsudou 2 (Japan, GIS1 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2001, gjspace,   0,        ns10_gjspace,   gjspace,      namcos10_memn_state,  memn_driver_init, ROT0, "Namco / Metro",     "GekiToride-Jong Space (10011 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2001, kd2001,    0,        ns10_kd2001,    namcos10,     namcos10_memn_state,  empty_init,       ROT0, "Namco",             "Knock Down 2001 (Japan, KD11 Ver. B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2001, knpuzzle,  0,        ns10_knpuzzle,  namcos10,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Kotoba no Puzzle Mojipittan (Japan, KPM1 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2001, mrdrilrg,  0,        ns10_mrdrilrg,  mrdrilr2,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Mr. Driller G (Japan, DRG1 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2002, chocovdr,  0,        ns10_chocovdr,  namcos10,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Uchuu Daisakusen: Chocovader Contactee (Japan, CVC1 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2002, gamshara,  0,        ns10_gamshara,  gamshara,     namcos10_memn_state,  memn_driver_init, ROT0, "Mitchell",          "Gamshara (20020912A / 10021 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2002, gamsharao, gamshara, ns10_gamshara,  gamshara,     namcos10_memn_state,  memn_driver_init, ROT0, "Mitchell",          "Gamshara (20020716A / 10021 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2002, panikuru,  0,        ns10_panikuru,  namcos10,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Panikuru Panekuru (Japan, PPA1 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2002, puzzball,  0,        ns10_puzzball,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Puzz Ball (Japan, PZB1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2002, startrgn,  0,        ns10_startrgn,  startrgn,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Star Trigon (Japan, STT1 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2002, sugorotc,  0,        ns10_sugorotic, mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Sugorotic JAPAN (STJ1 Ver.C)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2003, konotako,  0,        ns10_konotako,  konotako,     namcos10_memn_state,  memn_driver_init, ROT0, "Mitchell",          "Kono e Tako (10021 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2003, nflclsfb,  0,        ns10_nflclsfb,  nflclsfb,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco / Metro",     "NFL Classic Football (US, NCF3 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
+GAME( 2003, pacmball,  0,        ns10_pacmball,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Pacman BALL (PMB2 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2003, slotouji,  0,        ns10_slotouji,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Slot no Oujisama / Slot Prince (Japan, SLO1 Ver. B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // May 2 2003, decrypter not done yet
+GAME( 2004, sekaikh,   0,        ns10_sekaikh,   mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Sekai Kaseki Hakken (Japan, SKH1 Ver.B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
+GAME( 2004, sekaikha,  sekaikh,  ns10_sekaikh,   mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Sekai Kaseki Hakken (Japan, SKH1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
+GAME( 2005, ballpom,   0,        ns10_ballpom,   mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Ball Pom Line", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND ) // ROM VER. B0 FEB 09 2005 15:29:02 in test mode, boots but requires MGEXIO to proceed
+GAME( 2005, medalnt,   0,        ns10_medalnt,   namcos10,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Medal no Tatsujin Doki! Ooatari-Darake no Sugoroku Matsuri (MTL1 SPR0B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME( 2006, keroro,    0,        ns10_keroro,    mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco / Banpresto", "Keroro Gunsou: Pekopon Shinryaku Shirei...De Arimasu! (KRG1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // ケロロ軍曹　地球侵略指令…であります！
-GAME( 2007, gegemdb,   0,        ns10_gegemdb,   mgexio_medal, namcos10_memn_state,  empty_init,       ROT0, "Namco", "Gegege no Kitaro Yokai Yokocho Matsuri de Battle Ja (GYM1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // ゲゲゲの鬼太郎　妖怪横丁まつりでバトルじゃ
-GAME( 2007, medalnt2,  0,        ns10_medalnt2,  namcos10,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco", "Medal no Tatsujin 2 Atsumare! Go! Go! Sugoroku Sentai Don Ranger Five (MTA1 STMPR0A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // メダルの達人2 あつまれ!ゴー!ゴー!双六戦隊ドンレンジャーファイブ MTA100-1-ST-MPR0-A00 2007/01/30 19:51:54
+GAME( 2007, gegemdb,   0,        ns10_gegemdb,   mgexio_medal, namcos10_memn_state,  empty_init,       ROT0, "Namco",             "Gegege no Kitaro Yokai Yokocho Matsuri de Battle Ja (GYM1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // ゲゲゲの鬼太郎　妖怪横丁まつりでバトルじゃ
+GAME( 2007, medalnt2,  0,        ns10_medalnt2,  namcos10,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Medal no Tatsujin 2 Atsumare! Go! Go! Sugoroku Sentai Don Ranger Five (MTA1 STMPR0A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // メダルの達人2 あつまれ!ゴー!ゴー!双六戦隊ドンレンジャーファイブ MTA100-1-ST-MPR0-A00 2007/01/30 19:51:54
 
-GAME( 2001, taiko2,    0,        ns10_taiko2,    taiko,        namcos10_memn_state,  memn_driver_init, ROT0, "Namco", "Taiko no Tatsujin 2 (Japan, TK21 Ver.C)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 2002, taiko3,    0,        ns10_taiko3,    taiko,        namcos10_memn_state,  memn_driver_init, ROT0, "Namco", "Taiko no Tatsujin 3 (Japan, TK31 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 2002, taiko4,    0,        ns10_taiko4,    taiko,        namcos10_memn_state,  memn_driver_init, ROT0, "Namco", "Taiko no Tatsujin 4 (Japan, TK41 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 2003, taiko5,    0,        ns10_taiko5,    taiko,        namcos10_memn_state,  memn_driver_init, ROT0, "Namco", "Taiko no Tatsujin 5 (Japan, TK51 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 2004, taiko6,    0,        ns10_taiko6,    taiko,        namcos10_memn_state,  memn_driver_init, ROT0, "Namco", "Taiko no Tatsujin 6 (Japan, TK61 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2001, taiko2,    0,        ns10_taiko2,    taiko,        namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Taiko no Tatsujin 2 (Japan, TK21 Ver.C)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2002, taiko3,    0,        ns10_taiko3,    taiko,        namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Taiko no Tatsujin 3 (Japan, TK31 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2002, taiko4,    0,        ns10_taiko4,    taiko,        namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Taiko no Tatsujin 4 (Japan, TK41 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2003, taiko5,    0,        ns10_taiko5,    taiko,        namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Taiko no Tatsujin 5 (Japan, TK51 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2004, taiko6,    0,        ns10_taiko6,    taiko,        namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Taiko no Tatsujin 6 (Japan, TK61 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2004, taikort,   0,        ns10_taikort,   taiko,        namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Taiko no Tatsujin RT: Nippon no Kokoro (Japan, TKN1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // MEM(P3)
 GAME( 2001, g13jnr,    0,        ns10_g13jnr,    g13jnr,       namcos10_memp3_state, memn_driver_init, ROT0, "Eighting / Raizing / Namco", "Golgo 13: Juusei no Requiem (Japan, GLT1 VER.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2002, nicetsuk,  0,        ns10_nicetsuk,  nicetsuk,     namcos10_memp3_state, memn_driver_init, ROT0, "Namco / Metro", "Tsukkomi Yousei Gips Nice Tsukkomi (NTK1 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2003, squizchs,  0,        ns10_squizchs,  squizchs,     namcos10_memp3_state, memn_driver_init, ROT0, "Namco", "Seishun-Quiz Colorful High School (CHS1 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2002, nicetsuk,  0,        ns10_nicetsuk,  nicetsuk,     namcos10_memp3_state, memn_driver_init, ROT0, "Namco / Metro",              "Tsukkomi Yousei Gips Nice Tsukkomi (NTK1 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2003, squizchs,  0,        ns10_squizchs,  squizchs,     namcos10_memp3_state, memn_driver_init, ROT0, "Namco",                      "Seishun-Quiz Colorful High School (CHS1 Ver.A)", MACHINE_IMPERFECT_SOUND )

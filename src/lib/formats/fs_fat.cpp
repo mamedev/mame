@@ -141,10 +141,12 @@
 ****************************************************************************/
 
 #include "fs_fat.h"
+#include "fsblk.h"
 #include "pc_dsk.h"
+
 #include "strformat.h"
-#include "util/corestr.h"
-#include "util/strformat.h"
+
+#include <optional>
 
 using namespace fs;
 
@@ -449,8 +451,8 @@ std::unique_ptr<filesystem_t> fs::fat_image::mount_partition(fsblk_t &blockdev, 
 
 std::string directory_entry::name() const
 {
-	std::string_view stem = strtrimrightspace(raw_stem());
-	std::string_view ext = strtrimrightspace(raw_ext());
+	std::string_view stem = filesystem_t::trim_end_spaces(raw_stem());
+	std::string_view ext = filesystem_t::trim_end_spaces(raw_ext());
 	return !ext.empty()
 		? util::string_format("%s.%s", stem, ext)
 		: std::string(stem);
@@ -711,8 +713,8 @@ void impl::iterate_directory_entries(const directory_span &dir, const std::funct
 			if (dirent.raw_stem()[0] != 0x00)
 			{
 				// get the filename
-				std::string_view stem = strtrimrightspace(dirent.raw_stem());
-				std::string_view ext = strtrimrightspace(dirent.raw_ext());
+				std::string_view stem = trim_end_spaces(dirent.raw_stem());
+				std::string_view ext = trim_end_spaces(dirent.raw_ext());
 				if (ext.empty() && (stem == "." || stem == ".."))
 					continue;
 

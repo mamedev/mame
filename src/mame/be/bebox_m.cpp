@@ -319,7 +319,7 @@ void bebox_state::bebox_set_irq_bit(unsigned int interrupt_bit, int val)
  *
  *************************************/
 
-WRITE_LINE_MEMBER( bebox_state::fdc_interrupt )
+void bebox_state::fdc_interrupt(int state)
 {
 	bebox_set_irq_bit(13, state);
 	m_pic8259[0]->ir6_w(state);
@@ -346,12 +346,12 @@ uint64_t bebox_state::bebox_interrupt_ack_r()
  *
  *************************************************************/
 
-WRITE_LINE_MEMBER(bebox_state::bebox_pic8259_master_set_int_line)
+void bebox_state::bebox_pic8259_master_set_int_line(int state)
 {
 	bebox_set_irq_bit(5, state);
 }
 
-WRITE_LINE_MEMBER(bebox_state::bebox_pic8259_slave_set_int_line)
+void bebox_state::bebox_pic8259_slave_set_int_line(int state)
 {
 	m_pic8259[0]->ir2_w(state);
 }
@@ -362,7 +362,7 @@ WRITE_LINE_MEMBER(bebox_state::bebox_pic8259_slave_set_int_line)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(bebox_state::bebox_ide_interrupt)
+void bebox_state::bebox_ide_interrupt(int state)
 {
 	bebox_set_irq_bit(7, state);
 	m_pic8259[0]->ir6_w(state);
@@ -507,7 +507,7 @@ uint8_t bebox_state::bebox_80000480_r()
 }
 
 
-WRITE_LINE_MEMBER(bebox_state::bebox_dma_hrq_changed)
+void bebox_state::bebox_dma_hrq_changed(int state)
 {
 	m_ppc[0]->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
@@ -533,7 +533,8 @@ void bebox_state::bebox_dma_write_byte(offs_t offset, uint8_t data)
 	prog_space.write_byte(page_offset + offset, data);
 }
 
-WRITE_LINE_MEMBER(bebox_state::bebox_dma8237_out_eop){
+void bebox_state::bebox_dma8237_out_eop(int state)
+{
 	m_smc37c78->tc_w(state);
 }
 
@@ -542,10 +543,10 @@ inline void bebox_state::set_dma_channel(int channel, int state)
 	if (!state) m_dma_channel = channel;
 }
 
-WRITE_LINE_MEMBER(bebox_state::pc_dack0_w){ set_dma_channel(0, state); }
-WRITE_LINE_MEMBER(bebox_state::pc_dack1_w){ set_dma_channel(1, state); }
-WRITE_LINE_MEMBER(bebox_state::pc_dack2_w){ set_dma_channel(2, state); }
-WRITE_LINE_MEMBER(bebox_state::pc_dack3_w){ set_dma_channel(3, state); }
+void bebox_state::pc_dack0_w(int state) { set_dma_channel(0, state); }
+void bebox_state::pc_dack1_w(int state) { set_dma_channel(1, state); }
+void bebox_state::pc_dack2_w(int state) { set_dma_channel(2, state); }
+void bebox_state::pc_dack3_w(int state) { set_dma_channel(3, state); }
 
 /*************************************
  *
@@ -553,7 +554,7 @@ WRITE_LINE_MEMBER(bebox_state::pc_dack3_w){ set_dma_channel(3, state); }
  *
  *************************************/
 
-WRITE_LINE_MEMBER(bebox_state::bebox_timer0_w)
+void bebox_state::bebox_timer0_w(int state)
 {
 	m_pic8259[0]->ir0_w(state);
 }

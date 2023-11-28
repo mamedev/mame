@@ -56,7 +56,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	void adpcm_int(int state);
 	void sample_ctrl_w(uint8_t data);
 	void alligators_ctrl1_w(uint8_t data);
 	void alligators_ctrl2_w(uint8_t data);
@@ -69,7 +69,7 @@ private:
 	template <unsigned N> void disp_w(uint8_t data) { set_digits(N << 1, data); }
 
 	void pmm8713_ck(int i, int state);
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(alligator_ck) { pmm8713_ck(N, state); }
+	template <unsigned N> void alligator_ck(int state) { pmm8713_ck(N, state); }
 
 	void irq_ack_w(uint8_t data)            { m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE); }
 	void firq_ack_w(uint8_t data)           { m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE); }
@@ -92,7 +92,7 @@ private:
 	uint8_t   m_adpcm_ctrl;
 
 	uint8_t   m_alligators_ctrl;
-	int     m_motors_pos[5];
+	int       m_motors_pos[5] = { };
 };
 
 
@@ -199,6 +199,7 @@ void wackygtr_state::machine_reset()
 	m_adpcm_pos = 0;
 	m_adpcm_sel = 0;
 	m_adpcm_ctrl = 0x80;
+	m_alligators_ctrl = 0;
 }
 
 void wackygtr_state::set_digits(int p, uint8_t value)
@@ -250,7 +251,7 @@ static INPUT_PORTS_START( wackygtr )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 INPUT_PORTS_END
 
-WRITE_LINE_MEMBER(wackygtr_state::adpcm_int)
+void wackygtr_state::adpcm_int(int state)
 {
 	if (!(m_adpcm_ctrl & 0x80))
 	{

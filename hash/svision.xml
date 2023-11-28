@@ -706,10 +706,21 @@ license:CC0-1.0
 	<software name="sonnyxpr">
 		<description>Sonny X'press</description>
 		<year>199?</year>
-		<publisher>Watera</publisher>
+		<publisher>unknown</publisher>
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="0x10000">
 				<rom name="sonnyxpr.bin" size="0x10000" crc="c99b985a" sha1="00724d0275bd4ef77514468d6d04669c93125e32"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sonnyxpra" cloneof="sonnyxpr">
+		<description>Sonny X'press (prototype)</description>
+		<year>199?</year>
+		<publisher>unknown</publisher>
+		<part name="cart" interface="svision_cart">
+			<dataarea name="rom" size="0x10000">
+				<rom name="sonnyxpra.bin" size="0x10000" crc="cb67bcd8" sha1="578cdce33420facf19d2b7227b41693adde5b60e"/>
 			</dataarea>
 		</part>
 	</software>

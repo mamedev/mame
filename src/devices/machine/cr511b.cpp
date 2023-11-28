@@ -63,13 +63,6 @@ cr511b_device::cr511b_device(const machine_config &mconfig, const char *tag, dev
 
 void cr511b_device::device_start()
 {
-	// resolve callbacks
-	m_stch_handler.resolve_safe();
-	m_sten_handler.resolve_safe();
-	m_drq_handler.resolve_safe();
-	m_dten_handler.resolve_safe();
-	m_scor_handler.resolve_safe();
-	m_xaen_handler.resolve_safe();
 }
 
 //-------------------------------------------------
@@ -93,12 +86,12 @@ void cr511b_device::write(uint8_t data)
 {
 }
 
-WRITE_LINE_MEMBER( cr511b_device::enable_w )
+void cr511b_device::enable_w(int state)
 {
 	m_enabled = state;
 }
 
-WRITE_LINE_MEMBER( cr511b_device::cmd_w )
+void cr511b_device::cmd_w(int state)
 {
 	m_cmd = state;
 }

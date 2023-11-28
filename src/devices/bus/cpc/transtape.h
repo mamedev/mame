@@ -26,7 +26,7 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 
 	virtual void set_mapping(uint8_t type) override;
-	virtual WRITE_LINE_MEMBER( romen_w ) override { m_romen = state; }
+	virtual void romen_w(int state) override { m_romen = state; }
 
 	uint8_t input_r();
 	void output_w(uint8_t data);

@@ -63,10 +63,10 @@ public:
 	uint8_t read();
 	void write(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(iei_w) { m_iei = state; interrupt_check(); }
-	DECLARE_WRITE_LINE_MEMBER(rdy_w);
-	DECLARE_WRITE_LINE_MEMBER(wait_w);
-	DECLARE_WRITE_LINE_MEMBER(bai_w);
+	void iei_w(int state) { m_iei = state; interrupt_check(); }
+	void rdy_w(int state);
+	void wait_w(int state);
+	void bai_w(int state);
 
 private:
 	// device-level overrides

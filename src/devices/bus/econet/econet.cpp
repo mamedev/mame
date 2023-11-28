@@ -191,9 +191,6 @@ econet_device::econet_device(const machine_config &mconfig, const char *tag, dev
 
 void econet_device::device_start()
 {
-	// resolve callbacks
-	m_write_clk.resolve_safe();
-	m_write_data.resolve_safe();
 }
 
 
@@ -237,7 +234,7 @@ econet_device::daisy_entry::daisy_entry(device_econet_interface &device) :
 //  clk_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( econet_device::host_clk_w )
+void econet_device::host_clk_w(int state)
 {
 	set_signal(this, CLK, state);
 }
@@ -247,7 +244,7 @@ WRITE_LINE_MEMBER( econet_device::host_clk_w )
 //  data_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( econet_device::host_data_w )
+void econet_device::host_data_w(int state)
 {
 	set_signal(this, DATA, state);
 }

@@ -37,7 +37,7 @@ public:
 	uint8_t read(address_space &space, offs_t offset);
 
 	// control lines
-	DECLARE_WRITE_LINE_MEMBER(oe_w);
+	void oe_w(int state);
 	void unlock_write8(uint8_t data);
 	void unlock_write16(uint16_t data);
 	void unlock_write32(uint32_t data);

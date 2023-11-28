@@ -21,6 +21,12 @@ TODO:
 #include "sspeedr.lh"
 
 
+void sspeedr_state::machine_start()
+{
+	m_digits.resolve();
+	m_lampgo.resolve();
+	m_lampep.resolve();
+}
 
 void sspeedr_state::palette(palette_device &palette) const
 {
@@ -50,8 +56,8 @@ void sspeedr_state::int_ack_w(uint8_t data)
 
 void sspeedr_state::lamp_w(uint8_t data)
 {
-	output().set_value("lampGO", BIT(data, 0));
-	output().set_value("lampEP", BIT(data, 1));
+	m_lampgo = BIT(data, 0);
+	m_lampep = BIT(data, 1);
 	machine().bookkeeping().coin_counter_w(0, data & 8);
 }
 

@@ -66,8 +66,8 @@ private:
 	optional_region_ptr<uint8_t> m_default_data;
 
 	// I/O operations
-	DECLARE_WRITE_LINE_MEMBER( set_a9_12v );
-	DECLARE_WRITE_LINE_MEMBER( set_oe_12v );
+	void set_a9_12v(int state);
+	void set_oe_12v(int state);
 	TIMER_CALLBACK_MEMBER( write_complete );
 
 	void at28c64b_map8(address_map &map);

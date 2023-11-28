@@ -65,61 +65,7 @@ Compiled by K1W1
     - Video Easel
     - Worm War 1
 
-  * Cartridge Types :
-
-    - Standard 8k map to address area $A000-$BFFF.
-    - Standard 16k cartridges map to address area $8000-$BFFF.
-
-    - Right slot 8k cartridges are run in the address area from $8000-$9FFF. Atari 800 only.
-
-    - Phoenix 8k cartridges occupy 8k of address space between $A000 and $BFFF, and can be disabled by an access to $D500-$D5FF.
-
-    - Blizzard 16k cartridges occupy 16k of address space between $8000 and $BFFF, and can be disabled by an access to $D500-$D5FF.
-
-    - MegaCart 16k cartridges occupy 16k of address space between $8000 and $BFFF, and can be disabled by writing a byte with bit 7 set to $D500-$D5FF.
-    - MegaCart 32k are bank-switched cartridges that occupy 16k of address space between $8000 and $BFFF. It is controlled by a byte written to $D500-$D5FF.
-      Bit 0 selects one of two available banks, bit 7 disables the cartridge.
-
-    - Williams 32k cartridges have 4 banks mapped to $A000-$BFFF. An access to $D500 selects bank A, $D501 - bank B, etc. An access to $D508-$D50F disables the cartridge.
-    - Williams 64k cartridges have 8 banks mapped to $A000-$BFFF. An access to $D507 selects bank A, $D506 - bank B, etc. An access to $D508-$D50F disables the cartridge.
-
-    - DB 32k bank-switched cartridges have 4 banks. Bank D is mapped to $A000-$BFFF. Bank in $8000-$9FFF is selected by an access to $D500-$D5FF.
-      Two lowest bits of address select bank A, B, C or D.
-
-    - Express 64k cartridges have 8 banks mapped to $A000-$BFFF. An access to $D577 selects bank A, $D576 - bank B, etc. An access to $D578-$D57F disables the cartridge.
-
-    - Diamond 64k cartridges have 8 banks mapped to $A000-$BFFF. An access to $D5D7 selects bank A, $D5D6 - bank B, etc. An access to $D5D8-$D5DF disables the cartridge.
-
-    - SpartaDOS X cartridges have 8 banks mapped to $A000-$BFFF. An access to $D5E7 selects bank A, $D5E6 - bank B, etc. An access to $D5E8-$D5EF disables the cartridge.
-
-    - BBSB Contains main bank at $A000-$BFFF. From $8000-$8FFF is first bank, $9000-$9FFF is second bank. They are switched by accessing $8FF6-$8FF9 & $9FF6-$9FF9 respectively.
-      In each bank there's 4 x 4 KBs. Totally, it's 2 x 4 x 4 + 8 = 40 KBs. This switching technique is only used with the "Bounty Bob Strikes Back" cartridge.
-
-    - OSS Cartridge: -
-
-      There are two types of OSS cartridges. Both are 16 KB and occupy 8 KB of address space between $A000 and $BFFF.
-      The cartridge memory is divided into 4 banks, 4 KB each. One bank ('main') is always mapped to $B000-$BFFF.
-      The other 3 banks are mapped to $A000-$AFFF. The current bank is selected by accessing a byte in $D500-$D5FF.
-      Only 4 lowest bits of address are significant.
-
-        034M = This scheme is the more complicated of the two. The main bank is D. An access to: -
-                $D5x0 or $D5x1 selects bank A.
-                $D5x3 or $D5x7 selects bank B.
-                $D5x4 or $D5x5 selects bank C.
-                $D5x2 or $D5x6 is not useful. It disables ROM (there're $FF bytes in $A000-$AFFF).
-                $D5x8-$D5xF disables whole cartridge (enables computer's memory in address space between $A000 and $BFFF).
-
-        MO91 = This is the simpler one of OSS schemes. It uses only A0 and A3 address lines: -
-                A3=0, A0=0 - $A000-$AFFF: bank B, $B000-$BFFF: bank A.
-                A3=0, A0=1 - $A000-$AFFF: bank D, $B000-$BFFF: bank A.
-                A3=1, A0=0 - disable cartridge.
-                A3=1, A0=1 - $A000-$AFFF: bank C, $B000-$BFFF: bank A.
-
-        043M = Not much is known about this mapping scheme. It is only used in the "MAC/65 v1.0" & "Action! v3.5" cartridges.
-
-        8k OSS = Not much is known about this mapping scheme. It is only used in the "The Writers Tool" cartridge.
-
-    - Corina cartridge designed by GR8 Software
+  * For Cartridge Types please refer to bus/a800 folder.
 
   * Copy Protection - Some cartridges were produced that utilised a form of copy protection by writing data back to the ROM area in memory. There are many versions of
     these ROM's available that have been altered to circumvent this protection. This collection where possible has used original unaltered ROM's, those that have been
@@ -177,22 +123,7 @@ Compiled by K1W1
    - Atari                                    RAM Extension Module Test Rev 1.0
    - Atari Mexico                    U        LOGO Computing Language
 
-   - Atrax                           ER       Atrax (#01)
-   - Atrax                           ER       Atrax (#02)
-   - Atrax                           ER       Atrax (#03)
-   - Atrax                           ER       Atrax (#04)
-   - Atrax                           ER       Atrax (#05)
-   - Atrax                           ER       Atrax (#06)
    - Atrax                           ER       Atrax (#07)
-   - Atrax                           ER       Atrax (#08)
-   - Atrax                           ER       Atrax (#09)
-   - Atrax                           ER       Atrax (#10)
-   - Atrax                           ER       Atrax (#11)
-   - Atrax                           ER       Atrax (#12)
-   - Atrax                           ER       Atrax (#13)
-   - Atrax                           ER       Atrax (#14)
-   - Atrax                           ER       Atrax (#15)
-   - Atrax                           ER       Atrax (#16)
 
    - Beaumont                        ER       PUP (Primary Utility Pack)
 
@@ -384,10 +315,16 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="saltse02">
+	<software name="saltse02" supported="partial">
 		<description>600xl/800xl SALT Diagnostic Cartridge vSE.02</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+RAM test corrupts gfxs when RAM size is bigger than 16K
+Unemulated XTERN bus item [PBI]
+ITIA test returns not [GTIA]
+Voltage test fails
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">
@@ -512,7 +449,7 @@ Align test never completes, burn-in test requires a test disk and writing to flo
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_oss034m" />
 			<dataarea name="rom" size="16384">
-				<rom name="action programming language v3.6 (alt).rom" size="16384" crc="eb905cb4" sha1="a9db2200bda7980436461e2d48d02f2a3f3b54ac"/> <!-- Verified -->
+				<rom name="action programming language v3.6 (alt).rom" size="16384" crc="eb905cb4" sha1="a9db2200bda7980436461e2d48d02f2a3f3b54ac" status="baddump"/> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -542,13 +479,14 @@ Align test never completes, burn-in test requires a test disk and writing to flo
 		</part>
 	</software>
 
-	<software name="alfclrcv" supported="partial">
+	<software name="alfclrcv" supported="no">
 		<description>Alf in the Color Caves</description>
 		<year>1984</year>
 		<publisher>Spinnaker</publisher>
 		<notes><![CDATA[
 a800: Doesn't complete first animation after selecting left tunnel during gameplay, [cart] handling (override right slot map?)
 Draws with solid orange at bottom of screen after selecting left tunnel, should be black [ANTIC]
+Crashes during attract
 ]]></notes>
 		<info name="developer" value="Joyce Hakansson Associates, Inc" />
 		<info name="serial" value="ALF-AT" />
@@ -592,10 +530,13 @@ Unsupported [AtariLab] module
 		</part>
 	</software>
 
-	<software name="alienamb">
+	<software name="alienamb" supported="partial">
 		<description>Alien Ambush</description>
 		<year>1983</year>
 		<publisher>DANA</publisher>
+		<notes><![CDATA[
+Doesn't mask sprites on bottom of screen [GTIA] GRACTL
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
 			<dataarea name="rom" size="8192">
@@ -729,14 +670,11 @@ Title screen has masking artifact and wrong color (should be green) on mode sele
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[
-AST 2000 was two cartridges in one - it contained an AST Utility cartridge, and a cartridge for Turbo 2000 (another turbo system popular in Poland).
-The "AST 2000" contained a 16KB ROM and a two-position switch, which allowed to choose between one of two 8KB banks. So in reality this image is
-composed of two 8KB images. This ROM can be split in half and of the halves mounted as a Phoenix 8KB cartridge. Unfortunately, the second half
-(Turbo 2000) won't work in the emulator - the real cartridge contained a capacitor that automatically switched off the cartridge from memory after
-a certain time, and this isn't currently emulated.
+Unemulated [cassette] interface
+https://forums.atariage.com/topic/169199-mess-a800-cartridge-software-list/#comment-2136371
 ]]></notes>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="N/A" />
+			<feature name="slot" value="a800_phoenix_ast2k" />
 			<dataarea name="rom" size="16384">
 				<rom name="ast 2000.rom" size="16384" crc="e9da4eaa" sha1="7590ef4519ff33a80bb9a19a1dc903c44edcbc69"/>
 			</dataarea>
@@ -1026,6 +964,287 @@ a certain time, and this isn't currently emulated.
 		</part>
 	</software>
 
+	<!-- All Atrax entry notes presumes to use a PAL machine -->
+	<!-- (They have extra glitches when using NTSC) -->
+	<!-- It's unknown if any of these have been released outside Poland, probably not -->
+	<software name="atrax01" supported="partial">
+		<description>Atrax #01 (Poland)</description>
+		<year>1993?</year>
+		<publisher>Atrax</publisher>
+		<notes><![CDATA[
+Easy Money: boots
+Spy Master: boots
+Hawkmoon: cutoff [GTIA] main sprite
+Trix: inputs are too fast (verify)
+]]></notes>
+		<info name="usage" value="Spy Master: sports manual copy protection when accessing terminals" />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_atrax" />
+			<dataarea name="rom" size="131072">
+				<rom name="atrax01.bin" size="131072" crc="d3653f64" sha1="476333a6185a7d70a65a7c992eaee6cc6993790d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atrax02" supported="partial">
+		<description>Atrax #02 (Poland)</description>
+		<year>1993?</year>
+		<publisher>Atrax</publisher>
+		<notes><![CDATA[
+Vicky: boots
+Darkness Hour: boots
+Kampania Wrzesniowa: boots
+Geometria: sports heavy blackened [ANTIC] GFXs sections
+]]></notes>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_atrax" />
+			<dataarea name="rom" size="131072">
+				<rom name="atrax02.bin" size="131072" crc="e34facd9" sha1="dee6b708165be781eb8f7e265e7209a9365f11be"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atrax03">
+		<description>Atrax #03 (Poland)</description>
+		<year>1993?</year>
+		<publisher>Atrax</publisher>
+		<notes><![CDATA[
+Frank and Mark: boots
+Czaszki: boots
+The Jet Action: [ANTIC] playfield flickers a lot with NTSC machine (verify), has odd yellow boxes when starting a stage (verify)
+Gold Hunter: boots
+]]></notes>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_atrax" />
+			<dataarea name="rom" size="131072">
+				<rom name="atrax03.bin" size="131072" crc="55e39b41" sha1="e0cf78cf7b03216396079a3577e8d049d8b5c3f7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atrax04" supported="partial">
+		<description>Atrax #04 (Poland)</description>
+		<year>1993?</year>
+		<publisher>Atrax</publisher>
+		<notes><![CDATA[
+Streets: [ANTIC] playfield flickers on NTSC (verify)
+Kernaw: [GTIA] sprites don't completely mask out on edges, [ANTIC] playfield flickers on NTSC (verify)
+Dagobar: [ANTIC] playfield flickers on NTSC (verify)
+Uczen Czarnoksieznika: [GTIA] main sprite don't mask out on screen edge (verify)
+]]></notes>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_atrax" />
+			<dataarea name="rom" size="131072">
+				<rom name="atrax04.bin" size="131072" crc="dc5a540b" sha1="0f82354df78c4fe9384eb56bc97ac0fe9c6c31e6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atrax05">
+		<description>Atrax #05 (Poland)</description>
+		<year>1993?</year>
+		<publisher>Atrax</publisher>
+		<notes><![CDATA[
+Syn Boga Wiatru: [GTIA] ladder collision detection is off (verify)
+Honky: boots
+U 235: [ANTIC] playfield flickers on NTSC (verify)
+Hydraulik: boots
+]]></notes>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_atrax" />
+			<dataarea name="rom" size="131072">
+				<rom name="atrax05.bin" size="131072" crc="a599c16c" sha1="c7b5ec6c13749a951bd4bec4671aefe5076fdbb9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atrax06">
+		<description>Atrax #06 (Poland)</description>
+		<year>1993?</year>
+		<publisher>Atrax</publisher>
+		<notes><![CDATA[
+Imagine: boots
+Adax: boots
+Aurum: boots
+Electra: boots
+]]></notes>
+		<!-- Cheat: press TAB to skip a level in Electra -->
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_atrax" />
+			<dataarea name="rom" size="131072">
+				<rom name="atrax06.bin" size="131072" crc="74dba211" sha1="023680763209f3b360801e5096d820e62c6e663f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atrax08" supported="partial">
+		<description>Atrax #08 (Poland)</description>
+		<year>1993?</year>
+		<publisher>Atrax</publisher>
+		<notes><![CDATA[
+Smus: doesn't mask [GTIA] sprites on game over screen
+Captain Gather: boots
+Snowball: weird input handling (verify)
+Major Bronx: boots
+]]></notes>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_atrax" />
+			<dataarea name="rom" size="131072">
+				<rom name="atrax08.bin" size="131072" crc="d9d5c193" sha1="b9f7b40c36d130acda0f00ac8f6cd8b20af297a6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atrax09">
+		<description>Atrax #09 (Poland)</description>
+		<year>1993?</year>
+		<publisher>Atrax</publisher>
+		<notes><![CDATA[
+Digi Duck: boots
+Microx: boots
+Piekielko: boots
+Android: boots
+]]></notes>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_atrax" />
+			<dataarea name="rom" size="131072">
+				<rom name="atrax09.bin" size="131072" crc="0e99e18c" sha1="b647e121c1f6c0eb4346168db8f0964104e7c363"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atrax10" supported="partial">
+		<description>Atrax #10 (Poland)</description>
+		<year>1993?</year>
+		<publisher>Atrax</publisher>
+		<notes><![CDATA[
+Wladca: boots
+Alchemia: [GTIA] main sprite don't completely mask out on edges
+Wloczykij: boots
+Saper: boots
+]]></notes>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_atrax" />
+			<dataarea name="rom" size="131072">
+				<rom name="atrax10.bin" size="131072" crc="8ccddb58" sha1="c80136bfdae0fec9d7fd6d7509de69f81e251707"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atrax11" supported="partial">
+		<description>Atrax #11 (Poland)</description>
+		<year>1993?</year>
+		<publisher>Atrax</publisher>
+		<notes><![CDATA[
+Bank Bang!: boots
+Eureka!: boots
+Jaffar: boots
+Robal: boots
+Thinker: incorrect [ANTIC] masking effects
+]]></notes>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_atrax" />
+			<dataarea name="rom" size="131072">
+				<rom name="atrax11.bin" size="131072" crc="8f269d78" sha1="450d2c5d20018e96747df0e4a1c56f745ed09a5d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atrax12" supported="partial">
+		<description>Atrax #12 (Poland)</description>
+		<year>1993?</year>
+		<publisher>Atrax</publisher>
+		<notes><![CDATA[
+Bertyx: boots
+Midnight: boots
+Tank vs Tank: hangs on gameplay
+Sexversi: boots
+]]></notes>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_atrax" />
+			<dataarea name="rom" size="131072">
+				<rom name="atrax12.bin" size="131072" crc="a1c2f2a0" sha1="af29105021ab00d071f47e82c895350f7cd97470"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atrax13" supported="partial">
+		<description>Atrax #13 (Poland)</description>
+		<year>1993?</year>
+		<publisher>Atrax</publisher>
+		<notes><![CDATA[
+Tanks: No [GTIA] bullets, player inputs stops responding from time to time (verify)
+Tron: wrong [ANTIC] raster split for scrolling text (fixes when returning from gameplay), heavy [ANTIC] and [GTIA] artifacts on gameplay, can either not recognize or straight crash when pausing with 'P' key
+Tusker: boots
+Helix: boots
+]]></notes>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_atrax" />
+			<dataarea name="rom" size="131072">
+				<rom name="atrax13.bin" size="131072" crc="800ab6d7" sha1="7debecedafff2ebb0c0c7b30bb632c7f35764753"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atrax14" supported="no">
+		<description>Atrax #14 (Poland)</description>
+		<year>199?</year>
+		<publisher>Atrax</publisher>
+		<!-- TODO: Kolony needs Polish language knowledge -->
+		<notes><![CDATA[
+Axilox: cut off [ANTIC] text during gameplay
+Kolony:
+Reverse: [GTIA] button trigger is too fast
+Ship: black screen
+]]></notes>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_atrax" />
+			<dataarea name="rom" size="131072">
+				<rom name="atrax14.bin" size="131072" crc="21db0d60" sha1="fa67b2a73cdde0dec0647b60290cbe6e1e335bad"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atrax15" supported="partial">
+		<description>Atrax #15 (Poland)</description>
+		<year>199?</year>
+		<publisher>Atrax</publisher>
+		<!-- TODO: Cywilizacja and Mozgprocesor needs Polish language knowledge -->
+		<notes><![CDATA[
+Cywilizacja:
+Mozgprocesor:
+Missile Action: boots
+Zbir: boots
+]]></notes>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_atrax" />
+			<dataarea name="rom" size="131072">
+				<rom name="atrax15.bin" size="131072" crc="9543ef90" sha1="a4da951e20003d15372011fe8b859a5ba3ebf5b6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atrax16" supported="no">
+		<description>Atrax #16 (Poland)</description>
+		<year>199?</year>
+		<publisher>Atrax</publisher>
+		<!-- TODO: Historia entries all needs Polish language knowledge -->
+		<notes><![CDATA[
+Ortografia: black screen
+Historia  966 - 1385:
+Historia 1385 - 1572:
+Historia 1573 - 1795:
+Historia 1795 - 1918:
+Historia 1918 - 1992:
+]]></notes>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_atrax" />
+			<dataarea name="rom" size="131072">
+				<rom name="atrax16.bin" size="131072" crc="156e7460" sha1="881f285fe2dc4be6966036deb1b72c07204f01c4"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="epcyg4">
 		<description>Attack at EP-CYG-4</description>
 		<year>1982</year>
@@ -1039,8 +1258,10 @@ a certain time, and this isn't currently emulated.
 		</part>
 	</software>
 
+	<!-- US release of Matrix: Gridrunner 2, sequel of gridrunr -->
+	<!-- Not to be confused with the European '84 release of Attack of the Mutant Camels, different game but still developed by Jeff Minter -->
 	<software name="mtntcmls">
-		<description>Attack of the Mutant Camels</description>
+		<description>Attack of the Mutant Camels (US)</description>
 		<year>1983</year>
 		<publisher>HES</publisher>
 		<info name="serial" value="C518" />
@@ -1126,7 +1347,7 @@ a certain time, and this isn't currently emulated.
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_oss034m" />
 			<dataarea name="rom" size="16384">
-				<rom name="basic xl programming language v1.02.rom" size="16384" crc="e8b3fc3c" sha1="d43bea60d15aa7ad41e074396dfe5019e8415353"/> <!-- Verified -->
+				<rom name="basic xl programming language v1.02.rom" size="16384" crc="e8b3fc3c" sha1="d43bea60d15aa7ad41e074396dfe5019e8415353" status="baddump" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1397,10 +1618,13 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		</part>
 	</software>
 
-	<software name="turboblz">
+	<software name="turboblz" supported="no">
 		<description>Turbo Blizzard</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Unemulated [cassette] interface
+]]></notes>
 		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_blizzard" />
@@ -1410,10 +1634,13 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		</part>
 	</software>
 
-	<software name="cturbo2k">
+	<software name="cturbo2k" supported="no">
 		<description>Cartridge Turbo 2000 v3.16</description>
 		<year>199?</year>
 		<publisher>Info-Cell</publisher>
+		<notes><![CDATA[
+Unemulated [cassette] interface
+]]></notes>
 		<info name="developer" value="Pawel Mironczuk" />
 		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
 		<part name="cart" interface="a8bit_cart">
@@ -1424,10 +1651,13 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		</part>
 	</software>
 
-	<software name="turbo2k">
+	<software name="turbo2k" supported="no">
 		<description>Cartridge dla Turbo 2000 v1.0</description>
 		<year>1991</year>
 		<publisher>DOMAIN SOFT</publisher>
+		<notes><![CDATA[
+Unemulated [cassette] interface
+]]></notes>
 		<info name="developer" value="Tomasz Rolewski" />
 		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
 		<part name="cart" interface="a8bit_cart">
@@ -1438,10 +1668,13 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		</part>
 	</software>
 
-	<software name="turbo2ka" cloneof="turbo2k">
+	<software name="turbo2ka" cloneof="turbo2k" supported="no">
 		<description>Cartridge dla Turbo 2000 v1.0 (alt)</description>
 		<year>1991</year>
 		<publisher>DOMAIN SOFT</publisher>
+		<notes><![CDATA[
+Unemulated [cassette] interface
+]]></notes>
 		<info name="developer" value="Tomasz Rolewski" />
 		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
 		<part name="cart" interface="a8bit_cart">
@@ -1452,10 +1685,13 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		</part>
 	</software>
 
-	<software name="turbo2k1">
+	<software name="turbo2k1" supported="no">
 		<description>Cartridge Systemowy Turbo 2000 (v.1)</description>
 		<year>1991</year>
 		<publisher>ROBOsoft</publisher>
+		<notes><![CDATA[
+Unemulated [cassette] interface
+]]></notes>
 		<info name="developer" value="Tomasz Rolewski" />
 		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
 		<part name="cart" interface="a8bit_cart">
@@ -1466,10 +1702,13 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		</part>
 	</software>
 
-	<software name="turbo2k2" cloneof="turbo2k1">
+	<software name="turbo2k2" cloneof="turbo2k1" supported="no">
 		<description>Cartridge Systemowy Turbo 2000 (v.2)</description>
 		<year>1991</year>
 		<publisher>ROBOsoft</publisher>
+		<notes><![CDATA[
+Unemulated [cassette] interface
+]]></notes>
 		<info name="developer" value="Tomasz Rolewski" />
 		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
 		<part name="cart" interface="a8bit_cart">
@@ -1480,10 +1719,29 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		</part>
 	</software>
 
-	<software name="jturbo2k">
+	<software name="turbohit" supported="no">
+		<!-- "Atari Blizzard Hit" on main menu -->
+		<description>Turbo Hit (Blizzard 32kb)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Unemulated [cassette] interface
+]]></notes>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_blizzard_32kb" />
+			<dataarea name="rom" size="32768">
+				<rom name="turbo_hit.bin" size="32768" crc="cd0d086f" sha1="20e0fcdcdfc2c955b68ac682e9f821aab57996c5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jturbo2k" supported="no">
 		<description>Cartridge System Turbo 2000 (JK Soft)</description>
 		<year>1991</year>
 		<publisher>JK Soft</publisher>
+		<notes><![CDATA[
+Unemulated [cassette] interface
+]]></notes>
 		<info name="developer" value="Bartek Selinger" />
 		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
 		<part name="cart" interface="a8bit_cart">
@@ -1494,10 +1752,13 @@ Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
 		</part>
 	</software>
 
-	<software name="sturbo2k">
+	<software name="sturbo2k" supported="no">
 		<description>Cartridge System Turbo 2000</description>
 		<year>1991</year>
 		<publisher>Bartek Selinger</publisher>
+		<notes><![CDATA[
+Unemulated [cassette] interface
+]]></notes>
 		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_blizzard" />
@@ -1755,10 +2016,13 @@ It was meant to help point a satellite dish in the right direction to receive TV
 		</part>
 	</software>
 
-	<software name="compwar">
+	<software name="compwar" supported="no">
 		<description>Computer War</description>
 		<year>1983</year>
 		<publisher>Thorn EMI</publisher>
+		<notes><![CDATA[
+Doesn't display any missile on main gameplay screen
+]]></notes>
 		<info name="serial" value="THA12010" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
@@ -2005,7 +2269,8 @@ Bottom GFX text box doesn't mask properly, also flickers
 		<year>1989</year>
 		<publisher>Reeve Software</publisher>
 		<notes><![CDATA[
-Continously prints "BOOT ERROR"
+Unresponsive with mouse, doesn't key repeat with joy option, can't go up/down
+Ugly to look at without [ANTIC] television artifacts
 ]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_diamond" />
@@ -2015,25 +2280,30 @@ Continously prints "BOOT ERROR"
 		</part>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
-				<rom name="diamond paint.atr" size="92176" crc="d2994282" sha1="be83a0baca0f6b588e1a88a1e7d48a5ff09c2287"/>
+				<rom name="diamond utilities.atr" size="92176" crc="bb48082d" sha1="eb7ddc124960e0922be1ec426b2e98cffaa084e4"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
-				<rom name="diamond write.atr" size="92176" crc="e1e5b235" sha1="c3c2beb2f9acecb0068281ac77735f44f4988db5"/>
+				<rom name="diamond paint.atr" size="92176" crc="d2994282" sha1="be83a0baca0f6b588e1a88a1e7d48a5ff09c2287"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
-				<rom name="diamond utilities.atr" size="92176" crc="bb48082d" sha1="eb7ddc124960e0922be1ec426b2e98cffaa084e4"/>
+				<rom name="diamond write.atr" size="92176" crc="e1e5b235" sha1="c3c2beb2f9acecb0068281ac77735f44f4988db5"/>
 			</dataarea>
 		</part>
+
 	</software>
 
 	<software name="diamond" cloneof="diamond3" supported="no">
 		<description>Diamond Graphic OS v1.0</description>
 		<year>1989</year>
 		<publisher>Reeve Software</publisher>
+		<notes><![CDATA[
+Unresponsive with mouse, doesn't key repeat with joy option, can't go up/down
+Ugly to look at without [ANTIC] television artifacts
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_diamond" />
 			<dataarea name="rom" size="65536">
@@ -2046,7 +2316,11 @@ Continously prints "BOOT ERROR"
 		<description>Diamond Graphic OS v1.0 (earlier release)</description>
 		<year>1988</year>
 		<publisher>Reeve Software</publisher>
-		<info name="usage" value="Requires mouse"/>
+		<notes><![CDATA[
+Unresponsive with mouse, doesn't key repeat with joy option, can't go up/down
+Ugly to look at without [ANTIC] television artifacts
+]]></notes>
+		<info name="usage" value="Requires mouse in port 2"/>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_diamond" />
 			<dataarea name="rom" size="65536">
@@ -2082,10 +2356,13 @@ Continously prints "BOOT ERROR"
 		</part>
 	</software>
 
-	<software name="digduga" cloneof="digdug">
+	<software name="digduga" cloneof="digdug" supported="partial">
 		<description>Dig Dug (earlier release)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Flickering score layer on title screen
+]]></notes>
 		<info name="serial" value="RX8026" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
@@ -3408,7 +3685,7 @@ Offset sprites on specific rows [GTIA] mixing
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_oss034m" />
 			<dataarea name="rom" size="16384">
-				<rom name="mac-65 macro assembler v1.02.rom" size="16384" crc="51931a08" sha1="48e5d5e71d6c7b00f9429e90ef7514d3226a2bcf"/>
+				<rom name="mac-65 macro assembler v1.02.rom" size="16384" crc="51931a08" sha1="48e5d5e71d6c7b00f9429e90ef7514d3226a2bcf" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3451,16 +3728,56 @@ Offset sprites on specific rows [GTIA] mixing
 		</part>
 	</software>
 
-	<!-- TODO: mega* carts untested beyond if they boots -->
+	<!-- Comes as default with Maxflash Cartridge Studio -->
+	<software name="maxdemo" supported="partial">
+		<description>Maxflash Cartridge Studio - Demonstration Workbook</description>
+		<year>2015</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<notes><![CDATA[
+001. 3-D Tic-Tac-Toe:
+002. Abracadra:
+003: Alley Cat:
+004: Archon:
+005: Archon II Adept:
+006: BallBlazer:
+007: Blue Max:
+008: Bounty Bob Strikes Back: boots
+009: Demon Attack:
+010: Dimension X:
+011: Electrician: boots, garbage sprites if run after any other entry
+012: Gyruss:
+013: Pastfinder:
+014: Quasimodo:
+015: Satan's Hollow:
+016: Scrolls of Abadon:
+017: Tutankham:
+018: Yoomp! (1.1, NTSC):
+019: Alibaba and the Fourty Thieves:
+020: Jumpan:
+021: The Casten Game Disk:
+022: Spelunker:
+023: Zork I: doesn't boot, black screen
+]]></notes>
+		<info name="developer" value="Atarimax" />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="maxflash_1mb" />
+			<dataarea name="rom" size="1048576">
+				<rom name="maxflash_demo.rom" size="1048576" crc="146efe26" sha1="1a5518caac16c01282c46d2d2b1b87cdfab3a093"/>
+			</dataarea>
+		</part>
+	</software>
 
-	<software name="mega1" supported="no">
-		<description>Mega Cartridge 01 (Spain, pirate)</description>
+	<software name="mega1" supported="partial">
+		<description>Mega Cartridge 01 (Chile, pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
-Hardball: doesn't boot
-Riveraid: doesn't boot
+Hardball: works in a800xlp only, draws garbage with a800xl during gameplay
+Riveraid: boots
+Planetar: boots, uses optional Koala Pad
+Alien Ambusch: boots, cfr. alienamb
 ]]></notes>
+		<info name="usage" value="Hardball: hold OPTION key during boot to disable BASIC"/>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -3469,12 +3786,15 @@ Riveraid: doesn't boot
 		</part>
 	</software>
 
-	<software name="mega2" supported="no">
-		<description>Mega Cartridge 02 (Spain, pirate)</description>
+	<software name="mega2">
+		<description>Mega Cartridge 02 (Chile, pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
-Rambo: doesn't boot
+Rambo (Joe Blade): boots
+Arena: boots
+Moon Beam Arcade: boots
+Race in Space: boots
 ]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
@@ -3484,13 +3804,14 @@ Rambo: doesn't boot
 		</part>
 	</software>
 
-	<software name="mega3" supported="no">
-		<description>Mega Cartridge 03 (Spain, pirate)</description>
+	<software name="mega3" supported="partial">
+		<description>Mega Cartridge 03 (Chile, pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
-Pitstop: doesn't boot
-Mash: punts to memo pad
+Pitstop: boots
+Sea Bandit: boots
+Mash: black screen
 Hot Lips: doesn't boot, possibly bad dump (crashes in Altirra too)
 ]]></notes>
 		<part name="cart" interface="a8bit_cart">
@@ -3502,12 +3823,14 @@ Hot Lips: doesn't boot, possibly bad dump (crashes in Altirra too)
 	</software>
 
 	<software name="mega4" supported="partial">
-		<description>Mega Cartridge 04 (Spain, pirate)</description>
+		<description>Mega Cartridge 04 (Chile, pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
-Empire Strik: doesn't boot
-Rally Spedway: black screen
+Archon: boots
+Empire Strik: crashes during loading
+Rally Spedway: boots
+Fighter Pilot: boots
 ]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
@@ -3517,13 +3840,15 @@ Rally Spedway: black screen
 		</part>
 	</software>
 
-	<software name="mega5" supported="no">
-		<description>Mega Cartridge 05 (Spain, pirate)</description>
+	<software name="mega5">
+		<description>Mega Cartridge 05 (Chile, pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
-Crystal Raider: doesn't boot
-Keystone Kapers: doesn't boot
+Crystal Raider: boots
+Tank Commander: boots
+Misile Command: boots
+Keystone Kapers: boots
 ]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
@@ -3533,12 +3858,14 @@ Keystone Kapers: doesn't boot
 		</part>
 	</software>
 
-	<software name="mega6" supported="no">
-		<description>Mega Cartridge 06 (Spain, pirate)</description>
+	<software name="mega6" supported="partial">
+		<description>Mega Cartridge 06 (Chile, pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
-Outlaw: doesn't display any sprite
+Missile Command: boots
+Pacman: boots
+Outlaw: randomly doesn't display any sprite during gameplay
 ]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
@@ -3548,13 +3875,15 @@ Outlaw: doesn't display any sprite
 		</part>
 	</software>
 
-	<software name="mega7" supported="no">
-		<description>Mega Cartridge 07 (Spain, pirate)</description>
+	<software name="mega7" supported="partial">
+		<description>Mega Cartridge 07 (Chile, pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
-Crystal Raider: hardlocks MAME
-Space Invaders: doesn't boot
+Screaming: boots
+Cavmarte.2: boots
+Crystal Raider: boots
+Space Invaders: boots, same as spaceinv [GTIA] mixing
 ]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
@@ -3564,12 +3893,15 @@ Space Invaders: doesn't boot
 		</part>
 	</software>
 
-	<software name="mega8" supported="partial">
-		<description>Mega Cartridge 08 (Spain, pirate)</description>
+	<software name="mega8">
+		<description>Mega Cartridge 08 (Chile, pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
-Choplifter: black screen
+Choplifter: boots
+Trailblazer: boots
+Fighter Pilot: boots
+Cavmarte.1: boots
 ]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
@@ -3579,15 +3911,16 @@ Choplifter: black screen
 		</part>
 	</software>
 
-	<software name="mega9" supported="no">
-		<description>Mega Cartridge 09 (Spain, pirate)</description>
+	<software name="mega9" supported="partial">
+		<description>Mega Cartridge 09 (Chile, pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
-Ball Blaster: doesn't boot
-Sargon II: doesn't boot
-The Empire Strikes B.: doesn't boot
+Ball Blaster: boots
+Sargon II: boots, corrupted text layer making it unplayable (Altirra behaves the same)
+The Empire Strikes B.: boots, runs too fast
 ]]></notes>
+		<info name="usage" value="Sargon II: hold OPTION key during boot to disable BASIC"/>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -3596,13 +3929,15 @@ The Empire Strikes B.: doesn't boot
 		</part>
 	</software>
 
-	<software name="mega10" supported="no">
-		<description>Mega Cartridge 10 (Spain, pirate)</description>
+	<software name="mega10" supported="partial">
+		<description>Mega Cartridge 10 (Chile, pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
-Space Inv: offset bullets when traversing bases layer
-River Raid: black screen
+Last.V8: boots
+Space Inv: boots, offset bullets when traversing bases layer [GTIA] mixing
+River Raid: boots
+Cav.Marte.1: boots
 ]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
@@ -3613,13 +3948,14 @@ River Raid: black screen
 	</software>
 
 	<software name="mega11" supported="partial">
-		<description>Mega Cartridge 11 (Spain, pirate)</description>
+		<description>Mega Cartridge 11 (Chile, pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
+Oilswell: boots
 Despatch: detects extra bogus collision detection on manholes when hitting walls (verify)
-Pitstop: black screen
-Kaboom: black screen
+Pitstop: boots
+Kaboom: boots but expects a paddle in gameplay (hot swap?)
 ]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
@@ -3629,12 +3965,14 @@ Kaboom: black screen
 		</part>
 	</software>
 
-	<software name="mega12" supported="no">
-		<description>Mega Cartridge 12 (Spain, pirate)</description>
+	<software name="mega12" supported="partial">
+		<description>Mega Cartridge 12 (Chile, pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
-Rally Speedway: doesn't boot
+Frogs and Flies: boots
+Aztecchallenge: boots
+Rally Speedway: boots
 Rescue on Fractalus: doesn't boot, possibly bad dump
 ]]></notes>
 		<part name="cart" interface="a8bit_cart">
@@ -3645,14 +3983,17 @@ Rescue on Fractalus: doesn't boot, possibly bad dump
 		</part>
 	</software>
 
-	<software name="mega13" supported="no">
-		<description>Mega Cartridge 13 (Spain, pirate)</description>
+	<software name="mega13" supported="partial">
+		<description>Mega Cartridge 13 (Chile, pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
-Pitfall!.: punts to memo pad
-Wargames: black screen
+Pitfall!: boots
+Alienambusch: boots, cfr. alienamb
+Pacman: boots
+Wargames: boots
 ]]></notes>
+		<info name="usage" value="Pitfall and Wargames: hold OPTION key during boot to disable BASIC"/>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -3661,13 +4002,15 @@ Wargames: black screen
 		</part>
 	</software>
 
-	<software name="mega14" supported="no">
-		<description>Mega Cartridge 14 (Spain, pirate)</description>
+	<software name="mega14" supported="partial">
+		<description>Mega Cartridge 14 (Chile, pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
-Pitstop: black screen
-Star Raiders: draws glitchy [GTIA] sprites
+Pitstop: boots
+Necromancer: boots
+Star Raiders: black screen after title screen (regression), draws glitchy [GTIA] sprites
+Salmon (Salmon Run): boots
 ]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
@@ -3677,13 +4020,15 @@ Star Raiders: draws glitchy [GTIA] sprites
 		</part>
 	</software>
 
-	<software name="mega15" supported="no">
-		<description>Mega Cartridge 15 (pirate)</description>
+	<software name="mega15">
+		<description>Mega Cartridge 15 (Chile, pirate)</description>
 		<year>2004</year>
 		<publisher>Willysoft</publisher>
 		<notes><![CDATA[
-Flak Arreglado: doesn't boot
-Keystone Kapers: doesn't boot with stuck note
+Flak Arreglado: boots
+Race in Space: boots
+Cavmarte.2: boots
+Keystone Kapers: boots
 ]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
@@ -3885,7 +4230,7 @@ Enemy playfield has strip glitch on topmost row
 		<year>19??</year>
 		<publisher>Grupo SITSA</publisher>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a800_sitsa" />
+			<feature name="slot" value="a800_ultracart" />
 			<dataarea name="rom" size="32768">
 				<rom name="microcalc v2.2.rom" size="32768" crc="44507065" sha1="ac2e0ddac58fba9d0f8a01c26ee857b769c62a98"/>
 			</dataarea>
@@ -4560,6 +4905,40 @@ Activision logo glitches out on vertical scrolls
 		</part>
 	</software>
 
+	<software name="popmax" supported="partial">
+		<description>Prince of Persia (AtariMAX i/f)</description>
+		<year>2021</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<notes><![CDATA[
+Title screen is very off, [ANTIC] timing sensitive
+Missing text during attract mode
+]]></notes>
+		<info name="usage" value="Requires a130xe or xl with 128KB RAM"/>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="maxflash_1mb" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="prince of persia + atarimax.bin" size="0x100000" crc="52df819c" sha1="2871d5d4bc7588b288dea32121c66156301d360b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="popsic" cloneof="popmax" supported="partial">
+		<description>Prince of Persia (SIC! i/f)</description>
+		<year>2021</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<notes><![CDATA[
+Title screen is very off, [ANTIC] timing sensitive
+Missing text during attract mode
+]]></notes>
+		<info name="usage" value="Requires a130xe or xl with 128KB RAM"/>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="sic_256kb" />
+			<dataarea name="rom" size="0x040000">
+				<rom name="prince of persia + sic.bin" size="0x040000" crc="d531a9a6" sha1="92dde90f5a586754ae132a2aeedac084bce7c678"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="porkys" supported="partial">
 		<description>Porky's</description>
 		<year>1983</year>
@@ -4637,16 +5016,21 @@ Attract mode has glitchy text
 		</part>
 	</software>
 
-	<!-- TODO: prisma* carts untested -->
-	<!-- (cfr. mega* collection, they all crashes in one way or another) -->
-
-	<software name="prisma1" supported="no">
-		<description>Prisma 1 (Spain, pirate)</description>
+	<software name="prisma1" supported="partial">
+		<description>Prisma 1 (Chile, pirate)</description>
 		<year>199?</year>
 		<publisher>Prismasoft</publisher>
 		<notes><![CDATA[
-No game in list boots
+Super Pacman: boots
+Pinhead: boots, glitchy player sprite layer, no score layer, cuts off active ball [GTIA] mixing (edited? crashes in Altirra 4.01)
+Bombers (Boulder Bombers): boots
+Race in Space: boots
+Tetrix: boots, runs too fast
+Syntron: glitchy sprite (NTSC) or no sprite (PAL), unplayable
+Exocet: boots
+Galactic Chase: boots
 ]]></notes>
+		<info name="usage" value="Super Pacman: hold OPTION key during boot to disable BASIC" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -4655,13 +5039,21 @@ No game in list boots
 		</part>
 	</software>
 
-	<software name="prisma2" supported="no">
-		<description>Prisma 2 (Spain, pirate)</description>
+	<software name="prisma2" supported="partial">
+		<description>Prisma 2 (Chile, pirate)</description>
 		<year>199?</year>
 		<publisher>Prismasoft</publisher>
 		<notes><![CDATA[
-No game in list boots
+Mr. Do Castle: boots, [GTIA] sprites draws "angel halo" after some time in gameplay
+Climber 5: boots
+Snookie: boots, doesn't draw [GTIA] sprites if select any other game then reset and select this, btanb?
+Phobos: boots
+Pacman: boots
+Chaos: boots, doesn't clear [GTIA] trigger when player release button
+Qix: boots
+Cobra Race: boots
 ]]></notes>
+		<info name="usage" value="Mr. Do Castle: hold OPTION key during boot to disable BASIC" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -4670,13 +5062,19 @@ No game in list boots
 		</part>
 	</software>
 
-	<software name="prisma3" supported="no">
-		<description>Prisma 3 (Spain, pirate)</description>
-		<!-- The last game (Crystal Raider) doesn't run. Possible Bad dump. -->
+	<software name="prisma3" supported="partial">
+		<description>Prisma 3 (Chile, pirate)</description>
 		<year>1992</year>
 		<publisher>Prismasoft</publisher>
 		<notes><![CDATA[
-No game in list boots
+Super Cobra: boots
+River Raid: boots
+Gun Power Charlie: boots
+Typo Attack: boots
+Guardians of Gorn: boots, title screen "GORN" doesn't [ANTIC] mask playfield on right properly
+Shooting Arcade: boots
+Darts: boots
+Crystal Raiders: doesn't behave correctly (always selects Night mode, changing options shifts text, player always jumps), bad dump? Behaves the same in Altirra
 ]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
@@ -4686,22 +5084,45 @@ No game in list boots
 		</part>
 	</software>
 
-	<software name="prisma4" supported="no">
-		<description>Prisma 4 (Spain, pirate)</description>
+	<software name="prisma4" supported="partial">
+		<!-- "Prisma Giga-Cartridg" -->
+		<description>Prisma 4 (Chile, pirate)</description>
 		<year>1992</year>
 		<publisher>Prismasoft</publisher>
+		<notes><![CDATA[
+Pole Position: boots
+Soccer: boots, unresponsive inputs [GTIA] latch trigger, same as soccer entry
+Snooker: boots
+Chicken: boots, runs too fast
+Climber: boots
+Space Invaders II (Atari Invaders): boots, offset bullets and player sprites when traversing playfield [GTIA] mixing
+Fire Bug: crashes on boot, behaves the same in Altirra, bad dump?
+Othello: crashes on boot, behaves the same in Altirra, bad dump?
+]]></notes>
+		<info name="usage" value="Pole Position: hold OPTION key during boot to disable BASIC" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
-				<rom name="prisma 4.rom" size="65536" crc="670c49c6" sha1="b0dfe38188b2917b244a845aad85533f2987da1a"/>
+				<rom name="prisma 4.rom" size="65536" crc="670c49c6" sha1="b0dfe38188b2917b244a845aad85533f2987da1a" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="prisma5" supported="no">
-		<description>Prisma 5 (Spain, pirate)</description>
+	<software name="prisma5" supported="partial">
+		<description>Prisma 5 (Chile, pirate)</description>
 		<year>1992</year>
 		<publisher>Prismasoft</publisher>
+		<notes><![CDATA[
+Zaxxon: boots, doesn't mask sprites on top/bottom of screen [GTIA] GRACTL
+Jungle Hunt: boots
+Maze War: boots
+Centipede: boots
+Laser Gates: boots
+Super Cubes: boots
+Revenge of Plutonio (Revenge of the Plutonian Flies): boots, doesn't draw [ANTIC] playfield and text properly during gameplay
+Steeples Jack: boots, draws extra [ANTIC] char on left of status bar on gameplay that should be masked
+]]></notes>
+		<info name="usage" value="Zaxxon: hold OPTION key during boot to disable BASIC" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -4710,10 +5131,21 @@ No game in list boots
 		</part>
 	</software>
 
-	<software name="prisma6" supported="no">
-		<description>Prisma 6 (Spain, pirate)</description>
+	<software name="prisma6" supported="partial">
+		<description>Prisma 6 (Chile, pirate)</description>
 		<year>1992</year>
 		<publisher>Prismasoft</publisher>
+		<notes><![CDATA[
+Kaboom: boots, expects a paddle in [vcs_ctrl] port 1, how to deal with menu that wants joystick instead?
+Space Invaders: boots, offset bullets when traversing playfield [GTIA] mixing, same as spaceinv
+Frogger: boots, playfield stutters, same as frogger
+Chomper: boots
+Arkanoid III (Crack-Up!): boots, draws black and white playfield [GTIA] PRIOR mode 11
+Chess: boots
+Droids: boots
+Roundup: boots, doesn't draw [GTIA] sprites if select any other game then reset and select this, cow playfield stutters, cannot capture any cow, is the dump right?
+]]></notes>
+		<info name="usage" value="Frogger: hold OPTION key during boot to disable BASIC" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -4722,10 +5154,27 @@ No game in list boots
 		</part>
 	</software>
 
-	<software name="prismas" supported="no">
-		<description>Prisma Super 15-2 (Spain, pirate)</description>
+	<software name="prismas" supported="partial">
+		<description>Prisma Super 15-2 (Chile, pirate)</description>
 		<year>1992</year>
 		<publisher>Prismasoft</publisher>
+		<notes><![CDATA[
+Soccer: boots, unresponsive inputs [GTIA] latch trigger, same as soccer entry
+Space Invaders: boots, offset bullets when traversing playfield [GTIA] mixing, same as spaceinv
+Speed Ski: boots
+Steeple Jack: boots, draws extra [ANTIC] char on left of status bar on gameplay that should be masked
+Maze War: boots
+Blast: boots
+Bonk: boots
+Fire Bug: boots, [ANTIC] doesn't mask left/right sides of playfield
+Incoming: boots
+Gun Power Charlie: boots
+Last War: boots
+Rebel Fighter: boots
+The Electroids: boots
+Syntron: no sprites (NTSC), playable in PAL
+Krazy Katerpillars: boots, runs too fast
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -5002,6 +5451,51 @@ Score bar glitches out when player dies
 		</part>
 	</software>
 
+	<!-- PoC cartridge dump coming from Super Inexpensive Cart package -->
+	<software name="sic31in1" supported="partial">
+		<description>SIC! 31-in-1 Demonstration</description>
+		<year>2012?</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<notes><![CDATA[
+Abracadabra!:
+Asteroids:
+BC's Quest..:
+Caverns of Mars:
+Centipede:
+Choplifter:
+Decathlon:
+Donkey Kong:
+Donkey Kong Jr.: boots
+Flip and Flop:
+Frogger:
+H.E.R.O.:
+Jawbreaker:
+Joust:
+Jumpman Jr.
+Millipede:
+Miner 2049er:
+Moon Patrol:
+Ms. Pac-Man:
+Pengo:
+Pitfall:
+Pitfall II:
+Pole Position:
+Q*Bert:
+Qix:
+River Raid:
+Space Invaders:
+Star Raiders: black screen
+Super Breakout:
+Zaxxon:
+]]></notes>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="sic_512kb" />
+			<dataarea name="rom" size="524288">
+				<rom name="sic31in1.rom" size="524288" crc="7c32d258" sha1="7669612a2dee99a2f82466b8c1e83acea0c2cf16"/> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="siliconw">
 		<description>Silicon Warrior</description>
 		<year>1983</year>
@@ -5109,11 +5603,14 @@ Unresponsive inputs [GTIA] latch trigger
 		</part>
 	</software>
 
-	<software name="spaceinv">
+	<software name="spaceinv" supported="no">
 		<description>Space Invaders</description>
 		<!-- Re-released in 1986 (RX8008) -->
 		<year>1980</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Offset bullets when traversing playfield [GTIA] mixing
+]]></notes>
 		<info name="serial" value="CXL4008" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
@@ -5241,7 +5738,7 @@ Glitched rows, glitched gear GFX
 		<year>2006</year>
 		<publisher>DLT</publisher>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a800_sparta" />
+			<feature name="slot" value="a800_sparta_128kb" />
 			<dataarea name="rom" size="131072">
 				<rom name="spartados x v4.39rc.rom" size="131072" crc="a3ec2e58" sha1="79ad6acd8a61fdcbf427d098c77d84282110a6ef"/>
 			</dataarea>
@@ -5253,7 +5750,7 @@ Glitched rows, glitched gear GFX
 		<year>2008</year>
 		<publisher>DLT</publisher>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a800_sparta" />
+			<feature name="slot" value="a800_sparta_128kb" />
 			<dataarea name="rom" size="131072">
 				<rom name="spartados x v4.41.rom" size="131072" crc="687c7a15" sha1="12fc71f8437528117079fff777838b7193d38fcc"/>
 			</dataarea>
@@ -5265,7 +5762,7 @@ Glitched rows, glitched gear GFX
 		<year>2008</year>
 		<publisher>DLT</publisher>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a800_sparta" />
+			<feature name="slot" value="a800_sparta_128kb" />
 			<dataarea name="rom" size="131072">
 				<rom name="spartados x v4.42.rom" size="131072" crc="0b4bcfc5" sha1="663fef048ddd76316dd193023c560631b161257b"/>
 			</dataarea>
@@ -5277,7 +5774,7 @@ Glitched rows, glitched gear GFX
 		<year>2011</year>
 		<publisher>DLT</publisher>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a800_sparta" />
+			<feature name="slot" value="a800_sparta_128kb" />
 			<dataarea name="rom" size="131072">
 				<rom name="spartados x v4.43.rom" size="131072" crc="48be5d1e" sha1="d0579bc19d0fa8938d1557924c2e1c3b968e02e7"/>
 			</dataarea>
@@ -5289,7 +5786,7 @@ Glitched rows, glitched gear GFX
 		<year>2011</year>
 		<publisher>DLT</publisher>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a800_sparta" />
+			<feature name="slot" value="a800_sparta_128kb" />
 			<dataarea name="rom" size="131072">
 				<rom name="spartados x v4.44.rom" size="131072" crc="337516b0" sha1="99518cab315b564b2f7621d6969709bf7ee7c5af"/>
 			</dataarea>
@@ -5301,7 +5798,7 @@ Glitched rows, glitched gear GFX
 		<year>2011</year>
 		<publisher>DLT</publisher>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a800_sparta" />
+			<feature name="slot" value="a800_sparta_128kb" />
 			<dataarea name="rom" size="131072">
 				<rom name="spartados x v4.45.rom" size="131072" crc="df4520c1" sha1="d7ae9dc6c7a5dbf3890be0a6a66c5cc0501a6ca9"/>
 			</dataarea>
@@ -5313,7 +5810,7 @@ Glitched rows, glitched gear GFX
 		<year>2013</year>
 		<publisher>DLT</publisher>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a800_sparta" />
+			<feature name="slot" value="a800_sparta_128kb" />
 			<dataarea name="rom" size="131072">
 				<rom name="spartados x v4.46.rom" size="131072" crc="3254ee87" sha1="0123f640f56ef4be1bdabe3643770b72d4b0f396"/>
 			</dataarea>
@@ -5325,7 +5822,7 @@ Glitched rows, glitched gear GFX
 		<year>2015</year>
 		<publisher>DLT</publisher>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a800_sparta" />
+			<feature name="slot" value="a800_sparta_128kb" />
 			<dataarea name="rom" size="131072">
 				<rom name="spartados x v4.47.rom" size="131072" crc="fb0fa6d7" sha1="2bd2ad3ea6c4d5bad6042f42f75edeee555d4fdc"/>
 			</dataarea>
@@ -5345,7 +5842,7 @@ https://forums.atariage.com/topic/146490-spectraview-1-and-2-info/
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_oss034m" />
 			<dataarea name="rom" size="16384">
-				<rom name="spectraview-ii v201 (198x)(display systems international).rom" size="16384" crc="77c75598" sha1="e7e8d8919c420770bde5da39cbb47d9d1e89a40b"/>
+				<rom name="spectraview-ii v201 (198x)(display systems international).rom" size="16384" crc="77c75598" sha1="e7e8d8919c420770bde5da39cbb47d9d1e89a40b" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5575,6 +6072,9 @@ Glitched text and graphics displays
 		<description>Super Cartridge</description>
 		<year>199?</year>
 		<publisher>Unerring Master</publisher>
+		<notes><![CDATA[
+Unemulated [cassette] interface
+]]></notes>
 		<info name="usage" value="Requires the Atari Super Turbo hardware modification (or compatible ATT, UM) installed in a tape recorder." />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_blizzard" />
@@ -5913,17 +6413,25 @@ Requires PLATO dial-up modem connection
 		</part>
 	</software>
 
-	<software name="writerd" supported="no">
-		<description>The Writer's Tool (Dongle)</description>
+	<software name="writerd">
+		<description>The Writer's Tool</description>
 		<year>1985</year>
 		<publisher>OSS</publisher>
-		<notes><![CDATA[
-This cartridge requires the Writer's Tool disk software. It's basic function appears to be as a copy protection dongle for the disk software.
-]]></notes>
+		<!-- cart inserted just acts as a dongle, SW runs over the floppies -->
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_oss8k" />
 			<dataarea name="rom" size="8192">
 				<rom name="the writer's tool.rom" size="8192" crc="13bcf201" sha1="7de7b160c60f162b19f45789db07ddfd13836da2"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="writer's tool.atr" size="92176" crc="5a6e2133" sha1="c6d4c49fb53a41b28634b209176c74ed86fbfc64"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="writer's tool dictionary.atr" size="92176" crc="18c875b0" sha1="7c727bcc488892dfd83cfbc09b3e1e642d1beff9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5971,10 +6479,23 @@ Has garbage row strip on top of active playfield during hammer throw event
 		</part>
 	</software>
 
-	<software name="turboc1" supported="no">
-		<description>Turbo Cartridge C1 (Spain, pirate)</description>
+	<!-- TODO: turboc* cartridges not extensively tested -->
+
+	<software name="turboc1" supported="partial">
+		<description>Turbo Cartridge C1 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
+		<notes><![CDATA[
+1. Basketball: boots
+2. Salmon (Salmon Run): boots
+3. Alien Ambush: boots, doesn't mask sprites on bottom of screen [GTIA] GRACTL, doesn't show sprites if run after any other entry
+4. Rebel Fighter: boots
+5. Sea Bandit: boots
+6: Madnemetter: boots
+7. Sea Chase: boots
+8. River Raid: boots
+9. Pluton Fly (Revenge of the Plutonian Flies): boots, behaves better than prisma5 entry but still not 100% right (cyan strip on top)
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -5983,22 +6504,44 @@ Has garbage row strip on top of active playfield during hammer throw event
 		</part>
 	</software>
 
-	<software name="turboc2" supported="no">
-		<description>Turbo Cartridge C2 (Spain, pirate)</description>
+	<software name="turboc2" supported="partial">
+		<description>Turbo Cartridge C2 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
+		<notes><![CDATA[
+1. Krazy Kopter: boots, runs too fast
+2. Outlaw: boots
+3. Race in Space: boots
+4. Moon Beam (Moon Beam Arcade): boots
+5. Frogs &amp; Flies: boots
+6. Pool: boots
+7. Hotlips (Hot Lips): boots
+8. Zenji: boots, draws [GTIA] background color as cyan instead of black
+9. Super Cobra: boots
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a800_turbo64" />
+			<feature name="slot" value="a800_turbo" />
 			<dataarea name="rom" size="65536">
 				<rom name="turbocartridge c2.rom" size="65536" crc="ade93e66" sha1="02e24a1444e6d4ee3ab8dae5cba58724f5cbb34f"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="turboc3" supported="no">
-		<description>Turbo Cartridge C3 (Spain, pirate)</description>
+	<software name="turboc3" supported="partial">
+		<description>Turbo Cartridge C3 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
+		<notes><![CDATA[
+1. Pacman: boots
+2. Fighter Pilot I: boots
+3. Chomper: boots
+4. Money Hungry: boots
+5. Damas: boots
+6: Billiards: boots (three balls only, hacked version to behave like a Carom variant?)
+7. Aztec Challenge: boots
+8. Arena: boots
+9. Galaxian: boots, unplayable, behaves same as galaxian entry
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -6007,10 +6550,21 @@ Has garbage row strip on top of active playfield during hammer throw event
 		</part>
 	</software>
 
-	<software name="turboc4" supported="no">
-		<description>Turbo Cartridge C4 (Spain, pirate)</description>
+	<software name="turboc4" supported="partial">
+		<description>Turbo Cartridge C4 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
+		<notes><![CDATA[
+1. Keystone Kappers (Keystone Kapers): boots
+2. Livewire: boots, glitchy sprites if run after any other entry
+3. Centipede: boots
+4. Spark Bugs: boots
+5. Allien Swarm (Alien Swarm): boots
+6. Bacterion: boots
+7. Boxing: boots
+8. MegaMania: boots, behaves same as megmania entry
+9. MASH 4077: boots, behaves same as mash entry
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -6020,9 +6574,20 @@ Has garbage row strip on top of active playfield during hammer throw event
 	</software>
 
 	<software name="turboc5" supported="no">
-		<description>Turbo Cartridge C5 (Spain, pirate)</description>
+		<description>Turbo Cartridge C5 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
+		<notes><![CDATA[
+1. Tic Tac Toe:
+2. Klystron Ryder (Klystron Raider):
+3. Kunfu (Kung-Fu Master): boots
+4. Livewire II: boots, no [GTIA] player sprite if run after any other entry
+5. Blastoff Exocet: boots
+6. Missile Command:
+7. Asteroids:
+8. Speedway Blast:
+9. Challenge 5: boots
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -6032,9 +6597,20 @@ Has garbage row strip on top of active playfield during hammer throw event
 	</software>
 
 	<software name="turboc6" supported="no">
-		<description>Turbo Cartridge C6 (Spain, pirate)</description>
+		<description>Turbo Cartridge C6 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
+		<notes><![CDATA[
+1. Planetary Defense:
+2. Olympic Dual:
+3. Battle in the Ring:
+4. Grid Runner:
+5. Squish:
+6. Cavernas de Marte (Caverns of Mars II):
+7. Pengon:
+8. Deluxe Invaders:
+9. Space Invaders:
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -6044,11 +6620,28 @@ Has garbage row strip on top of active playfield during hammer throw event
 	</software>
 
 	<software name="turbod1" supported="no">
-		<description>Turbo Cartridge D1 (Spain, pirate)</description>
+		<description>Turbo Cartridge D1 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
+		<notes><![CDATA[
+A. Montezuma I:
+B. Vaquero:
+C. Olympic Dual:
+D. Outlaw:
+E. The Empire Strikes (The Empire Strikes Back):
+F. Dog Race:
+G. Retrofire:
+H. Darts:
+I. Labyrinth:
+J. Tumble Bugs:
+K. Chicken:
+L. Desmond Dungeon:
+M. River Rescue:
+N. Krazy Kopter:
+O. Danger Ranger:
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a800_turbo128" />
+			<feature name="slot" value="a800_turbo" />
 			<dataarea name="rom" size="131072">
 				<rom name="turbocartridge d1.rom" size="131072" crc="4d1dd418" sha1="91a2e78abe4f3bfa0a95d2248e988c556fe8a5c8"/>
 			</dataarea>
@@ -6056,11 +6649,28 @@ Has garbage row strip on top of active playfield during hammer throw event
 	</software>
 
 	<software name="turbod2" supported="no">
-		<description>Turbo Cartridge D2 (Spain, pirate)</description>
+		<description>Turbo Cartridge D2 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
+		<notes><![CDATA[
+A. Rally Speedway:
+B. Money Hungry:
+C. Tic Tac Toe:
+D. Race in Space:
+E. Sargon II:
+F. Boxing:
+G. Kunfu (Kung-Fu Master):
+H. Crystal Raider:
+I. Ant Eater:
+J. Diamonds:
+K. Gunfight:
+L. Jaw Breaker:
+M. Cloud Burst:
+N. Damas:
+O. Hotlips (Hot Lips):
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a800_turbo128" />
+			<feature name="slot" value="a800_turbo" />
 			<dataarea name="rom" size="131072">
 				<rom name="turbocartridge d2.rom" size="131072" crc="025ab67a" sha1="d456adb1c53f24e15a88c00a54b33ad22c9e7fcf"/>
 			</dataarea>
@@ -6068,11 +6678,28 @@ Has garbage row strip on top of active playfield during hammer throw event
 	</software>
 
 	<software name="turbod3" supported="no">
-		<description>Turbo Cartridge D3 (Spain, pirate)</description>
+		<description>Turbo Cartridge D3 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
+		<notes><![CDATA[
+A. Sea Dragon: boots
+B. Fighter Pilot I:
+C. Allien Ambush (Alien Ambush):
+D. Chomper:
+E. Pacman:
+F. Bacterion:
+G. Mr Cool: boots, has [GTIA] background color cyan instead of black
+H. Thrax Lair: boots
+I. Livewire II:
+J. Quarxon: boots
+K. Derblitz: boots
+L. Futbol (Soccer):
+M. Shooting Arcade:
+N. Pluton Fly:
+O. Rush Hour: boots, player sprite stutters when moving vertically [GTIA] mixing
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a800_turbo128" />
+			<feature name="slot" value="a800_turbo" />
 			<dataarea name="rom" size="131072">
 				<rom name="turbocartridge d3.rom" size="131072" crc="bca7d11b" sha1="fb75c42cc1c896aaabda7e9591a45fe9a2f3a8e8"/>
 			</dataarea>
@@ -6080,12 +6707,29 @@ Has garbage row strip on top of active playfield during hammer throw event
 	</software>
 
 	<software name="turbod4" supported="no">
-		<description>Turbo Cartridge D4 (Spain, pirate)</description>
-		<!-- Half of the games don't run. Possible Bad dump. -->
+		<description>Turbo Cartridge D4 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
+		<!-- Half of the games don't run. Likely bad dump -->
+		<notes><![CDATA[
+A. Jungle Hunt:
+B. Klystron Rider:
+C. Planetary Defense:
+D. Rebel Fighter:
+E. Cavernas de Marte:
+F. Moon Beam (Moon Beam Arcade):
+G. Allien Swarm (Alien Swarm):
+H. Submarine Commande (Submarine Commander):
+I. Blastoff Exocet:
+J. Rats Revenge:
+K. Pengon:
+L. Frogger I:
+M. Table Soccer: hangs at cyan screen
+N. Salmon Run:
+O. Bumper Ball: hangs at cyan screen
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a800_turbo128" />
+			<feature name="slot" value="a800_turbo" />
 			<dataarea name="rom" size="131072">
 				<rom name="turbocartridge d4 [b].rom" size="131072" crc="72df4a5e" sha1="519abe32c6c3ee09ec8f027790da4d51157ba468" status="baddump" />
 			</dataarea>
@@ -6093,11 +6737,28 @@ Has garbage row strip on top of active playfield during hammer throw event
 	</software>
 
 	<software name="turbod5" supported="no">
-		<description>Turbo Cartridge D5 (Spain, pirate)</description>
+		<description>Turbo Cartridge D5 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
+		<notes><![CDATA[
+A. Millipede:
+B. Frogs &amp; Flies:
+C. Sea Bandit:
+D. Futbol 2:
+E. Livewire:
+F. Space Invaders:
+G. Battle in the Ring:
+H. Legacy 2:
+I. Madnemetter:
+J. War Games (Computer War): boots, behaves same as compwar entry
+K. Cavernas de Marte:
+L. Keystone Kappers (Keystone Kapers):
+M. The Aardvark:
+N. Billiards:
+O. Missile Command:
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a800_turbo128" />
+			<feature name="slot" value="a800_turbo" />
 			<dataarea name="rom" size="131072">
 				<rom name="turbocartridge d5.rom" size="131072" crc="a5aee6fd" sha1="136bfa432b5ab340c332019e8ceb847f4afd1b03"/>
 			</dataarea>
@@ -6105,11 +6766,28 @@ Has garbage row strip on top of active playfield during hammer throw event
 	</software>
 
 	<software name="turbod6" supported="no">
-		<description>Turbo Cartridge D6 (Spain, pirate)</description>
+		<description>Turbo Cartridge D6 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
+		<notes><![CDATA[
+A. Arena:
+B. Atom Smasher:
+C. Zenji:
+D. Sea Chase:
+E. Spark Bugs:
+F. River Raid:
+G. Asteroids:
+H. Mr Dos Castle (Mr. Do's Castle):
+I. Aztec Challenge:
+J. Horse Race:
+K. Quick:
+L. Rear Door:
+M. Platter Mania:
+N. Megamania:
+O. Hyperblast:
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a800_turbo128" />
+			<feature name="slot" value="a800_turbo" />
 			<dataarea name="rom" size="131072">
 				<rom name="turbocartridge d6.rom" size="131072" crc="5498c7dc" sha1="e2ee9d60d4ce806ff822ca14d45758a26d4502cf"/>
 			</dataarea>
@@ -6117,11 +6795,28 @@ Has garbage row strip on top of active playfield during hammer throw event
 	</software>
 
 	<software name="turbod7" supported="no">
-		<description>Turbo Cartridge D7 (Spain, pirate)</description>
+		<description>Turbo Cartridge D7 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
+		<notes><![CDATA[
+A. Kaboom:
+B. Krazy Shoot Out:
+C. Fantastic Voyage:
+D. Fortune Hunt:
+E. Final Orbit:
+F. Galaxian:
+G. Q'Bert:
+H. Super Cobra:
+I. Centipede:
+J. Basketball:
+K. Speedway Blast:
+L. Squish:
+M. Attack Cammels (Attack of the Mutant Camels (Europe)): boots
+N. MASH 4077:
+O. Pitfall:
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a800_turbo128" />
+			<feature name="slot" value="a800_turbo" />
 			<dataarea name="rom" size="131072">
 				<rom name="turbocartridge d7.rom" size="131072" crc="3fb92d9e" sha1="f4c492b2c47c14bb5c8e2e3351b2b79d07395260"/>
 			</dataarea>
@@ -6129,9 +6824,27 @@ Has garbage row strip on top of active playfield during hammer throw event
 	</software>
 
 	<software name="turbod8" supported="no">
-		<description>Turbo Cartridge D8 (Spain, pirate)</description>
+		<!-- No header on menu -->
+		<description>Turbo Cartridge D8 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
+		<notes><![CDATA[
+A. Popcorn:
+B. Fire Bug:
+C. Elevator:
+D. Climber:
+E. Bombers:
+F. Bonk:
+G. Incoming:
+H. Syntron:
+I. Gunpow:
+J. Elektroids:
+K. Krazy:
+L. Laberinto:
+M. Galactic:
+N. Mr. TNT:
+O. Floyd:
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -6141,11 +6854,39 @@ Has garbage row strip on top of active playfield during hammer throw event
 	</software>
 
 	<software name="turboe1" supported="no">
-		<description>Turbo Cartridge E1 (Spain, pirate)</description>
+		<!-- "SUPER CARTRIDGE CX25" header on menu -->
+		<description>Turbo Cartridge E1 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
+		<notes><![CDATA[
+A. River Raid:
+B. Galaxian:
+C. Futbol (Soccer):
+D. Missile Command:
+E. Vaquero:
+F. Money Hungry:
+G. Fighter Pilot I:
+H. Baty Builder:
+I. Klystron Raider (Klystron Raider):
+J. Plnetary Defense:
+K. Space Invaders:
+L. Tic Tac Toe:
+M. QS Reversi:
+N. Allien Ambush (Alien Ambush):
+O. Chomper:
+P. Boxing:
+Q. Rebel Fighter:
+R. Livewire:
+S. Outlaw:
+T. Race in Space:
+U. Bacterion:
+V. Moon Beam (Moon Beam Arcade):
+W. EA Bandit:
+X. Keystone Kappers (Keystone Kapers):
+Y. Super Cobra:
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a800_turbo128" />
+			<feature name="slot" value="a800_turbo" />
 			<dataarea name="rom" size="131072">
 				<rom name="turbocartridge e1.rom" size="131072" crc="fa100cbf" sha1="c016952dc27960e33de3f0e652b8f4147d97d212"/>
 			</dataarea>
@@ -6153,33 +6894,73 @@ Has garbage row strip on top of active playfield during hammer throw event
 	</software>
 
 	<software name="turboe2" supported="no">
-		<description>Turbo Cartridge E2 (Spain, pirate)</description>
+		<description>Turbo Cartridge E2 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
+		<notes><![CDATA[
+A. Firebug:
+B. Elevator:
+C. Climber V:
+D. Bombers:
+E. Bonk:
+F. Incoming:
+G. Syntron:
+H. Power Gun:
+I. Elektroids:
+J. Krazy:
+K. Laberinto:
+L. Galactic:
+M. Mr. TNT:
+N. Floyd:
+O. Ring:
+P. Olympic Dual:
+Q. Grid Runner:
+R. Dog Race:
+S. Mr. Cool:
+T. Frogs &amp; Flies:
+U. Hotlips (Hot Lips):
+V. Meamania (MegaMania):
+W. Cavernas Marte II:
+X. Kayos
+Y. Crystal Raider:
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a800_turbo128" />
+			<feature name="slot" value="a800_turbo" />
 			<dataarea name="rom" size="131072">
 				<rom name="turbocartridge e2.rom" size="131072" crc="bede95cd" sha1="0d1ab2d43fc71ee5c0f55f9dc6e893a651ae7a62"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="turbox1" supported="no">
-		<description>Turbo Cartridge X1 (Spain, pirate)</description>
+	<software name="turbox1" supported="partial">
+		<description>Turbo Cartridge X1 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
+		<notes><![CDATA[
+1. Boina Verde (Green Beret): boots
+2. Missile Command: boots
+3. Sea Wolf (Sea Wolf II): boots, player missiles and playfield stutters [GTIA] mixing
+4. Outlaw: boots, glitchy sprites if run after any other entry
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
-			<feature name="slot" value="a800_williams" />
+			<feature name="slot" value="a800_turbo" />
 			<dataarea name="rom" size="65536">
 				<rom name="turbocartridge x1.rom" size="65536" crc="1dccc2c7" sha1="5e9ca706bbd9af33f260962e648b27f48a4b97fa"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="turbox2" supported="no">
-		<description>Turbo Cartridge X2 (Spain, pirate)</description>
+	<software name="turbox2" supported="partial">
+		<!-- "Supercart" header on main menu -->
+		<description>Turbo Cartridge X2 (Chile, pirate)</description>
 		<year>19??</year>
 		<publisher>Turbosoft</publisher>
+		<notes><![CDATA[
+1. Crystal Raider: boots
+2. Space Invaders: boots, has [GTIA] background color cyan instead of black, otherwise same as spaceinv entry
+3. Cavernas de Marte (Caverns of Mars): boots, has [GTIA] background color cyan instead of black on title screen, otherwise same as cvrnmars
+4. Screeming Wings: boots
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
@@ -6192,6 +6973,9 @@ Has garbage row strip on top of active playfield during hammer throw event
 		<description>Turbo System</description>
 		<year>1993</year>
 		<publisher>Dadok</publisher>
+		<notes><![CDATA[
+Utilities for unemulated [cassette] interface
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_phoenix" />
 			<dataarea name="rom" size="8192">
@@ -6501,6 +7285,97 @@ Garbage row strip at bottom of screen
 			<feature name="slot" value="a800_williams" />
 			<dataarea name="rom" size="65536">
 				<rom name="zybex.rom" size="65536" crc="c1da182c" sha1="f77c897e6461e0ceab7e3922c233319e7c4cd601"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- aDawilah releases, QA presumes using a65xea main set -->
+	<!-- TODO: Language barrier for all (Arabic) -->
+	<software name="adaw_akh" supported="no">
+		<!-- "IQ Test" -->
+		<description>Akhtabar Dhakayik</description>
+		<year>198?</year>
+		<publisher>aDawliah</publisher>
+		<notes><![CDATA[
+Needs Arabic keyboard layout
+During gameplay the timer/question (?) has offset char (verify)
+]]></notes>
+		<info name="alt_title" value="اختبر ذكائك"/>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_adawliah" />
+			<dataarea name="rom" size="32768">
+				<rom name="akhtabir dhakayik (198x)(adawliah)(sa).bin" size="32768" crc="a0252f95" sha1="5cf9325f3dde797cf22e323983e64ce88fcabd44"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="adaw_alta" supported="no">
+		<!-- "Power" -->
+		<description>al-Taaqa</description>
+		<year>198?</year>
+		<publisher>aDawliah</publisher>
+		<notes><![CDATA[
+Needs Arabic keyboard layout
+[ANTIC] background pens and timing looks odd (verify)
+]]></notes>
+		<info name="alt_title" value="الطاقة"/>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_adawliah" />
+			<dataarea name="rom" size="32768">
+				<rom name="altaaqa (198x)(adawliah)(sa).bin" size="32768" crc="0483fa8b" sha1="83cdc8fe569cb1cfdc23ec2ff577d691a1e0fd67"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="adaw_bank" supported="no">
+		<!-- "Data Bank" -->
+		<description>Bank al-Maelumat</description>
+		<year>198?</year>
+		<publisher>aDawliah</publisher>
+		<notes><![CDATA[
+Needs Arabic keyboard layout
+]]></notes>
+		<info name="alt_title" value="بنك المعلومات"/>
+		<part name="cart" interface="a8bit_cart">
+			<!-- TODO: Original .car ROM set as #56 (SIC! 512KB), unlikely? -->
+			<!-- <feature name="slot" value="a800_adawliah" /> -->
+			<feature name="slot" value="sic_512kb" />
+			<dataarea name="rom" size="524288">
+				<rom name="bank almaelumat (198x)(adawliah)(sa).bin" size="524288" crc="80fa21eb" sha1="d97f1333cb4dd292a12fb6752a357aecbefefca4" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="adaw_kayf" supported="no">
+		<!-- "How Computers Work" -->
+		<description>Kayf Yaemal al-Computer</description>
+		<year>198?</year>
+		<publisher>aDawliah</publisher>
+		<notes><![CDATA[
+Needs Arabic keyboard layout
+]]></notes>
+		<info name="alt_title" value="كيف يعمل الكمبيوتر"/>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_adawliah" />
+			<dataarea name="rom" size="32768">
+				<rom name="kayf yaemal alkumbuyutar (198x)(adawliah)(sa).bin" size="32768" crc="b793b32e" sha1="45d33eac87756ec2865f398d5ccdd203a79b933a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="adaw_qam" supported="no">
+		<!-- "Star Dictionary" -->
+		<description>Qamus Najm</description>
+		<year>198?</year>
+		<publisher>aDawliah</publisher>
+		<notes><![CDATA[
+Needs Arabic keyboard layout, prompts using arrow keys that aren't available in English layout
+]]></notes>
+		<info name="alt_title" value="قاموس نجم"/>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_adawliah" />
+			<dataarea name="rom" size="32768">
+				<rom name="qamus najm (198x)(adawliah)(sa).bin" size="32768" crc="79457426" sha1="fcce458bc72a39132c3a09cfbb1cac6b982245f0"/>
 			</dataarea>
 		</part>
 	</software>

@@ -131,8 +131,8 @@ private:
 	void stack_limit_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t romboard_r(offs_t offset);
 	[[maybe_unused]] void romboard_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(duarta_irq_handler);
-	DECLARE_WRITE_LINE_MEMBER(duartb_irq_handler);
+	void duarta_irq_handler(int state);
+	void duartb_irq_handler(int state);
 
 	void mem_map(address_map &map);
 	void storager_map(address_map& map);
@@ -351,7 +351,7 @@ uint16_t iris3000_state::dips_r(offs_t offset, uint16_t mem_mask)
 
 uint8_t iris3000_state::clock_ctrl_r()
 {
-	const uint8_t data = m_rtc->read(1);
+	const uint8_t data = m_rtc->data_r(); // FIXME: really?
 	LOGMASKED(LOG_RTC, "%s: clock_ctrl_r: %02x\n", machine().describe_context(), data);
 	return data;
 }
@@ -359,12 +359,12 @@ uint8_t iris3000_state::clock_ctrl_r()
 void iris3000_state::clock_ctrl_w(uint8_t data)
 {
 	LOGMASKED(LOG_RTC, "%s: clock_ctrl_w: %02x\n", machine().describe_context(), data);
-	m_rtc->write(1, data);
+	m_rtc->data_w(data); // FIXME: really?
 }
 
 uint8_t iris3000_state::clock_data_r()
 {
-	uint8_t data = m_rtc->read(0);
+	uint8_t data = m_rtc->get_address(); // FIXME: really?
 	LOGMASKED(LOG_RTC, "%s: clock_data_r: %02x\n", machine().describe_context(), data);
 	return data;
 }
@@ -372,7 +372,7 @@ uint8_t iris3000_state::clock_data_r()
 void iris3000_state::clock_data_w(uint8_t data)
 {
 	LOGMASKED(LOG_RTC, "%s: clock_data_w: %02x\n", machine().describe_context(), data);
-	m_rtc->write(0, data);
+	m_rtc->address_w(data); // FIXME: really?
 }
 
 uint8_t iris3000_state::kernel_base_r(offs_t offset)
@@ -599,12 +599,12 @@ void iris3000_state::storager_map(address_map& map)
     MACHINE DRIVERS
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(iris3000_state::duarta_irq_handler)
+void iris3000_state::duarta_irq_handler(int state)
 {
 	m_maincpu->set_input_line(M68K_IRQ_6, state);
 }
 
-WRITE_LINE_MEMBER(iris3000_state::duartb_irq_handler)
+void iris3000_state::duartb_irq_handler(int state)
 {
 	m_maincpu->set_input_line(M68K_IRQ_6, state);
 }

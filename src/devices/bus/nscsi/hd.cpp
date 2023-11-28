@@ -50,7 +50,7 @@ void nscsi_harddisk_device::device_reset()
 
 void nscsi_harddisk_device::device_add_mconfig(machine_config &config)
 {
-	HARDDISK(config, image).set_interface("scsi_hdd");
+	HARDDISK(config, image).set_interface("scsi_hdd,hdd");
 }
 
 uint8_t nscsi_harddisk_device::scsi_get_data(int id, int pos)
@@ -403,8 +403,8 @@ void nscsi_harddisk_device::scsi_command()
 		scsi_status_complete(SS_GOOD);
 		break;
 
-	case SC_RECIEVE_DIAG_RES: {
-		LOG("command RECIEVE DIAGNOSTICS RESULTS\n");
+	case SC_RECEIVE_DIAGNOSTIC_RESULTS: {
+		LOG("command RECEIVE DIAGNOSTIC RESULTS\n");
 		int size = (scsi_cmdbuf[3] << 8) | scsi_cmdbuf[4];
 		int pos = 0;
 		scsi_cmdbuf[pos++] = 0;
@@ -421,8 +421,8 @@ void nscsi_harddisk_device::scsi_command()
 		break;
 	}
 
-	case SC_SEND_DIAGNOSTICS: {
-		LOG("command SEND DIAGNOSTICS\n");
+	case SC_SEND_DIAGNOSTIC: {
+		LOG("command SEND DIAGNOSTIC\n");
 		int size = (scsi_cmdbuf[3] << 8) | scsi_cmdbuf[4];
 		if(scsi_cmdbuf[1] & 4) {
 			// Self-test
@@ -523,7 +523,7 @@ void nscsi_harddisk_device::scsi_command()
 		scsi_status_complete(SS_GOOD);
 		break;
 
-	case SC_VERIFY:
+	case SC_VERIFY_10:
 		LOG("command VERIFY BytChk %d\n", !!(scsi_cmdbuf[1] & 0x02));
 		if (!(scsi_cmdbuf[1] & 0x02))
 			scsi_status_complete(SS_GOOD);

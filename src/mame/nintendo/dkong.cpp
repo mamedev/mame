@@ -452,7 +452,7 @@ void dkong_state::memory_write_byte(offs_t offset, uint8_t data)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(dkong_state::s2650_interrupt)
+void dkong_state::s2650_interrupt(int state)
 {
 	if (state)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
@@ -672,7 +672,7 @@ void dkong_state::s2650_data_w(uint8_t data)
 	m_hunchloopback = data;
 }
 
-WRITE_LINE_MEMBER(dkong_state::s2650_fo_w)
+void dkong_state::s2650_fo_w(int state)
 {
 #if DEBUG_PROTECTION
 	logerror("%s write : FO = %02x\n", machine().describe_context(), data);
@@ -1623,7 +1623,7 @@ uint8_t dkong_state::braze_eeprom_r()
 	return m_eeprom->do_read();
 }
 
-WRITE_LINE_MEMBER(dkong_state::dk_braze_a15)
+void dkong_state::dk_braze_a15(int state)
 {
 	m_bank1->set_entry(state & 0x01);
 	m_bank2->set_entry(state & 0x01);
@@ -1667,13 +1667,13 @@ void dkong_state::braze_decrypt_rom(uint8_t *dest)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(dkong_state::vblank_irq)
+void dkong_state::vblank_irq(int state)
 {
 	if (state && m_nmi_mask)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(dkong_state::busreq_w )
+void dkong_state::busreq_w(int state)
 {
 	// since our Z80 has no support for BUSACK, we assume it is granted immediately
 	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
@@ -3795,16 +3795,16 @@ GAME( 1983, dkong3hs,  dkong3,   dk3_braze, dkong3,   dkong_state, init_dkong3hs
 GAME( 1983, pestplce,  mario,    pestplce,  pestplce, dkong_state, empty_init,    ROT0,   "bootleg", "Pest Place", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 /* 2650 based */
-GAME( 1984, herbiedk,  huncholy, herbiedk,  herbiedk, dkong_state, empty_init,    ROT270, "Century Electronics / Seatongrove Ltd",             "Herbie at the Olympics (DK conversion)",                   MACHINE_SUPPORTS_SAVE )
-GAME( 1983, hunchbkd,  hunchbak, s2650,     hunchbkd, dkong_state, empty_init,    ROT270, "Century Electronics",                               "Hunchback (DK conversion)",                                MACHINE_SUPPORTS_SAVE )
-GAME( 1984, sbdk,      superbik, s2650,     sbdk,     dkong_state, empty_init,    ROT270, "Century Electronics",                               "Super Bike (DK conversion)",                               MACHINE_SUPPORTS_SAVE )
-GAME( 1984, herodk,    hero,     s2650,     herodk,   dkong_state, init_herodk,   ROT270, "Seatongrove Ltd (Crown license)",                   "Hero in the Castle of Doom (DK conversion)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1984, herodku,   hero,     s2650,     herodk,   dkong_state, empty_init,    ROT270, "Seatongrove Ltd (Crown license)",                   "Hero in the Castle of Doom (DK conversion not encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, 8ballact,  0,        herbiedk,  8ballact, dkong_state, empty_init,    ROT270, "Seatongrove Ltd (Magic Electronics USA license)",   "Eight Ball Action (DK conversion)",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1984, 8ballact2, 8ballact, herbiedk,  8ballact, dkong_state, empty_init,    ROT270, "Seatongrove Ltd (Magic Electronics USA license)",   "Eight Ball Action (DKJr conversion)",                      MACHINE_SUPPORTS_SAVE )
-GAME( 1984, shootgal,  0,        s2650,     shootgal, dkong_state, empty_init,    ROT0,   "Seatongrove Ltd (Zaccaria license)",                "Shooting Gallery",                                         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, spclforc,  0,        spclforc,  spclforc, dkong_state, empty_init,    ROT270, "Senko Industries (Magic Electronics Inc. license)", "Special Forces",                                           MACHINE_SUPPORTS_SAVE )
-GAME( 1985, spcfrcii,  0,        spclforc,  spclforc, dkong_state, empty_init,    ROT270, "Senko Industries (Magic Electronics Inc. license)", "Special Forces II",                                        MACHINE_SUPPORTS_SAVE )
+GAME( 1984, herbiedk,  huncholy, herbiedk,  herbiedk, dkong_state, empty_init,    ROT270, "Seatongrove UK, Ltd.",                                 "Herbie at the Olympics (DK conversion)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1983, hunchbkd,  hunchbak, s2650,     hunchbkd, dkong_state, empty_init,    ROT270, "Century Electronics",                                  "Hunchback (DK conversion)",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sbdk,      superbik, s2650,     sbdk,     dkong_state, empty_init,    ROT270, "Century Electronics",                                  "Super Bike (DK conversion)",                                MACHINE_SUPPORTS_SAVE )
+GAME( 1984, herodk,    hero,     s2650,     herodk,   dkong_state, init_herodk,   ROT270, "Seatongrove UK, Ltd. (Crown license)",                 "Hero in the Castle of Doom (DK conversion)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1984, herodku,   hero,     s2650,     herodk,   dkong_state, empty_init,    ROT270, "Seatongrove UK, Ltd. (Crown license)",                 "Hero in the Castle of Doom (DK conversion, not encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, 8ballact,  0,        herbiedk,  8ballact, dkong_state, empty_init,    ROT270, "Seatongrove UK, Ltd. (Magic Electronics USA license)", "Eight Ball Action (DK conversion)",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1984, 8ballact2, 8ballact, herbiedk,  8ballact, dkong_state, empty_init,    ROT270, "Seatongrove UK, Ltd. (Magic Electronics USA license)", "Eight Ball Action (DKJr conversion)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1984, shootgal,  0,        s2650,     shootgal, dkong_state, empty_init,    ROT0,   "Seatongrove UK, Ltd. (Zaccaria license)",              "Shooting Gallery",                                          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, spclforc,  0,        spclforc,  spclforc, dkong_state, empty_init,    ROT270, "Senko Industries (Magic Electronics Inc. license)",    "Special Forces",                                            MACHINE_SUPPORTS_SAVE )
+GAME( 1985, spcfrcii,  0,        spclforc,  spclforc, dkong_state, empty_init,    ROT270, "Senko Industries (Magic Electronics Inc. license)",    "Special Forces II",                                         MACHINE_SUPPORTS_SAVE )
 
 /* EPOS */
 GAME( 1984, drakton,   0,        drakton,   drakton,  dkong_state, init_drakton,  ROT270, "Epos Corporation", "Drakton (DK conversion)",     MACHINE_SUPPORTS_SAVE )

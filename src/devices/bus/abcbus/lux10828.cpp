@@ -114,6 +114,9 @@ Notes:
 #include "emu.h"
 #include "lux10828.h"
 
+#include "formats/abc800_dsk.h"
+#include "formats/abc800i_dsk.h"
+
 
 
 //**************************************************************************
@@ -231,13 +234,13 @@ uint8_t luxor_55_10828_device::pio_pb_r()
 
 	// single/double sided drive
 	uint8_t sw1 = m_sw1->read() & 0x0f;
-	bool ds0 = m_sel0 ? BIT(sw1, 0) : 1;
-	bool ds1 = m_sel1 ? BIT(sw1, 1) : 1;
+	bool ds0 = BIT(m_sel, 0) ? BIT(sw1, 0) : 1;
+	bool ds1 = BIT(m_sel, 1) ? BIT(sw1, 1) : 1;
 	data |= !(ds0 && ds1);
 
 	// single/double density drive
-	bool dd0 = m_sel0 ? BIT(sw1, 2) : 1;
-	bool dd1 = m_sel1 ? BIT(sw1, 3) : 1;
+	bool dd0 = BIT(m_sel, 0) ? BIT(sw1, 2) : 1;
+	bool dd1 = BIT(m_sel, 1) ? BIT(sw1, 3) : 1;
 	data |= !(dd0 && dd1) << 1;
 
 	// TODO ULA output
@@ -306,7 +309,7 @@ void luxor_55_10828_device::floppy_formats(format_registration &fr)
 	fr.add(FLOPPY_ABC800_FORMAT);
 }
 
-WRITE_LINE_MEMBER( luxor_55_10828_device::fdc_intrq_w )
+void luxor_55_10828_device::fdc_intrq_w(int state)
 {
 	m_fdc_irq = state;
 	m_pio->port_b_write(state << 7);
@@ -314,7 +317,7 @@ WRITE_LINE_MEMBER( luxor_55_10828_device::fdc_intrq_w )
 	//if (state) m_maincpu->wait_w(CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( luxor_55_10828_device::fdc_drq_w )
+void luxor_55_10828_device::fdc_drq_w(int state)
 {
 	m_fdc_drq = state;
 
@@ -344,8 +347,8 @@ void luxor_55_10828_device::device_add_mconfig(machine_config &config)
 	m_fdc->intrq_wr_callback().set(FUNC(luxor_55_10828_device::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(luxor_55_10828_device::fdc_drq_w));
 
-	FLOPPY_CONNECTOR(config, m_floppy0, abc_floppies, "525ssdd", luxor_55_10828_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy1, abc_floppies, "525ssdd", luxor_55_10828_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], abc_floppies, "525ssdd", luxor_55_10828_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], abc_floppies, "525ssdd", luxor_55_10828_device::floppy_formats).enable_sound(true);
 }
 
 
@@ -410,8 +413,7 @@ luxor_55_10828_device::luxor_55_10828_device(const machine_config &mconfig, cons
 	m_maincpu(*this, Z80_TAG),
 	m_pio(*this, Z80PIO_TAG),
 	m_fdc(*this, MB8876_TAG),
-	m_floppy0(*this, MB8876_TAG":0"),
-	m_floppy1(*this, MB8876_TAG":1"),
+	m_floppy(*this, MB8876_TAG":%u", 0U),
 	m_sw1(*this, "SW1"),
 	m_s1(*this, "S1"),
 	m_cs(false),
@@ -420,8 +422,7 @@ luxor_55_10828_device::luxor_55_10828_device(const machine_config &mconfig, cons
 	m_fdc_irq(0),
 	m_fdc_drq(0),
 	m_wait_enable(0),
-	m_sel0(0),
-	m_sel1(0)
+	m_sel(0)
 {
 }
 
@@ -439,8 +440,7 @@ void luxor_55_10828_device::device_start()
 	save_item(NAME(m_fdc_irq));
 	save_item(NAME(m_fdc_drq));
 	save_item(NAME(m_wait_enable));
-	save_item(NAME(m_sel0));
-	save_item(NAME(m_sel1));
+	save_item(NAME(m_sel));
 
 	// patch out protection checks (bioses basf6106/mpi02)
 	uint8_t *rom = memregion(Z80_TAG)->base();
@@ -600,13 +600,12 @@ void luxor_55_10828_device::ctrl_w(uint8_t data)
 		return;
 
 	// drive selection
-	m_sel0 = BIT(data, 0);
-	m_sel1 = BIT(data, 1);
+	m_sel = data & 0x03;
 
 	floppy_image_device *floppy = nullptr;
 
-	if (m_sel0) floppy = m_floppy0->get_device();
-	if (m_sel1) floppy = m_floppy1->get_device();
+	if (BIT(m_sel, 0)) floppy = m_floppy[0]->get_device();
+	if (BIT(m_sel, 1)) floppy = m_floppy[1]->get_device();
 
 	m_fdc->set_floppy(floppy);
 

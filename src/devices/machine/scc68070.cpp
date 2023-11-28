@@ -240,15 +240,15 @@ void scc68070_device::cpu_space_map(address_map &map)
 
 scc68070_device::scc68070_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: scc68070_base_device(mconfig, tag, owner, clock, SCC68070, address_map_constructor(FUNC(scc68070_device::internal_map), this))
-	, m_iack2_callback(*this)
-	, m_iack4_callback(*this)
-	, m_iack5_callback(*this)
-	, m_iack7_callback(*this)
+	, m_iack2_callback(*this, autovector(2))
+	, m_iack4_callback(*this, autovector(4))
+	, m_iack5_callback(*this, autovector(5))
+	, m_iack7_callback(*this, autovector(7))
 	, m_uart_tx_callback(*this)
 	, m_uart_rtsn_callback(*this)
 	, m_i2c_scl_callback(*this)
 	, m_i2c_sdaw_callback(*this)
-	, m_i2c_sdar_callback(*this)
+	, m_i2c_sdar_callback(*this, 0)
 	, m_ipl(0)
 	, m_in2_line(CLEAR_LINE)
 	, m_in4_line(CLEAR_LINE)
@@ -261,34 +261,11 @@ scc68070_device::scc68070_device(const machine_config &mconfig, const char *tag,
 }
 
 //-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void scc68070_device::device_resolve_objects()
-{
-	scc68070_base_device::device_resolve_objects();
-
-	m_iack2_callback.resolve_safe(autovector(2));
-	m_iack4_callback.resolve_safe(autovector(4));
-	m_iack5_callback.resolve_safe(autovector(5));
-	m_iack7_callback.resolve_safe(autovector(7));
-	m_uart_tx_callback.resolve_safe();
-	m_uart_rtsn_callback.resolve_safe();
-	m_i2c_scl_callback.resolve_safe();
-	m_i2c_sdaw_callback.resolve_safe();
-	m_i2c_sdar_callback.resolve_safe(0);
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void scc68070_device::device_start()
 {
-	reset_cb().append(*this, FUNC(scc68070_device::reset_peripherals));
-
 	scc68070_base_device::device_start();
 
 	save_item(NAME(m_ipl));
@@ -450,43 +427,55 @@ void scc68070_device::device_reset()
 	set_timer_callback(0);
 }
 
-WRITE_LINE_MEMBER(scc68070_device::reset_peripherals)
+
+void scc68070_device::device_config_complete()
 {
-	m_lir = 0;
+	scc68070_base_device::device_config_complete();
 
-	m_picr1 = 0;
-	m_picr2 = 0;
-	m_timer_int = false;
-	m_i2c_int = false;
-	m_uart_rx_int = false;
-	m_uart_tx_int = false;
+	reset_cb().append(*this, FUNC(scc68070_device::reset_peripherals));
+}
 
-	m_i2c.status_register = ISR_PIN;
-	m_i2c.control_register = 0;
-	m_i2c.clock_control_register = 0;
-	m_i2c.scl_out_state = true;
-	m_i2c.scl_in_state = true;
-	m_i2c.sda_out_state = true;
-	m_i2c.state = I2C_IDLE;
-	m_i2c.clock_change_state = I2C_SCL_IDLE;
-	m_i2c.clocks = 0;
-	m_uart.command_register = 0;
-	m_uart.receive_pointer = -1;
-	m_uart.transmit_pointer = -1;
 
-	m_uart.mode_register = 0;
-	m_uart.status_register = USR_TXRDY;
-	m_uart.clock_select = 0;
+void scc68070_device::reset_peripherals(int state)
+{
+	if (state)
+	{
+		m_lir = 0;
 
-	m_timers.timer_status_register = 0;
-	m_timers.timer_control_register = 0;
+		m_picr1 = 0;
+		m_picr2 = 0;
+		m_timer_int = false;
+		m_i2c_int = false;
+		m_uart_rx_int = false;
+		m_uart_tx_int = false;
 
-	m_uart.rx_timer->adjust(attotime::never);
-	m_uart.tx_timer->adjust(attotime::never);
-	m_timers.timer0_timer->adjust(attotime::never);
-	m_i2c.timer->adjust(attotime::never);
+		m_i2c.status_register = ISR_PIN;
+		m_i2c.control_register = 0;
+		m_i2c.clock_control_register = 0;
+		m_i2c.scl_out_state = true;
+		m_i2c.scl_in_state = true;
+		m_i2c.sda_out_state = true;
+		m_i2c.state = I2C_IDLE;
+		m_i2c.clock_change_state = I2C_SCL_IDLE;
+		m_i2c.clocks = 0;
+		m_uart.command_register = 0;
+		m_uart.receive_pointer = -1;
+		m_uart.transmit_pointer = -1;
 
-	update_ipl();
+		m_uart.mode_register = 0;
+		m_uart.status_register = USR_TXRDY;
+		m_uart.clock_select = 0;
+
+		m_timers.timer_status_register = 0;
+		m_timers.timer_control_register = 0;
+
+		m_uart.rx_timer->adjust(attotime::never);
+		m_uart.tx_timer->adjust(attotime::never);
+		m_timers.timer0_timer->adjust(attotime::never);
+		m_i2c.timer->adjust(attotime::never);
+
+		update_ipl();
+	}
 }
 
 void scc68070_device::update_ipl()
@@ -516,31 +505,31 @@ void scc68070_device::update_ipl()
 	}
 }
 
-WRITE_LINE_MEMBER(scc68070_device::in2_w)
+void scc68070_device::in2_w(int state)
 {
 	m_in2_line = state;
 	update_ipl();
 }
 
-WRITE_LINE_MEMBER(scc68070_device::in4_w)
+void scc68070_device::in4_w(int state)
 {
 	m_in4_line = state;
 	update_ipl();
 }
 
-WRITE_LINE_MEMBER(scc68070_device::in5_w)
+void scc68070_device::in5_w(int state)
 {
 	m_in5_line = state;
 	update_ipl();
 }
 
-WRITE_LINE_MEMBER(scc68070_device::nmi_w)
+void scc68070_device::nmi_w(int state)
 {
 	m_nmi_line = state;
 	update_ipl();
 }
 
-WRITE_LINE_MEMBER(scc68070_device::int1_w)
+void scc68070_device::int1_w(int state)
 {
 	if (m_int1_line != state)
 	{
@@ -554,7 +543,7 @@ WRITE_LINE_MEMBER(scc68070_device::int1_w)
 	}
 }
 
-WRITE_LINE_MEMBER(scc68070_device::int2_w)
+void scc68070_device::int2_w(int state)
 {
 	if (m_int2_line != state)
 	{
@@ -1236,7 +1225,7 @@ void scc68070_device::i2c_process_rising_scl()
 	}
 }
 
-WRITE_LINE_MEMBER(scc68070_device::write_scl)
+void scc68070_device::write_scl(int state)
 {
 	if (m_i2c.status_register & ISR_MST)
 	{

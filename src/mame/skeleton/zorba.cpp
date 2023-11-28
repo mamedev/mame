@@ -51,24 +51,144 @@ ToDo:
 *************************************************************************************************************/
 
 #include "emu.h"
-#include "zorba.h"
 
 #include "zorbakbd.h"
 
 #include "bus/centronics/ctronics.h"
+#include "bus/ieee488/ieee488.h"
 #include "bus/rs232/rs232.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m68705.h"
 
+#include "imagedev/floppy.h"
+
+#include "machine/6821pia.h"
+#include "machine/i8251.h"
 #include "machine/input_merger.h"
 #include "machine/output_latch.h"
 #include "machine/pit8253.h"
+#include "machine/wd_fdc.h"
+#include "machine/z80dma.h"
 
+#include "sound/beep.h"
+
+#include "video/i8275.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
 
+
+namespace {
+
+class zorba_state : public driver_device
+{
+public:
+	zorba_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_config_port(*this, "CNF")
+		, m_rom(*this, "maincpu")
+		, m_ram(*this, "mainram")
+		, m_bank1(*this, "bank1")
+		, m_p_chargen(*this, "chargen")
+		, m_maincpu(*this, "maincpu")
+		, m_dma(*this, "dma")
+		, m_uart0(*this, "uart0")
+		, m_uart1(*this, "uart1")
+		, m_uart2(*this, "uart2")
+		, m_pia0(*this, "pia0")
+		, m_pia1(*this, "pia1")
+		, m_palette(*this, "palette")
+		, m_crtc(*this, "crtc")
+		, m_beep(*this, "beeper")
+		, m_fdc (*this, "fdc")
+		, m_floppy0(*this, "fdc:0")
+		, m_floppy1(*this, "fdc:1")
+		, m_ieee(*this, IEEE488_TAG)
+	{
+	}
+
+	DECLARE_INPUT_CHANGED_MEMBER(printer_type);
+	void zorba(machine_config &config);
+
+private:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	void zorba_io(address_map &map);
+	void zorba_mem(address_map &map);
+
+	// Memory banking control
+	uint8_t ram_r();
+	void ram_w(uint8_t data);
+	uint8_t rom_r();
+	void rom_w(uint8_t data);
+
+	// Interrupt vectoring glue
+	void intmask_w(uint8_t data);
+	template <unsigned N> void tx_rx_rdy_w(int state);
+	template <unsigned N> void irq_w(int state);
+
+	// DMA controller handlers
+	void busreq_w(int state);
+	uint8_t memory_read_byte(offs_t offset);
+	void memory_write_byte(offs_t offset, uint8_t data);
+	uint8_t io_read_byte(offs_t offset);
+	void io_write_byte(offs_t offset, uint8_t data);
+
+	// PIT handlers
+	void br1_w(int state);
+
+	// PIA handlers
+	void pia0_porta_w(uint8_t data);
+	uint8_t pia1_portb_r();
+	void pia1_portb_w(uint8_t data);
+
+	// Video
+	I8275_DRAW_CHARACTER_MEMBER(zorba_update_chr);
+
+	// Printer port glue
+	void printer_fault_w(int state);
+	void printer_select_w(int state);
+
+	required_ioport                     m_config_port;
+
+	required_region_ptr<u8>             m_rom;
+	required_shared_ptr<u8>             m_ram;
+	required_memory_bank                m_bank1;
+	required_region_ptr<uint8_t>        m_p_chargen;
+
+	required_device<cpu_device>         m_maincpu;
+	required_device<z80dma_device>      m_dma;
+	required_device<i8251_device>       m_uart0;
+	required_device<i8251_device>       m_uart1;
+	required_device<i8251_device>       m_uart2;
+	required_device<pia6821_device>     m_pia0;
+	required_device<pia6821_device>     m_pia1;
+
+	required_device<palette_device>     m_palette;
+	required_device<i8275_device>       m_crtc;
+
+	required_device<beep_device>        m_beep;
+
+	required_device<fd1793_device>      m_fdc;
+	required_device<floppy_connector>   m_floppy0;
+	required_device<floppy_connector>   m_floppy1;
+
+	required_device<ieee488_device>     m_ieee;
+
+	uint8_t m_intmask = 0U;
+	uint8_t m_tx_rx_rdy = 0U;
+	uint8_t m_irq = 0U;
+
+	bool    m_printer_prowriter = false;
+	int     m_printer_fault = 0;
+	int     m_printer_select = 0;
+
+	uint8_t m_term_data = 0U;
+};
 
 void zorba_state::zorba_mem(address_map &map)
 {
@@ -185,13 +305,13 @@ void zorba_state::zorba(machine_config &config)
 
 	// port A - disk select etc, beeper
 	// port B - parallel interface
-	PIA6821(config, m_pia0, 0);
+	PIA6821(config, m_pia0);
 	m_pia0->writepa_handler().set(FUNC(zorba_state::pia0_porta_w));
 	m_pia0->writepb_handler().set("parprndata", FUNC(output_latch_device::write));
 	m_pia0->cb2_handler().set("parprn", FUNC(centronics_device::write_strobe));
 
 	// IEEE488 interface
-	PIA6821(config, m_pia1, 0);
+	PIA6821(config, m_pia1);
 	m_pia1->readpa_handler().set(m_ieee, FUNC(ieee488_device::dio_r)); // TODO: gated with PB1
 	m_pia1->writepa_handler().set(m_ieee, FUNC(ieee488_device::host_dio_w)); // TODO: gated with PB1
 	m_pia1->readpb_handler().set(FUNC(zorba_state::pia1_portb_r));
@@ -341,13 +461,13 @@ void zorba_state::intmask_w(uint8_t data)
 	irq_w<5>(BIT(m_intmask & m_tx_rx_rdy, 4) | BIT(m_intmask & m_tx_rx_rdy, 5));
 }
 
-template <unsigned N> WRITE_LINE_MEMBER( zorba_state::tx_rx_rdy_w )
+template <unsigned N> void zorba_state::tx_rx_rdy_w(int state)
 {
 	m_tx_rx_rdy = (m_tx_rx_rdy & ~(1 << N)) | ((state ? 1 : 0) << N);
 	irq_w<(N >> 1) + 3>(BIT(m_intmask & m_tx_rx_rdy, N & ~1) | BIT(m_intmask & m_tx_rx_rdy, N | 1));
 }
 
-template <unsigned N> WRITE_LINE_MEMBER( zorba_state::irq_w )
+template <unsigned N> void zorba_state::irq_w(int state)
 {
 	m_irq = (m_irq & ~(1 << N)) | ((state ? 1 : 0) << N);
 
@@ -375,7 +495,7 @@ template <unsigned N> WRITE_LINE_MEMBER( zorba_state::irq_w )
 //  DMA controller handlers
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( zorba_state::busreq_w )
+void zorba_state::busreq_w(int state)
 {
 // since our Z80 has no support for BUSACK, we assume it is granted immediately
 	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
@@ -413,7 +533,7 @@ void zorba_state::io_write_byte(offs_t offset, uint8_t data)
 //  PIT handlers
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( zorba_state::br1_w )
+void zorba_state::br1_w(int state)
 {
 	// TODO: these can be jumpered to inputs from J2 so a modem can generate Baud rates
 	// TODO: receive clock is exposed on J2 for external devices without Baud rate generators
@@ -513,7 +633,7 @@ I8275_DRAW_CHARACTER_MEMBER( zorba_state::zorba_update_chr )
 //  Printer port glue
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( zorba_state::printer_fault_w )
+void zorba_state::printer_fault_w(int state)
 {
 	// connects to CB1 for Centronics
 	m_printer_fault = state;
@@ -521,7 +641,7 @@ WRITE_LINE_MEMBER( zorba_state::printer_fault_w )
 		m_pia0->cb1_w(state);
 }
 
-WRITE_LINE_MEMBER( zorba_state::printer_select_w )
+void zorba_state::printer_select_w(int state)
 {
 	// connects to CB1 for Prowriter
 	m_printer_select = state;
@@ -548,6 +668,8 @@ ROM_START( zorba )
 	ROM_LOAD( "74ls288.u38", 0x0020, 0x0020, CRC(5ec93ea7) SHA1(3a84c098474b05d5cbe1939a3e15f66d06470581) BAD_DUMP ) // looks like bad dump of address decode PROM
 	ROM_LOAD( "74ls288.u77", 0x0040, 0x0020, CRC(946e03b0) SHA1(24240bdd7bdf507a5b51628fb36ad1266fc53a28) BAD_DUMP ) // looks like bad dump of address decode PROM
 ROM_END
+
+} // anonymous namespace
 
 COMP( 1984?, zorba, 0, 0, zorba, zorba, zorba_state, empty_init, "Modular Micros", "Zorba (Modular Micros)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 

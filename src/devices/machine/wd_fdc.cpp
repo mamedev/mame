@@ -5,9 +5,7 @@
 
 #include "imagedev/floppy.h"
 
-#include "debugger.h"
-
-#define LOG_SETUP   (1U << 1) // Shows register setup
+#define LOG_DATA    (1U << 1) // Shows data reads and writes
 #define LOG_SHIFT   (1U << 2) // Shows shift register contents
 #define LOG_COMP    (1U << 3) // Shows operations on the CPU side
 #define LOG_COMMAND (1U << 4) // Shows command invocation
@@ -29,7 +27,7 @@
 
 #include "logmacro.h"
 
-#define LOGSETUP(...)   LOGMASKED(LOG_SETUP,  __VA_ARGS__)
+#define LOGDATA(...)    LOGMASKED(LOG_DATA, __VA_ARGS__)
 #define LOGSHIFT(...)   LOGMASKED(LOG_SHIFT, __VA_ARGS__)
 #define LOGCOMP(...)    LOGMASKED(LOG_COMP, __VA_ARGS__)
 #define LOGCOMMAND(...) LOGMASKED(LOG_COMMAND, __VA_ARGS__)
@@ -153,7 +151,7 @@ wd_fdc_device_base::wd_fdc_device_base(const machine_config &mconfig, device_typ
 	enp_cb(*this),
 	sso_cb(*this),
 	ready_cb(*this), // actually output by the drive, not by the FDC
-	enmf_cb(*this),
+	enmf_cb(*this, 0),
 	mon_cb(*this)
 {
 	force_ready = false;
@@ -175,16 +173,7 @@ void wd_fdc_device_base::set_disable_motor_control(bool _disable_motor_control)
 
 void wd_fdc_device_base::device_start()
 {
-	intrq_cb.resolve();
-	drq_cb.resolve();
-	hld_cb.resolve();
-	enp_cb.resolve();
-	sso_cb.resolve();
-	ready_cb.resolve();
-	enmf_cb.resolve();
-	mon_cb.resolve_safe();
-
-	if (!has_enmf && !enmf_cb.isnull())
+	if (!has_enmf && !enmf_cb.isunset())
 		logerror("Warning, this chip doesn't have an ENMF line.\n");
 
 	t_gen = timer_alloc(FUNC(wd_fdc_device_base::generic_tick), this);
@@ -236,7 +225,7 @@ void wd_fdc_device_base::soft_reset()
 	}
 }
 
-WRITE_LINE_MEMBER(wd_fdc_device_base::mr_w)
+void wd_fdc_device_base::mr_w(int state)
 {
 	if(mr && !state) {
 		command = 0x03;
@@ -252,19 +241,16 @@ WRITE_LINE_MEMBER(wd_fdc_device_base::mr_w)
 		mr = false;
 
 		// gnd == enmf enabled, otherwise disabled (default)
-		if (!enmf_cb.isnull() && has_enmf)
+		if (!enmf_cb.isunset() && has_enmf)
 			enmf = enmf_cb() ? false : true;
 
 		intrq = false;
-		if (!intrq_cb.isnull())
-			intrq_cb(intrq);
+		intrq_cb(intrq);
 		drq = false;
-		if (!drq_cb.isnull())
-			drq_cb(drq);
+		drq_cb(drq);
 		if(head_control) {
 			hld = false;
-			if(!hld_cb.isnull())
-				hld_cb(hld);
+			hld_cb(hld);
 		}
 
 		mon_cb(1); // Clear the MON* line
@@ -314,7 +300,7 @@ void wd_fdc_device_base::set_floppy(floppy_image_device *_floppy)
 		ready_callback(floppy, next_ready);
 }
 
-WRITE_LINE_MEMBER(wd_fdc_device_base::dden_w)
+void wd_fdc_device_base::dden_w(int state)
 {
 	if(disable_mfm) {
 		logerror("Error, this chip does not have a dden line\n");
@@ -370,8 +356,7 @@ void wd_fdc_device_base::command_end()
 			status &= ~S_BUSY;
 		}
 		intrq = true;
-		if(!intrq_cb.isnull())
-			intrq_cb(intrq);
+		intrq_cb(intrq);
 	}
 }
 
@@ -573,7 +558,6 @@ void wd_fdc_device_base::read_sector_start()
 
 	main_state = READ_SECTOR;
 	status &= ~(S_CRC|S_LOST|S_RNF|S_WP|S_DDM);
-	drop_drq();
 	update_sso();
 	set_hld();
 	sub_state = motor_control ? SPINUP : SPINUP_DONE;
@@ -677,7 +661,6 @@ void wd_fdc_device_base::read_track_start()
 
 	main_state = READ_TRACK;
 	status &= ~(S_LOST|S_RNF);
-	drop_drq();
 	update_sso();
 	set_hld();
 	sub_state = motor_control ? SPINUP : SPINUP_DONE;
@@ -756,7 +739,6 @@ void wd_fdc_device_base::read_id_start()
 
 	main_state = READ_ID;
 	status &= ~(S_WP|S_DDM|S_LOST|S_RNF);
-	drop_drq();
 	update_sso();
 	set_hld();
 	sub_state = motor_control ? SPINUP : SPINUP_DONE;
@@ -833,7 +815,6 @@ void wd_fdc_device_base::write_track_start()
 
 	main_state = WRITE_TRACK;
 	status &= ~(S_WP|S_DDM|S_LOST|S_RNF);
-	drop_drq();
 	update_sso();
 	set_hld();
 	sub_state = motor_control ? SPINUP : SPINUP_DONE;
@@ -932,9 +913,9 @@ void wd_fdc_device_base::write_track_continue()
 			if(format_last_byte_count) {
 				char buf[32];
 				if(format_last_byte_count > 1)
-					sprintf(buf, "%dx%02x", format_last_byte_count, format_last_byte);
+					snprintf(buf, 32, "%dx%02x", format_last_byte_count, format_last_byte);
 				else
-					sprintf(buf, "%02x", format_last_byte);
+					snprintf(buf, 32, "%02x", format_last_byte);
 				format_description_string += buf;
 			}
 			LOGDESC("track description %s\n", format_description_string.c_str());
@@ -960,7 +941,6 @@ void wd_fdc_device_base::write_sector_start()
 
 	main_state = WRITE_SECTOR;
 	status &= ~(S_CRC|S_LOST|S_RNF|S_WP|S_DDM);
-	drop_drq();
 	update_sso();
 	set_hld();
 	sub_state = motor_control  ? SPINUP : SPINUP_DONE;
@@ -1100,8 +1080,7 @@ void wd_fdc_device_base::interrupt_start()
 
 	if(!intrq && (command & I_IMM)) {
 		intrq = true;
-		if(!intrq_cb.isnull())
-			intrq_cb(intrq);
+		intrq_cb(intrq);
 	}
 
 	if(spinup_on_interrupt) { // see notes in FD1771 and WD1772 constructors, might be true for other FDC types as well.
@@ -1267,7 +1246,7 @@ void wd_fdc_device_base::do_cmd_w()
 
 void wd_fdc_device_base::cmd_w(uint8_t val)
 {
-	if (inverted_bus) val ^= 0xff;
+	val ^= bus_invert_value;
 	if (!mr) {
 		logerror("Not initiating command %02x during master reset\n", val);
 		return;
@@ -1285,8 +1264,7 @@ void wd_fdc_device_base::cmd_w(uint8_t val)
 	// No other logic present in real chips, descriptions of "Forced interrupt" (Dx) command in datasheets are wrong.
 	if (intrq) {
 		intrq = false;
-		if(!intrq_cb.isnull())
-			intrq_cb(intrq);
+		intrq_cb(intrq);
 	}
 
 	// No more than one write in flight, but interrupts take priority
@@ -1303,6 +1281,7 @@ void wd_fdc_device_base::cmd_w(uint8_t val)
 	else
 	{
 		intrq_cond = 0;
+		drop_drq();
 		// set busy, then set a timer to process the command
 		status |= S_BUSY;
 		delay_cycles(t_cmd, dden ? delay_command_commit*2 : delay_command_commit);
@@ -1313,8 +1292,7 @@ uint8_t wd_fdc_device_base::status_r()
 {
 	if(intrq && !(intrq_cond & I_IMM) && !machine().side_effects_disabled()) {
 		intrq = false;
-		if(!intrq_cb.isnull())
-			intrq_cb(intrq);
+		intrq_cb(intrq);
 	}
 
 	if(status_type_1) {
@@ -1354,8 +1332,7 @@ uint8_t wd_fdc_device_base::status_r()
 			status &= ~S_NRDY;
 	}
 
-	uint8_t val = status;
-	if (inverted_bus) val ^= 0xff;
+	uint8_t val = status ^ bus_invert_value;
 
 	LOGCOMP("Status value: %02X\n",val);
 
@@ -1370,22 +1347,17 @@ void wd_fdc_device_base::do_track_w()
 
 void wd_fdc_device_base::track_w(uint8_t val)
 {
-	if (inverted_bus) val ^= 0xff;
-
 	// No more than one write in flight
 	if(track_buffer != -1 || !mr)
 		return;
 
-	track_buffer = val;
+	track_buffer = val ^ bus_invert_value;
 	delay_cycles(t_track, dden ? delay_register_commit*2 : delay_register_commit);
 }
 
 uint8_t wd_fdc_device_base::track_r()
 {
-	uint8_t val = track;
-	if (inverted_bus) val ^= 0xff;
-
-	return val;
+	return track ^ bus_invert_value;
 }
 
 void wd_fdc_device_base::do_sector_w()
@@ -1398,15 +1370,13 @@ void wd_fdc_device_base::sector_w(uint8_t val)
 {
 	if (!mr) return;
 
-	if (inverted_bus) val ^= 0xff;
-
 	// No more than one write in flight
 	// C1581 accesses this register with an INC opcode,
 	// i.e. write old value, write new value, and the new value gets ignored by this
 	//if(sector_buffer != -1)
 	//  return;
 
-	sector_buffer = val;
+	sector_buffer = val ^ bus_invert_value;
 
 	// set a timer to write the new value to the register, but only if we aren't in
 	// the middle of an already occurring update
@@ -1416,31 +1386,27 @@ void wd_fdc_device_base::sector_w(uint8_t val)
 
 uint8_t wd_fdc_device_base::sector_r()
 {
-	uint8_t val = sector;
-	if (inverted_bus) val ^= 0xff;
-
-	return val;
+	return sector ^ bus_invert_value;
 }
 
 void wd_fdc_device_base::data_w(uint8_t val)
 {
 	if (!mr) return;
 
-	if (inverted_bus) val ^= 0xff;
-
-	data = val;
+	data = val ^ bus_invert_value;
+	LOGDATA("%s: Write %02X to data register (DRQ=%d)\n", machine().describe_context(), data, drq);
 	drop_drq();
 }
 
 uint8_t wd_fdc_device_base::data_r()
 {
 	if (!machine().side_effects_disabled())
+	{
+		LOGDATA("%s: Read %02X from data register (DRQ=%d)\n", machine().describe_context(), data, drq);
 		drop_drq();
+	}
 
-	uint8_t val = data;
-	if (inverted_bus) val ^= 0xff;
-
-	return val;
+	return data ^ bus_invert_value;
 }
 
 void wd_fdc_device_base::write(offs_t reg, uint8_t val)
@@ -1488,8 +1454,7 @@ void wd_fdc_device_base::spinup()
 
 void wd_fdc_device_base::ready_callback(floppy_image_device *floppy, int state)
 {
-	if(!ready_cb.isnull())
-		ready_cb(state);
+	ready_cb(state);
 
 	// why is this even possible?
 	if (!floppy)
@@ -1501,8 +1466,7 @@ void wd_fdc_device_base::ready_callback(floppy_image_device *floppy, int state)
 
 	if(!intrq && (((intrq_cond & I_RDY) && !state) || ((intrq_cond & I_NRDY) && state))) {
 		intrq = true;
-		if(!intrq_cb.isnull())
-			intrq_cb(intrq);
+		intrq_cb(intrq);
 	}
 }
 
@@ -1533,8 +1497,7 @@ void wd_fdc_device_base::index_callback(floppy_image_device *floppy, int state)
 
 		if(!intrq && (intrq_cond & I_IDX)) {
 			intrq = true;
-			if(!intrq_cb.isnull())
-				intrq_cb(intrq);
+			intrq_cb(intrq);
 		}
 		break;
 
@@ -1596,27 +1559,27 @@ void wd_fdc_device_base::index_callback(floppy_image_device *floppy, int state)
 	general_continue();
 }
 
-READ_LINE_MEMBER(wd_fdc_device_base::intrq_r)
+int wd_fdc_device_base::intrq_r()
 {
 	return intrq;
 }
 
-READ_LINE_MEMBER(wd_fdc_device_base::drq_r)
+int wd_fdc_device_base::drq_r()
 {
 	return drq;
 }
 
-READ_LINE_MEMBER(wd_fdc_device_base::hld_r)
+int wd_fdc_device_base::hld_r()
 {
 	return hld;
 }
 
-WRITE_LINE_MEMBER(wd_fdc_device_base::hlt_w)
+void wd_fdc_device_base::hlt_w(int state)
 {
 	hlt = bool(state);
 }
 
-READ_LINE_MEMBER(wd_fdc_device_base::enp_r)
+int wd_fdc_device_base::enp_r()
 {
 	return enp;
 }
@@ -1636,7 +1599,7 @@ void wd_fdc_device_base::live_start(int state)
 	cur_live.data_bit_context = false;
 	cur_live.byte_counter = 0;
 
-	if (!enmf_cb.isnull() && has_enmf)
+	if (!enmf_cb.isunset() && has_enmf)
 		enmf = enmf_cb() ? false : true;
 
 	pll_reset(dden, enmf, cur_live.tm);
@@ -2104,9 +2067,9 @@ void wd_fdc_device_base::live_run(attotime limit)
 				if(format_last_byte_count) {
 					char buf[32];
 					if(format_last_byte_count > 1)
-						sprintf(buf, "%dx%02x ", format_last_byte_count, format_last_byte);
+						snprintf(buf, 32, "%dx%02x ", format_last_byte_count, format_last_byte);
 					else
-						sprintf(buf, "%02x ", format_last_byte);
+						snprintf(buf, 32, "%02x ", format_last_byte);
 					format_description_string += buf;
 				}
 				format_last_byte = data;
@@ -2379,8 +2342,7 @@ void wd_fdc_device_base::set_drq()
 		status |= S_LOST;
 	} else if(!(status & S_LOST)) {
 		drq = true;
-		if(!drq_cb.isnull())
-			drq_cb(true);
+		drq_cb(true);
 	}
 }
 
@@ -2388,14 +2350,7 @@ void wd_fdc_device_base::drop_drq()
 {
 	if(drq) {
 		drq = false;
-		if(!drq_cb.isnull())
-			drq_cb(false);
-		if(main_state == IDLE && (status & S_BUSY)) {
-			status &= ~S_BUSY;
-			intrq = true;
-			if(!intrq_cb.isnull())
-				intrq_cb(intrq);
-		}
+		drq_cb(false);
 	}
 }
 
@@ -2405,8 +2360,7 @@ void wd_fdc_device_base::set_hld()
 		hld = true;
 		int temp = sub_state;
 		sub_state = DUMMY;
-		if(!hld_cb.isnull())
-			hld_cb(hld);
+		hld_cb(hld);
 		sub_state = temp;
 	}
 }
@@ -2417,8 +2371,7 @@ void wd_fdc_device_base::drop_hld()
 		hld = false;
 		int temp = sub_state;
 		sub_state = DUMMY;
-		if(!hld_cb.isnull())
-			hld_cb(hld);
+		hld_cb(hld);
 		sub_state = temp;
 	}
 }
@@ -2435,7 +2388,7 @@ void wd_fdc_device_base::update_sso()
 	// If a SSO callback is defined then it is assumed that this callback
 	// will update the floppy side if that is the connection. There are
 	// some machines that use the SSO output for other purposes.
-	if(!sso_cb.isnull()) {
+	if(!sso_cb.isunset()) {
 		sso_cb(side);
 		return;
 	}
@@ -2727,7 +2680,7 @@ fd1771_device::fd1771_device(const machine_config &mconfig, const char *tag, dev
 	delay_register_commit = 16/2; // will became x2 later due to FM
 	delay_command_commit = 20/2;  // same as above
 	disable_mfm = true;
-	inverted_bus = true;
+	bus_invert_value = 0xff;
 	side_control = false;
 	side_compare = false;
 	head_control = true;
@@ -2754,7 +2707,7 @@ fd1781_device::fd1781_device(const machine_config &mconfig, const char *tag, dev
 	delay_register_commit = 16;
 	delay_command_commit = 12;
 	disable_mfm = false;
-	inverted_bus = true;
+	bus_invert_value = 0xff;
 	side_control = false;
 	side_compare = false;
 	head_control = true;
@@ -2781,7 +2734,7 @@ fd1791_device::fd1791_device(const machine_config &mconfig, const char *tag, dev
 	delay_command_commit = 12;
 	disable_mfm = false;
 	has_enmf = false;
-	inverted_bus = true;
+	bus_invert_value = 0xff;
 	side_control = false;
 	side_compare = true;
 	head_control = true;
@@ -2797,7 +2750,7 @@ fd1792_device::fd1792_device(const machine_config &mconfig, const char *tag, dev
 	delay_command_commit = 12;
 	disable_mfm = true;
 	has_enmf = false;
-	inverted_bus = true;
+	bus_invert_value = 0xff;
 	side_control = false;
 	side_compare = true;
 	head_control = true;
@@ -2813,7 +2766,7 @@ fd1793_device::fd1793_device(const machine_config &mconfig, const char *tag, dev
 	delay_command_commit = 12;
 	disable_mfm = false;
 	has_enmf = false;
-	inverted_bus = false;
+	bus_invert_value = 0x00;
 	side_control = false;
 	side_compare = true;
 	head_control = true;
@@ -2829,7 +2782,7 @@ kr1818vg93_device::kr1818vg93_device(const machine_config &mconfig, const char *
 	delay_command_commit = 12;
 	disable_mfm = false;
 	has_enmf = false;
-	inverted_bus = false;
+	bus_invert_value = 0x00;
 	side_control = false;
 	side_compare = true;
 	head_control = true;
@@ -2845,7 +2798,7 @@ fd1794_device::fd1794_device(const machine_config &mconfig, const char *tag, dev
 	delay_command_commit = 12;
 	disable_mfm = true;
 	has_enmf = false;
-	inverted_bus = false;
+	bus_invert_value = 0x00;
 	side_control = false;
 	side_compare = true;
 	head_control = true;
@@ -2861,7 +2814,7 @@ fd1795_device::fd1795_device(const machine_config &mconfig, const char *tag, dev
 	delay_command_commit = 12;
 	disable_mfm = false;
 	has_enmf = false;
-	inverted_bus = true;
+	bus_invert_value = 0xff;
 	side_control = true;
 	side_compare = false;
 	head_control = true;
@@ -2885,7 +2838,7 @@ fd1797_device::fd1797_device(const machine_config &mconfig, const char *tag, dev
 	delay_command_commit = 12;
 	disable_mfm = false;
 	has_enmf = false;
-	inverted_bus = false;
+	bus_invert_value = 0x00;
 	side_control = true;
 	side_compare = false;
 	head_control = true;
@@ -2909,7 +2862,7 @@ mb8866_device::mb8866_device(const machine_config &mconfig, const char *tag, dev
 	delay_command_commit = 12;
 	disable_mfm = false;
 	has_enmf = false;
-	inverted_bus = true;
+	bus_invert_value = 0xff;
 	side_control = false;
 	side_compare = true;
 	head_control = true;
@@ -2925,7 +2878,7 @@ mb8876_device::mb8876_device(const machine_config &mconfig, const char *tag, dev
 	delay_command_commit = 12;
 	disable_mfm = false;
 	has_enmf = false;
-	inverted_bus = true;
+	bus_invert_value = 0xff;
 	side_control = false;
 	side_compare = true;
 	head_control = true;
@@ -2941,7 +2894,7 @@ mb8877_device::mb8877_device(const machine_config &mconfig, const char *tag, dev
 	delay_command_commit = 12;
 	disable_mfm = false;
 	has_enmf = false;
-	inverted_bus = false;
+	bus_invert_value = 0x00;
 	side_control = false;
 	side_compare = true;
 	head_control = true;
@@ -2957,7 +2910,7 @@ fd1761_device::fd1761_device(const machine_config &mconfig, const char *tag, dev
 	delay_command_commit = 12;
 	disable_mfm = false;
 	has_enmf = false;
-	inverted_bus = true;
+	bus_invert_value = 0xff;
 	side_control = false;
 	side_compare = true;
 	head_control = true;
@@ -2973,7 +2926,7 @@ fd1763_device::fd1763_device(const machine_config &mconfig, const char *tag, dev
 	delay_command_commit = 12;
 	disable_mfm = false;
 	has_enmf = false;
-	inverted_bus = false;
+	bus_invert_value = 0x00;
 	side_control = false;
 	side_compare = true;
 	head_control = true;
@@ -2989,7 +2942,7 @@ fd1765_device::fd1765_device(const machine_config &mconfig, const char *tag, dev
 	delay_command_commit = 12;
 	disable_mfm = false;
 	has_enmf = false;
-	inverted_bus = true;
+	bus_invert_value = 0xff;
 	side_control = true;
 	side_compare = false;
 	head_control = true;
@@ -3013,7 +2966,7 @@ fd1767_device::fd1767_device(const machine_config &mconfig, const char *tag, dev
 	delay_command_commit = 12;
 	disable_mfm = false;
 	has_enmf = false;
-	inverted_bus = false;
+	bus_invert_value = 0x00;
 	side_control = true;
 	side_compare = false;
 	head_control = true;
@@ -3037,7 +2990,7 @@ wd2791_device::wd2791_device(const machine_config &mconfig, const char *tag, dev
 	delay_command_commit = 12;
 	disable_mfm = false;
 	has_enmf = true;
-	inverted_bus = true;
+	bus_invert_value = 0xff;
 	side_control = false;
 	side_compare = true;
 	head_control = true;
@@ -3054,7 +3007,7 @@ wd2793_device::wd2793_device(const machine_config &mconfig, const char *tag, dev
 	delay_command_commit = 12;
 	disable_mfm = false;
 	has_enmf = true;
-	inverted_bus = false;
+	bus_invert_value = 0x00;
 	side_control = false;
 	side_compare = true;
 	head_control = true;
@@ -3070,7 +3023,7 @@ wd2795_device::wd2795_device(const machine_config &mconfig, const char *tag, dev
 	delay_command_commit = 12;
 	disable_mfm = false;
 	has_enmf = false;
-	inverted_bus = true;
+	bus_invert_value = 0xff;
 	side_control = true;
 	side_compare = false;
 	head_control = true;
@@ -3094,7 +3047,7 @@ wd2797_device::wd2797_device(const machine_config &mconfig, const char *tag, dev
 	delay_command_commit = 12;
 	disable_mfm = false;
 	has_enmf = false;
-	inverted_bus = false;
+	bus_invert_value = 0x00;
 	side_control = true;
 	side_compare = false;
 	head_control = true;
@@ -3118,7 +3071,7 @@ wd1770_device::wd1770_device(const machine_config &mconfig, const char *tag, dev
 	delay_command_commit = 36; // official 48 is too high for oric jasmin boot
 	disable_mfm = false;
 	has_enmf = false;
-	inverted_bus = false;
+	bus_invert_value = 0x00;
 	side_control = false;
 	side_compare = false;
 	head_control = false;
@@ -3136,7 +3089,7 @@ wd1772_device::wd1772_device(const machine_config &mconfig, const char *tag, dev
 	delay_command_commit = 48;
 	disable_mfm = false;
 	has_enmf = false;
-	inverted_bus = false;
+	bus_invert_value = 0x00;
 	side_control = false;
 	side_compare = false;
 	head_control = false;
@@ -3162,7 +3115,7 @@ wd1773_device::wd1773_device(const machine_config &mconfig, const char *tag, dev
 	delay_command_commit = 48;
 	disable_mfm = false;
 	has_enmf = false;
-	inverted_bus = false;
+	bus_invert_value = 0x00;
 	side_control = false;
 	side_compare = true;
 	head_control = false;

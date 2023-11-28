@@ -39,19 +39,20 @@ TODO:
 
 #include "emu.h"
 
+#include "mmboard.h"
+#include "mmdisplay1.h"
+
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "cpu/cosmac/cosmac.h"
-#include "mmboard.h"
 #include "sound/dac.h"
-#include "mmdisplay1.h"
 
 #include "softlist_dev.h"
 #include "speaker.h"
 
 // internal artwork
-#include "mephisto_mm1.lh" // clickable
-#include "mephisto_mirage.lh" // clickable
+#include "mephisto_mm1.lh"
+#include "mephisto_mirage.lh"
 
 
 namespace {
@@ -84,6 +85,9 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<2> m_inputs;
 
+	bool m_reset = false;
+	u8 m_kp_mux = 0;
+
 	// address maps
 	void mirage_map(address_map &map);
 	void mm1_map(address_map &map);
@@ -91,14 +95,11 @@ private:
 
 	// I/O handlers
 	void update_display();
-	DECLARE_READ_LINE_MEMBER(clear_r);
+	int clear_r();
 	void sound_w(u8 data);
 	void unknown_w(u8 data);
 	void keypad_w(u8 data);
-	template<int N> DECLARE_READ_LINE_MEMBER(keypad_r);
-
-	bool m_reset = false;
-	u8 m_kp_mux = 0;
+	template<int N> int keypad_r();
 };
 
 void mm1_state::machine_start()
@@ -119,7 +120,7 @@ void mm1_state::machine_reset()
     I/O
 *******************************************************************************/
 
-READ_LINE_MEMBER(mm1_state::clear_r)
+int mm1_state::clear_r()
 {
 	// CLEAR low + WAIT high resets cpu
 	int ret = (m_reset) ? 0 : 1;
@@ -145,7 +146,7 @@ void mm1_state::keypad_w(u8 data)
 }
 
 template<int N>
-READ_LINE_MEMBER(mm1_state::keypad_r)
+int mm1_state::keypad_r()
 {
 	// EF3,EF4: multiplexed inputs (keypad)
 	return (m_inputs[N]->read() & m_kp_mux) ? 1 : 0;

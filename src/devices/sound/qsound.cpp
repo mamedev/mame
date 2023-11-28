@@ -9,7 +9,7 @@
 
     The key components are a DSP16A, a TDA1543 dual 16-bit DAC with I2S
     input, and a TC9185P electronic volume control.  The TDA1543 is
-    simulated here; no attempt is being made to emulate theTC9185P.
+    simulated here; no attempt is being made to emulate the TC9185P.
 
     Commands work by writing an address/data word pair to be written to
     DSP's internal RAM.  In theory it's possible to write anywhere in
@@ -26,7 +26,7 @@
     is needed because DSP16 has latent PIO reads in active mode).  I've
     assumed that reading PIO with PSEL low when INT is asserted will
     return the address and cause INT to be de-asserted, and reading PIO
-    with PSEL low when int is not asserted will return the data word.
+    with PSEL low when INT is not asserted will return the data word.
     The DSP program will only respond to one external interrupt per
     sample interval (i.e. the maximum command rate is the same as the
     sample rate).
@@ -288,7 +288,7 @@ u16 qsound_device::dsp_sample_r(offs_t offset)
 	return u16(byte) << 8;
 }
 
-WRITE_LINE_MEMBER(qsound_device::dsp_ock_w)
+void qsound_device::dsp_ock_w(int state)
 {
 	// detect active edge
 	if (bool(state) == bool(m_ock))

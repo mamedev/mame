@@ -68,6 +68,16 @@ public:
 		, m_switches(*this, "SW%u", 0U)
 		, m_steer(*this, "STEER")
 		, m_digits(*this, "digit%u", 0U)
+		, m_offroad_right_lamp(*this, "Offroad Right %u Lamp", 1U)
+		, m_offroad_left_lamp(*this, "Offroad Left %u Lamp", 1U)
+		, m_damage_lamp(*this, "Damage Lamp")
+		, m_stop_lamp(*this, "Stop Lamp")
+		, m_gun_active_right_lamp(*this, "Gun Active Right Lamp")
+		, m_gun_active_left_lamp(*this, "Gun Active Left Lamp")
+		, m_vest_hit_lamp(*this, "Vest Hit %u Lamp", 1U)
+		, m_flash_red_lamp(*this, "Flash Red Lamp")
+		, m_flash_blue_lamp(*this, "Flash Blue Lamp")
+		, m_bullet_lamp(*this, "Bullet Lamp %u", 1U)
 		, m_irq(0)
 	{ }
 
@@ -94,6 +104,16 @@ private:
 	required_ioport_array<3> m_switches;
 	optional_ioport m_steer;
 	output_finder<16> m_digits;
+	output_finder<4> m_offroad_right_lamp;
+	output_finder<4> m_offroad_left_lamp;
+	output_finder<> m_damage_lamp;
+	output_finder<> m_stop_lamp;
+	output_finder<> m_gun_active_right_lamp;
+	output_finder<> m_gun_active_left_lamp;
+	output_finder<3> m_vest_hit_lamp;
+	output_finder<> m_flash_red_lamp;
+	output_finder<> m_flash_blue_lamp;
+	output_finder<6> m_bullet_lamp;
 
 	// screen updates
 	[[maybe_unused]] uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -103,10 +123,10 @@ private:
 	uint8_t io1_lm_r(offs_t offset);
 	void io2_w(offs_t offset, uint8_t data);
 	uint8_t io2_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(dacia_irq);
-	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(ld_w);
-	DECLARE_WRITE_LINE_MEMBER(via1_irq);
-	DECLARE_WRITE_LINE_MEMBER(via2_irq);
+	void dacia_irq(int state);
+	[[maybe_unused]] void ld_w(int state);
+	void via1_irq(int state);
+	void via2_irq(int state);
 	void dacia_receive(uint8_t data);
 	void update_dacia_irq();
 	void dacia_w(offs_t offset, uint8_t data);
@@ -260,7 +280,7 @@ TIMER_CALLBACK_MEMBER(cops_state::ld_timer_callback)
 	}
 }
 
-WRITE_LINE_MEMBER(cops_state::ld_w)
+void cops_state::ld_w(int state)
 {
 	m_lddata <<= 1;
 
@@ -654,23 +674,19 @@ void cops_state::io1_w(offs_t offset, uint8_t data)
 			m_lcd_data_h = data;
 			break;
 		case 0x04: /* WOP4 */
-			output().set_value("Offroad Right 4 Lamp", data & 0x80);
-			output().set_value("Offroad Right 3 Lamp", data & 0x40);
-			output().set_value("Offroad Right 2 Lamp", data & 0x20);
-			output().set_value("Offroad Right 1 Lamp", data & 0x10);
-			output().set_value("Offroad Left 4 Lamp", data & 0x08);
-			output().set_value("Offroad Left 3 Lamp", data & 0x04);
-			output().set_value("Offroad Left 2 Lamp", data & 0x02);
-			output().set_value("Offroad Left 1 Lamp", data & 0x01);
+			for (int i = 3; i >= 0; i--)
+				m_offroad_right_lamp[i] = BIT(data, i + 4);
+			for (int i = 3; i >= 0; i--)
+				m_offroad_left_lamp[i] = BIT(data, i);
 			break;
 		case 0x05: /* WOP5 */
-			output().set_value("Damage Lamp", data & 0x80);
-			output().set_value("Stop Lamp", data & 0x40);
-			output().set_value("Gun Active Right Lamp", data & 0x20);
-			output().set_value("Vest Hit 2 Lamp", data & 0x10);
-			output().set_value("Vest Hit 3 Lamp", data & 0x04);
-			output().set_value("Gun Active Left Lamp", data & 0x02);
-			output().set_value("Vest Hit 1 Lamp", data & 0x01);
+			m_damage_lamp = BIT(data, 7);
+			m_stop_lamp = BIT(data, 6);
+			m_gun_active_right_lamp = BIT(data, 5);
+			m_vest_hit_lamp[1] = BIT(data, 4);
+			m_vest_hit_lamp[2] = BIT(data, 2);
+			m_gun_active_left_lamp = BIT(data, 1);
+			m_vest_hit_lamp[0] = BIT(data, 0);
 			break;
 		case 0x06: /* WOP6 */
 			logerror("WOP6: data = %02x\n", data);
@@ -704,17 +720,13 @@ void cops_state::io2_w(offs_t offset, uint8_t data)
 	switch( offset & 0x0f )
 	{
 		case 0x02:
-			output().set_value("Flash Red Lamp", data & 0x01);
-			output().set_value("Flash Blue Lamp", data & 0x80);
+			m_flash_red_lamp = BIT(data, 0);
+			m_flash_blue_lamp = BIT(data, 7);
 			if ( data & ~0x91 ) logerror("Unknown io2_w, offset = %02x, data = %02x\n", offset, data);
 			break;
 		case 0x04:
-			output().set_value("Bullet Lamp 6", data & 0x20);
-			output().set_value("Bullet Lamp 5", data & 0x10);
-			output().set_value("Bullet Lamp 4", data & 0x08);
-			output().set_value("Bullet Lamp 3", data & 0x04);
-			output().set_value("Bullet Lamp 2", data & 0x02);
-			output().set_value("Bullet Lamp 1", data & 0x01);
+			for (int i = 5; i >= 0; i--)
+				m_bullet_lamp[i] = BIT(data, i);
 			if ( data & ~0x3f ) logerror("Unknown io2_w, offset = %02x, data = %02x\n", offset, data);
 			break;
 		default:
@@ -737,7 +749,7 @@ void cops_state::io2_w(offs_t offset, uint8_t data)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(cops_state::via1_irq)
+void cops_state::via1_irq(int state)
 {
 	if ( state == ASSERT_LINE )
 	{
@@ -773,7 +785,7 @@ void cops_state::via1_cb1_w(uint8_t data)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(cops_state::via2_irq)
+void cops_state::via2_irq(int state)
 {
 	if ( state == ASSERT_LINE )
 	{
@@ -878,6 +890,16 @@ INPUT_PORTS_END
 void cops_state::machine_start()
 {
 	m_digits.resolve();
+	m_offroad_right_lamp.resolve();
+	m_offroad_left_lamp.resolve();
+	m_damage_lamp.resolve();
+	m_stop_lamp.resolve();
+	m_gun_active_right_lamp.resolve();
+	m_gun_active_left_lamp.resolve();
+	m_vest_hit_lamp.resolve();
+	m_flash_red_lamp.resolve();
+	m_flash_blue_lamp.resolve();
+	m_bullet_lamp.resolve();
 
 	m_ld_timer = timer_alloc(FUNC(cops_state::ld_timer_callback), this);
 

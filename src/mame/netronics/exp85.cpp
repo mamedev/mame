@@ -77,8 +77,8 @@ private:
 
 	uint8_t i8355_a_r();
 	void i8355_a_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER( sid_r );
-	DECLARE_WRITE_LINE_MEMBER( sod_w );
+	int sid_r();
+	void sod_w(int state);
 
 	/* cassette state */
 	bool m_tape_control;
@@ -173,7 +173,7 @@ void exp85_state::i8355_a_w(uint8_t data)
 
 /* I8085A Interface */
 
-READ_LINE_MEMBER( exp85_state::sid_r )
+int exp85_state::sid_r()
 {
 	int data = 1;
 
@@ -189,7 +189,7 @@ READ_LINE_MEMBER( exp85_state::sid_r )
 	return data;
 }
 
-WRITE_LINE_MEMBER( exp85_state::sod_w )
+void exp85_state::sod_w(int state)
 {
 	if (m_tape_control)
 	{

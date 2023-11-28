@@ -73,14 +73,14 @@ protected:
 private:
 	void irq_ack_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(pot_mask1_w);
-	DECLARE_WRITE_LINE_MEMBER(pot_mask2_w);
+	void pot_mask1_w(int state);
+	void pot_mask2_w(int state);
 	void output_latch_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(start_1_led_w);
-	DECLARE_WRITE_LINE_MEMBER(start_2_led_w);
-	DECLARE_WRITE_LINE_MEMBER(serve_led_w);
-	DECLARE_WRITE_LINE_MEMBER(serve_2_led_w);
-	DECLARE_WRITE_LINE_MEMBER(coincount_w);
+	void start_1_led_w(int state);
+	void start_2_led_w(int state);
+	void serve_led_w(int state);
+	void serve_2_led_w(int state);
+	void coincount_w(int state);
 	uint8_t sync_r();
 	uint8_t sync2_r();
 	void sbrkout_videoram_w(offs_t offset, uint8_t data);
@@ -264,7 +264,7 @@ TIMER_CALLBACK_MEMBER(sbrkout_state::pot_trigger_callback)
 }
 
 
-WRITE_LINE_MEMBER(sbrkout_state::pot_mask1_w)
+void sbrkout_state::pot_mask1_w(int state)
 {
 	m_pot_mask[0] = !state;
 	m_pot_trigger[0] = 0;
@@ -272,7 +272,7 @@ WRITE_LINE_MEMBER(sbrkout_state::pot_mask1_w)
 }
 
 
-WRITE_LINE_MEMBER(sbrkout_state::pot_mask2_w)
+void sbrkout_state::pot_mask2_w(int state)
 {
 	m_pot_mask[1] = !state;
 	m_pot_trigger[1] = 0;
@@ -299,7 +299,7 @@ void sbrkout_state::output_latch_w(offs_t offset, uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(sbrkout_state::coincount_w)
+void sbrkout_state::coincount_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }

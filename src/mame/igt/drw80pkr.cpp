@@ -82,11 +82,11 @@ private:
 
 	void p1_w(uint8_t data);
 	void p2_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(prog_w);
+	void prog_w(int state);
 	void bus_w(uint8_t data);
 	void io_w(offs_t offset, uint8_t data);
-	DECLARE_READ_LINE_MEMBER(t0_r);
-	DECLARE_READ_LINE_MEMBER(t1_r);
+	int t0_r();
+	int t1_r();
 	uint8_t p1_r();
 	uint8_t p2_r();
 	uint8_t bus_r();
@@ -125,7 +125,7 @@ void drw80pkr_state::p2_w(uint8_t data)
 	m_p2 = data;
 }
 
-WRITE_LINE_MEMBER(drw80pkr_state::prog_w)
+void drw80pkr_state::prog_w(int state)
 {
 	m_prog = state;
 
@@ -198,12 +198,12 @@ void drw80pkr_state::io_w(offs_t offset, uint8_t data)
 * Read Handlers *
 ****************/
 
-READ_LINE_MEMBER(drw80pkr_state::t0_r)
+int drw80pkr_state::t0_r()
 {
 	return m_t0;
 }
 
-READ_LINE_MEMBER(drw80pkr_state::t1_r)
+int drw80pkr_state::t1_r()
 {
 	return m_t1;
 }

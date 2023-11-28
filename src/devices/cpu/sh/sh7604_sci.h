@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_CPU_SH2_SH7604_SCI_H
-#define MAME_CPU_SH2_SH7604_SCI_H
+#ifndef MAME_CPU_SH_SH7604_SCI_H
+#define MAME_CPU_SH_SH7604_SCI_H
 
 #pragma once
 
@@ -45,7 +45,8 @@ public:
 	uint8_t receive_data_r();
 
 protected:
-	enum {
+	enum
+	{
 		STATUS_MPBT = 1 << 0,
 		STATUS_MPB =  1 << 1,
 		STATUS_TEND = 1 << 2,
@@ -73,4 +74,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(SH7604_SCI, sh7604_sci_device)
 
-#endif // MAME_CPU_SH2_SH7604_SCI_H
+#endif // MAME_CPU_SH_SH7604_SCI_H

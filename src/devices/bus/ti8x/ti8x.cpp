@@ -48,7 +48,7 @@ ti8x_link_port_device::ti8x_link_port_device(
 }
 
 
-WRITE_LINE_MEMBER(ti8x_link_port_device::tip_w)
+void ti8x_link_port_device::tip_w(int state)
 {
 	if (bool(state) != m_tip_out)
 	{
@@ -59,7 +59,7 @@ WRITE_LINE_MEMBER(ti8x_link_port_device::tip_w)
 }
 
 
-WRITE_LINE_MEMBER(ti8x_link_port_device::ring_w)
+void ti8x_link_port_device::ring_w(int state)
 {
 	if (bool(state) != m_ring_out)
 	{
@@ -72,9 +72,6 @@ WRITE_LINE_MEMBER(ti8x_link_port_device::ring_w)
 
 void ti8x_link_port_device::device_start()
 {
-	m_tip_handler.resolve_safe();
-	m_ring_handler.resolve_safe();
-
 	save_item(NAME(m_tip_in));
 	save_item(NAME(m_tip_out));
 	save_item(NAME(m_ring_in));
@@ -228,7 +225,7 @@ void device_ti8x_link_port_bit_interface::accept_bit()
 }
 
 
-WRITE_LINE_MEMBER(device_ti8x_link_port_bit_interface::input_tip)
+void device_ti8x_link_port_bit_interface::input_tip(int state)
 {
 	m_tip_in = bool(state);
 	switch (m_bit_phase)
@@ -313,7 +310,7 @@ WRITE_LINE_MEMBER(device_ti8x_link_port_bit_interface::input_tip)
 }
 
 
-WRITE_LINE_MEMBER(device_ti8x_link_port_bit_interface::input_ring)
+void device_ti8x_link_port_bit_interface::input_ring(int state)
 {
 	m_ring_in = bool(state);
 	switch (m_bit_phase)

@@ -22,10 +22,11 @@ System dependencies:    uint16_t must be 16 bit unsigned int
 
 TODO:
 - verify invalid opcodes for the different CPU types
+- add 6802 nvram (only in case VCC STANDBY is connected to battery)
 - cleanups (difficult to do maintenance work right now)
 - improve 6801 and derivatives:
-  * make internal I/O map really internal
-  * RAM control register (eg. nvram)
+  * improve RAM control register
+  * improve STBY pin? RES pin (reset) should be ineffective while STBY is low
   * IS3 interrupt for 6801 port 3 handshake (already implemented for 6301Y)
   * finish 6301Y port 6 handshake, share implementation with p3csr?
   * 6301Y sci_trcsr2_r/w
@@ -487,8 +488,6 @@ void m6800_cpu_device::enter_interrupt(const char *message,uint16_t irq_vector)
 /* check the IRQ lines for pending interrupts */
 void m6800_cpu_device::check_irq_lines()
 {
-	// TODO: IS3 interrupt
-
 	if (m_nmi_pending)
 	{
 		if (m_wai_state & M6800_SLP)
@@ -535,13 +534,16 @@ void m6800_cpu_device::device_start()
 	space(has_space(AS_OPCODES) ? AS_OPCODES : AS_PROGRAM).cache(m_copcodes);
 	space(AS_PROGRAM).specific(m_program);
 
+	m_ppc.d = 0;
 	m_pc.d = 0;
 	m_s.d = 0;
 	m_x.d = 0;
 	m_d.d = 0;
 	m_cc = 0;
 	m_wai_state = 0;
-	m_irq_state[0] = m_irq_state[1] = m_irq_state[2] = 0;
+	m_nmi_state = 0;
+	m_nmi_pending = 0;
+	std::fill(std::begin(m_irq_state), std::end(m_irq_state), 0);
 
 	save_item(NAME(m_ppc.w.l));
 	save_item(NAME(m_pc.w.l));

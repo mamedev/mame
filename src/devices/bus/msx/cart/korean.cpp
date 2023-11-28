@@ -3,19 +3,33 @@
 #include "emu.h"
 #include "korean.h"
 
-DEFINE_DEVICE_TYPE(MSX_CART_KOREAN_25IN1,  msx_cart_korean_25in1_device,  "msx_cart_korean_25in1",  "MSX Cartridge - Korean 25-in-1")
-DEFINE_DEVICE_TYPE(MSX_CART_KOREAN_80IN1,  msx_cart_korean_80in1_device,  "msx_cart_korean_80in1",  "MSX Cartridge - Korean 80-in-1")
-DEFINE_DEVICE_TYPE(MSX_CART_KOREAN_90IN1,  msx_cart_korean_90in1_device,  "msx_cart_korean_90in1",  "MSX Cartridge - Korean 90-in-1")
-DEFINE_DEVICE_TYPE(MSX_CART_KOREAN_126IN1, msx_cart_korean_126in1_device, "msx_cart_korean_126in1", "MSX Cartridge - Korean 126-in-1")
 
+namespace {
 
-msx_cart_korean_25in1_device::msx_cart_korean_25in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MSX_CART_KOREAN_25IN1, tag, owner, clock)
-	, msx_cart_interface(mconfig, *this)
-	, m_rombank(*this, "rombank%u", 0U)
-	, m_bank_mask(0)
+class msx_cart_korean_25in1_device : public device_t, public msx_cart_interface
 {
-}
+public:
+	msx_cart_korean_25in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, MSX_CART_KOREAN_25IN1, tag, owner, clock)
+		, msx_cart_interface(mconfig, *this)
+		, m_rombank(*this, "rombank%u", 0U)
+		, m_bank_mask(0)
+	{ }
+
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
+
+protected:
+	// device_t implementation
+	virtual void device_start() override { }
+	virtual void device_reset() override;
+
+private:
+	void bank_w(u8 data);
+
+	memory_bank_array_creator<4> m_rombank;
+
+	u8 m_bank_mask;
+};
 
 void msx_cart_korean_25in1_device::device_reset()
 {
@@ -67,13 +81,30 @@ void msx_cart_korean_25in1_device::bank_w(u8 data)
 
 
 
-msx_cart_korean_80in1_device::msx_cart_korean_80in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MSX_CART_KOREAN_80IN1, tag, owner, clock)
-	, msx_cart_interface(mconfig, *this)
-	, m_rombank(*this, "rombank%u", 0U)
-	, m_bank_mask(0)
+class msx_cart_korean_80in1_device : public device_t, public msx_cart_interface
 {
-}
+public:
+	msx_cart_korean_80in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, MSX_CART_KOREAN_80IN1, tag, owner, clock)
+		, msx_cart_interface(mconfig, *this)
+		, m_rombank(*this, "rombank%u", 0U)
+		, m_bank_mask(0)
+	{ }
+
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
+
+protected:
+	// device_t implementation
+	virtual void device_start() override { }
+	virtual void device_reset() override;
+
+private:
+	void bank_w(offs_t offset, u8 data);
+
+	memory_bank_array_creator<4> m_rombank;
+
+	u8 m_bank_mask;
+};
 
 void msx_cart_korean_80in1_device::device_reset()
 {
@@ -121,14 +152,31 @@ void msx_cart_korean_80in1_device::bank_w(offs_t offset, u8 data)
 
 
 
-msx_cart_korean_90in1_device::msx_cart_korean_90in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, MSX_CART_KOREAN_90IN1, tag, owner, clock)
-	, msx_cart_interface(mconfig, *this)
-	, m_rombank(*this, "rombank%u", 0U)
-	, m_view(*this, "view")
-	, m_bank_mask(0)
+class msx_cart_korean_90in1_device : public device_t, public msx_cart_interface
 {
-}
+public:
+	msx_cart_korean_90in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: device_t(mconfig, MSX_CART_KOREAN_90IN1, tag, owner, clock)
+		, msx_cart_interface(mconfig, *this)
+		, m_rombank(*this, "rombank%u", 0U)
+		, m_view(*this, "view")
+		, m_bank_mask(0)
+	{ }
+
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
+
+protected:
+	// device_t implementation
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	void banking(u8 data);
+
+	memory_bank_array_creator<3> m_rombank;
+	memory_view m_view;
+	u8 m_bank_mask;
+};
 
 void msx_cart_korean_90in1_device::device_start()
 {
@@ -194,13 +242,29 @@ void msx_cart_korean_90in1_device::banking(u8 data)
 
 
 
-msx_cart_korean_126in1_device::msx_cart_korean_126in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, MSX_CART_KOREAN_126IN1, tag, owner, clock)
-	, msx_cart_interface(mconfig, *this)
-	, m_rombank(*this, "rombank%u", 0U)
-	, m_bank_mask(0)
+class msx_cart_korean_126in1_device : public device_t, public msx_cart_interface
 {
-}
+public:
+	msx_cart_korean_126in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: device_t(mconfig, MSX_CART_KOREAN_126IN1, tag, owner, clock)
+		, msx_cart_interface(mconfig, *this)
+		, m_rombank(*this, "rombank%u", 0U)
+		, m_bank_mask(0)
+	{ }
+
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
+
+protected:
+	// device_t implementation
+	virtual void device_start() override { }
+	virtual void device_reset() override;
+
+private:
+	void bank_w(offs_t offset, u8 data);
+
+	memory_bank_array_creator<2> m_rombank;
+	u8 m_bank_mask;
+};
 
 void msx_cart_korean_126in1_device::device_reset()
 {
@@ -241,3 +305,77 @@ void msx_cart_korean_126in1_device::bank_w(offs_t offset, uint8_t data)
 {
 	m_rombank[offset & 0x01]->set_entry(data & m_bank_mask);
 }
+
+
+
+
+
+class msx_cart_korean_hydlide2_device : public device_t, public msx_cart_interface
+{
+public:
+	msx_cart_korean_hydlide2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: device_t(mconfig, MSX_CART_KOREAN_HYDLIDE2, tag, owner, clock)
+		, msx_cart_interface(mconfig, *this)
+		, m_rombank(*this, "rombank")
+		, m_bank_mask(0)
+	{ }
+
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
+
+protected:
+	// device_t implementation
+	virtual void device_start() override { }
+	virtual void device_reset() override;
+
+private:
+	void bank_w(u8 data);
+
+	memory_bank_creator m_rombank;
+	u8 m_bank_mask;
+};
+
+void msx_cart_korean_hydlide2_device::device_reset()
+{
+	m_rombank->set_entry(0);
+}
+
+std::error_condition msx_cart_korean_hydlide2_device::initialize_cartridge(std::string &message)
+{
+	if (!cart_rom_region())
+	{
+		message = "msx_cart_korean_hydlide2_device: Required region 'rom' was not found.";
+		return image_error::INTERNAL;
+	}
+
+	const u32 size = cart_rom_region()->bytes();
+	const u16 banks = size / 0x4000;
+
+	if (size > 256 * 0x4000 || size < 0x8000 || size != banks * 0x4000 || (~(banks - 1) % banks))
+	{
+		message = "msx_cart_korean_hydlide2_device: Region 'rom' has unsupported size.";
+		return image_error::INVALIDLENGTH;
+	}
+
+	m_bank_mask = banks - 1;
+
+	m_rombank->configure_entries(0, banks, cart_rom_region()->base(), 0x4000);
+
+	page(1)->install_rom(0x4000, 0x7fff, cart_rom_region()->base());
+	page(2)->install_read_bank(0x8000, 0xbfff, m_rombank);
+	page(2)->install_write_handler(0x8000, 0x8000, emu::rw_delegate(*this, FUNC(msx_cart_korean_hydlide2_device::bank_w)));
+
+	return std::error_condition();
+}
+
+void msx_cart_korean_hydlide2_device::bank_w(uint8_t data)
+{
+	m_rombank->set_entry(data & m_bank_mask);
+}
+
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_KOREAN_25IN1,    msx_cart_interface, msx_cart_korean_25in1_device,    "msx_cart_korean_25in1",    "MSX Cartridge - Korean 25-in-1")
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_KOREAN_80IN1,    msx_cart_interface, msx_cart_korean_80in1_device,    "msx_cart_korean_80in1",    "MSX Cartridge - Korean 80-in-1")
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_KOREAN_90IN1,    msx_cart_interface, msx_cart_korean_90in1_device,    "msx_cart_korean_90in1",    "MSX Cartridge - Korean 90-in-1")
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_KOREAN_126IN1,   msx_cart_interface, msx_cart_korean_126in1_device,   "msx_cart_korean_126in1",   "MSX Cartridge - Korean 126-in-1")
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_KOREAN_HYDLIDE2, msx_cart_interface, msx_cart_korean_hydlide2_device, "msx_cart_korean_hydlide2", "MSX Cartridge - Korean Hydlide 2")

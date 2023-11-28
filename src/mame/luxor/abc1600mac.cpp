@@ -113,7 +113,7 @@ abc1600_mac_device::abc1600_mac_device(const machine_config &mconfig, const char
 	m_segment_ram(*this, "segment_ram", 0x400, ENDIANNESS_LITTLE),
 	m_page_ram(*this, "page_ram", 0x400*2, ENDIANNESS_LITTLE),
 	m_watchdog(*this, "watchdog"),
-	m_read_tren(*this),
+	m_read_tren(*this, 0xff),
 	m_write_tren(*this),
 	m_rstbut(0),
 	m_boote(0),
@@ -131,10 +131,6 @@ abc1600_mac_device::abc1600_mac_device(const machine_config &mconfig, const char
 
 void abc1600_mac_device::device_start()
 {
-	// resolve callbacks
-	m_read_tren.resolve_all_safe(0xff);
-	m_write_tren.resolve_all_safe();
-
 	// state saving
 	save_item(NAME(m_rstbut));
 	save_item(NAME(m_boote));

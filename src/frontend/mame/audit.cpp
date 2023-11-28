@@ -656,6 +656,9 @@ media_auditor::audit_record &media_auditor::audit_one_disk(const rom_entry *rom,
 	chd_file source;
 	const std::error_condition err = rom_load_manager::open_disk_image(m_enumerator.options(), std::forward<T>(args)..., rom, source);
 
+	// FIXME: A CHD with an invalid header or missing parent is treated as not found.
+	// We need a way to report more detailed errors for bad disk images.
+
 	// if we succeeded, get the hashes
 	if (!err)
 	{

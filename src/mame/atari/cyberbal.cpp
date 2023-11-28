@@ -100,7 +100,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<atari_jsa_ii_device> m_jsa;
 
-	DECLARE_WRITE_LINE_MEMBER(video_int_write_line);
+	void video_int_write_line(int state);
 	void video_int_ack_w(uint16_t data = 0);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update);
@@ -151,7 +151,7 @@ private:
 	required_device<screen_device> m_lscreen;
 	required_device<screen_device> m_rscreen;
 
-	DECLARE_WRITE_LINE_MEMBER(video_int_write_line);
+	void video_int_write_line(int state);
 	void video_int_ack_w(uint16_t data = 0);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update);
@@ -431,13 +431,13 @@ uint32_t cyberbal2p_state::screen_update_cyberbal2p(screen_device &screen, bitma
  *
  *************************************/
 
-WRITE_LINE_MEMBER(cyberbal2p_state::video_int_write_line)
+void cyberbal2p_state::video_int_write_line(int state)
 {
 	if (state)
 		m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(cyberbal_state::video_int_write_line)
+void cyberbal_state::video_int_write_line(int state)
 {
 	if (state)
 		m_extracpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);

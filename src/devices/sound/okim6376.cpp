@@ -280,51 +280,51 @@ void okim6376_device::oki_process(int channel, int command)
 			// determine the start position
 			offs_t start = get_start_position(channel);
 
-				if (start == 0)
+			if (start == 0)
+			{
+				voice->playing = 0;
+			}
+			else
+			{
+				/* set up the voice to play this sample */
+				if (!voice->playing)
 				{
-					voice->playing = 0;
+					voice->playing = 1;
+					voice->base_offset = start;
+					voice->sample = 0;
+					voice->count = 0;
+
+					/* also reset the ADPCM parameters */
+					voice->reset();
+					if (channel == 0)
+					{
+						/* We set channel 2's audio separately */
+						voice->volume = volume_table[0];
+					}
 				}
 				else
 				{
-					/* set up the voice to play this sample */
-					if (!voice->playing)
+					if (((m_nar)&&(channel == 0))||(channel == 1))//Store the request, for later processing (channel 2 ignores NAR)
 					{
-						voice->playing = 1;
-						voice->base_offset = start;
-						voice->sample = 0;
-						voice->count = 0;
-
-						/* also reset the ADPCM parameters */
-						voice->reset();
-						if (channel == 0)
-						{
-							/* We set channel 2's audio separately */
-							voice->volume = volume_table[0];
-						}
-					}
-					else
-					{
-						if (((m_nar)&&(channel == 0))||(channel == 1))//Store the request, for later processing (channel 2 ignores NAR)
-						{
-							m_stage[channel] = 1;
-						}
+						m_stage[channel] = 1;
 					}
 				}
 			}
 		}
-		/* otherwise, see if this is a silence command */
-		else
-		{
-			/* update the stream, then turn it off */
-			m_stream->update();
+	}
+	/* otherwise, see if this is a silence command */
+	else
+	{
+		/* update the stream, then turn it off */
+		m_stream->update();
 
-			if (command ==0)
+		if (command ==0)
+		{
+			int i;
+			for (i = 0; i < OKIM6376_VOICES; i++)
 			{
-				int i;
-				for (i = 0; i < OKIM6376_VOICES; i++)
-				{
-					struct ADPCMVoice *voice = &m_voice[i];
-					voice->playing = 0;
+				struct ADPCMVoice *voice = &m_voice[i];
+				voice->playing = 0;
 			}
 		}
 	}
@@ -422,8 +422,7 @@ void okim6376_device::adpcm_state_save_register(struct ADPCMVoice *voice, int in
 
 void okim6376_device::okim6376_state_save_register()
 {
-	int j;
-	for (j = 0; j < OKIM6376_VOICES; j++)
+	for (int j = 0; j < OKIM6376_VOICES; j++)
 	{
 		adpcm_state_save_register(&m_voice[j], j);
 	}
@@ -456,7 +455,7 @@ void okim6376_device::device_clock_changed()
 
 ***********************************************************************************************/
 
-READ_LINE_MEMBER( okim6376_device::busy_r )
+int okim6376_device::busy_r()
 {
 	struct ADPCMVoice *voice0 = &m_voice[0];
 	struct ADPCMVoice *voice1 = &m_voice[1];
@@ -472,13 +471,13 @@ READ_LINE_MEMBER( okim6376_device::busy_r )
 	}
 }
 
-READ_LINE_MEMBER( okim6376_device::nar_r )
+int okim6376_device::nar_r()
 {
 	LOG("OKIM6376: NAR %x\n",m_nar);
 	return m_nar;
 }
 
-WRITE_LINE_MEMBER( okim6376_device::ch2_w )
+void okim6376_device::ch2_w(int state)
 {
 	m_ch2_update = 0;//Clear flag
 	LOG("OKIM6376: CH2 %x\n",state);
@@ -515,7 +514,7 @@ WRITE_LINE_MEMBER( okim6376_device::ch2_w )
 }
 
 
-WRITE_LINE_MEMBER( okim6376_device::st_w )
+void okim6376_device::st_w(int state)
 {
 	//As in STart, presumably, this triggers everything
 
@@ -557,7 +556,7 @@ WRITE_LINE_MEMBER( okim6376_device::st_w )
 }
 
 
-WRITE_LINE_MEMBER( okim6650_device::cmd_w )
+void okim6650_device::cmd_w(int state)
 {
 	// TODO
 }

@@ -130,9 +130,9 @@ ioport_constructor c64_buscard2_device::device_input_ports() const
 
 void c64_buscard2_device::device_add_mconfig(machine_config &config)
 {
-	MOS6532_NEW(config, m_riot, 0);
+	MOS6532(config, m_riot, 0);
 
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 
 	IEEE488(config, m_bus, 0);
 	ieee488_slot_device::add_cbm_defaults(config, nullptr);

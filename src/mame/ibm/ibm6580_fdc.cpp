@@ -57,9 +57,6 @@ dw_fdc_device::dw_fdc_device(const machine_config &mconfig, const char *tag, dev
 
 void dw_fdc_device::device_start()
 {
-	m_out_data.resolve_safe();
-	m_out_clock.resolve_safe();
-	m_out_strobe.resolve_safe();
 	m_reset_timer = timer_alloc(FUNC(dw_fdc_device::assert_reset_line), this);
 }
 
@@ -96,14 +93,14 @@ uint8_t dw_fdc_device::p2_r()
 	return data;
 }
 
-READ_LINE_MEMBER( dw_fdc_device::t0_r )
+int dw_fdc_device::t0_r()
 {
 	LOGDBG("t0 == %d\n", m_t0);
 
 	return m_t0;
 }
 
-READ_LINE_MEMBER( dw_fdc_device::t1_r )
+int dw_fdc_device::t1_r()
 {
 	LOGDBG("t1 == %d\n", m_t1);
 
@@ -120,7 +117,7 @@ uint8_t dw_fdc_device::bus_r()
 	return m_bus;
 }
 
-WRITE_LINE_MEMBER( dw_fdc_device::reset_w )
+void dw_fdc_device::reset_w(int state)
 {
 	if(!state)
 		m_reset_timer->adjust(attotime::from_msec(50));
@@ -131,7 +128,7 @@ WRITE_LINE_MEMBER( dw_fdc_device::reset_w )
 	}
 }
 
-WRITE_LINE_MEMBER( dw_fdc_device::ack_w )
+void dw_fdc_device::ack_w(int state)
 {
 	m_t0 = state;
 }

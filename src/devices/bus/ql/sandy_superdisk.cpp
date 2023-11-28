@@ -9,6 +9,8 @@
 #include "emu.h"
 #include "sandy_superdisk.h"
 
+#include "formats/ql_dsk.h"
+
 
 
 //**************************************************************************
@@ -73,7 +75,7 @@ void sandy_super_disk_device::floppy_formats(format_registration &fr)
 //  centronics
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( sandy_super_disk_device::busy_w )
+void sandy_super_disk_device::busy_w(int state)
 {
 	m_busy = state;
 	check_interrupt();
@@ -87,8 +89,8 @@ WRITE_LINE_MEMBER( sandy_super_disk_device::busy_w )
 void sandy_super_disk_device::device_add_mconfig(machine_config &config)
 {
 	WD1772(config, m_fdc, 8000000);
-	FLOPPY_CONNECTOR(config, m_floppy0, sandy_super_disk_floppies, "35dd", sandy_super_disk_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy1, sandy_super_disk_floppies, nullptr, sandy_super_disk_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[0], sandy_super_disk_floppies, "35dd", sandy_super_disk_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[1], sandy_super_disk_floppies, nullptr, sandy_super_disk_device::floppy_formats);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->ack_handler().set(FUNC(sandy_super_disk_device::busy_w));
@@ -110,8 +112,7 @@ sandy_super_disk_device::sandy_super_disk_device(const machine_config &mconfig, 
 	device_t(mconfig, SANDY_SUPER_DISK, tag, owner, clock),
 	device_ql_expansion_card_interface(mconfig, *this),
 	m_fdc(*this, WD1772_TAG),
-	m_floppy0(*this, WD1772_TAG":0"),
-	m_floppy1(*this, WD1772_TAG":1"),
+	m_floppy(*this, WD1772_TAG":%u", 0U),
 	m_centronics(*this, CENTRONICS_TAG),
 	m_latch(*this, TTL74273_TAG),
 	m_rom(*this, "rom"),
@@ -230,11 +231,11 @@ void sandy_super_disk_device::write(offs_t offset, uint8_t data)
 
 				if (BIT(data, 1))
 				{
-					floppy = m_floppy0->get_device();
+					floppy = m_floppy[0]->get_device();
 				}
 				else if (BIT(data, 2))
 				{
-					floppy = m_floppy1->get_device();
+					floppy = m_floppy[1]->get_device();
 				}
 
 				m_fdc->set_floppy(floppy);

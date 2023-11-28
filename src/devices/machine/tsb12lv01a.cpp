@@ -26,7 +26,7 @@ DEFINE_DEVICE_TYPE(TSB12LV01A, tsb12lv01a_device, "tsb12lv01a", "TSB12LV01A IEEE
 tsb12lv01a_device::tsb12lv01a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TSB12LV01A, tag, owner, clock)
 	, m_int_cb(*this)
-	, m_phy_read_cb(*this)
+	, m_phy_read_cb(*this, 0x00)
 	, m_phy_write_cb(*this)
 {
 }
@@ -46,10 +46,6 @@ void tsb12lv01a_device::device_start()
 	save_item(NAME(m_atf_status));
 	save_item(NAME(m_itf_status));
 	save_item(NAME(m_grf_status));
-
-	m_int_cb.resolve_safe();
-	m_phy_read_cb.resolve_safe(0x00);
-	m_phy_write_cb.resolve_safe();
 }
 
 void tsb12lv01a_device::device_reset()
@@ -69,7 +65,7 @@ void tsb12lv01a_device::device_reset()
 	m_grf_status = 0x00000000;
 }
 
-WRITE_LINE_MEMBER(tsb12lv01a_device::phy_reset_w)
+void tsb12lv01a_device::phy_reset_w(int state)
 {
 	if (state)
 	{

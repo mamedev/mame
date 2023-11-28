@@ -86,9 +86,6 @@ void mc146818_device::device_start()
 	m_update_timer = timer_alloc(FUNC(mc146818_device::time_tick), this);
 	m_periodic_timer = timer_alloc(FUNC(mc146818_device::periodic_tick), this);
 
-	m_write_irq.resolve_safe();
-	m_write_sqw.resolve_safe();
-
 	save_pointer(NAME(m_data), data_size());
 	save_item(NAME(m_index));
 	save_item(NAME(m_sqw_state));
@@ -588,20 +585,12 @@ void mc146818_device::update_irq()
 //  read - I/O handler for reading
 //-------------------------------------------------
 
-uint8_t mc146818_device::read(offs_t offset)
+uint8_t mc146818_device::data_r()
 {
-	uint8_t data = 0;
-	switch (offset)
-	{
-	case 0:
-		data = m_index;
-		break;
+	uint8_t data = internal_read(m_index);
 
-	case 1:
-		data = internal_read(m_index);
+	if (!machine().side_effects_disabled())
 		LOG("mc146818_port_r(): offset=0x%02x data=0x%02x\n", m_index, data);
-		break;
-	}
 
 	return data;
 }
@@ -614,7 +603,8 @@ uint8_t mc146818_device::read_direct(offs_t offset)
 
 	uint8_t data = internal_read(offset);
 
-	LOG("mc146818_port_r(): offset=0x%02x data=0x%02x\n", offset, data);
+	if (!machine().side_effects_disabled())
+		LOG("mc146818_port_r(): offset=0x%02x data=0x%02x\n", offset, data);
 
 	return data;
 }
@@ -623,19 +613,16 @@ uint8_t mc146818_device::read_direct(offs_t offset)
 //  write - I/O handler for writing
 //-------------------------------------------------
 
-void mc146818_device::write(offs_t offset, uint8_t data)
+void mc146818_device::address_w(uint8_t data)
 {
-	switch (offset)
-	{
-	case 0:
-		internal_set_address(data % data_logical_size());
-		break;
+	internal_set_address(data % data_logical_size());
+}
 
-	case 1:
-		LOG("mc146818_port_w(): offset=0x%02x data=0x%02x\n", m_index, data);
-		internal_write(m_index, data);
-		break;
-	}
+void mc146818_device::data_w(uint8_t data)
+{
+	LOG("mc146818_port_w(): offset=0x%02x data=0x%02x\n", m_index, data);
+
+	internal_write(m_index, data);
 }
 
 void mc146818_device::write_direct(offs_t offset, uint8_t data)

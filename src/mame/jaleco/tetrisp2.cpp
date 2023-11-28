@@ -1752,23 +1752,23 @@ void tetrisp2_state::init_rockn3()
 	m_rockn_protectdata = 4;
 }
 
-WRITE_LINE_MEMBER(tetrisp2_state::field_irq_w)
+void tetrisp2_state::field_irq_w(int state)
 {
 	// irq1 is valid on all games but tetrisp2, but always masked by SR?
 	m_maincpu->set_input_line(1, (state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(tetrisp2_state::vblank_irq_w)
+void tetrisp2_state::vblank_irq_w(int state)
 {
 	m_maincpu->set_input_line(2, (state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(tetrisp2_state::timer_irq_w)
+void tetrisp2_state::timer_irq_w(int state)
 {
 	m_maincpu->set_input_line(4, (state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(tetrisp2_state::sound_reset_line_w)
+void tetrisp2_state::sound_reset_line_w(int state)
 {
 	logerror("%s: sound_reset_line_w %d but no CPU to reset?\n", machine().describe_context(), state);
 }
@@ -1930,22 +1930,22 @@ void tetrisp2_state::rockn2(machine_config &config)
 	ymz.add_route(1, "rspeaker", 1.0);
 }
 
-WRITE_LINE_MEMBER(rocknms_state::sub_field_irq_w)
+void rocknms_state::sub_field_irq_w(int state)
 {
 	m_subcpu->set_input_line(1, (state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(rocknms_state::sub_vblank_irq_w)
+void rocknms_state::sub_vblank_irq_w(int state)
 {
 	m_subcpu->set_input_line(2, (state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(rocknms_state::sub_timer_irq_w)
+void rocknms_state::sub_timer_irq_w(int state)
 {
 	m_subcpu->set_input_line(4, (state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(rocknms_state::sub_sound_reset_line_w)
+void rocknms_state::sub_sound_reset_line_w(int state)
 {
 	logerror("%s: sound_reset_line_w %d on sub CPU but no CPU to reset?\n", machine().describe_context(), state);
 }
@@ -2012,7 +2012,7 @@ void rocknms_state::rocknms(machine_config &config)
 	ymz.add_route(1, "rspeaker", 1.0);
 }
 
-WRITE_LINE_MEMBER(stepstag_state::field_cb)
+void stepstag_state::field_cb(int state)
 {
 	// TODO: pinpoint the exact source, translate to configure_scanline if necessary
 	// irq 4 is definitely a 30 Hz-ish here as well,
@@ -3381,11 +3381,11 @@ GAME( 1997, tetrisp2a, tetrisp2, tetrisp2, tetrisp2,  tetrisp2_state, empty_init
 GAME( 1997, tetrisp2j, tetrisp2, tetrisp2, tetrisp2j, tetrisp2_state, empty_init,   ROT0,    "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan, V2.2)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1997, tetrisp2ja,tetrisp2, tetrisp2, tetrisp2j, tetrisp2_state, empty_init,   ROT0,    "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan, V2.1)",          MACHINE_SUPPORTS_SAVE )
 
-GAME( 1997, nndmseal,  0,        nndmseal, nndmseal,  tetrisp2_state, init_rockn,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai (ver 1.3)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1997, nndmseal11,nndmseal, nndmseal, nndmseal,  tetrisp2_state, init_rockn,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai (ver 1.1)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1997, nndmseala, nndmseal, nndmseal, nndmseal,  tetrisp2_state, init_rockn,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai (Astro Boy ver. 1.0?)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // version guessed
-GAME( 1997, nndmsealb, nndmseal, nndmseal, nndmseal,  tetrisp2_state, init_rockn,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai (Astro Boy ver. 1.1)",  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // appears to have one more mode than the one above, ver taken from PRG ROM labels
-GAME( 1997, nndmsealc, nndmseal, nndmseal, nndmseal,  tetrisp2_state, init_rockn,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai (alternate ver 1.0)",   MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // only shows Jaleco copyright even though I'Max is in strings in ROMs. Ver taken from PRG ROM labels
+GAME( 1997, nndmseal,  0,        nndmseal, nndmseal,  nndmseal_state, init_rockn,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai (ver 1.3)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1997, nndmseal11,nndmseal, nndmseal, nndmseal,  nndmseal_state, init_rockn,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai (ver 1.1)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1997, nndmseala, nndmseal, nndmseal, nndmseal,  nndmseal_state, init_rockn,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai (Astro Boy ver. 1.0?)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // version guessed
+GAME( 1997, nndmsealb, nndmseal, nndmseal, nndmseal,  nndmseal_state, init_rockn,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai (Astro Boy ver. 1.1)",  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // appears to have one more mode than the one above, ver taken from PRG ROM labels
+GAME( 1997, nndmsealc, nndmseal, nndmseal, nndmseal,  nndmseal_state, init_rockn,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai (alternate ver 1.0)",   MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // only shows Jaleco copyright even though I'Max is in strings in ROMs. Ver taken from PRG ROM labels
 
 GAME( 1999, rockn,     0,        rockn,    rockn,     tetrisp2_state, init_rockn,   ROT270, "Jaleco",         "Rock'n Tread (Japan)",            MACHINE_SUPPORTS_SAVE )
 GAME( 1999, rockna,    rockn,    rockn,    rockn,     tetrisp2_state, init_rockn1,  ROT270, "Jaleco",         "Rock'n Tread (Japan, alternate)", MACHINE_SUPPORTS_SAVE )

@@ -162,6 +162,7 @@ public:
 	void mbutrfly(machine_config &config);
 	void olymp(machine_config &config);
 
+	void init_blshark();
 	void init_butrfly();
 	void init_leadera();
 	void init_mbutrfly() { save_item(NAME(m_mbutrfly_prot)); }
@@ -172,7 +173,7 @@ public:
 	void init_speedwaya();
 	void init_superb2k();
 
-	READ_LINE_MEMBER(mbutrfly_prot_r);
+	int mbutrfly_prot_r();
 
 protected:
 	virtual void machine_start() override;
@@ -359,7 +360,7 @@ void skylncr_state::mbutrfly_prot_w(uint8_t data)
 	m_mbutrfly_prot = BIT(data, 7);
 }
 
-READ_LINE_MEMBER(skylncr_state::mbutrfly_prot_r)
+int skylncr_state::mbutrfly_prot_r()
 {
 	return m_mbutrfly_prot;
 }
@@ -2274,6 +2275,17 @@ ROM_START( spcliner ) // on a ROLLA PCB, might actually be another title, won't 
 	ROM_LOAD16_BYTE( "4.u36", 0x00001, 0x20000, CRC(315e7e28) SHA1(c25ca2c9e4bf973cfe9e56a8dc849e53bdc1ebe3) )
 ROM_END
 
+ROM_START( blshark )
+	ROM_REGION( 0x80000, "maincpu", 0 ) // on sub PCB
+	ROM_LOAD( "sub",  0x00000, 0x10000, CRC(ed005267) SHA1(b20c62d76d4d49ee42e1f2f922015bec3cbbd25d) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD( "u32", 0x00000, 0x80000, CRC(3f2f06f1) SHA1(eb1d29da6a454cf45e182f4ce0c8eab66d1d1713) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD( "u33", 0x00000, 0x80000, CRC(e7f53af5) SHA1(49a722e97e384056d36dfa2d4bf754e90505befe) )
+ROM_END
+
 /**********************************
 *           Driver Init           *
 **********************************/
@@ -2461,7 +2473,23 @@ void skylncr_state::init_butrfly()
 		ROM[x] = bitswap<8>(ROM[x] ^ 0x1b, 4, 2, 6, 7, 1, 5, 3, 0);
 }
 
-} // Anonymous namespace
+void skylncr_state::init_blshark() // done by comparing code to skylancr, may be missing something
+{
+	uint8_t *const rom = memregion("maincpu")->base();
+	std::vector<uint8_t> buffer(0x10000);
+
+	memcpy(&buffer[0], rom, 0x10000);
+
+	for (int x = 0x00000; x < 0x10000; x++)
+	{
+		rom[x] = buffer[bitswap<24>(x, 23, 22, 21, 20, 19, 18, 17, 16, 14, 15, 12, 13, 10, 11, 8, 9, 6, 7, 5, 4, 3, 2, 1, 0)];
+
+		if (x >= 0x0b)
+			rom[x] ^= 0xff;
+	}
+}
+
+} // anonymous namespace
 
 
 /****************************************************
@@ -2491,3 +2519,4 @@ GAME( 199?, rolla,     0,        skylncr,  skylncr,  skylncr_state,  empty_init,
 GAME( 2000?,score5,    0,        skylncr,  score5,   skylncr_state,  init_sonikfig,  ROT0, "Z Games",              "Score 5",                                        MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // game runs but screen is completely black due to palette mishandling
 GAME( 2000?,superb2k,  0,        skylncr,  skylncr,  skylncr_state,  init_superb2k,  ROT0, "Random Games",         "Super Butterfly 2000",                           MACHINE_IS_SKELETON ) // encrypted / different CPU type ?
 GAME( 2000, seadevil,  0,        skylncr,  score5,   skylncr_state,  init_sonikfig,  ROT0, "Z Games",              "Sea Devil",                                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // GFX ROM loading is wrong, causing severe GFX glitches
+GAME( 2000, blshark,   0,        skylncr,  skylncr,  skylncr_state,  init_blshark,   ROT0, "MDS Hellas",           "Blue Shark (MDS Hellas)",                        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // protection?

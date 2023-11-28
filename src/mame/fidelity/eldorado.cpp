@@ -25,7 +25,7 @@ as seen on the PCB and also confirmed by Ron Nelson.
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_eldorado.lh" // clickable
+#include "fidel_eldorado.lh"
 
 
 namespace {
@@ -56,17 +56,17 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport m_inputs;
 
+	bool m_kp_select = false;
+	u16 m_inp_mux = 0;
+	u8 m_led_select = 0;
+
 	// I/O handlers
 	void update_display();
 	void mux_w(u8 data);
 	u8 mux_r();
 	void control_w(u8 data);
-	DECLARE_READ_LINE_MEMBER(t0_r);
+	int t0_r();
 	u8 input_r();
-
-	bool m_kp_select = false;
-	u16 m_inp_mux = 0;
-	u8 m_led_select = 0;
 };
 
 void eldorado_state::machine_start()
@@ -113,7 +113,7 @@ void eldorado_state::control_w(u8 data)
 	m_kp_select = !bool(data & 0x80);
 }
 
-READ_LINE_MEMBER(eldorado_state::t0_r)
+int eldorado_state::t0_r()
 {
 	// T0: P27
 	return m_kp_select ? 0 : 1;

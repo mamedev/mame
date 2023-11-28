@@ -147,7 +147,7 @@ void dragon_serial_device::scs_write(offs_t offset, u8 data)
 	}
 }
 
-WRITE_LINE_MEMBER(dragon_serial_device::write_acia_clock)
+void dragon_serial_device::write_acia_clock(int state)
 {
 	m_acia->write_txc(state);
 	m_acia->write_rxc(state);

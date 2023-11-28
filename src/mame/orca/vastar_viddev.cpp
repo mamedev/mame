@@ -102,7 +102,7 @@ void vastar_video_device::device_start()
 	save_item(NAME(m_flip_screen));
 }
 
-WRITE_LINE_MEMBER(vastar_video_device::flipscreen_w)
+void vastar_video_device::flipscreen_w(int state)
 {
 	m_flip_screen = state ? 1 : 0;
 

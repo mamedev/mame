@@ -90,11 +90,11 @@ private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	void apply_settings(void);
 
-	u8 m_pla_auto;
-	u16 m_butmask_auto;
-	u16 m_button_mask;
-	bool m_paddle_auto;
-	bool m_paddle_on;
+	u8 m_pla_auto = 0;
+	u16 m_butmask_auto = 0;
+	u16 m_button_mask = 0;
+	bool m_paddle_auto = false;
+	bool m_paddle_on = false;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void lcd_output_w(offs_t offset, u16 data) { m_lcd_pwm->matrix(offset, data); }
@@ -111,7 +111,7 @@ private:
 	void i8021_p0_w(u8 data);
 	void i8021_p1_w(u8 data);
 	void i8021_p2_w(u8 data);
-	DECLARE_READ_LINE_MEMBER(i8021_t1_r);
+	int i8021_t1_r();
 
 	u8 m_p0 = 0xff;
 	u8 m_p2 = 0xff;
@@ -389,7 +389,7 @@ void microvision_state::i8021_p2_w(u8 data)
 	m_p2 = data;
 }
 
-READ_LINE_MEMBER(microvision_state::i8021_t1_r)
+int microvision_state::i8021_t1_r()
 {
 	// T1: paddle capacitor (active low)
 	int active = (m_p2 & 0xc) ? 1 : 0;

@@ -61,7 +61,7 @@ m68307_cpu_device::m68307_cpu_device(const machine_config &mconfig, const char *
 	m_write_irq(*this),
 	m_write_a_tx(*this),
 	m_write_b_tx(*this),
-	m_read_inport(*this),
+	m_read_inport(*this, 0),
 	m_write_outport(*this),
 	m_porta_r(*this),
 	m_porta_w(*this),
@@ -106,7 +106,7 @@ void m68307_cpu_device::device_reset()
 	set_ipl(0);
 }
 
-WRITE_LINE_MEMBER(m68307_cpu_device::reset_peripherals)
+void m68307_cpu_device::reset_peripherals(int state)
 {
 	m_duart->reset();
 
@@ -170,7 +170,7 @@ void m68307_cpu_device::set_ipl(int level)
 	}
 }
 
-WRITE_LINE_MEMBER(m68307_cpu_device::timer0_interrupt)
+void m68307_cpu_device::timer0_interrupt(int state)
 {
 	int prioritylevel = (m_m68307SIM->m_picr & 0x7000) >> 12;
 	if (state && m_ipl < prioritylevel)
@@ -179,7 +179,7 @@ WRITE_LINE_MEMBER(m68307_cpu_device::timer0_interrupt)
 		set_ipl(m_m68307SIM->get_ipl(this));
 }
 
-WRITE_LINE_MEMBER(m68307_cpu_device::timer1_interrupt)
+void m68307_cpu_device::timer1_interrupt(int state)
 {
 	int prioritylevel = (m_m68307SIM->m_picr & 0x0700) >> 8;
 	if (state && m_ipl < prioritylevel)
@@ -188,7 +188,7 @@ WRITE_LINE_MEMBER(m68307_cpu_device::timer1_interrupt)
 		set_ipl(m_m68307SIM->get_ipl(this));
 }
 
-WRITE_LINE_MEMBER(m68307_cpu_device::m68307_duart_irq_handler)
+void m68307_cpu_device::m68307_duart_irq_handler(int state)
 {
 	int prioritylevel = (m_m68307SIM->m_picr & 0x0070) >> 4;
 	if (state && m_ipl < prioritylevel)
@@ -197,7 +197,7 @@ WRITE_LINE_MEMBER(m68307_cpu_device::m68307_duart_irq_handler)
 		set_ipl(m_m68307SIM->get_ipl(this));
 }
 
-WRITE_LINE_MEMBER(m68307_cpu_device::mbus_interrupt)
+void m68307_cpu_device::mbus_interrupt(int state)
 {
 	int prioritylevel = (m_m68307SIM->m_picr & 0x0007) >> 0;
 	if (state && m_ipl < prioritylevel)
@@ -251,12 +251,6 @@ void m68307_cpu_device::device_start()
 	m_m68307_base = 0xbfff;
 	m_m68307_scrhigh = 0x0007;
 	m_m68307_scrlow = 0xf010;
-
-	m_write_irq.resolve_safe();
-	m_write_a_tx.resolve_safe();
-	m_write_b_tx.resolve_safe();
-	m_read_inport.resolve();
-	m_write_outport.resolve_safe();
 
 	m_porta_r.set(nullptr);
 	m_porta_w.set(nullptr);

@@ -69,17 +69,18 @@ DEFINE_DEVICE_TYPE(SENSORBOARD, sensorboard_device, "sensorboard", "Sensorboard"
 sensorboard_device::sensorboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SENSORBOARD, tag, owner, clock),
 	device_nvram_interface(mconfig, *this),
-	m_out_piece(*this, "piece_%c%u", 0U + 'a', 1U),
+	m_out_piece(*this, "piece_%c%u", unsigned('a'), 1U),
 	m_out_pui(*this, "piece_ui%u", 0U),
 	m_out_count(*this, "count_ui%u", 0U),
 	m_inp_rank(*this, "RANK.%u", 1),
 	m_inp_spawn(*this, "SPAWN"),
 	m_inp_ui(*this, "UI"),
 	m_inp_conf(*this, "CONF"),
-	m_custom_init_cb(*this),
-	m_custom_sensor_cb(*this),
-	m_custom_spawn_cb(*this),
-	m_custom_output_cb(*this)
+	m_clear_cb(*this),
+	m_init_cb(*this),
+	m_sensor_cb(*this, 0),
+	m_spawn_cb(*this, 0),
+	m_output_cb(*this)
 {
 	m_nvram_auto = false;
 	m_nosensors = false;
@@ -87,6 +88,7 @@ sensorboard_device::sensorboard_device(const machine_config &mconfig, const char
 	m_inductive = false;
 	m_ui_enabled = 7;
 	set_delay(attotime::never);
+	clear_cb().set(*this, FUNC(sensorboard_device::clear_board));
 
 	// set defaults for most common use case (aka chess)
 	set_size(8, 8);
@@ -101,13 +103,7 @@ sensorboard_device::sensorboard_device(const machine_config &mconfig, const char
 
 void sensorboard_device::device_start()
 {
-	// resolve handlers
-	m_custom_init_cb.resolve_safe();
-	m_custom_sensor_cb.resolve_safe(0);
-	m_custom_spawn_cb.resolve();
-	m_custom_output_cb.resolve();
-
-	if (m_custom_output_cb.isnull())
+	if (m_output_cb.isunset())
 	{
 		m_out_piece.resolve();
 		m_out_pui.resolve();
@@ -196,8 +192,8 @@ void sensorboard_device::device_reset()
 
 	if (!nvram_on())
 	{
-		clear_board();
-		m_custom_init_cb(0);
+		m_clear_cb(0);
+		m_init_cb(0);
 	}
 	undo_reset();
 	refresh();
@@ -211,8 +207,8 @@ void sensorboard_device::device_reset()
 
 void sensorboard_device::nvram_default()
 {
-	clear_board();
-	m_custom_init_cb(1);
+	m_clear_cb(0);
+	m_init_cb(0);
 }
 
 bool sensorboard_device::nvram_read(util::read_stream &file)
@@ -322,20 +318,20 @@ void sensorboard_device::refresh()
 	if (machine().phase() < machine_phase::RESET)
 		return;
 
-	bool custom_out = !m_custom_output_cb.isnull();
+	bool custom_out = !m_output_cb.isunset();
 
 	// output spawn icons
 	for (int i = 0; i < m_maxspawn; i++)
 	{
 		if (custom_out)
-			m_custom_output_cb(i + 0x101, i + 1);
+			m_output_cb(i + 0x101, i + 1);
 		else
 			m_out_pui[i + 1] = i + 1;
 	}
 
 	// output hand piece
 	if (custom_out)
-		m_custom_output_cb(0x100, m_hand);
+		m_output_cb(0x100, m_hand);
 	else
 		m_out_pui[0] = m_hand;
 
@@ -351,7 +347,7 @@ void sensorboard_device::refresh()
 				piece += m_maxid;
 
 			if (custom_out)
-				m_custom_output_cb(pos, piece);
+				m_output_cb(pos, piece);
 			else
 				m_out_piece[x][y] = piece;
 		}
@@ -382,8 +378,8 @@ void sensorboard_device::refresh()
 
 	if (custom_out)
 	{
-		m_custom_output_cb(0x200, c0);
-		m_custom_output_cb(0x201, c1);
+		m_output_cb(0x200, c0);
+		m_output_cb(0x201, c1);
 	}
 	else
 	{
@@ -484,7 +480,7 @@ INPUT_CHANGED_MEMBER(sensorboard_device::sensor)
 	// optional custom handling:
 	// return d0 = block drop piece
 	// return d1 = block pick up piece
-	u8 custom = m_custom_sensor_cb(pos);
+	u8 custom = m_sensor_cb(pos);
 
 	// drop piece
 	if (m_hand != 0)
@@ -511,8 +507,8 @@ INPUT_CHANGED_MEMBER(sensorboard_device::ui_spawn)
 	m_handpos = -1;
 
 	// optional callback to change piece id
-	if (!m_custom_spawn_cb.isnull())
-		m_hand = m_custom_spawn_cb(pos);
+	if (!m_spawn_cb.isunset())
+		m_hand = m_spawn_cb(pos);
 
 	refresh();
 }
@@ -606,10 +602,10 @@ INPUT_CHANGED_MEMBER(sensorboard_device::ui_init)
 	cancel_sensor();
 	cancel_hand();
 
-	clear_board();
+	m_clear_cb(init ? 0 : 1);
 
 	if (init)
-		m_custom_init_cb(0);
+		m_init_cb(1);
 
 	// rotate pieces
 	if (m_inp_ui->read() & 2)

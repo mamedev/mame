@@ -81,7 +81,6 @@ public:
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
-	DECLARE_INPUT_CHANGED_MEMBER(acl_button) { if (newval) power_off(); }
 	DECLARE_INPUT_CHANGED_MEMBER(on_button);
 
 	void risc2500(machine_config &config);
@@ -106,6 +105,13 @@ private:
 	output_finder<14> m_syms;
 	output_finder<16> m_leds;
 
+	bool m_power = false;
+	u32 m_control = 0;
+	u32 m_prev_pc = 0;
+	u64 m_prev_cycle = 0;
+
+	bool m_bootrom_enabled = false;
+
 	void risc2500_mem(address_map &map);
 
 	void lcd_palette(palette_device &palette) const;
@@ -118,12 +124,6 @@ private:
 	u32 disable_boot_rom_r();
 	void install_bootrom(bool enable);
 	TIMER_DEVICE_CALLBACK_MEMBER(disable_bootrom) { install_bootrom(false); }
-	bool m_bootrom_enabled = false;
-
-	bool m_power = false;
-	u32 m_control = 0;
-	u32 m_prev_pc = 0;
-	u64 m_prev_cycle = 0;
 };
 
 void risc2500_state::machine_start()
@@ -398,7 +398,6 @@ static INPUT_PORTS_START( risc2500 )
 
 	PORT_START("RESET")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("ON")       PORT_CODE(KEYCODE_I) PORT_CHANGED_MEMBER(DEVICE_SELF, risc2500_state, on_button, 0)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("ACL")      PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, risc2500_state, acl_button, 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( montreux ) // on/off buttons have different labels

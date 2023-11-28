@@ -117,15 +117,13 @@ private:
 	void qx10_18_w(uint8_t data);
 	void prom_sel_w(uint8_t data);
 	void cmos_sel_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( qx10_upd765_interrupt );
+	void qx10_upd765_interrupt(int state);
 	void update_fdd_motor(uint8_t state);
 	void fdd_motor_w(uint8_t data);
 	uint8_t qx10_30_r();
 	void zoom_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( tc_w );
+	void tc_w(int state);
 	void sqw_out(uint8_t state);
-	uint8_t mc146818_r(offs_t offset);
-	void mc146818_w(offs_t offset, uint8_t data);
 	IRQ_CALLBACK_MEMBER( inta_call );
 	uint8_t get_slave_ack(offs_t offset);
 	uint8_t vram_bank_r();
@@ -144,15 +142,15 @@ private:
 	void centronics_select_handler(uint8_t state);
 	void centronics_sense_handler(uint8_t state);
 
-	DECLARE_WRITE_LINE_MEMBER(keyboard_clk);
-	DECLARE_WRITE_LINE_MEMBER(keyboard_irq);
-	DECLARE_WRITE_LINE_MEMBER(speaker_freq);
-	DECLARE_WRITE_LINE_MEMBER(speaker_duration);
+	void keyboard_clk(int state);
+	void keyboard_irq(int state);
+	void speaker_freq(int state);
+	void speaker_duration(int state);
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	void qx10_palette(palette_device &palette) const;
-	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
+	void dma_hrq_changed(int state);
 
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
@@ -473,7 +471,7 @@ static void qx10_floppies(device_slot_interface &device)
 	device.option_add("525dd", FLOPPY_525_DD);
 }
 
-WRITE_LINE_MEMBER( qx10_state::qx10_upd765_interrupt )
+void qx10_state::qx10_upd765_interrupt(int state)
 {
 	m_fdcint = state;
 
@@ -563,13 +561,13 @@ void qx10_state::portc_w(uint8_t data)
 /*
     DMA8237
 */
-WRITE_LINE_MEMBER(qx10_state::dma_hrq_changed)
+void qx10_state::dma_hrq_changed(int state)
 {
 	/* Assert HLDA */
 	m_dma_1->hack_w(state);
 }
 
-WRITE_LINE_MEMBER( qx10_state::tc_w )
+void qx10_state::tc_w(int state)
 {
 	/* floppy terminal count */
 	m_fdc->tc_w(!state);
@@ -623,23 +621,13 @@ void qx10_state::sqw_out(uint8_t state)
 	m_counter = cnt;
 }
 
-void qx10_state::mc146818_w(offs_t offset, uint8_t data)
-{
-	m_rtc->write(!offset, data);
-}
-
-uint8_t qx10_state::mc146818_r(offs_t offset)
-{
-	return m_rtc->read(!offset);
-}
-
-WRITE_LINE_MEMBER(qx10_state::keyboard_irq)
+void qx10_state::keyboard_irq(int state)
 {
 	m_scc->m1_r(); // always set
 	m_pic_m->ir4_w(state);
 }
 
-WRITE_LINE_MEMBER(qx10_state::keyboard_clk)
+void qx10_state::keyboard_clk(int state)
 {
 	// clock keyboard too
 	m_kbd->clk_w(state);
@@ -647,13 +635,13 @@ WRITE_LINE_MEMBER(qx10_state::keyboard_clk)
 	m_scc->txca_w(state);
 }
 
-WRITE_LINE_MEMBER(qx10_state::speaker_duration)
+void qx10_state::speaker_duration(int state)
 {
 	m_pit1_out0 = state;
 	update_speaker();
 }
 
-WRITE_LINE_MEMBER(qx10_state::speaker_freq)
+void qx10_state::speaker_freq(int state)
 {
 	m_spkr_freq = state;
 	update_speaker();
@@ -745,7 +733,8 @@ void qx10_state::qx10_io(address_map &map)
 	map(0x38, 0x39).rw(m_hgdc, FUNC(upd7220_device::read), FUNC(upd7220_device::write));
 	map(0x3a, 0x3a).w(FUNC(qx10_state::zoom_w));
 //  map(0x3b, 0x3b) GDC light pen req
-	map(0x3c, 0x3d).rw(FUNC(qx10_state::mc146818_r), FUNC(qx10_state::mc146818_w));
+	map(0x3c, 0x3c).rw(m_rtc, FUNC(mc146818_device::data_r), FUNC(mc146818_device::data_w));
+	map(0x3d, 0x3d).w(m_rtc, FUNC(mc146818_device::address_w));
 	map(0x40, 0x4f).rw(m_dma_1, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x50, 0x5f).rw(m_dma_2, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 }

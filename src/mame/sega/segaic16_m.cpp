@@ -262,7 +262,7 @@ sega_315_5250_compare_timer_device::sega_315_5250_compare_timer_device(const mac
 //  exck_w - clock the timer
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(sega_315_5250_compare_timer_device::exck_w)
+void sega_315_5250_compare_timer_device::exck_w(int state)
 {
 	if (m_exck == bool(state))
 		return;
@@ -280,8 +280,7 @@ WRITE_LINE_MEMBER(sega_315_5250_compare_timer_device::exck_w)
 	// regardless of the enable, a value of 0xfff will generate the IRQ
 	if (old_counter == 0xfff)
 	{
-		if (!m_68kint_callback.isnull())
-			m_68kint_callback(ASSERT_LINE);
+		m_68kint_callback(ASSERT_LINE);
 		m_counter = m_regs[8] & 0xfff;
 	}
 }
@@ -293,8 +292,7 @@ WRITE_LINE_MEMBER(sega_315_5250_compare_timer_device::exck_w)
 
 void sega_315_5250_compare_timer_device::interrupt_ack()
 {
-	if (!m_68kint_callback.isnull())
-		m_68kint_callback(CLEAR_LINE);
+	m_68kint_callback(CLEAR_LINE);
 }
 
 
@@ -356,10 +354,6 @@ void sega_315_5250_compare_timer_device::write(offs_t offset, u16 data, u16 mem_
 
 void sega_315_5250_compare_timer_device::device_start()
 {
-	// bind our handlers
-	m_68kint_callback.resolve();
-	m_zint_callback.resolve();
-
 	// save states
 	save_item(NAME(m_regs));
 	save_item(NAME(m_counter));
@@ -379,8 +373,7 @@ void sega_315_5250_compare_timer_device::device_reset()
 	m_bit = 0;
 
 	interrupt_ack();
-	if (!m_zint_callback.isnull())
-		m_zint_callback(CLEAR_LINE);
+	m_zint_callback(CLEAR_LINE);
 }
 
 
@@ -391,8 +384,7 @@ void sega_315_5250_compare_timer_device::device_reset()
 TIMER_CALLBACK_MEMBER(sega_315_5250_compare_timer_device::write_to_sound)
 {
 	m_regs[11] = param;
-	if (!m_zint_callback.isnull())
-		m_zint_callback(ASSERT_LINE);
+	m_zint_callback(ASSERT_LINE);
 }
 
 
@@ -402,7 +394,7 @@ TIMER_CALLBACK_MEMBER(sega_315_5250_compare_timer_device::write_to_sound)
 
 u8 sega_315_5250_compare_timer_device::zread()
 {
-	if (!m_zint_callback.isnull() && !machine().side_effects_disabled())
+	if (!machine().side_effects_disabled())
 		m_zint_callback(CLEAR_LINE);
 
 	return m_regs[11];

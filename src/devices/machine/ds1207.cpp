@@ -210,7 +210,7 @@ void ds1207_device::readbit(uint8_t *buffer)
 	}
 }
 
-WRITE_LINE_MEMBER(ds1207_device::write_rst)
+void ds1207_device::write_rst(int state)
 {
 	const uint8_t this_state = state ? 1 : 0;
 	if(m_rst != this_state)
@@ -245,7 +245,7 @@ WRITE_LINE_MEMBER(ds1207_device::write_rst)
 	}
 }
 
-WRITE_LINE_MEMBER(ds1207_device::write_clk)
+void ds1207_device::write_clk(int state)
 {
 	const uint8_t this_state = state ? 1 : 0;
 	if(m_clk != this_state)
@@ -491,7 +491,7 @@ WRITE_LINE_MEMBER(ds1207_device::write_clk)
 	}
 }
 
-WRITE_LINE_MEMBER(ds1207_device::write_dq)
+void ds1207_device::write_dq(int state)
 {
 	const uint8_t this_state = state ? 1 : 0;
 	if(m_dqw != this_state)
@@ -502,7 +502,7 @@ WRITE_LINE_MEMBER(ds1207_device::write_dq)
 	}
 }
 
-READ_LINE_MEMBER(ds1207_device::read_dq)
+int ds1207_device::read_dq()
 {
 	if(m_dqr == DQ_HIGH_IMPEDANCE)
 	{

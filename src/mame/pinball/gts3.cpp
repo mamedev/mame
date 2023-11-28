@@ -93,6 +93,10 @@ public:
 	void p7(machine_config &config);  // p7 sound card
 	DECLARE_INPUT_CHANGED_MEMBER(test_inp);
 
+protected:
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+
 private:
 	void segbank_w(offs_t offset, u8 data);
 	u8 u4a_r();
@@ -101,16 +105,16 @@ private:
 	void solenoid_w(offs_t, u8);
 	void u4b_w(u8 data);
 	void u5a_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(nmi_w);
+	void nmi_w(int state);
 	void mem_map(address_map &map);
+
 	bool m_dispclk = false;
 	bool m_lampclk = false;
 	u8 m_digit = 0U;
 	u8 m_row = 0U; // for lamps and switches
 	u8 m_segment[4]{};
 	u8 m_u4b = 0U;
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+
 	required_device<m65c02_device> m_maincpu;
 	required_device<via6522_device> m_u4;
 	required_device<via6522_device> m_u5;
@@ -239,7 +243,7 @@ INPUT_CHANGED_MEMBER( gts3_state::test_inp )
 }
 
 // This trampoline needed; WRITELINE("maincpu", m65c02_device, nmi_line) does not work
-WRITE_LINE_MEMBER( gts3_state::nmi_w )
+void gts3_state::nmi_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, (state) ? CLEAR_LINE : HOLD_LINE);
 }
@@ -378,13 +382,13 @@ void gts3_state::p0(machine_config &config)
 void gts3_state::p5(machine_config &config)
 {
 	p0(config);
-	GOTTLIEB_SOUND_PIN5(config, m_p5_sound, 0).add_route(ALL_OUTPUTS, "mono", 1.00);
+	GOTTLIEB_SOUND_PIN5(config, m_p5_sound).add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
 void gts3_state::p7(machine_config &config)
 {
 	p0(config);
-	GOTTLIEB_SOUND_PIN7(config, m_p7_sound, 0).add_route(ALL_OUTPUTS, "mono", 1.00);
+	GOTTLIEB_SOUND_PIN7(config, m_p7_sound).add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
 

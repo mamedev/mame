@@ -370,7 +370,6 @@ ioport_constructor kaypro_10_keyboard_device::device_input_ports() const
 
 void kaypro_10_keyboard_device::device_start()
 {
-	m_rxd_cb.resolve_safe();
 	m_led_caps_lock.resolve();
 
 	save_item(NAME(m_txd));
@@ -411,7 +410,7 @@ void kaypro_10_keyboard_device::p2_w(uint8_t data)
 	m_rxd_cb(BIT(data, 7));
 }
 
-READ_LINE_MEMBER(kaypro_10_keyboard_device::t1_r)
+int kaypro_10_keyboard_device::t1_r()
 {
 	return m_txd ? 1 : 0;
 }

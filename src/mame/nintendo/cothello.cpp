@@ -77,6 +77,11 @@ private:
 	required_ioport_array<4> m_inputs;
 	output_finder<3> m_digits;
 
+	u16 m_counter = 0;
+	u8 m_sound_data = 0;
+	emu_timer *m_counter_timer;
+	emu_timer *m_beeper_off;
+
 	void main_map(address_map &map);
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -87,11 +92,6 @@ private:
 
 	TIMER_CALLBACK_MEMBER(counter_tick);
 	TIMER_CALLBACK_MEMBER(beeper_off) { m_beeper->set_state(0); }
-
-	u16 m_counter = 0;
-	u8 m_sound_data = 0;
-	emu_timer *m_counter_timer;
-	emu_timer *m_beeper_off;
 };
 
 void cothello_state::machine_start()

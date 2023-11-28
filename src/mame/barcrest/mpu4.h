@@ -158,6 +158,7 @@ public:
 		, m_mpu4leds(*this, "mpu4led%u", 0U)
 		, m_digits(*this, "digit%u", 0U)
 		, m_triacs(*this, "triac%u", 0U)
+		, m_flutterbox(*this, "flutterbox")
 
 	 { }
 
@@ -336,7 +337,7 @@ public:
 	void mpu4base(machine_config &config);
 	void mpu4_bacta(machine_config &config);
 
-	DECLARE_WRITE_LINE_MEMBER(pia_gb_cb2_w);
+	void pia_gb_cb2_w(int state);
 
 protected:
 	void setup_rom_banks();
@@ -369,40 +370,40 @@ protected:
 	uint8_t bankswitch_r();
 	void bankset_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(cpu0_irq);
-	DECLARE_WRITE_LINE_MEMBER(ic2_o1_callback);
-	DECLARE_WRITE_LINE_MEMBER(ic2_o2_callback);
-	DECLARE_WRITE_LINE_MEMBER(ic2_o3_callback);
+	void cpu0_irq(int state);
+	void ic2_o1_callback(int state);
+	void ic2_o2_callback(int state);
+	void ic2_o3_callback(int state);
 	void pia_ic3_porta_w(uint8_t data);
 	void pia_ic3_portb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic3_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic3_cb2_w);
+	void pia_ic3_ca2_w(int state);
+	void pia_ic3_cb2_w(int state);
 	void pia_ic4_porta_w(uint8_t data);
 	void pia_ic4_portb_w(uint8_t data);
 	uint8_t pia_ic4_portb_r();
-	DECLARE_WRITE_LINE_MEMBER(pia_ic4_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic4_cb2_w);
+	void pia_ic4_ca2_w(int state);
+	void pia_ic4_cb2_w(int state);
 	uint8_t pia_ic5_porta_r();
 	void pia_ic5_porta_w(uint8_t data);
 	void pia_ic5_portb_w(uint8_t data);
 	uint8_t pia_ic5_portb_r();
-	DECLARE_WRITE_LINE_MEMBER(pia_ic5_cb2_w);
+	void pia_ic5_cb2_w(int state);
 	void pia_ic6_portb_w(uint8_t data);
 	void pia_ic6_porta_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic6_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic6_cb2_w);
+	void pia_ic6_ca2_w(int state);
+	void pia_ic6_cb2_w(int state);
 	void pia_ic7_porta_w(uint8_t data);
 	void pia_ic7_portb_w(uint8_t data);
 	uint8_t pia_ic7_portb_r();
-	DECLARE_WRITE_LINE_MEMBER(pia_ic7_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic7_cb2_w);
+	void pia_ic7_ca2_w(int state);
+	void pia_ic7_cb2_w(int state);
 	uint8_t pia_ic8_porta_r();
 	void pia_ic8_portb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic8_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic8_cb2_w);
+	void pia_ic8_ca2_w(int state);
+	void pia_ic8_cb2_w(int state);
 
 
-	DECLARE_WRITE_LINE_MEMBER(dataport_rxd);
+	void dataport_rxd(int state);
 
 
 	uint8_t bootleg806_r(address_space &space, offs_t offset);
@@ -458,6 +459,8 @@ protected:
 	output_finder<144> m_digits;
 
 	output_finder<8> m_triacs;
+
+	output_finder<> m_flutterbox;
 
 	uint8_t m_mmtr_data = 0;
 	uint8_t m_ay8913_address = 0;

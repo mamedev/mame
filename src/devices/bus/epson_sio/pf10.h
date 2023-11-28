@@ -45,11 +45,11 @@ protected:
 
 private:
 	// serial output from main cpu
-	DECLARE_WRITE_LINE_MEMBER( hd6303_tx_w );
+	void hd6303_tx_w(int state);
 
 	// from sio output
-	DECLARE_WRITE_LINE_MEMBER( rxc_w );
-	DECLARE_WRITE_LINE_MEMBER( pinc_w );
+	void rxc_w(int state);
+	void pinc_w(int state);
 
 	// floppy disk controller
 	uint8_t fdc_r(offs_t offset);
@@ -66,7 +66,7 @@ private:
 
 	void cpu_mem(address_map &map);
 
-	required_device<hd6303y_cpu_device> m_cpu;
+	required_device<hd6303x_cpu_device> m_cpu;
 	required_device<upd765a_device> m_fdc;
 	required_device<epson_sio_device> m_sio_output;
 	required_device<floppy_connector> m_floppy;

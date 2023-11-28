@@ -58,18 +58,6 @@ mb63h130_device::mb63h130_device(const machine_config &mconfig, const char *tag,
 
 
 //-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void mb63h149_device::device_resolve_objects()
-{
-	m_int_callback.resolve_safe();
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

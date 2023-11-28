@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /*********************************************************************
 
-    formats/msx_dsk.c
+    formats/msx_dsk.cpp
 
     MSX disk images
 
@@ -15,17 +15,17 @@ msx_format::msx_format() : upd765_format(formats)
 {
 }
 
-const char *msx_format::name() const
+const char *msx_format::name() const noexcept
 {
 	return "msx";
 }
 
-const char *msx_format::description() const
+const char *msx_format::description() const noexcept
 {
 	return "MSX disk image";
 }
 
-const char *msx_format::extensions() const
+const char *msx_format::extensions() const noexcept
 {
 	return "dsk";
 }

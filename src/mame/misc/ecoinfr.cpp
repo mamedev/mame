@@ -70,9 +70,9 @@ public:
 	void init_ecoinfr();
 	void init_ecoinfrmab();
 
-	DECLARE_READ_LINE_MEMBER(reel1_opto_r);
-	DECLARE_READ_LINE_MEMBER(reel2_opto_r);
-	DECLARE_READ_LINE_MEMBER(reel3_opto_r);
+	int reel1_opto_r();
+	int reel2_opto_r();
+	int reel3_opto_r();
 
 private:
 	int irq_toggle = 0;
@@ -88,7 +88,7 @@ private:
 	uint8_t port16_value = 0;
 	uint8_t port17_value = 0;
 
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
+	template <unsigned N> void reel_optic_cb(int state) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 	void ec_port00_out_w(uint8_t data);
 	void ec_port01_out_w(uint8_t data);
 	void ec_port02_out_w(uint8_t data);
@@ -518,19 +518,19 @@ void ecoinfr_state::portmap(address_map &map)
 	map(0x18, 0x18).w(FUNC(ecoinfr_state::ec_port18_out_w)); // 24 (Watchdog)
 }
 
-READ_LINE_MEMBER(ecoinfr_state::reel1_opto_r)
+int ecoinfr_state::reel1_opto_r()
 {
 	if (m_optic_pattern & 0x1) return 1;
 	return 0;
 }
 
-READ_LINE_MEMBER(ecoinfr_state::reel2_opto_r)
+int ecoinfr_state::reel2_opto_r()
 {
 	if (m_optic_pattern & 0x2) return 1;
 	return 0;
 }
 
-READ_LINE_MEMBER(ecoinfr_state::reel3_opto_r)
+int ecoinfr_state::reel3_opto_r()
 {
 	if (m_optic_pattern & 0x4) return 1;
 	return 0;

@@ -405,7 +405,7 @@ void sa1110_periphs_device::icp_w(offs_t offset, uint32_t data, uint32_t mem_mas
 
 */
 
-WRITE_LINE_MEMBER(sa1110_periphs_device::uart3_irq_callback)
+void sa1110_periphs_device::uart3_irq_callback(int state)
 {
 	set_irq_line(INT_UART3, state);
 }
@@ -792,7 +792,7 @@ void sa1110_periphs_device::uart3_w(offs_t offset, uint32_t data, uint32_t mem_m
 
 */
 
-WRITE_LINE_MEMBER(sa1110_periphs_device::mcp_irq_callback)
+void sa1110_periphs_device::mcp_irq_callback(int state)
 {
 	set_irq_line(INT_MCP, state);
 }
@@ -2445,10 +2445,6 @@ void sa1110_periphs_device::device_start()
 	save_item(STRUCT_MEMBER(m_dma_regs, dbs));
 	save_item(STRUCT_MEMBER(m_dma_regs, dbt));
 	save_item(NAME(m_dma_active_mask));
-
-	m_gpio_out.resolve_all_safe();
-	m_ssp_out.resolve_safe();
-	m_uart3_tx_out.resolve_safe();
 }
 
 void sa1110_periphs_device::device_reset()

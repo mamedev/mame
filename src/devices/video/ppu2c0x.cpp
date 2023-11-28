@@ -215,9 +215,6 @@ ppu2c04_clone_device::ppu2c04_clone_device(const machine_config& mconfig, const 
 
 void ppu2c0x_device::start_nopalram()
 {
-	// bind our handler
-	m_int_callback.resolve_safe();
-
 	// allocate timers
 	m_hblank_timer = timer_alloc(FUNC(ppu2c0x_device::hblank_tick), this);
 	m_nmi_timer = timer_alloc(FUNC(ppu2c0x_device::nmi_tick), this);

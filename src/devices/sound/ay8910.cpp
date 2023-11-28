@@ -1,193 +1,73 @@
 // license:BSD-3-Clause
 // copyright-holders:Couriersud
 /*
- * Couriersud, July 2014:
- *
- * This documents recent work on the AY8910. A YM2149 is now on it's way from
- * Hong Kong as well.
- *
- * TODO:
- *
- * - Create a true sound device nAY8910 driver.
- * - implement approach outlined below in this driver.
- *
- * For years I had a AY8910 in my drawer. Arduinos were around as well.
- * Using the approach documented in this blog post
- *    http://www.986-studio.com/2014/05/18/another-ay-entry/#more-476
- * I measured the output voltages using a Extech 520.
- *
- * Measurement Setup
- *
- * Laptop <--> Arduino <---> AY8910
- *
- * AY8910 Registers:
- * 0x07: 3f
- * 0x08: RV
- * 0x09: RV
- * 0x0A: RV
- *
- * Output was measured on Analog Output B with a resistor RD to
- * ground.
- *
- * Measurement results:
- *
- * RD      983  9.830k   99.5k  1.001M    open
- *
- * RV        B       B       B       B       B
- *  0   0.0000  0.0000  0.0001  0.0011  0.0616
- *  1   0.0106  0.0998  0.6680  1.8150  2.7260
- *  2   0.0150  0.1377  0.8320  1.9890  2.8120
- *  3   0.0222  0.1960  1.0260  2.1740  2.9000
- *  4   0.0320  0.2708  1.2320  2.3360  2.9760
- *  5   0.0466  0.3719  1.4530  2.4880  3.0440
- *  6   0.0665  0.4938  1.6680  2.6280  3.1130
- *  7   0.1039  0.6910  1.9500  2.7900  3.1860
- *  8   0.1237  0.7790  2.0500  2.8590  3.2340
- *  9   0.1986  1.0660  2.3320  3.0090  3.3090
- * 10   0.2803  1.3010  2.5050  3.0850  3.3380
- * 11   0.3548  1.4740  2.6170  3.1340  3.3590
- * 12   0.4702  1.6870  2.7340  3.1800  3.3730
- * 13   0.6030  1.8870  2.8410  3.2300  3.4050
- * 14   0.7530  2.0740  2.9280  3.2580  3.4170
- * 15   0.9250  2.2510  3.0040  3.2940  3.4380
- *
- * Using an equivalent model approach with two resistors
- *
- *      5V
- *       |
- *       Z
- *       Z Resistor Value for RV
- *       Z
- *       |
- *       +---> Output signal
- *       |
- *       Z
- *       Z External RD
- *       Z
- *       |
- *      GND
- *
- * will NOT work out of the box since RV = RV(RD).
- *
- * The following approach will be used going forward based on die pictures
- * of the AY8910 done by Dr. Stack van Hay:
- *
- *
- *              5V
- *             _| D
- *          G |      NMOS
- *     Vg ---||               Kn depends on volume selected
- *            |_  S Vs
- *               |
- *               |
- *               +---> VO Output signal
- *               |
- *               Z
- *               Z External RD
- *               Z
- *               |
- *              GND
- *
- *  Whilst conducting, the FET operates in saturation mode:
- *
- *  Id = Kn * (Vgs - Vth)^2
- *
- *  Using Id = Vs / RD
- *
- *  Vs = Kn * RD  * (Vg - Vs - Vth)^2
- *
- *  finally using Vg' = Vg - Vth
- *
- *  Vs = Vg' + 1 / (2 * Kn * RD) - sqrt((Vg' + 1 / (2 * Kn * RD))^2 - Vg'^2)
- *
- *  and finally
- *
- *  VO = Vs
- *
- *  and this can be used to re-Thenevin to 5V
- *
- *  RVequiv = RD * ( 5V / VO - 1)
- *
- *  The RV and Kn parameter are derived using least squares to match
- *  calculation results with measurements.
- *
- *  FIXME:
- *  There is voltage of 60 mV measured with the EX520 (Ri ~ 10M). This may
- *  be induced by cutoff currents from the 15 FETs.
- *
- */
 
+Emulation of the AY-3-8910 / YM2149 sound chip.
 
-/***************************************************************************
+Based on various code snippets by Ville Hallik, Michael Cuddy,
+Tatsuyuki Satoh, Fabrice Frances, Nicola Salmoria.
 
-  ay8910.cpp
+Mostly rewritten by couriersud in 2008
 
-  Emulation of the AY-3-8910 / YM2149 sound chip.
+Public documentation:
 
-  Based on various code snippets by Ville Hallik, Michael Cuddy,
-  Tatsuyuki Satoh, Fabrice Frances, Nicola Salmoria.
+- http://privatfrickler.de/blick-auf-den-chip-soundchip-general-instruments-ay-3-8910/
+  Die pictures of the AY8910
 
-  Mostly rewritten by couriersud in 2008
+- US Patent 4933980
 
-  Public documentation:
+Games using ADSR: gyruss
 
-  - http://privatfrickler.de/blick-auf-den-chip-soundchip-general-instruments-ay-3-8910/
-    Die pictures of the AY8910
+A list with more games using ADSR can be found here:
+      http://mametesters.org/view.php?id=3043
 
-  - US Patent 4933980
+TODO:
+* Measure volume / envelope parameters for AY8930 expanded mode
+* YM2610 & YM2608 will need a separate flag in their config structures
+  to distinguish between legacy and discrete mode.
 
-  Games using ADSR: gyruss
+The rewrite also introduces a generic model for the DAC. This model is
+not perfect, but allows channel mixing based on a parametrized approach.
+This model also allows to factor in different loads on individual channels.
+If a better model is developed in the future or better measurements are
+available, the driver should be easy to change. The model is described
+later.
 
-  A list with more games using ADSR can be found here:
-        http://mametesters.org/view.php?id=3043
+In order to not break hundreds of existing drivers by default the flag
+AY8910_LEGACY_OUTPUT is used by drivers not changed to take into account the
+new model. All outputs are normalized to the old output range (i.e. 0 .. 7ffff).
+In the case of channel mixing, output range is 0...3 * 7fff.
 
-  TODO:
-  * Measure volume / envelope parameters for AY8930 expanded mode
-  * YM2610 & YM2608 will need a separate flag in their config structures
-    to distinguish between legacy and discrete mode.
+The main difference between the AY-3-8910 and the YM2149 is, that the
+AY-3-8910 datasheet mentions, that fixed volume level 0, which is set by
+registers 8 to 10 is "channel off". The YM2149 mentions, that the generated
+signal has a 2V DC component. This is confirmed by measurements. The approach
+taken here is to assume the 2V DC offset for all outputs for the YM2149.
+For the AY-3-8910, an offset is used if envelope is active for a channel.
+This is backed by oscilloscope pictures from the datasheet. If a fixed volume
+is set, i.e. envelope is disabled, the output voltage is set to 0V. Recordings
+I found on the web for gyruss indicate, that the AY-3-8910 offset should
+be around 0.2V. This will also make sound levels more compatible with
+user observations for scramble.
 
-  The rewrite also introduces a generic model for the DAC. This model is
-  not perfect, but allows channel mixing based on a parametrized approach.
-  This model also allows to factor in different loads on individual channels.
-  If a better model is developed in the future or better measurements are
-  available, the driver should be easy to change. The model is described
-  later.
-
-  In order to not break hundreds of existing drivers by default the flag
-  AY8910_LEGACY_OUTPUT is used by drivers not changed to take into account the
-  new model. All outputs are normalized to the old output range (i.e. 0 .. 7ffff).
-  In the case of channel mixing, output range is 0...3 * 7fff.
-
-  The main difference between the AY-3-8910 and the YM2149 is, that the
-  AY-3-8910 datasheet mentions, that fixed volume level 0, which is set by
-  registers 8 to 10 is "channel off". The YM2149 mentions, that the generated
-  signal has a 2V DC component. This is confirmed by measurements. The approach
-  taken here is to assume the 2V DC offset for all outputs for the YM2149.
-  For the AY-3-8910, an offset is used if envelope is active for a channel.
-  This is backed by oscilloscope pictures from the datasheet. If a fixed volume
-  is set, i.e. envelope is disabled, the output voltage is set to 0V. Recordings
-  I found on the web for gyruss indicate, that the AY-3-8910 offset should
-  be around 0.2V. This will also make sound levels more compatible with
-  user observations for scramble.
-
-  The Model:
-                     5V     5V
-                      |      |
-                      /      |
-  Volume Level x >---|       Z
-                      >      Z Pullup Resistor RU
-                       |     Z
-                       Z     |
-                    Rx Z     |
-                       Z     |
-                       |     |
-                       '-----+-------->  >---+----> Output signal
-                             |               |
-                             Z               Z
-               Pulldown RD   Z               Z Load RL
-                             Z               Z
-                             |               |
-                            GND             GND
+The Model:
+                   5V     5V
+                    |      |
+                    /      |
+Volume Level x >---|       Z
+                    >      Z Pullup Resistor RU
+                     |     Z
+                     Z     |
+                  Rx Z     |
+                     Z     |
+                     |     |
+                     '-----+-------->  >---+----> Output signal
+                           |               |
+                           Z               Z
+             Pulldown RD   Z               Z Load RL
+                           Z               Z
+                           |               |
+                          GND             GND
 
 Each Volume level x will select a different resistor Rx. Measurements from fpgaarcade.com
 where used to calibrate channel mixing for the YM2149. This was done using
@@ -228,29 +108,28 @@ has twice the steps, happening twice as fast.
 
 ****************************************************************************
 
-    The bus control and chip selection signals of the AY PSGs and their
-    pin-compatible clones such as YM2149 are somewhat unconventional and
-    redundant, having been designed for compatibility with GI's CP1610
-    series of microprocessors. Much of the redundancy can be finessed by
-    tying BC2 to Vcc; AY-3-8913 and AY8930 do this internally.
+The bus control and chip selection signals of the AY PSGs and their
+pin-compatible clones such as YM2149 are somewhat unconventional and
+redundant, having been designed for compatibility with GI's CP1610
+series of microprocessors. Much of the redundancy can be finessed by
+tying BC2 to Vcc; AY-3-8913 and AY8930 do this internally.
 
-                            /A9   A8    /CS   BDIR  BC2   BC1
-                AY-3-8910   24    25    n/a   27    28    29
-                AY-3-8912   n/a   17    n/a   18    19    20
-                AY-3-8913   22    23    24    2     n/a   3
-                            ------------------------------------
-                Inactive            NACT      0     0     0
-                Latch address       ADAR      0     0     1
-                Inactive            IAB       0     1     0
-                Read from PSG       DTB       0     1     1
-                Latch address       BAR       1     0     0
-                Inactive            DW        1     0     1
-                Write to PSG        DWS       1     1     0
-                Latch address       INTAK     1     1     1
+                        /A9   A8    /CS   BDIR  BC2   BC1
+            AY-3-8910   24    25    n/a   27    28    29
+            AY-3-8912   n/a   17    n/a   18    19    20
+            AY-3-8913   22    23    24    2     n/a   3
+                        ------------------------------------
+            Inactive            NACT      0     0     0
+            Latch address       ADAR      0     0     1
+            Inactive            IAB       0     1     0
+            Read from PSG       DTB       0     1     1
+            Latch address       BAR       1     0     0
+            Inactive            DW        1     0     1
+            Write to PSG        DWS       1     1     0
+            Latch address       INTAK     1     1     1
 
-***************************************************************************/
+****************************************************************************
 
-/**
 AY-3-8910(A)/8914/8916/8917/8930/YM2149 (others?):
                         _______    _______
                       _|       \__/       |_
@@ -579,6 +458,122 @@ AY-8930 datasheet: http://www.ym2149.com/ay8930.pdf
 YM2149 datasheet: http://www.ym2149.com/ym2149.pdf
 YM2203 English datasheet: http://www.appleii-box.de/APPLE2/JonasCard/YM2203%20datasheet.pdf
 YM2203 Japanese datasheet contents, translated: http://www.larwe.com/technical/chip_ymopn.html
+
+****************************************************************************
+
+Couriersud, July 2014:
+
+This documents recent work on the AY8910. A YM2149 is now on it's way from
+Hong Kong as well.
+
+TODO:
+- Create a true sound device nAY8910 driver.
+- implement approach outlined below in this driver.
+
+For years I had a AY8910 in my drawer. Arduinos were around as well.
+Using the approach documented in this blog post
+   http://www.986-studio.com/2014/05/18/another-ay-entry/#more-476
+I measured the output voltages using a Extech 520.
+
+Measurement Setup
+
+Laptop <--> Arduino <---> AY8910
+
+AY8910 Registers:
+0x07: 3f
+0x08: RV
+0x09: RV
+0x0A: RV
+
+Output was measured on Analog Output B with a resistor RD to
+ground.
+
+Measurement results:
+
+RD      983  9.830k   99.5k  1.001M    open
+
+RV        B       B       B       B       B
+ 0   0.0000  0.0000  0.0001  0.0011  0.0616
+ 1   0.0106  0.0998  0.6680  1.8150  2.7260
+ 2   0.0150  0.1377  0.8320  1.9890  2.8120
+ 3   0.0222  0.1960  1.0260  2.1740  2.9000
+ 4   0.0320  0.2708  1.2320  2.3360  2.9760
+ 5   0.0466  0.3719  1.4530  2.4880  3.0440
+ 6   0.0665  0.4938  1.6680  2.6280  3.1130
+ 7   0.1039  0.6910  1.9500  2.7900  3.1860
+ 8   0.1237  0.7790  2.0500  2.8590  3.2340
+ 9   0.1986  1.0660  2.3320  3.0090  3.3090
+10   0.2803  1.3010  2.5050  3.0850  3.3380
+11   0.3548  1.4740  2.6170  3.1340  3.3590
+12   0.4702  1.6870  2.7340  3.1800  3.3730
+13   0.6030  1.8870  2.8410  3.2300  3.4050
+14   0.7530  2.0740  2.9280  3.2580  3.4170
+15   0.9250  2.2510  3.0040  3.2940  3.4380
+
+Using an equivalent model approach with two resistors
+
+     5V
+      |
+      Z
+      Z Resistor Value for RV
+      Z
+      |
+      +---> Output signal
+      |
+      Z
+      Z External RD
+      Z
+      |
+     GND
+
+will NOT work out of the box since RV = RV(RD).
+
+The following approach will be used going forward based on die pictures
+of the AY8910 done by Dr. Stack van Hay:
+
+
+             5V
+            _| D
+         G |      NMOS
+    Vg ---||               Kn depends on volume selected
+           |_  S Vs
+              |
+              |
+              +---> VO Output signal
+              |
+              Z
+              Z External RD
+              Z
+              |
+             GND
+
+Whilst conducting, the FET operates in saturation mode:
+
+Id = Kn * (Vgs - Vth)^2
+
+Using Id = Vs / RD
+
+Vs = Kn * RD  * (Vg - Vs - Vth)^2
+
+finally using Vg' = Vg - Vth
+
+Vs = Vg' + 1 / (2 * Kn * RD) - sqrt((Vg' + 1 / (2 * Kn * RD))^2 - Vg'^2)
+
+and finally
+
+VO = Vs
+
+and this can be used to re-Thenevin to 5V
+
+RVequiv = RD * ( 5V / VO - 1)
+
+The RV and Kn parameter are derived using least squares to match
+calculation results with measurements.
+
+FIXME:
+There is voltage of 60 mV measured with the EX520 (Ri ~ 10M). This may
+be induced by cutoff currents from the 15 FETs.
+
 */
 
 #include "emu.h"
@@ -598,12 +593,6 @@ YM2203 Japanese datasheet contents, translated: http://www.larwe.com/technical/c
 #define ENABLE_REGISTER_TEST        (0)     // Enable preprogrammed registers
 
 static constexpr stream_buffer::sample_t MAX_OUTPUT = 1.0;
-
-/*************************************
- *
- *  Type definitions
- *
- *************************************/
 
 
 /*************************************
@@ -654,11 +643,9 @@ static const ay8910_device::ay_ym_param ay8910_param =
 		4120,  2512,  1737,  1335,  1005,   747,   586,    451 },
 };
 
-/*
- * RL = 3000, Hacker Kay normalized pattern, 1.5V to 2.8V
- * These values correspond with guesses based on Gyruss schematics
- * They work well with scramble as well.
- */
+// RL = 3000, Hacker Kay normalized pattern, 1.5V to 2.8V
+// These values correspond with guesses based on Gyruss schematics
+// They work well with scramble as well.
 static const ay8910_device::ay_ym_param ay8910_param =
 {
 	930, 454,
@@ -667,12 +654,10 @@ static const ay8910_device::ay_ym_param ay8910_param =
 		4189,  2557,  1772,  1363,  1028,  766,   602,  464 },
 };
 
-/*
- * RL = 1000, Hacker Kay normalized pattern, 0.75V to 2.05V
- * These values correspond with guesses based on Gyruss schematics
- * They work well with scramble as well.
- */
-static const ay8910_device::ay_ym_param ay8910_param =
+// RL = 1000, Hacker Kay normalized pattern, 0.75V to 2.05V
+// These values correspond with guesses based on Gyruss schematics
+// They work well with scramble as well.
+ tatic const ay8910_device::ay_ym_param ay8910_param =
 {
 	1371, 313,
 	16,
@@ -680,9 +665,7 @@ static const ay8910_device::ay_ym_param ay8910_param =
 		3814,  2337,  1629,  1263,   962,  727,   580,   458 },
 };
 
-/*
- * RL = 1000, Hacker Kay normalized pattern, 0.2V to 1.5V
- */
+// RL = 1000, Hacker Kay normalized pattern, 0.2V to 1.5V
 static const ay8910_device::ay_ym_param ay8910_param =
 {
 	5806, 300,
@@ -693,44 +676,45 @@ static const ay8910_device::ay_ym_param ay8910_param =
 #endif
 
 /*
- * RL = 2000, Based on Matthew Westcott's measurements from Dec 2001.
- * -------------------------------------------------------------------
- *
- * http://groups.google.com/group/comp.sys.sinclair/browse_thread/thread/fb3091da4c4caf26/d5959a800cda0b5e?lnk=gst&q=Matthew+Westcott#d5959a800cda0b5e
- * After what Russell mentioned a couple of weeks back about the lack of
- * publicised measurements of AY chip volumes - I've finally got round to
- * making these readings, and I'm placing them in the public domain - so
- * anyone's welcome to use them in emulators or anything else.
 
- * To make the readings, I set up the chip to produce a constant voltage on
- * channel C (setting bits 2 and 5 of register 6), and varied the amplitude
- * (the low 4 bits of register 10). The voltages were measured between the
- * channel C output (pin 1) and ground (pin 6).
- *
- * Level  Voltage
- *  0     1.147
- *  1     1.162
- *  2     1.169
- *  3     1.178
- *  4     1.192
- *  5     1.213
- *  6     1.238
- *  7     1.299
- *  8     1.336
- *  9     1.457
- * 10     1.573
- * 11     1.707
- * 12     1.882
- * 13     2.06
- * 14     2.32
- * 15     2.58
- * -------------------------------------------------------------------
- *
- * The ZX spectrum output circuit was modelled in SwitcherCAD and
- * the resistor values below create the voltage levels above.
- * RD was measured on a real chip to be 8m Ohm, RU was 0.8m Ohm.
- */
+RL = 2000, Based on Matthew Westcott's measurements from Dec 2001.
+-------------------------------------------------------------------
 
+http://groups.google.com/group/comp.sys.sinclair/browse_thread/thread/fb3091da4c4caf26/d5959a800cda0b5e?lnk=gst&q=Matthew+Westcott#d5959a800cda0b5e
+After what Russell mentioned a couple of weeks back about the lack of
+publicised measurements of AY chip volumes - I've finally got round to
+making these readings, and I'm placing them in the public domain - so
+anyone's welcome to use them in emulators or anything else.
+
+To make the readings, I set up the chip to produce a constant voltage on
+channel C (setting bits 2 and 5 of register 6), and varied the amplitude
+(the low 4 bits of register 10). The voltages were measured between the
+channel C output (pin 1) and ground (pin 6).
+
+Level  Voltage
+ 0     1.147
+ 1     1.162
+ 2     1.169
+ 3     1.178
+ 4     1.192
+ 5     1.213
+ 6     1.238
+ 7     1.299
+ 8     1.336
+ 9     1.457
+10     1.573
+11     1.707
+12     1.882
+13     2.06
+14     2.32
+15     2.58
+-------------------------------------------------------------------
+
+The ZX spectrum output circuit was modelled in SwitcherCAD and
+the resistor values below create the voltage levels above.
+RD was measured on a real chip to be 8m Ohm, RU was 0.8m Ohm.
+
+*/
 
 static const ay8910_device::ay_ym_param ay8910_param =
 {
@@ -764,7 +748,6 @@ static const ay8910_device::mosfet_param ay8910_mosfet_param =
 		153.72985,
 	}
 };
-
 
 
 
@@ -976,7 +959,7 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 				((m_last_enable & 0x40) != (m_regs[AY_ENABLE] & 0x40)))
 			{
 				// write out 0xff if port set to input
-				if (!m_port_a_write_cb.isnull())
+				if (!m_port_a_write_cb.isunset())
 					m_port_a_write_cb((offs_t)0, (m_regs[AY_ENABLE] & 0x40) ? m_regs[AY_PORTA] : 0xff);
 			}
 
@@ -984,7 +967,7 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 				((m_last_enable & 0x80) != (m_regs[AY_ENABLE] & 0x80)))
 			{
 				// write out 0xff if port set to input
-				if (!m_port_b_write_cb.isnull())
+				if (!m_port_b_write_cb.isunset())
 					m_port_b_write_cb((offs_t)0, (m_regs[AY_ENABLE] & 0x80) ? m_regs[AY_PORTB] : 0xff);
 			}
 			m_last_enable = m_regs[AY_ENABLE];
@@ -1013,7 +996,7 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 		case AY_PORTA:
 			if (m_regs[AY_ENABLE] & 0x40)
 			{
-				if (!m_port_a_write_cb.isnull())
+				if (!m_port_a_write_cb.isunset())
 					m_port_a_write_cb((offs_t)0, m_regs[AY_PORTA]);
 				else
 					LOGMASKED(LOG_WARNINGS, "%s: warning: unmapped write %02x to %s Port A\n", machine().describe_context(), v, name());
@@ -1026,7 +1009,7 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 		case AY_PORTB:
 			if (m_regs[AY_ENABLE] & 0x80)
 			{
-				if (!m_port_b_write_cb.isnull())
+				if (!m_port_b_write_cb.isunset())
 					m_port_b_write_cb((offs_t)0, m_regs[AY_PORTB]);
 				else
 					LOGMASKED(LOG_WARNINGS, "%s: warning: unmapped write %02x to %s Port B\n", machine().describe_context(), v, name());
@@ -1304,16 +1287,11 @@ void ay8910_device::device_start()
 {
 	const int master_clock = clock();
 
-	if (m_ioports < 1 && !(m_port_a_read_cb.isnull() && m_port_a_write_cb.isnull()))
+	if (m_ioports < 1 && !(m_port_a_read_cb.isunset() && m_port_a_write_cb.isunset()))
 		fatalerror("Device '%s' is a %s and has no port A!", tag(), name());
 
-	if (m_ioports < 2 && !(m_port_b_read_cb.isnull() && m_port_b_write_cb.isnull()))
+	if (m_ioports < 2 && !(m_port_b_read_cb.isunset() && m_port_b_write_cb.isunset()))
 		fatalerror("Device '%s' is a %s and has no port B!", tag(), name());
-
-	m_port_a_read_cb.resolve();
-	m_port_b_read_cb.resolve();
-	m_port_a_write_cb.resolve();
-	m_port_b_write_cb.resolve();
 
 	if ((m_flags & AY8910_SINGLE_OUTPUT) != 0)
 	{
@@ -1452,7 +1430,7 @@ u8 ay8910_device::ay8910_read_ym()
 		   We do need a callback for those two flags. Kid Niki (Irem m62) is one such
 		   case were it makes a difference in comparison to a standard TTL output.
 		*/
-		if (!m_port_a_read_cb.isnull())
+		if (!m_port_a_read_cb.isunset())
 			m_regs[AY_PORTA] = m_port_a_read_cb(0);
 		else
 			LOGMASKED(LOG_WARNINGS, "%s: warning - read 8910 Port A\n", machine().describe_context());
@@ -1460,7 +1438,7 @@ u8 ay8910_device::ay8910_read_ym()
 	case AY_PORTB:
 		if ((m_regs[AY_ENABLE] & 0x80) != 0)
 			LOGMASKED(LOG_WARNINGS, "%s: warning - read from 8910 Port B set as output\n", machine().describe_context());
-		if (!m_port_b_read_cb.isnull())
+		if (!m_port_b_read_cb.isunset())
 			m_regs[AY_PORTB] = m_port_b_read_cb(0);
 		else
 			LOGMASKED(LOG_WARNINGS, "%s: warning - read 8910 Port B\n", machine().describe_context());
@@ -1505,6 +1483,7 @@ void ay8910_device::device_reset()
 {
 	ay8910_reset_ym();
 }
+
 
 /*************************************
  *
@@ -1617,8 +1596,8 @@ ay8910_device::ay8910_device(const machine_config &mconfig, device_type type, co
 	m_par_env(      (!(feature & PSG_HAS_EXPANDED_MODE)) && (psg_type == PSG_TYPE_AY) ? &ay8910_param : &ym2149_param_env),
 	m_flags(AY8910_LEGACY_OUTPUT),
 	m_feature(feature),
-	m_port_a_read_cb(*this),
-	m_port_b_read_cb(*this),
+	m_port_a_read_cb(*this, 0xff),
+	m_port_b_read_cb(*this, 0xff),
 	m_port_a_write_cb(*this),
 	m_port_b_write_cb(*this)
 {

@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "turrett.h"
 
-#include "bus/ata/idehd.h"
+#include "bus/ata/hdd.h"
 
 
 /*************************************
@@ -157,13 +157,13 @@ INPUT_PORTS_END
  *
  *************************************/
 
-READ_LINE_MEMBER( turrett_state::sbrc2_r )
+int turrett_state::sbrc2_r()
 {
 	return m_screen->vblank();
 }
 
 
-READ_LINE_MEMBER( turrett_state::sbrc3_r )
+int turrett_state::sbrc3_r()
 {
 	return m_dma_idle;
 }
@@ -331,7 +331,7 @@ public:
 		if (m_device_head & IDE_DEVICE_HEAD_L)
 			return (((m_device_head & IDE_DEVICE_HEAD_HS) << 24) | (m_cylinder_high << 16) | (m_cylinder_low << 8) | m_sector_number) - 63;
 
-		return ata_mass_storage_device::lba_address();
+		return ide_hdd_device::lba_address();
 	}
 };
 

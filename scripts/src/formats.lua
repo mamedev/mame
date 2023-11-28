@@ -75,6 +75,8 @@ project "formats"
 
 		MAME_DIR .. "src/lib/formats/fsmgr.h",
 		MAME_DIR .. "src/lib/formats/fsmgr.cpp",
+		MAME_DIR .. "src/lib/formats/fsblk.h",
+		MAME_DIR .. "src/lib/formats/fsblk.cpp",
 		MAME_DIR .. "src/lib/formats/fsblk_vec.h",
 		MAME_DIR .. "src/lib/formats/fsblk_vec.cpp",
 		MAME_DIR .. "src/lib/formats/fs_unformatted.h",
@@ -1405,6 +1407,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/nabupc_dsk.h,FORMATS["NABUPC_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "NABUPC_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/nabupc_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/nabupc_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/nanos_dsk.h,FORMATS["NANOS_DSK"] = true
 --------------------------------------------------
 
@@ -1929,6 +1943,18 @@ if opt_tool(FORMATS, "TI99_DSK") then
 	files {
 		MAME_DIR.. "src/lib/formats/ti99_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/ti99_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/tibdd001_dsk.h,FORMATS["TIBDD001_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "TIBDD001_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/tibdd001_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/tibdd001_dsk.h",
 	}
 end
 

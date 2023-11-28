@@ -224,22 +224,22 @@ protected:
 	uint8_t ppi_port_b_r();
 	uint8_t ppi_port_c_r();
 	void ppi_port_c_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
+	void fdc_irq(int state);
 	void ct_w(uint8_t data);
 	void adpcm_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(mfp_irq_callback);
+	void mfp_irq_callback(int state);
 
 	//dmac
-	DECLARE_WRITE_LINE_MEMBER(dma_irq);
+	void dma_irq(int state);
 	void dma_end(offs_t offset, uint8_t data);
 
 	int read_mouse();
 	void set_adpcm();
 
-	DECLARE_WRITE_LINE_MEMBER(fm_irq);
-	template <int N> DECLARE_WRITE_LINE_MEMBER(irq2_line);
-	template <int N> DECLARE_WRITE_LINE_MEMBER(irq4_line);
-	template <int N> DECLARE_WRITE_LINE_MEMBER(nmi_line);
+	void fm_irq(int state);
+	template <int N> void irq2_line(int state);
+	template <int N> void irq4_line(int state);
+	template <int N> void nmi_line(int state);
 
 	void scc_w(offs_t offset, uint16_t data);
 	uint16_t scc_r(offs_t offset);
@@ -288,7 +288,7 @@ protected:
 	bool get_text_pixel(int line, int pixel, uint16_t *pix);
 	bool draw_gfx_scanline(bitmap_ind16 &bitmap, rectangle cliprect, uint8_t priority);
 	bool draw_gfx(bitmap_rgb32 &bitmap,rectangle cliprect);
-	void draw_sprites(bitmap_ind16 &bitmap, int priority, rectangle cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap, screen_device &screen, rectangle cliprect);
 	void draw_bg(bitmap_ind16 &bitmap, screen_device &screen, int layer, bool opaque, rectangle rect);
 	template <bool Blend> rgb_t get_gfx_pixel(int scanline, int pixel, bool gfxblend, rgb_t blendpix);
 
@@ -318,7 +318,7 @@ public:
 	virtual void driver_start() override;
 
 protected:
-	DECLARE_WRITE_LINE_MEMBER(scsi_irq);
+	void scsi_irq(int state);
 	void scsi_unknown_w(uint8_t data);
 
 	required_device<mb89352_device> m_scsictrl;

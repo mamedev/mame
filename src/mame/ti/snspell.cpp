@@ -301,6 +301,14 @@ private:
 	optional_device<software_list_device> m_softlist;
 	required_ioport_array<9> m_inputs;
 
+	u32 m_cart_max_size = 0;
+	u8 *m_cart_base = nullptr;
+
+	bool m_power_on = false;
+	u32 m_r = 0;
+	u16 m_grid = 0;
+	u16 m_plate = 0;
+
 	void power_off();
 	void update_display();
 
@@ -312,14 +320,6 @@ private:
 	void lantrans_write_r(u32 data);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
-
-	u32 m_cart_max_size = 0;
-	u8 *m_cart_base = nullptr;
-
-	bool m_power_on = false;
-	u32 m_r = 0;
-	u16 m_grid = 0;
-	u16 m_plate = 0;
 };
 
 void snspell_state::machine_start()
@@ -521,7 +521,7 @@ static INPUT_PORTS_START( snspell )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_NAME("Repeat")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_NAME("Clue")
 
-	PORT_START("IN.8") // Vss!
+	PORT_START("IN.8") // Vss
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_NAME("Mystery Word")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_NAME("Secret Code")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_NAME("Letter")
@@ -628,7 +628,7 @@ static INPUT_PORTS_START( snspellsp ) // Spanish button names, different alphabe
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8) PORT_NAME("Borra")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_NAME("Repite")
 
-	PORT_START("IN.8") // Vss!
+	PORT_START("IN.8") // Vss
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_NAME("Otra Vez")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_NAME("Palabra Secreta")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_NAME("Dilo")

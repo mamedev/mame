@@ -5,13 +5,13 @@
     Psion Series 3
 
     TODO:
-    - battery backed RAM
     - DTMF tone generator
 
 ******************************************************************************/
 
 #include "emu.h"
 #include "cpu/nec/nec.h"
+#include "machine/nvram.h"
 #include "machine/psion_asic1.h"
 #include "machine/psion_asic2.h"
 #include "machine/psion_ssd.h"
@@ -38,6 +38,7 @@ public:
 		, m_asic1(*this, "asic1")
 		, m_asic2(*this, "asic2")
 		, m_ram(*this, "ram")
+		, m_nvram(*this, "nvram")
 		, m_palette(*this, "palette")
 		, m_keyboard(*this, "COL%u", 0U)
 		, m_dtmf(*this, "dtmf")
@@ -60,6 +61,7 @@ private:
 	required_device<psion_asic1_device> m_asic1;
 	required_device<psion_asic2_device> m_asic2;
 	required_device<ram_device> m_ram;
+	required_device<nvram_device> m_nvram;
 	required_device<palette_device> m_palette;
 	required_ioport_array<10> m_keyboard;
 	required_device<pcd3311_device> m_dtmf;
@@ -72,12 +74,16 @@ private:
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
 	void asic1_map(address_map &map);
+
+	uint8_t port_data_r();
+	void port_data_w(uint8_t data);
 };
 
 
 void psion3_state::machine_start()
 {
 	m_asic1->space(0).install_ram(0, m_ram->mask(), m_ram->pointer());
+	m_nvram->set_base(m_ram->pointer(), m_ram->size());
 }
 
 void psion3_state::machine_reset()
@@ -100,6 +106,7 @@ void psion3_state::io_map(address_map &map)
 
 void psion3_state::asic1_map(address_map &map)
 {
+	map(0x00000, 0x7ffff).noprw();
 	map(0x80000, 0xfffff).rom().region("flash", 0);
 }
 
@@ -244,6 +251,25 @@ INPUT_CHANGED_MEMBER(psion3_state::key_on)
 }
 
 
+uint8_t psion3_state::port_data_r()
+{
+	// b0 MainBattery   - 0 Low, 1 Good
+	// b1 BackupBattery - 0 Low, 1 Good
+	// b2 ?
+	// b3 ExternalPower - 0 Yes, 1 No
+	// b7 NC
+	return 0x03;
+}
+
+void psion3_state::port_data_w(uint8_t data)
+{
+	// b4 ?
+	// b5 VOL0
+	// b6 VOL1
+	logerror("port_data_w: %02x\n", data);
+}
+
+
 void psion3_state::palette_init(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(170, 180, 160));
@@ -267,6 +293,7 @@ void psion3_state::psion3(machine_config &config)
 	PALETTE(config, "palette", FUNC(psion3_state::palette_init), 2);
 
 	PSION_ASIC1(config, m_asic1, 7.68_MHz_XTAL);
+	m_asic1->set_screen("screen");
 	m_asic1->set_laptop_mode(false);
 	m_asic1->set_addrmap(0, &psion3_state::asic1_map);
 	m_asic1->int_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -280,6 +307,8 @@ void psion3_state::psion3(machine_config &config)
 	m_asic2->buz_cb().set(m_speaker, FUNC(speaker_sound_device::level_w));
 	m_asic2->buzvol_cb().set([this](int state) { m_speaker->set_output_gain(ALL_OUTPUTS, state ? 1.0 : 0.25); });
 	m_asic2->col_cb().set([this](uint8_t data) { return m_keyboard[data]->read(); });
+	m_asic2->read_pd_cb().set(FUNC(psion3_state::port_data_r));
+	m_asic2->write_pd_cb().set(FUNC(psion3_state::port_data_w));
 	m_asic2->data_r<1>().set(m_ssd[0], FUNC(psion_ssd_device::data_r));      // SSD Pack 1
 	m_asic2->data_w<1>().set(m_ssd[0], FUNC(psion_ssd_device::data_w));
 	m_asic2->data_r<2>().set(m_ssd[1], FUNC(psion_ssd_device::data_r));      // SSD Pack 2
@@ -288,6 +317,7 @@ void psion3_state::psion3(machine_config &config)
 	m_asic2->data_w<7>().set(m_sibo, FUNC(psion_sibo_slot_device::data_w));
 
 	RAM(config, m_ram).set_default_size("256K").set_extra_options("128K");
+	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00); // Piezo buzzer
@@ -300,7 +330,7 @@ void psion3_state::psion3(machine_config &config)
 	m_ssd[1]->door_cb().set(m_asic2, FUNC(psion_asic2_device::dnmi_w));
 
 	PSION_SIBO_SLOT(config, m_sibo, psion_sibo_devices, nullptr);
-	//m_sibo->int_cb().set(m_asic2, FUNC(psion_asic2_device::eint_w)); // TODO: unknown interrupt line
+	m_sibo->int_cb().set(m_asic2, FUNC(psion_asic2_device::sds_int_w));
 
 	SOFTWARE_LIST(config, "ssd_list").set_original("psion_ssd").set_filter("S3");
 }
@@ -330,12 +360,15 @@ ROM_START(pocketbk)
 	ROM_REGION16_LE(0x80000, "flash", ROMREGION_ERASEFF)
 	ROM_SYSTEM_BIOS(0, "191f", "V1.91F/ACN 270892")
 	ROMX_LOAD("pb_v1.91f_acn.bin", 0x00000, 0x80000, CRC(875a804b) SHA1(9db07b3de9bcb9cc0c56c9a6fb35b9653eba68b3), ROM_BIOS(0))
+
+	ROM_REGION(0x80000, "ssd1", 0) // Acorn Spell was only available pre-installed in a Pocket Book
+	ROM_LOAD("acspell.bin", 0x00000, 0x80000, CRC(2e55032a) SHA1(560a425a19b3f3d12da9a0e2127f2c67aa829082))
 ROM_END
 
 } // anonymous namespace
 
 
 //    YEAR  NAME       PARENT   COMPAT  MACHINE   INPUT      CLASS          INIT         COMPANY             FULLNAME           FLAGS
-COMP( 1991, psion3,    0,       0,      psion3,   psion3,    psion3_state,  empty_init,  "Psion",            "Series 3",        MACHINE_NOT_WORKING )
-COMP( 1992, pocketbk,  psion3,  0,      psion3s,  pocketbk,  psion3_state,  empty_init,  "Acorn Computers",  "Pocket Book",     MACHINE_NOT_WORKING )
-COMP( 1994, psion3s,   psion3,  0,      psion3s,  psion3s,   psion3_state,  empty_init,  "Psion",            "Series 3s",       MACHINE_NOT_WORKING )
+COMP( 1991, psion3,    0,       0,      psion3,   psion3,    psion3_state,  empty_init,  "Psion",            "Series 3",        MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1992, pocketbk,  psion3,  0,      psion3s,  pocketbk,  psion3_state,  empty_init,  "Acorn Computers",  "Pocket Book",     MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1994, psion3s,   psion3,  0,      psion3s,  psion3s,   psion3_state,  empty_init,  "Psion",            "Series 3s",       MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

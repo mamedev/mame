@@ -43,7 +43,7 @@ private:
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
 
 	void control_latch_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(system_reset_w);
+	void system_reset_w(int state);
 
 	void mem_map(address_map &map);
 	void char_map(address_map &map);
@@ -105,7 +105,7 @@ void tv955_state::control_latch_w(u8 data)
 	}
 }
 
-WRITE_LINE_MEMBER(tv955_state::system_reset_w)
+void tv955_state::system_reset_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
 	if (!state)

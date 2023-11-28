@@ -155,9 +155,9 @@ z80dma_device::z80dma_device(const machine_config &mconfig, const char *tag, dev
 	, m_out_int_cb(*this)
 	, m_out_ieo_cb(*this)
 	, m_out_bao_cb(*this)
-	, m_in_mreq_cb(*this)
+	, m_in_mreq_cb(*this, 0)
 	, m_out_mreq_cb(*this)
-	, m_in_iorq_cb(*this)
+	, m_in_iorq_cb(*this, 0)
 	, m_out_iorq_cb(*this)
 {
 }
@@ -169,16 +169,6 @@ z80dma_device::z80dma_device(const machine_config &mconfig, const char *tag, dev
 
 void z80dma_device::device_start()
 {
-	// resolve callbacks
-	m_out_busreq_cb.resolve_safe();
-	m_out_int_cb.resolve_safe();
-	m_out_ieo_cb.resolve_safe();
-	m_out_bao_cb.resolve_safe();
-	m_in_mreq_cb.resolve_safe(0);
-	m_out_mreq_cb.resolve_safe();
-	m_in_iorq_cb.resolve_safe(0);
-	m_out_iorq_cb.resolve_safe();
-
 	// allocate timer
 	m_timer = timer_alloc(FUNC(z80dma_device::timerproc), this);
 
@@ -859,7 +849,7 @@ TIMER_CALLBACK_MEMBER(z80dma_device::rdy_write_callback)
 //  rdy_w - ready input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(z80dma_device::rdy_w)
+void z80dma_device::rdy_w(int state)
 {
 	LOG("Z80DMA RDY: %d Active High: %d\n", state, READY_ACTIVE_HIGH);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(z80dma_device::rdy_write_callback),this), state);
@@ -870,7 +860,7 @@ WRITE_LINE_MEMBER(z80dma_device::rdy_w)
 //  wait_w - wait input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(z80dma_device::wait_w)
+void z80dma_device::wait_w(int state)
 {
 }
 
@@ -879,6 +869,6 @@ WRITE_LINE_MEMBER(z80dma_device::wait_w)
 //  bai_w - bus acknowledge input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(z80dma_device::bai_w)
+void z80dma_device::bai_w(int state)
 {
 }

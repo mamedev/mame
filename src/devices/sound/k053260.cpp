@@ -113,9 +113,6 @@ k053260_device::k053260_device(const machine_config &mconfig, const char *tag, d
 
 void k053260_device::device_start()
 {
-	m_sh1_cb.resolve_safe();
-	m_sh2_cb.resolve_safe();
-
 	m_stream = stream_alloc(0, 2, clock() / CLOCKS_PER_SAMPLE);
 
 	/* register with the save state system */

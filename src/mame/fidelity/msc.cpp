@@ -37,7 +37,7 @@ and one for MCS48. A12 is forced high or low to select the bank.
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_msc_v1.lh" // clickable
+#include "fidel_msc_v1.lh"
 
 
 namespace {
@@ -68,6 +68,9 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport m_inputs;
 
+	u8 m_led_select = 0;
+	u16 m_inp_mux = 0;
+
 	// address maps
 	void main_map(address_map &map);
 
@@ -80,9 +83,6 @@ private:
 	u8 read_inputs();
 	u8 input_hi_r();
 	u8 input_lo_r();
-
-	u8 m_led_select = 0;
-	u16 m_inp_mux = 0;
 };
 
 void msc_state::machine_start()
@@ -97,8 +97,6 @@ void msc_state::machine_start()
 /*******************************************************************************
     I/O
 *******************************************************************************/
-
-// MCU ports/generic
 
 void msc_state::update_display()
 {

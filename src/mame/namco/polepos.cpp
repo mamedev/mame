@@ -292,12 +292,12 @@ uint8_t polepos_state::ready_r()
 	return ret;
 }
 
-WRITE_LINE_MEMBER(polepos_state::gasel_w)
+void polepos_state::gasel_w(int state)
 {
 	m_adc_input = state;
 }
 
-WRITE_LINE_MEMBER(polepos_state::sb0_w)
+void polepos_state::sb0_w(int state)
 {
 	m_auto_start_mask = !state;
 }
@@ -311,7 +311,7 @@ template<bool sub1> void polepos_state::z8002_nvi_enable_w(uint16_t data)
 		(sub1 ? m_subcpu : m_subcpu2)->set_input_line(z8002_device::NVI_LINE, CLEAR_LINE);
 }
 
-READ_LINE_MEMBER(polepos_state::auto_start_r)
+int polepos_state::auto_start_r()
 {
 	return m_auto_start_mask;
 }
@@ -325,7 +325,7 @@ void polepos_state::out(uint8_t data)
 	machine().bookkeeping().coin_counter_w(0,~data & 8);
 }
 
-WRITE_LINE_MEMBER(polepos_state::lockout)
+void polepos_state::lockout(int state)
 {
 	machine().bookkeeping().coin_lockout_global_w(state);
 }
@@ -1404,6 +1404,84 @@ ROM_START( poleposa2 )
 	ROM_LOAD( "137279-001.7c", 0x0200, 0x00eb, CRC(4ddc51ba) SHA1(78e64ef9074bd103662bc78a312e3a2b2b0957cc) ) // N82S153N
 ROM_END
 
+ROM_START( poleposa1n ) // dumped from an original NAMCO 22089612 (22089632) PCB
+	// Z80 memory/ROM data
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pp2_9.6h",  0x0000, 0x2000, CRC(c918c043) SHA1(abc1aa3d7b670b5a65b4565dc646cd3c4edf4e6f) )
+	ROM_LOAD( "pp2_10.5h", 0x2000, 0x1000, CRC(7174bcb7) SHA1(460326a6cea201db2df813013c95562a222ea95d) )
+
+	// Z8002 #1 memory/ROM data
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD16_BYTE( "pp2_1.8m", 0x0001, 0x2000, CRC(8c2cf172) SHA1(57c774afab79599ac3f434113c3170fbb3d42620) )
+	ROM_LOAD16_BYTE( "pp2_2.8l", 0x0000, 0x2000, CRC(51018857) SHA1(ed28d44d172a01f76461f556229d1fe3a1b779a7) )
+
+	// Z8002 #2 memory/ROM data
+	ROM_REGION( 0x10000, "sub2", 0 )
+	ROM_LOAD16_BYTE( "pp2_5.4m", 0x0001, 0x2000, CRC(af4fc019) SHA1(1bb6c0f3ffada2e1df72e1767581f8e8bb2b18f9) )
+	ROM_LOAD16_BYTE( "pp2_6.4l", 0x0000, 0x2000, CRC(ba0045f3) SHA1(aedb8d8c56407963aa4ffb66243288c8fd6d845a) )
+
+	// graphics data
+	ROM_REGION( 0x01000, "gfx1", 0 ) // 2bpp alpha layer
+	ROM_LOAD( "pp2_28.1f", 0x0000, 0x1000, CRC(a949aa85) SHA1(2d6414196b6071101001128418233e585279ffb9) )
+
+	ROM_REGION( 0x01000, "gfx2", 0 ) // 2bpp view layer
+	ROM_LOAD( "pp1_29.1e", 0x0000, 0x1000, CRC(706e888a) SHA1(af1aa2199fcf73a3afbe760857ff117865350954) )
+
+	ROM_REGION( 0x04000, "gfx3", 0 ) // 4bpp 16x16 sprites
+	ROM_LOAD( "pp2_25.1n", 0x0000, 0x2000, CRC(34c2d310) SHA1(151513da03c49436e16856bfe9666526f81eda71) ) // 4bpp sm sprites, planes 0+1
+	ROM_LOAD( "pp2_26.1m", 0x2000, 0x2000, CRC(ba3005f3) SHA1(faef996b1282c97644a0cb503cb6a98a16084d30) ) // 4bpp sm sprites, planes 2+3
+
+	ROM_REGION( 0x10000, "gfx4", 0 ) // 4bpp 32x32 sprites
+	ROM_LOAD( "pp2_17.5n", 0x0000, 0x2000, CRC(2e134b46) SHA1(0938f5f9f5cc6d7c1096c569449db78dbc42da01) ) // 4bpp lg sprites, planes 0+1
+	ROM_LOAD( "pp2_19.4n", 0x2000, 0x2000, CRC(1c5c05b7) SHA1(2c2e912b7fd030d8c120508195aa6b1f3a6b34fc) )
+	ROM_LOAD( "pp2_21.3n", 0x4000, 0x2000, CRC(020f4de5) SHA1(50cb1633f50703fdc941b3183b0d2fac4977f687) )
+	ROM_LOAD( "pp2_18.5m", 0x8000, 0x2000, CRC(6f9997d2) SHA1(b26d505266ccf23bfd867f881756c3251c80f57b) ) // bpp lg sprites, planes 2+3
+	ROM_LOAD( "pp2_20.4m", 0xa000, 0x2000, CRC(b8a0411c) SHA1(fe6ac41c950004ef729733c6561d6d76ffeecf98) )
+	ROM_LOAD( "pp2_22.3m", 0xc000, 0x2000, CRC(4fbf3e94) SHA1(ec7ab91c7db768425e47c625098008f4d7da7bb0) )
+
+	ROM_REGION( 0x5000, "gfx5", 0 )  // road generation ROMs needed at runtime
+	ROM_LOAD( "pp1_30.3a", 0x0000, 0x2000, CRC(ee6b3315) SHA1(9cc26c6d3604c0f60d716f86e67e9d9c0487f87d) )    /* road control */
+	ROM_LOAD( "pp1_31.2a", 0x2000, 0x2000, CRC(6d1e7042) SHA1(90113ff0c93ed86d95067290088705bb5e6608d1) )    /* road bits 1 */
+	ROM_LOAD( "pp1_32.1a", 0x4000, 0x1000, CRC(4e97f101) SHA1(f377d053821c74aee93ebcd30a4d43e6156f3cfe) )    /* road bits 2 */
+
+	ROM_REGION( 0x1000, "gfx6", 0 )  // sprite scaling
+	ROM_LOAD( "pp1_27.1l", 0x0000, 0x1000, CRC(a61bff15) SHA1(f7a59970831cdaaa7bf59c2221a38e4746c54244) ) // vertical scaling
+
+	// graphics PROM data
+	ROM_REGION( 0x1040, "proms", 0 )
+	ROM_LOAD( "pp1-7.8l",   0x0000, 0x0100, CRC(f07ff2ad) SHA1(e1f3cb10a03d23f8c1d422acf271dba4e7b98cb1) ) // red palette
+	ROM_LOAD( "pp1-8.9l",   0x0100, 0x0100, CRC(adbde7d7) SHA1(956ac5117c1e310f554ac705aa2dc24a796c36a5) ) // green palette
+	ROM_LOAD( "pp1-9.10l",  0x0200, 0x0100, CRC(ddac786a) SHA1(d1860105bf91297533ccc4aa6775987df198d0fa) ) // blue palette
+	ROM_LOAD( "pp2-10.2h",  0x0300, 0x0100, CRC(1e8d0491) SHA1(e8bf1db5c1fb04a35763099965cf5c588240bde5) ) // alpha color
+	ROM_LOAD( "pp1-11.4d",  0x0400, 0x0100, CRC(0e4fe8a0) SHA1(d330b1e5ebccf5bbefcf71486fd80d816de38196) ) // background color
+	ROM_LOAD( "pp1-15.9a",  0x0500, 0x0100, CRC(2d502464) SHA1(682b7dd22e51d5db52c0804b7e27e47641dfa6bd) ) // vertical position low
+	ROM_LOAD( "pp1-16.10a", 0x0600, 0x0100, CRC(027aa62c) SHA1(c7030d8b64b80e107c446f6fbdd63f560c0a91c0) ) // vertical position med
+	ROM_LOAD( "pp1-17.11a", 0x0700, 0x0100, CRC(1f8d0df3) SHA1(b8f17758f114f5e247b65b3f2922ca2660757e66) ) // vertical position hi
+	ROM_LOAD( "pp1-12.3c",  0x0800, 0x0400, CRC(7afc7cfc) SHA1(ba2407f6eff124e881b354f13205a4c058b7cf60) ) // road color
+	ROM_LOAD( "pp2-6.6m",   0x0c00, 0x0400, CRC(b448c934) SHA1(8f3f440a922c5c4a1cad17c87662860610c4dd9d) ) // sprite color
+	ROM_LOAD( "pp1-13.8e",  0x1000, 0x0020, CRC(4330a51b) SHA1(9531d18ce2de4eda9913d47ef8c5cd8f05791716) ) // video RAM address decoder (not used)
+	ROM_LOAD( "pp1-14.9e",  0x1020, 0x0020, CRC(4330a51b) SHA1(9531d18ce2de4eda9913d47ef8c5cd8f05791716) ) // video RAM address decoder (not used)
+
+	// sound PROM data
+	ROM_REGION( 0x0100, "namco", 0 ) // not dumped for this set
+	ROM_LOAD( "136014-118.11d", 0x0000, 0x0100, CRC(8568decc) SHA1(0aac1fa082858d4d201e21511c609a989f9a1535) ) // Namco sound
+
+	ROM_REGION( 0x4000, "engine", 0 ) // not dumped for this set
+	ROM_LOAD( "136014-110.12f", 0x0000, 0x2000, CRC(b5ad4d5f) SHA1(c07e77a050200d6fe9952031f971ca35f4d15ff8) ) // engine sound
+	ROM_LOAD( "136014-111.12e", 0x2000, 0x2000, CRC(8fdd2f6f) SHA1(3818dc94c60cd78c4212ab7a4367cf3d98166ee6) ) // engine sound
+
+	ROM_REGION( 0x6000, "52xx", 0 ) // not dumped for this set
+	ROM_LOAD( "136014-106.9c", 0x0000, 0x2000, CRC(5b4cf05e) SHA1(52342572940489175607bbf5b6cfd05ee9b0f004) ) // voice
+
+	ROM_REGION( 0x0100, "user1", 0 ) // not dumped for this set
+	ROM_LOAD( "136014-117.7l", 0x0000, 0x0100, CRC(2401c817) SHA1(8991b7994513a469e64392fa8f233af5e5f06d54) ) // sync chain (unused)
+
+	ROM_REGION( 0x0300, "cpu_pals", 0 ) // PALs located on the CPU board, not dumped for this set
+	ROM_LOAD( "137316-001.2n", 0x0000, 0x0034, CRC(dd37bd15) SHA1(3820203c8d7a64826ed6172be38d51fc70792ccd) ) // MMI PAL12L6CN - manual states 137280-001
+	ROM_LOAD( "137316-001.5c", 0x0100, 0x0034, CRC(dd37bd15) SHA1(3820203c8d7a64826ed6172be38d51fc70792ccd) ) // MMI PAL12L6CN - manual states 137280-001
+	ROM_LOAD( "137279-001.7c", 0x0200, 0x00eb, CRC(4ddc51ba) SHA1(78e64ef9074bd103662bc78a312e3a2b2b0957cc) ) // N82S153N
+ROM_END
+
 /*
 Top Racer / Pole Position I/II (?)
 
@@ -2459,6 +2537,7 @@ void polepos_state::init_polepos2()
 GAME( 1982, polepos,    0,        polepos,    poleposa,  polepos_state, empty_init,    ROT0, "Namco",                   "Pole Position (World)",                                MACHINE_SUPPORTS_SAVE )
 GAME( 1982, poleposj,   polepos,  polepos,    polepos,   polepos_state, empty_init,    ROT0, "Namco",                   "Pole Position (Japan)",                                MACHINE_SUPPORTS_SAVE )
 GAME( 1982, poleposa1,  polepos,  polepos,    poleposa,  polepos_state, empty_init,    ROT0, "Namco (Atari license)",   "Pole Position (Atari version 1)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1982, poleposa1n, polepos,  polepos,    poleposa,  polepos_state, empty_init,    ROT0, "Namco (Atari license)",   "Pole Position (Atari version 1 on Namco PCB)",         MACHINE_SUPPORTS_SAVE )
 GAME( 1982, poleposa2,  polepos,  polepos,    poleposa,  polepos_state, empty_init,    ROT0, "Namco (Atari license)",   "Pole Position (Atari version 2)",                      MACHINE_SUPPORTS_SAVE )
 GAME( 1984, topracer,   polepos,  polepos,    polepos,   polepos_state, empty_init,    ROT0, "bootleg",                 "Top Racer (with MB8841 + MB8842, 1984)",               MACHINE_SUPPORTS_SAVE ) // the NAMCO customs have been cloned on these bootlegs
 GAME( 1983, topracera,  polepos,  polepos,    polepos,   polepos_state, empty_init,    ROT0, "bootleg",                 "Top Racer (with MB8841 + MB8842, 1983)",               MACHINE_SUPPORTS_SAVE ) // the only difference between them is the year displayed on the title screen

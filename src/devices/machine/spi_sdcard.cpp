@@ -29,6 +29,8 @@
 #include "spi_sdcard.h"
 #include "imagedev/harddriv.h"
 
+#include "multibyte.h"
+
 #define LOG_COMMAND (1U << 1)
 #define LOG_SPI     (1U << 2)
 
@@ -72,7 +74,6 @@ ALLOW_SAVE_TYPE(spi_sdcard_device::sd_type);
 
 void spi_sdcard_device::device_start()
 {
-	write_miso.resolve_safe();
 	save_item(NAME(m_state));
 	save_item(NAME(m_in_latch));
 	save_item(NAME(m_out_latch));
@@ -182,8 +183,7 @@ void spi_sdcard_device::latch_in()
 				m_data[0] = 0xfe; // data token
 				m_image->read(m_blknext++, &m_data[1]);
 				util::crc16_t crc16 = util::crc16_creator::simple(&m_data[1], m_blksize);
-				m_data[m_blksize + 1] = (crc16 >> 8) & 0xff;
-				m_data[m_blksize + 2] = (crc16 & 0xff);
+				put_u16be(&m_data[m_blksize + 1], crc16);
 				send_data(1 + m_blksize + 2, SD_STATE_DATA_MULTI);
 			}
 			break;
@@ -278,18 +278,14 @@ void spi_sdcard_device::do_command()
 			m_data[11] = 0x10; // Product Revision in BCD (1.0)
 			{
 				u32 uSerial = 0x12345678;
-				m_data[12] = (uSerial >> 24) & 0xff; // PSN - Product Serial Number
-				m_data[13] = (uSerial >> 16) & 0xff;
-				m_data[14] = (uSerial >> 8) & 0xff;
-				m_data[15] = (uSerial & 0xff);
+				put_u32be(&m_data[12], uSerial); // PSN - Product Serial Number
 			}
 			m_data[16] = 0x01; // MDT - Manufacturing Date
 			m_data[17] = 0x59; // 0x15 9 = 2021, September
 			m_data[18] = 0x00; // CRC7, bit 0 is always 0
 			{
 				util::crc16_t crc16 = util::crc16_creator::simple(&m_data[3], 16);
-				m_data[19] = (crc16 >> 8) & 0xff;
-				m_data[20] = (crc16 & 0xff);
+				put_u16be(&m_data[19], crc16);
 			}
 			send_data(3 + 16 + 2, SD_STATE_STBY);
 			break;
@@ -305,7 +301,7 @@ void spi_sdcard_device::do_command()
 			break;
 
 		case 16: // CMD16 - SET_BLOCKLEN
-			m_blksize = (u16(m_cmd[3]) << 8) | u16(m_cmd[4]);
+			m_blksize = get_u16be(&m_cmd[3]);
 			if (m_image->set_block_size(m_blksize))
 			{
 				m_data[0] = 0;
@@ -328,7 +324,7 @@ void spi_sdcard_device::do_command()
 				// byte of space between R1 and the data packet.
 				m_data[1] = 0xff;
 				m_data[2] = 0xfe; // data token
-				u32 blk = (u32(m_cmd[1]) << 24) | (u32(m_cmd[2]) << 16) | (u32(m_cmd[3]) << 8) | u32(m_cmd[4]);
+				u32 blk = get_u32be(&m_cmd[1]);
 				if (m_type == SD_TYPE_V2)
 				{
 					blk /= m_blksize;
@@ -337,8 +333,7 @@ void spi_sdcard_device::do_command()
 				m_image->read(blk, &m_data[3]);
 				{
 					util::crc16_t crc16 = util::crc16_creator::simple(&m_data[3], m_blksize);
-					m_data[m_blksize + 3] = (crc16 >> 8) & 0xff;
-					m_data[m_blksize + 4] = (crc16 & 0xff);
+					put_u16be(&m_data[m_blksize + 3], crc16);
 				}
 				send_data(3 + m_blksize + 2, SD_STATE_DATA);
 			}
@@ -356,7 +351,7 @@ void spi_sdcard_device::do_command()
 				// data token occurs some time after the R1 response.  A2SD
 				// expects at least 1 byte of space between R1 and the data
 				// packet.
-				m_blknext = (u32(m_cmd[1]) << 24) | (u32(m_cmd[2]) << 16) | (u32(m_cmd[3]) << 8) | u32(m_cmd[4]);
+				m_blknext = get_u32be(&m_cmd[1]);
 				if (m_type == SD_TYPE_V2)
 				{
 					m_blknext /= m_blksize;
@@ -371,7 +366,7 @@ void spi_sdcard_device::do_command()
 
 		case 24: // CMD24 - WRITE_BLOCK
 			m_data[0] = 0;
-			m_blknext = (u32(m_cmd[1]) << 24) | (u32(m_cmd[2]) << 16) | (u32(m_cmd[3]) << 8) | u32(m_cmd[4]);
+			m_blknext = get_u32be(&m_cmd[1]);
 			if (m_type == SD_TYPE_V2)
 			{
 				m_blknext /= m_blksize;

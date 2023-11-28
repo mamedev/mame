@@ -216,16 +216,16 @@ protected:
 	required_ioport_array<10> m_inputs;
 	output_finder<> m_power_on;
 
+	u8 *m_cart_base = nullptr;
+	u16 m_o = 0;
+	u32 m_r = 0;
+
 	void power_off();
 	virtual u8 read_k();
 	void write_o(u16 data);
 	void write_r(u32 data);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
-
-	u8 *m_cart_base = nullptr;
-	u16 m_o = 0;
-	u32 m_r = 0;
 };
 
 void snspellc_state::machine_start()
@@ -263,10 +263,10 @@ private:
 	optional_ioport m_overlay_inp;
 	output_finder<5> m_overlay_out;
 
+	u8 m_overlay_code = 0;
+
 	u8 get_hexchar(const char c);
 	TIMER_DEVICE_CALLBACK_MEMBER(get_overlay);
-
-	u8 m_overlay_code = 0;
 };
 
 void tntell_state::machine_start()
@@ -519,7 +519,7 @@ static INPUT_PORTS_START( snspellc )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('R')
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('\'')
 
-	PORT_START("IN.9") // Vss!
+	PORT_START("IN.9") // Vss
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_F1) PORT_NAME("Spell/On") PORT_CHANGED_MEMBER(DEVICE_SELF, snspellc_state, power_on, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) // speech chip data
@@ -583,7 +583,7 @@ static INPUT_PORTS_START( mathsmag )
 	PORT_START("IN.8") // R8
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("IN.9") // Vss!
+	PORT_START("IN.9") // Vss
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F1) PORT_NAME("Marche / Calcule") PORT_CHANGED_MEMBER(DEVICE_SELF, snspellc_state, power_on, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F2) PORT_NAME(u8"Arrét") // -> auto_power_off
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -648,7 +648,7 @@ static INPUT_PORTS_START( tntell )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("Grid 6-4")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("Grid 6-3")
 
-	PORT_START("IN.9") // Vss!
+	PORT_START("IN.9") // Vss
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_F1) PORT_NAME("Grid 6-6 (On)") PORT_CHANGED_MEMBER(DEVICE_SELF, tntell_state, power_on, 0)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) // speech chip data

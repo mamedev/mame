@@ -123,21 +123,21 @@ protected:
 	uint8_t pia_pb_r();
 	void pia_pa_w(uint8_t data);
 	void pia_pb_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER(pia_ca1_r);
-	DECLARE_WRITE_LINE_MEMBER(pia_cb2_w);
+	int pia_ca1_r();
+	void pia_cb2_w(int state);
 
 	void baud_write(uint16_t data);
-	DECLARE_WRITE_LINE_MEMBER(com8116_a_fr_w);
-	DECLARE_WRITE_LINE_MEMBER(com8116_a_ft_w);
-	DECLARE_WRITE_LINE_MEMBER(com8116_b_fr_w);
-	DECLARE_WRITE_LINE_MEMBER(com8116_b_ft_w);
+	void com8116_a_fr_w(int state);
+	void com8116_a_ft_w(int state);
+	void com8116_b_fr_w(int state);
+	void com8116_b_ft_w(int state);
 
 	uint8_t adlc_r(offs_t offset);
 	void adlc_w(offs_t offset, uint8_t data);
 
 	void earom_write(uint8_t data);
 	void misccr_write(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(system_clock_write);
+	void system_clock_write(int state);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -227,12 +227,12 @@ void bitgraph_state::pia_w(offs_t offset, uint8_t data)
 	return m_pia->write(3 - offset, data);
 }
 
-READ_LINE_MEMBER(bitgraph_state::pia_ca1_r)
+int bitgraph_state::pia_ca1_r()
 {
 	return m_screen->frame_number() & 1;
 }
 
-WRITE_LINE_MEMBER(bitgraph_state::pia_cb2_w)
+void bitgraph_state::pia_cb2_w(int state)
 {
 	// no-op to shut up verbose log
 }
@@ -309,7 +309,7 @@ void bitgraph_state::misccr_write(uint8_t data)
 	m_misccr = data;
 }
 
-WRITE_LINE_MEMBER(bitgraph_state::system_clock_write)
+void bitgraph_state::system_clock_write(int state)
 {
 	if (!BIT(m_pia_b, 6))
 	{
@@ -337,25 +337,25 @@ void bitgraph_state::baud_write(uint16_t data)
 	m_dbrga->str_w((data >> 12) & 15);  // 0 HOST
 }
 
-WRITE_LINE_MEMBER(bitgraph_state::com8116_a_fr_w)
+void bitgraph_state::com8116_a_fr_w(int state)
 {
 	m_acia0->write_txc(state);
 	m_acia0->write_rxc(state);
 }
 
-WRITE_LINE_MEMBER(bitgraph_state::com8116_a_ft_w)
+void bitgraph_state::com8116_a_ft_w(int state)
 {
 	m_acia1->write_txc(state);
 	m_acia1->write_rxc(state);
 }
 
-WRITE_LINE_MEMBER(bitgraph_state::com8116_b_fr_w)
+void bitgraph_state::com8116_b_fr_w(int state)
 {
 	m_acia2->write_txc(state);
 	m_acia2->write_rxc(state);
 }
 
-WRITE_LINE_MEMBER(bitgraph_state::com8116_b_ft_w)
+void bitgraph_state::com8116_b_ft_w(int state)
 {
 	if (m_acia3.found())
 	{
@@ -517,7 +517,7 @@ void bitgraph_state::bg_motherboard(machine_config &config)
 	m_dbrgb->fr_handler().set(FUNC(bitgraph_state::com8116_b_fr_w));
 	m_dbrgb->ft_handler().set(FUNC(bitgraph_state::com8116_b_ft_w));
 
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->readca1_handler().set(FUNC(bitgraph_state::pia_ca1_r));
 	m_pia->cb2_handler().set(FUNC(bitgraph_state::pia_cb2_w));
 	m_pia->readpa_handler().set(FUNC(bitgraph_state::pia_pa_r));

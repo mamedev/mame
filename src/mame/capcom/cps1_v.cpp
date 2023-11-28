@@ -97,6 +97,7 @@ U.S. Navy (Japan 901012)                                           89625B-1   CA
 Nemo (World 901109)                                          1990  89624B-3   NM24B            IOB1  88622-C-5    CPS-B-15  DL-0411-10010  None
 Nemo (World 901130)                                                89624B-3   NM24B            IOB1  88622-C-5    CPS-B-15  DL-0411-10010  None
 Nemo (Japan 901120)                                                89622B-3   NM22B            LWIO  88622-C-5    CPS-B-15  DL-0411-10010  None
+Nemo (Japan 901120)                                                89625B-1   NM22B            IOB1  88622-C-5    CPS-B-15  DL-0411-10010  None
 
 Street Fighter II: The World Warrior (World 910129)          1991  90629B-2   STF29            IOB1  90632C-1     CPS-B-17  DL-0411-10012  C632
 Street Fighter II: The World Warrior (World 910204)#               90629B-2   STF29            IOB1  90632C-1     CPS-B-17  DL-0411-10012  C632
@@ -1800,7 +1801,8 @@ static const struct CPS1config cps1_config_table[]=
 	{"chikij",      CPS_B_14,     mapper_CK22B },   // equivalent to CK24B
 	{"nemo",        CPS_B_15,     mapper_NM24B },
 	{"nemor1",      CPS_B_15,     mapper_NM24B },
-	{"nemoj",       CPS_B_15,     mapper_NM24B },   // wrong, this set uses NM22B, still not dumped
+	{"nemoj",       CPS_B_15,     mapper_NM24B },   // wrong, this set uses NM22B (dumped), specific mapper not implemented
+	{"nemoja",      CPS_B_15,     mapper_NM24B },   // wrong, this set uses NM22B (dumped), specific mapper not implemented
 	{"cawing",      CPS_B_16,     mapper_CA24B },
 	{"cawingr1",    CPS_B_16,     mapper_CA24B },
 	{"cawingu",     CPS_B_05,     mapper_CA22B },   // equivalent to CA24B
@@ -1993,6 +1995,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"pang3b4",     CPS_B_21_DEF, mapper_pang3b4 },
 	{"pang3b5",     CPS_B_21_DEF, mapper_CP1B1F_boot },   /* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */
 	{"ganbare",     CPS_B_21_DEF, mapper_GBPR2 },
+	{"pmonster",    CPS_B_21_DEF, mapper_GBPR2 },   // wrong, this set uses GBP63B, dumped but not reversed yet
 	{"gulunpa",     CPS_B_21_DEF, mapper_gulunpa }, // wrong
 
 	/* CPS Changer */
@@ -3112,7 +3115,7 @@ uint32_t cps_state::screen_update_cps1(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-WRITE_LINE_MEMBER(cps_state::screen_vblank_cps1)
+void cps_state::screen_vblank_cps1(int state)
 {
 	// rising edge
 	if (state)

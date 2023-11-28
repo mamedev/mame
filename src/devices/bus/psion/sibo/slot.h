@@ -53,16 +53,16 @@ public:
 	uint8_t data_r();
 	void data_w(uint16_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( int_w ) { m_int_cb(state); }
+	void int_w(int state) { m_int_cb(state); }
 
 protected:
-	// device-level overrides
+	// device_t overrides
 	virtual void device_start() override;
-
-	device_psion_sibo_interface *m_card;
 
 private:
 	devcb_write_line m_int_cb;
+
+	device_psion_sibo_interface *m_card;
 };
 
 

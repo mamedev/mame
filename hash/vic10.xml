@@ -6,7 +6,7 @@ license:CC0-1.0
 <softwarelist name="vic10" description="Commodore VIC-10 / Max Machine / UltiMax cartridges">
 
 	<software name="avengera" cloneof="avenger">
-		<description>Avenger (Jpn, v.02)</description>
+		<description>Avenger (Japan, v.02)</description>
 		<year>1982</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="C-64621" />
@@ -18,7 +18,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="avenger">
-		<description>Avenger (Euro, USA)</description>
+		<description>Avenger (Europe, USA)</description>
 		<year>1983</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="C-64621" />
@@ -30,7 +30,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bowling">
-		<description>Bowling (Jpn)</description>
+		<description>Bowling (Japan)</description>
 		<year>1983</year>
 		<publisher>HAL Laboratory</publisher>
 		<part name="cart" interface="vic10_cart">
@@ -44,7 +44,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="clownsa" cloneof="clowns">
-		<description>Clowns (Jpn, v.01)</description>
+		<description>Clowns (Japan, v.01)</description>
 		<year>1982</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="C-64606" />
@@ -56,7 +56,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="clowns">
-		<description>Clowns (Jpn, Newer)</description>
+		<description>Clowns (Japan, newer)</description>
 		<year>1982</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="C-64606" />
@@ -96,7 +96,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="lemans">
-		<description>Le Mans (Euro, USA)</description>
+		<description>Le Mans (Europe, USA)</description>
 		<year>1982</year>
 		<publisher>Commodore / HAL Laboratory</publisher>
 		<info name="serial" value="C-64616" />
@@ -108,7 +108,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="basic">
-		<description>MAX Basic (Jpn)</description>
+		<description>MAX Basic (Japan)</description>
 		<year>19??</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="vic10_cart">
@@ -123,7 +123,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="minibas">
-		<description>Mini Basic I (Jpn)</description>
+		<description>Mini Basic I (Japan)</description>
 		<year>19??</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="vic10_cart">
@@ -134,7 +134,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="moleattk">
-		<description>Mole Attack (Jpn, v.01)</description>
+		<description>Mole Attack (Japan, v.01)</description>
 		<year>1982</year>
 		<publisher>Commodore / HAL Laboratory</publisher>
 		<part name="cart" interface="vic10_cart">
@@ -145,7 +145,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="moneywar">
-		<description>Money Wars (Jpn, v.01)</description>
+		<description>Money Wars (Japan, v.01)</description>
 		<year>1982</year>
 		<publisher>Commodore / HAL Laboratory</publisher>
 		<part name="cart" interface="vic10_cart">
@@ -169,7 +169,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="musicm">
-		<description>Music Machine (Euro, USA)</description>
+		<description>Music Machine (Europe, USA)</description>
 		<year>1982</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="C-64402" />
@@ -181,7 +181,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="omegrace">
-		<description>Omega Race (Jpn, v.02)</description>
+		<description>Omega Race (Japan, v.02)</description>
 		<year>1982</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="C-64614" />
@@ -208,7 +208,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="radarrr2" cloneof="radarrr">
-		<description>Radar Rat Race (Alt)</description>
+		<description>Radar Rat Race (alt)</description>
 		<year>1982</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="C-64605" />
@@ -220,7 +220,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="radarrr1" cloneof="radarrr">
-		<description>Radar Rat Race (Jpn, v.02, Alt)</description>
+		<description>Radar Rat Race (Japan, v.02, alt)</description>
 		<year>1982</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="C-64605" />
@@ -232,7 +232,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="radarrr">
-		<description>Radar Rat Race (Jpn, v.02)</description>
+		<description>Radar Rat Race (Japan, v.02)</description>
 		<year>1982</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="C-64605" />
@@ -244,7 +244,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="roadrace">
-		<description>Road Race (Jpn, v.02)</description>
+		<description>Road Race (Japan, v.02)</description>
 		<year>1983</year>
 		<publisher>Commodore / HAL Laboratory</publisher>
 		<part name="cart" interface="vic10_cart">
@@ -255,7 +255,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="seawolf">
-		<description>Sea Wolf (Euro, USA)</description>
+		<description>Sea Wolf (Europe, USA)</description>
 		<year>1982</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="C-64603" />
@@ -266,8 +266,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="slalom">
+		<description>Slalom (World)</description>
+		<year>1983</year>
+		<publisher>Commodore / HAL Laboratory</publisher>
+		<part name="cart" interface="vic10_cart">
+			<dataarea name="lorom" size="0x2000">
+				<rom name="slalom.80" size="0x2000" crc="023e6349" sha1="bfcd2eb18900b92eef713f1636e01fdea1f5bb56" offset="0x0000" />
+			</dataarea>
+			<dataarea name="uprom" size="0x2000">
+				<rom name="slalom.e0" size="0x2000" crc="2d1acb56" sha1="616492972dca95e135b7f1f5a4377c00fb2c2170" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="spedmath">
-		<description>Speed Math &amp; Bingo Math (Euro, USA, v.01)</description>
+		<description>Speed Math &amp; Bingo Math (Europe, USA, v.01)</description>
 		<year>1982</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="C-64604" />
@@ -279,7 +293,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="supalien">
-		<description>Super Alien (Jpn, v.01)</description>
+		<description>Super Alien (Japan, v.01)</description>
 		<year>1982</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="vic10_cart">
@@ -290,7 +304,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="solarsys">
-		<description>The Visible Solar System (Euro, USA)</description>
+		<description>The Visible Solar System (Europe, USA)</description>
 		<year>1982</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="C-64609" />
@@ -302,7 +316,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="wowa" cloneof="wow">
-		<description>Wizard of Wor (Jpn, v.01)</description>
+		<description>Wizard of Wor (Japan, v.01)</description>
 		<year>1982</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="C-64615" />
@@ -314,7 +328,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="wow">
-		<description>Wizard of Wor (Jpn, v.02)</description>
+		<description>Wizard of Wor (Japan, v.02)</description>
 		<year>1982</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="C-64615" />

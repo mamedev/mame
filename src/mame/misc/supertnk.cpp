@@ -119,7 +119,6 @@ public:
 	supertnk_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_watchdog(*this, "watchdog")
 		, m_videoram(*this, "videoram%u", 0U, 0x2000U, ENDIANNESS_BIG)
 		, m_prgbank(*this, "prgbank")
 	{ }
@@ -133,16 +132,15 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(bankswitch_0_w);
-	DECLARE_WRITE_LINE_MEMBER(bankswitch_1_w);
-	DECLARE_WRITE_LINE_MEMBER(interrupt_enable_w);
-	DECLARE_WRITE_LINE_MEMBER(watchdog_reset_w);
+	void bankswitch_0_w(int state);
+	void bankswitch_1_w(int state);
+	void interrupt_enable_w(int state);
 	void videoram_w(offs_t offset, uint8_t data);
 	uint8_t videoram_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(bitplane_select_0_w);
-	DECLARE_WRITE_LINE_MEMBER(bitplane_select_1_w);
+	void bitplane_select_0_w(int state);
+	void bitplane_select_1_w(int state);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_interrupt);
+	void vblank_interrupt(int state);
 
 	void io_map(address_map &map);
 	void prg_map(address_map &map);
@@ -156,7 +154,6 @@ private:
 	bool m_interrupt_enable = false;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<watchdog_timer_device> m_watchdog;
 	memory_share_array_creator<uint8_t, 3> m_videoram;
 	required_memory_bank m_prgbank;
 };
@@ -178,14 +175,14 @@ void supertnk_state::machine_start()
  *
  *************************************/
 
-WRITE_LINE_MEMBER(supertnk_state::bankswitch_0_w)
+void supertnk_state::bankswitch_0_w(int state)
 {
 	m_rom_bank = (m_rom_bank & 0x02) | (state ? 0x01 : 0x00);
 	m_prgbank->set_entry(m_rom_bank);
 }
 
 
-WRITE_LINE_MEMBER(supertnk_state::bankswitch_1_w)
+void supertnk_state::bankswitch_1_w(int state)
 {
 	m_rom_bank = (m_rom_bank & 0x01) | (state ? 0x02 : 0x00);
 	m_prgbank->set_entry(m_rom_bank);
@@ -199,25 +196,20 @@ WRITE_LINE_MEMBER(supertnk_state::bankswitch_1_w)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(supertnk_state::vblank_interrupt)
+void supertnk_state::vblank_interrupt(int state)
 {
 	if (state && m_interrupt_enable)
 		m_maincpu->set_input_line(INT_9980A_LEVEL4, ASSERT_LINE);
 }
 
 
-WRITE_LINE_MEMBER(supertnk_state::interrupt_enable_w)
+void supertnk_state::interrupt_enable_w(int state)
 {
 	m_interrupt_enable = state;
 	if (!state)
 		m_maincpu->set_input_line(INT_9980A_LEVEL4, CLEAR_LINE);
 }
 
-
-WRITE_LINE_MEMBER(supertnk_state::watchdog_reset_w)
-{
-	m_watchdog->watchdog_enable(!state);
-}
 
 
 /*************************************
@@ -265,13 +257,13 @@ uint8_t supertnk_state::videoram_r(offs_t offset)
 }
 
 
-WRITE_LINE_MEMBER(supertnk_state::bitplane_select_0_w)
+void supertnk_state::bitplane_select_0_w(int state)
 {
 	m_bitplane_select = (m_bitplane_select & 0x02) | (state ? 0x01 : 0x00);
 }
 
 
-WRITE_LINE_MEMBER(supertnk_state::bitplane_select_1_w)
+void supertnk_state::bitplane_select_1_w(int state)
 {
 	m_bitplane_select = (m_bitplane_select & 0x01) | (state ? 0x02 : 0x00);
 }
@@ -435,15 +427,15 @@ void supertnk_state::supertnk(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &supertnk_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &supertnk_state::io_map);
 
+	WATCHDOG_TIMER(config, "watchdog");
+
 	ls259_device &outlatch(LS259(config, "outlatch")); // on CPU board near 2114 SRAM
 	outlatch.q_out_cb<0>().set(FUNC(supertnk_state::bitplane_select_0_w));
 	outlatch.q_out_cb<1>().set(FUNC(supertnk_state::bitplane_select_1_w));
 	outlatch.q_out_cb<2>().set(FUNC(supertnk_state::bankswitch_0_w));
 	outlatch.q_out_cb<4>().set(FUNC(supertnk_state::bankswitch_1_w));
-	outlatch.q_out_cb<6>().set(FUNC(supertnk_state::watchdog_reset_w)).invert();
+	outlatch.q_out_cb<6>().set("watchdog", FUNC(watchdog_timer_device::watchdog_enable)).invert();
 	outlatch.q_out_cb<7>().set(FUNC(supertnk_state::interrupt_enable_w));
-
-	WATCHDOG_TIMER(config, m_watchdog);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

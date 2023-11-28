@@ -38,11 +38,13 @@ ToDo:
 *********************************************************************************************************/
 
 #include "emu.h"
+
 #include "genpin.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/i8279.h"
 #include "sound/ay8910.h"
+
 #include "speaker.h"
 
 #include "peyper.lh"
@@ -70,9 +72,11 @@ public:
 	void peyper(machine_config &config);
 	void petaco(machine_config &config);
 
-private:
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+private:
 	u8 sw_r();
 	void col_w(u8 data);
 	void disp_w(u8 data);
@@ -731,6 +735,12 @@ ROM_START(odin)
 	ROM_LOAD("odin_b.bin", 0x2000, 0x2000, CRC(46744695) SHA1(fdbd8a93b3e4a9697e77e7d381759829b86fe28b))
 ROM_END
 
+ROM_START(odinp) // uses a slower IRQ clock (~440 Hz), as opposed to regular Peyper / Sonic machines, which run @ ~1600 Hz
+	ROM_REGION(0x6000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("cd1", 0x0000, 0x2000, CRC(f8747b2e) SHA1(8dfbef08bb0df0d1e5c11b88d29cd9c61b72bec9))
+	ROM_LOAD("cd2", 0x2000, 0x2000, CRC(c2dbe5b5) SHA1(c6b34334a55471f0550d84376f260fde9048cd31))
+ROM_END
+
 /*-------------------------------------------------------------------
 / Odin De Luxe (1985)
 /-------------------------------------------------------------------*/
@@ -851,10 +861,11 @@ ROM_START(petaco)
 ROM_END
 
 
-} // Anonymous namespace
+} // anonymous namespace
 
 GAME( 1984, petaco,   0,        petaco,   odin_dlx, peyper_state, init_1,     ROT0, "Juegos Populares", "Petaco",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, odin,     0,        peyper,   odin_dlx, peyper_state, init_1,     ROT0, "Peyper",     "Odin",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, odinp,    odin,     peyper,   odin_dlx, peyper_state, init_1,     ROT0, "Peyper",     "Odin (prototype)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, odin_dlx, 0,        peyper,   odin_dlx, peyper_state, init_1,     ROT0, "Sonic",      "Odin De Luxe",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, solarwap, 0,        peyper,   solarwap, peyper_state, init_0,     ROT0, "Sonic",      "Solar Wars (Sonic)",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, gamatros, 0,        peyper,   solarwap, peyper_state, init_0,     ROT0, "Sonic",      "Gamatron (Sonic)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

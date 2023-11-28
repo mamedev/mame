@@ -32,12 +32,12 @@
  *
  *************************************/
 
-WRITE_LINE_MEMBER(micro3d_state::duart_irq_handler)
+void micro3d_state::duart_irq_handler(int state)
 {
 	m_maincpu->set_input_line(3, state);
 }
 
-WRITE_LINE_MEMBER(micro3d_state::duart_txb)
+void micro3d_state::duart_txb(int state)
 {
 	if (state)
 		m_sound_port_latch[3] |= 1;
@@ -348,7 +348,7 @@ uint8_t micro3d_state::adc_volume_r()
 	return (uint8_t)((255.0/100.0) * m_volume->read() + 0.5);
 }
 
-READ_LINE_MEMBER(micro3d_state::botss_hwchk_r)
+int micro3d_state::botss_hwchk_r()
 {
 	return m_botss_latch;
 }

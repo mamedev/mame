@@ -40,16 +40,15 @@ public:
 
 	IRQ_CALLBACK_MEMBER(inta_cb);
 
-	DECLARE_WRITE_LINE_MEMBER(eint1_w);
-	DECLARE_WRITE_LINE_MEMBER(eint2_w);
-	DECLARE_WRITE_LINE_MEMBER(eint3_w);
-	DECLARE_WRITE_LINE_MEMBER(enmi_w);
+	void eint1_w(int state);
+	void eint2_w(int state);
+	void eint3_w(int state);
+	void enmi_w(int state);
 
 	uint32_t screen_update_single(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_dual(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

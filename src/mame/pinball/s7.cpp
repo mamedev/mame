@@ -133,17 +133,17 @@ private:
 	void switch_w(u8 data);
 	u8 nvram_r(offs_t offset);
 	void nvram_w(offs_t offset, u8 data);
-	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w) { }
-	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { } // enable solenoids
-	DECLARE_WRITE_LINE_MEMBER(pia22_ca2_w) { m_io_outputs[20] = state; } //ST5
-	DECLARE_WRITE_LINE_MEMBER(pia22_cb2_w) { } //ST-solenoids enable
-	DECLARE_WRITE_LINE_MEMBER(pia24_ca2_w) { m_io_outputs[17] = state; } //ST2
-	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { m_io_outputs[16] = state; } //ST1
-	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { } //diag leds enable
-	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { m_io_outputs[21] = state; } //ST6
-	DECLARE_WRITE_LINE_MEMBER(pia30_ca2_w) { m_io_outputs[19] = state; } //ST4
-	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { m_io_outputs[18] = state; } //ST3
-	DECLARE_WRITE_LINE_MEMBER(pia_irq);
+	void pia21_ca2_w(int state) { }
+	void pia21_cb2_w(int state) { } // enable solenoids
+	void pia22_ca2_w(int state) { m_io_outputs[20] = state; } //ST5
+	void pia22_cb2_w(int state) { } //ST-solenoids enable
+	void pia24_ca2_w(int state) { m_io_outputs[17] = state; } //ST2
+	void pia24_cb2_w(int state) { m_io_outputs[16] = state; } //ST1
+	void pia28_ca2_w(int state) { } //diag leds enable
+	void pia28_cb2_w(int state) { m_io_outputs[21] = state; } //ST6
+	void pia30_ca2_w(int state) { m_io_outputs[19] = state; } //ST4
+	void pia30_cb2_w(int state) { m_io_outputs[18] = state; } //ST3
+	void pia_irq(int state);
 	void main_map(address_map &map);
 
 	u8 m_strobe = 0U;
@@ -611,7 +611,7 @@ void s7_state::nvram_w(offs_t offset, u8 data)
 		m_nvram[offset] = data;
 }
 
-WRITE_LINE_MEMBER( s7_state::pia_irq )
+void s7_state::pia_irq(int state)
 {
 	if(state == CLEAR_LINE)
 	{
@@ -686,7 +686,7 @@ void s7_state::s7(machine_config &config)
 	genpin_audio(config);
 
 	/* Devices */
-	PIA6821(config, m_pia21, 0);
+	PIA6821(config, m_pia21);
 	m_pia21->readpa_handler().set_constant(0xff); // PA7 unknown input
 	m_pia21->readpb_handler().set_constant(0x3f); // PB0-4 unknown inputs
 	m_pia21->writepa_handler().set(FUNC(s7_state::sound_w));
@@ -696,7 +696,7 @@ void s7_state::s7(machine_config &config)
 	m_pia21->irqa_handler().set(FUNC(s7_state::pia_irq));
 	m_pia21->irqb_handler().set(FUNC(s7_state::pia_irq));
 
-	PIA6821(config, m_pia22, 0);
+	PIA6821(config, m_pia22);
 	m_pia22->writepa_handler().set(FUNC(s7_state::sol0_w));
 	m_pia22->writepb_handler().set(FUNC(s7_state::sol1_w));
 	m_pia22->ca2_handler().set(FUNC(s7_state::pia22_ca2_w));
@@ -704,7 +704,7 @@ void s7_state::s7(machine_config &config)
 	m_pia22->irqa_handler().set(FUNC(s7_state::pia_irq));
 	m_pia22->irqb_handler().set(FUNC(s7_state::pia_irq));
 
-	PIA6821(config, m_pia24, 0);
+	PIA6821(config, m_pia24);
 	m_pia24->writepa_handler().set(FUNC(s7_state::lamp0_w));
 	m_pia24->writepb_handler().set(FUNC(s7_state::lamp1_w));
 	m_pia24->ca2_handler().set(FUNC(s7_state::pia24_ca2_w));
@@ -712,7 +712,7 @@ void s7_state::s7(machine_config &config)
 	m_pia24->irqa_handler().set(FUNC(s7_state::pia_irq));
 	m_pia24->irqb_handler().set(FUNC(s7_state::pia_irq));
 
-	PIA6821(config, m_pia28, 0);
+	PIA6821(config, m_pia28);
 	m_pia28->readpa_handler().set(FUNC(s7_state::dips_r));
 	m_pia28->set_port_a_input_overrides_output_mask(0xff);
 	m_pia28->writepa_handler().set(FUNC(s7_state::dig0_w));
@@ -722,7 +722,7 @@ void s7_state::s7(machine_config &config)
 	m_pia28->irqa_handler().set(FUNC(s7_state::pia_irq));
 	m_pia28->irqb_handler().set(FUNC(s7_state::pia_irq));
 
-	PIA6821(config, m_pia30, 0);
+	PIA6821(config, m_pia30);
 	m_pia30->readpa_handler().set(FUNC(s7_state::switch_r));
 	m_pia30->set_port_a_input_overrides_output_mask(0xff);
 	m_pia30->writepb_handler().set(FUNC(s7_state::switch_w));
@@ -777,6 +777,21 @@ ROM_START(bk_l3)
 	ROM_REGION(0x3000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("bkl3_26.bin",  0x0800, 0x0800, CRC(6acc34a0) SHA1(3adad61d27e6416630f96554687bb66d3016166a) )
 	ROM_LOAD("bkl3_14.bin",  0x1000, 0x0800, CRC(74c37e4f) SHA1(8946b110901d0660676fba0c204aa2bc78223508) )
+	ROM_LOAD("ic20.716",     0x1800, 0x0800, CRC(dfb4b75a) SHA1(bcf017b01236f755cee419e398bbd8955ae3576a) )
+	ROM_LOAD("ic17.532",     0x2000, 0x1000, CRC(bb571a17) SHA1(fb0b7f247673dae0744d4188e1a03749a2237165) )
+
+	ROM_REGION(0x5000, "s6sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("speech7.532",  0x0000, 0x1000, CRC(c7e229bf) SHA1(3b2ab41031f507963af828639f1690dc350737af))
+	ROM_LOAD("speech5.532",  0x1000, 0x1000, CRC(411bc92f) SHA1(6c8d26fd13ed5eeba5cc40886d39c65a64beb377))
+	ROM_LOAD("speech6.532",  0x2000, 0x1000, CRC(fc985005) SHA1(9df4ad12cf98a5a92b8f933e6b6788a292c8776b))
+	ROM_LOAD("speech4.532",  0x3000, 0x1000, CRC(f36f12e5) SHA1(24fb192ad029cd35c08f4899b76d527776a4895b))
+	ROM_LOAD("sound12.716",  0x4800, 0x0800, CRC(6d454c0e) SHA1(21640b9ed3bdbae8bf27629891f355304e467c64))
+ROM_END
+
+ROM_START(bk_l2)
+	ROM_REGION(0x3000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("bk_rev2.ic26", 0x0800, 0x0800, CRC(703b61e1) SHA1(32013d72d70ed0bfca5eb10769471966c07dba09) )
+	ROM_LOAD("bk_rev2.ic14", 0x1000, 0x0800, CRC(30d87653) SHA1(2b1b927dfbd7c9ddcea2732e0d4e82c236499338) )
 	ROM_LOAD("ic20.716",     0x1800, 0x0800, CRC(dfb4b75a) SHA1(bcf017b01236f755cee419e398bbd8955ae3576a) )
 	ROM_LOAD("ic17.532",     0x2000, 0x1000, CRC(bb571a17) SHA1(fb0b7f247673dae0744d4188e1a03749a2237165) )
 
@@ -1102,6 +1117,7 @@ ROM_END
 GAME( 1980, bk_l4,    0,        s7, bk,    s7_state, empty_init, ROT0, "Williams",  "Black Knight (L-4)",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, bk_f4,    bk_l4,    s7, bk,    s7_state, empty_init, ROT0, "Williams",  "Black Knight (L-4, French speech)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, bk_l3,    bk_l4,    s7, bk,    s7_state, empty_init, ROT0, "Williams",  "Black Knight (L-3)",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, bk_l2,    bk_l4,    s7, bk,    s7_state, empty_init, ROT0, "Williams",  "Black Knight (L-2)",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, csmic_l1, 0,        s7, csmic, s7_state, empty_init, ROT0, "Williams",  "Cosmic Gunfight (L-1)",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, jngld_l2, 0,        s7, jngld, s7_state, empty_init, ROT0, "Williams",  "Jungle Lord (L-2)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, jngld_l1, jngld_l2, s7, jngld, s7_state, empty_init, ROT0, "Williams",  "Jungle Lord (L-1)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

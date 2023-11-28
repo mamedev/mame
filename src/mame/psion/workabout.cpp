@@ -5,11 +5,12 @@
     Psion Workabout
 
     TODO:
-    - battery backed RAM
+    - expansion LIF ports
 
 ******************************************************************************/
 
 #include "emu.h"
+#include "machine/nvram.h"
 #include "machine/psion_asic9.h"
 #include "machine/psion_ssd.h"
 #include "machine/ram.h"
@@ -32,11 +33,12 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_asic9(*this, "asic9")
 		, m_ram(*this, "ram")
+		, m_nvram(*this, "nvram")
 		, m_palette(*this, "palette")
 		, m_keyboard(*this, "COL%u", 0U)
 		, m_speaker(*this, "speaker")
 		, m_ssd(*this, "ssd%u", 1U)
-		//, m_exp(*this, "exp%u", 1U)
+		//, m_exp(*this, "exp")
 	{ }
 
 	void workabout(machine_config &config);
@@ -52,11 +54,12 @@ protected:
 private:
 	required_device<psion_asic9_device> m_asic9;
 	required_device<ram_device> m_ram;
+	required_device<nvram_device> m_nvram;
 	required_device<palette_device> m_palette;
 	required_ioport_array<8> m_keyboard;
 	required_device<speaker_sound_device> m_speaker;
 	required_device_array<psion_ssd_device, 2> m_ssd;
-	//required_device_array<psion_exp_slot_device, 3> m_exp;
+	//required_device<psion_exp_slot_device> m_exp;
 
 	void palette_init(palette_device &palette);
 
@@ -68,6 +71,7 @@ private:
 
 void workabout_state::machine_start()
 {
+	m_nvram->set_base(m_ram->pointer(), m_ram->size());
 }
 
 void workabout_state::machine_reset()
@@ -190,6 +194,7 @@ void workabout_state::palette_init(palette_device &palette)
 void workabout_state::workabout(machine_config &config)
 {
 	PSION_ASIC9(config, m_asic9, 7.68_MHz_XTAL); // V30H
+	m_asic9->set_screen("screen");
 	m_asic9->set_ram_rom("ram", "rom");
 	m_asic9->port_ab_r().set(FUNC(workabout_state::kbd_r));
 	m_asic9->buz_cb().set(m_speaker, FUNC(speaker_sound_device::level_w));
@@ -217,15 +222,14 @@ void workabout_state::workabout(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00); // Piezo buzzer
 
 	RAM(config, m_ram);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
 	PSION_SSD(config, m_ssd[0]);
 	m_ssd[0]->door_cb().set(m_asic9, FUNC(psion_asic9_device::medchng_w));
 	PSION_SSD(config, m_ssd[1]);
 	m_ssd[1]->door_cb().set(m_asic9, FUNC(psion_asic9_device::medchng_w));
 
-	//PSION_EXP_SLOT(config, m_exp[0], psion_exp_devices, nullptr);
-	//PSION_EXP_SLOT(config, m_exp[1], psion_exp_devices, nullptr);
-	//PSION_EXP_SLOT(config, m_exp[2], psion_exp_devices, nullptr);
+	//PSION_EXP_SLOT(config, m_exp, psion_exp_devices, nullptr);
 
 	SOFTWARE_LIST(config, "ssd_list").set_original("psion_ssd").set_filter("WA");
 }
@@ -269,5 +273,5 @@ ROM_END
 
 
 //    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY   FULLNAME        FLAGS
-COMP( 1995, psionwa,   0,      0,      psionwa,   workabout, workabout_state, empty_init, "Psion",  "Workabout",    MACHINE_NOT_WORKING )
-COMP( 1998, psionwamx, 0,      0,      psionwamx, workabout, workabout_state, empty_init, "Psion",  "Workabout mx", MACHINE_NOT_WORKING )
+COMP( 1995, psionwa,   0,      0,      psionwa,   workabout, workabout_state, empty_init, "Psion",  "Workabout",    MACHINE_SUPPORTS_SAVE )
+COMP( 1998, psionwamx, 0,      0,      psionwamx, workabout, workabout_state, empty_init, "Psion",  "Workabout mx", MACHINE_SUPPORTS_SAVE )

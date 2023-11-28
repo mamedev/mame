@@ -100,24 +100,6 @@ s100_bus_device::~s100_bus_device()
 
 void s100_bus_device::device_start()
 {
-	// resolve callbacks
-	m_write_irq.resolve_safe();
-	m_write_nmi.resolve_safe();
-	m_write_vi0.resolve_safe();
-	m_write_vi1.resolve_safe();
-	m_write_vi2.resolve_safe();
-	m_write_vi3.resolve_safe();
-	m_write_vi4.resolve_safe();
-	m_write_vi5.resolve_safe();
-	m_write_vi6.resolve_safe();
-	m_write_vi7.resolve_safe();
-	m_write_dma0.resolve_safe();
-	m_write_dma1.resolve_safe();
-	m_write_dma2.resolve_safe();
-	m_write_dma3.resolve_safe();
-	m_write_rdy.resolve_safe();
-	m_write_hold.resolve_safe();
-	m_write_error.resolve_safe();
 }
 
 

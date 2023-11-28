@@ -85,44 +85,44 @@ DEFINE_DEVICE_TYPE(DSPP, dspp_device, "dspp", "3DO DSPP")
 //  dspp_device - constructor
 //-------------------------------------------------
 
-dspp_device::dspp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: dspp_device(mconfig, DSPP, tag, owner, clock, address_map_constructor(FUNC(dspp_device::code_map), this),
-		address_map_constructor(FUNC(dspp_device::data_map), this))
+dspp_device::dspp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	dspp_device(mconfig, DSPP, tag, owner, clock, address_map_constructor(FUNC(dspp_device::code_map), this),
+	address_map_constructor(FUNC(dspp_device::data_map), this))
 {
 }
 
-dspp_device::dspp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor code_map_ctor, address_map_constructor data_map_ctor)
-	: cpu_device(mconfig, type, tag, owner, clock),
-		m_int_handler(*this),
-		m_dma_read_handler(*this),
-		m_dma_write_handler(*this),
-		m_code_config("code", ENDIANNESS_BIG, 16, 10, -1, code_map_ctor),
-		m_data_config("data", ENDIANNESS_BIG, 16, 10, -1, data_map_ctor),
-		m_output_fifo_start(0),
-		m_output_fifo_count(0),
-		m_dspx_reset(0),
-		m_dspx_int_enable(0),
-		m_dspx_channel_enable(0),
-		m_dspx_channel_complete(0),
-		m_dspx_channel_direction(0),
-		m_dspx_channel_8bit(0),
-		m_dspx_channel_sqxd(0),
-		m_dspx_shadow_current_addr(0),
-		m_dspx_shadow_current_count(0),
-		m_dspx_shadow_next_addr(0),
-		m_dspx_shadow_next_count(0),
-		m_dspx_dmanext_int(0),
-		m_dspx_dmanext_enable(0),
-		m_dspx_consumed_int(0),
-		m_dspx_consumed_enable(0),
-		m_dspx_underover_int(0),
-		m_dspx_underover_enable(0),
-		m_dspx_audio_time(0),
-		m_dspx_audio_duration(0),
-		m_cache(CACHE_SIZE),
-		m_drcuml(nullptr),
-		m_drcfe(nullptr),
-		m_drcoptions(0)
+dspp_device::dspp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor code_map_ctor, address_map_constructor data_map_ctor) :
+	cpu_device(mconfig, type, tag, owner, clock),
+	m_int_handler(*this),
+	m_dma_read_handler(*this, 0),
+	m_dma_write_handler(*this),
+	m_code_config("code", ENDIANNESS_BIG, 16, 10, -1, code_map_ctor),
+	m_data_config("data", ENDIANNESS_BIG, 16, 10, -1, data_map_ctor),
+	m_output_fifo_start(0),
+	m_output_fifo_count(0),
+	m_dspx_reset(0),
+	m_dspx_int_enable(0),
+	m_dspx_channel_enable(0),
+	m_dspx_channel_complete(0),
+	m_dspx_channel_direction(0),
+	m_dspx_channel_8bit(0),
+	m_dspx_channel_sqxd(0),
+	m_dspx_shadow_current_addr(0),
+	m_dspx_shadow_current_count(0),
+	m_dspx_shadow_next_addr(0),
+	m_dspx_shadow_next_count(0),
+	m_dspx_dmanext_int(0),
+	m_dspx_dmanext_enable(0),
+	m_dspx_consumed_int(0),
+	m_dspx_consumed_enable(0),
+	m_dspx_underover_int(0),
+	m_dspx_underover_enable(0),
+	m_dspx_audio_time(0),
+	m_dspx_audio_duration(0),
+	m_cache(CACHE_SIZE),
+	m_drcuml(nullptr),
+	m_drcfe(nullptr),
+	m_drcoptions(0)
 {
 #if 0
 	memset(m_core->m_stack, 0, sizeof(m_core->m_stack));
@@ -149,11 +149,6 @@ void dspp_device::device_start()
 	m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, flags, 1, 16, 0);
 
 	m_drcfe = std::make_unique<dspp_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
-
-	// Resolve our callbacks
-	m_int_handler.resolve_safe();
-	m_dma_read_handler.resolve_safe(0);
-	m_dma_write_handler.resolve_safe();
 
 	// Get our address spaces
 	space(AS_PROGRAM).cache(m_code_cache);

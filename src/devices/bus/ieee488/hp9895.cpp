@@ -138,7 +138,7 @@ hp9895_device::hp9895_device(const machine_config &mconfig, const char *tag, dev
 	  device_ieee488_interface(mconfig, *this),
 	  m_cpu(*this , "cpu"),
 	  m_phi(*this , "phi"),
-	  m_drives{{*this , "floppy0"} , {*this , "floppy1"}},
+	  m_drives(*this , "floppy%u" , 0U),
 	  m_switches{*this , "switches"}
 {
 }
@@ -416,42 +416,42 @@ void hp9895_device::ieee488_ren(int state)
 	m_phi->ren_w(state);
 }
 
-WRITE_LINE_MEMBER(hp9895_device::phi_eoi_w)
+void hp9895_device::phi_eoi_w(int state)
 {
 	m_bus->eoi_w(this , state);
 }
 
-WRITE_LINE_MEMBER(hp9895_device::phi_dav_w)
+void hp9895_device::phi_dav_w(int state)
 {
 	m_bus->dav_w(this , state);
 }
 
-WRITE_LINE_MEMBER(hp9895_device::phi_nrfd_w)
+void hp9895_device::phi_nrfd_w(int state)
 {
 	m_bus->nrfd_w(this , state);
 }
 
-WRITE_LINE_MEMBER(hp9895_device::phi_ndac_w)
+void hp9895_device::phi_ndac_w(int state)
 {
 	m_bus->ndac_w(this , state);
 }
 
-WRITE_LINE_MEMBER(hp9895_device::phi_ifc_w)
+void hp9895_device::phi_ifc_w(int state)
 {
 	m_bus->ifc_w(this , state);
 }
 
-WRITE_LINE_MEMBER(hp9895_device::phi_srq_w)
+void hp9895_device::phi_srq_w(int state)
 {
 	m_bus->srq_w(this , state);
 }
 
-WRITE_LINE_MEMBER(hp9895_device::phi_atn_w)
+void hp9895_device::phi_atn_w(int state)
 {
 	m_bus->atn_w(this , state);
 }
 
-WRITE_LINE_MEMBER(hp9895_device::phi_ren_w)
+void hp9895_device::phi_ren_w(int state)
 {
 	m_bus->ren_w(this , state);
 }
@@ -466,7 +466,7 @@ void hp9895_device::phi_dio_w(uint8_t data)
 	m_bus->dio_w(this , data);
 }
 
-WRITE_LINE_MEMBER(hp9895_device::phi_int_w)
+void hp9895_device::phi_int_w(int state)
 {
 	m_cpu->set_input_line(INPUT_LINE_NMI , state);
 	if (state) {

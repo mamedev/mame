@@ -60,7 +60,7 @@ public:
 
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override = 0;
 
-	DECLARE_WRITE_LINE_MEMBER(irq_out);
+	void irq_out(int state);
 
 protected:
 	msx_slot_cartridge_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
@@ -97,7 +97,7 @@ protected:
 	memory_region *cart_sram_region() { return m_exp ? m_exp->memregion("sram") : nullptr; }
 	const char *get_feature(std::string_view feature_name) { return m_exp ? m_exp->get_feature(feature_name) : nullptr; }
 	bool is_loaded_through_softlist() { return m_exp ? m_exp->loaded_through_softlist() : false; }
-	DECLARE_WRITE_LINE_MEMBER(irq_out);
+	void irq_out(int state);
 	msx_slot_cartridge_base_device *parent_slot() const { return m_exp; }
 	address_space &memory_space() const;
 	address_space &io_space() const;

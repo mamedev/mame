@@ -46,12 +46,12 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(hrq_w);
+	void hrq_w(int state);
 	u8 memory_r(offs_t offset);
 	void memory_w(offs_t offset, u8 data);
 	void floppy_control_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(rts_w);
-	DECLARE_WRITE_LINE_MEMBER(dtr_w);
+	void rts_w(int state);
+	void dtr_w(int state);
 
 	I8275_DRAW_CHARACTER_MEMBER(draw_character);
 
@@ -84,7 +84,7 @@ void systel1_state::machine_reset()
 	m_boot_read = true;
 }
 
-WRITE_LINE_MEMBER(systel1_state::hrq_w)
+void systel1_state::hrq_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 	m_dmac->hlda_w(state);
@@ -124,14 +124,14 @@ void systel1_state::floppy_control_w(u8 data)
 	m_boot_read = false;
 }
 
-WRITE_LINE_MEMBER(systel1_state::rts_w)
+void systel1_state::rts_w(int state)
 {
 	m_fdc->mr_w(state);
 	if (m_floppy->get_device() != nullptr)
 		m_floppy->get_device()->mon_w(!state);
 }
 
-WRITE_LINE_MEMBER(systel1_state::dtr_w)
+void systel1_state::dtr_w(int state)
 {
 	// probably floppy-related
 }

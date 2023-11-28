@@ -81,14 +81,15 @@ public:
 		, m_view(*this, "view")
 		, m_dac(*this, "dac%u", 0U)
 		, m_sdcard(*this, "sdcard")
+		, m_neogs_led(*this, "neogs_led")
 	{ }
 
 protected:
 	// device_t implementation
-	void device_start() override;
-	void device_reset() override;
-	const tiny_rom_entry *device_rom_region() const override;
-	void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	void neogsmap(address_map &map);
 
@@ -106,6 +107,7 @@ protected:
 	memory_view m_view;
 	required_device_array<dac_word_interface, 2> m_dac;
 	required_device<spi_sdcard_sdhc_device> m_sdcard;
+	output_finder<> m_neogs_led;
 
 private:
 	TIMER_CALLBACK_MEMBER(spi_clock);
@@ -212,8 +214,7 @@ void neogs_device::neogs_ctrl_w(u8 data)
 		LOG("NMI Request\n");
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
-	if (data & 0x20)
-		; // LED data:0 - 1-on, 0-off
+	m_neogs_led = BIT(data, 5);
 }
 
 template <u8 Bank> u8 neogs_device::ram_bank_r(offs_t offset)
@@ -425,9 +426,9 @@ const tiny_rom_entry *neogs_device::device_rom_region() const
 
 void neogs_device::neogsmap(address_map &map)
 {
-	map(0x00bb, 0x00bb).mirror(0xff00).rw(FUNC(neogs_device::neogs_status_r), FUNC(neogs_device::neogs_command_w));
-	map(0x00b3, 0x00b3).mirror(0xff00).rw(FUNC(neogs_device::neogs_data_r), FUNC(neogs_device::neogs_data_w));
-	map(0x0033, 0x0033).mirror(0xff00).w(FUNC(neogs_device::neogs_ctrl_w));
+	map(0x000bb, 0x000bb).mirror(0xff00).rw(FUNC(neogs_device::neogs_status_r), FUNC(neogs_device::neogs_command_w));
+	map(0x000b3, 0x000b3).mirror(0xff00).rw(FUNC(neogs_device::neogs_data_r), FUNC(neogs_device::neogs_data_w));
+	map(0x00033, 0x00033).mirror(0xff00).w(FUNC(neogs_device::neogs_ctrl_w));
 }
 
 void neogs_device::device_start()
@@ -451,6 +452,8 @@ void neogs_device::device_start()
 			});
 
 	m_zxbus->install_device(0x0000, 0xffff, *this, &neogs_device::neogsmap);
+
+	m_neogs_led.resolve();
 }
 
 void neogs_device::device_reset()
@@ -477,4 +480,4 @@ void neogs_device::device_reset()
 } // namespace bus::spectrum::zxbus
 
 
-DEFINE_DEVICE_TYPE_PRIVATE(ZXBUS_NEOGS, device_zxbus_card_interface, bus::spectrum::zxbus::neogs_device, "neogs", "NeoGS / General Sound")
+DEFINE_DEVICE_TYPE_PRIVATE(ZXBUS_NEOGS, device_zxbus_card_interface, bus::spectrum::zxbus::neogs_device, "zxbus_neogs", "NeoGS / General Sound")

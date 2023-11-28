@@ -160,9 +160,9 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(activity_button);
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
-	template <int Param> DECLARE_READ_LINE_MEMBER(outhole_x0);
-	template <int Param> DECLARE_READ_LINE_MEMBER(drop_target_x0);
-	template <int Param> DECLARE_READ_LINE_MEMBER(kickback_x3);
+	template <int Param> int outhole_x0();
+	template <int Param> int drop_target_x0();
+	template <int Param> int kickback_x3();
 
 	void by35(machine_config &config);
 	void nuovo(machine_config &config);
@@ -217,10 +217,10 @@ protected:
 	void u11_b_w(uint8_t data);
 	uint8_t nibble_nvram_r(offs_t offset);
 	void nibble_nvram_w(offs_t offset, uint8_t data);
-	DECLARE_READ_LINE_MEMBER(u10_ca1_r);
-	DECLARE_WRITE_LINE_MEMBER(u10_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(u10_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(u11_cb2_w);
+	int u10_ca1_r();
+	void u10_ca2_w(int state);
+	void u10_cb2_w(int state);
+	void u11_cb2_w(int state);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_z_freq);
@@ -1011,7 +1011,7 @@ INPUT_PORTS_END
 
 
 template <int Param>
-READ_LINE_MEMBER( by35_state::outhole_x0 )
+int by35_state::outhole_x0()
 {
 	int bit_shift = (Param & 0x07);
 	int port = ((Param >> 4) & 0x07);
@@ -1025,7 +1025,7 @@ READ_LINE_MEMBER( by35_state::outhole_x0 )
 }
 
 template <int Param>
-READ_LINE_MEMBER( by35_state::kickback_x3 )
+int by35_state::kickback_x3()
 {
 	int bit_shift = (Param & 0x07);
 	int port = ((Param >> 4) & 0x07);
@@ -1039,7 +1039,7 @@ READ_LINE_MEMBER( by35_state::kickback_x3 )
 }
 
 template <int Param>
-READ_LINE_MEMBER( by35_state::drop_target_x0 )
+int by35_state::drop_target_x0()
 {
 	/* Here we simulate the Drop Target switch states so the Drop Target Reset Solenoid can also release the switches */
 
@@ -1088,12 +1088,12 @@ INPUT_CHANGED_MEMBER( by35_state::self_test )
 	m_pia_u10->ca1_w(newval);
 }
 
-READ_LINE_MEMBER( by35_state::u10_ca1_r )
+int by35_state::u10_ca1_r()
 {
 	return m_io_test->read() & 0x01;
 }
 
-WRITE_LINE_MEMBER( by35_state::u10_ca2_w )
+void by35_state::u10_ca2_w(int state)
 {
 #if 0                   // Display Blanking - Out of sync with video redraw rate and causes flicker so it's disabled
 	if (state == 0)
@@ -1112,7 +1112,7 @@ WRITE_LINE_MEMBER( by35_state::u10_ca2_w )
 	m_u10_ca2 = state;
 }
 
-WRITE_LINE_MEMBER( by35_state::u10_cb2_w )
+void by35_state::u10_cb2_w(int state)
 {
 	LOG("New U10 CB2 state %01x, was %01x.   PIA=%02x\n", state, m_u10_cb2, m_u10a);
 
@@ -1122,13 +1122,10 @@ WRITE_LINE_MEMBER( by35_state::u10_cb2_w )
 	m_u10_cb2 = state;
 }
 
-WRITE_LINE_MEMBER( by35_state::u11_cb2_w )
+void by35_state::u11_cb2_w(int state)
 {
 	// Handle sound
-	if (!m_sound_int_handler.isnull())
-	{
-		m_sound_int_handler(state);
-	}
+	m_sound_int_handler(state);
 
 	m_u11_cb2 = state;
 }
@@ -1259,11 +1256,8 @@ void by35_state::u11_a_w(uint8_t data)
 	}
 
 	// Handle sound
-	if (!m_sound_select_handler.isnull())
-	{
-		int sound = (m_u11b & 0x0f) | ((data & 0x02) << 3);
-		m_sound_select_handler(sound);
-	}
+	const int sound = (m_u11b & 0x0f) | ((data & 0x02) << 3);
+	m_sound_select_handler(sound);
 
 	m_u11a = data;
 }
@@ -1341,11 +1335,8 @@ void by35_state::u11_b_w(uint8_t data)
 	}
 
 	// Handle sound
-	if (!m_sound_select_handler.isnull())
-	{
-		int sound = (data & 0x0f) | ((m_u11a & 0x02) << 3);
-		m_sound_select_handler(sound);
-	}
+	const int sound = (data & 0x0f) | ((m_u11a & 0x02) << 3);
+	m_sound_select_handler(sound);
 
 	m_u11b = data;
 }
@@ -1462,8 +1453,6 @@ void by35_state::machine_start()
 	m_lamps.resolve();
 	m_digits.resolve();
 	m_solenoids.resolve();
-	m_sound_select_handler.resolve();
-	m_sound_int_handler.resolve();
 
 	save_item(NAME(m_u10a));
 	save_item(NAME(m_u10b));
@@ -1506,7 +1495,7 @@ void by35_state::by35(machine_config &config)
 	genpin_audio(config);
 
 	/* Devices */
-	PIA6821(config, m_pia_u10, 0);
+	PIA6821(config, m_pia_u10);
 	m_pia_u10->readpa_handler().set(FUNC(by35_state::u10_a_r));
 	m_pia_u10->writepa_handler().set(FUNC(by35_state::u10_a_w));
 	m_pia_u10->readpb_handler().set(FUNC(by35_state::u10_b_r));
@@ -1520,7 +1509,7 @@ void by35_state::by35(machine_config &config)
 	TIMER(config, "timer_z_freq").configure_periodic(FUNC(by35_state::timer_z_freq), attotime::from_hz(100)); // Mains Line Frequency * 2
 	TIMER(config, m_zero_crossing_active_timer).configure_generic(FUNC(by35_state::timer_z_pulse));  // Active pulse length from Zero Crossing detector
 
-	PIA6821(config, m_pia_u11, 0);
+	PIA6821(config, m_pia_u11);
 	m_pia_u11->readpa_handler().set(FUNC(by35_state::u11_a_r));
 	m_pia_u11->writepa_handler().set(FUNC(by35_state::u11_a_w));
 	m_pia_u11->writepb_handler().set(FUNC(by35_state::u11_b_w));
@@ -2252,6 +2241,18 @@ ROM_START(m_mpac)
 	ROM_LOAD("872-03_5.532", 0xb000, 0x1000, CRC(8fcdf853) SHA1(7c6bffcd974d2684e7f2c69d926f6cabb53e2f90))
 ROM_END
 
+ROM_START(m_mpacb)
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD( "u2", 0x1000, 0x0800, CRC(a697971a) SHA1(e45cbb7822ac159c447877c4c837be5aaa4ac675))
+	ROM_CONTINUE( 0x5000, 0x0800)
+	ROM_LOAD( "720-53_6.732", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad))
+	ROM_CONTINUE( 0x5800, 0x0800)
+	ROM_RELOAD( 0x7000, 0x1000)
+	ROM_REGION(0x10000, "squawk_n_talk_ay:cpu", 0)
+	ROM_LOAD("872-01_4.532", 0xa000, 0x1000, CRC(d21ce16d) SHA1(3ee6e2629530e7e6e4d7eac713d34c48297a1047))
+	ROM_LOAD("872-03_5.532", 0xb000, 0x1000, CRC(8fcdf853) SHA1(7c6bffcd974d2684e7f2c69d926f6cabb53e2f90))
+ROM_END
+
 /*-----------------------------------------------------------
 / Grand Slam #1311
 /-----------------------------------------------------------*/
@@ -2906,7 +2907,8 @@ GAME( 1981, elektra,    0,        squawk_n_talk_ay, by35_os5x, by35_state, init_
 GAME( 1982, spectrm,    0,        squawk_n_talk,    by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Spectrum",                              MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, spectrm4,   spectrm,  squawk_n_talk,    by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Spectrum (ver 4)",                      MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, rapidfip,   0,        squawk_n_talk,    by35,      by35_state, init_by35_7, ROT0, "Bally", "Rapid Fire",                            MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, m_mpac,     0,        squawk_n_talk_ay, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Mr. and Mrs. PacMan",                   MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, m_mpac,     0,        squawk_n_talk_ay, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Mr. and Mrs. PacMan (set 1)",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, m_mpacb,    m_mpac,   squawk_n_talk_ay, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Mr. and Mrs. PacMan (set 2)",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, mysteria,   0,        squawk_n_talk_ay, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Mysterian (prototype)",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // uses 2 sound boards
 
 // Cheap Squeak sound

@@ -42,12 +42,16 @@ protected:
 	virtual void write_p1(u8 data) override;
 	virtual void io_write(offs_t offset, u8 data) override;
 	virtual u8 io_read(offs_t offset) override;
-	virtual DECLARE_READ_LINE_MEMBER(t0_read) override { return m_latch[0]->pending_r(); }
+	virtual int t0_read() override { return m_latch[0]->pending_r(); }
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device_array<generic_latch_8_device, 2> m_latch;
 	required_device<cassette_image_device> m_cass;
+
+	std::unique_ptr<u8[]> m_ram;
+	u8 m_control = 0;
+	bool m_installed = false;
 
 	void internal_io_w(offs_t offset, u8 data);
 	u8 internal_io_r(offs_t offset);
@@ -55,10 +59,6 @@ private:
 
 	void homecomp_io(address_map &map);
 	void homecomp_mem(address_map &map);
-
-	std::unique_ptr<u8[]> m_ram;
-	u8 m_control = 0;
-	bool m_installed = false;
 };
 
 // device type definition

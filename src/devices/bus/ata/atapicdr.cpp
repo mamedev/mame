@@ -21,12 +21,18 @@ atapi_cdrom_device::atapi_cdrom_device(const machine_config &mconfig, const char
 
 atapi_cdrom_device::atapi_cdrom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	atapi_hle_device(mconfig, type, tag, owner, clock),
+	device_ata_interface(mconfig, *this),
 	ultra_dma_mode(0)
 {
 }
 
+atapi_fixed_cdrom_device::atapi_fixed_cdrom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	atapi_cdrom_device(mconfig, type, tag, owner, clock)
+{
+}
+
 atapi_fixed_cdrom_device::atapi_fixed_cdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	atapi_cdrom_device(mconfig, ATAPI_FIXED_CDROM, tag, owner, clock)
+	atapi_fixed_cdrom_device(mconfig, ATAPI_FIXED_CDROM, tag, owner, clock)
 {
 }
 
@@ -161,7 +167,9 @@ void atapi_cdrom_device::ExecCommand()
 		case T10MMC_CMD_PLAY_AUDIO_TRACK_INDEX:
 		case T10MMC_CMD_PAUSE_RESUME:
 		case T10MMC_CMD_PLAY_AUDIO_12:
+		case T10MMC_CMD_READ_CD:
 		case T10SBC_CMD_READ_12:
+		case T10SBC_CMD_SEEK_10:
 			if(!m_image->exists())
 			{
 				m_phase = SCSI_PHASE_STATUS;
@@ -190,4 +198,10 @@ void atapi_cdrom_device::ExecCommand()
 			break;
 	}
 	t10mmc::ExecCommand();
+
+	// truckk requires seek complete flag to be set after calling the SEEK command
+	// so set the seek complete status flag after a successful request to emulate
+	// having asked the device itself to seek
+	if (command[0] == T10SBC_CMD_SEEK_10 && m_status_code == SCSI_STATUS_CODE_GOOD)
+		m_status |= IDE_STATUS_DSC;
 }

@@ -148,9 +148,6 @@ void acorn_vidc10_device::device_config_complete()
 
 void acorn_vidc10_device::device_start()
 {
-	m_vblank_cb.resolve_safe();
-	m_sound_drq_cb.resolve_safe();
-
 	for (int i = 0; i < entries(); i++)
 		set_pen_color(i, rgb_t::black());
 
@@ -532,7 +529,7 @@ u32 acorn_vidc10_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	return 0;
 }
 
-READ_LINE_MEMBER(acorn_vidc10_device::flyback_r)
+int acorn_vidc10_device::flyback_r()
 {
 	int vert_pos = screen().vpos();
 	if (vert_pos <= m_crtc_regs[CRTC_VDSR] * (m_crtc_interlace+1))

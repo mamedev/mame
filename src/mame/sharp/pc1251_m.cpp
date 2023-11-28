@@ -53,7 +53,7 @@ uint8_t pc1251_state::in_b_r()
 	return data;
 }
 
-READ_LINE_MEMBER(pc1251_state::reset_r)
+int pc1251_state::reset_r()
 {
 	return BIT(m_extra->read(), 1);
 }

@@ -76,10 +76,10 @@ DEFINE_DEVICE_TYPE(FGA002, fga002_device, "fga002", "Force FGA-002")
 fga002_device::fga002_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_out_int_cb(*this)
-	, m_liack4_cb(*this)
-	, m_liack5_cb(*this)
-	, m_liack6_cb(*this)
-	, m_liack7_cb(*this)
+	, m_liack4_cb(*this, 0)
+	, m_liack5_cb(*this, 0)
+	, m_liack6_cb(*this, 0)
+	, m_liack7_cb(*this, 0)
 	, m_irq_level(uint8_t(0))
 {
 	for (auto & elem : m_int_state)
@@ -94,13 +94,6 @@ fga002_device::fga002_device(const machine_config &mconfig, const char *tag, dev
 void fga002_device::device_start()
 {
 	LOG("%s\n", FUNCNAME);
-
-	// resolve callbacks
-	m_out_int_cb.resolve_safe();
-	m_liack4_cb.resolve_safe(0);
-	m_liack5_cb.resolve_safe(0);
-	m_liack6_cb.resolve_safe(0);
-	m_liack7_cb.resolve_safe(0);
 
 	// Timers
 	fga_timer = timer_alloc(FUNC(fga002_device::timer_tick), this);
@@ -591,14 +584,14 @@ void fga002_device::lirq_w(int status, int vector, int control, int state)
 	}
 }
 
-WRITE_LINE_MEMBER (fga002_device::lirq0_w) { LOGINT("%s\n", FUNCNAME); lirq_w( FGA_ISLOCAL0, INT_LOCAL0, FGA_ICRLOCAL0, state ); }
-WRITE_LINE_MEMBER (fga002_device::lirq1_w) { LOGINT("%s\n", FUNCNAME); lirq_w( FGA_ISLOCAL1, INT_LOCAL1, FGA_ICRLOCAL1, state ); }
-WRITE_LINE_MEMBER (fga002_device::lirq2_w) { LOGINT("%s\n", FUNCNAME); lirq_w( FGA_ISLOCAL2, INT_LOCAL2, FGA_ICRLOCAL2, state ); }
-WRITE_LINE_MEMBER (fga002_device::lirq3_w) { LOGINT("%s\n", FUNCNAME); lirq_w( FGA_ISLOCAL3, INT_LOCAL3, FGA_ICRLOCAL3, state ); }
-WRITE_LINE_MEMBER (fga002_device::lirq4_w) { LOGINT("%s\n", FUNCNAME); lirq_w( FGA_ISLOCAL4, INT_LOCAL4, FGA_ICRLOCAL4, state ); }
-WRITE_LINE_MEMBER (fga002_device::lirq5_w) { LOGINT("%s\n", FUNCNAME); lirq_w( FGA_ISLOCAL5, INT_LOCAL5, FGA_ICRLOCAL5, state ); }
-WRITE_LINE_MEMBER (fga002_device::lirq6_w) { LOGINT("%s\n", FUNCNAME); lirq_w( FGA_ISLOCAL6, INT_LOCAL6, FGA_ICRLOCAL6, state ); }
-WRITE_LINE_MEMBER (fga002_device::lirq7_w) { LOGINT("%s\n", FUNCNAME); lirq_w( FGA_ISLOCAL7, INT_LOCAL7, FGA_ICRLOCAL7, state ); }
+void fga002_device::lirq0_w(int state) { LOGINT("%s\n", FUNCNAME); lirq_w( FGA_ISLOCAL0, INT_LOCAL0, FGA_ICRLOCAL0, state ); }
+void fga002_device::lirq1_w(int state) { LOGINT("%s\n", FUNCNAME); lirq_w( FGA_ISLOCAL1, INT_LOCAL1, FGA_ICRLOCAL1, state ); }
+void fga002_device::lirq2_w(int state) { LOGINT("%s\n", FUNCNAME); lirq_w( FGA_ISLOCAL2, INT_LOCAL2, FGA_ICRLOCAL2, state ); }
+void fga002_device::lirq3_w(int state) { LOGINT("%s\n", FUNCNAME); lirq_w( FGA_ISLOCAL3, INT_LOCAL3, FGA_ICRLOCAL3, state ); }
+void fga002_device::lirq4_w(int state) { LOGINT("%s\n", FUNCNAME); lirq_w( FGA_ISLOCAL4, INT_LOCAL4, FGA_ICRLOCAL4, state ); }
+void fga002_device::lirq5_w(int state) { LOGINT("%s\n", FUNCNAME); lirq_w( FGA_ISLOCAL5, INT_LOCAL5, FGA_ICRLOCAL5, state ); }
+void fga002_device::lirq6_w(int state) { LOGINT("%s\n", FUNCNAME); lirq_w( FGA_ISLOCAL6, INT_LOCAL6, FGA_ICRLOCAL6, state ); }
+void fga002_device::lirq7_w(int state) { LOGINT("%s\n", FUNCNAME); lirq_w( FGA_ISLOCAL7, INT_LOCAL7, FGA_ICRLOCAL7, state ); }
 
 void fga002_device::write(offs_t offset, uint8_t data){
 	LOG("%s[%04x] <- %02x    - ", FUNCNAME, offset, data);

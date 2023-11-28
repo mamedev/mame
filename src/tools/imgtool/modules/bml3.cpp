@@ -23,6 +23,7 @@
 #include "iflopimg.h"
 
 #include "corestr.h"
+#include "multibyte.h"
 #include "opresolv.h"
 
 #include <cstdio>
@@ -134,7 +135,7 @@ static floperr_t get_bml3_dirent(imgtool::image &f, int index_loc, struct bml3_d
 		ent->ftype = buf[11];
 		ent->asciiflag = buf[12];
 		ent->first_granule = buf[13];
-		ent->lastsectorbytes = (buf[14] << 8) | buf[15];
+		ent->lastsectorbytes = get_u16be(&buf[14]);
 		break;
 	default:
 		return FLOPPY_ERROR_INVALIDIMAGE;
@@ -167,8 +168,7 @@ static floperr_t put_bml3_dirent(imgtool::image &f, int index_loc, const struct 
 		buf[11] = ent->ftype;
 		buf[12] = ent->asciiflag;
 		buf[13] = ent->first_granule;
-		buf[14] = ent->lastsectorbytes >> 8;
-		buf[15] = ent->lastsectorbytes & 0xff;
+		put_u16be(&buf[14], ent->lastsectorbytes);
 		break;
 	default:
 		return FLOPPY_ERROR_INVALIDIMAGE;
@@ -517,7 +517,10 @@ static imgtoolerr_t bml3_diskimage_open(imgtool::image &image, imgtool::stream::
 	ferr = callbacks->get_sector_length(floppy, 0, 20, 1, &sector_length);
 	if (ferr)
 		return imgtool_floppy_error(ferr);
-	int sectors_per_track = callbacks->get_sectors_per_track(floppy, 0, 20);
+
+	int sectors_per_track = -1;
+	if (callbacks->get_sectors_per_track)
+		sectors_per_track = callbacks->get_sectors_per_track(floppy, 0, 20);
 
 	if (heads_per_disk == 2 && sector_length == 128 && sectors_per_track == 16) {
 		// single-sided, single-density

@@ -6,13 +6,17 @@ Winbond W83977TF
 
 TODO:
 - PoC for a generic (LPC) Super I/O type, to be merged with fdc37c93x;
+- savquest (in pciagp) fails keyboard self test (PC=e140c reads bit 0 high
+  from port $64?)
 
 ***************************************************************************/
 
 #include "emu.h"
+#include "machine/w83977tf.h"
+
 #include "bus/isa/isa.h"
 //#include "machine/ds128x.h"
-#include "machine/w83977tf.h"
+#include "machine/pckeybrd.h"
 
 #define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_FUNC osd_printf_info
@@ -33,12 +37,12 @@ w83977tf_device::w83977tf_device(const machine_config &mconfig, const char *tag,
 	, m_irq1_callback(*this)
 	, m_irq8_callback(*this)
 	, m_irq9_callback(*this)
-//	, m_txd1_callback(*this)
-//	, m_ndtr1_callback(*this)
-//	, m_nrts1_callback(*this)
-//	, m_txd2_callback(*this)
-//	, m_ndtr2_callback(*this)
-//	, m_nrts2_callback(*this)
+//  , m_txd1_callback(*this)
+//  , m_ndtr1_callback(*this)
+//  , m_nrts1_callback(*this)
+//  , m_txd2_callback(*this)
+//  , m_ndtr2_callback(*this)
+//  , m_nrts2_callback(*this)
 { }
 
 void w83977tf_device::device_start()
@@ -50,17 +54,6 @@ void w83977tf_device::device_start()
 	//m_isa->set_dma_channel(3, this, true);
 	remap(AS_IO, 0, 0x400);
 
-	m_gp20_reset_callback.resolve_safe();
-	m_gp25_gatea20_callback.resolve_safe();
-	m_irq1_callback.resolve_safe();
-	m_irq8_callback.resolve_safe();
-	m_irq9_callback.resolve_safe();
-//	m_txd1_callback.resolve_safe();
-//	m_ndtr1_callback.resolve_safe();
-//	m_nrts1_callback.resolve_safe();
-//	m_txd2_callback.resolve_safe();
-//	m_ndtr2_callback.resolve_safe();
-//	m_nrts2_callback.resolve_safe();
 }
 
 void w83977tf_device::device_reset()
@@ -68,6 +61,8 @@ void w83977tf_device::device_reset()
 	m_index = 0;
 	m_hefras = 0;
 	m_lock_sequence = 2;
+	m_keyb_address[0] = 0x60;
+	m_keyb_address[1] = 0x64;
 }
 
 device_memory_interface::space_config_vector w83977tf_device::memory_space_config() const
@@ -83,14 +78,18 @@ void w83977tf_device::device_add_mconfig(machine_config &config)
 	DS12885(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->irq().set(FUNC(w83977tf_device::irq_rtc_w));
 	m_rtc->set_century_index(0x32);
-	
+
 	KBDC8042(config, m_kbdc);
 	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_PS2);
 	m_kbdc->set_interrupt_type(kbdc8042_device::KBDC8042_DOUBLE);
-	m_kbdc->input_buffer_full_callback().set(FUNC(w83977tf_device::irq_keyboard_w));
-	m_kbdc->input_buffer_full_mouse_callback().set(FUNC(w83977tf_device::irq_mouse_w));
 	m_kbdc->system_reset_callback().set(FUNC(w83977tf_device::kbdp20_gp20_reset_w));
 	m_kbdc->gate_a20_callback().set(FUNC(w83977tf_device::kbdp21_gp25_gatea20_w));
+	m_kbdc->input_buffer_full_callback().set(FUNC(w83977tf_device::irq_keyboard_w));
+	m_kbdc->input_buffer_full_mouse_callback().set(FUNC(w83977tf_device::irq_mouse_w));
+	m_kbdc->set_keyboard_tag("at_keyboard");
+
+	at_keyboard_device &at_keyb(AT_KEYB(config, "at_keyboard", pc_keyboard_device::KEYBOARD_TYPE::AT, 1));
+	at_keyb.keypress().set(m_kbdc, FUNC(kbdc8042_device::keyboard_w));
 }
 
 
@@ -103,14 +102,14 @@ void w83977tf_device::remap(int space_id, offs_t start, offs_t end)
 
 		if (m_activate[5] & 1)
 		{
-			m_isa->install_device(0x60, 0x60, read8sm_delegate(*m_kbdc, FUNC(kbdc8042_device::data_r)), write8sm_delegate(*m_kbdc, FUNC(kbdc8042_device::data_w)));
-			m_isa->install_device(0x64, 0x64, read8sm_delegate(*this, FUNC(w83977tf_device::keybc_status_r)), write8sm_delegate(*this, FUNC(w83977tf_device::keybc_command_w)));
+			m_isa->install_device(m_keyb_address[0], m_keyb_address[0], read8sm_delegate(*m_kbdc, FUNC(kbdc8042_device::data_r)), write8sm_delegate(*m_kbdc, FUNC(kbdc8042_device::data_w)));
+			m_isa->install_device(m_keyb_address[1], m_keyb_address[1], read8sm_delegate(*this, FUNC(w83977tf_device::keybc_status_r)), write8sm_delegate(*this, FUNC(w83977tf_device::keybc_command_w)));
 		}
 
 		if (m_activate[8] & 1)
 		{
 			// TODO: from port
-			m_isa->install_device(0x70, 0x7f, read8sm_delegate(*m_rtc, FUNC(ds12885_device::read)), write8sm_delegate(*m_rtc, FUNC(ds12885_device::write)));
+			m_isa->install_device(0x70, 0x7f, read8sm_delegate(*this, FUNC(w83977tf_device::rtc_r)), write8sm_delegate(*this, FUNC(w83977tf_device::rtc_w)));
 		}
 	}
 }
@@ -136,7 +135,7 @@ void w83977tf_device::write(offs_t offset, u8 data)
 			{
 				m_lock_sequence --;
 				//if (m_lock_sequence == 0)
-				//	LOG("Config unlocked\n");
+				//  LOG("Config unlocked\n");
 			}
 		}
 		else
@@ -159,20 +158,20 @@ void w83977tf_device::write(offs_t offset, u8 data)
 
 void w83977tf_device::config_map(address_map &map)
 {
-//	map(0x02, 0x02) configuration control (bit 0 soft reset)
+//  map(0x02, 0x02) configuration control (bit 0 soft reset)
 	map(0x07, 0x07).lr8(NAME([this] () { return m_logical_index; })).w(FUNC(w83977tf_device::logical_device_select_w));
 	map(0x20, 0x20).lr8(NAME([] () { return 0x97; })); // device ID
 	map(0x21, 0x21).lr8(NAME([] () { return 0x73; })); // revision
-//	map(0x22, 0x22) device power down control
-//	map(0x23, 0x23) global immediate power down
-//	map(0x24, 0x24)
-//	map(0x25, 0x25)
+//  map(0x22, 0x22) device power down control
+//  map(0x23, 0x23) global immediate power down
+//  map(0x24, 0x24)
+//  map(0x25, 0x25)
 	map(0x26, 0x26).rw(FUNC(w83977tf_device::cr26_r), FUNC(w83977tf_device::cr26_w));
-//	map(0x28, 0x28)
-//	map(0x2a, 0x2a)
-//	map(0x2b, 0x2b)
-//	map(0x2c, 0x2c)
-//	map(0x2d, 0x2f) Test Modes
+//  map(0x28, 0x28)
+//  map(0x2a, 0x2a)
+//  map(0x2b, 0x2b)
+//  map(0x2c, 0x2c)
+//  map(0x2d, 0x2f) Test Modes
 
 	map(0x30, 0xff).view(m_logical_view);
 	// FDC
@@ -191,8 +190,17 @@ void w83977tf_device::config_map(address_map &map)
 	m_logical_view[4](0x30, 0xff).unmaprw();
 	// KBC
 	m_logical_view[5](0x30, 0x30).rw(FUNC(w83977tf_device::activate_r<5>), FUNC(w83977tf_device::activate_w<5>));
+	m_logical_view[5](0x60, 0x63).rw(FUNC(w83977tf_device::keyb_io_address_r), FUNC(w83977tf_device::keyb_io_address_w));
 	m_logical_view[5](0x70, 0x70).rw(FUNC(w83977tf_device::keyb_irq_r), FUNC(w83977tf_device::keyb_irq_w));
 	m_logical_view[5](0x72, 0x72).rw(FUNC(w83977tf_device::mouse_irq_r), FUNC(w83977tf_device::mouse_irq_w));
+	m_logical_view[5](0xf0, 0xf0).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			// xx-- ---- KBC clock rate (00 = 6 MHz, 01 = 8 MHz, 10 = 12 MHz, 11 16 MHz)
+			// ---- -x-- Enable port $92
+			// ---- --xx Enables HW A20/reset from port $92
+			LOG("keyboard_hwcontrol_w: %02x\n", data);
+		})
+	);
 	// <reserved>
 	m_logical_view[6](0x30, 0xff).unmaprw();
 	// GPIO1
@@ -356,9 +364,49 @@ void w83977tf_device::keybc_command_w(offs_t offset, u8 data)
 	m_kbdc->data_w(4, data);
 }
 
+// $60-$61 selects data port, $62-$63 command port
+u8 w83977tf_device::keyb_io_address_r(offs_t offset)
+{
+	return m_keyb_address[(offset & 2) >> 1] >> ((offset & 1) ? 0 : 8) & 0xff;
+}
+
+void w83977tf_device::keyb_io_address_w(offs_t offset, u8 data)
+{
+	const u8 which = (offset & 2) >> 1;
+	if (offset & 1)
+	{
+		m_keyb_address[which] &= 0xff00;
+		m_keyb_address[which] |= data;
+		LOG("keyb_io_address_w[1] %04x (%04x & 0x00ff)\n", which, m_keyb_address[which], data);
+	}
+	else
+	{
+		m_keyb_address[which] &= 0xff;
+		m_keyb_address[which] |= data << 8;
+		LOG("keyb_io_address_w[0] %04x (%04x & 0xff00)\n", which, m_keyb_address[which], data << 8);
+	}
+	remap(AS_IO, 0, 0x400);
+}
+
 /*
  * Device #8 (RTC)
  */
+
+u8 w83977tf_device::rtc_r(offs_t offset)
+{
+	if (BIT(offset, 0))
+		return m_rtc->data_r();
+	else
+		return m_rtc->get_address();
+}
+
+void w83977tf_device::rtc_w(offs_t offset, u8 data)
+{
+	if (BIT(offset, 0))
+		m_rtc->data_w(data);
+	else
+		m_rtc->address_w(data);
+}
 
 void w83977tf_device::irq_rtc_w(int state)
 {

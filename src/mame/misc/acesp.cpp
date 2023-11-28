@@ -111,7 +111,7 @@ void ace_sp_state::ace_sp_map(address_map &map)
 {
 	/**** 6303Y internal area ****/
 	//----- 0x0000 - 0x0027 is internal registers -----
-	map(0x0000, 0x0027).m(m_maincpu, FUNC(hd6303y_cpu_device::hd6301y_io));
+
 	//----- 0x0028 - 0x003f is external access -----
 	// 0x30 - to/from reel MCU
 	// 0x31 - lamp high
@@ -128,7 +128,6 @@ void ace_sp_state::ace_sp_map(address_map &map)
 	/* 0x3e */
 	/* 0x3f */
 	//----- 0x0040 - 0x013f is internal RAM (256 bytes) -----
-	map(0x0040, 0x013f).ram();
 
 	/**** regular map ****/
 	map(0x0140, 0x1eff).ram();
@@ -168,7 +167,7 @@ void ace_sp_state::ace_sp(machine_config &config)
 	HD6303Y(config, m_maincpu, 2000000); // unknown clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &ace_sp_state::ace_sp_map);
 
-	PIA6821(config, "pia0", 0);
+	PIA6821(config, "pia0");
 
 	// unknown frequency
 	TIMER(config, "fixedfreq").configure_periodic(FUNC(ace_sp_state::gen_fixfreq), attotime::from_hz(50));

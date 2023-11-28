@@ -59,20 +59,6 @@ device_memory_interface::space_config_vector psion_asic1_device::memory_space_co
 
 
 //-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void psion_asic1_device::device_resolve_objects()
-{
-	m_int_cb.resolve_safe();
-	m_nmi_cb.resolve_safe();
-	m_frcovl_cb.resolve_safe();
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -134,8 +120,7 @@ TIMER_CALLBACK_MEMBER(psion_asic1_device::frc)
 	switch (--m_frc_count)
 	{
 	case 0x0000:
-		m_frc_ovl ^= 1;
-		m_frcovl_cb(m_frc_ovl);
+		m_frcovl_cb(m_frc_ovl ^= 1);
 
 		m_a1_interrupt_status |= 0x20; // FrcExpired
 		update_interrupts();
@@ -160,7 +145,7 @@ TIMER_CALLBACK_MEMBER(psion_asic1_device::watchdog)
 	}
 }
 
-WRITE_LINE_MEMBER(psion_asic1_device::eint1_w)
+void psion_asic1_device::eint1_w(int state)
 {
 	if (state)
 		m_a1_interrupt_status |= 0x04; // ExpIntRightB
@@ -170,7 +155,7 @@ WRITE_LINE_MEMBER(psion_asic1_device::eint1_w)
 	update_interrupts();
 }
 
-WRITE_LINE_MEMBER(psion_asic1_device::eint2_w)
+void psion_asic1_device::eint2_w(int state)
 {
 	if (state)
 		m_a1_interrupt_status |= 0x08; // ExpIntLeftA
@@ -180,7 +165,7 @@ WRITE_LINE_MEMBER(psion_asic1_device::eint2_w)
 	update_interrupts();
 }
 
-WRITE_LINE_MEMBER(psion_asic1_device::eint3_w)
+void psion_asic1_device::eint3_w(int state)
 {
 	if (state)
 		m_a1_interrupt_status |= 0x10; // Asic2Int
@@ -190,7 +175,7 @@ WRITE_LINE_MEMBER(psion_asic1_device::eint3_w)
 	update_interrupts();
 }
 
-WRITE_LINE_MEMBER(psion_asic1_device::enmi_w)
+void psion_asic1_device::enmi_w(int state)
 {
 	if (state)
 		m_a1_status |= 0x0200; // ExternalNmi
@@ -295,7 +280,7 @@ uint16_t psion_asic1_device::io_r(offs_t offset, uint16_t mem_mask)
 		break;
 
 	case 0x06: // A1InterruptStatus
-		data = m_a1_interrupt_status;
+		data = m_a1_interrupt_status & m_a1_interrupt_mask;
 		LOG("%s io_r: A1InterruptStatus => %02x\n", machine().describe_context(), data);
 		break;
 

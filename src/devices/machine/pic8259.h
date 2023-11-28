@@ -41,22 +41,21 @@ public:
 	void write(offs_t offset, uint8_t data);
 	uint8_t acknowledge();
 
-	DECLARE_WRITE_LINE_MEMBER( ir0_w ) { set_irq_line(0, state); }
-	DECLARE_WRITE_LINE_MEMBER( ir1_w ) { set_irq_line(1, state); }
-	DECLARE_WRITE_LINE_MEMBER( ir2_w ) { set_irq_line(2, state); }
-	DECLARE_WRITE_LINE_MEMBER( ir3_w ) { set_irq_line(3, state); }
-	DECLARE_WRITE_LINE_MEMBER( ir4_w ) { set_irq_line(4, state); }
-	DECLARE_WRITE_LINE_MEMBER( ir5_w ) { set_irq_line(5, state); }
-	DECLARE_WRITE_LINE_MEMBER( ir6_w ) { set_irq_line(6, state); }
-	DECLARE_WRITE_LINE_MEMBER( ir7_w ) { set_irq_line(7, state); }
+	void ir0_w(int state) { set_irq_line(0, state); }
+	void ir1_w(int state) { set_irq_line(1, state); }
+	void ir2_w(int state) { set_irq_line(2, state); }
+	void ir3_w(int state) { set_irq_line(3, state); }
+	void ir4_w(int state) { set_irq_line(4, state); }
+	void ir5_w(int state) { set_irq_line(5, state); }
+	void ir6_w(int state) { set_irq_line(6, state); }
+	void ir7_w(int state) { set_irq_line(7, state); }
 
 	IRQ_CALLBACK_MEMBER(inta_cb);
 
 protected:
 	pic8259_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

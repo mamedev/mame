@@ -335,8 +335,8 @@ protected:
 	uint8_t videopkr_p2_data_r();
 	void videopkr_p1_data_w(uint8_t data);
 	void videopkr_p2_data_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER(videopkr_t0_latch);
-	DECLARE_WRITE_LINE_MEMBER(prog_w);
+	int videopkr_t0_latch();
+	void prog_w(int state);
 	uint8_t sound_io_r();
 	void sound_io_w(uint8_t data);
 	uint8_t sound_p2_r();
@@ -426,8 +426,6 @@ private:
 	uint8_t m_sbp0 = 0U;
 };
 
-
-#define DATA_NVRAM_SIZE     0x100
 
 /*************************
 *     Video Hardware     *
@@ -780,12 +778,12 @@ void videopkr_state::videopkr_p2_data_w(uint8_t data)
 	m_p2 = data;
 }
 
-READ_LINE_MEMBER(videopkr_state::videopkr_t0_latch)
+int videopkr_state::videopkr_t0_latch()
 {
 	return m_t0_latch;
 }
 
-WRITE_LINE_MEMBER(videopkr_state::prog_w)
+void videopkr_state::prog_w(int state)
 {
 	if (!state)
 		m_maincpu->set_input_line(0, CLEAR_LINE);   /* clear interrupt FF */
@@ -1240,8 +1238,6 @@ void videopkr_state::machine_start()
 	m_count3 = 0;
 	m_count4 = 0;
 	m_ant_jckp = 0;
-
-	subdevice<nvram_device>("nvram")->set_base(m_data_ram, sizeof(m_data_ram));
 }
 
 void babypkr_state::machine_start()
@@ -1276,7 +1272,7 @@ void videopkr_state::videopkr(machine_config &config)
 	soundcpu.p2_in_cb().set(FUNC(videopkr_state::sound_p2_r));
 	soundcpu.p2_out_cb().set(FUNC(videopkr_state::sound_p2_w));
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "data_ram", nvram_device::DEFAULT_ALL_0);
 
 	TIMER(config, "t1_timer").configure_periodic(FUNC(videopkr_state::sound_t1_callback), attotime::from_hz(50));
 

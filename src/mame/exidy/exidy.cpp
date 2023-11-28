@@ -188,6 +188,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_dsw(*this, "DSW"),
 		m_in0(*this, "IN0"),
+		m_led(*this, "led%u", 0U),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
@@ -217,6 +218,7 @@ protected:
 
 	required_ioport m_dsw;
 	required_ioport m_in0;
+	output_finder<2> m_led;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
@@ -241,8 +243,7 @@ private:
 	required_shared_ptr<uint8_t> m_sprite_enable;
 	optional_shared_ptr<uint8_t> m_characterram;
 
-	emu_timer *m_collision_mob_timer = nullptr;
-	emu_timer *m_collision_bg_timer = nullptr;
+	emu_timer *m_collision_timer[128];
 	uint8_t m_collision_mask = 0;
 	uint8_t m_collision_invert = 0;
 	int m_is_2bpp = 0;
@@ -370,7 +371,7 @@ protected:
 
 private:
 	required_ioport m_dial;
-	uint8_t m_last_dial;
+	uint8_t m_last_dial = 0;
 };
 
 
@@ -473,8 +474,8 @@ void exidy_state::mtrap_ocl_w(uint8_t data) // Mouse Trap (possibly others) set 
 {
 	*m_sprite_enable = data;
 
-	output().set_value("led0", !BIT(data, 2));
-	output().set_value("led1", !BIT(data, 4));
+	m_led[0] = !BIT(data, 2);
+	m_led[1] = !BIT(data, 4);
 }
 
 
@@ -598,7 +599,7 @@ void fax_state::fax_map(address_map &map)
 	map(0x2000, 0x2000).w(FUNC(fax_state::fax_bank_select_w));
 	map(0x2000, 0x3fff).bankr(m_rom_bank);
 	map(0x5200, 0x520f).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x5213, 0x5217).nopw();        /* empty control lines on color/sound board */
+	map(0x5213, 0x5217).nopw(); // empty control lines on color/sound board
 	map(0x6000, 0x6fff).ram().share("characterram");
 	map(0x8000, 0xffff).rom();
 }
@@ -1155,11 +1156,11 @@ INTERRUPT_GEN_MEMBER(exidy_state::exidy_vblank_interrupt)
 }
 
 
-
 uint8_t exidy_state::exidy_interrupt_r()
 {
 	/* clear any interrupts */
-	m_maincpu->set_input_line(0, CLEAR_LINE);
+	if (!machine().side_effects_disabled())
+		m_maincpu->set_input_line(0, CLEAR_LINE);
 
 	/* return the latched condition */
 	return m_int_condition;
@@ -1176,9 +1177,9 @@ uint8_t exidy_state::exidy_interrupt_r()
 inline void exidy_state::set_1_color(int index, int which)
 {
 	m_palette->set_pen_color(index,
-							pal1bit(m_color_latch[2] >> which),
-							pal1bit(m_color_latch[1] >> which),
-							pal1bit(m_color_latch[0] >> which));
+			pal1bit(m_color_latch[2] >> which),
+			pal1bit(m_color_latch[1] >> which),
+			pal1bit(m_color_latch[0] >> which));
 }
 
 void exidy_state::set_colors()
@@ -1310,7 +1311,6 @@ void exidy_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 				(*m_spriteno & 0x0f) + 16 * sprite_set_1, 0,
 				0, 0, sx, sy, 0);
 	}
-
 }
 
 
@@ -1403,16 +1403,22 @@ void exidy_state::check_collision()
 					current_collision_mask |= 0x10;
 
 				/* if we got one, trigger an interrupt */
-				if ((current_collision_mask & m_collision_mask) && (count++ < 128))
-					m_collision_mob_timer->adjust(m_screen->time_until_pos(org_1_x + sx, org_1_y + sy), current_collision_mask);
+				if ((current_collision_mask & m_collision_mask) && count < 128)
+				{
+					m_collision_timer[count]->adjust(m_screen->time_until_pos(org_1_x + sx, org_1_y + sy), current_collision_mask);
+					count++;
+				}
 			}
 
 			if (m_motion_object_2_vid.pix(sy, sx) != 0xff)
 			{
 				/* check for background collision (M2CHAR) */
 				if (m_background_bitmap.pix(org_2_y + sy, org_2_x + sx) != 0)
-					if ((m_collision_mask & 0x08) && (count++ < 128))
-						m_collision_bg_timer->adjust(m_screen->time_until_pos(org_2_x + sx, org_2_y + sy), 0x08);
+					if ((m_collision_mask & 0x08) && count < 128)
+					{
+						m_collision_timer[count]->adjust(m_screen->time_until_pos(org_2_x + sx, org_2_y + sy), 0x08);
+						count++;
+					}
 			}
 		}
 }
@@ -1453,16 +1459,15 @@ uint32_t exidy_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 void exidy_state::machine_start()
 {
-	m_collision_mob_timer = timer_alloc(FUNC(exidy_state::latch_collision), this);
-	m_collision_bg_timer = timer_alloc(FUNC(exidy_state::latch_collision), this);
+	m_led.resolve();
+
+	for (int i = 0; i < 128; i++)
+		m_collision_timer[i] = timer_alloc(FUNC(exidy_state::latch_collision), this);
 }
 
 void spectar_state::machine_start()
 {
 	exidy_state::machine_start();
-
-	m_tone_freq = 0;
-	m_tone_active = 0;
 
 	/* start_raw can't be called here: chan.source will be set by
 	samples_device::device_start and then nulled out by samples_device::device_reset
@@ -1480,8 +1485,6 @@ void spectar_state::machine_start()
 void targ_state::machine_start()
 {
 	spectar_state::machine_start();
-
-	m_tone_pointer = 0;
 
 	save_item(NAME(m_port_2_last));
 	save_item(NAME(m_tone_pointer));
@@ -1613,7 +1616,7 @@ void exidy_state::venture(machine_config &config)
 	exidy_video_config(0x04, 0x04, false);
 
 	// audio hardware
-	pia6821_device &pia(PIA6821(config, "pia", 0));
+	pia6821_device &pia(PIA6821(config, "pia"));
 	pia.writepa_handler().set("soundbd", FUNC(venture_sound_device::pb_w));
 	pia.writepb_handler().set("soundbd", FUNC(venture_sound_device::pa_w));
 	pia.ca2_handler().set("soundbd", FUNC(venture_sound_device::cb_w));
@@ -1652,7 +1655,7 @@ void exidy_state::mtrap(machine_config &config)
 	exidy_video_config(0x14, 0x00, false);
 
 	// audio hardware
-	pia6821_device &pia(PIA6821(config, "pia", 0));
+	pia6821_device &pia(PIA6821(config, "pia"));
 	pia.writepa_handler().set("soundbd", FUNC(venture_sound_device::pb_w));
 	pia.writepb_handler().set("soundbd", FUNC(venture_sound_device::pa_w));
 	pia.ca2_handler().set("soundbd", FUNC(venture_sound_device::cb_w));
@@ -1688,6 +1691,7 @@ void fax_state::fax(machine_config &config)
 	// video hardware
 	exidy_video_config(0x04, 0x04, true);
 }
+
 
 /*************************************************************************
 
@@ -1881,7 +1885,7 @@ ROM_START( spectar )
 
 	ROM_REGION( 0x0140, "proms", 0 )
 	ROM_LOAD( "spl5c-2.5c",   0x0000, 0x0100, CRC(9ca2e061) SHA1(4111325b00a1017042d55c59308d41e8333ba627) ) // 6301 according to the Spectar manual, also seen as IM 5623CPE on PCB
-	ROM_LOAD( "prom.6d",      0x0100, 0x0020, BAD_DUMP CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // screen controller PROM, 6331 according to the Spectar manual, dumped from a bootleg
+	ROM_LOAD( "hrl6d-1.6d",   0x0100, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // screen controller PROM, 6331 according to the Spectar manual, also seen as IM 5610CPE on PCB
 	ROM_LOAD( "hrl14h-1.14h", 0x0120, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) ) // 6331 according to the Spectar manual
 ROM_END
 
@@ -1895,13 +1899,13 @@ ROM_START( spectar1 )
 	ROM_LOAD( "spl7a-1.7a",   0x3000, 0x0800, CRC(e08b0d8d) SHA1(6ffd6f8fb50c9fc09c38f56da7d6d005b66e78cc) )
 	ROM_LOAD( "spl6a-1.6a",   0x3800, 0x0800, CRC(f0e4e71a) SHA1(5487a94650c964a7ab07f30aacab0b470dcb3b40) )
 
-	ROM_REGION( 0x0400, "gfx1", 0 ) // some PCBs were seen with hrl11d-1
+	ROM_REGION( 0x0400, "gfx1", 0 ) // some PCBs were seen with hrl11d-1 (CRC(9f03513e) SHA1(aa4763e49df65e5686a96431543580b8d8285893))
 	ROM_LOAD( "hrl11d-2.11d", 0x0000, 0x0400, CRC(c55b645d) SHA1(0c18277939d74e3e1281a7f114a34781d30c2baf) )  /* this is actually not used (all FF) */
 	ROM_CONTINUE(             0x0000, 0x0400 )  /* overwrite with the real one */
 
 	ROM_REGION( 0x0140, "proms", 0 )
 	ROM_LOAD( "spl5c-2.5c",   0x0000, 0x0100, CRC(9ca2e061) SHA1(4111325b00a1017042d55c59308d41e8333ba627) ) // 6301 according to the Spectar manual, also seen as IM 5623CPE on PCB
-	ROM_LOAD( "prom.6d",      0x0100, 0x0020, BAD_DUMP CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // screen controller PROM, 6331 according to the Spectar manual, dumped from a bootleg
+	ROM_LOAD( "hrl6d-1.6d",   0x0100, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // screen controller PROM, 6331 according to the Spectar manual, also seen as IM 5610CPE on PCB
 	ROM_LOAD( "hrl14h-1.14h", 0x0120, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) ) // 6331 according to the Spectar manual
 ROM_END
 
@@ -2470,7 +2474,7 @@ ROM_START( fax )
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "fxl1-11d.32",  0x0000, 0x0800, CRC(62083db2) SHA1(0c6e90b73419bff53f991e66d4faa9495c7d8e09) )
 
-// loaded, but not hooked up
+	// loaded, but not hooked up
 	ROM_REGION( 0x0240, "proms", 0 )
 	ROM_LOAD( "fxl-6b",   0x0000, 0x0100, CRC(e1e867ae) SHA1(fe4cb560860579102aedad2c81fd7bed5825f484) )
 	ROM_LOAD( "fxl-8b",   0x0100, 0x0020, CRC(0da1bdf9) SHA1(0c2d85da59cf86f2d9cf5f33bdc63902ca5507d3) )
@@ -2523,7 +2527,7 @@ ROM_START( fax2 )
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "fxl1-11d.32",   0x0000, 0x0800, CRC(62083db2) SHA1(0c6e90b73419bff53f991e66d4faa9495c7d8e09) )
 
-// loaded, but not hooked up
+	// loaded, but not hooked up
 	ROM_REGION( 0x0240, "proms", 0 )
 	ROM_LOAD( "fxl-6b",   0x0000, 0x0100, CRC(e1e867ae) SHA1(fe4cb560860579102aedad2c81fd7bed5825f484) )
 	ROM_LOAD( "fxl-8b",   0x0100, 0x0020, CRC(0da1bdf9) SHA1(0c2d85da59cf86f2d9cf5f33bdc63902ca5507d3) )
@@ -2550,19 +2554,19 @@ void spectar_state::init_sidetrac()
 
 void targ_state::init_targ()
 {
-	// hard-coded palette controlled via 8x3 DIP switches on the board
-	m_color_latch[2] = 0x5c;
-	m_color_latch[1] = 0xee;
-	m_color_latch[0] = 0x6b;
+	// hard-coded palette controlled via 8x3 jumpers on the color adapter board
+	m_color_latch[2] = 0x54; // Red
+	m_color_latch[1] = 0xee; // Green
+	m_color_latch[0] = 0x6b; // Blue
 }
 
 
 void spectar_state::init_spectar()
 {
-	// hard-coded palette controlled via 8x3 DIP switches on the board
-	m_color_latch[2] = 0x58;
-	m_color_latch[1] = 0xee;
-	m_color_latch[0] = 0x09;
+	// hard-coded palette controlled via 8x3 jumpers on the color adapter board
+	m_color_latch[2] = 0xda; // Red
+	m_color_latch[1] = 0xee; // Green
+	m_color_latch[0] = 0x61; // Blue
 }
 
 } // anonymous namespace

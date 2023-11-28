@@ -143,7 +143,7 @@ private:
 	void ram_w(offs_t offset, uint8_t data);
 	uint8_t pia_keyboard_r();
 	void pia_display_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pia_display_gate_w);
+	void pia_display_gate_w(int state);
 	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 	TIMER_CALLBACK_MEMBER(ready_start_cb);
 	TIMER_CALLBACK_MEMBER(ready_end_cb);
@@ -475,7 +475,7 @@ void apple1_state::pia_display_w(uint8_t data)
 
 // CB2 here is connected two places: Port B bit 7 for CPU readback,
 // and to the display hardware
-WRITE_LINE_MEMBER(apple1_state::pia_display_gate_w)
+void apple1_state::pia_display_gate_w(int state)
 {
 	m_pia->portb_w((state << 7) ^ 0x80);
 
@@ -590,7 +590,7 @@ void apple1_state::apple1(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->readpa_handler().set(FUNC(apple1_state::pia_keyboard_r));
 	m_pia->writepb_handler().set(FUNC(apple1_state::pia_display_w));
 	m_pia->cb2_handler().set(FUNC(apple1_state::pia_display_gate_w));

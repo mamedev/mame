@@ -23,7 +23,7 @@ matter of time before that board dies too.
 
 It is thought that these games are based on MSX hardware
 as some of the Puzzle Star roms appear to be a hacked
-MSX Bios.  If we're lucky then the FGPA may only contain
+MSX BIOS.  If we're lucky then the FGPA may only contain
 Sang Ho's MSX simulation, rather than any specific game code.
 
 The FGPA is labeled 'Custom 3'

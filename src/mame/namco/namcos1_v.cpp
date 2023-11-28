@@ -245,7 +245,7 @@ u32 namcos1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 }
 
 
-WRITE_LINE_MEMBER(namcos1_state::screen_vblank)
+void namcos1_state::screen_vblank(int state)
 {
 	// rising edge
 	if (state)

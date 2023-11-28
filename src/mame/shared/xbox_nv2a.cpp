@@ -660,6 +660,8 @@ void vertex_program_simulator::process(int address, vertex_nv *in, vertex_nv *ou
 		output++;
 		count--;
 	}
+	input = nullptr;
+	output = nullptr;
 }
 
 int vertex_program_simulator::status()
@@ -2512,25 +2514,7 @@ void nv2a_renderer::compute_supersample_factors(float &horizontal, float &vertic
 
 void nv2a_renderer::convert_vertices(vertex_nv *source, nv2avertex_t *destination)
 {
-/*
-    FIXME: GCC 13.1 errored this without the static on "vert".  I believe this is a real bug, but I don't
-    know enough about what this code is doing to be confident.
-
-    In member function ‘void vertex_program_simulator::set_data(vertex_nv*, vertex_nv*)’,
-    inlined from ‘void vertex_program_simulator::process(int, vertex_nv*, vertex_nv*, int)’ at ../../../../../src/mame/shared/xbox_nv2a.cpp:643:10,
-    inlined from ‘void nv2a_renderer::convert_vertices(vertex_nv*, nv2avertex_t*)’ at ../../../../../src/mame/shared/xbox_nv2a.cpp:2546:29:
-../../../../../src/mame/shared/xbox_nv2a.cpp:449:16: error: storing the address of local variable ‘vert’ in ‘*&this_144(D)->vertexprogram.exec.vertex_program_simulator::output’ [-Werror=dangling-pointer=]
-  449 |         output = out;
-      |         ~~~~~~~^~~~~
-../../../../../src/mame/shared/xbox_nv2a.cpp: In member function ‘void nv2a_renderer::convert_vertices(vertex_nv*, nv2avertex_t*)’:
-../../../../../src/mame/shared/xbox_nv2a.cpp:2504:19: note: ‘vert’ declared here
- 2522 |         vertex_nv vert;
-      |                   ^~~~
-../../../../../src/mame/shared/xbox_nv2a.cpp:2502:82: note: ‘this’ declared here
- 2502 | void nv2a_renderer::convert_vertices(vertex_nv *source, nv2avertex_t *destination)
-      |                                                                                  ^
-*/
-	static vertex_nv vert;
+	vertex_nv vert;
 	int u;
 	float v[4];
 	double c;
@@ -4763,7 +4747,7 @@ void nv2a_renderer::combiner_compute_alpha_outputs(int id, int stage_number)
 	combiner.work[id].functions.Aop3 = std::clamp((combiner.work[id].functions.Aop3 + bias) * scale, -1.0f, 1.0f);
 }
 
-WRITE_LINE_MEMBER(nv2a_renderer::vblank_callback)
+void nv2a_renderer::vblank_callback(int state)
 {
 	LOGMASKED(LOG_NV2A_VERBOSE, "vblank_callback\n\r");
 	if ((state != 0) && (puller_waiting == 1)) {

@@ -1499,7 +1499,7 @@ ROM_START( terraf )
 	ROM_LOAD( "n82s129an.11j", 0x0000, 0x0100, CRC(81244757) SHA1(6324f63e571f0f7a0bb9eb97f9994809db79493f) ) /* N82S129AN or compatible labled "TF" */
 ROM_END
 
-ROM_START( terrafu ) /* Bootleg of the USA version?, uses some roms common to bootlegs that differ to the orginal board sets */
+ROM_START( terrafu ) /* Bootleg of the USA version?, uses some roms common to bootlegs that differ to the original board sets */
 	ROM_REGION( 0x60000, "maincpu", ROMREGION_ERASEFF ) /* 64K*8 for 68000 code */
 	ROM_LOAD16_BYTE( "tf-8.6e", 0x00000, 0x10000, CRC(fea6dd64) SHA1(682eae338ce14808f134897f594fae1c69e75a1a) )
 	ROM_LOAD16_BYTE( "tf-3.6h", 0x00001, 0x10000, CRC(02f9d05a) SHA1(88985373bc3cffbc838e0b701ecd732a417975a1) )
@@ -1531,6 +1531,40 @@ ROM_START( terrafu ) /* Bootleg of the USA version?, uses some roms common to bo
 
 	ROM_REGION( 0x0100, "proms", 0 )    /* Unknown use */
 	ROM_LOAD( "n82s129an.11j", 0x0000, 0x0100, CRC(81244757) SHA1(6324f63e571f0f7a0bb9eb97f9994809db79493f) ) /* N82S129AN or compatible labled "TF" */
+ROM_END
+
+ROM_START( terrafua ) // from an original PCB set: TF-1A + TF-2A PCBs. It's the same as the set above but with a different sound ROM (different first level BGM)
+	ROM_REGION( 0x60000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "8.6e", 0x00000, 0x10000, CRC(fea6dd64) SHA1(682eae338ce14808f134897f594fae1c69e75a1a) )
+	ROM_LOAD16_BYTE( "3.6h", 0x00001, 0x10000, CRC(02f9d05a) SHA1(88985373bc3cffbc838e0b701ecd732a417975a1) )
+	ROM_LOAD16_BYTE( "7.4e", 0x20000, 0x10000, CRC(fde8de7e) SHA1(6b0d27ec49c8c0609c110ad97938bec8c077ad18) )
+	ROM_LOAD16_BYTE( "2.4h", 0x20001, 0x10000, CRC(db987414) SHA1(0a1734794c626cf9083d7854c9000c5daadfc3fd) )
+	ROM_LOAD16_BYTE( "6.3e", 0x40000, 0x10000, CRC(962585bf) SHA1(795c53d6d303872f08d242a30dd3add507ac4355) ) // 1xxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "1.3h", 0x40001, 0x10000, CRC(3f060451) SHA1(26220a8a7052adc62ff1309e96f20d9bd05b4b10) ) // 1xxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "11.17k", 0x00000, 0x10000, CRC(d4d60a51) SHA1(2e38a2f0e0ec7fe2906475d24db7462f835c694c) )
+
+	ROM_REGION( 0x08000, "text", 0 )
+	ROM_LOAD( "9.11e", 0x00000, 0x08000, CRC(bc6f7cbc) SHA1(20b8a34de4bfa0c2fdcd2f7743a0ab35141f4bf9) )
+
+	ROM_REGION( 0x20000, "foreground", 0 )
+	ROM_LOAD( "5.15h", 0x00000, 0x10000, CRC(25d23dfd) SHA1(da32895c1aca403209b7fb181fa4fa23a8e74d32) )
+	ROM_LOAD( "4.13h", 0x10000, 0x10000, CRC(b9b0fe27) SHA1(983c48239ba1524b517f89f281f2b70564bea1e9) )
+
+	ROM_REGION( 0x20000, "background", 0 )
+	ROM_LOAD( "15.8a", 0x00000, 0x10000, CRC(2144d8e0) SHA1(ed89da11abf3d79753b478603009970c2600ab60) )
+	ROM_LOAD( "14.6a", 0x10000, 0x10000, CRC(744f5c9e) SHA1(696223a087bb575c7cfaba11e682b221ada461e4) )
+
+	ROM_REGION( 0x20000, "sprite", 0 )
+	ROM_LOAD16_BYTE( "12.7d", 0x00000, 0x10000, CRC(d74085a1) SHA1(3f6ba85dbd6e48a502c115b2d322a586fc4f56c9) )
+	ROM_LOAD16_BYTE( "13.9d", 0x00001, 0x10000, CRC(148aa0c5) SHA1(8d8a565540e91b384a9c154522501921b7da4d4e) )
+
+	ROM_REGION( 0x4000, "nb1414m4", 0 )    /* data for mcu/blitter */
+	ROM_LOAD( "10.11c", 0x0000, 0x4000, CRC(ac705812) SHA1(65be46ee959d8478cb6dffb25e61f7742276997b) )
+
+	ROM_REGION( 0x0100, "proms", 0 )    /* Unknown use */
+	ROM_LOAD( "0302.11j", 0x0000, 0x0100, CRC(0dc8cb70) SHA1(c0001e36f183b2e366b9ea0ad237b60ff62dd1ef) ) // N82S129AN
 ROM_END
 
 ROM_START( terrafj )
@@ -1973,6 +2007,7 @@ GAME( 1987, legionjb2, legion,   legionjb2, legion,   armedf_state,   init_legio
 
 GAME( 1987, terraf,    0,        terraf,    terraf,   armedf_state,   init_terraf,   ROT0,   "Nichibutsu",                    "Terra Force", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, terrafu,   terraf,   terraf,    terraf,   armedf_state,   init_terraf,   ROT0,   "Nichibutsu USA",                "Terra Force (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, terrafua,  terraf,   terraf,    terraf,   armedf_state,   init_terraf,   ROT0,   "Nichibutsu USA",                "Terra Force (US, alternate sound)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, terrafj,   terraf,   terraf,    terraf,   armedf_state,   init_terraf,   ROT0,   "Nichibutsu Japan",              "Terra Force (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, terrafjb,  terraf,   terrafjb,  terraf,   armedf_state,   init_terraf,   ROT0,   "bootleg",                       "Terra Force (Japan, bootleg with additional Z80)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, terrafb,   terraf,   terrafb,   terraf,   armedf_state,   init_terraf,   ROT0,   "bootleg",                       "Terra Force (Japan, bootleg set 2)", MACHINE_SUPPORTS_SAVE )

@@ -233,11 +233,11 @@ protected:
 	u32 screen_update_deadconx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_yesnoj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_metalb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_no_buffer);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_partial_buffer_delayed);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_partial_buffer_delayed_thundfox);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_full_buffer_delayed);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_partial_buffer_delayed_qzchikyu);
+	void screen_vblank_no_buffer(int state);
+	void screen_vblank_partial_buffer_delayed(int state);
+	void screen_vblank_partial_buffer_delayed_thundfox(int state);
+	void screen_vblank_full_buffer_delayed(int state);
+	void screen_vblank_partial_buffer_delayed_qzchikyu(int state);
 	INTERRUPT_GEN_MEMBER(interrupt);
 	INTERRUPT_GEN_MEMBER(megab_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(cchip_irq_clear_cb);

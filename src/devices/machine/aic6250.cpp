@@ -51,9 +51,9 @@ aic6250_device::aic6250_device(const machine_config &mconfig, device_type type, 
 	, nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF)
 	, m_int_cb(*this)
 	, m_breq_cb(*this)
-	, m_port_a_r_cb(*this)
+	, m_port_a_r_cb(*this, 0xff)
 	, m_port_a_w_cb(*this)
-	, m_port_b_r_cb(*this)
+	, m_port_b_r_cb(*this, 0xff)
 	, m_port_b_w_cb(*this)
 {
 }
@@ -153,14 +153,6 @@ void aic6250_device::write(offs_t offset, u8 data)
 
 void aic6250_device::device_start()
 {
-	m_int_cb.resolve_safe();
-	m_breq_cb.resolve_safe();
-
-	m_port_a_r_cb.resolve_safe(0xff);
-	m_port_a_w_cb.resolve_safe();
-	m_port_b_r_cb.resolve_safe(0xff);
-	m_port_b_w_cb.resolve_safe();
-
 	save_item(NAME(m_dma_count));
 	save_item(NAME(m_int_msk_reg_0));
 	save_item(NAME(m_offset_cntrl));
@@ -1014,7 +1006,7 @@ void aic6250_device::set_int_state(bool asserted)
  * the DMA transfer count falls below 8, data is transferred via individual
  * cycles on demand rather than prefetched.
  */
-WRITE_LINE_MEMBER(aic6250_device::back_w)
+void aic6250_device::back_w(int state)
 {
 	LOGMASKED(LOG_DMA, "back_w %d\n", state);
 

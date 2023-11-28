@@ -16,7 +16,6 @@
 #include "omti8621.h"
 #include "image.h"
 #include "imagedev/harddriv.h"
-#include "formats/pc_dsk.h"
 #include "formats/naslite_dsk.h"
 #include "formats/apollo_dsk.h"
 
@@ -1276,13 +1275,13 @@ void omti8621_device::set_jumper(uint16_t disk_type)
 }
 
 // FDC uses the standard IRQ 6 / DMA 2, doesn't appear to be configurable
-WRITE_LINE_MEMBER( omti8621_device::fdc_irq_w )
+void omti8621_device::fdc_irq_w(int state)
 {
 	if (BIT(m_moten, 3))
 		m_isa->irq6_w(state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( omti8621_device::fdc_drq_w )
+void omti8621_device::fdc_drq_w(int state)
 {
 	if (BIT(m_moten, 3))
 		m_isa->drq2_w(state ? ASSERT_LINE : CLEAR_LINE);

@@ -14,7 +14,7 @@
 #pragma once
 
 #include "coco.h"
-#include "6883sam.h"
+#include "machine/6883sam.h"
 #include "machine/mos6551.h"
 #include "sound/ay8910.h"
 #include "video/mc6847.h"
@@ -48,8 +48,8 @@ public:
 
 	uint8_t sam_read(offs_t offset);
 
-	DECLARE_WRITE_LINE_MEMBER( horizontal_sync );
-	DECLARE_WRITE_LINE_MEMBER( field_sync );
+	void horizontal_sync(int state);
+	void field_sync(int state);
 
 	void coco(machine_config &config);
 	void cocoh(machine_config &config);
@@ -59,6 +59,7 @@ public:
 	void t4426(machine_config &config);
 	void cd6809(machine_config &config);
 	void ms1600(machine_config &config);
+
 protected:
 	virtual void device_start() override;
 

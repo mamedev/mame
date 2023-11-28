@@ -45,7 +45,6 @@ generic_latch_base_device::generic_latch_base_device(const machine_config &mconf
 
 void generic_latch_base_device::device_start()
 {
-	m_data_pending_cb.resolve_safe();
 	save_item(NAME(m_latch_written));
 
 	// synchronization is needed since other devices may not be initialized yet
@@ -75,7 +74,7 @@ void generic_latch_base_device::device_reset()
 //  to be read
 //-------------------------------------------------
 
-READ_LINE_MEMBER(generic_latch_base_device::pending_r)
+int generic_latch_base_device::pending_r()
 {
 	return m_latch_written ? 1 : 0;
 }
@@ -138,12 +137,12 @@ void generic_latch_8_device::clear_w(u8 data)
 	m_latched_value = 0x00;
 }
 
-WRITE_LINE_MEMBER( generic_latch_8_device::preset )
+void generic_latch_8_device::preset(int state)
 {
 	m_latched_value = 0xff;
 }
 
-WRITE_LINE_MEMBER( generic_latch_8_device::clear )
+void generic_latch_8_device::clear(int state)
 {
 	m_latched_value = 0x00;
 }
@@ -209,12 +208,12 @@ void generic_latch_16_device::clear_w(u16 data)
 	m_latched_value = 0x0000;
 }
 
-WRITE_LINE_MEMBER( generic_latch_16_device::preset )
+void generic_latch_16_device::preset(int state)
 {
 	m_latched_value = 0xffff;
 }
 
-WRITE_LINE_MEMBER( generic_latch_16_device::clear )
+void generic_latch_16_device::clear(int state)
 {
 	m_latched_value = 0x0000;
 }

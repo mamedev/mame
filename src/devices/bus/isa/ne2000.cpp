@@ -3,6 +3,8 @@
 #include "emu.h"
 #include "ne2000.h"
 
+#include "multibyte.h"
+
 
 DEFINE_DEVICE_TYPE(NE2000, ne2000_device, "ne2000", "NE2000 Network Adapter")
 
@@ -23,10 +25,11 @@ ne2000_device::ne2000_device(const machine_config& mconfig, const char* tag, dev
 }
 
 void ne2000_device::device_start() {
-	char mac[7];
+	uint8_t mac[6];
 	uint32_t num = machine().rand();
 	memset(m_prom, 0x57, 16);
-	sprintf(mac+2, "\x1b%c%c%c", (num >> 16) & 0xff, (num >> 8) & 0xff, num & 0xff);
+	mac[2] = 0x1b;
+	put_u24be(mac+3, num);
 	mac[0] = 0; mac[1] = 0;  // avoid gcc warning
 	memcpy(m_prom, mac, 6);
 	m_dp8390->set_mac(mac);
@@ -83,7 +86,7 @@ void ne2000_device::ne2000_port_w(offs_t offset, uint16_t data, uint16_t mem_mas
 	return;
 }
 
-WRITE_LINE_MEMBER(ne2000_device::ne2000_irq_w) {
+void ne2000_device::ne2000_irq_w(int state) {
 	switch(m_irq) {
 	case 0:
 		m_isa->irq2_w(state);

@@ -12,18 +12,40 @@ GCMK-16X PCB, 2 ROM chips, Yamaha XE297A0 mapper chip.
 #include "emu.h"
 #include "holy_quran.h"
 
+namespace {
 
-DEFINE_DEVICE_TYPE(MSX_CART_HOLY_QURAN, msx_cart_holy_quran_device, "msx_cart_holy_quran", "MSX Cartridge - Holy Quran")
-
-
-msx_cart_holy_quran_device::msx_cart_holy_quran_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, MSX_CART_HOLY_QURAN, tag, owner, clock)
-	, msx_cart_interface(mconfig, *this)
-	, m_rombank(*this, "rombank%u", 0U)
-	, m_view1(*this, "view1")
-	, m_view2(*this, "view2")
+class msx_cart_holy_quran_device : public device_t, public msx_cart_interface
 {
-}
+public:
+	msx_cart_holy_quran_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: device_t(mconfig, MSX_CART_HOLY_QURAN, tag, owner, clock)
+		, msx_cart_interface(mconfig, *this)
+		, m_rombank(*this, "rombank%u", 0U)
+		, m_view1(*this, "view1")
+		, m_view2(*this, "view2")
+	{ }
+
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
+
+protected:
+	// device_t implementation
+	virtual void device_start() override { }
+	virtual void device_reset() override;
+
+private:
+	static constexpr size_t BANK_SIZE = 0x2000;
+
+	u8 read(offs_t offset);
+	u8 read2(offs_t offset);
+	template <int Bank> void bank_w(u8 data);
+
+	memory_bank_array_creator<4> m_rombank;
+	memory_view m_view1;
+	memory_view m_view2;
+
+	std::vector<u8> m_decrypted;
+	u8 m_bank_mask;
+};
 
 std::error_condition msx_cart_holy_quran_device::initialize_cartridge(std::string &message)
 {
@@ -114,3 +136,7 @@ void msx_cart_holy_quran_device::bank_w(u8 data)
 {
 	m_rombank[Bank]->set_entry(data & m_bank_mask);
 }
+
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_HOLY_QURAN, msx_cart_interface, msx_cart_holy_quran_device, "msx_cart_holy_quran", "MSX Cartridge - Holy Quran")

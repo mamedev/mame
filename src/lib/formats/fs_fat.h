@@ -14,10 +14,10 @@
 #pragma once
 
 #include "fsmgr.h"
-#include <optional>
-#include <string_view>
 
 namespace fs {
+
+using u8 = uint8_t;
 
 // ======================> fat_image
 

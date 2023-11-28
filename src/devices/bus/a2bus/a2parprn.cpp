@@ -20,8 +20,11 @@ public:
 	virtual u8 read_c0nx(u8 offset) override;
 	virtual void write_c0nx(u8 offset, u8 data) override;
 	virtual u8 read_cnxx(u8 offset) override;
+	virtual bool take_c800() override { return false; }
 
 protected:
+	a2bus_parprn_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
+
 	// device_t implementation
 	virtual tiny_rom_entry const *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -31,7 +34,7 @@ protected:
 
 private:
 	// printer status inputs
-	DECLARE_WRITE_LINE_MEMBER(ack_w);
+	void ack_w(int state);
 
 	// timer handlers
 	TIMER_CALLBACK_MEMBER(update_strobe);
@@ -39,12 +42,28 @@ private:
 	required_device<centronics_device>      m_printer_conn;
 	required_device<output_latch_device>    m_printer_out;
 	required_ioport                         m_input_config;
+
+protected:
 	required_region_ptr<u8>                 m_prom;
+
+private:
 	emu_timer *                             m_strobe_timer;
 
 	u8  m_next_strobe;  // B3 pin 13
 	u8  m_ack_latch;    // B2 pin 6
 	u8  m_ack_in;       // pin 2
+};
+
+
+class a2bus_4dparprn_device : public a2bus_parprn_device
+{
+public:
+	a2bus_4dparprn_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+
+protected:
+	// device_t implementation
+	virtual tiny_rom_entry const *device_rom_region() const override;
+	virtual void device_start() override;
 };
 
 
@@ -83,6 +102,12 @@ ROM_START(parprn)
 	ROM_LOAD( "prom.b4", 0x0000, 0x0100, BAD_DUMP CRC(00b742ca) SHA1(c67888354aa013f9cb882eeeed924e292734e717) )
 ROM_END
 
+ROM_START(4dparprn)
+	ROM_REGION(0x100, "prom", 0)
+	ROM_LOAD( "rom.bin", 0x0000, 0x0100, CRC(189262c9) SHA1(d6179664d6860df5ed26fce72f253e28f933b01a) )
+	ROM_IGNORE(0x700) // same data is repeated 8 times
+ROM_END
+
 
 INPUT_PORTS_START(parprn)
 	PORT_START("CFG")
@@ -104,8 +129,8 @@ INPUT_PORTS_END
 
 
 
-a2bus_parprn_device::a2bus_parprn_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
-	device_t(mconfig, A2BUS_PARPRN, tag, owner, clock),
+a2bus_parprn_device::a2bus_parprn_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_printer_conn(*this, "prn"),
 	m_printer_out(*this, "prn_out"),
@@ -118,6 +143,17 @@ a2bus_parprn_device::a2bus_parprn_device(machine_config const &mconfig, char con
 {
 }
 
+
+a2bus_parprn_device::a2bus_parprn_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+	a2bus_parprn_device(mconfig, A2BUS_PARPRN, tag, owner, clock)
+{
+}
+
+
+a2bus_4dparprn_device::a2bus_4dparprn_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+	a2bus_parprn_device(mconfig, A2BUS_4DPARPRN, tag, owner, clock)
+{
+}
 
 
 //----------------------------------------------
@@ -149,7 +185,7 @@ void a2bus_parprn_device::write_c0nx(u8 offset, u8 data)
 
 	ioport_value const cfg(m_input_config->read());
 
-	m_printer_out->write(data & (BIT(cfg, 8) ? 0xffU : 0x7fU));
+	m_printer_out->write(data & (BIT(cfg, 4) ? 0xffU : 0x7fU));
 	m_printer_conn->write_strobe(BIT(~cfg, 3));
 	m_next_strobe = BIT(cfg, 3);
 	m_ack_latch = 0U;
@@ -195,6 +231,12 @@ tiny_rom_entry const *a2bus_parprn_device::device_rom_region() const
 }
 
 
+tiny_rom_entry const *a2bus_4dparprn_device::device_rom_region() const
+{
+	return ROM_NAME(4dparprn);
+}
+
+
 void a2bus_parprn_device::device_add_mconfig(machine_config &config)
 {
 	CENTRONICS(config, m_printer_conn, centronics_devices, "printer");
@@ -221,6 +263,15 @@ void a2bus_parprn_device::device_start()
 }
 
 
+void a2bus_4dparprn_device::device_start()
+{
+	for (unsigned i = 0U; 0x100 > i; ++i)
+		m_prom[i] = (m_prom[i] << 4) | (m_prom[i] >> 4);
+
+	a2bus_parprn_device::device_start();
+}
+
+
 void a2bus_parprn_device::device_reset()
 {
 	m_ack_latch = 1U;
@@ -232,7 +283,7 @@ void a2bus_parprn_device::device_reset()
 //  printer status inputs
 //----------------------------------------------
 
-WRITE_LINE_MEMBER(a2bus_parprn_device::ack_w)
+void a2bus_parprn_device::ack_w(int state)
 {
 	if (bool(state) != bool(m_ack_in))
 	{
@@ -271,3 +322,4 @@ TIMER_CALLBACK_MEMBER(a2bus_parprn_device::update_strobe)
 
 
 DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_PARPRN, device_a2bus_card_interface, a2bus_parprn_device, "a2parprn", "Apple II Parallel Printer Interface Card")
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_4DPARPRN, device_a2bus_card_interface, a2bus_4dparprn_device, "4dparprn", "Fourth Dimension Parallel Printer Interface")

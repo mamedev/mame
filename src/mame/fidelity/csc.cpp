@@ -42,6 +42,7 @@ on the CSC. Also seen with 101-1025A04 label, same ROM contents.
 101-1025A03 might be optional, one (untampered) Spanish PCB was seen with a socket
 instead of this ROM. Most of the opening book is in here.
 
+PCB label: 510-1326B01
 CPU is a 6502 running at 1.95MHz (3.9MHz resonator, divided by 2)
 
 NMI is not used.
@@ -162,6 +163,7 @@ Elite Champion Challenger (ELITE)
 This is a limited-release chess computer based on the CSC. They removed the PIAs
 and did the I/O with TTL instead (PIAs will still work from software point of view).
 ---------------------------------
+PCB label: 510-1041B01
 MPS 6502C CPU @ 4MHz
 20KB total ROM size, 4KB RAM(8*HM6147P)
 
@@ -183,6 +185,8 @@ built-in CB9 module
 
 See CSC description above for more information.
 
+Like with EAS, the new game command for SU9 is: RE -> D6 (or D8) -> CL.
+
 ********************************************************************************
 
 Reversi Sensory Challenger (RSC)
@@ -190,11 +194,11 @@ The 1st version came out in 1980, a program revision was released in 1981.
 Another distinction is the board color and layout, the 1981 version is green.
 Not sure if the 1st version was even released, or just a prototype.
 ---------------------------------
-8*(8+1) buttons, 8*8+1 LEDs
-1KB RAM(2*2114), 4KB ROM
+PCB label: 510-1035A01
 MOS MPS 6502B CPU, frequency unknown
 MOS MPS 6520 PIA, I/O is nearly same as CSC's PIA 0
-PCB label 510-1035A01
+1KB RAM(2*2114), 4KB ROM
+8*(8+1) buttons, 8*8+1 LEDs
 
 To play it on MAME with the sensorboard device, it is recommended to set up
 keyboard shortcuts for the spawn inputs. Then hold the spawn input down while
@@ -215,9 +219,9 @@ clicking on the game board.
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_csc.lh" // clickable
-#include "fidel_rsc.lh" // clickable
-#include "fidel_su9.lh" // clickable
+#include "fidel_csc.lh"
+#include "fidel_rsc.lh"
+#include "fidel_su9.lh"
 
 
 namespace {
@@ -262,6 +266,11 @@ protected:
 	optional_region_ptr<u8> m_language;
 	optional_ioport_array<9> m_inputs;
 
+	u8 m_led_data = 0;
+	u8 m_7seg_data = 0;
+	u8 m_inp_mux = 0;
+	u8 m_speech_bank = 0;
+
 	// address maps
 	void csc_map(address_map &map);
 	void csce_map(address_map &map);
@@ -277,17 +286,12 @@ protected:
 	void pia0_pa_w(u8 data);
 	void pia0_pb_w(u8 data);
 	u8 pia0_pa_r();
-	DECLARE_WRITE_LINE_MEMBER(pia0_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia0_cb2_w);
+	void pia0_ca2_w(int state);
+	void pia0_cb2_w(int state);
 	void pia1_pa_w(u8 data);
 	void pia1_pb_w(u8 data);
 	u8 pia1_pb_r();
-	DECLARE_WRITE_LINE_MEMBER(pia1_ca2_w);
-
-	u8 m_led_data = 0;
-	u8 m_7seg_data = 0;
-	u8 m_inp_mux = 0;
-	u8 m_speech_bank = 0;
+	void pia1_ca2_w(int state);
 };
 
 void csc_state::machine_start()
@@ -438,7 +442,7 @@ void csc_state::pia0_pb_w(u8 data)
 	update_display();
 }
 
-WRITE_LINE_MEMBER(csc_state::pia0_cb2_w)
+void csc_state::pia0_cb2_w(int state)
 {
 	// 7442 A2
 	m_inp_mux = (m_inp_mux & ~4) | (state ? 4 : 0);
@@ -446,7 +450,7 @@ WRITE_LINE_MEMBER(csc_state::pia0_cb2_w)
 	update_sound();
 }
 
-WRITE_LINE_MEMBER(csc_state::pia0_ca2_w)
+void csc_state::pia0_ca2_w(int state)
 {
 	// 7442 A3
 	m_inp_mux = (m_inp_mux & ~8) | (state ? 8 : 0);
@@ -496,7 +500,7 @@ u8 csc_state::pia1_pb_r()
 	return data | (*m_language << 6 & 0xc0);
 }
 
-WRITE_LINE_MEMBER(csc_state::pia1_ca2_w)
+void csc_state::pia1_ca2_w(int state)
 {
 	// printer?
 }
@@ -623,14 +627,14 @@ void csc_state::csc(machine_config &config)
 	irq_clock.set_pulse_width(attotime::from_nsec(42750)); // measured ~42.75us
 	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
-	PIA6821(config, m_pia[0], 0);
+	PIA6821(config, m_pia[0]);
 	m_pia[0]->readpa_handler().set(FUNC(csc_state::pia0_pa_r));
 	m_pia[0]->writepa_handler().set(FUNC(csc_state::pia0_pa_w));
 	m_pia[0]->writepb_handler().set(FUNC(csc_state::pia0_pb_w));
 	m_pia[0]->ca2_handler().set(FUNC(csc_state::pia0_ca2_w));
 	m_pia[0]->cb2_handler().set(FUNC(csc_state::pia0_cb2_w));
 
-	PIA6821(config, m_pia[1], 0);
+	PIA6821(config, m_pia[1]);
 	m_pia[1]->readpb_handler().set(FUNC(csc_state::pia1_pb_r));
 	m_pia[1]->writepa_handler().set(FUNC(csc_state::pia1_pa_w));
 	m_pia[1]->writepb_handler().set(FUNC(csc_state::pia1_pb_w));
@@ -680,14 +684,14 @@ void su9_state::su9(machine_config &config)
 void csc_state::rsc(machine_config &config)
 {
 	// basic machine hardware
-	M6502(config, m_maincpu, 1800000); // measured approx 1.81MHz
+	M6502(config, m_maincpu, 1'800'000); // measured approx 1.81MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &csc_state::rsc_map);
 
 	auto &irq_clock(CLOCK(config, "irq_clock", 546)); // from 555 timer, measured
 	irq_clock.set_pulse_width(attotime::from_usec(38)); // active for 38us
 	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
-	PIA6821(config, m_pia[0], 0); // MOS 6520
+	PIA6821(config, m_pia[0]); // MOS 6520
 	m_pia[0]->readpa_handler().set(FUNC(csc_state::pia0_pa_r));
 	m_pia[0]->writepa_handler().set(FUNC(csc_state::pia0_pa_w));
 	m_pia[0]->writepb_handler().set(FUNC(csc_state::pia0_pb_w));

@@ -56,7 +56,7 @@ TODO:
 #include "softlist_dev.h"
 
 // internal artwork
-#include "ave_arb.lh" // clickable
+#include "ave_arb.lh"
 
 
 namespace {
@@ -98,24 +98,24 @@ private:
 	optional_device<generic_slot_device> m_cart;
 	required_ioport_array<2> m_inputs;
 
+	u16 m_inp_mux = 0;
+	u16 m_led_select = 0;
+	u8 m_led_group = 0;
+	u8 m_led_latch = 0;
+	u16 m_led_data = 0;
+
+	bool m_altboard = false;
+
 	void main_map(address_map &map);
 	void v2_map(address_map &map);
 
 	void init_board(int state);
-	bool m_altboard = false;
-
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	void update_display();
 	void leds_w(u8 data);
 	void control_w(u8 data);
 	u8 input_r();
-
-	u16 m_inp_mux = 0;
-	u16 m_led_select = 0;
-	u8 m_led_group = 0;
-	u8 m_led_latch = 0;
-	u16 m_led_data = 0;
 };
 
 void arb_state::machine_start()
@@ -150,13 +150,15 @@ void arb_state::init_board(int state)
 {
 	// different board setup for checkers
 	if (m_altboard)
+	{
 		for (int i = 0; i < 12; i++)
 		{
 			m_board->write_piece((i % 4) * 2 + ((i / 4) & 1), i / 4, 13); // white
 			m_board->write_piece((i % 4) * 2 + (~(i / 4) & 1), i / 4 + 5, 14); // black
 		}
+	}
 	else
-		m_board->preset_chess(state);
+		m_board->preset_chess();
 }
 
 

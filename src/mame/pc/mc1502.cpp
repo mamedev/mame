@@ -104,10 +104,10 @@ private:
 	uint8_t m_ppi_portc = 0;
 	uint8_t m_spkrdata = 0;
 
-	DECLARE_WRITE_LINE_MEMBER(mc1502_pit8253_out1_changed);
-	DECLARE_WRITE_LINE_MEMBER(mc1502_pit8253_out2_changed);
-	DECLARE_WRITE_LINE_MEMBER(mc1502_speaker_set_spkrdata);
-	DECLARE_WRITE_LINE_MEMBER(mc1502_i8251_syndet);
+	void mc1502_pit8253_out1_changed(int state);
+	void mc1502_pit8253_out2_changed(int state);
+	void mc1502_speaker_set_spkrdata(int state);
+	void mc1502_i8251_syndet(int state);
 
 	void mc1502_ppi_portb_w(uint8_t data);
 	void mc1502_ppi_portc_w(uint8_t data);
@@ -233,26 +233,26 @@ void mc1502_state::mc1502_kppi_portc_w(uint8_t data)
 	LOGPPI("mc1502_kppi_portc_w ( %02X -> %04X )\n", data, m_kbd.mask);
 }
 
-WRITE_LINE_MEMBER(mc1502_state::mc1502_i8251_syndet)
+void mc1502_state::mc1502_i8251_syndet(int state)
 {
 	if (!BIT(m_ppi_portc, 3))
 		m_maincpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(mc1502_state::mc1502_pit8253_out1_changed)
+void mc1502_state::mc1502_pit8253_out1_changed(int state)
 {
 	m_upd8251->write_txc(state);
 	m_upd8251->write_rxc(state);
 }
 
-WRITE_LINE_MEMBER(mc1502_state::mc1502_pit8253_out2_changed)
+void mc1502_state::mc1502_pit8253_out2_changed(int state)
 {
 	m_pit_out2 = state;
 	m_speaker->level_w(m_spkrdata & m_pit_out2);
 	m_cassette->output(state ? 1 : -1);
 }
 
-WRITE_LINE_MEMBER(mc1502_state::mc1502_speaker_set_spkrdata)
+void mc1502_state::mc1502_speaker_set_spkrdata(int state)
 {
 	m_spkrdata = state ? 1 : 0;
 	m_speaker->level_w(m_spkrdata & m_pit_out2);

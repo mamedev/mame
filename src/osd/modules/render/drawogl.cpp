@@ -1354,7 +1354,10 @@ int renderer_ogl::draw(const int update)
 
 				if(pendingPrimitive!=curPrimitive)
 				{
-					glLineWidth(prim.width);
+					if (curPrimitive==GL_POINTS)
+						glPointSize(prim.width);
+					else
+						glLineWidth(prim.width);
 					glBegin(curPrimitive);
 					pendingPrimitive=curPrimitive;
 				}

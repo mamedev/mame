@@ -383,15 +383,10 @@ void imagetek_i4100_device::device_start()
 
 	m_gfxrom_size = m_gfxrom.bytes();
 
-	m_irq_cb.resolve_safe();
 	m_blit_done_timer = timer_alloc(FUNC(imagetek_i4100_device::blit_done), this);
 
 	m_spritelist = std::make_unique<sprite_t []>(0x1000 / 8);
 	m_sprite_end = m_spritelist.get();
-
-	m_ext_ctrl_0_cb.resolve_safe();
-	m_ext_ctrl_1_cb.resolve_safe();
-	m_ext_ctrl_2_cb.resolve_safe();
 }
 
 void imagetek_i4300_device::device_start()
@@ -1437,7 +1432,7 @@ u32 imagetek_i4100_device::screen_update(screen_device &screen, bitmap_rgb32 &bi
 	return 0;
 }
 
-WRITE_LINE_MEMBER(imagetek_i4100_device::screen_eof)
+void imagetek_i4100_device::screen_eof(int state)
 {
 	if (state)
 	{

@@ -35,7 +35,7 @@ DEFINE_DEVICE_TYPE(KBDC8042, kbdc8042_device, "kbdc8042", "8042 Keyboard/Mouse C
 
 kbdc8042_device::kbdc8042_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, KBDC8042, tag, owner, clock)
-	, m_keyboard_dev(*this, "at_keyboard")
+	, m_keyboard_dev(*this, finder_base::DUMMY_TAG)
 	, m_mousex_port(*this, "MOUSEX")
 	, m_mousey_port(*this, "MOUSEY")
 	, m_mousebtn_port(*this, "MOUSEBTN")
@@ -50,12 +50,6 @@ kbdc8042_device::kbdc8042_device(const machine_config &mconfig, const char *tag,
 	m_interrupttype = KBDC8042_SINGLE;
 }
 
-void kbdc8042_device::device_add_mconfig(machine_config &config)
-{
-	AT_KEYB(config, m_keyboard_dev, pc_keyboard_device::KEYBOARD_TYPE::AT, 1);
-	m_keyboard_dev->keypress().set(FUNC(kbdc8042_device::keyboard_w));
-}
-
 
 /*-------------------------------------------------
     device_start - device-specific startup
@@ -63,13 +57,6 @@ void kbdc8042_device::device_add_mconfig(machine_config &config)
 
 void kbdc8042_device::device_start()
 {
-	// resolve callbacks
-	m_system_reset_cb.resolve_safe();
-	m_gate_a20_cb.resolve_safe();
-	m_input_buffer_full_cb.resolve_safe();
-	m_input_buffer_full_mouse_cb.resolve_safe();
-	m_output_buffer_empty_cb.resolve_safe();
-	m_speaker_cb.resolve_safe();
 	m_operation_write_state = 0; /* first write to 0x60 might occur before anything can set this */
 	memset(&m_keyboard, 0x00, sizeof(m_keyboard));
 	memset(&m_mouse, 0x00, sizeof(m_mouse));
@@ -110,13 +97,10 @@ void kbdc8042_device::at_8042_set_outport(uint8_t data, int initial)
 	uint8_t change = initial ? 0xFF : (m_outport ^ data);
 	m_outport = data;
 	if (change & 0x02)
-	{
-		if (!m_gate_a20_cb.isnull())
-			m_gate_a20_cb(data & 0x02 ? 1 : 0);
-	}
+		m_gate_a20_cb(data & 0x02 ? 1 : 0);
 }
 
-WRITE_LINE_MEMBER( kbdc8042_device::keyboard_w )
+void kbdc8042_device::keyboard_w(int state)
 {
 	if(state)
 		at_8042_check_keyboard();
@@ -136,16 +120,15 @@ void kbdc8042_device::at_8042_receive(uint8_t data, bool mouse)
 
 		if (m_interrupttype == KBDC8042_SINGLE)
 		{
-			if (!m_input_buffer_full_cb.isnull())
-				m_input_buffer_full_cb(1);
+			m_input_buffer_full_cb(1);
 		}
 		else
 		{
-			if (m_keyboard.received && (m_command & 1) && !m_input_buffer_full_cb.isnull())
+			if (m_keyboard.received && (m_command & 1))
 			{
 				m_input_buffer_full_cb(1);
 			}
-			if (m_mouse.received && (m_command & 2) && !m_input_buffer_full_mouse_cb.isnull())
+			if (m_mouse.received && (m_command & 2))
 			{
 				m_input_buffer_full_mouse_cb(1);
 			}
@@ -155,7 +138,7 @@ void kbdc8042_device::at_8042_receive(uint8_t data, bool mouse)
 
 void kbdc8042_device::at_8042_check_keyboard()
 {
-	if (!m_keyboard.received && !m_mouse.received)
+	if (!m_keyboard.received && !m_mouse.received && m_keyboard_dev.found())
 	{
 		int data = m_keyboard_dev->read();
 		if (data)
@@ -351,7 +334,8 @@ void kbdc8042_device::data_w(offs_t offset, uint8_t data)
 		case 0:
 			m_data = data;
 			m_sending = 1;
-			m_keyboard_dev->write(data);
+			if (m_keyboard_dev.found())
+				m_keyboard_dev->write(data);
 			break;
 
 		case 1:
@@ -470,8 +454,7 @@ void kbdc8042_device::data_w(offs_t offset, uint8_t data)
 			at_8042_clear_keyboard_received();
 		}
 		m_speaker &= ~0x80;
-		if (!m_speaker_cb.isnull())
-			m_speaker_cb((offs_t)0, m_speaker);
+		m_speaker_cb(offs_t(0), m_speaker);
 
 		break;
 
@@ -590,7 +573,7 @@ void kbdc8042_device::data_w(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(kbdc8042_device::write_out2)
+void kbdc8042_device::write_out2(int state)
 {
 	m_out2 = state;
 }

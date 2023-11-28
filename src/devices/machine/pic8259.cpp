@@ -379,21 +379,6 @@ void pic8259_device::write(offs_t offset, uint8_t data)
 
 
 //-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void pic8259_device::device_resolve_objects()
-{
-	// resolve callbacks
-	m_out_int_func.resolve_safe();
-	m_in_sp_func.resolve_safe(1);
-	m_read_slave_ack_func.resolve_safe(0);
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -469,8 +454,8 @@ DEFINE_DEVICE_TYPE(MK98PIC, mk98pic_device, "mk98pic", "Elektronika MK-98 PIC")
 pic8259_device::pic8259_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_out_int_func(*this)
-	, m_in_sp_func(*this)
-	, m_read_slave_ack_func(*this)
+	, m_in_sp_func(*this, 1)
+	, m_read_slave_ack_func(*this, 0)
 	, m_irr(0)
 	, m_irq_lines(0)
 	, m_level_trig_mode(0)

@@ -103,10 +103,10 @@ private:
 	void port0_w(offs_t offset, uint8_t data);
 	DECLARE_MACHINE_RESET(p8k);
 
-	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(fdc_irq);
-	DECLARE_WRITE_LINE_MEMBER(p8k_daisy_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(p8k_dma_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(p8k_16_daisy_interrupt );
+	[[maybe_unused]] void fdc_irq(int state);
+	void p8k_daisy_interrupt(int state);
+	void p8k_dma_irq_w(int state);
+	void p8k_16_daisy_interrupt(int state);
 	uint8_t memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, uint8_t data);
 	uint8_t io_read_byte(offs_t offset);
@@ -204,14 +204,14 @@ void p8k_state::port0_w(offs_t offset, uint8_t data)
 
 ****************************************************************************/
 
-WRITE_LINE_MEMBER( p8k_state::p8k_daisy_interrupt )
+void p8k_state::p8k_daisy_interrupt(int state)
 {
 	m_maincpu->set_input_line(0, state);
 }
 
 /* Z80 DMA */
 
-WRITE_LINE_MEMBER( p8k_state::p8k_dma_irq_w )
+void p8k_state::p8k_dma_irq_w(int state)
 {
 	m_i8272->tc_w(state);
 	p8k_daisy_interrupt(state);
@@ -259,7 +259,7 @@ static const z80_daisy_config p8k_daisy_chain[] =
 
 /* Intel 8272 Interface */
 
-DECLARE_WRITE_LINE_MEMBER( p8k_state::fdc_irq )
+void p8k_state::fdc_irq(int state)
 {
 	m_pio2->port_b_write(state ? 0x10 : 0x00);
 }
@@ -368,7 +368,7 @@ void p8k_state::p8k_16_iomap(address_map &map)
 
 ****************************************************************************/
 
-WRITE_LINE_MEMBER( p8k_state::p8k_16_daisy_interrupt )
+void p8k_state::p8k_16_daisy_interrupt(int state)
 {
 	m_maincpu->set_input_line(z8001_device::VI_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }

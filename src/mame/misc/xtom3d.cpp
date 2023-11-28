@@ -243,6 +243,8 @@ protected:
 
 private:
 	void remap(int space_id, offs_t start, offs_t end) override;
+
+	void device_map(address_map &map);
 };
 
 DEFINE_DEVICE_TYPE(ISA16_OKSAN_LPC, isa16_oksan_lpc, "isa16_oksan_lpc", "ISA16 Oksan Virtual LPC")
@@ -265,7 +267,7 @@ void isa16_oksan_lpc::device_add_mconfig(machine_config &config)
 	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_STANDARD);
 	m_kbdc->system_reset_callback().set_inputline(":maincpu", INPUT_LINE_RESET);
 	m_kbdc->gate_a20_callback().set_inputline(":maincpu", INPUT_LINE_A20);
-	m_kbdc->input_buffer_full_callback().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq1_w));
+	m_kbdc->input_buffer_full_callback().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq1_w));
 }
 
 
@@ -282,10 +284,14 @@ void isa16_oksan_lpc::device_reset()
 void isa16_oksan_lpc::remap(int space_id, offs_t start, offs_t end)
 {
 	if (space_id == AS_IO)
-	{
-		m_isa->install_device(0x60, 0x6f, read8sm_delegate(m_kbdc, FUNC(kbdc8042_device::data_r)), write8sm_delegate(m_kbdc, FUNC(kbdc8042_device::data_w)));
-		m_isa->install_device(0x70, 0x7f, read8sm_delegate(m_rtc, FUNC(mc146818_device::read)), write8sm_delegate(m_rtc, FUNC(mc146818_device::write)));
-	}
+		m_isa->install_device(0x60, 0x7f, *this, &isa16_oksan_lpc::device_map);
+}
+
+void isa16_oksan_lpc::device_map(address_map &map)
+{
+	map(0x00, 0x0f).rw(m_kbdc, FUNC(kbdc8042_device::data_r), FUNC(kbdc8042_device::data_w));
+	map(0x10, 0x1f).w(m_rtc, FUNC(mc146818_device::address_w)).umask32(0x00ff00ff);
+	map(0x10, 0x1f).rw(m_rtc, FUNC(mc146818_device::data_r), FUNC(mc146818_device::data_w)).umask32(0xff00ff00);
 }
 
 
@@ -316,7 +322,7 @@ private:
 	void xtom3d_map(address_map &map);
 //  void xtom3d_io(address_map &map);
 
-//  DECLARE_WRITE_LINE_MEMBER(vblank_assert);
+//  void vblank_assert(int state);
 
 	static void romdisk_config(device_t *device);
 //  static void cdrom_config(device_t *device);

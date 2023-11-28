@@ -6,7 +6,7 @@
 
     Systems supported by this driver:
 
-    Oric 1,
+    Oric-1,
     Oric Atmos,
     Oric Telestrat,
     Pravetz 8D
@@ -81,10 +81,10 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(nmi_pressed);
 	void via_a_w(uint8_t data);
 	void via_b_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(via_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(via_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(via_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(ext_irq_w);
+	void via_ca2_w(int state);
+	void via_cb2_w(int state);
+	void via_irq_w(int state);
+	void ext_irq_w(int state);
 	void psg_a_w(uint8_t data);
 	TIMER_CALLBACK_MEMBER(update_tape);
 
@@ -92,7 +92,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_oric(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_w);
+	void vblank_w(int state);
 
 	void oric_common(machine_config &config);
 	void oric(machine_config &config);
@@ -146,15 +146,15 @@ public:
 
 	void via2_a_w(uint8_t data);
 	void via2_b_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(via2_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(via2_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(via2_irq_w);
+	void via2_ca2_w(int state);
+	void via2_cb2_w(int state);
+	void via2_irq_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(acia_irq_w);
+	void acia_irq_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_hld_w);
+	void fdc_irq_w(int state);
+	void fdc_drq_w(int state);
+	void fdc_hld_w(int state);
 
 	static void floppy_formats(format_registration &fr);
 
@@ -360,25 +360,25 @@ void oric_state::via_b_w(uint8_t data)
 	m_cassette->output(data & 0x80 ? -1.0 : +1.0);
 }
 
-WRITE_LINE_MEMBER(oric_state::via_ca2_w)
+void oric_state::via_ca2_w(int state)
 {
 	m_via_ca2 = state;
 	update_psg();
 }
 
-WRITE_LINE_MEMBER(oric_state::via_cb2_w)
+void oric_state::via_cb2_w(int state)
 {
 	m_via_cb2 = state;
 	update_psg();
 }
 
-WRITE_LINE_MEMBER(oric_state::via_irq_w)
+void oric_state::via_irq_w(int state)
 {
 	m_via_irq = state;
 	update_irq();
 }
 
-WRITE_LINE_MEMBER(oric_state::ext_irq_w)
+void oric_state::ext_irq_w(int state)
 {
 	m_ext_irq = state;
 	update_irq();
@@ -396,7 +396,7 @@ TIMER_CALLBACK_MEMBER(oric_state::update_tape)
 		m_via->write_cb1(m_cassette->input() > 0.0038);
 }
 
-WRITE_LINE_MEMBER(oric_state::vblank_w)
+void oric_state::vblank_w(int state)
 {
 	if(m_config->read())
 		m_via->write_cb1(state);
@@ -503,17 +503,17 @@ void telestrat_state::via2_b_w(uint8_t data)
 	m_via2->write_pb(port);
 }
 
-WRITE_LINE_MEMBER(telestrat_state::via2_ca2_w)
+void telestrat_state::via2_ca2_w(int state)
 {
 	m_via2_ca2 = state;
 }
 
-WRITE_LINE_MEMBER(telestrat_state::via2_cb2_w)
+void telestrat_state::via2_cb2_w(int state)
 {
 	m_via2_cb2 = state;
 }
 
-WRITE_LINE_MEMBER(telestrat_state::via2_irq_w)
+void telestrat_state::via2_irq_w(int state)
 {
 	m_via2_irq = state;
 	update_irq();
@@ -543,24 +543,24 @@ u8 telestrat_state::port_318_r()
 }
 
 
-WRITE_LINE_MEMBER(telestrat_state::acia_irq_w)
+void telestrat_state::acia_irq_w(int state)
 {
 	m_acia_irq = state;
 	update_irq();
 }
 
-WRITE_LINE_MEMBER(telestrat_state::fdc_irq_w)
+void telestrat_state::fdc_irq_w(int state)
 {
 	m_fdc_irq = state;
 	update_irq();
 }
 
-WRITE_LINE_MEMBER(telestrat_state::fdc_drq_w)
+void telestrat_state::fdc_drq_w(int state)
 {
 	m_fdc_drq = state;
 }
 
-WRITE_LINE_MEMBER(telestrat_state::fdc_hld_w)
+void telestrat_state::fdc_hld_w(int state)
 {
 	m_fdc_hld = state;
 }
@@ -985,7 +985,7 @@ ROM_END
 
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS            INIT        COMPANY      FULLNAME                 FLAGS
-COMP( 1983, oric1,    0,      0,      oric,     oric,     oric_state,      empty_init, "Tangerine", "Oric 1" ,               MACHINE_SUPPORTS_SAVE )
+COMP( 1983, oric1,    0,      0,      oric,     oric,     oric_state,      empty_init, "Tangerine", "Oric-1" ,               MACHINE_SUPPORTS_SAVE )
 COMP( 1984, orica,    oric1,  0,      oric,     orica,    oric_state,      empty_init, "Tangerine", "Oric Atmos" ,           MACHINE_SUPPORTS_SAVE )
 COMP( 1985, prav8d,   oric1,  0,      prav8d,   prav8d,   oric_state,      empty_init, "Pravetz",   "Pravetz 8D",            MACHINE_SUPPORTS_SAVE )
 COMP( 1989, prav8dd,  oric1,  0,      prav8d,   prav8d,   oric_state,      empty_init, "Pravetz",   "Pravetz 8D (Disk ROM)", MACHINE_UNOFFICIAL | MACHINE_SUPPORTS_SAVE )

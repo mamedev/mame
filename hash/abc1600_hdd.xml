@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="abc1600_hdd" description="Luxor ABC 1600 hard disks">
+	<software name="micr1325a">
+		<description>Formatted Micropolis 1325A 69MB</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+
+		<!-- Micropolis 1325A 69MB -->
+		<part name="hdd" interface="scsi_hdd">
+			<diskarea name="harddriv">
+				<disk name="micr1325a" sha1="683180e8ac8f3b097e9f5c1a6950544e6e65a4d1" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="necd5126a">
+		<description>Formatted NEC D5216A 20MB</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+
+		<!-- NEC D5126A 20MB -->
+		<part name="hdd" interface="scsi_hdd">
+			<diskarea name="harddriv">
+				<disk name="necd5126a" sha1="541ffe714517afc29ded60778066b7be5538e08f" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+</softwarelist>

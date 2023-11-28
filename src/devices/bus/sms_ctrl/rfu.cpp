@@ -52,7 +52,7 @@ public:
 	virtual uint8_t in_r() override;
 	virtual void out_w(uint8_t data, uint8_t mem_mask) override;
 
-	DECLARE_WRITE_LINE_MEMBER(rapid_changed);
+	void rapid_changed(int state);
 
 protected:
 	// device_t implementation
@@ -102,7 +102,7 @@ sms_rapid_fire_device::sms_rapid_fire_device(const machine_config &mconfig, cons
 }
 
 
-WRITE_LINE_MEMBER(sms_rapid_fire_device::rapid_changed)
+void sms_rapid_fire_device::rapid_changed(int state)
 {
 	m_rapid = m_rfire_sw->read();
 	m_subctrl_port->out_w(m_in | m_rapid, m_drive & ~m_rapid);

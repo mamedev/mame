@@ -133,9 +133,9 @@ private:
 
 	void mem_map(address_map &map);
 
-	WRITE_LINE_MEMBER(midi_r) { m_rx_data = state; }
+	void midi_r(int state) { m_rx_data = state; }
 
-	WRITE_LINE_MEMBER(midiclock_w) { if (state) m_maincpu->m6801_clock_serial(); }
+	void midiclock_w(int state) { if (state) m_maincpu->m6801_clock_serial(); }
 
 	/**
 	 * @brief Handle a write to the synth's IO Port 1.
@@ -277,7 +277,7 @@ void yamaha_dx9_state::dx9(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(yamaha_dx9_state::palette_init), 3);
 
-	hd44780_device &lcdc(HD44780(config, "lcdc", 0));
+	hd44780_device &lcdc(HD44780(config, "lcdc", 250'000)); // TODO: clock not measured, datasheet typical clock used
 	lcdc.set_lcd_size(2, 16);
 	lcdc.set_pixel_update_cb(FUNC(yamaha_dx9_state::lcd_pixel_update));
 

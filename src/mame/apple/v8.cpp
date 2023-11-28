@@ -97,7 +97,7 @@ void v8_device::device_add_mconfig(machine_config &config)
 	m_screen->set_size(1024, 768);
 	m_screen->set_visarea(0, 640 - 1, 0, 480 - 1);
 	m_screen->set_screen_update(FUNC(v8_device::screen_update));
-	m_screen->screen_vblank().set(FUNC(v8_device::vbl_w));
+	m_screen->screen_vblank().set(FUNC(v8_device::slot_irq_w<0x40>));
 	config.set_default_layout(layout_monitors);
 
 	PALETTE(config, m_palette).set_entries(256);
@@ -138,7 +138,7 @@ v8_device::v8_device(const machine_config &mconfig, device_type type, const char
 	write_cb2(*this),
 	write_hdsel(*this),
 	write_hmmu_enable(*this),
-	read_pb3(*this),
+	read_pb3(*this, 0),
 	m_montype(*this, "MONTYPE"),
 	m_via1(*this, "via1"),
 	m_rom(*this, finder_base::DUMMY_TAG),
@@ -154,13 +154,6 @@ v8_device::v8_device(const machine_config &mconfig, device_type type, const char
 void v8_device::device_start()
 {
 	m_vram = std::make_unique<u32[]>(0x100000 / sizeof(u32));
-
-	write_pb4.resolve_safe();
-	write_pb5.resolve_safe();
-	write_cb2.resolve_safe();
-	write_hdsel.resolve_safe();
-	write_hmmu_enable.resolve_safe();
-	read_pb3.resolve_safe(0);
 
 	m_6015_timer = timer_alloc(FUNC(v8_device::mac_6015_tick), this);
 	m_6015_timer->adjust(attotime::never);
@@ -220,7 +213,7 @@ void v8_device::device_reset()
 u32 v8_device::rom_switch_r(offs_t offset)
 {
 	// disable the overlay
-	if (m_overlay)
+	if (m_overlay && !machine().side_effects_disabled())
 	{
 		ram_size(0xc0); // full SIMM, full 4MB onboard
 		m_overlay = false;
@@ -251,7 +244,7 @@ u8 v8_device::via_in_b()
 	return read_pb3() << 3;
 }
 
-WRITE_LINE_MEMBER(v8_device::via_out_cb2)
+void v8_device::via_out_cb2(int state)
 {
 	write_cb2(state & 1);
 }
@@ -267,13 +260,13 @@ void v8_device::via_out_b(u8 data)
 	write_pb5(BIT(data, 5));
 }
 
-WRITE_LINE_MEMBER(v8_device::via1_irq)
+void v8_device::via1_irq(int state)
 {
 	m_via_interrupt = state;
 	field_interrupts();
 }
 
-WRITE_LINE_MEMBER(v8_device::via2_irq)
+void v8_device::via2_irq(int state)
 {
 	m_via2_interrupt = state;
 	field_interrupts();
@@ -309,28 +302,36 @@ void v8_device::field_interrupts()
 	}
 }
 
-WRITE_LINE_MEMBER(v8_device::scc_irq_w)
+void v8_device::scc_irq_w(int state)
 {
 	m_scc_interrupt = (state == ASSERT_LINE);
 	field_interrupts();
 }
 
-WRITE_LINE_MEMBER(v8_device::vbl_w)
+template <u8 mask>
+void v8_device::slot_irq_w(int state)
 {
-	if (!state)
+	if (state)
 	{
-		return;
+		m_pseudovia_regs[2] &= ~mask;
+	}
+	else
+	{
+		m_pseudovia_regs[2] |= mask;
 	}
 
-	m_pseudovia_regs[2] &= ~0x40; // set vblank signal
-
-	if (m_pseudovia_regs[0x12] & 0x40)
-	{
-		pseudovia_recalc_irqs();
-	}
+	pseudovia_recalc_irqs();
 }
 
-WRITE_LINE_MEMBER(v8_device::asc_irq)
+template void v8_device::slot_irq_w<0x40>(int state);
+template void v8_device::slot_irq_w<0x20>(int state);
+template void v8_device::slot_irq_w<0x10>(int state);
+template void v8_device::slot_irq_w<0x08>(int state);
+template void v8_device::slot_irq_w<0x04>(int state);
+template void v8_device::slot_irq_w<0x02>(int state);
+template void v8_device::slot_irq_w<0x01>(int state);
+
+void v8_device::asc_irq(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -603,12 +604,12 @@ void v8_device::ram_size(u8 config)
 	}
 }
 
-WRITE_LINE_MEMBER(v8_device::cb1_w)
+void v8_device::cb1_w(int state)
 {
 	m_via1->write_cb1(state);
 }
 
-WRITE_LINE_MEMBER(v8_device::cb2_w)
+void v8_device::cb2_w(int state)
 {
 	m_via1->write_cb2(state);
 }
@@ -933,6 +934,7 @@ void spice_device::map(address_map &map)
 	v8_device::map(map);
 
 	map(0x516000, 0x517fff).rw(FUNC(spice_device::swim_r), FUNC(spice_device::swim_w));
+	map(0x518000, 0x518001).w(FUNC(spice_device::bright_contrast_w));
 }
 
 static INPUT_PORTS_START(spice)
@@ -1157,3 +1159,10 @@ void spice_device::via_out_a(u8 data)
 	}
 	m_hdsel = hdsel;
 }
+
+void spice_device::bright_contrast_w(offs_t offset, u8 data)
+{
+	// offset 0 = brightness (0-255)
+	// offset 1 = contrast (0-255)
+}
+

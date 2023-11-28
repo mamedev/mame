@@ -148,7 +148,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update_timer);
-	DECLARE_WRITE_LINE_MEMBER(video_int_write_line);
+	void video_int_write_line(int state);
 
 	void main_map(address_map &map);
 };
@@ -342,7 +342,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(foodf_state::scanline_update_timer)
 }
 
 
-WRITE_LINE_MEMBER(foodf_state::video_int_write_line)
+void foodf_state::video_int_write_line(int state)
 {
 	if (state)
 	{

@@ -113,7 +113,7 @@ ALLOW_SAVE_TYPE(dsp16_device_base::phase);
 ALLOW_SAVE_TYPE(dsp16_device_base::flags);
 ALLOW_SAVE_TYPE(dsp16_device_base::sio_flags);
 
-WRITE_LINE_MEMBER(dsp16_device_base::exm_w)
+void dsp16_device_base::exm_w(int state)
 {
 	if (bool(state) != bool(m_exm_in))
 	{
@@ -177,7 +177,7 @@ dsp16_device_base::dsp16_device_base(
 	, m_iack_cb(*this)
 	, m_ick_cb(*this), m_ild_cb(*this)
 	, m_do_cb(*this), m_ock_cb(*this), m_old_cb(*this), m_ose_cb(*this)
-	, m_pio_r_cb(*this), m_pio_w_cb(*this), m_pdb_w_cb(*this), m_psel_cb(*this), m_pids_cb(*this), m_pods_cb(*this)
+	, m_pio_r_cb(*this, 0U), m_pio_w_cb(*this), m_pdb_w_cb(*this), m_psel_cb(*this), m_pids_cb(*this), m_pods_cb(*this)
 	, m_space_config{
 			{ "rom", ENDIANNESS_BIG, 16, 16, -1, address_map_constructor(FUNC(dsp16_device_base::program_map), this) },
 			{ "ram", ENDIANNESS_BIG, 16, yaau_bits, -1, std::move(data_map) },
@@ -199,25 +199,6 @@ dsp16_device_base::dsp16_device_base(
 /***********************************************************************
     device_t implementation
 ***********************************************************************/
-
-void dsp16_device_base::device_resolve_objects()
-{
-	m_iack_cb.resolve_safe();
-
-	m_ick_cb.resolve_safe();
-	m_ild_cb.resolve_safe();
-	m_do_cb.resolve_safe();
-	m_ock_cb.resolve_safe();
-	m_old_cb.resolve_safe();
-	m_ose_cb.resolve_safe();
-
-	m_pio_r_cb.resolve();
-	m_pio_w_cb.resolve_safe();
-	m_pdb_w_cb.resolve_safe();
-	m_psel_cb.resolve_safe();
-	m_pids_cb.resolve_safe();
-	m_pods_cb.resolve_safe();
-}
 
 void dsp16_device_base::device_start()
 {
@@ -997,7 +978,6 @@ template <bool Debugger, bool Caching> inline void dsp16_device_base::execute_so
 
 			case 0x1e: // Reserved
 				throw emu_fatalerror("DSP16: reserved op %u (PC = %04X)\n", op >> 11, m_st_pcbase);
-				break;
 
 			case 0x1f: // F1 ; y = Y ; x = *pt++[i]
 				m_core->op_dau_ad(op) = m_core->dau_f1(op);
@@ -1533,7 +1513,7 @@ inline void dsp16_device_base::pio_step()
 		assert(!m_pids_out);
 		if (!--m_pio_pids_cnt)
 		{
-			if (!m_pio_r_cb.isnull())
+			if (!m_pio_r_cb.isunset())
 				m_pio_pdx_in = m_pio_r_cb(m_psel_out, 0xffffU);
 			m_pids_cb(m_pids_out = 1U);
 			LOGPIO("DSP16: PIO read active edge PSEL = %u, PDX = %04X (PC = %04X)\n", m_psel_out, m_pio_pdx_in, m_st_pcbase);

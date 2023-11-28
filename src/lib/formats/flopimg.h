@@ -68,7 +68,7 @@ public:
 	  @param image output buffer for data in MAME internal format.
 	  @return true on success, false otherwise.
 	*/
-	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const = 0;
+	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const = 0;
 
 	/*! @brief Save an image.
 	  The save function writes back an image from the MAME internal
@@ -78,17 +78,17 @@ public:
 	  @param image source buffer containing data in MAME internal format.
 	  @return true on success, false otherwise.
 	*/
-	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const;
+	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const;
 
 	//! @returns string containing name of format.
-	virtual const char *name() const = 0;
+	virtual const char *name() const noexcept = 0;
 	//! @returns string containing description of format.
-	virtual const char *description() const = 0;
+	virtual const char *description() const noexcept = 0;
 	//! @returns string containing comma-separated list of file
 	//! extensions the format may use.
-	virtual const char *extensions() const = 0;
+	virtual const char *extensions() const noexcept = 0;
 	//! @returns true if format supports saving.
-	virtual bool supports_save() const = 0;
+	virtual bool supports_save() const noexcept = 0;
 
 	//! This checks if the file has the proper extension for this format.
 	//! @param file_name
@@ -191,7 +191,7 @@ protected:
 	    @param variant the variant to test
 	    @result true if variant is in variants
 	*/
-	static bool has_variant(const std::vector<uint32_t> &variants, uint32_t variant);
+	static bool has_variant(const std::vector<uint32_t> &variants, uint32_t variant) noexcept;
 
 	//! Sector data description
 	struct desc_s
@@ -212,7 +212,7 @@ protected:
 	    @param track_size in _cells_, i.e. 100000 for a usual 2us-per-cell track at 300rpm.
 	    @param image
 	*/
-	static void generate_track(const desc_e *desc, int track, int head, const desc_s *sect, int sect_count, int track_size, floppy_image *image);
+	static void generate_track(const desc_e *desc, int track, int head, const desc_s *sect, int sect_count, int track_size, floppy_image &image);
 
 	/*! @brief Generate a track from cell binary values, MSB-first.
 	    @param track
@@ -223,7 +223,7 @@ protected:
 	    @param subtrack subtrack index, 0-3
 	    @param splice write splice position
 	*/
-	static void generate_track_from_bitstream(int track, int head, const uint8_t *trackbuf, int track_size, floppy_image *image, int subtrack = 0, int splice = 0);
+	static void generate_track_from_bitstream(int track, int head, const uint8_t *trackbuf, int track_size, floppy_image &image, int subtrack = 0, int splice = 0);
 
 	//! @brief Generate a track from cell level values (0/1/W/D/N).
 
@@ -240,7 +240,7 @@ protected:
 	    know. trackbuf may be modified at that position or after.
 	    @param image
 	*/
-	static void generate_track_from_levels(int track, int head, std::vector<uint32_t> &trackbuf, int splice_pos, floppy_image *image);
+	static void generate_track_from_levels(int track, int head, const std::vector<uint32_t> &trackbuf, int splice_pos, floppy_image &image);
 
 	//! Normalize the times in a cell buffer to bring the
 	//! 0..last_position range up to 0..200000000
@@ -321,7 +321,7 @@ protected:
 	 @endverbatim
 	 */
 
-	static std::vector<bool> generate_bitstream_from_track(int track, int head, int cell_size, floppy_image *image, int subtrack = 0, int *max_delta = nullptr);
+	static std::vector<bool> generate_bitstream_from_track(int track, int head, int cell_size, const floppy_image &image, int subtrack = 0, int *max_delta = nullptr);
 	static std::vector<uint8_t> generate_nibbles_from_bitstream(const std::vector<bool> &bitstream);
 
 	struct desc_pc_sector
@@ -341,11 +341,11 @@ protected:
 	};
 
 	static int calc_default_pc_gap3_size(uint32_t form_factor, int sector_size);
-	static void build_wd_track_fm(int track, int head, floppy_image *image, int cell_count, int sector_count, const desc_pc_sector *sects, int gap_3, int gap_1, int gap_2);
-	static void build_wd_track_mfm(int track, int head, floppy_image *image, int cell_count, int sector_count, const desc_pc_sector *sects, int gap_3, int gap_1, int gap_2=22);
-	static void build_pc_track_fm(int track, int head, floppy_image *image, int cell_count, int sector_count, const desc_pc_sector *sects, int gap_3, int gap_4a=40, int gap_1=26, int gap_2=11);
-	static void build_pc_track_mfm(int track, int head, floppy_image *image, int cell_count, int sector_count, const desc_pc_sector *sects, int gap_3, int gap_4a=80, int gap_1=50, int gap_2=22);
-	static void build_mac_track_gcr(int track, int head, floppy_image *image, const desc_gcr_sector *sects);
+	static void build_wd_track_fm(int track, int head, floppy_image &image, int cell_count, int sector_count, const desc_pc_sector *sects, int gap_3, int gap_1, int gap_2);
+	static void build_wd_track_mfm(int track, int head, floppy_image &image, int cell_count, int sector_count, const desc_pc_sector *sects, int gap_3, int gap_1, int gap_2=22);
+	static void build_pc_track_fm(int track, int head, floppy_image &image, int cell_count, int sector_count, const desc_pc_sector *sects, int gap_3, int gap_4a=40, int gap_1=26, int gap_2=11);
+	static void build_pc_track_mfm(int track, int head, floppy_image &image, int cell_count, int sector_count, const desc_pc_sector *sects, int gap_3, int gap_4a=80, int gap_1=50, int gap_2=22);
+	static void build_mac_track_gcr(int track, int head, floppy_image &image, const desc_gcr_sector *sects);
 
 	//! @brief Extract standard sectors from a regenerated bitstream.
 	//! Returns a vector of the vector contents, indexed by the sector id.  Missing sectors have size zero.
@@ -363,24 +363,24 @@ protected:
 	static std::vector<std::vector<uint8_t>> extract_sectors_from_bitstream_victor_gcr5(const std::vector<bool> &bitstream);
 
 	//! Mac type sectors with GCR6 encoding
-	static std::vector<std::vector<uint8_t>> extract_sectors_from_track_mac_gcr6(int head, int track, floppy_image *image);
+	static std::vector<std::vector<uint8_t>> extract_sectors_from_track_mac_gcr6(int head, int track, const floppy_image &image);
 
 
 	//! @brief Get a geometry (including sectors) from an image.
 
 	//!   PC-type sectors with MFM encoding
-	static void get_geometry_mfm_pc(floppy_image *image, int cell_size, int &track_count, int &head_count, int &sector_count);
+	static void get_geometry_mfm_pc(const floppy_image &image, int cell_size, int &track_count, int &head_count, int &sector_count);
 	//!   PC-type sectors with FM encoding
-	static void get_geometry_fm_pc(floppy_image *image, int cell_size, int &track_count, int &head_count, int &sector_count);
+	static void get_geometry_fm_pc(const floppy_image &image, int cell_size, int &track_count, int &head_count, int &sector_count);
 
 
 	//!  Regenerate the data for a full track.
 	//!  PC-type sectors with MFM encoding and fixed-size.
-	static void get_track_data_mfm_pc(int track, int head, floppy_image *image, int cell_size, int sector_size, int sector_count, uint8_t *sectdata);
+	static void get_track_data_mfm_pc(int track, int head, const floppy_image &image, int cell_size, int sector_size, int sector_count, uint8_t *sectdata);
 
 	//!  Regenerate the data for a full track.
 	//!  PC-type sectors with FM encoding and fixed-size.
-	static void get_track_data_fm_pc(int track, int head, floppy_image *image, int cell_size, int sector_size, int sector_count, uint8_t *sectdata);
+	static void get_track_data_fm_pc(int track, int head, const floppy_image &image, int cell_size, int sector_size, int sector_count, uint8_t *sectdata);
 
 	//! Look up a bit in a level-type stream.
 	static bool bit_r(const std::vector<uint32_t> &buffer, int offset);
@@ -552,12 +552,12 @@ public:
 	  @param form_factor form factor of drive (from enum)
 	*/
 	floppy_image(int tracks, int heads, uint32_t form_factor);
-	virtual ~floppy_image();
+	~floppy_image();
 
 	//! @return the form factor.
-	uint32_t get_form_factor() const { return form_factor; }
+	uint32_t get_form_factor() const noexcept { return form_factor; }
 	//! @return the variant.
-	uint32_t get_variant() const { return variant; }
+	uint32_t get_variant() const noexcept { return variant; }
 	//! @param v the variant.
 	void set_variant(uint32_t v) { variant = v; }
 	//! @param v the variant.
@@ -569,7 +569,8 @@ public:
 	  @param head head number
 	  @return a pointer to the data buffer for this track and head
 	*/
-	std::vector<uint32_t> &get_buffer(int track, int head, int subtrack = 0) { assert(track < tracks && head < heads); return track_array[track*4+subtrack][head].cell_data; }
+	std::vector<uint32_t> &get_buffer(int track, int head, int subtrack = 0) noexcept { assert(track < tracks && head < heads); return track_array[track*4+subtrack][head].cell_data; }
+	const std::vector<uint32_t> &get_buffer(int track, int head, int subtrack = 0) const noexcept { assert(track < tracks && head < heads); return track_array[track*4+subtrack][head].cell_data; }
 
 	//! Sets the write splice position.
 	//! The "track splice" information indicates where to start writing
@@ -583,26 +584,26 @@ public:
 	    @param head
 	    @param pos the position
 	*/
-	void set_write_splice_position(int track, int head, uint32_t pos, int subtrack = 0) { assert(track < tracks && head < heads); track_array[track*4+subtrack][head].write_splice = pos; }
+	void set_write_splice_position(int track, int head, uint32_t pos, int subtrack = 0) noexcept { assert(track < tracks && head < heads); track_array[track*4+subtrack][head].write_splice = pos; }
 	//! @return the current write splice position.
-	uint32_t get_write_splice_position(int track, int head, int subtrack = 0) const { assert(track < tracks && head < heads); return track_array[track*4+subtrack][head].write_splice; }
+	uint32_t get_write_splice_position(int track, int head, int subtrack = 0) const noexcept { assert(track < tracks && head < heads); return track_array[track*4+subtrack][head].write_splice; }
 	//! @return the maximal geometry supported by this format.
-	void get_maximal_geometry(int &tracks, int &heads) const;
+	void get_maximal_geometry(int &tracks, int &heads) const noexcept;
 
 	//! @return the current geometry of the loaded image.
-	void get_actual_geometry(int &tracks, int &heads);
+	void get_actual_geometry(int &tracks, int &heads) const noexcept;
 
 	//! @return the track resolution (0=full track, 1 = half-track, 2 = quarter track)
-	int get_resolution() const;
+	int get_resolution() const noexcept;
 
 	//! @return whether a given track is formatted
-	bool track_is_formatted(int track, int head, int subtrack = 0);
+	bool track_is_formatted(int track, int head, int subtrack = 0) const noexcept;
 
 	//! Returns the variant name for the particular disk form factor/variant
 	//! @param form_factor
 	//! @param variant
 	//! @return a string containing the variant name.
-	static const char *get_variant_name(uint32_t form_factor, uint32_t variant);
+	static const char *get_variant_name(uint32_t form_factor, uint32_t variant) noexcept;
 
 private:
 	int tracks, heads;

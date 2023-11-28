@@ -10,21 +10,24 @@
 
 #pragma once
 
+#include "315_5195.h"
+#include "segaic16_m.h"
+#include "segaic16.h"
+#include "sega16sp.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
-#include "315_5195.h"
 #include "machine/cxd1095.h"
 #include "machine/gen_latch.h"
+#include "machine/msm6253.h"
 #include "machine/nvram.h"
-#include "segaic16_m.h"
 #include "machine/upd4701.h"
 #include "sound/dac.h"
 #include "sound/upd7759.h"
 #include "sound/ymopm.h"
 #include "sound/ymopl.h"
-#include "segaic16.h"
-#include "sega16sp.h"
+
 #include "screen.h"
 
 INPUT_PORTS_EXTERN( system16b_generic );
@@ -54,6 +57,7 @@ public:
 		, m_soundlatch(*this, "soundlatch")
 		, m_cxdio(*this, "cxdio")
 		, m_upd4701a(*this, "upd4701a%u", 1U)
+		, m_adc(*this, "adc")
 		, m_workram(*this, "workram")
 		, m_i8751_sync_timer(nullptr)
 		, m_romboard(ROM_BOARD_INVALID)
@@ -64,10 +68,6 @@ public:
 		, m_i8751_initial_config(nullptr)
 		, m_atomicp_sound_divisor(0)
 		, m_atomicp_sound_count(0)
-		, m_hwc_input_value(0)
-		, m_hwc_monitor(*this, "MONITOR")
-		, m_hwc_left(*this, "LEFT")
-		, m_hwc_right(*this, "RIGHT")
 		, m_hwc_left_limit(*this, "LEFT_LIMIT")
 		, m_hwc_right_limit(*this, "RIGHT_LIMIT")
 		, m_mj_input_num(0)
@@ -87,6 +87,8 @@ public:
 	void fpointbla(machine_config &config);
 	void atomicp(machine_config &config);
 	void aceattacb_fd1094(machine_config &config);
+	void hwchamp(machine_config &config);
+	void hwchamp_fd1094(machine_config &config);
 	void system16b_i8751(machine_config &config);
 	void system16c(machine_config &config);
 	void system16b_mc8123(machine_config &config);
@@ -132,6 +134,8 @@ public:
 	void init_altbeas4_5521();
 	void init_aliensyn7_5358_small();
 
+	DECLARE_INPUT_CHANGED_MEMBER(handy_w);
+
 protected:
 	// memory mapping
 	void memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t index);
@@ -155,7 +159,7 @@ protected:
 	void sound_w16(uint16_t data);
 
 	// other callbacks
-	DECLARE_WRITE_LINE_MEMBER(upd7759_generate_nmi);
+	void upd7759_generate_nmi(int state);
 	INTERRUPT_GEN_MEMBER( i8751_main_cpu_vblank );
 	void spin_68k_w(uint8_t data);
 
@@ -246,6 +250,7 @@ protected:
 	optional_device<generic_latch_8_device> m_soundlatch; // not for atomicp
 	optional_device<cxd1095_device> m_cxdio; // for aceattac
 	optional_device_array<upd4701_device, 2> m_upd4701a; // for aceattac
+	optional_device<msm6253_device> m_adc; // for hwchamp
 
 	// memory pointers
 	required_shared_ptr<uint16_t> m_workram;
@@ -265,10 +270,6 @@ protected:
 
 	// game-specific state
 	uint8_t             m_atomicp_sound_count;
-	uint8_t             m_hwc_input_value;
-	optional_ioport     m_hwc_monitor;
-	optional_ioport     m_hwc_left;
-	optional_ioport     m_hwc_right;
 	optional_ioport     m_hwc_left_limit;
 	optional_ioport     m_hwc_right_limit;
 	uint8_t             m_mj_input_num;

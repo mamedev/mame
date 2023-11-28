@@ -74,10 +74,6 @@ i7220_device::i7220_device(const machine_config &mconfig, const char *tag, devic
 
 void i7220_device::device_start()
 {
-	// resolve callbacks
-	intrq_cb.resolve_safe();
-	drq_cb.resolve_safe();
-
 	m_bi.tm = timer_alloc(FUNC(i7220_device::general_continue), this);
 
 	// register for state saving

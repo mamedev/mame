@@ -805,7 +805,7 @@ offs_t apple2_common_device::dasm_override_GS(std::ostream &stream, offs_t pc, c
 				if (operand == 0xe100a8)
 				{
 					u16 call = opcodes.r8(pc + 4);
-					u32 params = opcodes.r16(pc + 6) & 0xffffff;
+					u32 params = opcodes.r32(pc + 6) & 0xffffff;
 					int item = 0;
 
 					while (gsos_calls[item].addr != 0xffff)

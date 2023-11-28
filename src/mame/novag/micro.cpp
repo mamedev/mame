@@ -29,7 +29,7 @@ switch tied to pin #4 (VSB: RAM standby power).
 #include "speaker.h"
 
 // internal artwork
-#include "novag_micro.lh" // clickable
+#include "novag_micro.lh"
 
 
 namespace {
@@ -59,6 +59,10 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport m_inputs;
 
+	u8 m_led_data = 0;
+	u8 m_control = 0;
+	u8 m_inp_mux = 0;
+
 	// address maps
 	void main_map(address_map &map);
 	void main_io(address_map &map);
@@ -70,10 +74,6 @@ private:
 	void control_w(u8 data);
 	u8 control_r();
 	void led_w(u8 data);
-
-	u8 m_led_data = 0;
-	u8 m_control = 0;
-	u8 m_inp_mux = 0;
 };
 
 void micro_state::machine_start()
@@ -100,7 +100,7 @@ void micro_state::input_w(u8 data)
 {
 	// P00-P01: MK3875 doesn't have these pins
 	// P02-P07: input mux part
-	m_inp_mux = data;
+	m_inp_mux = data >> 2;
 }
 
 u8 micro_state::input_r()
@@ -109,7 +109,7 @@ u8 micro_state::input_r()
 
 	// P10-P17: multiplexed inputs
 	// read chessboard
-	u8 cb_mux = (m_inp_mux & 0xfc) | (m_control >> 5 & 3);
+	u8 cb_mux = (m_inp_mux << 2) | (m_control >> 5 & 3);
 	cb_mux = bitswap<8>(cb_mux,4,5,6,7,1,0,3,2);
 
 	for (int i = 0; i < 8; i++)
@@ -197,11 +197,11 @@ INPUT_PORTS_END
 void micro_state::micro(machine_config &config)
 {
 	// basic machine hardware
-	F8(config, m_maincpu, 4500000/2); // matches video reference
+	F8(config, m_maincpu, 4'500'000/2); // matches video reference
 	m_maincpu->set_addrmap(AS_PROGRAM, &micro_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &micro_state::main_io);
 
-	f38t56_device &psu(F38T56(config, "psu", 4500000/2));
+	f38t56_device &psu(F38T56(config, "psu", 4'500'000/2));
 	psu.read_a().set(FUNC(micro_state::control_r));
 	psu.write_a().set(FUNC(micro_state::control_w));
 	psu.write_b().set(FUNC(micro_state::led_w));

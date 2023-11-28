@@ -133,6 +133,7 @@ Find lamps/reels after UPD changes.
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/6821pia.h"
+#include "machine/74259.h"
 #include "machine/i8279.h"
 #include "machine/mc68681.h"
 #include "machine/nvram.h"
@@ -231,22 +232,21 @@ protected:
 private:
 	void i82716_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t i82716_r(offs_t offset);
-	void write_odd(uint16_t data);
 	uint16_t read_odd();
-	void vsync_int_ctrl(uint16_t data);
+	void vsync_int_ctrl(int state);
 	uint8_t b_read();
 	void b_writ(uint8_t data);
 	void strobe_w(uint8_t data);
 	void lamp_data_w(uint8_t data);
 	uint8_t kbd_r();
 	uint32_t screen_update_maygayv1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_maygayv1);
+	void screen_vblank_maygayv1(int state);
 	uint8_t sound_p1_r();
 	void sound_p1_w(uint8_t data);
 	uint8_t sound_p3_r();
 	void sound_p3_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
-	DECLARE_WRITE_LINE_MEMBER(duart_txa);
+	void duart_irq_handler(int state);
+	void duart_txa(int state);
 	void main_map(address_map &map);
 	void cpu_space_map(address_map &map);
 
@@ -448,7 +448,7 @@ uint32_t maygayv1_state::screen_update_maygayv1(screen_device &screen, bitmap_in
 	return 0;
 }
 
-WRITE_LINE_MEMBER(maygayv1_state::screen_vblank_maygayv1)
+void maygayv1_state::screen_vblank_maygayv1(int state)
 {
 	// rising edge
 	if (state)
@@ -507,10 +507,6 @@ WRITE_LINE_MEMBER(maygayv1_state::screen_vblank_maygayv1)
 
 
 
-void maygayv1_state::write_odd(uint16_t data)
-{
-}
-
 //;860008 is a latch of some sort
 uint16_t maygayv1_state::read_odd()
 {
@@ -552,9 +548,9 @@ uint8_t maygayv1_state::kbd_r()
 	return m_kbd_ports[m_lamp_strobe & 0x07]->read();
 }
 
-void maygayv1_state::vsync_int_ctrl(uint16_t data)
+void maygayv1_state::vsync_int_ctrl(int state)
 {
-	m_vsync_latch_preset = data & 0x0100;
+	m_vsync_latch_preset = state;
 
 	// Active low
 	if (!(m_vsync_latch_preset))
@@ -568,8 +564,8 @@ void maygayv1_state::main_map(address_map &map)
 	map(0x100000, 0x17ffff).rom().region("maincpu", 0x80000);
 	map(0x800000, 0x800003).w("ymsnd", FUNC(ym2413_device::write)).umask16(0xff00);
 	map(0x820000, 0x820003).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write)).umask16(0x00ff);
-	map(0x860000, 0x86000d).rw(FUNC(maygayv1_state::read_odd), FUNC(maygayv1_state::write_odd));
-	map(0x86000e, 0x86000f).w(FUNC(maygayv1_state::vsync_int_ctrl));
+	map(0x860000, 0x86000d).r(FUNC(maygayv1_state::read_odd));
+	map(0x860000, 0x86000f).w("outlatch", FUNC(hc259_device::write_d0)).umask16(0xff00);
 	map(0x880000, 0x89ffff).rw(FUNC(maygayv1_state::i82716_r), FUNC(maygayv1_state::i82716_w));
 	map(0x8a0000, 0x8a001f).rw(m_duart68681, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
 	map(0x8c0000, 0x8c000f).r("pia", FUNC(pia6821_device::read)).umask16(0x00ff);
@@ -798,13 +794,13 @@ void maygayv1_state::cpu_space_map(address_map &map)
 	map(0xfffffa, 0xfffffb).lr16(NAME([this] () -> u16 { return m_duart68681->get_irq_vector(); }));
 }
 
-WRITE_LINE_MEMBER(maygayv1_state::duart_irq_handler)
+void maygayv1_state::duart_irq_handler(int state)
 {
 	m_maincpu->set_input_line(5, state);
 }
 
 
-WRITE_LINE_MEMBER(maygayv1_state::duart_txa)
+void maygayv1_state::duart_txa(int state)
 {
 	if (state)
 		m_p3 |= 1;
@@ -848,6 +844,9 @@ void maygayv1_state::maygayv1(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &maygayv1_state::main_map);
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &maygayv1_state::cpu_space_map);
 
+	hc259_device &outlatch(HC259(config, "outlatch"));
+	outlatch.q_out_cb<7>().set(FUNC(maygayv1_state::vsync_int_ctrl));
+
 	I8052(config, m_soundcpu, SOUND_CLOCK);
 	m_soundcpu->port_in_cb<1>().set(FUNC(maygayv1_state::sound_p1_r));
 	m_soundcpu->port_out_cb<1>().set(FUNC(maygayv1_state::sound_p1_w));
@@ -855,7 +854,7 @@ void maygayv1_state::maygayv1(machine_config &config)
 	m_soundcpu->port_out_cb<3>().set(FUNC(maygayv1_state::sound_p3_w));
 
 	/* U25 ST 2 9148 EF68B21P */
-	pia6821_device &pia(PIA6821(config, "pia", 0));
+	pia6821_device &pia(PIA6821(config, "pia"));
 	pia.readpa_handler().set(FUNC(maygayv1_state::b_read));
 	pia.readpb_handler().set(FUNC(maygayv1_state::b_read));
 	pia.writepa_handler().set(FUNC(maygayv1_state::b_writ));

@@ -24,6 +24,7 @@
 
 #include "imgtool.h"
 
+#include "multibyte.h"
 #include "opresolv.h"
 
 #include <cstdio>
@@ -58,24 +59,23 @@ static psion_pack *get_psion_pack(imgtool::image &image)
 	return (psion_pack*)image.extra_bytes();
 }
 
-uint16_t head_checksum(uint8_t* data)
+uint16_t head_checksum(const uint8_t* data)
 {
 	uint16_t checksum = 0;
 
 	for (int i=0; i<6; i+=2)
-		checksum += (data[i]<<8 | data[i+1]);
+		checksum += get_u16be(&data[i]);
 
 	return checksum;
 }
 
 uint16_t get_long_rec_size(imgtool::stream &stream)
 {
-	uint8_t size_h, size_l;
+	uint8_t size[2];
 
-	stream.read(&size_h, 1);
-	stream.read(&size_l, 1);
+	stream.read(size, 2);
 
-	return (size_h<<8) | size_l;
+	return get_u16be(size);
 }
 
 uint32_t update_pack_index(psion_pack *pack)

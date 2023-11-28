@@ -53,7 +53,7 @@ protected:
 	void tube_80186_io(address_map &map);
 	void tube_80186_mem(address_map &map);
 
-	DECLARE_WRITE_LINE_MEMBER(prst_w);
+	void prst_w(int state);
 };
 
 

@@ -106,15 +106,15 @@ namespace
 
 		// Clocks
 		void write_acia_clocks(int id, int state);
-		DECLARE_WRITE_LINE_MEMBER (write_f1_clock){ write_acia_clocks(mc14411_device::TIMER_F1, state); }
-		DECLARE_WRITE_LINE_MEMBER (write_f3_clock){ write_acia_clocks(mc14411_device::TIMER_F3, state); }
-		DECLARE_WRITE_LINE_MEMBER (write_f5_clock){ write_acia_clocks(mc14411_device::TIMER_F5, state); }
-		DECLARE_WRITE_LINE_MEMBER (write_f7_clock){ write_acia_clocks(mc14411_device::TIMER_F7, state); }
-		DECLARE_WRITE_LINE_MEMBER (write_f8_clock){ write_acia_clocks(mc14411_device::TIMER_F8, state); }
-		DECLARE_WRITE_LINE_MEMBER (write_f9_clock){ write_acia_clocks(mc14411_device::TIMER_F9, state); }
-		DECLARE_WRITE_LINE_MEMBER (write_f11_clock){ write_acia_clocks(mc14411_device::TIMER_F11, state); }
-		DECLARE_WRITE_LINE_MEMBER (write_f13_clock){ write_acia_clocks(mc14411_device::TIMER_F13, state); }
-		DECLARE_WRITE_LINE_MEMBER (write_f15_clock){ write_acia_clocks(mc14411_device::TIMER_F15, state); }
+		void write_f1_clock(int state) { write_acia_clocks(mc14411_device::TIMER_F1, state); }
+		void write_f3_clock(int state) { write_acia_clocks(mc14411_device::TIMER_F3, state); }
+		void write_f5_clock(int state) { write_acia_clocks(mc14411_device::TIMER_F5, state); }
+		void write_f7_clock(int state) { write_acia_clocks(mc14411_device::TIMER_F7, state); }
+		void write_f8_clock(int state) { write_acia_clocks(mc14411_device::TIMER_F8, state); }
+		void write_f9_clock(int state) { write_acia_clocks(mc14411_device::TIMER_F9, state); }
+		void write_f11_clock(int state) { write_acia_clocks(mc14411_device::TIMER_F11, state); }
+		void write_f13_clock(int state) { write_acia_clocks(mc14411_device::TIMER_F13, state); }
+		void write_f15_clock(int state) { write_acia_clocks(mc14411_device::TIMER_F15, state); }
 	protected:
 		coco_t4426_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
@@ -150,7 +150,7 @@ namespace
 
 void coco_t4426_device::device_add_mconfig(machine_config &config)
 {
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->writepa_handler().set(FUNC(coco_t4426_device::pia_A_w));
 
 	ACIA6850(config, m_uart, 0);

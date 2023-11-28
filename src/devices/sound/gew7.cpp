@@ -198,6 +198,7 @@ void gew7_pcm_device::write_hi(offs_t offset, uint8_t data)
 	case 3:
 		slot.m_vibrato = data & 7;
 		slot.m_tremolo = (data >> 3) & 7;
+		slot.m_reverse = data >> 7;
 		lfo_compute_step(slot.m_pitch_lfo, slot.m_lfo_frequency, slot.m_vibrato, 0);
 		lfo_compute_step(slot.m_amplitude_lfo, slot.m_lfo_frequency, slot.m_tremolo, 1);
 		break;

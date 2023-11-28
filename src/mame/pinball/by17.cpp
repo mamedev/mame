@@ -78,9 +78,9 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(activity_button);
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
-	template <int Param> DECLARE_READ_LINE_MEMBER(outhole_x0);
-	template <int Param> DECLARE_READ_LINE_MEMBER(saucer_x3);
-	template <int Param> DECLARE_READ_LINE_MEMBER(drop_target_x2);
+	template <int Param> int outhole_x0();
+	template <int Param> int saucer_x3();
+	template <int Param> int drop_target_x2();
 
 	void by17(machine_config &config);
 
@@ -129,10 +129,10 @@ private:
 	void u11_b_w(uint8_t data);
 	uint8_t nibble_nvram_r(offs_t offset);
 	void nibble_nvram_w(offs_t offset, uint8_t data);
-	DECLARE_READ_LINE_MEMBER(u10_ca1_r);
-	DECLARE_WRITE_LINE_MEMBER(u10_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(u10_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(u11_cb2_w);
+	int u10_ca1_r();
+	void u10_ca2_w(int state);
+	void u10_cb2_w(int state);
+	void u11_cb2_w(int state);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_z_freq);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_z_pulse);
@@ -465,7 +465,7 @@ INPUT_PORTS_END
 
 
 template <int Param>
-READ_LINE_MEMBER( by17_state::outhole_x0 )
+int by17_state::outhole_x0()
 {
 	int bit_shift = (Param & 0x07);
 	int port = ((Param >> 4) & 0x07);
@@ -479,7 +479,7 @@ READ_LINE_MEMBER( by17_state::outhole_x0 )
 }
 
 template <int Param>
-READ_LINE_MEMBER( by17_state::saucer_x3 )
+int by17_state::saucer_x3()
 {
 	int bit_shift = (Param & 0x07);
 	int port = ((Param >> 4) & 0x07);
@@ -493,7 +493,7 @@ READ_LINE_MEMBER( by17_state::saucer_x3 )
 }
 
 template <int Param>
-READ_LINE_MEMBER( by17_state::drop_target_x2 )
+int by17_state::drop_target_x2()
 {
 	/* Here we simulate fallen Drop Targets so the Drop Target Reset Solenoids can release the switches */
 
@@ -552,12 +552,12 @@ INPUT_CHANGED_MEMBER( by17_state::self_test )
 	m_pia_u10->ca1_w(newval);
 }
 
-READ_LINE_MEMBER( by17_state::u10_ca1_r )
+int by17_state::u10_ca1_r()
 {
 	return m_io_test->read() & 0x01;
 }
 
-WRITE_LINE_MEMBER( by17_state::u10_ca2_w )
+void by17_state::u10_ca2_w(int state)
 {
 #if 0                   // Display Blanking - Out of sync with video redraw rate and causes flicker so it's disabled
 	if (state == 0)
@@ -576,7 +576,7 @@ WRITE_LINE_MEMBER( by17_state::u10_ca2_w )
 	m_u10_ca2 = state;
 }
 
-WRITE_LINE_MEMBER( by17_state::u10_cb2_w )
+void by17_state::u10_cb2_w(int state)
 {
 //  logerror("New U10 CB2 state %01x, was %01x.   PIA=%02x\n", state, m_u10_cb2, m_u10a);
 
@@ -586,7 +586,7 @@ WRITE_LINE_MEMBER( by17_state::u10_cb2_w )
 	m_u10_cb2 = state;
 }
 
-WRITE_LINE_MEMBER( by17_state::u11_cb2_w )
+void by17_state::u11_cb2_w(int state)
 {
 	m_u11_cb2 = state;
 }
@@ -1006,7 +1006,7 @@ void by17_state::by17(machine_config &config)
 	genpin_audio(config);
 
 	/* Devices */
-	PIA6821(config, m_pia_u10, 0);
+	PIA6821(config, m_pia_u10);
 	m_pia_u10->readpa_handler().set(FUNC(by17_state::u10_a_r));
 	m_pia_u10->writepa_handler().set(FUNC(by17_state::u10_a_w));
 	m_pia_u10->readpb_handler().set(FUNC(by17_state::u10_b_r));
@@ -1020,7 +1020,7 @@ void by17_state::by17(machine_config &config)
 	TIMER(config, "timer_z_freq").configure_periodic(FUNC(by17_state::timer_z_freq), attotime::from_hz(100)); // Mains Line Frequency * 2
 	TIMER(config, m_zero_crossing_active_timer).configure_generic(FUNC(by17_state::timer_z_pulse));  // Active pulse length from Zero Crossing detector
 
-	PIA6821(config, m_pia_u11, 0);
+	PIA6821(config, m_pia_u11);
 	m_pia_u11->readpa_handler().set(FUNC(by17_state::u11_a_r));
 	m_pia_u11->writepa_handler().set(FUNC(by17_state::u11_a_w));
 	m_pia_u11->writepb_handler().set(FUNC(by17_state::u11_b_w));

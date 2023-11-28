@@ -71,11 +71,11 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<4> m_inputs;
 
-	void main_io(address_map &map);
-	void main_map(address_map &map);
-
 	u8 m_inp_mux = 0;
 	u8 m_digit_data = 0;
+
+	void main_io(address_map &map);
+	void main_map(address_map &map);
 
 	void update_display();
 	u8 pio_port_b_r();

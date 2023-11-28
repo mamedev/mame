@@ -1135,7 +1135,7 @@ popmessage   ("%08x %08x %08x %08x\n%08x %08x %08x %08x",
 	return 0;
 }
 
-WRITE_LINE_MEMBER(psikyosh_state::screen_vblank)
+void psikyosh_state::screen_vblank(int state)
 {
 	if (state)
 	{

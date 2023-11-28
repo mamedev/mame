@@ -15,7 +15,6 @@
 
 #include "cpcexp.h"
 #include "imagedev/cassette.h"
-#include "formats/tzx_cas.h"
 
 class cpc_doubler_device  : public device_t,
 						public device_cpc_expansion_card_interface

@@ -43,6 +43,11 @@ public:
 		m_bankmotor_timer(*this, "bankmotor"),
 		m_digital_ports(*this, { { "SERVICE", "UNKNOWN", "COINAGE", "DSW" } }),
 		m_adc_ports(*this, "ADC.%u", 0),
+		m_bank_motor_direction(*this, "Bank_Motor_Direction"),
+		m_bank_motor_speed(*this, "Bank_Motor_Speed"),
+		m_vibration_motor(*this, "Vibration_motor"),
+		m_start_lamp(*this, "Start_lamp"),
+		m_brake_lamp(*this, "Brake_lamp"),
 		m_workram(*this, "workram"),
 		m_custom_io_r(*this),
 		m_custom_io_w(*this),
@@ -110,6 +115,7 @@ protected:
 	void sub_map(address_map &map);
 
 	// device overrides
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
@@ -118,7 +124,7 @@ protected:
 
 	// internal helpers
 	void update_main_irqs();
-	DECLARE_WRITE_LINE_MEMBER(m68k_reset_callback);
+	void m68k_reset_callback(int state);
 
 	// custom I/O
 	uint16_t outrun_custom_io_r(address_space &space, offs_t offset);
@@ -145,6 +151,13 @@ protected:
 	// input ports
 	required_ioport_array<4> m_digital_ports;
 	optional_ioport_array<8> m_adc_ports;
+
+	// outputs
+	output_finder<> m_bank_motor_direction;
+	output_finder<> m_bank_motor_speed;
+	output_finder<> m_vibration_motor;
+	output_finder<> m_start_lamp;
+	output_finder<> m_brake_lamp;
 
 	// memory
 	required_shared_ptr<uint16_t> m_workram;

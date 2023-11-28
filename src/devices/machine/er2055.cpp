@@ -163,7 +163,7 @@ void er2055_device::update_state()
 //  successive write or erase operations
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(er2055_device::set_clk)
+void er2055_device::set_clk(int state)
 {
 	uint8_t oldstate = m_control_state;
 	if (state)

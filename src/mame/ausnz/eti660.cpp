@@ -81,11 +81,11 @@ private:
 	u8 pia_r();
 	void pia_w(u8 data);
 	void colorram_w(offs_t offset, u8 data);
-	DECLARE_READ_LINE_MEMBER( clear_r );
-	DECLARE_READ_LINE_MEMBER( ef2_r );
-	DECLARE_READ_LINE_MEMBER( ef4_r );
-	DECLARE_WRITE_LINE_MEMBER( q_w );
-	DECLARE_WRITE_LINE_MEMBER( ca2_w );
+	int clear_r();
+	int ef2_r();
+	int ef4_r();
+	void q_w(int state);
+	void ca2_w(int state);
 	void dma_w(offs_t offset, u8 data);
 	u8 pia_pa_r();
 	void pia_pa_w(u8 data);
@@ -132,7 +132,7 @@ void eti660_state::pia_w(u8 data)
 	m_pia->write(pia_offset, data);
 }
 
-WRITE_LINE_MEMBER( eti660_state::ca2_w ) // test with Wipeout game - it should start up in colour
+void eti660_state::ca2_w(int state) // test with Wipeout game - it should start up in colour
 {
 	m_cti->con_w(state);
 }
@@ -203,7 +203,7 @@ INPUT_PORTS_END
 
 /* CDP1802 Interface */
 
-READ_LINE_MEMBER( eti660_state::clear_r )
+int eti660_state::clear_r()
 {
 	// A hack to make the machine reset itself on
 	// boot, like the real one does.
@@ -214,17 +214,17 @@ READ_LINE_MEMBER( eti660_state::clear_r )
 	return BIT(m_special->read(), 0); // R key
 }
 
-READ_LINE_MEMBER( eti660_state::ef2_r )
+int eti660_state::ef2_r()
 {
 	return m_cassette->input() < 0;
 }
 
-READ_LINE_MEMBER( eti660_state::ef4_r )
+int eti660_state::ef4_r()
 {
 	return BIT(m_special->read(), 1); // S key
 }
 
-WRITE_LINE_MEMBER( eti660_state::q_w )
+void eti660_state::q_w(int state)
 {
 	/* CDP1864 audio output enable */
 	m_cti->aoe_w(state);
@@ -372,7 +372,7 @@ void eti660_state::eti660(machine_config &config)
 	m_cti->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->readpa_handler().set(FUNC(eti660_state::pia_pa_r));
 	m_pia->writepa_handler().set(FUNC(eti660_state::pia_pa_w));
 	m_pia->ca2_handler().set(FUNC(eti660_state::ca2_w));  // not working, bug in pia

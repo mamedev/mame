@@ -35,26 +35,40 @@ OKI M2128-15 RAM
 */
 
 #include "emu.h"
-#include "speaker.h"
-
-#include "sms.h"
 
 #include "cpu/z80/z80.h"
 #include "sound/ymopl.h"
+#include "video/315_5124.h"
 
+#include "speaker.h"
 
 namespace {
 
-class fwheel_state : public sms_state
+class fwheel_state : public driver_device
 {
 public:
 	fwheel_state(const machine_config &mconfig, device_type type, const char *tag)
-		: sms_state(mconfig, type, tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
+		, m_bank(*this, "bank")
+		, m_ipl(*this, "ipl")
+		, m_vdp(*this, "vdp")
 	{}
 
 	void fwheel(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
+	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
+	required_memory_bank m_bank;
+	required_memory_region m_ipl;
+	required_device<sega315_5124_device> m_vdp;
+
 	void main_io_map(address_map &map);
 	void main_prg_map(address_map &map);
 	void sound_prg_map(address_map &map);
@@ -65,7 +79,7 @@ private:
 
 void fwheel_state::main_prg_map(address_map &map)
 {
-	map(0x0000, 0xbfff).rom();
+	map(0x0000, 0x7fff).bankr(m_bank);
 	map(0xc000, 0xdfff).ram();
 }
 
@@ -73,9 +87,17 @@ void fwheel_state::main_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 
-	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::data_read), FUNC(sega315_5124_device::data_write));
-	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::control_read), FUNC(sega315_5124_device::control_write));
-	map(0xdc, 0xdc).portr("IN0");
+	map(0x3e, 0x3e).lw8(
+		NAME([this] (u8 data) {
+			// TODO: unconfirmed, may be either bit 3 or 5
+			m_bank->set_entry(BIT(data, 3));
+			if (data != 0xe0 && data != 0xc8)
+				logerror("I/O $3e -> %02x\n", data);
+		})
+	);
+	map(0xbe, 0xbe).rw(m_vdp, FUNC(sega315_5124_device::data_read), FUNC(sega315_5124_device::data_write));
+	map(0xbf, 0xbf).rw(m_vdp, FUNC(sega315_5124_device::control_read), FUNC(sega315_5124_device::control_write));
+	map(0xdc, 0xdc).portr("IN0"); // TODO: comms from another CPU
 }
 
 void fwheel_state::sound_prg_map(address_map &map)
@@ -152,6 +174,15 @@ static INPUT_PORTS_START( fwheel )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+void fwheel_state::machine_start()
+{
+	m_bank->configure_entries(0, 2, m_ipl->base(), 0x8000);
+}
+
+void fwheel_state::machine_reset()
+{
+	m_bank->set_entry(0);
+}
 
 void fwheel_state::fwheel(machine_config &config)
 {
@@ -164,15 +195,15 @@ void fwheel_state::fwheel(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	SCREEN(config, m_main_scr, SCREEN_TYPE_RASTER);
-	m_main_scr->set_raw(XTAL(10'738'000) / 2, \
-			sega315_5124_device::WIDTH , sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH - 2, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256 + 10, \
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(XTAL(10'738'000) / 2,
+			sega315_5124_device::WIDTH , sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH - 2, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256 + 10,
 			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT + 224);
-	m_main_scr->set_refresh_hz(XTAL(10'738'000) / 2 / (sega315_5124_device::WIDTH * sega315_5124_device::HEIGHT_NTSC));
-	m_main_scr->set_screen_update(FUNC(sms_state::screen_update_sms));
+	m_screen->set_refresh_hz(XTAL(10'738'000) / 2 / (sega315_5124_device::WIDTH * sega315_5124_device::HEIGHT_NTSC));
+	m_screen->set_screen_update(m_vdp, FUNC(sega315_5246_device::screen_update));
 
 	SEGA315_5124(config, m_vdp, XTAL(10'738'000)); // not verified
-	m_vdp->set_screen(m_main_scr);
+	m_vdp->set_screen(m_screen);
 	m_vdp->set_is_pal(false);
 	m_vdp->n_int().set_inputline(m_maincpu, 0);
 	m_vdp->n_nmi().set_inputline(m_maincpu, INPUT_LINE_NMI);
@@ -194,7 +225,7 @@ void fwheel_state::fwheel(machine_config &config)
 
 
 ROM_START( fwheel )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "ipl", 0 )
 	ROM_LOAD( "epr-12198.ic2", 0x00000, 0x10000, CRC(673e9aac) SHA1(62bec711b86a70988b80a74f440768b1460e46ac) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
@@ -208,4 +239,4 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1984?, fwheel, 0, fwheel, fwheel, fwheel_state, empty_init, ROT0, "Sega", "Fortune Wheel", MACHINE_IS_SKELETON )
+GAME( 1989, fwheel, 0, fwheel, fwheel, fwheel_state, empty_init, ROT270, "Sega", "Fortune Wheel", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

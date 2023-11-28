@@ -47,8 +47,7 @@
     1996  Print Club (Vol.5)         Atlus             ?                C2
 
 
-    Notes:
-            Bloxeed doesn't Read from the Protection Chip at all; all of the other games do.
+    Notes:  Bloxeed doesn't read from the protection chip at all; all of the other games do.
             Currently the protection chip is mostly understood, and needs a table of 256
             4-bit values for each game. In all cases except for Poto Poto and Puyo Puyo 2,
             the table is embedded in the code. Workarounds for the other 2 cases are
@@ -186,9 +185,9 @@ protected:
 	int m_segac2_sp_pal_lookup[4];
 	void recompute_palette_tables();
 
-	DECLARE_WRITE_LINE_MEMBER(vdp_sndirqline_callback_c2);
-	DECLARE_WRITE_LINE_MEMBER(vdp_lv6irqline_callback_c2);
-	DECLARE_WRITE_LINE_MEMBER(vdp_lv4irqline_callback_c2);
+	void vdp_sndirqline_callback_c2(int state);
+	void vdp_lv6irqline_callback_c2(int state);
+	void vdp_lv4irqline_callback_c2(int state);
 	IRQ_CALLBACK_MEMBER(int_callback);
 
 	uint8_t io_portc_r();
@@ -203,7 +202,7 @@ protected:
 	void prot_w(uint8_t data);
 	void counter_timer_w(uint8_t data);
 	uint16_t ichirjbl_prot_r();
-	DECLARE_WRITE_LINE_MEMBER(segac2_irq2_interrupt);
+	void segac2_irq2_interrupt(int state);
 
 	int prot_func_dummy(int in);
 	int prot_func_columns(int in);
@@ -1719,27 +1718,27 @@ uint32_t segac2_state::screen_update_segac2_new(screen_device &screen, bitmap_rg
     Interrupt handling
 ******************************************************************************/
 
-WRITE_LINE_MEMBER(segac2_state::segac2_irq2_interrupt)
+void segac2_state::segac2_irq2_interrupt(int state)
 {
 	//printf("sound irq %d\n", state);
 	m_maincpu->set_input_line(2, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 // the main interrupt on C2 comes from the vdp line used to drive the z80 interrupt on a regular genesis(!)
-WRITE_LINE_MEMBER(segac2_state::vdp_sndirqline_callback_c2)
+void segac2_state::vdp_sndirqline_callback_c2(int state)
 {
 	if (state == ASSERT_LINE)
 		m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
 // the line usually used to drive irq6 is not connected
-WRITE_LINE_MEMBER(segac2_state::vdp_lv6irqline_callback_c2)
+void segac2_state::vdp_lv6irqline_callback_c2(int state)
 {
 	//
 }
 
 // the scanline interrupt seems connected as usual
-WRITE_LINE_MEMBER(segac2_state::vdp_lv4irqline_callback_c2)
+void segac2_state::vdp_lv4irqline_callback_c2(int state)
 {
 	if (state == ASSERT_LINE)
 		m_maincpu->set_input_line(4, HOLD_LINE);

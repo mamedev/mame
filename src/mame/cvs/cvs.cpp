@@ -189,8 +189,8 @@ private:
 	uint8_t huncholy_prot_r(offs_t offset);
 	uint8_t superbik_prot_r();
 	uint8_t hero_prot_r(offs_t offset);
-	DECLARE_READ_LINE_MEMBER(speech_rom_read_bit);
-	DECLARE_WRITE_LINE_MEMBER(slave_cpu_interrupt);
+	int speech_rom_read_bit();
+	void slave_cpu_interrupt(int state);
 	uint8_t input_r(offs_t offset);
 	void speech_rom_address_lo_w(uint8_t data);
 	void speech_rom_address_hi_w(uint8_t data);
@@ -485,7 +485,7 @@ INTERRUPT_GEN_MEMBER(cvs_state::main_cpu_interrupt)
 }
 
 
-WRITE_LINE_MEMBER(cvs_state::slave_cpu_interrupt)
+void cvs_state::slave_cpu_interrupt(int state)
 {
 	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -529,7 +529,7 @@ uint8_t cvs_state::input_r(offs_t offset)
  *
  *************************************/
 #if 0
-READ_LINE_MEMBER(cvs_state::cvs_393hz_clock_r)
+int cvs_state::cvs_393hz_clock_r()
 {
 	return m_393hz_clock;
 }
@@ -651,7 +651,7 @@ void cvs_state::tms5110_pdc_w(offs_t offset, uint8_t data)
 }
 
 
-READ_LINE_MEMBER(cvs_state::speech_rom_read_bit)
+int cvs_state::speech_rom_read_bit()
 {
 	// before reading the bit, clamp the address to the region length
 	m_speech_rom_bit_address &= ((m_speech_data_rom.bytes() * 8) - 1);
@@ -1886,12 +1886,12 @@ GAME( 1981, spacefrt,  0,        cvs, spacefrt, cvs_state, empty_init,     ROT90
 GAME( 1982, 8ball,     0,        cvs, 8ball,    cvs_state, empty_init,     ROT90, "Century Electronics", "Video Eight Ball", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, 8ball1,    8ball,    cvs, 8ball,    cvs_state, empty_init,     ROT90, "Century Electronics", "Video Eight Ball (Rev.1)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, logger,    0,        cvs, logger,   cvs_state, empty_init,     ROT90, "Century Electronics", "Logger (Rev.3)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, loggerr2,  logger,   cvs, logger,   cvs_state, empty_init,     ROT90, "E T Marketing",       "Logger (Rev.2)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, loggerr2,  logger,   cvs, logger,   cvs_state, empty_init,     ROT90, "Century Electronics (Enter-Tech, Ltd. license)", "Logger (Rev.2)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, dazzler,   0,        cvs, dazzler,  cvs_state, empty_init,     ROT90, "Century Electronics", "Dazzler", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, wallst,    0,        cvs, wallst,   cvs_state, empty_init,     ROT90, "Century Electronics", "Wall Street", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, radarzon,  0,        cvs, radarzon, cvs_state, empty_init,     ROT90, "Century Electronics", "Radar Zone", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, radarzon1, radarzon, cvs, radarzon, cvs_state, empty_init,     ROT90, "Century Electronics", "Radar Zone (Rev.1)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, radarzont, radarzon, cvs, radarzon, cvs_state, empty_init,     ROT90, "Century Electronics (Tuni Electro Service Inc)", "Radar Zone (Tuni)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, radarzont, radarzon, cvs, radarzon, cvs_state, empty_init,     ROT90, "Century Electronics (Tuni Electro Service license)", "Radar Zone (Tuni)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Tuni Electro Service = predecessor to Enter-Tech
 GAME( 1982, outline,   radarzon, cvs, radarzon, cvs_state, empty_init,     ROT90, "Century Electronics", "Outline", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, goldbug,   0,        cvs, goldbug,  cvs_state, empty_init,     ROT90, "Century Electronics", "Gold Bug", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, diggerc,   0,        cvs, diggerc,  cvs_state, empty_init,     ROT90, "Century Electronics", "Digger (CVS)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
@@ -1901,5 +1901,5 @@ GAME( 1983, hunchbaka, hunchbak, cvs, hunchbak, cvs_state, init_hunchbaka, ROT90
 GAME( 1983, superbik,  0,        cvs, superbik, cvs_state, init_superbik,  ROT90, "Century Electronics", "Superbike", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, raiders,   0,        cvs, raiders,  cvs_state, init_raiders,   ROT90, "Century Electronics", "Raiders", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION| MACHINE_SUPPORTS_SAVE )
 GAME( 1983, raidersr3, raiders,  cvs, raiders,  cvs_state, init_raiders,   ROT90, "Century Electronics", "Raiders (Rev.3)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION| MACHINE_SUPPORTS_SAVE )
-GAME( 1984, hero,      0,        cvs, hero,     cvs_state, init_hero,      ROT90, "Century Electronics / Seatongrove Ltd", "Hero", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // (C) 1984 CVS on titlescreen, (C) 1983 Seatongrove on highscore screen
-GAME( 1984, huncholy,  0,        cvs, huncholy, cvs_state, init_huncholy,  ROT90, "Century Electronics / Seatongrove Ltd", "Hunchback Olympic", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, hero,      0,        cvs, hero,     cvs_state, init_hero,      ROT90, "Seatongrove UK, Ltd.", "Hero", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // (C) 1984 CVS on titlescreen, (C) 1983 Seatongrove on highscore screen
+GAME( 1984, huncholy,  0,        cvs, huncholy, cvs_state, init_huncholy,  ROT90, "Seatongrove UK, Ltd.", "Hunchback Olympic", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

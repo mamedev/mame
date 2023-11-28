@@ -887,7 +887,7 @@ Tested with marsmis2, fails
 		</part>
 	</software>
 
-	<!-- v.1.0 also known to exist (in .xex format -->
+	<!-- v.1.0 also known to exist (in .xex format) -->
 	<software name="yoomp" supported="partial">
 		<description>Yoomp! (v.1.1)</description>
 		<year>2007</year>
@@ -948,28 +948,15 @@ Garbage row strip at bottom of screen
 		</part>
 	</software>
 
-	<software name="writer">
-		<description>The Writer's Tool</description>
-		<year>1985</year>
-		<publisher>OSS</publisher>
-		<sharedfeat name="requirement" value="a800:writerd"/>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="92176">
-				<rom name="writer's tool.atr" size="92176" crc="5a6e2133" sha1="c6d4c49fb53a41b28634b209176c74ed86fbfc64"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="92176">
-				<rom name="writer's tool dictionary.atr" size="92176" crc="18c875b0" sha1="7c727bcc488892dfd83cfbc09b3e1e642d1beff9"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="specdemo" supported="no">
 		<description>Spectraview II Demo Disk</description>
 		<!-- Disk contains Sparta DOS and won't boot in MAME, works on other emulators -->
 		<year>198?</year>
 		<publisher>Display Systems International</publisher>
+		<notes><![CDATA[
+"Error: No DOS"
+Trying to DIR in SDX returns error 144 bad sector, trying to CAR will black screen as per a800:spectra2
+]]></notes>
 		<sharedfeat name="requirement" value="a800:spectra2"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="183952">

@@ -275,7 +275,7 @@ void m92_state::bankswitch_w(uint8_t data)
 		logerror("%05x: bankswitch %04x\n", m_maincpu->pc(), data);
 }
 
-READ_LINE_MEMBER(m92_state::sprite_busy_r)
+int m92_state::sprite_busy_r()
 {
 	return m_sprite_buffer_busy;
 }
@@ -1097,6 +1097,12 @@ void m92_state::gunforc2(machine_config &config)
 {
 	m92_banked(config);
 	m_soundcpu->set_decryption_table(lethalth_decryption_table);
+}
+
+void m92_state::geostorma(machine_config &config)
+{
+	gunforc2(config);
+	m_soundcpu->set_decryption_table(dsoccr94_decryption_table);
 }
 
 /***************************************************************************/
@@ -2504,6 +2510,41 @@ ROM_START( geostorm ) // M92-B-G  05C04171G1 ROM board
 	ROM_LOAD( "m92_b-7j-a.ic41", 0x0a00, 0x0117, CRC(09f57872) SHA1(19c3e0f3ae106e75dba3450745edd4bb9afdd923) ) // PAL16L8 - bruteforced
 ROM_END
 
+ROM_START( geostorma ) // same as above, but uses a different custom sound CPU and thus different sound CPU ROMs
+	ROM_REGION( 0x100000, "maincpu", 0 ) // white labels
+	ROM_LOAD16_BYTE("ic37", 0x000001, 0x040000, CRC(9be58d09) SHA1(ab98b91abc8129c342c59674eab9683cccc6ca35) )
+	ROM_LOAD16_BYTE("ic49", 0x000000, 0x040000, CRC(59abb75d) SHA1(52b48685470ffa3f36a8259bf333448bf40caea9) )
+	ROM_LOAD16_BYTE("ic36", 0x080001, 0x040000, CRC(34280b88) SHA1(3fd3cdf8acfa845abacb0708fb48741ee44dbf13) )
+	ROM_LOAD16_BYTE("ic48", 0x080000, 0x040000, CRC(c8c13f51) SHA1(fde3fd983ebb920f79e6898aa0576da9dd9f0c15) )
+
+	ROM_REGION( 0x20000, "soundcpu", 0 ) // white labels
+	ROM_LOAD16_BYTE("ic24", 0x00001, 0x10000, CRC(62a13a96) SHA1(48dc41173ab8a78a28a194132d68b2971bd7a9f6) )
+	ROM_LOAD16_BYTE("ic31", 0x00000, 0x10000, CRC(16b8b6b5) SHA1(c312dd6d86f69cf751579defc5bc2e661a7b20d4) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 ) // Tiles
+	ROM_LOAD("a2_-c0-.ic1",    0x000000, 0x080000, CRC(68b8f574) SHA1(fb935947cdde43e84453f82caeea141a4ae7226d) )
+	ROM_LOAD("a2_-c1-.ic2",    0x080000, 0x080000, CRC(0b9efe67) SHA1(1df4108d30d2538f6407e328513517cd3412321f) )
+	ROM_LOAD("a2_-c2-.ic16",   0x100000, 0x080000, CRC(7a9e9978) SHA1(241dc310e75960e306701a2e86e30d9c1a60ebff) )
+	ROM_LOAD("a2_-c3-.ic17",   0x180000, 0x080000, CRC(1395ee6d) SHA1(e9befc966e6ee046eaca185a9969976304a119d8) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) // Sprites
+	ROM_LOAD( "a2_-000-.ic44", 0x000000, 0x100000, CRC(38e03147) SHA1(cc5bacad9592aa5e91632b139955e1c704a67a33) )
+	ROM_LOAD( "a2_-010-.ic45", 0x100000, 0x100000, CRC(1d5b05f8) SHA1(884f134ed51b432965a4e5e79915ba9c0ab562c6) )
+	ROM_LOAD( "a2_-020-.ic46", 0x200000, 0x100000, CRC(f2f461cc) SHA1(04e91efc749d022c8012caac493767ec1f6a992d) )
+	ROM_LOAD( "a2_-030-.ic47", 0x300000, 0x100000, CRC(97609d9d) SHA1(71ddff85a8ddeac69863bbf6c493c5c3973fd175) )
+
+	ROM_REGION( 0x100000, "irem", 0 ) // Samples
+	ROM_LOAD("a2_-da-.ic10",  0x000000, 0x100000, CRC(3c8cdb6a) SHA1(d1f4186e8ddf99698443f8ee1c60a6e6bc367b09) )
+
+	ROM_REGION( 0x0c00, "plds", 0 )
+	ROM_LOAD( "m92_a-3m-.ic11",  0x0000, 0x0117, CRC(fc718efe) SHA1(d554dd74cecd95754a1e6e24c6a207d6d3428253) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "m92_a-7j-.ic41",  0x0200, 0x0117, CRC(5730b25a) SHA1(1877b807f6a94f6d515afc940e1d615a453490fd) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "m92_a-9j-.ic51",  0x0400, 0x0117, CRC(92d477cf) SHA1(6a1e9bfdb367384e8611f46300f378730817514b) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "m92_b-3f-.ic14",  0x0600, 0x0117, CRC(52ecf083) SHA1(1a1819e572f7fdd5aab2caeca8741441ffbea01d) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "m92_b-4f-.ic21",  0x0800, 0x0117, CRC(5e87fd01) SHA1(f076dea6bc94f5aa01121f8c70a39d8e5ee805e8) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "m92_b-7j-a.ic41", 0x0a00, 0x0117, CRC(09f57872) SHA1(19c3e0f3ae106e75dba3450745edd4bb9afdd923) ) // PAL16L8 - bruteforced
+ROM_END
+
 /***************************************************************************/
 
 /* has bankswitching */
@@ -2576,4 +2617,5 @@ GAME( 1993, psoldier,    ssoldier, psoldier,      psoldier,  m92_state, empty_in
 GAME( 1994, dsoccr94j,   dsoccr94, dsoccr94j,     dsoccr94j, m92_state, init_bank,     ROT0,   "Irem",         "Dream Soccer '94 (Japan, M92 hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 
 GAME( 1994, gunforc2,    0,        gunforc2,      gunforc2,  m92_state, init_bank,     ROT0,   "Irem",         "Gun Force II (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1994, geostorm,    gunforc2, gunforc2,      gunforc2,  m92_state, init_bank,     ROT0,   "Irem",         "Geo Storm (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1994, geostorm,    gunforc2, gunforc2,      gunforc2,  m92_state, init_bank,     ROT0,   "Irem",         "Geo Storm (Japan, 014 custom sound CPU)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1994, geostorma,   gunforc2, geostorma,     gunforc2,  m92_state, init_bank,     ROT0,   "Irem",         "Geo Storm (Japan, 026 custom sound CPU)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )

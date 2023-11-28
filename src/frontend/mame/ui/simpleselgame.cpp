@@ -17,6 +17,8 @@
 #include "ui/ui.h"
 #include "ui/utils.h"
 
+#include "infoxml.h"
+
 #include "audit.h"
 #include "drivenum.h"
 #include "emuopts.h"
@@ -352,13 +354,7 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 		tempbuf[1] = string_format(_("%1$s, %2$-.100s"), driver->year, driver->manufacturer);
 
 		// next line source path
-		std::string_view src(driver->type.source());
-		auto prefix(src.find("src/mame/"));
-		if (std::string_view::npos == prefix)
-			prefix = src.find("src\\mame\\");
-		if (std::string_view::npos != prefix)
-			src.remove_prefix(prefix + 9);
-		tempbuf[2] = string_format(_("Driver: %1$s"), src);
+		tempbuf[2] = string_format(_("Source file: %1$s"), info_xml_creator::format_sourcefile(driver->type.source()));
 
 		// update cached values if selection changed
 		if (driver != m_cached_driver)

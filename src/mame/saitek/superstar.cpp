@@ -4,7 +4,9 @@
 /*******************************************************************************
 
 SciSys Superstar / Turbostar
-Starting from Turbostar 432, SciSys started adding the "Kasparov" prefix.
+
+Starting from Turbostar 432, SciSys started using the "Kasparov Chess Computer"
+brand, and they added the "Kasparov" prefix to titles shortly afterwards.
 
 Hardware notes (Superstar 28K):
 - PCB label: YO1C-PE-017 REV2
@@ -52,8 +54,8 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-#include "saitek_sstar28k.lh" // clickable
-#include "saitek_tstar432.lh" // clickable
+#include "saitek_sstar28k.lh"
+#include "saitek_tstar432.lh"
 
 
 namespace {
@@ -86,6 +88,8 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<2> m_inputs;
 
+	u8 m_inp_mux = 0;
+
 	// address maps
 	void sstar28k_map(address_map &map);
 	void tstar432_map(address_map &map);
@@ -93,8 +97,6 @@ private:
 	// I/O handlers
 	void control_w(u8 data);
 	u8 input_r();
-
-	u8 m_inp_mux = 0;
 };
 
 void star_state::machine_start()
@@ -196,10 +198,10 @@ INPUT_PORTS_END
 void star_state::sstar28k(machine_config &config)
 {
 	// basic machine hardware
-	M6502(config, m_maincpu, 2000000); // no XTAL
+	M6502(config, m_maincpu, 2'000'000); // no XTAL
 	m_maincpu->set_addrmap(AS_PROGRAM, &star_state::sstar28k_map);
 
-	const attotime nmi_period = attotime::from_hz(2000000 / 0x2000); // 4020 Q13
+	const attotime nmi_period = attotime::from_hz(2'000'000 / 0x2000); // 4020 Q13
 	m_maincpu->set_periodic_int(FUNC(star_state::nmi_line_pulse), nmi_period);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
@@ -286,6 +288,6 @@ ROM_END
 //    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT     CLASS       INIT        COMPANY, FULLNAME, FLAGS
 SYST( 1983, sstar28k,  0,        0,      sstar28k, sstar28k, star_state, empty_init, "SciSys", "Superstar 28K", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-SYST( 1985, tstar432,  0,        0,      tstar432, sstar28k, star_state, empty_init, "SciSys", "Kasparov Turbostar 432 (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1985, tstar432a, tstar432, 0,      tstar432, sstar28k, star_state, empty_init, "SciSys", "Kasparov Turbostar 432 (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1985, tstar432,  0,        0,      tstar432, sstar28k, star_state, empty_init, "SciSys", "Turbostar 432 (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1985, tstar432a, tstar432, 0,      tstar432, sstar28k, star_state, empty_init, "SciSys", "Turbostar 432 (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1985, sstar36k,  tstar432, 0,      sstar36k, sstar28k, star_state, empty_init, "SciSys", "Superstar 36K", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

@@ -54,9 +54,6 @@ void mas3507d_device::device_start()
 	stream = stream_alloc(0, 2, 44100);
 	mp3dec = std::make_unique<mp3_audio>(reinterpret_cast<const uint8_t *>(&mp3data[0]));
 
-	cb_mpeg_frame_sync.resolve();
-	cb_demand.resolve();
-
 	save_item(NAME(mp3data));
 	save_item(NAME(samples));
 	save_item(NAME(i2c_bus_state));

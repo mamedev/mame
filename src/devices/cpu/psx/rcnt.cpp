@@ -29,32 +29,24 @@ void psxrcnt_device::device_reset()
 
 void psxrcnt_device::device_post_load()
 {
-	int n;
-	for( n = 0; n < 3; n++ )
-	{
-		root_timer_adjust( n );
-	}
+	for (int n = 0; n < 3; n++)
+		root_timer_adjust(n);
 }
 
 void psxrcnt_device::device_start()
 {
-	int n;
+	save_item(STRUCT_MEMBER(root_counter, n_count));
+	save_item(STRUCT_MEMBER(root_counter, n_mode));
+	save_item(STRUCT_MEMBER(root_counter, n_target));
+	save_item(STRUCT_MEMBER(root_counter, n_start));
 
-	m_irq0_handler.resolve_safe();
-	m_irq1_handler.resolve_safe();
-	m_irq2_handler.resolve_safe();
-
-	for( n = 0; n < 3; n++ )
+	for (int n = 0; n < 3; n++)
 	{
-		root_counter[ n ].timer = timer_alloc( FUNC( psxrcnt_device::timer_update ), this );
-		save_item(NAME(root_counter[ n ].n_count), n);
-		save_item(NAME(root_counter[ n ].n_mode), n);
-		save_item(NAME(root_counter[ n ].n_target), n);
-		save_item(NAME(root_counter[ n ].n_start), n);
-		root_counter[ n ].n_count = 0;
-		root_counter[ n ].n_mode = 0;
-		root_counter[ n ].n_target = 0;
-		root_counter[ n ].n_start = 0;
+		root_counter[n].timer = timer_alloc(FUNC(psxrcnt_device::timer_update ), this);
+		root_counter[n].n_count = 0;
+		root_counter[n].n_mode = 0;
+		root_counter[n].n_target = 0;
+		root_counter[n].n_start = 0;
 	}
 }
 

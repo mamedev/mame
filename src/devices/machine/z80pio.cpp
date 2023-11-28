@@ -41,10 +41,10 @@ z80pio_device::z80pio_device(const machine_config &mconfig, const char *tag, dev
 	device_t(mconfig, Z80PIO, tag, owner, clock),
 	device_z80daisy_interface(mconfig, *this),
 	m_out_int_cb(*this),
-	m_in_pa_cb(*this),
+	m_in_pa_cb(*this, 0),
 	m_out_pa_cb(*this),
 	m_out_ardy_cb(*this),
-	m_in_pb_cb(*this),
+	m_in_pb_cb(*this, 0),
 	m_out_pb_cb(*this),
 	m_out_brdy_cb(*this)
 {
@@ -59,15 +59,6 @@ void z80pio_device::device_start()
 {
 	m_port[PORT_A].start(this, PORT_A);
 	m_port[PORT_B].start(this, PORT_B);
-
-	// resolve callbacks
-	m_out_int_cb.resolve_safe();
-	m_in_pa_cb.resolve_safe(0);
-	m_out_pa_cb.resolve_safe();
-	m_out_ardy_cb.resolve_safe();
-	m_in_pb_cb.resolve_safe(0);
-	m_out_pb_cb.resolve_safe();
-	m_out_brdy_cb.resolve_safe();
 }
 
 
@@ -568,10 +559,24 @@ void z80pio_device::pio_port::write(uint8_t data)
 
 		data &= mask;
 
-		if ((m_icw & 0x60) == 0 && data != mask) match = true;
-		else if ((m_icw & 0x60) == 0x20 && data != 0) match = true;
-		else if ((m_icw & 0x60) == 0x40 && data == 0) match = true;
-		else if ((m_icw & 0x60) == 0x60 && data == mask) match = true;
+		switch (m_icw & 0x60)
+		{
+		case 0x00:
+			match = data != mask;
+			break;
+
+		case 0x20:
+			match = data != 0;
+			break;
+
+		case 0x40:
+			match = data == 0;
+			break;
+
+		case 0x60:
+			match = data == mask;
+			break;
+		}
 
 		if (!m_match && match && !m_ius)
 		{

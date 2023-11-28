@@ -57,11 +57,11 @@ public:
 protected:
 	void setup_main_sysctrl(machine_config &config, const XTAL clock);
 	void setup_main_sprite(machine_config &config, const XTAL clock);
-	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
-	DECLARE_WRITE_LINE_MEMBER(timer_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(field_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(sound_reset_line_w);
+	void flipscreen_w(int state);
+	void timer_irq_w(int state);
+	void vblank_irq_w(int state);
+	void field_irq_w(int state);
+	void sound_reset_line_w(int state);
 
 	u16 rockn_adpcmbank_r();
 	void rockn_adpcmbank_w(u16 data);
@@ -133,6 +133,13 @@ protected:
 	tilemap_t *m_tilemap_rot = nullptr;
 };
 
+class nndmseal_state : public tetrisp2_state
+{
+public:
+	using tetrisp2_state::tetrisp2_state;
+	static constexpr feature_type unemulated_features() { return feature::CAMERA | feature::PRINTER; }
+};
+
 class rocknms_state : public tetrisp2_state
 {
 public:
@@ -198,11 +205,11 @@ private:
 	tilemap_t *m_tilemap_sub_fg = nullptr;
 	tilemap_t *m_tilemap_sub_rot = nullptr;
 
-	DECLARE_WRITE_LINE_MEMBER(sub_flipscreen_w);
-	DECLARE_WRITE_LINE_MEMBER(sub_timer_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(sub_vblank_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(sub_field_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(sub_sound_reset_line_w);
+	void sub_flipscreen_w(int state);
+	void sub_timer_irq_w(int state);
+	void sub_vblank_irq_w(int state);
+	void sub_field_irq_w(int state);
+	void sub_sound_reset_line_w(int state);
 };
 
 class stepstag_state : public tetrisp2_state
@@ -275,7 +282,7 @@ private:
 	void stepstag_sub_map(address_map &map);
 	void vjdash_map(address_map &map);
 
-	DECLARE_WRITE_LINE_MEMBER(field_cb);
+	void field_cb(int state);
 	void setup_non_sysctrl_screen(machine_config &config, screen_device *screen, const XTAL xtal);
 
 	void convert_yuv422_to_rgb888(palette_device *paldev, u16 *palram,u32 offset);

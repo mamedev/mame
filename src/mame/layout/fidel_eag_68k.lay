@@ -117,8 +117,9 @@ license:CC0-1.0
 	<element name="text_r92"><text string="NEW" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_r93"><text string="GAME" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 
-	<element name="text_rx1"><text string="YOUR MOVE"><color red="0.61" green="0.6" blue="0.59" /></text></element>
-	<element name="text_ry1"><text string="CHECK"><color red="0.61" green="0.6" blue="0.59" /></text></element>
+	<element name="text_rx1a"><text string="YOUR"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_rx1b"><text string="MOVE"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_ry1"><text string="CHECK"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_rx2"><text string="CL" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_ry2"><text string="DM" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 
@@ -414,6 +415,57 @@ license:CC0-1.0
 	</group>
 
 
+<!-- 7seg panels -->
+
+	<group name="digits1">
+		<bounds x="0" y="0" width="25.5" height="8.5" />
+
+		<element name="digit6" ref="digit">
+			<bounds x="0" y="0" width="5.66" height="8.5" />
+		</element>
+		<element name="digit5" ref="digit">
+			<bounds x="5.66" y="0" width="5.66" height="8.5" />
+		</element>
+		<element name="digit7" ref="digit">
+			<bounds x="14.16" y="0" width="5.66" height="8.5" />
+		</element>
+		<element name="digit8" ref="digit">
+			<bounds x="19.82" y="0" width="5.66" height="8.5" />
+		</element>
+
+		<element name="5.7" ref="led">
+			<bounds x="12.58" y="1.5" width="0.85" height="0.85" />
+		</element>
+		<element name="6.7" ref="led">
+			<bounds x="12.13" y="6.15" width="0.85" height="0.85" />
+		</element>
+	</group>
+
+	<group name="digits2">
+		<bounds x="0" y="0" width="25.5" height="8.5" />
+
+		<element name="digit1" ref="digit">
+			<bounds x="0" y="0" width="5.66" height="8.5" />
+		</element>
+		<element name="digit0" ref="digit">
+			<bounds x="5.66" y="0" width="5.66" height="8.5" />
+		</element>
+		<element name="digit2" ref="digit">
+			<bounds x="14.16" y="0" width="5.66" height="8.5" />
+		</element>
+		<element name="digit3" ref="digit">
+			<bounds x="19.82" y="0" width="5.66" height="8.5" />
+		</element>
+
+		<element name="0.7" ref="led">
+			<bounds x="12.58" y="1.5" width="0.85" height="0.85" />
+		</element>
+		<element name="1.7" ref="led">
+			<bounds x="12.13" y="6.15" width="0.85" height="0.85" />
+		</element>
+	</group>
+
+
 <!-- build screen -->
 
 	<view name="Internal Layout">
@@ -425,8 +477,7 @@ license:CC0-1.0
 
 		<group ref="sb_ui"><bounds x="-12" y="3" width="10" height="80" /></group>
 
-	<!-- chessboard coords -->
-
+		<!-- chessboard coords -->
 		<element ref="text_8"><bounds x="0.2" y="7"  width="2" height="2" /></element>
 		<element ref="text_7"><bounds x="0.2" y="17" width="2" height="2" /></element>
 		<element ref="text_6"><bounds x="0.2" y="27" width="2" height="2" /></element>
@@ -445,25 +496,9 @@ license:CC0-1.0
 		<element ref="text_g"><bounds x="67.5" y="84.5" width="2" height="2" /></element>
 		<element ref="text_h"><bounds x="77.5" y="84.5" width="2" height="2" /></element>
 
-	<!-- panel 7seg leds -->
-
-		<element name="digit6" ref="digit"><bounds x="90" y="3" width="8.5" height="5.66" /><orientation rotate="90" /></element>
-		<element name="digit5" ref="digit"><bounds x="90" y="8.66" width="8.5" height="5.66" /><orientation rotate="90" /></element>
-		<element name="digit7" ref="digit"><bounds x="90" y="17.16" width="8.5" height="5.66" /><orientation rotate="90" /></element>
-		<element name="digit8" ref="digit"><bounds x="90" y="22.82" width="8.5" height="5.66" /><orientation rotate="90" /></element>
-
-		<element name="5.7" ref="led"><bounds x="96.15" y="15.58" width="0.85" height="0.85" /></element>
-		<element name="6.7" ref="led"><bounds x="91.5" y="15.13" width="0.85" height="0.85" /></element>
-
-		<element name="digit1" ref="digit"><bounds x="90" y="53" width="8.5" height="5.66" /><orientation rotate="90" /></element>
-		<element name="digit0" ref="digit"><bounds x="90" y="58.66" width="8.5" height="5.66" /><orientation rotate="90" /></element>
-		<element name="digit2" ref="digit"><bounds x="90" y="67.16" width="8.5" height="5.66" /><orientation rotate="90" /></element>
-		<element name="digit3" ref="digit"><bounds x="90" y="72.82" width="8.5" height="5.66" /><orientation rotate="90" /></element>
-
-		<element name="0.7" ref="led"><bounds x="96.15" y="65.58" width="0.85" height="0.85" /></element>
-		<element name="1.7" ref="led"><bounds x="91.5" y="65.13" width="0.85" height="0.85" /></element>
-
-	<!-- right side -->
+		<!-- right side -->
+		<group ref="digits1"><bounds x="90" y="5.5" width="6.66" height="20" /><orientation rotate="90" /></group>
+		<group ref="digits2"><bounds x="90" y="55.5" width="6.66" height="20" /><orientation rotate="90" /></group>
 
 		<element ref="text_r11"><bounds x="91.8" y="29.45" width="2" height="2" /></element>
 		<element ref="text_r21"><bounds x="91.8" y="31.95" width="2" height="2" /></element>
@@ -503,7 +538,8 @@ license:CC0-1.0
 
 		<element ref="text_rx2"><bounds x="96.8" y="79.65" width="10" height="1.5" /></element>
 		<element ref="text_ry2"><bounds x="96.8" y="82.15" width="10" height="1.5" /></element>
-		<element ref="text_rx1"><bounds x="88" y="78.75" width="6" height="1" /></element>
+		<element ref="text_rx1a"><bounds x="88" y="78.0" width="5.5" height="1" /></element>
+		<element ref="text_rx1b"><bounds x="88" y="78.75" width="5.5" height="1" /></element>
 		<element ref="text_ry1"><bounds x="88" y="81.25" width="5.5" height="1" /></element>
 
 		<element name="8.9" ref="led2y"><bounds x="90" y="79.75" width="1.5" height="1.5" /></element>

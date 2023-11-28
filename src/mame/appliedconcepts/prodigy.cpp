@@ -7,6 +7,10 @@ Like most other chess computers by ACI, it was also distributed by Chafitz.
 
 The chess engine is Morphy, which in turn is based on Sargon 2.5.
 
+Not counting The Mate, a chess game with chessboard peripheral for the Apple II,
+this is the only known Destiny series chesscomputer. ACI also announced Destiny
+Laser Chess, but it was never released.
+
 ********************************************************************************
 
 PCB notes:
@@ -72,7 +76,7 @@ The keypad is connected to the 12 pin KPDCN connector left to right KP1:
 #include "speaker.h"
 
 // internal artwork
-#include "aci_prodigy.lh" // clickable
+#include "aci_prodigy.lh"
 
 
 namespace {
@@ -104,6 +108,11 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<2> m_inputs;
 
+	u8 m_select = 0;
+	u8 m_led_data = 0;
+	u8 m_shift_data = 0;
+	u8 m_shift_clock = 0;
+
 	void main_map(address_map &map);
 
 	// I/O handlers
@@ -114,11 +123,6 @@ private:
 
 	void shift_clock_w(int state);
 	void shift_data_w(int state);
-
-	u8 m_select = 0;
-	u8 m_led_data = 0;
-	u8 m_shift_data = 0;
-	u8 m_shift_clock = 0;
 };
 
 void prodigy_state::machine_start()

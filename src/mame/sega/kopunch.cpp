@@ -430,13 +430,13 @@ void kopunch_state::kopunch(machine_config &config)
 	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
 	// $34 - always $80 (PPI mode 0, ports A & B & C as output)
 	ppi1.out_pa_callback().set(FUNC(kopunch_state::coin_w));
-	ppi1.out_pb_callback().set_log("PPI8255 - unmapped write port B");
-	ppi1.out_pc_callback().set_log("PPI8255 - unmapped write port C");
+	ppi1.out_pb_callback().set([this](uint8_t data) { logerror("%s ppi1 write port B: %02X\n", machine().describe_context(), data); });
+	ppi1.out_pc_callback().set([this](uint8_t data) { logerror("%s ppi1 write port C: %02X\n", machine().describe_context(), data); });
 
 	i8255_device &ppi2(I8255A(config, "ppi8255_2"));
 	// $38 - always $89 (PPI mode 0, ports A & B as output, port C as input)
 	ppi2.out_pa_callback().set(FUNC(kopunch_state::lamp_w));
-	ppi2.out_pb_callback().set_log("PPI8255 - unmapped write port B");
+	ppi2.out_pb_callback().set([this](uint8_t data) { logerror("%s ppi2 write port B: %02X\n", machine().describe_context(), data); });
 	ppi2.in_pc_callback().set_ioport("DSW");
 
 	i8255_device &ppi3(I8255A(config, "ppi8255_3"));

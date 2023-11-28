@@ -90,15 +90,15 @@ there is a CD-ROM drive.
 /*
 Grull Osgo - Improvements
 
--Changes about BIOS memory management so ROM Shadow now works properly.
- The changes are:
-    Rom Memory Map remmapped to 128K size map(0xfffe0000, 0xffffffff).rom().region("bios", 0);
+- Changes about BIOS memory management so ROM Shadow now works properly.
+  The changes are:
+  Rom Memory Map remmapped to 128K size map(0xfffe0000, 0xffffffff).rom().region("bios", 0);
 
--Changes in mtxc write handler and bios_ram write handler. Now The internal register access are
-compatible with chipset VIA.
- (this motherboard has VIA Apollo VXPro chipset. It is not compatible with Intel i430).
- With this changes now BIOS Shadow ram works fine, BIOS can relocate and decompress the full code
- necesary to run the Extended Bios, POST and Boot). No more BIOS Checksum error.
+- Changes in mtxc write handler and bios_ram write handler. Now The internal register access are
+  compatible with chipset VIA.
+  (this motherboard has VIA Apollo VXPro chipset. It is not compatible with Intel i430).
+  With this changes now BIOS Shadow ram works fine, BIOS can relocate and decompress the full code
+  necessary to run the Extended BIOS, POST and Boot). No more BIOS Checksum error.
 
 - Suppressed all video related items wich will be replaced with VGA driver.
 
@@ -110,14 +110,14 @@ compatible with chipset VIA.
 
 - Minor changes and NOPS into address maps for debugging purposes.
 
-- Now Bios is looking for the disk (BIOS Auto detection). It seems all works fine but must be there
-something wrong in the disk geometry reported by calchase.chd (20,255,63) since BIOS does not accept
- 255 heads as parameter. Perhaps a bad dump?
+- Now BIOS is looking for the disk (BIOS Auto detection). It seems all works fine but must be there
+  something wrong in the disk geometry reported by calchase.chd (20,255,63) since BIOS does not accept
+  255 heads as parameter. Perhaps a bad dump?
 
 - update by peter ferrie:
 - corrected memory map to 64kb blocks
 - corrected access to PAM register
- */
+*/
 
 
 #include "emu.h"
@@ -719,12 +719,6 @@ void calchase_state::hostinv(machine_config &config)
 	ISA16_SLOT(config, "isa1", 0, "isa", calchase_isa16_cards, "calchase_jamma_if", true);
 	// TODO: temp, to be converted to PCI slot
 	ISA16_SLOT(config, "isa2", 0, "isa", calchase_isa16_cards, "tgui9680", true);
-
-	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	DAC_12BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.25); // unknown DAC
-	DAC_12BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
 }
 
 void calchase_state::init_calchase()

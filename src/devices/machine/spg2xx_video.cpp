@@ -28,9 +28,9 @@ DEFINE_DEVICE_TYPE(SPG24X_VIDEO, spg24x_video_device, "spg24x_video", "SPG240-se
 
 spg2xx_video_device::spg2xx_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	m_guny_in(*this),
-	m_gunx_in(*this),
-	m_sprlimit_read_cb(*this),
+	m_guny_in(*this, 0),
+	m_gunx_in(*this, 0),
+	m_sprlimit_read_cb(*this, 0),
 	m_video_irq_cb(*this),
 	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_screen(*this, finder_base::DUMMY_TAG),
@@ -49,16 +49,10 @@ spg24x_video_device::spg24x_video_device(const machine_config &mconfig, const ch
 
 void spg2xx_video_device::device_start()
 {
-	m_guny_in.resolve_safe(0);
-	m_gunx_in.resolve_safe(0);
-
 	m_screenpos_timer = timer_alloc(FUNC(spg2xx_video_device::screenpos_hit), this);
 	m_screenpos_timer->adjust(attotime::never);
 
 	save_item(NAME(m_video_regs));
-
-	m_sprlimit_read_cb.resolve_safe(0);
-	m_video_irq_cb.resolve();
 }
 
 void spg2xx_video_device::device_reset()
@@ -439,7 +433,7 @@ void spg2xx_video_device::video_w(offs_t offset, uint16_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(spg2xx_video_device::vblank)
+void spg2xx_video_device::vblank(int state)
 {
 	if (!state)
 	{

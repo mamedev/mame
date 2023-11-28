@@ -21,8 +21,8 @@ public:
 	virtual void io_map(address_map &map) = 0;
 
 protected:
-	DECLARE_WRITE_LINE_MEMBER(firq_w);
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	void firq_w(int state);
+	void irq_w(int state);
 
 private:
 	thomson_extension_device *const m_ext;
@@ -44,7 +44,6 @@ public:
 	void io_map(address_space_installer &space, offs_t start, offs_t end);
 
 protected:
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 
 	devcb_write_line m_firq_callback;

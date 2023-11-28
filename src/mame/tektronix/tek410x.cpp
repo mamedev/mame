@@ -57,9 +57,9 @@ private:
 	u16 system_reset_r();
 
 	void ppi_pc_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(kb_rdata_w);
-	DECLARE_WRITE_LINE_MEMBER(kb_tdata_w);
-	DECLARE_WRITE_LINE_MEMBER(kb_rclamp_w);
+	void kb_rdata_w(int state);
+	void kb_tdata_w(int state);
+	void kb_rclamp_w(int state);
 
 	void xpos_w(u16 data);
 	void ypos_w(u16 data);
@@ -124,14 +124,14 @@ void tek4107a_state::ppi_pc_w(u8 data)
 	m_ppi_pc = data;
 }
 
-WRITE_LINE_MEMBER(tek4107a_state::kb_rdata_w)
+void tek4107a_state::kb_rdata_w(int state)
 {
 	m_kb_rdata = state;
 	if (!m_kb_rclamp)
 		m_duart[0]->rx_a_w(state);
 }
 
-WRITE_LINE_MEMBER(tek4107a_state::kb_rclamp_w)
+void tek4107a_state::kb_rclamp_w(int state)
 {
 	if (m_kb_rclamp != !state)
 	{
@@ -144,7 +144,7 @@ WRITE_LINE_MEMBER(tek4107a_state::kb_rclamp_w)
 	}
 }
 
-WRITE_LINE_MEMBER(tek4107a_state::kb_tdata_w)
+void tek4107a_state::kb_tdata_w(int state)
 {
 	if (m_kb_tdata != state)
 	{

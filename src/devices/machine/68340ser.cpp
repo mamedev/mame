@@ -144,7 +144,7 @@ void mc68340_serial_module_device::write(offs_t offset, uint8_t data)
 
 }
 
-WRITE_LINE_MEMBER( mc68340_serial_module_device::irq_w )
+void mc68340_serial_module_device::irq_w(int state)
 {
 	LOGINT("IRQ!\n%s\n", FUNCNAME);
 	m_cpu->update_ipl();

@@ -48,7 +48,7 @@ protected:
 	virtual void config_map(address_map &map) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
+	void ide_interrupt(int state);
 	void prog_if_w(uint8_t data);
 	uint32_t pcictrl_r(offs_t offset);
 	void pcictrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);

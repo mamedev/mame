@@ -263,14 +263,14 @@ void mc68340_timer_module_device::write(offs_t offset, uint16_t data, uint16_t m
 	LOG("%08x m68340_internal_timer_w %08x, %08x (%08x)\n", m_cpu->pcbase(), offset * 2, data, mem_mask);
 }
 
-WRITE_LINE_MEMBER( mc68340_timer_module_device::tin_w)
+void mc68340_timer_module_device::tin_w(int state)
 {
 	LOGTIMER("%s\n", FUNCNAME);
 
 	m_tin = state;
 }
 
-WRITE_LINE_MEMBER( mc68340_timer_module_device::tgate_w)
+void mc68340_timer_module_device::tgate_w(int state)
 {
 	LOGTIMER("%s\n", FUNCNAME);
 
@@ -311,11 +311,6 @@ void mc68340_timer_module_device::device_start()
 	m_cpu = downcast<m68340_cpu_device *>(owner());
 
 	m_timer = timer_alloc(FUNC(mc68340_timer_module_device::timer_callback), this);
-
-	// Resolve Timer callbacks
-	m_tout_out_cb.resolve_safe();
-	m_tgate_in_cb.resolve_safe();
-	m_tin_in_cb.resolve_safe();
 
 	m_ir = 0x000f;
 }
@@ -517,7 +512,6 @@ void mc68340_timer_module_device::tout_clear()
 mc68340_timer_module_device::mc68340_timer_module_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
   : device_t(mconfig, MC68340_TIMER_MODULE, tag, owner, clock)
   , m_tout_out_cb(*this)
-  , m_tin_in_cb(*this)
   , m_tgate_in_cb(*this)
 {
 }

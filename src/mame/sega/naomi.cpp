@@ -209,9 +209,9 @@ Notes:
 
 
 ------------------------------------------------------------------------------------------------------------
-Bios Version Information                                                                                   |
+BIOS Version Information                                                                                   |
 ------------------------------------------------------------------------------------------------------------
-    Bios Label               |  Support    | mobo s/n    | 171-7978B   | Support | Support   | 171-8346C   |
+    BIOS Label               |  Support    | mobo s/n    | 171-7978B   | Support | Support   | 171-8346C   |
 ---------------------------- | Multi-Board | EEPROM type | M1-type     | DIMM    | Net-DIMM  | M4-type     |
     NAOMI     |  Naomi 2     |             |             | ROM board   |         |           | ROM board   |
 ------------------------------------------------------------------------------------------------------------
@@ -2387,7 +2387,7 @@ MACHINE_RESET_MEMBER(naomi_state,naomi)
 	naomi_state::machine_reset();
 }
 
-WRITE_LINE_MEMBER(naomi_state::external_reset)
+void naomi_state::external_reset(int state)
 {
 	// routine called by the dimm board to reboot the naomi mainboard
 	logerror("Received reset fromm dimm board !\n");
@@ -11142,7 +11142,7 @@ void naomi_state::init_hotd2()
 /* 0041  */ GAME( 2006, ggxxac,    naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,"Arc System Works",  "Guilty Gear XX Accent Core (Japan) (GDL-0041)", GAME_FLAGS )
 /* 0042  */ GAME( 2006, takoron,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Compile Heart",  "Noukone Puzzle Takoron (Japan) (GDL-0042)", GAME_FLAGS )
 
-/* CDP-xxxxx and CDV-xxxxx (CD-ROM and DVD-ROM for Naomi 2 Satellite Terminal) */
+/* CDP-xxxxx and CDV-xxxxx (CD-ROM or DVD-ROM for Windows-based PC servers used with Naomi Satellite Terminals) */
 // CDP-10001?- World Club Champion Football Serie A 2001-2002 (Sega, 2002)
 // CDP-10001?- World Club Champion Football Serie A 2001-2002 Ver.1.2 (Sega, 2002)
 /* CDP-10001C*/ GAME( 2003, wccf116,  naomigd, naomigd, naomi, naomi_state, init_naomigd, ROT0, "Hitmaker / Sega", "World Club Champion Football Serie A 2001-2002 Ver.2 (Japan) (CDP-10001C)", GAME_FLAGS )

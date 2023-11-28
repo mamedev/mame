@@ -572,10 +572,12 @@ void alphasmart_state::alphasmart(machine_config &config)
 	m_maincpu->in_pd_callback().set(FUNC(alphasmart_state::port_d_r));
 	m_maincpu->out_pd_callback().set(FUNC(alphasmart_state::port_d_w));
 
-	KS0066_F05(config, m_lcdc[0], 0);
-	m_lcdc[0]->set_lcd_size(2, 40);
-	KS0066_F05(config, m_lcdc[1], 0);
-	m_lcdc[1]->set_lcd_size(2, 40);
+	for (auto &lcdc : m_lcdc)
+	{
+		KS0066(config, lcdc, 270'000); // TODO: clock not measured, datasheet typical clock used
+		lcdc->set_default_bios_tag("f05");
+		lcdc->set_lcd_size(2, 40);
+	}
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));

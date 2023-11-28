@@ -279,8 +279,8 @@ void mpu5_state::asic_w8(offs_t offset, uint8_t data)
 			m_sec->cs_w(~data&0x04);
 			[[fallthrough]];
 		case 0x0b:
-			output().set_value("statuslamp1", BIT(data, 4));
-			output().set_value("statuslamp2", BIT(data, 5));
+			m_statuslamp[0] = BIT(data, 4);
+			m_statuslamp[1] = BIT(data, 5);
 
 			if (data & 0x40)
 			{
@@ -425,6 +425,7 @@ INPUT_PORTS_END
 
 void mpu5_state::machine_start()
 {
+	m_statuslamp.resolve();
 	m_cpuregion = (uint16_t*)memregion( "maincpu" )->base();
 	m_mainram = make_unique_clear<uint16_t[]>(0x20000);
 	m_pic_output_bit =0;

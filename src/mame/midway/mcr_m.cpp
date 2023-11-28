@@ -79,6 +79,8 @@ const z80_daisy_config mcr_ipu_daisy_chain[] =
 
 void mcr_state::machine_start()
 {
+	m_backlight.resolve();
+
 	save_item(NAME(m_mcr_cocktail_flip));
 }
 
@@ -145,12 +147,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(mcr_nflfoot_state::ipu_interrupt)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(mcr_nflfoot_state::sio_txda_w)
+void mcr_nflfoot_state::sio_txda_w(int state)
 {
 	m_ipu_sio_txda = !state;
 }
 
-WRITE_LINE_MEMBER(mcr_nflfoot_state::sio_txdb_w)
+void mcr_nflfoot_state::sio_txdb_w(int state)
 {
 	// disc player
 	m_ipu_sio_txdb = !state;

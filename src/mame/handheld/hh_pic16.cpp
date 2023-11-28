@@ -13,6 +13,7 @@ known chips:
  *021     1650    1978, GI AY-3-8910 demo board
  @024     1655    1979, Toytronic? Football
  @033     1655A   1979, Toytronic Football (newer)
+ *034     1655A   1979, Cardinal Electronic Football
  @036     1655A   1979, Ideal Maniac
  @043     1655A   1979, Caprice Pro-Action Baseball
  @049     1655A   1980, Kingsford Match Me(?)/Mini Match Me
@@ -74,14 +75,14 @@ TODO:
 
 // internal artwork
 #include "drdunk.lh"
-#include "flash.lh" // clickable
+#include "flash.lh"
 #include "hccbaskb.lh"
-#include "leboom.lh" // clickable
-#include "maniac.lh" // clickable
-#include "melodym.lh" // clickable
-#include "matchme.lh" // clickable
+#include "leboom.lh"
+#include "maniac.lh"
+#include "melodym.lh"
+#include "matchme.lh"
 #include "rockpin.lh"
-#include "touchme.lh" // clickable
+#include "touchme.lh"
 #include "ttfball.lh"
 #include "us2pfball.lh"
 
@@ -190,7 +191,8 @@ INPUT_CHANGED_MEMBER(hh_pic16_state::reset_button)
 
 INPUT_CHANGED_MEMBER(hh_pic16_state::power_button)
 {
-	set_power((bool)param);
+	if (newval != field.defvalue())
+		set_power((bool)param);
 }
 
 void hh_pic16_state::set_power(bool state)
@@ -872,6 +874,8 @@ protected:
 private:
 	required_device<filter_volume_device> m_volume;
 
+	double m_speaker_volume = 0.0;
+
 	void update_display();
 	void write_b(u8 data);
 	u8 read_c();
@@ -879,7 +883,6 @@ private:
 
 	void speaker_update();
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
-	double m_speaker_volume = 0.0;
 };
 
 void flash_state::machine_start()
@@ -1316,13 +1319,14 @@ protected:
 private:
 	required_device<filter_volume_device> m_volume;
 
+	double m_speaker_volume = 0.0;
+
 	u8 read_a();
 	void write_b(u8 data);
 	void write_c(u8 data);
 
 	void speaker_update();
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
-	double m_speaker_volume = 0.0;
 };
 
 void leboom_state::machine_start()

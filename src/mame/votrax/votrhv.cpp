@@ -9,7 +9,7 @@
 /*
     The HC-110 and HC-120 both consist of 3 boards:
     1. An 'embedded system' 6800 board with two output latches, one input
-       latch, and two 'resume/reset' latches which  pull the 6800 is out of
+       latch, and two 'resume/reset' latches which pull the 6800 is out of
        reset on a rising edge, as a form of power saving. (pcb 1816?)
     2. A keyboard handler pcb; this is different on the HC-110 (where it is
        made by a 3rd party company for the 128-key input) and the HC-120
@@ -45,8 +45,6 @@
                 +--------+
     see http://bitsavers.org/components/motorola/_dataBooks/1978_Motorola_CMOS_Data_Book.pdf
     page 488
-
-    TODO: make the two latcha/b flops combine together using input_merger
 */
 
 /* Core includes */
@@ -96,9 +94,9 @@ public:
 	void votrhv(machine_config &config);
 	void hc110(machine_config &config);
 
-	DECLARE_WRITE_LINE_MEMBER(reset_counter);
-	DECLARE_WRITE_LINE_MEMBER(key_pressed);
-	DECLARE_WRITE_LINE_MEMBER(pho_done);
+	void reset_counter(int state);
+	void key_pressed(int state);
+	void pho_done(int state);
 
 protected:
 	virtual void machine_start() override;
@@ -442,7 +440,7 @@ void hc120_state::machine_reset()
  Driver specific functions
 ******************************************************************************/
 
-WRITE_LINE_MEMBER( votrhv_state::reset_counter )
+void votrhv_state::reset_counter(int state)
 {
 	if (state == CLEAR_LINE)
 	{
@@ -458,7 +456,7 @@ WRITE_LINE_MEMBER( votrhv_state::reset_counter )
 	}
 }
 
-WRITE_LINE_MEMBER( votrhv_state::key_pressed )
+void votrhv_state::key_pressed(int state)
 {
 	// If we got called here, a key was pressed or released somewhere on the keyboard, and we don't know where.
 	// If, regardless of whether a key was pressed or released, our currently selected column has a non-zero
@@ -467,15 +465,15 @@ WRITE_LINE_MEMBER( votrhv_state::key_pressed )
 	key_check();
 }
 
-WRITE_LINE_MEMBER( votrhv_state::pho_done )
+void votrhv_state::pho_done(int state)
 {
 	bool rising_edge = (!m_latcha_in && (state == ASSERT_LINE));
 	m_latcha_in = (state == ASSERT_LINE);
-	if (rising_edge) // HACK: sc-01 is in /ready state now
+	if (rising_edge) // HACK: SC-01-A is in /ready state now
 	{
 		// clock the pho_done flipflop which sets its state to 1
 		m_latcha_flop = true;
-		// HACK: we manually clock the same old phoneme into the sc-01 here, this is a hack since the 1818c the pho_done signal is a free running counter and doesn't stop like the A/R latch on the sc-01 does
+		// HACK: we manually clock the same old phoneme into the SC-01-A here, this is a hack since on the 1818C the pho_done signal is a free running counter and doesn't stop like the A/R latch on the SC-01[-A] does
 		//m_votrax->inflection_w((m_latchy&0xc0)>>6);
 		m_votrax->write(m_latchy&0x3f);
 		m_reset->in_w<0>(1);
@@ -508,7 +506,7 @@ void votrhv_state::latchx_w(uint8_t data)
 	 *  |||\----- \ LED select 1/2/3/4
 	 *  ||\------ /
 	 *  |\------- Green status LED
-	 *  \-------- Phoneme silence (ties pitch input of 1818c high thru a diode)
+	 *  \-------- Phoneme silence (ties pitch input of 1818C high thru a diode)
 	 */
 	m_latchx = data;
 	LOGLTX("latchx written with value of %02x\n", m_latchx);
@@ -696,14 +694,14 @@ void votrhv_state::hc110(machine_config &config)
 ******************************************************************************/
 
 ROM_START(hc110)
-	ROM_REGION(0x8000, "maskrom", 0) // 4x EA8316 (2316 equivalent) CMOS Mask ROMs and 2x 512x8 SN74S472 PROMs
+	ROM_REGION(0x8000, "maskrom", 0) // 4x EA8316 (2316 equivalent) CMOS Mask ROMs
 	//ROM_LOAD("ea8316e030.ic9", 0x0000, 0x0800, CRC(fd8cbf7d) SHA1(a2e1406c498a1821cacfcda254534f8e8d6b8260)) // used on older firmware?
 	ROM_LOAD("ea8316e144.ic9", 0x0000, 0x0800, CRC(636415ee) SHA1(9699ea75eed566447d8682f52665b01c1e876981))
 	ROM_LOAD("ea8316e031.ic8", 0x0800, 0x0800, CRC(f2de4e3b) SHA1(0cdc71a4d01d73e403cdf283c6eeb53f97ca5623))
 	ROM_LOAD("ea8316e032.ic7", 0x1000, 0x0800, CRC(5df1270c) SHA1(5c81fcb2bb2c0bf509aa9fc11a92071cd469e407))
 	ROM_LOAD("ea8316e033.ic6", 0x1800, 0x0800, CRC(0d7e246c) SHA1(1454c6c7ef3743320443c7bd1f37df6a25ff7795))
 
-	ROM_REGION(0x0600, "bootrom", 0)
+	ROM_REGION(0x0600, "bootrom", 0) // 2x 512x8 SN74S472 PROMs
 	// ic12 is unpopulated
 	ROM_LOAD("7031r2.sn74s472.ic11", 0x0200, 0x0200, CRC(6ef744c9) SHA1(6a92e520adb3c47b849241648ec2ca4107edfd8f))
 	ROM_LOAD("7031r3.sn74s472.ic10", 0x0400, 0x0200, CRC(0800b0e6) SHA1(9e0481bf6c5feaf6506ac241a2baf83fb9342033))
@@ -715,13 +713,13 @@ ROM_START(hc110)
 ROM_END
 
 ROM_START(hc120) // ic10 and ic11 are Rev B? is there an older revision undumped?
-	ROM_REGION(0x2000, "maskrom", 0) // 4x EA8316 (2316 equivalent) CMOS Mask ROMs and 2x 512x8 SN74S472 PROMs
+	ROM_REGION(0x2000, "maskrom", 0) // 4x EA8316 (2316 equivalent) CMOS Mask ROMs
 	ROM_LOAD("ea8316e030.ic9", 0x0000, 0x0800, CRC(fd8cbf7d) SHA1(a2e1406c498a1821cacfcda254534f8e8d6b8260))
 	ROM_LOAD("ea8316e031.ic8", 0x0800, 0x0800, CRC(f2de4e3b) SHA1(0cdc71a4d01d73e403cdf283c6eeb53f97ca5623))
 	ROM_LOAD("ea8316e032.ic7", 0x1000, 0x0800, CRC(5df1270c) SHA1(5c81fcb2bb2c0bf509aa9fc11a92071cd469e407))
 	ROM_LOAD("ea8316e033.ic6", 0x1800, 0x0800, CRC(0d7e246c) SHA1(1454c6c7ef3743320443c7bd1f37df6a25ff7795))
 
-	ROM_REGION(0x0600, "bootrom", 0)
+	ROM_REGION(0x0600, "bootrom", 0) // 2x 512x8 SN74S472 PROMs
 	// ic12 is unpopulated
 	ROM_LOAD("7037__r2b.sn74s472.ic11", 0x0200, 0x0200, CRC(44de1bb1) SHA1(53e6811baf37af5da0648e906fee6c6acf259b82))
 	ROM_LOAD("7037__r3b.sn74s472.ic10", 0x0400, 0x0200, CRC(688be8c7) SHA1(c9bdc7472cabcdddc23e63f45afbfcc835bb8f69))

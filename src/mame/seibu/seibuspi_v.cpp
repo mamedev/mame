@@ -512,12 +512,8 @@ void seibuspi_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 			continue;
 		const u8 primask = 1 << priority;
 
-		s16 xpos = m_sprite_ram[a + 1] & 0x3ff;
-		if (xpos & 0x200)
-			xpos |= 0xfc00;
-		s16 ypos = m_sprite_ram[a + 1] >> 16 & 0x1ff;
-		if (ypos & 0x100)
-			ypos |= 0xfe00;
+		s16 xpos = util::sext(m_sprite_ram[a + 1], 10);
+		s16 ypos = util::sext(m_sprite_ram[a + 1] >> 16, 9);
 		const int color = m_sprite_ram[a + 0] & 0x3f;
 
 		int width = (m_sprite_ram[a + 0] >> 8 & 0x7) + 1;

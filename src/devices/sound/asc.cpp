@@ -33,6 +33,8 @@
     0x828: WAVETABLE 3 PHASE
     0x82C: WAVETABLE 3 INCREMENT
 
+    TODO: rewrite this, we know so much more now and the "chip variant type" pattern must die.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -83,8 +85,6 @@ void asc_device::device_start()
 	save_item(NAME(m_regs));
 	save_item(NAME(m_phase));
 	save_item(NAME(m_incr));
-
-	write_irq.resolve_safe();
 }
 
 
@@ -209,7 +209,39 @@ void asc_device::sound_stream_update(sound_stream &stream, std::vector<read_stre
 						}
 						break;
 
-					default:    // V8/Sonora/Eagle/etc
+					// Sonora sets the 1/2 full flag continuously, ASC/EASC only does it when it happens
+					case asc_type::SONORA:
+					case asc_type::ARDBEG:
+						if (m_fifo_cap_a <= 0x200)
+						{
+							m_regs[R_FIFOSTAT-0x800] |= 1;  // fifo A less than half full
+
+							if (m_fifo_cap_a == 0)   // fifo A fully empty
+							{
+								m_regs[R_FIFOSTAT-0x800] |= 2;  // fifo A empty
+							}
+							if (!(m_regs[0xf09 - 0x800] & 1))
+							{
+								write_irq(ASSERT_LINE);
+							}
+						}
+
+						if (m_fifo_cap_b <= 0x200)
+						{
+							m_regs[R_FIFOSTAT-0x800] |= 4;  // fifo B less than half full
+
+							if (m_fifo_cap_b == 0)   // fifo B fully empty
+							{
+								m_regs[R_FIFOSTAT-0x800] |= 8;  // fifo B empty
+							}
+							if (!(m_regs[0xf29 - 0x800] & 1))
+							{
+								write_irq(ASSERT_LINE);
+							}
+						}
+						break;
+
+					default:    // V8/Eagle/etc
 						if (m_fifo_cap_a < 0x1ff)
 						{
 							m_regs[R_FIFOSTAT-0x800] |= 1;  // fifo A less than half full
@@ -219,20 +251,6 @@ void asc_device::sound_stream_update(sound_stream &stream, std::vector<read_stre
 								m_regs[R_FIFOSTAT-0x800] |= 2;  // fifo A empty
 							}
 							write_irq(ASSERT_LINE);
-						}
-
-						if (m_chip_type == asc_type::SONORA)
-						{
-							if (m_fifo_cap_b < 0x1ff)
-							{
-								m_regs[R_FIFOSTAT-0x800] |= 4;  // fifo B less than half full
-
-								if (m_fifo_cap_b == 0)   // fifo B fully empty
-								{
-									m_regs[R_FIFOSTAT-0x800] |= 8;  // fifo B empty
-								}
-								write_irq(ASSERT_LINE);
-							}
 						}
 						break;
 				}
@@ -442,9 +460,14 @@ void asc_device::write(offs_t offset, uint8_t data)
 			m_fifo_a[m_fifo_a_wrptr++] = data;
 			m_fifo_cap_a++;
 
-			if (m_fifo_cap_a == 0x3ff)
+			if (m_fifo_cap_a == 0x400)
 			{
 				m_regs[R_FIFOSTAT-0x800] |= 2;  // fifo A full
+			}
+
+			if (m_fifo_cap_a > 0x200)
+			{
+				m_regs[R_FIFOSTAT-0x800] &= ~1;
 			}
 
 			m_fifo_a_wrptr &= 0x3ff;
@@ -461,9 +484,14 @@ void asc_device::write(offs_t offset, uint8_t data)
 			m_fifo_b[m_fifo_b_wrptr++] = data;
 			m_fifo_cap_b++;
 
-			if (m_fifo_cap_b == 0x3ff)
+			if (m_fifo_cap_b == 0x400)
 			{
 				m_regs[R_FIFOSTAT-0x800] |= 8;  // fifo B full
+			}
+
+			if (m_fifo_cap_b > 0x200)
+			{
+				m_regs[R_FIFOSTAT-0x800] &= ~4;
 			}
 
 			m_fifo_b_wrptr &= 0x3ff;

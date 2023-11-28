@@ -148,7 +148,6 @@ static INPUT_PORTS_START( leapfrog_leappad )
 INPUT_PORTS_END
 
 
-
 void leapfrog_leappad_state::leapfrog_leappad(machine_config &config)
 {
 	I8032(config, m_maincpu, 96000000/10); //  LeapPad Leapfrog 05-9-01 FS80A363  (which exact type is it?)
@@ -204,30 +203,55 @@ ROM_START( leappad )
 	ROMX_LOAD( "leappadbios.bin",       0x000000, 0x100000, CRC(c886cddc) SHA1(f8a83b156feb28315d2321758678e141600a0d4e), ROM_BIOS(0) ) // contains "Aug 06 2001.16:33:16.155-00450.LeapPad ILA2 Universal Base ROM" and "Copyright (c) 1998-2001 Knowledge Kids Enterprises, Inc."
 	ROM_SYSTEM_BIOS( 1, "2mb_canada_full", "Canada" )
 	ROMX_LOAD( "leappadbioscanada.bin", 0x000000, 0x200000, CRC(cc12e3db) SHA1(adf52232adcfd4de5d8e31c0e0c09be61718a9d4), ROM_BIOS(1) ) // contains "Jan 23 2004 11:28:40 152-10620 2MB Canada Full Base ROM" and "Copyright (c) 2000-2004 LeapFrog Enterprises, Inc."
+
+	ROM_REGION( 0x8000, "bootloader", 0) // Main MCU (LeapFrog FS80A363) internal ROM (exact size unknown)
+	ROM_LOAD( "fs80a363.u4", 0x0000, 0x8000, NO_DUMP )
 ROM_END
 
 ROM_START( mfleappad )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS("internat_v1.3")
-	ROM_SYSTEM_BIOS( 0, "internat_v1.3",  "International V1.3" )
+	ROM_SYSTEM_BIOS( 0, "internat_v1.3",  "International" )
 	ROMX_LOAD( "myfirstleappadinternational.bin", 0x000000, 0x100000, CRC(4dc0c4d5) SHA1(573ecf2efaccf70e619cf54d63be9169e469ee6f), ROM_BIOS(0) ) // contains "May 07 2002 10:53:14 152-00932 MFLP International base ROM V1.3" and "Copyright (c) 2002 LeapFrog Enterprises, Inc."
 	ROM_SYSTEM_BIOS( 1, "us_2004",        "US" )
 	ROMX_LOAD( "myfirstleappadbios.bin",          0x000000, 0x400000, CRC(19174c16) SHA1(e0ba644fdf38fd5f91ab8c4b673c4a658cc3e612), ROM_BIOS(1) ) // contains "Feb 13 2004.10:58:53.152-10573.MFLP US Base ROM - 2004" and "Copyright (c) 2004 LeapFrog Enterprises, Inc."
+
+	ROM_REGION( 0x8000, "bootloader", 0) // Main MCU (LeapFrog FS80A363) internal ROM (exact size unknown)
+	ROM_LOAD( "fs80a363.u4", 0x0000, 0x8000, NO_DUMP )
+ROM_END
+
+ROM_START( leappadmic )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_DEFAULT_BIOS("us_2004")
+	ROM_SYSTEM_BIOS( 0, "us_2004", "US" )
+	ROMX_LOAD( "leapfrogvpadwithmic.bin", 0x000000, 0x800000, CRC(c289b660) SHA1(fa163661260942eab92e34ae802b3da0a6130a39), ROM_BIOS(0) ) // contains "Apr 29 2004 12:09:09 152-10793 MIB - LeapPad Plus Microphone baseROM - US 2004" and "Copyright (c) 2000-2004 LeapFrog Enterprises, Inc."
+
+	ROM_REGION( 0x8000, "bootloader", 0) // Main MCU (LeapFrog FS80A363) internal ROM (exact size unknown)
+	ROM_LOAD( "fs80a363.u4", 0x0000, 0x8000, NO_DUMP )
+
+	// Sunplus PA7790 sound MCU internal ROM (exact size unknown)
+	// It is unknown if other LeapPad models use the same MCU
+	ROM_REGION( 0x8000, "soundmcu", 0)
+	ROM_LOAD( "pa7790.u15",  0x0000, 0x8000, NO_DUMP )
 ROM_END
 
 ROM_START( ltleappad )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS("mar_10_2005")
-	ROM_SYSTEM_BIOS( 0, "mar_10_2005",  "Mar 10 2005" )
-	ROMX_LOAD( "littletouchleappadbios.bin", 0x000000, 0x400000, CRC(13687b26) SHA1(6ec1a47aaef9c9ed134bb143c2631f4d89d7c236), ROM_BIOS(0) ) // contains "Mar 10 2005 07:01:53 152-11244" and "Copyright (c) 2002-2005 LeapFrog Enterprises, Inc."
-	ROM_SYSTEM_BIOS( 1, "germany",  "Germany, Jan 11 2005" )
+	ROM_SYSTEM_BIOS( 0, "mar_10_2005", "Universal" ) // Includes the game 'One Bear in the Bedroom'
+	ROMX_LOAD( "littletouchleappadbios.bin",      0x000000, 0x400000, CRC(13687b26) SHA1(6ec1a47aaef9c9ed134bb143c2631f4d89d7c236), ROM_BIOS(0) ) // contains "Mar 10 2005 07:01:53 152-11244" and "Copyright (c) 2002-2005 LeapFrog Enterprises, Inc."
+	ROM_SYSTEM_BIOS( 1, "germany",     "Germany" )
 	ROMX_LOAD( "leappad_little_touch_german.bin", 0x000000, 0x400000, CRC(39ee76a2) SHA1(34f1b6e075e10e14380d925944f4c84d068ec58e), ROM_BIOS(1) ) // contains "Jan 11 2005 10:45:42 152-11010 Full Base ROM: V1.0 - Germany"
+
+	ROM_REGION( 0x8000, "bootloader", 0) // Main MCU (LeapFrog FS80A363) internal ROM (exact size unknown)
+	ROM_LOAD( "fs80a363.u4", 0x0000, 0x8000, NO_DUMP )
 ROM_END
 
 } // anonymous namespace
 
 
-//    year, name,      parent, compat, machine,            input,            class,                  init,       company,    fullname,               flags
-CONS( 2001, leappad,   0,      0,      leapfrog_leappad,   leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "LeapPad",              MACHINE_IS_SKELETON )
-CONS( 2002, mfleappad, 0,      0,      leapfrog_mfleappad, leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "My First LeapPad",     MACHINE_IS_SKELETON )
-CONS( 2005, ltleappad, 0,      0,      leapfrog_ltleappad, leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "Little Touch LeapPad", MACHINE_IS_SKELETON )
+//    year, name,       parent, compat, machine,            input,            class,                  init,       company,    fullname,                  flags
+CONS( 2001, leappad,    0,      0,      leapfrog_leappad,   leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "LeapPad",                 MACHINE_IS_SKELETON )
+CONS( 2002, mfleappad,  0,      0,      leapfrog_mfleappad, leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "My First LeapPad",        MACHINE_IS_SKELETON )
+CONS( 2004, leappadmic, 0,      0,      leapfrog_leappad,   leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "LeapPad Plus Microphone", MACHINE_IS_SKELETON ) // Compatible with regular LeapPad carts
+CONS( 2005, ltleappad,  0,      0,      leapfrog_ltleappad, leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "Little Touch LeapPad",    MACHINE_IS_SKELETON )

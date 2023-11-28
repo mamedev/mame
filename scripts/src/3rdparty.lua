@@ -1180,6 +1180,14 @@ project "bx"
 
 	configuration { }
 
+	if _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="linux" or _OPTIONS["targetos"]=="windows" or _OPTIONS["targetos"]=="asmjs" then
+		if _OPTIONS["gcc"]~=nil and (string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs")) then
+			buildoptions_cpp {
+				"-Wno-unused-private-field",
+			}
+		end
+	end
+
 	includedirs {
 		MAME_DIR .. "3rdparty/bx/include",
 		MAME_DIR .. "3rdparty/bx/3rdparty",
@@ -1277,7 +1285,7 @@ project "bimg"
 		"BX_CONFIG_DEBUG=0",
 	}
 
-	configuration { "x64", "mingw*" }
+	configuration { "x64", "mingw*", "not arm64" }
 		defines {
 			"ASTCENC_AVX=0",
 			"ASTCENC_SSE=20",
@@ -1461,6 +1469,11 @@ end
 				"BGFX_CONFIG_RENDERER_OPENGL=0",
 			}
 		end
+		if _OPTIONS["USE_WAYLAND"]=="1" then
+			defines {
+				"WL_EGL_PLATFORM=1",
+			}
+		end
 	end
 
 	if _OPTIONS["targetos"]=="macosx" and _OPTIONS["gcc"]~=nil then
@@ -1476,7 +1489,6 @@ end
 		MAME_DIR .. "3rdparty/bgfx/src/debug_renderdoc.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/dxgi.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/glcontext_egl.cpp",
-		MAME_DIR .. "3rdparty/bgfx/src/glcontext_glx.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/glcontext_html5.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/glcontext_wgl.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/nvapi.cpp",
@@ -1538,6 +1550,13 @@ project "portaudio"
 			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
 			"/wd4312", -- warning C4312: 'type cast': conversion from 'UINT' to 'HWAVEIN' of greater size
 		}
+	if _OPTIONS["vs"]=="clangcl" then
+		buildoptions {
+			"-Wno-implicit-const-int-float-conversion",
+			"-Wno-sometimes-uninitialized",
+			"-Wno-unused-but-set-variable",
+		}
+	end
 	if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
 			"/Qwd869",              -- remark #869: parameter "xxx" was never referenced
@@ -1571,7 +1590,8 @@ project "portaudio"
 				"-Wno-incompatible-pointer-types-discards-qualifiers",
 				"-Wno-pointer-sign",
 				"-Wno-switch",
-				"-Wno-macro-redefined"
+				"-Wno-macro-redefined",
+				"-Wno-unused-label",
 			}
 		else
 			buildoptions_c {
@@ -1629,6 +1649,7 @@ project "portaudio"
 		configuration { }
 		files {
 			MAME_DIR .. "3rdparty/portaudio/src/os/win/pa_win_util.c",
+			MAME_DIR .. "3rdparty/portaudio/src/os/win/pa_win_version.c",
 			MAME_DIR .. "3rdparty/portaudio/src/os/win/pa_win_waveformat.c",
 			MAME_DIR .. "3rdparty/portaudio/src/os/win/pa_win_hostapis.c",
 			MAME_DIR .. "3rdparty/portaudio/src/os/win/pa_win_coinitialize.c",

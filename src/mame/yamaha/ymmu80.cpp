@@ -2,11 +2,17 @@
 // copyright-holders:R. Belmont, Olivier Galibert
 /*************************************************************************************
 
-    Yamaha MU-80 and MU-100 : 32-voice polyphonic/multitimbral General MIDI/GS/XG tone modules
+    Yamaha MU-80 : 32-part, 64-note polyphonic/multitimbral General MIDI/GS/XG
+                   tone module
     Preliminary driver by R. Belmont and O. Galibert
 
+    The first XG-capable module (mu15 and mu50 came out later).  Uses a distributed
+    structure of chips, with two chained SWP20 providing 32-notes each with a MEG
+    effects processor at the end of the chain followed by an EQ chip on the result.
+
     MU80 CPU: Hitachi H8/3002 (HD6413D02F16), strapped for mode 4, with a 12 MHz oscillator
-    Sound ASICs: 2x Yamaha YMM275-F/SWP20 + 2x YMM279-F/SWD wave decoders + HD62908 "MEG" effects processor
+    Sound ASICs: 2x Yamaha YMM275-F/SWP20 + 2x YMM279-F/SWD wave decoders + HD62908 "MEG"
+    effects processor
 
     I/O ports from service manual:
 
@@ -200,7 +206,6 @@ private:
 
 	u8 cur_p6, cur_pa, cur_pb, cur_ic32;
 
-	u16 adc_zero_r();
 	u16 adc_ar_r();
 	u16 adc_al_r();
 	u16 adc_midisw_r();
@@ -214,13 +219,19 @@ private:
 	u16 pb_r();
 
 	virtual void machine_start() override;
-	void mu80_iomap(address_map &map);
+	virtual void machine_reset() override;
 	void mu80_map(address_map &map);
 };
 
 void mu80_state::machine_start()
 {
 	cur_p6 = cur_pa = cur_pb = cur_ic32 = 0xff;
+}
+
+void mu80_state::machine_reset()
+{
+	// Active-low, wired to gnd
+	m_mu80cpu->set_input_line(0, ASSERT_LINE);
 }
 
 void mu80_state::mu80_map(address_map &map)
@@ -230,12 +241,6 @@ void mu80_state::mu80_map(address_map &map)
 	map(0x400000, 0x40003f).m(m_swp20_0, FUNC(swp20_device::map));
 	map(0x440000, 0x44001f).m(m_meg, FUNC(meg_device::map));
 	map(0x460000, 0x46003f).m(m_swp20_1, FUNC(swp20_device::map));
-}
-
-// Grounded adc input
-u16 mu80_state::adc_zero_r()
-{
-	return 0;
 }
 
 // Analog input right (also sent to the swp)
@@ -325,26 +330,24 @@ u16 mu80_state::pa_r()
 	return cur_pa;
 }
 
-void mu80_state::mu80_iomap(address_map &map)
-{
-	map(h8_device::PORT_6, h8_device::PORT_6).rw(FUNC(mu80_state::p6_r), FUNC(mu80_state::p6_w));
-	map(h8_device::PORT_A, h8_device::PORT_A).rw(FUNC(mu80_state::pa_r), FUNC(mu80_state::pa_w));
-	map(h8_device::PORT_B, h8_device::PORT_B).rw(FUNC(mu80_state::pb_r), FUNC(mu80_state::pb_w));
-	map(h8_device::ADC_0, h8_device::ADC_0).r(FUNC(mu80_state::adc_ar_r));
-	map(h8_device::ADC_1, h8_device::ADC_1).r(FUNC(mu80_state::adc_zero_r));
-	map(h8_device::ADC_2, h8_device::ADC_2).r(FUNC(mu80_state::adc_al_r));
-	map(h8_device::ADC_3, h8_device::ADC_3).r(FUNC(mu80_state::adc_zero_r));
-	map(h8_device::ADC_4, h8_device::ADC_4).r(FUNC(mu80_state::adc_midisw_r));
-	map(h8_device::ADC_5, h8_device::ADC_6).r(FUNC(mu80_state::adc_zero_r));
-	map(h8_device::ADC_6, h8_device::ADC_6).r(FUNC(mu80_state::adc_battery_r));
-	map(h8_device::ADC_7, h8_device::ADC_7).r(FUNC(mu80_state::adc_zero_r)); // inputmod from the gate array
-}
-
 void mu80_state::mu80(machine_config &config)
 {
 	H83002(config, m_mu80cpu, 12_MHz_XTAL);
 	m_mu80cpu->set_addrmap(AS_PROGRAM, &mu80_state::mu80_map);
-	m_mu80cpu->set_addrmap(AS_IO, &mu80_state::mu80_iomap);
+	m_mu80cpu->read_adc<0>().set(FUNC(mu80_state::adc_ar_r));
+	m_mu80cpu->read_adc<1>().set_constant(0);
+	m_mu80cpu->read_adc<2>().set(FUNC(mu80_state::adc_al_r));
+	m_mu80cpu->read_adc<3>().set_constant(0);
+	m_mu80cpu->read_adc<4>().set(FUNC(mu80_state::adc_midisw_r));
+	m_mu80cpu->read_adc<5>().set_constant(0);
+	m_mu80cpu->read_adc<6>().set(FUNC(mu80_state::adc_battery_r));
+	m_mu80cpu->read_adc<7>().set_constant(0); // inputmod from the gate array
+	m_mu80cpu->read_port6().set(FUNC(mu80_state::p6_r));
+	m_mu80cpu->write_port6().set(FUNC(mu80_state::p6_w));
+	m_mu80cpu->read_porta().set(FUNC(mu80_state::pa_r));
+	m_mu80cpu->write_porta().set(FUNC(mu80_state::pa_w));
+	m_mu80cpu->read_portb().set(FUNC(mu80_state::pb_r));
+	m_mu80cpu->write_portb().set(FUNC(mu80_state::pb_w));
 
 	MULCD(config, m_lcd);
 
@@ -353,34 +356,38 @@ void mu80_state::mu80(machine_config &config)
 
 	SWP20(config, m_swp20_0);
 	m_swp20_0->set_device_rom_tag("swp20");
+	m_swp20_0->add_route(0, "lspeaker", 1.0);
+	m_swp20_0->add_route(1, "rspeaker", 1.0);
 
 	SWP20(config, m_swp20_1);
 	m_swp20_1->set_device_rom_tag("swp20");
+	m_swp20_1->add_route(0, "lspeaker", 1.0);
+	m_swp20_1->add_route(1, "rspeaker", 1.0);
 
 	MEG(config, m_meg);
 
 	auto &mdin_a(MIDI_PORT(config, "mdin_a"));
 	midiin_slot(mdin_a);
-	mdin_a.rxd_handler().set("mu80cpu:sci1", FUNC(h8_sci_device::rx_w));
+	mdin_a.rxd_handler().set(m_mu80cpu, FUNC(h83002_device::sci_rx_w<1>));
 
 	auto &mdin_b(MIDI_PORT(config, "mdin_b"));
 	midiin_slot(mdin_b);
-	mdin_b.rxd_handler().set("mu80cpu:sci0", FUNC(h8_sci_device::rx_w));
+	mdin_b.rxd_handler().set(m_mu80cpu, FUNC(h83002_device::sci_rx_w<0>));
 
 	auto &mdout(MIDI_PORT(config, "mdout"));
 	midiout_slot(mdout);
-	m_mu80cpu->subdevice<h8_sci_device>("sci0")->tx_handler().set(mdout, FUNC(midi_port_device::write_txd));
+	m_mu80cpu->write_sci_tx<0>().set(mdout, FUNC(midi_port_device::write_txd));
 }
 
 ROM_START( mu80 )
 	ROM_REGION( 0x80000, "mu80cpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "yamaha_mu80.bin", 0x000000, 0x080000, CRC(c31074c0) SHA1(a11bd4523cd8ff1e1744078c3b4c18112b73c61e) )
 
-	ROM_REGION16_LE( 0x2000000, "swp20", ROMREGION_ERASE00 )
-	ROM_LOAD( "xq012b0-822.bin", 0x1c00000, 0x200000, CRC(cb454418) SHA1(43dab164de5497df9203a1ac9e7ece478276e46d))
-	ROM_LOAD( "xq013b0-823.bin", 0x1a00000, 0x200000, CRC(f14117b4) SHA1(fc603b7b7a3f3500521d4d9638a9562f90cc0354))
-	ROM_LOAD( "xq089b0-824.bin", 0x1600000, 0x200000, CRC(0adbf203) SHA1(ecc4c1cfb123d12bc3dad092c31bddc707bb4d07))
-	ROM_LOAD( "xq090b0-825.bin", 0x0e00000, 0x200000, CRC(34c422b3) SHA1(14073c41fbdf4faa9da9c83dafe4dc2d6b01b53b))
+	ROM_REGION16_LE( 0x800000, "swp20", 0 )
+	ROM_LOAD( "xq012b0-822.bin", 0x000000, 0x200000, CRC(cb454418) SHA1(43dab164de5497df9203a1ac9e7ece478276e46d))
+	ROM_LOAD( "xq013b0-823.bin", 0x200000, 0x200000, CRC(f14117b4) SHA1(fc603b7b7a3f3500521d4d9638a9562f90cc0354))
+	ROM_LOAD( "xq089b0-824.bin", 0x400000, 0x200000, CRC(0adbf203) SHA1(ecc4c1cfb123d12bc3dad092c31bddc707bb4d07))
+	ROM_LOAD( "xq090b0-825.bin", 0x600000, 0x200000, CRC(34c422b3) SHA1(14073c41fbdf4faa9da9c83dafe4dc2d6b01b53b))
 ROM_END
 
 } // anonymous namespace

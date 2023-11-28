@@ -474,7 +474,7 @@ TIMER_CALLBACK_MEMBER(bq48x2_device::rtc_watchdog_cb)
     Indicates that there is an interrupt condition. Also used to drive the
     outgoing line.
 */
-READ_LINE_MEMBER(bq48x2_device::intrq_r)
+int bq48x2_device::intrq_r()
 {
 	bool alarm = (is_set(reg_interrupts, FLAG_AIE) && is_set(reg_flags, FLAG_AF));
 	bool period = (is_set(reg_interrupts, FLAG_PIE) && is_set(reg_flags, FLAG_PF));
@@ -514,12 +514,6 @@ void bq48x2_device::device_start()
 
 	// Watchdog timer
 	m_watchdog_timer = timer_alloc(FUNC(bq48x2_device::rtc_watchdog_cb), this);
-
-	// Interrupt line
-	m_interrupt_cb.resolve_safe();
-
-	// Reset output
-	m_resetout_cb.resolve_safe();
 
 	m_sram = std::make_unique<u8 []>(m_memsize);
 

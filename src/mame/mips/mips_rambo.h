@@ -25,7 +25,7 @@ public:
 	template <unsigned Channel> auto dma_w() { return m_channel[Channel].write_cb.bind(); }
 
 	// input lines
-	template <unsigned Channel> DECLARE_WRITE_LINE_MEMBER(drq_w);
+	template <unsigned Channel> void drq_w(int state);
 
 	void map(address_map &map);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

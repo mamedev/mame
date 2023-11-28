@@ -84,9 +84,9 @@ public:
 	void map_exrom(address_space_installer &space);
 	void map_io(address_space_installer &space);
 
-	DECLARE_WRITE_LINE_MEMBER( nmi_w );
-	DECLARE_WRITE_LINE_MEMBER( irq_w );
-	DECLARE_WRITE_LINE_MEMBER( firq_w );
+	void nmi_w(int state);
+	void irq_w(int state);
+	void firq_w(int state);
 
 protected:
 	bml3bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

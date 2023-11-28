@@ -22,6 +22,7 @@ Hardware notes:
 were actually released.
 
 TODO:
+- plosive consonants are very difficult to hear, it's an issue in votrax.cpp
 - add module slot
 
 *******************************************************************************/
@@ -29,7 +30,6 @@ TODO:
 #include "emu.h"
 
 #include "cpu/mcs48/mcs48.h"
-#include "machine/timer.h"
 #include "machine/tms6100.h"
 #include "video/mm5445.h"
 #include "video/pwm.h"
@@ -53,7 +53,6 @@ public:
 		m_display(*this, "display"),
 		m_tms6100(*this, "tms6100"),
 		m_speech(*this, "speech"),
-		m_onbutton_timer(*this, "on_button"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
@@ -72,10 +71,10 @@ private:
 	required_device<pwm_display_device> m_display;
 	required_device<tms6100_device> m_tms6100;
 	required_device<votrax_sc01_device> m_speech;
-	required_device<timer_device> m_onbutton_timer;
 	required_ioport_array<7> m_inputs;
 
 	bool m_power_on = false;
+	attotime m_onbutton_time;
 	u8 m_inp_mux = 0;
 	u8 m_phoneme = 0x3f;
 	int m_speech_strobe = 0;
@@ -94,6 +93,7 @@ void k28_state::machine_start()
 {
 	// register for savestates
 	save_item(NAME(m_power_on));
+	save_item(NAME(m_onbutton_time));
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_phoneme));
 	save_item(NAME(m_speech_strobe));
@@ -108,11 +108,12 @@ void k28_state::machine_start()
 
 void k28_state::machine_reset()
 {
+	m_vfd_data = 0;
 	m_power_on = true;
 	m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 
-	// the game relies on reading the on-button as pressed when it's turned on
-	m_onbutton_timer->adjust(attotime::from_msec(250));
+	// it relies on reading the on-button as pressed when it's turned on
+	m_onbutton_time = machine().time() + attotime::from_msec(250);
 }
 
 INPUT_CHANGED_MEMBER(k28_state::power_on)
@@ -125,6 +126,7 @@ void k28_state::power_off()
 {
 	m_power_on = false;
 	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_display->clear();
 }
 
 
@@ -188,7 +190,7 @@ u8 k28_state::mcu_p1_r()
 			data |= m_inputs[i]->read();
 
 			// force press on-button at boot
-			if (i == 5 && m_onbutton_timer->enabled())
+			if (i == 5 && machine().time() < m_onbutton_time)
 				data |= 1;
 		}
 
@@ -309,8 +311,6 @@ void k28_state::k28(machine_config &config)
 
 	TMS6100(config, m_tms6100, 3.579545_MHz_XTAL / 15); // CLK tied to 8021 ALE pin
 
-	TIMER(config, "on_button").configure_generic(nullptr);
-
 	// video hardware
 	MM5445(config, m_vfd).output_cb().set(FUNC(k28_state::vfd_output_w));
 	PWM_DISPLAY(config, m_display).set_size(9, 16);
@@ -346,4 +346,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1981, k28,  0,      0,      k28,     k28,   k28_state, empty_init, "Tiger Electronics", "K-2-8: Talking Learning Computer (model 7-230)", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, k28,  0,      0,      k28,     k28,   k28_state, empty_init, "Tiger Electronics", "K-2-8: Talking Learning Computer (model 7-230)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

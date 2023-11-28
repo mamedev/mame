@@ -240,7 +240,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(segahang_state::hangon_irq)
 uint8_t segahang_state::sound_data_r()
 {
 	// assert ACK
-	m_i8255_1->pc6_w(CLEAR_LINE);
+	m_i8255[0]->pc6_w(CLEAR_LINE);
 	return m_soundlatch->read();
 }
 
@@ -340,7 +340,7 @@ TIMER_CALLBACK_MEMBER(segahang_state::i8751_sync)
 TIMER_CALLBACK_MEMBER(segahang_state::ppi_sync)
 {
 	// synchronize writes to the 8255 PPI
-	m_i8255_1->write(param >> 8, param & 0xff);
+	m_i8255[0]->write(param >> 8, param & 0xff);
 }
 
 
@@ -361,9 +361,9 @@ void segahang_state::hangon_map(address_map &map)
 	map(0xc00000, 0xc3ffff).rom().region("subcpu", 0);
 	map(0xc68000, 0xc68fff).ram().share("segaic16road:roadram");
 	map(0xc7c000, 0xc7ffff).ram().share("subram");
-	map(0xe00000, 0xe00007).mirror(0x1fcfd8).r(m_i8255_1, FUNC(i8255_device::read)).w(FUNC(segahang_state::sync_ppi_w)).umask16(0x00ff);
+	map(0xe00000, 0xe00007).mirror(0x1fcfd8).r(m_i8255[0], FUNC(i8255_device::read)).w(FUNC(segahang_state::sync_ppi_w)).umask16(0x00ff);
 	map(0xe01000, 0xe01007).mirror(0x1fcfd8).r(FUNC(segahang_state::hangon_inputs_r)).umask16(0x00ff);
-	map(0xe03000, 0xe03007).mirror(0x1fcfd8).rw(m_i8255_2, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0xe03000, 0xe03007).mirror(0x1fcfd8).rw(m_i8255[1], FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0xe03021, 0xe03021).mirror(0x1fcfde).rw(m_adc, FUNC(adc0804_device::read), FUNC(adc0804_device::write));
 }
 
@@ -383,9 +383,9 @@ void segahang_state::sharrier_map(address_map &map)
 	map(0x110000, 0x110fff).ram().w(FUNC(segahang_state::paletteram_w)).share("paletteram");
 	map(0x124000, 0x127fff).ram().share("subram");
 	map(0x130000, 0x130fff).ram().share("sprites");
-	map(0x140000, 0x140007).mirror(0xffc8).r(m_i8255_1, FUNC(i8255_device::read)).w(FUNC(segahang_state::sync_ppi_w)).umask16(0x00ff);
+	map(0x140000, 0x140007).mirror(0xffc8).r(m_i8255[0], FUNC(i8255_device::read)).w(FUNC(segahang_state::sync_ppi_w)).umask16(0x00ff);
 	map(0x140010, 0x140017).mirror(0xffc8).r(FUNC(segahang_state::sharrier_inputs_r)).umask16(0x00ff);
-	map(0x140020, 0x140027).mirror(0xffc8).rw(m_i8255_2, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0x140020, 0x140027).mirror(0xffc8).rw(m_i8255[1], FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x140031, 0x140031).mirror(0xffce).rw(m_adc, FUNC(adc0804_device::read), FUNC(adc0804_device::write));
 	map(0x150000, 0x150001).mirror(0xfffe).nopw(); // mcu writes 0x1c here in its vblank irq
 	map(0x170000, 0x170001).mirror(0xfffe).nopr(); // mcu reads here (by accident?)
@@ -737,14 +737,21 @@ void segahang_state::shared_base(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
-	I8255(config, m_i8255_1);
-	m_i8255_1->out_pa_callback().set("soundlatch", FUNC(generic_latch_8_device::write));
-	m_i8255_1->out_pb_callback().set(FUNC(segahang_state::video_lamps_w));
-	m_i8255_1->out_pc_callback().set(FUNC(segahang_state::tilemap_sound_w));
+	I8255(config, m_i8255[0]);
+	m_i8255[0]->out_pa_callback().set("soundlatch", FUNC(generic_latch_8_device::write));
+	m_i8255[0]->out_pb_callback().set(FUNC(segahang_state::video_lamps_w));
+	m_i8255[0]->out_pc_callback().set(FUNC(segahang_state::tilemap_sound_w));
 
-	I8255(config, m_i8255_2);
-	m_i8255_2->out_pa_callback().set(FUNC(segahang_state::sub_control_adc_w));
-	m_i8255_2->in_pc_callback().set(FUNC(segahang_state::adc_status_r));
+	I8255(config, m_i8255[1]);
+	m_i8255[1]->out_pa_callback().set(FUNC(segahang_state::sub_control_adc_w));
+	m_i8255[1]->in_pc_callback().set(FUNC(segahang_state::adc_status_r));
+
+	for (int i = 0; i < 2; i++)
+	{
+		m_i8255[i]->tri_pa_callback().set_constant(0);
+		m_i8255[i]->tri_pb_callback().set_constant(0);
+		m_i8255[i]->tri_pc_callback().set_constant(0);
+	}
 
 	ADC0804(config, m_adc, MASTER_CLOCK_25MHz/4/6);
 	m_adc->vin_callback().set(FUNC(segahang_state::analog_r));

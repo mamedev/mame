@@ -113,7 +113,7 @@ void m68340_cpu_device::m68340_internal_sim_w(offs_t offset, uint16_t data, uint
 			LOGSIM("PC: %08x %s %04x, %04x (%04x) (MCR - Module Configuration Register)\n", m_ppc, FUNCNAME, offset * 2, data, mem_mask);
 			LOGPIT("- FRZ1: Watchdog and PIT timer are %s\n", (data & m68340_sim::REG_MCR_FRZ1) == 0 ? "enabled" : "disabled");
 			LOGSIM("- FRZ0: The BUS monitor is %s\n", (data & m68340_sim::REG_MCR_FRZ0) == 0 ? "enabled" : "disabled");
-			LOGSIM("- FIRQ: Full Interrupt Request Mode %s\n", data & m68340_sim::REG_MCR_FIRQ ? "used on port B" : "supressed, adding 4 chip select lines on Port B");
+			LOGSIM("- FIRQ: Full Interrupt Request Mode %s\n", data & m68340_sim::REG_MCR_FIRQ ? "used on port B" : "suppressed, adding 4 chip select lines on Port B");
 			LOGSIM("- SHEN0-SHEN1: Show Cycle Enable %02x - not implemented\n", ((data & m68340_sim::REG_MCR_SHEN) >> 8));
 			LOGSIM("- Supervisor registers %s - not implemented\n", data & m68340_sim::REG_MCR_SVREG ? "requries supervisor privileges" : "can be accessed by user privileged software");
 			LOGSIM("- Interrupt Arbitration level: %02x\n", data & m68340_sim::REG_MCR_ARBLV);
@@ -208,7 +208,7 @@ uint8_t m68340_cpu_device::m68340_internal_sim_ports_r(offs_t offset)
 			sim.m_porta &= sim.m_ddra;
 			// TODO: call callback
 
-			if (!m_pa_in_cb.isnull())
+			if (!m_pa_in_cb.isunset())
 			{
 				sim.m_porta |= (m_pa_in_cb() & ~sim.m_ddra);
 			}
@@ -245,7 +245,7 @@ uint8_t m68340_cpu_device::m68340_internal_sim_ports_r(offs_t offset)
 			sim.m_portb &= sim.m_ddrb;
 			// TODO: call callback
 
-			if (!m_pb_in_cb.isnull())
+			if (!m_pb_in_cb.isunset())
 			{
 				sim.m_portb |= (m_pb_in_cb() & ~sim.m_ddrb);
 			}
@@ -471,14 +471,6 @@ void m68340_cpu_device::start_68340_sim()
 	LOGCLOCK( " - Clock: %d [0x%08x]\n", clock(), clock());
 	m_irq_timer = timer_alloc(FUNC(m68340_cpu_device::periodic_interrupt_timer_callback), this);
 
-	// resolve callbacks Port A
-	m_pa_out_cb.resolve_safe();
-	m_pa_in_cb.resolve();
-
-	// resolve callbacks Port B
-	m_pb_out_cb.resolve_safe();
-	m_pb_in_cb.resolve();
-
 	// Setup correct VCO/clock speed based on reset values and crystal
 	assert(m_m68340SIM);
 	m68340_sim &sim = *m_m68340SIM;
@@ -560,7 +552,7 @@ void m68340_cpu_device::do_tick_pit()
 	}
 }
 
-WRITE_LINE_MEMBER( m68340_cpu_device::extal_w )
+void m68340_cpu_device::extal_w(int state)
 {
 	LOGPIT("%s H1 set to %d\n", FUNCNAME, state);
 	m_extal = state;

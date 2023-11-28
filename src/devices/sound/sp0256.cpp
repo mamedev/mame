@@ -68,8 +68,6 @@ sp0256_device::sp0256_device(const machine_config &mconfig, const char *tag, dev
 
 void sp0256_device::device_start()
 {
-	m_drq_cb.resolve_safe();
-	m_sby_cb.resolve_safe();
 	m_drq_cb(1);
 	m_sby_cb(1);
 
@@ -1164,7 +1162,7 @@ void sp0256_device::ald_w(uint8_t data)
 	return;
 }
 
-READ_LINE_MEMBER( sp0256_device::lrq_r )
+int sp0256_device::lrq_r()
 {
 	// force stream update
 	m_stream->update();
@@ -1172,7 +1170,7 @@ READ_LINE_MEMBER( sp0256_device::lrq_r )
 	return m_lrq == 0x8000;
 }
 
-READ_LINE_MEMBER( sp0256_device::sby_r )
+int sp0256_device::sby_r()
 {
 	// TODO: force stream update??
 

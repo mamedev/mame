@@ -126,7 +126,7 @@ protected:
 	required_region_ptr<uint8_t> m_rom, m_chrrom;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(vsync_changed);
+	void vsync_changed(int state);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	int m_rambank;
@@ -436,7 +436,7 @@ MC6845_UPDATE_ROW( a2bus_videx160_device::crtc_update_row )
 	}
 }
 
-WRITE_LINE_MEMBER( a2bus_videx160_device::vsync_changed )
+void a2bus_videx160_device::vsync_changed(int state)
 {
 	if ( state )
 	{

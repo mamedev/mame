@@ -7,13 +7,13 @@
 
     driver by smf, Aaron Giles, Chris Hardy & Scott Waye
 
-short term:
-    split driver/vidhrdw/sndhrdw/machine
-    add option to centre joystick to enter test menu
+TODO:
+- add option to centre joystick to enter test menu
+
 
 it uses a quad pokey package 137323-1221-406???
 the laser disc is a philips lvp 22vp931
-( but maybe this works too... Special Drive: Laser Disc Player - Philips VP-832A )
+(but maybe this works too... Special Drive: Laser Disc Player - Philips VP-832A)
 
 
 AV# 60626
@@ -29,6 +29,7 @@ but requires a special level III player for proper control. Video: CAV. Audio: A
 */
 
 #include "emu.h"
+
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/pokey.h"
@@ -36,11 +37,12 @@ but requires a special level III player for proper control. Video: CAV. Audio: A
 #include "machine/74259.h"
 #include "machine/adc0808.h"
 #include "machine/ldvp931.h"
-#include "machine/6532riot.h"
 #include "machine/gen_latch.h"
+#include "machine/mos6530.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "machine/x2212.h"
+
 #include "emupal.h"
 #include "speaker.h"
 #include "tilemap.h"
@@ -60,11 +62,12 @@ public:
 		m_tile_palette(*this, "tile_palette"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_riot(*this, "riot"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch"),
-		m_soundlatch2(*this, "soundlatch2"),
+		soundlatch(*this, "soundlatch%u", 1U),
+		m_pokey(*this, "pokey%u", 1U),
 		m_tms(*this, "tms"),
 		m_nvram_1c(*this, "nvram_1c"),
 		m_nvram_1d(*this, "nvram_1d"),
@@ -77,17 +80,17 @@ private:
 	uint8_t firefox_disc_status_r();
 	uint8_t firefox_disc_data_r();
 	void firefox_disc_read_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(firefox_disc_lock_w);
-	DECLARE_WRITE_LINE_MEMBER(audio_enable_left_w);
-	DECLARE_WRITE_LINE_MEMBER(audio_enable_right_w);
-	DECLARE_WRITE_LINE_MEMBER(firefox_disc_reset_w);
-	DECLARE_WRITE_LINE_MEMBER(firefox_disc_write_w);
+	void firefox_disc_lock_w(int state);
+	void audio_enable_left_w(int state);
+	void audio_enable_right_w(int state);
+	void firefox_disc_reset_w(int state);
+	void firefox_disc_write_w(int state);
 	void firefox_disc_data_w(uint8_t data);
 	void tileram_w(offs_t offset, uint8_t data);
 	void tile_palette_w(offs_t offset, uint8_t data);
 	void sprite_palette_w(offs_t offset, uint8_t data);
 	void firefox_objram_bank_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(sound_reset_w);
+	void sound_reset_w(int state);
 	uint8_t adc_r();
 	void adc_select_w(uint8_t data);
 	void nvram_w(offs_t offset, uint8_t data);
@@ -96,10 +99,8 @@ private:
 	void main_irq_clear_w(uint8_t data);
 	void main_firq_clear_w(uint8_t data);
 	void self_reset_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_right_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_left_w);
-	uint8_t riot_porta_r();
-	void riot_porta_w(uint8_t data);
+	void coin_counter_right_w(int state);
+	void coin_counter_left_w(int state);
 	TILE_GET_INFO_MEMBER(bgtile_get_info);
 	uint32_t screen_update_firefox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(video_timer_callback);
@@ -119,22 +120,23 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<mos6532_device> m_riot;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_device<generic_latch_8_device> m_soundlatch;
-	required_device<generic_latch_8_device> m_soundlatch2;
+	required_device_array<generic_latch_8_device, 2> soundlatch;
+	required_device_array<pokey_device, 4> m_pokey;
 	required_device<tms5220_device> m_tms;
 	required_device<x2212_device> m_nvram_1c;
 	required_device<x2212_device> m_nvram_1d;
 
 	required_memory_bank m_mainbank;
 
-	int m_n_disc_lock;
-	int m_n_disc_data;
-	int m_n_disc_read_data;
+	int m_n_disc_lock = 0;
+	int m_n_disc_data = 0;
+	int m_n_disc_read_data = 0;
 	tilemap_t *m_bgtiles;
-	int m_sprite_bank;
+	int m_sprite_bank = 0;
 };
 
 
@@ -193,28 +195,28 @@ void firefox_state::firefox_disc_read_w(uint8_t data)
 	m_n_disc_read_data = m_laserdisc->data_r();
 }
 
-WRITE_LINE_MEMBER(firefox_state::firefox_disc_lock_w)
+void firefox_state::firefox_disc_lock_w(int state)
 {
 	m_n_disc_lock = state;
 }
 
-WRITE_LINE_MEMBER(firefox_state::audio_enable_left_w)
+void firefox_state::audio_enable_left_w(int state)
 {
 	m_laserdisc->set_output_gain(0, state ? 1.0 : 0.0);
 }
 
-WRITE_LINE_MEMBER(firefox_state::audio_enable_right_w)
+void firefox_state::audio_enable_right_w(int state)
 {
 	m_laserdisc->set_output_gain(1, state ? 1.0 : 0.0);
 }
 
-WRITE_LINE_MEMBER(firefox_state::firefox_disc_reset_w)
+void firefox_state::firefox_disc_reset_w(int state)
 {
 	m_laserdisc->reset_w(state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 /* active low on dbb7 */
-WRITE_LINE_MEMBER(firefox_state::firefox_disc_write_w)
+void firefox_state::firefox_disc_write_w(int state)
 {
 	if (state == 0)
 		m_laserdisc->data_w(m_n_disc_data);
@@ -330,44 +332,14 @@ void firefox_state::firefox_objram_bank_w(uint8_t data)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(firefox_state::sound_reset_w)
+void firefox_state::sound_reset_w(int state)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 	if (state != 0)
 	{
-		m_soundlatch->reset();
-		m_soundlatch2->reset();
+		soundlatch[0]->reset();
+		soundlatch[1]->reset();
 	}
-}
-
-
-/*************************************
- *
- *  6532 RIOT handlers
- *
- *************************************/
-
-uint8_t firefox_state::riot_porta_r()
-{
-	/* bit 7 = MAINFLAG */
-	/* bit 6 = SOUNDFLAG */
-	/* bit 5 = PA5 */
-	/* bit 4 = TEST */
-	/* bit 3 = n/c */
-	/* bit 2 = TMS /ready */
-	/* bit 1 = TMS /read */
-	/* bit 0 = TMS /write */
-
-	return (m_soundlatch->pending_r() ? 0x80 : 0x00) | (m_soundlatch2->pending_r() ? 0x40 : 0x00) | 0x10 | (m_tms->readyq_r() << 2);
-}
-
-void firefox_state::riot_porta_w(uint8_t data)
-{
-	/* handle 5220 read */
-	m_tms->rsq_w((data>>1) & 1);
-
-	/* handle 5220 write */
-	m_tms->wsq_w(data & 1);
 }
 
 
@@ -422,12 +394,12 @@ void firefox_state::self_reset_w(uint8_t data)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(firefox_state::coin_counter_right_w)
+void firefox_state::coin_counter_right_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE_LINE_MEMBER(firefox_state::coin_counter_left_w)
+void firefox_state::coin_counter_left_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(1, state);
 }
@@ -445,8 +417,6 @@ void firefox_state::machine_start()
 	m_mainbank->configure_entries(0, 32, memregion("maincpu")->base() + 0x10000, 0x1000);
 
 	m_laserdisc->set_data_ready_callback(philips_22vp931_device::data_ready_delegate(&firefox_state::firq_gen, this));
-
-	m_sprite_bank = 0;
 }
 
 
@@ -472,7 +442,7 @@ void firefox_state::main_map(address_map &map)
 	map(0x4103, 0x4103).mirror(0x00f8).portr("opt0");             /* OPT0 */
 	map(0x4104, 0x4104).mirror(0x00f8).portr("opt1");             /* OPT1 */
 	map(0x4105, 0x4105).mirror(0x00f8).r(FUNC(firefox_state::firefox_disc_data_r));     /* DREAD */
-	map(0x4106, 0x4106).mirror(0x00f8).r(m_soundlatch2, FUNC(generic_latch_8_device::read));         /* RDSOUND */
+	map(0x4106, 0x4106).mirror(0x00f8).r(soundlatch[1], FUNC(generic_latch_8_device::read));         /* RDSOUND */
 	map(0x4107, 0x4107).mirror(0x00f8).r("adc", FUNC(adc0808_device::data_r));               /* ADC */
 	map(0x4200, 0x4200).mirror(0x0047).w(FUNC(firefox_state::main_irq_clear_w));       /* RSTIRQ */
 	map(0x4208, 0x4208).mirror(0x0047).w(FUNC(firefox_state::main_firq_clear_w));      /* RSTFIRQ */
@@ -483,7 +453,7 @@ void firefox_state::main_map(address_map &map)
 	map(0x4280, 0x4287).mirror(0x0040).w("latch0", FUNC(ls259_device::write_d7));
 	map(0x4288, 0x428f).mirror(0x0040).w("latch1", FUNC(ls259_device::write_d7));
 	map(0x4290, 0x4290).mirror(0x0047).w(FUNC(firefox_state::rom_bank_w));             /* WRTREG */
-	map(0x4298, 0x4298).mirror(0x0047).w(m_soundlatch, FUNC(generic_latch_8_device::write));        /* WRSOUND */
+	map(0x4298, 0x4298).mirror(0x0047).w(soundlatch[0], FUNC(generic_latch_8_device::write));        /* WRSOUND */
 	map(0x42a0, 0x42a0).mirror(0x0047).w(FUNC(firefox_state::firefox_disc_data_w));    /* DSKLATCH */
 	map(0x4400, 0xffff).rom();
 }
@@ -499,14 +469,14 @@ void firefox_state::main_map(address_map &map)
 void firefox_state::audio_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x0800, 0x087f).mirror(0x0700).ram(); /* RIOT ram */
-	map(0x0880, 0x089f).mirror(0x0760).rw("riot", FUNC(riot6532_device::read), FUNC(riot6532_device::write));
-	map(0x1000, 0x1000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0x1800, 0x1800).w(m_soundlatch2, FUNC(generic_latch_8_device::write));
-	map(0x2000, 0x200f).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));
-	map(0x2800, 0x280f).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
-	map(0x3000, 0x300f).rw("pokey3", FUNC(pokey_device::read), FUNC(pokey_device::write));
-	map(0x3800, 0x380f).rw("pokey4", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0x0800, 0x087f).mirror(0x0700).m(m_riot, FUNC(mos6532_device::ram_map));
+	map(0x0880, 0x089f).mirror(0x0760).m(m_riot, FUNC(mos6532_device::io_map));
+	map(0x1000, 0x1000).r(soundlatch[0], FUNC(generic_latch_8_device::read));
+	map(0x1800, 0x1800).w(soundlatch[1], FUNC(generic_latch_8_device::write));
+	map(0x2000, 0x200f).rw(m_pokey[0], FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0x2800, 0x280f).rw(m_pokey[1], FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0x3000, 0x300f).rw(m_pokey[2], FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0x3800, 0x380f).rw(m_pokey[3], FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x8000, 0xffff).rom();
 }
 
@@ -530,10 +500,10 @@ static INPUT_PORTS_START( firefox )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("rdin1")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch1", generic_latch_8_device, pending_r)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch2", generic_latch_8_device, pending_r)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Diagnostic Step") // mentioned in schematics, but N/C?
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -677,37 +647,34 @@ void firefox_state::firefox(machine_config &config)
 	X2212(config, "nvram_1c").set_auto_save(true);
 	X2212(config, "nvram_1d").set_auto_save(true);
 
-	riot6532_device &riot(RIOT6532(config, "riot", MASTER_XTAL/8));
-	riot.in_pa_callback().set(FUNC(firefox_state::riot_porta_r));
-	riot.out_pa_callback().set(FUNC(firefox_state::riot_porta_w));
-	riot.in_pb_callback().set("tms", FUNC(tms5220_device::status_r));
-	riot.out_pb_callback().set("tms", FUNC(tms5220_device::data_w));
-	riot.irq_callback().set_inputline("audiocpu", M6502_IRQ_LINE);
+	MOS6532(config, m_riot, MASTER_XTAL/8);
+	m_riot->pa_wr_callback<0>().set(m_tms, FUNC(tms5220_device::wsq_w));
+	m_riot->pa_wr_callback<1>().set(m_tms, FUNC(tms5220_device::rsq_w));
+	m_riot->pa_rd_callback<2>().set(m_tms, FUNC(tms5220_device::readyq_r));
+	m_riot->pa_rd_callback<4>().set_constant(1); // TEST
+	m_riot->pa_wr_callback<5>().set_nop(); // TMS5220 VDD
+	m_riot->pb_rd_callback().set(m_tms, FUNC(tms5220_device::status_r));
+	m_riot->pb_wr_callback().set(m_tms, FUNC(tms5220_device::data_w));
+	m_riot->irq_wr_callback().set_inputline(m_audiocpu, M6502_IRQ_LINE);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	GENERIC_LATCH_8(config, soundlatch[0]);
+	soundlatch[0]->data_pending_callback().set(m_riot, FUNC(mos6532_device::pa_bit_w<7>)); // MAINFLAG
+	soundlatch[0]->data_pending_callback().append_inputline(m_audiocpu, INPUT_LINE_NMI);
+	soundlatch[0]->data_pending_callback().append([this](int state) { if (state) machine().scheduler().perfect_quantum(attotime::from_usec(100)); });
 
-	GENERIC_LATCH_8(config, m_soundlatch2);
+	GENERIC_LATCH_8(config, soundlatch[1]);
+	soundlatch[1]->data_pending_callback().set(m_riot, FUNC(mos6532_device::pa_bit_w<6>)); // SOUNDFLAG
 
-	pokey_device &pokey1(POKEY(config, "pokey1", MASTER_XTAL/8));
-	pokey1.add_route(ALL_OUTPUTS, "lspeaker", 0.30);
-	pokey1.add_route(ALL_OUTPUTS, "rspeaker", 0.30);
-
-	pokey_device &pokey2(POKEY(config, "pokey2", MASTER_XTAL/8));
-	pokey2.add_route(ALL_OUTPUTS, "lspeaker", 0.30);
-	pokey2.add_route(ALL_OUTPUTS, "rspeaker", 0.30);
-
-	pokey_device &pokey3(POKEY(config, "pokey3", MASTER_XTAL/8));
-	pokey3.add_route(ALL_OUTPUTS, "lspeaker", 0.30);
-	pokey3.add_route(ALL_OUTPUTS, "rspeaker", 0.30);
-
-	pokey_device &pokey4(POKEY(config, "pokey4", MASTER_XTAL/8));
-	pokey4.add_route(ALL_OUTPUTS, "lspeaker", 0.30);
-	pokey4.add_route(ALL_OUTPUTS, "rspeaker", 0.30);
+	for (int i = 0; i < 4; i++)
+	{
+		POKEY(config, m_pokey[i], MASTER_XTAL/8);
+		m_pokey[i]->add_route(ALL_OUTPUTS, "lspeaker", 0.30);
+		m_pokey[i]->add_route(ALL_OUTPUTS, "rspeaker", 0.30);
+	}
 
 	TMS5220(config, m_tms, MASTER_XTAL/2/11);
 	m_tms->add_route(ALL_OUTPUTS, "lspeaker", 0.75);

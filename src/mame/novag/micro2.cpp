@@ -50,7 +50,7 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-#include "novag_micro2.lh" // clickable
+#include "novag_micro2.lh"
 
 
 namespace {
@@ -70,15 +70,13 @@ public:
 	// machine configs
 	void micro2(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(cpu_freq) { set_cpu_freq(); }
+	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq) { set_cpu_freq(); }
 
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override { set_cpu_freq(); }
 
 private:
-	void set_cpu_freq();
-
 	// devices/pointers
 	required_device<mcs48_cpu_device> m_maincpu;
 	required_device<pwm_display_device> m_display;
@@ -86,15 +84,17 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport m_inputs;
 
+	bool m_kp_select = false;
+	u8 m_inp_mux = 0;
+	u8 m_led_select = 0;
+
 	// I/O handlers
 	void update_display();
 	void mux_w(u8 data);
 	void control_w(u8 data);
 	u8 input_r();
 
-	bool m_kp_select = false;
-	u8 m_inp_mux = 0;
-	u8 m_led_select = 0;
+	void set_cpu_freq();
 };
 
 void micro2_state::machine_start()
@@ -108,8 +108,8 @@ void micro2_state::machine_start()
 void micro2_state::set_cpu_freq()
 {
 	// known CPU speeds: 6MHz(XTAL), 6MHz(LC), 12MHz(LC)
-	u32 clock = (ioport("FAKE")->read() & 1) ? 12000000 : 6000000;
-	m_board->set_delay(attotime::from_ticks(2000000, clock)); // see TODO
+	u32 clock = (ioport("FAKE")->read() & 1) ? 12'000'000 : 6'000'000;
+	m_board->set_delay(attotime::from_ticks(2'000'000, clock)); // see TODO
 	m_maincpu->set_unscaled_clock(clock);
 }
 
@@ -181,7 +181,7 @@ static INPUT_PORTS_START( micro2 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("Go")
 
 	PORT_START("FAKE")
-	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, micro2_state, cpu_freq, 0) // factory set
+	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, micro2_state, change_cpu_freq, 0) // factory set
 	PORT_CONFSETTING(    0x00, "6MHz (original)" )
 	PORT_CONFSETTING(    0x01, "12MHz (Octo)" )
 INPUT_PORTS_END

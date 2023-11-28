@@ -63,8 +63,14 @@
 #define ENV_ROMENABLE   (0x01)
 
 // 14M / 14, but with every 65th cycle stretched which we cannot reasonably emulate
-// 2 MHz mode probably has every 33rd cycle stretched but this is currently unproven.
 static constexpr XTAL APPLE2_CLOCK(1'021'800);
+
+// 2 MHz mode has every ~130th cycle stretched, and there are also dram refresh cycles
+// happening which slows the clock back to 1MHz for some periods.
+// There is mentioned in Apple documentation the result is ~1.8MHz
+// PH0 Measured on a logic analyser when running a loop in ram with the screen off
+// averaged over a long capture is 1.905MHz.
+static constexpr XTAL A3_2MHZ_CLOCK(1'905'000);
 
 uint8_t apple3_state::apple3_c0xx_r(offs_t offset)
 {
@@ -491,7 +497,7 @@ void apple3_state::apple3_c0xx_w(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(apple3_state::vbl_w)
+void apple3_state::vbl_w(int state)
 {
 	// do the font upload at the end of VBL, not the start
 	if ((!state) && (m_charwrt))
@@ -532,7 +538,7 @@ void apple3_state::apple3_update_memory()
 
 	LOGMASKED(LOG_MEMORY, "apple3_update_memory(): via_0_b=0x%02x via_1_a=0x0x%02x\n", m_via_0_b, m_via_1_a);
 
-	m_maincpu->set_unscaled_clock(((m_via_0_a & ENV_SLOWSPEED) ? APPLE2_CLOCK : (14.318181_MHz_XTAL / 7)), true);
+	m_maincpu->set_unscaled_clock(((m_via_0_a & ENV_SLOWSPEED) ? APPLE2_CLOCK : A3_2MHZ_CLOCK), true);
 
 	/* bank 2 (0100-01FF) */
 	if (!(m_via_0_a & ENV_STACK1XX))
@@ -664,7 +670,7 @@ void apple3_state::machine_reset()
 	m_scanend->adjust(attotime::never);
 }
 
-WRITE_LINE_MEMBER(apple3_state::a2bus_inh_w)
+void apple3_state::a2bus_inh_w(int state)
 {
 	m_inh_state = state;
 }
@@ -1083,7 +1089,7 @@ void apple3_state::apple3_memory_w(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(apple3_state::apple3_sync_w)
+void apple3_state::apple3_sync_w(int state)
 {
 //  printf("sync: %d\n", state);
 	m_sync = (state == ASSERT_LINE) ? true : false;
@@ -1109,11 +1115,17 @@ TIMER_CALLBACK_MEMBER(apple3_state::scanstart_cb)
 	int scanline;
 
 	scanline = m_screen->vpos();
-	//m_screen->update_partial(m_screen->vpos());
+	m_screen->update_partial(m_screen->vpos());
 
 	m_via[1]->write_pb6(0);
 
 	m_scanend->adjust(m_screen->time_until_pos(scanline, 559));
+
+	// Drop back to 1Mhz for video memory access
+	if (!(m_via_0_a & ENV_SLOWSPEED) && (m_via_0_a & ENV_VIDENABLE))
+	{
+		m_maincpu->set_unscaled_clock(APPLE2_CLOCK, true);
+	}
 }
 
 TIMER_CALLBACK_MEMBER(apple3_state::scanend_cb)
@@ -1122,16 +1134,53 @@ TIMER_CALLBACK_MEMBER(apple3_state::scanend_cb)
 
 	m_via[1]->write_pb6(1);
 
-	m_scanstart->adjust(m_screen->time_until_pos((scanline+1) % 224, 0));
+	m_scanstart->adjust(m_screen->time_until_pos((scanline+1) % 192, 0));
 
-	// check for ctrl-reset
-	if ((m_kbspecial->read() & 0x88) == 0x88)
+	// And back to 2MHz during blanking
+	if (!(m_via_0_a & ENV_SLOWSPEED) && (m_via_0_a & ENV_VIDENABLE))
 	{
-		m_maincpu->reset();
+		m_maincpu->set_unscaled_clock(A3_2MHZ_CLOCK, true);
 	}
 }
 
-READ_LINE_MEMBER(apple3_state::ay3600_shift_r)
+INPUT_CHANGED_MEMBER(apple3_state::keyb_special_changed)
+{
+	if (((m_kbspecial->read() & 0x88) == 0x88) && (m_via_0_a & ENV_NMIENABLE))
+	{
+		// ctrl-reset pressed (RESET)
+		if (!m_reset_latch)
+		{
+			m_reset_latch = true;
+			m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+		}
+	}
+	else if ((m_kbspecial->read() & 0x80) && (m_via_0_a & ENV_NMIENABLE) && !m_reset_latch)
+	{
+		// reset key only pressed (NMI)
+		if (!m_nmi_latch)
+		{
+			m_nmi_latch = true;
+			m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		}
+	}
+	else
+	{
+		if (m_reset_latch)
+		{
+			m_reset_latch = false;
+			// allow cards to see reset
+			m_a2bus->reset_bus();
+			m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		}
+		else if (m_nmi_latch)
+		{
+			m_nmi_latch = false;
+			m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+		}
+	}
+}
+
+int apple3_state::ay3600_shift_r()
 {
 	// either shift key
 	if (m_kbspecial->read() & 0x06)
@@ -1142,7 +1191,7 @@ READ_LINE_MEMBER(apple3_state::ay3600_shift_r)
 	return CLEAR_LINE;
 }
 
-READ_LINE_MEMBER(apple3_state::ay3600_control_r)
+int apple3_state::ay3600_control_r()
 {
 	if (m_kbspecial->read() & 0x08)
 	{
@@ -1237,7 +1286,7 @@ static const uint8_t key_remap[0x50][4] =
 	{ 0x00,0x00,0x00,0x00 }     /* 0x4f unused    */
 };
 
-WRITE_LINE_MEMBER(apple3_state::ay3600_data_ready_w)
+void apple3_state::ay3600_data_ready_w(int state)
 {
 	m_via[1]->write_ca2(state);
 
@@ -1260,6 +1309,41 @@ WRITE_LINE_MEMBER(apple3_state::ay3600_data_ready_w)
 			m_strobe = 0x80;
 //          printf("new char = %04x (%02x)\n", trans, m_transchar);
 		}
+	}
+}
+
+void apple3_state::ay3600_ako_w(int state)
+{
+	m_anykeydown = (state == ASSERT_LINE) ? true : false;
+
+	if (m_anykeydown)
+	{
+		m_repttimer->adjust(attotime::from_hz(2));
+	}
+	else
+	{
+		m_repttimer->adjust(attotime::never);
+	}
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(apple3_state::ay3600_repeat)
+{
+	// is the key still down?
+	if (m_anykeydown)
+	{
+		// Closed Apple key
+		if (m_kbspecial->read() & 0x20)
+		{
+			m_repttimer->adjust(attotime::from_hz(30));
+		}
+		else
+		{
+			m_repttimer->adjust(attotime::from_hz(10));
+		}
+
+		m_strobe = 0x80;
+		m_via[1]->write_ca2(ASSERT_LINE);
+		m_via[1]->write_ca2(CLEAR_LINE);
 	}
 }
 
@@ -1288,7 +1372,7 @@ void apple3_state::pdl_handler(int offset)
 		case 0x5c:
 			m_ramp_active = false;
 			m_pdl_charge = 0;
-			m_pdltimer->adjust(attotime::from_hz(1000000.0));
+			m_pdltimer->adjust(attotime::from_hz(950000.0));
 			break;
 
 		case 0x5d:
@@ -1321,7 +1405,7 @@ void apple3_state::pdl_handler(int offset)
 				m_pdl_charge += (pdlread*7);
 				m_pdl_charge -= 100;
 			}
-			m_pdltimer->adjust(attotime::from_hz(1000000.0));
+			m_pdltimer->adjust(attotime::from_hz(950000.0));
 			m_ramp_active = true;
 			break;
 
@@ -1343,7 +1427,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple3_state::paddle_timer)
 
 		if (m_pdl_charge > 0)
 		{
-			m_pdltimer->adjust(attotime::from_hz(1000000.0));
+			m_pdltimer->adjust(attotime::from_hz(950000.0));
 		}
 		else
 		{
@@ -1354,11 +1438,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple3_state::paddle_timer)
 	else
 	{
 		m_pdl_charge++;
-		m_pdltimer->adjust(attotime::from_hz(1000000.0));
+		m_pdltimer->adjust(attotime::from_hz(950000.0));
 	}
 }
 
-WRITE_LINE_MEMBER(apple3_state::a2bus_irq_w)
+void apple3_state::a2bus_irq_w(int state)
 {
 	uint8_t irq_mask = m_a2bus->get_a2bus_irq_mask();
 
@@ -1383,7 +1467,7 @@ WRITE_LINE_MEMBER(apple3_state::a2bus_irq_w)
 	}
 }
 
-WRITE_LINE_MEMBER(apple3_state::a2bus_nmi_w)
+void apple3_state::a2bus_nmi_w(int state)
 {
 	m_via[1]->write_pb7(state);
 

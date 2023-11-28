@@ -343,43 +343,43 @@ void mc68901_device::gpio_output()
 //  mc68901_device - constructor
 //-------------------------------------------------
 
-mc68901_device::mc68901_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, MC68901, tag, owner, clock),
-		m_timer_clock(0),
-		m_out_irq_cb(*this),
-		m_out_gpio_cb(*this),
-		m_out_tao_cb(*this),
-		m_out_tbo_cb(*this),
-		m_out_tco_cb(*this),
-		m_out_tdo_cb(*this),
-		m_out_so_cb(*this),
-		//m_out_rr_cb(*this),
-		//m_out_tr_cb(*this),
-		m_iack_chain_cb(*this),
-		m_aer(0),
-		m_ier(0),
-		m_scr(0),
-		m_scr_parity(false),
-		m_transmit_buffer(0),
-		m_receive_buffer(0),
-		m_gpio_input(0),
-		m_gpio_output(0xff),
-		m_rframe(0),
-		m_rclk(0),
-		m_rbits(0),
-		m_si_scan(0xff),
-		m_next_rsr(0),
-		m_rc(true),
-		m_si(true),
-		m_last_si(true),
-		m_rparity(false),
-		m_osr(0),
-		m_tclk(0),
-		m_tbits(0),
-		m_tc(true),
-		m_so(false),
-		m_tparity(false),
-		m_underrun(false)
+mc68901_device::mc68901_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, MC68901, tag, owner, clock),
+	m_timer_clock(0),
+	m_out_irq_cb(*this),
+	m_out_gpio_cb(*this),
+	m_out_tao_cb(*this),
+	m_out_tbo_cb(*this),
+	m_out_tco_cb(*this),
+	m_out_tdo_cb(*this),
+	m_out_so_cb(*this),
+	//m_out_rr_cb(*this),
+	//m_out_tr_cb(*this),
+	m_iack_chain_cb(*this, 0x18), // Spurious IRQ
+	m_aer(0),
+	m_ier(0),
+	m_scr(0),
+	m_scr_parity(false),
+	m_transmit_buffer(0),
+	m_receive_buffer(0),
+	m_gpio_input(0),
+	m_gpio_output(0xff),
+	m_rframe(0),
+	m_rclk(0),
+	m_rbits(0),
+	m_si_scan(0xff),
+	m_next_rsr(0),
+	m_rc(true),
+	m_si(true),
+	m_last_si(true),
+	m_rparity(false),
+	m_osr(0),
+	m_tclk(0),
+	m_tbits(0),
+	m_tc(true),
+	m_so(false),
+	m_tparity(false),
+	m_underrun(false)
 {
 }
 
@@ -390,18 +390,6 @@ mc68901_device::mc68901_device(const machine_config &mconfig, const char *tag, d
 
 void mc68901_device::device_start()
 {
-	/* resolve callbacks */
-	m_out_irq_cb.resolve_safe();
-	m_out_gpio_cb.resolve_safe();
-	m_out_tao_cb.resolve_safe();
-	m_out_tbo_cb.resolve_safe();
-	m_out_tco_cb.resolve_safe();
-	m_out_tdo_cb.resolve_safe();
-	m_out_so_cb.resolve_safe();
-	//m_out_rr_cb.resolve_safe();
-	//m_out_tr_cb.resolve_safe();
-	m_iack_chain_cb.resolve();
-
 	/* create the timers */
 	m_timer[TIMER_A] = timer_alloc(FUNC(mc68901_device::timer_count), this);
 	m_timer[TIMER_B] = timer_alloc(FUNC(mc68901_device::timer_count), this);
@@ -1051,29 +1039,26 @@ u8 mc68901_device::get_vector()
 		}
 	}
 
-	if (!m_iack_chain_cb.isnull())
-		return m_iack_chain_cb();
-	else
-		return 0x18; // Spurious irq
+	return m_iack_chain_cb();
 }
 
-WRITE_LINE_MEMBER( mc68901_device::i0_w ) { gpio_input(0, state); }
-WRITE_LINE_MEMBER( mc68901_device::i1_w ) { gpio_input(1, state); }
-WRITE_LINE_MEMBER( mc68901_device::i2_w ) { gpio_input(2, state); }
-WRITE_LINE_MEMBER( mc68901_device::i3_w ) { gpio_input(3, state); }
-WRITE_LINE_MEMBER( mc68901_device::i4_w ) { gpio_input(4, state); }
-WRITE_LINE_MEMBER( mc68901_device::i5_w ) { gpio_input(5, state); }
-WRITE_LINE_MEMBER( mc68901_device::i6_w ) { gpio_input(6, state); }
-WRITE_LINE_MEMBER( mc68901_device::i7_w ) { gpio_input(7, state); }
+void mc68901_device::i0_w(int state) { gpio_input(0, state); }
+void mc68901_device::i1_w(int state) { gpio_input(1, state); }
+void mc68901_device::i2_w(int state) { gpio_input(2, state); }
+void mc68901_device::i3_w(int state) { gpio_input(3, state); }
+void mc68901_device::i4_w(int state) { gpio_input(4, state); }
+void mc68901_device::i5_w(int state) { gpio_input(5, state); }
+void mc68901_device::i6_w(int state) { gpio_input(6, state); }
+void mc68901_device::i7_w(int state) { gpio_input(7, state); }
 
 
-WRITE_LINE_MEMBER( mc68901_device::tai_w )
+void mc68901_device::tai_w(int state)
 {
 	timer_input(TIMER_A, state);
 }
 
 
-WRITE_LINE_MEMBER( mc68901_device::tbi_w )
+void mc68901_device::tbi_w(int state)
 {
 	timer_input(TIMER_B, state);
 }
@@ -1086,7 +1071,7 @@ WRITE_LINE_MEMBER( mc68901_device::tbi_w )
 //  si_w - serial data input for receiver
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(mc68901_device::si_w)
+void mc68901_device::si_w(int state)
 {
 	m_si = state;
 }
@@ -1095,7 +1080,7 @@ WRITE_LINE_MEMBER(mc68901_device::si_w)
 //  rc_w - receiver clock input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(mc68901_device::rc_w)
+void mc68901_device::rc_w(int state)
 {
 	if (state != m_rc)
 	{
@@ -1110,7 +1095,7 @@ WRITE_LINE_MEMBER(mc68901_device::rc_w)
 //  tc_w - transmitter clock input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(mc68901_device::tc_w)
+void mc68901_device::tc_w(int state)
 {
 	if (state != m_tc)
 	{

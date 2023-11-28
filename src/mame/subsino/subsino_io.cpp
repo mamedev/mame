@@ -33,7 +33,7 @@ DEFINE_DEVICE_TYPE(SS9802, ss9802_device, "ss9802", "Subsino SS9802 I/O")
 
 subsino_io_device::subsino_io_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, m_in_port_callback(*this)
+	, m_in_port_callback(*this, 0xff)
 	, m_out_port_callback(*this)
 	, m_port_data{0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 	, m_port_dir{0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
@@ -48,13 +48,6 @@ ss9602_device::ss9602_device(const machine_config &mconfig, const char *tag, dev
 ss9802_device::ss9802_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: subsino_io_device(mconfig, SS9802, tag, owner, clock)
 {
-}
-
-void subsino_io_device::device_resolve_objects()
-{
-	// resolve read/write callbacks
-	m_in_port_callback.resolve_all();
-	m_out_port_callback.resolve_all_safe();
 }
 
 void subsino_io_device::device_start()
@@ -76,7 +69,7 @@ u8 subsino_io_device::read_port_data(unsigned port)
 	u8 data = m_port_data[port] & dir;
 	if (dir != 0xff)
 	{
-		if (!m_in_port_callback[port].isnull())
+		if (!m_in_port_callback[port].isunset())
 			data |= m_in_port_callback[port]() & ~dir;
 		else if (!machine().side_effects_disabled())
 			logerror("%s: Reading from undefined P%u input\n", machine().describe_context(), port);

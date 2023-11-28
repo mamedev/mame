@@ -71,7 +71,7 @@ private:
 	void layer_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void weststry_layer_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void weststry_soundlatch_w(offs_t offset, u8 data);
-	DECLARE_WRITE_LINE_MEMBER(weststry_opl_irq_w);
+	void weststry_opl_irq_w(int state);
 	void weststry_opl_w(offs_t offset, uint8_t data);
 	void weststry_soundnmi_ack_w(uint8_t data);
 	void weststry_soundnmi_update();

@@ -42,12 +42,12 @@ public:
 	// configuration helpers
 	template <typename... T> void set_input_callback(T &&... args) { m_input_callback.set(std::forward<T>(args)...); }
 
-	DECLARE_WRITE_LINE_MEMBER( cs_write );
-	DECLARE_WRITE_LINE_MEMBER( clk_write );
-	DECLARE_WRITE_LINE_MEMBER( di_write );
-	DECLARE_WRITE_LINE_MEMBER( se_write );
-	DECLARE_READ_LINE_MEMBER( sars_read );
-	DECLARE_READ_LINE_MEMBER( do_read );
+	void cs_write(int state);
+	void clk_write(int state);
+	void di_write(int state);
+	void se_write(int state);
+	int sars_read();
+	int do_read();
 
 protected:
 	adc083x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t mux_bits);

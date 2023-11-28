@@ -913,7 +913,7 @@ def code_find_deps(ci):
         if t & DEP.atl:
             t |= DEP.ath
         return [t, expr_deps(ci[2:])]
-    elif ci[0] == "=sr" or ci[0] == "=ccr" or ci[0] == "=8" or ci[0] == "=8h" or ci[0] == "=8xh" or ci[0] == "=8xl" or ci[0] == "=16l" or ci[0] == "=16h":
+    elif ci[0] == "=sr" or ci[0] == "=srd" or ci[0] == "=ccr" or ci[0] == "=8" or ci[0] == "=8h" or ci[0] == "=8xh" or ci[0] == "=8xl" or ci[0] == "=16l" or ci[0] == "=16h":
         return [regdep[ci[1]], expr_deps(ci[2:])]
     elif ci[0] == "=sri" or ci[0] == "=sri7":
         return [regdep[R.sr], 0]
@@ -1636,7 +1636,10 @@ def generate_base_code_for_microcode(ir, irmask, madr, tvn, group01):
 
     if ftu_to_sr and not to_ccr:
         assert(ftu_to_ccr)
-        code_to_sort.append(["=sr", R.sr, R.ftu])
+        if wait_bus_finish:
+            code_to_sort.append(["=srd", R.sr, R.ftu])
+        else:
+            code_to_sort.append(["=sr", R.sr, R.ftu])
     elif ftu_to_ccr:
         code_to_sort.append(["=ccr", R.sr, R.ftu])
         
@@ -1713,7 +1716,7 @@ def generate_base_code_for_microcode(ir, irmask, madr, tvn, group01):
     sort_and_append(code_to_sort, code)
 
     if wait_bus_finish:
-        code.append(["bus_end"])
+        code.append(["bus_end", ftu_to_sr and not to_ccr])
 
     if to_irc:
         code.append(["=", R.irc, R.edb])
@@ -1787,7 +1790,7 @@ def analyze_register_usage(code):
     usage = { 'rx': False, 'ry': False, 't': False }
     for cib in code:
         for ci in cib:
-            if ci[0] == "=" or ci[0] == "=sr" or ci[0] == "=ccr" or ci[0] == "=8" or ci[0] == "=16l" or ci[0] == "=16h" or ci[0] == "=8xl" or ci[0] == "=8xh" or ci[0] == "=8h":
+            if ci[0] == "=" or ci[0] == "=sr" or ci[0] == "=srd" or ci[0] == "=ccr" or ci[0] == "=8" or ci[0] == "=16l" or ci[0] == "=16h" or ci[0] == "=8xl" or ci[0] == "=8xh" or ci[0] == "=8h":
                 from_reg(ci[1], usage)
                 in_expression(ci[2:], usage)
             if ci[0] == "=t":
@@ -1917,9 +1920,11 @@ def propagate_bus_access(blocks, code, critical, gen_mode):
                 bus_access = ci
             elif ci[0] == 'bus_end':
                 if bus_access:
+                    sr_update = ci.pop()
                     ci.append(bid)
                     ci += bus_access[1:]
                     ci.append(critical)
+                    ci.append(sr_update)
                     bus_access = None
                     if (gen_mode & GEN.m68008) and ci[2] != 2 and not ci[3]:
                         bid += 4
@@ -2223,6 +2228,10 @@ def generate_source_from_code(code, gen_mode):
                         source.append("\t}")
                     if not (gen_mode & GEN.full):
                         source.append("\t[[fallthrough]]; case %d:" % (cid+1))
+                    if ci[10]:
+                        source.append("\tm_sr = m_new_sr;")
+                        source.append("\tupdate_user_super();")
+                        source.append("\tupdate_interrupt();")
                     cid += 2
                 if is_interrupt_vector_lookup:
                     source.append("\tend_interrupt_vector_lookup();")
@@ -2236,6 +2245,8 @@ def generate_source_from_code(code, gen_mode):
                     source.append("\t}")
             elif ci[0] == "=":
                 source.append("\t%s = %s;" % (regname[ci[1]], make_expression(ci[2:])))
+            elif ci[0] == "=srd":
+                source.append("\tm_new_sr = m_isr = %s & (SR_CCR|SR_SR);" % make_expression(ci[2:]))
             elif ci[0] == "=sr":
                 source.append("\t%s = m_isr = %s & (SR_CCR|SR_SR);" % (regname[ci[1]], make_expression(ci[2:])))
                 source.append("\tupdate_user_super();")

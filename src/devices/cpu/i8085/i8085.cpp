@@ -164,15 +164,15 @@ const u8 i8085a_cpu_device::lut_cycles_8080[256]={
 /* B */ 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
 /* C */ 5, 10,10,10,11,11,7, 11,5, 10,10,10,11,11,7, 11,
 /* D */ 5, 10,10,10,11,11,7, 11,5, 10,10,10,11,11,7, 11,
-/* E */ 5, 10,10,18,11,11,7, 11,5, 5, 10,5, 11,11,7, 11,
+/* E */ 5, 10,10,18,11,11,7, 11,5, 5, 10,4, 11,11,7, 11,
 /* F */ 5, 10,10,4, 11,11,7, 11,5, 5, 10,4, 11,11,7, 11 };
 
 const u8 i8085a_cpu_device::lut_cycles_8085[256]={
 /*      0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F  */
 /* 0 */ 4, 10,7, 6, 4, 4, 7, 4, 10,10,7, 6, 4, 4, 7, 4,
 /* 1 */ 7, 10,7, 6, 4, 4, 7, 4, 10,10,7, 6, 4, 4, 7, 4,
-/* 2 */ 7, 10,16,6, 4, 4, 7, 4, 10,10,16,6, 4, 4, 7, 4,
-/* 3 */ 7, 10,13,6, 10,10,10,4, 10,10,13,6, 4, 4, 7, 4,
+/* 2 */ 4, 10,16,6, 4, 4, 7, 4, 10,10,16,6, 4, 4, 7, 4,
+/* 3 */ 4, 10,13,6, 10,10,10,4, 10,10,13,6, 4, 4, 7, 4,
 /* 4 */ 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
 /* 5 */ 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
 /* 6 */ 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
@@ -183,7 +183,7 @@ const u8 i8085a_cpu_device::lut_cycles_8085[256]={
 /* B */ 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
 /* C */ 6, 10,7, 7, 9, 12,7, 12,6, 10,7, 6, 9, 9, 7, 12,
 /* D */ 6, 10,7, 10,9, 12,7, 12,6, 10,7, 10,9, 7, 7, 12,
-/* E */ 6, 10,7, 16,9, 12,7, 12,6, 6, 7, 5, 9, 10,7, 12,
+/* E */ 6, 10,7, 16,9, 12,7, 12,6, 6, 7, 4, 9, 10,7, 12,
 /* F */ 6, 10,7, 4, 9, 12,7, 12,6, 6, 7, 4, 9, 7, 7, 12 };
 
 /* special cases (partially taken care of elsewhere):
@@ -208,10 +208,10 @@ i8085a_cpu_device::i8085a_cpu_device(const machine_config &mconfig, device_type 
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8, 0)
 	, m_opcode_config("opcodes", ENDIANNESS_LITTLE, 8, 16, 0)
-	, m_in_inta_func(*this)
+	, m_in_inta_func(*this, 0)
 	, m_out_status_func(*this)
 	, m_out_inte_func(*this)
-	, m_in_sid_func(*this)
+	, m_in_sid_func(*this, 0)
 	, m_out_sod_func(*this)
 	, m_clk_out_func(*this)
 { }
@@ -250,16 +250,14 @@ device_memory_interface::space_config_vector i8085a_cpu_device::memory_space_con
 
 void i8085a_cpu_device::device_config_complete()
 {
-	m_clk_out_func.resolve();
-	if (!m_clk_out_func.isnull())
-		m_clk_out_func(clock() / 2);
+	m_clk_out_func.resolve_safe();
+	m_clk_out_func(clock() / 2);
 }
 
 
 void i8085a_cpu_device::device_clock_changed()
 {
-	if (!m_clk_out_func.isnull())
-		m_clk_out_func(clock() / 2);
+	m_clk_out_func(clock() / 2);
 }
 
 
@@ -351,13 +349,6 @@ void i8085a_cpu_device::device_start()
 	space(AS_PROGRAM).specific(m_program);
 	space(has_space(AS_OPCODES) ? AS_OPCODES : AS_PROGRAM).cache(m_copcodes);
 	space(AS_IO).specific(m_io);
-
-	/* resolve callbacks */
-	m_in_inta_func.resolve();
-	m_out_status_func.resolve_safe();
-	m_out_inte_func.resolve_safe();
-	m_in_sid_func.resolve_safe(0);
-	m_out_sod_func.resolve_safe();
 
 	/* register for state saving */
 	save_item(NAME(m_PC.w.l));
@@ -607,7 +598,7 @@ void i8085a_cpu_device::check_for_interrupts()
 	else if (m_irq_state[I8085_INTR_LINE] && (m_im & IM_IE))
 	{
 		/* break out of HALT state and call the IRQ ack callback */
-		if (!m_in_inta_func.isnull())
+		if (!m_in_inta_func.isunset())
 			standard_irq_callback(I8085_INTR_LINE, m_PC.w.l);
 		break_halt_for_interrupt();
 
@@ -712,7 +703,7 @@ u8 i8085a_cpu_device::read_op()
 
 u8 i8085a_cpu_device::read_inta()
 {
-	if (m_in_inta_func.isnull())
+	if (m_in_inta_func.isunset())
 		return standard_irq_callback(I8085_INTR_LINE, m_PC.w.l);
 	else
 		return m_in_inta_func(m_PC.w.l);
@@ -937,7 +928,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			m_AF.b.l = (m_AF.b.l & 0xfe) | (m_AF.b.h & CF);
 			break;
 
-		case 0x08: // 8085: DSUB, otherwise undocumented NOP
+		case 0x08: // 8085: undocumented DSUB, otherwise undocumented NOP
 			if (is_8085())
 			{
 				int q = m_HL.b.l - m_BC.b.l;
@@ -979,11 +970,11 @@ void i8085a_cpu_device::execute_one(int opcode)
 			m_AF.b.h = (m_AF.b.h >> 1) | (m_AF.b.h << 7);
 			break;
 
-		case 0x10: // 8085: ASRH, otherwise undocumented NOP
+		case 0x10: // 8085: undocumented ARHL, otherwise undocumented NOP
 			if (is_8085())
 			{
 				m_AF.b.l = (m_AF.b.l & ~CF) | (m_HL.b.l & CF);
-				m_HL.w.l = (m_HL.w.l >> 1);
+				m_HL.w.l = (m_HL.w.l & 0x8000) | (m_HL.w.l >> 1);
 			}
 			break;
 		case 0x11: // LXI D,nnnn
@@ -1019,7 +1010,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			break;
 		}
 
-		case 0x18: // 8085: RLDE, otherwise undocumented NOP
+		case 0x18: // 8085: undocumented RDEL, otherwise undocumented NOP
 			if (is_8085())
 			{
 				m_AF.b.l = (m_AF.b.l & ~(CF | VF)) | (m_DE.b.h >> 7);
@@ -1111,7 +1102,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			m_AF.b.h = m_WZ.b.h;
 			break;
 
-		case 0x28: // 8085: LDEH nn, otherwise undocumented NOP
+		case 0x28: // 8085: undocumented LDHI nn, otherwise undocumented NOP
 			if (is_8085())
 			{
 				m_WZ.d = read_arg();
@@ -1213,7 +1204,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			m_AF.b.l = (m_AF.b.l & 0xfe) | CF;
 			break;
 
-		case 0x38: // 8085: LDES nn, otherwise undocumented NOP
+		case 0x38: // 8085: undocumented LDSI nn, otherwise undocumented NOP
 			if (is_8085())
 			{
 				m_WZ.d = read_arg();
@@ -1435,7 +1426,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 		case 0xca: // JZ  nnnn
 			op_jmp(m_AF.b.l & ZF);
 			break;
-		case 0xcb: // 8085: RST V, otherwise undocumented JMP nnnn
+		case 0xcb: // 8085: undocumented RSTV, otherwise undocumented JMP nnnn
 			if (is_8085())
 			{
 				if (m_AF.b.l & VF)
@@ -1493,7 +1484,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 		case 0xd8: // RC
 			op_ret(m_AF.b.l & CF);
 			break;
-		case 0xd9: // 8085: SHLX, otherwise undocumented RET
+		case 0xd9: // 8085: undocumented SHLX, otherwise undocumented RET
 			if (is_8085())
 			{
 				m_WZ.w.l = m_DE.w.l;
@@ -1515,7 +1506,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 		case 0xdc: // CC nnnn
 			op_call(m_AF.b.l & CF);
 			break;
-		case 0xdd: // 8085: JNX nnnn, otherwise undocumented CALL nnnn
+		case 0xdd: // 8085: undocumented JNX5 nnnn, otherwise undocumented CALL nnnn
 			if (is_8085())
 				op_jmp(!(m_AF.b.l & KF));
 			else
@@ -1574,7 +1565,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 		case 0xec: // CPE nnnn
 			op_call(m_AF.b.l & PF);
 			break;
-		case 0xed: // 8085: LHLX, otherwise undocumented CALL nnnn
+		case 0xed: // 8085: undocumented LHLX, otherwise undocumented CALL nnnn
 			if (is_8085())
 			{
 				m_WZ.w.l = m_DE.w.l;
@@ -1640,7 +1631,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 		case 0xfc: // CM nnnn
 			op_call(m_AF.b.l & SF);
 			break;
-		case 0xfd: // 8085: JX nnnn, otherwise undocumented CALL nnnn
+		case 0xfd: // 8085: undocumented JX5 nnnn, otherwise undocumented CALL nnnn
 			if (is_8085())
 				op_jmp(m_AF.b.l & KF);
 			else

@@ -84,6 +84,8 @@ private:
 	required_ioport_array<5> m_inputs;
 	output_finder<2> m_lamps;
 
+	u8 m_select = 0;
+
 	void main_map(address_map &map);
 	void io_map(address_map &map);
 	void smiconk_main_map(address_map &map);
@@ -96,8 +98,6 @@ private:
 	u8 vblank_r();
 	void select_w(u8 data);
 	u8 input_r();
-
-	u8 m_select = 0;
 };
 
 void miconkit_state::machine_start()

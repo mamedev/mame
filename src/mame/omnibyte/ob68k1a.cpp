@@ -187,8 +187,8 @@ void ob68k1a_state::ob68k1a(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ob68k1a_state::ob68k1a_mem);
 
 	// devices
-	PIA6821(config, m_pia0, 0);
-	PIA6821(config, m_pia1, 0);
+	PIA6821(config, m_pia0);
+	PIA6821(config, m_pia1);
 	PTM6840(config, MC6840_TAG, 10_MHz_XTAL/10).set_external_clocks(0, 0, 0);
 
 	ACIA6850(config, m_acia0, 0);

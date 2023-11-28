@@ -2,6 +2,8 @@
 // copyright-holders:Wilbert Pol
 #include "kim1_cas.h"
 
+#include "multibyte.h"
+
 #include <cstring>
 
 #define SMPLO   -32768
@@ -87,8 +89,8 @@ static int kim1_handle_kim(int16_t *buffer, const uint8_t *casdata)
 	if ( cas_size < 9 ) return -1;
 	if ( memcmp( casdata, "KIM1", 4 ) ) return -1;
 
-	address = casdata[4] | ( casdata[5] << 8 );
-	size = casdata[6] | ( casdata[7] << 8 );
+	address = get_u16le( &casdata[4] );
+	size = get_u16le( &casdata[6] );
 	file_id = casdata[8];
 
 	data_pos = 9;

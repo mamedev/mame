@@ -228,6 +228,8 @@ class emu_exception : public std::exception { };
 class emu_fatalerror : public emu_exception
 {
 public:
+	emu_fatalerror(emu_fatalerror const &) = default;
+	emu_fatalerror(emu_fatalerror &&) = default;
 	emu_fatalerror(util::format_argument_pack<char> const &args);
 	emu_fatalerror(int _exitcode, util::format_argument_pack<char> const &args);
 

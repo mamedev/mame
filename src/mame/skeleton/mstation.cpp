@@ -98,7 +98,7 @@ private:
 	void irq_w(uint8_t data);
 	void refresh_ints();
 
-	DECLARE_WRITE_LINE_MEMBER( rtc_irq );
+	void rtc_irq(int state);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void mstation_palette(palette_device &palette) const;
@@ -417,7 +417,7 @@ void mstation_state::machine_reset()
 	m_bankdev2->set_bank(0);
 }
 
-WRITE_LINE_MEMBER( mstation_state::rtc_irq )
+void mstation_state::rtc_irq(int state)
 {
 	if (state)
 		m_irq |= (1<<5);

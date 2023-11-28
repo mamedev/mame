@@ -139,7 +139,7 @@ public:
 	uint16_t next_did_line_entry();
 	uint8_t get_cursor_pixel(int x, int y);
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_w);
+	void vblank_w(int state);
 
 	auto vert_int() { return m_vert_int.bind(); }
 	auto screen_timing_changed() { return m_screen_timing_changed.bind(); } // Hack. TODO: Figure out a better way
@@ -297,8 +297,8 @@ public:
 
 	uint32_t screen_update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE_LINE_MEMBER(vrint_w);
-	DECLARE_WRITE_LINE_MEMBER(update_screen_size);
+	void vrint_w(int state);
+	void update_screen_size(int state);
 
 	auto write_mask() { return m_write_mask_w.bind(); }
 	auto draw_flags() { return m_draw_flags_w.bind(); }

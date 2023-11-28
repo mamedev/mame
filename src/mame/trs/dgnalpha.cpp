@@ -119,8 +119,8 @@ private:
 	void psg_porta_write(uint8_t data);
 
 	/* fdc */
-	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	void fdc_intrq_w(int state);
+	void fdc_drq_w(int state);
 
 	void dgnalpha_io1(address_map &map);
 
@@ -278,7 +278,7 @@ void dragon_alpha_state::psg_porta_write(uint8_t data)
 //  through IC16 (early PLD), and is gated by pia2 CA2
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( dragon_alpha_state::fdc_intrq_w )
+void dragon_alpha_state::fdc_intrq_w(int state)
 {
 	if (state)
 	{
@@ -299,7 +299,7 @@ WRITE_LINE_MEMBER( dragon_alpha_state::fdc_intrq_w )
 //  does for pia1 CB1
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( dragon_alpha_state::fdc_drq_w )
+void dragon_alpha_state::fdc_drq_w(int state)
 {
 	m_pia_2->cb1_w(state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -361,7 +361,7 @@ void dragon_alpha_state::dgnalpha(machine_config &config)
 	m_ay8912->add_route(ALL_OUTPUTS, "speaker", 0.75);
 
 	// pia 2
-	PIA6821(config, m_pia_2, 0);
+	PIA6821(config, m_pia_2);
 	m_pia_2->writepa_handler().set(FUNC(dragon_alpha_state::pia2_pa_w));
 	m_pia_2->irqa_handler().set(m_firqs, FUNC(input_merger_device::in_w<2>));
 	m_pia_2->irqb_handler().set(m_firqs, FUNC(input_merger_device::in_w<3>));

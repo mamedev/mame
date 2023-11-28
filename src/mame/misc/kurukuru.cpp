@@ -437,7 +437,7 @@ private:
 	void ym2149_aout_w(uint8_t data);
 	void ym2149_bout_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(kurukuru_msm5205_vck);
+	void kurukuru_msm5205_vck(int state);
 	void kurukuru_audio_io(address_map &map);
 	void kurukuru_audio_map(address_map &map);
 	void kurukuru_io(address_map &map);
@@ -462,7 +462,7 @@ private:
 *************************************************/
 
 
-WRITE_LINE_MEMBER(kurukuru_state::kurukuru_msm5205_vck)
+void kurukuru_state::kurukuru_msm5205_vck(int state)
 {
 	m_soundirq->rst30_w(1);
 	m_adpcm->data_w(m_adpcm_data);

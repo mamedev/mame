@@ -108,8 +108,6 @@
 #include "machine/upd765.h"
 #include "machine/z80scc.h"
 
-#include "formats/pc_dsk.h"
-
 #define LOG_INTERRUPT (1U << 1)
 #define LOG_ALL_INTERRUPT (1U << 2)
 #define LOG_LED (1U << 3)

@@ -160,12 +160,12 @@ private:
 	void dsp_speedup_w(uint32_t data);
 	uint32_t ncr53c700_read(offs_t offset, uint32_t mem_mask = ~0);
 	void ncr53c700_write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(scsi_irq);
+	void scsi_irq(int state);
 
 	TIMER_CALLBACK_MEMBER(tms_timer1);
 	TIMER_CALLBACK_MEMBER(tms_tx_timer);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
-	DECLARE_WRITE_LINE_MEMBER(duart_irq);
+	void vblank_irq(int state);
+	void duart_irq(int state);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void upload_palette(uint32_t word1, uint32_t word2);
@@ -186,7 +186,6 @@ private:
 	bitmap_ind16 m_update_bitmap;
 
 	uint8_t m_port2_data = 0;
-	uint32_t m_last_watchdog = 0;
 	int m_left_volume = 0;
 	int m_right_volume = 0;
 	uint8_t m_interrupt_mask = 0;
@@ -206,7 +205,7 @@ public:
 
 	void fbcrazy(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER(meter_pulse_r);
+	int meter_pulse_r();
 
 protected:
 	virtual void machine_reset() override;
@@ -227,7 +226,7 @@ private:
 	void dsp_map(address_map &map);
 
 	TIMER_CALLBACK_MEMBER(trackball_timer);
-	DECLARE_WRITE_LINE_MEMBER(trackball_rts);
+	void trackball_rts(int state);
 
 	uint8_t m_aux_port3_data;
 	uint8_t m_trackball_ctr;
@@ -272,7 +271,6 @@ void rastersp_state::machine_start()
 	save_item(NAME(m_speedup_count));
 	save_item(NAME(m_tms_io_regs));
 	save_item(NAME(m_port2_data));
-	save_item(NAME(m_last_watchdog));
 	save_item(NAME(m_left_volume));
 	save_item(NAME(m_right_volume));
 	save_item(NAME(m_interrupt_mask));
@@ -299,7 +297,6 @@ void rastersp_state::machine_reset()
 	m_dlba = 0;
 	m_palette_number = 0;
 
-	m_last_watchdog = 0;
 	m_port2_data = 0;
 	m_left_volume = 0;
 	m_right_volume = 0;
@@ -607,7 +604,7 @@ void rastersp_state::update_irq(uint32_t which, uint32_t state)
 }
 
 
-WRITE_LINE_MEMBER( rastersp_state::scsi_irq )
+void rastersp_state::scsi_irq(int state)
 {
 	update_irq(IRQ_SCSI, state);
 
@@ -619,19 +616,19 @@ WRITE_LINE_MEMBER( rastersp_state::scsi_irq )
 }
 
 
-WRITE_LINE_MEMBER( rastersp_state::vblank_irq )
+void rastersp_state::vblank_irq(int state)
 {
 	if (state)
 		update_irq(IRQ_VBLANK, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER( rastersp_state::duart_irq )
+void rastersp_state::duart_irq(int state)
 {
 	update_irq(IRQ_UART, state);
 }
 
 
-WRITE_LINE_MEMBER( fbcrazy_state::trackball_rts )
+void fbcrazy_state::trackball_rts(int state)
 {
 	m_trackball_enabled = state;
 }
@@ -763,13 +760,7 @@ void rastersp_state::port1_w(uint32_t data)
 		m_dsp->set_input_line(TMS3203X_IRQ2, CLEAR_LINE);
 	}
 
-	if (BIT(data, 7) != m_last_watchdog)
-	{
-		m_last_watchdog = BIT(data, 7);
-
-		if (BIT(data, 7))
-			m_watchdog->watchdog_reset();
-	}
+	m_watchdog->reset_line_w(BIT(data, 7));
 }
 
 
@@ -899,7 +890,7 @@ void fbcrazy_state::aux_port4_w(offs_t offset, uint8_t data)
 	// Bit 7 - 5p lockout
 }
 
-READ_LINE_MEMBER(fbcrazy_state::meter_pulse_r)
+int fbcrazy_state::meter_pulse_r()
 {
 	return m_aux_port3_data & 0xbc ? 1 : 0;
 }
@@ -924,7 +915,7 @@ void rastersp_state::interrupt_ctrl_w(offs_t offset, uint8_t data)
 uint8_t rastersp_state::interrupt_status_r(offs_t offset)
 {
 	// TODO: This returns something to do with interrupts
-	// Is it a bit pattern of the current interupt or a
+	// Is it a bit pattern of the current interrupt or a
 	// bit pattern of all interrupts pending?
 	// Either way, 0 works anyway!
 	return 0;
@@ -1145,7 +1136,8 @@ void rastersp_state::io_map(address_map &map)
 	map(0x100c, 0x100f).portr("DSW2");
 	map(0x1010, 0x1013).portr("DSW1");
 	map(0x1014, 0x1017).portr("EXTRA");
-	map(0x4000, 0x4007).rw("rtc", FUNC(mc146818_device::read), FUNC(mc146818_device::write)).umask32(0x000000ff);
+	map(0x4000, 0x4000).w("rtc", FUNC(mc146818_device::address_w));
+	map(0x4004, 0x4004).rw("rtc", FUNC(mc146818_device::data_r), FUNC(mc146818_device::data_w));
 	map(0x6000, 0x6000).rw( m_duart, FUNC(z80scc_device::cb_r), FUNC(z80scc_device::cb_w));
 	map(0x6004, 0x6004).rw( m_duart, FUNC(z80scc_device::db_r), FUNC(z80scc_device::db_w));
 	map(0x6008, 0x6008).rw( m_duart, FUNC(z80scc_device::ca_r), FUNC(z80scc_device::ca_w));
@@ -1617,4 +1609,5 @@ ROM_END
 
 GAME( 1994, rotr,    0,    rastersp, rotr,    rastersp_state, empty_init, ROT0, "BFM/Mirage", "Rise of the Robots (prototype)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1994, rotra,   rotr, rastersp, rotr,    rastersp_state, empty_init, ROT0, "BFM/Mirage", "Rise of the Robots (prototype, older)", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1997, fbcrazy, 0,    fbcrazy,  fbcrazy, fbcrazy_state,  empty_init, ROT0, "BFM",        "Football Crazy (Video Quiz)",           MACHINE_SUPPORTS_SAVE )

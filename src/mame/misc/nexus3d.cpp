@@ -16,7 +16,7 @@
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
-#include "machine/serflash.h"
+#include "machine/nandflash.h"
 #include "emupal.h"
 #include "screen.h"
 #include "debugger.h"
@@ -34,7 +34,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_mainram(*this, "mainram"),
 		m_fbram(*this, "fbram"),
-		m_serflash(*this, "flash"),
+		m_nand(*this, "nand"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette")
 	{ }
@@ -48,7 +48,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint32_t> m_mainram;
 	required_shared_ptr<uint32_t> m_fbram;
-	required_device<serflash_device> m_serflash;
+	required_device<samsung_k9f2g08u0m_device> m_nand;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
@@ -61,7 +61,7 @@ private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 	void nexus3d_map(address_map &map);
 
 	uint32_t m_intpend = 0, m_intmask = 0, m_intlevel = 0;
@@ -243,9 +243,9 @@ void nexus3d_state::nexus3d_map(address_map &map)
 	map(0x8d000000, 0x8d000003).portr("IN2");
 
 	// flash
-	map(0x9C000000, 0x9C000003).r(m_serflash, FUNC(serflash_device::n3d_flash_r));
-	map(0x9C000010, 0x9C000013).w(m_serflash, FUNC(serflash_device::n3d_flash_cmd_w));
-	map(0x9C000018, 0x9C00001b).w(m_serflash, FUNC(serflash_device::n3d_flash_addr_w));
+	map(0x9C000000, 0x9C000003).r(m_nand, FUNC(nand_device::data_r));
+	map(0x9C000010, 0x9C000013).w(m_nand, FUNC(nand_device::command_w));
+	map(0x9C000018, 0x9C00001b).w(m_nand, FUNC(nand_device::address_w));
 
 	// read on irq 9 service, unknown purpose
 	map(0xc0000200, 0xc00002bf).nopr();
@@ -298,10 +298,10 @@ void nexus3d_state::machine_start()
 void nexus3d_state::machine_reset()
 {
 	// the first part of the flash ROM automatically gets copied to RAM
-	memcpy(m_mainram, memregion("flash")->base(), 4 * 1024);
+	memcpy(m_mainram, memregion("nand")->base(), 4 * 1024);
 }
 
-WRITE_LINE_MEMBER(nexus3d_state::screen_vblank)
+void nexus3d_state::screen_vblank(int state)
 {
 	// rising edge
 	if (state)
@@ -326,13 +326,13 @@ void nexus3d_state::nexus3d(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::RGB_565);
 
-	SERFLASH(config, m_serflash, 0);
+	SAMSUNG_K9F2G08U0M(config, m_nand, 0);
 }
 
 
 
 ROM_START( acheart )
-	ROM_REGION( 0x10800898, "flash", 0 ) /* ARM 32 bit code */
+	ROM_REGION( 0x10800898, "nand", 0 ) /* ARM 32 bit code */
 	ROM_LOAD( "arcanaheart.u1",     0x000000, 0x10800898, CRC(109bf439) SHA1(33fd39355923ef384d5eaeec8ae3f296509bde93) )
 
 	ROM_REGION( 0x200000, "user2", 0 ) // QDSP stuff
@@ -348,7 +348,7 @@ ROM_END
 
 
 ROM_START( acheartf )
-	ROM_REGION( 0x10800898, "flash", 0 ) /* ARM 32 bit code */
+	ROM_REGION( 0x10800898, "nand", 0 ) /* ARM 32 bit code */
 	ROM_LOAD( "arcanaheartfull.u1",     0x000000, 0x10800898, CRC(54b57a9d) SHA1(dee5a43b3aea854d2b98869dca74c57b66fb06eb))
 
 	ROM_REGION( 0x200000, "user2", 0 ) // QDSP stuff

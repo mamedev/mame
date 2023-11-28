@@ -17,7 +17,7 @@
 #define LOG_MAP    (1U << 3) // log full remaps
 
 #define VERBOSE (LOG_GENERAL | LOG_IO | LOG_TODO | LOG_MAP)
-#define LOG_OUTPUT_FUNC osd_printf_warning
+//#define LOG_OUTPUT_FUNC osd_printf_warning
 
 #include "logmacro.h"
 
@@ -26,13 +26,26 @@
 #define LOGTODO(...)   LOGMASKED(LOG_TODO, __VA_ARGS__)
 
 DEFINE_DEVICE_TYPE(I82443BX_HOST, i82443bx_host_device, "i82443bx_host", "Intel 82443BX PAC Host to PCI northbridge")
+DEFINE_DEVICE_TYPE(I82443LX_HOST, i82443lx_host_device, "i82443lx_host", "Intel 82443LX PAC Host to PCI northbridge")
+
+i82443bx_host_device::i82443bx_host_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: i82439hx_host_device(mconfig, type, tag, owner, clock)
+{
+}
 
 i82443bx_host_device::i82443bx_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i82439hx_host_device(mconfig, I82443BX_HOST, tag, owner, clock)
+	: i82443bx_host_device(mconfig, I82443BX_HOST, tag, owner, clock)
 {
 	// TODO: Device ID (DID) is 0x7192 when AGP_DIS is '1'
 	// rev 0x02 82443BX B-1
 	set_ids_host(0x80867190, 0x02, 0x00000000);
+}
+
+
+i82443lx_host_device::i82443lx_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i82443bx_host_device(mconfig, I82443LX_HOST, tag, owner, clock)
+{
+	set_ids_host(0x80867180, 0x00, 0x00000000);
 }
 
 void i82443bx_host_device::config_map(address_map &map)
@@ -128,12 +141,25 @@ void i82443bx_host_device::bspad_w(offs_t offset, u8 data)
  ****************************/
 
 DEFINE_DEVICE_TYPE(I82443BX_BRIDGE, i82443bx_bridge_device, "i82443bx_bridge", "Intel 82443BX Virtual PCI-to-PCI bridge")
+DEFINE_DEVICE_TYPE(I82443LX_BRIDGE, i82443lx_bridge_device, "i82443lx_bridge", "Intel 82443LX Virtual PCI-to-PCI bridge")
+
+i82443bx_bridge_device::i82443bx_bridge_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: pci_bridge_device(mconfig, type, tag, owner, clock)
+//  , m_vga(*this, finder_base::DUMMY_TAG)
+{
+}
 
 i82443bx_bridge_device::i82443bx_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_bridge_device(mconfig, I82443BX_BRIDGE, tag, owner, clock)
+	: i82443bx_bridge_device(mconfig, I82443BX_BRIDGE, tag, owner, clock)
 //  , m_vga(*this, finder_base::DUMMY_TAG)
 {
 	set_ids_bridge(0x80867191, 0x00);
+}
+
+i82443lx_bridge_device::i82443lx_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i82443bx_bridge_device(mconfig, I82443LX_BRIDGE, tag, owner, clock)
+{
+	set_ids_bridge(0x80867181, 0x00);
 }
 
 void i82443bx_bridge_device::map_extra(

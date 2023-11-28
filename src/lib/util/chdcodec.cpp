@@ -15,6 +15,7 @@
 #include "chd.h"
 #include "flac.h"
 #include "hashing.h"
+#include "multibyte.h"
 
 #include "lzma/C/LzmaDec.h"
 #include "lzma/C/LzmaEnc.h"
@@ -343,10 +344,10 @@ public:
 			throw std::error_condition(chd_file::error::COMPRESSION_ERROR);
 
 		// write compressed length
-		dest[ecc_bytes + 0] = complen >> ((complen_bytes - 1) * 8);
-		dest[ecc_bytes + 1] = complen >> ((complen_bytes - 2) * 8);
 		if (complen_bytes > 2)
-			dest[ecc_bytes + 2] = complen >> ((complen_bytes - 3) * 8);
+			put_u24be(&dest[ecc_bytes], complen);
+		else
+			put_u16be(&dest[ecc_bytes], complen);
 
 		// encode the subcode
 		return header_bytes + complen + m_subcode_compressor.compress(&m_buffer[frames * cdrom_file::MAX_SECTOR_DATA], frames * cdrom_file::MAX_SUBCODE_DATA, &dest[header_bytes + complen]);
@@ -388,9 +389,7 @@ public:
 		uint32_t header_bytes = ecc_bytes + complen_bytes;
 
 		// extract compressed length of base
-		uint32_t complen_base = (src[ecc_bytes + 0] << 8) | src[ecc_bytes + 1];
-		if (complen_bytes > 2)
-			complen_base = (complen_base << 8) | src[ecc_bytes + 2];
+		uint32_t complen_base = (complen_bytes > 2) ? get_u24be(&src[ecc_bytes]) : get_u16be(&src[ecc_bytes]);
 
 		// reset and decode
 		m_base_decompressor.decompress(&src[header_bytes], complen_base, &m_buffer[0], frames * cdrom_file::MAX_SECTOR_DATA);

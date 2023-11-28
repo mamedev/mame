@@ -27,20 +27,21 @@
 #include "bus/rs232/terminal.h"
 #include "cpu/i386/i386.h"
 #include "machine/fdc37c93x.h"
-#include "machine/w83977tf.h"
+#include "machine/i82371eb_acpi.h"
+#include "machine/i82371eb_ide.h"
+#include "machine/i82371eb_isa.h"
+#include "machine/i82371eb_usb.h"
 #include "machine/i82371sb.h"
 #include "machine/i82439hx.h"
 #include "machine/i82439tx.h"
 #include "machine/i82443bx_host.h"
-#include "machine/i82371eb_isa.h"
-#include "machine/i82371eb_ide.h"
-#include "machine/i82371eb_acpi.h"
-#include "machine/i82371eb_usb.h"
-#include "machine/pci-ide.h"
 #include "machine/pci.h"
+#include "machine/pci-ide.h"
+#include "machine/w83977tf.h"
+#include "video/clgd546x_laguna.h"
 #include "video/mga2064w.h"
-#include "video/virge_pci.h"
 #include "video/riva128.h"
+#include "video/virge_pci.h"
 
 namespace {
 
@@ -59,6 +60,7 @@ public:
 	void pcipc(machine_config &config);
 	void pcipctx(machine_config &config);
 	void pcinv3(machine_config &config);
+	void pcimga(machine_config &config);
 	void pciagp(machine_config &config);
 
 	pcipc_state(const machine_config &mconfig, device_type type, const char *tag);
@@ -526,17 +528,17 @@ void pcipc_state::smc_superio_config(device_t *device)
 void pcipc_state::winbond_superio_config(device_t *device)
 {
 	w83977tf_device &fdc = *downcast<w83977tf_device *>(device);
-//	fdc.set_sysopt_pin(1);
+//  fdc.set_sysopt_pin(1);
 	fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
 	fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
-	fdc.irq1().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq1_w));
-	fdc.irq8().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq8n_w));
-//	fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
-//	fdc.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
-//	fdc.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
-//	fdc.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
-//	fdc.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
-//	fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
+	fdc.irq1().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq1_w));
+	fdc.irq8().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq8n_w));
+//  fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
+//  fdc.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
+//  fdc.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
+//  fdc.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
+//  fdc.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
+//  fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
 }
 
 
@@ -604,6 +606,7 @@ void pcipc_state::pcipctx(machine_config &config)
 	i82371sb_isa_device &isa(I82371SB_ISA(config, "pci:07.0", 0, "maincpu"));
 	isa.boot_state_hook().set(FUNC(pcipc_state::boot_state_award_w));
 //  IDE_PCI(config, "pci:07.1", 0, 0x80867010, 0x03, 0x00000000);
+	// TODO: eventually change this to something else
 	MGA2064W(config, "pci:12.0", 0);
 }
 
@@ -611,6 +614,12 @@ void pcipc_state::pcinv3(machine_config &config)
 {
 	pcipc_state::pcipc(config);
 	RIVA128(config.replace(), "pci:12.0", 0);
+}
+
+void pcipc_state::pcimga(machine_config &config)
+{
+	pcipc_state::pcipc(config);
+	MGA2064W(config.replace(), "pci:12.0", 0);
 }
 
 void pcipc_state::pciagp(machine_config &config)
@@ -661,8 +670,8 @@ void pcipc_state::pciagp(machine_config &config)
 	serport1.cts_handler().set("board4:w83977tf", FUNC(fdc37c93x_device::ncts2_w));
 #endif
 
-	// TODO: temp, to be converted to a proper AGP card once we make this to boot
-	VIRGE_PCI(config, "pci:0e.0", 0); // J4C1
+	// TODO: temp link, to be moved to quakeat.cpp
+	CIRRUS_GD5465_LAGUNA3D(config, "pci:01.0:00.0", 0);
 }
 
 ROM_START(pcipc)
@@ -694,6 +703,12 @@ ROM_START(pcinv3)
 	ROMX_LOAD("m55-04ns.rom", 0x20000, 0x20000, CRC(0116b2b0) SHA1(19b0203decfd4396695334517488d488aec3ccde), ROM_BIOS(0))
 ROM_END
 
+ROM_START(pcimga)
+	ROM_REGION32_LE(0x40000, "pci:07.0", 0) /* PC bios */
+	ROM_SYSTEM_BIOS(0, "m55ns04", "m55ns04") // Micronics M55HI-Plus with no sound
+	ROMX_LOAD("m55-04ns.rom", 0x20000, 0x20000, CRC(0116b2b0) SHA1(19b0203decfd4396695334517488d488aec3ccde), ROM_BIOS(0))
+ROM_END
+
 ROM_START(pciagp)
 	ROM_REGION32_LE(0x40000, "pci:07.0", 0) /* PC bios */
 	// a.k.a. the BIOS present in savquest.cpp
@@ -707,7 +722,8 @@ INPUT_PORTS_END
 } // anonymous namespace
 
 
-COMP(1998, pcipc,    0,     0, pcipc,   pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430HX)", MACHINE_NO_SOUND)
-COMP(1998, pcinv3,   pcipc, 0, pcinv3,  pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430HX with Riva 128)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-COMP(1998, pcipctx,  0,     0, pcipctx, pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430TX)", MACHINE_NO_SOUND)
-COMP(1999, pciagp,   0,     0, pciagp,  pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI/AGP PC (440BX)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1998, pcipc,    0,     0, pcipc,   pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430HX)", MACHINE_NO_SOUND )
+COMP(1998, pcinv3,   pcipc, 0, pcinv3,  pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430HX with nVidia Riva 128)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Windows 98 doesn't recognize video card, may need AGP BIOS instead
+COMP(1998, pcimga,   pcipc, 0, pcimga,  pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430HX with Matrox Millennium)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // cfr. MGA2064W emulation
+COMP(1998, pcipctx,  0,     0, pcipctx, pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430TX)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // unemulated super I/O
+COMP(1999, pciagp,   0,     0, pciagp,  pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI/AGP PC (440BX)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // errors out with ISA state 0x05 (keyboard), does stuff if bypassed but eventually PnP breaks OS booting

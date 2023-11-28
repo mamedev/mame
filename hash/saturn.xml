@@ -30130,7 +30130,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying 3D Lemmings (E)... -->
 	<software name="3dlemmin" supported="no">
-		<description>3D Lemmings (Euro)</description>
+		<description>3D Lemmings (Europe)</description>
 		<year>1996</year>
 		<publisher>Psygnosis</publisher>
 		<info name="serial" value="T-11304H-50"/>
@@ -30144,7 +30144,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Actua Golf (E)... -->
 	<software name="actuagol" supported="no">
-		<description>Actua Golf (Euro)</description>
+		<description>Actua Golf (Europe)</description>
 		<year>1997</year>
 		<publisher>Gremlin</publisher>
 		<info name="serial" value="T-12302H-50"/>
@@ -30158,7 +30158,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying actsocce... -->
 	<software name="actuasoc" supported="no">
-		<description>Actua Soccer - Club Edition (Euro)</description>
+		<description>Actua Soccer - Club Edition (Europe)</description>
 		<year>1996</year>
 		<publisher>Gremlin</publisher>
 		<info name="serial" value="T-12305H-50"/>
@@ -30172,7 +30172,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Alien Trilogy (E) [ENG-FRA]... -->
 	<software name="alientri" supported="no">
-		<description>Alien Trilogy (Euro)</description>
+		<description>Alien Trilogy (Europe)</description>
 		<year>1996</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-8113H-50"/>
@@ -30200,7 +30200,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Alone in the Dark - Jack is Back v1.100 (1996)(Infogrames)(PAL)(M5)[!][T-15101HP-00738 A]... -->
 	<software name="aitd2" supported="no">
-		<description>Alone in the Dark - Jack is Back (Euro)</description>
+		<description>Alone in the Dark - Jack is Back (Europe)</description>
 		<year>1996</year>
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="T-15101H-50"/>
@@ -30214,7 +30214,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying 0322-amok-eur... -->
 	<software name="amok" supported="no">
-		<description>AMOK (Euro)</description>
+		<description>AMOK (Europe)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81064-50"/>
@@ -30270,7 +30270,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying aghtac... -->
 	<software name="arcadeac" supported="no">
-		<description>Arcade's Greatest Hits - The Atari Collection 1 (Euro)</description>
+		<description>Arcade's Greatest Hits - The Atari Collection 1 (Europe)</description>
 		<year>1996</year>
 		<publisher>GT Interactive</publisher>
 		<info name="serial" value="T-25413H-50"/>
@@ -30284,7 +30284,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying area51... -->
 	<software name="area51e" supported="no">
-		<description>Area 51 (Euro)</description>
+		<description>Area 51 (Europe)</description>
 		<year>1997</year>
 		<publisher>GT Interactive</publisher>
 		<info name="serial" value="T-25408H-50"/>
@@ -30298,7 +30298,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying atheletekings... -->
 	<software name="athlking" supported="no">
-		<description>Athlete Kings (Euro)</description>
+		<description>Athlete Kings (Europe)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81115-50"/>
@@ -30313,7 +30313,7 @@ Sega logo animation draws offset [VDP2]
 	<!-- Identifying Atlantis - The Lost Tales v1.200 (1998)(Sega)(PAL)(M3)(Disc 1 of 2)[!]... -->
 	<!-- Identifying Atlantis - The Lost Tales v1.200 (1998)(Sega)(PAL)(M3)(Disc 2 of 2)[!]... -->
 	<software name="atlantis" supported="no">
-		<description>Atlantis: The Lost Tales (Euro)</description>
+		<description>Atlantis: The Lost Tales (Europe)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81091-50"/>
@@ -30352,7 +30352,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Baku Baku v1.001 (1996)(Sega)(PAL)[!]... -->
 	<software name="bakubaku" supported="no">
-		<description>Baku Baku (Euro)</description>
+		<description>Baku Baku (Europe)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81501-50"/>
@@ -30366,7 +30366,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying 0692-Batman_Forever-eur... -->
 	<software name="batmanf" supported="no">
-		<description>Batman Forever - The Arcade Game (Euro)</description>
+		<description>Batman Forever - The Arcade Game (Europe)</description>
 		<year>1997</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-8140H-50"/>
@@ -30380,7 +30380,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying batoshremix... -->
 	<software name="toshimix" supported="no">
-		<description>Battle Arena Toshinden Remix (Euro)</description>
+		<description>Battle Arena Toshinden Remix (Europe)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81029-50"/>
@@ -30394,7 +30394,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying TOUSINDEN... -->
 	<software name="toshiura" supported="no">
-		<description>Battle Arena Toshinden URA - Ultimate Revenge Attack (Euro)</description>
+		<description>Battle Arena Toshinden URA - Ultimate Revenge Attack (Europe)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81054-50"/>
@@ -30408,7 +30408,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Battle Monsters v1.000 (1996)(Acclaim)(PAL)[!]... -->
 	<software name="btlmonst" supported="no">
-		<description>Battle Monsters (Euro)</description>
+		<description>Battle Monsters (Europe)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-8137H-50"/>
@@ -30422,7 +30422,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Battle Stations (E)... -->
 	<software name="battlest" supported="no">
-		<description>Battle Stations (Euro)</description>
+		<description>Battle Stations (Europe)</description>
 		<year>1996</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="T-5021H-50"/>
@@ -30436,7 +30436,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Black Dawn v1.000 (1997)(Virgin)(PAL)[!]... -->
 	<software name="blckdawn" supported="no">
-		<description>Black Dawn (Euro)</description>
+		<description>Black Dawn (Europe)</description>
 		<year>1997</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="T-7027H-50"/>
@@ -30450,7 +30450,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying bfire... -->
 	<software name="blckfire" supported="no">
-		<description>Black Fire (Euro)</description>
+		<description>Black Fire (Europe)</description>
 		<year>1995</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="T-7011H-50"/>
@@ -30506,7 +30506,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Blast Chamber v1.000 (1996)(Activision)(PAL)[!]... -->
 	<software name="blastchm" supported="no">
-		<description>Blast Chamber (Euro)</description>
+		<description>Blast Chamber (Europe)</description>
 		<year>1996</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="T-13003H-50"/>
@@ -30562,7 +30562,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying dw-bpnt... -->
 	<software name="bptennis" supported="no">
-		<description>Break Point (Euro)</description>
+		<description>Break Point (Europe)</description>
 		<year>1997</year>
 		<publisher>Ocean</publisher>
 		<info name="serial" value="T-16408H-50"/>
@@ -30576,7 +30576,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Bubble Bobble also featuring Rainbow Islands v1.000 (1996)(Acclaim)(PAL)[!]... -->
 	<software name="bublbobl" supported="no">
-		<description>Bubble Bobble also featuring Rainbow Islands (Euro)</description>
+		<description>Bubble Bobble also featuring Rainbow Islands (Europe)</description>
 		<year>1996</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-8131H-50"/>
@@ -30590,7 +30590,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Bug Too! v1.000 (1997)(SegaSoft)(PAL)[!]... -->
 	<software name="bug2" supported="no">
-		<description>Bug Too! (Euro)</description>
+		<description>Bug Too! (Europe)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81040-50"/>
@@ -30604,7 +30604,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Bug! v1.019 (1995)(Sega)(PAL)[!]... -->
 	<software name="bug" supported="no">
-		<description>Bug! (Euro)</description>
+		<description>Bug! (Europe)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81004-50"/>
@@ -30618,7 +30618,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying B_RANGERS... -->
 	<software name="burningr" supported="no">
-		<description>Burning Rangers (Euro)</description>
+		<description>Burning Rangers (Europe)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81803-50"/>
@@ -30632,7 +30632,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Bust-A-Move 2 - Arcade Edition v1.000 (1996)(Acclaim)(PAL)[!]... -->
 	<software name="bam2" supported="no">
-		<description>Bust-A-Move 2 - Arcade Edition (Euro)</description>
+		<description>Bust-A-Move 2 - Arcade Edition (Europe)</description>
 		<year>1996</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-8132H-50"/>
@@ -30646,7 +30646,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying dw-bom3... -->
 	<software name="bam3" supported="no">
-		<description>Bust-A-Move 3 (Euro)</description>
+		<description>Bust-A-Move 3 (Europe)</description>
 		<year>1997</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-8155H-50"/>
@@ -30660,7 +30660,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Casper (E)... -->
 	<software name="casper" supported="no">
-		<description>Casper (Euro)</description>
+		<description>Casper (Europe)</description>
 		<year>1997</year>
 		<publisher>Interplay</publisher>
 		<info name="serial" value="T-12512H-50"/>
@@ -30674,7 +30674,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying chaoscontrol... -->
 	<software name="chaoscon" supported="no">
-		<description>Chaos Control (Euro)</description>
+		<description>Chaos Control (Europe)</description>
 		<year>1995</year>
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="T-15102H-50"/>
@@ -30688,7 +30688,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying clock -->
 	<software name="cknight" supported="no">
-		<description>Clockwork Knight (Euro)</description>
+		<description>Clockwork Knight (Europe)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81007-50"/>
@@ -30702,7 +30702,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Clockwork Knight 2 (E)... -->
 	<software name="cknight2" supported="no">
-		<description>Clockwork Knight 2 (Euro)</description>
+		<description>Clockwork Knight 2 (Europe)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81021-50"/>
@@ -30782,7 +30782,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying 0696-Courier_Crisis-eur... -->
 	<software name="ccrisis" supported="no">
-		<description>Courier Crisis (Euro)</description>
+		<description>Courier Crisis (Europe)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81099-50"/>
@@ -30796,7 +30796,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying dw-crime... -->
 	<software name="crimewav" supported="no">
-		<description>CrimeWave (Euro)</description>
+		<description>CrimeWave (Europe)</description>
 		<year>1997</year>
 		<publisher>Eidos</publisher>
 		<info name="serial" value="T-8807H-50"/>
@@ -30824,7 +30824,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying crowcoa... -->
 	<software name="crow" supported="no">
-		<description>The Crow - City of Angels (Euro)</description>
+		<description>The Crow - City of Angels (Europe)</description>
 		<year>1997</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-8124H-50"/>
@@ -30880,7 +30880,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Crypt Killer v1.001 (1997)(Konami)(PAL)[!]... -->
 	<software name="cryptklr" supported="no">
-		<description>Crypt Killer (Euro)</description>
+		<description>Crypt Killer (Europe)</description>
 		<year>1997</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="T-9509H-50"/>
@@ -30894,7 +30894,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying CYBER_SPEEDWAY... -->
 	<software name="cyberspd" supported="no">
-		<description>Cyber Speedway (Euro)</description>
+		<description>Cyber Speedway (Europe)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81205-50"/>
@@ -30908,7 +30908,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Virtual-On - Cyber Troopers v1.002 (1996)(Sega)(PAL)[!]... -->
 	<software name="von" supported="no">
-		<description>Cyber Troopers Virtual On (Euro)</description>
+		<description>Cyber Troopers Virtual On (Europe)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81042-50"/>
@@ -30922,7 +30922,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Cyberia v1.000 (1996)(Interplay)(PAL)(M3)[!]... -->
 	<software name="cyberia" supported="no">
-		<description>Cyberia (Euro)</description>
+		<description>Cyberia (Europe)</description>
 		<year>1996</year>
 		<publisher>Interplay</publisher>
 		<info name="serial" value="T-12508H-50"/>
@@ -30996,7 +30996,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying dw-621-darius-gaiden-eur... -->
 	<software name="dariusg" supported="no">
-		<description>Darius Gaiden (Euro)</description>
+		<description>Darius Gaiden (Europe)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-8123H-50"/>
@@ -31010,7 +31010,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Darius II v1.000 (1996)(Sega)(PAL)[!]... -->
 	<software name="darius2" supported="no">
-		<description>Darius II (Euro)</description>
+		<description>Darius II (Europe)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81085-50"/>
@@ -31024,7 +31024,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying 0232-darksavior-eur... -->
 	<software name="darksav" supported="no">
-		<description>Dark Savior (Euro)</description>
+		<description>Dark Savior (Europe)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81304-50"/>
@@ -31038,7 +31038,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Darklight Conflict v1.000 (1997)(Electronic Arts)(PAL)(M6)[!]... -->
 	<software name="darkligt" supported="no">
-		<description>Darklight Conflict (Euro)</description>
+		<description>Darklight Conflict (Europe)</description>
 		<year>1996</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="T-5022H-50 (EAY)"/>
@@ -31052,7 +31052,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying daytona -->
 	<software name="daytona" supported="no">
-		<description>Daytona USA (Euro)</description>
+		<description>Daytona USA (Europe)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81200-50"/>
@@ -31066,7 +31066,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying DAYTONA_REMIX... -->
 	<software name="daytonce" supported="no">
-		<description>Daytona USA - Championship Circuit Edition (Euro)</description>
+		<description>Daytona USA - Championship Circuit Edition (Europe)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81213-50"/>
@@ -31081,7 +31081,7 @@ Sega logo animation draws offset [VDP2]
 	<!-- Identifying deepfear1... -->
 	<!-- Identifying deepfear2... -->
 	<software name="deepfear" supported="no">
-		<description>Deep Fear (Euro)</description>
+		<description>Deep Fear (Europe)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81804-50"/>
@@ -31100,7 +31100,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying 0401-Defcon_5-eur-v2... -->
 	<software name="defcon5" supported="no">
-		<description>Defcon 5 (Euro)</description>
+		<description>Defcon 5 (Europe)</description>
 		<year>1996</year>
 		<publisher>GT Interactive</publisher>
 		<info name="serial" value="T-25401H-50"/>
@@ -31128,7 +31128,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Destruction Derby v2.900 (1996)(Psygnosis)(PAL)[!]... -->
 	<software name="dderby" supported="no">
-		<description>Destruction Derby (Euro)</description>
+		<description>Destruction Derby (Europe)</description>
 		<year>1996</year>
 		<publisher>Psygnosis</publisher>
 		<info name="serial" value="T-11303H-50"/>
@@ -31142,7 +31142,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Diehardarcade... -->
 	<software name="diehard" supported="no">
-		<description>Die Hard Arcade (Euro)</description>
+		<description>Die Hard Arcade (Europe)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81057-50"/>
@@ -31156,7 +31156,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying DIE_HARD_TRILOGY... -->
 	<software name="diehardt" supported="no">
-		<description>Die Hard Trilogy (Euro)</description>
+		<description>Die Hard Trilogy (Europe)</description>
 		<year>1997</year>
 		<publisher>Fox Interactive</publisher>
 		<info name="serial" value="T-16103H-50"/>
@@ -31170,7 +31170,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Digital Pinball v1.004 (1995)(Sega)(PAL)[!][MK-81680P-426 9-95 7SB4]... -->
 	<software name="digipin" supported="no">
-		<description>Digital Pinball (Euro)</description>
+		<description>Digital Pinball (Europe)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81680-50"/>
@@ -31184,7 +31184,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Discworld_II-Redump... -->
 	<software name="discwrl2" supported="no">
-		<description>Discworld II - Missing Presumed...?! (Euro)</description>
+		<description>Discworld II - Missing Presumed...?! (Europe)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81093-50"/>
@@ -31198,7 +31198,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying SATURN DOOM... -->
 	<software name="doom" supported="no">
-		<description>Doom (Euro)</description>
+		<description>Doom (Europe)</description>
 		<year>1997</year>
 		<publisher>GT Interactive</publisher>
 		<info name="serial" value="T-25406H-50"/>
@@ -31212,7 +31212,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying DRAGON_FORCE... -->
 	<software name="dragnfrc" supported="no">
-		<description>Dragon Force (Euro)</description>
+		<description>Dragon Force (Europe)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81382-50"/>
@@ -31226,7 +31226,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying dw-dbzl... -->
 	<software name="dbzlegs" supported="no">
-		<description>Dragon Ball Z - The Legend (Spa)</description>
+		<description>Dragon Ball Z - The Legend (Spain)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="T-13305H-06"/>
@@ -31240,7 +31240,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying dw-dh... -->
 	<software name="dheart" supported="no">
-		<description>DragonHeart - Fire &amp; Steel (Euro)</description>
+		<description>DragonHeart - Fire &amp; Steel (Europe)</description>
 		<year>1997</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-8117H-50"/>
@@ -31254,7 +31254,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying DUKE_NUKEM_3D... -->
 	<software name="dukenk3d" supported="no">
-		<description>Duke Nukem 3D (Euro)</description>
+		<description>Duke Nukem 3D (Europe)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81071-50"/>
@@ -31268,7 +31268,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying EARTHWORM_JIM_2... -->
 	<software name="ejim2" supported="no">
-		<description>Earthworm Jim 2 (Euro)</description>
+		<description>Earthworm Jim 2 (Europe)</description>
 		<year>1996</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="T-7019H-50"/>
@@ -31285,7 +31285,7 @@ Sega logo animation draws offset [VDP2]
 	<!-- Identifying enemyzerodisk2... -->
 	<!-- Identifying enemyzerodisk3... -->
 	<software name="enemy0" supported="no">
-		<description>Enemy Zero (Euro)</description>
+		<description>Enemy Zero (Europe)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81076-50"/>
@@ -31314,7 +31314,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying EXHUMED... -->
 	<software name="exhumed" supported="no">
-		<description>Exhumed (Euro)</description>
+		<description>Exhumed (Europe)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81084-50"/>
@@ -31328,7 +31328,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying BELL_F1... -->
 	<software name="f1chal" supported="no">
-		<description>F1 Challenge (Euro)</description>
+		<description>F1 Challenge (Europe)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81206-50"/>
@@ -31342,7 +31342,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying FIFA 97 (E) [ENG]... -->
 	<software name="fifa97" supported="no">
-		<description>FIFA 97 (Euro)</description>
+		<description>FIFA 97 (Europe)</description>
 		<year>1997</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="T-5017H-50"/>
@@ -31426,7 +31426,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying FIFA Road to World Cup 98 (E) [ITA]... -->
 	<software name="fifa98i" cloneof="fifa98" supported="no">
-		<description>FIFA 98 - Road to World Cup (Ita)</description>
+		<description>FIFA 98 - Road to World Cup (Italy)</description>
 		<year>1998</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="T-5025H-50 (EAI)"/>
@@ -31440,7 +31440,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying FIFA Rumbo al Mundial 98 (E) [SPA]... -->
 	<software name="fifa98s" cloneof="fifa98" supported="no">
-		<description>FIFA 98 - Rumbo al Mundial (Spa)</description>
+		<description>FIFA 98 - Rumbo al Mundial (Spain)</description>
 		<year>1998</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="T-5025H-50 (EAS)"/>
@@ -31454,7 +31454,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Fifa96 (PAL) (EUR) - Saturn... -->
 	<software name="fifa96" supported="no">
-		<description>FIFA Soccer 96 (Euro)</description>
+		<description>FIFA Soccer 96 (Europe)</description>
 		<year>1996</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="T-5003H-50"/>
@@ -31468,7 +31468,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying fightersmm... -->
 	<software name="fightmix" supported="no">
-		<description>Fighters Megamix (Euro)</description>
+		<description>Fighters Megamix (Europe)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81073-50"/>
@@ -31482,7 +31482,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying dw-fvip... -->
 	<software name="fvipers" supported="no">
-		<description>Fighting Vipers (Euro)</description>
+		<description>Fighting Vipers (Europe)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81041-50"/>
@@ -31496,7 +31496,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying FIRESTORM_THUNDERHAWK_2... -->
 	<software name="thawk2" supported="no">
-		<description>Firestorm - Thunderhawk 2 (Euro)</description>
+		<description>Firestorm - Thunderhawk 2 (Europe)</description>
 		<year>1996</year>
 		<publisher>Core Design</publisher>
 		<info name="serial" value="T-11501H-50"/>
@@ -31510,7 +31510,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Formula Karts - Special Edition v1.000 (1997)(Manic Media Productions)(PAL)[!]... -->
 	<software name="formulak" supported="no">
-		<description>Formula Karts - Special Edition (Euro)</description>
+		<description>Formula Karts - Special Edition (Europe)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81282-50"/>
@@ -31524,7 +31524,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying 0699-Frank_Thomas_Big_Hurt_Baseball-eur... -->
 	<software name="bighurt" supported="no">
-		<description>Frank Thomas Big Hurt Baseball (Euro)</description>
+		<description>Frank Thomas Big Hurt Baseball (Europe)</description>
 		<year>1996</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-8138H-50"/>
@@ -31538,7 +31538,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying dw-Frank... -->
 	<software name="franken" supported="no">
-		<description>Frankenstein - Through the Eyes of the Monster (Euro)</description>
+		<description>Frankenstein - Through the Eyes of the Monster (Europe)</description>
 		<year>1997</year>
 		<publisher>Interplay</publisher>
 		<info name="serial" value="T-12511H-50"/>
@@ -31552,7 +31552,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Galactic Attack v1.000 (1996)(Acclaim)(PAL)[!]... -->
 	<software name="galactic" supported="no">
-		<description>Galactic Attack (Euro)</description>
+		<description>Galactic Attack (Europe)</description>
 		<year>1996</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-8116H-50"/>
@@ -31566,7 +31566,7 @@ Sega logo animation draws offset [VDP2]
 
 <!-- Identifying 0186-gxfg-eur... -->
 	<software name="galaxyfg" supported="no">
-		<description>Galaxy Fight (Euro)</description>
+		<description>Galaxy Fight (Europe)</description>
 		<year>1996</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="T-1504H-50"/>
@@ -31580,7 +31580,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Gex (E)... -->
 	<software name="gex" supported="no">
-		<description>Gex (Euro)</description>
+		<description>Gex (Europe)</description>
 		<year>1996</year>
 		<publisher>Crystal Dynamics</publisher>
 		<info name="serial" value="T-15904H-50"/>
@@ -31594,7 +31594,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Ghen War v1.000 (1996)(Virgin)(PAL)[!]... -->
 	<software name="ghenwar" supported="no">
-		<description>Ghen War (Euro)</description>
+		<description>Ghen War (Europe)</description>
 		<year>1996</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="T-7010H-50"/>
@@ -31608,7 +31608,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying GOLDENAXE... -->
 	<software name="gaxeduel" supported="no">
-		<description>Golden Axe - The Duel (Euro)</description>
+		<description>Golden Axe - The Duel (Europe)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81045-50"/>
@@ -31622,7 +31622,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Grid Run v1.000 (1996)(Virgin)(PAL)[!]... -->
 	<software name="gridrun" supported="no">
-		<description>Grid Run (Euro)</description>
+		<description>Grid Run (Europe)</description>
 		<year>1996</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="T-7017H-50"/>
@@ -31636,7 +31636,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Guardian Heroes EUR... -->
 	<software name="guardher" supported="no">
-		<description>Guardian Heroes (Euro)</description>
+		<description>Guardian Heroes (Europe)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81035-50"/>
@@ -31650,7 +31650,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Gun Griffon - The Eurasian Conflict v1.00 (1996)(Sega)(PAL)[!]... -->
 	<software name="gungriff" supported="no">
-		<description>Gungriffon (Euro)</description>
+		<description>Gungriffon (Europe)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81046-50"/>
@@ -31664,7 +31664,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying HANGON_GP_95... -->
 	<software name="hangongp" supported="no">
-		<description>Hang On GP '96 (Euro)</description>
+		<description>Hang On GP '96 (Europe)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81202-50"/>
@@ -31678,7 +31678,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Hardcore 4x4 v1.001 (1996)(Gremlin)(PAL)[!]... -->
 	<software name="hc4x4" supported="no">
-		<description>Hardcore 4x4 (Euro)</description>
+		<description>Hardcore 4x4 (Europe)</description>
 		<year>1997</year>
 		<publisher>Gremlin</publisher>
 		<info name="serial" value="T-12303H-50"/>
@@ -31692,7 +31692,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Heberekes Popoitto... -->
 	<software name="hebereke" supported="no">
-		<description>Hebereke's Popoitto (Euro)</description>
+		<description>Hebereke's Popoitto (Europe)</description>
 		<year>1995</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="T-1502H-50"/>
@@ -31706,7 +31706,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying hexen... -->
 	<software name="hexen" supported="no">
-		<description>Hexen (Euro)</description>
+		<description>Hexen (Europe)</description>
 		<year>1998</year>
 		<publisher>GT Interactive</publisher>
 		<info name="serial" value="T-25405H-50"/>
@@ -31720,7 +31720,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Hi-Octane v1.000 (1994)(Electronic Arts)(PAL)(M4)[!]... -->
 	<software name="hioctane" supported="no">
-		<description>Hi-Octane (Euro)</description>
+		<description>Hi-Octane (Europe)</description>
 		<year>1996</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="T-5002H-50"/>
@@ -31734,7 +31734,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying dw-hw2k... -->
 	<software name="highway2" supported="no">
-		<description>Highway 2000 (Euro)</description>
+		<description>Highway 2000 (Europe)</description>
 		<year>1995</year>
 		<publisher>JVC</publisher>
 		<info name="serial" value="T-6012H-50"/>
@@ -31790,7 +31790,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying HOUSE_OF_THE_DEAD... -->
 	<software name="hotd" supported="no">
-		<description>The House of the Dead (Euro)</description>
+		<description>The House of the Dead (Europe)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81802-50"/>
@@ -31804,7 +31804,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying 0700-Impact_Racing-eur... -->
 	<software name="impactrc" supported="no">
-		<description>Impact Racing (Euro)</description>
+		<description>Impact Racing (Europe)</description>
 		<year>1997</year>
 		<publisher>JVC</publisher>
 		<info name="serial" value="T-6010H-50"/>
@@ -31818,7 +31818,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying In the Hunt v1.000 (1996)(Kokopeli)(PAL)[!]... -->
 	<software name="inthunt" supported="no">
-		<description>In the Hunt (Euro)</description>
+		<description>In the Hunt (Europe)</description>
 		<year>1997</year>
 		<publisher>Kokopeli</publisher>
 		<info name="serial" value="T-10001H-50"/>
@@ -31832,7 +31832,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying dw-hlk... -->
 	<software name="hulk" supported="no">
-		<description>The Incredible Hulk - The Pantheon Saga (Euro)</description>
+		<description>The Incredible Hulk - The Pantheon Saga (Europe)</description>
 		<year>1996</year>
 		<publisher>Eidos</publisher>
 		<info name="serial" value="T-7905H-50"/>
@@ -31846,7 +31846,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Independence Day - The Game v1.000 (1997)(Fox)(PAL)(M6)[!]... -->
 	<software name="indepday" supported="no">
-		<description>Independence Day - The Game (Euro)</description>
+		<description>Independence Day - The Game (Europe)</description>
 		<year>1996</year>
 		<publisher>Fox Interactive</publisher>
 		<info name="serial" value="T-16104H-50"/>
@@ -31860,7 +31860,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying ivgoal... -->
 	<software name="intvgoal" supported="no">
-		<description>International Victory Goal (Euro)</description>
+		<description>International Victory Goal (Europe)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81105-50"/>
@@ -31874,7 +31874,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying IRONMAN... -->
 	<software name="ironman" supported="no">
-		<description>Iron Man X-O Manowar in Heavy Metal (Euro)</description>
+		<description>Iron Man X-O Manowar in Heavy Metal (Europe)</description>
 		<year>1996</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-8119H-50"/>
@@ -31888,7 +31888,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Jewels of the Oracle (E)... -->
 	<software name="jeworacl" supported="no">
-		<description>Jewels of the Oracle (Euro)</description>
+		<description>Jewels of the Oracle (Europe)</description>
 		<year>1996</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="T-1503H-50"/>
@@ -31902,7 +31902,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Johnny Bazookatone (T-7909H-50) (E)... -->
 	<software name="jbazooka" supported="no">
-		<description>Johnny Bazookatone (Euro)</description>
+		<description>Johnny Bazookatone (Europe)</description>
 		<year>1996</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="serial" value="T-7909H-50"/>
@@ -31916,7 +31916,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Jonah Lomu Rugby v1.100 (1997)(Sports Master)(PAL)(M4)[!]... -->
 	<software name="lomu" supported="no">
-		<description>Jonah Lomu Rugby (Euro)</description>
+		<description>Jonah Lomu Rugby (Europe)</description>
 		<!-- or is it  Jonah Lomu Rugby (United Kingdom) [T-12003H-05] -->
 		<year>1997</year>
 		<publisher>Sports Master</publisher>
@@ -31945,7 +31945,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Keio Flying Squadron 2 EUR ... -->
 	<software name="keio2" supported="no">
-		<description>Keio Flying Squadron 2 (Euro)</description>
+		<description>Keio Flying Squadron 2 (Europe)</description>
 		<year>1997</year>
 		<publisher>JVC</publisher>
 		<info name="serial" value="T-6008H-50"/>
@@ -31958,7 +31958,7 @@ Sega logo animation draws offset [VDP2]
 	</software>
 
 	<software name="kof95" supported="no">
-		<description>The King of Fighters '95 (Euro)</description>
+		<description>The King of Fighters '95 (Europe)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81088-50"/>
@@ -32001,7 +32001,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying 0295-lastbronx-eur... -->
 	<software name="lastbrnx" supported="no">
-		<description>Last Bronx (Euro)</description>
+		<description>Last Bronx (Europe)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81078-50"/>
@@ -32015,7 +32015,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying LOADED... -->
 	<software name="loaded" supported="no">
-		<description>Loaded (Euro)</description>
+		<description>Loaded (Europe)</description>
 		<year>1996</year>
 		<publisher>Gremlin</publisher>
 		<info name="serial" value="T-12301H-50"/>
@@ -32029,7 +32029,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Lost.Vikings.2.Norse.By.Norsewest.PAL... -->
 	<software name="lostvik2" supported="no">
-		<description>Lost Vikings 2 - Norse by Norsewest (Euro)</description>
+		<description>Lost Vikings 2 - Norse by Norsewest (Europe)</description>
 		<year>1997</year>
 		<publisher>Interplay</publisher>
 		<info name="serial" value="T12521H-50"/>
@@ -32043,7 +32043,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying The Lost World Jurassic Park... -->
 	<software name="lostwrld" supported="no">
-		<description>The Lost World - Jurassic Park (Euro)</description>
+		<description>The Lost World - Jurassic Park (Europe)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81065-50"/>
@@ -32057,7 +32057,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying nfl97... -->
 	<software name="madden97" supported="no">
-		<description>Madden NFL 97 (Euro)</description>
+		<description>Madden NFL 97 (Europe)</description>
 		<year>1996</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="T-5018H-50"/>
@@ -32071,7 +32071,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Madden NFL 98 (E)... -->
 	<software name="madden98" supported="no">
-		<description>Madden NFL 98 (Euro)</description>
+		<description>Madden NFL 98 (Europe)</description>
 		<year>1997</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="T-5024H-50"/>
@@ -32085,7 +32085,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying dw-mag_carp-redump... -->
 	<software name="magicarp" supported="no">
-		<description>Magic Carpet (Euro)</description>
+		<description>Magic Carpet (Europe)</description>
 		<year>1996</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="T-5006H-50"/>
@@ -32099,7 +32099,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying 0301-Mansion_Almas_Ocultas-spa-v2... -->
 	<software name="hidsoulss" cloneof="hidsouls" supported="no">
-		<description>La Mansión de las Almas Ocultas (Spa)</description>
+		<description>La Mansión de las Almas Ocultas (Spain)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81012-06"/>
@@ -32141,7 +32141,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying MANXTT_SUPER_BIKE... -->
 	<software name="manxtt" supported="no">
-		<description>Manx TT Super Bike (Euro)</description>
+		<description>Manx TT Super Bike (Europe)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81210-50"/>
@@ -32155,7 +32155,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying MARVEL_SUPER_HEROES... -->
 	<software name="msh" supported="no">
-		<description>Marvel Super Heroes (Euro)</description>
+		<description>Marvel Super Heroes (Europe)</description>
 		<year>1997</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="T-7032H-50"/>
@@ -32169,7 +32169,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Mass Destruction v1.200 (1997)(Sega)(PAL)[!]... -->
 	<software name="massdest" supported="no">
-		<description>Mass Destruction (Euro)</description>
+		<description>Mass Destruction (Europe)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81089-50"/>
@@ -32183,7 +32183,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying 0703-Maximum_Force-eur... -->
 	<software name="maxforce" supported="no">
-		<description>Maximum Force (Euro)</description>
+		<description>Maximum Force (Europe)</description>
 		<year>1996</year>
 		<publisher>GT Interactive</publisher>
 		<info name="serial" value="T-25417H-50"/>
@@ -32197,7 +32197,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying MechWarrior 2 v1.000 (1997)(Activision)(PAL)[!]... -->
 	<software name="mechwar2" supported="no">
-		<description>MechWarrior 2 (Euro)</description>
+		<description>MechWarrior 2 (Europe)</description>
 		<year>1997</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="T-13004H-50"/>
@@ -32211,7 +32211,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Megaman X3 (E)... -->
 	<software name="megamnx3" supported="no">
-		<description>Mega Man X3 (Euro)</description>
+		<description>Mega Man X3 (Europe)</description>
 		<year>1996</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="T-7029H-50"/>
@@ -32225,7 +32225,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Mighty Hits (E)... -->
 	<software name="mightyhi" supported="no">
-		<description>Mighty Hits (Euro)</description>
+		<description>Mighty Hits (Europe)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81087"/>
@@ -32239,7 +32239,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying mk2... -->
 	<software name="mk2" supported="no">
-		<description>Mortal Kombat II (Euro)</description>
+		<description>Mortal Kombat II (Europe)</description>
 		<year>1996</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-8103H-50"/>
@@ -32253,7 +32253,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Mortal Kombat Trilogy v1.000 (1997)(GT Interactive)(PAL)[!]... -->
 	<software name="mktrilgy" supported="no">
-		<description>Mortal Kombat Trilogy (Euro)</description>
+		<description>Mortal Kombat Trilogy (Europe)</description>
 		<year>1997</year>
 		<publisher>GT Interactive</publisher>
 		<info name="serial" value="T-25414H-50"/>
@@ -32268,7 +32268,7 @@ Sega logo animation draws offset [VDP2]
 	<!-- Identifying Mr Bones - CD1 (E)... -->
 	<!-- Identifying Mr Bones - CD2 (E)... -->
 	<software name="mrbones" supported="no">
-		<description>Mr. Bones (Euro)</description>
+		<description>Mr. Bones (Europe)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81016-50"/>
@@ -32287,7 +32287,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Myst v1.100 (1995)(Sunsoft)(PAL)(M4)[!]... -->
 	<software name="myst" supported="no">
-		<description>Myst (Euro)</description>
+		<description>Myst (Europe)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81081-50"/>
@@ -32301,7 +32301,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Mystaria - The Realms of Lore v1.000 (1995)(Sega)(PAL)[!]... -->
 	<software name="mystaria" supported="no">
-		<description>Mystaria - The Realms of Lore (Euro)</description>
+		<description>Mystaria - The Realms of Lore (Europe)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81300-50"/>
@@ -32371,7 +32371,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying NBA Action 98 v1.007 (1997)(Sega)(PAL)[!]... -->
 	<software name="nbaact98" supported="no">
-		<description>NBA Action 98 (Euro)</description>
+		<description>NBA Action 98 (Europe)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81124-50"/>
@@ -32385,7 +32385,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying NBA Action v1.026 (1995)(Sega)(PAL)[!]... -->
 	<software name="nbaact" supported="no">
-		<description>NBA Action (Euro)</description>
+		<description>NBA Action (Europe)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81103-50"/>
@@ -32399,7 +32399,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying NBA Jam Extreme (E)... -->
 	<software name="nbajamex" supported="no">
-		<description>NBA Jam Extreme (Euro)</description>
+		<description>NBA Jam Extreme (Europe)</description>
 		<year>1997</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-8151H-50"/>
@@ -32427,7 +32427,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying NBA Live 97 v1.000 (1997)(Electronic Arts)(PAL)[!]... -->
 	<software name="nbaliv97" supported="no">
-		<description>NBA Live 97 (Euro)</description>
+		<description>NBA Live 97 (Europe)</description>
 		<year>1997</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="T-5015H-50"/>
@@ -32441,7 +32441,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying NBA Live 98 (E)... -->
 	<software name="nbaliv98" supported="no">
-		<description>NBA Live 98 (Euro)</description>
+		<description>NBA Live 98 (Europe)</description>
 		<year>1997</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="T-5027H-50"/>
@@ -32455,7 +32455,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Road &amp; Track Presents The Need For Speed (E)... -->
 	<software name="nfs" supported="no">
-		<description>The Need for Speed (Euro)</description>
+		<description>The Need for Speed (Europe)</description>
 		<year>1996</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="T-5009H-50"/>
@@ -32483,7 +32483,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying NFL Quarterback Club '96 (E)... -->
 	<software name="nflqb96" supported="no">
-		<description>NFL Quarterback Club 96 (Euro)</description>
+		<description>NFL Quarterback Club 96 (Europe)</description>
 		<year>1996</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-8109H-50"/>
@@ -32497,7 +32497,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying NFL Quarterback Club '97 (E)... -->
 	<software name="nflqb97" supported="no">
-		<description>NFL Quarterback Club 97 (Euro)</description>
+		<description>NFL Quarterback Club 97 (Europe)</description>
 		<year>1997</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-8136H-50"/>
@@ -32511,7 +32511,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying nhl97... -->
 	<software name="nhl97" supported="no">
-		<description>NHL 97 (Euro)</description>
+		<description>NHL 97 (Europe)</description>
 		<year>1997</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="T-5016H-50"/>
@@ -32539,7 +32539,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying NHL 98 (E)... -->
 	<software name="nhl98" supported="no">
-		<description>NHL 98 (Euro)</description>
+		<description>NHL 98 (Europe)</description>
 		<year>1998</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="T-5026H-50"/>
@@ -32553,7 +32553,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying NHL All-Star Hockey v1.001 (1995)(Sega)(PAL)[!]... -->
 	<software name="nhlas" supported="no">
-		<description>NHL All-Star Hockey (Euro)</description>
+		<description>NHL All-Star Hockey (Europe)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81102-50"/>
@@ -32567,7 +32567,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying NHL-ALLSTAR-HOCKEY98-25-01-2006-PAL-GOSSY... -->
 	<software name="nhlas98" supported="no">
-		<description>NHL All-Star Hockey 98 (Euro)</description>
+		<description>NHL All-Star Hockey 98 (Europe)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81122-50"/>
@@ -32581,7 +32581,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying NHL... -->
 	<software name="nhlpower" supported="no">
-		<description>NHL Powerplay (Euro)</description>
+		<description>NHL Powerplay (Europe)</description>
 		<year>1996</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="T-7013H-50"/>
@@ -32595,7 +32595,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying DW-326-Sat-Night_Warriors-Darkstalkers_Revenge(E)-Redump... -->
 	<software name="nwarr" supported="no">
-		<description>Night Warriors - Darkstalkers' Revenge (Euro)</description>
+		<description>Night Warriors - Darkstalkers' Revenge (Europe)</description>
 		<year>1995</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="T-7009H-50"/>
@@ -32609,7 +32609,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying nights... -->
 	<software name="nights" supported="no">
-		<description>NiGHTS - into Dreams... (Euro)</description>
+		<description>NiGHTS - into Dreams... (Europe)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81020-50"/>
@@ -32623,7 +32623,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying 0705-Off_World_Interceptor_Extreme-eur... -->
 	<software name="offworld" supported="no">
-		<description>Off-World Interceptor Extreme (Euro)</description>
+		<description>Off-World Interceptor Extreme (Europe)</description>
 		<year>1995</year>
 		<publisher>Crystal Dynamics</publisher>
 		<info name="serial" value="T-15908H-50"/>
@@ -32637,7 +32637,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Olympic Soccer v2.000 (1994)(U.S. Gold)(PAL)(M5)[!]... -->
 	<software name="olympsoc" supported="no">
-		<description>Olympic Soccer (Euro)</description>
+		<description>Olympic Soccer (Europe)</description>
 		<year>1996</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="serial" value="T-7904H-50"/>
@@ -32665,7 +32665,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Pandemonium! (E)... -->
 	<software name="pandemon" supported="no">
-		<description>Pandemonium! (Euro)</description>
+		<description>Pandemonium! (Europe)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81090-50"/>
@@ -32679,7 +32679,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Panzer Dragoon v1.000 (1995)(Sega)(PAL)[!]... -->
 	<software name="panzer" supported="no">
-		<description>Panzer Dragoon (Euro)</description>
+		<description>Panzer Dragoon (Europe)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81009-50"/>
@@ -32693,7 +32693,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying PANZER_DRAGOON_ZWEI... -->
 	<software name="panzer2" supported="no">
-		<description>Panzer Dragoon II Zwei (Euro)</description>
+		<description>Panzer Dragoon II Zwei (Europe)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81022-50"/>
@@ -32710,7 +32710,7 @@ Sega logo animation draws offset [VDP2]
 	<!-- Identifying AZEL_3... -->
 	<!-- Identifying AZEL_4... -->
 	<software name="panzsaga" supported="no">
-		<description>Panzer Dragoon Saga (Euro)</description>
+		<description>Panzer Dragoon Saga (Europe)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81307-50"/>
@@ -32739,7 +32739,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying 0101-paro-eur... -->
 	<software name="parodius" supported="no">
-		<description>Parodius (Euro)</description>
+		<description>Parodius (Europe)</description>
 		<year>1995</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="T-9501H-50"/>
@@ -32753,7 +32753,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Pebble Beach Golf Links (MK81101-50) (E)_... -->
 	<software name="pebble" supported="no">
-		<description>Pebble Beach Golf Links (Euro)</description>
+		<description>Pebble Beach Golf Links (Europe)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81101-50"/>
@@ -32767,7 +32767,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying PGA Tour 97 (E)... -->
 	<software name="pga97" supported="no">
-		<description>PGA Tour 97 (Euro)</description>
+		<description>PGA Tour 97 (Europe)</description>
 		<year>1997</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="T-5011H-50"/>
@@ -32781,7 +32781,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying PHOTO_CD_OPERATING_SYSTEM... -->
 	<software name="photocdo" supported="no">
-		<description>Photo CD Operating System (Euro)</description>
+		<description>Photo CD Operating System (Europe)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81681-50"/>
@@ -32795,7 +32795,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Pinball Graffiti (E)... -->
 	<software name="pinbgraf" supported="no">
-		<description>Pinball Graffiti (Euro)</description>
+		<description>Pinball Graffiti (Europe)</description>
 		<year>1997</year>
 		<publisher>JVC</publisher>
 		<info name="serial" value="T-6011H-50"/>
@@ -32809,7 +32809,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Primal Rage (E)... -->
 	<software name="primal" supported="no">
-		<description>Primal Rage (Euro)</description>
+		<description>Primal Rage (Europe)</description>
 		<year>1996</year>
 		<publisher>Time Warner Interactive</publisher>
 		<info name="serial" value="T-4802H-50"/>
@@ -32823,7 +32823,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Pro Pinball - The Web (E)... -->
 	<software name="propin" supported="no">
-		<description>Pro Pinball - The Web (Euro)</description>
+		<description>Pro Pinball - The Web (Europe)</description>
 		<year>1998</year>
 		<publisher>Empire</publisher>
 		<info name="serial" value="T-30701H-50"/>
@@ -32837,7 +32837,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying QUAKE... -->
 	<software name="quake" supported="no">
-		<description>Quake (Euro)</description>
+		<description>Quake (Europe)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81066-50"/>
@@ -32851,7 +32851,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Rampage World Tour (E)... -->
 	<software name="rampage" supported="no">
-		<description>Rampage World Tour (Euro)</description>
+		<description>Rampage World Tour (Europe)</description>
 		<year>1996</year>
 		<publisher>GT Interactive</publisher>
 		<info name="serial" value="T-25416H-50"/>
@@ -32865,7 +32865,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying rayman... -->
 	<software name="rayman" supported="no">
-		<description>Rayman (Euro)</description>
+		<description>Rayman (Europe)</description>
 		<year>1995</year>
 		<publisher>Ubi Soft</publisher>
 		<info name="serial" value="T-17701H-50"/>
@@ -32879,7 +32879,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying RESIDENT_EVIL... -->
 	<software name="revil" supported="no">
-		<description>Resident Evil (Euro)</description>
+		<description>Resident Evil (Europe)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81092-50"/>
@@ -32893,7 +32893,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying RISE_2_RESURRECTION... -->
 	<software name="rise2" supported="no">
-		<description>Rise 2: Resurrection (Euro)</description>
+		<description>Rise 2: Resurrection (Europe)</description>
 		<year>1996</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-8114H-50"/>
@@ -32907,7 +32907,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Revolution X v1.000 (1996)(Acclaim)(PAL)[!]... -->
 	<software name="revx" supported="no">
-		<description>Revolution X featuring Aerosmith (Euro)</description>
+		<description>Revolution X featuring Aerosmith (Europe)</description>
 		<year>1996</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-8107H-50"/>
@@ -32938,7 +32938,7 @@ Sega logo animation draws offset [VDP2]
 	<!-- Identifying Riven - The Sequel to Myst v1.003 (1998)(Sega)(PAL)(Disc 3 of 4)[!]... -->
 	<!-- Identifying Riven - The Sequel to Myst v1.003 (1998)(Sega)(PAL)(Disc 4 of 4)[!]... -->
 	<software name="riven" supported="no">
-		<description>Riven - The Sequel to Myst (Euro)</description>
+		<description>Riven - The Sequel to Myst (Europe)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81801-50"/>
@@ -32967,7 +32967,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying roadrash... -->
 	<software name="roadrash" supported="no">
-		<description>Road Rash (Euro)</description>
+		<description>Road Rash (Europe)</description>
 		<year>1996</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="T-5008-50"/>
@@ -32981,7 +32981,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Robo Pit (E)... -->
 	<software name="robopit" supported="no">
-		<description>Robo Pit (Euro)</description>
+		<description>Robo Pit (Europe)</description>
 		<year>1996</year>
 		<publisher>Kokopeli</publisher>
 		<info name="serial" value="T-10002H-50"/>
@@ -32995,7 +32995,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying DW-380-Sat-Robotica-Cybernation Revolt(E)-Redump... -->
 	<software name="robotica" supported="no">
-		<description>Robotica - Cybernation Revolt (Euro)</description>
+		<description>Robotica - Cybernation Revolt (Europe)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81008-50"/>
@@ -33009,7 +33009,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying S_BOMBERMAN... -->
 	<software name="satbombm" supported="no">
-		<description>Saturn Bomberman (Euro)</description>
+		<description>Saturn Bomberman (Europe)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81070-50"/>
@@ -33023,7 +33023,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying DW-334-Sat-Scorcher(E)-Redump... -->
 	<software name="scorcher" supported="no">
-		<description>Scorcher (Euro)</description>
+		<description>Scorcher (Europe)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81214-50"/>
@@ -33037,7 +33037,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Sea Bass Fishing (E)... -->
 	<software name="seabass" supported="no">
-		<description>SeaBass Fishing (Euro)</description>
+		<description>SeaBass Fishing (Europe)</description>
 		<year>1996</year>
 		<publisher>JVC</publisher>
 		<info name="serial" value="T-6009H-50"/>
@@ -33051,7 +33051,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying SEGAAGES_VOL1... -->
 	<software name="segaages" supported="no">
-		<description>Sega Ages Vol. 1 (Euro)</description>
+		<description>Sega Ages Vol. 1 (Europe)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81604-50"/>
@@ -33065,7 +33065,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying SEGARALLY... -->
 	<software name="srallyc" supported="no">
-		<description>Sega Rally Championship (Euro)</description>
+		<description>Sega Rally Championship (Europe)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81207-50"/>
@@ -33079,7 +33079,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying SEGA_TOURINGCAR_CHAMPIONSHIP... -->
 	<software name="stcc" supported="no">
-		<description>Sega Touring Car Championship (Euro)</description>
+		<description>Sega Touring Car Championship (Europe)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81216-50"/>
@@ -33093,7 +33093,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying WWSOCCER_____97... -->
 	<software name="wwsoc97" supported="no">
-		<description>Sega Worldwide Soccer '97 (Euro)</description>
+		<description>Sega Worldwide Soccer '97 (Europe)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81112-50"/>
@@ -33107,7 +33107,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying WWSOCCER_____98... -->
 	<software name="wwsoc98" supported="no">
-		<description>Sega Worldwide Soccer '98 Club Edition (Euro, v1.003)</description>
+		<description>Sega Worldwide Soccer '98 Club Edition (Europe, v1.003)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81123-50?"/>
@@ -33121,7 +33121,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Sega Worldwide Soccer '98 Club Edition (E) [V1.002]... -->
 	<software name="wwsoc98a" cloneof="wwsoc98" supported="no">
-		<description>Sega Worldwide Soccer '98 Club Edition (Euro, v1.002)</description>
+		<description>Sega Worldwide Soccer '98 Club Edition (Europe, v1.002)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81123-50?"/>
@@ -33177,7 +33177,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying SHINING_FORCE_3_1... -->
 	<software name="shinfrc3" supported="no">
-		<description>Shining Force III (Euro)</description>
+		<description>Shining Force III (Europe)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81383-50"/>
@@ -33191,7 +33191,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying SHINING_THE_HOLY_ARK... -->
 	<software name="shinholy" supported="no">
-		<description>Shining the Holy Ark (Euro)</description>
+		<description>Shining the Holy Ark (Europe)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81306-50"/>
@@ -33205,7 +33205,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying SHINING_WISDOM... -->
 	<software name="shinwisd" supported="no">
-		<description>Shining Wisdom (Euro)</description>
+		<description>Shining Wisdom (Europe)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81381-50"/>
@@ -33219,7 +33219,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Shinobi X... -->
 	<software name="shinobix" supported="no">
-		<description>Shinobi X (Euro)</description>
+		<description>Shinobi X (Europe)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81082-50"/>
@@ -33233,7 +33233,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying dw-shock_ass... -->
 	<software name="shockwav" supported="no">
-		<description>Shockwave Assault (Euro)</description>
+		<description>Shockwave Assault (Europe)</description>
 		<year>1996</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="T-5005H-50"/>
@@ -33247,7 +33247,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying SimCity 2000 v1.000 (1995)(Sega)(PAL)[!]... -->
 	<software name="simcit2k" supported="no">
-		<description>Sim City 2000 (Euro)</description>
+		<description>Sim City 2000 (Europe)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81580-50"/>
@@ -33261,7 +33261,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying 0714-Skeleton_Warriors-eur... -->
 	<software name="skelwar" supported="no">
-		<description>Skeleton Warriors (Euro)</description>
+		<description>Skeleton Warriors (Europe)</description>
 		<year>1997</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="T-7018H-50"/>
@@ -33275,7 +33275,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying dw-sky... -->
 	<software name="skytargt" supported="no">
-		<description>Sky Target (Euro)</description>
+		<description>Sky Target (Europe)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81051-50"/>
@@ -33289,7 +33289,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Slam 'N Jam '96 featuring Magic &amp; Kareem v1.000 (1996)(Crystal Dynamics)(PAL)[!]... -->
 	<software name="slamnjam" supported="no">
-		<description>Slam 'n Jam '96 featuring Magic &amp; Kareem (Euro)</description>
+		<description>Slam 'n Jam '96 featuring Magic &amp; Kareem (Europe)</description>
 		<year>1996</year>
 		<publisher>Crystal Dynamics</publisher>
 		<info name="serial" value="T-15902H-50"/>
@@ -33303,7 +33303,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying SONIC_3D_ISLAND__... -->
 	<software name="sonic3d" supported="no">
-		<description>Sonic 3D - Flickies' Island (Euro)</description>
+		<description>Sonic 3D - Flickies' Island (Europe)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81062-50"/>
@@ -33317,7 +33317,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying SONIC_JAM... -->
 	<software name="sonicjam" supported="no">
-		<description>Sonic Jam (Euro)</description>
+		<description>Sonic Jam (Europe)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81079-50"/>
@@ -33331,7 +33331,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying SONIC_R... -->
 	<software name="sonicr" supported="no">
-		<description>Sonic R (Euro)</description>
+		<description>Sonic R (Europe)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81800-50"/>
@@ -33387,7 +33387,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying DW-327-Sat-Space_Hulk-Vengeance_of_the_Blood_Angels(E)-Redump... -->
 	<software name="spchulk" supported="no">
-		<description>Space Hulk - Vengeance of the Blood Angels (Euro)</description>
+		<description>Space Hulk - Vengeance of the Blood Angels (Europe)</description>
 		<year>1995</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="T-5007H-50"/>
@@ -33401,7 +33401,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying dw-sjam... -->
 	<software name="spacejam" supported="no">
-		<description>Space Jam (Euro)</description>
+		<description>Space Jam (Europe)</description>
 		<year>1997</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-8125H-50"/>
@@ -33415,7 +33415,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Spot Goes to Hollywood (E)... -->
 	<software name="spotgo" supported="no">
-		<description>Spot Goes to Hollywood (Euro)</description>
+		<description>Spot Goes to Hollywood (Europe)</description>
 		<year>1997</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="T-7001H-50"/>
@@ -33429,7 +33429,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying STARFIGHTER_3000_Pal... -->
 	<software name="sf3000" supported="no">
-		<description>StarFighter 3000 (Euro)</description>
+		<description>StarFighter 3000 (Europe)</description>
 		<year>1996</year>
 		<publisher>Telstar</publisher>
 		<info name="serial" value="T-29701H-50"/>
@@ -33443,7 +33443,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Steep Slope Sliders v1.000 (1997)(Sega)(PAL)[!]... -->
 	<software name="sss" supported="no">
-		<description>Steep Slope Sliders (Euro)</description>
+		<description>Steep Slope Sliders (Europe)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81128-50"/>
@@ -33457,7 +33457,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying THE_STORY_OF_THOR_2... -->
 	<software name="thor2" supported="no">
-		<description>The Story of Thor 2 (Euro)</description>
+		<description>The Story of Thor 2 (Europe)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81302-50"/>
@@ -33471,7 +33471,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying STREET_FIGHTER_ALPHA... -->
 	<software name="sfa" supported="no">
-		<description>Street Fighter Alpha - Warriors' Dreams (Euro)</description>
+		<description>Street Fighter Alpha - Warriors' Dreams (Europe)</description>
 		<year>1996</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="T-7008H-50"/>
@@ -33485,7 +33485,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying STREET_FIGHTER_ALPHA2... -->
 	<software name="sfa2" supported="no">
-		<description>Street Fighter Alpha 2 (Euro)</description>
+		<description>Street Fighter Alpha 2 (Europe)</description>
 		<year>1997</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="T-7026H-50"/>
@@ -33499,7 +33499,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying STREET_FIGHTER_COLLECTION... -->
 	<software name="sf2" supported="no">
-		<description>Street Fighter 2 (Street Fighter Collection Disc 1) (Euro)</description>
+		<description>Street Fighter 2 (Street Fighter Collection Disc 1) (Europe)</description>
 		<year>1998</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="T-7033H-50"/>
@@ -33513,7 +33513,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying STREET_FIGHTER_ALPHA2_DASH... -->
 	<software name="sfa2d" supported="no">
-		<description>Street Fighter Alpha 2 Dash (Street Fighter Collection Disc 2) (Euro)</description>
+		<description>Street Fighter Alpha 2 Dash (Street Fighter Collection Disc 2) (Europe)</description>
 		<year>1998</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="T-7033H-50"/>
@@ -33527,7 +33527,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying 0710-Street_Fighter_The_Movie-eur... -->
 	<software name="sftm" supported="no">
-		<description>Street Fighter - The Movie (Euro)</description>
+		<description>Street Fighter - The Movie (Europe)</description>
 		<year>1996</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-8105H-50"/>
@@ -33541,7 +33541,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Street Racer v1.000 (1996)(Ubi Soft)(PAL)[!]... -->
 	<software name="sracer" supported="no">
-		<description>Street Racer (Euro)</description>
+		<description>Street Racer (Europe)</description>
 		<year>1996</year>
 		<publisher>Ubi Soft</publisher>
 		<info name="serial" value="T-17702H-50"/>
@@ -33555,7 +33555,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Striker '96 v1.001 (1996)(Acclaim)(PAL)[!]... -->
 	<software name="strik96" supported="no">
-		<description>Striker '96 (Euro)</description>
+		<description>Striker '96 (Europe)</description>
 		<year>1996</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-8133H-50"/>
@@ -33569,7 +33569,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Super Puzzle Fighter II Turbo (E)... -->
 	<software name="spf2t" supported="no">
-		<description>Super Puzzle Fighter II Turbo (Euro)</description>
+		<description>Super Puzzle Fighter II Turbo (Europe)</description>
 		<year>1996</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="T-7030H-50"/>
@@ -33583,7 +33583,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Swagman... -->
 	<software name="swagman" supported="no">
-		<description>SwagMan (Euro)</description>
+		<description>SwagMan (Europe)</description>
 		<year>1995</year>
 		<publisher>Eidos</publisher>
 		<info name="serial" value="T-11502H-50"/>
@@ -33597,7 +33597,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Tempest 2000 v1.300 (1997)(Interplay)(PAL)[!]... -->
 	<software name="tempst2k" supported="no">
-		<description>Tempest 2000 (Euro)</description>
+		<description>Tempest 2000 (Europe)</description>
 		<year>1997</year>
 		<publisher>Interplay</publisher>
 		<info name="serial" value="T-12516H-50"/>
@@ -33611,7 +33611,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying 0029-DISCWORLD-eur-v2... -->
 	<software name="discwrld" supported="no">
-		<description>Terry Pratchett's Discworld (Euro)</description>
+		<description>Terry Pratchett's Discworld (Europe)</description>
 		<year>1996</year>
 		<publisher>Psygnosis</publisher>
 		<info name="serial" value="T-11302H-50"/>
@@ -33625,7 +33625,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Tetris Plus v1.000 (1997)(JVC)(PAL)[!]... -->
 	<software name="tetrisp" supported="no">
-		<description>Tetris Plus (Euro)</description>
+		<description>Tetris Plus (Europe)</description>
 		<year>1996</year>
 		<publisher>JVC</publisher>
 		<info name="serial" value="T-5704H-50"/>
@@ -33639,7 +33639,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying THEME_PARK... -->
 	<software name="themeprk" supported="no">
-		<description>Theme Park (Euro)</description>
+		<description>Theme Park (Europe)</description>
 		<year>1995</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="T-5001H-50"/>
@@ -33653,7 +33653,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Three Dirty Dwarves (E)... -->
 	<software name="3dwarves" supported="no">
-		<description>Three Dirty Dwarves (Euro)</description>
+		<description>Three Dirty Dwarves (Europe)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81033-50"/>
@@ -33681,7 +33681,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Tilt! v1.000 (1996)(Virgin)(PAL)(M3)[!]... -->
 	<software name="tilt" supported="no">
-		<description>Tilt! (Euro)</description>
+		<description>Tilt! (Europe)</description>
 		<year>1997</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="T-7015H-50"/>
@@ -33695,7 +33695,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Titan Wars (E)... -->
 	<software name="titanwar" supported="no">
-		<description>Titan Wars (Euro)</description>
+		<description>Titan Wars (Europe)</description>
 		<year>1996</year>
 		<publisher>Crystal Dynamics</publisher>
 		<info name="serial" value="T-15911H-50"/>
@@ -33709,7 +33709,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying TOMB... -->
 	<software name="traid" supported="no">
-		<description>Tomb Raider (Euro)</description>
+		<description>Tomb Raider (Europe)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81086-50"/>
@@ -33724,7 +33724,7 @@ Sega logo animation draws offset [VDP2]
 	<!-- Identifying Torico CD1 (E)... -->
 	<!-- Identifying Torico CD2 (E)... -->
 	<software name="torico" supported="no">
-		<description>Torico (Euro)</description>
+		<description>Torico (Europe)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81053-50"/>
@@ -33743,7 +33743,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying dw-trash... -->
 	<software name="trashit" supported="no">
-		<description>Trash It! (Euro)</description>
+		<description>Trash It! (Europe)</description>
 		<year>1996</year>
 		<publisher>GT Interactive</publisher>
 		<info name="serial" value="T-25411H-50"/>
@@ -33757,7 +33757,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying 0185-trpb-eur... -->
 	<software name="truepin" supported="no">
-		<description>True Pinball (Euro)</description>
+		<description>True Pinball (Europe)</description>
 		<year>1996</year>
 		<publisher>Ocean</publisher>
 		<info name="serial" value="T-16406H-50"/>
@@ -33771,7 +33771,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Tunnel B1 v1.000 (1996)(Ocean)(PAL)(M5)[!]... -->
 	<software name="tunnelb1" supported="no">
-		<description>Tunnel B1 (Euro)</description>
+		<description>Tunnel B1 (Europe)</description>
 		<year>1995</year>
 		<publisher>Ocean</publisher>
 		<info name="serial" value="T-16414H-50"/>
@@ -33785,7 +33785,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying euro96... -->
 	<software name="euro96" supported="no">
-		<description>UEFA Euro 96 England (Euro)</description>
+		<description>UEFA Euro 96 England (Europe)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81180-50"/>
@@ -33799,7 +33799,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Ultimate Mortal Kombat 3 v1.007 (1996)(GT Interactive)(PAL)[!]... -->
 	<software name="umk3" supported="no">
-		<description>Ultimate Mortal Kombat 3 (Euro)</description>
+		<description>Ultimate Mortal Kombat 3 (Europe)</description>
 		<year>1996</year>
 		<publisher>GT Interactive</publisher>
 		<info name="serial" value="T-25403H-50?"/>
@@ -33813,7 +33813,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying ULTIMATE_MORTAL_KOMBAT_3... -->
 	<software name="umk3a" cloneof="umk3" supported="no">
-		<description>Ultimate Mortal Kombat 3 (Euro, alt)</description>
+		<description>Ultimate Mortal Kombat 3 (Europe, alt)</description>
 		<year>1996</year>
 		<publisher>GT Interactive</publisher>
 		<info name="serial" value="T-25403H-50?"/>
@@ -33827,7 +33827,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Valora Valley Golf v1.000 (1995)(Vic Tokai)(PAL)[!]... -->
 	<software name="valora" supported="no">
-		<description>Valora Valley Golf (Euro)</description>
+		<description>Valora Valley Golf (Europe)</description>
 		<year>1996</year>
 		<publisher>Vic Tokai</publisher>
 		<info name="serial" value="T-2303H-50"/>
@@ -33841,7 +33841,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Victory Boxing v1.02E (1995)(JVC)(PAL)[!][T6005HP535 P1H]... -->
 	<software name="vicboxin" supported="no">
-		<description>Victory Boxing (Euro)</description>
+		<description>Victory Boxing (Europe)</description>
 		<year>1996</year>
 		<publisher>JVC</publisher>
 		<info name="serial" value="T-6005H-50"/>
@@ -33855,7 +33855,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying 0225-virtuacop-eur... -->
 	<software name="vcop" supported="no">
-		<description>Virtua Cop (Euro)</description>
+		<description>Virtua Cop (Europe)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81015-50"/>
@@ -33869,7 +33869,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying 0079-vco2-eur... -->
 	<software name="vcop2" supported="no">
-		<description>Virtua Cop 2 (Euro)</description>
+		<description>Virtua Cop 2 (Europe)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81043-50"/>
@@ -33883,7 +33883,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying CDDA_00... -->
 	<software name="vf" supported="no">
-		<description>Virtua Fighter (Euro)</description>
+		<description>Virtua Fighter (Europe)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81005-50"/>
@@ -33897,7 +33897,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Virtua Fighter 2 v1.001 (1996)(Sega)(PAL)[!][MK-81014P-00623A]... -->
 	<software name="vf2" supported="no">
-		<description>Virtua Fighter 2 (Euro, v1.001)</description>
+		<description>Virtua Fighter 2 (Europe, v1.001)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81014-50?"/>
@@ -33911,7 +33911,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying VIRTUA_FIGHTER_2... -->
 	<software name="vf2a" cloneof="vf2" supported="no">
-		<description>Virtua Fighter 2 (Euro, v1.000)</description>
+		<description>Virtua Fighter 2 (Europe, v1.000)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81014-50?"/>
@@ -33925,7 +33925,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying VF_KIDS... -->
 	<software name="vfkids" supported="no">
-		<description>Virtua Fighter Kids (Euro)</description>
+		<description>Virtua Fighter Kids (Europe)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81049-50"/>
@@ -33939,7 +33939,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Virtua Fighter Remix v0.001 (1995)(Sega)(PAL)[!]... -->
 	<software name="vfremix" supported="no">
-		<description>Virtua Fighter Remix (Euro)</description>
+		<description>Virtua Fighter Remix (Europe)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81083-50"/>
@@ -33953,7 +33953,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying virtua_racing... -->
 	<software name="vr" supported="no">
-		<description>Virtua Racing (Euro)</description>
+		<description>Virtua Racing (Europe)</description>
 		<year>1995</year>
 		<publisher>Time Warner Interactive</publisher>
 		<info name="serial" value="T-4801H-50"/>
@@ -33967,7 +33967,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Viruta Golf... -->
 	<software name="vgolf" supported="no">
-		<description>Virtual Golf (Euro)</description>
+		<description>Virtual Golf (Europe)</description>
 		<year>1996</year>
 		<publisher>Core Design</publisher>
 		<info name="serial" value="T-11506H-50"/>
@@ -33981,7 +33981,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Virtual Hydlide v1.000 (1995)(Sega)(PAL)[!][MK-81380P-402 8-95 2SA5]... -->
 	<software name="vhydlid" supported="no">
-		<description>Virtual Hydlide (Euro)</description>
+		<description>Virtual Hydlide (Europe)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81380-50"/>
@@ -33995,7 +33995,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying VIRTUAL_OPEN_TENNIS... -->
 	<software name="votennis" supported="no">
-		<description>Virtual Open Tennis (Euro)</description>
+		<description>Virtual Open Tennis (Europe)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-8129H-50"/>
@@ -34009,7 +34009,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying WarCraft II - The Dark Saga v1.000 (1997)(Electronic Arts)(PAL)(M5)[!]... -->
 	<software name="warcrft2" supported="no">
-		<description>WarCraft II - The Dark Saga (Euro)</description>
+		<description>WarCraft II - The Dark Saga (Europe)</description>
 		<year>1997</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="T-5023H-50"/>
@@ -34023,7 +34023,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying whizz... -->
 	<software name="whizz" supported="no">
-		<description>Whizz (Euro)</description>
+		<description>Whizz (Europe)</description>
 		<year>1997</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="T-9514H-50"/>
@@ -34037,7 +34037,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying wingarms... -->
 	<software name="wingarms" supported="no">
-		<description>Wing Arms (Euro)</description>
+		<description>Wing Arms (Europe)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81024-50"/>
@@ -34051,7 +34051,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Winter Heat v1.000 (1997)(Sega)(PAL)[!]... -->
 	<software name="winterht" supported="no">
-		<description>Winter Heat (Euro)</description>
+		<description>Winter Heat (Europe)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81129-50"/>
@@ -34065,7 +34065,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying 0332-wipeout-eur... -->
 	<software name="wipeout" supported="no">
-		<description>WipEout (Euro)</description>
+		<description>WipEout (Europe)</description>
 		<year>1996</year>
 		<publisher>Psygnosis</publisher>
 		<info name="serial" value="T-11301H-50"/>
@@ -34079,7 +34079,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying WIPEOUT_2... -->
 	<software name="wipe2097" supported="no">
-		<description>WipEout 2097 (Euro)</description>
+		<description>WipEout 2097 (Europe)</description>
 		<year>1998</year>
 		<publisher>Psygnosis</publisher>
 		<info name="serial" value="T-11308H-50"/>
@@ -34093,7 +34093,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying World Cup Golf - Professional Edition v1.001 (1995)(U.S. Gold)(PAL)[!]... -->
 	<software name="wcgolf" supported="no">
-		<description>World Cup Golf - Professional Edition (Euro)</description>
+		<description>World Cup Golf - Professional Edition (Europe)</description>
 		<year>1996</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="serial" value="T-7903H-50"/>
@@ -34135,7 +34135,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying WLS98... -->
 	<software name="wls98" supported="no">
-		<description>World League Soccer 98 (Euro)</description>
+		<description>World League Soccer 98 (Europe)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81181-50"/>
@@ -34149,7 +34149,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying World Series Baseball II (E)... -->
 	<software name="wsb2" supported="no">
-		<description>World Series Baseball II (Euro)</description>
+		<description>World Series Baseball II (Europe)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81113-50"/>
@@ -34163,7 +34163,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying World Series Baseball v1.005 (1995)(Sega)(PAL)[!][MK-81109P-511]... -->
 	<software name="wsb" supported="no">
-		<description>World Series Baseball (Euro)</description>
+		<description>World Series Baseball (Europe)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81109-50"/>
@@ -34177,7 +34177,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying WORMS... -->
 	<software name="worms" supported="no">
-		<description>Worms (Euro)</description>
+		<description>Worms (Europe)</description>
 		<year>1996</year>
 		<publisher>Ocean</publisher>
 		<info name="serial" value="T-16403H-50"/>
@@ -34191,7 +34191,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying WWF In Your House (E)... -->
 	<software name="wwfiyh" supported="no">
-		<description>WWF In Your House (Euro)</description>
+		<description>WWF In Your House (Europe)</description>
 		<year>1997</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-8126H-50"/>
@@ -34205,7 +34205,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying 0713-WWF_Wrestlemania_The_Arcade_Game-eur... -->
 	<software name="wwfag" supported="no">
-		<description>WWF WrestleMania - The Arcade Game (Euro)</description>
+		<description>WWF WrestleMania - The Arcade Game (Europe)</description>
 		<year>1996</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-8112H-50"/>
@@ -34219,7 +34219,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying XMENCOTA... -->
 	<software name="xmcota" supported="no">
-		<description>X-Men - Children of the Atom (Euro)</description>
+		<description>X-Men - Children of the Atom (Europe)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-8108H-50"/>
@@ -34233,7 +34233,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying z... -->
 	<software name="z" supported="no">
-		<description>Z (Euro)</description>
+		<description>Z (Europe)</description>
 		<year>1997</year>
 		<publisher>GT Interactive</publisher>
 		<info name="serial" value="T-25412H-50"/>
@@ -34249,7 +34249,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Bootleg Sampler (E)... -->
 	<software name="bootlegs" supported="no">
-		<description>Bootleg Sampler (Euro)</description>
+		<description>Bootleg Sampler (Europe)</description>
 		<year>199?</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="610-6165 / 000-SOE-00061"/>
@@ -34263,7 +34263,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying CRIMEWAVE_demo... -->
 	<software name="crimewavd" cloneof="crimewav" supported="no">
-		<description>CrimeWave Playable Demonstration Disk (Euro)</description>
+		<description>CrimeWave Playable Demonstration Disk (Europe)</description>
 		<year>1997</year>
 		<publisher>Eidos</publisher>
 		<info name="serial" value="610-6455"/>
@@ -34277,7 +34277,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Gremlin Demo Disc (E)... -->
 	<software name="gremlind" supported="no">
-		<description>Gremlin Demo Disc (Euro)</description>
+		<description>Gremlin Demo Disc (Europe)</description>
 		<year>1997</year>
 		<publisher>Gremlin</publisher>
 		<info name="serial" value="610-6675"/>
@@ -34291,7 +34291,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Gremlin Demo Disk EUR [610-6384-01] - By Madroms... -->
 	<software name="gremlinda" cloneof="gremlind" supported="no">
-		<description>Gremlin Demo Disk (Euro, alt)</description>
+		<description>Gremlin Demo Disk (Europe, alt)</description>
 		<year>1996</year>
 		<publisher>Gremlin</publisher>
 		<info name="serial" value="610-6384-01"/>
@@ -34305,7 +34305,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying IMPACT_RACING_demo... -->
 	<software name="impactrcd" cloneof="impactrc" supported="no">
-		<description>Impact Racing (Euro, demo)</description>
+		<description>Impact Racing (Europe, demo)</description>
 		<year>1997</year>
 		<publisher>JVC</publisher>
 		<info name="serial" value="610-9008-50"/>
@@ -34319,7 +34319,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Panzer Dragoon Demo (E)... -->
 	<software name="panzerd" cloneof="panzer" supported="no">
-		<description>Panzer Dragoon (Euro, demo)</description>
+		<description>Panzer Dragoon (Europe, demo)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81018-50"/>
@@ -34333,7 +34333,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Pinball Graffiti Demo (E)... -->
 	<software name="pinbgrafd" cloneof="pinbgraf" supported="no">
-		<description>Pinball Graffiti (Euro, demo)</description>
+		<description>Pinball Graffiti (Europe, demo)</description>
 		<year>1997</year>
 		<publisher>JVC</publisher>
 		<info name="serial" value="610-6493"/>
@@ -34347,9 +34347,10 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Saturn Power N.1 EUR [610-6576] - Core Demo Disc EUR [790-0002-50]... -->
 	<software name="satpowr1" supported="no">
-		<description>Saturn Power No. 1 (Euro) ~ Core Demo Disc (Euro)</description>
+		<description>Saturn Power No. 1 (Europe)</description>
 		<year>1997</year>
 		<publisher>Sega?</publisher>
+		<info name="alt_title" value="Core Demo Disc"/>
 		<info name="serial" value="610-6576, 790-0002-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
@@ -34361,7 +34362,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Saturn Power N.3 - Block-Rocking Beats EUR [SP03-8-97] - By Madroms... -->
 	<software name="satpowr3" supported="no">
-		<description>Saturn Power No. 3 - Block-Rocking Beats (Euro, Audio CD)</description>
+		<description>Saturn Power No. 3 - Block-Rocking Beats (Europe, Audio CD)</description>
 		<year>1997</year>
 		<publisher>Future Publishing</publisher>
 		<info name="serial" value="SP03-8-97"/>
@@ -34375,7 +34376,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Wipeout 2097 Demo (E)... -->
 	<software name="satpowr5" supported="no">
-		<description>Saturn Power No. 5 - WipEout 2097 Demo (Euro)</description>
+		<description>Saturn Power No. 5 - WipEout 2097 Demo (Europe)</description>
 		<year>1998</year>
 		<publisher>Psygnosis</publisher>
 		<info name="serial" value="560-0003-50"/>
@@ -34389,7 +34390,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Saturn Sampler (MMSJAN96)... -->
 	<software name="saturnsa" supported="no">
-		<description>Saturn Sampler (Euro, Audio CD)</description>
+		<description>Saturn Sampler (Europe, Audio CD)</description>
 		<year>199?</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MMSJAN96"/>
@@ -34403,7 +34404,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Sega Flash Vol. 1 (E)... -->
 	<software name="sflv1" supported="no">
-		<description>Sega Flash Vol. 1 (Euro)</description>
+		<description>Sega Flash Vol. 1 (Europe)</description>
 		<year>199?</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK610-6288A / 610-6288A"/>
@@ -34417,7 +34418,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Sega Flash Vol. 2 (E)... -->
 	<software name="sflv2" supported="no">
-		<description>Sega Flash Vol. 2 (Euro)</description>
+		<description>Sega Flash Vol. 2 (Europe)</description>
 		<year>199?</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="610-6288B"/>
@@ -34431,7 +34432,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Sega Flash Volume 3 (E)... -->
 	<software name="sflv3" supported="no">
-		<description>Sega Flash Vol. 3 (Euro)</description>
+		<description>Sega Flash Vol. 3 (Europe)</description>
 		<year>199?</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="610-6288C"/>
@@ -34445,7 +34446,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Sega Flash Vol 3 EUR v1.004 [610-6288C]... -->
 	<software name="sflv3a" cloneof="sflv3" supported="no">
-		<description>Sega Flash Vol. 3 (Euro, v1.004)</description>
+		<description>Sega Flash Vol. 3 (Europe, v1.004)</description>
 		<year>199?</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="610-6288C"/>
@@ -34459,7 +34460,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Sega Flash Vol. 4 (E)... -->
 	<software name="sflv4" supported="no">
-		<description>Sega Flash Vol. 4 (Euro)</description>
+		<description>Sega Flash Vol. 4 (Europe)</description>
 		<year>199?</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="610-6288D"/>
@@ -34473,7 +34474,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Sega Flash Vol. 5 (E)... -->
 	<software name="sflv5" supported="no">
-		<description>Sega Flash Vol. 5 (Euro)</description>
+		<description>Sega Flash Vol. 5 (Europe)</description>
 		<year>199?</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="610-6288E"/>
@@ -34487,7 +34488,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Sega Flash Vol. 6 (E)... -->
 	<software name="sflv6" supported="no">
-		<description>Sega Flash Vol. 6 (Euro)</description>
+		<description>Sega Flash Vol. 6 (Europe)</description>
 		<year>199?</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="610-6288F"/>
@@ -34501,7 +34502,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Sega Flash Vol. 7 (E)... -->
 	<software name="sflv7" supported="no">
-		<description>Sega Flash Vol. 7 (Euro)</description>
+		<description>Sega Flash Vol. 7 (Europe)</description>
 		<year>199?</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="610-6288G"/>
@@ -34515,7 +34516,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Sega Preview Vol. 1 (E)... -->
 	<software name="previsat" supported="no">
-		<description>Preview Sega Saturn Vol. 1 (Euro)</description>
+		<description>Preview Sega Saturn Vol. 1 (Europe)</description>
 		<year>199?</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="610-6377"/>
@@ -34529,7 +34530,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Swagman Demo EUR [610-6529] - By Madroms... -->
 	<software name="swagmand" cloneof="swagman" supported="no">
-		<description>SwagMan (Euro, demo)</description>
+		<description>SwagMan (Europe, demo)</description>
 		<year>1995</year>
 		<publisher>Eidos</publisher>
 		<info name="serial" value="610-6529"/>
@@ -34543,7 +34544,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Various - Club Saturn (single wav)_... -->
 	<software name="clubsat" supported="no">
-		<description>Club Saturn (Euro, Audio CD)</description>
+		<description>Club Saturn (Europe, Audio CD)</description>
 		<year>199?</year>
 		<publisher>Breakdown Records</publisher>
 		<info name="serial" value="BDR CD17"/>
@@ -34557,7 +34558,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying VICTORYBOXING_demo... -->
 	<software name="vicboxind" cloneof="vicboxin" supported="no">
-		<description>Victory Boxing (Euro, demo)</description>
+		<description>Victory Boxing (Europe, demo)</description>
 		<year>1996</year>
 		<publisher>JVC</publisher>
 		<info name="serial" value="ST-6005H"/>
@@ -34571,7 +34572,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying VideoCD Music Sampler Sega Saturn EUR - By Madroms... -->
 	<software name="videocdm" supported="no">
-		<description>VideoCD Music Sampler Sega Saturn (Euro)</description>
+		<description>VideoCD Music Sampler Sega Saturn (Europe)</description>
 		<year>199?</year>
 		<publisher>PolyGram Video</publisher>
 		<info name="serial" value="MK80310-50 / 000-SOE-00074"/>
@@ -34585,7 +34586,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Virtua Fighter C.G. Portrait Collection v1.000 (1995)(Sega)(PAL)[!][inc. with Virtua Fighter Remix]... -->
 	<software name="vfport" supported="no">
-		<description>Virtua Fighter C.G. Portrait Collection (Euro, Virtua Fighter Remix Bonus CD)</description>
+		<description>Virtua Fighter C.G. Portrait Collection (Europe, Virtua Fighter Remix Bonus CD)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="610-6083"/>
@@ -34599,7 +34600,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Winter Heat Demo Disc (E)... -->
 	<software name="winterhtd" cloneof="winterht" supported="no">
-		<description>Winter Heat (Euro, demo disc)</description>
+		<description>Winter Heat (Europe, demo disc)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81125-50"/>
@@ -34613,7 +34614,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Wrestle Mania - The Arcade Game Demo Disc (E)... -->
 	<software name="wwfagd" cloneof="wwfag" supported="no">
-		<description>WWF WrestleMania - The Arcade Game (Euro, demo)</description>
+		<description>WWF WrestleMania - The Arcade Game (Europe, demo)</description>
 		<year>1996</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-8112H-50"/>
@@ -34627,7 +34628,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying xmasnights... -->
 	<software name="xmasnigh" supported="no">
-		<description>Christmas NiGHTS Into Dreams... (Euro)</description>
+		<description>Christmas NiGHTS Into Dreams... (Europe)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="610-6438-50"/>
@@ -38642,7 +38643,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying chill... -->
 	<software name="chill" supported="no">
-		<description>Chill (Euro, prototype 19980119)</description>
+		<description>Chill (Europe, prototype 19980119)</description>
 		<year>1998</year>
 		<publisher>Eidos?</publisher>
 		<info name="serial" value="T-7616H-50?"/>
@@ -38722,7 +38723,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying vc2alpha... -->
 	<software name="vcop2p" cloneof="vcop2" supported="no">
-		<description>Virtua Cop 2 (Euro, prototype 19951020)</description>
+		<description>Virtua Cop 2 (Europe, prototype 19951020)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>

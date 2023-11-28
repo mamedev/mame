@@ -6,9 +6,10 @@
 
 **********************************************************************/
 
-
 #include "emu.h"
 #include "sdx.h"
+
+#include "formats/mtx_dsk.h"
 
 
 //**************************************************************************
@@ -137,8 +138,8 @@ void mtx_sdxbas_device::device_add_mconfig(machine_config &config)
 	MB8877(config, m_fdc, 8_MHz_XTAL / 8);
 	m_fdc->hld_wr_callback().set(FUNC(mtx_sdx_device::motor_w));
 
-	FLOPPY_CONNECTOR(config, "fdc:0", sdx_floppies, "525qd", mtx_sdx_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", sdx_floppies, "525qd", mtx_sdx_device::floppy_formats).enable_sound(true);
+	for (auto &floppy : m_floppy)
+		FLOPPY_CONNECTOR(config, floppy, sdx_floppies, "525qd", mtx_sdx_device::floppy_formats).enable_sound(true);
 }
 
 void mtx_sdxcpm_device::device_add_mconfig(machine_config &config)
@@ -147,8 +148,8 @@ void mtx_sdxcpm_device::device_add_mconfig(machine_config &config)
 	MB8877(config, m_fdc, 8_MHz_XTAL / 8);
 	m_fdc->hld_wr_callback().set(FUNC(mtx_sdx_device::motor_w));
 
-	FLOPPY_CONNECTOR(config, "fdc:0", sdx_floppies, "525qd", mtx_sdx_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", sdx_floppies, "525qd", mtx_sdx_device::floppy_formats).enable_sound(true);
+	for (auto &floppy : m_floppy)
+		FLOPPY_CONNECTOR(config, floppy, sdx_floppies, "525qd", mtx_sdx_device::floppy_formats).enable_sound(true);
 
 	/* 80 column video card - required to be installed in MTX internally */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -189,9 +190,8 @@ mtx_sdx_device::mtx_sdx_device(const machine_config &mconfig, device_type type, 
 	, device_mtx_exp_interface(mconfig, *this)
 	, m_sdx_rom(*this, "sdx_rom")
 	, m_fdc(*this, "fdc")
-	, m_floppy0(*this, "fdc:0")
-	, m_floppy1(*this, "fdc:1")
-	, m_dsw(*this, "DSW%u", 0)
+	, m_floppy(*this, "fdc:%u", 0U)
+	, m_dsw(*this, "DSW%u", 0U)
 {
 }
 
@@ -282,10 +282,11 @@ uint8_t mtx_sdx_device::sdx_status_r()
 
 	data |= m_dsw[BIT(m_control, 0)]->read() & 0x0f;
 
-	data |= (m_floppy0->get_device() && m_floppy1->get_device()) ? 0x10 : 0x00;
+	data |= (m_floppy[0]->get_device() && m_floppy[1]->get_device()) ? 0x10 : 0x00;
 
-	if (m_floppy)
-		data |= m_floppy->ready_r() ? 0x00 : 0x20;
+	floppy_image_device *floppy = m_floppy[BIT(m_control, 0)]->get_device();
+	if (floppy)
+		data |= floppy->ready_r() ? 0x00 : 0x20;
 
 	data |= m_fdc->intrq_r() ? 0x40 : 0x00;
 	data |= m_fdc->drq_r() ? 0x80 : 0x00;
@@ -307,22 +308,22 @@ void mtx_sdx_device::sdx_control_w(uint8_t data)
 	m_control = data;
 
 	/* bit 0: drive select */
-	m_floppy = BIT(data, 0) ? m_floppy1->get_device() : m_floppy0->get_device();
+	floppy_image_device *floppy = m_floppy[BIT(data, 0)]->get_device();
 
-	m_fdc->set_floppy(m_floppy);
+	m_fdc->set_floppy(floppy);
 
-	if (m_floppy)
+	if (floppy)
 	{
 		/* bit 1: side select */
-		m_floppy->ss_w(BIT(data, 1));
+		floppy->ss_w(BIT(data, 1));
 		logerror("motor on %d\n", BIT(data, 2));
 		/* bit 2: motor on */
-		m_floppy->mon_w(!(BIT(data, 2) || m_fdc->hld_r()));
+		floppy->mon_w(!(BIT(data, 2) || m_fdc->hld_r()));
 		logerror("head load %d\n", m_fdc->hld_r());
 		/* bit 3: motor ready */
 		//if (BIT(data, 3))
-			//m_floppy->mon_w(!BIT(data, 2));
-			//m_floppy->mon_w(!BIT(data, 3));
+			//floppy->mon_w(!BIT(data, 2));
+			//floppy->mon_w(!BIT(data, 3));
 		logerror("motor ready %d\n", BIT(data, 3));
 	}
 
@@ -330,10 +331,10 @@ void mtx_sdx_device::sdx_control_w(uint8_t data)
 	m_fdc->dden_w(!BIT(data, 4));
 }
 
-WRITE_LINE_MEMBER(mtx_sdx_device::motor_w)
+void mtx_sdx_device::motor_w(int state)
 {
-	if (m_floppy0->get_device()) m_floppy0->get_device()->mon_w(0);
-	if (m_floppy1->get_device()) m_floppy1->get_device()->mon_w(0);
+	if (m_floppy[0]->get_device()) m_floppy[0]->get_device()->mon_w(0);
+	if (m_floppy[1]->get_device()) m_floppy[1]->get_device()->mon_w(0);
 }
 
 //-------------------------------------------------

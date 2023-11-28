@@ -805,7 +805,7 @@ int bbc_state::bbc_keyboard(int data)
 }
 
 
-WRITE_LINE_MEMBER(bbc_state::snd_enable_w)
+void bbc_state::snd_enable_w(int state)
 {
 	if (!state && m_sn)
 	{
@@ -813,7 +813,7 @@ WRITE_LINE_MEMBER(bbc_state::snd_enable_w)
 	}
 }
 
-WRITE_LINE_MEMBER(bbc_state::speech_rsq_w)
+void bbc_state::speech_rsq_w(int state)
 {
 	if (m_tms)
 	{
@@ -825,7 +825,7 @@ WRITE_LINE_MEMBER(bbc_state::speech_rsq_w)
 	}
 }
 
-WRITE_LINE_MEMBER(bbc_state::speech_wsq_w)
+void bbc_state::speech_wsq_w(int state)
 {
 	/* Write select on the speech processor */
 	if (m_tms)
@@ -838,7 +838,7 @@ WRITE_LINE_MEMBER(bbc_state::speech_wsq_w)
 	}
 }
 
-WRITE_LINE_MEMBER(bbc_state::kbd_enable_w)
+void bbc_state::kbd_enable_w(int state)
 {
 	if (!state)
 	{
@@ -857,18 +857,18 @@ void bbc_state::mc146818_set()
 		{
 			if (m_latch->q1_r()) // WR
 			{
-				m_via_system_porta = m_rtc->read(1);
+				m_via_system_porta = m_rtc->data_r();
 			}
 			else
 			{
-				m_rtc->write(1, m_via_system_porta);
+				m_rtc->data_w(m_via_system_porta);
 			}
 		}
 
 		/* if address select is set then set the address in the 146818 */
 		if (m_mc146818_as)
 		{
-			m_rtc->write(0, m_via_system_porta);
+			m_rtc->address_w(m_via_system_porta);
 		}
 	}
 }
@@ -953,7 +953,7 @@ void bbc_state::via_system_portb_w(uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(bbc_state::lpstb_w)
+void bbc_state::lpstb_w(int state)
 {
 	m_via6522_0->write_cb2(state);
 	if (!state)
@@ -1109,7 +1109,7 @@ TIMER_CALLBACK_MEMBER(bbc_state::tape_timer_cb)
 	}
 }
 
-WRITE_LINE_MEMBER(bbc_state::write_rxd)
+void bbc_state::write_rxd(int state)
 {
 	m_rxd_serial = state;
 	update_acia_rxd();
@@ -1121,7 +1121,7 @@ void bbc_state::update_acia_rxd()
 }
 
 
-WRITE_LINE_MEMBER(bbc_state::write_dcd)
+void bbc_state::write_dcd(int state)
 {
 	m_dcd_serial = state;
 	update_acia_dcd();
@@ -1133,7 +1133,7 @@ void bbc_state::update_acia_dcd()
 }
 
 
-WRITE_LINE_MEMBER(bbc_state::write_cts)
+void bbc_state::write_cts(int state)
 {
 	m_cts_serial = state;
 	update_acia_cts();
@@ -1145,7 +1145,7 @@ void bbc_state::update_acia_cts()
 }
 
 
-WRITE_LINE_MEMBER(bbc_state::write_rts)
+void bbc_state::write_rts(int state)
 {
 	if (BIT(m_serproc_data, 6))
 	{
@@ -1159,7 +1159,7 @@ WRITE_LINE_MEMBER(bbc_state::write_rts)
 }
 
 
-WRITE_LINE_MEMBER(bbc_state::write_txd)
+void bbc_state::write_txd(int state)
 {
 	if (BIT(m_serproc_data, 6))
 	{
@@ -1243,7 +1243,7 @@ void bbc_state::serial_ula_w(uint8_t data)
 	m_acia_clock->set_clock_scale( (double) 1 / serial_clocks[ data & 0x07 ] );
 }
 
-WRITE_LINE_MEMBER(bbc_state::write_acia_clock)
+void bbc_state::write_acia_clock(int state)
 {
 	m_acia->write_txc(state);
 
@@ -1257,7 +1257,7 @@ WRITE_LINE_MEMBER(bbc_state::write_acia_clock)
 ***************************************/
 
 
-WRITE_LINE_MEMBER(bbc_state::bus_nmi_w)
+void bbc_state::bus_nmi_w(int state)
 {
 	m_bus_nmi = state;
 	update_nmi();
@@ -1281,13 +1281,13 @@ void bbc_state::update_nmi()
 	}
 }
 
-WRITE_LINE_MEMBER(bbc_state::fdc_intrq_w)
+void bbc_state::fdc_intrq_w(int state)
 {
 	m_fdc_irq = state;
 	update_nmi();
 }
 
-WRITE_LINE_MEMBER(bbc_state::fdc_drq_w)
+void bbc_state::fdc_drq_w(int state)
 {
 	m_fdc_drq = state;
 	update_nmi();

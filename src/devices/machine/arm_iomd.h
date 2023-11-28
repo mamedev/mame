@@ -42,13 +42,13 @@ public:
 	auto iocr_read_id() { return m_iocr_read_id_cb.bind(); }
 	auto iocr_write_id() { return m_iocr_write_id_cb.bind(); }
 	// IRQA
-	DECLARE_WRITE_LINE_MEMBER( vblank_irq );
+	void vblank_irq(int state);
 	// IRQB
-	DECLARE_WRITE_LINE_MEMBER( keyboard_irq );
+	void keyboard_irq(int state);
 	// DRQs
-	DECLARE_WRITE_LINE_MEMBER( sound_drq );
+	void sound_drq(int state);
 	// Reset
-	DECLARE_WRITE_LINE_MEMBER( keyboard_reset );
+	void keyboard_reset(int state);
 
 	// I/O operations
 	virtual void map(address_map &map);

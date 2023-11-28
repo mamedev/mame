@@ -309,12 +309,12 @@ void xavix_i2c_jmat_state::write_extended_io2(uint8_t data)
 	LOG("%s: io2_data_w %02x\n", machine().describe_context(), data);
 }
 
-READ_LINE_MEMBER(xavix_i2c_lotr_state::camera_r) // seems to be some kind of camera status bits
+int xavix_i2c_lotr_state::camera_r() // seems to be some kind of camera status bits
 {
 	return machine().rand();
 }
 
-READ_LINE_MEMBER(xavix_i2c_bowl_state::camera_r) // seems to be some kind of camera status bits
+int xavix_i2c_bowl_state::camera_r() // seems to be some kind of camera status bits
 {
 	return machine().rand();
 }

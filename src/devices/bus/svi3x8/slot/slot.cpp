@@ -42,10 +42,6 @@ svi_slot_bus_device::~svi_slot_bus_device()
 
 void svi_slot_bus_device::device_start()
 {
-	// resolve callbacks
-	m_int_handler.resolve_safe();
-	m_romdis_handler.resolve_safe();
-	m_ramdis_handler.resolve_safe();
 }
 
 //-------------------------------------------------
@@ -110,7 +106,7 @@ void svi_slot_bus_device::iorq_w(offs_t offset, uint8_t data)
 //  bk21_w - signal from host to slots
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( svi_slot_bus_device::bk21_w )
+void svi_slot_bus_device::bk21_w(int state)
 {
 	for (device_svi_slot_interface &entry : m_dev)
 		entry.bk21_w(state);
@@ -120,7 +116,7 @@ WRITE_LINE_MEMBER( svi_slot_bus_device::bk21_w )
 //  bk22_w - signal from host to slots
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( svi_slot_bus_device::bk22_w )
+void svi_slot_bus_device::bk22_w(int state)
 {
 	for (device_svi_slot_interface &entry : m_dev)
 		entry.bk22_w(state);
@@ -130,7 +126,7 @@ WRITE_LINE_MEMBER( svi_slot_bus_device::bk22_w )
 //  bk31_w - signal from host to slots
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( svi_slot_bus_device::bk31_w )
+void svi_slot_bus_device::bk31_w(int state)
 {
 	for (device_svi_slot_interface &entry : m_dev)
 		entry.bk31_w(state);
@@ -140,7 +136,7 @@ WRITE_LINE_MEMBER( svi_slot_bus_device::bk31_w )
 //  bk32_w - signal from host to slots
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( svi_slot_bus_device::bk32_w )
+void svi_slot_bus_device::bk32_w(int state)
 {
 	for (device_svi_slot_interface &entry : m_dev)
 		entry.bk32_w(state);

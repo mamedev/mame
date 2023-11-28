@@ -62,14 +62,14 @@ int img_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	}
 }
 
-bool img_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool img_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	uint64_t size;
 	if (io.length(size) || (size != IMG_IMAGE_SIZE && size != IMG_IMAGE_SIZE_FM)) {
 		return false;
 	}
 	bool is_dd = size == IMG_IMAGE_SIZE;
-	image->set_variant(is_dd ? floppy_image::SSDD : floppy_image::SSSD);
+	image.set_variant(is_dd ? floppy_image::SSDD : floppy_image::SSSD);
 
 	// Suck in the whole image
 	std::vector<uint8_t> image_data(size);
@@ -142,9 +142,9 @@ bool img_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	return true;
 }
 
-bool img_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool img_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
 {
-	bool is_dd = image->get_variant() == floppy_image::SSDD;
+	bool is_dd = image.get_variant() == floppy_image::SSDD;
 
 	for (int cyl = 0; cyl < TRACKS; cyl++) {
 		if (is_dd) {
@@ -172,22 +172,22 @@ bool img_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 	return true;
 }
 
-const char *img_format::name() const
+const char *img_format::name() const noexcept
 {
 	return "mds2";
 }
 
-const char *img_format::description() const
+const char *img_format::description() const noexcept
 {
 	return "MDS-II floppy disk image";
 }
 
-const char *img_format::extensions() const
+const char *img_format::extensions() const noexcept
 {
 	return "img";
 }
 
-bool img_format::supports_save() const
+bool img_format::supports_save() const noexcept
 {
 	return true;
 }

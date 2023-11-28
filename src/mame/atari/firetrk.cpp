@@ -57,11 +57,11 @@ public:
 
 	void firetrk(machine_config &config);
 
-	template <int P> DECLARE_READ_LINE_MEMBER(steer_dir_r);
-	template <int P> DECLARE_READ_LINE_MEMBER(steer_flag_r);
-	template <int P> DECLARE_READ_LINE_MEMBER(skid_r);
-	template <int P> DECLARE_READ_LINE_MEMBER(crash_r);
-	template <int P> DECLARE_READ_LINE_MEMBER(gear_r);
+	template <int P> int steer_dir_r();
+	template <int P> int steer_flag_r();
+	template <int P> int skid_r();
+	template <int P> int crash_r();
+	template <int P> int gear_r();
 	DECLARE_INPUT_CHANGED_MEMBER(service_mode_switch_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(firetrk_horn_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(gear_changed);
@@ -839,21 +839,21 @@ uint8_t montecar_state::dip_r(offs_t offset)
 
 
 template <int P>
-READ_LINE_MEMBER(firetrk_state::steer_dir_r)
+int firetrk_state::steer_dir_r()
 {
 	return m_steer_dir[P];
 }
 
 
 template <int P>
-READ_LINE_MEMBER(firetrk_state::steer_flag_r)
+int firetrk_state::steer_flag_r()
 {
 	return m_steer_flag[P];
 }
 
 
 template <int P>
-READ_LINE_MEMBER(firetrk_state::skid_r)
+int firetrk_state::skid_r()
 {
 	uint32_t ret;
 
@@ -867,7 +867,7 @@ READ_LINE_MEMBER(firetrk_state::skid_r)
 
 
 template <int P>
-READ_LINE_MEMBER(firetrk_state::crash_r)
+int firetrk_state::crash_r()
 {
 	uint32_t ret;
 
@@ -881,7 +881,7 @@ READ_LINE_MEMBER(firetrk_state::crash_r)
 
 
 template <int P>
-READ_LINE_MEMBER(firetrk_state::gear_r)
+int firetrk_state::gear_r()
 {
 	return (m_gear == P) ? 1 : 0;
 }
@@ -1607,6 +1607,31 @@ ROM_START( firetrk )
 ROM_END
 
 
+ROM_START( firetrka ) // identical data as above, just using ROMs instead of PROMs for the 0x3000 - 0x3fff range.
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "032823-02.c1",  0x2000, 0x800, CRC(9570bdd3) SHA1(4d26a9490d05d53da55fc59459a4dce5bca6c761) )
+	ROM_LOAD( "032824-01.d1",  0x2800, 0x800, CRC(a5fc5629) SHA1(bf20510d8623eda2740ff296a7813a3e6f7ec76e) )
+	ROM_LOAD( "032825-02.bin", 0x3000, 0x800, CRC(fa6f050f) SHA1(531b256d536cb4da450413d7b55bcba25ce02145) )
+	ROM_LOAD( "032826-02.bin", 0x3800, 0x800, CRC(e9080179) SHA1(5c0a246578a9336f89d585278cd4683782f8e006) )
+
+	ROM_REGION( 0x0800, "chars", 0 )
+	ROM_LOAD( "032827-01.r3", 0x000, 0x800, CRC(cca31d2b) SHA1(78235176c9cb2abd73a5778b54560b87634ca0e4) )
+
+	ROM_REGION( 0x0800, "tiles", 0 )
+	ROM_LOAD( "032828-02.f5", 0x000, 0x800, CRC(68ef5f19) SHA1(df227d6a57bba6298ebdeb5a118878da21d889f6) )
+
+	ROM_REGION( 0x0400, "cars", 0 )
+	ROM_LOAD( "032831-01.p7", 0x000, 0x400, CRC(bb8d144f) SHA1(9a1355ea6f88e96926c32e0e36ac0525b0243906) )
+
+	ROM_REGION( 0x1000, "trailer", 0 )
+	ROM_LOAD( "032829-01.j5", 0x000, 0x800, CRC(e7267d71) SHA1(7132b98622e899227a378ba8c010dde39c479978) )
+	ROM_LOAD( "032830-01.l5", 0x800, 0x800, CRC(e4d8b685) SHA1(30978658899c83e32dabdf554a13cf5e5235c725) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "009114.prm", 0x0000, 0x100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) ) // sync
+ROM_END
+
+
 ROM_START( superbug )
 	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD( "009121.d1", 0x0800, 0x800, CRC(350df308) SHA1(b957c830bb95e0752ea9793e3edcfdd52235e0ab) )
@@ -1658,6 +1683,7 @@ ROM_END
 } // anonymous namespace
 
 
-GAMEL( 1977, superbug, 0, superbug, superbug, superbug_state, empty_init, ROT270, "Atari (Kee Games)", "Super Bug",               MACHINE_SUPPORTS_SAVE, layout_superbug )
-GAME(  1978, firetrk,  0, firetrk,  firetrk,  firetrk_state,  empty_init, ROT270, "Atari",             "Fire Truck / Smokey Joe", MACHINE_SUPPORTS_SAVE )
-GAME(  1979, montecar, 0, montecar, montecar, montecar_state, empty_init, ROT270, "Atari",             "Monte Carlo",             MACHINE_SUPPORTS_SAVE )
+GAMEL( 1977, superbug, 0,       superbug, superbug, superbug_state, empty_init, ROT270, "Atari (Kee Games)", "Super Bug",                              MACHINE_SUPPORTS_SAVE, layout_superbug )
+GAME(  1978, firetrk,  0,       firetrk,  firetrk,  firetrk_state,  empty_init, ROT270, "Atari",             "Fire Truck / Smokey Joe (PROM version)", MACHINE_SUPPORTS_SAVE )
+GAME(  1978, firetrka, firetrk, firetrk,  firetrk,  firetrk_state,  empty_init, ROT270, "Atari",             "Fire Truck / Smokey Joe (ROM version)",  MACHINE_SUPPORTS_SAVE )
+GAME(  1979, montecar, 0,       montecar, montecar, montecar_state, empty_init, ROT270, "Atari",             "Monte Carlo",                            MACHINE_SUPPORTS_SAVE )

@@ -43,8 +43,8 @@ public:
 		m_dip(*this, "DIP")
 	{ }
 
-	template <int N> DECLARE_READ_LINE_MEMBER(collision_flipflop_r);
-	template <int N> DECLARE_READ_LINE_MEMBER(joystick_r);
+	template <int N> int collision_flipflop_r();
+	template <int N> int joystick_r();
 	void ultratnk(machine_config &config);
 
 protected:
@@ -86,7 +86,7 @@ private:
 	void wram_w(offs_t offset, uint8_t data);
 	void collision_reset_w(offs_t offset, uint8_t data);
 	void da_latch_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(lockout_w);
+	void lockout_w(int state);
 	void video_ram_w(offs_t offset, uint8_t data);
 	void attract_w(uint8_t data);
 	void explosion_w(uint8_t data);
@@ -95,7 +95,7 @@ private:
 
 	TILE_GET_INFO_MEMBER(tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
 
 	void cpu_map(address_map &map);
@@ -179,7 +179,7 @@ uint32_t ultratnk_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-WRITE_LINE_MEMBER(ultratnk_state::screen_vblank)
+void ultratnk_state::screen_vblank(int state)
 {
 	// rising edge
 	if (state)
@@ -238,14 +238,14 @@ void ultratnk_state::video_ram_w(offs_t offset, uint8_t data)
 // machine
 
 template <int N>
-READ_LINE_MEMBER(ultratnk_state::collision_flipflop_r)
+int ultratnk_state::collision_flipflop_r()
 {
 	return m_collision[N];
 }
 
 
 template <int N>
-READ_LINE_MEMBER(ultratnk_state::joystick_r)
+int ultratnk_state::joystick_r()
 {
 	uint8_t const joy = m_joy[N]->read() & 3;
 
@@ -341,7 +341,7 @@ void ultratnk_state::da_latch_w(uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(ultratnk_state::lockout_w)
+void ultratnk_state::lockout_w(int state)
 {
 	machine().bookkeeping().coin_lockout_global_w(!state);
 }

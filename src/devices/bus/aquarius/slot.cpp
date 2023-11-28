@@ -73,10 +73,6 @@ aquarius_cartridge_slot_device::aquarius_cartridge_slot_device(const machine_con
 void aquarius_cartridge_slot_device::device_start()
 {
 	m_cart = get_card_device();
-
-	// resolve callbacks
-	m_irq_handler.resolve_safe();
-	m_nmi_handler.resolve_safe();
 }
 
 //-------------------------------------------------

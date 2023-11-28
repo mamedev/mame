@@ -13,7 +13,7 @@
     TODO:
     - improve RAM configuration for mx machines
     - set RTC timer
-    - ASIC9MX implements V30MX, and likely the unknown Temic device found in 3c/Siena
+    - ASIC9MX implements V30MX, and likely the Temic (Condor) device found in 3c/Siena
 
 ******************************************************************************/
 
@@ -50,11 +50,14 @@ psion_asic9_device::psion_asic9_device(const machine_config &mconfig, device_typ
 	, m_frc2_timer(nullptr)
 	, m_watchdog_timer(nullptr)
 	, m_rtc_timer(nullptr)
+	, m_snd_timer(nullptr)
 	, m_buz_cb(*this)
 	, m_col_cb(*this)
-	, m_port_ab_r(*this)
+	, m_port_ab_r(*this, 0)
 	, m_port_ab_w(*this)
-	, m_data_r(*this)
+	, m_pcm_in(*this, 0)
+	, m_pcm_out(*this)
+	, m_data_r(*this, 0x00)
 	, m_data_w(*this)
 {
 }
@@ -109,23 +112,6 @@ device_memory_interface::space_config_vector psion_asic9_device::memory_space_co
 
 
 //-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void psion_asic9_device::device_resolve_objects()
-{
-	m_buz_cb.resolve_safe();
-	m_col_cb.resolve_safe();
-	m_port_ab_r.resolve_safe(0);
-	m_port_ab_w.resolve_safe();
-	m_data_r.resolve_all_safe(0x00);
-	m_data_w.resolve_all_safe();
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -164,6 +150,7 @@ void psion_asic9_device::device_start()
 	m_frc2_timer = timer_alloc(FUNC(psion_asic9_device::frc2), this);
 	m_watchdog_timer = timer_alloc(FUNC(psion_asic9_device::watchdog), this);
 	m_rtc_timer = timer_alloc(FUNC(psion_asic9_device::rtc), this);
+	m_snd_timer = timer_alloc(FUNC(psion_asic9_device::snd), this);
 	m_busy_timer = timer_alloc(FUNC(psion_asic9_device::busy), this);
 
 	m_a9_control = 0x00;
@@ -203,6 +190,7 @@ void psion_asic9_device::device_reset()
 	m_frc2_timer->adjust(attotime::from_hz(512000), 0, attotime::from_hz(512000));
 	m_watchdog_timer->adjust(attotime::from_hz(4), 0, attotime::from_hz(4));
 	m_rtc_timer->adjust(attotime::from_hz(1), 0, attotime::from_hz(1));
+	m_snd_timer->adjust(attotime::from_hz(8000), 0, attotime::from_hz(8000)); // unknown data rate
 
 	m_post = 0x00;
 
@@ -213,6 +201,7 @@ void psion_asic9_device::device_reset()
 	m_frc1_reload = 0;
 	m_frc2_count = 0;
 	m_frc2_reload = 0;
+	m_buz_toggle = 0;
 	m_watchdog_count = 0;
 	m_a9_protection_mode = false;
 	m_a9_protection_lower = 0x00;
@@ -225,9 +214,11 @@ void psion_asic9_device::device_reset()
 	m_a9_psel_8000 = 0x00;
 	m_a9_psel_9000 = 0x00;
 	m_a9_control_extra = 0x00;
-	m_rtc = time(nullptr) - 946684800;
+	m_rtc = 0;
 
+	m_a9_status |= 0x0020; // A9MMainsPresent
 	m_a9_status |= 0xe000; // A9MCold
+
 	m_a9_serial_control = 0x00;
 	m_a9_channel_select = 0x00;
 }
@@ -244,6 +235,10 @@ TIMER_CALLBACK_MEMBER(psion_asic9_device::frc1)
 	switch (--m_frc1_count)
 	{
 	case 0x0000:
+		if (BIT(m_a9_control_extra, 5)) // A9MBuzzFromFrc1OrTog
+		{
+			m_buz_cb(m_buz_toggle ^= 1);
+		}
 		m_a9_interrupt_status |= 0x40; // A9MFrc1
 		update_interrupts();
 		break;
@@ -288,7 +283,42 @@ TIMER_CALLBACK_MEMBER(psion_asic9_device::rtc)
 	m_rtc++;
 }
 
-WRITE_LINE_MEMBER(psion_asic9_device::eint0_w)
+TIMER_CALLBACK_MEMBER(psion_asic9_device::snd)
+{
+	if (BIT(m_a9_control, 11)) // A9MSoundEnable
+	{
+		switch (BIT(m_a9_control_extra, 7)) // A9MSoundDir
+		{
+		case 0:
+			if (!m_snd_fifo.full())
+				m_snd_fifo.enqueue(m_pcm_in());
+			if (m_snd_fifo.full())
+				m_a9_status |= 0x0800;
+			break;
+
+		case 1:
+			if (!m_snd_fifo.empty())
+				m_pcm_out(m_snd_fifo.dequeue());
+			if (!m_snd_fifo.full())
+				m_a9_status &= ~0x0800;
+			break;
+		}
+		m_a9_interrupt_status |= 0x01; // Sound
+		update_interrupts();
+	}
+}
+
+void psion_asic9_device::sds_int_w(int state)
+{
+	if (state)
+		m_a9_interrupt_status |= 0x04; // A9MSlave
+	else
+		m_a9_interrupt_status &= ~0x04;
+
+	update_interrupts();
+}
+
+void psion_asic9_device::eint0_w(int state)
 {
 	if (state)
 		m_a9_interrupt_status |= 0x08; // A9MExpIntC
@@ -298,17 +328,17 @@ WRITE_LINE_MEMBER(psion_asic9_device::eint0_w)
 	update_interrupts();
 }
 
-WRITE_LINE_MEMBER(psion_asic9_device::eint1_w)
+void psion_asic9_device::eint1_w(int state)
 {
 	if (state)
 		m_a9_interrupt_status |= 0x10; // A9MExpIntA
 	else
-		m_a9_interrupt_status &= ~0x10;
+	m_a9_interrupt_status &= ~0x10;
 
 	update_interrupts();
 }
 
-WRITE_LINE_MEMBER(psion_asic9_device::eint2_w)
+void psion_asic9_device::eint2_w(int state)
 {
 	if (state)
 		m_a9_interrupt_status |= 0x20; // A9MExpIntB
@@ -319,7 +349,7 @@ WRITE_LINE_MEMBER(psion_asic9_device::eint2_w)
 }
 
 
-WRITE_LINE_MEMBER(psion_asic9_device::medchng_w)
+void psion_asic9_device::medchng_w(int state)
 {
 	if (state)
 		m_a9_status |= 0x04; // A9MDoorNMI
@@ -566,8 +596,8 @@ uint16_t psion_asic9_device::io_r(offs_t offset, uint16_t mem_mask)
 	case 0x06: // A9BInterruptStatus
 		if (ACCESSING_BITS_0_7)
 		{
-			data = m_a9_interrupt_status;
-			LOG("%s io_r: A1InterruptStatus => %02x\n", machine().describe_context(), data);
+			data = m_a9_interrupt_status & m_a9_interrupt_mask;
+			LOG("%s io_r: A9InterruptStatus => %02x\n", machine().describe_context(), data);
 		}
 		break;
 
@@ -595,6 +625,9 @@ uint16_t psion_asic9_device::io_r(offs_t offset, uint16_t mem_mask)
 	case 0x1a: // A9BSoundData
 		if (ACCESSING_BITS_0_7)
 		{
+			data = m_snd_fifo.dequeue();
+			if (!m_snd_fifo.full())
+				m_a9_status &= ~0x0800;
 			LOG("%s io_r: A9BSoundData => %02x\n", machine().describe_context(), data);
 		}
 		break;
@@ -612,12 +645,12 @@ uint16_t psion_asic9_device::io_r(offs_t offset, uint16_t mem_mask)
 	case 0x22: // A9WPortABDDR
 		if (ACCESSING_BITS_0_7)
 		{
-			data = m_a9_port_ab_ddr & 0x00ff;
+			data |= m_a9_port_ab_ddr & 0x00ff;
 			LOG("%s io_r: A9WPortADDR => %02x\n", machine().describe_context(), data);
 		}
 		if (ACCESSING_BITS_8_15)
 		{
-			data = m_a9_port_ab_ddr & 0xff00;
+			data |= m_a9_port_ab_ddr & 0xff00;
 			LOG("%s io_r: A9WPortBDDR => %02x\n", machine().describe_context(), data >> 8);
 		}
 		break;
@@ -625,12 +658,12 @@ uint16_t psion_asic9_device::io_r(offs_t offset, uint16_t mem_mask)
 	case 0x24: // A9WPortCDData
 		if (ACCESSING_BITS_0_7)
 		{
-			data = 0x00;
+			data |= 0x00;
 			LOG("%s io_r: A9WPortCData => %02x\n", machine().describe_context(), data);
 		}
 		if (ACCESSING_BITS_8_15)
 		{
-			data = 0x00 << 8;
+			data |= 0x00 << 8;
 			LOG("%s io_r: A9WPortDData => %02x\n", machine().describe_context(), data >> 8);
 		}
 		break;
@@ -891,6 +924,9 @@ void psion_asic9_device::io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		if (ACCESSING_BITS_0_7)
 		{
 			LOG("%s io_w: A9BSoundData <= %04x\n", machine().describe_context(), data);
+			m_snd_fifo.enqueue(data & 0xff);
+			if (m_snd_fifo.full())
+				m_a9_status |= 0x0800;
 		}
 		break;
 

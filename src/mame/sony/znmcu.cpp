@@ -7,9 +7,9 @@ DEFINE_DEVICE_TYPE(ZNMCU, znmcu_device, "znmcu", "Sony ZN MCU")
 
 znmcu_device::znmcu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ZNMCU, tag, owner, clock),
-	m_dsw_handler(*this),
-	m_analog1_handler(*this),
-	m_analog2_handler(*this),
+	m_dsw_handler(*this, 0xff),
+	m_analog1_handler(*this, 0xff),
+	m_analog2_handler(*this, 0xff),
 	m_dataout_handler(*this),
 	m_dsr_handler(*this),
 	m_select(1),
@@ -22,12 +22,6 @@ znmcu_device::znmcu_device(const machine_config &mconfig, const char *tag, devic
 
 void znmcu_device::device_start()
 {
-	m_dsw_handler.resolve_safe(0xff);
-	m_analog1_handler.resolve_safe(0xff);
-	m_analog2_handler.resolve_safe(0xff);
-	m_dataout_handler.resolve_safe();
-	m_dsr_handler.resolve_safe();
-
 	m_mcu_timer = timer_alloc(FUNC(znmcu_device::mcu_tick), this);
 
 	m_dataout_handler(1);
@@ -43,7 +37,7 @@ void znmcu_device::device_start()
 	memset(m_send, 0, sizeof(m_send));
 }
 
-WRITE_LINE_MEMBER(znmcu_device::write_select)
+void znmcu_device::write_select(int state)
 {
 	if (m_select != state)
 	{
@@ -64,7 +58,7 @@ WRITE_LINE_MEMBER(znmcu_device::write_select)
 	}
 }
 
-WRITE_LINE_MEMBER(znmcu_device::write_clock)
+void znmcu_device::write_clock(int state)
 {
 	if (m_clk != state)
 	{

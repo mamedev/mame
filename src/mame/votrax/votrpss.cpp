@@ -354,8 +354,12 @@ z80 pinout:
 39      A9->     to eproms and module bus
 40      A10->    to eproms and module bus
 
-Note: it seems originally that /NMI and /HALT may have been tied together (and perhaps to VCC through a resistor) and NOT directly connected to VCc, so when the HALT opcode was executed it would immediately trigger an NMI and reset the cpu.
-BUT, at least on the revision C 1872 CPU pcb, they are both tied directly to VCC, disabling this behavior.
+Note: It seems originally that /NMI and /HALT may have been tied together
+  (and perhaps to VCC through a resistor) and NOT directly connected to VCC,
+  so when the HALT opcode was executed it would immediately trigger an NMI
+  and the CPU could handle this specifically.
+  However, at least on the revision C 1872 CPU pcb, they are both tied
+  directly to VCC, disabling this behavior.
 *****************************************************************************/
 
 /* Core includes */
@@ -402,7 +406,7 @@ private:
 	void ppi_pb_w(uint8_t data);
 	void ppi_pc_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
-	DECLARE_WRITE_LINE_MEMBER(write_uart_clock);
+	void write_uart_clock(int state);
 	IRQ_CALLBACK_MEMBER(irq_ack);
 
 	void io_map(address_map &map);

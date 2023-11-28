@@ -428,15 +428,15 @@ private:
 	uint8_t cashcade_r();
 	void mk4_printer_w(uint8_t data);
 	uint8_t mk4_printer_r();
-	DECLARE_WRITE_LINE_MEMBER(mkiv_pia_ca2);
-	DECLARE_WRITE_LINE_MEMBER(mkiv_pia_cb2);
+	void mkiv_pia_ca2(int state);
+	void mkiv_pia_cb2(int state);
 	void mkiv_pia_outb(uint8_t data);
 	uint8_t via_a_r();
 	uint8_t via_b_r();
 	void via_a_w(uint8_t data);
 	void via_b_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(via_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(via_cb2_w);
+	void via_ca2_w(int state);
+	void via_cb2_w(int state);
 	void pblp_out(uint8_t data);
 	void pbltlp_out(uint8_t data);
 	void zn434_w(uint8_t data);
@@ -676,7 +676,7 @@ uint8_t aristmk4_state::mkiv_pia_ina()
 {
 	/* uncomment this code once RTC is fixed */
 
-	//return m_rtc->read(1);
+	//return m_rtc->data_r();
 	return 0;   // OK for now, the aussie version has no RTC on the MB so this is valid.
 }
 
@@ -685,25 +685,25 @@ void aristmk4_state::mkiv_pia_outa(uint8_t data)
 {
 	if(m_rtc_data_strobe)
 	{
-		m_rtc->write(1,data);
+		m_rtc->data_w(data);
 		//logerror("rtc protocol write data: %02X\n",data);
 	}
 	else
 	{
-		m_rtc->write(0,data);
+		m_rtc->address_w(data);
 		//logerror("rtc protocol write address: %02X\n",data);
 	}
 }
 
 //output ca2
-WRITE_LINE_MEMBER(aristmk4_state::mkiv_pia_ca2)
+void aristmk4_state::mkiv_pia_ca2(int state)
 {
 	m_rtc_address_strobe = state;
 	// logerror("address strobe %02X\n", address_strobe);
 }
 
 //output cb2
-WRITE_LINE_MEMBER(aristmk4_state::mkiv_pia_cb2)
+void aristmk4_state::mkiv_pia_cb2(int state)
 {
 	m_rtc_data_strobe = state;
 	//logerror("data strobe: %02X\n", data);
@@ -937,13 +937,13 @@ void aristmk4_state::via_b_w(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(aristmk4_state::via_ca2_w)
+void aristmk4_state::via_ca2_w(int state)
 {
 	// CA2 is connected to CDSOL1 on schematics ?
 	//logerror("Via Port CA2 write %02X\n",data) ;
 }
 
-WRITE_LINE_MEMBER(aristmk4_state::via_cb2_w)
+void aristmk4_state::via_cb2_w(int state)
 {
 	// CB2 = hopper motor (HOPMO1). When it is 0x01, it is not running (active low)
 	// when it goes to 0, we're expecting to coins to be paid out, handled in via_b_r
@@ -1805,7 +1805,7 @@ void aristmk4_state::aristmk4(machine_config &config)
 	via.irq_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
 	// CA1 is connected to +5V, CB1 is not connected.
 
-	pia6821_device &pia(PIA6821(config, "pia6821_0", 0));
+	pia6821_device &pia(PIA6821(config, "pia6821_0"));
 	pia.readpa_handler().set(FUNC(aristmk4_state::mkiv_pia_ina));
 	pia.writepa_handler().set(FUNC(aristmk4_state::mkiv_pia_outa));
 	pia.writepb_handler().set(FUNC(aristmk4_state::mkiv_pia_outb));

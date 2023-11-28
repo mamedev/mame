@@ -127,12 +127,6 @@ void st6228_device::device_start()
 	m_data_rom_bank->configure_entries(0, 128, m_rom->base(), 0x40);
 
 	m_data_bank->set_base(&m_regs[0x80]);
-
-	m_porta_out.resolve_all_safe();
-	m_portb_out.resolve_all_safe();
-	m_portc_out.resolve_all_safe();
-	m_portd_out.resolve_all_safe();
-	m_timer_out.resolve_safe();
 }
 
 void st6228_device::device_reset()
@@ -199,29 +193,29 @@ std::unique_ptr<util::disasm_interface> st6228_device::create_disassembler()
 }
 
 // TODO: interrupts
-WRITE_LINE_MEMBER(st6228_device::porta0_w) { m_port_input[PORT_A] &= ~(1 << 0); m_port_input[PORT_A] |= (state << 0); }
-WRITE_LINE_MEMBER(st6228_device::porta1_w) { m_port_input[PORT_A] &= ~(1 << 1); m_port_input[PORT_A] |= (state << 1); }
-WRITE_LINE_MEMBER(st6228_device::porta2_w) { m_port_input[PORT_A] &= ~(1 << 2); m_port_input[PORT_A] |= (state << 2); }
-WRITE_LINE_MEMBER(st6228_device::porta3_w) { m_port_input[PORT_A] &= ~(1 << 3); m_port_input[PORT_A] |= (state << 3); }
-WRITE_LINE_MEMBER(st6228_device::porta4_w) { m_port_input[PORT_A] &= ~(1 << 4); m_port_input[PORT_A] |= (state << 4); }
-WRITE_LINE_MEMBER(st6228_device::porta5_w) { m_port_input[PORT_A] &= ~(1 << 5); m_port_input[PORT_A] |= (state << 5); }
+void st6228_device::porta0_w(int state) { m_port_input[PORT_A] &= ~(1 << 0); m_port_input[PORT_A] |= (state << 0); }
+void st6228_device::porta1_w(int state) { m_port_input[PORT_A] &= ~(1 << 1); m_port_input[PORT_A] |= (state << 1); }
+void st6228_device::porta2_w(int state) { m_port_input[PORT_A] &= ~(1 << 2); m_port_input[PORT_A] |= (state << 2); }
+void st6228_device::porta3_w(int state) { m_port_input[PORT_A] &= ~(1 << 3); m_port_input[PORT_A] |= (state << 3); }
+void st6228_device::porta4_w(int state) { m_port_input[PORT_A] &= ~(1 << 4); m_port_input[PORT_A] |= (state << 4); }
+void st6228_device::porta5_w(int state) { m_port_input[PORT_A] &= ~(1 << 5); m_port_input[PORT_A] |= (state << 5); }
 
-WRITE_LINE_MEMBER(st6228_device::portb4_w) { m_port_input[PORT_B] &= ~(1 << 4); m_port_input[PORT_B] |= (state << 4); }
-WRITE_LINE_MEMBER(st6228_device::portb5_w) { m_port_input[PORT_B] &= ~(1 << 5); m_port_input[PORT_B] |= (state << 5); }
-WRITE_LINE_MEMBER(st6228_device::portb6_w) { m_port_input[PORT_B] &= ~(1 << 6); m_port_input[PORT_B] |= (state << 6); }
+void st6228_device::portb4_w(int state) { m_port_input[PORT_B] &= ~(1 << 4); m_port_input[PORT_B] |= (state << 4); }
+void st6228_device::portb5_w(int state) { m_port_input[PORT_B] &= ~(1 << 5); m_port_input[PORT_B] |= (state << 5); }
+void st6228_device::portb6_w(int state) { m_port_input[PORT_B] &= ~(1 << 6); m_port_input[PORT_B] |= (state << 6); }
 
-WRITE_LINE_MEMBER(st6228_device::portc4_w) { m_port_input[PORT_C] &= ~(1 << 4); m_port_input[PORT_C] |= (state << 4); }
-WRITE_LINE_MEMBER(st6228_device::portc5_w) { m_port_input[PORT_C] &= ~(1 << 5); m_port_input[PORT_C] |= (state << 5); }
-WRITE_LINE_MEMBER(st6228_device::portc6_w) { m_port_input[PORT_C] &= ~(1 << 6); m_port_input[PORT_C] |= (state << 6); }
-WRITE_LINE_MEMBER(st6228_device::portc7_w) { m_port_input[PORT_C] &= ~(1 << 7); m_port_input[PORT_C] |= (state << 7); }
+void st6228_device::portc4_w(int state) { m_port_input[PORT_C] &= ~(1 << 4); m_port_input[PORT_C] |= (state << 4); }
+void st6228_device::portc5_w(int state) { m_port_input[PORT_C] &= ~(1 << 5); m_port_input[PORT_C] |= (state << 5); }
+void st6228_device::portc6_w(int state) { m_port_input[PORT_C] &= ~(1 << 6); m_port_input[PORT_C] |= (state << 6); }
+void st6228_device::portc7_w(int state) { m_port_input[PORT_C] &= ~(1 << 7); m_port_input[PORT_C] |= (state << 7); }
 
-WRITE_LINE_MEMBER(st6228_device::portd1_w) { m_port_input[PORT_D] &= ~(1 << 1); m_port_input[PORT_D] |= (state << 1); }
-WRITE_LINE_MEMBER(st6228_device::portd2_w) { m_port_input[PORT_D] &= ~(1 << 2); m_port_input[PORT_D] |= (state << 2); }
-WRITE_LINE_MEMBER(st6228_device::portd3_w) { m_port_input[PORT_D] &= ~(1 << 3); m_port_input[PORT_D] |= (state << 3); }
-WRITE_LINE_MEMBER(st6228_device::portd4_w) { m_port_input[PORT_D] &= ~(1 << 4); m_port_input[PORT_D] |= (state << 4); }
-WRITE_LINE_MEMBER(st6228_device::portd5_w) { m_port_input[PORT_D] &= ~(1 << 5); m_port_input[PORT_D] |= (state << 5); }
-WRITE_LINE_MEMBER(st6228_device::portd6_w) { m_port_input[PORT_D] &= ~(1 << 6); m_port_input[PORT_D] |= (state << 6); }
-WRITE_LINE_MEMBER(st6228_device::portd7_w) { m_port_input[PORT_D] &= ~(1 << 7); m_port_input[PORT_D] |= (state << 7); }
+void st6228_device::portd1_w(int state) { m_port_input[PORT_D] &= ~(1 << 1); m_port_input[PORT_D] |= (state << 1); }
+void st6228_device::portd2_w(int state) { m_port_input[PORT_D] &= ~(1 << 2); m_port_input[PORT_D] |= (state << 2); }
+void st6228_device::portd3_w(int state) { m_port_input[PORT_D] &= ~(1 << 3); m_port_input[PORT_D] |= (state << 3); }
+void st6228_device::portd4_w(int state) { m_port_input[PORT_D] &= ~(1 << 4); m_port_input[PORT_D] |= (state << 4); }
+void st6228_device::portd5_w(int state) { m_port_input[PORT_D] &= ~(1 << 5); m_port_input[PORT_D] |= (state << 5); }
+void st6228_device::portd6_w(int state) { m_port_input[PORT_D] &= ~(1 << 6); m_port_input[PORT_D] |= (state << 6); }
+void st6228_device::portd7_w(int state) { m_port_input[PORT_D] &= ~(1 << 7); m_port_input[PORT_D] |= (state << 7); }
 
 void st6228_device::gpio_set_output_bit(uint8_t index, uint8_t bit, uint8_t state)
 {
@@ -392,7 +386,7 @@ uint8_t st6228_device::gpio_option_r(offs_t offset)
 	return data;
 }
 
-WRITE_LINE_MEMBER(st6228_device::timer_w)
+void st6228_device::timer_w(int state)
 {
 	const int old = m_timer_pin;
 	m_timer_pin = state;

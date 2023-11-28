@@ -3,6 +3,11 @@
 #include "emu.h"
 #include "nscsi_bus.h"
 
+#include "util/multibyte.h"
+
+#include <cassert>
+#include <cstring>
+
 #define LOG_UNSUPPORTED (1U << 1)
 #define LOG_STATE       (1U << 2)
 #define LOG_CONTROL     (1U << 3)
@@ -198,17 +203,17 @@ nscsi_full_device::nscsi_full_device(const machine_config &mconfig, device_type 
 }
 
 const char *const nscsi_full_device::command_names[256] = {
-	/* 00 */ "TEST_UNIT_READY", "REZERO", "?", "REQUEST_SENSE", "FORMAT_UNIT", "?", "?", "REASSIGN_BLOCKS",
-	/* 08 */ "READ_6/RECIEVE", "?", "WRITE_6/SEND", "SEEK", "?", "?", "?", "?",
-	/* 10 */ "?", "?", "INQUIRY", "?", "?", "MODE_SELECT_6", "RESERVE_6", "RELEASE_6",
-	/* 18 */ "?", "?", "MODE_SENSE_6", "START_STOP_UNIT", "RECIEVE_DIAG_RES", "SEND_DIAGNOSTICS", "PREVENT_ALLOW_MEDIUM_REMOVAL", "?",
-	/* 20 */ "?", "?", "?", "READ_FORMAT_CAPACITIES", "?", "READ_CAPACITY", "?", "?",
+	/* 00 */ "TEST_UNIT_READY", "REWIND/REZERO_UNIT", "REQUEST_BLOCK_ADDRESS", "REQUEST_SENSE", "FORMAT/FORMAT_UNIT", "READ_BLOCK_LIMITS", "?", "INITIALIZE_ELEMENT_STATUS/REASSIGN_BLOCKS",
+	/* 08 */ "GET_MESSAGE_6/READ_6/RECEIVE", "?", "PRINT/SEND_MESSAGE_6/SEND_6/WRITE_6", "SEEK_6/SLEW_AND_PRINT", "SEEK_BLOCK", "?", "?", "READ_REVERSE",
+	/* 10 */ "SYNCHRONIZE_BUFFER/WRITE_FILEMARKS", "SPACE", "INQUIRY", "VERIFY_6", "RECOVER_BUFFERED_DATA", "MODE_SELECT_6", "RESERVE_6/RESERVE_UNIT", "RELEASE_6/RELEASE_UNIT",
+	/* 18 */ "COPY", "ERASE", "MODE_SENSE_6", "LOAD_UNLOAD/SCAN/STOP_PRINT/START_STOP_UNIT", "RECEIVE_DIAGNOSTIC_RESULTS", "SEND_DIAGNOSTIC", "PREVENT_ALLOW_MEDIUM_REMOVAL", "?",
+	/* 20 */ "?", "?", "?", "READ_FORMAT_CAPACITIES", "SET_WINDOW", "GET_WINDOW/READ_CAPACITY/READ_CD_RECORDED_CAPACITY", "?", "?",
 
-	/* 28 */ "READ_10", "READ_GENERATION", "WRITE_10", "SEEK_10", "ERASE_10", "READ_UPDATED_BLOCK_10", "WRITE_VERIFY", "VERIFY",
-	/* 30 */ "SEARCH_DATA_HIGH_10", "SEARCH_DATA_EQUAL_10", "SEARCH_DATA_LOW_10", "SET_LIMITS_10", "PREFETCH", "SYNC_CACHE", "LOCK_UNLOCK_CACHE", "READ_DEFECT_DATA",
-	/* 38 */ "MEDIUM_SCAN", "COMPARE", "COPY_AND_VERIFY", "WRITE_BUFFER", "READ_DATA_BUFFER", "UPDATE_BLOCK", "READ_LONG", "WRITE_LONG",
+	/* 28 */ "GET_MESSAGE_10/READ_10", "READ_GENERATION", "SEND_MESSAGE_10/SEND_10/WRITE_10", "LOCATE/POSITION_TO_ELEMENT/SEEK_10", "ERASE_10", "READ_UPDATED_BLOCK", "WRITE_AND_VERIFY_10", "VERIFY_10",
+	/* 30 */ "SEARCH_DATA_HIGH_10", "OBJECT_POSITION/SEARCH_DATA_EQUAL_10", "SEARCH_DATA_LOW_10", "SET_LIMITS_10", "PREFETCH/READ_POSITION", "SYNCHRONIZE_CACHE", "LOCK_UNLOCK_CACHE", "READ_DEFECT_DATA_10",
+	/* 38 */ "MEDIUM_SCAN", "COMPARE", "COPY_AND_VERIFY", "WRITE_BUFFER", "READ_BUFFER", "UPDATE_BLOCK", "READ_LONG", "WRITE_LONG",
 	/* 40 */ "CHANGE_DEFINITION", "WRITE_SAME", "READ_SUB_CHANNEL", "READ_TOC_PMA_ATIP", "READ_HEADER", "PLAY_AUDIO_10", "GET_CONFIGURATION", "PLAY_AUDIO_MSF",
-	/* 48 */ "PLAY_AUDIO_TRACK_INDEX", "PLAY_RELATIVE_10", "GET_EVENT_STATUS_NOTIFICATION", "PAUSE_RESUME", "LOG_SELECT", "LOG_SENSE", "STOP_PLAY_SCAN", "?",
+	/* 48 */ "PLAY_AUDIO_TRACK_INDEX", "PLAY_TRACK_RELATIVE_10", "GET_EVENT_STATUS_NOTIFICATION", "PAUSE_RESUME", "LOG_SELECT", "LOG_SENSE", "STOP_PLAY_SCAN", "?",
 	/* 50 */ "XDWRITE", "READ_DISC_INFORMATION/XPWRITE", "READ_TRACK_INFORMATION/XDREAD", "RESERVE_TRACK", "SEND_OPC_INFORMATION", "MODE_SELECT_10", "RESERVE_10", "RELEASE_10",
 	/* 58 */ "REPAIR_TRACK", "READ_MASTER_CUE", "MODE_SENSE_10", "CLOSE_TRACK_SESSION", "READ_BUFFER_CAPACITY", "SEND_CUE_SHEET", "PERSISTENT_RESERVE_IN", "PERSISTENT_RESERVE_OUT",
 	/* 80 */ "XDWRITE_EXTENDED", "REBUILD", "REGENERATE", "EXTENDED_COPY", "RECEIVE_COPY_RESULTS", "?", "?", "?",
@@ -617,15 +622,170 @@ void nscsi_full_device::scsi_data_out(int buf, int size)
 	c->param2 = size;
 }
 
+//////////////////////////////////////////////////////////////////////////////
+
+void nscsi_full_device::set_sense_data(const u8 sense_key, const u16 sense_key_code, const sense_data *data)
+{
+	assert(sizeof(scsi_sense_buffer) >= 18);
+	assert(sense_key <= 0x0f);
+	memset(scsi_sense_buffer, 0, 18);
+	if (data) {
+		scsi_sense_buffer[0] = (data->invalid ? 0 : 0x80) // even though SCSI-2 section 8.2.14 implies valid bit should always be set, other sections such as 10.2.12 disagree!
+							 | (data->deferred ? 0x71 : 0x70);
+		scsi_sense_buffer[2] = (data->filemark ? 0x80 : 0)
+							 | (data->eom ? 0x40 : 0)
+							 | (data->bad_len ? 0x20 : 0); // "incorrect length indicator"
+		put_s32be(&scsi_sense_buffer[3], data->info);
+	}
+	else
+		scsi_sense_buffer[0] = 0xf0;
+	scsi_sense_buffer[2] |= sense_key;
+	scsi_sense_buffer[7] = 10; // additional sense length
+	put_u16be(&scsi_sense_buffer[12], sense_key_code);
+}
+
 void nscsi_full_device::sense(bool deferred, uint8_t key, uint8_t asc, uint8_t ascq)
 {
-	memset(scsi_sense_buffer, 0, sizeof(scsi_sense_buffer));
-	scsi_sense_buffer[0] = deferred ? 0x71 : 0x70;
-	scsi_sense_buffer[2] = key;
-	scsi_sense_buffer[7] = sizeof(scsi_sense_buffer) - 8;
-	scsi_sense_buffer[12] = asc;
-	scsi_sense_buffer[13] = ascq;
+	sense_data s;
+	s.deferred = deferred;
+	set_sense_data(key, (asc << 8) | ascq, &s);
 }
+
+void nscsi_full_device::report_condition(const u8 sense_key, const u16 sense_key_code, const sense_data *data)
+{
+	set_sense_data(sense_key, sense_key_code, data);
+	scsi_status_complete(SS_CHECK_CONDITION);
+}
+
+void nscsi_full_device::report_bad_lun(const u8 cmd, const u8 lun)
+{
+	LOG("%s (0x%02x) lun=%d\n    *** BAD LUN\n", command_names[cmd], cmd, lun);
+	report_condition(SK_ILLEGAL_REQUEST, SKC_LOGICAL_UNIT_NOT_SUPPORTED);
+}
+
+void nscsi_full_device::report_bad_cmd(const u8 cmd)
+{
+	LOG("%s (0x%02x)\n    *** BAD COMMAND\n", command_names[cmd], cmd);
+	report_condition(SK_ILLEGAL_REQUEST, SKC_INVALID_COMMAND_OPERATION_CODE);
+}
+
+void nscsi_full_device::report_filemark(const s32 info, const bool eom)
+{
+	LOG("    *** FILEMARK info=%d\n", info);
+	sense_data s;
+	s.filemark = true;
+	s.eom = eom;
+	s.info = info;
+	report_condition(SK_NO_SENSE, SKC_FILEMARK_DETECTED, &s);
+}
+
+void nscsi_full_device::report_bom(const s32 info)
+{
+	LOG("    *** BOM info=%d\n", info);
+	sense_data s;
+	s.eom = true;
+	s.info = info;
+	report_condition(SK_NO_SENSE, SKC_BEGINNING_OF_PARTITION_MEDIUM_DETECTED, &s);
+}
+
+void nscsi_full_device::report_ew(const s32 info)
+{
+	LOG("    EW info=%d\n", info);
+	sense_data s;
+	s.eom = true;
+	s.info = info;
+	report_condition(SK_NO_SENSE, SKC_END_OF_PARTITION_MEDIUM_DETECTED, &s);
+}
+
+void nscsi_full_device::report_eod(const s32 info, const bool eom)
+{
+	LOG("    *** EOD info=%d\n", info);
+	sense_data s;
+	s.eom = eom;
+	s.info = info;
+	report_condition(SK_BLANK_CHECK, SKC_END_OF_DATA_DETECTED, &s);
+}
+
+void nscsi_full_device::report_eom(const bool write, const s32 info, const bool invalid)
+{
+	LOG("    *** EOM info=%d invalid=%d\n", info, invalid);
+	sense_data s;
+	s.invalid = invalid;
+	s.eom = true;
+	s.info = info;
+	report_condition(write ? SK_VOLUME_OVERFLOW : SK_MEDIUM_ERROR, SKC_END_OF_PARTITION_MEDIUM_DETECTED, &s);
+}
+
+void nscsi_full_device::report_bad_len(const bool over, const s32 info)
+{
+	LOG("    *** %sLENGTH BLOCK info=%d\n", over ? "OVER" : "UNDER", info);
+	sense_data s;
+	s.bad_len = true;
+	s.info = info;
+	report_condition(SK_ILLEGAL_REQUEST, SKC_NO_ADDITIONAL_SENSE_INFORMATION, &s);
+}
+
+void nscsi_full_device::report_bad_cdb_field()
+{
+	LOG("    *** BAD CDB FIELD\n");
+	report_condition(SK_ILLEGAL_REQUEST, SKC_INVALID_FIELD_IN_CDB);
+}
+
+void nscsi_full_device::report_bad_pl_field()
+{
+	LOG("    *** BAD PARAMETER LIST FIELD\n");
+	report_condition(SK_ILLEGAL_REQUEST, SKC_INVALID_FIELD_IN_PARAMETER_LIST);
+}
+
+void nscsi_full_device::report_bad_pl_len()
+{
+	LOG("    *** BAD PARAMETER LIST LENGTH\n");
+	report_condition(SK_ILLEGAL_REQUEST, SKC_PARAMETER_LIST_LENGTH_ERROR);
+}
+
+void nscsi_full_device::report_no_saving_params()
+{
+	LOG("    *** NO SAVING PARAMETERS\n");
+	report_condition(SK_ILLEGAL_REQUEST, SKC_SAVING_PARAMETERS_NOT_SUPPORTED);
+}
+
+void nscsi_full_device::report_no_medium()
+{
+	LOG("    *** NO MEDIUM\n");
+	report_condition(SK_NOT_READY, SKC_MEDIUM_NOT_PRESENT);
+}
+
+void nscsi_full_device::report_medium_changed()
+{
+	LOG("    MEDIUM CHANGED\n");
+	report_condition(SK_UNIT_ATTENTION, SKC_NOT_READY_TO_READY_TRANSITION_MEDIUM_MAY_HAVE_CHANGED);
+}
+
+void nscsi_full_device::report_read_only()
+{
+	LOG("    *** READ ONLY\n");
+	report_condition(SK_DATA_PROTECT, SKC_WRITE_PROTECTED);
+}
+
+void nscsi_full_device::report_read_failure()
+{
+	LOG("    *** READ FAILURE\n");
+	report_condition(SK_MEDIUM_ERROR, SKC_UNRECOVERED_READ_ERROR);
+}
+
+void nscsi_full_device::report_write_failure()
+{
+	LOG("    *** WRITE FAILURE\n");
+	report_condition(SK_MEDIUM_ERROR, SKC_WRITE_ERROR);
+}
+
+void nscsi_full_device::report_erase_failure()
+{
+	LOG("    *** ERASE FAILURE\n");
+	report_condition(SK_MEDIUM_ERROR, SKC_ERASE_FAILURE);
+}
+
+//////////////////////////////////////////////////////////////////////////////
 
 void nscsi_full_device::scsi_unknown_command()
 {
@@ -640,20 +800,32 @@ void nscsi_full_device::scsi_unknown_command()
 
 void nscsi_full_device::scsi_command()
 {
-	switch(scsi_cmdbuf[0]) {
-	case SC_REZERO:
-		LOG("command REZERO\n");
+	const u8 cmd = scsi_cmdbuf[0];
+	const u8 lun = get_lun(scsi_cmdbuf[1] >> 5); // LUN may be overridden by IDENTIFY, per SCSI-2 section 7.2.2
+	switch(cmd) {
+	case SC_REZERO_UNIT:
+		LOG("command REZERO UNIT\n");
 		scsi_status_complete(SS_GOOD);
 		break;
 	case SC_REQUEST_SENSE:
-		LOG("command REQUEST SENSE alloc=%d\n", scsi_cmdbuf[4]);
-		scsi_data_in(SBUF_SENSE, scsi_cmdbuf[4] ? std::min(scsi_cmdbuf[4], u8(sizeof(scsi_sense_buffer))) : 4);
-		scsi_status_complete(SS_GOOD);
+		handle_request_sense(lun);
 		break;
 	default:
 		scsi_unknown_command();
 		break;
 	}
+}
+
+void nscsi_full_device::handle_request_sense(const u8 lun) // mandatory; SCSI-2 section 8.2.14
+{
+	const u8 alloc_len = scsi_cmdbuf[4]; // allocation length
+	LOG("command REQUEST SENSE lun=%d alloc_len=%d\n", lun, alloc_len);
+	if ((scsi_cmdbuf[1] & 0x1f) || scsi_cmdbuf[2] || scsi_cmdbuf[3]) // error: reserved bits set
+		return report_bad_cdb_field();
+
+	assert(sizeof(scsi_sense_buffer) >= 18);
+	scsi_data_in(SBUF_SENSE, std::min(18, (const int)alloc_len));
+	scsi_status_complete(SS_GOOD);
 }
 
 void nscsi_full_device::scsi_message()

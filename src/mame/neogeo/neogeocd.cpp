@@ -846,9 +846,8 @@ void ngcd_state::machine_start()
 	m_sprgen->set_fixed_regions(m_fix_ram.get(), 0x20000, nullptr);
 	m_sprgen->neogeo_set_fixed_layer_source(1);
 
-	// irq levels for NEOCD (swapped compared to MVS / AES)
-	m_vblank_level = 2;
-	m_raster_level = 1;
+	m_vblank_level = 1;
+	m_raster_level = 3;
 
 	// initialize the memcard data structure
 	// NeoCD doesn't have memcard slots, rather, it has a larger internal memory which works the same
@@ -904,7 +903,10 @@ void ngcd_state::neocd_main_map(address_map &map)
 void ngcd_state::neocd_vector_map(address_map &map)
 {
 	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
-	map(0xfffff9, 0xfffff9).r(FUNC(ngcd_state::cdc_irq_ack));
+
+	map(0xfffff3, 0xfffff3).lr8(NAME([]() { return m68000_base_device::autovector(2); }));
+	map(0xfffff5, 0xfffff5).r(FUNC(ngcd_state::cdc_irq_ack));
+	map(0xfffff7, 0xfffff7).lr8(NAME([]() { return m68000_base_device::autovector(1); }));
 }
 
 
@@ -1006,19 +1008,19 @@ void ngcd_state::irq_update(uint8_t byteValue)
 		if ((m_irq_ack & 0x08) == 0) {
 			m_irq_vector = 0x17;
 			m_irq_vector_ack = 1;
-			m_maincpu->set_input_line(4, HOLD_LINE);
+			m_maincpu->set_input_line(2, HOLD_LINE);
 			return;
 		}
 		if ((m_irq_ack & 0x10) == 0) {
 			m_irq_vector = 0x16;
 			m_irq_vector_ack = 1;
-			m_maincpu->set_input_line(4, HOLD_LINE);
+			m_maincpu->set_input_line(2, HOLD_LINE);
 			return;
 		}
 		if ((m_irq_ack & 0x20) == 0) {
 			m_irq_vector = 0x15;
 			m_irq_vector_ack = 1;
-			m_maincpu->set_input_line(4, HOLD_LINE);
+			m_maincpu->set_input_line(2, HOLD_LINE);
 			return;
 		}
 	}
@@ -1049,7 +1051,8 @@ void ngcd_state::neocd_ntsc(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ngcd_state::neocd_audio_map);
 	m_audiocpu->set_addrmap(AS_IO, &ngcd_state::neocd_audio_io_map);
 
-	subdevice<hc259_device>("systemlatch")->q_out_cb<1>().set_log("NeoCD: write to regular vector change address?"); // what IS going on with "neocdz doubledr" and why do games write here if it's hooked up to nothing?
+	// what IS going on with "neocdz doubledr" and why do games write here if it's hooked up to nothing?
+	subdevice<hc259_device>("systemlatch")->q_out_cb<1>().set([this](int state) { logerror("%s NeoCD: write %d to regular vector change address?\n", machine().describe_context(), state); });
 
 	m_screen->set_screen_update(FUNC(ngcd_state::screen_update));
 
@@ -1086,9 +1089,9 @@ ROM_START( neocd )
 	ROMX_LOAD("top-sp1.bin",    0x00000, 0x80000, CRC(c36a47c0) SHA1(235f4d1d74364415910f73c10ae5482d90b4274f), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "front",   "Front loading Neo-Geo CD" )
 	ROMX_LOAD("front-sp1.bin",    0x00000, 0x80000, CRC(cac62307) SHA1(53bc1f283cdf00fa2efbb79f2e36d4c8038d743a), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1))
-	ROM_SYSTEM_BIOS( 2, "unibios32", "Universe Bios (Hack, Ver. 3.2)" )
+	ROM_SYSTEM_BIOS( 2, "unibios32", "Universe BIOS (Hack, Ver. 3.2)" )
 	ROMX_LOAD("uni-bioscd32.rom",    0x00000, 0x80000, CRC(0ffb3127) SHA1(5158b728e62b391fb69493743dcf7abbc62abc82), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(2))
-	ROM_SYSTEM_BIOS( 3, "unibios33", "Universe Bios (Hack, Ver. 3.3)" )
+	ROM_SYSTEM_BIOS( 3, "unibios33", "Universe BIOS (Hack, Ver. 3.3)" )
 	ROMX_LOAD("uni-bioscd33.rom",    0x00000, 0x80000, CRC(ff3abc59) SHA1(5142f205912869b673a71480c5828b1eaed782a8), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(3))
 
 	ROM_REGION( 0x20000, "spritegen:zoomy", 0 )
@@ -1099,9 +1102,9 @@ ROM_START( neocdz )
 	ROM_REGION16_BE( 0x80000, "mainbios", 0 )
 	ROM_SYSTEM_BIOS( 0, "official",   "Official BIOS" )
 	ROMX_LOAD("neocd.bin",    0x00000, 0x80000, CRC(df9de490) SHA1(7bb26d1e5d1e930515219cb18bcde5b7b23e2eda), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(0))
-	ROM_SYSTEM_BIOS( 1, "unibios32", "Universe Bios (Hack, Ver. 3.2)" )
+	ROM_SYSTEM_BIOS( 1, "unibios32", "Universe BIOS (Hack, Ver. 3.2)" )
 	ROMX_LOAD("uni-bioscd32.rom",    0x00000, 0x80000, CRC(0ffb3127) SHA1(5158b728e62b391fb69493743dcf7abbc62abc82), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1))
-	ROM_SYSTEM_BIOS( 2, "unibios33", "Universe Bios (Hack, Ver. 3.3)" )
+	ROM_SYSTEM_BIOS( 2, "unibios33", "Universe BIOS (Hack, Ver. 3.3)" )
 	ROMX_LOAD("uni-bioscd33.rom",    0x00000, 0x80000, CRC(ff3abc59) SHA1(5142f205912869b673a71480c5828b1eaed782a8), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(2))
 
 	ROM_REGION( 0x20000, "spritegen:zoomy", 0 )

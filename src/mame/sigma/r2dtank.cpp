@@ -81,7 +81,7 @@ public:
 
 	void r2dtank(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER(ttl74123_output_r);
+	int ttl74123_output_r();
 
 protected:
 	virtual void machine_start() override;
@@ -107,14 +107,14 @@ private:
 	void audio_command_w(uint8_t data);
 	uint8_t audio_answer_r();
 	void audio_answer_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(main_cpu_irq);
+	void main_cpu_irq(int state);
 	void AY8910_select_w(uint8_t data);
 	uint8_t AY8910_port_r();
 	void AY8910_port_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
+	void flipscreen_w(int state);
 	void pia_comp_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(ttl74123_output_changed);
+	void ttl74123_output_changed(int state);
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
@@ -129,7 +129,7 @@ private:
  *
  *************************************/
 
-WRITE_LINE_MEMBER(r2dtank_state::main_cpu_irq)
+void r2dtank_state::main_cpu_irq(int state)
 {
 	int combined_state = m_pia_main->irq_a_state() | m_pia_main->irq_b_state() |
 							m_pia_audio->irq_a_state() | m_pia_audio->irq_b_state();
@@ -237,14 +237,14 @@ void r2dtank_state::AY8910_port_w(uint8_t data)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(r2dtank_state::ttl74123_output_changed)
+void r2dtank_state::ttl74123_output_changed(int state)
 {
 	m_pia_main->ca1_w(state);
 	m_ttl74123_output = state;
 }
 
 
-READ_LINE_MEMBER(r2dtank_state::ttl74123_output_r)
+int r2dtank_state::ttl74123_output_r()
 {
 	return m_ttl74123_output;
 }
@@ -272,7 +272,7 @@ void r2dtank_state::machine_start()
  *************************************/
 
 
-WRITE_LINE_MEMBER(r2dtank_state::flipscreen_w)
+void r2dtank_state::flipscreen_w(int state)
 {
 	m_flipscreen = !state;
 }
@@ -482,14 +482,14 @@ void r2dtank_state::r2dtank(machine_config &config)
 	ttl74123.set_clear_pin_value(1);                    /* Clear pin - pulled high */
 	ttl74123.out_cb().set(FUNC(r2dtank_state::ttl74123_output_changed));
 
-	PIA6821(config, m_pia_main, 0);
+	PIA6821(config, m_pia_main);
 	m_pia_main->readpa_handler().set_ioport("IN0");
 	m_pia_main->readpb_handler().set_ioport("IN1");
 	m_pia_main->cb2_handler().set(FUNC(r2dtank_state::flipscreen_w));
 	m_pia_main->irqa_handler().set(FUNC(r2dtank_state::main_cpu_irq));
 	m_pia_main->irqb_handler().set(FUNC(r2dtank_state::main_cpu_irq));
 
-	PIA6821(config, m_pia_audio, 0);
+	PIA6821(config, m_pia_audio);
 	m_pia_audio->readpa_handler().set(FUNC(r2dtank_state::AY8910_port_r));
 	m_pia_audio->writepa_handler().set(FUNC(r2dtank_state::AY8910_port_w));
 	m_pia_audio->writepb_handler().set(FUNC(r2dtank_state::AY8910_select_w));

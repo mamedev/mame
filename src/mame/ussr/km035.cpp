@@ -274,8 +274,6 @@ km035_device::km035_device(const machine_config &mconfig, const char *tag, devic
 
 void km035_device::device_start()
 {
-	m_tx_handler.resolve_safe();
-	m_rts_handler.resolve_safe();
 }
 
 
@@ -289,7 +287,7 @@ void km035_device::device_reset()
 }
 
 
-WRITE_LINE_MEMBER(km035_device::write_rxd)
+void km035_device::write_rxd(int state)
 {
 	LOG("write_rxd %d\n", state);
 	m_maincpu->set_input_line(MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);

@@ -617,12 +617,6 @@ ste_video_device::ste_video_device(const machine_config &mconfig, const char *ta
 }
 
 
-void stx_video_device::device_resolve_objects()
-{
-	m_de_callback.resolve_safe();
-}
-
-
 void stx_video_device::device_start()
 {
 	m_shifter_timer = timer_alloc(FUNC(stx_video_device::shifter_tick), this);

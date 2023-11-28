@@ -5,7 +5,7 @@
 
 Fidelity Chesster Challenger
 
-These were made after Hegener + Glaser took over Fidelity(design phase started
+These were made after Hegener + Glaser took over Fidelity (design phase started
 before that). Kishon Chesster was released under both Fidelity, and Mephisto brands.
 
 ********************************************************************************
@@ -37,7 +37,7 @@ the S14001A in the 70s), this time a 65C02 software solution.
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_chesster.lh" // clickable
+#include "fidel_chesster.lh"
 
 
 namespace {
@@ -71,16 +71,16 @@ private:
 	required_device<pwm_display_device> m_display;
 	required_ioport m_inputs;
 
+	int m_numbanks = 0;
+	u8 m_speech_bank = 0;
+	u8 m_select = 0;
+
 	// address maps
 	void main_map(address_map &map);
 
 	// I/O handlers
 	void control_w(offs_t offset, u8 data);
 	u8 input_r(offs_t offset);
-
-	int m_numbanks = 0;
-	u8 m_speech_bank = 0;
-	u8 m_select = 0;
 };
 
 void chesster_state::init_chesster()
@@ -101,8 +101,6 @@ void chesster_state::machine_start()
 /*******************************************************************************
     I/O
 *******************************************************************************/
-
-// TTL/generic
 
 void chesster_state::control_w(offs_t offset, u8 data)
 {
@@ -186,7 +184,7 @@ void chesster_state::chesster(machine_config &config)
 	R65C02(config, m_maincpu, 5_MHz_XTAL); // RP65C02G
 	m_maincpu->set_addrmap(AS_PROGRAM, &chesster_state::main_map);
 
-	auto &irq_clock(CLOCK(config, "irq_clock", 9500)); // from 555 timer, measured (9.6kHz on a Chesster, 9.3kHz on a Kishon)
+	auto &irq_clock(CLOCK(config, "irq_clock", 9600)); // from 555 timer, measured (9.6kHz on a Chesster, 9.3kHz on a Kishon)
 	irq_clock.set_pulse_width(attotime::from_nsec(2600)); // active for 2.6us
 	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 

@@ -8,7 +8,7 @@ license:CC0-1.0
 
 	<element name="led" defstate="0">
 		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
-		<disk state="0"><color red="0.17" green="0.015" blue="0.02" /></disk>
+		<disk state="0"><color red="0.14" green="0.014" blue="0.02" /></disk>
 	</element>
 
 	<element name="text_10">
@@ -480,8 +480,8 @@ license:CC0-1.0
 		<element name="digit2" ref="digit"><bounds x="43.0" y="91" width="4" height="6" /></element>
 		<element name="digit3" ref="digit"><bounds x="47.5" y="91" width="4" height="6" /></element>
 
-		<element name="lcd0.16" ref="ldot"><bounds x="42.13" y="92.55" width="0.6" height="0.6" /></element>
-		<element name="lcd0.16" ref="ldot"><bounds x="41.97" y="94.75" width="0.6" height="0.6" /></element>
+		<element name="lcd0.16" ref="ldot"><bounds xc="42.45" yc="92.25" width="0.6" height="0.6" /></element>
+		<element name="lcd0.16" ref="ldot"><bounds xc="42.15" yc="95.65" width="0.6" height="0.6" /></element>
 	</group>
 
 	<group name="lcd2">
@@ -492,8 +492,8 @@ license:CC0-1.0
 		<element name="digit6" ref="digit"><bounds x="43.0" y="91" width="4" height="6" /></element>
 		<element name="digit7" ref="digit"><bounds x="47.5" y="91" width="4" height="6" /></element>
 
-		<element name="lcd1.16" ref="ldot"><bounds x="42.13" y="92.55" width="0.6" height="0.6" /></element>
-		<element name="lcd1.16" ref="ldot"><bounds x="41.97" y="94.75" width="0.6" height="0.6" /></element>
+		<element name="lcd1.16" ref="ldot"><bounds xc="42.45" yc="92.25" width="0.6" height="0.6" /></element>
+		<element name="lcd1.16" ref="ldot"><bounds xc="42.15" yc="95.65" width="0.6" height="0.6" /></element>
 	</group>
 
 
@@ -516,23 +516,23 @@ license:CC0-1.0
 		<rect state="1"><color red="0.65" green="0.65" blue="0.66" /></rect>
 	</element>
 
-	<element name="text_l1"><text string="NEW GAME" align="2"><color red="1" green="1" blue="1" /></text></element>
-	<element name="text_l2"><text string="ENTER POSITION" align="2"><color red="1" green="1" blue="1" /></text></element>
-	<element name="text_l3"><text string="SOUND/COLOR" align="2"><color red="1" green="1" blue="1" /></text></element>
-	<element name="text_l4"><text string="LIBRARY/CLEARBOARD" align="2"><color red="1" green="1" blue="1" /></text></element>
-	<element name="text_l5"><text string="REPLAY" align="2"><color red="1" green="1" blue="1" /></text></element>
-	<element name="text_l6"><text string="HINT" align="2"><color red="1" green="1" blue="1" /></text></element>
-	<element name="text_l7"><text string="LEVEL" align="2"><color red="1" green="1" blue="1" /></text></element>
-	<element name="text_l8"><text string="MULTI MOVE" align="2"><color red="1" green="1" blue="1" /></text></element>
-	<element name="text_l9"><text string="TAKE BACK" align="2"><color red="1" green="1" blue="1" /></text></element>
-	<element name="text_l10"><text string="MOVE" align="2"><color red="1" green="1" blue="1" /></text></element>
+	<element name="text_l1"><text string="NEW GAME" align="2"></text></element>
+	<element name="text_l2"><text string="ENTER POSITION" align="2"></text></element>
+	<element name="text_l3"><text string="SOUND/COLOR" align="2"></text></element>
+	<element name="text_l4"><text string="LIBRARY/CLEARBOARD" align="2"></text></element>
+	<element name="text_l5"><text string="REPLAY" align="2"></text></element>
+	<element name="text_l6"><text string="HINT" align="2"></text></element>
+	<element name="text_l7"><text string="LEVEL" align="2"></text></element>
+	<element name="text_l8"><text string="MULTI MOVE" align="2"></text></element>
+	<element name="text_l9"><text string="TAKE BACK" align="2"></text></element>
+	<element name="text_l10"><text string="MOVE" align="2"></text></element>
 
-	<element name="text_l11"><text string="ERROR" align="2"><color red="1" green="1" blue="1" /></text></element>
-	<element name="text_l12"><text string="CHECK" align="2"><color red="1" green="1" blue="1" /></text></element>
-	<element name="text_l13"><text string="MATE" align="2"><color red="1" green="1" blue="1" /></text></element>
-	<element name="text_l14"><text string="DRAW" align="2"><color red="1" green="1" blue="1" /></text></element>
-	<element name="text_l15"><text string="3RD REPET" align="2"><color red="1" green="1" blue="1" /></text></element> <!-- sic -->
-	<element name="text_l16"><text string="RESIGN" align="2"><color red="1" green="1" blue="1" /></text></element>
+	<element name="text_l11"><text string="ERROR" align="2"></text></element>
+	<element name="text_l12"><text string="CHECK" align="2"></text></element>
+	<element name="text_l13"><text string="MATE" align="2"></text></element>
+	<element name="text_l14"><text string="DRAW" align="2"></text></element>
+	<element name="text_l15"><text string="3RD REPET" align="2"></text></element> <!-- sic -->
+	<element name="text_l16"><text string="RESIGN" align="2"></text></element>
 
 	<element name="text_p1"><image file="chess/wk.svg"/></element>
 	<element name="text_p2"><image file="chess/wq.svg"/></element>
@@ -609,7 +609,7 @@ license:CC0-1.0
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="-6.5" right="123.5" top="6" bottom="94" />
+		<bounds left="-6" right="123.5" top="6" bottom="94" />
 
 		<group ref="panel"><bounds x="92.5" y="-5.6" width="50" height="100" /></group>
 

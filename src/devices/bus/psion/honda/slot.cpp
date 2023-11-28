@@ -48,8 +48,12 @@ device_psion_honda_interface::device_psion_honda_interface(const machine_config 
 psion_honda_slot_device::psion_honda_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PSION_HONDA_SLOT, tag, owner, clock)
 	, device_single_card_slot_interface<device_psion_honda_interface>(mconfig, *this)
+	, m_rxd_handler(*this)
+	, m_dcd_handler(*this)
+	, m_dsr_handler(*this)
+	, m_cts_handler(*this)
+	, m_sdoe_handler(*this)
 	, m_card(nullptr)
-	, m_int_cb(*this)
 {
 }
 
@@ -61,9 +65,6 @@ psion_honda_slot_device::psion_honda_slot_device(const machine_config &mconfig, 
 void psion_honda_slot_device::device_start()
 {
 	m_card = get_card_device();
-
-	// resolve callbacks
-	m_int_cb.resolve_safe();
 }
 
 
@@ -85,6 +86,24 @@ void psion_honda_slot_device::data_w(uint16_t data)
 {
 	if (m_card)
 		m_card->data_w(data);
+}
+
+void psion_honda_slot_device::write_txd(int state)
+{
+	if (m_card)
+		m_card->write_txd(state);
+}
+
+void psion_honda_slot_device::write_dtr(int state)
+{
+	if (m_card)
+		m_card->write_dtr(state);
+}
+
+void psion_honda_slot_device::write_rts(int state)
+{
+	if (m_card)
+		m_card->write_rts(state);
 }
 
 

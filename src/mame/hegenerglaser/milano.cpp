@@ -17,11 +17,12 @@ Nigel Short is basically a Milano 2.00
 
 #include "emu.h"
 
+#include "mmdisplay2.h"
+
 #include "cpu/m6502/r65c02.h"
 #include "machine/74259.h"
 #include "machine/nvram.h"
 #include "machine/sensorboard.h"
-#include "mmdisplay2.h"
 #include "video/pwm.h"
 
 // internal artwork
@@ -54,6 +55,9 @@ private:
 	required_device<pwm_display_device> m_led_pwm;
 	required_ioport m_keys;
 
+	u8 m_board_mux = 0;
+	u8 m_led_data = 0;
+
 	void milano_mem(address_map &map);
 
 	void update_leds();
@@ -61,9 +65,6 @@ private:
 	void board_w(u8 data);
 	u8 board_r();
 	u8 keys_r(offs_t offset);
-
-	u8 m_board_mux = 0;
-	u8 m_led_data = 0;
 };
 
 void milano_state::machine_start()

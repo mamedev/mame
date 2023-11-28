@@ -33,7 +33,7 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_dsc.lh" // clickable
+#include "fidel_dsc.lh"
 
 
 namespace {
@@ -64,6 +64,9 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<2> m_inputs;
 
+	u8 m_inp_mux = 0;
+	u8 m_led_select = 0;
+
 	// address maps
 	void main_map(address_map &map);
 
@@ -75,9 +78,6 @@ private:
 
 	void init_board(int state);
 	u8 read_board_row(u8 row);
-
-	u8 m_inp_mux = 0;
-	u8 m_led_select = 0;
 };
 
 void dsc_state::machine_start()

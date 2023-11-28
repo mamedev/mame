@@ -77,19 +77,19 @@ vt5x_cpu_device::vt5x_cpu_device(const machine_config &mconfig, device_type type
 	, m_ram_config("data", ENDIANNESS_LITTLE, 8, 6 + ybits, 0) // actually 7 bits wide
 	, m_baud_9600_callback(*this)
 	, m_vert_count_callback(*this)
-	, m_uart_rd_callback(*this)
+	, m_uart_rd_callback(*this, 0)
 	, m_uart_xd_callback(*this)
-	, m_ur_flag_callback(*this)
-	, m_ut_flag_callback(*this)
+	, m_ur_flag_callback(*this, 0)
+	, m_ut_flag_callback(*this, 0)
 	, m_ruf_callback(*this)
-	, m_key_up_callback(*this)
-	, m_kclk_callback(*this)
-	, m_frq_callback(*this)
+	, m_key_up_callback(*this, 1)
+	, m_kclk_callback(*this, 1)
+	, m_frq_callback(*this, 1)
 	, m_bell_callback(*this)
 	, m_cen_callback(*this)
-	, m_csf_callback(*this)
-	, m_ccf_callback(*this)
-	, m_char_data_callback(*this)
+	, m_csf_callback(*this, 1)
+	, m_ccf_callback(*this, 1)
+	, m_char_data_callback(*this, 0177)
 	, m_bbits(bbits)
 	, m_ybits(ybits)
 	, m_pc(0)
@@ -161,33 +161,6 @@ void vt5x_cpu_device::device_config_complete()
 
 	if (!screen().refresh_attoseconds())
 		screen().set_raw(clock(), 900, 128, 848, 256, 4, 244); // 60 Hz default parameters
-}
-
-void vt5x_cpu_device::device_resolve_objects()
-{
-	// resolve callbacks
-	m_baud_9600_callback.resolve_safe();
-	m_vert_count_callback.resolve_safe();
-	m_uart_rd_callback.resolve_safe(0);
-	m_uart_xd_callback.resolve_safe();
-	m_ur_flag_callback.resolve_safe(0);
-	m_ut_flag_callback.resolve_safe(0);
-	m_ruf_callback.resolve_safe();
-	m_key_up_callback.resolve_safe(1);
-	m_kclk_callback.resolve_safe(1);
-	m_frq_callback.resolve_safe(1);
-	m_bell_callback.resolve_safe();
-	m_cen_callback.resolve_safe();
-	m_csf_callback.resolve_safe(1);
-	m_ccf_callback.resolve_safe(1);
-	m_char_data_callback.resolve_safe(0177);
-}
-
-void vt52_cpu_device::device_resolve_objects()
-{
-	vt5x_cpu_device::device_resolve_objects();
-
-	m_graphic_callback.resolve_safe();
 }
 
 void vt5x_cpu_device::device_start()

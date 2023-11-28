@@ -96,13 +96,6 @@ void archimedes_exp_device::memc_map(address_map &map)
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void archimedes_exp_device::device_resolve_objects()
-{
-	// resolve callbacks
-	m_out_pirq_cb.resolve_safe();
-	m_out_pfiq_cb.resolve_safe();
-}
-
 void archimedes_exp_device::device_start()
 {
 	m_ioc = &space(AS_IO);

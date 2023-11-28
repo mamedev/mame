@@ -9,11 +9,7 @@
   Who Wants to Know? (wwtk@mail.com)
 
   This core is written with the advise and consent of Matthew Conte and is
-  released under the GNU Public License.  This core is freely available for
-  use in any freeware project, subject to the following terms:
-
-  Any modifications to this code must be duly noted in the source and
-  approved by Matthew Conte and myself prior to public submission.
+  released under the GNU Public License.
 
   timing notes:
   master = 21477270
@@ -55,7 +51,7 @@ nesapu_device::nesapu_device(const machine_config &mconfig, device_type type, co
 	, m_samps_per_sync(0)
 	, m_stream(nullptr)
 	, m_irq_handler(*this)
-	, m_mem_read_cb(*this)
+	, m_mem_read_cb(*this, 0x00)
 	, m_frame_timer(nullptr)
 {
 }
@@ -114,10 +110,6 @@ void nesapu_device::calculate_rates()
 
 void nesapu_device::device_start()
 {
-	// resolve callbacks
-	m_irq_handler.resolve_safe();
-	m_mem_read_cb.resolve_safe(0x00);
-
 	m_frame_timer = timer_alloc(FUNC(nesapu_device::frame_timer_cb), this);
 	m_frame_clocks = m_is_pal ? 33254 : 29830;
 	m_frame_period = clocks_to_attotime(m_frame_clocks);

@@ -198,8 +198,6 @@ ioport_constructor sgi_gr1_device::device_input_ports() const
 
 void sgi_gr1_device::device_start()
 {
-	m_int_fifo_cb.resolve_safe();
-
 	//save_item(NAME());
 
 	m_reset = true;

@@ -89,18 +89,6 @@ psion_ssd_device::~psion_ssd_device()
 
 
 //-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void psion_ssd_device::device_resolve_objects()
-{
-	m_door_cb.resolve_safe();
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -170,21 +158,43 @@ TIMER_CALLBACK_MEMBER(psion_ssd_device::close_door)
 
 std::pair<std::error_condition, std::string> psion_ssd_device::call_load()
 {
-	device_image_interface *image = nullptr;
-	interface(image);
-
-	uint32_t size = image->length();
+	uint32_t const size = length();
 
 	if (size < 0x10000 || size > 0x800000 || (size & (size - 1)) != 0)
 		return std::make_pair(image_error::INVALIDLENGTH, "Invalid size, must be 64K, 128K, 256K, 512K, 1M, 2M, 4M, 8M");
 
-	image->fread(m_ssd_data.get(), size);
+	if (fread(m_ssd_data, size) != size)
+		return std::make_pair(std::errc::io_error, std::string());
 
 	// check for Flash header
 	if ((m_ssd_data[0] | (m_ssd_data[1] << 8)) == 0xf1a5) // Flash
 		set_info_byte(size, SSD_FLASH1);
 	else
 		set_info_byte(size, SSD_RAM);
+
+	if (loaded_through_softlist())
+		battery_load(m_ssd_data.get(), size, nullptr);
+
+	// open the door
+	m_door_cb(ASSERT_LINE);
+
+	// setup the timer to close the door
+	m_door_timer->adjust(attotime::from_msec(200));
+
+	return std::make_pair(std::error_condition(), std::string());
+}
+
+
+std::pair<std::error_condition, std::string> psion_ssd_device::call_create(int format_type, util::option_resolution *create_args)
+{
+	uint32_t const size = 0x20000;
+
+	// 128k RAM Solid State Disk by default
+	set_info_byte(size, SSD_RAM);
+
+	std::fill_n(m_ssd_data.get(), sizeof(m_ssd_data), 0);
+
+	fwrite(m_ssd_data.get(), size);
 
 	// open the door
 	m_door_cb(ASSERT_LINE);
@@ -198,8 +208,32 @@ std::pair<std::error_condition, std::string> psion_ssd_device::call_load()
 
 void psion_ssd_device::call_unload()
 {
-	memset(m_ssd_data.get(), 0, sizeof(m_ssd_data));
+	uint32_t const size = length();
+
+	if ((m_info_byte & 0xe0) == 0x00) // not write protected
+	{
+		if (!loaded_through_softlist())
+		{
+			// write to original file
+			fseek(0, SEEK_SET);
+			fwrite(m_ssd_data.get(), size);
+		}
+		else
+		{
+			// write to nvram
+			battery_save(m_ssd_data.get(), size);
+		}
+	}
+
 	set_info_byte(0);
+
+	std::fill_n(m_ssd_data.get(), sizeof(m_ssd_data), 0);
+
+	// open the door
+	m_door_cb(ASSERT_LINE);
+
+	// setup the timer to close the door
+	m_door_timer->adjust(attotime::from_msec(200));
 }
 
 
@@ -215,7 +249,7 @@ void psion_ssd_device::set_info_byte(uint32_t size, uint8_t type)
 
 	// Type 1 Flash or RAM
 	if (type != SSD_RAM)
-		m_info_byte |= 0x20;
+		m_info_byte |= 0xe0; // write protected
 
 	// No. devices and size
 	switch (size)
@@ -229,9 +263,6 @@ void psion_ssd_device::set_info_byte(uint32_t size, uint8_t type)
 	case 0x400000: m_info_byte |= 0x1e; m_mem_width = 20; break; // 4M   (4 x 1M)
 	case 0x800000: m_info_byte |= 0x1f; m_mem_width = 21; break; // 8M   (4 x 2M)
 	}
-
-	// write protected
-	m_info_byte |= 0xe0;
 
 	// set pull-ups on ASIC5
 	m_asic5->set_info_byte(m_info_byte);
@@ -247,7 +278,7 @@ uint8_t psion_ssd_device::data_r()
 	return 0x00;
 }
 
-void  psion_ssd_device::data_w(uint16_t data)
+void psion_ssd_device::data_w(uint16_t data)
 {
 	if (m_info_byte & 7)
 	{

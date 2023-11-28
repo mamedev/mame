@@ -100,7 +100,7 @@
  *
  *************************************/
 
-WRITE_LINE_MEMBER(tutankhm_state::vblank_irq)
+void tutankhm_state::vblank_irq(int state)
 {
 	/* flip flops cause the interrupt to be signalled every other frame */
 	if (state)
@@ -112,7 +112,7 @@ WRITE_LINE_MEMBER(tutankhm_state::vblank_irq)
 }
 
 
-WRITE_LINE_MEMBER(tutankhm_state::irq_enable_w)
+void tutankhm_state::irq_enable_w(int state)
 {
 	m_irq_enable = state;
 	if (!m_irq_enable)
@@ -138,13 +138,13 @@ void tutankhm_state::tutankhm_bankselect_w(uint8_t data)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(tutankhm_state::coin_counter_1_w)
+void tutankhm_state::coin_counter_1_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
 
-WRITE_LINE_MEMBER(tutankhm_state::coin_counter_2_w)
+void tutankhm_state::coin_counter_2_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(1, state);
 }

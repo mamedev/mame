@@ -106,7 +106,7 @@ void senjyo_state::flip_screen_w(uint8_t data)
 	flip_screen_set(data);
 }
 
-WRITE_LINE_MEMBER(senjyo_state::dac_clock_w)
+void senjyo_state::dac_clock_w(int state)
 {
 	if (state)
 		m_dac->write(m_dac_prom->base()[m_dac_clock++ & 0xf]);

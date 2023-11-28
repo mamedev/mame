@@ -30,14 +30,14 @@ spg2xx_device::spg2xx_device(const machine_config &mconfig, device_type type, co
 	m_porta_out(*this),
 	m_portb_out(*this),
 	m_portc_out(*this),
-	m_porta_in(*this),
-	m_portb_in(*this),
-	m_portc_in(*this),
-	m_adc_in(*this),
-	m_guny_in(*this),
-	m_gunx_in(*this),
+	m_porta_in(*this, 0),
+	m_portb_in(*this, 0),
+	m_portc_in(*this, 0),
+	m_adc_in(*this, 0x0fff),
+	m_guny_in(*this, 0),
+	m_gunx_in(*this, 0),
 	m_i2c_w(*this),
-	m_i2c_r(*this),
+	m_i2c_r(*this, 0),
 	m_uart_tx(*this),
 	m_spi_tx(*this),
 	m_chip_sel(*this),
@@ -86,21 +86,6 @@ void spg2xx_device::device_start()
 {
 	unsp_device::device_start();
 
-	m_porta_out.resolve_safe();
-	m_portb_out.resolve_safe();
-	m_portc_out.resolve_safe();
-	m_porta_in.resolve_safe(0);
-	m_portb_in.resolve_safe(0);
-	m_portc_in.resolve_safe(0);
-	m_adc_in.resolve_all_safe(0x0fff);
-	m_guny_in.resolve_safe(0);
-	m_gunx_in.resolve_safe(0);
-	m_i2c_w.resolve_safe();
-	m_i2c_r.resolve_safe(0);
-	m_uart_tx.resolve_safe();
-	m_spi_tx.resolve_safe();
-	m_chip_sel.resolve_safe();
-
 	save_item(NAME(m_sprite_limit));
 	save_item(NAME(m_pal_flag));
 	save_item(NAME(m_fiq_vector));
@@ -117,7 +102,7 @@ void spg2xx_device::fiq_vector_w(uint8_t data)
 	m_fiq_vector = data;
 }
 
-WRITE_LINE_MEMBER(spg2xx_device::videoirq_w)
+void spg2xx_device::videoirq_w(int state)
 {
 	if (m_fiq_vector == 0)
 	{
@@ -129,37 +114,37 @@ WRITE_LINE_MEMBER(spg2xx_device::videoirq_w)
 	}
 }
 
-WRITE_LINE_MEMBER(spg2xx_device::timerirq_w)
+void spg2xx_device::timerirq_w(int state)
 {
 	set_state_unsynced(UNSP_IRQ2_LINE, state);
 }
 
-WRITE_LINE_MEMBER(spg2xx_device::uartirq_w)
+void spg2xx_device::uartirq_w(int state)
 {
 	set_state_unsynced(UNSP_IRQ3_LINE, state);
 }
 
-WRITE_LINE_MEMBER(spg2xx_device::audioirq_w)
+void spg2xx_device::audioirq_w(int state)
 {
 	set_state_unsynced(UNSP_IRQ4_LINE, state);
 }
 
-WRITE_LINE_MEMBER(spg2xx_device::audiochirq_w)
+void spg2xx_device::audiochirq_w(int state)
 {
 	set_state_unsynced(UNSP_FIQ_LINE, state);
 }
 
-WRITE_LINE_MEMBER(spg2xx_device::extirq_w)
+void spg2xx_device::extirq_w(int state)
 {
 	set_state_unsynced(UNSP_IRQ5_LINE, state);
 }
 
-WRITE_LINE_MEMBER(spg2xx_device::ffreq1_w)
+void spg2xx_device::ffreq1_w(int state)
 {
 	set_state_unsynced(UNSP_IRQ6_LINE, state);
 }
 
-WRITE_LINE_MEMBER(spg2xx_device::ffreq2_w)
+void spg2xx_device::ffreq2_w(int state)
 {
 	set_state_unsynced(UNSP_IRQ7_LINE, state);
 }

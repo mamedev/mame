@@ -289,8 +289,12 @@ bool ppc_device::frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 		case 0x2e:  // LMW
 			GPR_USED_OR_ZERO(desc, G_RA(op));
+
 			for (regnum = G_RD(op); regnum < 32; regnum++)
-				GPR_MODIFIED(desc, regnum);
+			{
+				if (regnum != G_RA(op) || ((m_ppc.m_cap & PPCCAP_4XX) && regnum == 31))
+					GPR_MODIFIED(desc, regnum);
+			}
 			desc.flags |= OPFLAG_READS_MEMORY;
 			desc.cycles = 32 - G_RD(op);
 			return true;

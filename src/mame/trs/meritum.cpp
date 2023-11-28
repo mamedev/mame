@@ -57,6 +57,8 @@ For Model III:
 #include "emu.h"
 #include "trs80.h"
 
+#include "trs80_quik.h"
+
 #include "bus/centronics/ctronics.h"
 #include "machine/input_merger.h"
 #include "machine/i8251.h"
@@ -397,9 +399,7 @@ void meritum_state::meritum1(machine_config &config)
 	m_cassette->set_default_state(CASSETTE_PLAY);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "cmd", attotime::from_seconds(1)));
-	quickload.set_load_callback(FUNC(meritum_state::quickload_cb));
-	quickload.set_interface("trs80_quik");
+	TRS80_QUICKLOAD(config, "quickload", m_maincpu, attotime::from_seconds(1));
 	SOFTWARE_LIST(config, "quik_list").set_original("trs80_quik").set_filter("M1");
 }
 

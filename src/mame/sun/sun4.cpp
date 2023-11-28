@@ -435,9 +435,6 @@
 #include "debugger.h"
 #include "screen.h"
 
-#include "formats/mfi_dsk.h"
-#include "formats/pc_dsk.h"
-
 #define LOG_AUXIO               (1U << 1)
 #define LOG_IRQ_READS           (1U << 2)
 #define LOG_IRQ_WRITES          (1U << 3)
@@ -594,12 +591,12 @@ protected:
 	void dma_addr_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void dma_count_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
-	DECLARE_WRITE_LINE_MEMBER(scsi_irq);
-	DECLARE_WRITE_LINE_MEMBER(scsi_drq);
+	void scsi_irq(int state);
+	void scsi_drq(int state);
 
-	template <int Chip> DECLARE_WRITE_LINE_MEMBER(scc_int);
+	template <int Chip> void scc_int(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
+	void fdc_irq(int state);
 
 	void ncr53c90(device_t *device);
 
@@ -711,7 +708,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	template <int Line> DECLARE_WRITE_LINE_MEMBER(sbus_irq_w);
+	template <int Line> void sbus_irq_w(int state);
 
 	void type1space_map(address_map &map);
 
@@ -1089,7 +1086,7 @@ void sun4_base_state::irq_w(u8 data)
 }
 
 template <int Chip>
-WRITE_LINE_MEMBER(sun4_base_state::scc_int)
+void sun4_base_state::scc_int(int state)
 {
 	LOGMASKED(LOG_IRQ_WRITES, "scc_int<%d>: %d (%d)\n", Chip, state, m_scc_int[0] || m_scc_int[1]);
 	m_scc_int[Chip] = state;
@@ -1312,7 +1309,7 @@ void sun4_base_state::dma_count_w(offs_t offset, u32 data, u32 mem_mask)
 	m_dma_count = data;
 }
 
-WRITE_LINE_MEMBER(sun4_base_state::scsi_irq)
+void sun4_base_state::scsi_irq(int state)
 {
 	const bool old_irq = m_scsi_irq;
 	m_scsi_irq = state;
@@ -1323,7 +1320,7 @@ WRITE_LINE_MEMBER(sun4_base_state::scsi_irq)
 	}
 }
 
-WRITE_LINE_MEMBER(sun4_base_state::scsi_drq)
+void sun4_base_state::scsi_drq(int state)
 {
 	LOGMASKED(LOG_SCSI_DRQ, "scsi_drq %d\n", state);
 	m_dma_ctrl &= ~DMA_REQ_PEND;
@@ -1339,7 +1336,7 @@ WRITE_LINE_MEMBER(sun4_base_state::scsi_drq)
 	}
 }
 
-WRITE_LINE_MEMBER(sun4_base_state::fdc_irq)
+void sun4_base_state::fdc_irq(int state)
 {
 	const bool old_irq = m_fdc_irq;
 	m_fdc_irq = state;
@@ -1351,7 +1348,7 @@ WRITE_LINE_MEMBER(sun4_base_state::fdc_irq)
 }
 
 template <int Line>
-WRITE_LINE_MEMBER(sun4c_state::sbus_irq_w)
+void sun4c_state::sbus_irq_w(int state)
 {
 	m_maincpu->set_input_line(Line, state);
 }

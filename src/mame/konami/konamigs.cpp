@@ -38,13 +38,15 @@
 **************************************************************************/
 
 #include "emu.h"
+
+#include "bus/ata/ataintf.h"
+#include "bus/ata/hdd.h"
 #include "cpu/sh/sh3comn.h"
 #include "cpu/sh/sh4.h"
-#include "bus/ata/ataintf.h"
-#include "machine/ataflash.h"
 #include "machine/s3520cf.h"
 #include "machine/ticket.h"
 #include "sound/ymz280b.h"
+
 #include "speaker.h"
 #include "screen.h"
 
@@ -120,7 +122,7 @@ protected:
 	void gpu_w(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	u16 vram_r(offs_t offset);
 	void vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(vblank);
+	void vblank(int state);
 	void do_render(bool vbkem);
 	void draw_quad_tex(u16 cmd, u16 *data);
 	void draw_quad_bin(u16 cmd, u16 *data);
@@ -400,7 +402,7 @@ void gsan_state::gpu_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	}
 }
 
-WRITE_LINE_MEMBER(gsan_state::vblank)
+void gsan_state::vblank(int state)
 {
 	if (state)
 	{
@@ -1030,7 +1032,7 @@ void gsan_state::machine_reset()
 
 static void gsan_devices(device_slot_interface &device)
 {
-	device.option_add("cfcard", ATA_FLASH_PCCARD);
+	device.option_add("cfcard", ATA_CF);
 }
 
 void gsan_state::gsan(machine_config &config)

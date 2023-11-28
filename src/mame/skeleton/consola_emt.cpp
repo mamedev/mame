@@ -279,7 +279,8 @@ void consoemt_state::consoemt(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(consoemt_state::consoemt_palette), 3);
 
-	KS0066_F05(config, m_lcdc, 0);
+	KS0066(config, m_lcdc, 270'000); // TODO: clock not measured, datasheet typical clock used
+	m_lcdc->set_default_bios_tag("f05");
 	m_lcdc->set_lcd_size(2, 20);
 	m_lcdc->set_pixel_update_cb(FUNC(consoemt_state::lcd_pixel_update));
 }

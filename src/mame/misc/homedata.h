@@ -33,10 +33,6 @@ public:
 	{
 	}
 
-	void mirderby(machine_config &config) ATTR_COLD;
-
-	void init_mirderby() ATTR_COLD;
-
 protected:
 	/* memory pointers */
 	optional_shared_ptr<uint8_t> m_vreg;
@@ -70,31 +66,15 @@ protected:
 
 	optional_ioport_array<12> m_keys;
 
-	uint8_t m_prot_data = 0;
-
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	uint8_t mirderby_prot_r();
-	void mirderby_prot_w(uint8_t data);
 	void mrokumei_videoram_w(offs_t offset, u8 data);
 	void homedata_blitter_param_w(uint8_t data);
-	TILE_GET_INFO_MEMBER(mirderby_get_info0_0);
-	TILE_GET_INFO_MEMBER(mirderby_get_info1_0);
-	TILE_GET_INFO_MEMBER(mirderby_get_info0_1);
-	TILE_GET_INFO_MEMBER(mirderby_get_info1_1);
-	DECLARE_VIDEO_START(mirderby);
-	void mirderby_palette(palette_device &palette) const ATTR_COLD;
-	uint32_t screen_update_mirderby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
-	INTERRUPT_GEN_MEMBER(homedata_irq);
-	void mrokumei_handleblit( int rom_base );
-	void mirderby_info0(tile_data &tileinfo, int tile_index, int page, int gfxbank);
-	void mirderby_info1(tile_data &tileinfo, int tile_index, int page, int gfxbank);
 
-	void cpu0_map(address_map &map) ATTR_COLD;
-	void cpu1_map(address_map &map) ATTR_COLD;
-	void cpu2_map(address_map &map) ATTR_COLD;
+	void screen_vblank(int state);
+	INTERRUPT_GEN_MEMBER(homedata_irq);
+	void mrokumei_handleblit(int rom_base);
 };
 
 

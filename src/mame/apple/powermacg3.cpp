@@ -56,13 +56,13 @@ private:
 	u16 read_sense();
 	void write_sense(u16 data);
 
-	WRITE_LINE_MEMBER(cuda_reset_w)
+	void cuda_reset_w(int state)
 	{
 		m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 		m_maincpu->set_input_line(INPUT_LINE_RESET, state);
 	}
 
-	WRITE_LINE_MEMBER(irq_w)
+	void irq_w(int state)
 	{
 		m_maincpu->set_input_line(PPC_IRQ, state);
 	}
@@ -159,7 +159,8 @@ void pwrmacg3_state::pwrmacg3(machine_config &config)
 
 	MACADB(config, m_macadb, 15.6672_MHz_XTAL);
 
-	CUDA(config, m_cuda, CUDA_341S0060);
+	CUDA_V2XX(config, m_cuda, XTAL(32'768));
+	m_cuda->set_default_bios_tag("341s0060");
 	m_cuda->reset_callback().set(FUNC(pwrmacg3_state::cuda_reset_w));
 	m_cuda->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
 	m_cuda->via_clock_callback().set(heathrow, FUNC(heathrow_device::cb1_w));

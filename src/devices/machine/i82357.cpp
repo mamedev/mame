@@ -33,7 +33,7 @@ i82357_device::i82357_device(const machine_config &mconfig, const char *tag, dev
 	, m_pic(*this, "pic%u", 0)
 	, m_pit(*this, "pit%u", 0)
 	, m_dma(*this, "dma%u", 0)
-	, m_out_rtc(*this)
+	, m_out_rtc_address(*this)
 	, m_out_nmi(*this)
 	, m_out_spkr(*this)
 {
@@ -128,7 +128,7 @@ void i82357_device::map(address_map &map)
 			{
 				m_nmi_enabled = !BIT(data, 7);
 
-				m_out_rtc(0, data & 0x7f);
+				m_out_rtc_address(data & 0x7f);
 
 				m_nmi_check->adjust(attotime::zero);
 			}, "nmi_rtc").umask64(0xff);
@@ -204,10 +204,6 @@ void i82357_device::map(address_map &map)
 
 void i82357_device::device_start()
 {
-	m_out_rtc.resolve_safe();
-	m_out_nmi.resolve_safe();
-	m_out_spkr.resolve_safe();
-
 	m_nmi_check = timer_alloc(FUNC(i82357_device::nmi_check), this);
 }
 
@@ -265,7 +261,7 @@ void i82357_device::nmi_ext_w(u8 data)
 	m_nmi_check->adjust(attotime::zero);
 }
 
-WRITE_LINE_MEMBER(i82357_device::in_iochk)
+void i82357_device::in_iochk(int state)
 {
 	if (!state && !(m_nmi_reg & NMI_PARITY_DISABLE))
 	{
@@ -277,7 +273,7 @@ WRITE_LINE_MEMBER(i82357_device::in_iochk)
 		m_nmi_reg &= ~NMI_IOCHK;
 }
 
-WRITE_LINE_MEMBER(i82357_device::in_parity)
+void i82357_device::in_parity(int state)
 {
 	if (!state && !(m_nmi_reg & NMI_IOCHK_DISABLE))
 	{

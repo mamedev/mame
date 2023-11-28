@@ -84,6 +84,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include "multibyte.h"
+
 
 namespace {
 
@@ -124,7 +126,7 @@ private:
 	uint16_t tms57002_status_word_r();
 	void tms57002_control_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	INTERRUPT_GEN_MEMBER(tms_sync);
-	DECLARE_WRITE_LINE_MEMBER(k054539_irq_gen);
+	void k054539_irq_gen(int state);
 
 	void scsi_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	void scsi_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
@@ -251,7 +253,7 @@ void konamigq_state::konamigq_k054539_map(address_map &map)
 
 
 /* 058141 */
-WRITE_LINE_MEMBER(konamigq_state::k054539_irq_gen)
+void konamigq_state::k054539_irq_gen(int state)
 {
 	if (m_sound_ctrl & 1)
 	{
@@ -287,11 +289,7 @@ void konamigq_state::scsi_dma_read( uint32_t *p_n_psxram, uint32_t n_address, in
 		i = 0;
 		while( n_this > 0 )
 		{
-			p_n_psxram[ n_address / 4 ] =
-				( sector_buffer[ i + 0 ] << 0 ) |
-				( sector_buffer[ i + 1 ] << 8 ) |
-				( sector_buffer[ i + 2 ] << 16 ) |
-				( sector_buffer[ i + 3 ] << 24 );
+			p_n_psxram[ n_address / 4 ] = get_u32le( &sector_buffer[ i ] );
 			n_address += 4;
 			i += 4;
 			n_this--;

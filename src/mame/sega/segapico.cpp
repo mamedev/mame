@@ -126,6 +126,8 @@ C = MB3514 / 9325 M36
 #include "softlist_dev.h"
 #include "speaker.h"
 
+#define VERBOSE (0)
+#include "logmacro.h"
 
 namespace {
 
@@ -163,7 +165,7 @@ protected:
 	uint16_t pico_read_penpos(int pen);
 	uint16_t pico_68k_io_read(offs_t offset);
 	void pico_68k_io_write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(sound_cause_irq);
+	void sound_cause_irq(int state);
 
 	void pico_mem(address_map &map);
 };
@@ -299,7 +301,7 @@ uint16_t pico_base_state::pico_68k_io_read(offs_t offset)
 }
 
 
-WRITE_LINE_MEMBER(pico_base_state::sound_cause_irq)
+void pico_base_state::sound_cause_irq(int state)
 {
 //  printf("sound irq\n");
 	/* sega_315_5641_pcm callback */
@@ -313,16 +315,16 @@ void pico_base_state::pico_68k_io_write(offs_t offset, uint16_t data, uint16_t m
 	switch (offset)
 	{
 		case 0x10/2:
-			if (mem_mask & 0xFF00)
-				m_sega_315_5641_pcm->port_w((data >> 8) & 0xFF);
-			if (mem_mask & 0x00FF)
-				m_sega_315_5641_pcm->port_w((data >> 0) & 0xFF);
+			if (mem_mask & 0xff00)
+				m_sega_315_5641_pcm->port_w((data >> 8) & 0xff);
+			if (mem_mask & 0x00ff)
+				m_sega_315_5641_pcm->port_w((data >> 0) & 0xff);
 			break;
 		case 0x12/2: // guess
 			// Note about uPD7759 lines:
 			//  reset line: 1 - normal, 1->0 - reset chip, 0 - playback disabled
 			//  start line: 0->1 - start playback
-			if (mem_mask & 0xFF00)
+			if (mem_mask & 0xff00)
 			{
 				// I assume that:
 				// value 8000 resets the FIFO? (always used with low reset line)
@@ -585,28 +587,48 @@ public:
 	void copera(machine_config &config);
 
 protected:
+	virtual void machine_reset() override;
 	virtual void machine_start() override;
+
+	void copera_pcm_cb(int state);
+	uint16_t copera_io_read(offs_t offset);
+	void copera_io_write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	TIMER_CALLBACK_MEMBER(process_ext_timer);
 
 private:
 	void copera_mem(address_map &map);
 
 	required_device<copera_cart_slot_device> m_picocart;
+
+	std::unique_ptr<uint16_t[]> m_ext_regs;
+	bool m_is_ext_requested;
+	emu_timer *m_ext_timer;
 };
 
-
+TIMER_CALLBACK_MEMBER(copera_state::process_ext_timer)
+{
+	// TODO: When is it enabled? Expected even if games don't set bit 3 of VDP mode register 3...
+	if (m_is_ext_requested)
+	{
+		m_maincpu->set_input_line(2, HOLD_LINE);
+		m_is_ext_requested = false;
+	}
+	else
+	{
+		m_maincpu->set_input_line(2, CLEAR_LINE);
+		m_is_ext_requested = true;
+	}
+}
 
 void copera_state::copera_mem(address_map &map)
 {
 	map(0x000000, 0x3fffff).rom();
-
 	map(0x800000, 0x80001f).rw(FUNC(copera_state::pico_68k_io_read), FUNC(copera_state::pico_68k_io_write));
-
+	map(0xbff800, 0xbff87f).rw(FUNC(copera_state::copera_io_read), FUNC(copera_state::copera_io_write)); // FIXME: Guessed range.
 	map(0xc00000, 0xc0001f).rw(m_vdp, FUNC(sega315_5313_device::vdp_r), FUNC(sega315_5313_device::vdp_w));
-
 	map(0xe00000, 0xe0ffff).ram().mirror(0x1f0000);
 }
-
-
 
 static void copera_cart(device_slot_interface &device)
 {
@@ -631,6 +653,28 @@ void copera_state::machine_start()
 	m_sega_315_5641_pcm->start_w(1);
 
 	m_vdp->stop_timers();
+
+	m_ext_regs = make_unique_clear<uint16_t[]>(0x80/2);
+
+	// FIXME: Guessed timing.
+	//
+	// It must be less than HBLANK. Games have a busy loop where they read
+	// VDP status register and check if bit 7 (vertical interrupt pending) is
+	// set and then cleared (e.g. Copera no Chikyuu Daisuki @ 0xfb3c4).
+	// Too frequent EXT interrupts result in that subroutine only executing after
+	// scanline 224 and will never catch bit 7 set.
+	m_ext_timer = timer_alloc(FUNC(copera_state::process_ext_timer), this);
+	m_ext_timer->adjust(attotime::zero, 0, m_vdp->screen().scan_period() * 20);
+}
+
+void copera_state::machine_reset()
+{
+	pico_base_state::machine_reset();
+
+	m_is_ext_requested = true;
+	m_ext_regs[0] = 0;
+	m_ext_regs[0x2/2] = 0xffff;
+	m_ext_regs[0x4/2] = 0xffff;
 }
 
 void copera_state::copera(machine_config &config)
@@ -649,11 +693,41 @@ void copera_state::copera(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	SEGA_315_5641_PCM(config, m_sega_315_5641_pcm, upd7759_device::STANDARD_CLOCK);
-	m_sega_315_5641_pcm->fifo_cb().set(FUNC(copera_state::sound_cause_irq));
+	m_sega_315_5641_pcm->fifo_cb().set(FUNC(copera_state::copera_pcm_cb));
 	m_sega_315_5641_pcm->add_route(ALL_OUTPUTS, "lspeaker", 0.16);
 	m_sega_315_5641_pcm->add_route(ALL_OUTPUTS, "rspeaker", 0.16);
 }
 
+void copera_state::copera_pcm_cb(int state)
+{
+	// TODO: Not IRQ3 (games assign an infinite loop handler), likely handled by an EXT callback.
+}
+
+uint16_t copera_state::copera_io_read(offs_t offset)
+{
+	LOG("COPERA IO r @ %08x: %08x = %04x\n", m_maincpu->pc(), 0xbff800 + offset * 2, m_ext_regs[offset]);
+	return m_ext_regs[offset];
+}
+
+void copera_state::copera_io_write(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	if (ACCESSING_BITS_8_15)
+	{
+		m_ext_regs[offset] = (data & mem_mask) | (m_ext_regs[offset] & 0x00ff);
+	}
+	if (ACCESSING_BITS_0_7)
+	{
+		m_ext_regs[offset] = (data & mem_mask) | (m_ext_regs[offset] & 0xff00);
+	}
+
+	// TODO: We only enable EXT handler callback 3.
+	if (((m_ext_regs[0x4/2] & 0xff) == 0xd) && ((m_ext_regs[0x2/2] & 0xff) == 0x3f))
+	{
+		m_ext_regs[0] |= 1 << 3;
+	}
+
+	LOG("COPERA IO w @ %08x: %08x = %04x (mask %08x)\n", m_maincpu->pc(), 0xbff800 + offset * 2, data, mem_mask);
+}
 
 
 ROM_START( copera )

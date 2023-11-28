@@ -149,7 +149,6 @@ NEP-16
 #include "emu.h"
 #include "suprnova.h"
 
-#include "cpu/sh/sh2.h"
 #include "machine/msm6242.h"
 #include "machine/nvram.h"
 #include "sound/ymz280b.h"
@@ -298,7 +297,7 @@ void skns_state::hit2_w(uint32_t data)
 {
 	hit_t &hit = m_hit;
 
-	// Decide to unlock on country char of string "FOR xxxxx" in Bios ROM at offset 0x420
+	// Decide to unlock on country char of string "FOR xxxxx" in BIOS ROM at offset 0x420
 	// this code simulates behaviour of protection PLD
 	data>>= 24;
 	hit.disconnect = 1;
@@ -764,7 +763,7 @@ GFXDECODE_END
 // XTALs : 28.636MHz, 33.3333MHz, 21.504MHz
 void skns_state::skns(machine_config &config)
 {
-	SH2(config, m_maincpu, XTAL(28'636'000));
+	SH2_SH7604(config, m_maincpu, XTAL(28'636'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &skns_state::skns_map);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(skns_state::irq), "screen", 0, 1);

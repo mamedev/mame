@@ -24,6 +24,7 @@
     - dynamcopc: corrupts palette for 2d (most likely unrelated with the lack of DSP);
     - fvipers, schamp: rasterizer has issues displaying some characters @see video/model2.cpp
     - fvipers: enables timers, but then irq register is empty, hence it crashes with an "interrupt halt" at POST (regression);
+    - hpyagu98: stops with 'Error #1' message during boot. Also writes to the 0x600000-0x62ffff range in main CPU program map
     - lastbrnx: uses external DMA port 0 for uploading SHARC program, hook-up might not be 100% right;
     - lastbrnx: has wrong graphics, uses several SHARC opcodes that needs to be double checked
                 (compute_fmul_avg, shift operation 0x11, ALU operation 0x89 (compute_favg));
@@ -2363,7 +2364,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2_interrupt)
 }
 
 #ifdef UNUSED_FUNCTION
-WRITE_LINE_MEMBER(model2_state::sound_ready_w)
+void model2_state::sound_ready_w(int state)
 {
 	if(state)
 	{
@@ -7237,6 +7238,48 @@ ROM_START( powsledm ) // Main unit is not dumped, temporary we use relay dump pl
 	ROM_LOAD16_WORD_SWAP("fpr-19461.34", 0x400000, 0x400000, CRC(7b91d65b) SHA1(3768f134fc9e54966e683cc4b9616d704cb9c49d) )
 ROM_END
 
+ROM_START( hpyagu98 ) /* Hanguk Pro Yagu 98, Model 2A, ROM board# 834-11342 REV. B */
+	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program, all without label
+	ROM_LOAD32_WORD( "hn27c4096.12", 0x000000, 0x080000, CRC(be721c2d) SHA1(55b1230c83931ac22a1c5dd3505b36c3f3330f57) )
+	ROM_LOAD32_WORD( "hn27c4096.13", 0x000002, 0x080000, CRC(bd86a3f9) SHA1(6d4c488ab5ba191be1a35d6e447bf859b7087c8b) )
+	ROM_LOAD32_WORD( "hn27c4096.14", 0x100000, 0x080000, CRC(01867b65) SHA1(943ea1387fb2cb6238382dddc0d79c11eac03160) )
+	ROM_LOAD32_WORD( "hn27c4096.15", 0x100002, 0x080000, CRC(e8d43bdc) SHA1(d9eb1f0943e26f01dae01a5a7a015e77541d6a21) )
+
+	ROM_REGION32_LE( 0x2400000, "main_data", 0 ) // Data
+	ROM_LOAD32_WORD( "bb-dt-0.10", 0x0000000, 0x400000, CRC(f3c7a573) SHA1(58d96e2f0fe004166b832e8edf6cfd54a367d549) )
+	ROM_LOAD32_WORD( "bb-dt-1.11", 0x0000002, 0x400000, CRC(dc755bf8) SHA1(24fb42ab15ee4bc68c7a485dfa448ed61714bb7b) )
+	ROM_LOAD32_WORD( "bb-dt-2.8",  0x0800000, 0x400000, CRC(0eb6f7f8) SHA1(f9d5f1002c80c7f11af5771c1787cdaeb30b9148) )
+	ROM_LOAD32_WORD( "bb-dt-3.9",  0x0800002, 0x400000, CRC(40d78440) SHA1(1f6d3cdf984d0a5618d210759728a778566f617c) )
+	ROM_LOAD32_WORD( "bb-dt-4.6",  0x1000000, 0x400000, CRC(c02187d9) SHA1(1da108a2ec00e3fc472b1a819655aff8c679051d) ) // = mpr-19837.7 dynabb97
+	ROM_LOAD32_WORD( "bb-dt-5.7",  0x1000002, 0x400000, CRC(546b61cd) SHA1(0cc0edd0a9c288143168d63a7d48d0fbfa64d8bf) ) // = mpr-19838.8 dynabb97
+	ROM_LOAD32_WORD( "bb-dt-6.4",  0x1800000, 0x400000, CRC(2107281c) SHA1(b1f88ed2e51f888c70b952e4fc798404243e8c56) )
+	ROM_LOAD32_WORD( "bb-dt-7.5",  0x1800002, 0x400000, CRC(05f1b8e7) SHA1(6420b24ae822a7973b98a545c46358149c2c24df) )
+
+	ROM_REGION32_LE( 0x800000, "copro_data", ROMREGION_ERASE00 ) // Copro extra data (collision/height map/etc)
+
+	ROM_REGION( 0x2000000, "polygons", 0 ) // Models
+	ROM_LOAD32_WORD( "bb-tp-0.16", 0x000000, 0x400000, CRC(562f98b3) SHA1(e55453b1341a576e6cac751903930146a2a690f5) )
+	ROM_LOAD32_WORD( "bb-tp-1.20", 0x000002, 0x400000, CRC(e731bdb4) SHA1(d9b116212e3abaef8ff62694df805754e4381f0f) )
+	ROM_LOAD32_WORD( "bb-tp-2.17", 0x800000, 0x400000, CRC(095c0357) SHA1(57d4981008dc8442b041960fc8ce1ef0b02c5970) )
+	ROM_LOAD32_WORD( "bb-tp-3.21", 0x800002, 0x400000, CRC(dbadc020) SHA1(101cab02cf6e14b7438faa0dadc565e0837aba34) )
+
+	ROM_REGION( 0x1000000, "textures", ROMREGION_ERASEFF ) // Textures
+	ROM_LOAD32_WORD( "bb-tx-0.25", 0x000000, 0x400000, CRC(d241a138) SHA1(bd2dff3d76b25705f474acd428b301fa984ff321) )
+	ROM_LOAD32_WORD( "bb-tx-1.24", 0x000002, 0x400000, CRC(ac04ce3c) SHA1(aa35e34957d5215d7f784cadc59fe1c74d4b6d01) )
+
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP( "am27c1024.30", 0x000000, 0x020000, CRC(023c64f1) SHA1(43b9bb1c7a3da8650a6da60f58466d4ac759b228) ) // without label
+
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP( "bb-sn-1.31", 0x000000, 0x200000, CRC(83b5f404) SHA1(95d858558d1d1a2d8493c68355e21ff336643829) )
+	ROM_LOAD16_WORD_SWAP( "bb-sn-2.32", 0x200000, 0x200000, CRC(dcf9ffd9) SHA1(5679c26d85cf0384dd402e1ac28867d26287ecc4) )
+	ROM_LOAD16_WORD_SWAP( "bb-sn-3.36", 0x400000, 0x200000, CRC(e4c938b2) SHA1(3a96433f58a52dea026ab47bf93dc6a9c620e1dd) )
+	ROM_LOAD16_WORD_SWAP( "bb-sn-4.37", 0x600000, 0x200000, CRC(8692fbf3) SHA1(d8e854bba7b54fba85e182d761a9fd02fd13646f) )
+
+	MODEL2_CPU_BOARD
+	MODEL2A_VID_BOARD
+ROM_END
+
 
 void model2_state::init_pltkids()
 {
@@ -7355,6 +7398,7 @@ GAME( 1997, airwlkrs,   0,        model2a,      vf2,       model2a_state, empty_
 GAME( 1998, dynamcop,   0,        model2a_5881, dynamcop,  model2a_state, empty_init,    ROT0, "Sega",   "Dynamite Cop (Export, Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, dyndeka2,   dynamcop, model2a_5881, dynamcop,  model2a_state, empty_init,    ROT0, "Sega",   "Dynamite Deka 2 (Japan, Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, pltkidsa,   pltkids,  model2a_5881, pltkids,   model2a_state, init_pltkids,  ROT0, "Psikyo", "Pilot Kids (Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, hpyagu98,   0,        model2a,      vf2,       model2a_state, empty_init,    ROT0, "Deniam", "Hanguk Pro Yagu 98", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 
 // Model 2B-CRX (SHARC, SCSP sound board)
 GAME( 1994, rchase2,    0,        rchase2,      rchase2,   model2b_state, empty_init,    ROT0, "Sega",   "Rail Chase 2 (Revision A)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )

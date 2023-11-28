@@ -18,8 +18,6 @@
 #include "machine/wozfdc.h"
 #include "imagedev/floppy.h"
 
-#include "formats/flopimg.h"
-
 
 //**************************************************************************
 //  TYPE DEFINITIONS

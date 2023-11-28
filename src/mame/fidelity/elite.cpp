@@ -6,8 +6,8 @@
 Fidelity Elite A/S series hardware (EAS, EAG, PC)
 see eag68k.cpp for 68000-based EAG hardware
 
-TODO:
-- verify fpres/feas irq active time
+NOTE: To start a new game in EAS/PC, press Game Control (aka Reset), activate
+the D6 square, and then press CL. See below for more info.
 
 BTANB:
 - feasglab locks up at boot if it was powered off in the middle of the game.
@@ -39,22 +39,31 @@ Though model EWC(improved Budapest) had a 3.57MHz XTAL and EAS-C(Glasgow) had
 a 4MHz XTAL.
 
 A condensator/battery keeps RAM contents alive for a while when powered off.
-Note that EAS doesn't have a "new game" button, it is done through game options:
-Press GAME CONTROL, then place/lift a piece on D6 to restart, or D8 to reset
-with default settings, then press CL.
+
+Note that EAS/PC doesn't have a "new game" button, it is done through game options:
+Press GAME CONTROL, then place/lift a piece on D6 to restart with user settings
+intact, or D8 to reset and clear memory, then press CL.
+
+Anecdote from Ron Nelson regarding the new game issue (Sid Samole was the CEO):
+"The next year I designed it into a wooden housing, and Kathy said she wanted to
+design the User Interface. I said ok go for it. When it was finished & masked,
+I was at an internal sales meeting. No one could figure out how to start a new game.
+Sid turned to me with a questioning look. I showed him how to do it (multiple key
+presses as I recall) and explained about Kathy. He said, don't let them do it again."
 
 Prestige Challenger (PC) hardware is very similar. It was released before EAS,
 it doesn't have the 8255 PPI, but has more RAM(7*TMM2016P). Some were released at
-3.6MHz instead of 4MHz, perhaps due to hardware instability? Opening module PC16 was
+3.6MHz instead of 4MHz, maybe due to hardware instability? Opening module PC16 was
 included by default, this module is the same as CB16 but at different form factor.
 
-Elite Avant Garde (models 6081,6088,6089) is on similar hardware as EAS.
+Elite Avant Garde (models 6081,6088,6089) is on similar hardware as EAS. Level B8
+starts a self-test and displays ROM checksums, press CL to advance.
 
 Fidelity Elite Private Line were EAS/EAG conversions released by Fidelity Deutschland.
-The "Elite Privat" was probably for the local market and the "Private Line" for export.
-They took out the motherboard and leds and placed them inside a little box separate
-from a (ledless) magnetic chessboard. The ROMs were unmodified, that makes them
-uninteresting to emulate as separate drivers.
+The "Elite Privat" was probably for the local market and the "Private Line" for
+export. They took out the motherboard and leds and placed them inside a little box
+separate from a (ledless) magnetic chessboard. The ROMs were unmodified, that makes
+them uninteresting to emulate as separate drivers.
 
 *******************************************************************************/
 
@@ -77,9 +86,9 @@ uninteresting to emulate as separate drivers.
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_eag.lh" // clickable
-#include "fidel_eas.lh" // clickable
-#include "fidel_pc.lh" // clickable
+#include "fidel_eag.lh"
+#include "fidel_eas.lh"
+#include "fidel_pc.lh"
 
 
 namespace {
@@ -128,6 +137,12 @@ protected:
 	required_region_ptr<u8> m_language;
 	required_ioport_array<2> m_inputs;
 
+	bool m_rotate = false;
+	u8 m_led_data = 0;
+	u8 m_7seg_data = 0;
+	u8 m_inp_mux = 0;
+	u8 m_speech_bank = 0;
+
 	// address maps
 	void eas_map(address_map &map);
 	void pc_map(address_map &map);
@@ -141,12 +156,6 @@ protected:
 	void ppi_porta_w(u8 data);
 	u8 ppi_portb_r();
 	void ppi_portc_w(u8 data);
-
-	bool m_rotate = false;
-	u8 m_led_data = 0;
-	u8 m_7seg_data = 0;
-	u8 m_inp_mux = 0;
-	u8 m_speech_bank = 0;
 };
 
 void elite_state::machine_start()
@@ -466,7 +475,7 @@ void elite_state::pc(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &elite_state::pc_map);
 
 	auto &irq_clock(CLOCK(config, "irq_clock", 38.4_kHz_XTAL/64)); // through 4060 IC, 600Hz
-	irq_clock.set_pulse_width(attotime::from_usec(10)); // active for ~10us
+	irq_clock.set_pulse_width(attotime::from_nsec(13700)); // active for 13.7us
 	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
@@ -852,7 +861,7 @@ ROM_START( fpresgla )
 ROM_END
 
 
-ROM_START( feag ) // model 6081, aka "Mobile Master"
+ROM_START( feag ) // model 6081, aka "Mobile Master" - checksum BE41 9B27 E959 42C1
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("eg_orange.ic9", 0xa000, 0x2000, CRC(df9e7e74) SHA1(db76750eba5515213ecce07402c4d974c14e1a23) ) // M5L2764K, orange sticker
 	ROM_LOAD("eg_black.ic5",  0xc000, 0x2000, CRC(a5f6f295) SHA1(319f00d4b7a1704a3ca722c40f4096004b4b89d2) ) // M5L2764K, black sticker
@@ -879,7 +888,7 @@ ROM_START( feag ) // model 6081, aka "Mobile Master"
 	ROMX_LOAD("101-64106.ic16", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9), ROM_BIOS(3) )
 ROM_END
 
-ROM_START( feag2100 )
+ROM_START( feag2100 ) // checksum F234 9D4A 2373 B2F1
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("el2100_2.ic5", 0xc000, 0x2000, CRC(76fec42f) SHA1(34660edb8458919fd179e93fdab3fe428a6625d0) )
 	ROM_LOAD("el2100_3.ic4", 0xe000, 0x2000, CRC(2079a506) SHA1(a7bb83138c7b6eff6ea96702d453a214697f4890) )
@@ -908,7 +917,7 @@ ROM_START( feag2100 )
 	ROMX_LOAD("101-64106.ic16", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9), ROM_BIOS(3) )
 ROM_END
 
-ROM_START( feag2100a ) // model 6088
+ROM_START( feag2100a ) // model 6088 - checksum F361 9D5E 1D31 ADF0
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("2100_c_black.ic5",  0xc000, 0x2000, CRC(454eb839) SHA1(83d206464c194b022d43913b5f4092a8201f36b9) )
 	ROM_LOAD("2100_c_green.ic4",  0xe000, 0x2000, CRC(f1f76a63) SHA1(337b4572b743d383c6a12c360875d37682de3647) )

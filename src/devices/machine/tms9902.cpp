@@ -906,11 +906,6 @@ void tms9902_device::device_start()
 {
 	m_clock_rate = clock();
 
-	m_int_cb.resolve_safe();
-	m_rcv_cb.resolve_safe();
-	m_xmit_cb.resolve_safe();
-	m_ctrl_cb.resolve_safe();
-
 	m_dectimer = timer_alloc(FUNC(tms9902_device::decrementer_expired), this);
 	m_recvtimer = timer_alloc(FUNC(tms9902_device::recv_tick), this);
 	m_sendtimer = timer_alloc(FUNC(tms9902_device::send_tick), this);

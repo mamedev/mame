@@ -41,11 +41,6 @@ wtl3132_device::wtl3132_device(machine_config const &mconfig, char const *tag, d
 
 void wtl3132_device::device_start()
 {
-	m_fpcn_cb.resolve_safe();
-	m_fpex_cb.resolve_safe();
-	m_zero_cb.resolve_safe();
-	m_port_x_cb.resolve_safe();
-
 	save_item(NAME(m_fpcn_state));
 	save_item(NAME(m_fpex_state));
 	save_item(NAME(m_zero_state));

@@ -191,7 +191,7 @@
 #include "cage.h"
 #include "dcs.h"
 
-#include "bus/ata/idehd.h"
+#include "bus/ata/hdd.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/mips/mips3.h"
 #include "machine/gt64xxx.h"
@@ -290,6 +290,7 @@ public:
 		m_io_system(*this, "SYSTEM"),
 		m_io_dips(*this, "DIPS"),
 		m_wheel_driver(*this, "wheel"),
+		m_wheel_motor(*this, "wheel_motor"),
 		m_lamps(*this, "lamp%u", 0U),
 		m_leds(*this, "led%u", 0U)
 	{
@@ -357,7 +358,8 @@ private:
 	optional_ioport m_io_gearshift;
 	optional_ioport m_io_system;
 	optional_ioport m_io_dips;
-	output_finder<1> m_wheel_driver;
+	output_finder<> m_wheel_driver;
+	output_finder<> m_wheel_motor;
 	output_finder<16> m_lamps;
 	output_finder<24> m_leds;
 
@@ -425,11 +427,11 @@ private:
 	void wheel_board_w(offs_t offset, uint32_t data);
 
 
-	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(vblank_assert);
+	void ide_interrupt(int state);
+	void vblank_assert(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(ethernet_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(ioasic_irq);
+	void ethernet_interrupt(int state);
+	void ioasic_irq(int state);
 	void update_vblank_irq();
 	void update_galileo_irqs();
 	void widget_reset();
@@ -484,6 +486,7 @@ void seattle_state::machine_start()
 	save_item(NAME(m_wheel_calibrated));
 
 	m_wheel_driver.resolve();
+	m_wheel_motor.resolve();
 	m_lamps.resolve();
 	m_leds.resolve();
 
@@ -529,7 +532,7 @@ void seattle_state::machine_reset()
 *
 *************************************/
 
-WRITE_LINE_MEMBER(seattle_state::ethernet_interrupt)
+void seattle_state::ethernet_interrupt(int state)
 {
 	m_ethernet_irq_state = state;
 	if (m_board_config == FLAGSTAFF_CONFIG)
@@ -548,7 +551,7 @@ WRITE_LINE_MEMBER(seattle_state::ethernet_interrupt)
 *
 *************************************/
 
-WRITE_LINE_MEMBER(seattle_state::ioasic_irq)
+void seattle_state::ioasic_irq(int state)
 {
 	m_maincpu->set_input_line(IOASIC_IRQ_NUM, state);
 }
@@ -675,7 +678,7 @@ void seattle_state::vblank_clear_w(uint32_t data)
 }
 
 
-WRITE_LINE_MEMBER(seattle_state::vblank_assert)
+void seattle_state::vblank_assert(int state)
 {
 	// cache the raw state
 	m_vblank_state = state;
@@ -752,7 +755,7 @@ void seattle_state::wheel_board_w(offs_t offset, uint32_t data)
 		}
 		else
 		{
-			m_wheel_driver[0] = arg; // target wheel angle. signed byte.
+			m_wheel_driver = arg; // target wheel angle. signed byte.
 			m_wheel_force = int8_t(arg);
 		}
 	}
@@ -987,7 +990,7 @@ void seattle_state::output_w(uint32_t data)
 				break;
 
 			case 0x04:
-				output().set_value("wheel", arg); // wheel motor delta. signed byte.
+				m_wheel_motor = arg; // wheel motor delta. signed byte.
 				m_wheel_force = int8_t(~arg);
 				//logerror("wheel_board_w: data = %08x op: %02x arg: %02x\n", data, op, arg);
 				break;

@@ -68,9 +68,9 @@ protected:
 	uint8_t via_pa_r();
 	void via_pb_w(uint8_t data);
 	void via_pa_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(via_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(via_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(via_irq);
+	void via_ca2_w(int state);
+	void via_cb2_w(int state);
+	void via_irq(int state);
 
 	void vectrex_base(machine_config &config);
 

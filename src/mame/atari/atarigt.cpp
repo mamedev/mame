@@ -82,7 +82,7 @@ INTERRUPT_GEN_MEMBER(atarigt_state::scanline_int_gen)
 }
 
 
-WRITE_LINE_MEMBER(atarigt_state::video_int_write_line)
+void atarigt_state::video_int_write_line(int state)
 {
 	if (state)
 	{
@@ -1501,6 +1501,6 @@ GAME( 1994, tmek51p,    tmek,     tmek,       tmek,      atarigt_state, init_tme
 GAME( 1994, tmek45,     tmek,     tmek,       tmek,      atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v4.5)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
 GAME( 1994, tmek44,     tmek,     tmek,       tmek,      atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v4.4)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
 GAME( 1994, tmek20,     tmek,     tmek,       tmek,      atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v2.0, prototype)", MACHINE_NODEVICE_LAN )
-GAME( 1994, primrage,   0,        primrage,   primrage,  atarigt_state, init_primrage, ROT0, "Atari Games", "Primal Rage (version 2.3, newer build)", MACHINE_UNEMULATED_PROTECTION ) // OS: Jan 4 1995 18:25:40 Main: Jan 4 1995 18:28:24
-GAME( 1994, primrageo,  primrage, primrage,   primrageo, atarigt_state, init_primrage, ROT0, "Atari Games", "Primal Rage (version 2.3, older build)", MACHINE_UNEMULATED_PROTECTION ) // OS: Dec 6 1994 16:04:09 Main: Dec 7 1994 17:24:05
+GAME( 1994, primrage,   0,        primrage,   primrage,  atarigt_state, init_primrage, ROT0, "Atari Games", "Primal Rage (version 2.3, Jan 1995)", MACHINE_UNEMULATED_PROTECTION ) // OS: Jan 4 1995 18:25:40 Main: Jan 4 1995 18:28:24
+GAME( 1994, primrageo,  primrage, primrage,   primrageo, atarigt_state, init_primrage, ROT0, "Atari Games", "Primal Rage (version 2.3, Dec 1994)", MACHINE_UNEMULATED_PROTECTION ) // OS: Dec 6 1994 16:04:09 Main: Dec 7 1994 17:24:05
 GAME( 1994, primrage20, primrage, primrage20, primrageo, atarigt_state, init_primrage, ROT0, "Atari Games", "Primal Rage (version 2.0)", MACHINE_UNEMULATED_PROTECTION ) // OS: Aug 9 1994 17:05:40 Main: Aug 9 1994 17:05:02

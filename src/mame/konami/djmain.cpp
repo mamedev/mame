@@ -72,7 +72,7 @@ hard drive  3.5 adapter     long 3.5 IDE cable      3.5 adapter   PCB
 #include "konami_helper.h"
 
 #include "bus/ata/ataintf.h"
-#include "bus/ata/idehd.h"
+#include "bus/ata/hdd.h"
 #include "cpu/m68000/m68020.h"
 #include "sound/k054539.h"
 
@@ -102,6 +102,12 @@ public:
 		, m_turntable(*this, "TT%u", 1U)
 		, m_sndram(*this, "sndram")
 		, m_leds(*this, "led%u", 0U)
+		, m_right_red_hlt(*this, "right-red-hlt")
+		, m_left_red_hlt(*this, "left-red-hlt")
+		, m_right_blue_hlt(*this, "right-blue-hlt")
+		, m_left_blue_hlt(*this, "left-blue-hlt")
+		, m_right_ssr(*this, "right-ssr")
+		, m_left_ssr(*this, "left-ssr")
 	{
 	}
 
@@ -112,6 +118,7 @@ public:
 	void init_bm7thmix();
 	void init_bm6thmix();
 	void init_hmcompmx();
+	void init_bscompmx();
 	void init_bmfinal();
 	void init_hmcompm2();
 	void init_bm5thmix();
@@ -149,7 +156,7 @@ private:
 
 	uint32_t screen_update_djmain(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vb_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
+	void ide_interrupt(int state);
 	void draw_sprites( bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	K056832_CB_MEMBER(tile_callback);
 	void k054539_map(address_map &map);
@@ -168,6 +175,12 @@ private:
 	optional_ioport_array<2> m_turntable;
 	required_shared_ptr<uint8_t> m_sndram;
 	output_finder<3> m_leds;
+	output_finder<> m_right_red_hlt;
+	output_finder<> m_left_red_hlt;
+	output_finder<> m_right_blue_hlt;
+	output_finder<> m_left_blue_hlt;
+	output_finder<> m_right_ssr;
+	output_finder<> m_left_ssr;
 
 	int m_sndram_bank = 0;
 	int m_turntable_select = 0;
@@ -559,10 +572,10 @@ void djmain_state::light_ctrl_1_w(offs_t offset, uint32_t data, uint32_t mem_mas
 {
 	if (ACCESSING_BITS_16_31)
 	{
-		output().set_value("right-red-hlt",  !(data & 0x08000000));   // Right red HIGHLIGHT
-		output().set_value("left-red-hlt",   !(data & 0x04000000));   // Left red HIGHLIGHT
-		output().set_value("left-blue-hlt",  !(data & 0x02000000));   // Left blue HIGHLIGHT
-		output().set_value("right-blue-hlt", !(data & 0x00200000));   // Right blue HIGHLIGHT
+		m_right_red_hlt = !BIT(data, 27);   // Right red HIGHLIGHT
+		m_left_red_hlt = !BIT(data, 26);   // Left red HIGHLIGHT
+		m_left_blue_hlt = !BIT(data, 25);   // Left blue HIGHLIGHT
+		m_right_blue_hlt = !BIT(data, 21);   // Right blue HIGHLIGHT
 	}
 }
 
@@ -570,8 +583,8 @@ void djmain_state::light_ctrl_2_w(offs_t offset, uint32_t data, uint32_t mem_mas
 {
 	if (ACCESSING_BITS_16_31)
 	{
-		output().set_value("left-ssr",       !!(data & 0x08000000));  // SSR
-		output().set_value("right-ssr",      !!(data & 0x08000000));  // SSR
+		m_left_ssr = !!BIT(data, 27);  // SSR
+		m_right_ssr = !!BIT(data, 27);    // SSR
 		m_leds[0] = BIT(data, 16);            // 1P START
 		m_leds[1] = BIT(data, 17);            // 2P START
 		m_leds[2] = BIT(data, 18);            // EFFECT
@@ -621,7 +634,7 @@ INTERRUPT_GEN_MEMBER(djmain_state::vb_interrupt)
 }
 
 
-WRITE_LINE_MEMBER( djmain_state::ide_interrupt )
+void djmain_state::ide_interrupt(int state)
 {
 	if (state != CLEAR_LINE)
 	{
@@ -1623,6 +1636,12 @@ void djmain_state::machine_start()
 		hdd->set_user_password(m_ata_user_password);
 
 	m_leds.resolve();
+	m_right_red_hlt.resolve();
+	m_left_red_hlt.resolve();
+	m_right_blue_hlt.resolve();
+	m_left_blue_hlt.resolve();
+	m_right_ssr.resolve();
+	m_left_ssr.resolve();
 
 	save_item(NAME(m_sndram_bank));
 	save_item(NAME(m_pending_vb_int));
@@ -1904,6 +1923,27 @@ ROM_START( bmcmxaac )
 
 	DISK_REGION( "ata:0:hdd" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "858aac11", 0, SHA1(31cb039c20783f399885f3d9a7582593dae0ed40) ) /* ver 1.00 AA */
+ROM_END
+
+ROM_START( bscompmx )
+	ROM_REGION( 0x100000, "maincpu", 0 )    /* MC68EC020FG25 MPU */
+	ROM_LOAD16_BYTE( "858kab01.6a", 0x000000, 0x80000, CRC(47c19dcc) SHA1(3698c9d5ccaa24626d5a04b20750dc3faf423f68) )
+	ROM_LOAD16_BYTE( "858kab02.8a", 0x000001, 0x80000, CRC(cc848aaa) SHA1(1ebe4f8d3936dbcd0a83dadc3547951fcab39786) )
+
+	ROM_REGION( 0x200000, "gfx1", 0)        /* SPRITE */
+	ROM_LOAD16_BYTE( "858kab03.19a", 0x000000, 0x80000, CRC(679022e9) SHA1(70026a5c5bcb8adb58e7e7246f3cc30471a844a6) )
+	ROM_LOAD16_BYTE( "858kab04.20a", 0x000001, 0x80000, CRC(d916d8ec) SHA1(827fcd2c3c5e0d01e4cf49820d23eef44b63cfaa) )
+	ROM_LOAD16_BYTE( "858kab05.22a", 0x100000, 0x80000, CRC(f59c8e83) SHA1(fe4fee34ce12afc02e709190ec3a756a0cf77e08) )
+	ROM_LOAD16_BYTE( "858kab06.24a", 0x100001, 0x80000, CRC(8de99a50) SHA1(bde3fae982bd0a3492135b20542d87a87dd772ce) )
+
+	ROM_REGION( 0x200000, "k056832", 0 )    /* TILEMAP */
+	ROM_LOAD16_BYTE( "858kab07.22d", 0x000000, 0x80000, CRC(3bd6d429) SHA1(bc63eb4931d528aad6199fa4374f8a7d3cc50094) )
+	ROM_LOAD16_BYTE( "858kab08.23d", 0x000001, 0x80000, CRC(3a16c0bb) SHA1(77c417cab5b71dcfce4225471eb73e26e1adb1bb) )
+	ROM_LOAD16_BYTE( "858kab09.25d", 0x100000, 0x80000, CRC(f4a2fab7) SHA1(b7814a2bb04cb11969295dba97b2755daddbaab6) )
+	ROM_LOAD16_BYTE( "858kab10.27d", 0x100001, 0x80000, CRC(177777fb) SHA1(9d556d7d65a588bad300dbd282c6b5a31629bd6d) )
+
+	DISK_REGION( "ata:0:hdd" )              /* IDE HARD DRIVE */
+	DISK_IMAGE( "858kab11", 0, SHA1(951376b895782ac57844b25d13a4984d37cc9fc8) ) /* ver 1.00 KA */
 ROM_END
 
 ROM_START( bm4thmix )
@@ -2356,6 +2396,23 @@ void djmain_state::init_hmcompmx()
 	m_ata_user_password = hmcompmx_user_password;
 }
 
+void djmain_state::init_bscompmx()
+{
+	static const uint8_t bscompmx_user_password[2 + 32] =
+	{
+		0x00, 0x00,
+		0x44, 0x42, 0x56, 0x4b, 0x3a, 0x34, 0x38, 0x2a,
+		0x5a, 0x53, 0x78, 0x3e, 0x74, 0x61, 0x6c, 0x0a,
+		0x7a, 0x63, 0x19, 0x77, 0x73, 0x7d, 0x0d, 0x12,
+		0x6b, 0x09, 0x02, 0x0f, 0x05, 0x00, 0x7d, 0x1b
+	};
+
+	init_beatmania();
+
+	m_ata_master_password = beatmania_master_password;
+	m_ata_user_password = bscompmx_user_password;
+}
+
 void djmain_state::init_bm4thmix()
 {
 	static const uint8_t bm4thmix_user_password[2 + 32] =
@@ -2563,6 +2620,7 @@ GAME( 1999, bmcompmx, 0,        djmainj, bmcompmx,  djmain_state, init_beatmania
 GAME( 1999, bmcompmxb,bmcompmx, djmainj, bmcompmx,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania complete MIX (ver JA-B)", 0 )
 GAME( 1999, bmcmxaac, bmcompmx, djmainu, bmcompmx,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania complete MIX (ver AA-C)", 0 )
 GAME( 1999, hmcompmx, bmcompmx, djmainu, bmcompmx,  djmain_state, init_hmcompmx,  ROT0, "Konami", "hiphopmania complete MIX (ver UA-B)", 0 )
+GAME( 1999, bscompmx, bmcompmx, djmainu, bmcompmx,  djmain_state, init_bscompmx,  ROT0, "Konami", "beatstage complete MIX (ver KA-B)", 0 )
 GAME( 1999, bm4thmix, 0,        djmainj, bm4thmix,  djmain_state, init_bm4thmix,  ROT0, "Konami", "beatmania 4th MIX (ver JA-A)", 0 )
 GAME( 1999, bs4thmix, bm4thmix, djmainu, bm4thmix,  djmain_state, init_bs4thmix,  ROT0, "Konami", "beatstage 4th MIX (ver KA-A)", 0 )
 GAME( 1999, bm5thmix, 0,        djmainj, bm5thmix,  djmain_state, init_bm5thmix,  ROT0, "Konami", "beatmania 5th MIX (ver JA-A)", 0 )

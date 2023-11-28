@@ -21,7 +21,8 @@ magnetic chess board sensors. See sc12.cpp for a more technical description.
 The first RAM chip is low-power, and battery-backed with a capacitor. This is
 also mentioned in the manual. Maybe it does not apply to older PCBs.
 
-Like with EAS, the new game command is: RE -> D8 -> CL.
+Like with EAS, the new game command for AS12 is: RE -> D6 (or D8) -> CL.
+The newer model 6085 does not have this issue.
 
 TODO:
 - is the initial AS12 3MHz version the same ROM as felega1? When it's configured
@@ -45,7 +46,7 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_as12.lh" // clickable
+#include "fidel_as12.lh"
 
 
 namespace {
@@ -81,6 +82,9 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport m_inputs;
 
+	u16 m_inp_mux = 0;
+	u8 m_led_data = 0;
+
 	// address maps
 	void main_map(address_map &map);
 
@@ -89,9 +93,6 @@ private:
 	void control_w(u8 data);
 	void led_w(offs_t offset, u8 data);
 	u8 input_r(offs_t offset);
-
-	u16 m_inp_mux = 0;
-	u8 m_led_data = 0;
 };
 
 void as12_state::machine_start()

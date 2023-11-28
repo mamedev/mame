@@ -245,7 +245,7 @@ TIMER_CALLBACK_MEMBER(ie15_device::hblank_onoff_tick)
 
 /* serial port */
 
-WRITE_LINE_MEMBER(ie15_device::rs232_conn_rxd_w)
+void ie15_device::rs232_conn_rxd_w(int state)
 {
 	device_serial_interface::rx_w(state);
 }
@@ -301,7 +301,7 @@ void ie15_device::serial_speed_w(uint8_t data)
 	return;
 }
 
-WRITE_LINE_MEMBER(ie15_device::update_serial)
+void ie15_device::update_serial(int state)
 {
 	int startbits = 1;
 	int databits = m_rs232_databits->read();
@@ -465,16 +465,9 @@ void ie15_device::kbd_put(uint16_t data)
 	}
 }
 
-WRITE_LINE_MEMBER( ie15_device::kbd_sdv )
+void ie15_device::kbd_sdv(int state)
 {
 	m_kbd_sdv = state;
-}
-
-void ie15_device::device_resolve_objects()
-{
-	m_rs232_conn_dtr_handler.resolve_safe();
-	m_rs232_conn_rts_handler.resolve_safe();
-	m_rs232_conn_txd_handler.resolve_safe();
 }
 
 void ie15_device::device_start()

@@ -473,7 +473,7 @@ hdc92x4_device::hdc92x4_device(const machine_config &mconfig, device_type type, 
 	m_out_dmarq(*this),
 	m_out_dip(*this),
 	m_out_auxbus(*this),
-	m_in_dma(*this),
+	m_in_dma(*this, 0),
 	m_out_dma(*this),
 	m_initialized(false)
 {
@@ -809,7 +809,7 @@ void hdc92x4_device::wait_line(int line, line_state level, int substate, bool st
 
 	if (line == SEEKCOMP_LINE && (seek_complete() == (level==ASSERT_LINE)))
 	{
-		LOGMASKED(LOG_LINES, "SEEK_COMPLETE line is already %d\n", level);
+		LOGMASKED(LOG_STEP, "SEEK_COMPLETE line is already %d\n", level);
 	}
 	else
 	{
@@ -930,7 +930,7 @@ void hdc92x4_device::read_id(int& cont, bool implied_seek, bool wait_seek_comple
 				if (wait_seek_complete)
 				{
 					// We have to wait for SEEK COMPLETE
-					LOGMASKED(LOG_SUBSTATES, "Waiting for SEEK COMPLETE\n");
+					LOGMASKED(LOG_STEP, "Waiting for SEEK COMPLETE\n");
 					wait_line(SEEKCOMP_LINE, ASSERT_LINE, READ_ID_SEEK_COMPLETE, false);
 					cont = WAIT;
 				}
@@ -943,7 +943,7 @@ void hdc92x4_device::read_id(int& cont, bool implied_seek, bool wait_seek_comple
 				break;
 			}
 
-			LOGMASKED(LOG_SUBSTATES, "substate STEP_ON\n");
+			LOGMASKED(LOG_STEP, "substate STEP_ON\n");
 			// STEPDIR = 0 -> towards TRK00
 			set_bits(m_output2, OUT2_STEPDIR, (m_track_delta>0));
 			set_bits(m_output2, OUT2_STEPPULSE, true);
@@ -952,7 +952,7 @@ void hdc92x4_device::read_id(int& cont, bool implied_seek, bool wait_seek_comple
 			break;
 
 		case READ_ID_STEPOFF:
-			LOGMASKED(LOG_SUBSTATES, "substate STEP_OFF\n");
+			LOGMASKED(LOG_STEP, "substate STEP_OFF\n");
 			set_bits(m_output2, OUT2_STEPPULSE, false);
 			m_track_delta += (m_track_delta<0)? 1 : -1;
 			// Return to STEP_ON, check whether there are more steps
@@ -1404,7 +1404,7 @@ void hdc92x4_device::restore_drive()
 
 	if (m_substate == UNDEF)
 	{
-		LOGMASKED(LOG_COMMAND, "RESTORE command %02x\n", current_command());
+		LOGMASKED(LOG_RESTORE, "RESTORE command %02x\n", current_command());
 		m_seek_count = 0;
 		m_substate = RESTORE_CHECK;
 	}
@@ -1447,7 +1447,7 @@ void hdc92x4_device::restore_drive()
 			break;
 
 		case STEP_ON:
-			LOGMASKED(LOG_SUBSTATES, "[%s] substate STEP_ON\n", ttsn());
+			LOGMASKED(LOG_RESTORE, "[%s] substate STEP_ON\n", ttsn());
 
 			// Increase step count
 			m_seek_count++;
@@ -1462,7 +1462,7 @@ void hdc92x4_device::restore_drive()
 			break;
 
 		case STEP_OFF:
-			LOGMASKED(LOG_SUBSTATES, "[%s] substate STEP_OFF\n", ttsn());
+			LOGMASKED(LOG_RESTORE, "[%s] substate STEP_OFF\n", ttsn());
 			set_bits(m_output2, OUT2_STEPPULSE, false);
 			wait_time(m_timer, step_time(), RESTORE_CHECK);
 			cont = WAIT;
@@ -1834,7 +1834,7 @@ void hdc92x4_device::read_sectors()
 	{
 		// Command init
 		m_logical = (current_command() & 0x04)!=0;  // used in VERIFY and DATA TRANSFER substate
-		LOGMASKED(LOG_COMMAND, "READ SECTORS %s command %02x, CHS=(%d,%d,%d)\n", m_logical? "LOGICAL": "PHYSICAL", current_command(), desired_cylinder(), desired_head(), desired_sector());
+		LOGMASKED(LOG_READ, "[%s] READ SECTORS %s command %02x, CHS=(%d,%d,%d)\n", ttsn(), m_logical? "LOGICAL": "PHYSICAL", current_command(), desired_cylinder(), desired_head(), desired_sector());
 
 		m_bypass = !m_is_hdc9234 && (current_command() & 0x02)!=0;
 		m_transfer_enabled = (current_command() & 0x01)!=0;
@@ -4610,7 +4610,7 @@ void hdc92x4_device::ready_handler()
 void hdc92x4_device::seek_complete_handler()
 {
 	int level = seek_complete()? ASSERT_LINE : CLEAR_LINE;
-	LOGMASKED(LOG_LINES, "[%s] Seek complete handler; level=%d\n", ttsn(), level);
+	LOGMASKED(LOG_STEP, "[%s] Seek complete handler; level=%d\n", ttsn(), level);
 
 	// Some commands may wait for SEEK_COMPLETE regardless of the step rate
 	if (waiting_for_line(SEEKCOMP_LINE, level))
@@ -4712,7 +4712,7 @@ void hdc92x4_device::set_interrupt(line_state intr)
 /*
     DMA acknowledge line.
 */
-WRITE_LINE_MEMBER( hdc92x4_device::dmaack )
+void hdc92x4_device::dmaack(int state)
 {
 	if (state==ASSERT_LINE)
 	{
@@ -4776,7 +4776,7 @@ TIMER_CALLBACK_MEMBER(hdc92x4_device::com_timer_expired)
 /*
     Reset the controller. Negative logic, but we use ASSERT_LINE.
 */
-WRITE_LINE_MEMBER( hdc92x4_device::reset )
+void hdc92x4_device::reset(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -4787,13 +4787,6 @@ WRITE_LINE_MEMBER( hdc92x4_device::reset )
 
 void hdc92x4_device::device_start()
 {
-	m_out_intrq.resolve_safe();
-	m_out_dip.resolve_safe();
-	m_out_auxbus.resolve_safe();
-	m_out_dmarq.resolve_safe();
-	m_out_dma.resolve_safe();
-	m_in_dma.resolve_safe(0);
-
 	// allocate timers
 	m_timer = timer_alloc(FUNC(hdc92x4_device::gen_timer_expired), this);
 	m_cmd_timer = timer_alloc(FUNC(hdc92x4_device::com_timer_expired), this);

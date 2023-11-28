@@ -25,6 +25,15 @@ tp1 = phi clock (tied to f2q rom access)
 #include "emu.h"
 #include "votrax.h"
 
+#define LOG_PHONE  (1U << 1)
+#define LOG_COMMIT (1U << 2)
+#define LOG_INT    (1U << 3)
+#define LOG_TICK   (1U << 4)
+#define LOG_FILTER (1U << 5)
+
+//#define VERBOSE (LOG_GENERAL | LOG_PHONE)
+#include "logmacro.h"
+
 
 DEFINE_DEVICE_TYPE(VOTRAX_SC01, votrax_sc01_device, "votrsc01", "Votrax SC-01")
 DEFINE_DEVICE_TYPE(VOTRAX_SC01A, votrax_sc01a_device, "votrsc01a", "Votrax SC-01-A")
@@ -111,7 +120,7 @@ void votrax_sc01_device::write(uint8_t data)
 	m_phone = data & 0x3f;
 
 	if(m_phone != prev || m_phone != 0x3f)
-		logerror("phone %02x.%d %s\n", m_phone, m_inflection, s_phone_table[m_phone]);
+		LOGMASKED(LOG_PHONE, "phone %02x.%d %s\n", m_phone, m_inflection, s_phone_table[m_phone]);
 
 	m_ar_state = CLEAR_LINE;
 	m_ar_cb(m_ar_state);
@@ -194,7 +203,6 @@ void votrax_sc01_device::device_start()
 	m_timer = timer_alloc(FUNC(votrax_sc01_device::phone_tick), this);
 
 	// reset outputs
-	m_ar_cb.resolve_safe();
 	m_ar_state = ASSERT_LINE;
 
 	// save inputs
@@ -409,8 +417,7 @@ void votrax_sc01_device::phone_commit()
 			// Hard-wired on the die, not an actual part of the rom.
 			m_rom_pause = (m_phone == 0x03) || (m_phone == 0x3e);
 
-			if(0)
-				logerror("commit fa=%x va=%x fc=%x f1=%x f2=%x f2q=%x f3=%x dur=%02x cld=%x vd=%d cl=%d pause=%d\n", m_rom_fa, m_rom_va, m_rom_fc, m_rom_f1, m_rom_f2, m_rom_f2q, m_rom_f3, m_rom_duration, m_rom_cld, m_rom_vd, m_rom_closure, m_rom_pause);
+			LOGMASKED(LOG_COMMIT, "commit fa=%x va=%x fc=%x f1=%x f2=%x f2q=%x f3=%x dur=%02x cld=%x vd=%d cl=%d pause=%d\n", m_rom_fa, m_rom_va, m_rom_fc, m_rom_f1, m_rom_f2, m_rom_f2q, m_rom_f3, m_rom_duration, m_rom_cld, m_rom_vd, m_rom_closure, m_rom_pause);
 
 			// That does not happen in the sc01(a) rom, but let's
 			// cover our behind.
@@ -460,29 +467,30 @@ void votrax_sc01_device::chip_update()
 	// The formants are frozen on a pause phone unless both voice and
 	// noise volumes are zero.
 	if(tick_208 && (!m_rom_pause || !(m_filt_fa || m_filt_va))) {
-		//      interpolate(m_cur_va,  m_rom_va);
+		// interpolate(m_cur_va,  m_rom_va);
 		interpolate(m_cur_fc,  m_rom_fc);
 		interpolate(m_cur_f1,  m_rom_f1);
 		interpolate(m_cur_f2,  m_rom_f2);
 		interpolate(m_cur_f2q, m_rom_f2q);
 		interpolate(m_cur_f3,  m_rom_f3);
-		//      logerror("int fa=%x va=%x fc=%x f1=%x f2=%02x f2q=%02x f3=%x\n", m_cur_fa >> 4, m_cur_va >> 4, m_cur_fc >> 4, m_cur_f1 >> 4, m_cur_f2 >> 3, m_cur_f2q >> 4, m_cur_f3 >> 4);
+		LOGMASKED(LOG_INT, "int fa=%x va=%x fc=%x f1=%x f2=%02x f2q=%02x f3=%x\n", m_cur_fa >> 4, m_cur_va >> 4, m_cur_fc >> 4, m_cur_f1 >> 4, m_cur_f2 >> 3, m_cur_f2q >> 4, m_cur_f3 >> 4);
 	}
 
 	// Non-formant update. Same bug there, va should be updated, not fc.
 	if(tick_625) {
 		if(m_ticks >= m_rom_vd)
 			interpolate(m_cur_fa, m_rom_fa);
-		if(m_ticks >= m_rom_cld)
-			//          interpolate(m_cur_fc, m_rom_fc);
+		if(m_ticks >= m_rom_cld) {
+			// interpolate(m_cur_fc, m_rom_fc);
 			interpolate(m_cur_va, m_rom_va);
-		//      logerror("int fa=%x va=%x fc=%x f1=%x f2=%02x f2q=%02x f3=%x\n", m_cur_fa >> 4, m_cur_va >> 4, m_cur_fc >> 4, m_cur_f1 >> 4, m_cur_f2 >> 3, m_cur_f2q >> 4, m_cur_f3 >> 4);
+			LOGMASKED(LOG_INT, "int fa=%x va=%x fc=%x f1=%x f2=%02x f2q=%02x f3=%x\n", m_cur_fa >> 4, m_cur_va >> 4, m_cur_fc >> 4, m_cur_f1 >> 4, m_cur_f2 >> 3, m_cur_f2q >> 4, m_cur_f3 >> 4);
+		}
 	}
 
 	// Closure counter, reset every other tick in theory when not
 	// active (on the extra rom cycle).
 	//
-	// The closure level is immediatly used in the analog path,
+	// The closure level is immediately used in the analog path,
 	// there's no pitch synchronization.
 
 	if(!m_cur_closure && (m_filt_fa || m_filt_va))
@@ -511,7 +519,7 @@ void votrax_sc01_device::chip_update()
 	m_noise = ((m_noise << 1) & 0x7ffe) | inp;
 	m_cur_noise = !(((m_noise >> 14) ^ (m_noise >> 13)) & 1);
 
-	//  logerror("%s tick %02x.%03x 625=%d 208=%d pitch=%02x.%x ns=%04x ni=%d noise=%d cl=%x.%x clf=%d/%d\n", machine().time().to_string(), m_ticks, m_phonetick, tick_625, tick_208, m_pitch >> 3, m_pitch & 7, m_noise, inp, m_cur_noise, m_closure >> 2, m_closure & 3, m_rom_closure, m_cur_closure);
+	LOGMASKED(LOG_TICK, "%s tick %02x.%03x 625=%d 208=%d pitch=%02x.%x ns=%04x ni=%d noise=%d cl=%x.%x clf=%d/%d\n", machine().time().to_string(), m_ticks, m_phonetick, tick_625, tick_208, m_pitch >> 3, m_pitch & 7, m_noise, inp, m_cur_noise, m_closure >> 2, m_closure & 3, m_rom_closure, m_cur_closure);
 }
 
 void votrax_sc01_device::filters_commit(bool force)
@@ -584,10 +592,8 @@ void votrax_sc01_device::filters_commit(bool force)
 								  14083);
 	}
 
-	if(0)
-		if(m_filt_fa || m_filt_va || m_filt_fc || m_filt_f1 || m_filt_f2 || m_filt_f2q || m_filt_f3)
-			logerror("filter fa=%x va=%x fc=%x f1=%x f2=%02x f2q=%x f3=%x\n",
-					 m_filt_fa, m_filt_va, m_filt_fc, m_filt_f1, m_filt_f2, m_filt_f2q, m_filt_f3);
+	if(m_filt_fa | m_filt_va | m_filt_fc | m_filt_f1 | m_filt_f2 | m_filt_f2q | m_filt_f3)
+		LOGMASKED(LOG_FILTER, "filter fa=%x va=%x fc=%x f1=%x f2=%02x f2q=%x f3=%x\n", m_filt_fa, m_filt_va, m_filt_fc, m_filt_f1, m_filt_f2, m_filt_f2q, m_filt_f3);
 }
 
 stream_buffer::sample_t votrax_sc01_device::analog_calc()
@@ -684,16 +690,16 @@ stream_buffer::sample_t votrax_sc01_device::analog_calc()
   defined as the ratio Vo/Vi.  To do that, you use some properties:
 
   - The intensity through an element is equal to the voltage
-    difference through the element divided by the impedence
+    difference through the element divided by the impedance
 
-  - The impedence of a resistance is equal to its resistance
+  - The impedance of a resistance is equal to its resistance
 
-  - The impedence of a capacitor is 1/(s*C) where C is its capacitance
+  - The impedance of a capacitor is 1/(s*C) where C is its capacitance
 
-  - The impedence of elements in series is the sum of the impedences
+  - The impedance of elements in series is the sum of their impedances
 
-  - The impedence of elements in parallel is the inverse of the sum of
-    the inverses
+  - The impedance of elements in parallel is the inverse of the sum of
+    their inverses
 
   - The sum of all intensities flowing into a node is 0 (there's no
     charge accumulation in a wire)
@@ -738,7 +744,7 @@ stream_buffer::sample_t votrax_sc01_device::analog_calc()
   |        H(s) = -------------------------
   |                 1 + k[1]*s + k[2]*s^2
 
-  We can always reintroduce the global multipler later, and it's 1 in
+  We can always reintroduce the global multiplier later, and it's 1 in
   most of our cases anyway.
 
   The we pose:

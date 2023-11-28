@@ -9,11 +9,7 @@
   Who Wants to Know? (wwtk@mail.com)
 
   This core is written with the advise and consent of Matthew Conte and is
-  released under the GNU Public License.  This core is freely available for
-  use in any freeware project, subject to the following terms:
-
-  Any modifications to this code must be duly noted in the source and
-  approved by Matthew Conte and myself prior to public submission.
+  released under the GNU Public License.
 
  *****************************************************************************
 

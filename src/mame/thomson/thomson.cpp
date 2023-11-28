@@ -534,7 +534,7 @@ void thomson_state::to7_base(machine_config &config, bool is_mo)
 		m_extension->option_add("nanoreseau", NANORESEAU_TO);
 
 /* pia */
-	PIA6821(config, m_pia_sys, 0);
+	PIA6821(config, m_pia_sys);
 	m_pia_sys->readpa_handler().set(FUNC(thomson_state::to7_sys_porta_in));
 	m_pia_sys->readpb_handler().set(FUNC(thomson_state::to7_sys_portb_in));
 	m_pia_sys->writepb_handler().set(FUNC(thomson_state::to7_sys_portb_out));
@@ -543,7 +543,7 @@ void thomson_state::to7_base(machine_config &config, bool is_mo)
 	m_pia_sys->irqa_handler().set("mainfirq", FUNC(input_merger_device::in_w<0>));
 	m_pia_sys->irqb_handler().set("mainfirq", FUNC(input_merger_device::in_w<1>));
 
-	PIA6821(config, m_pia_game, 0);
+	PIA6821(config, m_pia_game);
 	m_pia_game->readpa_handler().set(FUNC(thomson_state::to7_game_porta_in));
 	m_pia_game->readpb_handler().set(FUNC(thomson_state::to7_game_portb_in));
 	m_pia_game->writepb_handler().set(FUNC(thomson_state::to7_game_portb_out));

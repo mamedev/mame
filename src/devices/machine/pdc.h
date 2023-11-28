@@ -14,7 +14,6 @@
 #include "cpu/z80/z80.h"
 #include "machine/upd765.h"
 #include "machine/am9517a.h"
-#include "formats/pc_dsk.h"
 #include "machine/hdc92x4.h"
 #include "imagedev/mfmhd.h"
 

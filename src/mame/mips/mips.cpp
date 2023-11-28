@@ -180,20 +180,20 @@
  * Keyboard controller output port
  *  4: select 1M/4M SIMMs?
  *
+ * rs3230 -window -nomax -ui_active -tty1 terminal -numscreens 2
  * PON failures
- *   kseg0/kseg1 cache
- *   instruction cache functionality (skipped)
+ *   instruction cache functionality (failed)
  *   instruction cache mats+ (skipped)
- *   data cache block refill
+ *   data cache block refill (failed)
  *   instruction cache block refill (skipped)
- *   scc - requires z80scc zero count interrupt
+ *   id prom (failed)
  *   tod - loop <1 second real time?
  *   color frame buffer (skipped)
  *   dma controller chip
  *   scsi controller chip
  *   tlb (skipped) - all pass except tlb_n (requires cpu data cache)
  *   exception (skipped)
- *   parity
+ *   parity (failed)
  *   dma parity (skipped)
  *   at serial board (skipped)
  */
@@ -238,11 +238,7 @@
 #include "sound/spkrdev.h"
 #include "speaker.h"
 
-#include "formats/pc_dsk.h"
-
 #include "imagedev/floppy.h"
-
-#include "debugger.h"
 
 #define LOG_MMU     (1U << 1)
 #define LOG_IOCB    (1U << 2)
@@ -392,7 +388,7 @@ protected:
 	u16 lance_r(offs_t offset, u16 mem_mask = 0xffff);
 	void lance_w(offs_t offset, u16 data, u16 mem_mask = 0xffff);
 
-	template <u8 Source> WRITE_LINE_MEMBER(irq_w);
+	template <u8 Source> void irq_w(int state);
 
 private:
 	// processors and memory
@@ -571,10 +567,8 @@ void rx2030_state::iop_io_map(address_map &map)
 	map(0x0200, 0x0201).rw(m_fio, FUNC(z8038_device::fifo_r<1>), FUNC(z8038_device::fifo_w<1>)).umask16(0xff);
 	map(0x0202, 0x0203).rw(m_fio, FUNC(z8038_device::reg_r<1>), FUNC(z8038_device::reg_w<1>)).umask16(0xff);
 
-	map(0x0240, 0x0241).lw8(NAME([this] (u8 data) { m_rtc->write(0, data); })).umask16(0xff00);
-	map(0x0280, 0x0281).lrw8(
-			NAME([this] () { return m_rtc->read(1); }),
-			NAME([this] (u8 data) { m_rtc->write(1, data); })).umask16(0xff00);
+	map(0x0240, 0x0241).w(m_rtc, FUNC(mc146818_device::address_w)).umask16(0xff00);
+	map(0x0280, 0x0281).rw(m_rtc, FUNC(mc146818_device::data_r), FUNC(mc146818_device::data_w)).umask16(0xff00);
 
 	map(0x02c0, 0x2c1).lw8([this](u8 data)
 	{
@@ -1151,7 +1145,7 @@ void rx3230_state::rs3230(machine_config &config)
 	}
 }
 
-template <u8 Source> WRITE_LINE_MEMBER(rx3230_state::irq_w)
+template <u8 Source> void rx3230_state::irq_w(int state)
 {
 	if (state)
 		m_int_reg |= Source;

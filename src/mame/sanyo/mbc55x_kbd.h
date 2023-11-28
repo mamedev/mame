@@ -31,20 +31,19 @@ public:
 	auto txd_callback() { return m_txd_callback.bind(); }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	// device_matrix_keyboard_interface overrides
+	// device_matrix_keyboard_interface implementation
 	virtual void key_make(u8 row, u8 column) override;
 	virtual void key_repeat(u8 row, u8 column) override;
 	virtual void scan_complete() override;
 
-	// device_serial_interface overrides;
+	// device_serial_interface implementation
 	virtual void tra_callback() override;
 	virtual void tra_complete() override;
 

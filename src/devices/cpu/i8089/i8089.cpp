@@ -60,10 +60,6 @@ void i8089_device::device_start()
 	// set our instruction counter
 	set_icountptr(m_icount);
 
-	// resolve callbacks
-	m_write_sintr1.resolve_safe();
-	m_write_sintr2.resolve_safe();
-
 	// register debugger states
 	state_add(SYSBUS, "SYSBUS", m_sysbus).mask(0x01).formatstr("%1s");
 	state_add(SCB, "SCB", m_scb).mask(0xfffff);
@@ -346,7 +342,7 @@ void i8089_device::execute_run()
 //  EXTERNAL INPUTS
 //**************************************************************************
 
-WRITE_LINE_MEMBER( i8089_device::ca_w )
+void i8089_device::ca_w(int state)
 {
 	if (VERBOSE)
 		logerror("%s('%s'): ca_w: %u\n", shortname(), basetag(), state);
@@ -367,7 +363,7 @@ WRITE_LINE_MEMBER( i8089_device::ca_w )
 	m_ca = state;
 }
 
-WRITE_LINE_MEMBER( i8089_device::drq1_w ) { m_ch1->drq_w(state); }
-WRITE_LINE_MEMBER( i8089_device::drq2_w ) { m_ch2->drq_w(state); }
-WRITE_LINE_MEMBER( i8089_device::ext1_w ) { m_ch1->ext_w(state); }
-WRITE_LINE_MEMBER( i8089_device::ext2_w ) { m_ch2->ext_w(state); }
+void i8089_device::drq1_w(int state) { m_ch1->drq_w(state); }
+void i8089_device::drq2_w(int state) { m_ch2->drq_w(state); }
+void i8089_device::ext1_w(int state) { m_ch1->ext_w(state); }
+void i8089_device::ext2_w(int state) { m_ch2->ext_w(state); }

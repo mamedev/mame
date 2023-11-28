@@ -86,6 +86,26 @@ Demo/Shareware: "Bodycount", "Zone 66", "Save Our Pizzas", "Dangerous Dave", "Ca
 		</part>
 	</software>
 
+	<!-- Source: http://redump.org/disc/39732/ -->
+	<!-- <rom name="Ghostbusters II (Europe).cue" size="90" crc="b5173bfa" sha1="40d4df52366ca603906aaf431f896bfc87513cfe"/> -->
+	<!-- <rom name="Ghostbusters II (Europe).bin" size="8319024" crc="425f552f" sha1="20a9f1c1bec8097018e4ce4c288cccaf794a3049"/> -->
+	<software name="5plus1_12">
+		<description>5 Plus One: Pack 12 - Ghostbusters II</description>
+		<year>1994</year>
+		<publisher>Prism Leisure Corporation PLC</publisher>
+		<notes><![CDATA[
+Demo/Shareware included: "Back to the Forest", "Electroman", "Christmas Jetpack", "Hugo 3: Jungle of Doom", "Bip Bop 2"
+]]></notes>
+		<info name="region" value="Europe" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Ghostbusters II (Europe)" sha1="2518504af2cf720997401d967e67f75ffbd1bf49" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Source: http://redump.org/disc/35748/ -->
 	<!-- <rom name="TV Sports Football (Europe).cue" size="93" crc="64a640a0" sha1="fbc6fcb695b38c0792312a23ae3c79a4aab6ee7b"/> -->
 	<!-- <rom name="TV Sports Football (Europe).bin" size="6905472" crc="11800913" sha1="6660a474a49f71485cc5ee802dafca90736c53fc"/> -->
@@ -1481,6 +1501,52 @@ Some samples have audio crackling [SB16]
 		</part>
 	</software>
 
+	<!-- DOS -->
+	<software name="bestof2" supported="partial">
+		<description>Best of the Best Shareware Volume 2 (Canada)</description>
+		<year>1994</year>
+		<publisher>Explore The World of Software</publisher>
+		<notes><![CDATA[
+1994 Pool:
+1995 Card Games:
+3d Line Wars:
+3d Towers:
+Alien Carnage:
+Alien Doom (level pack for Doom):
+Body Blow:
+Boppin:
+Brudal Baddle:
+Cyberdogs:
+Desert Storm Command
+Digital Downs
+Doom Gathering (level pack for Doom):
+Doom Star Wars (Doom add-on):
+Dr. Riptide:
+Hero's Heart:
+Ladder Man III:
+NHL Hockey:
+One Must Fall:
+Operation Body Count:
+Pool Shark:
+Risky Woods: boot OK
+Shadow Force:
+Silverball Pinball:
+Skunny Karts:
+Skunny Space:
+Skunny Wildwest:
+Tie Fighter:
+Wacky Wheels:
+]]></notes>
+		<info name="usage" value="Run dosroc.exe for a" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="best_of_the_best_vol_2" sha1="4e698516d0a6676c25c3d3fa26b65fe0ce20f52b"/>
+			</diskarea>
+		</part>
+	</software>
+
+
 	<!-- DOS / Windows 3.1 -->
 	<software name="bfchess">
 		<description>Bobby Fischer Teaches Chess</description>
@@ -1573,6 +1639,41 @@ Some samples have audio crackling [SB16]
 		<part name="cdrom4" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="blade runner (1997)(virgin)(disc 4 of 4)" sha1="f4681e82c6cd1d17d449831102f5c9235b6d6659" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Pentium 75 MHz -->
+	<!-- Windows 95 -->
+	<!-- 16 MB RAM, CD-ROM x4, SVGA with 16-bit color depth, SB16 -->
+	<!-- Credits also mentions Mac support, different discs? -->
+	<software name="blindnes" supported="no">
+		<description>Blindness (Italy)</description>
+		<year>1996</year>
+		<!-- capitalized as "MONDADORI newmedia" on back cover -->
+		<publisher>Mondadori New Media</publisher>
+		<notes><![CDATA[
+Offset [SVGA] gfxs during initial credits and gameplay
+No [SVGA] card supports 16-bit color depth (required by gameplay)
+Has [SB16] lip-sync issues with ct486, may go down in requiring 75 MHz instead
+]]></notes>
+		<info name="developer" value="DedaloMedia Edizioni" />
+
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="blindness_cd1_[pc_ita]" sha1="21804a294e2555c699b32cd0a8c191c430ad1323"/>
+			</diskarea>
+		</part>
+
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="blindness_cd2_[pc_ita]" sha1="d44027d0ab4ba20efe1bdd843576b73dbca9666e"/>
+			</diskarea>
+		</part>
+
+		<part name="cdrom3" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="blindness_cd3_[pc_ita]" sha1="198059bc026de5fb246783f249b756f2969c2a77"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1809,6 +1910,24 @@ Some samples have audio crackling [SB16]
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Beneath a Steel Sky (USA) (En,Fr,De,Es,It,Pt,Sv) (Rerelease)" sha1="c95f573726cf073cceef0d5b6467c0b6ed211ed1" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/34829/ -->
+	<!-- <rom name="Brutal - Paws of Fury (Europe).cue" size="119" crc="5c1ebf31" md5="74acce0b4ed85bbd96d43ee0e0752366" sha1="434e25a55dd2319c405fee04af51837d6cbba928"/> -->
+	<!-- <rom name="Brutal - Paws of Fury (Europe).bin" size="4148928" crc="e4aee56a" md5="1b551092f6a7d1878c3a5053709530a9" sha1="a76f9f09db479caeb92403e68e31c26d03005224"/> -->
+	<software name="pawsfury">
+		<description>Brutal: Paws of Fury (Europe)</description>
+		<year>1995</year>
+		<publisher>GameTek</publisher>
+		<info name="developer" value="GameTek" />
+		<info name="region" value="Europe" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Brutal - Paws of Fury (Europe)" sha1="34a8c163fd76fda26d1735191bbfcb0de0307926" />
 			</diskarea>
 		</part>
 	</software>
@@ -2352,6 +2471,42 @@ Offset [CDDA] audio, does not stop when exiting game (including getting to Windo
 		</part>
 	</software>
 
+	<!-- Source: http://redump.org/disc/31166/ -->
+	<!-- <rom name="Cool Croc Twins, The + Magic Boy (Europe).cue" size="130" crc="cc97361e" sha1="4a149fe709f5d6ebd6fa0f9773951aeea2ef5d8d"/> -->
+	<!-- <rom name="Cool Croc Twins, The + Magic Boy (Europe).bin" size="7251216" crc="3aa0cc4f" sha1="d600e83f4c53cf9a8388245eddfb5dbf0168c76f"/> -->
+	<software name="cctmboy">
+		<description>The Cool Croc Twins + Magic Boy (Europe, 2 Game Pack release)</description>
+		<year>1996</year>
+		<publisher>Empire Interactive</publisher>
+		<info name="copy_protection" value="The Cool Croc Twins: Manual required" />
+		<info name="region" value="Europe" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Cool Croc Twins, The - Magic Boy (Europe)" sha1="e512584714ef77db7286a5db89164498184d6f09" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/35022/ -->
+	<!-- <rom name="Cool Croc Twins, The &amp; Magic Boy (Netherlands).cue" size="135" crc="735c8e39" sha1="4dc40651393d609bbd097615aae56432a7c922b8"/> -->
+	<!-- <rom name="Cool Croc Twins, The &amp; Magic Boy (Netherlands).bin" size="7604016" crc="e87a37a3" sha1="505f1f877d45c01dd1e8ab543008038f6c5c1258"/> -->
+	<software name="cctmboy_a" cloneof="cctmboy">
+		<description>The Cool Croc Twins + Magic Boy (Netherlands)</description>
+		<year>1996</year>
+		<publisher>Empire Interactive</publisher>
+		<info name="copy_protection" value="The Cool Croc Twins: Manual required" />
+		<info name="region" value="Netherlands" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Cool Croc Twins, The - Magic Boy (Netherlands)" sha1="fc20fc4bbc733a9f54046b70fde3b274206fd9c3" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- DOS -->
 	<!-- Multidisc collection featuring Around the World in 80 Days, Jungle Book and Peter Pan -->
 	<software name="creadcol">
@@ -2535,6 +2690,72 @@ Offset [CDDA] audio, does not stop when exiting game (including getting to Windo
 		</part>
 	</software>
 
+	<!-- Source: http://redump.org/disc/12371/ -->
+	<!-- <rom name="Darkseed (USA).cue" size="103" crc="5bea1486" sha1="4f3544fb04b63452652bd07ccb3eea2d83fe0416"/> -->
+	<!-- <rom name="Darkseed (USA).bin" size="37683744" crc="a39e19e0" sha1="415515e8d4084a1ca7aeef83d8190e5fc679089a"/> -->
+	<software name="darkseed" supported="no">
+		<description>Darkseed (USA)</description>
+		<year>1995</year>
+		<publisher>Cyberdreams</publisher>
+		<notes><![CDATA[
+Crash at the begining
+]]></notes>
+		<info name="developer" value="Cyberdreams" />
+		<info name="language" value="English" />
+		<info name="region" value="USA" />
+		<info name="version" value="1.51" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Darkseed (USA)" sha1="761707a1f8a0818749c94e84b1accd3eda174f08" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/29863/ -->
+	<!-- <rom name="Darkseed (USA) (Alt).cue" size="109" crc="abe6829e" sha1="04450a2f9f13ea32e4b51b918687c25b69d63763"/> -->
+	<!-- <rom name="Darkseed (USA) (Alt).bin" size="38036544" crc="a896d980" sha1="408b9b53d2aa117735c4f0dbcbbf60ac95d7ab10"/> -->
+	<software name="darkseed_a" cloneof="darkseed" supported="no">
+		<description>Darkseed (USA, alt)</description>
+		<year>1995</year>
+		<publisher>Cyberdreams</publisher>
+		<notes><![CDATA[
+Crash at the begining
+]]></notes>
+		<info name="developer" value="Cyberdreams" />
+		<info name="language" value="English" />
+		<info name="region" value="USA" />
+		<info name="version" value="1.51" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Darkseed (USA) (Alt)" sha1="49398734d9bc3dac0ee78db53d143513b0f3575c" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/44971/ -->
+	<!-- <rom name="Darkseed (Germany) (En,De).cue" size="115" crc="0a9e6a8b" sha1="8a3066baf496538a06b77268ead0b5f110a042d0"/> -->
+	<!-- <rom name="Darkseed (Germany) (En,De).bin" size="76228320" crc="fc3edbff" sha1="27b68fda248136d5827c77ba7954812ce9283473"/> -->
+	<software name="darkseed_de" cloneof="darkseed">
+		<description>Darkseed (Germany, Action Sixteen release)</description>
+		<year>1995</year>
+		<publisher>Cyberdreams</publisher>
+		<info name="developer" value="Cyberdreams" />
+		<info name="language" value="English/German" />
+		<info name="region" value="Germany" />
+		<info name="version" value="1.5" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Darkseed (Germany) (En,De)" sha1="e6046c44e9ae77da4897b75ffb6bbec0771ea379" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Source: http://redump.org/disc/56227/ -->
 	<!-- <rom name="Delphine Classic Collection (Europe) (En,De).cue" size="133" crc="64a640a0" sha1="fbc6fcb695b38c0792312a23ae3c79a4aab6ee7b"/> -->
 	<!-- <rom name="Delphine Classic Collection (Europe) (En,De).bin" size="24286752" crc="b9459f8e" sha1="be30d01753846885dd0f517baf22c035e80e9e00"/> -->
@@ -2588,6 +2809,7 @@ Unplayable without a Pentium CPU class
 Unemulated optional [Matrox Mystique] GPU
 https://www.pcgamingwiki.com/wiki/Destruction_Derby_2
 ]]></notes>
+
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="dd2_pc" sha1="934d21c1172848110c3198463f5a5261175263a3"/>
@@ -2619,6 +2841,7 @@ https://www.pcgamingwiki.com/wiki/Destruction_Derby_2
 Reports extremely irrealistic [cdrom] speeds in "Test Your PC" in setup menu
 Untested (and likely unsupported) Spawned Diablo and multi player mode
 ]]></notes>
+
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="diablo" sha1="c9d7819a9a9b3fe0927c89a9d9d220b0b7307300" />
@@ -2645,6 +2868,24 @@ Untested (and likely unsupported) Spawned Diablo and multi player mode
 		</part>
 	</software>
 
+	<!-- Source: http://redump.org/disc/92228/ -->
+	<!-- <rom name="Dig, The (Japan).cue" size="82" crc="7127b717" sha1="d0ffba436592b115b8ab5eb3b400210562d8031e"/> -->
+	<!-- <rom name="Dig, The (Japan).bin" size="778196832" crc="550c8138" sha1="3b3f8c72d86e380142299a91218139f32b34a682"/> -->
+	<software name="thedig_jp" cloneof="thedig">
+		<description>The Dig (Japan)</description>
+		<year>1995</year>
+		<publisher>MicroMouse</publisher>
+		<info name="developer" value="LucasArts" />
+		<info name="region" value="Japan" />
+		<sharedfeat name="platform" value="Windows 95 / NEC PC-98" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Dig, The (Japan)" sha1="0930e3f659a57797e81b8c4c4b3cce44948f7a8f" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- DOS -->
 	<software name="discdeep">
 		<description>Discoveries of the Deep</description>
@@ -2654,6 +2895,29 @@ Untested (and likely unsupported) Spawned Diablo and multi player mode
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="discoveries of the deep (1996)(softkey)" sha1="b55f1cc746f5efce727e83c06a31c6ac743da628" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/35759/ -->
+	<!-- <rom name="Dogfight - 80 Years of Aerial Warfare (Europe).cue" size="112" crc="469aa079" sha1="c8b9942cb121be3f043b95e95cda636c3558ece6"/> -->
+	<!-- <rom name="Dogfight - 80 Years of Aerial Warfare (Europe).bin" size="10231200" crc="5784c562" sha1="475f7955b3d273e3b8fd42ebc6a1c46f0a433ae7"/> -->
+	<software name="dogfight" supported="no">
+		<description>Dogfight: 80 Years of Aerial Warfare (Europe)</description>
+		<year>1994</year>
+		<publisher>MicroProse</publisher>
+		<notes><![CDATA[
+Crash after the copy protection screen (tried with "at486" machine)
+]]></notes>
+		<info name="copy_protection" value="Manual required" />
+		<info name="developer" value="Vektor Grafix" />
+		<info name="language" value="English" />
+		<info name="region" value="Europe" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Dogfight - 80 Years of Aerial Warfare (Europe)" sha1="87f2957a121653bc226060e8c6de8c80fc1bad16" />
 			</diskarea>
 		</part>
 	</software>
@@ -2687,6 +2951,34 @@ Untested (and likely unsupported) Spawned Diablo and multi player mode
 		</part>
 	</software>
 
+	<!-- Windows 3.1 -->
+	<!-- Rainbow disc (CD-ROM XA / CD-i / VideoCD / CD-DA) -->
+	<!--
+	Origin: redump (http://redump.org/disc/54514/)
+	<rom name="Cranberries, The - Doors and Windows (USA) (Track 1).bin" size="553665504" crc="499dc148" md5="ec76c5c41095ce953509bbfb889dd95a"/>
+	<rom name="Cranberries, The - Doors and Windows (USA) (Track 2).bin" size="44528064" crc="ff10d7d3" md5="b66710e4192053062aa80ecf6ea3c1e5"/>
+	<rom name="Cranberries, The - Doors and Windows (USA) (Track 3).bin" size="50516256" crc="aed80da5" md5="07876717d36fa90bdb6e55bbb0b06fc6"/>
+	<rom name="Cranberries, The - Doors and Windows (USA) (Track 4).bin" size="28405104" crc="8b042db3" md5="39d672dbc91e5c6e44a5a0d8e0f852d1"/>
+	<rom name="Cranberries, The - Doors and Windows (USA) (Track 5).bin" size="37269792" crc="26ed1a0d" md5="99afa04401a863b4238425848954a2a1"/>
+	<rom name="Cranberries, The - Doors and Windows (USA) (Track 6).bin" size="55996416" crc="4e78455b" md5="fca6e7e070cfb63d59e5872bd1692034"/>
+	<rom name="Cranberries, The - Doors and Windows (USA).cue" size="821" crc="2df31efa" md5="3875f3b228779ee4a7efce0939cd60c4"/>
+	Note: Track 1 in the cue file had to be edited to read MODE2/2352 to get around chdman not recognizing a valid CDI/2352 value.
+	The info for the original cue is below.
+	<rom name="Cranberries, The - Doors and Windows (USA).cue" size="819" crc="c4424220" md5="cd3b4ef9fe2c410b199e6ceede112cc3"/>
+	-->
+	<!-- TODO: Continuous MAME warnings about "requires ide_controller_32_device" -->
+	<software name="doorswin">
+		<description>The Cranberries: Doors and Windows (USA)</description>
+		<year>1995</year>
+		<publisher>Philips Media / Island Records</publisher>
+		<info name="serial" value="310691030-2 / 310691081-2"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="cranberries, the - doors and windows (usa)" sha1="7088d9cead7c658279a362e97caa55e0ee9f07a2" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- DOS -->
 	<software name="duke3d" supported="partial">
 		<description>Duke Nukem 3D (shareware v1.1)</description>
@@ -2699,6 +2991,84 @@ Terminal Velocity: incompatible with Windows 95 (verify), has unsupported option
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="3d_realms_-_duke_nukem_3d_(shareware_version)" sha1="60ac890bd8269b2dbaed687bff45aa009b48cab3" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/11351/ -->
+	<!-- <rom name="Dune (Europe) (En,Fr,De,Es,It).cue" size="119" crc="e13e91ce" sha1="a0fe7e06872496410e94f2d07ddb396871e02c40"/> -->
+	<!-- <rom name="Dune (Europe) (En,Fr,De,Es,It).bin" size="457581600" crc="bf86536e" sha1="7877944b99bb0ae884f2c5ed89f3b50f30e0109a"/> -->
+	<software name="dune">
+		<description>Dune (Europe, White Label release)</description>
+		<year>1995</year>
+		<publisher>Virgin Games</publisher>
+		<info name="developer" value="Cryo Interactive Entertainment" />
+		<info name="language" value="English/French/German/Italian/Spanish" />
+		<info name="region" value="Europe" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Dune (Europe) (En,Fr,De,Es,It)" sha1="50a206ea2b13252a8f24c6b34104640a1c58312a" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/37255/ -->
+	<!-- <rom name="Dune II - Battle for Arrakis (Netherlands) (En,Fr,De) (Hit Squad).cue" size="131" crc="16b38b65" sha1="6d595dfb39c2f6b142638c1704609effd59b445c"/> -->
+	<!-- <rom name="Dune II - Battle for Arrakis (Netherlands) (En,Fr,De) (Hit Squad).bin" size="23635248" crc="1347151e" sha1="d2476a24849949dd50cb1dfd7a83d20c1fed4659"/> -->
+	<software name="dune2">
+		<description>Dune II - Battle for Arrakis (Netherlands)</description>
+		<year>1995</year>
+		<publisher>Hit Squad</publisher>
+		<info name="developer" value="Westwood Studios" />
+		<info name="language" value="English/French/German" />
+		<info name="region" value="Netherlands" />
+		<info name="version" value="V1.07" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Dune II - Battle for Arrakis (Netherlands) (En,Fr,De) (Hit Squad)" sha1="8ca2656244198deba3e774d82ffbbf9aa853920e" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/57790/ -->
+	<!-- <rom name="Dune II - Battle for Arrakis (Germany) (Rerelease).cue" size="116" crc="fe34ef10" sha1="698c2a83b62e8275afbc03f3819da1267b4cfd2d"/> -->
+	<!-- <rom name="Dune II - Battle for Arrakis (Germany) (Rerelease).bin" size="44346960" crc="0b95afdd" sha1="79d393784e50f06a49f25aaa9014f4a81c208047"/> -->
+	<software name="dune2_de" cloneof="dune2">
+		<description>Dune II - Battle for Arrakis (Germany, PC Games Collection 2 release)</description>
+		<year>2001</year>
+		<publisher>Electronic Arts / Infogrames</publisher>
+		<info name="developer" value="Westwood Studios" />
+		<info name="language" value="English/French/German" />
+		<info name="version" value="V1.07" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Dune II - Battle for Arrakis (Germany) (Rerelease)" sha1="366197c98170ffe209e2aed6c8de7c1e8231ec03" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/46233/ -->
+	<!-- <rom name="Dune II - The Building of a Dynasty (USA).cue" size="107" crc="6393cd2d" sha1="47ade064382d770001d12dc58f6d8d97fa0dde5a"/> -->
+	<!-- <rom name="Dune II - The Building of a Dynasty (USA).bin" size="11223744" crc="11a655ac" sha1="533a0c6a5555210dd10f8b0666a4e5f8afa8f1e8"/> -->
+	<software name="dune2_us" cloneof="dune2">
+		<description>Dune II - The Building of a Dynasty (USA, Gold Medal 12 CD Pack)</description>
+		<year>1995</year>
+		<publisher>Virgin Games</publisher>
+		<info name="developer" value="Westwood Studios" />
+		<info name="language" value="English" />
+		<info name="region" value="USA" />
+		<info name="version" value="V1.07" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Dune II - The Building of a Dynasty (USA)" sha1="268bfa28d63d512ae4483ed979895f7d9da784e2" />
 			</diskarea>
 		</part>
 	</software>
@@ -3130,6 +3500,46 @@ This release doesn't have audio speech.
 		</part>
 	</software>
 
+	<!-- Source: http://redump.org/disc/6207/ -->
+	<!-- <rom name="Legend of Kyrandia, The - Book Three (Japan, Europe) (En,Fr,De).cue" size="152" crc="fc7cdeef" sha1="a69e9ee7df77a730041cf9724eb1633dcad347a1"/> -->
+	<!-- <rom name="Legend of Kyrandia, The - Book Three (Japan, Europe) (En,Fr,De).bin" size="686080752" crc="2a671eb7" sha1="6f3345505fdad4d053fe18a54d8bc7811b08f01c"/> -->
+	<software name="kyrandia3">
+		<description>Fables &amp; Fiends - Book Three: Malcolm's Revenge (Europe, Japan)</description>
+		<year>1994</year>
+		<publisher>Virgin Games</publisher>
+		<info name="developer" value="Westwood Studios" />
+		<info name="language" value="English/French/German" />
+		<info name="region" value="Europe/Japan" />
+		<info name="version" value="V1.02" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Legend of Kyrandia, The - Book Three (Japan, Europe) (En,Fr,De)" sha1="7662e5760c116f091ef3ec3579362fb7de847ec2" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/89353/ -->
+	<!-- <rom name="Legend of Kyrandia, The - Book Two - The Hand of Fate (UK) (Sold Out Software).cue" size="167" crc="5b4ef206" sha1="c3f3516adda322cd5e0f91f7724a8ee9584965c0"/> -->
+	<!-- <rom name="Legend of Kyrandia, The - Book Two - The Hand of Fate (UK) (Sold Out Software).bin" size="258496560" crc="98ce5104" sha1="3f9d314775bf52f2b7173748f217d042263ba8e9"/> -->
+	<software name="kyrandia2">
+		<description>Fables &amp; Fiends - Book Two: The Hand of Fate (UK, Sold Out release)</description>
+		<year>1995</year>
+		<publisher>Sold Out Software</publisher>
+		<info name="developer" value="Westwood Studios" />
+		<info name="language" value="English/French/German" />
+		<info name="region" value="UK" />
+		<info name="version" value="V1.0A" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Legend of Kyrandia, The - Book Two - The Hand of Fate (UK) (Sold Out Software)" sha1="49ab1512d8b3b5ffa2e8c3c0d7d08e5b5e7ccaa9" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- DOS -->
 	<!-- requires 600k of free memory -->
 	<!-- has no manual copy protection -->
@@ -3467,6 +3877,20 @@ Playable demos: "Gobliins 2", "Goblins 3", "Inca", "Lost", "Ween"
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="ggg" sha1="ab7babc13b5ffb4536fc7a553753a9d12ec41103" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- There's also a later Windows version hence the extra "DOS" tag -->
+	<software name="heromm1">
+		<description>Heroes of Might and Magic (USA, DOS, v1.0)</description>
+		<year>1995</year>
+		<publisher>New World Computing</publisher>
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="heroes_of_might_and_magic_(usa)" sha1="e8734799184c2114944e5ee62e3609f64a131b35"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4003,6 +4427,102 @@ Untested multiplayer options
 		</part>
 	</software>
 
+	<!-- Source: http://redump.org/disc/35437/ -->
+	<!-- <rom name="Jurassic Park (Europe) (En,Fr,De,Es,It).cue" size="1724" crc="e1941d1a" sha1="f21cfe6a746b08d5cbd0f0380f759dcc79f22fd9"/> -->
+	<!-- <rom name="Jurassic Park (Europe) (En,Fr,De,Es,It) (Track 01).bin" size="15876000" crc="b1a3d93e" sha1="326d78a34e163bcd31da24fdd3dc4d74ae5ec779"/> -->
+	<!-- <rom name="Jurassic Park (Europe) (En,Fr,De,Es,It) (Track 02).bin" size="41493984" crc="38b29a22" sha1="f41ce2bff7fd1430c4a9e2273bd171b889e75b34"/> -->
+	<!-- <rom name="Jurassic Park (Europe) (En,Fr,De,Es,It) (Track 03).bin" size="44170560" crc="76a99b22" sha1="e00febf6de0d18c2f468d3af5eed1c43b5a666f7"/> -->
+	<!-- <rom name="Jurassic Park (Europe) (En,Fr,De,Es,It) (Track 04).bin" size="26311824" crc="23ebf7dc" sha1="08cfb9f0f13a0ab44ea795b305c7ec0e91b07d66"/> -->
+	<!-- <rom name="Jurassic Park (Europe) (En,Fr,De,Es,It) (Track 05).bin" size="23461200" crc="71e48b2e" sha1="3609fe4379cc548595cd18d66582a36952f4738e"/> -->
+	<!-- <rom name="Jurassic Park (Europe) (En,Fr,De,Es,It) (Track 06).bin" size="16414608" crc="0d9fc2f4" sha1="9116de45fad4611ba464783548024b04bf3e4dbf"/> -->
+	<!-- <rom name="Jurassic Park (Europe) (En,Fr,De,Es,It) (Track 07).bin" size="27802992" crc="6fe4cb41" sha1="741dbdcb025eecb67c14075c75e9677a3df73453"/> -->
+	<!-- <rom name="Jurassic Park (Europe) (En,Fr,De,Es,It) (Track 08).bin" size="41515152" crc="a4dbb1c3" sha1="af932ce4b39f1488a039ba20f3b7bf584b3529c0"/> -->
+	<!-- <rom name="Jurassic Park (Europe) (En,Fr,De,Es,It) (Track 09).bin" size="28736736" crc="ae8088c9" sha1="75fb4d17712180fc8509b11154a3f3fb094d5e7f"/> -->
+	<!-- <rom name="Jurassic Park (Europe) (En,Fr,De,Es,It) (Track 10).bin" size="26998608" crc="f8534a71" sha1="8f40768bca937f3dceb6624fe46335d995d581f3"/> -->
+	<!-- <rom name="Jurassic Park (Europe) (En,Fr,De,Es,It) (Track 11).bin" size="5847072" crc="e411f6cb" sha1="8f8afe5e982725f245cf56cbf8225e7dc9682ee5"/> -->
+	<!-- <rom name="Jurassic Park (Europe) (En,Fr,De,Es,It) (Track 12).bin" size="33682992" crc="5732fc84" sha1="2d86f060dc4da13e9b71a9b35310c08645b1c865"/> -->
+	<!-- <rom name="Jurassic Park (Europe) (En,Fr,De,Es,It) (Track 13).bin" size="5844720" crc="0eb712f9" sha1="877e9d60b1faf109f4610cf27dbe3e1eac80996c"/> -->
+	<software name="jpark">
+		<description>Jurassic Park (Europe)</description>
+		<year>1993</year>
+		<publisher>Ocean</publisher>
+		<info name="developer" value="Ocean" />
+		<info name="language" value="English/French/German/Italian/Spanish" />
+		<info name="region" value="Europe" />
+		<info name="version" value="1.32" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Jurassic Park (Europe) (En,Fr,De,Es,It)" sha1="b6dce0797a9f4e1865edbdb19cdd9bf51fe8cad4" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/44441/ -->
+	<!-- <rom name="Jurassic Park (Germany) (En,Fr,De,Es,It) (Hit Squad, Soft Price).cue" size="2049" crc="9401d1c0" sha1="bd01065e9b27fd44720078546f5b0f413a1a1d6f"/> -->
+	<!-- <rom name="Jurassic Park (Germany) (En,Fr,De,Es,It) (Hit Squad, Soft Price) (Track 01).bin" size="15880704" crc="ba97aec6" sha1="d412f571df03b2e59d7ed0693d02e55c15f9f727"/> -->
+	<!-- <rom name="Jurassic Park (Germany) (En,Fr,De,Es,It) (Hit Squad, Soft Price) (Track 02).bin" size="41256432" crc="045fa1d8" sha1="811fc62e7a211853589593bd6dd8cf360815b519"/> -->
+	<!-- <rom name="Jurassic Park (Germany) (En,Fr,De,Es,It) (Hit Squad, Soft Price) (Track 03).bin" size="43998864" crc="bbeb0a99" sha1="588f3cc14975fd7ded5ee43d034330388023fcf1"/> -->
+	<!-- <rom name="Jurassic Park (Germany) (En,Fr,De,Es,It) (Hit Squad, Soft Price) (Track 04).bin" size="25679136" crc="7f17770b" sha1="6a57b5d1665d24edf8376ea675ac4a51760dce78"/> -->
+	<!-- <rom name="Jurassic Park (Germany) (En,Fr,De,Es,It) (Hit Squad, Soft Price) (Track 05).bin" size="23098992" crc="9e8d9ca1" sha1="6251d33a6dc34644757128bde80ca2c5c73ca581"/> -->
+	<!-- <rom name="Jurassic Park (Germany) (En,Fr,De,Es,It) (Hit Squad, Soft Price) (Track 06).bin" size="16612176" crc="fa0e2a5c" sha1="9e66aa12b4baa67d911f27b8f083d69e4ef0056e"/> -->
+	<!-- <rom name="Jurassic Park (Germany) (En,Fr,De,Es,It) (Hit Squad, Soft Price) (Track 07).bin" size="27123264" crc="0d45dde4" sha1="c72d2123dd2c2fd38f10e5387811debcc4e22067"/> -->
+	<!-- <rom name="Jurassic Park (Germany) (En,Fr,De,Es,It) (Hit Squad, Soft Price) (Track 08).bin" size="40993008" crc="4dabe487" sha1="f1896e6c4943ab267728d5b691e54e068b11873f"/> -->
+	<!-- <rom name="Jurassic Park (Germany) (En,Fr,De,Es,It) (Hit Squad, Soft Price) (Track 09).bin" size="28419216" crc="e5356944" sha1="13fb8eace336fc96c4f9c067dfb33ccabd812401"/> -->
+	<!-- <rom name="Jurassic Park (Germany) (En,Fr,De,Es,It) (Hit Squad, Soft Price) (Track 10).bin" size="26422368" crc="ccb7d2ce" sha1="48da0a4b14b9e9dbd0de4507fba5f4869f557bb9"/> -->
+	<!-- <rom name="Jurassic Park (Germany) (En,Fr,De,Es,It) (Hit Squad, Soft Price) (Track 11).bin" size="5292000" crc="c2525155" sha1="18d86b46d43a550dfbf473570f93b4c0a65e7504"/> -->
+	<!-- <rom name="Jurassic Park (Germany) (En,Fr,De,Es,It) (Hit Squad, Soft Price) (Track 12).bin" size="50466864" crc="a59453c3" sha1="27a0ea8ee777e7ede65fc747e255af9a530856ed"/> -->
+	<!-- <rom name="Jurassic Park (Germany) (En,Fr,De,Es,It) (Hit Squad, Soft Price) (Track 13).bin" size="5289648" crc="09dd3c76" sha1="db1d9c89070c9b48eded6a91b72b6177fab70287"/> -->
+	<software name="jpark_de" cloneof="jpark">
+		<description>Jurassic Park (Germany, Soft Price release)</description>
+		<year>1993</year>
+		<publisher>Ocean</publisher>
+		<info name="developer" value="Ocean" />
+		<info name="language" value="English/French/German/Italian/Spanish" />
+		<info name="region" value="Germany" />
+		<info name="version" value="1.37" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Jurassic Park (Germany) (En,Fr,De,Es,It) (Hit Squad, Soft Price)" sha1="3a00bd27bb408772b5a8395c784f1034217bc70e" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/35106/ -->
+	<!-- <rom name="Jurassic Park (USA) (En,Fr,De,Es,It).cue" size="1432" crc="debbd7fe" sha1="de1ad6fdf65a2e22700b2e589a7b8a71d0f3a985"/> -->
+	<!-- <rom name="Jurassic Park (USA) (En,Fr,De,Es,It) (Track 01).bin" size="16045344" crc="5d6dcc7c" sha1="67ec9b1910ae76107849dacb6be07a61429220a0"/> -->
+	<!-- <rom name="Jurassic Park (USA) (En,Fr,De,Es,It) (Track 02).bin" size="41609232" crc="52ec6df6" sha1="adb045827d92588127beef95e1c4368f68dcf735"/> -->
+	<!-- <rom name="Jurassic Park (USA) (En,Fr,De,Es,It) (Track 03).bin" size="43998864" crc="539081f2" sha1="5de5065a1fd98b2e6597ebc20e5195bde424d475"/> -->
+	<!-- <rom name="Jurassic Park (USA) (En,Fr,De,Es,It) (Track 04).bin" size="25679136" crc="53a09a63" sha1="44b805c30dffc7f235971a84a3f11aea9fcf13ab"/> -->
+	<!-- <rom name="Jurassic Park (USA) (En,Fr,De,Es,It) (Track 05).bin" size="23098992" crc="bb6a1e7e" sha1="a123f127fb14c13533122bd217ba8ba689f58097"/> -->
+	<!-- <rom name="Jurassic Park (USA) (En,Fr,De,Es,It) (Track 06).bin" size="16612176" crc="54e2c35d" sha1="c181ee441e0280742e7acbf705363e32d6291f9f"/> -->
+	<!-- <rom name="Jurassic Park (USA) (En,Fr,De,Es,It) (Track 07).bin" size="27123264" crc="980444f4" sha1="a7b56056a11840a414b37d603010bce34fdc9ae7"/> -->
+	<!-- <rom name="Jurassic Park (USA) (En,Fr,De,Es,It) (Track 08).bin" size="40993008" crc="dc16ddc0" sha1="e0a4d7d10ec2772e05dcb338a3609846084a2e25"/> -->
+	<!-- <rom name="Jurassic Park (USA) (En,Fr,De,Es,It) (Track 09).bin" size="28419216" crc="21fabbb5" sha1="4f0caf58c30dce777a161485ca8a1b9fa26c6045"/> -->
+	<!-- <rom name="Jurassic Park (USA) (En,Fr,De,Es,It) (Track 10).bin" size="26422368" crc="664e6459" sha1="8b6e4816a777f979811bae3549b03487e36c6d02"/> -->
+	<!-- <rom name="Jurassic Park (USA) (En,Fr,De,Es,It) (Track 11).bin" size="5292000" crc="a12a1d9b" sha1="16990cc1872f822614e6053483e6c7d3e6bd35d0"/> -->
+	<!-- <rom name="Jurassic Park (USA) (En,Fr,De,Es,It) (Track 12).bin" size="50466864" crc="fd24f3ab" sha1="a6fdf109bb31bf60175a677a8c7c15f2fd2102ec"/> -->
+	<!-- <rom name="Jurassic Park (USA) (En,Fr,De,Es,It) (Track 13).bin" size="5292000" crc="92a65df7" sha1="92df115438d40e3c19a2ee35dede2e2ad0606389"/> -->
+	<software name="jpark_us" cloneof="jpark">
+		<description>Jurassic Park (USA)</description>
+		<year>1993</year>
+		<publisher>Ocean</publisher>
+		<info name="developer" value="Ocean" />
+		<info name="language" value="English/French/German/Italian/Spanish" />
+		<info name="region" value="USA" />
+		<info name="version" value="1.37" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Jurassic Park (USA) (En,Fr,De,Es,It)" sha1="c7f28dabc4de837d363296d92a5b6ef0e4060baa" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Untouched image from original CD created with an ASUS DRW-1814BLT (EAC drive sample read offset reported as +6)
 	   If you subtract 0x18 (4 * 6) bytes from a .wav extracted from this CHD the audio matches a rip done with EAC (verified) -->
 	<software name="kingsq6e">
@@ -4418,7 +4938,6 @@ https://www.pcgamingwiki.com/wiki/Myst
 			</diskarea>
 		</part>
 	</software>
-
 
 	<!-- Source: redump.org/disc/31951/ -->
 	<!-- <rom name="Network Q RAC Rally (USA).cue" size="91" crc="4d252589" sha1="c22a126dfeb6e46c88a4098e6c9aeb0089c1c945"/> -->
@@ -4883,6 +5402,26 @@ Warlords III: Darklords Rising
 			</diskarea>
 		</part>
 	</software>
+
+	<!-- DOS -->
+	<!-- 4MB, 8MB and 16MB versions known to exist (?) -->
+	<!-- Win / Mac later release known to exist -->
+	<software name="primrage" supported="partial">
+		<description>Primal Rage (USA, DOS)</description>
+		<year>1994</year>
+		<publisher>Time Warner Interactive</publisher>
+		<notes><![CDATA[
+Detects 4MB even if there are 16MB [RAM] installed (verify claim on wiki, this may be 4MB version)
+[SVGA] S3 (at least) runs game at 70 Hz
+https://www.pcgamingwiki.com/wiki/Primal_Rage
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="timewarnerinteractive-primalrage-msdos-eng" sha1="c3e4c2d2ceebe80975d61c6761542dc180031520"/>
+			</diskarea>
+		</part>
+	</software>
+
 
 	<!-- Windows 3.1J / 95J -->
 	<!-- English prototype known to exist -->
@@ -5426,6 +5965,64 @@ Includes DOS and Windows installation setup.
 		</part>
 	</software>
 
+	<!-- Source: http://redump.org/disc/31405/ -->
+	<!-- <rom name="Star Control (Europe).cue" size="87" crc="9a5a8506" sha1="5db004d42ab482db3886ddcacc580b0ddf724c3a"/> -->
+	<!-- <rom name="Star Control (Europe).bin" size="1284192" crc="037f7092" sha1="e35d6025f699af91f3919e8f50e477a47625c965"/> -->
+	<software name="starcont">
+		<description>Star Control</description>
+		<year>1996</year>
+		<publisher>Telstar Fun &amp; Games</publisher>
+		<info name="language" value="English" />
+		<info name="region" value="Europe" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Star Control (Europe)" sha1="a15424a254499303cbeee11566eccc4f9471d34c" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/45077/ -->
+	<!-- <rom name="Stellar 7 (USA).cue" size="223" crc="9d6c928f" sha1="0fbda630109e0028fe0414a4dc0d918b491c0131"/> -->
+	<!-- <rom name="Stellar 7 (USA) (Track 1).bin" size="23320080" crc="3d4511c1" sha1="98b4d488e816c7f5e3c3f40dd26834ca7aad821a"/> -->
+	<!-- <rom name="Stellar 7 (USA) (Track 2).bin" size="237093360" crc="847737dd" sha1="0fd6bbf9e0e8b5be81798abf5599bc8d383d04be"/> -->
+	<software name="stellar7">
+		<description>Stellar 7 (USA)</description>
+		<year>1991</year>
+		<publisher>Sierra On-line</publisher>
+		<info name="developer" value="Dynamix" />
+		<info name="language" value="English" />
+		<info name="region" value="USA" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Stellar 7 (USA)" sha1="8277fbdf1ea4cbf42bb95bbc9f8beaa7685ee0bd" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/20427/ -->
+	<!-- <rom name="Stellar 7 (USA) (Alt).cue" size="212" crc="3fb207fe" sha1="e47eaa7959320d8dc5a38392fda2c2244fc1e12c"/> -->
+	<!-- <rom name="Stellar 7 (USA) (Alt) (Track 1).bin" size="23320080" crc="3d4511c1" sha1="98b4d488e816c7f5e3c3f40dd26834ca7aad821a"/> -->
+	<!-- <rom name="Stellar 7 (USA) (Alt) (Track 2).bin" size="237093360" crc="e9542aef" sha1="4e3008563b849842ffac23c68c9ba86763bcaa5d"/> -->
+	<software name="stellar7a" cloneof="stellar7">
+		<description>Stellar 7 (USA, alt)</description>
+		<year>1991</year>
+		<publisher>Sierra On-line</publisher>
+		<info name="developer" value="Dynamix" />
+		<info name="language" value="English" />
+		<info name="region" value="USA" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Stellar 7 (USA) (Alt)" sha1="6f19b85267ef39ba9a032cc4a36701b6943ff967" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="stg" supported="partial">
 		<description>S.T.G.</description>
 		<year>1999</year>
@@ -5936,6 +6533,41 @@ Has setup menu glitch with text [8514]
 		</part>
 	</software>
 
+	<!-- DOS -->
+	<software name="div103b" supported="partial">
+		<description>DIV Games Studio (English, v1.03b)</description>
+		<year>1998</year>
+		<publisher>Hammer Technologies</publisher>
+		<notes><![CDATA[
+Games packages all boots in ct486 but frameskips a lot, presumably needs Pentium 1 or 2 class machine
+Has [VESA] video mode options
+CDiv Player doesn't output any [redbook] sound (verify if access to CD is real)
+IDE not extensively tested
+v2 is OSS at https://github.com/DIVGAMES/DIV-Games-Studio
+]]></notes>
+		<info name="usage" value="Requires a VESA driver"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="divgamestudio" sha1="8fe4e601ca118bca1e45e61adcbbc9f49daa371e"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="div103b_fr" cloneof="div103b" supported="partial">
+		<description>DIV Games Studio (French, v1.03b)</description>
+		<year>2000</year>
+		<publisher>Hammer Technologies</publisher>
+		<notes><![CDATA[
+French version with extra examples compared to English one
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="div_games_studio_fr" sha1="cc3f10a85ca645ab2bf55f4864383cb78c493c98"/>
+			</diskarea>
+		</part>
+	</software>
+
+
 	<software name="freedos10">
 		<description>FreeDOS 1.0</description>
 		<year>2006</year>
@@ -6092,7 +6724,6 @@ Has setup menu glitch with text [8514]
 		</part>
 	</software>
 
-
 	<software name="freedos13rc4">
 		<description>FreeDOS 1.3 Release Candidate 4</description>
 		<year>2021</year>
@@ -6145,13 +6776,30 @@ Has setup menu glitch with text [8514]
 		</part>
 	</software>
 
+	<software name="mgamil1" supported="no">
+		<description>The Matrox Millennium Multimedia SuperPack (v1.60)</description>
+		<year>1996</year>
+		<publisher>Matrox</publisher>
+		<notes><![CDATA[
+cfr. [mga2064w] emulation
+Anything beyond Windows 3.1 is untested
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="matroxmil1" sha1="f3d826066dafb3e9eb3a0a7f5eaabc97642dd714"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Win 3.1 / 95 -->
 	<!-- Mac OS with System 7.0 -->
-	<!-- includes unknown type scanner driver-->
-	<software name="muscan">
+	<software name="muscan" supported="no">
 		<description>Mustek Power of Scanning</description>
 		<year>1997</year>
 		<publisher>Mustek</publisher>
+		<notes><![CDATA[
+Contains software drivers for a ScanExpress 6000SP Flatbed Scanner, SCSI i/f
+]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="mustek_scanner" sha1="5f708270ed5885c07a49fadc79ab3ffed420af52" />

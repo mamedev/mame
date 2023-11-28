@@ -33,7 +33,7 @@ and 4 TMM27128 with identical ROM contents as the newer version.
 #include "speaker.h"
 
 // internal artwork
-#include "novag_cexpert.lh" // clickable
+#include "novag_cexpert.lh"
 
 
 namespace {
@@ -67,6 +67,9 @@ private:
 	required_device<beep_device> m_beeper;
 	required_ioport_array<8> m_inputs;
 
+	u8 m_inp_mux = 0;
+	u8 m_led_select = 0;
+
 	void set_cpu_freq();
 
 	// address maps
@@ -78,9 +81,6 @@ private:
 	void control_w(u8 data);
 	u8 input1_r();
 	u8 input2_r();
-
-	u8 m_inp_mux = 0;
-	u8 m_led_select = 0;
 };
 
 void cexpert_state::machine_start()

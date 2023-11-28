@@ -173,11 +173,11 @@ private:
 		fr.add(FLOPPY_PC_FORMAT);
 	}
 
-	DECLARE_WRITE_LINE_MEMBER(fdc_interrupt)
+	void fdc_interrupt(int state)
 	{
 		maincpu->set_input_line(INPUT_LINE_IRQ4, state ? ASSERT_LINE : CLEAR_LINE);
 	}
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq)
+	void fdc_drq(int state)
 	{
 		maincpu->set_input_line(H8_INPUT_LINE_DREQ0, state ? ASSERT_LINE : CLEAR_LINE);
 	}
@@ -201,11 +201,6 @@ private:
 		map(0xe00030, 0xe00041).noprw(); // just to shut up the error.log
 		map(0xec0000, 0xec0001).r(FUNC(lw840_state::keyboard_r)).w(FUNC(lw840_state::keyboard_w));
 		map(0xec0004, 0xec0005).r(FUNC(lw840_state::disk_inserted_r));
-	}
-
-	void map_io(address_map &map) ATTR_COLD
-	{
-		map(h8_device::PORT_7, h8_device::PORT_7).r(FUNC(lw840_state::port7_r));
 	}
 };
 
@@ -347,7 +342,7 @@ void lw840_state::lw840(machine_config &config)
 	// basic machine hardware
 	H83003(config, maincpu, 14'745'600);
 	maincpu->set_addrmap(AS_PROGRAM, &lw840_state::map_program);
-	maincpu->set_addrmap(AS_IO, &lw840_state::map_io);
+	maincpu->read_port7().set(FUNC(lw840_state::port7_r));
 	maincpu->tend0().set("fdc", FUNC(gm82c765b_device::tc_line_w));
 
 	TIMER(config, "2khz").configure_periodic(FUNC(lw840_state::int2_timer_callback), attotime::from_hz(2*1000));
@@ -373,7 +368,7 @@ void lw840_state::lw840(machine_config &config)
 
 ROM_START( lw840 )
 	ROM_REGION(0x400000, "maincpu", 0)
-	ROM_LOAD("us3122-a", 0x00000, 0x400000, CRC(70A3A4A6) SHA1(11e32c7da58800d69af29089f7e7deeab513b1ae))
+	ROM_LOAD("us3122-a", 0x00000, 0x400000, CRC(70a3a4a6) SHA1(11e32c7da58800d69af29089f7e7deeab513b1ae))
 ROM_END
 
 } // anonymous namespace

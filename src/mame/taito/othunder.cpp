@@ -308,13 +308,13 @@ void othunder_state::irq_ack_w(offs_t offset, u16 data)
 	}
 }
 
-WRITE_LINE_MEMBER( othunder_state::vblank_w )
+void othunder_state::vblank_w(int state)
 {
 	if (state)
 		m_maincpu->set_input_line(5, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER( othunder_state::adc_eoc_w )
+void othunder_state::adc_eoc_w(int state)
 {
 	if (state)
 		m_maincpu->set_input_line(6, ASSERT_LINE);
@@ -342,15 +342,15 @@ void othunder_state::eeprom_w(u8 data)
                 x0000000    eeprom out data  */
 
 	/* Recoil Piston Motor Status */
-	output().set_value("Player1_Recoil_Piston", data & 0x1 );
-	output().set_value("Player2_Recoil_Piston", (data & 0x2) >>1 );
+	m_recoil_piston[0] = BIT(data, 0);
+	m_recoil_piston[1] = BIT(data, 1);
 
 	if (data & 4)
 		popmessage("OBPRI SET!");
 
-	m_eeprom->di_write((data & 0x40) >> 6);
-	m_eeprom->clk_write((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-	m_eeprom->cs_write((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->di_write(BIT(data, 6));
+	m_eeprom->clk_write(BIT(data, 5));
+	m_eeprom->cs_write(BIT(data, 4));
 }
 
 void othunder_state::coins_w(u8 data)
@@ -525,23 +525,28 @@ static INPUT_PORTS_START( othunder )
 	PORT_CONFSETTING(    0x00, DEF_STR( Low ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( othundrj )
+static INPUT_PORTS_START( othunderj )
 	PORT_INCLUDE( othunder )
 
 	PORT_MODIFY( "DSWA" )
 	TAITO_COINAGE_JAPAN_OLD
+
+	PORT_MODIFY( "DSWB" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Language ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Japanese ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( othundu )
-	PORT_INCLUDE( othundrj )
+static INPUT_PORTS_START( othunderu )
+	PORT_INCLUDE( othunder )
+
+	PORT_MODIFY( "DSWA" )
+	TAITO_COINAGE_JAPAN_OLD
 
 	PORT_MODIFY( "DSWB" )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Continue_Price ) )        /* see notes */
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x40, "Same as Start" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Language ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Japanese ) )
 INPUT_PORTS_END
 
 
@@ -572,6 +577,8 @@ GFXDECODE_END
 
 void othunder_state::machine_start()
 {
+	m_recoil_piston.resolve();
+
 	m_z80bank->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 
 	save_item(NAME(m_pan));
@@ -606,10 +613,7 @@ void othunder_state::othunder(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(40*8, 32*8);
-	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
+	screen.set_raw(XTAL(26'686'000) / 4, 424, 0, 320, 262, 16, 256); // same as taito_z.cpp
 	screen.set_screen_update(FUNC(othunder_state::screen_update));
 	screen.set_palette(m_tc0110pcr);
 	screen.screen_vblank().set(FUNC(othunder_state::vblank_w));
@@ -881,7 +885,7 @@ ROM_END
 
 GAME( 1988, othunder,    0,        othunder, othunder, othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Operation Thunderbolt (World, rev 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, othundero,   othunder, othunder, othunder, othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Operation Thunderbolt (World)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1988, othunderu,   othunder, othunder, othundu,  othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US, rev 1)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1988, othunderuo,  othunder, othunder, othundu,  othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1988, othunderj,   othunder, othunder, othundrj, othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito Corporation",         "Operation Thunderbolt (Japan)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1988, othunderjsc, othunder, othunder, othundrj, othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito Corporation",         "Operation Thunderbolt (Japan, SC)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1988, othunderu,   othunder, othunder, othunderu,  othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US, rev 1)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1988, othunderuo,  othunder, othunder, othunderu,  othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1988, othunderj,   othunder, othunder, othunderj, othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito Corporation",         "Operation Thunderbolt (Japan)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1988, othunderjsc, othunder, othunder, othunderj, othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito Corporation",         "Operation Thunderbolt (Japan, SC)",    MACHINE_SUPPORTS_SAVE )

@@ -19,19 +19,19 @@ public:
 
 	void map(address_map &map);
 
-	auto kbd_clk() { return subdevice<at_keyboard_controller_device>("keybc")->kbd_clk(); }
-	auto kbd_data() { return subdevice<at_keyboard_controller_device>("keybc")->kbd_data(); }
+	auto kbd_clk() { return m_keybc.lookup()->kbd_clk(); }
+	auto kbd_data() { return m_keybc.lookup()->kbd_data(); }
 
 	uint8_t page8_r(offs_t offset);
 	void page8_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(kbd_clk_w);
-	DECLARE_WRITE_LINE_MEMBER(kbd_data_w);
+	void kbd_clk_w(int state);
+	void kbd_data_w(int state);
 	uint8_t portb_r();
 	void portb_w(uint8_t data);
-	void write_rtc(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(iochck_w);
+	void rtcas_nmi_w(uint8_t data);
+	void iochck_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(shutdown);
+	void shutdown(int state);
 
 	uint32_t a20_286(bool state);
 
@@ -66,10 +66,10 @@ private:
 	uint8_t m_channel_check = 0;
 	uint8_t m_nmi_enabled = 0;
 
-	DECLARE_WRITE_LINE_MEMBER(pit8254_out2_changed);
+	void pit8254_out2_changed(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(dma8237_out_eop);
-	DECLARE_WRITE_LINE_MEMBER(dma8237_2_out_eop);
+	void dma8237_out_eop(int state);
+	void dma8237_2_out_eop(int state);
 	uint8_t dma8237_0_dack_r();
 	uint8_t dma8237_1_dack_r();
 	uint8_t dma8237_2_dack_r();
@@ -84,16 +84,16 @@ private:
 	void dma8237_5_dack_w(uint8_t data);
 	void dma8237_6_dack_w(uint8_t data);
 	void dma8237_7_dack_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(dack0_w);
-	DECLARE_WRITE_LINE_MEMBER(dack1_w);
-	DECLARE_WRITE_LINE_MEMBER(dack2_w);
-	DECLARE_WRITE_LINE_MEMBER(dack3_w);
-	DECLARE_WRITE_LINE_MEMBER(dack4_w);
-	DECLARE_WRITE_LINE_MEMBER(dack5_w);
-	DECLARE_WRITE_LINE_MEMBER(dack6_w);
-	DECLARE_WRITE_LINE_MEMBER(dack7_w);
+	void dack0_w(int state);
+	void dack1_w(int state);
+	void dack2_w(int state);
+	void dack3_w(int state);
+	void dack4_w(int state);
+	void dack5_w(int state);
+	void dack6_w(int state);
+	void dack7_w(int state);
 	uint8_t get_slave_ack(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
+	void dma_hrq_changed(int state);
 
 	uint8_t dma_read_byte(offs_t offset);
 	void dma_write_byte(offs_t offset, uint8_t data);

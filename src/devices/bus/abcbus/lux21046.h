@@ -14,8 +14,6 @@
 #include "abcbus.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
-#include "formats/abc800_dsk.h"
-#include "formats/abc800i_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80dma.h"
@@ -80,18 +78,17 @@ protected:
 
 	static void floppy_formats(format_registration &fr);
 
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( dma_int_w );
+	void dma_int_w(int state);
 
 	uint8_t memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, uint8_t data);
 	uint8_t io_read_byte(offs_t offset);
 	void io_write_byte(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
+	void fdc_intrq_w(int state);
 
 	uint8_t out_r();
 	void inp_w(uint8_t data);
@@ -106,15 +103,15 @@ private:
 	required_device<z80_device> m_maincpu;
 	required_device<z80dma_device> m_dma;
 	required_device<fd1793_device> m_fdc;
-	floppy_image_device *m_floppy;
+	floppy_image_device *m_selected_floppy;
 	required_ioport m_sw1;
 	required_ioport m_sw2;
 	required_ioport m_sw3;
 
 	bool m_cs;                  // card selected
-	uint8_t m_status;             // ABC BUS status
-	uint8_t m_out;                // ABC BUS data in
-	uint8_t m_inp;                // ABC BUS data out
+	uint8_t m_status;           // ABC BUS status
+	uint8_t m_out;              // ABC BUS data in
+	uint8_t m_inp;              // ABC BUS data out
 	bool m_fdc_irq;             // FDC interrupt
 	int m_dma_irq;              // DMA interrupt
 	int m_busy;                 // busy bit

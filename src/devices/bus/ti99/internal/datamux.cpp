@@ -481,7 +481,7 @@ void datamux_device::setaddress(offs_t offset, uint16_t busctrl)
     The datamux is connected to the clock line in order to operate
     the wait state counter and to read/write the bytes.
 */
-WRITE_LINE_MEMBER( datamux_device::clock_in )
+void datamux_device::clock_in(int state)
 {
 	// return immediately if the datamux is currently inactive
 	if (m_waitcount>0)
@@ -548,7 +548,7 @@ void datamux_device::ready_join()
 	m_ready((m_sysready==CLEAR_LINE || m_muxready==CLEAR_LINE)? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER( datamux_device::ready_line )
+void datamux_device::ready_line(int state)
 {
 	if (state != m_sysready) LOGMASKED(LOG_READY, "READY line from PBox = %d\n", state);
 	m_sysready = (line_state)state;
@@ -557,7 +557,7 @@ WRITE_LINE_MEMBER( datamux_device::ready_line )
 }
 
 /* Called from VDP via console. */
-WRITE_LINE_MEMBER( datamux_device::gromclk_in )
+void datamux_device::gromclk_in(int state)
 {
 	// Don't propagate the clock in idle phase
 	if (m_grom_idle) return;
@@ -581,10 +581,9 @@ WRITE_LINE_MEMBER( datamux_device::gromclk_in )
     DEVICE LIFECYCLE FUNCTIONS
 ***************************************************************************/
 
-void datamux_device::device_start(void)
+void datamux_device::device_start()
 {
 	m_muxready = ASSERT_LINE;
-	m_ready.resolve();
 
 	// Register persistable state variables
 	save_item(NAME(m_addr_buf));
@@ -599,11 +598,11 @@ void datamux_device::device_start(void)
 	save_item(NAME(m_grom_idle));
 }
 
-void datamux_device::device_stop(void)
+void datamux_device::device_stop()
 {
 }
 
-void datamux_device::device_reset(void)
+void datamux_device::device_reset()
 {
 	m_consolerom = (uint16_t*)owner()->memregion(TI99_CONSOLEROM)->base();
 	m_use32k = (ioport("RAM")->read()==1);

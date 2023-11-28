@@ -193,7 +193,7 @@ TMS340X0_FROM_SHIFTREG_CB_MEMBER(isa16_ex1280_device::from_shiftreg)
 //  vblank_w - toggle vblank bit(?)
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(isa16_ex1280_device::vblank_w)
+void isa16_ex1280_device::vblank_w(int state)
 {
 	//m_flags &= ~(1 << 1);
 	//m_flags |= (state << 1);

@@ -139,9 +139,6 @@ void bus_mouse_device::device_add_mconfig(machine_config &config)
 
 void bus_mouse_device::device_start()
 {
-	// resolve callbacks
-	m_write_extint.resolve_safe();
-
 	m_irq_timer = timer_alloc(FUNC(bus_mouse_device::irq_timer_tick), this);
 }
 

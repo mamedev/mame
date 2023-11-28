@@ -592,7 +592,7 @@ MC6845_UPDATE_ROW( abc802_state::abc802_update_row )
 //  vs_w - vertical sync write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( abc802_state::vs_w )
+void abc802_state::vs_w(int state)
 {
 	if (!state)
 	{
@@ -797,7 +797,7 @@ void abc806_state::sto_w(uint8_t data)
 //  eme_w - external memory enable
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(abc806_state::eme_w)
+void abc806_state::eme_w(int state)
 {
 	LOG("%s EME %u\n", machine().describe_context(), state);
 	m_eme = state;
@@ -808,7 +808,7 @@ WRITE_LINE_MEMBER(abc806_state::eme_w)
 //  _40_w - 40/80 column display
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(abc806_state::_40_w)
+void abc806_state::_40_w(int state)
 {
 	m_40 = state;
 }
@@ -818,7 +818,7 @@ WRITE_LINE_MEMBER(abc806_state::_40_w)
 //  hru2_a8_w - HRU II address line 8, PROT A0
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(abc806_state::hru2_a8_w)
+void abc806_state::hru2_a8_w(int state)
 {
 	m_hru2_a8 = state;
 }
@@ -828,7 +828,7 @@ WRITE_LINE_MEMBER(abc806_state::hru2_a8_w)
 //  prot_ini_w - PROT INI
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(abc806_state::prot_ini_w)
+void abc806_state::prot_ini_w(int state)
 {
 }
 
@@ -837,7 +837,7 @@ WRITE_LINE_MEMBER(abc806_state::prot_ini_w)
 //  txoff_w - text display enable
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(abc806_state::txoff_w)
+void abc806_state::txoff_w(int state)
 {
 	m_txoff = state;
 }
@@ -847,7 +847,7 @@ WRITE_LINE_MEMBER(abc806_state::txoff_w)
 //  prot_din_w - PROT DIN
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(abc806_state::prot_din_w)
+void abc806_state::prot_din_w(int state)
 {
 }
 
@@ -977,7 +977,7 @@ MC6845_UPDATE_ROW( abc806_state::abc806_update_row )
 //  hs_w - horizontal sync write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( abc806_state::hs_w )
+void abc806_state::hs_w(int state)
 {
 	int vsync;
 
@@ -1025,7 +1025,7 @@ WRITE_LINE_MEMBER( abc806_state::hs_w )
 //  vs_w - vertical sync write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( abc806_state::vs_w )
+void abc806_state::vs_w(int state)
 {
 	m_vsync = state;
 }
@@ -1741,7 +1741,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( abc800_state::ctc_tick )
 	m_ctc->trg2(0);
 }
 
-WRITE_LINE_MEMBER( abc800_state::ctc_z0_w )
+void abc800_state::ctc_z0_w(int state)
 {
 	if (BIT(m_sb, 2))
 	{
@@ -1752,7 +1752,7 @@ WRITE_LINE_MEMBER( abc800_state::ctc_z0_w )
 	cassette_output_tick(state);
 }
 
-WRITE_LINE_MEMBER( abc800_state::ctc_z1_w )
+void abc800_state::ctc_z1_w(int state)
 {
 	if (BIT(m_sb, 3))
 	{
@@ -1771,12 +1771,12 @@ WRITE_LINE_MEMBER( abc800_state::ctc_z1_w )
 //  Z80SIO
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( abc800_state::sio_txdb_w )
+void abc800_state::sio_txdb_w(int state)
 {
 	m_sio_txdb = state;
 }
 
-WRITE_LINE_MEMBER( abc800_state::sio_dtrb_w )
+void abc800_state::sio_dtrb_w(int state)
 {
 	if (m_cassette == nullptr) return;
 
@@ -1790,7 +1790,7 @@ WRITE_LINE_MEMBER( abc800_state::sio_dtrb_w )
 	}
 }
 
-WRITE_LINE_MEMBER( abc800_state::sio_rtsb_w )
+void abc800_state::sio_rtsb_w(int state)
 {
 	if (m_cassette == nullptr) return;
 
@@ -1807,7 +1807,7 @@ WRITE_LINE_MEMBER( abc800_state::sio_rtsb_w )
 //  Z80DART abc800
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( abc800_state::keydtr_w )
+void abc800_state::keydtr_w(int state)
 {
 	LOG("%s KEYDTR %u\n",machine().describe_context(),state);
 
@@ -1819,14 +1819,14 @@ WRITE_LINE_MEMBER( abc800_state::keydtr_w )
 //  Z80DART abc802
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( abc802_state::lrs_w )
+void abc802_state::lrs_w(int state)
 {
 	LOG("%s LRS %u\n",machine().describe_context(),state);
 
 	m_lrs = state;
 }
 
-WRITE_LINE_MEMBER( abc802_state::mux80_40_w )
+void abc802_state::mux80_40_w(int state)
 {
 	LOG("%s 80/40 MUX %u\n",machine().describe_context(),state);
 

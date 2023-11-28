@@ -86,15 +86,6 @@ void iq151cart_slot_device::device_start()
 	m_cart = get_card_device();
 	if (m_cart)
 		m_cart->set_screen_device(*m_screen);
-
-	// resolve callbacks
-	m_out_irq0_cb.resolve_safe();
-	m_out_irq1_cb.resolve_safe();
-	m_out_irq2_cb.resolve_safe();
-	m_out_irq3_cb.resolve_safe();
-	m_out_irq4_cb.resolve_safe();
-	m_out_drq_cb.resolve_safe();
-
 }
 
 

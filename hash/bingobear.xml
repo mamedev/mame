@@ -7,8 +7,8 @@ license:CC0-1.0
 <!--
 
 Known modules:
-- Doctor Bingo Bear (70511)
-- Space Bingo Bear (70512, TESL 7-130C-1-F)
+- Doctor Bingo Bear (70511, PCB: TESL 7-130C-1-F)
+- Space Bingo Bear (70512, same PCB)
 
 Presumably unreleased:
 - Rock Star Bingo Bear (70514)
@@ -18,6 +18,18 @@ Presumably unreleased:
 -->
 
 <softwarelist name="bingobear" description="Bingo Bear modules">
+
+	<software name="doctor">
+		<description>Doctor Bingo Bear</description>
+		<year>1986</year>
+		<publisher>Hasbro / Tiger Electronics</publisher>
+		<info name="serial" value="70511"/>
+		<part name="cart" interface="bingobear">
+			<dataarea name="rom" size="0x4000">
+				<rom name="cm62063.ic101" size="0x4000" crc="d7a12642" sha1="b93c7ef2414d17d20d240b05a960d7ff71b46102" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="space">
 		<description>Space Bingo Bear</description>

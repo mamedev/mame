@@ -497,7 +497,7 @@ void swtpc09_state::swtpc09_base(machine_config &config)
 	io7.firq_cb().set("mainfirq", FUNC(input_merger_device::in_w<7>));
 
 	// IO8 at 0xe080 is used internally by the MPID board PIA.
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->readpa_handler().set(FUNC(swtpc09_state::pia0_a_r));
 	m_pia->ca1_w(0);
 	m_pia->irqa_handler().set(FUNC(swtpc09_state::pia0_irq_a));

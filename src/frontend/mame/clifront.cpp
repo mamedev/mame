@@ -403,25 +403,10 @@ void cli_frontend::listsource(const std::vector<std::string> &args)
 {
 	auto const list_system_source = [] (device_type type)
 	{
-		std::string_view src(type.source());
-		auto prefix(src.find("src/mame/"));
-		if (std::string_view::npos == prefix)
-			prefix = src.find("src\\mame\\");
-		if (std::string_view::npos != prefix)
-		{
-			src.remove_prefix(prefix + 9);
-		}
-		else
-		{
-			auto prefix(src.find("src/"));
-			if (std::string_view::npos == prefix)
-				prefix = src.find("src\\");
-			if (std::string_view::npos != prefix)
-			{
-				src.remove_prefix(prefix + 4);
-			}
-		}
-		osd_printf_info("%-16s %s\n", type.shortname(), src);
+		osd_printf_info(
+				"%-16s %s\n",
+				type.shortname(),
+				info_xml_creator::format_sourcefile(type.source()));
 	};
 	apply_action(
 			args,
@@ -520,13 +505,8 @@ void cli_frontend::listbrothers(const std::vector<std::string> &args)
 	drivlist.reset();
 	while (drivlist.next())
 	{
-		std::string_view src(drivlist.driver().type.source());
-		auto prefix(src.find("src/mame/"));
-		if (std::string_view::npos == prefix)
-			prefix = src.find("src\\mame\\");
-		if (std::string_view::npos != prefix)
-			src.remove_prefix(prefix + 9);
-		int const clone_of = drivlist.clone();
+		auto const src(info_xml_creator::format_sourcefile(drivlist.driver().type.source()));
+		int const clone_of(drivlist.clone());
 		if (clone_of != -1)
 			osd_printf_info("%-20s %-16s %s\n", src, drivlist.driver().name, (clone_of == -1 ? "" : drivlist.driver(clone_of).name));
 		else
@@ -1785,34 +1765,41 @@ void cli_frontend::execute_commands(std::string_view exename)
 	// createconfig?
 	if (m_options.command() == CLICOMMAND_CREATECONFIG)
 	{
-		// attempt to open the output file
+		// attempt to open the output file and generate the updated (mame).ini
 		emu_file file(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 		if (file.open(std::string(emulator_info::get_configname()) + ".ini"))
 			throw emu_fatalerror("Unable to create file %s.ini\n",emulator_info::get_configname());
 
-		// generate the updated INI
 		file.puts(m_options.output_ini());
 
+		// ui.ini
 		ui_options ui_opts;
 		emu_file file_ui(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 		if (file_ui.open("ui.ini"))
 			throw emu_fatalerror("Unable to create file ui.ini\n");
 
-		// generate the updated INI
 		file_ui.puts(ui_opts.output_ini());
 
+		// plugin.ini
 		plugin_options plugin_opts;
 		path_iterator iter(m_options.plugins_path());
 		std::string pluginpath;
 		while (iter.next(pluginpath))
 			plugin_opts.scan_directory(pluginpath, true);
 
-		emu_file file_plugin(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		if (file_plugin.open("plugin.ini"))
-			throw emu_fatalerror("Unable to create file plugin.ini\n");
+		std::string plugins(plugin_opts.output_ini());
 
-		// generate the updated INI
-		file_plugin.puts(plugin_opts.output_ini());
+		// only update the file when it found plugins
+		if (!plugins.empty())
+		{
+			emu_file file_plugin(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+			if (file_plugin.open("plugin.ini"))
+				throw emu_fatalerror("Unable to create file plugin.ini\n");
+
+			file_plugin.puts(plugins);
+		}
+		else
+			osd_printf_error("Skipped plugin.ini, could not find any plugins\n");
 
 		return;
 	}

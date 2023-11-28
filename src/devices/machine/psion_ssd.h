@@ -30,11 +30,10 @@ public:
 	auto door_cb() { return m_door_cb.bind(); }
 
 	uint8_t data_r();
-	void  data_w(uint16_t data);
+	void data_w(uint16_t data);
 
 protected:
 	// device_t implementation
-	virtual void device_resolve_objects() override;
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -42,6 +41,7 @@ protected:
 
 	// device_image_interface implementation
 	virtual std::pair<std::error_condition, std::string> call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_create(int format_type, util::option_resolution *create_args) override;
 	virtual void call_unload() override;
 
 	virtual bool is_reset_on_load() const noexcept override { return false; }

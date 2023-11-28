@@ -159,8 +159,8 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
-	DECLARE_WRITE_LINE_MEMBER(drq_w);
+	void irq_w(int state);
+	void drq_w(int state);
 
 public:
 	virtual uint8_t dack_r(int line) override;

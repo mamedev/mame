@@ -130,10 +130,8 @@ DEFINE_DEVICE_TYPE(SONY_OA_D32V, sony_oa_d32v, "sony_oa_d32v", "Sony OA-D32V Mic
 DEFINE_DEVICE_TYPE(TEAC_FD_30A, teac_fd_30a, "teac_fd_30a", "TEAC FD-30A FDD")
 
 // TEAC 5.25" drives
-#if 0
 DEFINE_DEVICE_TYPE(TEAC_FD_55A, teac_fd_55a, "teac_fd_55a", "TEAC FD-55A FDD")
 DEFINE_DEVICE_TYPE(TEAC_FD_55B, teac_fd_55b, "teac_fd_55b", "TEAC FD-55B FDD")
-#endif
 DEFINE_DEVICE_TYPE(TEAC_FD_55E, teac_fd_55e, "teac_fd_55e", "TEAC FD-55E FDD")
 DEFINE_DEVICE_TYPE(TEAC_FD_55F, teac_fd_55f, "teac_fd_55f", "TEAC FD-55F FDD")
 DEFINE_DEVICE_TYPE(TEAC_FD_55G, teac_fd_55g, "teac_fd_55g", "TEAC FD-55G FDD")
@@ -312,6 +310,17 @@ void floppy_image_device::setup_led_cb(led_cb cb)
 	cur_led_cb = cb;
 }
 
+struct floppy_image_device::fs_enum : public fs::manager_t::floppy_enumerator {
+	floppy_image_device *m_fid;
+	const fs::manager_t *m_manager;
+
+	fs_enum(floppy_image_device *fid);
+
+	virtual void add_raw(const char *name, u32 key, const char *description) override;
+protected:
+	virtual void add_format(const floppy_image_format_t &type, u32 image_size, const char *name, const char *description) override;
+};
+
 floppy_image_device::fs_enum::fs_enum(floppy_image_device *fid)
 	: fs::manager_t::floppy_enumerator(fid->form_factor, fid->variants)
 	, m_fid(fid)
@@ -405,7 +414,7 @@ void floppy_image_device::commit_image()
 	if (err)
 		popmessage("Error, unable to truncate image: %s", err.message());
 
-	output_format->save(*io, variants, image.get());
+	output_format->save(*io, variants, *image);
 }
 
 void floppy_image_device::device_config_complete()
@@ -599,7 +608,7 @@ std::pair<std::error_condition, std::string> floppy_image_device::call_load()
 		return std::make_pair(image_error::INVALIDIMAGE, "Unable to identify image file format");
 
 	image = std::make_unique<floppy_image>(tracks, sides, form_factor);
-	if (!best_format->load(*io, form_factor, variants, image.get())) {
+	if (!best_format->load(*io, form_factor, variants, *image)) {
 		image.reset();
 		return std::make_pair(image_error::INVALIDIMAGE, "Incompatible image file format or corrupted data");
 	}
@@ -823,7 +832,7 @@ void floppy_image_device::init_fs(const fs_info *fs, const fs::meta_data &meta)
 		cfs->format(meta);
 
 		auto io = util::ram_read(img.data(), img.size(), 0xff);
-		fs->m_type->load(*io, floppy_image::FF_UNKNOWN, variants, image.get());
+		fs->m_type->load(*io, floppy_image::FF_UNKNOWN, variants, *image);
 	} else {
 		fs::unformatted_image::format(fs->m_key, image.get());
 	}
@@ -1407,6 +1416,11 @@ uint32_t floppy_image_device::get_form_factor() const
 uint32_t floppy_image_device::get_variant() const
 {
 	return image ? image->get_variant() : 0;
+}
+
+std::vector<uint32_t> &floppy_image_device::get_buffer()
+{
+	return image->get_buffer(cyl, ss, subcyl);
 }
 
 //===================================================================
@@ -2571,6 +2585,68 @@ void teac_fd_30a::setup_characteristics()
 	set_rpm(300);
 
 	variants.push_back(floppy_image::SSDD);
+}
+
+//-------------------------------------------------
+//  TEAC FD-55A
+//
+//  track to track: 6 ms
+//  average: 93 ms
+//  setting time: 15 ms
+//  motor start time: 400 ms
+//
+//-------------------------------------------------
+
+teac_fd_55a::teac_fd_55a(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: floppy_image_device(mconfig, TEAC_FD_55A, tag, owner, clock)
+{
+}
+
+teac_fd_55a::~teac_fd_55a()
+{
+}
+
+void teac_fd_55a::setup_characteristics()
+{
+	form_factor = floppy_image::FF_525;
+	tracks = 40;
+	sides = 1;
+	set_rpm(300);
+
+	variants.push_back(floppy_image::SSSD);
+	variants.push_back(floppy_image::SSDD);
+}
+
+//-------------------------------------------------
+//  TEAC FD-55B
+//
+//  track to track: 6 ms
+//  average: 93 ms
+//  setting time: 15 ms
+//  motor start time: 400 ms
+//
+//-------------------------------------------------
+
+teac_fd_55b::teac_fd_55b(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: floppy_image_device(mconfig, TEAC_FD_55B, tag, owner, clock)
+{
+}
+
+teac_fd_55b::~teac_fd_55b()
+{
+}
+
+void teac_fd_55b::setup_characteristics()
+{
+	form_factor = floppy_image::FF_525;
+	tracks = 40;
+	sides = 2;
+	set_rpm(300);
+
+	variants.push_back(floppy_image::SSSD);
+	variants.push_back(floppy_image::SSDD);
+	variants.push_back(floppy_image::DSSD);
+	variants.push_back(floppy_image::DSDD);
 }
 
 //-------------------------------------------------

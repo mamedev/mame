@@ -32,6 +32,7 @@ beta_disk_device::beta_disk_device(const machine_config &mconfig, const char *ta
 	, m_betadisk_active(0)
 	, m_wd179x(*this, "wd179x")
 	, m_floppy(*this, "wd179x:%u", 0U)
+	, m_floppy_led(*this, "fdd%u_led", 0U)
 	, m_control(0)
 	, m_motor_active(false)
 {
@@ -46,6 +47,8 @@ void beta_disk_device::device_start()
 	save_item(NAME(m_betadisk_active));
 	save_item(NAME(m_control));
 	save_item(NAME(m_motor_active));
+
+	m_floppy_led.resolve();
 }
 
 //-------------------------------------------------
@@ -55,6 +58,8 @@ void beta_disk_device::device_start()
 void beta_disk_device::device_reset()
 {
 	m_control = 0;
+	for (int i = 0; i < m_floppy_led.size(); i++)
+		m_floppy_led[i] = 0;
 }
 
 int beta_disk_device::is_active()
@@ -180,9 +185,15 @@ void beta_disk_device::motors_control()
 	for (int i = 0; i < 4; i++)
 	{
 		if (m_motor_active && (m_control & 3) == i)
+		{
 			m_floppy[i]->get_device()->mon_w(CLEAR_LINE);
+			m_floppy_led[i] = 1;
+		}
 		else
+		{
 			m_floppy[i]->get_device()->mon_w(ASSERT_LINE);
+			m_floppy_led[i] = 0;
+		}
 	}
 }
 

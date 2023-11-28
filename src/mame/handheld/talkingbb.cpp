@@ -140,11 +140,11 @@ private:
 	required_device<pwm_display_device> m_display;
 	required_ioport_array<5> m_inputs;
 
-	void main_map(address_map &map);
-	void main_io(address_map &map);
-
 	u8 m_bank = 0;
 	u8 m_inp_mux = 0;
+
+	void main_map(address_map &map);
+	void main_io(address_map &map);
 
 	// I/O handlers
 	void bank_w(u8 data);

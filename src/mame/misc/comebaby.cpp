@@ -302,7 +302,7 @@ void comebaby_state::comebaby(machine_config &config)
 	// YMF740G goes thru "pci:0c.0"
 	// Expansion slots, mapping SVGA for debugging
 	// TODO: all untested, check clock
-	#if ENABLE_VOODOO
+#if ENABLE_VOODOO
 	VOODOO_3_PCI(config, m_voodoo3, 0, m_maincpu, "screen"); // "pci:0d.0" J4D2
 	m_voodoo3->set_fbmem(2);
 	m_voodoo3->set_tmumem(4, 4);
@@ -314,11 +314,11 @@ void comebaby_state::comebaby(machine_config &config)
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 640 - 1, 0, 480 - 1);
 	screen.set_screen_update(PCI_AGP_ID, FUNC(voodoo_3_pci_device::screen_update));
-	#else
+#else
 	// "pci:0d.0" J4D2
 	// "pci:0e.0" J4D1
 	VIRGE_PCI(config, "pci:0e.0", 0); // J4C1
-	#endif
+#endif
 
 }
 
