@@ -18,9 +18,10 @@
 #define LOG_HANDLED_OPS         (1U << 2)
 #define LOG_UNHANDLED_CACHE_OPS (1U << 3)
 #define LOG_UNHANDLED_SYNC_OPS  (1U << 4)
+#define LOG_EXTREG_OPS          (1U << 8)
 
 
-#define VERBOSE LOG_UNHANDLED_OPS
+#define VERBOSE (LOG_UNHANDLED_OPS | LOG_EXTREG_OPS)
 #include "logmacro.h"
 
 // device type definitions
@@ -49,23 +50,24 @@ device_memory_interface::space_config_vector xtensa_device::memory_space_config(
 	return spaces;
 }
 
-uint32_t xtensa_device::extreg_windowbase_r()
-{
-	return m_extreg_windowbase;
-}
+uint32_t xtensa_device::extreg_windowbase_r() { return m_extreg_windowbase; }
+void xtensa_device::extreg_windowbase_w(u32 data) {	m_extreg_windowbase = data; logerror("m_extreg_windowbase set to %08x\n", data); }
+uint32_t xtensa_device::extreg_windowstart_r() { return m_extreg_windowstart; }
+void xtensa_device::extreg_windowstart_w(u32 data) { m_extreg_windowstart = data; logerror("m_extreg_windowstart set to %08x\n", data); }
+uint32_t xtensa_device::extreg_lbeg_r() { return m_extreg_lbeg; }
+void xtensa_device::extreg_lbeg_w(u32 data) { m_extreg_lbeg = data; logerror("m_extreg_lbeg set to %08x\n", data); }
+uint32_t xtensa_device::extreg_lend_r() { return m_extreg_lend; }
+void xtensa_device::extreg_lend_w(u32 data) { m_extreg_lend = data; logerror("m_extreg_lend set to %08x\n", data); }
+uint32_t xtensa_device::extreg_lcount_r() { return m_extreg_lcount; }
+void xtensa_device::extreg_lcount_w(u32 data) { m_extreg_lcount = data; logerror("m_extreg_lcount set to %08x\n", data); }
 
-void xtensa_device::extreg_windowbase_w(u32 data)
-{
-	m_extreg_windowbase = data;
-	logerror("m_extreg_windowbase set to %08x\n", data);
-}
 
 void xtensa_device::ext_regs(address_map &map)
 {
-	// Loop Option (0-2)
-	//map(0x00, 0x00) // "lbeg", 
-	//map(0x01, 0x01) // "lend",
-	//map(0x02, 0x02) // "lcount",
+	// Loop Option (0-2),
+	map(0x00, 0x00).rw(FUNC(xtensa_device::extreg_lbeg_r), FUNC(xtensa_device::extreg_lbeg_w)); // "lbeg" LOOP BEGIN
+	map(0x01, 0x01).rw(FUNC(xtensa_device::extreg_lend_r), FUNC(xtensa_device::extreg_lend_w)); // "lend" LOOP END
+	map(0x02, 0x02).rw(FUNC(xtensa_device::extreg_lcount_r), FUNC(xtensa_device::extreg_lcount_w)); // "lcount" LOOP COUNT
 
 	// Core Architecture (3)
 	//map(0x03, 0x03) // "sar", 
@@ -91,7 +93,7 @@ void xtensa_device::ext_regs(address_map &map)
 
 	 // Windowed Register Option (72-73)
 	map(0x48, 0x48).rw(FUNC(xtensa_device::extreg_windowbase_r), FUNC(xtensa_device::extreg_windowbase_w)); // "WindowBase",
-	//map(0x49, 0x49) // "WindowStart", 
+	map(0x49, 0x49).rw(FUNC(xtensa_device::extreg_windowstart_r), FUNC(xtensa_device::extreg_windowstart_w));// "WindowStart", 
 
 	// MMU Option (83)
 	//map(0x53, 0x53) // "ptevaddr", 
@@ -223,13 +225,24 @@ void xtensa_device::device_start()
 
 	std::fill(std::begin(m_a), std::end(m_a), 0);
 
+	m_num_physical_regs = 512; // just set this higher than it should be for now, until we emulate window exceptions (marimba startup check suggests 32, with it wrapping around when exceptions are disabled)
+	m_a.resize(m_num_physical_regs);
+
 	set_icountptr(m_icount);
 
 	state_add(XTENSA_PC, "PC", m_pc);
 	state_add(STATE_GENPC, "GENPC", m_pc);
 	state_add(STATE_GENPCBASE, "CURPC", m_pc);
-	for (int i = 0; i < 16; i++)
+	state_add(XTENSA_WINDOW, "WinBase", m_extreg_windowbase);
+
+	state_add(XTENSA_LOOPBEGIN, "LoopBegin", m_extreg_lbeg);
+	state_add(XTENSA_LOOPEND, "LoopEnd", m_extreg_lend);
+	state_add(XTENSA_LOOPCOUNT, "LoopCount", m_extreg_lcount);
+
+	for (int i = 0; i < m_num_physical_regs; i++)
 		state_add(XTENSA_A0 + i, string_format("a%d", i).c_str(), m_a[i]);
+
+	state_add(XTENSA_PC, "PC", m_pc);
 
 	save_item(NAME(m_pc));
 	save_item(NAME(m_a));
@@ -238,6 +251,15 @@ void xtensa_device::device_start()
 void xtensa_device::device_reset()
 {
 	// TODO: Reset state
+
+	m_extreg_windowbase = 0;
+	m_extreg_windowstart = 0;
+
+	m_extreg_sar = 0;
+
+	m_extreg_lbeg = 0;
+	m_extreg_lend = 0;
+	m_extreg_lcount = 0;
 }
 
 void xtensa_device::handle_reserved(u32 inst)
@@ -249,13 +271,33 @@ void xtensa_device::handle_reserved(u32 inst)
 u32 xtensa_device::get_reg(u8 reg)
 {
 	// TODO: much more complex than this with the Windowed Register Option!
-	return m_a[reg];
+	int realreg = reg + m_extreg_windowbase * 4;
+
+	if (realreg >= 0 && realreg < m_num_physical_regs)
+	{
+		return m_a[realreg];
+	}
+	else
+	{
+		// exceptions?
+		return m_a[realreg & (m_num_physical_regs-1)];
+	}
 }
 
 void xtensa_device::set_reg(u8 reg, u32 value)
 {
 	// TODO: much more complex than this with the Windowed Register Option!
-	m_a[reg] = value;
+	int realreg = reg + m_extreg_windowbase * 4;
+
+	if (realreg >= 0 && realreg < m_num_physical_regs)
+	{
+		m_a[realreg] = value;
+	}
+	else
+	{
+		// exceptions?
+		m_a[realreg & (m_num_physical_regs-1)] = value;
+	}
 }
 
 u32 xtensa_device::get_mem32(u32 addr)
@@ -489,8 +531,12 @@ void xtensa_device::getop_and_execute()
 					break;
 
 				case 0b0100: // SSAI
-					LOGMASKED(LOG_UNHANDLED_OPS, "%-8s%d\n", "ssai", BIT(inst, 8, 4) + (inst & 0x000010));
+				{
+					u8 imm = BIT(inst, 8, 4) + (inst & 0x000010);
+					LOGMASKED(LOG_HANDLED_OPS, "%-8s%d\n", "ssai", imm);
+					m_extreg_sar = imm;
 					break;
+				}
 
 				case 0b0110: case 0b0111: // RER, WER
 				case 0b1110: case 0b1111: // NSA, NSAU (with Miscellaneous Operations Option)
@@ -498,8 +544,12 @@ void xtensa_device::getop_and_execute()
 					break;
 
 				case 0b1000: // ROTW (with Windowed Register Option)
-					LOGMASKED(LOG_UNHANDLED_OPS, "%-8s%d\n", "rotw", util::sext(inst >> 4, 4));
+				{
+					s8 imm = util::sext(inst >> 4, 4);
+					LOGMASKED(LOG_HANDLED_OPS, "%-8s%d\n", "rotw", imm);
+					m_extreg_windowbase += imm;
 					break;
+				}
 
 				default:
 					handle_reserved(inst);
@@ -702,7 +752,7 @@ void xtensa_device::getop_and_execute()
 			{
 				u8 spcreg = BIT(inst, 8, 8);
 				u8 reg = BIT(inst, 4, 4);
-				LOGMASKED(LOG_UNHANDLED_OPS, "%s.%-3d a%d\n", "wsr", special_reg(spcreg, BIT(inst, 20)), reg);
+				LOGMASKED(LOG_EXTREG_OPS, "%s.%-3d a%d\n", "wsr", special_reg(spcreg, BIT(inst, 20)), reg);
 				space(AS_EXTREGS).write_dword(spcreg, get_reg(reg));
 				break;
 			}
@@ -1172,8 +1222,15 @@ void xtensa_device::getop_and_execute()
 					break;
 
 				case 0b1000: // LOOP (with Loop Option)
-					LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, 0x%08X\n", "loop", BIT(inst, 8, 4), m_pc + 4 + s8(u8(inst >> 16)));
+				{
+					u8 reg = BIT(inst, 8, 4);
+					u32 addr = m_pc + 4 + s8(u8(inst >> 16));
+					LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, 0x%08X\n", "loop",  reg, addr);
+					m_extreg_lcount = get_reg(reg)-1;
+					m_extreg_lbeg = m_nextpc;
+					m_extreg_lend = addr;
 					break;
+				}
 
 				case 0b1001: // LOOPNEZ (with Loop Option)
 					LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, 0x%08X\n", "loopnez", BIT(inst, 8, 4), m_pc + 4 + s8(u8(inst >> 16)));
@@ -1386,6 +1443,16 @@ void xtensa_device::getop_and_execute()
 	default:
 		handle_reserved(inst);
 		break;
+	}
+
+	// handle zero overhead loops
+	if (m_nextpc == m_extreg_lend)
+	{
+		if (m_extreg_lcount != 0)
+		{
+			m_extreg_lcount--;
+			m_nextpc = m_extreg_lbeg;
+		}
 	}
 
 	m_pc = m_nextpc;

@@ -18,10 +18,21 @@ public:
 
 	enum {
 		XTENSA_PC,
+		XTENSA_WINDOW,
+		XTENSA_LOOPBEGIN,
+		XTENSA_LOOPEND,
+		XTENSA_LOOPCOUNT,
 		XTENSA_A0, XTENSA_A1, XTENSA_A2, XTENSA_A3,
 		XTENSA_A4, XTENSA_A5, XTENSA_A6, XTENSA_A7,
 		XTENSA_A8, XTENSA_A9, XTENSA_A10, XTENSA_A11,
-		XTENSA_A12, XTENSA_A13, XTENSA_A14, XTENSA_A15
+		XTENSA_A12, XTENSA_A13, XTENSA_A14, XTENSA_A15,
+	/*
+		// with windowed extensions there 32 or 64 physical regs
+		XTENSA_A16, XTENSA_A17, XTENSA_A18, XTENSA_A19,
+		XTENSA_A20, XTENSA_A21, XTENSA_A22, XTENSA_A23,
+		XTENSA_A24, XTENSA_A25, XTENSA_A26, XTENSA_A27,
+		XTENSA_A28, XTENSA_A29, XTENSA_A30, XTENSA_A31,
+	*/
 	};
 
 protected:
@@ -49,6 +60,14 @@ private:
 
 	uint32_t extreg_windowbase_r();
 	void extreg_windowbase_w(u32 data);
+	uint32_t extreg_windowstart_r();
+	void extreg_windowstart_w(u32 data);
+	uint32_t extreg_lbeg_r();
+	void extreg_lbeg_w(u32 data);
+	uint32_t extreg_lend_r();
+	void extreg_lend_w(u32 data);
+	uint32_t extreg_lcount_r();
+	void extreg_lcount_w(u32 data);
 
 	void ext_regs(address_map &map);
 
@@ -62,13 +81,21 @@ private:
 	void handle_reserved(u32 inst);
 
 	// internal state
-	u32 m_a[16]; // actually 32 or 64 physical registers with Windowed extension
+	std::vector<uint32_t> m_a; // actually 32 or 64 physical registers with Windowed extension
 	u32 m_pc;
 	s32 m_icount;
 
 	u32 m_extreg_windowbase;
+	u32 m_extreg_windowstart;
+	u32 m_extreg_sar;
+	u32 m_extreg_lbeg;
+	u32 m_extreg_lend;
+	u32 m_extreg_lcount;
 
 	u32 m_nextpc;
+
+	// config
+	u32 m_num_physical_regs;
 };
 
 DECLARE_DEVICE_TYPE(XTENSA, xtensa_device)
