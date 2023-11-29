@@ -17,15 +17,22 @@
 ***************************************************************************/
 
 class kaneko_pandora_device : public device_t,
-								public device_video_interface
+								public device_video_interface,
+								public device_gfx_interface
 {
 public:
+	// constructor/destructor
 	kaneko_pandora_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T> kaneko_pandora_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&palette_tag, const gfx_decode_entry *gfxinfo)
+		: kaneko_pandora_device(mconfig, tag, owner, clock)
+	{
+		set_info(gfxinfo);
+		set_palette(std::forward<T>(palette_tag));
+	}
 
 	// configuration
-	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
-	void set_gfx_region(int gfxregion) { m_gfx_region = gfxregion; }
-	void set_offsets(int x_offset, int y_offset)
+	void set_gfxinfo(const gfx_decode_entry *gfxinfo) { set_info(gfxinfo); }
+	void set_offsets(int32_t x_offset, int32_t y_offset)
 	{
 		m_xoffset = x_offset;
 		m_yoffset = y_offset;
@@ -36,9 +43,9 @@ public:
 	void spriteram_LSB_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t spriteram_LSB_r(offs_t offset);
 	void update( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void set_clear_bitmap( int clear );
+	void set_clear_bitmap(int clear);
 	void eof();
-	void set_bg_pen( int pen );
+	void set_bg_pen(uint16_t pen);
 	void flip_screen_set(bool flip) { m_flip_screen = flip; }
 
 protected:
@@ -50,15 +57,13 @@ protected:
 
 private:
 	// internal state
-	std::unique_ptr<uint8_t[]>        m_spriteram;
-	std::unique_ptr<bitmap_ind16> m_sprites_bitmap; /* bitmap to render sprites to, Pandora seems to be frame'buffered' */
-	int             m_clear_bitmap = 0;
-	int             m_bg_pen = 0; // might work some other way..
-	uint8_t           m_gfx_region;
-	int             m_xoffset;
-	int             m_yoffset;
-	bool            m_flip_screen = false;
-	required_device<gfxdecode_device> m_gfxdecode;
+	std::unique_ptr<uint8_t[]>    m_spriteram;
+	std::unique_ptr<bitmap_ind16> m_sprites_bitmap; // bitmap to render sprites to, Pandora seems to be frame'buffered'
+	bool            m_clear_bitmap;
+	uint16_t        m_bg_pen; // might work some other way..
+	int32_t         m_xoffset;
+	int32_t         m_yoffset;
+	bool            m_flip_screen;
 };
 
 DECLARE_DEVICE_TYPE(KANEKO_PANDORA, kaneko_pandora_device)
