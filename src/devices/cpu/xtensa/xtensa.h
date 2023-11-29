@@ -82,8 +82,14 @@ private:
 
 	inline u32 get_reg(u8 reg);
 	inline void set_reg(u8 reg, u32 value);
+
 	inline u32 get_mem32(u32 addr);
 	inline void set_mem32(u32 addr, u32 data);
+
+	inline void set_mem8(u32 addr, u8 data);
+
+	inline u16 get_mem16(u32 addr);
+	inline void set_mem16(u32 addr, u16 data);
 
 	void handle_reserved(u32 inst);
 

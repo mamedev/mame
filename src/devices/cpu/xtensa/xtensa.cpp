@@ -324,7 +324,28 @@ void xtensa_device::set_mem32(u32 addr, u32 data)
 	if (addr & 3)
 		logerror("set_mem32 unaligned\n");
 
-	return m_space.write_dword(addr &~ 3, data);
+	m_space.write_dword(addr &~ 3, data);
+}
+
+void xtensa_device::set_mem8(u32 addr, u8 data)
+{
+	m_space.write_byte(addr, data);
+}
+
+u16 xtensa_device::get_mem16(u32 addr)
+{
+	if (addr & 1)
+		logerror("get_mem16 unaligned\n");
+
+	return m_space.read_word(addr & ~1);
+}
+
+void xtensa_device::set_mem16(u32 addr, u16 data)
+{
+	if (addr & 1)
+		logerror("set_mem16 unaligned\n");
+
+	m_space.write_word(addr & ~1, data);
 }
 
 void xtensa_device::handle_retw()
@@ -542,9 +563,14 @@ void xtensa_device::getop_and_execute()
 				break;
 
 			case 0b0001: // AND
-				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, a%d\n", "and", BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
+			{
+				u8 dstreg = BIT(inst, 12, 4);
+				u8 reg_s = BIT(inst, 8, 4);
+				u8 reg_t = BIT(inst, 4, 4);
+				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, a%d\n", "and", dstreg, reg_s, reg_t);
+				set_reg(dstreg, get_reg(reg_s) & get_reg(reg_t));
 				break;
-
+			}
 			case 0b0010: // OR
 				if (BIT(inst, 8, 4) == BIT(inst, 4, 4))
 				{
@@ -1001,13 +1027,54 @@ void xtensa_device::getop_and_execute()
 	case 0b0010: // LSAI
 		switch (BIT(inst, 12, 4))
 		{
-		case 0b0000: case 0b0100: // L8UI, S8I
+		case 0b0000: // L8UI
 			LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, %s\n", s_lsai_ops[BIT(inst, 12, 4)], BIT(inst, 4, 4), BIT(inst, 8, 4), format_imm(inst >> 16));
 			break;
 
-		case 0b0001: case 0b0101: case 0b1001: // L16UI, S16I, L16SI
-			LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, %s\n", s_lsai_ops[BIT(inst, 12, 4)], BIT(inst, 4, 4), BIT(inst, 8, 4), format_imm((inst >> 16) * 2));
+		case 0b0100: // S8I
+		{
+			u8 reg = BIT(inst, 4, 4);
+			u8 basereg = BIT(inst, 8, 4);
+			u8 offset = inst >> 16;
+			LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, %s\n", "s8i", reg, basereg, format_imm(offset));
+			u32 addr = get_reg(basereg) + offset;
+			set_mem8(addr, get_reg(reg)&0xff);
 			break;
+		}
+
+		case 0b0001: // L16UI
+		{
+			u8 dstreg = BIT(inst, 4, 4);
+			u8 basereg = BIT(inst, 8, 4);
+			u32 imm = (inst >> 16) * 2;
+			LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, %s\n", "l16ui", dstreg, basereg, format_imm(imm));
+			set_reg(dstreg, get_mem16(get_reg(basereg) + imm));
+			break;
+		}
+
+		case 0b0101: // S16I
+		{
+			u8 reg = BIT(inst, 4, 4);
+			u8 basereg = BIT(inst, 8, 4);
+			u16 offset = (inst >> 16) * 2;
+			LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, %s\n", "s16i", reg, basereg, format_imm(offset));
+			u32 addr = get_reg(basereg) + offset;
+			set_mem16(addr, get_reg(reg)&0xffff);
+			break;
+		}
+
+		case 0b1001: // L16SI
+		{
+			u8 dstreg = BIT(inst, 4, 4);
+			u8 basereg = BIT(inst, 8, 4);
+			u32 imm = (inst >> 16) * 2;
+			LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, %s\n", "l16si", dstreg, basereg, format_imm(imm));
+			u32 value = get_mem16(get_reg(basereg) + imm);
+			if (value & 0x00008000)
+				value |= 0xffff0000;
+			set_reg(dstreg, value);
+			break;
+		}
 
 		case 0b0010: // L32I
 		{
@@ -1029,7 +1096,7 @@ void xtensa_device::getop_and_execute()
 			break;
 		}
 
-		case 0b1011: // L32AI
+		case 0b1011: // L32AI (with Multiprocessor Synchronization Option)
 			LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, %s\n", s_lsai_ops[BIT(inst, 12, 4)], BIT(inst, 4, 4), BIT(inst, 8, 4), format_imm((inst >> 16) * 4));
 			break;
 
