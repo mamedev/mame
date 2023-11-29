@@ -368,6 +368,7 @@ ROM_END
 // use of a (now defunct) www.onkeysongs.com service for downloading additional songs to the microphone via bundled PC software.
 CONS( 2002, karatvst,      0,              0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies", "KaraokeTV Star (US, with 50 songs)", MACHINE_IS_SKELETON )
 // There is also a 35 song US version
+// The "Memorex Star Singer Karaoke / MKS4001" is also made by IVL and boasts 50 built in songs, the casing is different, so it could differ from the standard version.
 // There is a Japanese version, KaraokeStation, put out by Bandai in 2002 with similar internals to the US version ( http://www.akihito.spawn.jp/20021026.karaokestation/ )
 
 // The European releases take cartridges rather than relying on a download service
