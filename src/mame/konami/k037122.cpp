@@ -266,7 +266,7 @@ void k037122_device::reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			m_palette_base = palette_base;
 
 			// update all colors since palette moved
-			for (auto p = 0; p < 8192; p++)
+			for (auto p = 0; p < entries(); p++)
 			{
 				uint32_t const color = m_tile_ram[(m_palette_base / 4) + p];
 				set_pen_color(p, pal5bit(color >> 6), pal6bit(color >> 0), pal5bit(color >> 11));
