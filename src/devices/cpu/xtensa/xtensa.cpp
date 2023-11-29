@@ -679,14 +679,25 @@ void xtensa_device::getop_and_execute()
 				u8 dstreg = BIT(inst, 12, 4);
 				u8 reg_s = BIT(inst, 8, 4);
 				u8 reg_t = BIT(inst, 4, 4);
-				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, a%d\n", "sub", BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
+				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, a%d\n", "sub", dstreg, reg_s, reg_t);
 				set_reg(dstreg, get_reg(reg_s)-get_reg(reg_t));
 				break;
 			}
 
-			case 0b1001: case 0b1010: case 0b1011: // ADDX2, ADDX4, ADDX8
+			case 0b1001:// ADDX2
+			case 0b1010:// ADDX4
+			case 0b1011:// ADDX8
+			{
+				u8 dstreg = BIT(inst, 12, 4);
+				u8 reg_s = BIT(inst, 8, 4);
+				u8 reg_t = BIT(inst, 4, 4);
+				u8 shift = BIT(inst, 20, 2);
+				LOGMASKED(LOG_HANDLED_OPS, "%sx%-4da%d, a%d, a%d\n", "add", 1 << shift, dstreg, reg_s, reg_t);
+				set_reg(dstreg, (get_reg(reg_s)<<shift)+get_reg(reg_t));
+				break;
+			}
+
 			case 0b1101: case 0b1110: case 0b1111: // SUBX2, SUBX4, SUBX8
-				LOGMASKED(LOG_UNHANDLED_OPS, "%sx%-4da%d, a%d, a%d\n", BIT(inst, 22) ? "sub" : "add", 1 << BIT(inst, 20, 2), BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
 				break;
 
 			default:
@@ -1569,7 +1580,7 @@ void xtensa_device::getop_and_execute()
 				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, 0x%08X\n", "bne", as, at, addr);
 				break;
 			case 0b1010:// bge
-				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, 0x%08X\n", "bge", as, at, addr);
+				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, 0x%08X\n", "bge", as, at, addr);
 				if (get_reg(as) >= get_reg(at))
 				{
 					m_nextpc = addr;
