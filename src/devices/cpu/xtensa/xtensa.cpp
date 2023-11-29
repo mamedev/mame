@@ -548,11 +548,18 @@ void xtensa_device::getop_and_execute()
 			case 0b0010: // OR
 				if (BIT(inst, 8, 4) == BIT(inst, 4, 4))
 				{
-					LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d\n", "mov", BIT(inst, 12, 4), BIT(inst, 8, 4));
+					u8 dstreg = BIT(inst, 12, 4);
+					u8 srcreg = BIT(inst, 8, 4);
+					LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d\n", "mov", dstreg, srcreg);
+					set_reg(dstreg, get_reg(srcreg));
 				}
 				else
 				{
-					LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, a%d\n", "or", BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
+					u8 dstreg = BIT(inst, 12, 4);
+					u8 reg_s = BIT(inst, 8, 4);
+					u8 reg_t = BIT(inst, 4, 4);
+					LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, a%d\n", "or", dstreg, reg_s, reg_t);
+					set_reg(dstreg, get_reg(reg_s) | get_reg(reg_t));
 				}
 				break;
 
@@ -663,13 +670,25 @@ void xtensa_device::getop_and_execute()
 		case 0b0001: // RST1
 			switch (BIT(inst, 20, 4))
 			{
-			case 0b0000: case 0b0001: // SLLI (shift count is 0..31)
-				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, %d\n", "slli", BIT(inst, 12, 4), BIT(inst, 4, 4), BIT(inst, 8, 4) + (BIT(inst, 20) ? 16 : 0));
+			case 0b0000: case 0b0001: // SLLI (shift count is 1..31) - Shift Left Logical Immediate
+				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, %d\n", "slli", BIT(inst, 12, 4), BIT(inst, 4, 4), 32 - (BIT(inst, 8, 4) + (BIT(inst, 20) ? 16 : 0)));
 				break;
 
-			case 0b0010: case 0b0011: // SRAI (shift count is 0..31)
-				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, %d\n", "srai", BIT(inst, 12, 4), BIT(inst, 4, 4), BIT(inst, 8, 4) + (BIT(inst, 20) ? 16 : 0));
+			case 0b0010: // SRAI (shift count is 0..31) - Shift Right Arithmetic Immediate
+			case 0b0011: 
+			{
+				u8 dstreg = BIT(inst, 12, 4);
+				u8 srcreg = BIT(inst, 4, 4);
+				u8 amount = BIT(inst, 8, 4) + (BIT(inst, 20) ? 16 : 0);
+				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, %d\n", "srai", dstreg, srcreg, amount);
+				u32 source = get_reg(srcreg);
+				u32 result = source >> amount;
+				if (source & 0x80000000)
+					result |= 0xffffffff << (31 - (amount & 0x1f));
+
+				set_reg(dstreg, result);
 				break;
+			}
 
 			case 0b0100: // SRLI (shift count is 0..15) - Shift Right Logical Immediate
 			{
@@ -1084,8 +1103,14 @@ void xtensa_device::getop_and_execute()
 			break;
 
 		case 0b1010: // MOVI
-			LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, %s\n", "movi", BIT(inst, 4, 4), format_imm(util::sext((inst & 0x000f00) + (inst >> 16), 12)));
+		{
+			u8 dstreg = BIT(inst, 4, 4);
+			s32 imm = util::sext((inst & 0x000f00) + (inst >> 16), 12);
+			LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, %s\n", "movi", dstreg, format_imm(imm));
+			set_reg(dstreg, imm);
 			break;
+		}
+
 
 		case 0b1100: // ADDI
 		{
@@ -1480,8 +1505,14 @@ void xtensa_device::getop_and_execute()
 	}
 
 	case 0b1010: // ADD.N (with Code Density Option)
-		LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, a%d\n", "add.n", BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
+	{
+		u8 dstreg = BIT(inst, 12, 4);
+		u8 reg_s = BIT(inst, 8, 4);
+		u8 reg_t = BIT(inst, 4, 4);
+		LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, a%d\n", "add.n", dstreg, reg_s, reg_t);
+		set_reg(dstreg, get_reg(reg_s)+get_reg(reg_t));
 		break;
+	}
 
 	case 0b1011: // ADDI.N (with Code Density Option)
 	{
@@ -1509,7 +1540,7 @@ void xtensa_device::getop_and_execute()
 			{
 				// 6-bit immediate field is zero-extended (these forms can branch forward only)
 				u8 reg = BIT(inst, 8, 4);
-				u8 addr = m_pc + 4 + (inst & 0x0030) + BIT(inst, 12, 4);
+				u32 addr = m_pc + 4 + (inst & 0x0030) + BIT(inst, 12, 4);
 				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, 0x%08X\n", "bnez.n", reg, addr);
 				if (get_reg(reg) != 0)
 					m_nextpc = addr;
@@ -1519,7 +1550,7 @@ void xtensa_device::getop_and_execute()
 			{
 				// 6-bit immediate field is zero-extended (these forms can branch forward only)
 				u8 reg = BIT(inst, 8, 4);
-				u8 addr = m_pc + 4 + (inst & 0x0030) + BIT(inst, 12, 4);
+				u32 addr = m_pc + 4 + (inst & 0x0030) + BIT(inst, 12, 4);
 				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, 0x%08X\n", "beqz.n", reg, addr);
 				if (get_reg(reg) == 0)
 					m_nextpc = addr;
@@ -1532,8 +1563,13 @@ void xtensa_device::getop_and_execute()
 		switch (BIT(inst, 12, 4))
 		{
 		case 0b0000: // MOV.N
-			LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d\n", "mov.n", BIT(inst, 4, 4), BIT(inst, 8, 4));
+		{
+			u8 dstreg = BIT(inst, 4, 4);
+			u8 srcreg = BIT(inst, 8, 4);
+			LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d\n", "mov.n", dstreg, srcreg);
+			set_reg(dstreg, get_reg(srcreg));
 			break;
+		}
 
 		case 0b1111: // S3
 			switch (BIT(inst, 4, 4))
