@@ -76,6 +76,8 @@ private:
 
 	void ext_regs(address_map &map);
 
+	void handle_retw();
+
 	void getop_and_execute();
 
 	inline u32 get_reg(u8 reg);

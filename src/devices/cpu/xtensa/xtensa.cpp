@@ -65,7 +65,7 @@ void xtensa_device::extreg_ps_w(u32 data) { m_extreg_ps = data; logerror("m_extr
 
 void xtensa_device::set_callinc(u8 val)
 {
-	m_extreg_ps = (m_extreg_ps & ~0xfffcffff) | ((val & 3) << 16);
+	m_extreg_ps = (m_extreg_ps & 0xfffcffff) | ((val & 3) << 16);
 }
 
 u8 xtensa_device::get_callinc()
@@ -327,6 +327,15 @@ void xtensa_device::set_mem32(u32 addr, u32 data)
 	return m_space.write_dword(addr &~ 3, data);
 }
 
+void xtensa_device::handle_retw()
+{
+	// TODO: exceptions etc.
+	u32 addr = get_reg(0);
+	u8 xval = (addr >> 30) & 3;
+	u32 newaddr = (m_pc & 0xc0000000) | (addr & 0x3fffffff);
+	m_extreg_windowbase -= xval;
+	m_nextpc = newaddr;
+}
 
 void xtensa_device::getop_and_execute()
 {
@@ -364,8 +373,12 @@ void xtensa_device::getop_and_execute()
 						break;
 
 					case 0b1001: // RETW (with Windowed Register Option)
-						LOGMASKED(LOG_UNHANDLED_OPS, "retw\n");
+					{
+						LOGMASKED(LOG_HANDLED_OPS, "retw\n");
+						handle_retw();
 						break;
+					}
+
 
 					case 0b1010: // JX
 					{
@@ -1530,8 +1543,11 @@ void xtensa_device::getop_and_execute()
 				break;
 
 			case 0b0001: // RETW.N (with Windowed Register Option)
-				LOGMASKED(LOG_UNHANDLED_OPS, "retw.n\n");
+			{
+				LOGMASKED(LOG_HANDLED_OPS, "retw.n\n");
+				handle_retw();
 				break;
+			}
 
 			case 0b0010: // BREAK.N (with Debug Option)
 				LOGMASKED(LOG_UNHANDLED_OPS, "%-8s%d\n", "break.n", BIT(inst, 8, 4));
