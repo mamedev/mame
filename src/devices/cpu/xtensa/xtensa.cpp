@@ -406,6 +406,7 @@ void xtensa_device::getop_and_execute()
 						u8 reg = BIT(inst, 8, 4);
 						LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d\n", "jx", reg);
 						m_nextpc = get_reg(reg);
+						// m_pc = m_nextpc; return; // avoid loop check
 						break;
 					}
 
@@ -424,6 +425,7 @@ void xtensa_device::getop_and_execute()
 						u32 next = get_reg(reg);
 						set_reg(xval*4, (m_nextpc & 0x3fffffff) | (xval << 30));
 						m_nextpc = next;
+						// m_pc = m_nextpc; return; // avoid loop check
 						break;
 					}
 
@@ -697,8 +699,22 @@ void xtensa_device::getop_and_execute()
 			switch (BIT(inst, 20, 4))
 			{
 			case 0b0000: case 0b0001: // SLLI (shift count is 1..31) - Shift Left Logical Immediate
-				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, %d\n", "slli", BIT(inst, 12, 4), BIT(inst, 4, 4), 32 - (BIT(inst, 8, 4) + (BIT(inst, 20) ? 16 : 0)));
+			{
+				u8 dstreg = BIT(inst, 12, 4);
+				u8 srcreg = BIT(inst, 4, 4);
+				u16 shift = 32 - (BIT(inst, 8, 4) + (BIT(inst, 20) ? 16 : 0));
+				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, %d\n", "slli", dstreg, srcreg, shift);
+
+				if (shift == 32)
+				{
+					// undefined behavior
+				}
+				else
+				{
+					set_reg(dstreg, get_reg(srcreg) << shift);
+				}
 				break;
+			}
 
 			case 0b0010: // SRAI (shift count is 0..31) - Shift Right Arithmetic Immediate
 			case 0b0011: 
@@ -1330,6 +1346,7 @@ void xtensa_device::getop_and_execute()
 			u32 next = addr;
 			set_reg(xval*4, (m_nextpc & 0x3fffffff) | (xval << 30));
 			m_nextpc = next;
+			// m_pc = m_nextpc; return; // avoid loop check
 			break;
 		}
 		}
@@ -1343,6 +1360,7 @@ void xtensa_device::getop_and_execute()
 			u32 newpc = m_pc + 4 + util::sext(inst >> 6, 18);
 			LOGMASKED(LOG_HANDLED_OPS, "%-8s0x%08X\n", "j", newpc);
 			m_nextpc = newpc;
+			// m_pc = m_nextpc; return; // avoid loop check
 			break;
 		}
 
@@ -1360,7 +1378,10 @@ void xtensa_device::getop_and_execute()
 			{
 				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, 0x%08X\n", "bnez", reg, addr);
 				if (get_reg(reg) !=0)
+				{
 					m_nextpc = addr;
+					// m_pc = m_nextpc; return; // avoid loop check
+				}
 				break;
 			}
 			case 0b10:// bltz
@@ -1385,7 +1406,10 @@ void xtensa_device::getop_and_execute()
 			{
 				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, %s, 0x%08X\n", "beqi", reg, format_imm(imm), addr);
 				if (imm == get_reg(reg))
+				{
 					m_nextpc = addr;
+					// m_pc = m_nextpc; return; // avoid loop check
+				}
 				break;
 			}
 			case 0b01: // bnei
@@ -1444,7 +1468,10 @@ void xtensa_device::getop_and_execute()
 					m_extreg_lbeg = m_nextpc;
 					m_extreg_lend = addr;
 					if (!m_extreg_lcount)
+					{
 						m_nextpc = m_extreg_lend;
+						// m_pc = m_nextpc; return; // avoid loop check
+					}
 					break;
 				}
 
@@ -1477,12 +1504,18 @@ void xtensa_device::getop_and_execute()
 			if (BIT(inst, 15)) // BBSI
 			{
 				if ((BIT(get_reg(reg), imm)))
+				{
 					m_nextpc = addr;
+					// m_pc = m_nextpc; return; // avoid loop check
+				}
 			}
 			else // BBCI
 			{
 				if (!(BIT(get_reg(reg), imm)))
+				{
 					m_nextpc = addr;
+					// m_pc = m_nextpc; return; // avoid loop check
+				}
 			}
 			break;
 		}
@@ -1507,7 +1540,10 @@ void xtensa_device::getop_and_execute()
 			case 0b0011:// bltu
 				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, 0x%08X\n", "bltu", as, at, addr);
 				if (get_reg(as) < get_reg(at))
+				{
 					m_nextpc = addr;
+					// m_pc = m_nextpc; return; // avoid loop check
+				}
 				break;
 			case 0b0100:// ball
 				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, 0x%08X\n", "ball", as, at, addr);
@@ -1522,15 +1558,27 @@ void xtensa_device::getop_and_execute()
 			//	LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, 0x%08X\n", "bbci", as, at, addr);
 			//	break;
 			case 0b1000:// bany
-				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, 0x%08X\n", "bany", as, at, addr);
+				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, 0x%08X\n", "bany", as, at, addr);
+				if (get_reg(as) & get_reg(at))
+				{
+					m_nextpc = addr;
+					// m_pc = m_nextpc; return; // avoid loop check
+				}
 				break;
 			case 0b1001:// bne
 				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, 0x%08X\n", "bne", as, at, addr);
 				break;
 			case 0b1010:// bge
 				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, 0x%08X\n", "bge", as, at, addr);
+				if (get_reg(as) >= get_reg(at))
+				{
+					m_nextpc = addr;
+					// m_pc = m_nextpc; return; // avoid loop check
+				}
 				break;
-			case 0b1011:// bgeu,
+				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, 0x%08X\n", "bge", as, at, addr);
+				break;
+			case 0b1011:// bgeu
 				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, 0x%08X\n", "bgeu", as, at, addr);
 				break;
 			case 0b1100:// bnall
@@ -1610,7 +1658,10 @@ void xtensa_device::getop_and_execute()
 				u32 addr = m_pc + 4 + (inst & 0x0030) + BIT(inst, 12, 4);
 				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, 0x%08X\n", "bnez.n", reg, addr);
 				if (get_reg(reg) != 0)
+				{
 					m_nextpc = addr;
+					// m_pc = m_nextpc; return; // avoid loop check
+				}
 				break;
 			}
 			else
@@ -1620,7 +1671,10 @@ void xtensa_device::getop_and_execute()
 				u32 addr = m_pc + 4 + (inst & 0x0030) + BIT(inst, 12, 4);
 				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, 0x%08X\n", "beqz.n", reg, addr);
 				if (get_reg(reg) == 0)
+				{
 					m_nextpc = addr;
+					// m_pc = m_nextpc; return; // avoid loop check
+				}
 				break;
 			}
 			break;
@@ -1681,7 +1735,7 @@ void xtensa_device::getop_and_execute()
 		break;
 	}
 
-	// NOTE, if a branch of jump got us here the loop check isn't done! (currently it will happen)
+	// NOTE, if a branch of jump got us here the loop check isn't done!
 	// handle zero overhead loops
 	if (m_nextpc == m_extreg_lend)
 	{
