@@ -555,7 +555,6 @@ void toobin_state::toobin(machine_config &config)
 	m_jsa->test_read_cb().set_ioport("FF9000").bit(12);
 	m_jsa->add_route(0, "lspeaker", 1.0);
 	m_jsa->add_route(1, "rspeaker", 1.0);
-	config.device_remove("jsa:tms");
 }
 
 
