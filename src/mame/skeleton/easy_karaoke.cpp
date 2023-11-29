@@ -218,13 +218,67 @@ void easy_karaoke_cartslot_state::easy_karaoke(machine_config &config)
 	m_cart->set_device_load(FUNC(easy_karaoke_cartslot_state::cart_load));
 	SOFTWARE_LIST(config, "cart_list").set_original("easy_karaoke_cart");
 }
+/*
+The 'karatvst' set has the following 50 songs built in, there don't appear to be any downloaded songs in this NAND dump
 
+ABC                                         Jackson 5
+All I Have To Give                          Backstreet Boys
+Always On My Mind                           Elvis Presley
+America The Beautiful                       Standard    
+Baby Love                                   Supremes 
+...Baby One More Time                       Britney Spears
+Born To Make You Happy                      Britney Spears
+Brick House                                 The Commodores        
+Bye Bye Bye                                 N'Sync 
+Dancing Queen                               Abba
+Don't Let Me Get Me                         pink                
+Drive (For Daddy Gene)                      Alan Jackson             
+Fallin'                                     Alicia Keys         
+Girlfriend                                  N'Sync   
+Goodbye Earl                                Dixie Chicks
+Hit 'Em Up Style                            Blu Cantrell      
+I Believe I Can Fly                         R. Kelly                  
+I Heard It Through the Grapevine            Marvin Gaye               
+I Should Be Sleeping                        Emerson Drive            
+I Wanna Know                                Joe      
+I Want It That Way                          Backstreet Boys     
+If You're Gone                              Matchbox 20                         
+It's A Great Day To Be Alive                Travis Tritt           
+Lady Marmalade                              Christina Aguilera
+Love Shack                                  B52's              
+Me And Bobby McGee                          Kris Kristofferson    
+My Girl                                     Temptations  
+My Guy                                      Mary Wells 
+New York New York                           Frank Sinatra         
+No More Drama                               Mary J. Blige
+One Fine Day                                Chiffons   
+Oops...I Did It Again                       Britney Spears 
+Over The Rainbow                            Judy Garland 
+Overprotected                               Britney Spears  
+Stand By Your Man                           Tammy Wynette 
+Star Spangled Banner                        Public Domain        
+Stop In The Name Of Love                    Supremes 
+Stronger                                    Britney Spears           
+Super Freak                                 Rick James   
+Superman                                    Five For Fighting 
+That's The Way (I Like It)                  KC And The Sunshine Band  
+The Greatest Love Of All                    Whitney Houston  
+The Loco-Motion                             Kylie Minogue 
+The One                                     Backstreet Boys   
+There Is No Arizona                         Jamie O'Neal         
+We Wish You A Merry Xmas                    Traditional  
+What's Going On                             Marvin Gaye         
+Wild Thing                                  The Troggs 
+Wrapped Around                              Brad Paisley  
+You Can't Hurry Love                        The Supremes
+
+*/
 ROM_START( karatvst )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "karaoke37vf010.bin", 0x000000, 0x20000, CRC(9d3020e4) SHA1(bce5d42ecff88b310a43599c9e47cba920c6b6e1) ) // bootloader
 
 	ROM_REGION( 0x840000, "nand", ROMREGION_ERASEFF ) // NAND with main program, graphics, built in songs (and potentially user downloads)
-	ROM_LOAD( "tc58v64bft", 0x000000, 0x840000, NO_DUMP )	
+	ROM_LOAD( "karaoketc58v64bft.bin", 0x000000, 0x840000, CRC(8cf42f20) SHA1(fae09ab08035e8c894fe00dcb23746ea78391d7f) )	
 ROM_END
 
 /*
