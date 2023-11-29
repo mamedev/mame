@@ -184,14 +184,17 @@ uint32_t shuuz_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 					int const o13 = ((pf[x] & 0xf0) == 0xf0);
 
 					// compute the MO/PF signal
-					int mopf = 0;
-					if ((!(pf[x] & 0x80) && ((mo[x] & 0xc0) != 0xc0) && ((mo[x] & 0x0e) != 0x00) && !o13) ||
-						((pf[x] & 0x80) && ((mo[x] & 0xc0) == 0xc0) && ((mo[x] & 0x0e) != 0x00) && !o13))
-						mopf = 1;
+					int mopf = ((!(pf[x] & 0x80) && ((mo[x] & 0xc0) != 0xc0) && !o13) ||
+								 ((pf[x] & 0x80) && ((mo[x] & 0xc0) == 0xc0) && !o13));
 
 					// if MO/PF is 1, we draw the MO
 					if (mopf)
-						pf[x] = mo[x];
+					{
+						if ((mo[x] & 0x0e) != 0x00)		// MO colors 2 to F are solid
+							pf[x] = mo[x];
+						else if ((mo[x] & 0x0f) == 0x1) // MO color 1 causes a shadow on the PF 
+						    pf[x] |= 0x200;		        // Game sets palette 300:3FF to shadowed values of palette 100:1FF
+				    }
 				}
 		}
 	return 0;
