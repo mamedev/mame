@@ -43,9 +43,9 @@ public:
 	void spriteram_LSB_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t spriteram_LSB_r(offs_t offset);
 	void update( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void set_clear_bitmap( bool clear );
+	void set_clear_bitmap(int clear);
 	void eof();
-	void set_bg_pen( uint16_t pen );
+	void set_bg_pen(uint16_t pen);
 	void flip_screen_set(bool flip) { m_flip_screen = flip; }
 
 protected:
@@ -57,13 +57,13 @@ protected:
 
 private:
 	// internal state
-	std::unique_ptr<uint8_t[]>        m_spriteram;
-	std::unique_ptr<bitmap_ind16> m_sprites_bitmap; /* bitmap to render sprites to, Pandora seems to be frame'buffered' */
-	bool            m_clear_bitmap = false;
-	uint16_t        m_bg_pen = 0; // might work some other way..
+	std::unique_ptr<uint8_t[]>    m_spriteram;
+	std::unique_ptr<bitmap_ind16> m_sprites_bitmap; // bitmap to render sprites to, Pandora seems to be frame'buffered'
+	bool            m_clear_bitmap;
+	uint16_t        m_bg_pen; // might work some other way..
 	int32_t         m_xoffset;
 	int32_t         m_yoffset;
-	bool            m_flip_screen = false;
+	bool            m_flip_screen;
 };
 
 DECLARE_DEVICE_TYPE(KANEKO_PANDORA, kaneko_pandora_device)
