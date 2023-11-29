@@ -93,8 +93,11 @@ private:
 
 	void handle_reserved(u32 inst);
 
+	void switch_windowbase(s32 change);
+
 	// internal state
-	std::vector<uint32_t> m_a; // actually 32 or 64 physical registers with Windowed extension
+	std::vector<uint32_t> m_a_real; // actually 32 or 64 physical registers with Windowed extension
+	u32 m_a[16];
 	u32 m_pc;
 	s32 m_icount;
 

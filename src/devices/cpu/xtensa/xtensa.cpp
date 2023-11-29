@@ -51,7 +51,7 @@ device_memory_interface::space_config_vector xtensa_device::memory_space_config(
 }
 
 uint32_t xtensa_device::extreg_windowbase_r() { return m_extreg_windowbase; }
-void xtensa_device::extreg_windowbase_w(u32 data) {	m_extreg_windowbase = data; logerror("m_extreg_windowbase set to %08x\n", data); }
+void xtensa_device::extreg_windowbase_w(u32 data) {	m_extreg_windowbase = data; logerror("m_extreg_windowbase set to %08x\n", data); switch_windowbase(0); }
 uint32_t xtensa_device::extreg_windowstart_r() { return m_extreg_windowstart; }
 void xtensa_device::extreg_windowstart_w(u32 data) { m_extreg_windowstart = data; logerror("m_extreg_windowstart set to %08x\n", data); }
 uint32_t xtensa_device::extreg_lbeg_r() { return m_extreg_lbeg; }
@@ -237,7 +237,7 @@ void xtensa_device::device_start()
 	std::fill(std::begin(m_a), std::end(m_a), 0);
 
 	m_num_physical_regs = 512; // just set this higher than it should be for now, until we emulate window exceptions (marimba startup check suggests 32, with it wrapping around when exceptions are disabled)
-	m_a.resize(m_num_physical_regs);
+	m_a_real.resize(m_num_physical_regs);
 
 	set_icountptr(m_icount);
 
@@ -250,7 +250,7 @@ void xtensa_device::device_start()
 	state_add(XTENSA_LOOPEND, "LoopEnd", m_extreg_lend);
 	state_add(XTENSA_LOOPCOUNT, "LoopCount", m_extreg_lcount);
 
-	for (int i = 0; i < m_num_physical_regs; i++)
+	for (int i = 0; i < 16; i++)
 		state_add(XTENSA_A0 + i, string_format("a%d", i).c_str(), m_a[i]);
 
 	state_add(XTENSA_PC, "PC", m_pc);
@@ -264,6 +264,8 @@ void xtensa_device::device_reset()
 	// TODO: Reset state
 
 	m_extreg_windowbase = 0;
+	switch_windowbase(0);
+
 	m_extreg_windowstart = 0;
 
 	m_extreg_sar = 0;
@@ -281,6 +283,7 @@ void xtensa_device::handle_reserved(u32 inst)
 
 u32 xtensa_device::get_reg(u8 reg)
 {
+#if 0
 	// TODO: much more complex than this with the Windowed Register Option!
 	int realreg = reg + m_extreg_windowbase * 4;
 
@@ -293,10 +296,14 @@ u32 xtensa_device::get_reg(u8 reg)
 		// exceptions?
 		return m_a[realreg & (m_num_physical_regs-1)];
 	}
+#endif
+
+	return m_a[reg];
 }
 
 void xtensa_device::set_reg(u8 reg, u32 value)
 {
+#if 0
 	// TODO: much more complex than this with the Windowed Register Option!
 	int realreg = reg + m_extreg_windowbase * 4;
 
@@ -309,7 +316,27 @@ void xtensa_device::set_reg(u8 reg, u32 value)
 		// exceptions?
 		m_a[realreg & (m_num_physical_regs-1)] = value;
 	}
+#endif
+	m_a[reg] = value;
 }
+
+void xtensa_device::switch_windowbase(s32 change)
+{
+	for (int i=0;i<16;i++)
+	{
+		s32 realreg = (i + m_extreg_windowbase * 4) & (m_num_physical_regs-1);
+		m_a_real[realreg] = m_a[i];
+	}
+
+	m_extreg_windowbase += change;
+
+	for (int i=0;i<16;i++)
+	{
+		s32 realreg = (i + m_extreg_windowbase * 4) & (m_num_physical_regs-1);
+		m_a[i] = m_a_real[realreg];
+	}
+}
+
 
 u32 xtensa_device::get_mem32(u32 addr)
 {
@@ -354,7 +381,7 @@ void xtensa_device::handle_retw()
 	u32 addr = get_reg(0);
 	u8 xval = (addr >> 30) & 3;
 	u32 newaddr = (m_pc & 0xc0000000) | (addr & 0x3fffffff);
-	m_extreg_windowbase -= xval;
+	switch_windowbase(-xval);
 	m_nextpc = newaddr;
 }
 
@@ -619,7 +646,7 @@ void xtensa_device::getop_and_execute()
 				{
 					s8 imm = util::sext(inst >> 4, 4);
 					LOGMASKED(LOG_HANDLED_OPS, "%-8s%d\n", "rotw", imm);
-					m_extreg_windowbase += imm;
+					switch_windowbase(imm);
 					break;
 				}
 
@@ -1446,7 +1473,7 @@ void xtensa_device::getop_and_execute()
 				u32 stacksize = (inst >> 12) * 4;
 				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, %s\n", "entry", reg, format_imm(stacksize));
 				u32 stack = get_reg(reg);
-				m_extreg_windowbase += get_callinc();
+				switch_windowbase(get_callinc());
 				stack -= stacksize;
 				set_reg(reg, stack);
 				break;
