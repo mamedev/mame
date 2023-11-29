@@ -68,6 +68,11 @@ private:
 	void extreg_lend_w(u32 data);
 	uint32_t extreg_lcount_r();
 	void extreg_lcount_w(u32 data);
+	uint32_t extreg_ps_r();
+	void extreg_ps_w(u32 data);
+
+	void set_callinc(u8 val);
+	u8 get_callinc();
 
 	void ext_regs(address_map &map);
 
@@ -91,7 +96,7 @@ private:
 	u32 m_extreg_lbeg;
 	u32 m_extreg_lend;
 	u32 m_extreg_lcount;
-
+	u32 m_extreg_ps;
 	u32 m_nextpc;
 
 	// config

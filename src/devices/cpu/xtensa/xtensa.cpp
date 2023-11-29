@@ -19,7 +19,7 @@
 #define LOG_UNHANDLED_CACHE_OPS (1U << 3)
 #define LOG_UNHANDLED_SYNC_OPS  (1U << 4)
 #define LOG_EXTREG_OPS          (1U << 8)
-
+#define LOG_HANDLED_CALLX_OPS   (1U << 9)
 
 #define VERBOSE (LOG_UNHANDLED_OPS | LOG_EXTREG_OPS)
 #include "logmacro.h"
@@ -60,7 +60,18 @@ uint32_t xtensa_device::extreg_lend_r() { return m_extreg_lend; }
 void xtensa_device::extreg_lend_w(u32 data) { m_extreg_lend = data; logerror("m_extreg_lend set to %08x\n", data); }
 uint32_t xtensa_device::extreg_lcount_r() { return m_extreg_lcount; }
 void xtensa_device::extreg_lcount_w(u32 data) { m_extreg_lcount = data; logerror("m_extreg_lcount set to %08x\n", data); }
+uint32_t xtensa_device::extreg_ps_r() { return m_extreg_ps; }
+void xtensa_device::extreg_ps_w(u32 data) { m_extreg_ps = data; logerror("m_extreg_ps set to %08x\n", data); }
 
+void xtensa_device::set_callinc(u8 val)
+{
+	m_extreg_ps = (m_extreg_ps & ~0xfffcffff) | ((val & 3) << 16);
+}
+
+u8 xtensa_device::get_callinc()
+{
+	return (m_extreg_ps >> 16) & 3;
+}
 
 void xtensa_device::ext_regs(address_map &map)
 {
@@ -180,7 +191,7 @@ void xtensa_device::ext_regs(address_map &map)
 	//map(0xe4, 0xe4) // "intenable", 
 
 	// various options (230)
-	//map(0xe6, 0xe6) // "ps", 
+	map(0xe6, 0xe6).rw(FUNC(xtensa_device::extreg_ps_r), FUNC(xtensa_device::extreg_ps_w)); // "ps" PROCESSOR STATE
 
 	// Relocatable Vector Option (231)
 	//map(0xe7, 0xe7) // "vecbase", 
@@ -364,10 +375,23 @@ void xtensa_device::getop_and_execute()
 						break;
 					}
 
-					case 0b1100: // CALLX0
-					case 0b1101: case 0b1110: case 0b1111: // CALLX4, CALLX8, CALLX12 (with Windowed Register Option)
+					case 0b1100: // CALLX0 (with Windowed Register Option)
 						LOGMASKED(LOG_UNHANDLED_OPS, "callx%-3da%d\n", BIT(inst, 4, 2) * 4, BIT(inst, 8, 4));
 						break;
+
+					case 0b1101: // CALLX4 (with Windowed Register Option)
+					case 0b1110: // CALLX8 (with Windowed Register Option)
+					case 0b1111: // CALLX12 (with Windowed Register Option)
+					{
+						u8 reg = BIT(inst, 8, 4);
+						u8 xval = BIT(inst, 4, 2);
+						LOGMASKED(LOG_HANDLED_CALLX_OPS, "callx%-3da%d\n", xval * 4, reg);
+						set_callinc(xval);
+						u32 next = get_reg(reg);
+						set_reg(xval*4, (m_nextpc & 0x3fffffff) | (xval << 30));
+						m_nextpc = next;
+						break;
+					}
 
 					default:
 						handle_reserved(inst);
@@ -1187,9 +1211,22 @@ void xtensa_device::getop_and_execute()
 		switch (BIT(inst, 4, 2))
 		{
 		case 0b00: // CALL0
-		case 0b01: case 0b10: case 0b11: // CALL4, CALL8, CALL12 (with Windowed Register Option)
 			LOGMASKED(LOG_UNHANDLED_OPS, "call%-4d0x%08X\n", BIT(inst, 4, 2) * 4, (m_pc & 0xfffffffc) + 4 + util::sext(inst >> 6, 18) * 4);
 			break;
+
+		case 0b01: // CALL4 (with Windowed Register Option)
+		case 0b10: // CALL8 (with Windowed Register Option)
+		case 0b11: // CALL12 (with Windowed Register Option)
+		{
+			u32 addr = (m_pc & 0xfffffffc) + 4 + util::sext(inst >> 6, 18) * 4;
+			u8 xval = BIT(inst, 4, 2);
+			LOGMASKED(LOG_HANDLED_CALLX_OPS, "call%-4d0x%08X\n", xval * 4, addr);
+			set_callinc(xval);
+			u32 next = addr;
+			set_reg(xval*4, (m_nextpc & 0x3fffffff) | (xval << 30));
+			m_nextpc = next;
+			break;
+		}
 		}
 		break;
 
@@ -1232,15 +1269,48 @@ void xtensa_device::getop_and_execute()
 		}
 
 		case 0b10: // BI0
-			LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, %s, 0x%08X\n", s_bi0_ops[BIT(inst, 6, 2)], BIT(inst, 8, 4), format_imm(s_b4const[BIT(inst, 12, 4)]),  m_pc + 4 + s8(u8(inst >> 16)));
+		{
+			u8 reg = BIT(inst, 8, 4);
+			s32 imm = s_b4const[BIT(inst, 12, 4)];
+			u32 addr = m_pc + 4 + s8(u8(inst >> 16));
+			u8 optype = BIT(inst, 6, 2);
+			switch (optype)
+			{
+			case 0b00: // beqi
+			{
+				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, %s, 0x%08X\n", "beqi", reg, format_imm(imm), addr);
+				if (imm == get_reg(reg))
+					m_nextpc = addr;
+				break;
+			}
+			case 0b01: // bnei
+				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, %s, 0x%08X\n", "bnei", reg, format_imm(imm), addr);
+				break;
+			case 0b10: // blti
+				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, %s, 0x%08X\n", "blti", reg, format_imm(imm), addr);
+				break;
+			case 0b11: // bgei
+				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, %s, 0x%08X\n", "bgei", reg, format_imm(imm), addr);
+				break;
+			}
 			break;
+		}
 
 		case 0b11: // BI1
 			switch (BIT(inst, 6, 2))
 			{
 			case 0b00: // ENTRY
-				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, %s\n", "entry", BIT(inst, 8, 4), format_imm((inst >> 12) * 4));
+			{
+				// TODO window exception checking etc.
+				u8 reg = BIT(inst, 8, 4);
+				u32 stacksize = (inst >> 12) * 4;
+				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, %s\n", "entry", reg, format_imm(stacksize));
+				u32 stack = get_reg(reg);
+				m_extreg_windowbase += get_callinc();
+				stack -= stacksize;
+				set_reg(reg, stack);
 				break;
+			}
 
 			case 0b01: // B1
 				switch (BIT(inst, 12, 4))
