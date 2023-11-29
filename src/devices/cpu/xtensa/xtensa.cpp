@@ -29,6 +29,7 @@ DEFINE_DEVICE_TYPE(XTENSA, xtensa_device, "xtensa", "Tensilica Xtensa core")
 xtensa_device::xtensa_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: cpu_device(mconfig, XTENSA, tag, owner, clock)
 	, m_space_config("program", ENDIANNESS_LITTLE, 32, 32, 0)
+	, m_extregs_config("extregs", ENDIANNESS_LITTLE, 32, 8, -2, address_map_constructor(FUNC(xtensa_device::ext_regs), this))
 	, m_pc(0)
 {
 }
@@ -40,10 +41,180 @@ std::unique_ptr<util::disasm_interface> xtensa_device::create_disassembler()
 
 device_memory_interface::space_config_vector xtensa_device::memory_space_config() const
 {
-	return space_config_vector {
-		std::make_pair(AS_PROGRAM, &m_space_config),
+	space_config_vector spaces = {
+		std::make_pair(AS_PROGRAM, &m_space_config)
 	};
+
+	spaces.push_back(std::make_pair(AS_EXTREGS, &m_extregs_config));
+	return spaces;
 }
+
+uint32_t xtensa_device::extreg_windowbase_r()
+{
+	return m_extreg_windowbase;
+}
+
+void xtensa_device::extreg_windowbase_w(u32 data)
+{
+	m_extreg_windowbase = data;
+	logerror("m_extreg_windowbase set to %08x\n", data);
+}
+
+void xtensa_device::ext_regs(address_map &map)
+{
+	// Loop Option (0-2)
+	//map(0x00, 0x00) // "lbeg", 
+	//map(0x01, 0x01) // "lend",
+	//map(0x02, 0x02) // "lcount",
+
+	// Core Architecture (3)
+	//map(0x03, 0x03) // "sar", 
+
+	// Boolean Option (4)
+	//map(0x04, 0x04) // "br", 
+
+	// Extended L32R Option (5)
+	//map(0x05, 0x05) // "litbase", 
+
+	// Conditional Store Option (12)
+	//map(0x0c, 0x0c) // "scompare1", 
+
+	// MAC16 Option (16-17)
+	//map(0x10, 0x10) // "acclo",  
+	//map(0x11, 0x11) // "acchi",
+
+	// MAC16 Option (32-35)
+	//map(0x20, 0x20) // "m0", 
+	//map(0x21, 0x21) // "m1",
+	//map(0x22, 0x22) // "m2",
+	//map(0x23, 0x23) // "m3", 
+
+	 // Windowed Register Option (72-73)
+	map(0x48, 0x48).rw(FUNC(xtensa_device::extreg_windowbase_r), FUNC(xtensa_device::extreg_windowbase_w)); // "WindowBase",
+	//map(0x49, 0x49) // "WindowStart", 
+
+	// MMU Option (83)
+	//map(0x53, 0x53) // "ptevaddr", 
+
+	// Trace Port Option (89)
+	//map(0x59, 0x59) // "mmid", 
+
+	// MMU Option (90-92)
+	//map(0x5a, 0x5a) // "rasid", 
+	//map(0x5b, 0x5b) // "itlbcfg",
+	//map(0x5c, 0x5c) // "dtlbcfg", 
+
+	// Debug Option (96)
+	//map(0x60, 0x60) // "ibreakenable", 
+
+	// XEA1 Only (98)
+	//map(0x62, 0x62) // "cacheattr", 
+
+	// Conditional Store Option (99)
+	//map(0x63, 0x63) // "atomctl", 
+
+	// Debug Option (104)
+	//map(0x68, 0x68) // "ddr", 
+
+	// Memory ECC/Parity Option (106-111)
+	//map(0x6a, 0x6a) // "mepc",
+	//map(0x6b, 0x6b) // "meps",
+	//map(0x6c, 0x6c) // "mesave",
+	//map(0x6d, 0x6d) // "mesr",
+	//map(0x6e, 0x6e) // "mecr",
+	//map(0x6f, 0x6f) // "mevaddr", 
+
+	// Debug Option (128-129)
+	//map(0x80, 0x80) // "ibreaka0", 
+	//map(0x81, 0x81) // "ibreaka1", 
+
+	// Debug Option (144-145)
+	//map(0x90, 0x90) // "dbreaka0", 
+	//map(0x91, 0x91) // "dbreaka1",
+
+	// Debug Option (160-161)
+	//map(0xa0, 0xa0) // "dbreakc0",
+	//map(0xa1, 0xa1) // "dbreakc1", 
+
+	// Exception Option (177)
+	//map(0xb1, 0xb1) // "epc1", 
+
+	// High-Priority Interrupt Option (178-183)
+	//map(0xb2, 0xb2) // "epc2",
+	//map(0xb3, 0xb3) // "epc3",
+	//map(0xb4, 0xb4) // "epc4",
+	//map(0xb5, 0xb5) // "epc5",
+	//map(0xb6, 0xb6) // "epc6",
+	//map(0xb7, 0xb7) // "epc7", 
+
+	// Exception Option (192)
+	//map(0xc0, 0xc0) // "depc", 
+
+	// High-Priority Interrupt Option (194-199)
+	//map(0xc2, 0xc2) // "eps2", 
+	//map(0xc3, 0xc3) // "eps3",
+	//map(0xc4, 0xc4) // "eps4",
+	//map(0xc5, 0xc5) // "eps5",
+	//map(0xc6, 0xc6) // "eps6",
+	//map(0xc7, 0xc7) // "eps7", 
+
+	// Exception Option (209)
+	//map(0xd1, 0xd1) // "excsave1", 
+
+	// High-Priority Interrupt Option (210-215)
+	//map(0xd2, 0xd2) // "excsave2", 
+	//map(0xd3, 0xd3) // "excsave3",
+	//map(0xd4, 0xd4) // "excsave4",
+	//map(0xd5, 0xd5) // "excsave5",
+	//map(0xd6, 0xd6) // "excsave6",
+	//map(0xd7, 0xd7) // "excsave7", 
+
+	// Coprocessor Option (224)
+	//map(0xe0, 0xe0) // "cpenable", 
+
+	// Interrupt Option (226-228)
+	//map(0xe2, 0xe2) // "intset", 
+	//map(0xe3, 0xe3) // "intclr",
+	//map(0xe4, 0xe4) // "intenable", 
+
+	// various options (230)
+	//map(0xe6, 0xe6) // "ps", 
+
+	// Relocatable Vector Option (231)
+	//map(0xe7, 0xe7) // "vecbase", 
+
+	// Exception Option (232)
+	//map(0xe8, 0xe8) // "exccause", 
+
+	// Debug Option (233)
+	//map(0xe9, 0xe9) // "debugcause", 
+
+	// Timer Interrupt Option (234)
+	//map(0xea, 0xea) // "ccount", 
+
+	// Processor ID Option (235)
+	//map(0xeb, 0xeb) // "prid", 
+
+	// Debug Option (236-237)
+	//map(0xec, 0xec) // "icount", 
+	//map(0xed, 0xed) // "icountlevel",
+
+	// Exception Option (238)
+	//map(0xee, 0xee) // "excvaddr", 
+
+	// Timer Interrupt Option (240-242)
+	//map(0xf0, 0xf0) // "ccompare0", 
+	//map(0xf1, 0xf1) // "ccompare1",
+	//map(0xf2, 0xf2) // "ccompare2", 
+
+	// Miscellaneous Special Registers Option (244-247)
+	//map(0xf4, 0xf4) // "misc0", 
+	//map(0xf5, 0xf5) // "misc1",
+	//map(0xf6, 0xf6) // "misc2",
+	//map(0xf7, 0xf7) // "misc3", 
+
+}
+
 
 void xtensa_device::device_start()
 {
@@ -523,9 +694,18 @@ void xtensa_device::getop_and_execute()
 		case 0b0011: // RST3
 			switch (BIT(inst, 20, 4))
 			{
-			case 0b0000: case 0b0001: // RSR, WSR
-				LOGMASKED(LOG_UNHANDLED_OPS, "%s.%-3d a%d\n", s_rst3_ops[BIT(inst, 20, 4)], special_reg(BIT(inst, 8, 8), BIT(inst, 20)), BIT(inst, 4, 4));
+			case 0b0000:// RSR
+				LOGMASKED(LOG_UNHANDLED_OPS, "%s.%-3d a%d\n", "rsr", special_reg(BIT(inst, 8, 8), BIT(inst, 20)), BIT(inst, 4, 4));
 				break;
+
+			case 0b0001:// WSR
+			{
+				u8 spcreg = BIT(inst, 8, 8);
+				u8 reg = BIT(inst, 4, 4);
+				LOGMASKED(LOG_UNHANDLED_OPS, "%s.%-3d a%d\n", "wsr", special_reg(spcreg, BIT(inst, 20)), reg);
+				space(AS_EXTREGS).write_dword(spcreg, get_reg(reg));
+				break;
+			}
 
 			case 0b0010: case 0b0011: // SEXT, CLAMPS (with Miscellaneous Operations Option)
 				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, %d\n", s_rst3_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4) + 7);
@@ -947,8 +1127,31 @@ void xtensa_device::getop_and_execute()
 		}
 
 		case 0b01: // BZ
-			LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, 0x%08X\n", s_bz_ops[BIT(inst, 6, 2)], BIT(inst, 8, 4), m_pc + 4 + util::sext(inst >> 12, 12));
+		{
+			u8 reg = BIT(inst, 8, 4);
+			u32 addr = m_pc + 4 + util::sext(inst >> 12, 12);
+
+			switch (BIT(inst, 6, 2))
+			{
+			case 0b00:// beqz
+				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, 0x%08X\n", "beqz", reg, addr);
+				break;
+			case 0b01:// bnez
+			{
+				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, 0x%08X\n", "bnez", reg, addr);
+				if (get_reg(reg) !=0)
+					m_nextpc = addr;
+				break;
+			}
+			case 0b10:// bltz
+				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, 0x%08X\n", "bltz", reg, addr);
+				break;
+			case 0b11:// bgez
+				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, 0x%08X\n", "bgez", reg, addr);
+				break;
+			}
 			break;
+		}
 
 		case 0b10: // BI0
 			LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, %s, 0x%08X\n", s_bi0_ops[BIT(inst, 6, 2)], BIT(inst, 8, 4), format_imm(s_b4const[BIT(inst, 12, 4)]),  m_pc + 4 + s8(u8(inst >> 16)));

@@ -13,6 +13,10 @@ public:
 	xtensa_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	enum {
+		AS_EXTREGS = AS_OPCODES + 1,
+	};
+
+	enum {
 		XTENSA_PC,
 		XTENSA_A0, XTENSA_A1, XTENSA_A2, XTENSA_A3,
 		XTENSA_A4, XTENSA_A5, XTENSA_A6, XTENSA_A7,
@@ -38,8 +42,15 @@ protected:
 private:
 	// address space
 	address_space_config m_space_config;
+	address_space_config m_extregs_config;
+
 	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache m_cache;
 	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::specific m_space;
+
+	uint32_t extreg_windowbase_r();
+	void extreg_windowbase_w(u32 data);
+
+	void ext_regs(address_map &map);
 
 	void getop_and_execute();
 
@@ -54,6 +65,8 @@ private:
 	u32 m_a[16]; // actually 32 or 64 physical registers with Windowed extension
 	u32 m_pc;
 	s32 m_icount;
+
+	u32 m_extreg_windowbase;
 
 	u32 m_nextpc;
 };
