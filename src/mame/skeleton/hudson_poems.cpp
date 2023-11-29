@@ -65,7 +65,7 @@ void hudson_poems_state::machine_start()
 
 void hudson_poems_state::machine_reset()
 {
-	m_maincpu->set_pc(0x20000058);
+	m_maincpu->set_pc(0x00000040);
 }
 
 static INPUT_PORTS_START( hudson_poems )
