@@ -107,7 +107,7 @@ uint32_t xtensa_device::extreg_intenable_r() { logerror("m_extreg_intenable read
 void xtensa_device::extreg_intenable_w(u32 data) { m_extreg_intenable = data; logerror("m_extreg_intenable set to %08x\n", data); }
 uint32_t xtensa_device::extreg_intclr_r() { logerror("m_extreg_intclr read\n"); return m_extreg_intclr; }
 void xtensa_device::extreg_intclr_w(u32 data) { m_extreg_intclr = data; logerror("m_extreg_intclr set to %08x\n", data); }
-uint32_t xtensa_device::extreg_ccount_r() { logerror("m_extreg_ccount read\n"); return m_extreg_ccount; }
+uint32_t xtensa_device::extreg_ccount_r() { logerror("m_extreg_ccount read\n"); return machine().rand(); /* m_extreg_ccount;*/ }
 void xtensa_device::extreg_ccount_w(u32 data) { m_extreg_ccount = data; logerror("m_extreg_ccount set to %08x\n", data); }
 uint32_t xtensa_device::extreg_exccause_r() { logerror("m_extreg_exccause read\n"); return m_extreg_exccause; }
 void xtensa_device::extreg_exccause_w(u32 data) { m_extreg_exccause = data; logerror("m_extreg_exccause set to %08x\n", data); }
@@ -929,9 +929,13 @@ void xtensa_device::getop_and_execute()
 				break;
 
 			case 0b1001: // SRL
-				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d\n", "srl", BIT(inst, 12, 4), BIT(inst, 4, 4));
+			{
+				u8 dstreg = BIT(inst, 12, 4);
+				u8 srcreg = BIT(inst, 8, 4);
+				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d\n", "srl", dstreg, srcreg);
+				set_reg(dstreg, get_reg(srcreg) >> m_extreg_sar);
 				break;
-
+			}
 			case 0b1010: // SLL - Shift Left Logical
 			{
 				u8 dstreg = BIT(inst, 12, 4);
@@ -943,16 +947,37 @@ void xtensa_device::getop_and_execute()
 			}
 
 			case 0b1011: // SRA
-				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d\n", "sra", BIT(inst, 12, 4), BIT(inst, 4, 4));
+			{
+				u8 dstreg = BIT(inst, 12, 4);
+				u8 srcreg = BIT(inst, 8, 4);
+				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d\n", "sra", dstreg, srcreg);
+				u32 source = get_reg(srcreg);
+				u32 result = source >> m_extreg_sar;
+				if (source & 0x80000000)
+					result |= 0xffffffff << (31 - (m_extreg_sar & 0x1f));
+				set_reg(dstreg,result);
 				break;
+			}
 
 			case 0b1100: // MUL16U (with 16-bit Integer Multiply Option)
-				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, a%d\n", "mul16u", BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
+			{
+				u8 reg_r = BIT(inst, 12, 4);
+				u8 reg_s = BIT(inst, 8, 4);
+				u8 reg_t = BIT(inst, 4, 4);
+				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, a%d\n", "mul16u", reg_r, reg_s, reg_t);
+				set_reg(reg_r, (get_reg(reg_s)&0xffff) * (get_reg(reg_t)&0xffff));  
 				break;
+			}
 
 			case 0b1101: // MUL16S (with 16-bit Integer Multiply Option)
-				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, a%d\n", "mul16s", BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
+			{
+				u8 reg_r = BIT(inst, 12, 4);
+				u8 reg_s = BIT(inst, 8, 4);
+				u8 reg_t = BIT(inst, 4, 4);
+				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, a%d\n", "mul16s", reg_r, reg_s, reg_t);
+				set_reg(reg_r, s16((get_reg(reg_s)&0xffff)) * s16((get_reg(reg_t)&0xffff)));  
 				break;
+			}
 
 			case 0b1111: // IMP (Implementation-Specific)
 				switch (BIT(inst, 12, 4))
@@ -1080,9 +1105,17 @@ void xtensa_device::getop_and_execute()
 				break;
 
 			case 0b1000: // MOVEQZ
-				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, a%d\n", s_rst3_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
+			{
+				u8 dstreg = BIT(inst, 12, 4);
+				u8 reg_s = BIT(inst, 8, 4);
+				u8 reg_t = BIT(inst, 4, 4);
+				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, a%d\n", "moveqz", dstreg, reg_s, reg_t);
+				if (get_reg(reg_t) == 0)
+				{
+					set_reg(dstreg, get_reg(reg_s));
+				}
 				break;
-
+			}
 			case 0b1001: // MOVNEZ
 			{
 				u8 dstreg = BIT(inst, 12, 4);
@@ -1663,8 +1696,15 @@ void xtensa_device::getop_and_execute()
 				break;
 			}
 			case 0b01: // bnei
-				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, %s, 0x%08X\n", "bnei", reg, format_imm(imm), addr);
+			{
+				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, %s, 0x%08X\n", "bnei", reg, format_imm(imm), addr);
+				if (imm != get_reg(reg))
+				{
+					m_nextpc = addr;
+					m_pc = m_nextpc; return; // avoid loop check
+				}
 				break;
+			}
 			case 0b10: // blti
 				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, %s, 0x%08X\n", "blti", reg, format_imm(imm), addr);
 				if ((s32)get_reg(reg) < (s32)imm)
@@ -1674,7 +1714,12 @@ void xtensa_device::getop_and_execute()
 				}
 				break;
 			case 0b11: // bgei
-				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, %s, 0x%08X\n", "bgei", reg, format_imm(imm), addr);
+				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, %s, 0x%08X\n", "bgei", reg, format_imm(imm), addr);
+				if ((s32)get_reg(reg) >= (s32)imm)
+				{
+					m_nextpc = addr;
+					m_pc = m_nextpc; return; // avoid loop check
+				}
 				break;
 			}
 			break;
@@ -1740,9 +1785,33 @@ void xtensa_device::getop_and_execute()
 				}
 				break;
 
-			case 0b10: case 0b11: // BLTUI, BGEUI
-				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, %s, 0x%08X\n", BIT(inst, 6) ? "bgeui" : "bltui", BIT(inst, 8, 4), format_imm(s_b4constu[BIT(inst, 4, 4)]), m_pc + 4 + s8(u8(inst >> 16)));
+			case 0b10: // BLTUI - Branch if Less Than Unsigned Immediate
+			{
+				u8 reg = BIT(inst, 8, 4);
+				u32 imm = s_b4constu[BIT(inst, 4, 4)];
+				u32 addr = m_pc + 4 + s8(u8(inst >> 16));
+				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, %s, 0x%08X\n", "bltui", reg, format_imm(imm), addr);
+				if (get_reg(reg) < imm)
+				{
+					m_nextpc = addr;
+					m_pc = m_nextpc; return; // avoid loop check
+				}
 				break;
+			}
+
+			case 0b11: // BGEUI - Branch if Greater Than or Eq Unsigned Immediate
+			{
+				u8 reg = BIT(inst, 8, 4);
+				u32 imm = s_b4constu[BIT(inst, 4, 4)];
+				u32 addr = m_pc + 4 + s8(u8(inst >> 16));
+				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, %s, 0x%08X\n", "bgeui", reg, format_imm(imm), addr);
+				if (get_reg(reg) >= imm)
+				{
+					m_nextpc = addr;
+					m_pc = m_nextpc; return; // avoid loop check
+				}
+				break;
+			}
 			}
 			break;
 		}
@@ -2013,7 +2082,7 @@ void xtensa_device::getop_and_execute()
 		break;
 	}
 
-	// NOTE, if a branch of jump got us here the loop check isn't done!
+	// NOTE, if a branch or jump got us here the loop check isn't done!
 	// handle zero overhead loops
 	if (m_nextpc == m_extreg_lend)
 	{
