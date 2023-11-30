@@ -35,6 +35,8 @@ public:
 	*/
 	};
 
+	void irq_request_hack(); // for debugging
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -125,7 +127,7 @@ private:
 	void ext_regs(address_map &map);
 
 	void handle_retw();
-
+	void check_interrupts();
 	void getop_and_execute();
 
 	inline u32 get_reg(u8 reg);
@@ -185,6 +187,8 @@ private:
 
 	// config
 	u32 m_num_physical_regs;
+
+	u8 m_irq_req_hack;
 };
 
 DECLARE_DEVICE_TYPE(XTENSA, xtensa_device)

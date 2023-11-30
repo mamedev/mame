@@ -28,6 +28,7 @@
 #include "emu.h"
 
 #include "cpu/xtensa/xtensa.h"
+#include "machine/timer.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -54,6 +55,8 @@ protected:
 
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	
+	TIMER_DEVICE_CALLBACK_MEMBER(screen_scanline);
 
 	void mem_map(address_map &map);
 
@@ -67,7 +70,7 @@ private:
 	uint16_t m_unktable[256];
 	uint16_t m_unktableoffset;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<xtensa_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 };
@@ -164,6 +167,16 @@ static GFXDECODE_START( gfx_poems )
 	GFXDECODE_ENTRY( "maincpu", 0, gfx_8x8x8_raw, 0, 1 )
 GFXDECODE_END
 
+TIMER_DEVICE_CALLBACK_MEMBER(hudson_poems_state::screen_scanline)
+{
+	int scanline = param;
+
+	if (scanline == 200)
+	{
+		m_maincpu->irq_request_hack();
+	}
+}
+
 void hudson_poems_state::hudson_poems(machine_config &config)
 {
 	// 27Mhz XTAL, Xtensa based CPU
@@ -177,10 +190,13 @@ void hudson_poems_state::hudson_poems(machine_config &config)
 	screen.set_visarea(0, 320-1, 0, 240-1);
 	screen.set_screen_update(FUNC(hudson_poems_state::screen_update));
 
+	TIMER(config, "scantimer").configure_scanline(FUNC(hudson_poems_state::screen_scanline), "screen", 0, 1);
+
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_poems);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x100);
 
 	SPEAKER(config, "speaker").front_center();
+
 }
 
 ROM_START( marimba )

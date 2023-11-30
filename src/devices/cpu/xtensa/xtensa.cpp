@@ -323,6 +323,8 @@ void xtensa_device::device_reset()
 	m_extreg_lbeg = 0;
 	m_extreg_lend = 0;
 	m_extreg_lcount = 0;
+
+	m_extreg_intenable = 0;
 }
 
 void xtensa_device::handle_reserved(u32 inst)
@@ -595,8 +597,24 @@ void xtensa_device::getop_and_execute()
 						break;
 
 					case 0b0001: // RFI (with High-Priority Interrupt Option)
-						LOGMASKED(LOG_UNHANDLED_OPS, "%-8s%d\n", "rfi", BIT(inst, 8, 4));
+					{
+						u8 level = BIT(inst, 8, 4);
+
+						switch (level)
+						{
+						case 3:
+							LOGMASKED(LOG_HANDLED_OPS, "%-8s%d\n", "rfi", 3);
+							m_extreg_ps = m_extreg_eps3;
+							m_nextpc = m_extreg_epc3;
+							break;
+
+						default:
+							LOGMASKED(LOG_UNHANDLED_OPS, "%-8s%d\n", "rfi", level);
+							break;
+						}
+
 						break;
+					}
 
 					case 0b0010: // RFME (with Memory ECC/Parity Option)
 						LOGMASKED(LOG_UNHANDLED_OPS, "rfme\n");
@@ -700,12 +718,21 @@ void xtensa_device::getop_and_execute()
 					m_extreg_sar = 32 - (get_reg(srcreg) & 0x1f);
 					break;
 				}
-				case 0b0010: // SSA8L
-					LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d\n", s_st1_ops[BIT(inst, 12, 4)], BIT(inst, 8, 4));
+				case 0b0010: // SSA8L - Set Shift Amount for LE Byte Shift
+				{
+					u8 srcreg = BIT(inst, 8, 4);
+					LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d\n", "ssa8l", srcreg);
+					m_extreg_sar = (get_reg(srcreg) & 0x3)<<3;
 					break;
-				case 0b0011: // SSA8B
-					LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d\n", s_st1_ops[BIT(inst, 12, 4)], BIT(inst, 8, 4));
+				}
+
+				case 0b0011: // SSA8B - Set Shift Amount for BE Byte Shift
+				{
+					u8 srcreg = BIT(inst, 8, 4);
+					LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d\n", "ssa8b", srcreg);
+					m_extreg_sar = 32 - ((get_reg(srcreg) & 0x3)<<3);
 					break;
+				}
 
 				case 0b0100: // SSAI
 				{
@@ -2095,13 +2122,36 @@ void xtensa_device::getop_and_execute()
 
 	m_pc = m_nextpc;
 }
+void xtensa_device::check_interrupts()
+{
+	if (m_extreg_intenable == 0x16)
+	{
+		if (m_irq_req_hack == 1)
+		{
+			m_irq_req_hack = 0;
+			m_extreg_eps3 = m_extreg_ps;
+			m_extreg_epc3 = m_nextpc;
+
+			m_pc = 0x2c0001b4; // high priority interrupt 3 code is here in RAM, not sure what points to it yet
+		}
+	}
+}
+
+void xtensa_device::irq_request_hack()
+{
+	m_irq_req_hack = 1;
+}
 
 
 void xtensa_device::execute_run()
 {
 	while (m_icount > 0)
 	{
+		check_interrupts();
+
 		debugger_instruction_hook(m_pc);
+
+
 		getop_and_execute();
 		m_icount--;
 	}
