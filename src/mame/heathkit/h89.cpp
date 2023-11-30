@@ -46,6 +46,7 @@
 #include "tlb.h"
 #include "z37_fdc.h"
 #include "intr_cntrl.h"
+#include "sigmasoft_parallel_port.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/ins8250.h"
@@ -72,12 +73,15 @@ public:
 		m_serial1(*this, "serial1"),
 		m_serial2(*this, "serial2"),
 		m_serial3(*this, "serial3"),
+		m_sigma_parallel(*this, "sigma_parallel"),
 		m_config(*this, "CONFIG")
 	{
 	}
 
-	void h89(machine_config &config);
+	void h89_common(machine_config &config);
 
+	void h89(machine_config &config);
+	void h89_sigmasoft(machine_config &config);
 
 private:
 
@@ -93,6 +97,7 @@ private:
 	required_device<ins8250_device> m_serial1;
 	required_device<ins8250_device> m_serial2;
 	required_device<ins8250_device> m_serial3;
+	optional_device<sigmasoft_parallel_port> m_sigma_parallel;
 	required_ioport m_config;
 
 	// General Purpose Port (GPP)
@@ -122,8 +127,10 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(h89_irq_timer);
-	void h89_io(address_map &map);
+
 	void h89_mem(address_map &map);
+	void h89_io(address_map &map);
+	void h89_sigmasoft_io(address_map &map);
 
 	uint8_t raise_NMI_r();
 	void raise_NMI_w(uint8_t data);
@@ -242,6 +249,14 @@ void h89_state::h89_io(address_map &map)
 
 	// port defined on the H8. On the H89, access to these addresses causes a NMI
 	map(0xfa, 0xfb).rw(FUNC(h89_state::raise_NMI_r), FUNC(h89_state::raise_NMI_w));
+}
+
+void h89_state::h89_sigmasoft_io(address_map &map)
+{
+	h89_io(map);
+
+	// Add parallel port board.
+	map(0x08,0x0f).rw(m_sigma_parallel, FUNC(sigmasoft_parallel_port::read), FUNC(sigmasoft_parallel_port::write));
 }
 
 // Input ports
@@ -580,13 +595,18 @@ static void tlb_options(device_slot_interface &device)
 	device.option_add("watzman", HEATH_WATZ);
 }
 
+static void sigma_tlb_options(device_slot_interface &device)
+{
+	device.option_add("igc", HEATH_IGC);
+}
+
 static void intr_ctrl_options(device_slot_interface &device)
 {
 	device.option_add("original", HEATH_INTR_CNTRL);
 	device.option_add("h37", HEATH_Z37_INTR_CNTRL);
 }
 
-void h89_state::h89(machine_config & config)
+void h89_state::h89_common(machine_config & config)
 {
 	// basic machine hardware
 	Z80(config, m_maincpu, H89_CLOCK);
@@ -601,8 +621,6 @@ void h89_state::h89(machine_config & config)
 
 	INS8250(config, m_console, INS8250_CLOCK);
 	m_console->out_int_callback().set(FUNC(h89_state::console_intr));
-
-	HEATH_TLB_CONNECTOR(config, m_tlbc, tlb_options, "heath");
 
 	// Connect the console port on CPU board to TLB connector
 	m_console->out_tx_callback().set(m_tlbc, FUNC(heath_tlb_connector::serial_in_w));
@@ -628,8 +646,65 @@ void h89_state::h89(machine_config & config)
 	TIMER(config, "irq_timer", 0).configure_periodic(FUNC(h89_state::h89_irq_timer), attotime::from_msec(2));
 }
 
+void h89_state::h89(machine_config & config)
+{
+	HEATH_TLB_CONNECTOR(config, m_tlbc, tlb_options, "heath");
+
+	h89_common(config);
+}
+
+void h89_state::h89_sigmasoft(machine_config & config)
+{
+	HEATH_TLB_CONNECTOR(config, m_tlbc, sigma_tlb_options, "igc");
+
+	h89_common(config);
+
+	m_maincpu->set_addrmap(AS_IO, &h89_state::h89_sigmasoft_io);
+
+	SIGMASOFT_PARALLEL_PORT(config, m_sigma_parallel);
+	m_sigma_parallel->ctrl_r_cb().set(m_tlbc, FUNC(heath_tlb_connector::sigma_ctrl_r));
+	m_sigma_parallel->video_mem_r_cb().set(m_tlbc, FUNC(heath_tlb_connector::sigma_video_mem_r));
+	m_sigma_parallel->video_mem_cb().set(m_tlbc, FUNC(heath_tlb_connector::sigma_video_mem_w));
+	m_sigma_parallel->io_lo_cb().set(m_tlbc, FUNC(heath_tlb_connector::sigma_io_lo_addr_w));
+	m_sigma_parallel->io_hi_cb().set(m_tlbc, FUNC(heath_tlb_connector::sigma_io_hi_addr_w));
+	m_sigma_parallel->window_lo_cb().set(m_tlbc, FUNC(heath_tlb_connector::sigma_window_lo_addr_w));
+	m_sigma_parallel->window_hi_cb().set(m_tlbc, FUNC(heath_tlb_connector::sigma_window_hi_addr_w));
+	m_sigma_parallel->ctrl_cb().set(m_tlbc, FUNC(heath_tlb_connector::sigma_ctrl_w));
+}
+
 // ROM definition
 ROM_START( h89 )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
+	ROM_DEFAULT_BIOS("mtr90")
+
+	ROM_LOAD( "2716_444-19_h17.u520", 0x1800, 0x0800, CRC(26e80ae3) SHA1(0c0ee95d7cb1a760f924769e10c0db1678f2435c))
+
+	ROM_SYSTEM_BIOS(0, "mtr90", "MTR-90 (444-142)")
+	ROMX_LOAD("2732_444-142_mtr90.u518", 0x0000, 0x1000, CRC(c4ff47c5) SHA1(d6f3d71ff270a663003ec18a3ed1fa49f627123a), ROM_BIOS(0))
+
+	ROM_SYSTEM_BIOS(1, "mtr88", "MTR-88 (444-40)")
+	ROMX_LOAD("2716_444-40_mtr88.u518", 0x0000, 0x0800, CRC(093afb79) SHA1(bcc1569ad9da7babf0a4199cab96d8cd59b2dd78), ROM_BIOS(1))
+
+	ROM_SYSTEM_BIOS(2, "mtr89", "MTR-89 (444-62)")
+	ROMX_LOAD("2716_444-62_mtr89.u518", 0x0000, 0x0800, CRC(8f507972) SHA1(ac6c6c1344ee4e09fb60d53c85c9b761217fe9dc), ROM_BIOS(2))
+
+	ROM_SYSTEM_BIOS(3, "mms84b", "MMS 84B")
+	ROMX_LOAD("2732_444_84b_mms.u518", 0x0000, 0x1000, CRC(7e75d6f4) SHA1(baf34e036388d1a191197e31f8a93209f04fc58b), ROM_BIOS(3))
+
+	ROM_SYSTEM_BIOS(4, "kmr-100_v3.a.02", "Kres KMR-100")
+	ROMX_LOAD("2732_kmr100_v3_a_02.u518", 0x0000, 0x1000, CRC(fd491592) SHA1(3d5803f95c38b237b07cd230353cd9ddc9858c13), ROM_BIOS(4))
+
+	ROM_SYSTEM_BIOS(5, "mtrhex_4k", "Ultimeth ROM")
+	ROMX_LOAD("2732_mtrhex_4k.u518", 0x0000, 0x1000, CRC(e26b29a9) SHA1(ba13d6c9deef682a9a8262bc910d46b577929a13), ROM_BIOS(5))
+
+	ROM_SYSTEM_BIOS(6, "mtr90-84", "Heath's MTR-90 (444-84 - Superseded by 444-142)")
+	ROMX_LOAD("2732_444-84_mtr90.u518", 0x0000, 0x1000, CRC(f10fca03) SHA1(c4a978153af0f2dfcc9ba05be4c1033d33fee30b), ROM_BIOS(6))
+
+	ROM_SYSTEM_BIOS(7, "mms84a", "MMS 84A (Superseded by MMS 84B)")
+	ROMX_LOAD("2732_444_84a_mms.u518", 0x0000, 0x1000, CRC(0e541a7e) SHA1(b1deb620fc89c1068e2e663e14be69d1f337a4b9), ROM_BIOS(7))
+ROM_END
+
+ROM_START( h89_sigmasoft )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS("mtr90")
 
@@ -665,5 +740,6 @@ ROM_END
 
 // Driver
 
-//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY          FULLNAME        FLAGS
-COMP( 1979, h89,  0,      0,      h89,     h89,   h89_state, empty_init, "Heath Company", "Heathkit H89", MACHINE_SUPPORTS_SAVE)
+//    YEAR  NAME           PARENT COMPAT MACHINE        INPUT CLASS      INIT        COMPANY          FULLNAME                           FLAGS
+COMP( 1979, h89,           0,     0,     h89,           h89,  h89_state, empty_init, "Heath Company", "Heathkit H89",                    MACHINE_SUPPORTS_SAVE)
+COMP( 1979, h89_sigmasoft, h89,   0,     h89_sigmasoft, h89,  h89_state, empty_init, "Heath Company", "Heathkit H89 with SigmaSoft IGC", MACHINE_SUPPORTS_SAVE)

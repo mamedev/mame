@@ -19211,6 +19211,7 @@ h19                             // Heath H19 (Zenith Z-19)
 
 @source:heathkit/h89.cpp
 h89                             // Heath H89 (H88, Zenith Z-89, Z-90)
+h89_sigmasoft                   // H89 with the SigmaSoft IGC card
 
 @source:hec2hrp/hec2hrp.cpp
 hec2hr                          //
