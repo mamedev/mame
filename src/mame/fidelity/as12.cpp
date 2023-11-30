@@ -284,11 +284,11 @@ ROM_START( feleg ) // model 6085, serial 613623xx
 	ROM_LOAD("feleg.e000", 0xe000, 0x2000, CRC(b1fb49aa) SHA1(d8c9687dd564f0fa603e6d684effb1d113ac64b4) ) // "
 ROM_END
 
-ROM_START( felega ) // model AS12, serial 427921xx, but roms were upgraded
+ROM_START( felega ) // model AS12
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("felega.8000", 0x8000, 0x2000, CRC(e86453ed) SHA1(8279cf9a7f471f893922d53d901dae65fabbd33f) ) // MBM2764-25, no meaningful label
-	ROM_LOAD("felega.c000", 0xc000, 0x1000, CRC(4a2b6946) SHA1(fd7d11e2589e654f91f7c2f667b927075bd49339) ) // TMS2732AJL-45, "
-	ROM_LOAD("felega.e000", 0xe000, 0x2000, CRC(823083ad) SHA1(4ea6a679edc7c149f1467113e9e5736ee0d5f643) ) // MBM27C64-20, "
+	ROM_LOAD("blue.8000",  0x8000, 0x2000, CRC(e86453ed) SHA1(8279cf9a7f471f893922d53d901dae65fabbd33f) ) // AM2764-25DC
+	ROM_LOAD("green.c000", 0xc000, 0x1000, CRC(4a2b6946) SHA1(fd7d11e2589e654f91f7c2f667b927075bd49339) ) // D2732D
+	ROM_LOAD("black.e000", 0xe000, 0x2000, CRC(823083ad) SHA1(4ea6a679edc7c149f1467113e9e5736ee0d5f643) ) // AM2764-25DC
 ROM_END
 
 ROM_START( felega1 ) // model AS12, only 1 byte difference compared with felega2 (evidently not a bad dump)
