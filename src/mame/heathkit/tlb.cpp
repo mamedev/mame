@@ -1748,7 +1748,7 @@ void heath_imaginator_tlb_device::set_irq_line()
  *
  */
 heath_sigmasoft_igc_tlb_device::heath_sigmasoft_igc_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	heath_tlb_device(mconfig, HEATH_IMAGINATOR, tag, owner, clock)
+	heath_tlb_device(mconfig, HEATH_IGC, tag, owner, clock)
 {
 }
 
