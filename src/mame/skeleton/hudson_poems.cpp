@@ -29,6 +29,7 @@
 
 #include "cpu/xtensa/xtensa.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -40,7 +41,9 @@ class hudson_poems_state : public driver_device
 public:
 	hudson_poems_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_palette(*this, "palette"),
+		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	void hudson_poems(machine_config &config);
@@ -55,8 +58,18 @@ private:
 	void mem_map(address_map &map);
 
 	uint32_t poems_8020020_r();
+	uint32_t poems_800aa04_r();
+
+	void palette_w(offs_t offset, u32 data, u32 mem_mask);
+	void palette_reset_w(offs_t offset, u32 data, u32 mem_mask);
+	void set_palette_val(int entry);
+
+	uint16_t m_temppalette[256];
+	uint16_t m_paletteoffset;
 
 	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 void hudson_poems_state::machine_start()
@@ -66,6 +79,7 @@ void hudson_poems_state::machine_start()
 void hudson_poems_state::machine_reset()
 {
 	m_maincpu->set_pc(0x00000040);
+	m_paletteoffset = 0;
 }
 
 static INPUT_PORTS_START( hudson_poems )
@@ -82,12 +96,69 @@ uint32_t hudson_poems_state::poems_8020020_r()
 	return 0xffffffff;
 }
 
+uint32_t hudson_poems_state::poems_800aa04_r()
+{
+	return (machine().rand() & 1) ? 0x00000000 : 0xffffffff; 
+}
+
+void hudson_poems_state::set_palette_val(int entry)
+{
+	uint16_t datax = m_temppalette[entry];
+	int r = ((datax) & 0x001f) >> 0;
+	int g = ((datax) & 0x03e0) >> 5;
+	int b = ((datax) & 0x7c00) >> 10;
+	m_palette->set_pen_color(entry, pal5bit(r), pal5bit(g), pal5bit(b));
+}
+
+void hudson_poems_state::palette_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	if (mem_mask & 0x0000ffff)
+	{
+		if (m_paletteoffset < 256)
+		{
+			m_temppalette[m_paletteoffset] = data & 0x0000ffff;
+			set_palette_val(m_paletteoffset);
+			m_paletteoffset++;
+		}
+	}
+
+	if (mem_mask & 0xffff0000)
+	{
+		if (m_paletteoffset < 256)
+		{
+			m_temppalette[m_paletteoffset] = (data & 0xffff0000)>>16;
+			set_palette_val(m_paletteoffset);
+			m_paletteoffset++;
+		}
+	}
+}
+
+void hudson_poems_state::palette_reset_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	m_paletteoffset = 0;
+}
+
+
+
 void hudson_poems_state::mem_map(address_map &map)
 {
 	map(0x00000000, 0x007fffff).mirror(0x20000000).rom().region("maincpu", 0);
+	map(0x08008200, 0x08008203).r(FUNC(hudson_poems_state::poems_8020020_r));
+	map(0x0800aa04, 0x0800aa07).r(FUNC(hudson_poems_state::poems_800aa04_r));
+
+	// guess, might not be palette at all, might not be this address if code flow is still incorrect
+	map(0x0800b000, 0x0800b003).w(FUNC(hudson_poems_state::palette_w));
+	map(0x0800b004, 0x0800b007).w(FUNC(hudson_poems_state::palette_reset_w));
+
 	map(0x08020020, 0x08020023).r(FUNC(hudson_poems_state::poems_8020020_r));
+
 	map(0x2c000000, 0x2c7fffff).ram();
 }
+
+static GFXDECODE_START( gfx_poems )
+	GFXDECODE_ENTRY( "maincpu", 0, gfx_8x8x4_packed_lsb, 0, 16 )
+	GFXDECODE_ENTRY( "maincpu", 0, gfx_8x8x8_raw, 0, 1 )
+GFXDECODE_END
 
 void hudson_poems_state::hudson_poems(machine_config &config)
 {
@@ -101,6 +172,9 @@ void hudson_poems_state::hudson_poems(machine_config &config)
 	screen.set_size(320, 240); // resolution not confirmed
 	screen.set_visarea(0, 320-1, 0, 240-1);
 	screen.set_screen_update(FUNC(hudson_poems_state::screen_update));
+
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_poems);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x100);
 
 	SPEAKER(config, "speaker").front_center();
 }
