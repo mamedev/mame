@@ -112,6 +112,9 @@ void xtensa_device::extreg_ccount_w(u32 data) { m_extreg_ccount = data; logerror
 uint32_t xtensa_device::extreg_exccause_r() { logerror("m_extreg_exccause read\n"); return m_extreg_exccause; }
 void xtensa_device::extreg_exccause_w(u32 data) { m_extreg_exccause = data; logerror("m_extreg_exccause set to %08x\n", data); }
 
+uint32_t xtensa_device::extreg_sar_r() { logerror("m_extreg_sar read\n"); return m_extreg_sar; }
+void xtensa_device::extreg_sar_w(u32 data) { m_extreg_sar = data; logerror("m_extreg_sar set to %08x\n", data); }
+
 
 void xtensa_device::set_callinc(u8 val)
 {
@@ -131,7 +134,7 @@ void xtensa_device::ext_regs(address_map &map)
 	map(0x02, 0x02).rw(FUNC(xtensa_device::extreg_lcount_r), FUNC(xtensa_device::extreg_lcount_w)); // "lcount" LOOP COUNT
 
 	// Core Architecture (3)
-	//map(0x03, 0x03) // "sar", 
+	map(0x03, 0x03).rw(FUNC(xtensa_device::extreg_sar_r), FUNC(xtensa_device::extreg_sar_w)); // "sar" Shift Amount
 
 	// Boolean Option (4)
 	//map(0x04, 0x04) // "br", 
@@ -474,8 +477,12 @@ void xtensa_device::getop_and_execute()
 						break;
 
 					case 0b1000: // RET
-						LOGMASKED(LOG_UNHANDLED_OPS, "ret\n");
+					{
+						LOGMASKED(LOG_HANDLED_OPS, "ret\n");
+						m_nextpc = get_reg(0);
+						m_pc = m_nextpc; return; // avoid loop check
 						break;
+					}
 
 					case 0b1001: // RETW (with Windowed Register Option)
 					{
@@ -494,9 +501,16 @@ void xtensa_device::getop_and_execute()
 						break;
 					}
 
-					case 0b1100: // CALLX0 (with Windowed Register Option)
-						LOGMASKED(LOG_UNHANDLED_OPS, "callx%-3da%d\n", BIT(inst, 4, 2) * 4, BIT(inst, 8, 4));
+					case 0b1100: // CALLX0
+					{
+						u8 reg = BIT(inst, 8, 4);
+						LOGMASKED(LOG_HANDLED_OPS, "callx%-3da%d\n", 0, reg);
+						u32 next = get_reg(reg);
+						set_reg(0, m_nextpc);
+						m_nextpc = next;
+						m_pc = m_nextpc; return; // avoid loop check
 						break;
+					}
 
 					case 0b1101: // CALLX4 (with Windowed Register Option)
 					case 0b1110: // CALLX8 (with Windowed Register Option)
@@ -1625,8 +1639,15 @@ void xtensa_device::getop_and_execute()
 		switch (BIT(inst, 4, 2))
 		{
 		case 0b00: // CALL0
-			LOGMASKED(LOG_UNHANDLED_OPS, "call%-4d0x%08X\n", BIT(inst, 4, 2) * 4, (m_pc & 0xfffffffc) + 4 + util::sext(inst >> 6, 18) * 4);
+		{
+			u32 addr = (m_pc & 0xfffffffc) + 4 + util::sext(inst >> 6, 18) * 4;
+			LOGMASKED(LOG_HANDLED_OPS, "call%-4d0x%08X\n", 0, addr);
+			u32 next = addr;
+			set_reg(0, m_nextpc);
+			m_nextpc = next;
+			m_pc = m_nextpc; return; // avoid loop check
 			break;
+		}
 
 		case 0b01: // CALL4 (with Windowed Register Option)
 		case 0b10: // CALL8 (with Windowed Register Option)
@@ -2070,8 +2091,12 @@ void xtensa_device::getop_and_execute()
 			switch (BIT(inst, 4, 4))
 			{
 			case 0b0000: // RET.N
-				LOGMASKED(LOG_UNHANDLED_OPS, "ret.n\n");
+			{
+				LOGMASKED(LOG_HANDLED_OPS, "ret.n\n");
+				m_nextpc = get_reg(0);
+				m_pc = m_nextpc; return; // avoid loop check
 				break;
+			}
 
 			case 0b0001: // RETW.N (with Windowed Register Option)
 			{

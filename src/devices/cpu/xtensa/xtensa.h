@@ -120,6 +120,8 @@ private:
 	void extreg_ccount_w(u32 data);
 	uint32_t extreg_exccause_r();
 	void extreg_exccause_w(u32 data);
+	uint32_t extreg_sar_r();
+	void extreg_sar_w(u32 data);
 
 	void set_callinc(u8 val);
 	u8 get_callinc();
