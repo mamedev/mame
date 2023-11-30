@@ -672,7 +672,7 @@ offs_t xtensa_disassembler::disassemble(std::ostream &stream, offs_t pc, const x
 			break;
 
 		case 0b1100: case 0b1101: // ADDI, ADDMI
-			util::stream_format(stream, "%-8sa%d, a%d, %s", s_lsai_ops[BIT(inst, 12, 4)], BIT(inst, 8, 4), BIT(inst, 4, 4), format_imm(s8(u8(inst >> 16)) * (BIT(inst, 12) ? 256 : 1)));
+			util::stream_format(stream, "%-8sa%d, a%d, %s", s_lsai_ops[BIT(inst, 12, 4)], BIT(inst, 4, 4), BIT(inst, 8, 4), format_imm(s8(u8(inst >> 16)) * (BIT(inst, 12) ? 256 : 1)));
 			break;
 
 		default:

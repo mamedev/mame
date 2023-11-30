@@ -1430,21 +1430,21 @@ void xtensa_device::getop_and_execute()
 
 		case 0b1100: // ADDI
 		{
-			u8 dstreg = BIT(inst, 8, 4);
-			u8 srcreg = BIT(inst, 4, 4);
+			u8 reg_s = BIT(inst, 8, 4);
+			u8 reg_t = BIT(inst, 4, 4);
 			s32 imm = s8(u8(inst >> 16));
-			LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, %s\n", "addi", dstreg, srcreg, format_imm(imm));
-			set_reg(dstreg, get_reg(srcreg)+imm);
+			LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, %s\n", "addi", reg_t, reg_s, format_imm(imm));
+			set_reg(reg_t, get_reg(reg_s)+imm);
 			break;
 		}
 
 		case 0b1101: // ADDMI
 		{
-			u8 dstreg = BIT(inst, 8, 4);
-			u8 srcreg = BIT(inst, 4, 4);
+			u8 reg_s = BIT(inst, 8, 4);
+			u8 reg_t = BIT(inst, 4, 4);
 			s32 imm = s8(u8(inst >> 16)) * 256;
-			LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, %s\n", "addmi", dstreg , srcreg,  format_imm(imm));
-			set_reg(dstreg, get_reg(srcreg)+imm);
+			LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, %s\n", "addmi", reg_t , reg_s,  format_imm(imm));
+			set_reg(reg_t, get_reg(reg_s)+imm);
 			break;
 		}
 
