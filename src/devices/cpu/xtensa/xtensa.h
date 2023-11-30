@@ -134,6 +134,7 @@ private:
 	inline u32 get_mem32(u32 addr);
 	inline void set_mem32(u32 addr, u32 data);
 
+	inline u8 get_mem8(u32 addr);
 	inline void set_mem8(u32 addr, u8 data);
 
 	inline u16 get_mem16(u32 addr);

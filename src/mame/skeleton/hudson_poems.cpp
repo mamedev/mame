@@ -60,12 +60,12 @@ private:
 	uint32_t poems_8020020_r();
 	uint32_t poems_800aa04_r();
 
-	void palette_w(offs_t offset, u32 data, u32 mem_mask);
-	void palette_reset_w(offs_t offset, u32 data, u32 mem_mask);
+	void unktable_w(offs_t offset, u32 data, u32 mem_mask);
+	void unktable_reset_w(offs_t offset, u32 data, u32 mem_mask);
 	void set_palette_val(int entry);
 
-	uint16_t m_temppalette[256];
-	uint16_t m_paletteoffset;
+	uint16_t m_unktable[256];
+	uint16_t m_unktableoffset;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
@@ -79,7 +79,7 @@ void hudson_poems_state::machine_start()
 void hudson_poems_state::machine_reset()
 {
 	m_maincpu->set_pc(0x00000040);
-	m_paletteoffset = 0;
+	m_unktableoffset = 0;
 }
 
 static INPUT_PORTS_START( hudson_poems )
@@ -103,39 +103,40 @@ uint32_t hudson_poems_state::poems_800aa04_r()
 
 void hudson_poems_state::set_palette_val(int entry)
 {
-	uint16_t datax = m_temppalette[entry];
+	// not actually palette, but just to visualize it for now
+	uint16_t datax = m_unktable[entry];
 	int r = ((datax) & 0x001f) >> 0;
 	int g = ((datax) & 0x03e0) >> 5;
 	int b = ((datax) & 0x7c00) >> 10;
 	m_palette->set_pen_color(entry, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
-void hudson_poems_state::palette_w(offs_t offset, u32 data, u32 mem_mask)
+void hudson_poems_state::unktable_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (mem_mask & 0x0000ffff)
 	{
-		if (m_paletteoffset < 256)
+		if (m_unktableoffset < 256)
 		{
-			m_temppalette[m_paletteoffset] = data & 0x0000ffff;
-			set_palette_val(m_paletteoffset);
-			m_paletteoffset++;
+			m_unktable[m_unktableoffset] = data & 0x0000ffff;
+			set_palette_val(m_unktableoffset);
+			m_unktableoffset++;
 		}
 	}
 
 	if (mem_mask & 0xffff0000)
 	{
-		if (m_paletteoffset < 256)
+		if (m_unktableoffset < 256)
 		{
-			m_temppalette[m_paletteoffset] = (data & 0xffff0000)>>16;
-			set_palette_val(m_paletteoffset);
-			m_paletteoffset++;
+			m_unktable[m_unktableoffset] = (data & 0xffff0000)>>16;
+			set_palette_val(m_unktableoffset);
+			m_unktableoffset++;
 		}
 	}
 }
 
-void hudson_poems_state::palette_reset_w(offs_t offset, u32 data, u32 mem_mask)
+void hudson_poems_state::unktable_reset_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	m_paletteoffset = 0;
+	m_unktableoffset = 0;
 }
 
 
@@ -144,11 +145,14 @@ void hudson_poems_state::mem_map(address_map &map)
 {
 	map(0x00000000, 0x007fffff).mirror(0x20000000).rom().region("maincpu", 0);
 	map(0x08008200, 0x08008203).r(FUNC(hudson_poems_state::poems_8020020_r));
+
+	map(0x08009000, 0x08009fff).ram();
+
 	map(0x0800aa04, 0x0800aa07).r(FUNC(hudson_poems_state::poems_800aa04_r));
 
-	// guess, might not be palette at all, might not be this address if code flow is still incorrect
-	map(0x0800b000, 0x0800b003).w(FUNC(hudson_poems_state::palette_w));
-	map(0x0800b004, 0x0800b007).w(FUNC(hudson_poems_state::palette_reset_w));
+	// this does't actually appear to be palette
+	map(0x0800b000, 0x0800b003).w(FUNC(hudson_poems_state::unktable_w)); // writes a table of increasing 16-bit values here
+	map(0x0800b004, 0x0800b007).w(FUNC(hudson_poems_state::unktable_reset_w));
 
 	map(0x08020020, 0x08020023).r(FUNC(hudson_poems_state::poems_8020020_r));
 
