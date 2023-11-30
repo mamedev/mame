@@ -60,6 +60,7 @@ private:
 
 	void mem_map(address_map &map);
 
+	uint32_t poems_8000038_r();
 	uint32_t poems_8020020_r();
 	uint32_t poems_800aa04_r();
 
@@ -97,6 +98,11 @@ uint32_t hudson_poems_state::screen_update(screen_device &screen, bitmap_rgb32 &
 uint32_t hudson_poems_state::poems_8020020_r()
 {
 	return 0xffffffff;
+}
+
+uint32_t hudson_poems_state::poems_8000038_r()
+{
+	return (machine().rand() & 1) ? 0x00000000 : 0xffffffff; 
 }
 
 uint32_t hudson_poems_state::poems_800aa04_r()
@@ -147,6 +153,9 @@ void hudson_poems_state::unktable_reset_w(offs_t offset, u32 data, u32 mem_mask)
 void hudson_poems_state::mem_map(address_map &map)
 {
 	map(0x00000000, 0x007fffff).mirror(0x20000000).rom().region("maincpu", 0);
+
+	map(0x08000038, 0x0800003b).r(FUNC(hudson_poems_state::poems_8000038_r));
+
 	map(0x08008200, 0x08008203).r(FUNC(hudson_poems_state::poems_8020020_r));
 
 	map(0x08009000, 0x08009fff).ram();
