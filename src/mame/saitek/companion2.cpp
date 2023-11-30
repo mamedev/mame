@@ -61,12 +61,12 @@ Hardware notes:
 - port 2 I/O is changed a bit, rest is same as compan2
 
 HD6301V1C42P MCU is used in:
-- CXG Enterprise "S" (black/brown/blue)
-- CXG Star Chess (black/gray)
-- CXG Computachess III
-- CXG Super Computachess
-- CXG Crown
-- CXG Sphinx Galaxy 2 (suspected)
+- CXG Enterprise "S" (model 208, black/brown/blue)
+- CXG Star Chess (model 209, black/gray)
+- CXG Computachess III (model 008)
+- CXG Super Computachess (model 009)
+- CXG Crown (model 228)
+- CXG Sphinx Galaxy 2 (model 628, suspected)
 - Fidelity Genesis (Fidelity brand Computachess III)
 - Mephisto Merlin 4K (H+G brand Computachess III)
 - Multitech Enterprise (Multitech brand Super Computachess)
@@ -120,6 +120,11 @@ private:
 	required_device<pwm_display_device> m_display;
 	required_ioport_array<3> m_inputs;
 
+	emu_timer *m_standbytimer;
+	emu_timer *m_nmitimer;
+	bool m_power = false;
+	u8 m_inp_mux = 0;
+
 	// I/O handlers
 	u8 input1_r();
 	u8 input2_r();
@@ -130,11 +135,6 @@ private:
 
 	void set_cpu_freq();
 	TIMER_CALLBACK_MEMBER(set_pin);
-
-	emu_timer *m_standbytimer;
-	emu_timer *m_nmitimer;
-	bool m_power = false;
-	u8 m_inp_mux = 0;
 };
 
 void compan2_state::machine_start()
@@ -150,7 +150,7 @@ void compan2_state::machine_start()
 void compan2_state::set_cpu_freq()
 {
 	// Concord II MCU speed is around twice higher
-	m_maincpu->set_unscaled_clock((ioport("FAKE")->read() & 1) ? 7200000 : 4000000);
+	m_maincpu->set_unscaled_clock((ioport("FAKE")->read() & 1) ? 7'200'000 : 4'000'000);
 }
 
 
@@ -226,7 +226,7 @@ u8 compan2_state::input2_r()
 void compan2_state::mux_w(u8 data)
 {
 	// P30-P37: input mux, led data
-	m_inp_mux = data ^ 0xff;
+	m_inp_mux = ~data;
 	m_display->write_mx(m_inp_mux);
 }
 
@@ -278,7 +278,7 @@ static INPUT_PORTS_START( enterp )
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("Multi Move")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Queen")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("Level")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Sound/Color")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_CODE(KEYCODE_C) PORT_NAME("Sound/Color")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Take Back")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME("New Game")
 
@@ -372,7 +372,7 @@ void compan2_state::expchess(machine_config &config)
 	enterp(config);
 
 	// basic machine hardware
-	m_maincpu->set_clock(4000000); // approximation, no XTAL
+	m_maincpu->set_clock(4'000'000); // approximation, no XTAL
 	m_maincpu->in_p2_cb().set(FUNC(compan2_state::input2_r));
 	m_maincpu->out_p2_cb().set("dac", FUNC(dac_1bit_device::write)).bit(0);
 	m_maincpu->in_p4_cb().set(FUNC(compan2_state::power_r));

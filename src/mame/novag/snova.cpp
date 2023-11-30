@@ -102,6 +102,11 @@ private:
 	required_ioport_array<2> m_inputs;
 	output_finder<4, 10> m_out_lcd;
 
+	bool m_lcd_strobe = false;
+	u8 m_inp_mux = 0;
+	u8 m_select = 0;
+	u8 m_led_data = 0;
+
 	void snova_map(address_map &map);
 	void supremo_map(address_map &map);
 
@@ -113,11 +118,6 @@ private:
 	void p2_w(u8 data);
 	void p5_w(u8 data);
 	void p6_w(u8 data);
-
-	bool m_lcd_strobe = false;
-	u8 m_inp_mux = 0;
-	u8 m_select = 0;
-	u8 m_led_data = 0;
 };
 
 void snova_state::machine_start()

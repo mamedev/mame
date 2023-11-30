@@ -56,6 +56,13 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<8+1> m_inputs;
 
+	u8 m_control1 = 0;
+	u8 m_control2 = 0;
+	u8 m_select1 = 0;
+	u8 m_select2 = 0;
+	u8 m_led_data1 = 0;
+	u8 m_led_data2 = 0;
+
 	void main_map(address_map &map);
 
 	// I/O handlers
@@ -70,13 +77,6 @@ private:
 	u8 control2_r();
 	u8 chessboard_r();
 	void lcd_reset_w(u8 data);
-
-	u8 m_control1 = 0;
-	u8 m_control2 = 0;
-	u8 m_select1 = 0;
-	u8 m_select2 = 0;
-	u8 m_led_data1 = 0;
-	u8 m_led_data2 = 0;
 };
 
 void corona_state::machine_start()

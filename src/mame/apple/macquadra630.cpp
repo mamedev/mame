@@ -40,6 +40,8 @@
 #include "mactoolbox.h"
 #include "valkyrie.h"
 
+#include "bus/nubus/cards.h"
+#include "bus/nubus/nubus.h"
 #include "cpu/m68000/m68040.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
@@ -179,6 +181,11 @@ void quadra630_state::macqd630(machine_config &config)
 	m_primetimeii->pb4_callback().set(m_cuda, FUNC(cuda_device::set_byteack));
 	m_primetimeii->pb5_callback().set(m_cuda, FUNC(cuda_device::set_tip));
 	m_primetimeii->write_cb2().set(m_cuda, FUNC(cuda_device::set_via_data));
+
+	nubus_device &nubus(NUBUS(config, "pds", 0));
+	nubus.set_space(m_maincpu, AS_PROGRAM);
+	nubus.out_irqe_callback().set(m_primetimeii, FUNC(primetime_device::via2_irq_w<0x20>));
+	NUBUS_SLOT(config, "lcpds", "pds", mac_pdslc_cards, nullptr);
 
 	/* internal ram */
 	RAM(config, m_ram);

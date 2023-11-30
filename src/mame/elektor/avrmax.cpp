@@ -83,6 +83,10 @@ private:
 	optional_device<hd44780_device> m_lcd;
 	required_ioport_array<4> m_inputs;
 
+	u8 m_inp_mux = 0;
+	u8 m_shift_reg = 0;
+	int m_shift_clk = 0;
+
 	// address maps
 	void main_map(address_map &map);
 	void data_map(address_map &map);
@@ -95,10 +99,6 @@ private:
 	void lcd_w(u8 data);
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	u8 m_inp_mux = 0;
-	u8 m_shift_reg = 0;
-	int m_shift_clk = 0;
 };
 
 void avrmax_state::machine_start()
@@ -287,9 +287,11 @@ void avrmax_state::atm18mcc(machine_config &config)
 	screen.set_visarea_full();
 	screen.set_screen_update(FUNC(avrmax_state::screen_update));
 
+	HD44780U(config, m_lcd, 270'000); // TODO: clock not measured, datasheet typical clock used
 	// HD44780UA02 is required for certain international characters in cc2schach,
-	// the others can optionally use a more standard HD44780[U]A00 display
-	HD44780U_A02(config, m_lcd, 270'000); // TODO: clock not measured, datasheet typical clock used
+	// the English version can optionally use a more standard HD44780[U]A00 display
+	m_lcd->set_default_bios_tag("a02");
+
 	config.set_default_layout(layout_atm18mcc);
 }
 

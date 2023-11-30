@@ -36,6 +36,12 @@ protected:
 	virtual void machine_reset() override;
 	virtual void device_post_load() override { update_lcd(); }
 
+	bool m_power = false;
+	bool m_lcd_ready = false;
+	u8 m_lcd_count = 0;
+	u8 m_lcd_command = 0;
+	u8 m_lcd_data[0x40] = { };
+
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<pwm_display_device> m_display;
@@ -48,12 +54,6 @@ protected:
 	void power_off();
 	void set_cpu_freq();
 	void lcd_data_w(u8 data);
-
-	bool m_power = false;
-	bool m_lcd_ready = false;
-	u8 m_lcd_count = 0;
-	u8 m_lcd_command = 0;
-	u8 m_lcd_data[0x40];
 };
 
 INPUT_PORTS_EXTERN( saitek_stratos );

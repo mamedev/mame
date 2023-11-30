@@ -2654,6 +2654,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/msm6200.h,MACHINES["MSM6200"] = true
+---------------------------------------------------
+
+if (MACHINES["MSM6200"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/msm6200.cpp",
+		MAME_DIR .. "src/devices/machine/msm6200.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/msm6242.h,MACHINES["MSM6242"] = true
 ---------------------------------------------------
 
@@ -2957,6 +2969,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/psion_condor.h,MACHINES["PSION_CONDOR"] = true
+---------------------------------------------------
+
+if (MACHINES["PSION_CONDOR"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/psion_condor.cpp",
+		MAME_DIR .. "src/devices/machine/psion_condor.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/psion_ssd.h,MACHINES["PSION_SSD"] = true
 ---------------------------------------------------
 
@@ -2976,7 +3000,6 @@ if (MACHINES["PXA255"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/pxa255.cpp",
 		MAME_DIR .. "src/devices/machine/pxa255.h",
-		MAME_DIR .. "src/devices/machine/pxa255defs.h",
 	}
 end
 

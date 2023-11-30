@@ -3021,7 +3021,7 @@ Terminal Velocity: incompatible with Windows 95 (verify), has unsupported option
 		<description>Dune II - Battle for Arrakis (Netherlands)</description>
 		<year>1995</year>
 		<publisher>Hit Squad</publisher>
-		<info name="developer" value=" 	Westwood Studios" />
+		<info name="developer" value="Westwood Studios" />
 		<info name="language" value="English/French/German" />
 		<info name="region" value="Netherlands" />
 		<info name="version" value="V1.07" />
@@ -3041,7 +3041,7 @@ Terminal Velocity: incompatible with Windows 95 (verify), has unsupported option
 		<description>Dune II - Battle for Arrakis (Germany, PC Games Collection 2 release)</description>
 		<year>2001</year>
 		<publisher>Electronic Arts / Infogrames</publisher>
-		<info name="developer" value=" 	Westwood Studios" />
+		<info name="developer" value="Westwood Studios" />
 		<info name="language" value="English/French/German" />
 		<info name="version" value="V1.07" />
 		<sharedfeat name="platform" value="DOS" />
@@ -3060,7 +3060,7 @@ Terminal Velocity: incompatible with Windows 95 (verify), has unsupported option
 		<description>Dune II - The Building of a Dynasty (USA, Gold Medal 12 CD Pack)</description>
 		<year>1995</year>
 		<publisher>Virgin Games</publisher>
-		<info name="developer" value=" 	Westwood Studios" />
+		<info name="developer" value="Westwood Studios" />
 		<info name="language" value="English" />
 		<info name="region" value="USA" />
 		<info name="version" value="V1.07" />
@@ -5402,6 +5402,26 @@ Warlords III: Darklords Rising
 			</diskarea>
 		</part>
 	</software>
+
+	<!-- DOS -->
+	<!-- 4MB, 8MB and 16MB versions known to exist (?) -->
+	<!-- Win / Mac later release known to exist -->
+	<software name="primrage" supported="partial">
+		<description>Primal Rage (USA, DOS)</description>
+		<year>1994</year>
+		<publisher>Time Warner Interactive</publisher>
+		<notes><![CDATA[
+Detects 4MB even if there are 16MB [RAM] installed (verify claim on wiki, this may be 4MB version)
+[SVGA] S3 (at least) runs game at 70 Hz
+https://www.pcgamingwiki.com/wiki/Primal_Rage
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="timewarnerinteractive-primalrage-msdos-eng" sha1="c3e4c2d2ceebe80975d61c6761542dc180031520"/>
+			</diskarea>
+		</part>
+	</software>
+
 
 	<!-- Windows 3.1J / 95J -->
 	<!-- English prototype known to exist -->

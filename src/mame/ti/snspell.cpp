@@ -301,6 +301,14 @@ private:
 	optional_device<software_list_device> m_softlist;
 	required_ioport_array<9> m_inputs;
 
+	u32 m_cart_max_size = 0;
+	u8 *m_cart_base = nullptr;
+
+	bool m_power_on = false;
+	u32 m_r = 0;
+	u16 m_grid = 0;
+	u16 m_plate = 0;
+
 	void power_off();
 	void update_display();
 
@@ -312,14 +320,6 @@ private:
 	void lantrans_write_r(u32 data);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
-
-	u32 m_cart_max_size = 0;
-	u8 *m_cart_base = nullptr;
-
-	bool m_power_on = false;
-	u32 m_r = 0;
-	u16 m_grid = 0;
-	u16 m_plate = 0;
 };
 
 void snspell_state::machine_start()

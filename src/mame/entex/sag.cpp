@@ -66,13 +66,13 @@ private:
 	required_device<generic_slot_device> m_cart;
 	required_ioport_array<6> m_inputs;
 
+	u16 m_grid = 0;
+	u16 m_plate = 0;
+
 	void update_display();
 	u8 input_r();
 	void speaker_w(int state);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
-
-	u16 m_grid = 0;
-	u16 m_plate = 0;
 
 	void hmcs40_write_r(offs_t offset, u8 data);
 	void hmcs40_write_d(u16 data);

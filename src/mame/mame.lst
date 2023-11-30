@@ -673,6 +673,13 @@ upscope                         // (c) 1986 Grand products
 @source:amirix/wxstar4000.cpp
 wxstar4k                        // 1990 Applied Microelectronics Research (Amirix) / The Weather Channel
 
+@source:ampex/ampex.cpp
+dialog80                        // Ampex Dialogue 80
+
+@source:ampex/ampex210.cpp
+ampex210p                       //
+ampex230p                       //
+
 @source:ampro/ampro.cpp
 ampro                           //
 
@@ -14985,6 +14992,7 @@ jupace                          // Jupiter Ace
 alien                           // (c) 2005 Capcom
 dkbanana                        // (c) 2007 Capcom
 dkbanans                        // (c) 2007 Capcom
+dkjfever                        // (c) 2005 Capcom
 dokodemo                        // (c) 2006 Capcom
 mariojjl                        // (c) 2005 Capcom
 masmario                        // (c) 2004 Capcom
@@ -15883,6 +15891,10 @@ ctk551                          //
 ctk601                          //
 gz70sp                          //
 
+@source:casio/cz1.cpp
+cz1                             // 1986 Casio
+mz1                             // 1986 Casio (unreleased)
+
 @source:casio/cz101.cpp
 cz101                           // 1984 Casio
 
@@ -16399,6 +16411,9 @@ sgalaxyb
 @source:cxg/scptchess.cpp
 scptchess
 scptchessa
+
+@source:cxg/senterprise.cpp
+senterp
 
 @source:cxg/sphinx40.cpp
 sphinx40
@@ -18302,6 +18317,7 @@ ckongis                         //
 ckongmc                         // 1981 bootleg
 ckongmc2                        // 1981 bootleg
 ckongs                          // bootleg
+crazym                          // (c) 1982 GAT (bootleg)
 devilfshg                       // (c) 1982 Artic (bootleg?)
 devilfshgb                      // (c) 1984 Vision / Artic (bootleg?)
 dingo                           // (c) 1983 Ashby Computers and Graphics LTD. + Jaleco license
@@ -26918,6 +26934,9 @@ tmpdoki                         // (c) 1998 Media Syouji
 @source:mg1/mg1.cpp
 mg1                             // Whitechapel Computer Works MG-1
 
+@source:microcraft/dim68k.cpp
+dim68k                          //
+
 @source:microkey/primo.cpp
 primoa32                        // Primo A-32
 primoa48                        // Primo A-48
@@ -33022,6 +33041,7 @@ polepos2b                       // bootleg
 polepos2bi                      // bootleg
 polepos2bs                      // 1984, BCN Internacional S.A. (bootleg)
 poleposa1                       // 136014   (c) 1982 Atari
+poleposa1n                      //
 poleposa2                       // 136014   (c) 1982 + Atari license
 poleposj                        // (c) 1982
 ppspeed                         // bootleg
@@ -33153,6 +33173,9 @@ hmxpro                          // 1994 Network Computing Devices
 
 @source:ncd/ncdppc.cpp
 explorapro                      // 1995 Network Computing Devices
+
+@source:ncr/dmv.cpp
+dmv                             //
 
 @source:nec/apc.cpp
 apc                             //
@@ -36651,7 +36674,8 @@ trailer                         //
 ufo_x                           //
 
 @source:pinball/recel.cpp
-recel                           //
+recel13                         //
+recel14                         //
 r_alaska                        //
 r_blackm4                       //
 r_blackmag                      //
@@ -36665,6 +36689,7 @@ r_mrevil                        //
 r_pokrplus                      //
 r_quijote                       //
 r_screech                       //
+r_screech4                      //
 r_swash                         //
 r_torneo                        //
 
@@ -38716,14 +38741,15 @@ twinktmb
 
 @source:sega/megadriv_rad.cpp
 rad_sf2                         // (c)2004 Radica
-rad_sf2p                        // (c)2004 Radica
+rad_sf2uk                       // (c)2004 Radica
 rad_gen1                        // (c)2004 Radica
 rad_gen2                        // (c)2004 Radica
 rad_md1
-rad_md2
+rad_md1uk
+rad_md2uk
 rad_ssoc                        // (c)2004 Radica
 rad_sonic
-rad_sonicp
+rad_sonicuk
 rad_orun
 msi_sf2
 dgunl3227
@@ -41239,13 +41265,6 @@ asma3k                          // (c) 2000 AlphaSmart, Inc.
 @source:skeleton/am1000.cpp
 am1000                          // (c) 1988 Alpha Micro
 
-@source:skeleton/ampex.cpp
-dialog80                        // Ampex Dialogue 80
-
-@source:skeleton/ampex210.cpp
-ampex210p                       //
-ampex230p                       //
-
 @source:skeleton/antonelli_hd6305.cpp
 anto2495                        //
 anto2614                        //
@@ -41387,16 +41406,10 @@ digilog400                      //
 @source:skeleton/digitech_gsp5.cpp
 gsp5                            //
 
-@source:skeleton/dim68k.cpp
-dim68k                          //
-
 @source:skeleton/dm7000.cpp
 dm500                           //
 dm5620                          //
 dm7000                          //
-
-@source:skeleton/dmv.cpp
-dmv                             //
 
 @source:skeleton/dps1.cpp
 dps1                            //
@@ -41412,6 +41425,7 @@ e100                            //
 
 @source:skeleton/easy_karaoke.cpp
 easykara
+karams
 
 @source:skeleton/elcirculo.cpp
 elcirculo                       // (c) 1980 Inder
@@ -41496,6 +41510,9 @@ hprotr8a                        //
 
 @source:skeleton/ht68k.cpp
 ht68k                           //
+
+@source:skeleton/hudson_poems.cpp
+marimba                         //
 
 @source:skeleton/i7000.cpp
 i7000                           //
@@ -41900,9 +41917,6 @@ vp60                            //
 
 @source:skeleton/vsmilepro.cpp
 vsmilpro
-
-@source:skeleton/wicat.cpp
-wicat                           //
 
 @source:skeleton/xbase09.cpp
 xbase09                         //
@@ -44657,12 +44671,13 @@ sstarkar
 hyprscan                        //
 jak_bbh
 jak_bbsf
-zone3d
 zonefamf
 
 @source:tvgames/spg29x_lexibook_jg7425.cpp
-lx_jg7425
 lx_aven
+lx_frozen
+lx_jg7425
+zone3d
 
 @source:tvgames/spg2xx.cpp
 ablkickb
@@ -44673,6 +44688,7 @@ decathlna
 doraglob                        // (c) 2007 VTech
 doraglobg
 doraphon                        // (c) 2006 VTech
+doraphonf
 dreamlss
 fordrace
 gssytts
@@ -44681,6 +44697,7 @@ guitarss
 guitarssa
 hotwhl2p
 itvphone
+jeuint
 jjstrip
 jouet
 knd
@@ -45551,15 +45568,16 @@ gjrstar                         // Genius Junior Redstar (Germany)
 gjrstar2                        // Genius Junior Redstar 2 (Germany)
 gjrstar3                        // Genius Junior Redstar 3 (Germany)
 gln                             // Genius Leader Notebook
-pitagor                         // Pitagorin
 gls                             // Genius Leader Select
+pcompelr                        // Prekomputer Elektronik (Russia)
 pitagjr                         // Pitagorin Junior
+pitagor                         // Pitagorin
 scientus                        // Scientus (France, from C.Q.F.D)
 
 @source:vtech/gkidabc.cpp
+gjrprofi                        // Genius Junior Profi (Germany)
 gkidabc                         // Genius KID ABC Fan (Germany)
 miprimlec                       // Mis Primeras Lecciones (Spain)
-gjrprofi                        // Genius Junior Profi (Germany)
 
 @source:vtech/glcx.cpp
 bs9009cx                        // 1999 BrainStation 9009 CXL (Germany)
@@ -45694,6 +45712,12 @@ jupiter3                        //
 
 @source:westinghouse/testconsole.cpp
 whousetc                        //
+
+@source:wicat/t7000.cpp
+t7000                           //
+
+@source:wicat/wicat.cpp
+wicat                           //
 
 @source:wing/luckgrln.cpp
 7smash                          // (c) 1993 Sovic
@@ -45856,6 +45880,9 @@ psr340                          // 1999 PSR-340
 
 @source:yamaha/ympsr400.cpp
 psr500                          // 1991 PSR-500
+
+@source:yamaha/ympsr540.cpp
+psr540                          // 1999 PSR-540
 
 @source:yamaha/ymqy70.cpp
 qy70                            // 1997 QY-70

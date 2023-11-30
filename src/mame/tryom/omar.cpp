@@ -60,6 +60,8 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<5> m_inputs;
 
+	u8 m_inp_mux = 0;
+
 	void main_map(address_map &map);
 	void main_io(address_map &map);
 
@@ -68,8 +70,6 @@ private:
 	void p4_w(u8 data);
 	u8 p4_r();
 	void p5_w(u8 data);
-
-	u8 m_inp_mux = 0;
 };
 
 void omar_state::machine_start()

@@ -123,6 +123,9 @@ private:
 	optional_device<generic_slot_device> m_cart;
 	required_ioport m_inputs;
 
+	u8 m_led_select = 0;
+	u8 m_inp_mux = 0;
+
 	// address maps
 	void msc_map(address_map &map);
 	void sc6_map(address_map &map);
@@ -137,9 +140,6 @@ private:
 	u8 input_r();
 	int input6_r();
 	int input7_r();
-
-	u8 m_led_select = 0;
-	u8 m_inp_mux = 0;
 };
 
 void sc6_state::machine_start()

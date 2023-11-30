@@ -383,146 +383,170 @@ void recel_state::recel(machine_config & config)
 	genpin_audio(config);
 }
 
-// Is this the correct order?
-#define RECEL_BIOS \
+/* There are two different BIOS sets:
+    -13: For machines with personality PROM 1702.
+    -14: For machines with 2716 EPROM.
+*/
+
+#define RECEL_BIOS_13 \
 	ROM_REGION( 0x0800, "maincpu", ROMREGION_ERASEFF ) \
-	ROM_LOAD("a2362.b2", 0x0000, 0x0400, NO_DUMP ) \
-	ROM_LOAD("a2361.b1", 0x0400, 0x0400, NO_DUMP )
+	ROM_LOAD("a2361_13.b1", 0x0000, 0x0400, NO_DUMP ) \
+	ROM_LOAD("a2362_13.b2", 0x0400, 0x0400, NO_DUMP )
+
+#define RECEL_BIOS_14 \
+	ROM_REGION( 0x0800, "maincpu", ROMREGION_ERASEFF ) \
+	ROM_LOAD("a2361_14.b1", 0x0000, 0x0400, NO_DUMP ) \
+	ROM_LOAD("a2362_14.b2", 0x0400, 0x0400, NO_DUMP )
 
 
-ROM_START( recel )
-	RECEL_BIOS
+ROM_START( recel13 )
+	RECEL_BIOS_13
+
+	ROM_REGION( 0x0800, "module", ROMREGION_ERASEFF )
+ROM_END
+
+ROM_START( recel14 )
+	RECEL_BIOS_14
 
 	ROM_REGION( 0x0800, "module", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START(r_alaska)
-	RECEL_BIOS
+	RECEL_BIOS_13
 
 	ROM_REGION( 0x0800, "module", ROMREGION_ERASEFF )
-	ROM_LOAD("al.c5",   0x0000, 0x0100, CRC(905ef624) SHA1(ab0bb2e7262650b670524ce9f88bd1f14ffd749a) )
+	ROM_LOAD("al.c5",         0x0000, 0x0100, CRC(905ef624) SHA1(ab0bb2e7262650b670524ce9f88bd1f14ffd749a) )
 ROM_END
 
 ROM_START(r_hotcold)
-	RECEL_BIOS
+	RECEL_BIOS_13
 
 	ROM_REGION( 0x0800, "module", ROMREGION_ERASEFF )
-	ROM_LOAD("hc.c5",   0x0000, 0x0100, CRC(f58d0c05) SHA1(54ecf9f67ce3a5264bfd9c063353705f9202d524) )
+	ROM_LOAD("hc.c5",         0x0000, 0x0100, CRC(f58d0c05) SHA1(54ecf9f67ce3a5264bfd9c063353705f9202d524) )
 ROM_END
 
 ROM_START(r_screech)
-	RECEL_BIOS
+	RECEL_BIOS_13
 
 	ROM_REGION( 0x0800, "module", ROMREGION_ERASEFF )
-	ROM_LOAD("sc.c5",   0x0000, 0x0800, CRC(ddf2beac) SHA1(2ce67e2679bf7d545434a90209c462ad53c50e01) )
+	ROM_LOAD("sc_1_1702.bin", 0x0000, 0x0100, CRC(c9185ef3) SHA1(3ace6cccc96375c5eab3d43f86f52bf52124334e) )
+ROM_END
+
+ROM_START(r_screech4)
+	RECEL_BIOS_14
+
+	ROM_REGION( 0x0800, "module", ROMREGION_ERASEFF )
+	ROM_LOAD("sc.c5",         0x0000, 0x0800, CRC(ddf2beac) SHA1(2ce67e2679bf7d545434a90209c462ad53c50e01) )
 ROM_END
 
 ROM_START(r_mrevil)
-	RECEL_BIOS
+	RECEL_BIOS_13
 
 	ROM_REGION( 0x0800, "module", ROMREGION_ERASEFF )
-	ROM_LOAD( "me.c5",  0x0000, 0x0100, CRC(53ce24a0) SHA1(42d376e3e7a4e94a09db2f974af8d4869579d0f5) )
+	ROM_LOAD( "me.c5",        0x0000, 0x0100, CRC(53ce24a0) SHA1(42d376e3e7a4e94a09db2f974af8d4869579d0f5) )
 ROM_END
 
 ROM_START(r_torneo)
-	RECEL_BIOS
+	RECEL_BIOS_13
 
 	ROM_REGION( 0x0800, "module", ROMREGION_ERASEFF )
-	ROM_LOAD("to.c5",   0x0000, 0x0100, CRC(06518bca) SHA1(6e8d4dba3cc5713208794aafc40cad6aca558aa6) )
+	ROM_LOAD("to.c5",         0x0000, 0x0100, CRC(06518bca) SHA1(6e8d4dba3cc5713208794aafc40cad6aca558aa6) )
 ROM_END
 
 ROM_START(r_crzyrace)
-	RECEL_BIOS
+	RECEL_BIOS_14
 
 	ROM_REGION( 0x0800, "module", ROMREGION_ERASEFF )
-	ROM_LOAD("cr.c5",   0x0000, 0x0800, CRC(60088804) SHA1(a73a7f8a0583a79588f9823a5e65ed28edad96a3) )
+	ROM_LOAD("cr.c5",         0x0000, 0x0800, CRC(60088804) SHA1(a73a7f8a0583a79588f9823a5e65ed28edad96a3) )
 ROM_END
 
 ROM_START(r_fairfght)
-	RECEL_BIOS
+	RECEL_BIOS_13
 
 	ROM_REGION( 0x0800, "module", ROMREGION_ERASEFF )
-	ROM_LOAD("fa.c5",   0x0000, 0x0100, CRC(5d3694da) SHA1(4d0a8033acb6ef2e2af107f76540fd19b4a39b12) )
+	ROM_LOAD("fa.c5",         0x0000, 0x0100, CRC(5d3694da) SHA1(4d0a8033acb6ef2e2af107f76540fd19b4a39b12) )
 ROM_END
 
 ROM_START(r_pokrplus)
-	RECEL_BIOS
+	RECEL_BIOS_13
 
 	ROM_REGION( 0x0800, "module", ROMREGION_ERASEFF )
-	ROM_LOAD("po.c5",   0x0000, 0x0100, CRC(60a199a8) SHA1(045d61f56ea03a694722da810d465ab65d85cbfd) )
-	//ROM_LOAD( "po2.c5", 0x0000, 0x0100, CRC(571ee27b) SHA1(482a3ba18eff05bce4cab073b1f13fc2f145bb2b) )
-	//ROM_LOAD( "po3.c5", 0x0000, 0x0800, CRC(fadd715a) SHA1(6c5b6e8fcf77be2b0b7076dc1139760f7e4d5688) )
+	ROM_LOAD("po.c5",         0x0000, 0x0100, CRC(60a199a8) SHA1(045d61f56ea03a694722da810d465ab65d85cbfd) )
+	//ROM_LOAD( "po2.c5",       0x0000, 0x0100, CRC(571ee27b) SHA1(482a3ba18eff05bce4cab073b1f13fc2f145bb2b) )
+	//ROM_LOAD( "po3.c5",       0x0000, 0x0800, CRC(fadd715a) SHA1(6c5b6e8fcf77be2b0b7076dc1139760f7e4d5688) )
 ROM_END
 
 ROM_START(r_mrdoom)
-	RECEL_BIOS
+	RECEL_BIOS_13
 
 	ROM_REGION( 0x0800, "module", ROMREGION_ERASEFF )
-	ROM_LOAD("md.c5",   0x0000, 0x0100, CRC(ca679a69) SHA1(f08f0cfe646f08882473dcd5d23889fffe4a03c8) )
+	ROM_LOAD("md.c5",         0x0000, 0x0100, CRC(ca679a69) SHA1(f08f0cfe646f08882473dcd5d23889fffe4a03c8) )
 ROM_END
 
 ROM_START(r_cavalier)
-	RECEL_BIOS
+	RECEL_BIOS_13
 
 	ROM_REGION( 0x0800, "module", ROMREGION_ERASEFF )
-	ROM_LOAD("ca.c5",   0x0000, 0x0100, CRC(dc2e865f) SHA1(3f15f90dafa9d5e42381605044b6c9b529afd3af) )
-	//ROM_LOAD( "ca2.c5", 0x0000, 0x0100, CRC(dc2e865f) SHA1(3f15f90dafa9d5e42381605044b6c9b529afd3af) )
-	//ROM_LOAD( "ca3.c5", 0x0000, 0x0800, CRC(fddd2373) SHA1(d0c79aefd2806066455c721a1361d11d6dab7d5f) )
+	ROM_LOAD("ca.c5",         0x0000, 0x0100, CRC(dc2e865f) SHA1(3f15f90dafa9d5e42381605044b6c9b529afd3af) )
+	//ROM_LOAD( "ca2.c5",       0x0000, 0x0100, CRC(dc2e865f) SHA1(3f15f90dafa9d5e42381605044b6c9b529afd3af) )
+	//ROM_LOAD( "ca3.c5",       0x0000, 0x0800, CRC(fddd2373) SHA1(d0c79aefd2806066455c721a1361d11d6dab7d5f) )
 ROM_END
 
 ROM_START(r_swash)
-	RECEL_BIOS
+	RECEL_BIOS_13
 
 	ROM_REGION( 0x0800, "module", ROMREGION_ERASEFF )
-	ROM_LOAD("sw.c5",   0x0000, 0x0100, CRC(69326f5f) SHA1(f0bb4251f579ccf97c1cabb63254ba466ccd141e) )
+	ROM_LOAD("sw.c5",         0x0000, 0x0100, CRC(69326f5f) SHA1(f0bb4251f579ccf97c1cabb63254ba466ccd141e) )
 ROM_END
 
 ROM_START(r_quijote)
-	RECEL_BIOS
+	RECEL_BIOS_13
 
 	ROM_REGION( 0x0800, "module", ROMREGION_ERASEFF )
-	ROM_LOAD("qu.c5",   0x0000, 0x0100, CRC(1fd535d0) SHA1(a9c9a72881d195a0de751f10fa54fb181523a33f) )
-	//ROM_LOAD( "qu2.c5", 0x0000, 0x0100, CRC(a88224ee) SHA1(cb85edcacc6001a9d865ef7e22711d6f62f1fdc1) )
-	//ROM_LOAD( "qu3.c5", 0x0000, 0x0800, CRC(6eb5a08d) SHA1(3bfec2c0fdd1d8e1b03a5c189d2f37e1a52d065b) )
+	ROM_LOAD("qu.c5",         0x0000, 0x0100, CRC(1fd535d0) SHA1(a9c9a72881d195a0de751f10fa54fb181523a33f) )
+	//ROM_LOAD( "qu2.c5",       0x0000, 0x0100, CRC(a88224ee) SHA1(cb85edcacc6001a9d865ef7e22711d6f62f1fdc1) )
+	//ROM_LOAD( "qu3.c5",       0x0000, 0x0800, CRC(6eb5a08d) SHA1(3bfec2c0fdd1d8e1b03a5c189d2f37e1a52d065b) )
 ROM_END
 
 ROM_START(r_flipper)
-	RECEL_BIOS
+	RECEL_BIOS_14
 
 	ROM_REGION( 0x0800, "module", ROMREGION_ERASEFF )
-	ROM_LOAD("fl.c5",   0x0000, 0x0800, CRC(76ee0370) SHA1(f2a835a0b76f7258d5e65390c239f5456e30e87a) )
+	ROM_LOAD("fl.c5",         0x0000, 0x0800, CRC(76ee0370) SHA1(f2a835a0b76f7258d5e65390c239f5456e30e87a) )
 ROM_END
 
 ROM_START(r_blackmag)
-	RECEL_BIOS
+	RECEL_BIOS_14
 
 	ROM_REGION( 0x0800, "module", ROMREGION_ERASEFF )
 	ROM_LOAD("bm_1065_1.bin", 0x0000, 0x0800, CRC(a917718c) SHA1(0b4fdf270560df902e95b34c25cca20e91f1071c) )
 ROM_END
 
 ROM_START(r_blackm4)
-	RECEL_BIOS
+	RECEL_BIOS_14
 
 	ROM_REGION( 0x0800, "module", ROMREGION_ERASEFF )
-	ROM_LOAD("b4.c5",   0x0000, 0x0800, CRC(cd383f5b) SHA1(c38acaae46e5fd2660efbd0e2d35e295892e60a5) )
+	ROM_LOAD("b4.c5",         0x0000, 0x0800, CRC(cd383f5b) SHA1(c38acaae46e5fd2660efbd0e2d35e295892e60a5) )
 ROM_END
 
 } // anonymous namespace
 
-GAME(1977,  recel,       0,       recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Recel BIOS",       MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING)
+GAME(1977,  recel13,    0,       recel, recel, recel_state, empty_init, ROT0, "Recel",     "Recel BIOS (for 1702)", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING)
+GAME(1977,  recel14,    0,       recel, recel, recel_state, empty_init, ROT0, "Recel",     "Recel BIOS (for 2716)", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING)
 
-GAME(1978,  r_alaska,    recel,   recel, recel,     recel_state, empty_init, ROT0, "Interflip", "Alaska",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1978,  r_hotcold,   recel,   recel, recel,     recel_state, empty_init, ROT0, "Inder",     "Hot & Cold",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1978,  r_screech,   recel,   recel, recel,     recel_state, empty_init, ROT0, "Inder",     "Screech",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1978,  r_mrevil,    recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Mr. Evil",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1978,  r_torneo,    recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Torneo",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1978,  r_crzyrace,  recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Crazy Race",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1978,  r_fairfght,  recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Fair Fight",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1978,  r_pokrplus,  recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Poker Plus",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1979,  r_mrdoom,    recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Mr. Doom",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1979,  r_cavalier,  recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Cavalier",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1979,  r_swash,     recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "SwashBuckler",     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1979,  r_quijote,   recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Don Quijote",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1980,  r_flipper,   recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "The Flipper Game", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1980,  r_blackmag,  recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Black Magic",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1980,  r_blackm4,   recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Black Magic 4",    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  r_alaska,   recel13, recel, recel, recel_state, empty_init, ROT0, "Interflip", "Alaska",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  r_hotcold,  recel13, recel, recel, recel_state, empty_init, ROT0, "Inder",     "Hot & Cold",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  r_screech,  recel13, recel, recel, recel_state, empty_init, ROT0, "Inder",     "Screech (1 player)",    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  r_screech4, recel14, recel, recel, recel_state, empty_init, ROT0, "Inder",     "Screech (4 players)",   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  r_mrevil,   recel13, recel, recel, recel_state, empty_init, ROT0, "Recel",     "Mr. Evil",              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  r_torneo,   recel13, recel, recel, recel_state, empty_init, ROT0, "Recel",     "Torneo",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  r_crzyrace, recel14, recel, recel, recel_state, empty_init, ROT0, "Recel",     "Crazy Race",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  r_fairfght, recel13, recel, recel, recel_state, empty_init, ROT0, "Recel",     "Fair Fight",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  r_pokrplus, recel13, recel, recel, recel_state, empty_init, ROT0, "Recel",     "Poker Plus",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979,  r_mrdoom,   recel13, recel, recel, recel_state, empty_init, ROT0, "Recel",     "Mr. Doom",              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979,  r_cavalier, recel13, recel, recel, recel_state, empty_init, ROT0, "Recel",     "Cavalier",              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979,  r_swash,    recel13, recel, recel, recel_state, empty_init, ROT0, "Recel",     "SwashBuckler",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979,  r_quijote,  recel13, recel, recel, recel_state, empty_init, ROT0, "Recel",     "Don Quijote",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  r_flipper,  recel14, recel, recel, recel_state, empty_init, ROT0, "Recel",     "The Flipper Game",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  r_blackmag, recel14, recel, recel, recel_state, empty_init, ROT0, "Recel",     "Black Magic",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  r_blackm4,  recel14, recel, recel, recel_state, empty_init, ROT0, "Recel",     "Black Magic 4",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

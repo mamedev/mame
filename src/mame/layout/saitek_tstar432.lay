@@ -356,8 +356,7 @@ license:CC0-1.0
 		<group ref="sb_board"><bounds x="4" y="3" width="80" height="80" /></group>
 		<group ref="sb_ui"><bounds x="-11" y="3" width="10" height="80" /></group>
 
-	<!-- chessboard coords (actually, real board does not have this, but I like having them around) -->
-
+		<!-- chessboard coords (actually, real board does not have this, but I like having them around) -->
 		<element ref="text_8"><bounds x="0.3" y="7"  width="2" height="2" /></element>
 		<element ref="text_7"><bounds x="0.3" y="17" width="2" height="2" /></element>
 		<element ref="text_6"><bounds x="0.3" y="27" width="2" height="2" /></element>
@@ -376,8 +375,7 @@ license:CC0-1.0
 		<element ref="text_g"><bounds x="68" y="85.0" width="2" height="2" /></element>
 		<element ref="text_h"><bounds x="78" y="85.0" width="2" height="2" /></element>
 
-	<!-- chessboard leds -->
-
+		<!-- chessboard leds -->
 		<element name="7.1" ref="ledr"><bounds x="2.4" y="7"  width="0.8" height="2" /></element>
 		<element name="6.1" ref="ledr"><bounds x="2.4" y="17" width="0.8" height="2" /></element>
 		<element name="5.1" ref="ledr"><bounds x="2.4" y="27" width="0.8" height="2" /></element>
@@ -396,8 +394,7 @@ license:CC0-1.0
 		<element name="6.0" ref="ledr"><bounds x="68" y="83.8" width="2" height="0.8" /></element>
 		<element name="7.0" ref="ledr"><bounds x="78" y="83.8" width="2" height="0.8" /></element>
 
-	<!-- right side leds -->
-
+		<!-- right side leds -->
 		<element name="9.0" ref="ledr"><bounds x="88" y="37" width="0.8" height="2" /></element>
 		<element name="9.1" ref="ledr"><bounds x="88" y="41" width="0.8" height="2" /></element>
 		<element name="9.2" ref="ledr"><bounds x="88" y="45" width="0.8" height="2" /></element>
@@ -432,8 +429,7 @@ license:CC0-1.0
 		<element ref="text_l5"><bounds x="89.5" y="77.2" width="6" height="1.5" /></element>
 		<element ref="text_l6"><bounds x="89.5" y="81.2" width="6" height="1.5" /></element>
 
-	<!-- right side buttons -->
-
+		<!-- right side buttons -->
 		<element ref="text_p1"><bounds x="99.5" y="36.3" width="3" height="3" /></element>
 		<element ref="text_p2"><bounds x="99.5" y="40.3" width="3" height="3" /></element>
 		<element ref="text_p3"><bounds x="99.5" y="44.3" width="3" height="3" /></element>

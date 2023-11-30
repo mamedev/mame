@@ -273,6 +273,11 @@ protected:
 	required_device<dac_bit_interface> m_dac;
 	optional_ioport_array<3> m_inputs;
 
+	bool m_rotate = true;
+	u8 m_select = 0;
+	u8 m_7seg_data = 0;
+	u8 m_led_data = 0;
+
 	// address maps
 	void eag_map(address_map &map);
 	void eagv7_map(address_map &map);
@@ -285,11 +290,6 @@ protected:
 	u8 input_r(offs_t offset);
 	void leds_w(offs_t offset, u8 data);
 	void digit_w(offs_t offset, u8 data);
-
-	bool m_rotate = true;
-	u8 m_select = 0;
-	u8 m_7seg_data = 0;
-	u8 m_led_data = 0;
 };
 
 void eag_state::machine_start()

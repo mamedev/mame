@@ -862,7 +862,7 @@ u16 swp30_device::lfo_step_pmod_r(offs_t offset)
 
 void swp30_device::lfo_step_pmod_w(offs_t offset, u16 data)
 {
-	//	logerror("lfo_step_pmod[%02x] = %04x\n", offset >> 6, data);
+	//  logerror("lfo_step_pmod[%02x] = %04x\n", offset >> 6, data);
 	m_lfo_step_pmod[offset >> 6] = data;
 }
 
@@ -873,7 +873,7 @@ u16 swp30_device::lfo_amod_r(offs_t offset)
 
 void swp30_device::lfo_amod_w(offs_t offset, u16 data)
 {
-	//	logerror("lfo_amod[%02x] = %04x\n", offset >> 6, data);
+	//  logerror("lfo_amod[%02x] = %04x\n", offset >> 6, data);
 	m_lfo_amod[offset >> 6] = data;
 }
 
@@ -1012,7 +1012,7 @@ template<int sel> u16 swp30_device::meg_lfo_r(offs_t offset)
 
 template<int sel> void swp30_device::meg_lfo_w(offs_t offset, u16 data)
 {
-	int slot = (offset >> 6)*2 + sel; 
+	int slot = (offset >> 6)*2 + sel;
 	m_meg_lfo[slot] = data;
 
 	static const int dt[8] = { 0, 32, 64, 128, 256, 512,  1024, 2048 };
@@ -1218,7 +1218,7 @@ void swp30_device::execute_run()
 				lfo_p_phase = lfo_a_phase = 0;
 
 				// First, read the sample
-		
+
 				// - Find the base sample index and base address
 				s32 sample_pos = m_sample_pos[chan];
 				if(m_sample_end[chan] & 0x80000000)
@@ -1226,7 +1226,7 @@ void swp30_device::execute_run()
 
 				s32 spos = sample_pos >> 8;
 				offs_t base_address = m_sample_address[chan] & 0x1ffffff;
-		
+
 				// - Read/decompress the sample
 				s16 val0, val1;
 				switch(m_sample_address[chan] >> 30) {
@@ -1452,7 +1452,7 @@ void swp30_device::execute_run()
 					else
 						m_decay2_done[chan] = fpstep(m_envelope_level[chan], (m_decay2[chan] & 0xff) << 20, m_global_step[(m_decay2[chan] >> 8) & 0x7f]);
 					break;
-					
+
 				case RELEASE:
 					if((m_release_glo[chan] & 0x6000) == 0x6000) {
 						if(fpstep(m_envelope_level[chan], 0x8000000, decay_linear_step[(m_release_glo[chan] >> 8) & 0x1f]))
@@ -1488,9 +1488,11 @@ void swp30_device::execute_run()
 				const std::array<u16, 3> &vol = m_mixer[mix].vol;
 
 				// It looks like this could be turned into something generic, but not 100% clear
+				// routes 000100010001, 000200020002 etc seem to target the melo ports
 				switch(route) {
 				case 0x000000000000:
-					// Incorrect, the program writes the outputs to m30/m31
+					// Incorrect, the program writes the outputs to
+					// m30/m31, but right now the program doesn't run.
 					m_meg_output[0] += meg_att(input, (vol[0] >> 8)   + (vol[1] >> 8));
 					m_meg_output[1] += meg_att(input, (vol[0] & 0xff) + (vol[1] >> 8));
 					break;
@@ -1549,7 +1551,7 @@ void swp30_device::execute_run()
 				}
 			}
 		}
-			
+
 		debugger_instruction_hook(m_meg_pc);
 		m_icount --;
 		m_meg_pc ++;

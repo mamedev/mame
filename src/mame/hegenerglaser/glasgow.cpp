@@ -73,13 +73,13 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<2> m_keys;
 
+	u8 m_kp_mux = 0;
+
 	void glasgow_mem(address_map &map);
 
 	void control_w(u8 data);
 	u8 keys_r();
 	void keys_w(u8 data);
-
-	u8 m_kp_mux = 0;
 };
 
 void glasgow_state::machine_start()

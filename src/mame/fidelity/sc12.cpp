@@ -103,14 +103,14 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport m_inputs;
 
+	u8 m_inp_mux = 0;
+
 	// address maps
 	void main_map(address_map &map);
 
 	// I/O handlers
 	void control_w(u8 data);
 	u8 input_r(offs_t offset);
-
-	u8 m_inp_mux = 0;
 };
 
 void sc12_state::machine_start()

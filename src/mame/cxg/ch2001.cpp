@@ -62,6 +62,9 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<2> m_inputs;
 
+	u16 m_inp_mux = 0;
+	int m_dac_data = 0;
+
 	// address maps
 	void main_map(address_map &map);
 
@@ -69,9 +72,6 @@ private:
 	void speaker_w(u8 data);
 	void leds_w(u8 data);
 	u8 input_r();
-
-	u16 m_inp_mux = 0;
-	int m_dac_data = 0;
 };
 
 void ch2001_state::machine_start()

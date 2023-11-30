@@ -88,6 +88,8 @@ private:
 	required_device<timer_device> m_disable_bootrom;
 	optional_ioport m_fake;
 
+	bool m_bootrom_enabled = false;
+
 	// address maps
 	void mmtm_2m_map(address_map &map);
 	void mmtm_8m_map(address_map &map);
@@ -97,7 +99,6 @@ private:
 
 	void install_bootrom(bool enable);
 	TIMER_DEVICE_CALLBACK_MEMBER(disable_bootrom) { install_bootrom(false); }
-	bool m_bootrom_enabled = false;
 
 	void set_cpu_freq();
 };
@@ -140,7 +141,7 @@ void mmtm_state::set_cpu_freq()
 	m_maincpu->set_unscaled_clock(xtal[val]);
 
 	// lcd busy flag timing problem when overclocked
-	subdevice<hd44780_device>("display:hd44780")->set_busy_factor((val > 1) ? 0.75 : 1.0);
+	subdevice<hd44780_device>("display:hd44780")->set_clock_scale((val > 1) ? 1.32 : 1.0);
 }
 
 

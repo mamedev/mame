@@ -200,6 +200,9 @@ dmv_keyboard_device::dmv_keyboard_device(const machine_config &mconfig, const ch
 	: device_t(mconfig, DMV_KEYBOARD, tag, owner, clock)
 	, m_maincpu(*this, "mcu")
 	, m_keyboard(*this, "COL.%u", 0)
+	, m_col(0)
+	, m_sd_data_state(0)
+	, m_sd_poll_state(0)
 {
 }
 

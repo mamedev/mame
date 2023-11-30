@@ -69,6 +69,10 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<2> m_inputs;
 
+	bool m_power = false;
+	u8 m_inp_mux = 0;
+	u8 m_led_data = 0;
+
 	// address maps
 	void main_map(address_map &map);
 
@@ -77,10 +81,6 @@ private:
 	void control_w(u8 data);
 	void leds_w(u8 data);
 	u8 input_r();
-
-	bool m_power = false;
-	u8 m_inp_mux = 0;
-	u8 m_led_data = 0;
 };
 
 void regence_state::machine_start()

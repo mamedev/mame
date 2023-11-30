@@ -809,7 +809,7 @@ void royalmah_prgbank_state::ichiban_map(address_map &map)
 {
 	map(0x0000, 0x6fff).rom().region("maincpu", 0x10000);
 	map(0x7000, 0x7fff).ram().share("nvram");
-	map(0x8000, 0xffff).bankr(m_mainbank); // TODO: proper range for banked ROM
+	map(0x8000, 0xffff).bankr(m_mainbank);
 	map(0x8000, 0xffff).writeonly().share(m_videoram);
 }
 
@@ -943,16 +943,16 @@ void royalmah_prgbank_state::mjsiyoub_iomap(address_map &map)
 	map(0x40, 0x49).w(FUNC(royalmah_prgbank_state::mjyarou_bank_w));
 }
 
-void royalmah_prgbank_state::ichiban_iomap(address_map &map) // TODO: writes to 0x12 and 0x14, probably code and palette banking
+void royalmah_prgbank_state::ichiban_iomap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x01, 0x01).r("aysnd", FUNC(ym2149_device::data_r));
 	map(0x02, 0x03).w("aysnd", FUNC(ym2149_device::data_address_w));
 	map(0x10, 0x10).portr("DSW-A").w(FUNC(royalmah_prgbank_state::mjderngr_coin_w));
 	map(0x11, 0x11).portr("SYSTEM").w(FUNC(royalmah_prgbank_state::input_port_select_w));
-	map(0x12, 0x12).portr("DSW-B").nopw();
+	map(0x12, 0x12).portr("DSW-B").lw8(NAME([this] (uint8_t data) { m_mainbank->set_entry(data); })); // TODO: only seems to write 0x00, 0x01, 0x02 and 0x04. How does the banking really work?
 	map(0x13, 0x13).portr("DSW-C");
-	map(0x14, 0x14).portr("DSW-D").nopw();
+	map(0x14, 0x14).portr("DSW-D").lw8(NAME([this] (uint8_t data) { m_palette_base = data & 0x1f; })); // TODO: also uses bits 5 and 6
 	map(0x16, 0x17).w("ymsnd", FUNC(ym2413_device::write));
 }
 
@@ -5772,11 +5772,26 @@ HSync - 15.510kHz
 
 ***************************************************************************/
 
-ROM_START( ichiban )
+ROM_START( ichiban ) // TODO: how does the banking work?
 	ROM_REGION( 0x60000, "maincpu", 0 ) // opcodes in first half are mixed with pseudo-random garbage
 	ROM_LOAD( "3.u15", 0x00000, 0x20000, CRC(76240568) SHA1(cf055d1eaae25661a49ec4722a2c7caca862e66a) )
-	ROM_LOAD( "2.u14", 0x20000, 0x20000, CRC(b4834d8e) SHA1(836ddf7586dc5440faf88f5ec50a32265e9a0ec8) )
-	ROM_LOAD( "1.u28", 0x40000, 0x20000, CRC(2caa4d3f) SHA1(5e5af164880140b764c097a65388c22ba5ea572b) ) // ?
+	ROM_LOAD( "1.u28", 0x20000, 0x08000, CRC(2caa4d3f) SHA1(5e5af164880140b764c097a65388c22ba5ea572b) ) // bank 2 (title screen)
+	ROM_IGNORE(0x18000)
+	ROM_LOAD( "2.u14", 0x30000, 0x08000, CRC(b4834d8e) SHA1(836ddf7586dc5440faf88f5ec50a32265e9a0ec8) ) // bank 4 (mahjong tiles)
+	ROM_IGNORE(0x18000)
+
+	// 1.u28
+	// 1st 0x8000 contain title screen
+	// 2nd 0x8000 contain paytable
+	// 3rd 0x8000 contain in-game background
+	// 4th 0x8000 contain double up screen
+
+	// 2.u14
+	// 1st 0x8000 contain mahjong tiles (resulting in bad GFX for player's hand' tiles)
+	// 2nd 0x8000 contain mahjong tiles
+	// 3rd 0x8000 contain reels?
+	// 4th 0x8000 empty
+
 
 	ROM_REGION( 0x600, "proms", 0 )
 	ROM_LOAD( "mjr.u36", 0x000, 0x200, CRC(31cd7a90) SHA1(1525ad19d748561a52626e4ab13df67d9bedf3b8) )
@@ -5979,7 +5994,7 @@ void royalmah_prgbank_state::init_chalgirl()
 void royalmah_prgbank_state::init_ichiban()
 {
 	// TODO: work out banking
-	m_mainbank->configure_entry(0, memregion("maincpu")->base() + 0x18000);
+	m_mainbank->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x8000);
 }
 
 void royalmah_prgbank_state::init_pongboo2()
@@ -6031,7 +6046,7 @@ GAME( 1991,  mjvegasa, 0,        mjvegasa, mjvegasa, royalmah_prgbank_state, ini
 GAME( 1991,  mjvegas,  mjvegasa, mjvegas,  mjvegasa, royalmah_prgbank_state, init_mjvegas,  ROT0,   "Dynax",                      "Mahjong Vegas (Japan)",                 0 )
 GAME( 1992,  cafetime, 0,        cafetime, cafetime, royalmah_prgbank_state, init_cafetime, ROT0,   "Dynax",                      "Mahjong Cafe Time",                     0 )
 GAME( 1993,  cafedoll, 0,        cafedoll, cafetime, royalmah_prgbank_state, init_cafedoll, ROT0,   "Dynax",                      "Mahjong Cafe Doll (Japan, Ver. 1.00)",  MACHINE_NOT_WORKING ) // needs correct banking implementation (P3 seems to be used differently)
-GAME( 1993,  ichiban,  0,        ichiban,  ichiban,  royalmah_prgbank_state, init_ichiban,  ROT0,   "Excel",                      "Ichi Ban Jyan",                         MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND ) // should just need correct palette and ROM banking
+GAME( 1993,  ichiban,  0,        ichiban,  ichiban,  royalmah_prgbank_state, init_ichiban,  ROT0,   "Excel",                      "Ichi Ban Jyan",                         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // ROM banking is wrong, causing several GFX problems
 GAME( 1995,  mjtensin, 0,        mjtensin, mjtensin, royalmah_prgbank_state, init_mjtensin, ROT0,   "Dynax",                      "Mahjong Tensinhai (Japan)",             MACHINE_NOT_WORKING )
 GAME( 1996,  janptr96, 0,        janptr96, janptr96, royalmah_prgbank_state, init_janptr96, ROT0,   "Dynax",                      "Janputer '96 (Japan)",                  0 )
 GAME( 1997,  janptrsp, 0,        janptr96, janptr96, royalmah_prgbank_state, init_janptr96, ROT0,   "Dynax",                      "Janputer Special (Japan)",              0 )

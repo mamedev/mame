@@ -228,14 +228,15 @@ private:
 	optional_device<dac_bit_interface> m_dac;
 	required_ioport_array<8> m_inputs;
 
+	u32 m_barcode = 0;
+	u16 m_vfd_data = 0;
+	u8 m_inp_mux = 0;
+
 	// address maps
 	void main_map(address_map &map);
 	void main_io(address_map &map);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(barcode_shift) { m_barcode >>= 1; }
-	u32 m_barcode = 0;
-	u16 m_vfd_data = 0;
-	u8 m_inp_mux = 0;
 
 	// I/O handlers
 	void update_display();

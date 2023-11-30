@@ -94,6 +94,11 @@ private:
 	required_ioport_array<8+1> m_inputs;
 	output_finder<16, 34> m_out_lcd;
 
+	int m_ack_state = 0;
+	int m_rts_state = 0;
+	u8 m_inp_mux = 0;
+	u8 m_led_data[2] = { };
+
 	void main_map(address_map &map);
 
 	void lcd_pwm_w(offs_t offset, u8 data);
@@ -113,11 +118,6 @@ private:
 	void p5_w(u8 data);
 	u8 p6_r();
 	void p6_w(u8 data);
-
-	int m_ack_state = 0;
-	int m_rts_state = 0;
-	u8 m_inp_mux = 0;
-	u8 m_led_data[2] = { };
 };
 
 void ren_state::machine_start()

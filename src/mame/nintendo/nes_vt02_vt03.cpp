@@ -1498,7 +1498,7 @@ CONS( 2004, vsmaxxvd,  0,  0,  nes_vt_vh2009_8mb,        nes_vt, nes_vt_swap_op_
 CONS( 200?, vsmaxx77,  0,  0,  nes_vt_vh2009_8mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Senario / JungleTac",   "Vs Maxx Wireless 77-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 200?, joysti30,  0,  0,  nes_vt_vh2009_4mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "WinFun / JungleTac",    "Joystick 30", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // doesn't show WinFun onscreen, but packaging does
 
-// has no audio, is there extra hardware, or is it just using unemulated VT features?	
+// has no audio, is there extra hardware, or is it just using unemulated VT features?
 CONS( 2005, lxnoddy,   0,  0,  nes_vt_vh2009_pal_2mb,        lxnoddy, nes_vt_swap_op_d5_d6_state, empty_init, "Lexibook",   "Noddy's TV Console", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
 
 

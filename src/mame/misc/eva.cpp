@@ -86,11 +86,11 @@ private:
 	// devices
 	required_device<cop420_cpu_device> m_maincpu;
 
+	u8 m_g = 0;
+
 	u8 read_g();
 	void write_g(u8 data);
 	void write_d(u8 data);
-
-	u8 m_g = 0;
 };
 
 void eva24_state::machine_start()

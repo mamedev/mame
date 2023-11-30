@@ -54,12 +54,12 @@ void teradrive_state::at_softlists(machine_config &config)
 {
 	SOFTWARE_LIST(config, "pc_disk_list").set_original("ibm5150");
 	SOFTWARE_LIST(config, "at_disk_list").set_original("ibm5170");
-//	SOFTWARE_LIST(config, "at_cdrom_list").set_original("ibm5170_cdrom");
+//  SOFTWARE_LIST(config, "at_cdrom_list").set_original("ibm5170_cdrom");
 	SOFTWARE_LIST(config, "at_hdd_list").set_original("ibm5170_hdd");
 	SOFTWARE_LIST(config, "midi_disk_list").set_compatible("midi_flop");
 
-//	TODO: MD portion
-//	TODO: Teradrive SW list
+//  TODO: MD portion
+//  TODO: Teradrive SW list
 }
 
 void teradrive_state::teradrive_map(address_map &map)

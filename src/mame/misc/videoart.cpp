@@ -76,6 +76,16 @@ private:
 	required_ioport_array<4> m_inputs;
 	output_finder<> m_led;
 
+	u8 m_porta = 0xff;
+	u8 m_portb = 0xff;
+	u8 m_portc = 0xff;
+	u8 m_efdata = 0xff;
+	u8 m_romlatch = 0;
+	u8 m_ccount = 0;
+	u8 m_command = 0;
+	u8 m_pixel_offset = 0;
+	u8 m_vramdata = 0;
+
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline) { m_ef9367->update_scanline(param); }
@@ -92,16 +102,6 @@ private:
 	void portb_w(u8 data);
 	void portc_w(u8 data);
 	u8 portd_r();
-
-	u8 m_porta = 0xff;
-	u8 m_portb = 0xff;
-	u8 m_portc = 0xff;
-	u8 m_efdata = 0xff;
-	u8 m_romlatch = 0;
-	u8 m_ccount = 0;
-	u8 m_command = 0;
-	u8 m_pixel_offset = 0;
-	u8 m_vramdata = 0;
 };
 
 

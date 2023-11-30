@@ -140,6 +140,8 @@ private:
 	required_device<timer_device> m_bav_busy;
 	optional_ioport m_fake;
 
+	u8 m_bav_data = 0;
+
 	// address maps
 	void alm16_mem(address_map &map);
 	void alm32_mem(address_map &map);
@@ -160,8 +162,6 @@ private:
 
 	u8 spawn_cb(offs_t offset);
 	void set_sbtype(ioport_value newval);
-
-	u8 m_bav_data = 0;
 };
 
 void mmodular_state::machine_start()

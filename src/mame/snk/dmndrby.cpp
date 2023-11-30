@@ -946,7 +946,7 @@ ROM_END
 } // anonymous namespace
 
 
-//    YEAR, NAME,      PARENT,  MACHINE,  INPUT,    STATE,         INIT,       MONITOR, COMPANY,                    FULLNAME                                  FLAGS
 GAME( 1994, dmndrby,   0,       dderby,   dderby,   dmndrby_state, empty_init, ROT0,    "Electrocoin",              "Diamond Derby (Win bet, newer)",                  MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hack?
 GAME( 1986, dmndrbya,  dmndrby, dderby,   dderbya,  dmndrby_state, empty_init, ROT0,    "Electrocoin",              "Diamond Derby (Win bet, original)",               MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, dmndrbybl, dmndrby, dderby,   dderbybl, dmndrby_quinella_state, empty_init, ROT0,    "bootleg (EDG Impeuropex)", "Diamond Derby (Quinella bet, EDG Impeuropex bootleg)", MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+// Original Japanese Quinella version known to exist, cfr. flyer, published by Tsumara Ltd. (SNK spin-off?)

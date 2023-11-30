@@ -101,6 +101,13 @@ private:
 	required_ioport_array<7+2> m_inputs;
 	output_finder<3, 8, 34> m_out_x;
 
+	u8 m_dac_data = 0;
+	u8 m_lcd_lcd = 0;
+	u8 m_lcd_rowsel = 0;
+	u8 m_cb_mux = 0;
+
+	emu_timer *m_irqtimer = nullptr;
+
 	// address maps
 	void mark5_map(address_map &map);
 	void mark6_map(address_map &map);
@@ -121,12 +128,6 @@ private:
 	template<int N> void pwm_output_w(offs_t offset, u8 data);
 	template<int N> void lcd_output_w(u64 data);
 
-	u8 m_dac_data = 0;
-	u8 m_lcd_lcd = 0;
-	u8 m_lcd_rowsel = 0;
-	u8 m_cb_mux = 0;
-
-	emu_timer *m_irqtimer = nullptr;
 	TIMER_CALLBACK_MEMBER(interrupt);
 	void write_lcd(int state);
 };

@@ -216,16 +216,16 @@ protected:
 	required_ioport_array<10> m_inputs;
 	output_finder<> m_power_on;
 
+	u8 *m_cart_base = nullptr;
+	u16 m_o = 0;
+	u32 m_r = 0;
+
 	void power_off();
 	virtual u8 read_k();
 	void write_o(u16 data);
 	void write_r(u32 data);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
-
-	u8 *m_cart_base = nullptr;
-	u16 m_o = 0;
-	u32 m_r = 0;
 };
 
 void snspellc_state::machine_start()
@@ -263,10 +263,10 @@ private:
 	optional_ioport m_overlay_inp;
 	output_finder<5> m_overlay_out;
 
+	u8 m_overlay_code = 0;
+
 	u8 get_hexchar(const char c);
 	TIMER_DEVICE_CALLBACK_MEMBER(get_overlay);
-
-	u8 m_overlay_code = 0;
 };
 
 void tntell_state::machine_start()

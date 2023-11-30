@@ -88,6 +88,8 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<2> m_inputs;
 
+	u8 m_inp_mux = 0;
+
 	// address maps
 	void sstar28k_map(address_map &map);
 	void tstar432_map(address_map &map);
@@ -95,8 +97,6 @@ private:
 	// I/O handlers
 	void control_w(u8 data);
 	u8 input_r();
-
-	u8 m_inp_mux = 0;
 };
 
 void star_state::machine_start()
@@ -198,10 +198,10 @@ INPUT_PORTS_END
 void star_state::sstar28k(machine_config &config)
 {
 	// basic machine hardware
-	M6502(config, m_maincpu, 2000000); // no XTAL
+	M6502(config, m_maincpu, 2'000'000); // no XTAL
 	m_maincpu->set_addrmap(AS_PROGRAM, &star_state::sstar28k_map);
 
-	const attotime nmi_period = attotime::from_hz(2000000 / 0x2000); // 4020 Q13
+	const attotime nmi_period = attotime::from_hz(2'000'000 / 0x2000); // 4020 Q13
 	m_maincpu->set_periodic_int(FUNC(star_state::nmi_line_pulse), nmi_period);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);

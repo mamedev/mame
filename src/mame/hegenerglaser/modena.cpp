@@ -62,15 +62,15 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport m_keys;
 
+	u8 m_board_mux = 0;
+	u8 m_io_ctrl = 0;
+
 	void modena_mem(address_map &map);
 
 	u8 input_r();
 	void io_w(u8 data);
 	void led_w(u8 data);
 	void update_display();
-
-	u8 m_board_mux = 0;
-	u8 m_io_ctrl = 0;
 };
 
 void modena_state::machine_start()
