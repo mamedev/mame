@@ -107,9 +107,11 @@ uint32_t xtensa_device::extreg_intenable_r() { logerror("m_extreg_intenable read
 void xtensa_device::extreg_intenable_w(u32 data) { m_extreg_intenable = data; logerror("m_extreg_intenable set to %08x\n", data); }
 uint32_t xtensa_device::extreg_intclr_r() { logerror("m_extreg_intclr read\n"); return m_extreg_intclr; }
 void xtensa_device::extreg_intclr_w(u32 data) { m_extreg_intclr = data; logerror("m_extreg_intclr set to %08x\n", data); }
+uint32_t xtensa_device::extreg_intset_r() { logerror("m_extreg_intset read\n"); return 0x8; /*m_extreg_intset;*/ }
+void xtensa_device::extreg_intset_w(u32 data) { m_extreg_intset = data; logerror("m_extreg_intset set to %08x\n", data); }
 uint32_t xtensa_device::extreg_ccount_r() { logerror("m_extreg_ccount read\n"); return machine().rand(); /* m_extreg_ccount;*/ }
 void xtensa_device::extreg_ccount_w(u32 data) { m_extreg_ccount = data; logerror("m_extreg_ccount set to %08x\n", data); }
-uint32_t xtensa_device::extreg_exccause_r() { logerror("m_extreg_exccause read\n"); return m_extreg_exccause; }
+uint32_t xtensa_device::extreg_exccause_r() { logerror("m_extreg_exccause read\n"); return 0x4; /* m_extreg_exccause;*/ }
 void xtensa_device::extreg_exccause_w(u32 data) { m_extreg_exccause = data; logerror("m_extreg_exccause set to %08x\n", data); }
 
 uint32_t xtensa_device::extreg_sar_r() { logerror("m_extreg_sar read\n"); return m_extreg_sar; }
@@ -239,7 +241,7 @@ void xtensa_device::ext_regs(address_map &map)
 	//map(0xe0, 0xe0) // "cpenable", 
 
 	// Interrupt Option (226-228)
-	//map(0xe2, 0xe2) // "intset", 
+	map(0xe2, 0xe2).rw(FUNC(xtensa_device::extreg_intset_r), FUNC(xtensa_device::extreg_intset_w)); // "intset"
 	map(0xe3, 0xe3).rw(FUNC(xtensa_device::extreg_intclr_r), FUNC(xtensa_device::extreg_intclr_w)); // "intclr"
 	map(0xe4, 0xe4).rw(FUNC(xtensa_device::extreg_intenable_r), FUNC(xtensa_device::extreg_intenable_w)); // "intenable"
 
@@ -616,10 +618,28 @@ void xtensa_device::getop_and_execute()
 
 						switch (level)
 						{
+						case 2:
+							LOGMASKED(LOG_HANDLED_OPS, "%-8s%d\n", "rfi", 2);
+							m_extreg_ps = m_extreg_eps2;
+							m_nextpc = m_extreg_epc2;
+							break;
+
 						case 3:
 							LOGMASKED(LOG_HANDLED_OPS, "%-8s%d\n", "rfi", 3);
 							m_extreg_ps = m_extreg_eps3;
 							m_nextpc = m_extreg_epc3;
+							break;
+
+						case 4:
+							LOGMASKED(LOG_HANDLED_OPS, "%-8s%d\n", "rfi", 4);
+							m_extreg_ps = m_extreg_eps4;
+							m_nextpc = m_extreg_epc4;
+							break;
+
+						case 5:
+							LOGMASKED(LOG_HANDLED_OPS, "%-8s%d\n", "rfi", 5);
+							m_extreg_ps = m_extreg_eps5;
+							m_nextpc = m_extreg_epc5;
 							break;
 
 						default:
@@ -2149,18 +2169,43 @@ void xtensa_device::getop_and_execute()
 }
 void xtensa_device::check_interrupts()
 {
+	int intlevel = (machine().rand() & 1) ? 3 : 2;
+
 	if (m_extreg_intenable == 0x16)
 	{
 		if (m_irq_req_hack == 1)
 		{
 			m_irq_req_hack = 0;
-			m_extreg_eps3 = m_extreg_ps;
-			m_extreg_epc3 = m_nextpc;
 
-			m_pc = 0x2c0001b4; // high priority interrupt 3 code is here in RAM, not sure what points to it yet
+			if (intlevel == 2)
+			{
+				m_extreg_eps2 = m_extreg_ps;
+				m_extreg_epc2 = m_nextpc;
+				m_pc = 0x2c0001a4; // high priority interrupt 2 code is here in RAM, checks intset reg for 1 or 8, 1 does something with ccount and loops, 8 checks 2c00001c for a pointer, it is blank by default
+			}
+			else if (intlevel == 3)
+			{
+				m_extreg_eps3 = m_extreg_ps;
+				m_extreg_epc3 = m_nextpc;
+				m_pc = 0x2c0001b4; // high priority interrupt 3 code is here in RAM, not sure what points to it yet, needed to get out of first wait loop
+			}
+			else if (intlevel == 4)
+			{
+				m_extreg_eps4 = m_extreg_ps;
+				m_extreg_epc4 = m_nextpc;
+				m_pc = 0x2c0001c4; // high priority interrupt 4 code is here in RAM, not sure what points to it yet (no payload by default, reads a pointer from 2c00002c which is 0, so doesn't jump to it)
+			}
+			else if (intlevel == 5)
+			{
+				m_extreg_eps5 = m_extreg_ps;
+				m_extreg_epc5 = m_nextpc;
+				m_pc = 0x2c0001d4; // high priority interrupt 5 code is here in RAM, not sure what points to it yet, points back to ROM where there is an infinite loop!
+			}
 		}
 	}
 }
+
+
 
 void xtensa_device::irq_request_hack()
 {

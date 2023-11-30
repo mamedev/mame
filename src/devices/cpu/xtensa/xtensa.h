@@ -116,6 +116,8 @@ private:
 	void extreg_intenable_w(u32 data);
 	uint32_t extreg_intclr_r();
 	void extreg_intclr_w(u32 data);
+	uint32_t extreg_intset_r();
+	void extreg_intset_w(u32 data);
 	uint32_t extreg_ccount_r();
 	void extreg_ccount_w(u32 data);
 	uint32_t extreg_exccause_r();
@@ -183,6 +185,7 @@ private:
 	u32 m_extreg_ccompare0;
 	u32 m_extreg_intenable;
 	u32 m_extreg_intclr;
+	u32 m_extreg_intset;
 	u32 m_extreg_ccount;
 	u32 m_extreg_exccause;
 	u32 m_nextpc;
