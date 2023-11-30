@@ -302,7 +302,7 @@ offs_t xtensa_disassembler::disassemble(std::ostream &stream, offs_t pc, const x
 			switch (BIT(inst, 20, 4))
 			{
 			case 0b0000: case 0b0001: // SLLI (shift count is 1..31)
-				util::stream_format(stream, "%-8sa%d, a%d, %d", "slli", BIT(inst, 12, 4), BIT(inst, 4, 4), 32 - (BIT(inst, 8, 4) + (BIT(inst, 20) ? 16 : 0)));
+				util::stream_format(stream, "%-8sa%d, a%d, %d", "slli", BIT(inst, 12, 4), BIT(inst, 8, 4), 32 - (BIT(inst, 4, 4) + (BIT(inst, 20) ? 16 : 0)));
 				break;
 
 			case 0b0010: case 0b0011: // SRAI (shift count is 0..31)

@@ -739,8 +739,8 @@ void xtensa_device::getop_and_execute()
 			case 0b0000: case 0b0001: // SLLI (shift count is 1..31) - Shift Left Logical Immediate
 			{
 				u8 dstreg = BIT(inst, 12, 4);
-				u8 srcreg = BIT(inst, 4, 4);
-				u16 shift = 32 - (BIT(inst, 8, 4) + (BIT(inst, 20) ? 16 : 0));
+				u8 srcreg = BIT(inst, 8, 4);
+				u16 shift = 32 - (BIT(inst, 4, 4) + (BIT(inst, 20) ? 16 : 0));
 				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, %d\n", "slli", dstreg, srcreg, shift);
 
 				if (shift == 32)
