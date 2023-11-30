@@ -60,6 +60,7 @@ private:
 
 	void mem_map(address_map &map);
 
+	uint32_t poems_rand_r();
 	uint32_t poems_8000038_r();
 	uint32_t poems_8020020_r();
 	uint32_t poems_800aa04_r();
@@ -98,6 +99,11 @@ uint32_t hudson_poems_state::screen_update(screen_device &screen, bitmap_rgb32 &
 uint32_t hudson_poems_state::poems_8020020_r()
 {
 	return 0xffffffff;
+}
+
+uint32_t hudson_poems_state::poems_rand_r()
+{
+	return machine().rand();;
 }
 
 uint32_t hudson_poems_state::poems_8000038_r()
@@ -166,6 +172,10 @@ void hudson_poems_state::mem_map(address_map &map)
 	map(0x0800b000, 0x0800b003).w(FUNC(hudson_poems_state::unktable_w)); // writes a table of increasing 16-bit values here
 	map(0x0800b004, 0x0800b007).w(FUNC(hudson_poems_state::unktable_reset_w));
 
+	map(0x08020008, 0x0802000b).r(FUNC(hudson_poems_state::poems_rand_r));
+	//map(0x08020010, 0x08020013).r(FUNC(hudson_poems_state::poems_rand_r));
+	map(0x08020014, 0x08020017).r(FUNC(hudson_poems_state::poems_rand_r));
+	map(0x08020018, 0x0802001b).r(FUNC(hudson_poems_state::poems_rand_r));
 	map(0x08020020, 0x08020023).r(FUNC(hudson_poems_state::poems_8020020_r));
 
 	map(0x2c000000, 0x2c7fffff).ram();

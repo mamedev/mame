@@ -107,7 +107,7 @@ uint32_t xtensa_device::extreg_intenable_r() { logerror("m_extreg_intenable read
 void xtensa_device::extreg_intenable_w(u32 data) { m_extreg_intenable = data; logerror("m_extreg_intenable set to %08x\n", data); }
 uint32_t xtensa_device::extreg_intclr_r() { logerror("m_extreg_intclr read\n"); return m_extreg_intclr; }
 void xtensa_device::extreg_intclr_w(u32 data) { m_extreg_intclr = data; logerror("m_extreg_intclr set to %08x\n", data); }
-uint32_t xtensa_device::extreg_intset_r() { logerror("m_extreg_intset read\n"); return 0x8; /*m_extreg_intset;*/ }
+uint32_t xtensa_device::extreg_intset_r() { logerror("m_extreg_intset read\n"); return 0x4; /*0x8;*/ /*m_extreg_intset;*/ }
 void xtensa_device::extreg_intset_w(u32 data) { m_extreg_intset = data; logerror("m_extreg_intset set to %08x\n", data); }
 uint32_t xtensa_device::extreg_ccount_r() { logerror("m_extreg_ccount read\n"); return machine().rand(); /* m_extreg_ccount;*/ }
 void xtensa_device::extreg_ccount_w(u32 data) { m_extreg_ccount = data; logerror("m_extreg_ccount set to %08x\n", data); }
@@ -299,8 +299,8 @@ void xtensa_device::device_start()
 	state_add(XTENSA_PC, "PC", m_pc);
 	state_add(STATE_GENPC, "GENPC", m_pc);
 	state_add(STATE_GENPCBASE, "CURPC", m_pc);
-	state_add(XTENSA_WINDOW, "WinBase", m_extreg_windowbase);
-
+	state_add(XTENSA_WINDOW, "WinBase", m_extreg_windowbase);	
+	state_add(XTENSA_INTENABLE, "IntEnable", m_extreg_intenable);
 	state_add(XTENSA_LOOPBEGIN, "LoopBegin", m_extreg_lbeg);
 	state_add(XTENSA_LOOPEND, "LoopEnd", m_extreg_lend);
 	state_add(XTENSA_LOOPCOUNT, "LoopCount", m_extreg_lcount);
@@ -587,8 +587,11 @@ void xtensa_device::getop_and_execute()
 						switch (BIT(inst, 8, 4))
 						{
 						case 0b0000: // RFE (with Exception Option)
-							LOGMASKED(LOG_UNHANDLED_OPS, "rfe\n");
+						{
+							LOGMASKED(LOG_HANDLED_OPS, "rfe\n");
+							m_nextpc = m_extreg_epc1;
 							break;
+						}
 
 						case 0b0001: // RFUE (with Exception Option; XEA1 only)
 							LOGMASKED(LOG_UNHANDLED_OPS, "rfue\n");
@@ -2169,15 +2172,33 @@ void xtensa_device::getop_and_execute()
 }
 void xtensa_device::check_interrupts()
 {
-	int intlevel = (machine().rand() & 1) ? 3 : 2;
+	int intlevel = 3;// : 1;
 
-	if (m_extreg_intenable == 0x16)
+	if (m_extreg_intenable &= 0x16)
 	{
 		if (m_irq_req_hack == 1)
 		{
 			m_irq_req_hack = 0;
 
-			if (intlevel == 2)
+			// 0x2c000000 is a register window exception (4)
+			// 0x2c000040 is a register window exception (4)
+
+			// 0x2c000080 is a register window exception (8)
+			// 0x2c0000c0 is a register window exception (8)
+
+			// 0x2c000100 is a register window exception (12)
+			// 0x2c000140 is a register window exception (12)
+
+			// 0x2c000184 seems to be for an exception instead (although still uses high priority restore register 2) - reads exccause
+			//            and checks intset for 2 or 4
+			// 0x2c000194 is identical to 184
+
+			if (intlevel == 1)
+			{
+				m_extreg_epc1 = m_nextpc;
+				m_pc = 0x2c000194;
+			}
+			else if (intlevel == 2)
 			{
 				m_extreg_eps2 = m_extreg_ps;
 				m_extreg_epc2 = m_nextpc;
