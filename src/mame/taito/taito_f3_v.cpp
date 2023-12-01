@@ -2749,64 +2749,86 @@ inline void taito_f3_state::f3_drawgfx(bitmap_rgb32 &dest_bmp, const rectangle &
 
 void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 {
-	const auto calc_zoom = [](u16 &addition, u8 &addition_left, u8 block_zoom)
+	struct sprite_axis
 	{
-		addition = 0x100 - block_zoom + addition_left;
-		addition_left = addition & 0xf;
-		addition = addition >> 4;
-		// zoom = addition << 12;
+		u16 addition = 16;
+		u8 addition_left = 8;
+		u8 block_zoom = 0;
+		s16 pos = 0, block_pos = 0, global = 0, subglobal = 0;
+		void calc_zoom()
+		{
+			addition = 0x100 - block_zoom + addition_left;
+			addition_left = addition & 0xf;
+			addition = addition >> 4;
+			// zoom = addition << 12;
+		};
+		void update(u8 scroll, u16 posw, bool lock, u8 block_ctrl, u8 new_zoom)
+		{
+			s16 new_pos = util::sext(posw, 12);
+			// set scroll offsets
+			if (BIT(scroll, 0))
+				subglobal = new_pos;
+			if (BIT(scroll, 1))
+				global = new_pos;
+			// add scroll offsets
+			if (!BIT(scroll, 2))
+				new_pos += subglobal;
+			if (!BIT(scroll, 3))
+				new_pos += global;
+		
+			switch (block_ctrl)
+			{
+			case 0b00:
+				if (!lock)
+				{
+					block_pos = new_pos;
+					block_zoom = new_zoom;
+				}
+				[[fallthrough]];
+			case 0b10:
+				pos = block_pos;
+				addition_left = 8;
+				calc_zoom();
+				break;
+			case 0b11:
+				pos += addition;
+				calc_zoom();
+			}
+		};
 	};
-
+	sprite_axis x, y;
+	u8 color = 0;
+	//bool multi = false;
+	
 	const rectangle &visarea = m_screen->visible_area();
-	const int min_x = visarea.min_x, max_x = visarea.max_x;
-	const int min_y = visarea.min_y, max_y = visarea.max_y;
-	s16 global_x = 0, global_y = 0, subglobal_x = 0, subglobal_y = 0; // 12-bit signed values, extended to 16 bits
-	s16 block_x = 0, block_y = 0;
-	s16 last_x = 0, last_y = 0;
-	u8 block_zoom_x = 0, block_zoom_y = 0;
-	s16 this_x, this_y; // 12-bit signed values, extended to 16 bits
-	u16 y_addition = 16, x_addition = 16;
-	bool multi = false;
-
-	u8 x_addition_left = 8, y_addition_left = 8;
-
+	
 	tempsprite *sprite_ptr = &m_spritelist[0];
-
 	int total_sprites = 0;
-
-	u8 color = 0, last_color = 0;
-	bool flipx = 0, flipy = 0;
-	//int old_x = 0;
-	s16 y = 0, x = 0;
-
 	u16 sprite_top = 0x2000;
 	for (int offs = 0; offs < sprite_top && (total_sprites < 0x400); offs += 8)
 	{
-		const int current_offs = offs; /* Offs can change during loop, current_offs cannot */
+		const u16 *spr = &spriteram16_ptr[offs];
 
 		/* Check if the sprite list jump command bit is set */
-		if ((spriteram16_ptr[current_offs + 6 + 0]) & 0x8000)
+		if (BIT(spr[6], 15))
 		{
-			const u32 jump = (spriteram16_ptr[current_offs + 6 + 0]) & 0x3ff;
-
-			const u32 new_offs = ((offs & 0x4000) | ((jump << 4) / 2));
-			if (new_offs == offs)
+			const u32 new_offs = ((BIT(spr[6], 0, 10) << 4) / 2) | (offs & 0x4000);
+			if (new_offs == offs) // could this be ≤ ?
 				break;
-			offs = new_offs - 8;
+			offs = new_offs - 8; // subtract because we increment in the for loop
 		}
 
 		/* Check if special command bit is set */
-		if (spriteram16_ptr[current_offs + 2 + 1] & 0x8000)
+		if (BIT(spr[3], 15))
 		{
-			const u16 cntrl = spriteram16_ptr[current_offs + 4 + 1];
-			m_flipscreen = cntrl & 0x2000;
+			u16 cntrl = spr[5];
+			m_flipscreen = BIT(cntrl, 13);
 
-			/*  cntrl & 0x1000 = disabled?  (From F2 driver, doesn't seem used anywhere)
-			    cntrl & 0x0010 = ???
-			    cntrl & 0x0020 = ???
-			    cntrl & 0x0002 = enabled when Darius Gaiden sprite trail effect should occur (MT #1922)
-			                     Notice that sprites also completely disappear due of a bug/missing feature in the
-			             alpha routines.
+			/*  cntrl bit 12(0x1000) = disabled?  (From F2 driver, doesn't seem used anywhere)
+			    cntrl bit 4 (0x0010) = ???
+			    cntrl bit 5 (0x0020) = ???
+			    cntrl bit 1 (0x0002) = enabled when Darius Gaiden sprite trail effect should occur (MT #1922)
+			                     Notice that sprites also completely disappear due of a bug/missing feature in the alpha routines.
 			*/
 			// 0x0001 - bank select
 			// 0x0002 - ?sprites trail/don't unblit?
@@ -2826,233 +2848,50 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 				logerror("unknown spriteram ctrl bits: %04x at %06x\n",
 						 cntrl & 0xdcfc, 0x600000 + current_offs + 4 + 1);
 
-			m_sprite_extra_planes = (cntrl & 0x0300) >> 8;   // 0 = 4bpp, 1 = 5bpp, 2 = unused?, 3 = 6bpp
+			m_sprite_extra_planes = BIT(cntrl, 8, 2);   // 00 = 4bpp, 01 = 5bpp, 10 = unused?, 11 = 6bpp
 			m_sprite_pen_mask = (m_sprite_extra_planes << 4) | 0x0f;
 
 			/* Sprite bank select */
-			if (cntrl & 1)
+			if (BIT(cntrl, 0))
 			{
-				offs = offs | 0x4000;
-				sprite_top = sprite_top | 0x4000;
+				offs |= 0x4000;
+				sprite_top |= 0x4000;
 			}
 		}
 
-		/* Set global sprite scroll */
-		if (((spriteram16_ptr[current_offs + 2 + 0]) & 0xf000) == 0xa000)
-		{
-			global_x = (spriteram16_ptr[current_offs + 2 + 0]) & 0xfff;
-			global_x = util::sext(global_x, 12);
-			global_y = spriteram16_ptr[current_offs + 2 + 1] & 0xfff;
-			global_y = util::sext(global_y, 12);
-		}
-
-		/* And sub-global sprite scroll */
-		if (((spriteram16_ptr[current_offs + 2 + 0]) & 0xf000) == 0x5000)
-		{
-			subglobal_x = (spriteram16_ptr[current_offs + 2 + 0]) & 0xfff;
-			subglobal_x = util::sext(subglobal_x, 12);
-			subglobal_y = spriteram16_ptr[current_offs + 2 + 1] & 0xfff;
-			subglobal_y = util::sext(subglobal_y, 12);
-		}
-
-		if (((spriteram16_ptr[current_offs + 2 + 0]) & 0xf000) == 0xb000)
-		{
-			subglobal_x = (spriteram16_ptr[current_offs + 2 + 0]) & 0xfff;
-			subglobal_x = util::sext(subglobal_x, 12);
-			subglobal_y = spriteram16_ptr[current_offs + 2 + 1] & 0xfff;
-			subglobal_y = util::sext(subglobal_y, 12);
-			global_y = subglobal_y;
-			global_x = subglobal_x;
-		}
-
-		/* A real sprite to process! */
-		const int sprite = (spriteram16_ptr[current_offs + 0 + 0]) | ((spriteram16_ptr[current_offs + 4 + 1] & 1) << 16);
-		const u8 spritecont = spriteram16_ptr[current_offs + 4 + 0] >> 8;
-
-/* These games either don't set the XY control bits properly (68020 bug?), or
-    have some different mode from the others */
-#ifdef DARIUSG_KLUDGE
-		if (m_game == DARIUSG || m_game == GEKIRIDO || m_game == CLEOPATR || m_game == RECALH)
-			multi = spritecont & 0xf0;
-#endif
-
-		/* Check if this sprite is part of a continued block */
-		if (multi)
-		{
-			/* Bit 0x4 is 'use previous colour' for this block part */
-			if (spritecont & 0x4) color = last_color;
-			else color = (spriteram16_ptr[current_offs + 4 + 0]) & 0xff;
-
-#ifdef DARIUSG_KLUDGE
-			if (m_game == DARIUSG || m_game == GEKIRIDO || m_game == CLEOPATR || m_game == RECALH)
-			{
-				/* Adjust X Position */
-				if ((spritecont & 0x40) == 0)
-				{
-					if (spritecont & 0x4)
-						x = block_x;
-					else
-					{
-						this_x = spriteram16_ptr[current_offs + 2 + 0] & 0xfff;
-						this_x = util::sext(this_x, 12);
-
-						if ((spriteram16_ptr[current_offs + 2 + 0]) & 0x8000)
-							this_x += 0;
-						else if ((spriteram16_ptr[current_offs + 2 + 0]) & 0x4000) /* Ignore subglobal (but apply global) */
-							this_x += global_x;
-						else /* Apply both scroll offsets */
-							this_x += global_x + subglobal_x;
-
-						block_x = this_x;
-						x = this_x;
-					}
-					x_addition_left = 8;
-					calc_zoom(x_addition, x_addition_left, block_zoom_x);
-				}
-				else if ((spritecont & 0x80) != 0)
-				{
-					x = last_x + x_addition;
-					calc_zoom(x_addition, x_addition_left, block_zoom_x);
-				}
-
-				/* Adjust Y Position */
-				if ((spritecont & 0x10) == 0)
-				{
-					if (spritecont & 0x4)
-						y = block_y;
-					else
-					{
-						this_y = spriteram16_ptr[current_offs + 2 + 1] & 0xfff;
-						this_y = util::sext(this_y, 12);
-
-						if ((spriteram16_ptr[current_offs + 2 + 0]) & 0x8000)
-							this_y += 0;
-						else if ((spriteram16_ptr[current_offs + 2 + 0]) & 0x4000) /* Ignore subglobal (but apply global) */
-							this_y += global_y;
-						else /* Apply both scroll offsets */
-							this_y += global_y + subglobal_y;
-
-						block_y = this_y;
-						y = this_y;
-					}
-					y_addition_left = 8;
-					calc_zoom(y_addition, y_addition_left, block_zoom_y);
-				}
-				else if ((spritecont & 0x20) != 0)
-				{
-					y = last_y + y_addition;
-					calc_zoom(y_addition, y_addition_left, block_zoom_y);
-				}
-			}
-			else
-#endif
-			{
-				/* Adjust X Position */
-				if ((spritecont & 0x40) == 0)
-				{
-					x = block_x;
-					x_addition_left = 8;
-					calc_zoom(x_addition, x_addition_left, block_zoom_x);
-				}
-				else if ((spritecont & 0x80) != 0)
-				{
-					x = last_x + x_addition;
-					calc_zoom(x_addition, x_addition_left, block_zoom_x);
-				}
-				/* Adjust Y Position */
-				if ((spritecont & 0x10) == 0)
-				{
-					y = block_y;
-					y_addition_left = 8;
-					calc_zoom(y_addition, y_addition_left, block_zoom_y);
-				}
-				else if ((spritecont & 0x20) != 0)
-				{
-					y = last_y + y_addition;
-					calc_zoom(y_addition, y_addition_left, block_zoom_y);
-				}
-				/* Both zero = reread block latch? */
-			}
-		}
-		/* Else this sprite is the possible start of a block */
-		else
-		{
-			color = (spriteram16_ptr[current_offs + 4 + 0]) & 0xff;
-			last_color = color;
-
-			/* Sprite positioning */
-			this_x = spriteram16_ptr[current_offs + 2 + 0] & 0xfff;
-			this_y = spriteram16_ptr[current_offs + 2 + 1] & 0xfff;
-			this_x = util::sext(this_x, 12);
-			this_y = util::sext(this_y, 12);
-
-			/* Ignore both scroll offsets for this block */
-			if ((spriteram16_ptr[current_offs + 2 + 0]) & 0x8000)
-			{
-				this_x += 0;
-				this_y += 0;
-			}
-			else if ((spriteram16_ptr[current_offs + 2 + 0]) & 0x4000) /* Ignore subglobal (but apply global) */
-			{
-				this_x += global_x;
-				this_y += global_y;
-			}
-			else /* Apply both scroll offsets */
-			{
-				this_x += global_x + subglobal_x;
-				this_y += global_y + subglobal_y;
-			}
-
-			y = this_y;
-			block_y = this_y;
-			x = this_x;
-			block_x = this_x;
-
-			block_zoom_x = spriteram16_ptr[current_offs + 0 + 1];
-			block_zoom_y = spriteram16_ptr[current_offs + 0 + 1] >> 8;
-
-			x_addition_left = 8;
-			calc_zoom(x_addition, x_addition_left, block_zoom_x);
-
-			y_addition_left = 8;
-			calc_zoom(y_addition, y_addition_left, block_zoom_y);
-		}
-
+		u8 spritecont = spr[4] >> 8;
+		bool lock = BIT(spritecont, 2);
+		if (!lock)
+			color = spr[4] & 0xFF;
+		u8 scroll_mode = BIT(spr[2], 12, 4);
+		u16 zooms = spr[1];
+		x.update(scroll_mode, spr[2] & 0xFFF, lock, BIT(spritecont, 4+2, 2), zooms & 0xFF);
+		y.update(scroll_mode, spr[3] & 0xFFF, lock, BIT(spritecont, 4+0, 2), zooms & 0xFF);
+		
+		const int tile = spr[0] | (BIT(spr[5], 0) << 16);
+		if (!tile) continue;
+		if (!x.addition || !y.addition) continue;
+		
 		/* These features are common to sprite and block parts */
-		flipx = spritecont & 0x1;
-		flipy = spritecont & 0x2;
-		multi = spritecont & 0x8;
-		last_x = x;
-		last_y = y;
+		bool flipx = BIT(spritecont, 0);
+		bool flipy = BIT(spritecont, 1);
+		//multi = BIT(spritecont, 3);
 
-		if (!sprite) continue;
-		if (!x_addition || !y_addition) continue;
+		const int tx = m_flipscreen ? 512 - x.addition - x.pos : x.pos;
+		const int ty = m_flipscreen ? 256 - y.addition - y.pos : y.pos;
 
-		if (m_flipscreen)
-		{
-			const int tx = 512 - x_addition - x;
-			const int ty = 256 - y_addition - y;
-
-			if (tx + x_addition <= min_x || tx > max_x || ty + y_addition <= min_y || ty > max_y) continue;
-			sprite_ptr->x = tx;
-			sprite_ptr->y = ty;
-			sprite_ptr->flipx = !flipx;
-			sprite_ptr->flipy = !flipy;
-		}
-		else
-		{
-			if (x + x_addition <= min_x || x > max_x || y + y_addition <= min_y || y > max_y) continue;
-			sprite_ptr->x = x;
-			sprite_ptr->y = y;
-			sprite_ptr->flipx = flipx;
-			sprite_ptr->flipy = flipy;
-		}
-
-		sprite_ptr->code = sprite;
+		if (tx + x.addition <= visarea.min_x || tx > visarea.max_x || ty + y.addition <= visarea.min_y || ty > visarea.max_y)
+			continue;
+		
+		sprite_ptr->x = tx;
+		sprite_ptr->y = ty;
+		sprite_ptr->flipx = m_flipscreen ? !flipx : flipx;
+		sprite_ptr->flipy = m_flipscreen ? !flipy : flipy;
+		sprite_ptr->code = tile;
 		sprite_ptr->color = color;
-		sprite_ptr->zoomx = x_addition;
-		sprite_ptr->zoomy = y_addition;
-		sprite_ptr->pri = (color & 0xc0) >> 6;
+		sprite_ptr->zoomx = x.addition;
+		sprite_ptr->zoomy = y.addition;
+		sprite_ptr->pri = BIT(color, 6, 2);
 		sprite_ptr++;
 		total_sprites++;
 	}
