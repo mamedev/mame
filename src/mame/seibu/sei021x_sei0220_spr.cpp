@@ -73,10 +73,10 @@ Offset Bit                 Description
 00     x--- ---- ---- ---- Enable this sprite
        -x-- ---- ---- ---- Flip X
        --x- ---- ---- ---- Flip Y
-	   ---x xx-- ---- ---- Sprite width
-	   ---- --xx x--- ---- Sprite height
-	   ---- ---- -x-- ---- (Optional) Extra bit
-	   ---- ---- --xx xxxx Color index
+       ---x xx-- ---- ---- Sprite width
+       ---- --xx x--- ---- Sprite height
+       ---- ---- -x-- ---- (Optional) Extra bit
+       ---- ---- --xx xxxx Color index
 02     xx-- ---- ---- ---- Priority
        --xx xxxx xxxx xxxx Tile index
 04     x--- ---- ---- ---- (Optional) X sign bit
@@ -95,10 +95,10 @@ Offset Bit                 Description
 00     x--- ---- ---- ---- Disable this sprite
        -x-- ---- ---- ---- Flip Y
        --x- ---- ---- ---- Flip X
-	   ---- x--- ---- ---- Priority
+       ---- x--- ---- ---- Priority
        ---- --xx x--- ---- Sprite width
-	   ---- ---- -xxx ---- Sprite height
-	   ---- ---- ---- xxxx Color index
+       ---- ---- -xxx ---- Sprite height
+       ---- ---- ---- xxxx Color index
 02     ---x xxxx xxxx xxxx Tile index
 04     x--- ---- ---- ---- (Optional) X sign bit
        ---- ---x xxxx xxxx X position
