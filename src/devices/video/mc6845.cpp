@@ -531,6 +531,10 @@ void mc6845_device::recompute_parameters(bool postload)
 		m_hsync_off_pos = hsync_off_pos;
 		m_vsync_on_pos = vsync_on_pos;
 		m_vsync_off_pos = vsync_off_pos;
+		if (!m_line_timer->enabled() && m_has_valid_parameters)
+		{
+			m_line_timer->adjust(cclks_to_attotime(m_horiz_char_total + 1));
+		}
 		if ( (!m_reconfigure_cb.isnull()) && (!postload) )
 			m_line_counter = 0;
 	}
@@ -1301,8 +1305,10 @@ void mc6845_device::device_reset()
 
 	m_out_vsync_cb(false);
 
-	if (!m_line_timer->enabled())
+	if (!m_line_timer->enabled() && m_has_valid_parameters)
+	{
 		m_line_timer->adjust(cclks_to_attotime(m_horiz_char_total + 1));
+	}
 
 	m_light_pen_latched = false;
 
