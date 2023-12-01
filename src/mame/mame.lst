@@ -24137,6 +24137,7 @@ viostormeb                      // GX168 (c) 1993 (Europe)
 viostormj                       // GX168 (c) 1993 (Japan)
 viostormu                       // GX168 (c) 1993 (US)
 viostormub                      // GX168 (c) 1993 (US)
+viostormubbl                    // bootleg
 
 @source:konami/nemesis.cpp
 blkpnthr                        // GX604 (c) 1987 (Japan)
