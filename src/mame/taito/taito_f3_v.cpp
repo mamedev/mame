@@ -2830,23 +2830,6 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 			    cntrl bit 1 (0x0002) = enabled when Darius Gaiden sprite trail effect should occur (MT #1922)
 			                     Notice that sprites also completely disappear due of a bug/missing feature in the alpha routines.
 			*/
-			// 0x0001 - bank select
-			// 0x0002 - ?sprites trail/don't unblit?
-			// 0x0004 - ?
-			// 0x0008 - ?
-			// 0x0010 - ?
-			// 0x0020 - ?
-			// 0x0040 - ?
-			// 0x0080 - ?
-			// 0x0300 - extra plane enable
-			// 0x0c00 - ??
-			// 0x1000 - ?disabled?
-			// 0x2000 - flipscreen
-			// 0x4000 - ?
-			// 0x8000 - ?
-			if (cntrl & 0xdcfc)
-				logerror("unknown spriteram ctrl bits: %04x at %06x\n",
-						 cntrl & 0xdcfc, 0x600000 + current_offs + 4 + 1);
 
 			m_sprite_extra_planes = BIT(cntrl, 8, 2);   // 00 = 4bpp, 01 = 5bpp, 10 = unused?, 11 = 6bpp
 			m_sprite_pen_mask = (m_sprite_extra_planes << 4) | 0x0f;
@@ -2866,7 +2849,7 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 		u8 scroll_mode = BIT(spr[2], 12, 4);
 		u16 zooms = spr[1];
 		x.update(scroll_mode, spr[2] & 0xFFF, lock, BIT(spritecont, 4+2, 2), zooms & 0xFF);
-		y.update(scroll_mode, spr[3] & 0xFFF, lock, BIT(spritecont, 4+0, 2), zooms & 0xFF);
+		y.update(scroll_mode, spr[3] & 0xFFF, lock, BIT(spritecont, 4+0, 2), zooms >> 8);
 		
 		const int tile = spr[0] | (BIT(spr[5], 0) << 16);
 		if (!tile) continue;
