@@ -9,7 +9,8 @@
     Uses a TMPZ84C011 with YM3812 and two DACs
 
     TODO:
-    - DVD sound routing in here
+    - DVD sound routing in here;
+    - Pinpoint actual subboard name;
 
 ***************************************************************************/
 

@@ -53,7 +53,8 @@ A LDC labeled 2 pin connector
 
 namespace {
 
-#define MAIN_CLOCK XTAL(21'477'272)
+#define MAIN_CLOCK XTAL(12'000'000)
+#define VDP_CLOCK XTAL(21'477'272)
 #define SOUND_CLOCK XTAL(4'000'000)
 
 class nichild_state : public driver_device
@@ -469,7 +470,11 @@ static INPUT_PORTS_START( nichild_quiz )
 	PORT_START("DSWA")
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSWA:8")
 	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSWA:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSWA:6")
+    // at least for ldquiz4, to be verified for other games
+    // (definitely don't affect sound in shabdama unless it expects attract mode audio from LD player)
+    PORT_DIPNAME( 0x04, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("DSWA:6")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSWA:5")
 	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSWA:4")
 	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSWA:3")
@@ -507,7 +512,7 @@ static const z80_daisy_config daisy_chain_main[] =
 
 void nichild_state::nichild(machine_config &config)
 {
-	TMPZ84C011(config, m_maincpu, MAIN_CLOCK/4);
+	TMPZ84C011(config, m_maincpu, MAIN_CLOCK/2);
 	m_maincpu->set_daisy_config(daisy_chain_main);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nichild_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &nichild_state::main_io);
@@ -534,7 +539,7 @@ void nichild_state::nichild(machine_config &config)
 	m_dsw_shifter[1]->data_callback().set_ioport("DSWA");
 	m_dsw_shifter[1]->qh_callback().set([this](int state) { m_dsw_data = state; });
 
-	V9938(config, m_v9938, MAIN_CLOCK);
+	V9938(config, m_v9938, VDP_CLOCK);
 	m_v9938->set_screen_ntsc("screen");
 	m_v9938->set_vram_size(0x40000);
 	m_v9938->int_cb().set(m_maincpu, FUNC(tmpz84c011_device::trg3)).invert();
