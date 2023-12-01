@@ -2189,8 +2189,15 @@ void xtensa_device::check_interrupts()
 			// 0x2c000100 is a register window exception (12)
 			// 0x2c000140 is a register window exception (12)
 
-			// 0x2c000184 seems to be for an exception instead (although still uses high priority restore register 2) - reads exccause
-			//            and checks intset for 2 or 4
+			// 0x2c000184 seems to be for an exception instead (although still uses high priority restore register 2) 
+			//            and checks intset for 2 or 4  (so level 1 interrupts are 2 and 4 in intenable?)
+			//
+			// also checks exccause, with a number of valid causes, cause 4 and cause 5 have populated code
+			// cause 4 is external irq 1? cause 5 is AllocaCause?
+			// others are dummy
+			//
+			// cause 4 has some kind of 3 priority task manager based on lists in ram? see code at 2C000688
+			// 
 			// 0x2c000194 is identical to 184
 
 			if (intlevel == 1)
@@ -2200,18 +2207,24 @@ void xtensa_device::check_interrupts()
 			}
 			else if (intlevel == 2)
 			{
+				// high priority interrupt 2 code is here in RAM, checks intset reg for 1 or 8, 1 does something with ccount and loops, 8 checks 2c00001c for a pointer, it is blank by default
+				// writes 00000009 to intclear   0000008 as well as 0000001 ?  (so related to intenable/requests 0x8 and 0x1?)
+				// it also writes to ccompare0 which would clear the timer interrupt?
 				m_extreg_eps2 = m_extreg_ps;
 				m_extreg_epc2 = m_nextpc;
-				m_pc = 0x2c0001a4; // high priority interrupt 2 code is here in RAM, checks intset reg for 1 or 8, 1 does something with ccount and loops, 8 checks 2c00001c for a pointer, it is blank by default
+				m_pc = 0x2c0001a4; 
 			}
 			else if (intlevel == 3)
 			{
+				 // high priority interrupt 3 code is here in RAM, not sure what points to it yet, needed to get out of first wait loop
+				// writes to intclear 0000010 (so related to intenable/request 0x10)
 				m_extreg_eps3 = m_extreg_ps;
 				m_extreg_epc3 = m_nextpc;
 				m_pc = 0x2c0001b4; // high priority interrupt 3 code is here in RAM, not sure what points to it yet, needed to get out of first wait loop
 			}
 			else if (intlevel == 4)
 			{
+				// writes to intclear 00000020  (so related to intenable/request 0x10)
 				m_extreg_eps4 = m_extreg_ps;
 				m_extreg_epc4 = m_nextpc;
 				m_pc = 0x2c0001c4; // high priority interrupt 4 code is here in RAM, not sure what points to it yet (no payload by default, reads a pointer from 2c00002c which is 0, so doesn't jump to it)
@@ -2220,7 +2233,7 @@ void xtensa_device::check_interrupts()
 			{
 				m_extreg_eps5 = m_extreg_ps;
 				m_extreg_epc5 = m_nextpc;
-				m_pc = 0x2c0001d4; // high priority interrupt 5 code is here in RAM, not sure what points to it yet, points back to ROM where there is an infinite loop!
+				m_pc = 0x2c0001d4; // high priority interrupt 5 code is here in RAM, points back to ROM where there is an infinite loop! (so not used)
 			}
 		}
 	}
