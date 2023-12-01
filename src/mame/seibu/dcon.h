@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "sei0210_sei0211_sei0220_spr.h"
+#include "sei021x_sei0220_spr.h"
 
 #include "seibusound.h"
 

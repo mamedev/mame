@@ -72,7 +72,7 @@ Secret menu hack [totmejan only] (I couldn't find official way to enter, so it's
 
 #include "emu.h"
 
-#include "sei0210_sei0211_sei0220_spr.h"
+#include "sei021x_sei0220_spr.h"
 #include "seibu_crtc.h"
 
 #include "seibusound.h"

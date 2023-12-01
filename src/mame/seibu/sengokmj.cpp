@@ -55,7 +55,7 @@ RSSENGO2.72   chr.
 
 #include "emu.h"
 
-#include "sei0210_sei0211_sei0220_spr.h"
+#include "sei021x_sei0220_spr.h"
 
 #include "seibusound.h"
 
