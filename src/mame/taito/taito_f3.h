@@ -182,7 +182,7 @@ protected:
 	static const int NUM_TILEMAPS = 5;
 	static const int NUM_SPRITEGROUPS = 4; // high 2 bits of color
 	static const int NUM_CLIPPLANES = 4;
-	typedef struct {
+	struct clip_plane_inf {
 		u16 l;
 		u16 r;
 		auto set_upper(u8 left, u8 right) {
@@ -195,9 +195,9 @@ protected:
 			r = (r & 0x100) | right;
 			return this;
 		}
-	} clip_plane_inf;
+	};
 
-	typedef struct mixable {// layer compositing information
+	struct mixable {// layer compositing information
 		u16 mix_value;
 		u8 prio() const { return mix_value & 0x000f; };
 		auto clip_inv() const { return std::bitset<4>(mix_value >> 4); };
@@ -210,9 +210,9 @@ protected:
 		inline bool operator<(const mixable& rhs) const noexcept { return this->prio() < rhs.prio(); };
 		inline bool operator>(const mixable& rhs) const noexcept { return this->prio() > rhs.prio(); };
 		virtual void draw(u32* dst, int x, int y) {};
-	} mixable;
+	};
 
-	typedef struct : mixable {
+	struct sprite_inf : mixable {
 		// alpha mode in 6000
 		// line enable, clip settings in 7400
 		// priority in 7600
@@ -222,9 +222,9 @@ protected:
 
 		bool brightness; // 7400 0xf000
 		void draw(u32* dst, int x, int y) override;
-	} sprite_inf;
+	};
 
-	typedef struct : mixable {
+	struct pivot_inf : mixable {
 		bitmap_ind16* srcbitmap_pixel;
 		bitmap_ind8*  flagsbitmap_pixel;
 		bitmap_ind16* srcbitmap_vram;
@@ -234,9 +234,9 @@ protected:
 		u16 pivot_enable; // 7000
 		// mix info from 7200
 		bool use_pix() const { return pivot_control & 0xa0; };
-	} pivot_inf;
+	};
 
-	typedef struct : mixable {
+	struct playfield_inf : mixable {
 		bitmap_ind16* srcbitmap;
 		bitmap_ind8*  flagsbitmap;
 		const pen_t* clut;
@@ -256,9 +256,9 @@ protected:
 		u32 reg_x_count;
 		u32 reg_y_count;
 		void draw(u32* dst, int x, int y) override;
-	} playfield_inf;
+	};
 
-	typedef struct f3_line_inf {
+	struct f3_line_inf {
 		// 5000/4000
 		clip_plane_inf clip[NUM_CLIPPLANES];
 		// 6000 - don't store sync reg ?
@@ -276,7 +276,7 @@ protected:
 		pivot_inf pivot;
 		sprite_inf sp[NUM_SPRITEGROUPS];
 		playfield_inf pf[NUM_PLAYFIELDS];
-	} f3_line_inf;
+	};
 
 
 	struct f3_playfield_line_inf
