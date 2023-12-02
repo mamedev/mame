@@ -6,8 +6,6 @@
 
     Driver by Ville Linde
 
-
-
     Software notes (as per Police 911)
     -- VL - 01.06.2011
 
@@ -79,10 +77,25 @@
     0x0000c130:     ScheduleTask()
     0x00009d00:     LoadProgram(): R3 = ptr to filename
 
-
     TODO:
     - needs a proper way to dump security dongles, anything but p9112 has placeholder ROM for ds2430.
-    - figure out why games randomly crash (IRQ related?)
+    - figure out why games randomly crash, and why it seems to
+      happen more often with -nothrottle (irq section makes it to die
+      with a spurious)
+    - convert epic to use address map
+    - convert epic i2c to be a real i2c-complaint device, namely
+      for better irq driving
+    - convert epic irq section to be a device, make it input_merger complaint;
+    - (more intermediate steps for proper PCI conversions here)
+    - pinpoint what the i2c communicates with
+    - hookup adc0838
+    - Understand what really enables sound irq, can't be from Voodoo PCIINT.
+    \- service mode scale check doesn't work in mfightc (at least);
+    \- tsurugi: no sound;
+    - jpark3: attract mode demo play acts weird, the dinosaur gets submerged
+      and camera doesn't really know what to do, CPU core bug?
+    - mocapglf, sscopefh: video flickers, are they using the Konami 30-Hz demuxer
+      for driving 2 screens?
 
     Other notes:
     - "Distribution error" means there's a region mismatch.
@@ -90,7 +103,7 @@
     - Hold TEST while booting (from the very start) to initialize the RTC for most games.
     - It seems that p911 has 3 unique regional images: U/E, K/A, and J. If you try booting, for example, U region on a K/A image, it won't find some files and will error out with "distribution error".
 
-    Game status:
+    Game status (potentially outdated, to be moved on top):
         boxingm             Goes in-game. Controllers are not emulated. Various graphical glitches.
         jpark3              Goes in-game. Controllers are not emulated. Various graphical glitches.
         mocapb,j            Goes in-game. Controllers are not emulated. Various graphical glitches. Random crashes.
@@ -423,6 +436,7 @@ namespace {
 
 #define VIPER_DEBUG_LOG
 #define VIPER_DEBUG_EPIC_INTS       0
+// TODO: doesn't compile, wants attotime_string
 #define VIPER_DEBUG_EPIC_TIMERS     0
 #define VIPER_DEBUG_EPIC_REGS       0
 #define VIPER_DEBUG_EPIC_I2C        0
@@ -496,7 +510,7 @@ private:
 
 	uint16_t ppp_sensor_r(offs_t offset);
 
-	uint32_t screen_update_viper(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(viper_vblank);
 	void voodoo_pciint(int state);
 
@@ -646,7 +660,7 @@ private:
 	void voodoo3_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
 };
 
-uint32_t viper_state::screen_update_viper(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t viper_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return m_voodoo->update(bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
@@ -1230,7 +1244,7 @@ void viper_state::epic_w(offs_t offset, uint32_t data)
 				{
 					m_epic.eicr = data;
 					if (data & 0x08000000)
-						fatalerror("EPIC: serial interrupts mode not implemented\n");
+						throw emu_fatalerror("EPIC: serial interrupts mode not implemented\n");
 					break;
 				}
 				case 0x10e0:            // Offset 0x410E0 - Spurious Vector Register
@@ -1450,7 +1464,7 @@ uint64_t viper_state::cf_card_data_r(offs_t offset, uint64_t mem_mask)
 
 			default:
 			{
-				fatalerror("%s:cf_card_data_r: IDE reg %02X\n", machine().describe_context().c_str(), offset & 0xf);
+				throw emu_fatalerror("%s:cf_card_data_r: IDE reg %02X\n", machine().describe_context().c_str(), offset & 0xf);
 			}
 		}
 	}
@@ -1471,7 +1485,7 @@ void viper_state::cf_card_data_w(offs_t offset, uint64_t data, uint64_t mem_mask
 
 			default:
 			{
-				fatalerror("%s:cf_card_data_w: IDE reg %02X, %04X\n", machine().describe_context().c_str(), offset & 0xf, (uint16_t)(data >> 16));
+				throw emu_fatalerror("%s:cf_card_data_w: IDE reg %02X, %04X\n", machine().describe_context().c_str(), offset & 0xf, (uint16_t)(data >> 16));
 			}
 		}
 	}
@@ -1525,7 +1539,7 @@ uint64_t viper_state::cf_card_r(offs_t offset, uint64_t mem_mask)
 		{
 			int reg = offset;
 
-			printf("cf_r: %04X\n", reg);
+			logerror("cf_r: %04X\n", reg);
 
 			if ((reg >> 1) < sizeof(cf_card_tuples))
 			{
@@ -1533,7 +1547,7 @@ uint64_t viper_state::cf_card_r(offs_t offset, uint64_t mem_mask)
 			}
 			else
 			{
-				fatalerror("%s:compact_flash_r: reg %02X\n", machine().describe_context().c_str(), reg);
+				throw emu_fatalerror("%s:compact_flash_r: reg %02X\n", machine().describe_context().c_str(), reg);
 			}
 		}
 	}
@@ -1582,7 +1596,7 @@ void viper_state::cf_card_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 
 				default:
 				{
-					fatalerror("%s:compact_flash_w: IDE reg %02X, data %04X\n", machine().describe_context().c_str(), offset & 0xf, (uint16_t)((data >> 16) & 0xffff));
+					throw emu_fatalerror("%s:compact_flash_w: IDE reg %02X, data %04X\n", machine().describe_context().c_str(), offset & 0xf, (uint16_t)((data >> 16) & 0xffff));
 				}
 			}
 		}
@@ -1602,7 +1616,7 @@ void viper_state::cf_card_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 				}
 				default:
 				{
-					fatalerror("%s:compact_flash_w: reg %02X, data %04X\n", machine().describe_context().c_str(), offset, (uint16_t)((data >> 16) & 0xffff));
+					throw emu_fatalerror("%s:compact_flash_w: reg %02X, data %04X\n", machine().describe_context().c_str(), offset, (uint16_t)((data >> 16) & 0xffff));
 				}
 			}
 		}
@@ -1694,7 +1708,7 @@ uint32_t viper_state::voodoo3_pci_r(int function, int reg, uint32_t mem_mask)
 		}
 
 		default:
-			fatalerror("voodoo3_pci_r: %08X at %08X\n", reg, m_maincpu->pc());
+			throw emu_fatalerror("voodoo3_pci_r: %08X at %08X\n", reg, m_maincpu->pc());
 	}
 }
 
@@ -1761,7 +1775,7 @@ void viper_state::voodoo3_pci_w(int function, int reg, uint32_t data, uint32_t m
 		}
 
 		default:
-			fatalerror("voodoo3_pci_w: %08X, %08X at %08X\n", data, reg, m_maincpu->pc());
+			throw emu_fatalerror("voodoo3_pci_w: %08X, %08X at %08X\n", data, reg, m_maincpu->pc());
 	}
 }
 
@@ -1801,7 +1815,7 @@ void viper_state::voodoo3_lfb_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 
 TIMER_CALLBACK_MEMBER(viper_state::ds2430_timer_callback)
 {
-	printf("DS2430 timer callback\n");
+	logerror("DS2430 timer callback\n");
 
 	if (param == 1)
 	{
@@ -1890,12 +1904,12 @@ void viper_state::DS2430_w(int bit)
 		{
 			if (ds2430_insert_cmd_bit(bit))
 			{
-				printf("DS2430_w: rom command %02X\n", m_ds2430_cmd);
+				logerror("DS2430_w: rom command %02X\n", m_ds2430_cmd);
 				switch (m_ds2430_cmd)
 				{
 					case 0x33:      m_ds2430_state = DS2430_STATE_READ_ROM; break;
 					case 0xcc:      m_ds2430_state = DS2430_STATE_MEM_FUNCTION; break;
-					default:        fatalerror("DS2430_w: unimplemented rom command %02X\n", m_ds2430_cmd);
+					default:        throw emu_fatalerror("DS2430_w: unimplemented rom command %02X\n", m_ds2430_cmd);
 				}
 			}
 			break;
@@ -1905,11 +1919,11 @@ void viper_state::DS2430_w(int bit)
 		{
 			if (ds2430_insert_cmd_bit(bit))
 			{
-				printf("DS2430_w: mem function %02X\n", m_ds2430_cmd);
+				logerror("DS2430_w: mem function %02X\n", m_ds2430_cmd);
 				switch (m_ds2430_cmd)
 				{
 					case 0xf0:      m_ds2430_state = DS2430_STATE_READ_MEM_ADDRESS; break;
-					default:        fatalerror("DS2430_w: unimplemented mem function %02X\n", m_ds2430_cmd);
+					default:        throw emu_fatalerror("DS2430_w: unimplemented mem function %02X\n", m_ds2430_cmd);
 				}
 			}
 			break;
@@ -1919,7 +1933,7 @@ void viper_state::DS2430_w(int bit)
 		{
 			if (ds2430_insert_cmd_bit(bit))
 			{
-				printf("DS2430_w: read mem address %02X\n", m_ds2430_cmd);
+				logerror("DS2430_w: read mem address %02X\n", m_ds2430_cmd);
 				m_ds2430_addr = m_ds2430_cmd;
 				m_ds2430_state = DS2430_STATE_READ_MEM;
 			}
@@ -1930,7 +1944,7 @@ void viper_state::DS2430_w(int bit)
 		{
 			m_ds2430_unk_status = (m_ds2430_rom[(m_ds2430_data_count/8)] >> (m_ds2430_data_count%8)) & 1;
 			m_ds2430_data_count++;
-			printf("DS2430_w: read mem %d, bit = %d\n", m_ds2430_data_count, m_ds2430_unk_status);
+			logerror("DS2430_w: read mem %d, bit = %d\n", m_ds2430_data_count, m_ds2430_unk_status);
 
 			if (m_ds2430_data_count >= 256)
 			{
@@ -1947,7 +1961,7 @@ void viper_state::DS2430_w(int bit)
 		{
 			int rombit = (m_ds2430_rom[0x20 + (m_ds2430_data_count/8)] >> (m_ds2430_data_count%8)) & 1;
 			m_ds2430_data_count++;
-			printf("DS2430_w: read rom %d, bit = %d\n", m_ds2430_data_count, rombit);
+			logerror("DS2430_w: read rom %d, bit = %d\n", m_ds2430_data_count, rombit);
 
 			m_ds2430_unk_status = rombit;
 
@@ -1962,7 +1976,7 @@ void viper_state::DS2430_w(int bit)
 
 		default:
 		{
-			fatalerror("DS2430_w: unknown state %d\n", m_ds2430_cmd);
+			throw emu_fatalerror("DS2430_w: unknown state %d\n", m_ds2430_cmd);
 		}
 	}
 
@@ -2095,7 +2109,7 @@ void viper_state::unk_serial_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 
 					m_unk_serial_data_r = ((data & 0x1) << 7) | ((data & 0x2) << 5) | ((data & 0x4) << 3) | ((data & 0x8) << 1) | ((data & 0x10) >> 1) | ((data & 0x20) >> 3) | ((data & 0x40) >> 5) | ((data & 0x80) >> 7);
 
-					printf("unk_serial read reg %02X: %04X\n", reg, data);
+					logerror("unk_serial read reg %02X: %04X\n", reg, data);
 				}
 			}
 			if (m_unk_serial_bit_w == 16)
@@ -2104,7 +2118,7 @@ void viper_state::unk_serial_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 				{
 					int reg = m_unk_serial_cmd & 0x7f;
 					m_unk_serial_regs[reg] = m_unk_serial_data;
-					printf("unk_serial write reg %02X: %04X\n", reg, m_unk_serial_data);
+					logerror("unk_serial write reg %02X: %04X\n", reg, m_unk_serial_data);
 				}
 
 				m_unk_serial_bit_w = 0;
@@ -2136,7 +2150,9 @@ void viper_state::viper_map(address_map &map)
 	map(0xffe08000, 0xffe08007).noprw();
 	map(0xffe10000, 0xffe10007).r(FUNC(viper_state::input_r));
 	map(0xffe28000, 0xffe28007).nopw(); // ppp2nd leds
-	map(0xffe28008, 0xffe2801f).nopw(); // boxingm reads and writes here to read the pad sensor values
+	// boxingm reads and writes here to read the pad sensor values, 2nd adc?
+	// $10 bit 7 (w) clk_write, $18 bit 7 (r) do_read
+	map(0xffe28008, 0xffe2801f).nopw();
 	map(0xffe30000, 0xffe31fff).rw("m48t58", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write));
 	map(0xffe40000, 0xffe4000f).noprw();
 	map(0xffe50000, 0xffe50007).w(FUNC(viper_state::unk2_w));
@@ -2191,7 +2207,7 @@ static INPUT_PORTS_START( viper )
 
 	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Test Button")
+	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
@@ -2334,12 +2350,13 @@ INPUT_PORTS_START( boxingm )
 	PORT_DIPSETTING( 0x00, DEF_STR( No ) )
 
 	PORT_MODIFY("IN4")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Select L")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Select L")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Select R")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("BodyPad L")
+	// as attract claims, following two are for standing up on KO count
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("BodyPad L")
 
 	PORT_MODIFY("IN5")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("BodyPad R")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("BodyPad R")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // memory card check for boxingm (actually comms enable?)
 
 INPUT_PORTS_END
@@ -2674,8 +2691,8 @@ void viper_state::machine_reset()
 void viper_state::viper(machine_config &config)
 {
 	/* basic machine hardware */
-	MPC8240(config, m_maincpu, 166666666); // Unknown
-	m_maincpu->set_bus_frequency(100000000);
+	MPC8240(config, m_maincpu, 166'666'666); // Unknown
+	m_maincpu->set_bus_frequency(100'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &viper_state::viper_map);
 	m_maincpu->set_vblank_int("screen", FUNC(viper_state::viper_vblank));
 
@@ -2699,7 +2716,7 @@ void viper_state::viper(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_size(1024, 768);
 	screen.set_visarea(0, 1024 - 1, 0, 768 - 1);
-	screen.set_screen_update(FUNC(viper_state::screen_update_viper));
+	screen.set_screen_update(FUNC(viper_state::screen_update));
 
 	PALETTE(config, "palette").set_entries(65536);
 
