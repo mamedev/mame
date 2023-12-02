@@ -1723,7 +1723,7 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 		line.pf[3].rowscroll = pf4_rowscroll << 10;
 	}
 	// why is this shift here ... _x_offset is 16.16
-	// but then the lineram word must be 10.6 ?
+	// lineram word must be 10.6 ?
 	// i think to conform to the layer scroll regs which are 16.16
 
 
@@ -1742,13 +1742,32 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 	}
 }
 
+void taito_f3_state::get_pf_scroll(int pf_num, u32 &reg_sx, u32 &reg_sy)
+{
+	u32 sy = ((m_control_0[pf_num + 4] & 0xffff) <<  9) + (1 << 16);
+	u32 sx = ((m_control_0[pf_num] & 0xffc0) << 10) - ((6 + 4 * pf_num) << 16);
+	sx-= ((m_control_0[pf_num] & 0x003f) << 10) + 0x0400 - 0x10000;
+	if (m_flipscreen) {
+		sy =  0x3000000 - sy;
+		sx = -0x1a00000 - sx;
+	}
+	reg_sx = sx;
+	reg_sy = sy;
+}
 
 void taito_f3_state::sprite_inf::draw(u32* dst, int y, int x)
 {
-	u32 col = srcbitmap.pix(y, x);
-	if (col)
-		printf("%04x ", col);
-	*dst = srcbitmap.pix(y, x);
+	if (u32 col = srcbitmap.pix(y, x))
+		*dst = col;
+}
+void taito_f3_state::playfield_inf::draw(u32* dst, int y, int x)
+{
+	int y_index = ((reg_fx_y >> 16) + colscroll) & 0x1ff;
+	int x_index = ((reg_fx_x >> 16) + x) & 0x1ff;
+	if (!(flagsbitmap->pix(y_index, x_index) & 0xf0))
+		return;
+	if (u32 col = clut[srcbitmap->pix(y_index, x_index)])
+		*dst = col;
 }
 
 void taito_f3_state::scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -1765,13 +1784,20 @@ void taito_f3_state::scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cl
 	}
 
 	f3_line_inf line_data{};
-	bitmap_rgb32 sp[NUM_SPRITEGROUPS] =	{
-		bitmap_rgb32(bitmap.width(), bitmap.height()),
-		bitmap_rgb32(bitmap.width(), bitmap.height()),
-		bitmap_rgb32(bitmap.width(), bitmap.height()),
-		bitmap_rgb32(bitmap.width(), bitmap.height())
-	};
-
+	for (int sp = 0; sp < NUM_SPRITEGROUPS; ++sp) {
+		line_data.sp[sp].srcbitmap = bitmap_rgb32(bitmap.width(), bitmap.height());
+	}
+	for (int pf = 0; pf < NUM_PLAYFIELDS; ++pf) {
+		int tmap_number = pf + line_data.pf[pf].alt_tilemap * 2;
+		line_data.pf[pf].srcbitmap = &m_tilemap[tmap_number]->pixmap();
+		line_data.pf[pf].flagsbitmap = &m_tilemap[tmap_number]->flagsmap();
+		line_data.pf[pf].clut = &m_palette->pen(0);
+		get_pf_scroll(pf, line_data.pf[pf].reg_sx, line_data.pf[pf].reg_sy);
+		if (m_flipscreen)
+			line_data.pf[pf].reg_fx_y = -line_data.pf[pf].reg_sy - (256 << 16);
+		else
+			line_data.pf[pf].reg_fx_y = line_data.pf[pf].reg_sy;
+	}
 	{
 		const tempsprite *sprite_ptr;
 		gfx_element *sprite_gfx = m_gfxdecode->gfx(2);
@@ -1783,7 +1809,7 @@ void taito_f3_state::scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cl
 				const u8 pri = sprite_ptr->pri;
 
 				f3_drawgfx(
-						   sp[pri], cliprect, sprite_gfx,
+						   line_data.sp[pri].srcbitmap, cliprect, sprite_gfx,
 						   sprite_ptr->code,
 						   sprite_ptr->color & (~m_sprite_extra_planes),
 						   sprite_ptr->flipx, sprite_ptr->flipy,
@@ -1796,27 +1822,28 @@ void taito_f3_state::scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cl
 	for (int y = y_start; y != y_end; y += y_inc) {
 		read_line_ram(line_data, y);
 
-		std::array<mixable, NUM_SPRITEGROUPS + NUM_TILEMAPS> layers = {
-			line_data.sp[3], line_data.sp[2], line_data.sp[1], line_data.sp[0],
-			line_data.pivot,
-			line_data.pf[3], line_data.pf[2], line_data.pf[1], line_data.pf[0]
+		std::array<mixable*, NUM_SPRITEGROUPS + NUM_TILEMAPS> layers = {
+			&line_data.sp[3], &line_data.sp[2], &line_data.sp[1], &line_data.sp[0],
+			&line_data.pivot,
+			&line_data.pf[3], &line_data.pf[2], &line_data.pf[1], &line_data.pf[0]
 		};
 		std::stable_sort(layers.begin(), layers.end(),
-						 [](auto a, auto b){ return a < b; });
+						 [](auto a, auto b){ return *a < *b; });
 
 		for (int x = 46; x < 46 + 320; ++x) {
-			if (sp[0].pix(y,x))
-				bitmap.pix(y,x) = sp[0].pix(y,x);
-			if (sp[1].pix(y,x))
-				bitmap.pix(y,x) = sp[1].pix(y,x);
-			if (sp[2].pix(y,x))
-				bitmap.pix(y,x) = sp[2].pix(y,x);
-			if (sp[3].pix(y,x))
-				bitmap.pix(y,x) = sp[3].pix(y,x);
-			//for (auto gfx : layers) {
-				//gfx.draw(&bitmap.pix(y, x), y, x);
-			//}
+			for (auto gfx : layers) {
+				gfx->draw(&bitmap.pix(y, x), y, x);
+			}
 		}
+
+		// update registers
+		for (int pf = 0; pf < NUM_PLAYFIELDS; ++pf) {
+			auto p = &line_data.pf[pf];
+			p->reg_fx_y += p->y_scale << 9;
+			p->reg_fx_x = p->reg_sx + p->rowscroll + 10*p->x_scale;
+			p->reg_fx_x &= (m_width_mask << 16) | 0xffff;
+		}
+
 	}
 }
 
@@ -2911,7 +2938,6 @@ void taito_f3_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 }
 
 /******************************************************************************/
-
 u32 taito_f3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	u32 sy_fix[5], sx_fix[5];
@@ -2919,32 +2945,14 @@ u32 taito_f3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	/* Setup scroll */
-	sy_fix[0] = ((m_control_0[4] & 0xffff) <<  9) + (1 << 16);
-	sy_fix[1] = ((m_control_0[5] & 0xffff) <<  9) + (1 << 16);
-	sy_fix[2] = ((m_control_0[6] & 0xffff) <<  9) + (1 << 16);
-	sy_fix[3] = ((m_control_0[7] & 0xffff) <<  9) + (1 << 16);
-	sx_fix[0] = ((m_control_0[0] & 0xffc0) << 10) - (6 << 16);
-	sx_fix[1] = ((m_control_0[1] & 0xffc0) << 10) - (10 << 16);
-	sx_fix[2] = ((m_control_0[2] & 0xffc0) << 10) - (14 << 16);
-	sx_fix[3] = ((m_control_0[3] & 0xffc0) << 10) - (18 << 16);
+	for (int i = 0; i < 4; ++i)
+		get_pf_scroll(i, sx_fix[i], sy_fix[i]);
+
 	sx_fix[4] = -(m_control_1[4]) + 41;
 	sy_fix[4] = -(m_control_1[5] & 0x1ff);
 
-	sx_fix[0]-=((m_control_0[0] & 0x003f) << 10) + 0x0400 - 0x10000;
-	sx_fix[1]-=((m_control_0[1] & 0x003f) << 10) + 0x0400 - 0x10000;
-	sx_fix[2]-=((m_control_0[2] & 0x003f) << 10) + 0x0400 - 0x10000;
-	sx_fix[3]-=((m_control_0[3] & 0x003f) << 10) + 0x0400 - 0x10000;
-
 	if (m_flipscreen)
 	{
-		sy_fix[0] =  0x3000000 - sy_fix[0];
-		sy_fix[1] =  0x3000000 - sy_fix[1];
-		sy_fix[2] =  0x3000000 - sy_fix[2];
-		sy_fix[3] =  0x3000000 - sy_fix[3];
-		sx_fix[0] = -0x1a00000 - sx_fix[0];
-		sx_fix[1] = -0x1a00000 - sx_fix[1];
-		sx_fix[2] = -0x1a00000 - sx_fix[2];
-		sx_fix[3] = -0x1a00000 - sx_fix[3];
 		sx_fix[4] = -sx_fix[4] + 75;
 		sy_fix[4] = -sy_fix[4];
 	}

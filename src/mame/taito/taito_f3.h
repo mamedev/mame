@@ -239,6 +239,7 @@ protected:
 	typedef struct : mixable {
 		bitmap_ind16* srcbitmap;
 		bitmap_ind8*  flagsbitmap;
+		const pen_t* clut;
 
 		int colscroll;        // 4000
 		bool alt_tilemap;     // 4000
@@ -247,6 +248,14 @@ protected:
 		u8 y_scale;           // 8000
 		u16 pal_add;          // 9000
 		u16 rowscroll;        // a000
+
+		u32 reg_sx;
+		u32 reg_sy;
+		u32 reg_fx_x;
+		u32 reg_fx_y;
+		u32 reg_x_count;
+		u32 reg_y_count;
+		void draw(u32* dst, int x, int y) override;
 	} playfield_inf;
 
 	typedef struct f3_line_inf {
@@ -473,6 +482,8 @@ protected:
 	void get_vram_info(tilemap_t *vram_tilemap, tilemap_t *pixel_tilemap, int sx, int sy);
 	void scanline_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void get_pf_scroll(int pf_num, u32 &reg_sx, u32 &reg_sy);
+
 
 private:
 	optional_device<taito_en_device> m_taito_en;
