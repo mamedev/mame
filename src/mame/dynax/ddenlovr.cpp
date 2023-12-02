@@ -43,6 +43,7 @@ Year + Game                         Board                  CPU    Sound         
 1996  Mj Janshin Plus               NM7001004              Z80    YMZ284 YM2413 M6295  TZ-2053P
 1996  Mj Dai Touyouken              NM7001004              Z80    YMZ284 YM2413 M6295  TZ-2053P
 1996  Return Of Sel Jan II          NM504-2                Z80    YM2149 YM2413 M6295  TZ-2053P?
+1996  Return Of Sel Jan II          NM5020403              Z80    YMZ284 YM2413 M6295  70C160F011?
 1997  Hana Kagerou                                         KC80          YM2413 M6295  70C160F011
 1997  Kkot Bi Nyo                   9090123-2              KC80          YM2413 M6295  70C160F011                            A1010
 1997  Kkot Bi Nyo Special           9090123-3              KC80          YM2413 M6295  ?
@@ -13026,6 +13027,24 @@ ROM_START( sryudens )
 	ROM_LOAD( "50201.1c", 0x00000, 0x80000, CRC(5a8cd45c) SHA1(25ca573b8ba226fb3f2de48c57b5ced6884eaa63) )
 ROM_END
 
+ROM_START( seljan2a ) // same PCB as sryudens
+	ROM_REGION( 0x90000+16*0x1000, "maincpu", 0 )  // Z80 Code
+	ROM_LOAD( "50802.5c", 0x00000, 0x80000, CRC(2ccc37ad) SHA1(35d8891f7a68eda16c29d9039a75d0dd384d4b94) )
+	ROM_RELOAD(           0x10000, 0x80000 )
+
+	ROM_REGION( 0x4c0000, "blitter", 0 ) // 14d, 14f and 15f empty. ROMs are accessed out of order. Is there a PAL governing this? Scratched IC at 12c might be it
+	ROM_LOAD( "50808.13f", 0x000000, 0x100000, CRC(97daddfc) SHA1(4e88e6e444e19b94f81160052f24546ee0b36d25) )
+	ROM_LOAD( "50803.13b", 0x100000, 0x100000, CRC(5c7ffbdf) SHA1(c7072add7c8eaef400f3f35fed028c8ec7f2a2a2) )
+	ROM_LOAD( "50809.15j", 0x200000, 0x100000, CRC(e2f7b62a) SHA1(62abe92484bd3854efa23f6d8576a34491882f0f) )
+	ROM_LOAD( "50806.13d", 0x300000, 0x080000, CRC(8f34a31c) SHA1(9b56a462f871d935806b6594f07fa1e4214f9186) )
+	ROM_LOAD( "50807.15d", 0x380000, 0x080000, CRC(2fdd3b49) SHA1(db27d5d9f74f532ab4e9b8ffa81eef2fae2ef6fd) )
+	ROM_LOAD( "50805.15b", 0x400000, 0x080000, CRC(39ad357a) SHA1(899e369d7396ed40803df7c575199a65b18c046e) )
+	ROM_LOAD( "50804.14b", 0x480000, 0x040000, CRC(073b52a7) SHA1(acd372a9093111bd95351b1cf63b1ad37019a188) )
+
+	ROM_REGION( 0x80000, "oki", 0 )  // samples, same as seljan2 and sryudens
+	ROM_LOAD( "50801.1c", 0x00000, 0x80000, CRC(5a8cd45c) SHA1(25ca573b8ba226fb3f2de48c57b5ced6884eaa63) )
+ROM_END
+
 /***************************************************************************
 
 Mahjong Daimyojin
@@ -13320,6 +13339,7 @@ GAME( 1996, dtoyoken,  0,        dtoyoken,  dtoyoken, ddenlovr_state, empty_init
 GAME( 1996, sryudens,  0,        sryudens,  sryudens, ddenlovr_state, empty_init,    ROT0, "Dynax / Face",                                "Mahjong Seiryu Densetsu [BET] (Japan, NM502)",                   MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1996, seljan2,   0,        seljan2,   seljan2,  ddenlovr_state, empty_init,    ROT0, "Dynax / Face",                                "Return Of Sel Jan II [BET] (Japan, NM557)",                      MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, seljan2a,  seljan2,  sryudens,  seljan2,  ddenlovr_state, empty_init,    ROT0, "Dynax / Face",                                "Return Of Sel Jan II [BET] (Japan, NM508)",                      MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1996, mjflove,   0,        mjflove,   mjflove,  ddenlovr_state, empty_init,    ROT0, "Nakanihon",                                   "Mahjong Fantasic Love (Japan)",                                  MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS )
 
