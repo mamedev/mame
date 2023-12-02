@@ -78,10 +78,11 @@
     0x00009d00:     LoadProgram(): R3 = ptr to filename
 
     TODO:
-    - needs a proper way to dump security dongles, anything but p9112 has placeholder ROM for ds2430.
-    - figure out why games randomly crash, and why it seems to
-      happen more often with -nothrottle (irq section makes it to die
-      with a spurious)
+    - needs a proper way to dump security dongles, anything but p9112 has placeholder ROM for
+      ds2430.
+    - figure out why games randomly crash, and why it seems to happen more often with -nothrottle
+      (irq section makes it to die with a spurious)
+    - AGP interface with Voodoo 3 is definitely incorrect, and may be a cause of above;
     - convert epic to use address map
     - convert epic i2c to be a real i2c-complaint device, namely
       for better irq driving
@@ -449,9 +450,9 @@ class viper_state : public driver_device
 public:
 	viper_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_voodoo(*this, "voodoo"),
 		m_maincpu(*this, "maincpu"),
 		m_ata(*this, "ata"),
-		m_voodoo(*this, "voodoo"),
 		m_lpci(*this, "pcibus"),
 		m_ds2430_bit_timer(*this, "ds2430_timer2"),
 		m_workram(*this, "workram"),
@@ -476,6 +477,9 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	required_device<voodoo_3_device> m_voodoo;
 private:
 	uint32_t epic_r(offs_t offset);
 	void epic_w(offs_t offset, uint32_t data);
@@ -510,7 +514,6 @@ private:
 
 	uint16_t ppp_sensor_r(offs_t offset);
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(viper_vblank);
 	void voodoo_pciint(int state);
 
@@ -645,7 +648,6 @@ private:
 
 	required_device<ppc_device> m_maincpu;
 	required_device<ata_interface_device> m_ata;
-	required_device<voodoo_3_device> m_voodoo;
 	required_device<pci_bus_legacy_device> m_lpci;
 	required_device<timer_device> m_ds2430_bit_timer;
 	required_shared_ptr<uint64_t> m_workram;
@@ -660,9 +662,48 @@ private:
 	void voodoo3_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
 };
 
+class viper_subscreen_state : public viper_state
+{
+public:
+	viper_subscreen_state(const machine_config &mconfig, device_type type, const char *tag)
+		: viper_state(mconfig, type, tag)
+	{}
+
+protected:
+	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
+	virtual void video_start() override;
+private:
+	std::unique_ptr<bitmap_rgb32> m_voodoo_buf;
+	std::unique_ptr<bitmap_rgb32> m_ttl_buf;
+};
+
 uint32_t viper_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return m_voodoo->update(bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
+}
+
+void viper_subscreen_state::video_start()
+{
+	m_voodoo_buf = std::make_unique<bitmap_rgb32>(1024, 1024);
+	m_ttl_buf = std::make_unique<bitmap_rgb32>(1024, 1024);
+}
+
+// TODO: stub, pinpoint where the TTL muxer control is located
+// It definitely dispatch every 30 Hz, there must be a signal for starting it up.
+
+// TODO: understand how even TTL manages to rearrange Voodoo source with overrides
+// Generally Konami uses a readback bit for this.
+// Oddly enough the Voodoo is not touched on even/odd frame setup, and it doesn't setup anything
+// worth writing home in the VGA core, so a possible explaination is that TTL just pickup linear
+// pixels and rearranges on its own rules?
+
+// TODO: we need to read the TTL for nothing atm, otherwise sscopefh (at least) will hang earlier (???)
+uint32_t viper_subscreen_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	m_voodoo->update(screen.frame_number() & 1 ? *m_voodoo_buf : *m_ttl_buf, cliprect);
+
+	copybitmap(bitmap, *m_voodoo_buf, 0, 0, cliprect.min_x, cliprect.min_y, cliprect);
+	return 0;
 }
 
 static inline uint64_t read64be_with_32sle_device_handler(read32s_delegate handler, offs_t offset, uint64_t mem_mask)
@@ -2447,6 +2488,7 @@ INPUT_PORTS_START( sscopefh )
 
 	PORT_MODIFY("IN3")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Refill Key")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Hopper") // causes hopper errors if pressed, TBD
 
 	PORT_MODIFY("IN4")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("Credit 2 Pounds") // Currency probably changes between regions
@@ -2560,7 +2602,9 @@ INTERRUPT_GEN_MEMBER(viper_state::viper_vblank)
 void viper_state::voodoo_vblank(int state)
 {
 	if (state)
+	{
 	  mpc8240_interrupt(MPC8240_IRQ0);
+	}
 	//mpc8240_interrupt(MPC8240_IRQ3);
 }
 
@@ -3451,7 +3495,7 @@ GAME(2000, gticlub2,  kviper,    viper,     gticlub2,   viper_state, init_viperc
 GAME(2000, gticlub2ea,gticlub2,  viper,     gticlub2ea, viper_state, init_vipercf,  ROT0,  "Konami", "Driving Party: Racing in Italy (ver EAA)", MACHINE_NOT_WORKING)
 GAME(2001, jpark3,    kviper,    viper,     jpark3,     viper_state, init_vipercf,  ROT0,  "Konami", "Jurassic Park III (ver EBC)", MACHINE_NOT_WORKING)
 GAME(2001, jpark3u,   jpark3,    viper,     jpark3,     viper_state, init_vipercf,  ROT0,  "Konami", "Jurassic Park III (ver UBC)", MACHINE_NOT_WORKING)
-GAME(2001, mocapglf,  kviper,    viper_omz, mocapglf,   viper_state, init_vipercf,  ROT90, "Konami", "Mocap Golf (ver UAA)", MACHINE_NOT_WORKING)
+GAME(2001, mocapglf,  kviper,    viper_omz, mocapglf,   viper_subscreen_state, init_vipercf,  ROT90, "Konami", "Mocap Golf (ver UAA)", MACHINE_NOT_WORKING)
 GAME(2001, mocapb,    kviper,    viper,     mocapb,     viper_state, init_vipercf,  ROT90, "Konami", "Mocap Boxing (ver AAB)", MACHINE_NOT_WORKING)
 GAME(2001, mocapbj,   mocapb,    viper,     mocapb,     viper_state, init_vipercf,  ROT90, "Konami", "Mocap Boxing (ver JAA)", MACHINE_NOT_WORKING)
 GAME(2000, p911,      kviper,    viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver AAE)", MACHINE_NOT_WORKING)
@@ -3463,9 +3507,9 @@ GAME(2000, p911ed,    p911,      viper,     p911,       viper_state, init_viperc
 GAME(2000, p911ea,    p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 24/7 (ver EAD, alt)", MACHINE_NOT_WORKING)
 GAME(2000, p911j,     p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver JAE)", MACHINE_NOT_WORKING)
 GAME(2001, p9112,     kviper,    viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 911 2 (VER. UAA:B)", MACHINE_NOT_WORKING)
-GAME(2001, sscopex,   kviper,    viper,     sscopex,    viper_state, init_vipercf,  ROT0,  "Konami", "Silent Scope EX (ver UAA)", MACHINE_NOT_WORKING)
-GAME(2001, sogeki,    sscopex,   viper,     sogeki,     viper_state, init_vipercf,  ROT0,  "Konami", "Sogeki (ver JAA)", MACHINE_NOT_WORKING)
-GAME(2002, sscopefh,  kviper,    viper,     sscopefh,   viper_state, init_vipercf,  ROT0,  "Konami", "Silent Scope Fortune Hunter (ver EAA)", MACHINE_NOT_WORKING)
+GAME(2001, sscopex,   kviper,    viper,     sscopex,    viper_subscreen_state, init_vipercf,  ROT0,  "Konami", "Silent Scope EX (ver UAA)", MACHINE_NOT_WORKING)
+GAME(2001, sogeki,    sscopex,   viper,     sogeki,     viper_subscreen_state, init_vipercf,  ROT0,  "Konami", "Sogeki (ver JAA)", MACHINE_NOT_WORKING)
+GAME(2002, sscopefh,  kviper,    viper,     sscopefh,   viper_subscreen_state, init_vipercf,  ROT0,  "Konami", "Silent Scope Fortune Hunter (ver EAA)", MACHINE_NOT_WORKING) // UK only?
 GAME(2001, thrild2,   kviper,    viper,     thrild2,    viper_state, init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver EBB)", MACHINE_NOT_WORKING)
 GAME(2001, thrild2j,  thrild2,   viper,     thrild2,    viper_state, init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver JAA)", MACHINE_NOT_WORKING)
 GAME(2001, thrild2a,  thrild2,   viper,     thrild2,    viper_state, init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver AAA)", MACHINE_NOT_WORKING)
