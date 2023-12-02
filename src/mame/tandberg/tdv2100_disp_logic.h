@@ -21,10 +21,25 @@
 #include "screen.h"
 #include "speaker.h"
 
-class tandberg_disp_logic_device : public device_t
+class tandberg_tdv2100_disp_logic_device : public device_t
 {
 public:
-	tandberg_disp_logic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	tandberg_tdv2100_disp_logic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	auto write_waitl_callback() { return m_write_waitl_cb.bind(); }
+	auto write_onlil_callback() { return m_write_onlil_cb.bind(); }
+	auto write_carl_callback() { return m_write_carl_cb.bind(); }
+	auto write_errorl_callback() { return m_write_errorl_cb.bind(); }
+	auto write_enql_callback() { return m_write_enql_cb.bind(); }
+	auto write_ackl_callback() { return m_write_ackl_cb.bind(); }
+	auto write_nakl_callback() { return m_write_nakl_cb.bind(); }
+
+	// Input strobes
+	void process_keyboard_char(uint8_t key);
+	void w_cleark(int state);
+	void w_linek(int state);
+	void w_transk(int state);
+	void w_break(int state);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -39,10 +54,9 @@ protected:
 	void rs232_dsr_w(int state);
 	void rs232_cts_w(int state);
 	void rs232_txd_w(int state);
-	void rs232_dtr_toggle();
-	void rs232_rts_toggle();
 	void rs232_ri_w(int state);
 	void uart_rx(int state);
+	void uart_tx(int state);
 
 	required_device<screen_device>  	m_screen;
 	required_device<palette_device> 	m_palette;
@@ -54,6 +68,14 @@ protected:
 	required_device<rs232_port_device>	m_rs232;
 
 private:
+
+	devcb_write_line m_write_waitl_cb;
+	devcb_write_line m_write_onlil_cb;
+	devcb_write_line m_write_carl_cb;
+	devcb_write_line m_write_errorl_cb;
+	devcb_write_line m_write_enql_cb;
+	devcb_write_line m_write_ackl_cb;
+	devcb_write_line m_write_nakl_cb;
 
 	// Video
 	uint8_t attribute;
@@ -95,9 +117,10 @@ private:
 	bool request_to_send;
 	bool rx_handshake;
 	bool tx_handshake;
-	bool break_key_held;
 
 	// RS232 settings
+	void update_rs232_lamps();
+	void check_rs232_rx_error(int state);
 	bool force_on_line;
 	bool dcd_handshake;
 	bool hold_line_key_for_rts;
@@ -109,9 +132,15 @@ private:
 	bool ext_echo;
 	bool auto_rx_handshake;
 	bool auto_tx_handshake;
+
+	// Keyboard
+	bool break_key_held;
+	bool tx_data_pending_kbd;
+	uint8_t tx_data_kbd;
+	bool clear_ascii_hs_by_cleark;
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(TANDBERG_DISPLAY_LOGIC, tandberg_disp_logic_device)
+DECLARE_DEVICE_TYPE(TANDBERG_TDV2100_DISPLAY_LOGIC, tandberg_tdv2100_disp_logic_device)
 
 #endif // MAME_TANDBERG_DISP_LOGIC_H

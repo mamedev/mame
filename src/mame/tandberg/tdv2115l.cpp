@@ -11,7 +11,8 @@
 
 #include "emu.h"
 
-#include "disp_logic.h"
+#include "tdv2100_disp_logic.h"
+#include "tdv2100_kbd.h"
 
 namespace {
 
@@ -20,13 +21,15 @@ class tdv2115l_state : public driver_device
 public:
 	tdv2115l_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_terminal(*this, "terminal")
+		m_terminal(*this, "terminal"),
+		m_keyboard(*this, "keyboard")
 	{}
 
 	void tdv2115l(machine_config &config);
 
 private:
-	required_device<tandberg_disp_logic_device> m_terminal;
+	required_device<tandberg_tdv2100_disp_logic_device> m_terminal;
+	required_device<tandberg_tdv2100_keyboard_device> m_keyboard;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -35,31 +38,29 @@ private:
 
 void tdv2115l_state::tdv2115l(machine_config& config)
 {
-	TANDBERG_DISPLAY_LOGIC(config, m_terminal);
+	TANDBERG_TDV2100_DISPLAY_LOGIC(config, m_terminal);
+	TANDBERG_TDV2100_KEYBOARD(config, m_keyboard);
+	m_keyboard->write_kstr_callback().set(m_terminal, FUNC(tandberg_tdv2100_disp_logic_device::process_keyboard_char));
+	m_keyboard->write_cleark_callback().set(m_terminal, FUNC(tandberg_tdv2100_disp_logic_device::w_cleark));
+	m_keyboard->write_linek_callback().set(m_terminal, FUNC(tandberg_tdv2100_disp_logic_device::w_linek));
+	m_keyboard->write_transk_callback().set(m_terminal, FUNC(tandberg_tdv2100_disp_logic_device::w_transk));
+	m_keyboard->write_break_callback().set(m_terminal, FUNC(tandberg_tdv2100_disp_logic_device::w_break));
+	m_terminal->write_waitl_callback().set(m_keyboard, FUNC(tandberg_tdv2100_keyboard_device::w_waitl));
+	m_terminal->write_onlil_callback().set(m_keyboard, FUNC(tandberg_tdv2100_keyboard_device::w_onlil));
+	m_terminal->write_carl_callback().set(m_keyboard, FUNC(tandberg_tdv2100_keyboard_device::w_carl));
+	m_terminal->write_errorl_callback().set(m_keyboard, FUNC(tandberg_tdv2100_keyboard_device::w_errorl));
+	m_terminal->write_enql_callback().set(m_keyboard, FUNC(tandberg_tdv2100_keyboard_device::w_enql));
+	m_terminal->write_ackl_callback().set(m_keyboard, FUNC(tandberg_tdv2100_keyboard_device::w_ackl));
+	m_terminal->write_nakl_callback().set(m_keyboard, FUNC(tandberg_tdv2100_keyboard_device::w_nakl));
 }
 
 void tdv2115l_state::machine_start()
-{
-}
+{}
 
 void tdv2115l_state::machine_reset()
-{
-}
+{}
 
 static INPUT_PORTS_START( tdv2115l )
-
-PORT_START("X1")
-	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("/")          PORT_CODE(KEYCODE_SLASH)      PORT_CHAR('/') PORT_CHAR('?')
-	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("k_X2")
-	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("KP-0")       PORT_CODE(KEYCODE_0_PAD)      PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
-	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("KP-.")       PORT_CODE(KEYCODE_DEL_PAD)    PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
-	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("KP-Enter")   PORT_CODE(KEYCODE_ENTER_PAD)  PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))
-	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_UNUSED)
-
 INPUT_PORTS_END
 
 // ROM definition
