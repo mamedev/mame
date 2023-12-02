@@ -563,17 +563,6 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const gfx_layout gfxlayout =
-{
-	8,8,
-	0x4000,
-	4,
-	{ 0,1,2,3 },
-	{ 0, 4, 8, 12, 16, 20, 24, 28},
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
-};
-
 static const gfx_layout tile_layout =
 {
 	8,8,
@@ -602,9 +591,12 @@ static const gfx_layout sprite_layout =
 	8*8*4
 };
 
-static GFXDECODE_START( gfx_combatsc )
-	GFXDECODE_ENTRY( "gfx1", 0x00000, gfxlayout, 0, 8*16 )
-	GFXDECODE_ENTRY( "gfx2", 0x00000, gfxlayout, 0, 8*16 )
+static GFXDECODE_START( gfx_combatsc_1 )
+	GFXDECODE_ENTRY( "gfx1", 0x00000, gfx_8x8x4_packed_msb, 0, 8*16 )
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_combatsc_2 )
+	GFXDECODE_ENTRY( "gfx2", 0x00000, gfx_8x8x4_packed_msb, 0, 8*16 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_combatscb )
@@ -702,15 +694,12 @@ void combatsc_state::combatsc(machine_config &config)
 	m_screen->set_screen_update(FUNC(combatsc_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_combatsc);
 	PALETTE(config, m_palette, FUNC(combatsc_state::palette));
 	m_palette->set_format(palette_device::xBGR_555, 8 * 16 * 16, 128);
 	m_palette->set_endianness(ENDIANNESS_LITTLE);
 
-	K007121(config, m_k007121[0], 0);
-	m_k007121[0]->set_palette_tag(m_palette);
-	K007121(config, m_k007121[1], 0);
-	m_k007121[1]->set_palette_tag(m_palette);
+	K007121(config, m_k007121[0], 0, m_palette, gfx_combatsc_1);
+	K007121(config, m_k007121[1], 0, m_palette, gfx_combatsc_2);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
