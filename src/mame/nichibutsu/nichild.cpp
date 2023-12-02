@@ -15,11 +15,16 @@ TODO:
 - V9938 has issues with layer clears, has an hard time sending a vblank irq (the only one enabled)
   at the right time. Removing the invert() from the int_cb will "fix" it at the expense of being
   excruciatingly slow.
-- Document meaning of DIP switches
+- Document meaning of remaining DIP switches
+
+Notes:
+- In service mode, press KAN/PON for the sound test and CHI/REACH for the voice test
+- Push START to continue after the RGB test screen is shown
 
 ===================================================================================================
 
 1 x TMPZ84C011AF-6 main CPU
+1 x 12.000MHz OSC
 1 x 21.47727MHz OSC
 1 x Z0840004PSC audio CPU
 1 x 4.000MHz OSC
@@ -383,7 +388,9 @@ static INPUT_PORTS_START( nichild_mj )
 	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSWA:7")
 	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSWA:6")
 	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSWA:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSWA:4")
+	PORT_DIPNAME(0x10, 0x10, DEF_STR( Coinage )) PORT_DIPLOCATION("DSWA:4")
+	PORT_DIPSETTING(0x10, DEF_STR( 1C_1C ))
+	PORT_DIPSETTING(0x00, DEF_STR( 1C_2C ))
 	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSWA:3")
 	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSWA:2")
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSWA:1")
@@ -468,16 +475,22 @@ static INPUT_PORTS_START( nichild_quiz )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSWA")
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSWA:8")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSWA:7")
-    // at least for ldquiz4, to be verified for other games
-    // (definitely don't affect sound in shabdama unless it expects attract mode audio from LD player)
-    PORT_DIPNAME( 0x04, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("DSWA:6")
+	PORT_DIPNAME( 0x01, 0x00, "RGB Test Screen" ) PORT_DIPLOCATION("DSWA:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSWA:7") // ld video inserted into attract mode?
+	// at least for ldquiz4, to be verified for other games
+	// (definitely don't affect sound in shabdama unless it expects attract mode audio from LD player)
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("DSWA:6")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSWA:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSWA:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSWA:3")
+	PORT_DIPNAME(0x10, 0x10, DEF_STR( Lives )) PORT_DIPLOCATION("DSWA:4")
+	PORT_DIPSETTING(0x10, "3")
+	PORT_DIPSETTING(0x00, "5")
+	PORT_DIPNAME(0x20, 0x20, DEF_STR( Coinage )) PORT_DIPLOCATION("DSWA:3")
+	PORT_DIPSETTING(0x20, DEF_STR( 1C_1C ))
+	PORT_DIPSETTING(0x00, DEF_STR( 1C_2C ))
 	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSWA:2")
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSWA:1")
 
