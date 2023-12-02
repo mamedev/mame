@@ -36,7 +36,8 @@ public:
 	*/
 	};
 
-	void irq_request_hack(); // for debugging
+	void irq_request_hack(int which); // for debugging
+	void irq_off_hack();
 
 protected:
 	// device-level overrides
@@ -125,6 +126,11 @@ private:
 	void extreg_exccause_w(u32 data);
 	uint32_t extreg_sar_r();
 	void extreg_sar_w(u32 data);
+
+	void set_irqpri(u8 val);
+	u8 get_irqpri();
+	void clear_irqpri(u8 val);
+
 
 	void set_callinc(u8 val);
 	u8 get_callinc();

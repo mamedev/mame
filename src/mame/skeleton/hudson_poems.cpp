@@ -44,7 +44,8 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_mainram(*this, "mainram")
 	{ }
 
 	void hudson_poems(machine_config &config);
@@ -54,16 +55,16 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	
 	TIMER_DEVICE_CALLBACK_MEMBER(screen_scanline);
 
 	void mem_map(address_map &map);
 
 	uint32_t poems_rand_r();
-	uint32_t poems_8000038_r();
-	uint32_t poems_8020020_r();
-	uint32_t poems_800aa04_r();
+	//uint32_t poems_8000038_r();
+	//uint32_t poems_8020020_r();
+	//uint32_t poems_800aa04_r();
 
 	void unktable_w(offs_t offset, u32 data, u32 mem_mask);
 	void unktable_reset_w(offs_t offset, u32 data, u32 mem_mask);
@@ -75,6 +76,7 @@ private:
 	required_device<xtensa_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_shared_ptr<u32> m_mainram;
 };
 
 void hudson_poems_state::machine_start()
@@ -91,19 +93,46 @@ static INPUT_PORTS_START( hudson_poems )
 INPUT_PORTS_END
 
 
-uint32_t hudson_poems_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t hudson_poems_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	// just to show that some stuff gets uploaded to mainram if you let execution continue, looks like tilemap or tile data?
+	int count = 0;
+	for (int y=0;y<240;y++)
+	{
+		u16 *const dstptr_bitmap = &bitmap.pix(y);
+
+		for (int x=0;x<256/8;x++)
+		{
+			uint32_t pix = m_mainram[(0x9000/4)+count];
+
+			dstptr_bitmap[x*8+0] = (pix >> 0) & 0xf;
+			dstptr_bitmap[x*8+1] = (pix >> 4) & 0xf;
+			dstptr_bitmap[x*8+2] = (pix >> 8) & 0xf;
+			dstptr_bitmap[x*8+3] = (pix >> 12) & 0xf;
+			dstptr_bitmap[x*8+4] = (pix >> 16) & 0xf;
+			dstptr_bitmap[x*8+5] = (pix >> 20) & 0xf;
+			dstptr_bitmap[x*8+6] = (pix >> 24) & 0xf;
+			dstptr_bitmap[x*8+7] = (pix >> 28) & 0xf;
+
+			count++;
+			
+		}
+	}
+
 	return 0;
 }
 
-uint32_t hudson_poems_state::poems_8020020_r()
-{
-	return 0xffffffff;
-}
+
 
 uint32_t hudson_poems_state::poems_rand_r()
 {
-	return machine().rand();;
+	return (machine().rand() & 0x1) ? machine().rand() : 0;
+}
+
+/*
+uint32_t hudson_poems_state::poems_8020020_r()
+{
+	return 0xffffffff;
 }
 
 uint32_t hudson_poems_state::poems_8000038_r()
@@ -115,6 +144,7 @@ uint32_t hudson_poems_state::poems_800aa04_r()
 {
 	return (machine().rand() & 1) ? 0x00000000 : 0xffffffff; 
 }
+*/
 
 void hudson_poems_state::set_palette_val(int entry)
 {
@@ -160,26 +190,29 @@ void hudson_poems_state::mem_map(address_map &map)
 {
 	map(0x00000000, 0x007fffff).mirror(0x20000000).rom().region("maincpu", 0);
 
-	map(0x08000038, 0x0800003b).r(FUNC(hudson_poems_state::poems_8000038_r));
+	map(0x04002040, 0x04002043).r(FUNC(hudson_poems_state::poems_rand_r));
 
-	map(0x08008200, 0x08008203).r(FUNC(hudson_poems_state::poems_8020020_r));
+	map(0x08000038, 0x0800003b).r(FUNC(hudson_poems_state::poems_rand_r));
+
+	map(0x08008200, 0x08008203).r(FUNC(hudson_poems_state::poems_rand_r));
 
 	map(0x08009000, 0x08009fff).ram();
 
-	map(0x0800aa04, 0x0800aa07).r(FUNC(hudson_poems_state::poems_800aa04_r));
+	map(0x0800aa04, 0x0800aa07).r(FUNC(hudson_poems_state::poems_rand_r));
 
 	// this does't actually appear to be palette
 	map(0x0800b000, 0x0800b003).w(FUNC(hudson_poems_state::unktable_w)); // writes a table of increasing 16-bit values here
 	map(0x0800b004, 0x0800b007).w(FUNC(hudson_poems_state::unktable_reset_w));
 
 	map(0x08020008, 0x0802000b).r(FUNC(hudson_poems_state::poems_rand_r));
-	//map(0x08020010, 0x08020013).r(FUNC(hudson_poems_state::poems_rand_r));
+	map(0x08020010, 0x08020013).r(FUNC(hudson_poems_state::poems_rand_r));
 	map(0x08020014, 0x08020017).r(FUNC(hudson_poems_state::poems_rand_r));
 	map(0x08020018, 0x0802001b).r(FUNC(hudson_poems_state::poems_rand_r));
-	map(0x08020020, 0x08020023).r(FUNC(hudson_poems_state::poems_8020020_r));
+	map(0x08020020, 0x08020023).r(FUNC(hudson_poems_state::poems_rand_r));
 
-	map(0x2c000000, 0x2c7fffff).ram();
+	map(0x2c000000, 0x2c7fffff).ram().share("mainram");
 }
+
 
 static GFXDECODE_START( gfx_poems )
 	GFXDECODE_ENTRY( "maincpu", 0, gfx_8x8x4_packed_lsb, 0, 16 )
@@ -192,8 +225,28 @@ TIMER_DEVICE_CALLBACK_MEMBER(hudson_poems_state::screen_scanline)
 
 	if (scanline == 200)
 	{
-		m_maincpu->irq_request_hack();
+		m_maincpu->irq_request_hack(0x10);
 	}
+
+	if (scanline == 80)
+	{
+		m_maincpu->irq_request_hack(0x2);
+	}
+
+	if (scanline == 140)
+	{
+//		m_maincpu->irq_request_hack(0x4);
+
+		// this needs to change in RAM, presumably from an interrupt, but no idea how to get there
+		m_maincpu->space(AS_PROGRAM).write_dword(0x2c01d92c, 0x01);
+	}
+
+	if (scanline == 150)
+	{
+//		m_maincpu->irq_off_hack();
+	}
+	
+
 }
 
 void hudson_poems_state::hudson_poems(machine_config &config)
@@ -208,6 +261,7 @@ void hudson_poems_state::hudson_poems(machine_config &config)
 	screen.set_size(320, 240); // resolution not confirmed
 	screen.set_visarea(0, 320-1, 0, 240-1);
 	screen.set_screen_update(FUNC(hudson_poems_state::screen_update));
+	screen.set_palette(m_palette);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(hudson_poems_state::screen_scanline), "screen", 0, 1);
 

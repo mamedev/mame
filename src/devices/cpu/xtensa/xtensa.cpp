@@ -106,8 +106,8 @@ void xtensa_device::extreg_ccompare0_w(u32 data) { m_extreg_ccompare0 = data; lo
 uint32_t xtensa_device::extreg_intenable_r() { logerror("m_extreg_intenable read\n"); return m_extreg_intenable; }
 void xtensa_device::extreg_intenable_w(u32 data) { m_extreg_intenable = data; logerror("m_extreg_intenable set to %08x\n", data); }
 uint32_t xtensa_device::extreg_intclr_r() { logerror("m_extreg_intclr read\n"); return m_extreg_intclr; }
-void xtensa_device::extreg_intclr_w(u32 data) { m_extreg_intclr = data; logerror("m_extreg_intclr set to %08x\n", data); }
-uint32_t xtensa_device::extreg_intset_r() { logerror("m_extreg_intset read\n"); return 0x4; /*0x8;*/ /*m_extreg_intset;*/ }
+void xtensa_device::extreg_intclr_w(u32 data) { m_extreg_intclr = data; m_extreg_intset &= ~data; logerror("m_extreg_intclr set to %08x\n", data); }
+uint32_t xtensa_device::extreg_intset_r() { logerror("m_extreg_intset read\n"); return m_extreg_intset; }
 void xtensa_device::extreg_intset_w(u32 data) { m_extreg_intset = data; logerror("m_extreg_intset set to %08x\n", data); }
 uint32_t xtensa_device::extreg_ccount_r() { logerror("m_extreg_ccount read\n"); return machine().rand(); /* m_extreg_ccount;*/ }
 void xtensa_device::extreg_ccount_w(u32 data) { m_extreg_ccount = data; logerror("m_extreg_ccount set to %08x\n", data); }
@@ -117,6 +117,20 @@ void xtensa_device::extreg_exccause_w(u32 data) { m_extreg_exccause = data; loge
 uint32_t xtensa_device::extreg_sar_r() { logerror("m_extreg_sar read\n"); return m_extreg_sar; }
 void xtensa_device::extreg_sar_w(u32 data) { m_extreg_sar = data; logerror("m_extreg_sar set to %08x\n", data); }
 
+void xtensa_device::set_irqpri(u8 val)
+{
+	m_extreg_ps |= (val & 0xf);
+}
+
+void xtensa_device::clear_irqpri(u8 val)
+{
+	m_extreg_ps &= ~(val & 0xf);
+}
+
+u8 xtensa_device::get_irqpri()
+{
+	return m_extreg_ps & 0xf;
+}
 
 void xtensa_device::set_callinc(u8 val)
 {
@@ -590,6 +604,8 @@ void xtensa_device::getop_and_execute()
 						{
 							LOGMASKED(LOG_HANDLED_OPS, "rfe\n");
 							m_nextpc = m_extreg_epc1;
+							clear_irqpri(2);
+							//clear_irqpri(4);
 							break;
 						}
 
@@ -631,6 +647,7 @@ void xtensa_device::getop_and_execute()
 							LOGMASKED(LOG_HANDLED_OPS, "%-8s%d\n", "rfi", 3);
 							m_extreg_ps = m_extreg_eps3;
 							m_nextpc = m_extreg_epc3;
+							clear_irqpri(1);
 							break;
 
 						case 4:
@@ -1160,9 +1177,20 @@ void xtensa_device::getop_and_execute()
 				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, a%d\n", s_rst3_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
 				break;
 
-			case 0b0110: // MINU (with Miscellaneous Operations Option)
-				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, a%d\n", s_rst3_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
+			case 0b0110: // MINU (with Miscellaneous Operations Option) - Minimum Value Unsigned
+			{
+				u8 dstreg = BIT(inst, 12, 4);
+				u8 reg_s = BIT(inst, 8, 4);
+				u8 reg_t = BIT(inst, 4, 4) + 7;
+				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, a%d\n", "minu", BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
+
+				if (get_reg(reg_s) < get_reg(reg_t))
+					set_reg(dstreg, get_reg(reg_s));
+				else
+					set_reg(dstreg, get_reg(reg_t));
+
 				break;
+			}
 
 			case 0b0111: // MAXU (with Miscellaneous Operations Option)
 				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, a%d\n", s_rst3_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
@@ -2172,10 +2200,34 @@ void xtensa_device::getop_and_execute()
 }
 void xtensa_device::check_interrupts()
 {
-	int intlevel = 3;// : 1;
 
+	if ((m_extreg_intenable & 0x10) && (m_extreg_intset & 0x10) && (get_irqpri() < 1))
+	{
+		// high priority interrupt 3 code is here in RAM, not sure what points to it yet, needed to get out of first wait loop
+		// writes to intclear 0000010 (so related to intenable/request 0x10)
+		m_extreg_eps3 = m_extreg_ps;
+		m_extreg_epc3 = m_nextpc;
+		m_pc = 0x2c0001b4;
+		set_irqpri(1);
+	}
+	else if ((m_extreg_intenable & 0x02) && (m_extreg_intset & 0x02) && (get_irqpri() < 2))
+	{
+		m_extreg_epc1 = m_nextpc;
+		m_pc = 0x2c000194;
+		set_irqpri(2);
+	}
+	else if ((m_extreg_intenable & 0x04) && (m_extreg_intset & 0x04) && (get_irqpri() < 3))
+	{
+		m_extreg_epc1 = m_nextpc;
+		m_pc = 0x2c000194;
+		set_irqpri(4);
+	}
+
+#if 0
 	if (m_extreg_intenable &= 0x16)
 	{
+		int intlevel = 3;// : 1;
+
 		if (m_irq_req_hack == 1)
 		{
 			m_irq_req_hack = 0;
@@ -2247,14 +2299,40 @@ void xtensa_device::check_interrupts()
 			}
 		}
 	}
+#endif
+
 }
 
 
 
-void xtensa_device::irq_request_hack()
+void xtensa_device::irq_request_hack(int which)
 {
-	m_irq_req_hack = 1;
+	if (which == 0x10)
+	{
+	//	m_irq_req_hack = 1;
+		m_extreg_intset |= 0x10;
+	}
+
+	if (which == 0x2)
+	{
+	//	m_irq_req_hack = 1;
+		m_extreg_intset |= 0x02;
+	}
+
+	if (which == 0x4)
+	{
+	//	m_irq_req_hack = 1;
+		m_extreg_intset |= 0x04;
+	}
+
 }
+
+
+void xtensa_device::irq_off_hack()
+{
+	m_extreg_intset &= ~0x04;
+}
+
 
 
 void xtensa_device::execute_run()
