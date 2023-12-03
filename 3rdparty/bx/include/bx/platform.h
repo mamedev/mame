@@ -200,8 +200,9 @@
 #	undef  BX_PLATFORM_OSX
 #	define BX_PLATFORM_OSX __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__
 #elif defined(__EMSCRIPTEN__)
+#	include <emscripten/version.h>
 #	undef  BX_PLATFORM_EMSCRIPTEN
-#	define BX_PLATFORM_EMSCRIPTEN 1
+#	define BX_PLATFORM_EMSCRIPTEN (__EMSCRIPTEN_major__ * 10000 + __EMSCRIPTEN_minor__ * 100 + __EMSCRIPTEN_tiny__)
 #elif defined(__ORBIS__)
 #	undef  BX_PLATFORM_PS4
 #	define BX_PLATFORM_PS4 1
@@ -365,11 +366,11 @@
 
 #if BX_PLATFORM_ANDROID
 #	define BX_PLATFORM_NAME "Android " \
-				BX_STRINGIZE(BX_PLATFORM_ANDROID)
+		BX_STRINGIZE(BX_PLATFORM_ANDROID)
 #elif BX_PLATFORM_BSD
 #	define BX_PLATFORM_NAME "BSD"
 #elif BX_PLATFORM_EMSCRIPTEN
-#	define BX_PLATFORM_NAME "asm.js "          \
+#	define BX_PLATFORM_NAME "Emscripten "      \
 		BX_STRINGIZE(__EMSCRIPTEN_major__) "." \
 		BX_STRINGIZE(__EMSCRIPTEN_minor__) "." \
 		BX_STRINGIZE(__EMSCRIPTEN_tiny__)
