@@ -1254,7 +1254,6 @@ void m6801_cpu_device::device_reset()
 	m_port_ddr[0] = 0x00;
 	m_port_ddr[1] = 0x00;
 	m_port_ddr[2] = 0x00;
-	m_port_data[0] = 0;
 	m_p3csr = 0x00;
 	m_pending_isf_clear = false;
 	m_port2_written = false;
