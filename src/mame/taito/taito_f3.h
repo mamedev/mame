@@ -209,7 +209,6 @@ protected:
 
 		inline bool operator<(const mixable& rhs) const noexcept { return this->prio() < rhs.prio(); };
 		inline bool operator>(const mixable& rhs) const noexcept { return this->prio() > rhs.prio(); };
-		virtual void draw(u32* dst, int x, int y) {};
 	};
 
 	struct sprite_inf : mixable {
@@ -221,7 +220,6 @@ protected:
 		bitmap_rgb32 srcbitmap{};
 
 		bool brightness; // 7400 0xf000
-		void draw(u32* dst, int x, int y) override;
 	};
 
 	struct pivot_inf : mixable {
@@ -239,7 +237,6 @@ protected:
 	struct playfield_inf : mixable {
 		bitmap_ind16* srcbitmap;
 		bitmap_ind8*  flagsbitmap;
-		const pen_t* clut;
 
 		int colscroll;        // 4000
 		bool alt_tilemap;     // 4000
@@ -255,7 +252,6 @@ protected:
 		u32 reg_fx_y;
 		u32 reg_x_count;
 		u32 reg_y_count;
-		void draw(u32* dst, int x, int y) override;
 	};
 
 	struct f3_line_inf {
@@ -278,6 +274,9 @@ protected:
 		playfield_inf pf[NUM_PLAYFIELDS];
 	};
 
+	virtual void draw_line(u32* dst, int y, int xs, int xe, mixable* l);
+	virtual void draw_line(u32* dst, int y, int xs, int xe, sprite_inf* sp);
+	virtual void draw_line(u32* dst, int y, int xs, int xe, playfield_inf* pf);
 
 	struct f3_playfield_line_inf
 	{

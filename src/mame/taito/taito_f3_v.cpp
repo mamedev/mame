@@ -1755,19 +1755,29 @@ void taito_f3_state::get_pf_scroll(int pf_num, u32 &reg_sx, u32 &reg_sy)
 	reg_sy = sy;
 }
 
-void taito_f3_state::sprite_inf::draw(u32* dst, int y, int x)
+void taito_f3_state::draw_line(u32* dst, int y, int xs, int xe, mixable* l) { };
+void taito_f3_state::draw_line(u32* dst, int y, int xs, int xe, sprite_inf* sp)
 {
-	if (u32 col = srcbitmap.pix(y, x))
-		*dst = col;
-}
-void taito_f3_state::playfield_inf::draw(u32* dst, int y, int x)
-{
-	int y_index = ((reg_fx_y >> 16) + colscroll) & 0x1ff;
-	int x_index = ((reg_fx_x >> 16) + x) & 0x1ff;
-	if (!(flagsbitmap->pix(y_index, x_index) & 0xf0))
+	if (!sp->layer_enable())
 		return;
-	if (u32 col = clut[srcbitmap->pix(y_index, x_index)])
-		*dst = col;
+	for (int x = xs; x < xe; x++) {
+		if (u32 col = sp->srcbitmap.pix(y, x))
+			dst[x] = col;
+	}
+}
+void taito_f3_state::draw_line(u32* dst, int y, int xs, int xe, playfield_inf* pf)
+{
+	if (!pf->layer_enable())
+		return;
+	const pen_t *clut = &m_palette->pen(0);
+	int y_index = ((pf->reg_fx_y >> 16) + pf->colscroll) & 0x1ff;
+	for (int x = xs; x < xe; x++) {
+		int x_index = ((pf->reg_fx_x >> 16) + x) & m_width_mask;
+		if (!(pf->flagsbitmap->pix(y_index, x_index) & 0xf0))
+			continue;
+		if (u32 col = clut[pf->srcbitmap->pix(y_index, x_index)])
+			dst[x] = col;
+	}
 }
 
 void taito_f3_state::scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -1783,6 +1793,7 @@ void taito_f3_state::scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cl
 		y_inc = 1;
 	}
 
+	// acquire sprite rendering layers, playfield tilemaps, playfield scroll
 	f3_line_inf line_data{};
 	for (int sp = 0; sp < NUM_SPRITEGROUPS; ++sp) {
 		line_data.sp[sp].srcbitmap = bitmap_rgb32(bitmap.width(), bitmap.height());
@@ -1791,13 +1802,13 @@ void taito_f3_state::scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cl
 		int tmap_number = pf + line_data.pf[pf].alt_tilemap * 2;
 		line_data.pf[pf].srcbitmap = &m_tilemap[tmap_number]->pixmap();
 		line_data.pf[pf].flagsbitmap = &m_tilemap[tmap_number]->flagsmap();
-		line_data.pf[pf].clut = &m_palette->pen(0);
 		get_pf_scroll(pf, line_data.pf[pf].reg_sx, line_data.pf[pf].reg_sy);
 		if (m_flipscreen)
 			line_data.pf[pf].reg_fx_y = -line_data.pf[pf].reg_sy - (256 << 16);
 		else
 			line_data.pf[pf].reg_fx_y = line_data.pf[pf].reg_sy;
 	}
+	// draw sprite layers
 	{
 		const tempsprite *sprite_ptr;
 		gfx_element *sprite_gfx = m_gfxdecode->gfx(2);
@@ -1819,21 +1830,34 @@ void taito_f3_state::scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cl
 			}
 	}
 
+	auto prio = [](const auto& obj) -> u8 { return obj->prio(); };
+
 	for (int y = y_start; y != y_end; y += y_inc) {
 		read_line_ram(line_data, y);
 
-		std::array<mixable*, NUM_SPRITEGROUPS + NUM_TILEMAPS> layers = {
+		// sort layers
+		std::array<std::variant<pivot_inf*, sprite_inf*, playfield_inf*>,
+				   NUM_SPRITEGROUPS + NUM_TILEMAPS> layers = {
 			&line_data.sp[3], &line_data.sp[2], &line_data.sp[1], &line_data.sp[0],
 			&line_data.pivot,
 			&line_data.pf[3], &line_data.pf[2], &line_data.pf[1], &line_data.pf[0]
 		};
 		std::stable_sort(layers.begin(), layers.end(),
-						 [](auto a, auto b){ return *a < *b; });
+						 [prio](auto a, auto b) {
+							 return std::visit(prio, a) < std::visit(prio, b);
+						 });
 
-		for (int x = 46; x < 46 + 320; ++x) {
-			for (auto gfx : layers) {
-				gfx->draw(&bitmap.pix(y, x), y, x);
-			}
+		// draw layers to framebuffer, (for now, in bottom->top order)
+		for (auto gfx : layers) {
+			std::visit([&](auto&& arg) {
+				using T = std::decay_t<decltype(arg)>;
+				if constexpr (std::is_same_v<T, sprite_inf*>)
+					draw_line(&bitmap.pix(y), y, 46, 46 + 320, arg);
+				else if constexpr (std::is_same_v<T, playfield_inf*>)
+					draw_line(&bitmap.pix(y), y, 46, 46 + 320, arg);
+				else if constexpr (std::is_same_v<T, pivot_inf*>)
+					draw_line(&bitmap.pix(y), y, 46, 46 + 320, arg);
+			}, gfx);
 		}
 
 		// update registers
@@ -1843,7 +1867,6 @@ void taito_f3_state::scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cl
 			p->reg_fx_x = p->reg_sx + p->rowscroll + 10*p->x_scale;
 			p->reg_fx_x &= (m_width_mask << 16) | 0xffff;
 		}
-
 	}
 }
 
