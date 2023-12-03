@@ -433,6 +433,7 @@ The golf club acts like a LED gun. PCB power input is 12V.
 #include "speaker.h"
 
 // configurable logging
+//#define LOG_WARN  (1U << 1)
 #define LOG_I2C     (1U << 2)
 #define LOG_IRQ     (1U << 3)
 #define LOG_TIMER   (1U << 4)
@@ -857,7 +858,7 @@ void viper_state::epic_i2cdr_w(offs_t offset, uint8_t data)
 			// generate interrupt if interrupts are enabled
 			if (m_epic.i2c_cr & 0x40)
 			{
-				// TODO: mustn
+				// TODO: mustn't be instant
 				LOGI2C("I2C interrupt\n");
 				mpc8240_interrupt(MPC8240_I2C_IRQ);
 
@@ -1100,7 +1101,7 @@ void viper_state::epic_map(address_map &map)
 	// w/o strobe
 	map(0x600b0, 0x600b0).lw8(
 		NAME([this] (offs_t offset, u8 data) {
-			// pretty spammy
+			// spammy
 			//LOGIRQ("EOI IRQ%d ACK\n", m_epic.active_irq);
 
 			m_epic.irq[m_epic.active_irq].active = 0;
