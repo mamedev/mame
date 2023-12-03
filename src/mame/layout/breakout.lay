@@ -8,36 +8,28 @@ license:CC0-1.0
 
 	<element name="overlay">
 		<rect>
-			<bounds left="0" top="0" right="192" bottom="44" />
+			<bounds left="0" top="0" right="192" bottom="1440" />
 			<color red="1" green="1" blue="1" />
 		</rect>
 		<rect>
-			<bounds left="0" top="44" right="192" bottom="54" />
+			<bounds left="0" top="264" right="192" bottom="322" />
 			<color red="1" green="0.125" blue="0.125" />
 		</rect>
 		<rect>
-			<bounds left="0" top="54" right="192" bottom="64" />
+			<bounds left="0" top="319" right="192" bottom="378" />
 			<color red="1" green="0.5" blue="0.0625" />
 		</rect>
 		<rect>
-			<bounds left="0" top="64" right="192" bottom="74" />
+			<bounds left="0" top="375" right="192" bottom="434" />
 			<color red="0.25" green="1" blue="0.25" />
 		</rect>
 		<rect>
-			<bounds left="0" top="74" right="192" bottom="84" />
+			<bounds left="0" top="431" right="192" bottom="487" />
 			<color red="1" green="1" blue="0.25" />
 		</rect>
 		<rect>
-			<bounds left="0" top="84" right="192" bottom="231" />
-			<color red="1" green="1" blue="1" />
-		</rect>
-		<rect>
-			<bounds left="0" top="221" right="192" bottom="228" />
+			<bounds left="0" top="1305" right="192" bottom="1338" />
 			<color red="0.125" green="0.125" blue="1" />
-		</rect>
-		<rect>
-			<bounds left="0" top="228" right="192" bottom="244" />
-			<color red="1" green="1" blue="1" />
 		</rect>
 	</element>
 
