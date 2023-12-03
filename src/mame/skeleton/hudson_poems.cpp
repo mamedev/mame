@@ -58,8 +58,8 @@ protected:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t offset, int xx, int yy);
-	void draw_tile8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t offset, int xx, int yy);
+	void draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t tile, int xx, int yy);
+	void draw_tile8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t tile, int xx, int yy);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(screen_scanline);
 
@@ -106,66 +106,64 @@ static INPUT_PORTS_START( hudson_poems )
 INPUT_PORTS_END
 
 
-void hudson_poems_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t offset, int xx, int yy)
+void hudson_poems_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t tile, int xx, int yy)
 {
-	offset = offset * 8;
+	int flipx = tile & 0x800;
+	int flipy = tile & 0x400;
+	tile &= 0x3ff;
+
+	int realoffset = tile * 8;
 	int count = 0;
-	for (int y=0;y<8;y++)
+	for (int y = 0; y < 8; y++)
 	{
-		u16 *const dstptr_bitmap = &bitmap.pix(y+yy);
+		int realy = y;
+		if (flipy)
+			realy = 7 - y;
 
-		for (int x=0;x<8/8;x++)
+		u16* const dstptr_bitmap = &bitmap.pix(realy + yy);
+
+		uint32_t pix = m_mainram[(0x9c00 / 4) + count + realoffset];
+		int pos = xx;
+
+		if (flipx)
 		{
-			uint32_t pix = m_mainram[(0x9c00/4)+count+offset];
-			int pos = xx+x*8;
-
-			if (pos < cliprect.max_x) dstptr_bitmap[pos] = (pix >> 0) & 0xf;
-			pos++;
-			if (pos < cliprect.max_x) dstptr_bitmap[pos] = (pix >> 4) & 0xf;
-			pos++;
-			if (pos < cliprect.max_x) dstptr_bitmap[pos] = (pix >> 8) & 0xf;
-			pos++;
-			if (pos < cliprect.max_x) dstptr_bitmap[pos] = (pix >> 12) & 0xf;
-			pos++;
-			if (pos < cliprect.max_x) dstptr_bitmap[pos] = (pix >> 16) & 0xf;
-			pos++;
-			if (pos < cliprect.max_x) dstptr_bitmap[pos] = (pix >> 20) & 0xf;
-			pos++;
-			if (pos < cliprect.max_x) dstptr_bitmap[pos] = (pix >> 24) & 0xf;
-			pos++;
-			if (pos < cliprect.max_x) dstptr_bitmap[pos] = (pix >> 28) & 0xf;
-			pos++;
-
+			for (int i = 28; i >= 0; i -= 4)
+			{
+				if (pos < cliprect.max_x) dstptr_bitmap[pos] = (pix >> i) & 0xf;
+				pos++;
+			}
+			count++;
+		}
+		else
+		{
+			for (int i = 0; i < 32; i += 4)
+			{
+				if (pos < cliprect.max_x) dstptr_bitmap[pos] = (pix >> i) & 0xf;
+				pos++;
+			}
 			count++;
 		}
 	}
 }
 
-void hudson_poems_state::draw_tile8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t offset, int xx, int yy)
+void hudson_poems_state::draw_tile8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t tile, int xx, int yy)
 {
-	offset = offset * 16;
+	int offset = tile * 16;
 	int count = 0;
-	for (int y=0;y<8;y++)
+	for (int y = 0; y < 8; y++)
 	{
-		u16 *const dstptr_bitmap = &bitmap.pix(y+yy);
+		u16* const dstptr_bitmap = &bitmap.pix(y + yy);
 
-		for (int x=0;x<8/4;x++)
+		uint64_t pix = ((uint64_t)(m_mainram[(0x9c00 / 4) + count + 1 + offset]) << 32) | (uint64_t)(m_mainram[(0x9c00 / 4) + count + offset]);
+		int pos = xx;
+
+		for (int i = 0; i < 64; i += 8)
 		{
-			uint32_t pix = m_mainram[(0x9c00/4)+count+offset];
-
-			int pos = xx+x*4;
-
-			if (pos < cliprect.max_x) dstptr_bitmap[pos] = (pix >> 0) & 0xff;
+			if (pos < cliprect.max_x) dstptr_bitmap[pos] = (pix >> i) & 0xff;
 			pos++;
-			if (pos < cliprect.max_x) dstptr_bitmap[pos] = (pix >> 8) & 0xff;
-			pos++;
-			if (pos < cliprect.max_x) dstptr_bitmap[pos] = (pix >> 16) & 0xff;
-			pos++;
-			if (pos < cliprect.max_x) dstptr_bitmap[pos] = (pix >> 24) & 0xff;
-			pos++;
-
-			count++;
 		}
+
+		count += 2;
 	}
 }
 
