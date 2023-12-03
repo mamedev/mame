@@ -384,14 +384,16 @@ static INPUT_PORTS_START( nichild_mj )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSWA")
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSWA:8")
+	PORT_DIPNAME( 0x01, 0x01, "Background" ) PORT_DIPLOCATION("DSWA:8")
+	PORT_DIPSETTING(    0x01, "Green" )
+	PORT_DIPSETTING(    0x00, "Video Playback" )
 	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSWA:7")
 	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSWA:6")
 	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSWA:5")
 	PORT_DIPNAME(0x10, 0x10, DEF_STR( Coinage )) PORT_DIPLOCATION("DSWA:4")
 	PORT_DIPSETTING(0x10, DEF_STR( 1C_1C ))
 	PORT_DIPSETTING(0x00, DEF_STR( 1C_2C ))
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSWA:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSWA:3") // those three are probably difficulty
 	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSWA:2")
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSWA:1")
 
@@ -475,10 +477,12 @@ static INPUT_PORTS_START( nichild_quiz )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x00, "RGB Test Screen" ) PORT_DIPLOCATION("DSWA:8")
+	PORT_DIPNAME( 0x01, 0x01, "RGB Test Screen" ) PORT_DIPLOCATION("DSWA:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSWA:7") // ld video inserted into attract mode?
+	PORT_DIPNAME( 0x02, 0x02, "Video Playback In Attract Mode" ) PORT_DIPLOCATION("DSWA:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	// at least for ldquiz4, to be verified for other games
 	// (definitely don't affect sound in shabdama unless it expects attract mode audio from LD player)
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("DSWA:6")
@@ -678,11 +682,11 @@ GAME( 1991, shabdama, 0,   nichild, nichild_mj,   nichild_state, empty_init, ROT
 // LDQUIZ もう答えずにはいられない
 // 1992
 GAME( 1992, ldquiz4,  0,   nichild, nichild_quiz, nichild_state, empty_init, ROT0, "Nichibutsu / AV Japan", "LD Quiz dai 4-dan - Kotaetamon Gachi! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // LDQUIZ 答えたもん勝ち
-// LD麻雀 第5弾 夜明けのカフェテラス
+// LD麻雀 第5弾 夜明けのカフェテラス (LD A8165)
 // LD麻雀 第6弾 ティファニー
 // 1993
 // LD麻雀 第7弾 ジェラシー
-// LD麻雀 第8弾 ブルセラ
+// LD麻雀 第8弾 ブルセラ (LD A8190M)
 // 1994
 // LD麻雀 第9弾 ポケベル1919
 // LD麻雀 第10弾 ボディコン総集編
