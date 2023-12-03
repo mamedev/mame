@@ -146,22 +146,22 @@ protected:
 	bool m_double_r6_in_interlace_video_mode;
 
 	/* register file */
-	uint8_t   m_horiz_char_total;     /* 0x00 */
-	uint8_t   m_horiz_disp;           /* 0x01 */
-	uint8_t   m_horiz_sync_pos;       /* 0x02 */
-	uint8_t   m_sync_width;           /* 0x03 */
-	uint8_t   m_vert_char_total;      /* 0x04 */
-	uint8_t   m_vert_total_adj;       /* 0x05 */
-	uint8_t   m_vert_disp;            /* 0x06 */
-	uint8_t   m_vert_sync_pos;        /* 0x07 */
-	uint8_t   m_mode_control;         /* 0x08 */
-	uint8_t   m_max_ras_addr;         /* 0x09 */
-	uint8_t   m_cursor_start_ras;     /* 0x0a */
-	uint8_t   m_cursor_end_ras;       /* 0x0b */
-	uint16_t  m_disp_start_addr;      /* 0x0c/0x0d */
-	uint16_t  m_cursor_addr;          /* 0x0e/0x0f */
-	uint16_t  m_light_pen_addr;       /* 0x10/0x11 */
-	uint16_t  m_update_addr;          /* 0x12/0x13 */
+	uint8_t   m_horiz_char_total;     /* 0x00 - R0 */
+	uint8_t   m_horiz_disp;           /* 0x01 - R1 */
+	uint8_t   m_horiz_sync_pos;       /* 0x02 - R2 */
+	uint8_t   m_sync_width;           /* 0x03 - R3 */
+	uint8_t   m_vert_char_total;      /* 0x04 - R4 */
+	uint8_t   m_vert_total_adj;       /* 0x05 - R5 */
+	uint8_t   m_vert_disp;            /* 0x06 - R6 */
+	uint8_t   m_vert_sync_pos;        /* 0x07 - R7 */
+	uint8_t   m_mode_control;         /* 0x08 - R8 */
+	uint8_t   m_max_ras_addr;         /* 0x09 - R9 */
+	uint8_t   m_cursor_start_ras;     /* 0x0a - R10 */
+	uint8_t   m_cursor_end_ras;       /* 0x0b - R11 */
+	uint16_t  m_disp_start_addr;      /* 0x0c/0x0d - R12/R13 */
+	uint16_t  m_cursor_addr;          /* 0x0e/0x0f - R14/R15 */
+	uint16_t  m_light_pen_addr;       /* 0x10/0x11 - R16/R17 */
+	uint16_t  m_update_addr;          /* 0x12/0x13 - R18/R19 */
 
 	/* other internal state */
 	uint8_t   m_register_address_latch;
@@ -199,6 +199,7 @@ protected:
 	emu_timer *m_light_pen_latch_timer;
 	emu_timer *m_upd_adr_timer;
 	emu_timer *m_upd_trans_timer;
+	emu_timer *m_interlace_vsync_half_line_timer;
 
 	/* computed values - do NOT state save these! */
 	/* These computed are used to define the screen parameters for a driver */
@@ -228,6 +229,7 @@ protected:
 	void set_vsync(int state);
 	void set_cur(int state);
 	bool match_line();
+	bool match_interlace_line();
 	virtual bool check_cursor_visible(uint16_t ra, uint16_t line_addr);
 	TIMER_CALLBACK_MEMBER(handle_line_timer);
 	TIMER_CALLBACK_MEMBER(de_off_tick);
@@ -238,6 +240,7 @@ protected:
 	TIMER_CALLBACK_MEMBER(latch_light_pen);
 	TIMER_CALLBACK_MEMBER(adr_update_tick);
 	TIMER_CALLBACK_MEMBER(transparent_update_tick);
+	TIMER_CALLBACK_MEMBER(interlace_vsync);
 	virtual void update_cursor_state();
 	virtual uint8_t draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

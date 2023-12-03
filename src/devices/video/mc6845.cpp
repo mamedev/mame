@@ -617,6 +617,12 @@ bool mc6845_device::match_line()
 	/* Check if VSYNC should be enabled */
 	if ( m_line_counter == m_vert_sync_pos )
 	{
+		if (MODE_INTERLACE_AND_VIDEO && m_odd_field)
+		{
+			m_interlace_vsync_half_line_timer->adjust(cclks_to_attotime(m_horiz_char_total / 2));
+			return false;
+		}
+
 		m_vsync_width_counter = 0;
 		m_vsync_ff = 1;
 
@@ -705,6 +711,7 @@ TIMER_CALLBACK_MEMBER(mc6845_device::handle_line_timer)
 	{
 		uint8_t vsync_width = m_supports_vert_sync_width ? (m_sync_width >> 4) & 0x0f : 0;
 
+		// increment counter so systems that don't support specifying vsync width gets the default 16 scan lines
 		m_vsync_width_counter = ( m_vsync_width_counter + 1 ) & 0x0F;
 
 		/* Check if we've reached end of VSYNC */
@@ -716,23 +723,11 @@ TIMER_CALLBACK_MEMBER(mc6845_device::handle_line_timer)
 		}
 	}
 
-// temporary test code
-//     1 == original code plus some minor changes (still runs but is drawing)
-//     0 == new code for alternating lines (locks up gp-19 and apricot pc)
-#define ORIGINAL 0
-
-#if ORIGINAL
-	// For rudimentary 'interlace and video' support, m_raster_counter increments by 1 rather than the correct 2.
-	// The correct test would be:
-	// if ( m_raster_counter == (MODE_INTERLACE_AND_VIDEO ? m_max_ras_addr + 1 : m_max_ras_addr) )
-	if ( m_raster_counter == m_max_ras_addr + (MODE_INTERLACE_AND_VIDEO ? m_interlace_adjust : m_noninterlace_adjust) - 1 )
-#else
 	if (!m_adjust_active && ((!MODE_INTERLACE_AND_VIDEO && m_raster_counter == m_max_ras_addr + m_noninterlace_adjust - 1) ||
 		(MODE_INTERLACE_AND_VIDEO && ((m_odd_field && (m_raster_counter == m_max_ras_addr + m_interlace_adjust - 1)) ||
 			(!m_odd_field && (m_raster_counter == m_max_ras_addr + m_interlace_adjust - 2)))
 		))
 	)
-#endif
 	{
 		/* Check if we have reached the end of the vertical area */
 		if ( m_line_counter == m_vert_char_total )
@@ -741,9 +736,7 @@ TIMER_CALLBACK_MEMBER(mc6845_device::handle_line_timer)
 			m_adjust_active = 1;
 		}
 
-#if ORIGINAL
-		m_raster_counter = 0;
-#else
+		// TODO - handle MODE_INTERLACE half lines 
 		if (MODE_INTERLACE_AND_VIDEO && m_odd_field)
 		{
 			m_raster_counter = 1;
@@ -752,31 +745,28 @@ TIMER_CALLBACK_MEMBER(mc6845_device::handle_line_timer)
 		{
 			m_raster_counter = 0;
 		}
-#endif
 		m_line_counter = ( m_line_counter + 1 ) & 0x7F;
 		m_line_address = ( m_line_address + m_horiz_disp ) & 0x3fff;
 
 		if (match_line())
+		{
 			new_vsync = true;
+			if (MODE_INTERLACE_AND_VIDEO || MODE_INTERLACE)
+			{
+				m_odd_field = !m_odd_field;
+			}
+		}
 	}
 	else
 	{
-#if ORIGINAL
-		m_raster_counter = ( m_raster_counter + 1 ) & 0x1F;
-#else
 		m_raster_counter = ( m_raster_counter + (MODE_INTERLACE_AND_VIDEO ? 2 : 1) ) & 0x1F;
-#endif
 	}
 
 	if ( m_adjust_active )
 	{
 		/* Check if we have reached the end of a full cycle */
-#if ORIGINAL
-		if ( m_adjust_counter == m_vert_total_adj )
-#else
 		if ((!MODE_INTERLACE_AND_VIDEO && (m_adjust_counter == m_vert_total_adj )) ||
 			(MODE_INTERLACE_AND_VIDEO && ((m_adjust_counter + 1) >= m_vert_total_adj)))
-#endif
 		{
 			m_adjust_active = 0;
 			m_raster_counter = 0;
@@ -789,7 +779,7 @@ TIMER_CALLBACK_MEMBER(mc6845_device::handle_line_timer)
 				if (match_line())
 				{
 					new_vsync = true;
-					if (MODE_INTERLACE_AND_VIDEO)
+					if (MODE_INTERLACE_AND_VIDEO || MODE_INTERLACE)
 					{
 						m_odd_field = !m_odd_field;
 					}
@@ -804,11 +794,7 @@ TIMER_CALLBACK_MEMBER(mc6845_device::handle_line_timer)
 		}
 		else
 		{
-#if ORIGINAL
-			m_adjust_counter = ( m_adjust_counter + 1 ) & 0x1F;
-#else
 			m_adjust_counter = ( m_adjust_counter + (MODE_INTERLACE_AND_VIDEO ? 2 : 1) ) & 0x1F;
-#endif
 		}
 	}
 
@@ -838,7 +824,7 @@ TIMER_CALLBACK_MEMBER(mc6845_device::handle_line_timer)
 
 	/* Set VSYNC and DE signals */
 	set_vsync( new_vsync );
-	set_de( (m_line_enable_ff && nonzero_horizontal_width) ? true : false );
+	set_de( (m_line_enable_ff && nonzero_horizontal_width) ? 1 : 0 );
 }
 
 
@@ -904,6 +890,17 @@ TIMER_CALLBACK_MEMBER(mc6845_device::transparent_update_tick)
 	}
 }
 
+TIMER_CALLBACK_MEMBER(mc6845_device::interlace_vsync)
+{
+	// cancel the timer for now
+	m_interlace_vsync_half_line_timer->adjust(attotime::never);
+
+	m_vsync_width_counter = 0;
+	m_vsync_ff = 1;
+	m_odd_field = !m_odd_field;
+
+	set_vsync(true);
+}
 
 uint16_t mc6845_device::get_ma()
 {
@@ -1108,6 +1105,7 @@ void mc6845_device::device_start()
 	m_light_pen_latch_timer = timer_alloc(FUNC(mc6845_device::latch_light_pen), this);
 	m_upd_adr_timer = timer_alloc(FUNC(mc6845_device::adr_update_tick), this);
 	m_upd_trans_timer = timer_alloc(FUNC(mc6845_device::transparent_update_tick), this);
+	m_interlace_vsync_half_line_timer = timer_alloc(FUNC(mc6845_device::interlace_vsync), this);
 
 	// Make sure m_horiz_char_total/m_vert_char_total are less than m_horiz_disp/m_vert_disp
 	// to avoid calculating startup resolution before values are valid
