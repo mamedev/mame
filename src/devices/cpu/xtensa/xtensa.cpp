@@ -986,9 +986,18 @@ void xtensa_device::getop_and_execute()
 			}
 
 			case 0b0110: // XSR (added in T1040)
-				LOGMASKED(LOG_UNHANDLED_OPS, "xsr.%-3s a%d\n", special_reg(BIT(inst, 8, 8), true), BIT(inst, 4, 4));
+			{
+				u8 spcreg = BIT(inst, 8, 8);
+				u8 reg = BIT(inst, 4, 4);
+				LOGMASKED(LOG_UNHANDLED_OPS, "xsr.%-3s a%d\n", special_reg(spcreg, true), reg);
+#if 0
+				u32 spcregval = space(AS_EXTREGS).read_dword(spcreg);
+				u32 regval = get_reg(reg);
+				space(AS_EXTREGS).write_dword(spcreg, regval);
+				set_reg(reg, spcregval);
+#endif
 				break;
-
+			}
 			case 0b0111: // ACCER (added in RC-2009.0)
 				switch (BIT(inst, 20, 4))
 				{
