@@ -432,15 +432,22 @@ The golf club acts like a LED gun. PCB power input is 12V.
 #include "screen.h"
 #include "speaker.h"
 
+// configurable logging
+//#define LOG_WARN  (1U << 1)
+#define LOG_I2C     (1U << 2)
+#define LOG_IRQ     (1U << 3)
+#define LOG_TIMER   (1U << 4)
+
+#define VERBOSE (LOG_GENERAL | LOG_IRQ)
+//#define LOG_OUTPUT_STREAM std::cout
+
+#include "logmacro.h"
+
+#define LOGI2C(...)     LOGMASKED(LOG_I2C,     __VA_ARGS__)
+#define LOGIRQ(...)     LOGMASKED(LOG_IRQ,     __VA_ARGS__)
+#define LOGTIMER(...)   LOGMASKED(LOG_TIMER,   __VA_ARGS__)
 
 namespace {
-
-#define VIPER_DEBUG_LOG
-#define VIPER_DEBUG_EPIC_INTS       0
-// TODO: doesn't compile, wants attotime_string
-#define VIPER_DEBUG_EPIC_TIMERS     0
-#define VIPER_DEBUG_EPIC_REGS       0
-#define VIPER_DEBUG_EPIC_I2C        0
 
 
 #define SDRAM_CLOCK         166666666       // Main SDRAMs run at 166MHz
@@ -481,8 +488,10 @@ protected:
 
 	required_device<voodoo_3_device> m_voodoo;
 private:
-	uint32_t epic_r(offs_t offset);
-	void epic_w(offs_t offset, uint32_t data);
+	void epic_map(address_map &map);
+	uint8_t epic_i2cdr_r(offs_t offset);
+	void epic_i2cdr_w(offs_t offset, uint8_t data);
+
 	void unk2_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	uint64_t voodoo3_io_r(offs_t offset, uint64_t mem_mask = ~0);
 	void voodoo3_io_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
@@ -615,9 +624,6 @@ private:
 
 	MPC8240_EPIC m_epic{};
 
-#if VIPER_DEBUG_EPIC_REGS
-	const char* epic_get_register_name(uint32_t reg);
-#endif
 	void epic_update_interrupts();
 	void mpc8240_interrupt(int irq);
 	void mpc8240_epic_init();
@@ -732,10 +738,6 @@ static inline void write64be_with_32sle_device_handler(write32s_delegate handler
 
 uint32_t viper_state::mpc8240_pci_r(int function, int reg, uint32_t mem_mask)
 {
-	#ifdef VIPER_DEBUG_LOG
-//  printf("MPC8240: PCI read %d, %02X, %08X\n", function, reg, mem_mask);
-	#endif
-
 	switch (reg)
 	{
 	}
@@ -744,9 +746,6 @@ uint32_t viper_state::mpc8240_pci_r(int function, int reg, uint32_t mem_mask)
 
 void viper_state::mpc8240_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask)
 {
-	#ifdef VIPER_DEBUG_LOG
-//  printf("MPC8240: PCI write %d, %02X, %08X, %08X\n", function, reg, data, mem_mask);
-	#endif
 	COMBINE_DATA(&m_mpc8240_regs[reg/4]);
 }
 
@@ -776,121 +775,346 @@ void viper_state::pci_config_data_w(uint64_t data)
 /*****************************************************************************/
 // MPC8240 Embedded Programmable Interrupt Controller (EPIC)
 
-#if VIPER_DEBUG_EPIC_REGS
-const char* viper_state::epic_get_register_name(uint32_t reg)
+uint8_t viper_state::epic_i2cdr_r(offs_t offset)
 {
-	switch (reg >> 16)
+	if (m_epic.i2c_cr & 0x80 && !machine().side_effects_disabled())     // only do anything if the I2C module is enabled
 	{
-		// 0x00000 - 0x0ffff
-		case 0x0:
+		if (m_epic.i2c_state == I2C_STATE_ADDRESS_CYCLE)
 		{
-			switch (reg & 0xffff)
+			LOGI2C("I2C address cycle read\n");
+
+			m_epic.i2c_state = I2C_STATE_DATA_TRANSFER;
+
+			// set transfer complete in status register
+			m_epic.i2c_sr |= 0x80;
+
+			// generate interrupt if interrupt are enabled
+			if (m_epic.i2c_cr & 0x40)
 			{
-				case 0x3000:    return "I2CADR";
-				case 0x3004:    return "I2CFDR";
-				case 0x3008:    return "I2CCR";
-				case 0x300c:    return "I2CSR";
-				case 0x3010:    return "I2CDR";
+				LOGI2C("I2C interrupt\n");
+				mpc8240_interrupt(MPC8240_I2C_IRQ);
+
+				// set interrupt flag in status register
+				m_epic.i2c_sr |= 0x2;
 			}
 		}
-
-		// 0x40000 - 0x4ffff
-		case 0x4:
+		else if (m_epic.i2c_state == I2C_STATE_DATA_TRANSFER)
 		{
-			switch (reg & 0xffff)
-			{
-				case 0x1000:    return "FRR";
-				case 0x1020:    return "GCR";
-				case 0x1030:    return "EICR";
-				case 0x1080:    return "EVI";
-				case 0x1090:    return "PI";
-				case 0x10e0:    return "SVR";
-				case 0x10f0:    return "TFRR";
-				case 0x1100:    return "GTCCR0";
-				case 0x1110:    return "GTBCR0";
-				case 0x1120:    return "GTVPR0";
-				case 0x1130:    return "GTDR0";
-				case 0x1140:    return "GTCCR1";
-				case 0x1150:    return "GTBCR1";
-				case 0x1160:    return "GTVPR1";
-				case 0x1170:    return "GTDR1";
-				case 0x1180:    return "GTCCR2";
-				case 0x1190:    return "GTBCR2";
-				case 0x11a0:    return "GTVPR2";
-				case 0x11b0:    return "GTDR2";
-				case 0x11c0:    return "GTCCR3";
-				case 0x11d0:    return "GTBCR3";
-				case 0x11e0:    return "GTVPR3";
-				case 0x11f0:    return "GTDR3";
-			}
-			break;
-		}
+			LOGI2C("I2C data read\n");
 
-		// 0x50000 - 0x5ffff
-		case 0x5:
-		{
-			switch (reg & 0xffff)
-			{
-				case 0x0200:    return "IVPR0";
-				case 0x0210:    return "IDR0";
-				case 0x0220:    return "IVPR1";
-				case 0x0230:    return "IDR1";
-				case 0x0240:    return "IVPR2";
-				case 0x0250:    return "IDR2";
-				case 0x0260:    return "IVPR3";
-				case 0x0270:    return "IDR3";
-				case 0x0280:    return "IVPR4";
-				case 0x0290:    return "IDR4";
-				case 0x02a0:    return "SVPR5";
-				case 0x02b0:    return "SDR5";
-				case 0x02c0:    return "SVPR6";
-				case 0x02d0:    return "SDR6";
-				case 0x02e0:    return "SVPR7";
-				case 0x02f0:    return "SDR7";
-				case 0x0300:    return "SVPR8";
-				case 0x0310:    return "SDR8";
-				case 0x0320:    return "SVPR9";
-				case 0x0330:    return "SDR9";
-				case 0x0340:    return "SVPR10";
-				case 0x0350:    return "SDR10";
-				case 0x0360:    return "SVPR11";
-				case 0x0370:    return "SDR11";
-				case 0x0380:    return "SVPR12";
-				case 0x0390:    return "SDR12";
-				case 0x03a0:    return "SVPR13";
-				case 0x03b0:    return "SDR13";
-				case 0x03c0:    return "SVPR14";
-				case 0x03d0:    return "SDR14";
-				case 0x03e0:    return "SVPR15";
-				case 0x03f0:    return "SDR15";
-				case 0x1020:    return "IIVPR0";
-				case 0x1030:    return "IIDR0";
-				case 0x1040:    return "IIVPR1";
-				case 0x1050:    return "IIDR1";
-				case 0x1060:    return "IIVPR2";
-				case 0x1070:    return "IIDR2";
-				case 0x10c0:    return "IIVPR3";
-				case 0x10d0:    return "IIDR3";
-			}
-			break;
-		}
+			m_epic.i2c_state = I2C_STATE_ADDRESS_CYCLE;
 
-		// 0x60000 - 0x6FFFF
-		case 0x6:
-		{
-			switch (reg & 0xffff)
+			// set transfer complete in status register
+			m_epic.i2c_sr |= 0x80;
+
+			// generate interrupt if interrupt are enabled
+			/*if (m_epic.i2c_cr & 0x40)
 			{
-				case 0x0080:    return "PCTPR";
-				case 0x00a0:    return "IACK";
-				case 0x00b0:    return "EOI";
-			}
-			break;
+			    printf("I2C interrupt\n");
+			    mpc8240_interrupt(MPC8240_I2C_IRQ);
+
+			    // set interrupt flag in status register
+			    m_epic.i2c_sr |= 0x2;
+			}*/
 		}
 	}
 
-	return nullptr;
+	return 0;
 }
-#endif
+
+void viper_state::epic_i2cdr_w(offs_t offset, uint8_t data)
+{
+	if (m_epic.i2c_cr & 0x80)     // only do anything if the I2C module is enabled
+	{
+		if (m_epic.i2c_state == I2C_STATE_ADDRESS_CYCLE)          // waiting for address cycle
+		{
+			//int rw = data & 1;
+
+			int addr = (data >> 1) & 0x7f;
+			LOGI2C("I2C address cycle, addr = %02X\n", addr);
+			m_epic.i2c_state = I2C_STATE_DATA_TRANSFER;
+
+			// set transfer complete in status register
+			m_epic.i2c_sr |= 0x80;
+
+			// generate interrupt if interrupt are enabled
+			if (m_epic.i2c_cr & 0x40)
+			{
+				LOGI2C("I2C interrupt\n");
+				mpc8240_interrupt(MPC8240_I2C_IRQ);
+
+				// set interrupt flag in status register
+				m_epic.i2c_sr |= 0x2;
+			}
+		}
+		else if (m_epic.i2c_state == I2C_STATE_DATA_TRANSFER)     // waiting for data transfer
+		{
+			LOGI2C("I2C data transfer, data = %02X\n", data);
+			m_epic.i2c_state = I2C_STATE_ADDRESS_CYCLE;
+
+			// set transfer complete in status register
+			m_epic.i2c_sr |= 0x80;
+
+			// generate interrupt if interrupts are enabled
+			if (m_epic.i2c_cr & 0x40)
+			{
+				// TODO: mustn't be instant
+				LOGI2C("I2C interrupt\n");
+				mpc8240_interrupt(MPC8240_I2C_IRQ);
+
+				// set interrupt flag in status register
+				m_epic.i2c_sr |= 0x2;
+			}
+		}
+	}
+}
+
+// NOTE: swapendian_int*/8-bit ports used as a temp measure
+// handling with endianness can be done thru new PCI model later on (the EPIC is natively LE)
+
+// NOTE: not everything is "EPIC" but rather is space from the SoC that includes the EPIC.
+// Also a subset of I2O/DMAC/ATU/data path diags are mappable thru a 0x1000 window PCSRBAR,
+// while this full range thru EUMBBAR.
+void viper_state::epic_map(address_map &map)
+{
+//  map(0x00000, 0x00fff) I2O
+//  map(0x01000, 0x01fff) DMAC
+//  map(0x02000, 0x02fff) ATU Address Translation Unit
+	// I2C
+	map(0x03000, 0x03000).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_epic.i2c_adr;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOGI2C("I2CADR %02x\n", data);
+			m_epic.i2c_adr = data;
+		})
+	);
+	map(0x03004, 0x03004).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_epic.i2c_freq_div;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_epic.i2c_freq_div = data & 0x3f;
+			LOGI2C("I2CFDR FDR %02x\n", m_epic.i2c_freq_div);
+		})
+	);
+	map(0x03005, 0x03005).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_epic.i2c_freq_sample_rate;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_epic.i2c_freq_sample_rate = data & 0x3f;
+			LOGI2C("I2CFDR DFFSR %02x\n", m_epic.i2c_freq_sample_rate);
+		})
+	);
+	map(0x03008, 0x03008).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_epic.i2c_cr;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			if ((m_epic.i2c_cr & 0x80) == 0 && (data & 0x80) != 0)
+			{
+				m_epic.i2c_state = I2C_STATE_ADDRESS_CYCLE;
+			}
+			if ((m_epic.i2c_cr & 0x10) != (data & 0x10))
+			{
+				m_epic.i2c_state = I2C_STATE_ADDRESS_CYCLE;
+			}
+			m_epic.i2c_cr = data;
+			LOGI2C("I2CCR %02x\n", data);
+		})
+	);
+	map(0x0300c, 0x0300c).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_epic.i2c_sr;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_epic.i2c_sr = data;
+			LOGI2C("I2CSR %02x\n", data);
+		})
+	);
+	map(0x03010, 0x03010).rw(FUNC(viper_state::epic_i2cdr_r), FUNC(viper_state::epic_i2cdr_w));
+//  map(0x04000, 0x3ffff) <reserved>
+
+//  map(0x40000, 0x7ffff) EPIC
+	map(0x41030, 0x41033).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			data = swapendian_int32(data);
+			m_epic.eicr = data;
+			LOG("EICR %08x\n", data);
+			if (BIT(data, 27))
+				throw emu_fatalerror("EPIC: serial interrupts mode not implemented\n");
+		})
+	);
+	map(0x41080, 0x41083).lr32(
+		NAME([this] (offs_t offset) {
+			if (!machine().side_effects_disabled())
+				LOG("EVI read\n");
+			// step = 1, device_id = 0, vendor_id = 0
+			return swapendian_int32(0x00010000);
+		})
+	);
+	map(0x410e0, 0x410e0).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			m_epic.svr = data;
+			LOGIRQ("SVR %02x\n", data);
+		})
+	);
+
+	map(0x41110, 0x41113).select(0xc0).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			int timer_num = offset >> 4;
+			data = swapendian_int32(data);
+
+			m_epic.global_timer[timer_num].enable = (data & 0x80000000) ? 0 : 1;
+			m_epic.global_timer[timer_num].base_count = data & 0x7fffffff;
+
+			if (m_epic.global_timer[timer_num].enable && m_epic.global_timer[timer_num].base_count > 0)
+			{
+				attotime timer_duration =  attotime::from_hz((SDRAM_CLOCK / 8) / m_epic.global_timer[timer_num].base_count);
+				m_epic.global_timer[timer_num].timer->adjust(timer_duration, timer_num);
+
+				LOGTIMER("EPIC GTIMER%d: next in %s\n", timer_num, (timer_duration / 8).as_string() );
+			}
+			else
+			{
+				m_epic.global_timer[timer_num].timer->reset();
+			}
+		})
+	);
+
+	map(0x41120, 0x41123).select(0xc0).lrw32(
+		NAME([this] (offs_t offset) {
+			u32 ret = 0;
+			int timer_num = offset >> 4;
+
+			ret |= m_epic.irq[MPC8240_GTIMER0_IRQ + timer_num].mask ? 0x80000000 : 0;
+			ret |= m_epic.irq[MPC8240_GTIMER0_IRQ + timer_num].priority << 16;
+			ret |= m_epic.irq[MPC8240_GTIMER0_IRQ + timer_num].vector;
+			ret |= m_epic.irq[MPC8240_GTIMER0_IRQ + timer_num].active ? 0x40000000 : 0;
+			return swapendian_int32(ret);
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			int timer_num = offset >> 4;
+
+			data = swapendian_int32(data);
+
+			m_epic.irq[MPC8240_GTIMER0_IRQ + timer_num].mask = (data & 0x80000000) ? 1 : 0;
+			m_epic.irq[MPC8240_GTIMER0_IRQ + timer_num].priority = (data >> 16) & 0xf;
+			m_epic.irq[MPC8240_GTIMER0_IRQ + timer_num].vector = data & 0xff;
+
+			LOGIRQ("GTVPR%d %08x\n", timer_num, data);
+
+			if (!machine().side_effects_disabled())
+				epic_update_interrupts();
+		})
+	);
+	map(0x41130, 0x41130).select(0xc0).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			int timer_num = offset >> 4;
+
+			m_epic.irq[MPC8240_GTIMER0_IRQ + timer_num].destination = data & 0x1;
+
+			if (data)
+				throw emu_fatalerror("GTDR%d in P1 mode", timer_num, data & 1);
+		})
+	);
+
+	map(0x50200, 0x50203).select(0x1e0).lrw32(
+		NAME([this] (offs_t offset) {
+			u32 ret = 0;
+			int irq = offset >> 3;
+
+			ret |= m_epic.irq[MPC8240_IRQ0 + irq].mask ? 0x80000000 : 0;
+			ret |= m_epic.irq[MPC8240_IRQ0 + irq].priority << 16;
+			ret |= m_epic.irq[MPC8240_IRQ0 + irq].vector;
+			ret |= m_epic.irq[MPC8240_IRQ0 + irq].active ? 0x40000000 : 0;
+			return swapendian_int32(ret);
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			int irq = offset >> 3;
+
+			data = swapendian_int32(data);
+			m_epic.irq[MPC8240_IRQ0 + irq].mask = (data & 0x80000000) ? 1 : 0;
+			m_epic.irq[MPC8240_IRQ0 + irq].priority = (data >> 16) & 0xf;
+			m_epic.irq[MPC8240_IRQ0 + irq].vector = data & 0xff;
+
+			LOGIRQ("IVPR%d %08x\n", irq, data);
+
+			if (!machine().side_effects_disabled())
+				epic_update_interrupts();
+		})
+	);
+	map(0x50210, 0x50210).select(0x1e0).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			int irq = offset >> 3;
+
+			m_epic.irq[MPC8240_IRQ0 + irq].destination = data & 0x1;
+
+			if (data)
+				throw emu_fatalerror("IDR%d in P1 mode", irq, data & 1);
+		})
+	);
+	map(0x51020, 0x51023).lrw32(
+		NAME([this] (offs_t offset) {
+			u32 ret = 0;
+
+			ret |= m_epic.irq[MPC8240_I2C_IRQ].mask ? 0x80000000 : 0;
+			ret |= m_epic.irq[MPC8240_I2C_IRQ].priority << 16;
+			ret |= m_epic.irq[MPC8240_I2C_IRQ].vector;
+			ret |= m_epic.irq[MPC8240_I2C_IRQ].active ? 0x40000000 : 0;
+			return swapendian_int32(ret);
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			data = swapendian_int32(data);
+
+			m_epic.irq[MPC8240_I2C_IRQ].mask = (data & 0x80000000) ? 1 : 0;
+			m_epic.irq[MPC8240_I2C_IRQ].priority = (data >> 16) & 0xf;
+			m_epic.irq[MPC8240_I2C_IRQ].vector = data & 0xff;
+
+			LOGIRQ("IIVPR0 %08x\n", data);
+
+			if (!machine().side_effects_disabled())
+				epic_update_interrupts();
+		})
+	);
+	map(0x51030, 0x51030).lw8(
+		NAME([this] (offs_t, u8 data) {
+			m_epic.irq[MPC8240_I2C_IRQ].destination = data & 0x1;
+			if (data)
+				throw emu_fatalerror("I2C IRQ in P1 mode");
+			// epic_update_interrupts();
+		})
+	);
+	// IACK
+	map(0x600a0, 0x600a0).lr8(
+		NAME([this] (offs_t offset) {
+			u8 ret = 0;
+			if (!machine().side_effects_disabled())
+				epic_update_interrupts();
+			// spurious vector register is returned if no pending interrupts
+			ret = (m_epic.active_irq >= 0) ? m_epic.iack : m_epic.svr;
+			return ret;
+		})
+	);
+	// w/o strobe
+	map(0x600b0, 0x600b0).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			// spammy
+			//LOGIRQ("EOI IRQ%d ACK\n", m_epic.active_irq);
+
+			m_epic.irq[m_epic.active_irq].active = 0;
+			m_epic.active_irq = -1;
+
+			epic_update_interrupts();
+		})
+	);
+//  map(0x80000, 0xfefff) <reserved>
+//  map(0xff000, 0xff017) data path diags
+//  map(0xff018, 0xff048) data path diags watchpoints
+//  map(0xff04d, 0xfffff) <reserved>
+}
 
 TIMER_CALLBACK_MEMBER(viper_state::epic_global_timer_callback)
 {
@@ -901,9 +1125,7 @@ TIMER_CALLBACK_MEMBER(viper_state::epic_global_timer_callback)
 		attotime timer_duration =  attotime::from_hz((SDRAM_CLOCK / 8) / m_epic.global_timer[timer_num].base_count);
 		m_epic.global_timer[timer_num].timer->adjust(timer_duration, timer_num);
 
-#if VIPER_DEBUG_EPIC_TIMERS
-		printf("EPIC GTIMER%d: next in %s\n", timer_num, attotime_string(timer_duration, 8));
-#endif
+		LOGTIMER("EPIC GTIMER%d: next in %s\n", timer_num, (timer_duration / 8).as_string() );
 	}
 	else
 	{
@@ -940,506 +1162,20 @@ void viper_state::epic_update_interrupts()
 
 	if (irq >= 0 && m_epic.active_irq == -1)
 	{
-#if VIPER_DEBUG_EPIC_INTS
-		if (irq > 4 && irq < 20)
-			printf("EPIC IRQ%d taken\n", irq);
-#endif
-
 		m_epic.active_irq = irq;
 		m_epic.irq[m_epic.active_irq].pending = 0;
 		m_epic.irq[m_epic.active_irq].active = 1;
 
 		m_epic.iack = m_epic.irq[m_epic.active_irq].vector;
 
-#if VIPER_DEBUG_EPIC_INTS
-		if (irq > 4 && irq < 20)
-			printf("vector = %02X\n", m_epic.iack);
-#endif
+		//if (irq > 4 && irq < 20)
+			LOGIRQ("EPIC IRQ%d taken vector = %02X\n", irq, m_epic.iack);
 
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 	}
 	else
 	{
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
-	}
-}
-
-uint32_t viper_state::epic_r(offs_t offset)
-{
-	int reg;
-	reg = offset * 4;
-
-#if VIPER_DEBUG_EPIC_REGS
-	if (reg != 0x600a0)     // IACK is spammy
-	{
-		const char *regname = epic_get_register_name(reg);
-		if (regname)
-		{
-			printf("EPIC: read %08X (%s) at %08X\n", reg, regname, m_maincpu->pc());
-		}
-		else
-		{
-			printf("EPIC: read %08X at %08X\n", reg, m_maincpu->pc());
-		}
-	}
-#endif
-
-	uint32_t ret = 0;
-
-	switch (reg >> 16)
-	{
-		// 0x00000 - 0x0ffff
-		case 0x0:
-		{
-			switch (reg & 0xffff)
-			{
-				case 0x3000:            // Offset 0x3000 - I2CADR
-				{
-					ret = m_epic.i2c_adr;
-					break;
-				}
-				case 0x3004:            // Offset 0x3004 - I2CFDR
-				{
-					ret = m_epic.i2c_freq_div | (m_epic.i2c_freq_sample_rate << 8);
-					break;
-				}
-				case 0x3008:            // Offset 0x3008 - I2CCR
-				{
-					ret = m_epic.i2c_cr;
-					break;
-				}
-				case 0x300c:            // Offset 0x300c - I2CSR
-				{
-					ret = m_epic.i2c_sr;
-					break;
-				}
-				case 0x3010:            // Offset 0x3010 - I2CDR
-				{
-					if (m_epic.i2c_cr & 0x80)     // only do anything if the I2C module is enabled
-					{
-						if (m_epic.i2c_state == I2C_STATE_ADDRESS_CYCLE)
-						{
-#if VIPER_DEBUG_EPIC_I2C
-							printf("I2C address cycle read\n");
-#endif
-
-							m_epic.i2c_state = I2C_STATE_DATA_TRANSFER;
-
-							// set transfer complete in status register
-							m_epic.i2c_sr |= 0x80;
-
-							// generate interrupt if interrupt are enabled
-							if (m_epic.i2c_cr & 0x40)
-							{
-#if VIPER_DEBUG_EPIC_I2C
-								printf("I2C interrupt\n");
-#endif
-								mpc8240_interrupt(MPC8240_I2C_IRQ);
-
-								// set interrupt flag in status register
-								m_epic.i2c_sr |= 0x2;
-							}
-						}
-						else if (m_epic.i2c_state == I2C_STATE_DATA_TRANSFER)
-						{
-#if VIPER_DEBUG_EPIC_I2C
-							printf("I2C data read\n");
-#endif
-
-							m_epic.i2c_state = I2C_STATE_ADDRESS_CYCLE;
-
-							// set transfer complete in status register
-							m_epic.i2c_sr |= 0x80;
-
-							// generate interrupt if interrupt are enabled
-							/*if (m_epic.i2c_cr & 0x40)
-							{
-							    printf("I2C interrupt\n");
-							    mpc8240_interrupt(MPC8240_I2C_IRQ);
-
-							    // set interrupt flag in status register
-							    m_epic.i2c_sr |= 0x2;
-							}*/
-						}
-					}
-					break;
-				}
-			}
-			break;
-		}
-
-		// 0x40000 - 0x4ffff
-		case 0x4:
-		{
-			switch (reg & 0xffff)
-			{
-				case 0x1120:            // Offset 0x41120 - Global Timer 0 vector/priority register
-				case 0x1160:            // Offset 0x41160 - Global Timer 1 vector/priority register
-				case 0x11a0:            // Offset 0x411a0 - Global Timer 2 vector/priority register
-				case 0x11e0:            // Offset 0x411e0 - Global Timer 3 vector/priority register
-				{
-					int timer_num = ((reg & 0xffff) - 0x1120) >> 6;
-
-					ret |= m_epic.irq[MPC8240_GTIMER0_IRQ + timer_num].mask ? 0x80000000 : 0;
-					ret |= m_epic.irq[MPC8240_GTIMER0_IRQ + timer_num].priority << 16;
-					ret |= m_epic.irq[MPC8240_GTIMER0_IRQ + timer_num].vector;
-					ret |= m_epic.irq[MPC8240_GTIMER0_IRQ + timer_num].active ? 0x40000000 : 0;
-					break;
-				}
-			}
-			break;
-		}
-
-		// 0x50000 - 0x5FFFF
-		case 0x5:
-		{
-			switch (reg & 0xffff)
-			{
-				case 0x0200:            // Offset 0x50200 - IRQ0 vector/priority register
-				case 0x0220:            // Offset 0x50220 - IRQ1 vector/priority register
-				case 0x0240:            // Offset 0x50240 - IRQ2 vector/priority register
-				case 0x0260:            // Offset 0x50260 - IRQ3 vector/priority register
-				case 0x0280:            // Offset 0x50280 - IRQ4 vector/priority register
-				case 0x02a0:            // Offset 0x502a0 - IRQ5 vector/priority register
-				case 0x02c0:            // Offset 0x502c0 - IRQ6 vector/priority register
-				case 0x02e0:            // Offset 0x502e0 - IRQ7 vector/priority register
-				case 0x0300:            // Offset 0x50300 - IRQ8 vector/priority register
-				case 0x0320:            // Offset 0x50320 - IRQ9 vector/priority register
-				case 0x0340:            // Offset 0x50340 - IRQ10 vector/priority register
-				case 0x0360:            // Offset 0x50360 - IRQ11 vector/priority register
-				case 0x0380:            // Offset 0x50380 - IRQ12 vector/priority register
-				case 0x03a0:            // Offset 0x503a0 - IRQ13 vector/priority register
-				case 0x03c0:            // Offset 0x503c0 - IRQ14 vector/priority register
-				case 0x03e0:            // Offset 0x503e0 - IRQ15 vector/priority register
-				{
-					int irq = ((reg & 0xffff) - 0x200) >> 5;
-
-					ret |= m_epic.irq[MPC8240_IRQ0 + irq].mask ? 0x80000000 : 0;
-					ret |= m_epic.irq[MPC8240_IRQ0 + irq].priority << 16;
-					ret |= m_epic.irq[MPC8240_IRQ0 + irq].vector;
-					ret |= m_epic.irq[MPC8240_IRQ0 + irq].active ? 0x40000000 : 0;
-					break;
-				}
-				case 0x1020:            // Offset 0x51020 - I2C IRQ vector/priority register
-				{
-					ret |= m_epic.irq[MPC8240_I2C_IRQ].mask ? 0x80000000 : 0;
-					ret |= m_epic.irq[MPC8240_I2C_IRQ].priority << 16;
-					ret |= m_epic.irq[MPC8240_I2C_IRQ].vector;
-					ret |= m_epic.irq[MPC8240_I2C_IRQ].active ? 0x40000000 : 0;
-					break;
-				}
-			}
-			break;
-		}
-
-		// 0x60000 - 0x6FFFF
-		case 0x6:
-		{
-			switch (reg & 0xffff)
-			{
-				case 0x00a0:            // Offset 0x600A0 - IACK
-				{
-					epic_update_interrupts();
-
-					if (m_epic.active_irq >= 0)
-					{
-						ret = m_epic.iack;
-					}
-					else
-					{
-						// spurious vector register is returned if no pending interrupts
-						ret = m_epic.svr;
-					}
-					break;
-				}
-
-			}
-			break;
-		}
-	}
-
-	return swapendian_int32(ret);
-}
-
-void viper_state::epic_w(offs_t offset, uint32_t data)
-{
-	int reg;
-	reg = offset * 4;
-
-	data = swapendian_int32(data);
-
-#if VIPER_DEBUG_EPIC_REGS
-	if (reg != 0x600b0)     // interrupt clearing is spammy
-	{
-		const char *regname = epic_get_register_name(reg);
-		if (regname)
-		{
-			printf("EPIC: write %08X, %08X (%s) at %08X\n", data, reg, regname, m_maincpu->pc());
-		}
-		else
-		{
-			printf("EPIC: write %08X, %08X at %08X\n", data, reg, m_maincpu->pc());
-		}
-	}
-#endif
-
-	switch (reg >> 16)
-	{
-		case 0:
-		{
-			switch (reg & 0xffff)
-			{
-				case 0x3000:            // Offset 0x3000 - I2CADR
-				{
-					m_epic.i2c_adr = data;
-					break;
-				}
-				case 0x3004:            // Offset 0x3004 - I2CFDR
-				{
-					m_epic.i2c_freq_div = data & 0x3f;
-					m_epic.i2c_freq_sample_rate = (data >> 8) & 0x3f;
-					break;
-				}
-				case 0x3008:            // Offset 0x3008 - I2CCR
-				{
-					if ((m_epic.i2c_cr & 0x80) == 0 && (data & 0x80) != 0)
-					{
-						m_epic.i2c_state = I2C_STATE_ADDRESS_CYCLE;
-					}
-					if ((m_epic.i2c_cr & 0x10) != (data & 0x10))
-					{
-						m_epic.i2c_state = I2C_STATE_ADDRESS_CYCLE;
-					}
-					m_epic.i2c_cr = data;
-					break;
-				}
-				case 0x300c:            // Offset 0x300c - I2CSR
-				{
-					m_epic.i2c_sr = data;
-					break;
-				}
-				case 0x3010:            // Offset 0x3010 - I2CDR
-				{
-					if (m_epic.i2c_cr & 0x80)     // only do anything if the I2C module is enabled
-					{
-						if (m_epic.i2c_state == I2C_STATE_ADDRESS_CYCLE)          // waiting for address cycle
-						{
-							//int rw = data & 1;
-
-#if VIPER_DEBUG_EPIC_I2C
-							int addr = (data >> 1) & 0x7f;
-							printf("I2C address cycle, addr = %02X\n", addr);
-#endif
-							m_epic.i2c_state = I2C_STATE_DATA_TRANSFER;
-
-							// set transfer complete in status register
-							m_epic.i2c_sr |= 0x80;
-
-							// generate interrupt if interrupt are enabled
-							if (m_epic.i2c_cr & 0x40)
-							{
-#if VIPER_DEBUG_EPIC_I2C
-								printf("I2C interrupt\n");
-#endif
-								mpc8240_interrupt(MPC8240_I2C_IRQ);
-
-								// set interrupt flag in status register
-								m_epic.i2c_sr |= 0x2;
-							}
-						}
-						else if (m_epic.i2c_state == I2C_STATE_DATA_TRANSFER)     // waiting for data transfer
-						{
-#if VIPER_DEBUG_EPIC_I2C
-							printf("I2C data transfer, data = %02X\n", data);
-#endif
-							m_epic.i2c_state = I2C_STATE_ADDRESS_CYCLE;
-
-							// set transfer complete in status register
-							m_epic.i2c_sr |= 0x80;
-
-							// generate interrupt if interrupts are enabled
-							if (m_epic.i2c_cr & 0x40)
-							{
-#if VIPER_DEBUG_EPIC_I2C
-								printf("I2C interrupt\n");
-#endif
-								mpc8240_interrupt(MPC8240_I2C_IRQ);
-
-								// set interrupt flag in status register
-								m_epic.i2c_sr |= 0x2;
-							}
-						}
-					}
-					break;
-				}
-			}
-			break;
-		}
-
-		// 0x40000 - 0x4FFFF
-		case 4:
-		{
-			switch (reg & 0xffff)
-			{
-				case 0x1030:            // Offset 0x41030 - EICR
-				{
-					m_epic.eicr = data;
-					if (data & 0x08000000)
-						throw emu_fatalerror("EPIC: serial interrupts mode not implemented\n");
-					break;
-				}
-				case 0x10e0:            // Offset 0x410E0 - Spurious Vector Register
-				{
-					m_epic.svr = data;
-					break;
-				}
-				case 0x1120:            // Offset 0x41120 - Global timer 0 vector/priority register
-				case 0x1160:            // Offset 0x41160 - Global timer 1 vector/priority register
-				case 0x11a0:            // Offset 0x411A0 - Global timer 2 vector/priority register
-				case 0x11e0:            // Offset 0x411E0 - Global timer 3 vector/priority register
-				{
-					int timer_num = ((reg & 0xffff) - 0x1120) >> 6;
-
-					m_epic.irq[MPC8240_GTIMER0_IRQ + timer_num].mask = (data & 0x80000000) ? 1 : 0;
-					m_epic.irq[MPC8240_GTIMER0_IRQ + timer_num].priority = (data >> 16) & 0xf;
-					m_epic.irq[MPC8240_GTIMER0_IRQ + timer_num].vector = data & 0xff;
-
-					epic_update_interrupts();
-					break;
-				}
-				case 0x1130:            // Offset 0x41130 - Global timer 0 destination register
-				case 0x1170:            // Offset 0x41170 - Global timer 1 destination register
-				case 0x11b0:            // Offset 0x411B0 - Global timer 2 destination register
-				case 0x11f0:            // Offset 0x411F0 - Global timer 3 destination register
-				{
-					int timer_num = ((reg & 0xffff) - 0x1130) >> 6;
-
-					m_epic.irq[MPC8240_GTIMER0_IRQ + timer_num].destination = data & 0x1;
-
-					epic_update_interrupts();
-					break;
-				}
-				case 0x1110:            // Offset 0x41110 - Global timer 0 base count register
-				case 0x1150:            // Offset 0x41150 - Global timer 1 base count register
-				case 0x1190:            // Offset 0x41190 - Global timer 2 base count register
-				case 0x11d0:            // Offset 0x411d0 - Global timer 3 base count register
-				{
-					int timer_num = ((reg & 0xffff) - 0x1110) >> 6;
-
-					m_epic.global_timer[timer_num].enable = (data & 0x80000000) ? 0 : 1;
-					m_epic.global_timer[timer_num].base_count = data & 0x7fffffff;
-
-					if (m_epic.global_timer[timer_num].enable && m_epic.global_timer[timer_num].base_count > 0)
-					{
-						attotime timer_duration =  attotime::from_hz((SDRAM_CLOCK / 8) / m_epic.global_timer[timer_num].base_count);
-						m_epic.global_timer[timer_num].timer->adjust(timer_duration, timer_num);
-
-#if VIPER_DEBUG_EPIC_TIMERS
-						printf("EPIC GTIMER%d: next in %s\n", timer_num, attotime_string(timer_duration, 8));
-#endif
-					}
-					else
-					{
-						m_epic.global_timer[timer_num].timer->reset();
-					}
-					break;
-				}
-			}
-			break;
-		}
-
-		// 0x50000 - 0x5FFFF
-		case 0x5:
-		{
-			switch (reg & 0xffff)
-			{
-				case 0x0200:            // Offset 0x50200 - IRQ0 vector/priority register
-				case 0x0220:            // Offset 0x50220 - IRQ1 vector/priority register
-				case 0x0240:            // Offset 0x50240 - IRQ2 vector/priority register
-				case 0x0260:            // Offset 0x50260 - IRQ3 vector/priority register
-				case 0x0280:            // Offset 0x50280 - IRQ4 vector/priority register
-				case 0x02a0:            // Offset 0x502a0 - IRQ5 vector/priority register
-				case 0x02c0:            // Offset 0x502c0 - IRQ6 vector/priority register
-				case 0x02e0:            // Offset 0x502e0 - IRQ7 vector/priority register
-				case 0x0300:            // Offset 0x50300 - IRQ8 vector/priority register
-				case 0x0320:            // Offset 0x50320 - IRQ9 vector/priority register
-				case 0x0340:            // Offset 0x50340 - IRQ10 vector/priority register
-				case 0x0360:            // Offset 0x50360 - IRQ11 vector/priority register
-				case 0x0380:            // Offset 0x50380 - IRQ12 vector/priority register
-				case 0x03a0:            // Offset 0x503a0 - IRQ13 vector/priority register
-				case 0x03c0:            // Offset 0x503c0 - IRQ14 vector/priority register
-				case 0x03e0:            // Offset 0x503e0 - IRQ15 vector/priority register
-				{
-					int irq = ((reg & 0xffff) - 0x200) >> 5;
-
-					m_epic.irq[MPC8240_IRQ0 + irq].mask = (data & 0x80000000) ? 1 : 0;
-					m_epic.irq[MPC8240_IRQ0 + irq].priority = (data >> 16) & 0xf;
-					m_epic.irq[MPC8240_IRQ0 + irq].vector = data & 0xff;
-
-					epic_update_interrupts();
-					break;
-				}
-				case 0x1020:            // Offset 0x51020 - I2C IRQ vector/priority register
-				{
-					m_epic.irq[MPC8240_I2C_IRQ].mask = (data & 0x80000000) ? 1 : 0;
-					m_epic.irq[MPC8240_I2C_IRQ].priority = (data >> 16) & 0xf;
-					m_epic.irq[MPC8240_I2C_IRQ].vector = data & 0xff;
-
-					epic_update_interrupts();
-					break;
-				}
-				case 0x0210:            // Offset 0x50210 - IRQ0 destination register
-				case 0x0230:            // Offset 0x50230 - IRQ1 destination register
-				case 0x0250:            // Offset 0x50250 - IRQ2 destination register
-				case 0x0270:            // Offset 0x50270 - IRQ3 destination register
-				case 0x0290:            // Offset 0x50290 - IRQ4 destination register
-				case 0x02b0:            // Offset 0x502b0 - IRQ5 destination register
-				case 0x02d0:            // Offset 0x502d0 - IRQ6 destination register
-				case 0x02f0:            // Offset 0x502f0 - IRQ7 destination register
-				case 0x0310:            // Offset 0x50310 - IRQ8 destination register
-				case 0x0330:            // Offset 0x50330 - IRQ9 destination register
-				case 0x0350:            // Offset 0x50350 - IRQ10 destination register
-				case 0x0370:            // Offset 0x50370 - IRQ11 destination register
-				case 0x0390:            // Offset 0x50390 - IRQ12 destination register
-				case 0x03b0:            // Offset 0x503b0 - IRQ13 destination register
-				case 0x03d0:            // Offset 0x503d0 - IRQ14 destination register
-				case 0x03f0:            // Offset 0x503f0 - IRQ15 destination register
-				{
-					int irq = ((reg & 0xffff) - 0x210) >> 5;
-
-					m_epic.irq[MPC8240_IRQ0 + irq].destination = data & 0x1;
-
-					epic_update_interrupts();
-					break;
-				}
-				case 0x1030:            // Offset 0x51030 - I2C IRQ destination register
-				{
-					m_epic.irq[MPC8240_I2C_IRQ].destination = data & 0x1;
-					epic_update_interrupts();
-					break;
-				}
-			}
-			break;
-		}
-
-		// 0x60000 - 0x6FFFF
-		case 0x6:
-		{
-			switch (reg & 0xffff)
-			{
-				case 0x00b0:            // Offset 0x600B0 - EOI
-#if VIPER_DEBUG_EPIC_INTS
-					if (m_epic.active_irq > 4 && m_epic.active_irq < 20)
-						printf("EPIC IRQ%d cleared.\n", m_epic.active_irq);
-#endif
-					m_epic.irq[m_epic.active_irq].active = 0;
-					m_epic.active_irq = -1;
-
-					epic_update_interrupts();
-					break;
-			}
-			break;
-		}
 	}
 }
 
@@ -1597,9 +1333,7 @@ uint64_t viper_state::cf_card_r(offs_t offset, uint64_t mem_mask)
 
 void viper_state::cf_card_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
-	#ifdef VIPER_DEBUG_LOG
 	//logerror("%s:compact_flash_w: %08X%08X, %08X, %08X%08X\n", machine().describe_context(), (uint32_t)(data>>32), (uint32_t)(data), offset, (uint32_t)(mem_mask >> 32), (uint32_t)(mem_mask));
-	#endif
 
 	if (ACCESSING_BITS_16_31)
 	{
@@ -2176,7 +1910,7 @@ void viper_state::viper_map(address_map &map)
 {
 //  map.unmap_value_high();
 	map(0x00000000, 0x00ffffff).mirror(0x1000000).ram().share("workram");
-	map(0x80000000, 0x800fffff).rw(FUNC(viper_state::epic_r), FUNC(viper_state::epic_w));
+	map(0x80000000, 0x800fffff).m(*this, FUNC(viper_state::epic_map));
 	map(0x82000000, 0x83ffffff).rw(FUNC(viper_state::voodoo3_r), FUNC(viper_state::voodoo3_w));
 	map(0x84000000, 0x85ffffff).rw(FUNC(viper_state::voodoo3_lfb_r), FUNC(viper_state::voodoo3_lfb_w));
 	map(0xfe800000, 0xfe8000ff).rw(FUNC(viper_state::voodoo3_io_r), FUNC(viper_state::voodoo3_io_w));
