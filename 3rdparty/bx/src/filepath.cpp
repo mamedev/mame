@@ -121,7 +121,7 @@ namespace bx
 
 					break;
 				}
-				BX_FALLTHROUGH;
+				[[fallthrough]];
 
 			default:
 				if ( ( rooted && slashIdx+1 != size)

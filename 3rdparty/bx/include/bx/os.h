@@ -56,7 +56,7 @@ namespace bx
 	void* exec(const char* const* _argv);
 
 	///
-	BX_NO_RETURN void exit(int32_t _exitCode);
+	[[noreturn]] void exit(int32_t _exitCode);
 
 } // namespace bx
 

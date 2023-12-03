@@ -84,21 +84,21 @@ public:
 				{
 					switch (ch)
 					{
-					case '\"': bx::write(_writer, "\\\"",        &err); break;
-					case '\n': bx::write(_writer, "\\n\"\n\t\"", &err); break;
-					case '\r': bx::write(_writer, "\\r",         &err); break;
-					case '\\': escaped = true;                 BX_FALLTHROUGH;
-					default:   bx::write(_writer, ch, &err);            break;
+					case '\"': bx::write(_writer, "\\\"",        &err);  break;
+					case '\n': bx::write(_writer, "\\n\"\n\t\"", &err);  break;
+					case '\r': bx::write(_writer, "\\r",         &err);  break;
+					case '\\': escaped = true;                 [[fallthrough]];
+					default:   bx::write(_writer, ch, &err);             break;
 					}
 				}
 				else
 				{
 					switch (ch)
 					{
-					case '\n': bx::write(_writer, "\\\"\n\t\"", &err);  break;
-					case '\r':                                 BX_FALLTHROUGH;
-					case '\t': bx::write(_writer, "\\", &err); BX_FALLTHROUGH;
-					default  : bx::write(_writer, ch,   &err);          break;
+					case '\n': bx::write(_writer, "\\\"\n\t\"", &err);   break;
+					case '\r':                                 [[fallthrough]];
+					case '\t': bx::write(_writer, "\\", &err); [[fallthrough]];
+					default  : bx::write(_writer, ch,   &err);           break;
 					}
 
 					escaped = false;

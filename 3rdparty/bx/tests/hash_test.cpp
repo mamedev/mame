@@ -126,8 +126,8 @@ uint32_t MurmurHash2A(const void * key, int len, uint32_t seed = 0)
 
 	switch(len)
 	{
-	case 3: t ^= data[2] << 16; BX_FALLTHROUGH;
-	case 2: t ^= data[1] << 8;  BX_FALLTHROUGH;
+	case 3: t ^= data[2] << 16; [[fallthrough]];
+	case 2: t ^= data[1] << 8;  [[fallthrough]];
 	case 1: t ^= data[0];
 	};
 
@@ -229,8 +229,8 @@ uint32_t MurmurHash3_x86_32(const void * key, int len, uint32_t seed)
 
 	switch(len & 3)
 	{
-		case 3: k1 ^= tail[2] << 16; BX_FALLTHROUGH;
-		case 2: k1 ^= tail[1] << 8;  BX_FALLTHROUGH;
+		case 3: k1 ^= tail[2] << 16; [[fallthrough]];
+		case 2: k1 ^= tail[1] << 8;  [[fallthrough]];
 		case 1: k1 ^= tail[0];
 				k1 *= c1; k1 = rotl32(k1,15); k1 *= c2; h1 ^= k1;
 	};

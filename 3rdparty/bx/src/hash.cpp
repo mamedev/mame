@@ -256,9 +256,9 @@ struct HashMurmur2APod
 
 		switch (m_count)
 		{
-			case  3: kk |= m_tail[2] << 16; BX_FALLTHROUGH;
-			case  2: kk |= m_tail[1] <<  8; BX_FALLTHROUGH;
-			case  1: kk |= m_tail[0];       BX_FALLTHROUGH;
+			case  3: kk |= m_tail[2] << 16; [[fallthrough]];
+			case  2: kk |= m_tail[1] <<  8; [[fallthrough]];
+			case  1: kk |= m_tail[0];       [[fallthrough]];
 			case  0: mix(kk); break;
 			default: BX_ASSERT(false, "Bug, m_count can't be %d (expected < 4).", m_count); BX_UNREACHABLE;
 		}
@@ -318,8 +318,8 @@ struct HashMurmur3Pod
 
 		switch (m_count)
 		{
-			case  3: kk |= m_tail[2] << 16; BX_FALLTHROUGH;
-			case  2: kk |= m_tail[1] <<  8; BX_FALLTHROUGH;
+			case  3: kk |= m_tail[2] << 16; [[fallthrough]];
+			case  2: kk |= m_tail[1] <<  8; [[fallthrough]];
 			case  1: kk |= m_tail[0]; mix1(kk); break;
 			case  0: break;
 			default: BX_ASSERT(false, "Bug, m_count can't be %d (expected < 4).", m_count); BX_UNREACHABLE;
