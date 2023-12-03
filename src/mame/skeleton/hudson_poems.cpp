@@ -58,7 +58,7 @@ protected:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	//void draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t offset, int xx, int yy);
+	void draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t offset, int xx, int yy);
 	void draw_tile8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t offset, int xx, int yy);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(screen_scanline);
@@ -105,7 +105,7 @@ void hudson_poems_state::machine_reset()
 static INPUT_PORTS_START( hudson_poems )
 INPUT_PORTS_END
 
-#if 0
+
 void hudson_poems_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t offset, int xx, int yy)
 {
 	offset = offset * 8;
@@ -140,7 +140,6 @@ void hudson_poems_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, 
 		}
 	}
 }
-#endif
 
 void hudson_poems_state::draw_tile8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t offset, int xx, int yy)
 {
@@ -186,17 +185,30 @@ uint32_t hudson_poems_state::screen_update(screen_device &screen, bitmap_ind16 &
 	}
 #endif
 	int count = 0;
+	int width, base, bpp;
+
+//  width = 512; base = (0xa800/4); bpp = 4; // konami logo
+//	width = 128; base = (0x9418/4); bpp = 8; // poems logo
+	width = 512; base = (0xc600/4); bpp = 4; // bemani logo
+//	width = 512; base = (0xd400/4); bpp = 4; // warning screen
 
 	for (int y=0;y<224/8;y++)
 	{
-		//for (int x=0;x<512/8/2;x++)
-		for (int x=0;x<128/8/2;x++)
+		for (int x=0;x<width/8/2;x++)
 		{
 			//uint32_t tiles = m_mainram[(0xa800/4)+count];
-			uint32_t tiles = m_mainram[(0x9418/4)+count];
+			uint32_t tiles = m_mainram[base+count];
 
-			draw_tile8(screen, bitmap, cliprect, (tiles&0xffff), (x * 16), y * 8);
-			draw_tile8(screen, bitmap, cliprect, ((tiles>>16)&0xffff), (x * 16)+8, y * 8);
+			if (bpp == 4)
+			{
+				draw_tile(screen, bitmap, cliprect, (tiles&0xffff), (x * 16), y * 8);
+				draw_tile(screen, bitmap, cliprect, ((tiles>>16)&0xffff), (x * 16)+8, y * 8);
+			}
+			else if (bpp == 8)
+			{
+				draw_tile8(screen, bitmap, cliprect, (tiles&0xffff), (x * 16), y * 8);
+				draw_tile8(screen, bitmap, cliprect, ((tiles>>16)&0xffff), (x * 16)+8, y * 8);
+			}
 
 			count++;
 

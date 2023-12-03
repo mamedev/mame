@@ -412,16 +412,16 @@ void xtensa_device::switch_windowbase(s32 change)
 
 u32 xtensa_device::get_mem32(u32 addr)
 {
-	if (addr & 3)
-		logerror("get_mem32 unaligned\n");
+	//if (addr & 3)
+	//	logerror("get_mem32 unaligned\n");
 
 	return m_space.read_dword(addr & ~3);
 }
 
 void xtensa_device::set_mem32(u32 addr, u32 data)
 {
-	if (addr & 3)
-		logerror("set_mem32 unaligned\n");
+	//if (addr & 3)
+	//	logerror("set_mem32 unaligned\n");
 
 	m_space.write_dword(addr &~ 3, data);
 }
