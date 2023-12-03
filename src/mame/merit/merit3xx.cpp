@@ -446,7 +446,7 @@ Dipswitch on CRT-352 MEM is labeled SW1
 */
 
 #include "emu.h"
-#include "screen.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/ds1204.h"
 #include "machine/i8255.h"
@@ -457,8 +457,10 @@ Dipswitch on CRT-352 MEM is labeled SW1
 #include "video/bt47x.h"
 #include "video/mc6845.h"
 
+#include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
+
 
 namespace {
 
@@ -482,6 +484,7 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
 private:
 	MC6845_UPDATE_ROW(update_row);
 
@@ -566,8 +569,8 @@ void merit3xx_state::io_map(address_map &map)
 	map(0x18, 0x1b).m("ramdac", FUNC(bt476_device::map));
 	map(0x40, 0x40).rw("crtc", FUNC(hd6845s_device::status_r), FUNC(hd6845s_device::address_w));
 	map(0x41, 0x41).rw("crtc", FUNC(hd6845s_device::register_r), FUNC(hd6845s_device::register_w));
-	map(0x80, 0x80).r("ymsnd", FUNC(ym2149_device::data_r));
-	map(0x80, 0x81).w("ymsnd", FUNC(ym2149_device::address_data_w));
+	map(0x80, 0x80).r(m_ymsnd, FUNC(ym2149_device::data_r));
+	map(0x80, 0x81).w(m_ymsnd, FUNC(ym2149_device::address_data_w));
 }
 
 void merit3xx_state::crt350_main_map(address_map &map)
