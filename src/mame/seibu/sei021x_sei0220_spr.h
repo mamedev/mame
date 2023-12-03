@@ -40,7 +40,7 @@ protected:
 
 	virtual s32 get_coordinate(s32 coordinate)
 	{
-		return (coordinate & 0x8000) ? (0 - (0x200 - (coordinate & 0x1ff))) : (coordinate & 0x1ff);
+		return (coordinate & 0x1ff) - ((coordinate & 0x8000) ? 0x200 : 0);
 	}
 
 private:
@@ -50,9 +50,9 @@ private:
 	pri_cb_delegate     m_pri_cb;
 	gfxbank_cb_delegate m_gfxbank_cb;
 
-	bool m_alt_format = false;
-	s32 m_xoffset = 0;
-	s32 m_yoffset = 0;
+	bool m_alt_format;
+	s32 m_xoffset;
+	s32 m_yoffset;
 };
 
 class sei0211_device : public sei0210_device

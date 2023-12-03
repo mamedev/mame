@@ -113,90 +113,70 @@ Unmarked bits are unused/unknown.
 template<class T>
 void sei0210_device::draw(screen_device &screen, T &bitmap, const rectangle cliprect, u16* spriteram, u16 size)
 {
-	if (m_alt_format) // bloodbro.cpp
+	for (int i = 0; i < (size / 2); i += 4)
 	{
-		for (int i = 0; i < (size / 2); i += 4)
+		bool flipx, flipy;
+		u8 pri = 0, ext = 0;
+		u8 sizex, sizey;
+		u32 color, code;
+		s32 x, y;
+		if (m_alt_format)
 		{
 			if (BIT(spriteram[i], 15))
 				continue;
 
-			const bool flipy = BIT(spriteram[i + 0], 14);
-			const bool flipx = BIT(spriteram[i + 0], 13);
-			const u8 pri     = BIT(spriteram[i + 0], 11);
-			const u8 sizex   = BIT(spriteram[i + 0],  7,  3) + 1;
-			const u8 sizey   = BIT(spriteram[i + 0],  4,  3) + 1;
-			const u32 color  = BIT(spriteram[i + 0],  0,  4);
-			u32 code         = BIT(spriteram[i + 1],  0, 13);
-			s32 x            = BIT(spriteram[i + 2],  0,  9);
-			s32 y            = BIT(spriteram[i + 3],  0,  9);
+			flipy = BIT(spriteram[i + 0], 14);
+			flipx = BIT(spriteram[i + 0], 13);
+			pri   = BIT(spriteram[i + 0], 11);
+			sizex = BIT(spriteram[i + 0],  7,  3) + 1;
+			sizey = BIT(spriteram[i + 0],  4,  3) + 1;
+			color = BIT(spriteram[i + 0],  0,  4);
+			code  = BIT(spriteram[i + 1],  0, 13);
+			x     = BIT(spriteram[i + 2],  0,  9);
+			y     = BIT(spriteram[i + 3],  0,  9);
 
 			if (x >= 0x180) x -= 0x200;
 			if (y >= 0x180) y -= 0x200;
-
-			x += m_xoffset;
-			y += m_yoffset;
-
-			u32 pri_mask = 0;
-
-			if (!m_pri_cb.isnull())
-				pri_mask = m_pri_cb(pri, 0);
-
-			for (int ax = 0; ax < sizex; ax++)
-			{
-				for (int ay = 0; ay < sizey; ay++)
-				{
-					gfx(0)->prio_transpen(bitmap, cliprect,
-						code++,
-						color,
-						flipx, flipy,
-						flipx ? (x + 16 * (sizex - ax - 1)) : (x + 16 * ax),
-						flipy ? (y + 16 * (sizey - ay - 1)) : (y + 16 * ay),
-						screen.priority(), pri_mask, 15);
-				}
-			}
 		}
-	}
-	else
-	{
-		for (int i = 0; i < (size / 2); i += 4)
+		else
 		{
 			if (BIT(~spriteram[i], 15))
 				continue;
 
-			const bool flipx = BIT(spriteram[i + 0], 14);
-			const bool flipy = BIT(spriteram[i + 0], 13);
-			const u8 sizex   = BIT(spriteram[i + 0], 10,  3) + 1;
-			const u8 sizey   = BIT(spriteram[i + 0],  7,  3) + 1;
-			const u8 ext     = BIT(spriteram[i + 0],  6);
-			const u32 color  = BIT(spriteram[i + 0],  0,  6);
-			const u8 pri     = BIT(spriteram[i + 1], 14,  2);
-			u32 code         = BIT(spriteram[i + 1],  0, 14);
-			s32 x = get_coordinate(spriteram[i + 2]);
-			s32 y = get_coordinate(spriteram[i + 3]);
+			flipx = BIT(spriteram[i + 0], 14);
+			flipy = BIT(spriteram[i + 0], 13);
+			sizex = BIT(spriteram[i + 0], 10,  3) + 1;
+			sizey = BIT(spriteram[i + 0],  7,  3) + 1;
+			ext   = BIT(spriteram[i + 0],  6);
+			color = BIT(spriteram[i + 0],  0,  6);
+			pri   = BIT(spriteram[i + 1], 14,  2);
+			code  = BIT(spriteram[i + 1],  0, 14);
+			x = get_coordinate(spriteram[i + 2]);
+			y = get_coordinate(spriteram[i + 3]);
+		}
 
-			x += m_xoffset;
-			y += m_yoffset;
+		x += m_xoffset;
+		y += m_yoffset;
 
-			u32 pri_mask = 0;
+		u32 pri_mask = 0;
 
-			if (!m_pri_cb.isnull())
-				pri_mask = m_pri_cb(pri, ext);
+		if (!m_pri_cb.isnull())
+			pri_mask = m_pri_cb(pri, ext);
 
-			if (!m_gfxbank_cb.isnull())
-				code = m_gfxbank_cb(code, ext, BIT(spriteram[i + 3], 15));
+		if (!m_gfxbank_cb.isnull())
+			code = m_gfxbank_cb(code, ext, BIT(spriteram[i + 3], 15));
 
-			for (int ax = 0; ax < sizex; ax++)
+		for (int ax = 0; ax < sizex; ax++)
+		{
+			for (int ay = 0; ay < sizey; ay++)
 			{
-				for (int ay = 0; ay < sizey; ay++)
-				{
-					gfx(0)->prio_transpen(bitmap, cliprect,
-						code++,
-						color,
-						flipx, flipy,
-						flipx ? (x + 16 * (sizex - ax - 1)) : (x + 16 * ax),
-						flipy ? (y + 16 * (sizey - ay - 1)) : (y + 16 * ay),
-						screen.priority(), pri_mask, 15);
-				}
+				gfx(0)->prio_transpen(bitmap, cliprect,
+					code++,
+					color,
+					flipx, flipy,
+					flipx ? (x + 16 * (sizex - ax - 1)) : (x + 16 * ax),
+					flipy ? (y + 16 * (sizey - ay - 1)) : (y + 16 * ay),
+					screen.priority(), pri_mask, 15);
 			}
 		}
 	}
