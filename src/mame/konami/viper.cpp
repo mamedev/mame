@@ -82,21 +82,24 @@
       ds2430.
     - figure out why games randomly crash, and why it seems to happen more often with -nothrottle
       (irq section makes it to die with a spurious)
+    \- i2c irq timing is particularly fussy with code1d, xtrial, mocapglf
+    \- voodoo pciint for sscopefh/jpark3 (on T-Rex display during attract) seems fired at wrong
+       time.
     - AGP interface with Voodoo 3 is definitely incorrect, and may be a cause of above;
-    - convert epic to use address map
     - convert epic i2c to be a real i2c-complaint device, namely
       for better irq driving
-    - convert epic irq section to be a device, make it input_merger complaint;
+    - convert epic to be a device, make it input_merger/irq_callback complaint;
     - (more intermediate steps for proper PCI conversions here)
     - pinpoint what the i2c communicates with
     - hookup adc0838
     - Understand what really enables sound irq, can't be from Voodoo PCIINT.
-    \- service mode scale check doesn't work in mfightc (at least);
-    \- tsurugi: no sound;
+    \- tsurugi, boxingm, mfightc: no sound;
     - jpark3: attract mode demo play acts weird, the dinosaur gets submerged
       and camera doesn't really know what to do, CPU core bug?
-    - mocapglf, sscopefh: video flickers, are they using the Konami 30-Hz demuxer
-      for driving 2 screens?
+    - code1d, code1da: RTC self check bad
+    - mocapglf, sscopefh, sscopex: implement 2nd screen output, controlled by IP90C63A;
+    - most if not all games needs to be verified against factory settings
+      (game options, coin options & sound options often don't match "green colored" defaults)
 
     Other notes:
     - "Distribution error" means there's a region mismatch.
@@ -438,7 +441,7 @@ The golf club acts like a LED gun. PCB power input is 12V.
 #define LOG_IRQ     (1U << 3)
 #define LOG_TIMER   (1U << 4)
 
-#define VERBOSE (LOG_GENERAL | LOG_IRQ)
+#define VERBOSE (LOG_GENERAL | LOG_IRQ | LOG_I2C)
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -488,9 +491,7 @@ protected:
 
 	required_device<voodoo_3_device> m_voodoo;
 private:
-	void epic_map(address_map &map);
-	uint8_t epic_i2cdr_r(offs_t offset);
-	void epic_i2cdr_w(offs_t offset, uint8_t data);
+	void mpc8240_soc_map(address_map &map);
 
 	void unk2_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	uint64_t voodoo3_io_r(offs_t offset, uint64_t mem_mask = ~0);
@@ -536,6 +537,7 @@ private:
 
 	TIMER_CALLBACK_MEMBER(epic_global_timer_callback);
 	TIMER_CALLBACK_MEMBER(ds2430_timer_callback);
+	TIMER_CALLBACK_MEMBER(i2c_timer_callback);
 
 	int m_cf_card_ide = 0;
 	int m_unk_serial_bit_w = 0;
@@ -612,14 +614,7 @@ private:
 
 		MPC8240_IRQ irq[MPC8240_NUM_INTERRUPTS]{};
 
-		uint8_t i2c_adr = 0U;
-		int i2c_freq_div = 0, i2c_freq_sample_rate = 0;
-		uint8_t i2c_cr = 0U;
-		uint8_t i2c_sr = 0U;
-		int i2c_state = 0;
-
 		MPC8240_GLOBAL_TIMER global_timer[4]{};
-
 	};
 
 	MPC8240_EPIC m_epic{};
@@ -628,6 +623,19 @@ private:
 	void mpc8240_interrupt(int irq);
 	void mpc8240_epic_init();
 	void mpc8240_epic_reset(void);
+
+	struct MPC8240_I2C {
+		uint8_t adr = 0U;
+		int fdr = 0, dffsr = 0;
+		uint8_t cr = 0U;
+		uint8_t sr = 0U;
+		int state = 0;
+		emu_timer *timer = nullptr;
+	};
+
+	MPC8240_I2C m_i2c;
+	uint8_t i2cdr_r(offs_t offset);
+	void i2cdr_w(offs_t offset, uint8_t data);
 
 	// DS2430, to be device-ified, used at least by kpython.cpp, too
 	enum
@@ -775,46 +783,40 @@ void viper_state::pci_config_data_w(uint64_t data)
 /*****************************************************************************/
 // MPC8240 Embedded Programmable Interrupt Controller (EPIC)
 
-uint8_t viper_state::epic_i2cdr_r(offs_t offset)
+// TODO: timing calculation, comes from fdr / dffsr
+// most if not all games in the driver sets fdr = 0x27 = 512, dffsr = 0x21
+// code1db is *extremely* sensitive to this value
+#define I2C_TIMER_FREQ (SDRAM_CLOCK / 512) / 64
+
+uint8_t viper_state::i2cdr_r(offs_t offset)
 {
-	if (m_epic.i2c_cr & 0x80 && !machine().side_effects_disabled())     // only do anything if the I2C module is enabled
+	if (m_i2c.cr & 0x80 && !machine().side_effects_disabled())     // only do anything if the I2C module is enabled
 	{
-		if (m_epic.i2c_state == I2C_STATE_ADDRESS_CYCLE)
+		if (m_i2c.state == I2C_STATE_ADDRESS_CYCLE)
 		{
 			LOGI2C("I2C address cycle read\n");
 
-			m_epic.i2c_state = I2C_STATE_DATA_TRANSFER;
+			m_i2c.state = I2C_STATE_DATA_TRANSFER;
 
-			// set transfer complete in status register
-			m_epic.i2c_sr |= 0x80;
-
-			// generate interrupt if interrupt are enabled
-			if (m_epic.i2c_cr & 0x40)
-			{
-				LOGI2C("I2C interrupt\n");
-				mpc8240_interrupt(MPC8240_I2C_IRQ);
-
-				// set interrupt flag in status register
-				m_epic.i2c_sr |= 0x2;
-			}
+			m_i2c.timer->adjust(attotime::from_hz(I2C_TIMER_FREQ));
 		}
-		else if (m_epic.i2c_state == I2C_STATE_DATA_TRANSFER)
+		else if (m_i2c.state == I2C_STATE_DATA_TRANSFER)
 		{
 			LOGI2C("I2C data read\n");
 
-			m_epic.i2c_state = I2C_STATE_ADDRESS_CYCLE;
+			m_i2c.state = I2C_STATE_ADDRESS_CYCLE;
 
 			// set transfer complete in status register
-			m_epic.i2c_sr |= 0x80;
+			m_i2c.sr |= 0x80;
 
 			// generate interrupt if interrupt are enabled
-			/*if (m_epic.i2c_cr & 0x40)
+			/*if (m_i2c.cr & 0x40)
 			{
 			    printf("I2C interrupt\n");
 			    mpc8240_interrupt(MPC8240_I2C_IRQ);
 
 			    // set interrupt flag in status register
-			    m_epic.i2c_sr |= 0x2;
+			    m_i2c.sr |= 0x2;
 			}*/
 		}
 	}
@@ -822,50 +824,43 @@ uint8_t viper_state::epic_i2cdr_r(offs_t offset)
 	return 0;
 }
 
-void viper_state::epic_i2cdr_w(offs_t offset, uint8_t data)
+void viper_state::i2cdr_w(offs_t offset, uint8_t data)
 {
-	if (m_epic.i2c_cr & 0x80)     // only do anything if the I2C module is enabled
+	if (m_i2c.cr & 0x80)     // only do anything if the I2C module is enabled
 	{
-		if (m_epic.i2c_state == I2C_STATE_ADDRESS_CYCLE)          // waiting for address cycle
+		if (m_i2c.state == I2C_STATE_ADDRESS_CYCLE)          // waiting for address cycle
 		{
 			//int rw = data & 1;
 
 			int addr = (data >> 1) & 0x7f;
 			LOGI2C("I2C address cycle, addr = %02X\n", addr);
-			m_epic.i2c_state = I2C_STATE_DATA_TRANSFER;
+			m_i2c.state = I2C_STATE_DATA_TRANSFER;
 
-			// set transfer complete in status register
-			m_epic.i2c_sr |= 0x80;
-
-			// generate interrupt if interrupt are enabled
-			if (m_epic.i2c_cr & 0x40)
-			{
-				LOGI2C("I2C interrupt\n");
-				mpc8240_interrupt(MPC8240_I2C_IRQ);
-
-				// set interrupt flag in status register
-				m_epic.i2c_sr |= 0x2;
-			}
+			m_i2c.timer->adjust(attotime::from_hz(I2C_TIMER_FREQ));
 		}
-		else if (m_epic.i2c_state == I2C_STATE_DATA_TRANSFER)     // waiting for data transfer
+		else if (m_i2c.state == I2C_STATE_DATA_TRANSFER)     // waiting for data transfer
 		{
 			LOGI2C("I2C data transfer, data = %02X\n", data);
-			m_epic.i2c_state = I2C_STATE_ADDRESS_CYCLE;
+			m_i2c.state = I2C_STATE_ADDRESS_CYCLE;
 
-			// set transfer complete in status register
-			m_epic.i2c_sr |= 0x80;
-
-			// generate interrupt if interrupts are enabled
-			if (m_epic.i2c_cr & 0x40)
-			{
-				// TODO: mustn't be instant
-				LOGI2C("I2C interrupt\n");
-				mpc8240_interrupt(MPC8240_I2C_IRQ);
-
-				// set interrupt flag in status register
-				m_epic.i2c_sr |= 0x2;
-			}
+			m_i2c.timer->adjust(attotime::from_hz(I2C_TIMER_FREQ));
 		}
+	}
+}
+
+TIMER_CALLBACK_MEMBER(viper_state::i2c_timer_callback)
+{
+	// set transfer complete in status register
+	m_i2c.sr |= 0x80;
+
+	// generate interrupt if interrupt are enabled
+	if (m_i2c.cr & 0x40)
+	{
+		LOGI2C("I2C interrupt\n");
+		mpc8240_interrupt(MPC8240_I2C_IRQ);
+
+		// set interrupt flag in status register
+		m_i2c.sr |= 0x2;
 	}
 }
 
@@ -875,7 +870,7 @@ void viper_state::epic_i2cdr_w(offs_t offset, uint8_t data)
 // NOTE: not everything is "EPIC" but rather is space from the SoC that includes the EPIC.
 // Also a subset of I2O/DMAC/ATU/data path diags are mappable thru a 0x1000 window PCSRBAR,
 // while this full range thru EUMBBAR.
-void viper_state::epic_map(address_map &map)
+void viper_state::mpc8240_soc_map(address_map &map)
 {
 //  map(0x00000, 0x00fff) I2O
 //  map(0x01000, 0x01fff) DMAC
@@ -883,58 +878,58 @@ void viper_state::epic_map(address_map &map)
 	// I2C
 	map(0x03000, 0x03000).lrw8(
 		NAME([this] (offs_t offset) {
-			return m_epic.i2c_adr;
+			return m_i2c.adr;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			LOGI2C("I2CADR %02x\n", data);
-			m_epic.i2c_adr = data;
+			m_i2c.adr = data;
 		})
 	);
 	map(0x03004, 0x03004).lrw8(
 		NAME([this] (offs_t offset) {
-			return m_epic.i2c_freq_div;
+			return m_i2c.fdr;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			m_epic.i2c_freq_div = data & 0x3f;
-			LOGI2C("I2CFDR FDR %02x\n", m_epic.i2c_freq_div);
+			m_i2c.fdr = data & 0x3f;
+			LOGI2C("I2CFDR FDR %02x\n", m_i2c.fdr);
 		})
 	);
 	map(0x03005, 0x03005).lrw8(
 		NAME([this] (offs_t offset) {
-			return m_epic.i2c_freq_sample_rate;
+			return m_i2c.dffsr;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			m_epic.i2c_freq_sample_rate = data & 0x3f;
-			LOGI2C("I2CFDR DFFSR %02x\n", m_epic.i2c_freq_sample_rate);
+			m_i2c.dffsr = data & 0x3f;
+			LOGI2C("I2CFDR DFFSR %02x\n", m_i2c.dffsr);
 		})
 	);
 	map(0x03008, 0x03008).lrw8(
 		NAME([this] (offs_t offset) {
-			return m_epic.i2c_cr;
+			return m_i2c.cr;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			if ((m_epic.i2c_cr & 0x80) == 0 && (data & 0x80) != 0)
+			if ((m_i2c.cr & 0x80) == 0 && (data & 0x80) != 0)
 			{
-				m_epic.i2c_state = I2C_STATE_ADDRESS_CYCLE;
+				m_i2c.state = I2C_STATE_ADDRESS_CYCLE;
 			}
-			if ((m_epic.i2c_cr & 0x10) != (data & 0x10))
+			if ((m_i2c.cr & 0x10) != (data & 0x10))
 			{
-				m_epic.i2c_state = I2C_STATE_ADDRESS_CYCLE;
+				m_i2c.state = I2C_STATE_ADDRESS_CYCLE;
 			}
-			m_epic.i2c_cr = data;
+			m_i2c.cr = data;
 			LOGI2C("I2CCR %02x\n", data);
 		})
 	);
 	map(0x0300c, 0x0300c).lrw8(
 		NAME([this] (offs_t offset) {
-			return m_epic.i2c_sr;
+			return m_i2c.sr;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			m_epic.i2c_sr = data;
+			m_i2c.sr = data;
 			LOGI2C("I2CSR %02x\n", data);
 		})
 	);
-	map(0x03010, 0x03010).rw(FUNC(viper_state::epic_i2cdr_r), FUNC(viper_state::epic_i2cdr_w));
+	map(0x03010, 0x03010).rw(FUNC(viper_state::i2cdr_r), FUNC(viper_state::i2cdr_w));
 //  map(0x04000, 0x3ffff) <reserved>
 
 //  map(0x40000, 0x7ffff) EPIC
@@ -1203,10 +1198,13 @@ void viper_state::mpc8240_epic_reset(void)
 		m_epic.irq[i].mask = 1;
 	}
 
-	m_epic.active_irq = -1;
+	for (auto &gt : m_epic.global_timer)
+	{
+		gt.enable = 0;
+		gt.timer->reset();
+	}
 
-	// Init I2C
-	m_epic.i2c_state = I2C_STATE_ADDRESS_CYCLE;
+	m_epic.active_irq = -1;
 }
 
 /*****************************************************************************/
@@ -1910,7 +1908,7 @@ void viper_state::viper_map(address_map &map)
 {
 //  map.unmap_value_high();
 	map(0x00000000, 0x00ffffff).mirror(0x1000000).ram().share("workram");
-	map(0x80000000, 0x800fffff).m(*this, FUNC(viper_state::epic_map));
+	map(0x80000000, 0x800fffff).m(*this, FUNC(viper_state::mpc8240_soc_map));
 	map(0x82000000, 0x83ffffff).rw(FUNC(viper_state::voodoo3_r), FUNC(viper_state::voodoo3_w));
 	map(0x84000000, 0x85ffffff).rw(FUNC(viper_state::voodoo3_lfb_r), FUNC(viper_state::voodoo3_lfb_w));
 	map(0xfe800000, 0xfe8000ff).rw(FUNC(viper_state::voodoo3_io_r), FUNC(viper_state::voodoo3_io_w));
@@ -2396,6 +2394,8 @@ void viper_state::machine_start()
 	m_ds2430_timer = timer_alloc(FUNC(viper_state::ds2430_timer_callback), this);
 	mpc8240_epic_init();
 
+	m_i2c.timer = timer_alloc(FUNC(viper_state::i2c_timer_callback), this);
+
 	/* set conservative DRC options */
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
@@ -2425,12 +2425,13 @@ void viper_state::machine_start()
 	save_item(NAME(m_epic.eicr)); // written but never used
 	save_item(NAME(m_epic.svr));
 	save_item(NAME(m_epic.active_irq));
-	save_item(NAME(m_epic.i2c_adr));
-	save_item(NAME(m_epic.i2c_freq_div));
-	save_item(NAME(m_epic.i2c_freq_sample_rate));
-	save_item(NAME(m_epic.i2c_cr));
-	save_item(NAME(m_epic.i2c_sr));
-	save_item(NAME(m_epic.i2c_state));
+
+	save_item(NAME(m_i2c.adr));
+	save_item(NAME(m_i2c.fdr));
+	save_item(NAME(m_i2c.dffsr));
+	save_item(NAME(m_i2c.cr));
+	save_item(NAME(m_i2c.sr));
+	save_item(NAME(m_i2c.state));
 
 	save_item(STRUCT_MEMBER(m_epic.irq, vector));
 	save_item(STRUCT_MEMBER(m_epic.irq, priority));
@@ -2456,6 +2457,9 @@ void viper_state::machine_start()
 void viper_state::machine_reset()
 {
 	mpc8240_epic_reset();
+
+	m_i2c.state = I2C_STATE_ADDRESS_CYCLE;
+	m_i2c.timer->reset();
 
 	ide_hdd_device *hdd = m_ata->subdevice<ata_slot_device>("0")->subdevice<ide_hdd_device>("hdd");
 	uint16_t *identify_device = hdd->identify_device_buffer();
