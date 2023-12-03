@@ -169,47 +169,58 @@ void hudson_poems_state::draw_tile8(screen_device &screen, bitmap_ind16 &bitmap,
 
 uint32_t hudson_poems_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-#if 0
-	// just to show that some stuff gets uploaded to mainram if you let execution continue, looks like tilemap or tile data?
-	int count = 0;
-	for (int y=0;y<224/8;y++)
-	{
-		for (int x=0;x<256/8;x++)
-		{
-
-			count++;
-			draw_tile(screen, bitmap, cliprect, count * 8, x * 8, y * 8);
-		}
-	}
-#endif
-	int count = 0;
 	int width, base, bpp;
 
-//  width = 512; base = (0xa800/4); bpp = 4; // konami logo
-//	width = 128; base = (0x9418/4); bpp = 8; // poems logo
-	width = 512; base = (0xc600/4); bpp = 4; // bemani logo
-//	width = 512; base = (0xd400/4); bpp = 4; // warning screen
+	bool attempt_draw = true;
 
-	for (int y=0;y<224/8;y++)
+	int hack_select = m_mainram[0x9000/4];
+
+	switch (hack_select)
 	{
-		for (int x=0;x<width/8/2;x++)
+	case 0x09: width = 512; base = (0xa800/4); bpp = 4; break;// konami logo
+	case 0x0d: width = 128; base = (0x9418/4); bpp = 8; break;// poems logo
+	case 0x10: width = 512; base = (0xc600/4); bpp = 4; break;// bemani logo
+	case 0x14: width = 512; base = (0xd400/4); bpp = 4; break;// warning screen
+	default: attempt_draw = false; break;
+	}
+
+	if (!attempt_draw)
+	{
+		// just to show that some stuff gets uploaded to mainram if you let execution continue, looks like tilemap or tile data?
+		int count = 0;
+		for (int y=0;y<224/8;y++)
 		{
-			//uint32_t tiles = m_mainram[(0xa800/4)+count];
-			uint32_t tiles = m_mainram[base+count];
-
-			if (bpp == 4)
+			for (int x=0;x<256/8;x++)
 			{
-				draw_tile(screen, bitmap, cliprect, (tiles&0xffff), (x * 16), y * 8);
-				draw_tile(screen, bitmap, cliprect, ((tiles>>16)&0xffff), (x * 16)+8, y * 8);
+
+				count++;
+				draw_tile(screen, bitmap, cliprect, count * 8, x * 8, y * 8);
 			}
-			else if (bpp == 8)
+		}
+	}
+	else
+	{
+		int count = 0;
+		for (int y = 0; y < 224 / 8; y++)
+		{
+			for (int x = 0; x < width / 8 / 2; x++)
 			{
-				draw_tile8(screen, bitmap, cliprect, (tiles&0xffff), (x * 16), y * 8);
-				draw_tile8(screen, bitmap, cliprect, ((tiles>>16)&0xffff), (x * 16)+8, y * 8);
+				uint32_t tiles = m_mainram[base + count];
+
+				if (bpp == 4)
+				{
+					draw_tile(screen, bitmap, cliprect, (tiles & 0xffff), (x * 16), y * 8);
+					draw_tile(screen, bitmap, cliprect, ((tiles >> 16) & 0xffff), (x * 16) + 8, y * 8);
+				}
+				else if (bpp == 8)
+				{
+					draw_tile8(screen, bitmap, cliprect, (tiles & 0xffff), (x * 16), y * 8);
+					draw_tile8(screen, bitmap, cliprect, ((tiles >> 16) & 0xffff), (x * 16) + 8, y * 8);
+				}
+
+				count++;
+
 			}
-
-			count++;
-
 		}
 	}
 	return 0;
