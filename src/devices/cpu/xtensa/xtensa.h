@@ -199,8 +199,6 @@ private:
 
 	// config
 	u32 m_num_physical_regs;
-
-	u8 m_irq_req_hack;
 };
 
 DECLARE_DEVICE_TYPE(XTENSA, xtensa_device)
