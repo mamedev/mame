@@ -274,34 +274,34 @@ AI-8003  Pinpon Music Melody
 		</part>
 	</software>
 
-	<software name="okeihana" supported="no">
+	<software name="okeihana">
 		<description>Okeiko Hanamaru Aiueo</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
-		<notes>Hard to draw characters in the right place; missing overlays?</notes>
+		<notes>Hard to draw characters in the right place.</notes>
 		<info name="serial" value="AI-4201"/>
 		<info name="alt_title" value="おけいこ・はなまる　あいえうお"/>
 		<part name="card1" interface="segaai_card">
 			<feature name="slot" value="rom_128"/>
 			<feature name="part_id" value="Okeiko Aiueo"/>
 			<dataarea name="rom" size="0x20000">
-				<rom name="okeiko aiueo.bin" size="0x20000" crc="60bfd7c3" sha1="44fc802e66f086a3cb49e4fcde22ce6f704b405f"/>
+				<rom name="okeiko aiueo.bin" size="0x20000" crc="252a0490" sha1="ab9d00a575bf0fb12557315fcd7c7e16caa8d802"/>
 			</dataarea>
 		</part>
 		<part name="card2" interface="segaai_card">
 			<feature name="slot" value="rom_128" />
 			<feature name="part_id" value="Hanamaru Aiueo"/>
 			<dataarea name="rom" size="0x20000">
-				<rom name="hanamaru aiueo.bin" size="0x20000" crc="252a0490" sha1="ab9d00a575bf0fb12557315fcd7c7e16caa8d802"/>
+				<rom name="hanamaru aiueo.bin" size="0x20000" crc="60bfd7c3" sha1="44fc802e66f086a3cb49e4fcde22ce6f704b405f"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="wakuwaku" supported="no">
+	<software name="wakuwaku">
 		<description>Waku Waku ABC to 123</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
-		<notes>Hard to draw characters in the right place; missing overlay?</notes>
+		<notes>Hard to draw characters in the right place.</notes>
 		<info name="serial" value="AI-4202"/>
 		<info name="alt_title" value="わくわく　ＡＢＣと１２３"/>
 		<part name="card" interface="segaai_card">
@@ -312,11 +312,11 @@ AI-8003  Pinpon Music Melody
 		</part>
 	</software>
 
-	<software name="henshin" supported="no">
+	<software name="henshin">
 		<description>Henshin Kanji</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
-		<notes>Hard to draw characters in the right place; missing overlay?</notes>
+		<notes>Hard to draw characters in the right place.</notes>
 		<info name="serial" value="AI-4203"/>
 		<info name="alt_title" value="へんしんかんじ"/>
 		<part name="card" interface="segaai_card">
@@ -431,26 +431,26 @@ AI-8003  Pinpon Music Melody
 			<feature name="slot" value="rom_256"/>
 			<feature name="part_id" value="C-9533 - えいごでげーむ1 Popoのゆめ"/>
 			<dataarea name="rom" size="0x40000">
-				<rom name="eigo de game 1 popo no yume.bin" size="0x40000" crc="096ed76a" sha1="c9ad9479b72c7b58c596feaab984697b6cc1aa9e"/>
+				<rom name="eigo de game 1 - popo no yume.bin" size="0x40000" crc="096ed76a" sha1="c9ad9479b72c7b58c596feaab984697b6cc1aa9e"/>
 			</dataarea>
 		</part>
 		<part name="cass1" interface="flac_cass">
 			<feature name="part_id" value="えいごでげーむ1 Popoのゆめ"/>
 			<dataarea name="cass" size="62294686">
-				<rom name="eigo de game 1.flac" size="62294686" crc="2a89cd04" sha1="7207aae9543744a198dafaa969a812ddaa667160"/>
+				<rom name="eigo de game 1 - popo no yume.flac" size="62294686" crc="2a89cd04" sha1="7207aae9543744a198dafaa969a812ddaa667160"/>
 			</dataarea>
 		</part>
 		<part name="card2" interface="segaai_card">
 			<feature name="slot" value="rom_256"/>
 			<feature name="part_id" value="C-9536 - えいごでげーむ2 Popolandのひみつ"/>
 			<dataarea name="rom" size="0x40000">
-				<rom name="eigo de game 2 popoland no himitsu.bin" size="0x40000" crc="bd55f48c" sha1="8d25a2cbbf53844df94fc1becf461adc8b3f0190"/>
+				<rom name="eigo de game 2 - popoland no himitsu.bin" size="0x40000" crc="bd55f48c" sha1="8d25a2cbbf53844df94fc1becf461adc8b3f0190"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="flac_cass">
 			<feature name="part_id" value="えいごでげーむ2 Popolandのひみつ"/>
 			<dataarea name="cass" size="71325328">
-				<rom name="eigo de game 2.flac" size="71325328" crc="f6bbee6c" sha1="c967cf013e7fc02aed7ad5d0979c05cf280fd30e"/>
+				<rom name="eigo de game 2 - popoland no himitsu.flac" size="71325328" crc="f6bbee6c" sha1="c967cf013e7fc02aed7ad5d0979c05cf280fd30e"/>
 			</dataarea>
 		</part>
 	</software>
