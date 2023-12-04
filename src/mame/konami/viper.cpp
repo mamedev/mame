@@ -80,32 +80,35 @@
     TODO:
     - needs a proper way to dump security dongles, anything but p9112 has placeholder ROM for
       ds2430.
-    - figure out why games randomly crash, and why it seems to happen more often with -nothrottle
-      (irq section makes it to die with a spurious)
-    \- i2c irq timing is particularly fussy with code1d, xtrial, mocapglf
-    \- voodoo pciint for sscopefh/jpark3 (on T-Rex display during attract) seems fired at wrong
-       time.
     - AGP interface with Voodoo 3 is definitely incorrect, and may be a cause of above;
-    - convert epic i2c to be a real i2c-complaint device, namely
-      for better irq driving
+    - convert i2c to be a real i2c-complaint device;
     - convert epic to be a device, make it input_merger/irq_callback complaint;
+    - convert ds2430 to actual device;
     - (more intermediate steps for proper PCI conversions here)
-    - pinpoint what the i2c communicates with
+    - pinpoint if the i2c communicates with anything else within the HW.
     - hookup adc0838
     - Understand what really enables sound irq, can't be from Voodoo PCIINT.
     \- tsurugi, boxingm, mfightc: no sound;
+    - xtrial: hangs when coined up;
+    - gticlub2: throws NETWORK ERROR after course select;
     - jpark3: attract mode demo play acts weird, the dinosaur gets submerged
       and camera doesn't really know what to do, CPU core bug?
-    - code1d, code1da: RTC self check bad
+    - jpark3: crashes during second attract cycle;
+    - sscopex: attract mode black screens (coin still works), sogeki/sscopefh are unaffected;
+    - wcombat: black screen when entering service mode;
     - mocapglf, sscopefh, sscopex: implement 2nd screen output, controlled by IP90C63A;
-    - most if not all games needs to be verified against factory settings
+    \- sscopex/sogeki desyncs during gameplay intro, leaves heavy trails in gameplay;
+    - ppp2nd: hangs when selecting game mode from service (manages to save);
+    - code1d, code1da, p9112: RTC self check bad;
+    - all games needs to be verified against factory settings
       (game options, coin options & sound options often don't match "green colored" defaults)
 
     Other notes:
     - "Distribution error" means there's a region mismatch.
-    - Games that hang randomly seem to hang on IRQ16 possibly? You can see "IRQ16 taken" but it hangs before you see "IRQ16 cleared".
     - Hold TEST while booting (from the very start) to initialize the RTC for most games.
     - It seems that p911 has 3 unique regional images: U/E, K/A, and J. If you try booting, for example, U region on a K/A image, it won't find some files and will error out with "distribution error".
+    - mocapglf: enable "show diag" at boot then disable it once the diag text appears.
+      This will allow game to bypass the I/O SENSOR error later on.
 
     Game status (potentially outdated, to be moved on top):
         boxingm             Goes in-game. Controllers are not emulated. Various graphical glitches.
@@ -476,6 +479,7 @@ public:
 	void viper(machine_config &config);
 	void viper_ppp(machine_config &config);
 	void viper_omz(machine_config &config);
+	void viper_fullbody(machine_config &config);
 
 	void init_viper();
 	void init_vipercf();
@@ -2228,7 +2232,7 @@ INPUT_PORTS_START( sscopefh )
 	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
 
 	PORT_MODIFY("IN3")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Refill Key")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Refill Key")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Hopper") // causes hopper errors if pressed, TBD
 
 	PORT_MODIFY("IN4")
@@ -2539,6 +2543,18 @@ void viper_state::viper_ppp(machine_config &config)
 {
 	viper(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &viper_state::viper_ppp_map);
+}
+
+// mocapb / p911 alt speaker config
+void viper_state::viper_fullbody(machine_config &config)
+{
+	viper(config);
+	config.device_remove("lspeaker");
+	config.device_remove("rspeaker");
+	SPEAKER(config, "front").front_center();
+	SPEAKER(config, "rear").rear_center();
+	DMADAC(config.replace(), "dacl").add_route(ALL_OUTPUTS, "front", 1.0);
+	DMADAC(config.replace(), "dacr").add_route(ALL_OUTPUTS, "rear", 1.0);
 }
 
 void viper_state::omz3d_map(address_map &map)
@@ -3249,17 +3265,17 @@ GAME(2000, gticlub2ea,gticlub2,  viper,     gticlub2ea, viper_state, init_viperc
 GAME(2001, jpark3,    kviper,    viper,     jpark3,     viper_state, init_vipercf,  ROT0,  "Konami", "Jurassic Park III (ver EBC)", MACHINE_NOT_WORKING)
 GAME(2001, jpark3u,   jpark3,    viper,     jpark3,     viper_state, init_vipercf,  ROT0,  "Konami", "Jurassic Park III (ver UBC)", MACHINE_NOT_WORKING)
 GAME(2001, mocapglf,  kviper,    viper_omz, mocapglf,   viper_subscreen_state, init_vipercf,  ROT90, "Konami", "Mocap Golf (ver UAA)", MACHINE_NOT_WORKING)
-GAME(2001, mocapb,    kviper,    viper,     mocapb,     viper_state, init_vipercf,  ROT90, "Konami", "Mocap Boxing (ver AAB)", MACHINE_NOT_WORKING)
-GAME(2001, mocapbj,   mocapb,    viper,     mocapb,     viper_state, init_vipercf,  ROT90, "Konami", "Mocap Boxing (ver JAA)", MACHINE_NOT_WORKING)
-GAME(2000, p911,      kviper,    viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver AAE)", MACHINE_NOT_WORKING)
-GAME(2000, p911k,     p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver KAE)", MACHINE_NOT_WORKING)
-GAME(2000, p911ac,    p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver AAC)", MACHINE_NOT_WORKING)
-GAME(2000, p911kc,    p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver KAC)", MACHINE_NOT_WORKING)
-GAME(2000, p911ud,    p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 911 (ver UAD)", MACHINE_NOT_WORKING)
-GAME(2000, p911ed,    p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 24/7 (ver EAD)", MACHINE_NOT_WORKING)
-GAME(2000, p911ea,    p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 24/7 (ver EAD, alt)", MACHINE_NOT_WORKING)
-GAME(2000, p911j,     p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver JAE)", MACHINE_NOT_WORKING)
-GAME(2001, p9112,     kviper,    viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 911 2 (VER. UAA:B)", MACHINE_NOT_WORKING)
+GAME(2001, mocapb,    kviper,    viper_fullbody, mocapb,     viper_state, init_vipercf,  ROT90, "Konami", "Mocap Boxing (ver AAB)", MACHINE_NOT_WORKING)
+GAME(2001, mocapbj,   mocapb,    viper_fullbody, mocapb,     viper_state, init_vipercf,  ROT90, "Konami", "Mocap Boxing (ver JAA)", MACHINE_NOT_WORKING)
+GAME(2000, p911,      kviper,    viper_fullbody,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver AAE)", MACHINE_NOT_WORKING)
+GAME(2000, p911k,     p911,      viper_fullbody,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver KAE)", MACHINE_NOT_WORKING)
+GAME(2000, p911ac,    p911,      viper_fullbody,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver AAC)", MACHINE_NOT_WORKING)
+GAME(2000, p911kc,    p911,      viper_fullbody,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver KAC)", MACHINE_NOT_WORKING)
+GAME(2000, p911ud,    p911,      viper_fullbody,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 911 (ver UAD)", MACHINE_NOT_WORKING)
+GAME(2000, p911ed,    p911,      viper_fullbody,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 24/7 (ver EAD)", MACHINE_NOT_WORKING)
+GAME(2000, p911ea,    p911,      viper_fullbody,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 24/7 (ver EAD, alt)", MACHINE_NOT_WORKING)
+GAME(2000, p911j,     p911,      viper_fullbody,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver JAE)", MACHINE_NOT_WORKING)
+GAME(2001, p9112,     kviper,    viper_fullbody,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 911 2 (VER. UAA:B)", MACHINE_NOT_WORKING)
 GAME(2001, sscopex,   kviper,    viper,     sscopex,    viper_subscreen_state, init_vipercf,  ROT0,  "Konami", "Silent Scope EX (ver UAA)", MACHINE_NOT_WORKING)
 GAME(2001, sogeki,    sscopex,   viper,     sogeki,     viper_subscreen_state, init_vipercf,  ROT0,  "Konami", "Sogeki (ver JAA)", MACHINE_NOT_WORKING)
 GAME(2002, sscopefh,  kviper,    viper,     sscopefh,   viper_subscreen_state, init_vipercf,  ROT0,  "Konami", "Silent Scope Fortune Hunter (ver EAA)", MACHINE_NOT_WORKING) // UK only?
