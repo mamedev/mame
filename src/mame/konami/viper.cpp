@@ -89,17 +89,20 @@
     - hookup adc0838
     - Understand what really enables sound irq, can't be from Voodoo PCIINT.
     \- tsurugi, boxingm, mfightc: no sound;
+    \- thrild2: no BGMs;
     - xtrial: hangs when coined up;
     - gticlub2: throws NETWORK ERROR after course select;
     - jpark3: attract mode demo play acts weird, the dinosaur gets submerged
       and camera doesn't really know what to do, CPU core bug?
     - jpark3: crashes during second attract cycle;
-    - sscopex: attract mode black screens (coin still works), sogeki/sscopefh are unaffected;
+    - sscopex, thrild2: attract mode black screens (coin still works), sogeki/sscopefh are unaffected;
     - wcombat: black screen when entering service mode;
     - mocapglf, sscopefh, sscopex: implement 2nd screen output, controlled by IP90C63A;
     \- sscopex/sogeki desyncs during gameplay intro, leaves heavy trails in gameplay;
     - ppp2nd: hangs when selecting game mode from service (manages to save);
     - code1d, code1da, p9112: RTC self check bad;
+    - thrild2c: blue screen;
+    - thrild2ac: black screen;
     - all games needs to be verified against factory settings
       (game options, coin options & sound options often don't match "green colored" defaults)
 
@@ -789,8 +792,7 @@ void viper_state::pci_config_data_w(uint64_t data)
 
 // TODO: timing calculation, comes from fdr / dffsr
 // most if not all games in the driver sets fdr = 0x27 = 512, dffsr = 0x21
-// code1db is *extremely* sensitive to this value, should really be divided by 10
-#define I2C_TIMER_FREQ (SDRAM_CLOCK / 512) / 64
+#define I2C_TIMER_FREQ (SDRAM_CLOCK / 512) / 10
 
 uint8_t viper_state::i2cdr_r(offs_t offset)
 {
@@ -1942,7 +1944,7 @@ void viper_state::viper_map(address_map &map)
 	map(0xffe80000, 0xffe80007).w(FUNC(viper_state::unk1a_w));
 	map(0xffe88000, 0xffe88007).w(FUNC(viper_state::unk1b_w));
 	map(0xffe98000, 0xffe98007).noprw();
-	map(0xffe9a000, 0xffe9bfff).ram();                             // World Combat uses this
+	map(0xffe9a000, 0xffe9bfff).ram();   // wcombat uses this
 	map(0xffea0000, 0xffea0007).noprw(); // Gun sensor? Read heavily by p9112
 	map(0xfff00000, 0xfff3ffff).rom().region("user1", 0);       // Boot ROM
 }
@@ -2492,8 +2494,8 @@ void viper_state::machine_reset()
 void viper_state::viper(machine_config &config)
 {
 	/* basic machine hardware */
-	MPC8240(config, m_maincpu, 166'666'666); // Unknown
-	m_maincpu->set_bus_frequency(100'000'000);
+	MPC8240(config, m_maincpu, XTAL(33'868'800) * 6); // PCI clock * 6
+	m_maincpu->set_bus_frequency(XTAL(33'868'800) * 2); // TODO: x2 for AGP, other devices x1
 	m_maincpu->set_addrmap(AS_PROGRAM, &viper_state::viper_map);
 	m_maincpu->set_vblank_int("screen", FUNC(viper_state::viper_vblank));
 
