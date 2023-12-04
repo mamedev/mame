@@ -190,6 +190,7 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void luckycoin(machine_config &config);
 	void showhanc(machine_config &config);
 	void showhand(machine_config &config);
 	void skilldrp(machine_config &config);
@@ -244,6 +245,7 @@ private:
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void luckycoin_map(address_map &map);
 	void showhanc_map(address_map &map);
 	void showhand_map(address_map &map);
 	void skilldrp_map(address_map &map);
@@ -683,6 +685,22 @@ void astrocorp_state::skilldrp_map(address_map &map)
 	map(0x500000, 0x507fff).ram().share("nvram"); // battery
 	map(0x580001, 0x580001).w(FUNC(astrocorp_state::oki_bank_w));
 	map(0x600001, 0x600001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
+
+void astrocorp_state::luckycoin_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x280000, 0x2801ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x300000, 0x300fff).ram().share("spriteram");
+	map(0x302000, 0x302001).nopr().w(FUNC(astrocorp_state::draw_sprites_w));
+	map(0x304000, 0x304001).portr("INPUTS");
+	map(0x308001, 0x308001).w(FUNC(astrocorp_state::eeprom_w));
+	map(0x30a000, 0x30a001).nopr().w(FUNC(astrocorp_state::skilldrp_outputs_w));
+	map(0x30e000, 0x30e001).portr("EEPROM_IN");
+	map(0x400000, 0x407fff).ram().share("nvram"); // battery
+	map(0x500000, 0x500001).nopr().w(FUNC(astrocorp_state::screen_enable_w)).umask16(0x00ff);
+	map(0x580001, 0x580001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x600001, 0x600001).w(FUNC(astrocorp_state::oki_bank_w));
 }
 
 void astrocorp_state::speeddrp_map(address_map &map)
@@ -1234,6 +1252,12 @@ void astrocorp_state::skilldrp(machine_config &config)
 	OKIM6295(config, m_oki, 24_MHz_XTAL / 24, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
+void astrocorp_state::luckycoin(machine_config &config)
+{
+	skilldrp(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &astrocorp_state::luckycoin_map);
+}
+
 void astrocorp_state::speeddrp(machine_config &config)
 {
 	skilldrp(config);
@@ -1528,6 +1552,20 @@ RAM1 are SEC KM681000BLG-7L RAM chips
 
 ROM_START( skilldrp )
 	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "7-skill_drop_g1.01s.u100", 0x00000, 0x40000, CRC(8867df18) SHA1(19ad0104647b6f5c8b6c06749c24defdcacfd54d) )
+
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD( "mx29f1610amc.u26", 0x000000, 0x200000, CRC(4fdac800) SHA1(bcafceb6c34866c474714347e23f9e819b5fcfa6) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "5-skill_drop.rom5", 0x00000, 0x80000, CRC(a479e06d) SHA1(ee690d39188b8a43652c4aa5bf8267c1f6632d2f) ) // No chip location just "ROM#5" silkscreened under socket
+
+	ROM_REGION16_LE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46.u6", 0x00, 0x80, CRC(01c4bc62) SHA1(49710d2dac73791b4019b1dc15e0b5159c6fbaef) ) // factory default
+ROM_END
+
+ROM_START( skilldrpa )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "7-skill_drop_g1.0s.u100", 0x00000, 0x40000, CRC(f968b783) SHA1(1d693b1d460e659ca94aae8625ea26e120053f84) )
 
 	ROM_REGION( 0x200000, "sprites", 0 )
@@ -1535,6 +1573,20 @@ ROM_START( skilldrp )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "5-skill_drop.rom5", 0x00000, 0x80000, CRC(a479e06d) SHA1(ee690d39188b8a43652c4aa5bf8267c1f6632d2f) ) // No chip location just "ROM#5" silkscreened under socket
+
+	ROM_REGION16_LE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46.u6", 0x00, 0x80, CRC(01c4bc62) SHA1(49710d2dac73791b4019b1dc15e0b5159c6fbaef) ) // factory default
+ROM_END
+
+ROM_START( luckycoin )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "u100", 0x00000, 0x40000, CRC(77bbeebc) SHA1(45f5a18694e2a93d9c299dc1f405df32c9773ce6) ) // label was peeled off
+
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD( "mx29f1610amc.u26", 0x000000, 0x200000, CRC(9e6184b7) SHA1(23014b32d129e39c3956c36516d3920fd6e2e11b) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "5-lucky_coin.rom5", 0x00000, 0x80000, CRC(a479e06d) SHA1(ee690d39188b8a43652c4aa5bf8267c1f6632d2f) ) // No chip location just "ROM#5" silkscreened under socket
 
 	ROM_REGION16_LE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "93c46.u6", 0x00, 0x80, CRC(01c4bc62) SHA1(49710d2dac73791b4019b1dc15e0b5159c6fbaef) ) // factory default
@@ -2259,7 +2311,7 @@ ROM_START( monkeyl )
 	ROM_LOAD( "5_m.l._e1.0.u33", 0x00000, 0x80000, CRC(62122100) SHA1(519df7825ab62f0648192e6b1760dd9cc5ec7f9f) )
 
 	ROM_REGION16_LE( 0x80, "eeprom", 0 )
-	ROM_LOAD( "93c46.u10", 0x0000, 0x0080, CRC(eab965cc) SHA1(258358c89faaf643b526d1014946e14567cba88d) )
+	ROM_LOAD( "93c46.u10", 0x0000, 0x0080, CRC(eab965cc) SHA1(258358c89faaf643b526d1014946e14567cba88d) ) // TODO: factory default
 
 	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
 	ROM_LOAD( "monkeyl_cpucode.key", 0x00, 0x02, NO_DUMP )
@@ -2284,7 +2336,7 @@ ROM_START( monkeyla ) // MIN BET 1-XXX, % = LEVELS 1-8
 	ROM_LOAD( "5_m.l._e1.0.u33", 0x00000, 0x80000, CRC(62122100) SHA1(519df7825ab62f0648192e6b1760dd9cc5ec7f9f) )
 
 	ROM_REGION16_LE( 0x80, "eeprom", 0 )
-	ROM_LOAD( "93c46.u10", 0x0000, 0x0080, CRC(28e861d6) SHA1(4faa4d62954fd9a263d24caa6214353a109ec4f1) )
+	ROM_LOAD( "93c46.u10", 0x0000, 0x0080, CRC(28e861d6) SHA1(4faa4d62954fd9a263d24caa6214353a109ec4f1) ) // TODO: factory default
 
 	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
 	ROM_LOAD( "monkeyl_cpucode.key", 0x00, 0x02, NO_DUMP )
@@ -2809,7 +2861,9 @@ void astoneag_state::interleave_sprites_16x32()
 //     YEAR   NAME       PARENT    MACHINE    INPUTS     STATE            INIT            ROT   COMPANY        FULLNAME                                         FLAGS                                                  LAYOUT
 GAMEL( 2000,  showhand,  0,        showhand,  showhand,  astrocorp_state, init_showhand,  ROT0, "Astro Corp.", "Show Hand (Italy)",                             MACHINE_SUPPORTS_SAVE,                                 layout_showhand  )
 GAMEL( 2000,  showhanc,  showhand, showhanc,  showhanc,  astrocorp_state, init_showhanc,  ROT0, "Astro Corp.", "Wangpai Duijue (China)",                        MACHINE_SUPPORTS_SAVE,                                 layout_showhanc  )
-GAMEL( 2002,  skilldrp,  0,        skilldrp,  skilldrp,  astrocorp_state, empty_init,     ROT0, "Astro Corp.", "Skill Drop Georgia (Ver. G1.0S, Sep 13 2002)",  MACHINE_SUPPORTS_SAVE,                                 layout_skilldrp  ) // Sep 13 2002 09:17:54
+GAMEL( 2002,  skilldrp,  0,        skilldrp,  skilldrp,  astrocorp_state, empty_init,     ROT0, "Astro Corp.", "Skill Drop Georgia (Ver. G1.01S, Oct 1 2002)",  MACHINE_SUPPORTS_SAVE,                                 layout_skilldrp  ) // Oct  1 2002 09:42:32
+GAMEL( 2002,  skilldrpa, skilldrp, skilldrp,  skilldrp,  astrocorp_state, empty_init,     ROT0, "Astro Corp.", "Skill Drop Georgia (Ver. G1.0S, Sep 13 2002)",  MACHINE_SUPPORTS_SAVE,                                 layout_skilldrp  ) // Sep 13 2002 09:17:54
+GAMEL( 2002,  luckycoin, skilldrp, luckycoin, skilldrp,  astrocorp_state, empty_init,     ROT0, "Astro Corp.", "Lucky Coin (Jun 24 2002)",                      MACHINE_SUPPORTS_SAVE,                                 layout_skilldrp  ) // Jun 24 2002 13:02:31
 GAMEL( 2003,  speeddrp,  0,        speeddrp,  skilldrp,  astrocorp_state, empty_init,     ROT0, "Astro Corp.", "Speed Drop (Ver. 1.06, Sep 3 2003)",            MACHINE_SUPPORTS_SAVE,                                 layout_skilldrp  ) // Sep  3 2003 16:01:26
 
 // Simpler encryption
