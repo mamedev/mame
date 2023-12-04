@@ -13,7 +13,7 @@
 #define LOG_SER     (1U << 6)
 #define LOG_TIMER   (1U << 7)
 
-//#define VERBOSE (LOG_SER)
+//#define VERBOSE (LOG_PORT)
 //#define LOG_OUTPUT_STREAM std::cout
 //#define LOG_OUTPUT_STREAM std::cerr
 #include "logmacro.h"
@@ -301,7 +301,6 @@ void hd6301x_cpu_device::hd6301x_io(address_map &map)
 	hd6303x_io(map);
 	map(0x0002, 0x0002).rw(FUNC(hd6301x_cpu_device::p1_data_r), FUNC(hd6301x_cpu_device::p1_data_w)); // external except in single-chip mode
 	map(0x0004, 0x0004).rw(FUNC(hd6301x_cpu_device::ff_r), FUNC(hd6301x_cpu_device::p3_ddr_w)); // external except in single-chip mode
-	map(0x0005, 0x0005).rw(FUNC(hd6301x_cpu_device::ff_r), FUNC(hd6301x_cpu_device::p4_ddr_w)); // external except in single-chip mode
 	map(0x0006, 0x0006).rw(FUNC(hd6301x_cpu_device::p3_data_r), FUNC(hd6301x_cpu_device::p3_data_w)); // external except in single-chip mode
 	map(0x0007, 0x0007).rw(FUNC(hd6301x_cpu_device::p4_data_r), FUNC(hd6301x_cpu_device::p4_data_w)); // external except in single-chip mode
 	map(0x0018, 0x0018).rw(FUNC(hd6301x_cpu_device::p7_data_r), FUNC(hd6301x_cpu_device::p7_data_w)); // external except in single-chip mode
@@ -460,13 +459,18 @@ hd6301x_cpu_device::hd6301x_cpu_device(const machine_config &mconfig, device_typ
 	m_sclk_divider = 16;
 }
 
+hd6301x0_cpu_device::hd6301x0_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal, int nvram_bytes)
+	: hd6301x_cpu_device(mconfig, type, tag, owner, clock, internal, nvram_bytes)
+{
+}
+
 hd6301x0_cpu_device::hd6301x0_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hd6301x_cpu_device(mconfig, HD6301X0, tag, owner, clock, address_map_constructor(FUNC(hd6301x0_cpu_device::hd6301x_mem), this), 192)
+	: hd6301x0_cpu_device(mconfig, HD6301X0, tag, owner, clock, address_map_constructor(FUNC(hd6301x0_cpu_device::hd6301x_mem), this), 192)
 {
 }
 
 hd63701x0_cpu_device::hd63701x0_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hd6301x_cpu_device(mconfig, HD63701X0, tag, owner, clock, address_map_constructor(FUNC(hd63701x0_cpu_device::hd6301x_mem), this), 192)
+	: hd6301x0_cpu_device(mconfig, HD63701X0, tag, owner, clock, address_map_constructor(FUNC(hd63701x0_cpu_device::hd6301x_mem), this), 192)
 {
 }
 
@@ -1251,9 +1255,7 @@ void m6801_cpu_device::device_reset()
 	m_irq_state[M6801_TIN_LINE] = 0;
 	m_is3_state = 0;
 
-	m_port_ddr[0] = 0x00;
-	m_port_ddr[1] = 0x00;
-	m_port_ddr[2] = 0x00;
+	std::fill(std::begin(m_port_ddr), std::end(m_port_ddr), 0);
 	m_p3csr = 0x00;
 	m_pending_isf_clear = false;
 	m_port2_written = false;
@@ -1287,8 +1289,7 @@ void hd6301x_cpu_device::device_reset()
 {
 	m6801_cpu_device::device_reset();
 
-	m_portx_ddr[0] = 0x00;
-	m_portx_ddr[1] = 0x00;
+	std::fill(std::begin(m_portx_ddr), std::end(m_portx_ddr), 0);
 
 	m_tcsr2 = 0x00;
 	m_pending_tcsr2 = 0x00;
@@ -1301,6 +1302,14 @@ void hd6301x_cpu_device::device_reset()
 	m_t2cnt_written = false;
 
 	m_p3csr = 0; // does not have this reg
+}
+
+void hd6301x0_cpu_device::device_reset()
+{
+	hd6301x_cpu_device::device_reset();
+
+	// port 4 is write-only on X0
+	m_port_ddr[3] = 0xff;
 }
 
 void hd6301y_cpu_device::device_reset()
@@ -1319,6 +1328,9 @@ void mc68120_device::dpram_w(offs_t offset, uint8_t data)
 {
 	m_internal_ram[offset & 0x7f] = data;
 }
+
+
+// nvram handling
 
 bool m6801_cpu_device::nvram_write(util::write_stream &file)
 {
@@ -1376,6 +1388,86 @@ void m6801_cpu_device::nvram_default()
 		std::fill_n(&m_internal_ram[0], m_nvram_bytes, m_nvram_defval);
 		m_ram_ctrl &= 0x3f;
 	}
+}
+
+// HD6301* doesn't have a separate VCC Standby pin, so more internal registers are kept intact while in standby
+
+bool hd6301_cpu_device::nvram_write(util::write_stream &file)
+{
+	if (!m6801_cpu_device::nvram_write(file))
+		return false;
+
+	size_t actual;
+
+	// port output latches
+	if (file.write(&m_port_data[0], sizeof(m_port_data), actual) || sizeof(m_port_data) != actual)
+		return false;
+
+	return true;
+}
+
+bool hd6301x_cpu_device::nvram_write(util::write_stream &file)
+{
+	if (!hd6301_cpu_device::nvram_write(file))
+		return false;
+
+	size_t actual;
+
+	// port output latches
+	if (file.write(&m_portx_data[0], sizeof(m_portx_data), actual) || sizeof(m_portx_data) != actual)
+		return false;
+
+	return true;
+}
+
+bool hd6301_cpu_device::nvram_read(util::read_stream &file)
+{
+	if (!m6801_cpu_device::nvram_read(file))
+		return false;
+
+	size_t actual;
+
+	// port output latches
+	if (file.read(&m_port_data[0], sizeof(m_port_data), actual) || sizeof(m_port_data) != actual)
+		return false;
+
+	return true;
+}
+
+bool hd6301x_cpu_device::nvram_read(util::read_stream &file)
+{
+	if (!hd6301_cpu_device::nvram_read(file))
+		return false;
+
+	size_t actual;
+
+	// port output latches
+	if (file.read(&m_portx_data[0], sizeof(m_portx_data), actual) || sizeof(m_portx_data) != actual)
+		return false;
+
+	return true;
+}
+
+void hd6301_cpu_device::nvram_default()
+{
+	if (!nvram_backup_enabled() || m_nvram_bytes == 0)
+		return;
+
+	m6801_cpu_device::nvram_default();
+
+	// clear other registers
+	std::fill(std::begin(m_port_data), std::end(m_port_data), 0);
+}
+
+void hd6301x_cpu_device::nvram_default()
+{
+	if (!nvram_backup_enabled() || m_nvram_bytes == 0)
+		return;
+
+	hd6301_cpu_device::nvram_default();
+
+	// clear other registers
+	std::fill(std::begin(m_portx_data), std::end(m_portx_data), 0);
 }
 
 
