@@ -785,7 +785,7 @@ void viper_state::pci_config_data_w(uint64_t data)
 
 // TODO: timing calculation, comes from fdr / dffsr
 // most if not all games in the driver sets fdr = 0x27 = 512, dffsr = 0x21
-// code1db is *extremely* sensitive to this value
+// code1db is *extremely* sensitive to this value, should really be divided by 10
 #define I2C_TIMER_FREQ (SDRAM_CLOCK / 512) / 64
 
 uint8_t viper_state::i2cdr_r(offs_t offset)
@@ -1137,6 +1137,10 @@ void viper_state::epic_update_interrupts()
 
 	int irq = -1;
 	int priority = -1;
+
+	// Do not change the state until current irq is fully serviced.
+	if (m_epic.active_irq >= 0)
+		return;
 
 	// find the highest priority pending interrupt
 	for (i=MPC8240_NUM_INTERRUPTS-1; i >= 0; i--)
