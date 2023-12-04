@@ -51,6 +51,8 @@ public:
 
 	void hudson_poems(machine_config &config);
 
+	void init_marimba();
+
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -64,6 +66,8 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(screen_scanline);
 
 	void mem_map(address_map &map);
+
+	void nop_addr(uint32_t addr);
 
 	uint32_t poems_rand_r();
 	//uint32_t poems_8000038_r();
@@ -79,6 +83,8 @@ private:
 	uint32_t m_unkvregs[0x80/4];
 	uint16_t m_unktable[256];
 	uint16_t m_unktableoffset;
+
+	int m_hackcounter;
 
 	required_device<xtensa_device> m_maincpu;
 	required_device<palette_device> m_palette;
@@ -100,6 +106,7 @@ void hudson_poems_state::machine_reset()
 {
 	m_maincpu->set_pc(0x00000040);
 	m_unktableoffset = 0;
+	m_hackcounter = 0;
 }
 
 static INPUT_PORTS_START( hudson_poems )
@@ -169,6 +176,8 @@ void hudson_poems_state::draw_tile8(screen_device &screen, bitmap_ind16 &bitmap,
 
 uint32_t hudson_poems_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	bitmap.fill(0, cliprect);
+
 	int width, base, bpp;
 
 	bool attempt_draw = true;
@@ -230,7 +239,7 @@ uint32_t hudson_poems_state::screen_update(screen_device &screen, bitmap_ind16 &
 
 uint32_t hudson_poems_state::poems_rand_r()
 {
-	return (machine().rand() & 0x1) ? machine().rand() : 0;
+	return ((m_hackcounter++) & 0x3) ? 0xffffffff : 0;
 }
 
 /*
@@ -311,7 +320,7 @@ void hudson_poems_state::mem_map(address_map &map)
 	map(0x08000000, 0x0800007f).w(FUNC(hudson_poems_state::unk_vregs_w));
 
 	map(0x08000038, 0x0800003b).r(FUNC(hudson_poems_state::poems_rand_r));
-	map(0x08000800, 0x08000bff).ram().w(FUNC(hudson_poems_state::palette_w)).share("palram");
+	map(0x08000800, 0x08000fff).ram().w(FUNC(hudson_poems_state::palette_w)).share("palram");
 
 	map(0x08008200, 0x08008203).r(FUNC(hudson_poems_state::poems_rand_r));
 	map(0x08002000, 0x08008fff).ram();
@@ -387,10 +396,33 @@ void hudson_poems_state::hudson_poems(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(hudson_poems_state::screen_scanline), "screen", 0, 1);
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_poems);
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x100);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x400);
 
 	SPEAKER(config, "speaker").front_center();
 
+}
+
+void hudson_poems_state::nop_addr(uint32_t addr)
+{
+	uint8_t *ROM = memregion("maincpu")->base();
+	ROM[addr+0] = 0x10;
+	ROM[addr+1] = 0x11;
+	ROM[addr+2] = 0x20;
+}
+
+void hudson_poems_state::init_marimba()
+{
+	// we get stuck in these functions, why?
+	nop_addr(0x66186b);
+	nop_addr(0x661897);
+	nop_addr(0x6618af);
+	nop_addr(0x6618c3);
+	nop_addr(0x6618df);
+	nop_addr(0x6618f3);
+	nop_addr(0x661908);
+	nop_addr(0x661920);
+
+	nop_addr(0x6617db);
 }
 
 ROM_START( marimba )
@@ -404,4 +436,4 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 2005, marimba,      0,       0,      hudson_poems, hudson_poems, hudson_poems_state, empty_init, "Konami", "Marimba Tengoku (Japan)", MACHINE_IS_SKELETON )
+CONS( 2005, marimba,      0,       0,      hudson_poems, hudson_poems, hudson_poems_state, init_marimba, "Konami", "Marimba Tengoku (Japan)", MACHINE_IS_SKELETON )
