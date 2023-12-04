@@ -1200,7 +1200,7 @@ void xtensa_device::getop_and_execute()
 			{
 				u8 dstreg = BIT(inst, 12, 4);
 				u8 reg_s = BIT(inst, 8, 4);
-				u8 reg_t = BIT(inst, 4, 4) + 7;
+				u8 reg_t = BIT(inst, 4, 4);
 				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, a%d\n", "minu", BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
 
 				if (get_reg(reg_s) < get_reg(reg_t))
