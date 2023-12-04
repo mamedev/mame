@@ -1,5 +1,20 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
+/*
+
+6801 and derivatives
+
+TODO:
+- improve RAM control register
+- improve STBY pin? RES pin (reset) should be ineffective while STBY is low
+- IS3 interrupt for 6801 port 3 handshake (already implemented for 6301Y)
+- address TRAP (at the moment, only illegal opcode TRAP is emulated)
+- finish 6301Y port 6 handshake, share implementation with p3csr?
+- 6301Y sci_trcsr2_r/w
+- add 6801U4 extra timer registers (bublbobl, kikikai, though they seem
+  to work fine without)
+
+*/
 
 #include "emu.h"
 #include "m6801.h"

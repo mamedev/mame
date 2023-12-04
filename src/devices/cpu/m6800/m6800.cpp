@@ -24,14 +24,7 @@ TODO:
 - verify invalid opcodes for the different CPU types
 - add 6802 nvram (only in case VCC STANDBY is connected to battery)
 - cleanups (difficult to do maintenance work right now)
-- improve 6801 and derivatives:
-  * improve RAM control register
-  * improve STBY pin? RES pin (reset) should be ineffective while STBY is low
-  * IS3 interrupt for 6801 port 3 handshake (already implemented for 6301Y)
-  * finish 6301Y port 6 handshake, share implementation with p3csr?
-  * 6301Y sci_trcsr2_r/w
-  * add 6801U4 extra timer registers (bublbobl, kikikai, though they seem
-    to work fine without)
+- (see m6801.cpp for 6801-specific TODO)
 
 *****************************************************************************/
 
