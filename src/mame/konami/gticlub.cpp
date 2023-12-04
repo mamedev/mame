@@ -251,7 +251,7 @@ namespace {
 
 class gticlub_base_state : public driver_device
 {
-public:
+protected:
 	gticlub_base_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
@@ -272,7 +272,6 @@ public:
 		, m_cg_view(*this, "cg_view")
 	{ }
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
