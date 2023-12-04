@@ -38,7 +38,11 @@
 
 #include "vmnet_common.h"
 
-static int classify_mac(uint8_t *mac) {
+namespace osd {
+
+namespace {
+
+int classify_mac(uint8_t *mac) {
 	if ((mac[0] & 0x01) == 0) return 1; /* unicast */
 	if (memcmp(mac, "\xff\xff\xff\xff\xff\xff", 6) == 0) return 0xff; /* broadcast */
 	return 2; /* multicast */
@@ -269,12 +273,16 @@ void vmnet_module::exit() {
 	clear_netdev();
 }
 
+} // anonymous namespace
+
+} // namespace osd
+
 #else
 	#include "modules/osdmodule.h"
 	#include "netdev_module.h"
 
-	MODULE_NOT_SUPPORTED(vmnet_module, OSD_NETDEV_PROVIDER, "vmnet")
+	namespace osd { namespace { MODULE_NOT_SUPPORTED(vmnet_module, OSD_NETDEV_PROVIDER, "vmnet") } }
 #endif
 
 
-MODULE_DEFINITION(NETDEV_VMNET, vmnet_module)
+MODULE_DEFINITION(NETDEV_VMNET, osd::vmnet_module)

@@ -79,18 +79,18 @@ namespace vmnet_common {
 	dhcp_inform = 8,
 	};
 
-	int is_arp(const uint8_t *packet, u32 size);
-	int is_broadcast(const uint8_t *packet, u32 size);
-	int is_unicast(const uint8_t *packet, u32 size);
-	int is_multicast(const uint8_t *packet, u32 size);
-	int is_dhcp_out(const uint8_t *packet, u32 size);
-	int is_dhcp_in(const uint8_t *packet, u32 size);
-	u32 ip_checksum(const uint8_t *packet);
-	void recalc_ip_checksum(uint8_t *packet, u32 size);
-	void recalc_udp_checksum(uint8_t *packet, u32 size);
-	void fix_incoming_packet(uint8_t *packet, u32 size, const char real_mac[6], const char fake_mac[6]);
-	void fix_outgoing_packet(uint8_t *packet, u32 size, const char real_mac[6], const char fake_mac[6]);
-	u32 finalize_frame(u8 buf[], u32 length);
+	int is_arp(const uint8_t *packet, uint32_t size);
+	int is_broadcast(const uint8_t *packet, uint32_t size);
+	int is_unicast(const uint8_t *packet, uint32_t size);
+	int is_multicast(const uint8_t *packet, uint32_t size);
+	int is_dhcp_out(const uint8_t *packet, uint32_t size);
+	int is_dhcp_in(const uint8_t *packet, uint32_t size);
+	uint32_t ip_checksum(const uint8_t *packet);
+	void recalc_ip_checksum(uint8_t *packet, uint32_t size);
+	void recalc_udp_checksum(uint8_t *packet, uint32_t size);
+	void fix_incoming_packet(uint8_t *packet, uint32_t size, const char real_mac[6], const char fake_mac[6]);
+	void fix_outgoing_packet(uint8_t *packet, uint32_t size, const char real_mac[6], const char fake_mac[6]);
+	uint32_t finalize_frame(uint8_t buf[], uint32_t length);
 }
 
 #endif

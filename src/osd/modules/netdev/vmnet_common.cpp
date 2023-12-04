@@ -1,13 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders: Kelvin Sherlock, R. Belmont
 
-#include "emu.h"
+#include "hash.h"
 #include "vmnet_common.h"
+
+#include <algorithm>
+#include <cstdint>
 
 static constexpr int ETHERNET_MIN_FRAME = 64;
 static uint8_t ff[] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
 
-int vmnet_common::is_arp(const uint8_t *packet, u32 size) {
+int vmnet_common::is_arp(const uint8_t *packet, uint32_t size) {
   return size >= arp_data
 	&& packet[12] == 0x08 && packet[13] == 0x06 /* ARP */
 	&& packet[14] == 0x00 && packet[15] == 0x01 /* ethernet */
@@ -17,20 +20,20 @@ int vmnet_common::is_arp(const uint8_t *packet, u32 size) {
   ;
 }
 
-int vmnet_common::is_broadcast(const uint8_t *packet, u32 size) {
+int vmnet_common::is_broadcast(const uint8_t *packet, uint32_t size) {
   return !memcmp(packet + 0, ff, 6);
 }
 
-int vmnet_common::is_unicast(const uint8_t *packet, u32 size) {
+int vmnet_common::is_unicast(const uint8_t *packet, uint32_t size) {
   return (*packet & 0x01) == 0;
 }
 
-int vmnet_common::is_multicast(const uint8_t *packet, u32 size) {
+int vmnet_common::is_multicast(const uint8_t *packet, uint32_t size) {
   return (*packet & 0x01) == 0x01 && !is_broadcast(packet, size);
 }
 
-int vmnet_common::is_dhcp_out(const uint8_t *packet, u32 size) {
-  static uint8_t cookie[] = { 0x63, 0x82, 0x53, 0x63 };
+int vmnet_common::is_dhcp_out(const uint8_t *packet, uint32_t size) {
+  static const uint8_t cookie[] = { 0x63, 0x82, 0x53, 0x63 };
   return size >= 282
 	&& packet[12] == 0x08 && packet[13] == 0x00
 	&& packet[14] == 0x45 /* version 4 */
@@ -44,8 +47,8 @@ int vmnet_common::is_dhcp_out(const uint8_t *packet, u32 size) {
 }
 
 
-int vmnet_common::is_dhcp_in(const uint8_t *packet, u32 size) {
-  static uint8_t cookie[] = { 0x63, 0x82, 0x53, 0x63 };
+int vmnet_common::is_dhcp_in(const uint8_t *packet, uint32_t size) {
+  static const uint8_t cookie[] = { 0x63, 0x82, 0x53, 0x63 };
   return size >= 282
 	&& packet[12] == 0x08 && packet[13] == 0x00
 	&& packet[14] == 0x45 /* version 4 */
@@ -58,10 +61,9 @@ int vmnet_common::is_dhcp_in(const uint8_t *packet, u32 size) {
   ;
 }
 
-u32 vmnet_common::ip_checksum(const uint8_t *packet) {
-  u32 x = 0;
-  u32 i;
-  for (i = 0; i < ip_data; i += 2) {
+uint32_t vmnet_common::ip_checksum(const uint8_t *packet) {
+  uint32_t x = 0;
+  for (uint32_t i = 0; i < ip_data; i += 2) {
 	if (i == ip_header_cksum) continue;
 	x += packet[eth_data + i + 0 ] << 8;
 	x += packet[eth_data + i + 1];
@@ -73,10 +75,10 @@ u32 vmnet_common::ip_checksum(const uint8_t *packet) {
   return ~x & 0xffff;
 }
 
-void vmnet_common::recalc_ip_checksum(uint8_t *packet, u32 size)
+void vmnet_common::recalc_ip_checksum(uint8_t *packet, uint32_t size)
 {
-  u32 x = 0;
-  u32 i;
+  uint32_t x = 0;
+  uint32_t i;
 
   if (size < eth_data + ip_data) return;
 
@@ -99,7 +101,7 @@ void vmnet_common::recalc_ip_checksum(uint8_t *packet, u32 size)
 
 
 
-void vmnet_common::recalc_udp_checksum(uint8_t *packet, u32 size) {
+void vmnet_common::recalc_udp_checksum(uint8_t *packet, uint32_t size) {
   if (size < eth_data + ip_data + udp_data) return;
 
   uint8_t *udp_ptr = packet + eth_data + ip_data;
@@ -111,7 +113,7 @@ void vmnet_common::recalc_udp_checksum(uint8_t *packet, u32 size) {
   udp_ptr[udp_cksum+0] = 0;
   udp_ptr[udp_cksum+1] = 0;
 
-  u32 packet_len = (packet[eth_data + ip_len + 0] << 8) | (packet[eth_data + ip_len + 1]);
+  uint32_t packet_len = (packet[eth_data + ip_len + 0] << 8) | (packet[eth_data + ip_len + 1]);
 
   if (packet_len + eth_data < size)
 	return;
@@ -119,8 +121,8 @@ void vmnet_common::recalc_udp_checksum(uint8_t *packet, u32 size) {
   packet_len -= ip_data;
 
 
-  u32 sum = 0;
-  u32 i;
+  uint32_t sum = 0;
+  uint32_t i;
 
   // pseudo header = src address, dest address, protocol (17), udp + data length
   sum = 17 + packet_len;
@@ -151,7 +153,7 @@ void vmnet_common::recalc_udp_checksum(uint8_t *packet, u32 size) {
 }
 
 
-void vmnet_common::fix_incoming_packet(uint8_t *packet, u32 size, const char real_mac[6], const char fake_mac[6]) {
+void vmnet_common::fix_incoming_packet(uint8_t *packet, uint32_t size, const char real_mac[6], const char fake_mac[6]) {
 
   if (memcmp(packet + 0, real_mac, 6) == 0)
 	memcpy(packet + 0, fake_mac, 6);
@@ -172,7 +174,7 @@ void vmnet_common::fix_incoming_packet(uint8_t *packet, u32 size, const char rea
 
 }
 
-void vmnet_common::fix_outgoing_packet(uint8_t *packet, u32 size, const char real_mac[6], const char fake_mac[6]) {
+void vmnet_common::fix_outgoing_packet(uint8_t *packet, uint32_t size, const char real_mac[6], const char fake_mac[6]) {
 
   if (memcmp(packet + 6, fake_mac, 6) == 0)
 	memcpy(packet + 6, real_mac, 6);
@@ -202,7 +204,7 @@ void vmnet_common::fix_outgoing_packet(uint8_t *packet, u32 size, const char rea
 
 }
 
-u32 vmnet_common::finalize_frame(u8 buf[], u32 length)
+uint32_t vmnet_common::finalize_frame(uint8_t buf[], uint32_t length)
 {
   /*
    * The taptun driver receives frames which are shorter than the Ethernet
@@ -222,7 +224,7 @@ u32 vmnet_common::finalize_frame(u8 buf[], u32 length)
   }
 
   // compute and append the frame check sequence
-  const u32 fcs = util::crc32_creator::simple(buf, length);
+  const uint32_t fcs = util::crc32_creator::simple(buf, length);
 
   buf[length++] = (fcs >> 0) & 0xff;
   buf[length++] = (fcs >> 8) & 0xff;

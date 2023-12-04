@@ -320,12 +320,6 @@ function osdmodulesbuild()
 			"USE_QTDEBUG=0",
 		}
 	end
-
-	if _OPTIONS["USE_VMNET"]=="1" then
-		links {
-			"vmnet.framework"
-		}
-	end
 end
 
 
@@ -461,7 +455,6 @@ function osdmodulestargetconf()
 		if _OPTIONS["targetos"]=="macosx" then
 			links {
 				"OpenGL.framework",
-				"vmnet.framework"
 			}
 		elseif _OPTIONS["USE_DISPATCH_GL"]~="1" then
 			if _OPTIONS["targetos"]=="windows" then
@@ -532,6 +525,12 @@ function osdmodulestargetconf()
 				addoptionsfromstring(str)
 			end
 		end
+	end
+
+	if _OPTIONS["USE_VMNET"]=="1" then
+		links {
+			"vmnet.framework"
+		}
 	end
 
 	if _OPTIONS["targetos"]=="windows" then

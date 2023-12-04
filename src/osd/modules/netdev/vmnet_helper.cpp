@@ -38,6 +38,12 @@
 #include <unistd.h>
 #include <mach-o/dyld.h>
 
+extern char **environ;
+
+namespace osd {
+
+namespace {
+
 enum {
 	MSG_QUIT,
 	MSG_STATUS,
@@ -185,7 +191,6 @@ netdev_vmnet_helper::netdev_vmnet_helper(const char *name, class device_network_
 	}
 
 	if (m_child == 0) {
-		extern char **environ;
 		/* need to setsid() on the child */
 
 		dup2(pipe_stdin[0], STDIN_FILENO);
@@ -204,7 +209,7 @@ netdev_vmnet_helper::netdev_vmnet_helper(const char *name, class device_network_
 		for (int fd = 3; fd <= maxfd; ++fd)
 			close(fd);
 		setsid();
-		execve(path.c_str(), (char *const *)argv, environ);
+		execve(path.c_str(), (char *const *)argv, ::environ);
 		osd_printf_error("vmnet_helper: execve failed on path %s\n", path.c_str());
 		return;
 	}
@@ -446,8 +451,6 @@ int netdev_vmnet_helper::recv_dev(uint8_t **buf) {
 	return vmnet_common::finalize_frame(m_buffer, ok);
 }
 
-
-
 ssize_t netdev_vmnet_helper::read(void *data, size_t nbytes) {
 	for (;;) {
 		ssize_t rv = ::read(m_pipe[0], data, nbytes);
@@ -518,7 +521,7 @@ static CREATE_NETDEV(create_vmnet_helper) {
 }
 
 int vmnet_helper_module::init(osd_interface &osd, const osd_options &options) {
-	add_netdev("vmnet_helper", "VM Network Device (H)", create_vmnet_helper);
+	add_netdev("vmnet_helper", "VM Network Device (using helper)", create_vmnet_helper);
 	return 0;
 }
 
@@ -526,12 +529,16 @@ void vmnet_helper_module::exit() {
 	clear_netdev();
 }
 
+} // anonymous namespace
+
+} // namespace osd
+
 #else
 	#include "modules/osdmodule.h"
 	#include "netdev_module.h"
 
-	MODULE_NOT_SUPPORTED(vmnet_helper_module, OSD_NETDEV_PROVIDER, "vmnet_helper")
+	namespace osd { namespace { MODULE_NOT_SUPPORTED(vmnet_helper_module, OSD_NETDEV_PROVIDER, "vmnet_helper") } }
 #endif
 
 
-MODULE_DEFINITION(NETDEV_VMNET_HELPER, vmnet_helper_module)
+MODULE_DEFINITION(NETDEV_VMNET_HELPER, osd::vmnet_helper_module)
