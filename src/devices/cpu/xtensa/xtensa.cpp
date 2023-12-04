@@ -896,26 +896,7 @@ void xtensa_device::getop_and_execute()
 				}
 				break;
 
-			case 0b1000: // ADD
-			{
-				u8 dstreg = BIT(inst, 12, 4);
-				u8 reg_s = BIT(inst, 8, 4);
-				u8 reg_t = BIT(inst, 4, 4);
-				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, a%d\n", "add", dstreg, reg_s, reg_t);
-				set_reg(dstreg, get_reg(reg_s)+get_reg(reg_t));
-				break;
-			}
-
-			case 0b1100: // SUB
-			{
-				u8 dstreg = BIT(inst, 12, 4);
-				u8 reg_s = BIT(inst, 8, 4);
-				u8 reg_t = BIT(inst, 4, 4);
-				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, a%d\n", "sub", dstreg, reg_s, reg_t);
-				set_reg(dstreg, get_reg(reg_s)-get_reg(reg_t));
-				break;
-			}
-
+			case 0b1000:// ADD
 			case 0b1001:// ADDX2
 			case 0b1010:// ADDX4
 			case 0b1011:// ADDX8
@@ -924,13 +905,38 @@ void xtensa_device::getop_and_execute()
 				u8 reg_s = BIT(inst, 8, 4);
 				u8 reg_t = BIT(inst, 4, 4);
 				u8 shift = BIT(inst, 20, 2);
-				LOGMASKED(LOG_HANDLED_OPS, "%sx%-4da%d, a%d, a%d\n", "add", 1 << shift, dstreg, reg_s, reg_t);
+				if (shift)
+				{
+					LOGMASKED(LOG_HANDLED_OPS, "%sx%-4da%d, a%d, a%d\n", "add", 1 << shift, dstreg, reg_s, reg_t);
+				}
+				else
+				{
+					LOGMASKED(LOG_HANDLED_OPS, "%sx%-4da, a%d, a%d\n", "add", dstreg, reg_s, reg_t);
+				}
 				set_reg(dstreg, (get_reg(reg_s)<<shift)+get_reg(reg_t));
 				break;
 			}
 
-			case 0b1101: case 0b1110: case 0b1111: // SUBX2, SUBX4, SUBX8
+			case 0b1100: // SUB
+			case 0b1101: // SUBX2
+			case 0b1110: // SUBX4
+			case 0b1111: // SUBX8
+			{
+				u8 dstreg = BIT(inst, 12, 4);
+				u8 reg_s = BIT(inst, 8, 4);
+				u8 reg_t = BIT(inst, 4, 4);
+				u8 shift = BIT(inst, 20, 2);
+				if (shift)
+				{
+					LOGMASKED(LOG_HANDLED_OPS, "%sx%-4da%d, a%d, a%d\n", "sub", 1 << shift, dstreg, reg_s, reg_t);
+				}
+				else
+				{
+					LOGMASKED(LOG_HANDLED_OPS, "%sx%-4da, a%d, a%d\n", "sub", dstreg, reg_s, reg_t);
+				}
+				set_reg(dstreg, (get_reg(reg_s)<<shift)-get_reg(reg_t));
 				break;
+			}
 
 			default:
 				handle_reserved(inst);
@@ -2206,9 +2212,10 @@ void xtensa_device::getop_and_execute()
 	// handle zero overhead loops
 	if (m_nextpc == m_extreg_lend)
 	{
-		if (m_extreg_lcount != 0)
+		m_extreg_lcount--;
+
+		if (m_extreg_lcount != 0xffffffff)
 		{
-			m_extreg_lcount--;
 			m_nextpc = m_extreg_lbeg;
 		}
 	}

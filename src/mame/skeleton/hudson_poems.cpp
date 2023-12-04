@@ -67,8 +67,6 @@ private:
 
 	void mem_map(address_map &map);
 
-	void nop_addr(uint32_t addr);
-
 	uint32_t poems_rand_r();
 	//uint32_t poems_8000038_r();
 	//uint32_t poems_8020020_r();
@@ -402,27 +400,8 @@ void hudson_poems_state::hudson_poems(machine_config &config)
 
 }
 
-void hudson_poems_state::nop_addr(uint32_t addr)
-{
-	uint8_t *ROM = memregion("maincpu")->base();
-	ROM[addr+0] = 0x10;
-	ROM[addr+1] = 0x11;
-	ROM[addr+2] = 0x20;
-}
-
 void hudson_poems_state::init_marimba()
 {
-	// we get stuck in these functions, why?
-	nop_addr(0x66186b);
-	nop_addr(0x661897);
-	nop_addr(0x6618af);
-	nop_addr(0x6618c3);
-	nop_addr(0x6618df);
-	nop_addr(0x6618f3);
-	nop_addr(0x661908);
-	nop_addr(0x661920);
-
-	nop_addr(0x6617db);
 }
 
 ROM_START( marimba )
