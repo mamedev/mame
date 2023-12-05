@@ -80,22 +80,20 @@
     TODO:
     - needs a proper way to dump security dongles, anything but p9112 has placeholder ROM for
       ds2430.
-    - AGP interface with Voodoo 3 is definitely incorrect, and may be a cause of above;
+    - Voodoo 3 has issues with LOD minimums, cfr. mocapglf where card check don't display a bar
+      near the percentage;
     - convert i2c to be a real i2c-complaint device;
+    - hookup adc0838, reads from i2c;
     - convert epic to be a device, make it input_merger/irq_callback complaint;
     - convert ds2430 to actual device;
     - (more intermediate steps for proper PCI conversions here)
-    - pinpoint if the i2c communicates with anything else within the HW.
-    - hookup adc0838
-    - Understand what really enables sound irq, can't be from Voodoo PCIINT.
-    \- tsurugi, boxingm, mfightc: no sound;
-    \- thrild2: no BGMs;
     - xtrial: hangs when coined up;
     - gticlub2: throws NETWORK ERROR after course select;
     - jpark3: attract mode demo play acts weird, the dinosaur gets submerged
       and camera doesn't really know what to do, CPU core bug?
     - jpark3: crashes during second attract cycle;
     - sscopex, thrild2: attract mode black screens (coin still works), sogeki/sscopefh are unaffected;
+    - thrild2: no BGMs;
     - wcombat: black screen when entering service mode;
     - mocapglf, sscopefh, sscopex: implement 2nd screen output, controlled by IP90C63A;
     \- sscopex/sogeki desyncs during gameplay intro, leaves heavy trails in gameplay;
@@ -447,7 +445,7 @@ The golf club acts like a LED gun. PCB power input is 12V.
 #define LOG_IRQ     (1U << 3)
 #define LOG_TIMER   (1U << 4)
 
-#define VERBOSE (LOG_GENERAL | LOG_IRQ | LOG_I2C)
+#define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -459,7 +457,7 @@ The golf club acts like a LED gun. PCB power input is 12V.
 namespace {
 
 
-#define SDRAM_CLOCK         166666666       // Main SDRAMs run at 166MHz
+#define SDRAM_CLOCK         XTAL(33'868'800) * 3 // Main SDRAMs run at PCI * 3
 
 class viper_state : public driver_device
 {
@@ -508,12 +506,13 @@ private:
 	uint64_t voodoo3_lfb_r(offs_t offset, uint64_t mem_mask = ~0);
 	void voodoo3_lfb_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	uint8_t input_r(offs_t offset);
+	void output_w(offs_t offset, uint8_t data);
 	uint64_t e70000_r(offs_t offset, uint64_t mem_mask = ~0);
 	void e70000_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	void unk1a_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	void unk1b_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
-	uint64_t e00008_r(offs_t offset, uint64_t mem_mask = ~0);
-	void e00008_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint8_t e00008_r(offs_t offset);
+	void e00008_w(offs_t offset, uint8_t data);
 	uint64_t e00000_r();
 	uint64_t pci_config_addr_r();
 	void pci_config_addr_w(uint64_t data);
@@ -531,7 +530,6 @@ private:
 
 	uint16_t ppp_sensor_r(offs_t offset);
 
-	INTERRUPT_GEN_MEMBER(viper_vblank);
 	void voodoo_pciint(int state);
 
 	//the following two arrays need to stay public til the legacy PCI bus is removed
@@ -1663,6 +1661,32 @@ uint8_t viper_state::input_r(offs_t offset)
 #endif
 }
 
+void viper_state::output_w(offs_t offset, uint8_t data)
+{
+	/*
+	 * -11- ---- always enabled, bit 6 first then bit 5 (sound engine control?)
+	 * ---1 ---- enabled in tsurugi/mocapglf
+	 * ---- x--- output 1
+	 *           \- start button lamp for sscopex
+	 *           \- rotating light for mocapb
+	 * ---- -x-- output 0
+	 *           \- start button lamp for mocapglf
+	 *           \- coin lockout for mfightc
+	 *           \- scope enable for sscopex
+	 *           \- start button lamp for mocapb
+	 * ---- --xx coin counters
+	 *           \- sscopefh sends signals depending on the coin type
+	 */
+	if (offset == 0)
+	{
+		machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+		machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
+		m_sound_irq_enabled = bool(BIT(data, 5));
+		return;
+	}
+	LOG("output_w %02x -> %02x\n", offset, data);
+}
+
 int viper_state::ds2430_insert_cmd_bit(int bit)
 {
 	m_ds2430_data <<= 1;
@@ -1825,10 +1849,12 @@ void viper_state::unk1b_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 	}
 }
 
-uint64_t viper_state::e00008_r(offs_t offset, uint64_t mem_mask)
+// ties with irq2
+uint8_t viper_state::e00008_r(offs_t offset)
 {
-	uint64_t r = 0;
-	if (ACCESSING_BITS_0_7)
+	uint8_t r = 0;
+	LOG("e00008_r %02x\n", offset);
+	if (offset == 7)
 	{
 		r |= m_e00008_data;
 	}
@@ -1836,9 +1862,11 @@ uint64_t viper_state::e00008_r(offs_t offset, uint64_t mem_mask)
 	return r;
 }
 
-void viper_state::e00008_w(offs_t offset, uint64_t data, uint64_t mem_mask)
+void viper_state::e00008_w(offs_t offset, uint8_t data)
 {
-	if (ACCESSING_BITS_0_7)
+	LOG("e00008_w %02x -> %02x\n", offset, data);
+
+	if (offset == 7)
 	{
 		m_e00008_data = data & 0xff;
 	}
@@ -1930,22 +1958,24 @@ void viper_state::viper_map(address_map &map)
 //  map(0xff400xxx, 0xff400xxx) ppp2nd sense device
 	map(0xffe00000, 0xffe00007).r(FUNC(viper_state::e00000_r));
 	map(0xffe00008, 0xffe0000f).rw(FUNC(viper_state::e00008_r), FUNC(viper_state::e00008_w));
-	map(0xffe08000, 0xffe08007).noprw();
-	map(0xffe10000, 0xffe10007).r(FUNC(viper_state::input_r));
-	map(0xffe28000, 0xffe28007).nopw(); // ppp2nd leds
+	map(0xffe08000, 0xffe08007).nopw(); // timestamp? watchdog?
+	map(0xffe10000, 0xffe10007).rw(FUNC(viper_state::input_r), FUNC(viper_state::output_w));
+	map(0xffe20000, 0xffe20007).nopw(); // motor k-type for deluxe force feedback (xtrial, gticlub2, jpark3)
+	map(0xffe28000, 0xffe28007).nopw(); // ppp2nd/boxingm extended leds
 	// boxingm reads and writes here to read the pad sensor values, 2nd adc?
 	// $10 bit 7 (w) clk_write, $18 bit 7 (r) do_read
-	map(0xffe28008, 0xffe2801f).nopw();
+//	map(0xffe28008, 0xffe2801f).noprw();
 	map(0xffe30000, 0xffe31fff).rw("m48t58", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write));
 	map(0xffe40000, 0xffe4000f).noprw();
 	map(0xffe50000, 0xffe50007).w(FUNC(viper_state::unk2_w));
 	map(0xffe60000, 0xffe60007).noprw();
-	map(0xffe70000, 0xffe7000f).rw(FUNC(viper_state::e70000_r), FUNC(viper_state::e70000_w));
+	map(0xffe70000, 0xffe7000f).rw(FUNC(viper_state::e70000_r), FUNC(viper_state::e70000_w)); // DS2430
 	map(0xffe80000, 0xffe80007).w(FUNC(viper_state::unk1a_w));
 	map(0xffe88000, 0xffe88007).w(FUNC(viper_state::unk1b_w));
-	map(0xffe98000, 0xffe98007).noprw();
+	map(0xffe98000, 0xffe98007).noprw(); // network?
 	map(0xffe9a000, 0xffe9bfff).ram();   // wcombat uses this
 	map(0xffea0000, 0xffea0007).noprw(); // Gun sensor? Read heavily by p9112
+	map(0xffea8000, 0xffea8007).nopw(); // sound DMA trigger for block request?
 	map(0xfff00000, 0xfff3ffff).rom().region("user1", 0);       // Boot ROM
 }
 
@@ -2032,9 +2062,30 @@ static INPUT_PORTS_START( viper )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN5")
-	PORT_BIT(0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_DIPNAME( 0x01, 0x01, "5-0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "5-1" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "5-2" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "5-3" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "5-4" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "5-5" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "5-6" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "5-7" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN6")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2144,7 +2195,6 @@ INPUT_PORTS_START( boxingm )
 
 INPUT_PORTS_END
 
-// TODO: left/right escape, 2nd service switch?
 INPUT_PORTS_START( jpark3 )
 	PORT_INCLUDE( viper )
 
@@ -2155,6 +2205,12 @@ INPUT_PORTS_START( jpark3 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Gun Trigger") PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 Gun Trigger") PORT_PLAYER(2)
 
+	PORT_MODIFY("IN5")
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Right Escape button")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Left Escape button")
 INPUT_PORTS_END
 
 INPUT_PORTS_START( p911 )
@@ -2282,8 +2338,9 @@ INPUT_PORTS_START( tsurugi )
 
 	PORT_MODIFY("IN5")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Foot Pedal")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // deluxe ID? if off tries to check UART & "lampo"/bleeder at POST
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // sensor grip (1) horizontal (0) vertical
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // deluxe ID? memory card check?
+												// if off tries to check UART & "lampo"/bleeder at POST
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Sensor Grip")
 INPUT_PORTS_END
 
 INPUT_PORTS_START( wcombat )
@@ -2346,31 +2403,16 @@ INPUT_PORTS_END
 
 /*****************************************************************************/
 
-INTERRUPT_GEN_MEMBER(viper_state::viper_vblank)
-{
-	//mpc8240_interrupt(MPC8240_IRQ0);
-	//mpc8240_interrupt(MPC8240_IRQ3);
-}
-
 void viper_state::voodoo_vblank(int state)
 {
 	if (state)
-	{
-	  mpc8240_interrupt(MPC8240_IRQ0);
-	}
-	//mpc8240_interrupt(MPC8240_IRQ3);
+		mpc8240_interrupt(MPC8240_IRQ0);
 }
 
 void viper_state::voodoo_pciint(int state)
 {
 	if (state)
-	{
-		// This is a hack.
-		// There's no obvious (to me) trigger for when it's safe to start the audio interrupts, but after testing all of the games that can boot, it's safe to start audio interrupts once pciint is triggering.
-		m_sound_irq_enabled = true;
-
 		mpc8240_interrupt(MPC8240_IRQ4);
-	}
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(viper_state::sound_timer_callback)
@@ -2497,7 +2539,6 @@ void viper_state::viper(machine_config &config)
 	MPC8240(config, m_maincpu, XTAL(33'868'800) * 6); // PCI clock * 6
 	m_maincpu->set_bus_frequency(XTAL(33'868'800) * 2); // TODO: x2 for AGP, other devices x1
 	m_maincpu->set_addrmap(AS_PROGRAM, &viper_state::viper_map);
-	m_maincpu->set_vblank_int("screen", FUNC(viper_state::viper_vblank));
 
 	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
 	pcibus.set_device( 0, FUNC(viper_state::mpc8240_pci_r), FUNC(viper_state::mpc8240_pci_w));
