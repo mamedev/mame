@@ -15996,6 +15996,9 @@ tascr30a
 tascr30b
 tascr30g
 
+@source:chess/yeno_301xl.cpp
+y301xl
+
 @source:chess/yeno_532xl.cpp
 y532xl
 
