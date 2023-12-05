@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Philip Bennett, Ville Linde
+// copyright-holders:Philip Bennett
 /*
    Taito Power-JC System
 
