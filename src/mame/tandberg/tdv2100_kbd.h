@@ -37,6 +37,7 @@ protected:
 	required_memory_region          m_keyparams;
 	required_ioport_array<15>       m_matrix;
 	required_device<clock_device>   m_scan_clock;
+	required_ioport					m_sw_all_cap;
 
 	output_finder<>                 m_online_led;
 	output_finder<>                 m_carrier_led;
@@ -50,8 +51,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	void scan_next_column(int state);
 	void new_keystroke(uint8_t key_nr, bool shift = false, bool ctrl = false);
@@ -62,13 +63,21 @@ protected:
 	devcb_write_line m_write_transk_cb;
 	devcb_write_line m_write_break_cb;
 
-	bool inhibit_key_from_params;
-	bool all_caps;
+private:
+	void key_trigger();
 	int column_counter;
 	int keystate[15];
 	bool shift;
 	bool shift_lock;
 	bool control;
+
+	TIMER_CALLBACK_MEMBER(key_repeat);
+	emu_timer *m_key_repeat_trigger;
+	uint8_t char_buffer;
+	uint8_t	key_nr_in_buffer;
+	int key_repeat_delay_ms;
+	int key_repeat_rate_hz;
+	bool inhibit_key_from_params;
 };
 
 // device type definition

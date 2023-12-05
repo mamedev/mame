@@ -34,6 +34,8 @@ public:
 	auto write_ackl_callback() { return m_write_ackl_cb.bind(); }
 	auto write_nakl_callback() { return m_write_nakl_cb.bind(); }
 
+	DECLARE_INPUT_CHANGED_MEMBER(uart_changed);
+
 	// Input strobes
 	void process_keyboard_char(uint8_t key);
 	void w_cleark(int state);
@@ -45,6 +47,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual ioport_constructor device_input_ports() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -58,24 +61,30 @@ protected:
 	void uart_rx(int state);
 	void uart_tx(int state);
 
-	required_device<screen_device>  	m_screen;
-	required_device<palette_device> 	m_palette;
-	required_memory_region          	m_font;
-	memory_share_creator<uint8_t>   	m_vram;
-	required_device<beep_device>		m_beep;
-	required_device<ay51013_device>		m_uart;
-	required_device<clock_device>		m_uart_clock;
-	required_device<rs232_port_device>	m_rs232;
+	required_device<screen_device>      m_screen;
+	required_device<palette_device>     m_palette;
+	required_memory_region              m_font;
+	memory_share_creator<uint8_t>       m_vram;
+	required_device<beep_device>        m_beep;
+	required_device<ay51013_device>     m_uart;
+	required_device<clock_device>       m_uart_clock;
+	required_device<rs232_port_device>  m_rs232;
+	required_ioport                     m_sw_invert_video;
+	required_ioport                     m_sw_rs232_baud;
+	required_ioport                     m_sw_rs232_settings;
+	required_ioport                     m_dsw_u39;
+	required_ioport                     m_dsw_u73;
+	required_ioport                     m_dsw_u61;
 
 private:
 
-	devcb_write_line m_write_waitl_cb;
-	devcb_write_line m_write_onlil_cb;
-	devcb_write_line m_write_carl_cb;
-	devcb_write_line m_write_errorl_cb;
-	devcb_write_line m_write_enql_cb;
-	devcb_write_line m_write_ackl_cb;
-	devcb_write_line m_write_nakl_cb;
+	devcb_write_line                    m_write_waitl_cb;
+	devcb_write_line                    m_write_onlil_cb;
+	devcb_write_line                    m_write_carl_cb;
+	devcb_write_line                    m_write_errorl_cb;
+	devcb_write_line                    m_write_enql_cb;
+	devcb_write_line                    m_write_ackl_cb;
+	devcb_write_line                    m_write_nakl_cb;
 
 	// Video
 	uint8_t attribute;
@@ -84,26 +93,12 @@ private:
 	void data_to_display(uint8_t byte);
 	void char_to_display(uint8_t byte);
 
-	// Video settings
-	bool blank_ctrl_chars;
-	bool blank_attr_chars;
-	bool underline_mode;
-	bool extend_dot7;
-	bool full_inverse_video;
-
 	// Cursor
 	int cursor_x;
 	int cursor_y;
 	bool cursor_x_input;
 	bool cursor_y_input;
 	void advance_cursor();
-
-	// Cursor settings
-	bool block_cursor;
-	bool blinking_cursor;
-	bool auto_cr_lf;
-	bool auto_roll_up;
-	bool underline_input;
 
 	// Sound
 	bool speed_check;
@@ -112,32 +107,20 @@ private:
 	TIMER_CALLBACK_MEMBER(expire_speed_check);
 	TIMER_CALLBACK_MEMBER(end_beep);
 
-	// RS232
+	// RS-232
+	void update_rs232_lamps();
+	void check_rs232_rx_error(int state);
+	void set_uart_state_from_switches();
 	bool data_terminal_ready;
 	bool request_to_send;
 	bool rx_handshake;
 	bool tx_handshake;
 
-	// RS232 settings
-	void update_rs232_lamps();
-	void check_rs232_rx_error(int state);
-	bool force_on_line;
-	bool dcd_handshake;
-	bool hold_line_key_for_rts;
-	bool need_tx_for_on_line_led;
-	bool eight_bit_uart;
-	bool no_parity;
-	bool even_parity;
-	bool two_stop_bits;
-	bool ext_echo;
-	bool auto_rx_handshake;
-	bool auto_tx_handshake;
-
 	// Keyboard
 	bool break_key_held;
 	bool tx_data_pending_kbd;
 	uint8_t tx_data_kbd;
-	bool clear_ascii_hs_by_cleark;
+	bool underline_input;
 };
 
 // device type definition
