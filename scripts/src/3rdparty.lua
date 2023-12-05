@@ -128,7 +128,6 @@ project "zlib"
 
 	configuration { "vs*" }
 		buildoptions {
-			"/wd4131", -- warning C4131: 'xxx' : uses old-style declarator
 			"/wd4127", -- warning C4127: conditional expression is constant
 			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
 		}
@@ -141,11 +140,6 @@ end
 	configuration "Debug"
 		defines {
 			"verbose=-1",
-		}
-
-	configuration { "gmake or ninja" }
-		buildoptions_c {
-			"-Wno-strict-prototypes",
 		}
 
 	configuration { }
