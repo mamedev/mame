@@ -67,18 +67,18 @@ private:
 
 	void mem_map(address_map &map);
 
-	uint32_t poems_rand_r();
-	//uint32_t poems_8000038_r();
-	//uint32_t poems_8020020_r();
-	//uint32_t poems_800aa04_r();
-	
-	void unk_vregs_w(offs_t offset, u32 data, u32 mem_mask);
+	uint32_t poems_count_r();
+	uint32_t poems_8000038_r(offs_t offset, u32 mem_mask);
+	uint32_t poems_8000200_r(offs_t offset, u32 mem_mask);
+	uint32_t unk_aa04_r(offs_t offset, u32 mem_mask);
+	void unk_aa00_w(offs_t offset, u32 data, u32 mem_mask);
+
+	void fade_w(offs_t offset, u32 data, u32 mem_mask);
 	void unktable_w(offs_t offset, u32 data, u32 mem_mask);
 	void unktable_reset_w(offs_t offset, u32 data, u32 mem_mask);
 	void set_palette_val(int entry);
 	void palette_w(offs_t offset, u32 data, u32 mem_mask);
 
-	uint32_t m_unkvregs[0x80/4];
 	uint16_t m_unktable[256];
 	uint16_t m_unktableoffset;
 
@@ -92,12 +92,7 @@ private:
 };
 
 void hudson_poems_state::machine_start()
-{
-	for (int i = 0;i < 0x80/4; i++)
-		m_unkvregs[i] = 0x00;
-
-	save_item(NAME(m_unkvregs));
-	
+{	
 }
 
 void hudson_poems_state::machine_reset()
@@ -125,9 +120,9 @@ void hudson_poems_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, 
 		if (flipy)
 			realy = 7 - y;
 
-		u16* const dstptr_bitmap = &bitmap.pix(realy + yy);
+		u16 *const dstptr_bitmap = &bitmap.pix(realy + yy);
 
-		uint32_t pix = m_mainram[(0x9c00 / 4) + count + realoffset];
+		uint32_t pix = m_mainram[((0x9c00 / 4) + count + realoffset) & 0x7fff];
 		int pos = xx;
 
 		if (flipx)
@@ -153,13 +148,16 @@ void hudson_poems_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, 
 
 void hudson_poems_state::draw_tile8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t tile, int xx, int yy)
 {
+	tile &= 0x3ff;
+
 	int offset = tile * 16;
 	int count = 0;
 	for (int y = 0; y < 8; y++)
 	{
-		u16* const dstptr_bitmap = &bitmap.pix(y + yy);
+		u16 *const dstptr_bitmap = &bitmap.pix(y + yy);
 
-		uint64_t pix = ((uint64_t)(m_mainram[(0x9c00 / 4) + count + 1 + offset]) << 32) | (uint64_t)(m_mainram[(0x9c00 / 4) + count + offset]);
+		uint64_t pix = ((uint64_t)(m_mainram[((0x9c00 / 4) + count + 1 + offset) & 0x7fff]) << 32)
+			          | (uint64_t)(m_mainram[((0x9c00 / 4) + count + 0 + offset) & 0x7fff]);
 		int pos = xx;
 
 		for (int i = 0; i < 64; i += 8)
@@ -235,9 +233,41 @@ uint32_t hudson_poems_state::screen_update(screen_device &screen, bitmap_ind16 &
 
 
 
-uint32_t hudson_poems_state::poems_rand_r()
+uint32_t hudson_poems_state::poems_count_r()
 {
 	return ((m_hackcounter++) & 0x3) ? 0xffffffff : 0;
+}
+
+uint32_t hudson_poems_state::unk_aa04_r(offs_t offset, u32 mem_mask)
+{
+	//logerror("%s: unk_aa04_r %08x\n", machine().describe_context(), mem_mask);
+	return ((m_hackcounter++) & 0x3) ? 0xffffffff : 0;
+}
+
+void hudson_poems_state::unk_aa00_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	logerror("%s: unk_aa00_w %08x %08x\n", machine().describe_context(), data, mem_mask);
+}
+
+uint32_t hudson_poems_state::poems_8000038_r(offs_t offset, u32 mem_mask)
+{
+	if (!machine().side_effects_disabled())
+		if (m_maincpu->pc() != 0x2c000B5a)
+			logerror("%s: poems_8000038_r %08x\n", machine().describe_context(), mem_mask);
+
+	if (m_mainram[0x1baf8/4] == 0x00000000)
+		return 0xffffffff;
+	else
+		return 0x00000000;
+}
+
+uint32_t hudson_poems_state::poems_8000200_r(offs_t offset, u32 mem_mask)
+{
+	if (!machine().side_effects_disabled())
+		logerror("%s: poems_8000200_r %08x\n", machine().describe_context(), mem_mask);
+
+	// in some places it loops on bit 0 being clear, in other places it seems to simply be used like an ack
+	return 0x00000001;
 }
 
 /*
@@ -246,20 +276,7 @@ uint32_t hudson_poems_state::poems_8020020_r()
 	return 0xffffffff;
 }
 
-uint32_t hudson_poems_state::poems_8000038_r()
-{
-	return (machine().rand() & 1) ? 0x00000000 : 0xffffffff; 
-}
-
-uint32_t hudson_poems_state::poems_800aa04_r()
-{
-	return (machine().rand() & 1) ? 0x00000000 : 0xffffffff; 
-}
 */
-void hudson_poems_state::unk_vregs_w(offs_t offset, u32 data, u32 mem_mask)
-{
-	COMBINE_DATA(&m_unkvregs[offset]);
-}
 
 void hudson_poems_state::set_palette_val(int entry)
 {
@@ -275,6 +292,11 @@ void hudson_poems_state::palette_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_palram[offset]);
 	set_palette_val(offset);
+}
+
+void hudson_poems_state::fade_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	logerror("%s: fade_w %08x %08x\n", machine().describe_context().c_str(), data, mem_mask);
 }
 
 void hudson_poems_state::unktable_w(offs_t offset, u32 data, u32 mem_mask)
@@ -305,40 +327,41 @@ void hudson_poems_state::unktable_reset_w(offs_t offset, u32 data, u32 mem_mask)
 	m_unktableoffset = 0;
 }
 
-
-
 void hudson_poems_state::mem_map(address_map &map)
 {
 	map(0x00000000, 0x007fffff).mirror(0x20000000).rom().region("maincpu", 0);
 
 	map(0x04000000, 0x04003fff).ram();
+	map(0x04002040, 0x04002043).r(FUNC(hudson_poems_state::poems_count_r));
 
-	map(0x04002040, 0x04002043).r(FUNC(hudson_poems_state::poems_rand_r));
+	map(0x08000038, 0x0800003b).r(FUNC(hudson_poems_state::poems_8000038_r));
+	map(0x0800005c, 0x0800005f).w(FUNC(hudson_poems_state::fade_w));
 
-	map(0x08000000, 0x0800007f).w(FUNC(hudson_poems_state::unk_vregs_w));
-
-	map(0x08000038, 0x0800003b).r(FUNC(hudson_poems_state::poems_rand_r));
 	map(0x08000800, 0x08000fff).ram().w(FUNC(hudson_poems_state::palette_w)).share("palram");
 
-	map(0x08008200, 0x08008203).r(FUNC(hudson_poems_state::poems_rand_r));
-	map(0x08002000, 0x08008fff).ram();
-	map(0x08009000, 0x08009fff).ram();
+	map(0x08008200, 0x08008203).r(FUNC(hudson_poems_state::poems_8000200_r));
 
-	map(0x0800aa04, 0x0800aa07).r(FUNC(hudson_poems_state::poems_rand_r));
+	map(0x08008a00, 0x08008a7f).ram(); // filled with 32 copies of '0x0001'
+	map(0x08008c00, 0x08008c7f).ram(); // filled with 32 copies of '0x0003'
+	map(0x08009000, 0x080093ff).ram(); // filled with 32 copies of '0x0200, 0x0004, 0x0000, 0x0100, 0x0c02, 0x0000, 0x0000, 0x0000'
+	map(0x08009400, 0x080097ff).ram(); // filled with 32 copies of '0x0000, 0x3fff, 0x0000, 0x0000, 0x3fff, 0x0000, 0x0000, 0x0000'
+	map(0x08009800, 0x08009bff).ram(); // filled with 32 copies of '0x0080, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000'
 
-	// this does't actually appear to be palette
+	map(0x0800aa00, 0x0800aa03).w(FUNC(hudson_poems_state::unk_aa00_w));
+	map(0x0800aa04, 0x0800aa07).r(FUNC(hudson_poems_state::unk_aa04_r));
+
 	map(0x0800b000, 0x0800b003).w(FUNC(hudson_poems_state::unktable_w)); // writes a table of increasing 16-bit values here
 	map(0x0800b004, 0x0800b007).w(FUNC(hudson_poems_state::unktable_reset_w));
 
 	map(0x0800c040, 0x0800c05f).ram();
 
-//	map(0x08020008, 0x0802000b).r(FUNC(hudson_poems_state::poems_rand_r));
-//	map(0x08020010, 0x08020013).r(FUNC(hudson_poems_state::poems_rand_r));
-//	map(0x08020014, 0x08020017).r(FUNC(hudson_poems_state::poems_rand_r));
-//	map(0x08020018, 0x0802001b).r(FUNC(hudson_poems_state::poems_rand_r));
-	map(0x08020020, 0x08020023).r(FUNC(hudson_poems_state::poems_rand_r));
+//	map(0x08020008, 0x0802000b).r(FUNC(hudson_poems_state::poems_count_r));
+//	map(0x08020010, 0x08020013).r(FUNC(hudson_poems_state::poems_count_r));
+//	map(0x08020014, 0x08020017).r(FUNC(hudson_poems_state::poems_count_r));
+//	map(0x08020018, 0x0802001b).r(FUNC(hudson_poems_state::poems_count_r));
+	map(0x08020020, 0x08020023).r(FUNC(hudson_poems_state::poems_count_r));
 
-	map(0x2c000000, 0x2c7fffff).ram().share("mainram");
+	map(0x2c000000, 0x2c01ffff).ram().share("mainram");
 }
 
 
@@ -351,12 +374,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(hudson_poems_state::screen_scanline)
 {
 	int scanline = param;
 
-	if (scanline == 200)
+	if (scanline == 100)
 	{
 		m_maincpu->irq_request_hack(0x10);
 	}
 
-	if (scanline == 100) 
+	if (scanline == 200) 
 	{
 		m_maincpu->irq_request_hack(0x2);
 	}
@@ -366,7 +389,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hudson_poems_state::screen_scanline)
 //		m_maincpu->irq_request_hack(0x4);
 
 		// this needs to change in RAM, presumably from an interrupt, but no idea how to get there
-		m_maincpu->space(AS_PROGRAM).write_dword(0x2c01d92c, 0x01);
+		m_maincpu->space(AS_PROGRAM).write_byte(0x2c01d92c, 0x01);
 	}
 
 	if (scanline == 150)
