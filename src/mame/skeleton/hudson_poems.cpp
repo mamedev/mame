@@ -183,7 +183,7 @@ uint32_t hudson_poems_state::screen_update(screen_device &screen, bitmap_ind16 &
 	switch (hack_select)
 	{
 	case 0x09: width = 512; base = (0xa800/4); bpp = 4; break;// konami logo
-	case 0x0d: width = 128; base = (0x9418/4); bpp = 8; break;// poems logo
+	case 0x0d: width = 128; base = (0x9498/4); bpp = 8; break;// poems logo
 	case 0x10: width = 512; base = (0xc600/4); bpp = 4; break;// bemani logo
 	case 0x14: width = 512; base = (0xd400/4); bpp = 4; break;// warning screen
 	default: attempt_draw = false; break;
@@ -252,7 +252,7 @@ void hudson_poems_state::unk_aa00_w(offs_t offset, u32 data, u32 mem_mask)
 uint32_t hudson_poems_state::poems_8000038_r(offs_t offset, u32 mem_mask)
 {
 	if (!machine().side_effects_disabled())
-		if (m_maincpu->pc() != 0x2c000B5a)
+		if (m_maincpu->pc() != 0x2c000b5a)
 			logerror("%s: poems_8000038_r %08x\n", machine().describe_context(), mem_mask);
 
 	if (m_mainram[0x1baf8/4] == 0x00000000)
@@ -331,15 +331,55 @@ void hudson_poems_state::mem_map(address_map &map)
 {
 	map(0x00000000, 0x007fffff).mirror(0x20000000).rom().region("maincpu", 0);
 
-	map(0x04000000, 0x04003fff).ram();
+	/////////////////// unknown
+
+	//map(0x04000000, 0x04003fff).ram();
+	map(0x04000324, 0x04000327).nopw(); // uploads at table here from ROM after uploading fixed values from ROM to some other addresses
+	map(0x0400100c, 0x0400100f).nopr(); // read in various places at end of calls, every frame, but result seems to go unused?
 	map(0x04002040, 0x04002043).r(FUNC(hudson_poems_state::poems_count_r));
 
+	/////////////////// palette / regs?
+
 	map(0x08000038, 0x0800003b).r(FUNC(hudson_poems_state::poems_8000038_r));
+	map(0x0800003c, 0x0800003f).nopw(); // used close to the fade write code, writes FFFFFFFF
+
+	map(0x08000048, 0x0800004b).nopw(); // ^^
+	map(0x0800004c, 0x0800004f).nopw(); // ^^
+	map(0x08000050, 0x08000053).nopw(); // ^^ 16-bit write, sometimes writes 00000101 & 0000FFFF
+	map(0x08000054, 0x08000057).nopw(); // ^^ writes 15555555 while fading
 	map(0x0800005c, 0x0800005f).w(FUNC(hudson_poems_state::fade_w));
+
+	map(0x08000070, 0x08000073).nopw(); // ^^ sometimes writes 2C009C00 (one of the tile data bases)
+	map(0x08000074, 0x08000077).nopw(); // ^^
+	map(0x08000078, 0x0800007b).nopw(); // ^^
+	map(0x0800007c, 0x0800007f).nopw(); // ^^ sometimes writes 2C009800 (one of the tile data bases)
+
+	map(0x08000080, 0x08000083).nopw(); // also a similar time to palette uploads
+	map(0x08000084, 0x08000087).nopw(); // can write 0113D600
+	map(0x08000088, 0x0800008b).nopw(); // can write 000004E4
+	map(0x0800008c, 0x0800008f).nopw(); // can write 00001FF5
+	map(0x08000090, 0x08000093).nopw();
+	map(0x08000094, 0x08000097).nopw();
+	map(0x08000098, 0x0800009b).nopw();
+	map(0x0800009c, 0x0800009f).nopw();
+	map(0x080000a0, 0x080000a3).nopw();
+	map(0x080000a4, 0x080000a7).nopw();
+	map(0x080000a8, 0x080000ab).nopw();
+	map(0x080000ac, 0x080000af).nopw();
+
+	map(0x08000180, 0x08000183).nopw(); // gets set to 0000007F on startup
+	map(0x08000184, 0x08000187).nopw(); // gets set to 2C009400 on startup (some other video table?)
 
 	map(0x08000800, 0x08000fff).ram().w(FUNC(hudson_poems_state::palette_w)).share("palram");
 
+	/////////////////// sprites?
+
+	map(0x08008000, 0x08008003).nopw();
+
 	map(0x08008200, 0x08008203).r(FUNC(hudson_poems_state::poems_8000200_r));
+	map(0x08008204, 0x08008207).nopr().nopw(); // read only seems to be used to ack after write, value doesn't matter, similar code to 200 above
+
+	map(0x08008400, 0x08008403).nopw();
 
 	map(0x08008a00, 0x08008a7f).ram(); // filled with 32 copies of '0x0001'
 	map(0x08008c00, 0x08008c7f).ram(); // filled with 32 copies of '0x0003'
@@ -347,19 +387,28 @@ void hudson_poems_state::mem_map(address_map &map)
 	map(0x08009400, 0x080097ff).ram(); // filled with 32 copies of '0x0000, 0x3fff, 0x0000, 0x0000, 0x3fff, 0x0000, 0x0000, 0x0000'
 	map(0x08009800, 0x08009bff).ram(); // filled with 32 copies of '0x0080, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000'
 
-	map(0x0800aa00, 0x0800aa03).w(FUNC(hudson_poems_state::unk_aa00_w));
-	map(0x0800aa04, 0x0800aa07).r(FUNC(hudson_poems_state::unk_aa04_r));
+	map(0x0800a000, 0x0800a003).nopw();
+	map(0x0800a004, 0x0800a007).nopw();
+
+	map(0x0800aa00, 0x0800aa03).w(FUNC(hudson_poems_state::unk_aa00_w)); // writes 2c020000, which is the top of RAM?
+	map(0x0800aa04, 0x0800aa07).r(FUNC(hudson_poems_state::unk_aa04_r)); 
 
 	map(0x0800b000, 0x0800b003).w(FUNC(hudson_poems_state::unktable_w)); // writes a table of increasing 16-bit values here
 	map(0x0800b004, 0x0800b007).w(FUNC(hudson_poems_state::unktable_reset_w));
 
 	map(0x0800c040, 0x0800c05f).ram();
 
-//	map(0x08020008, 0x0802000b).r(FUNC(hudson_poems_state::poems_count_r));
+	///////////////////
+
+	map(0x08020000, 0x08020003).nopr().nopw();
+	map(0x08020004, 0x08020007).nopr().nopw();
+ 	map(0x08020008, 0x0802000b).nopr();
 //	map(0x08020010, 0x08020013).r(FUNC(hudson_poems_state::poems_count_r));
-//	map(0x08020014, 0x08020017).r(FUNC(hudson_poems_state::poems_count_r));
-//	map(0x08020018, 0x0802001b).r(FUNC(hudson_poems_state::poems_count_r));
+	map(0x08020014, 0x08020017).nopw(); // writes 0x10
+ 	map(0x08020018, 0x0802001b).nopr().nopw(); // writes 0x10
 	map(0x08020020, 0x08020023).r(FUNC(hudson_poems_state::poems_count_r));
+
+	///////////////////
 
 	map(0x2c000000, 0x2c01ffff).ram().share("mainram");
 }
