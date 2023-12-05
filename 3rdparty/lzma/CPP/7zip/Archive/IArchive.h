@@ -1,14 +1,21 @@
 // IArchive.h
 
-#ifndef __IARCHIVE_H
-#define __IARCHIVE_H
+#ifndef ZIP7_INC_IARCHIVE_H
+#define ZIP7_INC_IARCHIVE_H
 
 #include "../IProgress.h"
 #include "../IStream.h"
 #include "../PropID.h"
 
-#define ARCHIVE_INTERFACE_SUB(i, base, x) DECL_INTERFACE_SUB(i, base, 6, x)
-#define ARCHIVE_INTERFACE(i, x) ARCHIVE_INTERFACE_SUB(i, IUnknown, x)
+Z7_PURE_INTERFACES_BEGIN
+
+
+#define Z7_IFACE_CONSTR_ARCHIVE_SUB(i, base, n) \
+  Z7_DECL_IFACE_7ZIP_SUB(i, base, 6, n) \
+  { Z7_IFACE_COM7_PURE(i) };
+
+#define Z7_IFACE_CONSTR_ARCHIVE(i, n) \
+  Z7_IFACE_CONSTR_ARCHIVE_SUB(i, IUnknown, n)
 
 /*
 How the function in 7-Zip returns object for output parameter via pointer
@@ -81,11 +88,11 @@ namespace NArcInfoTimeFlags
   const unsigned kTime_Prec_Default_num_bits = 5;
 }
 
-#define TIME_PREC_TO_ARC_FLAGS_MASK(x) \
-  ((UInt32)1 << (NArcInfoTimeFlags::kTime_Prec_Mask_bit_index + (x)))
+#define TIME_PREC_TO_ARC_FLAGS_MASK(v) \
+  ((UInt32)1 << (NArcInfoTimeFlags::kTime_Prec_Mask_bit_index + (v)))
 
-#define TIME_PREC_TO_ARC_FLAGS_TIME_DEFAULT(x) \
-  ((UInt32)(x) << NArcInfoTimeFlags::kTime_Prec_Default_bit_index)
+#define TIME_PREC_TO_ARC_FLAGS_TIME_DEFAULT(v) \
+  ((UInt32)(v) << NArcInfoTimeFlags::kTime_Prec_Default_bit_index)
 
 namespace NArchive
 {
@@ -136,6 +143,7 @@ namespace NArchive
         kIsNotArc,
         kHeadersError,
         kWrongPassword
+        // , kMemError
       };
     }
   }
@@ -166,14 +174,11 @@ namespace NArchive
   }
 }
 
-#define INTERFACE_IArchiveOpenCallback(x) \
-  STDMETHOD(SetTotal)(const UInt64 *files, const UInt64 *bytes) x; \
-  STDMETHOD(SetCompleted)(const UInt64 *files, const UInt64 *bytes) x; \
+#define Z7_IFACEM_IArchiveOpenCallback(x) \
+  x(SetTotal(const UInt64 *files, const UInt64 *bytes)) \
+  x(SetCompleted(const UInt64 *files, const UInt64 *bytes)) \
 
-ARCHIVE_INTERFACE(IArchiveOpenCallback, 0x10)
-{
-  INTERFACE_IArchiveOpenCallback(PURE);
-};
+Z7_IFACE_CONSTR_ARCHIVE(IArchiveOpenCallback, 0x10)
 
 /*
 IArchiveExtractCallback::
@@ -224,57 +229,49 @@ SetOperationResult()
   Int32 opRes (NExtract::NOperationResult)
 */
 
-#define INTERFACE_IArchiveExtractCallback(x) \
-  INTERFACE_IProgress(x) \
-  STDMETHOD(GetStream)(UInt32 index, ISequentialOutStream **outStream, Int32 askExtractMode) x; \
-  STDMETHOD(PrepareOperation)(Int32 askExtractMode) x; \
-  STDMETHOD(SetOperationResult)(Int32 opRes) x; \
+// INTERFACE_IProgress(x)
 
-ARCHIVE_INTERFACE_SUB(IArchiveExtractCallback, IProgress, 0x20)
-{
-  INTERFACE_IArchiveExtractCallback(PURE)
-};
+#define Z7_IFACEM_IArchiveExtractCallback(x) \
+  x(GetStream(UInt32 index, ISequentialOutStream **outStream, Int32 askExtractMode)) \
+  x(PrepareOperation(Int32 askExtractMode)) \
+  x(SetOperationResult(Int32 opRes)) \
+
+Z7_IFACE_CONSTR_ARCHIVE_SUB(IArchiveExtractCallback, IProgress, 0x20)
 
 
 
 /*
-IArchiveExtractCallbackMessage can be requested from IArchiveExtractCallback object
+v23:
+IArchiveExtractCallbackMessage2 can be requested from IArchiveExtractCallback object
   by Extract() or UpdateItems() functions to report about extracting errors
 ReportExtractResult()
   UInt32 indexType (NEventIndexType)
   UInt32 index
   Int32 opRes (NExtract::NOperationResult)
 */
+/*
+before v23:
+#define Z7_IFACEM_IArchiveExtractCallbackMessage(x) \
+  x(ReportExtractResult(UInt32 indexType, UInt32 index, Int32 opRes))
+Z7_IFACE_CONSTR_ARCHIVE_SUB(IArchiveExtractCallbackMessage, IProgress, 0x21)
+*/
+#define Z7_IFACEM_IArchiveExtractCallbackMessage2(x) \
+  x(ReportExtractResult(UInt32 indexType, UInt32 index, Int32 opRes))
+Z7_IFACE_CONSTR_ARCHIVE(IArchiveExtractCallbackMessage2, 0x22)
 
-#define INTERFACE_IArchiveExtractCallbackMessage(x) \
-  STDMETHOD(ReportExtractResult)(UInt32 indexType, UInt32 index, Int32 opRes) x; \
-
-ARCHIVE_INTERFACE_SUB(IArchiveExtractCallbackMessage, IProgress, 0x21)
-{
-  INTERFACE_IArchiveExtractCallbackMessage(PURE)
-};
-
-
-#define INTERFACE_IArchiveOpenVolumeCallback(x) \
-  STDMETHOD(GetProperty)(PROPID propID, PROPVARIANT *value) x; \
-  STDMETHOD(GetStream)(const wchar_t *name, IInStream **inStream) x; \
-
-ARCHIVE_INTERFACE(IArchiveOpenVolumeCallback, 0x30)
-{
-  INTERFACE_IArchiveOpenVolumeCallback(PURE);
-};
+#define Z7_IFACEM_IArchiveOpenVolumeCallback(x) \
+  x(GetProperty(PROPID propID, PROPVARIANT *value)) \
+  x(GetStream(const wchar_t *name, IInStream **inStream))
+Z7_IFACE_CONSTR_ARCHIVE(IArchiveOpenVolumeCallback, 0x30)
 
 
-ARCHIVE_INTERFACE(IInArchiveGetStream, 0x40)
-{
-  STDMETHOD(GetStream)(UInt32 index, ISequentialInStream **stream) PURE;
-};
+#define Z7_IFACEM_IInArchiveGetStream(x) \
+  x(GetStream(UInt32 index, ISequentialInStream **stream))
+Z7_IFACE_CONSTR_ARCHIVE(IInArchiveGetStream, 0x40)
 
-
-ARCHIVE_INTERFACE(IArchiveOpenSetSubArchiveName, 0x50)
-{
-  STDMETHOD(SetSubArchiveName)(const wchar_t *name) PURE;
-};
+#define Z7_IFACEM_IArchiveOpenSetSubArchiveName(x) \
+  x(SetSubArchiveName(const wchar_t *name))
+Z7_IFACE_CONSTR_ARCHIVE(IArchiveOpenSetSubArchiveName, 0x50)
 
 
 /*
@@ -310,28 +307,25 @@ Notes:
   Some IInArchive handlers will work incorrectly in that case.
 */
 
-#ifdef _MSC_VER
-  #define MY_NO_THROW_DECL_ONLY throw()
+#if defined(_MSC_VER) && !defined(__clang__)
+  #define MY_NO_THROW_DECL_ONLY  Z7_COM7F_E
 #else
   #define MY_NO_THROW_DECL_ONLY
 #endif
 
-#define INTERFACE_IInArchive(x) \
-  STDMETHOD(Open)(IInStream *stream, const UInt64 *maxCheckStartPosition, IArchiveOpenCallback *openCallback) MY_NO_THROW_DECL_ONLY x; \
-  STDMETHOD(Close)() MY_NO_THROW_DECL_ONLY x; \
-  STDMETHOD(GetNumberOfItems)(UInt32 *numItems) MY_NO_THROW_DECL_ONLY x; \
-  STDMETHOD(GetProperty)(UInt32 index, PROPID propID, PROPVARIANT *value) MY_NO_THROW_DECL_ONLY x; \
-  STDMETHOD(Extract)(const UInt32* indices, UInt32 numItems, Int32 testMode, IArchiveExtractCallback *extractCallback) MY_NO_THROW_DECL_ONLY x; \
-  STDMETHOD(GetArchiveProperty)(PROPID propID, PROPVARIANT *value) MY_NO_THROW_DECL_ONLY x; \
-  STDMETHOD(GetNumberOfProperties)(UInt32 *numProps) MY_NO_THROW_DECL_ONLY x; \
-  STDMETHOD(GetPropertyInfo)(UInt32 index, BSTR *name, PROPID *propID, VARTYPE *varType) MY_NO_THROW_DECL_ONLY x; \
-  STDMETHOD(GetNumberOfArchiveProperties)(UInt32 *numProps) MY_NO_THROW_DECL_ONLY x; \
-  STDMETHOD(GetArchivePropertyInfo)(UInt32 index, BSTR *name, PROPID *propID, VARTYPE *varType) MY_NO_THROW_DECL_ONLY x; \
+#define Z7_IFACEM_IInArchive(x) \
+  x(Open(IInStream *stream, const UInt64 *maxCheckStartPosition, IArchiveOpenCallback *openCallback)) \
+  x(Close()) \
+  x(GetNumberOfItems(UInt32 *numItems)) \
+  x(GetProperty(UInt32 index, PROPID propID, PROPVARIANT *value)) \
+  x(Extract(const UInt32 *indices, UInt32 numItems, Int32 testMode, IArchiveExtractCallback *extractCallback)) \
+  x(GetArchiveProperty(PROPID propID, PROPVARIANT *value)) \
+  x(GetNumberOfProperties(UInt32 *numProps)) \
+  x(GetPropertyInfo(UInt32 index, BSTR *name, PROPID *propID, VARTYPE *varType)) \
+  x(GetNumberOfArchiveProperties(UInt32 *numProps)) \
+  x(GetArchivePropertyInfo(UInt32 index, BSTR *name, PROPID *propID, VARTYPE *varType)) \
 
-ARCHIVE_INTERFACE(IInArchive, 0x60)
-{
-  INTERFACE_IInArchive(PURE)
-};
+Z7_IFACE_CONSTR_ARCHIVE(IInArchive, 0x60)
 
 namespace NParentType
 {
@@ -340,7 +334,7 @@ namespace NParentType
     kDir = 0,
     kAltStream
   };
-};
+}
 
 namespace NPropDataType
 {
@@ -356,10 +350,11 @@ namespace NPropDataType
 
   const UInt32 kUtf8z  = kMask_Utf8  | kMask_ZeroEnd;
   const UInt32 kUtf16z = kMask_Utf16 | kMask_ZeroEnd;
-};
+}
 
 // UTF string (pointer to wchar_t) with zero end and little-endian.
 #define PROP_DATA_TYPE_wchar_t_PTR_Z_LE ((NPropDataType::kMask_Utf | NPropDataType::kMask_ZeroEnd) + (sizeof(wchar_t) >> 1))
+
 
 /*
 GetRawProp:
@@ -367,30 +362,24 @@ GetRawProp:
     S_OK - even if property is not set
 */
 
-#define INTERFACE_IArchiveGetRawProps(x) \
-  STDMETHOD(GetParent)(UInt32 index, UInt32 *parent, UInt32 *parentType) x; \
-  STDMETHOD(GetRawProp)(UInt32 index, PROPID propID, const void **data, UInt32 *dataSize, UInt32 *propType) x; \
-  STDMETHOD(GetNumRawProps)(UInt32 *numProps) x; \
-  STDMETHOD(GetRawPropInfo)(UInt32 index, BSTR *name, PROPID *propID) x;
+#define Z7_IFACEM_IArchiveGetRawProps(x) \
+  x(GetParent(UInt32 index, UInt32 *parent, UInt32 *parentType)) \
+  x(GetRawProp(UInt32 index, PROPID propID, const void **data, UInt32 *dataSize, UInt32 *propType)) \
+  x(GetNumRawProps(UInt32 *numProps)) \
+  x(GetRawPropInfo(UInt32 index, BSTR *name, PROPID *propID))
 
-ARCHIVE_INTERFACE(IArchiveGetRawProps, 0x70)
-{
-  INTERFACE_IArchiveGetRawProps(PURE)
-};
+Z7_IFACE_CONSTR_ARCHIVE(IArchiveGetRawProps, 0x70)
 
-#define INTERFACE_IArchiveGetRootProps(x) \
-  STDMETHOD(GetRootProp)(PROPID propID, PROPVARIANT *value) x; \
-  STDMETHOD(GetRootRawProp)(PROPID propID, const void **data, UInt32 *dataSize, UInt32 *propType) x; \
+#define Z7_IFACEM_IArchiveGetRootProps(x) \
+  x(GetRootProp(PROPID propID, PROPVARIANT *value)) \
+  x(GetRootRawProp(PROPID propID, const void **data, UInt32 *dataSize, UInt32 *propType)) \
  
-ARCHIVE_INTERFACE(IArchiveGetRootProps, 0x71)
-{
-  INTERFACE_IArchiveGetRootProps(PURE)
-};
+Z7_IFACE_CONSTR_ARCHIVE(IArchiveGetRootProps, 0x71)
 
-ARCHIVE_INTERFACE(IArchiveOpenSeq, 0x61)
-{
-  STDMETHOD(OpenSeq)(ISequentialInStream *stream) PURE;
-};
+#define Z7_IFACEM_IArchiveOpenSeq(x) \
+  x(OpenSeq(ISequentialInStream *stream)) \
+
+Z7_IFACE_CONSTR_ARCHIVE(IArchiveOpenSeq, 0x61)
 
 /*
   OpenForSize
@@ -416,12 +405,10 @@ Flags:
   the handler can return S_OK, but it doesn't check even Signature.
   So next Extract can be called for that sequential stream.
 */
-
 /*
-ARCHIVE_INTERFACE(IArchiveOpen2, 0x62)
-{
-  STDMETHOD(ArcOpen2)(ISequentialInStream *stream, UInt32 flags, IArchiveOpenCallback *openCallback) PURE;
-};
+#define Z7_IFACEM_IArchiveOpen2(x) \
+  x(ArcOpen2(ISequentialInStream *stream, UInt32 flags, IArchiveOpenCallback *openCallback))
+Z7_IFACE_CONSTR_ARCHIVE(IArchiveOpen2, 0x62)
 */
 
 // ---------- UPDATE ----------
@@ -454,27 +441,21 @@ SetOperationResult()
   Int32 opRes (NExtract::NOperationResult::kOK)
 */
 
-#define INTERFACE_IArchiveUpdateCallback(x) \
-  INTERFACE_IProgress(x); \
-  STDMETHOD(GetUpdateItemInfo)(UInt32 index, Int32 *newData, Int32 *newProps, UInt32 *indexInArchive) x; \
-  STDMETHOD(GetProperty)(UInt32 index, PROPID propID, PROPVARIANT *value) x; \
-  STDMETHOD(GetStream)(UInt32 index, ISequentialInStream **inStream) x; \
-  STDMETHOD(SetOperationResult)(Int32 operationResult) x; \
+// INTERFACE_IProgress(x)
+#define Z7_IFACEM_IArchiveUpdateCallback(x) \
+  x(GetUpdateItemInfo(UInt32 index, Int32 *newData, Int32 *newProps, UInt32 *indexInArchive)) \
+  x(GetProperty(UInt32 index, PROPID propID, PROPVARIANT *value)) \
+  x(GetStream(UInt32 index, ISequentialInStream **inStream)) \
+  x(SetOperationResult(Int32 operationResult)) \
 
-ARCHIVE_INTERFACE_SUB(IArchiveUpdateCallback, IProgress, 0x80)
-{
-  INTERFACE_IArchiveUpdateCallback(PURE);
-};
+Z7_IFACE_CONSTR_ARCHIVE_SUB(IArchiveUpdateCallback, IProgress, 0x80)
 
-#define INTERFACE_IArchiveUpdateCallback2(x) \
-  INTERFACE_IArchiveUpdateCallback(x) \
-  STDMETHOD(GetVolumeSize)(UInt32 index, UInt64 *size) x; \
-  STDMETHOD(GetVolumeStream)(UInt32 index, ISequentialOutStream **volumeStream) x; \
+// INTERFACE_IArchiveUpdateCallback(x)
+#define Z7_IFACEM_IArchiveUpdateCallback2(x) \
+  x(GetVolumeSize(UInt32 index, UInt64 *size)) \
+  x(GetVolumeStream(UInt32 index, ISequentialOutStream **volumeStream)) \
 
-ARCHIVE_INTERFACE_SUB(IArchiveUpdateCallback2, IArchiveUpdateCallback, 0x82)
-{
-  INTERFACE_IArchiveUpdateCallback2(PURE);
-};
+Z7_IFACE_CONSTR_ARCHIVE_SUB(IArchiveUpdateCallback2, IArchiveUpdateCallback, 0x82)
 
 namespace NUpdateNotifyOp
 {
@@ -493,7 +474,7 @@ namespace NUpdateNotifyOp
     // , kOpFinished
     // , kNumDefined
   };
-};
+}
 
 /*
 IArchiveUpdateCallbackFile::ReportOperation
@@ -502,36 +483,26 @@ IArchiveUpdateCallbackFile::ReportOperation
   UInt32 notifyOp (NUpdateNotifyOp)
 */
 
-#define INTERFACE_IArchiveUpdateCallbackFile(x) \
-  STDMETHOD(GetStream2)(UInt32 index, ISequentialInStream **inStream, UInt32 notifyOp) x; \
-  STDMETHOD(ReportOperation)(UInt32 indexType, UInt32 index, UInt32 notifyOp) x; \
+#define Z7_IFACEM_IArchiveUpdateCallbackFile(x) \
+  x(GetStream2(UInt32 index, ISequentialInStream **inStream, UInt32 notifyOp)) \
+  x(ReportOperation(UInt32 indexType, UInt32 index, UInt32 notifyOp)) \
 
-ARCHIVE_INTERFACE(IArchiveUpdateCallbackFile, 0x83)
-{
-  INTERFACE_IArchiveUpdateCallbackFile(PURE);
-};
+Z7_IFACE_CONSTR_ARCHIVE(IArchiveUpdateCallbackFile, 0x83)
 
 
-#define INTERFACE_IArchiveGetDiskProperty(x) \
-  STDMETHOD(GetDiskProperty)(UInt32 index, PROPID propID, PROPVARIANT *value) x; \
+#define Z7_IFACEM_IArchiveGetDiskProperty(x) \
+  x(GetDiskProperty(UInt32 index, PROPID propID, PROPVARIANT *value)) \
   
-ARCHIVE_INTERFACE(IArchiveGetDiskProperty, 0x84)
-{
-  INTERFACE_IArchiveGetDiskProperty(PURE);
-};
+Z7_IFACE_CONSTR_ARCHIVE(IArchiveGetDiskProperty, 0x84)
 
 /*
-#define INTERFACE_IArchiveUpdateCallbackArcProp(x) \
-  STDMETHOD(ReportProp)(UInt32 indexType, UInt32 index, PROPID propID, const PROPVARIANT *value) x; \
-  STDMETHOD(ReportRawProp)(UInt32 indexType, UInt32 index, PROPID propID, const void *data, UInt32 dataSize, UInt32 propType) x; \
-  STDMETHOD(ReportFinished)(UInt32 indexType, UInt32 index, Int32 opRes) x; \
-  STDMETHOD(DoNeedArcProp)(PROPID propID, Int32 *answer) x; \
+#define Z7_IFACEM_IArchiveUpdateCallbackArcProp(x) \
+  x(ReportProp(UInt32 indexType, UInt32 index, PROPID propID, const PROPVARIANT *value)) \
+  x(ReportRawProp(UInt32 indexType, UInt32 index, PROPID propID, const void *data, UInt32 dataSize, UInt32 propType)) \
+  x(ReportFinished(UInt32 indexType, UInt32 index, Int32 opRes)) \
+  x(DoNeedArcProp(PROPID propID, Int32 *answer)) \
  
-
-ARCHIVE_INTERFACE(IArchiveUpdateCallbackArcProp, 0x85)
-{
-  INTERFACE_IArchiveUpdateCallbackArcProp(PURE);
-};
+Z7_IFACE_CONSTR_ARCHIVE(IArchiveUpdateCallbackArcProp, 0x85)
 */
 
 /*
@@ -556,14 +527,11 @@ UpdateItems()
 */
 
 
-#define INTERFACE_IOutArchive(x) \
-  STDMETHOD(UpdateItems)(ISequentialOutStream *outStream, UInt32 numItems, IArchiveUpdateCallback *updateCallback) x; \
-  STDMETHOD(GetFileTimeType)(UInt32 *type) x;
+#define Z7_IFACEM_IOutArchive(x) \
+  x(UpdateItems(ISequentialOutStream *outStream, UInt32 numItems, IArchiveUpdateCallback *updateCallback)) \
+  x(GetFileTimeType(UInt32 *type))
 
-ARCHIVE_INTERFACE(IOutArchive, 0xA0)
-{
-  INTERFACE_IOutArchive(PURE)
-};
+Z7_IFACE_CONSTR_ARCHIVE(IOutArchive, 0xA0)
 
 
 /*
@@ -576,31 +544,26 @@ ISetProperties::SetProperties()
     VT_BSTR
 */
 
-ARCHIVE_INTERFACE(ISetProperties, 0x03)
-{
-  STDMETHOD(SetProperties)(const wchar_t * const *names, const PROPVARIANT *values, UInt32 numProps) PURE;
-};
+#define Z7_IFACEM_ISetProperties(x) \
+  x(SetProperties(const wchar_t * const *names, const PROPVARIANT *values, UInt32 numProps))
 
-ARCHIVE_INTERFACE(IArchiveKeepModeForNextOpen, 0x04)
-{
-  STDMETHOD(KeepModeForNextOpen)() PURE;
-};
+Z7_IFACE_CONSTR_ARCHIVE(ISetProperties, 0x03)
+
+#define Z7_IFACEM_IArchiveKeepModeForNextOpen(x) \
+  x(KeepModeForNextOpen()) \
+
+Z7_IFACE_CONSTR_ARCHIVE(IArchiveKeepModeForNextOpen, 0x04)
 
 /* Exe handler: the handler for executable format (PE, ELF, Mach-O).
    SFX archive: executable stub + some tail data.
      before 9.31: exe handler didn't parse SFX archives as executable format.
      for 9.31+: exe handler parses SFX archives as executable format, only if AllowTail(1) was called */
 
-ARCHIVE_INTERFACE(IArchiveAllowTail, 0x05)
-{
-  STDMETHOD(AllowTail)(Int32 allowTail) PURE;
-};
+#define Z7_IFACEM_IArchiveAllowTail(x) \
+  x(AllowTail(Int32 allowTail)) \
 
+Z7_IFACE_CONSTR_ARCHIVE(IArchiveAllowTail, 0x05)
 
-#define IMP_IInArchive_GetProp(k) \
-  (UInt32 index, BSTR *name, PROPID *propID, VARTYPE *varType) \
-    { if (index >= ARRAY_SIZE(k)) return E_INVALIDARG; \
-    *propID = k[index]; *varType = k7z_PROPID_To_VARTYPE[(unsigned)*propID];  *name = 0; return S_OK; } \
 
 
 struct CStatProp
@@ -616,44 +579,67 @@ namespace NCOM {
 BSTR AllocBstrFromAscii(const char *s) throw();
 }}
 
-#define IMP_IInArchive_GetProp_WITH_NAME(k) \
-  (UInt32 index, BSTR *name, PROPID *propID, VARTYPE *varType) \
-    { if (index >= ARRAY_SIZE(k)) return E_INVALIDARG; \
+
+#define IMP_IInArchive_GetProp_Base(fn, f, k) \
+  Z7_COM7F_IMF(CHandler::fn(UInt32 *numProps)) \
+    { *numProps = Z7_ARRAY_SIZE(k); return S_OK; } \
+  Z7_COM7F_IMF(CHandler::f(UInt32 index, BSTR *name, PROPID *propID, VARTYPE *varType)) \
+    { if (index >= Z7_ARRAY_SIZE(k)) return E_INVALIDARG; \
+
+#define IMP_IInArchive_GetProp_NO_NAME(fn, f, k) \
+  IMP_IInArchive_GetProp_Base(fn, f, k) \
+    *propID = k[index]; \
+    *varType = k7z_PROPID_To_VARTYPE[(unsigned)*propID]; \
+    *name = NULL; return S_OK; } \
+
+#define IMP_IInArchive_GetProp_WITH_NAME(fn, f, k) \
+  IMP_IInArchive_GetProp_Base(fn, f, k) \
     const CStatProp &prop = k[index]; \
-    *propID = (PROPID)prop.PropID; *varType = prop.vt; \
+    *propID = (PROPID)prop.PropID; \
+    *varType = prop.vt; \
     *name = NWindows::NCOM::AllocBstrFromAscii(prop.Name); return S_OK; } \
 
+
 #define IMP_IInArchive_Props \
-  STDMETHODIMP CHandler::GetNumberOfProperties(UInt32 *numProps) \
-    { *numProps = ARRAY_SIZE(kProps); return S_OK; } \
-  STDMETHODIMP CHandler::GetPropertyInfo IMP_IInArchive_GetProp(kProps)
+  IMP_IInArchive_GetProp_NO_NAME(GetNumberOfProperties, GetPropertyInfo, kProps)
 
 #define IMP_IInArchive_Props_WITH_NAME \
-  STDMETHODIMP CHandler::GetNumberOfProperties(UInt32 *numProps) \
-    { *numProps = ARRAY_SIZE(kProps); return S_OK; } \
-  STDMETHODIMP CHandler::GetPropertyInfo IMP_IInArchive_GetProp_WITH_NAME(kProps)
-
+  IMP_IInArchive_GetProp_WITH_NAME(GetNumberOfProperties, GetPropertyInfo, kProps)
 
 #define IMP_IInArchive_ArcProps \
-  STDMETHODIMP CHandler::GetNumberOfArchiveProperties(UInt32 *numProps) \
-    { *numProps = ARRAY_SIZE(kArcProps); return S_OK; } \
-  STDMETHODIMP CHandler::GetArchivePropertyInfo IMP_IInArchive_GetProp(kArcProps)
+  IMP_IInArchive_GetProp_NO_NAME(GetNumberOfArchiveProperties, GetArchivePropertyInfo, kArcProps)
 
 #define IMP_IInArchive_ArcProps_WITH_NAME \
-  STDMETHODIMP CHandler::GetNumberOfArchiveProperties(UInt32 *numProps) \
-    { *numProps = ARRAY_SIZE(kArcProps); return S_OK; } \
-  STDMETHODIMP CHandler::GetArchivePropertyInfo IMP_IInArchive_GetProp_WITH_NAME(kArcProps)
+  IMP_IInArchive_GetProp_WITH_NAME(GetNumberOfArchiveProperties, GetArchivePropertyInfo, kArcProps)
 
 #define IMP_IInArchive_ArcProps_NO_Table \
-  STDMETHODIMP CHandler::GetNumberOfArchiveProperties(UInt32 *numProps) \
+  Z7_COM7F_IMF(CHandler::GetNumberOfArchiveProperties(UInt32 *numProps)) \
     { *numProps = 0; return S_OK; } \
-  STDMETHODIMP CHandler::GetArchivePropertyInfo(UInt32, BSTR *, PROPID *, VARTYPE *) \
+  Z7_COM7F_IMF(CHandler::GetArchivePropertyInfo(UInt32, BSTR *, PROPID *, VARTYPE *)) \
     { return E_NOTIMPL; } \
 
 #define IMP_IInArchive_ArcProps_NO \
   IMP_IInArchive_ArcProps_NO_Table \
-  STDMETHODIMP CHandler::GetArchiveProperty(PROPID, PROPVARIANT *value) \
+  Z7_COM7F_IMF(CHandler::GetArchiveProperty(PROPID, PROPVARIANT *value)) \
     { value->vt = VT_EMPTY; return S_OK; }
+
+
+#define Z7_class_CHandler_final \
+        Z7_class_final(CHandler)
+
+
+#define Z7_CLASS_IMP_CHandler_IInArchive_0 \
+  Z7_CLASS_IMP_COM_1(CHandler, IInArchive)
+#define Z7_CLASS_IMP_CHandler_IInArchive_1(i1) \
+  Z7_CLASS_IMP_COM_2(CHandler, IInArchive, i1)
+#define Z7_CLASS_IMP_CHandler_IInArchive_2(i1, i2) \
+  Z7_CLASS_IMP_COM_3(CHandler, IInArchive, i1, i2)
+#define Z7_CLASS_IMP_CHandler_IInArchive_3(i1, i2, i3) \
+  Z7_CLASS_IMP_COM_4(CHandler, IInArchive, i1, i2, i3)
+#define Z7_CLASS_IMP_CHandler_IInArchive_4(i1, i2, i3, i4) \
+  Z7_CLASS_IMP_COM_5(CHandler, IInArchive, i1, i2, i3, i4)
+#define Z7_CLASS_IMP_CHandler_IInArchive_5(i1, i2, i3, i4, i5) \
+  Z7_CLASS_IMP_COM_6(CHandler, IInArchive, i1, i2, i3, i4, i5)
 
 
 
@@ -714,4 +700,5 @@ extern UInt32 g_ClientVersion;
         NFileTimeType::kWindows))
 */
 
+Z7_PURE_INTERFACES_END
 #endif

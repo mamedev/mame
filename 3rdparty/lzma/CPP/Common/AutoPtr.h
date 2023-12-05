@@ -1,13 +1,13 @@
 // Common/AutoPtr.h
 
-#ifndef __COMMON_AUTOPTR_H
-#define __COMMON_AUTOPTR_H
+#ifndef ZIP7_INC_COMMON_AUTOPTR_H
+#define ZIP7_INC_COMMON_AUTOPTR_H
 
 template<class T> class CMyAutoPtr
 {
   T *_p;
 public:
-  CMyAutoPtr(T *p = 0) : _p(p) {}
+  CMyAutoPtr(T *p = NULL) : _p(p) {}
   CMyAutoPtr(CMyAutoPtr<T>& p): _p(p.release()) {}
   CMyAutoPtr<T>& operator=(CMyAutoPtr<T>& p)
   {
@@ -21,10 +21,10 @@ public:
   T* release()
   {
     T *tmp = _p;
-    _p = 0;
+    _p = NULL;
     return tmp;
   }
-  void reset(T* p = 0)
+  void reset(T* p = NULL)
   {
     if (p != _p)
       delete _p;

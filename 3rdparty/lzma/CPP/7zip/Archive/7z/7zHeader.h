@@ -1,7 +1,7 @@
 // 7z/7zHeader.h
 
-#ifndef __7Z_HEADER_H
-#define __7Z_HEADER_H
+#ifndef ZIP7_INC_7Z_HEADER_H
+#define ZIP7_INC_7Z_HEADER_H
 
 #include "../../../Common/MyTypes.h"
 
@@ -11,13 +11,13 @@ namespace N7z {
 const unsigned kSignatureSize = 6;
 extern Byte kSignature[kSignatureSize];
 
-// #define _7Z_VOL
+// #define Z7_7Z_VOL
 // 7z-MultiVolume is not finished yet.
 // It can work already, but I still do not like some
 // things of that new multivolume format.
 // So please keep it commented.
 
-#ifdef _7Z_VOL
+#ifdef Z7_7Z_VOL
 extern Byte kFinishSignature[kSignatureSize];
 #endif
 
@@ -38,7 +38,7 @@ struct CStartHeader
 
 const UInt32 kStartHeaderSize = 20;
 
-#ifdef _7Z_VOL
+#ifdef Z7_7Z_VOL
 struct CFinishHeader: public CStartHeader
 {
   UInt64 ArchiveStartOffset;  // data offset from end if that struct
@@ -99,6 +99,7 @@ namespace NID
 
 const UInt32 k_Copy = 0;
 const UInt32 k_Delta = 3;
+const UInt32 k_ARM64 = 0xa;
 
 const UInt32 k_LZMA2 = 0x21;
 
@@ -122,14 +123,17 @@ const UInt32 k_SPARC = 0x3030805;
 
 const UInt32 k_AES   = 0x6F10701;
 
+// const UInt32 k_ZSTD = 0x4015D; // winzip zstd
+// 0x4F71101, 7z-zstd
 
 static inline bool IsFilterMethod(UInt64 m)
 {
-  if (m > (UInt64)0xFFFFFFFF)
+  if (m > (UInt32)0xFFFFFFFF)
     return false;
   switch ((UInt32)m)
   {
     case k_Delta:
+    case k_ARM64:
     case k_BCJ:
     case k_BCJ2:
     case k_PPC:

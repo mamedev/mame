@@ -1,7 +1,7 @@
 // OutStreamWithCRC.h
 
-#ifndef __OUT_STREAM_WITH_CRC_H
-#define __OUT_STREAM_WITH_CRC_H
+#ifndef ZIP7_INC_OUT_STREAM_WITH_CRC_H
+#define ZIP7_INC_OUT_STREAM_WITH_CRC_H
 
 #include "../../../../C/7zCrc.h"
 
@@ -9,17 +9,15 @@
 
 #include "../../IStream.h"
 
-class COutStreamWithCRC:
-  public ISequentialOutStream,
-  public CMyUnknownImp
-{
+Z7_CLASS_IMP_NOQIB_1(
+  COutStreamWithCRC
+  , ISequentialOutStream
+)
   CMyComPtr<ISequentialOutStream> _stream;
   UInt64 _size;
   UInt32 _crc;
   bool _calculate;
 public:
-  MY_UNKNOWN_IMP
-  STDMETHOD(Write)(const void *data, UInt32 size, UInt32 *processedSize);
   void SetStream(ISequentialOutStream *stream) { _stream = stream; }
   void ReleaseStream() { _stream.Release(); }
   void Init(bool calculate = true)

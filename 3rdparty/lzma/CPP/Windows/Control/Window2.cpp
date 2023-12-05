@@ -32,9 +32,9 @@ static LRESULT CALLBACK WindowProcedure(HWND aHWND, UINT message, WPARAM wParam,
   if (message == MY_START_WM_CREATE)
     tempWindow.SetUserDataLongPtr((LONG_PTR)(((LPCREATESTRUCT)lParam)->lpCreateParams));
   CWindow2 *window = (CWindow2 *)(tempWindow.GetUserDataLongPtr());
-  if (window != NULL && message == MY_START_WM_CREATE)
+  if (window && message == MY_START_WM_CREATE)
     window->Attach(aHWND);
-  if (window == 0)
+  if (!window)
   {
     #ifndef _UNICODE
     if (g_IsNT)
@@ -140,7 +140,7 @@ LRESULT CWindow2::OnMessage(UINT message, WPARAM wParam, LPARAM lParam)
         return -1;
       break;
     case WM_COMMAND:
-      if (OnCommand(wParam, lParam, result))
+      if (OnCommand(HIWORD(wParam), LOWORD(wParam), lParam, result))
         return result;
       break;
     case WM_NOTIFY:
@@ -160,12 +160,14 @@ LRESULT CWindow2::OnMessage(UINT message, WPARAM wParam, LPARAM lParam)
   return DefProc(message, wParam, lParam);
 }
 
-bool CWindow2::OnCommand(WPARAM wParam, LPARAM lParam, LRESULT &result)
+/*
+bool CWindow2::OnCommand2(WPARAM wParam, LPARAM lParam, LRESULT &result)
 {
   return OnCommand(HIWORD(wParam), LOWORD(wParam), lParam, result);
 }
+*/
 
-bool CWindow2::OnCommand(int /* code */, int /* itemID */, LPARAM /* lParam */, LRESULT & /* result */)
+bool CWindow2::OnCommand(unsigned /* code */, unsigned /* itemID */, LPARAM /* lParam */, LRESULT & /* result */)
 {
   return false;
   // return DefProc(message, wParam, lParam);
@@ -176,7 +178,7 @@ bool CWindow2::OnCommand(int /* code */, int /* itemID */, LPARAM /* lParam */, 
 }
 
 /*
-bool CDialog::OnButtonClicked(int buttonID, HWND buttonHWND)
+bool CDialog::OnButtonClicked(unsigned buttonID, HWND buttonHWND)
 {
   switch (buttonID)
   {

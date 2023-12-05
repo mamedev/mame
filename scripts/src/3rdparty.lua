@@ -744,7 +744,7 @@ if _OPTIONS["gcc"]~=nil then
 	if string.find(_OPTIONS["gcc"], "clang") then
 		if str_to_version(_OPTIONS["gcc_version"]) >= 100000 then
 			buildoptions_c {
-				"-Wno-misleading-indentation",
+				"-Wno-error=misleading-indentation",
 			}
 		end
 	else
@@ -758,17 +758,12 @@ end
 
 	configuration { "android-*" }
 		buildoptions {
-			"-Wno-misleading-indentation",
+			"-Wno-error=misleading-indentation",
 		}
 
 	configuration { "asmjs" }
 		buildoptions {
-			"-Wno-misleading-indentation",
-		}
-
-	configuration { "mingw*" }
-		buildoptions_c {
-			"-Wno-strict-prototypes",
+			"-Wno-error=misleading-indentation",
 		}
 
 	configuration { "vs*" }
@@ -779,7 +774,7 @@ end
 		}
 if _OPTIONS["vs"]=="clangcl" then
 		buildoptions {
-			"-Wno-misleading-indentation",
+			"-Wno-error=misleading-indentation",
 		}
 end
 if _OPTIONS["vs"]=="intel-15" then
@@ -789,8 +784,8 @@ if _OPTIONS["vs"]=="intel-15" then
 end
 	configuration { }
 		defines {
-			"_7ZIP_PPMD_SUPPPORT",
-			"_7ZIP_ST",
+			"Z7_PPMD_SUPPPORT",
+			"Z7_ST",
 		}
 
 	files {
@@ -833,6 +828,7 @@ end
 			MAME_DIR .. "3rdparty/lzma/C/Sha256.c",
 			MAME_DIR .. "3rdparty/lzma/C/Sha256Opt.c",
 			MAME_DIR .. "3rdparty/lzma/C/Sort.c",
+			-- MAME_DIR .. "3rdparty/lzma/C/SwapBytes.c",
 			-- MAME_DIR .. "3rdparty/lzma/C/Threads.c",
 			-- MAME_DIR .. "3rdparty/lzma/C/Xz.c",
 			-- MAME_DIR .. "3rdparty/lzma/C/XzCrc64.c",

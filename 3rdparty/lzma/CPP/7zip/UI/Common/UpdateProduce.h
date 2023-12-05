@@ -1,7 +1,7 @@
 // UpdateProduce.h
 
-#ifndef __UPDATE_PRODUCE_H
-#define __UPDATE_PRODUCE_H
+#ifndef ZIP7_INC_UPDATE_PRODUCE_H
+#define ZIP7_INC_UPDATE_PRODUCE_H
 
 #include "UpdatePair.h"
 
@@ -43,10 +43,13 @@ struct CUpdatePair2
       {}
 };
 
-struct IUpdateProduceCallback
+Z7_PURE_INTERFACES_BEGIN
+
+DECLARE_INTERFACE(IUpdateProduceCallback)
 {
   virtual HRESULT ShowDeleteFile(unsigned arcIndex) = 0;
 };
+Z7_PURE_INTERFACES_END
 
 void UpdateProduce(
     const CRecordVector<CUpdatePair> &updatePairs,

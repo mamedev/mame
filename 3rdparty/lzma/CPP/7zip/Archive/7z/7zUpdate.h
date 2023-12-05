@@ -1,7 +1,7 @@
 // 7zUpdate.h
 
-#ifndef __7Z_UPDATE_H
-#define __7Z_UPDATE_H
+#ifndef ZIP7_INC_7Z_UPDATE_H
+#define ZIP7_INC_7Z_UPDATE_H
 
 #include "../IArchive.h"
 
@@ -9,7 +9,6 @@
 
 #include "7zCompressionMode.h"
 #include "7zIn.h"
-#include "7zOut.h"
 
 namespace NArchive {
 namespace N7z {
@@ -95,8 +94,6 @@ struct CUpdateOptions
   bool MaxFilter;  // use BCJ2 filter instead of BCJ
   int AnalysisLevel;
 
-  CHeaderOptions HeaderOptions;
-
   UInt64 NumSolidFiles;
   UInt64 NumSolidBytes;
   bool SolidExtension;
@@ -110,6 +107,9 @@ struct CUpdateOptions
   bool Need_ATime;
   bool Need_MTime;
   bool Need_Attrib;
+  // bool Need_Crc;
+
+  CHeaderOptions HeaderOptions;
 
   CUpdateOptions():
       Method(NULL),
@@ -127,6 +127,7 @@ struct CUpdateOptions
       Need_ATime(false),
       Need_MTime(false),
       Need_Attrib(false)
+      // , Need_Crc(true)
     {}
 };
 
@@ -134,18 +135,12 @@ HRESULT Update(
     DECL_EXTERNAL_CODECS_LOC_VARS
     IInStream *inStream,
     const CDbEx *db,
-    const CObjectVector<CUpdateItem> &updateItems,
+    CObjectVector<CUpdateItem> &updateItems,
     // const CObjectVector<CTreeFolder> &treeFolders, // treeFolders[0] is root
     // const CUniqBlocks &secureBlocks,
-    COutArchive &archive,
-    CArchiveDatabaseOut &newDatabase,
     ISequentialOutStream *seqOutStream,
     IArchiveUpdateCallback *updateCallback,
-    const CUpdateOptions &options
-    #ifndef _NO_CRYPTO
-    , ICryptoGetTextPassword *getDecoderPassword
-    #endif
-    );
+    const CUpdateOptions &options);
 }}
 
 #endif

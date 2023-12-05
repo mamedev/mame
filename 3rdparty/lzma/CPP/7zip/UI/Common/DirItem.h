@@ -1,7 +1,7 @@
 // DirItem.h
 
-#ifndef __DIR_ITEM_H
-#define __DIR_ITEM_H
+#ifndef ZIP7_INC_DIR_ITEM_H
+#define ZIP7_INC_DIR_ITEM_H
 
 #ifdef _WIN32
 #include "../../../Common/MyLinux.h"
@@ -72,15 +72,15 @@ struct CDirItemsStat2: public CDirItemsStat
 };
 
 
+Z7_PURE_INTERFACES_BEGIN
 
-#define INTERFACE_IDirItemsCallback(x) \
-  virtual HRESULT ScanError(const FString &path, DWORD systemError) x; \
-  virtual HRESULT ScanProgress(const CDirItemsStat &st, const FString &path, bool isDir) x; \
+#define Z7_IFACEN_IDirItemsCallback(x) \
+  virtual HRESULT ScanError(const FString &path, DWORD systemError) x \
+  virtual HRESULT ScanProgress(const CDirItemsStat &st, const FString &path, bool isDir) x \
 
-struct IDirItemsCallback
-{
-  INTERFACE_IDirItemsCallback(=0)
-};
+Z7_IFACE_DECL_PURE(IDirItemsCallback)
+
+Z7_PURE_INTERFACES_END
 
 
 struct CArcTime
