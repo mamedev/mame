@@ -236,7 +236,7 @@
 #	if BX_CONFIG_DEBUG
 #		define BX_ASSERT_LOC _BX_ASSERT_LOC
 #	else
-#		define BX_ASSERT_LOC(...) BX_NOOP()
+#		define BX_ASSERT_LOC(_location, ...) BX_MACRO_BLOCK_BEGIN BX_UNUSED(_location) BX_MACRO_BLOCK_END
 #	endif // BX_CONFIG_DEBUG
 #endif // BX_ASSERT_LOC
 
@@ -252,7 +252,7 @@
 #	if BX_CONFIG_DEBUG
 #		define BX_TRACE_LOC _BX_TRACE_LOC
 #	else
-#		define BX_TRACE_LOC(...) BX_NOOP()
+#		define BX_TRACE_LOC(_location, ...) BX_MACRO_BLOCK_BEGIN BX_UNUSED(_location) BX_MACRO_BLOCK_END
 #	endif // BX_CONFIG_DEBUG
 #endif // BX_TRACE_LOC
 
@@ -268,7 +268,7 @@
 #	if BX_CONFIG_DEBUG
 #		define BX_WARN_LOC _BX_WARN_LOC
 #	else
-#		define BX_WARN_LOC(...) BX_NOOP()
+#		define BX_WARN_LOC(_location, ...) BX_MACRO_BLOCK_BEGIN BX_UNUSED(_location) BX_MACRO_BLOCK_END
 #	endif // BX_CONFIG_DEBUG
 #endif // BX_WARN_LOC
 
@@ -280,14 +280,6 @@
 #define _BX_TRACE_LOC(_location, _format, ...)                                                          \
 	BX_MACRO_BLOCK_BEGIN                                                                                \
 		bx::debugPrintf("%s(%d): BX " _format "\n", _location.filePath, _location.line, ##__VA_ARGS__); \
-	BX_MACRO_BLOCK_END
-
-#define _BX_WARN(_condition, _format, ...)            \
-	BX_MACRO_BLOCK_BEGIN                              \
-		if (!BX_IGNORE_C4127(_condition) )            \
-		{                                             \
-			BX_TRACE("WARN " _format, ##__VA_ARGS__); \
-		}                                             \
 	BX_MACRO_BLOCK_END
 
 #define _BX_ASSERT(_condition, _format, ...)                                                                   \
@@ -306,6 +298,14 @@
 		{                                                                                         \
 			bx::debugBreak();                                                                     \
 		}                                                                                         \
+	BX_MACRO_BLOCK_END
+
+#define _BX_WARN(_condition, _format, ...)            \
+	BX_MACRO_BLOCK_BEGIN                              \
+		if (!BX_IGNORE_C4127(_condition) )            \
+		{                                             \
+			BX_TRACE("WARN " _format, ##__VA_ARGS__); \
+		}                                             \
 	BX_MACRO_BLOCK_END
 
 #define _BX_WARN_LOC(_location, _condition, _format, ...)             \
