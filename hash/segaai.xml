@@ -60,6 +60,27 @@ AI-8003  Pinpon Music Melody
 		</part>
 	</software>
 
+	<software name="alicewora" cloneof="alicewor" supported="no">
+		<description>Alice World (1986)</description>
+		<year>1986</year>
+		<publisher>Sega</publisher>
+		<notes>Cassette is not supported yet.</notes>
+		<info name="alt_title" value="ありす・わーるど"/>
+		<part name="card" interface="segaai_card">
+			<!-- Hack to get the overlay to display; no mycard included in this release. -->
+			<feature name="part_id" value="Overlay"/>
+			<dataarea name="rom" size="0x20000"/>
+			<dataarea name="overlay" size="357096">
+				<rom name="alice world (1986).jpg" size="357096" crc="64b2482d" sha1="e756a4054d2b0f45a02620a581134d86d1496737"/>
+			</dataarea>
+		</part>
+		<part name="cass" interface="cass">
+			<dataarea name="cass" size="1">
+				<rom name="alice world (1986)" size="1" status="nodump"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="robinson">
 		<description>Robinson Land</description>
 		<year>1988</year>
@@ -96,6 +117,27 @@ AI-8003  Pinpon Music Melody
 		</part>
 	</software>
 
+	<software name="cosmictra" cloneof="cosmictr" supported="no">
+		<description>Cosmic Train (1987)</description>
+		<year>1987</year>
+		<publisher>Sega</publisher>
+		<notes>Cassette is not supported yet.</notes>
+		<info name="alt_title" value="こずみっく・とれいん"/>
+		<part name="card" interface="segaai_card">
+			<!-- Hack to get the overlay to display; no mycard included in this release. -->
+			<feature name="part_id" value="Overlay"/>
+			<dataarea name="rom" size="0x20000"/>
+			<dataarea name="overlay" size="440521">
+				<rom name="cosmic train (1987).jpg" size="440521" crc="735e7ced" sha1="41d2547b802c296620c67ea12866e116fa80d399"/>
+			</dataarea>
+		</part>
+		<part name="cass" interface="cass">
+			<dataarea name="cass" size="1">
+				<rom name="cosmic train (1987)" size="1" status="nodump"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cinderel">
 		<description>Cinderella Labyrinth</description>
 		<year>1988</year>
@@ -110,6 +152,27 @@ AI-8003  Pinpon Music Melody
 			</dataarea>
 			<dataarea name="overlay" size="266816">
 				<rom name="cinderella labyrinth.jpg" size="266816" crc="37bab4a3" sha1="25a7547ea3d4a8f65d8fab9b87f4c99d7198fe7e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cinderela" cloneof="cinderel" supported="no">
+		<description>Cinderella Labyrinth (1986)</description>
+		<year>1986</year>
+		<publisher>Sega</publisher>
+		<notes>Cassette is not supported yet.</notes>
+		<info name="alt_title" value="しんでれら・らびりんす"/>
+		<part name="card" interface="segaai_card">
+			<!-- Hack to get the overlay to display; no mycard included in this release. -->
+			<feature name="part_id" value="Overlay"/>
+			<dataarea name="rom" size="0x20000"/>
+			<dataarea name="overlay" size="512880">
+				<rom name="cinderella labyrinth (1986).jpg" size="512880" crc="4aee47fc" sha1="9b5be6597b1f77ce770d423686109d57cba7395e"/>
+			</dataarea>
+		</part>
+		<part name="cass" interface="cass">
+			<dataarea name="cass" size="1">
+				<rom name="inderella labyrinth (1986)" size="1" status="nodump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -131,6 +194,27 @@ AI-8003  Pinpon Music Melody
 		</part>
 	</software>
 
+	<software name="gullivera" cloneof="gulliver" supported="no">
+		<description>Gulliver Pocket (1986)</description>
+		<year>1986</year>
+		<publisher>Sega</publisher>
+		<notes>Cassette is not supported yet.</notes>
+		<info name="alt_title" value="がりばー・ぽけっと"/>
+		<part name="card" interface="segaai_card">
+			<!-- Hack to get the overlay to display; no mycard included in this release. -->
+			<feature name="part_id" value="Overlay"/>
+			<dataarea name="rom" size="0x20000"/>
+			<dataarea name="overlay" size="424585">
+				<rom name="gulliver pocket (1986).jpg" size="424585" crc="ad13e8e7" sha1="a79e725c5cafdf9ddd1afa6f38510db390ab3dc5"/>
+			</dataarea>
+		</part>
+		<part name="cass" interface="cass">
+			<dataarea name="cass" size="1">
+				<rom name="gulliver pocket (1986)" size="1" status="nodump"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mozartac">
 		<description>Mozart Academy</description>
 		<year>1988</year>
@@ -144,6 +228,27 @@ AI-8003  Pinpon Music Melody
 			</dataarea>
 			<dataarea name="overlay" size="112706">
 				<rom name="mozart academy.jpg" size="112706" crc="d91d55c7" sha1="045486555363ba8753e2174619566024e2af1536"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mozartaca" cloneof="mozartac" supported="no">
+		<description>Mozart Academy (1986)</description>
+		<year>1986</year>
+		<publisher>Sega</publisher>
+		<notes>Cassette is not supported yet.</notes>
+		<info name="alt_title" value="もーつぁると・あかでみー"/>
+		<part name="card" interface="segaai_card">
+			<!-- Hack to get the overlay to display; no mycard included in this release. -->
+			<feature name="part_id" value="Overlay"/>
+			<dataarea name="rom" size="0x20000"/>
+			<dataarea name="overlay" size="249080">
+				<rom name="mozart academy (1986).jpg" size="249080" crc="92368896" sha1="b64db5d24a1509c2970ac35864426078083c89d1"/>
+			</dataarea>
+		</part>
+		<part name="cass" interface="cass">
+			<dataarea name="cass" size="1">
+				<rom name="mozart academy (1986)" size="1" status="nodump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -166,6 +271,27 @@ AI-8003  Pinpon Music Melody
 		</part>
 	</software>
 
+	<software name="arabianna" cloneof="arabiann" supported="no">
+		<description>Arabian Night (1987)</description>
+		<year>1987</year>
+		<publisher>Sega</publisher>
+		<notes>Cassette is not supported yet.</notes>
+		<info name="alt_title" value="あらびあん・ないと"/>
+		<part name="card" interface="segaai_card">
+			<!-- Hack to get the overlay to display; no mycard included in this release. -->
+			<feature name="part_id" value="Overlay"/>
+			<dataarea name="rom" size="0x20000"/>
+			<dataarea name="overlay" size="414478">
+				<rom name="arabian night (1987).jpg" size="414478" crc="e4080789" sha1="d40660a456535df962f806a9d6447fb1233ba2ea"/>
+			</dataarea>
+		</part>
+		<part name="cass" interface="cass">
+			<dataarea name="cass" size="1">
+				<rom name="arabian night (1987)" size="1" status="nodump"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="andersen">
 		<description>Andersen Dream</description>
 		<year>1988</year>
@@ -180,6 +306,27 @@ AI-8003  Pinpon Music Melody
 			</dataarea>
 			<dataarea name="overlay" size="131182">
 				<rom name="andersen dream.jpg" size="131182" crc="71901572" sha1="648c528bde5d0dd51f4d1a5faf96ea7b25ecee00"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="andersena" cloneof="andersen" supported="no">
+		<description>Andersen Dream (1987)</description>
+		<year>1987</year>
+		<publisher>Sega</publisher>
+		<notes>Cassette is not supported yet.</notes>
+		<info name="alt_title" value="あんでるせん・どりーむ"/>
+		<part name="card" interface="segaai_card">
+			<!-- Hack to get the overlay to display; no mycard included in this release. -->
+			<feature name="part_id" value="Overlay"/>
+			<dataarea name="rom" size="0x20000"/>
+			<dataarea name="overlay" size="411831">
+				<rom name="andersen dream (1987).jpg" size="411831" crc="2f03ae8a" sha1="7d16493baec1fdf5e9ba5d284f421be362a39951"/>
+			</dataarea>
+		</part>
+		<part name="cass" interface="cass">
+			<dataarea name="cass" size="1">
+				<rom name="andersen dream (1987)" size="1" status="nodump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -202,6 +349,27 @@ AI-8003  Pinpon Music Melody
 		</part>
 	</software>
 
+	<software name="oceanfana" cloneof="oceanfan" supported="no">
+		<description>Ocean Fantasy (1987)</description>
+		<year>1987</year>
+		<publisher>Sega</publisher>
+		<notes>Cassette is not supported yet.</notes>
+		<info name="alt_title" value="おーしゃん・ふぁんたじー"/>
+		<part name="card" interface="segaai_card">
+			<!-- Hack to get the overlay to display; no mycard included in this release. -->
+			<feature name="part_id" value="Overlay"/>
+			<dataarea name="rom" size="0x20000"/>
+			<dataarea name="overlay" size="304726">
+				<rom name="ocean fantasy (1987).jpg" size="304726" crc="b927f8c1" sha1="4b59e3bdb7c4ed160cb678f24b5a4e07508a6e43"/>
+			</dataarea>
+		</part>
+		<part name="cass" interface="cass">
+			<dataarea name="cass" size="1">
+				<rom name="ocean fantasy (1987)" size="1" status="nodump"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="columbus">
 		<description>Columbus Map</description>
 		<year>1988</year>
@@ -216,6 +384,27 @@ AI-8003  Pinpon Music Melody
 			</dataarea>
 			<dataarea name="overlay" size="197012">
 				<rom name="columbus map.jpg" size="197012" crc="ed64e9ed" sha1="ddfe35d8ead25291c6ad3bca5d5bd758d59bb77c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="columbusa" cloneof="columbus" supported="no">
+		<description>Columbus Map (1987)</description>
+		<year>1987</year>
+		<publisher>Sega</publisher>
+		<notes>Cassette is not supported yet.</notes>
+		<info name="alt_title" value="ころんぶす・まっぷ"/>
+		<part name="card" interface="segaai_card">
+			<!-- Hack to get the overlay to display; no mycard included in this release. -->
+			<feature name="part_id" value="Overlay"/>
+			<dataarea name="rom" size="0x20000"/>
+			<dataarea name="overlay" size="662612">
+				<rom name="columbus map (1987).jpg" size="662612" crc="631b58cb" sha1="8dff423f00d17cde01b62bce03f46ed922e50a9c"/>
+			</dataarea>
+		</part>
+		<part name="cass" interface="cass">
+			<dataarea name="cass" size="1">
+				<rom name="columbus map (1987)" size="1" status="nodump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -278,7 +467,6 @@ AI-8003  Pinpon Music Melody
 		<description>Okeiko Hanamaru Aiueo</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
-		<notes>Hard to draw characters in the right place.</notes>
 		<info name="serial" value="AI-4201"/>
 		<info name="alt_title" value="おけいこ・はなまる　あいえうお"/>
 		<part name="card1" interface="segaai_card">
@@ -301,7 +489,6 @@ AI-8003  Pinpon Music Melody
 		<description>Waku Waku ABC to 123</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
-		<notes>Hard to draw characters in the right place.</notes>
 		<info name="serial" value="AI-4202"/>
 		<info name="alt_title" value="わくわく　ＡＢＣと１２３"/>
 		<part name="card" interface="segaai_card">
@@ -316,7 +503,6 @@ AI-8003  Pinpon Music Melody
 		<description>Henshin Kanji</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
-		<notes>Hard to draw characters in the right place.</notes>
 		<info name="serial" value="AI-4203"/>
 		<info name="alt_title" value="へんしんかんじ"/>
 		<part name="card" interface="segaai_card">
@@ -338,6 +524,9 @@ AI-8003  Pinpon Music Melody
 			<dataarea name="rom" size="0x20000">
 				<rom name="pinpon numbers.bin" size="0x20000" crc="8103d3b0" sha1="93ba9244bf6e07789617b2d182043da28aea0999"/>
 			</dataarea>
+			<dataarea name="overlay" size="408197">
+				<rom name="pinpon numbers.jpg" size="408197" crc="525fe509" sha1="8f7c2f44a0948a306444432a9d6be7ea536590c1"/>
+			</dataarea>
 		</part>
 	</software>
 
@@ -354,6 +543,9 @@ AI-8003  Pinpon Music Melody
 			<dataarea name="rom" size="0x20000">
 				<rom name="pinpon music rhythm.bin" size="0x20000" crc="376195cb" sha1="709d53959082a3e5477fb15c187612c98b0baac5"/>
 			</dataarea>
+			<dataarea name="overlay" size="363366">
+				<rom name="pinpon music rhythm.jpg" size="363366" crc="4a66fef5" sha1="f4c5626e06f1d032a153c73c45139bb87a8e8d72"/>
+			</dataarea>
 		</part>
 	</software>
 
@@ -369,6 +561,9 @@ AI-8003  Pinpon Music Melody
 			<feature name="slot" value="rom_128"/>
 			<dataarea name="rom" size="0x20000">
 				<rom name="pinpon music melody.bin" size="0x20000" crc="2deecb0c" sha1="3bddf3950921d09cf34e6def23cf491c8fa670c2"/>
+			</dataarea>
+			<dataarea name="overlay" size="336083">
+				<rom name="pinpon music melody.jpg" size="336083" crc="8b3ef04f" sha1="1b73747727c1d9febb5fb1e8f7164c17d66f7873"/>
 			</dataarea>
 		</part>
 	</software>
@@ -480,10 +675,10 @@ AI-8003  Pinpon Music Melody
 		<part name="card" interface="segaai_card">
 			<feature name="slot" value="rom_128"/>
 			<dataarea name="rom" size="0x20000">
-				<rom name="ai enikki 1986.bin" size="0x18000" crc="1849119c" sha1="2b04fe1ba0196ef24f2e1ea0270785cbbbf29c40"/>
+				<rom name="ai enikki (1986).bin" size="0x18000" crc="1849119c" sha1="2b04fe1ba0196ef24f2e1ea0270785cbbbf29c40"/>
 			</dataarea>
-			<dataarea name="overlay" size="210681">
-				<rom name="ai enikki.jpg" size="210681" crc="1d218dab" sha1="8d351acd7a6808ebc2d889caa016d85501c19cca"/>
+			<dataarea name="overlay" size="415344">
+				<rom name="ai enikki (1986).jpg" size="415344" crc="8bb40fa4" sha1="801316456a800e6bc19fb840adacb09d328a450b"/>
 			</dataarea>
 		</part>
 	</software>
