@@ -46,6 +46,7 @@
 #define LOG_SETUP   (1U << 1)
 #define LOG_REGS    (1U << 2)
 #define LOG_CONF    (1U << 3)
+#define LOG_INTERLACE (1U << 4)
 
 #define VERBOSE (LOG_SETUP|LOG_CONF|LOG_REGS)
 //#define LOG_OUTPUT_FUNC osd_printf_info
@@ -55,6 +56,7 @@
 #define LOGSETUP(...)   LOGMASKED(LOG_SETUP,  __VA_ARGS__)
 #define LOGREGS(...)    LOGMASKED(LOG_REGS,  __VA_ARGS__)
 #define LOGCONF(...)    LOGMASKED(LOG_CONF,  __VA_ARGS__)
+#define LOGINTL(...)    LOGMASKED(LOG_INTERLACE,  __VA_ARGS__)
 
 DEFINE_DEVICE_TYPE(MC6845,   mc6845_device,   "mc6845",   "Motorola MC6845 CRTC")
 DEFINE_DEVICE_TYPE(MC6845_1, mc6845_1_device, "mc6845_1", "Motorola MC6845-1 CRTC")
@@ -76,6 +78,7 @@ DEFINE_DEVICE_TYPE(AMS40489, ams40489_device, "ams40489", "AMS40489 ASIC (CRTC)"
 #define MODE_CURSOR_SKEW            ((m_mode_control & 0x20) != 0)
 #define MODE_DISPLAY_ENABLE_SKEW    ((m_mode_control & 0x10) != 0)
 #define MODE_ROW_COLUMN_ADDRESSING  ((m_mode_control & 0x04) != 0)
+#define MODE_ANY_INTERLACE          ((m_mode_control & 0x01) == 1)
 #define MODE_INTERLACE              ((m_mode_control & 0x03) == 1)
 #define MODE_INTERLACE_AND_VIDEO    ((m_mode_control & 0x03) == 3)
 
@@ -706,6 +709,9 @@ TIMER_CALLBACK_MEMBER(mc6845_device::handle_line_timer)
 	m_character_counter = 0;
 	m_cursor_x = -1;
 
+	LOGINTL("handle_line_timer - m_vsync: %d m_vsync_ff: %d m_line_counter: %d, m_raster_counter: %d, m_odd_field: %d, interlace_video: %d\n",
+		m_vsync, m_vsync_ff, m_line_counter, m_raster_counter, m_odd_field, MODE_INTERLACE_AND_VIDEO);
+
 	/* Check if VSYNC is active */
 	if ( m_vsync_ff )
 	{
@@ -723,46 +729,42 @@ TIMER_CALLBACK_MEMBER(mc6845_device::handle_line_timer)
 		}
 	}
 
-	if (!m_adjust_active && ((!MODE_INTERLACE_AND_VIDEO && m_raster_counter == m_max_ras_addr + m_noninterlace_adjust - 1) ||
-		(MODE_INTERLACE_AND_VIDEO && ((m_odd_field && (m_raster_counter == m_max_ras_addr + m_interlace_adjust - 1)) ||
-			(!m_odd_field && (m_raster_counter == m_max_ras_addr + m_interlace_adjust - 2)))
-		))
-	)
+	if (!m_adjust_active)
 	{
-		/* Check if we have reached the end of the vertical area */
-		if ( m_line_counter == m_vert_char_total )
+		LOGINTL("checking raster: m_raster_counter: %d, m_max_ras_addr: %d m_interlace_adjust: %d, mode: %d, odd: %d\n", 
+			m_raster_counter, m_max_ras_addr, m_interlace_adjust, MODE_INTERLACE_AND_VIDEO, m_odd_field);
+		if ((!MODE_INTERLACE_AND_VIDEO && m_raster_counter == m_max_ras_addr + m_noninterlace_adjust - 1) ||
+			(MODE_INTERLACE_AND_VIDEO && (m_raster_counter >= (m_max_ras_addr + m_interlace_adjust - 2)))
+			)
 		{
-			m_adjust_counter = 0;
-			m_adjust_active = 1;
-		}
+			LOGINTL("char raster complete: m_raster_counter: %d\n", m_raster_counter); 
+			/* Check if we have reached the end of the vertical area */
+			if ( m_line_counter == m_vert_char_total )
+			{
+				m_adjust_counter = 0;
+				m_adjust_active = 1;
+			}
 
-		// TODO - handle MODE_INTERLACE half lines 
-		if (MODE_INTERLACE_AND_VIDEO && m_odd_field)
-		{
-			m_raster_counter = 1;
+			// TODO - handle MODE_INTERLACE half lines
+			m_raster_counter = (MODE_INTERLACE_AND_VIDEO && m_odd_field) ? 1 : 0;
+			m_line_counter = ( m_line_counter + 1 ) & 0x7F;
+			m_line_address = ( m_line_address + m_horiz_disp ) & 0x3fff;
+
+			if (match_line())
+			{
+				new_vsync = true;
+				if (MODE_ANY_INTERLACE)
+				{
+					m_odd_field = !m_odd_field;
+				}
+			}
 		}
 		else
 		{
-			m_raster_counter = 0;
-		}
-		m_line_counter = ( m_line_counter + 1 ) & 0x7F;
-		m_line_address = ( m_line_address + m_horiz_disp ) & 0x3fff;
-
-		if (match_line())
-		{
-			new_vsync = true;
-			if (MODE_INTERLACE_AND_VIDEO || MODE_INTERLACE)
-			{
-				m_odd_field = !m_odd_field;
-			}
+			m_raster_counter = ( m_raster_counter + ((MODE_INTERLACE_AND_VIDEO) ? 2 : 1) ) & 0x1F;
 		}
 	}
 	else
-	{
-		m_raster_counter = ( m_raster_counter + (MODE_INTERLACE_AND_VIDEO ? 2 : 1) ) & 0x1F;
-	}
-
-	if ( m_adjust_active )
 	{
 		/* Check if we have reached the end of a full cycle */
 		if ((!MODE_INTERLACE_AND_VIDEO && (m_adjust_counter == m_vert_total_adj )) ||
@@ -779,7 +781,7 @@ TIMER_CALLBACK_MEMBER(mc6845_device::handle_line_timer)
 				if (match_line())
 				{
 					new_vsync = true;
-					if (MODE_INTERLACE_AND_VIDEO || MODE_INTERLACE)
+					if (MODE_ANY_INTERLACE)
 					{
 						m_odd_field = !m_odd_field;
 					}
@@ -790,11 +792,15 @@ TIMER_CALLBACK_MEMBER(mc6845_device::handle_line_timer)
 			update_cursor_state();
 
 			if (has_screen())
-				screen().reset_origin();
+			{
+				LOGINTL("screen - reset origin()\n");
+				// TODO fix screen reset_orgin()
+				//screen().reset_origin();
+			}
 		}
 		else
 		{
-			m_adjust_counter = ( m_adjust_counter + (MODE_INTERLACE_AND_VIDEO ? 2 : 1) ) & 0x1F;
+			m_adjust_counter = (m_adjust_counter + 1) & 0x1F;
 		}
 	}
 
@@ -892,6 +898,7 @@ TIMER_CALLBACK_MEMBER(mc6845_device::transparent_update_tick)
 
 TIMER_CALLBACK_MEMBER(mc6845_device::interlace_vsync)
 {
+	LOGINTL("interlace vsync\n");
 	// cancel the timer for now
 	m_interlace_vsync_half_line_timer->adjust(attotime::never);
 
