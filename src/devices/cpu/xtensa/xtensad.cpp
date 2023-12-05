@@ -836,7 +836,7 @@ offs_t xtensa_disassembler::disassemble(std::ostream &stream, offs_t pc, const x
 				break;
 
 			case 0b10: case 0b11: // BLTUI, BGEUI
-				util::stream_format(stream, "%-8sa%d, %s, 0x%08X", BIT(inst, 6) ? "bgeui" : "bltui", BIT(inst, 8, 4), format_imm(s_b4constu[BIT(inst, 4, 4)]), pc + 4 + s8(u8(inst >> 16)));
+				util::stream_format(stream, "%-8sa%d, %s, 0x%08X", BIT(inst, 6) ? "bgeui" : "bltui", BIT(inst, 8, 4), format_imm(s_b4constu[BIT(inst, 12, 4)]), pc + 4 + s8(u8(inst >> 16)));
 				return 3 | STEP_COND | SUPPORTED;
 			}
 			break;

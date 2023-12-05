@@ -1910,7 +1910,7 @@ void xtensa_device::getop_and_execute()
 			case 0b10: // BLTUI - Branch if Less Than Unsigned Immediate
 			{
 				u8 reg = BIT(inst, 8, 4);
-				u32 imm = s_b4constu[BIT(inst, 4, 4)];
+				u32 imm = s_b4constu[BIT(inst, 12, 4)];
 				u32 addr = m_pc + 4 + s8(u8(inst >> 16));
 				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, %s, 0x%08X\n", "bltui", reg, format_imm(imm), addr);
 				if (get_reg(reg) < imm)
@@ -1924,7 +1924,7 @@ void xtensa_device::getop_and_execute()
 			case 0b11: // BGEUI - Branch if Greater Than or Eq Unsigned Immediate
 			{
 				u8 reg = BIT(inst, 8, 4);
-				u32 imm = s_b4constu[BIT(inst, 4, 4)];
+				u32 imm = s_b4constu[BIT(inst, 12, 4)];
 				u32 addr = m_pc + 4 + s8(u8(inst >> 16));
 				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, %s, 0x%08X\n", "bgeui", reg, format_imm(imm), addr);
 				if (get_reg(reg) >= imm)

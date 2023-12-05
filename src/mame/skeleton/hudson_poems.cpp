@@ -108,9 +108,11 @@ INPUT_PORTS_END
 
 void hudson_poems_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t tile, int xx, int yy)
 {
-	int flipx = tile & 0x800;
-	int flipy = tile & 0x400;
-	tile &= 0x3ff;
+	int flipx = tile & 0x0800;
+	int flipy = tile & 0x0400;
+	int pal = (tile & 0xf000)>>8; 
+	tile &= 0x03ff;
+
 
 	int realoffset = tile * 8;
 	int count = 0;
@@ -129,7 +131,7 @@ void hudson_poems_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, 
 		{
 			for (int i = 28; i >= 0; i -= 4)
 			{
-				if (pos < cliprect.max_x) dstptr_bitmap[pos] = (pix >> i) & 0xf;
+				if (pos < cliprect.max_x) dstptr_bitmap[pos] = ((pix >> i) & 0xf) | pal;
 				pos++;
 			}
 			count++;
@@ -138,7 +140,7 @@ void hudson_poems_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, 
 		{
 			for (int i = 0; i < 32; i += 4)
 			{
-				if (pos < cliprect.max_x) dstptr_bitmap[pos] = (pix >> i) & 0xf;
+				if (pos < cliprect.max_x) dstptr_bitmap[pos] = ((pix >> i) & 0xf) | pal;
 				pos++;
 			}
 			count++;
@@ -186,6 +188,9 @@ uint32_t hudson_poems_state::screen_update(screen_device &screen, bitmap_ind16 &
 	case 0x0d: width = 128; base = (0x9498/4); bpp = 8; break;// poems logo
 	case 0x10: width = 512; base = (0xc600/4); bpp = 4; break;// bemani logo
 	case 0x14: width = 512; base = (0xd400/4); bpp = 4; break;// warning screen
+	case 0x38: width = 512; base = (0x14000/4); bpp = 4; break;// title 1
+	case 0x44: width = 512; base = (0x18400/4); bpp = 4; break;// title 2
+
 	default: attempt_draw = false; break;
 	}
 
@@ -430,7 +435,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(hudson_poems_state::screen_scanline)
 
 	if (scanline == 200) 
 	{
-		m_maincpu->irq_request_hack(0x2);
+//		if (machine().input().code_pressed_once(KEYCODE_W))
+//			m_maincpu->irq_request_hack(0x2);
 	}
 
 //	if ((scanline %= 80) == 48) 
@@ -438,6 +444,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(hudson_poems_state::screen_scanline)
 //		m_maincpu->irq_request_hack(0x4);
 
 		// this needs to change in RAM, presumably from an interrupt, but no idea how to get there
+	//	if (machine().input().code_pressed_once(KEYCODE_W))
+
 		m_maincpu->space(AS_PROGRAM).write_byte(0x2c01d92c, 0x01);
 	}
 
