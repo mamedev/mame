@@ -7,7 +7,7 @@ Mephisto Europa (aka Schachschule)
 
 Single-chip chess computer, the chess engine is by Frans Morsch.
 
-NOTE: Press the STOP button to turn the power off, before exiting MAME. Otherwise,
+NOTE: Before exiting MAME, press the STOP button to turn the power off. Otherwise,
 NVRAM won't save properly.
 
 Hardware notes:

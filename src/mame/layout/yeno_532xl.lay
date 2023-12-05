@@ -649,7 +649,7 @@ license:CC0-1.0
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="-12" right="118.5" top="-10" bottom="87" />
+		<bounds left="-13" right="118.5" top="-10" bottom="87" />
 
 		<element ref="white"><bounds x="0" y="-10" width="120" height="97" /></element>
 
@@ -674,7 +674,7 @@ license:CC0-1.0
 
 		<element ref="black"><bounds x="3.5" y="2.5" width="81" height="81" /></element>
 		<group ref="sb_board"><bounds x="4" y="3" width="80" height="80" /></group>
-		<group ref="sb_ui"><bounds x="-11" y="3" width="10" height="80" /></group>
+		<group ref="sb_ui"><bounds x="-11.5" y="3" width="10" height="80" /></group>
 
 		<group ref="lcd2"><bounds x="4" y="-6.5" width="14" height="5.333" /></group>
 		<group ref="lcd1"><bounds x="24" y="-6.5" width="14" height="5.333" /></group>

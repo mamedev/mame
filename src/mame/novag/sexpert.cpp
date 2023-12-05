@@ -310,9 +310,8 @@ void sforte_state::lcd_data_w(u8 data)
 
 	// d7: enable beeper
 	// capacitor for noise filter (sound glitches otherwise)
-	u8 param = data >> 7 & 1;
-	if (param != m_beeptimer->param())
-		m_beeptimer->adjust(attotime::from_msec(1), param);
+	if (m_beeptimer->param() != BIT(data, 7))
+		m_beeptimer->adjust(attotime::from_msec(1), BIT(data, 7));
 
 	// LCD pins: same as sexpert
 	sexpert_state::lcd_data_w(data);
