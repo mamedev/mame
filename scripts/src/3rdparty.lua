@@ -1747,11 +1747,6 @@ project "utf8proc"
 			"verbose=-1",
 		}
 
-	configuration { "gmake or ninja" }
-		buildoptions_c {
-			"-Wno-strict-prototypes",
-		}
-
 	configuration { }
 
 	files {
