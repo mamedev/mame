@@ -113,7 +113,11 @@ DEFINE_DEVICE_TYPE(HEATH_ULTRA, heath_ultra_tlb_device, "heath_ultra_tlb", "Heat
 DEFINE_DEVICE_TYPE(HEATH_WATZ, heath_watz_tlb_device, "heath_watz_tlb", "Heath Terminal Logic Board w/Watzman ROM")
 DEFINE_DEVICE_TYPE(HEATH_GP19, heath_gp19_tlb_device, "heath_gp19_tlb", "Heath Terminal Logic Board plus Northwest Digital Systems GP-19")
 DEFINE_DEVICE_TYPE(HEATH_IMAGINATOR, heath_imaginator_tlb_device, "heath_imaginator_tlb", "Heath Terminal Logic Board plus Cleveland Codonics Imaginator I-100")
-DEFINE_DEVICE_TYPE(HEATH_IGC, heath_sigmasoft_igc_tlb_device, "heath_sigmasoft_igc_tlb_device", "Heath Terminal Logic Board plus SigmaSoft Interactive Graphics Controller")
+DEFINE_DEVICE_TYPE(HEATH_IGC, heath_igc_tlb_device, "heath_igc_tlb_device", "Heath Terminal Logic Board plus SigmaSoft Interactive Graphics Controller")
+DEFINE_DEVICE_TYPE(HEATH_IGC_SUPER19, heath_igc_super19_tlb_device, "heath_igc_super19_tlb_device", "Heath Terminal Logic Board w/ Super19 ROM plus SigmaSoft Interactive Graphics Controller")
+DEFINE_DEVICE_TYPE(HEATH_IGC_ULTRA, heath_igc_ultra_tlb_device, "heath_igc_ultra_tlb_device", "Heath Terminal Logic Board w/ Ultra ROM plus SigmaSoft Interactive Graphics Controller")
+DEFINE_DEVICE_TYPE(HEATH_IGC_WATZ, heath_igc_watz_tlb_device, "heath_igc_watz_tlb_device", "Heath Terminal Logic Board w/Watzman ROM plus SigmaSoft Interactive Graphics Controller")
+
 
 
 
@@ -1747,21 +1751,24 @@ void heath_imaginator_tlb_device::set_irq_line()
  *
  *
  */
-heath_sigmasoft_igc_tlb_device::heath_sigmasoft_igc_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+heath_igc_tlb_device::heath_igc_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	heath_tlb_device(mconfig, HEATH_IGC, tag, owner, clock)
 {
 }
 
+heath_igc_tlb_device::heath_igc_tlb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	heath_tlb_device(mconfig, type, tag, owner, clock)
+{
+}
 
-void heath_sigmasoft_igc_tlb_device::device_add_mconfig(machine_config &config)
+void heath_igc_tlb_device::device_add_mconfig(machine_config &config)
 {
 	heath_tlb_device::device_add_mconfig(config);
 
-	m_crtc->set_update_row_callback(FUNC(heath_sigmasoft_igc_tlb_device::crtc_update_row));
+	m_crtc->set_update_row_callback(FUNC(heath_igc_tlb_device::crtc_update_row));
 }
 
-
-void heath_sigmasoft_igc_tlb_device::device_start()
+void heath_igc_tlb_device::device_start()
 {
 	heath_tlb_device::device_start();
 
@@ -1780,7 +1787,7 @@ void heath_sigmasoft_igc_tlb_device::device_start()
 	save_item(NAME(m_window_address));
 }
 
-void heath_sigmasoft_igc_tlb_device::device_reset()
+void heath_igc_tlb_device::device_reset()
 {
 	LOGFUNC("%s:\n", FUNCNAME);
 
@@ -1792,7 +1799,7 @@ void heath_sigmasoft_igc_tlb_device::device_reset()
 	m_window_address = 0x0000;
 }
 
-void heath_sigmasoft_igc_tlb_device::sigma_ctrl_w(uint8_t data)
+void heath_igc_tlb_device::sigma_ctrl_w(uint8_t data)
 {
 	LOGREG("%s: data: %02x\n", FUNCNAME, data);
 
@@ -1811,7 +1818,7 @@ void heath_sigmasoft_igc_tlb_device::sigma_ctrl_w(uint8_t data)
 	}
 }
 
-uint8_t heath_sigmasoft_igc_tlb_device::sigma_ctrl_r()
+uint8_t heath_igc_tlb_device::sigma_ctrl_r()
 {
 	u8 ret_val = 0x00;
 
@@ -1829,7 +1836,7 @@ uint8_t heath_sigmasoft_igc_tlb_device::sigma_ctrl_r()
 	return ret_val;
 }
 
-void heath_sigmasoft_igc_tlb_device::sigma_video_mem_w(uint8_t data)
+void heath_igc_tlb_device::sigma_video_mem_w(uint8_t data)
 {
 	LOGREG("%s: data: %02x\n", FUNCNAME, data);
 
@@ -1838,7 +1845,7 @@ void heath_sigmasoft_igc_tlb_device::sigma_video_mem_w(uint8_t data)
 	m_p_graphic_ram[(m_memory_bank_select << 16) + m_io_address++] = data;
 }
 
-uint8_t heath_sigmasoft_igc_tlb_device::sigma_video_mem_r(void)
+uint8_t heath_igc_tlb_device::sigma_video_mem_r(void)
 {
 	LOGFUNC("%s:\n", FUNCNAME);
 
@@ -1850,35 +1857,35 @@ uint8_t heath_sigmasoft_igc_tlb_device::sigma_video_mem_r(void)
 	return m_p_graphic_ram[addr];
 }
 
-void heath_sigmasoft_igc_tlb_device::sigma_io_lo_addr_w(uint8_t data)
+void heath_igc_tlb_device::sigma_io_lo_addr_w(uint8_t data)
 {
 	LOGREG("%s: data: %02x\n", FUNCNAME, data);
 
 	m_io_address = (m_io_address & 0xff00) | data;
 }
 
-void heath_sigmasoft_igc_tlb_device::sigma_io_hi_addr_w(uint8_t data)
+void heath_igc_tlb_device::sigma_io_hi_addr_w(uint8_t data)
 {
 	LOGREG("%s: data: %02x\n", FUNCNAME, data);
 
 	m_io_address = (data << 8) | (m_io_address & 0x00ff);
 }
 
-void heath_sigmasoft_igc_tlb_device::sigma_window_lo_addr_w(uint8_t data)
+void heath_igc_tlb_device::sigma_window_lo_addr_w(uint8_t data)
 {
 	LOGREG("%s: data: %02x\n", FUNCNAME, data);
 
 	m_window_address = (m_window_address & 0xff00) | data;
 }
 
-void heath_sigmasoft_igc_tlb_device::sigma_window_hi_addr_w(uint8_t data)
+void heath_igc_tlb_device::sigma_window_hi_addr_w(uint8_t data)
 {
 	LOGREG("%s: data: %02x\n", FUNCNAME, data);
 
 	m_window_address = (data << 8) | (m_window_address & 0x00ff);
 }
 
-MC6845_UPDATE_ROW(heath_sigmasoft_igc_tlb_device::crtc_update_row)
+MC6845_UPDATE_ROW(heath_igc_tlb_device::crtc_update_row)
 {
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	uint32_t *p = &bitmap.pix(y);
@@ -1921,6 +1928,87 @@ MC6845_UPDATE_ROW(heath_sigmasoft_igc_tlb_device::crtc_update_row)
 	{
 		std::fill_n(p, x_count * 8, palette[0]);
 	}
+}
+
+
+/**
+ * Super-19 ROM
+ *
+ * Developed by ATG Systems
+ */
+heath_igc_super19_tlb_device::heath_igc_super19_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	heath_igc_tlb_device(mconfig, HEATH_IGC_SUPER19, tag, owner, clock)
+{
+}
+
+const tiny_rom_entry *heath_igc_super19_tlb_device::device_rom_region() const
+{
+	return ROM_NAME(super19);
+}
+
+ioport_constructor heath_igc_super19_tlb_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(super19);
+}
+
+
+/**
+ * UltraROM
+ *
+ * Developed by William G. Parrott, III, sold by Software Wizardry, Inc.
+ */
+heath_igc_ultra_tlb_device::heath_igc_ultra_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	heath_igc_tlb_device(mconfig, HEATH_IGC_ULTRA, tag, owner, clock)
+{
+}
+
+void heath_igc_ultra_tlb_device::device_add_mconfig(machine_config &config)
+{
+	heath_tlb_device::device_add_mconfig(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &heath_igc_ultra_tlb_device::mem_map);
+}
+
+void heath_igc_ultra_tlb_device::mem_map(address_map &map)
+{
+	heath_tlb_device::mem_map(map);
+
+	// update rom mirror setting to allow page 2 memory
+	map(0x0000, 0x0fff).mirror(0x2000).rom();
+
+	// Page 2 memory
+	map(0x1000, 0x1fff).mirror(0x2000).ram();
+}
+
+const tiny_rom_entry *heath_igc_ultra_tlb_device::device_rom_region() const
+{
+	return ROM_NAME(ultra19);
+}
+
+ioport_constructor heath_igc_ultra_tlb_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(ultra19);
+}
+
+
+/**
+ * Watzman ROM
+ *
+ * Developed by Barry Watzman, sold by HUG (Heath Users Group)
+*/
+heath_igc_watz_tlb_device::heath_igc_watz_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	heath_igc_tlb_device(mconfig, HEATH_IGC_WATZ, tag, owner, clock)
+{
+}
+
+const tiny_rom_entry *heath_igc_watz_tlb_device::device_rom_region() const
+{
+	return ROM_NAME(watz19);
+}
+
+ioport_constructor heath_igc_watz_tlb_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(watz19);
 }
 
 

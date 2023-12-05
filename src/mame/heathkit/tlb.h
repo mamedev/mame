@@ -302,10 +302,10 @@ protected:
 /**
  *  Heath TLB plus SigmaSoft Interactive Graphics Controller
  */
-class heath_sigmasoft_igc_tlb_device : public heath_tlb_device
+class heath_igc_tlb_device : public heath_tlb_device
 {
 public:
-	heath_sigmasoft_igc_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	heath_igc_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void sigma_ctrl_w(uint8_t data) override;
 	virtual uint8_t sigma_ctrl_r() override;
@@ -320,6 +320,7 @@ public:
 	virtual void sigma_window_hi_addr_w(uint8_t val) override;
 
 protected:
+	heath_igc_tlb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -354,6 +355,48 @@ protected:
 	uint16_t m_window_address;
 };
 
+/**
+ *  Heath TLB with the super19 ROM plus SigmaSoft Interactive Graphics Controller
+ */
+class heath_igc_super19_tlb_device : public heath_igc_tlb_device
+{
+public:
+	heath_igc_super19_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override;
+};
+
+/**
+ *  Heath TLB with the ultrarom plus SigmaSoft Interactive Graphics Controller
+ */
+class heath_igc_ultra_tlb_device : public heath_igc_tlb_device
+{
+public:
+	heath_igc_ultra_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	void mem_map(address_map &map);
+};
+
+/**
+ *  Heath TLB with the watzman ROM plus SigmaSoft Interactive Graphics Controller
+ */
+class heath_igc_watz_tlb_device : public heath_igc_tlb_device
+{
+public:
+	heath_igc_watz_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override;
+};
+
 DECLARE_DEVICE_TYPE(HEATH_TLB, heath_tlb_device)
 DECLARE_DEVICE_TYPE(HEATH_GP19, heath_gp19_tlb_device)
 DECLARE_DEVICE_TYPE(HEATH_IMAGINATOR, heath_imaginator_tlb_device)
@@ -361,7 +404,10 @@ DECLARE_DEVICE_TYPE(HEATH_SUPER19, heath_super19_tlb_device)
 DECLARE_DEVICE_TYPE(HEATH_SUPERSET, heath_superset_tlb_device)
 DECLARE_DEVICE_TYPE(HEATH_WATZ, heath_watz_tlb_device)
 DECLARE_DEVICE_TYPE(HEATH_ULTRA, heath_ultra_tlb_device)
-DECLARE_DEVICE_TYPE(HEATH_IGC, heath_sigmasoft_igc_tlb_device)
+DECLARE_DEVICE_TYPE(HEATH_IGC, heath_igc_tlb_device)
+DECLARE_DEVICE_TYPE(HEATH_IGC_SUPER19, heath_igc_super19_tlb_device)
+DECLARE_DEVICE_TYPE(HEATH_IGC_ULTRA, heath_igc_ultra_tlb_device)
+DECLARE_DEVICE_TYPE(HEATH_IGC_WATZ, heath_igc_watz_tlb_device)
 
 /**
  * Connector for the Terminal Logic Board in an H-89 class computer
@@ -396,6 +442,12 @@ public:
 	void dsr_in_w(int state)    { if (m_tlb) m_tlb->dsr_in_w(state); }
 	void cts_in_w(int state)    { if (m_tlb) m_tlb->cts_in_w(state); }
 
+	// signals out from the tlb
+	void serial_out_b(int data) { m_write_sd(data); }
+	void dtr_out(int data)      { m_dtr_cb(data); }
+	void rts_out(int data)      { m_rts_cb(data); }
+	void reset_out(int data)    { m_reset(data); }
+
 	// optional SigmaSet operations
 	void sigma_ctrl_w(uint8_t data)          { if (m_tlb) m_tlb->sigma_ctrl_w(data); }
 	uint8_t sigma_ctrl_r()                   { return (m_tlb) ? m_tlb->sigma_ctrl_r() : 0x00; }
@@ -408,11 +460,6 @@ public:
 
 	void sigma_window_lo_addr_w(uint8_t val) { if (m_tlb) m_tlb->sigma_window_lo_addr_w(val); }
 	void sigma_window_hi_addr_w(uint8_t val) { if (m_tlb) m_tlb->sigma_window_hi_addr_w(val); }
-
-	void serial_out_b(int data) { m_write_sd(data); }
-	void dtr_out(int data)      { m_dtr_cb(data); }
-	void rts_out(int data)      { m_rts_cb(data); }
-	void reset_out(int data)    { m_reset(data); }
 
 protected:
 	virtual void device_start() override;
