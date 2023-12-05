@@ -1285,7 +1285,7 @@ void m6801_cpu_device::device_reset()
 	OCD = 0xffff;
 	TOD = 0xffff;
 	m_timer_next = 0xffff;
-	m_ram_ctrl |= 0x78;
+	m_ram_ctrl |= 0x40;
 	m_latch09 = 0;
 
 	m_trcsr = M6801_TRCSR_TDRE;
@@ -1311,6 +1311,7 @@ void hd6301x_cpu_device::device_reset()
 	m_tcsr2 = 0x00;
 	m_pending_tcsr2 = 0x00;
 	OC2D = 0xffff;
+	m_ram_ctrl = (m_ram_ctrl & 0x80) | 0x7c;
 
 	m_t2cnt = 0x00;
 	m_tconr = 0xff;
@@ -1333,6 +1334,7 @@ void hd6301y_cpu_device::device_reset()
 {
 	hd6301x_cpu_device::device_reset();
 
+	m_ram_ctrl = (m_ram_ctrl & 0x80) | 0x78;
 	m_p6csr = 7;
 }
 
@@ -2231,6 +2233,17 @@ void m6801_cpu_device::sci_tdr_w(uint8_t data)
 
 uint8_t m6801_cpu_device::rcr_r()
 {
+	return m_ram_ctrl | 0x3f;
+}
+
+uint8_t hd6301x_cpu_device::rcr_r()
+{
+	return m_ram_ctrl | 0x30;
+}
+
+uint8_t hd6301y_cpu_device::rcr_r()
+{
+	// no unused bits
 	return m_ram_ctrl;
 }
 

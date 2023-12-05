@@ -122,7 +122,7 @@ protected:
 	uint8_t sci_rdr_r();
 	void sci_tdr_w(uint8_t data);
 
-	uint8_t rcr_r();
+	virtual uint8_t rcr_r();
 	virtual void rcr_w(uint8_t data);
 	uint8_t ff_r();
 
@@ -340,6 +340,7 @@ protected:
 	virtual void p6_data_w(uint8_t data);
 	uint8_t p7_data_r();
 	void p7_data_w(uint8_t data);
+	virtual uint8_t rcr_r() override;
 
 	uint8_t tcsr2_r();
 	void tcsr2_w(uint8_t data);
@@ -442,6 +443,7 @@ protected:
 	virtual void p6_data_w(uint8_t data) override;
 	uint8_t p6_csr_r();
 	void p6_csr_w(uint8_t data);
+	virtual uint8_t rcr_r() override;
 	virtual void rcr_w(uint8_t data) override;
 
 	virtual void m6800_check_irq2() override;
