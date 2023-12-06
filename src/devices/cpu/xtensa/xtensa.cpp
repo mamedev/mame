@@ -1035,7 +1035,7 @@ void xtensa_device::getop_and_execute()
 			case 0b1001: // SRL
 			{
 				u8 dstreg = BIT(inst, 12, 4);
-				u8 srcreg = BIT(inst, 8, 4);
+				u8 srcreg = BIT(inst, 4, 4);
 				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d\n", "srl", dstreg, srcreg);
 				set_reg(dstreg, get_reg(srcreg) >> m_extreg_sar);
 				break;
@@ -1053,7 +1053,7 @@ void xtensa_device::getop_and_execute()
 			case 0b1011: // SRA
 			{
 				u8 dstreg = BIT(inst, 12, 4);
-				u8 srcreg = BIT(inst, 8, 4);
+				u8 srcreg = BIT(inst, 4, 4);
 				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d\n", "sra", dstreg, srcreg);
 				u32 source = get_reg(srcreg);
 				u32 result = source >> m_extreg_sar;
@@ -1245,8 +1245,17 @@ void xtensa_device::getop_and_execute()
 			}
 
 			case 0b1010: // MOVLTZ
-				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, a%d\n", s_rst3_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
+			{
+				u8 dstreg = BIT(inst, 12, 4);
+				u8 reg_s = BIT(inst, 8, 4);
+				u8 reg_t = BIT(inst, 4, 4);
+				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, a%d\n", "movltz", dstreg, reg_s, reg_t);
+				if ((get_reg(reg_t) & 0x80000000))
+				{
+					set_reg(dstreg, get_reg(reg_s));
+				}
 				break;
+			}
 
 			case 0b1011: // MOVGEZ
 			{
