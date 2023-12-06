@@ -1,5 +1,6 @@
 /* grabbag - Convenience lib for various routines common to several tools
- * Copyright (C) 2002,2003,2004,2005,2006,2007  Josh Coalson
+ * Copyright (C) 2002-2009  Josh Coalson
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,10 +29,10 @@
 extern "C" {
 #endif
 
-unsigned grabbag__cuesheet_msf_to_frame(unsigned minutes, unsigned seconds, unsigned frames);
-void grabbag__cuesheet_frame_to_msf(unsigned frame, unsigned *minutes, unsigned *seconds, unsigned *frames);
+uint32_t grabbag__cuesheet_msf_to_frame(uint32_t minutes, uint32_t seconds, uint32_t frames);
+void grabbag__cuesheet_frame_to_msf(uint32_t frame, uint32_t *minutes, uint32_t *seconds, uint32_t *frames);
 
-FLAC__StreamMetadata *grabbag__cuesheet_parse(FILE *file, const char **error_message, unsigned *last_line_read, FLAC__bool is_cdda, FLAC__uint64 lead_out_offset);
+FLAC__StreamMetadata *grabbag__cuesheet_parse(FILE *file, const char **error_message, uint32_t *last_line_read, uint32_t sample_rate, FLAC__bool is_cdda, FLAC__uint64 lead_out_offset);
 
 void grabbag__cuesheet_emit(FILE *file, const FLAC__StreamMetadata *cuesheet, const char *file_reference);
 

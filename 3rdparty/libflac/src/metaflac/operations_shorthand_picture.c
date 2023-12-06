@@ -1,5 +1,6 @@
 /* metaflac - Command-line FLAC metadata editor
- * Copyright (C) 2001,2002,2003,2004,2005,2006,2007  Josh Coalson
+ * Copyright (C) 2001-2009  Josh Coalson
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -11,12 +12,12 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #  include <config.h>
 #endif
 
@@ -94,9 +95,9 @@ FLAC__bool do_shorthand_operation__picture(const char *filename, FLAC__Metadata_
 				} while(FLAC__metadata_iterator_next(iterator) && 0 == picture);
 				if(0 == picture) {
 					if(block_number < 0)
-						fprintf(stderr, "%s: ERROR: FLAC file has no PICTURE block\n", filename);
+						flac_fprintf(stderr, "%s: ERROR: FLAC file has no PICTURE block\n", filename);
 					else
-						fprintf(stderr, "%s: ERROR: FLAC file has no PICTURE block at block #%d\n", filename, block_number);
+						flac_fprintf(stderr, "%s: ERROR: FLAC file has no PICTURE block at block #%d\n", filename, block_number);
 					ok = false;
 				}
 				else
@@ -122,19 +123,21 @@ FLAC__bool import_pic_from(const char *filename, FLAC__StreamMetadata **picture,
 	const char *error_message;
 
 	if(0 == specification || strlen(specification) == 0) {
-		fprintf(stderr, "%s: ERROR: empty picture specification\n", filename);
+		flac_fprintf(stderr, "%s: ERROR: empty picture specification\n", filename);
 		return false;
 	}
 
 	*picture = grabbag__picture_parse_specification(specification, &error_message);
 
 	if(0 == *picture) {
-		fprintf(stderr, "%s: ERROR: while parsing picture specification \"%s\": %s\n", filename, specification, error_message);
+		flac_fprintf(stderr, "%s: ERROR: while parsing picture specification \"%s\": %s\n", filename, specification, error_message);
 		return false;
 	}
 
 	if(!FLAC__format_picture_is_legal(&(*picture)->data.picture, &error_message)) {
-		fprintf(stderr, "%s: ERROR: new PICTURE block for \"%s\" is illegal: %s\n", filename, specification, error_message);
+		flac_fprintf(stderr, "%s: ERROR: new PICTURE block for \"%s\" is illegal: %s\n", filename, specification, error_message);
+		FLAC__metadata_object_delete(*picture);
+		*picture = 0;
 		return false;
 	}
 
@@ -148,26 +151,34 @@ FLAC__bool export_pic_to(const char *filename, const FLAC__StreamMetadata *pictu
 	const FLAC__uint32 len = picture->data.picture.data_length;
 
 	if(0 == pic_filename || strlen(pic_filename) == 0) {
-		fprintf(stderr, "%s: ERROR: empty export file name\n", filename);
+		flac_fprintf(stderr, "%s: ERROR: empty export file name\n", filename);
 		return false;
 	}
 	if(0 == strcmp(pic_filename, "-"))
 		f = grabbag__file_get_binary_stdout();
 	else
-		f = fopen(pic_filename, "wb");
+		f = flac_fopen(pic_filename, "wb");
 
 	if(0 == f) {
-		fprintf(stderr, "%s: ERROR: can't open export file %s: %s\n", filename, pic_filename, strerror(errno));
+		flac_fprintf(stderr, "%s: ERROR: can't open export file %s: %s\n", filename, pic_filename, strerror(errno));
 		return false;
 	}
 
 	if(fwrite(picture->data.picture.data, 1, len, f) != len) {
-		fprintf(stderr, "%s: ERROR: writing PICTURE data to file\n", filename);
+		flac_fprintf(stderr, "%s: ERROR: writing PICTURE data to file\n", filename);
+		if(f != stdout)
+			fclose(f);
 		return false;
 	}
 
 	if(f != stdout)
 		fclose(f);
+
+#ifdef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+	/* Delete output file when fuzzing */
+	if(f != stdout)
+		flac_unlink(pic_filename);
+#endif
 
 	return true;
 }

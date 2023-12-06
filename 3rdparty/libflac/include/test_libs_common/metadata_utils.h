@@ -1,5 +1,6 @@
 /* test_libFLAC - Unit tester for libFLAC
- * Copyright (C) 2002,2003,2004,2005,2006,2007  Josh Coalson
+ * Copyright (C) 2002-2009  Josh Coalson
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -11,9 +12,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 #ifndef FLAC__TEST_LIBS_COMMON_METADATA_UTILS_H
@@ -27,9 +28,9 @@
 
 FLAC__bool mutils__compare_block_data_streaminfo(const FLAC__StreamMetadata_StreamInfo *block, const FLAC__StreamMetadata_StreamInfo *blockcopy);
 
-FLAC__bool mutils__compare_block_data_padding(const FLAC__StreamMetadata_Padding *block, const FLAC__StreamMetadata_Padding *blockcopy, unsigned block_length);
+FLAC__bool mutils__compare_block_data_padding(const FLAC__StreamMetadata_Padding *block, const FLAC__StreamMetadata_Padding *blockcopy, uint32_t block_length);
 
-FLAC__bool mutils__compare_block_data_application(const FLAC__StreamMetadata_Application *block, const FLAC__StreamMetadata_Application *blockcopy, unsigned block_length);
+FLAC__bool mutils__compare_block_data_application(const FLAC__StreamMetadata_Application *block, const FLAC__StreamMetadata_Application *blockcopy, uint32_t block_length);
 
 FLAC__bool mutils__compare_block_data_seektable(const FLAC__StreamMetadata_SeekTable *block, const FLAC__StreamMetadata_SeekTable *blockcopy);
 
@@ -39,7 +40,7 @@ FLAC__bool mutils__compare_block_data_cuesheet(const FLAC__StreamMetadata_CueShe
 
 FLAC__bool mutils__compare_block_data_picture(const FLAC__StreamMetadata_Picture *block, const FLAC__StreamMetadata_Picture *blockcopy);
 
-FLAC__bool mutils__compare_block_data_unknown(const FLAC__StreamMetadata_Unknown *block, const FLAC__StreamMetadata_Unknown *blockcopy, unsigned block_length);
+FLAC__bool mutils__compare_block_data_unknown(const FLAC__StreamMetadata_Unknown *block, const FLAC__StreamMetadata_Unknown *blockcopy, uint32_t block_length);
 
 FLAC__bool mutils__compare_block(const FLAC__StreamMetadata *block, const FLAC__StreamMetadata *blockcopy);
 

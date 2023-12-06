@@ -1,5 +1,6 @@
 /* metaflac - Command-line FLAC metadata editor
- * Copyright (C) 2001,2002,2003,2004,2005,2006,2007  Josh Coalson
+ * Copyright (C) 2001-2009  Josh Coalson
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -11,12 +12,12 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #  include <config.h>
 #endif
 
@@ -25,6 +26,7 @@
 #include "utils.h"
 #include "FLAC/assert.h"
 #include "share/alloc.h"
+#include "share/compat.h"
 #include "share/grabbag/replaygain.h"
 #include <ctype.h>
 #include <stdio.h>
@@ -62,21 +64,24 @@ struct share__option long_options_[] = {
 	{ "set-channels", 1, 0, 0 }, /* undocumented */
 	{ "set-bps", 1, 0, 0 }, /* undocumented */
 	{ "set-total-samples", 1, 0, 0 }, /* undocumented */ /* WATCHOUT: used by test/test_flac.sh on windows */
-	{ "show-vendor-tag", 0, 0, 0 }, 
-	{ "show-tag", 1, 0, 0 }, 
-	{ "remove-all-tags", 0, 0, 0 }, 
-	{ "remove-tag", 1, 0, 0 }, 
-	{ "remove-first-tag", 1, 0, 0 }, 
-	{ "set-tag", 1, 0, 0 }, 
-	{ "set-tag-from-file", 1, 0, 0 }, 
-	{ "import-tags-from", 1, 0, 0 }, 
-	{ "export-tags-to", 1, 0, 0 }, 
+	{ "show-vendor-tag", 0, 0, 0 },
+	{ "show-all-tags", 0, 0, 0 },
+	{ "show-tag", 1, 0, 0 },
+	{ "remove-all-tags", 0, 0, 0 },
+	{ "remove-all-tags-except", 1, 0, 0 },
+	{ "remove-tag", 1, 0, 0 },
+	{ "remove-first-tag", 1, 0, 0 },
+	{ "set-tag", 1, 0, 0 },
+	{ "set-tag-from-file", 1, 0, 0 },
+	{ "import-tags-from", 1, 0, 0 },
+	{ "export-tags-to", 1, 0, 0 },
 	{ "import-cuesheet-from", 1, 0, 0 },
 	{ "export-cuesheet-to", 1, 0, 0 },
 	{ "import-picture-from", 1, 0, 0 },
 	{ "export-picture-to", 1, 0, 0 },
 	{ "add-seekpoint", 1, 0, 0 },
 	{ "add-replay-gain", 0, 0, 0 },
+	{ "scan-replay-gain", 0, 0, 0 },
 	{ "remove-replay-gain", 0, 0, 0 },
 	{ "add-padding", 1, 0, 0 },
 	/* major operations */
@@ -111,6 +116,7 @@ static FLAC__bool parse_uint32(const char *src, FLAC__uint32 *dest);
 static FLAC__bool parse_uint64(const char *src, FLAC__uint64 *dest);
 static FLAC__bool parse_string(const char *src, char **dest);
 static FLAC__bool parse_vorbis_comment_field_name(const char *field_ref, char **name, const char **violation);
+static FLAC__bool parse_vorbis_comment_field_names(const char *field_ref, char **names, const char **violation);
 static FLAC__bool parse_add_seekpoint(const char *in, char **out, const char **violation);
 static FLAC__bool parse_add_padding(const char *in, unsigned *out);
 static FLAC__bool parse_block_number(const char *in, Argument_BlockNumber *out);
@@ -133,6 +139,8 @@ void init_options(CommandLineOptions *options)
 	options->cued_seekpoints = true;
 	options->show_long_help = false;
 	options->show_version = false;
+	options->data_format_is_binary = false;
+	options->data_format_is_binary_headerless = false;
 	options->application_data_format_is_hexdump = false;
 
 	options->ops.operations = 0;
@@ -177,8 +185,8 @@ FLAC__bool parse_options(int argc, char *argv[], CommandLineOptions *options)
 		options->prefix_with_filename = (argc - share__optind > 1);
 
 	if(share__optind >= argc && !options->show_long_help && !options->show_version) {
-		fprintf(stderr,"ERROR: you must specify at least one FLAC file;\n");
-		fprintf(stderr,"       metaflac cannot be used as a pipe\n");
+		flac_fprintf(stderr,"ERROR: you must specify at least one FLAC file;\n");
+		flac_fprintf(stderr,"       metaflac cannot be used as a pipe\n");
 		had_error = true;
 	}
 
@@ -186,7 +194,7 @@ FLAC__bool parse_options(int argc, char *argv[], CommandLineOptions *options)
 
 	if(options->num_files > 0) {
 		unsigned i = 0;
-		if(0 == (options->filenames = (char**)safe_malloc_mul_2op_(sizeof(char*), /*times*/options->num_files)))
+		if(0 == (options->filenames = safe_malloc_mul_2op_(sizeof(char*), /*times*/options->num_files)))
 			die("out of memory allocating space for file names list");
 		while(share__optind < argc)
 			options->filenames[i++] = local_strdup(argv[share__optind++]);
@@ -194,40 +202,40 @@ FLAC__bool parse_options(int argc, char *argv[], CommandLineOptions *options)
 
 	if(options->args.checks.num_major_ops > 0) {
 		if(options->args.checks.num_major_ops > 1) {
-			fprintf(stderr, "ERROR: you may only specify one major operation at a time\n");
+			flac_fprintf(stderr, "ERROR: you may only specify one major operation at a time\n");
 			had_error = true;
 		}
 		else if(options->args.checks.num_shorthand_ops > 0) {
-			fprintf(stderr, "ERROR: you may not mix shorthand and major operations\n");
+			flac_fprintf(stderr, "ERROR: you may not mix shorthand and major operations\n");
 			had_error = true;
 		}
 	}
 
 	/* check for only one FLAC file used with certain options */
-	if(options->num_files > 1) {
+	if(!had_error && options->num_files > 1) {
 		if(0 != find_shorthand_operation(options, OP__IMPORT_CUESHEET_FROM)) {
-			fprintf(stderr, "ERROR: you may only specify one FLAC file when using '--import-cuesheet-from'\n");
+			flac_fprintf(stderr, "ERROR: you may only specify one FLAC file when using '--import-cuesheet-from'\n");
 			had_error = true;
 		}
 		if(0 != find_shorthand_operation(options, OP__EXPORT_CUESHEET_TO)) {
-			fprintf(stderr, "ERROR: you may only specify one FLAC file when using '--export-cuesheet-to'\n");
+			flac_fprintf(stderr, "ERROR: you may only specify one FLAC file when using '--export-cuesheet-to'\n");
 			had_error = true;
 		}
 		if(0 != find_shorthand_operation(options, OP__EXPORT_PICTURE_TO)) {
-			fprintf(stderr, "ERROR: you may only specify one FLAC file when using '--export-picture-to'\n");
+			flac_fprintf(stderr, "ERROR: you may only specify one FLAC file when using '--export-picture-to'\n");
 			had_error = true;
 		}
 		if(
 			0 != find_shorthand_operation(options, OP__IMPORT_VC_FROM) &&
 			0 == strcmp(find_shorthand_operation(options, OP__IMPORT_VC_FROM)->argument.filename.value, "-")
 		) {
-			fprintf(stderr, "ERROR: you may only specify one FLAC file when using '--import-tags-from=-'\n");
+			flac_fprintf(stderr, "ERROR: you may only specify one FLAC file when using '--import-tags-from=-'\n");
 			had_error = true;
 		}
 	}
 
 	if(options->args.checks.has_block_type && options->args.checks.has_except_block_type) {
-		fprintf(stderr, "ERROR: you may not specify both '--block-type' and '--except-block-type'\n");
+		flac_fprintf(stderr, "ERROR: you may not specify both '--block-type' and '--except-block-type'\n");
 		had_error = true;
 	}
 
@@ -249,7 +257,7 @@ FLAC__bool parse_options(int argc, char *argv[], CommandLineOptions *options)
 		}
 	}
 
-	return !had_error;
+	return had_error;
 }
 
 void free_options(CommandLineOptions *options)
@@ -266,6 +274,7 @@ void free_options(CommandLineOptions *options)
 			case OP__SHOW_VC_FIELD:
 			case OP__REMOVE_VC_FIELD:
 			case OP__REMOVE_VC_FIRSTFIELD:
+			case OP__REMOVE_VC_ALL_EXCEPT:
 				if(0 != op->argument.vc_field_name.value)
 					free(op->argument.vc_field_name.value);
 				break;
@@ -399,7 +408,7 @@ FLAC__bool parse_option(int option_index, const char *option_argument, CommandLi
 		op = append_shorthand_operation(options, OP__SET_MD5SUM);
 		FLAC__ASSERT(0 != option_argument);
 		if(!parse_md5(option_argument, op->argument.streaminfo_md5.value)) {
-			fprintf(stderr, "ERROR (--%s): bad MD5 sum\n", opt);
+			flac_fprintf(stderr, "ERROR (--%s): bad MD5 sum\n", opt);
 			ok = false;
 		}
 		else
@@ -408,7 +417,7 @@ FLAC__bool parse_option(int option_index, const char *option_argument, CommandLi
 	else if(0 == strcmp(opt, "set-min-blocksize")) {
 		op = append_shorthand_operation(options, OP__SET_MIN_BLOCKSIZE);
 		if(!parse_uint32(option_argument, &(op->argument.streaminfo_uint32.value)) || op->argument.streaminfo_uint32.value < FLAC__MIN_BLOCK_SIZE || op->argument.streaminfo_uint32.value > FLAC__MAX_BLOCK_SIZE) {
-			fprintf(stderr, "ERROR (--%s): value must be >= %u and <= %u\n", opt, FLAC__MIN_BLOCK_SIZE, FLAC__MAX_BLOCK_SIZE);
+			flac_fprintf(stderr, "ERROR (--%s): value must be >= %u and <= %u\n", opt, FLAC__MIN_BLOCK_SIZE, FLAC__MAX_BLOCK_SIZE);
 			ok = false;
 		}
 		else
@@ -417,7 +426,7 @@ FLAC__bool parse_option(int option_index, const char *option_argument, CommandLi
 	else if(0 == strcmp(opt, "set-max-blocksize")) {
 		op = append_shorthand_operation(options, OP__SET_MAX_BLOCKSIZE);
 		if(!parse_uint32(option_argument, &(op->argument.streaminfo_uint32.value)) || op->argument.streaminfo_uint32.value < FLAC__MIN_BLOCK_SIZE || op->argument.streaminfo_uint32.value > FLAC__MAX_BLOCK_SIZE) {
-			fprintf(stderr, "ERROR (--%s): value must be >= %u and <= %u\n", opt, FLAC__MIN_BLOCK_SIZE, FLAC__MAX_BLOCK_SIZE);
+			flac_fprintf(stderr, "ERROR (--%s): value must be >= %u and <= %u\n", opt, FLAC__MIN_BLOCK_SIZE, FLAC__MAX_BLOCK_SIZE);
 			ok = false;
 		}
 		else
@@ -426,7 +435,7 @@ FLAC__bool parse_option(int option_index, const char *option_argument, CommandLi
 	else if(0 == strcmp(opt, "set-min-framesize")) {
 		op = append_shorthand_operation(options, OP__SET_MIN_FRAMESIZE);
 		if(!parse_uint32(option_argument, &(op->argument.streaminfo_uint32.value)) || op->argument.streaminfo_uint32.value >= (1u<<FLAC__STREAM_METADATA_STREAMINFO_MIN_FRAME_SIZE_LEN)) {
-			fprintf(stderr, "ERROR (--%s): value must be a %u-bit unsigned integer\n", opt, FLAC__STREAM_METADATA_STREAMINFO_MIN_FRAME_SIZE_LEN);
+			flac_fprintf(stderr, "ERROR (--%s): value must be a %u-bit unsigned integer\n", opt, FLAC__STREAM_METADATA_STREAMINFO_MIN_FRAME_SIZE_LEN);
 			ok = false;
 		}
 		else
@@ -435,7 +444,7 @@ FLAC__bool parse_option(int option_index, const char *option_argument, CommandLi
 	else if(0 == strcmp(opt, "set-max-framesize")) {
 		op = append_shorthand_operation(options, OP__SET_MAX_FRAMESIZE);
 		if(!parse_uint32(option_argument, &(op->argument.streaminfo_uint32.value)) || op->argument.streaminfo_uint32.value >= (1u<<FLAC__STREAM_METADATA_STREAMINFO_MAX_FRAME_SIZE_LEN)) {
-			fprintf(stderr, "ERROR (--%s): value must be a %u-bit unsigned integer\n", opt, FLAC__STREAM_METADATA_STREAMINFO_MAX_FRAME_SIZE_LEN);
+			flac_fprintf(stderr, "ERROR (--%s): value must be a %u-bit unsigned integer\n", opt, FLAC__STREAM_METADATA_STREAMINFO_MAX_FRAME_SIZE_LEN);
 			ok = false;
 		}
 		else
@@ -444,7 +453,7 @@ FLAC__bool parse_option(int option_index, const char *option_argument, CommandLi
 	else if(0 == strcmp(opt, "set-sample-rate")) {
 		op = append_shorthand_operation(options, OP__SET_SAMPLE_RATE);
 		if(!parse_uint32(option_argument, &(op->argument.streaminfo_uint32.value)) || !FLAC__format_sample_rate_is_valid(op->argument.streaminfo_uint32.value)) {
-			fprintf(stderr, "ERROR (--%s): invalid sample rate\n", opt);
+			flac_fprintf(stderr, "ERROR (--%s): invalid sample rate\n", opt);
 			ok = false;
 		}
 		else
@@ -453,7 +462,7 @@ FLAC__bool parse_option(int option_index, const char *option_argument, CommandLi
 	else if(0 == strcmp(opt, "set-channels")) {
 		op = append_shorthand_operation(options, OP__SET_CHANNELS);
 		if(!parse_uint32(option_argument, &(op->argument.streaminfo_uint32.value)) || op->argument.streaminfo_uint32.value > FLAC__MAX_CHANNELS) {
-			fprintf(stderr, "ERROR (--%s): value must be > 0 and <= %u\n", opt, FLAC__MAX_CHANNELS);
+			flac_fprintf(stderr, "ERROR (--%s): value must be > 0 and <= %u\n", opt, FLAC__MAX_CHANNELS);
 			ok = false;
 		}
 		else
@@ -462,7 +471,7 @@ FLAC__bool parse_option(int option_index, const char *option_argument, CommandLi
 	else if(0 == strcmp(opt, "set-bps")) {
 		op = append_shorthand_operation(options, OP__SET_BPS);
 		if(!parse_uint32(option_argument, &(op->argument.streaminfo_uint32.value)) || op->argument.streaminfo_uint32.value < FLAC__MIN_BITS_PER_SAMPLE || op->argument.streaminfo_uint32.value > FLAC__MAX_BITS_PER_SAMPLE) {
-			fprintf(stderr, "ERROR (--%s): value must be >= %u and <= %u\n", opt, FLAC__MIN_BITS_PER_SAMPLE, FLAC__MAX_BITS_PER_SAMPLE);
+			flac_fprintf(stderr, "ERROR (--%s): value must be >= %u and <= %u\n", opt, FLAC__MIN_BITS_PER_SAMPLE, FLAC__MAX_BITS_PER_SAMPLE);
 			ok = false;
 		}
 		else
@@ -471,7 +480,7 @@ FLAC__bool parse_option(int option_index, const char *option_argument, CommandLi
 	else if(0 == strcmp(opt, "set-total-samples")) {
 		op = append_shorthand_operation(options, OP__SET_TOTAL_SAMPLES);
 		if(!parse_uint64(option_argument, &(op->argument.streaminfo_uint64.value)) || op->argument.streaminfo_uint64.value >= (((FLAC__uint64)1)<<FLAC__STREAM_METADATA_STREAMINFO_TOTAL_SAMPLES_LEN)) {
-			fprintf(stderr, "ERROR (--%s): value must be a %u-bit unsigned integer\n", opt, FLAC__STREAM_METADATA_STREAMINFO_TOTAL_SAMPLES_LEN);
+			flac_fprintf(stderr, "ERROR (--%s): value must be a %u-bit unsigned integer\n", opt, FLAC__STREAM_METADATA_STREAMINFO_TOTAL_SAMPLES_LEN);
 			ok = false;
 		}
 		else
@@ -486,12 +495,26 @@ FLAC__bool parse_option(int option_index, const char *option_argument, CommandLi
 		FLAC__ASSERT(0 != option_argument);
 		if(!parse_vorbis_comment_field_name(option_argument, &(op->argument.vc_field_name.value), &violation)) {
 			FLAC__ASSERT(0 != violation);
-			fprintf(stderr, "ERROR (--%s): malformed vorbis comment field name \"%s\",\n       %s\n", opt, option_argument, violation);
+			flac_fprintf(stderr, "ERROR (--%s): malformed vorbis comment field name \"%s\",\n       %s\n", opt, option_argument, violation);
 			ok = false;
 		}
 	}
+	else if(0 == strcmp(opt, "show-all-tags")) {
+		op = append_shorthand_operation(options, OP__EXPORT_VC_TO);
+		parse_string("-",&op->argument.filename.value);
+	}
 	else if(0 == strcmp(opt, "remove-all-tags")) {
 		(void) append_shorthand_operation(options, OP__REMOVE_VC_ALL);
+	}
+	else if(0 == strcmp(opt, "remove-all-tags-except")) {
+		const char *violation;
+		op = append_shorthand_operation(options, OP__REMOVE_VC_ALL_EXCEPT);
+		FLAC__ASSERT(0 != option_argument);
+		if(!parse_vorbis_comment_field_names(option_argument, &(op->argument.vc_field_name.value), &violation)) {
+			FLAC__ASSERT(0 != violation);
+			flac_fprintf(stderr, "ERROR (--%s): malformed vorbis comment field name \"%s\",\n       %s\n", opt, option_argument, violation);
+			ok = false;
+		}
 	}
 	else if(0 == strcmp(opt, "remove-tag")) {
 		const char *violation;
@@ -499,7 +522,7 @@ FLAC__bool parse_option(int option_index, const char *option_argument, CommandLi
 		FLAC__ASSERT(0 != option_argument);
 		if(!parse_vorbis_comment_field_name(option_argument, &(op->argument.vc_field_name.value), &violation)) {
 			FLAC__ASSERT(0 != violation);
-			fprintf(stderr, "ERROR (--%s): malformed vorbis comment field name \"%s\",\n       %s\n", opt, option_argument, violation);
+			flac_fprintf(stderr, "ERROR (--%s): malformed vorbis comment field name \"%s\",\n       %s\n", opt, option_argument, violation);
 			ok = false;
 		}
 	}
@@ -509,7 +532,7 @@ FLAC__bool parse_option(int option_index, const char *option_argument, CommandLi
 		FLAC__ASSERT(0 != option_argument);
 		if(!parse_vorbis_comment_field_name(option_argument, &(op->argument.vc_field_name.value), &violation)) {
 			FLAC__ASSERT(0 != violation);
-			fprintf(stderr, "ERROR (--%s): malformed vorbis comment field name \"%s\",\n       %s\n", opt, option_argument, violation);
+			flac_fprintf(stderr, "ERROR (--%s): malformed vorbis comment field name \"%s\",\n       %s\n", opt, option_argument, violation);
 			ok = false;
 		}
 	}
@@ -520,7 +543,7 @@ FLAC__bool parse_option(int option_index, const char *option_argument, CommandLi
 		op->argument.vc_field.field_value_from_file = false;
 		if(!parse_vorbis_comment_field(option_argument, &(op->argument.vc_field.field), &(op->argument.vc_field.field_name), &(op->argument.vc_field.field_value), &(op->argument.vc_field.field_value_length), &violation)) {
 			FLAC__ASSERT(0 != violation);
-			fprintf(stderr, "ERROR (--%s): malformed vorbis comment field \"%s\",\n       %s\n", opt, option_argument, violation);
+			flac_fprintf(stderr, "ERROR (--%s): malformed vorbis comment field \"%s\",\n       %s\n", opt, option_argument, violation);
 			ok = false;
 		}
 	}
@@ -531,7 +554,7 @@ FLAC__bool parse_option(int option_index, const char *option_argument, CommandLi
 		op->argument.vc_field.field_value_from_file = true;
 		if(!parse_vorbis_comment_field(option_argument, &(op->argument.vc_field.field), &(op->argument.vc_field.field_name), &(op->argument.vc_field.field_value), &(op->argument.vc_field.field_value_length), &violation)) {
 			FLAC__ASSERT(0 != violation);
-			fprintf(stderr, "ERROR (--%s): malformed vorbis comment field \"%s\",\n       %s\n", opt, option_argument, violation);
+			flac_fprintf(stderr, "ERROR (--%s): malformed vorbis comment field \"%s\",\n       %s\n", opt, option_argument, violation);
 			ok = false;
 		}
 	}
@@ -539,7 +562,7 @@ FLAC__bool parse_option(int option_index, const char *option_argument, CommandLi
 		op = append_shorthand_operation(options, OP__IMPORT_VC_FROM);
 		FLAC__ASSERT(0 != option_argument);
 		if(!parse_string(option_argument, &(op->argument.filename.value))) {
-			fprintf(stderr, "ERROR (--%s): missing filename\n", opt);
+			flac_fprintf(stderr, "ERROR (--%s): missing filename\n", opt);
 			ok = false;
 		}
 	}
@@ -547,19 +570,19 @@ FLAC__bool parse_option(int option_index, const char *option_argument, CommandLi
 		op = append_shorthand_operation(options, OP__EXPORT_VC_TO);
 		FLAC__ASSERT(0 != option_argument);
 		if(!parse_string(option_argument, &(op->argument.filename.value))) {
-			fprintf(stderr, "ERROR (--%s): missing filename\n", opt);
+			flac_fprintf(stderr, "ERROR (--%s): missing filename\n", opt);
 			ok = false;
 		}
 	}
 	else if(0 == strcmp(opt, "import-cuesheet-from")) {
 		if(0 != find_shorthand_operation(options, OP__IMPORT_CUESHEET_FROM)) {
-			fprintf(stderr, "ERROR (--%s): may be specified only once\n", opt);
+			flac_fprintf(stderr, "ERROR (--%s): may be specified only once\n", opt);
 			ok = false;
 		}
 		op = append_shorthand_operation(options, OP__IMPORT_CUESHEET_FROM);
 		FLAC__ASSERT(0 != option_argument);
 		if(!parse_string(option_argument, &(op->argument.import_cuesheet_from.filename))) {
-			fprintf(stderr, "ERROR (--%s): missing filename\n", opt);
+			flac_fprintf(stderr, "ERROR (--%s): missing filename\n", opt);
 			ok = false;
 		}
 	}
@@ -567,7 +590,7 @@ FLAC__bool parse_option(int option_index, const char *option_argument, CommandLi
 		op = append_shorthand_operation(options, OP__EXPORT_CUESHEET_TO);
 		FLAC__ASSERT(0 != option_argument);
 		if(!parse_string(option_argument, &(op->argument.filename.value))) {
-			fprintf(stderr, "ERROR (--%s): missing filename\n", opt);
+			flac_fprintf(stderr, "ERROR (--%s): missing filename\n", opt);
 			ok = false;
 		}
 	}
@@ -575,16 +598,16 @@ FLAC__bool parse_option(int option_index, const char *option_argument, CommandLi
 		op = append_shorthand_operation(options, OP__IMPORT_PICTURE_FROM);
 		FLAC__ASSERT(0 != option_argument);
 		if(!parse_string(option_argument, &(op->argument.specification.value))) {
-			fprintf(stderr, "ERROR (--%s): missing specification\n", opt);
+			flac_fprintf(stderr, "ERROR (--%s): missing specification\n", opt);
 			ok = false;
 		}
 	}
 	else if(0 == strcmp(opt, "export-picture-to")) {
-		const Argument *arg = find_argument(options, ARG__BLOCK_NUMBER);
+		arg = find_argument(options, ARG__BLOCK_NUMBER);
 		op = append_shorthand_operation(options, OP__EXPORT_PICTURE_TO);
 		FLAC__ASSERT(0 != option_argument);
 		if(!parse_string(option_argument, &(op->argument.export_picture_to.filename))) {
-			fprintf(stderr, "ERROR (--%s): missing filename\n", opt);
+			flac_fprintf(stderr, "ERROR (--%s): missing filename\n", opt);
 			ok = false;
 		}
 		op->argument.export_picture_to.block_number_link = arg? &(arg->value.block_number) : 0;
@@ -595,7 +618,7 @@ FLAC__bool parse_option(int option_index, const char *option_argument, CommandLi
 		FLAC__ASSERT(0 != option_argument);
 		if(!parse_add_seekpoint(option_argument, &spec, &violation)) {
 			FLAC__ASSERT(0 != violation);
-			fprintf(stderr, "ERROR (--%s): malformed seekpoint specification \"%s\",\n       %s\n", opt, option_argument, violation);
+			flac_fprintf(stderr, "ERROR (--%s): malformed seekpoint specification \"%s\",\n       %s\n", opt, option_argument, violation);
 			ok = false;
 		}
 		else {
@@ -609,6 +632,9 @@ FLAC__bool parse_option(int option_index, const char *option_argument, CommandLi
 	}
 	else if(0 == strcmp(opt, "add-replay-gain")) {
 		(void) append_shorthand_operation(options, OP__ADD_REPLAY_GAIN);
+	}
+	else if(0 == strcmp(opt, "scan-replay-gain")) {
+		(void) append_shorthand_operation(options, OP__SCAN_REPLAY_GAIN);
 	}
 	else if(0 == strcmp(opt, "remove-replay-gain")) {
 		const FLAC__byte * const tags[5] = {
@@ -628,7 +654,7 @@ FLAC__bool parse_option(int option_index, const char *option_argument, CommandLi
 		op = append_shorthand_operation(options, OP__ADD_PADDING);
 		FLAC__ASSERT(0 != option_argument);
 		if(!parse_add_padding(option_argument, &(op->argument.add_padding.length))) {
-			fprintf(stderr, "ERROR (--%s): illegal length \"%s\", length must be >= 0 and < 2^%u\n", opt, option_argument, FLAC__STREAM_METADATA_LENGTH_LEN);
+			flac_fprintf(stderr, "ERROR (--%s): illegal length \"%s\", length must be >= 0 and < 2^%u\n", opt, option_argument, FLAC__STREAM_METADATA_LENGTH_LEN);
 			ok = false;
 		}
 	}
@@ -660,7 +686,7 @@ FLAC__bool parse_option(int option_index, const char *option_argument, CommandLi
 		arg = append_argument(options, ARG__BLOCK_NUMBER);
 		FLAC__ASSERT(0 != option_argument);
 		if(!parse_block_number(option_argument, &(arg->value.block_number))) {
-			fprintf(stderr, "ERROR: malformed block number specification \"%s\"\n", option_argument);
+			flac_fprintf(stderr, "ERROR: malformed block number specification \"%s\"\n", option_argument);
 			ok = false;
 		}
 	}
@@ -668,7 +694,7 @@ FLAC__bool parse_option(int option_index, const char *option_argument, CommandLi
 		arg = append_argument(options, ARG__BLOCK_TYPE);
 		FLAC__ASSERT(0 != option_argument);
 		if(!parse_block_type(option_argument, &(arg->value.block_type))) {
-			fprintf(stderr, "ERROR (--%s): malformed block type specification \"%s\"\n", opt, option_argument);
+			flac_fprintf(stderr, "ERROR (--%s): malformed block type specification \"%s\"\n", opt, option_argument);
 			ok = false;
 		}
 		options->args.checks.has_block_type = true;
@@ -677,7 +703,7 @@ FLAC__bool parse_option(int option_index, const char *option_argument, CommandLi
 		arg = append_argument(options, ARG__EXCEPT_BLOCK_TYPE);
 		FLAC__ASSERT(0 != option_argument);
 		if(!parse_block_type(option_argument, &(arg->value.block_type))) {
-			fprintf(stderr, "ERROR (--%s): malformed block type specification \"%s\"\n", opt, option_argument);
+			flac_fprintf(stderr, "ERROR (--%s): malformed block type specification \"%s\"\n", opt, option_argument);
 			ok = false;
 		}
 		options->args.checks.has_except_block_type = true;
@@ -686,14 +712,16 @@ FLAC__bool parse_option(int option_index, const char *option_argument, CommandLi
 		arg = append_argument(options, ARG__DATA_FORMAT);
 		FLAC__ASSERT(0 != option_argument);
 		if(!parse_data_format(option_argument, &(arg->value.data_format))) {
-			fprintf(stderr, "ERROR (--%s): illegal data format \"%s\"\n", opt, option_argument);
+			flac_fprintf(stderr, "ERROR (--%s): illegal data format \"%s\"\n", opt, option_argument);
 			ok = false;
 		}
+		options->data_format_is_binary = arg->value.data_format.is_binary;
+		options->data_format_is_binary_headerless = arg->value.data_format.is_headerless;
 	}
 	else if(0 == strcmp(opt, "application-data-format")) {
 		FLAC__ASSERT(0 != option_argument);
 		if(!parse_application_data_format(option_argument, &(options->application_data_format_is_hexdump))) {
-			fprintf(stderr, "ERROR (--%s): illegal application data format \"%s\"\n", opt, option_argument);
+			flac_fprintf(stderr, "ERROR (--%s): illegal application data format \"%s\"\n", opt, option_argument);
 			ok = false;
 		}
 	}
@@ -713,16 +741,16 @@ void append_new_operation(CommandLineOptions *options, Operation operation)
 {
 	if(options->ops.capacity == 0) {
 		options->ops.capacity = 50;
-		if(0 == (options->ops.operations = (Operation*)malloc(sizeof(Operation) * options->ops.capacity)))
+		if(0 == (options->ops.operations = malloc(sizeof(Operation) * options->ops.capacity)))
 			die("out of memory allocating space for option list");
 		memset(options->ops.operations, 0, sizeof(Operation) * options->ops.capacity);
 	}
 	if(options->ops.capacity <= options->ops.num_operations) {
 		unsigned original_capacity = options->ops.capacity;
-		if(options->ops.capacity > SIZE_MAX / 2) /* overflow check */
+		if(options->ops.capacity > UINT32_MAX / 2) /* overflow check */
 			die("out of memory allocating space for option list");
 		options->ops.capacity *= 2;
-		if(0 == (options->ops.operations = (Operation*)safe_realloc_mul_2op_(options->ops.operations, sizeof(Operation), /*times*/options->ops.capacity)))
+		if(0 == (options->ops.operations = safe_realloc_mul_2op_(options->ops.operations, sizeof(Operation), /*times*/options->ops.capacity)))
 			die("out of memory allocating space for option list");
 		memset(options->ops.operations + original_capacity, 0, sizeof(Operation) * (options->ops.capacity - original_capacity));
 	}
@@ -734,16 +762,16 @@ void append_new_argument(CommandLineOptions *options, Argument argument)
 {
 	if(options->args.capacity == 0) {
 		options->args.capacity = 50;
-		if(0 == (options->args.arguments = (Argument*)malloc(sizeof(Argument) * options->args.capacity)))
+		if(0 == (options->args.arguments = malloc(sizeof(Argument) * options->args.capacity)))
 			die("out of memory allocating space for option list");
 		memset(options->args.arguments, 0, sizeof(Argument) * options->args.capacity);
 	}
 	if(options->args.capacity <= options->args.num_arguments) {
 		unsigned original_capacity = options->args.capacity;
-		if(options->args.capacity > SIZE_MAX / 2) /* overflow check */
+		if(options->args.capacity > UINT32_MAX / 2) /* overflow check */
 			die("out of memory allocating space for option list");
 		options->args.capacity *= 2;
-		if(0 == (options->args.arguments = (Argument*)safe_realloc_mul_2op_(options->args.arguments, sizeof(Argument), /*times*/options->args.capacity)))
+		if(0 == (options->args.arguments = safe_realloc_mul_2op_(options->args.arguments, sizeof(Argument), /*times*/options->args.capacity)))
 			die("out of memory allocating space for option list");
 		memset(options->args.arguments + original_capacity, 0, sizeof(Argument) * (options->args.capacity - original_capacity));
 	}
@@ -840,34 +868,12 @@ FLAC__bool parse_uint32(const char *src, FLAC__uint32 *dest)
 	return true;
 }
 
-#ifdef _MSC_VER
-/* There's no strtoull() in MSVC6 so we just write a specialized one */
-static FLAC__uint64 local__strtoull(const char *src)
-{
-	FLAC__uint64 ret = 0;
-	int c;
-	FLAC__ASSERT(0 != src);
-	while(0 != (c = *src++)) {
-		c -= '0';
-		if(c >= 0 && c <= 9)
-			ret = (ret * 10) + c;
-		else
-			break;
-	}
-	return ret;
-}
-#endif
-
 FLAC__bool parse_uint64(const char *src, FLAC__uint64 *dest)
 {
 	FLAC__ASSERT(0 != src);
 	if(strlen(src) == 0 || strspn(src, "0123456789") != strlen(src))
 		return false;
-#ifdef _MSC_VER
-	*dest = local__strtoull(src);
-#else
 	*dest = strtoull(src, 0, 10);
-#endif
 	return true;
 }
 
@@ -898,6 +904,29 @@ FLAC__bool parse_vorbis_comment_field_name(const char *field_ref, char **name, c
 	}
 
 	*name = s;
+
+	return true;
+}
+
+FLAC__bool parse_vorbis_comment_field_names(const char *field_ref, char **names, const char **violation)
+{
+	static const char * const violations[] = {
+		"field name contains invalid character"
+	};
+
+	char *q, *s;
+
+	s = local_strdup(field_ref);
+
+	for(q = s; *q; q++) {
+		if(*q < 0x20 || *q > 0x7d) {
+			free(s);
+			*violation = violations[0];
+			return false;
+		}
+	}
+
+	*names = s;
 
 	return true;
 }
@@ -974,7 +1003,7 @@ FLAC__bool parse_block_number(const char *in, Argument_BlockNumber *out)
 
 	/* make space */
 	FLAC__ASSERT(out->num_entries > 0);
-	if(0 == (out->entries = (unsigned*)safe_malloc_mul_2op_(sizeof(unsigned), /*times*/out->num_entries)))
+	if(0 == (out->entries = safe_malloc_mul_2op_(sizeof(unsigned), /*times*/out->num_entries)))
 		die("out of memory allocating space for option list");
 
 	/* load 'em up */
@@ -1013,7 +1042,7 @@ FLAC__bool parse_block_type(const char *in, Argument_BlockType *out)
 
 	/* make space */
 	FLAC__ASSERT(out->num_entries > 0);
-	if(0 == (out->entries = (Argument_BlockTypeEntry*)safe_malloc_mul_2op_(sizeof(Argument_BlockTypeEntry), /*times*/out->num_entries)))
+	if(0 == (out->entries = safe_malloc_mul_2op_(sizeof(Argument_BlockTypeEntry), /*times*/out->num_entries)))
 		die("out of memory allocating space for option list");
 
 	/* load 'em up */
@@ -1040,10 +1069,10 @@ FLAC__bool parse_block_type(const char *in, Argument_BlockType *out)
 			out->entries[entry].type = FLAC__METADATA_TYPE_APPLICATION;
 			out->entries[entry].filter_application_by_id = (0 != r);
 			if(0 != r) {
-				if(strlen(r) == 4) {
-					strcpy(out->entries[entry].application_id, r);
+				if(strlen(r) == sizeof (out->entries[entry].application_id)) {
+					memcpy(out->entries[entry].application_id, r, sizeof (out->entries[entry].application_id));
 				}
-				else if(strlen(r) == 10 && strncmp(r, "0x", 2) == 0 && strspn(r+2, "0123456789ABCDEFabcdef") == 8) {
+				else if(strlen(r) == 10 && FLAC__STRNCASECMP(r, "0x", 2) == 0 && strspn(r+2, "0123456789ABCDEFabcdef") == 8) {
 					FLAC__uint32 x = strtoul(r+2, 0, 16);
 					out->entries[entry].application_id[3] = (FLAC__byte)(x & 0xff);
 					out->entries[entry].application_id[2] = (FLAC__byte)((x>>=8) & 0xff);
@@ -1083,10 +1112,18 @@ FLAC__bool parse_block_type(const char *in, Argument_BlockType *out)
 
 FLAC__bool parse_data_format(const char *in, Argument_DataFormat *out)
 {
-	if(0 == strcmp(in, "binary"))
-		out->is_binary = true;
-	else if(0 == strcmp(in, "text"))
+	if(0 == strcmp(in, "binary-headerless")) {
 		out->is_binary = false;
+		out->is_headerless = true;
+	}
+	else if(0 == strcmp(in, "binary")) {
+		out->is_binary = true;
+		out->is_headerless = false;
+	}
+	else if(0 == strcmp(in, "text")) {
+		out->is_binary = false;
+		out->is_headerless = false;
+	}
 	else
 		return false;
 	return true;
@@ -1105,5 +1142,5 @@ FLAC__bool parse_application_data_format(const char *in, FLAC__bool *out)
 
 void undocumented_warning(const char *opt)
 {
-	fprintf(stderr, "WARNING: undocmented option --%s should be used with caution,\n         only for repairing a damaged STREAMINFO block\n", opt);
+	flac_fprintf(stderr, "WARNING: undocumented option --%s should be used with caution,\n         only for repairing a damaged STREAMINFO block\n", opt);
 }

@@ -1,5 +1,6 @@
 /* test_libFLAC++ - Unit tester for libFLAC++
- * Copyright (C) 2002,2003,2004,2005,2006,2007  Josh Coalson
+ * Copyright (C) 2002-2009  Josh Coalson
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -11,16 +12,21 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "FLAC/assert.h"
-#include "FLAC++/metadata.h"
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <stdio.h>
 #include <stdlib.h> /* for malloc() */
 #include <string.h> /* for memcmp() */
+#include "FLAC/assert.h"
+#include "FLAC++/metadata.h"
+#include "share/safe_str.h"
 
 static ::FLAC__StreamMetadata streaminfo_, padding_, seektable_, application_, vorbiscomment_, cuesheet_, picture_;
 
@@ -34,7 +40,7 @@ static void *malloc_or_die_(size_t size)
 {
 	void *x = malloc(size);
 	if(0 == x) {
-		fprintf(stderr, "ERROR: out of memory allocating %u bytes\n", (unsigned)size);
+		fprintf(stderr, "ERROR: out of memory allocating %u bytes\n", (uint32_t)size);
 		exit(1);
 	}
 	return x;
@@ -50,18 +56,18 @@ static char *strdup_or_die_(const char *s)
 	return x;
 }
 
-static bool index_is_equal_(const ::FLAC__StreamMetadata_CueSheet_Index &index, const ::FLAC__StreamMetadata_CueSheet_Index &indexcopy)
+static bool index_is_equal_(const ::FLAC__StreamMetadata_CueSheet_Index &indx, const ::FLAC__StreamMetadata_CueSheet_Index &indxcopy)
 {
-	if(indexcopy.offset != index.offset)
+	if(indxcopy.offset != indx.offset)
 		return false;
-	if(indexcopy.number != index.number)
+	if(indxcopy.number != indx.number)
 		return false;
 	return true;
 }
 
 static bool track_is_equal_(const ::FLAC__StreamMetadata_CueSheet_Track *track, const ::FLAC__StreamMetadata_CueSheet_Track *trackcopy)
 {
-	unsigned i;
+	uint32_t i;
 
 	if(trackcopy->offset != track->offset)
 		return false;
@@ -243,7 +249,7 @@ static void free_metadata_blocks_()
 
 bool test_metadata_object_streaminfo()
 {
-	unsigned expected_length;
+	uint32_t expected_length;
 
 	printf("testing class FLAC::Metadata::StreamInfo\n");
 
@@ -476,7 +482,7 @@ bool test_metadata_object_streaminfo()
 
 bool test_metadata_object_padding()
 {
-	unsigned expected_length;
+	uint32_t expected_length;
 
 	printf("testing class FLAC::Metadata::Padding\n");
 
@@ -637,7 +643,7 @@ bool test_metadata_object_padding()
 
 bool test_metadata_object_application()
 {
-	unsigned expected_length;
+	uint32_t expected_length;
 
 	printf("testing class FLAC::Metadata::Application\n");
 
@@ -807,7 +813,7 @@ bool test_metadata_object_application()
 
 bool test_metadata_object_seektable()
 {
-	unsigned expected_length;
+	uint32_t expected_length;
 
 	printf("testing class FLAC::Metadata::SeekTable\n");
 
@@ -1006,7 +1012,7 @@ bool test_metadata_object_seektable()
 
 bool test_metadata_object_vorbiscomment()
 {
-	unsigned expected_length;
+	uint32_t expected_length;
 
 	printf("testing class FLAC::Metadata::VorbisComment::Entry\n");
 
@@ -1021,7 +1027,7 @@ bool test_metadata_object_vorbiscomment()
 	}
 	printf("OK\n");
 
-	printf("testing Entry::Entry(const char *field, unsigned field_length)... ");
+	printf("testing Entry::Entry(const char *field, uint32_t field_length)... ");
 	FLAC::Metadata::VorbisComment::Entry entry2("name2=value2", strlen("name2=value2"));
 	if(!entry2.is_valid())
 		return die_("!is_valid()");
@@ -1037,7 +1043,7 @@ bool test_metadata_object_vorbiscomment()
 		printf("OK\n");
 	}
 
-	printf("testing Entry::Entry(const char *field_name, const char *field_value, unsigned field_value_length)... ");
+	printf("testing Entry::Entry(const char *field_name, const char *field_value, uint32_t field_value_length)... ");
 	FLAC::Metadata::VorbisComment::Entry entry3("name3", "value3", strlen("value3"));
 	if(!entry3.is_valid())
 		return die_("!is_valid()");
@@ -1119,7 +1125,7 @@ bool test_metadata_object_vorbiscomment()
 		return die_("entry mismatch");
 	printf("OK\n");
 
-	printf("testing Entry::set_field_value(const char *field_value, unsigned field_value_length)... ");
+	printf("testing Entry::set_field_value(const char *field_value, uint32_t field_value_length)... ");
 	if(!entry1.set_field_value("value1", strlen("value1")))
 		return die_("returned false");
 	if(0 != memcmp(entry1.get_field_value(), "value1", strlen("value1")))
@@ -1137,7 +1143,7 @@ bool test_metadata_object_vorbiscomment()
 		return die_("entry mismatch");
 	printf("OK\n");
 
-	printf("testing Entry::set_field(const char *field, unsigned field_length)... ");
+	printf("testing Entry::set_field(const char *field, uint32_t field_length)... ");
 	if(!entry1.set_field("name0=value0", strlen("name0=value0")))
 		return die_("returned false");
 	if(0 != memcmp(entry1.get_field_name(), "name0", strlen("name0")))
@@ -1422,7 +1428,7 @@ bool test_metadata_object_vorbiscomment()
 
 bool test_metadata_object_cuesheet()
 {
-	unsigned expected_length;
+	uint32_t expected_length;
 
 	printf("testing class FLAC::Metadata::CueSheet::Track\n");
 
@@ -1694,7 +1700,7 @@ bool test_metadata_object_cuesheet()
 	{
 		char mcn[129];
 		memset(mcn, 0, sizeof(mcn));
-		strcpy(mcn, "1234567890123");
+		safe_strncpy(mcn, "1234567890123", sizeof(mcn));
 		block.set_media_catalog_number(mcn);
 		if(0 != memcmp(block.get_media_catalog_number(), mcn, sizeof(mcn)))
 			return die_("value mismatch");
@@ -1801,7 +1807,7 @@ bool test_metadata_object_cuesheet()
 
 bool test_metadata_object_picture()
 {
-	unsigned expected_length;
+	uint32_t expected_length;
 
 	printf("testing class FLAC::Metadata::Picture\n");
 
@@ -2020,7 +2026,7 @@ bool test_metadata_object_picture()
 	printf("testing Picture::set_colors()... +\n");
 	printf("        Picture::get_colors()... ");
 	block.set_colors(1u>16);
-	if(block.get_colors() != 1u>16)
+	if(block.get_colors() != (1u>16))
 		return die_("value mismatch, expected 2^16");
 	printf("OK\n");
 

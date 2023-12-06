@@ -1,5 +1,6 @@
 /* libFLAC - Free Lossless Audio Codec
- * Copyright (C) 2002,2003,2004,2005,2006,2007  Josh Coalson
+ * Copyright (C) 2002-2009  Josh Coalson
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -45,7 +46,7 @@ typedef struct FLAC__OggDecoderAspect {
 	/* these are for internal state related to Ogg decoding */
 	ogg_stream_state stream_state;
 	ogg_sync_state sync_state;
-	unsigned version_major, version_minor;
+	uint32_t version_major, version_minor;
 	FLAC__bool need_serial_number;
 	FLAC__bool end_of_stream;
 	FLAC__bool have_working_page; /* only if true will the following vars be valid */

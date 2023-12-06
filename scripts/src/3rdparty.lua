@@ -666,25 +666,69 @@ if _OPTIONS["vs"]=="intel-15" then
 		}
 end
 
-	configuration { "mingw-clang" }
-		buildoptions {
-			"-include stdint.h"
+	configuration { "mingw*" }
+		defines {
+			"HAVE_FSEEKO",
+		}
+
+	configuration { "Release" }
+		defines {
+			"NDEBUG",
 		}
 
 	configuration { }
 		defines {
-			"WORDS_BIGENDIAN=0",
-			"FLAC__NO_ASM",
-			"_LARGEFILE_SOURCE",
-			"_FILE_OFFSET_BITS=64",
+			"HAVE_CONFIG_H", -- mostly because PACKAGE_VERSION is a pain to do otherwise
+			"ENABLE_64_BIT_WORDS=1",
+			"OGG_FOUND=0",
 			"FLAC__HAS_OGG=0",
-			"HAVE_CONFIG_H=1",
+			"HAVE_LROUND=1",
+			"HAVE_INTTYPES_H",
+			"HAVE_STDBOOL_H",
+			"HAVE_STDINT_H",
+			"HAVE_STDIO_H",
+			"HAVE_STDLIB_H",
+			"HAVE_STRING_H",
+			"_FILE_OFFSET_BITS=64",
+			"_LARGEFILE_SOURCE",
 		}
+
+		if _OPTIONS["gcc"]~=nil then
+			defines {
+				"HAVE_BSWAP16",
+				"HAVE_BSWAP32",
+			}
+		end
+
+		if _OPTIONS["BIGENDIAN"]=="1" then
+			defines {
+				"CPU_IS_BIG_ENDIAN=1",
+				"CPU_IS_LITTLE_ENDIAN=0",
+				"WORDS_BIGENDIAN=1",
+			}
+		else
+			defines {
+				"CPU_IS_BIG_ENDIAN=0",
+				"CPU_IS_LITTLE_ENDIAN=1",
+				"WORDS_BIGENDIAN=0",
+			}
+		end
+
+		if _OPTIONS["targetos"]=="macosx" then
+			defines {
+				"FLAC__SYS_DARWIN",
+			}
+		elseif _OPTIONS["targetos"]=="linux" then
+			defines {
+				"FLAC__SYS_LINUX",
+			}
+		end
+
 
 	configuration { "gmake or ninja" }
 		buildoptions_c {
-			"-Wno-unused-function",
-			"-O0",
+			"-Wno-error=bad-function-cast",
+			"-Wno-error=unused-function",
 		}
 	if _OPTIONS["gcc"]~=nil and (string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "android")) then
 		buildoptions {
@@ -710,16 +754,34 @@ end
 		MAME_DIR .. "3rdparty/libflac/src/libFLAC/cpu.c",
 		MAME_DIR .. "3rdparty/libflac/src/libFLAC/crc.c",
 		MAME_DIR .. "3rdparty/libflac/src/libFLAC/fixed.c",
+		MAME_DIR .. "3rdparty/libflac/src/libFLAC/fixed_intrin_avx2.c",
+		MAME_DIR .. "3rdparty/libflac/src/libFLAC/fixed_intrin_sse2.c",
+		MAME_DIR .. "3rdparty/libflac/src/libFLAC/fixed_intrin_sse42.c",
+		MAME_DIR .. "3rdparty/libflac/src/libFLAC/fixed_intrin_ssse3.c",
 		MAME_DIR .. "3rdparty/libflac/src/libFLAC/float.c",
 		MAME_DIR .. "3rdparty/libflac/src/libFLAC/format.c",
 		MAME_DIR .. "3rdparty/libflac/src/libFLAC/lpc.c",
+		MAME_DIR .. "3rdparty/libflac/src/libFLAC/lpc_intrin_avx2.c",
+		MAME_DIR .. "3rdparty/libflac/src/libFLAC/lpc_intrin_fma.c",
+		MAME_DIR .. "3rdparty/libflac/src/libFLAC/lpc_intrin_neon.c",
+		MAME_DIR .. "3rdparty/libflac/src/libFLAC/lpc_intrin_sse2.c",
+		MAME_DIR .. "3rdparty/libflac/src/libFLAC/lpc_intrin_sse41.c",
 		MAME_DIR .. "3rdparty/libflac/src/libFLAC/md5.c",
 		MAME_DIR .. "3rdparty/libflac/src/libFLAC/memory.c",
 		MAME_DIR .. "3rdparty/libflac/src/libFLAC/stream_decoder.c",
 		MAME_DIR .. "3rdparty/libflac/src/libFLAC/stream_encoder.c",
 		MAME_DIR .. "3rdparty/libflac/src/libFLAC/stream_encoder_framing.c",
+		MAME_DIR .. "3rdparty/libflac/src/libFLAC/stream_encoder_intrin_avx2.c",
+		MAME_DIR .. "3rdparty/libflac/src/libFLAC/stream_encoder_intrin_sse2.c",
+		MAME_DIR .. "3rdparty/libflac/src/libFLAC/stream_encoder_intrin_ssse3.c",
 		MAME_DIR .. "3rdparty/libflac/src/libFLAC/window.c",
 	}
+
+	if _OPTIONS["targetos"]=="windows" then
+		files {
+			MAME_DIR .. "3rdparty/libflac/src/share/win_utf8_io/win_utf8_io.c",
+		}
+	end
 else
 links {
 	ext_lib("flac"),

@@ -1,5 +1,6 @@
 /* metaflac - Command-line FLAC metadata editor
- * Copyright (C) 2001,2002,2003,2004,2005,2006,2007  Josh Coalson
+ * Copyright (C) 2001-2009  Josh Coalson
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -11,9 +12,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 #ifndef metaflac__options_h
@@ -53,6 +54,7 @@ typedef enum {
 	OP__SHOW_VC_VENDOR,
 	OP__SHOW_VC_FIELD,
 	OP__REMOVE_VC_ALL,
+	OP__REMOVE_VC_ALL_EXCEPT,
 	OP__REMOVE_VC_FIELD,
 	OP__REMOVE_VC_FIRSTFIELD,
 	OP__SET_VC_FIELD,
@@ -64,6 +66,7 @@ typedef enum {
 	OP__EXPORT_PICTURE_TO,
 	OP__ADD_SEEKPOINT,
 	OP__ADD_REPLAY_GAIN,
+	OP__SCAN_REPLAY_GAIN,
 	OP__ADD_PADDING,
 	OP__LIST,
 	OP__APPEND,
@@ -128,6 +131,7 @@ typedef struct {
 
 typedef struct {
 	FLAC__bool is_binary;
+	FLAC__bool is_headerless;
 } Argument_DataFormat;
 
 typedef struct {
@@ -187,6 +191,8 @@ typedef struct {
 	FLAC__bool cued_seekpoints;
 	FLAC__bool show_long_help;
 	FLAC__bool show_version;
+	FLAC__bool data_format_is_binary;
+	FLAC__bool data_format_is_binary_headerless;
 	FLAC__bool application_data_format_is_hexdump;
 	struct {
 		Operation *operations;

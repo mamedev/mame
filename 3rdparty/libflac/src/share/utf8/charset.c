@@ -1,19 +1,19 @@
 /*
  * Copyright (C) 2001 Edmund Grimley Evans <edmundo@rano.org>
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 /*
@@ -27,11 +27,11 @@
  * 8-bit char, 16-bit short and 32-bit int.
  */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #  include <config.h>
 #endif
 
-#ifndef HAVE_ICONV /* should be ifdef USE_CHARSET_CONVERT */
+#if !defined _WIN32 && !defined HAVE_ICONV /* should be && defined USE_CHARSET_CONVERT */
 
 #include <stdlib.h>
 
@@ -56,7 +56,7 @@ static int ascii_strcasecmp(const char *s1, const char *s2)
   char c1, c2;
 
   for (;; s1++, s2++) {
-    if (!*s1 || !*s1)
+    if (!*s1 || !*s2)
       break;
     if (*s1 == *s2)
       continue;
@@ -69,7 +69,7 @@ static int ascii_strcasecmp(const char *s1, const char *s2)
     if (c1 != c2)
       break;
   }
-  return (unsigned char)*s1 - (unsigned char)*s2;
+  return (uint8_t)*s1 - (uint8_t)*s2;
 }
 
 /*
@@ -78,7 +78,7 @@ static int ascii_strcasecmp(const char *s1, const char *s2)
 
 int utf8_mbtowc(int *pwc, const char *s, size_t n)
 {
-  unsigned char c;
+  uint8_t c;
   int wc, i, k;
 
   if (!n || !s)
@@ -129,7 +129,7 @@ int utf8_mbtowc(int *pwc, const char *s, size_t n)
 
 int utf8_wctomb(char *s, int wc1)
 {
-  unsigned int wc = wc1;
+  uint32_t wc = wc1;
 
   if (!s)
     return 0;
@@ -231,7 +231,7 @@ static int mbtowc_ascii(void *map, int *pwc, const char *s, size_t n)
   (void)map;
   if (!n || !s)
     return 0;
-  wc = (unsigned char)*s;
+  wc = (uint8_t)*s;
   if (wc & ~0x7f)
     return -1;
   if (pwc)
@@ -263,7 +263,7 @@ static int mbtowc_iso1(void *map, int *pwc, const char *s, size_t n)
   (void)map;
   if (!n || !s)
     return 0;
-  wc = (unsigned char)*s;
+  wc = (uint8_t)*s;
   if (wc & ~0xff)
     return -1;
   if (pwc)
@@ -287,18 +287,18 @@ static int wctomb_iso1(void *map, char *s, int wc)
  */
 
 struct map {
-  const unsigned short *from;
+  const uint16_t *from;
   struct inverse_map *to;
 };
 
 static int mbtowc_8bit(void *map1, int *pwc, const char *s, size_t n)
 {
   struct map *map = map1;
-  unsigned short wc;
+  uint16_t wc;
 
   if (!n || !s)
     return 0;
-  wc = map->from[(unsigned char)*s];
+  wc = map->from[(uint8_t)*s];
   if (wc == 0xffff)
     return -1;
   if (pwc)
@@ -316,8 +316,8 @@ static int mbtowc_8bit(void *map1, int *pwc, const char *s, size_t n)
  */
 
 struct inverse_map {
-  unsigned char first[256];
-  unsigned char next[256];
+  uint8_t first[256];
+  uint8_t next[256];
 };
 
 /*
@@ -328,13 +328,13 @@ struct inverse_map {
 /* #define HASH(i) 0 */
 /* #define HASH(i) 99 */
 
-static struct inverse_map *make_inverse_map(const unsigned short *from)
+static struct inverse_map *make_inverse_map(const uint16_t *from)
 {
   struct inverse_map *to;
   char used[256];
   int i, j, k;
 
-  to = (struct inverse_map *)malloc(sizeof(struct inverse_map));
+  to = malloc(sizeof(struct inverse_map));
   if (!to)
     return 0;
   for (i = 0; i < 256; i++)
@@ -359,10 +359,10 @@ static struct inverse_map *make_inverse_map(const unsigned short *from)
   return to;
 }
 
-int wctomb_8bit(void *map1, char *s, int wc1)
+static int wctomb_8bit(void *map1, char *s, int wc1)
 {
   struct map *map = map1;
-  unsigned short wc = wc1;
+  uint16_t wc = wc1;
   int i;
 
   if (!s)
@@ -447,9 +447,9 @@ struct charset *charset_find(const char *code)
   for (i = 0; maps[i].name; i++)
     if (!ascii_strcasecmp(code, maps[i].name)) {
       if (!maps[i].charset) {
-	maps[i].charset = (struct charset *)malloc(sizeof(struct charset));
+	maps[i].charset = malloc(sizeof(struct charset));
 	if (maps[i].charset) {
-	  struct map *map = (struct map *)malloc(sizeof(struct map));
+	  struct map *map = malloc(sizeof(struct map));
 	  if (!map) {
 	    free(maps[i].charset);
 	    maps[i].charset = 0;
@@ -485,7 +485,7 @@ int charset_convert(const char *fromcode, const char *tocode,
 {
   int ret = 0;
   struct charset *charset1, *charset2;
-  char *tobuf, *p, *newbuf;
+  char *tobuf, *p;
   int i, j, wc;
 
   charset1 = charset_find(fromcode);
@@ -493,7 +493,7 @@ int charset_convert(const char *fromcode, const char *tocode,
   if (!charset1 || !charset2 )
     return -1;
 
-  tobuf = (char *)safe_malloc_mul2add_(fromlen, /*times*/charset2->max, /*+*/1);
+  tobuf = safe_malloc_mul2add_(fromlen, /*times*/charset2->max, /*+*/1);
   if (!tobuf)
     return -2;
 
@@ -520,8 +520,10 @@ int charset_convert(const char *fromcode, const char *tocode,
     *tolen = p - tobuf;
   *p++ = '\0';
   if (to) {
-    newbuf = realloc(tobuf, p - tobuf);
-    *to = newbuf ? newbuf : tobuf;
+    char *tobuf_saved = tobuf;
+    *to = realloc(tobuf, p - tobuf);
+    if (*to == NULL)
+      *to = tobuf_saved;
   }
   else
     free(tobuf);

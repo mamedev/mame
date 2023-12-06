@@ -1,5 +1,6 @@
 /* metaflac - Command-line FLAC metadata editor
- * Copyright (C) 2001,2002,2003,2004,2005,2006,2007  Josh Coalson
+ * Copyright (C) 2001-2009  Josh Coalson
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -11,20 +12,27 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #  include <config.h>
 #endif
 
 #include "operations.h"
 #include "options.h"
 #include <locale.h>
+#include <stdlib.h>
+#include <string.h>
+#include "share/compat.h"
 
+#ifndef FUZZ_TOOL_METAFLAC
 int main(int argc, char *argv[])
+#else
+static int main_to_fuzz(int argc, char *argv[])
+#endif
 {
 	CommandLineOptions options;
 	int ret = 0;
@@ -33,11 +41,30 @@ int main(int argc, char *argv[])
 	_response(&argc, &argv);
 	_wildcard(&argc, &argv);
 #endif
+#ifdef _WIN32
+	if (get_utf8_argv(&argc, &argv) != 0) {
+		fputs("ERROR: failed to convert command line parameters to UTF-8\n", stderr);
+		return 1;
+	}
+#endif
 
+#ifdef _WIN32
+	{
+		const char *var;
+		var = getenv("LC_ALL");
+		if (!var)
+			var = getenv("LC_NUMERIC");
+		if (!var)
+			var = getenv("LANG");
+		if (!var || strcmp(var, "C") != 0)
+			setlocale(LC_ALL, "");
+	}
+#else
 	setlocale(LC_ALL, "");
+#endif
 	init_options(&options);
 
-	if(parse_options(argc, argv, &options))
+	if ((ret = parse_options(argc, argv, &options)) == 0)
 		ret = !do_operations(&options);
 	else
 		ret = 1;

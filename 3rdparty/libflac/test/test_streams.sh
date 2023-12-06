@@ -1,10 +1,11 @@
-#!/bin/sh
+#!/bin/sh -e
 
 #  FLAC - Free Lossless Audio Codec
-#  Copyright (C) 2001,2002,2003,2004,2005,2006,2007  Josh Coalson
+#  Copyright (C) 2001-2009  Josh Coalson
+#  Copyright (C) 2011-2023  Xiph.Org Foundation
 #
 #  This file is part the FLAC project.  FLAC is comprised of several
-#  components distributed under difference licenses.  The codec libraries
+#  components distributed under different licenses.  The codec libraries
 #  are distributed under Xiph.Org's BSD-like license (see the file
 #  COPYING.Xiph in this distribution).  All other programs, libraries, and
 #  plugins are distributed under the GPL (see COPYING.GPL).  The documentation
@@ -17,43 +18,31 @@
 #  restrictive of those mentioned above.  See the file COPYING.Xiph in this
 #  distribution.
 
-die ()
-{
-	echo $* 1>&2
-	exit 1
-}
+. ./common.sh
 
-if [ x = x"$1" ] ; then 
-	BUILD=debug
-else
-	BUILD="$1"
-fi
-
-LD_LIBRARY_PATH=../obj/$BUILD/lib:$LD_LIBRARY_PATH
-export LD_LIBRARY_PATH
 PATH=../src/flac:$PATH
 PATH=../src/test_streams:$PATH
-PATH=../obj/$BUILD/bin:$PATH
+PATH=../objs/$BUILD/bin:$PATH
 
-if [ x"$FLAC__TEST_LEVEL" = x ] ; then
+if [ -z "$FLAC__TEST_LEVEL" ] ; then
 	FLAC__TEST_LEVEL=1
 fi
 
-flac --help 1>/dev/null 2>/dev/null || die "ERROR can't find flac executable"
+flac${EXE} --help 1>/dev/null 2>/dev/null || die "ERROR can't find flac executable"
 
 run_flac ()
 {
-	if [ x"$FLAC__TEST_WITH_VALGRIND" = xyes ] ; then
-		echo "valgrind --leak-check=yes --show-reachable=yes --num-callers=100 flac $*" >>test_streams.valgrind.log
-		valgrind --leak-check=yes --show-reachable=yes --num-callers=100 --log-fd=4 flac $* 4>>test_streams.valgrind.log
+	if [ "$FLAC__TEST_WITH_VALGRIND" = yes ] ; then
+		echo "valgrind --leak-check=yes --show-reachable=yes --num-callers=50 flac $*" >>test_streams.valgrind.log
+		valgrind --leak-check=yes --show-reachable=yes --num-callers=50 --log-fd=4 flac --no-error-on-compression-fail $* 4>>test_streams.valgrind.log
 	else
-		flac $*
+		flac${EXE} --no-error-on-compression-fail $*
 	fi
 }
 
 echo "Generating streams..."
 if [ ! -f wacky1.wav ] ; then
-	test_streams || die "ERROR during test_streams"
+	test_streams || die "ERROR: missing files"
 fi
 
 #
@@ -67,13 +56,13 @@ test_file ()
 	bps=$3
 	encode_options="$4"
 
-	echo -n "$name (--channels=$channels --bps=$bps $encode_options): encode..."
+	echo $ECHO_N "$name (--channels=$channels --bps=$bps $encode_options): encode..." $ECHO_C
 	cmd="run_flac --verify --silent --force --force-raw-format --endian=little --sign=signed --sample-rate=44100 --bps=$bps --channels=$channels $encode_options --no-padding $name.raw"
 	echo "### ENCODE $name #######################################################" >> ./streams.log
 	echo "###    cmd=$cmd" >> ./streams.log
 	$cmd 2>>./streams.log || die "ERROR during encode of $name"
 
-	echo -n "decode..."
+	echo $ECHO_N "decode..." $ECHO_C
 	cmd="run_flac --silent --force --endian=little --sign=signed --decode --force-raw-format --output-name=$name.cmp $name.flac"
 	echo "### DECODE $name #######################################################" >> ./streams.log
 	echo "###    cmd=$cmd" >> ./streams.log
@@ -83,7 +72,7 @@ test_file ()
 	ls -1l $name.flac >> ./streams.log
 	ls -1l $name.cmp >> ./streams.log
 
-	echo -n "compare..."
+	echo $ECHO_N "compare..." $ECHO_C
 	cmp $name.raw $name.cmp || die "ERROR during compare of $name"
 
 	echo OK
@@ -96,13 +85,13 @@ test_file_piped ()
 	bps=$3
 	encode_options="$4"
 
-	if [ `env | grep -ic '^comspec='` != 0 ] ; then
+	if [ "$(env | grep -ic '^comspec=')" != 0 ] ; then
 		is_win=yes
 	else
 		is_win=no
 	fi
 
-	echo -n "$name: encode via pipes..."
+	echo $ECHO_N "$name: encode via pipes..." $ECHO_C
 	if [ $is_win = yes ] ; then
 		cmd="run_flac --verify --silent --force --force-raw-format --endian=little --sign=signed --sample-rate=44100 --bps=$bps --channels=$channels $encode_options --no-padding --stdout $name.raw"
 		echo "### ENCODE $name #######################################################" >> ./streams.log
@@ -112,9 +101,9 @@ test_file_piped ()
 		cmd="run_flac --verify --silent --force --force-raw-format --endian=little --sign=signed --sample-rate=44100 --bps=$bps --channels=$channels $encode_options --no-padding --stdout -"
 		echo "### ENCODE $name #######################################################" >> ./streams.log
 		echo "###    cmd=$cmd" >> ./streams.log
-		cat $name.raw | $cmd 1>$name.flac 2>>./streams.log || die "ERROR during encode of $name"
+		$cmd < $name.raw 1>$name.flac 2>>./streams.log || die "ERROR during encode of $name"
 	fi
-	echo -n "decode via pipes..."
+	echo $ECHO_N "decode via pipes..." $ECHO_C
 	if [ $is_win = yes ] ; then
 		cmd="run_flac --silent --force --endian=little --sign=signed --decode --force-raw-format --stdout $name.flac"
 		echo "### DECODE $name #######################################################" >> ./streams.log
@@ -124,14 +113,58 @@ test_file_piped ()
 		cmd="run_flac --silent --force --endian=little --sign=signed --decode --force-raw-format --stdout -"
 		echo "### DECODE $name #######################################################" >> ./streams.log
 		echo "###    cmd=$cmd" >> ./streams.log
-		cat $name.flac | $cmd 1>$name.cmp 2>>./streams.log || die "ERROR during decode of $name"
+		$cmd < $name.flac 1>$name.cmp 2>>./streams.log || die "ERROR during decode of $name"
 	fi
 	ls -1l $name.raw >> ./streams.log
 	ls -1l $name.flac >> ./streams.log
 	ls -1l $name.cmp >> ./streams.log
 
-	echo -n "compare..."
+	echo $ECHO_N "compare..." $ECHO_C
 	cmp $name.raw $name.cmp || die "ERROR during compare of $name"
+
+	echo OK
+}
+
+test_corrupted_file ()
+{
+	name=$1
+	channels=$2
+	bps=$3
+	encode_options="$4"
+
+	echo $ECHO_N "$name (--channels=$channels --bps=$bps $encode_options): encode..." $ECHO_C
+	cmd="run_flac --verify --silent --no-padding --force --force-raw-format --endian=little --sign=signed --sample-rate=44100 --bps=$bps --channels=$channels $encode_options --no-padding $name.raw"
+	echo "### ENCODE $name #######################################################" >> ./streams.log
+	echo "###    cmd=$cmd" >> ./streams.log
+	$cmd 2>>./streams.log || die "ERROR during encode of $name"
+
+	filesize=$(wc -c < $name.flac)
+	bs=$((filesize/13))
+
+	# Overwrite with 'garbagegarbagegarbage....'
+	yes garbage 2>/dev/null | dd of=$name.flac conv=notrunc bs=$bs seek=1 count=2 2>> ./streams.log
+	# Overwrite with 0x00
+	dd if=/dev/zero of=$name.flac conv=notrunc bs=$bs seek=4 count=2 2>> ./streams.log
+	# Overwrite with 0xFF
+	tr '\0' '\377' < /dev/zero | dd of=$name.flac conv=notrunc bs=$bs seek=7 count=2 2>> ./streams.log
+	# Remove section
+	cp $name.flac $name.tmp.flac
+	dd if=$name.tmp.flac of=$name.flac bs=$bs skip=12 seek=10 2>> ./streams.log
+
+	echo $ECHO_N "decode..." $ECHO_C
+	cmd="run_flac --silent --decode-through-errors --force --endian=little --sign=signed --decode --force-raw-format --output-name=$name.cmp $name.flac"
+	echo "### DECODE $name.corrupt #######################################################" >> ./streams.log
+	echo "###    cmd=$cmd" >> ./streams.log
+	$cmd 2>>./streams.log || die "ERROR during decode of $name"
+
+	ls -1l $name.raw >> ./streams.log
+	ls -1l $name.flac >> ./streams.log
+	ls -1l $name.cmp >> ./streams.log
+
+	echo $ECHO_N "compare..." $ECHO_C
+	if [ "$(wc -c < $name.raw)" -ne "$(wc -c < $name.cmp)" ]; then
+		die "ERROR, length of decoded file not equal to length of original"
+	fi
 
 	echo OK
 }
@@ -151,7 +184,7 @@ test_file test02 2 16 "-0 -l $max_lpc_order --lax -m -e -p"
 test_file test03 1 16 "-0 -l $max_lpc_order --lax -m -e -p"
 test_file test04 2 16 "-0 -l $max_lpc_order --lax -m -e -p"
 
-for bps in 8 16 24 ; do
+for bps in 8 16 24 32 ; do
 	echo "Testing $bps-bit full-scale deflection streams..."
 	for b in 01 02 03 04 05 06 07 ; do
 		test_file fsd$bps-$b 1 $bps "-0 -l $max_lpc_order --lax -m -e -p"
@@ -163,7 +196,7 @@ for b in 01 ; do
 	test_file wbps16-$b 1 16 "-0 -l $max_lpc_order --lax -m -e -p"
 done
 
-for bps in 8 16 24 ; do
+for bps in 8 16 24 32; do
 	echo "Testing $bps-bit sine wave streams..."
 	for b in 00 ; do
 		test_file sine${bps}-$b 1 $bps "-0 -l $max_lpc_order --lax -m -e --sample-rate=48000"
@@ -193,6 +226,15 @@ for disable in '' '--disable-verbatim-subframes --disable-constant-subframes' '-
 				test_file noise8m32 1 8 "-8 -p -e -l $lpc_order --lax --blocksize=$blocksize $disable"
 			fi
 		done
+	done
+done
+
+echo "Testing blocksize variations with subdivide apodization..."
+for blocksize in 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 ; do
+	for lpc_order in 0 1 2 3 4 5 7 8 9 15 16 17 31 32 ; do
+		if [ $lpc_order = 0 ] || [ $lpc_order -le $blocksize ] ; then
+			test_file noise8m32 1 8 "-8 -p -e -A \"subdivide_tukey(32)\" -l $lpc_order --lax --blocksize=$blocksize"
+		fi
 	done
 done
 
@@ -241,15 +283,36 @@ for f in 10 11 12 13 14 15 16 17 18 19 ; do
 	done
 done
 
+echo "Testing corruption handling..."
+for bps in 8 16 24 ; do
+	for f in 00 01 02 03 04 10 11 12 13 14 15 16 17 18 19; do
+		for disable in '' '--disable-verbatim-subframes --disable-constant-subframes' '--disable-verbatim-subframes --disable-constant-subframes --disable-fixed-subframes' ; do
+			if [ -z "$disable" ] || [ "$FLAC__TEST_LEVEL" -gt 0 ] ; then
+				for opt in 0 1 2 4 5 6 8 ; do
+					for extras in '' '-p' '-e' ; do
+						if [ -z "$extras" -o "$FLAC__TEST_LEVEL" -gt 0 ] && { [ "$bps" -eq 16 -a "$f" -lt 15 ] || [ "$FLAC__TEST_LEVEL" -gt 1 ]; } ; then
+							if [ "$f" -lt 10 ] ; then
+								test_corrupted_file sine$bps-$f 1 $bps "-$opt $extras $disable"
+							else
+								test_corrupted_file sine$bps-$f 2 $bps "-$opt $extras $disable"
+							fi
+						fi
+					done
+				done
+			fi
+		done
+	done
+done
+
 echo "Testing noise..."
 for disable in '' '--disable-verbatim-subframes --disable-constant-subframes' '--disable-verbatim-subframes --disable-constant-subframes --disable-fixed-subframes' ; do
 	if [ -z "$disable" ] || [ "$FLAC__TEST_LEVEL" -gt 0 ] ; then
 		for channels in 1 2 4 8 ; do
-			if [ $channels -le 2 ] || [ "$FLAC__TEST_LEVEL" -gt 0 ] ; then
-				for bps in 8 16 24 ; do
+			if [ $channels -le 2 ] || [ "$FLAC__TEST_LEVEL" -gt 1 ] ; then
+				for bps in 8 16 24 32; do
 					for opt in 0 1 2 3 4 5 6 7 8 ; do
 						for extras in '' '-p' '-e' ; do
-							if [ -z "$extras" ] || [ "$FLAC__TEST_LEVEL" -gt 0 ] ; then
+                                                        if { [ -z "$extras" ] || [ "$FLAC__TEST_LEVEL" -gt 0 ]; } && { [ "$extras" != '-p' ] || [ "$opt" -gt 2 ]; } ; then
 								for blocksize in '' '--lax -b 32' '--lax -b 32768' '--lax -b 65535' ; do
 									if [ -z "$blocksize" ] || [ "$FLAC__TEST_LEVEL" -gt 0 ] ; then
 										test_file noise $channels $bps "-$opt $extras $blocksize $disable"

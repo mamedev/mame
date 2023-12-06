@@ -1,5 +1,6 @@
 /* metaflac - Command-line FLAC metadata editor
- * Copyright (C) 2001,2002,2003,2004,2005,2006,2007  Josh Coalson
+ * Copyright (C) 2001-2009  Josh Coalson
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -11,29 +12,31 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #  include <config.h>
 #endif
 
-#include "utils.h"
-#include "FLAC/assert.h"
-#include "share/alloc.h"
-#include "share/utf8.h"
 #include <ctype.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "utils.h"
+#include "FLAC/assert.h"
+#include "share/alloc.h"
+#include "share/safe_str.h"
+#include "share/utf8.h"
+#include "share/compat.h"
 
 void die(const char *message)
 {
 	FLAC__ASSERT(0 != message);
-	fprintf(stderr, "ERROR: %s\n", message);
+	flac_fprintf(stderr, "ERROR: %s\n", message);
 	exit(1);
 }
 
@@ -58,21 +61,34 @@ char *local_strdup(const char *source)
 
 void local_strcat(char **dest, const char *source)
 {
-	size_t ndest, nsource;
+	size_t ndest, nsource, outlen;
 
 	FLAC__ASSERT(0 != dest);
 	FLAC__ASSERT(0 != source);
 
-	ndest = *dest? strlen(*dest) : 0;
+	ndest = *dest ? strlen(*dest) : 0;
 	nsource = strlen(source);
+	outlen = ndest + nsource + 1;
 
 	if(nsource == 0)
 		return;
 
-	*dest = (char*)safe_realloc_add_3op_(*dest, ndest, /*+*/nsource, /*+*/1);
-	if(0 == *dest)
+	*dest = safe_realloc_add_3op_(*dest, ndest, /*+*/nsource, /*+*/1);
+	if(*dest == NULL)
 		die("out of memory growing string");
-	strcpy((*dest)+ndest, source);
+	/* If ndest == 0, strlen in safe_strncat reads
+	 * uninitialized data. To prevent that, set first character
+	 * to zero */
+	if(ndest == 0)
+		*dest[0] = 0;
+	safe_strncat(*dest, source, outlen);
+}
+
+static inline int local_isprint(int c)
+{
+	if (c < 32) return 0;
+	if (c > 127) return 0;
+	return isprint(c);
 }
 
 void hexdump(const char *filename, const FLAC__byte *buf, unsigned bytes, const char *indent)
@@ -81,11 +97,11 @@ void hexdump(const char *filename, const FLAC__byte *buf, unsigned bytes, const 
 	const FLAC__byte *b = buf;
 
 	for(i = 0; i < bytes; i += 16) {
-		printf("%s%s%s%08X: "
+		flac_printf("%s%s", filename? filename:"", filename? ":":"");
+		printf("%s%08X: "
 			"%02X %02X %02X %02X %02X %02X %02X %02X "
 			"%02X %02X %02X %02X %02X %02X %02X %02X "
 			"%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c\n",
-			filename? filename:"", filename? ":":"",
 			indent, i,
 			left >  0? (unsigned char)b[ 0] : 0,
 			left >  1? (unsigned char)b[ 1] : 0,
@@ -103,22 +119,22 @@ void hexdump(const char *filename, const FLAC__byte *buf, unsigned bytes, const 
 			left > 13? (unsigned char)b[13] : 0,
 			left > 14? (unsigned char)b[14] : 0,
 			left > 15? (unsigned char)b[15] : 0,
-			(left >  0) ? (isprint(b[ 0]) ? b[ 0] : '.') : ' ',
-			(left >  1) ? (isprint(b[ 1]) ? b[ 1] : '.') : ' ',
-			(left >  2) ? (isprint(b[ 2]) ? b[ 2] : '.') : ' ',
-			(left >  3) ? (isprint(b[ 3]) ? b[ 3] : '.') : ' ',
-			(left >  4) ? (isprint(b[ 4]) ? b[ 4] : '.') : ' ',
-			(left >  5) ? (isprint(b[ 5]) ? b[ 5] : '.') : ' ',
-			(left >  6) ? (isprint(b[ 6]) ? b[ 6] : '.') : ' ',
-			(left >  7) ? (isprint(b[ 7]) ? b[ 7] : '.') : ' ',
-			(left >  8) ? (isprint(b[ 8]) ? b[ 8] : '.') : ' ',
-			(left >  9) ? (isprint(b[ 9]) ? b[ 9] : '.') : ' ',
-			(left > 10) ? (isprint(b[10]) ? b[10] : '.') : ' ',
-			(left > 11) ? (isprint(b[11]) ? b[11] : '.') : ' ',
-			(left > 12) ? (isprint(b[12]) ? b[12] : '.') : ' ',
-			(left > 13) ? (isprint(b[13]) ? b[13] : '.') : ' ',
-			(left > 14) ? (isprint(b[14]) ? b[14] : '.') : ' ',
-			(left > 15) ? (isprint(b[15]) ? b[15] : '.') : ' '
+			(left >  0) ? (local_isprint(b[ 0]) ? b[ 0] : '.') : ' ',
+			(left >  1) ? (local_isprint(b[ 1]) ? b[ 1] : '.') : ' ',
+			(left >  2) ? (local_isprint(b[ 2]) ? b[ 2] : '.') : ' ',
+			(left >  3) ? (local_isprint(b[ 3]) ? b[ 3] : '.') : ' ',
+			(left >  4) ? (local_isprint(b[ 4]) ? b[ 4] : '.') : ' ',
+			(left >  5) ? (local_isprint(b[ 5]) ? b[ 5] : '.') : ' ',
+			(left >  6) ? (local_isprint(b[ 6]) ? b[ 6] : '.') : ' ',
+			(left >  7) ? (local_isprint(b[ 7]) ? b[ 7] : '.') : ' ',
+			(left >  8) ? (local_isprint(b[ 8]) ? b[ 8] : '.') : ' ',
+			(left >  9) ? (local_isprint(b[ 9]) ? b[ 9] : '.') : ' ',
+			(left > 10) ? (local_isprint(b[10]) ? b[10] : '.') : ' ',
+			(left > 11) ? (local_isprint(b[11]) ? b[11] : '.') : ' ',
+			(left > 12) ? (local_isprint(b[12]) ? b[12] : '.') : ' ',
+			(left > 13) ? (local_isprint(b[13]) ? b[13] : '.') : ' ',
+			(left > 14) ? (local_isprint(b[14]) ? b[14] : '.') : ' ',
+			(left > 15) ? (local_isprint(b[15]) ? b[15] : '.') : ' '
 		);
 		left -= 16;
 		b += 16;
@@ -134,47 +150,47 @@ void print_error_with_chain_status(FLAC__Metadata_Chain *chain, const char *form
 
 	va_start(args, format);
 
-	(void) vfprintf(stderr, format, args);
+	(void) flac_vfprintf(stderr, format, args);
 
 	va_end(args);
 
-	fprintf(stderr, ", status = \"%s\"\n", FLAC__Metadata_ChainStatusString[status]);
+	flac_fprintf(stderr, ", status = \"%s\"\n", FLAC__Metadata_ChainStatusString[status]);
 
 	if(status == FLAC__METADATA_CHAIN_STATUS_ERROR_OPENING_FILE) {
-		fprintf(stderr, "\n"
+		flac_fprintf(stderr, "\n"
 			"The FLAC file could not be opened.  Most likely the file does not exist\n"
 			"or is not readable.\n"
 		);
 	}
 	else if(status == FLAC__METADATA_CHAIN_STATUS_NOT_A_FLAC_FILE) {
-		fprintf(stderr, "\n"
+		flac_fprintf(stderr, "\n"
 			"The file does not appear to be a FLAC file.\n"
 		);
 	}
 	else if(status == FLAC__METADATA_CHAIN_STATUS_NOT_WRITABLE) {
-		fprintf(stderr, "\n"
+		flac_fprintf(stderr, "\n"
 			"The FLAC file does not have write permissions.\n"
 		);
 	}
 	else if(status == FLAC__METADATA_CHAIN_STATUS_BAD_METADATA) {
-		fprintf(stderr, "\n"
-			"The metadata to be writted does not conform to the FLAC metadata\n"
+		flac_fprintf(stderr, "\n"
+			"The metadata to be written does not conform to the FLAC metadata\n"
 			"specifications.\n"
 		);
 	}
 	else if(status == FLAC__METADATA_CHAIN_STATUS_READ_ERROR) {
-		fprintf(stderr, "\n"
+		flac_fprintf(stderr, "\n"
 			"There was an error while reading the FLAC file.\n"
 		);
 	}
 	else if(status == FLAC__METADATA_CHAIN_STATUS_WRITE_ERROR) {
-		fprintf(stderr, "\n"
+		flac_fprintf(stderr, "\n"
 			"There was an error while writing FLAC file; most probably the disk is\n"
 			"full.\n"
 		);
 	}
 	else if(status == FLAC__METADATA_CHAIN_STATUS_UNLINK_ERROR) {
-		fprintf(stderr, "\n"
+		flac_fprintf(stderr, "\n"
 			"There was an error removing the temporary FLAC file.\n"
 		);
 	}
@@ -221,13 +237,18 @@ void write_vc_field(const char *filename, const FLAC__StreamMetadata_VorbisComme
 {
 	if(0 != entry->entry) {
 		if(filename)
-			fprintf(f, "%s:", filename);
+			flac_fprintf(f, "%s:", filename);
 
 		if(!raw) {
 			/*
 			 * WATCHOUT: comments that contain an embedded null will
 			 * be truncated by utf_decode().
 			 */
+#ifdef _WIN32 /* if we are outputting to console, we need to use proper print functions to show unicode characters */
+			if (f == stdout || f == stderr) {
+				flac_fprintf(f, "%s", entry->entry);
+			} else {
+#endif
 			char *converted;
 
 			if(utf8_decode((const char *)entry->entry, &converted) >= 0) {
@@ -237,6 +258,9 @@ void write_vc_field(const char *filename, const FLAC__StreamMetadata_VorbisComme
 			else {
 				(void) local_fwrite(entry->entry, 1, entry->length, f);
 			}
+#ifdef _WIN32
+			}
+#endif
 		}
 		else {
 			(void) local_fwrite(entry->entry, 1, entry->length, f);

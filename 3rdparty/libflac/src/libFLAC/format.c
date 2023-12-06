@@ -1,5 +1,6 @@
 /* libFLAC - Free Lossless Audio Codec library
- * Copyright (C) 2000,2001,2002,2003,2004,2005,2006,2007  Josh Coalson
+ * Copyright (C) 2000-2009  Josh Coalson
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -38,128 +39,119 @@
 #include <string.h> /* for memset() */
 #include "FLAC/assert.h"
 #include "FLAC/format.h"
+#include "share/alloc.h"
+#include "share/compat.h"
 #include "private/format.h"
+#include "private/macros.h"
 
-#ifndef FLaC__INLINE
-#define FLaC__INLINE
-#endif
-
-#ifdef min
-#undef min
-#endif
-#define min(a,b) ((a)<(b)?(a):(b))
-
-/* adjust for compilers that can't understand using LLU suffix for uint64_t literals */
-#ifdef _MSC_VER
-#define FLAC__U64L(x) x
+#if (defined GIT_COMMIT_HASH && defined GIT_COMMIT_DATE)
+# ifdef GIT_COMMIT_TAG
+FLAC_API const char *FLAC__VERSION_STRING = GIT_COMMIT_TAG;
+FLAC_API const char *FLAC__VENDOR_STRING = "reference libFLAC " GIT_COMMIT_TAG " " GIT_COMMIT_DATE;
+# else
+FLAC_API const char *FLAC__VERSION_STRING = "git-" GIT_COMMIT_HASH " " GIT_COMMIT_DATE;
+FLAC_API const char *FLAC__VENDOR_STRING = "reference libFLAC git-" GIT_COMMIT_HASH " " GIT_COMMIT_DATE;
+# endif
 #else
-#define FLAC__U64L(x) x##LLU
-#endif
-
-/* VERSION should come from configure */
-FLAC_API const char *FLAC__VERSION_STRING = VERSION;
-
-#if defined _MSC_VER || defined __BORLANDC__ || defined __MINW32__
-/* yet one more hack because of MSVC6: */
-FLAC_API const char *FLAC__VENDOR_STRING = "reference libFLAC 1.2.1 20070917";
-#else
-FLAC_API const char *FLAC__VENDOR_STRING = "reference libFLAC " VERSION " 20070917";
+/* PACKAGE_VERSION should come from configure */
+FLAC_API const char *FLAC__VERSION_STRING = PACKAGE_VERSION;
+FLAC_API const char *FLAC__VENDOR_STRING = "reference libFLAC " PACKAGE_VERSION " 20230623";
 #endif
 
 FLAC_API const FLAC__byte FLAC__STREAM_SYNC_STRING[4] = { 'f','L','a','C' };
-FLAC_API const unsigned FLAC__STREAM_SYNC = 0x664C6143;
-FLAC_API const unsigned FLAC__STREAM_SYNC_LEN = 32; /* bits */
+FLAC_API const uint32_t FLAC__STREAM_SYNC = 0x664C6143;
+FLAC_API const uint32_t FLAC__STREAM_SYNC_LEN = 32; /* bits */
 
-FLAC_API const unsigned FLAC__STREAM_METADATA_STREAMINFO_MIN_BLOCK_SIZE_LEN = 16; /* bits */
-FLAC_API const unsigned FLAC__STREAM_METADATA_STREAMINFO_MAX_BLOCK_SIZE_LEN = 16; /* bits */
-FLAC_API const unsigned FLAC__STREAM_METADATA_STREAMINFO_MIN_FRAME_SIZE_LEN = 24; /* bits */
-FLAC_API const unsigned FLAC__STREAM_METADATA_STREAMINFO_MAX_FRAME_SIZE_LEN = 24; /* bits */
-FLAC_API const unsigned FLAC__STREAM_METADATA_STREAMINFO_SAMPLE_RATE_LEN = 20; /* bits */
-FLAC_API const unsigned FLAC__STREAM_METADATA_STREAMINFO_CHANNELS_LEN = 3; /* bits */
-FLAC_API const unsigned FLAC__STREAM_METADATA_STREAMINFO_BITS_PER_SAMPLE_LEN = 5; /* bits */
-FLAC_API const unsigned FLAC__STREAM_METADATA_STREAMINFO_TOTAL_SAMPLES_LEN = 36; /* bits */
-FLAC_API const unsigned FLAC__STREAM_METADATA_STREAMINFO_MD5SUM_LEN = 128; /* bits */
+FLAC_API const uint32_t FLAC__STREAM_METADATA_STREAMINFO_MIN_BLOCK_SIZE_LEN = 16; /* bits */
+FLAC_API const uint32_t FLAC__STREAM_METADATA_STREAMINFO_MAX_BLOCK_SIZE_LEN = 16; /* bits */
+FLAC_API const uint32_t FLAC__STREAM_METADATA_STREAMINFO_MIN_FRAME_SIZE_LEN = 24; /* bits */
+FLAC_API const uint32_t FLAC__STREAM_METADATA_STREAMINFO_MAX_FRAME_SIZE_LEN = 24; /* bits */
+FLAC_API const uint32_t FLAC__STREAM_METADATA_STREAMINFO_SAMPLE_RATE_LEN = 20; /* bits */
+FLAC_API const uint32_t FLAC__STREAM_METADATA_STREAMINFO_CHANNELS_LEN = 3; /* bits */
+FLAC_API const uint32_t FLAC__STREAM_METADATA_STREAMINFO_BITS_PER_SAMPLE_LEN = 5; /* bits */
+FLAC_API const uint32_t FLAC__STREAM_METADATA_STREAMINFO_TOTAL_SAMPLES_LEN = 36; /* bits */
+FLAC_API const uint32_t FLAC__STREAM_METADATA_STREAMINFO_MD5SUM_LEN = 128; /* bits */
 
-FLAC_API const unsigned FLAC__STREAM_METADATA_APPLICATION_ID_LEN = 32; /* bits */
+FLAC_API const uint32_t FLAC__STREAM_METADATA_APPLICATION_ID_LEN = 32; /* bits */
 
-FLAC_API const unsigned FLAC__STREAM_METADATA_SEEKPOINT_SAMPLE_NUMBER_LEN = 64; /* bits */
-FLAC_API const unsigned FLAC__STREAM_METADATA_SEEKPOINT_STREAM_OFFSET_LEN = 64; /* bits */
-FLAC_API const unsigned FLAC__STREAM_METADATA_SEEKPOINT_FRAME_SAMPLES_LEN = 16; /* bits */
+FLAC_API const uint32_t FLAC__STREAM_METADATA_SEEKPOINT_SAMPLE_NUMBER_LEN = 64; /* bits */
+FLAC_API const uint32_t FLAC__STREAM_METADATA_SEEKPOINT_STREAM_OFFSET_LEN = 64; /* bits */
+FLAC_API const uint32_t FLAC__STREAM_METADATA_SEEKPOINT_FRAME_SAMPLES_LEN = 16; /* bits */
 
 FLAC_API const FLAC__uint64 FLAC__STREAM_METADATA_SEEKPOINT_PLACEHOLDER = FLAC__U64L(0xffffffffffffffff);
 
-FLAC_API const unsigned FLAC__STREAM_METADATA_VORBIS_COMMENT_ENTRY_LENGTH_LEN = 32; /* bits */
-FLAC_API const unsigned FLAC__STREAM_METADATA_VORBIS_COMMENT_NUM_COMMENTS_LEN = 32; /* bits */
+FLAC_API const uint32_t FLAC__STREAM_METADATA_VORBIS_COMMENT_ENTRY_LENGTH_LEN = 32; /* bits */
+FLAC_API const uint32_t FLAC__STREAM_METADATA_VORBIS_COMMENT_NUM_COMMENTS_LEN = 32; /* bits */
 
-FLAC_API const unsigned FLAC__STREAM_METADATA_CUESHEET_INDEX_OFFSET_LEN = 64; /* bits */
-FLAC_API const unsigned FLAC__STREAM_METADATA_CUESHEET_INDEX_NUMBER_LEN = 8; /* bits */
-FLAC_API const unsigned FLAC__STREAM_METADATA_CUESHEET_INDEX_RESERVED_LEN = 3*8; /* bits */
+FLAC_API const uint32_t FLAC__STREAM_METADATA_CUESHEET_INDEX_OFFSET_LEN = 64; /* bits */
+FLAC_API const uint32_t FLAC__STREAM_METADATA_CUESHEET_INDEX_NUMBER_LEN = 8; /* bits */
+FLAC_API const uint32_t FLAC__STREAM_METADATA_CUESHEET_INDEX_RESERVED_LEN = 3*8; /* bits */
 
-FLAC_API const unsigned FLAC__STREAM_METADATA_CUESHEET_TRACK_OFFSET_LEN = 64; /* bits */
-FLAC_API const unsigned FLAC__STREAM_METADATA_CUESHEET_TRACK_NUMBER_LEN = 8; /* bits */
-FLAC_API const unsigned FLAC__STREAM_METADATA_CUESHEET_TRACK_ISRC_LEN = 12*8; /* bits */
-FLAC_API const unsigned FLAC__STREAM_METADATA_CUESHEET_TRACK_TYPE_LEN = 1; /* bit */
-FLAC_API const unsigned FLAC__STREAM_METADATA_CUESHEET_TRACK_PRE_EMPHASIS_LEN = 1; /* bit */
-FLAC_API const unsigned FLAC__STREAM_METADATA_CUESHEET_TRACK_RESERVED_LEN = 6+13*8; /* bits */
-FLAC_API const unsigned FLAC__STREAM_METADATA_CUESHEET_TRACK_NUM_INDICES_LEN = 8; /* bits */
+FLAC_API const uint32_t FLAC__STREAM_METADATA_CUESHEET_TRACK_OFFSET_LEN = 64; /* bits */
+FLAC_API const uint32_t FLAC__STREAM_METADATA_CUESHEET_TRACK_NUMBER_LEN = 8; /* bits */
+FLAC_API const uint32_t FLAC__STREAM_METADATA_CUESHEET_TRACK_ISRC_LEN = 12*8; /* bits */
+FLAC_API const uint32_t FLAC__STREAM_METADATA_CUESHEET_TRACK_TYPE_LEN = 1; /* bit */
+FLAC_API const uint32_t FLAC__STREAM_METADATA_CUESHEET_TRACK_PRE_EMPHASIS_LEN = 1; /* bit */
+FLAC_API const uint32_t FLAC__STREAM_METADATA_CUESHEET_TRACK_RESERVED_LEN = 6+13*8; /* bits */
+FLAC_API const uint32_t FLAC__STREAM_METADATA_CUESHEET_TRACK_NUM_INDICES_LEN = 8; /* bits */
 
-FLAC_API const unsigned FLAC__STREAM_METADATA_CUESHEET_MEDIA_CATALOG_NUMBER_LEN = 128*8; /* bits */
-FLAC_API const unsigned FLAC__STREAM_METADATA_CUESHEET_LEAD_IN_LEN = 64; /* bits */
-FLAC_API const unsigned FLAC__STREAM_METADATA_CUESHEET_IS_CD_LEN = 1; /* bit */
-FLAC_API const unsigned FLAC__STREAM_METADATA_CUESHEET_RESERVED_LEN = 7+258*8; /* bits */
-FLAC_API const unsigned FLAC__STREAM_METADATA_CUESHEET_NUM_TRACKS_LEN = 8; /* bits */
+FLAC_API const uint32_t FLAC__STREAM_METADATA_CUESHEET_MEDIA_CATALOG_NUMBER_LEN = 128*8; /* bits */
+FLAC_API const uint32_t FLAC__STREAM_METADATA_CUESHEET_LEAD_IN_LEN = 64; /* bits */
+FLAC_API const uint32_t FLAC__STREAM_METADATA_CUESHEET_IS_CD_LEN = 1; /* bit */
+FLAC_API const uint32_t FLAC__STREAM_METADATA_CUESHEET_RESERVED_LEN = 7+258*8; /* bits */
+FLAC_API const uint32_t FLAC__STREAM_METADATA_CUESHEET_NUM_TRACKS_LEN = 8; /* bits */
 
-FLAC_API const unsigned FLAC__STREAM_METADATA_PICTURE_TYPE_LEN = 32; /* bits */
-FLAC_API const unsigned FLAC__STREAM_METADATA_PICTURE_MIME_TYPE_LENGTH_LEN = 32; /* bits */
-FLAC_API const unsigned FLAC__STREAM_METADATA_PICTURE_DESCRIPTION_LENGTH_LEN = 32; /* bits */
-FLAC_API const unsigned FLAC__STREAM_METADATA_PICTURE_WIDTH_LEN = 32; /* bits */
-FLAC_API const unsigned FLAC__STREAM_METADATA_PICTURE_HEIGHT_LEN = 32; /* bits */
-FLAC_API const unsigned FLAC__STREAM_METADATA_PICTURE_DEPTH_LEN = 32; /* bits */
-FLAC_API const unsigned FLAC__STREAM_METADATA_PICTURE_COLORS_LEN = 32; /* bits */
-FLAC_API const unsigned FLAC__STREAM_METADATA_PICTURE_DATA_LENGTH_LEN = 32; /* bits */
+FLAC_API const uint32_t FLAC__STREAM_METADATA_PICTURE_TYPE_LEN = 32; /* bits */
+FLAC_API const uint32_t FLAC__STREAM_METADATA_PICTURE_MIME_TYPE_LENGTH_LEN = 32; /* bits */
+FLAC_API const uint32_t FLAC__STREAM_METADATA_PICTURE_DESCRIPTION_LENGTH_LEN = 32; /* bits */
+FLAC_API const uint32_t FLAC__STREAM_METADATA_PICTURE_WIDTH_LEN = 32; /* bits */
+FLAC_API const uint32_t FLAC__STREAM_METADATA_PICTURE_HEIGHT_LEN = 32; /* bits */
+FLAC_API const uint32_t FLAC__STREAM_METADATA_PICTURE_DEPTH_LEN = 32; /* bits */
+FLAC_API const uint32_t FLAC__STREAM_METADATA_PICTURE_COLORS_LEN = 32; /* bits */
+FLAC_API const uint32_t FLAC__STREAM_METADATA_PICTURE_DATA_LENGTH_LEN = 32; /* bits */
 
-FLAC_API const unsigned FLAC__STREAM_METADATA_IS_LAST_LEN = 1; /* bits */
-FLAC_API const unsigned FLAC__STREAM_METADATA_TYPE_LEN = 7; /* bits */
-FLAC_API const unsigned FLAC__STREAM_METADATA_LENGTH_LEN = 24; /* bits */
+FLAC_API const uint32_t FLAC__STREAM_METADATA_IS_LAST_LEN = 1; /* bits */
+FLAC_API const uint32_t FLAC__STREAM_METADATA_TYPE_LEN = 7; /* bits */
+FLAC_API const uint32_t FLAC__STREAM_METADATA_LENGTH_LEN = 24; /* bits */
 
-FLAC_API const unsigned FLAC__FRAME_HEADER_SYNC = 0x3ffe;
-FLAC_API const unsigned FLAC__FRAME_HEADER_SYNC_LEN = 14; /* bits */
-FLAC_API const unsigned FLAC__FRAME_HEADER_RESERVED_LEN = 1; /* bits */
-FLAC_API const unsigned FLAC__FRAME_HEADER_BLOCKING_STRATEGY_LEN = 1; /* bits */
-FLAC_API const unsigned FLAC__FRAME_HEADER_BLOCK_SIZE_LEN = 4; /* bits */
-FLAC_API const unsigned FLAC__FRAME_HEADER_SAMPLE_RATE_LEN = 4; /* bits */
-FLAC_API const unsigned FLAC__FRAME_HEADER_CHANNEL_ASSIGNMENT_LEN = 4; /* bits */
-FLAC_API const unsigned FLAC__FRAME_HEADER_BITS_PER_SAMPLE_LEN = 3; /* bits */
-FLAC_API const unsigned FLAC__FRAME_HEADER_ZERO_PAD_LEN = 1; /* bits */
-FLAC_API const unsigned FLAC__FRAME_HEADER_CRC_LEN = 8; /* bits */
+FLAC_API const uint32_t FLAC__FRAME_HEADER_SYNC = 0x3ffe;
+FLAC_API const uint32_t FLAC__FRAME_HEADER_SYNC_LEN = 14; /* bits */
+FLAC_API const uint32_t FLAC__FRAME_HEADER_RESERVED_LEN = 1; /* bits */
+FLAC_API const uint32_t FLAC__FRAME_HEADER_BLOCKING_STRATEGY_LEN = 1; /* bits */
+FLAC_API const uint32_t FLAC__FRAME_HEADER_BLOCK_SIZE_LEN = 4; /* bits */
+FLAC_API const uint32_t FLAC__FRAME_HEADER_SAMPLE_RATE_LEN = 4; /* bits */
+FLAC_API const uint32_t FLAC__FRAME_HEADER_CHANNEL_ASSIGNMENT_LEN = 4; /* bits */
+FLAC_API const uint32_t FLAC__FRAME_HEADER_BITS_PER_SAMPLE_LEN = 3; /* bits */
+FLAC_API const uint32_t FLAC__FRAME_HEADER_ZERO_PAD_LEN = 1; /* bits */
+FLAC_API const uint32_t FLAC__FRAME_HEADER_CRC_LEN = 8; /* bits */
 
-FLAC_API const unsigned FLAC__FRAME_FOOTER_CRC_LEN = 16; /* bits */
+FLAC_API const uint32_t FLAC__FRAME_FOOTER_CRC_LEN = 16; /* bits */
 
-FLAC_API const unsigned FLAC__ENTROPY_CODING_METHOD_TYPE_LEN = 2; /* bits */
-FLAC_API const unsigned FLAC__ENTROPY_CODING_METHOD_PARTITIONED_RICE_ORDER_LEN = 4; /* bits */
-FLAC_API const unsigned FLAC__ENTROPY_CODING_METHOD_PARTITIONED_RICE_PARAMETER_LEN = 4; /* bits */
-FLAC_API const unsigned FLAC__ENTROPY_CODING_METHOD_PARTITIONED_RICE2_PARAMETER_LEN = 5; /* bits */
-FLAC_API const unsigned FLAC__ENTROPY_CODING_METHOD_PARTITIONED_RICE_RAW_LEN = 5; /* bits */
+FLAC_API const uint32_t FLAC__ENTROPY_CODING_METHOD_TYPE_LEN = 2; /* bits */
+FLAC_API const uint32_t FLAC__ENTROPY_CODING_METHOD_PARTITIONED_RICE_ORDER_LEN = 4; /* bits */
+FLAC_API const uint32_t FLAC__ENTROPY_CODING_METHOD_PARTITIONED_RICE_PARAMETER_LEN = 4; /* bits */
+FLAC_API const uint32_t FLAC__ENTROPY_CODING_METHOD_PARTITIONED_RICE2_PARAMETER_LEN = 5; /* bits */
+FLAC_API const uint32_t FLAC__ENTROPY_CODING_METHOD_PARTITIONED_RICE_RAW_LEN = 5; /* bits */
 
-FLAC_API const unsigned FLAC__ENTROPY_CODING_METHOD_PARTITIONED_RICE_ESCAPE_PARAMETER = 15; /* == (1<<FLAC__ENTROPY_CODING_METHOD_PARTITIONED_RICE_PARAMETER_LEN)-1 */
-FLAC_API const unsigned FLAC__ENTROPY_CODING_METHOD_PARTITIONED_RICE2_ESCAPE_PARAMETER = 31; /* == (1<<FLAC__ENTROPY_CODING_METHOD_PARTITIONED_RICE2_PARAMETER_LEN)-1 */
+FLAC_API const uint32_t FLAC__ENTROPY_CODING_METHOD_PARTITIONED_RICE_ESCAPE_PARAMETER = 15; /* == (1<<FLAC__ENTROPY_CODING_METHOD_PARTITIONED_RICE_PARAMETER_LEN)-1 */
+FLAC_API const uint32_t FLAC__ENTROPY_CODING_METHOD_PARTITIONED_RICE2_ESCAPE_PARAMETER = 31; /* == (1<<FLAC__ENTROPY_CODING_METHOD_PARTITIONED_RICE2_PARAMETER_LEN)-1 */
 
 FLAC_API const char * const FLAC__EntropyCodingMethodTypeString[] = {
 	"PARTITIONED_RICE",
 	"PARTITIONED_RICE2"
 };
 
-FLAC_API const unsigned FLAC__SUBFRAME_LPC_QLP_COEFF_PRECISION_LEN = 4; /* bits */
-FLAC_API const unsigned FLAC__SUBFRAME_LPC_QLP_SHIFT_LEN = 5; /* bits */
+FLAC_API const uint32_t FLAC__SUBFRAME_LPC_QLP_COEFF_PRECISION_LEN = 4; /* bits */
+FLAC_API const uint32_t FLAC__SUBFRAME_LPC_QLP_SHIFT_LEN = 5; /* bits */
 
-FLAC_API const unsigned FLAC__SUBFRAME_ZERO_PAD_LEN = 1; /* bits */
-FLAC_API const unsigned FLAC__SUBFRAME_TYPE_LEN = 6; /* bits */
-FLAC_API const unsigned FLAC__SUBFRAME_WASTED_BITS_FLAG_LEN = 1; /* bits */
+FLAC_API const uint32_t FLAC__SUBFRAME_ZERO_PAD_LEN = 1; /* bits */
+FLAC_API const uint32_t FLAC__SUBFRAME_TYPE_LEN = 6; /* bits */
+FLAC_API const uint32_t FLAC__SUBFRAME_WASTED_BITS_FLAG_LEN = 1; /* bits */
 
-FLAC_API const unsigned FLAC__SUBFRAME_TYPE_CONSTANT_BYTE_ALIGNED_MASK = 0x00;
-FLAC_API const unsigned FLAC__SUBFRAME_TYPE_VERBATIM_BYTE_ALIGNED_MASK = 0x02;
-FLAC_API const unsigned FLAC__SUBFRAME_TYPE_FIXED_BYTE_ALIGNED_MASK = 0x10;
-FLAC_API const unsigned FLAC__SUBFRAME_TYPE_LPC_BYTE_ALIGNED_MASK = 0x40;
+FLAC_API const uint32_t FLAC__SUBFRAME_TYPE_CONSTANT_BYTE_ALIGNED_MASK = 0x00;
+FLAC_API const uint32_t FLAC__SUBFRAME_TYPE_VERBATIM_BYTE_ALIGNED_MASK = 0x02;
+FLAC_API const uint32_t FLAC__SUBFRAME_TYPE_FIXED_BYTE_ALIGNED_MASK = 0x10;
+FLAC_API const uint32_t FLAC__SUBFRAME_TYPE_LPC_BYTE_ALIGNED_MASK = 0x40;
 
 FLAC_API const char * const FLAC__SubframeTypeString[] = {
 	"CONSTANT",
@@ -214,23 +206,31 @@ FLAC_API const char * const FLAC__StreamMetadata_Picture_TypeString[] = {
 	"Publisher/Studio logotype"
 };
 
-FLAC_API FLAC__bool FLAC__format_sample_rate_is_valid(unsigned sample_rate)
+FLAC_API FLAC__bool FLAC__format_sample_rate_is_valid(uint32_t sample_rate)
 {
-	if(sample_rate == 0 || sample_rate > FLAC__MAX_SAMPLE_RATE) {
+	if(sample_rate > FLAC__MAX_SAMPLE_RATE) {
 		return false;
 	}
 	else
 		return true;
 }
 
-FLAC_API FLAC__bool FLAC__format_sample_rate_is_subset(unsigned sample_rate)
+FLAC_API FLAC__bool FLAC__format_blocksize_is_subset(uint32_t blocksize, uint32_t sample_rate)
 {
-	if(
-		!FLAC__format_sample_rate_is_valid(sample_rate) ||
-		(
-			sample_rate >= (1u << 16) &&
-			!(sample_rate % 1000 == 0 || sample_rate % 10 == 0)
-		)
+	if(blocksize > 16384)
+		return false;
+	else if(sample_rate <= 48000 && blocksize > 4608)
+		return false;
+	else
+		return true;
+}
+
+FLAC_API FLAC__bool FLAC__format_sample_rate_is_subset(uint32_t sample_rate)
+{
+	if( // sample rate is not subset if
+		!FLAC__format_sample_rate_is_valid(sample_rate) || // sample rate is invalid or
+		sample_rate >= ((1u << 16) * 10) || // sample rate is larger then or equal to 655360 or
+		(sample_rate >= (1u << 16) && sample_rate % 10 != 0) //sample rate is >= 65536 and not divisible by 10
 	) {
 		return false;
 	}
@@ -241,11 +241,14 @@ FLAC_API FLAC__bool FLAC__format_sample_rate_is_subset(unsigned sample_rate)
 /* @@@@ add to unit tests; it is already indirectly tested by the metadata_object tests */
 FLAC_API FLAC__bool FLAC__format_seektable_is_legal(const FLAC__StreamMetadata_SeekTable *seek_table)
 {
-	unsigned i;
+	uint32_t i;
 	FLAC__uint64 prev_sample_number = 0;
 	FLAC__bool got_prev = false;
 
 	FLAC__ASSERT(0 != seek_table);
+
+	if((FLAC__uint64)(seek_table->num_points) * FLAC__STREAM_METADATA_SEEKPOINT_LENGTH >= (1u << FLAC__STREAM_METADATA_LENGTH_LEN))
+		return false;
 
 	for(i = 0; i < seek_table->num_points; i++) {
 		if(got_prev) {
@@ -275,12 +278,15 @@ static int seekpoint_compare_(const FLAC__StreamMetadata_SeekPoint *l, const FLA
 }
 
 /* @@@@ add to unit tests; it is already indirectly tested by the metadata_object tests */
-FLAC_API unsigned FLAC__format_seektable_sort(FLAC__StreamMetadata_SeekTable *seek_table)
+FLAC_API uint32_t FLAC__format_seektable_sort(FLAC__StreamMetadata_SeekTable *seek_table)
 {
-	unsigned i, j;
+	uint32_t i, j;
 	FLAC__bool first;
 
 	FLAC__ASSERT(0 != seek_table);
+
+	if (seek_table->num_points == 0)
+		return 0;
 
 	/* sort the seekpoints */
 	qsort(seek_table->points, seek_table->num_points, sizeof(FLAC__StreamMetadata_SeekPoint), (int (*)(const void *, const void *))seekpoint_compare_);
@@ -313,7 +319,7 @@ FLAC_API unsigned FLAC__format_seektable_sort(FLAC__StreamMetadata_SeekTable *se
  * and a more clear explanation at the end of this section:
  *   http://www.cl.cam.ac.uk/~mgk25/unicode.html#utf-8
  */
-static FLaC__INLINE unsigned utf8len_(const FLAC__byte *utf8)
+static uint32_t utf8len_(const FLAC__byte *utf8)
 {
 	FLAC__ASSERT(0 != utf8);
 	if ((utf8[0] & 0x80) == 0) {
@@ -363,11 +369,11 @@ FLAC_API FLAC__bool FLAC__format_vorbiscomment_entry_name_is_legal(const char *n
 	return true;
 }
 
-FLAC_API FLAC__bool FLAC__format_vorbiscomment_entry_value_is_legal(const FLAC__byte *value, unsigned length)
+FLAC_API FLAC__bool FLAC__format_vorbiscomment_entry_value_is_legal(const FLAC__byte *value, uint32_t length)
 {
-	if(length == (unsigned)(-1)) {
+	if(length == (uint32_t)(-1)) {
 		while(*value) {
-			unsigned n = utf8len_(value);
+			uint32_t n = utf8len_(value);
 			if(n == 0)
 				return false;
 			value += n;
@@ -376,7 +382,7 @@ FLAC_API FLAC__bool FLAC__format_vorbiscomment_entry_value_is_legal(const FLAC__
 	else {
 		const FLAC__byte *end = value + length;
 		while(value < end) {
-			unsigned n = utf8len_(value);
+			uint32_t n = utf8len_(value);
 			if(n == 0)
 				return false;
 			value += n;
@@ -387,7 +393,7 @@ FLAC_API FLAC__bool FLAC__format_vorbiscomment_entry_value_is_legal(const FLAC__
 	return true;
 }
 
-FLAC_API FLAC__bool FLAC__format_vorbiscomment_entry_is_legal(const FLAC__byte *entry, unsigned length)
+FLAC_API FLAC__bool FLAC__format_vorbiscomment_entry_is_legal(const FLAC__byte *entry, uint32_t length)
 {
 	const FLAC__byte *s, *end;
 
@@ -401,7 +407,7 @@ FLAC_API FLAC__bool FLAC__format_vorbiscomment_entry_is_legal(const FLAC__byte *
 	s++; /* skip '=' */
 
 	while(s < end) {
-		unsigned n = utf8len_(s);
+		uint32_t n = utf8len_(s);
 		if(n == 0)
 			return false;
 		s += n;
@@ -415,7 +421,7 @@ FLAC_API FLAC__bool FLAC__format_vorbiscomment_entry_is_legal(const FLAC__byte *
 /* @@@@ add to unit tests; it is already indirectly tested by the metadata_object tests */
 FLAC_API FLAC__bool FLAC__format_cuesheet_is_legal(const FLAC__StreamMetadata_CueSheet *cue_sheet, FLAC__bool check_cd_da_subset, const char **violation)
 {
-	unsigned i, j;
+	uint32_t i, j;
 
 	if(check_cd_da_subset) {
 		if(cue_sheet->lead_in < 2 * 44100) {
@@ -505,7 +511,7 @@ FLAC_API FLAC__bool FLAC__format_picture_is_legal(const FLAC__StreamMetadata_Pic
 	}
 
 	for(b = picture->description; *b; ) {
-		unsigned n = utf8len_(b);
+		uint32_t n = utf8len_(b);
 		if(n == 0) {
 			if(violation) *violation = "description string must be valid UTF-8";
 			return false;
@@ -519,7 +525,8 @@ FLAC_API FLAC__bool FLAC__format_picture_is_legal(const FLAC__StreamMetadata_Pic
 /*
  * These routines are private to libFLAC
  */
-unsigned FLAC__format_get_max_rice_partition_order(unsigned blocksize, unsigned predictor_order)
+#if 0 /* UNUSED */
+uint32_t FLAC__format_get_max_rice_partition_order(uint32_t blocksize, uint32_t predictor_order)
 {
 	return
 		FLAC__format_get_max_rice_partition_order_from_blocksize_limited_max_and_predictor_order(
@@ -528,20 +535,21 @@ unsigned FLAC__format_get_max_rice_partition_order(unsigned blocksize, unsigned 
 			predictor_order
 		);
 }
+#endif
 
-unsigned FLAC__format_get_max_rice_partition_order_from_blocksize(unsigned blocksize)
+uint32_t FLAC__format_get_max_rice_partition_order_from_blocksize(uint32_t blocksize)
 {
-	unsigned max_rice_partition_order = 0;
+	uint32_t max_rice_partition_order = 0;
 	while(!(blocksize & 1)) {
 		max_rice_partition_order++;
 		blocksize >>= 1;
 	}
-	return min(FLAC__MAX_RICE_PARTITION_ORDER, max_rice_partition_order);
+	return flac_min(FLAC__MAX_RICE_PARTITION_ORDER, max_rice_partition_order);
 }
 
-unsigned FLAC__format_get_max_rice_partition_order_from_blocksize_limited_max_and_predictor_order(unsigned limit, unsigned blocksize, unsigned predictor_order)
+uint32_t FLAC__format_get_max_rice_partition_order_from_blocksize_limited_max_and_predictor_order(uint32_t limit, uint32_t blocksize, uint32_t predictor_order)
 {
-	unsigned max_rice_partition_order = limit;
+	uint32_t max_rice_partition_order = limit;
 
 	while(max_rice_partition_order > 0 && (blocksize >> max_rice_partition_order) <= predictor_order)
 		max_rice_partition_order--;
@@ -574,20 +582,27 @@ void FLAC__format_entropy_coding_method_partitioned_rice_contents_clear(FLAC__En
 	FLAC__format_entropy_coding_method_partitioned_rice_contents_init(object);
 }
 
-FLAC__bool FLAC__format_entropy_coding_method_partitioned_rice_contents_ensure_size(FLAC__EntropyCodingMethod_PartitionedRiceContents *object, unsigned max_partition_order)
+#if defined(_MSC_VER)
+// silence three MSVC warnings 'result of 32-bit shift implicitly converted to 64 bits (was 64-bit shift intended?)'
+#pragma warning ( disable : 4334 )
+#endif
+
+FLAC__bool FLAC__format_entropy_coding_method_partitioned_rice_contents_ensure_size(FLAC__EntropyCodingMethod_PartitionedRiceContents *object, uint32_t max_partition_order)
 {
 	FLAC__ASSERT(0 != object);
 
-	FLAC__ASSERT(object->capacity_by_order > 0 || (0 == object->parameters && 0 == object->raw_bits));
-
-	if(object->capacity_by_order < max_partition_order) {
-		if(0 == (object->parameters = (unsigned*)realloc(object->parameters, sizeof(unsigned)*((unsigned long long)1 << max_partition_order))))
+	if(object->capacity_by_order < max_partition_order || object->parameters == NULL || object->raw_bits == NULL) {
+		if(0 == (object->parameters = safe_realloc_(object->parameters, sizeof(uint32_t)*(1 << max_partition_order))))
 			return false;
-		if(0 == (object->raw_bits = (unsigned*)realloc(object->raw_bits, sizeof(unsigned)*((unsigned long long)1 << max_partition_order))))
+		if(0 == (object->raw_bits = safe_realloc_(object->raw_bits, sizeof(uint32_t)*(1 << max_partition_order))))
 			return false;
-		memset(object->raw_bits, 0, sizeof(unsigned)*((unsigned long long)1 << max_partition_order));
+		memset(object->raw_bits, 0, sizeof(uint32_t)*(1 << max_partition_order));
 		object->capacity_by_order = max_partition_order;
 	}
 
 	return true;
 }
+
+#if defined(_MSC_VER)
+#pragma warning ( default : 4334 )
+#endif

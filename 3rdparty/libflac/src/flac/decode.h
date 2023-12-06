@@ -1,5 +1,6 @@
 /* flac - Command-line FLAC encoder/decoder
- * Copyright (C) 2000,2001,2002,2003,2004,2005,2006,2007  Josh Coalson
+ * Copyright (C) 2000-2009  Josh Coalson
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -11,15 +12,15 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 #ifndef flac__decode_h
 #define flac__decode_h
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #  include <config.h>
 #endif
 
@@ -51,24 +52,22 @@ typedef struct {
 	FLAC__bool has_cue_specification;
 	utils__CueSpecification cue_specification;
 	FLAC__bool channel_map_none; /* --channel-map=none specified, eventually will expand to take actual channel map */
+	FLAC__bool relaxed_foreign_metadata_handling;
+	FileSubFormat force_subformat;
+
+	FileFormat format;
+	union {
+		struct {
+			FLAC__bool is_big_endian;
+			FLAC__bool is_unsigned_samples;
+		} raw;
+		struct {
+			foreign_metadata_t *foreign_metadata; /* NULL unless --keep-foreign-metadata requested */
+		} iff;
+	} format_options;
 } decode_options_t;
 
-/* used for AIFF also */
-typedef struct {
-	decode_options_t common;
-	foreign_metadata_t *foreign_metadata; /* NULL unless --keep-foreign-metadata requested */
-} wav_decode_options_t;
-
-typedef struct {
-	decode_options_t common;
-
-	FLAC__bool is_big_endian;
-	FLAC__bool is_unsigned_samples;
-} raw_decode_options_t;
-
 /* outfile == 0 => test only */
-int flac__decode_aiff(const char *infilename, const char *outfilename, FLAC__bool analysis_mode, analysis_options aopts, wav_decode_options_t options);
-int flac__decode_wav(const char *infilename, const char *outfilename, FLAC__bool analysis_mode, analysis_options aopts, wav_decode_options_t options);
-int flac__decode_raw(const char *infilename, const char *outfilename, FLAC__bool analysis_mode, analysis_options aopts, raw_decode_options_t options);
+int flac__decode_file(const char *infilename, const char *outfilename, FLAC__bool analysis_mode, analysis_options aopts, decode_options_t options);
 
 #endif

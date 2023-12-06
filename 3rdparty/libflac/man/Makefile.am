@@ -1,5 +1,6 @@
 #  flac - Command-line FLAC encoder/decoder
-#  Copyright (C) 2000,2001,2002,2003,2004,2005,2006,2007  Josh Coalson
+#  Copyright (C) 2000-2009  Josh Coalson
+#  Copyright (C) 2011-2023  Xiph.Org Foundation
 #
 #  This program is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU General Public License
@@ -11,25 +12,23 @@
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
 #
-#  You should have received a copy of the GNU General Public License
-#  along with this program; if not, write to the Free Software
-#  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+#  You should have received a copy of the GNU General Public License along
+#  with this program; if not, write to the Free Software Foundation, Inc.,
+#  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-if FLaC__HAS_DOCBOOK_TO_MAN
-flac.1: flac.sgml
-	docbook-to-man $? > $@ || (docbook2man $? && mv FLAC.1 $@)
+if FLaC__HAS_PANDOC
+flac.1: flac.md
+	pandoc --standalone --to man $? > $@
 
-metaflac.1: metaflac.sgml
-	docbook-to-man $? > $@ || (docbook2man $? && mv METAFLAC.1 $@)
-else
-flac.1:
-	echo "*** Warning: docbook-to-man not found; man pages will not be built."
-	touch $@
-
-metaflac.1:
-	touch $@
-endif
+metaflac.1: metaflac.md
+	pandoc --standalone --to man $? > $@
 
 man_MANS = flac.1 metaflac.1
 
-EXTRA_DIST = $(man_MANS) flac.sgml metaflac.sgml
+else
+if FLaC__HAS_PREBUILT_MANPAGES
+man_MANS = flac.1 metaflac.1
+endif
+endif
+
+EXTRA_DIST = flac.1 metaflac.1 flac.md metaflac.md

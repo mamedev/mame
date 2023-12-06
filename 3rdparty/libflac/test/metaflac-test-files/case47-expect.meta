@@ -1,7 +1,7 @@
 METADATA block #0
   type: 0 (STREAMINFO)
   is last: false
-  length: 34
+  length: XXX
   sample_rate: 8000 Hz
   channels: 1
   bits-per-sample: 8
@@ -10,13 +10,13 @@ METADATA block #0
 METADATA block #1
   type: 3 (SEEKTABLE)
   is last: false
-  length: 18
+  length: XXX
   seek points: 1
     point 0: sample_number=0
 METADATA block #2
   type: 4 (VORBIS_COMMENT)
   is last: false
-  length: 117
+  length: XXX
   comments: 4
     comment[0]: f=0123456789abcdefghij
     comment[1]: TITLE=Tittle
@@ -25,7 +25,7 @@ METADATA block #2
 METADATA block #3
   type: 5 (CUESHEET)
   is last: false
-  length: 480
+  length: XXX
   media catalog number: 1234567890123
   lead-in: 0
   is CD: false
@@ -46,7 +46,7 @@ METADATA block #3
 METADATA block #4
   type: 6 (PICTURE)
   is last: false
-  length: 141
+  length: XXX
   type: 3 (Cover (front))
   MIME type: image/gif
   description: 0.gif
@@ -54,12 +54,12 @@ METADATA block #4
   height: 24
   depth: 24
   colors: 2
-  data length: 95
+  data length: XXX
   data:
 METADATA block #5
   type: 6 (PICTURE)
   is last: false
-  length: 917
+  length: XXX
   type: 3 (Cover (front))
   MIME type: image/gif
   description: 1.gif
@@ -67,9 +67,9 @@ METADATA block #5
   height: 8
   depth: 24
   colors: 256
-  data length: 871
+  data length: XXX
   data:
 METADATA block #6
   type: 1 (PADDING)
   is last: true
-  length: 43
+  length: XXX

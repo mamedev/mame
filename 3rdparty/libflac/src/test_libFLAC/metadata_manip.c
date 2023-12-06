@@ -1,5 +1,6 @@
 /* test_libFLAC - Unit tester for libFLAC
- * Copyright (C) 2002,2003,2004,2005,2006,2007  Josh Coalson
+ * Copyright (C) 2002-2009  Josh Coalson
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -11,12 +12,12 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #  include <config.h>
 #endif
 
@@ -26,13 +27,8 @@
 #if defined _MSC_VER || defined __MINGW32__
 #include <sys/utime.h> /* for utime() */
 #include <io.h> /* for chmod() */
-#if _MSC_VER <= 1600 /* @@@ [2G limit] */
-#define fseeko fseek
-#define ftello ftell
-#endif
 #else
 #include <sys/types.h> /* some flavors of BSD (like OS X) require this to get time_t */
-#include <utime.h> /* for utime() */
 #include <unistd.h> /* for chown(), unlink() */
 #endif
 #include <sys/stat.h> /* for stat(), maybe chmod() */
@@ -40,6 +36,9 @@
 #include "FLAC/stream_decoder.h"
 #include "FLAC/metadata.h"
 #include "share/grabbag.h"
+#include "share/compat.h"
+#include "share/macros.h"
+#include "share/safe_str.h"
 #include "test_libs_common/file_utils_flac.h"
 #include "test_libs_common/metadata_utils.h"
 #include "metadata.h"
@@ -62,14 +61,14 @@ typedef struct {
 
 typedef struct {
 	FLAC__StreamMetadata *blocks[64];
-	unsigned num_blocks;
+	uint32_t num_blocks;
 } our_metadata_struct;
 
 /* our copy of the metadata in flacfilename() */
 static our_metadata_struct our_metadata_;
 
 /* the current block number that corresponds to the position of the iterator we are testing */
-static unsigned mc_our_block_number_ = 0;
+static uint32_t mc_our_block_number_ = 0;
 
 static const char *flacfilename(FLAC__bool is_ogg)
 {
@@ -100,7 +99,7 @@ static void *malloc_or_die_(size_t size)
 {
 	void *x = malloc(size);
 	if(0 == x) {
-		fprintf(stderr, "ERROR: out of memory allocating %u bytes\n", (unsigned)size);
+		fprintf(stderr, "ERROR: out of memory allocating %u bytes\n", (uint32_t)size);
 		exit(1);
 	}
 	return x;
@@ -118,9 +117,9 @@ static char *strdup_or_die_(const char *s)
 
 /* functions for working with our metadata copy */
 
-static FLAC__bool replace_in_our_metadata_(FLAC__StreamMetadata *block, unsigned position, FLAC__bool copy)
+static FLAC__bool replace_in_our_metadata_(FLAC__StreamMetadata *block, uint32_t position, FLAC__bool copy)
 {
-	unsigned i;
+	uint32_t i;
 	FLAC__StreamMetadata *obj = block;
 	FLAC__ASSERT(position < our_metadata_.num_blocks);
 	if(copy) {
@@ -138,9 +137,9 @@ static FLAC__bool replace_in_our_metadata_(FLAC__StreamMetadata *block, unsigned
 	return true;
 }
 
-static FLAC__bool insert_to_our_metadata_(FLAC__StreamMetadata *block, unsigned position, FLAC__bool copy)
+static FLAC__bool insert_to_our_metadata_(FLAC__StreamMetadata *block, uint32_t position, FLAC__bool copy)
 {
-	unsigned i;
+	uint32_t i;
 	FLAC__StreamMetadata *obj = block;
 	if(copy) {
 		if(0 == (obj = FLAC__metadata_object_clone(block)))
@@ -164,9 +163,9 @@ static FLAC__bool insert_to_our_metadata_(FLAC__StreamMetadata *block, unsigned 
 	return true;
 }
 
-static void delete_from_our_metadata_(unsigned position)
+static void delete_from_our_metadata_(uint32_t position)
 {
-	unsigned i;
+	uint32_t i;
 	FLAC__ASSERT(position < our_metadata_.num_blocks);
 	FLAC__metadata_object_delete(our_metadata_.blocks[position]);
 	for(i = position; i < our_metadata_.num_blocks - 1; i++)
@@ -188,13 +187,16 @@ static void delete_from_our_metadata_(unsigned position)
 static FLAC__bool open_tempfile_(const char *filename, FILE **tempfile, char **tempfilename)
 {
 	static const char *tempfile_suffix = ".metadata_edit";
+	size_t dest_len = strlen(filename) + strlen(tempfile_suffix) + 1;
 
-	if(0 == (*tempfilename = (char*)malloc(strlen(filename) + strlen(tempfile_suffix) + 1)))
+	*tempfilename = malloc(dest_len);
+	if (*tempfilename == NULL)
 		return false;
-	strcpy(*tempfilename, filename);
-	strcat(*tempfilename, tempfile_suffix);
+	safe_strncpy(*tempfilename, filename, dest_len);
+	safe_strncat(*tempfilename, tempfile_suffix, dest_len);
 
-	if(0 == (*tempfile = fopen(*tempfilename, "wb")))
+	*tempfile = flac_fopen(*tempfilename, "wb");
+	if (*tempfile == NULL)
 		return false;
 
 	return true;
@@ -202,13 +204,13 @@ static FLAC__bool open_tempfile_(const char *filename, FILE **tempfile, char **t
 
 static void cleanup_tempfile_(FILE **tempfile, char **tempfilename)
 {
-	if(0 != *tempfile) {
+	if (*tempfile != NULL) {
 		(void)fclose(*tempfile);
 		*tempfile = 0;
 	}
 
-	if(0 != *tempfilename) {
-		(void)unlink(*tempfilename);
+	if (*tempfilename != NULL) {
+		(void)flac_unlink(*tempfilename);
 		free(*tempfilename);
 		*tempfilename = 0;
 	}
@@ -227,14 +229,14 @@ static FLAC__bool transport_tempfile_(const char *filename, FILE **tempfile, cha
 	}
 
 #if defined _MSC_VER || defined __MINGW32__ || defined __EMX__
-	/* on some flavors of windows, rename() will fail if the destination already exists */
-	if(unlink(filename) < 0) {
+	/* on some flavors of windows, flac_rename() will fail if the destination already exists */
+	if(flac_unlink(filename) < 0) {
 		cleanup_tempfile_(tempfile, tempfilename);
 		return false;
 	}
 #endif
 
-	if(0 != rename(*tempfilename, filename)) {
+	if(0 != flac_rename(*tempfilename, filename)) {
 		cleanup_tempfile_(tempfile, tempfilename);
 		return false;
 	}
@@ -244,27 +246,32 @@ static FLAC__bool transport_tempfile_(const char *filename, FILE **tempfile, cha
 	return true;
 }
 
-static FLAC__bool get_file_stats_(const char *filename, struct stat *stats)
+static FLAC__bool get_file_stats_(const char *filename, struct flac_stat_s *stats)
 {
 	FLAC__ASSERT(0 != filename);
 	FLAC__ASSERT(0 != stats);
-	return (0 == stat(filename, stats));
+	return (0 == flac_stat(filename, stats));
 }
 
-static void set_file_stats_(const char *filename, struct stat *stats)
+static void set_file_stats_(const char *filename, struct flac_stat_s *stats)
 {
+#if defined(_POSIX_C_SOURCE) && (_POSIX_C_SOURCE >= 200809L) && !defined(_WIN32)
+	struct timespec srctime[2] = {};
+	srctime[0].tv_sec = stats->st_atime;
+	srctime[1].tv_sec = stats->st_mtime;
+#else
 	struct utimbuf srctime;
-
+	srctime.actime = stats->st_atime;
+	srctime.modtime = stats->st_mtime;
+#endif
 	FLAC__ASSERT(0 != filename);
 	FLAC__ASSERT(0 != stats);
 
-	srctime.actime = stats->st_atime;
-	srctime.modtime = stats->st_mtime;
-	(void)chmod(filename, stats->st_mode);
-	(void)utime(filename, &srctime);
-#if !defined _MSC_VER && !defined __MINGW32__ && !defined __EMX__
-	(void)chown(filename, stats->st_uid, -1);
-	(void)chown(filename, -1, stats->st_gid);
+	(void)flac_chmod(filename, stats->st_mode);
+	(void)flac_utime(filename, &srctime);
+#if !defined _MSC_VER && !defined __MINGW32__
+	FLAC_CHECK_RETURN(chown(filename, stats->st_uid, -1));
+	FLAC_CHECK_RETURN(chown(filename, -1, stats->st_gid));
 #endif
 }
 
@@ -281,7 +288,7 @@ static size_t chain_write_cb_(const void *ptr, size_t size, size_t nmemb, FLAC__
 
 static int chain_seek_cb_(FLAC__IOHandle handle, FLAC__int64 offset, int whence)
 {
-	off_t o = (off_t)offset;
+	FLAC__off_t o = (FLAC__off_t)offset;
 	FLAC__ASSERT(offset == o);
 	return fseeko((FILE*)handle, o, whence);
 }
@@ -314,14 +321,14 @@ static FLAC__bool write_chain_(FLAC__Metadata_Chain *chain, FLAC__bool use_paddi
 		callbacks.eof = chain_eof_cb_;
 
 		if(FLAC__metadata_chain_check_if_tempfile_needed(chain, use_padding)) {
-			struct stat stats;
+			struct flac_stat_s stats;
 			FILE *file, *tempfile = 0;
 			char *tempfilename;
 			if(preserve_file_stats) {
 				if(!get_file_stats_(filename, &stats))
 					return false;
 			}
-			if(0 == (file = fopen(filename, "rb")))
+			if(0 == (file = flac_fopen(filename, "rb")))
 				return false; /*@@@@ chain status still says OK though */
 			if(!open_tempfile_(filename, &tempfile, &tempfilename)) {
 				fclose(file);
@@ -342,7 +349,7 @@ static FLAC__bool write_chain_(FLAC__Metadata_Chain *chain, FLAC__bool use_paddi
 				set_file_stats_(filename, &stats);
 		}
 		else {
-			FILE *file = fopen(filename, "r+b");
+			FILE *file = flac_fopen(filename, "r+b");
 			if(0 == file)
 				return false; /*@@@@ chain status still says OK though */
 			if(!FLAC__metadata_chain_write_with_callbacks(chain, use_padding, (FLAC__IOHandle)file, callbacks))
@@ -371,7 +378,7 @@ static FLAC__bool read_chain_(FLAC__Metadata_Chain *chain, const char *filename,
 
 		{
 			FLAC__bool ret;
-			FILE *file = fopen(filename, "rb");
+			FILE *file = flac_fopen(filename, "rb");
 			if(0 == file)
 				return false; /*@@@@ chain status still says OK though */
 			ret = is_ogg?
@@ -386,9 +393,9 @@ static FLAC__bool read_chain_(FLAC__Metadata_Chain *chain, const char *filename,
 
 /* function for comparing our metadata to a FLAC__Metadata_Chain */
 
-static FLAC__bool compare_chain_(FLAC__Metadata_Chain *chain, unsigned current_position, FLAC__StreamMetadata *current_block)
+static FLAC__bool compare_chain_(FLAC__Metadata_Chain *chain, uint32_t current_position, FLAC__StreamMetadata *current_block)
 {
-	unsigned i;
+	uint32_t i;
 	FLAC__Metadata_Iterator *iterator;
 	FLAC__StreamMetadata *block;
 	FLAC__bool next_ok = true;
@@ -465,7 +472,7 @@ static void decoder_metadata_callback_null_(const FLAC__StreamDecoder *decoder, 
 {
 	(void)decoder, (void)metadata, (void)client_data;
 
-	printf("%d... ", mc_our_block_number_);
+	printf("%u... ", mc_our_block_number_);
 	fflush(stdout);
 
 	mc_our_block_number_++;
@@ -482,7 +489,7 @@ static void decoder_metadata_callback_compare_(const FLAC__StreamDecoder *decode
 	if(dcd->error_occurred)
 		return;
 
-	printf("%d... ", mc_our_block_number_);
+	printf("%u... ", mc_our_block_number_);
 	fflush(stdout);
 
 	if(mc_our_block_number_ >= our_metadata_.num_blocks) {
@@ -504,14 +511,14 @@ static void decoder_error_callback_(const FLAC__StreamDecoder *decoder, FLAC__St
 	(void)decoder;
 
 	dcd->error_occurred = true;
-	printf("ERROR: got error callback, status = %s (%u)\n", FLAC__StreamDecoderErrorStatusString[status], (unsigned)status);
+	printf("ERROR: got error callback, status = %s (%u)\n", FLAC__StreamDecoderErrorStatusString[status], (uint32_t)status);
 }
 
 static FLAC__bool generate_file_(FLAC__bool include_extras, FLAC__bool is_ogg)
 {
 	FLAC__StreamMetadata streaminfo, vorbiscomment, *cuesheet, picture, padding;
 	FLAC__StreamMetadata *metadata[4];
-	unsigned i = 0, n = 0;
+	uint32_t i = 0, n = 0;
 
 	printf("generating %sFLAC file for test\n", is_ogg? "Ogg " : "");
 
@@ -532,7 +539,7 @@ static FLAC__bool generate_file_(FLAC__bool include_extras, FLAC__bool is_ogg)
 	memset(streaminfo.data.stream_info.md5sum, 0, 16);
 
 	{
-		const unsigned vendor_string_length = (unsigned)strlen(FLAC__VENDOR_STRING);
+		const uint32_t vendor_string_length = (uint32_t)strlen(FLAC__VENDOR_STRING);
 		vorbiscomment.is_last = false;
 		vorbiscomment.type = FLAC__METADATA_TYPE_VORBIS_COMMENT;
 		vorbiscomment.length = (4 + vendor_string_length) + 4;
@@ -547,7 +554,7 @@ static FLAC__bool generate_file_(FLAC__bool include_extras, FLAC__bool is_ogg)
 		if (0 == (cuesheet = FLAC__metadata_object_new(FLAC__METADATA_TYPE_CUESHEET)))
 			return die_("priming our metadata");
 		cuesheet->is_last = false;
-		strcpy(cuesheet->data.cue_sheet.media_catalog_number, "bogo-MCN");
+		safe_strncpy(cuesheet->data.cue_sheet.media_catalog_number, "bogo-MCN", sizeof(cuesheet->data.cue_sheet.media_catalog_number));
 		cuesheet->data.cue_sheet.lead_in = 123;
 		cuesheet->data.cue_sheet.is_cd = false;
 		if (!FLAC__metadata_object_cuesheet_insert_blank_track(cuesheet, 0))
@@ -748,7 +755,7 @@ static FLAC__bool test_level_0_(void)
 
 	printf("testing FLAC__metadata_get_picture()... ");
 
-	if(!FLAC__metadata_get_picture(flacfilename(/*is_ogg=*/false), &picture, /*type=*/(FLAC__StreamMetadata_Picture_Type)(-1), /*mime_type=*/0, /*description=*/0, /*max_width=*/(unsigned)(-1), /*max_height=*/(unsigned)(-1), /*max_depth=*/(unsigned)(-1), /*max_colors=*/(unsigned)(-1)))
+	if(!FLAC__metadata_get_picture(flacfilename(/*is_ogg=*/false), &picture, /*type=*/(FLAC__StreamMetadata_Picture_Type)(-1), /*mime_type=*/0, /*description=*/0, /*max_width=*/(uint32_t)(-1), /*max_height=*/(uint32_t)(-1), /*max_depth=*/(uint32_t)(-1), /*max_colors=*/(uint32_t)(-1)))
 		return die_("during FLAC__metadata_get_picture()");
 
 	/* check to see if some basic data matches (c.f. generate_file_()) */
@@ -770,7 +777,7 @@ static FLAC__bool test_level_1_(void)
 	FLAC__Metadata_SimpleIterator *iterator;
 	FLAC__StreamMetadata *block, *app, *padding;
 	FLAC__byte data[1000];
-	unsigned our_current_position = 0;
+	uint32_t our_current_position = 0;
 
 	/* initialize 'data' to avoid Valgrind errors */
 	memset(data, 0, sizeof(data));
@@ -796,7 +803,7 @@ static FLAC__bool test_level_1_(void)
 	if(!FLAC__metadata_simple_iterator_init(iterator, flacfilename(/*is_ogg=*/false), /*read_only=*/false, /*preserve_file_stats=*/false))
 		return die_("FLAC__metadata_simple_iterator_init() returned false");
 
-	printf("is writable = %u\n", (unsigned)FLAC__metadata_simple_iterator_is_writable(iterator));
+	printf("is writable = %u\n", (uint32_t)FLAC__metadata_simple_iterator_is_writable(iterator));
 	if(FLAC__metadata_simple_iterator_is_writable(iterator))
 		return die_("iterator claims file is writable when tester thinks it should not be; are you running as root?\n");
 
@@ -892,13 +899,16 @@ static FLAC__bool test_level_1_(void)
 		return die_("FLAC__metadata_simple_iterator_init() returned false");
 	our_current_position = 0;
 
-	printf("is writable = %u\n", (unsigned)FLAC__metadata_simple_iterator_is_writable(iterator));
+	printf("is writable = %u\n", (uint32_t)FLAC__metadata_simple_iterator_is_writable(iterator));
 
 	printf("[S]VP\ttry to write over STREAMINFO block...\n");
 	if(!FLAC__metadata_simple_iterator_set_block(iterator, app, false))
 		printf("\tFLAC__metadata_simple_iterator_set_block() returned false like it should\n");
 	else
 		return die_("FLAC__metadata_simple_iterator_set_block() returned true but shouldn't have");
+
+	if(FLAC__metadata_simple_iterator_status(iterator) != FLAC__METADATA_SIMPLE_ITERATOR_STATUS_ILLEGAL_INPUT)
+		return die_("FLAC__metadata_simple_iterator_status() should have been FLAC__METADATA_SIMPLE_ITERATOR_STATUS_ILLEGAL_INPUT");
 
 	printf("[S]VP\tnext\n");
 	if(!FLAC__metadata_simple_iterator_next(iterator))
@@ -950,6 +960,9 @@ static FLAC__bool test_level_1_(void)
 	printf("[S]VPPP\tdelete (STREAMINFO block), must fail\n");
 	if(FLAC__metadata_simple_iterator_delete_block(iterator, false))
 		return die_ss_("FLAC__metadata_simple_iterator_delete_block(iterator, false) should have returned false", iterator);
+
+	if(FLAC__metadata_simple_iterator_status(iterator) != FLAC__METADATA_SIMPLE_ITERATOR_STATUS_ILLEGAL_INPUT)
+		return die_("FLAC__metadata_simple_iterator_status() should have been FLAC__METADATA_SIMPLE_ITERATOR_STATUS_ILLEGAL_INPUT");
 
 	if(!test_file_(/*is_ogg=*/false, decoder_metadata_callback_compare_))
 		return false;
@@ -1431,7 +1444,7 @@ static FLAC__bool test_level_2_(FLAC__bool filename_based, FLAC__bool is_ogg)
 	FLAC__Metadata_Chain *chain;
 	FLAC__StreamMetadata *block, *app, *padding;
 	FLAC__byte data[2000];
-	unsigned our_current_position;
+	uint32_t our_current_position;
 
 	/* initialize 'data' to avoid Valgrind errors */
 	memset(data, 0, sizeof(data));
@@ -1995,7 +2008,7 @@ static FLAC__bool test_level_2_misc_(FLAC__bool is_ogg)
 
 	printf("read chain (callback-based)\n");
 	{
-		FILE *file = fopen(flacfilename(is_ogg), "rb");
+		FILE *file = flac_fopen(flacfilename(is_ogg), "rb");
 		if(0 == file)
 			return die_("opening file");
 		if(!FLAC__metadata_chain_read_with_callbacks(chain, (FLAC__IOHandle)file, callbacks)) {
@@ -2016,7 +2029,7 @@ static FLAC__bool test_level_2_misc_(FLAC__bool is_ogg)
 
 	printf("read chain (callback-based)\n");
 	{
-		FILE *file = fopen(flacfilename(is_ogg), "rb");
+		FILE *file = flac_fopen(flacfilename(is_ogg), "rb");
 		if(0 == file)
 			return die_("opening file");
 		if(!FLAC__metadata_chain_read_with_callbacks(chain, (FLAC__IOHandle)file, callbacks)) {
@@ -2044,7 +2057,7 @@ static FLAC__bool test_level_2_misc_(FLAC__bool is_ogg)
 
 	printf("read chain (callback-based)\n");
 	{
-		FILE *file = fopen(flacfilename(is_ogg), "rb");
+		FILE *file = flac_fopen(flacfilename(is_ogg), "rb");
 		if(0 == file)
 			return die_("opening file");
 		if(!FLAC__metadata_chain_read_with_callbacks(chain, (FLAC__IOHandle)file, callbacks)) {
