@@ -459,6 +459,7 @@ namespace {
 
 #define PCI_CLOCK           (XTAL(33'868'800))
 #define SDRAM_CLOCK         (PCI_CLOCK * 3) // Main SDRAMs run at 100 MHz
+#define TIMER_CLOCK         (SDRAM_CLOCK / 8)
 
 class viper_state : public driver_device
 {
@@ -1012,7 +1013,7 @@ void viper_state::mpc8240_soc_map(address_map &map)
 
 			if (m_epic.global_timer[timer_num].enable && m_epic.global_timer[timer_num].base_count > 0)
 			{
-				attotime timer_duration =  attotime::from_hz((SDRAM_CLOCK / 8) / m_epic.global_timer[timer_num].base_count);
+				attotime timer_duration = attotime::from_hz(TIMER_CLOCK / m_epic.global_timer[timer_num].base_count);
 				m_epic.global_timer[timer_num].timer->adjust(timer_duration, timer_num);
 
 				LOGTIMER("EPIC GTIMER%d: next in %s\n", timer_num, (timer_duration / 8).as_string() );
@@ -1162,10 +1163,10 @@ TIMER_CALLBACK_MEMBER(viper_state::epic_global_timer_callback)
 
 	if (m_epic.global_timer[timer_num].enable && m_epic.global_timer[timer_num].base_count > 0)
 	{
-		attotime timer_duration =  attotime::from_hz((SDRAM_CLOCK / 8) / m_epic.global_timer[timer_num].base_count);
+		attotime timer_duration = attotime::from_hz(TIMER_CLOCK / m_epic.global_timer[timer_num].base_count);
 		m_epic.global_timer[timer_num].timer->adjust(timer_duration, timer_num);
 
-		LOGTIMER("EPIC GTIMER%d: next in %s\n", timer_num, (timer_duration / 8).as_string() );
+		LOGTIMER("EPIC GTIMER%d: next in %s\n", timer_num, timer_duration.as_string() );
 	}
 	else
 	{
@@ -2008,7 +2009,8 @@ void viper_state::viper_map(address_map &map)
 	// $10 bit 7 (w) clk_write, $18 bit 7 (r) do_read
 //  map(0xffe28008, 0xffe2801f).noprw();
 	map(0xffe30000, 0xffe31fff).rw("m48t58", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write));
-	map(0xffe40000, 0xffe4000f).noprw();
+	map(0xffe40000, 0xffe40007).noprw(); // JTAG? 0x00 on normal operation, other values on POST,
+										 // 0xa8/0xa9 for unexpected irq (namely irq1)
 	map(0xffe50000, 0xffe50007).w(FUNC(viper_state::unk2_w));
 	map(0xffe60000, 0xffe60007).noprw();
 	map(0xffe70000, 0xffe7000f).rw(FUNC(viper_state::e70000_r), FUNC(viper_state::e70000_w)); // DS2430
@@ -2402,6 +2404,21 @@ INPUT_PORTS_START( mocapb )
 
 	PORT_MODIFY("IN5")
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // P2 SHT2 (checks and fails serial if pressed)
+
+	// TODO: placeholders, not really IPT_PEDALs and not really PORT_PLAYER(2)
+	PORT_MODIFY("AN0")
+	PORT_BIT( 0xfff, 0x00, IPT_PEDAL ) PORT_NAME("Left Glove Rear-Front") PORT_MINMAX(0x000,0xfff) PORT_SENSITIVITY(50) PORT_KEYDELTA(25) PORT_REVERSE
+
+	PORT_MODIFY("AN1")
+	PORT_BIT( 0xfff, 0x00, IPT_PEDAL2 ) PORT_NAME("Left Glove Left-Right") PORT_MINMAX(0x000,0xfff) PORT_SENSITIVITY(50) PORT_KEYDELTA(25) PORT_REVERSE
+	// TODO: Left Glove Bottom-Top
+
+	PORT_MODIFY("AN2")
+	PORT_BIT( 0xfff, 0x00, IPT_PEDAL ) PORT_NAME("Right Glove Rear-Front") PORT_MINMAX(0x00,0xfff) PORT_SENSITIVITY(50) PORT_KEYDELTA(25) PORT_REVERSE PORT_PLAYER(2)
+
+	PORT_MODIFY("AN3")
+	PORT_BIT( 0xfff, 0x00, IPT_PEDAL2 ) PORT_NAME("Right Glove Left-Right") PORT_MINMAX(0x00,0xfff) PORT_SENSITIVITY(50) PORT_KEYDELTA(25) PORT_REVERSE PORT_PLAYER(2)
+	// TODO: Right Glove Bottom-Top
 INPUT_PORTS_END
 
 INPUT_PORTS_START( sscopefh )
@@ -3474,9 +3491,9 @@ GAME(2001, sscopex,   kviper,    viper,     sscopex,    viper_subscreen_state, i
 GAME(2001, sogeki,    sscopex,   viper,     sogeki,     viper_subscreen_state, init_vipercf,  ROT0,  "Konami", "Sogeki (ver JAA)", MACHINE_NOT_WORKING)
 GAME(2002, sscopefh,  kviper,    viper,     sscopefh,   viper_subscreen_state, init_vipercf,  ROT0,  "Konami", "Silent Scope Fortune Hunter (ver EAA)", MACHINE_NOT_WORKING) // UK only?
 GAME(2001, thrild2,   kviper,    viper,     thrild2,    viper_state, init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver EBB)", MACHINE_NOT_WORKING)
-GAME(2001, thrild2j,  thrild2,   viper,     thrild2,    viper_state, init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver JAA)", MACHINE_NOT_WORKING)
-GAME(2001, thrild2a,  thrild2,   viper,     thrild2,    viper_state, init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver AAA)", MACHINE_NOT_WORKING)
-GAME(2001, thrild2ab, thrild2,   viper,     thrild2,    viper_state, init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver AAA, alt)", MACHINE_NOT_WORKING)
+GAME(2001, thrild2j,  thrild2,   viper,     gticlub2,   viper_state, init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver JAA)", MACHINE_NOT_WORKING)
+GAME(2001, thrild2a,  thrild2,   viper,     gticlub2,   viper_state, init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver AAA)", MACHINE_NOT_WORKING)
+GAME(2001, thrild2ab, thrild2,   viper,     gticlub2,   viper_state, init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver AAA, alt)", MACHINE_NOT_WORKING)
 GAME(2001, thrild2ac, thrild2,   viper,     thrild2,    viper_state, init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver AAA, alt 2)", MACHINE_NOT_WORKING)
 GAME(2001, thrild2c,  thrild2,   viper,     thrild2,    viper_state, init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver EAA)", MACHINE_NOT_WORKING)
 GAME(2002, tsurugi,   kviper,    viper,     tsurugi,    viper_state, init_vipercf,  ROT0,  "Konami", "Tsurugi (ver EAB)", MACHINE_NOT_WORKING)
