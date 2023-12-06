@@ -4,7 +4,7 @@
 /*
 KCPU30-BASS KOMAYA PCB
 
-kuru.kuru-count (2005) - さーくるん
+Circlun - kuru.kuru-count (2005) - さーくるん
 mechanical medal game
 https://www.youtube.com/watch?v=L8LYEyvYvIY
 
@@ -118,4 +118,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2005, kkcount, 0, kkcount, kkcount, komaya_state, empty_init, ROT0, "Komaya", "Kuru.Kuru-Count", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 2005, kkcount, 0, kkcount, kkcount, komaya_state, empty_init, ROT0, "Komaya", "Circlun - Kuru.Kuru-Count", MACHINE_IS_SKELETON_MECHANICAL )
