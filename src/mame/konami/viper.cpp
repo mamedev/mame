@@ -99,6 +99,7 @@
     \- sscopex/sogeki desyncs during gameplay intro, leaves heavy trails in gameplay;
     - ppp2nd: hangs when selecting game mode from service (manages to save);
     - code1d, code1da, p9112: RTC self check bad;
+    - code1db: crashes when selecting single course type;
     - thrild2c: blue screen;
     - thrild2ac: black screen;
     - all games needs to be verified against factory settings
@@ -473,6 +474,7 @@ public:
 		m_workram(*this, "workram"),
 		m_ds2430_rom(*this, "ds2430"),
 		m_io_ports(*this, "IN%u", 0U),
+		m_analog_input(*this, "AN%u", 0U),
 		m_gun_input(*this, "GUN%u", 0U),
 		m_io_ppp_sensors(*this, "SENSOR%u", 1U),
 		m_dmadac(*this, { "dacr", "dacl" })
@@ -637,6 +639,8 @@ private:
 		uint8_t cr = 0U;
 		uint8_t sr = 0U;
 		int state = 0;
+		uint8_t addr_latch = 0U;
+		bool rw = 0;
 		emu_timer *timer = nullptr;
 	};
 
@@ -675,6 +679,7 @@ private:
 	required_shared_ptr<uint64_t> m_workram;
 	required_region_ptr<uint8_t> m_ds2430_rom;
 	required_ioport_array<8> m_io_ports;
+	required_ioport_array<4> m_analog_input;
 	required_ioport_array<4> m_gun_input;
 	optional_ioport_array<4> m_io_ppp_sensors;
 	required_device_array<dmadac_sound_device, 2> m_dmadac;
@@ -798,6 +803,7 @@ void viper_state::pci_config_data_w(uint64_t data)
 
 uint8_t viper_state::i2cdr_r(offs_t offset)
 {
+	u8 res = 0;
 	if (m_i2c.cr & 0x80 && !machine().side_effects_disabled())     // only do anything if the I2C module is enabled
 	{
 		if (m_i2c.state == I2C_STATE_ADDRESS_CYCLE)
@@ -817,6 +823,34 @@ uint8_t viper_state::i2cdr_r(offs_t offset)
 			// set transfer complete in status register
 			m_i2c.sr |= 0x80;
 
+			if (m_i2c.rw)
+			{
+				if ((m_i2c.addr_latch & 0xf0) == 0x10)
+				{
+					// TODO: hackish direct read
+					// What should really happen here is that i2c initiates a transfer with
+					// connected devices in serial form, cycling thru the various devices.
+					// The hard part is to drive the adc (which has 4 write and 2 read lines)
+					// with only sda/scl, and assuming it is really adc and the Guru note doesn't
+					// refer to boxingm instead.
+
+					// 0x1c: voltage, assume 5v
+					if (m_i2c.addr_latch == 0x1c)
+						return 0x80;
+					const u16 adc_value = m_analog_input[m_i2c.addr_latch & 0x3]->read();
+					// FIXME: upper nibble is currently discarded in port defs
+					// is it expecting 7 bits of data and 1 of parity?
+					// cfr. input tests returning different values for each nibble when both are equal.
+					const u8 adc_nibble = BIT(m_i2c.addr_latch, 2) ? 0 : 8;
+
+					res = (adc_value) >> adc_nibble;
+				}
+				else
+					LOG("I2C: unmapped read access %02x\n", m_i2c.addr_latch);
+			}
+			else
+				LOG("I2C: read access %02x in write mode!\n", m_i2c.addr_latch);
+
 			// generate interrupt if interrupt are enabled
 			/*if (m_i2c.cr & 0x40)
 			{
@@ -829,7 +863,7 @@ uint8_t viper_state::i2cdr_r(offs_t offset)
 		}
 	}
 
-	return 0;
+	return res;
 }
 
 void viper_state::i2cdr_w(offs_t offset, uint8_t data)
@@ -839,16 +873,19 @@ void viper_state::i2cdr_w(offs_t offset, uint8_t data)
 		if (m_i2c.state == I2C_STATE_ADDRESS_CYCLE)          // waiting for address cycle
 		{
 			//int rw = data & 1;
-
-			int addr = (data >> 1) & 0x7f;
-			LOGI2C("I2C address cycle, addr = %02X\n", addr);
+			m_i2c.rw = bool(data & 1);
+			m_i2c.addr_latch = (data >> 1) & 0x7f;
+			LOGI2C("I2C address cycle %s, addr = %02X \n"
+				, m_i2c.rw ? "read" : "write"
+				, m_i2c.addr_latch
+			);
 			m_i2c.state = I2C_STATE_DATA_TRANSFER;
 
 			m_i2c.timer->adjust(attotime::from_hz(I2C_TIMER_FREQ));
 		}
 		else if (m_i2c.state == I2C_STATE_DATA_TRANSFER)     // waiting for data transfer
 		{
-			LOGI2C("I2C data transfer, data = %02X\n", data);
+			LOGI2C("I2C data transfer, data = %02x\n", data);
 			m_i2c.state = I2C_STATE_ADDRESS_CYCLE;
 
 			m_i2c.timer->adjust(attotime::from_hz(I2C_TIMER_FREQ));
@@ -1969,7 +2006,7 @@ void viper_state::viper_map(address_map &map)
 	map(0xffe28000, 0xffe28007).nopr(); // sscopex busy flag for secondary screen?
 	// boxingm reads and writes here to read the pad sensor values, 2nd adc?
 	// $10 bit 7 (w) clk_write, $18 bit 7 (r) do_read
-//	map(0xffe28008, 0xffe2801f).noprw();
+//  map(0xffe28008, 0xffe2801f).noprw();
 	map(0xffe30000, 0xffe31fff).rw("m48t58", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write));
 	map(0xffe40000, 0xffe4000f).noprw();
 	map(0xffe50000, 0xffe50007).w(FUNC(viper_state::unk2_w));
@@ -2114,6 +2151,18 @@ static INPUT_PORTS_START( viper )
 
 	PORT_START("GUN3")
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("AN0")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("AN1")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("AN2")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("AN3")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( ppp2nd )
@@ -2179,13 +2228,26 @@ INPUT_PORTS_START( thrild2 )
 	PORT_MODIFY("IN4")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Shift Up")
 
-	// TODO: analog channels
+	// TODO: normal type steering wheel (non-K type)
+	PORT_MODIFY("AN0")
+	PORT_BIT( 0xfff, 0x000, IPT_PADDLE ) PORT_NAME("Steering Wheel") PORT_MINMAX(0x800,0x7ff) PORT_SENSITIVITY(50) PORT_KEYDELTA(50)
+
+	PORT_MODIFY("AN1")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_NAME("Gas Pedal") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(25) PORT_REVERSE
+
+	PORT_MODIFY("AN2")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_NAME("Brake Pedal") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(25) PORT_REVERSE
 INPUT_PORTS_END
 
 INPUT_PORTS_START( gticlub2 )
 	PORT_INCLUDE( thrild2 )
 
-	// TODO: specific analog channel for hand brake
+	// K-Type steering wheel
+	PORT_MODIFY("AN0")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_NAME("Steering Wheel") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(50) PORT_REVERSE
+
+	PORT_MODIFY("AN3")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL3 ) PORT_NAME("Handbrake Lever") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(25) PORT_REVERSE
 INPUT_PORTS_END
 
 INPUT_PORTS_START( gticlub2ea )
@@ -2215,6 +2277,7 @@ INPUT_PORTS_START( boxingm )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("BodyPad R")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // memory card check for boxingm (actually comms enable?)
 
+	// TODO: non-i2c analog ports
 INPUT_PORTS_END
 
 INPUT_PORTS_START( jpark3 )
@@ -2425,6 +2488,8 @@ INPUT_PORTS_START( wcombat )
 
 	PORT_MODIFY("IN4")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // X flip screen
+
+	// TODO: whatever it reads from the i2c analog ports (needs service mode)
 INPUT_PORTS_END
 
 INPUT_PORTS_START( xtrial )
@@ -2443,16 +2508,31 @@ INPUT_PORTS_START( xtrial )
 
 	PORT_MODIFY("IN4")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Shift Up")
+
+	// virtually identical to gticlub
+	PORT_MODIFY("AN0")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_NAME("Steering Wheel") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(50) PORT_REVERSE
+
+	PORT_MODIFY("AN1")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_NAME("Gas Pedal") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(25) PORT_REVERSE
+
+	PORT_MODIFY("AN2")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_NAME("Brake Pedal") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(25) PORT_REVERSE
+
+	PORT_MODIFY("AN3")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL3 ) PORT_NAME("Handbrake Lever") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(25) PORT_REVERSE
 INPUT_PORTS_END
 
 INPUT_PORTS_START( code1d )
 	PORT_INCLUDE( viper )
 
 	PORT_MODIFY("IN2")
-	PORT_DIPNAME( 0x01, 0x00, "DIP4" ) PORT_DIPLOCATION("SW:4") // Unknown, but without this set the game won't display anything besides a blue screen
+	// Unknown, but without this set the game won't display anything besides a blue screen
+	PORT_DIPNAME( 0x01, 0x00, "DIP4" ) PORT_DIPLOCATION("SW:4")
 	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "Calibrate Controls On Boot" ) PORT_DIPLOCATION("SW:2") // Game crashes during boot when this is on
+	// needs it to be on otherwise analog inputs won't work in gameplay
+	PORT_DIPNAME( 0x04, 0x04, "Calibrate Controls On Boot" ) PORT_DIPLOCATION("SW:2")
 	PORT_DIPSETTING( 0x04, DEF_STR( Yes ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( No ) )
 	PORT_DIPNAME( 0x08, 0x00, "Memory Card Check On Boot" ) PORT_DIPLOCATION("SW:1")
@@ -2462,6 +2542,14 @@ INPUT_PORTS_START( code1d )
 	PORT_MODIFY("IN4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Action Button")
 
+	PORT_MODIFY("AN0")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_NAME("Steering Wheel") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(50) PORT_REVERSE
+
+	PORT_MODIFY("AN1")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_NAME("Gas Pedal") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(25) PORT_REVERSE
+
+	PORT_MODIFY("AN2")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_NAME("Brake Pedal") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(25) PORT_REVERSE
 INPUT_PORTS_END
 
 /*****************************************************************************/
