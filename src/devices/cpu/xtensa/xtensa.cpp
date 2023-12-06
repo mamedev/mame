@@ -21,8 +21,9 @@
 #define LOG_EXTREG_OPS          (1U << 8)
 #define LOG_HANDLED_CALLX_OPS   (1U << 9)
 #define LOG_NAMED_REGS          (1U << 10)
+#define LOG_TIMER_REGS          (1U << 11)
 
-#define VERBOSE (LOG_UNHANDLED_OPS)
+#define VERBOSE (LOG_UNHANDLED_OPS | LOG_TIMER_REGS)
 #include "logmacro.h"
 
 // device type definitions
@@ -51,21 +52,11 @@ device_memory_interface::space_config_vector xtensa_device::memory_space_config(
 	return spaces;
 }
 
-uint32_t xtensa_device::extreg_windowbase_r() { LOGMASKED(LOG_NAMED_REGS, "m_extreg_windowbase read\n"); return m_extreg_windowbase; }
-void xtensa_device::extreg_windowbase_w(u32 data) {	m_extreg_windowbase = data; LOGMASKED(LOG_NAMED_REGS, "m_extreg_windowbase set to %08x\n", data); switch_windowbase(0); }
-uint32_t xtensa_device::extreg_windowstart_r() { LOGMASKED(LOG_NAMED_REGS, "m_extreg_windowstart read\n"); return m_extreg_windowstart; }
-void xtensa_device::extreg_windowstart_w(u32 data) { m_extreg_windowstart = data; LOGMASKED(LOG_NAMED_REGS, "m_extreg_windowstart set to %08x\n", data); }
-uint32_t xtensa_device::extreg_lbeg_r() { LOGMASKED(LOG_NAMED_REGS, "m_extreg_lbeg read\n"); return m_extreg_lbeg; }
-void xtensa_device::extreg_lbeg_w(u32 data) { m_extreg_lbeg = data; LOGMASKED(LOG_NAMED_REGS, "m_extreg_lbeg set to %08x\n", data); }
-uint32_t xtensa_device::extreg_lend_r() { LOGMASKED(LOG_NAMED_REGS, "m_extreg_lend read\n"); return m_extreg_lend; }
-void xtensa_device::extreg_lend_w(u32 data) { m_extreg_lend = data; LOGMASKED(LOG_NAMED_REGS, "m_extreg_lend set to %08x\n", data); }
-uint32_t xtensa_device::extreg_lcount_r() { LOGMASKED(LOG_NAMED_REGS, "m_extreg_lcount read\n"); return m_extreg_lcount; }
-void xtensa_device::extreg_lcount_w(u32 data) { m_extreg_lcount = data; LOGMASKED(LOG_NAMED_REGS, "m_extreg_lcount set to %08x\n", data); }
-uint32_t xtensa_device::extreg_ps_r() { LOGMASKED(LOG_NAMED_REGS, "m_extreg_ps read\n"); return m_extreg_ps; }
-void xtensa_device::extreg_ps_w(u32 data) { m_extreg_ps = data; LOGMASKED(LOG_NAMED_REGS, "m_extreg_ps set to %08x\n", data); }
+/* Exceptions */
 
-uint32_t xtensa_device::extreg_cacheattr_r() { LOGMASKED(LOG_NAMED_REGS, "m_extreg_cacheattr read\n"); return m_extreg_cacheattr; }
-void xtensa_device::extreg_cacheattr_w(u32 data) { m_extreg_cacheattr = data; LOGMASKED(LOG_NAMED_REGS, "m_extreg_cacheattr set to %08x\n", data); }
+uint32_t xtensa_device::extreg_exccause_r() { LOGMASKED(LOG_NAMED_REGS, "m_extreg_exccause read\n"); return 0x4; /* m_extreg_exccause;*/ }
+void xtensa_device::extreg_exccause_w(u32 data) { m_extreg_exccause = data; LOGMASKED(LOG_NAMED_REGS, "m_extreg_exccause set to %08x\n", data); }
+
 uint32_t xtensa_device::extreg_epc1_r() { LOGMASKED(LOG_NAMED_REGS, "m_extreg_epc1 read\n"); return m_extreg_epc1; }
 void xtensa_device::extreg_epc1_w(u32 data) { m_extreg_epc1 = data; LOGMASKED(LOG_NAMED_REGS, "m_extreg_epc1 set to %08x\n", data); }
 uint32_t xtensa_device::extreg_epc2_r() { LOGMASKED(LOG_NAMED_REGS, "m_extreg_epc2 read\n"); return m_extreg_epc2; }
@@ -76,6 +67,7 @@ uint32_t xtensa_device::extreg_epc4_r() { LOGMASKED(LOG_NAMED_REGS, "m_extreg_ep
 void xtensa_device::extreg_epc4_w(u32 data) { m_extreg_epc4 = data; LOGMASKED(LOG_NAMED_REGS, "m_extreg_epc4 set to %08x\n", data); }
 uint32_t xtensa_device::extreg_epc5_r() { LOGMASKED(LOG_NAMED_REGS, "m_extreg_epc5 read\n"); return m_extreg_epc5; }
 void xtensa_device::extreg_epc5_w(u32 data) { m_extreg_epc5 = data; LOGMASKED(LOG_NAMED_REGS, "m_extreg_epc5 set to %08x\n", data); }
+
 uint32_t xtensa_device::extreg_eps2_r() { LOGMASKED(LOG_NAMED_REGS, "m_extreg_eps2 read\n"); return m_extreg_eps2; }
 void xtensa_device::extreg_eps2_w(u32 data) { m_extreg_eps2 = data; LOGMASKED(LOG_NAMED_REGS, "m_extreg_eps2 set to %08x\n", data); }
 uint32_t xtensa_device::extreg_eps3_r() { LOGMASKED(LOG_NAMED_REGS, "m_extreg_eps3 read\n"); return m_extreg_eps3; }
@@ -84,6 +76,7 @@ uint32_t xtensa_device::extreg_eps4_r() { LOGMASKED(LOG_NAMED_REGS, "m_extreg_ep
 void xtensa_device::extreg_eps4_w(u32 data) { m_extreg_eps4 = data; LOGMASKED(LOG_NAMED_REGS, "m_extreg_eps4 set to %08x\n", data); }
 uint32_t xtensa_device::extreg_eps5_r() { LOGMASKED(LOG_NAMED_REGS, "m_extreg_eps5 read\n"); return m_extreg_eps5; }
 void xtensa_device::extreg_eps5_w(u32 data) { m_extreg_eps5 = data; LOGMASKED(LOG_NAMED_REGS, "m_extreg_eps5 set to %08x\n", data); }
+
 uint32_t xtensa_device::extreg_excsave1_r() { LOGMASKED(LOG_NAMED_REGS, "m_extreg_excsave1 read\n"); return m_extreg_excsave1; }
 void xtensa_device::extreg_excsave1_w(u32 data) { m_extreg_excsave1 = data; LOGMASKED(LOG_NAMED_REGS, "m_extreg_excsave1 set to %08x\n", data); }
 uint32_t xtensa_device::extreg_excsave2_r() { LOGMASKED(LOG_NAMED_REGS, "m_extreg_excsave2 read\n"); return m_extreg_excsave2; }
@@ -94,6 +87,44 @@ uint32_t xtensa_device::extreg_excsave4_r() { LOGMASKED(LOG_NAMED_REGS, "m_extre
 void xtensa_device::extreg_excsave4_w(u32 data) { m_extreg_excsave4 = data; LOGMASKED(LOG_NAMED_REGS, "m_extreg_excsave4 set to %08x\n", data); }
 uint32_t xtensa_device::extreg_excsave5_r() { LOGMASKED(LOG_NAMED_REGS, "m_extreg_excsave5 read\n"); return m_extreg_excsave5; }
 void xtensa_device::extreg_excsave5_w(u32 data) { m_extreg_excsave5 = data; LOGMASKED(LOG_NAMED_REGS, "m_extreg_excsave5 set to %08x\n", data); }
+
+/* Interrupts */
+
+uint32_t xtensa_device::extreg_intenable_r() { LOGMASKED(LOG_NAMED_REGS, "m_extreg_intenable read\n"); return m_extreg_intenable; }
+void xtensa_device::extreg_intenable_w(u32 data) { m_extreg_intenable = data; LOGMASKED(LOG_NAMED_REGS, "m_extreg_intenable set to %08x\n", data); }
+uint32_t xtensa_device::extreg_intclr_r() { LOGMASKED(LOG_NAMED_REGS, "m_extreg_intclr read\n"); return m_extreg_intclr; }
+void xtensa_device::extreg_intclr_w(u32 data) { m_extreg_intclr = data; m_extreg_intset &= ~data; LOGMASKED(LOG_NAMED_REGS, "m_extreg_intclr set to %08x\n", data); }
+uint32_t xtensa_device::extreg_intset_r() { LOGMASKED(LOG_NAMED_REGS, "m_extreg_intset read\n"); return m_extreg_intset; }
+void xtensa_device::extreg_intset_w(u32 data) { m_extreg_intset = data; LOGMASKED(LOG_NAMED_REGS, "m_extreg_intset set to %08x\n", data); }
+
+/* Window handling */
+
+uint32_t xtensa_device::extreg_windowbase_r() { LOGMASKED(LOG_NAMED_REGS, "m_extreg_windowbase read\n"); return m_extreg_windowbase; }
+void xtensa_device::extreg_windowbase_w(u32 data) {	m_extreg_windowbase = data; LOGMASKED(LOG_NAMED_REGS, "m_extreg_windowbase set to %08x\n", data); switch_windowbase(0); }
+uint32_t xtensa_device::extreg_windowstart_r() { LOGMASKED(LOG_NAMED_REGS, "m_extreg_windowstart read\n"); return m_extreg_windowstart; }
+void xtensa_device::extreg_windowstart_w(u32 data) { m_extreg_windowstart = data; LOGMASKED(LOG_NAMED_REGS, "m_extreg_windowstart set to %08x\n", data); }
+
+/* General processor state */
+
+uint32_t xtensa_device::extreg_ps_r() { LOGMASKED(LOG_NAMED_REGS, "m_extreg_ps read\n"); return m_extreg_ps; }
+void xtensa_device::extreg_ps_w(u32 data) { m_extreg_ps = data; LOGMASKED(LOG_NAMED_REGS, "m_extreg_ps set to %08x\n", data); }
+
+/* Loop handling */
+
+uint32_t xtensa_device::extreg_lbeg_r() { LOGMASKED(LOG_NAMED_REGS, "m_extreg_lbeg read\n"); return m_extreg_lbeg; }
+void xtensa_device::extreg_lbeg_w(u32 data) { m_extreg_lbeg = data; LOGMASKED(LOG_NAMED_REGS, "m_extreg_lbeg set to %08x\n", data); }
+uint32_t xtensa_device::extreg_lend_r() { LOGMASKED(LOG_NAMED_REGS, "m_extreg_lend read\n"); return m_extreg_lend; }
+void xtensa_device::extreg_lend_w(u32 data) { m_extreg_lend = data; LOGMASKED(LOG_NAMED_REGS, "m_extreg_lend set to %08x\n", data); }
+uint32_t xtensa_device::extreg_lcount_r() { LOGMASKED(LOG_NAMED_REGS, "m_extreg_lcount read\n"); return m_extreg_lcount; }
+void xtensa_device::extreg_lcount_w(u32 data) { m_extreg_lcount = data; LOGMASKED(LOG_NAMED_REGS, "m_extreg_lcount set to %08x\n", data); }
+
+/* Shifter */
+
+uint32_t xtensa_device::extreg_sar_r() { LOGMASKED(LOG_NAMED_REGS, "m_extreg_sar read\n"); return m_extreg_sar; }
+void xtensa_device::extreg_sar_w(u32 data) { m_extreg_sar = data; LOGMASKED(LOG_NAMED_REGS, "m_extreg_sar set to %08x\n", data); }
+
+/* Debugging */
+
 uint32_t xtensa_device::extreg_ibreaka0_r() { LOGMASKED(LOG_NAMED_REGS, "m_extreg_ibreaka0 read\n"); return m_extreg_ibreaka0; }
 void xtensa_device::extreg_ibreaka0_w(u32 data) { m_extreg_ibreaka0 = data; LOGMASKED(LOG_NAMED_REGS, "m_extreg_ibreaka0 set to %08x\n", data); }
 uint32_t xtensa_device::extreg_dbreaka0_r() { LOGMASKED(LOG_NAMED_REGS, "m_extreg_dbreaka0 read\n"); return m_extreg_dbreaka0; }
@@ -102,21 +133,39 @@ uint32_t xtensa_device::extreg_dbreakc0_r() { LOGMASKED(LOG_NAMED_REGS, "m_extre
 void xtensa_device::extreg_dbreakc0_w(u32 data) { m_extreg_dbreakc0 = data; LOGMASKED(LOG_NAMED_REGS, "m_extreg_dbreakc0 set to %08x\n", data); }
 uint32_t xtensa_device::extreg_icountlevel_r() { LOGMASKED(LOG_NAMED_REGS, "m_extreg_icountlevel read\n"); return m_extreg_icountlevel; }
 void xtensa_device::extreg_icountlevel_w(u32 data) { m_extreg_icountlevel = data; LOGMASKED(LOG_NAMED_REGS, "m_extreg_icountlevel set to %08x\n", data); }
-uint32_t xtensa_device::extreg_ccompare0_r() { LOGMASKED(LOG_NAMED_REGS, "m_extreg_ccompare0 read\n"); return m_extreg_ccompare0; }
-void xtensa_device::extreg_ccompare0_w(u32 data) { m_extreg_ccompare0 = data; LOGMASKED(LOG_NAMED_REGS, "m_extreg_ccompare0 set to %08x\n", data); }
-uint32_t xtensa_device::extreg_intenable_r() { LOGMASKED(LOG_NAMED_REGS, "m_extreg_intenable read\n"); return m_extreg_intenable; }
-void xtensa_device::extreg_intenable_w(u32 data) { m_extreg_intenable = data; LOGMASKED(LOG_NAMED_REGS, "m_extreg_intenable set to %08x\n", data); }
-uint32_t xtensa_device::extreg_intclr_r() { LOGMASKED(LOG_NAMED_REGS, "m_extreg_intclr read\n"); return m_extreg_intclr; }
-void xtensa_device::extreg_intclr_w(u32 data) { m_extreg_intclr = data; m_extreg_intset &= ~data; LOGMASKED(LOG_NAMED_REGS, "m_extreg_intclr set to %08x\n", data); }
-uint32_t xtensa_device::extreg_intset_r() { LOGMASKED(LOG_NAMED_REGS, "m_extreg_intset read\n"); return m_extreg_intset; }
-void xtensa_device::extreg_intset_w(u32 data) { m_extreg_intset = data; LOGMASKED(LOG_NAMED_REGS, "m_extreg_intset set to %08x\n", data); }
-uint32_t xtensa_device::extreg_ccount_r() { LOGMASKED(LOG_NAMED_REGS, "m_extreg_ccount read\n"); return machine().rand(); /* m_extreg_ccount;*/ }
-void xtensa_device::extreg_ccount_w(u32 data) { m_extreg_ccount = data; LOGMASKED(LOG_NAMED_REGS, "m_extreg_ccount set to %08x\n", data); }
-uint32_t xtensa_device::extreg_exccause_r() { LOGMASKED(LOG_NAMED_REGS, "m_extreg_exccause read\n"); return 0x4; /* m_extreg_exccause;*/ }
-void xtensa_device::extreg_exccause_w(u32 data) { m_extreg_exccause = data; LOGMASKED(LOG_NAMED_REGS, "m_extreg_exccause set to %08x\n", data); }
 
-uint32_t xtensa_device::extreg_sar_r() { LOGMASKED(LOG_NAMED_REGS, "m_extreg_sar read\n"); return m_extreg_sar; }
-void xtensa_device::extreg_sar_w(u32 data) { m_extreg_sar = data; LOGMASKED(LOG_NAMED_REGS, "m_extreg_sar set to %08x\n", data); }
+/* Misc */
+
+uint32_t xtensa_device::extreg_cacheattr_r() { LOGMASKED(LOG_NAMED_REGS, "m_extreg_cacheattr read\n"); return m_extreg_cacheattr; }
+void xtensa_device::extreg_cacheattr_w(u32 data) { m_extreg_cacheattr = data; LOGMASKED(LOG_NAMED_REGS, "m_extreg_cacheattr set to %08x\n", data); }
+
+/* Timer */
+
+uint32_t xtensa_device::extreg_ccompare0_r()
+{
+	LOGMASKED(LOG_TIMER_REGS, "m_extreg_ccompare0 read\n");
+	return m_extreg_ccompare0;
+}
+
+void xtensa_device::extreg_ccompare0_w(u32 data)
+{
+	// writing this clears the timer interrupt
+	m_extreg_ccompare0 = data;
+	LOGMASKED(LOG_TIMER_REGS, "m_extreg_ccompare0 set to %08x (clear timer interrupt)\n", data);
+}
+
+uint32_t xtensa_device::extreg_ccount_r()
+{
+	LOGMASKED(LOG_TIMER_REGS, "m_extreg_ccount read (%08x)\n", m_extreg_ccount);
+	return m_extreg_ccount;
+}
+
+void xtensa_device::extreg_ccount_w(u32 data)
+{
+	m_extreg_ccount = data;
+	LOGMASKED(LOG_TIMER_REGS, "m_extreg_ccount set to %08x\n", data);
+}
+
 
 void xtensa_device::set_irqpri(u8 val)
 {
@@ -2382,6 +2431,7 @@ void xtensa_device::execute_run()
 
 		debugger_instruction_hook(m_pc);
 
+		m_extreg_ccount++;
 
 		getop_and_execute();
 		m_icount--;

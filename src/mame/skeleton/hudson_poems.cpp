@@ -50,6 +50,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette"),
+		m_screen(*this, "screen"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_mainram(*this, "mainram"),
 		m_palram(*this, "palram")
@@ -74,6 +75,7 @@ private:
 	void mem_map(address_map &map);
 
 	uint32_t poems_count_r();
+	uint32_t poems_unk_r();
 	uint32_t poems_8000038_r(offs_t offset, u32 mem_mask);
 	uint32_t poems_8000200_r(offs_t offset, u32 mem_mask);
 	uint32_t unk_aa04_r(offs_t offset, u32 mem_mask);
@@ -93,6 +95,7 @@ private:
 
 	required_device<xtensa_device> m_maincpu;
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<u32> m_mainram;
 	required_shared_ptr<u32> m_palram;
@@ -246,6 +249,10 @@ uint32_t hudson_poems_state::screen_update(screen_device &screen, bitmap_ind16 &
 	return 0;
 }
 
+uint32_t hudson_poems_state::poems_unk_r()
+{
+	return 0x00000000;
+}
 
 
 uint32_t hudson_poems_state::poems_count_r()
@@ -428,7 +435,7 @@ void hudson_poems_state::mem_map(address_map &map)
  	map(0x08020008, 0x0802000b).nopr();
 //	map(0x08020010, 0x08020013).r(FUNC(hudson_poems_state::poems_count_r));
 	map(0x08020014, 0x08020017).nopw(); // writes 0x10
- 	map(0x08020018, 0x0802001b).nopr().nopw(); // writes 0x10
+ 	map(0x08020018, 0x0802001b).r(FUNC(hudson_poems_state::poems_unk_r)).nopw(); // writes 0x10
 	map(0x08020020, 0x08020023).r(FUNC(hudson_poems_state::poems_count_r));
 
 	///////////////////
