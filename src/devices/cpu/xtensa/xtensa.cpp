@@ -728,23 +728,22 @@ void xtensa_device::getop_and_execute()
 				set_reg(dstreg, get_reg(reg_s) & get_reg(reg_t));
 				break;
 			}
-			case 0b0010: // OR
+			case 0b0010: // OR / MOV
+			{
+				u8 dstreg = BIT(inst, 12, 4);
+				u8 reg_s = BIT(inst, 8, 4);
+				u8 reg_t = BIT(inst, 4, 4);
 				if (BIT(inst, 8, 4) == BIT(inst, 4, 4))
 				{
-					u8 dstreg = BIT(inst, 12, 4);
-					u8 srcreg = BIT(inst, 8, 4);
-					LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d\n", "mov", dstreg, srcreg);
-					set_reg(dstreg, get_reg(srcreg));
+					LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d\n", "mov", dstreg, reg_s);
 				}
 				else
 				{
-					u8 dstreg = BIT(inst, 12, 4);
-					u8 reg_s = BIT(inst, 8, 4);
-					u8 reg_t = BIT(inst, 4, 4);
 					LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, a%d\n", "or", dstreg, reg_s, reg_t);
-					set_reg(dstreg, get_reg(reg_s) | get_reg(reg_t));
 				}
-				break;
+				set_reg(dstreg, get_reg(reg_s) | get_reg(reg_t));
+			}
+			break;
 
 			case 0b0011: // XOR
 			{
@@ -1184,6 +1183,7 @@ void xtensa_device::getop_and_execute()
 				u8 srcreg = BIT(inst, 8, 4);
 				u8 bit = BIT(inst, 4, 4) + 7;
 				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, %d\n", "sext", dstreg, srcreg, bit);
+				// do we need to add another 1 to 'bit' for use with sext? common values in code seem to be 7, 15 etc.
 				set_reg(dstreg, util::sext(get_reg(srcreg), bit));
 				break;
 			}
