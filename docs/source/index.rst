@@ -30,6 +30,7 @@ MAME Documentation
     tools/index
 
     contributing/index
+    devtutorials/index
     techspecs/index
 
     security

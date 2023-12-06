@@ -799,16 +799,11 @@ project "7z"
 
 	configuration { "gmake or ninja" }
 		buildoptions_c {
-			"-Wno-strict-prototypes",
-			"-Wno-undef",
+			"-Wno-error=undef",
 		}
 if _OPTIONS["gcc"]~=nil then
 	if string.find(_OPTIONS["gcc"], "clang") then
-		if str_to_version(_OPTIONS["gcc_version"]) >= 100000 then
-			buildoptions_c {
-				"-Wno-error=misleading-indentation",
-			}
-		end
+
 	else
 		if str_to_version(_OPTIONS["gcc_version"]) >= 130000 then
 			buildoptions_c {
@@ -818,27 +813,12 @@ if _OPTIONS["gcc"]~=nil then
 	end
 end
 
-	configuration { "android-*" }
-		buildoptions {
-			"-Wno-error=misleading-indentation",
-		}
-
-	configuration { "asmjs" }
-		buildoptions {
-			"-Wno-error=misleading-indentation",
-		}
-
 	configuration { "vs*" }
 		buildoptions {
 			"/wd4100", -- warning C4100: 'xxx' : unreferenced formal parameter
 			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
 			"/wd4457", -- warning C4457: declaration of 'xxx' hides function parameter
 		}
-if _OPTIONS["vs"]=="clangcl" then
-		buildoptions {
-			"-Wno-error=misleading-indentation",
-		}
-end
 if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
 			"/Qwd869",              -- remark #869: parameter "xxx" was never referenced
