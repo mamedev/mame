@@ -66,7 +66,7 @@ protected:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t tile, int xx, int yy, int gfxbase);
+	void draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t tile, int xx, int yy, int gfxbase, int extrapal);
 	void draw_tile8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t tile, int xx, int yy);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(screen_scanline);
@@ -113,11 +113,12 @@ static INPUT_PORTS_START( hudson_poems )
 INPUT_PORTS_END
 
 
-void hudson_poems_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t tile, int xx, int yy, int gfxbase)
+void hudson_poems_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t tile, int xx, int yy, int gfxbase, int extrapal)
 {
 	int flipx = tile & 0x0800;
 	int flipy = tile & 0x0400;
-	int pal = (tile & 0xf000)>>8; 
+	int pal = (tile & 0xf000)>>8;
+	pal += extrapal * 0x100;
 	tile &= 0x3ff;
 
 	int realoffset = tile * 8;
@@ -182,7 +183,7 @@ uint32_t hudson_poems_state::screen_update(screen_device &screen, bitmap_ind16 &
 {
 	bitmap.fill(0, cliprect);
 
-	int width, base, bpp, gfxbase;
+	int width, base, bpp, gfxbase, extrapal;
 
 	bool attempt_draw = true;
 
@@ -190,12 +191,15 @@ uint32_t hudson_poems_state::screen_update(screen_device &screen, bitmap_ind16 &
 
 	switch (hack_select)
 	{
-	case 0x09: width = 512; base = (0xa800/4); bpp = 4; gfxbase = 0x9c00; break;// konami logo
-	case 0x0d: width = 512; base = (0xb800/4); bpp = 8; gfxbase = 0x9c00; break;// poems logo
-	case 0x10: width = 512; base = (0xc600/4); bpp = 4; gfxbase = 0x9c00; break;// bemani logo
-	case 0x14: width = 512; base = (0xd400/4); bpp = 4; gfxbase = 0x9c00; break;// warning screen
-	case 0x38: width = 512; base = (0x14000/4); bpp = 4; gfxbase = 0x9800; break;// title 1
-	case 0x44: width = 512; base = (0x18400/4); bpp = 4; gfxbase = 0x9800; break;// title 2
+	case 0x09: width = 512; base = (0xa800/4); bpp = 4; gfxbase = 0x9c00; extrapal = 0; break;// konami logo
+	case 0x0d: width = 512; base = (0xb800/4); bpp = 8; gfxbase = 0x9c00; extrapal = 0; break;// poems logo
+	case 0x10: width = 512; base = (0xc600/4); bpp = 4; gfxbase = 0x9c00; extrapal = 0;break;// bemani logo
+	case 0x14: width = 512; base = (0xd400/4); bpp = 4; gfxbase = 0x9c00; extrapal = 0; break;// warning screen
+    case 0x38: width = 512; base = (0x14000/4); bpp = 4; gfxbase = 0x9800; break;// title 1 logo (shouldn't be this tall?, contains the top half of below)
+	//case 0x38: width = 512; base = (0x14800/4); bpp = 4; gfxbase = 0x9800+0x7800; extrapal = 1; break;// title 1 background
+	//case 0x38: width = 512; base = (0x15800/4); bpp = 4; gfxbase = 0x9800+0x7800; extrapal = 1; break;// title 1 background (same as above, but set to use palette 1)
+	//case 0x38: width = 512; base = (0x16800/4); bpp = 4; gfxbase = 0x9800+base_hack; break;// title 1 logo (shouldn't be this tall?, bottom half of title screen, but not the button/text)
+	case 0x44: width = 512; base = (0x18400/4); bpp = 4; gfxbase = 0x9800; extrapal = 0; break;// game demo
 
 	default: attempt_draw = false; break;
 	}
@@ -210,7 +214,7 @@ uint32_t hudson_poems_state::screen_update(screen_device &screen, bitmap_ind16 &
 			{
 
 				count++;
-				draw_tile(screen, bitmap, cliprect, count * 8, x * 8, y * 8, 0x9c00);
+				draw_tile(screen, bitmap, cliprect, count * 8, x * 8, y * 8, 0x9c00, 0);
 			}
 		}
 	}
@@ -225,8 +229,8 @@ uint32_t hudson_poems_state::screen_update(screen_device &screen, bitmap_ind16 &
 
 				if (bpp == 4)
 				{
-					draw_tile(screen, bitmap, cliprect, (tiles & 0xffff), (x * 16), y * 8, gfxbase);
-					draw_tile(screen, bitmap, cliprect, ((tiles >> 16) & 0xffff), (x * 16) + 8, y * 8, gfxbase);
+					draw_tile(screen, bitmap, cliprect, (tiles & 0xffff), (x * 16), y * 8, gfxbase, extrapal);
+					draw_tile(screen, bitmap, cliprect, ((tiles >> 16) & 0xffff), (x * 16) + 8, y * 8, gfxbase, extrapal);
 				}
 				else if (bpp == 8)
 				{
@@ -452,23 +456,20 @@ TIMER_DEVICE_CALLBACK_MEMBER(hudson_poems_state::screen_scanline)
 
 	if (scanline == 200) 
 	{
-//		if (machine().input().code_pressed_once(KEYCODE_W))
-//			m_maincpu->irq_request_hack(0x2);
+		//m_maincpu->irq_request_hack(0x2);
 	}
 
 //	if ((scanline %= 80) == 48) 
 	{
-//		m_maincpu->irq_request_hack(0x4);
-
-		// this needs to change in RAM, presumably from an interrupt, but no idea how to get there
-	//	if (machine().input().code_pressed_once(KEYCODE_W))
+		//	m_maincpu->irq_request_hack(0x4);
+		//  this needs to change in RAM, presumably from an interrupt, but no idea how to get there
 
 		m_maincpu->space(AS_PROGRAM).write_byte(0x2c01d92c, 0x01);
 	}
 
 	if (scanline == 150)
 	{
-//		m_maincpu->irq_off_hack();
+	//	m_maincpu->irq_off_hack();
 	}
 	
 
