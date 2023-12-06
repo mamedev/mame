@@ -128,9 +128,11 @@ void xtensa_device::extreg_sar_w(u32 data) { m_extreg_sar = data; LOGMASKED(LOG_
 uint32_t xtensa_device::extreg_ibreaka0_r() { LOGMASKED(LOG_NAMED_REGS, "m_extreg_ibreaka0 read\n"); return m_extreg_ibreaka0; }
 void xtensa_device::extreg_ibreaka0_w(u32 data) { m_extreg_ibreaka0 = data; LOGMASKED(LOG_NAMED_REGS, "m_extreg_ibreaka0 set to %08x\n", data); }
 uint32_t xtensa_device::extreg_dbreaka0_r() { LOGMASKED(LOG_NAMED_REGS, "m_extreg_dbreaka0 read\n"); return m_extreg_dbreaka0; }
+
 void xtensa_device::extreg_dbreaka0_w(u32 data) { m_extreg_dbreaka0 = data; LOGMASKED(LOG_NAMED_REGS, "m_extreg_dbreaka0 set to %08x\n", data); }
 uint32_t xtensa_device::extreg_dbreakc0_r() { LOGMASKED(LOG_NAMED_REGS, "m_extreg_dbreakc0 read\n"); return m_extreg_dbreakc0; }
 void xtensa_device::extreg_dbreakc0_w(u32 data) { m_extreg_dbreakc0 = data; LOGMASKED(LOG_NAMED_REGS, "m_extreg_dbreakc0 set to %08x\n", data); }
+
 uint32_t xtensa_device::extreg_icountlevel_r() { LOGMASKED(LOG_NAMED_REGS, "m_extreg_icountlevel read\n"); return m_extreg_icountlevel; }
 void xtensa_device::extreg_icountlevel_w(u32 data) { m_extreg_icountlevel = data; LOGMASKED(LOG_NAMED_REGS, "m_extreg_icountlevel set to %08x\n", data); }
 
@@ -1232,8 +1234,7 @@ void xtensa_device::getop_and_execute()
 				u8 srcreg = BIT(inst, 8, 4);
 				u8 bit = BIT(inst, 4, 4) + 7;
 				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, %d\n", "sext", dstreg, srcreg, bit);
-				// do we need to add another 1 to 'bit' for use with sext? common values in code seem to be 7, 15 etc.
-				set_reg(dstreg, util::sext(get_reg(srcreg), bit));
+				set_reg(dstreg, util::sext(get_reg(srcreg), bit+1));
 				break;
 			}
 
