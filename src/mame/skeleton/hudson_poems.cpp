@@ -191,7 +191,7 @@ uint32_t hudson_poems_state::screen_update(screen_device &screen, bitmap_ind16 &
 	switch (hack_select)
 	{
 	case 0x09: width = 512; base = (0xa800/4); bpp = 4; gfxbase = 0x9c00; break;// konami logo
-	case 0x0d: width = 128; base = (0x9498/4); bpp = 8; gfxbase = 0x9c00; break;// poems logo
+	case 0x0d: width = 512; base = (0xb800/4); bpp = 8; gfxbase = 0x9c00; break;// poems logo
 	case 0x10: width = 512; base = (0xc600/4); bpp = 4; gfxbase = 0x9c00; break;// bemani logo
 	case 0x14: width = 512; base = (0xd400/4); bpp = 4; gfxbase = 0x9c00; break;// warning screen
 	case 0x38: width = 512; base = (0x14000/4); bpp = 4; gfxbase = 0x9800; break;// title 1

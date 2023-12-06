@@ -1863,7 +1863,7 @@ void xtensa_device::getop_and_execute()
 			{
 				// TODO window exception checking etc.
 				u8 reg = BIT(inst, 8, 4);
-				u32 stacksize = (inst >> 12) * 4;
+				u32 stacksize = (inst >> 12) << 3;
 				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, %s\n", "entry", reg, format_imm(stacksize));
 				u32 stack = get_reg(reg);
 				switch_windowbase(get_callinc());
