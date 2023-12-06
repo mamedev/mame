@@ -1932,9 +1932,8 @@ MC6845_UPDATE_ROW(heath_igc_tlb_device::crtc_update_row)
 
 
 /**
- * Super-19 ROM
+ * SigmaSoft and Systems IGC plus TLB with Super-19 ROM
  *
- * Developed by ATG Systems
  */
 heath_igc_super19_tlb_device::heath_igc_super19_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	heath_igc_tlb_device(mconfig, HEATH_IGC_SUPER19, tag, owner, clock)
@@ -1953,9 +1952,8 @@ ioport_constructor heath_igc_super19_tlb_device::device_input_ports() const
 
 
 /**
- * UltraROM
+ * SigmaSoft and Systems IGC plus TLB with UltraROM
  *
- * Developed by William G. Parrott, III, sold by Software Wizardry, Inc.
  */
 heath_igc_ultra_tlb_device::heath_igc_ultra_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	heath_igc_tlb_device(mconfig, HEATH_IGC_ULTRA, tag, owner, clock)
@@ -1992,9 +1990,8 @@ ioport_constructor heath_igc_ultra_tlb_device::device_input_ports() const
 
 
 /**
- * Watzman ROM
+ * SigmaSoft and Systems IGC plus TLB with Watzman ROM
  *
- * Developed by Barry Watzman, sold by HUG (Heath Users Group)
 */
 heath_igc_watz_tlb_device::heath_igc_watz_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	heath_igc_tlb_device(mconfig, HEATH_IGC_WATZ, tag, owner, clock)
