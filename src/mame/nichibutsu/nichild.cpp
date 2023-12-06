@@ -45,6 +45,8 @@ A LDC labeled 2 pin connector
 
 #include "emu.h"
 
+#include "nbmjctrl.h"
+
 #include "cpu/z80/tmpz84c011.h"
 #include "machine/74166.h"
 #include "machine/gen_latch.h"
@@ -71,8 +73,8 @@ public:
 		, m_audiocpu(*this, "audiocpu")
 		, m_v9938(*this, "v9938")
 		, m_gfxrom(*this, "gfx")
-		, m_p1_keymatrix(*this, { "P1_KEY0", "P1_KEY1", "P1_KEY2", "P1_KEY3", "P1_KEY4" })
-		, m_p2_keymatrix(*this, { "P2_KEY0", "P2_KEY1", "P2_KEY2", "P2_KEY3", "P2_KEY4" })
+		, m_keys{ { *this, "P1_KEY%u", 0U }, { *this, "P2_KEY%u", 0U } }
+		, m_dsw(*this, "DSW%c", 'A')
 		, m_dsw_shifter(*this, "ttl166_%u", 1U)
 		, m_sound_rom(*this, "audiorom")
 		, m_soundbank(*this, "soundbank")
@@ -88,8 +90,8 @@ private:
 	required_device<v9938_device> m_v9938;
 	required_region_ptr<uint8_t> m_gfxrom;
 
-	required_ioport_array<5> m_p1_keymatrix;
-	required_ioport_array<5> m_p2_keymatrix;
+	required_ioport_array<5> m_keys[2];
+	required_ioport_array<2> m_dsw;
 	required_device_array<ttl166_device, 2> m_dsw_shifter;
 
 	required_region_ptr<uint8_t> m_sound_rom;
@@ -102,9 +104,6 @@ private:
 	void key_select_w(uint8_t data);
 	uint8_t porta_r();
 	void porta_w(uint8_t data);
-	void portb_w(uint8_t data);
-	void portc_w(uint8_t data);
-	void portd_w(uint8_t data);
 	void gfxbank_w(uint8_t data);
 
 	void main_map(address_map &map);
@@ -162,21 +161,6 @@ void nichild_state::porta_w(uint8_t data)
 	m_dsw_shifter[1]->clock_w(BIT(data, 6));
 }
 
-void nichild_state::portb_w(uint8_t data)
-{
-	logerror("PORTB %02x\n",data);
-}
-
-void nichild_state::portc_w(uint8_t data)
-{
-	logerror("PORTC %02x\n",data);
-}
-
-void nichild_state::portd_w(uint8_t data)
-{
-	logerror("PORTD %02x\n",data);
-}
-
 void nichild_state::gfxbank_w(uint8_t data)
 {
 	// TODO: ldquiz4 checks up to 0x30, what for?
@@ -186,28 +170,35 @@ void nichild_state::gfxbank_w(uint8_t data)
 uint8_t nichild_state::p1_keymatrix_r()
 {
 	uint8_t result = 0xff;
-	for (unsigned i = 0; m_p1_keymatrix.size() > i; ++i)
-	{
-		if (!BIT(m_key_select, i))
-			result &= m_p1_keymatrix[i]->read();
-	}
+
+	for (unsigned i = 0; i < 5; i++)
+		if (BIT(m_key_select, i) == 0)
+			result &= m_keys[0][i]->read();
+
 	return result;
 }
 
 uint8_t nichild_state::p2_keymatrix_r()
 {
 	uint8_t result = 0xff;
-	for (unsigned i = 0; m_p2_keymatrix.size() > i; ++i)
-	{
-		if (!BIT(m_key_select, i))
-			result &= m_p2_keymatrix[i]->read();
-	}
+
+	for (unsigned i = 0; i < 5; i++)
+		if (BIT(m_key_select, i) == 0)
+			result &= m_keys[1][i]->read();
+
 	return result;
 }
 
 void nichild_state::key_select_w(uint8_t data)
 {
+	// 7-------  unknown (always 0?)
+	// -6------  coin counter
+	// --5-----  unknown (sometimes toggles 0/1)
+	// ---43210  key row select
+
 	m_key_select = (data & 0x1f);
+
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 6));
 }
 
 void nichild_state::main_map(address_map &map)
@@ -260,106 +251,7 @@ void nichild_state::audio_io(address_map &map)
 
 
 static INPUT_PORTS_START( nichild_mj )
-	// mahjong panels are virtually identical to nb1413m3
-	PORT_START("P1_KEY0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_M )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_I )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_E )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_A )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("P1_KEY1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_N )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_J )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_F )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_B )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("P1_KEY2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_K )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_G )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_C )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("P1_KEY3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_L )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_H )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_D )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("P1_KEY4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("P2_KEY0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_KAN ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_M ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_I ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_E ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_A ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("P2_KEY1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_BET ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_REACH ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_N ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_J ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_F ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_B ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("P2_KEY2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_RON ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_CHI ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_K ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_G ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_C ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("P2_KEY3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_PON ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_L ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_H ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_D ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("P2_KEY4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_BIG ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_INCLUDE(nbmjctrl)
 
 	PORT_START("PORTD")
 	PORT_DIPNAME( 0x01, 0x01, "PORTD" )
@@ -384,28 +276,28 @@ static INPUT_PORTS_START( nichild_mj )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x01, "Background" ) PORT_DIPLOCATION("DSWA:8")
-	PORT_DIPSETTING(    0x01, "Green" )
-	PORT_DIPSETTING(    0x00, "Video Playback" )
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSWA:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSWA:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSWA:5")
-	PORT_DIPNAME(0x10, 0x10, DEF_STR( Coinage )) PORT_DIPLOCATION("DSWA:4")
-	PORT_DIPSETTING(0x10, DEF_STR( 1C_1C ))
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSWA:1") // those three are probably difficulty
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSWA:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSWA:3")
+	PORT_DIPNAME(0x08, 0x08, DEF_STR( Coinage )) PORT_DIPLOCATION("DSWA:4")
+	PORT_DIPSETTING(0x08, DEF_STR( 1C_1C ))
 	PORT_DIPSETTING(0x00, DEF_STR( 1C_2C ))
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSWA:3") // those three are probably difficulty
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSWA:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSWA:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSWA:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSWA:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSWA:7")
+	PORT_DIPNAME( 0x80, 0x80, "Background" ) PORT_DIPLOCATION("DSWA:8")
+	PORT_DIPSETTING(    0x80, "Green" )
+	PORT_DIPSETTING(    0x00, "Video Playback" )
 
 	PORT_START("DSWB")
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSWB:8")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSWB:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSWB:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSWB:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSWB:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSWB:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSWB:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSWB:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSWB:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSWB:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSWB:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSWB:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSWB:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSWB:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSWB:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSWB:8")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( nichild_quiz )
@@ -417,8 +309,7 @@ static INPUT_PORTS_START( nichild_quiz )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("C Button") PORT_PLAYER(1)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("B Button") PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("A Button") PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P1_KEY1")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -439,8 +330,7 @@ static INPUT_PORTS_START( nichild_quiz )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("C Button") PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("B Button") PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("A Button") PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P2_KEY1")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -477,36 +367,36 @@ static INPUT_PORTS_START( nichild_quiz )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x01, "RGB Test Screen" ) PORT_DIPLOCATION("DSWA:8")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Video Playback In Attract Mode" ) PORT_DIPLOCATION("DSWA:7")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSWA:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSWA:2")
+	PORT_DIPNAME(0x04, 0x04, DEF_STR( Coinage )) PORT_DIPLOCATION("DSWA:3")
+	PORT_DIPSETTING(0x04, DEF_STR( 1C_1C ))
+	PORT_DIPSETTING(0x00, DEF_STR( 1C_2C ))
+	PORT_DIPNAME(0x08, 0x08, DEF_STR( Lives )) PORT_DIPLOCATION("DSWA:4")
+	PORT_DIPSETTING(0x08, "3")
+	PORT_DIPSETTING(0x00, "5")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSWA:5")
 	// at least for ldquiz4, to be verified for other games
 	// (definitely don't affect sound in shabdama unless it expects attract mode audio from LD player)
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("DSWA:6")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("DSWA:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSWA:5")
-	PORT_DIPNAME(0x10, 0x10, DEF_STR( Lives )) PORT_DIPLOCATION("DSWA:4")
-	PORT_DIPSETTING(0x10, "3")
-	PORT_DIPSETTING(0x00, "5")
-	PORT_DIPNAME(0x20, 0x20, DEF_STR( Coinage )) PORT_DIPLOCATION("DSWA:3")
-	PORT_DIPSETTING(0x20, DEF_STR( 1C_1C ))
-	PORT_DIPSETTING(0x00, DEF_STR( 1C_2C ))
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSWA:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSWA:1")
+	PORT_DIPNAME( 0x40, 0x40, "Video Playback In Attract Mode" ) PORT_DIPLOCATION("DSWA:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "RGB Test Screen" ) PORT_DIPLOCATION("DSWA:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSWB")
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSWB:8")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSWB:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSWB:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSWB:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSWB:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSWB:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSWB:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSWB:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSWB:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSWB:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSWB:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSWB:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSWB:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSWB:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSWB:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSWB:8")
 INPUT_PORTS_END
 
 
@@ -538,9 +428,6 @@ void nichild_state::nichild(machine_config &config)
 	m_maincpu->in_pc_callback().set(FUNC(nichild_state::p2_keymatrix_r));
 	m_maincpu->in_pd_callback().set_ioport("PORTD");
 	m_maincpu->out_pa_callback().set(FUNC(nichild_state::porta_w));
-	m_maincpu->out_pb_callback().set(FUNC(nichild_state::portb_w));
-	m_maincpu->out_pc_callback().set(FUNC(nichild_state::portc_w));
-	m_maincpu->out_pd_callback().set(FUNC(nichild_state::portd_w));
 	m_maincpu->out_pe_callback().set(FUNC(nichild_state::gfxbank_w));
 
 	Z80(config, m_audiocpu, SOUND_CLOCK);
@@ -549,11 +436,11 @@ void nichild_state::nichild(machine_config &config)
 	m_audiocpu->set_periodic_int(FUNC(nichild_state::irq0_line_hold), attotime::from_hz(XTAL(SOUND_CLOCK)/512)); // ?
 
 	TTL166(config, m_dsw_shifter[0]);
-	m_dsw_shifter[0]->data_callback().set_ioport("DSWB");
+	m_dsw_shifter[0]->data_callback().set([this]() { return bitswap<8>(m_dsw[1]->read(), 0, 1, 2, 3, 4, 5, 6, 7); }); // DSWB
 	m_dsw_shifter[0]->qh_callback().set(m_dsw_shifter[1], FUNC(ttl166_device::serial_w));
 
 	TTL166(config, m_dsw_shifter[1]);
-	m_dsw_shifter[1]->data_callback().set_ioport("DSWA");
+	m_dsw_shifter[1]->data_callback().set([this]() { return bitswap<8>(m_dsw[0]->read(), 0, 1, 2, 3, 4, 5, 6, 7); }); // DSWA
 	m_dsw_shifter[1]->qh_callback().set([this](int state) { m_dsw_data = state; });
 
 	V9938(config, m_v9938, VDP_CLOCK);
