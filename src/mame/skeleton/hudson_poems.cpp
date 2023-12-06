@@ -23,6 +23,12 @@
    2005/11/17   絶体絶命でんぢゃらすじーさん パーティーじゃっ!全員集合!!  (Mini-Game Collection)
    2005/11/24   ぐ〜チョコランタン スプーだいすき!プレイマット                (Kid's Floor Mat)
 
+   -------------
+
+   Marimba Tengoku has a secret test menue (unsure how to access it)
+   the ROM check code for that menu is at 0x661010 in ROM and does a full 32-bit word sum
+   of the ROM, comparing it against the value stored in the last 4 bytes (it passes)
+
  */
 
 #include "emu.h"
@@ -60,7 +66,7 @@ protected:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t tile, int xx, int yy);
+	void draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t tile, int xx, int yy, int gfxbase);
 	void draw_tile8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t tile, int xx, int yy);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(screen_scanline);
@@ -78,6 +84,7 @@ private:
 	void unktable_reset_w(offs_t offset, u32 data, u32 mem_mask);
 	void set_palette_val(int entry);
 	void palette_w(offs_t offset, u32 data, u32 mem_mask);
+	void mainram_w(offs_t offset, u32 data, u32 mem_mask);
 
 	uint16_t m_unktable[256];
 	uint16_t m_unktableoffset;
@@ -106,13 +113,12 @@ static INPUT_PORTS_START( hudson_poems )
 INPUT_PORTS_END
 
 
-void hudson_poems_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t tile, int xx, int yy)
+void hudson_poems_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t tile, int xx, int yy, int gfxbase)
 {
 	int flipx = tile & 0x0800;
 	int flipy = tile & 0x0400;
 	int pal = (tile & 0xf000)>>8; 
-	tile &= 0x03ff;
-
+	tile &= 0x3ff;
 
 	int realoffset = tile * 8;
 	int count = 0;
@@ -124,7 +130,7 @@ void hudson_poems_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, 
 
 		u16 *const dstptr_bitmap = &bitmap.pix(realy + yy);
 
-		uint32_t pix = m_mainram[((0x9c00 / 4) + count + realoffset) & 0x7fff];
+		uint32_t pix = m_mainram[((gfxbase / 4) + count + realoffset) & 0xffff];
 		int pos = xx;
 
 		if (flipx)
@@ -158,8 +164,8 @@ void hudson_poems_state::draw_tile8(screen_device &screen, bitmap_ind16 &bitmap,
 	{
 		u16 *const dstptr_bitmap = &bitmap.pix(y + yy);
 
-		uint64_t pix = ((uint64_t)(m_mainram[((0x9c00 / 4) + count + 1 + offset) & 0x7fff]) << 32)
-			          | (uint64_t)(m_mainram[((0x9c00 / 4) + count + 0 + offset) & 0x7fff]);
+		uint64_t pix = ((uint64_t)(m_mainram[((0x9c00 / 4) + count + 1 + offset) & 0xffff]) << 32)
+			          | (uint64_t)(m_mainram[((0x9c00 / 4) + count + 0 + offset) & 0xffff]);
 		int pos = xx;
 
 		for (int i = 0; i < 64; i += 8)
@@ -176,7 +182,7 @@ uint32_t hudson_poems_state::screen_update(screen_device &screen, bitmap_ind16 &
 {
 	bitmap.fill(0, cliprect);
 
-	int width, base, bpp;
+	int width, base, bpp, gfxbase;
 
 	bool attempt_draw = true;
 
@@ -184,12 +190,12 @@ uint32_t hudson_poems_state::screen_update(screen_device &screen, bitmap_ind16 &
 
 	switch (hack_select)
 	{
-	case 0x09: width = 512; base = (0xa800/4); bpp = 4; break;// konami logo
-	case 0x0d: width = 128; base = (0x9498/4); bpp = 8; break;// poems logo
-	case 0x10: width = 512; base = (0xc600/4); bpp = 4; break;// bemani logo
-	case 0x14: width = 512; base = (0xd400/4); bpp = 4; break;// warning screen
-	case 0x38: width = 512; base = (0x14000/4); bpp = 4; break;// title 1
-	case 0x44: width = 512; base = (0x18400/4); bpp = 4; break;// title 2
+	case 0x09: width = 512; base = (0xa800/4); bpp = 4; gfxbase = 0x9c00; break;// konami logo
+	case 0x0d: width = 128; base = (0x9498/4); bpp = 8; gfxbase = 0x9c00; break;// poems logo
+	case 0x10: width = 512; base = (0xc600/4); bpp = 4; gfxbase = 0x9c00; break;// bemani logo
+	case 0x14: width = 512; base = (0xd400/4); bpp = 4; gfxbase = 0x9c00; break;// warning screen
+	case 0x38: width = 512; base = (0x14000/4); bpp = 4; gfxbase = 0x9800; break;// title 1
+	case 0x44: width = 512; base = (0x18400/4); bpp = 4; gfxbase = 0x9800; break;// title 2
 
 	default: attempt_draw = false; break;
 	}
@@ -204,7 +210,7 @@ uint32_t hudson_poems_state::screen_update(screen_device &screen, bitmap_ind16 &
 			{
 
 				count++;
-				draw_tile(screen, bitmap, cliprect, count * 8, x * 8, y * 8);
+				draw_tile(screen, bitmap, cliprect, count * 8, x * 8, y * 8, 0x9c00);
 			}
 		}
 	}
@@ -219,8 +225,8 @@ uint32_t hudson_poems_state::screen_update(screen_device &screen, bitmap_ind16 &
 
 				if (bpp == 4)
 				{
-					draw_tile(screen, bitmap, cliprect, (tiles & 0xffff), (x * 16), y * 8);
-					draw_tile(screen, bitmap, cliprect, ((tiles >> 16) & 0xffff), (x * 16) + 8, y * 8);
+					draw_tile(screen, bitmap, cliprect, (tiles & 0xffff), (x * 16), y * 8, gfxbase);
+					draw_tile(screen, bitmap, cliprect, ((tiles >> 16) & 0xffff), (x * 16) + 8, y * 8, gfxbase);
 				}
 				else if (bpp == 8)
 				{
@@ -332,10 +338,18 @@ void hudson_poems_state::unktable_reset_w(offs_t offset, u32 data, u32 mem_mask)
 	m_unktableoffset = 0;
 }
 
+void hudson_poems_state::mainram_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	COMBINE_DATA(&m_mainram[offset]);
+
+	m_gfxdecode->gfx(2)->mark_dirty(offset / 8);
+	m_gfxdecode->gfx(3)->mark_dirty(offset / 16);
+}
+
 void hudson_poems_state::mem_map(address_map &map)
 {
-	map(0x00000000, 0x007fffff).mirror(0x20000000).rom().region("maincpu", 0);
-
+	map(0x00000000, 0x007fffff).mirror(0x21000000).rom().region("maincpu", 0);
+	      
 	/////////////////// unknown
 
 	//map(0x04000000, 0x04003fff).ram();
@@ -395,7 +409,7 @@ void hudson_poems_state::mem_map(address_map &map)
 	map(0x0800a000, 0x0800a003).nopw();
 	map(0x0800a004, 0x0800a007).nopw();
 
-	map(0x0800aa00, 0x0800aa03).w(FUNC(hudson_poems_state::unk_aa00_w)); // writes 2c020000, which is the top of RAM?
+	map(0x0800aa00, 0x0800aa03).w(FUNC(hudson_poems_state::unk_aa00_w)); // writes 2c020000, which is the top of RAM? (or middle?)
 	map(0x0800aa04, 0x0800aa07).r(FUNC(hudson_poems_state::unk_aa04_r)); 
 
 	map(0x0800b000, 0x0800b003).w(FUNC(hudson_poems_state::unktable_w)); // writes a table of increasing 16-bit values here
@@ -415,13 +429,16 @@ void hudson_poems_state::mem_map(address_map &map)
 
 	///////////////////
 
-	map(0x2c000000, 0x2c01ffff).ram().share("mainram");
+	map(0x2c000000, 0x2c03ffff).ram().w(FUNC(hudson_poems_state::mainram_w)).share("mainram");
 }
 
 
 static GFXDECODE_START( gfx_poems )
 	GFXDECODE_ENTRY( "maincpu", 0, gfx_8x8x4_packed_lsb, 0, 16 )
 	GFXDECODE_ENTRY( "maincpu", 0, gfx_8x8x8_raw, 0, 1 )
+
+	GFXDECODE_RAM( "mainram", 0, gfx_8x8x4_packed_lsb, 0, 16 )
+	GFXDECODE_RAM( "mainram", 0, gfx_8x8x8_raw, 0, 1 )
 GFXDECODE_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(hudson_poems_state::screen_scanline)

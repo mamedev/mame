@@ -2019,7 +2019,13 @@ void xtensa_device::getop_and_execute()
 				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, 0x%08X\n", "ball", as, at, addr);
 				break;
 			case 0b0101:// bbc
-				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, 0x%08X\n", "bbc", as, at, addr);
+				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, 0x%08X\n", "bbc", as, at, addr);
+				if (!(BIT(get_reg(as), get_reg(at)&0x1f)))
+				{
+					m_nextpc = addr;
+					m_pc = m_nextpc; return; // avoid loop check
+				}
+
 				break;
 			//case 0b0110:// bbci
 			//	LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, 0x%08X\n", "bbci", as, at, addr);
