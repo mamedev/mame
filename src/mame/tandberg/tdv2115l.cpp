@@ -30,21 +30,11 @@ public:
 private:
 	required_device<tandberg_tdv2100_disp_logic_device> m_terminal;
 	required_device<tandberg_tdv2100_keyboard_device> m_keyboard;
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
 };
 
 void tdv2115l_state::tdv2115l(machine_config& config)
 {
 	TANDBERG_TDV2100_DISPLAY_LOGIC(config, m_terminal);
-	TANDBERG_TDV2100_KEYBOARD(config, m_keyboard);
-	m_keyboard->write_kstr_callback().set(m_terminal, FUNC(tandberg_tdv2100_disp_logic_device::process_keyboard_char));
-	m_keyboard->write_cleark_callback().set(m_terminal, FUNC(tandberg_tdv2100_disp_logic_device::w_cleark));
-	m_keyboard->write_linek_callback().set(m_terminal, FUNC(tandberg_tdv2100_disp_logic_device::w_linek));
-	m_keyboard->write_transk_callback().set(m_terminal, FUNC(tandberg_tdv2100_disp_logic_device::w_transk));
-	m_keyboard->write_break_callback().set(m_terminal, FUNC(tandberg_tdv2100_disp_logic_device::w_break));
 	m_terminal->write_waitl_callback().set(m_keyboard, FUNC(tandberg_tdv2100_keyboard_device::w_waitl));
 	m_terminal->write_onlil_callback().set(m_keyboard, FUNC(tandberg_tdv2100_keyboard_device::w_onlil));
 	m_terminal->write_carl_callback().set(m_keyboard, FUNC(tandberg_tdv2100_keyboard_device::w_carl));
@@ -52,13 +42,14 @@ void tdv2115l_state::tdv2115l(machine_config& config)
 	m_terminal->write_enql_callback().set(m_keyboard, FUNC(tandberg_tdv2100_keyboard_device::w_enql));
 	m_terminal->write_ackl_callback().set(m_keyboard, FUNC(tandberg_tdv2100_keyboard_device::w_ackl));
 	m_terminal->write_nakl_callback().set(m_keyboard, FUNC(tandberg_tdv2100_keyboard_device::w_nakl));
+
+	TANDBERG_TDV2100_KEYBOARD(config, m_keyboard);
+	m_keyboard->write_kstr_callback().set(m_terminal, FUNC(tandberg_tdv2100_disp_logic_device::process_keyboard_char));
+	m_keyboard->write_cleark_callback().set(m_terminal, FUNC(tandberg_tdv2100_disp_logic_device::w_cleark));
+	m_keyboard->write_linek_callback().set(m_terminal, FUNC(tandberg_tdv2100_disp_logic_device::w_linek));
+	m_keyboard->write_transk_callback().set(m_terminal, FUNC(tandberg_tdv2100_disp_logic_device::w_transk));
+	m_keyboard->write_break_callback().set(m_terminal, FUNC(tandberg_tdv2100_disp_logic_device::w_break));
 }
-
-void tdv2115l_state::machine_start()
-{}
-
-void tdv2115l_state::machine_reset()
-{}
 
 static INPUT_PORTS_START( tdv2115l )
 INPUT_PORTS_END
@@ -71,4 +62,4 @@ ROM_END
 
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY     FULLNAME     FLAGS
-COMP( 1976, tdv2115l, 0,      0,      tdv2115l, tdv2115l, tdv2115l_state, empty_init, "Tandberg", "TDV-2115L", 0 )
+COMP( 1976, tdv2115l, 0,      0,      tdv2115l, tdv2115l, tdv2115l_state, empty_init, "Tandberg", "TDV-2115L", MACHINE_SUPPORTS_SAVE )

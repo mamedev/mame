@@ -50,8 +50,20 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
+private:
+
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	// Video, Cursor & Sound
+	void vblank(int state);
+	int get_attribute(int at_row, int at_col);
+	void char_to_display(uint8_t byte);
+	void data_to_display(uint8_t byte);
+	void advance_cursor();
+	TIMER_CALLBACK_MEMBER(expire_speed_check);
+	TIMER_CALLBACK_MEMBER(end_beep);
+
+	// RS-232
 	void rs232_rxd_w(int state);
 	void rs232_dcd_w(int state);
 	void rs232_dsr_w(int state);
@@ -60,10 +72,13 @@ protected:
 	void rs232_ri_w(int state);
 	void uart_rx(int state);
 	void uart_tx(int state);
+	void update_rs232_lamps();
+	void check_rs232_rx_error(int state);
+	void set_uart_state_from_switches();
 
 	required_device<screen_device>      m_screen;
 	required_device<palette_device>     m_palette;
-	required_memory_region              m_font;
+	required_region_ptr<uint8_t>        m_font;
 	memory_share_creator<uint8_t>       m_vram;
 	required_device<beep_device>        m_beep;
 	required_device<ay51013_device>     m_uart;
@@ -76,8 +91,6 @@ protected:
 	required_ioport                     m_dsw_u73;
 	required_ioport                     m_dsw_u61;
 
-private:
-
 	devcb_write_line                    m_write_waitl_cb;
 	devcb_write_line                    m_write_onlil_cb;
 	devcb_write_line                    m_write_carl_cb;
@@ -86,41 +99,31 @@ private:
 	devcb_write_line                    m_write_ackl_cb;
 	devcb_write_line                    m_write_nakl_cb;
 
-	// Video
-	uint8_t attribute;
-	int frame_counter;
-	bool video_enable;
-	void data_to_display(uint8_t byte);
-	void char_to_display(uint8_t byte);
-
-	// Cursor
-	int cursor_x;
-	int cursor_y;
-	bool cursor_x_input;
-	bool cursor_y_input;
-	void advance_cursor();
-
-	// Sound
-	bool speed_check;
+	// Video, Cursor & Sound
+	int m_frame_counter;
+	bool m_video_enable;
+	bool m_vblank_state;
+	int m_cursor_row;
+	int m_cursor_col;
+	bool m_cursor_row_input;
+	bool m_cursor_col_input;
+	bool m_underline_input;
+	bool m_speed_check;
 	emu_timer *m_beep_trigger;
 	emu_timer *m_speed_ctrl;
-	TIMER_CALLBACK_MEMBER(expire_speed_check);
-	TIMER_CALLBACK_MEMBER(end_beep);
 
 	// RS-232
-	void update_rs232_lamps();
-	void check_rs232_rx_error(int state);
-	void set_uart_state_from_switches();
-	bool data_terminal_ready;
-	bool request_to_send;
-	bool rx_handshake;
-	bool tx_handshake;
+	bool m_data_terminal_ready;
+	bool m_request_to_send;
+	bool m_rx_handshake;
+	bool m_tx_handshake;
 
 	// Keyboard
-	bool break_key_held;
-	bool tx_data_pending_kbd;
-	uint8_t tx_data_kbd;
-	bool underline_input;
+	bool m_line_key_held;
+	bool m_trans_key_held;
+	bool m_break_key_held;
+	bool m_data_pending_kbd;
+	uint8_t m_data_kbd;
 };
 
 // device type definition

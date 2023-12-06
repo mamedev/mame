@@ -5,18 +5,18 @@
 	Tandberg TDV-2100 Series Keyboard
 
 	Two keyboards exist, one using switches and logic to derive keypresses,
-	the other based on an OEM design from KeyTronics, based on capacitive
+	the other based on an OEM design from Key Tronic Corp, based on capacitive
 	switches and the 20-04592-013 30293E-013 chip by GI (AY-3-4592 derivative).
 	In both cases there is a translation ROM for deriving an ASCII character
-	for each keypress, and the Key-Tronics version also has a ROM for sorting
+	for each keypress, and the Keytronic version also has a ROM for sorting
 	out key properties. For the logic-based keyboard all keys have the same
 	properties.
 
 	The logic keyboard toggles a relay in order to make a typing-sound, while
-	the Key-Tronics keyboard has a proper buzzer for this click.
+	the Keytronic keyboard has a proper buzzer for this click.
 
 
-	Key-Tronics keyboard key numbers (as printed on PCB):
+	Keytronic keyboard key numbers (as printed on PCB):
 
 				  1  2  3  4  5  6  7  8  9  10 11 12 13 14
 		15 16 17  18   19 20 21 22 23 24 25 26 27 28 29 30 31   32  33  34
@@ -40,7 +40,7 @@
 					* Alternate positions, selectable by jumpers
 
 
-	Key-Tronics keyboard key-id (bit7 = Shift, bit8 = Ctrl):
+	Keytronic keyboard key-id (bit7 = Shift, bit8 = Ctrl):
 
 		   | 0   1   2   3   4   5   6   7   8   9   10  11  12  13  14
 		---+---------------------------------------------------------------
@@ -86,10 +86,10 @@
 
 
 	TODO:
-		* Add key-repeat potentiometers
+		* Add key-repeat delay/rate potentiometers
 		* Add click sound and volume potentiometer
 		* Add CRT brightness-adjust potentiometer
-		* Add any relevant jumpers
+		* Expose 8-bit output mode and add jumpers for layout options
 
 ****************************************************************************/
 
@@ -120,23 +120,24 @@ tandberg_tdv2100_keyboard_device::tandberg_tdv2100_keyboard_device(const machine
 	m_write_cleark_cb(*this),
 	m_write_linek_cb(*this),
 	m_write_transk_cb(*this),
-	m_write_break_cb(*this)
+	m_write_break_cb(*this),
+	m_column_counter(0),
+	m_shift(false),
+	m_shift_lock(false),
+	m_control(false),
+	m_char_buffer(0x00),
+	m_key_nr_in_buffer(0xff),
+	m_key_repeat_delay_ms(800),     // Set by potentiometer, 500ms -> 1250ms
+	m_key_repeat_rate_hz(20),       // Set by potentiometer, 10Hz -> 30Hz
+	m_8_bit_output(false)           // Hardwiered by PCB-trace jumpers 37-39 and 40-42, set at factory
+	                                //   true:
+	                                //     Use parameter PROM bit 2 to get which keys are inhibited
+	                                //     Replace TRANS key strobe with extra character data-bit
+	                                //   false:
+	                                //     Ignore parameter PROM bit 2
+	                                //     Use msb of char-map PROM to get which keys are inhibited
 {
-	column_counter = 0;
-	shift = false;
-	shift_lock = false;
-	control = false;
-	for(int i=0; i<15; i++)
-	{
-		keystate[i] = 0;
-	}
-
-	inhibit_key_from_params = false;    // Set by jumper 40-42
-
-	char_buffer = 0x00;
-	key_nr_in_buffer = 0xFF;
-	key_repeat_delay_ms = 800;          // Set by potentiometer, 500ms -> 1250ms
-	key_repeat_rate_hz = 20;            // Set by potentiometer, 10Hz -> 30Hz
+	std::fill(m_keystate, m_keystate+15, 0);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -155,10 +156,9 @@ void tandberg_tdv2100_keyboard_device::device_start()
 	m_nak_led.resolve();
 	m_wait_led.resolve();
 	m_shiftlock_led.resolve();
-}
 
-void tandberg_tdv2100_keyboard_device::device_reset()
-{}
+	save_item(NAME(m_shift_lock));
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -169,35 +169,34 @@ void tandberg_tdv2100_keyboard_device::scan_next_column(int state)
 {
 	if(state)
 	{
-		int column = m_matrix[column_counter]->read();
+		int column = m_matrix[m_column_counter]->read();
 
 		for(int row_counter=0; row_counter<8; row_counter++)
 		{
-			int key_mask = 1<<row_counter;
-			int key_state = column&key_mask;
-			if(key_state != (keystate[column_counter]&key_mask))
+			if(BIT(column, row_counter) != BIT(m_keystate[m_column_counter], row_counter))
 			{
-			// This simulates the enumeration done by the internal LUT of the 20-04592-013
-			uint8_t key_nr = (~((column_counter-1)*8 + row_counter + 1))&0xFF;
-				if(key_state)
+				// This simulates the enumeration done by the internal LUT of the 20-04592-013
+				uint8_t key_nr = (~((m_column_counter-1)*8 + row_counter + 1))&0xff;
+				if(BIT(column, row_counter))
 				{
-					switch(column_counter)
+					switch(m_column_counter)
 					{
 						case 0:
 							switch(row_counter)
 							{
 								case 0:
 								case 1:
-									shift = true;
+									m_keystate[m_column_counter] |= 1<<row_counter;     // In case the second shift key is let go on the same scan
+									m_shift = true;
 									break;
 
 								case 2:
-									shift_lock = !shift_lock;
-									m_shiftlock_led = !shift_lock;
+									m_shift_lock = !m_shift_lock;
+									m_shiftlock_led = !m_shift_lock;
 									break;
 
 								case 3:
-									control = true;
+									m_control = true;
 									break;
 							}
 							break;
@@ -210,7 +209,10 @@ void tandberg_tdv2100_keyboard_device::scan_next_column(int state)
 									break;
 
 								case 5:
-									m_write_transk_cb(1);
+									if(!m_8_bit_output)
+									{
+										m_write_transk_cb(1);
+									}
 									break;
 
 								case 6:
@@ -224,24 +226,24 @@ void tandberg_tdv2100_keyboard_device::scan_next_column(int state)
 							break;
 
 						default:
-							new_keystroke(key_nr, (shift||shift_lock), control);
+							new_keystroke(key_nr, (m_shift||m_shift_lock), m_control);
 					}
-					keystate[column_counter] |= key_mask;
 				}
 				else
 				{
-					switch(column_counter)
+					switch(m_column_counter)
 					{
 						case 0:
 							switch(row_counter)
 							{
 								case 0:
 								case 1:
-									shift = keystate[column_counter]&0x03&(~key_mask);
+									m_keystate[m_column_counter] &= ~(1<<row_counter);  // Turn off released shift key
+									m_shift = m_keystate[m_column_counter]&0x03;	        // Keep shift state if the other shift key is still down
 									break;
 
 								case 3:
-									control = false;
+									m_control = false;
 									break;
 							}
 							break;
@@ -254,7 +256,10 @@ void tandberg_tdv2100_keyboard_device::scan_next_column(int state)
 									break;
 
 								case 5:
-									m_write_transk_cb(0);
+									if(!m_8_bit_output)
+									{
+										m_write_transk_cb(0);
+									}
 									break;
 
 								case 6:
@@ -268,46 +273,49 @@ void tandberg_tdv2100_keyboard_device::scan_next_column(int state)
 							break;
 
 						default:
-							if(key_nr == key_nr_in_buffer)
+							if(key_nr == m_key_nr_in_buffer)
 							{
-								key_nr_in_buffer = 0xFF;
 								m_key_repeat_trigger->adjust(attotime::never);
 							}
 					}
-					keystate[column_counter] &= ~key_mask;
 				}
 			}
 		}
+		m_keystate[m_column_counter] = column;
 
-		column_counter++;
-		if(column_counter >= 15)
+		m_column_counter++;
+		if(m_column_counter >= 15)
 		{
-			column_counter = 0;
+			m_column_counter = 0;
 		}
 	}
 }
 
-void tandberg_tdv2100_keyboard_device::new_keystroke(uint8_t key_nr, bool shft, bool ctrl)
+void tandberg_tdv2100_keyboard_device::new_keystroke(uint8_t key_nr, bool shift, bool control)
 {
-	uint8_t param = m_keyparams->base()[(key_nr&0x7F) | ((ctrl) ? 0x80 : 0x00)];
+	uint8_t param = m_keyparams[(key_nr&0x7f) | ((control) ? 0x80 : 0x00)];
 	bool all_caps = !(m_sw_all_cap->read());
-	shft = (shft || ((param&0x01) && all_caps));
-	uint8_t key = m_keymap->base()[(key_nr&0x07F) | ((shft) ? 0x080 : 0x000) | ((ctrl) ? 0x100 : 0x000)];
+	shift = (shift || ((param&0x01) && all_caps));
+	uint8_t key = m_keymap[(key_nr&0x07f) | ((shift) ? 0x080 : 0x000) | ((control) ? 0x100 : 0x000)];
 
 	bool inhibit = (key&0x80);
-	if(inhibit_key_from_params)
+	if(m_8_bit_output)
 	{
 		inhibit = (param&0x04);
 	}
 
 	if(!inhibit)
 	{
-		key_nr_in_buffer = key_nr;
-		char_buffer = key&0x7F;
+		m_key_nr_in_buffer = key_nr;
+		m_char_buffer = key&0x7f;
+		if(m_8_bit_output)
+		{
+			m_write_transk_cb((key>>7)&0x01);
+		}
 		key_trigger();
 		if(param&0x02)
 		{
-			m_key_repeat_trigger->adjust(attotime::from_msec(key_repeat_delay_ms));
+			m_key_repeat_trigger->adjust(attotime::from_msec(m_key_repeat_delay_ms));
 		}
 	}
 }
@@ -315,7 +323,7 @@ void tandberg_tdv2100_keyboard_device::new_keystroke(uint8_t key_nr, bool shft, 
 TIMER_CALLBACK_MEMBER(tandberg_tdv2100_keyboard_device::key_repeat)
 {
 	key_trigger();
-	m_key_repeat_trigger->adjust(attotime::from_hz(key_repeat_rate_hz));
+	m_key_repeat_trigger->adjust(attotime::from_hz(m_key_repeat_rate_hz));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -325,8 +333,8 @@ TIMER_CALLBACK_MEMBER(tandberg_tdv2100_keyboard_device::key_repeat)
 
 void tandberg_tdv2100_keyboard_device::key_trigger()
 {
-	m_write_kstr_cb(0x80|char_buffer);
-	m_write_kstr_cb(char_buffer);
+	m_write_kstr_cb(0x80|m_char_buffer);
+	m_write_kstr_cb(m_char_buffer);
 }
 
 void tandberg_tdv2100_keyboard_device::w_waitl(int state)
@@ -381,8 +389,8 @@ static INPUT_PORTS_START( tdv2115l )
 
 	PORT_START("sw_all_cap")
 		PORT_CONFNAME(0x1, 0x1, "ALL CAP")
-			PORT_CONFSETTING(0x0, DEF_STR( On ))
 			PORT_CONFSETTING(0x1, DEF_STR( Off ))
+			PORT_CONFSETTING(0x0, DEF_STR( On ))
 
 	PORT_START("X0")
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("SHIFT (Right)")      PORT_CODE(KEYCODE_RSHIFT)       PORT_CHAR(UCHAR_SHIFT_1)
@@ -397,131 +405,131 @@ static INPUT_PORTS_START( tdv2115l )
 	PORT_START("X1")
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
 		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
-		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("1 !")                PORT_CODE(KEYCODE_1)            PORT_CHAR('1') PORT_CHAR('!')
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                   PORT_CODE(KEYCODE_1)            PORT_CHAR('1') PORT_CHAR('!')
 		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
 		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
 		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
 		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
-		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME(": *")                PORT_CODE(KEYCODE_BACKSLASH)    PORT_CHAR(':') PORT_CHAR('*')
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_BACKSLASH)    PORT_CHAR(':') PORT_CHAR('*')
 
 	PORT_START("X2")
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("RETURN")             PORT_CODE(KEYCODE_ENTER_PAD)    PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))
-		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("@ `")                PORT_CODE(KEYCODE_EQUALS)       PORT_CHAR('@') PORT_CHAR('`')
-		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("; +")                PORT_CODE(KEYCODE_CLOSEBRACE)   PORT_CHAR(';') PORT_CHAR('+')
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_EQUALS)       PORT_CHAR('@') PORT_CHAR('`')
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_CLOSEBRACE)   PORT_CHAR(';') PORT_CHAR('+')
 		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("DEL")                PORT_CODE(KEYCODE_DEL)          PORT_CHAR(UCHAR_MAMEKEY(DEL))
 		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
 		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("Z")                  PORT_CODE(KEYCODE_Z)            PORT_CHAR('z') PORT_CHAR('Z')
-		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("F9")                 PORT_CODE(KEYCODE_F9)           PORT_CHAR(UCHAR_MAMEKEY(F9))
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_F9)           PORT_CHAR(UCHAR_MAMEKEY(F9))
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("LF")                 PORT_CODE(KEYCODE_ENTER)        PORT_CHAR(13)
 
 	PORT_START("X3")
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("ER LINE")            PORT_CODE(KEYCODE_F11)          PORT_CHAR(UCHAR_MAMEKEY(F11))
-		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("^ \xC2\xAC")         PORT_CODE(KEYCODE_TILDE)        PORT_CHAR('^') PORT_CHAR(0x00ac)
-		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("\xC3\x85")           PORT_CODE(KEYCODE_OPENBRACE)    PORT_CHAR(0x00e5) PORT_CHAR(0x00c5)
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_TILDE)        PORT_CHAR('^') PORT_CHAR(0x00ac)
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("\xC3\x85")           PORT_CODE(KEYCODE_OPENBRACE)    PORT_CHAR(0x00e5) PORT_CHAR(0x00c5)     // Å
 		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("A")                  PORT_CODE(KEYCODE_A)            PORT_CHAR('a') PORT_CHAR('A')
 		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("(Space)")            PORT_CODE(KEYCODE_SPACE)        PORT_CHAR(' ')
 		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
-		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("Down")               PORT_CODE(KEYCODE_DOWN)         PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_DOWN)         PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("X4")
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("(Blank 3)")
-		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("- =")                PORT_CODE(KEYCODE_SLASH)        PORT_CHAR('-') PORT_CHAR('=')
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_SLASH)        PORT_CHAR('-') PORT_CHAR('=')
 		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("P")                  PORT_CODE(KEYCODE_P)            PORT_CHAR('p') PORT_CHAR('P')
-		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("\xC3\x86")           PORT_CODE(KEYCODE_QUOTE)        PORT_CHAR(0x00e6) PORT_CHAR(0x00c6)
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("\xC3\x86")           PORT_CODE(KEYCODE_QUOTE)        PORT_CHAR(0x00e6) PORT_CHAR(0x00c6)     // Æ
 		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
 		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("0 (NumPad)")         PORT_CODE(KEYCODE_0_PAD)        PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
-		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("F10")                PORT_CODE(KEYCODE_F10)          PORT_CHAR(UCHAR_MAMEKEY(F10))
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_F10)          PORT_CHAR(UCHAR_MAMEKEY(F10))
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("CR")                 PORT_CODE(KEYCODE_BACKSPACE)    PORT_CHAR(10)
 
 	PORT_START("X5")
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("(Blank 2)")
-		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("0 _")                PORT_CODE(KEYCODE_0)            PORT_CHAR('0') PORT_CHAR('_')
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_0)            PORT_CHAR('0') PORT_CHAR('_')
 		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("O")                  PORT_CODE(KEYCODE_O)            PORT_CHAR('o') PORT_CHAR('O')
-		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("\xC3\x98")           PORT_CODE(KEYCODE_COLON)        PORT_CHAR(0x00f8) PORT_CHAR(0x00d8)
-		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("/ ?")                PORT_CODE(KEYCODE_MINUS)        PORT_CHAR('/') PORT_CHAR('?')
-		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("F3")                 PORT_CODE(KEYCODE_F3)           PORT_CHAR(UCHAR_MAMEKEY(F3))
-		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("Left")               PORT_CODE(KEYCODE_LEFT)         PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("\xC3\x98")           PORT_CODE(KEYCODE_COLON)        PORT_CHAR(0x00f8) PORT_CHAR(0x00d8)     // Ø
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_MINUS)        PORT_CHAR('/') PORT_CHAR('?')
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_F3)           PORT_CHAR(UCHAR_MAMEKEY(F3))
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_LEFT)         PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("X6")
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("(Blank 1)")
-		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("9 )")                PORT_CODE(KEYCODE_9)            PORT_CHAR('9') PORT_CHAR(')')
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_9)            PORT_CHAR('9') PORT_CHAR(')')
 		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("I")                  PORT_CODE(KEYCODE_I)            PORT_CHAR('i') PORT_CHAR('I')
 		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("L")                  PORT_CODE(KEYCODE_L)            PORT_CHAR('l') PORT_CHAR('L')
-		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME(". >")                PORT_CODE(KEYCODE_STOP)         PORT_CHAR('.') PORT_CHAR('>')
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_STOP)         PORT_CHAR('.') PORT_CHAR('>')
 		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME(". (NumPad)")         PORT_CODE(KEYCODE_DEL_PAD)      PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
-		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("Right")              PORT_CODE(KEYCODE_RIGHT)        PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_RIGHT)        PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("X7")
-		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("Scroll Down")        PORT_CODE(KEYCODE_PGDN)         PORT_CHAR(UCHAR_MAMEKEY(PGDN))
-		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("8 (")                PORT_CODE(KEYCODE_8)            PORT_CHAR('8') PORT_CHAR('(')
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_PGDN)         PORT_CHAR(UCHAR_MAMEKEY(PGDN))
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_8)            PORT_CHAR('8') PORT_CHAR('(')
 		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("U")                  PORT_CODE(KEYCODE_U)            PORT_CHAR('u') PORT_CHAR('U')
 		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("K")                  PORT_CODE(KEYCODE_K)            PORT_CHAR('k') PORT_CHAR('K')
-		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME(", <")                PORT_CODE(KEYCODE_COMMA)        PORT_CHAR(',') PORT_CHAR('<')
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_COMMA)        PORT_CHAR(',') PORT_CHAR('<')
 		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("- (NumPad)")         PORT_CODE(KEYCODE_MINUS_PAD)    PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD))
-		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("Home")               PORT_CODE(KEYCODE_HOME)         PORT_CHAR(UCHAR_MAMEKEY(HOME))
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("Cursor Home")        PORT_CODE(KEYCODE_HOME)         PORT_CHAR(UCHAR_MAMEKEY(HOME))
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("X8")
-		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("Scroll Up")          PORT_CODE(KEYCODE_PGUP)         PORT_CHAR(UCHAR_MAMEKEY(PGUP))
-		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("7 `")                PORT_CODE(KEYCODE_7)            PORT_CHAR('7') PORT_CHAR('`')
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_PGUP)         PORT_CHAR(UCHAR_MAMEKEY(PGUP))
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_7)            PORT_CHAR('7') PORT_CHAR('`')
 		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("Y")                  PORT_CODE(KEYCODE_Y)            PORT_CHAR('y') PORT_CHAR('Y')
 		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("J")                  PORT_CODE(KEYCODE_J)            PORT_CHAR('j') PORT_CHAR('J')
 		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("M")                  PORT_CODE(KEYCODE_M)            PORT_CHAR('m') PORT_CHAR('M')
 		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("3 (NumPad)")         PORT_CODE(KEYCODE_3_PAD)        PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
-		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("F7")                 PORT_CODE(KEYCODE_F7)           PORT_CHAR(UCHAR_MAMEKEY(F7))
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_F7)           PORT_CHAR(UCHAR_MAMEKEY(F7))
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("SPACE (NumPad)")
 
 	PORT_START("X9")
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("VIDEO ON")           PORT_CODE(KEYCODE_NUMLOCK)      PORT_CHAR(UCHAR_MAMEKEY(NUMLOCK))
-		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("6 &")                PORT_CODE(KEYCODE_6)            PORT_CHAR('6') PORT_CHAR('&')
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_6)            PORT_CHAR('6') PORT_CHAR('&')
 		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("T")                  PORT_CODE(KEYCODE_T)            PORT_CHAR('t') PORT_CHAR('T')
 		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("H")                  PORT_CODE(KEYCODE_H)            PORT_CHAR('h') PORT_CHAR('H')
 		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("N")                  PORT_CODE(KEYCODE_N)            PORT_CHAR('n') PORT_CHAR('N')
 		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("1 (NumPad)")         PORT_CODE(KEYCODE_1_PAD)        PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
-		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("F8")                 PORT_CODE(KEYCODE_F8)           PORT_CHAR(UCHAR_MAMEKEY(F8))
-		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("F2")                 PORT_CODE(KEYCODE_F2)           PORT_CHAR(UCHAR_MAMEKEY(F2))
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_F8)           PORT_CHAR(UCHAR_MAMEKEY(F8))
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_F2)           PORT_CHAR(UCHAR_MAMEKEY(F2))
 
 	PORT_START("X10")
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("VIDEO OFF")          PORT_CODE(KEYCODE_SCRLOCK)      PORT_CHAR(UCHAR_MAMEKEY(SCRLOCK))
-		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("5 %")                PORT_CODE(KEYCODE_5)            PORT_CHAR('5') PORT_CHAR('%')
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_5)            PORT_CHAR('5') PORT_CHAR('%')
 		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("R")                  PORT_CODE(KEYCODE_R)            PORT_CHAR('r') PORT_CHAR('R')
 		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("G")                  PORT_CODE(KEYCODE_G)            PORT_CHAR('g') PORT_CHAR('G')
 		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("B")                  PORT_CODE(KEYCODE_B)            PORT_CHAR('b') PORT_CHAR('B')
 		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("2 (NumPad)")         PORT_CODE(KEYCODE_2_PAD)        PORT_CHAR(UCHAR_MAMEKEY(2_PAD))
-		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("Up")                 PORT_CODE(KEYCODE_UP)           PORT_CHAR(UCHAR_MAMEKEY(UP))
-		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("F1")                 PORT_CODE(KEYCODE_F1)           PORT_CHAR(UCHAR_MAMEKEY(F1))
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_UP)           PORT_CHAR(UCHAR_MAMEKEY(UP))
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_F1)           PORT_CHAR(UCHAR_MAMEKEY(F1))
 
 	PORT_START("X11")
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("UNDER LINE")         PORT_CODE(KEYCODE_INSERT)       PORT_CHAR(UCHAR_MAMEKEY(INSERT))
-		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("4 $")                PORT_CODE(KEYCODE_4)            PORT_CHAR('4') PORT_CHAR('$')
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_4)            PORT_CHAR('4') PORT_CHAR('$')
 		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("E")                  PORT_CODE(KEYCODE_E)            PORT_CHAR('e') PORT_CHAR('E')
 		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("F")                  PORT_CODE(KEYCODE_F)            PORT_CHAR('f') PORT_CHAR('F')
 		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("V")                  PORT_CODE(KEYCODE_V)            PORT_CHAR('v') PORT_CHAR('V')
 		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("4 (NumPad)")         PORT_CODE(KEYCODE_4_PAD)        PORT_CHAR(UCHAR_MAMEKEY(4_PAD))
-		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("F6")                 PORT_CODE(KEYCODE_F6)           PORT_CHAR(UCHAR_MAMEKEY(F6))
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_F6)           PORT_CHAR(UCHAR_MAMEKEY(F6))
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("7 (NumPad)")         PORT_CODE(KEYCODE_7_PAD)        PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
 
 	PORT_START("X12")
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("NORM")               PORT_CODE(KEYCODE_RCONTROL)     PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))
-		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("3 \xC2\xA3")         PORT_CODE(KEYCODE_3)            PORT_CHAR('3') PORT_CHAR(0x00a3)
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_3)            PORT_CHAR('3') PORT_CHAR(0x00a3)
 		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("W")                  PORT_CODE(KEYCODE_W)            PORT_CHAR('w') PORT_CHAR('W')
 		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("D")                  PORT_CODE(KEYCODE_D)            PORT_CHAR('d') PORT_CHAR('D')
 		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("C")                  PORT_CODE(KEYCODE_C)            PORT_CHAR('c') PORT_CHAR('C')
 		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("5 (NumPad)")         PORT_CODE(KEYCODE_5_PAD)        PORT_CHAR(UCHAR_MAMEKEY(5_PAD))
-		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("F5")                 PORT_CODE(KEYCODE_F5)           PORT_CHAR(UCHAR_MAMEKEY(F5))
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_F5)           PORT_CHAR(UCHAR_MAMEKEY(F5))
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("8 (NumPad)")         PORT_CODE(KEYCODE_8_PAD)        PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
 
 	PORT_START("X13")
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("ER PAGE")            PORT_CODE(KEYCODE_F12)          PORT_CHAR(UCHAR_MAMEKEY(F12))
-		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("2 \"")               PORT_CODE(KEYCODE_2)            PORT_CHAR('2') PORT_CHAR('"')
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_2)            PORT_CHAR('2') PORT_CHAR('"')
 		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("Q")                  PORT_CODE(KEYCODE_Q)            PORT_CHAR('q') PORT_CHAR('Q')
 		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("S")                  PORT_CODE(KEYCODE_S)            PORT_CHAR('s') PORT_CHAR('S')
 		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("X")                  PORT_CODE(KEYCODE_X)            PORT_CHAR('x') PORT_CHAR('X')
 		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("6 (NumPad)")         PORT_CODE(KEYCODE_6_PAD)        PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
-		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("F4")                 PORT_CODE(KEYCODE_F4)           PORT_CHAR(UCHAR_MAMEKEY(F4))
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_F4)           PORT_CHAR(UCHAR_MAMEKEY(F4))
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("9 (NumPad)")         PORT_CODE(KEYCODE_9_PAD)        PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
 
 	PORT_START("X14")
@@ -543,10 +551,10 @@ ioport_constructor tandberg_tdv2100_keyboard_device::device_input_ports() const
 
 ROM_START( tdv2115l )
 	ROM_REGION( 0x0200, "keyboard_chars_rom", ROMREGION_ERASEFF )
-	ROM_LOAD( "prom.82s147.z17", 0x0000, 0x0200, CRC(5455D48E) SHA1(B85021EFBFC794C0C21C1919333C2BF08785C330))
+	ROM_LOAD( "prom.82s147.z17", 0x0000, 0x0200, CRC(5455d48e) SHA1(b85021efbfc794c0c21c1919333c2bf08785c330))
 
 	ROM_REGION( 0x0100, "keyboard_params_rom", ROMREGION_ERASEFF )
-	ROM_LOAD_NIB_LOW( "prom.82s129.z15", 0x0000, 0x0100, CRC(6497BC08) SHA1(A8985AE2C90F8E7361C3E4418314925B17E72B10))
+	ROM_LOAD_NIB_LOW( "prom.82s129.z15", 0x0000, 0x0100, CRC(6497bc08) SHA1(a8985ae2c90f8e7361c3e4418314925b17e72b10))
 ROM_END
 
 const tiny_rom_entry *tandberg_tdv2100_keyboard_device::device_rom_region() const

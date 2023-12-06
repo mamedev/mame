@@ -105,7 +105,7 @@ Keyboard LEDs for the Tandberg TDV-2100 series
 		</screen>
 
 		<element name="background" ref="background">
-			<bounds x="0" y="350" width="587" height="40" />
+			<bounds x="0" y="350" width="500" height="40" />
 		</element>
 
 		<element name="led_power_s" ref="led_socket">

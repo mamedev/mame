@@ -33,8 +33,19 @@ public:
 	void w_nakl(int state);
 
 protected:
-	required_memory_region          m_keymap;
-	required_memory_region          m_keyparams;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+private:
+	void scan_next_column(int state);
+	void new_keystroke(uint8_t key_nr, bool shift, bool control);
+	void key_trigger();
+	TIMER_CALLBACK_MEMBER(key_repeat);
+
+	required_region_ptr<uint8_t>    m_keymap;
+	required_region_ptr<uint8_t>    m_keyparams;
 	required_ioport_array<15>       m_matrix;
 	required_device<clock_device>   m_scan_clock;
 	required_ioport					m_sw_all_cap;
@@ -48,36 +59,26 @@ protected:
 	output_finder<>                 m_wait_led;
 	output_finder<>                 m_shiftlock_led;
 
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	devcb_write8                    m_write_kstr_cb;
+	devcb_write_line                m_write_cleark_cb;
+	devcb_write_line                m_write_linek_cb;
+	devcb_write_line                m_write_transk_cb;
+	devcb_write_line                m_write_break_cb;
 
-	void scan_next_column(int state);
-	void new_keystroke(uint8_t key_nr, bool shift = false, bool ctrl = false);
+	int m_column_counter;
+	uint8_t m_keystate[15];
 
-	devcb_write8 m_write_kstr_cb;
-	devcb_write_line m_write_cleark_cb;
-	devcb_write_line m_write_linek_cb;
-	devcb_write_line m_write_transk_cb;
-	devcb_write_line m_write_break_cb;
+	bool m_shift;
+	bool m_shift_lock;
+	bool m_control;
+	uint8_t m_char_buffer;
+	uint8_t	m_key_nr_in_buffer;
 
-private:
-	void key_trigger();
-	int column_counter;
-	int keystate[15];
-	bool shift;
-	bool shift_lock;
-	bool control;
-
-	TIMER_CALLBACK_MEMBER(key_repeat);
+	int m_key_repeat_delay_ms;
+	int m_key_repeat_rate_hz;
 	emu_timer *m_key_repeat_trigger;
-	uint8_t char_buffer;
-	uint8_t	key_nr_in_buffer;
-	int key_repeat_delay_ms;
-	int key_repeat_rate_hz;
-	bool inhibit_key_from_params;
+
+	bool m_8_bit_output;
 };
 
 // device type definition
