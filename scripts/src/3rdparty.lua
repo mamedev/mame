@@ -743,43 +743,43 @@ end
 	configuration { }
 
 	includedirs {
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/include",
-		MAME_DIR .. "3rdparty/libflac/include",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/include",
+		MAME_DIR .. "3rdparty/flac/include",
 	}
 
 	files {
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/bitmath.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/bitreader.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/bitwriter.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/cpu.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/crc.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/fixed.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/fixed_intrin_avx2.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/fixed_intrin_sse2.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/fixed_intrin_sse42.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/fixed_intrin_ssse3.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/float.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/format.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/lpc.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/lpc_intrin_avx2.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/lpc_intrin_fma.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/lpc_intrin_neon.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/lpc_intrin_sse2.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/lpc_intrin_sse41.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/md5.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/memory.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/stream_decoder.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/stream_encoder.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/stream_encoder_framing.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/stream_encoder_intrin_avx2.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/stream_encoder_intrin_sse2.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/stream_encoder_intrin_ssse3.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/window.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/bitmath.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/bitreader.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/bitwriter.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/cpu.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/crc.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/fixed.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/fixed_intrin_avx2.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/fixed_intrin_sse2.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/fixed_intrin_sse42.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/fixed_intrin_ssse3.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/float.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/format.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/lpc.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/lpc_intrin_avx2.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/lpc_intrin_fma.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/lpc_intrin_neon.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/lpc_intrin_sse2.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/lpc_intrin_sse41.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/md5.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/memory.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/stream_decoder.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/stream_encoder.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/stream_encoder_framing.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/stream_encoder_intrin_avx2.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/stream_encoder_intrin_sse2.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/stream_encoder_intrin_ssse3.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/window.c",
 	}
 
 	if _OPTIONS["targetos"]=="windows" then
 		files {
-			MAME_DIR .. "3rdparty/libflac/src/share/win_utf8_io/win_utf8_io.c",
+			MAME_DIR .. "3rdparty/flac/src/share/win_utf8_io/win_utf8_io.c",
 		}
 	end
 else

@@ -58,6 +58,6 @@ src/osd/sdl/man/* svneol=LF#text/plain eol=lf
 src/osd/sdl/shader/*.fsh svneol=native#text/plain
 src/osd/sdl/shader/*.vsh svneol=native#text/plain
 
-3rdparty/libflac/test/cuesheets/*.cue                            -text
-3rdparty/libflac/test/flac-to-flac-metadata-test-files/*.meta    -text
-3rdparty/libflac/test/metaflac-test-files/*.meta                 -text
+3rdparty/flac/test/cuesheets/*.cue                           -text
+3rdparty/flac/test/flac-to-flac-metadata-test-files/*.meta   -text
+3rdparty/flac/test/metaflac-test-files/*.meta                -text
