@@ -30412,6 +30412,9 @@ dealracl                        //
 kingpin                         // (c) 1983 American Communications Laboratories Inc.
 maxideal                        // (c) 1983 American Communications Laboratories Inc.
 
+@source:misc/kkcount.cpp
+kkcount
+
 @source:misc/kurukuru.cpp
 kurukuru                        // (c) 1990 Success / Taiyo Jidoki.
 ppj                             // (c) 199? Success / Taiyo Jidoki.
