@@ -125,11 +125,11 @@ Not tested on real hardware yet but you can see the test menu render in memory a
 
 static INPUT_PORTS_START( hudson_poems )
 	PORT_START( "IN1" )
-	PORT_BIT( 0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("White")
-	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("Yellow (Select Up)")
-	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("Red (Ok)")
-	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("Blue (Select Down)")
-	PORT_BIT( 0x00000020, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("Green")
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("White")
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("Yellow (Select Up)")
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("Red (Ok)")
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("Blue (Select Down)")
+	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("Green")
 INPUT_PORTS_END
 
 void hudson_poems_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t tile, int xx, int yy, int gfxbase, int extrapal)
@@ -187,9 +187,9 @@ uint32_t hudson_poems_state::screen_update(screen_device &screen, bitmap_ind16 &
 	case 0x10: width = 512; base = (0xc600 / 4); bpp = 4; gfxbase = 0x9c00; extrapal = 0; break;// bemani logo
 	case 0x14: width = 512; base = (0xd400 / 4); bpp = 4; gfxbase = 0x9c00; extrapal = 0; break;// warning screen
 	case 0x38: width = 512; base = (0x14000 / 4); bpp = 4; gfxbase = 0x9800; break;// title 1 logo (shouldn't be this tall?, contains the top half of below)
-		///case 0x38: width = 512; base = (0x14800/4); bpp = 4; gfxbase = 0x9800+0x7800; extrapal = 1; break;// title 1 background
-		//case 0x38: width = 512; base = (0x15800/4); bpp = 4; gfxbase = 0x9800+0x7800; extrapal = 1; break;// title 1 background (same as above, but set to use palette 1)
-		//case 0x38: width = 512; base = (0x16800/4); bpp = 4; gfxbase = 0x9800+base_hack; break;// title 1 logo (shouldn't be this tall?, bottom half of title screen, but not the button/text)
+	//case 0x38: width = 512; base = (0x14800/4); bpp = 4; gfxbase = 0x9800+0x7800; extrapal = 1; break;// title 1 background
+	//case 0x38: width = 512; base = (0x15800/4); bpp = 4; gfxbase = 0x9800+0x7800; extrapal = 1; break;// title 1 background (same as above, but set to use palette 1)
+	//case 0x38: width = 512; base = (0x16800/4); bpp = 4; gfxbase = 0x9800+base_hack; break;// title 1 logo (shouldn't be this tall?, bottom half of title screen, but not the button/text)
 	case 0x44: width = 512; base = (0x18400 / 4); bpp = 4; gfxbase = 0x9800; extrapal = 0; break;// game demo
 	default: attempt_draw = false; break;
 	}
