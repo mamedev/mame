@@ -145,20 +145,49 @@ void hudson_poems_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitma
 
 	for (int i = 0; i < 64; i++)
 	{
-	//  uint32_t spritedword0 = m_mainram[(spritebase + i * 2) + 0];
-		uint32_t spritedword1 = m_mainram[(spritebase + i * 2) + 1];
+		int tilebase = 0x6e0;
+		uint16_t spriteword0 = m_mainram[(spritebase + i * 2) + 0] & 0xffff;
+		uint16_t spriteword1 = m_mainram[(spritebase + i * 2) + 0] >> 16;
+		uint16_t spriteword2 = m_mainram[(spritebase + i * 2) + 1] & 0xffff;
+		uint16_t spriteword3 = m_mainram[(spritebase + i * 2) + 1] >> 16;
 
-		int x = (spritedword1 & 0x03ff0000)>>16; // arrows pointing at tutorial hints
-		int y = (spritedword1 & 0x000003ff);
+		int x = (spriteword3 & 0x03ff);
+		int y = (spriteword2 & 0x03ff);
+		int tilenum = spriteword1 & 0x0fff;
+		int pal = (spriteword2 & 0x3c00)>>10;
+		pal += 0x10;
+
+		tilenum &= 0xfff;
+		tilenum += tilebase;
 
 		/* based on code analysis of function at 006707A4
-		word0 ( 0abb bbcc ---- -def ) OR ( 1abb bbcc dddd dddd )
-		word1 ( cccc ---- ---- ---- ) - other bits are used, but pulled from ram?
-		word2 ( 0abb bbcc cccc cccc )
-		word3 ( aabb bbcc cccc cccc )
+		word0 ( 0abb bbcc ---- -dFe ) OR ( 1abb bbcc dddd dddd )   F = flipX
+		word1 ( cccc --tt tttt tttt ) - other bits are used, but pulled from ram? t = tile number?
+		word2 ( 0app ppyy yyyy yyyy ) p = pal y = ypos
+		word3 ( aabb bbxx xxxx xxxx )  x = xpos
 		*/
 
-		gfx->opaque(bitmap,cliprect,0,0,0,0,x,y);
+		int flipx = spriteword0 & 2;
+		int height = (spriteword1 & 0x3000)>>12;
+		height = 1 << height;
+		int width = (spriteword1 & 0xc000)>>14;
+		width = 1 << width;
+
+		if (spriteword0 & 0x8000)
+		{
+
+		}
+		else
+		{
+			int basetilenum = tilenum;
+			for (int xx = 0; xx < width; xx++)
+			{		
+				for (int yy = 0; yy < height; yy++)
+				{
+					gfx->transpen(bitmap, cliprect, basetilenum + xx + (yy * 0x20), pal, flipx, 0, x + xx * 8, y + yy * 8, 0);
+				}	
+			}
+		}
 	}
 
 	/*
