@@ -29,15 +29,16 @@ public:
 	void sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
 private:
 	// internal state
 	std::unique_ptr<uint8_t[]> m_ram;
 
-	bool            m_flipscreen;    // current code uses the 7342 flipscreen!!
-	uint8_t         m_regs[8];   // current code uses the 7342 regs!! (only [2])
+	bool            m_flipscreen;   // current code uses the 7342 flipscreen!!
+	uint8_t         m_regs[8];      // current code uses the 7342 regs!! (only [2])
 	uint32_t        m_banklimit;
 	sprite_delegate m_callback;
 };

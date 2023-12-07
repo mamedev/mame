@@ -21,7 +21,7 @@ public:
 		set_palette(std::forward<T>(palette_tag));
 	}
 
-	//  configuration
+	// configuration
 	template <typename... T> void set_tile_callback(T &&... args) { m_callback.set(std::forward<T>(args)...); }
 
 	uint8_t read(offs_t offset);
@@ -35,27 +35,28 @@ public:
 	int is_int_enabled();
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
 private:
 	// internal state
-	std::unique_ptr<uint8_t[]>    m_ram;
-	std::unique_ptr<uint8_t[]>    m_scroll_ram;
-	uint8_t    *m_videoram[2];
-	uint8_t    *m_colorram[2];
+	std::unique_ptr<uint8_t[]>  m_ram;
+	std::unique_ptr<uint8_t[]>  m_scroll_ram;
+	const uint8_t               *m_videoram[2];
+	const uint8_t               *m_colorram[2];
 
-	tilemap_t  *m_tilemap[2]{};
-	bool       m_flipscreen, m_int_enabled;
-	uint8_t    m_regs[8];
-	uint16_t   m_scrollx[2];
-	uint8_t    m_scrolly[2];
-	tile_delegate m_callback;
+	tilemap_t       *m_tilemap[2];
+	bool            m_flipscreen, m_int_enabled;
+	uint8_t         m_regs[8];
+	uint16_t        m_scrollx[2];
+	uint8_t         m_scrolly[2];
+	tile_delegate   m_callback;
 
 	TILEMAP_MAPPER_MEMBER(scan);
 	TILE_GET_INFO_MEMBER(get_tile_info0);
 	TILE_GET_INFO_MEMBER(get_tile_info1);
-	void get_tile_info( tile_data &tileinfo, int tile_index, uint8_t layer );
+	void get_tile_info(tile_data &tileinfo, int tile_index, uint8_t layer);
 };
 
 DECLARE_DEVICE_TYPE(K007342, k007342_device)

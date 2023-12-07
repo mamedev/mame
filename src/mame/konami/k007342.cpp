@@ -43,9 +43,9 @@ k007342_device::k007342_device(const machine_config &mconfig, const char *tag, d
 	device_gfx_interface(mconfig, *this),
 	m_ram(nullptr),
 	m_scroll_ram(nullptr),
-	m_videoram{nullptr, nullptr},
-	m_colorram{nullptr, nullptr},
-	//m_tilemap[2];
+	m_videoram{ nullptr, nullptr },
+	m_colorram{ nullptr, nullptr },
+	m_tilemap{ nullptr, nullptr },
 	m_flipscreen(false),
 	m_int_enabled(false),
 	//m_regs[8],
@@ -135,7 +135,7 @@ void k007342_device::scroll_w(offs_t offset, uint8_t data)
 
 void k007342_device::vreg_w(offs_t offset, uint8_t data)
 {
-	switch(offset)
+	switch (offset)
 	{
 		case 0x00:
 			/* bit 1: INT control */
@@ -225,7 +225,7 @@ void k007342_device::tilemap_update()
 #endif
 }
 
-void k007342_device::tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int num, int flags, uint32_t priority )
+void k007342_device::tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int num, int flags, uint32_t priority)
 {
 	m_tilemap[num]->draw(screen, bitmap, cliprect, flags, priority);
 }
