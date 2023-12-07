@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Ville Linde
+// copyright-holders:Ville Linde, Angelo Salese
 
 /*
     Konami Viper System
@@ -434,6 +434,7 @@ The golf club acts like a LED gun. PCB power input is 12V.
 #include "cpu/upd78k/upd78k4.h"
 #include "bus/ata/ataintf.h"
 #include "bus/ata/hdd.h"
+#include "machine/ins8250.h"
 #include "machine/lpci.h"
 #include "machine/timekpr.h"
 #include "machine/timer.h"
@@ -473,6 +474,7 @@ public:
 		m_voodoo(*this, "voodoo"),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
+		m_duart_com(*this, "duart_com"),
 		m_ata(*this, "ata"),
 		m_lpci(*this, "pcibus"),
 		m_ds2430_bit_timer(*this, "ds2430_timer2"),
@@ -520,9 +522,7 @@ private:
 	void e70000_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	void unk1a_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	void unk1b_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
-	uint8_t e00008_r(offs_t offset);
-	void e00008_w(offs_t offset, uint8_t data);
-	uint64_t e00000_r();
+
 	uint64_t pci_config_addr_r();
 	void pci_config_addr_w(uint64_t data);
 	uint64_t pci_config_data_r();
@@ -535,10 +535,12 @@ private:
 	void ata_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	uint64_t unk_serial_r(offs_t offset, uint64_t mem_mask = ~0);
 	void unk_serial_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
-	void voodoo_vblank(int state);
 
 	uint16_t ppp_sensor_r(offs_t offset);
 
+	void uart_int(int state);
+
+	void voodoo_vblank(int state);
 	void voodoo_pciint(int state);
 
 	//the following two arrays need to stay public til the legacy PCI bus is removed
@@ -559,7 +561,6 @@ private:
 	uint16_t m_unk_serial_data = 0U;
 	uint16_t m_unk_serial_data_r = 0U;
 	uint8_t m_unk_serial_regs[0x80]{};
-	uint64_t m_e00008_data = 0U;
 	uint32_t m_sound_buffer_offset = 0U;
 	bool m_sound_irq_enabled = false;
 
@@ -680,6 +681,7 @@ private:
 
 	required_device<ppc_device> m_maincpu;
 	required_device<screen_device> m_screen;
+	required_device<pc16552_device> m_duart_com;
 	required_device<ata_interface_device> m_ata;
 	required_device<pci_bus_legacy_device> m_lpci;
 	required_device<timer_device> m_ds2430_bit_timer;
@@ -1906,35 +1908,6 @@ void viper_state::unk1b_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 	}
 }
 
-// ties with irq2
-uint8_t viper_state::e00008_r(offs_t offset)
-{
-	uint8_t r = 0;
-	LOG("e00008_r %02x\n", offset);
-	if (offset == 7)
-	{
-		r |= m_e00008_data;
-	}
-
-	return r;
-}
-
-void viper_state::e00008_w(offs_t offset, uint8_t data)
-{
-	LOG("e00008_w %02x -> %02x\n", offset, data);
-
-	if (offset == 7)
-	{
-		m_e00008_data = data & 0xff;
-	}
-}
-
-uint64_t viper_state::e00000_r()
-{
-	uint64_t r = 0;//0xffffffffffffffffU;
-	return r;
-}
-
 uint64_t viper_state::unk_serial_r(offs_t offset, uint64_t mem_mask)
 {
 	uint64_t r = 0;
@@ -2014,8 +1987,7 @@ void viper_state::viper_map(address_map &map)
 	// 0xff200000, 0xff200fff - cf_card_r/w (installed in DRIVER_INIT(vipercf))
 	// 0xff300000, 0xff300fff - ata_r/w (installed in DRIVER_INIT(viperhd))
 //  map(0xff400xxx, 0xff400xxx) ppp2nd sense device
-	map(0xffe00000, 0xffe00007).r(FUNC(viper_state::e00000_r));
-	map(0xffe00008, 0xffe0000f).rw(FUNC(viper_state::e00008_r), FUNC(viper_state::e00008_w));
+	map(0xffe00000, 0xffe0000f).rw(m_duart_com, FUNC(pc16552_device::read), FUNC(pc16552_device::write));
 	map(0xffe08000, 0xffe08007).nopw(); // timestamp? watchdog?
 	map(0xffe10000, 0xffe10007).rw(FUNC(viper_state::input_r), FUNC(viper_state::output_w));
 	map(0xffe20000, 0xffe20007).nopw(); // motor k-type for deluxe force feedback (xtrial, gticlub2, jpark3)
@@ -2587,6 +2559,12 @@ INPUT_PORTS_END
 
 /*****************************************************************************/
 
+void viper_state::uart_int(int state)
+{
+	if (state)
+		mpc8240_interrupt(MPC8240_IRQ2);
+}
+
 void viper_state::voodoo_vblank(int state)
 {
 	if (state)
@@ -2730,8 +2708,13 @@ void viper_state::viper(machine_config &config)
 
 	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
 
+	PC16552D(config, "duart_com", 0);
+	// TODO: unverified clocks and channel types, likely connects to sensor motion based games
+	NS16550(config, "duart_com:chan0", XTAL(19'660'800));
+	NS16550(config, "duart_com:chan1", XTAL(19'660'800)).out_int_callback().set(FUNC(viper_state::uart_int));
+
 	VOODOO_3(config, m_voodoo, voodoo_3_device::NOMINAL_CLOCK);
-	m_voodoo->set_fbmem(8); // TODO: should be 16, implement VMI_DATA_5 strapping pin in Voodoo core instead
+	m_voodoo->set_fbmem(8); // TODO: should be 16, implement VMI_DATA_5 strapping pin in Voodoo 3 core instead
 	m_voodoo->set_screen("screen");
 	m_voodoo->set_cpu("maincpu");
 	m_voodoo->set_status_cycles(1000); // optimization to consume extra cycles when polling status
