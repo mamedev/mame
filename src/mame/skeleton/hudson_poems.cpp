@@ -70,6 +70,8 @@ private:
 	void draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t tile, int xx, int yy, int gfxbase, int extrapal);
 	void draw_tile8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t tile, int xx, int yy, int gfxbase, int extrapal);
 
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	uint32_t poems_random_r();
 	void unk_trigger_w(offs_t offset, u32 data, u32 mem_mask);
 
@@ -106,7 +108,7 @@ private:
 };
 
 void hudson_poems_state::machine_start()
-{	
+{
 }
 
 void hudson_poems_state::machine_reset()
@@ -135,6 +137,38 @@ static INPUT_PORTS_START( hudson_poems )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("Blue (Select Down)")
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("Green")
 INPUT_PORTS_END
+
+void hudson_poems_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	int spritebase = 0x9400 / 4;
+	gfx_element *gfx = m_gfxdecode->gfx(2);
+
+	for (int i = 0; i < 64; i++)
+	{
+	//  uint32_t spritedword0 = m_mainram[(spritebase + i * 2) + 0];
+		uint32_t spritedword1 = m_mainram[(spritebase + i * 2) + 1];
+
+		int x = (spritedword1 & 0x03ff0000)>>16; // arrows pointing at tutorial hints
+		int y = (spritedword1 & 0x000003ff);
+
+		/* based on code analysis of function at 006707A4
+		word0 ( 0abb bbcc ---- -def ) OR ( 1abb bbcc dddd dddd )
+		word1 ( cccc ---- ---- ---- ) - other bits are used, but pulled from ram?
+		word2 ( 0abb bbcc cccc cccc )
+		word3 ( aabb bbcc cccc cccc )
+		*/
+
+		gfx->opaque(bitmap,cliprect,0,0,0,0,x,y);
+	}
+
+	/*
+	popmessage("%08x %08x\n%08x %08x\n%08x %08x\n%08x %08x\n", m_mainram[spritebase + 0], m_mainram[spritebase + 1],
+	                                                           m_mainram[spritebase + 2], m_mainram[spritebase + 3],
+	                                                           m_mainram[spritebase + 4], m_mainram[spritebase + 5],
+	                                                           m_mainram[spritebase + 6], m_mainram[spritebase + 7]);
+	*/
+}
+
 
 void hudson_poems_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t tile, int xx, int yy, int gfxbase, int extrapal)
 {
@@ -237,6 +271,9 @@ uint32_t hudson_poems_state::screen_update(screen_device &screen, bitmap_ind16 &
 			}
 		}
 	}
+
+	draw_sprites(screen, bitmap, cliprect);
+
 	return 0;
 }
 
@@ -296,7 +333,7 @@ uint32_t hudson_poems_state::poems_8000200_r(offs_t offset, u32 mem_mask)
 /*
 uint32_t hudson_poems_state::poems_8020020_r()
 {
-	return 0xffffffff;
+    return 0xffffffff;
 }
 
 */
@@ -319,7 +356,7 @@ void hudson_poems_state::palette_w(offs_t offset, u32 data, u32 mem_mask)
 
 void hudson_poems_state::fade_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	logerror("%s: fade_w %08x %08x\n", machine().describe_context().c_str(), data, mem_mask);
+	logerror("%s: fade_w %08x %08x\n", machine().describe_context(), data, mem_mask);
 }
 
 void hudson_poems_state::unktable_w(offs_t offset, u32 data, u32 mem_mask)
@@ -354,7 +391,7 @@ void hudson_poems_state::unk_trigger_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	logerror("%s: unk_trigger_w %08x %08x\n", machine().describe_context(), data, mem_mask);
 	//  this needs to change in RAM, presumably from an interrupt, but no idea how to get there
-//	m_maincpu->space(AS_PROGRAM).write_byte(0x2c01d92c, 0x01);
+//  m_maincpu->space(AS_PROGRAM).write_byte(0x2c01d92c, 0x01);
 	m_maincpu->irq_request_hack(0x4);
 }
 
@@ -374,7 +411,7 @@ void hudson_poems_state::mainram_w(offs_t offset, u32 data, u32 mem_mask)
 void hudson_poems_state::mem_map(address_map &map)
 {
 	map(0x00000000, 0x007fffff).mirror(0x20000000).rom().region("maincpu", 0);
-	      
+
 	/////////////////// unknown
 	map(0x04000040, 0x04000043).r(FUNC(hudson_poems_state::poems_random_r));
 	map(0x04000140, 0x04000143).r(FUNC(hudson_poems_state::poems_random_r));
@@ -442,7 +479,7 @@ void hudson_poems_state::mem_map(address_map &map)
 	map(0x0800a004, 0x0800a007).nopw();
 
 	map(0x0800aa00, 0x0800aa03).w(FUNC(hudson_poems_state::unk_aa00_w)); // writes 2c020000, which is the top of RAM? (or middle?)
-	map(0x0800aa04, 0x0800aa07).r(FUNC(hudson_poems_state::unk_aa04_r)); 
+	map(0x0800aa04, 0x0800aa07).r(FUNC(hudson_poems_state::unk_aa04_r));
 
 	map(0x0800b000, 0x0800b003).w(FUNC(hudson_poems_state::unktable_w)); // writes a table of increasing 16-bit values here
 	map(0x0800b004, 0x0800b007).w(FUNC(hudson_poems_state::unktable_reset_w));
@@ -453,10 +490,10 @@ void hudson_poems_state::mem_map(address_map &map)
 
 	map(0x08020000, 0x08020003).nopr().nopw();
 	map(0x08020004, 0x08020007).nopr().nopw();
- 	map(0x08020008, 0x0802000b).nopr();
+	map(0x08020008, 0x0802000b).nopr();
 	map(0x08020010, 0x08020013).r(FUNC(hudson_poems_state::poems_8020010_r));
 	map(0x08020014, 0x08020017).nopw(); // writes 0x10
- 	map(0x08020018, 0x0802001b).r(FUNC(hudson_poems_state::poems_unk_r)).nopw(); // writes 0x10
+	map(0x08020018, 0x0802001b).r(FUNC(hudson_poems_state::poems_unk_r)).nopw(); // writes 0x10
 	map(0x08020020, 0x08020023).r(FUNC(hudson_poems_state::poems_count_r));
 
 	///////////////////
@@ -494,7 +531,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hudson_poems_state::screen_scanline)
 		m_maincpu->irq_request_hack(0x10);
 	}
 
-	if (scanline == 200) 
+	if (scanline == 200)
 	{
 		//m_maincpu->irq_request_hack(0x2);
 	}

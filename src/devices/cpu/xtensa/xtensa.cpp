@@ -1,10 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:AJR
+// copyright-holders:AJR, David Haywood
 /***************************************************************************
 
     Tensilica Xtensa
-
-    Currently this device is just a stub with no actual execution core.
 
 ***************************************************************************/
 
@@ -23,7 +21,7 @@
 #define LOG_NAMED_REGS          (1U << 10)
 #define LOG_TIMER_REGS          (1U << 11)
 
-#define VERBOSE (LOG_UNHANDLED_OPS | LOG_TIMER_REGS)
+#define VERBOSE (LOG_UNHANDLED_OPS)
 #include "logmacro.h"
 
 // device type definitions

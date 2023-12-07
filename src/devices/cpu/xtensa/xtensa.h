@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:AJR
+// copyright-holders:AJR, David Haywood
 
 #ifndef MAME_CPU_XTENSA_XTENSA_H
 #define MAME_CPU_XTENSA_XTENSA_H
