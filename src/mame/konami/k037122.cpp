@@ -96,16 +96,14 @@ k037122_device::k037122_device(const machine_config &mconfig, const char *tag, d
 
 void k037122_device::device_start()
 {
-	static const gfx_layout k037122_char_layout =
-	{
-	8, 8,
-	K037122_NUM_TILES,
-	8,
-	{ 0,1,2,3,4,5,6,7 },
-	{ 1*16, 0*16, 3*16, 2*16, 5*16, 4*16, 7*16, 6*16 },
-	{ 0*128, 1*128, 2*128, 3*128, 4*128, 5*128, 6*128, 7*128 },
-	8*128
-	};
+	static const gfx_layout k037122_char_layout = {
+			8, 8,
+			K037122_NUM_TILES,
+			8,
+			{ 0,1,2,3,4,5,6,7 },
+			{ 1*16, 0*16, 3*16, 2*16, 5*16, 4*16, 7*16, 6*16 },
+			{ 0*128, 1*128, 2*128, 3*128, 4*128, 5*128, 6*128, 7*128 },
+			8*128 };
 
 	m_char_ram = make_unique_clear<uint32_t[]>(0x200000 / 4);
 	m_tile_ram = make_unique_clear<uint32_t[]>(0x20000 / 4);
@@ -117,7 +115,7 @@ void k037122_device::device_start()
 	m_tilemap_128->set_transparent_pen(0);
 	m_tilemap_256->set_transparent_pen(0);
 
-	set_gfx(0,std::make_unique<gfx_element>(this, k037122_char_layout, (uint8_t*)m_char_ram.get(), 0, entries() / 16, 0));
+	set_gfx(0 ,std::make_unique<gfx_element>(this, k037122_char_layout, (uint8_t *)m_char_ram.get(), 0, entries() / 16, 0));
 
 	save_pointer(NAME(m_reg), 0x400 / 4);
 	save_pointer(NAME(m_char_ram), 0x200000 / 4);

@@ -384,7 +384,6 @@ private:
 	void hangplt_map(address_map &map);
 	void hangplt_sharc0_map(address_map &map);
 	void hangplt_sharc1_map(address_map &map);
-
 };
 
 
