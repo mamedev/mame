@@ -11,7 +11,7 @@
 class k007342_device : public device_t, public device_gfx_interface
 {
 public:
-	using tile_delegate = device_delegate<void (int layer, uint32_t bank, uint32_t *code, uint32_t *color, uint8_t *flags)>;
+	using tile_delegate = device_delegate<void (int layer, uint32_t bank, uint32_t &code, uint32_t &color, uint8_t &flags)>;
 
 	k007342_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	template<typename T> k007342_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&palette_tag, const gfx_decode_entry *gfxinfo)

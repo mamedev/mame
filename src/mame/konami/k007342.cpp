@@ -267,7 +267,7 @@ void k007342_device::get_tile_info( tile_data &tileinfo, int tile_index, uint8_t
 	tileinfo.category = (color & 0x80) >> 7;
 
 	if (!m_callback.isnull())
-		m_callback(layer, m_regs[1], &code, &color, &flags);
+		m_callback(layer, m_regs[1], code, color, flags);
 
 
 	tileinfo.set(0,

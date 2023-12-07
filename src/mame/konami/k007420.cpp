@@ -110,7 +110,7 @@ void k007420_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 		bool flipx = m_ram[offs + 4] & 0x04;
 		bool flipy = m_ram[offs + 4] & 0x08;
 
-		m_callback(&code, &color);
+		m_callback(code, color);
 
 		const uint32_t bank = code & bankmask;
 		code &= codemask;

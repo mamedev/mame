@@ -112,8 +112,8 @@ private:
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vblank_irq(int state);
-	void tile_callback(int layer, uint32_t bank, uint32_t *code, uint32_t *color, uint8_t *flags);
-	void sprite_callback(uint32_t *code, uint32_t *color);
+	void tile_callback(int layer, uint32_t bank, uint32_t &code, uint32_t &color, uint8_t &flags);
+	void sprite_callback(uint32_t &code, uint32_t &color);
 
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
@@ -144,13 +144,13 @@ void rockrage_state::palette(palette_device &palette) const
 
 ***************************************************************************/
 
-void rockrage_state::tile_callback(int layer, uint32_t bank, uint32_t *code, uint32_t *color, uint8_t *flags)
+void rockrage_state::tile_callback(int layer, uint32_t bank, uint32_t &code, uint32_t &color, uint8_t &flags)
 {
 	if (layer == 1)
-		*code |= ((*color & 0x40) << 2) | ((m_vreg & 0x04) << 7); // doesn't use bank here (Tutankhamen eyes blinking)
+		code |= ((color & 0x40) << 2) | ((m_vreg & 0x04) << 7); // doesn't use bank here (Tutankhamen eyes blinking)
 	else
-		*code |= ((*color & 0x40) << 2) | ((bank & 0x03) << 10) | ((m_vreg & 0x04) << 7) | ((m_vreg & 0x08) << 9);
-	*color = layer * 16 + (*color & 0x0f);
+		code |= ((color & 0x40) << 2) | ((bank & 0x03) << 10) | ((m_vreg & 0x04) << 7) | ((m_vreg & 0x08) << 9);
+	color = layer * 16 + (color & 0x0f);
 }
 
 /***************************************************************************
@@ -159,11 +159,11 @@ void rockrage_state::tile_callback(int layer, uint32_t bank, uint32_t *code, uin
 
 ***************************************************************************/
 
-void rockrage_state::sprite_callback(uint32_t *code, uint32_t *color)
+void rockrage_state::sprite_callback(uint32_t &code, uint32_t &color)
 {
-	*code |= ((*color & 0x40) << 2) | ((*color & 0x80) << 1) * ((m_vreg & 0x03) << 1);
-	*code = (*code << 2) | ((*color & 0x30) >> 4);
-	*color = 0 + (*color & 0x0f);
+	code |= ((color & 0x40) << 2) | ((color & 0x80) << 1) * ((m_vreg & 0x03) << 1);
+	code = (code << 2) | ((color & 0x30) >> 4);
+	color = 0 + (color & 0x0f);
 }
 
 

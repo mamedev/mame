@@ -106,8 +106,8 @@ private:
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
-	void tile_callback(int layer, uint32_t bank, uint32_t *code, uint32_t *color, uint8_t *flags);
-	void sprite_callback(uint32_t *code, uint32_t *color);
+	void tile_callback(int layer, uint32_t bank, uint32_t &code, uint32_t &color, uint8_t &flags);
+	void sprite_callback(uint32_t &code, uint32_t &color);
 
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
@@ -140,10 +140,10 @@ void bladestl_state::palette(palette_device &palette) const
 
 ***************************************************************************/
 
-void bladestl_state::tile_callback(int layer, uint32_t bank, uint32_t *code, uint32_t *color, uint8_t *flags)
+void bladestl_state::tile_callback(int layer, uint32_t bank, uint32_t &code, uint32_t &color, uint8_t &flags)
 {
-	*code |= ((*color & 0x0f) << 8) | ((*color & 0x40) << 6);
-	*color = layer;
+	code |= ((color & 0x0f) << 8) | ((color & 0x40) << 6);
+	color = layer;
 }
 
 /***************************************************************************
@@ -152,11 +152,11 @@ void bladestl_state::tile_callback(int layer, uint32_t bank, uint32_t *code, uin
 
 ***************************************************************************/
 
-void bladestl_state::sprite_callback(uint32_t *code, uint32_t *color)
+void bladestl_state::sprite_callback(uint32_t &code, uint32_t &color)
 {
-	*code |= ((*color & 0xc0) << 2) + m_spritebank;
-	*code = (*code << 2) | ((*color & 0x30) >> 4);
-	*color = 0 + (*color & 0x0f);
+	code |= ((color & 0xc0) << 2) + m_spritebank;
+	code = (code << 2) | ((color & 0x30) >> 4);
+	color = 0 + (color & 0x0f);
 }
 
 
