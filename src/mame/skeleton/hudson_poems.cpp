@@ -145,7 +145,7 @@ void hudson_poems_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitma
 
 	for (int i = 0; i < 64; i++)
 	{
-		int tilebase = 0x6e0;
+		int tilebase;
 		uint16_t spriteword0 = m_mainram[(spritebase + i * 2) + 0] & 0xffff;
 		uint16_t spriteword1 = m_mainram[(spritebase + i * 2) + 0] >> 16;
 		uint16_t spriteword2 = m_mainram[(spritebase + i * 2) + 1] & 0xffff;
@@ -153,21 +153,29 @@ void hudson_poems_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitma
 
 		int x = (spriteword3 & 0x03ff);
 		int y = (spriteword2 & 0x03ff);
-		int tilenum = spriteword1 & 0x0fff;
+		int tilenum = spriteword1 & 0x01ff;
 		int pal = (spriteword2 & 0x3c00)>>10;
 		pal += 0x10;
 
 		tilenum &= 0xfff;
+
+		// is it selecting from multiple tile pages (which can have different bases?) (probably from a register somewhere)
+		if (spriteword0 & 0x0100)
+			tilebase = 0x6e0;
+		else
+			tilebase = 0x8c0;
+
 		tilenum += tilebase;
 
 		/* based on code analysis of function at 006707A4
-		word0 ( 0abb bbcc ---- -dFe ) OR ( 1abb bbcc dddd dddd )   F = flipX
-		word1 ( cccc --tt tttt tttt ) - other bits are used, but pulled from ram? t = tile number?
+		word0 ( 0abb bbcc ---- -dFf ) OR ( 1abb bbcc dddd dddd )   F = flipX f = flipY
+		word1 ( wwhh ---t tttt tttt ) - other bits are used, but pulled from ram? t = tile number?  ww = width hh = height
 		word2 ( 0app ppyy yyyy yyyy ) p = pal y = ypos
 		word3 ( aabb bbxx xxxx xxxx )  x = xpos
 		*/
 
 		int flipx = spriteword0 & 2;
+		int flipy = spriteword0 & 1;
 		int height = (spriteword1 & 0x3000)>>12;
 		height = 1 << height;
 		int width = (spriteword1 & 0xc000)>>14;
@@ -181,10 +189,22 @@ void hudson_poems_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitma
 		{
 			int basetilenum = tilenum;
 			for (int xx = 0; xx < width; xx++)
-			{		
+			{
+				int xpos, ypos;
+
+				if (!flipx)
+					xpos = x + xx * 8;
+				else
+					xpos = x + (((width-1) * 8) - xx * 8);
+
 				for (int yy = 0; yy < height; yy++)
 				{
-					gfx->transpen(bitmap, cliprect, basetilenum + xx + (yy * 0x20), pal, flipx, 0, x + xx * 8, y + yy * 8, 0);
+					if (!flipy)
+						ypos = y + yy * 8;
+					else
+						ypos = y + (((height-1) * 8) - yy * 8);
+
+					gfx->transpen(bitmap, cliprect, basetilenum + xx + (yy * 0x20), pal, flipx, flipy, xpos, ypos, 0);
 				}	
 			}
 		}
