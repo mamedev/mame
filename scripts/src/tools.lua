@@ -859,7 +859,7 @@ if _OPTIONS["targetos"] == "macosx" then
 		}
 
 		files {
-			MAME_DIR .. "src/tools/vmnet_helper.c",
+			MAME_DIR .. "src/tools/vmnet_helper.cpp",
 		}
 
 		configuration { }

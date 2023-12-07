@@ -1,17 +1,16 @@
 // license:BSD-3-Clause
-// copyright-holders:Kelvin Sherlock
+// copyright-holders: R. Belmont, Kelvin Sherlock
 /*
     macOS vmnet network interface helper
-    by Kelvin Sherlock
+    by R. Belmont and Kelvin Sherlock
 
     This helper application must be made SUID root as follows:
     sudo chown root vmnet_helper
     sudo chmod +s vmnet_helper
 */
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+
+#include <cstdint>
+#include <iostream>
 #include <sys/types.h>
 #include <sys/uio.h>
 #include <unistd.h>
@@ -19,25 +18,46 @@
 #include <errno.h>
 #include <err.h>
 
-static interface_ref interface;
-static uint8_t interface_mac[6];
-static long interface_mtu;
-static long interface_packet_size;
-static vmnet_return_t interface_status;
+class vmnet_helper
+{
+public:
+	vmnet_helper();
 
-static size_t buffer_size = 0;
-static uint8_t *buffer = NULL;
+	void vm_run(void);
 
-enum {
-	MSG_QUIT,
-	MSG_STATUS,
-	MSG_READ,
-	MSG_WRITE
+private:
+	enum
+	{
+		MSG_QUIT,
+		MSG_STATUS,
+		MSG_READ,
+		MSG_WRITE
+	};
+
+	ssize_t safe_read(void *buffer, size_t nbyte);
+	ssize_t safe_readv(const struct iovec *iov, int iovcnt);
+	ssize_t safe_write(const void *buffer, size_t nbyte);
+	ssize_t safe_writev(const struct iovec *iov, int iovcnt);
+	void msg_status(uint32_t size);
+	int classify_mac(uint8_t *mac);
+	void msg_read(uint32_t flags);
+	void msg_write(uint32_t size);
+	int drop_privileges(void);
+	void vm_startup(void);
+	void vm_shutdown(void);
+
+	interface_ref interface;
+	uint8_t interface_mac[6];
+	long interface_mtu;
+	long interface_packet_size;
+	vmnet_return_t interface_status;
+	size_t buffer_size = 0;
+	uint8_t *buffer = NULL;
 };
 
 #define MAKE_MSG(msg, extra) (msg | ((extra) << 8))
 
-ssize_t safe_read(void *buffer, size_t nbyte) {
+ssize_t vmnet_helper::safe_read(void *buffer, size_t nbyte) {
 
 	ssize_t rv;
 	for(;;) {
@@ -52,7 +72,7 @@ ssize_t safe_read(void *buffer, size_t nbyte) {
 }
 
 
-ssize_t safe_readv(const struct iovec *iov, int iovcnt) {
+ssize_t vmnet_helper::safe_readv(const struct iovec *iov, int iovcnt) {
 
 	ssize_t rv;
 	for(;;) {
@@ -66,7 +86,7 @@ ssize_t safe_readv(const struct iovec *iov, int iovcnt) {
 	return rv;
 }
 
-ssize_t safe_write(const void *buffer, size_t nbyte) {
+ssize_t vmnet_helper::safe_write(const void *buffer, size_t nbyte) {
 
 	ssize_t rv;
 	for(;;) {
@@ -80,7 +100,7 @@ ssize_t safe_write(const void *buffer, size_t nbyte) {
 	return rv;
 }
 
-ssize_t safe_writev(const struct iovec *iov, int iovcnt) {
+ssize_t vmnet_helper::safe_writev(const struct iovec *iov, int iovcnt) {
 
 	ssize_t rv;
 	for(;;) {
@@ -95,7 +115,7 @@ ssize_t safe_writev(const struct iovec *iov, int iovcnt) {
 }
 
 
-void msg_status(uint32_t size) {
+void vmnet_helper::msg_status(uint32_t size) {
 	struct iovec iov[4];
 
 	uint32_t msg = MAKE_MSG(MSG_STATUS, 6 + 4 + 4);
@@ -116,13 +136,13 @@ void msg_status(uint32_t size) {
 	safe_writev(iov, 4);
 }
 
-int classify_mac(uint8_t *mac) {
+int vmnet_helper::classify_mac(uint8_t *mac) {
 	if ((mac[0] & 0x01) == 0) return 1; /* unicast */
 	if (memcmp(mac, "\xff\xff\xff\xff\xff\xff", 6) == 0) return 0xff; /* broadcast */
 	return 2; /* multicast */
 }
 
-void msg_read(uint32_t flags) {
+void vmnet_helper::msg_read(uint32_t flags) {
 	/* flag to block broadcast, multicast, etc? */
 
 	int count = 1;
@@ -167,7 +187,7 @@ void msg_read(uint32_t flags) {
 }
 
 
-void msg_write(uint32_t size) {
+void vmnet_helper::msg_write(uint32_t size) {
 
 	ssize_t ok;
 
@@ -210,7 +230,7 @@ void msg_write(uint32_t size) {
  * POS36-C
  * https://www.securecoding.cert.org/confluence/display/c/POS36-C.+Observe+correct+revocation+order+while+relinquishing+privileges
 */
-static int drop_privileges(void) {
+int vmnet_helper::drop_privileges(void) {
 	// If we are not effectively root, don't drop privileges
 	if (geteuid() != 0 && getegid() != 0) {
 		return 0;
@@ -224,17 +244,18 @@ static int drop_privileges(void) {
 	return 0;
 }
 
-void vm_startup(void) {
+vmnet_helper::vmnet_helper() {
+	memset(interface_mac, 0, sizeof(interface_mac));
+	interface_status = VMNET_SUCCESS;
+	interface_mtu = 0;
+	interface_packet_size = 0;
+}
+
+void vmnet_helper::vm_startup(void) {
 
 	xpc_object_t dict;
 	dispatch_queue_t q;
 	dispatch_semaphore_t sem;
-
-
-	memset(interface_mac, 0, sizeof(interface_mac));
-	interface_status = 0;
-	interface_mtu = 0;
-	interface_packet_size = 0;
 
 	dict = xpc_dictionary_create(NULL, NULL, 0);
 	xpc_dictionary_set_uint64(dict, vmnet_operation_mode_key, VMNET_SHARED_MODE);
@@ -292,7 +313,7 @@ void vm_startup(void) {
 	drop_privileges();
 }
 
-void vm_shutdown(void) {
+void vmnet_helper::vm_shutdown(void) {
 
 	dispatch_queue_t q;
 	dispatch_semaphore_t sem;
@@ -308,48 +329,60 @@ void vm_shutdown(void) {
 		dispatch_release(sem);
 
 		interface = NULL;
-		interface_status = 0;
+		interface_status = VMNET_SUCCESS;
 	}
 	free(buffer);
 	buffer = NULL;
 	buffer_size = 0;
-
 }
 
-int main(int argc, char **argv) {
+void vmnet_helper::vm_run()
+{
 	uint32_t msg;
 	uint32_t extra;
 	ssize_t ok;
 
 	vm_startup();
 
-	for(;;) {
+	for (;;)
+	{
 		ok = safe_read(&msg, 4);
-		if (ok == 0) break;
-		if (ok != 4) errx(1, "read msg");
+		if (ok == 0)
+			break;
+		if (ok != 4)
+			errx(1, "read msg");
 
 		extra = msg >> 8;
 		msg = msg & 0xff;
 
-		switch(msg) {
-			case MSG_STATUS:
-				msg_status(extra);
-				break;
+		switch (msg)
+		{
+		case MSG_STATUS:
+			msg_status(extra);
+			break;
 
-			case MSG_QUIT:
-				vm_shutdown();
-				exit(0);
+		case MSG_QUIT:
+			vm_shutdown();
+			return;
 
-			case MSG_READ:
-				msg_read(extra);
-				break;
+		case MSG_READ:
+			msg_read(extra);
+			break;
 
-			case MSG_WRITE:
-				msg_write(extra);
-				break;
+		case MSG_WRITE:
+			msg_write(extra);
+			break;
 		}
 	}
 
 	vm_shutdown();
-	exit(0);
+}
+
+int main(int argc, char **argv) {
+	vmnet_helper *helper;
+
+	helper = new vmnet_helper;
+	helper->vm_run();
+
+	return 0;
 }
