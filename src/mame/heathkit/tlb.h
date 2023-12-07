@@ -338,7 +338,7 @@ protected:
 	void window_addr_lo_w(uint8_t data);
 	void window_addr_hi_w(uint8_t data);
 
-	std::unique_ptr<u8[]>   m_p_graphic_ram;
+	std::unique_ptr<uint8_t[]>   m_p_graphic_ram;
 
 	// Control Register
 	bool m_pixel_video_enabled;

@@ -15,10 +15,10 @@
 class sigmasoft_parallel_port : public device_t
 {
 public:
-	sigmasoft_parallel_port(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	sigmasoft_parallel_port(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	void write(offs_t reg, u8 val);
-	u8   read(offs_t reg);
+	void write(offs_t reg, uint8_t val);
+	uint8_t   read(offs_t reg);
 
 
 	auto ctrl_r_cb() { return m_ctrl_r.bind(); }

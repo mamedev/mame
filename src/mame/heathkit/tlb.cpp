@@ -1547,8 +1547,8 @@ void heath_imaginator_tlb_device::device_start()
 	m_mem_bank->configure_entries(0, 2, memregion("maincpu")->base(), 0x2000);
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x8000, 0xbfff, "irq_update",
-			[this] (offs_t offset, u8 &data, u8 mem_mask) { if (!machine().side_effects_disabled()) { tap_8000h(); } },
-			[this] (offs_t offset, u8 &data, u8 mem_mask) { if (!machine().side_effects_disabled()) { tap_8000h(); } });
+			[this] (offs_t offset, uint8_t &data, uint8_t mem_mask) { if (!machine().side_effects_disabled()) { tap_8000h(); } },
+			[this] (offs_t offset, uint8_t &data, uint8_t mem_mask) { if (!machine().side_effects_disabled()) { tap_8000h(); } });
 }
 
 void heath_imaginator_tlb_device::device_reset()
@@ -1558,8 +1558,8 @@ void heath_imaginator_tlb_device::device_reset()
 	m_mem_bank->set_entry(1);
 	m_tap_6000h.remove();
 	m_tap_6000h = m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x6000, 0x7fff, "mem_map_update",
-			[this] (offs_t offset, u8 &data, u8 mem_mask) { if (!machine().side_effects_disabled()) { tap_6000h(); } },
-			[this] (offs_t offset, u8 &data, u8 mem_mask) { if (!machine().side_effects_disabled()) { tap_6000h(); } });
+			[this] (offs_t offset, uint8_t &data, uint8_t mem_mask) { if (!machine().side_effects_disabled()) { tap_6000h(); } },
+			[this] (offs_t offset, uint8_t &data, uint8_t mem_mask) { if (!machine().side_effects_disabled()) { tap_6000h(); } });
 
 	m_alphanumeric_mode_active = true;
 	m_graphics_mode_active = false;
@@ -1820,7 +1820,7 @@ void heath_igc_tlb_device::sigma_ctrl_w(uint8_t data)
 
 uint8_t heath_igc_tlb_device::sigma_ctrl_r()
 {
-	u8 ret_val = 0x00;
+	uint8_t ret_val = 0x00;
 
 	ret_val |= m_pixel_video_enabled ? 0x01 : 0x00;
 	ret_val |= m_character_video_disabled ? 0x02 : 0x00;
@@ -1892,6 +1892,8 @@ MC6845_UPDATE_ROW(heath_igc_tlb_device::crtc_update_row)
 
 	if (de)
 	{
+		uint8_t video_invert = m_video_invert_enabled ? 0xff : 0;
+
 		for (int x = 0; x < x_count; x++)
 		{
 			uint8_t output = 0x00;
@@ -1916,7 +1918,7 @@ MC6845_UPDATE_ROW(heath_igc_tlb_device::crtc_update_row)
 				output |= m_p_graphic_ram[(((y * 80) + x) + m_window_address) & 0xffff];
 			}
 
-			output ^= m_video_invert_enabled ? 0xff : 0;
+			output ^= video_invert;
 
 			for (int b = 0; 8 > b; ++b)
 			{
