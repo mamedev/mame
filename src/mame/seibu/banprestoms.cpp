@@ -38,6 +38,7 @@ TODO:
 
 #include "emu.h"
 
+#include "sei021x_sei0220_spr.h"
 #include "seibu_crtc.h"
 
 #include "cpu/m68000/m68000.h"
@@ -62,6 +63,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
+		, m_spritegen(*this, "spritegen")
 		, m_ticket(*this, "ticket")
 		, m_rtc(*this, "rtc")
 		, m_vram(*this, "vram%u", 0U)
@@ -81,6 +83,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<sei0211_device> m_spritegen;
 	required_device<ticket_dispenser_device> m_ticket;
 	required_device<lh5045_device> m_rtc;
 
@@ -102,7 +105,7 @@ private:
 
 	template <uint8_t Which> TILE_GET_INFO_MEMBER(tile_info);
 
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
+	uint32_t pri_cb(uint8_t pri, uint8_t ext);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void prg_map(address_map &map);
@@ -154,62 +157,24 @@ TILE_GET_INFO_MEMBER(banprestoms_state::tile_info)
 {
 	int tile = m_vram[Which][tile_index] & 0xfff;
 	int color = (m_vram[Which][tile_index] >> 12) & 0x0f;
-	tileinfo.set(Which + 1, tile, color, 0);
+	tileinfo.set(Which, tile, color, 0);
 }
 
-void banprestoms_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri)
+uint32_t banprestoms_state::pri_cb(uint8_t pri, uint8_t ext)
 {
-	for (int offs = 0x400 - 4; offs >= 0; offs -= 4)
+	switch (pri)
 	{
-		if ((m_spriteram[offs] & 0x8000) != 0x8000) continue;
-		int sprite = m_spriteram[offs + 1];
-		if ((sprite >> 14) != pri) continue;
-		sprite &= 0x1fff;
-
-		int y = m_spriteram[offs + 3];
-		int x = m_spriteram[offs + 2];
-
-		int color = m_spriteram[offs] & 0x3f;
-		int fx = m_spriteram[offs] & 0x4000;
-		int fy = m_spriteram[offs] & 0x2000;
-		int dy = ((m_spriteram[offs] & 0x0380) >> 7) + 1;
-		int dx = ((m_spriteram[offs] & 0x1c00) >> 10) + 1;
-
-		// co-ordinates don't have a sign bit, there must be wrapping logic
-		// co-ordinate masking might need to be applied during drawing instead
-		x &= 0x1ff;
-		if (x >= 0x180)
-			x -= 0x200;
-
-		y &= 0x1ff;
-		if (y >= 0x180)
-			y -= 0x200;
-
-		for (int ax = 0; ax < dx; ax++)
-		{
-			for (int ay = 0; ay < dy; ay++)
-			{
-				if (!fy)
-				{
-					if (!fx)
-						m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, sprite++, color, fx, fy, x + ax * 16, y + ay * 16, 15);
-					else
-						m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, sprite++, color, fx, fy, x + (dx - 1 - ax) * 16, y + ay * 16, 15);
-				}
-				else
-				{
-					if (!fx)
-						m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, sprite++, color, fx, fy, x + ax * 16, y + (dy - 1 - ay) * 16, 15);
-					else
-						m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, sprite++, color, fx, fy, x + (dx - 1 - ax) * 16, y + (dy - 1 - ay) * 16, 15);
-				}
-			}
-		}
+		case 0: return GFX_PMASK_8;
+		case 1: return GFX_PMASK_8 | GFX_PMASK_4;
+		case 2: return GFX_PMASK_8 | GFX_PMASK_4 | GFX_PMASK_2;
+		case 3:
+		default: return 0;
 	}
 }
 
 uint32_t banprestoms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	screen.priority().fill(0, cliprect);
 	bitmap.fill(m_palette->pen(0x7ff), cliprect); //black pen
 
 	m_tilemap[0]->set_scrollx(0, m_scrollram[0]);
@@ -221,14 +186,11 @@ uint32_t banprestoms_state::screen_update(screen_device &screen, bitmap_ind16 &b
 	m_tilemap[3]->set_scrollx(0, 128);
 	m_tilemap[3]->set_scrolly(0, -16);
 
-	if (!(m_layer_en & 0x0001)) { m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0); }
-	if (!(m_layer_en & 0x0010)) { draw_sprites(bitmap, cliprect, 2); }
-	if (!(m_layer_en & 0x0002)) { m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0); }
-	if (!(m_layer_en & 0x0010)) { draw_sprites(bitmap, cliprect, 1); }
-	if (!(m_layer_en & 0x0004)) { m_tilemap[2]->draw(screen, bitmap, cliprect, 0, 0); }
-	if (!(m_layer_en & 0x0010)) { draw_sprites(bitmap, cliprect, 0); }
-	if (!(m_layer_en & 0x0008)) { m_tilemap[3]->draw(screen, bitmap, cliprect, 0, 0); }
-	if (!(m_layer_en & 0x0010)) { draw_sprites(bitmap, cliprect, 3); }
+	if (BIT(~m_layer_en, 0)) { m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 1); }
+	if (BIT(~m_layer_en, 1)) { m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 2); }
+	if (BIT(~m_layer_en, 2)) { m_tilemap[2]->draw(screen, bitmap, cliprect, 0, 4); }
+	if (BIT(~m_layer_en, 3)) { m_tilemap[3]->draw(screen, bitmap, cliprect, 0, 8); }
+	if (BIT(~m_layer_en, 4)) { m_spritegen->draw_sprites(screen, bitmap, cliprect, m_spriteram, m_spriteram.bytes()); }
 
 	return 0;
 }
@@ -430,11 +392,14 @@ static const gfx_layout charlayout =
 };
 
 static GFXDECODE_START( gfx_banprestoms )
-	GFXDECODE_ENTRY( "spr_gfx",0, tilelayout, 0x000, 0x40 )
 	GFXDECODE_ENTRY( "bg_gfx", 0, tilelayout, 0x100, 0x10 ) // TODO, doesn't seem to be used by the dumped games
 	GFXDECODE_ENTRY( "md_gfx", 0, tilelayout, 0x100, 0x10 ) // TODO, doesn't seem to be used by the dumped games
 	GFXDECODE_ENTRY( "fg_gfx", 0, tilelayout, 0x100, 0x10 )
 	GFXDECODE_ENTRY( "tx_gfx", 0, charlayout, 0x200, 0x10 )
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_banprestoms_spr )
+	GFXDECODE_ENTRY( "spr_gfx",0, tilelayout, 0x000, 0x40 )
 GFXDECODE_END
 
 
@@ -466,6 +431,9 @@ void banprestoms_state::banprestoms(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_banprestoms);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x400); // TODO: copied from other drivers using the same CRTC
+
+	SEI0211(config, m_spritegen, XTAL(14'318'181), m_palette, gfx_banprestoms_spr);
+	m_spritegen->set_pri_callback(FUNC(banprestoms_state::pri_cb));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

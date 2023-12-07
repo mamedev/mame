@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "sei021x_sei0220_spr.h"
+
 #include "seibusound.h"
 
 #include "emupal.h"
@@ -19,6 +21,7 @@ public:
 		m_seibu_sound(*this, "seibu_sound"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_spritegen(*this, "spritegen"),
 		m_back_data(*this, "back_data"),
 		m_fore_data(*this, "fore_data"),
 		m_mid_data(*this, "mid_data"),
@@ -34,6 +37,7 @@ private:
 	required_device<seibu_sound_device> m_seibu_sound;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<sei0211_device> m_spritegen;
 
 	required_shared_ptr<uint16_t> m_back_data;
 	required_shared_ptr<uint16_t> m_fore_data;
@@ -70,7 +74,7 @@ private:
 
 	uint32_t screen_update_dcon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_sdgndmps(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
+	uint32_t pri_cb(uint8_t pri, uint8_t ext);
 	void dcon_map(address_map &map);
 	void sdgndmps_map(address_map &map);
 };
