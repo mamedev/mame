@@ -35,6 +35,8 @@
 
 #include "emu.h"
 
+#include "nichisnd.h"
+
 #include "bus/ata/atadev.h"
 #include "bus/ata/atapicdr.h"
 #include "bus/ata/ataintf.h"
@@ -47,7 +49,8 @@
 #include "video/v9938.h"
 #include "video/zr36110.h"
 
-#include "nichisnd.h"
+#include "speaker.h"
+
 
 class hrdvd_ata_controller_device : public abstract_ata_interface_device
 {

@@ -15,7 +15,6 @@
 
 #include "cpu/z80/tmpz84c011.h"
 #include "machine/74166.h"
-#include "machine/gen_latch.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -39,17 +38,15 @@ public:
 		m_system(*this, "SYSTEM"),
 		m_dsw(*this, "DSW%c", 'A'),
 		m_dsw_shifter(*this, "ttl166_%u", 1U),
-		m_soundlatch(*this, "soundlatch"),
 		m_palette_ptr(*this, "paletteram"),
 		m_blit_region(*this, "blitter")
 	{ }
 
 	int hopper_r();
 
-	void NBMJDRV1_base(machine_config &config);
-	void NBMJDRV1(machine_config &config);
-	void NBMJDRV2(machine_config &config);
-	void NBMJDRV3(machine_config &config);
+	void nbmjtype1(machine_config &config);
+	void nbmjtype2(machine_config &config);
+
 	void patimono(machine_config &config);
 	void mjuraden(machine_config &config);
 	void psailor1(machine_config &config);
@@ -79,8 +76,6 @@ public:
 	void ultramhm(machine_config &config);
 	void otatidai(machine_config &config);
 
-	void init_nbmj9195();
-
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -97,7 +92,6 @@ private:
 	optional_ioport m_system;
 	required_ioport_array<2> m_dsw;
 	optional_device_array<ttl166_device, 2> m_dsw_shifter;
-	required_device<generic_latch_8_device> m_soundlatch;
 
 	optional_shared_ptr<uint8_t> m_palette_ptr; //shabdama doesn't use it at least for now
 
@@ -135,13 +129,11 @@ private:
 	int m_flipscreen_old[VRAM_MAX];
 	emu_timer *m_blitter_timer = nullptr;
 
-	void soundbank_w(uint8_t data);
 	void key_select_w(uint8_t data);
 	uint8_t mscoutm_cpu_portb_r();
 	uint8_t mscoutm_cpu_portc_r();
 	uint8_t others_cpu_portb_r();
 	uint8_t others_cpu_portc_r();
-	void soundcpu_porte_w(uint8_t data);
 	void palette_w(offs_t offset, uint8_t data);
 	void nb22090_palette_w(offs_t offset, uint8_t data);
 	void blitter_0_w(offs_t offset, uint8_t data);
@@ -165,7 +157,6 @@ private:
 	void vramflip(int vram);
 	void update_pixel(int vram, int x, int y);
 	void gfxdraw(int vram);
-	int dipsw_r();
 	void postload();
 
 	void cmehyou_io_map(address_map &map);
@@ -197,8 +188,6 @@ private:
 	void sailorwr_io_map(address_map &map);
 	void sailorws_io_map(address_map &map);
 	void sailorws_map(address_map &map);
-	void sailorws_sound_io_map(address_map &map);
-	void sailorws_sound_map(address_map &map);
 	void yosimotm_io_map(address_map &map);
 	void yosimoto_io_map(address_map &map);
 };
