@@ -20,10 +20,10 @@ public:
 		set_palette(std::forward<T>(palette_tag));
 	}
 
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u16* spriteram, int size);
-	void set_flip_screen(bool flip) { m_flip_screen = flip; }
-
 	template <typename... T> void set_colpri_callback(T &&... args) { m_colpri_cb.set(std::forward<T>(args)...); }
+
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, const u16 *spriteram, int size);
+	void set_flip_screen(bool flip) { m_flip_screen = flip; }
 
 protected:
 	virtual void device_start() override;
@@ -31,7 +31,7 @@ protected:
 
 private:
 	colpri_cb_delegate m_colpri_cb;
-	bool m_flip_screen = false;
+	bool m_flip_screen;
 };
 
 DECLARE_DEVICE_TYPE(DECO_KARNOVSPRITES, deco_karnovsprites_device)
