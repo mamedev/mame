@@ -657,7 +657,7 @@ void xtensa_device::getop_and_execute()
 							LOGMASKED(LOG_HANDLED_OPS, "rfe\n");
 							m_nextpc = m_extreg_epc1;
 							clear_irqpri(2);
-							//clear_irqpri(4);
+							clear_irqpri(4);
 							break;
 						}
 

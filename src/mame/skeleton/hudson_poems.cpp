@@ -70,12 +70,14 @@ private:
 	void draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t tile, int xx, int yy, int gfxbase, int extrapal);
 	void draw_tile8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t tile, int xx, int yy, int gfxbase, int extrapal);
 
+	uint32_t poems_random_r();
 	void unk_trigger_w(offs_t offset, u32 data, u32 mem_mask);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(screen_scanline);
 
 	void mem_map(address_map &map);
 
+	uint32_t poems_8020010_r();
 	uint32_t poems_count_r();
 	uint32_t poems_unk_r();
 	uint32_t poems_8000038_r(offs_t offset, u32 mem_mask);
@@ -243,10 +245,20 @@ uint32_t hudson_poems_state::poems_unk_r()
 	return 0x00000000;
 }
 
+uint32_t hudson_poems_state::poems_random_r()
+{
+	return machine().rand();
+}
+
 
 uint32_t hudson_poems_state::poems_count_r()
 {
 	return ((m_hackcounter++) & 0x3) ? 0xffffffff : 0;
+}
+
+uint32_t hudson_poems_state::poems_8020010_r()
+{
+	return 0x4;
 }
 
 uint32_t hudson_poems_state::unk_aa04_r(offs_t offset, u32 mem_mask)
@@ -342,7 +354,8 @@ void hudson_poems_state::unk_trigger_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	logerror("%s: unk_trigger_w %08x %08x\n", machine().describe_context(), data, mem_mask);
 	//  this needs to change in RAM, presumably from an interrupt, but no idea how to get there
-	m_maincpu->space(AS_PROGRAM).write_byte(0x2c01d92c, 0x01);
+//	m_maincpu->space(AS_PROGRAM).write_byte(0x2c01d92c, 0x01);
+	m_maincpu->irq_request_hack(0x4);
 }
 
 
@@ -356,15 +369,23 @@ void hudson_poems_state::mainram_w(offs_t offset, u32 data, u32 mem_mask)
 	m_gfxdecode->gfx(5)->mark_dirty(offset / 2);
 }
 
+
+
 void hudson_poems_state::mem_map(address_map &map)
 {
-	map(0x00000000, 0x007fffff).mirror(0x21000000).rom().region("maincpu", 0);
+	map(0x00000000, 0x007fffff).mirror(0x20000000).rom().region("maincpu", 0);
 	      
 	/////////////////// unknown
+	map(0x04000040, 0x04000043).r(FUNC(hudson_poems_state::poems_random_r));
+	map(0x04000140, 0x04000143).r(FUNC(hudson_poems_state::poems_random_r));
+	map(0x04000240, 0x04000243).r(FUNC(hudson_poems_state::poems_random_r));
+	map(0x04000340, 0x04000343).r(FUNC(hudson_poems_state::poems_random_r));
 
-	//map(0x04000000, 0x04003fff).ram();
 	//map(0x04000324, 0x04000327).nopw(); // uploads a table here from ROM after uploading fixed values from ROM to some other addresses
-	map(0x0400033c, 0x0400033f).w(FUNC(hudson_poems_state::unk_trigger_w));
+	map(0x0400033c, 0x0400033f).w(FUNC(hudson_poems_state::unk_trigger_w)); // maybe DMA?
+	map(0x04001000, 0x04001003).r(FUNC(hudson_poems_state::poems_random_r));
+
+
 	map(0x0400100c, 0x0400100f).nopr(); // read in various places at end of calls, every frame, but result seems to go unused?
 	map(0x04002040, 0x04002043).portr("IN1");
 
@@ -402,7 +423,7 @@ void hudson_poems_state::mem_map(address_map &map)
 
 	map(0x08000800, 0x08000fff).ram().w(FUNC(hudson_poems_state::palette_w)).share("palram");
 
-	/////////////////// sprites?
+	/////////////////// sprites? (more likely to be sound!)
 
 	map(0x08008000, 0x08008003).nopw();
 
@@ -433,7 +454,7 @@ void hudson_poems_state::mem_map(address_map &map)
 	map(0x08020000, 0x08020003).nopr().nopw();
 	map(0x08020004, 0x08020007).nopr().nopw();
  	map(0x08020008, 0x0802000b).nopr();
-//	map(0x08020010, 0x08020013).r(FUNC(hudson_poems_state::poems_count_r));
+	map(0x08020010, 0x08020013).r(FUNC(hudson_poems_state::poems_8020010_r));
 	map(0x08020014, 0x08020017).nopw(); // writes 0x10
  	map(0x08020018, 0x0802001b).r(FUNC(hudson_poems_state::poems_unk_r)).nopw(); // writes 0x10
 	map(0x08020020, 0x08020023).r(FUNC(hudson_poems_state::poems_count_r));
@@ -480,7 +501,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hudson_poems_state::screen_scanline)
 
 	if (scanline == 150)
 	{
-		//m_maincpu->irq_off_hack();
+		m_maincpu->irq_off_hack();
 	}
 }
 
