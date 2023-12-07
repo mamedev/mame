@@ -95,12 +95,15 @@ private:
 	void mainram_w(offs_t offset, u32 data, u32 mem_mask);
 
 	void spritegfx_base_w(offs_t offset, u32 data, u32 mem_mask);
+	void spritelist_base_w(offs_t offset, u32 data, u32 mem_mask);
+	void tilemap_base_w(offs_t offset, u32 data, u32 mem_mask);
 
 	uint16_t m_unktable[256];
 	uint16_t m_unktableoffset;
 
 	uint32_t m_spritegfxbase[4];
-
+	uint32_t m_spritelistbase;
+	uint32_t m_tilemapbase;
 
 	int m_hackcounter;
 
@@ -145,7 +148,7 @@ INPUT_PORTS_END
 
 void hudson_poems_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int spritebase = 0x9400 / 4;
+	int spritebase = (m_spritelistbase & 0x0003ffff) / 4;
 	gfx_element *gfx = m_gfxdecode->gfx(2);
 
 	for (int i = 0; i < 64; i++)
@@ -222,6 +225,15 @@ void hudson_poems_state::spritegfx_base_w(offs_t offset, u32 data, u32 mem_mask)
 	COMBINE_DATA(&m_spritegfxbase[offset]);
 }
 
+void hudson_poems_state::tilemap_base_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	COMBINE_DATA(&m_tilemapbase);
+}
+
+void hudson_poems_state::spritelist_base_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	COMBINE_DATA(&m_spritelistbase);
+}
 
 void hudson_poems_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t tile, int xx, int yy, int gfxbase, int extrapal)
 {
@@ -267,23 +279,26 @@ uint32_t hudson_poems_state::screen_update(screen_device &screen, bitmap_ind16 &
 		{
 			// it briefly writes 0x2c001a00 to 0x08000070 when you enter test mode (where the font gfx are stored) before switching back, could be DMA?
 			// unless there's an error causing it to rewrite the old pointers
-			width = 256; base = (0x2a00 / 4); bpp = 4; gfxbase = 0x1a00; extrapal = 0; break;// test mode
+			width = 256; bpp = 4; gfxbase = 0x1a00; extrapal = 0; break;// test mode
 		}
 		else
 		{
-			width = 512; base = (0xa800 / 4); bpp = 4; gfxbase = 0x9c00; extrapal = 0; break;// konami logo
+			width = 512;  bpp = 4; gfxbase = 0x9c00; extrapal = 0; break;// konami logo
 		}
 	}
-	case 0x0d: width = 512; base = (0xb800 / 4); bpp = 8; gfxbase = 0x9c00; extrapal = 0; break;// poems logo
-	case 0x10: width = 512; base = (0xc600 / 4); bpp = 4; gfxbase = 0x9c00; extrapal = 0; break;// bemani logo
-	case 0x14: width = 512; base = (0xd400 / 4); bpp = 4; gfxbase = 0x9c00; extrapal = 0; break;// warning screen
-	case 0x38: width = 512; base = (0x14000 / 4); bpp = 4; gfxbase = 0x9800; break;// title 1 logo (shouldn't be this tall?, contains the top half of below)
+	case 0x0d: width = 512; bpp = 8; gfxbase = 0x9c00; extrapal = 0; break;// poems logo
+	case 0x10: width = 512; bpp = 4; gfxbase = 0x9c00; extrapal = 0; break;// bemani logo
+	case 0x14: width = 512; bpp = 4; gfxbase = 0x9c00; extrapal = 0; break;// warning screen
+	case 0x38: width = 512; bpp = 4; gfxbase = 0x9800; break;// title 1 logo (shouldn't be this tall?, contains the top half of below)
 	//case 0x38: width = 512; base = (0x14800/4); bpp = 4; gfxbase = 0x9800+0x7800; extrapal = 1; break;// title 1 background
 	//case 0x38: width = 512; base = (0x15800/4); bpp = 4; gfxbase = 0x9800+0x7800; extrapal = 1; break;// title 1 background (same as above, but set to use palette 1)
 	//case 0x38: width = 512; base = (0x16800/4); bpp = 4; gfxbase = 0x9800+base_hack; break;// title 1 logo (shouldn't be this tall?, bottom half of title screen, but not the button/text)
-	case 0x44: width = 512; base = (0x18400 / 4); bpp = 4; gfxbase = 0x9800; extrapal = 0; break;// game demo
+	case 0x44: width = 512; bpp = 4; gfxbase = 0x9800; extrapal = 0; break;// game demo
 	default: attempt_draw = false; break;
 	}
+
+	// contains a full 32-bit address
+	base = (m_tilemapbase & 0x0003ffff) / 4;
 
 	if (!attempt_draw)
 	{
@@ -494,7 +509,7 @@ void hudson_poems_state::mem_map(address_map &map)
 	map(0x08000070, 0x0800007f).w(FUNC(hudson_poems_state::spritegfx_base_w)); // ^^ sometimes writes 2C009C00 (one of the tile data bases)
 
 	//map(0x08000080, 0x08000083).nopw(); // also a similar time to palette uploads
-	//map(0x08000084, 0x08000087).nopw(); // can write 0113D600
+	map(0x08000084, 0x08000087).w(FUNC(hudson_poems_state::tilemap_base_w)); // can write 0113D600
 	//map(0x08000088, 0x0800008b).nopw(); // can write 000004E4
 	//map(0x0800008c, 0x0800008f).nopw(); // can write 00001FF5
 	//map(0x08000090, 0x08000093).nopw();
@@ -507,7 +522,7 @@ void hudson_poems_state::mem_map(address_map &map)
 	//map(0x080000ac, 0x080000af).nopw();
 
 	//map(0x08000180, 0x08000183).nopw(); // gets set to 0000007F on startup
-	//map(0x08000184, 0x08000187).nopw(); // gets set to 2C009400 on startup (some other video table?)
+	map(0x08000184, 0x08000187).w(FUNC(hudson_poems_state::spritelist_base_w)); // gets set to 2C009400 on startup
 
 	map(0x08000800, 0x08000fff).ram().w(FUNC(hudson_poems_state::palette_w)).share("palram");
 
