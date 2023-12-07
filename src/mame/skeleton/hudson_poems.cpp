@@ -94,8 +94,13 @@ private:
 	void palette_w(offs_t offset, u32 data, u32 mem_mask);
 	void mainram_w(offs_t offset, u32 data, u32 mem_mask);
 
+	void spritegfx_base_w(offs_t offset, u32 data, u32 mem_mask);
+
 	uint16_t m_unktable[256];
 	uint16_t m_unktableoffset;
+
+	uint32_t m_spritegfxbase[4];
+
 
 	int m_hackcounter;
 
@@ -153,25 +158,19 @@ void hudson_poems_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitma
 
 		int x = (spriteword3 & 0x03ff);
 		int y = (spriteword2 & 0x03ff);
-		int tilenum = spriteword1 & 0x01ff;
-		int pal = (spriteword2 & 0x3c00)>>10;
-		pal += 0x10;
-
-		tilenum &= 0xfff;
+		int tilenum = spriteword1 & 0x03ff;
+		int pal = (spriteword2 & 0x7c00)>>10;
 
 		// is it selecting from multiple tile pages (which can have different bases?) (probably from a register somewhere)
-		if (spriteword0 & 0x0100)
-			tilebase = 0x6e0;
-		else
-			tilebase = 0x8c0;
-
+		tilebase = (m_spritegfxbase[(spriteword0 & 0x0300)>>8] & 0x0003ffff) / 32; // m_spritegfxbase contains a full memory address pointer to RAM
+	
 		tilenum += tilebase;
 
 		/* based on code analysis of function at 006707A4
 		word0 ( 0abb bbcc ---- -dFf ) OR ( 1abb bbcc dddd dddd )   F = flipX f = flipY
 		word1 ( wwhh ---t tttt tttt ) - other bits are used, but pulled from ram? t = tile number?  ww = width hh = height
-		word2 ( 0app ppyy yyyy yyyy ) p = pal y = ypos
-		word3 ( aabb bbxx xxxx xxxx )  x = xpos
+		word2 ( 0Ppp ppyy yyyy yyyy ) P = palette bank p = palette y = ypos
+		word3 ( aabb bbxx xxxx xxxx ) x = xpos
 		*/
 
 		int flipx = spriteword0 & 2;
@@ -216,6 +215,11 @@ void hudson_poems_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitma
 	                                                           m_mainram[spritebase + 4], m_mainram[spritebase + 5],
 	                                                           m_mainram[spritebase + 6], m_mainram[spritebase + 7]);
 	*/
+}
+
+void hudson_poems_state::spritegfx_base_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	COMBINE_DATA(&m_spritegfxbase[offset]);
 }
 
 
@@ -486,25 +490,23 @@ void hudson_poems_state::mem_map(address_map &map)
 	map(0x08000054, 0x08000057).nopw(); // ^^ writes 15555555 while fading
 	map(0x0800005c, 0x0800005f).w(FUNC(hudson_poems_state::fade_w));
 
-	//map(0x08000070, 0x08000073).nopw(); // ^^ sometimes writes 2C009C00 (one of the tile data bases)
-	map(0x08000074, 0x08000077).nopw(); // ^^
-	map(0x08000078, 0x0800007b).nopw(); // ^^
-	//map(0x0800007c, 0x0800007f).nopw(); // ^^ sometimes writes 2C009800 (one of the tile data bases)
+	// are these runtime registers, or DMA sources?
+	map(0x08000070, 0x0800007f).w(FUNC(hudson_poems_state::spritegfx_base_w)); // ^^ sometimes writes 2C009C00 (one of the tile data bases)
 
-	map(0x08000080, 0x08000083).nopw(); // also a similar time to palette uploads
-	map(0x08000084, 0x08000087).nopw(); // can write 0113D600
-	map(0x08000088, 0x0800008b).nopw(); // can write 000004E4
-	map(0x0800008c, 0x0800008f).nopw(); // can write 00001FF5
-	map(0x08000090, 0x08000093).nopw();
-	map(0x08000094, 0x08000097).nopw();
-	map(0x08000098, 0x0800009b).nopw();
-	map(0x0800009c, 0x0800009f).nopw();
-	map(0x080000a0, 0x080000a3).nopw();
-	map(0x080000a4, 0x080000a7).nopw();
-	map(0x080000a8, 0x080000ab).nopw();
-	map(0x080000ac, 0x080000af).nopw();
+	//map(0x08000080, 0x08000083).nopw(); // also a similar time to palette uploads
+	//map(0x08000084, 0x08000087).nopw(); // can write 0113D600
+	//map(0x08000088, 0x0800008b).nopw(); // can write 000004E4
+	//map(0x0800008c, 0x0800008f).nopw(); // can write 00001FF5
+	//map(0x08000090, 0x08000093).nopw();
+	//map(0x08000094, 0x08000097).nopw();
+	//map(0x08000098, 0x0800009b).nopw();
+	//map(0x0800009c, 0x0800009f).nopw();
+	//map(0x080000a0, 0x080000a3).nopw();
+	//map(0x080000a4, 0x080000a7).nopw();
+	//map(0x080000a8, 0x080000ab).nopw();
+	//map(0x080000ac, 0x080000af).nopw();
 
-	map(0x08000180, 0x08000183).nopw(); // gets set to 0000007F on startup
+	//map(0x08000180, 0x08000183).nopw(); // gets set to 0000007F on startup
 	//map(0x08000184, 0x08000187).nopw(); // gets set to 2C009400 on startup (some other video table?)
 
 	map(0x08000800, 0x08000fff).ram().w(FUNC(hudson_poems_state::palette_w)).share("palram");
