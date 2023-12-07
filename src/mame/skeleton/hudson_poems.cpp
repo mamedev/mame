@@ -98,6 +98,9 @@ private:
 	void spritelist_base_w(offs_t offset, u32 data, u32 mem_mask);
 	void tilemap_base_w(offs_t offset, u32 data, u32 mem_mask);
 	void tilemap_unk_w(offs_t offset, u32 data, u32 mem_mask);
+	void tilemap_cfg_w(offs_t offset, u32 data, u32 mem_mask);
+	void tilemap_scr_w(offs_t offset, u32 data, u32 mem_mask);
+
 
 	uint16_t m_unktable[256];
 	uint16_t m_unktableoffset;
@@ -106,6 +109,7 @@ private:
 	uint32_t m_spritelistbase;
 	uint32_t m_tilemapbase;
 	uint32_t m_tilemapunk;
+	uint32_t m_tilemapscr;
 
 	int m_hackcounter;
 
@@ -128,6 +132,7 @@ void hudson_poems_state::machine_reset()
 	m_maincpu->set_pc(0x00000040);
 	m_unktableoffset = 0;
 	m_hackcounter = 0;
+	m_tilemapscr = 0;
 }
 
 /*
@@ -235,10 +240,21 @@ void hudson_poems_state::tilemap_base_w(offs_t offset, u32 data, u32 mem_mask)
 	COMBINE_DATA(&m_tilemapbase);
 }
 
+void hudson_poems_state::tilemap_cfg_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	logerror("tilemap_cfg_w %08x\n", data);
+}
+
 void hudson_poems_state::tilemap_unk_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	//logerror("m_tilemapunk %08x\n", data);
 	COMBINE_DATA(&m_tilemapunk);
+}
+
+void hudson_poems_state::tilemap_scr_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	logerror("tilemap_scroll_w %08x\n", data);
+	COMBINE_DATA(&m_tilemapscr);
 }
 
 void hudson_poems_state::spritelist_base_w(offs_t offset, u32 data, u32 mem_mask)
@@ -330,19 +346,25 @@ uint32_t hudson_poems_state::screen_update(screen_device &screen, bitmap_ind16 &
 		int count = 0;
 		for (int y = 0; y < 224 / 8; y++)
 		{
+			int yscroll = (m_tilemapscr >> 16) & 0x7ff;
+			if (yscroll & 0x400)
+				yscroll -= 0x800;
+
+			int ypos = (y * 8 + yscroll) & 0x1ff;
+
 			for (int x = 0; x < width / 8 / 2; x++)
 			{
 				uint32_t tiles = m_mainram[base + count];
 
 				if (bpp == 4)
 				{
-					draw_tile(screen, bitmap, cliprect, (tiles & 0xffff), (x * 16), y * 8, gfxbase, extrapal);
-					draw_tile(screen, bitmap, cliprect, ((tiles >> 16) & 0xffff), (x * 16) + 8, y * 8, gfxbase, extrapal);
+					draw_tile(screen, bitmap, cliprect, (tiles & 0xffff), (x * 16), ypos, gfxbase, extrapal);
+					draw_tile(screen, bitmap, cliprect, ((tiles >> 16) & 0xffff), (x * 16) + 8, ypos, gfxbase, extrapal);
 				}
 				else if (bpp == 8)
 				{
-					draw_tile8(screen, bitmap, cliprect, (tiles & 0xffff), (x * 16), y * 8, gfxbase, extrapal);
-					draw_tile8(screen, bitmap, cliprect, ((tiles >> 16) & 0xffff), (x * 16) + 8, y * 8, gfxbase, extrapal);
+					draw_tile8(screen, bitmap, cliprect, (tiles & 0xffff), (x * 16), ypos, gfxbase, extrapal);
+					draw_tile8(screen, bitmap, cliprect, ((tiles >> 16) & 0xffff), (x * 16) + 8, ypos, gfxbase, extrapal);
 				}
 
 				count++;
@@ -508,25 +530,25 @@ void hudson_poems_state::mem_map(address_map &map)
 	/////////////////// palette / regs?
 
 	map(0x08000038, 0x0800003b).r(FUNC(hudson_poems_state::poems_8000038_r));
-	map(0x0800003c, 0x0800003f).nopw(); // used close to the fade write code, writes FFFFFFFF
+	//map(0x0800003c, 0x0800003f).nopw(); // used close to the fade write code, writes FFFFFFFF
 
-	map(0x08000048, 0x0800004b).nopw(); // ^^
-	map(0x0800004c, 0x0800004f).nopw(); // ^^
-	map(0x08000050, 0x08000053).nopw(); // ^^ 16-bit write, sometimes writes 00000101 & 0000FFFF
-	map(0x08000054, 0x08000057).nopw(); // ^^ writes 15555555 while fading
+	//map(0x08000048, 0x0800004b).nopw(); // ^^
+	//map(0x0800004c, 0x0800004f).nopw(); // ^^
+	//map(0x08000050, 0x08000053).nopw(); // ^^ 16-bit write, sometimes writes 00000101 & 0000FFFF
+	//map(0x08000054, 0x08000057).nopw(); // ^^ writes 15555555 while fading
 	map(0x0800005c, 0x0800005f).w(FUNC(hudson_poems_state::fade_w));
 
 	// are these runtime registers, or DMA sources?
 	map(0x08000070, 0x0800007f).w(FUNC(hudson_poems_state::spritegfx_base_w)); // ^^ sometimes writes 2C009C00 (one of the tile data bases)
 
-	//map(0x08000080, 0x08000083).nopw(); // also a similar time to palette uploads
-	map(0x08000084, 0x08000087).w(FUNC(hudson_poems_state::tilemap_base_w)); // can write 0113D600
+	map(0x08000080, 0x08000083).w(FUNC(hudson_poems_state::tilemap_cfg_w)); // also a similar time to palette uploads
+	map(0x08000084, 0x08000087).w(FUNC(hudson_poems_state::tilemap_base_w)); 
 	map(0x08000088, 0x0800008b).w(FUNC(hudson_poems_state::tilemap_unk_w));
-	//map(0x0800008c, 0x0800008f).nopw(); // can write 00001FF5
+	//map(0x0800008c, 0x0800008f).nopw(); 
 	//map(0x08000090, 0x08000093).nopw();
 	//map(0x08000094, 0x08000097).nopw();
 	//map(0x08000098, 0x0800009b).nopw();
-	//map(0x0800009c, 0x0800009f).nopw();
+	map(0x0800009c, 0x0800009f).w(FUNC(hudson_poems_state::tilemap_scr_w));
 	//map(0x080000a0, 0x080000a3).nopw();
 	//map(0x080000a4, 0x080000a7).nopw();
 	//map(0x080000a8, 0x080000ab).nopw();
@@ -537,7 +559,7 @@ void hudson_poems_state::mem_map(address_map &map)
 
 	map(0x08000800, 0x08000fff).ram().w(FUNC(hudson_poems_state::palette_w)).share("palram");
 
-	/////////////////// sprites? (more likely to be sound!)
+	/////////////////// sound regs??
 
 	map(0x08008000, 0x08008003).nopw();
 
