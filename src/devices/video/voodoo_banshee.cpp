@@ -467,6 +467,7 @@ void voodoo_banshee_device::device_start()
 	m_io_regs.write(banshee_io_regs::sipMonitor, 0x40000000);
 	m_io_regs.write(banshee_io_regs::lfbMemoryConfig, 0x000a2200);
 	u32 dram0 = 0x00579d29;
+	// HACK: VMI_DATA_6 / VMI_DATA_5 strapping pins
 	if (m_fbmem_in_mb == 16)
 		dram0 |= 0x0c000000;      // Midway Vegas (denver) expects 2 banks of 16MBit SGRAMs
 	else

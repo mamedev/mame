@@ -395,8 +395,7 @@ void xtom3d_state::xtom3d(machine_config &config)
 	#if ENABLE_VOODOO
 	VOODOO_BANSHEE_PCI(config, m_voodoo, 0, m_maincpu, "screen"); // "pci:0d.0" J4D2
 	// TODO: confirm values
-	m_voodoo->set_fbmem(2);
-	m_voodoo->set_tmumem(4, 4);
+	m_voodoo->set_fbmem(16);
 	m_voodoo->set_status_cycles(1000);
 	//subdevice<generic_voodoo_device>(PCI_AGP_ID":voodoo")->vblank_callback().set(FUNC(xtom3d_state::vblank_assert));
 
