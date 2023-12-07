@@ -93,7 +93,7 @@ void k007420_device::write(offs_t offset, uint8_t data)
  *   7  | xxxxxxxx | unused
  */
 
-void k007420_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void k007420_device::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	const uint32_t codemask = m_banklimit;
 	const uint32_t bankmask = ~m_banklimit;
