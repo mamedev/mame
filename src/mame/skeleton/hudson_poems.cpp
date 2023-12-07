@@ -97,6 +97,7 @@ private:
 	void spritegfx_base_w(offs_t offset, u32 data, u32 mem_mask);
 	void spritelist_base_w(offs_t offset, u32 data, u32 mem_mask);
 	void tilemap_base_w(offs_t offset, u32 data, u32 mem_mask);
+	void tilemap_unk_w(offs_t offset, u32 data, u32 mem_mask);
 
 	uint16_t m_unktable[256];
 	uint16_t m_unktableoffset;
@@ -104,6 +105,7 @@ private:
 	uint32_t m_spritegfxbase[4];
 	uint32_t m_spritelistbase;
 	uint32_t m_tilemapbase;
+	uint32_t m_tilemapunk;
 
 	int m_hackcounter;
 
@@ -172,7 +174,7 @@ void hudson_poems_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitma
 		tilenum += tilebase;
 
 		/* based on code analysis of function at 006707A4
-		word0 ( 0abb bbcc ---- -dFf ) OR ( 1abb bbcc dddd dddd )   F = flipX f = flipY
+		word0 ( 0abb bbBB ---- -dFf ) OR ( 1abb bbcc dddd dddd ) BB = sprite base  F = flipX f = flipY
 		word1 ( wwhh ---t tttt tttt ) - other bits are used, but pulled from ram? t = tile number?  ww = width hh = height
 		word2 ( 0Ppp ppyy yyyy yyyy ) P = palette bank p = palette y = ypos
 		word3 ( aabb bbxx xxxx xxxx ) x = xpos
@@ -233,6 +235,12 @@ void hudson_poems_state::tilemap_base_w(offs_t offset, u32 data, u32 mem_mask)
 	COMBINE_DATA(&m_tilemapbase);
 }
 
+void hudson_poems_state::tilemap_unk_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	//logerror("m_tilemapunk %08x\n", data);
+	COMBINE_DATA(&m_tilemapunk);
+}
+
 void hudson_poems_state::spritelist_base_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_spritelistbase);
@@ -278,31 +286,30 @@ uint32_t hudson_poems_state::screen_update(screen_device &screen, bitmap_ind16 &
 	{
 		if ((m_mainram[0x1a00 / 4]) == 0xffffffff) // gross hack, this is the tile data!
 		{
-			// it briefly writes 0x2c001a00 to 0x08000070 when you enter test mode (where the font gfx are stored) before switching back, could be DMA?
-			// unless there's an error causing it to rewrite the old pointers
-			width = 256; bpp = 4; gfxbase = 0x1a00; extrapal = 0; break;// test mode
+			width = 256; bpp = 4; extrapal = 0; break;// test mode
 		}
 		else
 		{
-			width = 512;  bpp = 4; gfxbase = 0x9c00; extrapal = 0; break;// konami logo
+			width = 512;  bpp = 4; extrapal = 0; break;// konami logo
 		}
 	}
-	case 0x0d: width = 512; bpp = 8; gfxbase = 0x9c00; extrapal = 0; break;// poems logo
-	case 0x10: width = 512; bpp = 4; gfxbase = 0x9c00; extrapal = 0; break;// bemani logo
-	case 0x14: width = 512; bpp = 4; gfxbase = 0x9c00; extrapal = 0; break;// warning screen
-	case 0x38: width = 512; bpp = 4; gfxbase = 0x9800; break;// title 1 logo (shouldn't be this tall?, contains the top half of below)
+	case 0x0d: width = 512; bpp = 8; extrapal = 0; break;// poems logo
+	case 0x10: width = 512; bpp = 4; extrapal = 0; break;// bemani logo
+	case 0x14: width = 512; bpp = 4; extrapal = 0; break;// warning screen
+	case 0x38: width = 512; bpp = 4; extrapal = 0; break;// title 1 logo (shouldn't be this tall?, contains the top half of below)
 	//case 0x38: width = 512; base = (0x14800/4); bpp = 4; gfxbase = 0x9800+0x7800; extrapal = 1; break;// title 1 background
 	//case 0x38: width = 512; base = (0x15800/4); bpp = 4; gfxbase = 0x9800+0x7800; extrapal = 1; break;// title 1 background (same as above, but set to use palette 1)
 	//case 0x38: width = 512; base = (0x16800/4); bpp = 4; gfxbase = 0x9800+base_hack; break;// title 1 logo (shouldn't be this tall?, bottom half of title screen, but not the button/text)
-	case 0x44: width = 512; bpp = 4; gfxbase = 0x9800; extrapal = 0; break;// game demo
+	case 0x44: width = 512; bpp = 4; extrapal = 0; break;// game demo
 	default: attempt_draw = false; break;
 	}
 
 	// contains a full 32-bit address
 	base = (m_tilemapbase & 0x0003ffff) / 4;
 
-	// doesn't work for the test screen, the correct value of  2c001a00 IS written to the register, but then quickly replaced with 2c009c00 again, maybe the irq needs to also be off?
-	//gfxbase = (m_spritegfxbase[0] & 0x0003ffff);
+	// contains a full 32-bit address.  for this to work in the test mode the interrupts must be disabled as soon as test mode is entered, otherwise the pointer
+	// gets overwritten with an incorrect one.  Test mode does not require interrupts to function, although the bit we use to disable them is likely incorrect.
+	gfxbase = (m_spritegfxbase[0] & 0x0003ffff);
 
 	if (!attempt_draw)
 	{
@@ -514,7 +521,7 @@ void hudson_poems_state::mem_map(address_map &map)
 
 	//map(0x08000080, 0x08000083).nopw(); // also a similar time to palette uploads
 	map(0x08000084, 0x08000087).w(FUNC(hudson_poems_state::tilemap_base_w)); // can write 0113D600
-	//map(0x08000088, 0x0800008b).nopw(); // can write 000004E4
+	map(0x08000088, 0x0800008b).w(FUNC(hudson_poems_state::tilemap_unk_w));
 	//map(0x0800008c, 0x0800008f).nopw(); // can write 00001FF5
 	//map(0x08000090, 0x08000093).nopw();
 	//map(0x08000094, 0x08000097).nopw();
@@ -598,7 +605,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(hudson_poems_state::screen_scanline)
 
 	if (scanline == 100)
 	{
-		m_maincpu->irq_request_hack(0x10);
+		if (m_tilemapunk != 1) // unlikely, this is probably just tilemap size, with 1 being 256 and 2 being 512
+			m_maincpu->irq_request_hack(0x10);
 	}
 
 	if (scanline == 200)
