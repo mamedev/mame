@@ -5364,3 +5364,17 @@ if (BUSES["MC68000_SYSBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/mc68000/ram.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/bus/waveblaster/waveblaster.h,BUSES["WAVEBLASTER"] = true
+---------------------------------------------------
+
+if (BUSES["WAVEBLASTER"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/waveblaster/waveblaster.cpp",
+		MAME_DIR .. "src/devices/bus/waveblaster/waveblaster.h",
+		MAME_DIR .. "src/devices/bus/waveblaster/omniwave.cpp",
+		MAME_DIR .. "src/devices/bus/waveblaster/omniwave.h",
+	}
+end
