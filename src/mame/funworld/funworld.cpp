@@ -8811,7 +8811,6 @@ void intergames_state::init_novop_b()
 }
 
 void intergames_state::init_intgms()
-//void intergames_state::driver_start()
 {
 	// NOP'ing some values in ROM space to avoid the hardware error.
 
