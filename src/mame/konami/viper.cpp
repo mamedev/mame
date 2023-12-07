@@ -725,16 +725,31 @@ void viper_subscreen_state::video_start()
 	m_ttl_buf = std::make_unique<bitmap_rgb32>(1024, 1024);
 }
 
-// TODO: stub, pinpoint where the TTL muxer control is located
-// It definitely dispatch every 30 Hz, there must be a signal for starting it up.
+// TODO: multiscreen games enables TV out in Voodoo core specifically for these games,
+// then drives what to actually draw thru overlay regs.
+// [:voodoo] ':maincpu' (000205C8):internal_io_w(vidInFormat) = 00008000 & FFFFFFFF
+// sscopex (sub screen 320x240, current m_ttl_buf cuts off picture)
+// [:voodoo] ':maincpu' (0002A424):internal_io_w(vidOverlayStartCoords) = 00000000 & FFFFFFFF
+// [:voodoo] ':maincpu' (0002A424):internal_io_w(vidOverlayEndScreenCoord) = 0017F3FF & FFFFFFFF
+// [:voodoo] ':maincpu' (0002A424):internal_io_w(vidOverlayDudxOffsetSrcWidth) = 20000000 & FFFFFFFF
+// [:voodoo] ':maincpu' (0002A424):internal_io_w(vidDesktopOverlayStride) = 00080008 & FFFFFFFF
+// [:voodoo] ':maincpu' (000200DC):internal_io_w(vidOverlayStartCoords) = 0000004E & FFFFFFFF
+// [:voodoo] ':maincpu' (000200DC):internal_io_w(vidOverlayEndScreenCoord) = 000FF289 & FFFFFFFF
+// [:voodoo] ':maincpu' (000200DC):internal_io_w(vidOverlayDudxOffsetSrcWidth) = 11E00000 & FFFFFFFF
+// [:voodoo] ':maincpu' (000200DC):internal_io_w(vidDesktopOverlayStride) = 00050008 & FFFFFFFF
+// mocapglf (sub screen 512x384, ROT90 like main)
+// [:voodoo] ':maincpu' (0102A4AC):internal_io_w(vidOverlayStartCoords) = 00000000 & FFFFFFFF
+// [:voodoo] ':maincpu' (0102A4AC):internal_io_w(vidOverlayEndScreenCoord) = 0017F3FF & FFFFFFFF
+// [:voodoo] ':maincpu' (0102A4AC):internal_io_w(vidOverlayDudxOffsetSrcWidth) = 20000000 & FFFFFFFF
+// [:voodoo] ':maincpu' (0102A4AC):internal_io_w(vidDesktopOverlayStride) = 00080008 & FFFFFFFF
+// [:voodoo] ':maincpu' (010200DC):internal_io_w(vidOverlayStartCoords) = 00000000 & FFFFFFFF
+// [:voodoo] ':maincpu' (010200DC):internal_io_w(vidOverlayEndScreenCoord) = 0017F3FF & FFFFFFFF
+// [:voodoo] ':maincpu' (010200DC):internal_io_w(vidOverlayDudxOffsetSrcWidth) = 20000000 & FFFFFFFF
+// [:voodoo] ':maincpu' (010200DC):internal_io_w(vidDesktopOverlayStride) = 00080008 & FFFFFFFF
+// Stereo video seems disabled (no writes to rightOverlayBuf) so a 30 Hz TTL demuxer may still be
+// used here.
 
-// TODO: understand how even TTL manages to rearrange Voodoo source with overrides
-// Generally Konami uses a readback bit for this.
-// Oddly enough the Voodoo is not touched on even/odd frame setup, and it doesn't setup anything
-// worth writing home in the VGA core, so a possible explaination is that TTL just pickup linear
-// pixels and rearranges on its own rules?
-
-// TODO: we need to read the TTL for nothing atm, otherwise sscopefh (at least) will hang earlier (???)
+// TODO: we need to read the secondary TV out for nothing atm, otherwise sscopefh (at least) will hang (???)
 uint32_t viper_subscreen_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_voodoo->update(screen.frame_number() & 1 ? *m_voodoo_buf : *m_ttl_buf, cliprect);
