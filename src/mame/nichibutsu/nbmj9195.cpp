@@ -48,13 +48,15 @@ void nbmj9195_state::outcoin_flag_w(uint8_t data)
 	// bit2: hopper
 	// bit3: coin lockout
 
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+
 	if (data & 0x04) m_outcoin_flag ^= 1;
 	else m_outcoin_flag = 1;
 }
 
 void nbmj9195_state::key_select_w(uint8_t data)
 {
-	// 765-----  unknown
+	// 765-----  type1: unknown (unused?), type2: system inputs
 	// ---43210  key row select
 
 	m_key_select = data & 0x1f;
@@ -1937,11 +1939,7 @@ static INPUT_PORTS_START( nbmjtype2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED ) // output
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
@@ -2126,7 +2124,6 @@ void nbmj9195_state::nbmjtype1(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj9195_state::sailorws_map);
 	m_maincpu->set_addrmap(AS_IO, &nbmj9195_state::sailorws_io_map);
 	m_maincpu->in_pa_callback().set_ioport("SYSTEM");
-	m_maincpu->out_pa_callback().set(FUNC(nbmj9195_state::key_select_w));
 	m_maincpu->in_pb_callback().set(FUNC(nbmj9195_state::others_cpu_portb_r));
 	m_maincpu->in_pc_callback().set(FUNC(nbmj9195_state::others_cpu_portc_r));
 	m_maincpu->out_pc_callback().set(FUNC(nbmj9195_state::dipswbitsel_w));
@@ -2986,6 +2983,7 @@ ROM_START( jituroku )
 	ROM_LOAD( "8.9h",  0x280000, 0x80000, CRC(9368409b) SHA1(f98ddaa578f450a057747972b32d96cbe6eea31a) )
 	ROM_LOAD( "9.10h", 0x300000, 0x80000, CRC(6bea11d7) SHA1(c9ea69ed38a86c138f702f84c26897225cdaff31) )
 ROM_END
+
 
 //    YEAR, NAME,     PARENT,   MACHINE,  INPUT,    STATE,          INIT,       MONITOR, COMPANY, FULLNAME, FLAGS
 GAME( 1992, mjuraden, 0,        mjuraden, mjuraden, nbmj9195_state, empty_init, ROT0,    "Nichibutsu / Yubis", "Mahjong Uranai Densetsu (Japan)", MACHINE_SUPPORTS_SAVE )
