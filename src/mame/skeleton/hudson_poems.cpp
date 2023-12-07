@@ -68,7 +68,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t tile, int xx, int yy, int gfxbase, int extrapal);
-	void draw_tile8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t tile, int xx, int yy);
+	void draw_tile8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t tile, int xx, int yy, int gfxbase, int extrapal);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(screen_scanline);
 
@@ -112,74 +112,48 @@ void hudson_poems_state::machine_reset()
 	m_hackcounter = 0;
 }
 
-static INPUT_PORTS_START( hudson_poems )
-INPUT_PORTS_END
+/*
+You can unlock the test menu on boot by inputing a 3 step sequence while the Konami logo is being shown:
+Step 1 checks if you input white or yellow 2 times
+Step 2 checks if you input red or blue 2 times
+Step 3 checks if you input white or green 3 times
 
+These are not grouped inputs, so for step 1 you must input white x2 or yellow x2 instead of white x1 and yellow x1 for it to count.
+Not tested on real hardware yet but you can see the test menu render in memory at 2c002a96.
+
+*/
+
+static INPUT_PORTS_START( hudson_poems )
+	PORT_START( "IN1" )
+	PORT_BIT( 0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("White")
+	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("Yellow (Select Up)")
+	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("Red (Ok)")
+	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("Blue (Select Down)")
+	PORT_BIT( 0x00000020, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("Green")
+INPUT_PORTS_END
 
 void hudson_poems_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t tile, int xx, int yy, int gfxbase, int extrapal)
 {
+	gfx_element *gfx = m_gfxdecode->gfx(2);
 	int flipx = tile & 0x0800;
 	int flipy = tile & 0x0400;
-	int pal = (tile & 0xf000)>>8;
-	pal += extrapal * 0x100;
+	int pal = (tile & 0xf000)>>12;
+	pal += extrapal * 0x10;
 	tile &= 0x3ff;
-
-	int realoffset = tile * 8;
-	int count = 0;
-	for (int y = 0; y < 8; y++)
-	{
-		int realy = y;
-		if (flipy)
-			realy = 7 - y;
-
-		u16 *const dstptr_bitmap = &bitmap.pix(realy + yy);
-
-		uint32_t pix = m_mainram[((gfxbase / 4) + count + realoffset) & 0xffff];
-		int pos = xx;
-
-		if (flipx)
-		{
-			for (int i = 28; i >= 0; i -= 4)
-			{
-				if (pos < cliprect.max_x) dstptr_bitmap[pos] = ((pix >> i) & 0xf) | pal;
-				pos++;
-			}
-			count++;
-		}
-		else
-		{
-			for (int i = 0; i < 32; i += 4)
-			{
-				if (pos < cliprect.max_x) dstptr_bitmap[pos] = ((pix >> i) & 0xf) | pal;
-				pos++;
-			}
-			count++;
-		}
-	}
+	tile += gfxbase / 32;
+	gfx->opaque(bitmap,cliprect,tile,pal,flipx,flipy,xx,yy);
 }
 
-void hudson_poems_state::draw_tile8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t tile, int xx, int yy)
+void hudson_poems_state::draw_tile8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t tile, int xx, int yy, int gfxbase, int extrapal)
 {
+	gfx_element *gfx = m_gfxdecode->gfx(3);
+	int flipx = tile & 0x0800;
+	int flipy = tile & 0x0400;
+	int pal = 0;//(tile & 0xf000)>>8;
+	pal += extrapal;
 	tile &= 0x3ff;
-
-	int offset = tile * 16;
-	int count = 0;
-	for (int y = 0; y < 8; y++)
-	{
-		u16 *const dstptr_bitmap = &bitmap.pix(y + yy);
-
-		uint64_t pix = ((uint64_t)(m_mainram[((0x9c00 / 4) + count + 1 + offset) & 0xffff]) << 32)
-			          | (uint64_t)(m_mainram[((0x9c00 / 4) + count + 0 + offset) & 0xffff]);
-		int pos = xx;
-
-		for (int i = 0; i < 64; i += 8)
-		{
-			if (pos < cliprect.max_x) dstptr_bitmap[pos] = (pix >> i) & 0xff;
-			pos++;
-		}
-
-		count += 2;
-	}
+	tile += gfxbase / 64;
+	gfx->opaque(bitmap,cliprect,tile,pal,flipx,flipy,xx,yy);
 }
 
 uint32_t hudson_poems_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -195,6 +169,7 @@ uint32_t hudson_poems_state::screen_update(screen_device &screen, bitmap_ind16 &
 	switch (hack_select)
 	{
 	case 0x09: width = 512; base = (0xa800/4); bpp = 4; gfxbase = 0x9c00; extrapal = 0; break;// konami logo
+//	case 0x09: width = 512; base = (0x2a00/4); bpp = 4; gfxbase = 0x9c00; extrapal = 0; break;// test mode (but there's no obvious font?)
 	case 0x0d: width = 512; base = (0xb800/4); bpp = 8; gfxbase = 0x9c00; extrapal = 0; break;// poems logo
 	case 0x10: width = 512; base = (0xc600/4); bpp = 4; gfxbase = 0x9c00; extrapal = 0;break;// bemani logo
 	case 0x14: width = 512; base = (0xd400/4); bpp = 4; gfxbase = 0x9c00; extrapal = 0; break;// warning screen
@@ -237,8 +212,8 @@ uint32_t hudson_poems_state::screen_update(screen_device &screen, bitmap_ind16 &
 				}
 				else if (bpp == 8)
 				{
-					draw_tile8(screen, bitmap, cliprect, (tiles & 0xffff), (x * 16), y * 8);
-					draw_tile8(screen, bitmap, cliprect, ((tiles >> 16) & 0xffff), (x * 16) + 8, y * 8);
+					draw_tile8(screen, bitmap, cliprect, (tiles & 0xffff), (x * 16), y * 8, gfxbase, extrapal);
+					draw_tile8(screen, bitmap, cliprect, ((tiles >> 16) & 0xffff), (x * 16) + 8, y * 8, gfxbase, extrapal);
 				}
 
 				count++;
@@ -355,6 +330,8 @@ void hudson_poems_state::mainram_w(offs_t offset, u32 data, u32 mem_mask)
 
 	m_gfxdecode->gfx(2)->mark_dirty(offset / 8);
 	m_gfxdecode->gfx(3)->mark_dirty(offset / 16);
+	m_gfxdecode->gfx(4)->mark_dirty(offset / 4);
+	m_gfxdecode->gfx(5)->mark_dirty(offset / 2);
 }
 
 void hudson_poems_state::mem_map(address_map &map)
@@ -364,9 +341,9 @@ void hudson_poems_state::mem_map(address_map &map)
 	/////////////////// unknown
 
 	//map(0x04000000, 0x04003fff).ram();
-	map(0x04000324, 0x04000327).nopw(); // uploads at table here from ROM after uploading fixed values from ROM to some other addresses
+	//map(0x04000324, 0x04000327).nopw(); // uploads a table here from ROM after uploading fixed values from ROM to some other addresses
 	map(0x0400100c, 0x0400100f).nopr(); // read in various places at end of calls, every frame, but result seems to go unused?
-	map(0x04002040, 0x04002043).r(FUNC(hudson_poems_state::poems_count_r));
+	map(0x04002040, 0x04002043).portr("IN1");
 
 	/////////////////// palette / regs?
 
@@ -379,10 +356,10 @@ void hudson_poems_state::mem_map(address_map &map)
 	map(0x08000054, 0x08000057).nopw(); // ^^ writes 15555555 while fading
 	map(0x0800005c, 0x0800005f).w(FUNC(hudson_poems_state::fade_w));
 
-	map(0x08000070, 0x08000073).nopw(); // ^^ sometimes writes 2C009C00 (one of the tile data bases)
+	//map(0x08000070, 0x08000073).nopw(); // ^^ sometimes writes 2C009C00 (one of the tile data bases)
 	map(0x08000074, 0x08000077).nopw(); // ^^
 	map(0x08000078, 0x0800007b).nopw(); // ^^
-	map(0x0800007c, 0x0800007f).nopw(); // ^^ sometimes writes 2C009800 (one of the tile data bases)
+	//map(0x0800007c, 0x0800007f).nopw(); // ^^ sometimes writes 2C009800 (one of the tile data bases)
 
 	map(0x08000080, 0x08000083).nopw(); // also a similar time to palette uploads
 	map(0x08000084, 0x08000087).nopw(); // can write 0113D600
@@ -398,7 +375,7 @@ void hudson_poems_state::mem_map(address_map &map)
 	map(0x080000ac, 0x080000af).nopw();
 
 	map(0x08000180, 0x08000183).nopw(); // gets set to 0000007F on startup
-	map(0x08000184, 0x08000187).nopw(); // gets set to 2C009400 on startup (some other video table?)
+	//map(0x08000184, 0x08000187).nopw(); // gets set to 2C009400 on startup (some other video table?)
 
 	map(0x08000800, 0x08000fff).ram().w(FUNC(hudson_poems_state::palette_w)).share("palram");
 
@@ -443,13 +420,25 @@ void hudson_poems_state::mem_map(address_map &map)
 	map(0x2c000000, 0x2c03ffff).ram().w(FUNC(hudson_poems_state::mainram_w)).share("mainram");
 }
 
+const gfx_layout gfx_8x8x2 =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	2,
+	{ 0,1 },
+	{ STEP8(0,2) },
+	{ STEP8(0,16) },
+	8*16
+};
 
 static GFXDECODE_START( gfx_poems )
 	GFXDECODE_ENTRY( "maincpu", 0, gfx_8x8x4_packed_lsb, 0, 16 )
 	GFXDECODE_ENTRY( "maincpu", 0, gfx_8x8x8_raw, 0, 1 )
 
-	GFXDECODE_RAM( "mainram", 0, gfx_8x8x4_packed_lsb, 0, 16 )
-	GFXDECODE_RAM( "mainram", 0, gfx_8x8x8_raw, 0, 1 )
+	GFXDECODE_RAM( "mainram", 0, gfx_8x8x4_packed_lsb, 0, 32 )
+	GFXDECODE_RAM( "mainram", 0, gfx_8x8x8_raw, 0, 2 )
+	GFXDECODE_RAM( "mainram", 0, gfx_8x8x2, 0, 64 )
+	GFXDECODE_RAM( "mainram", 0, gfx_8x8x1, 0, 128 )
 GFXDECODE_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(hudson_poems_state::screen_scanline)
@@ -478,8 +467,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(hudson_poems_state::screen_scanline)
 	{
 	//	m_maincpu->irq_off_hack();
 	}
-	
-
 }
 
 void hudson_poems_state::hudson_poems(machine_config &config)
@@ -502,7 +489,6 @@ void hudson_poems_state::hudson_poems(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x400);
 
 	SPEAKER(config, "speaker").front_center();
-
 }
 
 void hudson_poems_state::init_marimba()
