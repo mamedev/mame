@@ -160,25 +160,37 @@ uint32_t hudson_poems_state::screen_update(screen_device &screen, bitmap_ind16 &
 {
 	bitmap.fill(0, cliprect);
 
+	// 0x9400 is almost certainly the sprite list ( a pointer gets set there in a register too )
+
 	int width, base, bpp, gfxbase, extrapal;
 
 	bool attempt_draw = true;
 
-	int hack_select = m_mainram[0x9000/4];
+	int hack_select = m_mainram[0x9000 / 4];
 
 	switch (hack_select)
 	{
-	case 0x09: width = 512; base = (0xa800/4); bpp = 4; gfxbase = 0x9c00; extrapal = 0; break;// konami logo
-//	case 0x09: width = 512; base = (0x2a00/4); bpp = 4; gfxbase = 0x9c00; extrapal = 0; break;// test mode (but there's no obvious font?)
-	case 0x0d: width = 512; base = (0xb800/4); bpp = 8; gfxbase = 0x9c00; extrapal = 0; break;// poems logo
-	case 0x10: width = 512; base = (0xc600/4); bpp = 4; gfxbase = 0x9c00; extrapal = 0;break;// bemani logo
-	case 0x14: width = 512; base = (0xd400/4); bpp = 4; gfxbase = 0x9c00; extrapal = 0; break;// warning screen
-    case 0x38: width = 512; base = (0x14000/4); bpp = 4; gfxbase = 0x9800; break;// title 1 logo (shouldn't be this tall?, contains the top half of below)
-	//case 0x38: width = 512; base = (0x14800/4); bpp = 4; gfxbase = 0x9800+0x7800; extrapal = 1; break;// title 1 background
-	//case 0x38: width = 512; base = (0x15800/4); bpp = 4; gfxbase = 0x9800+0x7800; extrapal = 1; break;// title 1 background (same as above, but set to use palette 1)
-	//case 0x38: width = 512; base = (0x16800/4); bpp = 4; gfxbase = 0x9800+base_hack; break;// title 1 logo (shouldn't be this tall?, bottom half of title screen, but not the button/text)
-	case 0x44: width = 512; base = (0x18400/4); bpp = 4; gfxbase = 0x9800; extrapal = 0; break;// game demo
-
+	case 0x09:
+	{
+		if ((m_mainram[0x1a00 / 4]) == 0xffffffff) // gross hack, this is the tile data!
+		{
+			// it briefly writes 0x2c001a00 to 0x08000070 when you enter test mode (where the font gfx are stored) before switching back, could be DMA?
+			// unless there's an error causing it to rewrite the old pointers
+			width = 256; base = (0x2a00 / 4); bpp = 4; gfxbase = 0x1a00; extrapal = 0; break;// test mode
+		}
+		else
+		{
+			width = 512; base = (0xa800 / 4); bpp = 4; gfxbase = 0x9c00; extrapal = 0; break;// konami logo
+		}
+	}
+	case 0x0d: width = 512; base = (0xb800 / 4); bpp = 8; gfxbase = 0x9c00; extrapal = 0; break;// poems logo
+	case 0x10: width = 512; base = (0xc600 / 4); bpp = 4; gfxbase = 0x9c00; extrapal = 0; break;// bemani logo
+	case 0x14: width = 512; base = (0xd400 / 4); bpp = 4; gfxbase = 0x9c00; extrapal = 0; break;// warning screen
+	case 0x38: width = 512; base = (0x14000 / 4); bpp = 4; gfxbase = 0x9800; break;// title 1 logo (shouldn't be this tall?, contains the top half of below)
+		///case 0x38: width = 512; base = (0x14800/4); bpp = 4; gfxbase = 0x9800+0x7800; extrapal = 1; break;// title 1 background
+		//case 0x38: width = 512; base = (0x15800/4); bpp = 4; gfxbase = 0x9800+0x7800; extrapal = 1; break;// title 1 background (same as above, but set to use palette 1)
+		//case 0x38: width = 512; base = (0x16800/4); bpp = 4; gfxbase = 0x9800+base_hack; break;// title 1 logo (shouldn't be this tall?, bottom half of title screen, but not the button/text)
+	case 0x44: width = 512; base = (0x18400 / 4); bpp = 4; gfxbase = 0x9800; extrapal = 0; break;// game demo
 	default: attempt_draw = false; break;
 	}
 
