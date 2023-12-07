@@ -117,6 +117,8 @@ private:
 
 void hudson_poems_state::machine_start()
 {
+	save_item(NAME(m_spritegfxbase));
+
 }
 
 void hudson_poems_state::machine_reset()
@@ -223,6 +225,7 @@ void hudson_poems_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitma
 void hudson_poems_state::spritegfx_base_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_spritegfxbase[offset]);
+	logerror("%s: spritegfx_base_w %d %08x\n", machine().describe_context(), offset, data);
 }
 
 void hudson_poems_state::tilemap_base_w(offs_t offset, u32 data, u32 mem_mask)
@@ -263,8 +266,6 @@ uint32_t hudson_poems_state::screen_update(screen_device &screen, bitmap_ind16 &
 {
 	bitmap.fill(0, cliprect);
 
-	// 0x9400 is almost certainly the sprite list ( a pointer gets set there in a register too )
-
 	int width, base, bpp, gfxbase, extrapal;
 
 	bool attempt_draw = true;
@@ -299,6 +300,9 @@ uint32_t hudson_poems_state::screen_update(screen_device &screen, bitmap_ind16 &
 
 	// contains a full 32-bit address
 	base = (m_tilemapbase & 0x0003ffff) / 4;
+
+	// doesn't work for the test screen, the correct value of  2c001a00 IS written to the register, but then quickly replaced with 2c009c00 again, maybe the irq needs to also be off?
+	//gfxbase = (m_spritegfxbase[0] & 0x0003ffff);
 
 	if (!attempt_draw)
 	{
