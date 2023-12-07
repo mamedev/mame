@@ -10,6 +10,7 @@ DEFINE_DEVICE_TYPE(DECO_KARNOVSPRITES, deco_karnovsprites_device, "deco_karnovsp
 
 deco_karnovsprites_device::deco_karnovsprites_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, DECO_KARNOVSPRITES, tag, owner, clock)
+	, device_gfx_interface(mconfig, *this)
 	, m_colpri_cb(*this)
 {
 }
@@ -26,7 +27,7 @@ void deco_karnovsprites_device::device_reset()
 {
 }
 
-void deco_karnovsprites_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, u16* spriteram, int size)
+void deco_karnovsprites_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u16* spriteram, int size)
 {
 	const bool priority = !m_colpri_cb.isnull();
 	int start, end, inc;
@@ -92,25 +93,25 @@ void deco_karnovsprites_device::draw_sprites(screen_device &screen, bitmap_ind16
 
 		if (priority)
 		{
-			gfx->prio_transpen(bitmap,cliprect,
+			gfx(0)->prio_transpen(bitmap,cliprect,
 					sprite,
 					colour,fx,fy,x,y,screen.priority(),pri_mask,0);
 
 			/* 1 more sprite drawn underneath */
 			if (extra)
-				gfx->prio_transpen(bitmap,cliprect,
+				gfx(0)->prio_transpen(bitmap,cliprect,
 					sprite2,
 					colour,fx,fy,x,y+16,screen.priority(),pri_mask,0);
 		}
 		else
 		{
-			gfx->transpen(bitmap,cliprect,
+			gfx(0)->transpen(bitmap,cliprect,
 					sprite,
 					colour,fx,fy,x,y,0);
 
 			/* 1 more sprite drawn underneath */
 			if (extra)
-				gfx->transpen(bitmap,cliprect,
+				gfx(0)->transpen(bitmap,cliprect,
 					sprite2,
 					colour,fx,fy,x,y+16,0);
 		}
