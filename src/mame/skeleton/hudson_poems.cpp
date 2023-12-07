@@ -70,6 +70,8 @@ private:
 	void draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t tile, int xx, int yy, int gfxbase, int extrapal);
 	void draw_tile8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t tile, int xx, int yy, int gfxbase, int extrapal);
 
+	void unk_trigger_w(offs_t offset, u32 data, u32 mem_mask);
+
 	TIMER_DEVICE_CALLBACK_MEMBER(screen_scanline);
 
 	void mem_map(address_map &map);
@@ -336,6 +338,14 @@ void hudson_poems_state::unktable_reset_w(offs_t offset, u32 data, u32 mem_mask)
 	m_unktableoffset = 0;
 }
 
+void hudson_poems_state::unk_trigger_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	logerror("%s: unk_trigger_w %08x %08x\n", machine().describe_context(), data, mem_mask);
+	//  this needs to change in RAM, presumably from an interrupt, but no idea how to get there
+	m_maincpu->space(AS_PROGRAM).write_byte(0x2c01d92c, 0x01);
+}
+
+
 void hudson_poems_state::mainram_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_mainram[offset]);
@@ -354,6 +364,7 @@ void hudson_poems_state::mem_map(address_map &map)
 
 	//map(0x04000000, 0x04003fff).ram();
 	//map(0x04000324, 0x04000327).nopw(); // uploads a table here from ROM after uploading fixed values from ROM to some other addresses
+	map(0x0400033c, 0x0400033f).w(FUNC(hudson_poems_state::unk_trigger_w));
 	map(0x0400100c, 0x0400100f).nopr(); // read in various places at end of calls, every frame, but result seems to go unused?
 	map(0x04002040, 0x04002043).portr("IN1");
 
@@ -467,17 +478,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(hudson_poems_state::screen_scanline)
 		//m_maincpu->irq_request_hack(0x2);
 	}
 
-//	if ((scanline %= 80) == 48) 
-	{
-		//	m_maincpu->irq_request_hack(0x4);
-		//  this needs to change in RAM, presumably from an interrupt, but no idea how to get there
-
-		m_maincpu->space(AS_PROGRAM).write_byte(0x2c01d92c, 0x01);
-	}
-
 	if (scanline == 150)
 	{
-	//	m_maincpu->irq_off_hack();
+		//m_maincpu->irq_off_hack();
 	}
 }
 
