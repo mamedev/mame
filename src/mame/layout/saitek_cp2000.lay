@@ -9,7 +9,8 @@ license:CC0-1.0
 	<element name="blackb"><rect><color red="0" green="0" blue="0" /></rect></element>
 	<element name="white"><rect><color red="0.81" green="0.8" blue="0.79" /></rect></element>
 	<element name="whitew"><rect><color red="1" green="1" blue="1" /></rect></element>
-	<element name="whitem"><rect><color red="0.31" green="0.43" blue="0.49" /></rect></element>
+	<element name="whitem"><rect><color red="0.46" green="0.54" blue="0.58" /></rect></element>
+	<element name="brown"><rect><color red="0.35" green="0.26" blue="0.21" /></rect></element>
 
 	<element name="digit" defstate="0">
 		<led7seg><color red="1.0" green="0.1" blue="0.15" /></led7seg>
@@ -496,24 +497,24 @@ license:CC0-1.0
 		<element ref="whitem" blend="multiply"><bounds x="74" y="73" width="7" height="7" /></element>
 		<element ref="whitem" blend="multiply"><bounds x="82" y="73" width="15" height="7" /></element>
 
-		<element ref="cblack" blend="add"><bounds x="66" y="49" width="7" height="7" /></element>
-		<element ref="cblack" blend="add"><bounds x="74" y="49" width="7" height="7" /></element>
-		<element ref="cblack" blend="add"><bounds x="82" y="49" width="7" height="7" /></element>
-		<element ref="cblack" blend="add"><bounds x="90" y="49" width="7" height="7" /></element>
+		<element ref="brown" blend="add"><bounds x="66" y="49" width="7" height="7" /></element>
+		<element ref="brown" blend="add"><bounds x="74" y="49" width="7" height="7" /></element>
+		<element ref="brown" blend="add"><bounds x="82" y="49" width="7" height="7" /></element>
+		<element ref="brown" blend="add"><bounds x="90" y="49" width="7" height="7" /></element>
 
-		<element ref="cblack" blend="add"><bounds x="66" y="57" width="7" height="7" /></element>
-		<element ref="cblack" blend="add"><bounds x="74" y="57" width="7" height="7" /></element>
-		<element ref="cblack" blend="add"><bounds x="82" y="57" width="7" height="7" /></element>
-		<element ref="cblack" blend="add"><bounds x="90" y="57" width="7" height="7" /></element>
+		<element ref="brown" blend="add"><bounds x="66" y="57" width="7" height="7" /></element>
+		<element ref="brown" blend="add"><bounds x="74" y="57" width="7" height="7" /></element>
+		<element ref="brown" blend="add"><bounds x="82" y="57" width="7" height="7" /></element>
+		<element ref="brown" blend="add"><bounds x="90" y="57" width="7" height="7" /></element>
 
-		<element ref="cblack" blend="add"><bounds x="66" y="65" width="7" height="7" /></element>
-		<element ref="cblack" blend="add"><bounds x="74" y="65" width="7" height="7" /></element>
-		<element ref="cblack" blend="add"><bounds x="82" y="65" width="7" height="7" /></element>
-		<element ref="cblack" blend="add"><bounds x="90" y="65" width="7" height="7" /></element>
+		<element ref="brown" blend="add"><bounds x="66" y="65" width="7" height="7" /></element>
+		<element ref="brown" blend="add"><bounds x="74" y="65" width="7" height="7" /></element>
+		<element ref="brown" blend="add"><bounds x="82" y="65" width="7" height="7" /></element>
+		<element ref="brown" blend="add"><bounds x="90" y="65" width="7" height="7" /></element>
 
-		<element ref="cblack" blend="add"><bounds x="66" y="73" width="7" height="7" /></element>
-		<element ref="cblack" blend="add"><bounds x="74" y="73" width="7" height="7" /></element>
-		<element ref="cblack" blend="add"><bounds x="82" y="73" width="15" height="7" /></element>
+		<element ref="brown" blend="add"><bounds x="66" y="73" width="7" height="7" /></element>
+		<element ref="brown" blend="add"><bounds x="74" y="73" width="7" height="7" /></element>
+		<element ref="brown" blend="add"><bounds x="82" y="73" width="15" height="7" /></element>
 
 		<element ref="hlb" inputtag="IN.3" inputmask="0x01"><bounds x="66" y="49" width="7" height="7" /><color alpha="0.22" /></element>
 		<element ref="hlb" inputtag="IN.2" inputmask="0x01"><bounds x="74" y="49" width="7" height="7" /><color alpha="0.22" /></element>

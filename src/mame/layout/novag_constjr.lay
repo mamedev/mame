@@ -8,7 +8,8 @@ license:CC0-1.0
 
 	<element name="red"><rect><color red="0.7" green="0.13" blue="0.12" /></rect></element>
 	<element name="whitew"><rect><color red="1" green="1" blue="1" /></rect></element>
-	<element name="whitem"><rect><color red="0.31" green="0.43" blue="0.49" /></rect></element>
+	<element name="whitem"><rect><color red="0.46" green="0.54" blue="0.58" /></rect></element>
+	<element name="brown"><rect><color red="0.35" green="0.26" blue="0.21" /></rect></element>
 
 	<element name="ledr" defstate="0">
 		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
@@ -46,14 +47,14 @@ license:CC0-1.0
 	<element name="text_l3"><text string="Check"><color red="0.9" green="0.9" blue="0.9" /></text></element>
 	<element name="text_l7"><text string="Error"><color red="0.9" green="0.9" blue="0.9" /></text></element>
 
-	<element name="text_r1"><text string="Black/White"><color red="0.5" green="0.37" blue="0.3" /></text></element>
-	<element name="text_r2"><text string="Verify"><color red="0.5" green="0.37" blue="0.3" /></text></element>
-	<element name="text_r3"><text string="Set Up"><color red="0.5" green="0.37" blue="0.3" /></text></element>
-	<element name="text_r4"><text string="New Game"><color red="0.5" green="0.37" blue="0.3" /></text></element>
-	<element name="text_r5"><text string="Set Level"><color red="0.5" green="0.37" blue="0.3" /></text></element>
-	<element name="text_r6"><text string="Sound"><color red="0.5" green="0.37" blue="0.3" /></text></element>
-	<element name="text_r7"><text string="Take Back"><color red="0.5" green="0.37" blue="0.3" /></text></element>
-	<element name="text_r8"><text string="Go"><color red="0.5" green="0.37" blue="0.3" /></text></element>
+	<element name="text_r1"><text string="Black/White"><color red="0.35" green="0.26" blue="0.21" /></text></element>
+	<element name="text_r2"><text string="Verify"><color red="0.35" green="0.26" blue="0.21" /></text></element>
+	<element name="text_r3"><text string="Set Up"><color red="0.35" green="0.26" blue="0.21" /></text></element>
+	<element name="text_r4"><text string="New Game"><color red="0.35" green="0.26" blue="0.21" /></text></element>
+	<element name="text_r5"><text string="Set Level"><color red="0.35" green="0.26" blue="0.21" /></text></element>
+	<element name="text_r6"><text string="Sound"><color red="0.35" green="0.26" blue="0.21" /></text></element>
+	<element name="text_r7"><text string="Take Back"><color red="0.35" green="0.26" blue="0.21" /></text></element>
+	<element name="text_r8"><text string="Go"><color red="0.35" green="0.26" blue="0.21" /></text></element>
 
 	<element name="text_p1"><image file="chess/bk.svg"></image></element>
 	<element name="text_p2"><image file="chess/bq.svg"></image></element>
@@ -391,14 +392,14 @@ license:CC0-1.0
 		<element ref="text_r2"><bounds x="84.5" y="70.7" width="9" height="1.5" /></element>
 		<element ref="text_r1"><bounds x="84.5" y="80.7" width="9" height="1.5" /></element>
 
-		<element ref="cblack"><bounds x="85.5" y="5.5" width="7" height="5" /></element>
-		<element ref="cblack"><bounds x="85.5" y="15.5" width="7" height="5" /></element>
-		<element ref="cblack"><bounds x="85.5" y="25.5" width="7" height="5" /></element>
-		<element ref="cblack"><bounds x="85.5" y="35.5" width="7" height="5" /></element>
-		<element ref="cblack"><bounds x="85.5" y="45.5" width="7" height="5" /></element>
-		<element ref="cblack"><bounds x="85.5" y="55.5" width="7" height="5" /></element>
-		<element ref="cblack"><bounds x="85.5" y="65.5" width="7" height="5" /></element>
-		<element ref="cblack"><bounds x="85.5" y="75.5" width="7" height="5" /></element>
+		<element ref="brown"><bounds x="85.5" y="5.5" width="7" height="5" /></element>
+		<element ref="brown"><bounds x="85.5" y="15.5" width="7" height="5" /></element>
+		<element ref="brown"><bounds x="85.5" y="25.5" width="7" height="5" /></element>
+		<element ref="brown"><bounds x="85.5" y="35.5" width="7" height="5" /></element>
+		<element ref="brown"><bounds x="85.5" y="45.5" width="7" height="5" /></element>
+		<element ref="brown"><bounds x="85.5" y="55.5" width="7" height="5" /></element>
+		<element ref="brown"><bounds x="85.5" y="65.5" width="7" height="5" /></element>
+		<element ref="brown"><bounds x="85.5" y="75.5" width="7" height="5" /></element>
 
 		<element ref="red"><bounds x="86" y="6" width="6" height="4" /></element>
 		<element ref="whitew"><bounds x="86" y="16" width="6" height="4" /></element>
@@ -423,12 +424,12 @@ license:CC0-1.0
 		<element ref="whitem" blend="multiply"><bounds x="86" y="56" width="6" height="4" /></element>
 		<element ref="whitem" blend="multiply"><bounds x="86" y="66" width="6" height="4" /></element>
 
-		<element ref="cblack" blend="add"><bounds x="86" y="16" width="6" height="4" /></element>
-		<element ref="cblack" blend="add"><bounds x="86" y="26" width="6" height="4" /></element>
-		<element ref="cblack" blend="add"><bounds x="86" y="36" width="6" height="4" /></element>
-		<element ref="cblack" blend="add"><bounds x="86" y="46" width="6" height="4" /></element>
-		<element ref="cblack" blend="add"><bounds x="86" y="56" width="6" height="4" /></element>
-		<element ref="cblack" blend="add"><bounds x="86" y="66" width="6" height="4" /></element>
+		<element ref="brown" blend="add"><bounds x="86" y="16" width="6" height="4" /></element>
+		<element ref="brown" blend="add"><bounds x="86" y="26" width="6" height="4" /></element>
+		<element ref="brown" blend="add"><bounds x="86" y="36" width="6" height="4" /></element>
+		<element ref="brown" blend="add"><bounds x="86" y="46" width="6" height="4" /></element>
+		<element ref="brown" blend="add"><bounds x="86" y="56" width="6" height="4" /></element>
+		<element ref="brown" blend="add"><bounds x="86" y="66" width="6" height="4" /></element>
 
 		<element ref="hlb" inputtag="IN.0" inputmask="0x01"><bounds x="85.5" y="5.5"  width="7" height="5" /><color alpha="0.15" /></element>
 		<element ref="hlb" inputtag="IN.0" inputmask="0x02"><bounds x="85.5" y="15.5" width="7" height="5" /><color alpha="0.15" /></element>
