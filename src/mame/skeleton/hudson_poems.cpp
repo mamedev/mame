@@ -173,7 +173,6 @@ Step 2 checks if you input red or blue 2 times
 Step 3 checks if you input white or green 3 times
 
 These are not grouped inputs, so for step 1 you must input white x2 or yellow x2 instead of white x1 and yellow x1 for it to count.
-Not tested on real hardware yet but you can see the test menu render in memory at 2c002a96.
 
 */
 
@@ -724,4 +723,4 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 2005, marimba,      0,       0,      hudson_poems, hudson_poems, hudson_poems_state, init_marimba, "Konami", "Marimba Tengoku (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, marimba,      0,       0,      hudson_poems, hudson_poems, hudson_poems_state, init_marimba, "Konami", "Marimba Tengoku (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
