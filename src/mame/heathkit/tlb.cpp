@@ -448,7 +448,7 @@ MC6845_UPDATE_ROW(heath_tlb_device::crtc_update_row)
 			// Display a scanline of a character (8 pixels)
 			for (int b = 0; 8 > b; ++b)
 			{
-				*p++ = palette[BIT(gfx, 7 - b)];
+				*p++ = palette[BIT(gfx, b)];
 			}
 		}
 	}
@@ -863,7 +863,7 @@ ROM_START( h19 )
 	ROM_LOAD( "2732_444-46_h19code.u437", 0x0000, 0x1000, CRC(f4447da0) SHA1(fb4093d5b763be21a9580a0defebed664b1f7a7b))
 
 	// Original font
-	ROM_REGION( 0x0800, "chargen", 0 )
+	ROM_REGION( 0x0800, "chargen", ROMREGION_REVERSEBITS )
 	ROM_LOAD( "2716_444-29_h19font.u420", 0x0000, 0x0800, CRC(d595ac1d) SHA1(130fb4ea8754106340c318592eec2d8a0deaf3d0))
 
 	// Original keyboard
@@ -878,7 +878,7 @@ ROM_START( super19 )
 	ROM_LOAD( "2732_super19_h447.u437", 0x0000, 0x1000, CRC(6c51aaa6) SHA1(5e368b39fe2f1af44a905dc474663198ab630117))
 
 	// Original font
-	ROM_REGION( 0x0800, "chargen", 0 )
+	ROM_REGION( 0x0800, "chargen", ROMREGION_REVERSEBITS )
 	ROM_LOAD( "2716_444-29_h19font.u420", 0x0000, 0x0800, CRC(d595ac1d) SHA1(130fb4ea8754106340c318592eec2d8a0deaf3d0))
 
 	// Original keyboard
@@ -897,7 +897,7 @@ ROM_START( superset )
 	ROM_CONTINUE(0x2000, 0x2000)
 
 	// Superset SUPERFONT
-	ROM_REGION( 0x8000, "chargen", 0 )
+	ROM_REGION( 0x8000, "chargen", ROMREGION_REVERSEBITS )
 	ROM_LOAD( "27256_101-431_superset_font.u420", 0x0000, 0x8000, CRC(4c0688f6) SHA1(be6059913420ad66f5c839d619fdcb164ffae85a))
 
 	// Superset Keyboard
@@ -918,7 +918,7 @@ ROM_START( watz19 )
 	ROMX_LOAD("watzman-a.u437", 0x0000, 0x1000, CRC(1f7553e9) SHA1(ac6ddb12b4fb46c1a0ad08ee43978ad3153b51aa), ROM_BIOS(1))
 
 	// Original font
-	ROM_REGION( 0x0800, "chargen", 0 )
+	ROM_REGION( 0x0800, "chargen", ROMREGION_REVERSEBITS )
 	ROM_LOAD( "2716_444-29_h19font.u420", 0x0000, 0x0800, CRC(d595ac1d) SHA1(130fb4ea8754106340c318592eec2d8a0deaf3d0))
 
 	// Watzman keyboard
@@ -933,7 +933,7 @@ ROM_START( ultra19 )
 	ROM_LOAD( "2532_h19_ultra_firmware.u437", 0x0000, 0x1000, CRC(8ad4cdb4) SHA1(d6e1fc37a1f52abfce5e9adb1819e0030bed1df3))
 
 	// Original font
-	ROM_REGION( 0x0800, "chargen", 0 )
+	ROM_REGION( 0x0800, "chargen", ROMREGION_REVERSEBITS )
 	ROM_LOAD( "2716_444-29_h19font.u420", 0x0000, 0x0800, CRC(d595ac1d) SHA1(130fb4ea8754106340c318592eec2d8a0deaf3d0))
 
 	// Ultra keyboard
@@ -950,7 +950,7 @@ ROM_START( gp19 )
 	ROM_LOAD( "gp19_rom_3_ver_1_1.u24", 0x2000, 0x1000, CRC(878f577c) SHA1(0756435914dcfb981de4e40d5f81af3e0f5bb1c5))
 
 	// GP-19 font
-	ROM_REGION( 0x1000, "chargen", 0 )
+	ROM_REGION( 0x1000, "chargen", ROMREGION_REVERSEBITS )
 	ROM_LOAD( "gp19_char_gen_cg_1.u21", 0x0000, 0x1000, CRC(49ec9242) SHA1(770a8c7b5b15bcfe465fd84326d0ae3dcaa85311))
 
 	// Original keyboard
@@ -968,7 +968,7 @@ ROM_START( imaginator )
 	ROM_LOAD( "2732_imaginator_gpc_rev_1.2_pn_9000_0002.u9a", 0x2000, 0x1000, CRC(507bb13f) SHA1(5b210f8d77e22fdf063f611eb5c29636cdb01250))
 
 	// Original font
-	ROM_REGION( 0x0800, "chargen", 0 )
+	ROM_REGION( 0x0800, "chargen", ROMREGION_REVERSEBITS )
 	ROM_LOAD( "2716_444-29_h19font.u420", 0x0000, 0x0800, CRC(d595ac1d) SHA1(130fb4ea8754106340c318592eec2d8a0deaf3d0))
 
 	// Original keyboard
@@ -1226,7 +1226,7 @@ MC6845_UPDATE_ROW(heath_superset_tlb_device::crtc_update_row)
 			// Display a scanline of a character (8 pixels)
 			for (int b = 0; 8 > b; ++b)
 			{
-				*p++ = palette[BIT(gfx, 7 - b)];
+				*p++ = palette[BIT(gfx, b)];
 			}
 		}
 	}
@@ -1455,7 +1455,7 @@ MC6845_UPDATE_ROW(heath_gp19_tlb_device::crtc_update_row)
 				// Display a scanline of a character (8 pixels)
 				for (int b = 0; 8 > b; ++b)
 				{
-					*p++ = palette[BIT(gfx, 7 - b)];
+					*p++ = palette[BIT(gfx, b)];
 				}
 			}
 		}
@@ -1689,7 +1689,7 @@ MC6845_UPDATE_ROW(heath_imaginator_tlb_device::crtc_update_row)
 					chr &= 0x7f;
 				}
 
-				output |= bitswap<8>(m_p_chargen[(chr << 4) | ra] ^ inv, 0, 1, 2, 3, 4, 5, 6, 7);
+				output |= m_p_chargen[(chr << 4) | ra] ^ inv;
 			}
 
 			if (m_graphics_mode_active && (x > 7 ) && (x < 73))

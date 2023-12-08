@@ -60,6 +60,7 @@ template <typename T> inline u32  ROMREGION_GETWIDTH(T const &r)       { return 
 template <typename T> inline bool ROMREGION_ISLITTLEENDIAN(T const &r) { return (ROMREGION_GETFLAGS(r) & ROMREGION_ENDIANMASK) == ROMREGION_LE; }
 template <typename T> inline bool ROMREGION_ISBIGENDIAN(T const &r)    { return (ROMREGION_GETFLAGS(r) & ROMREGION_ENDIANMASK) == ROMREGION_BE; }
 template <typename T> inline bool ROMREGION_ISINVERTED(T const &r)     { return (ROMREGION_GETFLAGS(r) & ROMREGION_INVERTMASK) == ROMREGION_INVERT; }
+template <typename T> inline bool ROMREGION_ISBITREVERSED(T const &r)  { return (ROMREGION_GETFLAGS(r) & ROMREGION_REVERSEBITSMASK) == ROMREGION_REVERSEBITS; }
 template <typename T> inline bool ROMREGION_ISERASE(T const &r)        { return (ROMREGION_GETFLAGS(r) & ROMREGION_ERASEMASK) == ROMREGION_ERASE; }
 template <typename T> inline u32  ROMREGION_GETERASEVAL(T const &r)    { return (ROMREGION_GETFLAGS(r) & ROMREGION_ERASEVALMASK) >> 16; }
 template <typename T> inline u32  ROMREGION_GETDATATYPE(T const &r)    { return ROMREGION_GETFLAGS(r) & ROMREGION_DATATYPEMASK; }
@@ -445,7 +446,7 @@ private:
 	void verify_length_and_hash(emu_file *file, std::string_view name, u32 explength, const util::hash_collection &hashes);
 	void display_loading_rom_message(const char *name, bool from_list);
 	void display_rom_load_results(bool from_list);
-	void region_post_process(memory_region *region, bool invert);
+	void region_post_process(memory_region *region, bool invert, bool reversebits);
 	std::unique_ptr<emu_file> open_rom_file(
 			const std::vector<std::string> &searchpath,
 			const rom_entry *romp,

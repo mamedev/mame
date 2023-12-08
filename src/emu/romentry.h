@@ -58,6 +58,10 @@ enum
 #define     ROMREGION_NOINVERT      0x00000000
 #define     ROMREGION_INVERT        0x00000800
 
+#define ROMREGION_REVERSEBITSMASK   0x00001000          /* reversed the bits in each byte of the region */
+#define     ROMREGION_NOREVERSEBITS 0x00000000
+#define     ROMREGION_REVERSEBITS   0x00001000
+
 #define ROMREGION_ERASEMASK         0x00002000          /* erase the region before loading */
 #define     ROMREGION_NOERASE       0x00000000
 #define     ROMREGION_ERASE         0x00002000

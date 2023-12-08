@@ -680,7 +680,7 @@ void rom_load_manager::display_rom_load_results(bool from_list)
     byte swapping and inverting data as necessary
 -------------------------------------------------*/
 
-void rom_load_manager::region_post_process(memory_region *region, bool invert)
+void rom_load_manager::region_post_process(memory_region *region, bool invert, bool reversebits)
 {
 	// do nothing if no region
 	if (!region)
@@ -697,6 +697,16 @@ void rom_load_manager::region_post_process(memory_region *region, bool invert)
 		u8 *base(region->base());
 		for (int i = 0; i < region->bytes(); i++)
 			*base++ ^= 0xff;
+	}
+
+	if (reversebits)
+	{
+		LOG("+ Reversing bit region\n");
+		u8 *base(region->base());
+		for (int i = 0; i < region->bytes(); i++)
+		{
+			*base++ = bitswap<8>(*base, 0, 1, 2, 3, 4, 5, 6, 7);
+		}
 	}
 
 	// swap the endianness if we need to
@@ -1455,7 +1465,7 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 
 	// now go back and post-process all the regions
 	for (const rom_entry *region = start_region; region != nullptr; region = rom_next_region(region))
-		region_post_process(device.memregion(region->name()), ROMREGION_ISINVERTED(region));
+		region_post_process(device.memregion(region->name()), ROMREGION_ISINVERTED(region), ROMREGION_ISBITREVERSED(region));
 
 	// display the results and exit
 	display_rom_load_results(true);
@@ -1534,7 +1544,7 @@ void rom_load_manager::process_region_list()
 	// now go back and post-process all the regions
 	for (device_t &device : deviter)
 		for (const rom_entry *region = rom_first_region(device); region != nullptr; region = rom_next_region(region))
-			region_post_process(device.memregion(region->name()), ROMREGION_ISINVERTED(region));
+			region_post_process(device.memregion(region->name()), ROMREGION_ISINVERTED(region), ROMREGION_ISBITREVERSED(region));
 
 	// and finally register all per-game parameters
 	for (device_t &device : deviter)
