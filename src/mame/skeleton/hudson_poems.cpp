@@ -71,7 +71,7 @@ private:
 	void draw_tile8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t tile, int xx, int yy, int gfxbase, int extrapal);
 
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which);
+	void draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int priority);
 
 	uint32_t poems_random_r();
 	void unk_trigger_w(offs_t offset, u32 data, u32 mem_mask);
@@ -252,9 +252,15 @@ void hudson_poems_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitma
 	*/
 }
 
-void hudson_poems_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which)
+void hudson_poems_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int priority)
 {
 	int width, base, bpp, gfxbase, extrapal;
+
+	// guess, could be more/less bits, or somewhere else entirely, works for the 2 scenes that need it
+	int thispriority = (m_tilemapcfg[which] & 0x01f00000) >> 20;
+
+	if (thispriority != priority)
+		return;
 
 	// seems to get set for disabled layers
 	if (m_tilemapcfg[which] & 0x02000000)
@@ -271,6 +277,11 @@ void hudson_poems_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitma
 		bpp = 8;
 	else
 		bpp = 4;
+
+	if (m_tilemapcfg[which] & 0x00080000)
+		extrapal = 1;
+	else
+		extrapal = 0;
 
 	// contains a full 32-bit address
 	base = (m_tilemapbase[which] & 0x0003ffff) / 4;
@@ -292,6 +303,10 @@ void hudson_poems_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitma
 
 	int tilemap_drawheight = ((m_tilemaphigh[which] >> 16) & 0xff);
 	int tilemap_drawwidth = ((m_tilemaphigh[which] >> 0) & 0x1ff);
+
+	// clamp to size of tilemap (test mode has 256 wide tilemap in RAM, but sets full 320 width?)
+	if (tilemap_drawwidth > width)
+		tilemap_drawwidth = width;
 
 	// note m_tilemaphigh seems to be in pixels, we currently treat it as tiles
 	// these could actually be 'end pos' regs, with unknown start regs currently always set to 0
@@ -372,10 +387,14 @@ void hudson_poems_state::draw_tile8(screen_device &screen, bitmap_ind16 &bitmap,
 uint32_t hudson_poems_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
-	draw_tilemap(screen, bitmap, cliprect, 0);
-//	draw_tilemap(screen, bitmap, cliprect, 1); // title screen background
-//	draw_tilemap(screen, bitmap, cliprect, 2); // seems to be status bar in the game demo, but suggests that tilegfx base isn't tied to tilmap number
-	draw_tilemap(screen, bitmap, cliprect, 3); // background for the character in game demo etc.
+
+	for (int pri = 0x1f; pri >= 0; pri--)
+	{
+		draw_tilemap(screen, bitmap, cliprect, 0, pri);
+		draw_tilemap(screen, bitmap, cliprect, 1, pri); // title screen background
+		draw_tilemap(screen, bitmap, cliprect, 2, pri); // seems to be status bar in the game demo, but suggests that tilegfx base isn't tied to tilmap number
+		draw_tilemap(screen, bitmap, cliprect, 3, pri); // background for the character in game demo etc.
+	}
 
 	draw_sprites(screen, bitmap, cliprect);
 
