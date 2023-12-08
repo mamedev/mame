@@ -65,27 +65,22 @@ license:CC0-1.0
 	<element name="text_p6">      <image file="chess/wp.svg"/></element>
 
 	<element name="sym_colon" defstate="0">
-		<rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect>
 		<text state="0" string=":"> <color red="0.49412" green="0.51765" blue="0.51765" /></text>
 		<text state="1" string=":"> <color red="0.200" green="0.164" blue="0.169" /></text>
 	</element>
 	<element name="sym_left" defstate="0">
-		<rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect>
 		<text state="0" string="&#x2190;">  <color red="0.49412" green="0.51765" blue="0.51765" /></text>
 		<text state="1" string="&#x2190;">  <color red="0.200" green="0.164" blue="0.169" /></text>
 	</element>
 	<element name="sym_right" defstate="0">
-		<rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect>
 		<text state="0" string="&#x2192;">  <color red="0.49412" green="0.51765" blue="0.51765" /></text>
 		<text state="1" string="&#x2192;">  <color red="0.200" green="0.164" blue="0.169" /></text>
 	</element>
 	<element name="sym_white" defstate="0">
-		<rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect>
 		<text state="0" string="&#x25cb;">  <color red="0.49412" green="0.51765" blue="0.51765" /></text>
 		<text state="1" string="&#x25cb;">  <color red="0.200" green="0.164" blue="0.169" /></text>
 	</element>
 	<element name="sym_black" defstate="0">
-		<rect><color red="1.0" green="1.0" blue="1.0" /></rect>
 		<text state="0" string="&#x25cf;">  <color red="0.91300" green="0.90411" blue="0.89188" /></text>
 		<text state="1" string="&#x25cf;">  <color red="0.36954" green="0.27945" blue="0.27567" /></text>
 	</element>
@@ -266,43 +261,23 @@ license:CC0-1.0
 	<element name="text_uit1"><text string="S.BOARD"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uit2"><text string="INTERFACE"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uib1"><text string="BOARD:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_uib2">
-		<rect><color red="0.86" green="0.85" blue="0.85" /></rect>
-		<text string="RESET"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_uib3">
-		<rect><color red="0.86" green="0.85" blue="0.85" /></rect>
-		<text string="CLEAR"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
+	<element name="text_uib2"><text string="RESET"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_uib3"><text string="CLEAR"><color red="0.01" green="0.01" blue="0.01" /></text></element>
 	<element name="text_uis1"><text string="SPAWN:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uih1"><text string="HAND:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_uih2">
-		<rect><color red="0.86" green="0.85" blue="0.85" /></rect>
-		<text string="REMOVE"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
+	<element name="text_uih2"><text string="REMOVE"><color red="0.01" green="0.01" blue="0.01" /></text></element>
 	<element name="text_uiu1"><text string="UNDO:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_uiu2a">
-		<rect><color red="0.86" green="0.85" blue="0.85" /></rect>
-		<text string=" &lt;&lt;"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_uiu2b">
-		<rect><color red="0.86" green="0.85" blue="0.85" /></rect>
-		<text string=" &lt;  "><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_uiu2c">
-		<rect><color red="0.86" green="0.85" blue="0.85" /></rect>
-		<text string="   &gt;"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_uiu2d">
-		<rect><color red="0.86" green="0.85" blue="0.85" /></rect>
-		<text string=" &gt;&gt;"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
+	<element name="text_uiu2a"><text string=" &lt;&lt;"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_uiu2b"><text string=" &lt;  "><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_uiu2c"><text string="   &gt;"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_uiu2d"><text string=" &gt;&gt;"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_uiu3b"><text string="/"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+
 	<element name="text_uiu3a" defstate="0">
 		<simplecounter maxstate="999" digits="1" align="2">
 			<color red="0.81" green="0.8" blue="0.79" />
 		</simplecounter>
 	</element>
-	<element name="text_uiu3b"><text string="/"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uiu3c" defstate="0">
 		<simplecounter maxstate="999" digits="1" align="1">
 			<color red="0.81" green="0.8" blue="0.79" />

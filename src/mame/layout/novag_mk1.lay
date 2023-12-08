@@ -62,46 +62,16 @@ license:CC0-1.0
 	<element name="text_b06b"><image file="chess/wr.svg"/></element>
 	<element name="text_b07b"><image file="chess/wp.svg"/></element>
 
-	<element name="text_b09a">
-		<rect><color red="1" green="1" blue="1" /></rect>
-		<text string="1" align="2"><color red="0" green="0" blue="0" /></text>
-	</element>
-	<element name="text_b10a">
-		<rect><color red="1" green="1" blue="1" /></rect>
-		<text string="2" align="2"><color red="0" green="0" blue="0" /></text>
-	</element>
-	<element name="text_b11a">
-		<rect><color red="1" green="1" blue="1" /></rect>
-		<text string="3" align="2"><color red="0" green="0" blue="0" /></text>
-	</element>
-	<element name="text_b12a">
-		<rect><color red="1" green="1" blue="1" /></rect>
-		<text string="4" align="2"><color red="0" green="0" blue="0" /></text>
-	</element>
-	<element name="text_b12b">
-		<rect><color red="1" green="1" blue="1" /></rect>
-		<text string="fp"><color red="0" green="0" blue="0" /></text>
-	</element>
-	<element name="text_b13a">
-		<rect><color red="1" green="1" blue="1" /></rect>
-		<text string="5" align="2"><color red="0" green="0" blue="0" /></text>
-	</element>
-	<element name="text_b14a">
-		<rect><color red="1" green="1" blue="1" /></rect>
-		<text string="6" align="2"><color red="0" green="0" blue="0" /></text>
-	</element>
-	<element name="text_b15a">
-		<rect><color red="1" green="1" blue="1" /></rect>
-		<text string="7" align="2"><color red="0" green="0" blue="0" /></text>
-	</element>
-	<element name="text_b16a">
-		<rect><color red="1" green="1" blue="1" /></rect>
-		<text string="8" align="2"><color red="0" green="0" blue="0" /></text>
-	</element>
-	<element name="text_b16b">
-		<rect><color red="1" green="1" blue="1" /></rect>
-		<text string="ep"><color red="0" green="0" blue="0" /></text>
-	</element>
+	<element name="text_b09a"><text string="1" align="2"><color red="0" green="0" blue="0" /></text></element>
+	<element name="text_b10a"><text string="2" align="2"><color red="0" green="0" blue="0" /></text></element>
+	<element name="text_b11a"><text string="3" align="2"><color red="0" green="0" blue="0" /></text></element>
+	<element name="text_b12a"><text string="4" align="2"><color red="0" green="0" blue="0" /></text></element>
+	<element name="text_b12b"><text string="fp"><color red="0" green="0" blue="0" /></text></element>
+	<element name="text_b13a"><text string="5" align="2"><color red="0" green="0" blue="0" /></text></element>
+	<element name="text_b14a"><text string="6" align="2"><color red="0" green="0" blue="0" /></text></element>
+	<element name="text_b15a"><text string="7" align="2"><color red="0" green="0" blue="0" /></text></element>
+	<element name="text_b16a"><text string="8" align="2"><color red="0" green="0" blue="0" /></text></element>
+	<element name="text_b16b"><text string="ep"><color red="0" green="0" blue="0" /></text></element>
 
 	<element name="text_b09b"><image file="chess/bk.svg"/></element>
 	<element name="text_b10b"><image file="chess/bq.svg"/></element>

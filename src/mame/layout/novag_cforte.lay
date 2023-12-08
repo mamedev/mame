@@ -58,38 +58,14 @@ license:CC0-1.0
 	<element name="text_l7"><text string="Black" align="1"><color red="0.51" green="0.5" blue="0.49" /></text></element>
 	<element name="text_l8"><text string="White" align="1"><color red="0.51" green="0.5" blue="0.49" /></text></element>
 
-	<element name="text_r2x">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="Pro-Op"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_r3x">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="Priority"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_r4x">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="Clear Book"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_r5x">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="Print Book"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_r6x">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="No/End"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_r7x">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="Yes/Start"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_m8x">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="&#x2190;"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_r8x">
-		<rect><color red="0.7" green="0.13" blue="0.12" /></rect>
-		<text string="&#x2192;"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
+	<element name="text_r2x"><text string="Pro-Op"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_r3x"><text string="Priority"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_r4x"><text string="Clear Book"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_r5x"><text string="Print Book"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_r6x"><text string="No/End"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_r7x"><text string="Yes/Start"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_m8x"><text string="&#x2190;"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_r8x"><text string="&#x2192;"><color red="0.1" green="0.1" blue="0.1" /></text></element>
 
 	<element name="text_m1a"><text string="Player/Player"><color red="0.51" green="0.5" blue="0.49" /></text></element>
 	<element name="text_m1b"><text string="Gambit/Large"><color red="0.51" green="0.5" blue="0.49" /></text></element>
@@ -288,43 +264,23 @@ license:CC0-1.0
 	<element name="text_uit1"><text string="S.BOARD"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uit2"><text string="INTERFACE"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uib1"><text string="BOARD:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_uib2">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="RESET"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_uib3">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="CLEAR"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
+	<element name="text_uib2"><text string="RESET"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_uib3"><text string="CLEAR"><color red="0.01" green="0.01" blue="0.01" /></text></element>
 	<element name="text_uis1"><text string="SPAWN:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uih1"><text string="HAND:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_uih2">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="REMOVE"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
+	<element name="text_uih2"><text string="REMOVE"><color red="0.01" green="0.01" blue="0.01" /></text></element>
 	<element name="text_uiu1"><text string="UNDO:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_uiu2a">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string=" &lt;&lt;"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_uiu2b">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string=" &lt;  "><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_uiu2c">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="   &gt;"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_uiu2d">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string=" &gt;&gt;"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
+	<element name="text_uiu2a"><text string=" &lt;&lt;"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_uiu2b"><text string=" &lt;  "><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_uiu2c"><text string="   &gt;"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_uiu2d"><text string=" &gt;&gt;"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_uiu3b"><text string="/"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+
 	<element name="text_uiu3a" defstate="0">
 		<simplecounter maxstate="999" digits="1" align="2">
 			<color red="0.81" green="0.8" blue="0.79" />
 		</simplecounter>
 	</element>
-	<element name="text_uiu3b"><text string="/"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uiu3c" defstate="0">
 		<simplecounter maxstate="999" digits="1" align="1">
 			<color red="0.81" green="0.8" blue="0.79" />

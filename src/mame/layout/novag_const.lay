@@ -64,67 +64,22 @@ license:CC0-1.0
 	<element name="text_p11"><image file="chess/br.svg"></image></element>
 	<element name="text_p12"><image file="chess/bp.svg"></image></element>
 
-	<element name="text_rb01a">
-		<rect><color red="0.5" green="0.37" blue="0.3" /></rect>
-		<text string="Multi Move"><color red="0.81" green="0.8" blue="0.79" /></text>
-	</element>
-	<element name="text_rb01b">
-		<rect><color red="0.5" green="0.37" blue="0.3" /></rect>
-		<text string="Player / Player"><color red="0.81" green="0.8" blue="0.79" /></text>
-	</element>
-	<element name="text_rb02a">
-		<rect><color red="0.5" green="0.37" blue="0.3" /></rect>
-		<text string="Best Move"><color red="0.81" green="0.8" blue="0.79" /></text>
-	</element>
-	<element name="text_rb02b">
-		<rect><color red="0.5" green="0.37" blue="0.3" /></rect>
-		<text string="Random"><color red="0.81" green="0.8" blue="0.79" /></text>
-	</element>
-	<element name="text_rb03">
-		<rect><color red="0.5" green="0.37" blue="0.3" /></rect>
-		<text string="Sound"><color red="0.81" green="0.8" blue="0.79" /></text>
-	</element>
-	<element name="text_rb07">
-		<rect><color red="0.5" green="0.37" blue="0.3" /></rect>
-		<text string="Set Level"><color red="0.81" green="0.8" blue="0.79" /></text>
-	</element>
-	<element name="text_rb08">
-		<rect><color red="0.5" green="0.37" blue="0.3" /></rect>
-		<text string="Take Back"><color red="0.81" green="0.8" blue="0.79" /></text>
-	</element>
+	<element name="text_rb01a"><text string="Multi Move"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_rb01b"><text string="Player / Player"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_rb02a"><text string="Best Move"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_rb02b"><text string="Random"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_rb03"><text string="Sound"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_rb07"><text string="Set Level"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_rb08"><text string="Take Back"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 
-	<element name="text_rb11">
-		<rect><color red="0.5" green="0.37" blue="0.3" /></rect>
-		<text string="New Game"><color red="0.81" green="0.8" blue="0.79" /></text>
-	</element>
-	<element name="text_rb12a">
-		<rect><color red="0.5" green="0.37" blue="0.3" /></rect>
-		<text string="Verify"><color red="0.81" green="0.8" blue="0.79" /></text>
-	</element>
-	<element name="text_rb12b">
-		<rect><color red="0.5" green="0.37" blue="0.3" /></rect>
-		<text string="Set Up"><color red="0.81" green="0.8" blue="0.79" /></text>
-	</element>
-	<element name="text_rb13">
-		<rect><color red="0.5" green="0.37" blue="0.3" /></rect>
-		<text string="Change Color"><color red="0.81" green="0.8" blue="0.79" /></text>
-	</element>
-	<element name="text_rb14">
-		<rect><color red="0.5" green="0.37" blue="0.3" /></rect>
-		<text string="Clear Board"><color red="0.81" green="0.8" blue="0.79" /></text>
-	</element>
-	<element name="text_rb17a">
-		<rect><color red="0.5" green="0.37" blue="0.3" /></rect>
-		<text string="Hint"><color red="0.81" green="0.8" blue="0.79" /></text>
-	</element>
-	<element name="text_rb17b">
-		<rect><color red="0.5" green="0.37" blue="0.3" /></rect>
-		<text string="Show Moves"><color red="0.81" green="0.8" blue="0.79" /></text>
-	</element>
-	<element name="text_rb18">
-		<rect><color red="0.5" green="0.37" blue="0.3" /></rect>
-		<text string="Go"><color red="0.81" green="0.8" blue="0.79" /></text>
-	</element>
+	<element name="text_rb11"><text string="New Game"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_rb12a"><text string="Verify"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_rb12b"><text string="Set Up"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_rb13"><text string="Change Color"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_rb14"><text string="Clear Board"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_rb17a"><text string="Hint"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_rb17b"><text string="Show Moves"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_rb18"><text string="Go"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 
 	<element name="text_setup">
 		<rect><color red="0.5" green="0.37" blue="0.3" /></rect>
@@ -287,43 +242,23 @@ license:CC0-1.0
 	<element name="text_uit1"><text string="S.BOARD"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uit2"><text string="INTERFACE"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uib1"><text string="BOARD:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_uib2">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="RESET"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_uib3">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="CLEAR"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
+	<element name="text_uib2"><text string="RESET"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_uib3"><text string="CLEAR"><color red="0.01" green="0.01" blue="0.01" /></text></element>
 	<element name="text_uis1"><text string="SPAWN:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uih1"><text string="HAND:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_uih2">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="REMOVE"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
+	<element name="text_uih2"><text string="REMOVE"><color red="0.01" green="0.01" blue="0.01" /></text></element>
 	<element name="text_uiu1"><text string="UNDO:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_uiu2a">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string=" &lt;&lt;"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_uiu2b">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string=" &lt;  "><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_uiu2c">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="   &gt;"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_uiu2d">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string=" &gt;&gt;"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
+	<element name="text_uiu2a"><text string=" &lt;&lt;"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_uiu2b"><text string=" &lt;  "><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_uiu2c"><text string="   &gt;"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_uiu2d"><text string=" &gt;&gt;"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_uiu3b"><text string="/"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+
 	<element name="text_uiu3a" defstate="0">
 		<simplecounter maxstate="999" digits="1" align="2">
 			<color red="0.81" green="0.8" blue="0.79" />
 		</simplecounter>
 	</element>
-	<element name="text_uiu3b"><text string="/"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uiu3c" defstate="0">
 		<simplecounter maxstate="999" digits="1" align="1">
 			<color red="0.81" green="0.8" blue="0.79" />
