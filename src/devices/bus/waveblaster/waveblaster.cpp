@@ -5,6 +5,7 @@
 #include "waveblaster.h"
 
 #include "omniwave.h"
+#include "db50xg.h"
 
 
 DEFINE_DEVICE_TYPE(WAVEBLASTER_CONNECTOR, waveblaster_connector, "waveblaster_connector", "Waveblaster extension connector")
@@ -32,6 +33,7 @@ void waveblaster_connector::midi_rx(int state)
 void waveblaster_intf(device_slot_interface &device)
 {
 	device.option_add("omniwave", OMNIWAVE);
+	device.option_add("db50xg", DB50XG);
 }
 
 device_waveblaster_interface::device_waveblaster_interface(const machine_config &mconfig, device_t &device) :

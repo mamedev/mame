@@ -5376,5 +5376,7 @@ if (BUSES["WAVEBLASTER"]~=null) then
 		MAME_DIR .. "src/devices/bus/waveblaster/waveblaster.h",
 		MAME_DIR .. "src/devices/bus/waveblaster/omniwave.cpp",
 		MAME_DIR .. "src/devices/bus/waveblaster/omniwave.h",
+		MAME_DIR .. "src/devices/bus/waveblaster/db50xg.cpp",
+		MAME_DIR .. "src/devices/bus/waveblaster/db50xg.h",
 	}
 end
