@@ -22,7 +22,7 @@ Hardware notes:
 
 Chess Companion II:
 - PCB label: YO1B-01 REV.B
-- Hitachi HD6301V1 (0609V171) @ ~4MHz (LC oscillator)
+- Hitachi HD6301V1P (0609V171) @ ~4MHz (LC oscillator)
 - chessboard buttons, 16+5 leds, piezo
 
 Explorer Chess:
@@ -57,7 +57,7 @@ CXG Enterprise "S" / Star Chess is on very similar hardware, so it's emulated
 in this driver too.
 
 Hardware notes:
-- Hitachi HD6301V1 (HD6301V1C42P), 7.15909MHz XTAL
+- Hitachi HD6301V1P (HD6301V1C42P), 7.15909MHz XTAL
 - port 2 I/O is changed a bit, rest is same as compan2
 
 HD6301V1C42P MCU is used in:
@@ -179,7 +179,7 @@ INPUT_CHANGED_MEMBER(compan2_state::power_off)
 		m_power = false;
 
 		// when power switch is set to MEMORY, it triggers an NMI after a short delay
-		attotime delay = attotime::from_msec(100);
+		attotime delay = attotime::from_msec(50);
 		m_nmitimer->adjust(delay, INPUT_LINE_NMI);
 
 		// afterwards, MCU STBY pin is asserted after a short delay

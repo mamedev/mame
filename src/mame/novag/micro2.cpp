@@ -12,9 +12,10 @@ This program was used in several Novag chesscomputers:
 - Novag Octo
 
 suspected, to be confirmed:
-- Novag Allegro
+- Novag Allegro (not Allegro 4)
 - Novag Piccolo
-- Novag Alto
+
+The chess engine is by Julio Kaplan, not David Kittinger.
 
 Hardware notes:
 

@@ -17,7 +17,7 @@ TODO:
 
 Hardware notes:
 - PCB label (Super Crown): CXG 218-600-001
-- Hitachi HD6301Y0 (mode 2), 8MHz XTAL
+- Hitachi HD6301Y0P (mode 2), 8MHz XTAL
 - 2KB battery-backed RAM (HM6116LP-3)
 - chessboard buttons, 24 LEDs, piezo
 

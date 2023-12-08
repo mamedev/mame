@@ -13,7 +13,7 @@ TRAP interrupt for the beeper routine. Very strange.
 
 Hardware notes:
 - PCB label: WSE 8108A
-- Hitachi HD63B01X0, 8MHz XTAL
+- Hitachi HD63B01X0P, 8MHz XTAL
 - 8*8 chessboard buttons, 16+1 LEDs, piezo
 
 Yeno 309 XT is on the same PCB, and has the same MCU ROM.
@@ -67,7 +67,6 @@ private:
 	required_ioport_array<2> m_inputs;
 
 	emu_timer *m_standbytimer;
-	bool m_power = false;
 	u16 m_inp_mux = 0;
 
 	// I/O handlers
@@ -83,7 +82,6 @@ void y301xl_state::machine_start()
 	m_standbytimer = timer_alloc(FUNC(y301xl_state::set_standby), this);
 
 	// register for savestates
-	save_item(NAME(m_power));
 	save_item(NAME(m_inp_mux));
 }
 
@@ -95,8 +93,6 @@ void y301xl_state::machine_start()
 
 void y301xl_state::machine_reset()
 {
-	m_power = true;
-
 	m_maincpu->set_input_line(HD6301_IRQ_LINE, CLEAR_LINE);
 	m_maincpu->set_input_line(M6801_STBY_LINE, CLEAR_LINE);
 }
@@ -108,13 +104,11 @@ TIMER_CALLBACK_MEMBER(y301xl_state::set_standby)
 
 INPUT_CHANGED_MEMBER(y301xl_state::power_off)
 {
-	if (newval && m_power)
+	if (newval && !m_maincpu->standby())
 	{
-		m_power = false;
-
 		// IRQ1 when power switch is set to SAVE, followed by STBY after a short delay
 		m_maincpu->set_input_line(HD6301_IRQ_LINE, ASSERT_LINE);
-		m_standbytimer->adjust(attotime::from_msec(100), M6801_STBY_LINE);
+		m_standbytimer->adjust(attotime::from_msec(50), M6801_STBY_LINE);
 	}
 }
 

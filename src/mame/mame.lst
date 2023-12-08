@@ -34739,6 +34739,9 @@ constq
 ssensor4
 supercon
 
+@source:novag/constjr.cpp
+constjr
+
 @source:novag/diablo.cpp
 diablo68
 diablo68a

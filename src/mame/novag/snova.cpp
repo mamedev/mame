@@ -11,7 +11,7 @@ NVRAM won't work properly (supremo doesn't have NVRAM).
 
 TODO:
 - beeps are glitchy, as if interrupted for too long
-- if/when MAME supports an exit callback, hook up power-off NMI to that
+- if/when MAME supports an exit callback, hook up nsnova power-off NMI to that
 - nsnova serial port isn't working, MCU emulation problem?
 - nsnova unmapped reads from 0x33/0x34
 - is "Aquamarine / Super Nova" the same rom as nsnova and just a redesign?
