@@ -57,7 +57,7 @@ namespace  {
 
 ROM_START(nabu_keyboard_rom)
 	ROM_REGION( 0x800, "mcu", 0 )
-	ROM_LOAD( "nabukeyboard-90020070-reva-2716.bin", 0x000, 0x800, CRC(eead3abc) SHA1(2f6ff63ca2f2ac90f3e03ef4f2b79883205e8a4e) )
+	ROM_LOAD( "nabukeyboard-90020070-revb-2716.bin", 0x000, 0x800, CRC(7d6ebc61) SHA1(5b0cb3da5b4afcae321c2a557e328c416b107dd7) )
 ROM_END
 
 //**************************************************************************
