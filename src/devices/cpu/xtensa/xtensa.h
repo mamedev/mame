@@ -27,17 +27,7 @@ public:
 		XTENSA_A4, XTENSA_A5, XTENSA_A6, XTENSA_A7,
 		XTENSA_A8, XTENSA_A9, XTENSA_A10, XTENSA_A11,
 		XTENSA_A12, XTENSA_A13, XTENSA_A14, XTENSA_A15,
-	/*
-		// with windowed extensions there 32 or 64 physical regs
-		XTENSA_A16, XTENSA_A17, XTENSA_A18, XTENSA_A19,
-		XTENSA_A20, XTENSA_A21, XTENSA_A22, XTENSA_A23,
-		XTENSA_A24, XTENSA_A25, XTENSA_A26, XTENSA_A27,
-		XTENSA_A28, XTENSA_A29, XTENSA_A30, XTENSA_A31,
-	*/
 	};
-
-	void irq_request_hack(int which); // for debugging
-	void irq_off_hack();
 
 protected:
 	// device-level overrides
@@ -137,6 +127,7 @@ private:
 
 	void ext_regs(address_map &map);
 
+	bool handle_bz(u32 inst);
 	void handle_retw();
 	void check_interrupts();
 	void getop_and_execute();

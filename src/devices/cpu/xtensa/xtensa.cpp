@@ -13,11 +13,9 @@
 #include "xtensa_tables.h"
 
 #define LOG_UNHANDLED_OPS       (1U << 1)
-#define LOG_HANDLED_OPS         (1U << 2)
 #define LOG_UNHANDLED_CACHE_OPS (1U << 3)
 #define LOG_UNHANDLED_SYNC_OPS  (1U << 4)
 #define LOG_EXTREG_OPS          (1U << 8)
-#define LOG_HANDLED_CALLX_OPS   (1U << 9)
 #define LOG_NAMED_REGS          (1U << 10)
 #define LOG_TIMER_REGS          (1U << 11)
 
@@ -374,26 +372,88 @@ void xtensa_device::device_start()
 
 	state_add(XTENSA_PC, "PC", m_pc);
 
-	save_item(NAME(m_pc));
+	save_item(NAME(m_a_real));
 	save_item(NAME(m_a));
+	save_item(NAME(m_pc));
+	save_item(NAME(m_icount));
+	save_item(NAME(m_extreg_windowbase));
+	save_item(NAME(m_extreg_windowstart));
+	save_item(NAME(m_extreg_sar));
+	save_item(NAME(m_extreg_lbeg));
+	save_item(NAME(m_extreg_lend));
+	save_item(NAME(m_extreg_lcount));
+	save_item(NAME(m_extreg_ps));
+	save_item(NAME(m_extreg_cacheattr));
+	save_item(NAME(m_extreg_epc1));
+	save_item(NAME(m_extreg_epc2));
+	save_item(NAME(m_extreg_epc3));
+	save_item(NAME(m_extreg_epc4));
+	save_item(NAME(m_extreg_epc5));
+	save_item(NAME(m_extreg_eps2));
+	save_item(NAME(m_extreg_eps3));
+	save_item(NAME(m_extreg_eps4));
+	save_item(NAME(m_extreg_eps5));
+	save_item(NAME(m_extreg_excsave1));
+	save_item(NAME(m_extreg_excsave2));
+	save_item(NAME(m_extreg_excsave3));
+	save_item(NAME(m_extreg_excsave4));
+	save_item(NAME(m_extreg_excsave5));
+	save_item(NAME(m_extreg_ibreaka0));
+	save_item(NAME(m_extreg_dbreaka0));
+	save_item(NAME(m_extreg_dbreakc0));
+	save_item(NAME(m_extreg_icountlevel));
+	save_item(NAME(m_extreg_ccompare0));
+	save_item(NAME(m_extreg_intenable));
+	save_item(NAME(m_extreg_intclr));
+	save_item(NAME(m_extreg_intset));
+	save_item(NAME(m_extreg_ccount));
+	save_item(NAME(m_extreg_exccause));
+	save_item(NAME(m_nextpc));
 }
 
 void xtensa_device::device_reset()
 {
-	// TODO: Reset state
-
 	m_extreg_windowbase = 0;
+	m_extreg_windowstart = 0;
 	switch_windowbase(0);
 
-	m_extreg_windowstart = 0;
+	for (int i=0;i<m_num_physical_regs;i++)
+		m_a_real[i] = 0;
+
+	for (int i=0;i<16;i++)
+		m_a[i] = 0;;
 
 	m_extreg_sar = 0;
-
 	m_extreg_lbeg = 0;
 	m_extreg_lend = 0;
 	m_extreg_lcount = 0;
-
+	m_extreg_ps = 0;
+	m_extreg_cacheattr = 0;
+	m_extreg_epc1 = 0;
+	m_extreg_epc2 = 0;
+	m_extreg_epc3 = 0;
+	m_extreg_epc4 = 0;
+	m_extreg_epc5 = 0;
+	m_extreg_eps2 = 0;
+	m_extreg_eps3 = 0;
+	m_extreg_eps4 = 0;
+	m_extreg_eps5 = 0;
+	m_extreg_excsave1 = 0;
+	m_extreg_excsave2 = 0;
+	m_extreg_excsave3 = 0;
+	m_extreg_excsave4 = 0;
+	m_extreg_excsave5 = 0;
+	m_extreg_ibreaka0 = 0;
+	m_extreg_dbreaka0 = 0;
+	m_extreg_dbreakc0 = 0;
+	m_extreg_icountlevel = 0;
+	m_extreg_ccompare0 = 0;
 	m_extreg_intenable = 0;
+	m_extreg_intclr = 0;
+	m_extreg_intset = 0;
+	m_extreg_ccount = 0;
+	m_extreg_exccause = 0;
+	m_nextpc = 0;
 }
 
 void xtensa_device::handle_reserved(u32 inst)
@@ -404,40 +464,11 @@ void xtensa_device::handle_reserved(u32 inst)
 
 u32 xtensa_device::get_reg(u8 reg)
 {
-#if 0
-	// TODO: much more complex than this with the Windowed Register Option!
-	int realreg = reg + m_extreg_windowbase * 4;
-
-	if (realreg >= 0 && realreg < m_num_physical_regs)
-	{
-		return m_a[realreg];
-	}
-	else
-	{
-		// exceptions?
-		return m_a[realreg & (m_num_physical_regs-1)];
-	}
-#endif
-
 	return m_a[reg];
 }
 
 void xtensa_device::set_reg(u8 reg, u32 value)
 {
-#if 0
-	// TODO: much more complex than this with the Windowed Register Option!
-	int realreg = reg + m_extreg_windowbase * 4;
-
-	if (realreg >= 0 && realreg < m_num_physical_regs)
-	{
-		m_a[realreg] = value;
-	}
-	else
-	{
-		// exceptions?
-		m_a[realreg & (m_num_physical_regs-1)] = value;
-	}
-#endif
 	m_a[reg] = value;
 }
 
@@ -510,6 +541,54 @@ void xtensa_device::handle_retw()
 	switch_windowbase(-xval);
 	m_nextpc = newaddr;
 }
+bool xtensa_device::handle_bz(u32 inst)
+{
+	u8 reg = BIT(inst, 8, 4);
+	u32 addr = m_pc + 4 + util::sext(inst >> 12, 12);
+
+	switch (BIT(inst, 6, 2))
+	{
+	case 0b00:// beqz
+	{
+		if (get_reg(reg) == 0)
+		{
+			m_nextpc = addr;
+			return true; // avoid loop check
+		}
+		break;
+	}
+	case 0b01:// bnez
+	{
+		if (get_reg(reg) != 0)
+		{
+			m_nextpc = addr;
+			return true; // avoid loop check
+		}
+		break;
+	}
+	case 0b10:// bltz
+	{
+		if (get_reg(reg) & 0x80000000)
+		{
+			m_nextpc = addr;
+			return true; // avoid loop check
+		}
+		break;
+	}
+	case 0b11:// bgez
+	{
+		if (!(get_reg(reg) & 0x80000000))
+		{
+			m_nextpc = addr;
+			return true; // avoid loop check
+		}
+		break;
+	}
+	break;
+	}
+
+	return false;
+}
 
 void xtensa_device::getop_and_execute()
 {
@@ -544,7 +623,6 @@ void xtensa_device::getop_and_execute()
 
 					case 0b1000: // RET
 					{
-						LOGMASKED(LOG_HANDLED_OPS, "ret\n");
 						m_nextpc = get_reg(0);
 						m_pc = m_nextpc; return; // avoid loop check
 						break;
@@ -552,7 +630,6 @@ void xtensa_device::getop_and_execute()
 
 					case 0b1001: // RETW (with Windowed Register Option)
 					{
-						LOGMASKED(LOG_HANDLED_OPS, "retw\n");
 						handle_retw();
 						break;
 					}
@@ -561,7 +638,6 @@ void xtensa_device::getop_and_execute()
 					case 0b1010: // JX
 					{
 						u8 reg = BIT(inst, 8, 4);
-						LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d\n", "jx", reg);
 						m_nextpc = get_reg(reg);
 						m_pc = m_nextpc; return; // avoid loop check
 						break;
@@ -570,7 +646,6 @@ void xtensa_device::getop_and_execute()
 					case 0b1100: // CALLX0
 					{
 						u8 reg = BIT(inst, 8, 4);
-						LOGMASKED(LOG_HANDLED_OPS, "callx%-3da%d\n", 0, reg);
 						u32 next = get_reg(reg);
 						set_reg(0, m_nextpc);
 						m_nextpc = next;
@@ -584,7 +659,6 @@ void xtensa_device::getop_and_execute()
 					{
 						u8 reg = BIT(inst, 8, 4);
 						u8 xval = BIT(inst, 4, 2);
-						LOGMASKED(LOG_HANDLED_CALLX_OPS, "callx%-3da%d\n", xval * 4, reg);
 						set_callinc(xval);
 						u32 next = get_reg(reg);
 						set_reg(xval*4, (m_nextpc & 0x3fffffff) | (xval << 30));
@@ -635,7 +709,7 @@ void xtensa_device::getop_and_execute()
 						break;
 
 					case 0b00001111: // NOP (added in RA-2004.1; was assembly macro previously)
-						LOGMASKED(LOG_HANDLED_OPS, "nop\n");
+						// nothing
 						break;
 
 					default:
@@ -652,7 +726,6 @@ void xtensa_device::getop_and_execute()
 						{
 						case 0b0000: // RFE (with Exception Option)
 						{
-							LOGMASKED(LOG_HANDLED_OPS, "rfe\n");
 							m_nextpc = m_extreg_epc1;
 							clear_irqpri(2);
 							clear_irqpri(4);
@@ -688,26 +761,22 @@ void xtensa_device::getop_and_execute()
 						switch (level)
 						{
 						case 2:
-							LOGMASKED(LOG_HANDLED_OPS, "%-8s%d\n", "rfi", 2);
 							m_extreg_ps = m_extreg_eps2;
 							m_nextpc = m_extreg_epc2;
 							break;
 
 						case 3:
-							LOGMASKED(LOG_HANDLED_OPS, "%-8s%d\n", "rfi", 3);
 							m_extreg_ps = m_extreg_eps3;
 							m_nextpc = m_extreg_epc3;
 							clear_irqpri(1);
 							break;
 
 						case 4:
-							LOGMASKED(LOG_HANDLED_OPS, "%-8s%d\n", "rfi", 4);
 							m_extreg_ps = m_extreg_eps4;
 							m_nextpc = m_extreg_epc4;
 							break;
 
 						case 5:
-							LOGMASKED(LOG_HANDLED_OPS, "%-8s%d\n", "rfi", 5);
 							m_extreg_ps = m_extreg_eps5;
 							m_nextpc = m_extreg_epc5;
 							break;
@@ -773,7 +842,6 @@ void xtensa_device::getop_and_execute()
 				u8 dstreg = BIT(inst, 12, 4);
 				u8 reg_s = BIT(inst, 8, 4);
 				u8 reg_t = BIT(inst, 4, 4);
-				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, a%d\n", "and", dstreg, reg_s, reg_t);
 				set_reg(dstreg, get_reg(reg_s) & get_reg(reg_t));
 				break;
 			}
@@ -782,14 +850,6 @@ void xtensa_device::getop_and_execute()
 				u8 dstreg = BIT(inst, 12, 4);
 				u8 reg_s = BIT(inst, 8, 4);
 				u8 reg_t = BIT(inst, 4, 4);
-				if (BIT(inst, 8, 4) == BIT(inst, 4, 4))
-				{
-					LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d\n", "mov", dstreg, reg_s);
-				}
-				else
-				{
-					LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, a%d\n", "or", dstreg, reg_s, reg_t);
-				}
 				set_reg(dstreg, get_reg(reg_s) | get_reg(reg_t));
 			}
 			break;
@@ -799,7 +859,6 @@ void xtensa_device::getop_and_execute()
 				u8 dstreg = BIT(inst, 12, 4);
 				u8 reg_s = BIT(inst, 8, 4);
 				u8 reg_t = BIT(inst, 4, 4);
-				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, a%d\n", "xor", dstreg, reg_s, reg_t);
 				set_reg(dstreg, get_reg(reg_s) ^ get_reg(reg_t));
 				break;
 			}
@@ -810,21 +869,18 @@ void xtensa_device::getop_and_execute()
 				case 0b0000: // SSR - Set Shift Amount for Right Shift
 				{
 					u8 srcreg = BIT(inst, 8, 4);
-					LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d\n", "ssr", srcreg);
 					m_extreg_sar = get_reg(srcreg) & 0x1f;
 					break;
 				}
 				case 0b0001: // SSL - Set Shift Amount for Left Shift
 				{
 					u8 srcreg = BIT(inst, 8, 4);
-					LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d\n", "ssl", srcreg);
 					m_extreg_sar = 32 - (get_reg(srcreg) & 0x1f);
 					break;
 				}
 				case 0b0010: // SSA8L - Set Shift Amount for LE Byte Shift
 				{
 					u8 srcreg = BIT(inst, 8, 4);
-					LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d\n", "ssa8l", srcreg);
 					m_extreg_sar = (get_reg(srcreg) & 0x3)<<3;
 					break;
 				}
@@ -832,7 +888,6 @@ void xtensa_device::getop_and_execute()
 				case 0b0011: // SSA8B - Set Shift Amount for BE Byte Shift
 				{
 					u8 srcreg = BIT(inst, 8, 4);
-					LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d\n", "ssa8b", srcreg);
 					m_extreg_sar = 32 - ((get_reg(srcreg) & 0x3)<<3);
 					break;
 				}
@@ -840,7 +895,6 @@ void xtensa_device::getop_and_execute()
 				case 0b0100: // SSAI
 				{
 					u8 imm = BIT(inst, 8, 4) + (inst & 0x000010);
-					LOGMASKED(LOG_HANDLED_OPS, "%-8s%d\n", "ssai", imm);
 					m_extreg_sar = imm;
 					break;
 				}
@@ -861,7 +915,6 @@ void xtensa_device::getop_and_execute()
 				{
 					u8 dstreg = BIT(inst, 4, 4);
 					u8 srcreg = BIT(inst, 8, 4);
-					LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d\n", s_st1_ops[BIT(inst, 12, 4)], dstreg, srcreg);
 					u32 result;
 					u32 srcval = get_reg(srcreg);
 
@@ -880,7 +933,6 @@ void xtensa_device::getop_and_execute()
 				case 0b1000: // ROTW (with Windowed Register Option)
 				{
 					s8 imm = util::sext(inst >> 4, 4);
-					LOGMASKED(LOG_HANDLED_OPS, "%-8s%d\n", "rotw", imm);
 					switch_windowbase(imm);
 					break;
 				}
@@ -916,7 +968,6 @@ void xtensa_device::getop_and_execute()
 				{
 					u8 dstreg = BIT(inst, 12, 4);
 					u8 srcreg = BIT(inst, 4, 4);
-					LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d\n", "neg", dstreg, srcreg);
 					u32 src = get_reg(srcreg);
 					u32 result;
 					result = (src ^ 0xffffffff) + 1;
@@ -928,7 +979,6 @@ void xtensa_device::getop_and_execute()
 				{
 					u8 dstreg = BIT(inst, 12, 4);
 					u8 srcreg = BIT(inst, 4, 4);
-					LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d\n", "abs", dstreg, srcreg);
 					u32 src = get_reg(srcreg);
 					u32 result;
 					if (src & 0x80000000)
@@ -953,14 +1003,6 @@ void xtensa_device::getop_and_execute()
 				u8 reg_s = BIT(inst, 8, 4);
 				u8 reg_t = BIT(inst, 4, 4);
 				u8 shift = BIT(inst, 20, 2);
-				if (shift)
-				{
-					LOGMASKED(LOG_HANDLED_OPS, "%sx%-4da%d, a%d, a%d\n", "add", 1 << shift, dstreg, reg_s, reg_t);
-				}
-				else
-				{
-					LOGMASKED(LOG_HANDLED_OPS, "%sx%-4da, a%d, a%d\n", "add", dstreg, reg_s, reg_t);
-				}
 				set_reg(dstreg, (get_reg(reg_s)<<shift)+get_reg(reg_t));
 				break;
 			}
@@ -974,14 +1016,6 @@ void xtensa_device::getop_and_execute()
 				u8 reg_s = BIT(inst, 8, 4);
 				u8 reg_t = BIT(inst, 4, 4);
 				u8 shift = BIT(inst, 20, 2);
-				if (shift)
-				{
-					LOGMASKED(LOG_HANDLED_OPS, "%sx%-4da%d, a%d, a%d\n", "sub", 1 << shift, dstreg, reg_s, reg_t);
-				}
-				else
-				{
-					LOGMASKED(LOG_HANDLED_OPS, "%sx%-4da, a%d, a%d\n", "sub", dstreg, reg_s, reg_t);
-				}
 				set_reg(dstreg, (get_reg(reg_s)<<shift)-get_reg(reg_t));
 				break;
 			}
@@ -1000,8 +1034,6 @@ void xtensa_device::getop_and_execute()
 				u8 dstreg = BIT(inst, 12, 4);
 				u8 srcreg = BIT(inst, 8, 4);
 				u16 shift = 32 - (BIT(inst, 4, 4) + (BIT(inst, 20) ? 16 : 0));
-				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, %d\n", "slli", dstreg, srcreg, shift);
-
 				if (shift == 32)
 				{
 					// undefined behavior
@@ -1019,7 +1051,6 @@ void xtensa_device::getop_and_execute()
 				u8 dstreg = BIT(inst, 12, 4);
 				u8 srcreg = BIT(inst, 4, 4);
 				u8 amount = BIT(inst, 8, 4) + (BIT(inst, 20) ? 16 : 0);
-				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, %d\n", "srai", dstreg, srcreg, amount);
 				u32 source = get_reg(srcreg);
 				u32 result = source >> amount;
 				if (source & 0x80000000)
@@ -1034,7 +1065,6 @@ void xtensa_device::getop_and_execute()
 				u8 dstreg = BIT(inst, 12, 4);
 				u8 srcreg = BIT(inst, 4, 4);
 				u8 amount = BIT(inst, 8, 4);
-				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, %d\n", "srli", dstreg, srcreg, amount);
 				set_reg(dstreg, get_reg(srcreg) >> amount);
 				break;
 			}
@@ -1043,7 +1073,6 @@ void xtensa_device::getop_and_execute()
 			{
 				u8 spcreg = BIT(inst, 8, 8);
 				u8 reg = BIT(inst, 4, 4);
-				LOGMASKED(LOG_HANDLED_OPS, "xsr.%-3s a%d\n", special_reg(spcreg, true), reg);
 				u32 spcregval = space(AS_EXTREGS).read_dword(spcreg);
 				u32 regval = get_reg(reg);
 				space(AS_EXTREGS).write_dword(spcreg, regval);
@@ -1072,7 +1101,6 @@ void xtensa_device::getop_and_execute()
 				u8 reg_r = BIT(inst, 12, 4);
 				u8 reg_s = BIT(inst, 8, 4);
 				u8 reg_t = BIT(inst, 4, 4);
-				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, a%d\n", "src", reg_r, reg_s, reg_t);
 				u64 fullvalue = get_reg(reg_s) | (((u64)get_reg(reg_t))<<32);
 				u32 result = fullvalue >> (m_extreg_sar & 0x1f);
 				set_reg(reg_r, result);
@@ -1084,7 +1112,6 @@ void xtensa_device::getop_and_execute()
 			{
 				u8 dstreg = BIT(inst, 12, 4);
 				u8 srcreg = BIT(inst, 4, 4);
-				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d\n", "srl", dstreg, srcreg);
 				set_reg(dstreg, get_reg(srcreg) >> m_extreg_sar);
 				break;
 			}
@@ -1092,7 +1119,6 @@ void xtensa_device::getop_and_execute()
 			{
 				u8 dstreg = BIT(inst, 12, 4);
 				u8 srcreg = BIT(inst, 8, 4);
-				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d\n", "sll", dstreg, srcreg);
 				// we also do the "32 -" part in SSL, which sets m_extreg_sar.  is this correct?
 				set_reg(dstreg, get_reg(srcreg) << (32 - m_extreg_sar));
 				break;
@@ -1102,7 +1128,6 @@ void xtensa_device::getop_and_execute()
 			{
 				u8 dstreg = BIT(inst, 12, 4);
 				u8 srcreg = BIT(inst, 4, 4);
-				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d\n", "sra", dstreg, srcreg);
 				u32 source = get_reg(srcreg);
 				u32 result = source >> m_extreg_sar;
 				if (source & 0x80000000)
@@ -1116,7 +1141,6 @@ void xtensa_device::getop_and_execute()
 				u8 reg_r = BIT(inst, 12, 4);
 				u8 reg_s = BIT(inst, 8, 4);
 				u8 reg_t = BIT(inst, 4, 4);
-				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, a%d\n", "mul16u", reg_r, reg_s, reg_t);
 				set_reg(reg_r, (get_reg(reg_s)&0xffff) * (get_reg(reg_t)&0xffff));  
 				break;
 			}
@@ -1126,7 +1150,6 @@ void xtensa_device::getop_and_execute()
 				u8 reg_r = BIT(inst, 12, 4);
 				u8 reg_s = BIT(inst, 8, 4);
 				u8 reg_t = BIT(inst, 4, 4);
-				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, a%d\n", "mul16s", reg_r, reg_s, reg_t);
 				set_reg(reg_r, s16((get_reg(reg_s)&0xffff)) * s16((get_reg(reg_t)&0xffff)));  
 				break;
 			}
@@ -1231,7 +1254,6 @@ void xtensa_device::getop_and_execute()
 				u8 dstreg = BIT(inst, 12, 4);
 				u8 srcreg = BIT(inst, 8, 4);
 				u8 bit = BIT(inst, 4, 4) + 7;
-				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, %d\n", "sext", dstreg, srcreg, bit);
 				set_reg(dstreg, util::sext(get_reg(srcreg), bit+1));
 				break;
 			}
@@ -1253,7 +1275,6 @@ void xtensa_device::getop_and_execute()
 				u8 dstreg = BIT(inst, 12, 4);
 				u8 reg_s = BIT(inst, 8, 4);
 				u8 reg_t = BIT(inst, 4, 4);
-				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, a%d\n", "minu", BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
 
 				if (get_reg(reg_s) < get_reg(reg_t))
 					set_reg(dstreg, get_reg(reg_s));
@@ -1272,7 +1293,6 @@ void xtensa_device::getop_and_execute()
 				u8 dstreg = BIT(inst, 12, 4);
 				u8 reg_s = BIT(inst, 8, 4);
 				u8 reg_t = BIT(inst, 4, 4);
-				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, a%d\n", "moveqz", dstreg, reg_s, reg_t);
 				if (get_reg(reg_t) == 0)
 				{
 					set_reg(dstreg, get_reg(reg_s));
@@ -1284,7 +1304,6 @@ void xtensa_device::getop_and_execute()
 				u8 dstreg = BIT(inst, 12, 4);
 				u8 reg_s = BIT(inst, 8, 4);
 				u8 reg_t = BIT(inst, 4, 4);
-				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, a%d\n", "movnez", dstreg, reg_s, reg_t);
 				if (get_reg(reg_t) != 0)
 				{
 					set_reg(dstreg, get_reg(reg_s));
@@ -1297,7 +1316,6 @@ void xtensa_device::getop_and_execute()
 				u8 dstreg = BIT(inst, 12, 4);
 				u8 reg_s = BIT(inst, 8, 4);
 				u8 reg_t = BIT(inst, 4, 4);
-				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, a%d\n", "movltz", dstreg, reg_s, reg_t);
 				if ((get_reg(reg_t) & 0x80000000))
 				{
 					set_reg(dstreg, get_reg(reg_s));
@@ -1310,7 +1328,6 @@ void xtensa_device::getop_and_execute()
 				u8 dstreg = BIT(inst, 12, 4);
 				u8 reg_s = BIT(inst, 8, 4);
 				u8 reg_t = BIT(inst, 4, 4);
-				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, a%d\n", "movgez", dstreg, reg_s, reg_t);
 				if (!(get_reg(reg_t) & 0x80000000))
 				{
 					set_reg(dstreg, get_reg(reg_s));
@@ -1334,7 +1351,6 @@ void xtensa_device::getop_and_execute()
 			u8 srcreg = BIT(inst, 4, 4);
 			u8 shift = BIT(inst, 8, 4) + (BIT(inst, 16) ? 16 : 0);
 			u8 numbits = BIT(inst, 20, 4) + 1;
-			LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, %d, %d\n", "extui", dstreg, srcreg, shift, numbits);
 			set_reg(dstreg, (get_reg(srcreg) >> shift) & ((1 << numbits)-1));
 			break;
 		}
@@ -1467,7 +1483,6 @@ void xtensa_device::getop_and_execute()
 	{
 		u8 reg = BIT(inst, 4, 4);
 		u32 addr = (m_pc + 3 - 0x40000 + (inst >> 8) * 4) & 0xfffffffc;
-		LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, 0x%08X\n", "l32r", reg, addr);
 		set_reg(reg, get_mem32(addr));
 		break;
 	}
@@ -1480,7 +1495,6 @@ void xtensa_device::getop_and_execute()
 			u8 dstreg = BIT(inst, 4, 4);
 			u8 basereg = BIT(inst, 8, 4);
 			u32 imm = (inst >> 16);
-			LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, %s\n", "l8ui", dstreg, basereg, format_imm(imm));
 			set_reg(dstreg, get_mem8(get_reg(basereg) + imm));
 			break;
 		}
@@ -1490,7 +1504,6 @@ void xtensa_device::getop_and_execute()
 			u8 reg = BIT(inst, 4, 4);
 			u8 basereg = BIT(inst, 8, 4);
 			u8 offset = inst >> 16;
-			LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, %s\n", "s8i", reg, basereg, format_imm(offset));
 			u32 addr = get_reg(basereg) + offset;
 			set_mem8(addr, get_reg(reg)&0xff);
 			break;
@@ -1501,7 +1514,6 @@ void xtensa_device::getop_and_execute()
 			u8 dstreg = BIT(inst, 4, 4);
 			u8 basereg = BIT(inst, 8, 4);
 			u32 imm = (inst >> 16) * 2;
-			LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, %s\n", "l16ui", dstreg, basereg, format_imm(imm));
 			set_reg(dstreg, get_mem16(get_reg(basereg) + imm));
 			break;
 		}
@@ -1511,7 +1523,6 @@ void xtensa_device::getop_and_execute()
 			u8 reg = BIT(inst, 4, 4);
 			u8 basereg = BIT(inst, 8, 4);
 			u16 offset = (inst >> 16) * 2;
-			LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, %s\n", "s16i", reg, basereg, format_imm(offset));
 			u32 addr = get_reg(basereg) + offset;
 			set_mem16(addr, get_reg(reg)&0xffff);
 			break;
@@ -1522,7 +1533,6 @@ void xtensa_device::getop_and_execute()
 			u8 dstreg = BIT(inst, 4, 4);
 			u8 basereg = BIT(inst, 8, 4);
 			u32 imm = (inst >> 16) * 2;
-			LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, %s\n", "l16si", dstreg, basereg, format_imm(imm));
 			u32 value = get_mem16(get_reg(basereg) + imm);
 			if (value & 0x00008000)
 				value |= 0xffff0000;
@@ -1535,7 +1545,6 @@ void xtensa_device::getop_and_execute()
 			u8 dstreg = BIT(inst, 4, 4);
 			u8 basereg = BIT(inst, 8, 4);
 			u32 imm = (inst >> 16) * 4;
-			LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, %s\n", "l32i", BIT(inst, 4, 4), BIT(inst, 8, 4), format_imm((inst >> 16) * 4));
 			set_reg(dstreg, get_mem32(get_reg(basereg) + imm));
 			break;
 		}
@@ -1545,7 +1554,6 @@ void xtensa_device::getop_and_execute()
 			u8 srcreg = BIT(inst, 4, 4);
 			u8 basereg = BIT(inst, 8, 4);
 			u32 imm = (inst >> 16) * 4;
-			LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, %s\n", "s32i", srcreg, basereg, format_imm(imm));
 			set_mem32(get_reg(basereg) + imm, get_reg(srcreg));
 			break;
 		}
@@ -1627,18 +1635,15 @@ void xtensa_device::getop_and_execute()
 		{
 			u8 dstreg = BIT(inst, 4, 4);
 			s32 imm = util::sext((inst & 0x000f00) + (inst >> 16), 12);
-			LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, %s\n", "movi", dstreg, format_imm(imm));
 			set_reg(dstreg, imm);
 			break;
 		}
-
 
 		case 0b1100: // ADDI
 		{
 			u8 reg_s = BIT(inst, 8, 4);
 			u8 reg_t = BIT(inst, 4, 4);
 			s32 imm = s8(u8(inst >> 16));
-			LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, %s\n", "addi", reg_t, reg_s, format_imm(imm));
 			set_reg(reg_t, get_reg(reg_s)+imm);
 			break;
 		}
@@ -1648,7 +1653,6 @@ void xtensa_device::getop_and_execute()
 			u8 reg_s = BIT(inst, 8, 4);
 			u8 reg_t = BIT(inst, 4, 4);
 			s32 imm = s8(u8(inst >> 16)) * 256;
-			LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, %s\n", "addmi", reg_t , reg_s,  format_imm(imm));
 			set_reg(reg_t, get_reg(reg_s)+imm);
 			break;
 		}
@@ -1772,7 +1776,6 @@ void xtensa_device::getop_and_execute()
 		case 0b00: // CALL0
 		{
 			u32 addr = (m_pc & 0xfffffffc) + 4 + util::sext(inst >> 6, 18) * 4;
-			LOGMASKED(LOG_HANDLED_OPS, "call%-4d0x%08X\n", 0, addr);
 			u32 next = addr;
 			set_reg(0, m_nextpc);
 			m_nextpc = next;
@@ -1786,7 +1789,6 @@ void xtensa_device::getop_and_execute()
 		{
 			u32 addr = (m_pc & 0xfffffffc) + 4 + util::sext(inst >> 6, 18) * 4;
 			u8 xval = BIT(inst, 4, 2);
-			LOGMASKED(LOG_HANDLED_CALLX_OPS, "call%-4d0x%08X\n", xval * 4, addr);
 			set_callinc(xval);
 			u32 next = addr;
 			set_reg(xval*4, (m_nextpc & 0x3fffffff) | (xval << 30));
@@ -1803,7 +1805,6 @@ void xtensa_device::getop_and_execute()
 		case 0b00: // J
 		{
 			u32 newpc = m_pc + 4 + util::sext(inst >> 6, 18);
-			LOGMASKED(LOG_HANDLED_OPS, "%-8s0x%08X\n", "j", newpc);
 			m_nextpc = newpc;
 			m_pc = m_nextpc; return; // avoid loop check
 			break;
@@ -1811,48 +1812,12 @@ void xtensa_device::getop_and_execute()
 
 		case 0b01: // BZ
 		{
-			u8 reg = BIT(inst, 8, 4);
-			u32 addr = m_pc + 4 + util::sext(inst >> 12, 12);
+			if (handle_bz(inst))
+			{
+				m_pc = m_nextpc;
+				return;
+			}
 
-			switch (BIT(inst, 6, 2))
-			{
-			case 0b00:// beqz
-			{
-				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, 0x%08X\n", "beqz", reg, addr);
-				if (get_reg(reg) == 0)
-				{
-					m_nextpc = addr;
-					m_pc = m_nextpc; return; // avoid loop check
-				}
-				break;
-			}
-			case 0b01:// bnez
-			{
-				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, 0x%08X\n", "bnez", reg, addr);
-				if (get_reg(reg) != 0)
-				{
-					m_nextpc = addr;
-					m_pc = m_nextpc; return; // avoid loop check
-				}
-				break;
-			}
-			case 0b10:// bltz
-				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, 0x%08X\n", "bltz", reg, addr);
-				if (get_reg(reg) & 0x80000000)
-				{
-					m_nextpc = addr;
-					m_pc = m_nextpc; return; // avoid loop check
-				}
-				break;
-			case 0b11:// bgez
-				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, 0x%08X\n", "bgez", reg, addr);
-				if (!(get_reg(reg) & 0x80000000))
-				{
-					m_nextpc = addr;
-					m_pc = m_nextpc; return; // avoid loop check
-				}
-				break;
-			}
 			break;
 		}
 
@@ -1866,7 +1831,6 @@ void xtensa_device::getop_and_execute()
 			{
 			case 0b00: // beqi
 			{
-				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, %s, 0x%08X\n", "beqi", reg, format_imm(imm), addr);
 				if (imm == get_reg(reg))
 				{
 					m_nextpc = addr;
@@ -1876,7 +1840,6 @@ void xtensa_device::getop_and_execute()
 			}
 			case 0b01: // bnei
 			{
-				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, %s, 0x%08X\n", "bnei", reg, format_imm(imm), addr);
 				if (imm != get_reg(reg))
 				{
 					m_nextpc = addr;
@@ -1885,7 +1848,6 @@ void xtensa_device::getop_and_execute()
 				break;
 			}
 			case 0b10: // blti
-				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, %s, 0x%08X\n", "blti", reg, format_imm(imm), addr);
 				if ((s32)get_reg(reg) < (s32)imm)
 				{
 					m_nextpc = addr;
@@ -1893,7 +1855,6 @@ void xtensa_device::getop_and_execute()
 				}
 				break;
 			case 0b11: // bgei
-				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, %s, 0x%08X\n", "bgei", reg, format_imm(imm), addr);
 				if ((s32)get_reg(reg) >= (s32)imm)
 				{
 					m_nextpc = addr;
@@ -1912,7 +1873,6 @@ void xtensa_device::getop_and_execute()
 				// TODO window exception checking etc.
 				u8 reg = BIT(inst, 8, 4);
 				u32 stacksize = (inst >> 12) << 3;
-				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, %s\n", "entry", reg, format_imm(stacksize));
 				u32 stack = get_reg(reg);
 				switch_windowbase(get_callinc());
 				stack -= stacksize;
@@ -1931,7 +1891,6 @@ void xtensa_device::getop_and_execute()
 				{
 					u8 reg = BIT(inst, 8, 4);
 					u32 addr = m_pc + 4 + s8(u8(inst >> 16));
-					LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, 0x%08X\n", "loop",  reg, addr);
 					m_extreg_lcount = get_reg(reg)-1;
 					m_extreg_lbeg = m_nextpc;
 					m_extreg_lend = addr;
@@ -1942,7 +1901,6 @@ void xtensa_device::getop_and_execute()
 				{
 					u8 reg = BIT(inst, 8, 4);
 					u32 addr = m_pc + 4 + s8(u8(inst >> 16));
-					LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, 0x%08X\n", "loopnez", reg, addr );
 					m_extreg_lcount = get_reg(reg)-1;
 					m_extreg_lbeg = m_nextpc;
 					m_extreg_lend = addr;
@@ -1969,7 +1927,6 @@ void xtensa_device::getop_and_execute()
 				u8 reg = BIT(inst, 8, 4);
 				u32 imm = s_b4constu[BIT(inst, 12, 4)];
 				u32 addr = m_pc + 4 + s8(u8(inst >> 16));
-				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, %s, 0x%08X\n", "bltui", reg, format_imm(imm), addr);
 				if (get_reg(reg) < imm)
 				{
 					m_nextpc = addr;
@@ -1983,7 +1940,6 @@ void xtensa_device::getop_and_execute()
 				u8 reg = BIT(inst, 8, 4);
 				u32 imm = s_b4constu[BIT(inst, 12, 4)];
 				u32 addr = m_pc + 4 + s8(u8(inst >> 16));
-				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, %s, 0x%08X\n", "bgeui", reg, format_imm(imm), addr);
 				if (get_reg(reg) >= imm)
 				{
 					m_nextpc = addr;
@@ -2003,7 +1959,6 @@ void xtensa_device::getop_and_execute()
 			u8 reg = BIT(inst, 8, 4);
 			u8 imm =  BIT(inst, 4, 4) + (BIT(inst, 12) ? 16 : 0);
 			u32 addr = m_pc + 4 + s8(u8(inst >> 16));
-			LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, %d, 0x%08X\n", BIT(inst, 15) ? "bbsi" : "bbci", reg, imm, addr);
 			if (BIT(inst, 15)) // BBSI
 			{
 				if ((BIT(get_reg(reg), imm)))
@@ -2032,7 +1987,6 @@ void xtensa_device::getop_and_execute()
 			switch (BIT(inst, 12, 4))
 			{
 			case 0b0000:// bnone
-				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, 0x%08X\n", "bnone", as, at, addr);
 				if (!(get_reg(as) & get_reg(at)))
 				{
 					m_nextpc = addr;
@@ -2040,7 +1994,6 @@ void xtensa_device::getop_and_execute()
 				}
 				break;
 			case 0b0001:// beq
-				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, 0x%08X\n", "beq", as, at, addr);
 				if ((get_reg(as) == get_reg(at)))
 				{
 					m_nextpc = addr;
@@ -2048,7 +2001,6 @@ void xtensa_device::getop_and_execute()
 				}
 				break;
 			case 0b0010:// blt
-				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, 0x%08X\n", "blt", as, at, addr);
 				if ((s32)get_reg(as) < (s32)get_reg(at))
 				{
 					m_nextpc = addr;
@@ -2056,7 +2008,6 @@ void xtensa_device::getop_and_execute()
 				}
 				break;
 			case 0b0011:// bltu
-				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, 0x%08X\n", "bltu", as, at, addr);
 				if (get_reg(as) < get_reg(at))
 				{
 					m_nextpc = addr;
@@ -2067,7 +2018,6 @@ void xtensa_device::getop_and_execute()
 				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, 0x%08X\n", "ball", as, at, addr);
 				break;
 			case 0b0101:// bbc
-				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, 0x%08X\n", "bbc", as, at, addr);
 				if (!(BIT(get_reg(as), get_reg(at)&0x1f)))
 				{
 					m_nextpc = addr;
@@ -2082,7 +2032,6 @@ void xtensa_device::getop_and_execute()
 			//	LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, 0x%08X\n", "bbci", as, at, addr);
 			//	break;
 			case 0b1000:// bany
-				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, 0x%08X\n", "bany", as, at, addr);
 				if (get_reg(as) & get_reg(at))
 				{
 					m_nextpc = addr;
@@ -2090,7 +2039,6 @@ void xtensa_device::getop_and_execute()
 				}
 				break;
 			case 0b1001:// bne
-				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, 0x%08X\n", "bne", as, at, addr);
 				if ((get_reg(as) != get_reg(at)))
 				{
 					m_nextpc = addr;
@@ -2098,7 +2046,6 @@ void xtensa_device::getop_and_execute()
 				}
 				break;
 			case 0b1010:// bge
-				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, 0x%08X\n", "bge", as, at, addr);
 				if ((s32)get_reg(as) >= (s32)get_reg(at))
 				{
 					m_nextpc = addr;
@@ -2106,7 +2053,6 @@ void xtensa_device::getop_and_execute()
 				}
 				break;
 			case 0b1011:// bgeu
-				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, 0x%08X\n", "bgeu", as, at, addr);
 				if (get_reg(as) >= get_reg(at))
 				{
 					m_nextpc = addr;
@@ -2136,7 +2082,6 @@ void xtensa_device::getop_and_execute()
 		u8 dstreg = BIT(inst, 4, 4);
 		u8 basereg = BIT(inst, 8, 4);
 		u32 imm = BIT(inst, 12, 4) * 4;
-		LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, %s\n", "l32i.n", dstreg, basereg, format_imm(imm));
 		set_reg(dstreg, get_mem32(get_reg(basereg) + imm));
 		break;
 	}
@@ -2146,7 +2091,6 @@ void xtensa_device::getop_and_execute()
 		u8 srcreg = BIT(inst, 4, 4);
 		u8 basereg = BIT(inst, 8, 4);
 		u32 imm = BIT(inst, 12, 4) * 4;
-		LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, %s\n", "s32i.n", srcreg, basereg, format_imm(imm));
 		set_mem32(get_reg(basereg) + imm, get_reg(srcreg));
 		break;
 	}
@@ -2156,7 +2100,6 @@ void xtensa_device::getop_and_execute()
 		u8 dstreg = BIT(inst, 12, 4);
 		u8 reg_s = BIT(inst, 8, 4);
 		u8 reg_t = BIT(inst, 4, 4);
-		LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, a%d\n", "add.n", dstreg, reg_s, reg_t);
 		set_reg(dstreg, get_reg(reg_s)+get_reg(reg_t));
 		break;
 	}
@@ -2166,7 +2109,6 @@ void xtensa_device::getop_and_execute()
 		u8 dstreg = BIT(inst, 12, 4);
 		u8 srcreg = BIT(inst, 8, 4);
 		s32 imm = BIT(inst, 4, 4) == 0 ? -1 : int(BIT(inst, 4, 4));
-		LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d, %d\n", "addi.n", dstreg, srcreg, imm);
 		set_reg(dstreg, get_reg(srcreg)+imm);
 		break;
 	}
@@ -2177,7 +2119,6 @@ void xtensa_device::getop_and_execute()
 			// 7-bit immediate field uses asymmetric sign extension (range is -32..95)
 			u8 dstreg = BIT(inst, 8, 4);
 			s32 imm = int((inst & 0x0070) + BIT(inst, 12, 4) - (BIT(inst, 5, 2) == 0b11 ? 128 : 0));
-			LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, %s\n", "movi.n", dstreg, format_imm(imm));
 			set_reg(dstreg,imm);
 			break;
 		}
@@ -2188,7 +2129,6 @@ void xtensa_device::getop_and_execute()
 				// 6-bit immediate field is zero-extended (these forms can branch forward only)
 				u8 reg = BIT(inst, 8, 4);
 				u32 addr = m_pc + 4 + (inst & 0x0030) + BIT(inst, 12, 4);
-				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, 0x%08X\n", "bnez.n", reg, addr);
 				if (get_reg(reg) != 0)
 				{
 					m_nextpc = addr;
@@ -2201,7 +2141,6 @@ void xtensa_device::getop_and_execute()
 				// 6-bit immediate field is zero-extended (these forms can branch forward only)
 				u8 reg = BIT(inst, 8, 4);
 				u32 addr = m_pc + 4 + (inst & 0x0030) + BIT(inst, 12, 4);
-				LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, 0x%08X\n", "beqz.n", reg, addr);
 				if (get_reg(reg) == 0)
 				{
 					m_nextpc = addr;
@@ -2219,7 +2158,6 @@ void xtensa_device::getop_and_execute()
 		{
 			u8 dstreg = BIT(inst, 4, 4);
 			u8 srcreg = BIT(inst, 8, 4);
-			LOGMASKED(LOG_HANDLED_OPS, "%-8sa%d, a%d\n", "mov.n", dstreg, srcreg);
 			set_reg(dstreg, get_reg(srcreg));
 			break;
 		}
@@ -2229,7 +2167,6 @@ void xtensa_device::getop_and_execute()
 			{
 			case 0b0000: // RET.N
 			{
-				LOGMASKED(LOG_HANDLED_OPS, "ret.n\n");
 				m_nextpc = get_reg(0);
 				m_pc = m_nextpc; return; // avoid loop check
 				break;
@@ -2237,7 +2174,6 @@ void xtensa_device::getop_and_execute()
 
 			case 0b0001: // RETW.N (with Windowed Register Option)
 			{
-				LOGMASKED(LOG_HANDLED_OPS, "retw.n\n");
 				handle_retw();
 				break;
 			}
@@ -2247,7 +2183,7 @@ void xtensa_device::getop_and_execute()
 				break;
 
 			case 0b0011: // NOP.N
-				LOGMASKED(LOG_HANDLED_OPS, "nop.n\n");
+				// nothing
 				break;
 
 			case 0b0110: // ILL.N
@@ -2285,9 +2221,9 @@ void xtensa_device::getop_and_execute()
 
 	m_pc = m_nextpc;
 }
+
 void xtensa_device::check_interrupts()
 {
-
 	if ((m_extreg_intenable & 0x10) && (m_extreg_intset & 0x10) && (get_irqpri() < 1))
 	{
 		// high priority interrupt 3 code is here in RAM, not sure what points to it yet, needed to get out of first wait loop
@@ -2310,115 +2246,11 @@ void xtensa_device::check_interrupts()
 		set_irqpri(4);
 	}
 
-#if 0
-	if (m_extreg_intenable &= 0x16)
-	{
-		int intlevel = 3;// : 1;
-
-		if (m_irq_req_hack == 1)
-		{
-			m_irq_req_hack = 0;
-
-			// 0x2c000000 is a register window exception (4)
-			// 0x2c000040 is a register window exception (4)
-
-			// 0x2c000080 is a register window exception (8)
-			// 0x2c0000c0 is a register window exception (8)
-
-			// 0x2c000100 is a register window exception (12)
-			// 0x2c000140 is a register window exception (12)
-
-			// 0x2c000184 seems to be for an exception instead (although still uses high priority restore register 2) 
-			//            and checks intset for 2 or 4  (so level 1 interrupts are 2 and 4 in intenable?)
-			//            both 2 and 4 are enabled in intenable (0x16)
-			//            the code contains no irqclear write for 4 however? (maybe 4 is timer, cleared by writing ccompare0
-			//            but none of the code in this handler writes ccompare0)
-			// 
-			// 
-			//
-			// also checks exccause (which is the exception register) with a number of valid causes, cause 4 and cause 5 have populated code
-			// cause 4 is external irq 1? cause 5 is AllocaCause?
-			// others are dummy
-			//
-			// cause 4 has some kind of 3 priority task manager based on lists in ram? see code at 2C000688
-			// 
-			// 0x2c000194 is identical to 184
-
-			if (intlevel == 1)
-			{
-				m_extreg_epc1 = m_nextpc;
-				m_pc = 0x2c000194;
-			}
-			else if (intlevel == 2)
-			{
-				// high priority interrupt 2 code is here in RAM, checks intset reg for 1 or 8, 1 does something with ccount and loops, 8 checks 2c00001c for a pointer, it is blank by default
-				// writes 00000009 to intclear   0000008 as well as 0000001 ?  (so related to intenable/requests 0x8 and 0x1?)
-				// it also writes to ccompare0 which would clear the timer interrupt?
-
-				// intenable never has 8 or 1 set currently, so unused at this stage?
-
-				m_extreg_eps2 = m_extreg_ps;
-				m_extreg_epc2 = m_nextpc;
-				m_pc = 0x2c0001a4; 
-			}
-			else if (intlevel == 3)
-			{
-				 // high priority interrupt 3 code is here in RAM, not sure what points to it yet, needed to get out of first wait loop
-				// writes to intclear 0000010 (so related to intenable/request 0x10)
-				m_extreg_eps3 = m_extreg_ps;
-				m_extreg_epc3 = m_nextpc;
-				m_pc = 0x2c0001b4;
-			}
-			else if (intlevel == 4)
-			{
-				// high priority interrupt 4 code is here in RAM, not sure what points to it yet (no payload by default, reads a pointer from 2c00002c which is 0, so doesn't jump to it)
-				// writes to intclear 00000020  (so related to intenable/request 0x20)  -- not currently ever enabled in intenable?
-				m_extreg_eps4 = m_extreg_ps;
-				m_extreg_epc4 = m_nextpc;
-				m_pc = 0x2c0001c4; 
-			}
-			else if (intlevel == 5)
-			{
-				// high priority interrupt 5 code is here in RAM, points back to ROM where there is an infinite loop! (so not used)
-				m_extreg_eps5 = m_extreg_ps;
-				m_extreg_epc5 = m_nextpc;
-				m_pc = 0x2c0001d4; 
-			}
-		}
-	}
-#endif
-
+	// m_pc = 0x2c0001b4;
+	// m_pc = 0x2c0001c4; 
+	// m_pc = 0x2c0001d4; 
 }
 
-
-
-void xtensa_device::irq_request_hack(int which)
-{
-	if (which == 0x10)
-	{
-	//	m_irq_req_hack = 1;
-		m_extreg_intset |= 0x10;
-	}
-
-	if (which == 0x2)
-	{
-	//	m_irq_req_hack = 1;
-		m_extreg_intset |= 0x02;
-	}
-
-	if (which == 0x4)
-	{
-	//	m_irq_req_hack = 1;
-		m_extreg_intset |= 0x04;
-	}
-
-}
-
-
-void xtensa_device::irq_off_hack()
-{
-	m_extreg_intset &= ~0x04;
-}
 
 
 
@@ -2439,5 +2271,27 @@ void xtensa_device::execute_run()
 
 void xtensa_device::execute_set_input(int inputnum, int state)
 {
-	// TODO
+	if (inputnum == 0x10)
+	{
+		if (state == ASSERT_LINE)
+			m_extreg_intset |= 0x10;
+		else
+			m_extreg_intset &= ~0x10;
+	}
+
+	if (inputnum == 0x2)
+	{
+		if (state == ASSERT_LINE)
+			m_extreg_intset |= 0x02;
+		else
+			m_extreg_intset &= ~0x02;
+	}
+
+	if (inputnum == 0x4)
+	{
+		if (state == ASSERT_LINE)
+			m_extreg_intset |= 0x04;
+		else
+			m_extreg_intset &= ~0x04;
+	}
 }

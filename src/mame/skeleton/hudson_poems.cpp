@@ -40,6 +40,10 @@
 #include "screen.h"
 #include "speaker.h"
 
+#define LOG_SPRITEBASE       (1U << 1)
+
+#define VERBOSE (0)
+#include "logmacro.h"
 
 namespace {
 
@@ -348,7 +352,7 @@ void hudson_poems_state::draw_tilemap(screen_device &screen, bitmap_rgb32 &bitma
 void hudson_poems_state::spritegfx_base_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_spritegfxbase[offset]);
-	logerror("%s: spritegfx_base_w %d %08x\n", machine().describe_context(), offset, data);
+	LOGMASKED(LOG_SPRITEBASE, "%s: spritegfx_base_w %d %08x\n", machine().describe_context(), offset, data);
 }
 
 void hudson_poems_state::spritelist_base_w(offs_t offset, u32 data, u32 mem_mask)
@@ -433,7 +437,6 @@ uint32_t hudson_poems_state::poems_8020010_r()
 
 uint32_t hudson_poems_state::unk_aa04_r(offs_t offset, u32 mem_mask)
 {
-	//logerror("%s: unk_aa04_r %08x\n", machine().describe_context(), mem_mask);
 	return ((m_hackcounter++) & 0x3) ? 0xffffffff : 0;
 }
 
@@ -463,17 +466,8 @@ uint32_t hudson_poems_state::poems_8000200_r(offs_t offset, u32 mem_mask)
 	return 0x00000001;
 }
 
-/*
-uint32_t hudson_poems_state::poems_8020020_r()
-{
-    return 0xffffffff;
-}
-
-*/
-
 void hudson_poems_state::set_palette_val(int entry)
 {
-	// not actually palette, but just to visualize it for now
 	uint16_t datax = m_palram[entry];
 	int b = ((datax) & 0x001f) >> 0;
 	int g = ((datax) & 0x03e0) >> 5;
@@ -490,6 +484,13 @@ void hudson_poems_state::palette_w(offs_t offset, u32 data, u32 mem_mask)
 void hudson_poems_state::fade_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	logerror("%s: fade_w %08x %08x\n", machine().describe_context(), data, mem_mask);
+
+	u8 val = 0x1f - ((data >> 16) & 0x1f);
+
+	double intensity = (double)(val & 0x1f) / (double)0x1f;
+	for (int i = 0; i < 0x200; i++)
+		m_palette->set_pen_contrast(i, intensity);
+
 }
 
 void hudson_poems_state::unktable_w(offs_t offset, u32 data, u32 mem_mask)
@@ -523,9 +524,7 @@ void hudson_poems_state::unktable_reset_w(offs_t offset, u32 data, u32 mem_mask)
 void hudson_poems_state::unk_trigger_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	logerror("%s: unk_trigger_w %08x %08x\n", machine().describe_context(), data, mem_mask);
-	//  this needs to change in RAM, presumably from an interrupt, but no idea how to get there
-//  m_maincpu->space(AS_PROGRAM).write_byte(0x2c01d92c, 0x01);
-	m_maincpu->irq_request_hack(0x4);
+	m_maincpu->set_input_line(0x4, ASSERT_LINE);
 }
 
 
@@ -535,8 +534,6 @@ void hudson_poems_state::mainram_w(offs_t offset, u32 data, u32 mem_mask)
 
 	m_gfxdecode->gfx(2)->mark_dirty(offset / 8);
 	m_gfxdecode->gfx(3)->mark_dirty(offset / 16);
-	m_gfxdecode->gfx(4)->mark_dirty(offset / 4);
-	m_gfxdecode->gfx(5)->mark_dirty(offset / 2);
 }
 
 template<int Which>
@@ -649,25 +646,12 @@ void hudson_poems_state::mem_map(address_map &map)
 	map(0x2c000000, 0x2c03ffff).ram().w(FUNC(hudson_poems_state::mainram_w)).share("mainram");
 }
 
-const gfx_layout gfx_8x8x2 =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	2,
-	{ 0,1 },
-	{ STEP8(0,2) },
-	{ STEP8(0,16) },
-	8*16
-};
-
 static GFXDECODE_START( gfx_poems )
 	GFXDECODE_ENTRY( "maincpu", 0, gfx_8x8x4_packed_lsb, 0, 16 )
 	GFXDECODE_ENTRY( "maincpu", 0, gfx_8x8x8_raw, 0, 1 )
 
 	GFXDECODE_RAM( "mainram", 0, gfx_8x8x4_packed_lsb, 0, 32 )
 	GFXDECODE_RAM( "mainram", 0, gfx_8x8x8_raw, 0, 2 )
-	GFXDECODE_RAM( "mainram", 0, gfx_8x8x2, 0, 64 )
-	GFXDECODE_RAM( "mainram", 0, gfx_8x8x1, 0, 128 )
 GFXDECODE_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(hudson_poems_state::screen_scanline)
@@ -676,18 +660,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(hudson_poems_state::screen_scanline)
 
 	if (scanline == 100)
 	{
-		if (m_tilemapunk[0] != 1) // unlikely, this is probably just tilemap size, with 1 being 256 and 2 being 512
-			m_maincpu->irq_request_hack(0x10);
-	}
-
-	if (scanline == 200)
-	{
-		//m_maincpu->irq_request_hack(0x2);
+		if (m_tilemapunk[0] != 1) // wrong, this is probably just tilemap size, with 1 being 256 and 2 being 512, but prevents unwanted IRQs in Test Mode
+			m_maincpu->set_input_line(0x10, ASSERT_LINE);
 	}
 
 	if (scanline == 150)
 	{
-		m_maincpu->irq_off_hack();
+		m_maincpu->set_input_line(0x04, CLEAR_LINE);
 	}
 }
 
@@ -707,7 +686,7 @@ void hudson_poems_state::hudson_poems(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(hudson_poems_state::screen_scanline), "screen", 0, 1);
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_poems);
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x400);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x200);
 
 	SPEAKER(config, "speaker").front_center();
 }
@@ -727,4 +706,4 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 2005, marimba,      0,       0,      hudson_poems, hudson_poems, hudson_poems_state, init_marimba, "Konami", "Marimba Tengoku (Japan)", MACHINE_IS_SKELETON )
+CONS( 2005, marimba,      0,       0,      hudson_poems, hudson_poems, hudson_poems_state, init_marimba, "Konami", "Marimba Tengoku (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
