@@ -78,6 +78,7 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(screen_scanline);
 
+	template<int Which>	void tilemap_map(address_map &map, uint32_t base);
 	void mem_map(address_map &map);
 
 	uint32_t poems_8020010_r();
@@ -106,6 +107,9 @@ private:
 
 	template<int Layer>	uint32_t tilemap_base_r(offs_t offset, u32 mem_mask);
 	template<int Layer>	uint32_t tilemap_high_r(offs_t offset, u32 mem_mask);
+	template<int Layer>	uint32_t tilemap_unk_r(offs_t offset, u32 mem_mask);
+	template<int Layer>	uint32_t tilemap_cfg_r(offs_t offset, u32 mem_mask);
+	template<int Layer>	uint32_t tilemap_scr_r(offs_t offset, u32 mem_mask);
 
 
 	uint16_t m_unktable[256];
@@ -134,7 +138,12 @@ void hudson_poems_state::machine_start()
 	save_item(NAME(m_spritegfxbase));
 	save_item(NAME(m_tilemapbase));
 	save_item(NAME(m_tilemaphigh));
+	save_item(NAME(m_tilemapunk));
+	save_item(NAME(m_tilemapcfg));
+	save_item(NAME(m_tilemapscr));
 }
+
+
 
 void hudson_poems_state::machine_reset()
 {
@@ -142,6 +151,11 @@ void hudson_poems_state::machine_reset()
 	m_unktableoffset = 0;
 	m_hackcounter = 0;
 	m_tilemapscr[0] = 0;
+
+	for (int i = 0; i < 4; i++)
+	{
+		m_tilemapbase[i] = m_tilemaphigh[i] = m_tilemapunk[i] = m_tilemapcfg[i] = m_tilemapscr[i] = 0;
+	}
 }
 
 /*
@@ -242,6 +256,10 @@ void hudson_poems_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitma
 {
 	int width, base, bpp, gfxbase, extrapal;
 
+	// seems to get set for disabled layers
+	if (m_tilemapcfg[which] & 0x02000000)
+		return;
+
 	extrapal = 0;
 
 	if (m_tilemapunk[which] == 2)
@@ -260,35 +278,43 @@ void hudson_poems_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitma
 	// contains a full 32-bit address.  for this to work in the test mode the interrupts must be disabled as soon as test mode is entered, otherwise the pointer
 	// gets overwritten with an incorrect one.  Test mode does not require interrupts to function, although the bit we use to disable them is likely incorrect.
 	// this does NOT really seem to be tied to tilemap number, probably from a config reg
-	gfxbase = (m_spritegfxbase[which] & 0x0003ffff);
+	// this reg?
+	int whichbase = (m_tilemapcfg[which] & 0x00000060) >> 5;
+	gfxbase = (m_spritegfxbase[whichbase] & 0x0003ffff);
+
+	int yscroll = (m_tilemapscr[which] >> 16) & 0x7ff;
+	if (yscroll & 0x400)
+		yscroll -= 0x800;
+
+	int xscroll = (m_tilemapscr[which] >> 0) & 0x7ff;
+	if (xscroll & 0x400)
+		xscroll -= 0x800;
+
+	int tilemap_drawheight = ((m_tilemaphigh[which] >> 16) & 0xff);
+	int tilemap_drawwidth = ((m_tilemaphigh[which] >> 0) & 0x1ff);
 
 	// note m_tilemaphigh seems to be in pixels, we currently treat it as tiles
-	int count = 0;
-	for (int y = 0; y < ((m_tilemaphigh[which]>>16) & 0xff) / 8; y++)
-	{
-		int yscroll = (m_tilemapscr[which] >> 16) & 0x7ff;
-		if (yscroll & 0x400)
-			yscroll -= 0x800;
+	// these could actually be 'end pos' regs, with unknown start regs currently always set to 0
 
+	for (int y = 0; y < tilemap_drawheight / 8; y++)
+	{
 		int ypos = (y * 8 + yscroll) & 0x1ff;
 
-		for (int x = 0; x < width / 8 / 2; x++)
+		for (int x = 0; x < tilemap_drawwidth / 8 / 2; x++)
 		{
-			uint32_t tiles = m_mainram[base + count];
+			uint32_t tiles = m_mainram[base + (y * width / 8 / 2) + x];
+			int xpos = (x * 16 + xscroll) & 0x1ff;
 
 			if (bpp == 4)
 			{
-				draw_tile(screen, bitmap, cliprect, (tiles & 0xffff), (x * 16), ypos, gfxbase, extrapal);
-				draw_tile(screen, bitmap, cliprect, ((tiles >> 16) & 0xffff), (x * 16) + 8, ypos, gfxbase, extrapal);
+				draw_tile(screen, bitmap, cliprect, (tiles & 0xffff), xpos, ypos, gfxbase, extrapal);
+				draw_tile(screen, bitmap, cliprect, ((tiles >> 16) & 0xffff), xpos + 8, ypos, gfxbase, extrapal);
 			}
 			else if (bpp == 8)
 			{
-				draw_tile8(screen, bitmap, cliprect, (tiles & 0xffff), (x * 16), ypos, gfxbase, extrapal);
-				draw_tile8(screen, bitmap, cliprect, ((tiles >> 16) & 0xffff), (x * 16) + 8, ypos, gfxbase, extrapal);
+				draw_tile8(screen, bitmap, cliprect, (tiles & 0xffff), xpos, ypos, gfxbase, extrapal);
+				draw_tile8(screen, bitmap, cliprect, ((tiles >> 16) & 0xffff), xpos + 8, ypos, gfxbase, extrapal);
 			}
-
-			count++;
-
 		}
 	}
 }
@@ -314,9 +340,11 @@ template<int Layer> void hudson_poems_state::tilemap_scr_w(offs_t offset, u32 da
 
 template<int Layer>	uint32_t hudson_poems_state::tilemap_base_r(offs_t offset, u32 mem_mask) { return m_tilemapbase[Layer]; }
 template<int Layer>	uint32_t hudson_poems_state::tilemap_high_r(offs_t offset, u32 mem_mask) { return m_tilemaphigh[Layer]; }
+template<int Layer>	uint32_t hudson_poems_state::tilemap_unk_r(offs_t offset, u32 mem_mask) { return m_tilemapunk[Layer]; }
+template<int Layer>	uint32_t hudson_poems_state::tilemap_cfg_r(offs_t offset, u32 mem_mask) { return m_tilemapcfg[Layer]; }
+template<int Layer>	uint32_t hudson_poems_state::tilemap_scr_r(offs_t offset, u32 mem_mask) { return m_tilemapscr[Layer]; }
 
-
-
+	
 void hudson_poems_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t tile, int xx, int yy, int gfxbase, int extrapal)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(2);
@@ -326,7 +354,7 @@ void hudson_poems_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, 
 	pal += extrapal * 0x10;
 	tile &= 0x3ff;
 	tile += gfxbase / 32;
-	gfx->opaque(bitmap,cliprect,tile,pal,flipx,flipy,xx,yy);
+	gfx->transpen(bitmap,cliprect,tile,pal,flipx,flipy,xx,yy, 0);
 }
 
 void hudson_poems_state::draw_tile8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t tile, int xx, int yy, int gfxbase, int extrapal)
@@ -338,7 +366,7 @@ void hudson_poems_state::draw_tile8(screen_device &screen, bitmap_ind16 &bitmap,
 	pal += extrapal;
 	tile &= 0x3ff;
 	tile += gfxbase / 64;
-	gfx->opaque(bitmap,cliprect,tile,pal,flipx,flipy,xx,yy);
+	gfx->transpen(bitmap,cliprect,tile,pal,flipx,flipy,xx,yy, 0);
 }
 
 uint32_t hudson_poems_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -347,7 +375,7 @@ uint32_t hudson_poems_state::screen_update(screen_device &screen, bitmap_ind16 &
 	draw_tilemap(screen, bitmap, cliprect, 0);
 //	draw_tilemap(screen, bitmap, cliprect, 1); // title screen background
 //	draw_tilemap(screen, bitmap, cliprect, 2); // seems to be status bar in the game demo, but suggests that tilegfx base isn't tied to tilmap number
-//	draw_tilemap(screen, bitmap, cliprect, 3); // background for the character in game demo etc.
+	draw_tilemap(screen, bitmap, cliprect, 3); // background for the character in game demo etc.
 
 	draw_sprites(screen, bitmap, cliprect);
 
@@ -483,7 +511,26 @@ void hudson_poems_state::mainram_w(offs_t offset, u32 data, u32 mem_mask)
 	m_gfxdecode->gfx(5)->mark_dirty(offset / 2);
 }
 
-
+template<int Which>
+void hudson_poems_state::tilemap_map(address_map &map, uint32_t base)
+{
+	map(base+0x00, base+0x03).rw(FUNC(hudson_poems_state::tilemap_cfg_r<Which>), FUNC(hudson_poems_state::tilemap_cfg_w<Which>));
+	map(base+0x04, base+0x07).rw(FUNC(hudson_poems_state::tilemap_base_r<Which>), FUNC(hudson_poems_state::tilemap_base_w<Which>)); 
+	map(base+0x08, base+0x0b).rw(FUNC(hudson_poems_state::tilemap_unk_r<Which>), FUNC(hudson_poems_state::tilemap_unk_w<Which>)); // usually 1 or 2 (tilemap width in ram?)
+	map(base+0x0c, base+0x0f).ram(); // usually 0 or 1
+	map(base+0x10, base+0x13).ram(); // not used?
+	map(base+0x14, base+0x17).ram(); // not used?
+	map(base+0x18, base+0x1b).rw(FUNC(hudson_poems_state::tilemap_high_r<Which>), FUNC(hudson_poems_state::tilemap_high_w<Which>)); // top word is display height, bottom word seems to be display width
+	map(base+0x1c, base+0x1f).rw(FUNC(hudson_poems_state::tilemap_scr_r<Which>), FUNC(hudson_poems_state::tilemap_scr_w<Which>)); // top word is y scroll, bottom word is x scroll
+	map(base+0x20, base+0x23).ram(); // used, always 00001000 (maybe zoom?)
+	map(base+0x24, base+0x27).ram(); // not used?
+	map(base+0x28, base+0x2b).ram(); // not used?
+	map(base+0x2c, base+0x2f).ram(); // used, always 00001000 (maybe zoom?)
+	map(base+0x30, base+0x33).ram(); // not used?
+	map(base+0x34, base+0x37).ram(); // not used?
+	map(base+0x38, base+0x3b).ram(); // not used?
+	map(base+0x3c, base+0x3f).ram(); // not used?
+}
 
 void hudson_poems_state::mem_map(address_map &map)
 {
@@ -518,37 +565,13 @@ void hudson_poems_state::mem_map(address_map &map)
 	map(0x08000070, 0x0800007f).w(FUNC(hudson_poems_state::spritegfx_base_w)); // ^^ sometimes writes 2C009C00 (one of the tile data bases)
 
 	// registers 0x080 - 0x0bf are tilemap 0
-	map(0x08000080, 0x08000083).w(FUNC(hudson_poems_state::tilemap_cfg_w<0>)); // also a similar time to palette uploads
-	map(0x08000084, 0x08000087).rw(FUNC(hudson_poems_state::tilemap_base_r<0>), FUNC(hudson_poems_state::tilemap_base_w<0>)); 
-	map(0x08000088, 0x0800008b).w(FUNC(hudson_poems_state::tilemap_unk_w<0>));
-	map(0x0800008c, 0x08000097).ram();
-	map(0x08000098, 0x0800009b).rw(FUNC(hudson_poems_state::tilemap_high_r<0>), FUNC(hudson_poems_state::tilemap_high_w<0>));
-	map(0x0800009c, 0x0800009f).w(FUNC(hudson_poems_state::tilemap_scr_w<0>));
-	map(0x080000a0, 0x080000bf).ram();
+	tilemap_map<0>(map, 0x08000080);
 	// registers 0x0c0 - 0x0ff are tilemap 1
-	map(0x080000c0, 0x080000c3).w(FUNC(hudson_poems_state::tilemap_cfg_w<1>)); 
-	map(0x080000c4, 0x080000c7).rw(FUNC(hudson_poems_state::tilemap_base_r<1>), FUNC(hudson_poems_state::tilemap_base_w<1>)); 
-	map(0x080000c8, 0x080000cb).w(FUNC(hudson_poems_state::tilemap_unk_w<1>));
-	map(0x080000cc, 0x080000d7).ram();
-	map(0x080000d8, 0x080000db).w(FUNC(hudson_poems_state::tilemap_high_w<1>));
-	map(0x080000dc, 0x080000df).w(FUNC(hudson_poems_state::tilemap_scr_w<1>));
-	map(0x080000e0, 0x080000ff).ram();
+	tilemap_map<1>(map, 0x080000c0);
 	// registers 0x100 - 0x13f are tilemap 2
-	map(0x08000100, 0x08000103).w(FUNC(hudson_poems_state::tilemap_cfg_w<2>)); 
-	map(0x08000104, 0x08000107).rw(FUNC(hudson_poems_state::tilemap_base_r<2>), FUNC(hudson_poems_state::tilemap_base_w<2>)); 
-	map(0x08000108, 0x0800010b).w(FUNC(hudson_poems_state::tilemap_unk_w<2>));
-	map(0x0800010c, 0x08000117).ram();
-	map(0x08000118, 0x0800011b).w(FUNC(hudson_poems_state::tilemap_high_w<2>));
-	map(0x0800011c, 0x0800012f).w(FUNC(hudson_poems_state::tilemap_scr_w<2>));
-	map(0x08000120, 0x0800013f).ram();
+	tilemap_map<2>(map, 0x08000100);
 	// registers 0x140 - 0x17f are tilemap 3
-	map(0x08000140, 0x08000143).w(FUNC(hudson_poems_state::tilemap_cfg_w<3>)); 
-	map(0x08000144, 0x08000147).rw(FUNC(hudson_poems_state::tilemap_base_r<3>), FUNC(hudson_poems_state::tilemap_base_w<3>)); 
-	map(0x08000148, 0x0800014b).w(FUNC(hudson_poems_state::tilemap_unk_w<3>));
-	map(0x0800014c, 0x08000157).ram();
-	map(0x08000158, 0x0800015b).w(FUNC(hudson_poems_state::tilemap_high_w<3>));
-	map(0x0800015c, 0x0800016f).w(FUNC(hudson_poems_state::tilemap_scr_w<3>));
-	map(0x08000160, 0x0800017f).ram();
+	tilemap_map<3>(map, 0x08000140);
 
 	// registers at 0x180 are sprites
 
