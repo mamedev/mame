@@ -69,28 +69,28 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void draw_tile(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t tile, int xx, int yy, int gfxbase, int extrapal);
-	void draw_tile8(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t tile, int xx, int yy, int gfxbase, int extrapal);
+	void draw_tile(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 tile, int xx, int yy, int gfxbase, int extrapal);
+	void draw_tile8(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 tile, int xx, int yy, int gfxbase, int extrapal);
 
 	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_tilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int which, int priority);
 
-	uint32_t poems_random_r();
+	u32 poems_random_r();
 	void unk_trigger_w(offs_t offset, u32 data, u32 mem_mask);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(screen_scanline);
 
-	template<int Which>	void tilemap_map(address_map &map, uint32_t base);
+	template<int Which> void tilemap_map(address_map &map, u32 base);
 	void mem_map(address_map &map);
 
-	uint32_t poems_8020010_r();
-	uint32_t poems_count_r();
-	uint32_t poems_unk_r();
-	uint32_t poems_8000038_r(offs_t offset, u32 mem_mask);
-	uint32_t poems_8000200_r(offs_t offset, u32 mem_mask);
-	uint32_t unk_aa04_r(offs_t offset, u32 mem_mask);
+	u32 poems_8020010_r();
+	u32 poems_count_r();
+	u32 poems_unk_r();
+	u32 poems_8000038_r(offs_t offset, u32 mem_mask);
+	u32 poems_8000200_r(offs_t offset, u32 mem_mask);
+	u32 unk_aa04_r(offs_t offset, u32 mem_mask);
 	void unk_aa00_w(offs_t offset, u32 data, u32 mem_mask);
 
 	void fade_w(offs_t offset, u32 data, u32 mem_mask);
@@ -104,30 +104,29 @@ private:
 	void spritelist_base_w(offs_t offset, u32 data, u32 mem_mask);
 
 	template<int Layer> void tilemap_base_w(offs_t offset, u32 data, u32 mem_mask);
-	template<int Layer>	void tilemap_unk_w(offs_t offset, u32 data, u32 mem_mask);
-	template<int Layer>	void tilemap_cfg_w(offs_t offset, u32 data, u32 mem_mask);
-	template<int Layer>	void tilemap_scr_w(offs_t offset, u32 data, u32 mem_mask);
-	template<int Layer>	void tilemap_high_w(offs_t offset, u32 data, u32 mem_mask);
+	template<int Layer> void tilemap_unk_w(offs_t offset, u32 data, u32 mem_mask);
+	template<int Layer> void tilemap_cfg_w(offs_t offset, u32 data, u32 mem_mask);
+	template<int Layer> void tilemap_scr_w(offs_t offset, u32 data, u32 mem_mask);
+	template<int Layer> void tilemap_high_w(offs_t offset, u32 data, u32 mem_mask);
 
-	template<int Layer>	uint32_t tilemap_base_r(offs_t offset, u32 mem_mask);
-	template<int Layer>	uint32_t tilemap_high_r(offs_t offset, u32 mem_mask);
-	template<int Layer>	uint32_t tilemap_unk_r(offs_t offset, u32 mem_mask);
-	template<int Layer>	uint32_t tilemap_cfg_r(offs_t offset, u32 mem_mask);
-	template<int Layer>	uint32_t tilemap_scr_r(offs_t offset, u32 mem_mask);
+	template<int Layer> u32 tilemap_base_r(offs_t offset, u32 mem_mask);
+	template<int Layer> u32 tilemap_high_r(offs_t offset, u32 mem_mask);
+	template<int Layer> u32 tilemap_unk_r(offs_t offset, u32 mem_mask);
+	template<int Layer> u32 tilemap_cfg_r(offs_t offset, u32 mem_mask);
+	template<int Layer> u32 tilemap_scr_r(offs_t offset, u32 mem_mask);
 
+	u16 m_unktable[256];
+	u16 m_unktableoffset;
 
-	uint16_t m_unktable[256];
-	uint16_t m_unktableoffset;
+	u32 m_spritegfxbase[4];
+	u32 m_spritelistbase;
+	u32 m_tilemapbase[4];
+	u32 m_tilemapunk[4];
+	u32 m_tilemapcfg[4];
+	u32 m_tilemapscr[4];
+	u32 m_tilemaphigh[4];
 
-	uint32_t m_spritegfxbase[4];
-	uint32_t m_spritelistbase;
-	uint32_t m_tilemapbase[4];
-	uint32_t m_tilemapunk[4];
-	uint32_t m_tilemapcfg[4];
-	uint32_t m_tilemapscr[4];
-	uint32_t m_tilemaphigh[4];
-
-	int m_hackcounter;
+	s32 m_hackcounter;
 
 	required_device<xtensa_device> m_maincpu;
 	required_device<palette_device> m_palette;
@@ -139,26 +138,31 @@ private:
 
 void hudson_poems_state::machine_start()
 {
+	save_item(NAME(m_unktable));
+	save_item(NAME(m_unktableoffset));
+
 	save_item(NAME(m_spritegfxbase));
+	save_item(NAME(m_spritelistbase));
+
 	save_item(NAME(m_tilemapbase));
-	save_item(NAME(m_tilemaphigh));
 	save_item(NAME(m_tilemapunk));
 	save_item(NAME(m_tilemapcfg));
 	save_item(NAME(m_tilemapscr));
+	save_item(NAME(m_tilemaphigh));
+
+	save_item(NAME(m_hackcounter));
 }
 
 
 
 void hudson_poems_state::machine_reset()
 {
-	m_maincpu->set_pc(0x00000040);
 	m_unktableoffset = 0;
 	m_hackcounter = 0;
-	m_tilemapscr[0] = 0;
 
 	for (int i = 0; i < 4; i++)
 	{
-		m_tilemapbase[i] = m_tilemaphigh[i] = m_tilemapunk[i] = m_tilemapcfg[i] = m_tilemapscr[i] = 0;
+		m_spritegfxbase[i] = m_tilemapbase[i] = m_tilemaphigh[i] = m_tilemapunk[i] = m_tilemapcfg[i] = m_tilemapscr[i] = 0;
 	}
 }
 
@@ -190,10 +194,10 @@ void hudson_poems_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitma
 	for (int i = 0; i < 64; i++)
 	{
 		int tilebase;
-		uint16_t spriteword0 = m_mainram[(spritebase + i * 2) + 0] & 0xffff;
-		uint16_t spriteword1 = m_mainram[(spritebase + i * 2) + 0] >> 16;
-		uint16_t spriteword2 = m_mainram[(spritebase + i * 2) + 1] & 0xffff;
-		uint16_t spriteword3 = m_mainram[(spritebase + i * 2) + 1] >> 16;
+		u16 spriteword0 = m_mainram[(spritebase + i * 2) + 0] & 0xffff;
+		u16 spriteword1 = m_mainram[(spritebase + i * 2) + 0] >> 16;
+		u16 spriteword2 = m_mainram[(spritebase + i * 2) + 1] & 0xffff;
+		u16 spriteword3 = m_mainram[(spritebase + i * 2) + 1] >> 16;
 
 		int x = (spriteword3 & 0x03ff);
 		int y = (spriteword2 & 0x03ff);
@@ -202,7 +206,7 @@ void hudson_poems_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitma
 
 		// is it selecting from multiple tile pages (which can have different bases?) (probably from a register somewhere)
 		tilebase = (m_spritegfxbase[(spriteword0 & 0x0300)>>8] & 0x0003ffff) / 32; // m_spritegfxbase contains a full memory address pointer to RAM
-	
+
 		tilenum += tilebase;
 
 		/* based on code analysis of function at 006707A4
@@ -252,7 +256,7 @@ void hudson_poems_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitma
 					else
 						gfx->alpha(bitmap, cliprect, basetilenum + xx + (yy * 0x20), pal, flipx, flipy, xpos, ypos, 0, 0xff-(alpha<<4));
 
-				}	
+				}
 			}
 		}
 	}
@@ -330,7 +334,7 @@ void hudson_poems_state::draw_tilemap(screen_device &screen, bitmap_rgb32 &bitma
 
 		for (int x = 0; x < tilemap_drawwidth / 8 / 2; x++)
 		{
-			uint32_t tiles = m_mainram[base + (y * width / 8 / 2) + x];
+			u32 tiles = m_mainram[base + (y * width / 8 / 2) + x];
 			int xpos = (x * 16 + xscroll) & 0x1ff;
 
 			if (bpp == 4)
@@ -361,19 +365,19 @@ void hudson_poems_state::spritelist_base_w(offs_t offset, u32 data, u32 mem_mask
 }
 
 template<int Layer> void hudson_poems_state::tilemap_base_w(offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_tilemapbase[Layer]); }
-template<int Layer> void hudson_poems_state::tilemap_cfg_w(offs_t offset, u32 data, u32 mem_mask) {	COMBINE_DATA(&m_tilemapcfg[Layer]); }
-template<int Layer> void hudson_poems_state::tilemap_unk_w(offs_t offset, u32 data, u32 mem_mask) {	COMBINE_DATA(&m_tilemapunk[Layer]); }
+template<int Layer> void hudson_poems_state::tilemap_cfg_w(offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_tilemapcfg[Layer]); }
+template<int Layer> void hudson_poems_state::tilemap_unk_w(offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_tilemapunk[Layer]); }
 template<int Layer> void hudson_poems_state::tilemap_high_w(offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_tilemaphigh[Layer]); }
-template<int Layer> void hudson_poems_state::tilemap_scr_w(offs_t offset, u32 data, u32 mem_mask) {	COMBINE_DATA(&m_tilemapscr[Layer]); }
+template<int Layer> void hudson_poems_state::tilemap_scr_w(offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_tilemapscr[Layer]); }
 
-template<int Layer>	uint32_t hudson_poems_state::tilemap_base_r(offs_t offset, u32 mem_mask) { return m_tilemapbase[Layer]; }
-template<int Layer>	uint32_t hudson_poems_state::tilemap_high_r(offs_t offset, u32 mem_mask) { return m_tilemaphigh[Layer]; }
-template<int Layer>	uint32_t hudson_poems_state::tilemap_unk_r(offs_t offset, u32 mem_mask) { return m_tilemapunk[Layer]; }
-template<int Layer>	uint32_t hudson_poems_state::tilemap_cfg_r(offs_t offset, u32 mem_mask) { return m_tilemapcfg[Layer]; }
-template<int Layer>	uint32_t hudson_poems_state::tilemap_scr_r(offs_t offset, u32 mem_mask) { return m_tilemapscr[Layer]; }
+template<int Layer> u32 hudson_poems_state::tilemap_base_r(offs_t offset, u32 mem_mask) { return m_tilemapbase[Layer]; }
+template<int Layer> u32 hudson_poems_state::tilemap_high_r(offs_t offset, u32 mem_mask) { return m_tilemaphigh[Layer]; }
+template<int Layer> u32 hudson_poems_state::tilemap_unk_r(offs_t offset, u32 mem_mask) { return m_tilemapunk[Layer]; }
+template<int Layer> u32 hudson_poems_state::tilemap_cfg_r(offs_t offset, u32 mem_mask) { return m_tilemapcfg[Layer]; }
+template<int Layer> u32 hudson_poems_state::tilemap_scr_r(offs_t offset, u32 mem_mask) { return m_tilemapscr[Layer]; }
 
-	
-void hudson_poems_state::draw_tile(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t tile, int xx, int yy, int gfxbase, int extrapal)
+
+void hudson_poems_state::draw_tile(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 tile, int xx, int yy, int gfxbase, int extrapal)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(2);
 	int flipx = tile & 0x0800;
@@ -385,7 +389,7 @@ void hudson_poems_state::draw_tile(screen_device &screen, bitmap_rgb32 &bitmap, 
 	gfx->transpen(bitmap,cliprect,tile,pal,flipx,flipy,xx,yy, 0);
 }
 
-void hudson_poems_state::draw_tile8(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t tile, int xx, int yy, int gfxbase, int extrapal)
+void hudson_poems_state::draw_tile8(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 tile, int xx, int yy, int gfxbase, int extrapal)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(3);
 	int flipx = tile & 0x0800;
@@ -397,7 +401,7 @@ void hudson_poems_state::draw_tile8(screen_device &screen, bitmap_rgb32 &bitmap,
 	gfx->transpen(bitmap,cliprect,tile,pal,flipx,flipy,xx,yy, 0);
 }
 
-uint32_t hudson_poems_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 hudson_poems_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 
@@ -414,28 +418,28 @@ uint32_t hudson_poems_state::screen_update(screen_device &screen, bitmap_rgb32 &
 	return 0;
 }
 
-uint32_t hudson_poems_state::poems_unk_r()
+u32 hudson_poems_state::poems_unk_r()
 {
 	return 0x00000000;
 }
 
-uint32_t hudson_poems_state::poems_random_r()
+u32 hudson_poems_state::poems_random_r()
 {
 	return machine().rand();
 }
 
 
-uint32_t hudson_poems_state::poems_count_r()
+u32 hudson_poems_state::poems_count_r()
 {
 	return ((m_hackcounter++) & 0x3) ? 0xffffffff : 0;
 }
 
-uint32_t hudson_poems_state::poems_8020010_r()
+u32 hudson_poems_state::poems_8020010_r()
 {
 	return 0x4;
 }
 
-uint32_t hudson_poems_state::unk_aa04_r(offs_t offset, u32 mem_mask)
+u32 hudson_poems_state::unk_aa04_r(offs_t offset, u32 mem_mask)
 {
 	return ((m_hackcounter++) & 0x3) ? 0xffffffff : 0;
 }
@@ -445,7 +449,7 @@ void hudson_poems_state::unk_aa00_w(offs_t offset, u32 data, u32 mem_mask)
 	logerror("%s: unk_aa00_w %08x %08x\n", machine().describe_context(), data, mem_mask);
 }
 
-uint32_t hudson_poems_state::poems_8000038_r(offs_t offset, u32 mem_mask)
+u32 hudson_poems_state::poems_8000038_r(offs_t offset, u32 mem_mask)
 {
 	if (!machine().side_effects_disabled())
 		if (m_maincpu->pc() != 0x2c000b5a)
@@ -457,7 +461,7 @@ uint32_t hudson_poems_state::poems_8000038_r(offs_t offset, u32 mem_mask)
 		return 0x00000000;
 }
 
-uint32_t hudson_poems_state::poems_8000200_r(offs_t offset, u32 mem_mask)
+u32 hudson_poems_state::poems_8000200_r(offs_t offset, u32 mem_mask)
 {
 	if (!machine().side_effects_disabled())
 		logerror("%s: poems_8000200_r %08x\n", machine().describe_context(), mem_mask);
@@ -468,7 +472,7 @@ uint32_t hudson_poems_state::poems_8000200_r(offs_t offset, u32 mem_mask)
 
 void hudson_poems_state::set_palette_val(int entry)
 {
-	uint16_t datax = m_palram[entry];
+	u16 datax = m_palram[entry];
 	int b = ((datax) & 0x001f) >> 0;
 	int g = ((datax) & 0x03e0) >> 5;
 	int r = ((datax) & 0x7c00) >> 10;
@@ -537,10 +541,10 @@ void hudson_poems_state::mainram_w(offs_t offset, u32 data, u32 mem_mask)
 }
 
 template<int Which>
-void hudson_poems_state::tilemap_map(address_map &map, uint32_t base)
+void hudson_poems_state::tilemap_map(address_map &map, u32 base)
 {
 	map(base+0x00, base+0x03).rw(FUNC(hudson_poems_state::tilemap_cfg_r<Which>), FUNC(hudson_poems_state::tilemap_cfg_w<Which>));
-	map(base+0x04, base+0x07).rw(FUNC(hudson_poems_state::tilemap_base_r<Which>), FUNC(hudson_poems_state::tilemap_base_w<Which>)); 
+	map(base+0x04, base+0x07).rw(FUNC(hudson_poems_state::tilemap_base_r<Which>), FUNC(hudson_poems_state::tilemap_base_w<Which>));
 	map(base+0x08, base+0x0b).rw(FUNC(hudson_poems_state::tilemap_unk_r<Which>), FUNC(hudson_poems_state::tilemap_unk_w<Which>)); // usually 1 or 2 (tilemap width in ram?)
 	map(base+0x0c, base+0x0f).ram(); // usually 0 or 1
 	map(base+0x10, base+0x13).ram(); // not used?
@@ -675,6 +679,20 @@ void hudson_poems_state::hudson_poems(machine_config &config)
 	// 27Mhz XTAL, Xtensa based CPU
 	XTENSA(config, m_maincpu, 27_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &hudson_poems_state::mem_map);
+	// the vectors can be configured when the CPU is manufactured, so treat as config options
+	m_maincpu->set_startupvector(0x00000040);
+	m_maincpu->set_irq_vector(4, 0x2c0001b4); // 0x10
+	m_maincpu->set_irq_vector(1, 0x2c000194); // 0x02
+	m_maincpu->set_irq_vector(2, 0x2c000194); // 0x04
+	// 0x2c0001b4 these are also valid vectors
+	// 0x2c0001c4
+	// 0x2c0001d4
+	// 0x2c000000 is a register window exception (4)
+	// 0x2c000040 is a register window exception (4)
+	// 0x2c000080 is a register window exception (8)
+	// 0x2c0000c0 is a register window exception (8)
+	// 0x2c000100 is a register window exception (12)
+	// 0x2c000140 is a register window exception (12)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);

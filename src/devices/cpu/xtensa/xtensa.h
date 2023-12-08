@@ -29,6 +29,16 @@ public:
 		XTENSA_A12, XTENSA_A13, XTENSA_A14, XTENSA_A15,
 	};
 
+	void set_irq_vector(int bit, u32 vector)
+	{
+		m_irq_vectors[bit] = vector;
+	}
+
+	void set_startupvector(u32 vector)
+	{
+		m_startupvector = vector;
+	}
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -190,6 +200,9 @@ private:
 
 	// config
 	u32 m_num_physical_regs;
+
+	u32 m_irq_vectors[32];
+	u32 m_startupvector;
 };
 
 DECLARE_DEVICE_TYPE(XTENSA, xtensa_device)

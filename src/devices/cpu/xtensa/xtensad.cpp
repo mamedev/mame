@@ -627,7 +627,7 @@ offs_t xtensa_disassembler::disassemble(std::ostream &stream, offs_t pc, const x
 					break;
 
 				case 0b0011: // DIU (with Data Cache Index Lock Option)
-					util::stream_format(stream, "%-8sa%d, %s", "diu", BIT(inst, 8, 4), format_imm((inst >> 20) * 4));	
+					util::stream_format(stream, "%-8sa%d, %s", "diu", BIT(inst, 8, 4), format_imm((inst >> 20) * 4));
 					break;
 
 				case 0b0100: // DIWB (added in T1050)
@@ -685,7 +685,7 @@ offs_t xtensa_disassembler::disassemble(std::ostream &stream, offs_t pc, const x
 		if (BIT(inst, 12, 2) == 0)
 		{
 			// LSI, SSI, LSIU, SSIU
-			util::stream_format(stream, "%-8sf%d, a%d, %s", s_lsci_ops[BIT(inst, 14, 2)], BIT(inst, 4, 4), BIT(inst, 8, 4), format_imm(BIT(inst, 16, 8) * 4));	
+			util::stream_format(stream, "%-8sf%d, a%d, %s", s_lsci_ops[BIT(inst, 14, 2)], BIT(inst, 4, 4), BIT(inst, 8, 4), format_imm(BIT(inst, 16, 8) * 4));
 			return 3 | SUPPORTED;
 		}
 		else
