@@ -96,7 +96,10 @@ private:
 
 	void spritegfx_base_w(offs_t offset, u32 data, u32 mem_mask);
 	void spritelist_base_w(offs_t offset, u32 data, u32 mem_mask);
-	void tilemap_base_w(offs_t offset, u32 data, u32 mem_mask);
+	void tilemap_base_0_w(offs_t offset, u32 data, u32 mem_mask);
+	void tilemap_base_1_w(offs_t offset, u32 data, u32 mem_mask);
+	void tilemap_base_2_w(offs_t offset, u32 data, u32 mem_mask);
+	void tilemap_base_3_w(offs_t offset, u32 data, u32 mem_mask);
 	void tilemap_unk_w(offs_t offset, u32 data, u32 mem_mask);
 	void tilemap_cfg_w(offs_t offset, u32 data, u32 mem_mask);
 	void tilemap_scr_w(offs_t offset, u32 data, u32 mem_mask);
@@ -107,7 +110,7 @@ private:
 
 	uint32_t m_spritegfxbase[4];
 	uint32_t m_spritelistbase;
-	uint32_t m_tilemapbase;
+	uint32_t m_tilemapbase[4];
 	uint32_t m_tilemapunk;
 	uint32_t m_tilemapscr;
 
@@ -124,7 +127,7 @@ private:
 void hudson_poems_state::machine_start()
 {
 	save_item(NAME(m_spritegfxbase));
-
+	save_item(NAME(m_tilemapbase));
 }
 
 void hudson_poems_state::machine_reset()
@@ -235,9 +238,24 @@ void hudson_poems_state::spritegfx_base_w(offs_t offset, u32 data, u32 mem_mask)
 	logerror("%s: spritegfx_base_w %d %08x\n", machine().describe_context(), offset, data);
 }
 
-void hudson_poems_state::tilemap_base_w(offs_t offset, u32 data, u32 mem_mask)
+void hudson_poems_state::tilemap_base_0_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	COMBINE_DATA(&m_tilemapbase);
+	COMBINE_DATA(&m_tilemapbase[0]);
+}
+
+void hudson_poems_state::tilemap_base_1_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	COMBINE_DATA(&m_tilemapbase[1]);
+}
+
+void hudson_poems_state::tilemap_base_2_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	COMBINE_DATA(&m_tilemapbase[2]);
+}
+
+void hudson_poems_state::tilemap_base_3_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	COMBINE_DATA(&m_tilemapbase[3]);
 }
 
 void hudson_poems_state::tilemap_cfg_w(offs_t offset, u32 data, u32 mem_mask)
@@ -321,7 +339,7 @@ uint32_t hudson_poems_state::screen_update(screen_device &screen, bitmap_ind16 &
 	}
 
 	// contains a full 32-bit address
-	base = (m_tilemapbase & 0x0003ffff) / 4;
+	base = (m_tilemapbase[0] & 0x0003ffff) / 4;
 
 	// contains a full 32-bit address.  for this to work in the test mode the interrupts must be disabled as soon as test mode is entered, otherwise the pointer
 	// gets overwritten with an incorrect one.  Test mode does not require interrupts to function, although the bit we use to disable them is likely incorrect.
@@ -514,14 +532,14 @@ void hudson_poems_state::mem_map(address_map &map)
 	map(0x00000000, 0x007fffff).mirror(0x20000000).rom().region("maincpu", 0);
 
 	/////////////////// unknown
-	map(0x04000040, 0x04000043).r(FUNC(hudson_poems_state::poems_random_r));
-	map(0x04000140, 0x04000143).r(FUNC(hudson_poems_state::poems_random_r));
-	map(0x04000240, 0x04000243).r(FUNC(hudson_poems_state::poems_random_r));
-	map(0x04000340, 0x04000343).r(FUNC(hudson_poems_state::poems_random_r));
+	map(0x04000040, 0x04000043).r(FUNC(hudson_poems_state::poems_random_r)).nopw();
+	map(0x04000140, 0x04000143).r(FUNC(hudson_poems_state::poems_random_r)).nopw();
+	map(0x04000240, 0x04000243).r(FUNC(hudson_poems_state::poems_random_r)).nopw();
+	map(0x04000340, 0x04000343).r(FUNC(hudson_poems_state::poems_random_r)).nopw();
 
 	//map(0x04000324, 0x04000327).nopw(); // uploads a table here from ROM after uploading fixed values from ROM to some other addresses
 	map(0x0400033c, 0x0400033f).w(FUNC(hudson_poems_state::unk_trigger_w)); // maybe DMA?
-	map(0x04001000, 0x04001003).r(FUNC(hudson_poems_state::poems_random_r));
+	map(0x04001000, 0x04001003).r(FUNC(hudson_poems_state::poems_random_r)).nopw();
 
 
 	map(0x0400100c, 0x0400100f).nopr(); // read in various places at end of calls, every frame, but result seems to go unused?
@@ -541,8 +559,11 @@ void hudson_poems_state::mem_map(address_map &map)
 	// are these runtime registers, or DMA sources?
 	map(0x08000070, 0x0800007f).w(FUNC(hudson_poems_state::spritegfx_base_w)); // ^^ sometimes writes 2C009C00 (one of the tile data bases)
 
+
+	// registers 0x080 - 0x0bf are tilemap 0
+
 	map(0x08000080, 0x08000083).w(FUNC(hudson_poems_state::tilemap_cfg_w)); // also a similar time to palette uploads
-	map(0x08000084, 0x08000087).w(FUNC(hudson_poems_state::tilemap_base_w)); 
+	map(0x08000084, 0x08000087).w(FUNC(hudson_poems_state::tilemap_base_0_w)); 
 	map(0x08000088, 0x0800008b).w(FUNC(hudson_poems_state::tilemap_unk_w));
 	//map(0x0800008c, 0x0800008f).nopw(); 
 	//map(0x08000090, 0x08000093).nopw();
@@ -554,7 +575,21 @@ void hudson_poems_state::mem_map(address_map &map)
 	//map(0x080000a8, 0x080000ab).nopw();
 	//map(0x080000ac, 0x080000af).nopw();
 
-	//map(0x08000180, 0x08000183).nopw(); // gets set to 0000007F on startup
+	// registers 0x0c0 - 0x0ff are tilemap 1
+
+	map(0x080000c4, 0x080000c7).w(FUNC(hudson_poems_state::tilemap_base_1_w)); 
+
+	// registers 0x180 - 0x13f are tilemap 2
+
+	map(0x08000104, 0x08000107).w(FUNC(hudson_poems_state::tilemap_base_2_w)); 
+
+	// registers 0x140 - 0x17f are tilemap 3
+
+	map(0x08000144, 0x08000147).w(FUNC(hudson_poems_state::tilemap_base_3_w)); 
+
+	// registers at 0x180 are sprites
+
+	//map(0x08000180, 0x08000183).nopw(); // gets set to 0000007F on startup (list length?)
 	map(0x08000184, 0x08000187).w(FUNC(hudson_poems_state::spritelist_base_w)); // gets set to 2C009400 on startup
 
 	map(0x08000800, 0x08000fff).ram().w(FUNC(hudson_poems_state::palette_w)).share("palram");
