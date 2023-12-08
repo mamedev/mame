@@ -706,7 +706,7 @@ void rom_load_manager::region_post_process(memory_region *region, bool invert, b
 		for (int i = 0; i < region->bytes(); i++)
 		{
 			*base = bitswap<8>(*base, 0, 1, 2, 3, 4, 5, 6, 7);
-			*base++;
+			base++;
 		}
 	}
 
