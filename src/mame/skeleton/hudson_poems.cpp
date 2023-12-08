@@ -65,13 +65,13 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t tile, int xx, int yy, int gfxbase, int extrapal);
-	void draw_tile8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t tile, int xx, int yy, int gfxbase, int extrapal);
+	void draw_tile(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t tile, int xx, int yy, int gfxbase, int extrapal);
+	void draw_tile8(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t tile, int xx, int yy, int gfxbase, int extrapal);
 
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int priority);
+	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_tilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int which, int priority);
 
 	uint32_t poems_random_r();
 	void unk_trigger_w(offs_t offset, u32 data, u32 mem_mask);
@@ -178,7 +178,7 @@ static INPUT_PORTS_START( hudson_poems )
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("Green")
 INPUT_PORTS_END
 
-void hudson_poems_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void hudson_poems_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int spritebase = (m_spritelistbase & 0x0003ffff) / 4;
 	gfx_element *gfx = m_gfxdecode->gfx(2);
@@ -202,18 +202,23 @@ void hudson_poems_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitma
 		tilenum += tilebase;
 
 		/* based on code analysis of function at 006707A4
-		word0 ( 0abb bbBB ---- -dFf ) OR ( 1abb bbcc dddd dddd ) BB = sprite base  F = flipX f = flipY
+		word0 ( 0abb bbBB ---- -dFf ) OR ( 1abb bbcc dddd dddd ) a = ?  b = alpha blend? (toggles between all bits on and off for battery logo) BB = sprite base  F = flipX f = flipY
 		word1 ( wwhh ---t tttt tttt ) - other bits are used, but pulled from ram? t = tile number?  ww = width hh = height
 		word2 ( 0Ppp ppyy yyyy yyyy ) P = palette bank p = palette y = ypos
 		word3 ( aabb bbxx xxxx xxxx ) x = xpos
 		*/
 
+		int alpha = (spriteword0 & 0x3c00)>>10;
 		int flipx = spriteword0 & 2;
 		int flipy = spriteword0 & 1;
 		int height = (spriteword1 & 0x3000)>>12;
 		height = 1 << height;
 		int width = (spriteword1 & 0xc000)>>14;
 		width = 1 << width;
+
+		if (alpha == 0x00)
+			continue;
+
 
 		if (spriteword0 & 0x8000)
 		{
@@ -238,7 +243,11 @@ void hudson_poems_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitma
 					else
 						ypos = y + (((height-1) * 8) - yy * 8);
 
-					gfx->transpen(bitmap, cliprect, basetilenum + xx + (yy * 0x20), pal, flipx, flipy, xpos, ypos, 0);
+					if (alpha == 0xf)
+						gfx->transpen(bitmap, cliprect, basetilenum + xx + (yy * 0x20), pal, flipx, flipy, xpos, ypos, 0);
+					else
+						gfx->alpha(bitmap, cliprect, basetilenum + xx + (yy * 0x20), pal, flipx, flipy, xpos, ypos, 0, 0xff-(alpha<<4));
+
 				}	
 			}
 		}
@@ -252,7 +261,7 @@ void hudson_poems_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitma
 	*/
 }
 
-void hudson_poems_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int priority)
+void hudson_poems_state::draw_tilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int which, int priority)
 {
 	int width, base, bpp, gfxbase, extrapal;
 
@@ -360,7 +369,7 @@ template<int Layer>	uint32_t hudson_poems_state::tilemap_cfg_r(offs_t offset, u3
 template<int Layer>	uint32_t hudson_poems_state::tilemap_scr_r(offs_t offset, u32 mem_mask) { return m_tilemapscr[Layer]; }
 
 	
-void hudson_poems_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t tile, int xx, int yy, int gfxbase, int extrapal)
+void hudson_poems_state::draw_tile(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t tile, int xx, int yy, int gfxbase, int extrapal)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(2);
 	int flipx = tile & 0x0800;
@@ -372,7 +381,7 @@ void hudson_poems_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, 
 	gfx->transpen(bitmap,cliprect,tile,pal,flipx,flipy,xx,yy, 0);
 }
 
-void hudson_poems_state::draw_tile8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t tile, int xx, int yy, int gfxbase, int extrapal)
+void hudson_poems_state::draw_tile8(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t tile, int xx, int yy, int gfxbase, int extrapal)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(3);
 	int flipx = tile & 0x0800;
@@ -384,7 +393,7 @@ void hudson_poems_state::draw_tile8(screen_device &screen, bitmap_ind16 &bitmap,
 	gfx->transpen(bitmap,cliprect,tile,pal,flipx,flipy,xx,yy, 0);
 }
 
-uint32_t hudson_poems_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t hudson_poems_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 
@@ -691,10 +700,9 @@ void hudson_poems_state::hudson_poems(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(320, 240); // resolution not confirmed
+	screen.set_size(320, 240);
 	screen.set_visarea(0, 320-1, 0, 240-1);
 	screen.set_screen_update(FUNC(hudson_poems_state::screen_update));
-	screen.set_palette(m_palette);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(hudson_poems_state::screen_scanline), "screen", 0, 1);
 
