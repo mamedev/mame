@@ -262,9 +262,11 @@ license:CC0-1.0
 		<text string="START"><color red="0.82" green="0.82" blue="0.82" /></text>
 	</element>
 	<element name="text_l5a">
+		<text string="ALL HURDLES"><color red="0" green="0" blue="0" /></text>
 		<text string="ALL HURDLES"><color red="0.82" green="0.82" blue="0.82" /></text>
 	</element>
 	<element name="text_l5b">
+		<text string="CLEARED"><color red="0" green="0" blue="0" /></text>
 		<text string="CLEARED"><color red="0.82" green="0.82" blue="0.82" /></text>
 	</element>
 	<element name="text_l5c">
@@ -280,12 +282,14 @@ license:CC0-1.0
 		<text string="DOWN"><color red="0.82" green="0.82" blue="0.82" /></text>
 	</element>
 	<element name="text_l7a">
+		<text string="2 HURDLES"><color red="0" green="0" blue="0" /></text>
 		<text string="2 HURDLES"><color red="0.82" green="0.82" blue="0.82" /></text>
 	</element>
 	<element name="text_l7b">
 		<text string="DOWN"><color red="0.82" green="0.82" blue="0.82" /></text>
 	</element>
 	<element name="text_l8a">
+		<text string="3 HURDLES"><color red="0" green="0" blue="0" /></text>
 		<text string="3 HURDLES"><color red="0.82" green="0.82" blue="0.82" /></text>
 	</element>
 	<element name="text_l8b">
@@ -310,12 +314,14 @@ license:CC0-1.0
 		<text string="SCORE"><color red="0.82" green="0.82" blue="0.82" /></text>
 	</element>
 	<element name="text_l12a">
+		<text string="TOTAL"><color red="0" green="0" blue="0" /></text>
 		<text string="TOTAL"><color red="0.82" green="0.82" blue="0.82" /></text>
 	</element>
 	<element name="text_l12b">
 		<text string="SCORE"><color red="0.82" green="0.82" blue="0.82" /></text>
 	</element>
 	<element name="text_l13a">
+		<text string="RECORD"><color red="0" green="0" blue="0" /></text>
 		<text string="RECORD"><color red="0.82" green="0.82" blue="0.82" /></text>
 	</element>
 	<element name="text_l13b">
@@ -331,6 +337,7 @@ license:CC0-1.0
 		<text string="SKILL"><color red="0.82" green="0.82" blue="0.82" /></text>
 	</element>
 	<element name="text_l15b">
+		<text string="LEVEL"><color red="0" green="0" blue="0" /></text>
 		<text string="LEVEL"><color red="0.82" green="0.82" blue="0.82" /></text>
 	</element>
 	<element name="text_l16a">
