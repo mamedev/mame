@@ -2456,7 +2456,7 @@ void cdkong_state::speaker_update()
 	if (m_r[1] & 8)
 		m_speaker_volume = 1.0;
 
-	m_volume->flt_volume_set_volume(m_speaker_volume);
+	m_volume->set_gain(m_speaker_volume);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(cdkong_state::speaker_decay_sim)
@@ -3598,7 +3598,7 @@ u8 estargte_state::cop_latch_ack_r()
 void estargte_state::cop_vol_w(u8 data)
 {
 	// G0-G2: speaker volume (not mute when 0)
-	m_volume->flt_volume_set_volume(((data & 7) | 8) / 15.0);
+	m_volume->set_gain(((data & 7) | 8) / 15.0);
 }
 
 // inputs

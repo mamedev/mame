@@ -1585,7 +1585,7 @@ void taitoz_z80_sound_state::sound_bankswitch_w(u8 data)
 /**** sound pan control ****/
 void taitoz_state::pancontrol_w(offs_t offset, u8 data)
 {
-	m_filter[offset & 3]->flt_volume_set_volume(data / 255.0f);
+	m_filter[offset & 3]->set_gain(data / 255.0f);
 }
 
 

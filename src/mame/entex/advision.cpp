@@ -272,7 +272,7 @@ void advision_state::sound_g_w(u8 data)
 void advision_state::sound_d_w(u8 data)
 {
 	// D0: speaker volume
-	m_volume->flt_volume_set_volume((data & 1) ? 0.5 : 1.0);
+	m_volume->set_gain((data & 1) ? 0.5 : 1.0);
 }
 
 

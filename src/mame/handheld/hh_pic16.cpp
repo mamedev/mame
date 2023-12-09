@@ -899,7 +899,7 @@ void flash_state::speaker_update()
 		m_speaker_volume = 50.0;
 
 	// it takes a bit before it actually starts fading
-	m_volume->flt_volume_set_volume(std::min(m_speaker_volume, 1.0));
+	m_volume->set_gain(std::min(m_speaker_volume, 1.0));
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(flash_state::speaker_decay_sim)
@@ -1342,7 +1342,7 @@ void leboom_state::speaker_update()
 	if (~m_c & 0x80)
 		m_speaker_volume = 1.0;
 
-	m_volume->flt_volume_set_volume(m_speaker_volume);
+	m_volume->set_gain(m_speaker_volume);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(leboom_state::speaker_decay_sim)

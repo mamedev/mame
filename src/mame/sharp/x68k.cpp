@@ -346,8 +346,8 @@ void x68k_state::ppi_port_c_w(uint8_t data)
 
 		set_adpcm();
 		m_okim6258->set_divider(m_adpcm.rate);
-		m_adpcm_out[0]->flt_volume_set_volume((m_adpcm.pan & 1) ? 0.0f : 1.0f);
-		m_adpcm_out[1]->flt_volume_set_volume((m_adpcm.pan & 2) ? 0.0f : 1.0f);
+		m_adpcm_out[0]->set_gain((m_adpcm.pan & 1) ? 0.0f : 1.0f);
+		m_adpcm_out[1]->set_gain((m_adpcm.pan & 2) ? 0.0f : 1.0f);
 	}
 
 	// Set joystick outputs

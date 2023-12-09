@@ -719,7 +719,7 @@ void topspeed_state::volume_w(offs_t offset, u8 data)
 		case 0x600: filter = m_filter1r;    break; // YM-2151 R
 	}
 
-	filter->flt_volume_set_volume(data / 255.0f);
+	filter->set_gain(data / 255.0f);
 }
 
 void topspeed_state::z80ctc_to0(int state)

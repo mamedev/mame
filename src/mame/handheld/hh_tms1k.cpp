@@ -1892,7 +1892,7 @@ void cchime_state::machine_start()
 
 TIMER_DEVICE_CALLBACK_MEMBER(cchime_state::speaker_decay_sim)
 {
-	m_volume->flt_volume_set_volume(m_speaker_volume);
+	m_volume->set_gain(m_speaker_volume);
 
 	// volume decays when speaker is off, decay scale is determined by tone knob
 	const double step = (1.005 - 1.0005) / 100.0; // approximation
@@ -1922,7 +1922,7 @@ void cchime_state::write_o(u16 data)
 
 	// O2: trigger speaker on
 	if (~m_o & data & 4)
-		m_volume->flt_volume_set_volume(m_speaker_volume = 1.0);
+		m_volume->set_gain(m_speaker_volume = 1.0);
 
 	m_o = data;
 }
@@ -3491,7 +3491,7 @@ void litelrn_state::machine_start()
 
 TIMER_DEVICE_CALLBACK_MEMBER(litelrn_state::speaker_decay_sim)
 {
-	m_volume->flt_volume_set_volume(m_speaker_volume);
+	m_volume->set_gain(m_speaker_volume);
 
 	// volume decays when speaker is off, rate is determined by tone knob
 	const double div[3] = { 1.002, 1.004, 1.008 }; // approximation
@@ -3512,7 +3512,7 @@ void litelrn_state::write_o(u16 data)
 {
 	// O0: trigger speaker on
 	if (~data & m_o & 1)
-		m_volume->flt_volume_set_volume(m_speaker_volume = 1.0);
+		m_volume->set_gain(m_speaker_volume = 1.0);
 
 	// O2: select mode switch
 	// other: N/C
@@ -6017,7 +6017,7 @@ void mmarvin_state::machine_start()
 
 TIMER_DEVICE_CALLBACK_MEMBER(mmarvin_state::speaker_decay_sim)
 {
-	m_volume->flt_volume_set_volume(m_speaker_volume);
+	m_volume->set_gain(m_speaker_volume);
 
 	// volume decays when speaker is off, decay scale is determined by tone knob
 	const double step = (1.01 - 1.003) / 100.0; // approximation
@@ -6047,7 +6047,7 @@ void mmarvin_state::write_r(u32 data)
 
 	// R9: trigger speaker on
 	if (m_r & ~data & 0x200)
-		m_volume->flt_volume_set_volume(m_speaker_volume = 1.0);
+		m_volume->set_gain(m_speaker_volume = 1.0);
 
 	// R0,R1: digit/led select
 	// R7: digit DP
