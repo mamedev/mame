@@ -65,25 +65,25 @@ license:CC0-1.0
 	<element name="text_p11"><image file="chess/br.svg"></image></element>
 	<element name="text_p12"><image file="chess/bp.svg"></image></element>
 
-	<element name="text_rb01a"><text string="Multi Move"><color red="0.83" green="0.82" blue="0.81" /></text></element>
-	<element name="text_rb01b"><text string="Player / Player"><color red="0.83" green="0.82" blue="0.81" /></text></element>
-	<element name="text_rb02a"><text string="Best Move"><color red="0.83" green="0.82" blue="0.81" /></text></element>
-	<element name="text_rb02b"><text string="Random"><color red="0.83" green="0.82" blue="0.81" /></text></element>
-	<element name="text_rb03"><text string="Sound"><color red="0.83" green="0.82" blue="0.81" /></text></element>
-	<element name="text_rb07"><text string="Set Level"><color red="0.83" green="0.82" blue="0.81" /></text></element>
-	<element name="text_rb08"><text string="Take Back"><color red="0.83" green="0.82" blue="0.81" /></text></element>
+	<element name="text_rb01a"><text string="Multi Move"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_rb01b"><text string="Player / Player"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_rb02a"><text string="Best Move"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_rb02b"><text string="Random"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_rb03"><text string="Sound"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_rb07"><text string="Set Level"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_rb08"><text string="Take Back"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 
-	<element name="text_rb11"><text string="New Game"><color red="0.83" green="0.82" blue="0.81" /></text></element>
-	<element name="text_rb12a"><text string="Verify"><color red="0.83" green="0.82" blue="0.81" /></text></element>
-	<element name="text_rb12b"><text string="Set Up"><color red="0.83" green="0.82" blue="0.81" /></text></element>
-	<element name="text_rb13"><text string="Change Color"><color red="0.83" green="0.82" blue="0.81" /></text></element>
-	<element name="text_rb14"><text string="Clear Board"><color red="0.83" green="0.82" blue="0.81" /></text></element>
-	<element name="text_rb17a"><text string="Hint"><color red="0.83" green="0.82" blue="0.81" /></text></element>
-	<element name="text_rb17b"><text string="Show Moves"><color red="0.83" green="0.82" blue="0.81" /></text></element>
-	<element name="text_rb18"><text string="Go"><color red="0.83" green="0.82" blue="0.81" /></text></element>
+	<element name="text_rb11"><text string="New Game"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_rb12a"><text string="Verify"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_rb12b"><text string="Set Up"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_rb13"><text string="Change Color"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_rb14"><text string="Clear Board"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_rb17a"><text string="Hint"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_rb17b"><text string="Show Moves"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_rb18"><text string="Go"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 
 	<element name="text_setup">
-		<rect><color red="0.5" green="0.37" blue="0.3" /></rect>
+		<rect><color red="0.35" green="0.26" blue="0.21" /></rect>
 		<text string="SET UP"><color red="0.83" green="0.82" blue="0.81" /></text>
 	</element>
 
@@ -352,7 +352,8 @@ license:CC0-1.0
 	<view name="Internal Layout">
 		<bounds left="-12.5" right="114" top="-0.5" bottom="88.5" />
 
-		<element ref="cblack"><bounds x="3.5" y="2.5" width="102.5" height="81" /></element>
+		<element ref="cblack"><bounds x="3.5" y="2.5" width="90" height="81" /></element>
+		<element ref="brown"><bounds x="84.5" y="2.5" width="21.5" height="81" /></element>
 		<group ref="sb_board"><bounds x="4" y="3" width="80" height="80" /></group>
 		<element ref="cwhite"><bounds x="83.95" y="2.5" width="1" height="81" /></element>
 
@@ -398,7 +399,7 @@ license:CC0-1.0
 
 		<!-- right side buttons -->
 		<element ref="cwhite"><bounds x="95.333" y="12.5" width="9.333" height="29" /></element>
-		<element ref="cblack"><bounds x="95.533" y="12.7" width="8.933" height="28.6" /></element>
+		<element ref="brown"><bounds x="95.533" y="12.7" width="8.933" height="28.6" /></element>
 		<element ref="text_setup"><bounds x="96.5" y="11.8" width="7" height="1.5" /></element>
 
 		<element ref="text_rb01a"><bounds x="86" y="4.2" width="10" height="1.5" /></element>
