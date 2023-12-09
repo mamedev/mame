@@ -1471,23 +1471,34 @@ ROM_END
   player/CPU roles are reversed. This version is known as Разведчики космоса
   (Razvedchiki kosmosa, export version: Explorers of Space).
 
+  Another variant of the game which also included a radiation dosimeter was
+  released by Научприбор (Nauchpribor, USSR) in 1991. This unit was named
+  Альтаир (Altair). This unit uses the same screen as ИМ-22 (Весёлые
+  футболисты, export version: Monkey Goalkeeper). The ROM has been modified to
+  include showing radiation exposure. The dosimeter mode can be entered by
+  pressing the dosimeter mode button when the unit is showing time. Radiation
+  readings are shown in µSv/h. The dosimeter mode ends automatically after 40
+  seconds. A gas-discharge counter (SBM-20-1) collects radiation exposure and
+  feeds info to the game board via the D0-D3 input lines.
+
   The following Mickey Mouse Elektronika clones are emulated in MAME:
 
-  Model  Title               Transliteration      Export version      Note
-  ------------------------------------------------------------------------------
-  ИМ-02  Ну, погоди!         Nu, pogodi!          -                   -
-  ИМ-10  Хоккей              Hockey (Khokkey)     Ice Hockey          Export version manufactured by PO Proton
-  ИМ-13  Разведчики космоса  Razvedchiki kosmosa  Explorers of Space  Modified ROM (see note above)
-  ИМ-16  Охота               Okhota               Fowling             -
-  ИМ-19  Биатлон             Biathlon (Biatlon)   -                   -
-  ИМ-22  Весёлые футболисты  Vesyolye futbolisty  Monkey Goalkeeper   -
-  ИМ-32  Кот-рыболов         Kot-rybolov          -                   -
-  ИМ-33  Квака-задавака      Kvaka-zadavaka       Frogling            -
-  ИМ-49  Ночные воришки      Nochnye vorishki     Night Burglars      -
-  ИМ-50  Космический полёт   Kosmicheskiy polyot  Space Flight        The Model ID is the same as Весёлая арифметика (Vesyolaya arithmetika, export version: Amusing Arithmetic) (not emulated in MAME)
-  ИМ-51  Морская атака       Morskaya ataka       -                   -
-  ИМ-53  Атака астероидов    Ataka asteroidov     -                   Graphics are very similar to ИМ-50
-  -      Цирк                Circus (Tsirk)       -                   Unknown Model ID
+  Model    Title               Transliteration      Export version      Note
+  --------------------------------------------------------------------------------
+  ИМ-02    Ну, погоди!         Nu, pogodi!          -                   -
+  ИМ-10    Хоккей              Hockey (Khokkey)     Ice Hockey          Export version manufactured by PO Proton
+  ИМ-13    Разведчики космоса  Razvedchiki kosmosa  Explorers of Space  Modified ROM (see note above)
+  ИМ-16    Охота               Okhota               Fowling             -
+  ИМ-19    Биатлон             Biathlon (Biatlon)   -                   -
+  ИМ-22    Весёлые футболисты  Vesyolye futbolisty  Monkey Goalkeeper   -
+  ИМ-32    Кот-рыболов         Kot-rybolov          -                   -
+  ИМ-33    Квака-задавака      Kvaka-zadavaka       Frogling            -
+  ИМ-49    Ночные воришки      Nochnye vorishki     Night Burglars      -
+  ИМ-50    Космический полёт   Kosmicheskiy polyot  Space Flight        The Model ID is the same as Весёлая арифметика (Vesyolaya arithmetika, export version: Amusing Arithmetic) (not emulated in MAME)
+  ИМ-51    Морская атака       Morskaya ataka       -                   -
+  ИМ-53    Атака астероидов    Ataka asteroidov     -                   Graphics are very similar to ИМ-50
+  -        Цирк                Circus (Tsirk)       -                   Unknown Model ID
+  ДБГБ-06И Альтаир             Altair               -                   Modified ROM (see note above)
 
 *******************************************************************************/
 
@@ -1513,6 +1524,7 @@ public:
 	void morataka(machine_config &config);
 	void atakaast(machine_config &config);
 	void ecircus(machine_config &config);
+	void naltair(machine_config &config);
 };
 
 // inputs
@@ -1547,6 +1559,27 @@ static INPUT_PORTS_START( rkosmosa )
 
 	PORT_MODIFY("BA")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( naltair )
+	PORT_INCLUDE( gnw_mmouse )
+
+	PORT_MODIFY("IN.0") // R2
+	PORT_CONFNAME( 0x01, 0x00, "Increase dosimeter reading with +1") // Connected to dosimeter
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+	PORT_CONFNAME( 0x02, 0x00, "Increase dosimeter reading with +2") // Connected to dosimeter
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
+	PORT_CONFNAME( 0x04, 0x00, "Increase dosimeter reading with +4") // Connected to dosimeter
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x04, DEF_STR( On ) )
+	PORT_CONFNAME( 0x08, 0x00, "Increase dosimeter reading with +8") // Connected to dosimeter
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x08, DEF_STR( On ) )
+
+	PORT_MODIFY("IN.1") // R3
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY PORT_NAME("Right Up / Dosimeter Mode")
 INPUT_PORTS_END
 
 // config
@@ -1624,6 +1657,11 @@ void gnw_mmouse_state::atakaast(machine_config &config)
 void gnw_mmouse_state::ecircus(machine_config &config)
 {
 	kb1013vk12_common(config, 1657, 1080); // R mask option ?
+}
+
+void gnw_mmouse_state::naltair(machine_config &config)
+{
+	kb1013vk12_common(config, 1655, 1080); // R mask option ?
 }
 
 // roms
@@ -1746,6 +1784,14 @@ ROM_START( ecircus )
 
 	ROM_REGION( 124643, "screen", 0)
 	ROM_LOAD( "ecircus.svg", 0, 124643, CRC(079f25db) SHA1(defa784c80e01ce6affbb424930674114275bea1) )
+ROM_END
+
+ROM_START( naltair )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "dbgb-06i.bin", 0x0000, 0x0740, CRC(7e5bf42b) SHA1(588db84d8c9a1abaae77534321dec8466967eb5f) )
+
+	ROM_REGION( 131901, "screen", 0)
+	ROM_LOAD( "naltair.svg", 0, 131901, CRC(85811308) SHA1(288aa41bade08c61e0d346b9c1109179564e34ed) )
 ROM_END
 
 
@@ -11452,6 +11498,7 @@ SYST( 19??, kosmicpt,     gnw_mmouse,  0,      kosmicpt,     gnw_mmouse,   gnw_m
 SYST( 19??, morataka,     gnw_mmouse,  0,      morataka,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Morskaja ataka", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1992, atakaast,     gnw_mmouse,  0,      atakaast,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Ataka asteroidov", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 19??, ecircus,      gnw_mmouse,  0,      ecircus,      gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Circus (Elektronika)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, naltair,      gnw_mmouse,  0,      naltair,      naltair,      gnw_mmouse_state,   empty_init, "bootleg (Nauchpribor)", "Altair (Nauchpribor)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1989, kosmicmt,     gnw_fire,    0,      kosmicmt,     gnw_fire,     gnw_fire_state,     empty_init, "bootleg (Elektronika)", "Kosmicheskiy most", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1990, auslalom,     0,           0,      auslalom,     auslalom,     auslalom_state,     empty_init, "Elektronika", "Autoslalom", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
