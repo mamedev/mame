@@ -84,11 +84,11 @@ private:
 	void sol3_w(u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[i] = BIT(data, i); }; // solenoids 0-7
 	u8 switch_r();
 	void switch_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { } // enable solenoids
-	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { } // dummy to stop error log filling up
-	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { m_comma34 = state; } // comma3&4
-	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { m_comma12 = state; } // comma1&2
-	DECLARE_WRITE_LINE_MEMBER(pia_irq);
+	void pia21_cb2_w(int state) { } // enable solenoids
+	void pia24_cb2_w(int state) { } // dummy to stop error log filling up
+	void pia28_ca2_w(int state) { m_comma34 = state; } // comma3&4
+	void pia28_cb2_w(int state) { m_comma12 = state; } // comma1&2
+	void pia_irq(int state);
 
 	void main_map(address_map &map);
 
@@ -295,7 +295,7 @@ void s9_state::switch_w(u8 data)
 	m_row = data;
 }
 
-WRITE_LINE_MEMBER( s9_state::pia_irq )
+void s9_state::pia_irq(int state)
 {
 	if(state == CLEAR_LINE)
 	{
@@ -365,7 +365,7 @@ void s9_state::s9(machine_config &config)
 	genpin_audio(config);
 
 	/* Devices */
-	PIA6821(config, m_pia21, 0);
+	PIA6821(config, m_pia21);
 	m_pia21->set_port_a_input_overrides_output_mask(0xff);
 	m_pia21->ca1_w(1); // sound busy
 	m_pia21->writepa_handler().set("s9sound", FUNC(williams_s9_sound_device::write));
@@ -375,14 +375,14 @@ void s9_state::s9(machine_config &config)
 	m_pia21->irqa_handler().set(FUNC(s9_state::pia_irq));
 	m_pia21->irqb_handler().set(FUNC(s9_state::pia_irq));
 
-	PIA6821(config, m_pia24, 0);
+	PIA6821(config, m_pia24);
 	m_pia24->writepa_handler().set(FUNC(s9_state::lamp0_w));
 	m_pia24->writepb_handler().set(FUNC(s9_state::lamp1_w));
 	m_pia24->cb2_handler().set(FUNC(s9_state::pia24_cb2_w));
 	m_pia24->irqa_handler().set(FUNC(s9_state::pia_irq));
 	m_pia24->irqb_handler().set(FUNC(s9_state::pia_irq));
 
-	PIA6821(config, m_pia28, 0);
+	PIA6821(config, m_pia28);
 	m_pia28->writepa_handler().set(FUNC(s9_state::dig0_w));
 	m_pia28->writepb_handler().set(FUNC(s9_state::dig1_w));
 	m_pia28->ca2_handler().set(FUNC(s9_state::pia28_ca2_w));
@@ -390,7 +390,7 @@ void s9_state::s9(machine_config &config)
 	m_pia28->irqa_handler().set(FUNC(s9_state::pia_irq));
 	m_pia28->irqb_handler().set(FUNC(s9_state::pia_irq));
 
-	PIA6821(config, m_pia30, 0);
+	PIA6821(config, m_pia30);
 	m_pia30->readpa_handler().set(FUNC(s9_state::switch_r));
 	m_pia30->set_port_a_input_overrides_output_mask(0xff);
 	m_pia30->writepb_handler().set(FUNC(s9_state::switch_w));

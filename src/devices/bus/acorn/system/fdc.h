@@ -8,7 +8,6 @@
 
 **********************************************************************/
 
-
 #ifndef MAME_BUS_ACORN_SYSTEM_FDC_H
 #define MAME_BUS_ACORN_SYSTEM_FDC_H
 
@@ -17,7 +16,6 @@
 #include "bus/acorn/bus.h"
 #include "imagedev/floppy.h"
 #include "machine/i8271.h"
-#include "formats/acorn_dsk.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -42,9 +40,9 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(bus_nmi_w);
-	DECLARE_WRITE_LINE_MEMBER(motor_w);
-	DECLARE_WRITE_LINE_MEMBER(side_w);
+	void bus_nmi_w(int state);
+	void motor_w(int state);
+	void side_w(int state);
 
 	required_device<i8271_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;

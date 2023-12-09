@@ -567,6 +567,9 @@ NO_USE_PORTAUDIO
 NO_USE_PULSEAUDIO
     Set to **1** to disable building the PulseAudio sound output module on
     Linux.
+USE_WAYLAND
+    Set to **1** to include support for bgfx video output with the Wayland
+    display server.
 USE_TAPTUN
     Set to **1** to include the tap/tun network module, or set to **0** to
     disable building the tap/tun network module.  The tap/tun network module is
@@ -757,12 +760,6 @@ local variables.  You currently need to add ``NOWERROR=1`` to the options passed
 to make when generating the Visual Studio project files.  This stops warnings
 from being treated as errors.  (MSVC seems to lack options to control which
 specific warnings are treated as error, which other compilers support.)
-
-There is an as-yet unresolved issue with duplicate COM GUIDS being defined in
-the PortAudio library when the target Windows version is set to Windows Vista
-(6.0) or later.  To work around this, add ``NO_USE_PORTAUDIO=1`` to the options
-passed to make when generating the Visual Studio project files.  MAME will be
-built without support for sound output via PortAudio.
 
 
 .. _compiling-unusual:

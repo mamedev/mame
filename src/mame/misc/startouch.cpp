@@ -98,7 +98,7 @@ ROM_START(europl01)
 	ROM_REGION(0x66da4, "dongle", 0)
 	ROM_LOAD("9b91f19d.hsp", 0x00000, 0x66da4, CRC(0cf78908) SHA1(c596f415accd6b91be85ea8c1b89ea380d0dc6c8))
 
-	DISK_REGION( "ide:0:hdd:image" ) // Sleic-Petaco Star Touch 2001. Version 2.0. Date 06/April/2001
+	DISK_REGION( "ide:0:hdd" ) // Sleic-Petaco Star Touch 2001. Version 2.0. Date 06/April/2001
 	DISK_IMAGE("sleic-petaco_startouch_2001_v2.0", 0, SHA1(3164a5786d6b9bb0dd9910b4d27a77a6b746dedf)) // Labeled "Star Touch 2001" but when running, game title is EuroPlay 2001
 ROM_END
 

@@ -65,10 +65,6 @@ ds1386_32k_device::ds1386_32k_device(const machine_config &mconfig, const char *
 
 void ds1386_device::device_start()
 {
-	m_inta_cb.resolve_safe();
-	m_intb_cb.resolve_safe();
-	m_sqw_cb.resolve_safe();
-
 	m_tod_alarm = 0;
 	m_watchdog_alarm = 0;
 	m_square = 1;

@@ -88,8 +88,6 @@ private:
 	devcb_write_line m_stb_handler;
 	devcb_write_line m_rts_handler;
 
-	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
 	// input pins state
 	u8 m_data = 0;
 	int m_nmi = 0;
@@ -97,6 +95,8 @@ private:
 	int m_pw = 0;
 
 	device_saitekosa_expansion_interface *m_module;
+
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 // ======================> device_saitekosa_expansion_interface

@@ -77,6 +77,9 @@ Notes:
 #include "emu.h"
 #include "lux21046.h"
 
+#include "formats/abc800_dsk.h"
+#include "formats/abc800i_dsk.h"
+
 
 
 //**************************************************************************
@@ -226,7 +229,7 @@ void luxor_55_21046_device::luxor_55_21046_io(address_map &map)
 
 */
 
-WRITE_LINE_MEMBER( luxor_55_21046_device::dma_int_w )
+void luxor_55_21046_device::dma_int_w(int state)
 {
 	m_dma_irq = state;
 
@@ -271,7 +274,7 @@ static void abc_floppies(device_slot_interface &device)
 	device.option_add("8dsdd", FLOPPY_8_DSDD);
 }
 
-WRITE_LINE_MEMBER( luxor_55_21046_device::fdc_intrq_w )
+void luxor_55_21046_device::fdc_intrq_w(int state)
 {
 	m_fdc_irq = state;
 
@@ -318,36 +321,36 @@ void luxor_55_21046_device::device_add_mconfig(machine_config & config)
 void abc830_device::device_add_mconfig(machine_config &config)
 {
 	luxor_55_21046_device::device_add_mconfig(config);
-	FLOPPY_CONNECTOR(config, m_floppy0, abc_floppies, "525ssdd", luxor_55_21046_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy1, abc_floppies, "525ssdd", luxor_55_21046_device::floppy_formats).enable_sound(true);
+	for (auto &floppy : m_floppy)
+		FLOPPY_CONNECTOR(config, floppy, abc_floppies, "525ssdd", luxor_55_21046_device::floppy_formats).enable_sound(true);
 }
 
 void abc832_device::device_add_mconfig(machine_config &config)
 {
 	luxor_55_21046_device::device_add_mconfig(config);
-	FLOPPY_CONNECTOR(config, m_floppy0, abc_floppies, "525qd", luxor_55_21046_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy1, abc_floppies, "525qd", luxor_55_21046_device::floppy_formats).enable_sound(true);
+	for (auto &floppy : m_floppy)
+		FLOPPY_CONNECTOR(config, floppy, abc_floppies, "525qd", luxor_55_21046_device::floppy_formats).enable_sound(true);
 }
 
 void abc834_device::device_add_mconfig(machine_config &config)
 {
 	luxor_55_21046_device::device_add_mconfig(config);
-	FLOPPY_CONNECTOR(config, m_floppy0, abc_floppies, "525qd", luxor_55_21046_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy1, abc_floppies, "525qd", luxor_55_21046_device::floppy_formats).enable_sound(true);
+	for (auto &floppy : m_floppy)
+		FLOPPY_CONNECTOR(config, floppy, abc_floppies, "525qd", luxor_55_21046_device::floppy_formats).enable_sound(true);
 }
 
 void abc838_device::device_add_mconfig(machine_config &config)
 {
 	luxor_55_21046_device::device_add_mconfig(config);
-	FLOPPY_CONNECTOR(config, m_floppy0, abc_floppies, "8dsdd", luxor_55_21046_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy1, abc_floppies, "8dsdd", luxor_55_21046_device::floppy_formats).enable_sound(true);
+	for (auto &floppy : m_floppy)
+		FLOPPY_CONNECTOR(config, floppy, abc_floppies, "8dsdd", luxor_55_21046_device::floppy_formats).enable_sound(true);
 }
 
 void abc850_floppy_device::device_add_mconfig(machine_config &config)
 {
 	luxor_55_21046_device::device_add_mconfig(config);
-	FLOPPY_CONNECTOR(config, m_floppy0, abc_floppies, "525qd", luxor_55_21046_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy1, abc_floppies, nullptr, luxor_55_21046_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], abc_floppies, "525qd", luxor_55_21046_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], abc_floppies, nullptr, luxor_55_21046_device::floppy_formats).enable_sound(true);
 }
 
 
@@ -719,12 +722,11 @@ luxor_55_21046_device::luxor_55_21046_device(const machine_config &mconfig, cons
 luxor_55_21046_device::luxor_55_21046_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_abcbus_card_interface(mconfig, *this),
-	m_floppy0(*this, SAB1793_TAG":0"),
-	m_floppy1(*this, SAB1793_TAG":1"),
+	m_floppy(*this, SAB1793_TAG":%u", 0U),
 	m_maincpu(*this, Z80_TAG),
 	m_dma(*this, Z80DMA_TAG),
 	m_fdc(*this, SAB1793_TAG),
-	m_floppy(nullptr),
+	m_selected_floppy(nullptr),
 	m_sw1(*this, "SW1"),
 	m_sw2(*this, "SW2"),
 	m_sw3(*this, "SW3"),
@@ -1015,20 +1017,23 @@ void luxor_55_21046_device::_9b_w(uint8_t data)
 	*/
 
 	// drive select
-	m_floppy = nullptr;
+	m_selected_floppy = nullptr;
 
-	if (BIT(data, 0)) m_floppy = m_floppy0->get_device();
-	if (BIT(data, 1)) m_floppy = m_floppy1->get_device();
+	for (int n = 0; n < 2; n++)
+	{
+		if (BIT(data, n))
+			m_selected_floppy = m_floppy[n]->get_device();
+	}
 
-	m_fdc->set_floppy(m_floppy);
+	m_fdc->set_floppy(m_selected_floppy);
 
-	if (m_floppy)
+	if (m_selected_floppy)
 	{
 		// motor enable
-		m_floppy->mon_w(!BIT(data, 3));
+		m_selected_floppy->mon_w(!BIT(data, 3));
 
 		// side select
-		m_floppy->ss_w(BIT(data, 5));
+		m_selected_floppy->ss_w(BIT(data, 5));
 	}
 }
 
@@ -1093,8 +1098,8 @@ uint8_t luxor_55_21046_device::_9a_r(offs_t offset)
 	data |= m_busy;
 
 	// floppy
-	data |= (m_floppy ? m_floppy->twosid_r() : 1) << 1;
-	//data |= (m_floppy ? m_floppy->dskchg_r() : 1) << 4;
+	data |= (m_selected_floppy ? m_selected_floppy->twosid_r() : 1) << 1;
+	//data |= (m_selected_floppy ? m_selected_floppy->dskchg_r() : 1) << 4;
 
 	// SW2
 	uint8_t sw2 = m_sw2->read() & 0x0f;

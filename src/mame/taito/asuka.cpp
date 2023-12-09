@@ -352,7 +352,7 @@ protected:
 	void variable_colpri_cb(u32 &sprite_colbank, u32 &pri_mask, u16 sprite_ctrl);
 	void fixed_colpri_cb(u32 &sprite_colbank, u32 &pri_mask, u16 sprite_ctrl);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 
 	void z80_map(address_map &map);
 
@@ -393,7 +393,7 @@ private:
 	void msm5205_address_w(u8 data);
 	void msm5205_start_w(u8 data);
 	void msm5205_stop_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(msm5205_vck);
+	void msm5205_vck(int state);
 
 	void asuka_map(address_map &map);
 	void z80_map(address_map &map);
@@ -528,7 +528,7 @@ void base_state::sound_bankswitch_w(u8 data)
 }
 
 
-WRITE_LINE_MEMBER(msm_state::msm5205_vck)
+void msm_state::msm5205_vck(int state)
 {
 	if (!state)
 		return;
@@ -779,11 +779,11 @@ static INPUT_PORTS_START( bonzeadv )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL // as with all c-chip through ADC reads this ends up on 0x80 instead of 0x08
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( jigkmgri )
@@ -1049,7 +1049,7 @@ void cadash_state::machine_start()
 	m_int5_timer = timer_alloc(FUNC(cadash_state::interrupt5), this);
 }
 
-WRITE_LINE_MEMBER(base_state::screen_vblank)
+void base_state::screen_vblank(int state)
 {
 	// rising edge
 	if (state)

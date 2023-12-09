@@ -536,7 +536,7 @@ void newbrain_state::cop_d_w(uint8_t data)
 //  k1_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( newbrain_state::k1_w )
+void newbrain_state::k1_w(int state)
 {
 	LOGMASKED(LOG_VFD, "%s %s SO %u\n", machine().time().as_string(), machine().describe_context(), state);
 
@@ -548,7 +548,7 @@ WRITE_LINE_MEMBER( newbrain_state::k1_w )
 //  k2_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( newbrain_state::k2_w )
+void newbrain_state::k2_w(int state)
 {
 	LOGMASKED(LOG_VFD, "%s %s SK %u\n", machine().time().as_string(), machine().describe_context(), state);
 
@@ -569,7 +569,7 @@ int newbrain_state::tpin()
 	return (m_cassette1->input() > +0.04) || (m_cassette2->input() > +0.04);
 }
 
-READ_LINE_MEMBER( newbrain_state::tdi_r )
+int newbrain_state::tdi_r()
 {
 	return tpin() ^ m_cop_tdo;
 }

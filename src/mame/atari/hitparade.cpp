@@ -60,12 +60,12 @@ private:
 	required_device<pwm_display_device> m_display;
 	required_ioport_array<6> m_inputs;
 
+	u32 m_r = 0;
+	u16 m_o = 0;
+
 	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
-
-	u32 m_r = 0;
-	u16 m_o = 0;
 };
 
 void hitpar_state::machine_start()

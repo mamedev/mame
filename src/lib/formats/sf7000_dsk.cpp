@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /*********************************************************************
 
-    formats/sf7000_dsk.c
+    formats/sf7000_dsk.cpp
 
     sf7000 format
 
@@ -14,17 +14,17 @@ sf7000_format::sf7000_format() : upd765_format(formats)
 {
 }
 
-const char *sf7000_format::name() const
+const char *sf7000_format::name() const noexcept
 {
 	return "sf7";
 }
 
-const char *sf7000_format::description() const
+const char *sf7000_format::description() const noexcept
 {
 	return "SF7 disk image";
 }
 
-const char *sf7000_format::extensions() const
+const char *sf7000_format::extensions() const noexcept
 {
 	return "sf7";
 }

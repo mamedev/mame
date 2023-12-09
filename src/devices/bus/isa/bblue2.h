@@ -30,9 +30,9 @@ public:
 	uint8_t z80_ram_r(offs_t offset) { return m_ram->read(offset); }
 	void z80_ram_w(offs_t offset, uint8_t data) { m_ram->write(offset,data); }
 
-	DECLARE_WRITE_LINE_MEMBER(port1_irq) { m_isa->irq4_w(state); }
-	DECLARE_WRITE_LINE_MEMBER(port2_irq) { m_isa->irq3_w(state); }
-	DECLARE_WRITE_LINE_MEMBER(lpt_irq);
+	void port1_irq(int state) { m_isa->irq4_w(state); }
+	void port2_irq(int state) { m_isa->irq3_w(state); }
+	void lpt_irq(int state);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

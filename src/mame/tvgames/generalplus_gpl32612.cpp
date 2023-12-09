@@ -274,6 +274,18 @@ ROM_START( zippityuk )
 	ROM_LOAD( "29f2c08aacwp.u2", 0x0000, 0x10800000, CRC(27d172ae) SHA1(9ade19d7aa28fba13581e6879b39e3a7702260b0) )
 ROM_END
 
+ROM_START( kidizmp )
+	ROM_REGION( 0x10800000, "nandrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "s34ml02g1_withspare.u13", 0x0000, 0x10800000, CRC(c5d55bdc) SHA1(073fc3fd56c532750b4e2020abe27d3448999d56) )
+ROM_END
+
+ROM_START( kidizmb )
+	ROM_REGION(  0x8400000, "nandrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "hy27uf081g2a_withspare.bin", 0x0000, 0x8400000, CRC(b87861c4) SHA1(8b5cc2557b54a37928be818430b91c48db98758f) )
+ROM_END
+
+
+
 void generalplus_gpl32612_game_state::nand_init(int blocksize, int blocksize_stripped)
 {
 	uint8_t* rom = memregion("nand")->base();
@@ -327,3 +339,8 @@ CONS( 200?, jak_dchp,        0,       0,      gpl32612, gpl32612, generalplus_gp
 CONS( 201?, zippity,         0,       0,      zippity, gpl32612, generalplus_zippity_game_state, empty_init,  "LeapFrog",         "Zippity (US)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 // TODO, check if code differs, or just unused areas of the NAND
 CONS( 201?, zippityuk,       zippity, 0,      zippity, gpl32612, generalplus_zippity_game_state, empty_init,  "LeapFrog",         "Zippity (UK)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// GP32C01 (maybe, picture is unclear) - Camera for kids
+CONS( 2013, kidizmp,         0,        0,      zippity, gpl32612, generalplus_zippity_game_state, empty_init,  "VTech",         "Kidizoom Connect (Germany, pink camera)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+// seems to be older tech, just glob + ROM, assuming it's a GP32 series based on above and due to having ARM code
+CONS( 201?, kidizmb,         0,        0,      zippity, gpl32612, generalplus_zippity_game_state, empty_init,  "VTech",         "Kidizoom (Germany, blue camera)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

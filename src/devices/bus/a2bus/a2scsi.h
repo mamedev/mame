@@ -28,7 +28,7 @@ public:
 	// construction/destruction
 	a2bus_scsi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER( drq_w );
+	void drq_w(int state);
 
 protected:
 	a2bus_scsi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

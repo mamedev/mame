@@ -76,16 +76,16 @@
 #include "emu.h"
 #include "tipi.h"
 
-#define LOG_WARN       (1U<<1)
-#define LOG_EPROM      (1U<<2)
-#define LOG_CRU        (1U<<3)
-#define LOG_PORTS      (1U<<4)
-#define LOG_RPI        (1U<<5)
-#define LOG_QUEUE      (1U<<6)
-#define LOG_PROT       (1U<<7)
-#define LOG_DETAIL     (1U<<8)
+#define LOG_WARN       (1U << 1)
+#define LOG_EPROM      (1U << 2)
+#define LOG_CRU        (1U << 3)
+#define LOG_PORTS      (1U << 4)
+#define LOG_RPI        (1U << 5)
+#define LOG_QUEUE      (1U << 6)
+#define LOG_PROT       (1U << 7)
+#define LOG_DETAIL     (1U << 8)
 
-#define VERBOSE ( LOG_GENERAL | LOG_WARN )
+#define VERBOSE (LOG_GENERAL | LOG_WARN)
 #define RASPI "rpi"
 
 #include "logmacro.h"
@@ -648,7 +648,11 @@ void tipi_card_device::device_add_mconfig(machine_config &config)
 
 ROM_START( tipi )
 	ROM_REGION(0x8000, TI99_DSRROM, 0)
-	ROM_LOAD("tipidsr.u2", 0x0000, 0x8000, CRC(a54e65af) SHA1(f930e4b079a5b6b24dc20f262e9c599d2051b6be))
+	ROM_DEFAULT_BIOS("2023")
+	ROM_SYSTEM_BIOS(0, "2021", "TIPI DSR (2021)" )
+	ROMX_LOAD("tipidsr.u2", 0x0000, 0x8000, CRC(a54e65af) SHA1(f930e4b079a5b6b24dc20f262e9c599d2051b6be), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "2023", "TIPI DSR (2023)" )
+	ROMX_LOAD("tipidsr_2023.u2", 0x0000, 0x8000, CRC(666f0b63) SHA1(70950e647d5a5102695580064b0bf8d2703586d3), ROM_BIOS(1))
 ROM_END
 
 

@@ -60,9 +60,6 @@
 #pragma once
 
 #include "imagedev/floppy.h"
-#include "formats/d64_dsk.h"
-#include "formats/g64_dsk.h"
-#include "formats/d71_dsk.h"
 
 
 
@@ -85,18 +82,18 @@ public:
 	uint8_t yb_r();
 	void yb_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( test_w );
-	DECLARE_WRITE_LINE_MEMBER( accl_w );
-	DECLARE_WRITE_LINE_MEMBER( ted_w );
-	DECLARE_WRITE_LINE_MEMBER( mtr_w );
-	DECLARE_WRITE_LINE_MEMBER( oe_w );
-	DECLARE_WRITE_LINE_MEMBER( soe_w );
-	DECLARE_WRITE_LINE_MEMBER( atni_w );
-	DECLARE_WRITE_LINE_MEMBER( atna_w );
+	void test_w(int state);
+	void accl_w(int state);
+	void ted_w(int state);
+	void mtr_w(int state);
+	void oe_w(int state);
+	void soe_w(int state);
+	void atni_w(int state);
+	void atna_w(int state);
 
-	DECLARE_READ_LINE_MEMBER( sync_r ) { return checkpoint_live.sync; }
-	DECLARE_READ_LINE_MEMBER( byte_r ) { return checkpoint_live.byte; }
-	DECLARE_READ_LINE_MEMBER( atn_r ) { return m_atni ^ m_atna; }
+	int sync_r() { return checkpoint_live.sync; }
+	int byte_r() { return checkpoint_live.byte; }
+	int atn_r() { return m_atni ^ m_atna; }
 
 	void stp_w(int stp);
 	void ds_w(int ds);

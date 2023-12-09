@@ -73,15 +73,18 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "cococart.h"
 #include "coco_fdc.h"
+
 #include "meb_intrf.h"
+
+#include "imagedev/floppy.h"
 #include "machine/ds1315.h"
 #include "machine/input_merger.h"
 #include "machine/msm6242.h"
 #include "machine/wd_fdc.h"
-#include "imagedev/floppy.h"
+
 #include "formats/dmk_dsk.h"
+#include "formats/flex_dsk.h"
 #include "formats/fs_coco_os9.h"
 #include "formats/fs_coco_rsdos.h"
 #include "formats/jvc_dsk.h"
@@ -89,7 +92,6 @@
 #include "formats/sdf_dsk.h"
 #include "formats/vdk_dsk.h"
 
-//#define LOG_GENERAL   (1U << 0) //defined in logmacro.h already
 #define LOG_WDFDC   (1U << 1) // Shows register setup
 #define LOG_WDIO    (1U << 2) // Shows data read and write
 #define LOG_WDSCII  (1U << 3) // Shows SCII register setup
@@ -147,10 +149,11 @@ protected:
 void coco_family_fdc_device_base::floppy_formats(format_registration &fr)
 {
 	fr.add_mfm_containers();
+	fr.add(FLOPPY_FLEX_FORMAT);
 	fr.add(FLOPPY_DMK_FORMAT);
+	fr.add(FLOPPY_SDF_FORMAT);
 	fr.add(FLOPPY_JVC_FORMAT);
 	fr.add(FLOPPY_VDK_FORMAT);
-	fr.add(FLOPPY_SDF_FORMAT);
 	fr.add(FLOPPY_OS9_FORMAT);
 	fr.add(fs::COCO_RSDOS);
 	fr.add(fs::COCO_OS9);
@@ -250,7 +253,7 @@ coco_fdc_device_base::coco_fdc_device_base(const machine_config &mconfig, device
 void coco_fdc_device_base::update_lines()
 {
 	// clear HALT enable under certain circumstances
-	if (intrq() && (dskreg() & 0x20))
+	if (intrq())
 		set_dskreg(dskreg() & ~0x80);  // clear halt enable
 
 	// set the NMI line
@@ -649,7 +652,7 @@ namespace
 	void coco_scii_device::update_lines()
 	{
 		// clear HALT enable under certain circumstances
-		if (intrq() && (dskreg() & 0x20))
+		if (intrq())
 			set_dskreg(dskreg() & ~0x80);  // clear halt enable
 
 		if ((m_cache_controler & 0x02) == 0) /* cache disabled */

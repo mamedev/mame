@@ -16,7 +16,6 @@
 #include "machine/input_merger.h"
 #include "machine/wd_fdc.h"
 #include "imagedev/floppy.h"
-#include "formats/acorn_dsk.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

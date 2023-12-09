@@ -38,7 +38,7 @@ public:
 		CD_TRACK_MODE2_FORM1,       /* mode 2 2048 bytes/sector */
 		CD_TRACK_MODE2_FORM2,       /* mode 2 2324 bytes/sector */
 		CD_TRACK_MODE2_FORM_MIX,    /* mode 2 2336 bytes/sector */
-		CD_TRACK_MODE2_RAW,         /* mode 2 2352 bytes / sector */
+		CD_TRACK_MODE2_RAW,         /* mode 2 2352 bytes/sector */
 		CD_TRACK_AUDIO,             /* redbook audio track 2352 bytes/sector (588 samples) */
 
 		CD_TRACK_RAW_DONTCARE       /* special flag for cdrom_read_data: just return me whatever is there */
@@ -151,6 +151,7 @@ public:
 	static const char *get_subtype_string(uint32_t subtype);
 	static std::error_condition parse_metadata(chd_file *chd, toc &toc);
 	static std::error_condition write_metadata(chd_file *chd, const toc &toc);
+	bool is_gdrom() const { return cdtoc.flags & (CD_FLAG_GDROM|CD_FLAG_GDROMLE); }
 
 	// ECC utilities
 	static bool ecc_verify(const uint8_t *sector);

@@ -38,8 +38,8 @@ advertisements, but box and manual still simply name it Checker Challenger.
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_acr.lh" // clickable
-#include "fidel_cc10.lh" // clickable
+#include "fidel_acr.lh"
+#include "fidel_cc10.lh"
 
 
 namespace {
@@ -78,7 +78,9 @@ private:
 	optional_device<beep_device> m_beeper;
 	required_ioport_array<4> m_inputs;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(beeper_off) { m_beeper->set_state(0); }
+	u8 m_inp_mux = 0;
+	u8 m_led_select = 0;
+	u8 m_7seg_data = 0;
 
 	// address maps
 	void acr_map(address_map &map);
@@ -89,16 +91,14 @@ private:
 	u8 main_trampoline_r(offs_t offset);
 	void main_trampoline_w(offs_t offset, u8 data);
 
+	TIMER_DEVICE_CALLBACK_MEMBER(beeper_off) { m_beeper->set_state(0); }
+
 	// I/O handlers
 	void update_display();
 	void ppi_porta_w(u8 data);
 	void ppi_portb_w(u8 data);
 	u8 ppi_portc_r();
 	void ppi_portc_w(u8 data);
-
-	u8 m_inp_mux = 0;
-	u8 m_led_select = 0;
-	u8 m_7seg_data = 0;
 };
 
 void ccx_state::machine_start()
@@ -114,8 +114,6 @@ void ccx_state::machine_start()
 /*******************************************************************************
     I/O
 *******************************************************************************/
-
-// I8255 PPI
 
 void ccx_state::update_display()
 {

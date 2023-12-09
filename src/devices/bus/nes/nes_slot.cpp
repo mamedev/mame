@@ -467,7 +467,7 @@ void device_nes_cart_interface::set_nt_mirroring(int mirroring)
 //  Interrupt helpers
 //-------------------------------------------------
 
-DECLARE_WRITE_LINE_MEMBER(device_nes_cart_interface::set_irq_line)
+void device_nes_cart_interface::set_irq_line(int state)
 {
 	assert(state == ASSERT_LINE || state == CLEAR_LINE);
 

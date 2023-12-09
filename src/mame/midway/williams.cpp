@@ -705,7 +705,7 @@ void williams_state::sound_map(address_map &map)
 }
 
 /* Same as above, but for second sound board */
-void blaster_state::sound2_map(address_map &map)
+void williams_state::sound2_map(address_map &map)
 {
 	map(0x0000, 0x007f).ram(); // internal RAM
 	map(0x0080, 0x00ff).ram(); // MC6810 RAM
@@ -1572,17 +1572,17 @@ void williams_state::williams_base(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, "soundirq").output_handler().set_inputline(m_soundcpu, M6808_IRQ_LINE);
 
-	PIA6821(config, m_pia[0], 0);
+	PIA6821(config, m_pia[0]);
 	m_pia[0]->readpa_handler().set_ioport("IN0");
 	m_pia[0]->readpb_handler().set_ioport("IN1");
 
-	PIA6821(config, m_pia[1], 0);
+	PIA6821(config, m_pia[1]);
 	m_pia[1]->readpa_handler().set_ioport("IN2");
 	m_pia[1]->writepb_handler().set(FUNC(williams_state::snd_cmd_w));
 	m_pia[1]->irqa_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<0>));
 	m_pia[1]->irqb_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<1>));
 
-	PIA6821(config, m_pia[2], 0);
+	PIA6821(config, m_pia[2]);
 	m_pia[2]->writepa_handler().set("dac", FUNC(dac_byte_interface::data_w));
 	m_pia[2]->irqa_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<0>));
 	m_pia[2]->irqb_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<1>));
@@ -1664,7 +1664,7 @@ void spdball_state::spdball(machine_config &config)
 	williams_b1(config);
 
 	// pia
-	PIA6821(config, m_pia[3], 0);
+	PIA6821(config, m_pia[3]);
 	m_pia[3]->readpa_handler().set_ioport("IN3");
 	m_pia[3]->readpb_handler().set_ioport("IN4");
 }
@@ -1680,7 +1680,7 @@ void williams_state::lottofun(machine_config &config)
 	TICKET_DISPENSER(config, "ticket", attotime::from_msec(70), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH);
 }
 
-void sinistar_state::sinistar(machine_config &config)
+void sinistar_state::upright(machine_config &config)
 {
 	williams_b1(config);
 	m_blitter_clip_address = 0x7400;
@@ -1693,6 +1693,29 @@ void sinistar_state::sinistar(machine_config &config)
 
 	// sound hardware
 	HC55516(config, "cvsd", 0).add_route(ALL_OUTPUTS, "speaker", 0.8);
+}
+
+void sinistar_state::cockpit(machine_config &config)
+{
+	upright(config);
+
+	// basic machine hardware
+	auto &soundcpu_b(M6808(config, "soundcpu_b", SOUND_CLOCK)); // internal clock divider of 4, effective frequency is 894.886kHz
+	soundcpu_b.set_addrmap(AS_PROGRAM, &sinistar_state::sound2_map);
+
+	// additional sound hardware
+	SPEAKER(config, "rspeaker").rear_center();
+	MC1408(config, "rdac").add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
+
+	// pia
+	INPUT_MERGER_ANY_HIGH(config, "soundirq_b").output_handler().set_inputline("soundcpu_b", M6808_IRQ_LINE);
+
+	m_pia[1]->writepb_handler().set(FUNC(sinistar_state::cockpit_snd_cmd_w));
+
+	PIA6821(config, m_pia[3]);
+	m_pia[3]->writepa_handler().set("rdac", FUNC(dac_byte_interface::data_w));
+	m_pia[3]->irqa_handler().set("soundirq_b", FUNC(input_merger_any_high_device::in_w<0>));
+	m_pia[3]->irqb_handler().set("soundirq_b", FUNC(input_merger_any_high_device::in_w<1>));
 }
 
 void playball_state::playball(machine_config &config)
@@ -1734,8 +1757,8 @@ void blaster_state::blaster(machine_config &config)
 	blastkit(config);
 
 	// basic machine hardware
-	M6808(config, m_soundcpu_b, SOUND_CLOCK); // internal clock divider of 4, effective frequency is 894.886kHz
-	m_soundcpu_b->set_addrmap(AS_PROGRAM, &blaster_state::sound2_map);
+	auto &soundcpu_b(M6808(config, "soundcpu_b", SOUND_CLOCK)); // internal clock divider of 4, effective frequency is 894.886kHz
+	soundcpu_b.set_addrmap(AS_PROGRAM, &blaster_state::sound2_map);
 
 	// pia
 	m_pia[0]->readpb_handler().set("mux_b", FUNC(ls157_device::output_r)).mask(0x0f);
@@ -1751,12 +1774,12 @@ void blaster_state::blaster(machine_config &config)
 	m_muxb->a_in_callback().set_ioport("INP1");
 	m_muxb->b_in_callback().set_ioport("INP2");
 
-	INPUT_MERGER_ANY_HIGH(config, "soundirq_b").output_handler().set_inputline(m_soundcpu_b, M6808_IRQ_LINE);
+	INPUT_MERGER_ANY_HIGH(config, "soundirq_b").output_handler().set_inputline("soundcpu_b", M6808_IRQ_LINE);
 
 	m_pia[1]->writepb_handler().set(FUNC(blaster_state::blaster_snd_cmd_w));
 	m_pia[2]->writepa_handler().set("ldac", FUNC(dac_byte_interface::data_w));
 
-	PIA6821(config, m_pia[3], 0);
+	PIA6821(config, m_pia[3]);
 	m_pia[3]->writepa_handler().set("rdac", FUNC(dac_byte_interface::data_w));
 	m_pia[3]->irqa_handler().set("soundirq_b", FUNC(input_merger_any_high_device::in_w<0>));
 	m_pia[3]->irqb_handler().set("soundirq_b", FUNC(input_merger_any_high_device::in_w<1>));
@@ -1809,18 +1832,18 @@ void williams2_state::williams2_base(machine_config &config)
 	INPUT_MERGER_ANY_HIGH(config, "soundirq").output_handler().set_inputline(m_soundcpu, M6808_IRQ_LINE);
 
 	// pia
-	PIA6821(config, m_pia[0], 0);
+	PIA6821(config, m_pia[0]);
 	m_pia[0]->readpa_handler().set_ioport("IN0");
 	m_pia[0]->readpb_handler().set_ioport("IN1");
 
-	PIA6821(config, m_pia[1], 0);
+	PIA6821(config, m_pia[1]);
 	m_pia[1]->readpa_handler().set_ioport("IN2");
 	m_pia[1]->writepb_handler().set(FUNC(williams2_state::snd_cmd_w));
 	m_pia[1]->cb2_handler().set(m_pia[2], FUNC(pia6821_device::ca1_w));
 	m_pia[1]->irqa_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<0>));
 	m_pia[1]->irqb_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<1>));
 
-	PIA6821(config, m_pia[2], 0);
+	PIA6821(config, m_pia[2]);
 	m_pia[2]->writepa_handler().set(m_pia[1], FUNC(pia6821_device::portb_w));
 	m_pia[2]->writepb_handler().set("dac", FUNC(dac_byte_interface::data_w));
 	m_pia[2]->ca2_handler().set(m_pia[1], FUNC(pia6821_device::cb1_w));
@@ -3131,6 +3154,15 @@ There is known to be a "perfect" version of Sinistar, that being the original ve
   dev team. The dev team thought this version had the best game play while Williams decided it was too easy (IE: it
   could be played too long on one quarter)
 
+Sinistar's cockpit cabinet features two sound boards, one for the front speakers and another for the rear.  The rear
+  sound board uses a different ROM, Video Sound ROM 10.  It adds a slight delay to some of the sound effects,
+  and ignores the extra ship and bounce effects.  It has no speech ROMs.
+
+If you disconnect the speech ROMs from the upright sound board, Video Sound ROM 9 will play two replacement sound
+  effects for the Sinistar's missing audio.  Any line of dialogue will be replaced by a generic alarm noise,
+  while the Sinistar roar is replaced by a loud square wave synth noise that attempts to emulate the "sini-scream".
+  Video Sound Rom 10 disables this functionality so that it doesn't play placeholder sounds in place of speech.
+
 */
 ROM_START( sinistar ) // rev. 3
 	ROM_REGION( 0x19000, "maincpu", 0 ) // solid RED labels with final production part numbers
@@ -3153,14 +3185,34 @@ ROM_START( sinistar ) // rev. 3
 	ROM_LOAD( "3004_speech_ic4_r1_16-3004-49.ic4", 0xe000, 0x1000, CRC(4b56a626) SHA1(44430cd5c110ec751b0bfb8ae99b26d443350db1) )
 	ROM_LOAD( "video_sound_rom_9_std.808.ic12",    0xf000, 0x1000, CRC(b82f4ddb) SHA1(c70c7dd6e88897920d7709a260f27810f66aade1) )
 
-/*
-    ROM_REGION( 0x10000, "soundcpu_b", 0 ) // Stereo sound requires 2nd sound board as used in the cockpit version
-    ROM_LOAD( "3004_speech_ic7_r1_16-3004-52.ic7", 0xb000, 0x1000, CRC(e1019568) SHA1(442f4f3ccd2e1db2136d2ffb121ea442921f87ca) )
-    ROM_LOAD( "3004_speech_ic5_r1_16-3004-50.ic5", 0xc000, 0x1000, CRC(cf3b5ffd) SHA1(d5d51c550581c9d46ab331dd4fd32541a2ef598e) )
-    ROM_LOAD( "3004_speech_ic6_r1_16-3004-51.ic6", 0xd000, 0x1000, CRC(ff8d2645) SHA1(16fa2a602acbbc182dd96bab113ab18356f3daf0) )
-    ROM_LOAD( "3004_speech_ic4_r1_16-3004-49.ic4", 0xe000, 0x1000, CRC(4b56a626) SHA1(44430cd5c110ec751b0bfb8ae99b26d443350db1) )
-    ROM_LOAD( "video_sound_rom_10_std.ic12",       0xf000, 0x1000, CRC(b5c70082) SHA1(643af087b57da3a71c68372c79c5777e0c1fbef7) ) // not sure if all speech ROMs need to be here too
-*/
+	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_LOAD( "decoder_rom_4.3g", 0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) ) // Universal Horizontal decoder ROM - 7641-5 BPROM - P/N A-5342-09694
+	ROM_LOAD( "decoder_rom_6.3c", 0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) ) // Universal Vertical decoder ROM - 7641-5 BPROM - P/N A-5342-09821
+ROM_END
+
+ROM_START( sinistarc ) // rev. 3
+	ROM_REGION( 0x19000, "maincpu", 0 ) // solid RED labels with final production part numbers
+	ROM_LOAD( "sinistar_rom_10-b_16-3004-62.4c", 0x0e000, 0x1000, CRC(3d670417) SHA1(81802622bee8dbea5c0f08019d87d941dcdbe292) )
+	ROM_LOAD( "sinistar_rom_11-b_16-3004-63.4a", 0x0f000, 0x1000, CRC(3162bc50) SHA1(2f38e572ab9c731e38dfe9bad3cc8222a775c5ea) )
+	ROM_LOAD( "sinistar_rom_1-b_16-3004-53.1d",  0x10000, 0x1000, CRC(f6f3a22c) SHA1(026d8cab07734fa294a5645edbe65a904bcbc302) )
+	ROM_LOAD( "sinistar_rom_2-b_16-3004-54.1c",  0x11000, 0x1000, CRC(cab3185c) SHA1(423d1e3b0c07333ec582529bc4d0b7baf591820a) )
+	ROM_LOAD( "sinistar_rom_3-b_16-3004-55.1a",  0x12000, 0x1000, CRC(1ce1b3cc) SHA1(5bc03d7249529d827dc60c087e074ab3e4ea7361) )
+	ROM_LOAD( "sinistar_rom_4-b_16-3004-56.2d",  0x13000, 0x1000, CRC(6da632ba) SHA1(72c0c3d5a5ca87ca4d95fcedaf834206e4633950) )
+	ROM_LOAD( "sinistar_rom_5-b_16-3004-57.2c",  0x14000, 0x1000, CRC(b662e8fc) SHA1(828a89d2ea13d8a362dae708f86bff54cb231887) )
+	ROM_LOAD( "sinistar_rom_6-b_16-3004-58.2a",  0x15000, 0x1000, CRC(2306183d) SHA1(703e29e6446856615760a4897c0f5d79cc7bdfb2) )
+	ROM_LOAD( "sinistar_rom_7-b_16-3004-59.3d",  0x16000, 0x1000, CRC(e5dd918e) SHA1(bf4e2ada6a59d246218544d822ba5355da925924) )
+	ROM_LOAD( "sinistar_rom_8-b_16-3004-60.3c",  0x17000, 0x1000, CRC(4785a787) SHA1(8c7eca656b2c23b0da41a8c7ce51a2735cab85a4) )
+	ROM_LOAD( "sinistar_rom_9-b_16-3004-61.3a",  0x18000, 0x1000, CRC(50cb63ad) SHA1(96e28e4fef98fff2649741a266fa590e0313e3b0) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "3004_speech_ic7_r1_16-3004-52.ic7", 0xb000, 0x1000, CRC(e1019568) SHA1(442f4f3ccd2e1db2136d2ffb121ea442921f87ca) )
+	ROM_LOAD( "3004_speech_ic5_r1_16-3004-50.ic5", 0xc000, 0x1000, CRC(cf3b5ffd) SHA1(d5d51c550581c9d46ab331dd4fd32541a2ef598e) )
+	ROM_LOAD( "3004_speech_ic6_r1_16-3004-51.ic6", 0xd000, 0x1000, CRC(ff8d2645) SHA1(16fa2a602acbbc182dd96bab113ab18356f3daf0) )
+	ROM_LOAD( "3004_speech_ic4_r1_16-3004-49.ic4", 0xe000, 0x1000, CRC(4b56a626) SHA1(44430cd5c110ec751b0bfb8ae99b26d443350db1) )
+	ROM_LOAD( "video_sound_rom_9_std.808.ic12",    0xf000, 0x1000, CRC(b82f4ddb) SHA1(c70c7dd6e88897920d7709a260f27810f66aade1) )
+
+	ROM_REGION( 0x10000, "soundcpu_b", 0 ) // Stereo sound requires 2nd sound board as used in the cockpit version
+	ROM_LOAD( "video_sound_rom_10_std.ic12",       0xf000, 0x1000, CRC(b5c70082) SHA1(643af087b57da3a71c68372c79c5777e0c1fbef7) ) // no speech board is connected
 
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "decoder_rom_4.3g", 0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) ) // Universal Horizontal decoder ROM - 7641-5 BPROM - P/N A-5342-09694
@@ -3188,14 +3240,34 @@ ROM_START( sinistar2 ) // rev. 2
 	ROM_LOAD( "3004_speech_ic4_r1_16-3004-49.ic4", 0xe000, 0x1000, CRC(4b56a626) SHA1(44430cd5c110ec751b0bfb8ae99b26d443350db1) )
 	ROM_LOAD( "video_sound_rom_9_std.808.ic12",    0xf000, 0x1000, CRC(b82f4ddb) SHA1(c70c7dd6e88897920d7709a260f27810f66aade1) )
 
-/*
-    ROM_REGION( 0x10000, "soundcpu_b", 0 ) // Stereo sound requires 2nd sound board as used in the cockpit version
-    ROM_LOAD( "3004_speech_ic7_r1_16-3004-52.ic7", 0xb000, 0x1000, CRC(e1019568) SHA1(442f4f3ccd2e1db2136d2ffb121ea442921f87ca) )
-    ROM_LOAD( "3004_speech_ic5_r1_16-3004-50.ic5", 0xc000, 0x1000, CRC(cf3b5ffd) SHA1(d5d51c550581c9d46ab331dd4fd32541a2ef598e) )
-    ROM_LOAD( "3004_speech_ic6_r1_16-3004-51.ic6", 0xd000, 0x1000, CRC(ff8d2645) SHA1(16fa2a602acbbc182dd96bab113ab18356f3daf0) )
-    ROM_LOAD( "3004_speech_ic4_r1_16-3004-49.ic4", 0xe000, 0x1000, CRC(4b56a626) SHA1(44430cd5c110ec751b0bfb8ae99b26d443350db1) )
-    ROM_LOAD( "video_sound_rom_10_std.ic12",       0xf000, 0x1000, CRC(b5c70082) SHA1(643af087b57da3a71c68372c79c5777e0c1fbef7) ) // not sure if all speech ROMs need to be here too
-*/
+	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_LOAD( "decoder_rom_4.3g", 0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) ) // Universal Horizontal decoder ROM - 7641-5 BPROM - P/N A-5342-09694
+	ROM_LOAD( "decoder_rom_6.3c", 0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) ) // Universal Vertical decoder ROM - 7641-5 BPROM - P/N A-5342-09821
+ROM_END
+
+ROM_START( sinistarc2 ) // rev. 2
+	ROM_REGION( 0x19000, "maincpu", 0 ) // solid RED labels with final production part numbers
+	ROM_LOAD( "sinistar_rom_10-b_16-3004-47.4c", 0x0e000, 0x1000, CRC(3d670417) SHA1(81802622bee8dbea5c0f08019d87d941dcdbe292) ) //  == rev. 3 PN 16-3004-62
+	ROM_LOAD( "sinistar_rom_11-b_16-3004-48.4a", 0x0f000, 0x1000, CRC(792c8b00) SHA1(1f847ca8a67595927c36d69cead02813c2431c7b) ) //  unique to rev. 2
+	ROM_LOAD( "sinistar_rom_1-b_16-3004-38.1d",  0x10000, 0x1000, CRC(f6f3a22c) SHA1(026d8cab07734fa294a5645edbe65a904bcbc302) ) //  == rev. 3 PN 16-3004-53
+	ROM_LOAD( "sinistar_rom_2-b_16-3004-39.1c",  0x11000, 0x1000, CRC(cab3185c) SHA1(423d1e3b0c07333ec582529bc4d0b7baf591820a) ) //  == rev. 3 PN 16-3004-54
+	ROM_LOAD( "sinistar_rom_3-b_16-3004-40.1a",  0x12000, 0x1000, CRC(1ce1b3cc) SHA1(5bc03d7249529d827dc60c087e074ab3e4ea7361) ) //  == rev. 3 PN 16-3004-55
+	ROM_LOAD( "sinistar_rom_4-b_16-3004-41.2d",  0x13000, 0x1000, CRC(6da632ba) SHA1(72c0c3d5a5ca87ca4d95fcedaf834206e4633950) ) //  == rev. 3 PN 16-3004-56
+	ROM_LOAD( "sinistar_rom_5-b_16-3004-42.2c",  0x14000, 0x1000, CRC(b662e8fc) SHA1(828a89d2ea13d8a362dae708f86bff54cb231887) ) //  == rev. 3 PN 16-3004-57
+	ROM_LOAD( "sinistar_rom_6-b_16-3004-43.2a",  0x15000, 0x1000, CRC(2306183d) SHA1(703e29e6446856615760a4897c0f5d79cc7bdfb2) ) //  == rev. 3 PN 16-3004-57
+	ROM_LOAD( "sinistar_rom_7-b_16-3004-44.3d",  0x16000, 0x1000, CRC(e5dd918e) SHA1(bf4e2ada6a59d246218544d822ba5355da925924) ) //  == rev. 3 PN 16-3004-59
+	ROM_LOAD( "sinistar_rom_8-b_16-3004-45.3c",  0x17000, 0x1000, CRC(d7ecee45) SHA1(f9552035409bce0a36ed93a677b28f8cd361f8f1) ) //  unique to rev. 2
+	ROM_LOAD( "sinistar_rom_9-b_16-3004-46.3a",  0x18000, 0x1000, CRC(50cb63ad) SHA1(96e28e4fef98fff2649741a266fa590e0313e3b0) ) //  == rev. 3 PN 16-3004-61
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "3004_speech_ic7_r1_16-3004-52.ic7", 0xb000, 0x1000, CRC(e1019568) SHA1(442f4f3ccd2e1db2136d2ffb121ea442921f87ca) )
+	ROM_LOAD( "3004_speech_ic5_r1_16-3004-50.ic5", 0xc000, 0x1000, CRC(cf3b5ffd) SHA1(d5d51c550581c9d46ab331dd4fd32541a2ef598e) )
+	ROM_LOAD( "3004_speech_ic6_r1_16-3004-51.ic6", 0xd000, 0x1000, CRC(ff8d2645) SHA1(16fa2a602acbbc182dd96bab113ab18356f3daf0) )
+	ROM_LOAD( "3004_speech_ic4_r1_16-3004-49.ic4", 0xe000, 0x1000, CRC(4b56a626) SHA1(44430cd5c110ec751b0bfb8ae99b26d443350db1) )
+	ROM_LOAD( "video_sound_rom_9_std.808.ic12",    0xf000, 0x1000, CRC(b82f4ddb) SHA1(c70c7dd6e88897920d7709a260f27810f66aade1) )
+
+	ROM_REGION( 0x10000, "soundcpu_b", 0 ) // Stereo sound requires 2nd sound board as used in the cockpit version
+	ROM_LOAD( "video_sound_rom_10_std.ic12",       0xf000, 0x1000, CRC(b5c70082) SHA1(643af087b57da3a71c68372c79c5777e0c1fbef7) ) // no speech board is connected
 
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "decoder_rom_4.3g", 0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) ) // Universal Horizontal decoder ROM - 7641-5 BPROM - P/N A-5342-09694
@@ -3738,16 +3810,16 @@ GAME( 1980, defenderb,  defender, defender,       defender, defender_state,  emp
 GAME( 1980, defenderw,  defender, defender,       defender, defender_state,  empty_init,    ROT0,   "Williams",                             "Defender (White label)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1980, defenderj,  defender, defender,       defender, defender_state,  empty_init,    ROT0,   "Williams (Taito Corporation license)", "T.T Defender",                       MACHINE_SUPPORTS_SAVE )
 GAME( 1980, defndjeu,   defender, defender,       defender, defender_state,  init_defndjeu, ROT0,   "bootleg (Jeutel)",                     "Defender (bootleg)",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, tornado1,   defender, defender,       defender, defender_state,  init_defndjeu, ROT0,   "bootleg (Jeutel)",                     "Tornado (set 1, Defender bootleg)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1980, tornado2,   defender, defender,       defender, defender_state,  init_defndjeu, ROT0,   "bootleg (Jeutel)",                     "Tornado (set 2, Defender bootleg)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // bad dump?
-GAME( 1980, zero,       defender, defender,       defender, defender_state,  init_defndjeu, ROT0,   "bootleg (Jeutel)",                     "Zero (set 1, Defender bootleg)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1980, zero2,      defender, defender,       defender, defender_state,  init_defndjeu, ROT0,   "bootleg (Amtec)",                      "Zero (set 2, Defender bootleg)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1980, defcmnd,    defender, defender,       defender, defender_state,  empty_init,    ROT0,   "bootleg",                              "Defense Command (Defender bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, defence,    defender, defender,       defender, defender_state,  empty_init,    ROT0,   "bootleg (Outer Limits)",               "Defence Command (Defender bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 198?, defenseb,   defender, defender,       defender, defender_state,  empty_init,    ROT0,   "bootleg",                              "Defense (Defender bootleg)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1981, startrkd,   defender, defender,       defender, defender_state,  empty_init,    ROT0,   "bootleg",                              "Star Trek (Defender bootleg)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1980, attackf,    defender, defender,       defender, defender_state,  empty_init,    ROT0,   "bootleg (Famaresa)",                   "Attack (Defender bootleg)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1981, galwars2,   defender, defender,       defender, defender_state,  empty_init,    ROT0,   "bootleg (Sonic)",                      "Galaxy Wars II (Defender bootleg)",  MACHINE_SUPPORTS_SAVE ) // Sega Sonic - Sega S.A., only displays Sonic on title screen
+GAME( 1980, tornado1,   defender, defender,       defender, defender_state,  init_defndjeu, ROT0,   "bootleg (Jeutel)",                     "Tornado (bootleg of Defender, set 1)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1980, tornado2,   defender, defender,       defender, defender_state,  init_defndjeu, ROT0,   "bootleg (Jeutel)",                     "Tornado (bootleg of Defender, set 2)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // bad dump?
+GAME( 1980, zero,       defender, defender,       defender, defender_state,  init_defndjeu, ROT0,   "bootleg (Jeutel)",                     "Zero (bootleg of Defender, set 1)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1980, zero2,      defender, defender,       defender, defender_state,  init_defndjeu, ROT0,   "bootleg (Amtec)",                      "Zero (bootleg of Defender, set 2)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1980, defcmnd,    defender, defender,       defender, defender_state,  empty_init,    ROT0,   "bootleg",                              "Defense Command (bootleg of Defender)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, defence,    defender, defender,       defender, defender_state,  empty_init,    ROT0,   "bootleg (Outer Limits)",               "Defence Command (bootleg of Defender)", MACHINE_SUPPORTS_SAVE )
+GAME( 198?, defenseb,   defender, defender,       defender, defender_state,  empty_init,    ROT0,   "bootleg",                              "Defense (bootleg of Defender)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1981, startrkd,   defender, defender,       defender, defender_state,  empty_init,    ROT0,   "bootleg",                              "Star Trek (bootleg of Defender)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1980, attackf,    defender, defender,       defender, defender_state,  empty_init,    ROT0,   "bootleg (Famaresa)",                   "Attack (bootleg of Defender)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1981, galwars2,   defender, defender,       defender, defender_state,  empty_init,    ROT0,   "bootleg (Sonic)",                      "Galaxy Wars II (bootleg of Defender)",  MACHINE_SUPPORTS_SAVE ) // Sega Sonic - Sega S.A., only displays Sonic on title screen
 
 GAME( 1980, mayday,     0,        defender,       mayday,   mayday_state,    empty_init,    ROT0,   "Hoei",                 "Mayday (set 1)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // \  original by Hoei, which one of these 3 sets is bootleg/licensed/original is unknown
 GAME( 1980, maydaya,    mayday,   defender,       mayday,   mayday_state,    empty_init,    ROT0,   "Hoei",                 "Mayday (set 2)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) //  > these games have an unemulated protection chip of some sort which is hacked around in /machine/williams.cpp "protection_r" function
@@ -3784,9 +3856,11 @@ GAME( 1982, bubblesp,   bubbles,  williams_b1,    bubbles,  bubbles_state,   emp
 
 GAME( 1982, splat,      0,        splat,          splat,    wms_muxed_state, empty_init,    ROT0,   "Williams", "Splat!", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, sinistar,   0,        sinistar,       sinistar, sinistar_state,  empty_init,    ROT270, "Williams", "Sinistar (revision 3)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1982, sinistar2,  sinistar, sinistar,       sinistar, sinistar_state,  empty_init,    ROT270, "Williams", "Sinistar (revision 2)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1982, sinistarp,  sinistar, sinistar,       sinistar, sinistar_state,  empty_init,    ROT270, "Williams", "Sinistar (AMOA-82 prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, sinistar,   0,        upright,        sinistar, sinistar_state,  empty_init,    ROT270, "Williams", "Sinistar (revision 3, upright)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, sinistarc,  sinistar, cockpit,        sinistar, sinistar_state,  empty_init,    ROT270, "Williams", "Sinistar (revision 3, cockpit)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, sinistar2,  sinistar, upright,        sinistar, sinistar_state,  empty_init,    ROT270, "Williams", "Sinistar (revision 2, upright)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, sinistarc2, sinistar, cockpit,        sinistar, sinistar_state,  empty_init,    ROT270, "Williams", "Sinistar (revision 2, cockpit)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, sinistarp,  sinistar, upright,        sinistar, sinistar_state,  empty_init,    ROT270, "Williams", "Sinistar (AMOA-82 prototype)",   MACHINE_SUPPORTS_SAVE )
 
 GAME( 1983, playball,   0,        playball,       playball, playball_state,  empty_init,    ROT270, "Williams", "PlayBall! (prototype)", MACHINE_SUPPORTS_SAVE )
 

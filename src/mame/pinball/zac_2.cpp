@@ -76,8 +76,8 @@ private:
 	u8 data_r();
 	void ctrl_w(u8 data);
 	void data_w(u8 data);
-	DECLARE_READ_LINE_MEMBER(serial_r);
-	DECLARE_WRITE_LINE_MEMBER(serial_w);
+	int serial_r();
+	void serial_w(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_2_inttimer);
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_2_outtimer);
 	void zac_2_data(address_map &map);
@@ -236,13 +236,13 @@ void zac_2_state::data_w(u8 data)
 // writes to sound card
 }
 
-READ_LINE_MEMBER( zac_2_state::serial_r )
+int zac_2_state::serial_r()
 {
 // from printer
 	return 0;
 }
 
-WRITE_LINE_MEMBER( zac_2_state::serial_w )
+void zac_2_state::serial_w(int state)
 {
 // to printer
 }
@@ -565,6 +565,24 @@ ROM_START(farfallag)
 	ROM_LOAD("farf_de.1g", 0xa000, 0x2000, CRC(0500d468) SHA1(f7dfc6f52e4db1d0d42edb646d719badbcee8ef0))
 ROM_END
 
+ROM_START(farfallaf)
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD ( "cpurom1.bin", 0x0000, 0x0800, CRC(ac249150) SHA1(9eac1bf6119cd1fa6cc823faf02b9bf153519a77))
+	ROM_CONTINUE(0x2000, 0x0800)
+	ROM_CONTINUE(0x4000, 0x0800)
+	ROM_CONTINUE(0x6000, 0x0800)
+	ROM_LOAD ( "cpurom2.bin", 0x0800, 0x0800, CRC(6edc823f) SHA1(b10fcbc308ec06762a2eb35921a7e6a68fd5c9b1))
+	ROM_CONTINUE(0x2800, 0x0800)
+	ROM_CONTINUE(0x1000, 0x0800)
+	ROM_CONTINUE(0x3000, 0x0800)
+
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("farf_fr.1d", 0xe000, 0x2000, CRC(8c8f0d22) SHA1(442ea7bd239f6b7828ecec2188739a8cc1605be8))
+	ROM_LOAD("rom2.snd", 0xc000, 0x1000, CRC(76da384d) SHA1(0e4616bf2fb2c21270aecfc04ad9e68ce9390bfb))
+	ROM_RELOAD(0xd000, 0x1000)
+	ROM_LOAD("farf_fr.1g", 0xa000, 0x2000, CRC(581d0513) SHA1(ea861a0299a556c6c3dd1189c53f9e6d99140189))
+ROM_END
+
 /*--------------------------------
 / Magic Castle (09/84)
 /-------------------------------*/
@@ -647,6 +665,22 @@ ROM_START(mexico)
 	ROM_LOAD("mex86_f.snd", 0xc000, 0x4000, CRC(301c2b63) SHA1(df4a4cb48d28d53c3728066d3e3fa9eac17c78c5))
 ROM_END
 
+ROM_START(mexicoi)
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD ( "mex86_1.lgc", 0x0000, 0x0800, CRC(60d559b1) SHA1(1097f32dd0c89b6e3653a620e39696d8ab1289fc))
+	ROM_CONTINUE(0x4000, 0x0800)
+	ROM_CONTINUE(0x6000, 0x0800)
+	ROM_CONTINUE(0x2000, 0x0800)
+	ROM_LOAD ( "mex86_2.lgc", 0x0800, 0x0800, CRC(5c984c15) SHA1(c6228568cee6a365a3c552a57e5e1e0445108bad))
+	ROM_CONTINUE(0x2800, 0x0800)
+	ROM_CONTINUE(0x1000, 0x0800)
+	ROM_CONTINUE(0x3000, 0x0800)
+
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("mex86_it.snd", 0xa000, 0x2000, CRC(18ceec3a) SHA1(074429ea8610c9fc423ba0e23e557223137c768d))
+	ROM_LOAD("mex86_f.snd",  0xc000, 0x4000, CRC(301c2b63) SHA1(df4a4cb48d28d53c3728066d3e3fa9eac17c78c5))
+ROM_END
+
 /*------------------------------------------------------------------------------------
 / New Star's Phoenix (08/87) same roms as Star's Phoenix, playboard slightly changed
 /------------------------------------------------------------------------------------*/
@@ -715,6 +749,22 @@ ROM_START(pinchamp)
 	ROM_LOAD("pchmp_gb.1g", 0xc000, 0x0800, CRC(39b68215) SHA1(4d57f1f1f71f7bdbef67ca4cc62cfde80d1ab04c))
 ROM_END
 
+ROM_START(pinchampf)
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD ( "pinchamp.ic1", 0x0000, 0x0800, CRC(1412ec33) SHA1(82c158ec0536f76cbe80e8c12e0047579439a5b7))
+	ROM_CONTINUE(0x2000, 0x0800)
+	ROM_LOAD ( "pinchamp.ic2", 0x0800, 0x0800, CRC(a24ba4c6) SHA1(4f02c4d6cd727fa96a68c72012b0b4a4484397c4))
+	ROM_CONTINUE(0x2800, 0x0800)
+	ROM_LOAD ( "pinchamp.ic3", 0x1000, 0x0800, CRC(df5f4f88) SHA1(249cf958b0998aa41fa26c617be9b6c52c2f5549))
+	ROM_CONTINUE(0x3000, 0x0800)
+
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("pchmp_fr.1c", 0xf000, 0x1000, CRC(fcaa6907) SHA1(9c6a3c88754651fd3972bad7c3a920cd4fa885ce))
+	ROM_LOAD("pchmp_fr.1e", 0xe000, 0x1000, CRC(24d83e74) SHA1(f78e151c9885b965cd5209777580414522362ebf))
+	ROM_LOAD("pchmp_fr.1f", 0xd000, 0x1000, CRC(1cd8398c) SHA1(cc72bdce47d8f7189fe315e44cb0af976fc25d65))
+	ROM_LOAD("pchmp_fr.1g", 0xc000, 0x1000, CRC(e8f5cdcb) SHA1(b94dd696cf1688ede90c54e9b55a8d6ec546ecba))
+ROM_END
+
 ROM_START(pinchampg)
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD ( "pinchamp.ic1", 0x0000, 0x0800, CRC(1412ec33) SHA1(82c158ec0536f76cbe80e8c12e0047579439a5b7))
@@ -761,6 +811,22 @@ ROM_START(pinchamp7)
 	ROM_LOAD("pchmp_gb.1e", 0xe000, 0x1000, CRC(24d83e74) SHA1(f78e151c9885b965cd5209777580414522362ebf))
 	ROM_LOAD("pchmp_gb.1f", 0xd000, 0x1000, CRC(d055e8c6) SHA1(0820d941880aa8925b400c792af7ce6b80dcbc48))
 	ROM_LOAD("pchmp_gb.1g", 0xc000, 0x0800, CRC(39b68215) SHA1(4d57f1f1f71f7bdbef67ca4cc62cfde80d1ab04c))
+ROM_END
+
+ROM_START(pinchamp7f)
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD ( "pblchmp7.ic1", 0x0000, 0x0800, CRC(f050b7fa) SHA1(918bdfd77e785c546202c29b1e296ca5f683ca66))
+	ROM_CONTINUE(0x2000, 0x0800)
+	ROM_LOAD ( "pblchmp7.ic2", 0x0800, 0x0800, CRC(cbcb63c7) SHA1(c15329482f02614185adcd0475a02c667cadfc98))
+	ROM_CONTINUE(0x2800, 0x0800)
+	ROM_LOAD ( "pblchmp7.ic3", 0x1000, 0x0800, CRC(54abff9c) SHA1(925c7c1fb903bd6069aee1967c75eb8e61ecf591))
+	ROM_CONTINUE(0x3000, 0x0800)
+
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("pchmp_fr.1c", 0xf000, 0x1000, CRC(fcaa6907) SHA1(9c6a3c88754651fd3972bad7c3a920cd4fa885ce))
+	ROM_LOAD("pchmp_fr.1e", 0xe000, 0x1000, CRC(24d83e74) SHA1(f78e151c9885b965cd5209777580414522362ebf))
+	ROM_LOAD("pchmp_fr.1f", 0xd000, 0x1000, CRC(1cd8398c) SHA1(cc72bdce47d8f7189fe315e44cb0af976fc25d65))
+	ROM_LOAD("pchmp_fr.1g", 0xc000, 0x1000, CRC(e8f5cdcb) SHA1(b94dd696cf1688ede90c54e9b55a8d6ec546ecba))
 ROM_END
 
 ROM_START(pinchamp7g)
@@ -1159,6 +1225,24 @@ ROM_START(tmachzacf)
 	ROM_LOAD("tmach_fr.1g", 0xa000, 0x2000, CRC(4fb43fa3) SHA1(35ef929976e16abef9e70e569a6c005fd7995a6b))
 ROM_END
 
+ROM_START(tmachzaci)
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD ( "timemach.ic1", 0x0000, 0x0800, CRC(d88f424b) SHA1(a0c51f894d604504253f66e49298a9d836e25308))
+	ROM_CONTINUE(0x2000, 0x0800)
+	ROM_CONTINUE(0x4000, 0x0800)
+	ROM_CONTINUE(0x6000, 0x0800)
+	ROM_LOAD ( "timemach.ic2", 0x0800, 0x0800, CRC(3c313487) SHA1(17c6c4a0c0c6dd90cf7fd9298b945305f734747d))
+	ROM_CONTINUE(0x2800, 0x0800)
+	ROM_CONTINUE(0x1000, 0x0800)
+	ROM_CONTINUE(0x3000, 0x0800)
+
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("tmach_it.1d", 0xe000, 0x2000, CRC(8d0272fe) SHA1(031d868a847eb157e182ac2cf69d2dd1bbf33aa5))
+	ROM_LOAD("sound2.e", 0xc000, 0x1000, CRC(41881a1d) SHA1(42f8dd13c38e11c0dd3cf59c64751baaacb00ac1))
+	ROM_RELOAD(0xd000, 0x1000)
+	ROM_LOAD("tmach_it.1g", 0xa000, 0x2000, CRC(fc94b56c) SHA1(cacb1e2414416b0ddaacc37a3e9c2501d7b57ef9))
+ROM_END
+
 
 /*--------------------------------
 / Zankor (12/86)
@@ -1213,9 +1297,11 @@ GAME(1982,  socrkinga,  socrking, zac_2,  zac_2, zac_2_state, empty_init, ROT0, 
 GAME(1982,  socrkingi,  socrking, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Soccer Kings (Italian speech)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1982,  socrkingg,  socrking, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Soccer Kings (German speech)",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1983,  pinchamp,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Pinball Champ",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1983,  pinchampf,  pinchamp, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Pinball Champ (French speech)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1983,  pinchampg,  pinchamp, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Pinball Champ (German speech)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1983,  pinchampi,  pinchamp, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Pinball Champ (Italian speech)",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1983,  pinchamp7,  pinchamp, zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Pinball Champ (7 digits)",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1983,  pinchamp7f, pinchamp, zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Pinball Champ (7 digits French speech)",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1983,  pinchamp7g, pinchamp, zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Pinball Champ (7 digits German speech)",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1983,  pinchamp7i, pinchamp, zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Pinball Champ (7 digits Italian speech)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 
@@ -1223,9 +1309,11 @@ GAME(1983,  pinchamp7i, pinchamp, zac_2,  zac_2, zac_2_state, init_1,     ROT0, 
 GAME(1983,  tmachzac,   0,        zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Time Machine (Zaccaria)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1983,  tmachzacg,  tmachzac, zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Time Machine (Zaccaria, German speech)",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1983,  tmachzacf,  tmachzac, zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Time Machine (Zaccaria, French speech)",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1983,  tmachzaci,  tmachzac, zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Time Machine (Zaccaria, Italian speech)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1983,  farfalla,   0,        zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Farfalla",                                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1983,  farfallai,  farfalla, zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Farfalla (Italian speech)",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1983,  farfallag,  farfalla, zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Farfalla (German speech)",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1983,  farfallaf,  farfalla, zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Farfalla (French speech)",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1984,  dvlrider,   0,        zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Devil Riders",                            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1984,  dvlrideri,  dvlrider, zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Devil Riders (Italian speech)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1984,  dvlriderg,  dvlrider, zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Devil Riders (German speech)",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
@@ -1248,6 +1336,7 @@ GAME(1986,  bbeltzaci,  bbeltzac, zac_2,  zac_2, zac_2_state, empty_init, ROT0, 
 GAME(1986,  bbeltzacg,  bbeltzac, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Black Belt (Zaccaria, German speech)",    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1986,  bbeltzacf,  bbeltzac, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Black Belt (Zaccaria, French speech)",    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1986,  mexico,     0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Mexico 86 (German speech)",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1986,  mexicoi,    mexico,   zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Mexico 86 (Italian speech)",              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1986,  zankor,     0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Zankor (TMS5200 Italian speech)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1986,  zankor2i,   zankor,   zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Zankor (TMS5220 Italian speech)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1987,  spookyp,    0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Spooky",                                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

@@ -35,9 +35,6 @@ void ttl74543_device::device_start()
 	save_item(NAME(m_oeba));
 
 	save_item(NAME(m_latch));
-
-	m_output_a.resolve_safe();
-	m_output_b.resolve_safe();
 }
 
 void ttl74543_device::device_reset()
@@ -85,35 +82,35 @@ void ttl74543_device::outputa_rz(uint8_t& value)
 	if (m_ceba && m_oeba) value = m_latch;
 }
 
-WRITE_LINE_MEMBER( ttl74543_device::ceab_w )
+void ttl74543_device::ceab_w(int state)
 {
 	m_ceab = (state == 0);
 	if (m_ceab && m_oeab) m_output_b(m_latch);
 }
 
-WRITE_LINE_MEMBER( ttl74543_device::leab_w )
+void ttl74543_device::leab_w(int state)
 {
 	m_leab = (state == 0);
 }
 
-WRITE_LINE_MEMBER( ttl74543_device::oeab_w )
+void ttl74543_device::oeab_w(int state)
 {
 	m_oeab = (state == 0);
 	if (m_ceab && m_oeab) m_output_b(m_latch);
 }
 
-WRITE_LINE_MEMBER( ttl74543_device::ceba_w )
+void ttl74543_device::ceba_w(int state)
 {
 	m_ceba = (state == 0);
 	if (m_ceba && m_oeba) m_output_a(m_latch);
 }
 
-WRITE_LINE_MEMBER( ttl74543_device::leba_w )
+void ttl74543_device::leba_w(int state)
 {
 	m_leba = (state == 0);
 }
 
-WRITE_LINE_MEMBER( ttl74543_device::oeba_w )
+void ttl74543_device::oeba_w(int state)
 {
 	m_oeba = (state == 0);
 	if (m_ceba && m_oeba) m_output_a(m_latch);

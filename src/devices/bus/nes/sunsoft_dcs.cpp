@@ -16,12 +16,11 @@
 #include "sunsoft_dcs.h"
 
 #ifdef NES_PCB_DEBUG
-#define VERBOSE 1
+#define VERBOSE (LOG_GENERAL)
 #else
-#define VERBOSE 0
+#define VERBOSE (0)
 #endif
-
-#define LOG_MMC(x) do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
 
 
 //-----------------------------------------------
@@ -202,7 +201,7 @@ void nes_sunsoft_dcs_device::pcb_reset()
 
 void nes_sunsoft_dcs_device::write_h(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("Sunsoft DCS write_h, offset %04x, data: %02x\n", offset, data));
+	LOG("Sunsoft DCS write_h, offset %04x, data: %02x\n", offset, data);
 
 	switch (offset & 0x7000)
 	{
@@ -219,7 +218,7 @@ void nes_sunsoft_dcs_device::write_h(offs_t offset, uint8_t data)
 
 uint8_t nes_sunsoft_dcs_device::read_h(offs_t offset)
 {
-	LOG_MMC(("Sunsoft DCS read_h, offset: %04x\n", offset));
+	LOG("Sunsoft DCS read_h, offset: %04x\n", offset);
 
 	if (m_exrom_enable && m_subslot->m_cart && offset < 0x4000)
 	{
@@ -234,7 +233,7 @@ uint8_t nes_sunsoft_dcs_device::read_h(offs_t offset)
 
 void nes_sunsoft_dcs_device::write_m(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("Sunsoft DCS write_m, offset: %04x, data: %02x\n", offset, data));
+	LOG("Sunsoft DCS write_m, offset: %04x, data: %02x\n", offset, data);
 
 	if (!m_battery.empty() && m_wram_enable)
 		m_battery[offset & (m_battery.size() - 1)] = data;
@@ -250,7 +249,7 @@ void nes_sunsoft_dcs_device::write_m(offs_t offset, uint8_t data)
 
 uint8_t nes_sunsoft_dcs_device::read_m(offs_t offset)
 {
-	LOG_MMC(("Sunsoft DCS read_m, offset: %04x\n", offset));
+	LOG("Sunsoft DCS read_m, offset: %04x\n", offset);
 
 	if (!m_battery.empty() && m_wram_enable)
 		return m_battery[offset & (m_battery.size() - 1)];

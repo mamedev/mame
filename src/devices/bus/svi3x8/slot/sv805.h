@@ -36,7 +36,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( uart_intr_w );
+	void uart_intr_w(int state);
 
 	required_device<ins8250_device> m_uart;
 	required_device<rs232_port_device> m_rs232;

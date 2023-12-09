@@ -138,7 +138,7 @@ TIMER_CALLBACK_MEMBER(metro_state::mouja_irq)
 	if (m_vdp3) m_vdp3->set_irq(0);
 }
 
-WRITE_LINE_MEMBER(metro_state::vblank_irq)
+void metro_state::vblank_irq(int state)
 {
 	if (state)
 	{
@@ -173,7 +173,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(metro_state::bangball_scanline)
 }
 
 /* lev 2-7 (lev 1 seems sound related) */
-WRITE_LINE_MEMBER(metro_state::karatour_vblank_irq)
+void metro_state::karatour_vblank_irq(int state)
 {
 //  printf("%d %d %lld\n", state, m_screen->vpos(), m_screen->frame_number());
 
@@ -198,7 +198,7 @@ WRITE_LINE_MEMBER(metro_state::karatour_vblank_irq)
 	}
 }
 
-WRITE_LINE_MEMBER(metro_state::ext_irq5_enable_w)
+void metro_state::ext_irq5_enable_w(int state)
 {
 	m_ext_irq_enable = state;
 }
@@ -210,7 +210,7 @@ void metro_state::mouja_irq_timer_ctrl_w(u16 data)
 	m_mouja_irq_timer->adjust(attotime::zero, 0, attotime::from_hz(freq));
 }
 
-WRITE_LINE_MEMBER(metro_state::puzzlet_vblank_irq)
+void metro_state::puzzlet_vblank_irq(int state)
 {
 	if (state)
 	{
@@ -230,7 +230,7 @@ WRITE_LINE_MEMBER(metro_state::puzzlet_vblank_irq)
 
 ***************************************************************************/
 
-READ_LINE_MEMBER(metro_state::rxd_r)
+int metro_state::rxd_r()
 {
 	u8 data = m_sound_data;
 
@@ -259,7 +259,7 @@ u8 metro_state::soundstatus_r()
 	return (m_busy_sndcpu ? 0x00 : 0x01);
 }
 
-READ_LINE_MEMBER(metro_state::custom_soundstatus_r)
+int metro_state::custom_soundstatus_r()
 {
 	return (m_busy_sndcpu ? 1 : 0);
 }
@@ -1070,13 +1070,6 @@ void metro_state::puzzlet_portb_w(u16 data)
 //  popmessage("PORTB %02x", data);
 }
 
-void metro_state::puzzlet_io_map(address_map &map)
-{
-	map(h8_device::PORT_7, h8_device::PORT_7).portr("IN2");
-	map(h8_device::PORT_B, h8_device::PORT_B).portr("DSW0").w(FUNC(metro_state::puzzlet_portb_w));
-}
-
-
 /***************************************************************************
                                 Varia Metal
 ***************************************************************************/
@@ -1110,7 +1103,7 @@ void metro_state::es8712_reset_w(u8 data)
 	m_essnd->reset();
 }
 
-WRITE_LINE_MEMBER(metro_state::vmetal_es8712_irq)
+void metro_state::vmetal_es8712_irq(int state)
 {
 	if (m_essnd_gate)
 		m_maincpu->set_input_line(3, state);
@@ -3492,17 +3485,19 @@ void metro_state::gstrik2(machine_config &config)
 void metro_state::puzzlet(machine_config &config)
 {
 	/* basic machine hardware */
-	H83007(config, m_maincpu, 20_MHz_XTAL); // H8/3007 - Hitachi HD6413007F20 CPU. Clock 20MHz
-	m_maincpu->set_addrmap(AS_PROGRAM, &metro_state::puzzlet_map);
-	m_maincpu->set_addrmap(AS_IO, &metro_state::puzzlet_io_map);
+	auto &maincpu(H83007(config, m_maincpu, 20_MHz_XTAL)); // H8/3007 - Hitachi HD6413007F20 CPU. Clock 20MHz
+	maincpu.set_addrmap(AS_PROGRAM, &metro_state::puzzlet_map);
+	maincpu.read_port7().set_ioport("IN2");
+	maincpu.read_portb().set_ioport("DSW0");
+	maincpu.write_portb().set(FUNC(metro_state::puzzlet_portb_w));
 
 	/* Coins/service */
 	z8_device &coinmcu(Z86E02(config, "coinmcu", 20_MHz_XTAL/5)); // clock divider guessed
 	coinmcu.p0_in_cb().set_ioport("COIN");
 	coinmcu.p2_in_cb().set_ioport("START");
-	coinmcu.p2_out_cb().set("maincpu:sci1", FUNC(h8_sci_device::rx_w)).bit(6);
-	subdevice<h8_sci_device>("maincpu:sci1")->tx_handler().set_inputline("coinmcu", INPUT_LINE_IRQ2).invert();
-	subdevice<h8_sci_device>("maincpu:sci1")->clk_handler().set_inputline("coinmcu", INPUT_LINE_IRQ0).invert();
+	coinmcu.p2_out_cb().set(maincpu, FUNC(h83007_device::sci_rx_w<1>)).bit(6);
+	maincpu.write_sci_tx<1>().set_inputline("coinmcu", INPUT_LINE_IRQ2).invert();
+	maincpu.write_sci_clk<1>().set_inputline("coinmcu", INPUT_LINE_IRQ0).invert();
 
 	/* video hardware */
 	// TODO: looks like game is running in i4220 compatibility mode, $778000 seems to be an id for the chip?
@@ -4537,21 +4532,40 @@ Custom: I4300 095
 
 ROM_START( gakusai )
 	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 Code */
-	ROM_LOAD16_BYTE( "6.bin", 0x000000, 0x040000, CRC(6f8ab082) SHA1(18caf49a0c65f831d375f089f27b8570b094f029) )
-	ROM_LOAD16_BYTE( "5.bin", 0x000001, 0x040000, CRC(010176c4) SHA1(48fcea18c02c1426a699a636f44b21cf7625e8a0) )
+	ROM_LOAD16_BYTE( "6.u38", 0x000000, 0x040000, CRC(6f8ab082) SHA1(18caf49a0c65f831d375f089f27b8570b094f029) )
+	ROM_LOAD16_BYTE( "5.u39", 0x000001, 0x040000, CRC(010176c4) SHA1(48fcea18c02c1426a699a636f44b21cf7625e8a0) )
 
 	ROM_REGION( 0x2000000, "vdp3", 0 )  /* Gfx + Data (Addressable by CPU & Blitter) */
-	ROM_LOAD64_WORD( "2l.bin", 0x0000000, 0x400000, CRC(45dfb5c7) SHA1(04338d695bd6973fd7d7286a8da563250ae4f71b) )
-	ROM_LOAD64_WORD( "4l.bin", 0x0000002, 0x400000, CRC(7ab64f49) SHA1(e4d9a7bf97635b41fe632b3542eee1f609db080a) )
-	ROM_LOAD64_WORD( "1l.bin", 0x0000004, 0x400000, CRC(75093421) SHA1(cfe549e24abfedd740ead30cab235df494e9f45d) )
-	ROM_LOAD64_WORD( "3l.bin", 0x0000006, 0x400000, CRC(4dcfcd98) SHA1(bfb882d99c854e68e86f4e8f8aa7d02dcf5e9cfc) )
-	ROM_LOAD64_WORD( "2u.bin", 0x1000000, 0x400000, CRC(8d4f912b) SHA1(1fcf1dd50fd678cc908ab47bcccaa4ed7b2b6938) )
-	ROM_LOAD64_WORD( "4u.bin", 0x1000002, 0x400000, CRC(1f83e98a) SHA1(10b2d3ceb4bda6a2ecf795b865c948563c2fb84d) )
-	ROM_LOAD64_WORD( "1u.bin", 0x1000004, 0x400000, CRC(28b386d9) SHA1(d1e151fa112c86d2cb97b7a5439a1e549359055d) )
-	ROM_LOAD64_WORD( "3u.bin", 0x1000006, 0x400000, CRC(87f3c5e6) SHA1(097c0a53b040399d928f17fe3e9f42755b1d72f3) )
+	ROM_LOAD64_WORD( "2l.u26", 0x0000000, 0x400000, CRC(45dfb5c7) SHA1(04338d695bd6973fd7d7286a8da563250ae4f71b) )
+	ROM_LOAD64_WORD( "4l.u27", 0x0000002, 0x400000, CRC(7ab64f49) SHA1(e4d9a7bf97635b41fe632b3542eee1f609db080a) )
+	ROM_LOAD64_WORD( "1l.u24", 0x0000004, 0x400000, CRC(75093421) SHA1(cfe549e24abfedd740ead30cab235df494e9f45d) )
+	ROM_LOAD64_WORD( "3l.u25", 0x0000006, 0x400000, CRC(4dcfcd98) SHA1(bfb882d99c854e68e86f4e8f8aa7d02dcf5e9cfc) )
+	ROM_LOAD64_WORD( "2u.u21", 0x1000000, 0x400000, CRC(8d4f912b) SHA1(1fcf1dd50fd678cc908ab47bcccaa4ed7b2b6938) )
+	ROM_LOAD64_WORD( "4u.u20", 0x1000002, 0x400000, CRC(1f83e98a) SHA1(10b2d3ceb4bda6a2ecf795b865c948563c2fb84d) )
+	ROM_LOAD64_WORD( "1u.u23", 0x1000004, 0x400000, CRC(28b386d9) SHA1(d1e151fa112c86d2cb97b7a5439a1e549359055d) )
+	ROM_LOAD64_WORD( "3u.u22", 0x1000006, 0x400000, CRC(87f3c5e6) SHA1(097c0a53b040399d928f17fe3e9f42755b1d72f3) )
 
 	ROM_REGION( 0x400000, "oki", 0 )    /* Samples */
-	ROM_LOAD( "7.bin", 0x000000, 0x400000, CRC(34575a14) SHA1(53d458513f208f07844e1727d5889e85dcd4f0ed) )
+	ROM_LOAD( "7.u11", 0x000000, 0x400000, CRC(34575a14) SHA1(53d458513f208f07844e1727d5889e85dcd4f0ed) )
+ROM_END
+
+ROM_START( gakusaia )
+	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 Code */
+	ROM_LOAD16_BYTE( "6.u38", 0x000000, 0x040000, CRC(16155d87) SHA1(8fc44f9a9c03b211edc204deba1aa4ac9d455eeb) )
+	ROM_LOAD16_BYTE( "5.u39", 0x000001, 0x040000, CRC(2564acb8) SHA1(fe526594c7fa2eba05eeb3c58081244c8966588f) )
+
+	ROM_REGION( 0x2000000, "vdp3", 0 )  /* Gfx + Data (Addressable by CPU & Blitter) */
+	ROM_LOAD64_WORD( "2l.u26", 0x0000000, 0x400000, CRC(45dfb5c7) SHA1(04338d695bd6973fd7d7286a8da563250ae4f71b) )
+	ROM_LOAD64_WORD( "4l.u27", 0x0000002, 0x400000, CRC(7ab64f49) SHA1(e4d9a7bf97635b41fe632b3542eee1f609db080a) )
+	ROM_LOAD64_WORD( "1l.u24", 0x0000004, 0x400000, CRC(75093421) SHA1(cfe549e24abfedd740ead30cab235df494e9f45d) )
+	ROM_LOAD64_WORD( "3l.u25", 0x0000006, 0x400000, CRC(4dcfcd98) SHA1(bfb882d99c854e68e86f4e8f8aa7d02dcf5e9cfc) )
+	ROM_LOAD64_WORD( "2u.u21", 0x1000000, 0x400000, CRC(8d4f912b) SHA1(1fcf1dd50fd678cc908ab47bcccaa4ed7b2b6938) )
+	ROM_LOAD64_WORD( "4u.u20", 0x1000002, 0x400000, CRC(1f83e98a) SHA1(10b2d3ceb4bda6a2ecf795b865c948563c2fb84d) )
+	ROM_LOAD64_WORD( "1u.u23", 0x1000004, 0x400000, CRC(28b386d9) SHA1(d1e151fa112c86d2cb97b7a5439a1e549359055d) )
+	ROM_LOAD64_WORD( "3u.u22", 0x1000006, 0x400000, CRC(87f3c5e6) SHA1(097c0a53b040399d928f17fe3e9f42755b1d72f3) )
+
+	ROM_REGION( 0x400000, "oki", 0 )    /* Samples */
+	ROM_LOAD( "7.u11", 0x000000, 0x400000, CRC(34575a14) SHA1(53d458513f208f07844e1727d5889e85dcd4f0ed) )
 ROM_END
 
 
@@ -5038,7 +5052,25 @@ AMD MACH110-20 (CPLD)
 
 ***************************************************************************/
 
-ROM_START( pururun )
+ROM_START( pururun ) // These labels follow standard production format, IE: Game code, region/revision - PU JA
+	ROM_REGION( 0x80000, "maincpu", 0 )        // 68000 Code
+	ROM_LOAD16_BYTE( "pu_ja-5.20e", 0x000000, 0x020000, CRC(c15ae3db) SHA1(7056ef5d96b7bdd30e85c2e7f0482cf04e2300c7) )
+	ROM_LOAD16_BYTE( "pu_ja-6.20c", 0x000001, 0x020000, CRC(2e21328a) SHA1(6aad7fb728042eef2edce73acd73cd9a29cb1082) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )       // NEC78C10 Code
+	ROM_LOAD( "pu_ja-8.3i", 0x000000, 0x020000, CRC(edc3830b) SHA1(13ee759d10711218465f6d7155e9c443a82b323c) )
+
+	ROM_REGION( 0x200000, "vdp2", 0 )   // Gfx + Data (Addressable by CPU & Blitter)
+	ROM_LOAD64_WORD( "pu_ja-2.14i", 0x000000, 0x080000, CRC(93a9dbed) SHA1(76d11a14e655d3d6de95847dd69f425467d1a1d9) )
+	ROM_LOAD64_WORD( "pu_ja-4.18i", 0x000002, 0x080000, CRC(47d82187) SHA1(a588f053781773d54a2333bf70965ff357da0253) )
+	ROM_LOAD64_WORD( "pu_ja-1.12i", 0x000004, 0x080000, CRC(436096c6) SHA1(35575defa25f0e3a7db3fb7a0e22e003e05d9c67) )
+	ROM_LOAD64_WORD( "pu_ja-3.16i", 0x000006, 0x080000, CRC(80619e1a) SHA1(625d3fc829e3b7f24de9b0b932b2cef2cd8509ef) )
+
+	ROM_REGION( 0x040000, "oki", 0 )    // Samples
+	ROM_LOAD( "pu_ja-7.3g", 0x000000, 0x040000, CRC(51ae4926) SHA1(1a69a00e960bda399aaf051b3dcc9e0a108c8047) )
+ROM_END
+
+ROM_START( pururuna ) // dev or proto version?, PU9 & 19 don't follow normal Game code, region/revision format
 	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 Code */
 	ROM_LOAD16_BYTE( "pu9-19-5.20e", 0x000000, 0x020000, CRC(5a466a1b) SHA1(032eeaf66ce1b601385a8e76d2efd9ea6fd34680) )
 	ROM_LOAD16_BYTE( "pu9-19-6.20c", 0x000001, 0x020000, CRC(d155a53c) SHA1(6916a1bad82c624b8757f5124416dac50a8dd7f5) )
@@ -5465,7 +5497,8 @@ GAME( 1994, toride2gk, toride2g, toride2g,  toride2g,   metro_state, init_metro,
 GAME( 1994, toride2j,  toride2g, toride2g,  toride2g,   metro_state, init_metro,    ROT0,   "Metro",                                           "Toride II (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1994, gunmast,   0,        pururun,   gunmast,    metro_state, init_metro,    ROT0,   "Metro",                                           "Gun Master", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, daitorid,  0,        daitorid,  daitorid,   metro_state, init_metro,    ROT0,   "Metro",                                           "Daitoride", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, pururun,   0,        pururun,   pururun,    metro_state, init_metro,    ROT0,   "Metro / Banpresto",                               "Pururun", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, pururun,   0,        pururun,   pururun,    metro_state, init_metro,    ROT0,   "Metro / Banpresto",                               "Pururun (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, pururuna,  pururun,  pururun,   pururun,    metro_state, init_metro,    ROT0,   "Metro / Banpresto",                               "Pururun (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, puzzli,    0,        puzzli,    puzzli,     metro_state, init_metro,    ROT0,   "Metro / Banpresto",                               "Puzzli (revision B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, puzzlia,   puzzli,   puzzlia,   puzzli,     metro_state, init_metro,    ROT0,   "Metro / Banpresto",                               "Puzzli (revision A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, 3kokushi,  0,        sankokushi,sankokushi, metro_state, init_karatour, ROT0,   "Mitchell",                                        "Sankokushi (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
@@ -5481,7 +5514,8 @@ GAME( 1999, batlbubl,  bangball, batlbubl,  batlbubl,   metro_state, init_balcub
 GAME( 1995, dokyusei,  0,        dokyusei,  dokyusei,   metro_state, empty_init,    ROT0,   "Make Software / Elf / Media Trading",             "Mahjong Doukyuusei", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, dokyusp,   0,        dokyusp,   gakusai,    metro_state, empty_init,    ROT0,   "Make Software / Elf / Media Trading",             "Mahjong Doukyuusei Special", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, mouja,     0,        mouja,     mouja,      metro_state, init_mouja,    ROT0,   "Etona",                                           "Mouja (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, gakusai,   0,        gakusai,   gakusai,    metro_state, empty_init,    ROT0,   "MakeSoft",                                        "Mahjong Gakuensai (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, gakusai,   0,        gakusai,   gakusai,    metro_state, empty_init,    ROT0,   "MakeSoft",                                        "Mahjong Gakuensai (Japan, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, gakusaia,  gakusai,  gakusai,   gakusai,    metro_state, empty_init,    ROT0,   "MakeSoft",                                        "Mahjong Gakuensai (Japan, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1998, gakusai2,  0,        gakusai2,  gakusai,    metro_state, empty_init,    ROT0,   "MakeSoft",                                        "Mahjong Gakuensai 2 (Japan)", MACHINE_SUPPORTS_SAVE )
 
 // HUM-002 / HUM-003

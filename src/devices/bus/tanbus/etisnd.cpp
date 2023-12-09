@@ -26,28 +26,28 @@ DEFINE_DEVICE_TYPE(TANBUS_ETISND, tanbus_etisnd_device, "tanbus_etisnd", "Microt
 
 void tanbus_etisnd_device::device_add_mconfig(machine_config &config)
 {
-	PIA6821(config, m_pia[0], 0);
+	PIA6821(config, m_pia[0]);
 	m_pia[0]->writepa_handler().set("dac1", FUNC(dac_byte_interface::data_w));
 	m_pia[0]->writepb_handler().set("dac2", FUNC(dac_byte_interface::data_w));
 
-	PIA6821(config, m_pia[1], 0);
+	PIA6821(config, m_pia[1]);
 	m_pia[1]->writepa_handler().set("dac3", FUNC(dac_byte_interface::data_w));
 	m_pia[1]->writepb_handler().set("dac4", FUNC(dac_byte_interface::data_w));
 
-	PIA6821(config, m_pia[2], 0);
+	PIA6821(config, m_pia[2]);
 	m_pia[2]->writepa_handler().set("dac5", FUNC(dac_byte_interface::data_w));
 	m_pia[2]->writepb_handler().set("dac6", FUNC(dac_byte_interface::data_w));
 
-	PIA6821(config, m_pia[3], 0);
+	PIA6821(config, m_pia[3]);
 	m_pia[2]->writepb_handler().set(FUNC(tanbus_etisnd_device::pia_pb_w));
 
 	SPEAKER(config, "speaker").front_center();
-	DAC0800(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
-	DAC0800(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
-	DAC0800(config, "dac3", 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
-	DAC0800(config, "dac4", 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
-	DAC0800(config, "dac5", 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
-	DAC0800(config, "dac6", 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	DAC0800(config, "dac1").add_route(ALL_OUTPUTS, "speaker", 1.0);
+	DAC0800(config, "dac2").add_route(ALL_OUTPUTS, "speaker", 1.0);
+	DAC0800(config, "dac3").add_route(ALL_OUTPUTS, "speaker", 1.0);
+	DAC0800(config, "dac4").add_route(ALL_OUTPUTS, "speaker", 1.0);
+	DAC0800(config, "dac5").add_route(ALL_OUTPUTS, "speaker", 1.0);
+	DAC0800(config, "dac6").add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	AY8910(config, m_ay8910, DERIVED_CLOCK(1, 4)).add_route(ALL_OUTPUTS, "speaker", 0.5);
 }

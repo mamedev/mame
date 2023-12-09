@@ -1,9 +1,136 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-/* Atronic Russian Video Fruit Machines */
+/* Atronic Video Fruit Machines */
 /*
  From 1999? (documentation is dated August 99)
 
+Atronic was an Austrian/German slot machine manufacturer. It later
+merged with Spielo.
+
+Atronic CashLine platform (~199x-2004?) - z80-based
+
+Atronic CashLine platform is used in multiple cabinet form-factors:
+* Regular/Upright (?)
+* WBC - Wide Body Cabinet
+* AST - Atronic Slant Top
+* Titan (?)
+
+* CashLine hardware description:
+
+Backplane has room for 4 boards:
+1. Master board [Z80]
+2. Graphic Board [TMS34020]
+3. Sound Board (optional?) [YMZ280B?]
+4. Communications board (optional) [M68k]
+
+CashLine PCB boards have EEPROM/EPROM slots for software installation:
+* Main software         - Master board, socket U2
+* Paytable software     - Master board, socket U6
+* Security device (PLA) - Master board, socket U35 (PLA)
+* Graphic software      - Graphic board, sockets U8 .. U15
+* Sound software        - Sound board, sockets U18 .. U21
+* Comm software         - Comm board, sockets U34 and U35
+
+Atronic platforms following Z80-based CashLine:
+* "Hi(!)bility" platform (2001) - two 68k-based circuit boards for game control and external
+  communications running OSE (Enea?) operating system, and a customized PC mainboard
+  based on Intel 815 chipset and Intel Celeron 566MHz CPU running Windows CE.
+  Custom ATI Radeon Mobility M6 AGP graphics card is used for dual displays.
+* "Oxygen" platform - 3 board system, with two PowerPC-based for game control and
+  communications and customized PC mainboard based on Intel i855GM with integrated GPU
+  and Intel Pentium M CPU at 1.6GHz. All boards use Linux.
+* "Sensys" - single board system running Linux. Custom all-purpose board with Intel
+  i915GM chipset with integrated GPU and Intel Core2Duo CPU at 2.2GHz.
+* "Synergy" - direct successor of "Sensys" platform. Utilizing i965GME chipset (and possibly
+  newer CPU).
+
+CashLine-based slot machines were followed by Atronic Harmony, Atronic E-Motion and
+Atronic e^2-Motion slot machines.
+
+All product lines also featured a custom linked gaming products:
+* e-Motion: Cash Fever, King Kong Cash, The Game of Life, Mystery Magic, Hot Link, etc)
+* e^2-Motion: Mystery Magic, Hot Link
+
+Atronic eMotion software is deployed via set of EEPROMs + CD + Security box (custom hw?).
+Known eMotion games (code in braces taken verbatim from CDROM, CF - Cash Fever,
+KKC - King Kong Cash, DDTE - ??):
+* African Cash (HCDSTDAFCA-11.1.4.3 66009549 / 65023927)
+* Angels & Devils (?)
+* Bamboo Forest
+* Bella Venezia (?)
+* Big Boys Toys (HCD-STD-BBTO-11.1.1.2 2008)
+* Blastin' Barrels (HCDUSAGOS2_3.2.2.48)
+* Caribbean Queen (HCD-STD-CAQU-11.1.0.16 2008 SAP-NO. 66009928)
+* Champagne & Roses (HCD_STD_CHRO_11.1.3.25 2007 SAP-NO. 66008329)
+* China Town (HCD_STD_CHTO_11.1.3.15 2007 SAP-NO. 66007445)
+* Creepy Cash (HCDSTDCRCA-4.1.5.1 66006639 NV# L06-2531-03 w/o security?)
+* Crimson Fire (HCD-STD-CRFI-11.1.2.5 2007)
+* Crimson Fire [KKC] (HCD_STD_KKCR_11.1.3.1 2008 SAP-NO. 66010132) [v11/v12]
+* Crystal Lake
+* Deal or no Deal The Show (HCDSTDDODB - 11.1.2.3 66008401 / 65023927)
+* Diamond Mine (HCD-STD-DIMI1CG-12.0.0.12 2009 SAP-NO. 66011438)
+* Diamond Mine [KKC] (HCD_STD_DIMI1KK_12.0.0.11 2010 SAP-NO. 66012065)
+* Deep Diamonds
+* Doggie Cash - Garden (HCDSTDTDWI1DC-12.0.4.2SIG 66012509 / 65023927 / Spielo)
+* Doggie Cash - Glittering (HCDSTDTDPA1DC-12.0.2.2SIG 66012507 / 65023927 / Spielo)
+* Doggie Cash - Sports (HCDSTDTDSP1DC-12.0.2.2SIG 66012508 / 65023927 / Spielo)
+* Doggie Cash - Twins (HCDSTDTDMM1DC-12.0.4.2SIG 66012506 / 65023927 / Spielo)
+* Eric Ring of Silver (HCD-STD-RIOS-11.1.0.16 2007)
+* Frenzy Fruits [CF] (HCD-STD-FFCF-11.1.0.18 2007)
+* Golden Adventure
+* Golden Harp (HCD-STD-GOHA-11.1.0.33 2008)
+* Golden Light (HCDSTDGOLI_11.1.2.1 66008710 / 65023927)
+* Golden Light (HCD_STD_GOLI_11.1.1.3 2007 SAP-NO. 66008062)
+* Granny's Trucking Co.
+* Gypsy Fortune (HCDUSAGYPS-3.0.0.8 66003310)
+* Gypsy Moon (HCD-STD-GYMO1CG-12.0.1.20 2009 SAP-NO. 66011154)
+* Imperial Rome
+* Jungle of Gold [KKC] (HCD_STD_KKJU_11.1.3.1 2008 SAP-NO. 66010168) [v11/v12]
+* Knights of the Grail (HCD_STD_KNGR_11.1.0.46 2008 SAP-NO. 66009045)
+* Kublai Khan [DDTE] (HCDSTDDLKU-11.1.3.1 66009322 / 65023927)
+* Logic Goods
+* Magic Academy (HCD_STD_MAAC_11.1.0.5 2006 SAP-NO. 66006963)
+* Might Miner SP (HCDSTDMIMI-11.1.2.2 66010359 / 65023927)
+* Mistress of the Sea (HCDSTDMIST-4.0.4.19 66004029 / 65023927)
+* Money Island (HCDSTDMOIS-4.1.5.1 66005113 / 65023927 w/o security?)
+* Mystical Journey (HCD-STD-MYJO-11.1.1.12 2007)
+* Mystical Journey (HCDSTDMYJO-11.1.2.1 66008244 / 65023927)
+* Mystical Journey [DDTE] (HCDSTDDLMY-11.1.1.1 66009192 / 65023927)
+* Mystic Pearls (HCD_STD_MYPE_11.1.0.36 2008 SAP-NO. 66009819)
+* Mystic Pearls [KKC] (HCD_STD_KKMY_12.0.0.17 2009 SAP-NO. 66011142)
+* Passion Coast (HCDSTDPACO-4.1.5.1 6605996 / MS# M0-450-08-06-048 w/o security?)
+* Passion Coast (HCDSTDPACO-4.1.5.1 6605996 / 65023927)
+* Passion Coast (HCD_STD_PACO_11.1.0.7 2006 SAP-NO. 66006909)
+* Princess of the Amazon [KKC] (HCD_STD_KKPO_12.0.0.11 2008 SAP-NO. 66010362)
+* Scarab (HCDSTDSCAR-11.1.2.9 66009334 / 65023927)
+* Sign of Zodiac (HCDSTDZODI_3.0.2.52 66001491 w/o security?)
+* Sphinx Classic (?)
+* Stargate Daniel Jackson (HCDSTDSGDJ-12.0.2.3 66011063 / 65023927)
+* Stargate Jack O'Neill (HCDSTDSGJO-12.0.3.4 66011324 / 65023927)
+* Stargate Samantha Carter (HCDSTDSGSC-12.0.2.4 66011??? / 65023927)
+* Sun Spirit (HCDSTDGOSU-11.1.0.27 66007627 / 65023927)
+* Sun Spirit [KKC] (HCD_STD_KKGO_11.1.3.1 2008 SAP-NO. 66010164) [v11/v12]
+* Super Sphinx
+* Star of Africa (HCDSTDSTA2-11.1.2 66008806 / 65023927 / Spielo)
+* Tabby Cash
+* The Crazy Nest [CF] (HCDSTDCRCF-4.0.5.1 66005543 / 65023927)
+* The Game of Life - Career choices
+* Toucan Treasures (HCD-STD-TOTR-???)
+* Treasures of Venice (HCDSTDVENI_3.1.3.41 66003110)
+* Tree Stooges Wild Stooges (HCDSTDTSWS-12.0.3.10 66011091 / 65023927 / Spielo)
+* Tiger & Dragon [KKC] (HCD_STD_KKTI_11.1.4.1 2008 SAP-NO. 66010128) [v11/v12]
+* Time for Money [CF] (HCD-STD-TICF-11.1.0.9 2007 SAP-NO. 66007383)
+* Treasure Cats (HCD_STD_WICA_11.1.0.2 2007)
+* Treasure Cats [KKC] (HCD_STD_KKWI_11.1.5.3 2009 SAP-NO. 66010696) [v11/v12]
+* Wild Diamonds [KKC] (HCD_STD_WIDI1KK_12.0.0.4 2009 SAP-NO. 66011416)
+* Wild Fangs (HCD_STD_WIFA_11.1.1.1 2007 SAP-NO. 66007957)
+* Wild Fangs [CF] (HCD-STD-WFCF-11.1.1.1 2007)
+* Wild Valley
+* Xanadu - City of Luck (HCD_STD_XACL_11.1.1.2 2007 SAP-NO. 66007934)
+* Xanadu - City of Luck (HCD_STD_XACL_11.1.2.4 66008982 / 65023927
+* Xanadu - City of Luck [KKC] (HCD_STD_KKXA_11.1.2.1 2008 SAP-NO. 66010166) [v11/v12]
+
+CashLine:
  There was PC software with these too, I think they're meant to connect to a PC for configuration?
  I've put what there was in an ISO, and converted it to a CHD for later inspection.
 
@@ -134,8 +261,6 @@ OSZ2: 25.000MHz
 GFX board: 21 / QC 8129
 Color: Red
 Markings bottom: 6 470.5020 00.21
-
-
 */
 
 
@@ -197,13 +322,11 @@ U35: Bt477KPJ150  ;
 GFX board: 05 / QC 2053
 Markings bottom: 6 470.5020 00.05
 
-
 */
 
 /*---------------------------------------------------------------------------------------------------------------------------------------
     Bonus Poker
 -----------------------------------------------------------------------------------------------------------------------------------------
-
 
 -- CPU Board ---
 
@@ -310,9 +433,7 @@ OSZ2: 25MHz
 
 GFX board: 07 / QC 2286
 Markings bottom: 6 470.5020 00.07
-
 */
-
 
 #include "emu.h"
 #include "cpu/z180/z180.h"
@@ -323,7 +444,6 @@ Markings bottom: 6 470.5020 00.07
 #include "emupal.h"
 #include "screen.h"
 #include "video/ramdac.h"
-
 
 namespace {
 
@@ -1334,6 +1454,26 @@ ROM_END
 
 } // anonymous namespace
 
+/*
+ Possible CashLine games:
+ * Aphrodite
+ * Babooshka? (Alternate spelling)
+ * Break the Spell
+ * Chickendales (Alternate spelling?)
+ * Diver's Dream
+ * Golden Glen (Alternate spelling?)
+ * Happy Happy Hippy
+ * Happy Safari
+ * Ice Mondey (Alternate spelling?)
+ * Isle of Fun
+ * Joker Poker
+ * Kismet
+ * Mystery Game
+ * Mystery Mask
+ * Sign of Zodiac
+ * Three Wishes
+ * Xanadu Magic
+ */
 
 GAME( 1999, atronic,   0,        atronic, atronic, atronic_state, empty_init, ROT0, "Atronic", "Atronic SetUp/Clear Chips (Russia, set 1)", MACHINE_IS_SKELETON)
 GAME( 1999, atronica,  atronic,  atronic, atronic, atronic_state, empty_init, ROT0, "Atronic", "Atronic SetUp/Clear Chips (Russia, set 2)", MACHINE_IS_SKELETON)

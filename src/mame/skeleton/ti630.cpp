@@ -40,6 +40,11 @@ It means we probably would have to emulate a modem device for it to treat commun
 #include "emupal.h"
 #include "screen.h"
 
+#define LOG_IO_PORTS (1U << 1)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
 
 namespace {
 
@@ -72,8 +77,6 @@ private:
 	required_device<hd44780_device> m_lcdc;
 };
 
-#define LOG_IO_PORTS 0
-
 void ti630_state::i80c31_prg(address_map &map)
 {
 	map(0x0000, 0xffff).rom();
@@ -85,9 +88,9 @@ void ti630_state::init_ti630()
 
 void ti630_state::i80c31_io(address_map &map)
 {
-	map(0x0000, 0x0000) /*.mirror(?)*/ .w("hd44780", FUNC(hd44780_device::control_w));
-	map(0x1000, 0x1000) /*.mirror(?)*/ .w("hd44780", FUNC(hd44780_device::data_w));
-	map(0x2000, 0x2000) /*.mirror(?)*/ .r("hd44780", FUNC(hd44780_device::control_r));
+	map(0x0000, 0x0000) /*.mirror(?)*/ .w(m_lcdc, FUNC(hd44780_device::control_w));
+	map(0x1000, 0x1000) /*.mirror(?)*/ .w(m_lcdc, FUNC(hd44780_device::data_w));
+	map(0x2000, 0x2000) /*.mirror(?)*/ .r(m_lcdc, FUNC(hd44780_device::control_r));
 	map(0x8000, 0xffff).ram(); /*TODO: verify the ammont of RAM and the correct address range to which it is mapped. This is just a first reasonable guess that apparently yields good results in the emulation */
 }
 
@@ -102,22 +105,18 @@ void ti630_state::machine_reset()
 uint8_t ti630_state::i80c31_p1_r()
 {
 	uint8_t value = 0;
-	if (LOG_IO_PORTS)
-		logerror("P1 read value:%02X\n", value);
-
+	LOGMASKED(LOG_IO_PORTS, "P1 read value:%02X\n", value);
 	return value;
 }
 
 void ti630_state::i80c31_p1_w(uint8_t data)
 {
-	if (LOG_IO_PORTS)
-		logerror("Write to P1: %02X\n", data);
+	LOGMASKED(LOG_IO_PORTS, "Write to P1: %02X\n", data);
 }
 
 void ti630_state::i80c31_p3_w(uint8_t data)
 {
-	if (LOG_IO_PORTS)
-		logerror("Write to P3: %02X\n", data);
+	LOGMASKED(LOG_IO_PORTS, "Write to P3: %02X\n", data);
 }
 
 void ti630_state::ti630_palette(palette_device &palette) const
@@ -155,7 +154,7 @@ void ti630_state::ti630(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
+	screen.set_screen_update(m_lcdc, FUNC(hd44780_device::screen_update));
 	screen.set_size(6*16, 9*2);
 	screen.set_visarea(0, 6*16-1, 0, 9*2-1);
 	screen.set_palette("palette");
@@ -163,7 +162,7 @@ void ti630_state::ti630(machine_config &config)
 	PALETTE(config, "palette", FUNC(ti630_state::ti630_palette), 2);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_ti630);
 
-	HD44780(config, m_lcdc, 0);
+	HD44780(config, m_lcdc, 250'000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 16);
 }
 

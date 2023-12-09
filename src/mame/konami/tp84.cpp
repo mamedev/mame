@@ -140,10 +140,10 @@ private:
 	bool m_irq_enable = false;
 	bool m_sub_irq_mask = false;
 
-	DECLARE_WRITE_LINE_MEMBER(irq_enable_w);
-	template <uint8_t Which> DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
-	DECLARE_WRITE_LINE_MEMBER(flip_screen_x_w);
-	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
+	void irq_enable_w(int state);
+	template <uint8_t Which> void coin_counter_w(int state);
+	void flip_screen_x_w(int state);
+	void flip_screen_y_w(int state);
 	uint8_t sh_timer_r();
 	void filter_w(offs_t offset, uint8_t data);
 	void sh_irqtrigger_w(uint8_t data);
@@ -154,7 +154,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void audio_map(address_map &map);
@@ -361,7 +361,7 @@ void tp84_state::machine_start()
 }
 
 
-WRITE_LINE_MEMBER(tp84_state::vblank_irq)
+void tp84_state::vblank_irq(int state)
 {
 	if (state && m_irq_enable)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
@@ -370,7 +370,7 @@ WRITE_LINE_MEMBER(tp84_state::vblank_irq)
 }
 
 
-WRITE_LINE_MEMBER(tp84_state::irq_enable_w)
+void tp84_state::irq_enable_w(int state)
 {
 	m_irq_enable = state;
 	if (!m_irq_enable)
@@ -379,19 +379,19 @@ WRITE_LINE_MEMBER(tp84_state::irq_enable_w)
 
 
 template <uint8_t Which>
-WRITE_LINE_MEMBER(tp84_state::coin_counter_w)
+void tp84_state::coin_counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(Which, state);
 }
 
 
-WRITE_LINE_MEMBER(tp84_state::flip_screen_x_w)
+void tp84_state::flip_screen_x_w(int state)
 {
 	m_flipscreen_x = state;
 }
 
 
-WRITE_LINE_MEMBER(tp84_state::flip_screen_y_w)
+void tp84_state::flip_screen_y_w(int state)
 {
 	m_flipscreen_y = state;
 }

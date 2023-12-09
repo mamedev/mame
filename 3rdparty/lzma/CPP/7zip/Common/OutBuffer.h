@@ -1,13 +1,13 @@
 // OutBuffer.h
 
-#ifndef __OUT_BUFFER_H
-#define __OUT_BUFFER_H
+#ifndef ZIP7_INC_OUT_BUFFER_H
+#define ZIP7_INC_OUT_BUFFER_H
 
 #include "../IStream.h"
 #include "../../Common/MyCom.h"
 #include "../../Common/MyException.h"
 
-#ifndef _NO_EXCEPTIONS
+#ifndef Z7_NO_EXCEPTIONS
 struct COutBufferException: public CSystemException
 {
   COutBufferException(HRESULT errorCode): CSystemException(errorCode) {}
@@ -29,11 +29,11 @@ protected:
 
   HRESULT FlushPart() throw();
 public:
-  #ifdef _NO_EXCEPTIONS
+  #ifdef Z7_NO_EXCEPTIONS
   HRESULT ErrorCode;
   #endif
 
-  COutBuffer(): _buf(0), _pos(0), _stream(0), _buf2(0) {}
+  COutBuffer(): _buf(NULL), _pos(0), _stream(NULL), _buf2(NULL) {}
   ~COutBuffer() { Free(); }
   
   bool Create(UInt32 bufSize) throw();
@@ -47,8 +47,11 @@ public:
 
   void WriteByte(Byte b)
   {
-    _buf[_pos++] = b;
-    if (_pos == _limitPos)
+    UInt32 pos = _pos;
+    _buf[pos] = b;
+    pos++;
+    _pos = pos;
+    if (pos == _limitPos)
       FlushWithCheck();
   }
   void WriteBytes(const void *data, size_t size)

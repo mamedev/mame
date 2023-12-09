@@ -126,7 +126,7 @@ protected:
 	void m68k_shared_1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t dsp0_status_r();
 	void dsp0_control_w(uint16_t data);
-	DECLARE_READ_LINE_MEMBER(dsp0_bio_r);
+	int dsp0_bio_r();
 	void dsp0_bank_w(uint16_t data);
 	uint16_t analog_r();
 
@@ -193,7 +193,7 @@ public:
 protected:
 	uint16_t dsp1_status_r();
 	void dsp1_control_w(uint16_t data);
-	DECLARE_READ_LINE_MEMBER(dsp1_bio_r);
+	int dsp1_bio_r();
 	void dsp1_bank_w(uint16_t data);
 
 	virtual void machine_reset() override;
@@ -641,7 +641,7 @@ void atarisy4_state::dsp0_control_w(uint16_t data)
 	m_csr[0] = data;
 }
 
-READ_LINE_MEMBER(atarisy4_state::dsp0_bio_r)
+int atarisy4_state::dsp0_bio_r()
 {
 	return BIT(m_csr[0], 2);
 }
@@ -675,7 +675,7 @@ void airrace_state::dsp1_control_w(uint16_t data)
 	m_csr[1] = data;
 }
 
-READ_LINE_MEMBER(airrace_state::dsp1_bio_r)
+int airrace_state::dsp1_bio_r()
 {
 	return BIT(m_csr[1], 2);
 }

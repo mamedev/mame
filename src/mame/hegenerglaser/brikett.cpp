@@ -75,21 +75,22 @@ BTANB:
 
 #include "emu.h"
 
+#include "mmdisplay1.h"
+
 #include "cpu/cosmac/cosmac.h"
 #include "machine/cdp1852.h"
 #include "machine/sensorboard.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
-#include "mmdisplay1.h"
 #include "video/pwm.h"
 
 #include "speaker.h"
 
 // internal artwork
-#include "mephisto_1.lh" // clickable
-#include "mephisto_esb2.lh" // clickable
-#include "mephisto_3.lh" // clickable
-#include "mephisto_junior.lh" // clickable
+#include "mephisto_1.lh"
+#include "mephisto_esb2.lh"
+#include "mephisto_3.lh"
+#include "mephisto_junior.lh"
 
 
 namespace {
@@ -134,6 +135,11 @@ private:
 	required_device<timer_device> m_speaker_off;
 	optional_ioport_array<4+2> m_inputs;
 
+	bool m_reset = false;
+	u8 m_esb_led = 0;
+	u8 m_esb_row = 0;
+	u8 m_esb_select = 0;
+
 	// address maps
 	void mephisto_map(address_map &map);
 	void mephistoj_map(address_map &map);
@@ -147,20 +153,21 @@ private:
 
 	// I/O handlers
 	INTERRUPT_GEN_MEMBER(interrupt);
-	DECLARE_READ_LINE_MEMBER(clear_r);
+	int clear_r();
 	u8 input_r(offs_t offset);
 	u8 sound_r();
 
 	void esb_w(u8 data);
-	DECLARE_READ_LINE_MEMBER(esb_r);
+	int esb_r();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_off) { m_dac->write(0); }
-
-	bool m_reset = false;
-	u8 m_esb_led = 0;
-	u8 m_esb_row = 0;
-	u8 m_esb_select = 0;
 };
+
+
+
+/*******************************************************************************
+    Initialization
+*******************************************************************************/
 
 void brikett_state::machine_start()
 {
@@ -197,12 +204,14 @@ void brikett_state::set_cpu_freq()
     I/O
 *******************************************************************************/
 
+// base hardware
+
 INTERRUPT_GEN_MEMBER(brikett_state::interrupt)
 {
 	m_maincpu->set_input_line(COSMAC_INPUT_LINE_INT, HOLD_LINE);
 }
 
-READ_LINE_MEMBER(brikett_state::clear_r)
+int brikett_state::clear_r()
 {
 	// CLEAR low + WAIT high resets cpu
 	int ret = (m_reset) ? 0 : 1;
@@ -233,6 +242,9 @@ u8 brikett_state::input_r(offs_t offset)
 
 	return data;
 }
+
+
+// ESB 6000
 
 void brikett_state::esb_w(u8 data)
 {
@@ -265,7 +277,7 @@ void brikett_state::esb_w(u8 data)
 	m_led_pwm->matrix(~m_esb_row, m_esb_led);
 }
 
-READ_LINE_MEMBER(brikett_state::esb_r)
+int brikett_state::esb_r()
 {
 	// EF1: read chessboard sensor
 	if (m_board && m_inputs[5].read_safe(0))

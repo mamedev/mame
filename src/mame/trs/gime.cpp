@@ -84,7 +84,6 @@
 
 #include "emu.h"
 #include "gime.h"
-#include "6883sam.h"
 #include "bus/coco/cococart.h"
 #include "machine/ram.h"
 
@@ -144,7 +143,7 @@ gime_device::gime_device(const machine_config &mconfig, device_type type, const 
 	, sam6883_friend_device_interface(mconfig, *this, 8)
 	, m_write_irq(*this)
 	, m_write_firq(*this)
-	, m_read_floating_bus(*this)
+	, m_read_floating_bus(*this, 0)
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
 	, m_ram(*this, finder_base::DUMMY_TAG)
 	, m_cart_device(*this, finder_base::DUMMY_TAG)
@@ -192,11 +191,6 @@ void gime_device::device_start()
 		snprintf(buffer, std::size(buffer), "wbank%d", i);
 		m_write_banks[i] = machine().root_device().membank(buffer);
 	}
-
-	// resolve callbacks
-	m_write_irq.resolve_safe();
-	m_write_firq.resolve_safe();
-	m_read_floating_bus.resolve_safe(0);
 
 	// set up ROM/RAM pointers
 	m_rom = m_rom_region->base();
@@ -994,7 +988,7 @@ inline void gime_device::write_gime_register(offs_t offset, uint8_t data)
 			// alone won't affect the MMU; writes to $FFAx are required to "latch"
 			// in the $FF9B value.
 			//
-			// The reason that $FF9B is not mentioned in offical documentation
+			// The reason that $FF9B is not mentioned in official documentation
 			// is because it is only meaningful in CoCo 3's with the 2MB upgrade
 			break;
 
@@ -1202,7 +1196,7 @@ void gime_device::change_gime_firq(uint8_t data)
 //  ignored in lo-res mode.  Specifically, $FF9D is masked with $E0, and
 //  $FF9E is masked with $3F
 //
-//  John Kowalski confirms this behavior
+//  John Kowalski confirms this behaviour
 //-------------------------------------------------
 
 inline offs_t gime_device::get_video_base()

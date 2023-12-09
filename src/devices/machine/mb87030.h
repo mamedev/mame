@@ -160,11 +160,7 @@ private:
 		Selection,
 		TransferWaitReq,
 		TransferSendData,
-		TransferSendDataDMAReq,
-		TransferSendDataDMAResp,
 		TransferRecvData,
-		TransferRecvDataDMAReq,
-		TransferRecvDataDMAResp,
 		TransferSendAck,
 		TransferWaitDeassertREQ,
 		TransferDeassertACK
@@ -206,8 +202,6 @@ private:
 	uint32_t m_tc;
 	uint8_t m_exbf;
 
-	uint8_t m_hdb;
-	bool m_hdb_loaded;
 	bool m_send_atn_during_selection;
 	util::fifo <uint8_t, 8> m_fifo;
 

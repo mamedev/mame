@@ -84,6 +84,7 @@ BD-62     ms   SM512   Bomb Sweeper
 JB-63     ms   SM511   Safe Buster
 MV-64     ms   SM512   Gold Cliff
 ZL-65     ms   SM512   Zelda
+TR-66*    ms   SM512?  Tetris Jr. (prototype)
 CJ-71*    tt   SM511?  Donkey Kong Jr.
 CM-72     tt   SM511   Mario's Cement Factory
 SM-73*    tt   SM511?  Snoopy
@@ -143,6 +144,8 @@ The MCUs used were not imported from Sharp, but cloned by USSR, renamed to
 
 #include "emu.h"
 #include "hh_sm510.h"
+
+#include "sound/samples.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -275,7 +278,7 @@ u8 hh_sm510_state::read_inputs(int columns, int fixed)
 
 	// read selected input rows
 	for (int i = 0; i < columns; i++)
-		if (m_inp_mux >> i & 1)
+		if (BIT(m_inp_mux, i))
 			ret |= m_inputs[i]->read();
 
 	if (fixed >= 0)
@@ -362,8 +365,8 @@ void hh_sm510_state::piezo2bit_input_w(u8 data)
 void hh_sm510_state::mcfg_cpu_common(machine_config &config)
 {
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->read_ba().set([this] () { return m_io_ba.read_safe(1); });
-	m_maincpu->read_b().set([this] () { return m_io_b.read_safe(1); });
+	m_maincpu->read_ba().set([this]() { return m_io_ba.read_safe(1); });
+	m_maincpu->read_b().set([this]() { return m_io_b.read_safe(1); });
 }
 
 void hh_sm510_state::mcfg_cpu_sm5a(machine_config &config)
@@ -908,8 +911,7 @@ ROM_END
   * Sharp SM5A label MH-06 5104 (no decap)
   * lcd screen with custom segments, 1-bit sound
 
-  This is the Gold Series version, there's also a new wide screen version
-  (NH-103)
+  This is the Gold Series version, there's also a new wide screen version (NH-103)
 
 *******************************************************************************/
 
@@ -3162,9 +3164,8 @@ ROM_END
 /*******************************************************************************
 
   Nintendo Game & Watch: Mario's Cement Factory (model CM-72)
-  * PCB labels: CM-72 M (main board)
-                CM-72 C (joystick controller board)
-                CM-72 S (buttons controller board)
+  * PCB labels: CM-72 M (main board), CM-72 C (joystick controller board),
+    CM-72 S (buttons controller board)
   * Sharp SM511 label CM-72 534A, or CM-72A 536C (no decap)
   * inverted lcd screen with custom segments, 1-bit sound
 
@@ -3562,9 +3563,9 @@ ROM_END
   Nintendo Game & Watch: Mickey Mouse (model DC-95),
   Nintendo Game & Watch: Donkey Kong Circus (model MK-96)
   * PCB labels: DC-95M (main board), DC-95C (controller board)
-  * Sharp SM511
-     - label DC-95 284C (Mickey Mouse) (no decap)
-     - label DC-95 541D (Donkey Kong Circus) (no decap)
+  * Sharp SM511:
+    label DC-95 284C (Mickey Mouse) (no decap)
+    label DC-95 541D (Donkey Kong Circus) (no decap)
   * inverted lcd screen with custom segments, 1-bit sound
 
   This is the panorama version of Mickey Mouse. There's also a wide screen
@@ -3941,9 +3942,9 @@ ROM_END
 
   Nintendo Game & Watch: Super Mario Bros. (model: see below)
   * PCB label: YM-801 (Crystal Screen), YM-105 (New Wide Screen)
-  * Sharp SM511
-     - label YM-801 8034A (Crystal Screen) (not dumped yet)
-     - label YM-105 9024B (New Wide Screen) (die label ?)
+  * Sharp SM511:
+    label YM-801 8034A (Crystal Screen) (not dumped yet)
+    label YM-105 9024B (New Wide Screen) (die label ?)
   * lcd screen with custom segments, 1-bit sound
 
   First released in 1986 on Crystal Screen (model YM-801), rereleased on
@@ -4038,9 +4039,9 @@ ROM_END
   Nintendo Game & Watch: Climber Crystal Screen (model DR-802),
   Nintendo Game & Watch: Climber New Wide Screen (model DR-106)
   * PCB label: DR-802 (Crystal Screen), DR-106 (New Wide Screen)
-  * Sharp SM511
-     - label DR-802 8626A (Crystal Screen) (not dumped yet)
-     - label DR-106 9038B (New Wide Screen) (no decap)
+  * Sharp SM511:
+    label DR-802 8626A (Crystal Screen) (not dumped yet)
+    label DR-106 9038B (New Wide Screen) (no decap)
   * lcd screen with custom segments, 1-bit sound
 
   First released in 1986 on Crystal Screen (model DR-802), rereleased on
@@ -4135,9 +4136,9 @@ ROM_END
   Nintendo Game & Watch: Balloon Fight Crystal Screen (model BF-803),
   Nintendo Game & Watch: Balloon Fight New Wide Screen (model BF-107)
   * PCB label: DR-802-2 (Crystal Screen), DR-106 (New Wide Screen)
-  * Sharp SM511
-     - label BF-803 8646A (Crystal Sscreen) (not dumped yet)
-     - label BF-107 9031B (New Wide Screen) (no decap)
+  * Sharp SM511:
+    label BF-803 8646A (Crystal Screen) (not dumped yet)
+    label BF-107 9031B (New Wide Screen) (no decap)
   * lcd screen with custom segments, 1-bit sound
 
   First released in 1986 on Crystal Screen (model BF-803), rereleased on
@@ -5278,10 +5279,13 @@ ROM_END
 
 /*******************************************************************************
 
-  Konami Lone Ranger
+  Konami The Lone Ranger
   * PCB label: BH009
   * Sharp SM511 under epoxy (die label KMS73B, 781)
   * lcd screen with custom segments, 1-bit sound
+
+  There's also a rare version from 1992 called "Bull's-Eye: Barbecue Sauce",
+  assumed to be a promotional item licensed to Heinz.
 
 *******************************************************************************/
 
@@ -5363,14 +5367,14 @@ public:
 
 static INPUT_PORTS_START( knascar )
 	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_CB(input_changed)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Pause")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
 
 	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_CHANGED_CB(input_changed)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_CB(input_changed)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
 
@@ -5473,12 +5477,152 @@ ROM_END
 
 /*******************************************************************************
 
-  Konami NFL Football
+  Konami Teenage Mutant Ninja Turtles II: Splinter Speaks (model 13012)
+  * PCB label: BH012
+  * Sharp SM511 under epoxy (die label KMS73B, 785)
+  * OKI MSM6373 ADPCM under epoxy + 1-bit sound
+  * lcd screen with custom segments
+
+*******************************************************************************/
+
+class ktmnt2_state : public hh_sm510_state
+{
+public:
+	ktmnt2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag),
+		m_samples(*this, "samples")
+	{ }
+
+	void ktmnt2(machine_config &config);
+
+protected:
+	required_device<samples_device> m_samples;
+
+	void sound_w(u8 data);
+	int sound_busy_r();
+};
+
+// handlers
+
+void ktmnt2_state::sound_w(u8 data)
+{
+	// S8: ADPCM reset
+	if (~data & 0x80)
+		m_samples->stop(0);
+
+	// S7: ADPCM ST
+	else if (~data & m_inp_mux & 0x40)
+	{
+		// latch from S1-S5
+		u8 sample = data & 0x1f;
+
+		if (m_samples->playing(0))
+		{
+			// stop command
+			if (sample == 0)
+				m_samples->stop(0);
+		}
+		else if (sample != 0)
+		{
+			sample--;
+			if (sample < m_samples->samples() && strncmp(m_samples->names()[sample + 1], "none", 4))
+				m_samples->start(0, sample);
+		}
+	}
+
+	// other: input mux
+	input_w(data);
+}
+
+int ktmnt2_state::sound_busy_r()
+{
+	// B: ADPCM busy
+	return m_samples->playing(0) ? 0 : 1;
+}
+
+// inputs
+
+static INPUT_PORTS_START( ktmnt2 )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Pause")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
+INPUT_PORTS_END
+
+// config
+
+static const char *const ktmnt2_sample_names[] =
+{
+	"*ktmnt2",
+	"cowabunga",
+	"pizzapower",
+	"lookoutforshredder",
+	"bebop",
+	"rocksteady",
+	"radicaldude",
+	"gameover",
+	"yeow",
+	"what",
+	"oof",
+	"yeah",
+	nullptr
+};
+
+void ktmnt2_state::ktmnt2(machine_config &config)
+{
+	sm511_common(config, 1513, 1080);
+	m_maincpu->write_s().set(FUNC(ktmnt2_state::sound_w));
+	m_maincpu->read_b().set(FUNC(ktmnt2_state::sound_busy_r));
+
+	// sound hardware
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(1);
+	m_samples->set_samples_names(ktmnt2_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.5);
+}
+
+// roms
+
+ROM_START( ktmnt2 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "785.program", 0x0000, 0x1000, CRC(de10cfbc) SHA1(10251abae89317258d3fa45f9378ec458128b080) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "785.melody", 0x000, 0x100, CRC(cdcecef2) SHA1(f29e3dd268b2f2c6d5ed6ffb68051ac462bcac8a) )
+
+	ROM_REGION( 520607, "screen", 0)
+	ROM_LOAD( "ktmnt2.svg", 0, 520607, CRC(cdbdd320) SHA1(cb2569426eec18c3fb4cedfc4d1f95a92e818e9a) )
+
+	ROM_REGION( 0x8000, "adpcm", 0)
+	ROM_LOAD( "msm6373", 0, 0x8000, NO_DUMP )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Konami NFL Football (model 13013)
   * PCB label: BH013
   * Sharp SM511 under epoxy (die label KMS73B, 786)
   * lcd screen with custom segments, 1-bit sound
 
-  This is the 1989 version. It was rereleased in 1992, assumed to be the same
+  This is the 1990 version. It was rereleased in 1992, assumed to be the same
   game underneath.
 
 *******************************************************************************/
@@ -5545,7 +5689,328 @@ ROM_END
 
 /*******************************************************************************
 
-  Konami Bucky O'Hare
+  Konami Star Trek: 25th Anniversary (model 13015)
+  * PCB label: BH015
+  * Sharp SM511 under epoxy (die label KMS73B, 787)
+  * OKI MSM6373 ADPCM under epoxy + 1-bit sound
+  * lcd screen with custom segments
+
+*******************************************************************************/
+
+class kst25_state : public ktmnt2_state
+{
+public:
+	kst25_state(const machine_config &mconfig, device_type type, const char *tag) :
+		ktmnt2_state(mconfig, type, tag)
+	{
+		// increase lcd decay: bullets flicker
+		m_decay_len = 30;
+	}
+
+	void kst25(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( kst25 )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, 0x02, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x03, NOTEQUALS, 0x00) // Up/Down
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Pause")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("FAKE") // Up/Down are electronically the same button
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+INPUT_PORTS_END
+
+// config
+
+static const char *const kst25_sample_names[] =
+{
+	"*kst25",
+	"beammeupscotty",
+	"warpspeed",
+	"thatsnotlogical",
+	"shieldsup",
+	"firethephotontorpedos",
+	"orbittheplanet",
+	"engage",
+	"boom",
+	"teleporter",
+	"klaxon",
+	"photontorpedo",
+	"hum",
+	nullptr
+};
+
+void kst25_state::kst25(machine_config &config)
+{
+	ktmnt2(config);
+
+	config.device_remove("screen");
+	mcfg_svg_screen(config, 1464, 1080);
+	m_samples->set_samples_names(kst25_sample_names);
+}
+
+// roms
+
+ROM_START( kst25 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "787.program", 0x0000, 0x1000, CRC(05abdeec) SHA1(b947fcf4c6c9696b606eabdc74594076013ff73c) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "787.melody", 0x000, 0x100, CRC(3f1c63d4) SHA1(efdfa49c4fd89f2ca5d5cfc6bf9fa741ac227338) )
+
+	ROM_REGION( 570121, "screen", 0)
+	ROM_LOAD( "kst25.svg", 0, 570121, CRC(6529d2de) SHA1(993c84ae46277d0d8e0af66473f6ce324b697638) )
+
+	ROM_REGION( 0x8000, "adpcm", 0)
+	ROM_LOAD( "msm6373", 0, 0x8000, NO_DUMP )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Konami Top Gun: Second Mission
+  * PCB label: BH017
+  * Sharp SM511 under epoxy (die label KMS73B, 792)
+  * OKI MSM6373 ADPCM under epoxy + 1-bit sound
+  * lcd screen with custom segments
+
+*******************************************************************************/
+
+class ktopgun2_state : public ktmnt2_state
+{
+public:
+	ktopgun2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		ktmnt2_state(mconfig, type, tag)
+	{ }
+
+	void ktopgun2(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( ktopgun2 )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Pause")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
+INPUT_PORTS_END
+
+// config
+
+static const char *const ktopgun2_sample_names[] =
+{
+	"*ktopgun2",
+	"explosion",
+	"crash",
+	"none",
+	"machinegun",
+	"boom",
+	"lockon",
+	"none",
+	"danger",
+	"missioncomplete",
+	"targetinrange",
+	"none",
+	"bailout",
+	"none",
+	"gameover",
+	nullptr
+};
+
+void ktopgun2_state::ktopgun2(machine_config &config)
+{
+	ktmnt2(config);
+
+	config.device_remove("screen");
+	mcfg_svg_screen(config, 1496, 1080);
+	m_samples->set_samples_names(ktopgun2_sample_names);
+}
+
+// roms
+
+ROM_START( ktopgun2 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "792.program", 0x0000, 0x1000, CRC(bb6eeeb6) SHA1(7bb21d1736ef7fdfc58ffc0e9dc633ec3c491117) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "792.melody", 0x000, 0x100, CRC(dce276ae) SHA1(27ce9c02e69c38120fd3608577176cdce29f6f06) )
+
+	ROM_REGION( 756991, "screen", 0)
+	ROM_LOAD( "ktopgun2.svg", 0, 756991, CRC(d65dbf75) SHA1(f2b55bfba784919f6601a7adaeeb7e5951a03367) )
+
+	ROM_REGION( 0x8000, "adpcm", 0)
+	ROM_LOAD( "msm6373", 0, 0x8000, NO_DUMP )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Konami Teenage Mutant Ninja Turtles 3: Shredder's Last Stand (model 13017)
+  * PCB label: BH018
+  * Sharp SM511 under epoxy (die label KMS73B, 794)
+  * lcd screen with custom segments, 1-bit sound
+
+  This game was also embedded in a PDA sold by Takara, called Teenage Mutant
+  Ninja Turtles: Electrical Note.
+
+*******************************************************************************/
+
+class ktmnt3_state : public hh_sm510_state
+{
+public:
+	ktmnt3_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void ktmnt3(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( ktmnt3 )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Pause")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
+INPUT_PORTS_END
+
+// config
+
+void ktmnt3_state::ktmnt3(machine_config &config)
+{
+	sm511_common(config, 1593, 1080);
+}
+
+// roms
+
+ROM_START( ktmnt3 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "794.program", 0x0000, 0x1000, CRC(fcbd6f79) SHA1(45badb94fb3e32350efb7e46e2e271c18135e2aa) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "794.melody", 0x000, 0x100, CRC(9731c180) SHA1(443c4b9c2564e0901a0777d90ab8c138b24788ea) )
+
+	ROM_REGION( 563465, "screen", 0)
+	ROM_LOAD( "ktmnt3.svg", 0, 563465, CRC(7877c17e) SHA1(276e42a7dce9d57647b9168a0843dd988d043d88) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Konami Teenage Mutant Ninja Turtles: Basketball (model 13018)
+  * PCB label: BH019
+  * Sharp SM511 under epoxy (die label KMS73B, 793)
+  * lcd screen with custom segments, 1-bit sound
+
+*******************************************************************************/
+
+class ktmntbb_state : public hh_sm510_state
+{
+public:
+	ktmntbb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void ktmntbb(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( ktmntbb )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Pause")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
+INPUT_PORTS_END
+
+// config
+
+void ktmntbb_state::ktmntbb(machine_config &config)
+{
+	sm511_common(config, 1466, 1080);
+}
+
+// roms
+
+ROM_START( ktmntbb )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "793.program", 0x0000, 0x1000, CRC(0973b329) SHA1(1c4161e5c53f6c6dd9752a228f361cf053f181f4) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "793.melody", 0x000, 0x100, CRC(cddefb96) SHA1(e9b6d3947c415a3ed520a3dab66a381159dfd79b) )
+
+	ROM_REGION( 873508, "screen", 0)
+	ROM_LOAD( "ktmntbb.svg", 0, 873508, CRC(cc4bbfbd) SHA1(1b300e24a8890ad36a7f6e65ba8d5e41e2de2858) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Konami Bucky O'Hare (model 13019)
   * PCB label: BH020
   * Sharp SM511 under epoxy (die label KMS73B, N58)
   * lcd screen with custom segments, 1-bit sound
@@ -6289,8 +6754,8 @@ protected:
 
 private:
 	// R2 connects to a single LED behind the screen
-	void led_w(u8 data) { m_led_out = data >> 1 & 1; }
 	output_finder<> m_led_out;
+	void led_w(u8 data) { m_led_out = data >> 1 & 1; }
 };
 
 void tgaiden_state::machine_start()
@@ -10567,6 +11032,78 @@ ROM_END
 
 /*******************************************************************************
 
+  Tronica: Super Goal Keeper (model SK-10)
+  * PCB labels: SK-10 280683 32-647-1
+  * Sharp SM5A labels (no decap): 0132 238A TRONICA
+  * lcd screen with custom segments, 1-bit sound
+
+*******************************************************************************/
+
+class trsgkeep_state : public hh_sm510_state
+{
+public:
+	trsgkeep_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void trsgkeep(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( trsgkeep )
+	PORT_START("IN.0") // R2
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_CHANGED_CB(input_changed)
+
+	PORT_START("IN.2") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB -- this one multiplies scoring factor with 10
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+// config
+
+void trsgkeep_state::trsgkeep(machine_config &config)
+{
+	sm5a_common(config, 1465, 1080); // R mask option confirmed
+}
+
+// roms
+
+ROM_START( trsgkeep )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "0132_238a", 0x0000, 0x0740, CRC(db80f1ed) SHA1(030e18ec05bbc98a474105d8d6f503082ab638cc) )
+
+	ROM_REGION( 119358, "screen", 0)
+	ROM_LOAD( "trsgkeep.svg", 0, 119358, CRC(4108349e) SHA1(359fb4eee1cfd85965efd1308f0002ebf38d231a) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
   Tronica: Space Mission (model SM-11), Spider (model SG-21)
   * PCB labels: SPACE MISSION SM-11 250582 (SM-11)
                 SPACE MISSION SM-11 220982 (SG-21)
@@ -10925,12 +11462,17 @@ SYST( 1989, ktopgun,      0,           0,      ktopgun,      ktopgun,      ktopg
 SYST( 1989, kgradius,     0,           0,      kgradius,     kgradius,     kgradius_state,     empty_init, "Konami", "Gradius (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1989, ktmnt,        0,           0,      ktmnt,        ktmnt,        ktmnt_state,        empty_init, "Konami", "Teenage Mutant Ninja Turtles (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1989, kskatedie,    0,           0,      kskatedie,    kskatedie,    kskatedie_state,    empty_init, "Konami (licensed from Electronic Arts)", "Skate or Die (Konami, handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1989, kbilly,       0,           0,      kbilly,       kbilly,       kbilly_state,       empty_init, "Konami", "The Adventures of Bayou Billy (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1989, kbottom9,     0,           0,      kbottom9,     kbottom9,     kbottom9_state,     empty_init, "Konami", "Bottom of the Ninth (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1989, kloneran,     0,           0,      kloneran,     kloneran,     kloneran_state,     empty_init, "Konami", "Lone Ranger (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1989, knascar,      0,           0,      knascar,      knascar,      knascar_state,      empty_init, "Konami", "Bill Elliott's NASCAR Racing (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1989, kblades,      0,           0,      kblades,      kblades,      kblades_state,      empty_init, "Konami", "Blades of Steel (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1989, knfl,         0,           0,      knfl,         knfl,         knfl_state,         empty_init, "Konami", "NFL Football (Konami, handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1990, kbilly,       0,           0,      kbilly,       kbilly,       kbilly_state,       empty_init, "Konami", "The Adventures of Bayou Billy (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1990, kbottom9,     0,           0,      kbottom9,     kbottom9,     kbottom9_state,     empty_init, "Konami", "Bottom of the Ninth (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1990, kloneran,     0,           0,      kloneran,     kloneran,     kloneran_state,     empty_init, "Konami", "The Lone Ranger (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1990, knascar,      0,           0,      knascar,      knascar,      knascar_state,      empty_init, "Konami", "Bill Elliott's NASCAR Racing (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1990, kblades,      0,           0,      kblades,      kblades,      kblades_state,      empty_init, "Konami", "Blades of Steel (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1990, ktmnt2,       0,           0,      ktmnt2,       ktmnt2,       ktmnt2_state,       empty_init, "Konami", "Teenage Mutant Ninja Turtles II: Splinter Speaks (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_IMPERFECT_SOUND )
+SYST( 1990, knfl,         0,           0,      knfl,         knfl,         knfl_state,         empty_init, "Konami", "NFL Football (Konami, handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, kst25,        0,           0,      kst25,        kst25,        kst25_state,        empty_init, "Konami", "Star Trek: 25th Anniversary (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_IMPERFECT_SOUND )
+SYST( 1991, ktopgun2,     0,           0,      ktopgun2,     ktopgun2,     ktopgun2_state,     empty_init, "Konami", "Top Gun: Second Mission (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_IMPERFECT_SOUND )
+SYST( 1991, ktmnt3,       0,           0,      ktmnt3,       ktmnt3,       ktmnt3_state,       empty_init, "Konami", "Teenage Mutant Ninja Turtles 3: Shredder's Last Stand (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, ktmntbb,      0,           0,      ktmntbb,      ktmntbb,      ktmntbb_state,      empty_init, "Konami", "Teenage Mutant Ninja Turtles: Basketball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1991, kbucky,       0,           0,      kbucky,       kbucky,       kbucky_state,       empty_init, "Konami", "Bucky O'Hare (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1991, kgarfld,      0,           0,      kgarfld,      kgarfld,      kgarfld_state,      empty_init, "Konami", "Garfield (Konami)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
@@ -11003,6 +11545,7 @@ SYST( 1983, trshutvoy,    0,           0,      trshutvoy,    trshutvoy,    trshu
 SYST( 1983, tigarden,     trshutvoy,   0,      tigarden,     trshutvoy,    trshutvoy_state,    empty_init, "Tronica", "Thief in Garden", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1982, trsrescue,    0,           0,      trsrescue,    trsrescue,    trsrescue_state,    empty_init, "Tronica", "Space Rescue", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1983, trthuball,    trsrescue,   0,      trthuball,    trsrescue,    trsrescue_state,    empty_init, "Tronica", "Thunder Ball (Tronica)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1983, trsgkeep,     0,           0,      trsgkeep,     trsgkeep,     trsgkeep_state,     empty_init, "Tronica", "Super Goal Keeper", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1982, trspacmis,    0,           0,      trspacmis,    trspacmis,    trspacmis_state,    empty_init, "Tronica", "Space Mission (Tronica)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1982, trspider,     trspacmis,   0,      trspider,     trspacmis,    trspacmis_state,    empty_init, "Tronica", "Spider (Tronica)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 

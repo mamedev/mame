@@ -140,7 +140,6 @@ void apple3_state::text40(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint8_t const *const ram = m_ram->pointer();
 	uint32_t const ram_size = m_ram->size();
-	int const smooth = m_va | (m_vb << 1) | (m_vc << 2);
 	int const beginrow = (cliprect.top() - (cliprect.top() % 8)) / 8;
 	int const endrow = (cliprect.bottom() - (cliprect.bottom() % 8) + 7) / 8;
 
@@ -167,33 +166,25 @@ void apple3_state::text40(bitmap_ind16 &bitmap, const rectangle &cliprect)
 				fg = WHITE;
 			}
 
-			/* inverse? */
-			if (!(ch & 0x80))
-			{
-				using std::swap;
-				swap(fg, bg);
-			}
-
 			uint8_t const *const char_data = &m_char_mem[(ch & 0x7F) * 8];
 
 			for (int row = 0; row < 8; row++)
 			{
 				for (int col = 0; col < 7; col++)
 				{
-					int lc;
-					if (m_smoothscr)
+					uint16_t *const dest = &bitmap.pix(y * 8 + row, x * 14 + col * 2);
+
+					// Flash or Inverse
+					if (!(ch & 0x80) && (!(char_data[row] & 0x80) || m_flash))
 					{
-						// get the offset into the group of 8 lines
-						lc = (col + smooth) & 7;
+						dest[0] = (char_data[row] & (1 << col)) ? bg : fg;
+						dest[1] = (char_data[row] & (1 << col)) ? bg : fg;
 					}
 					else
 					{
-						lc = col;
+						dest[0] = (char_data[row] & (1 << col)) ? fg : bg;
+						dest[1] = (char_data[row] & (1 << col)) ? fg : bg;
 					}
-
-					uint16_t *const dest = &bitmap.pix(y * 8 + row, x * 14 + lc * 2);
-					dest[0] = (char_data[row] & (1 << col)) ? fg : bg;
-					dest[1] = (char_data[row] & (1 << col)) ? fg : bg;
 				}
 			}
 		}
@@ -206,7 +197,6 @@ void apple3_state::text80(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint8_t const *const ram = m_ram->pointer();
 	uint32_t const ram_size = m_ram->size();
-	int const smooth = m_va | (m_vb << 1) | (m_vc << 2);
 	int const beginrow = (cliprect.top() - (cliprect.top() % 8)) / 8;
 	int const endrow = (cliprect.bottom() - (cliprect.bottom() % 8) + 7) / 8;
 
@@ -219,44 +209,50 @@ void apple3_state::text80(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			uint8_t const *char_data;
 			pen_t fg, bg;
 
+			fg = GREEN;
+			bg = BLACK;
+
 			/* first character */
 			ch = ram[offset + 0x0000];
 			char_data = &m_char_mem[(ch & 0x7F) * 8];
-			fg = (ch & 0x80) ? GREEN : BLACK;
-			bg = (ch & 0x80) ? BLACK : GREEN;
 
 			for (int row = 0; row < 8; row++)
 			{
 				for (int col = 0; col < 7; col++)
 				{
-					int lc;
-					if (m_smoothscr)
+					uint16_t *const dest = &bitmap.pix(y * 8 + row, x * 14 + col + 0);
+
+					// Flash or Inverse
+					if (!(ch & 0x80) && (!(char_data[row] & 0x80) || m_flash))
 					{
-						// get the offset into the group of 8 lines
-						lc = (col + smooth) & 7;
+						*dest = (char_data[row] & (1 << col)) ? bg : fg;
 					}
 					else
 					{
-						lc = col;
+						*dest = (char_data[row] & (1 << col)) ? fg : bg;
 					}
-
-					uint16_t *const dest = &bitmap.pix(y * 8 + row, x * 14 + lc + 0);
-					*dest = (char_data[row] & (1 << col)) ? fg : bg;
 				}
 			}
 
 			/* second character */
 			ch = ram[offset + 0x0400];
 			char_data = &m_char_mem[(ch & 0x7F) * 8];
-			fg = (ch & 0x80) ? GREEN : BLACK;
-			bg = (ch & 0x80) ? BLACK : GREEN;
 
 			for (int row = 0; row < 8; row++)
 			{
 				for (int col = 0; col < 7; col++)
 				{
 					uint16_t *const dest = &bitmap.pix(y * 8 + row, x * 14 + col + 7);
-					*dest = (char_data[row] & (1 << col)) ? fg : bg;
+
+					// Flash or Inverse
+					if (!(ch & 0x80) && (!(char_data[row] & 0x80) || m_flash))
+					{
+						*dest = (char_data[row] & (1 << col)) ? bg : fg;
+					}
+					else
+					{
+						*dest = (char_data[row] & (1 << col)) ? fg : bg;
+					}
 				}
 			}
 		}
@@ -468,6 +464,9 @@ void apple3_state::graphics_chires(bitmap_ind16 &bitmap, const rectangle &clipre
 uint32_t apple3_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 //  printf("gfx mode %x\n", m_flags & (VAR_VM3|VAR_VM1|VAR_VM0));
+
+	// always update the flash timer here so it's smooth regardless of mode switches
+	m_flash = ((machine().time() * 4).seconds() & 1) ? true : false;
 
 	switch(m_flags & (VAR_VM3|VAR_VM1|VAR_VM0))
 	{

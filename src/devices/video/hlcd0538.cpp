@@ -46,10 +46,6 @@ hlcd0539_device::hlcd0539_device(const machine_config &mconfig, const char *tag,
 
 void hlcd0538_device::device_start()
 {
-	// resolve callbacks
-	m_write_cols.resolve_safe();
-	m_write_interrupt.resolve_safe();
-
 	// timer (when LCD pin is oscillator)
 	m_lcd_timer = timer_alloc(FUNC(hlcd0538_device::toggle_lcd), this);
 	attotime period = (clock() != 0) ? attotime::from_hz(2 * clock()) : attotime::never;
@@ -78,7 +74,7 @@ TIMER_CALLBACK_MEMBER(hlcd0538_device::toggle_lcd)
 	lcd_w(!m_lcd);
 }
 
-WRITE_LINE_MEMBER(hlcd0538_device::clk_w)
+void hlcd0538_device::clk_w(int state)
 {
 	state = (state) ? 1 : 0;
 
@@ -89,7 +85,7 @@ WRITE_LINE_MEMBER(hlcd0538_device::clk_w)
 	m_clk = state;
 }
 
-WRITE_LINE_MEMBER(hlcd0538_device::lcd_w)
+void hlcd0538_device::lcd_w(int state)
 {
 	state = (state) ? 1 : 0;
 

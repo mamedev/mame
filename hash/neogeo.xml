@@ -4319,7 +4319,7 @@ license:CC0-1.0
 	-->
 
 	<software name="ssideki3">
-		<description>Super Sidekicks 3 - The Next Glory / Tokuten Ou 3 - Eikou e no Michi</description>
+		<description>Super Sidekicks 3 - The Next Glory / Tokuten Ou 3 - Eikou e no Chousen</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NGM-081 (MVS), NGH-081 (AES)"/>
@@ -10102,7 +10102,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="kog" cloneof="kof97" supported="no">
-		<description>King of Gladiator (The King of Fighters '97 bootleg)</description>
+		<description>King of Gladiator (bootleg of The King of Fighters '97)</description>
 		<year>1997</year>
 		<publisher>bootleg</publisher>
 		<sharedfeat name="release" value="MVS" />
@@ -10138,7 +10138,7 @@ license:CC0-1.0
 		<!-- Shock Troopers - 2nd Squad bootleg -->
 
 	<software name="lans2004" cloneof="shocktr2">
-		<description>Lansquenet 2004 (Shock Troopers - 2nd Squad bootleg)</description>
+		<description>Lansquenet 2004 (bootleg of Shock Troopers - 2nd Squad)</description>
 		<year>1998</year>
 		<publisher>bootleg</publisher>
 		<sharedfeat name="release" value="MVS" />
@@ -10211,7 +10211,7 @@ license:CC0-1.0
 		<!-- Metal Slug 3 bootleg -->
 
 	<software name="mslug3b6" cloneof="mslug3">
-		<description>Metal Slug 6 (Metal Slug 3 bootleg)</description>
+		<description>Metal Slug 6 (bootleg of Metal Slug 3)</description>
 		<year>2000</year>
 		<publisher>bootleg</publisher>
 		<info name="compat_note" value="AES menus have incorrect graphics" />
@@ -10285,9 +10285,9 @@ license:CC0-1.0
 		<!-- The King of Fighters 2001 bootlegs -->
 
 	<software name="cthd2003" cloneof="kof2001">
-		<description>Crouching Tiger Hidden Dragon 2003 (The King of Fighters 2001 bootleg)</description>
+		<description>Crouching Tiger Hidden Dragon 2003 (hack of The King of Fighters 2001)</description>
 		<year>2003</year>
-		<publisher>bootleg</publisher>
+		<publisher>bootleg (Phenixsoft)</publisher>
 		<sharedfeat name="release" value="MVS" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
@@ -10325,9 +10325,9 @@ license:CC0-1.0
 	</software>
 
 	<software name="ct2k3sp" cloneof="kof2001">
-		<description>Crouching Tiger Hidden Dragon 2003 Super Plus (The King of Fighters 2001 bootleg)</description>
+		<description>Crouching Tiger Hidden Dragon 2003 Super Plus (hack of The King of Fighters 2001)</description>
 		<year>2003</year>
-		<publisher>bootleg</publisher>
+		<publisher>bootleg (Phenixsoft)</publisher>
 		<info name="compat_note" value="Super Plus text remains on screen during gameplay" />
 		<sharedfeat name="release" value="MVS" />
 		<sharedfeat name="compatibility" value="MVS" />
@@ -10366,9 +10366,9 @@ license:CC0-1.0
 	</software>
 
 	<software name="ct2k3sa" cloneof="kof2001">
-		<description>Crouching Tiger Hidden Dragon 2003 Super Plus alternate (The King of Fighters 2001 bootleg)</description>
+		<description>Crouching Tiger Hidden Dragon 2003 Super Plus (hack of The King of Fighters 2001, alternate)</description>
 		<year>2003</year>
-		<publisher>bootleg</publisher>
+		<publisher>bootleg (Phenixsoft)</publisher>
 		<info name="compat_note" value="Super Plus text remains on screen during gameplay" />
 		<sharedfeat name="release" value="MVS" />
 		<sharedfeat name="compatibility" value="MVS" />
@@ -10638,7 +10638,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="kof10th" cloneof="kof2002">
-		<description>The King of Fighters 10th Anniversary (The King of Fighters 2002 bootleg)</description>
+		<description>The King of Fighters 10th Anniversary (bootleg of The King of Fighters 2002)</description>
 		<year>2002</year>
 		<publisher>bootleg</publisher>
 		<sharedfeat name="release" value="MVS" />
@@ -10682,7 +10682,7 @@ license:CC0-1.0
 
 	<software name="kf10thep" cloneof="kof2002">
 		<!-- does not behave well in multi-slot -->
-		<description>The King of Fighters 10th Anniversary Extra Plus (The King of Fighters 2002 bootleg)</description>
+		<description>The King of Fighters 10th Anniversary Extra Plus (bootleg of The King of Fighters 2002)</description>
 		<year>2005</year>
 		<publisher>bootleg</publisher>
 		<sharedfeat name="release" value="MVS" />
@@ -10728,7 +10728,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="kf2k5uni" cloneof="kof2002">
-		<description>The King of Fighters 10th Anniversary 2005 Unique (The King of Fighters 2002 bootleg)</description>
+		<description>The King of Fighters 10th Anniversary 2005 Unique (bootleg of The King of Fighters 2002)</description>
 		<year>2004</year>
 		<publisher>bootleg</publisher>
 		<sharedfeat name="release" value="MVS" />
@@ -10771,7 +10771,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="kof2k4se" cloneof="kof2002">
-		<description>The King of Fighters Special Edition 2004 (The King of Fighters 2002 bootleg)</description>
+		<description>The King of Fighters Special Edition 2004 (bootleg of The King of Fighters 2002)</description>
 		<year>2004</year>
 		<publisher>bootleg</publisher>
 		<info name="compat_note" value="Missing NeoGeo logo at startup" />
@@ -11230,7 +11230,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="kf2k3pl" cloneof="kof2003">
-		<description>The King of Fighters 2004 Plus / Hero (The King of Fighters 2003 bootleg)</description>
+		<description>The King of Fighters 2004 Plus / Hero (bootleg of The King of Fighters 2003)</description>
 		<year>2003</year>
 		<publisher>bootleg</publisher>
 		<info name="compat_note" value="Plus text remains on screen during gameplay" />
@@ -11269,7 +11269,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="kf2k3upl" cloneof="kof2003">
-		<description>The King of Fighters 2004 Ultra Plus (The King of Fighters 2003 bootleg)</description>
+		<description>The King of Fighters 2004 Ultra Plus (bootleg of The King of Fighters 2003)</description>
 		<year>2003</year>
 		<publisher>bootleg</publisher>
 		<info name="compat_note" value="Ultra Plus text remains on screen during gameplay" />
@@ -11439,7 +11439,3 @@ license:CC0-1.0
 
 
 </softwarelist>
-
-
-
-

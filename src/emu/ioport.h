@@ -25,6 +25,7 @@
 #include <cstdint>
 #include <cstring>
 #include <ctime>
+#include <initializer_list>
 #include <list>
 #include <memory>
 #include <vector>
@@ -961,7 +962,7 @@ public:
 private:
 	// internal helpers
 	void init_port_types();
-	void init_autoselect_devices(int type1, int type2, int type3, const char *option, const char *ananame);
+	void init_autoselect_devices(std::initializer_list<ioport_type> types, std::string_view option, std::string_view ananame);
 
 	void frame_update_callback();
 	void frame_update();
@@ -1222,10 +1223,10 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, s
 	configurer.field_set_crosshair(CROSSHAIR_AXIS_##axis, altaxis, scale, offset);
 
 #define PORT_CROSSHAIR_MAPPER(_callback) \
-	configurer.field_set_crossmapper(ioport_field_crossmap_delegate(_callback, #_callback, DEVICE_SELF, (device_t *)nullptr));
+	configurer.field_set_crossmapper(ioport_field_crossmap_delegate(owner, DEVICE_SELF, _callback, #_callback));
 
 #define PORT_CROSSHAIR_MAPPER_MEMBER(_device, _class, _member) \
-	configurer.field_set_crossmapper(ioport_field_crossmap_delegate(&_class::_member, #_class "::" #_member, _device, (_class *)nullptr));
+	configurer.field_set_crossmapper(ioport_field_crossmap_delegate(owner, _device, &_class::_member, #_class "::" #_member));
 
 // how many optical counts for 1 full turn of the control
 #define PORT_FULL_TURN_COUNT(_count) \

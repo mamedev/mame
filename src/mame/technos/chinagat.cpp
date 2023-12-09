@@ -304,8 +304,8 @@ private:
 	void saiyugoub1_adpcm_rom_addr_w(uint8_t data);
 	void saiyugoub1_adpcm_control_w(uint8_t data);
 	void saiyugoub1_m5205_clk_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER(saiyugoub1_m5205_irq_r);
-	DECLARE_WRITE_LINE_MEMBER(saiyugoub1_m5205_irq_w);
+	int saiyugoub1_m5205_irq_r();
+	void saiyugoub1_m5205_irq_w(int state);
 
 	void i8748_map(address_map &map);
 	void main_map(address_map &map);
@@ -514,7 +514,7 @@ void chinagat_state::saiyugoub1_adpcm_control_w(uint8_t data)
 #endif
 }
 
-READ_LINE_MEMBER(chinagat_state::saiyugoub1_m5205_irq_r )
+int chinagat_state::saiyugoub1_m5205_irq_r()
 {
 	if (m_adpcm_sound_irq)
 	{
@@ -524,7 +524,7 @@ READ_LINE_MEMBER(chinagat_state::saiyugoub1_m5205_irq_r )
 	return 0;
 }
 
-WRITE_LINE_MEMBER(chinagat_state::saiyugoub1_m5205_irq_w)
+void chinagat_state::saiyugoub1_m5205_irq_w(int state)
 {
 	m_adpcm_sound_irq = 1;
 }

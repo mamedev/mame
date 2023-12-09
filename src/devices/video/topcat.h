@@ -20,7 +20,7 @@ public:
 	uint16_t ctrl_r(address_space &space, offs_t offset, uint16_t mem_mask = ~0);
 	void ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	WRITE_LINE_MEMBER(vblank_w);
+	void vblank_w(int state);
 	void topcat_mem(address_map &map);
 
 	bool plane_enabled();

@@ -679,8 +679,7 @@ void lua_engine::on_machine_frame()
 {
 	std::vector<int> tasks = std::move(m_frame_tasks);
 	m_frame_tasks.clear();
-	for (int ref : tasks)
-		resume(ref);
+	resume_tasks(m_lua_state, tasks, true); // TODO: doesn't need to return anything
 
 	m_notifiers->on_frame();
 
@@ -1799,8 +1798,8 @@ void lua_engine::initialize()
 	screen_dev_type["height"] = sol::property([] (screen_device &sdev) { return sdev.visible_area().height(); });
 	screen_dev_type["refresh"] = sol::property([] (screen_device &sdev) { return ATTOSECONDS_TO_HZ(sdev.refresh_attoseconds()); });
 	screen_dev_type["refresh_attoseconds"] = sol::property([] (screen_device &sdev) { return sdev.refresh_attoseconds(); });
-	screen_dev_type["xofffset"] = sol::property(&screen_device::xoffset);
-	screen_dev_type["yofffset"] = sol::property(&screen_device::yoffset);
+	screen_dev_type["xoffset"] = sol::property(&screen_device::xoffset);
+	screen_dev_type["yoffset"] = sol::property(&screen_device::yoffset);
 	screen_dev_type["xscale"] = sol::property(&screen_device::xscale);
 	screen_dev_type["yscale"] = sol::property(&screen_device::yscale);
 	screen_dev_type["pixel_period"] = sol::property([] (screen_device &sdev) { return sdev.pixel_period().as_double(); });
@@ -2144,8 +2143,7 @@ bool lua_engine::frame_hook()
 {
 	std::vector<int> tasks = std::move(m_update_tasks);
 	m_update_tasks.clear();
-	for (int ref : tasks)
-		resume(ref);
+	resume_tasks(m_lua_state, tasks, true); // TODO: doesn't need to return anything
 
 	return execute_function("LUA_ON_FRAME_DONE");
 }

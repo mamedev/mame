@@ -54,8 +54,8 @@ public:
 	void set_timing_scale(double scale) { m_timing_scale = scale; }
 
 	// serial data line handlers
-	DECLARE_READ_LINE_MEMBER(data_r);
-	DECLARE_WRITE_LINE_MEMBER(data_w);
+	int data_r();
+	void data_w(int state);
 
 protected:
 	// device-level overrides

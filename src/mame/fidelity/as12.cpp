@@ -21,7 +21,8 @@ magnetic chess board sensors. See sc12.cpp for a more technical description.
 The first RAM chip is low-power, and battery-backed with a capacitor. This is
 also mentioned in the manual. Maybe it does not apply to older PCBs.
 
-Like with EAS, the new game command is: RE -> D8 -> CL.
+Like with EAS, the new game command for AS12 is: RE -> D6 (or D8) -> CL.
+The newer model 6085 does not have this issue.
 
 TODO:
 - is the initial AS12 3MHz version the same ROM as felega1? When it's configured
@@ -45,7 +46,7 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_as12.lh" // clickable
+#include "fidel_as12.lh"
 
 
 namespace {
@@ -81,6 +82,9 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport m_inputs;
 
+	u16 m_inp_mux = 0;
+	u8 m_led_data = 0;
+
 	// address maps
 	void main_map(address_map &map);
 
@@ -89,9 +93,6 @@ private:
 	void control_w(u8 data);
 	void led_w(offs_t offset, u8 data);
 	u8 input_r(offs_t offset);
-
-	u16 m_inp_mux = 0;
-	u8 m_led_data = 0;
 };
 
 void as12_state::machine_start()
@@ -283,11 +284,11 @@ ROM_START( feleg ) // model 6085, serial 613623xx
 	ROM_LOAD("feleg.e000", 0xe000, 0x2000, CRC(b1fb49aa) SHA1(d8c9687dd564f0fa603e6d684effb1d113ac64b4) ) // "
 ROM_END
 
-ROM_START( felega ) // model AS12, serial 427921xx, but roms were upgraded
+ROM_START( felega ) // model AS12
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("felega.8000", 0x8000, 0x2000, CRC(e86453ed) SHA1(8279cf9a7f471f893922d53d901dae65fabbd33f) ) // MBM2764-25, no meaningful label
-	ROM_LOAD("felega.c000", 0xc000, 0x1000, CRC(4a2b6946) SHA1(fd7d11e2589e654f91f7c2f667b927075bd49339) ) // TMS2732AJL-45, "
-	ROM_LOAD("felega.e000", 0xe000, 0x2000, CRC(823083ad) SHA1(4ea6a679edc7c149f1467113e9e5736ee0d5f643) ) // MBM27C64-20, "
+	ROM_LOAD("blue.8000",  0x8000, 0x2000, CRC(e86453ed) SHA1(8279cf9a7f471f893922d53d901dae65fabbd33f) ) // AM2764-25DC
+	ROM_LOAD("green.c000", 0xc000, 0x1000, CRC(4a2b6946) SHA1(fd7d11e2589e654f91f7c2f667b927075bd49339) ) // D2732D
+	ROM_LOAD("black.e000", 0xe000, 0x2000, CRC(823083ad) SHA1(4ea6a679edc7c149f1467113e9e5736ee0d5f643) ) // AM2764-25DC
 ROM_END
 
 ROM_START( felega1 ) // model AS12, only 1 byte difference compared with felega2 (evidently not a bad dump)

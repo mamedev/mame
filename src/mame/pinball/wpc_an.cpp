@@ -96,10 +96,13 @@ TODO: (wpc in general)
 
 #include "wpc_an.lh"
 
+#define LOG_WPC (1U << 1)
+
+#define VERBOSE (LOG_WPC)
+#include "logmacro.h"
+
 
 namespace {
-
-#define LOG_WPC (1)
 
 class wpc_an_state : public driver_device
 {
@@ -132,9 +135,9 @@ private:
 
 	uint8_t ram_r(offs_t offset);
 	void ram_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(snd_reply_w);
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
-	DECLARE_WRITE_LINE_MEMBER(firq_w);
+	void snd_reply_w(int state);
+	void irq_w(int state);
+	void firq_w(int state);
 	uint8_t sound_ctrl_r();
 	void sound_ctrl_w(uint8_t data);
 	uint8_t sound_data_r();
@@ -307,18 +310,18 @@ void wpc_an_state::rombank_w(uint8_t data)
 	m_cpubank->set_entry(data & m_bankmask);
 }
 
-WRITE_LINE_MEMBER(wpc_an_state::snd_reply_w)
+void wpc_an_state::snd_reply_w(int state)
 {
 	if(state)
 		m_maincpu->set_input_line(M6809_FIRQ_LINE,ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(wpc_an_state::irq_w)
+void wpc_an_state::irq_w(int state)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE,CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(wpc_an_state::firq_w)
+void wpc_an_state::firq_w(int state)
 {
 	m_maincpu->set_input_line(M6809_FIRQ_LINE,CLEAR_LINE);
 }
@@ -379,7 +382,7 @@ void wpc_an_state::ram_w(offs_t offset, uint8_t data)
 	if((!m_wpc->memprotect_active()) || ((offset & m_wpc->get_memprotect_mask()) != m_wpc->get_memprotect_mask()))
 		m_ram[offset] = data;
 	else
-		if(LOG_WPC) logerror("WPC: Memory protection violation at 0x%04x (mask=0x%04x)\n",offset,m_wpc->get_memprotect_mask());
+		LOGMASKED(LOG_WPC, "WPC: Memory protection violation at 0x%04x (mask=0x%04x)\n",offset,m_wpc->get_memprotect_mask());
 }
 
 void wpc_an_state::machine_start()

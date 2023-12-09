@@ -276,7 +276,7 @@ void bbc_datacentre_device::jim_w(offs_t offset, uint8_t data)
 	m_ram[((m_page_ram & 0x0fff) << 8) | offset] = data;
 }
 
-WRITE_LINE_MEMBER(bbc_datacentre_device::irq_w)
+void bbc_datacentre_device::irq_w(int state)
 {
 	if (BIT(m_links->read(), 1))
 	{

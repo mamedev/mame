@@ -206,11 +206,19 @@ Board contains only 29 ROMs and not much else.
 #include "cbombers.lh"
 
 
+void undrfire_state::machine_start()
+{
+	m_lamp_start.resolve();
+	m_gun_recoil.resolve();
+	m_lamp.resolve();
+	m_wheel_vibration.resolve();
+}
+
 /**********************************************************
             GAME INPUTS
 **********************************************************/
 
-READ_LINE_MEMBER(undrfire_state::frame_counter_r)
+int undrfire_state::frame_counter_r()
 {
 	return m_frame_counter;
 }
@@ -290,10 +298,10 @@ void undrfire_state::motor_control_w(u8 data)
     ........ x.......   P2 gun vibration
 */
 
-	output().set_value("P1_lamp_start", BIT(data, 4)); //p1 start
-	output().set_value("P2_lamp_start", BIT(data, 5)); //p2 start
-	output().set_value("P1_gun_recoil", BIT(data, 6)); //p1 recoil
-	output().set_value("P2_gun_recoil", BIT(data, 7)); //p2 recoil
+	m_lamp_start[0] = BIT(data, 4); //p1 start
+	m_lamp_start[1] = BIT(data, 5); //p2 start
+	m_gun_recoil[0] = BIT(data, 6); //p1 recoil
+	m_gun_recoil[1] = BIT(data, 7); //p2 recoil
 }
 
 void undrfire_state::cbombers_cpua_ctrl_w(u32 data)
@@ -302,13 +310,10 @@ void undrfire_state::cbombers_cpua_ctrl_w(u32 data)
     ........ ..xxxxxx   Lamp 1-6 enables
     ........ .x......   Vibration
 */
-	output().set_value("Lamp_1", BIT(data, 0));
-	output().set_value("Lamp_2", BIT(data, 1));
-	output().set_value("Lamp_3", BIT(data, 2));
-	output().set_value("Lamp_4", BIT(data, 3));
-	output().set_value("Lamp_5", BIT(data, 4));
-	output().set_value("Lamp_6", BIT(data, 5));
-	output().set_value("Wheel_vibration", BIT(data, 6));
+	for (int i = 0; i < 6; i++)
+		m_lamp[i] = BIT(data, i);
+
+	m_wheel_vibration = BIT(data, 6);
 
 	m_subcpu->set_input_line(INPUT_LINE_RESET, BIT(data, 12) ? CLEAR_LINE : ASSERT_LINE);
 }

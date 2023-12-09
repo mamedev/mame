@@ -119,10 +119,10 @@ taito_cchip_device::taito_cchip_device(const machine_config &mconfig, const char
 	m_upd4464_bank(*this, "upd4464_bank"),
 	m_upd4464_bank68(*this, "upd4464_bank68"),
 	m_sharedram(*this, "upd4464", 0x2000, ENDIANNESS_LITTLE),
-	m_in_pa_cb(*this),
-	m_in_pb_cb(*this),
-	m_in_pc_cb(*this),
-	m_in_ad_cb(*this),
+	m_in_pa_cb(*this, 0),
+	m_in_pb_cb(*this, 0),
+	m_in_pc_cb(*this, 0),
+	m_in_ad_cb(*this, 0),
 	m_out_pa_cb(*this),
 	m_out_pb_cb(*this),
 	m_out_pc_cb(*this)
@@ -207,17 +207,6 @@ void taito_cchip_device::device_add_mconfig(machine_config &config)
 	upd.an5_func().set([this] { return BIT(m_in_ad_cb(), 5) ? 0xff : 0; });
 	upd.an6_func().set([this] { return BIT(m_in_ad_cb(), 6) ? 0xff : 0; });
 	upd.an7_func().set([this] { return BIT(m_in_ad_cb(), 7) ? 0xff : 0; });
-}
-
-void taito_cchip_device::device_resolve_objects()
-{
-	m_in_pa_cb.resolve_safe(0);
-	m_in_pb_cb.resolve_safe(0);
-	m_in_pc_cb.resolve_safe(0);
-	m_in_ad_cb.resolve_safe(0);
-	m_out_pa_cb.resolve_safe();
-	m_out_pb_cb.resolve_safe();
-	m_out_pc_cb.resolve_safe();
 }
 
 void taito_cchip_device::device_start()

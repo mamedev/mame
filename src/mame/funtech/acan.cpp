@@ -24,7 +24,7 @@ acan_sound_device::acan_sound_device(const machine_config &mconfig, const char *
 	, m_timer(nullptr)
 	, m_timer_irq_handler(*this)
 	, m_dma_irq_handler(*this)
-	, m_ram_read(*this)
+	, m_ram_read(*this, 0)
 	, m_active_channels(0)
 	, m_dma_channels(0)
 {
@@ -36,10 +36,6 @@ void acan_sound_device::device_start()
 	m_stream = stream_alloc(0, 2, clock() / 16 / 5);
 	m_mix = std::make_unique<int32_t[]>((clock() / 16 / 5) * 2);
 	m_timer = timer_alloc(FUNC(acan_sound_device::channel_irq), this);
-
-	m_timer_irq_handler.resolve_safe();
-	m_dma_irq_handler.resolve_safe();
-	m_ram_read.resolve_safe(0);
 
 	// register for savestates
 	save_item(NAME(m_active_channels));

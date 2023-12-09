@@ -23,8 +23,8 @@ public:
 	void map(address_map &map);
 	void set_ram_size(u32 size);
 
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	DECLARE_WRITE_LINE_MEMBER(hdc_drq_w);
+	void fdc_drq_w(int state);
+	void hdc_drq_w(int state);
 
 protected:
 	virtual void device_start() override;

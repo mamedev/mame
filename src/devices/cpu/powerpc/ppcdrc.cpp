@@ -1465,7 +1465,7 @@ void ppc_device::static_generate_lsw_entries(int mode)
 		char temp[20];
 
 		/* allocate a handle */
-		sprintf(temp, "lsw%d", regnum);
+		snprintf(temp, 20, "lsw%d", regnum);
 		alloc_handle(m_drcuml.get(), &m_lsw[mode][regnum], temp);
 		UML_HANDLE(block, *m_lsw[mode][regnum]);                               // handle  lsw<regnum>
 		UML_LABEL(block, regnum);                                                       // regnum:
@@ -1517,7 +1517,7 @@ void ppc_device::static_generate_stsw_entries(int mode)
 		char temp[20];
 
 		/* allocate a handle */
-		sprintf(temp, "stsw%d", regnum);
+		snprintf(temp, 20, "stsw%d", regnum);
 		alloc_handle(m_drcuml.get(), &m_stsw[mode][regnum], temp);
 		UML_HANDLE(block, *m_stsw[mode][regnum]);                              // handle  stsw<regnum>
 		UML_LABEL(block, regnum);                                                       // regnum:
@@ -2256,12 +2256,15 @@ bool ppc_device::generate_opcode(drcuml_block &block, compiler_state *compiler, 
 		case 0x2e:  /* LMW */
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IMMU(op));                                // mapvar  dsisr,DSISR_IMMU(op)
 			UML_MOV(block, mem(&m_core->tempaddr), R32Z(G_RA(op)));                  // mov     [tempaddr],ra
+
 			for (int regnum = G_RD(op); regnum < 32; regnum++)
 			{
 				UML_ADD(block, I0, mem(&m_core->tempaddr), (int16_t)G_SIMM(op) + 4 * (regnum - G_RD(op)));
 																							// add     i0,[tempaddr],simm + 4*(regnum-rd)
 				UML_CALLH(block, *m_read32align[m_core->mode]);         // callh   read32align
-				UML_MOV(block, R32(regnum), I0);                                        // mov     regnum,i0
+
+				if (regnum != G_RA(op) || ((m_cap & PPCCAP_4XX) && regnum == 31))
+					UML_MOV(block, R32(regnum), I0);                                        // mov     regnum,i0
 			}
 			generate_update_cycles(block, compiler, desc->pc + 4, true);           // <update cycles>
 			return true;

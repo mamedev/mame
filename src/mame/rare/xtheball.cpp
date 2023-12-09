@@ -52,7 +52,7 @@ private:
 	required_ioport m_analog_x;
 	required_ioport m_analog_y;
 
-	DECLARE_WRITE_LINE_MEMBER(foreground_mode_w);
+	void foreground_mode_w(int state);
 	uint16_t analogx_r();
 	uint16_t analogy_watchdog_r();
 
@@ -153,7 +153,7 @@ TMS340X0_FROM_SHIFTREG_CB_MEMBER(xtheball_state::from_shiftreg)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(xtheball_state::foreground_mode_w)
+void xtheball_state::foreground_mode_w(int state)
 {
 	m_foreground_mode = state;
 }
@@ -175,7 +175,9 @@ uint16_t xtheball_state::analogx_r()
 uint16_t xtheball_state::analogy_watchdog_r()
 {
 	/* doubles as a watchdog address */
-	m_watchdog->watchdog_reset();
+	if (!machine().side_effects_disabled())
+		m_watchdog->watchdog_reset();
+
 	return (m_analog_y->read() << 8) | 0x00ff;
 }
 

@@ -181,12 +181,12 @@ private:
 	uint8_t vram_r(offs_t offset);
 	void vram_w(offs_t offset, uint8_t data);
 	uint8_t get_slave_ack(offs_t offset);
-	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(fdc_drq);
+	[[maybe_unused]] void fdc_drq(int state);
 	uint8_t bank_sel_r(offs_t offset);
 	void bank_sel_w(offs_t offset, uint8_t data);
 	uint8_t dma_read(offs_t offset);
 	void dma_write(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
+	void dma_hrq_changed(int state);
 	uint8_t system_r(offs_t offset);
 	void system_w(offs_t offset, uint8_t data);
 	uint8_t cntl_r();
@@ -207,21 +207,21 @@ private:
 	uint8_t video_latch_r(offs_t offset);
 	void video_latch_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(spk_w);
-	DECLARE_WRITE_LINE_MEMBER(spk_freq_w);
-	DECLARE_WRITE_LINE_MEMBER(beep_w);
-	DECLARE_WRITE_LINE_MEMBER(serial_clock_w);
-	DECLARE_WRITE_LINE_MEMBER(parallel_busy_w) { m_printer_busy = state; }
-	DECLARE_WRITE_LINE_MEMBER(parallel_slctout_w) { m_printer_slctout = state; }
+	void spk_w(int state);
+	void spk_freq_w(int state);
+	void beep_w(int state);
+	void serial_clock_w(int state);
+	void parallel_busy_w(int state) { m_printer_busy = state; }
+	void parallel_slctout_w(int state) { m_printer_slctout = state; }
 
-	DECLARE_WRITE_LINE_MEMBER(dack0_w) { m_dma1->hack_w(state ? 0 : 1); }  // for all unused DMA channel?
-	DECLARE_WRITE_LINE_MEMBER(dack1_w) { if(!state) m_current_dma = 1; else if(m_current_dma == 1) m_current_dma = -1; }  // HD
-	DECLARE_WRITE_LINE_MEMBER(dack2_w) { if(!state) m_current_dma = 2; else if(m_current_dma == 2) m_current_dma = -1; }  // RAM refresh
-	DECLARE_WRITE_LINE_MEMBER(dack3_w) { m_dma1->hack_w(state ? 0 : 1); }
-	DECLARE_WRITE_LINE_MEMBER(dack4_w) { m_dma1->hack_w(state ? 0 : 1); }
-	DECLARE_WRITE_LINE_MEMBER(dack5_w) { if(!state) m_current_dma = 5; else if(m_current_dma == 5) m_current_dma = -1; }  // Floppy
-	DECLARE_WRITE_LINE_MEMBER(dack6_w) { m_dma1->hack_w(state ? 0 : 1); }
-	DECLARE_WRITE_LINE_MEMBER(dack7_w) { m_dma1->hack_w(state ? 0 : 1); }
+	void dack0_w(int state) { m_dma1->hack_w(state ? 0 : 1); }  // for all unused DMA channel?
+	void dack1_w(int state) { if(!state) m_current_dma = 1; else if(m_current_dma == 1) m_current_dma = -1; }  // HD
+	void dack2_w(int state) { if(!state) m_current_dma = 2; else if(m_current_dma == 2) m_current_dma = -1; }  // RAM refresh
+	void dack3_w(int state) { m_dma1->hack_w(state ? 0 : 1); }
+	void dack4_w(int state) { m_dma1->hack_w(state ? 0 : 1); }
+	void dack5_w(int state) { if(!state) m_current_dma = 5; else if(m_current_dma == 5) m_current_dma = -1; }  // Floppy
+	void dack6_w(int state) { m_dma1->hack_w(state ? 0 : 1); }
+	void dack7_w(int state) { m_dma1->hack_w(state ? 0 : 1); }
 
 	void octopus_io(address_map &map);
 	void octopus_mem(address_map &map);
@@ -382,7 +382,7 @@ uint8_t octopus_state::vram_r(offs_t offset)
 	return m_vram[offset];
 }
 
-WRITE_LINE_MEMBER(octopus_state::fdc_drq)
+void octopus_state::fdc_drq(int state)
 {
 	// TODO
 }
@@ -514,9 +514,7 @@ uint8_t octopus_state::rtc_r()
 	uint8_t ret = 0xff;
 
 	if(m_rtc_data)
-		ret = m_rtc->read(1);
-	else if(m_rtc_address)
-		ret = m_rtc->read(0);
+		ret = m_rtc->data_r();
 
 	return ret;
 }
@@ -524,9 +522,9 @@ uint8_t octopus_state::rtc_r()
 void octopus_state::rtc_w(uint8_t data)
 {
 	if(m_rtc_data)
-		m_rtc->write(1,data);
+		m_rtc->data_w(data);
 	else if(m_rtc_address)
-		m_rtc->write(0,data);
+		m_rtc->address_w(data);
 }
 
 // RTC/FDC control - PPI port B
@@ -633,19 +631,19 @@ void octopus_state::vidcontrol_w(uint8_t data)
 // Sound level provided by i8253 timer 2
 // Enabled by /DTR signal from i8251
 // 100ms beep triggered by pulsing /CTS signal low on i8251
-WRITE_LINE_MEMBER(octopus_state::spk_w)
+void octopus_state::spk_w(int state)
 {
 	m_speaker_active = !state;
 	m_speaker->level_w(((m_speaker_active || m_beep_active) && m_speaker_level) ? 1 : 0);
 }
 
-WRITE_LINE_MEMBER(octopus_state::spk_freq_w)
+void octopus_state::spk_freq_w(int state)
 {
 	m_speaker_level = state;
 	m_speaker->level_w(((m_speaker_active || m_beep_active) && m_speaker_level) ? 1 : 0);
 }
 
-WRITE_LINE_MEMBER(octopus_state::beep_w)
+void octopus_state::beep_w(int state)
 {
 	if(!state)  // active low
 	{
@@ -655,7 +653,7 @@ WRITE_LINE_MEMBER(octopus_state::beep_w)
 	}
 }
 
-WRITE_LINE_MEMBER(octopus_state::serial_clock_w)
+void octopus_state::serial_clock_w(int state)
 {
 	m_serial->rxca_w(state);
 	m_serial->txca_w(state);
@@ -723,7 +721,7 @@ void octopus_state::dma_write(offs_t offset, uint8_t data)
 	prog_space.write_byte((m_fd_bank << 16) + offset, data);
 }
 
-WRITE_LINE_MEMBER( octopus_state::dma_hrq_changed )
+void octopus_state::dma_hrq_changed(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
@@ -939,7 +937,7 @@ void octopus_state::octopus(machine_config &config)
 	m_pic2->in_sp_callback().set_constant(0);
 
 	// RTC (MC146818 via i8255 PPI)
-	I8255(config, m_ppi, 0);
+	I8255(config, m_ppi);
 	m_ppi->in_pa_callback().set(FUNC(octopus_state::rtc_r));
 	m_ppi->in_pb_callback().set(FUNC(octopus_state::cntl_r));
 	m_ppi->in_pc_callback().set(FUNC(octopus_state::gpo_r));

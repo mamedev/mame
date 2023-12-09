@@ -536,17 +536,17 @@ uint32_t tiki100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 /* Z80-PIO Interface */
 
-DECLARE_WRITE_LINE_MEMBER( tiki100_state::write_centronics_ack )
+void tiki100_state::write_centronics_ack(int state)
 {
 	m_centronics_ack = state;
 }
 
-DECLARE_WRITE_LINE_MEMBER( tiki100_state::write_centronics_busy )
+void tiki100_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
 
-DECLARE_WRITE_LINE_MEMBER( tiki100_state::write_centronics_perror )
+void tiki100_state::write_centronics_perror(int state)
 {
 	m_centronics_perror = state;
 }
@@ -616,7 +616,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(tiki100_state::ctc_tick)
 	m_ctc->trg1(0);
 }
 
-WRITE_LINE_MEMBER( tiki100_state::bar0_w )
+void tiki100_state::bar0_w(int state)
 {
 	m_ctc->trg2(state);
 
@@ -625,7 +625,7 @@ WRITE_LINE_MEMBER( tiki100_state::bar0_w )
 	if (!m_st) m_dart->txca_w(state);
 }
 
-WRITE_LINE_MEMBER( tiki100_state::bar2_w )
+void tiki100_state::bar2_w(int state)
 {
 	if (m_st) m_dart->txca_w(state);
 
@@ -672,7 +672,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( tiki100_state::tape_tick )
 	m_pio->port_b_write((m_cassette->input() > 0.0) << 7);
 }
 
-WRITE_LINE_MEMBER( tiki100_state::busrq_w )
+void tiki100_state::busrq_w(int state)
 {
 	// since our Z80 has no support for BUSACK, we assume it is granted immediately
 	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);

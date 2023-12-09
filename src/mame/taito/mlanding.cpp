@@ -103,8 +103,6 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	TIMER_CALLBACK_MEMBER(dma_complete);
-
 private:
 	static constexpr u32 c_dma_bank_words = 0x2000;
 
@@ -117,13 +115,13 @@ private:
 	required_device_array<msm5205_device, 2> m_msm;
 	required_device<z80ctc_device> m_ctc;
 
-	required_memory_bank    m_dma_bank;
+	required_memory_bank m_dma_bank;
 	required_region_ptr_array<u8, 2> m_msm_rom;
 
 	required_shared_ptr<u16> m_g_ram;
 	required_shared_ptr<u16> m_cha_ram;
 	required_shared_ptr<u16> m_dot_ram;
-	required_shared_ptr<u8>  m_power_ram;
+	required_shared_ptr<u8> m_power_ram;
 
 	required_device<palette_device> m_palette;
 
@@ -132,17 +130,18 @@ private:
 	required_ioport_array<2> m_io_limit;
 
 	std::unique_ptr<u16[]> m_dma_ram;
-	u8   m_dma_cpu_bank;
-	u8   m_dma_busy;
-	u16  m_dsp_hold_signal;
-	emu_timer *m_dma_done_timer;
+	u8 m_dma_cpu_bank = 0;
+	u8 m_dma_busy = 0;
+	u16 m_dsp_hold_signal = 0;
+	emu_timer *m_dma_done_timer = nullptr;
 
-	u32  m_msm_pos[2];
-	u8   m_msm_reset[2];
-	u8   m_msm_nibble[2];
-	u8   m_msm2_vck;
-	u8   m_msm2_vck2;
+	u32 m_msm_pos[2] = { };
+	u8 m_msm_reset[2] = { };
+	u8 m_msm_nibble[2] = { };
+	u8 m_msm2_vck = 0;
+	u8 m_msm2_vck2 = 0;
 
+	TIMER_CALLBACK_MEMBER(dma_complete);
 	void dma_start_w(u16 data = 0);
 	void dma_stop_w(u16 data = 0);
 	void output_w(u16 data);
@@ -166,8 +165,8 @@ private:
 	void msm5205_1_addr_hi_w(u8 data);
 	void msm5205_2_start_w(u8 data);
 	void msm5205_2_stop_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(msm5205_1_vck);
-	DECLARE_WRITE_LINE_MEMBER(z80ctc_to0);
+	void msm5205_1_vck(int state);
+	void z80ctc_to0(int state);
 
 	u8 motor_r();
 
@@ -195,7 +194,7 @@ private:
 void mlanding_state::machine_start()
 {
 	// Allocate two DMA RAM banks
-	m_dma_ram = std::make_unique<u16[]>(c_dma_bank_words * 2);
+	m_dma_ram = make_unique_clear<u16[]>(c_dma_bank_words * 2);
 	m_dma_bank->configure_entries(0, 2, m_dma_ram.get(), c_dma_bank_words * 2);
 
 	// Register state for saving
@@ -588,14 +587,14 @@ void mlanding_state::msm5205_update(unsigned chip)
 }
 
 
-WRITE_LINE_MEMBER(mlanding_state::msm5205_1_vck)
+void mlanding_state::msm5205_1_vck(int state)
 {
 	if (state)
 		msm5205_update(0);
 }
 
 
-WRITE_LINE_MEMBER(mlanding_state::z80ctc_to0)
+void mlanding_state::z80ctc_to0(int state)
 {
 	if (m_msm2_vck2 && !state)
 	{
@@ -785,6 +784,8 @@ void mlanding_state::dsp_map_data(address_map &map)
 	map(0x0400, 0x1fff).ram().share(m_dot_ram);
 }
 
+
+
 /*************************************
  *
  *  Audio CPU memory handlers
@@ -928,6 +929,8 @@ static INPUT_PORTS_START( mlandingj )
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 INPUT_PORTS_END
 
+
+
 /*************************************
  *
  *  Machine driver
@@ -936,7 +939,7 @@ INPUT_PORTS_END
 
 void mlanding_state::mlanding(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M68000(config, m_maincpu, 16_MHz_XTAL / 2); // TS68000CP8
 	m_maincpu->set_addrmap(AS_PROGRAM, &mlanding_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(mlanding_state::irq6_line_hold));
@@ -969,7 +972,7 @@ void mlanding_state::mlanding(machine_config &config)
 
 	TAITOIO_YOKE(config, m_yoke, 0);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(16_MHz_XTAL, 640, 0, 512, 462, 0, 400); // Estimated
 	screen.set_screen_update(FUNC(mlanding_state::screen_update));
@@ -977,7 +980,7 @@ void mlanding_state::mlanding(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 32768);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 16_MHz_XTAL / 4));
@@ -1073,5 +1076,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1987, mlanding,         0, mlanding, mlanding,  mlanding_state, empty_init, ROT0, "Taito America Corporation", "Midnight Landing (Germany)", MACHINE_SUPPORTS_SAVE ) // Japanese or German selectable via dip-switch. Copyright changes accordingly.
+GAME( 1987, mlanding,  0,        mlanding, mlanding,  mlanding_state, empty_init, ROT0, "Taito America Corporation", "Midnight Landing (Germany)", MACHINE_SUPPORTS_SAVE ) // Japanese or German selectable via dip-switch. Copyright changes accordingly.
 GAME( 1987, mlandingj, mlanding, mlanding, mlandingj, mlanding_state, empty_init, ROT0, "Taito Corporation",         "Midnight Landing (Japan)",   MACHINE_SUPPORTS_SAVE ) // Japanese or English selectable via dip-switch. Copyright changes accordingly.

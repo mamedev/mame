@@ -69,7 +69,7 @@ plus4_expansion_slot_device::plus4_expansion_slot_device(const machine_config &m
 	device_single_card_slot_interface<device_plus4_expansion_card_interface>(mconfig, *this),
 	device_cartrom_image_interface(mconfig, *this),
 	m_write_irq(*this),
-	m_read_dma_cd(*this),
+	m_read_dma_cd(*this, 0xff),
 	m_write_dma_cd(*this),
 	m_write_aec(*this),
 	m_card(nullptr)
@@ -84,12 +84,6 @@ plus4_expansion_slot_device::plus4_expansion_slot_device(const machine_config &m
 void plus4_expansion_slot_device::device_start()
 {
 	m_card = get_card_device();
-
-	// resolve callbacks
-	m_write_irq.resolve_safe();
-	m_read_dma_cd.resolve_safe(0xff);
-	m_write_dma_cd.resolve_safe();
-	m_write_aec.resolve_safe();
 }
 
 

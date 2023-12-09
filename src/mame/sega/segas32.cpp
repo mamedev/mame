@@ -624,7 +624,6 @@ segas32_state::segas32_state(const machine_config &mconfig, device_type type, co
 
 
 
-
 /*************************************
  *
  *  Machine init
@@ -814,7 +813,6 @@ INTERRUPT_GEN_MEMBER(segas32_state::start_of_vblank_int)
  *
  *************************************/
 
-
 void segas32_state::misc_output_0_w(uint8_t data)
 {
 	if (m_sw1_output)
@@ -859,7 +857,7 @@ void segas32_state::tilebank_external_w(uint8_t data)
 }
 
 template<int Which>
-WRITE_LINE_MEMBER(segas32_state::display_enable_w)
+void segas32_state::display_enable_w(int state)
 {
 	m_system32_displayenable[Which] = state;
 }
@@ -967,7 +965,7 @@ void segas32_state::sound_int_control_hi_w(offs_t offset, uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(segas32_state::ym3438_irq_handler)
+void segas32_state::ym3438_irq_handler(int state)
 {
 	if (state)
 		signal_sound_irq(SOUND_IRQ_YM3438);
@@ -1263,6 +1261,7 @@ void segas32_state::multipcm_map(address_map &map)
 	map(0x180000, 0x1fffff).bankr("multipcmbankhi");
 }
 
+
 /*************************************
  *
  *  V25 Protection CPU memory handlers
@@ -1299,7 +1298,6 @@ void segas32_state::upd7725_data_map(address_map &map)
  *  Generic port definitions
  *
  *************************************/
-
 
 static INPUT_PORTS_START( system32_generic )
 	PORT_START("mainpcb:P1_A")
@@ -2235,13 +2233,11 @@ GFXDECODE_END
 
 
 
-
 /*************************************
  *
  *  Machine driver
  *
  *************************************/
-
 
 void segas32_state::device_add_mconfig(machine_config &config)
 {
@@ -2497,13 +2493,13 @@ void segas32_cd_state::lamps2_w(uint8_t data)
 		m_lamps[8 + i] = BIT(data, i);
 }
 
-WRITE_LINE_MEMBER(segas32_cd_state::scsi_irq_w)
+void segas32_cd_state::scsi_irq_w(int state)
 {
 	//printf("%02x IRQ\n",state);
 	// TODO: sent!
 }
 
-WRITE_LINE_MEMBER(segas32_cd_state::scsi_drq_w)
+void segas32_cd_state::scsi_drq_w(int state)
 {
 	//printf("%02x DRQ\n",state);
 }
@@ -3472,23 +3468,19 @@ ROM_START( brivalj )
 	ROM_LOAD( "mpr-15626.ic34",    0x200000, 0x100000, CRC(83306d1e) SHA1(feb08902b51c0013d9417832cdf198e36cdfc28c) )
 	ROM_LOAD( "mpr-15625.ic24",    0x300000, 0x100000, CRC(3ce82932) SHA1(f2107bc2591f46a51c9f0d706933b1ae69db91f9) )
 
-	/* the 10 ROMs below may be bad dumps ... mp14598 / 99 have corrupt tiles when compared to the ROMs
-	   in the parent set, but Sega did change the part numbers so they might be correct, the others
-	   are suspicious, the changes are very similar but the part numbers haven't changed.  We really
-	   need a 3rd board to verify */
 	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
-	ROM_LOAD16_BYTE( "mpr-14599f.ic14", 0x000000, 0x200000, CRC(1de17e83) SHA1(04ee14b863f93b42a5bd1b6da71cff54ef11d4b7) ) /* ROM # matches tile ROM # from Arabian Fight ??? */
-	ROM_LOAD16_BYTE( "mpr-14598f.ic5",  0x000001, 0x200000, CRC(cafb0de9) SHA1(94c6bfc7a4081dee373e9466a7b6f80889696087) ) /* ROM # matches tile ROM # from Arabian Fight ??? */
+	ROM_LOAD16_BYTE( "mpr-15629.ic14", 0x000000, 0x200000, CRC(2c8dd96d) SHA1(4a42a30485c19eb4f4a9d518a3dff3ae11911d01) )
+	ROM_LOAD16_BYTE( "mpr-15628.ic5",  0x000001, 0x200000, CRC(58d4ca40) SHA1(b1633acc803bba7e8283a9663b49abeda662a74d) )
 
 	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
-	ROM_LOAD64_WORD( "brivalj_mp15637.32", 0x000000, 0x200000, CRC(f39844c0) SHA1(c48dc8cccdd9d3756cf99a983c6a89ed43fcda22) )
-	ROM_LOAD64_WORD( "brivalj_mp15635.30", 0x000002, 0x200000, CRC(263cf6d1) SHA1(7accd214502fd050edc0901c9929d6069dae4d00) )
-	ROM_LOAD64_WORD( "brivalj_mp15633.28", 0x000004, 0x200000, CRC(44e9a88b) SHA1(57a930b9c3b83c889df54de60c90f847c2dcb614) )
-	ROM_LOAD64_WORD( "brivalj_mp15631.26", 0x000006, 0x200000, CRC(e93cf9c9) SHA1(17786cd3ccaef613216db724e923861841c52b45) )
-	ROM_LOAD64_WORD( "brivalj_mp15636.31", 0x800000, 0x200000, CRC(079ff77f) SHA1(bdd41acef58c39ba58cf85d307229622877dbdf9) )
-	ROM_LOAD64_WORD( "brivalj_mp15634.29", 0x800002, 0x200000, CRC(1edc14cd) SHA1(80a281c904560b364fe9f2b8987b7a254220a29f) )
-	ROM_LOAD64_WORD( "brivalj_mp15632.27", 0x800004, 0x200000, CRC(796215f2) SHA1(d7b393781dbba59c9b1cd600d27e6d91e36ea771) )
-	ROM_LOAD64_WORD( "brivalj_mp15630.25", 0x800006, 0x200000, CRC(8dabb501) SHA1(c5af2187d00e0b9732a82441f9758b303fecbb2c) )
+	ROM_LOAD64_WORD( "mpr-15637.ic32", 0x000000, 0x200000, CRC(b6cf2f05) SHA1(a308d40ce5165e03fccf7fcd615ee111f7840fdc) )
+	ROM_LOAD64_WORD( "mpr-15635.ic30", 0x000002, 0x200000, CRC(70f2eb2b) SHA1(9868c8b0dd8ce810a0e32f51e702eee7e1c9a967) )
+	ROM_LOAD64_WORD( "mpr-15633.ic28", 0x000004, 0x200000, CRC(005dfed5) SHA1(f555620d75d3886a890307be9df9c0879bcda695) )
+	ROM_LOAD64_WORD( "mpr-15631.ic26", 0x000006, 0x200000, CRC(c35e2f21) SHA1(37935aa2eaa1769e57fb58f47f9797ae153d7496) )
+	ROM_LOAD64_WORD( "mpr-15636.ic31", 0x800000, 0x200000, CRC(d81ca97b) SHA1(a8e64e6cbe822f18ce20f50c8ddb8f1d5ed8b783) )
+	ROM_LOAD64_WORD( "mpr-15634.ic29", 0x800002, 0x200000, CRC(b0c6c52a) SHA1(04dd7344ca82e38f9d796a764c9e5a631a89aaac) )
+	ROM_LOAD64_WORD( "mpr-15632.ic27", 0x800004, 0x200000, CRC(8476e52b) SHA1(e89748d34febcaf362580cdae30a5c570e56899a) )
+	ROM_LOAD64_WORD( "mpr-15630.ic25", 0x800006, 0x200000, CRC(bf7dd2f6) SHA1(ab3fbe9e2b9b57424fb2a147f32b0f573c0b11b8) )
 ROM_END
 
 
@@ -5913,7 +5905,7 @@ void segas32_state::init_sonic()
 	segas32_common_init();
 
 	/* install protection handlers */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20E5C4, 0x20E5C5, write16s_delegate(*this, FUNC(segas32_state::sonic_level_load_protection)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20e5c4, 0x20e5c5, write16s_delegate(*this, FUNC(segas32_state::sonic_level_load_protection)));
 }
 
 
@@ -5938,7 +5930,7 @@ void segas32_state::init_svf()
 void segas32_state::init_jleague()
 {
 	segas32_common_init();
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20F700, 0x20F705, write16_delegate(*this, FUNC(segas32_state::jleague_protection_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20f700, 0x20f705, write16_delegate(*this, FUNC(segas32_state::jleague_protection_w)));
 }
 
 
@@ -6022,7 +6014,7 @@ GAME( 1994, svs,       svf,      sega_system32,             svf,      segas32_ne
 GAME( 1994, jleague,   svf,      sega_system32,             svf,      segas32_new_state, init_jleague,  ROT0, "Sega",   "The J.League 1994 (Japan, Rev A)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, jleagueo,  svf,      sega_system32,             svf,      segas32_new_state, init_jleague,  ROT0, "Sega",   "The J.League 1994 (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-
+// System Multi32
 GAME( 1994, harddunk,  0,        sega_multi32_6p,           harddunk, segas32_new_state, init_harddunk, ROT0, "Sega",   "Hard Dunk (World)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, harddunkj, harddunk, sega_multi32_6p,           harddunk, segas32_new_state, init_harddunk, ROT0, "Sega",   "Hard Dunk (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 

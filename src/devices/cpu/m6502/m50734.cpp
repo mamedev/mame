@@ -27,9 +27,9 @@ DEFINE_DEVICE_TYPE(M50734, m50734_device, "m50734", "Mitsubishi M50734")
 m50734_device::m50734_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: m740_device(mconfig, M50734, tag, owner, clock)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 16, 0)
-	, m_port_in_cb(*this)
+	, m_port_in_cb(*this, 0)
 	, m_port_out_cb(*this)
-	, m_analog_in_cb(*this)
+	, m_analog_in_cb(*this, 0)
 	, m_port_latch{0, 0, 0, 0}
 	, m_port_3state{0, 0, 0, 0}
 	, m_ad_control(0)
@@ -53,13 +53,15 @@ device_memory_interface::space_config_vector m50734_device::memory_space_config(
 	return scv;
 }
 
-void m50734_device::device_resolve_objects()
+void m50734_device::device_config_complete()
 {
+	m740_device::device_config_complete();
+
 	for (int n = 0; n < 4; n++)
-		m_port_in_cb[n].resolve_safe(m_port_3state[n]);
-	m_port_in_cb[4].resolve_safe(0);
-	m_port_out_cb.resolve_all_safe();
-	m_analog_in_cb.resolve_all_safe(0);
+	{
+		if (m_port_in_cb[n].isunset())
+			m_port_in_cb[n].bind().set_constant(m_port_3state[n]);
+	}
 }
 
 void m50734_device::step_motor(int which)

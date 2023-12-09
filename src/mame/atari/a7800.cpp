@@ -103,7 +103,7 @@
 #include "bus/a7800/a78_carts.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/timer.h"
-#include "machine/mos6530n.h"
+#include "machine/mos6530.h"
 #include "sound/tiaintf.h"
 
 #include "emupal.h"
@@ -164,7 +164,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<tia_device> m_tia;
 	required_device<atari_maria_device> m_maria;
-	required_device<mos6532_new_device> m_riot;
+	required_device<mos6532_device> m_riot;
 	required_ioport m_io_joysticks;
 	required_ioport m_io_buttons;
 	required_ioport m_io_console_buttons;
@@ -210,10 +210,9 @@ uint8_t a7800_state::riot_console_button_r()
 
 void a7800_state::riot_button_pullup_w(uint8_t data)
 {
-	if(m_maincpu->space(AS_PROGRAM).read_byte(0x283) & 0x04)
-		m_p1_one_button = data & 0x04; // pin 6 of the controller port is held high by the riot chip when reading two-button controllers (from schematic)
-	if(m_maincpu->space(AS_PROGRAM).read_byte(0x283) & 0x10)
-		m_p2_one_button = data & 0x10;
+	// pin 6 of the controller port is held high by the riot chip when reading two-button controllers (from schematic)
+	m_p1_one_button = data & 0x04;
+	m_p2_one_button = data & 0x10;
 }
 
 uint8_t a7800_state::tia_r(offs_t offset)
@@ -240,12 +239,12 @@ uint8_t a7800_state::tia_r(offs_t offset)
 	case 0x0b:
 		return ((m_io_buttons->read() & 0x04) << 5);
 	case 0x0c:
-		if (((m_io_buttons->read() & 0x08) ||(m_io_buttons->read() & 0x02)) && m_p1_one_button)
+		if (((m_io_buttons->read() & 0x08) || (m_io_buttons->read() & 0x02)) && m_p1_one_button)
 			return 0x00;
 		else
 			return 0x80;
 	case 0x0d:
-		if (((m_io_buttons->read() & 0x01) ||(m_io_buttons->read() & 0x04)) && m_p2_one_button)
+		if (((m_io_buttons->read() & 0x01) || (m_io_buttons->read() & 0x04)) && m_p2_one_button)
 			return 0x00;
 		else
 			return 0x80;
@@ -311,8 +310,8 @@ void a7800_state::a7800_mem(address_map &map)
 	map(0x0000, 0x01ff).mirror(0x2000).ram(); // 0x40-0xff, 0x140-0x1ff are mirrors of second 6116 chip
 	map(0x0000, 0x001f).mirror(0x300).rw(FUNC(a7800_state::tia_r), FUNC(a7800_state::tia_w));
 	map(0x0020, 0x003f).mirror(0x300).rw(m_maria, FUNC(atari_maria_device::read), FUNC(atari_maria_device::write));
-	map(0x0280, 0x029f).mirror(0x160).m(m_riot, FUNC(mos6532_new_device::io_map));
-	map(0x0480, 0x04ff).mirror(0x100).m(m_riot, FUNC(mos6532_new_device::ram_map));
+	map(0x0280, 0x029f).mirror(0x160).m(m_riot, FUNC(mos6532_device::io_map));
+	map(0x0480, 0x04ff).mirror(0x100).m(m_riot, FUNC(mos6532_device::ram_map));
 	map(0x1800, 0x1fff).ram();
 	map(0x2200, 0x27ff).ram();  // 0x2000-0x21ff, installed in mirror above
 								// According to the official Software Guide, the RAM at 0x2000 is
@@ -1399,7 +1398,7 @@ void a7800_state::a7800_common(machine_config &config, uint32_t clock)
 	TIA(config, m_tia, clock/4/114).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	// devices
-	MOS6532_NEW(config, m_riot, clock/8);
+	MOS6532(config, m_riot, clock/8);
 	m_riot->pa_rd_callback().set(FUNC(a7800_state::riot_joystick_r));
 	m_riot->pb_rd_callback().set(FUNC(a7800_state::riot_console_button_r));
 	m_riot->pb_wr_callback().set(FUNC(a7800_state::riot_button_pullup_w));
@@ -1437,14 +1436,15 @@ void a7800_pal_state::a7800_pal(machine_config &config)
 ROM_START( a7800 )
 	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
 	ROM_SYSTEM_BIOS( 0, "a7800", "Atari 7800" )
+	// TODO: c024922b-29usa.u7, c024922b-29.u7 and c024922b-01.u7 have been seen on pics, which one is this? Or are they all the same?
 	ROMX_LOAD("7800.u7", 0x3000, 0x1000, CRC(5d13730c) SHA1(d9d134bb6b36907c615a594cc7688f7bfcef5b43), ROM_BIOS(0))
-	ROM_SYSTEM_BIOS( 1, "a7800pr", "Atari 7800 (prototype with Asteroids)" )
+	ROM_SYSTEM_BIOS( 1, "a7800pr", "Atari 7800 (prototype with Asteroids)" ) // TODO: is this really a prototype? notice the ROM code is almost the same as the released PAL version
 	ROMX_LOAD("c300558-001a.u7", 0x0000, 0x4000, CRC(a0e10edf) SHA1(14584b1eafe9721804782d4b1ac3a4a7313e455f), ROM_BIOS(1))
 ROM_END
 
 ROM_START( a7800p )
 	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("7800pal.rom", 0x0000, 0x4000, CRC(d5b61170) SHA1(5a140136a16d1d83e4ff32a19409ca376a8df874))
+	ROM_LOAD("c300558-001b.u7", 0x0000, 0x4000, CRC(d5b61170) SHA1(5a140136a16d1d83e4ff32a19409ca376a8df874))
 ROM_END
 
 

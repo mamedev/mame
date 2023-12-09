@@ -12,7 +12,7 @@ device_network_interface::device_network_interface(const machine_config &mconfig
 	// Convert to Mibps to Bps
 	m_bandwidth = bandwidth << (20 - 3);
 	m_mtu = mtu;
-	set_mac("\0\0\0\0\0\0");
+	memset(m_mac, 0, 6);
 	m_intf = -1;
 	m_loopback_control = false;
 }
@@ -107,7 +107,7 @@ void device_network_interface::set_promisc(bool promisc)
 	if(m_dev) m_dev->set_promisc(promisc);
 }
 
-void device_network_interface::set_mac(const char *mac)
+void device_network_interface::set_mac(const u8 *mac)
 {
 	memcpy(m_mac, mac, 6);
 	if(m_dev) m_dev->set_mac(m_mac);

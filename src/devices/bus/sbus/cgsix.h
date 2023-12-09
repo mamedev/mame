@@ -50,7 +50,7 @@ protected:
 	void cursor_address_w(uint32_t data);
 	uint32_t cursor_ram_r(offs_t offset);
 	void cursor_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(vblank_w);
+	void vblank_w(int state);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint8_t perform_rasterop(uint8_t src, uint8_t dst, uint8_t mask = 0xff);

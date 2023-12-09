@@ -126,7 +126,7 @@ void mm5799_device::op_tin()
 void mm5799_device::op_tf()
 {
 	// TF x: test F pin
-	u8 f = m_read_f.isnull() ? m_f : m_read_f();
+	u8 f = m_read_f.isunset() ? m_f : m_read_f();
 	m_skip = !BIT(f, m_op >> 4 & 3);
 }
 
@@ -140,7 +140,7 @@ void mm5799_device::op_tkb()
 void mm5799_device::op_tir()
 {
 	// TIR: test DO3 pin
-	int d = m_read_do3.isnull() ? (m_do >> 2) : m_read_do3();
+	int d = m_read_do3.isunset() ? (m_do >> 2) : m_read_do3();
 	m_skip = !bool(d & 1);
 }
 

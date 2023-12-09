@@ -62,10 +62,10 @@ mc68hc11_cpu_device::mc68hc11_cpu_device(const machine_config &mconfig, device_t
 	, device_nvram_interface(mconfig, *this, (config_mask & 0xf9) != 0)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0, address_map_constructor(FUNC(mc68hc11_cpu_device::internal_map), this))
 	, m_irq_asserted(false)
-	, m_port_input_cb(*this)
+	, m_port_input_cb(*this, 0xff)
 	, m_port_output_cb(*this)
-	, m_analog_cb(*this)
-	, m_spi2_data_input_cb(*this)
+	, m_analog_cb(*this, 0)
+	, m_spi2_data_input_cb(*this, 0xff)
 	, m_spi2_data_output_cb(*this)
 	, m_ram_view(*this, "ram")
 	, m_reg_view(*this, "regs")
@@ -153,15 +153,6 @@ device_memory_interface::space_config_vector mc68hc11_cpu_device::memory_space_c
 	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_program_config)
 	};
-}
-
-void mc68hc11_cpu_device::device_resolve_objects()
-{
-	m_port_input_cb.resolve_all_safe(0xff);
-	m_port_output_cb.resolve_all_safe();
-	m_analog_cb.resolve_all_safe(0);
-	m_spi2_data_input_cb.resolve_safe(0xff);
-	m_spi2_data_output_cb.resolve_safe();
 }
 
 std::unique_ptr<util::disasm_interface> mc68hc11_cpu_device::create_disassembler()

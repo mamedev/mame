@@ -317,6 +317,15 @@ void intelfsh_device::device_start()
 	save_pointer( &m_data[0], "m_data", m_size);
 }
 
+//-------------------------------------------------
+//  is_ready - emulates the *Busy/Ready pin on some
+//             flash devices.
+//-------------------------------------------------
+
+bool intelfsh_device::is_ready()
+{
+	return (m_status & 0x80) ? true : false;
+}
 
 //-------------------------------------------------
 //  delay_tick - handle delayed commands/events
@@ -332,6 +341,7 @@ TIMER_CALLBACK_MEMBER(intelfsh_device::delay_tick)
 
 	case FM_ERASEAMD4:
 		m_flash_mode = FM_NORMAL;
+		m_status = 0x80;
 		break;
 	}
 }

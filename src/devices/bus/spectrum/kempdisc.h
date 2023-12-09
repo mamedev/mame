@@ -12,7 +12,6 @@
 #include "softlist.h"
 #include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
-#include "formats/dsk_dsk.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -42,7 +41,7 @@ protected:
 	virtual uint8_t mreq_r(offs_t offset) override;
 	virtual uint8_t iorq_r(offs_t offset) override;
 	virtual void iorq_w(offs_t offset, uint8_t data) override;
-	virtual DECLARE_READ_LINE_MEMBER(romcs) override;
+	virtual int romcs() override;
 
 	// passthru
 	virtual void pre_opcode_fetch(offs_t offset) override { m_exp->pre_opcode_fetch(offset); }

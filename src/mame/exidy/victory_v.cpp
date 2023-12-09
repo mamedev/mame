@@ -9,6 +9,12 @@
 #include "emu.h"
 #include "victory.h"
 
+#define LOG_MICROCODE (1U << 1)
+#define LOG_COLLISION (1U << 2)
+#define LOG_UNKNOWN   (1U << 3)
+
+#define VERBOSE (0)
+#include "logmacro.h"
 
 
 /* number of ticks per clock of the microcode state machine   */
@@ -18,10 +24,6 @@
 #define VICTORY_MICRO_STATE_CLOCK   (XTAL(11'289'000))
 #define MICRO_STATE_CLOCK_PERIOD    attotime::from_hz(VICTORY_MICRO_STATE_CLOCK / 8)
 
-
-/* debugging constants */
-#define LOG_MICROCODE       0
-#define LOG_COLLISION       0
 
 /*************************************
  *
@@ -46,9 +48,12 @@ void victory_state::video_start()
 	m_bgcoll = m_bgcollx = m_bgcolly = 0;
 	m_scrollx = m_scrolly = 0;
 	m_video_control = 0;
+
 	memset(&m_micro, 0, sizeof(m_micro));
 	m_micro.timer = machine().scheduler().timer_alloc(timer_expired_delegate());
-	m_bgcoll_irq_timer = timer_alloc(FUNC(victory_state::bgcoll_irq_callback), this);
+
+	for (int i = 0; i < 128; i++)
+		m_bgcoll_irq_timer[i] = timer_alloc(FUNC(victory_state::bgcoll_irq_callback), this);
 
 	/* register for state saving */
 	save_item(NAME(m_paletteram));
@@ -144,7 +149,7 @@ uint8_t victory_state::video_control_r(offs_t offset)
 	{
 		case 0x00:  /* 5XFIQ */
 			result = m_fgcollx;
-			if (LOG_COLLISION) logerror("%04X:5XFIQ read = %02X\n", m_maincpu->pcbase(), result);
+			LOGMASKED(LOG_COLLISION, "%04X:5XFIQ read = %02X\n", m_maincpu->pcbase(), result);
 			return result;
 
 		case 0x01:  /* 5CLFIQ */
@@ -154,12 +159,12 @@ uint8_t victory_state::video_control_r(offs_t offset)
 				m_fgcoll = 0;
 				update_irq();
 			}
-			if (LOG_COLLISION) logerror("%04X:5CLFIQ read = %02X\n", m_maincpu->pcbase(), result);
+			LOGMASKED(LOG_COLLISION, "%04X:5CLFIQ read = %02X\n", m_maincpu->pcbase(), result);
 			return result;
 
 		case 0x02:  /* 5BACKX */
 			result = m_bgcollx & 0xfc;
-			if (LOG_COLLISION) logerror("%04X:5BACKX read = %02X\n", m_maincpu->pcbase(), result);
+			LOGMASKED(LOG_COLLISION, "%04X:5BACKX read = %02X\n", m_maincpu->pcbase(), result);
 			return result;
 
 		case 0x03:  /* 5BACKY */
@@ -169,7 +174,7 @@ uint8_t victory_state::video_control_r(offs_t offset)
 				m_bgcoll = 0;
 				update_irq();
 			}
-			if (LOG_COLLISION) logerror("%04X:5BACKY read = %02X\n", m_maincpu->pcbase(), result);
+			LOGMASKED(LOG_COLLISION, "%04X:5BACKY read = %02X\n", m_maincpu->pcbase(), result);
 			return result;
 
 		case 0x04:  /* 5STAT */
@@ -184,11 +189,11 @@ uint8_t victory_state::video_control_r(offs_t offset)
 			result |= (~m_vblank_irq & 1) << 5;
 			result |= (~m_bgcoll & 1) << 4;
 			result |= (m_screen->vpos() & 0x100) >> 5;
-			if (LOG_COLLISION) logerror("%04X:5STAT read = %02X\n", m_maincpu->pcbase(), result);
+			LOGMASKED(LOG_COLLISION, "%04X:5STAT read = %02X\n", m_maincpu->pcbase(), result);
 			return result;
 
 		default:
-			logerror("%04X:video_control_r(%02X)\n", m_maincpu->pcbase(), offset);
+			LOGMASKED(LOG_UNKNOWN, "%04X:video_control_r(%02X)\n", m_maincpu->pcbase(), offset);
 			break;
 	}
 	return 0;
@@ -208,87 +213,87 @@ void victory_state::video_control_w(offs_t offset, uint8_t data)
 	switch (offset)
 	{
 		case 0x00:  /* LOAD IL */
-			if (LOG_MICROCODE) logerror("%04X:IL=%02X\n", m_maincpu->pcbase(), data);
+			LOGMASKED(LOG_MICROCODE, "%04X:IL=%02X\n", m_maincpu->pcbase(), data);
 			micro.i = (micro.i & 0xff00) | (data & 0x00ff);
 			break;
 
 		case 0x01:  /* LOAD IH */
-			if (LOG_MICROCODE) logerror("%04X:IH=%02X\n", m_maincpu->pcbase(), data);
+			LOGMASKED(LOG_MICROCODE, "%04X:IH=%02X\n", m_maincpu->pcbase(), data);
 			micro.i = (micro.i & 0x00ff) | ((data << 8) & 0xff00);
 			if (micro.cmdlo == 5)
 			{
-				if (LOG_MICROCODE) logerror("  Command 5 triggered by write to IH\n");
+				LOGMASKED(LOG_MICROCODE, "  Command 5 triggered by write to IH\n");
 				command5();
 			}
 			break;
 
 		case 0x02:  /* LOAD CMD */
-			if (LOG_MICROCODE) logerror("%04X:CMD=%02X\n", m_maincpu->pcbase(), data);
+			LOGMASKED(LOG_MICROCODE, "%04X:CMD=%02X\n", m_maincpu->pcbase(), data);
 			micro.cmd = data;
 			micro.cmdlo = data & 7;
 			if (micro.cmdlo == 0)
-				logerror("  Command 0 triggered\n");
+				LOGMASKED(LOG_MICROCODE, "  Command 0 triggered\n");
 			else if (micro.cmdlo == 1)
-				logerror("  Command 1 triggered\n");
+				LOGMASKED(LOG_MICROCODE, "  Command 1 triggered\n");
 			else if (micro.cmdlo == 6)
 			{
-				if (LOG_MICROCODE) logerror("  Command 6 triggered\n");
+				LOGMASKED(LOG_MICROCODE, "  Command 6 triggered\n");
 				command6();
 			}
 			break;
 
 		case 0x03:  /* LOAD G */
-			if (LOG_MICROCODE) logerror("%04X:G=%02X\n", m_maincpu->pcbase(), data);
+			LOGMASKED(LOG_MICROCODE, "%04X:G=%02X\n", m_maincpu->pcbase(), data);
 			micro.g = data;
 			break;
 
 		case 0x04:  /* LOAD X */
-			if (LOG_MICROCODE) logerror("%04X:X=%02X\n", m_maincpu->pcbase(), data);
+			LOGMASKED(LOG_MICROCODE, "%04X:X=%02X\n", m_maincpu->pcbase(), data);
 			micro.xp = data;
 			if (micro.cmdlo == 3)
 			{
-				if (LOG_MICROCODE) logerror(" Command 3 triggered by write to X\n");
+				LOGMASKED(LOG_MICROCODE, " Command 3 triggered by write to X\n");
 				command3();
 			}
 			break;
 
 		case 0x05:  /* LOAD Y */
-			if (LOG_MICROCODE) logerror("%04X:Y=%02X\n", m_maincpu->pcbase(), data);
+			LOGMASKED(LOG_MICROCODE, "%04X:Y=%02X\n", m_maincpu->pcbase(), data);
 			micro.yp = data;
 			if (micro.cmdlo == 4)
 			{
-				if (LOG_MICROCODE) logerror("  Command 4 triggered by write to Y\n");
+				LOGMASKED(LOG_MICROCODE, "  Command 4 triggered by write to Y\n");
 				command4();
 			}
 			break;
 
 		case 0x06:  /* LOAD R */
-			if (LOG_MICROCODE) logerror("%04X:R=%02X\n", m_maincpu->pcbase(), data);
+			LOGMASKED(LOG_MICROCODE, "%04X:R=%02X\n", m_maincpu->pcbase(), data);
 			micro.r = data;
 			break;
 
 		case 0x07:  /* LOAD B */
-			if (LOG_MICROCODE) logerror("%04X:B=%02X\n", m_maincpu->pcbase(), data);
+			LOGMASKED(LOG_MICROCODE, "%04X:B=%02X\n", m_maincpu->pcbase(), data);
 			micro.b = data;
 			if (micro.cmdlo == 2)
 			{
-				if (LOG_MICROCODE) logerror("  Command 2 triggered by write to B\n");
+				LOGMASKED(LOG_MICROCODE, "  Command 2 triggered by write to B\n");
 				command2();
 			}
 			else if (micro.cmdlo == 7)
 			{
-				if (LOG_MICROCODE) logerror("  Command 7 triggered by write to B\n");
+				LOGMASKED(LOG_MICROCODE, "  Command 7 triggered by write to B\n");
 				command7();
 			}
 			break;
 
 		case 0x08:  /* SCROLLX */
-			if (LOG_MICROCODE) logerror("%04X:SCROLLX write = %02X\n", m_maincpu->pcbase(), data);
+			LOGMASKED(LOG_MICROCODE, "%04X:SCROLLX write = %02X\n", m_maincpu->pcbase(), data);
 			m_scrollx = data;
 			break;
 
 		case 0x09:  /* SCROLLY */
-			if (LOG_MICROCODE) logerror("%04X:SCROLLY write = %02X\n", m_maincpu->pcbase(), data);
+			LOGMASKED(LOG_MICROCODE, "%04X:SCROLLY write = %02X\n", m_maincpu->pcbase(), data);
 			m_scrolly = data;
 			break;
 
@@ -300,18 +305,18 @@ void victory_state::video_control_w(offs_t offset, uint8_t data)
 			// D3 = SINVERT
 			// D2 = BIR12
 			// D1 = SELOVER
-			if (LOG_MICROCODE) logerror("%04X:CONTROL write = %02X\n", m_maincpu->pcbase(), data);
+			LOGMASKED(LOG_MICROCODE, "%04X:CONTROL write = %02X\n", m_maincpu->pcbase(), data);
 			m_video_control = data;
 			break;
 
 		case 0x0b:  /* CLRVIRQ */
-			if (LOG_MICROCODE) logerror("%04X:CLRVIRQ write = %02X\n", m_maincpu->pcbase(), data);
+			LOGMASKED(LOG_MICROCODE, "%04X:CLRVIRQ write = %02X\n", m_maincpu->pcbase(), data);
 			m_vblank_irq = 0;
 			update_irq();
 			break;
 
 		default:
-			if (LOG_MICROCODE) logerror("%04X:video_control_w(%02X) = %02X\n", m_maincpu->pcbase(), offset, data);
+			LOGMASKED(LOG_MICROCODE, "%04X:video_control_w(%02X) = %02X\n", m_maincpu->pcbase(), offset, data);
 			break;
 	}
 }
@@ -601,13 +606,12 @@ int victory_state::command3()
 	int xcount = 8 - (micro.r >> 5);
 	int shift = micro.xp & 7;
 	int nshift = 8 - shift;
-	int x, y, sy;
 
-	for (x = 0; x < xcount; x++, micro.xp += 8)
+	for (int x = 0; x < xcount; x++, micro.xp += 8)
 	{
-		sy = micro.yp;
+		uint8_t sy = micro.yp;
 
-		for (y = 0; y < ycount; y++)
+		for (int y = 0; y < ycount; y++)
 		{
 			int srcoffs = micro.i++ & 0x3fff;
 			int dstoffs = (sy++ & 0xff) * 32 + micro.xp / 8;
@@ -703,7 +707,7 @@ int victory_state::command4()
 */
 	int keep_going = 0;
 
-	if (LOG_MICROCODE) logerror("================= EXECUTE BEGIN\n");
+	LOGMASKED(LOG_MICROCODE, "================= EXECUTE BEGIN\n");
 
 	micro.count_states(4);
 
@@ -716,7 +720,7 @@ int victory_state::command4()
 		micro.r = m_gram[0x2001 + micro.pc];
 		micro.xp = m_rram[0x2001 + micro.pc];
 		micro.yp = m_bram[0x2001 + micro.pc];
-		if (LOG_MICROCODE) logerror("PC=%03X  CMD=%02X I=%04X R=%02X X=%02X Y=%02X\n", micro.pc, micro.cmd, micro.i, micro.r, micro.xp, micro.yp);
+		LOGMASKED(LOG_MICROCODE, "PC=%03X  CMD=%02X I=%04X R=%02X X=%02X Y=%02X\n", micro.pc, micro.cmd, micro.i, micro.r, micro.xp, micro.yp);
 		micro.pc = (micro.pc + 2) & 0x1ff;
 
 		switch (micro.cmdlo)
@@ -732,7 +736,7 @@ int victory_state::command4()
 		}
 	} while (keep_going);
 
-	if (LOG_MICROCODE) logerror("================= EXECUTE END\n");
+	LOGMASKED(LOG_MICROCODE, "================= EXECUTE END\n");
 
 	return micro.cmd & 0x80;
 }
@@ -798,12 +802,11 @@ int victory_state::command5()
 	uint8_t y = micro.yp;
 	int acc = 0x80;
 	int i = micro.i >> 8;
-	int c;
 
 	/* non-collision-detect case */
 	if (!(micro.cmd & 0x08) || m_fgcoll)
 	{
-		for (c = micro.i & 0xff; c < 0x100; c++)
+		for (int c = micro.i & 0xff; c < 0x100; c++)
 		{
 			int addr = y * 32 + x / 8;
 			int shift = x & 7;
@@ -834,7 +837,7 @@ int victory_state::command5()
 	/* collision-detect case */
 	else
 	{
-		for (c = micro.i & 0xff; c < 0x100; c++)
+		for (int c = micro.i & 0xff; c < 0x100; c++)
 		{
 			int addr = y * 32 + x / 8;
 			int shift = x & 7;
@@ -1117,8 +1120,11 @@ uint32_t victory_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 			int fpix = *fg++;
 			int bpix = bg[(x + m_scrollx) & 255];
 			scanline[x] = bpix | (fpix << 3);
-			if (fpix && (bpix & bgcollmask) && count++ < 128)
-				m_bgcoll_irq_timer->adjust(screen.time_until_pos(y, x), x | (y << 8));
+			if (fpix && (bpix & bgcollmask) && count < 128)
+			{
+				m_bgcoll_irq_timer[count]->adjust(screen.time_until_pos(y, x), x | (y << 8));
+				count++;
+			}
 		}
 	}
 

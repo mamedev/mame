@@ -7,9 +7,9 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "emuopts.h"
 #include "exp.h"
 
+#include "formats/cbm_crt.h"
 
 
 //**************************************************************************
@@ -73,12 +73,6 @@ vic10_expansion_slot_device::vic10_expansion_slot_device(const machine_config &m
 void vic10_expansion_slot_device::device_start()
 {
 	m_card = get_card_device();
-
-	// resolve callbacks
-	m_write_irq.resolve_safe();
-	m_write_res.resolve_safe();
-	m_write_cnt.resolve_safe();
-	m_write_sp.resolve_safe();
 }
 
 
@@ -184,8 +178,8 @@ void vic10_expansion_slot_device::cd_w(offs_t offset, uint8_t data, int lorom, i
 	}
 }
 
-READ_LINE_MEMBER( vic10_expansion_slot_device::p0_r ) { int state = 0; if (m_card != nullptr) state = m_card->vic10_p0_r(); return state; }
-WRITE_LINE_MEMBER( vic10_expansion_slot_device::p0_w ) { if (m_card != nullptr) m_card->vic10_p0_w(state); }
+int vic10_expansion_slot_device::p0_r() { int state = 0; if (m_card != nullptr) state = m_card->vic10_p0_r(); return state; }
+void vic10_expansion_slot_device::p0_w(int state) { if (m_card != nullptr) m_card->vic10_p0_w(state); }
 
 
 //-------------------------------------------------

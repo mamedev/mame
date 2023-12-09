@@ -46,10 +46,10 @@ public:
 	auto write_protect_cb() { return m_write_protect_cb.bind(); }
 
 	// called from card device
-	DECLARE_WRITE_LINE_MEMBER( card_detect_w ) { m_card_detect_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER( battery_voltage_1_w ) { m_battery_voltage_1_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER( battery_voltage_2_w ) { m_battery_voltage_2_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER( write_protect_w ) { m_write_protect_cb(state); }
+	void card_detect_w(int state) { m_card_detect_cb(state); }
+	void battery_voltage_1_w(int state) { m_battery_voltage_1_cb(state); }
+	void battery_voltage_2_w(int state) { m_battery_voltage_2_cb(state); }
+	void write_protect_w(int state) { m_write_protect_cb(state); }
 
 	// 16-bit access
 	uint16_t read_memory(offs_t offset, uint16_t mem_mask = ~0);

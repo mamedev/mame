@@ -9,6 +9,8 @@
 #include "emu.h"
 #include "compis_fdc.h"
 
+#include "formats/cpis_dsk.h"
+
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -29,12 +31,12 @@ DEFINE_DEVICE_TYPE(COMPIS_FDC, compis_fdc_device, "compis_fdc", "Compis FDC")
 //  floppy_formats
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( compis_fdc_device::fdc_irq )
+void compis_fdc_device::fdc_irq(int state)
 {
 	m_slot->mintr1_w(state);
 }
 
-WRITE_LINE_MEMBER( compis_fdc_device::fdc_drq )
+void compis_fdc_device::fdc_drq(int state)
 {
 	m_slot->mdrqt_w(state);
 }
@@ -61,8 +63,9 @@ void compis_fdc_device::device_add_mconfig(machine_config &config)
 	I8272A(config, m_fdc, 8'000'000, true);
 	m_fdc->intrq_wr_callback().set(FUNC(compis_fdc_device::fdc_irq));
 	m_fdc->drq_wr_callback().set(FUNC(compis_fdc_device::fdc_drq));
-	FLOPPY_CONNECTOR(config, m_floppy0, compis_floppies, "525qd", compis_fdc_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy1, compis_floppies, "525qd", compis_fdc_device::floppy_formats);
+
+	for (auto &floppy : m_floppy)
+		FLOPPY_CONNECTOR(config, floppy, compis_floppies, "525qd", compis_fdc_device::floppy_formats);
 }
 
 
@@ -79,8 +82,7 @@ compis_fdc_device::compis_fdc_device(const machine_config &mconfig, const char *
 	device_t(mconfig, COMPIS_FDC, tag, owner, clock),
 	device_isbx_card_interface(mconfig, *this),
 	m_fdc(*this, I8272_TAG),
-	m_floppy0(*this, I8272_TAG":0"),
-	m_floppy1(*this, I8272_TAG":1")
+	m_floppy(*this, I8272_TAG":%u", 0U)
 {
 }
 
@@ -171,6 +173,10 @@ void compis_fdc_device::opt0_w(int state)
 
 void compis_fdc_device::opt1_w(int state)
 {
-	m_floppy0->get_device()->mon_w(state);
-	m_floppy1->get_device()->mon_w(state);
+	for (auto &floppy : m_floppy)
+	{
+		floppy_image_device *fd = floppy->get_device();
+		if (fd)
+			fd->mon_w(state);
+	}
 }

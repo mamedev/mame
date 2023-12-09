@@ -12,10 +12,13 @@
 
 #include "fs_cbmdos.h"
 #include "d64_dsk.h"
+#include "fsblk.h"
+
 #include "corestr.h"
 #include "strformat.h"
 
 #include <array>
+#include <optional>
 #include <set>
 #include <string_view>
 #include <tuple>

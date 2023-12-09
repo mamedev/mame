@@ -61,31 +61,31 @@ public:
 		return m_portd_out[Bit - 1].bind();
 	}
 
-	DECLARE_WRITE_LINE_MEMBER(porta0_w);
-	DECLARE_WRITE_LINE_MEMBER(porta1_w);
-	DECLARE_WRITE_LINE_MEMBER(porta2_w);
-	DECLARE_WRITE_LINE_MEMBER(porta3_w);
-	DECLARE_WRITE_LINE_MEMBER(porta4_w);
-	DECLARE_WRITE_LINE_MEMBER(porta5_w);
+	void porta0_w(int state);
+	void porta1_w(int state);
+	void porta2_w(int state);
+	void porta3_w(int state);
+	void porta4_w(int state);
+	void porta5_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(portb4_w);
-	DECLARE_WRITE_LINE_MEMBER(portb5_w);
-	DECLARE_WRITE_LINE_MEMBER(portb6_w);
+	void portb4_w(int state);
+	void portb5_w(int state);
+	void portb6_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(portc4_w);
-	DECLARE_WRITE_LINE_MEMBER(portc5_w);
-	DECLARE_WRITE_LINE_MEMBER(portc6_w);
-	DECLARE_WRITE_LINE_MEMBER(portc7_w);
+	void portc4_w(int state);
+	void portc5_w(int state);
+	void portc6_w(int state);
+	void portc7_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(portd1_w);
-	DECLARE_WRITE_LINE_MEMBER(portd2_w);
-	DECLARE_WRITE_LINE_MEMBER(portd3_w);
-	DECLARE_WRITE_LINE_MEMBER(portd4_w);
-	DECLARE_WRITE_LINE_MEMBER(portd5_w);
-	DECLARE_WRITE_LINE_MEMBER(portd6_w);
-	DECLARE_WRITE_LINE_MEMBER(portd7_w);
+	void portd1_w(int state);
+	void portd2_w(int state);
+	void portd3_w(int state);
+	void portd4_w(int state);
+	void portd5_w(int state);
+	void portd6_w(int state);
+	void portd7_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(timer_w);
+	void timer_w(int state);
 
 protected:
 	// device-level overrides

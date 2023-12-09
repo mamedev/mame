@@ -46,7 +46,7 @@ DEFINE_DEVICE_TYPE(F38T56, f38t56_device, "f38t56_psu", "Fairchild F38T56 PSU")
 f3853_device::f3853_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_int_req_callback(*this),
-	m_pri_out_callback(*this),
+	m_pri_out_callback(*this), // TODO: not implemented
 	m_int_daisy_chain_callback(*this),
 	m_int_vector(0),
 	m_prescaler(31),
@@ -60,7 +60,7 @@ f3853_device::f3853_device(const machine_config &mconfig, const char *tag, devic
 
 f3851_device::f3851_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	f3853_device(mconfig, type, tag, owner, clock),
-	m_read_port(*this),
+	m_read_port(*this, 0),
 	m_write_port(*this)
 { }
 
@@ -88,18 +88,7 @@ f38t56_device::f38t56_device(const machine_config &mconfig, const char *tag, dev
 
 void f3853_device::device_resolve_objects()
 {
-	m_int_req_callback.resolve_safe();
-	m_pri_out_callback.resolve_safe(); // TODO: not implemented
 	m_int_daisy_chain_callback.resolve();
-}
-
-void f3851_device::device_resolve_objects()
-{
-	f3853_device::device_resolve_objects();
-
-	// 2 I/O ports
-	m_read_port.resolve_all_safe(0);
-	m_write_port.resolve_all_safe();
 }
 
 void f3853_device::device_start()
@@ -207,7 +196,7 @@ TIMER_CALLBACK_MEMBER(f3853_device::timer_callback)
 }
 
 
-WRITE_LINE_MEMBER(f3853_device::ext_int_w)
+void f3853_device::ext_int_w(int state)
 {
 	if (!m_external_interrupt_line && state && m_external_int_enable)
 	{
@@ -217,7 +206,7 @@ WRITE_LINE_MEMBER(f3853_device::ext_int_w)
 	set_interrupt_request_line();
 }
 
-WRITE_LINE_MEMBER(f3853_device::pri_in_w)
+void f3853_device::pri_in_w(int state)
 {
 	m_priority_line = bool(state);
 	set_interrupt_request_line();

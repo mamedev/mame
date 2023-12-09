@@ -5,7 +5,7 @@
   Suwa Seikosha (now Seiko Epson) SMC1102, SMC1112
 
 SMC1102 is a CMOS MCU based on TMS1100, keeping the same ALU and opcode mnemonics.
-The stack(CALL/RETN) works a bit differently. They added a timer, interrupts,
+The stack(CALL/RETN) works a bit differently. They also added a timer, interrupts,
 and a built-in LCD controller.
 
 In the USA, it was marketed by S-MOS Systems, an affiliate of Seiko Group.
@@ -19,7 +19,6 @@ SMC1112 die notes (SMC1102 is assumed to be the same):
 - no output PLA
 
 TODO:
-- LCD refresh timing is unknown
 - add (micro)instructions PLA if it turns out it can be customized
 - add halt opcode
 
@@ -60,8 +59,6 @@ std::unique_ptr<util::disasm_interface> smc1102_cpu_device::create_disassembler(
 void smc1102_cpu_device::device_start()
 {
 	tms1100_cpu_device::device_start();
-
-	m_write_segs.resolve_safe();
 
 	// zerofill
 	memset(m_lcd_ram, 0, sizeof(m_lcd_ram));
@@ -113,16 +110,16 @@ void smc1102_cpu_device::device_reset()
 	m_timeout = false;
 
 	// changed/added fixed instructions (mostly handled in op_extra)
-	m_fixed_decode[0x0a] = F_EXTRA;
-	m_fixed_decode[0x71] = F_EXTRA;
-	m_fixed_decode[0x74] = F_EXTRA;
-	m_fixed_decode[0x75] = F_EXTRA;
-	m_fixed_decode[0x76] = F_RETN;
-	m_fixed_decode[0x78] = F_EXTRA;
-	m_fixed_decode[0x7b] = F_EXTRA;
+	m_fixed_decode[0x0a] = F_EXTRA; // TASR
+	m_fixed_decode[0x71] = F_EXTRA; // HALT
+	m_fixed_decode[0x74] = F_EXTRA; // INTEN
+	m_fixed_decode[0x75] = F_EXTRA; // INTDIS
+	m_fixed_decode[0x76] = F_RETN; // INTRTN
+	m_fixed_decode[0x78] = F_EXTRA; // SELIN
+	m_fixed_decode[0x7b] = F_EXTRA; // TMSET
 
-	m_fixed_decode[0x72] = m_fixed_decode[0x73] = F_EXTRA;
-	m_fixed_decode[0x7c] = m_fixed_decode[0x7d] = F_EXTRA;
+	m_fixed_decode[0x72] = m_fixed_decode[0x73] = F_EXTRA; // TSG
+	m_fixed_decode[0x7c] = m_fixed_decode[0x7d] = F_EXTRA; // "
 }
 
 u32 smc1102_cpu_device::decode_micro(offs_t offset)
@@ -252,6 +249,13 @@ void smc1102_cpu_device::execute_run()
 			}
 		}
 
+		// overall, LCD refresh rate is 64Hz
+		if ((m_div & 0x1ff) == 0)
+		{
+			for (int i = 0; i < 4; i++)
+				m_write_segs(i, m_lcd_ram[i]);
+		}
+
 		// 4 cycles per opcode instead of 6
 		switch (m_subcycle)
 		{
@@ -309,7 +313,6 @@ void smc1102_cpu_device::op_tsg()
 {
 	// TSG: transfer LCD S/R to RAM
 	m_lcd_ram[m_opcode & 3] = m_lcd_sr;
-	m_write_segs(m_opcode & 3, m_lcd_sr);
 }
 
 void smc1102_cpu_device::op_intdis()

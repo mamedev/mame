@@ -72,7 +72,7 @@ hard drive  3.5 adapter     long 3.5 IDE cable      3.5 adapter   PCB
 #include "konami_helper.h"
 
 #include "bus/ata/ataintf.h"
-#include "bus/ata/idehd.h"
+#include "bus/ata/hdd.h"
 #include "cpu/m68000/m68020.h"
 #include "sound/k054539.h"
 
@@ -102,6 +102,12 @@ public:
 		, m_turntable(*this, "TT%u", 1U)
 		, m_sndram(*this, "sndram")
 		, m_leds(*this, "led%u", 0U)
+		, m_right_red_hlt(*this, "right-red-hlt")
+		, m_left_red_hlt(*this, "left-red-hlt")
+		, m_right_blue_hlt(*this, "right-blue-hlt")
+		, m_left_blue_hlt(*this, "left-blue-hlt")
+		, m_right_ssr(*this, "right-ssr")
+		, m_left_ssr(*this, "left-ssr")
 	{
 	}
 
@@ -112,6 +118,7 @@ public:
 	void init_bm7thmix();
 	void init_bm6thmix();
 	void init_hmcompmx();
+	void init_bscompmx();
 	void init_bmfinal();
 	void init_hmcompm2();
 	void init_bm5thmix();
@@ -149,7 +156,7 @@ private:
 
 	uint32_t screen_update_djmain(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vb_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
+	void ide_interrupt(int state);
 	void draw_sprites( bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	K056832_CB_MEMBER(tile_callback);
 	void k054539_map(address_map &map);
@@ -168,6 +175,12 @@ private:
 	optional_ioport_array<2> m_turntable;
 	required_shared_ptr<uint8_t> m_sndram;
 	output_finder<3> m_leds;
+	output_finder<> m_right_red_hlt;
+	output_finder<> m_left_red_hlt;
+	output_finder<> m_right_blue_hlt;
+	output_finder<> m_left_blue_hlt;
+	output_finder<> m_right_ssr;
+	output_finder<> m_left_ssr;
 
 	int m_sndram_bank = 0;
 	int m_turntable_select = 0;
@@ -559,10 +572,10 @@ void djmain_state::light_ctrl_1_w(offs_t offset, uint32_t data, uint32_t mem_mas
 {
 	if (ACCESSING_BITS_16_31)
 	{
-		output().set_value("right-red-hlt",  !(data & 0x08000000));   // Right red HIGHLIGHT
-		output().set_value("left-red-hlt",   !(data & 0x04000000));   // Left red HIGHLIGHT
-		output().set_value("left-blue-hlt",  !(data & 0x02000000));   // Left blue HIGHLIGHT
-		output().set_value("right-blue-hlt", !(data & 0x00200000));   // Right blue HIGHLIGHT
+		m_right_red_hlt = !BIT(data, 27);   // Right red HIGHLIGHT
+		m_left_red_hlt = !BIT(data, 26);   // Left red HIGHLIGHT
+		m_left_blue_hlt = !BIT(data, 25);   // Left blue HIGHLIGHT
+		m_right_blue_hlt = !BIT(data, 21);   // Right blue HIGHLIGHT
 	}
 }
 
@@ -570,8 +583,8 @@ void djmain_state::light_ctrl_2_w(offs_t offset, uint32_t data, uint32_t mem_mas
 {
 	if (ACCESSING_BITS_16_31)
 	{
-		output().set_value("left-ssr",       !!(data & 0x08000000));  // SSR
-		output().set_value("right-ssr",      !!(data & 0x08000000));  // SSR
+		m_left_ssr = !!BIT(data, 27);  // SSR
+		m_right_ssr = !!BIT(data, 27);    // SSR
 		m_leds[0] = BIT(data, 16);            // 1P START
 		m_leds[1] = BIT(data, 17);            // 2P START
 		m_leds[2] = BIT(data, 18);            // EFFECT
@@ -621,7 +634,7 @@ INTERRUPT_GEN_MEMBER(djmain_state::vb_interrupt)
 }
 
 
-WRITE_LINE_MEMBER( djmain_state::ide_interrupt )
+void djmain_state::ide_interrupt(int state)
 {
 	if (state != CLEAR_LINE)
 	{
@@ -1623,6 +1636,12 @@ void djmain_state::machine_start()
 		hdd->set_user_password(m_ata_user_password);
 
 	m_leds.resolve();
+	m_right_red_hlt.resolve();
+	m_left_red_hlt.resolve();
+	m_right_blue_hlt.resolve();
+	m_left_blue_hlt.resolve();
+	m_right_ssr.resolve();
+	m_left_ssr.resolve();
 
 	save_item(NAME(m_sndram_bank));
 	save_item(NAME(m_pending_vb_int));
@@ -1732,7 +1751,7 @@ ROM_START( bm1stmix )
 	ROM_LOAD16_BYTE( "753jaa09.25d", 0x100000, 0x80000, CRC(b50c3dbb) SHA1(6022ea249aad0793b2279699e68087b4bc9b4ef1) )
 	ROM_LOAD16_BYTE( "753jaa10.27d", 0x100001, 0x80000, CRC(391f4bfd) SHA1(791c9889ea3ce639bbfb87934a1cad9aa3c9ccde) )
 
-	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
+	DISK_REGION( "ata:0:hdd" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "753jaa11", 0, SHA1(2e70cf31a853322f29f99b6f292c187a2cf33015) ) /* ver 1.00 JA */
 	// There is an alternate image
 	//DISK_IMAGE( "753jaa11", 0, MD5(260c9b72f4a03055e3abad61c6225324) SHA1(2cc3e149744516bf2353a2b47d33bc9d2072b6c4) ) /* ver 1.00 JA */
@@ -1755,7 +1774,7 @@ ROM_START( bm2ndmix )
 	ROM_LOAD16_BYTE( "853jaa09.25d", 0x100000, 0x80000, CRC(8584e21e) SHA1(3d1ca6de00f9ac07bbe7cd1e67093cca7bf484bb) )
 	ROM_LOAD16_BYTE( "853jaa10.27d", 0x100001, 0x80000, CRC(9cb92d98) SHA1(6ace4492ba0b5a8f94a9e7b4f7126b31c6254637) )
 
-	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
+	DISK_REGION( "ata:0:hdd" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "853jaa11", 0, SHA1(9683ff8462491252b6eb2e5b3aa6496884c01506) ) /* ver 1.10 JA */
 ROM_END
 
@@ -1776,7 +1795,7 @@ ROM_START( bm2ndmxa )
 	ROM_LOAD16_BYTE( "853jaa09.25d", 0x100000, 0x80000, CRC(8584e21e) SHA1(3d1ca6de00f9ac07bbe7cd1e67093cca7bf484bb) )
 	ROM_LOAD16_BYTE( "853jaa10.27d", 0x100001, 0x80000, CRC(9cb92d98) SHA1(6ace4492ba0b5a8f94a9e7b4f7126b31c6254637) )
 
-	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
+	DISK_REGION( "ata:0:hdd" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "853jaa11", 0, SHA1(9683ff8462491252b6eb2e5b3aa6496884c01506) ) /* ver 1.10 JA */
 ROM_END
 
@@ -1797,7 +1816,7 @@ ROM_START( bm3rdmix )
 	ROM_LOAD16_BYTE( "825jaa09.25d", 0x100000, 0x80000, CRC(d3e65669) SHA1(51abf452da60794fa47c05d11c08b203dde563ff) )
 	ROM_LOAD16_BYTE( "825jaa10.27d", 0x100001, 0x80000, CRC(44d184f3) SHA1(28f3ec33a29164a6531f53db071272ccf015f66d) )
 
-	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
+	DISK_REGION( "ata:0:hdd" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "825jaa11", 0, SHA1(048919977232bbce046406a7212586cf39b77cf2) ) /* ver 1.00 JA */
 ROM_END
 
@@ -1818,7 +1837,7 @@ ROM_START( bm3rdeaa )
 	ROM_LOAD16_BYTE( "825eaa09.25d", 0x100000, 0x80000, CRC(829000ca) SHA1(f52494869cca78e7bc6125d329292eaa15fffed5) )
 	ROM_LOAD16_BYTE( "825eaa10.27d", 0x100001, 0x80000, CRC(345ee6e5) SHA1(ce5d05b26900ed09fb3996a60edaf332e3acd720) )
 
-	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
+	DISK_REGION( "ata:0:hdd" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "825jab11", 0, SHA1(f506a83d43aeed87a7a32c3f7312d2a2b7d60d91) )  /* ver 1.01 JA */
 ROM_END
 
@@ -1839,7 +1858,7 @@ ROM_START( bmcompmx )
 	ROM_LOAD16_BYTE( "858jaa09.25d", 0x100000, 0x80000, CRC(0b4ad843) SHA1(c01e15053dd1975dc68db9f4e6da47062d8f9b54) )
 	ROM_LOAD16_BYTE( "858jaa10.27d", 0x100001, 0x80000, CRC(00b124ee) SHA1(435d28a327c2707833a8ddfe841104df65ffa3f8) )
 
-	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
+	DISK_REGION( "ata:0:hdd" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "858jaa11", 0, SHA1(bc590472046336a1000f29901fe3fd7b29747e47) ) /* ver 1.00 JA */
 ROM_END
 
@@ -1860,7 +1879,7 @@ ROM_START( bmcompmxb )
 	ROM_LOAD16_BYTE( "858jaa09.25d", 0x100000, 0x80000, CRC(0b4ad843) SHA1(c01e15053dd1975dc68db9f4e6da47062d8f9b54) )
 	ROM_LOAD16_BYTE( "858jaa10.27d", 0x100001, 0x80000, CRC(00b124ee) SHA1(435d28a327c2707833a8ddfe841104df65ffa3f8) )
 
-	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
+	DISK_REGION( "ata:0:hdd" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "858jaa11", 0, SHA1(bc590472046336a1000f29901fe3fd7b29747e47) ) /* ver 1.00 JA */
 ROM_END
 
@@ -1881,7 +1900,7 @@ ROM_START( hmcompmx )
 	ROM_LOAD16_BYTE( "858uaa09.25d", 0x100000, 0x80000, CRC(99519886) SHA1(664f6bd953201a6e2fc123cb8b3facf72766107d) )
 	ROM_LOAD16_BYTE( "858uaa10.27d", 0x100001, 0x80000, CRC(20aa7145) SHA1(eeff87eb9a9864985d751f45e843ee6e73db8cfd) )
 
-	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
+	DISK_REGION( "ata:0:hdd" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "858jaa11", 0, SHA1(bc590472046336a1000f29901fe3fd7b29747e47) ) /* ver 1.00 JA */
 ROM_END
 
@@ -1902,8 +1921,29 @@ ROM_START( bmcmxaac )
 	ROM_LOAD16_BYTE( "858aac09.25d", 0x100000, 0x80000, CRC(46b7c6e2) SHA1(913de33f10bd86f261567f634eece2f157d0c9b0) )
 	ROM_LOAD16_BYTE( "858aac10.27d", 0x100001, 0x80000, CRC(15d1230f) SHA1(848df167e9e20c1d1e9f3bf79bcc4fc1d2121944) )
 
-	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
+	DISK_REGION( "ata:0:hdd" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "858aac11", 0, SHA1(31cb039c20783f399885f3d9a7582593dae0ed40) ) /* ver 1.00 AA */
+ROM_END
+
+ROM_START( bscompmx )
+	ROM_REGION( 0x100000, "maincpu", 0 )    /* MC68EC020FG25 MPU */
+	ROM_LOAD16_BYTE( "858kab01.6a", 0x000000, 0x80000, CRC(47c19dcc) SHA1(3698c9d5ccaa24626d5a04b20750dc3faf423f68) )
+	ROM_LOAD16_BYTE( "858kab02.8a", 0x000001, 0x80000, CRC(cc848aaa) SHA1(1ebe4f8d3936dbcd0a83dadc3547951fcab39786) )
+
+	ROM_REGION( 0x200000, "gfx1", 0)        /* SPRITE */
+	ROM_LOAD16_BYTE( "858kab03.19a", 0x000000, 0x80000, CRC(679022e9) SHA1(70026a5c5bcb8adb58e7e7246f3cc30471a844a6) )
+	ROM_LOAD16_BYTE( "858kab04.20a", 0x000001, 0x80000, CRC(d916d8ec) SHA1(827fcd2c3c5e0d01e4cf49820d23eef44b63cfaa) )
+	ROM_LOAD16_BYTE( "858kab05.22a", 0x100000, 0x80000, CRC(f59c8e83) SHA1(fe4fee34ce12afc02e709190ec3a756a0cf77e08) )
+	ROM_LOAD16_BYTE( "858kab06.24a", 0x100001, 0x80000, CRC(8de99a50) SHA1(bde3fae982bd0a3492135b20542d87a87dd772ce) )
+
+	ROM_REGION( 0x200000, "k056832", 0 )    /* TILEMAP */
+	ROM_LOAD16_BYTE( "858kab07.22d", 0x000000, 0x80000, CRC(3bd6d429) SHA1(bc63eb4931d528aad6199fa4374f8a7d3cc50094) )
+	ROM_LOAD16_BYTE( "858kab08.23d", 0x000001, 0x80000, CRC(3a16c0bb) SHA1(77c417cab5b71dcfce4225471eb73e26e1adb1bb) )
+	ROM_LOAD16_BYTE( "858kab09.25d", 0x100000, 0x80000, CRC(f4a2fab7) SHA1(b7814a2bb04cb11969295dba97b2755daddbaab6) )
+	ROM_LOAD16_BYTE( "858kab10.27d", 0x100001, 0x80000, CRC(177777fb) SHA1(9d556d7d65a588bad300dbd282c6b5a31629bd6d) )
+
+	DISK_REGION( "ata:0:hdd" )              /* IDE HARD DRIVE */
+	DISK_IMAGE( "858kab11", 0, SHA1(951376b895782ac57844b25d13a4984d37cc9fc8) ) /* ver 1.00 KA */
 ROM_END
 
 ROM_START( bm4thmix )
@@ -1923,7 +1963,7 @@ ROM_START( bm4thmix )
 	ROM_LOAD16_BYTE( "847jab09.25d", 0x100000, 0x80000, CRC(2e4ac9fe) SHA1(bbd4c6e0c82fc0be88f851e901e5853b6bcf775f) )
 	ROM_LOAD16_BYTE( "847jab10.27d", 0x100001, 0x80000, CRC(c78516f5) SHA1(1adf5805c808dc55de14a9a9b20c3d2cf7bf414d) )
 
-	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
+	DISK_REGION( "ata:0:hdd" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "847jaa11", 0, SHA1(8cad631531b5616d6a4b0a99d988f4b525932dc7) ) /* ver 1.00 JA */
 ROM_END
 
@@ -1944,7 +1984,7 @@ ROM_START( bs4thmix )
 	ROM_LOAD16_BYTE( "847kaa09.25d", 0x100000, 0x80000, CRC(c078f7d3) SHA1(2c268f1b7f1fa71c659d899a49e839128b789245) )
 	ROM_LOAD16_BYTE( "847kaa10.27d", 0x100001, 0x80000, CRC(2f676be7) SHA1(43d1844280117e76c95bb9b32ea3ca511fffc131) )
 
-	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
+	DISK_REGION( "ata:0:hdd" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "847kaa01", 0, SHA1(be35c25d11892b57817ca9da90734a439d259824) )
 ROM_END
 
@@ -1965,7 +2005,7 @@ ROM_START( bm5thmix )
 	ROM_LOAD16_BYTE( "981jaa09.25d", 0x100000, 0x80000, CRC(d96d4e1c) SHA1(379aa4e82cd06490645f54dab1724c827108735d) )
 	ROM_LOAD16_BYTE( "981jaa10.27d", 0x100001, 0x80000, CRC(06bee0e4) SHA1(6eea8614cb01e7079393b9976b6fd6a52c14e3c0) )
 
-	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
+	DISK_REGION( "ata:0:hdd" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "981jaa11", 0, SHA1(dc7353fa436d96ae174a58d3a38ca9928a63727f) ) /* ver 1.00 JA */
 ROM_END
 
@@ -1986,7 +2026,7 @@ ROM_START( bmclubmx )
 	ROM_LOAD16_BYTE( "993jaa09.25d", 0x100000, 0x80000, CRC(e1a172dd) SHA1(42e850c055dc5bfccf6b6989f9f3a945fce13006) )
 	ROM_LOAD16_BYTE( "993jaa10.27d", 0x100001, 0x80000, CRC(9d113a2d) SHA1(eee94a5f7015c49aa630b8df0c8e9d137d238811) )
 
-	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
+	DISK_REGION( "ata:0:hdd" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "993hdda01", 0, SHA1(f5d4df1dd27ce6ee2d0897852342691d55b63bfb) )
 	// this image has not been verified
 	//  DISK_IMAGE( "993jaa11", 0, MD5(e26eb62d7cf3357585f5066da6063143) )  /* ver 1.00 JA */
@@ -2009,7 +2049,7 @@ ROM_START( bmcompm2 )
 	ROM_LOAD16_BYTE( "988jaa09.25d", 0x100000, 0x80000, CRC(8f3bae7f) SHA1(c4dac14f6c7f75a2b19153e05bfe969e9eb4aca0) )
 	ROM_LOAD16_BYTE( "988jaa10.27d", 0x100001, 0x80000, CRC(248bf0ee) SHA1(d89205ed57e771401bfc2c24043d200ecbd0b7fc) )
 
-	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
+	DISK_REGION( "ata:0:hdd" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "988jaa11", 0, SHA1(12a0988c631dd3331e54b8417a9659402afe168b) ) /* ver 1.00 JA */
 ROM_END
 
@@ -2030,7 +2070,7 @@ ROM_START( hmcompm2 )
 	ROM_LOAD16_BYTE( "988uaa09.25d", 0x100000, 0x80000, CRC(c2ad6810) SHA1(706388c5acf6718297fd90e10f8a673463a0893b) )
 	ROM_LOAD16_BYTE( "988uaa10.27d", 0x100001, 0x80000, CRC(dab0f3c9) SHA1(6fd899e753e32f60262c54ab8553c686c7ef28de) )
 
-	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
+	DISK_REGION( "ata:0:hdd" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "988jaa11", 0, SHA1(12a0988c631dd3331e54b8417a9659402afe168b) ) /* ver 1.00 JA */
 ROM_END
 
@@ -2051,7 +2091,7 @@ ROM_START( bmdct )
 	ROM_LOAD16_BYTE( "995jaa09.25d", 0x100000, 0x80000, CRC(1510a9c2) SHA1(daf1ab26b7b6b0fe0123b3fbee68684157c2ce51) )
 	ROM_LOAD16_BYTE( "995jaa10.27d", 0x100001, 0x80000, CRC(f9e4e9f2) SHA1(fe91badf6b0baeea690d75399d8c66fabcf6d352) )
 
-	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
+	DISK_REGION( "ata:0:hdd" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "995jaa11", 0, SHA1(8fec3c4d97f64f48b9867230a97cda4347496075) ) /* ver 1.00 JA */
 ROM_END
 
@@ -2072,7 +2112,7 @@ ROM_START( bmcorerm )
 	ROM_LOAD16_BYTE( "a05jaa09.25d", 0x100000, 0x80000, CRC(1504d62c) SHA1(3c31c6625bc089235a96fe21021239f2d0c0f6e1) )
 	ROM_LOAD16_BYTE( "a05jaa10.27d", 0x100001, 0x80000, CRC(99d75c36) SHA1(9599420863aa0a9492d3caeb03f8ac5fd4c3cdb2) )
 
-	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
+	DISK_REGION( "ata:0:hdd" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "a05jaa11", 0, SHA1(7ebc41cc3e9a0a922b49201b34e29201522eb726) ) /* ver 1.00 JA */
 ROM_END
 
@@ -2093,7 +2133,7 @@ ROM_START( bm6thmix )
 	ROM_LOAD16_BYTE( "a21jaa09.25d", 0x100000, 0x80000, CRC(181e6f70) SHA1(82c7ca3068ace9a66b614ead4b90ea6fe4017d51) )
 	ROM_LOAD16_BYTE( "a21jaa10.27d", 0x100001, 0x80000, CRC(1ac33595) SHA1(3173bb8dc420487c4d427e779444a98aad37d51e) )
 
-	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
+	DISK_REGION( "ata:0:hdd" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "a21jaa11", 0, SHA1(ed0a07212a360e75934fc22c56265842cf0829b6) ) /* ver 1.00 JA */
 ROM_END
 
@@ -2114,7 +2154,7 @@ ROM_START( bm7thmix )
 	ROM_LOAD16_BYTE( "b07jaa09.25d", 0x100000, 0x80000, CRC(2530cedb) SHA1(94b38b4fe198b26a2ff4d99d2cb28a0f935fe940) )
 	ROM_LOAD16_BYTE( "b07jaa10.27d", 0x100001, 0x80000, CRC(6b75ba9c) SHA1(aee922adc3bc0296ae6e08e461b20a9e5e72a2df) )
 
-	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
+	DISK_REGION( "ata:0:hdd" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "b07jaa11", 0, SHA1(e4925494f0a801abb4d3aa6524c379eb445d8dff) ) /* ver 1.00 JA */
 	// this image has not been verified
 	//DISK_IMAGE( "b07jab11", 0, MD5(0e9440787ca69567792095085e2a3619) )    /* ver 1.00 JA */
@@ -2137,7 +2177,7 @@ ROM_START( bmfinal )
 	ROM_LOAD16_BYTE( "c01jaa09.25d", 0x100000, 0x80000, CRC(45cf93b1) SHA1(7c5082bcd1fe15761a0a965e25dda121904ff1bd) )
 	ROM_LOAD16_BYTE( "c01jaa10.27d", 0x100001, 0x80000, CRC(c9927749) SHA1(c2644877bda483e241381265e723ea8ab8357761) )
 
-	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
+	DISK_REGION( "ata:0:hdd" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "c01jaa11", 0, SHA1(0a53c4412a72a886f5fb98c12c529d056d625244) ) /* ver 1.00 JA */
 	// this image has not been verified
 	//DISK_IMAGE( "c01jaa11", 0, MD5(8bb7e6b6bc63cac8a4f2997307c25748) )    /* ver 1.00 JA */
@@ -2160,7 +2200,7 @@ ROM_START( popn1 )
 	ROM_LOAD16_BYTE( "803t_a09.25d", 0x100000, 0x80000, CRC(45ab3978) SHA1(c34b800dfb14affcb705dffa566d046a6d1e7c7c) )
 	ROM_LOAD16_BYTE( "803t_a10.27d", 0x100001, 0x80000, CRC(a487ad02) SHA1(ca9edb611ddf2f1e7d42b049ce867b173fce3634) )
 
-	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
+	DISK_REGION( "ata:0:hdd" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "803_ta_hdd", 0, SHA1(be833a3c0f1e5953271fa7d8d6e81211fbe9710f) ) /* GQ803AA  pop'n music ver1.01  1998/10/14 (C) KONAMI */
 ROM_END
 
@@ -2181,7 +2221,7 @@ ROM_START( popn1a )
 	ROM_LOAD16_BYTE( "803aaa09.25d", 0x100000, 0x80000, CRC(45ab3978) SHA1(c34b800dfb14affcb705dffa566d046a6d1e7c7c) )
 	ROM_LOAD16_BYTE( "803aaa10.27d", 0x100001, 0x80000, CRC(a487ad02) SHA1(ca9edb611ddf2f1e7d42b049ce867b173fce3634) )
 
-	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
+	DISK_REGION( "ata:0:hdd" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "803jaa11", 0, SHA1(8684c1a1f0de9496bac0333c0302e35359173d8a) ) /* GQ803 pop'n music ver1.00  1998/09/04 (C) KONAMI */
 ROM_END
 
@@ -2202,7 +2242,7 @@ ROM_START( popn1k )
 	ROM_LOAD16_BYTE( "803aaa09.25d", 0x100000, 0x80000, CRC(45ab3978) SHA1(c34b800dfb14affcb705dffa566d046a6d1e7c7c) )
 	ROM_LOAD16_BYTE( "803aaa10.27d", 0x100001, 0x80000, CRC(a487ad02) SHA1(ca9edb611ddf2f1e7d42b049ce867b173fce3634) )
 
-	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
+	DISK_REGION( "ata:0:hdd" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "803kaa11", 0, SHA1(be833a3c0f1e5953271fa7d8d6e81211fbe9710f) ) /* GQ803AA  pop'n music ver1.01  1998/10/14 (C) KONAMI */
 ROM_END
 
@@ -2223,7 +2263,7 @@ ROM_START( popn1j )
 	ROM_LOAD16_BYTE( "803jaa09.25d", 0x100000, 0x80000, CRC(204d53eb) SHA1(349de147246b0ed08fb7e473d63e073b71fa30c9) )
 	ROM_LOAD16_BYTE( "803jaa10.27d", 0x100001, 0x80000, CRC(535a61a3) SHA1(b24c57601a7e3a349473af69114703133a46806d) )
 
-	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
+	DISK_REGION( "ata:0:hdd" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "803jaa11", 0, SHA1(8684c1a1f0de9496bac0333c0302e35359173d8a) ) /* GQ803 pop'n music ver1.00  1998/09/04 (C) KONAMI */
 ROM_END
 
@@ -2244,7 +2284,7 @@ ROM_START( popn2 )
 	ROM_LOAD16_BYTE( "831jaa09.25d", 0x100000, 0x80000, CRC(ae7838d2) SHA1(4f8a6793065c6c1eb08161f65b1d6246987bf47e) )
 	ROM_LOAD16_BYTE( "831jaa10.27d", 0x100001, 0x80000, CRC(85173cb6) SHA1(bc4d86bf4654a9a0a58e624f77090854950f3993) )
 
-	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
+	DISK_REGION( "ata:0:hdd" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "831jhdda01", 0, SHA1(ef62d5fcc1a36235fc932e6ecef71dc845d1d72d) ) /* GQ831JA  pop'n music ver1.00  1999/2/28 (C) KONAMI */
 ROM_END
 
@@ -2265,7 +2305,7 @@ ROM_START( popn3 )
 	ROM_LOAD16_BYTE( "980a09.25d",   0x100000, 0x080000, CRC(1cb4d84e) SHA1(9669585c6a2825aeae6e47dd03458624b4c44721) )
 	ROM_LOAD16_BYTE( "980a10.27d",   0x100001, 0x080000, CRC(7776b87e) SHA1(662b7cd7cb4fb8f8bab240ef543bf9a593e23a03) )
 
-	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
+	DISK_REGION( "ata:0:hdd" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "980hdda01", 0, SHA1(57ece2b63c32d194d4e41b4e4a45aaab30150fd4) ) /* GQ980JA  pop'n music 3 ver. 1.00  1999/09/02 (C) KONAMI */
 ROM_END
 
@@ -2286,7 +2326,7 @@ ROM_START( popnstex )
 	ROM_LOAD16_BYTE( "970jba09.25d", 0x100000, 0x80000, CRC(5d2bda52) SHA1(d03c135ac04437b54e4d267ae168fe7ebb9e5b65) )
 	ROM_LOAD16_BYTE( "970jba10.27d", 0x100001, 0x80000, CRC(edc4a245) SHA1(30bbd7bf0299a064119c535abb9be69d725aa130) )
 
-	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
+	DISK_REGION( "ata:0:hdd" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "970jba11", 0, SHA1(72e92b73b22a8f35e9faca93211e5acf781e66bb) )  /* GQ970  pop'n stage 1.5 ver1.00  1999/10/15 (C) KONAMI */
 ROM_END
 
@@ -2310,7 +2350,7 @@ ROM_START( bm3rdmxb )
 	ROM_LOAD16_BYTE( "825jab09.25d", 0x100000, 0x80000, CRC(1407ba5d) SHA1(e7a0d190326589f4d94e83cb7c85dd4e91f4efad) )
 	ROM_LOAD16_BYTE( "825jab10.27d", 0x100001, 0x80000, CRC(2afd0a10) SHA1(1b8b868ac5720bb1b376f4eb8952efb190257bda) )
 
-	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
+	DISK_REGION( "ata:0:hdd" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "825jab11", 0, MD5(f4360da10a932ba90e93469df7426d1d) SHA1(1) )  /* ver 1.01 JA */
 ROM_END
 
@@ -2354,6 +2394,23 @@ void djmain_state::init_hmcompmx()
 
 	m_ata_master_password = beatmania_master_password;
 	m_ata_user_password = hmcompmx_user_password;
+}
+
+void djmain_state::init_bscompmx()
+{
+	static const uint8_t bscompmx_user_password[2 + 32] =
+	{
+		0x00, 0x00,
+		0x44, 0x42, 0x56, 0x4b, 0x3a, 0x34, 0x38, 0x2a,
+		0x5a, 0x53, 0x78, 0x3e, 0x74, 0x61, 0x6c, 0x0a,
+		0x7a, 0x63, 0x19, 0x77, 0x73, 0x7d, 0x0d, 0x12,
+		0x6b, 0x09, 0x02, 0x0f, 0x05, 0x00, 0x7d, 0x1b
+	};
+
+	init_beatmania();
+
+	m_ata_master_password = beatmania_master_password;
+	m_ata_user_password = bscompmx_user_password;
 }
 
 void djmain_state::init_bm4thmix()
@@ -2563,6 +2620,7 @@ GAME( 1999, bmcompmx, 0,        djmainj, bmcompmx,  djmain_state, init_beatmania
 GAME( 1999, bmcompmxb,bmcompmx, djmainj, bmcompmx,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania complete MIX (ver JA-B)", 0 )
 GAME( 1999, bmcmxaac, bmcompmx, djmainu, bmcompmx,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania complete MIX (ver AA-C)", 0 )
 GAME( 1999, hmcompmx, bmcompmx, djmainu, bmcompmx,  djmain_state, init_hmcompmx,  ROT0, "Konami", "hiphopmania complete MIX (ver UA-B)", 0 )
+GAME( 1999, bscompmx, bmcompmx, djmainu, bmcompmx,  djmain_state, init_bscompmx,  ROT0, "Konami", "beatstage complete MIX (ver KA-B)", 0 )
 GAME( 1999, bm4thmix, 0,        djmainj, bm4thmix,  djmain_state, init_bm4thmix,  ROT0, "Konami", "beatmania 4th MIX (ver JA-A)", 0 )
 GAME( 1999, bs4thmix, bm4thmix, djmainu, bm4thmix,  djmain_state, init_bs4thmix,  ROT0, "Konami", "beatstage 4th MIX (ver KA-A)", 0 )
 GAME( 1999, bm5thmix, 0,        djmainj, bm5thmix,  djmain_state, init_bm5thmix,  ROT0, "Konami", "beatmania 5th MIX (ver JA-A)", 0 )

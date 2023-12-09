@@ -121,8 +121,8 @@ uint8_t tanbus_radisc_device::read(offs_t offset, int inhrom, int inhram, int be
 	case 0xbf94:
 		data = status_r();
 		break;
-	case 0xbf98: case 0xbf99:
-		data = m_rtc->read(offset & 0x01);
+	case 0xbf99:
+		data = m_rtc->data_r();
 		break;
 	}
 
@@ -150,8 +150,11 @@ void tanbus_radisc_device::write(offs_t offset, uint8_t data, int inhrom, int in
 		m_beeper_state ^= 1;
 		m_beeper->set_state(m_beeper_state);
 		break;
-	case 0xbf98: case 0xbf99:
-		m_rtc->write(offset & 0x01, data);
+	case 0xbf98:
+		m_rtc->address_w(data);
+		break;
+	case 0xbf99:
+		m_rtc->data_w(data);
 		break;
 	}
 }
@@ -194,17 +197,17 @@ uint8_t tanbus_radisc_device::status_r()
 	return m_status | (m_fdc->drq_r() << 7) | (m_fdc->hld_r() << 6) | (m_fdc->intrq_r() << 0);
 }
 
-WRITE_LINE_MEMBER(tanbus_radisc_device::fdc_drq_w)
+void tanbus_radisc_device::fdc_drq_w(int state)
 {
 	m_tanbus->so_w((m_drq_enable && state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(tanbus_radisc_device::fdc_irq_w)
+void tanbus_radisc_device::fdc_irq_w(int state)
 {
 	m_irq_line->in_w<IRQ_FDC>((m_irq_enable && state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(tanbus_radisc_device::irq_w)
+void tanbus_radisc_device::irq_w(int state)
 {
 	m_tanbus->irq_w(state ? ASSERT_LINE : CLEAR_LINE);
 }

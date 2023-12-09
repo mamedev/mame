@@ -394,7 +394,7 @@ void segas1x_bootleg_state::tturfbl_msm5205_data_w(uint8_t data)
 	m_sample_buffer = data;
 }
 
-WRITE_LINE_MEMBER(segas1x_bootleg_state::tturfbl_msm5205_callback)
+void segas1x_bootleg_state::tturfbl_msm5205_callback(int state)
 {
 	m_msm->data_w((m_sample_buffer >> 4) & 0x0f);
 
@@ -474,7 +474,7 @@ void segas1x_bootleg_state::shinobi_datsu_sound_map(address_map &map)
 	map(0xf800, 0xffff).ram();
 }
 
-WRITE_LINE_MEMBER(segas1x_bootleg_state::datsu_msm5205_callback)
+void segas1x_bootleg_state::datsu_msm5205_callback(int state)
 {
 	if (!state)
 		return;
@@ -1209,7 +1209,7 @@ void segas1x_bootleg_state::shdancbl_msm5205_data_w(uint8_t data)
 	m_sample_buffer = data;
 }
 
-WRITE_LINE_MEMBER(segas1x_bootleg_state::shdancbl_msm5205_callback)
+void segas1x_bootleg_state::shdancbl_msm5205_callback(int state)
 {
 	m_msm->data_w(m_sample_buffer & 0x0f);
 
@@ -2084,7 +2084,7 @@ void segas1x_bootleg_state::z80_ym2151(machine_config &config)
 	YM2151(config, "ymsnd", 4000000).add_route(0, "lspeaker", 0.32).add_route(1, "rspeaker", 0.32);
 }
 
-WRITE_LINE_MEMBER(segas1x_bootleg_state::sound_cause_nmi)
+void segas1x_bootleg_state::sound_cause_nmi(int state)
 {
 	if (state)
 		m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
@@ -3757,6 +3757,44 @@ ROM_START( bloxeedbl )
 	ROM_LOAD( "pal16l8.ic29",    0x600, 0x104, CRC(75ab9e6d) SHA1(38ec8432d86889c999759de8a0b01dbf7a86fda3) )
 ROM_END
 
+// 2 PCB stack
+// Main PCB (marked UNIVE and SERY2) has MC68000P10 with nearby 20 MHz XTAL, Z0840004PSC with nearby 24 MHz XTAL, 2x AY-3-8910A (!), 2x 8-dip banks
+// GFX PCB (marked SYSTEMCAD 014 88 011B) has the GFX ROMs and lots of TTLs
+ROM_START( timescanbl )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "ts_8.ic3",  0x00000, 0x10000, CRC(a9b4e091) SHA1(2fa6cbd35498bc99c8099d4060defafd0d9c83b6) )
+	ROM_LOAD16_BYTE( "ts_10.ic6", 0x00001, 0x10000, CRC(c1d620d0) SHA1(17b62390d384a97a45d7a16754e61b2283320fd6) )
+	ROM_LOAD16_BYTE( "ts_7a.ic2", 0x20000, 0x10000, CRC(deab7e4e) SHA1(472a55b0ba289b0f4e538bb4c8b826dede3a40bb) ) // FIXED BITS (11111111), verified. Why though?
+	ROM_LOAD16_BYTE( "ts_9a.ic5", 0x20001, 0x10000, CRC(deab7e4e) SHA1(472a55b0ba289b0f4e538bb4c8b826dede3a40bb) ) // FIXED BITS (11111111), verified. Why though?
+
+	ROM_REGION( 0x8000, "soundcpu", 0 )
+	ROM_LOAD( "ts_6a.ic68", 0x00000, 0x8000, CRC(42abf28e) SHA1(b1279c59f2d6c020b97b8fb60dadd35f9affcf0d) )
+
+	ROM_REGION( 0x30000, "tiles", 0 )
+	ROM_LOAD( "ts_3.ic119", 0x00000, 0x10000, CRC(9ba3e236) SHA1(88891b774d51d923a60392a89d2f26e144337e6b) )
+	ROM_LOAD( "ts_4.ic118", 0x10000, 0x10000, CRC(e88abc47) SHA1(bd44bceeda3844bf35d220776f87b1e78ebb7923) )
+	ROM_LOAD( "ts_5.ic117", 0x20000, 0x10000, CRC(9c1d7121) SHA1(44262391f778c4391abf65891ad53fae957c8853) )
+
+	ROM_REGION16_BE( 0x80000, "sprites", 0 ) // same as the original but in bigger ROMS
+	ROM_LOAD16_BYTE( "ts_1.ic10", 0x00000, 0x8000, CRC(b5e4b7c8) SHA1(a441b5c0db1adf9c34556af655149c1340c681c8) )
+	ROM_CONTINUE(                 0x20000, 0x8000 )
+	ROM_CONTINUE(                 0x40000, 0x8000 )
+	ROM_CONTINUE(                 0x60000, 0x8000 )
+	ROM_LOAD16_BYTE( "ts_2.ic8",  0x00001, 0x8000, CRC(ef4bca57) SHA1(93fba50cdbf65b055cf89967e2c6a36a4059cddd) )
+	ROM_CONTINUE(                 0x20001, 0x8000 )
+	ROM_CONTINUE(                 0x40001, 0x8000 )
+	ROM_CONTINUE(                 0x60001, 0x8000 )
+
+	ROM_REGION( 0x120, "proms", 0 )
+	ROM_LOAD( "b_82s129.i22", 0x000, 0x100, CRC(88962e80) SHA1(ebf3d57d53fcba727cf20e4bb26f12934f7d1bc7) )
+	ROM_LOAD( "b_82s123.ic4", 0x100, 0x020, CRC(98d14190) SHA1(94f49830c98dbb54e10caa31100e382978813531) )
+
+	ROM_REGION( 0x400, "gals", ROMREGION_ERASE00 )
+	ROM_LOAD( "shinobi_gal16v8.ic3", 0x000, 0x117, CRC(4d988385) SHA1(9be8db60bdd452b4013bab42c4b5592b387c927b) )
+	ROM_LOAD( "cs_galv8v.ic13",      0x200, 0x117, NO_DUMP )
+ROM_END
+
+
 /*************************************
  *
  *  Driver initialization
@@ -4073,10 +4111,11 @@ GAME( 1989, tturfbl,     tturf,     tturfbl,       tturf,    segas1x_bootleg_sta
 GAME( 1989, dduxbl,      ddux,      dduxbl,        ddux,     segas1x_bootleg_state,  init_dduxbl,     ROT0,   "bootleg (Datsu)", "Dynamite Dux (Datsu bootleg)", MACHINE_NOT_WORKING )
 GAME( 1988, altbeastbl,  altbeast,  altbeastbl,    tetris,   segas1x_bootleg_state,  init_altbeastbl, ROT0,   "bootleg (Datsu)", "Altered Beast (Datsu bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1988, altbeastbl2, altbeast,  altbeastbl,    tetris,   segas1x_bootleg_state,  init_altbeastbl, ROT0,   "bootleg",         "Altered Beast (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // broken sprites
-GAME( 1988, mutantwarr,  altbeast,  altbeastbl,    tetris,   segas1x_bootleg_state,  init_altbeastbl, ROT0,   "bootleg (Datsu)", "Mutant Warrior (Altered Beast - Datsu bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1988, mutantwarr,  altbeast,  altbeastbl,    tetris,   segas1x_bootleg_state,  init_altbeastbl, ROT0,   "bootleg (Datsu)", "Mutant Warrior (Datsu bootleg of Altered Beast)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1989, eswatbl,     eswat,     eswatbl,       eswat,    segas1x_bootleg_state,  init_eswatbl,    ROT0,   "bootleg", "E-Swat - Cyber Police (bootleg, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1989, eswatbl2,    eswat,     eswatbl2,      eswat,    segas1x_bootleg_state,  init_eswatbl,    ROT0,   "bootleg", "E-Swat - Cyber Police (bootleg, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1988, tetrisbl,    tetris,    tetrisbl,      tetris,   segas1x_bootleg_state,  init_dduxbl,     ROT0,   "bootleg", "Tetris (bootleg)", 0 )
+GAME( 1987, timescanbl,  timescan,  tetrisbl,      tetris,   segas1x_bootleg_state,  empty_init,      ROT0,   "bootleg", "Time Scanner (bootleg)", MACHINE_NOT_WORKING ) // encrypted
 
 /* Tetris-based hardware */
 GAME( 1991, beautyb,     0,         beautyb,       tetris,   segas1x_bootleg_state,  init_beautyb,    ROT0,   "AMT", "Beauty Block", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

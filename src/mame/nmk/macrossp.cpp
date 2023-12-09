@@ -396,10 +396,10 @@ private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_macrossp(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_macrossp);
+	void screen_vblank_macrossp(int state);
 	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, int linem, int pri);
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	void irqhandler(int state);
 
 	void macrossp_map(address_map &map);
 	void macrossp_es5506_bank1_map(address_map &map);
@@ -857,7 +857,7 @@ uint32_t macrossp_state::screen_update_macrossp(screen_device &screen, bitmap_rg
 	return 0;
 }
 
-WRITE_LINE_MEMBER(macrossp_state::screen_vblank_macrossp)
+void macrossp_state::screen_vblank_macrossp(int state)
 {
 	// rising edge
 	if (state)
@@ -1098,7 +1098,7 @@ GFXDECODE_END
 
 /*** MACHINE DRIVER **********************************************************/
 
-WRITE_LINE_MEMBER(macrossp_state::irqhandler)
+void macrossp_state::irqhandler(int state)
 {
 	logerror("ES5506 irq %d\n", state);
 

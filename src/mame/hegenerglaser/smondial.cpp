@@ -77,6 +77,9 @@ protected:
 	required_ioport_array<4> m_keys;
 	output_finder<8> m_digits;
 
+	u8 m_led_data = 0;
+	u8 m_board_mux = 0;
+
 	// address maps
 	void smondialb_mem(address_map &map);
 	void smondial2_mem(address_map &map);
@@ -88,9 +91,6 @@ protected:
 	virtual void led_w(u8 data);
 	void board_w(u8 data);
 	INTERRUPT_GEN_MEMBER(nmi_handler);
-
-	u8 m_led_data = 0;
-	u8 m_board_mux = 0;
 };
 
 void smondialb_state::machine_start()

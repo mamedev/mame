@@ -51,9 +51,6 @@ mm5448_device::mm5448_device(const machine_config &mconfig, const char *tag, dev
 
 void mm5445_device::device_start()
 {
-	// resolve callbacks
-	m_write_output.resolve_safe();
-
 	// zerofill
 	m_clk = 0;
 	m_enable = 0;
@@ -74,7 +71,7 @@ void mm5445_device::device_start()
 //  handlers
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(mm5445_device::clock_w)
+void mm5445_device::clock_w(int state)
 {
 	state = (state) ? 1 : 0;
 	bool rise = state && !m_clk;

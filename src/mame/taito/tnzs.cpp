@@ -26,7 +26,7 @@ PCBs:
 
 Seta#       Taito#s             CPUS    RxM2    ROM1    MCU?    Video RAM   PROMs   SETA X1 GFXROMs     QUADRATURE  ESD. PROT   Games                           Picture
 P0-022-A    K1100245A J1100108A 2xZ80B  512/256 512/256 8042    4x6116      Yes, 2  03      23c1000     uPD4701AC   3x X2-003*4 arkanoid2                       http://www.classicarcaderesource.com/RevengeOfDoh3.jpg
-P0-022-B    K1100234A J1100108A 2xZ80B  512/256 512/256 8042    4x6116      Yes, 2  03      27c512(A)   uPD4701AC   3x X2-003*4 plumppop                        N/A
+P0-022-B    K1100234A J1100108A 2xZ80B  512/256 512/256 8042    4x6116      Yes, 2  03      27c512(A)   uPD4701AC   3x X2-003*4 plumppop                        https://ia904709.us.archive.org/2/items/plump-pop-pcb/IMG_3544.jpg
 P0-025-A    K1100241A J1100107A 2xZ80B  512/256 512/256 8042    4x6116      Yes, 2  03      23c1000     N/A         3x X2-003   drtoppel,extermatn,chukatai(B)  http://arcade.ym2149.com/pcb/taito/drtoppel_pcb_partside.jpg
 P0-028-A    K1100416A J1100332A 2xZ80B  512/256 512/256 8042    4x6116      No      05,06   23c1000     N/A         3x X2-004   chukatai(B)                     http://i.ebayimg.com/images/g/AhoAAOSw-FZXj5A5/s-l1600.jpg
 P0-038A     M6100309A           3xZ80B  512/256 512/256 NONE    1x6164      No      05,06   23c1000     N/A         3x X2-003   kageki                          http://i.ebayimg.com/images/a/(KGrHqJ,!lwE6C8-G97lBOjOu9mwVw~~/s-l1600.jpg
@@ -896,7 +896,7 @@ public:
 	void tnzsb(machine_config &config) ATTR_COLD;
 
 protected:
-	DECLARE_WRITE_LINE_MEMBER(ym2203_irqhandler);
+	void ym2203_irqhandler(int state);
 
 	void sound_command_w(uint8_t data);
 
@@ -1409,7 +1409,7 @@ void tnzsb_state::sound_command_w(uint8_t data)
 }
 
 // handler called by the 2203 emulator when the internal timers cause an IRQ
-WRITE_LINE_MEMBER(tnzsb_state::ym2203_irqhandler)
+void tnzsb_state::ym2203_irqhandler(int state)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }

@@ -307,7 +307,7 @@ private:
 	void scrollregs_w(offs_t offset, uint8_t data);
 	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 	INTERRUPT_GEN_MEMBER(slave_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
@@ -419,7 +419,7 @@ uint32_t airbustr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-WRITE_LINE_MEMBER(airbustr_state::screen_vblank)
+void airbustr_state::screen_vblank(int state)
 {
 	// rising edge
 	if (state)
@@ -436,7 +436,7 @@ WRITE_LINE_MEMBER(airbustr_state::screen_vblank)
 
 void airbustr_state::calc1_w(offs_t offset, uint8_t data)
 {
-	offset += 0x1fe0;
+	offset += 0xfe0;
 	m_devram[offset] = data;
 
 	// CALC1 chip is 16-bit
@@ -684,6 +684,9 @@ INPUT_PORTS_END
 
 static GFXDECODE_START( gfx_airbustr )
 	GFXDECODE_ENTRY( "tiles",   0, gfx_8x8x4_row_2x2_group_packed_lsb,   0, 32 )
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_airbustr_spr )
 	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_row_2x2_group_packed_msb, 512, 16 )
 GFXDECODE_END
 
@@ -768,9 +771,7 @@ void airbustr_state::airbustrb(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_airbustr);
 	PALETTE(config, m_palette).set_format(palette_device::xGRB_555, 768);
 
-	KANEKO_PANDORA(config, m_pandora, 0);
-	m_pandora->set_gfx_region(1);
-	m_pandora->set_gfxdecode_tag(m_gfxdecode);
+	KANEKO_PANDORA(config, m_pandora, 0, m_palette, gfx_airbustr_spr);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

@@ -1,3 +1,9 @@
+MY_CONSOLE = 1
+
+!IFNDEF UNDER_CE
+CFLAGS = $(CFLAGS) -DZ7_LONG_PATH -DZ7_LARGE_PAGES -DZ7_DEVICE_FILE
+!ENDIF
+
 CONSOLE_OBJS = \
   $O\BenchCon.obj \
   $O\ConsoleClose.obj \
@@ -33,4 +39,7 @@ UI_COMMON_OBJS = \
   $O\UpdatePair.obj \
   $O\UpdateProduce.obj \
 
-#
+C_OBJS = $(C_OBJS) \
+  $O\DllSecur.obj \
+
+# we need empty line after last line above

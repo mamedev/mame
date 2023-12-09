@@ -66,9 +66,9 @@ public:
 	auto ff_handler() { return m_ff_handler.bind(); }
 	auto hf_handler() { return m_hf_handler.bind(); }
 
-	DECLARE_READ_LINE_MEMBER( ef_r ) { return !m_ef; } // _EF
-	DECLARE_READ_LINE_MEMBER( ff_r ) { return !m_ff; } // _FF
-	DECLARE_READ_LINE_MEMBER( hf_r ) { return !m_hf; } // _HF
+	int ef_r() { return !m_ef; } // _EF
+	int ff_r() { return !m_ff; } // _FF
+	int hf_r() { return !m_hf; } // _HF
 
 	// normal configuration
 	void data_word_w(uint16_t data) { fifo_write(data); }

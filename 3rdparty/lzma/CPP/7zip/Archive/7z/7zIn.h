@@ -1,7 +1,7 @@
 // 7zIn.h
 
-#ifndef __7Z_IN_H
-#define __7Z_IN_H
+#ifndef ZIP7_INC_7Z_IN_H
+#define ZIP7_INC_7Z_IN_H
 
 #include "../../../Common/MyCom.h"
 
@@ -22,12 +22,12 @@ namespace N7z {
   We don't need to init isEncrypted and passwordIsDefined
   We must upgrade them only */
 
-#ifdef _NO_CRYPTO
-#define _7Z_DECODER_CRYPRO_VARS_DECL
-#define _7Z_DECODER_CRYPRO_VARS
+#ifdef Z7_NO_CRYPTO
+#define Z7_7Z_DECODER_CRYPRO_VARS_DECL
+#define Z7_7Z_DECODER_CRYPRO_VARS
 #else
-#define _7Z_DECODER_CRYPRO_VARS_DECL , ICryptoGetTextPassword *getTextPassword, bool &isEncrypted, bool &passwordIsDefined, UString &password
-#define _7Z_DECODER_CRYPRO_VARS , getTextPassword, isEncrypted, passwordIsDefined, password
+#define Z7_7Z_DECODER_CRYPRO_VARS_DECL , ICryptoGetTextPassword *getTextPassword, bool &isEncrypted, bool &passwordIsDefined, UString &password
+#define Z7_7Z_DECODER_CRYPRO_VARS , getTextPassword, isEncrypted, passwordIsDefined, password
 #endif
 
 struct CParsedMethods
@@ -115,6 +115,7 @@ struct CDatabase: public CFolders
   CUInt64DefVector ATime;
   CUInt64DefVector MTime;
   CUInt64DefVector StartPos;
+  CUInt32DefVector Attrib;
   CBoolVector IsAnti;
   /*
   CBoolVector IsAux;
@@ -146,6 +147,7 @@ struct CDatabase: public CFolders
     ATime.Clear();
     MTime.Clear();
     StartPos.Clear();
+    Attrib.Clear();
     IsAnti.Clear();
     // IsAux.Clear();
   }
@@ -172,13 +174,14 @@ struct CDatabase: public CFolders
   HRESULT GetPath_Prop(unsigned index, PROPVARIANT *path) const throw();
 };
 
+
 struct CInArchiveInfo
 {
   CArchiveVersion Version;
-  UInt64 StartPosition;
-  UInt64 StartPositionAfterHeader;
-  UInt64 DataStartPosition;
-  UInt64 DataStartPosition2;
+  UInt64 StartPosition;               // in stream
+  UInt64 StartPositionAfterHeader;    // in stream
+  UInt64 DataStartPosition;           // in stream
+  UInt64 DataStartPosition2;          // in stream. it's for headers
   CRecordVector<UInt64> FileInfoPopIDs;
   
   void Clear()
@@ -191,6 +194,7 @@ struct CInArchiveInfo
   }
 };
 
+
 struct CDbEx: public CDatabase
 {
   CInArchiveInfo ArcInfo;
@@ -200,6 +204,7 @@ struct CDbEx: public CDatabase
 
   UInt64 HeadersSize;
   UInt64 PhySize;
+  // UInt64 EndHeaderOffset; // relative to position after StartHeader (32 bytes)
 
   /*
   CRecordVector<size_t> SecureOffsets;
@@ -253,6 +258,17 @@ struct CDbEx: public CDatabase
 
     HeadersSize = 0;
     PhySize = 0;
+    // EndHeaderOffset = 0;
+  }
+
+  bool CanUpdate() const
+  {
+    if (ThereIsHeaderError
+        || UnexpectedEnd
+        || StartHeaderWasRecovered
+        || UnsupportedFeatureError)
+      return false;
+    return true;
   }
 
   void FillLinks();
@@ -337,6 +353,8 @@ class CInArchive
   UInt64 _arhiveBeginStreamPosition;
   UInt64 _fileEndPosition;
 
+  UInt64 _rangeLimit; // relative to position after StartHeader (32 bytes)
+
   Byte _header[kHeaderSize];
 
   UInt64 HeadersSize;
@@ -369,6 +387,8 @@ class CInArchive
   void SkipData() { _inByteBack->SkipData(); }
   void WaitId(UInt64 id);
 
+  void Read_UInt32_Vector(CUInt32DefVector &v);
+
   void ReadArchiveProperties(CInArchiveInfo &archiveInfo);
   void ReadHashDigests(unsigned numItems, CUInt32DefVector &crcs);
   
@@ -398,17 +418,17 @@ class CInArchive
       DECL_EXTERNAL_CODECS_LOC_VARS
       UInt64 baseOffset, UInt64 &dataOffset,
       CObjectVector<CByteBuffer> &dataVector
-      _7Z_DECODER_CRYPRO_VARS_DECL
+      Z7_7Z_DECODER_CRYPRO_VARS_DECL
       );
   HRESULT ReadHeader(
       DECL_EXTERNAL_CODECS_LOC_VARS
       CDbEx &db
-      _7Z_DECODER_CRYPRO_VARS_DECL
+      Z7_7Z_DECODER_CRYPRO_VARS_DECL
       );
   HRESULT ReadDatabase2(
       DECL_EXTERNAL_CODECS_LOC_VARS
       CDbEx &db
-      _7Z_DECODER_CRYPRO_VARS_DECL
+      Z7_7Z_DECODER_CRYPRO_VARS_DECL
       );
 public:
   CInArchive(bool useMixerMT):
@@ -422,7 +442,7 @@ public:
   HRESULT ReadDatabase(
       DECL_EXTERNAL_CODECS_LOC_VARS
       CDbEx &db
-      _7Z_DECODER_CRYPRO_VARS_DECL
+      Z7_7Z_DECODER_CRYPRO_VARS_DECL
       );
 };
   

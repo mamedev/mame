@@ -29,11 +29,6 @@ Tengai              (J) 1996    SH404          SH404 has MCU, ymf278-b for sound
 
 To Do:
 
-- Some games use naive/unlikely measurements (exactly 59.30), which should be verified.
-  Tengai and Strikers 1945 have accurate measurements from PCB. Maybe these could be used
-  for other titles too?
-- All games but Tengai / Strikers 1945 use IRQ1 for VBlank. This is likely incorrect.
-  On Tengai/Strikers 1945, its actually IPL2 that's asserted (Interrupt Level = 4).
 - tengai / tengaij: "For use in Japan" screen is supposed to output the
   typical blue Psikyo backdrop gradient instead of being pure black as it is
   now;
@@ -41,6 +36,12 @@ To Do:
 
 NOTE: Despite being mentioned in the manual Strikers 1945 doesn't seem to
       have a Free Play mode.
+
+The tengai PIC dump has been tested on PCB with the available s1945 program ROMs:
+s1945 (World) - working ok
+s1945a (Japan / World) - resets when start pressed
+s1945k (Korea) - working ok
+s1945j (Japan) - boots but locks up with black screen when start pressed
 
 ***************************************************************************/
 
@@ -90,7 +91,7 @@ This was pointed out by Bart Puype
                         Strikers 1945 / Tengai MCU
 ***************************************************************************/
 
-READ_LINE_MEMBER(psikyo_state::mcu_status_r)
+int psikyo_state::mcu_status_r()
 {
 	int ret = 0x00;
 
@@ -431,7 +432,7 @@ void psikyo_state::s1945_sound_io_map(address_map &map)
 
 ***************************************************************************/
 
-READ_LINE_MEMBER(psikyo_state::z80_nmi_r)
+int psikyo_state::z80_nmi_r()
 {
 	int ret = 0x00;
 
@@ -1030,7 +1031,7 @@ void psikyo_state::sngkace(machine_config &config)
 	/* basic machine hardware */
 	M68EC020(config, m_maincpu, XTAL(32'000'000)/2); /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &psikyo_state::sngkace_map);
-	m_maincpu->set_vblank_int("screen", FUNC(psikyo_state::irq1_line_hold));
+	m_maincpu->set_vblank_int("screen", FUNC(psikyo_state::irq4_line_hold));
 
 	Z80(config, m_audiocpu, XTAL(32'000'000)/8); /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &psikyo_state::sngkace_sound_map);
@@ -1038,11 +1039,7 @@ void psikyo_state::sngkace(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	// TODO: accurate measurements
-	m_screen->set_refresh_hz(59.3);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	m_screen->set_size(320, 256);
-	m_screen->set_visarea(0, 320-1, 0, 256-32-1);
+	m_screen->set_raw(14.318181_MHz_XTAL / 2, 456, 0, 320, 262, 0, 224);  // Approximately 59.923Hz, 38 Lines in VBlank
 	m_screen->set_screen_update(FUNC(psikyo_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(psikyo_state::screen_vblank));
 
@@ -1076,7 +1073,7 @@ void psikyo_state::gunbird(machine_config &config)
 	/* basic machine hardware */
 	M68EC020(config, m_maincpu, 16_MHz_XTAL);  // 16 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &psikyo_state::gunbird_map);
-	m_maincpu->set_vblank_int("screen", FUNC(psikyo_state::irq1_line_hold));
+	m_maincpu->set_vblank_int("screen", FUNC(psikyo_state::irq4_line_hold));
 
 	LZ8420M(config, m_audiocpu, 16_MHz_XTAL / 2);  // 8 MHz (16 / 2)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &psikyo_state::gunbird_sound_map);
@@ -1084,11 +1081,7 @@ void psikyo_state::gunbird(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	// TODO: accurate measurements
-	m_screen->set_refresh_hz(59.3);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	m_screen->set_size(320, 256);
-	m_screen->set_visarea(0, 320-1, 0, 256-32-1);
+	m_screen->set_raw(14.318181_MHz_XTAL / 2, 456, 0, 320, 262, 0, 224);  // Approximately 59.923Hz, 38 Lines in VBlank
 	m_screen->set_screen_update(FUNC(psikyo_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(psikyo_state::screen_vblank));
 
@@ -1774,8 +1767,8 @@ ROM_START( tengai )
 	ROM_REGION( 0x001000, "mcu", 0 )       // MCU, not hooked up
 	/* PIC configuration:
 	     -User ID: 37EA
-	     -Watchdog Timer: unknown
-	     -Oscilator Mode: probably XT (unconfirmed)
+	     -Watchdog Timer: unknown - tested on PCB: both settings work
+	     -Oscillator Mode: probably XT (unconfirmed) - tested on PCB: HS and XT work, LP and RC don't
 	*/
 	ROM_LOAD( "4.u59", 0x00000, 0x01000, CRC(e563b054) SHA1(7593389d35851a71a8af2e094ec7e55cd818743a) )
 
@@ -1806,8 +1799,8 @@ ROM_START( tengaij )
 	ROM_REGION( 0x001000, "mcu", 0 )       // MCU, not hooked up
 	/* PIC configuration:
 	     -User ID: 37EA
-	     -Watchdog Timer: unknown
-	     -Oscilator Mode: probably XT (unconfirmed)
+	     -Watchdog Timer: unknown - tested on PCB: both settings work
+	     -Oscillator Mode: probably XT (unconfirmed) - tested on PCB: HS and XT work, LP and RC don't
 	*/
 	ROM_LOAD( "4.u59", 0x00000, 0x01000, CRC(e563b054) SHA1(7593389d35851a71a8af2e094ec7e55cd818743a) ) // From a World PCB
 

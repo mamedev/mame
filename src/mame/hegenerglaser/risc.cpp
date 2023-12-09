@@ -19,12 +19,13 @@ Hardware notes:
 
 #include "emu.h"
 
+#include "mmboard.h"
+#include "mmdisplay2.h"
+
 #include "cpu/m6502/m65sc02.h"
 #include "machine/74259.h"
-#include "machine/nvram.h"
-#include "mmboard.h"
 #include "machine/chessmachine.h"
-#include "mmdisplay2.h"
+#include "machine/nvram.h"
 
 // internal artwork
 #include "mephisto_risc.lh"
@@ -153,7 +154,6 @@ void risc_state::mrisc(machine_config &config)
 	m_maincpu->set_periodic_int(FUNC(risc_state::irq0_line_hold), irq_period);
 
 	CHESSMACHINE(config, m_chessm, 14'000'000); // Mephisto manual says 14MHz (no XTAL)
-	config.set_perfect_quantum(m_maincpu);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

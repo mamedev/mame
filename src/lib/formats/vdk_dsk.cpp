@@ -19,17 +19,17 @@ vdk_format::vdk_format()
 {
 }
 
-const char *vdk_format::name() const
+const char *vdk_format::name() const noexcept
 {
 	return "vdk";
 }
 
-const char *vdk_format::description() const
+const char *vdk_format::description() const noexcept
 {
 	return "VDK disk image";
 }
 
-const char *vdk_format::extensions() const
+const char *vdk_format::extensions() const noexcept
 {
 	return "vdk";
 }
@@ -46,7 +46,7 @@ int vdk_format::identify(util::random_read &io, uint32_t form_factor, const std:
 		return 0;
 }
 
-bool vdk_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool vdk_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	size_t actual;
 	if (io.seek(0, SEEK_SET))
@@ -93,14 +93,14 @@ bool vdk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	return true;
 }
 
-bool vdk_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool vdk_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
 {
 	size_t actual;
 	if (io.seek(0, SEEK_SET))
 		return false;
 
 	int track_count, head_count;
-	image->get_actual_geometry(track_count, head_count);
+	image.get_actual_geometry(track_count, head_count);
 
 	// write header
 	uint8_t header[12];
@@ -136,7 +136,7 @@ bool vdk_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 	return true;
 }
 
-bool vdk_format::supports_save() const
+bool vdk_format::supports_save() const noexcept
 {
 	return true;
 }

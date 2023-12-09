@@ -110,6 +110,16 @@ protected:
 	virtual void machine_start() override;
 
 private:
+	required_device<tms70c46_device> m_maincpu;
+	required_memory_bank m_sysbank;
+	required_device<generic_slot_device> m_cart;
+	required_ioport_array<8> m_key_matrix;
+	required_ioport m_battery_inp;
+	output_finder<80> m_segs;
+
+	u8 m_key_select = 0;
+	u8 m_power = 0;
+
 	void update_lcd_indicator(u8 y, u8 x, int state);
 	void update_battery_status(int state);
 
@@ -122,16 +132,6 @@ private:
 	HD44780_PIXEL_UPDATE(ti74_pixel_update);
 	HD44780_PIXEL_UPDATE(ti95_pixel_update);
 	void main_map(address_map &map);
-
-	required_device<tms70c46_device> m_maincpu;
-	required_memory_bank m_sysbank;
-	required_device<generic_slot_device> m_cart;
-	required_ioport_array<8> m_key_matrix;
-	required_ioport m_battery_inp;
-	output_finder<80> m_segs;
-
-	u8 m_key_select = 0;
-	u8 m_power = 0;
 };
 
 
@@ -536,7 +536,7 @@ void ti74_state::ti74(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(ti74_state::ti74_palette), 3);
 
-	hd44780_device &hd44780(HD44780(config, "hd44780", 0)); // 270kHz
+	hd44780_device &hd44780(HD44780(config, "hd44780", 270'000)); // OSC = 91K resistor
 	hd44780.set_lcd_size(2, 16); // 2*16 internal
 	hd44780.set_pixel_update_cb(FUNC(ti74_state::ti74_pixel_update));
 
@@ -569,7 +569,7 @@ void ti74_state::ti95(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(ti74_state::ti74_palette), 3);
 
-	hd44780_device &hd44780(HD44780(config, "hd44780", 0));
+	hd44780_device &hd44780(HD44780(config, "hd44780", 270'000)); // OSC = 91K resistor
 	hd44780.set_lcd_size(2, 16);
 	hd44780.set_pixel_update_cb(FUNC(ti74_state::ti95_pixel_update));
 

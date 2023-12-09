@@ -9,6 +9,8 @@
 
 #include "machine/dp8390.h"
 
+#include "multibyte.h"
+
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -39,11 +41,12 @@ x68k_neptune_device::x68k_neptune_device(const machine_config &mconfig, const ch
 
 void x68k_neptune_device::device_start()
 {
-	char mac[7];
+	uint8_t mac[6];
 	uint32_t num = machine().rand();
 	m_slot = dynamic_cast<x68k_expansion_slot_device *>(owner());
 	memset(m_prom, 0x57, 16);
-	sprintf(mac+2, "\x1b%c%c%c", (num >> 16) & 0xff, (num >> 8) & 0xff, num & 0xff);
+	mac[2] = 0x1b;
+	put_u24be(mac+3, num);
 	mac[0] = 0; mac[1] = 0;  // avoid gcc warning
 	memcpy(m_prom, mac, 6);
 	m_dp8390->set_mac(mac);
@@ -132,7 +135,7 @@ void x68k_neptune_device::x68k_neptune_mem_write(offs_t offset, uint8_t data)
 	m_board_ram[offset - (16*1024)] = data;
 }
 
-WRITE_LINE_MEMBER(x68k_neptune_device::x68k_neptune_irq_w)
+void x68k_neptune_device::x68k_neptune_irq_w(int state)
 {
 	m_slot->irq2_w(state);
 	logerror("Neptune: IRQ2 set to %i\n",state);

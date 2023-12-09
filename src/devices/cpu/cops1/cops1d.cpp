@@ -96,7 +96,7 @@ offs_t cops1_common_disassembler::common_disasm(const u8 *lut_opmap, std::ostrea
 		u8 arg = params.r8(pc);
 		len++;
 
-		if (instr == em_LG)
+		if (instr == mLG)
 		{
 			// bit 6 indicates GO or CALL
 			if (~arg & 0x40)
@@ -115,34 +115,34 @@ offs_t cops1_common_disassembler::common_disasm(const u8 *lut_opmap, std::ostrea
 		if (mask < 16)
 		{
 			// SM and RSM param is scrambled
-			if (instr >= em_SM1 && instr <= em_SM8)
-				param = instr - em_SM1;
-			else if (instr >= em_RSM1 && instr <= em_RSM8)
-				param = instr - em_RSM1;
+			if (instr >= mSM1 && instr <= mSM8)
+				param = instr - mSM1;
+			else if (instr >= mRSM1 && instr <= mRSM8)
+				param = instr - mRSM1;
 
 			// memory bit opcodes are 1,2,4,8
-			if (instr >= em_SM1 && instr <= em_TM)
+			if (instr >= mSM1 && instr <= mTM)
 				param = 1 << param;
 
 			// TF is 1,2,3,4
-			else if (instr == em_TF)
+			else if (instr == mTF)
 				param++;
 
 			// EXC type instructions omit param if it's 0
-			if (!(param == 0 && (instr == em_EXC || instr == em_EXCM || instr == em_EXCP || instr == em_MTA)))
+			if (!(param == 0 && (instr == mEXC || instr == mEXCM || instr == mEXCP || instr == mMTA)))
 				util::stream_format(stream, "%d", param);
 		}
 		else
 		{
 			// exception for LG
-			if (instr == em_LG || instr == em_LGCALL)
+			if (instr == mLG || instr == mLGCALL)
 				util::stream_format(stream, "$%02X,$%02X", param >> 6, param & 0x3f);
 
 			// exception for LB/LBL
-			else if (instr == em_LB || instr == em_LBL)
+			else if (instr == mLB || instr == mLBL)
 			{
 				// LB x,10 is 0 by default
-				if (instr == em_LB && (param & 0xf) == 10)
+				if (instr == mLB && (param & 0xf) == 10)
 					param &= 0x30;
 
 				util::stream_format(stream, "%d,%d", param >> 4, param & 0xf);
@@ -161,26 +161,26 @@ offs_t cops1_common_disassembler::common_disasm(const u8 *lut_opmap, std::ostrea
 
 const u8 mm5799_disassembler::mm5799_opmap[0x100] =
 {
-/*  0        1        2        3        4        5        6        7        8        9        A        B        C        D        E        F  */
-	em_NOP,  em_HXBR, em_ADD,  em_SC,   em_TF,   em_TIR,  em_MTA,  em_EXC,  em_EXCM, em_EXCP, em_LB,   em_LB,   em_LB,   em_LB,   em_LB,   em_LB,   // 0
-	em_DSPA, em_DSPS, em_AD,   em_LBL,  em_TF,   em_TKB,  em_MTA,  em_EXC,  em_EXCM, em_EXCP, em_LB,   em_LB,   em_LB,   em_LB,   em_LB,   em_LB,   // 1
-	em_COMP, em_AXO,  em_SUB,  em_RSC,  em_TF,   em_BTD,  em_MTA,  em_EXC,  em_EXCM, em_EXCP, em_LB,   em_LB,   em_LB,   em_LB,   em_LB,   em_LB,   // 2
-	em_0TA,  em_HXA,  em_TAM,  em_LDF,  em_READ, em_TIN,  em_MTA,  em_EXC,  em_EXCM, em_EXCP, em_LB,   em_LB,   em_LB,   em_LB,   em_LB,   em_LB,   // 3
+//  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F
+	mNOP,  mHXBR, mADD,  mSC,   mTF,   mTIR,  mMTA,  mEXC,  mEXCM, mEXCP, mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   // 0
+	mDSPA, mDSPS, mAD,   mLBL,  mTF,   mTKB,  mMTA,  mEXC,  mEXCM, mEXCP, mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   // 1
+	mCOMP, mAXO,  mSUB,  mRSC,  mTF,   mBTD,  mMTA,  mEXC,  mEXCM, mEXCP, mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   // 2
+	m0TA,  mHXA,  mTAM,  mLDF,  mREAD, mTIN,  mMTA,  mEXC,  mEXCM, mEXCP, mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   // 3
 
-	em_RET,  em_RETS, em_RSM8, em_BTA,  em_TM,   em_TM,   em_TM,   em_TM,   em_RSM1, em_SM1,  em_SM8,  em_RSM4, em_RSM2, em_TC,   em_SM2,  em_SM4,  // 4
-	em_ATB,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  // 5
-	em_LG,   em_LG,   em_LG,   em_LG,   em_LG,   em_LG,   em_LG,   em_LG,   em_LG,   em_LG,   em_LG,   em_LG,   em_LG,   em_LG,   em_LG,   em_LG,   // 6
-	em_LM,   em_LM,   em_LM,   em_LM,   em_LM,   em_LM,   em_LM,   em_LM,   em_LM,   em_LM,   em_LM,   em_LM,   em_LM,   em_LM,   em_LM,   em_LM,   // 7
+	mRET,  mRETS, mRSM8, mBTA,  mTM,   mTM,   mTM,   mTM,   mRSM1, mSM1,  mSM8,  mRSM4, mRSM2, mTC,   mSM2,  mSM4,  // 4
+	mATB,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  // 5
+	mLG,   mLG,   mLG,   mLG,   mLG,   mLG,   mLG,   mLG,   mLG,   mLG,   mLG,   mLG,   mLG,   mLG,   mLG,   mLG,   // 6
+	mLM,   mLM,   mLM,   mLM,   mLM,   mLM,   mLM,   mLM,   mLM,   mLM,   mLM,   mLM,   mLM,   mLM,   mLM,   mLM,   // 7
 
-	em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, // 8
-	em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, // 9
-	em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, // A
-	em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, em_CALL, // B
+	mCALL, mCALL, mCALL, mCALL, mCALL, mCALL, mCALL, mCALL, mCALL, mCALL, mCALL, mCALL, mCALL, mCALL, mCALL, mCALL, // 8
+	mCALL, mCALL, mCALL, mCALL, mCALL, mCALL, mCALL, mCALL, mCALL, mCALL, mCALL, mCALL, mCALL, mCALL, mCALL, mCALL, // 9
+	mCALL, mCALL, mCALL, mCALL, mCALL, mCALL, mCALL, mCALL, mCALL, mCALL, mCALL, mCALL, mCALL, mCALL, mCALL, mCALL, // A
+	mCALL, mCALL, mCALL, mCALL, mCALL, mCALL, mCALL, mCALL, mCALL, mCALL, mCALL, mCALL, mCALL, mCALL, mCALL, mCALL, // B
 
-	em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   // C
-	em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   // D
-	em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   // E
-	em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   em_GO,   em_GO    // F
+	mGO,   mGO,   mGO,   mGO,   mGO,   mGO,   mGO,   mGO,   mGO,   mGO,   mGO,   mGO,   mGO,   mGO,   mGO,   mGO,   // C
+	mGO,   mGO,   mGO,   mGO,   mGO,   mGO,   mGO,   mGO,   mGO,   mGO,   mGO,   mGO,   mGO,   mGO,   mGO,   mGO,   // D
+	mGO,   mGO,   mGO,   mGO,   mGO,   mGO,   mGO,   mGO,   mGO,   mGO,   mGO,   mGO,   mGO,   mGO,   mGO,   mGO,   // E
+	mGO,   mGO,   mGO,   mGO,   mGO,   mGO,   mGO,   mGO,   mGO,   mGO,   mGO,   mGO,   mGO,   mGO,   mGO,   mGO    // F
 };
 
 offs_t mm5799_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)

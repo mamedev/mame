@@ -56,10 +56,6 @@ void saitekosa_expansion_device::device_start()
 	// get inserted module
 	m_module = get_card_device();
 
-	// resolve callbacks
-	m_stb_handler.resolve_safe();
-	m_rts_handler.resolve_safe();
-
 	// register for savestates
 	save_item(NAME(m_data));
 	save_item(NAME(m_nmi));

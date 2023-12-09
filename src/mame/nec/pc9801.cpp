@@ -360,12 +360,12 @@ Keyboard TX commands:
 
 void pc98_base_state::rtc_w(uint8_t data)
 {
-	m_rtc->c0_w((data & 0x01) >> 0);
-	m_rtc->c1_w((data & 0x02) >> 1);
-	m_rtc->c2_w((data & 0x04) >> 2);
-	m_rtc->stb_w((data & 0x08) >> 3);
-	m_rtc->clk_w((data & 0x10) >> 4);
-	m_rtc->data_in_w(((data & 0x20) >> 5));
+	m_rtc->c0_w(BIT(data, 0));
+	m_rtc->c1_w(BIT(data, 1));
+	m_rtc->c2_w(BIT(data, 2));
+	m_rtc->stb_w(BIT(data, 3));
+	m_rtc->clk_w(BIT(data, 4));
+	m_rtc->data_in_w(BIT(data, 5));
 	if(data & 0xc0)
 		logerror("RTC write to undefined bits %02x\n",data & 0xc0);
 }
@@ -507,7 +507,7 @@ void pc9801_state::sasi_data_w(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER( pc9801_state::write_sasi_io )
+void pc9801_state::write_sasi_io(int state)
 {
 	m_sasi_ctrl_in->write_bit2(state);
 
@@ -527,7 +527,7 @@ WRITE_LINE_MEMBER( pc9801_state::write_sasi_io )
 		m_pic2->ir1_w(0);
 }
 
-WRITE_LINE_MEMBER( pc9801_state::write_sasi_req )
+void pc9801_state::write_sasi_req(int state)
 {
 	m_sasi_ctrl_in->write_bit7(state);
 
@@ -635,17 +635,20 @@ void pc9801_state::pc9801_common_io(address_map &map)
 	map(0x0000, 0x001f).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask16(0xff00);
 	map(0x0000, 0x001f).rw(FUNC(pc9801_state::pic_r), FUNC(pc9801_state::pic_w)).umask16(0x00ff); // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
 	map(0x0020, 0x002f).w(FUNC(pc9801_state::rtc_w)).umask16(0x00ff);
-	map(0x0030, 0x0037).rw(m_ppi_sys, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00); //i8251 RS232c / i8255 system port
+	map(0x0030, 0x0037).rw(m_ppi_sys, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00);
+	map(0x0030, 0x0033).rw(m_sio, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff); //i8251 RS232c / i8255 system port
 	map(0x0040, 0x0047).rw(m_ppi_prn, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x0040, 0x0047).rw(m_keyb, FUNC(pc9801_kbd_device::rx_r), FUNC(pc9801_kbd_device::tx_w)).umask16(0xff00); //i8255 printer port / i8251 keyboard
-	map(0x0050, 0x0057).rw("ppi8255_fdd", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00);
-	map(0x0050, 0x0053).w(FUNC(pc9801_state::nmi_ctrl_w)).umask16(0x00ff); // NMI FF / i8255 floppy port (2d?)
+	map(0x0050, 0x0057).lr8(NAME([] (offs_t offset) { return 0xff; })).umask16(0xff00);
+	map(0x0050, 0x0053).w(FUNC(pc9801_state::nmi_ctrl_w)).umask16(0x00ff); // NMI FF / host FDD 2d (PC-80S31K)
 	map(0x0060, 0x0063).rw(m_hgdc[0], FUNC(upd7220_device::read), FUNC(upd7220_device::write)).umask16(0x00ff); //upd7220 character ports / <undefined>
 	map(0x0064, 0x0064).w(FUNC(pc9801_state::vrtc_clear_w));
 //  map(0x006c, 0x006f) border color / <undefined>
-	map(0x0070, 0x007f).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0xff00);
+	// TODO: PC-98Bible suggests that $73 timer #1 is unavailable on non-vanilla models (verify on HW)
+	// (can be accessed only thru the $3fdb alias)
+	map(0x0070, 0x0077).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0xff00);
 	map(0x0070, 0x007f).rw(FUNC(pc9801_state::txt_scrl_r), FUNC(pc9801_state::txt_scrl_w)).umask16(0x00ff); //display registers / i8253 pit
-	map(0x0090, 0x0093).rw(m_sio, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0xff00);
+//  map(0x0090, 0x0093).rw(m_sio, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0xff00); // CMT SIO (optional, C-Bus)
 	map(0x7fd8, 0x7fdf).rw(m_ppi_mouse, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00);
 }
 
@@ -761,7 +764,6 @@ void pc9801vm_state::a20_ctrl_w(offs_t offset, uint8_t data)
 		// TODO: is there any other way that doesn't involve direct r/w of ppi address?
 		por = m_ppi_sys->read(2) & ~0x20;
 		m_ppi_sys->write(2, por);
-		m_maincpu->set_input_line(INPUT_LINE_A20, CLEAR_LINE);
 		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		m_gate_a20 = 0;
 	}
@@ -1419,21 +1421,21 @@ irq assignment (PC-9801F):
 ir0 PIT
 ir1 keyboard
 ir2 vblank
-ir3
+ir3 expansion bus INT0
 ir4 rs-232c
-ir5
-ir6
-ir7 slave irq
+ir5 expansion bus INT1
+ir6 expansion bus INT2
+ir7 PIC slave
 
 8259 slave:
 ir0 printer
-ir1 IDE?
-ir2 2dd floppy irq
-ir3 2hd floppy irq
-ir4 opn
-ir5 mouse
-ir6
-ir7
+ir1 expansion bus INT3 (HDD)
+ir2 expansion bus INT41 (2dd floppy irq)
+ir3 expansion bus INT42 (2hd floppy irq)
+ir4 expansion bus INT5 (usually FM sound board)
+ir5 expansion bus INT6 (mouse)
+ir6 NDP coprocessor (up to V30 CPU)
+ir7 <gnd>
 */
 
 
@@ -1467,7 +1469,7 @@ uint8_t pc9801_state::get_slave_ack(offs_t offset)
 *
 ****************************************/
 
-WRITE_LINE_MEMBER(pc9801_state::dma_hrq_changed)
+void pc9801_state::dma_hrq_changed(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
@@ -1476,7 +1478,7 @@ WRITE_LINE_MEMBER(pc9801_state::dma_hrq_changed)
 //  logerror("%02x HLDA\n",state);
 }
 
-WRITE_LINE_MEMBER(pc9801_state::tc_w )
+void pc9801_state::tc_w(int state)
 {
 	/* floppy terminal count */
 	m_fdc_2hd->tc_w(state);
@@ -1537,6 +1539,63 @@ void pc9801_state::dma_write_byte(offs_t offset, uint8_t data)
 	program.write_byte(addr, data);
 }
 
+uint8_t pc9801vm_state::dma_read_byte(offs_t offset)
+{
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	offs_t addr = (m_dma_offset[m_dack] << 16) | offset;
+
+	if (BIT(m_dma_access_ctrl, 2))
+		addr &= 0xfffff;
+
+	if(offset == 0xffff)
+	{
+		switch(m_dma_autoinc[m_dack])
+		{
+			case 1:
+			{
+				uint8_t page = m_dma_offset[m_dack];
+				m_dma_offset[m_dack] = ((page + 1) & 0xf) | (page & 0xf0);
+				break;
+			}
+			case 3:
+				m_dma_offset[m_dack]++;
+				break;
+		}
+	}
+
+//  logerror("%08x %02x\n",addr, m_dma_access_ctrl);
+	return program.read_byte(addr);
+}
+
+
+void pc9801vm_state::dma_write_byte(offs_t offset, uint8_t data)
+{
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	offs_t addr = (m_dma_offset[m_dack] << 16) | offset;
+
+	if (BIT(m_dma_access_ctrl, 2))
+		addr &= 0xfffff;
+
+	if(offset == 0xffff)
+	{
+		switch(m_dma_autoinc[m_dack])
+		{
+			case 1:
+			{
+				uint8_t page = m_dma_offset[m_dack];
+				m_dma_offset[m_dack] = ((page + 1) & 0xf) | (page & 0xf0);
+				break;
+			}
+			case 3:
+				m_dma_offset[m_dack]++;
+				break;
+		}
+	}
+//  logerror("%08x %02x %02x\n",addr,data, m_dma_access_ctrl);
+
+	program.write_byte(addr, data);
+}
+
 void pc9801_state::set_dma_channel(int channel, int state)
 {
 	if (!state) m_dack = channel;
@@ -1548,10 +1607,10 @@ ch2 FDC
 ch3 SCSI
 */
 
-WRITE_LINE_MEMBER(pc9801_state::dack0_w){ /*logerror("%02x 0\n",state);*/ set_dma_channel(0, state); }
-WRITE_LINE_MEMBER(pc9801_state::dack1_w){ /*logerror("%02x 1\n",state);*/ set_dma_channel(1, state); }
-WRITE_LINE_MEMBER(pc9801_state::dack2_w){ /*logerror("%02x 2\n",state);*/ set_dma_channel(2, state); }
-WRITE_LINE_MEMBER(pc9801_state::dack3_w){ /*logerror("%02x 3\n",state);*/ set_dma_channel(3, state); }
+void pc9801_state::dack0_w(int state) { /*logerror("%02x 0\n",state);*/ set_dma_channel(0, state); }
+void pc9801_state::dack1_w(int state) { /*logerror("%02x 1\n",state);*/ set_dma_channel(1, state); }
+void pc9801_state::dack2_w(int state) { /*logerror("%02x 2\n",state);*/ set_dma_channel(2, state); }
+void pc9801_state::dack3_w(int state) { /*logerror("%02x 3\n",state);*/ set_dma_channel(3, state); }
 
 /*
  * PPI "system" I/F
@@ -1589,8 +1648,8 @@ u8 pc9801_state::ppi_sys_portb_r()
 {
 	u8 res = 0;
 
-	res |= m_rtc->data_out_r();
 	res |= BIT(m_dsw1->read(), 0) << 3;
+	res |= m_rtc->data_out_r();
 
 	return res;
 }
@@ -1836,7 +1895,7 @@ static void pc9801_cbus_devices(device_slot_interface &device)
 
 //  Jast Sound, could be installed independently
 
-WRITE_LINE_MEMBER( pc9801_state::fdc_2dd_irq )
+void pc9801_state::fdc_2dd_irq(int state)
 {
 	logerror("IRQ 2DD %d\n",state);
 
@@ -1848,7 +1907,7 @@ WRITE_LINE_MEMBER( pc9801_state::fdc_2dd_irq )
 	}
 }
 
-WRITE_LINE_MEMBER( pc9801vm_state::fdc_irq_w )
+void pc9801vm_state::fdc_irq_w(int state)
 {
 	if(m_fdc_mode & 1)
 		m_pic2->ir3_w(state);
@@ -1856,7 +1915,7 @@ WRITE_LINE_MEMBER( pc9801vm_state::fdc_irq_w )
 		m_pic2->ir2_w(state);
 }
 
-WRITE_LINE_MEMBER( pc9801vm_state::fdc_drq_w )
+void pc9801vm_state::fdc_drq_w(int state)
 {
 	if(m_fdc_mode & 1)
 		m_dmac->dreq2_w(state ^ 1);
@@ -2021,7 +2080,7 @@ MACHINE_RESET_MEMBER(pc9801bx_state,pc9801bx2)
 	m_dma_access_ctrl = 0x00;
 }
 
-WRITE_LINE_MEMBER(pc9801_state::vrtc_irq)
+void pc9801_state::vrtc_irq(int state)
 {
 	if(state)
 		m_pic1->ir2_w(1);
@@ -2225,12 +2284,6 @@ void pc9801_state::pc9801_common(machine_config &config)
 	FLOPPY_CONNECTOR(config, "upd765_2hd:0", pc9801_floppies, "525hd", pc9801_state::floppy_formats);//.enable_sound(true);
 	FLOPPY_CONNECTOR(config, "upd765_2hd:1", pc9801_floppies, "525hd", pc9801_state::floppy_formats);//.enable_sound(true);
 
-	i8255_device &ppi_fdd(I8255(config, "ppi8255_fdd"));
-	ppi_fdd.in_pa_callback().set_constant(0xff);
-	ppi_fdd.in_pb_callback().set_constant(0xff);
-	ppi_fdd.in_pc_callback().set_constant(0xff);
-	//ppi_fdd.out_pc_callback().set(FUNC(pc9801_state::ppi_fdd_portc_w));
-
 	SOFTWARE_LIST(config, "disk_list").set_original("pc98");
 
 	/* video hardware */
@@ -2354,7 +2407,7 @@ void pc9801vm_state::pc9801ux(machine_config &config)
 	i80286_cpu_device &maincpu(I80286(config.replace(), m_maincpu, 10000000));
 	maincpu.set_addrmap(AS_PROGRAM, &pc9801vm_state::pc9801ux_map);
 	maincpu.set_addrmap(AS_IO, &pc9801vm_state::pc9801ux_io);
-	maincpu.set_a20_callback(i80286_cpu_device::a20_cb(&pc9801vm_state::a20_286, this));
+	maincpu.set_a20_callback(FUNC(pc9801vm_state::a20_286));
 	maincpu.set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	config_floppy_35hd(config);
@@ -2367,7 +2420,7 @@ void pc9801vm_state::pc9801dx(machine_config &config)
 	i80286_cpu_device &maincpu(I80286(config.replace(), m_maincpu, 12000000));
 	maincpu.set_addrmap(AS_PROGRAM, &pc9801vm_state::pc9801ux_map);
 	maincpu.set_addrmap(AS_IO, &pc9801vm_state::pc9801ux_io);
-	maincpu.set_a20_callback(i80286_cpu_device::a20_cb(&pc9801vm_state::a20_286, this));
+	maincpu.set_a20_callback(FUNC(pc9801vm_state::a20_286));
 	maincpu.set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	config_floppy_525hd(config);

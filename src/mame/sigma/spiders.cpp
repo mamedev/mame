@@ -243,7 +243,7 @@ INTERRUPT_GEN_MEMBER(spiders_state::update_pia_1)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(spiders_state::ic60_74123_output_changed)
+void spiders_state::ic60_74123_output_changed(int state)
 {
 	m_pia[1]->ca1_w(state);
 }
@@ -273,7 +273,7 @@ void spiders_state::machine_start()
  *************************************/
 
 
-WRITE_LINE_MEMBER(spiders_state::flipscreen_w)
+void spiders_state::flipscreen_w(int state)
 {
 	m_flipscreen = state;
 }
@@ -527,20 +527,20 @@ void spiders_state::spiders(machine_config &config)
 	crtc.set_update_row_callback(FUNC(spiders_state::crtc_update_row));
 	crtc.out_de_callback().set("ic60", FUNC(ttl74123_device::a_w));
 
-	PIA6821(config, m_pia[0], 0);
+	PIA6821(config, m_pia[0]);
 	m_pia[0]->readpa_handler().set_ioport("IN0");
 	m_pia[0]->readpb_handler().set_ioport("IN1");
 	m_pia[0]->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
 	m_pia[0]->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
-	PIA6821(config, m_pia[1], 0);
+	PIA6821(config, m_pia[1]);
 	m_pia[1]->readpa_handler().set(FUNC(spiders_state::gfx_rom_r));
 	m_pia[1]->writepb_handler().set(FUNC(spiders_state::gfx_rom_intf_w));
 	m_pia[1]->cb2_handler().set(FUNC(spiders_state::flipscreen_w));
 	m_pia[1]->irqa_handler().set_inputline("maincpu", M6809_FIRQ_LINE);
 	m_pia[1]->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
 
-	PIA6821(config, m_pia[2], 0);
+	PIA6821(config, m_pia[2]);
 	m_pia[2]->writepa_handler().set(FUNC(spiders_state::spiders_audio_ctrl_w));
 	m_pia[2]->writepb_handler().set(FUNC(spiders_state::spiders_audio_command_w));
 	m_pia[2]->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<3>));
@@ -548,7 +548,7 @@ void spiders_state::spiders(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 
-	PIA6821(config, m_pia[3], 0);
+	PIA6821(config, m_pia[3]);
 	m_pia[3]->writepa_handler().set(FUNC(spiders_state::spiders_audio_a_w));
 	m_pia[3]->writepb_handler().set(FUNC(spiders_state::spiders_audio_b_w));
 	m_pia[3]->irqa_handler().set_inputline("audiocpu", M6802_IRQ_LINE);

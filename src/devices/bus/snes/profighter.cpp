@@ -19,8 +19,6 @@
 #include "imagedev/floppy.h"
 #include "machine/upd765.h"
 
-#include "formats/pc_dsk.h"
-
 
 DEFINE_DEVICE_TYPE(SNS_PRO_FIGHTER_Q, sns_pro_fighter_q_device, "profighterq", "Super Pro. Fighter Q (variant 1)");
 DEFINE_DEVICE_TYPE(SNS_PRO_FIGHTER_QA, sns_pro_fighter_qa_device, "profighterqa", "Super Pro. Fighter Q (variant 2)");

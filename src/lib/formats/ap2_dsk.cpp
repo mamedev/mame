@@ -12,6 +12,7 @@
 #include "basicdsk.h"
 
 #include "ioprocs.h"
+#include "multibyte.h"
 
 #include <cassert>
 #include <cstdlib>
@@ -50,17 +51,17 @@ a2_16sect_dos_format::a2_16sect_dos_format() : a2_16sect_format(false)
 {
 }
 
-const char *a2_16sect_dos_format::name() const
+const char *a2_16sect_dos_format::name() const noexcept
 {
 	return "a2_16sect_dos";
 }
 
-const char *a2_16sect_dos_format::description() const
+const char *a2_16sect_dos_format::description() const noexcept
 {
 	return "Apple II 16-sector dsk image (DOS sector order)";
 }
 
-const char *a2_16sect_dos_format::extensions() const
+const char *a2_16sect_dos_format::extensions() const noexcept
 {
 	return "dsk,do";
 }
@@ -69,22 +70,22 @@ a2_16sect_prodos_format::a2_16sect_prodos_format() : a2_16sect_format(true)
 {
 }
 
-const char *a2_16sect_prodos_format::name() const
+const char *a2_16sect_prodos_format::name() const noexcept
 {
 	return "a2_16sect_prodos";
 }
 
-const char *a2_16sect_prodos_format::description() const
+const char *a2_16sect_prodos_format::description() const noexcept
 {
 	return "Apple II 16-sector dsk image (ProDos sector order)";
 }
 
-const char *a2_16sect_prodos_format::extensions() const
+const char *a2_16sect_prodos_format::extensions() const noexcept
 {
 	return "dsk,po";
 }
 
-bool a2_16sect_format::supports_save() const
+bool a2_16sect_format::supports_save() const noexcept
 {
 	return true;
 }
@@ -172,13 +173,13 @@ int a2_16sect_format::identify(util::random_read &io, uint32_t form_factor, cons
 	return FIFID_SIZE | (m_prodos_order == prodos_order ? FIFID_HINT : 0);
 }
 
-bool a2_16sect_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool a2_16sect_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	uint64_t size;
 	if (io.length(size))
 		return false;
 
-	image->set_form_variant(floppy_image::FF_525, floppy_image::SSSD);
+	image.set_form_variant(floppy_image::FF_525, floppy_image::SSSD);
 
 	int tracks = (size == (40 * 16 * 256)) ? 40 : 35;
 
@@ -270,7 +271,7 @@ uint8_t a2_16sect_format::gb(const std::vector<bool> &buf, int &pos, int &wrap)
 
 //#define VERBOSE_SAVE
 
-bool a2_16sect_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool a2_16sect_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
 {
 		int g_tracks, g_heads;
 		int visualgrid[16][APPLE2_TRACK_COUNT]; // visualizer grid, cleared/initialized below
@@ -298,7 +299,7 @@ bool a2_16sect_format::save(util::random_read_write &io, const std::vector<uint3
 				elem[j] = 0;
 			}
 		}
-		image->get_actual_geometry(g_tracks, g_heads);
+		image.get_actual_geometry(g_tracks, g_heads);
 
 		int head = 0;
 
@@ -347,7 +348,7 @@ bool a2_16sect_format::save(util::random_read_write &io, const std::vector<uint3
 								uint8_t se = gcr4_decode(h[4],h[5]);
 								uint8_t chk = gcr4_decode(h[6],h[7]);
 								#ifdef VERBOSE_SAVE
-								uint32_t post = (h[8]<<16)|(h[9]<<8)|h[10];
+								uint32_t post = get_u24be(&h[8]);
 								printf("Address Mark:\tVolume %d, Track %d, Sector %2d, Checksum %02X: %s, Postamble %03X: %s\n", vl, tr, se, chk, (chk ^ vl ^ tr ^ se)==0?"OK":"BAD", post, (post&0xFFFF00)==0xDEAA00?"OK":"BAD");
 								#endif
 								// sanity check
@@ -528,22 +529,22 @@ a2_rwts18_format::a2_rwts18_format() : floppy_image_format_t()
 {
 }
 
-const char *a2_rwts18_format::name() const
+const char *a2_rwts18_format::name() const noexcept
 {
 		return "a2_rwts18";
 }
 
-const char *a2_rwts18_format::description() const
+const char *a2_rwts18_format::description() const noexcept
 {
 		return "Apple II RWTS18-type Image";
 }
 
-const char *a2_rwts18_format::extensions() const
+const char *a2_rwts18_format::extensions() const noexcept
 {
 		return "rti";
 }
 
-bool a2_rwts18_format::supports_save() const
+bool a2_rwts18_format::supports_save() const noexcept
 {
 		return true;
 }
@@ -557,7 +558,7 @@ int a2_rwts18_format::identify(util::random_read &io, uint32_t form_factor, cons
 		return size == expected_size ? FIFID_SIZE : 0;
 }
 
-bool a2_rwts18_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool a2_rwts18_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 /*      TODO: rewrite me properly
         uint8_t sector_data[(256)*16];
@@ -603,7 +604,7 @@ uint8_t a2_rwts18_format::gb(const std::vector<bool> &buf, int &pos, int &wrap)
 		return v;
 }
 
-bool a2_rwts18_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool a2_rwts18_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
 {
 		int g_tracks, g_heads;
 		int visualgrid[18][APPLE2_TRACK_COUNT]; // visualizer grid, cleared/initialized below
@@ -632,7 +633,7 @@ bool a2_rwts18_format::save(util::random_read_write &io, const std::vector<uint3
 				elem[j] = 0;
 			}
 		}
-		image->get_actual_geometry(g_tracks, g_heads);
+		image.get_actual_geometry(g_tracks, g_heads);
 
 		int head = 0;
 
@@ -674,7 +675,7 @@ bool a2_rwts18_format::save(util::random_read_write &io, const std::vector<uint3
 						uint8_t tr = gcr4_decode(h[2],h[3]);
 						uint8_t se = gcr4_decode(h[4],h[5]);
 						uint8_t chk = gcr4_decode(h[6],h[7]);
-						uint32_t post = (h[8]<<16)|(h[9]<<8)|h[10];
+						uint32_t post = get_u24be(&h[8]);
 						printf("Address Mark:\tVolume %d, Track %d, Sector %2d, Checksum %02X: %s, Postamble %03X: %s\n", vl, tr, se, chk, (chk ^ vl ^ tr ^ se)==0?"OK":"BAD", post, (post&0xFFFF00)==0xDEAA00?"OK":"BAD");
 						// sanity check
 						if (tr == 0 && se < nsect) {
@@ -834,7 +835,7 @@ bool a2_rwts18_format::save(util::random_read_write &io, const std::vector<uint3
 								uint8_t tr = gcr6bw_tb[h[0]];
 								uint8_t se = gcr6bw_tb[h[1]];
 								uint8_t chk = gcr6bw_tb[h[2]];
-								uint32_t post = (h[3]<<16)|(h[4]<<8)|h[5];
+								uint32_t post = get_u24be(&h[3]);
 								uint8_t bbundid = h[6];
 								printf("RWTS18 AM:\t Track %d, Sector %2d, Checksum %02X: %s, Postamble %03X: %s, BBUNDID %02x\n", tr, se, chk, (chk ^ tr ^ se)==0?"OK":"BAD", post, post==0xAAFFFF?"OK":"BAD", bbundid);
 								// sanity check
@@ -1010,22 +1011,22 @@ a2_edd_format::a2_edd_format() : floppy_image_format_t()
 {
 }
 
-const char *a2_edd_format::name() const
+const char *a2_edd_format::name() const noexcept
 {
 	return "a2_edd";
 }
 
-const char *a2_edd_format::description() const
+const char *a2_edd_format::description() const noexcept
 {
 	return "Apple II EDD Image";
 }
 
-const char *a2_edd_format::extensions() const
+const char *a2_edd_format::extensions() const noexcept
 {
 	return "edd";
 }
 
-bool a2_edd_format::supports_save() const
+bool a2_edd_format::supports_save() const noexcept
 {
 	return false;
 }
@@ -1040,10 +1041,10 @@ int a2_edd_format::identify(util::random_read &io, uint32_t form_factor, const s
 
 uint8_t a2_edd_format::pick(const uint8_t *data, int pos)
 {
-	return ((data[pos>>3] << 8) | data[(pos>>3)+1]) >> (8-(pos & 7));
+	return get_u16be(&data[pos>>3]) >> (8-(pos & 7));
 }
 
-bool a2_edd_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool a2_edd_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	uint8_t nibble[16384], stream[16384];
 	int npos[16384];
@@ -1118,11 +1119,11 @@ bool a2_edd_format::load(util::random_read &io, uint32_t form_factor, const std:
 			stream[splice >> 3] ^= 0x80 >> (splice & 7);
 
 		generate_track_from_bitstream(i >> 2, 0, stream, len, image, i & 3);
-		image->set_write_splice_position(i >> 2, 0, uint32_t(uint64_t(200'000'000)*splice/len), i & 3);
+		image.set_write_splice_position(i >> 2, 0, uint32_t(uint64_t(200'000'000)*splice/len), i & 3);
 	}
 	img.reset();
 
-	image->set_form_variant(floppy_image::FF_525, floppy_image::SSSD);
+	image.set_form_variant(floppy_image::FF_525, floppy_image::SSSD);
 
 	return true;
 }
@@ -1134,22 +1135,22 @@ a2_nib_format::a2_nib_format() : floppy_image_format_t()
 {
 }
 
-const char *a2_nib_format::name() const
+const char *a2_nib_format::name() const noexcept
 {
 	return "a2_nib";
 }
 
-const char *a2_nib_format::description() const
+const char *a2_nib_format::description() const noexcept
 {
 	return "Apple II NIB Image";
 }
 
-const char *a2_nib_format::extensions() const
+const char *a2_nib_format::extensions() const noexcept
 {
 	return "nib";
 }
 
-bool a2_nib_format::supports_save() const
+bool a2_nib_format::supports_save() const noexcept
 {
 	return false;
 }
@@ -1277,7 +1278,7 @@ std::vector<uint32_t> a2_nib_format::generate_levels_from_nibbles(const std::vec
 	return levels;
 }
 
-bool a2_nib_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool a2_nib_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	uint64_t size;
 	if (io.length(size))
@@ -1297,7 +1298,7 @@ bool a2_nib_format::load(util::random_read &io, uint32_t form_factor, const std:
 								   0, image);
 	}
 
-	image->set_form_variant(floppy_image::FF_525, floppy_image::SSSD);
+	image.set_form_variant(floppy_image::FF_525, floppy_image::SSSD);
 
 	return true;
 }

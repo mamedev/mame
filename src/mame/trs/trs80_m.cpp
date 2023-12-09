@@ -209,7 +209,7 @@ INTERRUPT_GEN_MEMBER(trs80_state::rtc_interrupt)
 }
 
 
-WRITE_LINE_MEMBER(trs80_state::intrq_w)
+void trs80_state::intrq_w(int state)
 {
 	if (state)
 	{
@@ -348,94 +348,4 @@ void trs80_state::machine_reset()
 		u16 s_clock = s_bauds[m_io_baud->read()] << 4;
 		m_uart_clock->set_unscaled_clock(s_clock);
 	}
-}
-
-
-/***************************************************************************
-    PARAMETERS
-***************************************************************************/
-
-#define LOG 1
-
-#define CMD_TYPE_OBJECT_CODE                            0x01
-#define CMD_TYPE_TRANSFER_ADDRESS                       0x02
-#define CMD_TYPE_END_OF_PARTITIONED_DATA_SET_MEMBER     0x04
-#define CMD_TYPE_LOAD_MODULE_HEADER                     0x05
-#define CMD_TYPE_PARTITIONED_DATA_SET_HEADER            0x06
-#define CMD_TYPE_PATCH_NAME_HEADER                      0x07
-#define CMD_TYPE_ISAM_DIRECTORY_ENTRY                   0x08
-#define CMD_TYPE_END_OF_ISAM_DIRECTORY_ENTRY            0x0a
-#define CMD_TYPE_PDS_DIRECTORY_ENTRY                    0x0c
-#define CMD_TYPE_END_OF_PDS_DIRECTORY_ENTRY             0x0e
-#define CMD_TYPE_YANKED_LOAD_BLOCK                      0x10
-#define CMD_TYPE_COPYRIGHT_BLOCK                        0x1f
-
-/***************************************************************************
-    IMPLEMENTATION
-***************************************************************************/
-
-// TODO: If you get "Attempting to write outside of RAM" enough times in succession, MAME will exit unexpectedly (no error).
-QUICKLOAD_LOAD_MEMBER(trs80_state::quickload_cb)
-{
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-
-	u8 type, length;
-	u8 data[0x100];
-	u8 addr[2];
-	void *ptr;
-
-	while (!image.image_feof())
-	{
-		image.fread(&type, 1);
-		image.fread(&length, 1);
-
-		switch (type)
-		{
-		case CMD_TYPE_OBJECT_CODE:  // 01 - block of data
-			{
-				length -= 2;
-				u16 block_length = length ? length : 256;
-				image.fread(&addr, 2);
-				u16 address = (addr[1] << 8) | addr[0];
-				if (LOG) logerror("/CMD object code block: address %04x length %u\n", address, block_length);
-				ptr = program.get_write_ptr(address);
-				if (!ptr)
-				{
-					return std::make_pair(
-							image_error::INVALIDIMAGE,
-							util::string_format("Object code block at address %04x is outside RAM", address));
-				}
-				image.fread( ptr, block_length);
-			}
-			break;
-
-		case CMD_TYPE_TRANSFER_ADDRESS: // 02 - go address
-			{
-				image.fread(&addr, 2);
-				u16 address = (addr[1] << 8) | addr[0];
-				if (LOG) logerror("/CMD transfer address %04x\n", address);
-				m_maincpu->set_state_int(Z80_PC, address);
-			}
-			return std::make_pair(std::error_condition(), std::string());
-
-		case CMD_TYPE_LOAD_MODULE_HEADER: // 05 - name
-			image.fread(&data, length);
-			if (LOG) logerror("/CMD load module header '%s'\n", data);
-			break;
-
-		case CMD_TYPE_COPYRIGHT_BLOCK: // 1F - copyright info
-			image.fread(&data, length);
-			if (LOG) logerror("/CMD copyright block '%s'\n", data);
-			break;
-
-		default:
-			image.fread(&data, length);
-			logerror("/CMD unsupported block type %u!\n", type);
-			return std::make_pair(
-					image_error::INVALIDIMAGE,
-					util::string_format("Unsupported or invalid block type %u", type));
-		}
-	}
-
-	return std::make_pair(std::error_condition(), std::string());
 }

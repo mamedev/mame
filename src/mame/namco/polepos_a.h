@@ -22,7 +22,7 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 public:
-	DECLARE_WRITE_LINE_MEMBER(clson_w);
+	void clson_w(int state);
 	void polepos_engine_sound_lsb_w(uint8_t data);
 	void polepos_engine_sound_msb_w(uint8_t data);
 

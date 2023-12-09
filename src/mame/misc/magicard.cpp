@@ -242,12 +242,12 @@ protected:
 	void pic_portb_w(offs_t offset, uint8_t data, uint8_t mask);
 	void output_w(offs_t offset, uint16_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(cpu_int1);
+	void cpu_int1(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(scc66470_irq);
-	DECLARE_WRITE_LINE_MEMBER(cpu_i2c_scl);
-	DECLARE_WRITE_LINE_MEMBER(cpu_i2c_sda_write);
-	DECLARE_READ_LINE_MEMBER(cpu_i2c_sda_read);
+	void scc66470_irq(int state);
+	void cpu_i2c_scl(int state);
+	void cpu_i2c_sda_write(int state);
+	int cpu_i2c_sda_read();
 
 	void update_sda(uint8_t device, uint8_t state);
 	void update_scl(uint8_t device, uint8_t state);
@@ -322,7 +322,7 @@ private:
 	void write_ds1207_ds2401(offs_t offset, uint8_t data);
 	void output_w(offs_t offset, uint16_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(cpu_int1);
+	void cpu_int1(int state);
 
 	optional_device<ds2401_device> m_ds2401;
 	optional_device<ds1207_device> m_ds1207;
@@ -403,9 +403,10 @@ uint32_t magicard_base_state::screen_update_magicard(screen_device &screen, bitm
 	return 0;
 }
 
-/*************************
-*      R/W Handlers      *
-*************************/
+
+/*******************************************
+*               R/W Handlers               *
+*******************************************/
 
 uint8_t magicard_state::read_ds1207(offs_t offset)
 {
@@ -475,9 +476,9 @@ void hotslots_state::output_w(offs_t offset, uint16_t data)
 }
 
 
-/*************************
-*      Memory Maps       *
-*************************/
+/*********************************************
+*           Memory Map Information           *
+*********************************************/
 
 void magicard_state::magicard_map(address_map &map)
 {
@@ -534,9 +535,9 @@ void hotslots_state::puzzleme_map(address_map &map)
 	hotslots_map_base(map);
 }
 
-/*************************
-*      Input ports       *
-*************************/
+/*********************************************
+*                Input Ports                 *
+*********************************************/
 
 static INPUT_PORTS_START( magicard )
 	PORT_START("SW0")
@@ -769,23 +770,23 @@ void magicard_base_state::machine_reset()
 }
 
 
-/*************************
-*    Machine Drivers     *
-*************************/
+/*********************************************
+*              Machine Drivers               *
+*********************************************/
 
-WRITE_LINE_MEMBER(magicard_base_state::scc66470_irq)
+void magicard_base_state::scc66470_irq(int state)
 {
 	m_maincpu->int2_w(state);
 }
 
-WRITE_LINE_MEMBER(magicard_base_state::cpu_int1)
+void magicard_base_state::cpu_int1(int state)
 {
 	// TODO: is this used by games on magicard hardware ?
 	m_maincpu->int1_w(1);
 	m_maincpu->int1_w(0);
 }
 
-WRITE_LINE_MEMBER(hotslots_state::cpu_int1)
+void hotslots_state::cpu_int1(int state)
 {
 	m_maincpu->int1_w(state);
 }
@@ -822,24 +823,24 @@ void magicard_base_state::update_sda(uint8_t device, uint8_t state)
 	m_i2cmem->write_sda(m_sda_state ? 0 : 1);
 }
 
-WRITE_LINE_MEMBER(magicard_base_state::cpu_i2c_scl)
+void magicard_base_state::cpu_i2c_scl(int state)
 {
 	update_scl(I2C_CPU, state);
 }
 
-WRITE_LINE_MEMBER(magicard_base_state::cpu_i2c_sda_write)
+void magicard_base_state::cpu_i2c_sda_write(int state)
 {
 	update_sda(I2C_CPU, state);
 }
 
-READ_LINE_MEMBER(magicard_base_state::cpu_i2c_sda_read)
+int magicard_base_state::cpu_i2c_sda_read()
 {
 	return (m_sda_state ? 0 : 1) & (m_i2cmem->read_sda() ? 1 : 0);
 }
 
 void magicard_base_state::magicard_base(machine_config &config)
 {
-	SCC68070(config, m_maincpu, CLOCK_C); /* SCC-68070 CCA84 */
+	SCC68070(config, m_maincpu, CLOCK_C);  // SCC-68070 CCA84
 	m_maincpu->i2c_scl_w().set(FUNC(magicard_base_state::cpu_i2c_scl));
 	m_maincpu->i2c_sda_w().set(FUNC(magicard_base_state::cpu_i2c_sda_write));
 	m_maincpu->i2c_sda_r().set(FUNC(magicard_base_state::cpu_i2c_sda_read));
@@ -882,7 +883,7 @@ void magicard_state::magicard_pic54(machine_config &config)
 {
 	magicard(config);
 
-	pic16c54_device &pic(PIC16C54(config, "pic16c54", 3686400)); // correct?
+	pic16c54_device &pic(PIC16C54(config, "pic16c54", 3686400));  // correct?
 	pic.read_b().set(FUNC(magicard_state::pic_portb_r));
 	pic.write_b().set(FUNC(magicard_state::pic_portb_w));
 }
@@ -891,7 +892,7 @@ void magicard_state::magicard_pic56(machine_config &config)
 {
 	magicard(config);
 
-	pic16c56_device &pic(PIC16C56(config, "pic16c56", 3686400)); // correct?
+	pic16c56_device &pic(PIC16C56(config, "pic16c56", 3686400));  // correct?
 	pic.read_b().set(FUNC(magicard_state::pic_portb_r));
 	pic.write_b().set(FUNC(magicard_state::pic_portb_w));
 }
@@ -933,7 +934,7 @@ void hotslots_state::hotslots_pic54(machine_config &config)
 {
 	hotslots(config);
 
-	pic16c54_device &pic(PIC16C54(config, "pic16c54", 3686400)); // correct?
+	pic16c54_device &pic(PIC16C54(config, "pic16c54", 3686400));  // correct?
 	pic.read_b().set(FUNC(hotslots_state::pic_portb_r));
 	pic.write_b().set(FUNC(hotslots_state::pic_portb_w));
 }
@@ -951,7 +952,7 @@ void hotslots_state::puzzleme(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &hotslots_state::puzzleme_map);
 
-	pic16c54_device &pic(PIC16C54(config, "pic16c54", 3686400)); // correct?
+	pic16c54_device &pic(PIC16C54(config, "pic16c54", 3686400));  // correct?
 	pic.read_b().set(FUNC(hotslots_state::pic_portb_r));
 	pic.write_b().set(FUNC(hotslots_state::pic_portb_w));
 
@@ -962,9 +963,9 @@ void hotslots_state::puzzleme(machine_config &config)
 }
 
 
-/*************************
-*        Rom Load        *
-*************************/
+/*********************************************
+*                  Rom Load                  *
+*********************************************/
 
 /*
   Magicard Ver 2.01
@@ -976,10 +977,10 @@ ROM_START( magicard )
 	ROM_REGION( 0x0100, "sereeprom", 0 )  // Serial EPROM
 	ROM_LOAD16_WORD_SWAP("mgorigee.bin",    0x0000, 0x0100, CRC(f09eb2b2) SHA1(2d6efcea6c0835ea754285e22354dff8f059fdf5) )
 
-	ROM_REGION(0x4d, "ds1207", 0) /* timekey */
-	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(48528ccf) SHA1(182f5aa2938328bac59110eee1b340b3b4ea3e29) ) // created to match game
+	ROM_REGION(0x4d, "ds1207", 0)  // timekey
+	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(48528ccf) SHA1(182f5aa2938328bac59110eee1b340b3b4ea3e29) )  // created to match game
 
-	ROM_REGION(0x4000, "nvram", 0) /* Default NVRAM */
+	ROM_REGION(0x4000, "nvram", 0)  // Default NVRAM
 	ROM_LOAD( "magicard.nv", 0x0000, 0x4000, CRC(3b7d957e) SHA1(2c56b7f37a2166a99c9e6b05d90ace0a4dd179e2) )
 ROM_END
 
@@ -996,10 +997,10 @@ ROM_START( magicrd1a )
 	ROM_REGION( 0x0100, "sereeprom", 0 )  // Serial EPROM
 	ROM_LOAD("mgorigee.bin",    0x0000, 0x0100, CRC(f09eb2b2) SHA1(2d6efcea6c0835ea754285e22354dff8f059fdf5) )
 
-	ROM_REGION(0x4d, "ds1207", 0) /* timekey */
-	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(4902b7c2) SHA1(6e6fe825cfcf39bae60ecc45ab0742772f87cf80) ) // created to match game
+	ROM_REGION(0x4d, "ds1207", 0)  // timekey
+	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(4902b7c2) SHA1(6e6fe825cfcf39bae60ecc45ab0742772f87cf80) )  // created to match game
 
-	ROM_REGION(0x4000, "nvram", 0) /* Default NVRAM */
+	ROM_REGION(0x4000, "nvram", 0)  // Default NVRAM
 	ROM_LOAD( "magicrd1a.nv", 0x0000, 0x4000, CRC(4d78bbcc) SHA1(943344f03a69ee25526e2b1f2e74722ae2601c11) )
 ROM_END
 
@@ -1010,17 +1011,17 @@ ROM_START( magicrd1b )
 	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
 	ROM_LOAD16_WORD_SWAP( "mg_8.bin", 0x00000, 0x80000, CRC(f5499765) SHA1(63bcf40b91b43b218c1f9ec1d126a856f35d0844) )
 
-	/*bigger than the other sets?*/
+	// bigger than the other sets?
 	ROM_REGION( 0x20000, "other", 0 )  // unknown
 	ROM_LOAD16_WORD_SWAP("mg_u3.bin",   0x00000, 0x20000, CRC(2116de31) SHA1(fb9c21ca936532e7c342db4bcaaac31c478b1a35) )
 
 	ROM_REGION( 0x0100, "sereeprom", 0 )  // Serial EPROM
 	ROM_LOAD("mgorigee.bin",    0x0000, 0x0100, CRC(fea8a821) SHA1(c744cac6af7621524fc3a2b0a9a135a32b33c81b) )
 
-	ROM_REGION(0x4d, "ds1207", 0) /* timekey */
-	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(cbcc1a42) SHA1(4b577c85f5856192ce04051a2d305a9080192177) ) // created to match game
+	ROM_REGION(0x4d, "ds1207", 0)  // timekey
+	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(cbcc1a42) SHA1(4b577c85f5856192ce04051a2d305a9080192177) )  // created to match game
 
-	ROM_REGION(0x4000, "nvram", 0) /* Default NVRAM */
+	ROM_REGION(0x4000, "nvram", 0)  // Default NVRAM
 	ROM_LOAD( "magicrd1b.nv", 0x0000, 0x4000, CRC(4d78bbcc) SHA1(943344f03a69ee25526e2b1f2e74722ae2601c11) )
 ROM_END
 
@@ -1173,13 +1174,13 @@ ROM_START( magicrde )
 	ROM_REGION( 0x0100, "sereeprom", 0 )  // Serial EPROM
 	ROM_LOAD("st24c02.ic26",    0x0000, 0x0100, CRC(427bcdc7) SHA1(0b1debf6aa2a50717fcf85dfb8d98ba70871beb9) )
 
-	ROM_REGION(0x8, "serial_id", 0) /* serial number */
-	ROM_LOAD( "ds2401", 0x000000, 0x000008, BAD_DUMP CRC(3f87b999) SHA1(29649749d521ced9dc7ef1d0d6ddb9a8beea360f) ) // created to match game
+	ROM_REGION(0x8, "serial_id", 0)  // serial number
+	ROM_LOAD( "ds2401", 0x000000, 0x000008, BAD_DUMP CRC(3f87b999) SHA1(29649749d521ced9dc7ef1d0d6ddb9a8beea360f) )  // created to match game
 
-	ROM_REGION(0x4d, "ds1207", 0) /* timekey */
-	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(b00bf924) SHA1(ab98b2955697765518d877d4e19dbe45de0d9503) ) // created to match game
+	ROM_REGION(0x4d, "ds1207", 0)  // timekey
+	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(b00bf924) SHA1(ab98b2955697765518d877d4e19dbe45de0d9503) )  // created to match game
 
-	ROM_REGION(0x10000, "nvram", 0) /* Default NVRAM */
+	ROM_REGION(0x10000, "nvram", 0)  // Default NVRAM
 	ROM_LOAD( "magicrde.nv", 0x0000, 0x10000, CRC(6b9f6abd) SHA1(fd171f465a16d3f2da9c19924ee31f6e56ee746c) )
 ROM_END
 
@@ -1211,13 +1212,13 @@ ROM_START( magicrdea )
 	ROM_REGION( 0x0100, "sereeprom", 0 )  // Serial EPROM
 	ROM_LOAD("st24c02.ic26",    0x0000, 0x0100, CRC(427bcdc7) SHA1(0b1debf6aa2a50717fcf85dfb8d98ba70871beb9) )
 
-	ROM_REGION(0x8, "serial_id", 0) /* serial number */
-	ROM_LOAD( "ds2401", 0x000000, 0x000008, BAD_DUMP CRC(3f87b999) SHA1(29649749d521ced9dc7ef1d0d6ddb9a8beea360f) ) // created to match game
+	ROM_REGION(0x8, "serial_id", 0)  // serial number
+	ROM_LOAD( "ds2401", 0x000000, 0x000008, BAD_DUMP CRC(3f87b999) SHA1(29649749d521ced9dc7ef1d0d6ddb9a8beea360f) )  // created to match game
 
-	ROM_REGION(0x4d, "ds1207", 0) /* timekey */
-	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(b00bf924) SHA1(ab98b2955697765518d877d4e19dbe45de0d9503) ) // created to match game
+	ROM_REGION(0x4d, "ds1207", 0)  // timekey
+	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(b00bf924) SHA1(ab98b2955697765518d877d4e19dbe45de0d9503) )  // created to match game
 
-	ROM_REGION(0x10000, "nvram", 0) /* Default NVRAM */
+	ROM_REGION(0x10000, "nvram", 0)  // Default NVRAM
 	ROM_LOAD( "magicrdea.nv", 0x0000, 0x10000, CRC(a1043c84) SHA1(30c3bb43e91fc358a2592f9a6efbd146eec4e43c) )
 ROM_END
 
@@ -1270,8 +1271,8 @@ ROM_START( magicrdj )
 	ROM_LOAD16_WORD_SWAP( "27c4002_v4.01_af18.ic21", 0x00000, 0x80000, CRC(7700fd22) SHA1(0555c08c82f56e6399a89f6408e52d9d0beba2ac) )
 
 
-	ROM_REGION(0x8, "serial_id", 0) /* serial number */
-	ROM_LOAD( "ds2401", 0x000000, 0x000008, BAD_DUMP CRC(3f87b999) SHA1(29649749d521ced9dc7ef1d0d6ddb9a8beea360f) ) // created to match game
+	ROM_REGION(0x8, "serial_id", 0)  // serial number
+	ROM_LOAD( "ds2401", 0x000000, 0x000008, BAD_DUMP CRC(3f87b999) SHA1(29649749d521ced9dc7ef1d0d6ddb9a8beea360f) )  // created to match game
 	// PIC undumped
 	// Serial EPROM undumped
 ROM_END
@@ -1304,10 +1305,10 @@ ROM_START( magicrdeb )
 	ROM_REGION( 0x0100, "sereeprom", 0 ) // Serial EEPROM
 	ROM_LOAD("24lc02b.ic26",    0x0000, 0x0100, CRC(5cb1b2b2) SHA1(84d4535e5491d9a4a9c658d39df16757bc572a4b) )
 
-	ROM_REGION(0x8, "serial_id", 0) /* serial number */
-	ROM_LOAD( "ds2401", 0x000000, 0x000008, BAD_DUMP CRC(3f87b999) SHA1(29649749d521ced9dc7ef1d0d6ddb9a8beea360f) ) // created to match game
+	ROM_REGION(0x8, "serial_id", 0)  // serial number
+	ROM_LOAD( "ds2401", 0x000000, 0x000008, BAD_DUMP CRC(3f87b999) SHA1(29649749d521ced9dc7ef1d0d6ddb9a8beea360f) )  // created to match game
 
-	ROM_REGION(0x10000, "nvram", 0) /* Default NVRAM */
+	ROM_REGION(0x10000, "nvram", 0)  // Default NVRAM
 	ROM_LOAD( "magicrdeb.nv", 0x0000, 0x10000, CRC(8beb061b) SHA1(c29a2086dea30c98565e811d9686af35da42c9d9) )
 ROM_END
 
@@ -1323,10 +1324,10 @@ ROM_START( magicrd1c )
 	ROM_REGION( 0x1fff, "pic16c54", 0 )  // decapped
 	ROM_LOAD("pic16c54a.bin",   0x0000, 0x1fff, CRC(e777e814) SHA1(e0440be76fa1f3c7ae7d31e1b29a2ba73552231c) )
 
-	ROM_REGION(0x4d, "ds1207", 0) /* timekey */
-	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(ab0b75a2) SHA1(3a3c594d77936e671d25f526459355cc446a0991) ) // created to match game
+	ROM_REGION(0x4d, "ds1207", 0)  // timekey
+	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(ab0b75a2) SHA1(3a3c594d77936e671d25f526459355cc446a0991) )   // created to match game
 
-	ROM_REGION(0x4000, "nvram", 0) /* Default NVRAM */
+	ROM_REGION(0x4000, "nvram", 0)  // Default NVRAM
 	ROM_LOAD( "magicrd1c.nv", 0x0000, 0x4000, CRC(d6244455) SHA1(b6389574f1d4a4a64590d544c9bafe4892feb0a1) )
 
 	ROM_REGION( 0x0100, "sereeprom", 0 ) // Serial EEPROM
@@ -1475,7 +1476,7 @@ ROM_START( quingo )
 	ROM_LOAD16_WORD_SWAP( "quingo_export_v500_27.07.99.bin", 0x00000, 0x80000, CRC(2cd89fe3) SHA1(bdd256d5114227166aff1c9f84b573e5f00530fd) )
 
 	ROM_REGION( 0x0200, "sereeprom", 0 )  // Serial EPROM
-	ROM_LOAD16_WORD_SWAP("quingo_24c04a.bin", 0x0000, 0x0200, BAD_DUMP CRC(d5e82b49) SHA1(7dbdf7d539cbd59a3ac546b6f50861c4958abb3a) ) // all AA & 55
+	ROM_LOAD16_WORD_SWAP("quingo_24c04a.bin", 0x0000, 0x0200, BAD_DUMP CRC(d5e82b49) SHA1(7dbdf7d539cbd59a3ac546b6f50861c4958abb3a) )  // all AA & 55
 ROM_END
 
 /*
@@ -1562,7 +1563,7 @@ ROM_START( bigdeal0 )
 	ROM_LOAD16_WORD_SWAP( "big_deal_belgien_v504_21.05.01.bin", 0x00000, 0x80000, CRC(3e3484db) SHA1(78bb655deacc57ad041a46de7ef153ce25922a8a) )
 
 	ROM_REGION( 0x0200, "sereeprom", 0 )  // Serial EPROM
-	ROM_LOAD16_WORD_SWAP("big_deal_24c04a.bin", 0x0000, 0x0200, BAD_DUMP CRC(d5e82b49) SHA1(7dbdf7d539cbd59a3ac546b6f50861c4958abb3a) ) // all AA & 55
+	ROM_LOAD16_WORD_SWAP("big_deal_24c04a.bin", 0x0000, 0x0200, BAD_DUMP CRC(d5e82b49) SHA1(7dbdf7d539cbd59a3ac546b6f50861c4958abb3a) )  // all AA & 55
 ROM_END
 
 /*
@@ -1649,7 +1650,7 @@ ROM_START( belslots )
 	ROM_LOAD16_WORD_SWAP( "bel_slots_exp_v501_01.12.99.bin", 0x00000, 0x80000, CRC(bd0b97ff) SHA1(9431359f91fd059c61441f4cb4924500889552a9) )
 
 	ROM_REGION( 0x0200, "sereeprom", 0 )  // Serial EPROM
-	ROM_LOAD16_WORD_SWAP("bel_slots_exp_24c04a.bin", 0x0000, 0x0200, BAD_DUMP CRC(d5e82b49) SHA1(7dbdf7d539cbd59a3ac546b6f50861c4958abb3a) ) // all AA & 55
+	ROM_LOAD16_WORD_SWAP("bel_slots_exp_24c04a.bin", 0x0000, 0x0200, BAD_DUMP CRC(d5e82b49) SHA1(7dbdf7d539cbd59a3ac546b6f50861c4958abb3a) )  // all AA & 55
 ROM_END
 
 /*
@@ -1798,10 +1799,10 @@ ROM_START( magicrd1 )
 	ROM_REGION( 0x1fff, "pic16c56", 0 )  // decapped
 	ROM_LOAD("pic16c56.bin",   0x0000, 0x1fff, CRC(b5655603) SHA1(d9126c36f3fca7e769ea60aaa711bb304b4b6a11) )
 
-	ROM_REGION(0x4d, "ds1207", 0) /* timekey */
-	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(cbcc1a42) SHA1(4b577c85f5856192ce04051a2d305a9080192177) ) // created to match game
+	ROM_REGION(0x4d, "ds1207", 0)  // timekey
+	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(cbcc1a42) SHA1(4b577c85f5856192ce04051a2d305a9080192177) )  // created to match game
 
-	ROM_REGION(0x4000, "nvram", 0) /* Default NVRAM */
+	ROM_REGION(0x4000, "nvram", 0)  // Default NVRAM
 	ROM_LOAD( "magicrd1.nv", 0x0000, 0x4000, CRC(5b62f04a) SHA1(0cc6404e1bb66801a562ff7a1479859c17e9f209) )
 ROM_END
 
@@ -1877,10 +1878,10 @@ ROM_START( lucky7i )
 	ROM_LOAD16_WORD_SWAP( "27c210.6", 0x00000, 0x20000, CRC(3a99e9f3) SHA1(b9b533378ce514662cbd85a37ee138a2df760ed4) )
 	ROM_LOAD16_WORD_SWAP( "27c210.5", 0x20000, 0x20000, CRC(b4da8856) SHA1(a33158d75047561fa9674ceb6b22cc63b5b49aed) )
 
-	ROM_REGION(0x4d, "ds1207", 0) /* timekey */
-	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(7b838ea7) SHA1(5c22b789251becd20f56f944b76c5b779e5a8892) ) // created to match game
+	ROM_REGION(0x4d, "ds1207", 0)  // timekey
+	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(7b838ea7) SHA1(5c22b789251becd20f56f944b76c5b779e5a8892) )  // created to match game
 
-	ROM_REGION(0x4000, "nvram", 0) /* Default NVRAM */
+	ROM_REGION(0x4000, "nvram", 0)  // Default NVRAM
 	ROM_LOAD( "lucky7i.nv", 0x0000, 0x4000, CRC(51960419) SHA1(ef7f9d7d9714fda0af23b311232194567887a264) )
 ROM_END
 
@@ -1975,10 +1976,10 @@ ROM_START( magicrd1d )
 	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
 	ROM_LOAD16_WORD_SWAP( "w.bin", 0x00000, 0x80000, CRC(28300427) SHA1(83ea014a818246f476d769ad06cb2eba1ce699e8) )
 
-	ROM_REGION(0x4d, "ds1207", 0) /* timekey */
-	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(cbcc1a42) SHA1(4b577c85f5856192ce04051a2d305a9080192177) ) // created to match game
+	ROM_REGION(0x4d, "ds1207", 0)  // timekey
+	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(cbcc1a42) SHA1(4b577c85f5856192ce04051a2d305a9080192177) )  // created to match game
 
-	ROM_REGION(0x4000, "nvram", 0) /* Default NVRAM */
+	ROM_REGION(0x4000, "nvram", 0)  // Default NVRAM
 	ROM_LOAD( "magicrd1d.nv", 0x0000, 0x4000, CRC(2d2e1082) SHA1(f288fa800da59dc89cdca02e528c94161b149f1c) )
 ROM_END
 
@@ -2071,10 +2072,10 @@ ROM_START( dallaspk )
 	ROM_LOAD16_WORD_SWAP( "cz-v1-p.bin", 0x00000, 0x20000, CRC(ad575e3f) SHA1(4e22957c42610fec0a96bd85f4b766422b020d88) )
 	ROM_LOAD16_WORD_SWAP( "cz-v1-b.bin", 0x20000, 0x20000, CRC(2595d346) SHA1(34f09931d82b5376e4f3922222645c796dad0440) )
 
-	ROM_REGION(0x4d, "ds1207", 0) /* timekey */
-	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(37adab02) SHA1(2b9859ae6cabfdb9c70f94ccc38a271caf6539aa) ) // created to match game
+	ROM_REGION(0x4d, "ds1207", 0)  // timekey
+	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(37adab02) SHA1(2b9859ae6cabfdb9c70f94ccc38a271caf6539aa) )  // created to match game
 
-	ROM_REGION(0x4000, "nvram", 0) /* Default NVRAM */
+	ROM_REGION(0x4000, "nvram", 0)  // Default NVRAM
 	ROM_LOAD( "dallaspk.nv", 0x0000, 0x4000, CRC(4886d292) SHA1(d06bbeb06c7bc407cb1cf6f2a6d266e578d359e2) )
 ROM_END
 
@@ -2149,18 +2150,53 @@ ROM_START( kajotcrd )
 	ROM_REGION( 0x0100, "sereeprom", 0 )  // Serial EPROM
 	ROM_LOAD("x24c02.ic26",    0x0000, 0x0100, CRC(0f143d6f) SHA1(c293728a997cd0868705dced55955072c6ebf5c0) )
 
-	ROM_REGION(0x8, "serial_id", 0) /* serial number */
-	ROM_LOAD( "ds2401", 0x000000, 0x000008, BAD_DUMP CRC(3f87b999) SHA1(29649749d521ced9dc7ef1d0d6ddb9a8beea360f) ) // created to match game
+	ROM_REGION(0x8, "serial_id", 0)  // serial number
+	ROM_LOAD( "ds2401", 0x000000, 0x000008, BAD_DUMP CRC(3f87b999) SHA1(29649749d521ced9dc7ef1d0d6ddb9a8beea360f) )  // created to match game
 ROM_END
+
+
+/*
+  Lucky 7i
+  Ver 04/91a
+  2 bytes of difference.
+
+  Early board.
+
+*/
+ROM_START( lucky7x )
+	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
+	ROM_LOAD16_WORD_SWAP( "nosticker_d27c210_6.bin", 0x00000, 0x20000, CRC(abff21e2) SHA1(88f8265114bbe9ed5004f97d4b3cdc7ae9c3d1e4) )
+	ROM_LOAD16_WORD_SWAP( "nosticker_d27c210_5.bin", 0x20000, 0x20000, CRC(b4da8856) SHA1(a33158d75047561fa9674ceb6b22cc63b5b49aed) )
+
+	ROM_REGION(0x4d, "ds1210", 0)  // timekey
+	ROM_LOAD( "ds1210.bin", 0x000000, 0x00004d, BAD_DUMP CRC(7b838ea7) SHA1(5c22b789251becd20f56f944b76c5b779e5a8892) )  // taken from lucky7i
+
+	ROM_REGION(0x4000, "nvram", 0)  // Default NVRAM
+	ROM_LOAD( "lucky7i.nv", 0x0000, 0x4000, BAD_DUMP CRC(51960419) SHA1(ef7f9d7d9714fda0af23b311232194567887a264) )  // taken from lucky7i
+ROM_END
+
+/*
+  Jolly Joker?
+  Ver 11/90b
+
+  Early board.
+
+*/
+ROM_START( jjokeri )
+	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
+	ROM_LOAD16_WORD_SWAP( "g55_6__d27c210.bin", 0x00000, 0x20000, CRC(e208598b) SHA1(697b37e39025d31de6f37bd8bd59b35cee998e63) )
+	ROM_LOAD16_WORD_SWAP( "g55_5__d27c210.bin", 0x20000, 0x20000, CRC(997d4de9) SHA1(47d46b4be99f4d62e23b78219c5f186476b93701) )
+ROM_END
+
 
 } // anonymous namespace
 
 
-/*************************
-*      Game Drivers      *
-*************************/
+/*********************************************
+*                Game Drivers                *
+*********************************************/
 
-//    YEAR  NAME       PARENT    MACHINE          INPUT     STATE           INIT           ROT    COMPANY   FULLNAME                                     FLAGS
+//    YEAR  NAME        PARENT    MACHINE         INPUT      STATE           INIT        ROT    COMPANY      FULLNAME                                     FLAGS
 
 GAME( 1994, magicard,   0,        magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v2.01)",                         MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1994, magicrd1,   0,        magicard_pic56, magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.10 14.09.94)",                MACHINE_SUPPORTS_SAVE )
@@ -2180,6 +2216,9 @@ GAME( 1999, quingo,     0,        magicle,        hotslots,  hotslots_state, emp
 GAME( 1999, belslots,   0,        magicle,        hotslots,  hotslots_state, empty_init, ROT0, "Impera",    "Bel Slots Export (5.01)",                    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 2001, bigdeal0,   0,        magicle,        magicard,  hotslots_state, empty_init, ROT0, "Impera",    "Big Deal Belgien (5.04)",                    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 199?, puzzleme,   0,        puzzleme,       puzzleme,  hotslots_state, empty_init, ROT0, "Impera",    "Puzzle Me!",                                 MACHINE_SUPPORTS_SAVE )
-GAME( 1991, lucky7i,    0,        magicard,       lucky7i,   magicard_state, empty_init, ROT0, "Impera",    "Lucky 7 (Impera) V04/91a",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1991, lucky7i,    0,        magicard,       lucky7i,   magicard_state, empty_init, ROT0, "Impera",    "Lucky 7 (Impera, V04/91a, set 1)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1993, dallaspk,   0,        magicard,       dallaspk,  magicard_state, empty_init, ROT0, "<unknown>", "Dallas Poker",                               MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1993, kajotcrd,   0,        hotslots,       magicard,  hotslots_state, empty_init, ROT0, "Amatic",    "Kajot Card (Version 1.01, Wien Euro)",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+
+GAME( 1991, lucky7x,    lucky7i,  magicard,       lucky7i,   magicard_state, empty_init, ROT0, "Impera",    "Lucky 7 (Impera, V04/91a, set 2)",           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1991, jjokeri,    0,        magicard,       lucky7i,   magicard_state, empty_init, ROT0, "Impera",    "Jolly Joker? (Impera, V11/90b)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

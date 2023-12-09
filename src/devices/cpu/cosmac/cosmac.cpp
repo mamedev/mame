@@ -358,27 +358,27 @@ DEFINE_DEVICE_TYPE(CDP1806, cdp1806_device, "cdp1806", "RCA CDP1806")
 //  cosmac_device - constructor
 //-------------------------------------------------
 
-cosmac_device::cosmac_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, type, tag, owner, clock),
-		cosmac_disassembler::config(),
-		m_program_config("program", ENDIANNESS_LITTLE, 8, 16),
-		m_io_config("io", ENDIANNESS_LITTLE, 8, 3),
-		m_read_wait(*this),
-		m_read_clear(*this),
-		m_read_ef(*this),
-		m_write_q(*this),
-		m_read_dma(*this),
-		m_write_dma(*this),
-		m_write_sc(*this),
-		m_write_tpb(*this),
-		m_state(cosmac_state::STATE_1_INIT),
-		m_mode(cosmac_mode::RESET),
-		m_pmode(cosmac_mode::RUN),
-		m_wait(true),
-		m_clear(true),
-		m_irq(CLEAR_LINE),
-		m_dmain(CLEAR_LINE),
-		m_dmaout(CLEAR_LINE)
+cosmac_device::cosmac_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	cpu_device(mconfig, type, tag, owner, clock),
+	cosmac_disassembler::config(),
+	m_program_config("program", ENDIANNESS_LITTLE, 8, 16),
+	m_io_config("io", ENDIANNESS_LITTLE, 8, 3),
+	m_read_wait(*this, 0),
+	m_read_clear(*this, 0),
+	m_read_ef(*this, 0),
+	m_write_q(*this),
+	m_read_dma(*this, 0),
+	m_write_dma(*this),
+	m_write_sc(*this),
+	m_write_tpb(*this),
+	m_state(cosmac_state::STATE_1_INIT),
+	m_mode(cosmac_mode::RESET),
+	m_pmode(cosmac_mode::RUN),
+	m_wait(true),
+	m_clear(true),
+	m_irq(CLEAR_LINE),
+	m_dmain(CLEAR_LINE),
+	m_dmaout(CLEAR_LINE)
 {
 	for (auto & elem : m_ef)
 		elem = CLEAR_LINE;
@@ -477,16 +477,6 @@ void cosmac_device::device_start()
 	m_cnt_load = 0;
 	m_cnt_count = 0;
 	m_cnt_timer = timer_alloc(FUNC(cosmac_device::cnt_timerout), this);
-
-	// resolve callbacks
-	m_read_wait.resolve();
-	m_read_clear.resolve();
-	m_read_ef.resolve_all();
-	m_write_q.resolve_safe();
-	m_read_dma.resolve_safe(0);
-	m_write_dma.resolve_safe();
-	m_write_sc.resolve_safe();
-	m_write_tpb.resolve_safe();
 
 	// get our address spaces
 	space(AS_PROGRAM).cache(m_cache);
@@ -940,11 +930,11 @@ inline void cosmac_device::debug()
 
 inline void cosmac_device::sample_wait_clear()
 {
-	if (!m_read_wait.isnull()) m_wait = m_read_wait();
-	if (!m_read_clear.isnull()) m_clear = m_read_clear();
+	if (!m_read_wait.isunset()) m_wait = m_read_wait();
+	if (!m_read_clear.isunset()) m_clear = m_read_clear();
 
 	m_pmode = m_mode;
-	m_mode = (cosmac_mode) ((m_clear << 1) | m_wait);
+	m_mode = cosmac_mode((m_clear << 1) | m_wait);
 }
 
 
@@ -955,7 +945,7 @@ inline void cosmac_device::sample_wait_clear()
 inline void cosmac_device::sample_ef_lines()
 {
 	for (int i = 0; i < 4; i++)
-		EF[i] = m_read_ef[i].isnull() ? m_ef_line[i] : m_read_ef[i]();
+		EF[i] = m_read_ef[i].isunset() ? m_ef_line[i] : m_read_ef[i]();
 }
 
 

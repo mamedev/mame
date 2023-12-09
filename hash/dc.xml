@@ -740,7 +740,8 @@ Black screen [GDROM]
 		<year>2002</year>
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
-Punts to BIOS at start of loading [GDROM]
+Punts to BIOS at start of loading [GDROM READY] (fixed)
+[PVR] title screen text blink don't mix properly with logo
 ]]></notes>
 		<info name="serial" value="HDR-0154"/>
 		<!-- Disc ID: 673-03371 -->
@@ -1141,7 +1142,7 @@ Punts to BIOS at start of loading [GDROM]
 		<year>2004</year>
 		<publisher>Pionesoft</publisher>
 		<notes><![CDATA[
-Punts to BIOS at start of loading [GDROM], locks up
+Punts to BIOS at start of loading [GDROM READY], locks up (fixed)
 ]]></notes>
 		<info name="serial" value="T-18705M"/>
 		<!-- Disc Serial: T-18705M/T-18706M -->
@@ -1222,7 +1223,7 @@ Punts to BIOS at start of loading [GDROM]
 		<year>2001</year>
 		<publisher>NEC Interchannel</publisher>
 		<notes><![CDATA[
-Punts to BIOS at start of loading [GDROM]
+Punts to BIOS at start of loading [GDROM READY] (fixed)
 ]]></notes>
 		<info name="serial" value="T-20112M"/>
 		<info name="release" value="20010920"/>
@@ -1891,7 +1892,7 @@ Punts to BIOS at start of loading [GDROM]
 		<year>2001</year>
 		<publisher>NEC Interchannel</publisher>
 		<notes><![CDATA[
-No [redbook] audio
+No [AICA] audio on opening FMV
 ]]></notes>
 		<info name="serial" value="T-20107M"/>
 		<info name="release" value="20010412"/>
@@ -1914,7 +1915,8 @@ No [redbook] audio
 		<year>2005</year>
 		<publisher>Pionesoft</publisher>
 		<notes><![CDATA[
-Punts to BIOS at start of loading [GDROM]
+Punts to BIOS at start of loading [GDROM READY] (fixed)
+[PVR] dire performance at (static) title screen
 ]]></notes>
 		<info name="serial" value="T-18712M"/>
 		<info name="release" value="20050224"/>
@@ -1982,7 +1984,8 @@ Punts to BIOS at start of loading [GDROM]
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
-Punts to BIOS at start of loading [GDROM]
+Punts to BIOS at start of loading [GDROM READY] (fixed)
+Hangs at "Now loading" screen [GDROM]?
 ]]></notes>
 		<info name="serial" value="HDR-0075"/>
 		<info name="release" value="20001207"/>
@@ -2229,7 +2232,7 @@ Optional [BBA] support
 		<year>2004</year>
 		<publisher>Alchemist</publisher>
 		<notes><![CDATA[
-Punts to BIOS at start of loading [GDROM]
+Punts to BIOS at start of loading [GDROM READY] (fixed)
 ]]></notes>
 		<info name="serial" value="T-47110M"/>
 		<info name="release" value="20041028"/>
@@ -2417,7 +2420,9 @@ Punts to BIOS at start of loading [GDROM]
 		<year>1999</year>
 		<publisher>ESP</publisher>
 		<notes><![CDATA[
-Punts to BIOS at start of loading [GDROM], locks up
+Punts to BIOS at start of loading [GDROM READY], locks up (fixed)
+Has [redbook] audio
+Doesn't update [PVR] cursor on no [VMU] screen and title screen
 ]]></notes>
 		<info name="serial" value="T-38702M"/>
 		<info name="release" value="19991209"/>
@@ -2440,7 +2445,7 @@ Punts to BIOS at start of loading [GDROM], locks up
 		<year>2000</year>
 		<publisher>Visco</publisher>
 		<notes><![CDATA[
-Black screen [GDROM]
+Black screen [GDROM READY] (fixed)
 ]]></notes>
 		<info name="serial" value="T-5801M"/>
 		<info name="release" value="20001221"/>
@@ -3165,7 +3170,7 @@ Black screen [GDROM]
 		<year>2002</year>
 		<publisher>Fujicom</publisher>
 		<notes><![CDATA[
-Punts to BIOS at start of loading [GDROM]
+Punts to BIOS at start of loading [GDROM READY] (fixed)
 ]]></notes>
 		<info name="serial" value="T-42904M"/>
 		<info name="release" value="20020124"/>
@@ -3238,7 +3243,8 @@ Punts to BIOS at start of loading [GDROM]
 		<year>2001</year>
 		<publisher>Bimboosoft</publisher>
 		<notes><![CDATA[
-No [redbook] audio
+Ugly Bimboosoft [PVR] render at startup
+Has [redbook] audio
 ]]></notes>
 		<info name="serial" value="T-41202M"/>
 		<info name="release" value="20010920"/>
@@ -3284,6 +3290,9 @@ No [redbook] audio
 		<description>Bomber Hehhe! (Japan)</description>
 		<year>2002</year>
 		<publisher>Fujicom</publisher>
+		<notes><![CDATA[
+[PVR] ignores alpha for TV-like scanline effects on main menu
+]]></notes>
 		<info name="serial" value="T-42903M"/>
 		<info name="release" value="20020110"/>
 		<info name="alt_title" value="ボンバーヘッヘ"/>
@@ -3305,6 +3314,9 @@ No [redbook] audio
 		<description>Bomberman Online (USA)</description>
 		<year>2001</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+[PVR] bomb explosions draws empty at center
+]]></notes>
 		<info name="serial" value="51065"/>
 		<info name="release" value="20011030"/>
 		<part interface="cdrom" name="cdrom">
@@ -3343,7 +3355,8 @@ No [redbook] audio
 		<year>2003</year>
 		<publisher>G.rev</publisher>
 		<notes><![CDATA[
-Punts to BIOS at start of loading [GDROM]
+Punts to BIOS at start of loading [GDROM READY] (fixed)
+[PVR] ugly cutoff of background at VMU screen
 ]]></notes>
 		<info name="serial" value="T-46703M"/>
 		<info name="release" value="20030925"/>
@@ -3769,7 +3782,7 @@ Built on Windows CE, requires [MMU] support
 		<year>2003</year>
 		<publisher>Princess Soft</publisher>
 		<notes><![CDATA[
-Black screen [GDROM]
+Black screen [GDROM READY] (fixed)
 ]]></notes>
 		<info name="serial" value="T-46513M"/>
 		<info name="release" value="20030529"/>
@@ -3793,7 +3806,8 @@ Black screen [GDROM]
 		<year>2001</year>
 		<publisher>NEC Interchannel</publisher>
 		<notes><![CDATA[
-Punts to BIOS at start of loading [GDROM]
+Punts to BIOS at start of loading [GDROM READY] (fixed)
+[PVR] logo reel do ugly fade-ins/-outs
 ]]></notes>
 		<info name="serial" value="T-20111M"/>
 		<info name="release" value="20010823"/>
@@ -3915,11 +3929,12 @@ Punts to BIOS at start of loading [GDROM]
 		<year>2001</year>
 		<publisher>NEC Interchannel</publisher>
 		<notes><![CDATA[
-Punts to BIOS at start of loading [GDROM]
+Punts to BIOS at start of loading [GDROM READY] (fixed)
 ]]></notes>
 		<info name="serial" value="T-20108M"/>
 		<info name="release" value="20010405"/>
 		<info name="alt_title" value="Canvas 〜セピア色のモチーフ〜"/>
+		<info name="developer" value="Cocktail Soft"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
 				<disk name="canvas sepia-iro no motif (jpn)" sha1="a4f5b577a5452d6783750506f593727b45314623"/>
@@ -4136,7 +4151,7 @@ Hangs on ADX logo with [drc]
 		<year>2002</year>
 		<publisher>Abel</publisher>
 		<notes><![CDATA[
-Punts to BIOS at start of loading [GDROM]
+Punts to BIOS at start of loading [GDROM READY] (fixed)
 ]]></notes>
 		<info name="serial" value="T-44405M"/>
 		<info name="release" value="20020328"/>
@@ -4171,7 +4186,7 @@ Punts to BIOS at start of loading [GDROM]
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
-Black screen [GDROM], [SH4] jumps to lalaland
+Black screen [GDROM READY] (fixed)
 ]]></notes>
 		<info name="serial" value="HDR-0115, HDR-0132 (Limited Box)"/>
 		<info name="release" value="20001228"/>
@@ -4469,7 +4484,7 @@ Crashes after ADX logo with [drc]
 		<year>2004</year>
 		<publisher>Milestone Inc.</publisher>
 		<notes><![CDATA[
-Punts to BIOS at start of loading [GDROM], locks up
+Punts to BIOS at start of loading [GDROM READY], locks up (fixed)
 ]]></notes>
 		<info name="serial" value="T-47801M"/>
 		<info name="release" value="20041216"/>
@@ -4487,7 +4502,7 @@ Punts to BIOS at start of loading [GDROM], locks up
 		<year>2004</year>
 		<publisher>Milestone Inc.</publisher>
 		<notes><![CDATA[
-Punts to BIOS at start of loading [GDROM], locks up
+Punts to BIOS at start of loading [GDROM READY], locks up (fixed)
 ]]></notes>
 		<info name="serial" value="T-47801M, STRV-002 (Bonus CD)"/>
 		<info name="release" value="20041216"/>
@@ -4512,7 +4527,7 @@ Punts to BIOS at start of loading [GDROM], locks up
 		<year>2004</year>
 		<publisher>Milestone Inc.</publisher>
 		<notes><![CDATA[
-Punts to BIOS at start of loading [GDROM], locks up
+Punts to BIOS at start of loading [GDROM READY], locks up (fixed)
 ]]></notes>
 		<info name="serial" value="T-47801M, STRV-003 (Bonus CD)"/>
 		<info name="release" value="20050224"/>
@@ -4777,7 +4792,7 @@ Built on Windows CE, requires [MMU] support
 		<year>2003</year>
 		<publisher>Alchemist</publisher>
 		<notes><![CDATA[
-Punts to BIOS at start of loading [GDROM], locks up
+Punts to BIOS at start of loading [GDROM READY], locks up (fixed)
 ]]></notes>
 		<info name="serial" value="T-47107M"/>
 		<info name="release" value="20031225"/>
@@ -4801,7 +4816,7 @@ Punts to BIOS at start of loading [GDROM], locks up
 		<year>2003</year>
 		<publisher>Alchemist</publisher>
 		<notes><![CDATA[
-Punts to BIOS at start of loading [GDROM], locks up
+Punts to BIOS at start of loading [GDROM READY], locks up (fixed)
 ]]></notes>
 		<info name="serial" value="610-8395"/>
 		<info name="alt_title" value="ショコラ 〜maid cafe “curio”〜 体験版"/>
@@ -5393,7 +5408,7 @@ Overly stretched [PVR] output (displays top right of actual screen, SCALER_CTL)
 		<year>2001</year>
 		<publisher>AquaPlus</publisher>
 		<notes><![CDATA[
-Punts to BIOS at start of loading [GDROM]
+Punts to BIOS at start of loading [GDROM READY] (fixed)
 ]]></notes>
 		<info name="serial" value="T-38301M, T-38302M (Shokai Genteiban)"/>
 		<info name="release" value="20010809"/>
@@ -5464,7 +5479,8 @@ Punts to BIOS at start of loading [GDROM]
 		<year>2001</year>
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
-Punts to BIOS at start of loading [GDROM]
+Punts to BIOS at start of loading [GDROM READY] (fixed)
+[PVR] ROP bug for title screen composition
 ]]></notes>
 		<info name="serial" value="HDR-0160"/>
 		<info name="release" value="20010614"/>
@@ -5625,7 +5641,7 @@ Punts to BIOS at start of loading [GDROM]
 		<year>2001</year>
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
-Crashes at "Produced by Sega"
+Crashes at "Produced by Sega" [GDROM READY] (fixed)
 ]]></notes>
 		<info name="serial" value="HDR-0176"/>
 		<info name="release" value="20010913"/>
@@ -5650,7 +5666,7 @@ Crashes at "Produced by Sega"
 		<year>2001</year>
 		<publisher>Hackberry</publisher>
 		<notes><![CDATA[
-Punts to BIOS at start of loading [GDROM], locks up
+Punts to BIOS at start of loading [GDROM READY], locks up (fixed)
 ]]></notes>
 		<info name="serial" value="T-45801M"/>
 		<info name="release" value="20010802"/>
@@ -5852,7 +5868,8 @@ Punts to BIOS at start of loading [GDROM], locks up
 		<year>2001</year>
 		<publisher>Media Factory</publisher>
 		<notes><![CDATA[
-Hangs at "Produced by Sega", [GDROM] keeps reading LBA=$afbe with REQ_ERROR 13h
+Hangs at "Produced by Sega", [GDROM READY] keeps reading LBA=$afbe with REQ_ERROR 13h (fixed)
+[PVR] ROP bug for title screen text
 ]]></notes>
 		<info name="serial" value="T-43903M"/>
 		<info name="release" value="20010712"/>
@@ -6064,7 +6081,8 @@ Hangs at "Produced by Sega", [GDROM] keeps reading LBA=$afbe with REQ_ERROR 13h
 		<year>2001</year>
 		<publisher>Princess Soft</publisher>
 		<notes><![CDATA[
-Black screen [GDROM]
+Black screen [GDROM READY] (fixed)
+No [PVR] renders/black screen on FMV and title screen (sound plays, setup [fb_r_ctrl] [fb_w_ctrl] [fb_w_linestride] to 0)
 ]]></notes>
 		<info name="serial" value="T-46502M, T-46552M (Alt. Audio CD)"/>
 		<info name="release" value="20011025"/>
@@ -7384,7 +7402,7 @@ Black screen [GDROM]
 		<publisher>Hudson</publisher>
 		<notes><![CDATA[
 Test case for [PVR] flickerfree feature
-No [redbook] audio
+Has [redbook] audio (title screen)
 ]]></notes>
 		<info name="serial" value="T-14305M"/>
 		<info name="release" value="19990722"/>
@@ -8145,7 +8163,7 @@ Hardlocks MAME if left idle on title screen with [drc]
 		<year>2002</year>
 		<publisher>G.rev</publisher>
 		<notes><![CDATA[
-Punts to BIOS at start of loading [GDROM]
+Punts to BIOS at start of loading [GDROM READY] (fixed)
 ]]></notes>
 		<info name="serial" value="T-46701M"/>
 		<info name="release" value="20020131"/>
@@ -8348,7 +8366,7 @@ Punts to BIOS at start of loading [GDROM]
 		<year>1999</year>
 		<publisher>Softbank</publisher>
 		<notes><![CDATA[
-No [redbook] audio
+Goes silent on title/attract (btanb)
 ]]></notes>
 		<info name="serial" value="610-7164"/>
 		<info name="release" value="19990723"/>
@@ -8381,7 +8399,7 @@ No [redbook] audio
 		<year>1999</year>
 		<publisher>Softbank</publisher>
 		<notes><![CDATA[
-No [redbook] audio
+Goes silent on title/attract (btanb)
 ]]></notes>
 		<info name="serial" value="610-7164-02 (Disc 1), 610-7164-03 (Disc 2)"/>
 		<info name="release" value="19990827"/>
@@ -8476,7 +8494,7 @@ No [redbook] audio
 		<year>2000</year>
 		<publisher>Softbank</publisher>
 		<notes><![CDATA[
-No [redbook] audio
+Goes silent on title/attract (btanb)
 ]]></notes>
 		<info name="serial" value="610-7164-06"/>
 		<info name="release" value="20000707"/>
@@ -8500,7 +8518,7 @@ No [redbook] audio
 		<year>2000</year>
 		<publisher>Softbank</publisher>
 		<notes><![CDATA[
-No [redbook] audio
+Goes silent on title/attract (btanb)
 ]]></notes>
 		<info name="serial" value="610-7164-07"/>
 		<info name="release" value="20000811"/>
@@ -8524,7 +8542,12 @@ No [redbook] audio
 		<year>2000</year>
 		<publisher>Softbank</publisher>
 		<notes><![CDATA[
-No [redbook] audio
+Goes silent on title/attract (btanb)
+deSPIRIA:
+OutTrigger: crashes during loading with big [GDROM] transfer [drc]
+18 Wheeler:
+Illbleed:
+Capcom vs SNK:
 ]]></notes>
 		<info name="serial" value="610-7164-08"/>
 		<info name="release" value="20000929"/>
@@ -8560,7 +8583,13 @@ No [redbook] audio
 		<year>2000</year>
 		<publisher>Softbank</publisher>
 		<notes><![CDATA[
-No [redbook] audio
+Goes silent on title/attract (btanb)
+Virtua Tennis: fails [GDROM READY] loading, punts to game select (fixed)
+Heavy [PVR] issues (too many to list)
+Guilty Gear X:
+Marionette Handler 2:
+Tricolore Crise (FMV):
+Moero! Justice Gakuen (FMV):
 ]]></notes>
 		<info name="serial" value="610-7164-09"/>
 		<info name="release" value="20001127"/>
@@ -8585,7 +8614,7 @@ No [redbook] audio
 		<year>2000</year>
 		<publisher>Softbank</publisher>
 		<notes><![CDATA[
-No [redbook] audio
+Goes silent on title/attract (btanb)
 ]]></notes>
 		<info name="serial" value="610-7164-10"/>
 		<info name="release" value="20001229"/>
@@ -8610,7 +8639,8 @@ No [redbook] audio
 		<year>2001</year>
 		<publisher>Softbank</publisher>
 		<notes><![CDATA[
-No [redbook] audio
+Goes silent on title/attract (btanb)
+[AICA] sound crackling on game select menu
 ]]></notes>
 		<info name="serial" value="610-7164-11"/>
 		<info name="release" value="20010209"/>
@@ -8635,7 +8665,7 @@ No [redbook] audio
 		<year>2001</year>
 		<publisher>Softbank</publisher>
 		<notes><![CDATA[
-No [redbook] audio
+Goes silent on title/attract (btanb)
 ]]></notes>
 		<info name="serial" value="610-7164-12"/>
 		<info name="release" value="20010330"/>
@@ -8660,7 +8690,7 @@ No [redbook] audio
 		<year>2001</year>
 		<publisher>Softbank</publisher>
 		<notes><![CDATA[
-No [redbook] audio
+Goes silent on title/attract (btanb)
 ]]></notes>
 		<info name="serial" value="610-7164-13"/>
 		<info name="release" value="2001"/>
@@ -11707,7 +11737,7 @@ Doesn't detect key repeat properly in main menu (inputs get stuck), [Maple] timi
 		<year>2001</year>
 		<publisher>Capcom</publisher>
 		<notes><![CDATA[
-Punts to BIOS at start of loading [GDROM]
+Punts to BIOS at start of loading [GDROM READY] (fixed)
 ]]></notes>
 		<info name="serial" value="T-1227M"/>
 		<info name="release" value="20010606"/>
@@ -11730,7 +11760,7 @@ Punts to BIOS at start of loading [GDROM]
 		<year>2001</year>
 		<publisher>Capcom</publisher>
 		<notes><![CDATA[
-Punts to BIOS at start of loading [GDROM]
+Punts to BIOS at start of loading [GDROM READY] (fixed)
 ]]></notes>
 		<info name="serial" value="T-1228M"/>
 		<info name="release" value="20010808"/>
@@ -11753,7 +11783,7 @@ Punts to BIOS at start of loading [GDROM]
 		<year>2001</year>
 		<publisher>Capcom</publisher>
 		<notes><![CDATA[
-Punts to BIOS at start of loading [GDROM]
+Punts to BIOS at start of loading [GDROM READY] (fixed)
 ]]></notes>
 		<info name="serial" value="T-1229M"/>
 		<info name="release" value="20011010"/>
@@ -11817,7 +11847,7 @@ Punts to BIOS at start of loading [GDROM]
 		<year>2002</year>
 		<publisher>NEC Interchannel</publisher>
 		<notes><![CDATA[
-Punts to BIOS at start of loading [GDROM]
+Punts to BIOS at start of loading [GDROM READY] (fixed)
 ]]></notes>
 		<info name="serial" value="T-20116M"/>
 		<info name="release" value="20020725"/>
@@ -12030,7 +12060,7 @@ Hardlocks MAME after event "how to play" with [drc]
 		<year>2001</year>
 		<publisher>NetVillage</publisher>
 		<notes><![CDATA[
-Punts to BIOS at start of loading [GDROM]
+Punts to BIOS at start of loading [GDROM READY] (fixed)
 ]]></notes>
 		<info name="serial" value="T-39802M"/>
 		<info name="release" value="20010322"/>
@@ -12328,7 +12358,7 @@ Punts to BIOS at start of loading [GDROM]
 		<year>2001</year>
 		<publisher>Abel</publisher>
 		<notes><![CDATA[
-Punts to BIOS at start of loading [GDROM]
+Punts to BIOS at start of loading [GDROM READY] (fixed)
 ]]></notes>
 		<info name="serial" value="T-44404M"/>
 		<info name="release" value="20010531"/>
@@ -12648,7 +12678,8 @@ Punts to BIOS at start of loading [GDROM]
 		<year>1999</year>
 		<publisher>Video System</publisher>
 		<notes><![CDATA[
-No [redbook] audio
+Has [redbook] audio
+[PVR] Z-fighting on car select, specifically front wings
 ]]></notes>
 		<info name="serial" value="T-3001M"/>
 		<info name="release" value="19991125"/>
@@ -13085,7 +13116,8 @@ Gameplay requires [PVR] user tile clip
 		<year>2001</year>
 		<publisher>SNK</publisher>
 		<notes><![CDATA[
-Punts to BIOS at start of loading [GDROM], locks up
+Punts to BIOS at start of loading [GDROM READY], locks up (fixed)
+Hangs on SNK logo
 ]]></notes>
 		<info name="serial" value="T-3108M, T-47302M (SNK Best Buy)"/>
 		<info name="release" value="20010927"/>
@@ -13401,7 +13433,10 @@ Punts to BIOS at start of loading [GDROM], locks up
 		<year>2001</year>
 		<publisher>Spike</publisher>
 		<notes><![CDATA[
-No [redbook] audio
+Has [redbook] audio
+[PVR] goes blank during first frames, should display white over black screen before CD audio starts up
+[PVR] ROP bug for end intro title/pre-match presentation flames
+[PVR] user tile clip for referee on exibition match setup
 ]]></notes>
 		<info name="serial" value="T-18804M, T-18805M"/>
 		<info name="release" value="20010301"/>
@@ -13431,7 +13466,8 @@ No [redbook] audio
 		<year>2002</year>
 		<publisher>Broccoli</publisher>
 		<notes><![CDATA[
-Hangs at "Produced by Sega", [GDROM] reads LBA=$afd8 and $afdc (same as culdcept2?)
+Hangs at "Produced by Sega", [GDROM READY] (fixed)
+Too fast ADX logo transition
 ]]></notes>
 		<info name="serial" value="T-46305M"/>
 		<!-- JASRAC ID: V-021068 -->
@@ -13485,7 +13521,8 @@ Hangs at "Produced by Sega", [GDROM] reads LBA=$afd8 and $afdc (same as culdcept
 		<year>2002</year>
 		<publisher>Broccoli</publisher>
 		<notes><![CDATA[
-Hangs at "Produced by Sega", [GDROM] reads LBA=$afd8 and $afdc (same as culdcept2?)
+Hangs at "Produced by Sega", [GDROM READY] (fixed)
+Too fast ADX logo transition
 ]]></notes>
 		<info name="serial" value="T-46304M"/>
 		<!-- JASRAC ID: V-021068 -->
@@ -13593,8 +13630,10 @@ Hangs at "Produced by Sega", [GDROM] reads LBA=$afd8 and $afdc (same as culdcept
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
 [PVR] safety cars in attract mode have ugly renders
-Black screen on title, [PVR] wrong ROP?
-Checkered flag is blackened on main menu [PVR]
+[PVR] Black screen on title
+[PVR] Checkered flag is blackened on main menu with [drc]
+Hangs after selecting car with [drc]
+[PVR] Gameplay rear mirrors draws garbage
 ]]></notes>
 		<info name="serial" value="HDR-0013"/>
 		<info name="release" value="19990325"/>
@@ -15229,7 +15268,7 @@ Hangs on FMV with [drc]
 		<year>2001</year>
 		<publisher>Softmax</publisher>
 		<notes><![CDATA[
-Punts to BIOS at start of loading [GDROM]
+Punts to BIOS at start of loading [GDROM READY] (fixed)
 ]]></notes>
 		<info name="serial" value="T-44501M"/>
 		<info name="release" value="20010125"/>
@@ -15664,8 +15703,8 @@ Punts to BIOS at start of loading [GDROM]
 		<year>2000</year>
 		<publisher>Sammy</publisher>
 		<notes><![CDATA[
-[PVR] tester for bare polygons wrong normals (in training)
-No [redbook] audio
+[PVR] wrong normals for bare polygons HP bars in gameplay
+Has [redbook] audio
 ]]></notes>
 		<info name="serial" value="T-2402M"/>
 		<info name="release" value="20001214"/>
@@ -15752,7 +15791,7 @@ No [redbook] audio
 		<year>2000</year>
 		<publisher>Sammy</publisher>
 		<notes><![CDATA[
-No [redbook] audio
+Has [redbook] audio
 ]]></notes>
 		<info name="serial" value="610-7937"/>
 		<info name="alt_title" value="GUILTY GEAR X 体験版"/>
@@ -16029,7 +16068,7 @@ Optional [BBA] support
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
 Optional [BBA] support
-Punts to BIOS at start of loading [GDROM]
+Punts to BIOS at start of loading [GDROM READY] (fixed)
 ]]></notes>
 		<info name="serial" value="HDR-0195"/>
 		<info name="release" value="20020314"/>
@@ -16191,7 +16230,8 @@ Built on Windows CE, requires [MMU] support
 		<year>2001</year>
 		<publisher>NEC Interchannel</publisher>
 		<notes><![CDATA[
-Punts to BIOS at start of loading [GDROM]
+Punts to BIOS at start of loading [GDROM READY] (fixed)
+[PVR] title screen text doesn't blend properly
 ]]></notes>
 		<info name="serial" value="T-20106M"/>
 		<info name="release" value="20010322"/>
@@ -16337,7 +16377,7 @@ Punts to BIOS at start of loading [GDROM]
 		<year>2000</year>
 		<publisher>Capcom</publisher>
 		<notes><![CDATA[
-No [redbook] audio
+Has [redbook] audio
 ]]></notes>
 		<info name="serial" value="T-2202M"/>
 		<info name="release" value="20001026"/>
@@ -16569,7 +16609,8 @@ Built on Windows CE, requires [MMU] support
 		<year>2001</year>
 		<publisher>Starfish-SD</publisher>
 		<notes><![CDATA[
-Punts to BIOS at start of loading [GDROM]
+Punts to BIOS at start of loading [GDROM READY] (fixed)
+[PVR] title screen text doesn't blend properly
 ]]></notes>
 		<info name="serial" value="T-46101M"/>
 		<info name="release" value="20010726"/>
@@ -17009,7 +17050,7 @@ FMV draws [PVR] black pixels instead of transparent color
 		<year>2002</year>
 		<publisher>ESP</publisher>
 		<notes><![CDATA[
-Punts to BIOS at start of loading [GDROM], locks up
+Punts to BIOS at start of loading [GDROM READY], locks up (fixed)
 ]]></notes>
 		<info name="serial" value="T-38706M"/>
 		<info name="release" value="20020905"/>
@@ -17175,7 +17216,7 @@ Punts to BIOS at start of loading [GDROM], locks up
 		<year>1998</year>
 		<publisher>Imagineer</publisher>
 		<notes><![CDATA[
-No [redbook] audio
+Has [redbook] audio, requires pause state to kick in during attract
 ]]></notes>
 		<info name="serial" value="T-15001M"/>
 		<info name="release" value="19981217"/>
@@ -17209,7 +17250,7 @@ No [redbook] audio
 		<year>1998</year>
 		<publisher>Imagineer</publisher>
 		<notes><![CDATA[
-No [redbook] audio
+Has [redbook] audio, requires pause state to kick in during attract
 ]]></notes>
 		<info name="serial" value="T-15001M"/>
 		<info name="release" value="19981217"/>
@@ -17331,7 +17372,7 @@ No [redbook] audio
 		<year>2001</year>
 		<publisher>Datam Polystar</publisher>
 		<notes><![CDATA[
-Punts to BIOS at start of loading [GDROM]
+Punts to BIOS at start of loading [GDROM READY] (fixed)
 ]]></notes>
 		<info name="serial" value="T-19506M"/>
 		<info name="release" value="20011108"/>
@@ -17547,7 +17588,7 @@ Crashes on FMV with [drc]
 		<year>2004</year>
 		<publisher>Symbio Planning</publisher>
 		<notes><![CDATA[
-Punts to BIOS at start of loading [GDROM]
+Punts to BIOS at start of loading [GDROM READY] (fixed)
 ]]></notes>
 		<info name="serial" value="T-46902M"/>
 		<info name="release" value="20040129"/>
@@ -17600,7 +17641,7 @@ Punts to BIOS at start of loading [GDROM]
 		<publisher>Visit</publisher>
 		<notes><![CDATA[
 Black screen after initial screen loading with [drc]
-No [redbook] audio
+Has [redbook] audio
 ]]></notes>
 		<info name="serial" value="T-43401M"/>
 		<info name="release" value="20000831"/>
@@ -17625,6 +17666,10 @@ No [redbook] audio
 		<description>Jeremy McGrath Supercross 2000 (USA)</description>
 		<year>2000</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+[PVR] loading and main menu have no background images [drc]
+Fails loading when selecting race [drc]
+]]></notes>
 		<info name="serial" value="T-8104N"/>
 		<info name="release" value="20000808"/>
 		<info name="ring_code" value="1S T-8104N"/>
@@ -17736,7 +17781,8 @@ No [redbook] audio
 		<year>2000</year>
 		<publisher>Bimboosoft</publisher>
 		<notes><![CDATA[
-No [redbook] audio
+Ugly Bimboosoft [PVR] render at startup
+Has [redbook] audio
 ]]></notes>
 		<info name="serial" value="T-41201M"/>
 		<info name="release" value="20001102"/>
@@ -18488,7 +18534,9 @@ Built on Windows CE, requires [MMU] support
 		<year>2007</year>
 		<publisher>Milestone Inc.</publisher>
 		<notes><![CDATA[
-Punts to BIOS at start of loading [GDROM], locks up
+Punts to BIOS at start of loading [GDROM READY], locks up (fixed)
+Hangs on gameplay
+Ugly sample scratches coming from [AICA]
 ]]></notes>
 		<info name="serial" value="T-47803M"/>
 		<info name="release" value="20070308"/>
@@ -18514,7 +18562,8 @@ Punts to BIOS at start of loading [GDROM], locks up
 		<year>2004</year>
 		<publisher>Rain Software</publisher>
 		<notes><![CDATA[
-No [redbook] audio
+Goes silent on title screen (verify)
+cdrom2: [redbook] audio
 ]]></notes>
 		<info name="serial" value="T-47501M"/>
 		<info name="release" value="20040415"/>
@@ -18671,7 +18720,7 @@ No [redbook] audio
 		<year>2002</year>
 		<publisher>Alchemist</publisher>
 		<notes><![CDATA[
-Punts to BIOS at start of loading [GDROM]
+Punts to BIOS at start of loading [GDROM READY] (fixed)
 ]]></notes>
 		<info name="serial" value="T-47101M, T-47102M"/>
 		<info name="release" value="20020926"/>
@@ -18923,7 +18972,8 @@ Built on Windows CE, requires [MMU] support
 		<year>2001</year>
 		<publisher>Success</publisher>
 		<notes><![CDATA[
-Punts to BIOS at start of loading [GDROM]
+Punts to BIOS at start of loading [GDROM READY] (fixed)
+Black screen
 ]]></notes>
 		<info name="serial" value="T-9905M"/>
 		<info name="release" value="20010426"/>
@@ -18948,7 +18998,8 @@ Punts to BIOS at start of loading [GDROM]
 		<year>2002</year>
 		<publisher>Success</publisher>
 		<notes><![CDATA[
-Punts to BIOS at start of loading [GDROM]
+Punts to BIOS at start of loading [GDROM READY] (fixed)
+Black screen
 ]]></notes>
 		<info name="serial" value="T-9906M"/>
 		<info name="release" value="20021128"/>
@@ -19229,6 +19280,10 @@ Hangs after (skipped) FMV, keeps stuck at 0% on loading
 		<description>Legacy of Kain: Soul Reaver (USA)</description>
 		<year>2000</year>
 		<publisher>Eidos Interactive</publisher>
+		<notes><![CDATA[
+Heavy [PVR] texture issues
+Crashes after FMV on few seconds of (broken) GFXs [drc]
+]]></notes>
 		<info name="serial" value="T-36802N"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
@@ -19840,6 +19895,10 @@ Hangs after (skipped) FMV, keeps stuck at 0% on loading
 		<description>Maken X (USA)</description>
 		<year>1999</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+[PVR] missing backface culling during new game intro
+[PVR] texture warps during gameplay
+]]></notes>
 		<info name="serial" value="51050"/>
 		<info name="release" value="19991031"/>
 		<part interface="cdrom" name="cdrom">
@@ -20808,7 +20867,7 @@ Built on Windows CE, requires [MMU] support
 		<year>2002</year>
 		<publisher>FOG</publisher>
 		<notes><![CDATA[
-Punts to BIOS at start of loading [GDROM]
+Punts to BIOS at start of loading [GDROM READY] (fixed)
 ]]></notes>
 		<info name="serial" value="T-36702M"/>
 		<info name="release" value="20020117"/>
@@ -20831,7 +20890,7 @@ Punts to BIOS at start of loading [GDROM]
 		<year>2002</year>
 		<publisher>FOG</publisher>
 		<notes><![CDATA[
-Punts to BIOS at start of loading [GDROM]
+Punts to BIOS at start of loading [GDROM READY] (fixed)
 ]]></notes>
 		<info name="serial" value="T-36703M"/>
 		<info name="release" value="20021024"/>
@@ -20874,7 +20933,8 @@ Punts to BIOS at start of loading [GDROM]
 		<year>2002</year>
 		<publisher>NEC Interchannel</publisher>
 		<notes><![CDATA[
-Punts to BIOS at start of loading [GDROM]
+Punts to BIOS at start of loading [GDROM READY] (fixed)
+[PVR] ugly fade-ins/-outs effects
 ]]></notes>
 		<info name="serial" value="T-20114M"/>
 		<info name="release" value="20020307"/>
@@ -21054,7 +21114,7 @@ Punts to BIOS at start of loading [GDROM]
 		<publisher>Ubisoft</publisher>
 		<notes><![CDATA[
 Wrong [PVR] texture renders in gameplay
-No [redbook] audio
+Has [redbook] audio
 ]]></notes>
 		<info name="serial" value="T-17701M"/>
 		<info name="release" value="19990311"/>
@@ -21502,7 +21562,7 @@ Built on Windows CE, requires [MMU] support
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
-Crashes at "Produced by Sega", PC=C010094
+Crashes at "Produced by Sega" [GDROM READY] (fixed)
 ]]></notes>
 		<info name="serial" value="HDR-0092"/>
 		<info name="release" value="20000928"/>
@@ -21584,6 +21644,9 @@ Crashes at "Produced by Sega", PC=C010094
 		<description>Mr. Driller (USA)</description>
 		<year>2000</year>
 		<publisher>Namco</publisher>
+		<notes><![CDATA[
+Has [redbook] audio
+]]></notes>
 		<info name="serial" value="T-1402N"/>
 		<info name="release" value="20000625"/>
 		<part interface="cdrom" name="cdrom">
@@ -23939,7 +24002,7 @@ cfr. https://github.com/mamedev/mame/issues/9106 for more info.
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
 Check-GD program
-Stuck with a Sega copyright printed on screen
+Stuck with "Please Connect PAD Port A" [Maple]
 ]]></notes>
 		<!--<info name="serial" value="DCFD01"/>-->
 		<info name="serial" value="HKT-999999"/>

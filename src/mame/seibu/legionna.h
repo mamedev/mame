@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "sei021x_sei0220_spr.h"
 #include "seibu_crtc.h"
 #include "seibucop.h"
 
@@ -35,6 +36,7 @@ public:
 		, m_oki(*this, "oki")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
+		, m_spritegen(*this, "spritegen")
 		, m_crtc(*this, "crtc")
 		, m_raiden2cop(*this, "raiden2cop")
 	{
@@ -88,9 +90,11 @@ private:
 	u32 screen_update_heatbrl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_godzilla(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_grainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
+	u32 pri_cb(u8 pri, u8 ext);
+	u32 grainbow_pri_cb(u8 pri, u8 ext);
+	u32 godzilla_tile_cb(u32 code, u8 ext, u8 y);
 	void descramble_legionnaire_gfx(u8* src);
-	void common_video_start(bool split, bool has_extended_banking, bool has_extended_priority);
+	void common_video_start(bool split);
 	void common_video_allocate_ptr();
 
 	void cupsoc_map(address_map &map);
@@ -113,14 +117,10 @@ private:
 	std::unique_ptr<u16[]> m_paletteram;
 	u16 m_layer_disable;
 	std::unique_ptr<u16[]> m_layer_config;
-	int m_sprite_xoffs = 0;
-	int m_sprite_yoffs = 0;
 	tilemap_t *m_background_layer = nullptr;
 	tilemap_t *m_foreground_layer = nullptr;
 	tilemap_t *m_midground_layer = nullptr;
 	tilemap_t *m_text_layer = nullptr;
-	bool m_has_extended_banking = false;
-	bool m_has_extended_priority = false;
 	u16 m_sprite_pri_mask[4]{};
 	u16 m_back_gfx_bank;
 	u16 m_fore_gfx_bank;
@@ -133,6 +133,7 @@ private:
 	required_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<sei0211_device> m_spritegen;
 	required_device<seibu_crtc_device> m_crtc;
 	optional_device<raiden2cop_device> m_raiden2cop;
 };

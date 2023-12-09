@@ -14,7 +14,7 @@
 #include "ieee488.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"
-#include "machine/mos6530n.h"
+#include "machine/mos6530.h"
 #include "bus/scsi/scsi.h"
 
 
@@ -61,14 +61,14 @@ private:
 	uint8_t riot1_pb_r();
 	void riot1_pb_w(uint8_t data);
 	void via_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( ack_w );
-	DECLARE_WRITE_LINE_MEMBER( enable_w );
+	void ack_w(int state);
+	void enable_w(int state);
 	void scsi_data_w(uint8_t data);
 
 	required_device<m6502_device> m_maincpu;
 	required_device<m6502_device> m_hdccpu;
-	required_device<mos6532_new_device> m_riot0;
-	required_device<mos6532_new_device> m_riot1;
+	required_device<mos6532_device> m_riot0;
+	required_device<mos6532_device> m_riot1;
 	required_device<via6522_device> m_via;
 	required_device<scsi_port_device> m_sasibus;
 	required_device<output_latch_device> m_sasi_data_out;

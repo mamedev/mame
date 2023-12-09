@@ -16,7 +16,7 @@
 #include "bus/centronics/ctronics.h"
 #include "bus/ieee488/ieee488.h"
 #include "machine/6821pia.h"
-#include "machine/mos6530n.h"
+#include "machine/mos6530.h"
 
 
 
@@ -50,7 +50,7 @@ protected:
 	virtual int c64_exrom_r(offs_t offset, int sphi2, int ba, int rw) override;
 
 private:
-	required_device<mos6532_new_device> m_riot;
+	required_device<mos6532_device> m_riot;
 	required_device<pia6821_device> m_pia;
 	required_device<ieee488_device> m_bus;
 	required_device<centronics_device> m_centronics;
@@ -61,7 +61,7 @@ private:
 
 	bool m_busy;
 
-	DECLARE_WRITE_LINE_MEMBER( busy_w ) { m_busy = state; }
+	void busy_w(int state) { m_busy = state; }
 };
 
 

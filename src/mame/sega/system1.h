@@ -53,6 +53,7 @@ public:
 	void sys1ppisx_315_5064(machine_config &config);
 	void sys2_317_0007(machine_config &config);
 	void sys1piox_315_5110(machine_config &config);
+	void sys1piox_315_5111(machine_config &config);
 	void sys1piox_315_5065(machine_config &config);
 	void sys2m(machine_config &config);
 	void sys1ppix_315_5178(machine_config &config);
@@ -136,6 +137,7 @@ private:
 	u8 m_tilemap_pages = 0;
 
 	// protection, miscs
+	u8 m_adjust_cycles = 0;
 	u8 m_mute_xor = 0;
 	u8 m_dakkochn_mux_data = 0;
 	u8 m_mcu_control = 0;
@@ -164,6 +166,7 @@ private:
 	void sound_control_w(u8 data);
 
 	// misc handlers
+	void adjust_cycles(u8 data);
 	void mcu_control_w(u8 data);
 	u8 mcu_io_r(offs_t offset);
 	void mcu_io_w(offs_t offset, u8 data);

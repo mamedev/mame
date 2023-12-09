@@ -430,7 +430,7 @@ void truxton2_state::machine_start()
 }
 
 
-WRITE_LINE_MEMBER(toaplan2_state::toaplan2_reset)
+void toaplan2_state::toaplan2_reset(int state)
 {
 	if (m_audiocpu != nullptr)
 		m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
@@ -663,7 +663,7 @@ void toaplan2_state::shared_ram_w(offs_t offset, u8 data)
 }
 
 
-READ_LINE_MEMBER(toaplan2_state::c2map_r)
+int toaplan2_state::c2map_r()
 {
 	// For Teki Paki hardware
 	// bit 4 high signifies secondary CPU is ready
@@ -880,6 +880,24 @@ void toaplan2_state::dogyuun_68k_mem(address_map &map)
 }
 
 
+void toaplan2_state::dogyuunto_68k_mem(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x100000, 0x103fff).ram();
+	map(0x218000, 0x218fff).rw(FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w)).umask16(0x00ff); // reads the same area as the finished game on startup, but then uses only this part
+	map(0x21c01d, 0x21c01d).w(FUNC(toaplan2_state::coin_sound_reset_w)); // Coin count/lock + Z80 reset line
+	map(0x21c020, 0x21c021).portr("IN1");
+	map(0x21c024, 0x21c025).portr("IN2");
+	map(0x21c028, 0x21c029).portr("SYS");
+	map(0x21c02c, 0x21c02d).portr("DSWA");
+	map(0x21c030, 0x21c031).portr("DSWB");
+	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
+	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x500000, 0x50000d).rw(m_vdp[1], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
+	map(0x700000, 0x700001).r(FUNC(toaplan2_state::video_count_r));         // test bit 8
+}
+
+
 void toaplan2_state::kbash_68k_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
@@ -962,13 +980,13 @@ void toaplan2_state::pipibibi_bootleg_68k_mem(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x080000, 0x082fff).ram();
-	map(0x083000, 0x0837ff).rw(m_vdp[0], FUNC(gp9001vdp_device::pipibibi_bootleg_spriteram16_r), FUNC(gp9001vdp_device::pipibibi_bootleg_spriteram16_w));   // SpriteRAM
+	map(0x083000, 0x0837ff).rw(m_vdp[0], FUNC(gp9001vdp_device::bootleg_spriteram16_r), FUNC(gp9001vdp_device::bootleg_spriteram16_w));   // SpriteRAM
 	map(0x083800, 0x087fff).ram();             // SpriteRAM (unused)
 	map(0x0c0000, 0x0c0fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x120000, 0x120fff).ram();             // Copy of SpriteRAM ?
 //  map(0x13f000, 0x13f001).nopw();        // ???
-	map(0x180000, 0x182fff).rw(m_vdp[0], FUNC(gp9001vdp_device::pipibibi_bootleg_videoram16_r), FUNC(gp9001vdp_device::pipibibi_bootleg_videoram16_w)); // TileRAM
-	map(0x188000, 0x18800f).w(m_vdp[0], FUNC(gp9001vdp_device::pipibibi_bootleg_scroll_w));
+	map(0x180000, 0x182fff).rw(m_vdp[0], FUNC(gp9001vdp_device::bootleg_videoram16_r), FUNC(gp9001vdp_device::bootleg_videoram16_w)); // TileRAM
+	map(0x188000, 0x18800f).w(m_vdp[0], FUNC(gp9001vdp_device::bootleg_scroll_w));
 	map(0x190003, 0x190003).r(FUNC(toaplan2_state::shared_ram_r));  // Z80 ready ?
 	map(0x190011, 0x190011).w(FUNC(toaplan2_state::shared_ram_w)); // Z80 task to perform
 	map(0x19c01d, 0x19c01d).w(FUNC(toaplan2_state::coin_w));
@@ -1177,6 +1195,26 @@ void toaplan2_state::snowbro2_68k_mem(address_map &map)
 	map(0x70001c, 0x70001d).portr("SYS");
 	map(0x700031, 0x700031).w(FUNC(toaplan2_state::oki_bankswitch_w<0>));
 	map(0x700035, 0x700035).w(FUNC(toaplan2_state::coin_w));
+}
+
+void toaplan2_state::snowbro2b3_68k_mem(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x100000, 0x10ffff).ram();
+	map(0x404000, 0x404fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x500000, 0x500003).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
+	map(0x600001, 0x600001).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x700004, 0x700005).portr("DSWA");
+	map(0x700008, 0x700009).portr("DSWB");
+	map(0x70000c, 0x70000d).portr("IN1");
+	map(0x700010, 0x700011).portr("IN2");
+	map(0x700014, 0x700015).portr("IN3");
+	map(0x700018, 0x700019).portr("IN4");
+	map(0x700035, 0x700035).w(FUNC(toaplan2_state::coin_w));
+	map(0x700041, 0x700041).w(FUNC(toaplan2_state::oki_bankswitch_w<0>));
+	map(0xff0000, 0xff2fff).rw(m_vdp[0], FUNC(gp9001vdp_device::bootleg_videoram16_r), FUNC(gp9001vdp_device::bootleg_videoram16_w));
+	map(0xff3000, 0xff37ff).rw(m_vdp[0], FUNC(gp9001vdp_device::bootleg_spriteram16_r), FUNC(gp9001vdp_device::bootleg_spriteram16_w));
+	map(0xff8000, 0xff800f).w(m_vdp[0], FUNC(gp9001vdp_device::bootleg_scroll_w));
 }
 
 
@@ -1416,6 +1454,15 @@ void truxton2_state::bbakraid_sound_z80_port(address_map &map)
 	map(0x48, 0x48).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
 	map(0x4a, 0x4a).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));
 	map(0x80, 0x81).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write));
+}
+
+
+void toaplan2_state::dogyuunto_sound_z80_mem(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xc000, 0xc7ff).ram().share(m_shared_ram);
+	map(0xe000, 0xe001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xe004, 0xe004).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
 
@@ -2882,6 +2929,105 @@ static INPUT_PORTS_START( snowbro2 )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( snowbro2b3 )
+	PORT_START("IN1")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_SERVICE1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_TILT )
+	TOAPLAN_TEST_SWITCH( 0x0400, IP_ACTIVE_HIGH )
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("IN3")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(3) PORT_8WAY
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(3) PORT_8WAY
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(3) PORT_8WAY
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(3) PORT_8WAY
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(3)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_START3 )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("IN4")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(4) PORT_8WAY
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(4) PORT_8WAY
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(4) PORT_8WAY
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(4) PORT_8WAY
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(4)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(4)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_START4 )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("DSWA")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Continue_Price ) ) PORT_DIPLOCATION("SW1:!1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x01, "Discount" )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:!2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_HIGH, "SW1:!3" )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:!4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:!5,!6")
+	PORT_DIPSETTING(    0x30, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:!7,!8")
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_6C ) )
+
+	PORT_START("DSWB")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:!1,!2")
+	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Very_Hard ) )
+	PORT_DIPNAME( 0x000c,   0x0000, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:!3,!4")
+	PORT_DIPSETTING(        0x000c, DEF_STR( None ) )
+	PORT_DIPSETTING(        0x0008, "200k only" )
+	PORT_DIPSETTING(        0x0000, "100k only" )
+	PORT_DIPSETTING(        0x0004, "100k and every 500k" )
+	PORT_DIPNAME( 0x0030,   0x0000, DEF_STR( Lives ) )      PORT_DIPLOCATION("SW2:!5,!6")
+	PORT_DIPSETTING(        0x0030, "1" )
+	PORT_DIPSETTING(        0x0020, "2" )
+	PORT_DIPSETTING(        0x0000, "3" )
+	PORT_DIPSETTING(        0x0010, "4" )
+	PORT_DIPNAME( 0x0040,   0x0000, "Invulnerability (Cheat)" )     PORT_DIPLOCATION("SW2:!7")
+	PORT_DIPSETTING(        0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(        0x0040, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080,   0x0000, "Maximum Players" )     PORT_DIPLOCATION("SW2:!8")
+	PORT_DIPSETTING(        0x0080, "2" )
+	PORT_DIPSETTING(        0x0000, "4" )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( sstriker )
 	PORT_INCLUDE( toaplan2_3b )
 
@@ -3139,6 +3285,19 @@ static INPUT_PORTS_START( bgareggacn )
 //  PORT_CONFSETTING(        0x0002, "USA (Fabtek)" )
 //  PORT_CONFSETTING(        0x0000, DEF_STR( Japan ) )
 	PORT_CONFSETTING(       0x0003, DEF_STR( China ) )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( bgareggabl )
+	PORT_INCLUDE( bgaregga )
+
+	PORT_MODIFY("DSWB") // Always uses bonus life settings from Japan region
+	PORT_DIPNAME( 0x0080,   0x0000, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:!8")
+	PORT_DIPSETTING(        0x0080, "1000k and 2000k" )
+	PORT_DIPSETTING(        0x0000, "Every 1000k" )
+
+	PORT_MODIFY("JMPR") // Region is hard-coded
+	PORT_BIT( 0x0003, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
@@ -3581,6 +3740,20 @@ void toaplan2_state::dogyuun(machine_config &config)
 }
 
 
+void toaplan2_state::dogyuunto(machine_config &config)
+{
+	dogyuun(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::dogyuunto_68k_mem);
+	m_maincpu->set_clock(24_MHz_XTAL / 2); // 24 MHz instead of 25
+
+	z80_device &audiocpu(Z80(config.replace(), "audiocpu", 27_MHz_XTAL / 8)); // guessed divisor
+	audiocpu.set_addrmap(AS_PROGRAM, &toaplan2_state::dogyuunto_sound_z80_mem);
+
+	m_oki[0]->set_clock(1.056_MHz_XTAL); // blue resonator 1056J
+}
+
+
 void toaplan2_state::kbash(machine_config &config)
 {
 	/* basic machine hardware */
@@ -3774,6 +3947,7 @@ void toaplan2_state::pipibibsbl(machine_config &config)
 	GP9001_VDP(config, m_vdp[0], 27_MHz_XTAL); // FIXME: bootleg has no VDP
 	m_vdp[0]->set_palette(m_palette);
 	m_vdp[0]->vint_out_cb().set_inputline(m_maincpu, M68K_IRQ_4, ASSERT_LINE);
+	m_vdp[0]->set_bootleg_extra_offsets(0x01f, 0x1ef, 0x01d, 0x1ef, 0x01b, 0x1ef, 0x1d4, 0x1f7);
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,toaplan2)
 
@@ -4010,7 +4184,7 @@ void pwrkick_state::pwrkick(machine_config &config) // Sunwise SW931201-1 PCB (2
 	m_maincpu->set_addrmap(AS_PROGRAM, &pwrkick_state::pwrkick_68k_mem);
 	m_maincpu->reset_cb().set(FUNC(pwrkick_state::toaplan2_reset));
 
-	UPD4992(config, m_rtc, 32'768);
+	UPD4992(config, m_rtc, 32.768_kHz_XTAL);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -4046,7 +4220,7 @@ void pwrkick_state::othldrby(machine_config &config) // Sunwise S951060-VGP PCB 
 	m_maincpu->set_addrmap(AS_PROGRAM, &pwrkick_state::othldrby_68k_mem);
 	m_maincpu->reset_cb().set(FUNC(pwrkick_state::toaplan2_reset));
 
-	UPD4992(config, m_rtc, 32'768);
+	UPD4992(config, m_rtc, 32.768_kHz_XTAL);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -4140,6 +4314,17 @@ void toaplan2_state::snowbro2(machine_config &config)
 
 	OKIM6295(config, m_oki[0], 16_MHz_XTAL/4, okim6295_device::PIN7_LOW);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.5);
+}
+
+void toaplan2_state::snowbro2b3(machine_config &config)
+{
+	snowbro2(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::snowbro2b3_68k_mem);
+	m_maincpu->set_vblank_int("screen", FUNC(toaplan2_state::irq2_line_hold));
+
+	m_vdp[0]->vint_out_cb().set_nop();
+	m_vdp[0]->set_bootleg_extra_offsets(0x02e, 0x1f0, 0x02e, 0x1ee, 0x02e, 0x1ef, 0x1e9, 0x1ef);
 }
 
 
@@ -4568,6 +4753,40 @@ ROM_START( dogyuunt )
 
 	ROM_REGION( 0x40000, "oki1", 0 )     /* ADPCM Samples */
 	ROM_LOAD( "tp022_2.w30", 0x00000, 0x40000, CRC(043271b3) SHA1(c7eaa929e55dd956579b824ea9d20a1d0129a925) )
+ROM_END
+
+
+/*
+This set came on a TX-022 PCB (different from the final version, TP-022).
+Seems the game is always in 'debug mode' according to the test menu (dip has no effect). Still, it has no invicibility effect.
+Couldn't find a read for the region settings jumpers.
+Hardware differences according to the dumper:
+* Two GCUs have nearly identical sections copy-pasted, one above the other.
+* Toaplan HK-1000 ceramic module is used for inputs; the final implements the logic separately.
+* Inputs mapped in the main CPU address space.
+* No NEC V25 sound CPU; instead, there is a Z80 with its own ROM.
+* Sound amp pinout is reversed; mounted to the underside as a bodge fix (this is how I received it).
+* Board is marked "TX-022" instead of "TP-022". A halfway point from the development code "GX-022"
+*/
+ROM_START( dogyuunto )
+	ROM_REGION( 0x080000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "8-25.u11", 0x000000, 0x080000, CRC(4d3c952f) SHA1(194f3065c513238921047ead8b425c3d0538b9a7) ) // real hand-written label is '8/25'
+
+	ROM_REGION( 0x08000, "audiocpu", 0 )
+	ROM_LOAD( "u25", 0x00000, 0x08000, CRC(41a34a7e) SHA1(c4f7833249436fd064c7088c9776d12dee4a7d39) ) // only had a white label
+
+	// the GP9001 mask ROMs were not dumped for this set, but the ROM codes match so they are believed identical
+	ROM_REGION( 0x200000, "gp9001_0", 0 )
+	ROM_LOAD16_WORD_SWAP( "tp022_3.w92", 0x000000, 0x100000, CRC(191b595f) SHA1(89344946daa18087cc83f92027cf5da659b1c7a5) )
+	ROM_LOAD16_WORD_SWAP( "tp022_4.w93", 0x100000, 0x100000, CRC(d58d29ca) SHA1(90d142fef37764ef817347a2bed77892a288a077) )
+
+	ROM_REGION( 0x400000, "gp9001_1", 0 )
+	ROM_LOAD16_WORD_SWAP( "tp022_5.w16", 0x000000, 0x200000, CRC(d4c1db45) SHA1(f5655467149ba737128c2f54c9c6cdaca6e4c35c) )
+	ROM_LOAD16_WORD_SWAP( "tp022_6.w17", 0x200000, 0x200000, CRC(d48dc74f) SHA1(081b5a00a2ff2bd82b98b30aab3cb5b6ae1014d5) )
+
+	// this may have some corruption (only 24, apparently random, bytes differ from the standard ROM), however preserve it for now until it has been verified.
+	ROM_REGION( 0x40000, "oki1", 0 )
+	ROM_LOAD( "2m.u29", 0x00000, 0x40000, CRC(5e7a77d8) SHA1(da6beb5e8e015965ff42fd52f5aa0c0ae5bcee4f) ) // '2M' hand-written
 ROM_END
 
 
@@ -5177,7 +5396,7 @@ ROM_START( batsugunbl )
 	ROM_LOAD( "27c040.bin", 0x00000, 0x80000, CRC(1f8ec1b6) SHA1(28107a90d29613ceddc001df2556543b33c1294c) )
 ROM_END
 
-ROM_START( pwrkick ) // Sunwise SW931301-1 PCB - 8-liner connections
+ROM_START( pwrkick ) // Sunwise SW931201-1 PCB - 8-liner connections
 	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "1.u61", 0x000000, 0x080000, CRC(118b5899) SHA1(7a1637a63eb17e3892d79aede5730013a1dc00f9) )
 
@@ -5189,7 +5408,54 @@ ROM_START( pwrkick ) // Sunwise SW931301-1 PCB - 8-liner connections
 	ROM_LOAD( "4.u33", 0x000000, 0x080000, CRC(3ab742f1) SHA1(ce8ca02ca57fd77872e421ce601afd017d3518a0) )
 ROM_END
 
-ROM_START( burgkids ) // Sunwise SW931301-1 PCB - 8-liner connections
+/*
+
+Burger Kids, 1995 Sunwise
+
+SW931201-1
++--||||||-----------------------------------------+
+|         YM3014*  YM2151*                        |
+| TDA1519A         M6295   FFK4.U33          BT1  |
+|                              U31*               |
+|                      16.000MHz 32.768kHz D4992C |
+|                                      MB3771     |
+|8                                                |
+|-                                     U67*       |
+|L                                 FFK1.U61 62256 |
+|I                                     U68* 62256 |
+|N                     GAL16V8B    TMP68HC000P-12 |
+|E                                                |
+|R                                                |
+|                        1635  27.000MHz FFK3.U27 |
+|             GAL16V8B   1635  20.000MHz     U12* |
+| SW1         GAL16V8B    +---------+    FFK2.U26 |
+| SW2                     | L7A0498 |        U13* |
+| SW3                     | GP9001  |   4256 4256 |
+|     6216                +---------+   4256 4256 |
+|     6216                              4256 4256 |
++-------------------------------------------------+
+
+NOTE: This PCB uses an 8-Liner style edge connector
+
+* Denotes unpopulated components
+
+   CPU: Toshiba TMP68HC000P-12
+ Sound: OKI M6295
+ Video: L7A0498 GP9001 QFP208
+   OSC: 27MHz, 20MHz, 16MHz & 32.768kHz
+   RAM: MB81C4256A-70P - 256K x 4-bit DRAM
+        HM62256BLP-9 - 32K x 8-bit SRAM
+        IMS1635P-25 - 8K x 8-bit SRAM
+        XRM6216-10 - 2K x 8-bit SRAM
+ Other: 8 Position Dipswitch x 3
+        NEC D4992 CMOS 8-Bit Parallel I/O Calendar Clock
+        MB3771 Voltage monitor
+        BT1 - CR2550 3Volt battery
+
+NOTE: Sunwise's S951060-VGP PCB uses identical componenets to the SW931201 but has a standard JAMMA connector
+*/
+
+ROM_START( burgkids ) // Sunwise SW931201-1 PCB - 8-liner connections
 	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "ffk1.u61", 0x000000, 0x080000, CRC(ac96cb0d) SHA1(2ce5c06d61f3ff18b222619e41d09e46d44c5bab) )
 
@@ -5201,7 +5467,7 @@ ROM_START( burgkids ) // Sunwise SW931301-1 PCB - 8-liner connections
 	ROM_LOAD( "ffk4.u33", 0x000000, 0x080000,  CRC(3b032d4f) SHA1(69056bf205aadf6c9fee56ce396b11a5187caa03) )
 ROM_END
 
-ROM_START( othldrby ) // Sunwise S951060-VGP PCB - JAMMA compliant (components identical to Sunwise SW931301-1 PCB)
+ROM_START( othldrby ) // Sunwise S951060-VGP PCB - JAMMA compliant (components identical to Sunwise SW931201-1 PCB)
 	ROM_REGION( 0x080000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "sunwise_db0_1.u61", 0x00000, 0x80000, CRC(6b4008d3) SHA1(4cf838c47563ba482be8364b2e115569a4a06c83) )
 
@@ -5282,6 +5548,20 @@ ROM_START( snowbro2b2 ) // seems to mostly be the same data, but with copyright 
 
 	ROM_REGION( 0x80000, "oki1", 0 )         /* ADPCM Samples */
 	ROM_LOAD( "rom09.bin", 0x00000, 0x80000, CRC(638f341e) SHA1(aa3fca25f099339ece1878ea730c5e9f18ec4823) )
+ROM_END
+
+ROM_START( snowbro2b3 ) // SK000616 PCB, no original parts, seems hardcoded on Europe region
+	ROM_REGION( 0x080000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "prg", 0x000000, 0x080000, CRC(8ce2ede2) SHA1(ddd8a2aa442cd5bb3a7d393b9b5c06fd981e7c61) )
+
+	ROM_REGION( 0x400000, "gp9001_0", 0 ) // not actually a GP9001
+	ROM_LOAD( "gfx2", 0x100000, 0x100000, CRC(a3be41af) SHA1(4cb1ce9c47bf8bbf7d1e36f6a1d276ce52957cfb) )
+	ROM_CONTINUE(     0x000000, 0x100000 )
+	ROM_LOAD( "gfx1", 0x300000, 0x100000, CRC(8df1ab06) SHA1(2a28caf7d545dc05acfcd2a8d2ffbd9f710af45d) )
+	ROM_CONTINUE(     0x200000, 0x100000 )
+
+	ROM_REGION( 0x80000, "oki1", 0 )
+	ROM_LOAD( "voice", 0x00000, 0x80000, CRC(638f341e) SHA1(aa3fca25f099339ece1878ea730c5e9f18ec4823) )
 ROM_END
 
 ROM_START( snowbro2ny ) // Nyanko
@@ -5635,7 +5915,7 @@ ROM_START( bgareggacn )
 	ROM_LOAD( "rom5.bin", 0x000000, 0x100000, CRC(f6d49863) SHA1(3a3c354852adad06e8a051511abfab7606bce382) )
 ROM_END
 
-
+// 1945二代 (1945 Èr Dài)
 ROM_START( bgareggabl )
 	ROM_REGION( 0x100000, "maincpu", 0 )            /* Main 68K code */
 	ROM_LOAD16_WORD_SWAP( "xt-8m.bin", 0x000000, 0x100000, CRC(4a6657cb) SHA1(1838956e7597eaa78ea5ee58d0ccc79cbbd7ded5) )
@@ -5657,6 +5937,7 @@ ROM_START( bgareggabl )
 	ROM_LOAD( "rom5.bin", 0x000000, 0x100000, CRC(f6d49863) SHA1(3a3c354852adad06e8a051511abfab7606bce382) )
 ROM_END
 
+// 雷神传 (Léishén Chuán)
 ROM_START( bgareggabla )
 	ROM_REGION( 0x100000, "maincpu", 0 )            /* Main 68K code */
 	ROM_LOAD16_WORD_SWAP( "27c8100.mon-sys", 0x000000, 0x100000, CRC(d334e5aa) SHA1(41607b5630d7b92a96607ea95c5b55ad43745857) )
@@ -6162,10 +6443,11 @@ GAME( 1991, ghox,        0,        ghox,         ghox,       ghox_state,     emp
 GAME( 1991, ghoxj,       ghox,     ghox,         ghox,       ghox_state,     empty_init,    ROT270, "Toaplan",         "Ghox (joystick)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1991, ghoxjo,      ghox,     ghox,         ghoxjo,     ghox_state,     empty_init,    ROT270, "Toaplan",         "Ghox (joystick, older)",    MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, dogyuun,     0,        dogyuun,      dogyuun,    toaplan2_state, init_dogyuun,  ROT270, "Toaplan",         "Dogyuun",                   MACHINE_SUPPORTS_SAVE )
-GAME( 1992, dogyuuna,    dogyuun,  dogyuun,      dogyuuna,   toaplan2_state, init_dogyuun,  ROT270, "Toaplan",         "Dogyuun (older set)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1992, dogyuunb,    dogyuun,  dogyuun,      dogyuunt,   toaplan2_state, init_dogyuun,  ROT270, "Toaplan",         "Dogyuun (oldest set)",      MACHINE_SUPPORTS_SAVE ) // maybe a newer location test version, instead
-GAME( 1992, dogyuunt,    dogyuun,  dogyuun,      dogyuunt,   toaplan2_state, init_dogyuun,  ROT270, "Toaplan",         "Dogyuun (location test)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dogyuun,     0,        dogyuun,      dogyuun,    toaplan2_state, init_dogyuun,  ROT270, "Toaplan",         "Dogyuun",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dogyuuna,    dogyuun,  dogyuun,      dogyuuna,   toaplan2_state, init_dogyuun,  ROT270, "Toaplan",         "Dogyuun (older set)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dogyuunb,    dogyuun,  dogyuun,      dogyuunt,   toaplan2_state, init_dogyuun,  ROT270, "Toaplan",         "Dogyuun (oldest set)",              MACHINE_SUPPORTS_SAVE ) // maybe a newer location test version, instead
+GAME( 1992, dogyuunt,    dogyuun,  dogyuun,      dogyuunt,   toaplan2_state, init_dogyuun,  ROT270, "Toaplan",         "Dogyuun (10/9/1992 location test)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dogyuunto,   dogyuun,  dogyuunto,    dogyuunt,   toaplan2_state, init_vfive,    ROT270, "Toaplan",         "Dogyuun (8/25/1992 location test)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1993, kbash,       0,        kbash,        kbash,      toaplan2_state, empty_init,    ROT0,   "Toaplan / Atari", "Knuckle Bash",                 MACHINE_SUPPORTS_SAVE ) // Atari license shown for some regions.
 GAME( 1993, kbashk,      kbash,    kbash,        kbashk,     toaplan2_state, empty_init,    ROT0,   "Toaplan / Taito", "Knuckle Bash (Korean PCB)",    MACHINE_SUPPORTS_SAVE ) // Japan region has optional Taito license, maybe the original Japan release?
@@ -6223,6 +6505,7 @@ GAME( 1994, snowbro2,    0,        snowbro2,   snowbro2,   toaplan2_state, empty
 GAME( 1994, snowbro2ny,  snowbro2, snowbro2,   snowbro2,   toaplan2_state, empty_init,      ROT0,   "Nyanko",           "Snow Bros. 2 - With New Elves / Otenki Paradise (Nyanko)",         MACHINE_SUPPORTS_SAVE ) // not a bootleg, has original parts (the "GP9001 L7A0498 TOA PLAN" IC and the three mask ROMs)
 GAME( 1998, snowbro2b,   snowbro2, snowbro2,   snowbro2,   toaplan2_state, empty_init,      ROT0,   "bootleg",          "Snow Bros. 2 - With New Elves / Otenki Paradise (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, snowbro2b2,  snowbro2, snowbro2,   snowbro2,   toaplan2_state, empty_init,      ROT0,   "bootleg (Q Elec)", "Snow Bros. 2 - With New Elves / Otenki Paradise (bootleg, set 2)", MACHINE_SUPPORTS_SAVE ) // possibly not a bootleg, has some original parts
+GAME( 1994, snowbro2b3,  snowbro2, snowbro2b3, snowbro2b3, toaplan2_state, empty_init,      ROT0,   "bootleg",          "Snow Bros. 2 - With New Elves / Otenki Paradise (bootleg, set 3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // GFX offsets not 100% correct
 
 GAME( 1993, sstriker,    0,        mahoudai,   sstriker,   truxton2_state, empty_init,      ROT270, "Raizing",                         "Sorcer Striker",           MACHINE_SUPPORTS_SAVE ) // verified on two different PCBs
 GAME( 1993, sstrikerk,   sstriker, mahoudai,   sstrikerk,  truxton2_state, empty_init,      ROT270, "Raizing (Unite Trading license)", "Sorcer Striker (Korea)" ,  MACHINE_SUPPORTS_SAVE ) // Although the region jumper is functional, it's a Korean board / version
@@ -6231,17 +6514,17 @@ GAME( 1993, mahoudai,    sstriker, mahoudai,   mahoudai,   truxton2_state, empty
 GAME( 1994, kingdmgp,    0,        shippumd,   kingdmgp,   truxton2_state, empty_init,      ROT270, "Raizing / Eighting", "Kingdom Grandprix",               MACHINE_SUPPORTS_SAVE ) // from Korean board, missing letters on credits screen but this is correct
 GAME( 1994, shippumd,    kingdmgp, shippumd,   shippumd,   truxton2_state, empty_init,      ROT270, "Raizing / Eighting", "Shippu Mahou Daisakusen (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1996, bgaregga,    0,        bgaregga,   bgaregga,   truxton2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga (Europe / USA / Japan / Asia) (Sat Feb 3 1996)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, bgareggat,   bgaregga, bgaregga,   bgaregga,   truxton2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga (location test) (Wed Jan 17 1996)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, bgareggahk,  bgaregga, bgaregga,   bgareggahk, truxton2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga (Austria / Hong Kong) (Sat Feb 3 1996)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, bgareggatw,  bgaregga, bgaregga,   bgareggatw, truxton2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga (Taiwan / Germany) (Thu Feb 1 1996)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, bgareggak,   bgaregga, bgaregga,   bgareggak,  truxton2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga (Korea / Greece) (Wed Feb 7 1996)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, bgaregganv,  bgaregga, bgaregga,   bgareggahk, truxton2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga - New Version (Austria / Hong Kong) (Sat Mar 2 1996)" , MACHINE_SUPPORTS_SAVE ) // displays New Version only when set to HK
-GAME( 1996, bgareggat2,  bgaregga, bgaregga,   bgaregga,   truxton2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga - Type 2 (Europe / USA / Japan / Asia) (Sat Mar 2 1996)" , MACHINE_SUPPORTS_SAVE ) // displays Type 2 only when set to Europe
-GAME( 1996, bgareggacn,  bgaregga, bgaregga,   bgareggacn, truxton2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga - Type 2 (Denmark / China) (Tue Apr 2 1996)", MACHINE_SUPPORTS_SAVE ) // displays Type 2 only when set to Denmark
-GAME( 1996, bgareggabl,  bgaregga, bgareggabl, bgareggacn, truxton2_state, init_bgaregga,   ROT270, "bootleg",            "1945 Part-2 (Chinese hack of Battle Garegga)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, bgareggabla, bgaregga, bgareggabl, bgareggacn, truxton2_state, init_bgaregga,   ROT270, "bootleg",            "Lei Shen Zhuan Thunder Deity Biography (Chinese hack of Battle Garegga)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, bgareggablj, bgaregga, bgareggabl, bgaregga,   truxton2_state, init_bgaregga,   ROT270, "bootleg",            "Battle Garegga (Japan, bootleg) (Sat Feb 3 1996)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, bgaregga,    0,        bgaregga,   bgaregga,   truxton2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga (Europe / USA / Japan / Asia) (Sat Feb 3 1996)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1996, bgareggat,   bgaregga, bgaregga,   bgaregga,   truxton2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga (location test) (Wed Jan 17 1996)",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1996, bgareggahk,  bgaregga, bgaregga,   bgareggahk, truxton2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga (Austria / Hong Kong) (Sat Feb 3 1996)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1996, bgareggatw,  bgaregga, bgaregga,   bgareggatw, truxton2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga (Taiwan / Germany) (Thu Feb 1 1996)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1996, bgareggak,   bgaregga, bgaregga,   bgareggak,  truxton2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga (Korea / Greece) (Wed Feb 7 1996)",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1996, bgaregganv,  bgaregga, bgaregga,   bgareggahk, truxton2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga - New Version (Austria / Hong Kong) (Sat Mar 2 1996)" ,     MACHINE_SUPPORTS_SAVE ) // displays New Version only when set to HK
+GAME( 1996, bgareggat2,  bgaregga, bgaregga,   bgaregga,   truxton2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga - Type 2 (Europe / USA / Japan / Asia) (Sat Mar 2 1996)" ,  MACHINE_SUPPORTS_SAVE ) // displays Type 2 only when set to Europe
+GAME( 1996, bgareggacn,  bgaregga, bgaregga,   bgareggacn, truxton2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga - Type 2 (Denmark / China) (Tue Apr 2 1996)",               MACHINE_SUPPORTS_SAVE ) // displays Type 2 only when set to Denmark
+GAME( 1998, bgareggabl,  bgaregga, bgareggabl, bgareggabl, truxton2_state, init_bgaregga,   ROT270, "bootleg (Melody)",   "1945 Er Dai / 1945 Part-2 (Chinese hack of Battle Garegga)",               MACHINE_SUPPORTS_SAVE ) // based on Thu Feb 1 1996 set, Region hardcoded to China
+GAME( 1997, bgareggabla, bgaregga, bgareggabl, bgareggabl, truxton2_state, init_bgaregga,   ROT270, "bootleg (Melody)",   "Leishen Chuan / Thunder Deity Biography (Chinese hack of Battle Garegga)", MACHINE_SUPPORTS_SAVE ) // based on Thu Feb 1 1996 set, Region hardcoded to Asia
+GAME( 1996, bgareggablj, bgaregga, bgareggabl, bgareggabl, truxton2_state, init_bgaregga,   ROT270, "bootleg",            "Battle Garegga (Japan, bootleg) (Sat Feb 3 1996)",                         MACHINE_SUPPORTS_SAVE )
 
 // these are all based on Version B, even if only the Japan version states 'version B'
 GAME( 1998, batrider,    0,        batrider,   batrider,   truxton2_state, init_batrider,   ROT270, "Raizing / Eighting", "Armed Police Batrider (Europe) (Fri Feb 13 1998)",           MACHINE_SUPPORTS_SAVE )

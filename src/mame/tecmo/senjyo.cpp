@@ -106,7 +106,7 @@ void senjyo_state::flip_screen_w(uint8_t data)
 	flip_screen_set(data);
 }
 
-WRITE_LINE_MEMBER(senjyo_state::dac_clock_w)
+void senjyo_state::dac_clock_w(int state)
 {
 	if (state)
 		m_dac->write(m_dac_prom->base()[m_dac_clock++ & 0xf]);
@@ -114,7 +114,7 @@ WRITE_LINE_MEMBER(senjyo_state::dac_clock_w)
 
 void senjyo_state::dac_volume_w(uint8_t data)
 {
-	m_volume->flt_volume_set_volume((data & 0xf) / 15.0);
+	m_volume->set_gain((data & 0xf) / 15.0);
 }
 
 void senjyo_state::dac_enable_w(uint8_t data)

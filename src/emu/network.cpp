@@ -57,7 +57,7 @@ void network_manager::config_load(config_type cfg_type, config_level cfg_level, 
 						network.set_interface(interface);
 						const char *mac_addr = node->get_attribute_string("mac", nullptr);
 						if (mac_addr != nullptr && strlen(mac_addr) == 17) {
-							char mac[7];
+							uint8_t mac[6];
 							unsigned int mac_num[6];
 							sscanf(mac_addr, "%02x:%02x:%02x:%02x:%02x:%02x", &mac_num[0], &mac_num[1], &mac_num[2], &mac_num[3], &mac_num[4], &mac_num[5]);
 							for (int i = 0; i<6; i++) mac[i] = mac_num[i];

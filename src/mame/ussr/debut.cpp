@@ -54,7 +54,7 @@ Keypad legend:
 #include "speaker.h"
 
 // internal artwork
-#include "debutm.lh" // clickable
+#include "debutm.lh"
 
 
 namespace {
@@ -90,6 +90,10 @@ private:
 	output_finder<4> m_out_digit;
 	required_ioport m_inputs;
 
+	u8 m_latch[5] = { };
+	u8 m_dac_data = 0;
+	u8 m_lcd_update = 0;
+
 	// address maps
 	void main_map(address_map &map);
 	void main_io(address_map &map);
@@ -98,11 +102,7 @@ private:
 	INTERRUPT_GEN_MEMBER(interrupt);
 	u8 input_r(offs_t offset);
 	void latch_w(offs_t offset, u8 data);
-	DECLARE_WRITE_LINE_MEMBER(lcd_update_w);
-
-	u8 m_latch[5] = { };
-	u8 m_dac_data = 0;
-	u8 m_lcd_update = 0;
+	void lcd_update_w(int state);
 };
 
 void debut_state::machine_start()
@@ -166,7 +166,7 @@ void debut_state::latch_w(offs_t offset, u8 data)
 	}
 }
 
-WRITE_LINE_MEMBER(debut_state::lcd_update_w)
+void debut_state::lcd_update_w(int state)
 {
 	// 8086 S5 also goes to the lcd panel
 	if (!state && m_lcd_update)

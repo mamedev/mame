@@ -18,7 +18,7 @@
 
 /*
 
-         OS2 OS3 OS4 K4  K3  K2  K1  GND al  bt  ACL _R1 _Tp NC  NC   note: on SM5L, pin 31=V1, 32=V2, 33=NC
+         OS2 OS3 OS4 K4  K3  K2  K1  GND α   β   ACL _R1 _Tp NC  NC   note: on SM5L, pin 31=V1, 32=V2, 33=NC
          45  44  43  42  41  40  39  38  37  36  35  34  33  32  31
         ____________________________________________________________
        |                                                            |

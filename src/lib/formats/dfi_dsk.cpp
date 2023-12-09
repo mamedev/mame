@@ -14,6 +14,7 @@
 #include "dfi_dsk.h"
 
 #include "ioprocs.h"
+#include "multibyte.h"
 
 #include "osdcore.h" // osd_printf_*
 
@@ -39,22 +40,22 @@ dfi_format::dfi_format() : floppy_image_format_t()
 {
 }
 
-const char *dfi_format::name() const
+const char *dfi_format::name() const noexcept
 {
 	return "dfi";
 }
 
-const char *dfi_format::description() const
+const char *dfi_format::description() const noexcept
 {
 	return "DiscFerret flux dump format";
 }
 
-const char *dfi_format::extensions() const
+const char *dfi_format::extensions() const noexcept
 {
 	return "dfi";
 }
 
-bool dfi_format::supports_save() const
+bool dfi_format::supports_save() const noexcept
 {
 	return false;
 }
@@ -67,7 +68,7 @@ int dfi_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	return memcmp(sign, "DFE2", 4) ? 0 : FIFID_SIGN;
 }
 
-bool dfi_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool dfi_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	size_t actual;
 	char sign[4];
@@ -89,10 +90,10 @@ bool dfi_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	while(pos < size) {
 		uint8_t h[10];
 		io.read_at(pos, h, 10, actual);
-		uint16_t track = (h[0] << 8) | h[1];
-		uint16_t head  = (h[2] << 8) | h[3];
+		uint16_t track = get_u16be(&h[0]);
+		uint16_t head  = get_u16be(&h[2]);
 		// Ignore sector
-		uint32_t tsize = (h[6] << 24) | (h[7] << 16) | (h[8] << 8) | h[9];
+		uint32_t tsize = get_u32be(&h[6]);
 
 		// if the position-so-far-in-file plus 10 (for the header) plus track size
 		// is larger than the size of the file, free buffers and bail out
@@ -164,7 +165,7 @@ bool dfi_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		if(!index_time)
 			index_time = total_time;
 
-		std::vector<uint32_t> &buf = image->get_buffer(track, head);
+		std::vector<uint32_t> &buf = image.get_buffer(track, head);
 		buf.resize(tsize);
 
 		int cur_time = 0;

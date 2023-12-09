@@ -627,8 +627,6 @@ void superfx_device::device_start()
 
 	m_program = &space(AS_PROGRAM);
 
-	m_out_irq_func.resolve();
-
 	save_item(NAME(m_pipeline));
 	save_item(NAME(m_ramaddr));
 

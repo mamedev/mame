@@ -45,9 +45,9 @@
 
 
 // configurable logging
-#define LOG_MISC     (1U <<  1)
-#define LOG_SOUND    (1U <<  2)
-#define LOG_PB       (1U <<  3)
+#define LOG_MISC     (1U << 1)
+#define LOG_SOUND    (1U << 2)
+#define LOG_PB       (1U << 3)
 
 //#define VERBOSE (LOG_GENERAL | LOG_MISC | LOG_SOUND | LOG_PB)
 
@@ -289,8 +289,7 @@ void dribling_state::pb_w(uint8_t data)
 void dribling_state::shr_w(uint8_t data)
 {
 	// bit 3 = watchdog
-	if (data & 0x08)
-		m_watchdog->watchdog_reset();
+	m_watchdog->reset_line_w(BIT(~data, 3));
 
 	// bit 2-0 = SH0-2
 	m_sh = data & 0x07;

@@ -50,7 +50,7 @@ public:
 	z80ctc_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -92,21 +92,20 @@ public:
 	// read/write handlers
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( trg0 );
-	DECLARE_WRITE_LINE_MEMBER( trg1 );
-	DECLARE_WRITE_LINE_MEMBER( trg2 );
-	DECLARE_WRITE_LINE_MEMBER( trg3 );
+	void trg0(int state);
+	void trg1(int state);
+	void trg2(int state);
+	void trg3(int state);
 
 	u16 get_channel_constant(int ch) const { return m_channel[ch]->m_tconst; }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset_after_children() override;
 
-	// z80daisy_interface overrides
+	// z80daisy_interface implementation
 	virtual int z80daisy_irq_state() override;
 	virtual int z80daisy_irq_ack() override;
 	virtual void z80daisy_irq_reti() override;
@@ -115,7 +114,7 @@ private:
 	// internal helpers
 	void interrupt_check();
 
-	z80ctc_channel_device &channel_config(int ch) { return *subdevice<z80ctc_channel_device>(m_channel[ch].finder_tag()); }
+	z80ctc_channel_device &channel_config(int ch) { return *m_channel[ch].lookup(); }
 
 	// internal state
 	devcb_write_line   m_intr_cb;              // interrupt callback

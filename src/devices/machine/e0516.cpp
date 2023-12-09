@@ -44,7 +44,7 @@ DEFINE_DEVICE_TYPE(E0516, e0516_device, "e0516", "E05-16 RTC")
 e0516_device::e0516_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, E0516, tag, owner, clock),
 	device_rtc_interface(mconfig, *this),
-	m_read_outsel(*this),
+	m_read_outsel(*this, 1),
 	m_write_sec(*this),
 	m_write_min(*this),
 	m_write_hrs(*this),
@@ -69,13 +69,6 @@ e0516_device::e0516_device(const machine_config &mconfig, const char *tag, devic
 
 void e0516_device::device_start()
 {
-	// resolve callbacks
-	m_read_outsel.resolve_safe(1);
-	m_write_sec.resolve_safe();
-	m_write_min.resolve_safe();
-	m_write_hrs.resolve_safe();
-	m_write_day.resolve_safe();
-
 	// allocate timers
 	m_timer = timer_alloc(FUNC(e0516_device::timer_tick), this);
 	m_timer->adjust(attotime::from_hz(clock() / 32768), 0, attotime::from_hz(clock() / 32768));
@@ -111,7 +104,7 @@ TIMER_CALLBACK_MEMBER(e0516_device::timer_tick)
 //  cs_w - chip select input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( e0516_device::cs_w )
+void e0516_device::cs_w(int state)
 {
 	if (m_cs != state)
 	{
@@ -143,7 +136,7 @@ WRITE_LINE_MEMBER( e0516_device::cs_w )
 //  clk_w - serial clock input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( e0516_device::clk_w )
+void e0516_device::clk_w(int state)
 {
 	if (m_cs) return;
 	if (m_clk == state) return;
@@ -302,7 +295,7 @@ WRITE_LINE_MEMBER( e0516_device::clk_w )
 //  dio_w - serial data input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( e0516_device::dio_w )
+void e0516_device::dio_w(int state)
 {
 	LOG("E05-16 '%s' DIO %u\n", tag(), state);
 
@@ -317,7 +310,7 @@ WRITE_LINE_MEMBER( e0516_device::dio_w )
 //  do_r - serial data output
 //-------------------------------------------------
 
-READ_LINE_MEMBER( e0516_device::dio_r )
+int e0516_device::dio_r()
 {
 	if (m_cs || (m_state == STATE_HI_Z))
 	{
@@ -333,7 +326,7 @@ READ_LINE_MEMBER( e0516_device::dio_r )
 //  reset_w - reset input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( e0516_device::reset_w )
+void e0516_device::reset_w(int state)
 {
 	LOG("E05-16 '%s' RESET %u\n", tag(), state);
 

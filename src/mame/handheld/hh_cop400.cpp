@@ -7,7 +7,9 @@ National Semiconductor COPS(COP400 MCU series) handhelds or other simple
 devices, mostly LED electronic games/toys.
 
 TODO:
-- why does h2hbaskbc(and clones) need a workaround on writing L pins?
+- minspace: Add graphics overlay mask? There's a commercial with B&W footage
+  of what's probably an older prototype, and there's an advertisement with a
+  mock-up picture for the display.
 - vidchal: Add screen and gun cursor with brightness detection callback,
   and softwarelist for the video tapes. We'd also need a VHS player device.
   The emulated lightgun itself appears to be working fine(eg. add a 30hz
@@ -30,25 +32,26 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-#include "bshipg.lh" // clickable
-#include "ctstein.lh" // clickable
+#include "bshipg.lh"
+#include "comparca.lh"
+#include "ctstein.lh"
 #include "einvaderc.lh"
-#include "funjacks.lh" // clickable
-#include "funrlgl.lh" // clickable
-#include "funtag.lh" // clickable
+#include "funjacks.lh"
+#include "funrlgl.lh"
+#include "funtag.lh"
 #include "h2hbaskbc.lh"
 #include "h2hhockeyc.lh"
 #include "h2hsoccerc.lh"
 #include "lafootb.lh"
-#include "lchicken.lh" // clickable
-#include "lightfgt.lh" // clickable
+#include "lchicken.lh"
+#include "lightfgt.lh"
 #include "lilcomp.lh"
 #include "mbaskb2.lh"
 #include "mdallas.lh"
+#include "minspace.lh"
 #include "msoccer2.lh"
-#include "qkracer.lh"
+#include "qkracera.lh"
 #include "scat.lh"
-#include "unkeinv.lh"
 #include "vidchal.lh"
 
 //#include "hh_cop400_test.lh" // common test-layout - use external artwork
@@ -80,13 +83,14 @@ protected:
 	optional_device<speaker_sound_device> m_speaker;
 	optional_ioport_array<6> m_inputs; // max 6
 
-	// misc common
-	u8 m_l = 0;         // MCU port L write data
-	u8 m_g = 0;         // MCU port G write data
-	u8 m_d = 0;         // MCU port D write data
-	int m_so = 0;       // MCU SO line state
-	int m_sk = 0;       // MCU SK line state
 	u16 m_inp_mux = ~0; // multiplexed inputs mask
+
+	// MCU output pin state
+	u8 m_l = 0;         // port L
+	u8 m_g = 0;         // port G
+	u8 m_d = 0;         // port D
+	int m_so = 0;       // SO line
+	int m_sk = 0;       // SK line
 
 	u16 read_inputs(int columns, u16 colmask = ~0);
 	void set_power(bool state);
@@ -98,12 +102,12 @@ protected:
 void hh_cop400_state::machine_start()
 {
 	// register for savestates
+	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_l));
 	save_item(NAME(m_g));
 	save_item(NAME(m_d));
 	save_item(NAME(m_so));
 	save_item(NAME(m_sk));
-	save_item(NAME(m_inp_mux));
 }
 
 void hh_cop400_state::machine_reset()
@@ -128,7 +132,7 @@ u16 hh_cop400_state::read_inputs(int columns, u16 colmask)
 
 	// read selected input rows
 	for (int i = 0; i < columns; i++)
-		if (~m_inp_mux >> i & 1)
+		if (!BIT(m_inp_mux, i))
 			ret &= m_inputs[i]->read();
 
 	return ret;
@@ -142,7 +146,8 @@ INPUT_CHANGED_MEMBER(hh_cop400_state::reset_button)
 
 INPUT_CHANGED_MEMBER(hh_cop400_state::power_button)
 {
-	set_power((bool)param);
+	if (newval != field.defvalue())
+		set_power((bool)param);
 }
 
 void hh_cop400_state::set_power(bool state)
@@ -290,6 +295,7 @@ public:
 	void h2hhockeyc(machine_config &config);
 
 private:
+	void update_display();
 	void write_d(u8 data);
 	void write_g(u8 data);
 	void write_l(u8 data);
@@ -298,28 +304,35 @@ private:
 
 // handlers
 
+void h2hbaskbc_state::update_display()
+{
+	// D2,D3 double as multiplexer
+	u16 mask = ((~m_d >> 3 & 1) * 0x00ff) | ((~m_d >> 2 & 1) * 0xff00);
+	u16 sel = m_g | m_d << 4;
+
+	m_display->matrix((sel << 8 | sel) & mask, m_l);
+}
+
 void h2hbaskbc_state::write_d(u8 data)
 {
 	// D: led select
-	m_d = data & 0xf;
+	m_d = data;
+	update_display();
 }
 
 void h2hbaskbc_state::write_g(u8 data)
 {
 	// G: led select, input mux
-	m_inp_mux = data;
-	m_g = data & 0xf;
+	m_g = m_inp_mux = data;
+	update_display();
 }
 
 void h2hbaskbc_state::write_l(u8 data)
 {
-	// D2,D3 double as multiplexer
-	u16 mask = ((m_d >> 2 & 1) * 0x00ff) | ((m_d >> 3 & 1) * 0xff00);
-	u16 sel = (m_g | m_d << 4 | m_g << 8 | m_d << 12) & mask;
-
-	// D2+G0,G1 are 7segs
-	// L0-L6: digit segments A-G, L0-L4: led data
-	m_display->matrix(sel, data);
+	// L0-L6: digit segments A-G
+	// L0-L4: led data
+	m_l = data;
+	update_display();
 }
 
 u8 h2hbaskbc_state::read_in()
@@ -384,7 +397,7 @@ INPUT_PORTS_END
 void h2hbaskbc_state::h2hbaskbc(machine_config &config)
 {
 	// basic machine hardware
-	COP420(config, m_maincpu, 1000000); // approximation - RC osc. R=43K, C=101pF
+	COP420(config, m_maincpu, 1000000); // approximation - RC osc. R=43K, C=100pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_d().set(FUNC(h2hbaskbc_state::write_d));
 	m_maincpu->write_g().set(FUNC(h2hbaskbc_state::write_g));
@@ -434,7 +447,7 @@ ROM_END
   * COP444L MCU label /B138 COPL444-HRZ/N INV II (die label HRZ COP 444L/A)
   * 3 7seg LEDs, LED matrix and overlay mask, 1-bit sound
 
-  The first version was on TMS1100 (see hh_tms1k.c), this is the reprogrammed
+  The first version was on TMS1100 (see hh_tms1k.cpp), this is the reprogrammed
   second release with a gray case instead of black.
 
 *******************************************************************************/
@@ -452,8 +465,8 @@ private:
 	void update_display();
 	void write_d(u8 data);
 	void write_g(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(write_sk);
-	DECLARE_WRITE_LINE_MEMBER(write_so);
+	void write_sk(int state);
+	void write_so(int state);
 	void write_l(u8 data);
 };
 
@@ -481,7 +494,7 @@ void einvaderc_state::write_g(u8 data)
 	update_display();
 }
 
-WRITE_LINE_MEMBER(einvaderc_state::write_sk)
+void einvaderc_state::write_sk(int state)
 {
 	// SK: speaker out + led grid 8
 	m_speaker->level_w(state);
@@ -489,7 +502,7 @@ WRITE_LINE_MEMBER(einvaderc_state::write_sk)
 	update_display();
 }
 
-WRITE_LINE_MEMBER(einvaderc_state::write_so)
+void einvaderc_state::write_so(int state)
 {
 	// SO: led grid 9
 	m_so = state;
@@ -560,129 +573,6 @@ ROM_END
 
 /*******************************************************************************
 
-  Gordon Barlow Design electronic Space Invaders game (unreleased, from patent US4345764)
-  * COP421 (likely a development chip)
-  * 36+9 LEDs, 1-bit sound
-
-  This game is presumedly unreleased. The title is unknown, the patent simply
-  names it "Hand-held electronic game". There is no mass-manufacture company
-  assigned to it either. The game seems unfinished(no scorekeeping, some bugs),
-  and the design is very complex. Player ship and bullets are on a moving "wand",
-  a 2-way mirror makes it appear on the same plane as the enemies and barriers.
-
-*******************************************************************************/
-
-class unkeinv_state : public hh_cop400_state
-{
-public:
-	unkeinv_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_cop400_state(mconfig, type, tag)
-	{ }
-
-	void unkeinv(machine_config &config);
-
-private:
-	void update_display();
-	void write_g(u8 data);
-	void write_d(u8 data);
-	void write_l(u8 data);
-	u8 read_l();
-};
-
-// handlers
-
-void unkeinv_state::update_display()
-{
-	m_display->matrix(m_g << 4 | m_d, m_l);
-}
-
-void unkeinv_state::write_g(u8 data)
-{
-	// G0,G1: led select part
-	// G2,G3: input mux
-	m_g = ~data & 0xf;
-	update_display();
-}
-
-void unkeinv_state::write_d(u8 data)
-{
-	// D0-D3: led select part
-	m_d = ~data & 0xf;
-	update_display();
-}
-
-void unkeinv_state::write_l(u8 data)
-{
-	// L0-L7: led data
-	m_l = ~data & 0xff;
-	update_display();
-}
-
-u8 unkeinv_state::read_l()
-{
-	u8 ret = 0xff;
-
-	// L0-L5+G2: positional odd
-	// L0-L5+G3: positional even
-	u8 pos = m_inputs[1]->read();
-	if (m_g & 4 && pos & 1)
-		ret ^= (1 << (pos >> 1));
-	if (m_g & 8 && ~pos & 1)
-		ret ^= (1 << (pos >> 1));
-
-	// L7+G3: fire button
-	if (m_g & 8 && m_inputs[0]->read())
-		ret ^= 0x80;
-
-	return ret & ~m_l;
-}
-
-// inputs
-
-static INPUT_PORTS_START( unkeinv )
-	PORT_START("IN.0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-
-	PORT_START("IN.1")
-	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CENTERDELTA(0)
-INPUT_PORTS_END
-
-// config
-
-void unkeinv_state::unkeinv(machine_config &config)
-{
-	// basic machine hardware
-	COP421(config, m_maincpu, 850000); // frequency guessed
-	m_maincpu->set_config(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
-	m_maincpu->write_g().set(FUNC(unkeinv_state::write_g));
-	m_maincpu->write_d().set(FUNC(unkeinv_state::write_d));
-	m_maincpu->write_l().set(FUNC(unkeinv_state::write_l));
-	m_maincpu->read_l().set(FUNC(unkeinv_state::read_l));
-	m_maincpu->read_l_tristate().set_constant(0xff);
-	m_maincpu->write_so().set(m_speaker, FUNC(speaker_sound_device::level_w));
-
-	// video hardware
-	PWM_DISPLAY(config, m_display).set_size(6, 8);
-	config.set_default_layout(layout_unkeinv);
-
-	// sound hardware
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
-}
-
-// roms
-
-ROM_START( unkeinv )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "cop421_us4345764", 0x0000, 0x0400, CRC(0068c3a3) SHA1(4e5fd566a5a26c066cc14623a9bd01e109ebf797) ) // typed in from patent US4345764, good print quality
-ROM_END
-
-
-
-
-
-/*******************************************************************************
-
   LJN I Took a Lickin' From a Chicken
   * COP421 MCU label ~/005 COP421-NJC/N
   * 11 leds, 1-bit sound, motor to a chicken on a spring
@@ -692,7 +582,7 @@ ROM_END
   known releases:
   - USA: I Took a Lickin' From a Chicken, published by LJN
   - Japan: Professor Chicken's Genius Classroom 「にわとり博士の天才教室」, published by Bandai
-    (not sure if it's the same ROM, or just licensed the outer shell)
+  - Netherlands: Kip ik heb je, published by Smith Family Toys
 
 *******************************************************************************/
 
@@ -707,7 +597,7 @@ public:
 
 	void lchicken(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER(motor_switch_r);
+	int motor_switch_r();
 
 protected:
 	virtual void machine_start() override;
@@ -738,7 +628,7 @@ void lchicken_state::machine_start()
 
 // handlers
 
-READ_LINE_MEMBER(lchicken_state::motor_switch_r)
+int lchicken_state::motor_switch_r()
 {
 	return m_motor_pos > 0xe8; // approximation
 }
@@ -764,7 +654,7 @@ void lchicken_state::write_d(u8 data)
 {
 	// D0-D3: input mux
 	// D3: motor on
-	m_inp_mux = data & 0xf;
+	m_inp_mux = data;
 	m_motor_on_out = ~data >> 3 & 1;
 }
 
@@ -1279,7 +1169,7 @@ void mbaskb2_state::sub_write_g(u8 data)
 void mbaskb2_state::sub_write_d(u8 data)
 {
 	// D: led select (high)
-	m_d = data & 0xf;
+	m_d = data;
 	update_display();
 }
 
@@ -1442,7 +1332,7 @@ void lafootb_state::write_l(u8 data)
 void lafootb_state::write_d(u8 data)
 {
 	// D: led select, D2,D3: input mux
-	m_d = data & 0xf;
+	m_d = data;
 	m_inp_mux = data >> 2 & 3;
 	update_display();
 }
@@ -1560,7 +1450,7 @@ void mdallas_state::write_d(u8 data)
 {
 	// D: select digit, input mux high
 	m_inp_mux = (m_inp_mux & 0xf) | (data << 4 & 0x30);
-	m_d = data & 0xf;
+	m_d = data;
 	update_display();
 }
 
@@ -1568,7 +1458,7 @@ void mdallas_state::write_g(u8 data)
 {
 	// G: select digit, input mux low
 	m_inp_mux = (m_inp_mux & 0x30) | (data & 0xf);
-	m_g = data & 0xf;
+	m_g = data;
 	update_display();
 }
 
@@ -1633,7 +1523,7 @@ INPUT_PORTS_END
 void mdallas_state::mdallas(machine_config &config)
 {
 	// basic machine hardware
-	COP444L(config, m_maincpu, 900000); // approximation - RC osc. R=57K, C=101pF
+	COP444L(config, m_maincpu, 900000); // approximation - RC osc. R=57K, C=100pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_l().set(FUNC(mdallas_state::write_l));
 	m_maincpu->write_d().set(FUNC(mdallas_state::write_d));
@@ -1656,6 +1546,129 @@ void mdallas_state::mdallas(machine_config &config)
 ROM_START( mdallas )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "cop444l-hyn_n", 0x0000, 0x0800, CRC(7848b78c) SHA1(778d24512180892f58c49df3c72ca77b2618d63b) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Mego Invasion From Space (unreleased)
+  * COP421 (likely a development chip)
+  * 36+9 LEDs with overlay mask (for enemies and player ship), 1-bit sound
+
+  This game is presumedly unreleased. The design is very complex. Player ship
+  and bullets are on a moving "wand", a 2-way mirror makes it appear on the same
+  plane as the enemies and barriers.
+
+  It is described in patent US4345764, the ROM data is included.
+
+*******************************************************************************/
+
+class minspace_state : public hh_cop400_state
+{
+public:
+	minspace_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_cop400_state(mconfig, type, tag)
+	{ }
+
+	void minspace(machine_config &config);
+
+private:
+	void update_display();
+	void write_g(u8 data);
+	void write_d(u8 data);
+	void write_l(u8 data);
+	u8 read_l();
+};
+
+// handlers
+
+void minspace_state::update_display()
+{
+	m_display->matrix(m_g << 4 | m_d, m_l);
+}
+
+void minspace_state::write_g(u8 data)
+{
+	// G0,G1: led select part
+	// G2,G3: input mux
+	m_g = ~data & 0xf;
+	update_display();
+}
+
+void minspace_state::write_d(u8 data)
+{
+	// D0-D3: led select part
+	m_d = ~data & 0xf;
+	update_display();
+}
+
+void minspace_state::write_l(u8 data)
+{
+	// L0-L7: led data
+	m_l = ~data & 0xff;
+	update_display();
+}
+
+u8 minspace_state::read_l()
+{
+	u8 ret = 0xff;
+
+	// L0-L5+G2: positional odd
+	// L0-L5+G3: positional even
+	u8 pos = m_inputs[1]->read() >> 8;
+	if (m_g & 4 && pos & 1)
+		ret ^= (1 << (pos >> 1));
+	if (m_g & 8 && ~pos & 1)
+		ret ^= (1 << (pos >> 1));
+
+	// L7+G3: fire button
+	if (m_g & 8 && m_inputs[0]->read())
+		ret ^= 0x80;
+
+	return ret & ~m_l;
+}
+
+// inputs
+
+static INPUT_PORTS_START( minspace )
+	PORT_START("IN.0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+
+	PORT_START("IN.1")
+	PORT_BIT( 0xfff, 0x600, IPT_PADDLE ) PORT_MINMAX(0x040, 0xbc0) PORT_SENSITIVITY(25) PORT_KEYDELTA(100) PORT_CENTERDELTA(0)
+INPUT_PORTS_END
+
+// config
+
+void minspace_state::minspace(machine_config &config)
+{
+	// basic machine hardware
+	COP421(config, m_maincpu, 850000); // frequency guessed
+	m_maincpu->set_config(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
+	m_maincpu->write_g().set(FUNC(minspace_state::write_g));
+	m_maincpu->write_d().set(FUNC(minspace_state::write_d));
+	m_maincpu->write_l().set(FUNC(minspace_state::write_l));
+	m_maincpu->read_l().set(FUNC(minspace_state::read_l));
+	m_maincpu->read_l_tristate().set_constant(0xff);
+	m_maincpu->write_so().set(m_speaker, FUNC(speaker_sound_device::level_w));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(6, 8);
+	config.set_default_layout(layout_minspace);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( minspace )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "cop421_us4345764", 0x0000, 0x0400, CRC(0068c3a3) SHA1(4e5fd566a5a26c066cc14623a9bd01e109ebf797) ) // typed in from patent US4345764, good print quality
 ROM_END
 
 
@@ -1785,7 +1798,7 @@ public:
 
 private:
 	void update_display();
-	DECLARE_WRITE_LINE_MEMBER(write_so);
+	void write_so(int state);
 	void write_d(u8 data);
 	void write_l(u8 data);
 	u8 read_g();
@@ -1799,7 +1812,7 @@ void lightfgt_state::update_display()
 	m_display->matrix(grid, m_l);
 }
 
-WRITE_LINE_MEMBER(lightfgt_state::write_so)
+void lightfgt_state::write_so(int state)
 {
 	// SO: led grid 0 (and input mux)
 	m_so = state;
@@ -1901,7 +1914,7 @@ ROM_END
   * PCB label: 7924750G02 REV A
   * COP420 MCU label COP420-JWE/N
 
-  see hh_tms1k.cpp bship driver for more information
+  This is the COP420 version, see hh_tms1k.cpp bship driver for more information.
 
 *******************************************************************************/
 
@@ -1922,7 +1935,7 @@ private:
 	void write_g(u8 data);
 	u8 read_l();
 	u8 read_in();
-	DECLARE_WRITE_LINE_MEMBER(write_so);
+	void write_so(int state);
 };
 
 // handlers
@@ -1952,7 +1965,7 @@ u8 bshipg_state::read_in()
 	return read_inputs(4, 0xf00) >> 8;
 }
 
-WRITE_LINE_MEMBER(bshipg_state::write_so)
+void bshipg_state::write_so(int state)
 {
 	// SO: led
 	m_display->matrix(1, state);
@@ -2066,14 +2079,14 @@ ROM_END
 
 *******************************************************************************/
 
-class qkracer_state : public hh_cop400_state
+class qkracera_state : public hh_cop400_state
 {
 public:
-	qkracer_state(const machine_config &mconfig, device_type type, const char *tag) :
+	qkracera_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_cop400_state(mconfig, type, tag)
 	{ }
 
-	void qkracer(machine_config &config);
+	void qkracera(machine_config &config);
 
 private:
 	void update_display();
@@ -2081,46 +2094,46 @@ private:
 	void write_g(u8 data);
 	void write_l(u8 data);
 	u8 read_in();
-	DECLARE_WRITE_LINE_MEMBER(write_sk);
+	void write_sk(int state);
 };
 
 // handlers
 
-void qkracer_state::update_display()
+void qkracera_state::update_display()
 {
 	m_display->matrix(~(m_d | m_g << 4 | m_sk << 8), m_l);
 }
 
-void qkracer_state::write_d(u8 data)
+void qkracera_state::write_d(u8 data)
 {
 	// D: select digit, D3: input mux low bit
 	m_inp_mux = (m_inp_mux & ~1) | (data >> 3 & 1);
-	m_d = data & 0xf;
+	m_d = data;
 	update_display();
 }
 
-void qkracer_state::write_g(u8 data)
+void qkracera_state::write_g(u8 data)
 {
 	// G: select digit, input mux
 	m_inp_mux = (m_inp_mux & 1) | (data << 1 & 0x1e);
-	m_g = data & 0xf;
+	m_g = data;
 	update_display();
 }
 
-void qkracer_state::write_l(u8 data)
+void qkracera_state::write_l(u8 data)
 {
 	// L0-L6: digit segment data
 	m_l = data & 0x7f;
 	update_display();
 }
 
-u8 qkracer_state::read_in()
+u8 qkracera_state::read_in()
 {
 	// IN: multiplexed inputs
 	return read_inputs(5, 0xf);
 }
 
-WRITE_LINE_MEMBER(qkracer_state::write_sk)
+void qkracera_state::write_sk(int state)
 {
 	// SK: green led
 	m_sk = state;
@@ -2129,7 +2142,7 @@ WRITE_LINE_MEMBER(qkracer_state::write_sk)
 
 // inputs
 
-static INPUT_PORTS_START( qkracer )
+static INPUT_PORTS_START( qkracera )
 	PORT_START("IN.0") // D3 port IN
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("Amateur")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("Pro")
@@ -2163,29 +2176,29 @@ INPUT_PORTS_END
 
 // config
 
-void qkracer_state::qkracer(machine_config &config)
+void qkracera_state::qkracera(machine_config &config)
 {
 	// basic machine hardware
-	COP420(config, m_maincpu, 950000); // approximation - RC osc. R=47K, C=100pF
+	COP420(config, m_maincpu, 700000); // approximation - RC osc. R=47K, C=100pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
-	m_maincpu->write_d().set(FUNC(qkracer_state::write_d));
-	m_maincpu->write_g().set(FUNC(qkracer_state::write_g));
-	m_maincpu->write_l().set(FUNC(qkracer_state::write_l));
-	m_maincpu->read_in().set(FUNC(qkracer_state::read_in));
-	m_maincpu->write_sk().set(FUNC(qkracer_state::write_sk));
+	m_maincpu->write_d().set(FUNC(qkracera_state::write_d));
+	m_maincpu->write_g().set(FUNC(qkracera_state::write_g));
+	m_maincpu->write_l().set(FUNC(qkracera_state::write_l));
+	m_maincpu->read_in().set(FUNC(qkracera_state::read_in));
+	m_maincpu->write_sk().set(FUNC(qkracera_state::write_sk));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 7);
 	m_display->set_segmask(0xdf, 0x7f);
 	m_display->set_segmask(0x20, 0x41); // equals sign
-	config.set_default_layout(layout_qkracer);
+	config.set_default_layout(layout_qkracera);
 
 	// no sound!
 }
 
 // roms
 
-ROM_START( qkracer )
+ROM_START( qkracera )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "cop420-npg_n", 0x0000, 0x0400, CRC(17f8e538) SHA1(23d1a1819e6ba552d8da83da2948af1cf5b13d5b) )
 ROM_END
@@ -2308,7 +2321,7 @@ void scat_state::write_d(u8 data)
 {
 	// D: select digit, input mux (low)
 	m_inp_mux = (m_inp_mux & 0x30) | (data & 0xf);
-	m_d = data & 0xf;
+	m_d = data;
 	update_display();
 }
 
@@ -2316,7 +2329,7 @@ void scat_state::write_g(u8 data)
 {
 	// G: select digit, input mux (high)
 	m_inp_mux = (m_inp_mux & 0xf) | (data << 4 & 0x30);
-	m_g = data & 0xf;
+	m_g = data;
 	update_display();
 }
 
@@ -2440,7 +2453,7 @@ private:
 	void update_display();
 	void write_d(u8 data);
 	void write_l(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(write_sk);
+	void write_sk(int state);
 };
 
 // handlers
@@ -2464,7 +2477,7 @@ void vidchal_state::write_l(u8 data)
 	update_display();
 }
 
-WRITE_LINE_MEMBER(vidchal_state::write_sk)
+void vidchal_state::write_sk(int state)
 {
 	// SK: hit led
 	m_sk = state;
@@ -2517,6 +2530,133 @@ ROM_END
 
 /*******************************************************************************
 
+  Tandy Computerized Arcade (model 60-2159A)
+  * PCB label: 60-2159A
+  * COP421 MCU label -B9112 COP421-UPG/N
+  * 12 lamps behind buttons, 1-bit sound
+
+  This is the COP421 version, see hh_tms1k.cpp comparc driver for more information.
+
+*******************************************************************************/
+
+class comparca_state : public hh_cop400_state
+{
+public:
+	comparca_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_cop400_state(mconfig, type, tag)
+	{ }
+
+	void comparca(machine_config &config);
+
+private:
+	void write_d(u8 data);
+	void write_l(u8 data);
+	u8 read_l();
+	u8 read_g();
+	int read_si();
+};
+
+// handlers
+
+void comparca_state::write_d(u8 data)
+{
+	// D: input mux
+	m_d = m_inp_mux = data;
+}
+
+void comparca_state::write_l(u8 data)
+{
+	// L0-L3: lamp data
+	// L4-L6: lamp select
+	m_l = data;
+	m_display->matrix(~m_l >> 4 & 7, m_l);
+}
+
+u8 comparca_state::read_l()
+{
+	// L7: Repeat-2 button
+	return m_inputs[4]->read() << 7 | m_l;
+}
+
+u8 comparca_state::read_g()
+{
+	// G: multiplexed inputs
+	return read_inputs(4, 0xf);
+}
+
+int comparca_state::read_si()
+{
+	// SI: D3
+	return BIT(m_d, 3);
+}
+
+// inputs
+
+static INPUT_PORTS_START( comparca )
+	PORT_START("IN.0") // D0 port G
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Button 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Button 2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Button 3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Button 4")
+
+	PORT_START("IN.1") // D1 port G
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Button 5")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Button 6")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("Button 7")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("Button 8")
+
+	PORT_START("IN.2") // D2 port G
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("Button 9")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Button 10")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("Button 11")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_EQUALS) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("Button 12")
+
+	PORT_START("IN.3") // D3 port G
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("Space-2")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("Select")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("Play-2/Hit-7")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("Start")
+
+	PORT_START("IN.4") // L7
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Repeat-2")
+INPUT_PORTS_END
+
+// config
+
+void comparca_state::comparca(machine_config &config)
+{
+	// basic machine hardware
+	COP421(config, m_maincpu, 550000); // approximation - RC osc. R=33K, C=56pF
+	m_maincpu->set_config(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
+	m_maincpu->write_d().set(FUNC(comparca_state::write_d));
+	m_maincpu->write_l().set(FUNC(comparca_state::write_l));
+	m_maincpu->read_l().set(FUNC(comparca_state::read_l));
+	m_maincpu->read_g().set(FUNC(comparca_state::read_g));
+	m_maincpu->write_so().set(m_speaker, FUNC(speaker_sound_device::level_w));
+	m_maincpu->read_si().set(FUNC(comparca_state::read_si));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(3, 4);
+	config.set_default_layout(layout_comparca);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( comparca )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "cop421-upg_n.ic1", 0x0000, 0x0400, CRC(dcaf8655) SHA1(68bc84a108476c41f91b882d24cb516ba72a8d99) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
   Texas Instruments My Little Computer
   * PCB label: 1066659-4, 17-92-81
   * COP444L MCU label COP444L 1066666
@@ -2547,7 +2687,7 @@ private:
 	void write_l(u8 data);
 	void write_g(u8 data);
 	u8 read_g();
-	DECLARE_WRITE_LINE_MEMBER(write_sk);
+	void write_sk(int state);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(power_off) { set_power(false); }
 };
@@ -2588,13 +2728,12 @@ u8 lilcomp_state::read_g()
 	return read_inputs(3, m_g);
 }
 
-WRITE_LINE_MEMBER(lilcomp_state::write_sk)
+void lilcomp_state::write_sk(int state)
 {
-	if (state == m_sk)
-		return;
-
 	// SK: trigger power off after a short delay (since it also toggles at boot)
-	m_power_timer->adjust(state ? attotime::from_msec(100) : attotime::never);
+	if (state != m_sk)
+		m_power_timer->adjust(state ? attotime::from_msec(100) : attotime::never);
+
 	m_sk = state;
 }
 
@@ -2674,9 +2813,7 @@ SYST( 1980, h2hsoccerc, 0,         0,      h2hsoccerc, h2hsoccerc, h2hbaskbc_sta
 
 SYST( 1981, einvaderc,  einvader,  0,      einvaderc,  einvaderc,  einvaderc_state, empty_init, "Entex", "Space Invader (Entex, COP444L version)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1980, unkeinv,    0,         0,      unkeinv,    unkeinv,    unkeinv_state,   empty_init, "Gordon Barlow Design", "unknown electronic Space Invaders game (patent)", MACHINE_SUPPORTS_SAVE )
-
-SYST( 1980, lchicken,   0,         0,      lchicken,   lchicken,   lchicken_state,  empty_init, "LJN", "I Took a Lickin' From a Chicken", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_MECHANICAL )
+SYST( 1980, lchicken,   0,         0,      lchicken,   lchicken,   lchicken_state,  empty_init, "LJN Toys", "I Took a Lickin' From a Chicken", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_MECHANICAL )
 
 SYST( 1979, funjacks,   0,         0,      funjacks,   funjacks,   funjacks_state,  empty_init, "Mattel Electronics", "Funtronics: Jacks", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1979, funrlgl,    0,         0,      funrlgl,    funrlgl,    funrlgl_state,   empty_init, "Mattel Electronics", "Funtronics: Red Light Green Light", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
@@ -2686,16 +2823,20 @@ SYST( 1979, msoccer2,   0,         0,      msoccer2,   msoccer2,   mbaskb2_state
 SYST( 1980, lafootb,    0,         0,      lafootb,    lafootb,    lafootb_state,   empty_init, "Mattel Electronics", "Look Alive! Football", MACHINE_SUPPORTS_SAVE )
 SYST( 1981, mdallas,    0,         0,      mdallas,    mdallas,    mdallas_state,   empty_init, "Mattel Electronics", "Dalla$ (J.R. handheld)", MACHINE_SUPPORTS_SAVE ) // ***
 
+SYST( 1980, minspace,   0,         0,      minspace,   minspace,   minspace_state,  empty_init, "Mego", "Invasion From Space (patent)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+
 SYST( 1980, plus1,      0,         0,      plus1,      plus1,      plus1_state,     empty_init, "Milton Bradley", "Plus One", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS ) // ***
 SYST( 1981, lightfgt,   0,         0,      lightfgt,   lightfgt,   lightfgt_state,  empty_init, "Milton Bradley", "Electronic Lightfight: The Games of Dueling Lights", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1982, bshipg,     bship,     0,      bshipg,     bshipg,     bshipg_state,    empty_init, "Milton Bradley", "Electronic Battleship (COP420 version, Rev. G)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
 
-SYST( 1979, qkracer,    0,         0,      qkracer,    qkracer,    qkracer_state,   empty_init, "National Semiconductor", "QuizKid Racer (COP420 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1979, qkracera,   qkracer,   0,      qkracera,   qkracera,   qkracera_state,  empty_init, "National Semiconductor", "QuizKid Racer (COP420 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 SYST( 1982, copspa,     0,         0,      mdallas,    copspa,     mdallas_state,   empty_init, "National Semiconductor", "COPS Pocket Assistant", MACHINE_SUPPORTS_SAVE )
 
 SYST( 1984, solution,   0,         0,      scat,       solution,   scat_state,      empty_init, "SCAT", "The Solution", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
 SYST( 1987, vidchal,    0,         0,      vidchal,    vidchal,    vidchal_state,   empty_init, "Select Merchandise", "Video Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+
+SYST( 1981, comparca,   comparc,   0,      comparca,   comparca,   comparca_state,  empty_init, "Tandy Corporation", "Computerized Arcade (COP421 version, model 60-2159A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the games: ***
 
 SYST( 1989, lilcomp,    0,         0,      lilcomp,    lilcomp,    lilcomp_state,   empty_init, "Texas Instruments", "My Little Computer", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 

@@ -37,7 +37,6 @@
 #pragma once
 
 #include "imagedev/cartrom.h"
-#include "formats/cbm_crt.h"
 
 
 //**************************************************************************
@@ -73,14 +72,14 @@ public:
 	// computer interface
 	uint8_t cd_r(offs_t offset, uint8_t data, int lorom, int uprom, int exram);
 	void cd_w(offs_t offset, uint8_t data, int lorom, int uprom, int exram);
-	DECLARE_READ_LINE_MEMBER( p0_r );
-	DECLARE_WRITE_LINE_MEMBER( p0_w );
+	int p0_r();
+	void p0_w(int state);
 
 	// cartridge interface
-	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_write_irq(state); }
-	DECLARE_WRITE_LINE_MEMBER( res_w ) { m_write_res(state); }
-	DECLARE_WRITE_LINE_MEMBER( cnt_w ) { m_write_cnt(state); }
-	DECLARE_WRITE_LINE_MEMBER( sp_w ) { m_write_sp(state); }
+	void irq_w(int state) { m_write_irq(state); }
+	void res_w(int state) { m_write_res(state); }
+	void cnt_w(int state) { m_write_cnt(state); }
+	void sp_w(int state) { m_write_sp(state); }
 
 protected:
 	// device_t implementation

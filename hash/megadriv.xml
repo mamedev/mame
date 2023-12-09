@@ -848,6 +848,29 @@ The three available regions are PAL, NTSC-U and NTSC-J or a combination such as 
 	</software>
 
 
+	<software name="smgp2p" cloneof="smgp2">
+		<description>Ayrton Senna's Super Monaco GP II (Europe, Japan, prototype)</description>
+		<year>1992</year>
+		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL,NTSC-J"/>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="epr1.bin" size="131072" crc="49d4e5c6" sha1="ff79b4b6869458f1440a86ea5b25f0d325acb93f" offset="0x00000" loadflag="load16_byte"/>
+				<rom name="epr0.bin" size="131072" crc="eb0d0619" sha1="831eee46616596f4a985e6e2616def88eee51198" offset="0x00001" loadflag="load16_byte"/>
+				<rom name="epr3.bin" size="131072" crc="10ddeb8e" sha1="da66eb7780f53c5754106b09c7f8cef53a8b2620" offset="0x40000" loadflag="load16_byte"/>
+				<rom name="epr2.bin" size="131072" crc="99bf91df" sha1="07da2e26015022e7e895d7dbe7ba946d701b2b49" offset="0x40001" loadflag="load16_byte"/>
+				<rom name="epr5.bin" size="131072" crc="91b2e098" sha1="905c76b96ddd85c9edee33dfd4c9ba1f5056e91f" offset="0x80000" loadflag="load16_byte"/>
+				<rom name="epr4.bin" size="131072" crc="561b23a5" sha1="d6747cc415587e6918e936ce07b599e69a2743bb" offset="0x80001" loadflag="load16_byte"/>
+				<rom name="epr7.bin" size="131072" crc="376181c6" sha1="fe24eb3263595056e198a533ffb7c86705dcc37a" offset="0xc0000" loadflag="load16_byte"/>
+				<rom name="epr6.bin" size="131072" crc="7ff276dd" sha1="8264f0deb8607a248638d6bd71db22677bebb35c" offset="0xc0001" loadflag="load16_byte"/>
+			</dataarea>
+			<dataarea name="sram" size="16384">
+			</dataarea>
+		</part>
+	</software>
+
+
 	<software name="backtof3">
 		<description>Back to the Future Part III (Europe)</description>
 		<year>1991</year>
@@ -7593,7 +7616,7 @@ Unsupported [Menacer] peripheral
 
 <!-- Both Euro and USA confirmed -->
 	<software name="sonic">
-		<description>Sonic the Hedgehog (Europe, USA)</description>
+		<description>Sonic The Hedgehog (Europe, USA)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="release" value="19910623"/>
@@ -7609,7 +7632,7 @@ Unsupported [Menacer] peripheral
 
 <!-- Jpn only is confirmed -->
 	<software name="sonicj" cloneof="sonic">
-		<description>Sonic the Hedgehog (Japan, Korea)</description>
+		<description>Sonic The Hedgehog (Japan, Korea)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-4049"/>
@@ -7627,7 +7650,7 @@ Unsupported [Menacer] peripheral
 
 <!-- Euro and Jpn are confirmed -->
 	<software name="sonic2">
-		<description>Sonic the Hedgehog 2 (World, rev. A)</description>
+		<description>Sonic The Hedgehog 2 (World, rev. A)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-4088 (JPN)"/>
@@ -7644,7 +7667,7 @@ Unsupported [Menacer] peripheral
 
 
 	<software name="sonic3">
-		<description>Sonic the Hedgehog 3 (Europe)</description>
+		<description>Sonic The Hedgehog 3 (Europe)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -9934,7 +9957,7 @@ Doesn't accept any input
 	</software>
 
 	<software name="sonic3j" cloneof="sonic3">
-		<description>Sonic the Hedgehog 3 (Japan, Korea)</description>
+		<description>Sonic The Hedgehog 3 (Japan, Korea)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-5531"/>
@@ -20132,7 +20155,7 @@ Needs [megadriv_z80_z80_bank_w] workaround to work (emulator copy protection?)
 	</software>
 
 	<software name="micromacc" cloneof="micromac">
-		<description>Micro Machines (Can)</description>
+		<description>Micro Machines (Canada)</description>
 		<year>1993</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -25239,18 +25262,23 @@ https://bootleggames.fandom.com/wiki/San_Guo_Zhi_V
 		</part>
 	</software>
 
-	<software name="sansan" supported="no">
+	<software name="sansan" supported="partial">
 		<description>San San (Japan)</description>
 		<year>1994</year>
 		<publisher>San San Co.</publisher>
 		<notes><![CDATA[
-Unsupported [Sega Mega Modem] features
+Unsupported [Sega Mega Modem] features, local multiplayer supported only.
 ]]></notes>
 		<info name="serial" value="T-147013"/>
 		<info name="alt_title" value="サンサン"/>
+		<info name="usage" value="Initialize SRAM thru option 4 -> 2, accept. Option 2 -> 4 for local multiplayer"/>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="san san (japan).bin" size="1048576" crc="5b85deed" sha1="e882c3af57884862bafc764226c88c287752e9d6"/>
+			</dataarea>
+			<!-- Guessed, SRAM size=16384 causes heavy glitches in menuing -->
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -26513,7 +26541,7 @@ Black screen, writes in ROM area then jumps to PC=1a2000 (encryption?)
 	</software>
 
 	<software name="sonicpir" cloneof="sonic">
-		<description>Sonic the Hedgehog (pirate, ripped from Golden 10 in 1)</description>
+		<description>Sonic The Hedgehog (pirate, ripped from Golden 10 in 1)</description>
 		<year>1991?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -26524,7 +26552,7 @@ Black screen, writes in ROM area then jumps to PC=1a2000 (encryption?)
 	</software>
 
 	<software name="sonicp" cloneof="sonic">
-		<description>Sonic the Hedgehog (prototype)</description>
+		<description>Sonic The Hedgehog (prototype)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -26535,7 +26563,7 @@ Black screen, writes in ROM area then jumps to PC=1a2000 (encryption?)
 	</software>
 
 	<software name="sonic2a" cloneof="sonic2">
-		<description>Sonic the Hedgehog 2 (World)</description>
+		<description>Sonic The Hedgehog 2 (World)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-4088 (JPN)"/>
@@ -26549,7 +26577,7 @@ Black screen, writes in ROM area then jumps to PC=1a2000 (encryption?)
 	</software>
 
 	<software name="sonic2p8" cloneof="sonic2">
-		<description>Sonic the Hedgehog 2 (Beta 4, 19920918, 16.26)</description>
+		<description>Sonic The Hedgehog 2 (Beta 4, 19920918, 16.26)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -26560,7 +26588,7 @@ Black screen, writes in ROM area then jumps to PC=1a2000 (encryption?)
 	</software>
 
 	<software name="sonic2p7" cloneof="sonic2">
-		<description>Sonic the Hedgehog 2 (Beta 5, 19920921, 12.06)</description>
+		<description>Sonic The Hedgehog 2 (Beta 5, 19920921, 12.06)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -26571,7 +26599,7 @@ Black screen, writes in ROM area then jumps to PC=1a2000 (encryption?)
 	</software>
 
 	<software name="sonic2p6" cloneof="sonic2">
-		<description>Sonic the Hedgehog 2 (Beta 6, 19920922, 18.47)</description>
+		<description>Sonic The Hedgehog 2 (Beta 6, 19920922, 18.47)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -26582,7 +26610,7 @@ Black screen, writes in ROM area then jumps to PC=1a2000 (encryption?)
 	</software>
 
 	<software name="sonic2p5" cloneof="sonic2">
-		<description>Sonic the Hedgehog 2 (Beta 6, 19920922, 19.42)</description>
+		<description>Sonic The Hedgehog 2 (Beta 6, 19920922, 19.42)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -26593,7 +26621,7 @@ Black screen, writes in ROM area then jumps to PC=1a2000 (encryption?)
 	</software>
 
 	<software name="sonic2p4" cloneof="sonic2">
-		<description>Sonic the Hedgehog 2 (Beta 7, 19920924, 09.26)</description>
+		<description>Sonic The Hedgehog 2 (Beta 7, 19920924, 09.26)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -26604,7 +26632,7 @@ Black screen, writes in ROM area then jumps to PC=1a2000 (encryption?)
 	</software>
 
 	<software name="sonic2p3" cloneof="sonic2">
-		<description>Sonic the Hedgehog 2 (Beta 8, 19920924, 19.27)</description>
+		<description>Sonic The Hedgehog 2 (Beta 8, 19920924, 19.27)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -26615,7 +26643,7 @@ Black screen, writes in ROM area then jumps to PC=1a2000 (encryption?)
 	</software>
 
 	<software name="sonic2p2" cloneof="sonic2">
-		<description>Sonic the Hedgehog 2 (prototype)</description>
+		<description>Sonic The Hedgehog 2 (prototype)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -26626,7 +26654,7 @@ Black screen, writes in ROM area then jumps to PC=1a2000 (encryption?)
 	</software>
 
 	<software name="sonic2b" cloneof="sonic2">
-		<description>Sonic the Hedgehog 2 (World, rev. 01a)</description>
+		<description>Sonic The Hedgehog 2 (World, rev. 01a)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-4088 (JPN)"/>
@@ -26640,7 +26668,7 @@ Black screen, writes in ROM area then jumps to PC=1a2000 (encryption?)
 	</software>
 
 	<software name="sonic2c" cloneof="sonic2">
-		<description>Sonic the Hedgehog 2 (World, rev. SC02)</description>
+		<description>Sonic The Hedgehog 2 (World, rev. SC02)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-4088 (JPN)"/>
@@ -26654,7 +26682,7 @@ Black screen, writes in ROM area then jumps to PC=1a2000 (encryption?)
 	</software>
 
 	<software name="sonic2p1" cloneof="sonic2">
-		<description>Sonic the Hedgehog 2 (World, prototype)</description>
+		<description>Sonic The Hedgehog 2 (World, prototype)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -26665,7 +26693,7 @@ Black screen, writes in ROM area then jumps to PC=1a2000 (encryption?)
 	</software>
 
 	<software name="sonic2p9" cloneof="sonic2">
-		<description>Sonic the Hedgehog 2 (World, prototype 19920821)</description>
+		<description>Sonic The Hedgehog 2 (World, prototype 19920821)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -26683,7 +26711,7 @@ Black screen, writes in ROM area then jumps to PC=1a2000 (encryption?)
 	</software>
 
 	<software name="sonic2p10" cloneof="sonic2">
-		<description>Sonic the Hedgehog 2 (World, prototype 19920914)</description>
+		<description>Sonic The Hedgehog 2 (World, prototype 19920914)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -26697,7 +26725,7 @@ Black screen, writes in ROM area then jumps to PC=1a2000 (encryption?)
 	</software>
 
 	<software name="sonic2p11" cloneof="sonic2">
-		<description>Sonic the Hedgehog 2 (World, final prototype 19921102)</description>
+		<description>Sonic The Hedgehog 2 (World, final prototype 19921102)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -26711,7 +26739,7 @@ Black screen, writes in ROM area then jumps to PC=1a2000 (encryption?)
 	</software>
 
 	<software name="sonic3pir" cloneof="sonic3">
-		<description>Sonic the Hedgehog 3 (pirate)</description>
+		<description>Sonic The Hedgehog 3 (pirate)</description>
 		<year>1994?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -26725,7 +26753,7 @@ Black screen, writes in ROM area then jumps to PC=1a2000 (encryption?)
 	</software>
 
 	<software name="sonic3u" cloneof="sonic3">
-		<description>Sonic the Hedgehog 3 (USA)</description>
+		<description>Sonic The Hedgehog 3 (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -26748,7 +26776,7 @@ Black screen, writes in ROM area then jumps to PC=1a2000 (encryption?)
 	</software>
 
 	<software name="sonic3up" cloneof="sonic3">
-		<description>Sonic the Hedgehog 3 (USA, prototype 19931120)</description>
+		<description>Sonic The Hedgehog 3 (USA, prototype 19931120)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -26763,7 +26791,7 @@ Black screen, writes in ROM area then jumps to PC=1a2000 (encryption?)
 	</software>
 
 	<software name="sonic3p1" cloneof="sonic3">
-		<description>Sonic the Hedgehog 3 (World, prototype 19931103)</description>
+		<description>Sonic The Hedgehog 3 (World, prototype 19931103)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">

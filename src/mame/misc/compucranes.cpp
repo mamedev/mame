@@ -3,6 +3,8 @@
 /***************************************************************************
 
  Skeleton driver for MCS51-based crane coinops from Compumatic.
+ The same PCB was used on machines from different manufacturers, like OMVending
+ and Covielsa.
 
  Display is just a four digits 7-segments (on a small PCB called "Plumadig").
 
@@ -41,6 +43,8 @@
 
  The MCU on the older PCBs can differ between 80C32 compatible models
  (found with a Winbond W78C32C-40 and with a TS80C32X2-MCA).
+
+ V2 uses a 24C16 SEEPROM, while later models use a 24C64.
 
  "GANCHONEW" V1 PCB has a different layout.
 
@@ -81,14 +85,23 @@ void compucranes_state::ganchonew(machine_config &config)
 // "GANCHONEW V8" PCB with ATX PSU connector
 ROM_START(mastcrane)
 	ROM_REGION(0x80000, "maincpu", 0)
-	ROM_LOAD("v8.ic3",      0x00000, 0x20000, CRC(c47d11ad) SHA1(b0e784b7f68492f2872c06674f92d582def9cd26)) // Found the same ROM on V7 and V8 PCBs
+	ROM_LOAD("v8.ic3",      0x00000, 0x20000, CRC(c47d11ad) SHA1(b0e784b7f68492f2872c06674f92d582def9cd26))
 
 	ROM_REGION(0x00117, "pld", 0)
 	ROM_LOAD("gal16v8.ic4", 0x00000, 0x00117, CRC(4d665a06) SHA1(504f0107482f636cd216579e982c6162c0b120a7)) // Verified to be the same on all known PCB revisions
 ROM_END
 
-// "GANCHONEW V2" PCB with AT PSU connector
+// "GANCHONEW V7" PCB with AT PSU connector
 ROM_START(mastcranea)
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD("v7.ic3",      0x00000, 0x20000, CRC(c3a5a2fe) SHA1(1f89508420b8eb829081bdee17b3248030063d20))
+
+	ROM_REGION(0x00117, "pld", 0)
+	ROM_LOAD("atf16v8.ic4", 0x00000, 0x00117, CRC(4d665a06) SHA1(504f0107482f636cd216579e982c6162c0b120a7)) // Verified to be the same on all known PCB revisions
+ROM_END
+
+// "GANCHONEW V2" PCB with AT PSU connector
+ROM_START(mastcraneb)
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("505.ic3",     0x00000, 0x20000, CRC(3dbb83f1) SHA1(3536762937332add0ca942283cc22ff301884a4a))
 
@@ -96,8 +109,19 @@ ROM_START(mastcranea)
 	ROM_LOAD("gal16v8.ic4", 0x00000, 0x00117, CRC(4d665a06) SHA1(504f0107482f636cd216579e982c6162c0b120a7)) // Verified to be the same on all known PCB revisions
 ROM_END
 
+// "GANCHONEW V2" PCB with AT PSU connector
+ROM_START(octopussy)
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD("w29c011.ic5", 0x00000, 0x20000, CRC(47da93e8) SHA1(aa821dd22c1912ec2942ca6afd989d61df4387d7))
+
+	ROM_REGION(0x00117, "pld", 0)
+	ROM_LOAD("atf16v8.ic4", 0x00000, 0x00117, CRC(4d665a06) SHA1(504f0107482f636cd216579e982c6162c0b120a7))
+ROM_END
+
 } // anonymous namespace
 
 //    YEAR  NAME        PARENT     MACHINE    INPUT      CLASS              INIT        ROT   COMPANY       FULLNAME                FLAGS
 GAME( 199?, mastcrane,  0,         ganchonew, ganchonew, compucranes_state, empty_init, ROT0, "Compumatic", "Master Crane (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 199?, mastcranea, mastcrane, ganchonew, ganchonew, compucranes_state, empty_init, ROT0, "Compumatic", "Master Crane (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, mastcraneb, mastcrane, ganchonew, ganchonew, compucranes_state, empty_init, ROT0, "Compumatic", "Master Crane (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1990, octopussy,  mastcrane, ganchonew, ganchonew, compucranes_state, empty_init, ROT0, "Covielsa",   "Octopussy",            MACHINE_IS_SKELETON_MECHANICAL )

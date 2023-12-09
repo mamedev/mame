@@ -14,8 +14,8 @@
 
 #include "formats/vt_dsk_legacy.h"
 
-#include "formats/imageutl.h"
 #include "corestr.h"
+#include "multibyte.h"
 #include "opresolv.h"
 
 #include <cmath>
@@ -141,7 +141,7 @@ static imgtoolerr_t vzdos_read_sector_data(imgtool::image &img, int track, int s
 	if (ret) return (imgtoolerr_t)ret;
 
 	/* verify sector checksums */
-	if (pick_integer_le(buffer, DATA_SIZE + 2, 2) != chksum16(buffer, DATA_SIZE + 2))
+	if (get_u16le(&buffer[DATA_SIZE + 2]) != chksum16(buffer, DATA_SIZE + 2))
 		return IMGTOOLERR_CORRUPTFILE;
 
 	memcpy(data, &buffer, DATA_SIZE + 2);
@@ -159,7 +159,7 @@ static imgtoolerr_t vzdos_write_sector_data(imgtool::image &img, int track, int 
 	if (ret) return (imgtoolerr_t)ret;
 
 	memcpy(buffer, data, DATA_SIZE + 2);
-	place_integer_le(buffer, DATA_SIZE + 2, 2, chksum16(data, DATA_SIZE + 2));
+	put_u16le(&buffer[DATA_SIZE + 2], chksum16(data, DATA_SIZE + 2));
 
 	ret = floppy_write_sector(imgtool_floppy(img), 0, track, sector_order[sector], data_start, buffer, sizeof(buffer), 0);  /* TODO: pass ddam argument from imgtool */
 	if (ret) return (imgtoolerr_t)ret;
@@ -189,10 +189,10 @@ static imgtoolerr_t vzdos_get_dirent(imgtool::image &img, int index, vzdos_diren
 	entry = ((index % 8) * sizeof(vzdos_dirent));
 
 	memcpy(ent, &buffer[entry], 10);
-	ent->start_track   = pick_integer_le(&buffer[entry], 10, 1);
-	ent->start_sector  = pick_integer_le(&buffer[entry], 11, 1);
-	ent->start_address = pick_integer_le(&buffer[entry], 12, 2);
-	ent->end_address   = pick_integer_le(&buffer[entry], 14, 2);
+	ent->start_track   = buffer[entry + 10];
+	ent->start_sector  = buffer[entry + 11];
+	ent->start_address = get_u16le(&buffer[entry + 12]);
+	ent->end_address   = get_u16le(&buffer[entry + 14]);
 
 	if (ent->ftype == 0x00)
 		return IMGTOOLERR_FILENOTFOUND;
@@ -220,10 +220,10 @@ static imgtoolerr_t vzdos_set_dirent(imgtool::image &img, int index, vzdos_diren
 	entry = ((index % 8) * sizeof(vzdos_dirent));
 
 	memcpy(&buffer[entry], &ent, 10);
-	place_integer_le(buffer, entry + 10, 1, ent.start_track);
-	place_integer_le(buffer, entry + 11, 1, ent.start_sector);
-	place_integer_le(buffer, entry + 12, 2, ent.start_address);
-	place_integer_le(buffer, entry + 14, 2, ent.end_address);
+	buffer[entry + 10] = ent.start_track;
+	buffer[entry + 11] = ent.start_sector;
+	put_u16le(&buffer[entry + 12], ent.start_address);
+	put_u16le(&buffer[entry + 14], ent.end_address);
 
 	/* save new sector */
 	ret = vzdos_write_sector_data(img, 0, (int) index / 8, buffer);
@@ -514,12 +514,12 @@ static imgtoolerr_t vzdos_diskimage_readfile(imgtool::partition &partition, cons
 		if (ret) return ret;
 
 		/* detect sectors pointing to themselfs */
-		if ((track == (int)pick_integer_le(buffer, DATA_SIZE, 1)) && (sector == (int)pick_integer_le(buffer, DATA_SIZE + 1, 1)))
+		if ((track == (int)buffer[DATA_SIZE]) && (sector == (int)buffer[DATA_SIZE + 1]))
 			return IMGTOOLERR_CORRUPTIMAGE;
 
 		/* load next track and sector values */
-		track  = pick_integer_le(buffer, DATA_SIZE, 1);
-		sector = pick_integer_le(buffer, DATA_SIZE + 1, 1);
+		track  = buffer[DATA_SIZE];
+		sector = buffer[DATA_SIZE + 1];
 
 		/* track 0 is invalid */
 		if ((track == 0) && (filesize > DATA_SIZE))
@@ -595,8 +595,8 @@ static imgtoolerr_t vzdos_diskimage_deletefile(imgtool::partition &partition, co
 		if (ret) return ret;
 
 		/* load next track and sector values */
-		next_track  = pick_integer_le(buffer, DATA_SIZE, 1);
-		next_sector = pick_integer_le(buffer, DATA_SIZE + 1, 1);
+		next_track  = buffer[DATA_SIZE];
+		next_sector = buffer[DATA_SIZE + 1];
 
 		/* overwrite sector with default values */
 		ret = vzdos_clear_sector(img, track, sector);
@@ -854,7 +854,7 @@ static imgtoolerr_t vzsnapshot_readfile(imgtool::partition &partition, const cha
 
 	memset(header + 4, 0x00, 17);
 	memcpy(header + 4, entry.fname, vzdos_get_fname_len(entry.fname) + 1);
-	place_integer_le(header, 22, 2, entry.start_address);
+	put_u16le(&header[22], entry.start_address);
 
 	/* write header to file */
 	destf.write(header, sizeof(header));
@@ -879,7 +879,7 @@ static imgtoolerr_t vzsnapshot_writefile(imgtool::partition &partition, const ch
 	/* prepare directory entry */
 	entry.ftype         = header[21] == 0xF1 ? 'B' : 'T';
 	entry.delimitor     = ':';
-	entry.start_address = pick_integer_le(header, 22, 2);
+	entry.start_address = get_u16le(&header[22]);
 
 	/* filename from header or directly? */
 	fnameopt = opts->lookup_int('F');

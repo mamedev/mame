@@ -43,8 +43,108 @@ TODO:
 
 
 #include "emu.h"
-#include "xor100.h"
+
+#include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
+#include "bus/s100/s100.h"
+#include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
+#include "machine/com8116.h"
+#include "machine/i8251.h"
+#include "machine/i8255.h"
+#include "machine/ram.h"
+#include "machine/wd_fdc.h"
+#include "machine/z80ctc.h"
+
+namespace {
+
+#define SCREEN_TAG      "screen"
+#define Z80_TAG         "5b"
+#define I8251_A_TAG     "12b"
+#define I8251_B_TAG     "14b"
+#define I8255A_TAG      "8a"
+#define COM5016_TAG     "15c"
+#define Z80CTC_TAG      "11b"
+#define WD1795_TAG      "wd1795"
+#define CENTRONICS_TAG  "centronics"
+#define RS232_A_TAG     "rs232a"
+#define RS232_B_TAG     "rs232b"
+#define S100_TAG        "s100"
+
+class xor100_state : public driver_device
+{
+public:
+	xor100_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, Z80_TAG)
+		, m_uart_a(*this, I8251_A_TAG)
+		, m_uart_b(*this, I8251_B_TAG)
+		, m_fdc(*this, WD1795_TAG)
+		, m_ctc(*this, Z80CTC_TAG)
+		, m_ram(*this, RAM_TAG)
+		, m_centronics(*this, CENTRONICS_TAG)
+		, m_s100(*this, S100_TAG)
+		, m_floppy(*this, WD1795_TAG":%u", 0U)
+		, m_rom(*this, Z80_TAG)
+		, m_bank1(*this, "bank1")
+		, m_bank2(*this, "bank2")
+		, m_bank3(*this, "bank3")
+	{ }
+
+	void xor100(machine_config &config);
+
+private:
+	void mmu_w(uint8_t data);
+	void prom_toggle_w(uint8_t data);
+	uint8_t prom_disable_r();
+	uint8_t fdc_wait_r();
+	void fdc_dcont_w(uint8_t data);
+	void fdc_dsel_w(uint8_t data);
+	void fdc_intrq_w(int state);
+	void fdc_drq_w(int state);
+
+	uint8_t i8255_pc_r();
+	void ctc_z0_w(int state);
+	void ctc_z1_w(int state);
+	void ctc_z2_w(int state);
+	void write_centronics_busy(int state);
+	void write_centronics_select(int state);
+
+	void xor100_io(address_map &map);
+	void xor100_mem(address_map &map);
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	void bankswitch();
+	void post_load();
+
+	required_device<cpu_device> m_maincpu;
+	required_device<i8251_device> m_uart_a;
+	required_device<i8251_device> m_uart_b;
+	required_device<fd1795_device> m_fdc;
+	required_device<z80ctc_device> m_ctc;
+	required_device<ram_device> m_ram;
+	required_device<centronics_device> m_centronics;
+	required_device<s100_bus_device> m_s100;
+	required_device_array<floppy_connector, 4> m_floppy;
+	required_memory_region m_rom;
+	required_memory_bank m_bank1;
+	required_memory_bank m_bank2;
+	required_memory_bank m_bank3;
+
+	// memory state
+	int m_mode = 0;
+	int m_bank = 0;
+
+	// floppy state
+	bool m_fdc_irq = false;
+	bool m_fdc_drq = false;
+	int m_fdc_dden = 0;
+
+	int m_centronics_busy = 0;
+	int m_centronics_select = 0;
+};
 
 /* Read/Write Handlers */
 
@@ -354,12 +454,12 @@ INPUT_PORTS_END
 
 /* Printer 8255A Interface */
 
-WRITE_LINE_MEMBER( xor100_state::write_centronics_busy )
+void xor100_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
 
-WRITE_LINE_MEMBER( xor100_state::write_centronics_select )
+void xor100_state::write_centronics_select(int state)
 {
 	m_centronics_select = state;
 }
@@ -394,15 +494,15 @@ uint8_t xor100_state::i8255_pc_r()
 
 /* Z80-CTC Interface */
 
-WRITE_LINE_MEMBER( xor100_state::ctc_z0_w )
+void xor100_state::ctc_z0_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER( xor100_state::ctc_z1_w )
+void xor100_state::ctc_z1_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER( xor100_state::ctc_z2_w )
+void xor100_state::ctc_z2_w(int state)
 {
 }
 
@@ -413,7 +513,7 @@ static void xor100_floppies(device_slot_interface &device)
 	device.option_add("8ssdd", FLOPPY_8_SSDD); // Shugart SA-100
 }
 
-void xor100_state::fdc_intrq_w(bool state)
+void xor100_state::fdc_intrq_w(int state)
 {
 	m_fdc_irq = state;
 	m_ctc->trg0(state);
@@ -422,7 +522,7 @@ void xor100_state::fdc_intrq_w(bool state)
 		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
 }
 
-void xor100_state::fdc_drq_w(bool state)
+void xor100_state::fdc_drq_w(int state)
 {
 	m_fdc_drq = state;
 
@@ -522,6 +622,9 @@ void xor100_state::xor100(machine_config &config)
 	m_ctc->zc_callback<2>().set(FUNC(xor100_state::ctc_z2_w));
 
 	FD1795(config, m_fdc, 8_MHz_XTAL / 4);
+	m_fdc->intrq_wr_callback().set(FUNC(xor100_state::fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(xor100_state::fdc_drq_w));
+
 	FLOPPY_CONNECTOR(config, m_floppy[0], xor100_floppies, "8ssdd", floppy_image_device::default_mfm_floppy_formats);
 	FLOPPY_CONNECTOR(config, m_floppy[1], xor100_floppies, "8ssdd", floppy_image_device::default_mfm_floppy_formats);
 	FLOPPY_CONNECTOR(config, m_floppy[2], xor100_floppies, nullptr,    floppy_image_device::default_mfm_floppy_formats);
@@ -560,6 +663,8 @@ ROM_START( xor100 )
 	ROM_SYSTEM_BIOS( 0, "v185", "v1.85" )
 	ROMX_LOAD( "xp 185.8b", 0x000, 0x800, CRC(0d0bda8d) SHA1(11c83f7cd7e6a570641b44a2f2cc5737a7dd8ae3), ROM_BIOS(0) )
 ROM_END
+
+} // anonymous namespace
 
 /* System Drivers */
 

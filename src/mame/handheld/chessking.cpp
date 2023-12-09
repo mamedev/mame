@@ -8,7 +8,6 @@ Hold down START at boot to enter test mode.
 
 TODO:
 - lots of unknown writes
-- sound emulation is guessed
 - dump/add more cartridges? considering how unknown the handheld is, maybe only a handful were released
 - LCD chip(s) is not emulated, maybe the I/O chip does a DMA from RAM to the LCD?
 - chess game is buggy, assume that's just the way it is, aka BTANB
@@ -75,6 +74,10 @@ private:
 	required_device<beep_device> m_beeper;
 	required_device<generic_slot_device> m_cart;
 
+	uint8_t m_3f_data = 0;
+	uint8_t m_cart_bank = 0;
+	uint16_t m_beeper_freq = 0;
+
 	void chesskng_map(address_map &map);
 	void chesskng_io(address_map &map);
 
@@ -97,10 +100,6 @@ private:
 	void unk_6f_w(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	uint8_t m_3f_data = 0;
-	uint8_t m_cart_bank = 0;
-	uint16_t m_beeper_freq = 0;
 };
 
 void chessking_state::machine_start()
@@ -367,4 +366,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS            INIT        COMPANY             FULLNAME                   FLAGS
-SYST( 1994, chesskng, 0,      0,      chesskng, chesskng, chessking_state, empty_init, "I-Star Co., Ltd.", "Chess King (model ET-6)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // sound not 100% verified against device output
+SYST( 1994, chesskng, 0,      0,      chesskng, chesskng, chessking_state, empty_init, "I-Star Co., Ltd.", "Chess King (model ET-6)", MACHINE_SUPPORTS_SAVE )

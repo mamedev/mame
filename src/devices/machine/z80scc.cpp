@@ -99,16 +99,15 @@ baud rate:
 //  CONFIGURABLE LOGGING
 //**************************************************************************
 
-#define LOG_GENERAL (1U <<  0)
-#define LOG_SETUP   (1U <<  1)
-#define LOG_READ    (1U <<  2)
-#define LOG_INT     (1U <<  3)
-#define LOG_CMD     (1U <<  4)
-#define LOG_TX      (1U <<  5)
-#define LOG_RCV     (1U <<  6)
-#define LOG_CTS     (1U <<  7)
-#define LOG_DCD     (1U <<  8)
-#define LOG_SYNC    (1U <<  9)
+#define LOG_SETUP   (1U << 1)
+#define LOG_READ    (1U << 2)
+#define LOG_INT     (1U << 3)
+#define LOG_CMD     (1U << 4)
+#define LOG_TX      (1U << 5)
+#define LOG_RCV     (1U << 6)
+#define LOG_CTS     (1U << 7)
+#define LOG_DCD     (1U << 8)
+#define LOG_SYNC    (1U << 9)
 
 //#define VERBOSE (LOG_GENERAL|LOG_SETUP|LOG_READ|LOG_INT|LOG_CMD|LOG_TX|LOG_RCV|LOG_CTS|LOG_DCD|LOG_SYNC)
 //#define LOG_OUTPUT_STREAM std::cout
@@ -478,24 +477,6 @@ scc85233_device::scc85233_device(const machine_config &mconfig, const char *tag,
 scc8523l_device::scc8523l_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: z80scc_device(mconfig, SCC8523L, tag, owner, clock, TYPE_SCC8523L)
 {
-}
-
-//-------------------------------------------------
-//  device_resolve_objects - device-specific setup
-//-------------------------------------------------
-void z80scc_device::device_resolve_objects()
-{
-	LOG("%s\n", FUNCNAME);
-
-	// resolve callbacks
-	m_out_txd_cb.resolve_all_safe();
-	m_out_dtr_cb.resolve_all_safe();
-	m_out_rts_cb.resolve_all_safe();
-	m_out_wreq_cb.resolve_all_safe();
-	m_out_sync_cb.resolve_all_safe();
-	m_out_rxdrq_cb.resolve_all_safe();
-	m_out_txdrq_cb.resolve_all_safe();
-	m_out_int_cb.resolve_safe();
 }
 
 //-------------------------------------------------
@@ -1065,10 +1046,8 @@ void z80scc_channel::device_start()
 	m_uart->m_wr0_ptrbits = 0;
 
 	m_rx_fifo_sz = (m_uart->m_variant & z80scc_device::SET_ESCC) ? 8 : 3;
-	m_rx_fifo_wp = m_rx_fifo_rp = 0;
 
 	m_tx_fifo_sz = (m_uart->m_variant & z80scc_device::SET_ESCC) ? 4 : 1;
-	m_tx_fifo_wp = m_tx_fifo_rp = 0;
 
 	m_rxc   = 0x00;
 	m_txc   = 0x00;
@@ -1149,6 +1128,10 @@ void z80scc_channel::device_reset()
 	// Reset RS232 emulation
 	receive_register_reset();
 	transmit_register_reset();
+
+	// empty fifos
+	m_rx_fifo_wp = m_rx_fifo_rp = 0;
+	m_tx_fifo_wp = m_tx_fifo_rp = 0;
 
 	// Soft/Channel Reset values (mostly) according to SCC users manual
 	m_wr0   = 0x00;
@@ -1651,7 +1634,7 @@ uint8_t z80scc_channel::do_sccreg_rr14()
 {
 	LOGR("%s\n", FUNCNAME);
 	if (m_uart->m_variant & (z80scc_device::SET_ESCC | z80scc_device::TYPE_SCC85C30))
-		return BIT(m_wr7, 6) ? m_wr7 : m_rr10;
+		return BIT(m_wr7p, 6) ? m_wr7p : m_rr10;
 	else
 		return m_rr10;
 }
@@ -1800,24 +1783,17 @@ void z80scc_channel::do_sccreg_wr0(uint8_t data)
 		   priority conditions to request interrupts. This command allows the use of the internal
 		   daisy chain (even in systems without an external daisy chain) and is the last operation in
 		   an interrupt service routine. */
-		if (m_uart->m_variant & z80scc_device::SET_NMOS)
+		LOGCMD("Reset Highest IUS\n");
+		// loop over all interrupt sources
+		for (auto & elem : m_uart->m_int_state)
 		{
-			logerror("WR0_RESET_HIGHEST_IUS command not supported on NMOS\n");
-		}
-		else
-		{
-			LOGCMD("Reset Highest IUS\n");
-			// loop over all interrupt sources
-			for (auto & elem : m_uart->m_int_state)
+			// find the first interrupt under service
+			if (elem & Z80_DAISY_IEO)
 			{
-				// find the first interrupt under service
-				if (elem & Z80_DAISY_IEO)
-				{
-					LOGCMD("- found IUS bit to clear\n");
-					elem = 0; // Clear IUS bit (called IEO in z80 daisy lingo)
-					m_uart->check_interrupts();
-					break;
-				}
+				LOGCMD("- found IUS bit to clear\n");
+				elem = 0; // Clear IUS bit (called IEO in z80 daisy lingo)
+				m_uart->check_interrupts();
+				break;
 			}
 		}
 		break;
@@ -2015,7 +1991,10 @@ void z80scc_channel::do_sccreg_wr6(uint8_t data)
 void z80scc_channel::do_sccreg_wr7(uint8_t data)
 {
 	LOG("%s(%02x): Receive sync\n", FUNCNAME, data);
-	m_sync_pattern = (data << 8) | (m_sync_pattern & 0xff);
+	if ((m_uart->m_variant & (z80scc_device::SET_ESCC | z80scc_device::TYPE_SCC85C30)) && BIT(m_wr15, 0))
+		m_wr7p = data;
+	else
+		m_sync_pattern = (data << 8) | (m_sync_pattern & 0xff);
 }
 
 /* WR8 is the transmit buffer register */

@@ -13,7 +13,6 @@
 
 #include "adamnet.h"
 #include "cpu/m6800/m6801.h"
-#include "formats/adam_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 

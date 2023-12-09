@@ -25,12 +25,11 @@ zxbus_slot_device::zxbus_slot_device(const machine_config &mconfig, device_type 
 
 void zxbus_slot_device::device_start()
 {
-	device_zxbus_card_interface *const intf(get_card_device());
-	if (intf) intf->set_zxbusbus(*m_zxbus_bus);
+	device_zxbus_card_interface *const card(get_card_device());
+	if (card) card->set_zxbusbus(*m_zxbus_bus);
 
 	m_zxbus_bus->add_slot(*this);
 }
-
 
 DEFINE_DEVICE_TYPE(ZXBUS, zxbus_device, "zxbus", "ZXBUS bus")
 
@@ -60,10 +59,6 @@ device_zxbus_card_interface::device_zxbus_card_interface(const machine_config &m
 {
 }
 
-device_zxbus_card_interface::~device_zxbus_card_interface()
-{
-}
-
 void device_zxbus_card_interface::interface_pre_start()
 {
 	if (!m_zxbus)
@@ -71,9 +66,13 @@ void device_zxbus_card_interface::interface_pre_start()
 }
 
 
+#include "nemoide.h"
 #include "neogs.h"
+#include "smuc.h"
 
 void zxbus_cards(device_slot_interface &device)
 {
+	device.option_add("nemoide", ZXBUS_NEMOIDE);
 	device.option_add("neogs", ZXBUS_NEOGS);
+	device.option_add("smuc", ZXBUS_SMUC);
 }

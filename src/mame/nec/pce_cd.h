@@ -9,7 +9,7 @@
  TYPE DEFINITIONS
  ***************************************************************************/
 
-#include "imagedev/chd_cd.h"
+#include "imagedev/cdromimg.h"
 #include "machine/nvram.h"
 #include "sound/cdda.h"
 #include "sound/msm5205.h"
@@ -198,7 +198,6 @@ private:
 	required_device<nvram_device> m_nvram;
 	required_device<cdrom_image_device> m_cdrom;
 
-	cdrom_file  *m_cd_file = nullptr;
 	const cdrom_file::toc*  m_toc = nullptr;
 	emu_timer   *m_data_timer = nullptr;
 	emu_timer   *m_adpcm_dma_timer = nullptr;
@@ -212,10 +211,10 @@ private:
 
 	emu_timer   *m_ack_clear_timer = nullptr;
 
-	DECLARE_WRITE_LINE_MEMBER(msm5205_int);
+	void msm5205_int(int state);
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
 
-	DECLARE_WRITE_LINE_MEMBER(cdda_end_mark_cb);
+	void cdda_end_mark_cb(int state);
 };
 
 

@@ -53,10 +53,6 @@ void psi_keyboard_bus_device::device_start()
 {
 	// get connected keyboard
 	m_kbd = get_card_device();
-
-	// resolve callbacks
-	m_rx_handler.resolve_safe();
-	m_key_strobe_handler.resolve_safe();
 }
 
 //-------------------------------------------------
@@ -72,7 +68,7 @@ void psi_keyboard_bus_device::device_reset()
 //  host to module interface
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( psi_keyboard_bus_device::tx_w )
+void psi_keyboard_bus_device::tx_w(int state)
 {
 	if (m_kbd)
 		m_kbd->tx_w(state);

@@ -1104,6 +1104,11 @@ end
 					"-Wno-error=uninitialized",   -- netlist
 				}
 			end
+			if version >= 130000 then
+				buildoptions_cpp {
+					"-Wno-xor-used-as-pow",
+				}
+			end
 		end
 	end
 
@@ -1233,7 +1238,7 @@ configuration { "linux-*" }
 		end
 
 
-configuration { "netbsd" }
+configuration { "freebsd or netbsd" }
 		flags {
 			"LinkSupportCircularDependencies",
 		}
@@ -1525,7 +1530,7 @@ function generate_has_header(hashname, hash)
    file:write(string.format("#ifndef GENERATED_HAS_%s_H\n", hashname))
    file:write(string.format("#define GENERATED_HAS_%s_H\n", hashname))
    file:write("\n")
-   for k, v in pairs(hash) do
+   for k, v in ipairs(hash) do
 	  if v then
 		 file:write(string.format("#define HAS_%s_%s\n", hashname, k))
 	  end

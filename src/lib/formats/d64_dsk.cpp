@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /*********************************************************************
 
-    formats/d64_dsk.c
+    formats/d64_dsk.cpp
 
     Commodore 4040/1541/1551 sector disk image format
 
@@ -29,17 +29,17 @@ d64_format::d64_format(const format *_formats)
 	formats = _formats;
 }
 
-const char *d64_format::name() const
+const char *d64_format::name() const noexcept
 {
 	return "d64";
 }
 
-const char *d64_format::description() const
+const char *d64_format::description() const noexcept
 {
 	return "Commodore 4040/1541/1551 disk image";
 }
 
-const char *d64_format::extensions() const
+const char *d64_format::extensions() const noexcept
 {
 	return "d64";
 }
@@ -217,7 +217,7 @@ void d64_format::fix_end_gap(floppy_image_format_t::desc_e* desc, int remaining_
 	desc[22].p1 >>= remaining_size & 0x01;
 }
 
-bool d64_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool d64_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	int type = find_size(io, form_factor);
 	if(type == -1)
@@ -275,12 +275,12 @@ bool d64_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		}
 	}
 
-	image->set_variant(f.variant);
+	image.set_variant(f.variant);
 
 	return true;
 }
 
-bool d64_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool d64_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
 {
 	const format &f = formats[0];
 
@@ -302,7 +302,7 @@ bool d64_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 	return true;
 }
 
-void d64_format::extract_sectors(floppy_image *image, const format &f, desc_s *sdesc, int track, int head, int sector_count) const
+void d64_format::extract_sectors(const floppy_image &image, const format &f, desc_s *sdesc, int track, int head, int sector_count) const
 {
 	int physical_track = this->get_physical_track(f, head, track);
 	int cell_size = this->get_cell_size(f, track);

@@ -45,7 +45,7 @@
 #define LOGWARN(...)      LOGMASKED(LOG_WARN, __VA_ARGS__)
 #define LOGXFER(...)      LOGMASKED(LOG_XFER, __VA_ARGS__)
 
-WRITE_LINE_MEMBER(dc_cons_state::ata_interrupt)
+void dc_cons_state::ata_interrupt(int state)
 {
 	if (state)
 		dc_sysctrl_regs[SB_ISTEXT] |= IST_EXT_GDROM;
@@ -104,6 +104,10 @@ TIMER_CALLBACK_MEMBER(dc_cons_state::atapi_xfer_end )
 		atapi_xferlen -= 2048;
 		atapi_xferbase += 2048;
 	}
+
+	// TODO: understand when this should go off
+	// (would otherwise cause REQ ERRORs in gdrom_device with current hookup)
+	m_ata->write_dmack(0);
 
 	// set the next transfer, or a transfer end event.
 	atapi_timer->adjust(attotime::from_usec(ATAPI_SINGLE_XFER_TIME), atapi_xferlen);

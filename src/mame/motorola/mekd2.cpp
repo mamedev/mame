@@ -107,9 +107,9 @@ public:
 	void mekd2(machine_config &config);
 
 private:
-	DECLARE_READ_LINE_MEMBER(key40_r);
+	int key40_r();
 	uint8_t key_r();
-	DECLARE_WRITE_LINE_MEMBER(nmi_w);
+	void nmi_w(int state);
 	void digit_w(uint8_t data);
 	void segment_w(uint8_t data);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
@@ -211,7 +211,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mekd2_state::trace_timer)
 }
 
 
-WRITE_LINE_MEMBER( mekd2_state::nmi_w )
+void mekd2_state::nmi_w(int state)
 {
 	if (state)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
@@ -227,7 +227,7 @@ WRITE_LINE_MEMBER( mekd2_state::nmi_w )
 
 ************************************************************/
 
-READ_LINE_MEMBER( mekd2_state::key40_r )
+int mekd2_state::key40_r()
 {
 	return BIT(m_keydata, 6);
 }
@@ -376,7 +376,7 @@ void mekd2_state::mekd2(machine_config &config)
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* Devices */
-	PIA6821(config, m_pia_s, 0);
+	PIA6821(config, m_pia_s);
 	m_pia_s->readpa_handler().set(FUNC(mekd2_state::key_r));
 	m_pia_s->readcb1_handler().set(FUNC(mekd2_state::key40_r));
 	m_pia_s->writepa_handler().set(FUNC(mekd2_state::segment_w));
@@ -385,7 +385,7 @@ void mekd2_state::mekd2(machine_config &config)
 	m_pia_s->irqa_handler().set_inputline("maincpu", INPUT_LINE_NMI);
 	m_pia_s->irqb_handler().set_inputline("maincpu", INPUT_LINE_NMI);
 
-	PIA6821(config, m_pia_u, 0);
+	PIA6821(config, m_pia_u);
 	m_pia_u->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 	m_pia_u->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 

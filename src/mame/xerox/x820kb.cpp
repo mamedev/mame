@@ -271,7 +271,6 @@ void xerox_820_keyboard_device::device_start()
 
 void xerox_820_keyboard_device::device_reset()
 {
-	m_kbstb_cb.resolve_safe();
 }
 
 void xerox_820_keyboard_device::device_reset_after_children()
@@ -331,7 +330,7 @@ uint8_t xerox_820_keyboard_device::kb_p2_r()
 //  kb_t0_r -
 //-------------------------------------------------
 
-READ_LINE_MEMBER( xerox_820_keyboard_device::kb_t0_r )
+int xerox_820_keyboard_device::kb_t0_r()
 {
 	uint8_t data = 1;
 
@@ -349,7 +348,7 @@ READ_LINE_MEMBER( xerox_820_keyboard_device::kb_t0_r )
 //  kb_t1_r -
 //-------------------------------------------------
 
-READ_LINE_MEMBER( xerox_820_keyboard_device::kb_t1_r )
+int xerox_820_keyboard_device::kb_t1_r()
 {
 	return 1; // ??? if 0, toggle P17
 }

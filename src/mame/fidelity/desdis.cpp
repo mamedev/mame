@@ -49,9 +49,9 @@ Designer Mach IV Master 2325 (model 6129) overview:
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_desdis.lh" // clickable
-#include "fidel_desdis_68kg.lh" // clickable
-#include "fidel_desdis_68kr.lh" // clickable
+#include "fidel_desdis.lh"
+#include "fidel_desdis_68kg.lh"
+#include "fidel_desdis_68kr.lh"
 
 
 namespace {
@@ -88,6 +88,9 @@ protected:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport m_inputs;
 
+	u8 m_select = 0;
+	u32 m_lcd_data = 0;
+
 	// address maps
 	void fdes2100d_map(address_map &map);
 
@@ -96,9 +99,6 @@ protected:
 	virtual void control_w(offs_t offset, u8 data);
 	virtual void lcd_w(offs_t offset, u8 data);
 	virtual u8 input_r(offs_t offset);
-
-	u8 m_select = 0;
-	u32 m_lcd_data = 0;
 };
 
 void desdis_state::init_fdes2100d()
@@ -158,8 +158,6 @@ void desmas_state::init_fdes2265()
 /*******************************************************************************
     I/O
 *******************************************************************************/
-
-// TTL/generic
 
 void desdis_state::update_lcd()
 {

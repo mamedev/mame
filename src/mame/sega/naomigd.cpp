@@ -8,6 +8,8 @@
 
 #include "romload.h"
 
+#include "multibyte.h"
+
 /*
 
   GPIO pins(main board: EEPROM, DIMM SPDs, option board: PIC16, JPs)
@@ -330,14 +332,14 @@ uint64_t naomi_gdrom_board::des_encrypt_decrypt(bool decrypt, uint64_t src, cons
 	for(int i = 0; i < 32 ; i+=4) {
 		uint32_t temp;
 
-		temp = ((r<<1) | (r>>31)) ^ des_subkeys[subkey];
+		temp = rotl_32(r, 1) ^ des_subkeys[subkey];
 		l ^= DES_SBOX8[ (temp>>0)  & 0x3f ];
 		l ^= DES_SBOX6[ (temp>>8)  & 0x3f ];
 		l ^= DES_SBOX4[ (temp>>16) & 0x3f ];
 		l ^= DES_SBOX2[ (temp>>24) & 0x3f ];
 		subkey++;
 
-		temp = ((r>>3) | (r<<29)) ^ des_subkeys[subkey];
+		temp = rotr_32(r, 3) ^ des_subkeys[subkey];
 		l ^= DES_SBOX7[ (temp>>0)  & 0x3f ];
 		l ^= DES_SBOX5[ (temp>>8)  & 0x3f ];
 		l ^= DES_SBOX3[ (temp>>16) & 0x3f ];
@@ -346,14 +348,14 @@ uint64_t naomi_gdrom_board::des_encrypt_decrypt(bool decrypt, uint64_t src, cons
 		if(decrypt)
 			subkey -= 4;
 
-		temp = ((l<<1) | (l>>31)) ^ des_subkeys[subkey];
+		temp = rotl_32(l, 1) ^ des_subkeys[subkey];
 		r ^= DES_SBOX8[ (temp>>0)  & 0x3f ];
 		r ^= DES_SBOX6[ (temp>>8)  & 0x3f ];
 		r ^= DES_SBOX4[ (temp>>16) & 0x3f ];
 		r ^= DES_SBOX2[ (temp>>24) & 0x3f ];
 		subkey++;
 
-		temp = ((l>>3) | (l<<29)) ^ des_subkeys[subkey];
+		temp = rotr_32(l, 3) ^ des_subkeys[subkey];
 		r ^= DES_SBOX7[ (temp>>0)  & 0x3f ];
 		r ^= DES_SBOX5[ (temp>>8)  & 0x3f ];
 		r ^= DES_SBOX3[ (temp>>16) & 0x3f ];
@@ -370,22 +372,6 @@ uint64_t naomi_gdrom_board::des_encrypt_decrypt(bool decrypt, uint64_t src, cons
 	permutate(r, l, 0x0f0f0f0f, 4);
 
 	return (uint64_t(r) << 32) | uint64_t(l);
-}
-
-uint64_t naomi_gdrom_board::read_to_qword(const uint8_t *region)
-{
-	uint64_t ret = 0;
-
-	for(int i=0;i<8;i++)
-		ret |= uint64_t(region[i]) << (56-(8*i));
-
-	return ret;
-}
-
-void naomi_gdrom_board::write_from_qword(uint8_t *region, uint64_t qword)
-{
-	for(int i=0;i<8;i++)
-		region[i] = qword >> (56-(i*8));
 }
 
 // For ide gdrom controller
@@ -410,7 +396,6 @@ idegdrom_device::idegdrom_device(const machine_config &mconfig, const char *tag,
 void idegdrom_device::device_start()
 {
 	pci_device::device_start();
-	irq_cb.resolve_safe();
 	add_map(0x00000020, M_IO, FUNC(idegdrom_device::map_command));
 	bank_infos[0].adr = 0x01c0;
 	// pci system does not support base addresses not multiples of size
@@ -434,11 +419,11 @@ void idegdrom_device::map_extra(uint64_t memory_window_start, uint64_t memory_wi
 
 static void gdrom_devices(device_slot_interface &device)
 {
-	device.option_add("gdrom", GDROM);
+	device.option_add("gdrom", ATAPI_GDROM);
 }
 
 
-WRITE_LINE_MEMBER(idegdrom_device::ide_irq)
+void idegdrom_device::ide_irq(int state)
 {
 	irq_cb(state);
 }
@@ -876,14 +861,8 @@ void naomi_gdrom_board::find_file(const char *name, const uint8_t *dir_sector, u
 		}
 		if(fnlen == FILENAME_LENGTH+1) {
 			// start sector and size of file
-			file_start = ((dir_sector[pos+2] << 0) |
-							(dir_sector[pos+3] << 8) |
-							(dir_sector[pos+4] << 16) |
-							(dir_sector[pos+5] << 24));
-			file_size =  ((dir_sector[pos+10] << 0) |
-							(dir_sector[pos+11] << 8) |
-							(dir_sector[pos+12] << 16) |
-							(dir_sector[pos+13] << 24));
+			file_start = get_u32le(&dir_sector[pos+2]);
+			file_size =  get_u32le(&dir_sector[pos+10]);
 
 			logerror("start %08x size %08x\n", file_start, file_size);
 			break;
@@ -951,10 +930,7 @@ void naomi_gdrom_board::device_start()
 		// read frame 0xb06e (frame=sector+150)
 		// dimm board firmware starts straight from this frame
 		gdromfile->read_data((netpic ? 0 : 45000) + 16, buffer, cdrom_file::CD_TRACK_MODE1);
-		uint32_t path_table = ((buffer[0x8c+0] << 0) |
-								(buffer[0x8c+1] << 8) |
-								(buffer[0x8c+2] << 16) |
-								(buffer[0x8c+3] << 24));
+		uint32_t path_table = get_u32le(&buffer[0x8c]);
 		// path table
 		gdromfile->read_data(path_table, buffer, cdrom_file::CD_TRACK_MODE1);
 
@@ -964,10 +940,7 @@ void naomi_gdrom_board::device_start()
 		uint32_t file_start = 0, file_size = 0;
 
 		if (netpic == 0) {
-			uint32_t dir = ((buffer[0x2 + 0] << 0) |
-				(buffer[0x2 + 1] << 8) |
-				(buffer[0x2 + 2] << 16) |
-				(buffer[0x2 + 3] << 24));
+			uint32_t dir = get_u32le(&buffer[0x2]);
 
 			gdromfile->read_data(dir, dir_sector, cdrom_file::CD_TRACK_MODE1);
 			find_file(name, dir_sector, file_start, file_size);
@@ -985,10 +958,7 @@ void naomi_gdrom_board::device_start()
 			{
 				if (buffer[i] == 3 && buffer[i + 8] == 'R' && buffer[i + 9] == 'O' && buffer[i + 10] == 'M')    // find ROM dir
 				{
-					uint32_t dir = ((buffer[i + 2] << 0) |
-						(buffer[i + 3] << 8) |
-						(buffer[i + 4] << 16) |
-						(buffer[i + 5] << 24));
+					uint32_t dir = get_u32le(&buffer[i + 2]);
 					memcpy(name, "ROM.BIN", 7);
 					gdromfile->read_data(dir, dir_sector, cdrom_file::CD_TRACK_MODE1);
 					break;
@@ -1017,7 +987,7 @@ void naomi_gdrom_board::device_start()
 
 			// decrypt read data from dimm_des_data to dimm_data
 			for (int i = 0; i < file_rounded_size; i += 8)
-				write_from_qword(&dimm_data[i], swapendian_int64(des_encrypt_decrypt(true, swapendian_int64(read_to_qword(&dimm_des_data[i])), des_subkeys)));
+				put_u64le(&dimm_data[i], des_encrypt_decrypt(true, get_u64le(&dimm_des_data[i]), des_subkeys));
 		}
 
 		delete gdromfile;
@@ -1170,21 +1140,21 @@ ROM_START( dimm )
 
 	// main firmwares
 	ROM_REGION(0x200000, "bios", ROMREGION_64BIT)
-	ROM_SYSTEM_BIOS(0, "fpr-23489c.ic14", "Bios 0")
+	ROM_SYSTEM_BIOS(0, "fpr-23489c.ic14", "BIOS 0")
 	ROMX_LOAD( "fpr-23489c.ic14", 0x000000, 0x200000, CRC(bc38bea1) SHA1(b36fcc6902f397d9749e9d02de1bbb7a5e29d468), ROM_BIOS(0))
-	ROM_SYSTEM_BIOS(1, "203_203.bin", "Bios 1")
+	ROM_SYSTEM_BIOS(1, "203_203.bin", "BIOS 1")
 	ROMX_LOAD( "203_203.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(6f55f1ae0606816a4eca6645ed36eb7f9c7ad9cf), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS(2, "fpr23718.ic36", "Bios 2")
+	ROM_SYSTEM_BIOS(2, "fpr23718.ic36", "BIOS 2")
 	ROMX_LOAD( "fpr23718.ic36",   0x000000, 0x200000, CRC(a738ea1c) SHA1(b7b5a55a6a4cf0aa2df1b3dff62ff67f864c55e8), ROM_BIOS(2))
-	ROM_SYSTEM_BIOS(3, "213_203.bin", "Bios 3")
+	ROM_SYSTEM_BIOS(3, "213_203.bin", "BIOS 3")
 	ROMX_LOAD( "213_203.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(17131f318632610b87bc095156ffad4597fed4ca), ROM_BIOS(3))
-	ROM_SYSTEM_BIOS(4, "217_203.bin", "Bios 4")
+	ROM_SYSTEM_BIOS(4, "217_203.bin", "BIOS 4")
 	ROMX_LOAD( "217_203.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(e5a229ae7ed48b2955cad63529fd938c6db555e5), ROM_BIOS(4))
-	ROM_SYSTEM_BIOS(5, "fpr23905.ic36", "Bios 5")
+	ROM_SYSTEM_BIOS(5, "fpr23905.ic36", "BIOS 5")
 	ROMX_LOAD( "fpr23905.ic36",   0x000000, 0x200000, CRC(ffffffff) SHA1(acade4362807c7571b1c2a48ed6067e4bddd404b), ROM_BIOS(5))
-	ROM_SYSTEM_BIOS(6, "317_312.bin", "Bios 6")
+	ROM_SYSTEM_BIOS(6, "317_312.bin", "BIOS 6")
 	ROMX_LOAD( "317_312.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(31d698cd659446ee09a2eeedec6e4bc6a19d05e8), ROM_BIOS(6))
-	ROM_SYSTEM_BIOS(7, "401_203.bin", "Bios 7")
+	ROM_SYSTEM_BIOS(7, "401_203.bin", "BIOS 7")
 	ROMX_LOAD( "401_203.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(edb52597108462bcea8eb2a47c19e51e5fb60638), ROM_BIOS(7))
 
 	// dynamically filled with data

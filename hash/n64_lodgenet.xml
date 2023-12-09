@@ -1,0 +1,436 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+
+<softwarelist name="n64_lodgenet" description="LodgeNet 64 software">
+
+	<software name="1080snow" supported="no">
+		<description>1080° Snowboarding</description>
+		<year>1998</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="nteg00"/>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="nteg00.z64" size="0x1000000" crc="67e010d2" sha1="7266eef53af8f2c21f3e3288258121f97eddfa7e" status="baddump"/>
+<!--                <rom name="nteg00.i64" size="64" crc="57c7bfe2" sha1="23e06350c61dccf3ffaade55873163adabf747f7" status="baddump"/> -->
+			</dataarea>
+
+		</part>
+	</software>
+
+	<software name="dk64" supported="no">
+		<description>Donkey Kong 64</description>
+		<year>1999</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="ndog00"/>
+		<info name="usage" value="Requires 16k EEPROM." />
+		<info name="user_notes" value="Will crash unless you let it run up until the intro song starts to play." />
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="0x2000000">
+				<rom name="ndog00.z64" size="0x2000000" crc="acba2248" sha1="f39476827ccf7f03707de5d79949559a4dac390b" status="baddump"/>
+<!--                <rom name="ndog00.i64" size="0x40" crc="2e760dba" sha1="3ec335744c43823df3bff3dc5936f6c0611e5891" status="baddump"/> -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drmar64" supported="no">
+		<description>Dr. Mario 64</description>
+		<year>2001</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="nn6g00"/>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="nn6g00.z64" size="0x400000" crc="dd5190ee" sha1="e63b10abfaa37aa8c7f37643d6d4e82fadb511fe" status="baddump"/>
+<!--                <rom name="nn6g00.i64" size="0x40" crc="8f5aa504" sha1="87ab08a44a9df500650223a00fa067b5fa616e08" status="baddump"/> -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="excitb64" supported="no">
+		<description>Excitebike 64 (USA)</description>
+		<year>2000</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="nmxg00"/>
+		<info name="usage" value="Requires 16k EEPROM." />
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="nmxg00.z64" size="0x1000000" crc="a1895884" sha1="3a043dc4c8b1351ca56c3ab9bb061bd7fa99c312" status="baddump"/>
+<!--                <rom name="nmxg00.i64" size="0x40" crc="ddd8f443" sha1="f78929fd62668cd0f0b7146b1e55f4430cb1f997" status="baddump"/> -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fzerox" supported="no">
+		<description>F-Zero X</description>
+		<year>1998</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="nfzg00"/>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="nfzg00.z64" size="0x1000000" crc="1c753f3f" sha1="2a7cd80ce10a654f3844c602268d66cdbe78230d" status="baddump"/>
+<!--                <rom name="nfzg00.i64" size="0x40" crc="0ca548dc" sha1="4b7077c638883195ec8a0b94f5e96391c2fc68ab" status="baddump"/> -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gauntleg" supported="no">
+		<description>Gauntlet Legends</description>
+		<year>1999</year>
+		<publisher>Midway</publisher>
+		<info name="serial" value="ngxg02"/>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="ngxg02.z64" size="0x1000000" crc="1f030279" sha1="45a8d42e17993d1009c858d1847b311197b04f8c" status="baddump"/>
+<!--                <rom name="ngxg02.i64" size="0x40" crc="195f583f" sha1="9ab84f08b4d54ccf627080e657afa3f1893fec92" status="baddump"/> -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hydroth" supported="no">
+		<description>Hydro Thunder</description>
+		<year>2000</year>
+		<publisher>Midway</publisher>
+		<info name="serial" value="nhtg01"/>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="0x2000000">
+				<rom name="nhtg01.z64" size="0x2000000" crc="1ec49934" sha1="30794eb5c1c6a22fbb9dd530f22d153163a6ccda" status="baddump"/>
+<!--                <rom name="nhtg01.i64" size="0x40" crc="2e82689d" sha1="d77158239a249f4db34c31d6e2e15b9e3e948fe0" status="baddump"/> -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kirby64" supported="no">
+		<description>Kirby 64 - The Crystal Shards</description>
+		<year>2000</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="nk4g00"/>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="0x2000000">
+				<rom name="nk4g00.z64" size="0x2000000" crc="70ba28e4" sha1="f615c6e10d1044c944bd4965c5471bb3f1cf5c5b" status="baddump"/>
+<!--                <rom name="nk4g00.i64" size="0x40" crc="5a049d23" sha1="265413c4a08f7aead7ca7bd746f3897c74eb0029" status="baddump"/> -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zeldamaj" supported="no">
+		<description>The Legend of Zelda - Majora's Mask</description>
+		<year>2000</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="nzsg00"/>
+		<info name="usage" value="Requires 16k EEPROM." />
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="0x2000000">
+				<rom name="nzsg00.z64" size="0x2000000" crc="e4b47e08" sha1="ecabc86f0de743c02ba3fa0c83ab163538b00be9" status="baddump"/>
+<!--                <rom name="nzsg00.i64" size="0x40" crc="8d23977d" sha1="f882460a888b8db76e8b163fd508d89e7b2e9e00" status="baddump"/> -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zeldaoot" supported="no">
+		<description>The Legend of Zelda - Ocarina of Time</description>
+		<year>1998</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="czlg00" />
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="0x2000000">
+				<rom name="czlg00.z64" size="0x2000000" crc="c4d2ac1d" sha1="86ff85565e0e4f78d56f50e73df51ba29d36738a" status="baddump"/>
+<!--                <rom name="czlg00.i64" size="0x40" crc="0eb0198c" sha1="45185a1938db659ee6760117cd4f742aac5e18bf" status="baddump"/> -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marioglf" supported="no">
+		<description>Mario Golf</description>
+		<year>1999</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="nmfg00"/>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="0x2000000">
+				<rom name="nmfg00.z64" size="0x2000000" crc="1c256575" sha1="47c5f700940bb65be1145e7d6543ddf1a816ddda" status="baddump"/>
+<!--                <rom name="nmfg00.i64" size="0x40" crc="df31532f" sha1="51db8e096b345ca306d34d114dc82bf36211db1d" status="baddump"/> -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mariokrt" supported="no">
+		<description>Mario Kart 64</description>
+		<year>1997</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="nktg00"/>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="0xc00000">
+				<rom name="nktg00.z64" size="0xc00000" crc="407edef1" sha1="5b0a0c8b57881f43f9314b427a84d29a46a12607" status="baddump"/>
+<!--                <rom name="nktg00.i64" size="0x40" crc="de24f369" sha1="45ffe8cdac5266f261b7b1ca3d2cca7c48877bea" status="baddump"/> -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mariopr3" supported="no">
+		<description>Mario Party 3</description>
+		<year>2001</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="nmvg00"/>
+		<info name="usage" value="Requires 16k EEPROM." />
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="0x2000000">
+				<rom name="nmvg00.z64" size="0x2000000" crc="9f929c0f" sha1="9be79ddb66a6306dec7404e934c6d9fe454f42f4" status="baddump"/>
+<!--                <rom name="nmvg00.i64" size="0x40" crc="80ee8f86" sha1="c2c18a6d2b2c098767d7015f06300a1fc5772a33" status="baddump"/> -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marioten" supported="no">
+		<description>Mario Tennis</description>
+		<year>2000</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="nm8g00"/>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="nm8g00.z64" size="0x1000000" crc="02af0a24" sha1="1f76e775c5f2e247d6550aecc2666149c6025989" status="baddump"/>
+<!--                <rom name="nm8g00.i64" size="0x40" crc="fe9453db" sha1="0c1a3f857838c2f3c6268a825b9533725aabeec8" status="baddump"/> -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="midwaygh" supported="no">
+		<description>Midway's Greatest Arcade Hits Vol. 1</description>
+		<year>2000</year>
+		<publisher>Midway</publisher>
+		<info name="serial" value="naig01"/>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="naig01.z64" size="0x400000" crc="f3c48bb7" sha1="a36131328ad707800f6841289cdede17b3b9ee16" status="baddump"/>
+<!--                <rom name="naig01.i64" size="0x40" crc="ecd08883" sha1="7ece35ed1c97dfc8c1364dbf5f4a08475237dd45" status="baddump"/> -->
+
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mk4" supported="no">
+		<description>Mortal Kombat 4</description>
+		<year>1998</year>
+		<publisher>Midway</publisher>
+		<info name="serial" value="nm4g01"/>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="nm4g01.z64" size="0x1000000" crc="ea494c11" sha1="535429836cfd4b6f533dd6dda540a19286613518" status="baddump"/>
+<!--                <rom name="nm4g01.i64" size="0x40" crc="d8b7a45d" sha1="11c67fab63842aa58dc9bb41535d1924222d5a54" status="baddump"/> -->
+
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ntetris" supported="no">
+		<description>The New Tetris</description>
+		<year>1999</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="nrig00"/>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="0xc00000">
+				<rom name="nrig00.z64" size="0xc00000" crc="d3523b37" sha1="cf52ba144788ecc9c1f7cfd61d7878c6173b1ef6" status="baddump"/>
+<!--                <rom name="nrig00.i64" size="0x40" crc="b120d9e4" sha1="18ebc23a139eea274333cce9635a2852bcf3ea2a" status="baddump"/> -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="papermar" supported="no">
+		<description>Paper Mario</description>
+		<year>2000</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="nmqg00"/>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="0x4000000">
+				<rom name="nmqg00.z64" size="0x4000000" crc="f845af4e" sha1="c54905138e67daaddc6def94e76f626c4fbc81f7" status="baddump"/>
+<!--                <rom name="nmqg00.i64" size="0x40" crc="cb9f0acf" sha1="c0b890b570121defd863c1e01ef076091e0f5b44" status="baddump"/> -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pilotwin" supported="no">
+		<description>Pilotwings 64</description>
+		<year>1996</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="npwg01"/>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="npwg01.z64" size="0x800000" crc="29fa9832" sha1="580d65f3d5cae595bf7c62456ff6ea60a4595798" status="baddump"/>
+<!--                <rom name="npwg01.i64" size="0x40" crc="8756a34a" sha1="7b623ec9ae5c7be5dd2830ba5d2d7c30f98ea57b" status="baddump"/> -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokesnap" supported="no">
+		<description>Pokémon Snap</description>
+		<year>1999</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="npfg00"/>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="npfg00.z64" size="0x1000000" crc="8347c9bc" sha1="b624c57e4d9e7851b422475a200fe72a300e3b1c" status="baddump"/>
+<!--                <rom name="npfg00.i64" size="0x40" crc="a72187f0" sha1="7017d71fce3e1f9e55a143f530288caaa9ca0bb9" status="baddump"/> -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rampage2" supported="no">
+		<description>Rampage 2 - Universal Tour</description>
+		<year>1998</year>
+		<publisher>Midway</publisher>
+		<info name="serial" value="n2pg01"/>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="0xc00000">
+				<rom name="n2pg01.z64" size="0xc00000" crc="c28afc5e" sha1="0a6c390b7d1a96b93fc28faa3b11cf18400b1773" status="baddump"/>
+<!--                <rom name="n2pg01.i64" size="0x40" crc="86a3477e" sha1="5aff7233b78eb203563353089be032037c9af651" status="baddump"/> -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="r2rumble" supported="no">
+		<description>Ready 2 Rumble Boxing</description>
+		<year>1999</year>
+		<publisher>Midway</publisher>
+		<info name="serial" value="nrdg01"/>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="0x1FB5360">
+				<rom name="nrdg01.z64" size="0x1FB5360" crc="6d8dab04" sha1="2ad70a3243a20cd02d24103a2717c90654c173ac" status="baddump"/>
+				<!-- Dump size is 33,248,096. Underdump? -->
+<!--                <rom name="nrdg01.i64" size="0x40" crc="eda5e440" sha1="c8f691d1e88ddf1423685b593d3b6496728448ad" status="baddump"/> -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rush2" supported="no">
+		<description>Rush 2 - Extreme Racing USA</description>
+		<year>1998</year>
+		<publisher>Midway</publisher>
+		<info name="serial" value="nr2g02"/>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="0xc00000">
+				<rom name="nr2g02.z64" size="0xc00000" crc="c7e9d391" sha1="1556edd66c54bf6ec200915ac4265f078c1555a2" status="baddump"/>
+<!--                <rom name="nr2g02.i64" size="0x40" crc="889f42d1" sha1="78dff0630eba88816d0ddb45bb2af101e00b7f63" status="baddump"/> -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starfox" supported="no">
+		<description>Star Fox 64</description>
+		<year>1997</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="nfxg01"/>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="0xc00000">
+				<rom name="nfxg01.z64" size="0xc00000" crc="637a422d" sha1="1b759465439297fbbe21c19df0924d8e75b1aa5a" status="baddump"/>
+<!--                <rom name="nfxg01.i64" size="0x40" crc="f89ccbcf" sha1="0de280df6c5ed6dd7c529c1784123a79514b3d74" status="baddump"/> -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swrogue" supported="no">
+		<description>Star Wars - Rogue Squadron</description>
+		<year>1998</year>
+		<publisher>LucasArts</publisher>
+		<info name="serial" value="nrsg00"/>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="nrsg00.z64" size="0x1000000" crc="b31c4197" sha1="80cdebe735d21589b692157633aae4be0b98c08e" status="baddump"/>
+<!--                <rom name="nrsg00.i64" size="0x40" crc="b2c4fd5d" sha1="dccd8a3aaecf1b3d8148f56dd51be31dc1048f27" status="baddump"/> -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sm64u" supported="no">
+		<description>Super Mario 64</description>
+		<year>1996</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="nsmg00"/>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="nsmg00.z64" size="0x800000" crc="35c02d9f" sha1="37f5ed5394d885de2aff705074bd76ddc95d3cc9" status="baddump"/>
+<!--                <rom name="nsmg00.i64" size="0x40" crc="1749981b" sha1="1530b8a818b0457847b9b79add0840c4c2fa0629" status="baddump"/> -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smashbro" supported="no">
+		<description>Super Smash Bros.</description>
+		<year>1999</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="nalg00"/>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="nalg00.z64" size="0x1000000" crc="1c001a5d" sha1="a0aea7d219443209c6580a501601d3151c58d3ac" status="baddump"/>
+<!--                <rom name="nalg00.i64" size="0x40" crc="6c30334f" sha1="7ecf5ccbc981ecca414ebaa86eef57ce721c32e8" status="baddump"/> -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vchess" supported="no">
+		<description>Virtual Chess 64</description>
+		<year>1998</year>
+		<publisher>Titus</publisher>
+		<info name="serial" value="nvcg02" />
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="nvcg02.z64" size="0x400000" crc="ac7aa76d" sha1="90a012eb6a0cb1ac158492a6c2683f181c5b0205" status="baddump"/>
+<!--                <rom name="nvcg02.i64" size="0x40" crc="e59ad6fb" sha1="8ff65140eeb055798663a0cdcac8ebcdc90cefd8" status="baddump"/> -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vpool" supported="no">
+		<description>Virtual Pool 64</description>
+		<year>1998</year>
+		<publisher>Crave Entertainment</publisher>
+		<info name="serial" value="nvrg03" />
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="nvrg03.z64" size="0x400000" crc="b58fc734" sha1="b595e31c1599d52ef363c974ea54e52f201795f2" status="baddump"/>
+<!--                <rom name="nvrg03.i64" size="0x40" crc="fdc31374" sha1="0ece94752fcb28e08c4c311bc3f5d545f3b7517a" status="baddump"/> -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="waverace" supported="no">
+		<description>Wave Race 64</description>
+		<year>1996</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="nwrg11"/>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="nwrg11.z64" size="0x800000" crc="6def22dc" sha1="895c70d2280d5d6cc0bd7013a135c21b688f9f80" status="baddump"/>
+<!--                <rom name="nwrg11.i64" size="0x40" crc="7940a187" sha1="7954964efb9f8cbba9d1385c2a24007714cd5966" status="baddump"/> -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yoshisto" supported="no">
+		<description>Yoshi's Story</description>
+		<year>1997</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="nysg00"/>
+		<info name="usage" value="Requires 16k EEPROM." />
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="nysg00.z64" size="0x1000000" crc="19a7091e" sha1="f489a3cdef729cd1ade23996096fe88501e75079" status="baddump"/>
+<!--                <rom name="nysg00.i64" size="0x40" crc="57c2cf72" sha1="0c721086f560a6faf9e8b1476d033e261d3f24cc" status="baddump"/> -->
+			</dataarea>
+		</part>
+	</software>
+
+<!-- System utilities -->
+
+	<software name="eeerase" supported="no">
+		<description>eeerase</description>
+		<year>19??</year>
+		<publisher>LodgeNet</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="0x120000">
+				<rom name="eeerase.z64" size="0x120000" crc="2d5bc167" sha1="bcb439e41a997ee459a0b792cbbfe4a765894d67" status="baddump"/>
+<!--                <rom name="eeerase.i64" size="0x40" crc="8e89a3c6" sha1="9bc23e80b0737b0f9401f8512113f8284414538b" status="baddump"/> -->
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

@@ -72,6 +72,7 @@ To summarize, known MCU chip ROM serials+year:
 *******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/mcs48/mcs48.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
@@ -83,9 +84,9 @@ To summarize, known MCU chip ROM serials+year:
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_gambit.lh" // clickable
-#include "fidel_msc_v2.lh" // clickable
-#include "fidel_sc6.lh" // clickable
+#include "fidel_gambit.lh"
+#include "fidel_msc_v2.lh"
+#include "fidel_sc6.lh"
 
 
 namespace {
@@ -122,6 +123,9 @@ private:
 	optional_device<generic_slot_device> m_cart;
 	required_ioport m_inputs;
 
+	u8 m_led_select = 0;
+	u8 m_inp_mux = 0;
+
 	// address maps
 	void msc_map(address_map &map);
 	void sc6_map(address_map &map);
@@ -134,11 +138,8 @@ private:
 
 	u8 read_inputs();
 	u8 input_r();
-	DECLARE_READ_LINE_MEMBER(input6_r);
-	DECLARE_READ_LINE_MEMBER(input7_r);
-
-	u8 m_led_select = 0;
-	u8 m_inp_mux = 0;
+	int input6_r();
+	int input7_r();
 };
 
 void sc6_state::machine_start()
@@ -153,8 +154,6 @@ void sc6_state::machine_start()
 /*******************************************************************************
     I/O
 *******************************************************************************/
-
-// MCU ports/generic
 
 void sc6_state::update_display()
 {
@@ -207,13 +206,13 @@ u8 sc6_state::input_r()
 	return (read_inputs() & 0x3f) | 0xc0;
 }
 
-READ_LINE_MEMBER(sc6_state::input6_r)
+int sc6_state::input6_r()
 {
 	// T0: multiplexed inputs bit 6
 	return read_inputs() >> 6 & 1;
 }
 
-READ_LINE_MEMBER(sc6_state::input7_r)
+int sc6_state::input7_r()
 {
 	// T1: multiplexed inputs bit 7
 	return read_inputs() >> 7 & 1;

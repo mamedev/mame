@@ -95,9 +95,6 @@ void stepper_device::update_optic()
 
 void stepper_device::device_start()
 {
-	/* resolve callbacks */
-	m_optic_cb.resolve_safe();
-
 	/* register for state saving */
 	save_item(NAME(m_index_start));
 	save_item(NAME(m_index_end));
@@ -328,7 +325,6 @@ void reel_device::advance_phase()
 		case MPU3_48STEP_REEL :
 		/* The MPU3 harness is actually the same as the MPU4 setup, but with two active lines instead of four, and a slight change to the windings.
 		   Inverters are used so if a pin is low, the higher bit of the pair is activated, and if high the lower bit is activated.
-		   The stepper driven MPU2 should use this hardware as well.
 		*/
 		switch (m_pattern)
 		{

@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "m68000.h"
+#include "m68000mcu.h"
 
 class tmp68301_device : public m68000_mcu_device
 {
@@ -16,9 +16,9 @@ public:
 	auto parallel_r_cb() { return m_parallel_r_cb.bind(); }
 	auto parallel_w_cb() { return m_parallel_w_cb.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER(rx0_w) { serial_rx_w(0, state); }
-	DECLARE_WRITE_LINE_MEMBER(rx1_w) { serial_rx_w(1, state); }
-	DECLARE_WRITE_LINE_MEMBER(rx2_w) { serial_rx_w(2, state); }
+	void rx0_w(int state) { serial_rx_w(0, state); }
+	void rx1_w(int state) { serial_rx_w(1, state); }
+	void rx2_w(int state) { serial_rx_w(2, state); }
 
 	auto tx0_handler() { return m_tx_cb[0].bind(); }
 	auto tx1_handler() { return m_tx_cb[1].bind(); }
@@ -27,9 +27,11 @@ public:
 	void timer_in_w(int state);
 
 protected:
+	tmp68301_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	devcb_read16  m_parallel_r_cb;
 	devcb_write16 m_parallel_w_cb;
-	devcb_write_line m_tx_cb[3];
+	devcb_write_line::array<3> m_tx_cb;
 
 	void device_start() override;
 	void device_reset() override;
@@ -37,6 +39,8 @@ protected:
 	void execute_set_input(int inputnum, int state) override;
 
 	void internal_update(uint64_t current_time = 0) override;
+
+	virtual u8 base_timer_irq() const noexcept { return 4; }
 
 	void internal_map(address_map &map);
 	void cpu_space_map(address_map &map);
@@ -301,6 +305,17 @@ protected:
 
 };
 
+class tmp68303_device : public tmp68301_device
+{
+public:
+	tmp68303_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+private:
+	virtual u8 base_timer_irq() const noexcept override { return 3; }
+};
+
 DECLARE_DEVICE_TYPE(TMP68301, tmp68301_device)
+DECLARE_DEVICE_TYPE(TMP68303, tmp68303_device)
+
 
 #endif

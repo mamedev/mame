@@ -8,6 +8,72 @@ license:CC0-1.0
     MSX(1) software that was released on 5 1/4" floppies
 -->
 
+	<software name="amazonia">
+		<description>Amazônia (Brazil)</description>
+		<year>1989</year>
+		<publisher>ProKit</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="184320">
+				<rom name="amazonia - prokit.dsk" size="184320" crc="b5d87d1a" sha1="f2ac9ea9d873a8ffa14fc3d36ca8c74fdd1d3030" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bkpdisco">
+		<description>BKP Disco (Brazil)</description>
+		<year>19??</year>
+		<publisher>Enigma Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="184320">
+				<rom name="bkp disco - enigma software.dsk" size="184320" crc="6d2e1a90" sha1="83ed8f6ae6310a6d348c6443e409eb40282ca32e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="condemc">
+		<description>O Conde de Monte Cristo (Brazil)</description>
+		<year>1988</year>
+		<publisher>Nemesis Informatica</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="184320">
+				<rom name="o conde de monte cristo - nemesis informatica.dsk" size="184320" crc="7c8bf6be" sha1="ae11b322736943e3a7068c1f5fb56fbecbc2a241" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="diskmec2">
+		<description>Disk Mechanic v2.0 (Brazil)</description>
+		<year>1990</year>
+		<publisher>Discovery Informatica</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk mechanic v2.0 - discovery informatica.dsk" size="368640" crc="48d7c1d0" sha1="03b80134729235c0febc77becf353a7fd294ad32" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="graphicv">
+		<description>Graphic View (Brazil)</description>
+		<year>1989</year>
+		<publisher>Paulisoft Informatica</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="graphic view - paulisoft informatica.dsk" size="368640" crc="9b6365af" sha1="69fb0677a955669fbf229936e820683700b472c3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="graphos3p">
+		<description>Graphos III Pro (Brazil)</description>
+		<year>1989</year>
+		<publisher>ProKit</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="graphos iii pro - prokit.dsk" size="368640" crc="73b2706b" sha1="ae20bf30e1f4c774d2c51542938fcbe579cfadf1" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="msxdostb">
 		<description>MSX-DOS Tools (Brazil, v4.3)</description>
 		<year>1991</year>
@@ -15,6 +81,52 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184320">
 				<rom name="msx-dos tools v4.3 (1991)(nemesis informatica)(br).dsk" size="184320" crc="e93070dd" sha1="f78578bf88fa08d0268d7ed2f3cb62406527c500" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msxword3">
+		<description>MSX-Word v3.0 (Brazil)</description>
+		<year>1988</year>
+		<publisher>Cibertron Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="184320">
+				<rom name="msx-word v3.0 - cibertron software.dsk" size="184320" crc="36b7cff0" sha1="f9fc432b6c1ef5335862b329bb1f47905af1b434" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="profcard">
+		<description>Professional Cards (Brazil)</description>
+		<year>1990</year>
+		<publisher>Discovery Informatica</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="professonal cards - discovery informatica.dsk" size="368640" crc="88b10895" sha1="8f3ba18e72d25a8dae360f318d6ab4d3e60d1957" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="profpubl">
+		<description>Professional Publisher (Brazil)</description>
+		<year>1990</year>
+		<publisher>Discovery Informatica</publisher>
+		<info name="usage" value="Requires the instructions to enter password." />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="professonal publisher - discovery informatica.dsk" size="368640" crc="ebf4ca7a" sha1="e85ff831a494d7569b24dda18c28de052246c299" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="serrapel">
+		<description>Serra Pelada (Brazil)</description>
+		<year>1987</year>
+		<publisher>Pro Kit</publisher>
+		<info name="usage" value="RUN&quot;SERRA.BAS&quot;" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="serra pelada - pro kit.dsk" size="368640" crc="48312507" sha1="46fd964d8cc3210661c08ed53bf215c8d00d45ef" />
 			</dataarea>
 		</part>
 	</software>

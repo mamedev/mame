@@ -1,6 +1,6 @@
 USING THE IJG JPEG LIBRARY
 
-Copyright (C) 1994-2013, Thomas G. Lane, Guido Vollbeding.
+Copyright (C) 1994-2019, Thomas G. Lane, Guido Vollbeding.
 This file is part of the Independent JPEG Group's software.
 For conditions of distribution and use, see the accompanying README file.
 
@@ -2591,8 +2591,8 @@ different sizes.  If the image dimensions are not a multiple of the MCU size,
 you must also pad the data correctly (usually, this is done by replicating
 the last column and/or row).  The data must be padded to a multiple of a DCT
 block in each component: that is, each downsampled row must contain a
-multiple of block_size valid samples, and there must be a multiple of
-block_size sample rows for each component.  (For applications such as
+multiple of DCT_h_scaled_size valid samples, and there must be a multiple of
+DCT_v_scaled_size sample rows for each component.  (For applications such as
 conversion of digital TV images, the standard image size is usually a
 multiple of the DCT block size, so that no padding need actually be done.)
 
@@ -2602,8 +2602,6 @@ jpeg_write_scanlines().  Before calling jpeg_start_compress(), you must do
 the following:
   * Set cinfo->raw_data_in to TRUE.  (It is set FALSE by jpeg_set_defaults().)
     This notifies the library that you will be supplying raw data.
-    Furthermore, set cinfo->do_fancy_downsampling to FALSE if you want to use
-    real downsampled data.  (It is set TRUE by jpeg_set_defaults().)
   * Ensure jpeg_color_space is correct --- an explicit jpeg_set_colorspace()
     call is a good idea.  Note that since color conversion is bypassed,
     in_color_space is ignored, except that jpeg_set_defaults() uses it to
@@ -2620,23 +2618,25 @@ The scanlines count passed to and returned from jpeg_write_raw_data is
 measured in terms of the component with the largest v_samp_factor.
 
 jpeg_write_raw_data() processes one MCU row per call, which is to say
-v_samp_factor*block_size sample rows of each component.  The passed num_lines
-value must be at least max_v_samp_factor*block_size, and the return value
-will be exactly that amount (or possibly some multiple of that amount, in
-future library versions).  This is true even on the last call at the bottom
-of the image; don't forget to pad your data as necessary.
+v_samp_factor*min_DCT_v_scaled_size sample rows of each component.  The passed
+num_lines value must be at least max_v_samp_factor*min_DCT_v_scaled_size, and
+the return value will be exactly that amount (or possibly some multiple of
+that amount, in future library versions).  This is true even on the last call
+at the bottom of the image; don't forget to pad your data as necessary.
 
 The required dimensions of the supplied data can be computed for each
 component as
-	cinfo->comp_info[i].width_in_blocks*block_size  samples per row
-	cinfo->comp_info[i].height_in_blocks*block_size rows in image
+	cinfo->comp_info[i].width_in_blocks *
+	cinfo->comp_info[i].DCT_h_scaled_size		samples per row
+	cinfo->comp_info[i].height_in_blocks *
+	cinfo->comp_info[i].DCT_v_scaled_size		rows in image
 after jpeg_start_compress() has initialized those fields.  If the valid data
 is smaller than this, it must be padded appropriately.  For some sampling
 factors and image sizes, additional dummy DCT blocks are inserted to make
 the image a multiple of the MCU dimensions.  The library creates such dummy
 blocks itself; it does not read them from your supplied data.  Therefore you
-need never pad by more than block_size samples.  An example may help here.
-Assume 2h2v downsampling of YCbCr data, that is
+need never pad by more than DCT_scaled_size samples.
+An example may help here.  Assume 2h2v downsampling of YCbCr data, that is
 	cinfo->comp_info[0].h_samp_factor = 2		for Y
 	cinfo->comp_info[0].v_samp_factor = 2
 	cinfo->comp_info[1].h_samp_factor = 1		for Cb
@@ -2662,27 +2662,26 @@ destination module suspends, jpeg_write_raw_data() will return 0.
 In this case the same data rows must be passed again on the next call.
 
 
-Decompression with raw data output implies bypassing all postprocessing.
-You must deal with the color space and sampling factors present in the
-incoming file.  If your application only handles, say, 2h1v YCbCr data,
-you must check for and fail on other color spaces or other sampling factors.
+Decompression with raw data output implies bypassing all postprocessing:
+you cannot ask for color quantization, for instance.  More seriously, you
+must deal with the color space and sampling factors present in the incoming
+file.  If your application only handles, say, 2h1v YCbCr data, you must
+check for and fail on other color spaces or other sampling factors.
 The library will not convert to a different color space for you.
 
 To obtain raw data output, set cinfo->raw_data_out = TRUE before
 jpeg_start_decompress() (it is set FALSE by jpeg_read_header()).  Be sure to
 verify that the color space and sampling factors are ones you can handle.
-Furthermore, set cinfo->do_fancy_upsampling = FALSE if you want to get real
-downsampled data (it is set TRUE by jpeg_read_header()).
 Then call jpeg_read_raw_data() in place of jpeg_read_scanlines().  The
 decompression process is otherwise the same as usual.
 
 jpeg_read_raw_data() returns one MCU row per call, and thus you must pass a
-buffer of at least max_v_samp_factor*block_size scanlines (scanline counting
-is the same as for raw-data compression).  The buffer you pass must be large
-enough to hold the actual data plus padding to DCT-block boundaries.  As with
-compression, any entirely dummy DCT blocks are not processed so you need not
-allocate space for them, but the total scanline count includes them.  The
-above example of computing buffer dimensions for raw-data compression is
+buffer of at least max_v_samp_factor*min_DCT_v_scaled_size scanlines (scanline
+counting is the same as for raw-data compression).  The buffer you pass must
+be large enough to hold the actual data plus padding to DCT-block boundaries.
+As with compression, any entirely dummy DCT blocks are not processed so you
+need not allocate space for them, but the total scanline count includes them.
+The above example of computing buffer dimensions for raw-data compression is
 equally valid for decompression.
 
 Input suspension is supported with raw-data decompression: if the data source

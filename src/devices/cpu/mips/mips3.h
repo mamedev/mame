@@ -542,6 +542,7 @@ public:
 private:
 	uint32_t compute_config_register();
 	uint32_t compute_prid_register();
+	uint32_t compute_fpu_prid_register();
 
 	uint32_t generate_tlb_index();
 	void tlb_map_entry(int tlbindex);

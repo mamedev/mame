@@ -169,12 +169,12 @@ public:
 	void di_w(u8 data);
 	void a_w(u8 data);
 	u8 do_r() const;
-	DECLARE_WRITE_LINE_MEMBER(data_out_enable);     // 1 = asserted
-	DECLARE_WRITE_LINE_MEMBER(data_in_positive);    // 1 = asserted
-	DECLARE_WRITE_LINE_MEMBER(data_out_positive);   // 0 = asserted
-	DECLARE_WRITE_LINE_MEMBER(r_w);                 // 1 = read, 0 = write
-	DECLARE_WRITE_LINE_MEMBER(r_w_a);               // 1 = read, 0 = write
-	DECLARE_WRITE_LINE_MEMBER(prgm_prom_pwr);       // 0 = asserted
+	void data_out_enable(int state);    // 1 = asserted
+	void data_in_positive(int state);   // 1 = asserted
+	void data_out_positive(int state);  // 0 = asserted
+	void r_w(int state);                // 1 = read, 0 = write
+	void r_w_a(int state);              // 1 = read, 0 = write
+	void prgm_prom_pwr(int state);      // 0 = asserted
 
 protected:
 	// device_t implementation

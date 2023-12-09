@@ -125,7 +125,7 @@ protected:
 	DECLARE_MACHINE_RESET(zerowing);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 	void interrupt();
 
 	void create_tilemaps();
@@ -136,7 +136,7 @@ protected:
 	void log_vram();
 	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual void reset_sound();
-	DECLARE_WRITE_LINE_MEMBER(reset_callback);
+	void reset_callback(int state);
 	required_device<m68000_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<ym3812_device> m_ymsnd;
@@ -174,14 +174,14 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_lockout_1_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_lockout_2_w);
+	void coin_counter_1_w(int state);
+	void coin_counter_2_w(int state);
+	void coin_lockout_1_w(int state);
+	void coin_lockout_2_w(int state);
 	u16 tileram_r(offs_t offset);
 	void pri_cb(u8 priority, u32 &pri_mask);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 
 	required_device<toaplan_scu_device> m_spritegen;
 	void rallybik_main_map(address_map &map);
@@ -216,7 +216,7 @@ private:
 	u16 dsp_r();
 	void dsp_w(u16 data);
 	void dsp_bio_w(u16 data);
-	DECLARE_READ_LINE_MEMBER(bio_r);
+	int bio_r();
 	void dsp_ctrl_w(u8 data);
 	void dsp_int_w(int enable);
 
@@ -248,7 +248,7 @@ private:
 	u8 cmdavailable_r();
 	u8 port_6_word_r();
 
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 
 	void hd647180_io_map(address_map &map);
 	void main_map(address_map &map);

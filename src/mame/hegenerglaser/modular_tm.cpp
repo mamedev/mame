@@ -26,7 +26,7 @@ BTANB:
 Hardware notes:
 
 V(Verkauf?) home version:
-- 68030 @ 36MHz (not sure about type, big heatsink in the way)
+- XC68030RC33B @ 36MHz
 - 256KB SRAM (8*TC55465P-25), 128KB or 256KB ROM
 - 2MB DRAM (16*TC514256AP-70)
 - 8KB battery-backed SRAM (TC5565PL-15)
@@ -42,14 +42,15 @@ After boot, it copies ROM to RAM, probably to circumvent waitstates on slow ROM.
 
 #include "emu.h"
 
-#include "cpu/m68000/m68030.h"
-#include "machine/nvram.h"
-#include "machine/timer.h"
 #include "mmboard.h"
 #include "mmdisplay2.h"
 
+#include "cpu/m68000/m68030.h"
+#include "machine/nvram.h"
+#include "machine/timer.h"
+
 // internal artwork
-#include "mephisto_modular_tm.lh" // clickable
+#include "mephisto_modular_tm.lh"
 
 
 namespace {
@@ -87,6 +88,8 @@ private:
 	required_device<timer_device> m_disable_bootrom;
 	optional_ioport m_fake;
 
+	bool m_bootrom_enabled = false;
+
 	// address maps
 	void mmtm_2m_map(address_map &map);
 	void mmtm_8m_map(address_map &map);
@@ -96,7 +99,6 @@ private:
 
 	void install_bootrom(bool enable);
 	TIMER_DEVICE_CALLBACK_MEMBER(disable_bootrom) { install_bootrom(false); }
-	bool m_bootrom_enabled = false;
 
 	void set_cpu_freq();
 };
@@ -139,7 +141,7 @@ void mmtm_state::set_cpu_freq()
 	m_maincpu->set_unscaled_clock(xtal[val]);
 
 	// lcd busy flag timing problem when overclocked
-	subdevice<hd44780_device>("display:hd44780")->set_busy_factor((val > 1) ? 0.75 : 1.0);
+	subdevice<hd44780_device>("display:hd44780")->set_clock_scale((val > 1) ? 1.32 : 1.0);
 }
 
 
@@ -215,7 +217,7 @@ void mmtm_state::mmtm_v(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mmtm_state::mmtm_2m_map);
 
 	const attotime irq_period = attotime::from_hz(12.288_MHz_XTAL / 0x8000); // through 4060, 375Hz
-	m_maincpu->set_periodic_int(FUNC(mmtm_state::irq2_line_hold), irq_period);
+	m_maincpu->set_periodic_int(FUNC(mmtm_state::irq3_line_hold), irq_period);
 
 	TIMER(config, "disable_bootrom").configure_generic(FUNC(mmtm_state::disable_bootrom));
 

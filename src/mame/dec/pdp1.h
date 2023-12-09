@@ -189,7 +189,6 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 
 	// device_image_interface implementation
@@ -235,7 +234,6 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 
 	// device_image_interface implementation
@@ -278,7 +276,6 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 
 	// device_image_interface implementation
@@ -422,7 +419,7 @@ public:
 	virtual void video_start() override;
 	void pdp1_palette(palette_device &palette) const;
 	uint32_t screen_update_pdp1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_pdp1);
+	void screen_vblank_pdp1(int state);
 	INTERRUPT_GEN_MEMBER(pdp1_interrupt);
 	TIMER_CALLBACK_MEMBER(dpy_callback);
 	void pdp1_machine_stop();
@@ -442,7 +439,7 @@ public:
 	void pdp1_draw_lightpen(bitmap_ind16 &bitmap);
 	void pdp1_lightpen();
 
-	template <int Mask> DECLARE_WRITE_LINE_MEMBER(io_status_w);
+	template <int Mask> void io_status_w(int state);
 
 	void pdp1(machine_config &config);
 	void pdp1_map(address_map &map);

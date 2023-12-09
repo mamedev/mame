@@ -5083,6 +5083,33 @@ ROM_START(elvisp302)
 	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
 ROM_END
 
+ROM_START(elvisp100)
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD( "elvis_cpu_1.00.bin",  0x0000, 0x20000, CRC(5ca9aadc) SHA1(563248af88a851e9eac115c34a80e107b1dba20e))
+	ROM_RELOAD(0x20000, 0x20000)
+	ROM_RELOAD(0x40000, 0x20000)
+	ROM_RELOAD(0x60000, 0x20000)
+
+	ROM_REGION(0x80000, "dmdcpu", 0)
+	ROM_LOAD( "elvis_display_1.00.bin",  0x0000, 0x80000, CRC(8feffc70) SHA1(71849701d49064c65adfdf76908f9fa79a8b25b8))
+
+	ROM_REGION32_LE(0x600000, "cpu2", 0)
+	ROM_LOAD("bios1a.u8", 0x400000, 0x20000, CRC(e2e3fc18) SHA1(5ce564828c1d814b680788f20ba8b134249ccfb9))
+	ROM_RELOAD(0x0,0x20000)
+
+	ROM_REGION(0x10000, "soundcpu", 0)
+	ROM_LOAD("elvis.u7",0x0000,0x10000,CRC(1df6c1b5) SHA1(7a9ebfc555e54ce92ad140ac6fcb82d9848ad8a6))
+
+	ROM_REGION(0x1000000, "bsmt", 0)
+	ROM_LOAD("elvis.u17", 0x000000, 0x100000, CRC(ff032897) SHA1(bf347c26a450bc07cdc94fc582dedf3a0cdc2a1b))
+	ROM_LOAD("elvis.u21", 0x100000, 0x100000, CRC(c3c19a40) SHA1(97f7f36eed62ca389c770bf5d746721724e17250))
+	ROM_LOAD("elvis.u36", 0x200000, 0x100000, CRC(e98f0dc9) SHA1(6dbab09435e993fef97d6a80a73675723bea7c1d))
+	ROM_LOAD("elvis.u37", 0x300000, 0x100000, CRC(88ba0966) SHA1(43ea198c9fcdc1c396d4180308042c6c08311829))
+
+	ROM_REGION(0x117, "plds", 0 )
+	ROM_LOAD("16v8d.u213", 0x000, 0x117, BAD_DUMP CRC(942d99fd) SHA1(db33b16e582c6762ac6843a3613edb733cbeb499)) // Dumped from a Terminator 3 Spain machine, may be different on others
+ROM_END
+
 ROM_START(elvisl)
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("elvscpul.500", 0x00000, 0x20000, CRC(d6813d67) SHA1(863a1b5bc62eca218f64d9bae24b205e1a8e2b6c))
@@ -9177,6 +9204,7 @@ GAME(2004, elvisp,       0,        whitestarm, whitestar, whitestar_state, empty
 GAME(2004, elvisp4,      elvisp,   whitestarm, whitestar, whitestar_state, empty_init, ROT0, "Stern", "Elvis (CPU 4.00, display A4.01)",                                                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(2004, elvisp303,    elvisp,   whitestarm, whitestar, whitestar_state, empty_init, ROT0, "Stern", "Elvis (CPU 3.03, display A3.02)",                                                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(2004, elvisp302,    elvisp,   whitestarm, whitestar, whitestar_state, empty_init, ROT0, "Stern", "Elvis (CPU 3.02, display A3.02)",                                                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(2004, elvisp100,    elvisp,   whitestarm, whitestar, whitestar_state, empty_init, ROT0, "Stern", "Elvis (CPU 1.00, display A1.00)",                                                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(2004, elvisf,       elvisp,   whitestarm, whitestar, whitestar_state, empty_init, ROT0, "Stern", "Elvis (CPU 5.00, display F5.00, France)",                                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(2004, elvisf4,      elvisp,   whitestarm, whitestar, whitestar_state, empty_init, ROT0, "Stern", "Elvis (CPU 4.00, display F4.01, France)",                                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(2004, elvisf303,    elvisp,   whitestarm, whitestar, whitestar_state, empty_init, ROT0, "Stern", "Elvis (CPU 3.03, display F3.02, France)",                                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

@@ -117,7 +117,9 @@ March 2013 NPW:
 //  PARAMETERS
 //**************************************************************************
 
-#define LOG_INTERRUPTS  0
+#define LOG_INTERRUPTS (1U << 1)
+#define VERBOSE (0)
+#include "logmacro.h"
 
 // turn off 'unreferenced label' errors
 #if defined(__GNUC__)
@@ -163,8 +165,6 @@ void m6809_base_device::device_start()
 	space(AS_PROGRAM).specific(m_mintf->program);
 	space(has_space(AS_OPCODES) ? AS_OPCODES : AS_PROGRAM).cache(m_mintf->csprogram);
 
-	m_lic_func.resolve_safe();
-
 	// register our state for the debugger
 	state_add(STATE_GENPCBASE, "CURPC",     m_ppc.w).callimport().noshow();
 	state_add(STATE_GENFLAGS,  "CURFLAGS",  m_cc).formatstr("%8s").noshow();
@@ -186,15 +186,28 @@ void m6809_base_device::device_start()
 	// initialize variables
 	m_cc = 0;
 	m_pc.w = 0;
+	m_ppc.w = 0;
 	m_s.w = 0;
 	m_u.w = 0;
 	m_q.q = 0;
 	m_x.w = 0;
 	m_y.w = 0;
 	m_dp = 0;
-	m_reg = 0;
+	m_temp.w = 0;
+	m_opcode = 0;
+
 	m_reg8 = nullptr;
 	m_reg16 = nullptr;
+	m_reg = 0;
+	m_nmi_line = false;
+	m_nmi_asserted = false;
+	m_firq_line = false;
+	m_irq_line = false;
+	m_lds_encountered = false;
+
+	m_state = 0;
+	m_cond = false;
+	m_free_run = false;
 
 	// setup regtable
 	save_item(NAME(m_pc.w));
@@ -208,6 +221,7 @@ void m6809_base_device::device_start()
 	save_item(NAME(m_cc));
 	save_item(NAME(m_temp.w));
 	save_item(NAME(m_opcode));
+
 	save_item(NAME(m_nmi_asserted));
 	save_item(NAME(m_nmi_line));
 	save_item(NAME(m_firq_line));
@@ -454,8 +468,7 @@ uint32_t m6809_base_device::execute_input_lines() const noexcept
 
 void m6809_base_device::execute_set_input(int inputnum, int state)
 {
-	if (LOG_INTERRUPTS)
-		logerror("%s: inputnum=%s state=%d totalcycles=%d\n", machine().describe_context(), inputnum_string(inputnum), state, (int) attotime_to_clocks(machine().time()));
+	LOGMASKED(LOG_INTERRUPTS, "%s: inputnum=%s state=%d totalcycles=%d\n", machine().describe_context(), inputnum_string(inputnum), state, attotime_to_clocks(machine().time()));
 
 	switch(inputnum)
 	{

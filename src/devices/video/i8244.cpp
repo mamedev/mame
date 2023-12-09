@@ -150,8 +150,6 @@ void i8244_device::i8244_palette(palette_device &palette) const
 
 void i8244_device::device_start()
 {
-	m_irq_func.resolve_safe();
-
 	// allocate timers
 	m_vblank_timer = timer_alloc(FUNC(i8244_device::vblank_start), this);
 	m_vblank_timer->adjust(screen().time_until_pos(m_vblank_start, m_hblank_start - 1), 0, screen().frame_period());

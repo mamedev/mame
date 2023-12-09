@@ -19,7 +19,7 @@
 
 class h8_adc_device : public device_t {
 public:
-	void set_info(const char *intc_tag, int vect);
+	template<typename T, typename U> void set_info(T &&cpu, U &&intc, int vect) { m_cpu.set_tag(std::forward<T>(cpu)), m_intc.set_tag(std::forward<U>(intc)); m_intc_vector = vect; }
 
 	uint8_t addr8_r(offs_t offset);
 	uint16_t addr16_r(offs_t offset);
@@ -27,7 +27,7 @@ public:
 	uint8_t adcr_r();
 	void adcsr_w(uint8_t data);
 	void adcr_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(adtrg_w);
+	void adtrg_w(int state);
 
 	void set_suspend(bool suspend);
 	uint64_t internal_update(uint64_t current_time);
@@ -35,11 +35,9 @@ public:
 protected:
 	h8_adc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	required_device<h8_device> cpu;
-	h8_intc_device *intc;
-	address_space *io;
-	const char *intc_tag;
-	int intc_vector;
+	required_device<h8_device> m_cpu;
+	required_device<h8_intc_device> m_intc;
+	int m_intc_vector;
 
 	enum {
 		T_SOFT  = 1<<0,
@@ -65,14 +63,14 @@ protected:
 		COUNTED = 64
 	};
 
-	uint16_t addr[8], buf[2];
-	uint8_t adcsr, adcr;
-	int register_mask;
-	int trigger, start_mode, start_channel, end_channel, start_count;
-	bool suspend_on_interrupt, analog_power_control;
-	int mode, channel, count;
-	bool analog_powered, adtrg;
-	uint64_t next_event;
+	uint16_t m_addr[8], m_buf[2];
+	uint8_t m_adcsr, m_adcr;
+	int m_register_mask;
+	int m_trigger, m_start_mode, m_start_channel, m_end_channel, m_start_count;
+	bool m_suspend_on_interrupt, m_analog_power_control;
+	int m_mode, m_channel, m_count;
+	bool m_analog_powered, m_adtrg;
+	uint64_t m_next_event;
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -94,10 +92,10 @@ protected:
 class h8_adc_3337_device : public h8_adc_device {
 public:
 	h8_adc_3337_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	h8_adc_3337_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *intc_tag, int vect)
+	template <typename T, typename U> h8_adc_3337_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu, U &&intc, int vect)
 		: h8_adc_3337_device(mconfig, tag, owner, 0)
 	{
-		set_info(intc_tag, vect);
+		set_info(cpu, intc, vect);
 	}
 
 protected:
@@ -108,10 +106,10 @@ protected:
 class h8_adc_3006_device : public h8_adc_device {
 public:
 	h8_adc_3006_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	h8_adc_3006_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *intc_tag, int vect)
+	template <typename T, typename U> h8_adc_3006_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu, U &&intc, int vect)
 		: h8_adc_3006_device(mconfig, tag, owner, 0)
 	{
-		set_info(intc_tag, vect);
+		set_info(cpu, intc, vect);
 	}
 
 protected:
@@ -122,10 +120,10 @@ protected:
 class h8_adc_2245_device : public h8_adc_device {
 public:
 	h8_adc_2245_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	h8_adc_2245_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *intc_tag, int vect)
+	template <typename T, typename U> h8_adc_2245_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu, U &&intc, int vect)
 		: h8_adc_2245_device(mconfig, tag, owner, 0)
 	{
-		set_info(intc_tag, vect);
+		set_info(cpu, intc, vect);
 	}
 
 protected:
@@ -136,10 +134,10 @@ protected:
 class h8_adc_2320_device : public h8_adc_device {
 public:
 	h8_adc_2320_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	h8_adc_2320_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *intc_tag, int vect)
+	template <typename T, typename U> h8_adc_2320_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu, U &&intc, int vect)
 		: h8_adc_2320_device(mconfig, tag, owner, 0)
 	{
-		set_info(intc_tag, vect);
+		set_info(cpu, intc, vect);
 	}
 
 protected:
@@ -150,10 +148,10 @@ protected:
 class h8_adc_2357_device : public h8_adc_device {
 public:
 	h8_adc_2357_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	h8_adc_2357_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *intc_tag, int vect)
+	template <typename T, typename U> h8_adc_2357_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu, U &&intc, int vect)
 		: h8_adc_2357_device(mconfig, tag, owner, 0)
 	{
-		set_info(intc_tag, vect);
+		set_info(cpu, intc, vect);
 	}
 
 protected:
@@ -164,10 +162,10 @@ protected:
 class h8_adc_2655_device : public h8_adc_device {
 public:
 	h8_adc_2655_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	h8_adc_2655_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *intc_tag, int vect)
+	template <typename T, typename U> h8_adc_2655_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu, U &&intc, int vect)
 		: h8_adc_2655_device(mconfig, tag, owner, 0)
 	{
-		set_info(intc_tag, vect);
+		set_info(cpu, intc, vect);
 	}
 
 protected:

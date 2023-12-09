@@ -8,9 +8,8 @@
 
 #include "hti_tape.h"
 
-#include "imageutl.h"
-
 #include "ioprocs.h"
+#include "multibyte.h"
 
 
 static constexpr uint32_t OLD_FILE_MAGIC = 0x5441434f;  // Magic value at start of old-format image file: "TACO"
@@ -59,7 +58,7 @@ bool hti_format_t::load_tape(util::random_read &io)
 	uint8_t tmp[ 4 ];
 
 	io.read(tmp, 4, actual);
-	auto magic = pick_integer_be(tmp , 0 , 4);
+	auto magic = get_u32be(tmp);
 	if (((m_img_format == HTI_DELTA_MOD_16_BITS || m_img_format == HTI_DELTA_MOD_17_BITS) && magic != FILE_MAGIC_DELTA && magic != OLD_FILE_MAGIC) ||
 		(m_img_format == HTI_MANCHESTER_MOD && magic != FILE_MAGIC_MANCHESTER)) {
 		return false;
@@ -83,7 +82,7 @@ void hti_format_t::save_tape(util::random_read_write &io)
 	size_t actual;
 	uint8_t tmp[ 4 ];
 
-	place_integer_be(tmp, 0, 4, m_img_format == HTI_MANCHESTER_MOD ? FILE_MAGIC_MANCHESTER : FILE_MAGIC_DELTA);
+	put_u32be(tmp, m_img_format == HTI_MANCHESTER_MOD ? FILE_MAGIC_MANCHESTER : FILE_MAGIC_DELTA);
 	io.write(tmp, 4, actual);
 
 	for (unsigned i = 0; i < no_of_tracks(); i++) {
@@ -102,7 +101,7 @@ void hti_format_t::save_tape(util::random_read_write &io)
 		}
 		dump_sequence(io, it_start, n_words);
 		// End of track
-		place_integer_le(tmp, 0, 4, (uint32_t)-1);
+		put_u32le(tmp, (uint32_t)-1);
 		io.write(tmp, 4, actual);
 	}
 }
@@ -393,7 +392,7 @@ bool hti_format_t::load_track(util::random_read &io , tape_track_t& track , bool
 		// Read no. of words to follow
 		io.read(tmp, 4, actual);
 
-		tmp32 = pick_integer_le(tmp, 0, 4);
+		tmp32 = get_u32le(tmp);
 
 		// Track ends
 		if (tmp32 == (uint32_t)-1) {
@@ -405,7 +404,7 @@ bool hti_format_t::load_track(util::random_read &io , tape_track_t& track , bool
 		// Read tape position of block
 		io.read(tmp, 4, actual);
 
-		tmp32 = pick_integer_le(tmp, 0, 4);
+		tmp32 = get_u32le(tmp);
 
 		tape_pos_t pos = (tape_pos_t)tmp32 + delta_pos;
 
@@ -416,7 +415,7 @@ bool hti_format_t::load_track(util::random_read &io , tape_track_t& track , bool
 			uint16_t tmp16;
 
 			io.read(tmp, 2, actual);
-			tmp16 = pick_integer_le(tmp, 0, 2);
+			tmp16 = get_u16le(tmp);
 
 			if (!old_format) {
 				track.insert(std::make_pair(pos , tmp16));
@@ -477,12 +476,12 @@ void hti_format_t::dump_sequence(util::random_read_write &io , tape_track_t::con
 	if (n_words) {
 		size_t actual;
 		uint8_t tmp[ 8 ];
-		place_integer_le(tmp, 0, 4, n_words);
-		place_integer_le(tmp, 4, 4, it_start->first);
+		put_u32le(&tmp[ 0 ], n_words);
+		put_u32le(&tmp[ 4 ], it_start->first);
 		io.write(tmp, 8, actual);
 
 		for (unsigned i = 0; i < n_words; i++) {
-			place_integer_le(tmp, 0, 2, it_start->second);
+			put_u16le(tmp, it_start->second);
 			io.write(tmp, 2, actual);
 			++it_start;
 		}

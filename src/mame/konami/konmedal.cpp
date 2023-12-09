@@ -88,6 +88,7 @@ public:
 		m_k053252(*this, "k053252"),
 		m_k052109(*this, "k052109"),
 		m_palette(*this, "palette"),
+		m_scc_map(*this, "scc_map"),
 		m_ymz(*this, "ymz"),
 		m_oki(*this, "oki"),
 		m_upd7759(*this, "upd"),
@@ -128,6 +129,7 @@ private:
 	uint8_t vram_r(offs_t offset);
 	void vram_w(offs_t offset, uint8_t data);
 	void bankswitch_w(uint8_t data);
+	void scc_enable_w(uint8_t data);
 	void control2_w(uint8_t data);
 	void medalcnt_w(uint8_t data);
 	void lamps_w(uint8_t data);
@@ -137,8 +139,8 @@ private:
 
 	K056832_CB_MEMBER(tile_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(konmedal_scanline);
-	WRITE_LINE_MEMBER(vbl_ack_w) { m_maincpu->set_input_line(0, CLEAR_LINE); }
-	WRITE_LINE_MEMBER(nmi_ack_w) { m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE); }
+	void vbl_ack_w(int state) { m_maincpu->set_input_line(0, CLEAR_LINE); }
+	void nmi_ack_w(int state) { m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE); }
 	void ccu_int_time_w(uint8_t data) { m_ccu_int_time = data; }
 	void k056832_w(offs_t offset, uint8_t data) { m_k056832->write(offset ^ 1, data); }
 	void k056832_b_w(offs_t offset, uint8_t data) { m_k056832->b_w(offset ^ 1, data); }
@@ -161,6 +163,7 @@ private:
 	optional_device<k053252_device> m_k053252;
 	optional_device<k052109_device> m_k052109;
 	required_device<palette_device> m_palette;
+	memory_view m_scc_map;
 	optional_device<ymz280b_device> m_ymz;
 	optional_device<okim6295_device> m_oki;
 	optional_device<upd7759_device> m_upd7759;
@@ -168,11 +171,14 @@ private:
 	required_ioport m_outport;
 	output_finder<8> m_lamps;
 
-	u8 m_control, m_control2, m_shuri_irq;
-	int m_ccu_int_time, m_ccu_int_time_count;
-	int m_avac;
-	int m_layer_colorbase[4];
-	int m_layer_order[4];
+	u8 m_control = 0;
+	u8 m_control2 = 0;
+	u8 m_shuri_irq = 0;
+	int m_ccu_int_time = 0;
+	int m_ccu_int_time_count = 0;
+	int m_avac = 0;
+	int m_layer_colorbase[4] = { };
+	int m_layer_order[4] = { };
 };
 
 void konmedal_state::control2_w(uint8_t data)
@@ -381,6 +387,16 @@ void konmedal_state::bankswitch_w(uint8_t data)
 	m_control = data & 0xf;
 }
 
+void konmedal_state::scc_enable_w(uint8_t data)
+{
+	// SCC memory bank register 3, 0x3f to enable access to sound registers
+	// normally it's safe to ignore this register in arcade drivers, but in this case slimekun relies on it
+	if ((data & 0x3f) == 0x3f)
+		m_scc_map.select(0);
+	else
+		m_scc_map.disable();
+}
+
 void konmedal_state::medal_main(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("maincpu", 0);
@@ -420,8 +436,9 @@ void konmedal_state::ddboy_main(address_map &map)
 	map(0xc703, 0xc703).portr("IN2");
 	map(0xc800, 0xc80f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write));
 	map(0xcc00, 0xcc00).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xd000, 0xd000).nopw();    // ???  writes 00 and 3f every frame
-	map(0xd800, 0xd8ff).m("k051649", FUNC(k051649_device::scc_map));
+	map(0xd000, 0xd000).mirror(0x07ff).w(FUNC(konmedal_state::scc_enable_w));
+	map(0xd800, 0xdfff).view(m_scc_map);
+	m_scc_map[0](0xd800, 0xd8ff).mirror(0x0700).m("k051649", FUNC(k051649_device::scc_map));
 	map(0xe000, 0xffff).rw(FUNC(konmedal_state::vram_r), FUNC(konmedal_state::vram_w));
 }
 
@@ -439,8 +456,9 @@ void konmedal_state::shuriboy_main(address_map &map)
 	map(0x8c00, 0x8c00).w(FUNC(konmedal_state::shuri_bank_w));
 	map(0x8d00, 0x8d00).w(m_upd7759, FUNC(upd7759_device::port_w));
 	map(0x8e00, 0x8e00).w(FUNC(konmedal_state::lamps_w));
-	map(0x9000, 0x9000).nopw();     // writes alternating 00 and 3F
-	map(0x9800, 0x98ff).m("k051649", FUNC(k051649_device::scc_map));
+	map(0x9000, 0x9000).mirror(0x07ff).w(FUNC(konmedal_state::scc_enable_w));
+	map(0x9800, 0x9fff).view(m_scc_map);
+	m_scc_map[0](0x9800, 0x98ff).mirror(0x0700).m("k051649", FUNC(k051649_device::scc_map));
 	map(0xa000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xffff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write));
 	map(0xdd00, 0xdd00).rw(FUNC(konmedal_state::shuri_irq_r), FUNC(konmedal_state::shuri_irq_w));
@@ -797,7 +815,9 @@ MACHINE_START_MEMBER(konmedal_state, shuriboy)
 
 void konmedal_state::machine_reset()
 {
-	m_control = m_control2 = m_shuri_irq = 0;
+	m_control = 0;
+	m_control2 = 0;
+	m_shuri_irq = 0;
 	m_ccu_int_time_count = 0;
 	m_ccu_int_time = 31;
 	m_avac = 0;
@@ -973,7 +993,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(konmedal_state::shuri_scanline)
 	if ((scanline == 240) && (m_shuri_irq & 0x4))
 	{
 		m_maincpu->set_input_line(0, ASSERT_LINE);
-
 	}
 
 	if ((scanline == 255) && (m_shuri_irq & 0x1))
@@ -994,7 +1013,7 @@ void konmedal_state::mario_scrollhack_w(uint8_t data)
 void konmedal_state::shuriboy(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(24'000'000) / 3); // divisor unknown
+	Z80(config, m_maincpu, XTAL(24'000'000) / 4); // divisor unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &konmedal_state::shuriboy_main);
 	TIMER(config, "scantimer").configure_scanline(FUNC(konmedal_state::shuri_scanline), "screen", 0, 1);
 
@@ -1012,8 +1031,8 @@ void konmedal_state::shuriboy(machine_config &config)
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(konmedal_state::konmedal_palette)).set_format(palette_device::xRGB_444, 256); // not verified
-//  m_palette->enable_shadows();
-//  m_palette->enable_hilights();
+	//m_palette->enable_shadows();
+	//m_palette->enable_hilights();
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);

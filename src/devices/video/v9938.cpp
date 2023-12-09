@@ -38,17 +38,17 @@ todo:
 #include "emu.h"
 #include "v9938.h"
 
-#define LOG_WARN     (1U<<1)
-#define LOG_INT      (1U<<2)
-#define LOG_STATUS   (1U<<3)
-#define LOG_REGWRITE (1U<<4)
-#define LOG_COMMAND  (1U<<5)
-#define LOG_MODE     (1U<<6)
-#define LOG_NOTIMP   (1U<<7)
-#define LOG_DETAIL   (1U<<8)
+#define LOG_WARN     (1U << 1)
+#define LOG_INT      (1U << 2)
+#define LOG_STATUS   (1U << 3)
+#define LOG_REGWRITE (1U << 4)
+#define LOG_COMMAND  (1U << 5)
+#define LOG_MODE     (1U << 6)
+#define LOG_NOTIMP   (1U << 7)
+#define LOG_DETAIL   (1U << 8)
 
 // Minimum log should be warnings
-#define VERBOSE (LOG_GENERAL | LOG_WARN )
+#define VERBOSE (LOG_GENERAL | LOG_WARN)
 
 #include "logmacro.h"
 
@@ -241,14 +241,14 @@ void v99x8_device::set_screen_parameters()
 	}
 	else
 	{
-		// NYSC
+		// NTSC
 		m_scanline_start = (m_cont_reg[9] & 0x80) ? 16 : 26;
 		m_scanline_max = (m_cont_reg[9] & 0x80) ? 234 : 244;
 	}
 	m_visible_y = (m_cont_reg[9] & 0x80) ? 212 : 192;
 }
 
-
+// FIXME: this doesn't really allow for external clock configuration
 void v99x8_device::configure_pal_ntsc()
 {
 	if (m_pal_ntsc)
@@ -608,7 +608,6 @@ void v99x8_device::register_w(uint8_t data)
 
 void v99x8_device::device_start()
 {
-	m_int_callback.resolve_safe();
 	m_vdp_ops_count = 1;
 	m_vdp_engine = nullptr;
 
@@ -693,6 +692,7 @@ void v99x8_device::device_reset()
 	m_cmd_write_first = m_pal_write_first = 0;
 	m_int_state = 0;
 	m_read_ahead = 0; m_address_latch = 0; // ???
+	// FIXME: this drifts the scanline number wrt screen h/vpos
 	m_scanline = 0;
 	// MZ: The status registers 4 and 6 hold the high bits of the sprite
 	// collision location. The unused bits are set to 1.
@@ -811,6 +811,7 @@ void v99x8_device::check_int()
 	** called; because of this Mr. Ghost, Xevious and SD Snatcher don't
 	** run. As a patch it's called every scanline
 	*/
+	// FIXME: breaks nichibutsu hrdvd.cpp & nichild.cpp, really needs INPUT_MERGER instead.
 	m_int_callback(n);
 }
 

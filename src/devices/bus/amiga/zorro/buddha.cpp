@@ -155,7 +155,7 @@ void buddha_device::autoconfig_base_address(offs_t address)
 	m_slot->cfgout_w(0);
 }
 
-WRITE_LINE_MEMBER( buddha_device::cfgin_w )
+void buddha_device::cfgin_w(int state)
 {
 	LOG("configin_w (%d)\n", state);
 
@@ -196,7 +196,7 @@ void buddha_device::speed_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	LOG("speed_w %04x [mask = %04x]\n", data, mem_mask);
 }
 
-WRITE_LINE_MEMBER( buddha_device::ide_0_interrupt_w )
+void buddha_device::ide_0_interrupt_w(int state)
 {
 	LOG("ide_0_interrupt_w (%d)\n", state);
 
@@ -206,7 +206,7 @@ WRITE_LINE_MEMBER( buddha_device::ide_0_interrupt_w )
 		m_slot->int2_w(state);
 }
 
-WRITE_LINE_MEMBER( buddha_device::ide_1_interrupt_w )
+void buddha_device::ide_1_interrupt_w(int state)
 {
 	LOG("ide_1_interrupt_w (%d)\n", state);
 

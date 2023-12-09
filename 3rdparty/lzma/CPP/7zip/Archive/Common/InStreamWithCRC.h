@@ -1,7 +1,7 @@
 // InStreamWithCRC.h
 
-#ifndef __IN_STREAM_WITH_CRC_H
-#define __IN_STREAM_WITH_CRC_H
+#ifndef ZIP7_INC_IN_STREAM_WITH_CRC_H
+#define ZIP7_INC_IN_STREAM_WITH_CRC_H
 
 #include "../../../../C/7zCrc.h"
 
@@ -9,26 +9,29 @@
 
 #include "../../IStream.h"
 
-class CSequentialInStreamWithCRC:
-  public ISequentialInStream,
-  public CMyUnknownImp
-{
-public:
-  MY_UNKNOWN_IMP
-
-  STDMETHOD(Read)(void *data, UInt32 size, UInt32 *processedSize);
-private:
+Z7_CLASS_IMP_NOQIB_2(
+  CSequentialInStreamWithCRC
+  , ISequentialInStream
+  , IStreamGetSize
+)
   CMyComPtr<ISequentialInStream> _stream;
   UInt64 _size;
   UInt32 _crc;
   bool _wasFinished;
+  UInt64 _fullSize;
 public:
-  void SetStream(ISequentialInStream *stream) { _stream = stream;  }
+  
+  CSequentialInStreamWithCRC():
+    _fullSize((UInt64)(Int64)-1)
+    {}
+
+  void SetStream(ISequentialInStream *stream) { _stream = stream; }
+  void SetFullSize(UInt64 fullSize) { _fullSize = fullSize; }
   void Init()
   {
     _size = 0;
-    _wasFinished = false;
     _crc = CRC_INIT_VAL;
+    _wasFinished = false;
   }
   void ReleaseStream() { _stream.Release(); }
   UInt32 GetCRC() const { return CRC_GET_DIGEST(_crc); }
@@ -36,22 +39,19 @@ public:
   bool WasFinished() const { return _wasFinished; }
 };
 
-class CInStreamWithCRC:
-  public IInStream,
-  public CMyUnknownImp
-{
-public:
-  MY_UNKNOWN_IMP1(IInStream)
 
-  STDMETHOD(Read)(void *data, UInt32 size, UInt32 *processedSize);
-  STDMETHOD(Seek)(Int64 offset, UInt32 seekOrigin, UInt64 *newPosition);
-private:
+Z7_CLASS_IMP_COM_1(
+  CInStreamWithCRC,
+  IInStream
+)
+  Z7_IFACE_COM7_IMP(ISequentialInStream)
+
   CMyComPtr<IInStream> _stream;
   UInt64 _size;
   UInt32 _crc;
   // bool _wasFinished;
 public:
-  void SetStream(IInStream *stream) { _stream = stream;  }
+  void SetStream(IInStream *stream) { _stream = stream; }
   void Init()
   {
     _size = 0;

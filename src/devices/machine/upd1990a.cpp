@@ -73,9 +73,6 @@ bool upd1990a_device::is_serial_mode()
 void upd1990a_device::device_start()
 {
 	(void)m_variant;
-	// resolve callbacks
-	m_write_data.resolve_safe();
-	m_write_tp.resolve_safe();
 
 	for (auto & elem : m_shift_reg)
 		elem = 0;
@@ -187,7 +184,7 @@ TIMER_CALLBACK_MEMBER(upd1990a_device::test_tick)
 //  stb_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( upd1990a_device::stb_w )
+void upd1990a_device::stb_w(int state)
 {
 	if (!m_cs)
 		return;
@@ -373,7 +370,7 @@ WRITE_LINE_MEMBER( upd1990a_device::stb_w )
 //  clk_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( upd1990a_device::clk_w )
+void upd1990a_device::clk_w(int state)
 {
 	if (!m_cs)
 		return;
@@ -420,14 +417,14 @@ WRITE_LINE_MEMBER( upd1990a_device::clk_w )
 //  misc input pins
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( upd1990a_device::cs_w )
+void upd1990a_device::cs_w(int state)
 {
 	// chip select
 	LOG("uPD1990A CS %u\n", state);
 	m_cs = state;
 }
 
-WRITE_LINE_MEMBER( upd1990a_device::oe_w )
+void upd1990a_device::oe_w(int state)
 {
 	// output enable
 	LOG("uPD1990A OE %u\n", state);
@@ -439,25 +436,25 @@ WRITE_LINE_MEMBER( upd1990a_device::oe_w )
 		m_write_data(get_data_out());
 }
 
-WRITE_LINE_MEMBER( upd1990a_device::c0_w )
+void upd1990a_device::c0_w(int state)
 {
 	LOG("uPD1990A C0 %u\n", state);
 	m_c_unlatched = (m_c_unlatched & 0x06) | state;
 }
 
-WRITE_LINE_MEMBER( upd1990a_device::c1_w )
+void upd1990a_device::c1_w(int state)
 {
 	LOG("uPD1990A C1 %u\n", state);
 	m_c_unlatched = (m_c_unlatched & 0x05) | (state << 1);
 }
 
-WRITE_LINE_MEMBER( upd1990a_device::c2_w )
+void upd1990a_device::c2_w(int state)
 {
 	LOG("uPD1990A C2 %u\n", state);
 	m_c_unlatched = (m_c_unlatched & 0x03) | (state << 2);
 }
 
-WRITE_LINE_MEMBER( upd1990a_device::data_in_w )
+void upd1990a_device::data_in_w(int state)
 {
 	// data input
 	LOG("uPD1990A DATA IN %u\n", state);
@@ -476,12 +473,12 @@ int upd1990a_device::get_data_out()
 }
 
 
-READ_LINE_MEMBER( upd1990a_device::data_out_r )
+int upd1990a_device::data_out_r()
 {
 	return get_data_out();
 }
 
-READ_LINE_MEMBER( upd1990a_device::tp_r )
+int upd1990a_device::tp_r()
 {
 	return m_tp;
 }

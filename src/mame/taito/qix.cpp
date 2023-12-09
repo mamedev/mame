@@ -612,20 +612,21 @@ void qix_state::qix_base(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	PIA6821(config, m_pia0, 0);
+	PIA6821(config, m_pia0);
 	m_pia0->readpa_handler().set_ioport("P1");
 	m_pia0->set_port_a_input_overrides_output_mask(0xff);
 	m_pia0->readpb_handler().set_ioport("COIN");
 
-	PIA6821(config, m_pia1, 0);
+	PIA6821(config, m_pia1);
 	m_pia1->readpa_handler().set_ioport("SPARE");
 	m_pia1->set_port_a_input_overrides_output_mask(0xff);
 	m_pia1->readpb_handler().set_ioport("IN0");
 
-	PIA6821(config, m_pia2, 0);
+	PIA6821(config, m_pia2);
 	m_pia2->readpa_handler().set_ioport("P2");
 	m_pia2->set_port_a_input_overrides_output_mask(0xff);
 	m_pia2->writepb_handler().set(FUNC(qix_state::qix_coinctl_w));
+	m_pia2->tspb_handler().set_constant(0);
 
 	/* video hardware */
 	qix_video(config);
@@ -694,7 +695,7 @@ void zookeep_state::zookeepbl(machine_config &config)
 
 ***************************************************************************/
 
-void qix_state::slither(machine_config &config)
+void slither_state::slither(machine_config &config)
 {
 	qix_base(config);
 
@@ -702,12 +703,13 @@ void qix_state::slither(machine_config &config)
 
 	m_maincpu->set_clock(SLITHER_CLOCK_OSC/4/4);   /* 1.34 MHz */
 
-	m_pia1->readpa_handler().set(FUNC(qix_state::slither_trak_lr_r));
-	m_pia1->writepb_handler().set(FUNC(qix_state::slither_76489_0_w));
+	m_pia1->readpa_handler().set(FUNC(slither_state::trak_lr_r));
+	m_pia1->cb2_handler().set(FUNC(slither_state::sn76489_0_ctrl_w));
 	m_pia1->readpb_handler().set_constant(0);
 
-	m_pia2->readpa_handler().set(FUNC(qix_state::slither_trak_ud_r));
-	m_pia2->writepb_handler().set(FUNC(qix_state::slither_76489_1_w));
+	m_pia2->readpa_handler().set(FUNC(slither_state::trak_ud_r));
+	m_pia2->writepb_handler().set_nop();
+	m_pia2->cb2_handler().set(FUNC(slither_state::sn76489_1_ctrl_w));
 	m_pia2->readpb_handler().set_constant(0);
 
 	/* video hardware */
@@ -1443,12 +1445,12 @@ void qix_state::init_kram3()
 	m_bank1->set_entry(0);
 }
 
-WRITE_LINE_MEMBER(qix_state::kram3_lic_maincpu_changed)
+void qix_state::kram3_lic_maincpu_changed(int state)
 {
 	m_bank0->set_entry( state ? 1 : 0 );
 }
 
-WRITE_LINE_MEMBER(qix_state::kram3_lic_videocpu_changed)
+void qix_state::kram3_lic_videocpu_changed(int state)
 {
 	m_bank1->set_entry( state ? 1 : 0 );
 }
@@ -1481,7 +1483,7 @@ GAME( 1982, zookeep2,  zookeep,  zookeep,   zookeep,  zookeep_state, empty_init,
 GAME( 1982, zookeep3,  zookeep,  zookeep,   zookeep,  zookeep_state, empty_init,   ROT0,   "Taito America Corporation", "Zoo Keeper (set 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, zookeepbl, zookeep,  zookeepbl, zookeep,  zookeep_state, empty_init,   ROT0,   "bootleg", "Zoo Keeper (bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, slither,   0,        slither,   slither,  qix_state,     empty_init,   ROT270, "Century II (GDI license)", "Slither (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, slithera,  slither,  slither,   slither,  qix_state,     empty_init,   ROT270, "Century II (GDI license)", "Slither (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, slither,   0,        slither,   slither,  slither_state, empty_init,   ROT270, "Century II (GDI license)", "Slither (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, slithera,  slither,  slither,   slither,  slither_state, empty_init,   ROT270, "Century II (GDI license)", "Slither (set 2)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1984, complexx,  0,        qix,       complexx, qix_state,     empty_init,   ROT270, "Taito America Corporation", "Complex X", MACHINE_SUPPORTS_SAVE )

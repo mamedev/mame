@@ -39,6 +39,9 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 
+	u8 m_latch = 0xff;
+	bool m_latch_enable = false;
+
 	void main_map(address_map &map);
 
 	u8 rts_r();
@@ -48,9 +51,6 @@ private:
 	void control_w(u8 data);
 
 	void set_cpu_freq();
-
-	u8 m_latch = 0xff;
-	bool m_latch_enable = false;
 };
 
 

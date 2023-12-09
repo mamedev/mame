@@ -51,8 +51,6 @@ psxgpu_device::psxgpu_device(const machine_config &mconfig, device_type type, co
 
 void psxgpu_device::device_start()
 {
-	m_vblank_handler.resolve_safe();
-
 	screen().register_vblank_callback(vblank_state_delegate(&psxgpu_device::vblank, this));
 
 	for( int n_colour = 0; n_colour < 0x10000; n_colour++ )

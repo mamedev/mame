@@ -43,12 +43,14 @@ public:
 	void batsugun(machine_config &config);
 	void batsugunbl(machine_config &config);
 	void dogyuun(machine_config &config);
+	void dogyuunto(machine_config &config);
 	void enmadaio(machine_config &config);
 	void kbash(machine_config &config);
 	void kbash2(machine_config &config);
 	void pipibibs(machine_config &config);
 	void pipibibsbl(machine_config &config);
 	void snowbro2(machine_config &config);
+	void snowbro2b3(machine_config &config);
 	void tekipaki(machine_config &config);
 	void vfive(machine_config &config);
 
@@ -58,7 +60,7 @@ public:
 	void init_pipibibsbl();
 	void init_vfive();
 
-	DECLARE_READ_LINE_MEMBER(c2map_r);
+	int c2map_r();
 
 protected:
 	// We encode priority with colour in the tilemaps, so need a larger palette
@@ -106,15 +108,17 @@ protected:
 	u32 screen_update_toaplan2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_dogyuun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_batsugun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 	void cpu_space_fixeightbl_map(address_map &map);
 	void cpu_space_pipibibsbl_map(address_map &map);
 
-	DECLARE_WRITE_LINE_MEMBER(toaplan2_reset);
+	void toaplan2_reset(int state);
 
 	void batsugun_68k_mem(address_map &map);
 	void batsugunbl_68k_mem(address_map &map);
 	void dogyuun_68k_mem(address_map &map);
+	void dogyuunto_68k_mem(address_map &map);
+	void dogyuunto_sound_z80_mem(address_map &map);
 	void enmadaio_68k_mem(address_map &map);
 	void enmadaio_oki(address_map &map);
 	void fixeightbl_oki(address_map &map);
@@ -126,6 +130,7 @@ protected:
 	void pipibibs_68k_mem(address_map &map);
 	void pipibibs_sound_z80_mem(address_map &map);
 	void snowbro2_68k_mem(address_map &map);
+	void snowbro2b3_68k_mem(address_map &map);
 	void tekipaki_68k_mem(address_map &map);
 	void v25_mem(address_map &map);
 	void vfive_68k_mem(address_map &map);

@@ -730,26 +730,26 @@ uint8_t galaga_state::bosco_dsw_r(offs_t offset)
 	return bit0 | (bit1 << 1);
 }
 
-WRITE_LINE_MEMBER(galaga_state::flip_screen_w)
+void galaga_state::flip_screen_w(int state)
 {
 	flip_screen_set(state);
 }
 
-WRITE_LINE_MEMBER(galaga_state::irq1_clear_w)
+void galaga_state::irq1_clear_w(int state)
 {
 	m_main_irq_mask = state;
 	if (!m_main_irq_mask)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(galaga_state::irq2_clear_w)
+void galaga_state::irq2_clear_w(int state)
 {
 	m_sub_irq_mask = state;
 	if (!m_sub_irq_mask)
 		m_subcpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(galaga_state::nmion_w)
+void galaga_state::nmion_w(int state)
 {
 	m_sub2_nmi_mask = !state;
 }
@@ -762,7 +762,7 @@ void galaga_state::out(uint8_t data)
 	machine().bookkeeping().coin_counter_w(0,~data & 8);
 }
 
-WRITE_LINE_MEMBER(galaga_state::lockout)
+void galaga_state::lockout(int state)
 {
 	machine().bookkeeping().coin_lockout_global_w(state);
 }
@@ -1544,7 +1544,7 @@ static const char *const battles_sample_names[] =
 	nullptr   /* end of array */
 };
 
-WRITE_LINE_MEMBER(galaga_state::vblank_irq)
+void galaga_state::vblank_irq(int state)
 {
 	if (state && m_main_irq_mask)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
@@ -3513,41 +3513,42 @@ void battles_state::driver_start()
 
 /* Original Namco hardware, with Namco Customs */
 
-//    YEAR, NAME,      PARENT,  MACHINE, INPUT,    STATE,         INIT,         MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1981, bosco,     0,       bosco,   bosco,    bosco_state,   empty_init,   ROT0,   "Namco", "Bosconian - Star Destroyer (version 5)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, bosco3,    bosco,   bosco,   bosco,    bosco_state,   empty_init,   ROT0,   "Namco", "Bosconian - Star Destroyer (version 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, bosco1,    bosco,   bosco,   bosco,    bosco_state,   empty_init,   ROT0,   "Namco", "Bosconian - Star Destroyer (version 1, newer)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, bosco1o,   bosco,   bosco,   bosco,    bosco_state,   empty_init,   ROT0,   "Namco", "Bosconian - Star Destroyer (version 1, older)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, boscomd,   bosco,   bosco,   boscomd,  bosco_state,   empty_init,   ROT0,   "Namco (Midway license)", "Bosconian - Star Destroyer (Midway, new version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, boscomdo,  bosco,   bosco,   boscomd,  bosco_state,   empty_init,   ROT0,   "Namco (Midway license)", "Bosconian - Star Destroyer (Midway, old version)", MACHINE_SUPPORTS_SAVE )
+//    YEAR, NAME,      PARENT,   MACHINE, INPUT,    STATE,         INIT,         MONITOR,COMPANY,FULLNAME,FLAGS
+GAME( 1981, bosco,     0,        bosco,   bosco,    bosco_state,   empty_init,   ROT0,   "Namco", "Bosconian - Star Destroyer (version 5)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, bosco3,    bosco,    bosco,   bosco,    bosco_state,   empty_init,   ROT0,   "Namco", "Bosconian - Star Destroyer (version 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, bosco1,    bosco,    bosco,   bosco,    bosco_state,   empty_init,   ROT0,   "Namco", "Bosconian - Star Destroyer (version 1, newer)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, bosco1o,   bosco,    bosco,   bosco,    bosco_state,   empty_init,   ROT0,   "Namco", "Bosconian - Star Destroyer (version 1, older)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, boscomd,   bosco,    bosco,   boscomd,  bosco_state,   empty_init,   ROT0,   "Namco (Midway license)", "Bosconian - Star Destroyer (Midway, new version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, boscomdo,  bosco,    bosco,   boscomd,  bosco_state,   empty_init,   ROT0,   "Namco (Midway license)", "Bosconian - Star Destroyer (Midway, old version)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1981, galaga,    0,       galaga,  galaga,   galaga_state,  init_galaga,  ROT90,  "Namco", "Galaga (Namco rev. B)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, galagao,   galaga,  galaga,  galaga,   galaga_state,  init_galaga,  ROT90,  "Namco", "Galaga (Namco)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, galagamw,  galaga,  galaga,  galagamw, galaga_state,  init_galaga,  ROT90,  "Namco (Midway license)", "Galaga (Midway set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, galagamk,  galaga,  galaga,  galaga,   galaga_state,  init_galaga,  ROT90,  "Namco (Midway license)", "Galaga (Midway set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, galagamf,  galaga,  galaga,  galaga,   galaga_state,  init_galaga,  ROT90,  "Namco (Midway license)", "Galaga (Midway set 1 with fast shoot hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, galaga,    0,        galaga,  galaga,   galaga_state,  init_galaga,  ROT90,  "Namco", "Galaga (Namco rev. B)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, galagao,   galaga,   galaga,  galaga,   galaga_state,  init_galaga,  ROT90,  "Namco", "Galaga (Namco)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, galagamw,  galaga,   galaga,  galagamw, galaga_state,  init_galaga,  ROT90,  "Namco (Midway license)", "Galaga (Midway set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, galagamk,  galaga,   galaga,  galaga,   galaga_state,  init_galaga,  ROT90,  "Namco (Midway license)", "Galaga (Midway set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, galagamf,  galaga,   galaga,  galaga,   galaga_state,  init_galaga,  ROT90,  "Namco (Midway license)", "Galaga (Midway set 1 with fast shoot hack)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, xevious,   0,       xevious, xevious,  xevious_state, init_xevious, ROT90,  "Namco", "Xevious (Namco)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, xeviousa,  xevious, xevious, xeviousa, xevious_state, init_xevious, ROT90,  "Namco (Atari license)", "Xevious (Atari, harder)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, xeviousb,  xevious, xevious, xeviousb, xevious_state, init_xevious, ROT90,  "Namco (Atari license)", "Xevious (Atari)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, xeviousc,  xevious, xevious, xeviousa, xevious_state, init_xevious, ROT90,  "Namco (Atari license)", "Xevious (Atari, Namco PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, sxevious,  xevious, xevious, sxevious, xevious_state, init_xevious, ROT90,  "Namco", "Super Xevious", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, sxeviousj, xevious, xevious, sxevious, xevious_state, init_xevious, ROT90,  "Namco", "Super Xevious (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, xevious,   0,        xevious, xevious,  xevious_state, init_xevious, ROT90,  "Namco", "Xevious (Namco)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, xeviousa,  xevious,  xevious, xeviousa, xevious_state, init_xevious, ROT90,  "Namco (Atari license)", "Xevious (Atari, harder)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, xeviousb,  xevious,  xevious, xeviousb, xevious_state, init_xevious, ROT90,  "Namco (Atari license)", "Xevious (Atari)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, xeviousc,  xevious,  xevious, xeviousa, xevious_state, init_xevious, ROT90,  "Namco (Atari license)", "Xevious (Atari, Namco PCB)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, digdug,    0,       digdug,  digdug,   digdug_state,  empty_init,   ROT90,  "Namco", "Dig Dug (rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, digdug1,   digdug,  digdug,  digdug,   digdug_state,  empty_init,   ROT90,  "Namco", "Dig Dug (rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, digdugat,  digdug,  digdug,  digdug,   digdug_state,  empty_init,   ROT90,  "Namco (Atari license)", "Dig Dug (Atari, rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, digdugat1, digdug,  digdug,  digdug,   digdug_state,  empty_init,   ROT90,  "Namco (Atari license)", "Dig Dug (Atari, rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, digsid,    digdug,  digdug,  digdug,   digdug_state,  empty_init,   ROT90,  "Namco (Sidam license)", "Dig Dug (manufactured by Sidam)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sxevious,  0,        xevious, sxevious, xevious_state, init_xevious, ROT90,  "Namco", "Super Xevious", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sxeviousj, sxevious, xevious, sxevious, xevious_state, init_xevious, ROT90,  "Namco", "Super Xevious (Japan)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1982, digdug,    0,        digdug,  digdug,   digdug_state,  empty_init,   ROT90,  "Namco", "Dig Dug (rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, digdug1,   digdug,   digdug,  digdug,   digdug_state,  empty_init,   ROT90,  "Namco", "Dig Dug (rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, digdugat,  digdug,   digdug,  digdug,   digdug_state,  empty_init,   ROT90,  "Namco (Atari license)", "Dig Dug (Atari, rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, digdugat1, digdug,   digdug,  digdug,   digdug_state,  empty_init,   ROT90,  "Namco (Atari license)", "Dig Dug (Atari, rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, digsid,    digdug,   digdug,  digdug,   digdug_state,  empty_init,   ROT90,  "Namco (Sidam license)", "Dig Dug (manufactured by Sidam)", MACHINE_SUPPORTS_SAVE )
 
 /* Bootlegs with replacement I/O chips */
 
-GAME( 1982, gallag,    galaga,  galagab, galaga,   galaga_state,  init_galaga,  ROT90,  "bootleg", "Gallag", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1984, gatsbee,   galaga,  gatsbee, gatsbee,  galaga_state,  init_galaga,  ROT90,  "hack (Uchida)", "Gatsbee", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1981, nebulbee,  galaga,  galagab, galaga,   galaga_state,  init_galaga,  ROT90,  "bootleg", "Nebulous Bee", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1982, gallag,    galaga,   galagab, galaga,   galaga_state,  init_galaga,  ROT90,  "bootleg", "Gallag", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1984, gatsbee,   galaga,   gatsbee, gatsbee,  galaga_state,  init_galaga,  ROT90,  "hack (Uchida)", "Gatsbee", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1981, nebulbee,  galaga,   galagab, galaga,   galaga_state,  init_galaga,  ROT90,  "bootleg", "Nebulous Bee", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1982, xevios,    xevious, xevious, xevious,  xevious_state, init_xevios,  ROT90,  "bootleg", "Xevios", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, battles,   xevious, battles, xevious,  battles_state, init_xevious, ROT90,  "bootleg", "Battles (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, battles2,  xevious, xevious, xevious,  xevious_state, init_xevios,  ROT90,  "bootleg", "Battles (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, xevios,    xevious,  xevious, xevious,  xevious_state, init_xevios,  ROT90,  "bootleg", "Xevios", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, battles,   xevious,  battles, xevious,  battles_state, init_xevious, ROT90,  "bootleg", "Battles (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, battles2,  xevious,  xevious, xevious,  xevious_state, init_xevios,  ROT90,  "bootleg", "Battles (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, dzigzag,   digdug,  dzigzag, digdug,   digdug_state,  empty_init,   ROT90,  "bootleg", "Zig Zag (Dig Dug hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, dzigzag,   digdug,   dzigzag, digdug,   digdug_state,  empty_init,   ROT90,  "bootleg", "Zig Zag (Dig Dug hardware)", MACHINE_SUPPORTS_SAVE )

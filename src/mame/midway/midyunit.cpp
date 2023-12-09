@@ -171,7 +171,7 @@ uint8_t midyunit_state::yawdim2_soundlatch_r()
  *
  *************************************/
 
-READ_LINE_MEMBER(midyunit_state::narc_talkback_strobe_r)
+int midyunit_state::narc_talkback_strobe_r()
 {
 	return (m_narc_sound->read() >> 8) & 1;
 }
@@ -183,7 +183,7 @@ CUSTOM_INPUT_MEMBER(midyunit_state::narc_talkback_data_r)
 }
 
 
-READ_LINE_MEMBER(midyunit_state::adpcm_irq_state_r)
+int midyunit_state::adpcm_irq_state_r()
 {
 	return m_adpcm_sound->irq_read() & 1;
 }
@@ -3232,6 +3232,27 @@ ROM_START( mkyawdim4 )
 ROM_END
 
 
+ROM_START( mkla3bl ) // strange bootleg with peculiarly arranged GFX ROMs.
+	ROM_REGION( 0x50000, "adpcm:cpu", 0 )
+	ROM_LOAD ( "m1-a003", 0x10000, 0x40000, CRC(c615844c) SHA1(5732f9053a5f73b0cc3b0166d7dc4430829d5bc7) )
+
+	ROM_REGION( 0x100000, "adpcm:oki", 0 )
+	ROM_LOAD ( "m1-a001", 0x00000, 0x40000, CRC(258bd7f9) SHA1(463890b23f17350fb9b8a85897b0777c45bc2d54) )
+	ROM_RELOAD(               0x40000, 0x40000 )
+	ROM_LOAD ( "m1-a002", 0x80000, 0x40000, CRC(7b7ec3b6) SHA1(6eec1b90d4a4855f34a7ebfbf93f3358d5627db4) )
+	ROM_RELOAD(               0xc0000, 0x40000 )
+
+	ROM_REGION16_LE( 0x100000, "user1", 0 )
+	ROM_LOAD16_BYTE( "ax422-m1-5", 0x00000, 0x80000, CRC(2ce843c5) SHA1(d48efcecd6528414249f3884edc32e0dafa9677f) )
+	ROM_LOAD16_BYTE( "ax422-m1-4", 0x00001, 0x80000, CRC(49a46e10) SHA1(c63c00531b29c01ee864acc141b1713507d25c69) )
+
+	ROM_REGION( 0x800000, "gfx1", 0 )
+	ROM_LOAD ( "pw3412-m1-a", 0x000000, 0x200000, CRC(87776f14) SHA1(83533049545b175fa1fc8e021056466f6a37b2a5) ) // even == a-2.bin, odd == b-2.bin
+	ROM_LOAD ( "pw3412-m1-b", 0x200000, 0x200000, CRC(30724e04) SHA1(a5f354b82fd5f73535ba77ed8be473f862528682) ) // even == a-1.bin, odd == b-1.bin
+	ROM_LOAD ( "pw3412-m1-c", 0x400000, 0x200000, CRC(96612f94) SHA1(4cc80962bd04992ce95857650514c6f40f16fdad) ) // 1st half == c-1.bin, 2nd half == c-2.bin
+ROM_END
+
+
 ROM_START( term2 )
 	ROM_REGION( 0x50000, "adpcm:cpu", 0 )   /* sound CPU */
 	ROM_LOAD (  "sl1_terminator_2_u3_sound_rom.u3",   0x10000, 0x20000, CRC(73c3f5c4) SHA1(978dd974590e77294dbe9a647aebd3d24af6397f) )
@@ -3594,6 +3615,7 @@ GAME( 1992, mkyawdim,   mk,       mkyawdim,                mkyawdim, midyunit_st
 GAME( 1992, mkyawdim2,  mk,       mkyawdim,                mkyawdim, midyunit_state, init_mkyawdim2, ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 2)", MACHINE_SUPPORTS_SAVE ) // some sound effects are missing on real pcb
 GAME( 1992, mkyawdim3,  mk,       mkyawdim,                mkyawdim, midyunit_state, init_mkyawdim,  ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND) // are some sound effects missing/wrong?
 GAME( 1992, mkyawdim4,  mk,       mkyawdim,                mkyawdim, midyunit_state, init_mkyawdim,  ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 4)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND) // are some sound effects missing/wrong?
+GAME( 1992, mkla3bl,    mk,       yunit_adpcm_6bit_fast,   mkla4,    midyunit_state, init_mkla3bl,   ROT0, "bootleg (Victor)", "Mortal Kombat (Victor bootleg of rev 3.0 08/31/92)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1992, totcarn,    0,        yunit_adpcm_6bit_fast,   totcarn, midyunit_state,  init_totcarn,  ROT0, "Midway",   "Total Carnage (rev LA1 03/10/92)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, totcarnp2,  totcarn,  yunit_adpcm_6bit_fast,   totcarn, midyunit_state,  init_totcarn,  ROT0, "Midway",   "Total Carnage (prototype, proto v 2.0 02/10/92)", MACHINE_SUPPORTS_SAVE )

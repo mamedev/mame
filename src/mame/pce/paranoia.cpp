@@ -67,7 +67,7 @@ private:
 	void i8155_a_w(uint8_t data);
 	void i8155_b_w(uint8_t data);
 	void i8155_c_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(i8155_timer_out);
+	void i8155_timer_out(int state);
 	void paranoia_8085_io_map(address_map &map);
 	void paranoia_8085_map(address_map &map);
 	void paranoia_z80_io_map(address_map &map);
@@ -161,7 +161,7 @@ void paranoia_state::i8155_c_w(uint8_t data)
 	//logerror("i8155 Port C: %02X\n", data);
 }
 
-WRITE_LINE_MEMBER(paranoia_state::i8155_timer_out)
+void paranoia_state::i8155_timer_out(int state)
 {
 	//m_subcpu->set_input_line(I8085_RST55_LINE, state ? CLEAR_LINE : ASSERT_LINE );
 	//logerror("Timer out %d\n", state);
@@ -231,4 +231,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1990, paranoia, 0, paranoia, paranoia, paranoia_state, init_pce_common, ROT0, "Naxat Soft", "Paranoia", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, paranoia, 0, paranoia, paranoia, paranoia_state, init_pce_common, ROT0, "Naxat Soft", "Paranoia (Arcade PC Engine, bootleg?)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // Based off PCE not TG16, cfr. stage clear screen

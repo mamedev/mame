@@ -24,6 +24,7 @@
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/g65816/g65816.h"
 #include "machine/6522via.h"
 #include "machine/6850acia.h"
@@ -40,12 +41,17 @@
 #include "bus/econet/econet.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
 #include "utf8.h"
 
 #include "accomm.lh"
+
+
+namespace {
 
 /* Interrupts */
 #define INT_HIGH_TONE       0x40
@@ -928,8 +934,7 @@ void accomm_state::accomm(machine_config &config)
 	MOS6522(config, m_via, 16_MHz_XTAL / 16);
 	m_via->writepa_handler().set("cent_data_out", FUNC(output_latch_device::write));
 	m_via->ca2_handler().set("centronics", FUNC(centronics_device::write_strobe));
-	m_via->readpb_handler().set(m_rtc, FUNC(pcf8573_device::sda_r)).bit(0);
-	m_via->readpb_handler().append(m_cct, FUNC(saa5240a_device::read_sda)).bit(0);
+	m_via->readpb_handler().set([this] () { return uint8_t(m_rtc->sda_r() & m_cct->read_sda()); });
 	m_via->writepb_handler().set(m_rtc, FUNC(pcf8573_device::sda_w)).bit(1).invert();
 	m_via->writepb_handler().append(m_rtc, FUNC(pcf8573_device::scl_w)).bit(2).invert();
 	m_via->writepb_handler().append(m_cct, FUNC(saa5240a_device::write_sda)).bit(1).invert();
@@ -1078,6 +1083,8 @@ ROM_START(accommi)
 
 	ROM_REGION(0x380000, "ext", ROMREGION_ERASEFF)
 ROM_END
+
+} // anonymous namespace
 
 
 /*    YEAR  NAME     PARENT  COMPAT MACHINE  INPUT   CLASS         INIT        COMPANY            FULLNAME                          FLAGS */

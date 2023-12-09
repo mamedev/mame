@@ -186,6 +186,7 @@ public:
 		CLONES,
 		MANUFACTURER,
 		YEAR,
+		SOURCE_FILE,
 		SAVE,
 		NOSAVE,
 		CHD,
@@ -276,10 +277,13 @@ class machine_filter_data
 public:
 	std::vector<std::string> const &manufacturers()     const { return m_manufacturers; }
 	std::vector<std::string> const &years()             const { return m_years; }
+	std::vector<std::string> const &source_files()      const { return m_source_files; }
 
 	// adding entries
 	void add_manufacturer(std::string const &manufacturer);
 	void add_year(std::string const &year);
+	void add_source_file(std::string_view path);
+
 	void finalise();
 
 	// use heuristics to extract meaningful parts from machine metadata
@@ -306,6 +310,7 @@ private:
 
 	std::vector<std::string>    m_manufacturers;
 	std::vector<std::string>    m_years;
+	std::vector<std::string>    m_source_files;
 
 	machine_filter::type        m_current_filter = machine_filter::ALL;
 	filter_map                  m_filters;
@@ -404,7 +409,6 @@ struct ui_globals
 
 // GLOBAL FUNCTIONS
 char* chartrimcarriage(char str[]);
-const char* strensure(const char* s);
 int getprecisionchr(const char* s);
 std::vector<std::string> tokenize(const std::string &text, char sep);
 

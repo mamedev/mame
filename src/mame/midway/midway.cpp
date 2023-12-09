@@ -100,7 +100,7 @@ void midway_ssio_device::write(offs_t offset, uint8_t data)
 //  reset_write - write to the reset line
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(midway_ssio_device::reset_write)
+void midway_ssio_device::reset_write(int state)
 {
 	if (state)
 	{
@@ -517,7 +517,7 @@ void midway_sounds_good_device::write(uint8_t data)
 //  reset_write - write to the reset line
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(midway_sounds_good_device::reset_write)
+void midway_sounds_good_device::reset_write(int state)
 {
 //if (state) osd_printf_debug("SG Reset\n");
 	m_cpu->set_input_line(INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
@@ -555,7 +555,7 @@ void midway_sounds_good_device::portb_w(uint8_t data)
 //  irq_w - IRQ line state changes
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(midway_sounds_good_device::irq_w)
+void midway_sounds_good_device::irq_w(int state)
 {
 	int combined_state = m_pia->irq_a_state() | m_pia->irq_b_state();
 	m_cpu->set_input_line(4, combined_state ? ASSERT_LINE : CLEAR_LINE);
@@ -608,13 +608,13 @@ void midway_sounds_good_device::device_add_mconfig(machine_config &config)
 	M68000(config, m_cpu, DERIVED_CLOCK(1, 2));
 	m_cpu->set_addrmap(AS_PROGRAM, &midway_sounds_good_device::soundsgood_map);
 
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->writepa_handler().set(FUNC(midway_sounds_good_device::porta_w));
 	m_pia->writepb_handler().set(FUNC(midway_sounds_good_device::portb_w));
 	m_pia->irqa_handler().set(FUNC(midway_sounds_good_device::irq_w));
 	m_pia->irqb_handler().set(FUNC(midway_sounds_good_device::irq_w));
 
-	AD7533(config, m_dac, 0); /// ad7533jn.u10
+	AD7533(config, m_dac); /// ad7533jn.u10
 
 	// The DAC filters here are identical to those on the "Turbo Cheap Squeak" and "Cheap Squeak Deluxe" boards.
 	//LM359 @U2.2, 2nd order MFB low-pass (fc = 5404.717733, Q = 0.625210, gain = -1.000000)
@@ -712,7 +712,7 @@ void midway_turbo_cheap_squeak_device::write(uint8_t data)
 //  reset_write - write to the reset line
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(midway_turbo_cheap_squeak_device::reset_write)
+void midway_turbo_cheap_squeak_device::reset_write(int state)
 {
 	m_cpu->set_input_line(INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -745,7 +745,7 @@ void midway_turbo_cheap_squeak_device::portb_w(uint8_t data)
 //  irq_w - IRQ line state changes
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(midway_turbo_cheap_squeak_device::irq_w)
+void midway_turbo_cheap_squeak_device::irq_w(int state)
 {
 	int combined_state = m_pia->irq_a_state() | m_pia->irq_b_state();
 	m_cpu->set_input_line(M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
@@ -775,13 +775,13 @@ void midway_turbo_cheap_squeak_device::device_add_mconfig(machine_config &config
 	MC6809E(config, m_cpu, DERIVED_CLOCK(1, 4));
 	m_cpu->set_addrmap(AS_PROGRAM, &midway_turbo_cheap_squeak_device::turbocs_map);
 
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->writepa_handler().set(FUNC(midway_turbo_cheap_squeak_device::porta_w));
 	m_pia->writepb_handler().set(FUNC(midway_turbo_cheap_squeak_device::portb_w));
 	m_pia->irqa_handler().set(FUNC(midway_turbo_cheap_squeak_device::irq_w));
 	m_pia->irqb_handler().set(FUNC(midway_turbo_cheap_squeak_device::irq_w));
 
-	AD7533(config, m_dac, 0); /// ad7533jn.u11
+	AD7533(config, m_dac); /// ad7533jn.u11
 
 	// The DAC filters here are identical to those on the "Sounds Good" and "Cheap Squeak Deluxe" boards.
 	//LM359 @U14.2, 2nd order MFB low-pass (fc = 5404.717733, Q = 0.625210, gain = -1.000000)

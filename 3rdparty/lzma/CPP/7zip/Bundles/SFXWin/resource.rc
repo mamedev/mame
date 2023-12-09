@@ -48,3 +48,8 @@ STRINGTABLE DISCARDABLE
 BEGIN
   IDS_PROP_MTIME        "Modified"
 END
+
+
+#ifndef UNDER_CE
+1 24 MOVEABLE PURE "../../UI/GUI/7zG.exe.manifest"
+#endif

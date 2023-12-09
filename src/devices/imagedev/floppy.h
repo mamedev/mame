@@ -11,10 +11,16 @@
 
 #pragma once
 
-#include "formats/flopimg.h"
-#include "formats/fsmgr.h"
 #include "sound/samples.h"
 #include "screen.h"
+
+class floppy_image;
+class floppy_image_format_t;
+
+namespace fs {
+	class manager_t;
+	class meta_data;
+};
 
 class floppy_sound_device;
 
@@ -109,7 +115,7 @@ public:
 	void setup_wpt_cb(wpt_cb cb);
 	void setup_led_cb(led_cb cb);
 
-	std::vector<uint32_t> &get_buffer() { return image->get_buffer(cyl, ss, subcyl); }
+	std::vector<uint32_t> &get_buffer();
 	int get_cyl() const { return cyl; }
 	bool on_track() const { return !subcyl; }
 
@@ -153,16 +159,7 @@ public:
 	void    enable_sound(bool doit) { m_make_sound = doit; }
 
 protected:
-	struct fs_enum : public fs::manager_t::floppy_enumerator {
-		floppy_image_device *m_fid;
-		const fs::manager_t *m_manager;
-
-		fs_enum(floppy_image_device *fid);
-
-		virtual void add_raw(const char *name, u32 key, const char *description) override;
-	protected:
-		virtual void add_format(const floppy_image_format_t &type, u32 image_size, const char *name, const char *description) override;
-	};
+	struct fs_enum;
 
 	floppy_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -345,6 +342,8 @@ DECLARE_FLOPPY_IMAGE_DEVICE(SONY_OA_D31V,        sony_oa_d31v,        "floppy_3_
 DECLARE_FLOPPY_IMAGE_DEVICE(SONY_OA_D32W,        sony_oa_d32w,        "floppy_3_5")
 DECLARE_FLOPPY_IMAGE_DEVICE(SONY_OA_D32V,        sony_oa_d32v,        "floppy_3_5")
 DECLARE_FLOPPY_IMAGE_DEVICE(TEAC_FD_30A,         teac_fd_30a,         "floppy_3")
+DECLARE_FLOPPY_IMAGE_DEVICE(TEAC_FD_55A,         teac_fd_55a,         "floppy_5_25")
+DECLARE_FLOPPY_IMAGE_DEVICE(TEAC_FD_55B,         teac_fd_55b,         "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(TEAC_FD_55E,         teac_fd_55e,         "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(TEAC_FD_55F,         teac_fd_55f,         "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(TEAC_FD_55G,         teac_fd_55g,         "floppy_5_25")

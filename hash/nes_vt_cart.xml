@@ -18,4 +18,16 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- Generic looking cartridge paired with a Joystick style controller -->
+	<software name="5bonus">
+		<description>5 Bonus Games</description>
+		<year>200?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_vt_cart">
+			<dataarea name="rom" size="0x80000">
+				<rom name="C9C8_8-20LS.U1" size="0x80000" crc="ea86e3cd" sha1="b641a6bda9f80c9cd9730008eff24df92a6a59cb"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

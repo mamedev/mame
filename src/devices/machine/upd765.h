@@ -48,8 +48,8 @@ public:
 	void tc_w(bool val);
 	void ready_w(bool val);
 
-	DECLARE_WRITE_LINE_MEMBER(tc_line_w) { tc_w(state == ASSERT_LINE); }
-	DECLARE_WRITE_LINE_MEMBER(reset_w);
+	void tc_line_w(int state) { tc_w(state == ASSERT_LINE); }
+	void reset_w(int state);
 
 	void set_rate(int rate); // rate in bps, to be used when the fdc is externally frequency-controlled
 
@@ -61,7 +61,6 @@ public:
 protected:
 	upd765_family_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -574,9 +573,6 @@ public:
 	virtual void map(address_map &map) override;
 	uint8_t input_r();
 
-protected:
-	virtual void device_start() override;
-
 private:
 	devcb_read8 m_input_handler;
 };
@@ -609,7 +605,6 @@ public:
 
 protected:
 	virtual void soft_reset() override;
-	virtual void device_start() override;
 
 private:
 	virtual int check_command() override;

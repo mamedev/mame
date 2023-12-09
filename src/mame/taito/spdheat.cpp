@@ -12,21 +12,107 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "spdheat.h"
-#include "spdheat.lh"
 
-#include "speaker.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/input_merger.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
+#include "sound/dac.h"
 #include "sound/flt_vol.h"
 #include "sound/ymopn.h"
 
+#include "emupal.h"
+#include "screen.h"
+#include "speaker.h"
+#include "tilemap.h"
 
-static constexpr XTAL MASTER_CLOCK  = 16_MHz_XTAL;
-static constexpr XTAL SOUND_CLOCK   = 4_MHz_XTAL;
-static constexpr XTAL FM_CLOCK      = SOUND_CLOCK / 2;
+#include "spdheat.lh"
+
+
+namespace {
+
+/*************************************
+ *
+ *  Machine class
+ *
+ *************************************/
+
+class spdheat_state : public driver_device
+{
+public:
+	spdheat_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_subcpu(*this, "subcpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_audio_irq(*this, "audio_irq"),
+		m_fg_ram(*this, "fg_ram%u", 0U),
+		m_spriteram(*this, "spriteram"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette0(*this, "palette0"),
+		m_palette1(*this, "palette1"),
+		m_palette2(*this, "palette2"),
+		m_palette3(*this, "palette3"),
+		m_dac(*this, "dac")
+	{ }
+
+	void spdheat(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<input_merger_any_high_device> m_audio_irq;
+	required_shared_ptr_array<uint16_t, 4> m_fg_ram;
+	required_shared_ptr<uint16_t> m_spriteram;
+	tilemap_t *m_fg_tilemap[4]{};
+
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette0;
+	required_device<palette_device> m_palette1;
+	required_device<palette_device> m_palette2;
+	required_device<palette_device> m_palette3;
+	required_device<dac_byte_interface> m_dac;
+
+	uint32_t m_sound_data[4]{};
+	uint32_t m_sound_status = 0;
+	uint32_t m_sub_data = 0;
+	uint32_t m_sub_status = 0;
+
+	void main_map(address_map &map);
+	void sub_map(address_map &map);
+	void sub_io_map(address_map &map);
+	void sound_map(address_map &map);
+
+	void sub_dac_w(uint8_t data);
+	void sub_nmi_w(uint8_t data);
+	void sub_status_w(uint8_t data);
+	uint8_t sub_snd_r();
+	uint8_t soundstatus_r();
+	uint8_t sub_status_r();
+	uint16_t sound_status_r();
+	template<int screen> void sound_w(uint16_t data);
+	template<int screen> uint8_t sndcpu_sound_r();
+	void ym1_port_a_w(uint8_t data);
+	void ym1_port_b_w(uint8_t data);
+	void ym2_port_a_w(uint8_t data);
+	void ym2_port_b_w(uint8_t data);
+	void ym3_port_a_w(uint8_t data);
+	void ym3_port_b_w(uint8_t data);
+	void ym4_port_a_w(uint8_t data);
+	void ym4_port_b_w(uint8_t data);
+
+	template<int screen> void text_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	template<int screen> TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t xo, uint32_t yo);
+	template<int which> uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+};
 
 
 /*************************************
@@ -296,11 +382,6 @@ void spdheat_state::sound_w(uint16_t data)
 {
 	m_sound_data[screen] = data;
 	m_sound_status &= ~(1 << screen);
-}
-
-uint8_t spdheat_state::sub_r()
-{
-	return 0; // TODO
 }
 
 void spdheat_state::sub_dac_w(uint8_t data)
@@ -685,6 +766,10 @@ GFXDECODE_END
 
 void spdheat_state::spdheat(machine_config &config)
 {
+	constexpr XTAL MASTER_CLOCK = 16_MHz_XTAL;
+	constexpr XTAL SOUND_CLOCK = 4_MHz_XTAL;
+	constexpr XTAL FM_CLOCK = SOUND_CLOCK / 2;
+
 	/* basic machine hardware */
 	M68000(config, m_maincpu, MASTER_CLOCK / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &spdheat_state::main_map);
@@ -841,6 +926,8 @@ ROM_START( spdheatj )
 	ROM_LOAD( "a55-13.ic52",  0x10000, 0x08000, CRC(38085e40) SHA1(5e4d6f9ce39a95bdddf5b2f4504fe3c34b5a8585) )
 	ROM_LOAD( "a55-14.ic36",  0x18000, 0x08000, CRC(31c38779) SHA1(42ce3441a540644d17f27e84f8c5693cbee3e9f1) )
 ROM_END
+
+} // anonymous namespace
 
 
 /*************************************

@@ -2,8 +2,13 @@
 // copyright-holders:
 
 /*
+
 Cow Tipping
 Game Refuge / Team Play 2004
+
+TODO:
+- Unemulated MC68SZ328 + AMD_29LV640MB;
+- Lengthy debug strings in dump hints at a blitter/texture based video section;
 
 PCB sputnik rev. 1.1
 
@@ -17,14 +22,17 @@ Two identical looking PCBs were dumped. The dumps are different (even taking int
 isn't currently known if it's because they're different sets or because of the saved scores and settings.
 
 The PIC is undumped, but on PCB the game seems to run without it, hanging when checking the ticket dispenser.
+
 */
 
 
 
 #include "emu.h"
-#include "cpu/pic16c5x/pic16c5x.h"
+
 #include "cpu/m68000/m68000.h"
+#include "cpu/pic16c5x/pic16c5x.h"
 #include "machine/mc68328.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -36,8 +44,8 @@ class cowtipping_state : public driver_device
 {
 public:
 	cowtipping_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{ }
 
 	void cowtipping(machine_config &config);
@@ -65,7 +73,8 @@ uint32_t cowtipping_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 
 void cowtipping_state::main_map(address_map &map)
 {
-	map(0x000000, 0x8000ff).rom().region("maincpu", 0);
+	map(0x00000000, 0x008000ff).rom().region("flash", 0);
+	map(0x05000000, 0x0501ffff).ram();
 }
 
 
@@ -75,10 +84,12 @@ INPUT_PORTS_END
 
 void cowtipping_state::cowtipping(machine_config &config)
 {
-	MC68328(config, m_maincpu, 32.768_kHz_XTAL * 506);        // 16.580608 MHz, multiplier unknown, to be adjusted
+	MC68EZ328(config, m_maincpu, 32.768_kHz_XTAL * 506); // 16.580608 MHz, multiplier unknown, actually MC68SZ328
 	m_maincpu->set_addrmap(AS_PROGRAM, &cowtipping_state::main_map);
 
 	PIC16C56(config, "pic", 4000000);  // Actually PIC12C508/P, clock not verified
+
+//  TODO: AMD_29LV640MB (64 MBit with Boot Sector)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));  // wrong
 	screen.set_refresh_hz(60);
@@ -94,7 +105,7 @@ void cowtipping_state::cowtipping(machine_config &config)
 
 
 ROM_START( cowtipp )
-	ROM_REGION16_BE(0x800100, "maincpu", 0)
+	ROM_REGION16_BE(0x800100, "flash", 0)
 	ROM_LOAD16_WORD_SWAP( "am29lv640mb-u5-3287.u5", 0x000000, 0x800100, CRC(5aa4ac7c) SHA1(4b882008e13e581c0131875a1845c7e78696087e) )
 	// empty space at u6
 
@@ -103,7 +114,7 @@ ROM_START( cowtipp )
 ROM_END
 
 ROM_START( cowtippa )
-	ROM_REGION16_BE(0x800100, "maincpu", 0)
+	ROM_REGION16_BE(0x800100, "flash", 0)
 	ROM_LOAD16_WORD_SWAP( "am29lv640mb-u5-3276.u5", 0x000000, 0x800100, BAD_DUMP CRC(05ce9f7f) SHA1(c27772c9a6a1feaf4d83ae0902759fa25642ad65) ) // suspected bad, seems to have some problems with bit 5
 	// empty space at u6
 

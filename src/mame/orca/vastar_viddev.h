@@ -51,7 +51,7 @@ public:
 		m_bg_tilemap[Which]->mark_tile_dirty(offset & 0x3ff);
 	}
 
-	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
+	void flipscreen_w(int state);
 	void priority_w(uint8_t data) { m_fg_vregs = data; }
 
 protected:

@@ -193,11 +193,6 @@ void kcexp_slot_device::device_validity_check(validity_checker &valid) const
 void kcexp_slot_device::device_start()
 {
 	m_cart = get_card_device();
-
-	// resolve callbacks
-	m_out_irq_cb.resolve_safe();
-	m_out_nmi_cb.resolve_safe();
-	m_out_halt_cb.resolve_safe();
 }
 
 
@@ -270,7 +265,7 @@ void kcexp_slot_device::io_write(offs_t offset, uint8_t data)
    MEI line write
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER( kcexp_slot_device::mei_w )
+void kcexp_slot_device::mei_w(int state)
 {
 	LOG("KCEXP: %s MEI line\n", state != CLEAR_LINE ? "ASSERT": "CLEAR");
 
@@ -282,7 +277,7 @@ WRITE_LINE_MEMBER( kcexp_slot_device::mei_w )
    MEO line write
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER( kcexp_slot_device::meo_w )
+void kcexp_slot_device::meo_w(int state)
 {
 	LOG("KCEXP: %s MEO line\n", state != CLEAR_LINE ? "ASSERT": "CLEAR");
 

@@ -31,12 +31,6 @@ void thomson_extension_device::io_map(address_space_installer &space, offs_t sta
 		space.install_device(start, end, *dev, &thomson_extension_interface::io_map);
 }
 
-void thomson_extension_device::device_resolve_objects()
-{
-	m_firq_callback.resolve_safe();
-	m_irq_callback.resolve_safe();
-}
-
 void thomson_extension_device::device_start()
 {
 }
@@ -47,13 +41,13 @@ thomson_extension_interface::thomson_extension_interface(const machine_config &m
 {
 }
 
-WRITE_LINE_MEMBER(thomson_extension_interface::firq_w)
+void thomson_extension_interface::firq_w(int state)
 {
 	if(m_ext)
 		m_ext->m_firq_callback(state);
 }
 
-WRITE_LINE_MEMBER(thomson_extension_interface::irq_w)
+void thomson_extension_interface::irq_w(int state)
 {
 	if(m_ext)
 		m_ext->m_irq_callback(state);

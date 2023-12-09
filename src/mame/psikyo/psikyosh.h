@@ -6,7 +6,7 @@
 #pragma once
 
 #include "machine/eepromser.h"
-#include "cpu/sh/sh2.h"
+#include "cpu/sh/sh7604.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -88,7 +88,7 @@ private:
 	const struct sprite_t *m_sprite_end;
 
 	/* devices */
-	required_device<sh2_device> m_maincpu;
+	required_device<sh2_sh7604_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
@@ -110,7 +110,7 @@ private:
 	u32 mjgtaste_input_r();
 	void eeprom_w(u8 data);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 	INTERRUPT_GEN_MEMBER(interrupt);
 	void draw_scanline32_alpha(bitmap_rgb32 &bitmap, s32 destx, s32 desty, s32 length, const u32 *srcptr, int alpha);
 	void draw_scanline32_argb(bitmap_rgb32 &bitmap, s32 destx, s32 desty, s32 length, const u32 *srcptr);

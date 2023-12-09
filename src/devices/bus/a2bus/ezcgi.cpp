@@ -52,7 +52,7 @@ protected:
 	required_device<tms9918a_device> m_tms;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( tms_irq_w );
+	void tms_irq_w(int state);
 };
 
 class a2bus_ezcgi_9938_device:
@@ -77,7 +77,7 @@ protected:
 	required_device<v9938_device> m_tms;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( tms_irq_w );
+	void tms_irq_w(int state);
 };
 
 class a2bus_ezcgi_9958_device:
@@ -102,7 +102,7 @@ protected:
 	required_device<v9958_device> m_tms;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( tms_irq_w );
+	void tms_irq_w(int state);
 };
 
 #define MSX2_XBORDER_PIXELS     16
@@ -328,7 +328,7 @@ void a2bus_ezcgi_9958_device::write_c0nx(uint8_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER( a2bus_ezcgi_device::tms_irq_w )
+void a2bus_ezcgi_device::tms_irq_w(int state)
 {
 	if (state)
 	{
@@ -340,7 +340,7 @@ WRITE_LINE_MEMBER( a2bus_ezcgi_device::tms_irq_w )
 	}
 }
 
-WRITE_LINE_MEMBER( a2bus_ezcgi_9938_device::tms_irq_w )
+void a2bus_ezcgi_9938_device::tms_irq_w(int state)
 {
 	if (state)
 	{
@@ -352,7 +352,7 @@ WRITE_LINE_MEMBER( a2bus_ezcgi_9938_device::tms_irq_w )
 	}
 }
 
-WRITE_LINE_MEMBER( a2bus_ezcgi_9958_device::tms_irq_w )
+void a2bus_ezcgi_9958_device::tms_irq_w(int state)
 {
 	if (state)
 	{

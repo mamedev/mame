@@ -12,44 +12,59 @@
 
   -- Z80 based --
 
-   * Noraut Poker,                        1988,  Noraut Ltd.
-   * Noraut Deluxe Poker (console),       198?,  Noraut Ltd.
-   * Noraut Deluxe Poker (bootleg),       198?,  Unknown.
-   * Noraut Joker Poker (original),       198?,  Noraut Ltd.
-   * Noraut Joker Poker (Prologic HW),    198?,  Video Fun Games Ltd.
-   * Noraut Joker Poker (alt),            1988,  Noraut Ltd.
-   * Noraut Red Hot Joker Poker,          1988,  Noraut Ltd.
-   * Noraut Red Hot Joker Poker (alt HW), 198?,  Noraut Ltd.
-   * Noraut Poker (NTX10A),               1988,  Noraut Ltd.
-   * Noraut Joker Poker (V3.010a),        2002,  Noraut Ltd.
-   * Noraut Joker Poker (V3.011a),        2003,  Noraut Ltd.
-   * Noraut unknown set 1 (console),      198?,  Noraut Ltd.
-   * Noraut unknown set 2 (console),      198?,  Noraut Ltd.
-   * Mainline Double Joker Poker,         198?,  Mainline London.
-   * Double Joker Poker (45%-75% payout), 199?,  DellFern Ltd.
-   * Royal on Ten (Noraut Deluxe hack),   2005,  Unknown.
-   * Credit Poker (ver.30c, standard),    1999,  CGI.
-   * Kimble Double HI-LO (z80 version),   198?,  Kimble Ireland.
-   * PMA Poker,                           198?,  PMA.
-   * Poker / Black Jack (Model 7521),     198?,  M. Kramer Manufacturing.
-   * Draw Poker (Joker Poker V.01),       1984,  Coinmaster.
+   * Noraut Poker,                               1988,  Noraut Ltd.
+   * Noraut Deluxe Poker (console),              198?,  Noraut Ltd.
+   * Noraut Deluxe Poker (bootleg),              198?,  Unknown.
+   * Noraut Joker Poker (original),              198?,  Noraut Ltd.
+   * Noraut Joker Poker (Prologic HW),           198?,  Video Fun Games Ltd.
+   * Noraut Joker Poker (alt),                   1988,  Noraut Ltd.
+   * Noraut Red Hot Joker Poker,                 1988,  Noraut Ltd.
+   * Noraut Red Hot Joker Poker (alt HW),        198?,  Noraut Ltd.
+   * Noraut Poker (NTX10A),                      1988,  Noraut Ltd.
+   * Noraut Jacks Plus / Joker Poker (V3.010a),  2002,  Noraut Ltd.
+   * Noraut Jacks Plus / Joker Poker (V3.011a),  2003,  Noraut Ltd.
+   * Noraut Joker Poker (console, set 1),        198?,  Noraut Ltd.
+   * Noraut Joker Poker (console, set 2),        198?,  Noraut Ltd.
+   * Mainline Double Joker Poker,                198?,  Mainline London.
+   * Double Joker Poker (45%-75% payout),        199?,  DellFern Ltd.
+   * Royal on Ten (hack of Noraut Deluxe Poker), 2005,  Unknown.
+   * Credit Poker (ver.30c, standard),           1999,  CGI.
+   * Credit Poker (ver.30b, 7 & 9 bonus),        1999,  CGI.
+   * Credit Poker (ver.23b, 7 & 9 bonus),        1998,  CGI.
+   * Double Joker Poker (CGI),                   19??,  CGI.
+   * Kimble Double HI-LO (z80 version),          198?,  Kimble Ireland.
+   * PMA Poker,                                  198?,  PMA.
+   * Poker / Black Jack (Model 7521),            198?,  M. Kramer Manufacturing.
+   * New Hi-Low Poker,                           19??,  Song won?
+   * Draw Poker (Joker Poker V.01),              1984,  Coinmaster.
 
   -- 8080 based --
 
-   * Draw Poker HI-LO,                    1983,  M. Kramer Manufacturing.
-   * Draw Poker HI-LO (alt),              1983,  Unknown.
-   * Draw Poker HI-LO (Japanese),         198?,  Unknown.
-   * Kimble Double HI-LO,                 198?,  Kimble Ireland.
-   * GTI Poker,                           1983,  GTI Inc.
-   * HI-LO Double Up Joker Poker,         1983,  SMS Manufacturing Corp.
-   * Drews Revenge (v.2.89, set 1),       1986,  Drews Inc.
-   * Drews Revenge (v.2.89, set 2),       1986,  Drews Inc.
-   * Turbo Poker 2,                       1993,  Micro Manufacturing, Inc.
-   * Southern Systems Joker Poker,        1982,  Southern Systems & Assembly, Ltd.
-   * Fast Draw (poker conversion kit)?,   198?,  Stern Electronics?
-   * Draw Poker HI-LO (unknown, rev 1),   198?,  SMS Manufacturing Corp?.
-   * Draw Poker HI-LO (unknown, rev 2),   198?,  SMS Manufacturing Corp?.
+   * Draw Poker HI-LO,                           1983,  M. Kramer Manufacturing.
+   * Draw Poker HI-LO (alt),                     1983,  Unknown.
+   * Draw Poker HI-LO (Japanese),                198?,  Unknown.
+   * Kimble Double HI-LO,                        198?,  Kimble Ireland.
+   * GTI Poker,                                  1983,  GTI Inc.
+   * GTI Poker? (SMS hardware),                  1983,  GTI Inc.
+   * HI-LO Double Up Joker Poker,                1983,  SMS Manufacturing Corp.
+   * Drews Revenge (v.2.89, set 1),              1986,  Drews Inc.
+   * Drews Revenge (v.2.89, set 2),              1986,  Drews Inc.
+   * Southern Systems Joker Poker,               1982,  Southern Systems & Assembly, Ltd.
 
+  -- 8080 based with MCU --
+
+   * Turbo Poker 2,                              1993,  Micro Manufacturing, Inc.
+
+  -- unknown CPU based --
+
+   * Fast Draw (poker conversion kit)?,          198?,  Stern Electronics?
+   * Draw Poker HI-LO (unknown, rev 1),          198?,  SMS Manufacturing Corp?.
+   * Draw Poker HI-LO (unknown, rev 2),          198?,  SMS Manufacturing Corp?.
+   * unknown poker game PKII/DM,                 198?,  Unknown.
+   * unknown LJF Corportaion poker game          1989,  LJF Corporation
+
+
+*******************************************************************************
 
   This hardware emulation opened a big can of worms. :)
 
@@ -533,11 +548,23 @@
   - Added PCB description and sound hardware schematics.
 
 
+  [2013-2023]
+
+  - Added more sets.
+  - Partial decryption of norautua & norautub sets.
+  - Decryption of noraut3 sets.
+  - Working inputs, DIP switches, and button-lamps layouts to noraut3 games.
+  - Change game description to noraut3 games, since are dual games selectable
+     through a DIP switch.
+
+
   TODO:
 
-  - Analize and hook the 3rd PPI device at 0xc0-0xc3.
-    /OBF handshake line (PC7) doesn't seems to work properly.
+  - Check the 3rd PPI device at 0xc0-0xc3 (VRAM).
+    /OBF handshake line (PC7) formerly didn't seems to work properly.
   - Interrupts in 8080 based games.
+  - Emulation of 8228 device for the 8080 based games.
+  - Find WTH are the reads at EFh.
   - Find if wide chars are hardcoded or tied to a bit.
   - Save support.
   - Parent/clone relationship.
@@ -560,13 +587,13 @@
 
 #define NORAUT_MASTER_CLOCK     XTAL(18'432'000)
 #define DPHL_MASTER_CLOCK       XTAL(18'000'000)
-#define NORAUT_CPU_CLOCK        NORAUT_MASTER_CLOCK / 8     /* 2.30275 MHz - Measured: 2.305 MHz */
-#define DPHL_CPU_CLOCK          DPHL_MASTER_CLOCK / 9       /* 2 MHz (from 8224) */
+#define NORAUT_CPU_CLOCK        NORAUT_MASTER_CLOCK / 8     // 2.30275 MHz - Measured: 2.305 MHz
+#define DPHL_CPU_CLOCK          DPHL_MASTER_CLOCK / 9       // 2 MHz (from 8224)
 
 
-/*************************
-*     Video Hardware     *
-*************************/
+/*********************************************
+*               Video Hardware               *
+*********************************************/
 
 void norautp_state::video_start()
 {
@@ -580,11 +607,11 @@ uint32_t norautp_state::screen_update_norautp(screen_device &screen, bitmap_ind1
 
 	count = 0;
 
-	bitmap.fill(m_palette->pen(0), cliprect); //black pen
+	bitmap.fill(m_palette->pen(0), cliprect);  // black pen
 
 	for(y = 0; y < 8; y++)
 	{
-		/* Double width, displaced 8 pixels in X */
+		// Double width, displaced 8 pixels in X
 		if(y == 2 || (y >= 4 && y < 6))
 		{
 			for(x = 0; x < 16; x++)
@@ -617,21 +644,21 @@ uint32_t norautp_state::screen_update_norautp(screen_device &screen, bitmap_ind1
 
 void norautp_state::norautp_palette(palette_device &palette) const
 {
-	/* 1st gfx bank */
-	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0xff));    /* blue */
-	palette.set_pen_color(1, rgb_t(0xff, 0xff, 0x00));    /* yellow */
-	palette.set_pen_color(2, rgb_t(0x00, 0x00, 0xff));    /* blue */
-	palette.set_pen_color(3, rgb_t(0xff, 0xff, 0xff));    /* white */
-	palette.set_pen_color(4, rgb_t(0xff, 0xff, 0xff));    /* white */
-	palette.set_pen_color(5, rgb_t(0xff, 0x00, 0x00));    /* red */
-	palette.set_pen_color(6, rgb_t(0xff, 0xff, 0xff));    /* white */
-	palette.set_pen_color(7, rgb_t(0x00, 0x00, 0x00));    /* black */
+	// 1st gfx bank
+	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0xff));    // blue
+	palette.set_pen_color(1, rgb_t(0xff, 0xff, 0x00));    // yellow
+	palette.set_pen_color(2, rgb_t(0x00, 0x00, 0xff));    // blue
+	palette.set_pen_color(3, rgb_t(0xff, 0xff, 0xff));    // white
+	palette.set_pen_color(4, rgb_t(0xff, 0xff, 0xff));    // white
+	palette.set_pen_color(5, rgb_t(0xff, 0x00, 0x00));    // red
+	palette.set_pen_color(6, rgb_t(0xff, 0xff, 0xff));    // white
+	palette.set_pen_color(7, rgb_t(0x00, 0x00, 0x00));    // black
 }
 
 
-/*************************
-*      R/W Handlers      *
-*************************/
+/*******************************************
+*               R/W Handlers               *
+*******************************************/
 
 void norautp_state::mainlamps_w(uint8_t data)
 {
@@ -648,14 +675,14 @@ void norautp_state::mainlamps_w(uint8_t data)
     -x-- ----  * HOLD 5 lamp.
     x--- ----  * CANCEL lamp.
 */
-	m_lamps[0] = BIT(data, 0);  /* CHANGE CARD lamp */
-	m_lamps[1] = BIT(data, 1);  /* SAVE / HALF GAMBLE lamp */
-	m_lamps[2] = BIT(data, 2);  /* HOLD 1 lamp */
-	m_lamps[3] = BIT(data, 3);  /* HOLD 2 lamp */
-	m_lamps[4] = BIT(data, 4);  /* HOLD 3 lamp */
-	m_lamps[5] = BIT(data, 5);  /* HOLD 4 lamp */
-	m_lamps[6] = BIT(data, 6);  /* HOLD 5 lamp */
-	m_lamps[7] = BIT(data, 7);  /* CANCEL lamp */
+	m_lamps[0] = BIT(data, 0);  // CHANGE CARD lamp
+	m_lamps[1] = BIT(data, 1);  // SAVE / HALF GAMBLE lamp
+	m_lamps[2] = BIT(data, 2);  // HOLD 1 lamp
+	m_lamps[3] = BIT(data, 3);  // HOLD 2 lamp
+	m_lamps[4] = BIT(data, 4);  // HOLD 3 lamp
+	m_lamps[5] = BIT(data, 5);  // HOLD 4 lamp
+	m_lamps[6] = BIT(data, 6);  // HOLD 5 lamp
+	m_lamps[7] = BIT(data, 7);  // CANCEL lamp
 
 //  popmessage("lamps: %02x", data);
 }
@@ -673,10 +700,10 @@ void norautp_state::soundlamps_w(uint8_t data)
   xxxx ----  * Discrete Sound Lines.
 */
 
-	m_lamps[8] = BIT(data, 0);  /* DEAL / DRAW lamp */
-	m_lamps[9] = BIT(data, 1);  /* BET / COLLECT lamp */
+	m_lamps[8] = BIT(data, 0);  // DEAL / DRAW lamp
+	m_lamps[9] = BIT(data, 1);  // BET / COLLECT lamp
 
-	/* the 4 MSB are for discrete sound */
+	// the 4 MSB are for discrete sound
 	m_discrete->write(NORAUTP_SND_EN, (data >> 7) & 0x01);
 	m_discrete->write(NORAUTP_FREQ_DATA, (data >> 4) & 0x07);
 
@@ -698,12 +725,12 @@ void norautp_state::counterlamps_w(uint8_t data)
     -x-- ----  + Coin counter related.
     x--- ----  + DEFLECT (always activated).
 */
-	m_lamps[10] = BIT(data, 0); /* HI lamp */
-	m_lamps[11] = BIT(data, 1); /* LO lamp */
+	m_lamps[10] = BIT(data, 0);  // HI lamp
+	m_lamps[11] = BIT(data, 1);  // LO lamp
 
-	machine().bookkeeping().coin_counter_w(0, data & 0x10);  /* Coin1/3 counter */
-	machine().bookkeeping().coin_counter_w(1, data & 0x20);  /* Coin2 counter */
-	machine().bookkeeping().coin_counter_w(2, data & 0x08);  /* Payout pulse */
+	machine().bookkeeping().coin_counter_w(0, data & 0x10);  // Coin1/3 counter
+	machine().bookkeeping().coin_counter_w(1, data & 0x20);  // Coin2 counter
+	machine().bookkeeping().coin_counter_w(2, data & 0x08);  // Payout pulse
 }
 
 
@@ -719,11 +746,11 @@ void norautp_state::counterlamps_w(uint8_t data)
 
 //void norautp_state::ppi2_portc_w(uint8_t data)
 //{
-//  /* PC0-PC2 don't seems to be connected to any output */
+//  // PC0-PC2 don't seems to be connected to any output
 //}
 
 
-WRITE_LINE_MEMBER(norautp_state::ppi2_obf_w)
+void norautp_state::ppi2_obf_w(int state)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(norautp_state::ppi2_ack), this), state);
 }
@@ -740,7 +767,7 @@ TIMER_CALLBACK_MEMBER(norautp_state::ppi2_ack)
 }
 
 #ifdef UNUSED_FUNCTION // old implementation
-/*game waits for /OBF signal (bit 7) to be set.*/
+// game waits for /OBF signal (bit 7) to be set.
 uint8_t norautp_state::test_r()
 {
 	return 0xff;
@@ -755,9 +782,9 @@ void norautp_state::vram_data_w(uint8_t data)
 {
 	m_np_vram[m_np_addr] = data & 0xff;
 
-	/* trigger 8255-2 port C bit 7 (/OBF) */
-//  m_ppi8255_2->set_pc_bit(7, 0);
-//  m_ppi8255_2->set_pc_bit(7, 1);
+	// trigger 8255-2 port C bit 7 (/OBF)
+	// m_ppi8255_2->set_pc_bit(7, 0);
+	// m_ppi8255_2->set_pc_bit(7, 1);
 
 }
 
@@ -767,16 +794,16 @@ void norautp_state::vram_addr_w(uint8_t data)
 }
 #endif
 
-/* game waits for bit 4 (0x10) to be reset.*/
+// game waits for bit 4 (0x10) to be reset.
 uint8_t norautp_state::test2_r()
 {
 	return 0x00;
 }
 
 
-/*************************
-* Memory Map Information *
-*************************/
+/*********************************************
+*           Memory Map Information           *
+*********************************************/
 /*
 
   CPU & PPI settings by set...
@@ -836,7 +863,13 @@ void norautp_state::norautp_map(address_map &map)
 {
 	map.global_mask(0x3fff);
 	map(0x0000, 0x1fff).rom();
-	map(0x2000, 0x27ff).ram().share("nvram");   /* 6116 */
+	map(0x2000, 0x27ff).ram().share("nvram");   // 6116
+}
+
+void norautp_state::decrypted_opcodes_map(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x1fff).rom().share(m_decrypted_opcodes);
 }
 
 void norautp_state::norautp_portmap(address_map &map)
@@ -876,29 +909,42 @@ void norautp_state::norautxp_map(address_map &map)
 {
 //  map.global_mask(~0x4000);
 	map.global_mask(0x7fff);
-	map(0x0000, 0x3fff).rom(); /* need to be checked */
-	map(0x6000, 0x67ff).ram().share("nvram"); /* HM6116 */
+	map(0x0000, 0x3fff).rom();  // need to be checked
+	map(0x6000, 0x67ff).ram().share("nvram");  // HM6116
 }
 
 void norautp_state::norautx4_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x6000, 0x67ff).ram().share("nvram"); /* 6116 */
+	map(0x6000, 0x67ff).ram().share("nvram");  // 6116
 }
 
 #ifdef UNUSED_CODE
 void norautp_state::norautx8_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rom(); /* need to be checked */
-	map(0xc000, 0xc7ff).ram().share("nvram"); /* 6116 */
+	map(0x0000, 0x7fff).rom();  // need to be checked
+	map(0xc000, 0xc7ff).ram().share("nvram");  // 6116
 }
 #endif
+
+void norautp_state::noraut3_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom().region("maincpu", 0x4000);
+	map(0x6000, 0x67ff).ram().share("nvram");  // 6116
+	map(0x8000, 0xbfff).rom().region("maincpu", 0xc000);
+}
+
+void norautp_state::noraut3_decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom().region("maincpu", 0x0000);
+	map(0x8000, 0xbfff).rom().region("maincpu", 0x8000);
+}
 
 void norautp_state::kimble_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xc7ff).ram().share("nvram");
-	map(0xc800, 0xc9ff).ram(); /* working RAM? */
+	map(0xc800, 0xc9ff).ram();  // working RAM?
 }
 
 #ifdef UNUSED_CODE
@@ -911,14 +957,14 @@ void norautp_state::norautxp_portmap(address_map &map)
 void norautp_state::newhilop_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0xd000, 0xd7ff).ram().share("nvram");   /* 6116 */
+	map(0xd000, 0xd7ff).ram().share("nvram");   // 6116
 }
 
 void norautp_state::cgidjp_map(address_map &map)
 {
 	map.global_mask(0x3fff);
 	map(0x0000, 0x1fff).rom().region("maincpu", 0x2000);
-	map(0x2000, 0x27ff).ram().share("nvram");   /* 6116 */
+	map(0x2000, 0x27ff).ram().share("nvram");   // 6116
 }
 
 void norautp_state::cgidjp_opcodes_map(address_map &map)
@@ -927,13 +973,14 @@ void norautp_state::cgidjp_opcodes_map(address_map &map)
 	map(0x0000, 0x1fff).rom().region("maincpu", 0);
 }
 
-/*********** 8080 based **********/
+
+/*************** 8080 based **************/
 
 void norautp_state::dphl_map(address_map &map)
 {
-	map.global_mask(0x7fff); /* A15 not connected */
+	map.global_mask(0x7fff);  // A15 not connected
 	map(0x0000, 0x3fff).rom();
-	map(0x5000, 0x53ff).ram().share("nvram");   /* should be 2x 0x100 segments (4x 2111) */
+	map(0x5000, 0x53ff).ram().share("nvram");  // should be 2x 0x100 segments (4x 2111)
 }
 
 void norautp_state::dphla_map(address_map &map)
@@ -979,24 +1026,24 @@ void norautp_state::kimbldhl_map(address_map &map)
 
 void norautp_state::drhl_map(address_map &map)
 {
-	map.global_mask(0x7fff); /* A15 not connected */
+	map.global_mask(0x7fff);  // A15 not connected
 	map(0x0000, 0x3fff).rom();
 	map(0x5000, 0x53ff).ram().share("nvram");
 	map(0x5400, 0x57ff).ram();
 }
 
 
-/*************************
-*      Input Ports       *
-*************************/
+/*********************************************
+*                Input Ports                 *
+*********************************************/
 
 static INPUT_PORTS_START( norautp )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal / Draw")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )  PORT_NAME("Bet / Collect")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)  /* Coin A */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)  /* Coin B */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)  // Coin A
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)  // Coin B
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_K) PORT_NAME("IN0-5")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Hi")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )  PORT_NAME("Lo")
@@ -1010,13 +1057,12 @@ static INPUT_PORTS_START( norautp )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2)  /* Coin C */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2)  // Coin C
 
-	PORT_START("IN2")   /* Only 3 lines: PPI-2; PC0-PC2 */
+	PORT_START("IN2")   // Only 3 lines: PPI-2; PC0-PC2
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_J) PORT_NAME("IN2-1")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Readout")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_L) PORT_NAME("Low Level Hopper")
-
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
@@ -1045,13 +1091,14 @@ static INPUT_PORTS_START( norautp )
 	PORT_DIPSETTING(    0x00, "10 Pence" )
 INPUT_PORTS_END
 
+
 static INPUT_PORTS_START( norautrh )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal / Draw")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )  PORT_NAME("Bet / Change Card")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)  /* Coin A */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)  /* Coin B */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)  // Coin A
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)  // Coin B
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Readout")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Hi")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )  PORT_NAME("Lo")
@@ -1065,13 +1112,12 @@ static INPUT_PORTS_START( norautrh )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_CANCEL )   /* Coin C for other games */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_CANCEL )   // Coin C for other games
 
-	PORT_START("IN2")   /* Only 3 lines: PPI-2; PC0-PC2 */
+	PORT_START("IN2")   // Only 3 lines: PPI-2; PC0-PC2
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW1:8")
@@ -1099,13 +1145,14 @@ static INPUT_PORTS_START( norautrh )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+
 static INPUT_PORTS_START( norautpn )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal / Start")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )  PORT_NAME("Bet / Change Card")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)  /* Coin A */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)  /* Coin B */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)  // Coin A
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)  // Coin B
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Readout")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Hi")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )  PORT_NAME("Lo")
@@ -1121,11 +1168,10 @@ static INPUT_PORTS_START( norautpn )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
 
-	PORT_START("IN2")   /* Only 3 lines: PPI-2; PC0-PC2 */
+	PORT_START("IN2")   // Only 3 lines: PPI-2; PC0-PC2
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
@@ -1154,6 +1200,7 @@ static INPUT_PORTS_START( norautpn )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+
 static INPUT_PORTS_START( mainline )
 
 	PORT_INCLUDE( norautrh )
@@ -1166,6 +1213,7 @@ static INPUT_PORTS_START( mainline )
 	PORT_DIPSETTING(    0x80, "A=50; B=25" )
 INPUT_PORTS_END
 
+
 static INPUT_PORTS_START( ndxron10 )
 
 	PORT_INCLUDE( norautpn )
@@ -1175,6 +1223,7 @@ static INPUT_PORTS_START( ndxron10 )
 	PORT_DIPSETTING(    0x08, "A=1; B=5" )
 	PORT_DIPSETTING(    0x00, "A=1; B=25" )
 INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( norautkl )
 
@@ -1235,7 +1284,6 @@ static INPUT_PORTS_START( cdrawpkr )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G) PORT_NAME("IN2-02")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H) PORT_NAME("IN2-04")
 
-
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -1264,11 +1312,50 @@ static INPUT_PORTS_START( cdrawpkr )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( noraut3 )
+
+	PORT_INCLUDE( norautp )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )    PORT_NAME("Bet / Change Card")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )      PORT_NAME("Settings")
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )   PORT_NAME("Take / Save")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Raise Bet" )             PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Game Type" )             PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPSETTING(    0x10, "Jacks Plus" )
+	PORT_DIPSETTING(    0x00, "Joker Poker" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW1:3")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Show Bet" )              PORT_DIPLOCATION("DSW1:2")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
 
 
-/*************************
-*    Graphics Layouts    *
-*************************/
+/*********************************************
+*              Graphics Layouts              *
+*********************************************/
 
 static const gfx_layout charlayout =
 /*
@@ -1299,64 +1386,64 @@ static const gfx_layout charlayout32x32 =
 };
 
 
-/******************************
-* Graphics Decode Information *
-******************************/
+/**************************************************
+*           Graphics Decode Information           *
+**************************************************/
 
-/* GFX are stored in the 2nd half... Maybe the HW could handle 2 bitplanes? */
+// GFX are stored in the 2nd half... Maybe the HW could handle 2 bitplanes?
 static GFXDECODE_START( gfx_norautp )
 	GFXDECODE_ENTRY( "gfx", 0x800, charlayout,      0, 4 )
 	GFXDECODE_ENTRY( "gfx", 0x800, charlayout32x32, 0, 4 )
 GFXDECODE_END
 
 
-/*************************
-*    Machine Drivers     *
-*************************/
+/*********************************************
+*              Machine Drivers               *
+*********************************************/
 
 void norautp_state::noraut_base(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	Z80(config, m_maincpu, NORAUT_CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::norautp_map);
 	m_maincpu->set_addrmap(AS_IO, &norautp_state::norautp_portmap);
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);   /* doesn't work if placed at derivative drivers */
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);   // doesn't work if placed at derivative drivers
 
 	I8255(config, m_ppi8255[0], 0);
-	/* (60-63) Mode 0 - Port A set as input */
+	// (60-63) Mode 0 - Port A set as input
 	m_ppi8255[0]->in_pa_callback().set_ioport("DSW1");
 	m_ppi8255[0]->out_pb_callback().set(FUNC(norautp_state::mainlamps_w));
 	m_ppi8255[0]->out_pc_callback().set(FUNC(norautp_state::counterlamps_w));
 
 	I8255(config, m_ppi8255[1], 0);
-	/* (a0-a3) Mode 0 - Ports A & B set as input */
+	// (a0-a3) Mode 0 - Ports A & B set as input
 	m_ppi8255[1]->in_pa_callback().set_ioport("IN0");
 	m_ppi8255[1]->in_pb_callback().set_ioport("IN1");
 	m_ppi8255[1]->out_pc_callback().set(FUNC(norautp_state::soundlamps_w));
 
 	I8255(config, m_ppi8255[2], 0);
-	/* (c0-c3) Group A Mode 2 (5-lines handshacked bidirectional port)
-	 Group B Mode 0, output;  (see below for lines PC0-PC2) */
+	// (c0-c3) Group A Mode 2 (5-lines handshacked bidirectional port).
+	// PPI-2 is configured as mixed mode2 and mode0 output.
+	// It means that port A should be bidirectional and port B just as output.
+	// Port C high as hshk regs, and PC0-PC2 as input (norautp, norautjp) or output (other sets)
+	// Group B Mode 0, output;  (see below for lines PC0-PC2)
 	m_ppi8255[2]->in_pc_callback().set_ioport("IN2");
 	m_ppi8255[2]->out_pc_callback().set(FUNC(norautp_state::ppi2_obf_w)).bit(7);
-	/*  PPI-2 is configured as mixed mode2 and mode0 output.
-	 It means that port A should be bidirectional and port B just as output.
-	 Port C high as hshk regs, and PC0-PC2 as input (norautp, norautjp) or output (other sets). */
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(32*16, 32*16);
-	m_screen->set_visarea(2*16, 31*16-1, (0*16) + 8, 16*16-1);    /* the hardware clips the top 8 pixels */
+	m_screen->set_visarea(2*16, 31*16-1, (0*16) + 8, 16*16-1);    // the hardware clips the top 8 pixels
 	m_screen->set_screen_update(FUNC(norautp_state::screen_update_norautp));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_norautp);
 	PALETTE(config, m_palette, FUNC(norautp_state::norautp_palette), 8);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	DISCRETE(config, m_discrete, norautp_discrete);
 	m_discrete->add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -1366,18 +1453,25 @@ void norautp_state::norautp(machine_config &config)
 {
 	noraut_base(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
+}
+
+void norautp_state::norautu(machine_config &config)
+{
+	norautp(config);
+
+	m_maincpu->set_addrmap(AS_OPCODES, &norautp_state::decrypted_opcodes_map);
 }
 
 void norautp_state::norautpl(machine_config &config)
 {
 	noraut_base(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
 
-	/* sound hardware */
+	// sound hardware
 	m_discrete->set_intf(kimble_discrete);
 }
 
@@ -1385,7 +1479,7 @@ void norautp_state::norautxp(machine_config &config)
 {
 	noraut_base(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::norautxp_map);
 	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
 }
@@ -1394,7 +1488,7 @@ void norautp_state::nortest1(machine_config &config)
 {
 	noraut_base(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::nortest1_map);
 	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
 }
@@ -1403,7 +1497,7 @@ void norautp_state::norautx4(machine_config &config)
 {
 	noraut_base(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::norautx4_map);
 	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
 }
@@ -1413,21 +1507,31 @@ void norautp_state::norautx8(machine_config &config)
 {
 	noraut_base(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::norautx8_map);
 	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
 }
 #endif
 
+void norautp_state::noraut3(machine_config &config)
+{
+	noraut_base(config);
+
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::noraut3_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &norautp_state::noraut3_decrypted_opcodes_map);
+	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
+}
+
 void norautp_state::kimble(machine_config &config)
 {
 	noraut_base(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::kimble_map);
 	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
 
-	/* sound hardware */
+	// sound hardware
 	m_discrete->set_intf(kimble_discrete);
 }
 
@@ -1435,7 +1539,7 @@ void norautp_state::newhilop(machine_config &config)
 {
 	noraut_base(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::newhilop_map);
 //  m_maincpu->set_addrmap(AS_IO, &norautp_state::newhilop_portmap);
 	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
@@ -1445,7 +1549,7 @@ void norautp_state::cgidjp(machine_config &config)
 {
 	noraut_base(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::cgidjp_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &norautp_state::cgidjp_opcodes_map);
 	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
@@ -1455,23 +1559,23 @@ void norautp_state::cdrawpkr(machine_config &config)
 {
 	noraut_base(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
 	m_screen->set_visarea(5*8, 61*8-1, (0*16) + 8, 16*16-1);
 }
 
-/********** 8080 based **********/
+/************** 8080 based **************/
 
 void norautp_state::dphl(machine_config &config)
 {
 	noraut_base(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	I8080(config.replace(), m_maincpu, DPHL_CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::dphl_map);
 	m_maincpu->set_addrmap(AS_IO, &norautp_state::norautp_portmap);
 
-	/* sound hardware */
+	// sound hardware
 	m_discrete->set_intf(dphl_discrete);
 }
 
@@ -1479,12 +1583,12 @@ void norautp_state::dphla(machine_config &config)
 {
 	noraut_base(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	I8080(config.replace(), m_maincpu, DPHL_CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::dphla_map);
 	m_maincpu->set_addrmap(AS_IO, &norautp_state::norautp_portmap);
 
-	/* sound hardware */
+	// sound hardware
 	m_discrete->set_intf(dphl_discrete);
 }
 
@@ -1492,12 +1596,12 @@ void norautp_state::kimbldhl(machine_config &config)
 {
 	noraut_base(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	I8080(config.replace(), m_maincpu, DPHL_CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::kimbldhl_map);
 	m_maincpu->set_addrmap(AS_IO, &norautp_state::norautp_portmap);
 
-	/* sound hardware */
+	// sound hardware
 	m_discrete->set_intf(kimble_discrete);
 }
 
@@ -1505,12 +1609,12 @@ void norautp_state::dphltest(machine_config &config)
 {
 	noraut_base(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	I8080(config.replace(), m_maincpu, DPHL_CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::dphltest_map);
 	m_maincpu->set_addrmap(AS_IO, &norautp_state::norautp_portmap);
 
-	/* sound hardware */
+	// sound hardware
 	m_discrete->set_intf(dphl_discrete);
 }
 
@@ -1518,12 +1622,12 @@ void norautp_state::drhl(machine_config &config)
 {
 	noraut_base(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	I8080(config.replace(), m_maincpu, DPHL_CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::drhl_map);
 	m_maincpu->set_addrmap(AS_IO, &norautp_state::norautp_portmap);
 
-	/* sound hardware */
+	// sound hardware
 	m_discrete->set_intf(dphl_discrete);
 }
 
@@ -1531,25 +1635,25 @@ void norautp_state::ssjkrpkr(machine_config &config)
 {
 	noraut_base(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	I8080(config.replace(), m_maincpu, DPHL_CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::ssjkrpkr_map);
 	m_maincpu->set_addrmap(AS_IO, &norautp_state::norautp_portmap);
 
-	/* sound hardware */
+	// sound hardware
 	m_discrete->set_intf(dphl_discrete);
 }
 
 
-/*************************
-*        Rom Load        *
-*************************/
+/*********************************************
+*                  Rom Load                  *
+*********************************************/
 
-/*************************************** Z80 sets ***************************************/
-/*                                                                                      */
-/*   The following ones are 'Draw Poker HI-LO' type, running in a Z80 based hardware    */
-/*                                                                                      */
-/****************************************************************************************/
+//*************************************** Z80 sets ***************************************
+//*                                                                                      *
+//*   The following ones are 'Draw Poker HI-LO' type, running in a Z80 based hardware    *
+//*                                                                                      *
+//****************************************************************************************
 
 /*
 
@@ -1644,7 +1748,7 @@ ROM_END
 /*
 
   Noraut Deluxe Poker (console).
-  From PCB with daghterboard.
+  From PCB with daughterboard.
 
   ----
 
@@ -1661,7 +1765,7 @@ ROM_END
 */
 
 ROM_START( norautdx )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* console version */
+	ROM_REGION( 0x10000, "maincpu", 0 )  // console version
 	ROM_LOAD( "noraut_deluxe_24pin_console.bin", 0x0000, 0x1000, CRC(d41bd404) SHA1(52e984ca28a15a1485ca672dd1fef973cf0c7617) )
 	ROM_LOAD( "noraut_deluxe_24pin_z80.bin",     0x1000, 0x0800, CRC(c70bc8f9) SHA1(d947be4e6741f3a884ceca76d1a0fd13625a5f78) )
 
@@ -1799,7 +1903,7 @@ ROM_END
 */
 
 ROM_START( norautpl )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* slightly different than original JP */
+	ROM_REGION( 0x10000, "maincpu", 0 )  // slightly different than original JP
 	ROM_LOAD( "u11.bin",  0x0000, 0x1000, CRC(2abd1b82) SHA1(8cbe9ea481ec2465faaf79fcfc22ec78d83bd98d) )
 	ROM_LOAD( "u16.bin",  0x1000, 0x1000, CRC(dbc3960a) SHA1(d58ee89134f9d8db80d3e066fd01e4e484126d00) )
 
@@ -1896,11 +2000,11 @@ ROM_START( norautjp )
 
 	ROM_REGION( 0x1000, "gfx", 0 )
 	ROM_FILL(                     0x0000, 0x0800, 0xff )
-	ROM_LOAD( "2732-1char.bin",   0x0800, 0x0800, CRC(d94be899) SHA1(b7212162324fa2d67383a475052e3b351bb1af5f) )    /* first half 0xff filled */
+	ROM_LOAD( "2732-1char.bin",   0x0800, 0x0800, CRC(d94be899) SHA1(b7212162324fa2d67383a475052e3b351bb1af5f) )  // first half 0xff filled
 	ROM_CONTINUE(                 0x0800, 0x0800 )
 
 	ROM_REGION( 0x800,  "nvram", 0 )
-	ROM_LOAD( "norautjp_nv.bin",  0x0000, 0x0400, CRC(0a0614b2) SHA1(eb21b2723b41743daf787cfc379bc67cce2b8538) )    /* default NVRAM */
+	ROM_LOAD( "norautjp_nv.bin",  0x0000, 0x0400, CRC(0a0614b2) SHA1(eb21b2723b41743daf787cfc379bc67cce2b8538) )  // default NVRAM
 
 ROM_END
 
@@ -1938,7 +2042,7 @@ ROM_END
 */
 
 ROM_START( norautra )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* Program ROM is 0000-1fff and identical to norautrh, the rest is filled with FF's */
+	ROM_REGION( 0x10000, "maincpu", 0 )  // Program ROM is 0000-1fff and identical to norautrh, the rest is filled with FF's
 	ROM_LOAD( "noraut_red_hot_1bet_joker_poker.bin", 0x0000, 0x8000, CRC(f284b574) SHA1(ff683731f3dbdaed5d0d25276ca90b68a422e403) )
 
 	ROM_REGION( 0x1000,  "gfx", 0 )
@@ -1975,7 +2079,7 @@ ROM_END
   CHAR Eprom:2732
   Marked: "GU27"
 
-  daughter card is connected on to another card containing only pcb tracks no components
+  Daughter card is connected on to another card containing only pcb tracks no components
   This second board connects to main board with ribbon cable to the 40pin socket where
   the original cpu would of been.
 
@@ -2158,7 +2262,7 @@ ROM_END
 /*
 
   Noraut 2 bet joker hard console.
-  From PCB with daghterboard.
+  From PCB with daughterboard.
 
   ----
 
@@ -2179,7 +2283,7 @@ ROM_END
 /*
 
   Noraut 4 bet joker console.
-  From PCB with daghterboard.
+  From PCB with daughterboard.
 
   ----
 
@@ -2226,7 +2330,7 @@ ROM_END
 */
 
 ROM_START( df_djpkr )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* Program ROM is 0000-1fff, copied along the 64K of the ROM */
+	ROM_REGION( 0x10000, "maincpu", 0 )  // Program ROM is 0000-1fff, copied along the 64K of the ROM
 	ROM_LOAD( "dellfern_4bet_joker_z80_28pin_45-75_payout.bin", 0x0000, 0x10000, CRC(9d150a47) SHA1(da9c0d6632faab685dd061f39b01d8e65793e1e6) )
 
 	ROM_REGION( 0x1000,  "gfx", 0 )
@@ -2286,7 +2390,7 @@ ROM_END
 */
 
 ROM_START( cgip30cs )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* Program ROM is 0000-3fff, duplicated to fit the ROM size */
+	ROM_REGION( 0x10000, "maincpu", 0 )  // Program ROM is 0000-3fff, duplicated to fit the ROM size
 	ROM_LOAD( "cgi_standard_no_bonus_30c_z80_28pin.bin", 0x0000, 0x8000, CRC(7c784964) SHA1(c3deeacc73493939a11dd4cdf0fe07fcd2a9ad8a) )
 
 	ROM_REGION( 0x1000,  "gfx", 0 )
@@ -2295,33 +2399,33 @@ ROM_START( cgip30cs )
 ROM_END
 
 ROM_START( cgip30b )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* Program ROM is 0000-3fff, duplicated to fit the ROM size */
-	ROM_LOAD( "u11", 0x0000, 0x8000, CRC(e32400cc) SHA1(f219aa4f35d92581b223a2172ff54cb3a6eaf7fe) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_REGION( 0x10000, "maincpu", 0 )  // Program ROM is 0000-3fff, duplicated to fit the ROM size
+	ROM_LOAD( "u11", 0x0000, 0x8000, CRC(e32400cc) SHA1(f219aa4f35d92581b223a2172ff54cb3a6eaf7fe) )  // 1ST AND 2ND HALF IDENTICAL
 
 	ROM_REGION( 0x1000,  "gfx", 0 )
-	ROM_FILL(                     0x0000, 0x0800, 0xff )
-	ROM_LOAD( "u27",   0x0800, 0x0800, CRC(d94be899) SHA1(b7212162324fa2d67383a475052e3b351bb1af5f) ) // 0xxxxxxxxxxx = 0xFF
-	ROM_CONTINUE(                 0x0800, 0x0800 )
+	ROM_FILL(         0x0000, 0x0800, 0xff )
+	ROM_LOAD( "u27",  0x0800, 0x0800, CRC(d94be899) SHA1(b7212162324fa2d67383a475052e3b351bb1af5f) )  // 0xxxxxxxxxxx = 0xFF
+	ROM_CONTINUE(     0x0800, 0x0800 )
 ROM_END
 
-ROM_START( cgip23b ) // PCB marked 'POKER Version 1.1'. Z0840004PSC + 4 x NEC 82C55AC-2
+ROM_START( cgip23b )  // PCB marked 'POKER Version 1.1'. Z0840004PSC + 4 x NEC 82C55AC-2
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "u29", 0x0000, 0x8000, CRC(e8ac2803) SHA1(fe545fcc7dad5eb8786fae853262392ba9b067ca) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD( "u29", 0x0000, 0x8000, CRC(e8ac2803) SHA1(fe545fcc7dad5eb8786fae853262392ba9b067ca) )  // 1ST AND 2ND HALF IDENTICAL
 
 	ROM_REGION( 0x1000,  "gfx", 0 )
-	ROM_LOAD( "u16", 0x0000, 0x1000, CRC(d94be899) SHA1(b7212162324fa2d67383a475052e3b351bb1af5f) ) // 0xxxxxxxxxxx = 0xFF
+	ROM_LOAD( "u16", 0x0000, 0x1000, CRC(d94be899) SHA1(b7212162324fa2d67383a475052e3b351bb1af5f) )  // 0xxxxxxxxxxx = 0xFF
 ROM_END
 
 
 // PCB has a sticker: Casino Games Innovation Incorporating GS Research POKER PCB
 ROM_START( cgidjp )
-	ROM_REGION( 0x08000, "maincpu", 0 ) /* Program ROM is 0000-3fff, duplicated to fit the ROM size, opcodes are 0000-1fff, data 2000-3fff */
+	ROM_REGION( 0x08000, "maincpu", 0 )  // Program ROM is 0000-3fff, duplicated to fit the ROM size, opcodes are 0000-1fff, data 2000-3fff
 	ROM_LOAD( "27c256.bin", 0x0000, 0x8000, CRC(6e0b8999) SHA1(5219b38292e531589d90ae3df08990f8d8664cc3) )
 
 	ROM_REGION( 0x1000,  "gfx", 0 )
-	ROM_FILL(                     0x0000, 0x0800, 0xff )
-	ROM_LOAD( "27c32.bin",        0x0800, 0x0800, CRC(d94be899) SHA1(b7212162324fa2d67383a475052e3b351bb1af5f) )    /* first half 0xff filled */
-	ROM_CONTINUE(                 0x0800, 0x0800 )
+	ROM_FILL(               0x0000, 0x0800, 0xff )
+	ROM_LOAD( "27c32.bin",  0x0800, 0x0800, CRC(d94be899) SHA1(b7212162324fa2d67383a475052e3b351bb1af5f) )  // first half 0xff filled
+	ROM_CONTINUE(           0x0800, 0x0800 )
 ROM_END
 
 /*
@@ -2410,7 +2514,7 @@ ROM_END
 
   PCB Layout EXPANSION BOARD (Kimble Double HI-LO 8080):
 
-  EXPANSION BOARD  Silksceened:SCT 34-88
+  EXPANSION BOARD  Silkscreened:SCT 34-88
    __________________________________________________________________
   |                                          5             6         |
   |            4 WIRES   ****            _________     _________     |
@@ -2434,7 +2538,7 @@ ROM_END
 
 
   Z80 ADDON BOARD:
-  Silksceened:SCT 38-90
+  Silkscreened:SCT 38-90
    _____________________________________________________________
   |                                                             |
   |  ____________________________     _________     _________   |
@@ -2649,15 +2753,15 @@ ROM_START( newhilop )
 	ROM_COPY( "gfx_data", 0xf000, 0x0000, 0x1000 )
 
 	ROM_REGION( 0x0100,  "proms", 0 )
-	ROM_LOAD( "82s129.4d", 0x0000, 0x0100, CRC(88302127) SHA1(aed1273974917673405f1234ab64e6f8b3856c34) ) //= japan_6301.u51        dphljp     Draw Poker HI-LO (Japanese)
+	ROM_LOAD( "82s129.4d", 0x0000, 0x0100, CRC(88302127) SHA1(aed1273974917673405f1234ab64e6f8b3856c34) )  // = japan_6301.u51 / dphljp / Draw Poker HI-LO (Japanese)
 ROM_END
 
 
-/*************************************** 8080 sets **************************************/
-/*                                                                                      */
-/*   The following ones are 'Draw Poker HI-LO' type, running in a 8080 based hardware   */
-/*                                                                                      */
-/****************************************************************************************/
+//*************************************** 8080 sets **************************************
+//*                                                                                      *
+//*   The following ones are 'Draw Poker HI-LO' type, running in a 8080 based hardware   *
+//*                                                                                      *
+//****************************************************************************************
 
 /*
 
@@ -2887,7 +2991,7 @@ ROM_END
 
 */
 
-ROM_START( dphljp ) /* close to GTI Poker */
+ROM_START( dphljp )  // close to GTI Poker
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "japan_12.u12", 0x0000, 0x0800, CRC(086a2303) SHA1(900c7241c33a38fb1a791b311e50f7d7f43bb955) )
 	ROM_RELOAD(               0x0800, 0x0800 )
@@ -3020,7 +3124,7 @@ ROM_END
 */
 
 ROM_START( kimbldhl )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* Program ROM is 0000-6e40 */
+	ROM_REGION( 0x10000, "maincpu", 0 )  // Program ROM is 0000-6e40
 	ROM_LOAD( "jpc525611.bin", 0x0000, 0x8000, CRC(4a3f1aef) SHA1(570ef733989da6e89f0387f1e80b934cec7a7663) )
 
 	ROM_REGION( 0x1000,  "gfx", 0 )
@@ -3290,7 +3394,7 @@ ROM_START( drhl )
 	ROM_REGION( 0x1000,  "gfx", 0 )
 	ROM_LOAD( "drhl_v1.0.u31",  0x0000, 0x1000, CRC(bbc7c970) SHA1(9268a430764a5ea8ba7cd18944ec254a44d9dff2) )
 
-	ROM_REGION( 0x0200,  "plds", 0 )    /* possible bad dump. fusemap's 1st half is all 1's and 2nd half 0's */
+	ROM_REGION( 0x0200,  "plds", 0 )    // possible bad dump. fusemap's 1st half is all 1's and 2nd half 0's */
 	ROM_LOAD( "drhl_ampal16l8pc.u51",  0x0000, 0x0104, CRC(bd76fb53) SHA1(2d0634e8edb3289a103719466465e9777606086e) )
 ROM_END
 
@@ -3304,10 +3408,10 @@ ROM_START( drhla )
 	ROM_REGION( 0x1000,  "gfx", 0 )
 	ROM_LOAD( "drews.u31",  0x0000, 0x1000, CRC(bbc7c970) SHA1(9268a430764a5ea8ba7cd18944ec254a44d9dff2) )
 
-	ROM_REGION( 0x0800,  "dallas", 0 )  /* it's in fact NVRAM, but double sized... */
+	ROM_REGION( 0x0800,  "dallas", 0 )  // it's in fact NVRAM, but double sized...
 	ROM_LOAD( "ds1220ab.u33",  0x0000, 0x0800, CRC(f357d314) SHA1(72791b2effd3ec2e98b735c9b215fc9abe3f5aea) )
 
-	ROM_REGION( 0x0200,  "plds", 0 )    /* this one is unprotected and seems ok */
+	ROM_REGION( 0x0200,  "plds", 0 )  // this one is unprotected and seems ok
 	ROM_LOAD( "pal16l8a.u51",  0x0000, 0x0104, CRC(4c98193f) SHA1(b6bdb6eef0d962a3aa4df0e23a8937a7e3210062) )
 ROM_END
 
@@ -3489,18 +3593,18 @@ ROM_END
 */
 
 ROM_START( ssjkrpkr )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* Southern Systems */
+	ROM_REGION( 0x10000, "maincpu", 0 )  // Southern Systems
 	ROM_LOAD( "oc.u11", 0x0000, 0x1000, CRC(b9072aa5) SHA1(bfa3df090e1030aaebbb784cb5e686f4f84f2263) )
 	ROM_LOAD( "oc.u10", 0x1000, 0x1000, CRC(8652ebb9) SHA1(e907df4f8da99b42c425ed58da3cda9943c89fb7) )
 
-	/* All garbage inside. Replaced with generic GFX ROM from DPHLA set, modified to support the "'" char */
+	// All garbage inside. Replaced with generic GFX ROM from DPHLA set, modified to support the "'" char
 	ROM_REGION( 0x1000,  "gfx", 0 )
 	ROM_FILL(           0x0000, 0x0800, 0xff )
 	ROM_LOAD( "oc.u27", 0x0800, 0x0800, BAD_DUMP CRC(ac8e9f2c) SHA1(25ab615de3055e5be78d409194edf7e3c03fe9b9) )
 ROM_END
 
 
-/************************** Unknown Sets ****************************/
+/****************************** Unknown Sets ********************************/
 
 /*
 
@@ -3516,7 +3620,7 @@ ROM_END
 */
 
 ROM_START( fastdrwp )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* PC=0x068b for error screen */
+	ROM_REGION( 0x10000, "maincpu", 0 )  // PC=0x068b for error screen
 	ROM_LOAD( "u12.bin", 0x0000, 0x1000, CRC(d020d7d3) SHA1(4808ef14adf230e3971161c9375f2b354cd9d519) )
 	ROM_LOAD( "u18.bin", 0x1000, 0x1000, CRC(03de6413) SHA1(c61131244e8095b998c5e31724a21496cacad247) )
 
@@ -3538,7 +3642,7 @@ ROM_END
 */
 
 ROM_START( dphlunka )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* no stack, call's RET go to PC=0 */
+	ROM_REGION( 0x10000, "maincpu", 0 )  // no stack, call's RET go to PC=0
 	ROM_LOAD( "u-12_ss.u12", 0x0000, 0x1000, CRC(10ddbc16) SHA1(ab683d836c9223bc67701e092c2cb95afc0f0fa2) )
 	ROM_LOAD( "u-18_ss.u18", 0x1000, 0x1000, CRC(ffbac2bf) SHA1(219247624e0eb0c0c805f5f9a96c4b6b60c9c5ac) )
 
@@ -3560,7 +3664,7 @@ ROM_END
 */
 
 ROM_START( dphlunkb )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* PC=0x068b for error screen */
+	ROM_REGION( 0x10000, "maincpu", 0 )  // PC=0x068b for error screen
 	ROM_LOAD( "u-12_rev-2.u12", 0x0000, 0x1000, CRC(1b1d8ca4) SHA1(405bf8a56dfc669a0890b0af9417c1ed6a3bf374) )
 	ROM_LOAD( "u-18_rev-2.u18", 0x1000, 0x1000, CRC(22dbe0c7) SHA1(ca223074b0f4b86e60a1b91c22568680845ae17e) )
 
@@ -3587,7 +3691,7 @@ ROM_END
 */
 
 ROM_START( pkii_dm )
-	ROM_REGION( 0x10000, "maincpu", 0 ) // no stack, call's RET go to PC=0
+	ROM_REGION( 0x10000, "maincpu", 0 )  // no stack, call's RET go to PC=0
 	ROM_LOAD( "12.u12", 0x0000, 0x1000, CRC(048e70d8) SHA1(f0eb16ba68455638de2ce68f51f305a13d0df287) )
 	ROM_LOAD( "13.u18", 0x1000, 0x1000, CRC(06cf6789) SHA1(587d883c399348b518e3be4d1dc2581824055328) )
 
@@ -3597,6 +3701,17 @@ ROM_START( pkii_dm )
 
 	ROM_REGION( 0x0200,  "proms", 0 )
 	ROM_LOAD( "63s141n.u51",  0x0000, 0x0100, CRC(88302127) SHA1(aed1273974917673405f1234ab64e6f8b3856c34) )
+ROM_END
+
+ROM_START( unkljfpk ) // encrypted, has 'Copyright  1982, 1989 LJF Corporation' plaintext in ROM
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "nickphan.u3", 0x0000, 0x8000, CRC(bb03826c) SHA1(249283427dcbfbd16d02cad8e5885e651085954f) )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_LOAD( "phan.u31", 0x0000, 0x1000, CRC(0501ac8f) SHA1(98154a049db2343a8ab12193ddf5c547590fc625) ) // 1ST AND 2ND HALF IDENTICAL
+
+	ROM_REGION( 0x0100,  "proms", 0 )
+	ROM_LOAD( "phanprom.pr", 0x0000, 0x0100, CRC(fc2aace1) SHA1(eba975274da310196db53f799112d8bbac1d0ca8) )
 ROM_END
 
 /*
@@ -3628,9 +3743,9 @@ ROM_START( cdrawpkr )
 ROM_END
 
 
-/**************************
-*       Driver Init       *
-**************************/
+/*********************************************
+*                Driver Init                 *
+*********************************************/
 
 /* These are to patch the check for /OBF handshake line,
    that seems to be wrong. Otherwise will enter in an infinite loop.
@@ -3692,48 +3807,717 @@ ROM_END
 //  ROM[0x0b0b] = 0x00;
 //}
 
+
+/*
+The following tables are for the norautua and norautub sets. The encryption seems based on substitution tables
+chosen by bits 0, 1, 2 and 3 of the address and by the M1 line.
+However, it is improbable that games this old and simple use 0x2000 of ROM to hold such large tables, so they can
+probably be calculated if the algorithm is identified.
+They mostly work, however to be 100% confident the algorithm needs to be figured out or ar least more sets are needed.
+*/
+
 void norautp_state::init_enc()
 {
-/* Attempt to decrypt the program ROM */
+	uint8_t unkn = 0x00;
 
-//  uint8_t *rom = memregion("maincpu")->base();
-//  uint8_t *buffer;
-//  int size = 0x2000; //memregion("maincpu")->bytes();
-//  int start = 0;
-//  int i;
+	// opcodes
+	static const uint8_t opcodes_sub_table_00[0x100] =
+	{// 0x00  0x01  0x02  0x03  0x04  0x05  0x06  0x07  0x08  0x09  0x0a  0x0b  0x0c  0x0d  0x0e  0x0f
+		unkn, unkn, 0x7f, 0xb0, 0xed, 0x28, unkn, unkn, unkn, 0xd5, 0xd0, unkn, 0x7e, unkn, unkn, unkn, // 0x0x
+		0x4e, unkn, unkn, unkn, unkn, unkn, unkn, 0x04, unkn, 0x2a, unkn, unkn, 0x0c, 0x09, unkn, unkn, // 0x1x
+		unkn, 0xea, 0xa9, unkn, 0xbb, 0x3d, unkn, unkn, unkn, unkn, 0x66, unkn, unkn, unkn, unkn, unkn, // 0x2x
+		unkn, unkn, 0x1d, unkn, 0x77, unkn, unkn, 0x3e, unkn, 0x23, 0xe5, unkn, 0xb9, 0x0e, unkn, unkn, // 0x3x
+		unkn, 0x35, unkn, 0xb8, unkn, unkn, unkn, 0xf1, unkn, 0xf7, unkn, unkn, 0x36, 0xdf, unkn, unkn, // 0x4x
+		unkn, unkn, unkn, unkn, 0xfe, unkn, unkn, 0x20, unkn, 0x33, 0x2b, unkn, unkn, 0x10, 0x57, unkn, // 0x5x
+		unkn, 0xca, 0x13, 0xcb, 0xc1, 0xeb, 0xa3, 0xdd, 0x46, unkn, unkn, 0xb7, unkn, unkn, unkn, unkn, // 0x6x
+		unkn, 0xf3, unkn, unkn, unkn, unkn, 0xc2, 0x7c, unkn, 0xcd, unkn, unkn, 0x42, 0xc8, 0x32, 0x22, // 0x7x
+		unkn, unkn, 0x83, unkn, unkn, unkn, unkn, unkn, unkn, 0x06, unkn, 0x5b, unkn, unkn, 0xfd, 0xa5, // 0x8x
+		unkn, 0xc3, 0xe7, unkn, unkn, unkn, unkn, unkn, unkn, unkn, 0x71, unkn, 0x3a, unkn, unkn, 0x0f, // 0x9x
+		0x34, unkn, 0xda, unkn, unkn, unkn, 0x85, unkn, 0xe6, unkn, unkn, unkn, unkn, 0xe3, unkn, unkn, // 0xax
+		unkn, 0x1e, 0x05, unkn, 0x4f, unkn, unkn, unkn, unkn, unkn, 0xaf, unkn, 0x01, 0x5f, unkn, unkn, // 0xbx
+		unkn, 0x38, 0x30, unkn, unkn, 0x6f, 0x70, 0x16, unkn, 0xc9, unkn, 0xc5, 0x78, 0x7a, unkn, unkn, // 0xcx
+		unkn, 0xd1, unkn, unkn, 0xbe, unkn, unkn, 0x79, unkn, unkn, unkn, unkn, 0x6a, 0x37, unkn, unkn, // 0xdx
+		unkn, 0x7d, unkn, unkn, unkn, 0x21, unkn, unkn, unkn, 0x1f, unkn, unkn, unkn, unkn, 0x11, 0xfa, // 0xex
+		unkn, unkn, unkn, 0x08, 0x7b, 0x5e, 0x47, 0xdb, unkn, 0x18, 0x07, 0xc0, unkn, unkn, unkn, unkn, // 0xfx
+	};
 
+	static const uint8_t opcodes_sub_table_01[0x100] =
+	{// 0x00  0x01  0x02  0x03  0x04  0x05  0x06  0x07  0x08  0x09  0x0a  0x0b  0x0c  0x0d  0x0e  0x0f
+		unkn, 0xdf, unkn, unkn, 0xfe, 0x83, unkn, unkn, unkn, 0x07, unkn, unkn, 0x7a, unkn, 0x30, unkn, // 0x0x
+		unkn, 0x0e, unkn, unkn, unkn, 0x18, 0xba, unkn, unkn, 0xfb, unkn, unkn, 0x0b, unkn, 0x16, unkn, // 0x1x
+		unkn, 0xf6, 0xb5, unkn, unkn, 0xc1, unkn, unkn, 0x78, unkn, 0x35, 0xd6, unkn, 0xc5, unkn, unkn, // 0x2x
+		unkn, unkn, 0xd1, 0xb1, 0x1b, unkn, 0x46, 0xc2, 0x06, unkn, unkn, 0xe6, unkn, 0x7e, unkn, unkn, // 0x3x
+		unkn, unkn, unkn, unkn, unkn, 0x34, unkn, unkn, 0xe7, unkn, 0xea, unkn, 0x2b, 0xca, unkn, unkn, // 0x4x
+		0x09, 0xf5, unkn, unkn, 0x60, 0x20, unkn, unkn, 0x3d, unkn, 0x79, 0x6a, unkn, unkn, 0xc3, 0x2a, // 0x5x
+		unkn, unkn, unkn, 0x7d, 0x23, unkn, unkn, unkn, unkn, 0x0f, unkn, unkn, 0x38, 0x04, unkn, 0x3e, // 0x6x
+		0x4e, unkn, 0xcc, unkn, 0x81, 0xb0, 0xe5, unkn, unkn, 0xda, unkn, unkn, unkn, 0xb9, unkn, unkn, // 0x7x
+		unkn, unkn, 0x21, 0xaf, unkn, 0xc8, unkn, unkn, unkn, unkn, 0x28, unkn, unkn, unkn, unkn, unkn, // 0x8x
+		unkn, unkn, unkn, 0x1a, 0xcd, 0xfd, 0x10, 0xb7, unkn, unkn, unkn, unkn, unkn, unkn, unkn, 0xc0, // 0x9x
+		0x27, 0x14, unkn, unkn, unkn, unkn, 0x1d, unkn, unkn, 0xa0, 0x33, unkn, unkn, 0x01, 0xdd, 0xed, // 0xax
+		0x11, 0x08, unkn, unkn, 0x4f, unkn, 0x1e, unkn, unkn, 0xc9, unkn, unkn, 0xcb, unkn, 0x36, 0xd5, // 0xbx
+		unkn, unkn, 0x6f, unkn, unkn, unkn, unkn, 0x13, unkn, 0x22, unkn, 0xa8, 0xb8, unkn, unkn, unkn, // 0xcx
+		unkn, 0x77, unkn, unkn, unkn, 0x5f, unkn, unkn, 0x00, 0x2f, unkn, unkn, unkn, 0xa3, unkn, unkn, // 0xdx
+		unkn, unkn, unkn, 0x3a, unkn, unkn, unkn, 0xd2, unkn, 0x57, unkn, unkn, 0x32, unkn, unkn, unkn, // 0xex
+		0x1f, unkn, unkn, unkn, unkn, 0x7b, unkn, 0x47, unkn, unkn, unkn, unkn, unkn, unkn, unkn, 0x17, // 0xfx
+	};
 
-//  for (i = start; i < size; i++)
-//  {
-//      rom[i] = rom[i] ^ 0x09 ^ 0xff;
-//      rom[i+1] = rom[i+1] ^ 0xfb ^ 0xff;
-//      rom[i+2] = rom[i+2] ^ 0xb2 ^ 0xff;
-//      rom[i+3] = rom[i+3] ^ 0x60 ^ 0xff;
-//      rom[i+4] = rom[i+4] ^ 0xce ^ 0xff;
-//      rom[i+5] = rom[i+5] ^ 0x44 ^ 0xff;
-//      rom[i+6] = rom[i+6] ^ 0x6e ^ 0xff;
-//      rom[i+7] = rom[i+7] ^ 0x61 ^ 0xff;
-//      rom[i+8] = rom[i+8] ^ 0x37 ^ 0xff;
-//      rom[i+9] = rom[i+9] ^ 0x5e ^ 0xff;
-//      rom[i+10] = rom[i+10] ^ 0xfb ^ 0xff;
-//      rom[i+11] = rom[i+11] ^ 0xc6 ^ 0xff;
-//      rom[i+12] = rom[i+12] ^ 0x1d ^ 0xff;
-//      rom[i+13] = rom[i+13] ^ 0x33 ^ 0xff;
-//      rom[i+14] = rom[i+14] ^ 0x00 ^ 0xff;
-//      rom[i+15] = rom[i+15] ^ 0xff ^ 0xff;
+	static const uint8_t opcodes_sub_table_02[0x100] =
+	{// 0x00  0x01  0x02  0x03  0x04  0x05  0x06  0x07  0x08  0x09  0x0a  0x0b  0x0c  0x0d  0x0e  0x0f
+		0xfe, unkn, unkn, unkn, 0x07, unkn, 0xda, 0x10, unkn, 0x32, 0x7e, unkn, 0xa7, unkn, 0xfb, unkn, // 0x0x
+		0x36, 0xb0, 0x3e, unkn, 0x20, unkn, 0xe5, unkn, 0x79, 0xe6, unkn, unkn, 0x73, unkn, 0xc4, unkn, // 0x1x
+		0xb8, unkn, unkn, unkn, unkn, unkn, unkn, 0x43, 0x86, 0x78, unkn, unkn, unkn, unkn, 0xc9, unkn, // 0x2x
+		unkn, unkn, unkn, 0x34, unkn, unkn, 0x47, unkn, 0x4f, unkn, unkn, 0xc1, 0xcf, 0x2f, 0xed, unkn, // 0x3x
+		unkn, 0xc5, unkn, unkn, unkn, unkn, unkn, unkn, 0xff, 0x11, unkn, unkn, 0xf3, unkn, unkn, 0xfd, // 0x4x
+		0x3f, 0xc0, unkn, 0xa3, 0xe9, unkn, 0x1a, 0x1e, 0x0a, 0x7a, 0xd3, 0x90, unkn, 0xcc, 0x31, unkn, // 0x5x
+		0xd1, unkn, unkn, unkn, 0xdf, 0x2b, unkn, 0x3a, unkn, unkn, unkn, unkn, 0x2a, 0xbf, unkn, unkn, // 0x6x
+		unkn, 0xdd, 0x46, unkn, 0xc8, unkn, 0x33, unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, // 0x7x
+		unkn, unkn, unkn, unkn, unkn, unkn, 0x15, unkn, unkn, unkn, unkn, unkn, unkn, 0x23, 0x06, unkn, // 0x8x
+		unkn, unkn, unkn, unkn, 0xbe, unkn, unkn, unkn, 0x57, unkn, unkn, 0x21, unkn, 0x22, unkn, unkn, // 0x9x
+		0xb9, unkn, unkn, 0xf6, 0xe1, unkn, unkn, 0xe7, unkn, unkn, unkn, 0xd8, unkn, 0x5f, unkn, unkn, // 0xax
+		unkn, 0x87, 0x28, 0x68, unkn, 0xaf, 0x0d, unkn, unkn, 0xca, 0xbb, unkn, 0x35, unkn, unkn, unkn, // 0xbx
+		unkn, 0x9e, unkn, 0xc3, unkn, unkn, 0x0e, unkn, unkn, 0xd5, 0x0f, 0x18, unkn, unkn, unkn, unkn, // 0xcx
+		0x01, 0xd7, 0xb7, 0xa8, unkn, 0xcd, unkn, unkn, 0x1d, 0xf1, 0xd0, unkn, unkn, 0x4e, unkn, unkn, // 0xdx
+		unkn, unkn, unkn, 0x30, 0x09, 0x7c, 0xc6, 0x77, unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, // 0xex
+		unkn, unkn, unkn, 0x56, 0x7b, unkn, 0x3d, unkn, unkn, unkn, 0x38, 0xcb, unkn, unkn, unkn, unkn, // 0xfx
+	};
 
-//      i = i + 16;
-//  }
+	static const uint8_t opcodes_sub_table_03[0x100] =
+	{// 0x00  0x01  0x02  0x03  0x04  0x05  0x06  0x07  0x08  0x09  0x0a  0x0b  0x0c  0x0d  0x0e  0x0f
+		0xfd, unkn, unkn, unkn, unkn, unkn, 0x3d, unkn, 0xcf, unkn, 0x06, unkn, 0x05, unkn, unkn, unkn, // 0x0x
+		0xd9, unkn, unkn, 0xf1, 0xdd, 0xda, 0x01, unkn, unkn, unkn, unkn, unkn, 0x18, unkn, unkn, unkn, // 0x1x
+		unkn, unkn, unkn, unkn, 0xd3, unkn, 0x87, 0xf5, unkn, unkn, 0x34, unkn, unkn, unkn, unkn, unkn, // 0x2x
+		unkn, unkn, unkn, unkn, unkn, unkn, 0x1e, 0x78, unkn, unkn, unkn, 0x26, 0x22, unkn, unkn, unkn, // 0x3x
+		unkn, unkn, unkn, 0x46, unkn, 0xf7, 0x3f, unkn, unkn, unkn, 0xe7, unkn, unkn, 0x80, 0xdb, unkn, // 0x4x
+		unkn, 0xcc, unkn, 0xc8, 0xb8, 0x32, unkn, unkn, 0xb0, 0xd1, unkn, unkn, unkn, 0x7c, unkn, unkn, // 0x5x
+		unkn, 0xcd, unkn, unkn, unkn, 0xb7, 0xc6, 0x47, unkn, unkn, unkn, 0x19, unkn, unkn, 0x23, unkn, // 0x6x
+		unkn, unkn, unkn, unkn, unkn, 0x31, unkn, unkn, 0xaf, 0xb1, 0x11, 0x20, unkn, unkn, 0x16, unkn, // 0x7x
+		unkn, unkn, unkn, 0x7e, unkn, unkn, unkn, unkn, unkn, 0xc2, unkn, 0x3c, unkn, unkn, unkn, unkn, // 0x8x
+		0x56, unkn, unkn, 0x79, 0x7a, unkn, unkn, unkn, 0x4e, unkn, unkn, 0xbe, unkn, unkn, unkn, unkn, // 0x9x
+		unkn, unkn, 0x30, 0x36, unkn, unkn, unkn, 0xa6, unkn, 0x76, unkn, unkn, 0x7b, unkn, 0xe1, unkn, // 0xax
+		unkn, unkn, 0x81, unkn, 0xfa, 0xc5, 0x4f, 0x90, 0xf2, unkn, 0xcb, unkn, unkn, unkn, unkn, 0x10, // 0xbx
+		0xc0, 0x7d, 0xe6, unkn, unkn, unkn, 0xca, unkn, unkn, unkn, 0xd5, unkn, unkn, 0x2f, 0xc3, unkn, // 0xcx
+		0xba, unkn, 0x21, 0x2a, 0x52, unkn, unkn, 0x3a, unkn, unkn, 0x77, 0xed, unkn, unkn, unkn, unkn, // 0xdx
+		0x38, 0xee, unkn, unkn, unkn, 0x0f, unkn, unkn, unkn, unkn, 0x3e, unkn, unkn, 0x0e, unkn, 0x28, // 0xex
+		unkn, 0xc9, 0xb9, 0xe5, unkn, 0x24, unkn, 0xd0, 0xfe, 0xa5, 0x27, 0x15, unkn, unkn, 0xdf, unkn, // 0xfx
+	};
 
-//  buffer = alloc_array_or_die(uint8_t, size);
-//  memcpy(buffer, rom, size);
+	static const uint8_t opcodes_sub_table_04[0x100] =
+	{// 0x00  0x01  0x02  0x03  0x04  0x05  0x06  0x07  0x08  0x09  0x0a  0x0b  0x0c  0x0d  0x0e  0x0f
+		0x70, 0x7e, unkn, 0xe5, 0xc1, 0xd8, 0xb8, unkn, unkn, unkn, unkn, 0xa5, 0xf3, 0xd3, unkn, 0x79, // 0x0x
+		unkn, 0xd2, unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, 0xd5, unkn, 0x7f, unkn, unkn, 0x21, // 0x1x
+		unkn, unkn, 0xaf, 0x31, unkn, unkn, unkn, 0x71, unkn, unkn, unkn, 0x3d, unkn, unkn, unkn, 0xa6, // 0x2x
+		unkn, unkn, 0x7a, unkn, unkn, 0x37, unkn, unkn, 0xcd, unkn, 0xb1, unkn, 0xfa, unkn, unkn, unkn, // 0x3x
+		unkn, unkn, 0x2a, unkn, 0x04, unkn, 0xc8, 0x2f, unkn, 0x1a, unkn, unkn, unkn, unkn, 0xca, unkn, // 0x4x
+		0x30, unkn, unkn, unkn, 0x1d, unkn, unkn, 0x46, 0xb5, unkn, 0x1e, unkn, 0xee, 0xc6, 0xd6, unkn, // 0x5x
+		0x0d, 0x4f, unkn, unkn, unkn, 0x0e, 0xf7, 0x57, 0xd9, 0xdf, 0x56, unkn, unkn, unkn, unkn, 0x06, // 0x6x
+		0x81, unkn, 0xc3, unkn, 0x18, unkn, unkn, 0xb9, 0x10, 0x1c, unkn, unkn, unkn, unkn, unkn, unkn, // 0x7x
+		unkn, unkn, unkn, 0x11, unkn, 0xcb, unkn, 0x0f, unkn, unkn, 0xeb, unkn, unkn, 0xc9, unkn, unkn, // 0x8x
+		0xd7, 0x2b, unkn, unkn, unkn, unkn, 0x7d, 0x72, unkn, unkn, unkn, 0x3e, unkn, unkn, unkn, 0x23, // 0x9x
+		0x5f, unkn, unkn, 0xdd, 0x7c, 0x32, 0x38, unkn, 0xe1, 0xb6, unkn, unkn, unkn, 0xf2, unkn, unkn, // 0xax
+		unkn, 0xd0, unkn, 0xc4, unkn, unkn, unkn, 0x22, unkn, 0xbf, unkn, 0xda, unkn, 0xf5, 0x52, unkn, // 0xbx
+		unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, 0x47, unkn, 0xbe, 0x4e, unkn, 0x3a, 0x77, 0x01, // 0xcx
+		0x6f, unkn, 0x17, unkn, 0x20, 0x07, 0xb7, unkn, 0x34, unkn, unkn, unkn, unkn, 0x35, unkn, unkn, // 0xdx
+		unkn, unkn, unkn, unkn, 0x16, unkn, unkn, unkn, 0xfd, unkn, unkn, 0x28, unkn, 0x36, 0xfe, 0xe6, // 0xex
+		unkn, unkn, 0xb0, unkn, 0xed, unkn, unkn, unkn, unkn, unkn, unkn, 0x78, unkn, unkn, unkn, unkn, // 0xfx
+	};
 
-//  free(buffer);
+	static const uint8_t opcodes_sub_table_05[0x100] =
+	{// 0x00  0x01  0x02  0x03  0x04  0x05  0x06  0x07  0x08  0x09  0x0a  0x0b  0x0c  0x0d  0x0e  0x0f
+		unkn, 0xc9, 0x07, 0x2b, 0x09, unkn, 0xeb, 0xb2, unkn, unkn, 0xb6, 0x08, unkn, unkn, unkn, unkn, // 0x0x
+		unkn, 0xc1, 0x1e, unkn, 0x78, 0xa9, unkn, 0x18, unkn, unkn, unkn, unkn, 0x2a, unkn, unkn, 0x16, // 0x1x
+		unkn, unkn, unkn, 0x28, 0xb9, 0xfd, 0xed, unkn, unkn, 0xf6, unkn, unkn, 0x06, unkn, 0x20, 0x23, // 0x2x
+		unkn, unkn, unkn, unkn, 0xf1, unkn, unkn, 0x3a, unkn, unkn, unkn, 0xe6, unkn, 0xe5, unkn, unkn, // 0x3x
+		unkn, unkn, unkn, 0x11, 0xc8, unkn, 0x6f, unkn, unkn, unkn, unkn, unkn, 0x47, unkn, unkn, unkn, // 0x4x
+		unkn, unkn, 0xdf, unkn, unkn, unkn, 0xc4, unkn, unkn, 0x36, 0xb7, unkn, 0xe1, unkn, 0xaf, unkn, // 0x5x
+		0xcd, unkn, unkn, 0x7d, unkn, unkn, unkn, unkn, unkn, 0xdd, unkn, unkn, 0x30, unkn, unkn, unkn, // 0x6x
+		0x7e, unkn, unkn, 0xc3, 0x14, unkn, unkn, unkn, unkn, unkn, unkn, 0x87, 0xcb, unkn, unkn, unkn, // 0x7x
+		unkn, unkn, unkn, unkn, 0xb8, 0xf5, unkn, 0xdb, unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, // 0x8x
+		unkn, 0xc0, unkn, 0x2f, 0x0b, unkn, unkn, 0xd5, 0x17, unkn, unkn, 0xa3, 0xa6, 0x01, 0x21, 0x22, // 0x9x
+		unkn, unkn, 0x57, unkn, unkn, 0xd1, unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, 0x0e, // 0xax
+		unkn, unkn, 0x1d, 0x3e, 0xfb, 0x5b, unkn, 0x13, unkn, unkn, 0xd2, unkn, 0x38, 0x10, 0x3d, 0x7a, // 0xbx
+		unkn, unkn, unkn, unkn, unkn, unkn, 0xd8, 0x72, unkn, 0xbe, 0x0f, unkn, 0xca, unkn, unkn, unkn, // 0xcx
+		unkn, 0x66, unkn, unkn, 0xfe, unkn, unkn, unkn, unkn, 0xb0, unkn, unkn, 0x15, 0x32, 0x79, unkn, // 0xdx
+		0x0c, 0xda, 0x5f, 0xe7, unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, 0x35, 0x70, unkn, // 0xex
+		unkn, unkn, unkn, 0x77, unkn, unkn, unkn, 0x7c, unkn, unkn, unkn, unkn, 0xba, 0x4e, unkn, 0xb5, // 0xfx
+	};
+
+	static const uint8_t opcodes_sub_table_06[0x100] =
+	{// 0x00  0x01  0x02  0x03  0x04  0x05  0x06  0x07  0x08  0x09  0x0a  0x0b  0x0c  0x0d  0x0e  0x0f
+		0xfb, 0xc1, 0xaf, 0xfd, unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, // 0x0x
+		0x31, unkn, unkn, unkn, unkn, unkn, 0x7e, 0xbe, 0x77, unkn, unkn, unkn, 0x1e, unkn, unkn, 0x1b, // 0x1x
+		unkn, unkn, unkn, 0x3a, unkn, 0x0c, unkn, 0xc8, 0x2f, unkn, 0xe1, unkn, 0xeb, 0xa0, 0x7c, 0xa2, // 0x2x
+		unkn, unkn, unkn, 0xb5, unkn, unkn, unkn, unkn, unkn, 0x35, unkn, 0xc9, unkn, unkn, unkn, unkn, // 0x3x
+		unkn, unkn, unkn, unkn, unkn, 0xc4, unkn, unkn, 0x72, 0xab, 0x36, unkn, 0x32, 0xe7, unkn, 0xc0, // 0x4x
+		0xd1, unkn, 0x0e, 0x19, unkn, unkn, 0xcd, 0x5b, unkn, unkn, 0xf6, unkn, unkn, 0xb9, 0x7a, unkn, // 0x5x
+		unkn, 0x7b, unkn, 0xb8, 0x2b, unkn, unkn, 0xdd, 0xc5, unkn, unkn, 0xa3, 0xed, unkn, unkn, 0x38, // 0x6x
+		unkn, 0x06, unkn, unkn, unkn, 0x01, unkn, 0x23, unkn, 0xcb, unkn, unkn, unkn, 0x20, unkn, unkn, // 0x7x
+		0x16, 0xd5, unkn, unkn, 0xd3, 0xfe, unkn, unkn, unkn, unkn, unkn, 0x0f, 0x3e, unkn, unkn, 0x28, // 0x8x
+		unkn, 0x78, unkn, unkn, unkn, 0xa8, unkn, 0xb6, 0xd6, unkn, unkn, unkn, unkn, unkn, unkn, unkn, // 0x9x
+		unkn, 0xd7, unkn, 0xe5, unkn, 0x18, unkn, 0x09, unkn, 0x11, unkn, 0x07, unkn, unkn, 0xcc, unkn, // 0xax
+		unkn, 0x15, unkn, unkn, unkn, unkn, 0xf5, unkn, unkn, 0xdf, unkn, 0x30, unkn, unkn, unkn, unkn, // 0xbx
+		unkn, 0x47, 0x4f, unkn, unkn, unkn, unkn, unkn, 0xd8, unkn, unkn, unkn, unkn, unkn, 0x3c, 0x79, // 0xcx
+		0x5f, unkn, 0x08, 0x3d, unkn, unkn, 0x21, unkn, unkn, unkn, unkn, unkn, 0x37, 0x2a, 0x10, unkn, // 0xdx
+		unkn, 0x1d, 0xe6, unkn, 0x57, unkn, unkn, unkn, 0x14, unkn, unkn, 0xc3, unkn, unkn, unkn, unkn, // 0xex
+		unkn, unkn, unkn, 0xb0, 0xb7, unkn, unkn, 0x6f, unkn, unkn, unkn, 0x22, unkn, unkn, unkn, unkn, // 0xfx
+	};
+
+	static const uint8_t opcodes_sub_table_07[0x100] =
+	{// 0x00  0x01  0x02  0x03  0x04  0x05  0x06  0x07  0x08  0x09  0x0a  0x0b  0x0c  0x0d  0x0e  0x0f
+		0x11, 0xc6, unkn, unkn, 0x2b, unkn, unkn, unkn, unkn, unkn, unkn, 0x3a, unkn, unkn, 0x21, 0x4e, // 0x0x
+		unkn, unkn, 0xc3, 0x30, unkn, 0x76, 0x69, unkn, unkn, 0x04, unkn, 0xcd, unkn, 0xc2, unkn, 0x46, // 0x1x
+		0xc9, unkn, unkn, unkn, 0xd3, unkn, 0xe9, 0xbe, 0xb5, unkn, unkn, unkn, 0x87, unkn, unkn, unkn, // 0x2x
+		0x0f, 0x28, 0x78, unkn, unkn, unkn, 0x02, 0x10, unkn, 0xf5, unkn, unkn, unkn, unkn, unkn, 0xdf, // 0x3x
+		0x60, unkn, unkn, 0x1d, 0x0d, unkn, unkn, unkn, 0xfe, 0xed, unkn, unkn, 0x7e, 0xc8, unkn, unkn, // 0x4x
+		unkn, 0x47, unkn, 0xb8, 0x32, unkn, 0x1b, 0xcc, 0xd5, unkn, unkn, 0xe7, 0xfd, unkn, 0xaf, unkn, // 0x5x
+		unkn, unkn, 0x2f, unkn, unkn, unkn, unkn, unkn, 0xf3, unkn, unkn, unkn, unkn, 0x2a, 0x23, unkn, // 0x6x
+		unkn, 0x42, 0xa6, 0xb1, 0x1e, 0x36, unkn, 0xc1, unkn, unkn, unkn, unkn, unkn, unkn, 0xdd, unkn, // 0x7x
+		0x05, unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, // 0x8x
+		unkn, unkn, 0x3d, unkn, 0xe6, unkn, 0x72, 0xcf, unkn, 0x77, unkn, 0x57, 0xc0, 0xa0, 0x7a, unkn, // 0x9x
+		0x52, unkn, unkn, 0x7c, unkn, unkn, unkn, unkn, unkn, 0xe1, unkn, unkn, unkn, unkn, 0xd0, 0xb9, // 0xax
+		0x3e, 0x07, unkn, 0xb7, unkn, unkn, 0xd6, 0x15, unkn, unkn, unkn, unkn, unkn, 0x79, unkn, unkn, // 0xbx
+		unkn, unkn, 0x20, unkn, unkn, unkn, 0x0e, 0xca, 0x1a, 0x06, unkn, unkn, unkn, 0xf6, 0xcb, 0xda, // 0xcx
+		unkn, unkn, unkn, 0x4f, 0x18, unkn, 0xdb, 0xb2, unkn, 0x38, 0x27, unkn, unkn, unkn, 0x81, unkn, // 0xdx
+		unkn, 0xd1, unkn, unkn, unkn, 0x7b, unkn, unkn, unkn, 0xc4, unkn, unkn, unkn, 0xd2, unkn, unkn, // 0xex
+		0x56, unkn, 0x5f, unkn, 0x80, unkn, 0x16, unkn, unkn, 0xc5, unkn, unkn, unkn, unkn, 0x22, unkn, // 0xfx
+	};
+
+	static const uint8_t opcodes_sub_table_08[0x100] =
+	{// 0x00  0x01  0x02  0x03  0x04  0x05  0x06  0x07  0x08  0x09  0x0a  0x0b  0x0c  0x0d  0x0e  0x0f
+		unkn, 0x19, unkn, unkn, unkn, unkn, 0xc8, unkn, unkn, unkn, 0x27, unkn, unkn, 0x37, unkn, 0x2b, // 0x0x
+		unkn, 0x28, 0x0e, unkn, 0x69, 0x3e, unkn, 0xcc, unkn, unkn, 0x3d, unkn, unkn, 0xc3, unkn, 0x77, // 0x1x
+		0x16, unkn, unkn, unkn, 0x23, unkn, 0xca, 0xe7, unkn, 0x1d, 0x4e, 0xc9, unkn, 0xc4, unkn, unkn, // 0x2x
+		unkn, unkn, unkn, 0x1f, unkn, 0x47, unkn, 0x17, unkn, unkn, unkn, unkn, 0xcd, 0x0d, 0xfe, unkn, // 0x3x
+		0xdf, unkn, unkn, 0x68, unkn, 0xd8, 0x22, unkn, unkn, unkn, unkn, unkn, unkn, unkn, 0xe1, 0xe5, // 0x4x
+		unkn, unkn, 0xb6, unkn, unkn, unkn, unkn, 0x32, unkn, unkn, 0xbe, unkn, unkn, unkn, unkn, 0x11, // 0x5x
+		unkn, unkn, unkn, unkn, unkn, unkn, unkn, 0x35, unkn, 0x7a, unkn, unkn, unkn, unkn, unkn, 0x56, // 0x6x
+		0xd3, unkn, unkn, unkn, unkn, 0x71, unkn, unkn, 0x06, unkn, 0xf6, unkn, unkn, 0x36, unkn, unkn, // 0x7x
+		unkn, unkn, 0xcb, 0xba, unkn, unkn, unkn, unkn, unkn, 0x10, unkn, 0xdd, 0xc6, unkn, unkn, unkn, // 0x8x
+		0x1e, 0x4f, unkn, unkn, unkn, 0x3a, 0xb9, 0x18, 0x78, unkn, 0x2a, unkn, 0x14, unkn, unkn, 0x52, // 0x9x
+		unkn, unkn, 0x57, 0xa6, unkn, unkn, unkn, 0x38, unkn, 0xe6, unkn, 0x21, 0xc1, unkn, unkn, 0xa0, // 0xax
+		0xbf, unkn, unkn, unkn, unkn, unkn, unkn, 0xb7, 0x01, 0xd5, 0x42, unkn, 0x7c, unkn, 0xf2, unkn, // 0xbx
+		unkn, 0xf5, unkn, 0xf1, 0xdb, 0xb0, unkn, 0x0f, unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, // 0xcx
+		unkn, unkn, unkn, unkn, 0x04, unkn, unkn, unkn, 0xd7, unkn, 0x5f, unkn, 0x34, unkn, unkn, unkn, // 0xdx
+		0x30, 0x1b, 0xbb, unkn, unkn, 0xb5, 0x20, unkn, unkn, unkn, unkn, unkn, 0x07, unkn, 0x12, 0x79, // 0xex
+		unkn, unkn, unkn, unkn, unkn, unkn, 0x7e, unkn, unkn, 0xaf, 0x46, unkn, unkn, unkn, unkn, 0xc0, // 0xfx
+	};
+
+	static const uint8_t opcodes_sub_table_09[0x100] =
+	{// 0x00  0x01  0x02  0x03  0x04  0x05  0x06  0x07  0x08  0x09  0x0a  0x0b  0x0c  0x0d  0x0e  0x0f
+		0xca, 0x3d, unkn, unkn, unkn, unkn, unkn, unkn, 0x66, 0x20, unkn, unkn, 0x7c, 0xed, unkn, 0x77, // 0x0x
+		0x10, unkn, 0xfa, 0xb8, unkn, unkn, unkn, 0xbb, 0x3c, 0x7f, unkn, 0xa6, unkn, unkn, unkn, unkn, // 0x1x
+		unkn, 0xd7, 0x38, 0x1f, 0xdf, unkn, 0xd2, 0xf6, unkn, unkn, 0x23, 0x1e, 0xc3, unkn, 0x2f, 0x1a, // 0x2x
+		0xd3, unkn, unkn, unkn, unkn, 0xb9, unkn, unkn, 0x16, unkn, 0xb5, 0xb0, 0x79, unkn, unkn, unkn, // 0x3x
+		0xcd, unkn, unkn, 0xc2, unkn, unkn, unkn, unkn, unkn, 0x0b, 0x3e, unkn, 0x17, 0x12, 0xdb, 0x52, // 0x4x
+		unkn, unkn, 0x28, 0x24, 0x34, 0xb6, 0xcb, 0x36, 0x6f, 0xea, unkn, unkn, unkn, 0x7e, unkn, unkn, // 0x5x
+		unkn, unkn, unkn, unkn, 0xf7, 0x4e, unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, 0xc8, unkn, // 0x6x
+		0xe6, 0xf5, 0xb7, unkn, unkn, 0xdd, unkn, 0x27, unkn, 0xda, 0x87, unkn, unkn, unkn, 0xa5, unkn, // 0x7x
+		unkn, unkn, 0xf1, unkn, unkn, unkn, unkn, 0x47, unkn, 0xd6, unkn, unkn, 0x0e, 0x78, unkn, 0x35, // 0x8x
+		unkn, unkn, unkn, 0xd1, 0x22, unkn, unkn, unkn, unkn, 0x2a, unkn, 0x15, unkn, unkn, unkn, unkn, // 0x9x
+		0x0c, 0x57, unkn, unkn, unkn, unkn, 0x32, 0x67, unkn, unkn, unkn, unkn, 0x5f, unkn, unkn, unkn, // 0xax
+		0x58, unkn, unkn, unkn, unkn, 0x14, unkn, 0x19, 0xe5, 0x2b, 0xaf, unkn, 0x29, unkn, unkn, 0x1d, // 0xbx
+		0x11, unkn, 0x4f, unkn, 0xa9, unkn, unkn, unkn, 0x01, 0xfe, 0x30, 0xc9, unkn, 0xb3, unkn, 0x04, // 0xcx
+		0x56, unkn, unkn, 0x3a, unkn, 0x0f, unkn, 0xe1, unkn, unkn, 0x18, unkn, 0x21, unkn, 0xc0, unkn, // 0xdx
+		unkn, unkn, unkn, unkn, 0xd5, 0xb1, unkn, unkn, 0xc5, unkn, unkn, unkn, 0x06, unkn, unkn, 0xc1, // 0xex
+		0x7a, unkn, unkn, 0x7d, unkn, 0x13, unkn, unkn, 0x07, unkn, unkn, 0xe7, unkn, unkn, unkn, 0xfb, // 0xfx
+	};
+
+	static const uint8_t opcodes_sub_table_0a[0x100] =
+	{// 0x00  0x01  0x02  0x03  0x04  0x05  0x06  0x07  0x08  0x09  0x0a  0x0b  0x0c  0x0d  0x0e  0x0f
+		unkn, unkn, 0xcb, 0xb5, unkn, 0xb9, unkn, 0xca, 0x18, unkn, 0x38, unkn, 0x47, 0x04, 0x2f, 0xed, // 0x0x
+		0xc1, unkn, 0x34, unkn, unkn, unkn, 0x7b, 0xb1, 0xc5, unkn, unkn, unkn, 0x1d, unkn, unkn, unkn, // 0x1x
+		unkn, 0xdd, unkn, unkn, unkn, 0x27, unkn, unkn, unkn, 0x1a, unkn, unkn, 0x3d, 0xf6, unkn, unkn, // 0x2x
+		unkn, unkn, 0x6f, 0x06, 0x1e, 0x13, 0xd8, unkn, unkn, 0x10, 0x1b, 0x28, unkn, 0x4f, 0x11, 0xa3, // 0x3x
+		0x23, unkn, 0xe6, unkn, 0x7d, 0xc0, 0xd5, unkn, 0xc8, 0x2b, unkn, unkn, unkn, unkn, 0x3a, unkn, // 0x4x
+		unkn, unkn, unkn, unkn, unkn, unkn, unkn, 0xfe, unkn, 0xc2, 0xaf, unkn, 0x20, unkn, 0x14, unkn, // 0x5x
+		0x12, unkn, unkn, 0xcd, 0xda, 0xfb, unkn, unkn, unkn, unkn, unkn, unkn, 0x35, 0xa1, 0x57, unkn, // 0x6x
+		unkn, 0x7c, unkn, 0x87, 0xab, unkn, unkn, 0x0e, unkn, unkn, 0xc3, unkn, unkn, unkn, 0xb7, unkn, // 0x7x
+		0x79, unkn, unkn, unkn, unkn, 0x16, 0xd7, 0x01, 0x4d, unkn, unkn, 0x36, unkn, 0x58, unkn, 0x30, // 0x8x
+		unkn, unkn, unkn, unkn, 0xe1, unkn, 0x81, 0x8e, unkn, 0xb8, unkn, unkn, 0xe7, 0xfd, unkn, unkn, // 0x9x
+		0xb0, unkn, unkn, unkn, 0xb3, unkn, 0xbe, unkn, unkn, 0xc9, 0x67, unkn, unkn, unkn, unkn, 0x7a, // 0xax
+		unkn, unkn, 0x3c, 0x22, 0x19, 0x2a, 0x5e, unkn, unkn, 0x78, unkn, unkn, unkn, 0x3e, 0x4e, unkn, // 0xbx
+		unkn, 0xe5, unkn, unkn, 0xf2, unkn, unkn, 0xc6, 0x32, unkn, 0xae, unkn, 0x70, unkn, unkn, unkn, // 0xcx
+		unkn, unkn, unkn, 0xf5, 0x77, 0x21, 0xa5, 0x7e, unkn, 0xdf, unkn, unkn, unkn, 0x31, 0xf3, unkn, // 0xdx
+		0xc4, unkn, 0x0f, 0x7f, unkn, unkn, unkn, unkn, unkn, unkn, 0x07, 0x1f, unkn, unkn, unkn, 0x05, // 0xex
+		unkn, unkn, 0x5f, unkn, unkn, unkn, 0x15, unkn, unkn, unkn, unkn, 0xd3, 0xd1, unkn, unkn, unkn, // 0xfx
+	};
+
+	static const uint8_t opcodes_sub_table_0b[0x100] =
+	{// 0x00  0x01  0x02  0x03  0x04  0x05  0x06  0x07  0x08  0x09  0x0a  0x0b  0x0c  0x0d  0x0e  0x0f
+		0x38, unkn, unkn, unkn, unkn, unkn, 0xb1, unkn, 0xb5, 0x1d, 0xb6, unkn, 0x34, unkn, unkn, unkn, // 0x0x
+		unkn, 0x4d, unkn, unkn, 0xcb, 0xc3, unkn, unkn, unkn, 0x3a, unkn, unkn, unkn, 0xfd, unkn, unkn, // 0x1x
+		unkn, unkn, unkn, 0xb7, 0x4f, unkn, unkn, 0x28, 0x47, unkn, unkn, unkn, unkn, unkn, 0xe5, 0x18, // 0x2x
+		unkn, unkn, unkn, unkn, unkn, 0xc2, unkn, 0x7c, unkn, 0xa5, unkn, unkn, unkn, unkn, unkn, unkn, // 0x3x
+		0x19, unkn, unkn, unkn, unkn, unkn, unkn, 0xfe, unkn, unkn, unkn, unkn, unkn, 0x15, 0xe6, 0x10, // 0x4x
+		unkn, 0xd1, 0x57, 0x3d, 0x79, unkn, unkn, 0xc5, unkn, 0x32, unkn, unkn, 0xd6, unkn, 0x2f, unkn, // 0x5x
+		unkn, unkn, unkn, unkn, 0x02, unkn, unkn, unkn, 0xbe, 0x04, unkn, unkn, 0xae, 0xaf, 0xe1, 0x21, // 0x6x
+		unkn, 0x0f, unkn, 0xe9, 0x23, 0xb9, 0xc6, unkn, unkn, 0x35, unkn, 0x70, unkn, 0xb0, 0x12, unkn, // 0x7x
+		unkn, unkn, 0xed, unkn, 0xd7, unkn, unkn, unkn, unkn, 0xb3, unkn, 0x78, unkn, unkn, unkn, 0x1c, // 0x8x
+		0xa3, unkn, 0x20, unkn, unkn, unkn, unkn, unkn, unkn, unkn, 0x16, 0x1a, unkn, 0x2b, unkn, 0xc0, // 0x9x
+		unkn, unkn, 0xda, unkn, 0x77, 0xf2, unkn, 0xf5, unkn, 0xd3, unkn, unkn, 0x09, unkn, 0x36, unkn, // 0xax
+		0x2a, unkn, unkn, unkn, 0x7d, unkn, 0x52, unkn, 0x1e, unkn, 0x0b, unkn, unkn, unkn, unkn, 0xd8, // 0xbx
+		0xa6, 0x08, 0x7e, unkn, unkn, unkn, 0x01, unkn, unkn, unkn, 0xcd, 0xca, unkn, unkn, 0xdd, unkn, // 0xcx
+		0x0e, 0xe7, 0x3c, unkn, unkn, 0x7a, unkn, unkn, unkn, unkn, 0x31, unkn, unkn, 0x07, 0xc8, unkn, // 0xdx
+		unkn, unkn, unkn, unkn, unkn, unkn, unkn, 0x0d, 0x46, unkn, 0x11, unkn, 0xdb, unkn, 0x5f, 0x22, // 0xex
+		unkn, 0x5b, 0xd2, 0x3e, unkn, unkn, unkn, unkn, unkn, 0x13, 0x0a, 0xbb, 0xc9, 0x06, unkn, unkn, // 0xfx
+	};
+
+	static const uint8_t opcodes_sub_table_0c[0x100] =
+	{// 0x00  0x01  0x02  0x03  0x04  0x05  0x06  0x07  0x08  0x09  0x0a  0x0b  0x0c  0x0d  0x0e  0x0f
+		unkn, 0x3c, 0x06, unkn, 0xc1, 0x0f, 0x18, 0x0d, unkn, unkn, unkn, 0xd7, unkn, 0x77, 0x2c, unkn, // 0x0x
+		0x78, 0x30, unkn, unkn, unkn, 0xdb, unkn, unkn, unkn, 0xb9, 0xd1, 0x7e, unkn, unkn, 0xfe, 0x72, // 0x1x
+		unkn, unkn, unkn, unkn, unkn, 0x1f, 0xd8, unkn, unkn, unkn, 0xc5, unkn, 0xd3, unkn, unkn, unkn, // 0x2x
+		0xc3, 0x22, unkn, unkn, 0x7f, unkn, unkn, 0x86, unkn, 0x56, unkn, unkn, 0x52, unkn, unkn, 0xd2, // 0x3x
+		unkn, unkn, 0x32, unkn, unkn, unkn, unkn, 0x3e, 0xb7, unkn, unkn, 0xb5, 0x3d, unkn, unkn, unkn, // 0x4x
+		unkn, 0x47, 0x66, unkn, unkn, unkn, 0x14, unkn, unkn, 0xb3, 0x71, unkn, unkn, unkn, unkn, 0x20, // 0x5x
+		unkn, unkn, unkn, 0xe6, unkn, 0x57, unkn, 0xdf, 0x2a, unkn, 0x4f, unkn, unkn, 0x79, unkn, 0xbe, // 0x6x
+		unkn, 0xe7, unkn, 0xc8, unkn, 0x5b, unkn, unkn, 0x46, 0xc0, unkn, unkn, 0x5e, unkn, unkn, unkn, // 0x7x
+		0x7b, unkn, 0x23, unkn, 0xd6, 0x16, 0x7d, unkn, unkn, unkn, unkn, unkn, unkn, 0xc9, 0x21, unkn, // 0x8x
+		0xf1, unkn, 0xb1, unkn, 0x43, unkn, unkn, unkn, 0xf6, unkn, 0xbb, 0x27, unkn, unkn, 0x04, unkn, // 0x9x
+		0xea, unkn, 0x01, 0xdd, unkn, unkn, unkn, unkn, 0x3f, unkn, unkn, unkn, unkn, unkn, unkn, 0x28, // 0xax
+		unkn, unkn, 0xda, unkn, 0xcd, unkn, unkn, unkn, unkn, 0xaf, 0x38, unkn, unkn, 0xe9, 0x34, 0x36, // 0xbx
+		0xf5, unkn, unkn, 0x10, unkn, 0x1a, unkn, 0x7c, unkn, unkn, 0xc2, unkn, 0x07, 0xcb, 0x11, unkn, // 0xcx
+		0x3a, unkn, unkn, 0xe5, 0xd5, unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, // 0xdx
+		0xca, 0xb8, unkn, unkn, 0x2f, unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, // 0xex
+		unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, 0x5f, unkn, 0x1e, unkn, 0x2b, unkn, unkn, // 0xfx
+	};
+
+	static const uint8_t opcodes_sub_table_0d[0x100] =
+	{// 0x00  0x01  0x02  0x03  0x04  0x05  0x06  0x07  0x08  0x09  0x0a  0x0b  0x0c  0x0d  0x0e  0x0f
+		unkn, 0x35, 0xcd, unkn, unkn, 0x38, unkn, 0x47, unkn, unkn, unkn, unkn, 0xfb, 0x24, unkn, unkn, // 0x0x
+		0xd7, 0x7e, unkn, unkn, unkn, unkn, unkn, unkn, unkn, 0xb1, unkn, 0xf6, unkn, unkn, unkn, unkn, // 0x1x
+		unkn, unkn, unkn, 0x3e, unkn, 0xd0, 0x4a, unkn, unkn, unkn, 0xb2, unkn, unkn, unkn, 0x01, 0xf7, // 0x2x
+		unkn, unkn, 0xd2, unkn, 0x66, unkn, unkn, unkn, 0xaf, 0x2b, 0x16, unkn, unkn, unkn, 0xe7, 0xfd, // 0x3x
+		0xf1, 0x02, 0x7c, unkn, unkn, unkn, unkn, unkn, unkn, 0xea, 0x34, unkn, unkn, unkn, 0x3d, unkn, // 0x4x
+		0xdf, 0xb8, unkn, 0xd6, unkn, unkn, 0x2f, 0x18, 0x1b, unkn, unkn, 0xed, 0x77, 0x4e, 0x7b, unkn, // 0x5x
+		0x11, unkn, unkn, unkn, 0x79, 0xff, 0x23, unkn, unkn, 0x26, 0x28, 0xfe, unkn, unkn, unkn, 0x57, // 0x6x
+		unkn, unkn, unkn, unkn, 0xe6, 0xc5, 0x32, unkn, unkn, 0x1d, unkn, 0xf2, unkn, unkn, 0x7a, unkn, // 0x7x
+		unkn, 0xcb, 0x04, unkn, 0x06, 0xb7, unkn, unkn, unkn, 0x2a, 0xbb, 0x27, unkn, unkn, unkn, unkn, // 0x8x
+		0x6f, 0x0f, unkn, 0x3f, unkn, 0xcc, 0x3a, 0x4f, 0xc6, unkn, unkn, unkn, 0x1a, 0x0e, unkn, unkn, // 0x9x
+		unkn, unkn, unkn, unkn, unkn, 0x22, unkn, unkn, unkn, unkn, unkn, 0xc4, 0x14, 0xc0, unkn, unkn, // 0xax
+		0x07, 0x20, unkn, 0xc2, unkn, unkn, unkn, unkn, unkn, unkn, unkn, 0xe5, unkn, 0x21, unkn, unkn, // 0xbx
+		0xc3, unkn, 0x46, unkn, 0x3c, unkn, 0x87, unkn, unkn, unkn, unkn, unkn, unkn, 0xd8, 0xd1, unkn, // 0xcx
+		0x78, unkn, 0xd3, 0xc9, unkn, unkn, unkn, 0xc1, unkn, 0x86, unkn, unkn, 0xb5, unkn, unkn, unkn, // 0xdx
+		0xdd, unkn, unkn, unkn, unkn, unkn, 0xe1, unkn, 0x72, unkn, 0x15, unkn, unkn, 0x30, unkn, 0x10, // 0xex
+		unkn, unkn, unkn, unkn, 0xbe, unkn, 0xda, 0xdb, unkn, 0x1e, unkn, unkn, 0x36, unkn, unkn, unkn, // 0xfx
+	};
+
+	static const uint8_t opcodes_sub_table_0e[0x100] =
+	{// 0x00  0x01  0x02  0x03  0x04  0x05  0x06  0x07  0x08  0x09  0x0a  0x0b  0x0c  0x0d  0x0e  0x0f
+		0xfd, unkn, 0x20, unkn, unkn, unkn, 0x35, unkn, unkn, 0xdd, 0x0a, 0xd8, 0x01, unkn, unkn, unkn, // 0x0x
+		unkn, 0x04, 0xbf, unkn, 0x87, unkn, 0x05, unkn, unkn, unkn, 0x16, unkn, 0xa1, 0xaf, unkn, unkn, // 0x1x
+		unkn, 0xf7, 0x46, unkn, 0x42, unkn, 0xb1, 0x47, unkn, 0xc4, unkn, unkn, unkn, 0xc0, 0x38, unkn, // 0x2x
+		0x1e, unkn, unkn, unkn, unkn, 0x0f, 0x3d, unkn, unkn, unkn, unkn, unkn, 0xdf, unkn, unkn, unkn, // 0x3x
+		0x57, 0x56, unkn, unkn, unkn, 0x79, 0xa2, unkn, unkn, unkn, 0x6f, unkn, 0x9e, 0xd7, unkn, 0xed, // 0x4x
+		0x4e, unkn, unkn, 0x19, unkn, 0x15, unkn, unkn, 0x86, unkn, 0x23, unkn, unkn, unkn, 0xbb, unkn, // 0x5x
+		unkn, unkn, unkn, 0x4f, 0xe7, 0x22, unkn, unkn, unkn, unkn, unkn, 0xd0, 0xc6, 0xb0, unkn, unkn, // 0x6x
+		unkn, 0x7a, 0xd2, unkn, unkn, 0xc5, 0xe5, unkn, unkn, unkn, 0x0e, unkn, unkn, unkn, unkn, unkn, // 0x7x
+		0xf5, unkn, unkn, unkn, 0x11, unkn, unkn, unkn, unkn, 0x2a, unkn, 0xd3, unkn, unkn, 0xcb, unkn, // 0x8x
+		0x8e, 0x7c, 0x7e, unkn, 0xc1, unkn, unkn, unkn, 0x36, unkn, unkn, unkn, 0x21, unkn, 0xe9, unkn, // 0x9x
+		0x3a, 0x4a, 0xa5, 0xba, unkn, 0x77, unkn, 0xd5, unkn, unkn, unkn, unkn, unkn, unkn, unkn, 0xc3, // 0xax
+		unkn, unkn, 0x3e, 0x32, unkn, unkn, unkn, unkn, unkn, 0x2b, 0xc9, 0xe6, unkn, unkn, unkn, unkn, // 0xbx
+		unkn, unkn, 0x75, unkn, 0xa6, unkn, unkn, 0x07, unkn, unkn, 0xcf, unkn, 0x0d, unkn, 0xc2, unkn, // 0xcx
+		unkn, unkn, unkn, unkn, 0x28, unkn, unkn, 0x1a, 0xe1, 0xd1, 0xc8, unkn, unkn, 0xb9, unkn, unkn, // 0xdx
+		unkn, unkn, 0x12, 0xb7, unkn, unkn, unkn, unkn, 0x7f, unkn, unkn, unkn, 0x06, unkn, unkn, unkn, // 0xex
+		0xd6, 0xca, unkn, 0x66, unkn, unkn, unkn, 0x7b, 0x18, 0xcd, 0x70, 0xfe, unkn, unkn, 0x71, 0xf1, // 0xfx
+	};
+
+	static const uint8_t opcodes_sub_table_0f[0x100] =
+	{// 0x00  0x01  0x02  0x03  0x04  0x05  0x06  0x07  0x08  0x09  0x0a  0x0b  0x0c  0x0d  0x0e  0x0f
+		unkn, unkn, unkn, 0xaf, 0x0d, unkn, unkn, unkn, unkn, unkn, 0xb2, 0xe7, unkn, unkn, 0xd1, unkn, // 0x0x
+		unkn, unkn, unkn, unkn, unkn, 0x0f, 0x77, unkn, unkn, 0xba, 0xa5, unkn, unkn, unkn, 0x18, 0xd3, // 0x1x
+		0x79, 0x5f, unkn, 0xf6, unkn, unkn, unkn, 0x0c, unkn, unkn, unkn, unkn, unkn, unkn, 0x7c, unkn, // 0x2x
+		unkn, unkn, unkn, 0xc5, unkn, unkn, unkn, unkn, 0xc6, unkn, unkn, 0x6f, 0xfd, 0xeb, unkn, unkn, // 0x3x
+		unkn, 0x30, 0xe6, unkn, 0xfb, unkn, unkn, unkn, 0xb1, unkn, unkn, unkn, unkn, unkn, unkn, 0x36, // 0x4x
+		0xcd, 0x04, unkn, unkn, 0x1d, 0x35, unkn, 0xdd, unkn, 0xb5, 0x12, unkn, unkn, unkn, unkn, unkn, // 0x5x
+		unkn, unkn, 0x4e, 0x47, 0x38, unkn, unkn, 0x3e, 0x7e, unkn, unkn, unkn, unkn, unkn, unkn, unkn, // 0x6x
+		unkn, unkn, unkn, 0x32, unkn, unkn, 0x06, unkn, unkn, unkn, unkn, 0xc9, unkn, 0x75, 0x29, 0x19, // 0x7x
+		unkn, 0x5b, unkn, 0x2f, 0x28, unkn, unkn, unkn, unkn, unkn, unkn, unkn, 0xb9, unkn, unkn, 0xfe, // 0x8x
+		0x85, 0xdb, unkn, 0x57, 0xe5, unkn, unkn, 0x15, 0x0e, unkn, 0xd8, 0x09, 0x3a, unkn, unkn, unkn, // 0x9x
+		unkn, 0x22, 0x16, 0xc1, unkn, unkn, unkn, unkn, 0x05, 0xc8, 0xe3, unkn, 0xbe, unkn, unkn, unkn, // 0xax
+		unkn, 0x3d, unkn, unkn, 0x3c, 0x21, unkn, unkn, unkn, 0x23, unkn, unkn, 0x11, unkn, unkn, 0x2a, // 0xbx
+		0xed, 0xc3, 0xe1, 0xd6, unkn, 0xb0, unkn, 0x1e, unkn, unkn, 0xf7, unkn, unkn, unkn, 0xf1, 0x34, // 0xcx
+		unkn, 0x0a, unkn, 0xd0, 0x2b, unkn, unkn, 0x13, unkn, unkn, 0xd5, unkn, unkn, unkn, 0x08, unkn, // 0xdx
+		0xd2, 0x01, unkn, 0x42, unkn, 0x20, 0xca, unkn, unkn, unkn, unkn, unkn, 0xb8, unkn, 0xc2, 0xc0, // 0xex
+		0x31, 0xcb, 0x07, unkn, unkn, 0x27, unkn, unkn, unkn, unkn, 0xb7, 0x7a, unkn, 0x10, unkn, unkn, // 0xfx
+	};
+
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int i = 0; i < 0x2000; i++)
+	{
+		uint8_t x = rom[i];
+
+		switch(i & 0x0f)
+		{
+			case 0x00: m_decrypted_opcodes[i] = opcodes_sub_table_00[x]; break;
+			case 0x01: m_decrypted_opcodes[i] = opcodes_sub_table_01[x]; break;
+			case 0x02: m_decrypted_opcodes[i] = opcodes_sub_table_02[x]; break;
+			case 0x03: m_decrypted_opcodes[i] = opcodes_sub_table_03[x]; break;
+			case 0x04: m_decrypted_opcodes[i] = opcodes_sub_table_04[x]; break;
+			case 0x05: m_decrypted_opcodes[i] = opcodes_sub_table_05[x]; break;
+			case 0x06: m_decrypted_opcodes[i] = opcodes_sub_table_06[x]; break;
+			case 0x07: m_decrypted_opcodes[i] = opcodes_sub_table_07[x]; break;
+			case 0x08: m_decrypted_opcodes[i] = opcodes_sub_table_08[x]; break;
+			case 0x09: m_decrypted_opcodes[i] = opcodes_sub_table_09[x]; break;
+			case 0x0a: m_decrypted_opcodes[i] = opcodes_sub_table_0a[x]; break;
+			case 0x0b: m_decrypted_opcodes[i] = opcodes_sub_table_0b[x]; break;
+			case 0x0c: m_decrypted_opcodes[i] = opcodes_sub_table_0c[x]; break;
+			case 0x0d: m_decrypted_opcodes[i] = opcodes_sub_table_0d[x]; break;
+			case 0x0e: m_decrypted_opcodes[i] = opcodes_sub_table_0e[x]; break;
+			case 0x0f: m_decrypted_opcodes[i] = opcodes_sub_table_0f[x]; break;
+		}
+	}
+
+	// data
+	static const uint8_t data_sub_table_00[0x100] =
+	{// 0x00  0x01  0x02  0x03  0x04  0x05  0x06  0x07  0x08  0x09  0x0a  0x0b  0x0c  0x0d  0x0e  0x0f
+		0xfd, unkn, unkn, unkn, 0x86, 0x6c, unkn, 0x00, 0x0c, 0xff, 0x60, unkn, unkn, unkn, 0x24, unkn, // 0x0x
+		0x07, unkn, 0x78, unkn, 0x55, unkn, 0x1a, 0xe9, 0x5b, 0x32, 0x0b, unkn, unkn, unkn, unkn, unkn, // 0x1x
+		0x62, unkn, unkn, unkn, unkn, unkn, 0x66, unkn, 0x49, 0xe4, unkn, 0x16, 0x0f, 0x17, unkn, unkn, // 0x2x
+		0xce, unkn, 0x04, 0x5e, 0xa5, 0x3c, 0x01, unkn, 0x50, unkn, 0x54, unkn, 0x69, 0xf8, 0xc5, 0x82, // 0x3x
+		0x45, unkn, unkn, unkn, 0x0a, 0x14, unkn, 0x93, 0x1f, unkn, unkn, 0x1b, 0x13, unkn, unkn, 0x4a, // 0x4x
+		unkn, unkn, 0x63, 0x83, 0x0e, unkn, unkn, 0x7e, unkn, 0xd7, 0x39, unkn, unkn, 0x3b, 0xa7, 0xc6, // 0x5x
+		0x23, 0x1d, unkn, unkn, unkn, unkn, 0x56, 0x90, 0x65, 0x44, unkn, unkn, 0x67, 0x57, 0x46, 0xef, // 0x6x
+		0x3f, 0xf1, unkn, unkn, unkn, unkn, 0x10, 0xf0, unkn, unkn, unkn, 0x08, unkn, unkn, unkn, 0x3e, // 0x7x
+		unkn, 0x41, unkn, unkn, unkn, 0x8c, 0x03, unkn, 0xa4, unkn, unkn, 0xd8, unkn, 0xb4, 0xee, 0x6e, // 0x8x
+		0x96, 0x6a, 0x27, 0xad, 0x12, unkn, unkn, 0x30, 0x2b, 0x53, 0x48, unkn, 0x80, 0x42, 0x77, unkn, // 0x9x
+		0x11, unkn, unkn, 0xb0, 0x52, 0xf9, unkn, 0x85, unkn, unkn, 0x5c, 0x09, unkn, 0x22, 0x4d, unkn, // 0xax
+		unkn, 0xe0, 0x2a, 0x64, 0x1c, 0x05, 0x4c, unkn, 0x18, 0x2d, 0x20, unkn, 0xd0, unkn, unkn, 0x7c, // 0xbx
+		unkn, unkn, unkn, unkn, 0x0d, unkn, 0x47, 0x15, 0x75, 0xd1, unkn, unkn, 0x2c, unkn, 0xc0, 0xbb, // 0xcx
+		0xa2, unkn, 0x35, unkn, 0x4f, unkn, unkn, unkn, 0x2e, 0x43, unkn, unkn, 0x68, 0x25, unkn, 0xf3, // 0xdx
+		unkn, 0x4b, 0xe8, 0xf4, unkn, unkn, 0xbf, unkn, 0x31, 0xf5, 0xa0, unkn, unkn, 0xc4, 0x1e, 0x4e, // 0xex
+		0x8e, unkn, unkn, unkn, unkn, 0xe6, 0x76, 0x33, 0x06, unkn, unkn, unkn, unkn, 0x02, unkn, unkn  // 0xfx
+	};
+
+	static const uint8_t data_sub_table_01[0x100] =
+	{// 0x00  0x01  0x02  0x03  0x04  0x05  0x06  0x07  0x08  0x09  0x0a  0x0b  0x0c  0x0d  0x0e  0x0f
+		unkn, unkn, 0x52, unkn, unkn, 0x85, 0x34, 0x60, unkn, unkn, 0x56, unkn, unkn, 0x0b, unkn, 0x7f, // 0x0x
+		unkn, unkn, 0x9e, 0x1d, 0x63, 0x2a, 0xb0, unkn, unkn, unkn, unkn, 0x4e, unkn, 0x35, 0xea, unkn, // 0x1x
+		0x0d, 0xe2, 0x40, 0x45, unkn, unkn, unkn, unkn, 0x08, 0xef, 0x21, unkn, 0x7e, 0x10, unkn, 0x2d, // 0x2x
+		0x19, 0x0a, unkn, 0x0f, unkn, unkn, 0x50, 0xf4, unkn, unkn, 0x06, unkn, unkn, 0x4d, unkn, unkn, // 0x3x
+		0x30, 0xb4, unkn, 0xf8, unkn, 0xad, 0x1c, 0x3b, unkn, 0x2b, 0x93, 0xe4, unkn, unkn, unkn, unkn, // 0x4x
+		0x55, unkn, 0x2e, 0x05, 0xd7, 0x84, unkn, unkn, 0x6a, unkn, 0xcc, unkn, unkn, unkn, 0xe8, unkn, // 0x5x
+		0xc0, unkn, 0xe9, 0x13, unkn, 0x4a, 0x61, 0x1b, 0xaa, unkn, unkn, 0x59, unkn, unkn, unkn, unkn, // 0x6x
+		0x6c, unkn, unkn, unkn, 0xfb, unkn, unkn, unkn, 0x66, unkn, unkn, unkn, 0xf9, 0x4c, unkn, unkn, // 0x7x
+		unkn, 0x53, 0xe6, 0x46, 0x49, 0x1f, 0x09, unkn, 0x00, unkn, 0x16, 0xa0, unkn, 0x17, 0xa2, 0xa4, // 0x8x
+		unkn, 0x1e, 0x5a, unkn, 0x74, unkn, 0x5e, unkn, 0xcf, 0xc4, 0x65, unkn, unkn, unkn, 0x26, unkn, // 0x9x
+		unkn, 0x1a, 0x7c, 0x4b, unkn, unkn, unkn, 0x51, 0xc2, 0x47, unkn, unkn, unkn, 0x43, 0x3c, 0x62, // 0xax
+		unkn, unkn, unkn, 0x23, 0x18, 0x2c, 0x5b, 0x04, unkn, unkn, unkn, 0x42, 0xf0, 0x0e, unkn, 0xfc, // 0xbx
+		0x0c, 0xf3, unkn, 0xdd, 0x32, unkn, 0x54, 0x4f, unkn, 0x41, unkn, unkn, 0x03, unkn, unkn, unkn, // 0xcx
+		unkn, 0x7b, 0x68, unkn, 0x44, 0x02, 0x37, unkn, unkn, unkn, 0x48, 0x12, 0xb6, 0x20, unkn, 0x57, // 0xdx
+		0x2f, unkn, 0x8e, 0x15, 0x07, unkn, unkn, 0xfd, unkn, 0xa6, 0xa1, unkn, unkn, unkn, unkn, unkn, // 0xex
+		0x80, unkn, 0x01, 0x64, 0x39, 0x3d, unkn, 0x90, unkn, unkn, 0x76, 0xff, 0xf1, unkn, 0x11, unkn  // 0xfx
+	};
+
+	static const uint8_t data_sub_table_02[0x100] =
+	{// 0x00  0x01  0x02  0x03  0x04  0x05  0x06  0x07  0x08  0x09  0x0a  0x0b  0x0c  0x0d  0x0e  0x0f
+		unkn, unkn, 0x43, 0x4a, unkn, 0xb3, 0x93, 0x1a, 0xdc, unkn, unkn, unkn, 0xa7, 0x48, unkn, 0xd7, // 0x0x
+		unkn, unkn, 0x05, unkn, unkn, unkn, unkn, unkn, 0x15, unkn, 0x60, 0x42, unkn, unkn, 0x2a, unkn, // 0x1x
+		0x67, unkn, 0x38, unkn, 0x55, unkn, unkn, 0xac, 0x83, unkn, 0xa1, unkn, 0xf4, unkn, unkn, 0x46, // 0x2x
+		unkn, 0x50, unkn, 0x18, 0x3e, 0x11, 0xe6, unkn, unkn, 0x62, 0x76, 0x5e, 0xe0, 0x0f, 0xfd, 0x2e, // 0x3x
+		0x45, 0x33, 0x61, unkn, 0x2d, unkn, 0x1c, 0x24, 0x19, unkn, unkn, 0xc9, unkn, 0x02, 0xc7, unkn, // 0x4x
+		0x2c, unkn, 0x0e, 0xc0, 0x08, unkn, 0xf8, 0x14, 0x7e, 0xad, 0x3b, unkn, unkn, 0x39, unkn, 0xf6, // 0x5x
+		0xa5, unkn, 0x4c, unkn, 0x23, 0x54, unkn, unkn, unkn, 0x0a, unkn, unkn, unkn, unkn, unkn, unkn, // 0x6x
+		0x2b, 0xdd, 0x6b, unkn, 0x5c, unkn, 0x00, unkn, unkn, unkn, unkn, 0x36, unkn, 0x57, 0xce, unkn, // 0x7x
+		0x1d, unkn, unkn, unkn, 0xbf, 0x32, 0xf0, 0x4f, 0x16, 0x35, 0x63, 0x21, 0x0c, 0x1b, unkn, unkn, // 0x8x
+		0x56, unkn, 0xef, unkn, 0x06, unkn, 0x59, 0x04, 0x41, unkn, unkn, unkn, 0x4b, unkn, unkn, unkn, // 0x9x
+		0x28, 0x7b, 0x3d, unkn, unkn, 0x12, 0xb6, unkn, 0x44, 0xb4, unkn, unkn, unkn, 0x09, unkn, unkn, // 0xax
+		0xd2, unkn, 0xff, 0x3c, 0x6a, 0x20, 0xab, unkn, unkn, 0x40, 0xee, 0xa0, unkn, 0xbb, 0x68, 0x1e, // 0xbx
+		0xc5, 0x49, 0x6d, unkn, 0x5f, 0x17, 0xfc, unkn, unkn, 0xb0, unkn, unkn, 0x2f, unkn, 0xbe, unkn, // 0xcx
+		unkn, unkn, 0x10, unkn, 0x3a, unkn, 0x4d, unkn, 0xf2, 0x0d, 0xd0, unkn, unkn, 0x34, unkn, 0xbd, // 0xdx
+		unkn, unkn, 0x4e, 0x3f, unkn, 0xcc, 0x0b, 0x7c, 0x01, unkn, 0x88, 0x5a, 0x53, 0x03, unkn, unkn, // 0xex
+		0xc6, unkn, 0xf7, 0x30, unkn, 0x13, 0x85, unkn, unkn, unkn, unkn, 0x51, 0x52, 0x80, 0x07, 0xf5  // 0xfx
+	};
+
+	static const uint8_t data_sub_table_03[0x100] =
+	{// 0x00  0x01  0x02  0x03  0x04  0x05  0x06  0x07  0x08  0x09  0x0a  0x0b  0x0c  0x0d  0x0e  0x0f
+		0xad, 0x34, unkn, unkn, unkn, unkn, 0x30, 0x09, unkn, unkn, unkn, unkn, unkn, unkn, 0x17, 0x3e, // 0x0x
+		0x60, unkn, unkn, unkn, 0xa2, unkn, 0x21, 0x39, 0x80, unkn, unkn, 0x7d, 0x05, 0x28, 0x06, 0x25, // 0x1x
+		0x0d, unkn, 0x10, 0xb6, 0x26, unkn, 0x24, 0x57, 0xef, unkn, 0x0e, unkn, 0xee, 0x67, unkn, unkn, // 0x2x
+		unkn, 0x1f, 0x32, unkn, unkn, 0x38, unkn, 0x69, unkn, 0xf6, unkn, unkn, 0x65, 0x2c, 0x23, 0x14, // 0x3x
+		0x40, unkn, 0x04, 0x3c, 0x12, 0xe3, 0x4c, unkn, unkn, 0xf8, unkn, 0xc5, 0x4e, unkn, unkn, 0x15, // 0x4x
+		0xf1, 0x20, unkn, 0x93, unkn, 0x94, unkn, 0x16, 0xa5, unkn, unkn, 0xdc, 0x5a, unkn, 0x19, unkn, // 0x5x
+		0xff, unkn, 0x3b, unkn, 0x55, 0x4b, unkn, unkn, 0x54, 0x47, unkn, 0x50, unkn, unkn, 0x46, unkn, // 0x6x
+		unkn, unkn, unkn, 0x13, unkn, 0x6e, unkn, unkn, unkn, 0xb0, unkn, 0xb3, 0x90, 0x7a, unkn, unkn, // 0x7x
+		0xd7, 0xf0, unkn, 0x42, unkn, unkn, 0xc3, unkn, unkn, 0xd5, unkn, 0x22, 0x4a, unkn, 0x4f, unkn, // 0x8x
+		unkn, 0x6a, 0xdb, 0xf7, unkn, 0x37, unkn, unkn, 0xfc, 0x02, unkn, unkn, 0xbd, unkn, unkn, unkn, // 0x9x
+		0x11, 0x53, unkn, unkn, unkn, 0x1c, unkn, 0x52, 0x63, 0xbc, 0x41, 0xf9, unkn, unkn, 0xc4, unkn, // 0xax
+		0x18, unkn, 0xbb, 0x0f, 0x4d, 0x1b, unkn, unkn, unkn, 0xe0, unkn, 0x61, 0x43, unkn, 0x44, 0xaa, // 0xbx
+		unkn, 0x0b, unkn, unkn, 0xcc, 0x98, 0x59, 0x2d, 0x35, 0x1d, 0x49, 0x0c, 0x1a, unkn, 0xe9, unkn, // 0xcx
+		0x6b, 0x3f, 0x7e, unkn, unkn, unkn, 0xf4, unkn, 0x9e, unkn, 0x2b, unkn, unkn, unkn, unkn, unkn, // 0xdx
+		0x56, unkn, 0xa7, 0x0a, 0x45, 0x2e, 0x62, unkn, unkn, 0x2a, 0x48, unkn, 0xe6, 0x03, unkn, 0xd8, // 0xex
+		unkn, 0x66, unkn, 0xf5, unkn, 0x08, 0x01, unkn, unkn, 0x8e, 0x00, unkn, unkn, 0x1e, unkn, unkn  // 0xfx
+	};
+
+	static const uint8_t data_sub_table_04[0x100] =
+	{// 0x00  0x01  0x02  0x03  0x04  0x05  0x06  0x07  0x08  0x09  0x0a  0x0b  0x0c  0x0d  0x0e  0x0f
+		unkn, unkn, 0x2f, unkn, unkn, 0xcc, unkn, 0x35, unkn, 0x4f, 0x3e, unkn, 0x12, unkn, unkn, 0x30, // 0x0x
+		unkn, unkn, unkn, 0xf0, unkn, unkn, 0x64, 0xaf, 0xd9, unkn, 0x2c, unkn, 0x2b, unkn, unkn, unkn, // 0x1x
+		0xee, 0xbf, unkn, 0x13, 0x65, 0x52, unkn, unkn, 0x4a, 0x09, 0xc3, 0x08, 0xa0, 0x04, unkn, 0x62, // 0x2x
+		0x4d, unkn, unkn, 0x47, unkn, unkn, unkn, unkn, unkn, 0xc4, unkn, 0x3c, 0xf3, 0x67, 0x0d, unkn, // 0x3x
+		0xb9, unkn, 0x14, 0x05, unkn, 0x4c, unkn, 0x60, unkn, 0xd3, 0xd4, unkn, unkn, unkn, unkn, 0x16, // 0x4x
+		0xa7, 0x69, 0x9c, unkn, 0x90, 0x1f, unkn, unkn, unkn, 0x49, unkn, 0x56, unkn, 0xfe, unkn, 0x8e, // 0x5x
+		0x27, 0x54, 0x66, unkn, 0x01, 0x03, 0x20, 0x0e, 0xf5, unkn, unkn, unkn, unkn, 0xc2, unkn, 0x25, // 0x6x
+		unkn, 0x21, unkn, 0xad, 0x51, 0x23, unkn, 0xd0, 0x40, 0x06, unkn, unkn, unkn, unkn, 0xe9, 0x48, // 0x7x
+		unkn, 0xc5, unkn, 0x45, unkn, unkn, unkn, 0x0f, 0xfd, unkn, 0xfa, 0x32, unkn, 0xf7, unkn, 0x68, // 0x8x
+		unkn, unkn, 0x0a, 0xc1, 0x8c, 0x22, 0xed, 0x28, 0xb1, 0x55, 0x6a, unkn, unkn, 0x1a, 0x46, unkn, // 0x9x
+		0x42, 0x24, 0x4b, unkn, unkn, unkn, unkn, unkn, unkn, 0x3f, 0x73, 0x00, 0xcb, 0x2d, unkn, unkn, // 0xax
+		0x3b, 0xfc, unkn, 0xe8, unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, 0xbc, 0x15, 0x50, unkn, // 0xbx
+		0x6f, 0x57, 0x33, 0x7c, unkn, unkn, 0xc6, unkn, 0xe0, 0x2a, unkn, 0x63, unkn, unkn, 0xff, 0xe6, // 0xcx
+		0x41, 0x1e, 0x43, 0xf9, unkn, 0x76, 0x2e, unkn, 0x44, unkn, 0x58, 0x0c, unkn, 0x1d, 0x53, 0x1b, // 0xdx
+		0x85, unkn, 0xa5, unkn, 0xe3, 0xb2, 0x02, 0x07, unkn, 0x91, 0xd8, unkn, 0x10, 0xca, unkn, unkn, // 0xex
+		unkn, 0x80, 0xe2, unkn, unkn, 0x1c, unkn, 0x4e, unkn, unkn, 0x17, 0x18, 0x11, 0x0b, unkn, 0x7f  // 0xfx
+	};
+
+	static const uint8_t data_sub_table_05[0x100] =
+	{// 0x00  0x01  0x02  0x03  0x04  0x05  0x06  0x07  0x08  0x09  0x0a  0x0b  0x0c  0x0d  0x0e  0x0f
+		0x2a, unkn, unkn, unkn, unkn, 0xe0, unkn, 0x3b, unkn, unkn, 0x79, 0x50, unkn, unkn, unkn, unkn, // 0x0x
+		unkn, unkn, unkn, 0x4b, unkn, unkn, 0x28, unkn, 0x07, 0x0a, 0xc5, unkn, unkn, 0x69, unkn, unkn, // 0x1x
+		unkn, 0x06, 0xc8, unkn, unkn, unkn, 0x3c, unkn, 0x6c, unkn, unkn, unkn, 0x11, 0x17, unkn, unkn, // 0x2x
+		0x66, unkn, unkn, 0x8a, unkn, 0x09, 0xfb, unkn, unkn, 0xcf, 0xc9, unkn, 0xd4, 0x1f, 0xb0, 0x7c, // 0x3x
+		unkn, unkn, 0x04, unkn, 0xff, 0x20, 0x02, 0x60, unkn, unkn, 0x12, 0x84, unkn, 0xef, 0xd7, 0xaa, // 0x4x
+		unkn, 0x34, unkn, unkn, unkn, unkn, unkn, 0x49, 0x56, 0xbe, 0x10, 0x4d, 0x7f, 0x19, unkn, 0x1d, // 0x5x
+		unkn, unkn, 0xf6, 0x36, unkn, unkn, unkn, unkn, unkn, 0xb6, 0xce, 0xf7, 0xb4, unkn, unkn, 0x43, // 0x6x
+		unkn, 0x3e, 0x4c, 0xc3, unkn, unkn, unkn, 0x00, unkn, 0x93, unkn, 0x01, 0x16, 0x0f, unkn, unkn, // 0x7x
+		unkn, unkn, unkn, unkn, unkn, unkn, 0xba, 0xbf, 0xf9, 0xad, 0x13, unkn, unkn, unkn, unkn, 0x44, // 0x8x
+		unkn, 0x26, unkn, 0x32, 0xc0, 0x21, unkn, unkn, 0x24, 0x64, 0x14, unkn, unkn, 0x2d, 0x4f, 0x0c, // 0x9x
+		unkn, unkn, 0x58, 0x1b, unkn, unkn, 0x99, unkn, 0x80, 0x2e, 0x7e, unkn, unkn, unkn, unkn, unkn, // 0xax
+		0x46, 0xac, unkn, unkn, unkn, unkn, 0x4e, unkn, unkn, 0x08, 0xfe, 0x57, unkn, unkn, 0xda, 0xa9, // 0xbx
+		0x63, 0x18, unkn, 0x0e, 0x3f, unkn, 0x76, 0x4a, unkn, 0xb3, 0x03, unkn, unkn, unkn, 0x6a, 0x52, // 0xcx
+		unkn, unkn, unkn, 0xf5, 0x31, 0xf0, unkn, 0x41, 0x70, 0xe9, 0x05, 0xe6, 0xfc, unkn, 0x0d, 0x90, // 0xdx
+		unkn, 0xa2, unkn, unkn, unkn, unkn, 0xe5, 0xf8, 0x62, 0x55, 0x45, unkn, unkn, 0x42, 0x68, 0x1e, // 0xex
+		unkn, 0x48, 0x15, 0x54, 0x1a, 0xe4, 0x33, 0x53, 0x30, 0x61, 0x1c, 0x40, 0x22, 0x0b, unkn, unkn  // 0xfx
+	};
+
+	static const uint8_t data_sub_table_06[0x100] =
+	{// 0x00  0x01  0x02  0x03  0x04  0x05  0x06  0x07  0x08  0x09  0x0a  0x0b  0x0c  0x0d  0x0e  0x0f
+		unkn, unkn, 0xe6, unkn, unkn, unkn, 0xc6, unkn, unkn, 0xf1, unkn, 0x23, 0x4f, 0xb8, unkn, unkn, // 0x0x
+		0x06, unkn, 0x7c, 0xda, unkn, unkn, 0xbf, unkn, unkn, unkn, 0x47, unkn, 0x44, 0x20, 0x93, 0x37, // 0x1x
+		unkn, unkn, unkn, unkn, unkn, unkn, 0x2f, unkn, 0x27, 0xed, 0x56, unkn, 0x2d, unkn, 0x45, unkn, // 0x2x
+		unkn, 0x58, 0x62, unkn, 0x65, unkn, unkn, unkn, 0x2a, unkn, unkn, unkn, 0x0c, unkn, unkn, 0x86, // 0x3x
+		0x05, 0xce, 0x0f, unkn, 0x11, 0x01, unkn, unkn, unkn, unkn, unkn, 0x1e, unkn, unkn, 0x21, unkn, // 0x4x
+		0x02, unkn, unkn, unkn, unkn, 0xf6, unkn, 0x80, 0x1a, unkn, 0x3d, 0x7b, 0x17, 0x70, 0x36, 0x77, // 0x5x
+		0x5e, 0xd1, unkn, 0xd0, 0x0b, unkn, 0x2e, unkn, 0x48, unkn, 0x24, 0xb0, unkn, unkn, 0xff, 0x10, // 0x6x
+		unkn, 0x40, 0xb6, unkn, 0x51, unkn, 0xe0, 0xad, 0x28, 0xc9, 0x9c, 0x1c, 0x57, unkn, 0x2c, 0x13, // 0x7x
+		0x53, unkn, 0x31, unkn, 0x8e, 0x43, unkn, 0x54, 0x49, 0xe5, unkn, unkn, 0x64, unkn, 0x34, 0x35, // 0x8x
+		0x1f, 0xf0, 0x3c, 0x4b, unkn, 0x19, unkn, unkn, 0x52, unkn, 0x00, 0x8c, unkn, 0xdf, unkn, 0x0d, // 0x9x
+		0x08, 0x4a, 0x1b, 0x2b, unkn, 0x4c, unkn, unkn, 0x63, unkn, 0xcf, 0xa1, 0x1d, unkn, unkn, 0x16, // 0xax
+		0xf5, unkn, 0x60, unkn, unkn, unkn, unkn, 0x50, 0x7a, 0x14, 0x03, 0xcb, unkn, unkn, unkn, unkn, // 0xbx
+		0x30, unkn, 0x78, 0x4d, unkn, 0x6b, unkn, unkn, unkn, 0x95, unkn, 0x42, unkn, unkn, 0xbe, 0x12, // 0xcx
+		0x83, 0xfe, 0x33, 0x90, unkn, 0xf4, 0x6e, 0x46, 0x07, 0x0a, 0xcc, 0x7f, unkn, unkn, unkn, 0xc0, // 0xdx
+		unkn, 0x3b, 0xb9, 0xa4, 0x09, unkn, 0x59, 0xfc, unkn, 0x4e, unkn, 0xf9, 0x41, 0x9a, 0xd3, 0x0e, // 0xex
+		unkn, unkn, unkn, 0x15, 0x32, unkn, 0x8b, 0x55, 0x18, 0x25, 0x04, 0x29, unkn, unkn, unkn, unkn  // 0xfx
+	};
+
+	static const uint8_t data_sub_table_07[0x100] =
+	{// 0x00  0x01  0x02  0x03  0x04  0x05  0x06  0x07  0x08  0x09  0x0a  0x0b  0x0c  0x0d  0x0e  0x0f
+		0x0e, unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, 0x3e, unkn, 0x08, unkn, unkn, 0x15, unkn, // 0x0x
+		unkn, 0x32, unkn, unkn, unkn, unkn, 0x87, unkn, 0x04, 0x47, 0x56, unkn, unkn, 0x69, 0x1c, 0x1e, // 0x1x
+		0x53, 0xed, 0x66, unkn, 0x40, unkn, 0x16, 0x2d, unkn, unkn, unkn, 0xda, unkn, 0xe5, unkn, unkn, // 0x2x
+		0x54, 0x06, 0x43, 0x24, unkn, 0x9a, 0x6e, 0x50, unkn, 0xdf, unkn, 0x20, 0xbc, 0xbf, 0xcf, unkn, // 0x3x
+		0x65, unkn, 0x4c, 0xb4, unkn, unkn, unkn, 0xf9, unkn, unkn, 0x1b, 0x8e, 0xe9, unkn, 0x01, 0x1d, // 0x4x
+		0xa5, 0x1f, 0xf7, unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, 0x03, 0x28, 0x4e, 0x17, // 0x5x
+		0x9e, 0xff, unkn, 0x05, 0x26, unkn, 0x0d, unkn, 0x3d, 0xcb, 0x11, 0x0f, 0x25, 0x1a, unkn, 0x38, // 0x6x
+		0xfb, 0x0a, 0x5a, 0x2a, unkn, unkn, 0x4d, 0xe0, unkn, unkn, unkn, unkn, 0x9f, 0xf0, 0x68, unkn, // 0x7x
+		unkn, 0xe8, 0x30, 0x60, unkn, 0xf4, 0x2e, 0x8b, 0x46, unkn, 0x27, unkn, 0x0b, 0xc0, 0x21, unkn, // 0x8x
+		unkn, unkn, unkn, 0x83, unkn, 0x6a, unkn, 0x84, unkn, unkn, 0x33, 0x3a, unkn, 0x18, unkn, 0xb0, // 0x9x
+		0xc9, unkn, 0x80, 0x3c, 0x07, 0xd5, unkn, 0x19, 0xc3, 0xcc, unkn, 0x57, unkn, 0x90, 0xfe, unkn, // 0xax
+		0xa4, 0x23, 0xa0, unkn, unkn, 0x41, unkn, 0xca, 0x35, 0x48, unkn, 0x00, unkn, 0x13, unkn, 0x44, // 0xbx
+		unkn, unkn, 0x4f, unkn, unkn, unkn, 0xc2, 0x09, unkn, 0x2b, 0xba, 0x34, unkn, unkn, 0x14, 0x2c, // 0xcx
+		0x86, unkn, 0x10, 0x12, unkn, 0xad, unkn, 0x7c, unkn, 0x4a, unkn, 0x45, 0x59, unkn, 0x63, unkn, // 0xdx
+		0x49, unkn, unkn, 0x67, 0x02, 0x4b, unkn, unkn, 0x6d, unkn, unkn, unkn, 0x55, 0x7e, unkn, unkn, // 0xex
+		0xd0, 0xf6, unkn, unkn, unkn, unkn, unkn, unkn, 0xef, 0x42, 0x51, unkn, unkn, unkn, unkn, 0x52  // 0xfx
+	};
+
+	static const uint8_t data_sub_table_08[0x100] =
+	{// 0x00  0x01  0x02  0x03  0x04  0x05  0x06  0x07  0x08  0x09  0x0a  0x0b  0x0c  0x0d  0x0e  0x0f
+		0x21, 0x6d, unkn, unkn, unkn, unkn, 0x32, unkn, unkn, 0x1a, 0x9a, unkn, 0x38, unkn, unkn, unkn, // 0x0x
+		0xcb, 0x3e, unkn, unkn, 0x16, 0x4e, unkn, unkn, 0xa4, unkn, 0xf6, 0xd0, unkn, 0x63, 0x08, 0x46, // 0x1x
+		0x02, unkn, 0x23, unkn, 0xed, unkn, 0xfa, unkn, unkn, unkn, unkn, 0x00, 0x2a, 0xc5, unkn, unkn, // 0x2x
+		0x3b, 0xf3, unkn, unkn, unkn, 0x67, 0xe0, 0xff, unkn, 0x4f, 0x53, 0x68, unkn, unkn, unkn, unkn, // 0x3x
+		0xf9, unkn, 0x2d, unkn, 0x5c, 0x1e, 0x0e, unkn, 0x54, unkn, unkn, unkn, 0x66, 0x4b, 0x0d, 0x90, // 0x4x
+		0x52, 0xc4, 0xb3, 0xa0, unkn, unkn, unkn, 0xf8, 0x45, unkn, unkn, 0x6b, unkn, 0x4a, 0x0f, 0x1c, // 0x5x
+		0xfc, 0x4d, 0x0c, 0x1d, unkn, 0x17, unkn, 0xad, unkn, 0xc2, 0xe6, unkn, 0x12, 0x04, 0x1b, 0x2b, // 0x6x
+		0x62, 0x6a, 0x85, 0xee, 0xb4, unkn, 0x11, 0x64, 0xd7, unkn, unkn, unkn, 0xa2, 0xe9, 0x7c, 0xca, // 0x7x
+		unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, 0xc7, 0xb7, 0x18, 0xab, unkn, unkn, 0x2c, 0xa1, // 0x8x
+		0x30, unkn, unkn, 0x73, 0x9c, unkn, 0x25, 0xd6, unkn, 0x03, 0xf4, 0x0b, 0xf0, 0x58, unkn, 0x7d, // 0x9x
+		unkn, 0x97, 0x14, 0xd5, unkn, unkn, unkn, unkn, 0xb6, unkn, 0x57, unkn, 0x55, 0x60, 0x59, unkn, // 0xax
+		0x06, 0x42, 0xe8, unkn, 0xc0, 0x20, unkn, unkn, unkn, unkn, unkn, unkn, 0x84, unkn, 0x01, unkn, // 0xbx
+		0x0a, 0x09, 0x56, unkn, 0x44, unkn, unkn, 0x49, 0x39, 0xbc, unkn, 0x05, unkn, unkn, unkn, 0x8d, // 0xcx
+		0x80, unkn, unkn, 0xcc, 0x41, 0xbf, unkn, 0x50, unkn, 0x65, unkn, 0x15, unkn, unkn, unkn, 0xb0, // 0xdx
+		0x47, 0x93, unkn, 0x48, 0x5d, unkn, 0x37, unkn, 0x43, 0xfe, 0x40, 0x33, 0x07, 0x10, unkn, 0x76, // 0xex
+		unkn, 0x13, 0xef, 0x3c, unkn, 0x8e, unkn, 0xc3, unkn, unkn, unkn, 0x7e, unkn, 0x2e, unkn, unkn  // 0xfx
+	};
+
+	static const uint8_t data_sub_table_09[0x100] =
+	{// 0x00  0x01  0x02  0x03  0x04  0x05  0x06  0x07  0x08  0x09  0x0a  0x0b  0x0c  0x0d  0x0e  0x0f
+		0xb1, 0xfd, unkn, 0xdc, unkn, unkn, 0x4f, 0x96, unkn, 0x2b, 0x34, unkn, 0x56, 0x90, 0x3b, 0xf5, // 0x0x
+		unkn, unkn, unkn, 0x59, unkn, 0x2e, unkn, 0x58, 0x79, 0x0f, 0xb0, unkn, unkn, unkn, unkn, unkn, // 0x1x
+		0xc0, unkn, 0xfc, unkn, unkn, unkn, 0x11, 0x2c, unkn, 0x80, unkn, 0x10, unkn, 0xf6, 0xc8, 0x3c, // 0x2x
+		unkn, 0x37, 0x63, unkn, 0x02, unkn, unkn, unkn, 0x33, unkn, unkn, unkn, unkn, unkn, unkn, 0x62, // 0x3x
+		unkn, unkn, 0x14, 0x2a, unkn, 0x38, 0x92, unkn, unkn, unkn, unkn, 0x45, unkn, 0x18, 0x0c, 0x46, // 0x4x
+		0x1b, 0x1d, unkn, unkn, 0xe0, unkn, unkn, 0xad, unkn, 0x42, unkn, 0x03, 0xc6, 0xf1, 0xff, 0xf7, // 0x5x
+		unkn, unkn, unkn, unkn, 0xa1, unkn, unkn, unkn, unkn, 0x13, 0x26, 0xb6, 0x19, unkn, unkn, 0xa4, // 0x6x
+		unkn, 0x6a, 0xaa, unkn, 0x01, unkn, 0xf9, 0x20, unkn, 0x3e, unkn, 0x07, unkn, 0x06, unkn, unkn, // 0x7x
+		0xc3, 0xd2, unkn, 0x2d, unkn, 0x0a, 0xc5, unkn, unkn, unkn, 0x44, 0xd7, 0x52, 0xf2, unkn, unkn, // 0x8x
+		0x4c, unkn, 0x28, 0x48, unkn, 0x76, unkn, unkn, 0xd5, 0x50, 0xd4, 0x32, 0x0e, 0x08, 0x09, unkn, // 0x9x
+		0x4d, 0x93, unkn, 0xf0, unkn, unkn, 0xbc, unkn, unkn, 0x16, unkn, unkn, 0x55, 0x3a, 0x8e, 0x60, // 0xax
+		0xcc, 0xe8, unkn, unkn, unkn, unkn, unkn, unkn, 0x05, 0x53, unkn, 0xaf, unkn, 0xfa, 0xbb, unkn, // 0xbx
+		0xd0, 0xfe, unkn, unkn, 0xee, unkn, unkn, 0x12, 0x85, unkn, 0x30, 0x15, unkn, 0x04, 0x00, 0xce, // 0xcx
+		0x65, 0x4a, unkn, unkn, 0x0b, unkn, 0x49, unkn, unkn, 0x6c, 0x0d, 0x41, 0x7c, unkn, 0xda, unkn, // 0xdx
+		0x4e, unkn, unkn, unkn, unkn, 0x17, unkn, unkn, 0xf8, 0xd6, unkn, unkn, unkn, unkn, 0x43, 0x4b, // 0xex
+		unkn, 0x54, 0x1c, 0x1e, unkn, unkn, unkn, unkn, 0xe6, unkn, unkn, unkn, 0x95, unkn, 0x57, unkn  // 0xfx
+	};
+
+	static const uint8_t data_sub_table_0a[0x100] =
+	{// 0x00  0x01  0x02  0x03  0x04  0x05  0x06  0x07  0x08  0x09  0x0a  0x0b  0x0c  0x0d  0x0e  0x0f
+		0x20, unkn, unkn, 0x62, 0x69, unkn, unkn, 0xc0, unkn, unkn, 0x98, unkn, unkn, unkn, unkn, 0x0e, // 0x0x
+		0x70, 0xfe, 0x19, unkn, unkn, 0x18, 0x2c, 0x57, unkn, unkn, 0xe9, 0x50, 0x46, 0x16, 0xe6, unkn, // 0x1x
+		unkn, unkn, 0x03, unkn, 0xe4, unkn, 0x64, 0xe8, 0xad, unkn, 0x05, 0x0a, 0x21, 0x07, unkn, unkn, // 0x2x
+		unkn, 0x0c, 0x56, 0x27, 0x4b, unkn, unkn, 0x80, 0x6c, unkn, unkn, 0x3f, 0x25, 0x63, 0x00, unkn, // 0x3x
+		0x4e, unkn, 0xd3, 0x41, 0x39, unkn, unkn, 0x09, unkn, 0x2a, unkn, 0x5d, unkn, 0x04, 0xd5, 0x2d, // 0x4x
+		0xbc, unkn, unkn, unkn, unkn, 0x91, unkn, unkn, 0x48, unkn, unkn, 0x35, 0x8e, unkn, 0xf7, unkn, // 0x5x
+		unkn, unkn, unkn, 0x1d, unkn, unkn, 0xf5, unkn, 0xf2, 0x6e, unkn, unkn, unkn, 0xf8, unkn, unkn, // 0x6x
+		unkn, 0x3b, unkn, 0x4c, unkn, 0x08, unkn, unkn, 0x85, unkn, 0x52, 0xc6, 0x60, unkn, 0x0f, unkn, // 0x7x
+		0x76, unkn, 0x55, 0x66, unkn, 0x45, unkn, unkn, unkn, 0x5c, 0xd0, unkn, 0xa1, unkn, unkn, unkn, // 0x8x
+		unkn, 0xf0, unkn, 0x78, unkn, unkn, 0x43, 0xfd, unkn, unkn, 0xa4, 0x75, 0x2e, 0x2b, unkn, 0x1f, // 0x9x
+		0xd1, unkn, 0x54, unkn, 0x10, 0xbf, unkn, unkn, unkn, 0x1e, 0xc1, unkn, 0x0d, 0x32, 0xc7, unkn, // 0xax
+		0xcf, unkn, 0x14, unkn, unkn, unkn, unkn, unkn, 0x01, unkn, unkn, unkn, 0x1c, unkn, 0x3c, unkn, // 0xbx
+		0xa2, 0xf9, 0xb0, 0x44, unkn, 0x24, unkn, unkn, unkn, 0x12, 0x68, 0xe0, 0x11, 0x4d, unkn, 0x13, // 0xcx
+		unkn, 0x94, 0x49, unkn, unkn, unkn, unkn, 0x17, 0x33, unkn, unkn, unkn, unkn, 0xdf, 0xf4, 0xfa, // 0xdx
+		unkn, unkn, 0x30, unkn, 0x06, unkn, 0x02, unkn, 0x53, unkn, unkn, 0x9a, 0x92, 0x34, unkn, 0x0b, // 0xex
+		0x4a, unkn, unkn, 0xc3, 0x4f, 0xf1, unkn, unkn, 0xfc, unkn, 0xef, 0xff, unkn, unkn, unkn, 0x51  // 0xfx
+	};
+
+	static const uint8_t data_sub_table_0b[0x100] =
+	{// 0x00  0x01  0x02  0x03  0x04  0x05  0x06  0x07  0x08  0x09  0x0a  0x0b  0x0c  0x0d  0x0e  0x0f
+		unkn, 0x39, unkn, unkn, unkn, 0x69, 0x27, unkn, 0xf0, unkn, unkn, unkn, unkn, unkn, unkn, 0x57, // 0x0x
+		0x9a, 0x10, unkn, 0x04, 0x08, 0xd6, unkn, unkn, 0x03, 0x6b, 0x1f, 0x37, unkn, 0x30, 0xe9, unkn, // 0x1x
+		0xc4, unkn, 0x25, unkn, 0x7d, unkn, 0xe5, unkn, 0x1e, unkn, 0x54, 0xd0, unkn, 0x49, 0x80, unkn, // 0x2x
+		0x78, unkn, 0x3f, 0x9f, 0xf7, 0x11, 0x67, 0xa2, unkn, 0x4a, 0x33, unkn, unkn, 0xef, unkn, 0xd1, // 0x3x
+		0xd7, unkn, 0xfc, unkn, 0x3d, 0xfe, unkn, 0x14, 0x05, 0x0f, 0x3e, 0xc7, 0x45, 0xca, 0x59, 0x35, // 0x4x
+		unkn, unkn, 0x13, 0x41, unkn, 0xcb, 0x09, 0x4d, unkn, 0xbb, 0x51, 0x66, unkn, unkn, unkn, unkn, // 0x5x
+		unkn, unkn, unkn, unkn, unkn, 0x07, 0x8e, 0x2a, 0xdf, 0xb0, 0x19, 0x18, 0x2f, unkn, 0x1d, 0xc0, // 0x6x
+		unkn, unkn, 0x52, unkn, 0x00, 0xf8, unkn, unkn, 0x20, unkn, 0xad, 0x1c, 0x68, unkn, 0x34, unkn, // 0x7x
+		unkn, 0x1a, 0x0a, 0x62, 0x55, 0x32, unkn, unkn, 0xf4, unkn, unkn, unkn, unkn, 0xa3, 0x44, 0x85, // 0x8x
+		unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, 0x0e, 0x3c, unkn, unkn, // 0x9x
+		unkn, unkn, 0x7f, 0x16, 0x48, unkn, unkn, 0x0c, unkn, 0x64, unkn, 0x50, unkn, 0x36, unkn, unkn, // 0xax
+		unkn, 0x06, 0x83, 0xa4, 0x53, unkn, unkn, unkn, unkn, unkn, unkn, 0x47, unkn, unkn, unkn, 0x46, // 0xbx
+		0x90, 0x60, unkn, 0xf6, unkn, 0xf5, 0xff, 0x31, unkn, 0x17, 0x43, 0xe6, unkn, 0x40, 0x02, unkn, // 0xcx
+		0x56, 0x4b, 0xda, 0x15, unkn, 0x4f, unkn, unkn, unkn, unkn, 0x63, 0x0b, 0xa5, unkn, unkn, 0xbf, // 0xdx
+		unkn, 0x01, 0x12, unkn, unkn, unkn, unkn, unkn, unkn, 0x0d, unkn, unkn, unkn, 0x1b, 0x4c, unkn, // 0xex
+		unkn, unkn, 0x2d, unkn, 0x26, unkn, 0x84, 0x4e, 0x28, unkn, unkn, unkn, 0x2c, 0x2e, unkn, 0xe0  // 0xfx
+	};
+
+	static const uint8_t data_sub_table_0c[0x100] =
+	{// 0x00  0x01  0x02  0x03  0x04  0x05  0x06  0x07  0x08  0x09  0x0a  0x0b  0x0c  0x0d  0x0e  0x0f
+		0x5e, unkn, 0xcb, 0x2a, 0x3f, 0x55, 0x51, 0xc5, 0x0b, unkn, 0x79, unkn, unkn, unkn, unkn, unkn, // 0x0x
+		0x8e, 0x29, unkn, 0x62, unkn, unkn, unkn, 0x1e, unkn, unkn, unkn, 0x52, unkn, 0xff, 0xe6, 0xe2, // 0x1x
+		unkn, 0x09, 0x7c, 0x18, unkn, 0x63, unkn, 0xdf, 0x60, unkn, 0x16, unkn, unkn, 0x2e, 0x3b, 0x3e, // 0x2x
+		0x20, unkn, 0xca, 0x34, 0x1c, unkn, unkn, 0xdd, unkn, 0x2c, unkn, unkn, unkn, 0xc0, 0xda, unkn, // 0x3x
+		0x40, 0x35, 0x1d, unkn, 0x43, 0xc2, unkn, unkn, 0x3d, unkn, 0x33, 0x88, 0x4d, unkn, 0xc3, 0x54, // 0x4x
+		unkn, 0x48, unkn, 0x27, unkn, unkn, 0x38, unkn, unkn, 0x0d, unkn, 0x61, 0x17, 0x10, 0x45, unkn, // 0x5x
+		0x0f, unkn, unkn, 0x57, 0x05, 0xaa, unkn, unkn, 0x75, unkn, unkn, 0x90, 0x1a, unkn, 0x24, unkn, // 0x6x
+		unkn, 0x12, unkn, 0xfe, 0x21, unkn, 0x01, unkn, unkn, 0xe0, unkn, 0x4f, 0x32, unkn, unkn, unkn, // 0x7x
+		unkn, 0x23, 0x3c, 0x00, unkn, unkn, unkn, unkn, unkn, unkn, 0xd0, 0x0a, 0x50, 0xf9, 0x59, 0xb6, // 0x8x
+		0x28, 0xa3, unkn, 0x30, unkn, 0x44, unkn, unkn, 0x58, unkn, 0x11, 0xbb, 0x03, unkn, unkn, 0x13, // 0x9x
+		0xf6, 0x06, 0xbf, 0x41, unkn, 0x74, 0x9a, 0xce, 0x98, 0xf1, unkn, unkn, 0x04, unkn, unkn, 0x80, // 0xax
+		0x14, 0xb4, unkn, unkn, 0x08, 0xf0, 0x25, unkn, unkn, unkn, unkn, 0xea, 0x46, 0xe9, 0x31, 0x67, // 0xbx
+		0x6c, unkn, 0xc7, 0x07, unkn, unkn, 0x0c, unkn, 0x2b, unkn, unkn, 0xcf, 0x4b, unkn, 0xc4, 0x47, // 0xcx
+		0x9f, unkn, unkn, 0x53, unkn, unkn, 0x65, unkn, 0xa0, 0x15, unkn, unkn, unkn, 0xf4, 0x2d, 0xf8, // 0xdx
+		0x02, unkn, 0x36, 0x85, 0x1b, unkn, unkn, 0x37, unkn, unkn, unkn, unkn, 0x5d, 0x66, 0xef, 0xed, // 0xex
+		0x0e, unkn, 0x4a, unkn, 0xc6, 0x49, 0x4c, unkn, unkn, unkn, unkn, 0x4e, unkn, unkn, unkn, unkn  // 0xfx
+	};
+
+	static const uint8_t data_sub_table_0d[0x100] =
+	{// 0x00  0x01  0x02  0x03  0x04  0x05  0x06  0x07  0x08  0x09  0x0a  0x0b  0x0c  0x0d  0x0e  0x0f
+		unkn, unkn, 0x12, 0x5e, unkn, 0x50, 0xae, unkn, 0x52, unkn, unkn, 0x20, 0x35, 0xf6, 0xd0, 0x11, // 0x0x
+		0x7f, unkn, 0xe0, 0xe4, unkn, unkn, unkn, 0x48, unkn, 0xd1, 0xb0, 0xd7, unkn, 0xdd, 0x70, 0x6d, // 0x1x
+		0x61, unkn, unkn, 0x53, unkn, unkn, unkn, 0x01, unkn, 0x2d, unkn, unkn, unkn, 0x4b, unkn, unkn, // 0x2x
+		unkn, unkn, 0x18, 0xff, 0x2a, 0xfe, unkn, 0x4c, 0x3c, unkn, 0x10, unkn, 0xc2, 0x1c, unkn, 0x60, // 0x3x
+		0x69, 0x02, unkn, 0x39, 0x0e, 0x73, 0x0a, 0x31, unkn, 0xf8, 0x55, unkn, 0xa2, unkn, unkn, unkn, // 0x4x
+		unkn, unkn, unkn, unkn, 0xf1, 0x14, unkn, unkn, unkn, unkn, unkn, 0x04, unkn, 0xad, 0x44, 0x90, // 0x5x
+		0x6b, unkn, 0x8a, 0x22, 0x0b, 0xe8, 0xf3, unkn, 0x0c, 0xc0, 0x28, 0xf7, 0x1b, unkn, 0x30, unkn, // 0x6x
+		unkn, unkn, 0x00, unkn, unkn, unkn, 0x8b, unkn, 0x32, unkn, unkn, 0x15, 0x05, 0x46, unkn, 0x13, // 0x7x
+		unkn, 0x45, 0x34, 0x06, 0x63, 0x2c, unkn, unkn, unkn, 0xcb, unkn, 0x0d, unkn, 0x08, unkn, unkn, // 0x8x
+		unkn, 0x17, 0xcd, 0x64, unkn, 0xed, 0xf4, 0xcc, unkn, unkn, unkn, 0x4d, unkn, 0x7e, unkn, 0xc4, // 0x9x
+		0x09, 0x3e, unkn, 0x65, 0x3b, unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, 0xce, unkn, // 0xax
+		unkn, 0x7c, unkn, 0x3f, 0x4f, unkn, unkn, unkn, unkn, unkn, 0x80, unkn, 0xe6, 0x42, unkn, unkn, // 0xbx
+		0xda, unkn, unkn, 0x1f, unkn, 0x2b, unkn, unkn, 0xe9, 0x23, 0x62, 0x19, unkn, unkn, 0x86, unkn, // 0xcx
+		0xf5, 0xf0, 0x41, 0x43, unkn, 0x40, unkn, 0x25, 0xf9, 0x4a, unkn, 0x4e, 0x2e, 0x03, unkn, unkn, // 0xdx
+		unkn, 0x88, 0x0f, 0xee, 0x16, 0x1e, 0xa0, 0xe2, unkn, 0x59, unkn, 0xa9, unkn, unkn, unkn, 0x6a, // 0xex
+		unkn, 0x47, 0x49, 0x76, 0x07, unkn, unkn, unkn, 0x54, unkn, 0xb4, unkn, 0x96, unkn, unkn, 0x38  // 0xfx
+	};
+
+	static const uint8_t data_sub_table_0e[0x100] =
+	{// 0x00  0x01  0x02  0x03  0x04  0x05  0x06  0x07  0x08  0x09  0x0a  0x0b  0x0c  0x0d  0x0e  0x0f
+		0xff, unkn, unkn, 0xf0, 0x30, 0xed, 0x0b, 0x63, unkn, unkn, 0x3f, 0x1e, unkn, unkn, 0x41, 0xa6, // 0x0x
+		unkn, 0x47, 0x2a, 0xd0, 0x4c, unkn, unkn, unkn, 0x51, unkn, unkn, 0xb0, 0xcf, unkn, unkn, 0x90, // 0x1x
+		0x1f, 0x39, unkn, unkn, 0xbf, unkn, 0x0d, 0x07, 0x52, 0xaa, 0x15, unkn, unkn, 0x49, 0x14, 0xf4, // 0x2x
+		unkn, 0x43, 0xe0, unkn, unkn, 0x85, unkn, 0x4e, 0x33, 0x60, unkn, 0xf7, 0x62, unkn, unkn, unkn, // 0x3x
+		0x4a, unkn, unkn, unkn, 0x2c, unkn, 0x68, unkn, 0xe6, 0x4f, 0xe9, unkn, 0xc4, 0x53, unkn, 0x18, // 0x4x
+		unkn, unkn, 0x57, 0x78, 0xef, 0x03, unkn, 0xc6, 0x19, 0x1d, unkn, 0x44, 0xc9, 0x96, unkn, unkn, // 0x5x
+		unkn, unkn, unkn, 0x61, 0x0c, 0x3c, 0x45, unkn, 0x08, unkn, unkn, 0xcd, unkn, 0xfc, 0x1c, unkn, // 0x6x
+		unkn, unkn, unkn, unkn, 0xf6, unkn, 0x79, unkn, unkn, 0x5d, 0xc7, 0xd1, 0x29, 0xc0, 0x32, 0x46, // 0x7x
+		unkn, unkn, 0x7f, 0x9c, 0xd2, unkn, unkn, unkn, unkn, 0x0f, unkn, 0x4b, 0x00, 0xf9, 0x95, unkn, // 0x8x
+		0xf1, unkn, 0x26, unkn, unkn, 0x2e, 0x28, unkn, 0xe4, unkn, unkn, 0x9d, 0x5b, unkn, unkn, 0x1a, // 0x9x
+		0x2d, 0x7c, unkn, 0x88, unkn, unkn, 0xdf, 0x05, unkn, 0x0a, unkn, unkn, unkn, 0xad, 0xd7, unkn, // 0xax
+		unkn, unkn, 0x06, unkn, 0x59, 0x54, unkn, 0x02, 0x12, 0x34, unkn, unkn, 0x20, 0x09, unkn, unkn, // 0xbx
+		0x40, unkn, 0x55, unkn, unkn, 0x23, unkn, 0x38, 0x17, unkn, 0x16, unkn, 0x65, unkn, 0xeb, 0x24, // 0xcx
+		unkn, unkn, 0x2b, unkn, unkn, unkn, 0x76, unkn, unkn, 0xbb, unkn, 0x13, unkn, 0xc5, 0xa0, 0x21, // 0xdx
+		0x0e, unkn, 0xda, unkn, unkn, 0x6a, unkn, 0xd5, unkn, 0x04, unkn, 0x66, 0xf5, 0x50, unkn, 0xf8, // 0xex
+		0xc3, unkn, 0xc2, unkn, unkn, 0x11, 0x48, 0x01, 0x2f, unkn, 0x3b, unkn, unkn, 0x10, 0xcb, 0xf2  // 0xfx
+	};
+
+	static const uint8_t data_sub_table_0f[0x100] =
+	{// 0x00  0x01  0x02  0x03  0x04  0x05  0x06  0x07  0x08  0x09  0x0a  0x0b  0x0c  0x0d  0x0e  0x0f
+		0x04, unkn, unkn, unkn, unkn, unkn, unkn, unkn, 0xb4, unkn, 0x50, unkn, 0x63, unkn, unkn, 0x20, // 0x0x
+		unkn, unkn, 0x85, 0x19, 0x46, 0x00, unkn, 0x58, unkn, 0xcb, unkn, 0x41, 0xc0, 0x30, unkn, 0x48, // 0x1x
+		unkn, 0x07, 0xf0, 0x65, unkn, 0xbf, 0x91, 0x45, 0x62, 0x35, 0x40, unkn, 0x56, unkn, unkn, unkn, // 0x2x
+		0x69, 0x4c, 0x0d, 0xe9, unkn, unkn, unkn, 0xee, 0x5e, unkn, 0xf4, 0x49, 0xa3, 0x08, unkn, 0x0b, // 0x3x
+		0x18, 0x43, unkn, unkn, 0x24, 0x0f, 0x5b, unkn, 0x86, unkn, unkn, 0x73, unkn, unkn, unkn, 0x0a, // 0x4x
+		0x17, unkn, 0x4b, 0x52, 0xd5, 0xba, unkn, unkn, 0x53, unkn, unkn, unkn, 0xad, 0xe8, 0x3f, unkn, // 0x5x
+		0xb0, unkn, 0xae, 0x1a, 0xc4, unkn, 0x11, 0x37, 0x67, unkn, 0x44, unkn, 0xb6, 0x4a, 0x2d, unkn, // 0x6x
+		0x59, 0xd0, unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn, 0x61, 0x32, unkn, 0x6b, 0x3e, 0x26, // 0x7x
+		unkn, unkn, unkn, 0xce, unkn, 0x7c, 0x0e, 0xb3, unkn, unkn, unkn, unkn, 0x16, unkn, 0x80, 0xbb, // 0x8x
+		unkn, unkn, 0x2b, unkn, 0xc6, unkn, unkn, 0x54, 0x90, unkn, 0x09, 0x01, unkn, unkn, unkn, 0x05, // 0x9x
+		0x1c, 0x1f, 0x55, unkn, unkn, 0xf8, 0x3b, 0xfe, 0xe0, unkn, 0x12, unkn, unkn, 0xe4, unkn, 0x34, // 0xax
+		unkn, unkn, 0x10, unkn, unkn, unkn, unkn, 0xf5, 0x06, 0x57, 0x4f, 0x03, 0xd1, unkn, unkn, 0x3a, // 0xbx
+		0x38, 0x6f, 0xa2, 0xe5, unkn, 0xed, 0x14, unkn, unkn, 0x4d, 0x0c, 0x7e, unkn, 0x2e, unkn, 0x6a, // 0xcx
+		unkn, unkn, 0xa0, 0x22, 0x33, unkn, unkn, unkn, 0x15, 0x4e, unkn, 0xfb, 0x8e, unkn, unkn, unkn, // 0xdx
+		unkn, 0xcf, unkn, 0x2c, 0x60, unkn, 0x1b, 0xe6, 0x02, unkn, 0x1d, unkn, unkn, 0x1e, unkn, unkn, // 0xex
+		unkn, unkn, 0x47, unkn, unkn, 0xf9, 0x8a, 0x76, 0x6c, unkn, 0xfc, unkn, 0x64, 0x25, unkn, 0xff  // 0xfx
+	};
+
+	for (int i = 0; i < 0x2000; i++)
+	{
+		uint8_t x = rom[i];
+
+		switch(i & 0x0f)
+		{
+			case 0x00: rom[i] = data_sub_table_00[x]; break;
+			case 0x01: rom[i] = data_sub_table_01[x]; break;
+			case 0x02: rom[i] = data_sub_table_02[x]; break;
+			case 0x03: rom[i] = data_sub_table_03[x]; break;
+			case 0x04: rom[i] = data_sub_table_04[x]; break;
+			case 0x05: rom[i] = data_sub_table_05[x]; break;
+			case 0x06: rom[i] = data_sub_table_06[x]; break;
+			case 0x07: rom[i] = data_sub_table_07[x]; break;
+			case 0x08: rom[i] = data_sub_table_08[x]; break;
+			case 0x09: rom[i] = data_sub_table_09[x]; break;
+			case 0x0a: rom[i] = data_sub_table_0a[x]; break;
+			case 0x0b: rom[i] = data_sub_table_0b[x]; break;
+			case 0x0c: rom[i] = data_sub_table_0c[x]; break;
+			case 0x0d: rom[i] = data_sub_table_0d[x]; break;
+			case 0x0e: rom[i] = data_sub_table_0e[x]; break;
+			case 0x0f: rom[i] = data_sub_table_0f[x]; break;
+		}
+	}
 }
 
 void norautp_state::init_deb()
-/* Just for debugging purposes */
-/*   Should be removed soon    */
+// Just for debugging purposes
+// Should be removed soon
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	ROM[0x02f7] = 0xca;
@@ -3757,47 +4541,47 @@ void norautp_state::init_ssa()
 }
 
 
-/*************************
-*      Game Drivers      *
-*************************/
+/*********************************************
+*                Game Drivers                *
+*********************************************/
 
-/************************************** Z80 sets **************************************/
-/*  The following ones are 'Draw Poker HI-LO' type, running in a Z80 based hardware   */
-/**************************************************************************************/
+//************************************** Z80 sets **************************************
+//*  The following ones are 'Draw Poker HI-LO' type, running in a Z80 based hardware   *
+//**************************************************************************************
 
-//     YEAR  NAME      PARENT   MACHINE   INPUT     CLASS          INIT        ROT   COMPANY                     FULLNAME                               FLAGS                LAYOUT
-GAMEL( 1988, norautp,  0,       norautp,  norautp,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Poker",                        0,                   layout_noraut11 )
-GAMEL( 198?, norautdx, 0,       norautp,  norautpn, norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Deluxe Poker (console)",       0,                   layout_noraut12 )
-GAMEL( 198?, norautpn, norautp, norautp,  norautpn, norautp_state, empty_init, ROT0, "bootleg",                  "Noraut Deluxe Poker (bootleg)",       0,                   layout_noraut12 )
-GAMEL( 198?, norautjo, 0,       norautp,  mainline, norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Joker Poker (original)",       0,                   layout_noraut12 )
-GAMEL( 198?, norautpl, 0,       norautpl, mainline, norautp_state, empty_init, ROT0, "Video Fun Games Ltd.",     "Noraut Joker Poker (Prologic HW)",    0,                   layout_noraut12 )
-GAMEL( 1988, norautjp, norautp, norautp,  norautp,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Joker Poker (alt)",            0,                   layout_noraut11 )
-GAMEL( 1988, norautrh, 0,       norautp,  norautrh, norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Red Hot Joker Poker",          0,                   layout_noraut12 )
-GAMEL( 198?, norautra, 0,       norautp,  norautrh, norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Red Hot Joker Poker (alt HW)", 0,                   layout_noraut12 ) // 1-bet?? where??...
-GAME(  1988, norautu,  0,       norautxp, norautp,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Poker (NTX10A)",               MACHINE_NOT_WORKING )
-GAME(  2002, noraut3a, 0,       norautxp, norautp,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Joker Poker (V3.010a)",        MACHINE_NOT_WORKING )
-GAME(  2003, noraut3b, 0,       norautxp, norautp,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Joker Poker (V3.011a)",        MACHINE_NOT_WORKING )
-GAMEL( 198?, norautua, 0,       norautp,  norautp,  norautp_state, init_enc,   ROT0, "Noraut Ltd.",              "Noraut unknown set 1 (console)",      MACHINE_NOT_WORKING, layout_noraut12 )
-GAMEL( 198?, norautub, 0,       norautp,  norautp,  norautp_state, init_enc,   ROT0, "Noraut Ltd.",              "Noraut unknown set 2 (console)",      MACHINE_NOT_WORKING, layout_noraut12 )
-GAMEL( 198?, mainline, 0,       norautp,  mainline, norautp_state, empty_init, ROT0, "Mainline London",          "Mainline Double Joker Poker",         0,                   layout_noraut12 )
-GAMEL( 199?, df_djpkr, 0,       norautp,  mainline, norautp_state, empty_init, ROT0, "DellFern Ltd.",            "Double Joker Poker (45%-75% payout)", 0,                   layout_noraut12 )
-GAMEL( 2005, ndxron10, 0,       norautp,  ndxron10, norautp_state, empty_init, ROT0, "<unknown>",                "Royal on Ten (Noraut Deluxe hack)",   0,                   layout_noraut12 )
-GAMEL( 1999, cgip30cs, 0,       norautx4, norautkl, norautp_state, init_deb,   ROT0, "CGI",                      "Credit Poker (ver.30c, standard)",    0,                   layout_noraut12 ) // CGI - Credit Poker, VERSION 30C, 21/12/99
-GAMEL( 1999, cgip30b,  cgip30cs,norautx4, norautkl, norautp_state, empty_init, ROT0, "CGI",                      "Credit Poker (ver.30b, 7 & 9 bonus)", 0,                   layout_noraut12 ) // CGI - Credit Poker, VERSION 30B, 7 &9 BONUS, 21/12/99 BY V.S. for CGI
-GAMEL( 1998, cgip23b,  cgip30cs,norautx4, norautkl, norautp_state, empty_init, ROT0, "CGI",                      "Credit Poker (ver.23b, 7 & 9 bonus)", 0,                   layout_noraut12 ) // CGI - Credit Poker, VERSION 23B, 7 &9 BONUS, 31.03.98. BY V.S.
-GAMEL( 19??, cgidjp,   0,       cgidjp,   mainline, norautp_state, empty_init, ROT0, "CGI",                      "Double Joker Poker (CGI)",            0,                   layout_noraut12 ) // very similar to df_djpkr
-GAME(  198?, kimblz80, 0,       kimble,   norautp,  norautp_state, empty_init, ROT0, "Kimble Ireland",           "Kimble Double HI-LO (z80 version)",   MACHINE_NOT_WORKING )
-GAME(  1983, pma,      0,       nortest1, norautp,  norautp_state, empty_init, ROT0, "PMA",                      "PMA Poker",                           MACHINE_NOT_WORKING )
-GAMEL( 198?, bjpoker,  0,       norautxp, norautrh, norautp_state, empty_init, ROT0, "M.Kramer Manufacturing.",  "Poker / Black Jack (Model 7521)",     MACHINE_NOT_WORKING, layout_noraut12 )
-GAME(  19??, newhilop, 0,       newhilop, norautp,  norautp_state, empty_init, ROT0, "Song Won?",                "New Hi-Low Poker",                    MACHINE_NOT_WORKING )
-GAMEL( 1984, cdrawpkr, 0,       cdrawpkr, cdrawpkr, norautp_state, empty_init, ROT0, "Coinmaster",               "Draw Poker (Joker Poker V.01)",       0,                   layout_noraut11 )
+//     YEAR  NAME      PARENT   MACHINE   INPUT     CLASS          INIT        ROT   COMPANY                     FULLNAME                                        FLAGS                 LAYOUT
+GAMEL( 1988, norautp,  0,       norautp,  norautp,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Poker",                                 0,                    layout_noraut11 )
+GAMEL( 198?, norautdx, 0,       norautp,  norautpn, norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Deluxe Poker (console)",                0,                    layout_noraut12 )
+GAMEL( 198?, norautpn, norautp, norautp,  norautpn, norautp_state, empty_init, ROT0, "bootleg",                  "Noraut Deluxe Poker (bootleg)",                0,                    layout_noraut12 )
+GAMEL( 198?, norautjo, 0,       norautp,  mainline, norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Joker Poker (original)",                0,                    layout_noraut12 )
+GAMEL( 198?, norautpl, 0,       norautpl, mainline, norautp_state, empty_init, ROT0, "Video Fun Games Ltd.",     "Noraut Joker Poker (Prologic HW)",             0,                    layout_noraut12 )
+GAMEL( 1988, norautjp, norautp, norautp,  norautp,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Joker Poker (alt)",                     0,                    layout_noraut11 )
+GAMEL( 1988, norautrh, 0,       norautp,  norautrh, norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Red Hot Joker Poker",                   0,                    layout_noraut12 )
+GAMEL( 198?, norautra, 0,       norautp,  norautrh, norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Red Hot Joker Poker (alt HW)",          0,                    layout_noraut12 ) // 1-bet?? where??...
+GAME(  1988, norautu,  0,       norautxp, norautp,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Poker (NTX10A)",                        MACHINE_NOT_WORKING )
+GAMEL( 2002, noraut3a, 0,       noraut3,  noraut3,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Jacks Plus / Joker Poker (V3.010a)",    MACHINE_NOT_WORKING,  layout_noraut12 )
+GAMEL( 2003, noraut3b, 0,       noraut3,  noraut3,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Jacks Plus / Joker Poker (V3.011a)",    MACHINE_NOT_WORKING,  layout_noraut12 )
+GAMEL( 198?, norautua, 0,       norautu,  norautp,  norautp_state, init_enc,   ROT0, "Noraut Ltd.",              "Noraut Joker Poker (console, set 1)",          MACHINE_NOT_WORKING,  layout_noraut12 )
+GAMEL( 198?, norautub, 0,       norautu,  norautp,  norautp_state, init_enc,   ROT0, "Noraut Ltd.",              "Noraut Joker Poker (console, set 2)",          MACHINE_NOT_WORKING,  layout_noraut12 )
+GAMEL( 198?, mainline, 0,       norautp,  mainline, norautp_state, empty_init, ROT0, "Mainline London",          "Mainline Double Joker Poker",                  0,                    layout_noraut12 )
+GAMEL( 199?, df_djpkr, 0,       norautp,  mainline, norautp_state, empty_init, ROT0, "DellFern Ltd.",            "Double Joker Poker (45%-75% payout)",          0,                    layout_noraut12 )
+GAMEL( 2005, ndxron10, 0,       norautp,  ndxron10, norautp_state, empty_init, ROT0, "<unknown>",                "Royal on Ten (hack of Noraut Deluxe Poker)",   0,                    layout_noraut12 )
+GAMEL( 1999, cgip30cs, 0,       norautx4, norautkl, norautp_state, init_deb,   ROT0, "CGI",                      "Credit Poker (ver.30c, standard)",             0,                    layout_noraut12 ) // CGI - Credit Poker, VERSION 30C, 21/12/99
+GAMEL( 1999, cgip30b,  cgip30cs,norautx4, norautkl, norautp_state, empty_init, ROT0, "CGI",                      "Credit Poker (ver.30b, 7 & 9 bonus)",          0,                    layout_noraut12 ) // CGI - Credit Poker, VERSION 30B, 7 &9 BONUS, 21/12/99 BY V.S. for CGI
+GAMEL( 1998, cgip23b,  cgip30cs,norautx4, norautkl, norautp_state, empty_init, ROT0, "CGI",                      "Credit Poker (ver.23b, 7 & 9 bonus)",          0,                    layout_noraut12 ) // CGI - Credit Poker, VERSION 23B, 7 &9 BONUS, 31.03.98. BY V.S.
+GAMEL( 19??, cgidjp,   0,       cgidjp,   mainline, norautp_state, empty_init, ROT0, "CGI",                      "Double Joker Poker (CGI)",                     0,                    layout_noraut12 ) // very similar to df_djpkr
+GAME(  198?, kimblz80, 0,       kimble,   norautp,  norautp_state, empty_init, ROT0, "Kimble Ireland",           "Kimble Double HI-LO (z80 version)",            MACHINE_NOT_WORKING )
+GAME(  1983, pma,      0,       nortest1, norautp,  norautp_state, empty_init, ROT0, "PMA",                      "PMA Poker",                                    MACHINE_NOT_WORKING )
+GAMEL( 198?, bjpoker,  0,       norautxp, norautrh, norautp_state, empty_init, ROT0, "M.Kramer Manufacturing.",  "Poker / Black Jack (Model 7521)",              MACHINE_NOT_WORKING,  layout_noraut12 )
+GAME(  19??, newhilop, 0,       newhilop, norautp,  norautp_state, empty_init, ROT0, "Song Won?",                "New Hi-Low Poker",                             MACHINE_NOT_WORKING )
+GAMEL( 1984, cdrawpkr, 0,       cdrawpkr, cdrawpkr, norautp_state, empty_init, ROT0, "Coinmaster",               "Draw Poker (Joker Poker V.01)",                0,                    layout_noraut11 )
 
 
-/************************************* 8080 sets **************************************/
-/*  The following ones are 'Draw Poker HI-LO' type, running in a 8080 based hardware  */
-/**************************************************************************************/
+//************************************* 8080 sets **************************************
+//*  The following ones are 'Draw Poker HI-LO' type, running in a 8080 based hardware  *
+//**************************************************************************************
 
-//     YEAR  NAME      PARENT   MACHINE   INPUT    STATE          INIT        ROT   COMPANY                        FULLNAME                            FLAGS             LAYOUT
+//     YEAR  NAME      PARENT   MACHINE   INPUT    STATE          INIT        ROT   COMPANY                        FULLNAME                            FLAGS                 LAYOUT
 GAME(  1983, dphl,     0,       dphl,     norautp, norautp_state, empty_init, ROT0, "M.Kramer Manufacturing.",     "Draw Poker HI-LO (M.Kramer)",      MACHINE_NOT_WORKING )
 GAME(  1983, dphla,    0,       dphla,    norautp, norautp_state, empty_init, ROT0, "<unknown>",                   "Draw Poker HI-LO (Alt)",           MACHINE_NOT_WORKING )
 GAME(  1983, dphljp,   0,       dphl,     norautp, norautp_state, empty_init, ROT0, "<unknown>",                   "Draw Poker HI-LO (Japanese)",      MACHINE_NOT_WORKING )
@@ -3809,16 +4593,17 @@ GAME(  1986, drhl,     0,       drhl,     norautp, norautp_state, empty_init, RO
 GAME(  1986, drhla,    drhl,    drhl,     norautp, norautp_state, empty_init, ROT0, "Drews Inc.",                  "Drews Revenge (v.2.89, set 2)",    MACHINE_NOT_WORKING )
 GAME(  1982, ssjkrpkr, 0,       ssjkrpkr, norautp, norautp_state, init_ssa,   ROT0, "Southern Systems & Assembly", "Southern Systems Joker Poker",     MACHINE_NOT_WORKING )
 
-/* The following one also has a custom 68705 MCU */
+// The following one also has a custom 68705 MCU
 GAME(  1993, tpoker2,  0,       dphltest, norautp, norautp_state, empty_init, ROT0, "Micro Manufacturing",         "Turbo Poker 2",                    MACHINE_NOT_WORKING )
 
 
-/************************************ unknown sets ************************************/
-/* The following ones are still unknown. No info about name, CPU, manufacturer, or HW */
-/**************************************************************************************/
+//************************************ unknown sets ************************************
+//* The following ones are still unknown. No info about name, CPU, manufacturer, or HW *
+//**************************************************************************************
 
-//     YEAR  NAME      PARENT   MACHINE   INPUT    STATE          INIT        ROT   COMPANY                     FULLNAME                               FLAGS             LAYOUT
+//     YEAR  NAME      PARENT   MACHINE   INPUT    STATE          INIT        ROT   COMPANY                     FULLNAME                               FLAGS                 LAYOUT
 GAME(  198?, fastdrwp, 0,       dphl,     norautp, norautp_state, empty_init, ROT0, "Stern Electronics?",       "Fast Draw (poker conversion kit)?",   MACHINE_NOT_WORKING )
 GAME(  198?, dphlunka, 0,       dphl,     norautp, norautp_state, empty_init, ROT0, "SMS Manufacturing Corp.",  "Draw Poker HI-LO (unknown, rev 1)",   MACHINE_NOT_WORKING )
 GAME(  198?, dphlunkb, 0,       dphl,     norautp, norautp_state, empty_init, ROT0, "SMS Manufacturing Corp.",  "Draw Poker HI-LO (unknown, rev 2)",   MACHINE_NOT_WORKING )
 GAME(  198?, pkii_dm,  0,       nortest1, norautp, norautp_state, empty_init, ROT0, "<unknown>",                "unknown poker game PKII/DM",          MACHINE_NOT_WORKING )
+GAME(  1989, unkljfpk, 0,       nortest1, norautp, norautp_state, empty_init, ROT0, "LJF Corporation",          "unknown LJF Corporation poker game",  MACHINE_NOT_WORKING )

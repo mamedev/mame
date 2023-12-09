@@ -161,6 +161,10 @@ protected:
 	required_ioport_array<8> m_keyboard;
 	required_ioport_array<2> m_joysticks;
 
+	u8 m_ram[0x80];
+	u8 m_p1 = 0xff;
+	u8 m_p2 = 0xff;
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -172,14 +176,10 @@ protected:
 	void p1_write(u8 data);
 	u8 p2_read();
 	void p2_write(u8 data);
-	DECLARE_READ_LINE_MEMBER(t1_read);
+	int t1_read();
 
 	void odyssey2_io(address_map &map);
 	void odyssey2_mem(address_map &map);
-
-	u8 m_ram[0x80];
-	u8 m_p1 = 0xff;
-	u8 m_p2 = 0xff;
 
 private:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -208,6 +208,10 @@ private:
 	required_device<i8243_device> m_i8243;
 	required_device<ef9340_1_device> m_ef934x;
 
+	u8 m_mix_i8244 = 0xff;
+	u8 m_mix_ef934x = 0xff;
+	u8 m_ef934x_extram[0x800];
+
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void p2_write(u8 data);
@@ -217,10 +221,6 @@ private:
 	inline offs_t ef934x_extram_address(offs_t offset);
 	u8 ef934x_extram_r(offs_t offset);
 	void ef934x_extram_w(offs_t offset, u8 data);
-
-	u8 m_mix_i8244 = 0xff;
-	u8 m_mix_ef934x = 0xff;
-	u8 m_ef934x_extram[0x800];
 };
 
 void odyssey2_state::machine_start()
@@ -430,7 +430,7 @@ u8 odyssey2_state::bus_read()
 	return data;
 }
 
-READ_LINE_MEMBER(odyssey2_state::t1_read)
+int odyssey2_state::t1_read()
 {
 	return m_i8244->vblank() | m_i8244->hblank();
 }

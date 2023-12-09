@@ -1,48 +1,45 @@
 // InOutTempBuffer.h
 
-#ifndef __IN_OUT_TEMP_BUFFER_H
-#define __IN_OUT_TEMP_BUFFER_H
+#ifndef ZIP7_INC_IN_OUT_TEMP_BUFFER_H
+#define ZIP7_INC_IN_OUT_TEMP_BUFFER_H
 
-#include "../../Common/MyCom.h"
+// #ifdef _WIN32
+#define USE_InOutTempBuffer_FILE
+// #endif
+
+#ifdef USE_InOutTempBuffer_FILE
 #include "../../Windows/FileDir.h"
+#endif
 
 #include "../IStream.h"
 
 class CInOutTempBuffer
 {
+  UInt64 _size;
+  void **_bufs;
+  size_t _numBufs;
+  size_t _numFilled;
+
+ #ifdef USE_InOutTempBuffer_FILE
+  
+  bool _tempFile_Created;
+  bool _useMemOnly;
+  UInt32 _crc;
+  // COutFile object must be declared after CTempFile object for correct destructor order
   NWindows::NFile::NDir::CTempFile _tempFile;
   NWindows::NFile::NIO::COutFile _outFile;
-  Byte *_buf;
-  size_t _bufPos;
-  UInt64 _size;
-  UInt32 _crc;
-  bool _tempFileCreated;
 
-  bool WriteToFile(const void *data, UInt32 size);
+ #endif
+
+  void *GetBuf(size_t index);
+
+  Z7_CLASS_NO_COPY(CInOutTempBuffer)
 public:
   CInOutTempBuffer();
   ~CInOutTempBuffer();
-  void Create();
-
-  void InitWriting();
-  bool Write(const void *data, UInt32 size);
-
+  HRESULT Write_HRESULT(const void *data, UInt32 size);
   HRESULT WriteToStream(ISequentialOutStream *stream);
   UInt64 GetDataSize() const { return _size; }
 };
-
-/*
-class CSequentialOutTempBufferImp:
-  public ISequentialOutStream,
-  public CMyUnknownImp
-{
-  CInOutTempBuffer *_buf;
-public:
-  void Init(CInOutTempBuffer *buffer)  { _buf = buffer; }
-  MY_UNKNOWN_IMP
-
-  STDMETHOD(Write)(const void *data, UInt32 size, UInt32 *processedSize);
-};
-*/
 
 #endif

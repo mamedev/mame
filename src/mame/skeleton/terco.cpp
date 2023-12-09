@@ -39,9 +39,9 @@
 //#include "machine/kb3600.h"
 //#include "machine/mc14411.h"
 
-#define LOG_SETUP   (1U <<  1)
-#define LOG_READ    (1U <<  2)
-#define LOG_BCD     (1U <<  3)
+#define LOG_SETUP   (1U << 1)
+#define LOG_READ    (1U << 2)
+#define LOG_BCD     (1U << 3)
 
 //#define VERBOSE (LOG_BCD|LOG_SETUP)
 //#define LOG_OUTPUT_STREAM std::cout
@@ -305,8 +305,8 @@ void t4490_state::t4490(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &t4490_state::t4490_map);
 
 	/* devices */
-	PIA6821(config, m_pia1, 0);
-	PIA6821(config, m_pia2, 0);
+	PIA6821(config, m_pia1);
+	PIA6821(config, m_pia2);
 	ACIA6850(config, "acia", 0);
 }
 

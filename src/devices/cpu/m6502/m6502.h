@@ -98,6 +98,7 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
+	virtual bool cpu_is_interruptible() const override { return true; }
 	virtual uint32_t execute_min_cycles() const noexcept override;
 	virtual uint32_t execute_max_cycles() const noexcept override;
 	virtual uint32_t execute_input_lines() const noexcept override;
@@ -129,7 +130,7 @@ protected:
 	uint8_t   Y;                      /* Y index register */
 	uint8_t   P;                      /* Processor status */
 	uint8_t   IR;                     /* Prefetched instruction register */
-	int     inst_state_base;        /* Current instruction bank */
+	int       inst_state_base;        /* Current instruction bank */
 
 	std::unique_ptr<memory_interface> mintf;
 	int inst_state, inst_substate;
@@ -143,10 +144,10 @@ protected:
 	void write(uint16_t adr, uint8_t val) { mintf->write(adr, val); }
 	void write_9(uint16_t adr, uint8_t val) { mintf->write_9(adr, val); }
 	uint8_t read_arg(uint16_t adr) { return mintf->read_arg(adr); }
-	uint8_t read_pc() { return mintf->read_arg(PC++); }
-	uint8_t read_pc_noinc() { return mintf->read_arg(PC); }
-	void prefetch();
-	void prefetch_noirq();
+	uint8_t read_pc() { return mintf->read_arg(PC); }
+	void prefetch_start();
+	void prefetch_end();
+	void prefetch_end_noirq();
 	void set_nz(uint8_t v);
 
 	u32 XPC;

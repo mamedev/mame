@@ -1172,6 +1172,19 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="panica" cloneof="panic">
+		<description>Space Panic (alt)</description>
+		<year>1983</year>
+		<publisher>Coleco / CBS</publisher>
+		<info name="developer" value="Universal" />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="panica.1" size="8192" crc="1c0353f2" sha1="edbba9d2b75cf49369c0bb019ef1d5d7d6838be9" offset="0x0000" />
+				<rom name="panica.2" size="8192" crc="9d938cbd" sha1="d1d4e224470f2a4b997c71428ce9e6e1bb720ecc" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pepper2">
 		<!-- Pepper II (1983)(Coleco).bin -->
 		<description>Pepper II</description>
@@ -1197,6 +1210,19 @@ license:CC0-1.0
 			<dataarea name="rom" size="16384">
 				<rom name="pitfall.1" size="8192" crc="27bc4115" sha1="f9c11f484c14c5cfc9c4eddc5203f82a5fe3b8f8" offset="0x0000" />
 				<rom name="pitfall.2" size="8192" crc="24c3fc26" sha1="57d0bc47ac795c9262e60ac43a6409e09ca100a1" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pitfalla" cloneof="pitfall">
+		<description>Pitfall! (alt)</description>
+		<year>1983</year>
+		<publisher>Activision</publisher>
+		<info name="serial" value="VS-001-04" />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="pitfalla.1" size="8192" crc="d504e3ab" sha1="bb6eced4bd49af8f86a8943cbcc0164bfb411105" offset="0x0000" />
+				<rom name="pitfalla.2" size="8192" crc="4d470f40" sha1="be14494896f3993db1ef35d20ad99f1406097d69" offset="0x2000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1508,6 +1534,19 @@ license:CC0-1.0
 			<dataarea name="rom" size="16384">
 				<rom name="smurfrgc.1"  size="8192" crc="675bf14d" sha1="4ba14cce2e022d039188d7faeee78a679e1f451f" offset="0x0000" />
 				<rom name="smurfrgca.2" size="8192" crc="993ed67c" sha1="b924e2c63d1edb271a65b21ac74a8221c9445ffc" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smurfp" cloneof="smurf">
+		<description>Smurf Rescue in Gargamel's Castle (prototype)</description>
+		<year>1982</year>
+		<publisher>Coleco / CBS</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="20480">
+				<rom name="c-smurf prgm.1" size="8192" crc="d9af8c4e" sha1="6cd393ebe301f1ff160c6c359ec4ad7971386c51" offset="0x0000" />
+				<rom name="c-smurf prgm.2" size="8192" crc="865ac4e5" sha1="0793c3dfcf830a4b6ff0fdcc80c00477b8633214" offset="0x2000" />
+				<rom name="smurf-3"        size="4096" crc="b7d79c6e" sha1="43827b40094a0c070874c13141c48301750a9e80" offset="0x4000" />
 			</dataarea>
 		</part>
 	</software>

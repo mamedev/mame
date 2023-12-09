@@ -14,9 +14,10 @@
 
 **********************************************************************/
 
-
 #include "emu.h"
 #include "plus3.h"
+
+#include "formats/acorn_dsk.h"
 
 
 //**************************************************************************
@@ -164,7 +165,7 @@ void electron_plus3_device::expbus_w(offs_t offset, uint8_t data)
 	{
 		m_fdc->write(offset & 0x03, data);
 	}
-	else if (offset == 0xfe05)
+	else if ((offset == 0xfe05) && !(data & 0xf0))
 	{
 		m_romsel = data & 0x0f;
 	}

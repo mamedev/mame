@@ -1,12 +1,14 @@
 // license:BSD-3-Clause
-// copyright-holders:Angelo Salese, Pierpaolo Prazzoli
-/*****************************************************************************************
+// copyright-holders:Angelo Salese, Pierpaolo Prazzoli, Takahiro Nogi
+/**************************************************************************************************
 
+Dai-Fugo (c) 1983 Sega / Seta
 Speed Attack! (c) 1984 Seta Kikaku Corp.
 
 driver by Pierpaolo Prazzoli & Angelo Salese, based on early work by David Haywood
 
 TODO:
+ - Improve IOX device for daifugo (many hardwired reads);
  - It's possible that there is only one coin chute and not two,needs a real board to know
    more about it.
 
@@ -19,7 +21,8 @@ How to play:
 Notes:
  - According to the text gfx rom, there are also a Taito and a KKK versions out there.
 
-------------------------------------------------------------------------------------------
+===================================================================================================
+
 SPEED ATTACK!
 (c)SETA
 
@@ -41,7 +44,7 @@ CB0-7   :7E
 CB1.BPR :7L TBP18S030
 CB2.BPR :6K 82S129
 
-----------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 
 DIP SWITCH 8BIT (Default: ALL ON)
 
@@ -73,7 +76,39 @@ SW 8   : TEST MODE H:TEST
             |18|
 
 PS / PD :  key matrix
-*****************************************************************************************/
+
+===================================================================================================
+
+Dai-Fugo (C)1983 ESCO TRADING CO.,INC. / SEGA ENTERPRISES LTD. / SETA KIKAKU LTD.
+
+Developed by SETA
+Manufactured by SEGA
+Exclusively licensed to ESCO
+
+Model No.834-5206
+
+CA2_1.1c    PRG 0x2000
+CA2_2.1d    PRG 0x2000
+CA2_3.1e    PRG 0x2000
+CA2_4.1h    PRG 0x1000
+CA1_5.7c    CHR 0x2000
+CA1_6.7d    CHR 0x2000
+CA1_7.7e    CHR 0x2000
+tbp24s10.6k COLOR   0x100
+tbp18s030.7l    CLUT    0x20
+
+X'tal       12.000MHz
+CPU         D780C(Z80 1.5MHz?)
+SOUND       AY-3-8910(1.5MHz?)
+CRTC        HD46505SP-1 1.5MHz
+WRAM        M58725P(16Kbit SRAM)
+VRAM        M5L2114LP-3(4Kbit SRAM) x4
+CUSTOM      AC001(14pin DIP)
+            AC002(40pin DIP)
+            AC003(40pin DIP)
+DIPSW       8 Elements Switch Array x1
+
+**************************************************************************************************/
 
 #include "emu.h"
 #include "speedatk.h"
@@ -153,6 +188,38 @@ uint8_t speedatk_state::key_matrix_r()
 	return iox_key_matrix_calc((m_mux_data == 2) ? 0 : 2);
 }
 
+uint8_t speedatk_state::daifugo_key_matrix_r()
+{
+	if(m_coin_impulse > 0)
+	{
+		m_coin_impulse--;
+		return 0x80;
+	}
+
+	if(ioport("COINS")->read() & 1)
+	{
+		m_coin_impulse = m_coin_settings;
+		m_coin_impulse--;
+		return 0x80;
+	}
+
+	static const char *const keynames[] = { "PLAYER1", "PLAYER2" };
+
+	int i;
+	const uint8_t player_side = (m_mux_data >> 2) & 1;
+
+	// key matrix check and change binary digit to decimal number
+	for (i = 0 ; i < 16 ; i++)
+	{
+		if (ioport(keynames[player_side])->read() & (1 << i))
+		{
+			return (i + 1);
+		}
+	}
+
+	return 0;
+}
+
 void speedatk_state::key_matrix_w(uint8_t data)
 {
 	m_mux_data = data;
@@ -193,6 +260,31 @@ void speedatk_state::speedatk_mem(address_map &map)
 	map(0xb000, 0xb3ff).ram().share("colorram");
 }
 
+void speedatk_state::daifugo_mem(address_map &map)
+{
+	speedatk_mem(map);
+	map(0x8000, 0x8000).rw(FUNC(speedatk_state::daifugo_key_matrix_r), FUNC(speedatk_state::key_matrix_w));
+	map(0x8001, 0x8001).lr8(NAME([] (offs_t offset) {
+		// TODO: bit 1 seems to be a busy flag, will throw a "BAD CSTM 2" if that is high.
+		return 0x00;
+	}));
+	// Protection?
+	map(0x8464, 0x8464).lr8(NAME([] (offs_t offset) {
+		return 0x00;    // this value is never referenced in game
+	}));
+	map(0x8465, 0x8465).lr8(NAME([] (offs_t offset) {
+		return 0xb6;    // strange behavior if value other than 0xb6 is set
+	}));
+	map(0x8469, 0x8469).lr8(NAME([] (offs_t offset) {
+		return 0x84;    // 1000_0100b(084h) game stops if other value is set
+	}));
+	map(0x8471, 0x8471).lr8(NAME([] (offs_t offset) {
+		return 0x00;    // 0x00 game stops if other value is set
+	}));
+	map(0x8630, 0x8630).lr8(NAME([] (offs_t offset) {
+		return 0x4d;    // 0x4D accept I/O and sound process
+	}));
+}
 
 void speedatk_state::speedatk_io(address_map &map)
 {
@@ -203,6 +295,72 @@ void speedatk_state::speedatk_io(address_map &map)
 	map(0x40, 0x41).w("aysnd", FUNC(ay8910_device::address_data_w));
 	//what's 60-6f for? Seems used only in attract mode and read back when a 2p play ends ...
 }
+
+static INPUT_PORTS_START( daifugo )
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Time/CPU Card" )
+	PORT_DIPSETTING(    0x10, "300/Not Open" )
+	PORT_DIPSETTING(    0x00, "400/Open" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("COINS")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
+
+	PORT_START("PLAYER1")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_HANAFUDA_A )      PORT_PLAYER(1)  // 1
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_HANAFUDA_B )      PORT_PLAYER(1)  // 2
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_HANAFUDA_C )      PORT_PLAYER(1)  // 3
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_HANAFUDA_D )      PORT_PLAYER(1)  // 4
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNUSED )          PORT_PLAYER(1)  // 5
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNUSED )          PORT_PLAYER(1)  // 6
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_HANAFUDA_E )      PORT_PLAYER(1)  // 7
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_HANAFUDA_H )      PORT_PLAYER(1)  // 8
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_HANAFUDA_F )      PORT_PLAYER(1)  // 9
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_HANAFUDA_G )      PORT_PLAYER(1)  // 10
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNUSED )          PORT_PLAYER(1)  // 11
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_START1 )          PORT_PLAYER(1)  // 12
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_START2 )          PORT_PLAYER(1)  // 13
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_HANAFUDA_YES )    PORT_PLAYER(1)  // 14
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_HANAFUDA_NO ) PORT_NAME("P1 Hanafuda No/Pass")    PORT_PLAYER(1)  // 15
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNUSED )          PORT_PLAYER(1)  // 16
+
+	PORT_START("PLAYER2")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_HANAFUDA_A )      PORT_PLAYER(2)  // 1
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_HANAFUDA_B )      PORT_PLAYER(2)  // 2
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_HANAFUDA_C )      PORT_PLAYER(2)  // 3
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_HANAFUDA_D )      PORT_PLAYER(2)  // 4
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNUSED )          PORT_PLAYER(2)  // 5
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNUSED )          PORT_PLAYER(2)  // 6
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_HANAFUDA_E )      PORT_PLAYER(2)  // 7
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_HANAFUDA_H )      PORT_PLAYER(2)  // 8
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_HANAFUDA_F )      PORT_PLAYER(2)  // 9
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_HANAFUDA_G )      PORT_PLAYER(2)  // 10
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNUSED )          PORT_PLAYER(2)  // 11
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_UNUSED )          PORT_PLAYER(2)  // 12
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_UNUSED )          PORT_PLAYER(2)  // 13
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_HANAFUDA_YES )    PORT_PLAYER(2)  // 14
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_HANAFUDA_NO ) PORT_NAME("P2 Hanafuda No/Pass")    PORT_PLAYER(2)  // 15
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNUSED )          PORT_PLAYER(2)  // 16
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( speedatk )
 	PORT_START("DSW")
@@ -298,7 +456,7 @@ void speedatk_state::output_w(uint8_t data)
 
 void speedatk_state::speedatk(machine_config &config)
 {
-	Z80(config, m_maincpu, MASTER_CLOCK/2); //divider is unknown
+	Z80(config, m_maincpu, MASTER_CLOCK/4); //divider is unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &speedatk_state::speedatk_mem);
 	m_maincpu->set_addrmap(AS_IO, &speedatk_state::speedatk_io);
 	m_maincpu->set_vblank_int("screen", FUNC(speedatk_state::irq0_line_hold));
@@ -324,11 +482,37 @@ void speedatk_state::speedatk(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", MASTER_CLOCK/4)); //divider is unknown
+	ay8910_device &aysnd(AY8910(config, "aysnd", MASTER_CLOCK/8)); //divider is unknown
 	aysnd.port_b_read_callback().set_ioport("DSW");
 	aysnd.port_a_write_callback().set(FUNC(speedatk_state::output_w));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.5);
 }
+
+void speedatk_state::daifugo(machine_config &config)
+{
+	speedatk(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &speedatk_state::daifugo_mem);
+}
+
+ROM_START( daifugo )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ca2_1.1c",      0x0000, 0x2000, CRC(cef063a1) SHA1(851c8f7f723822c19c02a35908b6246bd5d5c806) )
+	ROM_LOAD( "ca2_2.1d",      0x2000, 0x2000, CRC(29e17bb9) SHA1(7028dca9b794af561eb86fc9d3e5ad7c7c9c6050) )
+	ROM_LOAD( "ca2_3.1e",      0x4000, 0x2000, CRC(570dc665) SHA1(f473aeeaa536ed476bd107fd6b594e3dfd5d9cf4) )
+	ROM_LOAD( "ca2_4.1h",      0x6000, 0x1000, CRC(85a1707c) SHA1(de95bb11918ed15f0061041f4a2ccbc38832280a) )
+
+	ROM_REGION( 0x6000, "gfx1", ROMREGION_ERASE00 )
+	// unused in daifugo?
+
+	ROM_REGION( 0x6000, "gfx2", 0 )
+	ROM_LOAD( "ca1_5.7c",      0x0000, 0x2000, CRC(36f08de2) SHA1(0852b52dbc309addbf81e4e6692b02bf6fea3f95) )
+	ROM_LOAD( "ca1_6.7d",      0x2000, 0x2000, CRC(c70b8f3d) SHA1(d8d9f0db53b89800a46e6ba2b6cd8b5669563cac) )
+	ROM_LOAD( "ca1_7.7e",      0x4000, 0x2000, CRC(12a6ba09) SHA1(f9a133774b29d061168e247d74deed8fcc561d0c) )
+
+	ROM_REGION( 0x0220, "proms", 0 )
+	ROM_LOAD( "tbp18s030.7l",  0x0000, 0x0020, CRC(bd674823) SHA1(c664b9959c939900dde3f86722404253b0e3f3f6) )  // color PROM
+	ROM_LOAD( "tbp24s10.6k",   0x0020, 0x0100, CRC(6bd28c7a) SHA1(6840481a9b496cb37a45895b73d3270e49212a3e) )  // lookup table
+ROM_END
 
 ROM_START( speedatk )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -351,4 +535,5 @@ ROM_START( speedatk )
 	ROM_LOAD( "cb2.bpr",      0x0020, 0x0100, CRC(a604cf96) SHA1(a4ef6e77dcd3abe4c27e8e636222a5ee711a51f5) ) /* lookup table */
 ROM_END
 
-GAME( 1984, speedatk, 0, speedatk, speedatk, speedatk_state, empty_init, ROT0, "Seta Kikaku Corp.", "Speed Attack! (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, daifugo, 0,  daifugo,  daifugo,  speedatk_state, empty_init, ROT90, "Seta Kikaku / Sega (Esco Trading Co license)", "Daifugo (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1984, speedatk, 0, speedatk, speedatk, speedatk_state, empty_init, ROT0,  "Seta Kikaku", "Speed Attack! (Japan)", MACHINE_SUPPORTS_SAVE )

@@ -33,14 +33,13 @@ public:
 	void host_w(offs_t offset, u8 data);
 
 	// peripheral device requests
-	DECLARE_WRITE_LINE_MEMBER(pint_w);
-	DECLARE_WRITE_LINE_MEMBER(reqa_w);
-	DECLARE_WRITE_LINE_MEMBER(reqb_w);
+	void pint_w(int state);
+	void reqa_w(int state);
+	void reqb_w(int state);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

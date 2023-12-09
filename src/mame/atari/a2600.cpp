@@ -111,7 +111,7 @@ E1 Prog ROM 42 DEMON/DIAMOND (CX2615)
 #include "speaker.h"
 #include "tia.h"
 
-#include "machine/mos6530n.h"
+#include "machine/mos6530.h"
 
 //#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
@@ -147,7 +147,7 @@ protected:
 	void switch_A_w(uint8_t data);
 	uint8_t switch_A_r();
 	void switch_B_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(irq_callback);
+	void irq_callback(int state);
 	uint16_t a2600_read_input_port(offs_t offset);
 	uint8_t a2600_get_databus_contents(offs_t offset);
 	void a2600_tia_vsync_callback(uint16_t data);
@@ -155,7 +155,7 @@ protected:
 	required_shared_ptr<uint8_t> m_riot_ram;
 	required_device<tia_video_device> m_tia;
 	required_device<m6507_device> m_maincpu;
-	required_device<mos6532_new_device> m_riot;
+	required_device<mos6532_device> m_riot;
 	required_device<vcs_control_port_device> m_joy1;
 	required_device<vcs_control_port_device> m_joy2;
 	required_device<screen_device> m_screen;
@@ -264,7 +264,7 @@ void a2600_base_state::a2600_mem(address_map &map) // 6507 has 13-bit address sp
 {
 	map(0x0000, 0x007f).mirror(0x0f00).rw(m_tia, FUNC(tia_video_device::read), FUNC(tia_video_device::write));
 	map(0x0080, 0x00ff).mirror(0x0d00).ram().share("riot_ram");
-	map(0x0280, 0x029f).mirror(0x0d00).m("riot", FUNC(mos6532_new_device::io_map));
+	map(0x0280, 0x029f).mirror(0x0d00).m("riot", FUNC(mos6532_device::io_map));
 }
 
 void a2600_pop_state::memory_map(address_map &map) // 6507 has 13-bit address space, 0x0000 - 0x1fff
@@ -378,7 +378,7 @@ void a2600_base_state::switch_B_w(uint8_t data)
 {
 }
 
-WRITE_LINE_MEMBER(a2600_base_state::irq_callback)
+void a2600_base_state::irq_callback(int state)
 {
 }
 
@@ -619,7 +619,7 @@ void a2600_base_state::a2600_base_ntsc(machine_config &config)
 	TIA(config, "tia", m_xtal/114).add_route(ALL_OUTPUTS, "mono", 0.90);
 
 	/* devices */
-	MOS6532_NEW(config, m_riot, m_xtal / 3);
+	MOS6532(config, m_riot, m_xtal / 3);
 	m_riot->pa_rd_callback().set(FUNC(a2600_state::switch_A_r));
 	m_riot->pa_wr_callback().set(FUNC(a2600_state::switch_A_w));
 	m_riot->pb_rd_callback().set_ioport("SWB");
@@ -652,7 +652,7 @@ void a2600_base_state::a2600_base_pal(machine_config &config)
 	TIA(config, "tia", m_xtal/114).add_route(ALL_OUTPUTS, "mono", 0.90);
 
 	/* devices */
-	MOS6532_NEW(config, m_riot, m_xtal / 3);
+	MOS6532(config, m_riot, m_xtal / 3);
 	m_riot->pa_rd_callback().set(FUNC(a2600_state::switch_A_r));
 	m_riot->pa_wr_callback().set(FUNC(a2600_state::switch_A_w));
 	m_riot->pb_rd_callback().set_ioport("SWB");

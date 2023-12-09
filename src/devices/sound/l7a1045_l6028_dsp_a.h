@@ -26,7 +26,7 @@ public:
 	void dma_w_cb(offs_t offset, uint8_t data);
 	uint16_t dma_r16_cb() { m_voice[0].pos++; return 0; }
 	void dma_w16_cb(uint16_t data) { m_voice[0].pos++; }
-	DECLARE_WRITE_LINE_MEMBER(dma_hreq_cb);
+	void dma_hreq_cb(int state);
 
 protected:
 	// device-level overrides

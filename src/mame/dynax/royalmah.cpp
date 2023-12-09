@@ -35,16 +35,16 @@ Year + Game               Board(s)               CPU      Company            Not
 89  Mahjong Shinkirou     D210301BL2 + FRM-00?   TLCS-90  Dynax
 89  Mahjong Derringer     D2203018L              Z80      Dynax              Larger palette
 90  Mahjong If..?         D2909278L              TLCS-90  Dynax              Larger palette
-91  Mahjong Vegas         D5011308L1 + FRM-00    TLCS-90  Dynax              Undumped internal rom (mjvegas set)
+91  Mahjong Vegas         D5011308L1 + FRM-00    TLCS-90  Dynax              Larger palette, RTC
 92  Mahjong Cafe Time     D6310128L1-1           TLCS-90  Dynax              Larger palette, RTC
-93  Mahjong Cafe Doll     D76052208L-2           TLCS-90  Dynax              Larger palette, RTC, Undumped internal rom
+93  Mahjong Cafe Doll     D76052208L-2           TLCS-90  Dynax              Larger palette, RTC
 93  Ichi Ban Jian         MJ911                  Z80      Excel              Larger palette, additional YM2413
 95  Mahjong Tensinhai     D10010318L1            TLCS-90  Dynax              Larger palette, RTC
 96  Janputer '96          NS503X0727             Z80      Dynax              Larger palette, RTC
 97  Pong Boo! 2           NEW PONG-BOO           Z80(?)   OCT                OKI M6295, no PROMs
 97  Janputer Special      CS166P008 + NS5110207  Z80      Dynax              Larger palette, RTC
-99  Mahjong Cafe Break    NS528-9812             TLCS-90  Nakanihon / Dynax  Undumped internal rom
-99  Mahjong Cafe Paradise ? + TSS001-0001        TLCS-90  Techno-Top         Undumped internal rom
+99  Mahjong Cafe Break    NS528-9812             TLCS-90  Nakanihon / Dynax  Larger palette, RTC
+99  Mahjong Cafe Paradise ? + TSS001-0001        TLCS-90  Techno-Top         Larger palette, RTC
 -----------------------------------------------------------------------------------------------------------------------
 
 TODO:
@@ -90,8 +90,13 @@ Stephh's notes (based on the games Z80 code and some tests) :
     front of a random combination. It's value remains *1 though.
     Could it be a leftover from another game ('tontonb' for exemple) ?
 
-- janptr96, janptrsp: in service mode press in sequence N,Ron,Ron,N to access some
-  hidden options. (thanks bnathan)
+- cafepara, janptr96, janptrsp: in service mode press in sequence N,Ron,Ron,N to
+  access some hidden options. (thanks bnathan)
+
+- cafebrk and cafepara share the same internal TMP91640 code, while
+  cafedoll and mjvegas share the same internal TMP90840 code. Curiously,
+  cafetime has the same internal TMP90840 code as cafedoll and mjvegas,
+  but it's configured to run in external ROM mode.
 
 ****************************************************************************/
 
@@ -254,7 +259,10 @@ public:
 	void mjifb(machine_config &config) ATTR_COLD;
 	void mjdejavu(machine_config &config) ATTR_COLD;
 	void mjtensin(machine_config &config) ATTR_COLD;
+	void cafedoll(machine_config &config) ATTR_COLD;
+	void cafepara(machine_config &config) ATTR_COLD;
 	void cafetime(machine_config &config) ATTR_COLD;
+	void mjvegas(machine_config &config) ATTR_COLD;
 	void mjvegasa(machine_config &config) ATTR_COLD;
 	void ichiban(machine_config &config) ATTR_COLD;
 	void pongboo2(machine_config &config) ATTR_COLD;
@@ -264,7 +272,9 @@ public:
 	void init_suzume() ATTR_COLD;
 	void init_daisyari() ATTR_COLD;
 	void init_mjtensin() ATTR_COLD;
+	void init_cafedoll() ATTR_COLD;
 	void init_cafetime() ATTR_COLD;
+	void init_mjvegas() ATTR_COLD;
 	void init_mjvegasa() ATTR_COLD;
 	void init_jongshin() ATTR_COLD;
 	void init_mjifb() ATTR_COLD;
@@ -331,6 +341,9 @@ private:
 	uint8_t cafetime_7fe4_r();
 	void cafetime_7fe3_w(uint8_t data);
 
+	void cafedoll_p6_w(uint8_t data);
+	void cafedoll_p7_w(uint8_t data);
+
 	void mjvegasa_p4_w(uint8_t data);
 	void mjvegasa_p3_w(uint8_t data);
 	void mjvegasa_rombank_w(uint8_t data);
@@ -339,6 +352,10 @@ private:
 	void mjvegasa_coin_counter_w(uint8_t data);
 	void mjvegasa_12400_w(uint8_t data);
 	uint8_t mjvegasa_12500_r();
+
+	uint8_t mjvegas_p5_r();
+	void mjvegas_p6_w(uint8_t data);
+	void mjvegas_p7_w(uint8_t data);
 
 	void mjderngr_palette(palette_device &palette) const ATTR_COLD;
 
@@ -360,6 +377,7 @@ private:
 	void mjdejavu_map(address_map &map) ATTR_COLD;
 	void mjtensin_map(address_map &map) ATTR_COLD;
 	void mjvegasa_map(address_map &map) ATTR_COLD;
+	void cafepara_map(address_map &map) ATTR_COLD;
 	void cafetime_map(address_map &map) ATTR_COLD;
 
 	void chalgirl_iomap(address_map &map) ATTR_COLD;
@@ -394,6 +412,7 @@ private:
 
 	uint8_t m_suzume_bank = 0;
 	uint8_t m_mjyarou_bank = 0;
+	uint8_t m_mjvegas_p5_val = 0;
 };
 
 
@@ -790,7 +809,7 @@ void royalmah_prgbank_state::ichiban_map(address_map &map)
 {
 	map(0x0000, 0x6fff).rom().region("maincpu", 0x10000);
 	map(0x7000, 0x7fff).ram().share("nvram");
-	map(0x8000, 0xffff).bankr(m_mainbank); // TODO: proper range for banked ROM
+	map(0x8000, 0xffff).bankr(m_mainbank);
 	map(0x8000, 0xffff).writeonly().share(m_videoram);
 }
 
@@ -924,16 +943,16 @@ void royalmah_prgbank_state::mjsiyoub_iomap(address_map &map)
 	map(0x40, 0x49).w(FUNC(royalmah_prgbank_state::mjyarou_bank_w));
 }
 
-void royalmah_prgbank_state::ichiban_iomap(address_map &map) // TODO: writes to 0x12 and 0x14, probably code and palette banking
+void royalmah_prgbank_state::ichiban_iomap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x01, 0x01).r("aysnd", FUNC(ym2149_device::data_r));
 	map(0x02, 0x03).w("aysnd", FUNC(ym2149_device::data_address_w));
 	map(0x10, 0x10).portr("DSW-A").w(FUNC(royalmah_prgbank_state::mjderngr_coin_w));
 	map(0x11, 0x11).portr("SYSTEM").w(FUNC(royalmah_prgbank_state::input_port_select_w));
-	map(0x12, 0x12).portr("DSW-B").nopw();
+	map(0x12, 0x12).portr("DSW-B").lw8(NAME([this] (uint8_t data) { m_mainbank->set_entry(data); })); // TODO: only seems to write 0x00, 0x01, 0x02 and 0x04. How does the banking really work?
 	map(0x13, 0x13).portr("DSW-C");
-	map(0x14, 0x14).portr("DSW-D").nopw();
+	map(0x14, 0x14).portr("DSW-D").lw8(NAME([this] (uint8_t data) { m_palette_base = data & 0x1f; })); // TODO: also uses bits 5 and 6
 	map(0x16, 0x17).w("ymsnd", FUNC(ym2413_device::write));
 }
 
@@ -1393,6 +1412,22 @@ void royalmah_prgbank_state::cafetime_p3_w(uint8_t data)
 	m_mainbank->set_entry(m_rombank);
 }
 
+void royalmah_prgbank_state::cafedoll_p6_w(uint8_t data)
+{
+	m_mjvegas_p5_val &= 0x0f;
+
+	if (data & 0x03)
+		m_mjvegas_p5_val |= (1 << 4);
+}
+
+void royalmah_prgbank_state::cafedoll_p7_w(uint8_t data)
+{
+	m_mjvegas_p5_val &= 0xf0;
+
+	if (data & 0x0f)
+		m_mjvegas_p5_val |= (1 << 3);
+}
+
 void royalmah_prgbank_state::cafetime_dsw_w(uint8_t data)
 {
 	m_dsw_select = data;
@@ -1441,9 +1476,51 @@ void royalmah_prgbank_state::cafetime_map(address_map &map)
 
 
 /****************************************************************************
-                               Mahjong Vegas
+                                Mahjong Cafe Paradise
 ****************************************************************************/
 
+void royalmah_prgbank_state::cafepara_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x7eff).ram().share("nvram");
+	map(0x7fe1, 0x7fe1).r(m_ay, FUNC(ay8910_device::data_r));
+	map(0x7fe2, 0x7fe3).w(m_ay, FUNC(ay8910_device::data_address_w));
+	map(0x7ff0, 0x7ff0).w(FUNC(royalmah_prgbank_state::janptr96_coin_counter_w));
+	map(0x7ff1, 0x7ff1).portr("SYSTEM").nopw();
+	map(0x7ff3, 0x7ff3).w(FUNC(royalmah_prgbank_state::input_port_select_w));
+	map(0x7ff4, 0x7ff4).lw8(NAME([this] (uint8_t data) { m_mainbank->set_entry(data); if (data >= 0x10) logerror("mainbank_w: %02x\n", data); }));
+	map(0x7ff5, 0x7ff5).lw8(NAME([this] (uint8_t data) { logerror("0x7ff5 write: %02x\n", data); })); // bit 1 seems coin counter but it's actually at 0x7ff0
+	map(0x7ff6, 0x7ff6).w(FUNC(royalmah_prgbank_state::mjderngr_palbank_w));
+	map(0x7ff7, 0x7ff7).w(FUNC(royalmah_prgbank_state::cafetime_7fe3_w));
+	map(0x8000, 0xffff).bankr(m_mainbank);
+	map(0x8000, 0xffff).writeonly().share(m_videoram);
+	map(0xfff0, 0xffff).rw(m_rtc, FUNC(msm6242_device::read), FUNC(msm6242_device::write)); // TODO: this should probably be behind a view
+}
+
+
+/****************************************************************************
+                               Mahjong Vegas
+****************************************************************************/
+uint8_t royalmah_prgbank_state::mjvegas_p5_r()
+{
+	return m_mjvegas_p5_val;
+}
+
+void royalmah_prgbank_state::mjvegas_p6_w(uint8_t data)
+{
+	m_mjvegas_p5_val &= 0x0f;
+
+	if (data & 0x07)
+		m_mjvegas_p5_val |= (1 << 4);
+}
+
+void royalmah_prgbank_state::mjvegas_p7_w(uint8_t data)
+{
+	m_mjvegas_p5_val &= 0xf0;
+
+	if (data & 0x07)
+		m_mjvegas_p5_val |= (1 << 3);
+}
 void royalmah_prgbank_state::mjvegasa_p4_w(uint8_t data)
 {
 	m_rombank = (m_rombank & 0xf8) | ((data & 0x0e) >> 1);
@@ -3514,11 +3591,11 @@ static INPUT_PORTS_START( jansou )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( mjvegasa )
+static INPUT_PORTS_START( mjvegasa ) // dips definitions and defaults from manual (machine translated)
 	PORT_INCLUDE( mjctrl2 )
 
 	PORT_START("DSW1")  // 6810
-	PORT_DIPNAME( 0x0f, 0x07, "Pay Out Rate" )
+	PORT_DIPNAME( 0x0f, 0x07, "Pay Out Rate" ) PORT_DIPLOCATION("SW1:1,2,3,4")
 	PORT_DIPSETTING(    0x0f, "96%" )
 	PORT_DIPSETTING(    0x0e, "93%" )
 	PORT_DIPSETTING(    0x0d, "90%" )
@@ -3535,116 +3612,116 @@ static INPUT_PORTS_START( mjvegasa )
 	PORT_DIPSETTING(    0x02, "56%" )
 	PORT_DIPSETTING(    0x01, "53%" )
 	PORT_DIPSETTING(    0x00, "50%" )
-	PORT_DIPNAME( 0x30, 0x30, "Odds Rate" )
+	PORT_DIPNAME( 0x30, 0x00, "Odds Rate" ) PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(    0x30, "1 2 4 8 12 16 24 32" )
 	PORT_DIPSETTING(    0x00, "1 2 3 5 8 15 30 50" )
 	PORT_DIPSETTING(    0x10, "1 2 3 5 10 25 50 100" )
 	PORT_DIPSETTING(    0x20, "1 2 3 5 10 50 100 200" )
-	PORT_DIPNAME( 0xc0, 0xc0, "Max Bet" )
+	PORT_DIPNAME( 0xc0, 0x40, "Max Bet" ) PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0xc0, "1" )
 	PORT_DIPSETTING(    0x80, "5" )
 	PORT_DIPSETTING(    0x40, "10" )
 	PORT_DIPSETTING(    0x00, "20" )
 
 	PORT_START("DSW2")  // 6811
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
-	PORT_DIPNAME( 0x0c, 0x0c, "YAKUMAN Times" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Minimum Rate" ) PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x0c, "1" )
 	PORT_DIPSETTING(    0x08, "2" )
 	PORT_DIPSETTING(    0x04, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x70, 0x70, "YAKUMAN Bonus" )
-	PORT_DIPSETTING(    0x70, "Cut" )
-	PORT_DIPSETTING(    0x60, "100?" )
+	PORT_DIPNAME( 0x70, 0x70, "YAKUMAN Bonus" )  PORT_DIPLOCATION("SW2:5,6,7") // this is the default for 'corner' machines, for 'single' it's listed as 0x30
+	PORT_DIPSETTING(    0x70, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x60, "Once on Start" )
 	PORT_DIPSETTING(    0x50, "300" )
 	PORT_DIPSETTING(    0x40, "500" )
 	PORT_DIPSETTING(    0x30, "700" )
 	PORT_DIPSETTING(    0x20, "1000" )
-//  PORT_DIPSETTING(    0x10, "1000" )
-//  PORT_DIPSETTING(    0x00, "1000" )
-	PORT_DIPNAME( 0x80, 0x80, "Unknown 2-7" )
-	PORT_DIPSETTING(    0x00, "1" )
-	PORT_DIPSETTING(    0x80, "2" )
+	PORT_DIPSETTING(    0x10, "1000" ) // dip combination not listed in the manual
+	PORT_DIPSETTING(    0x00, "1000" ) // dip combination not listed in the manual
+	PORT_DIPNAME( 0x80, 0x80, "Yakuman Bonus Cycle" ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x00, "Once" )
+	PORT_DIPSETTING(    0x80, "Twice" )
 
 	PORT_START("DSW3")  // 6812
-	PORT_DIPNAME( 0x01, 0x01, "Unknown 3-0" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Unknown 3-1" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "3 BAI In YAKUMAN Bonus Chance" )
+	PORT_DIPNAME( 0x01, 0x01, "Payout Type" ) PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(    0x01, "Credits" )
+	PORT_DIPSETTING(    0x00, "Hopper" )
+	PORT_DIPNAME( 0x02, 0x02, "Hopper Type" ) PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x00, "Reversed" )
+	PORT_DIPNAME( 0x04, 0x00, "Service Count" ) PORT_DIPLOCATION("SW3:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Unknown 3-3" )
+	PORT_DIPNAME( 0x08, 0x00, "W-Bet" ) PORT_DIPLOCATION("SW3:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Unknown 3-4" )
+	PORT_DIPNAME( 0x10, 0x00, "Renchan Rate" ) PORT_DIPLOCATION("SW3:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Unknown 3-5" )
+	PORT_DIPNAME( 0x20, 0x00, "Auto Reach" ) PORT_DIPLOCATION("SW3:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Unknown 3-6" )
+	PORT_DIPNAME( 0x40, 0x40, "Auto Tsumo" ) PORT_DIPLOCATION("SW3:7") // machine translated as 'automatic mode'
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Unknown 3-7" )
+	PORT_DIPNAME( 0x80, 0x80, "Yakuman Match" ) PORT_DIPLOCATION("SW3:8") // machine translated as 'service point'
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW4")  // 6813
-	PORT_DIPNAME( 0x01, 0x01, "Unknown 4-0" )
+	PORT_DIPNAME( 0x01, 0x00, "Last Chance" ) PORT_DIPLOCATION("SW4:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Show Clock" )
+	PORT_DIPNAME( 0x02, 0x00, "Show Clock" ) PORT_DIPLOCATION("SW4:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x04, 0x00, "Girls" )
+	PORT_DIPNAME( 0x04, 0x00, "Girls" ) PORT_DIPLOCATION("SW4:3") // Renshu Gal Display according to machine translation
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "Background" )
+	PORT_DIPNAME( 0x08, 0x00, "Background" ) PORT_DIPLOCATION("SW4:4")
 	PORT_DIPSETTING(    0x08, "Black" )
 	PORT_DIPSETTING(    0x00, "Green" )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW4:5") // default off according to manual, but left on for testing convenience
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Unknown 4-5" )
+	PORT_DIPNAME( 0x20, 0x00, "In Game Music" ) PORT_DIPLOCATION("SW4:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Unknown 4-6" )
+	PORT_DIPNAME( 0x40, 0x00, "Yakuman Match Frequency" ) PORT_DIPLOCATION("SW4:7") // machine translated as 'time service frequency'
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Unknown 4-7" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW4:8") // 'OFF' in manual
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSWTOP")    // 6814
-	PORT_DIPNAME( 0x01, 0x01, "Credits Per Note" )
+	PORT_DIPNAME( 0x01, 0x01, "Credits Per Note" ) PORT_DIPLOCATION("SW1:9")
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "10" )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:10")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Unknown 2-8" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Unknown 2-9" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Flip-Flop Key" )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:9")
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
+	PORT_DIPNAME( 0x08, 0x00, "Wave of Dividends" ) PORT_DIPLOCATION("SW2:10")
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( High ) )
+	PORT_DIPNAME( 0x10, 0x00, "Don Den Key" ) PORT_DIPLOCATION("SW3:9")
 	PORT_DIPSETTING(    0x00, "Flip-Flop" )
 	PORT_DIPSETTING(    0x10, "Start" )
-	PORT_DIPNAME( 0x20, 0x20, "Don Den Times" )
+	PORT_DIPNAME( 0x20, 0x00, "Don Den Times" ) PORT_DIPLOCATION("SW3:10")
 	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPSETTING(    0x20, "8" )
-	PORT_DIPNAME( 0x40, 0x40, "Unknown 4-8" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW4:9") // 'OFF' in manual
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Debug Mode" )    // e.g. press start in bet screen
+	PORT_DIPNAME( 0x80, 0x80, "Debug Mode" ) PORT_DIPLOCATION("SW4:10") // e.g. press start in bet screen ('OFF' in manual)
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -4086,6 +4163,37 @@ void royalmah_prgbank_state::cafetime(machine_config &config)
 	MSM6242(config, m_rtc, 32.768_kHz_XTAL).out_int_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
 }
 
+void royalmah_prgbank_state::cafedoll(machine_config &config)
+{
+	cafetime(config);
+	tmp90840_device &tmp(TMP90840(config.replace(), m_maincpu, XTAL(8'000'000))); // XTAL is verified, should it be divided?
+	tmp.set_addrmap(AS_PROGRAM, &royalmah_prgbank_state::cafetime_map);
+	tmp.port_write<3>().set(FUNC(royalmah_prgbank_state::cafetime_p3_w));
+	tmp.port_write<4>().set(FUNC(royalmah_prgbank_state::cafetime_p4_w));
+	tmp.port_read<5>().set(FUNC(royalmah_prgbank_state::mjvegas_p5_r));
+	tmp.port_write<6>().set(FUNC(royalmah_prgbank_state::cafedoll_p6_w));
+	tmp.port_write<7>().set(FUNC(royalmah_prgbank_state::cafedoll_p7_w));
+}
+
+void royalmah_prgbank_state::cafepara(machine_config &config)
+{
+	cafetime(config);
+	tmp91640_device &tmp(TMP91640(config.replace(), m_maincpu, XTAL(8'000'000))); // XTAL is verified, should it be divided?
+	tmp.set_addrmap(AS_PROGRAM, &royalmah_prgbank_state::cafepara_map);
+	tmp.port_read<3>().set([this] () { logerror("%s: p3 in\n", machine().describe_context()); return uint8_t(0); }); // read sometimes
+	tmp.port_read<4>().set([this] () { logerror("%s: p4 in\n", machine().describe_context()); return uint8_t(0); }); // not seen yet
+	tmp.port_read<5>().set([this] () { logerror("%s: p5 in\n", machine().describe_context()); return uint8_t(0); }); // dips 5-8 for each of the 4 dip banks + dips 9-10 for first and second bank
+	tmp.port_read<6>().set([this] () { logerror("%s: p6 in\n", machine().describe_context()); return uint8_t(0); }); // dips 1-4 for each of the 4 dip banks + dips 9-10 for third and fourth bank
+	tmp.port_read<7>().set([this] () { logerror("%s: p7 in\n", machine().describe_context()); return uint8_t(0); }); // not seen yet
+	tmp.port_read<8>().set([this] () { logerror("%s: p8 in\n", machine().describe_context()); return uint8_t(0); });
+	tmp.port_write<3>().set([this] (uint8_t data) { logerror("%s: p3 out %02X\n", machine().describe_context(), data); }); // 0x6c at startup, remnant of older games?
+	tmp.port_write<4>().set([this] (uint8_t data) { logerror("%s: p4 out %02X\n", machine().describe_context(), data); }); // 0x00 at startup
+	tmp.port_write<5>().set([this] (uint8_t data) { logerror("%s: p5 out %02X\n", machine().describe_context(), data); }); // not seen yet
+	tmp.port_write<6>().set([this] (uint8_t data) { logerror("%s: p6 out %02X\n", machine().describe_context(), data); }); // not seen yet
+	tmp.port_write<7>().set([this] (uint8_t data) { logerror("%s: p7 out %02X\n", machine().describe_context(), data); }); // seen 0x07, 0x0b, 0x0d, 0x0f. DSW select
+	tmp.port_write<8>().set([this] (uint8_t data) { logerror("%s: p8 out %02X\n", machine().describe_context(), data); }); // 0x00 or 0x08, most probably view but could also have to do with DSW select
+}
+
 void royalmah_prgbank_state::mjvegasa(machine_config &config)
 {
 	mjderngr(config);
@@ -4101,6 +4209,20 @@ void royalmah_prgbank_state::mjvegasa(machine_config &config)
 
 	// devices
 	MSM6242(config, m_rtc, 32.768_kHz_XTAL).out_int_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
+}
+
+void royalmah_prgbank_state::mjvegas(machine_config &config)
+{
+	mjvegasa(config);
+
+	tmp90840_device &tmp(TMP90840(config.replace(), m_maincpu, XTAL(8'000'000))); // XTAL is verified, should it be divided?
+	tmp.set_addrmap(AS_PROGRAM, &royalmah_prgbank_state::mjvegasa_map);
+	tmp.port_read<3>().set(FUNC(royalmah_prgbank_state::mjtensin_p3_r));
+	tmp.port_write<3>().set(FUNC(royalmah_prgbank_state::mjvegasa_p3_w));
+	tmp.port_write<4>().set(FUNC(royalmah_prgbank_state::mjvegasa_p4_w));
+	tmp.port_read<5>().set(FUNC(royalmah_prgbank_state::mjvegas_p5_r));
+	tmp.port_write<6>().set(FUNC(royalmah_prgbank_state::mjvegas_p6_w));
+	tmp.port_write<7>().set(FUNC(royalmah_prgbank_state::mjvegas_p7_w));
 }
 
 void royalmah_prgbank_state::ichiban(machine_config &config)
@@ -4916,12 +5038,12 @@ Notes:
 
 ROM_START( cafedoll )
 	ROM_REGION( 0x190000, "maincpu", 0 )
-	ROM_LOAD( "76xx.tmp90841", 0x00000, 0x02000, NO_DUMP )
-	ROM_LOAD( "7601", 0x000000, 0x80000, CRC(20c80ad9) SHA1(e45edd101c6e26c0fa3c3f15f4a4152a853e41bd) )
+	ROM_LOAD( "7601",              0x000000, 0x80000, CRC(20c80ad9) SHA1(e45edd101c6e26c0fa3c3f15f4a4152a853e41bd) )
+	ROM_LOAD( "76xx.tmp90840",     0x000000, 0x02000, CRC(091a85dc) SHA1(964ccbc13466464c2feee10f807078ec517bed5c) ) // internal ROM
 	// bank switched ROMs follow
-	ROM_RELOAD(       0x010000, 0x80000 )
-	ROM_LOAD( "7602", 0x090000, 0x80000, CRC(f472960c) SHA1(cc2feb4374ba94035101114c73e1690cfeac9b91) )
-	ROM_LOAD( "7603", 0x110000, 0x80000, CRC(c4293019) SHA1(afd717844e9e681ada14e80cd10dce0ed60d4259) )
+	ROM_COPY( "maincpu", 0x000000, 0x010000, 0x80000 )
+	ROM_LOAD( "7602",              0x090000, 0x80000, CRC(f472960c) SHA1(cc2feb4374ba94035101114c73e1690cfeac9b91) )
+	ROM_LOAD( "7603",              0x110000, 0x80000, CRC(c4293019) SHA1(afd717844e9e681ada14e80cd10dce0ed60d4259) )
 
 	ROM_REGION( 0x400, "proms", 0 )
 	ROM_LOAD( "d76-2_82s147.9f", 0x000, 0x200, CRC(9c1d0512) SHA1(3ca82d4271badc890701ecc76b97e80b16509b50) )
@@ -4945,12 +5067,13 @@ and a PLCC68 chip (likely FPGA)
 
 ROM_START( cafepara )
 	ROM_REGION( 0x290000, "maincpu", 0 )
-	ROM_LOAD( "cafepara.tmp91640", 0x000000, 0x004000, NO_DUMP )
 	// VIDEO & AM MICRO COMPUTER SYSTEMS 1999 TECHNO-TOP,LIMITED NAGOYA JAPAN MAHJONG CAFE PARADISE TSS001 VER. 1.00
-	ROM_LOAD( "00101.1h", 0x000000, 0x080000, CRC(f5917280) SHA1(e6180e36643075ab9fa5bc27baef2a464a23f581) )
-	// bank switched ROMs follow
-	ROM_RELOAD(           0x010000, 0x080000 )
-	ROM_LOAD( "00102.1d", 0x090000, 0x200000, CRC(ed3b5447) SHA1(ac24e9c00c94c35d2b2ec35f0c4262ceeda5408f) )
+	ROM_LOAD( "00101.1h",           0x000000, 0x080000, CRC(f5917280) SHA1(e6180e36643075ab9fa5bc27baef2a464a23f581) ) // external ROM with first 0x4000 empty
+	ROM_LOAD( "cafepara.tmp91640",  0x000000, 0x004000, CRC(0575607c) SHA1(e641ffd1bd44f2b4a0cdf72c49990933a0f0ff22) ) // internal ROM
+
+	// bank switched ROMs follow (test mode checks 0x50 banks)
+	ROM_COPY( "maincpu",  0x000000, 0x010000, 0x080000 )
+	ROM_LOAD( "00102.1d",           0x090000, 0x200000, CRC(ed3b5447) SHA1(ac24e9c00c94c35d2b2ec35f0c4262ceeda5408f) )
 
 	ROM_REGION( 0x400, "proms", 0 )
 	ROM_LOAD( "ts001b.4h", 0x000, 0x200, CRC(b0019654) SHA1(78ba9b35744849c430f99137ea0da3d5564cc72a) )
@@ -5031,13 +5154,14 @@ Notes:
 ***************************************************************************/
 
 ROM_START( mjvegas )
-	ROM_REGION( 0xd0000, "maincpu", 0 )
-	ROM_LOAD( "50xx.tmp90841", 0x00000, 0x02000, NO_DUMP )
-	ROM_LOAD( "5001a.1b", 0x00000, 0x20000, CRC(91859a47) SHA1(3c452405bf28f5e7302eaccdf472e91b64629a67) )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF  )
+	ROM_LOAD( "5001a.1b",          0x00000, 0x20000, CRC(91859a47) SHA1(3c452405bf28f5e7302eaccdf472e91b64629a67) ) // external ROM with first 0x2000 empty
+	ROM_LOAD( "50xx.tmp90840",     0x00000, 0x02000, CRC(091a85dc) SHA1(964ccbc13466464c2feee10f807078ec517bed5c) ) // internal ROM
+
 	// bank switched ROMs follow
-	ROM_RELOAD(           0x10000, 0x20000 )
-	ROM_LOAD( "5002.1d",  0x30000, 0x80000, CRC(016c0a32) SHA1(5c5fdd631eacb36a0ee7dba9e070c2d3d3d8fd5b) )
-	ROM_LOAD( "5003.1e",  0xb0000, 0x20000, CRC(5323cc85) SHA1(58b75ba560f05a0568024f52ee89f54713219452) )
+	ROM_COPY( "maincpu", 0x000000, 0x070000, 0x020000 )   // 0c-0f
+	ROM_LOAD( "5002.1d",           0x210000, 0x80000, CRC(016c0a32) SHA1(5c5fdd631eacb36a0ee7dba9e070c2d3d3d8fd5b) ) // 40-4f
+	ROM_LOAD( "5003.1e",           0x2f0000, 0x20000, CRC(5323cc85) SHA1(58b75ba560f05a0568024f52ee89f54713219452) ) // 5c-5f
 
 	ROM_REGION( 0x400, "proms", 0 )
 	ROM_LOAD( "d50-2_82s147.4h", 0x000, 0x200, CRC(3c960ea2) SHA1(65e05e3f129e9e6fcb14b7d44a75a76919c54d52) )
@@ -5059,7 +5183,7 @@ ROM_END
 
 /***************************************************************************
 
-Mahjong Shinkirou Deja Vu (+ some ROMs from Jan Oh (Toapan) !?)
+Mahjong Shinkirou Deja Vu (+ some ROMs from Jan Oh (Toaplan) !?)
 
 This game runs on Royal Mahjong hardware.
 
@@ -5211,11 +5335,13 @@ Notes:
 ***************************************************************************/
 
 ROM_START( cafebrk )
-	ROM_REGION( 0x280000, "maincpu", 0 )
-	ROM_LOAD( "528.tmp91640", 0x000000, 0x004000, NO_DUMP )
-	ROM_LOAD( "528011.1f",    0x000000, 0x080000, CRC(440ae60b) SHA1(c24efd76ba73adcb614b1974e8f92592800ba53c) )
+	ROM_REGION( 0x290000, "maincpu", 0 )
+	ROM_LOAD( "528011.1f",         0x000000, 0x080000, CRC(440ae60b) SHA1(c24efd76ba73adcb614b1974e8f92592800ba53c) )
+	ROM_LOAD( "528.tmp91640",      0x000000, 0x004000, CRC(0575607c) SHA1(e641ffd1bd44f2b4a0cdf72c49990933a0f0ff22) ) // internal ROM
+
 	// bank switched ROMs follow
-	ROM_LOAD( "52802.1d",     0x080000, 0x200000, CRC(bf4760fc) SHA1(d54ab9e298800a31d95a5f8b98ab9ba5b2866acf) )
+	ROM_COPY( "maincpu", 0x000000, 0x010000, 0x080000 )
+	ROM_LOAD( "52802.1d",          0x090000, 0x200000, CRC(bf4760fc) SHA1(d54ab9e298800a31d95a5f8b98ab9ba5b2866acf) )
 
 	ROM_REGION( 0x400, "proms", 0 )
 	ROM_LOAD( "ns528b2.4h", 0x000, 0x200, CRC(5699e69a) SHA1(fe13b93dd2c4a16865b4edcb0fee1390fdade725) )
@@ -5646,11 +5772,26 @@ HSync - 15.510kHz
 
 ***************************************************************************/
 
-ROM_START( ichiban )
+ROM_START( ichiban ) // TODO: how does the banking work?
 	ROM_REGION( 0x60000, "maincpu", 0 ) // opcodes in first half are mixed with pseudo-random garbage
 	ROM_LOAD( "3.u15", 0x00000, 0x20000, CRC(76240568) SHA1(cf055d1eaae25661a49ec4722a2c7caca862e66a) )
-	ROM_LOAD( "2.u14", 0x20000, 0x20000, CRC(b4834d8e) SHA1(836ddf7586dc5440faf88f5ec50a32265e9a0ec8) )
-	ROM_LOAD( "1.u28", 0x40000, 0x20000, CRC(2caa4d3f) SHA1(5e5af164880140b764c097a65388c22ba5ea572b) ) // ?
+	ROM_LOAD( "1.u28", 0x20000, 0x08000, CRC(2caa4d3f) SHA1(5e5af164880140b764c097a65388c22ba5ea572b) ) // bank 2 (title screen)
+	ROM_IGNORE(0x18000)
+	ROM_LOAD( "2.u14", 0x30000, 0x08000, CRC(b4834d8e) SHA1(836ddf7586dc5440faf88f5ec50a32265e9a0ec8) ) // bank 4 (mahjong tiles)
+	ROM_IGNORE(0x18000)
+
+	// 1.u28
+	// 1st 0x8000 contain title screen
+	// 2nd 0x8000 contain paytable
+	// 3rd 0x8000 contain in-game background
+	// 4th 0x8000 contain double up screen
+
+	// 2.u14
+	// 1st 0x8000 contain mahjong tiles (resulting in bad GFX for player's hand' tiles)
+	// 2nd 0x8000 contain mahjong tiles
+	// 3rd 0x8000 contain reels?
+	// 4th 0x8000 empty
+
 
 	ROM_REGION( 0x600, "proms", 0 )
 	ROM_LOAD( "mjr.u36", 0x000, 0x200, CRC(31cd7a90) SHA1(1525ad19d748561a52626e4ab13df67d9bedf3b8) )
@@ -5735,11 +5876,25 @@ void royalmah_prgbank_state::init_cafetime()
 	save_item(NAME(m_rombank));
 }
 
+void royalmah_prgbank_state::init_cafedoll()
+{
+	init_cafetime();
+
+	save_item(NAME(m_mjvegas_p5_val));
+}
+
 void royalmah_prgbank_state::init_mjvegasa()
 {
 	m_mainbank->configure_entries(0, 128, memregion("maincpu")->base() + 0x10000, 0x8000);
 
 	save_item(NAME(m_rombank));
+}
+
+void royalmah_prgbank_state::init_mjvegas()
+{
+	init_mjvegasa();
+
+	save_item(NAME(m_mjvegas_p5_val));
 }
 
 void royalmah_prgbank_state::init_jongshin()
@@ -5839,7 +5994,7 @@ void royalmah_prgbank_state::init_chalgirl()
 void royalmah_prgbank_state::init_ichiban()
 {
 	// TODO: work out banking
-	m_mainbank->configure_entry(0, memregion("maincpu")->base() + 0x18000);
+	m_mainbank->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x8000);
 }
 
 void royalmah_prgbank_state::init_pongboo2()
@@ -5888,13 +6043,13 @@ GAME( 1990,  mjifb,    0,        mjifb,    mjifb,    royalmah_prgbank_state, ini
 GAME( 1990,  mjifb2,   mjifb,    mjifb,    mjifb,    royalmah_prgbank_state, init_mjifb,    ROT0,   "Dynax",                      "Mahjong If...? [BET](2921)",            0 )
 GAME( 1990,  mjifb3,   mjifb,    mjifb,    mjifb,    royalmah_prgbank_state, init_mjifb,    ROT0,   "Dynax",                      "Mahjong If...? [BET](2931)",            0 )
 GAME( 1991,  mjvegasa, 0,        mjvegasa, mjvegasa, royalmah_prgbank_state, init_mjvegasa, ROT0,   "Dynax",                      "Mahjong Vegas (Japan, unprotected)",    0 )
-GAME( 1991,  mjvegas,  mjvegasa, mjvegasa, mjvegasa, royalmah_prgbank_state, init_mjvegasa, ROT0,   "Dynax",                      "Mahjong Vegas (Japan)",                 MACHINE_NOT_WORKING )
+GAME( 1991,  mjvegas,  mjvegasa, mjvegas,  mjvegasa, royalmah_prgbank_state, init_mjvegas,  ROT0,   "Dynax",                      "Mahjong Vegas (Japan)",                 0 )
 GAME( 1992,  cafetime, 0,        cafetime, cafetime, royalmah_prgbank_state, init_cafetime, ROT0,   "Dynax",                      "Mahjong Cafe Time",                     0 )
-GAME( 1993,  cafedoll, 0,        mjifb,    mjifb,    royalmah_prgbank_state, init_mjifb,    ROT0,   "Dynax",                      "Mahjong Cafe Doll (Japan)",             MACHINE_NOT_WORKING )
-GAME( 1993,  ichiban,  0,        ichiban,  ichiban,  royalmah_prgbank_state, init_ichiban,  ROT0,   "Excel",                      "Ichi Ban Jyan",                         MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND ) // should just need correct palette and ROM banking
+GAME( 1993,  cafedoll, 0,        cafedoll, cafetime, royalmah_prgbank_state, init_cafedoll, ROT0,   "Dynax",                      "Mahjong Cafe Doll (Japan, Ver. 1.00)",  MACHINE_NOT_WORKING ) // needs correct banking implementation (P3 seems to be used differently)
+GAME( 1993,  ichiban,  0,        ichiban,  ichiban,  royalmah_prgbank_state, init_ichiban,  ROT0,   "Excel",                      "Ichi Ban Jyan",                         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // ROM banking is wrong, causing several GFX problems
 GAME( 1995,  mjtensin, 0,        mjtensin, mjtensin, royalmah_prgbank_state, init_mjtensin, ROT0,   "Dynax",                      "Mahjong Tensinhai (Japan)",             MACHINE_NOT_WORKING )
 GAME( 1996,  janptr96, 0,        janptr96, janptr96, royalmah_prgbank_state, init_janptr96, ROT0,   "Dynax",                      "Janputer '96 (Japan)",                  0 )
 GAME( 1997,  janptrsp, 0,        janptr96, janptr96, royalmah_prgbank_state, init_janptr96, ROT0,   "Dynax",                      "Janputer Special (Japan)",              0 )
 GAME( 1997,  pongboo2, 0,        pongboo2, ichiban,  royalmah_prgbank_state, init_pongboo2, ROT0,   "OCT",                        "Pong Boo! 2 (Ver. 1.31)",               MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS ) // banking, palette, inputs
-GAME( 1999,  cafebrk,  0,        mjifb,    mjifb,    royalmah_prgbank_state, init_mjifb,    ROT0,   "Nakanihon / Dynax",          "Mahjong Cafe Break",                    MACHINE_NOT_WORKING )
-GAME( 1999,  cafepara, 0,        mjifb,    mjifb,    royalmah_prgbank_state, init_mjifb,    ROT0,   "Techno-Top",                 "Mahjong Cafe Paradise",                 MACHINE_NOT_WORKING )
+GAME( 1999,  cafebrk,  0,        cafepara, cafetime, royalmah_prgbank_state, init_mjtensin, ROT0,   "Nakanihon / Dynax",          "Mahjong Cafe Break (Ver. 1.01J)",       MACHINE_NOT_WORKING ) // needs correct banking and / or 1d ROM descrambling
+GAME( 1999,  cafepara, 0,        cafepara, cafetime, royalmah_prgbank_state, init_mjtensin, ROT0,   "Techno-Top",                 "Mahjong Cafe Paradise (Ver. 1.00)",     MACHINE_NOT_WORKING ) // needs correct banking and / or 1d ROM descrambling

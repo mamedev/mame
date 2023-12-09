@@ -58,10 +58,6 @@ microtan_kbd_slot_device::microtan_kbd_slot_device(const machine_config &mconfig
 void microtan_kbd_slot_device::device_start()
 {
 	m_kbd = get_card_device();
-
-	// resolve callbacks
-	m_strobe_handler.resolve_safe();
-	m_reset_handler.resolve_safe();
 }
 
 

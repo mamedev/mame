@@ -1,7 +1,7 @@
 // Windows/MemoryLock.h
 
-#ifndef __WINDOWS_MEMORY_LOCK_H
-#define __WINDOWS_MEMORY_LOCK_H
+#ifndef ZIP7_INC_WINDOWS_MEMORY_LOCK_H
+#define ZIP7_INC_WINDOWS_MEMORY_LOCK_H
 
 #include "../Common/MyWindows.h"
 
@@ -30,6 +30,8 @@ inline void EnablePrivilege_SymLink()
   
   // Do we need to set SE_BACKUP_NAME ?
 }
+
+unsigned Get_LargePages_RiskLevel();
 
 #endif
 

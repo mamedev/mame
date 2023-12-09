@@ -13,7 +13,7 @@ class acs8600_ics_device : public device_t
 public:
 	acs8600_ics_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER(attn_w);
+	void attn_w(int state);
 
 	auto irq1_callback() { return m_out_irq1_func.bind(); }
 	auto irq2_callback() { return m_out_irq2_func.bind(); }
@@ -21,7 +21,6 @@ public:
 	const tiny_rom_entry *device_rom_region() const override;
 
 protected:
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 

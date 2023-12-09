@@ -45,6 +45,13 @@ Dumped by Chackn
 #include "screen.h"
 #include "speaker.h"
 
+#define LOG_VRAM (1U << 1)
+
+#define VERBOSE (0)
+//#define LOG_OUTPUT_FUNC printf
+#include "logmacro.h"
+
+
 /* VDP device to give us our own memory map */
 class janshi_vdp_device : public device_t, public device_memory_interface
 {
@@ -407,33 +414,31 @@ void pinkiri8_state::output_regs_w(uint8_t data)
 }
 
 
-#define LOG_VRAM 0
-
 void pinkiri8_state::pinkiri8_vram_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
 		case 0:
 			m_vram_addr = (data << 0)  | (m_vram_addr&0xffff00);
-			if (LOG_VRAM) printf("\n prev writes was %04x\n\naddress set to %04x -\n", m_prev_writes, m_vram_addr );
+			LOGMASKED(LOG_VRAM, "\n prev writes was %04x\n\naddress set to %04x -\n", m_prev_writes, m_vram_addr);
 			m_prev_writes = 0;
 			break;
 
 		case 1:
 			m_vram_addr = (data << 8)  | (m_vram_addr & 0xff00ff);
-			if (LOG_VRAM)printf("\naddress set to %04x\n", m_vram_addr);
+			LOGMASKED(LOG_VRAM, "\naddress set to %04x\n", m_vram_addr);
 			break;
 
 		case 2:
 			m_vram_addr = (data << 16) | (m_vram_addr & 0x00ffff);
-			if (LOG_VRAM)printf("\naddress set to %04x\n", m_vram_addr);
+			LOGMASKED(LOG_VRAM, "\naddress set to %04x\n", m_vram_addr);
 			break;
 
 		case 3:
 		{
 			address_space &vdp_space = m_vdp->space();
 
-			if (LOG_VRAM) printf("%02x ", data);
+			LOGMASKED(LOG_VRAM, "%02x ", data);
 			m_prev_writes++;
 			m_vram_addr++;
 

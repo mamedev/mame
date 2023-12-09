@@ -13,6 +13,7 @@ known chips:
  *021     1650    1978, GI AY-3-8910 demo board
  @024     1655    1979, Toytronic? Football
  @033     1655A   1979, Toytronic Football (newer)
+ *034     1655A   1979, Cardinal Electronic Football
  @036     1655A   1979, Ideal Maniac
  @043     1655A   1979, Caprice Pro-Action Baseball
  @049     1655A   1980, Kingsford Match Me(?)/Mini Match Me
@@ -74,14 +75,14 @@ TODO:
 
 // internal artwork
 #include "drdunk.lh"
-#include "flash.lh" // clickable
+#include "flash.lh"
 #include "hccbaskb.lh"
-#include "leboom.lh" // clickable
-#include "maniac.lh" // clickable
-#include "melodym.lh" // clickable
-#include "matchme.lh" // clickable
+#include "leboom.lh"
+#include "maniac.lh"
+#include "melodym.lh"
+#include "matchme.lh"
 #include "rockpin.lh"
-#include "touchme.lh" // clickable
+#include "touchme.lh"
 #include "ttfball.lh"
 #include "us2pfball.lh"
 
@@ -114,12 +115,13 @@ protected:
 	optional_device<speaker_sound_device> m_speaker;
 	optional_ioport_array<6> m_inputs; // max 6
 
-	// misc common
-	u8 m_a = 0;         // MCU port A write data
-	u8 m_b = 0;         // " B
-	u8 m_c = 0;         // " C
-	u8 m_d = 0;         // " D
 	u16 m_inp_mux = ~0; // multiplexed inputs mask
+
+	// MCU output pin state
+	u8 m_a = 0;         // port A
+	u8 m_b = 0;         // port B
+	u8 m_c = 0;         // port C
+	u8 m_d = 0;         // port D
 
 	u16 read_inputs(int columns, u16 colmask = ~0);
 	u8 read_rotated_inputs(int columns, u8 rowmask = ~0);
@@ -132,11 +134,11 @@ protected:
 void hh_pic16_state::machine_start()
 {
 	// register for savestates
+	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_a));
 	save_item(NAME(m_b));
 	save_item(NAME(m_c));
 	save_item(NAME(m_d));
-	save_item(NAME(m_inp_mux));
 }
 
 void hh_pic16_state::machine_reset()
@@ -161,7 +163,7 @@ u16 hh_pic16_state::read_inputs(int columns, u16 colmask)
 
 	// read selected input rows
 	for (int i = 0; i < columns; i++)
-		if (~m_inp_mux >> i & 1)
+		if (!BIT(m_inp_mux, i))
 			ret &= m_inputs[i]->read();
 
 	return ret;
@@ -189,7 +191,8 @@ INPUT_CHANGED_MEMBER(hh_pic16_state::reset_button)
 
 INPUT_CHANGED_MEMBER(hh_pic16_state::power_button)
 {
-	set_power((bool)param);
+	if (newval != field.defvalue())
+		set_power((bool)param);
 }
 
 void hh_pic16_state::set_power(bool state)
@@ -871,6 +874,8 @@ protected:
 private:
 	required_device<filter_volume_device> m_volume;
 
+	double m_speaker_volume = 0.0;
+
 	void update_display();
 	void write_b(u8 data);
 	u8 read_c();
@@ -878,7 +883,6 @@ private:
 
 	void speaker_update();
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
-	double m_speaker_volume = 0.0;
 };
 
 void flash_state::machine_start()
@@ -895,7 +899,7 @@ void flash_state::speaker_update()
 		m_speaker_volume = 50.0;
 
 	// it takes a bit before it actually starts fading
-	m_volume->flt_volume_set_volume(std::min(m_speaker_volume, 1.0));
+	m_volume->set_gain(std::min(m_speaker_volume, 1.0));
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(flash_state::speaker_decay_sim)
@@ -1315,13 +1319,14 @@ protected:
 private:
 	required_device<filter_volume_device> m_volume;
 
+	double m_speaker_volume = 0.0;
+
 	u8 read_a();
 	void write_b(u8 data);
 	void write_c(u8 data);
 
 	void speaker_update();
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
-	double m_speaker_volume = 0.0;
 };
 
 void leboom_state::machine_start()
@@ -1337,7 +1342,7 @@ void leboom_state::speaker_update()
 	if (~m_c & 0x80)
 		m_speaker_volume = 1.0;
 
-	m_volume->flt_volume_set_volume(m_speaker_volume);
+	m_volume->set_gain(m_speaker_volume);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(leboom_state::speaker_decay_sim)

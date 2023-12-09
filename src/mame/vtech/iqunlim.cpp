@@ -62,10 +62,10 @@ A4 = MAX232
 #include "screen.h"
 #include "softlist_dev.h"
 
-#define LOG_CARD_A_READ     (1 << 1u)
-#define LOG_CARD_A_WRITE    (1 << 2u)
-#define LOG_CARD_B_READ     (1 << 3u)
-#define LOG_CARD_B_WRITE    (1 << 4u)
+#define LOG_CARD_A_READ     (1U << 1)
+#define LOG_CARD_A_WRITE    (1U << 2)
+#define LOG_CARD_B_READ     (1U << 3)
+#define LOG_CARD_B_WRITE    (1U << 4)
 #define LOG_ALL             (LOG_CARD_A_READ | LOG_CARD_A_WRITE | LOG_CARD_B_READ | LOG_CARD_B_WRITE)
 
 #define VERBOSE (LOG_ALL)
@@ -119,12 +119,12 @@ void iqunlim_state::machine_start()
 void iqunlim_state::machine_reset()
 {
 	// Copy ROM vectors into RAM
-	memcpy(m_ram->pointer(), memregion("maincpu")->base(), 0x8);
+	memcpy(m_ram->pointer(), memregion("ipl")->base(), 0x100);
 }
 
 void iqunlim_state::mem_map(address_map &map)
 {
-	map(0x02000000, 0x023fffff).rom().region("maincpu", 0); // 68EZ328 /CSA0 pin selects System ROM after bootup
+	map(0x02000000, 0x023fffff).rom().region("ipl", 0); // 68EZ328 /CSA0 pin selects System ROM after bootup
 	map(0x03000000, 0x0307ffff).ram(); // Region used by the internal flash memory
 	map(0x04000000, 0x04ffffff).rw(FUNC(iqunlim_state::card4x_r), FUNC(iqunlim_state::card4x_w)); // Region used by Card B
 	map(0x05000000, 0x05ffffff).rw(FUNC(iqunlim_state::card5x_r), FUNC(iqunlim_state::card5x_w)); // Region used by Card A
@@ -209,12 +209,12 @@ void iqunlim_state::iqunlim(machine_config &config)
 }
 
 ROM_START( iqunlim )
-	ROM_REGION(0x400000, "maincpu", 0)
+	ROM_REGION16_BE(0x400000, "ipl", 0)
 	ROM_LOAD16_WORD_SWAP( "27-06122-006.bin", 0x000000, 0x400000, CRC(811b1b19) SHA1(bac99ce408ed0a3b6449db88b363293b46ce69b9) )
 ROM_END
 
 ROM_START( iqunlimgr )
-	ROM_REGION(0x400000, "maincpu", 0)
+	ROM_REGION16_BE(0x400000, "ipl", 0)
 	ROM_LOAD16_WORD_SWAP( "27-06126-007.bin", 0x000000, 0x400000, CRC(2e99cfef) SHA1(790869ffcf7fd666def8ff57fce0691062b3cec5) )
 ROM_END
 

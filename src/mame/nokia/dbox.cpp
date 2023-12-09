@@ -412,17 +412,15 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-//#define LOG_GENERAL (1U <<  0) // Already defined in logmacro.h
-#define LOG_SETUP   (1U <<  1)
-#define LOG_DISPLAY (1U <<  2)
-#define LOG_FLASH   (1U <<  3)
+#define LOG_SETUP   (1U << 1)
+#define LOG_DISPLAY (1U << 2)
+#define LOG_FLASH   (1U << 3)
 
 #define VERBOSE  (LOG_FLASH)
 #define LOG_OUTPUT_FUNC printf
 
 #include "logmacro.h"
 
-//#define LOG(...)        LOGMASKED(LOG_GENERAL, __VA_ARGS__) // Already defined in logmacro.h
 #define LOGSETUP(...)   LOGMASKED(LOG_SETUP,   __VA_ARGS__)
 #define LOGDISPLAY(...) LOGMASKED(LOG_DISPLAY, __VA_ARGS__)
 #define LOGFLASH(...)  LOGMASKED(LOG_FLASH,   __VA_ARGS__)

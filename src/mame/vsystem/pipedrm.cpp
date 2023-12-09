@@ -201,7 +201,7 @@ protected:
 
 private:
 	void bankswitch_w(uint8_t data);
-	uint8_t pending_command_r();
+	uint8_t soundlatch_pending_r();
 };
 
 class pipedrm_state : public hatris_state
@@ -273,7 +273,7 @@ void pipedrm_state::sound_bankswitch_w(uint8_t data)
  *
  *************************************/
 
-uint8_t hatris_state::pending_command_r()
+uint8_t hatris_state::soundlatch_pending_r()
 {
 	return m_soundlatch->pending_r();
 }
@@ -342,7 +342,7 @@ void hatris_state::main_portmap(address_map &map)
 	map(0x22, 0x22).portr("DSW1");
 	map(0x23, 0x23).portr("DSW2");
 	map(0x24, 0x24).portr("SYSTEM");
-	map(0x25, 0x25).r(FUNC(hatris_state::pending_command_r));
+	map(0x25, 0x25).r(FUNC(hatris_state::soundlatch_pending_r));
 }
 
 
@@ -376,7 +376,7 @@ void hatris_state::sound_portmap(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x03).mirror(0x08).rw("ymsnd", FUNC(ym2608_device::read), FUNC(ym2608_device::write));
 	map(0x04, 0x04).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0x05, 0x05).r(FUNC(hatris_state::pending_command_r)).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));
+	map(0x05, 0x05).r(FUNC(hatris_state::soundlatch_pending_r)).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));
 }
 
 
@@ -649,12 +649,12 @@ void hatris_state::machine_reset()
 void pipedrm_state::pipedrm(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 12000000/2);
+	Z80(config, m_maincpu, 12_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pipedrm_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &pipedrm_state::main_portmap);
 	m_maincpu->set_vblank_int("screen", FUNC(pipedrm_state::irq0_line_hold));
 
-	Z80(config, m_subcpu, 14318000/4);
+	Z80(config, m_subcpu, 14.318181_MHz_XTAL / 4);
 	m_subcpu->set_addrmap(AS_PROGRAM, &pipedrm_state::sound_map);
 	m_subcpu->set_addrmap(AS_IO, &pipedrm_state::sound_portmap);
 
@@ -670,7 +670,7 @@ void pipedrm_state::pipedrm(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pipedrm);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
-	VSYSTEM_GGA(config, m_gga, XTAL(14'318'181) / 2); // divider not verified
+	VSYSTEM_GGA(config, m_gga, 14.318181_MHz_XTAL / 2); // divider not verified
 	m_gga->write_cb().set(FUNC(pipedrm_state::fromance_gga_data_w));
 
 	VSYSTEM_SPR2(config, m_spr_old, 0);
@@ -686,7 +686,7 @@ void pipedrm_state::pipedrm(machine_config &config)
 	m_soundlatch->data_pending_callback().set_inputline(m_subcpu, INPUT_LINE_NMI);
 	m_soundlatch->set_separate_acknowledge(true);
 
-	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000));
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8_MHz_XTAL));
 	ymsnd.irq_handler().set_inputline("sub", 0);
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 1.0);
@@ -696,12 +696,12 @@ void pipedrm_state::pipedrm(machine_config &config)
 void hatris_state::hatris(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 12000000/2);
+	Z80(config, m_maincpu, 12_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &hatris_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &hatris_state::main_portmap);
 	m_maincpu->set_vblank_int("screen", FUNC(hatris_state::irq0_line_hold));
 
-	Z80(config, m_subcpu, 14318000/4);
+	Z80(config, m_subcpu, 14.318181_MHz_XTAL / 4);
 	m_subcpu->set_addrmap(AS_PROGRAM, &hatris_state::sound_map);
 	m_subcpu->set_addrmap(AS_IO, &hatris_state::sound_portmap);
 
@@ -717,7 +717,7 @@ void hatris_state::hatris(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hatris);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
-	VSYSTEM_GGA(config, m_gga, XTAL(14'318'181) / 2); // divider not verified
+	VSYSTEM_GGA(config, m_gga, 14.318181_MHz_XTAL / 2); // divider not verified
 	m_gga->write_cb().set(FUNC(hatris_state::fromance_gga_data_w));
 
 	/* sound hardware */
@@ -730,7 +730,7 @@ void hatris_state::hatris(machine_config &config)
 	// sound board.
 	//m_soundlatch->data_pending_callback().set_inputline(m_subcpu, INPUT_LINE_NMI);
 
-	ym2608_device &ym2608(YM2608(config, "ymsnd", 8000000));
+	ym2608_device &ym2608(YM2608(config, "ymsnd", 8_MHz_XTAL));
 	ym2608.irq_handler().set_inputline("sub", 0);
 	ym2608.add_route(0, "mono", 0.50);
 	ym2608.add_route(1, "mono", 1.0);
@@ -773,10 +773,10 @@ ROM_START( pipedrm )
 	ROM_LOAD( "g72.u83", 0x00000, 0x80000, CRC(dc3d14be) SHA1(4220f3fd13487dd861ac84b1b0d3e92125b3cc19) )
 
 	ROM_REGION( 0x0800, "plds", 0 )
-	ROM_LOAD( "palce16v8h.114", 0x0000, 0x0117, CRC(1f3a3816) SHA1(2b4d84ab98036b8861961f610b1b1ec23a653ef7) ) /* Stamped 1023 */
-	ROM_LOAD( "gal16v8a.115",   0x0200, 0x0117, CRC(2b32e239) SHA1(a3b9e45a1ce15ea4cc5754b2bf89cbaa416e814a) ) /* Stamped 1015 */
-	ROM_LOAD( "gal16v8a.116",   0x0400, 0x0117, CRC(3674f043) SHA1(06c88f65877a6575149bdd4f7cea64cd310227bd) ) /* Stamped 1014 */
-	ROM_LOAD( "gal16v8a.127",   0x0600, 0x0117, CRC(7115d95c) SHA1(23044039373b5a2face63d72c3fc6bf7f0c8a475) ) /* Stamped 1016 */
+	ROM_LOAD( "palce16v8h.114", 0x0000, 0x0117, CRC(1f3a3816) SHA1(2b4d84ab98036b8861961f610b1b1ec23a653ef7) ) // Stamped 1023
+	ROM_LOAD( "gal16v8a.115",   0x0200, 0x0117, CRC(2b32e239) SHA1(a3b9e45a1ce15ea4cc5754b2bf89cbaa416e814a) ) // Stamped 1015
+	ROM_LOAD( "gal16v8a.116",   0x0400, 0x0117, CRC(3674f043) SHA1(06c88f65877a6575149bdd4f7cea64cd310227bd) ) // Stamped 1014
+	ROM_LOAD( "gal16v8a.127",   0x0600, 0x0117, CRC(7115d95c) SHA1(23044039373b5a2face63d72c3fc6bf7f0c8a475) ) // Stamped 1016
 ROM_END
 
 ROM_START( pipedrmu )
@@ -807,10 +807,10 @@ ROM_START( pipedrmu )
 	ROM_LOAD( "g72.u83", 0x00000, 0x80000, CRC(dc3d14be) SHA1(4220f3fd13487dd861ac84b1b0d3e92125b3cc19) )
 
 	ROM_REGION( 0x0800, "plds", 0 )
-	ROM_LOAD( "palce16v8h.114", 0x0000, 0x0117, CRC(1f3a3816) SHA1(2b4d84ab98036b8861961f610b1b1ec23a653ef7) ) /* Stamped 1023 */
-	ROM_LOAD( "gal16v8a.115",   0x0200, 0x0117, CRC(2b32e239) SHA1(a3b9e45a1ce15ea4cc5754b2bf89cbaa416e814a) ) /* Stamped 1015 */
-	ROM_LOAD( "gal16v8a.116",   0x0400, 0x0117, CRC(3674f043) SHA1(06c88f65877a6575149bdd4f7cea64cd310227bd) ) /* Stamped 1014 */
-	ROM_LOAD( "gal16v8a.127",   0x0600, 0x0117, CRC(7115d95c) SHA1(23044039373b5a2face63d72c3fc6bf7f0c8a475) ) /* Stamped 1016 */
+	ROM_LOAD( "palce16v8h.114", 0x0000, 0x0117, CRC(1f3a3816) SHA1(2b4d84ab98036b8861961f610b1b1ec23a653ef7) ) // Stamped 1023
+	ROM_LOAD( "gal16v8a.115",   0x0200, 0x0117, CRC(2b32e239) SHA1(a3b9e45a1ce15ea4cc5754b2bf89cbaa416e814a) ) // Stamped 1015
+	ROM_LOAD( "gal16v8a.116",   0x0400, 0x0117, CRC(3674f043) SHA1(06c88f65877a6575149bdd4f7cea64cd310227bd) ) // Stamped 1014
+	ROM_LOAD( "gal16v8a.127",   0x0600, 0x0117, CRC(7115d95c) SHA1(23044039373b5a2face63d72c3fc6bf7f0c8a475) ) // Stamped 1016
 ROM_END
 
 
@@ -842,10 +842,10 @@ ROM_START( pipedrmj )
 	ROM_LOAD( "g72.u83", 0x00000, 0x80000, CRC(dc3d14be) SHA1(4220f3fd13487dd861ac84b1b0d3e92125b3cc19) )
 
 	ROM_REGION( 0x0800, "plds", 0 )
-	ROM_LOAD( "palce16v8h.114", 0x0000, 0x0117, CRC(1f3a3816) SHA1(2b4d84ab98036b8861961f610b1b1ec23a653ef7) ) /* Stamped 1023 */
-	ROM_LOAD( "gal16v8a.115",   0x0200, 0x0117, CRC(2b32e239) SHA1(a3b9e45a1ce15ea4cc5754b2bf89cbaa416e814a) ) /* Stamped 1015 */
-	ROM_LOAD( "gal16v8a.116",   0x0400, 0x0117, CRC(3674f043) SHA1(06c88f65877a6575149bdd4f7cea64cd310227bd) ) /* Stamped 1014 */
-	ROM_LOAD( "gal16v8a.127",   0x0600, 0x0117, CRC(7115d95c) SHA1(23044039373b5a2face63d72c3fc6bf7f0c8a475) ) /* Stamped 1016 */
+	ROM_LOAD( "palce16v8h.114", 0x0000, 0x0117, CRC(1f3a3816) SHA1(2b4d84ab98036b8861961f610b1b1ec23a653ef7) ) // Stamped 1023
+	ROM_LOAD( "gal16v8a.115",   0x0200, 0x0117, CRC(2b32e239) SHA1(a3b9e45a1ce15ea4cc5754b2bf89cbaa416e814a) ) // Stamped 1015
+	ROM_LOAD( "gal16v8a.116",   0x0400, 0x0117, CRC(3674f043) SHA1(06c88f65877a6575149bdd4f7cea64cd310227bd) ) // Stamped 1014
+	ROM_LOAD( "gal16v8a.127",   0x0600, 0x0117, CRC(7115d95c) SHA1(23044039373b5a2face63d72c3fc6bf7f0c8a475) ) // Stamped 1016
 ROM_END
 
 
@@ -877,54 +877,81 @@ ROM_START( pipedrmt )
 	ROM_LOAD( "g72.u83", 0x00000, 0x80000, CRC(dc3d14be) SHA1(4220f3fd13487dd861ac84b1b0d3e92125b3cc19) )
 
 	ROM_REGION( 0x0800, "plds", 0 )
-	ROM_LOAD( "palce16v8h.114", 0x0000, 0x0117, CRC(1f3a3816) SHA1(2b4d84ab98036b8861961f610b1b1ec23a653ef7) ) /* Stamped 1023 */
-	ROM_LOAD( "gal16v8a.115",   0x0200, 0x0117, CRC(2b32e239) SHA1(a3b9e45a1ce15ea4cc5754b2bf89cbaa416e814a) ) /* Stamped 1015 */
-	ROM_LOAD( "gal16v8a.116",   0x0400, 0x0117, CRC(3674f043) SHA1(06c88f65877a6575149bdd4f7cea64cd310227bd) ) /* Stamped 1014 */
-	ROM_LOAD( "gal16v8a.127",   0x0600, 0x0117, CRC(7115d95c) SHA1(23044039373b5a2face63d72c3fc6bf7f0c8a475) ) /* Stamped 1016 */
+	ROM_LOAD( "palce16v8h.114", 0x0000, 0x0117, CRC(1f3a3816) SHA1(2b4d84ab98036b8861961f610b1b1ec23a653ef7) ) // Stamped 1023
+	ROM_LOAD( "gal16v8a.115",   0x0200, 0x0117, CRC(2b32e239) SHA1(a3b9e45a1ce15ea4cc5754b2bf89cbaa416e814a) ) // Stamped 1015
+	ROM_LOAD( "gal16v8a.116",   0x0400, 0x0117, CRC(3674f043) SHA1(06c88f65877a6575149bdd4f7cea64cd310227bd) ) // Stamped 1014
+	ROM_LOAD( "gal16v8a.127",   0x0600, 0x0117, CRC(7115d95c) SHA1(23044039373b5a2face63d72c3fc6bf7f0c8a475) ) // Stamped 1016
 ROM_END
 
 
-ROM_START( hatris )
+ROM_START( hatris ) // VS-Z80-0H-8 PCB
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2.ic79", 0x00000, 0x08000, CRC(4ab50b54) SHA1(0eaab164a88c127bdf05c72f36d95be7fa3bb7de) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "1-ic81.bin", 0x00000, 0x08000, CRC(db25e166) SHA1(3538963d092967311d0a216b1e33ea39389b0d87) )
+	ROM_LOAD( "1.ic81", 0x00000, 0x08000, CRC(db25e166) SHA1(3538963d092967311d0a216b1e33ea39389b0d87) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "b0-ic56.bin", 0x00000, 0x20000, CRC(34f337a4) SHA1(ad74bb3fbfd16c9e92daa1cf5c5e522d11ba7dfb) )
-	ROM_FILL(                0x20000, 0x20000, 0x00000 )
-	ROM_LOAD( "b1-ic73.bin", 0x40000, 0x08000, CRC(6351d0ba) SHA1(6d6b2e23f0569e625414de11803955df60bbbd48) )
-	ROM_FILL(                0x48000, 0x18000, 0x00000 )
+	ROM_LOAD( "b0.ic56", 0x00000, 0x20000, CRC(34f337a4) SHA1(ad74bb3fbfd16c9e92daa1cf5c5e522d11ba7dfb) ) // mask ROM stamped B0
+	ROM_FILL(            0x20000, 0x20000, 0x00000 )
+	ROM_LOAD( "b1.ic73", 0x40000, 0x08000, CRC(6351d0ba) SHA1(6d6b2e23f0569e625414de11803955df60bbbd48) ) // mask ROM stamped B1
+	ROM_FILL(            0x48000, 0x18000, 0x00000 )
 
 	ROM_REGION( 0x40000, "gfx2", 0 )
-	ROM_LOAD( "a0-ic55.bin", 0x00000, 0x20000, CRC(7b7bc619) SHA1(b661c772e33aa7352dcdc20c4a9a84ed25ff89d7) )
-	ROM_LOAD( "a1-ic60.bin", 0x20000, 0x20000, CRC(f74d4168) SHA1(9ac433c4ce61fe402334aa97d32a51cfac634c46) )
+	ROM_LOAD( "a0.ic55", 0x00000, 0x20000, CRC(7b7bc619) SHA1(b661c772e33aa7352dcdc20c4a9a84ed25ff89d7) ) // mask ROM stamped A0
+	ROM_LOAD( "a1.ic60", 0x20000, 0x20000, CRC(f74d4168) SHA1(9ac433c4ce61fe402334aa97d32a51cfac634c46) ) // mask ROM stamped A1
 
 	ROM_REGION( 0x20000, "ymsnd", 0 )
-	ROM_LOAD( "pc-ic53.bin", 0x00000, 0x20000, CRC(07147712) SHA1(97692186e85f3a4a19dbd1bd95ed882e903a3c4a) )
+	ROM_LOAD( "pc.ic53", 0x00000, 0x20000, CRC(07147712) SHA1(97692186e85f3a4a19dbd1bd95ed882e903a3c4a) ) // mask ROM stamped PC
 ROM_END
 
 
-ROM_START( hatrisj )
+ROM_START( hatrisj ) // VS-Z80-0H-8 PCB
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2-ic79.bin", 0x00000, 0x08000, CRC(bbcaddbf) SHA1(7f01493dadfed87112644a8ef77ae58fa273980d) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "1-ic81.bin", 0x00000, 0x08000, CRC(db25e166) SHA1(3538963d092967311d0a216b1e33ea39389b0d87) )
+	ROM_LOAD( "1.ic81", 0x00000, 0x08000, CRC(db25e166) SHA1(3538963d092967311d0a216b1e33ea39389b0d87) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "b0-ic56.bin", 0x00000, 0x20000, CRC(34f337a4) SHA1(ad74bb3fbfd16c9e92daa1cf5c5e522d11ba7dfb) )
-	ROM_FILL(                0x20000, 0x20000, 0x00000 )
-	ROM_LOAD( "b1-ic73.bin", 0x40000, 0x08000, CRC(6351d0ba) SHA1(6d6b2e23f0569e625414de11803955df60bbbd48) )
-	ROM_FILL(                0x48000, 0x18000, 0x00000 )
+	ROM_LOAD( "b0.ic56", 0x00000, 0x20000, CRC(34f337a4) SHA1(ad74bb3fbfd16c9e92daa1cf5c5e522d11ba7dfb) ) // mask ROM stamped B0
+	ROM_FILL(            0x20000, 0x20000, 0x00000 )
+	ROM_LOAD( "b1.ic73", 0x40000, 0x08000, CRC(6351d0ba) SHA1(6d6b2e23f0569e625414de11803955df60bbbd48) ) // mask ROM stamped B1
+	ROM_FILL(            0x48000, 0x18000, 0x00000 )
 
 	ROM_REGION( 0x40000, "gfx2", 0 )
-	ROM_LOAD( "a0-ic55.bin", 0x00000, 0x20000, CRC(7b7bc619) SHA1(b661c772e33aa7352dcdc20c4a9a84ed25ff89d7) )
-	ROM_LOAD( "a1-ic60.bin", 0x20000, 0x20000, CRC(f74d4168) SHA1(9ac433c4ce61fe402334aa97d32a51cfac634c46) )
+	ROM_LOAD( "a0.ic55", 0x00000, 0x20000, CRC(7b7bc619) SHA1(b661c772e33aa7352dcdc20c4a9a84ed25ff89d7) ) // mask ROM stamped A0
+	ROM_LOAD( "a1.ic60", 0x20000, 0x20000, CRC(f74d4168) SHA1(9ac433c4ce61fe402334aa97d32a51cfac634c46) ) // mask ROM stamped A1
 
 	ROM_REGION( 0x20000, "ymsnd", 0 )
-	ROM_LOAD( "pc-ic53.bin", 0x00000, 0x20000, CRC(07147712) SHA1(97692186e85f3a4a19dbd1bd95ed882e903a3c4a) )
+	ROM_LOAD( "pc.ic53", 0x00000, 0x20000, CRC(07147712) SHA1(97692186e85f3a4a19dbd1bd95ed882e903a3c4a) ) // mask ROM stamped PC
+ROM_END
+
+
+/*
+The PCB had a sticker stating "Show Version" written in Japanese, so this version was likely meant for the
+  1990 AOU show held 1990/02/27 through 1990/02/28 or possibly for the 1990 AMOA held 1990/10/25 through
+  1990/10/27 as it has a "THIS GAME IS FOR USE IN THE USA ONLY." regional copyright notice
+*/
+ROM_START( hatrisp ) // PCB silkscreened VS-Z80-0H-8 despite being different to the above sets' PCB
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "3-6show.ic8", 0x00000, 0x08000, CRC(e1cf7403) SHA1(86a5392c6078618575682b53a83e7810fd6db7c0) ) // hand written 3/6  Show
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "3-6.ic94", 0x00000, 0x08000, CRC(e0b05b71) SHA1(ced27439611c3a7a4f7cb4d90d4b3a6f1e3e104c) ) // hand written 3/6
+
+	ROM_REGION( 0x80000, "gfx1", 0 ) // the "+" in the file name takes place of the '
+	ROM_LOAD( "b0.ic76+", 0x00000, 0x20000, CRC(60346041) SHA1(6a8fbd64f5b25e7f0a19aefcb6f852adf10eda37) ) // hand written B0, IC position was silkscreened as IC76'
+	ROM_FILL(             0x20000, 0x20000, 0x00000 )
+	ROM_LOAD( "b1.ic76",  0x40000, 0x20000, CRC(e8e2db07) SHA1(dfbfb2a9a20b44134306acb4a99a22978e8d8547) ) // hand written B1, IC position was silkscreened as IC76
+	ROM_FILL(             0x48000, 0x20000, 0x00000 )
+
+	ROM_REGION( 0x40000, "gfx2", 0 ) // the "+" in the file name takes place of the '
+	ROM_LOAD( "a0.ic51+", 0x00000, 0x20000, CRC(7b7bc619) SHA1(b661c772e33aa7352dcdc20c4a9a84ed25ff89d7) ) // hand written A0, IC position was silkscreened as IC51'
+	ROM_LOAD( "a1.ic51",  0x20000, 0x20000, CRC(f74d4168) SHA1(9ac433c4ce61fe402334aa97d32a51cfac634c46) ) // hand written A1, IC position was silkscreened as IC51
+
+	ROM_REGION( 0x20000, "ymsnd", 0 )
+	ROM_LOAD( "pc.ic107", 0x00000, 0x20000, CRC(07147712) SHA1(97692186e85f3a4a19dbd1bd95ed882e903a3c4a) )
 ROM_END
 
 
@@ -959,9 +986,10 @@ void hatris_state::init_hatris()
  *
  *************************************/
 
-GAME( 1990, pipedrm,  0,       pipedrm, pipedrm, pipedrm_state, init_pipedrm, ROT0, "Video System Co.", "Pipe Dream (World)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pipedrmu, pipedrm, pipedrm, pipedrm, pipedrm_state, init_pipedrm, ROT0, "Video System Co.", "Pipe Dream (US)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pipedrmj, pipedrm, pipedrm, pipedrm, pipedrm_state, init_pipedrm, ROT0, "Video System Co.", "Pipe Dream (Japan)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pipedrmt, pipedrm, pipedrm, pipedrm, pipedrm_state, init_pipedrm, ROT0, "Video System Co.", "Pipe Dream (Taiwan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hatris,   0,       hatris,  hatris,  hatris_state,  init_hatris,  ROT0, "Video System Co.", "Hatris (US)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hatrisj,  hatris,  hatris,  hatris,  hatris_state,  init_hatris,  ROT0, "Video System Co.", "Hatris (Japan)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pipedrm,  0,       pipedrm, pipedrm, pipedrm_state, init_pipedrm, ROT0, "Video System Co.", "Pipe Dream (World)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pipedrmu, pipedrm, pipedrm, pipedrm, pipedrm_state, init_pipedrm, ROT0, "Video System Co.", "Pipe Dream (US)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pipedrmj, pipedrm, pipedrm, pipedrm, pipedrm_state, init_pipedrm, ROT0, "Video System Co.", "Pipe Dream (Japan)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pipedrmt, pipedrm, pipedrm, pipedrm, pipedrm_state, init_pipedrm, ROT0, "Video System Co.", "Pipe Dream (Taiwan)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hatris,   0,       hatris,  hatris,  hatris_state,  init_hatris,  ROT0, "Video System Co.", "Hatris (US)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hatrisj,  hatris,  hatris,  hatris,  hatris_state,  init_hatris,  ROT0, "Video System Co.", "Hatris (Japan)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hatrisp,  hatris,  hatris,  hatris,  hatris_state,  init_hatris,  ROT0, "Video System Co.", "Hatris (show version)", MACHINE_SUPPORTS_SAVE )

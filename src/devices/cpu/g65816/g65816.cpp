@@ -875,8 +875,6 @@ void g65816_device::device_start()
 	(has_space(AS_OPCODES) ? space(AS_OPCODES) : space(AS_PROGRAM)).cache(m_opcode);
 	(has_space(AS_DATA) ? space(AS_DATA) : space(AS_PROGRAM)).specific(m_data);
 
-	m_wdm_w.resolve_safe();
-
 	save_item(NAME(m_a));
 	save_item(NAME(m_b));
 	save_item(NAME(m_x));

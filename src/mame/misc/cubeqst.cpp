@@ -33,41 +33,44 @@ namespace {
 class cubeqst_state : public driver_device
 {
 public:
-	cubeqst_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_laserdisc(*this, "laserdisc"),
-			m_maincpu(*this, "main_cpu"),
-			m_rotatecpu(*this, "rotate_cpu"),
-			m_linecpu(*this, "line_cpu"),
-			m_soundcpu(*this, "sound_cpu"),
-			m_screen(*this, "screen"),
-			m_dacs(*this, {
-				"rdac0", "ldac0",
-				"rdac1", "ldac1",
-				"rdac2", "ldac2",
-				"rdac3", "ldac3",
-				"rdac4", "ldac4",
-				"rdac5", "ldac5",
-				"rdac6", "ldac6",
-				"rdac7", "ldac7"
-			}),
-			m_generic_paletteram_16(*this, "paletteram")
+	cubeqst_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_laserdisc(*this, "laserdisc"),
+		m_maincpu(*this, "main_cpu"),
+		m_rotatecpu(*this, "rotate_cpu"),
+		m_linecpu(*this, "line_cpu"),
+		m_soundcpu(*this, "sound_cpu"),
+		m_screen(*this, "screen"),
+		m_ldacs(*this, "ldac%u", 0U),
+		m_rdacs(*this, "rdac%u", 0U),
+		m_generic_paletteram_16(*this, "paletteram")
 	{
 	}
 
-	std::unique_ptr<uint8_t[]> m_depth_buffer;
-	int m_video_field = 0;
-	uint8_t m_io_latch = 0;
-	uint8_t m_reset_latch = 0;
+	void cubeqst(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
 	required_device<simutrek_special_device> m_laserdisc;
 	required_device<cpu_device> m_maincpu;
 	required_device<cquestrot_cpu_device> m_rotatecpu;
 	required_device<cquestlin_cpu_device> m_linecpu;
 	required_device<cquestsnd_cpu_device> m_soundcpu;
 	required_device<screen_device> m_screen;
-	required_device_array<dac_word_interface, 16> m_dacs;
+	required_device_array<dac_word_interface, 8> m_ldacs;
+	required_device_array<dac_word_interface, 8> m_rdacs;
 	required_shared_ptr<uint16_t> m_generic_paletteram_16;
+
+	std::unique_ptr<uint8_t[]> m_depth_buffer;
+	int m_video_field = 0;
+	uint8_t m_io_latch = 0;
+	uint8_t m_reset_latch = 0;
 	std::unique_ptr<rgb_t[]> m_colormap;
+
 	void palette_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t line_r();
 	void laserdisc_w(uint16_t data);
@@ -83,14 +86,10 @@ public:
 	uint16_t read_sndram(offs_t offset);
 	void write_sndram(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void sound_dac_w(uint16_t data);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	uint32_t screen_update_cubeqst(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	TIMER_CALLBACK_MEMBER(delayed_bank_swap);
 	void swap_linecpu_banks();
-	void cubeqst(machine_config &config);
 	void line_sound_map(address_map &map);
 	void m68k_program_map(address_map &map);
 	void rotate_map(address_map &map);
@@ -117,7 +116,6 @@ public:
 
 void cubeqst_state::video_start()
 {
-	m_video_field = 0;
 	m_depth_buffer = std::make_unique<uint8_t[]>(512);
 }
 
@@ -206,7 +204,7 @@ uint16_t cubeqst_state::line_r()
 	return m_screen->vpos();
 }
 
-WRITE_LINE_MEMBER(cubeqst_state::vblank_irq)
+void cubeqst_state::vblank_irq(int state)
 {
 	if (state)
 	{
@@ -333,7 +331,7 @@ void cubeqst_state::io_w(uint16_t data)
 	*/
 
 	/* TODO: On rising edge of Q7, status LED latch is written */
-	if ( !BIT(m_io_latch, 7) && BIT(data, 7) )
+	if (!BIT(m_io_latch, 7) && BIT(data, 7))
 	{
 		/*
 		    0: Battery failure
@@ -358,7 +356,7 @@ uint16_t cubeqst_state::io_r()
 	     10: Spare  / Trackball V data
 	*/
 
-	if ( !BIT(m_io_latch, 7) )
+	if (!BIT(m_io_latch, 7))
 		return port_data;
 	else
 		/* Return zeroes for the trackball signals for now */
@@ -385,11 +383,11 @@ static INPUT_PORTS_START( cubeqst )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME( "Cube" )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Right Fire" )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME( "Left Fire" )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Cube")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Right Fire")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Left Fire")
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_SERVICE )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME( "Free Game" )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("Free Game")
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xf800, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -465,10 +463,8 @@ void cubeqst_state::line_sound_map(address_map &map)
 void cubeqst_state::machine_start()
 {
 	/* TODO: Use resistor values */
-	int i;
-
 	m_colormap = std::make_unique<rgb_t[]>(65536);
-	for (i = 0; i < 65536; ++i)
+	for (int i = 0; i < 65536; ++i)
 	{
 		uint8_t a, r, g, b, y;
 
@@ -508,10 +504,14 @@ void cubeqst_state::machine_reset()
 /* Called by the sound CPU emulation */
 void cubeqst_state::sound_dac_w(uint16_t data)
 {
-	/// d0 selects between 4051.1d (right, d0=1) and 4051.3d (left, d0=0)
+	/// d0 selects between 4051.1d (right, d0=0) and 4051.3d (left, d0=1)
 	/// d1-d3 select the channel
 	/// d4-d11 are sent to the 7521 dac, d11 is inverted
-	m_dacs[data & 15]->write((data >> 4) ^ 0x800);
+	uint16_t val = (data >> 4) ^ 0x800;
+	if (data & 1)
+		m_ldacs[data >> 1 & 7]->write(val);
+	else
+		m_rdacs[data >> 1 & 7]->write(val);
 }
 
 
@@ -564,11 +564,11 @@ void cubeqst_state::cubeqst(machine_config &config)
 
 	for (int i = 0; i < 8; i++)
 	{
-		// ad7521jn.2d (59) + cd4051be.1d (24) + 1500pf.c22 (34) + tl074cn.1b (53) + r10k.rn1 (30)
-		AD7521(config, m_dacs[i*2+0], 0).add_route(0, "rspeaker", 0.125);
+		// AD7521JN.2D (59) + CD4051BE.3D (24) + 1500pF.C6-C13 (34) + TL074CN.3B/3C (53) + 10K.RN3/4 (30)
+		AD7521(config, m_ldacs[i]).add_route(0, "lspeaker", 0.125);
 
-		// ad7521jn.2d (59) + cd4051be.3d (24) + 1500pf.c13 (34) + tl074cn.3b (53) + r10k.rn3 (30)
-		AD7521(config, m_dacs[i*2+1], 0).add_route(0, "lspeaker", 0.125);
+		// AD7521JN.2D (59) + CD4051BE.1D (24) + 1500pF.C15-C22 (34) + TL074CN.1B/1C (53) + 10K.RN1/2 (30)
+		AD7521(config, m_rdacs[i]).add_route(0, "rspeaker", 0.125);
 	}
 }
 

@@ -602,7 +602,7 @@ void berzerk_state::audio_w(offs_t offset, uint8_t data)
 		case 1:
 		{
 			/* volume - 0 appears to be inaudible */
-			m_s14001a_volume->flt_volume_set_volume((data >> 3 & 7) / 7.0);
+			m_s14001a_volume->set_gain((data >> 3 & 7) / 7.0);
 
 			/* clock control - the first LS161 divides the clock by 9 to 16, the 2nd by 8,
 			   giving a final clock from 19.5kHz to 34.7kHz */
@@ -1454,5 +1454,5 @@ GAME( 1980, berzerkb, berzerk, berzerk, berzerk,  berzerk_state, empty_init,    
 GAME( 1980, berzerkf, berzerk, berzerk, berzerkf, berzerk_state, empty_init,    ROT0, "Stern Electronics", "Berzerk (French Speech, revision RC31)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, berzerkg, berzerk, berzerk, berzerkg, berzerk_state, empty_init,    ROT0, "Stern Electronics", "Berzerk (German Speech, revision RC32)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, berzerks, berzerk, berzerk, berzerks, berzerk_state, empty_init,    ROT0, "Stern Electronics (Sonic License)", "Berzerk (Spanish Speech, revision RC32)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, frenzy,   0,       frenzy,  frenzy,   berzerk_state, empty_init,    ROT0, "Stern Electronics", "Frenzy (revision RA1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, frenzy,   0,       frenzy,  frenzy,   berzerk_state, empty_init,    ROT0, "Stern Electronics", "Frenzy (revision RA1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, moonwarp, 0,       frenzy,  moonwarp, berzerk_state, init_moonwarp, ROT0, "Stern Electronics", "Moon War (prototype on Frenzy hardware)", MACHINE_SUPPORTS_SAVE )

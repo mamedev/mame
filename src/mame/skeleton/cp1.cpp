@@ -2,12 +2,12 @@
 // copyright-holders:Sandro Ronco
 /***************************************************************************
 
-        Kosmos CP-1
+        Kosmos CP1
 
         06/03/2012 Skeleton driver.
 
         on board there is also 8155
-        KEYBOARD Membrane keyboard, 57 keys
+        KEYBOARD Membrane keyboard, 20+10 keys
         6 * 7 seg led display
 
 ****************************************************************************/
@@ -41,11 +41,13 @@ public:
 	{ }
 
 	void cp1(machine_config &config);
-private:
-	void cp1_io(address_map &map);
 
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+private:
+	void cp1_io(address_map &map);
 
 	uint8_t port1_r();
 	uint8_t port2_r();
@@ -68,9 +70,8 @@ private:
 	required_ioport_array<5> m_io_lines;
 	required_ioport m_io_config;
 
-	uint8_t   m_7seg;
-	uint8_t   m_port2;
-	uint8_t   m_matrix;
+	uint8_t m_port2 = 0;
+	uint8_t m_matrix = 0;
 };
 
 uint8_t cp1_state::port1_r()
@@ -103,8 +104,8 @@ uint8_t cp1_state::port2_r()
 
 	uint8_t data = 0;
 
-	for(int i=0; i<5; i++)
-		if (!(m_matrix & (1<<i)))
+	for (int i = 0; i < 5; i++)
+		if (BIT(m_matrix, i))
 			data |= m_io_lines[i]->read();
 
 	return (data & 0x0f) | (m_port2 & 0xf0);
@@ -159,8 +160,7 @@ void cp1_state::i8155_write(offs_t offset, uint8_t data)
 
 void cp1_state::i8155_porta_w(uint8_t data)
 {
-	m_7seg = data & 0x7f; // PA7 is not connected
-	m_display->matrix(~m_matrix, m_7seg);
+	m_display->write_mx(data | 0x80); // PA7 is not connected
 }
 
 uint8_t cp1_state::i8155_portb_r()
@@ -177,8 +177,8 @@ void cp1_state::i8155_portb_w(uint8_t data)
 void cp1_state::i8155_portc_w(uint8_t data)
 {
 	// --xx xxxx   keyboard matrix, 7seg select
-	m_matrix = data & 0x3f;
-	m_display->matrix(~m_matrix, m_7seg);
+	m_matrix = ~data & 0x3f;
+	m_display->write_my(m_matrix);
 }
 
 
@@ -227,13 +227,12 @@ INPUT_PORTS_END
 
 void cp1_state::machine_start()
 {
+	save_item(NAME(m_port2));
+	save_item(NAME(m_matrix));
 }
 
 void cp1_state::machine_reset()
 {
-	m_port2 = 0;
-	m_matrix = 0;
-	m_7seg = 0;
 	m_cassette->change_state(CASSETTE_STOPPED, CASSETTE_MASK_UISTATE);
 }
 
@@ -278,10 +277,6 @@ void cp1_state::cp1(machine_config &config)
 	maincpu.p1_out_cb().set(FUNC(cp1_state::port1_w));
 	maincpu.p2_in_cb().set(FUNC(cp1_state::port2_r));
 	maincpu.p2_out_cb().set(FUNC(cp1_state::port2_w));
-	maincpu.bus_in_cb().set_log("getbus");
-	maincpu.bus_out_cb().set_log("putbus");
-	maincpu.t0_in_cb().set_log("t0_r");
-	maincpu.t1_in_cb().set_log("t1_r");
 
 	i8155_device &i8155(I8155(config, "i8155", 0));
 	i8155.out_pa_callback().set(FUNC(cp1_state::i8155_porta_w));
@@ -291,8 +286,9 @@ void cp1_state::cp1(machine_config &config)
 
 	I8155(config, "i8155_cp3", 0);
 
-	PWM_DISPLAY(config, m_display).set_size(6, 7);
+	PWM_DISPLAY(config, m_display).set_size(6, 8);
 	m_display->set_segmask(0x3f, 0x7f);
+	m_display->set_segmask(0x08, 0xff); // 3rd digit DP is always on
 	config.set_default_layout(layout_cp1);
 
 	SPEAKER(config, "mono").front_center();
@@ -326,4 +322,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY   FULLNAME                 FLAGS
-COMP( 1980, cp1,  0,      0,      cp1,     cp1,   cp1_state, empty_init, "Kosmos", "CP1 / Computer Praxis", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1980, cp1,  0,      0,      cp1,     cp1,   cp1_state, empty_init, "Kosmos", "CP1 / Computer-Praxis", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

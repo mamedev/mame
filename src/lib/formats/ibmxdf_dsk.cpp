@@ -2,7 +2,7 @@
 // copyright-holders:Sergey Svishchev
 /*********************************************************************
 
-    formats/ibmxdf_dsk.c
+    formats/ibmxdf_dsk.cpp
 
     IBM Extended Density Format
 
@@ -40,17 +40,17 @@ ibmxdf_format::ibmxdf_format() : wd177x_format(formats)
 {
 }
 
-const char *ibmxdf_format::name() const
+const char *ibmxdf_format::name() const noexcept
 {
 	return "ibmxdf";
 }
 
-const char *ibmxdf_format::description() const
+const char *ibmxdf_format::description() const noexcept
 {
 	return "IBM XDF disk image";
 }
 
-const char *ibmxdf_format::extensions() const
+const char *ibmxdf_format::extensions() const noexcept
 {
 	return "xdf,img";
 }
@@ -178,7 +178,7 @@ const ibmxdf_format::format ibmxdf_format::formats_head1_track0[] = {
 	{}
 };
 
-bool ibmxdf_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool ibmxdf_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	int type = find_size(io, form_factor, variants);
 	if(type == -1)
@@ -218,7 +218,7 @@ bool ibmxdf_format::load(util::random_read &io, uint32_t form_factor, const std:
 			generate_track(desc, track, head, sectors, tf.sector_count, total_size, image);
 		}
 
-	image->set_variant(f.variant);
+	image.set_variant(f.variant);
 
 	return true;
 }

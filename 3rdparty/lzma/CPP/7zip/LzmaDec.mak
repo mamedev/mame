@@ -1,0 +1,7 @@
+!IF "$(PLATFORM)" == "x64"
+!IFNDEF NO_ASM
+CFLAGS_C_SPEC = -DZ7_LZMA_DEC_OPT
+ASM_OBJS = $(ASM_OBJS) \
+  $O\LzmaDecOpt.obj
+!ENDIF
+!ENDIF

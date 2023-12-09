@@ -45,8 +45,7 @@ public:
 		m_colorram(*this, "colorram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_ay(*this, "ay%u", 1U),
-		m_irq_mask(0)
+		m_ay(*this, "ay%u", 1U)
 	{
 	}
 
@@ -58,14 +57,14 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
-	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void coin_counter_1_w(int state);
+	void coin_counter_2_w(int state);
+	void irq_mask_w(int state);
+	void vblank_irq(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(schick_palettebank_w);
-	DECLARE_WRITE_LINE_MEMBER(schick_colortablebank_w);
-	DECLARE_WRITE_LINE_MEMBER(schick_gfxbank_w);
+	void schick_palettebank_w(int state);
+	void schick_colortablebank_w(int state);
+	void schick_gfxbank_w(int state);
 
 	TILEMAP_MAPPER_MEMBER(schick_scan_rows);
 	TILE_GET_INFO_MEMBER(schick_get_tile_info);
@@ -106,10 +105,10 @@ private:
 
 	uint8_t soundlatch_read_and_clear();
 
-	uint8_t m_irq_mask;
 	uint32_t screen_update_schick(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_irq_mask = 0;
 	uint8_t m_charbank = 0;
 	uint8_t m_spritebank = 0;
 	uint8_t m_palettebank = 0;
@@ -199,21 +198,21 @@ void schick_state::schick_colorram_w(offs_t offset, uint8_t data)
 	m_bg_tilemap->mark_tile_dirty(offset );
 }
 
-WRITE_LINE_MEMBER(schick_state::schick_palettebank_w)
+void schick_state::schick_palettebank_w(int state)
 {
 	logerror("%s: schick_palettebank_w %d\n", machine().describe_context(), state);
 	m_palettebank = state;
 	m_bg_tilemap->mark_all_dirty();
 }
 
-WRITE_LINE_MEMBER(schick_state::schick_colortablebank_w)
+void schick_state::schick_colortablebank_w(int state)
 {
 	logerror("%s: schick_colortablebank_w %d\n", machine().describe_context(), state);
 	m_colortablebank = state;
 	m_bg_tilemap->mark_all_dirty();
 }
 
-WRITE_LINE_MEMBER(schick_state::schick_gfxbank_w)
+void schick_state::schick_gfxbank_w(int state)
 {
 	logerror("%s: schick_gfxbank_w %d\n", machine().describe_context(), state);
 	m_spritebank = state;
@@ -221,17 +220,17 @@ WRITE_LINE_MEMBER(schick_state::schick_gfxbank_w)
 	m_bg_tilemap->mark_all_dirty();
 }
 
-WRITE_LINE_MEMBER(schick_state::coin_counter_1_w)
+void schick_state::coin_counter_1_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE_LINE_MEMBER(schick_state::coin_counter_2_w)
+void schick_state::coin_counter_2_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(1, state);
 }
 
-WRITE_LINE_MEMBER(schick_state::irq_mask_w)
+void schick_state::irq_mask_w(int state)
 {
 	m_irq_mask = state;
 }
@@ -569,7 +568,7 @@ static GFXDECODE_START( gfx_schick )
 	GFXDECODE_ENTRY( "gfx1", 0x7000, spritelayout, 0, 128/4 ) // gameplay, has C, K, ? block tiles (and different scenery items) (for levels 4,5,6?)
 GFXDECODE_END
 
-WRITE_LINE_MEMBER(schick_state::vblank_irq)
+void schick_state::vblank_irq(int state)
 {
 	if (state && m_irq_mask)
 		m_maincpu->set_input_line(0, HOLD_LINE);
@@ -593,9 +592,9 @@ void schick_state::schick(machine_config &config) // all dividers unknown
 
 	LS259(config, m_latch); // 3I, TODO: identify bits' function. 0 is correct, 2, 6 and 7 seem to be set when switching from title screen to game screen, 1, 3, 4 and 5 seem to never be set during gameplay
 	m_latch->q_out_cb<0>().set(FUNC(schick_state::irq_mask_w));
-	m_latch->q_out_cb<1>().set_log("m_latch bit 1 set");
+	m_latch->q_out_cb<1>().set([this](int state) { logerror("%s latch bit 1 w: %d\n", machine().describe_context(), state); });
 	m_latch->q_out_cb<2>().set(FUNC(schick_state::schick_palettebank_w));
-	m_latch->q_out_cb<3>().set_log("m_latch bit 3 set");
+	m_latch->q_out_cb<3>().set([this](int state) { logerror("%s latch bit 3 w: %d\n", machine().describe_context(), state); });
 	m_latch->q_out_cb<4>().set(FUNC(schick_state::coin_counter_1_w));
 	m_latch->q_out_cb<5>().set(FUNC(schick_state::coin_counter_2_w));
 	m_latch->q_out_cb<6>().set(FUNC(schick_state::schick_colortablebank_w));

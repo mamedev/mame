@@ -33,7 +33,7 @@ not have an edge connector or empty ROM socket for it.
 #include "speaker.h"
 
 // internal artwork
-#include "yeno_532xl.lh" // clickable
+#include "yeno_532xl.lh"
 
 
 namespace {
@@ -70,6 +70,10 @@ private:
 	output_finder<8> m_out_digit;
 	output_finder<64> m_out_lcd;
 
+	u8 m_led_data = 0;
+	u8 m_cb_mux = 0xff;
+	u8 m_control = 0xff;
+
 	// address maps
 	void main_map(address_map &map);
 
@@ -80,10 +84,6 @@ private:
 	void cb_w(u8 data);
 	void led_w(u8 data);
 	void control_w(offs_t offset, u8 data);
-
-	u8 m_led_data = 0;
-	u8 m_cb_mux = 0xff;
-	u8 m_control = 0xff;
 };
 
 void y532xl_state::machine_start()

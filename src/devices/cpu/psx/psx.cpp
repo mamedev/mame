@@ -1785,16 +1785,16 @@ void psxcpu_device::psxcpu_internal_map(address_map &map)
 //-------------------------------------------------
 
 psxcpu_device::psxcpu_device( const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock ) :
-	cpu_device( mconfig, type, tag, owner, clock ),
-	m_program_config( "program", ENDIANNESS_LITTLE, 32, 32, 0, address_map_constructor(FUNC(psxcpu_device::psxcpu_internal_map), this)),
-	m_gpu_read_handler( *this ),
-	m_gpu_write_handler( *this ),
-	m_spu_read_handler( *this ),
-	m_spu_write_handler( *this ),
-	m_cd_read_handler( *this ),
-	m_cd_write_handler( *this ),
-	m_ram( *this, "ram" ),
-	m_rom( *this, "rom" )
+	cpu_device(mconfig, type, tag, owner, clock),
+	m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0, address_map_constructor(FUNC(psxcpu_device::psxcpu_internal_map), this)),
+	m_gpu_read_handler(*this, 0),
+	m_gpu_write_handler(*this),
+	m_spu_read_handler(*this, 0),
+	m_spu_write_handler(*this),
+	m_cd_read_handler(*this, 0),
+	m_cd_write_handler(*this),
+	m_ram(*this, "ram"),
+	m_rom(*this, "rom")
 {
 	m_disable_rom_berr = false;
 }
@@ -1988,13 +1988,6 @@ void psxcpu_device::device_start()
 
 	// set our instruction counter
 	set_icountptr(m_icount);
-
-	m_gpu_read_handler.resolve_safe( 0 );
-	m_gpu_write_handler.resolve_safe();
-	m_spu_read_handler.resolve_safe( 0 );
-	m_spu_write_handler.resolve_safe();
-	m_cd_read_handler.resolve_safe( 0 );
-	m_cd_write_handler.resolve_safe();
 }
 
 

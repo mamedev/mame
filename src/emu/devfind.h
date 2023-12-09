@@ -216,21 +216,21 @@ public:
 /// Abstract non-template base class for object auto-discovery helpers.
 /// Provides the interface that the device_t uses to manage discovery at
 /// resolution time.
-class finder_base
+class device_resolver_base
 {
 public:
 	/// \brief Destructor
 	///
 	/// Destruction via base class pointer and dynamic type behaviour
 	/// are allowed.
-	virtual ~finder_base();
+	virtual ~device_resolver_base();
 
 	/// \brief Get next registered object discovery helper
 	///
 	/// Implementation of basic single-linked list behaviour.
 	/// \return Pointer to the next registered object discovery helper,
 	///   or nullptr if this is the last.
-	finder_base *next() const { return m_next; }
+	device_resolver_base *next() const noexcept { return m_next; }
 
 	/// \brief Attempt discovery
 	///
@@ -254,6 +254,32 @@ public:
 	/// subsequently removes or replaces devices.
 	virtual void end_configuration() = 0;
 
+protected:
+	/// \brief Designated constructor
+	///
+	/// Construct base object discovery helper and register with device
+	/// to be invoked at resolution time.
+	/// \param [in] base Device to register with for resolution.
+	device_resolver_base(device_t &base);
+
+
+	/// \brief Pointer to next registered discovery helper
+	///
+	/// This is a polymorphic class, so it can't be held in a standard
+	/// list container that requires elements of the same type.  Hence
+	/// it implements basic intrusive single-linked list behaviour.
+	device_resolver_base *const m_next;
+};
+
+
+/// \brief Base class for object discovery helpers
+///
+/// Abstract non-template base class for object auto-discovery helpers.
+/// Provides functionality for specifying a target as a base device and
+/// relative tag.  Also supplies helpers for looking up resources.
+class finder_base : protected device_resolver_base
+{
+public:
 	/// \brief Get search tag
 	///
 	/// Returns the search tag.
@@ -280,6 +306,7 @@ public:
 	void set_tag(device_t &base, char const *tag)
 	{
 		assert(!m_resolved);
+		assert(tag);
 		m_base = base;
 		m_tag = tag;
 	}
@@ -315,7 +342,9 @@ protected:
 	///
 	/// Construct base object discovery helper and register with device
 	/// to be invoked at resolution time.
-	/// \param [in] base Base device to search from.
+	/// \param [in] base Device to register with for resolution.  Also
+	///   sets initial base device to search from.  The tag must be
+	///   specified relative to this device.
 	/// \param [in] tag Object tag to search for.  This is not copied,
 	///   it is the caller's responsibility to ensure this pointer
 	///   remains valid until resolution time.
@@ -418,13 +447,6 @@ protected:
 	/// \return True if found or not required, false otherwise.
 	bool report_missing(bool found, char const *objname, bool required) const;
 
-
-	/// \brief Pointer to next registered discovery helper
-	///
-	/// This is a polymorphic class, so it can't be held in a standard
-	/// list container that requires elements of the same type.  Hence
-	/// it implements basic intrusive single-linked list behaviour.
-	finder_base *const m_next;
 
 	/// \brief Base device to search from
 	std::reference_wrapper<device_t> m_base;
@@ -599,6 +621,12 @@ public:
 		this->m_target = &device;
 		return device;
 	}
+
+	/// \brief Look up target during configuration
+	/// Look up the current target device during configuration, before
+	/// resolution.
+	/// \return Pointer to target device if found, or nullptr otherwise.
+	DeviceClass *lookup() const { return this->m_base.get().template subdevice<DeviceClass>(this->m_tag); }
 
 private:
 	/// \brief Check that device implementation has expected tag

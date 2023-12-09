@@ -208,14 +208,11 @@ void canons80_state::keyscan_w(u8 data)
 
 void canons80_state::canons80_map(address_map &map)
 {
-	map(0x0000, 0x001f).m("maincpu", FUNC(hd6301x0_cpu_device::hd6301x_io));
-	map(0x0040, 0x00ff).ram();
 	map(0x0100, 0x07ff).ram();
 	map(0x1000, 0x1000).w(FUNC(canons80_state::keyscan_w));
 	map(0x2000, 0x2001).rw("lcdc", FUNC(hd44780_device::read), FUNC(hd44780_device::write));
 	map(0x4000, 0x7fff).rom().region("external", 0x4000);
 	map(0x8000, 0xbfff).rom().region("external", 0);
-	map(0xf000, 0xffff).rom().region("maincpu", 0);
 }
 
 static INPUT_PORTS_START(canons80)
@@ -311,7 +308,7 @@ INPUT_PORTS_END
 void canons80_state::canons80(machine_config &config)
 {
 	// basic machine hardware
-	hd6301x0_cpu_device &maincpu(HD6301X0(config, "maincpu", 6_MHz_XTAL)); // hd63a01xop
+	hd6301x0_cpu_device &maincpu(HD6301X0(config, "maincpu", 6_MHz_XTAL)); // hd63a01x0p
 	maincpu.set_addrmap(AS_PROGRAM, &canons80_state::canons80_map);
 	maincpu.in_p2_cb().set_ioport("P2");
 	maincpu.in_p5_cb().set(FUNC(canons80_state::keyboard_r));
@@ -323,7 +320,7 @@ void canons80_state::canons80(machine_config &config)
 	screen.set_visarea(0, 16*6-1, 0, 16-1);
 	screen.set_palette("palette");
 
-	hd44780_device &hd44780(HD44780(config, "lcdc"));
+	hd44780_device &hd44780(HD44780(config, "lcdc", 250'000)); // TODO: Wrong device type, should be T1719A; clock not measured, datasheet typical clock used
 	hd44780.set_lcd_size(2, 16);
 	hd44780.set_pixel_update_cb(FUNC(canons80_state::pixel_update));
 

@@ -20,8 +20,6 @@ public:
 	}
 
 	virtual ~t10spc() { }
-	virtual void SetDevice( void *device ) = 0;
-	virtual void GetDevice( void **device ) = 0;
 
 	virtual void SetCommand( uint8_t *command, int commandLength );
 	virtual void ExecCommand();
@@ -52,6 +50,7 @@ protected:
 		SCSI_SENSE_ASC_ASCQ_AUDIO_PLAY_OPERATION_PAUSED = 0x0012,
 		SCSI_SENSE_ASC_ASCQ_AUDIO_PLAY_OPERATION_SUCCESSFULLY_COMPLETED = 0x0013,
 		SCSI_SENSE_ASC_ASCQ_AUDIO_PLAY_OPERATION_STOPPED_DUE_TO_ERROR = 0x0014,
+		SCSI_SENSE_ASC_ASCQ_ILLEGAL_FIELD_IN_CDB = 0x2400,
 		SCSI_SENSE_ASC_ASCQ_ILLEGAL_MODE_FOR_THIS_TRACK = 0x6400
 	};
 

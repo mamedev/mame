@@ -75,8 +75,6 @@ void msx_slot_rs232_base_device::device_start()
 {
 	msx_slot_rom_device::device_start();
 
-	m_irq_handler.resolve_safe();
-
 	save_item(NAME(m_irq_mask));
 	save_item(NAME(m_out2));
 	save_item(NAME(m_cts));
@@ -108,36 +106,36 @@ void msx_slot_rs232_base_device::irq_mask_w(offs_t offset, u8 data)
 	m_irq_mask = data;
 }
 
-WRITE_LINE_MEMBER(msx_slot_rs232_base_device::out2_w)
+void msx_slot_rs232_base_device::out2_w(int state)
 {
 	m_out2 = state;
 	update_irq_state();
 }
 
-WRITE_LINE_MEMBER(msx_slot_rs232_base_device::cts_w)
+void msx_slot_rs232_base_device::cts_w(int state)
 {
 	m_cts = state;
 	m_i8251->write_cts(state);
 }
 
-WRITE_LINE_MEMBER(msx_slot_rs232_base_device::dcd_w)
+void msx_slot_rs232_base_device::dcd_w(int state)
 {
 	m_dcd = state;
 	update_irq_state();
 }
 
-WRITE_LINE_MEMBER(msx_slot_rs232_base_device::ri_w)
+void msx_slot_rs232_base_device::ri_w(int state)
 {
 	m_ri = state;
 }
 
-WRITE_LINE_MEMBER(msx_slot_rs232_base_device::rxrdy_w)
+void msx_slot_rs232_base_device::rxrdy_w(int state)
 {
 	m_rxrdy = state;
 	update_irq_state();
 }
 
-WRITE_LINE_MEMBER(msx_slot_rs232_base_device::txrdy_w)
+void msx_slot_rs232_base_device::txrdy_w(int state)
 {
 	m_txrdy = state;
 	update_irq_state();

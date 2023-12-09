@@ -1,8 +1,8 @@
 /* 7z.h -- 7z interface
-2015-11-18 : Igor Pavlov : Public domain */
+2023-04-02 : Igor Pavlov : Public domain */
 
-#ifndef __7Z_H
-#define __7Z_H
+#ifndef ZIP7_INC_7Z_H
+#define ZIP7_INC_7Z_H
 
 #include "7zTypes.h"
 
@@ -91,14 +91,16 @@ typedef struct
   UInt64 *CoderUnpackSizes;       // for all coders in all folders
 
   Byte *CodersData;
+
+  UInt64 RangeLimit;
 } CSzAr;
 
 UInt64 SzAr_GetFolderUnpackSize(const CSzAr *p, UInt32 folderIndex);
 
 SRes SzAr_DecodeFolder(const CSzAr *p, UInt32 folderIndex,
-    ILookInStream *stream, UInt64 startPos,
+    ILookInStreamPtr stream, UInt64 startPos,
     Byte *outBuffer, size_t outSize,
-    ISzAlloc *allocMain);
+    ISzAllocPtr allocMain);
 
 typedef struct
 {
@@ -131,7 +133,7 @@ typedef struct
 #define SzArEx_GetFileSize(p, i) ((p)->UnpackPositions[(i) + 1] - (p)->UnpackPositions[i])
 
 void SzArEx_Init(CSzArEx *p);
-void SzArEx_Free(CSzArEx *p, ISzAlloc *alloc);
+void SzArEx_Free(CSzArEx *p, ISzAllocPtr alloc);
 UInt64 SzArEx_GetFolderStreamPos(const CSzArEx *p, UInt32 folderIndex, UInt32 indexInFolder);
 int SzArEx_GetFolderFullPackSize(const CSzArEx *p, UInt32 folderIndex, UInt64 *resSize);
 
@@ -172,15 +174,15 @@ UInt16 *SzArEx_GetFullNameUtf16_Back(const CSzArEx *p, size_t fileIndex, UInt16 
 
 SRes SzArEx_Extract(
     const CSzArEx *db,
-    ILookInStream *inStream,
+    ILookInStreamPtr inStream,
     UInt32 fileIndex,         /* index of file */
     UInt32 *blockIndex,       /* index of solid block */
     Byte **outBuffer,         /* pointer to pointer to output buffer (allocated with allocMain) */
     size_t *outBufferSize,    /* buffer size for output buffer */
     size_t *offset,           /* offset of stream for required file in *outBuffer */
     size_t *outSizeProcessed, /* size of file in *outBuffer */
-    ISzAlloc *allocMain,
-    ISzAlloc *allocTemp);
+    ISzAllocPtr allocMain,
+    ISzAllocPtr allocTemp);
 
 
 /*
@@ -194,8 +196,8 @@ SZ_ERROR_INPUT_EOF
 SZ_ERROR_FAIL
 */
 
-SRes SzArEx_Open(CSzArEx *p, ILookInStream *inStream,
-    ISzAlloc *allocMain, ISzAlloc *allocTemp);
+SRes SzArEx_Open(CSzArEx *p, ILookInStreamPtr inStream,
+    ISzAllocPtr allocMain, ISzAllocPtr allocTemp);
 
 EXTERN_C_END
 

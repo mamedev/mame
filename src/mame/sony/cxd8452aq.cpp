@@ -76,7 +76,6 @@ void cxd8452aq_device::device_start()
 {
 	m_bus->cache(m_main_cache);
 	space(0).cache(m_net_cache);
-	m_irq_handler.resolve_safe();
 	m_apbus_virt_to_phys_callback.resolve();
 	m_irq_check = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cxd8452aq_device::irq_check), this));
 	m_dma_check = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cxd8452aq_device::dma_check), this));
@@ -247,7 +246,7 @@ TIMER_CALLBACK_MEMBER(cxd8452aq_device::dma_check)
 	if (rxDmaActive && txDmaActive)
 	{
 		// TODO: is this an error? allow it for now, but log it.
-		LOGMASKED(LOG_GENERAL, "WARNING: RX and TX DMA active at the same time, this may not be a valid condition.\n");
+		LOG("WARNING: RX and TX DMA active at the same time, this may not be a valid condition.\n");
 	}
 
 	if (rxDmaActive)

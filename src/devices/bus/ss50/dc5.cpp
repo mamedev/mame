@@ -44,10 +44,7 @@ public:
 		: device_t(mconfig, SS50_DC5, tag, owner, clock)
 		, ss50_card_interface(mconfig, *this)
 		, m_fdc(*this, "fdc")
-		, m_floppy0(*this, "fdc:0")
-		, m_floppy1(*this, "fdc:1")
-		, m_floppy2(*this, "fdc:2")
-		, m_floppy3(*this, "fdc:3")
+		, m_floppy(*this, "fdc:%u", 0U)
 		, m_interrupt_select(*this, "INTERRUPT_SELECT")
 		, m_address_mode(*this, "ADDRESS_MODE")
 		, m_two_control_regs(*this, "TWO_CONTROL_REGS")
@@ -74,9 +71,9 @@ protected:
 	virtual void register_write(offs_t offset, uint8_t data) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_sso_w );
+	void fdc_intrq_w(int state);
+	void fdc_drq_w(int state);
+	void fdc_sso_w(int state);
 
 	static void floppy_formats(format_registration &fr);
 	uint8_t m_fdc_status;              // for floppy controller
@@ -98,10 +95,7 @@ private:
 	uint8_t validate_fdc_sector_size(uint8_t cmd);
 
 	required_device<wd2797_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<floppy_connector> m_floppy2;
-	required_device<floppy_connector> m_floppy3;
+	required_device_array<floppy_connector, 4> m_floppy;
 	required_ioport m_interrupt_select;
 	required_ioport m_address_mode;
 	required_ioport m_two_control_regs;
@@ -268,10 +262,8 @@ static void flex_floppies(device_slot_interface &device)
 void ss50_dc5_device::device_add_mconfig(machine_config &config)
 {
 	WD2797(config, m_fdc, 12_MHz_XTAL / 12); // divider is selectable
-	FLOPPY_CONNECTOR(config, "fdc:0", flex_floppies, "sssd35", ss50_dc5_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", flex_floppies, "sssd35", ss50_dc5_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:2", flex_floppies, "sssd35", ss50_dc5_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:3", flex_floppies, "sssd35", ss50_dc5_device::floppy_formats).enable_sound(true);
+	for (auto &floppy : m_floppy)
+		FLOPPY_CONNECTOR(config, floppy, flex_floppies, "sssd35", ss50_dc5_device::floppy_formats).enable_sound(true);
 
 	m_fdc->intrq_wr_callback().set(FUNC(ss50_dc5_device::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(ss50_dc5_device::fdc_drq_w));
@@ -503,7 +495,7 @@ uint8_t ss50_dc5_device::validate_fdc_sector_size(uint8_t cmd)
 	return cmd;
 }
 
-WRITE_LINE_MEMBER( ss50_dc5_device::fdc_intrq_w )
+void ss50_dc5_device::fdc_intrq_w(int state)
 {
 	if (state)
 		m_fdc_status |= 0x40;
@@ -518,7 +510,7 @@ WRITE_LINE_MEMBER( ss50_dc5_device::fdc_intrq_w )
 		write_firq(state);
 }
 
-WRITE_LINE_MEMBER( ss50_dc5_device::fdc_drq_w )
+void ss50_dc5_device::fdc_drq_w(int state)
 {
 	if (state)
 		m_fdc_status |= 0x80;
@@ -526,7 +518,7 @@ WRITE_LINE_MEMBER( ss50_dc5_device::fdc_drq_w )
 		m_fdc_status &= 0x7f;
 }
 
-WRITE_LINE_MEMBER( ss50_dc5_device::fdc_sso_w )
+void ss50_dc5_device::fdc_sso_w(int state)
 {
 	// The DC4 and DC5 invert the SSO output and wire it to the DDEN input
 	// to allow selection of single or double density.
@@ -605,10 +597,12 @@ void ss50_dc5_device::control_register_update()
 	// The floppy drives do not gate the motor based on the select input,
 	// so the motors run, or not, irrespective of the drive selection.
 	uint8_t motor = m_motor_timer_out ? CLEAR_LINE : ASSERT_LINE;
-	m_floppy0->get_device()->mon_w(motor);
-	m_floppy1->get_device()->mon_w(motor);
-	m_floppy2->get_device()->mon_w(motor);
-	m_floppy3->get_device()->mon_w(motor);
+	for (auto &floppy : m_floppy)
+	{
+		floppy_image_device *fd = floppy->get_device();
+		if (fd)
+			fd->mon_w(motor);
+	}
 
 	// The DC2, DC3, DC4, DC5 have a drive inhibit feature controlled by
 	// bit 7, and the drives are de-selected if the motor timer has timed
@@ -622,13 +616,7 @@ void ss50_dc5_device::control_register_update()
 	floppy_image_device *floppy = nullptr;
 
 	if ((bit7_side_select || !inhibit) && m_motor_timer_out)
-	{
-		uint8_t drive = m_control_register & 3;
-		if (drive == 0) floppy = m_floppy0->get_device();
-		if (drive == 1) floppy = m_floppy1->get_device();
-		if (drive == 2) floppy = m_floppy2->get_device();
-		if (drive == 3) floppy = m_floppy3->get_device();
-	}
+		floppy = m_floppy[m_control_register & 3]->get_device();
 
 	if (floppy != m_fdc_selected_floppy)
 	{

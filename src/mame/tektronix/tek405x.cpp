@@ -410,21 +410,21 @@ void tek4051_state::x_pia_pb_w(uint8_t data)
 	*/
 }
 
-WRITE_LINE_MEMBER( tek4051_state::adot_w )
+void tek4051_state::adot_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER( tek4051_state::bufclk_w )
+void tek4051_state::bufclk_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER( tek4051_state::x_pia_irqa_w )
+void tek4051_state::x_pia_irqa_w(int state)
 {
 	m_x_pia_irqa = state;
 	update_irq();
 }
 
-WRITE_LINE_MEMBER( tek4051_state::x_pia_irqb_w )
+void tek4051_state::x_pia_irqb_w(int state)
 {
 	m_x_pia_irqb = state;
 	update_irq();
@@ -486,17 +486,17 @@ void tek4051_state::sb_w(uint8_t data)
 	*/
 }
 
-WRITE_LINE_MEMBER( tek4051_state::sot_w )
+void tek4051_state::sot_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER( tek4051_state::y_pia_irqa_w )
+void tek4051_state::y_pia_irqa_w(int state)
 {
 	m_y_pia_irqa = state;
 	update_nmi();
 }
 
-WRITE_LINE_MEMBER( tek4051_state::y_pia_irqb_w )
+void tek4051_state::y_pia_irqb_w(int state)
 {
 	m_y_pia_irqb = state;
 	update_nmi();
@@ -593,17 +593,17 @@ void tek4051_state::kb_pia_pb_w(uint8_t data)
 	m_gpib->host_ren_w(!BIT(data, 7));
 }
 
-WRITE_LINE_MEMBER( tek4051_state::kb_halt_w )
+void tek4051_state::kb_halt_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER( tek4051_state::kb_pia_irqa_w )
+void tek4051_state::kb_pia_irqa_w(int state)
 {
 	m_kb_pia_irqa = state;
 	update_irq();
 }
 
-WRITE_LINE_MEMBER( tek4051_state::kb_pia_irqb_w )
+void tek4051_state::kb_pia_irqb_w(int state)
 {
 	m_kb_pia_irqb = state;
 	update_irq();
@@ -666,13 +666,13 @@ void tek4051_state::tape_pia_pb_w(uint8_t data)
 	*/
 }
 
-WRITE_LINE_MEMBER( tek4051_state::tape_pia_irqa_w )
+void tek4051_state::tape_pia_irqa_w(int state)
 {
 	m_tape_pia_irqa = state;
 	update_nmi();
 }
 
-WRITE_LINE_MEMBER( tek4051_state::tape_pia_irqb_w )
+void tek4051_state::tape_pia_irqb_w(int state)
 {
 	m_tape_pia_irqb = state;
 	update_nmi();
@@ -774,7 +774,7 @@ void tek4051_state::gpib_pia_pb_w(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER( tek4051_state::talk_w )
+void tek4051_state::talk_w(int state)
 {
 	m_talk = state;
 
@@ -786,13 +786,13 @@ WRITE_LINE_MEMBER( tek4051_state::talk_w )
 	}
 }
 
-WRITE_LINE_MEMBER( tek4051_state::gpib_pia_irqa_w )
+void tek4051_state::gpib_pia_irqa_w(int state)
 {
 	m_gpib_pia_irqa = state;
 	update_irq();
 }
 
-WRITE_LINE_MEMBER( tek4051_state::gpib_pia_irqb_w )
+void tek4051_state::gpib_pia_irqb_w(int state)
 {
 	m_gpib_pia_irqb = state;
 	update_irq();
@@ -877,25 +877,25 @@ void tek4051_state::com_pia_pb_w(uint8_t data)
 	m_acia_clock->set_clock_scale((double) 1 / div);
 }
 
-WRITE_LINE_MEMBER( tek4051_state::com_pia_irqa_w )
+void tek4051_state::com_pia_irqa_w(int state)
 {
 	m_com_pia_irqa = state;
 	update_irq();
 }
 
-WRITE_LINE_MEMBER( tek4051_state::com_pia_irqb_w )
+void tek4051_state::com_pia_irqb_w(int state)
 {
 	m_com_pia_irqb = state;
 	update_irq();
 }
 
-WRITE_LINE_MEMBER( tek4051_state::acia_irq_w )
+void tek4051_state::acia_irq_w(int state)
 {
 	m_acia_irq = state;
 	update_irq();
 }
 
-WRITE_LINE_MEMBER( tek4051_state::write_acia_clock )
+void tek4051_state::write_acia_clock(int state)
 {
 	m_acia->write_txc(state);
 	m_acia->write_rxc(state);
@@ -979,7 +979,7 @@ void tek4051_state::tek4051(machine_config &config)
 	// devices
 	TIMER(config, "keyboard").configure_periodic(FUNC(tek4051_state::keyboard_tick), attotime::from_hz(XTAL(12'500'000)/15/4));
 
-	pia6821_device &piax(PIA6821(config, MC6820_X_TAG, 0));
+	pia6821_device &piax(PIA6821(config, MC6820_X_TAG));
 	piax.readpa_handler().set(FUNC(tek4051_state::x_pia_pa_r));
 	// CB1 viewcause
 	piax.writepa_handler().set(FUNC(tek4051_state::x_pia_pa_w));
@@ -989,7 +989,7 @@ void tek4051_state::tek4051(machine_config &config)
 	piax.irqa_handler().set(FUNC(tek4051_state::x_pia_irqa_w));
 	piax.irqb_handler().set(FUNC(tek4051_state::x_pia_irqb_w));
 
-	pia6821_device &piay(PIA6821(config, MC6820_Y_TAG, 0));
+	pia6821_device &piay(PIA6821(config, MC6820_Y_TAG));
 	piay.readpa_handler().set(FUNC(tek4051_state::sa_r));
 	// CA1 rdbyte
 	// CB1 mdata
@@ -1000,7 +1000,7 @@ void tek4051_state::tek4051(machine_config &config)
 	piay.irqa_handler().set(FUNC(tek4051_state::y_pia_irqa_w));
 	piay.irqb_handler().set(FUNC(tek4051_state::y_pia_irqb_w));
 
-	pia6821_device &piakbd(PIA6821(config, MC6820_KB_TAG, 0));
+	pia6821_device &piakbd(PIA6821(config, MC6820_KB_TAG));
 	piakbd.readpa_handler().set(FUNC(tek4051_state::kb_pia_pa_r));
 	piakbd.readpb_handler().set(FUNC(tek4051_state::kb_pia_pb_r));
 	// CA1 key
@@ -1009,7 +1009,7 @@ void tek4051_state::tek4051(machine_config &config)
 	piakbd.irqa_handler().set(FUNC(tek4051_state::kb_pia_irqa_w));
 	piakbd.irqb_handler().set(FUNC(tek4051_state::kb_pia_irqb_w));
 
-	pia6821_device &piatape(PIA6821(config, MC6820_TAPE_TAG, 0));
+	pia6821_device &piatape(PIA6821(config, MC6820_TAPE_TAG));
 	piatape.readpa_handler().set(FUNC(tek4051_state::tape_pia_pa_r));
 	// CA1 rmark
 	// CB1 lohole
@@ -1020,7 +1020,7 @@ void tek4051_state::tek4051(machine_config &config)
 	piatape.irqa_handler().set(FUNC(tek4051_state::tape_pia_irqa_w));
 	piatape.irqb_handler().set(FUNC(tek4051_state::tape_pia_irqb_w));
 
-	PIA6821(config, m_gpib_pia, 0);
+	PIA6821(config, m_gpib_pia);
 	m_gpib_pia->readpa_handler().set(IEEE488_TAG, FUNC(ieee488_device::dio_r));
 	m_gpib_pia->readpb_handler().set(FUNC(tek4051_state::gpib_pia_pb_r));
 	m_gpib_pia->writepa_handler().set(FUNC(tek4051_state::dio_w));
@@ -1029,7 +1029,7 @@ void tek4051_state::tek4051(machine_config &config)
 	m_gpib_pia->irqa_handler().set(FUNC(tek4051_state::gpib_pia_irqa_w));
 	m_gpib_pia->irqb_handler().set(FUNC(tek4051_state::gpib_pia_irqb_w));
 
-	PIA6821(config, m_com_pia, 0);
+	PIA6821(config, m_com_pia);
 	m_com_pia->readpb_handler().set(FUNC(tek4051_state::com_pia_pb_r));
 	//CA1 - SRX (RS-232 pin 12)
 	m_com_pia->writepa_handler().set(FUNC(tek4051_state::com_pia_pa_w));

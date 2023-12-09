@@ -65,18 +65,6 @@ m3000_device::m3000_device(const machine_config &mconfig, const char *tag, devic
 
 
 //-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void m3002_device::device_resolve_objects()
-{
-	m_irq_callback.resolve_safe();
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

@@ -57,9 +57,10 @@
 #include "nes_vt_soc.h"
 
 
-DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC,          nes_vt02_vt03_soc_device,          "nes_vt02_vt03_soc",       "VT02/03 series System on a Chip (NTSC)")
-DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_PAL,      nes_vt02_vt03_soc_pal_device,      "nes_vt02_vt03_soc_pal",   "VT02/03 series System on a Chip (PAL)")
-DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_SCRAMBLE, nes_vt02_vt03_soc_scramble_device, "nes_vt02_vt03_soc_scram", "VT02/03 series System on a Chip (NTSC, with simple Opcode scrambling)")
+DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC,              nes_vt02_vt03_soc_device,          "nes_vt02_vt03_soc",       "VT02/03 series System on a Chip (NTSC)")
+DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_PAL,          nes_vt02_vt03_soc_pal_device,      "nes_vt02_vt03_soc_pal",   "VT02/03 series System on a Chip (PAL)")
+DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_SCRAMBLE,     nes_vt02_vt03_soc_scramble_device, "nes_vt02_vt03_soc_scram", "VT02/03 series System on a Chip (NTSC, with simple Opcode scrambling)")
+DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_SCRAMBLE_PAL, nes_vt02_vt03_soc_scramble_pal_device, "nes_vt02_vt03_soc_pal_scram", "VT02/03 series System on a Chip (PAL, with simple Opcode scrambling)")
 
 void nes_vt02_vt03_soc_device::program_map(address_map &map)
 {
@@ -77,16 +78,16 @@ nes_vt02_vt03_soc_device::nes_vt02_vt03_soc_device(const machine_config& mconfig
 	m_chrram(nullptr),
 	m_space_config("program", ENDIANNESS_LITTLE, 8, 25, 0, address_map_constructor(FUNC(nes_vt02_vt03_soc_device::program_map), this)),
 	m_write_0_callback(*this),
-	m_read_0_callback(*this),
-	m_read_1_callback(*this),
+	m_read_0_callback(*this, 0xff),
+	m_read_1_callback(*this, 0xff),
 	m_extra_write_0_callback(*this),
 	m_extra_write_1_callback(*this),
 	m_extra_write_2_callback(*this),
 	m_extra_write_3_callback(*this),
-	m_extra_read_0_callback(*this),
-	m_extra_read_1_callback(*this),
-	m_extra_read_2_callback(*this),
-	m_extra_read_3_callback(*this)
+	m_extra_read_0_callback(*this, 0xff),
+	m_extra_read_1_callback(*this, 0xff),
+	m_extra_read_2_callback(*this, 0xff),
+	m_extra_read_3_callback(*this, 0xff)
 {
 	// 'no scramble' configuration
 	for (int i = 0; i < 6; i++)
@@ -127,6 +128,11 @@ nes_vt02_vt03_soc_scramble_device::nes_vt02_vt03_soc_scramble_device(const machi
 {
 }
 
+nes_vt02_vt03_soc_scramble_pal_device::nes_vt02_vt03_soc_scramble_pal_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+	nes_vt02_vt03_soc_device(mconfig, NES_VT02_VT03_SOC_SCRAMBLE_PAL, tag, owner, clock)
+{
+}
+
 void nes_vt02_vt03_soc_device::device_start()
 {
 	save_item(NAME(m_410x));
@@ -155,20 +161,6 @@ void nes_vt02_vt03_soc_device::device_start()
 	//m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8sm_delegate(*m_cartslot->m_cart, FUNC(device_nes_cart_interface::chr_r)), write8sm_delegate(*m_cartslot->m_cart, FUNC(device_nes_cart_interface::chr_w)));
 	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8sm_delegate(*this, FUNC(nes_vt02_vt03_soc_device::nt_r)), write8sm_delegate(*this, FUNC(nes_vt02_vt03_soc_device::nt_w)));
 	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8sm_delegate(*this, FUNC(nes_vt02_vt03_soc_device::chr_r)), write8sm_delegate(*this, FUNC(nes_vt02_vt03_soc_device::chr_w)));
-
-	m_write_0_callback.resolve_safe();
-	m_read_0_callback.resolve_safe(0xff);
-	m_read_1_callback.resolve_safe(0xff);
-
-	m_extra_write_0_callback.resolve_safe();
-	m_extra_write_1_callback.resolve_safe();
-	m_extra_write_2_callback.resolve_safe();
-	m_extra_write_3_callback.resolve_safe();
-
-	m_extra_read_0_callback.resolve_safe(0xff);
-	m_extra_read_1_callback.resolve_safe(0xff);
-	m_extra_read_2_callback.resolve_safe(0xff);
-	m_extra_read_3_callback.resolve_safe(0xff);
 }
 
 void nes_vt02_vt03_soc_device::device_reset()
@@ -1072,7 +1064,7 @@ void nes_vt02_vt03_soc_device::nes_vt_map(address_map &map)
 
 
 
-WRITE_LINE_MEMBER(nes_vt02_vt03_soc_device::apu_irq)
+void nes_vt02_vt03_soc_device::apu_irq(int state)
 {
 	// TODO
 //  set_input_line(RP2A03_APU_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
@@ -1162,4 +1154,13 @@ void nes_vt02_vt03_soc_scramble_device::device_add_mconfig(machine_config& confi
 
 	RP2A03_CORE_SWAP_OP_D5_D6(config.replace(), m_maincpu, NTSC_APU_CLOCK); // Insect Chase in polmega confirms RP2A03 core type, not 6502
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt02_vt03_soc_scramble_device::nes_vt_map);
+}
+
+void nes_vt02_vt03_soc_scramble_pal_device::device_add_mconfig(machine_config& config)
+{
+	nes_vt02_vt03_soc_device::device_add_mconfig(config);
+
+	RP2A03_CORE_SWAP_OP_D5_D6(config.replace(), m_maincpu, PAL_APU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt02_vt03_soc_scramble_pal_device::nes_vt_map);
+	do_pal_timings_and_ppu_replacement(config);
 }

@@ -17,7 +17,7 @@ Driver by Tomasz Slanina
 - VDP has also custom label ( "RY 050012    DDU 30600" ) plus TI logo
   Seems to be TMS9928A
   XTAL:10.738MHZ
-- 2xY2404 ( SN76489A comaptible? ) for music and sfx
+- 2xY2404 ( SN76489A compatible? ) for music and sfx
 - MSM5205 - sample player (see below)
 
 - TODO:
@@ -119,7 +119,7 @@ private:
 	uint8_t controls_r();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_WRITE_LINE_MEMBER(vblank_w);
+	void vblank_w(int state);
 	required_device<tms9995_device> m_maincpu;
 	void pachifev_cru(address_map &map);
 	void pachifev_map(address_map &map);
@@ -267,7 +267,7 @@ INPUT_PORTS_END
 #if USE_MSM
 
 
-WRITE_LINE_MEMBER(pachifev_state::pf_adpcm_int)
+void pachifev_state::pf_adpcm_int(int state)
 {
 	if (m_adpcm_pos >= 0x4000 || m_adpcm_idle)
 	{
@@ -312,7 +312,7 @@ void pachifev_state::machine_reset()
 }
 
 
-WRITE_LINE_MEMBER(pachifev_state::vblank_w)
+void pachifev_state::vblank_w(int state)
 {
 	if (state)
 	{

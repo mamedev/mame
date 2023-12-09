@@ -279,7 +279,7 @@ void s11b_state::s11b_base(machine_config &config)
 	genpin_audio(config);
 
 	/* Devices */
-	PIA6821(config, m_pia21, 0);
+	PIA6821(config, m_pia21);
 	m_pia21->readpa_handler().set(FUNC(s11b_state::sound_r));
 	m_pia21->set_port_a_input_overrides_output_mask(0xff);
 	m_pia21->writepa_handler().set(FUNC(s11b_state::sound_w));
@@ -289,14 +289,14 @@ void s11b_state::s11b_base(machine_config &config)
 	m_pia21->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<1>));
 	m_pia21->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<2>));
 
-	PIA6821(config, m_pia24, 0);
+	PIA6821(config, m_pia24);
 	m_pia24->writepa_handler().set(FUNC(s11b_state::lamp0_w));
 	m_pia24->writepb_handler().set(FUNC(s11b_state::lamp1_w));
 	m_pia24->cb2_handler().set(FUNC(s11b_state::pia24_cb2_w));
 	m_pia24->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<3>));
 	m_pia24->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<4>));
 
-	PIA6821(config, m_pia28, 0);
+	PIA6821(config, m_pia28);
 	m_pia28->readpa_handler().set(FUNC(s11b_state::pia28_w7_r));
 	m_pia28->set_port_a_input_overrides_output_mask(0xff);
 	m_pia28->writepa_handler().set(FUNC(s11b_state::s11a_dig0_w));
@@ -306,7 +306,7 @@ void s11b_state::s11b_base(machine_config &config)
 	m_pia28->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<5>));
 	m_pia28->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<6>));
 
-	PIA6821(config, m_pia2c, 0);
+	PIA6821(config, m_pia2c);
 	m_pia2c->writepa_handler().set(FUNC(s11b_state::s11b_pia2c_pa_w));
 	m_pia2c->writepb_handler().set(FUNC(s11b_state::s11b_pia2c_pb_w));
 	m_pia2c->ca2_handler().set(FUNC(s11b_state::pia2c_ca2_w));
@@ -314,7 +314,7 @@ void s11b_state::s11b_base(machine_config &config)
 	m_pia2c->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<7>));
 	m_pia2c->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<8>));
 
-	PIA6821(config, m_pia30, 0);
+	PIA6821(config, m_pia30);
 	m_pia30->readpa_handler().set(FUNC(s11b_state::switch_r));
 	m_pia30->set_port_a_input_overrides_output_mask(0xff);
 	m_pia30->writepb_handler().set(FUNC(s11b_state::switch_w));
@@ -323,7 +323,7 @@ void s11b_state::s11b_base(machine_config &config)
 	m_pia30->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<9>));
 	m_pia30->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<10>));
 
-	PIA6821(config, m_pia34, 0);
+	PIA6821(config, m_pia34);
 	m_pia34->writepa_handler().set(FUNC(s11b_state::s11b_pia34_pa_w));
 	m_pia34->writepb_handler().set(FUNC(s11b_state::pia34_pb_w));
 	m_pia34->ca2_handler().set_nop();
@@ -356,7 +356,7 @@ void s11b_state::s11b_base(machine_config &config)
 	m_cvsd_filter->add_route(ALL_OUTPUTS, m_cvsd_filter2, 1.0);
 	HC55516(config, m_hc55516, 0).add_route(ALL_OUTPUTS, m_cvsd_filter, 1.0/4.0); // to prevent massive clipping issues, we divide the signal by 4 here before going into the filters, then multiply it by 4 after it comes out the other end
 
-	PIA6821(config, m_pias, 0);
+	PIA6821(config, m_pias);
 	m_pias->readpa_handler().set(FUNC(s11b_state::sound_r));
 	m_pias->set_port_a_input_overrides_output_mask(0xff);
 	m_pias->writepa_handler().set(FUNC(s11b_state::sound_w));

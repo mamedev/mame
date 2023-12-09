@@ -28,9 +28,9 @@ public:
 	// static configuration helpers
 	auto rxd_handler() { return m_rxd_handler.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER( write_txd );
+	void write_txd(int state);
 
-	DECLARE_READ_LINE_MEMBER( rx_r ) { return m_rxd; }
+	int rx_r() { return m_rxd; }
 
 protected:
 	virtual void device_start() override;
@@ -53,8 +53,8 @@ class device_midi_port_interface : public device_interface
 public:
 	virtual ~device_midi_port_interface();
 
-	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) { }
-	DECLARE_WRITE_LINE_MEMBER( output_rxd ) { m_port->m_rxd = state; m_port->m_rxd_handler(state); }
+	virtual void input_txd(int state) { }
+	void output_rxd(int state) { m_port->m_rxd = state; m_port->m_rxd_handler(state); }
 
 protected:
 	device_midi_port_interface(const machine_config &mconfig, device_t &device);

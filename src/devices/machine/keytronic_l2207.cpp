@@ -90,7 +90,6 @@ void keytronic_l2207_device::device_resolve_objects()
 {
 	m_leds.resolve();
 	m_all_caps.resolve();
-	m_ser_out_callback.resolve_safe();
 }
 
 void keytronic_l2207_device::device_start()
@@ -100,7 +99,7 @@ void keytronic_l2207_device::device_start()
 	save_item(NAME(m_beeper_latch));
 }
 
-WRITE_LINE_MEMBER(keytronic_l2207_device::ser_in_w)
+void keytronic_l2207_device::ser_in_w(int state)
 {
 	m_mcu->set_input_line(MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);
 }

@@ -164,12 +164,12 @@ void bbc_sasi_device::jim_w(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(bbc_sasi_device::req_w)
+void bbc_sasi_device::req_w(int state)
 {
 	m_sasi->ack_w(0);
 }
 
-WRITE_LINE_MEMBER(bbc_sasi_device::sel_w)
+void bbc_sasi_device::sel_w(int state)
 {
 	m_sel_state = state;
 }

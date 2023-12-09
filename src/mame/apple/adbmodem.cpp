@@ -95,14 +95,14 @@ void adbmodem_device::adb_change()
 //  adbmodem_device - constructor
 //-------------------------------------------------
 
-adbmodem_device::adbmodem_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ADBMODEM, tag, owner, clock),
-	  write_reset(*this),
-	  write_linechange(*this),
-	  write_via_clock(*this),
-	  write_via_data(*this),
-	  write_irq(*this),
-	  m_maincpu(*this, "adbmodem")
+adbmodem_device::adbmodem_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, ADBMODEM, tag, owner, clock),
+	write_reset(*this),
+	write_linechange(*this),
+	write_via_clock(*this),
+	write_via_data(*this),
+	write_irq(*this),
+	m_maincpu(*this, "adbmodem")
 #if USE_BUS_ADB
 	, m_adb_connector{{*this, "adb1"}, {*this, finder_base::DUMMY_TAG}}
 #endif
@@ -115,12 +115,6 @@ adbmodem_device::adbmodem_device(const machine_config &mconfig, const char *tag,
 
 void adbmodem_device::device_start()
 {
-	write_reset.resolve_safe();
-	write_linechange.resolve_safe();
-	write_via_clock.resolve_safe();
-	write_via_data.resolve_safe();
-	write_irq.resolve_safe();
-
 #if USE_BUS_ADB
 	for (int i = 0; i < 2; i++)
 	{

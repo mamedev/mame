@@ -44,7 +44,7 @@ PALIB = libportaudio.la
 PAINC = include/portaudio.h
 
 PA_LDFLAGS = $(LDFLAGS) $(SHARED_FLAGS) -rpath $(libdir) -no-undefined \
-	     -export-symbols-regex "(Pa|PaMacCore|PaJack|PaAlsa|PaAsio|PaOSS|PaWasapi|PaWasapiWinrt|PaWinMME)_.*" \
+	     -export-symbols-regex "(Pa|PaMacCore|PaPulseAudio|PaJack|PaAlsa|PaAsio|PaOSS|PaWasapi|PaWasapiWinrt|PaWinMME)_.*" \
 	     -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
 COMMON_OBJS = \
@@ -66,7 +66,7 @@ LOOPBACK_OBJS = \
 	qa/loopback/src/test_audio_analyzer.o \
 	qa/loopback/src/write_wav.o \
 	qa/loopback/src/paqa.o
-	
+
 EXAMPLES = \
 	bin/pa_devs \
 	bin/pa_fuzz \
@@ -82,7 +82,7 @@ SELFTESTS = \
 	bin/paqa_devs \
 	bin/paqa_errs \
 	bin/paqa_latency
-	
+
 TESTS = \
 	bin/patest1 \
 	bin/patest_buffer \
@@ -146,6 +146,7 @@ SRC_DIRS = \
 	src/hostapi/coreaudio \
 	src/hostapi/dsound \
 	src/hostapi/jack \
+	src/hostapi/pulseaudio \
 	src/hostapi/oss \
 	src/hostapi/skeleton \
 	src/hostapi/wasapi \

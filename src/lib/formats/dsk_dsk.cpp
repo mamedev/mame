@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /*********************************************************************
 
-    formats/dsk_dsk.c
+    formats/dsk_dsk.cpp
 
     DSK disk images
 
@@ -13,6 +13,7 @@
 #include "imageutl.h"
 
 #include "ioprocs.h"
+#include "multibyte.h"
 
 #include "osdcore.h" // osd_printf_*
 
@@ -103,10 +104,10 @@ static floperr_t get_offset(floppy_image_legacy *floppy, int head, int track, in
 		get_tag(floppy)->sector_size = (1<<(track_info[0x014]+7));
 		offs = track_offset + 0x100 +sector * get_tag(floppy)->sector_size;
 	} else {
-		get_tag(floppy)->sector_size = track_info[0x18 + (sector<<3) + 6] + (track_info[0x18+(sector<<3) + 7]<<8);
+		get_tag(floppy)->sector_size = get_u16le(&track_info[0x18 + (sector<<3) + 6]);
 		offs = track_offset + 0x100;
 		for (i=0;i<sector;i++) {
-			offs += track_info[0x18 + (i<<3) + 6] + (track_info[0x18+(i<<3) + 7]<<8);
+			offs += get_u16le(&track_info[0x18 + (i<<3) + 6]);
 		}
 	}
 
@@ -251,7 +252,7 @@ FLOPPY_CONSTRUCT( dsk_dsk_construct )
 		for (i=0; i<tag->tracks * tag->heads; i++)
 		{
 			tag->track_offsets[cnt] = tmp;
-			tmp += pick_integer_le(header, 0x32, 2);
+			tmp += get_u16le(&header[0x32]);
 			cnt += skip;
 		}
 	} else  {
@@ -287,22 +288,22 @@ dsk_format::dsk_format() : floppy_image_format_t()
 {
 }
 
-const char *dsk_format::name() const
+const char *dsk_format::name() const noexcept
 {
 	return "dsk";
 }
 
-const char *dsk_format::description() const
+const char *dsk_format::description() const noexcept
 {
 	return "CPC DSK Format";
 }
 
-const char *dsk_format::extensions() const
+const char *dsk_format::extensions() const noexcept
 {
 	return "dsk";
 }
 
-bool dsk_format::supports_save() const
+bool dsk_format::supports_save() const noexcept
 {
 	return false;
 }
@@ -353,7 +354,7 @@ struct sector_header
 
 #pragma pack()
 
-bool dsk_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool dsk_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	size_t actual;
 
@@ -377,7 +378,7 @@ bool dsk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	int tracks  = header[0x30];
 
 	int img_tracks, img_heads;
-	image->get_maximal_geometry(img_tracks, img_heads);
+	image.get_maximal_geometry(img_tracks, img_heads);
 	if (tracks > img_tracks)
 	{
 		if (tracks - img_tracks > DUMP_THRESHOLD)
@@ -403,7 +404,7 @@ bool dsk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		for (int i=0; i<tracks * heads; i++)
 		{
 			track_offsets[cnt] = tmp;
-			tmp += pick_integer_le(header, 0x32, 2);
+			tmp += get_u16le(&header[0x32]);
 			cnt += skip;
 		}
 	} else  {

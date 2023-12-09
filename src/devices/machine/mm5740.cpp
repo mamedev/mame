@@ -43,21 +43,20 @@ const tiny_rom_entry *mm5740_device::device_rom_region() const
 //  mm5740_device - constructor
 //-------------------------------------------------
 
-mm5740_device::mm5740_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+mm5740_device::mm5740_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, MM5740, tag, owner, clock),
-	m_read_x(*this),
-	m_read_shift(*this),
-	m_read_control(*this),
+	m_read_x(*this, 0x3ff),
+	m_read_shift(*this, 0),
+	m_read_control(*this, 0),
 	m_write_data_ready(*this),
 	m_rom(*this, "internal")
 {
-	std::fill(std::begin(m_x_mask), std::end(m_x_mask), 0);
 }
 
-uint32_t mm5740_device::calc_effective_clock_key_debounce(uint32_t capacitance)
+u32 mm5740_device::calc_effective_clock_key_debounce(u32 capacitance)
 {
 	// calculate key debounce based on capacitance in pF
-	uint32_t key_debounce_msec = capacitance / 125;
+	u32 key_debounce_msec = capacitance / 125;
 	if (key_debounce_msec == 0)
 	{
 		key_debounce_msec = 1;
@@ -72,11 +71,10 @@ uint32_t mm5740_device::calc_effective_clock_key_debounce(uint32_t capacitance)
 
 void mm5740_device::device_start()
 {
-	// resolve callbacks
-	m_read_x.resolve_all_safe(0x3ff);
-	m_read_shift.resolve_safe(0);
-	m_read_control.resolve_safe(0);
-	m_write_data_ready.resolve_safe();
+	std::fill(std::begin(m_x_mask), std::end(m_x_mask), 0);
+	m_b = -1;
+	m_repeat = false;
+	m_last_repeat = false;
 
 	// allocate timers
 	m_scan_timer = timer_alloc(FUNC(mm5740_device::perform_scan), this);
@@ -84,16 +82,10 @@ void mm5740_device::device_start()
 
 	// state saving
 	save_item(NAME(m_b));
+	save_item(NAME(m_offset));
 	save_item(NAME(m_x_mask));
-}
-
-
-//-------------------------------------------------
-//  device_start - device-specific reset
-//-------------------------------------------------
-
-void mm5740_device::device_reset()
-{
+	save_item(NAME(m_repeat));
+	save_item(NAME(m_last_repeat));
 }
 
 //-------------------------------------------------
@@ -106,7 +98,12 @@ TIMER_CALLBACK_MEMBER(mm5740_device::perform_scan)
 
 	for (int x = 0; x < 9; x++)
 	{
-		uint16_t data = m_read_x[x]() ^ 0x3ff;
+		u16 data = m_read_x[x]() ^ 0x3ff;
+
+		if (data)
+		{
+			ako = true;
+		}
 
 		if ((data ^ m_x_mask[x]) == 0)
 		{
@@ -116,40 +113,54 @@ TIMER_CALLBACK_MEMBER(mm5740_device::perform_scan)
 
 		for (int y = 0; y < 10; y++)
 		{
+			u16 offset = x * 10 + y;
+
 			if (BIT(data, y))
 			{
-				uint8_t *rom = m_rom->base();
-				uint16_t offset = x*10 + y;
+				u8 *rom = m_rom->base();
 				// Common portion
-				uint16_t common = (uint16_t) rom[offset];
+				u16 common = (u16)rom[offset];
 
-				offset += (((m_read_shift() ? 1: 0) + (m_read_control() ? 2: 0)) + 1) * 90;
+				u16 uniq_offset = offset + ((((m_read_shift() ? 1 : 0) + (m_read_control() ? 2 : 0)) + 1) * 90);
 
 				// Unique portion based on shift/ctrl keys.
-				uint8_t uniq = rom[offset];
+				u8 uniq = rom[uniq_offset];
 
-				uint16_t b = (((common & 0x10) << 4) | ((uniq & 0x0f) << 4) | (common & 0x0f)) ^ 0x1ff;
+				u16 b = (((common & 0x10) << 4) | ((uniq & 0x0f) << 4) | (common & 0x0f)) ^ 0x1ff;
 
-				ako = true;
-
+				// Check for a new keypress
 				if (!BIT(m_x_mask[x], y))
 				{
 					m_x_mask[x] |= (1 << y);
 					if (m_b != b)
 					{
 						m_b = b;
+						m_offset = offset;
 						m_write_data_ready(ASSERT_LINE);
 
 						return;
 					}
 				}
 			}
-			else    // key released, unmark it from the "down" info
+			else
 			{
+				// key released, unmark it from the "down" info
 				m_x_mask[x] &= ~(1 << y);
+				if (m_offset == offset)
+				{
+					m_write_data_ready(CLEAR_LINE);
+					m_b = -1;
+				}
 			}
 		}
 	}
+
+	if ((m_repeat) && (!m_last_repeat) && (m_b != -1))
+	{
+		m_write_data_ready(ASSERT_LINE);
+	}
+
+	m_last_repeat = m_repeat;
 
 	if (!ako)
 	{
@@ -158,12 +169,16 @@ TIMER_CALLBACK_MEMBER(mm5740_device::perform_scan)
 	}
 }
 
+void mm5740_device::repeat_line_w(int state)
+{
+	m_repeat = (state == ASSERT_LINE);
+}
 
 //-------------------------------------------------
 //  b_r -
 //-------------------------------------------------
 
-uint16_t mm5740_device::b_r()
+u16 mm5740_device::b_r()
 {
 	m_write_data_ready(CLEAR_LINE);
 	return m_b;

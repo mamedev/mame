@@ -43,8 +43,13 @@ Todo:
 #include "softlist_dev.h"
 #include "speaker.h"
 
-#include "formats/imageutl.h"
 #include "formats/vt_cas.h"
+#include "multibyte.h"
+
+#define LOG_VTECH1_LATCH (1U << 1)
+
+#define VERBOSE (0)
+#include "logmacro.h"
 
 
 namespace {
@@ -52,8 +57,6 @@ namespace {
 /***************************************************************************
     CONSTANTS & MACROS
 ***************************************************************************/
-
-#define LOG_VTECH1_LATCH 0
 
 #define VTECH1_CLK        3579500
 #define VZ300_XTAL1_CLK   XTAL(17'734'470)
@@ -173,7 +176,7 @@ SNAPSHOT_LOAD_MEMBER(vtech1_base_state::snapshot_cb)
 	pgmname[16] = '\0';
 
 	// get start and end addresses
-	uint16_t const start = pick_integer_le(header, 22, 2);
+	uint16_t const start = get_u16le(&header[22]);
 	uint16_t const end = start + image.length() - sizeof(header);
 	uint16_t const size = end - start;
 
@@ -266,8 +269,7 @@ uint8_t vtech1_base_state::keyboard_r(offs_t offset)
 
 void vtech1_base_state::latch_w(uint8_t data)
 {
-	if (LOG_VTECH1_LATCH)
-		logerror("vtech1_latch_w $%02X\n", data);
+	LOGMASKED(LOG_VTECH1_LATCH, "vtech1_latch_w $%02X\n", data);
 
 	// bit 2, cassette out (actually bits 1 and 2 perform this function, so either can be used)
 	m_cassette->output( BIT(data, 2) ? 1.0 : -1.0);

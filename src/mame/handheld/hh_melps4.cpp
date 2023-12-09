@@ -88,7 +88,7 @@ u8 hh_melps4_state::read_inputs(int columns)
 
 	// read selected input rows
 	for (int i = 0; i < columns; i++)
-		if (m_inp_mux >> i & 1)
+		if (BIT(m_inp_mux, i))
 			ret |= m_inputs[i]->read();
 
 	return ret;
@@ -112,13 +112,13 @@ INPUT_CHANGED_MEMBER(hh_melps4_state::reset_button)
 
   Coleco Frogger (manufactured in Japan, licensed from Sega)
   * PCB label: Coleco Frogger Code No. 01-81543, KS-003282 Japan
-  * Mitsubishi M58846-701P MCU
+  * Mitsubishi M58846-701P MCU, 1-bit sound
   * cyan/red/green VFD Itron CP5090GLR R1B
   * color overlay: row 2(goal): blue, row 3-6: yellow
 
   Gakken / Konami Frogger
   * PCB label: Konami Gakken KH-8201D
-  * Mitsubishi M58846-700P MCU (Konami logo on it)
+  * Mitsubishi M58846-700P MCU (Konami logo on it), 1-bit sound
   * cyan/red/green VFD
   * color overlay: row 2(goal): blue, row 3-6: yellow, row 8-10(cars): red
 
@@ -137,7 +137,6 @@ private:
 	void update_display();
 	void plate_w(offs_t offset, u8 data);
 	void grid_w(u16 data);
-	DECLARE_WRITE_LINE_MEMBER(speaker_w);
 	u16 input_r();
 };
 
@@ -166,12 +165,6 @@ void cfrogger_state::grid_w(u16 data)
 	// D0-D11: vfd grid
 	m_grid = data;
 	update_display();
-}
-
-WRITE_LINE_MEMBER(cfrogger_state::speaker_w)
-{
-	// T: speaker out
-	m_speaker->level_w(state);
 }
 
 u16 cfrogger_state::input_r()
@@ -213,7 +206,7 @@ void cfrogger_state::cfrogger(machine_config &config)
 	m_maincpu->write_f().set(FUNC(cfrogger_state::plate_w));
 	m_maincpu->write_g().set(FUNC(cfrogger_state::plate_w));
 	m_maincpu->write_d().set(FUNC(cfrogger_state::grid_w));
-	m_maincpu->write_t().set(FUNC(cfrogger_state::speaker_w));
+	m_maincpu->write_t().set(m_speaker, FUNC(speaker_sound_device::level_w));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
@@ -246,7 +239,7 @@ ROM_END
 
   Gakken / Konami Jungler (manufactured in Japan)
   * PCB label: Konami Gakken GR503
-  * Mitsubishi M58846-702P MCU
+  * Mitsubishi M58846-702P MCU, 1-bit sound
   * cyan/red/green VFD Itron CP5143GLR SGA
   * color overlay: all yellow
 
@@ -265,7 +258,6 @@ private:
 	void update_display();
 	void plate_w(offs_t offset, u8 data);
 	void grid_w(u16 data);
-	DECLARE_WRITE_LINE_MEMBER(speaker_w);
 	u16 input_r();
 };
 
@@ -294,12 +286,6 @@ void gjungler_state::grid_w(u16 data)
 	// D0-D11: vfd grid
 	m_grid = data;
 	update_display();
-}
-
-WRITE_LINE_MEMBER(gjungler_state::speaker_w)
-{
-	// T: speaker out
-	m_speaker->level_w(state);
 }
 
 u16 gjungler_state::input_r()
@@ -342,7 +328,7 @@ void gjungler_state::gjungler(machine_config &config)
 	m_maincpu->write_g().set(FUNC(gjungler_state::plate_w));
 	m_maincpu->write_u().set(FUNC(gjungler_state::plate_w));
 	m_maincpu->write_d().set(FUNC(gjungler_state::grid_w));
-	m_maincpu->write_t().set(FUNC(gjungler_state::speaker_w));
+	m_maincpu->write_t().set(m_speaker, FUNC(speaker_sound_device::level_w));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));

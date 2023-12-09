@@ -93,6 +93,7 @@
 #include "pa_win_waveformat.h"
 #include "pa_win_wdmks_utils.h"
 #include "pa_win_coinitialize.h"
+#include "pa_win_version.h"
 
 #if (defined(WIN32) && (defined(_MSC_VER) && (_MSC_VER >= 1200))) /* MSC version 6 and above */
 #pragma comment( lib, "dsound.lib" )
@@ -328,43 +329,26 @@ typedef struct PaWinDsStream
  */
 static double PaWinDS_GetMinSystemLatencySeconds( void )
 {
-/*
-NOTE: GetVersionEx() is deprecated as of Windows 8.1 and can not be used to reliably detect
-versions of Windows higher than Windows 8 (due to manifest requirements for reporting higher versions).
-Microsoft recommends switching to VerifyVersionInfo (available on Win 2k and later), however GetVersionEx
-is faster, for now we just disable the deprecation warning.
-See: https://msdn.microsoft.com/en-us/library/windows/desktop/ms724451(v=vs.85).aspx
-See: http://www.codeproject.com/Articles/678606/Part-Overcoming-Windows-s-deprecation-of-GetVe
-*/
-#pragma warning (disable : 4996) /* use of GetVersionEx */
-
     double minLatencySeconds;
     /* Set minimal latency based on whether NT or other OS.
      * NT has higher latency.
      */
+    PaOsVersion version = PaWinUtil_GetOsVersion();
 
-    OSVERSIONINFO osvi;
-    osvi.dwOSVersionInfoSize = sizeof( osvi );
-    GetVersionEx( &osvi );
-    DBUG(("PA - PlatformId = 0x%x\n", osvi.dwPlatformId ));
-    DBUG(("PA - MajorVersion = 0x%x\n", osvi.dwMajorVersion ));
-    DBUG(("PA - MinorVersion = 0x%x\n", osvi.dwMinorVersion ));
-    /* Check for NT */
-    if( (osvi.dwMajorVersion == 4) && (osvi.dwPlatformId == 2) )
-    {
-        minLatencySeconds = PA_DS_WIN_NT_DEFAULT_LATENCY_;
-    }
-    else if(osvi.dwMajorVersion >= 5)
-    {
-        minLatencySeconds = PA_DS_WIN_WDM_DEFAULT_LATENCY_;
-    }
-    else
+    if(version <= paOsVersionWindows9x)
     {
         minLatencySeconds = PA_DS_WIN_9X_DEFAULT_LATENCY_;
     }
-    return minLatencySeconds;
+    else if(version == paOsVersionWindowsNT4)
+    {
+        minLatencySeconds = PA_DS_WIN_NT_DEFAULT_LATENCY_;
+    }
+    else if(version >= paOsVersionWindows2000)
+    {
+        minLatencySeconds = PA_DS_WIN_WDM_DEFAULT_LATENCY_;
+    }
 
-#pragma warning (default : 4996)
+    return minLatencySeconds;
 }
 
 

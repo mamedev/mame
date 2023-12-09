@@ -1,4 +1,4 @@
-.TH DJPEG 1 "26 July 2015"
+.TH DJPEG 1 "28 April 2019"
 .SH NAME
 djpeg \- decompress a JPEG file to an image file
 .SH SYNOPSIS
@@ -16,7 +16,8 @@ djpeg \- decompress a JPEG file to an image file
 decompresses the named JPEG file, or the standard input if no file is named,
 and produces an image file on the standard output.  PBMPLUS (PPM/PGM), BMP,
 GIF, Targa, or RLE (Utah Raster Toolkit) output format can be selected.
-(RLE is supported only if the URT library is available.)
+(RLE is supported only if the URT library is available, which it isn't
+on most non-Unix systems.)
 .SH OPTIONS
 All switch names may be abbreviated; for example,
 .B \-grayscale
@@ -76,8 +77,8 @@ Scaling is handy if the image is larger than your screen; also,
 runs much faster when scaling down the output.
 .TP
 .B \-bmp
-Select BMP output format (Windows flavor).  8-bit colormapped format is
-emitted if
+Select BMP output format (Windows flavor).
+8-bit colormapped format is emitted if
 .B \-colors
 or
 .B \-grayscale
@@ -85,13 +86,24 @@ is specified, or if the JPEG file is grayscale; otherwise, 24-bit full-color
 format is emitted.
 .TP
 .B \-gif
-Select GIF output format.  Since GIF does not support more than 256 colors,
+Select GIF output format (LZW compressed).
+Since GIF does not support more than 256 colors,
 .B \-colors 256
-is assumed (unless you specify a smaller number of colors).
+is assumed (unless you specify a smaller number of colors).  If you specify
+.BR \-fast ,
+the default number of colors is 216.
+.TP
+.B \-gif0
+Select GIF output format (uncompressed).
+Since GIF does not support more than 256 colors,
+.B \-colors 256
+is assumed (unless you specify a smaller number of colors).  If you specify
+.BR \-fast ,
+the default number of colors is 216.
 .TP
 .B \-os2
-Select BMP output format (OS/2 1.x flavor).  8-bit colormapped format is
-emitted if
+Select BMP output format (OS/2 1.x flavor).
+8-bit colormapped format is emitted if
 .B \-colors
 or
 .B \-grayscale
@@ -250,8 +262,3 @@ Wallace, Gregory K.  "The JPEG Still Picture Compression Standard",
 Communications of the ACM, April 1991 (vol. 34, no. 4), pp. 30-44.
 .SH AUTHOR
 Independent JPEG Group
-.SH BUGS
-To avoid the Unisys LZW patent (now expired),
-.B djpeg
-produces uncompressed GIF files.  These are larger than they should be, but
-are readable by standard GIF decoders.

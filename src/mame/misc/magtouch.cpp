@@ -83,7 +83,7 @@ video card
 #include "machine/ins8250.h"
 #include "machine/microtch.h"
 #include "machine/nvram.h"
-#include "bus/isa/trident.h"
+#include "video/pc_vga_trident.h"
 #include "bus/isa/isa.h"
 #include "bus/isa/sblaster.h"
 
@@ -148,7 +148,7 @@ void magtouch_state::magtouch_io_w(offs_t offset, uint8_t data)
 void magtouch_state::magtouch_map(address_map &map)
 {
 	map(0x00000000, 0x0009ffff).ram();
-	map(0x000a0000, 0x000bffff).rw("vga", FUNC(trident_vga_device::mem_r), FUNC(trident_vga_device::mem_w));
+	map(0x000a0000, 0x000bffff).rw("vga", FUNC(tvga9000_device::mem_r), FUNC(tvga9000_device::mem_w));
 	map(0x000c0000, 0x000c7fff).rom().region("video_bios", 0);
 	map(0x000d0000, 0x000d1fff).ram().share("nvram");
 	map(0x000d8000, 0x000dffff).bankr("rombank");
@@ -160,9 +160,7 @@ void magtouch_state::magtouch_io(address_map &map)
 {
 	pcat32_io_common(map);
 	map(0x02e0, 0x02e7).rw(FUNC(magtouch_state::magtouch_io_r), FUNC(magtouch_state::magtouch_io_w));
-	map(0x03b0, 0x03bf).rw("vga", FUNC(trident_vga_device::port_03b0_r), FUNC(trident_vga_device::port_03b0_w));
-	map(0x03c0, 0x03cf).rw("vga", FUNC(trident_vga_device::port_03c0_r), FUNC(trident_vga_device::port_03c0_w));
-	map(0x03d0, 0x03df).rw("vga", FUNC(trident_vga_device::port_03d0_r), FUNC(trident_vga_device::port_03d0_w));
+	map(0x03b0, 0x03df).m("vga", FUNC(tvga9000_device::io_map));
 	map(0x03f8, 0x03ff).rw("ns16450_0", FUNC(ns16450_device::ins8250_r), FUNC(ns16450_device::ins8250_w));
 }
 
@@ -214,8 +212,12 @@ void magtouch_state::magtouch(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
 	/* video hardware */
-	pcvideo_trident_vga(config);
-	tvga9000_device &vga(TVGA9000_VGA(config.replace(), "vga", 0));
+	// TODO: map to ISA bus
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(25.1748_MHz_XTAL, 900, 0, 640, 526, 0, 480);
+	screen.set_screen_update("vga", FUNC(tvga9000_device::screen_update));
+
+	tvga9000_device &vga(TVGA9000_VGA(config, "vga", 0));
 	vga.set_screen("screen");
 	vga.set_vram_size(0x200000);
 

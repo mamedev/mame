@@ -45,7 +45,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void ctrl_w(uint8_t data);
-	void mcs51_tx_callback(uint8_t data);
+	void port3_w(uint8_t data);
 	void led_strobe_w(uint8_t data);
 	void lcd_latch_w(uint8_t data);
 	void lcd_control_w(uint8_t data);
@@ -71,6 +71,8 @@ void piggypas_state::output_digits()
 	m_digits[1] = bitswap<8>((m_digit_latch >> 8) & 0xff, 7,6,4,3,2,1,0,5) & 0x7f;
 	m_digits[2] = bitswap<8>((m_digit_latch >> 16) & 0xff, 7,6,4,3,2,1,0,5) & 0x7f;
 	m_digits[3] = bitswap<8>((m_digit_latch >> 24) & 0xff, 7,6,4,3,2,1,0,5) & 0x7f;
+
+	m_digit_latch = 0;
 }
 
 void piggypas_state::ctrl_w(uint8_t data)
@@ -83,9 +85,15 @@ void piggypas_state::ctrl_w(uint8_t data)
 	m_ctrl = data;
 }
 
-void piggypas_state::mcs51_tx_callback(uint8_t data)
+void piggypas_state::port3_w(uint8_t data)
 {
-	m_digit_latch = (m_digit_latch >> 8) | (u32(data) << 24);
+	if (!BIT(data, 1))
+	{
+		m_digit_latch >>= 1;
+
+		if (BIT(data, 0))
+			m_digit_latch |= (1U << 31);
+	}
 }
 
 void piggypas_state::led_strobe_w(uint8_t data)
@@ -197,14 +205,14 @@ void piggypas_state::piggypas(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &piggypas_state::piggypas_io);
 	m_maincpu->port_out_cb<1>().set(FUNC(piggypas_state::led_strobe_w));
 	m_maincpu->port_in_cb<3>().set_ioport("IN2");
-	m_maincpu->serial_tx_cb().set(FUNC(piggypas_state::mcs51_tx_callback));
+	m_maincpu->port_out_cb<3>().set(FUNC(piggypas_state::port3_w));
 //  m_maincpu->set_vblank_int("screen", FUNC(piggypas_state::irq0_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // DS1220AD
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(50);
-	screen.set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
+	screen.set_screen_update(m_hd44780, FUNC(hd44780_device::screen_update));
 	screen.set_size(16*6, 8);
 	screen.set_visarea(0, 16*6-1, 0, 8-1);
 	screen.set_palette("palette");
@@ -212,9 +220,9 @@ void piggypas_state::piggypas(machine_config &config)
 	PALETTE(config, "palette").set_entries(2);
 	config.set_default_layout(layout_piggypas);
 
-	hd44780_device &hd44780(HD44780(config, "hd44780"));
-	hd44780.set_lcd_size(1, 16);
-	hd44780.set_pixel_update_cb(FUNC(piggypas_state::piggypas_pixel_update));
+	HD44780(config, m_hd44780, 250'000); // TODO: clock not measured, datasheet typical clock used
+	m_hd44780->set_lcd_size(1, 16);
+	m_hd44780->set_pixel_update_cb(FUNC(piggypas_state::piggypas_pixel_update));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -235,7 +243,6 @@ void piggypas_state::fidlstix(machine_config &config)
 	piggypas(config);
 
 	m_maincpu->set_addrmap(AS_IO, &piggypas_state::fidlstix_io);
-	m_maincpu->serial_tx_cb().set_nop();
 	m_maincpu->port_in_cb<1>().set(m_hd44780, FUNC(hd44780_device::db_r));
 	m_maincpu->port_out_cb<1>().set(FUNC(piggypas_state::lcd_latch_w));
 	m_maincpu->port_out_cb<3>().set(FUNC(piggypas_state::lcd_control_w));

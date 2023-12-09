@@ -55,7 +55,7 @@ public:
 		, m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	DECLARE_WRITE_LINE_MEMBER(key_pressed);
+	void key_pressed(int state);
 
 	void monty(machine_config &config);
 	void mmonty(machine_config &config);
@@ -69,6 +69,10 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<6> m_inputs;
 
+	u64 m_lcd_data[32] = { };
+	int m_lcd_cs = 0;
+	int m_halt = 0;
+
 	void monty_mem(address_map &map);
 	void mmonty_mem(address_map &map);
 	void monty_io(address_map &map);
@@ -79,11 +83,7 @@ private:
 	void control_w(offs_t offset, u8 data);
 	void lcd_w(offs_t offset, u8 data) { m_lcd[m_lcd_cs]->write(offset, data); }
 	u8 input_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(halt_changed) { m_halt = state; }
-
-	u64 m_lcd_data[32] = { };
-	int m_lcd_cs = 0;
-	int m_halt = 0;
+	void halt_changed(int state) { m_halt = state; }
 };
 
 void monty_state::machine_start()
@@ -138,7 +138,7 @@ u8 monty_state::input_r(offs_t offset)
 	return ~data;
 }
 
-WRITE_LINE_MEMBER(monty_state::key_pressed)
+void monty_state::key_pressed(int state)
 {
 	if (state && m_halt)
 		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);

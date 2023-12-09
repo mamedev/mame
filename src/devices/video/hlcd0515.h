@@ -41,7 +41,7 @@
 */
 
 
-class hlcd0515_device : public device_t
+class hlcd0515_device : public device_t, public device_nvram_interface
 {
 public:
 	hlcd0515_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
@@ -50,17 +50,23 @@ public:
 	auto write_cols() { return m_write_cols.bind(); } // COL/ROW pins (offset for ROW)
 	auto write_data() { return m_write_data.bind(); } // DATA OUT pin
 
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
-	DECLARE_WRITE_LINE_MEMBER(cs_w);
-	DECLARE_WRITE_LINE_MEMBER(data_w) { m_data = (state) ? 1 : 0; }
-	DECLARE_READ_LINE_MEMBER(data_r) { return m_dataout; }
+	void clock_w(int state);
+	void cs_w(int state);
+	void data_w(int state) { m_data = (state) ? 1 : 0; }
+	int data_r() { return m_dataout; }
 
 protected:
 	hlcd0515_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 colmax);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
+	// device_nvram_interface implementation
+	virtual void nvram_default() override { internal_clear(); }
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
+
+	void internal_clear();
 	TIMER_CALLBACK_MEMBER(scan_lcd);
 
 	virtual void set_control();
@@ -72,7 +78,7 @@ protected:
 	int m_clk;      // "
 	int m_data;     // "
 	int m_dataout;  // DATA OUT pin state
-	int m_count;
+	u8 m_count;
 	u8 m_control;
 	bool m_blank;   // display blank/visible
 	u8 m_rowmax;    // number of rows output by lcd (max 8)

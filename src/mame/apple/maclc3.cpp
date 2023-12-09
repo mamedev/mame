@@ -24,7 +24,10 @@
 #include "mactoolbox.h"
 #include "sonora.h"
 
+#include "bus/nscsi/cd.h"
 #include "bus/nscsi/devices.h"
+#include "bus/nubus/cards.h"
+#include "bus/nubus/nubus.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68030.h"
 #include "machine/ram.h"
@@ -62,10 +65,14 @@ public:
 
 	void maclc3_base(machine_config &config);
 	void maclc3(machine_config &config);
+	void maclc3p(machine_config &config);
 	void maclc520(machine_config &config);
+	void maclc550(machine_config &config);
 	void base_map(address_map &map);
 	void maclc3_map(address_map &map);
+	void maclc3p_map(address_map &map);
 	void maclc520_map(address_map &map);
+	void maclc550_map(address_map &map);
 
 private:
 	required_device<m68030_device> m_maincpu;
@@ -101,7 +108,7 @@ private:
 		m_maincpu->pulse_input_line(M68K_LINE_BUSERROR, attotime::zero);
 	}
 
-	WRITE_LINE_MEMBER(cuda_reset_w)
+	void cuda_reset_w(int state)
 	{
 		m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 		m_maincpu->set_input_line(INPUT_LINE_RESET, state);
@@ -133,10 +140,22 @@ void macvail_state::maclc3_map(address_map &map)
 	map(0x5ffffffc, 0x5fffffff).lr32(NAME([](offs_t offset) { return 0xa55a0001; }));
 }
 
+void macvail_state::maclc3p_map(address_map &map)
+{
+	base_map(map);
+	map(0x5ffffffc, 0x5fffffff).lr32(NAME([](offs_t offset) { return 0xa55a0003; }));
+}
+
 void macvail_state::maclc520_map(address_map &map)
 {
 	base_map(map);
 	map(0x5ffffffc, 0x5fffffff).lr32(NAME([](offs_t offset) { return 0xa55a0100; }));
+}
+
+void macvail_state::maclc550_map(address_map &map)
+{
+	base_map(map);
+	map(0x5ffffffc, 0x5fffffff).lr32(NAME([](offs_t offset) { return 0xa55a0101; }));
 }
 
 u16 macvail_state::scsi_r(offs_t offset, u16 mem_mask)
@@ -214,7 +233,7 @@ INPUT_PORTS_END
 
 void macvail_state::maclc3_base(machine_config &config)
 {
-	M68030(config, m_maincpu, 25000000);
+	M68030(config, m_maincpu, 25_MHz_XTAL);
 	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
 	RAM(config, m_ram);
@@ -225,8 +244,13 @@ void macvail_state::maclc3_base(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:0", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:1", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:3", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, "cdrom");
+	NSCSI_CONNECTOR(config, "scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config(
+		[](device_t *device)
+		{
+			device->subdevice<cdda_device>("cdda")->add_route(0, "^^sonora:lspeaker", 1.0);
+			device->subdevice<cdda_device>("cdda")->add_route(1, "^^sonora:rspeaker", 1.0);
+		});
+	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", mac_scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr5380", NCR53C80).machine_config([this](device_t *device)
@@ -244,6 +268,7 @@ void macvail_state::maclc3_base(machine_config &config)
 	m_scsihelp->timeout_error_callback().set(FUNC(macvail_state::scsi_berr_w));
 
 	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
+	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("MC68030,MC68030_32");
 	SOFTWARE_LIST(config, "flop35hd_list").set_original("mac_hdflop");
 
 	SCC85C30(config, m_scc, C7M);
@@ -266,6 +291,14 @@ void macvail_state::maclc3_base(machine_config &config)
 	m_sonora->set_maincpu_tag("maincpu");
 	m_sonora->set_rom_tag("bootrom");
 
+	nubus_device &nubus(NUBUS(config, "pds", 0));
+	nubus.set_space(m_maincpu, AS_PROGRAM);
+	// LC III style PDS cards have slot IRQs $C, $D, and $E connected
+	nubus.out_irqc_callback().set(m_sonora, FUNC(sonora_device::slot_irq_w<0x08>));
+	nubus.out_irqd_callback().set(m_sonora, FUNC(sonora_device::slot_irq_w<0x10>));
+	nubus.out_irqe_callback().set(m_sonora, FUNC(sonora_device::slot_irq_w<0x20>));
+	NUBUS_SLOT(config, "lcpds", "pds", mac_pdslc_cards, nullptr);
+
 	MACADB(config, m_macadb, C15M);
 }
 
@@ -274,7 +307,8 @@ void macvail_state::maclc3(machine_config &config)
 	maclc3_base(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &macvail_state::maclc3_map);
 
-	EGRET(config, m_egret, EGRET_341S0851);
+	EGRET(config, m_egret, XTAL(32'768));
+	m_egret->set_default_bios_tag("341s0851");
 	m_egret->reset_callback().set(FUNC(macvail_state::cuda_reset_w));
 	m_egret->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
 	m_egret->via_clock_callback().set(m_sonora, FUNC(sonora_device::cb1_w));
@@ -288,12 +322,20 @@ void macvail_state::maclc3(machine_config &config)
 	m_sonora->cb2_callback().set(m_egret, FUNC(egret_device::set_via_data));
 }
 
+void macvail_state::maclc3p(machine_config &config)
+{
+	maclc3(config);
+	M68030(config.replace(), m_maincpu, 33_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &macvail_state::maclc3p_map);
+}
+
 void macvail_state::maclc520(machine_config &config)
 {
 	maclc3_base(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &macvail_state::maclc520_map);
 
-	CUDA(config, m_cuda, CUDA_341S0060);
+	CUDA_V2XX(config, m_cuda, XTAL(32'768));
+	m_cuda->set_default_bios_tag("341s0060");
 	m_cuda->reset_callback().set(FUNC(macvail_state::cuda_reset_w));
 	m_cuda->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
 	m_cuda->via_clock_callback().set(m_sonora, FUNC(sonora_device::cb1_w));
@@ -307,6 +349,13 @@ void macvail_state::maclc520(machine_config &config)
 	m_sonora->cb2_callback().set(m_cuda, FUNC(cuda_device::set_via_data));
 }
 
+void macvail_state::maclc550(machine_config &config)
+{
+	maclc520(config);
+	M68030(config.replace(), m_maincpu, 33_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &macvail_state::maclc550_map);
+}
+
 ROM_START( maclc3 )
 	ROM_REGION32_BE(0x100000, "bootrom", 0)
 	ROM_LOAD( "ecbbc41c.rom", 0x000000, 0x100000, CRC(e578f5f3) SHA1(c77df3220c861f37a2c553b6ee9241b202dfdffc) )
@@ -317,7 +366,12 @@ ROM_START( maclc520 )
 	ROM_LOAD( "ede66cbd.rom", 0x000000, 0x100000, CRC(a893cb0f) SHA1(c54ee2f45020a4adeb7451adce04cd6e5fb69790) )
 ROM_END
 
+#define rom_maclc3p rom_maclc3
+#define rom_maclc550 rom_maclc520
+
 } // anonymous namespace
 
-COMP(1993, maclc3, 0, 0, maclc3, macadb, macvail_state, empty_init, "Apple Computer", "Macintosh LC III", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND)
-COMP(1993, maclc520, 0, 0, maclc520, macadb, macvail_state, empty_init, "Apple Computer", "Macintosh LC 520", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND)
+COMP(1993, maclc3, 0, 0, maclc3, macadb, macvail_state, empty_init, "Apple Computer", "Macintosh LC III", MACHINE_SUPPORTS_SAVE )
+COMP(1993, maclc3p, maclc3, 0, maclc3p, macadb, macvail_state, empty_init, "Apple Computer", "Macintosh LC III+", MACHINE_SUPPORTS_SAVE )
+COMP(1993, maclc520, 0, 0, maclc520, macadb, macvail_state, empty_init, "Apple Computer", "Macintosh LC 520", MACHINE_SUPPORTS_SAVE )
+COMP(1994, maclc550, maclc520, 0, maclc550, macadb, macvail_state, empty_init, "Apple Computer", "Macintosh LC 550", MACHINE_SUPPORTS_SAVE )

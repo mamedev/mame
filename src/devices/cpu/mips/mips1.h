@@ -17,161 +17,25 @@ public:
 	void berr_w(int state) { m_bus_error = bool(state); }
 
 protected:
-	mips1core_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, u32 cpurev, size_t icache_size, size_t dcache_size);
+	mips1core_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, u32 cpurev, size_t icache_size, size_t dcache_size, bool cache_pws);
 
-	enum registers : unsigned
-	{
-		MIPS1_R0   = 0,
-		MIPS1_COP0 = 32,
-		MIPS1_F0   = 64,
-
-		MIPS1_PC   = 80,
-		MIPS1_HI,
-		MIPS1_LO,
-		MIPS1_FCR30,
-		MIPS1_FCR31,
-	};
-
-	enum exception : u32
-	{
-		EXCEPTION_INTERRUPT = 0x00000000,
-		EXCEPTION_TLBMOD    = 0x00000004,
-		EXCEPTION_TLBLOAD   = 0x00000008,
-		EXCEPTION_TLBSTORE  = 0x0000000c,
-		EXCEPTION_ADDRLOAD  = 0x00000010,
-		EXCEPTION_ADDRSTORE = 0x00000014,
-		EXCEPTION_BUSINST   = 0x00000018,
-		EXCEPTION_BUSDATA   = 0x0000001c,
-		EXCEPTION_SYSCALL   = 0x00000020,
-		EXCEPTION_BREAK     = 0x00000024,
-		EXCEPTION_INVALIDOP = 0x00000028,
-		EXCEPTION_BADCOP    = 0x0000002c,
-		EXCEPTION_OVERFLOW  = 0x00000030,
-		EXCEPTION_TRAP      = 0x00000034,
-
-		EXCEPTION_BADCOP0   = 0x0000002c,
-		EXCEPTION_BADCOP1   = 0x1000002c,
-		EXCEPTION_BADCOP2   = 0x2000002c,
-		EXCEPTION_BADCOP3   = 0x3000002c,
-	};
-
-	enum cop0_reg : u8
-	{
-		COP0_Index    = 0,
-		COP0_Random   = 1,
-		COP0_EntryLo  = 2,
-		COP0_BusCtrl  = 2,  // r3041 only
-		COP0_Config   = 3,  // r3041/r3071/r3081 only
-		COP0_Context  = 4,
-		COP0_BadVAddr = 8,
-		COP0_Count    = 9,  // r3041 only
-		COP0_EntryHi  = 10,
-		COP0_PortSize = 10, // r3041 only
-		COP0_Compare  = 11, // r3041 only
-		COP0_Status   = 12,
-		COP0_Cause    = 13,
-		COP0_EPC      = 14,
-		COP0_PRId     = 15,
-	};
-
-	enum sr_mask : u32
-	{
-		SR_IEc   = 0x00000001, // interrupt enable (current)
-		SR_KUc   = 0x00000002, // user mode (current)
-		SR_IEp   = 0x00000004, // interrupt enable (previous)
-		SR_KUp   = 0x00000008, // user mode (previous)
-		SR_IEo   = 0x00000010, // interrupt enable (old)
-		SR_KUo   = 0x00000020, // user mode (old)
-		SR_IMSW0 = 0x00000100, // software interrupt 0 enable
-		SR_IMSW1 = 0x00000200, // software interrupt 1 enable
-		SR_IMEX0 = 0x00000400, // external interrupt 0 enable
-		SR_IMEX1 = 0x00000800, // external interrupt 1 enable
-		SR_IMEX2 = 0x00001000, // external interrupt 2 enable
-		SR_IMEX3 = 0x00002000, // external interrupt 3 enable
-		SR_IMEX4 = 0x00004000, // external interrupt 4 enable
-		SR_IMEX5 = 0x00008000, // external interrupt 5 enable
-		SR_IsC   = 0x00010000, // isolate (data) cache
-		SR_SwC   = 0x00020000, // swap caches
-		SR_PZ    = 0x00040000, // cache parity zero
-		SR_CM    = 0x00080000, // cache match
-		SR_PE    = 0x00100000, // cache parity error
-		SR_TS    = 0x00200000, // tlb shutdown
-		SR_BEV   = 0x00400000, // boot exception vectors
-		SR_RE    = 0x02000000, // reverse endianness in user mode
-		SR_COP0  = 0x10000000, // coprocessor 0 usable
-		SR_COP1  = 0x20000000, // coprocessor 1 usable
-		SR_COP2  = 0x40000000, // coprocessor 2 usable
-		SR_COP3  = 0x80000000, // coprocessor 3 usable
-
-		SR_KUIE   = 0x0000003f, // all interrupt enable and user mode bits
-		SR_KUIEpc = 0x0000000f, // previous and current interrupt enable and user mode bits
-		SR_KUIEop = 0x0000003c, // old and previous interrupt enable and user mode bits
-		SR_IM     = 0x0000ff00, // all interrupt mask bits
-	};
-
-	enum cause_mask : u32
-	{
-		CAUSE_EXCCODE = 0x0000007c, // exception code
-		CAUSE_IPSW0   = 0x00000100, // software interrupt 0 pending
-		CAUSE_IPSW1   = 0x00000200, // software interrupt 1 pending
-		CAUSE_IPEX0   = 0x00000400, // external interrupt 0 pending
-		CAUSE_IPEX1   = 0x00000800, // external interrupt 1 pending
-		CAUSE_IPEX2   = 0x00001000, // external interrupt 2 pending
-		CAUSE_IPEX3   = 0x00002000, // external interrupt 3 pending
-		CAUSE_IPEX4   = 0x00004000, // external interrupt 4 pending
-		CAUSE_IPEX5   = 0x00008000, // external interrupt 5 pending
-		CAUSE_IP      = 0x0000ff00, // interrupt pending
-		CAUSE_CE      = 0x30000000, // co-processor error
-		CAUSE_BD      = 0x80000000, // branch delay
-
-		CAUSE_IPEX    = 0x0000fc00, // external interrupt pending
-	};
-
-	enum entryhi_mask : u32
-	{
-		EH_VPN  = 0xfffff000, // virtual page number
-		EH_ASID = 0x00000fc0, // address space identifier
-
-		EH_WM   = 0xffffffc0, // write mask
-	};
-	enum entrylo_mask : u32
-	{
-		EL_PFN = 0xfffff000, // physical frame
-		EL_N   = 0x00000800, // noncacheable
-		EL_D   = 0x00000400, // dirty
-		EL_V   = 0x00000200, // valid
-		EL_G   = 0x00000100, // global
-
-		EL_WM  = 0xffffff00, // write mask
-	};
-	enum context_mask : u32
-	{
-		PTE_BASE = 0xffe00000, // base address of page table
-		BAD_VPN  = 0x001ffffc, // virtual address bits 30..12
-	};
-
-	// device_t overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// device_execute_interface overrides
+	// device_execute_interface implementation
 	virtual u32 execute_min_cycles() const noexcept override { return 1; }
 	virtual u32 execute_max_cycles() const noexcept override { return 40; }
 	virtual u32 execute_input_lines() const noexcept override { return 6; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
-	// device_memory_interface overrides
+	// device_memory_interface implementation
 	virtual space_config_vector memory_space_config() const override;
 	virtual bool memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override;
-	bool memory_translate(int intention, offs_t &address, bool debug);
 
-	// device_disasm_interface overrides
+	// device_disasm_interface implementation
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
-
-	void icache_map(address_map &map);
-	void dcache_map(address_map &map);
 
 	// exceptions
 	void generate_exception(u32 exception, bool refill = false);
@@ -193,10 +57,47 @@ protected:
 	void swl(u32 const op);
 	void swr(u32 const op);
 
-	// memory accessors
+	// memory
+	enum translate_result : unsigned { ERROR, UNCACHED, CACHED };
+	virtual translate_result translate(int intention, offs_t &address, bool debug);
 	template <typename T, bool Aligned = true, typename U> std::enable_if_t<std::is_convertible<U, std::function<void(T)>>::value, void> load(u32 address, U &&apply);
-	template <typename T, bool Aligned = true, typename U> std::enable_if_t<std::is_convertible<U, T>::value, void> store(u32 address, U data, T mem_mask = ~T(0));
-	bool fetch(u32 address, std::function<void(u32)> &&apply);
+	template <typename T, bool Aligned = true> void store(u32 address, T data, T mem_mask = ~T(0));
+	void fetch(u32 address, std::function<void(u32)> &&apply);
+
+	// cache
+	template <typename T> unsigned shift_factor(u32 address) const;
+	struct cache
+	{
+		cache(size_t size)
+			: size(size)
+		{
+		}
+
+		struct line
+		{
+			enum tag_mask : u32
+			{
+				INV = 0x0000'0001, // cache line invalid
+			};
+
+			void invalidate() { tag = INV; }
+			void update(u32 data, u32 mask = 0xffff'ffffU)
+			{
+				this->tag &= ~INV;
+				this->data = (this->data & ~mask) | (data & mask);
+			}
+
+			u32 tag;
+			u32 data;
+		};
+
+		size_t lines() const { return size / 4; }
+		void start() { line = std::make_unique<struct line[]>(lines()); }
+
+		size_t const size;
+		std::unique_ptr<struct line[]> line;
+	};
+	std::tuple<struct cache::line &, bool> cache_lookup(u32 address, bool invalidate, bool icache = false);
 
 	// debug helpers
 	std::string debug_string(u32 string_pointer, unsigned const limit = 0);
@@ -205,10 +106,6 @@ protected:
 	// address spaces
 	address_space_config const m_program_config_be;
 	address_space_config const m_program_config_le;
-	address_space_config const m_icache_config;
-	address_space_config const m_dcache_config;
-
-	int m_data_spacenum;
 
 	// configuration
 	u32 const m_cpurev;
@@ -236,8 +133,10 @@ protected:
 	u32 m_branch_target;
 
 	// cache memory
-	size_t const m_icache_size;
-	size_t const m_dcache_size;
+	struct cache m_icache;
+	struct cache m_dcache;
+	translate_result const m_cache;
+	bool const m_cache_pws; // cache supports partial-word store
 
 	// I/O
 	devcb_read_line::array<4> m_in_brcond;
@@ -262,45 +161,13 @@ public:
 	void set_fpu(u32 revision, unsigned interrupt = 3) { m_fcr0 = revision; m_fpu_irq = interrupt; }
 
 protected:
-	mips1_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, u32 cpurev, size_t icache_size, size_t dcache_size);
+	mips1_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, u32 cpurev, size_t icache_size, size_t dcache_size, bool cache_pws);
 
-	enum cp1_fcr31_mask : u32
-	{
-		FCR31_RM = 0x00000003, // rounding mode
-
-		FCR31_FI = 0x00000004, // inexact operation flag
-		FCR31_FU = 0x00000008, // underflow flag
-		FCR31_FO = 0x00000010, // overflow flag
-		FCR31_FZ = 0x00000020, // divide by zero flag
-		FCR31_FV = 0x00000040, // invalid operation flag
-
-		FCR31_EI = 0x00000080, // inexact operation enable
-		FCR31_EU = 0x00000100, // underflow enable
-		FCR31_EO = 0x00000200, // overflow enable
-		FCR31_EZ = 0x00000400, // divide by zero enable
-		FCR31_EV = 0x00000800, // invalid operation enable
-
-		FCR31_CI = 0x00001000, // inexact operation cause
-		FCR31_CU = 0x00002000, // underflow cause
-		FCR31_CO = 0x00004000, // overflow cause
-		FCR31_CZ = 0x00008000, // divide by zero cause
-		FCR31_CV = 0x00010000, // invalid operation cause
-		FCR31_CE = 0x00020000, // unimplemented operation cause
-
-		FCR31_C  = 0x00800000, // condition
-
-		FCR31_FM = 0x0000007c, // flag mask
-		FCR31_EM = 0x00000f80, // enable mask
-		FCR31_CM = 0x0001f000, // cause mask (except unimplemented)
-	};
-
-	// device_t overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// device_memory_interface overrides
-	virtual bool memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override;
-	bool memory_translate(int intention, offs_t &address, bool debug);
+	virtual translate_result translate(int intention, offs_t &address, bool debug) override;
 
 	virtual void handle_cop0(u32 const op) override;
 	virtual u32 get_cop0_reg(unsigned const reg) override;

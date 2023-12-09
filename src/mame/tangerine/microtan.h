@@ -41,7 +41,7 @@ public:
 	void micron(machine_config &config);
 	void spinveti(machine_config &config);
 
-	DECLARE_WRITE_LINE_MEMBER(trigger_reset);
+	void trigger_reset(int state);
 
 protected:
 	virtual void machine_start() override;
@@ -101,7 +101,7 @@ public:
 
 	void mt6809(machine_config &config);
 
-	DECLARE_WRITE_LINE_MEMBER(trigger_reset);
+	void trigger_reset(int state);
 
 protected:
 	virtual void machine_start() override;

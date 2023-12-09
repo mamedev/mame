@@ -1,3 +1,4 @@
+--
 -- license:BSD-3-Clause
 -- copyright-holders:MAMEdev Team
 
@@ -127,7 +128,6 @@ project "zlib"
 
 	configuration { "vs*" }
 		buildoptions {
-			"/wd4131", -- warning C4131: 'xxx' : uses old-style declarator
 			"/wd4127", -- warning C4127: conditional expression is constant
 			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
 		}
@@ -140,11 +140,6 @@ end
 	configuration "Debug"
 		defines {
 			"verbose=-1",
-		}
-
-	configuration { "gmake or ninja" }
-		buildoptions_c {
-			"-Wno-strict-prototypes",
 		}
 
 	configuration { }
@@ -671,25 +666,69 @@ if _OPTIONS["vs"]=="intel-15" then
 		}
 end
 
-	configuration { "mingw-clang" }
-		buildoptions {
-			"-include stdint.h"
+	configuration { "mingw*" }
+		defines {
+			"HAVE_FSEEKO",
+		}
+
+	configuration { "Release" }
+		defines {
+			"NDEBUG",
 		}
 
 	configuration { }
 		defines {
-			"WORDS_BIGENDIAN=0",
-			"FLAC__NO_ASM",
-			"_LARGEFILE_SOURCE",
-			"_FILE_OFFSET_BITS=64",
+			"HAVE_CONFIG_H", -- mostly because PACKAGE_VERSION is a pain to do otherwise
+			"ENABLE_64_BIT_WORDS=1",
+			"OGG_FOUND=0",
 			"FLAC__HAS_OGG=0",
-			"HAVE_CONFIG_H=1",
+			"HAVE_LROUND=1",
+			"HAVE_INTTYPES_H",
+			"HAVE_STDBOOL_H",
+			"HAVE_STDINT_H",
+			"HAVE_STDIO_H",
+			"HAVE_STDLIB_H",
+			"HAVE_STRING_H",
+			"_FILE_OFFSET_BITS=64",
+			"_LARGEFILE_SOURCE",
 		}
+
+		if _OPTIONS["gcc"]~=nil then
+			defines {
+				"HAVE_BSWAP16",
+				"HAVE_BSWAP32",
+			}
+		end
+
+		if _OPTIONS["BIGENDIAN"]=="1" then
+			defines {
+				"CPU_IS_BIG_ENDIAN=1",
+				"CPU_IS_LITTLE_ENDIAN=0",
+				"WORDS_BIGENDIAN=1",
+			}
+		else
+			defines {
+				"CPU_IS_BIG_ENDIAN=0",
+				"CPU_IS_LITTLE_ENDIAN=1",
+				"WORDS_BIGENDIAN=0",
+			}
+		end
+
+		if _OPTIONS["targetos"]=="macosx" then
+			defines {
+				"FLAC__SYS_DARWIN",
+			}
+		elseif _OPTIONS["targetos"]=="linux" then
+			defines {
+				"FLAC__SYS_LINUX",
+			}
+		end
+
 
 	configuration { "gmake or ninja" }
 		buildoptions_c {
-			"-Wno-unused-function",
-			"-O0",
+			"-Wno-error=bad-function-cast",
+			"-Wno-error=unused-function",
 		}
 	if _OPTIONS["gcc"]~=nil and (string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "android")) then
 		buildoptions {
@@ -704,27 +743,45 @@ end
 	configuration { }
 
 	includedirs {
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/include",
-		MAME_DIR .. "3rdparty/libflac/include",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/include",
+		MAME_DIR .. "3rdparty/flac/include",
 	}
 
 	files {
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/bitmath.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/bitreader.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/bitwriter.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/cpu.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/crc.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/fixed.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/float.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/format.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/lpc.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/md5.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/memory.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/stream_decoder.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/stream_encoder.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/stream_encoder_framing.c",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/window.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/bitmath.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/bitreader.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/bitwriter.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/cpu.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/crc.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/fixed.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/fixed_intrin_avx2.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/fixed_intrin_sse2.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/fixed_intrin_sse42.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/fixed_intrin_ssse3.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/float.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/format.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/lpc.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/lpc_intrin_avx2.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/lpc_intrin_fma.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/lpc_intrin_neon.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/lpc_intrin_sse2.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/lpc_intrin_sse41.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/md5.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/memory.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/stream_decoder.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/stream_encoder.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/stream_encoder_framing.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/stream_encoder_intrin_avx2.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/stream_encoder_intrin_sse2.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/stream_encoder_intrin_ssse3.c",
+		MAME_DIR .. "3rdparty/flac/src/libFLAC/window.c",
 	}
+
+	if _OPTIONS["targetos"]=="windows" then
+		files {
+			MAME_DIR .. "3rdparty/flac/src/share/win_utf8_io/win_utf8_io.c",
+		}
+	end
 else
 links {
 	ext_lib("flac"),
@@ -742,29 +799,19 @@ project "7z"
 
 	configuration { "gmake or ninja" }
 		buildoptions_c {
-			"-Wno-strict-prototypes",
-			"-Wno-undef",
+			"-Wno-error=undef",
 		}
-if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") and str_to_version(_OPTIONS["gcc_version"]) >= 100000 then
-		buildoptions_c {
-			"-Wno-misleading-indentation",
-		}
+if _OPTIONS["gcc"]~=nil then
+	if string.find(_OPTIONS["gcc"], "clang") then
+
+	else
+		if str_to_version(_OPTIONS["gcc_version"]) >= 130000 then
+			buildoptions_c {
+				"-Wno-error=dangling-pointer",
+			}
+		end
+	end
 end
-
-	configuration { "android-*" }
-		buildoptions {
-			"-Wno-misleading-indentation",
-		}
-
-	configuration { "asmjs" }
-		buildoptions {
-			"-Wno-misleading-indentation",
-		}
-
-	configuration { "mingw*" }
-		buildoptions_c {
-			"-Wno-strict-prototypes",
-		}
 
 	configuration { "vs*" }
 		buildoptions {
@@ -772,11 +819,6 @@ end
 			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
 			"/wd4457", -- warning C4457: declaration of 'xxx' hides function parameter
 		}
-if _OPTIONS["vs"]=="clangcl" then
-		buildoptions {
-			"-Wno-misleading-indentation",
-		}
-end
 if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
 			"/Qwd869",              -- remark #869: parameter "xxx" was never referenced
@@ -784,8 +826,8 @@ if _OPTIONS["vs"]=="intel-15" then
 end
 	configuration { }
 		defines {
-			"_7ZIP_PPMD_SUPPPORT",
-			"_7ZIP_ST",
+			"Z7_PPMD_SUPPPORT",
+			"Z7_ST",
 		}
 
 	files {
@@ -811,19 +853,24 @@ end
 			-- MAME_DIR .. "3rdparty/lzma/C/DllSecur.c",
 			MAME_DIR .. "3rdparty/lzma/C/LzFind.c",
 			-- MAME_DIR .. "3rdparty/lzma/C/LzFindMt.c",
+			MAME_DIR .. "3rdparty/lzma/C/LzFindOpt.c",
 			MAME_DIR .. "3rdparty/lzma/C/Lzma2Dec.c",
-			MAME_DIR .. "3rdparty/lzma/C/Lzma2Enc.c",
-			MAME_DIR .. "3rdparty/lzma/C/Lzma86Dec.c",
-			MAME_DIR .. "3rdparty/lzma/C/Lzma86Enc.c",
+			-- MAME_DIR .. "3rdparty/lzma/C/Lzma2DecMt.c",
+			-- MAME_DIR .. "3rdparty/lzma/C/Lzma2Enc.c",
+			-- MAME_DIR .. "3rdparty/lzma/C/Lzma86Dec.c",
+			-- MAME_DIR .. "3rdparty/lzma/C/Lzma86Enc.c",
 			MAME_DIR .. "3rdparty/lzma/C/LzmaDec.c",
 			MAME_DIR .. "3rdparty/lzma/C/LzmaEnc.c",
 			-- MAME_DIR .. "3rdparty/lzma/C/LzmaLib.c",
 			-- MAME_DIR .. "3rdparty/lzma/C/MtCoder.c",
+			-- MAME_DIR .. "3rdparty/lzma/C/MtDec.c",
 			MAME_DIR .. "3rdparty/lzma/C/Ppmd7.c",
 			MAME_DIR .. "3rdparty/lzma/C/Ppmd7Dec.c",
-			MAME_DIR .. "3rdparty/lzma/C/Ppmd7Enc.c",
+			-- MAME_DIR .. "3rdparty/lzma/C/Ppmd7Enc.c",
 			MAME_DIR .. "3rdparty/lzma/C/Sha256.c",
+			MAME_DIR .. "3rdparty/lzma/C/Sha256Opt.c",
 			MAME_DIR .. "3rdparty/lzma/C/Sort.c",
+			-- MAME_DIR .. "3rdparty/lzma/C/SwapBytes.c",
 			-- MAME_DIR .. "3rdparty/lzma/C/Threads.c",
 			-- MAME_DIR .. "3rdparty/lzma/C/Xz.c",
 			-- MAME_DIR .. "3rdparty/lzma/C/XzCrc64.c",
@@ -1165,6 +1212,14 @@ project "bx"
 
 	configuration { }
 
+	if _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="linux" or _OPTIONS["targetos"]=="windows" or _OPTIONS["targetos"]=="asmjs" then
+		if _OPTIONS["gcc"]~=nil and (string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs")) then
+			buildoptions_cpp {
+				"-Wno-unused-private-field",
+			}
+		end
+	end
+
 	includedirs {
 		MAME_DIR .. "3rdparty/bx/include",
 		MAME_DIR .. "3rdparty/bx/3rdparty",
@@ -1262,7 +1317,7 @@ project "bimg"
 		"BX_CONFIG_DEBUG=0",
 	}
 
-	configuration { "x64", "mingw*" }
+	configuration { "x64", "mingw*", "not arm64" }
 		defines {
 			"ASTCENC_AVX=0",
 			"ASTCENC_SSE=20",
@@ -1446,6 +1501,11 @@ end
 				"BGFX_CONFIG_RENDERER_OPENGL=0",
 			}
 		end
+		if _OPTIONS["USE_WAYLAND"]=="1" then
+			defines {
+				"WL_EGL_PLATFORM=1",
+			}
+		end
 	end
 
 	if _OPTIONS["targetos"]=="macosx" and _OPTIONS["gcc"]~=nil then
@@ -1461,7 +1521,6 @@ end
 		MAME_DIR .. "3rdparty/bgfx/src/debug_renderdoc.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/dxgi.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/glcontext_egl.cpp",
-		MAME_DIR .. "3rdparty/bgfx/src/glcontext_glx.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/glcontext_html5.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/glcontext_wgl.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/nvapi.cpp",
@@ -1523,6 +1582,13 @@ project "portaudio"
 			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
 			"/wd4312", -- warning C4312: 'type cast': conversion from 'UINT' to 'HWAVEIN' of greater size
 		}
+	if _OPTIONS["vs"]=="clangcl" then
+		buildoptions {
+			"-Wno-implicit-const-int-float-conversion",
+			"-Wno-sometimes-uninitialized",
+			"-Wno-unused-but-set-variable",
+		}
+	end
 	if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
 			"/Qwd869",              -- remark #869: parameter "xxx" was never referenced
@@ -1556,7 +1622,8 @@ project "portaudio"
 				"-Wno-incompatible-pointer-types-discards-qualifiers",
 				"-Wno-pointer-sign",
 				"-Wno-switch",
-				"-Wno-macro-redefined"
+				"-Wno-macro-redefined",
+				"-Wno-unused-label",
 			}
 		else
 			buildoptions_c {
@@ -1614,6 +1681,7 @@ project "portaudio"
 		configuration { }
 		files {
 			MAME_DIR .. "3rdparty/portaudio/src/os/win/pa_win_util.c",
+			MAME_DIR .. "3rdparty/portaudio/src/os/win/pa_win_version.c",
 			MAME_DIR .. "3rdparty/portaudio/src/os/win/pa_win_waveformat.c",
 			MAME_DIR .. "3rdparty/portaudio/src/os/win/pa_win_hostapis.c",
 			MAME_DIR .. "3rdparty/portaudio/src/os/win/pa_win_coinitialize.c",
@@ -1715,11 +1783,6 @@ project "utf8proc"
 	configuration "Debug"
 		defines {
 			"verbose=-1",
-		}
-
-	configuration { "gmake or ninja" }
-		buildoptions_c {
-			"-Wno-strict-prototypes",
 		}
 
 	configuration { }

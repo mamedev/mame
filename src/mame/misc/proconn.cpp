@@ -61,6 +61,9 @@ public:
 
 	void init_proconn();
 
+protected:
+	virtual void machine_reset() override;
+
 private:
 	template <unsigned N> void ay_w(uint8_t data) { m_ay->address_data_w(N, data); }
 
@@ -86,49 +89,49 @@ private:
 
 	/* PIO 1 */
 
-	DECLARE_WRITE_LINE_MEMBER(pio_1_m_out_int_w)    { /* logerror("pio_1_m_out_int_w %02x\n", state); */ }
+	void pio_1_m_out_int_w(int state)   { /* logerror("pio_1_m_out_int_w %02x\n", state); */ }
 	uint8_t pio_1_m_in_pa_r()           { logerror("pio_1_m_in_pa_r (INPUT MATRIX)\n"); return machine().rand(); }
 	void pio_1_m_out_pa_w(uint8_t data) { logerror("pio_1_m_out_pa_w %02x\n", data); }
-	DECLARE_WRITE_LINE_MEMBER(pio_1_m_out_ardy_w)   { logerror("pio_1_m_out_ardy_w %02x\n", state); }
+	void pio_1_m_out_ardy_w(int state)  { logerror("pio_1_m_out_ardy_w %02x\n", state); }
 	uint8_t pio_1_m_in_pb_r()           { logerror("pio_1_m_in_pb_r\n"); return 0x00; }
 	void pio_1_m_out_pb_w(uint8_t data) { logerror("pio_1_m_out_pb_w %02x (REELS)\n", data); }
-	DECLARE_WRITE_LINE_MEMBER(pio_1_m_out_brdy_w)   { logerror("pio_1_m_out_brdy_w %02x\n", state); }
+	void pio_1_m_out_brdy_w(int state)  { logerror("pio_1_m_out_brdy_w %02x\n", state); }
 
 	/* PIO 2 */
-	DECLARE_WRITE_LINE_MEMBER(pio_2_m_out_int_w)    { /* logerror("pio_2_m_out_int_w %02x\n", state); */ }
+	void pio_2_m_out_int_w(int state)   { /* logerror("pio_2_m_out_int_w %02x\n", state); */ }
 	uint8_t pio_2_m_in_pa_r()           { logerror("pio_2_m_in_pa_r\n"); return 0x00; }
 	void pio_2_m_out_pa_w(uint8_t data) { logerror("pio_2_m_out_pa_w %02x\n", data); }
-	DECLARE_WRITE_LINE_MEMBER(pio_2_m_out_ardy_w)   { logerror("pio_2_m_out_ardy_w %02x\n", state); }
+	void pio_2_m_out_ardy_w(int state)  { logerror("pio_2_m_out_ardy_w %02x\n", state); }
 	uint8_t pio_2_m_in_pb_r()           { logerror("pio_2_m_in_pb_r\n"); return 0x00; }
 	void pio_2_m_out_pb_w(uint8_t data) { logerror("pio_2_m_out_pb_w %02x (ALPHA)\n", data); }
-	DECLARE_WRITE_LINE_MEMBER(pio_2_m_out_brdy_w)   { logerror("pio_2_m_out_brdy_w %02x\n", state); }
+	void pio_2_m_out_brdy_w(int state)  { logerror("pio_2_m_out_brdy_w %02x\n", state); }
 
 	/* PIO 3 */
-	DECLARE_WRITE_LINE_MEMBER(pio_3_m_out_int_w)    { /* logerror("pio_3_m_out_int_w %02x\n", state); */ }
+	void pio_3_m_out_int_w(int state)   { /* logerror("pio_3_m_out_int_w %02x\n", state); */ }
 	uint8_t pio_3_m_in_pa_r()           { logerror("pio_3_m_in_pa_r (REEL OPTICS)\n"); return 0x00; }
 	void pio_3_m_out_pa_w(uint8_t data) { logerror("pio_3_m_out_pa_w %02x (STROBE)\n", data); }
-	DECLARE_WRITE_LINE_MEMBER(pio_3_m_out_ardy_w)   { logerror("pio_3_m_out_ardy_w %02x\n", state); }
+	void pio_3_m_out_ardy_w(int state)  { logerror("pio_3_m_out_ardy_w %02x\n", state); }
 	uint8_t pio_3_m_in_pb_r()           { logerror("pio_3_m_in_pb_r (COIN INPUT)\n"); return 0x00; }
 	void pio_3_m_out_pb_w(uint8_t data) { logerror("pio_3_m_out_pb_w %02x\n", data); }
-	DECLARE_WRITE_LINE_MEMBER(pio_3_m_out_brdy_w)   { logerror("pio_3_m_out_brdy_w %02x\n", state); }
+	void pio_3_m_out_brdy_w(int state)  { logerror("pio_3_m_out_brdy_w %02x\n", state); }
 
 	/* PIO 4 */
-	DECLARE_WRITE_LINE_MEMBER(pio_4_m_out_int_w)    { /* logerror("pio_4_m_out_int_w %02x\n", state); */ }
+	void pio_4_m_out_int_w(int state)   { /* logerror("pio_4_m_out_int_w %02x\n", state); */ }
 	uint8_t pio_4_m_in_pa_r()           { logerror("pio_4_m_in_pa_r\n"); return 0x00; }
 	void pio_4_m_out_pa_w(uint8_t data) { logerror("pio_4_m_out_pa_w %02x (TRIAC)\n", data); }
-	DECLARE_WRITE_LINE_MEMBER(pio_4_m_out_ardy_w)   { logerror("pio_4_m_out_ardy_w %02x\n", state); }
+	void pio_4_m_out_ardy_w(int state)  { logerror("pio_4_m_out_ardy_w %02x\n", state); }
 	uint8_t pio_4_m_in_pb_r()           { logerror("pio_4_m_in_pb_r\n"); return 0x00; }
 	void pio_4_m_out_pb_w(uint8_t data) { logerror("pio_4_m_out_pb_w %02x (7SEG)\n", data); }
-	DECLARE_WRITE_LINE_MEMBER(pio_4_m_out_brdy_w)   { logerror("pio_4_m_out_brdy_w %02x\n", state); }
+	void pio_4_m_out_brdy_w(int state)  { logerror("pio_4_m_out_brdy_w %02x\n", state); }
 
 	/* PIO 5 */
-	DECLARE_WRITE_LINE_MEMBER(pio_5_m_out_int_w)    { /* logerror("pio_5_m_out_int_w %02x\n", state); */ }
+	void pio_5_m_out_int_w(int state)   { /* logerror("pio_5_m_out_int_w %02x\n", state); */ }
 	uint8_t pio_5_m_in_pa_r()           { logerror("pio_5_m_in_pa_r\n"); return 0x00; }
 	void pio_5_m_out_pa_w(uint8_t data) { logerror("pio_5_m_out_pa_w %02x (LAMPS0)\n", data); }
-	DECLARE_WRITE_LINE_MEMBER(pio_5_m_out_ardy_w)   { logerror("pio_5_m_out_ardy_w %02x\n", state); }
+	void pio_5_m_out_ardy_w(int state)  { logerror("pio_5_m_out_ardy_w %02x\n", state); }
 	uint8_t pio_5_m_in_pb_r()           { logerror("pio_5_m_in_pb_r\n"); return 0x00; }
 	void pio_5_m_out_pb_w(uint8_t data) { logerror("pio_5_m_out_pb_w %02x (LAMPS1)\n", data); }
-	DECLARE_WRITE_LINE_MEMBER(pio_5_m_out_brdy_w)   { logerror("pio_5_m_out_brdy_w %02x\n", state); }
+	void pio_5_m_out_brdy_w(int state)  { logerror("pio_5_m_out_brdy_w %02x\n", state); }
 
 	void proconn_map(address_map &map);
 	void proconn_portmap(address_map &map);
@@ -143,7 +146,7 @@ private:
 	required_device<meters_device> m_meters;
 
 	int m_meter = 0;
-	virtual void machine_reset() override;
+
 	void meter_w(uint8_t data);
 	[[maybe_unused]] void serial_transmit(offs_t offset, uint16_t data);
 	[[maybe_unused]] uint16_t serial_receive(offs_t offset);

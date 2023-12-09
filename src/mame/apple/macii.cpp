@@ -21,6 +21,7 @@
 #include "macscsi.h"
 #include "mactoolbox.h"
 
+#include "bus/nscsi/cd.h"
 #include "bus/nscsi/devices.h"
 #include "bus/macpds/macpds.h"
 #include "bus/nubus/nubus.h"
@@ -151,7 +152,7 @@ private:
 	// ADB refresh timer, independent of anything else going on
 	emu_timer *m_adbupdate_timer = nullptr;
 
-	WRITE_LINE_MEMBER(adb_irq_w) { m_adb_irq_pending = state; }
+	void adb_irq_w(int state) { m_adb_irq_pending = state; }
 
 	// this is shared among all video setups with vram
 	optional_shared_ptr<uint32_t> m_vram;
@@ -163,7 +164,7 @@ private:
 	void set_memory_overlay(int overlay);
 	void scc_mouse_irq( int x, int y );
 	void nubus_slot_interrupt(uint8_t slot, uint32_t state);
-	DECLARE_WRITE_LINE_MEMBER(set_scc_interrupt);
+	void set_scc_interrupt(int state);
 	void set_via_interrupt(int value);
 	void set_via2_interrupt(int value);
 	void field_interrupts();
@@ -185,10 +186,10 @@ private:
 	void macii_scsi_drq_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void scsi_berr_w(uint8_t data);
 
-	template <int Slot> DECLARE_WRITE_LINE_MEMBER(nubus_irq_w);
+	template <int Slot> void nubus_irq_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(mac_scsi_irq);
-	DECLARE_WRITE_LINE_MEMBER(mac_asc_irq);
+	void mac_scsi_irq(int state);
+	void mac_asc_irq(int state);
 
 	void macii_map(address_map &map);
 	void macse30_map(address_map &map);
@@ -211,7 +212,7 @@ private:
 
 	TIMER_CALLBACK_MEMBER(mac_adbrefresh_tick);
 	TIMER_CALLBACK_MEMBER(mac_scanline_tick);
-	DECLARE_WRITE_LINE_MEMBER(mac_adb_via_out_cb2);
+	void mac_adb_via_out_cb2(int state);
 	uint8_t mac_via_in_a();
 	uint8_t mac_via_in_b();
 	void mac_via_out_a(uint8_t data);
@@ -221,8 +222,8 @@ private:
 	void mac_via2_out_a(uint8_t data);
 	void mac_via2_out_b(uint8_t data);
 	void mac_state_load();
-	DECLARE_WRITE_LINE_MEMBER(mac_via_irq);
-	DECLARE_WRITE_LINE_MEMBER(mac_via2_irq);
+	void mac_via_irq(int state);
+	void mac_via2_irq(int state);
 	void mac_driver_init(model_t model);
 	void mac_install_memory(offs_t memory_begin, offs_t memory_end, offs_t memory_size, void *memory_data, int is_rom);
 };
@@ -302,7 +303,7 @@ void mac_state::field_interrupts()
 	}
 }
 
-WRITE_LINE_MEMBER(mac_state::set_scc_interrupt)
+void mac_state::set_scc_interrupt(int state)
 {
 	m_scc_interrupt = state;
 	this->field_interrupts();
@@ -320,7 +321,7 @@ void mac_state::set_via2_interrupt(int value)
 	this->field_interrupts();
 }
 
-WRITE_LINE_MEMBER(mac_state::mac_asc_irq)
+void mac_state::mac_asc_irq(int state)
 {
 	m_via2->write_cb1(state ^ 1);
 }
@@ -478,7 +479,7 @@ void mac_state::macii_scsi_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	m_scsihelp->write_wrapper(pseudo_dma, reg, data >> 8);
 }
 
-WRITE_LINE_MEMBER(mac_state::mac_scsi_irq)
+void mac_state::mac_scsi_irq(int state)
 {
 }
 
@@ -536,7 +537,7 @@ void mac_state::mac_iwm_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		m_maincpu->adjust_icount(-5);
 }
 
-WRITE_LINE_MEMBER(mac_state::mac_adb_via_out_cb2)
+void mac_state::mac_adb_via_out_cb2(int state)
 {
 	// printf("VIA OUT CB2 = %x\n", state);
 #if !MACII_USE_ADBMODEM
@@ -661,7 +662,7 @@ void mac_state::mac_via_out_b(uint8_t data)
 	m_rtc->clk_w((data >> 1) & 0x01);
 }
 
-WRITE_LINE_MEMBER(mac_state::mac_via_irq)
+void mac_state::mac_via_irq(int state)
 {
 	/* interrupt the 68k (level 1) */
 	set_via_interrupt(state);
@@ -722,7 +723,7 @@ void mac_state::mac_via_w(offs_t offset, uint16_t data, uint16_t mem_mask)
  * VIA 2 (on Mac IIs, PowerBooks > 100, and PowerMacs)
  * *************************************************************************/
 
-WRITE_LINE_MEMBER(mac_state::mac_via2_irq)
+void mac_state::mac_via2_irq(int state)
 {
 	set_via2_interrupt(state);
 }
@@ -961,17 +962,17 @@ TIMER_CALLBACK_MEMBER(mac_state::mac_scanline_tick)
 	m_scanline_timer->adjust(m_screen->time_until_pos(next_scanline), next_scanline);
 }
 
-template <int Slot> WRITE_LINE_MEMBER(mac_state::nubus_irq_w)
+template <int Slot> void mac_state::nubus_irq_w(int state)
 {
 	nubus_slot_interrupt(Slot, state);
 }
 
-template WRITE_LINE_MEMBER(mac_state::nubus_irq_w<9>);
-template WRITE_LINE_MEMBER(mac_state::nubus_irq_w<0xa>);
-template WRITE_LINE_MEMBER(mac_state::nubus_irq_w<0xb>);
-template WRITE_LINE_MEMBER(mac_state::nubus_irq_w<0xc>);
-template WRITE_LINE_MEMBER(mac_state::nubus_irq_w<0xd>);
-template WRITE_LINE_MEMBER(mac_state::nubus_irq_w<0xe>);
+template void mac_state::nubus_irq_w<9>(int state);
+template void mac_state::nubus_irq_w<0xa>(int state);
+template void mac_state::nubus_irq_w<0xb>(int state);
+template void mac_state::nubus_irq_w<0xc>(int state);
+template void mac_state::nubus_irq_w<0xd>(int state);
+template void mac_state::nubus_irq_w<0xe>(int state);
 
 void mac_state::phases_w(uint8_t phases)
 {
@@ -1068,8 +1069,11 @@ void mac_state::macii(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:0", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:1", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:3", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, "cdrom");
+	NSCSI_CONNECTOR(config, "scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config([](device_t *device)
+																							{
+			device->subdevice<cdda_device>("cdda")->add_route(0, "^^lspeaker", 1.0);
+			device->subdevice<cdda_device>("cdda")->add_route(1, "^^rspeaker", 1.0); });
+	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", mac_scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr5380", NCR53C80).machine_config([this](device_t *device)
@@ -1087,6 +1091,7 @@ void mac_state::macii(machine_config &config)
 	m_scsihelp->timeout_error_callback().set(FUNC(mac_state::scsi_berr_w));
 
 	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
+	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("MC68020");
 
 	nubus_device &nubus(NUBUS(config, "nubus", 0));
 	nubus.set_space(m_maincpu, AS_PROGRAM);
@@ -1142,6 +1147,8 @@ void mac_state::macii(machine_config &config)
 	m_ram->set_default_size("2M");
 	m_ram->set_extra_options("8M,32M,64M,96M,128M");
 
+	SOFTWARE_LIST(config, "flop_mac35_orig").set_original("mac_flop_orig");
+	SOFTWARE_LIST(config, "flop_mac35_clean").set_original("mac_flop_clcracked");
 	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
 }
 
@@ -1176,6 +1183,8 @@ void mac_state::maciix(machine_config &config)
 	M68030(config.replace(), m_maincpu, C15M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::macii_map);
 	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
+
+	SOFTWARE_LIST(config.replace(), "cd_list").set_original("mac_cdrom").set_filter("MC68030");
 }
 
 void mac_state::maciicx(machine_config &config)

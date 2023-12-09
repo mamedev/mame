@@ -12,7 +12,7 @@
 #define ROM128 (BIT(m_regs[MEM_CONFIG], 0))
 #define OFFS_512(_rl) (((m_regs[_rl + 1] & 1) << 8) | m_regs[_rl])
 
-#define VM static_cast<v_mode>(BIT(m_regs[V_CONFIG], 0, 2))
+#define VM v_mode(BIT(m_regs[V_CONFIG], 0, 2))
 
 static constexpr rectangle screen_area[4] = {
 	rectangle(tsconf_state::with_hblank(52), tsconf_state::with_hblank(256 + 51), tsconf_state::with_vblank(48), tsconf_state::with_vblank(192 + 47)), // 52|256|52 x 48-192-48
@@ -107,6 +107,11 @@ u8 tsconf_state::get_border_color(u16 hpos, u16 vpos)
 	return m_regs[BORDER];
 }
 
+u32 tsconf_state::get_vpage_offset()
+{
+	return PAGE4K(m_regs[V_PAGE] & ((VM == VM_16C) ? 0xf8 : 0xf0));
+}
+
 /*
 Layered as:
  + Border - already updated with screen_update_spectrum()
@@ -158,7 +163,7 @@ void tsconf_state::tsconf_UpdateZxScreenBitmap(screen_device &screen, bitmap_ind
 {
 	u8 pal_offset = m_regs[PAL_SEL] << 4;
 	u8 *screen_location = m_ram->pointer() + PAGE4K(m_regs[V_PAGE]);
-	u8 *attrs_location = m_ram->pointer() + PAGE4K(m_regs[V_PAGE]) + 0x1800;
+	u8 *attrs_location = screen_location + 0x1800;
 	bool invert_attrs = u64(screen.frame_number() / m_frame_invert_count) & 1;
 	for (u16 vpos = cliprect.top(); vpos <= cliprect.bottom(); vpos++)
 	{
@@ -215,7 +220,7 @@ void tsconf_state::tsconf_UpdateGfxBitmap(bitmap_ind16 &bitmap, const rectangle 
 	{
 		u16 y_offset = (OFFS_512(G_Y_OFFS_L) + m_gfx_y_frame_offset + vpos) & 0x1ff;
 		u16 x_offset = (OFFS_512(G_X_OFFS_L) + (cliprect.left() - get_screen_area().left())) & 0x1ff;
-		u8 *video_location = m_ram->pointer() + PAGE4K(m_regs[V_PAGE]) + ((y_offset * 512 + x_offset) >> (2 - VM));
+		u8 *video_location = m_ram->pointer() + get_vpage_offset() + ((y_offset * 512 + x_offset) >> (2 - VM));
 		u16 *bm = &(bitmap.pix(vpos, cliprect.left()));
 		s16 width = cliprect.width();
 		if (VM == VM_16C)
@@ -347,20 +352,20 @@ void tsconf_state::ram_page_write(u8 page, offs_t offset, u8 data)
 	}
 	else
 	{
-		if (ram_addr >= PAGE4K(m_regs[T0_G_PAGE]) && ram_addr < PAGE4K(m_regs[T0_G_PAGE] + 8))
+		if (ram_addr >= PAGE4K(m_regs[T0_G_PAGE] & 0xf8) && ram_addr < PAGE4K((m_regs[T0_G_PAGE] & 0xf8) + 8))
 			m_gfxdecode->gfx(TM_TILES0)->mark_all_dirty();
 
-		if (ram_addr >= PAGE4K(m_regs[T1_G_PAGE]) && ram_addr < PAGE4K(m_regs[T1_G_PAGE] + 8))
+		if (ram_addr >= PAGE4K(m_regs[T1_G_PAGE] & 0xf8) && ram_addr < PAGE4K((m_regs[T1_G_PAGE] & 0xf8) + 8))
 			m_gfxdecode->gfx(TM_TILES1)->mark_all_dirty();
 	}
 
-	if (ram_addr >= PAGE4K(m_regs[V_PAGE]) && ram_addr < PAGE4K(m_regs[V_PAGE] + 1))
+	if (ram_addr >= get_vpage_offset() && ram_addr < get_vpage_offset() + PAGE4K((VM == VM_16C) ? 8 : 16))
 		m_ts_tilemap[TM_TS_CHAR]->mark_all_dirty();
 
 	if (ram_addr >= PAGE4K(m_regs[m_regs[V_PAGE] ^ 0x01]) && ram_addr < PAGE4K(m_regs[m_regs[V_PAGE] ^ 0x01] + 1))
 		m_gfxdecode->gfx(TM_TS_CHAR)->mark_all_dirty();
 
-	if (ram_addr >= PAGE4K(m_regs[SG_PAGE]) && ram_addr < PAGE4K(m_regs[SG_PAGE] + 8))
+	if (ram_addr >= PAGE4K(m_regs[SG_PAGE] & 0xf8) && ram_addr < PAGE4K((m_regs[SG_PAGE] & 0xf8) + 8))
 		m_gfxdecode->gfx(TM_SPRITES)->mark_all_dirty();
 
 	m_ram->write(ram_addr, data);
@@ -368,18 +373,19 @@ void tsconf_state::ram_page_write(u8 page, offs_t offset, u8 data)
 
 u16 tsconf_state::ram_read16(offs_t offset)
 {
-	return ((m_ram->read(offset & 0xfffffffe)) << 8) | m_ram->read(offset | 1);
+	return (m_ram->read(offset & ~offs_t(1)) << 8) | m_ram->read(offset | 1);
 }
 
 void tsconf_state::ram_write16(offs_t offset, u16 data)
 {
-	ram_page_write(0, offset & 0xfffffffe, data >> 8);
+	ram_page_write(0, offset & ~offs_t(1), data >> 8);
 	ram_page_write(0, offset | 1, data & 0xff);
 }
 
 u16 tsconf_state::spi_read16()
 {
-	return (tsconf_port_57_zctr_r(0) << 8) | tsconf_port_57_zctr_r(0);
+	const u16 data_hi = tsconf_port_57_zctr_r() << 8;
+	return data_hi | tsconf_port_57_zctr_r();
 }
 
 void tsconf_state::cram_write(u16 offset, u8 data)
@@ -393,7 +399,7 @@ void tsconf_state::cram_write(u16 offset, u8 data)
 
 void tsconf_state::cram_write16(offs_t offset, u16 data)
 {
-	cram_write(offset & 0xfffe, data >> 8);
+	cram_write(offset & 0x1fe, data >> 8);
 	cram_write(offset | 1, data & 0xff);
 };
 
@@ -403,6 +409,12 @@ void tsconf_state::sfile_write16(offs_t offset, u16 data)
 	m_sfile->write(dest, data >> 8);
 	m_sfile->write(dest | 1, data & 0xff);
 };
+
+u8 tsconf_state::tsconf_port_xx1f_r(offs_t offset) {
+	return m_beta->started() && m_beta->is_active()
+		? m_beta->status_r()
+		: 0x00; // TODO kempston read
+}
 
 void tsconf_state::tsconf_port_7ffd_w(u8 data)
 {
@@ -469,12 +481,20 @@ void tsconf_state::tsconf_port_xxaf_w(offs_t port, u8 data)
 	bool delay_update = true;
 	switch (nreg)
 	{
-	// more registers which marked as *1 in the xls, but rest need to be tested
+	case V_CONFIG:
+	case V_PAGE:
 	case G_X_OFFS_L:
 	case G_X_OFFS_H:
 	case G_Y_OFFS_L:
 	case G_Y_OFFS_H:
-		m_scanline_delayed_regs_update[static_cast<tsconf_regs>(nreg)] = data;
+	case PAL_SEL:
+	case T0_G_PAGE:
+	case T1_G_PAGE:
+	case T0_X_OFFSET_L:
+	case T0_X_OFFSET_H:
+	case T1_X_OFFSET_L:
+	case T1_X_OFFSET_H:
+		m_scanline_delayed_regs_update[tsconf_regs(nreg)] = data;
 		break;
 
 	default:
@@ -569,37 +589,14 @@ void tsconf_state::tsconf_port_xxaf_w(offs_t port, u8 data)
 
 	switch (nreg)
 	{
-	case V_CONFIG:
-	case V_PAGE:
-		tsconf_update_video_mode();
-		break;
-
 	case T_MAP_PAGE:
 		m_ts_tilemap[TM_TILES0]->mark_all_dirty();
 		m_ts_tilemap[TM_TILES1]->mark_all_dirty();
 		break;
 
-	case T0_G_PAGE:
-		m_gfxdecode->gfx(TM_TILES0)->set_source(m_ram->pointer() + PAGE4K(data));
-		break;
-
-	case T0_X_OFFSET_L:
-	case T0_X_OFFSET_H:
-		m_ts_tilemap[TM_TILES0]->set_scrollx(OFFS_512(T0_X_OFFSET_L));
-		break;
-
 	case T0_Y_OFFSET_L:
 	case T0_Y_OFFSET_H:
 		m_ts_tilemap[TM_TILES0]->set_scrolly(OFFS_512(T0_Y_OFFSET_L));
-		break;
-
-	case T1_G_PAGE:
-		m_gfxdecode->gfx(TM_TILES1)->set_source(m_ram->pointer() + PAGE4K(data));
-		break;
-
-	case T1_X_OFFSET_L:
-	case T1_X_OFFSET_H:
-		m_ts_tilemap[TM_TILES1]->set_scrollx(OFFS_512(T1_X_OFFSET_L));
 		break;
 
 	case T1_Y_OFFSET_L:
@@ -608,7 +605,7 @@ void tsconf_state::tsconf_port_xxaf_w(offs_t port, u8 data)
 		break;
 
 	case SG_PAGE:
-		m_gfxdecode->gfx(TM_SPRITES)->set_source(m_ram->pointer() + PAGE4K(data));
+		m_gfxdecode->gfx(TM_SPRITES)->set_source(m_ram->pointer() + PAGE4K(data & 0xf8));
 		break;
 
 	case SYS_CONFIG:
@@ -624,7 +621,6 @@ void tsconf_state::tsconf_port_xxaf_w(offs_t port, u8 data)
 		break;
 
 	case FMAPS:
-	case PAL_SEL:
 	case TS_CONFIG:
 	case INT_MASK:
 	// TODO
@@ -669,7 +665,7 @@ void tsconf_state::tsconf_port_f7_w(offs_t offset, u8 data)
 			if (m_glukrs->address_r() == 0xf0)
 			{
 				u8 m_fx[0xf] = {0xff};
-				m_port_f7_ext = static_cast<gluk_ext>(data);
+				m_port_f7_ext = gluk_ext(data);
 				switch (m_port_f7_ext)
 				{
 				case CONF_VERSION:
@@ -703,38 +699,38 @@ void tsconf_state::tsconf_port_f7_w(offs_t offset, u8 data)
 	}
 }
 
-void tsconf_state::tsconf_port_77_zctr_w(offs_t port, u8 data)
+void tsconf_state::tsconf_port_77_zctr_w(u8 data)
 {
 	m_sdcard->spi_ss_w(BIT(data, 0));
 	m_zctl_cs = BIT(data, 1);
 }
 
-u8 tsconf_state::tsconf_port_77_zctr_r(offs_t port)
+u8 tsconf_state::tsconf_port_77_zctr_r()
 {
 	return 0x02 | (m_sdcard->get_card_present() ? 0x00 : 0x01);
 }
 
-void tsconf_state::tsconf_port_57_zctr_w(offs_t port, u8 data)
+void tsconf_state::tsconf_port_57_zctr_w(u8 data)
 {
 	if (!m_zctl_cs)
 	{
 		for (u8 m = 0x80; m; m >>= 1)
 		{
-			m_sdcard->spi_clock_w(CLEAR_LINE); // 0-S R
 			m_sdcard->spi_mosi_w(data & m ? 1 : 0);
+			m_sdcard->spi_clock_w(CLEAR_LINE); // 0-S R
 			m_sdcard->spi_clock_w(ASSERT_LINE); // 1-L W
 		}
 	}
 }
 
-u8 tsconf_state::tsconf_port_57_zctr_r(offs_t port)
+u8 tsconf_state::tsconf_port_57_zctr_r()
 {
 	if (m_zctl_cs)
 		return 0xff;
 
 	u8 data = m_zctl_di;
 	if (!machine().side_effects_disabled())
-		tsconf_port_57_zctr_w(0, 0xff);
+		tsconf_port_57_zctr_w(0xff);
 
 	return data;
 }
@@ -743,6 +739,14 @@ void tsconf_state::tsconf_spi_miso_w(u8 data)
 {
 	m_zctl_di <<= 1;
 	m_zctl_di |= data;
+}
+
+void tsconf_state::tsconf_ay_address_w(u8 data)
+{
+	if ((m_mod_ay->read() == 1) && ((data & 0xfe) == 0xfe))
+		m_ay_selected = data & 1;
+	else
+		m_ay[m_ay_selected]->address_w(data);
 }
 
 IRQ_CALLBACK_MEMBER(tsconf_state::irq_vector)
@@ -830,12 +834,18 @@ TIMER_CALLBACK_MEMBER(tsconf_state::irq_scanline)
 
 	u16 screen_vpos = m_screen->vpos();
 	m_scanline_irq_timer->adjust(m_screen->time_until_pos(screen_vpos + 1));
-	m_screen->update_now();
+	if (!m_scanline_delayed_regs_update.empty())
+		m_screen->update_now();
 	for (const auto &[reg, val] : m_scanline_delayed_regs_update)
 	{
 		m_regs[reg] = val;
 		switch (reg)
 		{
+		case V_CONFIG:
+		case V_PAGE:
+			tsconf_update_video_mode();
+			break;
+
 		case G_Y_OFFS_L:
 		case G_Y_OFFS_H:
 			m_gfx_y_frame_offset = screen_vpos < get_screen_area().top()
@@ -843,6 +853,27 @@ TIMER_CALLBACK_MEMBER(tsconf_state::irq_scanline)
 				: -screen_vpos;
 			break;
 
+		case T0_G_PAGE:
+			m_gfxdecode->gfx(TM_TILES0)->set_source(m_ram->pointer() + PAGE4K(val & 0xf8));
+			break;
+
+		case T1_G_PAGE:
+			m_gfxdecode->gfx(TM_TILES1)->set_source(m_ram->pointer() + PAGE4K(val & 0xf8));
+			break;
+
+		case T0_X_OFFSET_L:
+		case T0_X_OFFSET_H:
+			m_ts_tilemap[TM_TILES0]->set_scrollx(OFFS_512(T0_X_OFFSET_L));
+			break;
+
+		case T1_X_OFFSET_L:
+		case T1_X_OFFSET_H:
+			m_ts_tilemap[TM_TILES1]->set_scrollx(OFFS_512(T1_X_OFFSET_L));
+			break;
+
+		case G_X_OFFS_L:
+		case G_X_OFFS_H:
+		case PAL_SEL:
 		default:
 			break;
 		}

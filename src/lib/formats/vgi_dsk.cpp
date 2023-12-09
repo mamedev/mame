@@ -60,7 +60,7 @@ int micropolis_vgi_format::identify(util::random_read &io, uint32_t form_factor,
 	return FIFID_SIZE;
 }
 
-bool micropolis_vgi_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool micropolis_vgi_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	uint64_t file_size;
 	if (io.length(file_size))
@@ -68,7 +68,7 @@ bool micropolis_vgi_format::load(util::random_read &io, uint32_t form_factor, co
 	const format fmt = find_format(file_size);
 	if (!fmt.head_count)
 		return false;
-	image->set_variant(fmt.variant);
+	image.set_variant(fmt.variant);
 
 	std::vector<uint32_t> buf;
 	uint8_t sector_bytes[275];
@@ -92,16 +92,16 @@ bool micropolis_vgi_format::load(util::random_read &io, uint32_t form_factor, co
 	return true;
 }
 
-bool micropolis_vgi_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool micropolis_vgi_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
 {
-	uint32_t variant = image->get_variant();
+	uint32_t variant = image.get_variant();
 	format fmt = {};
 	for (int i = 0; formats[i].head_count; i++)
 		if (variant == formats[i].variant)
 			fmt = formats[i];
 	if (!fmt.head_count) {
 		int heads, tracks;
-		image->get_actual_geometry(tracks, heads);
+		image.get_actual_geometry(tracks, heads);
 		if (heads == 0 && tracks == 0)
 			return false; // Brand-new image; we don't know the size yet
 		for (int i = 0; formats[i].head_count; i++)

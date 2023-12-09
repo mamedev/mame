@@ -36,7 +36,7 @@ public:
 	auto update() { return m_update_cb.bind(); }
 
 	// signal-level interface
-	virtual DECLARE_WRITE_LINE_MEMBER(wr_w); // write strobe (rising edge)
+	virtual void wr_w(int state); // write strobe (rising edge)
 	void addr_w(u8 state);
 	void data_w(u8 state);
 
@@ -66,6 +66,8 @@ protected:
 private:
 	devcb_write16 m_update_cb;
 
+	void do_update(offs_t offset);
+
 	// internal state
 	u8 m_digit_ram[4]; // holds the digit code for each position
 	bool m_cursor_state[4]; // holds the cursor state for each position
@@ -74,9 +76,9 @@ private:
 class dl1416_device : public dl1414_device
 {
 public:
-	virtual DECLARE_WRITE_LINE_MEMBER(wr_w) override;
-	DECLARE_WRITE_LINE_MEMBER(ce_w); // chip enable (active low)
-	DECLARE_WRITE_LINE_MEMBER(cu_w); // cursor enable (active low)
+	virtual void wr_w(int state) override;
+	void ce_w(int state); // chip enable (active low)
+	void cu_w(int state); // cursor enable (active low)
 
 protected:
 	dl1416_device(

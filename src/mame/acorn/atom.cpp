@@ -118,10 +118,11 @@ Hardware:   PPIA 8255
 #include "emu.h"
 #include "atom.h"
 #include "machine/clock.h"
-#include "formats/imageutl.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
+
+#include "multibyte.h"
 #include "utf8.h"
 
 /***************************************************************************
@@ -158,9 +159,9 @@ QUICKLOAD_LOAD_MEMBER(atom_state::quickload_cb)
 
 	image.fread(header, 0x16);
 
-	uint16_t start_address = pick_integer_le(header, 0x10, 2);
-	uint16_t run_address = pick_integer_le(header, 0x12, 2);
-	uint16_t size = pick_integer_le(header, 0x14, 2);
+	uint16_t start_address = get_u16le(&header[0x10]);
+	uint16_t run_address = get_u16le(&header[0x12]);
+	uint16_t size = get_u16le(&header[0x14]);
 
 	if (LOG)
 	{
@@ -561,7 +562,7 @@ void atom_state::ppi_pc_w(uint8_t data)
     i8271 interface
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER( atom_state::atom_8271_interrupt_callback )
+void atom_state::atom_8271_interrupt_callback(int state)
 {
 	/* I'm assuming that the nmi is edge triggered */
 	/* a interrupt from the fdc will cause a change in line state, and
@@ -582,7 +583,7 @@ WRITE_LINE_MEMBER( atom_state::atom_8271_interrupt_callback )
 	m_previous_i8271_int_state = state;
 }
 
-WRITE_LINE_MEMBER( atom_state::motor_w )
+void atom_state::motor_w(int state)
 {
 	for (u8 i = 0; i < 2; i++)
 	{
@@ -594,7 +595,7 @@ WRITE_LINE_MEMBER( atom_state::motor_w )
 	}
 }
 
-WRITE_LINE_MEMBER(atom_state::cassette_output_tick)
+void atom_state::cassette_output_tick(int state)
 {
 	m_hz2400 = state;
 

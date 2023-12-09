@@ -28,8 +28,6 @@
 
 #include "emupal.h"
 
-#include "formats/pc_dsk.h"
-
 
 #define MAINCPU_TAG "maincpu"
 
@@ -109,12 +107,12 @@ private:
 	uint8_t printer_status_r();
 	void printer_data_w(uint8_t data);
 	void disk_select_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(printer_busy_w);
-	DECLARE_WRITE_LINE_MEMBER(printer_paper_end_w);
-	DECLARE_WRITE_LINE_MEMBER(printer_select_w);
+	void printer_busy_w(int state);
+	void printer_paper_end_w(int state);
+	void printer_select_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(vid_hsync_changed);
-	DECLARE_WRITE_LINE_MEMBER(vid_vsync_changed);
+	void vid_hsync_changed(int state);
+	void vid_vsync_changed(int state);
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 	void mbc55x_palette(palette_device &palette) const;

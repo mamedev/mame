@@ -194,7 +194,7 @@ keyboard microcontroller ROM as follows:
   called **mackbd_m0110a_f.zip**, or a 7-Zip archive called
   **mackbd_m0110a_f.7z**.
 * The parent ROM device is the U.S. Macintosh Plus keyboard with integrated
-  numeric keypad, whcih has the short name ``mackbd_m0110a``, so MAME will look
+  numeric keypad, which has the short name ``mackbd_m0110a``, so MAME will look
   for a folder called **mackbd_m0110a**, a PKZIP archive called
   **mackbd_m0110a.zip**, or a 7-Zip archive called **mackbd_m0110a.7z**.
 * The short name of the Unitron 1024 system is ``utrn1024``, so MAME will look
@@ -227,10 +227,6 @@ item ROMs in the following locations:
 * A folder or archive matching the short name of the parent software item, if
   applicable.  (This is for convenience for software items that also run as
   stand-alone systems with the same short name, such as Neo Geo games.)
-* Any folders and archives that would be searched for system or device ROMs for
-  the system or device that the software list belongs to.  This is for
-  historical reasons due to the way software list support was originally added
-  to MESS and will be removed in a future version of MAME.
 
 If you load the German version of Dune II from the Mega Drive/Genesis cartridge
 software list in the PAL Mega Drive console, MAME will look for the cartridge
@@ -255,13 +251,6 @@ ROM as follows:
 * Still ignoring the short name of the software list, MAME will use the short
   name of the parent software item only, looking for a folder called **dune2**,
   a PKZIP archive called **dune2.zip** or a 7-Zip archive called **dune2.7z**.
-* The short name of the PAL Mega Drive system is ``megadriv``, so MAME will look
-  for a folder called **megadriv**, a PKZIP archive called **megadriv.zip**, or
-  a 7-Zip archive called **megadriv.7z**.
-* The parent system of the PAL Mega Drive is the North American Genesis system,
-  which has the short name ``genesis``, so MAME will look for a folder called
-  **genesis**, a PKZIP archive called **genesis.zip**, or a 7-Zip archive called
-  **genesis.7z**.
 
 CHD format disk images
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -283,6 +272,13 @@ almost the same way it searches for ROMs, with just a few differences:
   MAME uses the content digest from the CHD header, not the checksum of the CHD
   file itself.  The checksum of the CHD file itself can vary depending on
   compression options.
+
+To save space, MAME allows delta CHD files to be used for clone systems, devices
+with parent ROM devices and clone software items.  The delta CHD file must use a
+CHD format disk image from the parent system, parent ROM device or parent
+software item as its parent CHD file.  The space saved depends on how much
+content can be reused from the parent CHD file.  MAME searches the same
+locations for parent CHD files that it would search for the disk image itself.
 
 Loose software
 ~~~~~~~~~~~~~~

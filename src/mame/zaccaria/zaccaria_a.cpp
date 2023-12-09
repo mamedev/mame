@@ -235,7 +235,7 @@ void zac1b111xx_melody_base::device_add_mconfig(machine_config &config)
 	clock_device &timebase(CLOCK(config, "timebase", XTAL(3'579'545)/4096/2)); // CPU clock divided using 4040 and half of 74LS74
 	timebase.signal_handler().set(m_melodypia, FUNC(pia6821_device::cb1_w));
 
-	PIA6821(config, m_melodypia, 0);
+	PIA6821(config, m_melodypia);
 	m_melodypia->readpa_handler().set(FUNC(zac1b111xx_melody_base::melodypia_porta_r));
 	m_melodypia->writepa_handler().set(FUNC(zac1b111xx_melody_base::melodypia_porta_w));
 	m_melodypia->writepb_handler().set(FUNC(zac1b111xx_melody_base::melodypia_portb_w));
@@ -277,7 +277,7 @@ void zac1b11107_audio_device::sound_w(u8 data)
 	m_melody_command = data | 0xc0;
 }
 
-WRITE_LINE_MEMBER(zac1b11107_audio_device::reset_w)
+void zac1b11107_audio_device::reset_w(int state)
 {
 	// TODO: there is a pulse-stretching network attached that should be simulated
 	m_melodycpu->set_input_line(INPUT_LINE_RESET, state);
@@ -347,12 +347,12 @@ void zac1b11142_audio_device::hs_w(u8 data)
 	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-READ_LINE_MEMBER(zac1b11142_audio_device::acs_r)
+int zac1b11142_audio_device::acs_r()
 {
 	return (~m_pia_1i->b_output() >> 3) & 0x01;
 }
 
-WRITE_LINE_MEMBER(zac1b11142_audio_device::ressound_w)
+void zac1b11142_audio_device::ressound_w(int state)
 {
 	// TODO: there is a pulse-stretching network attached that should be simulated
 	m_melodycpu->set_input_line(INPUT_LINE_RESET, state);
@@ -430,13 +430,13 @@ void zac1b11142_audio_device::device_add_mconfig(machine_config &config)
 	M6802(config, m_audiocpu, XTAL(3'579'545)); // verified on pcb
 	m_audiocpu->set_addrmap(AS_PROGRAM, &zac1b11142_audio_device::zac1b11142_audio_map);
 
-	PIA6821(config, m_pia_1i, 0);
+	PIA6821(config, m_pia_1i);
 	m_pia_1i->readpa_handler().set(m_speech, FUNC(tms5220_device::status_r));
 	m_pia_1i->writepa_handler().set(m_speech, FUNC(tms5220_device::data_w));
 	m_pia_1i->writepb_handler().set(FUNC(zac1b11142_audio_device::pia_1i_portb_w));
 
 	//MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.30, AUTO_ALLOC_INPUT, 0); // mc1408.1f
-	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "sound_nl", 1.0, 7); // mc1408.1f
+	MC1408(config, "dac").add_route(ALL_OUTPUTS, "sound_nl", 1.0, 7); // mc1408.1f
 
 	// There is no xtal, the clock is obtained from a RC oscillator as shown in the TMS5220 datasheet (R=100kOhm C=22pF)
 	// 162kHz measured on pin 3 20 minutes after power on, clock would then be 162.3*4=649.2kHz
@@ -492,8 +492,6 @@ ioport_constructor zac1b11142_audio_device::device_input_ports() const
 void zac1b11142_audio_device::device_start()
 {
 	zac1b111xx_melody_base::device_start();
-
-	m_acs_cb.resolve_safe();
 
 	save_item(NAME(m_host_command));
 }

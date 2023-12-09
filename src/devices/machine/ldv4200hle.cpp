@@ -680,8 +680,6 @@ void pioneer_ldv4200hle_device::device_start()
 	// pass through to the parent
 	laserdisc_device::device_start();
 
-	m_serial_tx.resolve_safe();
-
 	// allocate timers
 	m_vbi_fetch = timer_alloc(FUNC(pioneer_ldv4200hle_device::process_vbi_data), this);
 

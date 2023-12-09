@@ -15,6 +15,7 @@
 #include "chd.h"
 #include "flac.h"
 #include "hashing.h"
+#include "multibyte.h"
 
 #include "lzma/C/LzmaDec.h"
 #include "lzma/C/LzmaEnc.h"
@@ -114,11 +115,11 @@ public:
 
 private:
 	// internal helpers
-	static void *fast_alloc(void *p, size_t size);
-	static void fast_free(void *p, void *address);
+	static void *fast_alloc(ISzAllocPtr p, size_t size);
+	static void fast_free(ISzAllocPtr p, void *address);
 
 	static constexpr int MAX_LZMA_ALLOCS = 64;
-	uint32_t *                m_allocptr[MAX_LZMA_ALLOCS];
+	uint32_t *m_allocptr[MAX_LZMA_ALLOCS];
 };
 
 
@@ -343,10 +344,10 @@ public:
 			throw std::error_condition(chd_file::error::COMPRESSION_ERROR);
 
 		// write compressed length
-		dest[ecc_bytes + 0] = complen >> ((complen_bytes - 1) * 8);
-		dest[ecc_bytes + 1] = complen >> ((complen_bytes - 2) * 8);
 		if (complen_bytes > 2)
-			dest[ecc_bytes + 2] = complen >> ((complen_bytes - 3) * 8);
+			put_u24be(&dest[ecc_bytes], complen);
+		else
+			put_u16be(&dest[ecc_bytes], complen);
 
 		// encode the subcode
 		return header_bytes + complen + m_subcode_compressor.compress(&m_buffer[frames * cdrom_file::MAX_SECTOR_DATA], frames * cdrom_file::MAX_SUBCODE_DATA, &dest[header_bytes + complen]);
@@ -388,9 +389,7 @@ public:
 		uint32_t header_bytes = ecc_bytes + complen_bytes;
 
 		// extract compressed length of base
-		uint32_t complen_base = (src[ecc_bytes + 0] << 8) | src[ecc_bytes + 1];
-		if (complen_bytes > 2)
-			complen_base = (complen_base << 8) | src[ecc_bytes + 2];
+		uint32_t complen_base = (complen_bytes > 2) ? get_u24be(&src[ecc_bytes]) : get_u16be(&src[ecc_bytes]);
 
 		// reset and decode
 		m_base_decompressor.decompress(&src[header_bytes], complen_base, &m_buffer[0], frames * cdrom_file::MAX_SECTOR_DATA);
@@ -1020,9 +1019,9 @@ chd_lzma_allocator::~chd_lzma_allocator()
 //  allocates and frees memory frequently
 //-------------------------------------------------
 
-void *chd_lzma_allocator::fast_alloc(void *p, size_t size)
+void *chd_lzma_allocator::fast_alloc(ISzAllocPtr p, size_t size)
 {
-	auto *codec = reinterpret_cast<chd_lzma_allocator *>(p);
+	auto *const codec = static_cast<chd_lzma_allocator *>(const_cast<ISzAlloc *>(p));
 
 	// compute the size, rounding to the nearest 1k
 	size = (size + 0x3ff) & ~0x3ff;
@@ -1059,12 +1058,12 @@ void *chd_lzma_allocator::fast_alloc(void *p, size_t size)
 //  allocates and frees memory frequently
 //-------------------------------------------------
 
-void chd_lzma_allocator::fast_free(void *p, void *address)
+void chd_lzma_allocator::fast_free(ISzAllocPtr p, void *address)
 {
 	if (address == nullptr)
 		return;
 
-	auto *codec = reinterpret_cast<chd_lzma_allocator *>(p);
+	auto *const codec = static_cast<chd_lzma_allocator *>(const_cast<ISzAlloc *>(p));
 
 	// find the hunk
 	uint32_t *ptr = reinterpret_cast<uint32_t *>(address) - 1;
@@ -1149,7 +1148,7 @@ uint32_t chd_lzma_compressor::compress(const uint8_t *src, uint32_t srclen, uint
 void chd_lzma_compressor::configure_properties(CLzmaEncProps &props, uint32_t hunkbytes)
 {
 	LzmaEncProps_Init(&props);
-	props.level = 9;
+	props.level = 8;
 	props.reduceSize = hunkbytes;
 	LzmaEncProps_Normalize(&props);
 }

@@ -112,8 +112,16 @@ static INPUT_PORTS_START( holddraw )
 INPUT_PORTS_END
 
 
+// TODO: not right, just to get a decode
 static const gfx_layout charlayout =
 {
+	8,8,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ STEP8(0, 1) },
+	{ STEP8(0, 1*8) },
+	8*8*1
 };
 
 static GFXDECODE_START( gfx_amstarz80 )

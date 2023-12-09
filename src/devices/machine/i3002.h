@@ -76,23 +76,23 @@ public:
 	void fc_kbus_w(uint8_t fc , uint8_t k);
 
 	// Write Carry Input
-	DECLARE_WRITE_LINE_MEMBER(ci_w) { m_ci = state; }
+	void ci_w(int state) { m_ci = state; }
 
 	// Write Left Input
-	DECLARE_WRITE_LINE_MEMBER(li_w) { m_li = state; }
+	void li_w(int state) { m_li = state; }
 
 	// Read Carry Output
-	DECLARE_READ_LINE_MEMBER(co_r) const { return m_co; }
+	int co_r() const { return m_co; }
 
 	// Read Right Output
-	DECLARE_READ_LINE_MEMBER(ro_r) const { return m_ro; }
+	int ro_r() const { return m_ro; }
 
 	// Read output buses
 	uint8_t abus_r() const { return m_reg[ REG_MAR ]; }
 	uint8_t dbus_r() const { return m_reg[ REG_AC ]; }
 
 	// Clock pulse
-	DECLARE_WRITE_LINE_MEMBER(clk_w);
+	void clk_w(int state);
 
 	// Compute RO if FC is the code of right-shift op (and return true)
 	// Return false in all other cases

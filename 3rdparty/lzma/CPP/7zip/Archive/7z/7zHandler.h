@@ -1,16 +1,28 @@
 // 7z/Handler.h
 
-#ifndef __7Z_HANDLER_H
-#define __7Z_HANDLER_H
+#ifndef ZIP7_7Z_HANDLER_H
+#define ZIP7_7Z_HANDLER_H
 
 #include "../../ICoder.h"
 #include "../IArchive.h"
 
 #include "../../Common/CreateCoder.h"
 
-#ifndef EXTRACT_ONLY
-#include "../Common/HandlerOut.h"
+#ifndef Z7_7Z_SET_PROPERTIES
+
+#ifdef Z7_EXTRACT_ONLY
+  #if !defined(Z7_ST) && !defined(Z7_SFX)
+    #define Z7_7Z_SET_PROPERTIES
+  #endif
+#else
+  #define Z7_7Z_SET_PROPERTIES
 #endif
+
+#endif
+
+// #ifdef Z7_7Z_SET_PROPERTIES
+#include "../Common/HandlerOut.h"
+// #endif
 
 #include "7zCompressionMode.h"
 #include "7zIn.h"
@@ -18,28 +30,14 @@
 namespace NArchive {
 namespace N7z {
 
-#ifndef __7Z_SET_PROPERTIES
 
-#ifdef EXTRACT_ONLY
-  #if !defined(_7ZIP_ST) && !defined(_SFX)
-    #define __7Z_SET_PROPERTIES
-  #endif
-#else
-  #define __7Z_SET_PROPERTIES
-#endif
-
-#endif
-
-
-#ifndef EXTRACT_ONLY
+#ifndef Z7_EXTRACT_ONLY
 
 class COutHandler: public CMultiMethodProps
 {
   HRESULT SetSolidFromString(const UString &s);
   HRESULT SetSolidFromPROPVARIANT(const PROPVARIANT &value);
 public:
-  bool _removeSfxBlock;
-  
   UInt64 _numSolidFiles;
   UInt64 _numSolidBytes;
   bool _numSolidBytesDefined;
@@ -51,12 +49,14 @@ public:
   bool _encryptHeaders;
   // bool _useParents; 9.26
 
-  CBoolPair Write_CTime;
-  CBoolPair Write_ATime;
-  CBoolPair Write_MTime;
+  CHandlerTimeOptions TimeOptions;
+
+  CBoolPair Write_Attrib;
 
   bool _useMultiThreadMixer;
 
+  bool _removeSfxBlock;
+  
   // bool _volumeMode;
 
   void InitSolidFiles() { _numSolidFiles = (UInt64)(Int64)(-1); }
@@ -69,72 +69,73 @@ public:
     _numSolidBytesDefined = false;
   }
 
+  void InitProps7z();
   void InitProps();
 
-  COutHandler() { InitProps(); }
+  COutHandler() { InitProps7z(); }
 
   HRESULT SetProperty(const wchar_t *name, const PROPVARIANT &value);
 };
 
 #endif
 
-class CHandler:
+class CHandler Z7_final:
   public IInArchive,
   public IArchiveGetRawProps,
-  #ifdef __7Z_SET_PROPERTIES
+  
+  #ifdef Z7_7Z_SET_PROPERTIES
   public ISetProperties,
   #endif
-  #ifndef EXTRACT_ONLY
+  
+  #ifndef Z7_EXTRACT_ONLY
   public IOutArchive,
   #endif
-  PUBLIC_ISetCompressCodecsInfo
-  public CMyUnknownImp
-  #ifndef EXTRACT_ONLY
-  , public COutHandler
+  
+  Z7_PUBLIC_ISetCompressCodecsInfo_IFEC
+  
+  public CMyUnknownImp,
+
+  #ifndef Z7_EXTRACT_ONLY
+    public COutHandler
+  #else
+    public CCommonMethodProps
   #endif
 {
-public:
-  MY_QUERYINTERFACE_BEGIN2(IInArchive)
-  MY_QUERYINTERFACE_ENTRY(IArchiveGetRawProps)
-  #ifdef __7Z_SET_PROPERTIES
-  MY_QUERYINTERFACE_ENTRY(ISetProperties)
-  #endif
-  #ifndef EXTRACT_ONLY
-  MY_QUERYINTERFACE_ENTRY(IOutArchive)
-  #endif
-  QUERY_ENTRY_ISetCompressCodecsInfo
-  MY_QUERYINTERFACE_END
-  MY_ADDREF_RELEASE
+  Z7_COM_QI_BEGIN2(IInArchive)
+  Z7_COM_QI_ENTRY(IArchiveGetRawProps)
+ #ifdef Z7_7Z_SET_PROPERTIES
+  Z7_COM_QI_ENTRY(ISetProperties)
+ #endif
+ #ifndef Z7_EXTRACT_ONLY
+  Z7_COM_QI_ENTRY(IOutArchive)
+ #endif
+  Z7_COM_QI_ENTRY_ISetCompressCodecsInfo_IFEC
+  Z7_COM_QI_END
+  Z7_COM_ADDREF_RELEASE
 
-  INTERFACE_IInArchive(;)
-  INTERFACE_IArchiveGetRawProps(;)
-
-  #ifdef __7Z_SET_PROPERTIES
-  STDMETHOD(SetProperties)(const wchar_t * const *names, const PROPVARIANT *values, UInt32 numProps);
-  #endif
-
-  #ifndef EXTRACT_ONLY
-  INTERFACE_IOutArchive(;)
-  #endif
-
+  Z7_IFACE_COM7_IMP(IInArchive)
+  Z7_IFACE_COM7_IMP(IArchiveGetRawProps)
+ #ifdef Z7_7Z_SET_PROPERTIES
+  Z7_IFACE_COM7_IMP(ISetProperties)
+ #endif
+ #ifndef Z7_EXTRACT_ONLY
+  Z7_IFACE_COM7_IMP(IOutArchive)
+ #endif
   DECL_ISetCompressCodecsInfo
-
-  CHandler();
 
 private:
   CMyComPtr<IInStream> _inStream;
   NArchive::N7z::CDbEx _db;
   
-  #ifndef _NO_CRYPTO
+ #ifndef Z7_NO_CRYPTO
   bool _isEncrypted;
   bool _passwordIsDefined;
-  UString _password;
-  #endif
+  UString _password; // _Wipe
+ #endif
 
-  #ifdef EXTRACT_ONLY
+  #ifdef Z7_EXTRACT_ONLY
   
-  #ifdef __7Z_SET_PROPERTIES
-  UInt32 _numThreads;
+  #ifdef Z7_7Z_SET_PROPERTIES
   bool _useMultiThreadMixer;
   #endif
 
@@ -146,17 +147,12 @@ private:
 
   HRESULT PropsMethod_To_FullMethod(CMethodFull &dest, const COneMethodInfo &m);
   HRESULT SetHeaderMethod(CCompressionMethodMode &headerMethod);
-  HRESULT SetMainMethod(CCompressionMethodMode &method
-      #ifndef _7ZIP_ST
-      , UInt32 numThreads
-      #endif
-      );
-
+  HRESULT SetMainMethod(CCompressionMethodMode &method);
 
   #endif
 
   bool IsFolderEncrypted(CNum folderIndex) const;
-  #ifndef _SFX
+  #ifndef Z7_SFX
 
   CRecordVector<UInt64> _fileInfoPopIDs;
   void FillPopIDs();
@@ -166,6 +162,13 @@ private:
   #endif
 
   DECL_EXTERNAL_CODECS_VARS
+
+public:
+  CHandler();
+  ~CHandler()
+  {
+    Close();
+  }
 };
 
 }}

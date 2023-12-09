@@ -40,7 +40,7 @@ DEFINE_DEVICE_TYPE(UPD7001, upd7001_device, "upd7001", "NEC uPD7001 A/D Converte
 
 upd7001_device::upd7001_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, UPD7001, tag, owner, clock)
-	, m_an_callback(*this)
+	, m_an_callback(*this, 0)
 	, m_eoc_callback(*this)
 	, m_res(0.0)
 	, m_cap(0.0)
@@ -57,18 +57,6 @@ upd7001_device::upd7001_device(const machine_config &mconfig, const char *tag, d
 	, m_sr(0)
 	, m_mpx(0)
 {
-}
-
-
-//-------------------------------------------------
-//  device_resolve_objects -
-//-------------------------------------------------
-
-void upd7001_device::device_resolve_objects()
-{
-	// resolve callbacks
-	m_an_callback.resolve_all_safe(0);
-	m_eoc_callback.resolve_safe();
 }
 
 
@@ -105,7 +93,7 @@ void upd7001_device::device_start()
 //  cs_w - active-low chip select
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(upd7001_device::cs_w)
+void upd7001_device::cs_w(int state)
 {
 	if (!state && !m_cs_active)
 	{
@@ -166,7 +154,7 @@ TIMER_CALLBACK_MEMBER(upd7001_device::output_enabled)
 //  sck_w - shift data out of and into register
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(upd7001_device::sck_w)
+void upd7001_device::sck_w(int state)
 {
 	if (m_cs_active)
 	{
@@ -196,7 +184,7 @@ WRITE_LINE_MEMBER(upd7001_device::sck_w)
 //  select input to convert
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(upd7001_device::dl_w)
+void upd7001_device::dl_w(int state)
 {
 	if (state && !m_dl && m_cs_active)
 		m_mpx = m_sr & 3;

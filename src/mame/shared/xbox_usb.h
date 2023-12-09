@@ -392,8 +392,6 @@ private:
 		emu_timer *timer = nullptr;
 		int state = 0;
 		uint32_t framenumber = 0;
-		uint32_t nextinterupted = 0;
-		uint32_t nextbulked = 0;
 		int interruptbulkratio = 0;
 		int writebackdonehadcounter = 0;
 		address_space *space = nullptr;

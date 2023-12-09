@@ -8,22 +8,22 @@ SciSys/Saitek Stratos chesscomputer family (1987-1990)
 
 - Stratos
 - Turbo King
-- Corona --> saitek_corona.cpp
+- Corona --> corona.cpp
 
 IMPORTANT: The user is expected to press the STOP button to turn off the computer.
-When not using -autosave, press that button before exiting MAME, or NVRAM can get corrupt.
-If that happens, the chesscomputer will become unresponsive on next boot. To force a
-cold boot, press ACL, then hold the PLAY button and press GO.
+When not using -autosave, press that button before exiting MAME, or NVRAM can get
+corrupt. If that happens, the chesscomputer will become unresponsive on next boot.
+To force a cold boot, hold the PLAY button and power on/reset (F3).
 
 TODO:
 - emulate LCD at lower level, probably an MCU with embedded LCDC
-- LCD status bit handling is guessed. stratos expects it to be high after lcd command 0xf,
-  but tking2 won't work if it's done that way, and corona is different too
-- irq timing is derived from the main XTAL, but result should be similar with 5MHz and 5.67MHz,
-  there are a couple of "FREQ. SEL" nodes on the PCB, maybe related (not the ones in input ports).
-  irq source should be from HELIOS pin 2
-- tking(old revisions) and stratos slow responsive buttons, related to irq timing, but if that's changed,
-  the led blinking and in-game clock is too fast
+- LCD status bit handling is guessed. stratos expects it to be high after lcd
+  command 0xf, but tking2 won't work if it's done that way, and corona differs too
+- irq timing is derived from the main XTAL, but result should be similar with 5MHz
+  and 5.67MHz, there are a couple of "FREQ. SEL" nodes on the PCB, maybe related
+  (not the ones in input ports). irq source should be from HELIOS pin 2
+- tking(old revisions) and stratos slow responsive buttons, related to irq timing,
+  but if that's changed, the led blinking and in-game clock is too fast
 - does nvram.u7 work? it's cleared during boot, but not used after
 
 ================================================================================
@@ -39,13 +39,15 @@ Hardware notes:
 Stratos/Turbo King are identical.
 Corona has magnet sensors and two HELIOS chips.
 
-There is no official Saitek program versioning for these. The D/D+ versions are known since
-they're the same chess engine as later Saitek modules, such as the Analyst module.
-Likewise, officially there isn't a "Turbo King II" or "Corona II", these 'sequels' are titled
-as such by the chesscomputer community. Saitek simply advertised them as an improved program.
+There is no official Saitek program versioning for these. The D/D+ versions are
+known since they're the same chess engine as later Saitek modules, such as the
+Analyst module. Likewise, officially there isn't a "Turbo King II" or "Corona II",
+these 'sequels' are titled as such by the chesscomputer community. Saitek simply
+advertised them as an improved program.
 
-The initial Stratos/Turbo King (PRG ROM labels known: M,K,L,P) are probably engine version B,
-very few bytes difference between revisions. The first Corona is engine version C.
+The initial Stratos/Turbo King (PRG ROM labels known: M,K,L,P) are probably
+engine version B, very few bytes difference between revisions. The first Corona
+is engine version C.
 
 *******************************************************************************/
 
@@ -63,8 +65,8 @@ very few bytes difference between revisions. The first Corona is engine version 
 #include "speaker.h"
 
 // internal artwork
-#include "saitek_stratos.lh" // clickable
-#include "saitek_tking.lh" // clickable
+#include "saitek_stratos.lh"
+#include "saitek_tking.lh"
 
 
 class stratos_state : public saitek_stratos_state
@@ -102,6 +104,10 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<8+2> m_inputs;
 
+	u8 m_select = 0;
+	u8 m_control = 0;
+	u8 m_led_data = 0;
+
 	void main_map(address_map &map);
 
 	// I/O handlers
@@ -114,10 +120,6 @@ private:
 	void control_w(u8 data);
 	u8 lcd_data_r();
 	u8 extrom_r(offs_t offset);
-
-	u8 m_select = 0;
-	u8 m_control = 0;
-	u8 m_led_data = 0;
 };
 
 // saitek_stratos_state
@@ -417,7 +419,6 @@ INPUT_PORTS_START( saitek_stratos )
 
 	PORT_START("RESET")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_CHANGED_MEMBER(DEVICE_SELF, saitek_stratos_state, go_button, 0) PORT_NAME("Go")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, saitek_stratos_state, acl_button, 0) PORT_NAME("ACL")
 
 	PORT_START("FAKE")
 	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, saitek_stratos_state, switch_cpu_freq, 0) // factory set
@@ -436,8 +437,42 @@ static INPUT_PORTS_START( stratos )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, stratos_state, lcd_ready_r)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( tking2 )
+static INPUT_PORTS_START( tking ) // same buttons, but different locations
 	PORT_INCLUDE( stratos )
+
+	PORT_MODIFY("IN.0")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Set Up")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_CODE(KEYCODE_L) PORT_NAME("Level")
+
+	PORT_MODIFY("IN.1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("Sound")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_J) PORT_NAME("Stop")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_K) PORT_CODE(KEYCODE_N) PORT_NAME("New Game")
+
+	PORT_MODIFY("IN.4")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_NAME("Play Normal")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("Tab / Color")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_CODE(KEYCODE_MINUS) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-")
+
+	PORT_MODIFY("IN.5")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_CODE(KEYCODE_EQUALS) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_NAME("Function")
+
+	PORT_MODIFY("IN.6")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_NAME("Library")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) PORT_NAME("Info")
+
+	PORT_MODIFY("IN.7")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("Analysis")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Normal")
+
+	PORT_MODIFY("RESET")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) PORT_CHANGED_MEMBER(DEVICE_SELF, saitek_stratos_state, go_button, 0) PORT_NAME("Go")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( tking2 )
+	PORT_INCLUDE( tking )
 
 	PORT_MODIFY("IN.5")
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_CUSTOM)
@@ -543,5 +578,5 @@ SYST( 1987, stratos,  0,       0,      stratos, stratos, stratos_state, empty_in
 SYST( 1987, stratosa, stratos, 0,      stratos, stratos, stratos_state, empty_init, "SciSys", "Kasparov Stratos (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 SYST( 1990, tking,    stratos, 0,      tking2,  tking2,  stratos_state, empty_init, "Saitek", "Kasparov Turbo King (ver. D)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // aka Turbo King II
-SYST( 1988, tkinga,   stratos, 0,      tking,   stratos, stratos_state, empty_init, "Saitek", "Kasparov Turbo King (ver. B, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1988, tkingb,   stratos, 0,      tking,   stratos, stratos_state, empty_init, "Saitek", "Kasparov Turbo King (ver. B, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, tkinga,   stratos, 0,      tking,   tking,   stratos_state, empty_init, "Saitek", "Kasparov Turbo King (ver. B, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, tkingb,   stratos, 0,      tking,   tking,   stratos_state, empty_init, "Saitek", "Kasparov Turbo King (ver. B, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

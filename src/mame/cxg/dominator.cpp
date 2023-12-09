@@ -5,6 +5,10 @@
 
 CXG Sphinx Dominator, chess computer.
 
+The chess engine is by Frans Morsch, older versions (before 2.05) were buggy.
+Hold Pawn + Knight buttons at boot for test mode, it will tell the version number.
+This engine was also used in the newer Mephisto Modena.
+
 Hardware notes:
 - R65C02P4 @ 4MHz
 - 32KB ROM, 8KB RAM battery-backed
@@ -15,25 +19,23 @@ Sphinx Commander also uses the Dominator program, and is on similar hardware,
 but with a Chess 3008 housing (wooden chessboard, magnet sensors).
 Sphinx Galaxy is on similar hardware too, with less leds.
 
-The chess engine is by Frans Morsch, older versions (before 2.05) were buggy.
-Hold Pawn + Knight buttons at boot for test mode, it will tell the version number.
-This engine was also used in the newer Mephisto Modena.
-
 *******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6502/r65c02.h"
 #include "machine/nvram.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
 #include "video/pwm.h"
 #include "video/lc7582.h"
+
 #include "speaker.h"
 
 // internal artwork
-#include "cxg_dominator.lh" // clickable
-#include "cxg_galaxy.lh" // clickable
-#include "cxg_commander.lh" // clickable
+#include "cxg_dominator.lh"
+#include "cxg_galaxy.lh"
+#include "cxg_commander.lh"
 
 
 namespace {
@@ -200,7 +202,7 @@ static INPUT_PORTS_START( dominator )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("Level")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_NAME("Hint")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("Replay")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_NAME("Library/Clear")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("Library/Clear")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_CODE(KEYCODE_C) PORT_NAME("Sound/Colour")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Enter Position")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME("New Game")
@@ -229,7 +231,7 @@ static INPUT_PORTS_START( galaxy )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME("New Game")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Enter Position")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_CODE(KEYCODE_C) PORT_NAME("Sound/Color")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_NAME("Library/Clearboard")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("Library/Clearboard")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) PORT_NAME("Multi Move")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("Level")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_NAME("Hint")

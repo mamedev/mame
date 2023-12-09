@@ -48,6 +48,10 @@ protected:
 	required_memory_bank m_rombank;
 	required_device<generic_slot_device> m_extrom;
 
+	u8 m_latch = 0xff;
+	bool m_latch_enable = false;
+	u8 m_extrom_bank = 0;
+
 	virtual void main_map(address_map &map);
 
 	u8 extrom_r(offs_t offset);
@@ -59,10 +63,6 @@ protected:
 	void control_w(u8 data);
 
 	void set_cpu_freq();
-
-	u8 m_latch = 0xff;
-	bool m_latch_enable = false;
-	u8 m_extrom_bank = 0;
 };
 
 class saitekosa_analyst_device : public saitekosa_maestro_device

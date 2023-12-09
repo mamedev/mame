@@ -66,9 +66,16 @@ std::pair<std::error_condition, std::string> vboy_cart_slot_device::call_load()
 	{
 		LOG("Allocating %u byte cartridge ROM region\n", len);
 		romregion = machine().memory().region_alloc(subtag("rom"), len, 4, ENDIANNESS_LITTLE);
-		u32 const cnt(fread(romregion->base(), len));
+		u32 *const rombase(reinterpret_cast<u32 *>(romregion->base()));
+		u32 const cnt(fread(rombase, len));
 		if (cnt != len)
-			return std::make_pair(image_error::UNSPECIFIED, "Error reading cartridge file");
+			return std::make_pair(std::errc::io_error, "Error reading cartridge file");
+
+		if (ENDIANNESS_NATIVE != ENDIANNESS_LITTLE)
+		{
+			for (u32 i = 0; (len / 4) > i; ++i)
+				rombase[i] = swapendian_int32(rombase[i]);
+		}
 	}
 
 	return std::make_pair(m_cart->load(), std::string());
@@ -92,12 +99,6 @@ void vboy_cart_slot_device::device_validity_check(validity_checker &valid) const
 
 	if (m_rom_base & 0x00ff'ffff)
 		osd_printf_error("ROM base address 0x%X is not on a 24-bit boundary\n", m_rom_base);
-}
-
-
-void vboy_cart_slot_device::device_resolve_objects()
-{
-	m_intcro.resolve_safe();
 }
 
 

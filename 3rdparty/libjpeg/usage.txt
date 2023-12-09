@@ -47,7 +47,7 @@ or
 This syntax works on all systems, so it is useful for scripts.
 
 The currently supported image file formats are: PPM (PBMPLUS color format),
-PGM (PBMPLUS grayscale format), BMP, Targa, and RLE (Utah Raster Toolkit
+PGM (PBMPLUS grayscale format), BMP, GIF, Targa, and RLE (Utah Raster Toolkit
 format).  (RLE is supported only if the URT library is available, which it
 isn't on most non-Unix systems.)  cjpeg recognizes the input image format
 automatically, with the exception of some Targa-format files.  You have to
@@ -73,10 +73,10 @@ The basic command line switches for cjpeg are:
 
 	-grayscale	Create monochrome JPEG file from color input.
 			Be sure to use this switch when compressing a grayscale
-			BMP file, because cjpeg isn't bright enough to notice
-			whether a BMP file uses only shades of gray.  By
-			saying -grayscale, you'll get a smaller JPEG file that
-			takes less time to process.
+			BMP or GIF file, because cjpeg isn't bright enough to
+			notice whether a BMP or GIF file uses only shades of
+			gray.  By saying -grayscale, you'll get a smaller
+			JPEG file that takes less time to process.
 
 	-rgb		Create RGB JPEG file.
 			Using this switch suppresses the conversion from RGB
@@ -317,10 +317,17 @@ The basic command line switches for djpeg are:
 			is specified, or if the JPEG file is grayscale;
 			otherwise, 24-bit full-color format is emitted.
 
-	-gif		Select GIF output format.  Since GIF does not support
-			more than 256 colors, -colors 256 is assumed (unless
-			you specify a smaller number of colors).  If you
-			specify -fast, the default number of colors is 216.
+	-gif		Select GIF output format (LZW compressed).
+			Since GIF does not support more than 256 colors,
+			-colors 256 is assumed (unless you specify a smaller
+			number of colors).  If you specify -fast, the default
+			number of colors is 216.
+
+	-gif0		Select GIF output format (uncompressed).
+			Since GIF does not support more than 256 colors,
+			-colors 256 is assumed (unless you specify a smaller
+			number of colors).  If you specify -fast, the default
+			number of colors is 216.
 
 	-os2		Select BMP output format (OS/2 1.x flavor).  8-bit
 			colormapped format is emitted if -colors or -grayscale
@@ -411,10 +418,6 @@ quality settings to make very small JPEG files; the percentage improvement
 is often a lot more than it is on larger files.  (At present, -optimize
 mode is always selected when generating progressive JPEG files.)
 
-GIF input files are no longer supported, to avoid the Unisys LZW patent
-(now expired).
-(Conversion of GIF files to JPEG is usually a bad idea anyway.)
-
 
 HINTS FOR DJPEG
 
@@ -439,10 +442,6 @@ Two-pass color quantization requires a good deal of memory; on MS-DOS machines
 it may run out of memory even with -maxmemory 0.  In that case you can still
 decompress, with some loss of image quality, by specifying -onepass for
 one-pass quantization.
-
-To avoid the Unisys LZW patent (now expired), djpeg produces uncompressed GIF
-files.  These are larger than they should be, but are readable by standard GIF
-decoders.
 
 
 HINTS FOR BOTH PROGRAMS
@@ -571,10 +570,33 @@ The image can be losslessly cropped by giving the switch:
 	-crop WxH+X+Y	Crop to a rectangular subarea of width W, height H
 			starting at point X,Y.
 
+Crop extension: The width or height parameters can be made larger than the
+source image.  In this case the extra area is filled in with zero (neutral
+gray).  A larger width parameter has two more options:  Attaching an 'f'
+character ("flatten") to the width number will fill in the extra area with
+the DC of the adjacent block, instead of gray out.  Attaching an 'r'
+character ("reflect") to the width number will fill in the extra area with
+repeated reflections of the source region, instead of gray out.
+
 A complementary lossless-wipe option is provided to discard (gray out) data
 inside a given image region while losslessly preserving what is outside:
 	-wipe WxH+X+Y	Wipe (gray out) a rectangular subarea of
 			width W, height H starting at point X,Y.
+
+Attaching an 'f' character ("flatten") to the width number will fill the
+region with the average of adjacent blocks, instead of gray out.  In case
+the wipe region and outside area form two horizontally adjacent rectangles,
+attaching an 'r' character ("reflect") to the width number will fill the
+region with repeated reflections of the outside area, instead of gray out.
+
+Another option is lossless-drop, which replaces data at a given image
+position by another image:
+	-drop +X+Y filename	Drop another image
+
+Both source images must have the same subsampling values.  It is best if
+they also have the same quantization, otherwise quantization adaption occurs.
+The trim option can be used with the drop option to requantize the drop file
+to the source file.
 
 Other not-strictly-lossless transformation switches are:
 

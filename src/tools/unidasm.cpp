@@ -41,6 +41,7 @@ using util::BIT;
 #include "cpu/cr16b/cr16bdasm.h"
 #include "cpu/cr16c/cr16cdasm.h"
 #include "cpu/cubeqcpu/cubedasm.h"
+#include "cpu/ddp516/ddp516d.h"
 #include "cpu/dsp16/dsp16dis.h"
 #include "cpu/dsp32/dsp32dis.h"
 #include "cpu/dsp56000/dsp56000d.h"
@@ -49,6 +50,7 @@ using util::BIT;
 #include "cpu/e132xs/32xsdasm.h"
 #include "cpu/es5510/es5510d.h"
 #include "cpu/esrip/esripdsm.h"
+#include "cpu/evolution/evod.h"
 #include "cpu/f2mc16/f2mc16d.h"
 #include "cpu/f8/f8dasm.h"
 #include "cpu/fr/frdasm.h"
@@ -84,6 +86,7 @@ using util::BIT;
 #include "cpu/lc8670/lc8670dsm.h"
 #include "cpu/lh5801/5801dasm.h"
 #include "cpu/lr35902/lr35902d.h"
+#include "cpu/m16c/m16cdasm.h"
 #include "cpu/m32c/m32cdasm.h"
 #include "cpu/m37710/m7700ds.h"
 #include "cpu/m6502/m4510d.h"
@@ -118,6 +121,7 @@ using util::BIT;
 #include "cpu/mips/mips3dsm.h"
 #include "cpu/mips/mips1dsm.h"
 #include "cpu/mk1/mk1dasm.h"
+#include "cpu/mn1400/mn1400d.h"
 #include "cpu/mn1610/mn1610d.h"
 #include "cpu/mn1880/mn1880d.h"
 #include "cpu/mn10200/mn102dis.h"
@@ -163,6 +167,7 @@ using util::BIT;
 #include "cpu/ssem/ssemdasm.h"
 #include "cpu/ssp1601/ssp1601d.h"
 #include "cpu/st62xx/st62xx_dasm.h"
+#include "cpu/st9/st9dasm.h"
 #include "cpu/superfx/sfx_dasm.h"
 #include "cpu/t11/t11dasm.h"
 #include "cpu/tlcs870/tlcs870d.h"
@@ -200,6 +205,7 @@ using util::BIT;
 #include "cpu/vt61/vt61dasm.h"
 #include "cpu/we32000/we32100d.h"
 #include "cpu/xavix2/xavix2d.h"
+#include "cpu/xtensa/xtensad.h"
 #include "cpu/z180/z180dasm.h"
 #include "cpu/z8/z8dasm.h"
 #include "cpu/z80/z80dasm.h"
@@ -426,6 +432,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "cquestrot",       be, -3, []() -> util::disasm_interface * { return new cquestrot_disassembler; } },
 	{ "cquestsnd",       be, -3, []() -> util::disasm_interface * { return new cquestsnd_disassembler; } },
 	{ "cyber18",         be, -1, []() -> util::disasm_interface * { return new cyber18_disassembler; } },
+	{ "ddp516",          be, -1, []() -> util::disasm_interface * { return new ddp516_disassembler; } },
 	{ "dp8344",          le, -1, []() -> util::disasm_interface * { return new dp8344_disassembler; } },
 	{ "ds5002fp",        le,  0, []() -> util::disasm_interface * { return new ds5002fp_disassembler; } },
 	{ "ds80c320",        le,  0, []() -> util::disasm_interface * { return new ds80c320_disassembler; } },
@@ -437,6 +444,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "epg3231",         le, -1, []() -> util::disasm_interface * { return new epg3231_disassembler; } },
 //  { "es5510",          be,  0, []() -> util::disasm_interface * { return new es5510_disassembler; } }, // Currently does nothing
 	{ "esrip",           be,  0, []() -> util::disasm_interface * { return new esrip_disassembler; } },
+	{ "evo",             le, -1, []() -> util::disasm_interface * { return new evolution_disassembler; } },
 	{ "f2mc16",          le,  0, []() -> util::disasm_interface * { return new f2mc16_disassembler; } },
 	{ "f8",              be,  0, []() -> util::disasm_interface * { return new f8_disassembler; } },
 	{ "fr",              be,  0, []() -> util::disasm_interface * { return new fr_disassembler; } },
@@ -496,6 +504,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "lh5801",          le,  0, []() -> util::disasm_interface * { return new lh5801_disassembler; } },
 	{ "lr35902",         le,  0, []() -> util::disasm_interface * { return new lr35902_disassembler; } },
 	{ "m146805",         be,  0, []() -> util::disasm_interface * { return new m146805_disassembler; } },
+	{ "m16c",            le,  0, []() -> util::disasm_interface * { return new m16c_disassembler; } },
 	{ "m32c",            le,  0, []() -> util::disasm_interface * { return new m32c_disassembler; } },
 	{ "m37710",          le,  0, []() -> util::disasm_interface * { return new m7700_disassembler(&m7700_unidasm); } },
 	{ "m4510",           le,  0, []() -> util::disasm_interface * { return new m4510_disassembler; } },
@@ -536,6 +545,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "mm76",            le,  0, []() -> util::disasm_interface * { return new mm76_disassembler; } },
 	{ "mm78",            le,  0, []() -> util::disasm_interface * { return new mm78_disassembler; } },
 	{ "mn10200",         le,  0, []() -> util::disasm_interface * { return new mn10200_disassembler; } },
+	{ "mn1400",          le,  0, []() -> util::disasm_interface * { return new mn1400_disassembler; } },
 	{ "mn1610",          be, -1, []() -> util::disasm_interface * { return new mn1610_disassembler; } },
 	{ "mn1613",          be, -1, []() -> util::disasm_interface * { return new mn1613_disassembler; } },
 	{ "mn1860",          be,  0, []() -> util::disasm_interface * { return new mn1860_disassembler; } },
@@ -561,6 +571,11 @@ static const dasm_table_entry dasm_table[] =
 	{ "power",           be,  0, []() -> util::disasm_interface * { return new power_disassembler; } },
 	{ "powerpc",         be,  0, []() -> util::disasm_interface * { return new powerpc_disassembler; } },
 	{ "pps4",            le,  0, []() -> util::disasm_interface * { return new pps4_disassembler; } },
+	{ "prime16s",        be, -1, []() -> util::disasm_interface * { return new prime16s_disassembler; } },
+	{ "prime32r",        be, -1, []() -> util::disasm_interface * { return new prime32r_disassembler; } },
+	{ "prime32s",        be, -1, []() -> util::disasm_interface * { return new prime32s_disassembler; } },
+	{ "prime64r",        be, -1, []() -> util::disasm_interface * { return new prime64r_disassembler; } },
+	{ "prime64v",        be, -1, []() -> util::disasm_interface * { return new prime64v_disassembler; } },
 	{ "psxcpu",          le,  0, []() -> util::disasm_interface * { return new psxcpu_disassembler; } },
 	{ "r65c02",          le,  0, []() -> util::disasm_interface * { return new r65c02_disassembler; } },
 	{ "r65c19",          le,  0, []() -> util::disasm_interface * { return new r65c19_disassembler; } },
@@ -603,6 +618,8 @@ static const dasm_table_entry dasm_table[] =
 	{ "ssem",            le,  0, []() -> util::disasm_interface * { return new ssem_disassembler; } },
 	{ "ssp1601",         be, -1, []() -> util::disasm_interface * { return new ssp1601_disassembler; } },
 	{ "st62xx",          le,  0, []() -> util::disasm_interface * { return new st62xx_disassembler; } },
+	{ "st9",             be,  0, []() -> util::disasm_interface * { return new st9_disassembler; } },
+	{ "st9p",            be,  0, []() -> util::disasm_interface * { return new st9p_disassembler; } },
 	{ "superfx",         le,  0, []() -> util::disasm_interface * { return new superfx_disassembler(&superfx_unidasm); } },
 	{ "t11",             le,  0, []() -> util::disasm_interface * { return new t11_disassembler; } },
 	{ "tlcs870",         le,  0, []() -> util::disasm_interface * { return new tlcs870_disassembler; } },
@@ -680,6 +697,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "upi41",           le,  0, []() -> util::disasm_interface * { return new mcs48_disassembler(true, false); } },
 	{ "v60",             le,  0, []() -> util::disasm_interface * { return new v60_disassembler; } },
 	{ "v620",            be, -1, []() -> util::disasm_interface * { return new v620_disassembler; } },
+	{ "v620f",           be, -1, []() -> util::disasm_interface * { return new v620f_disassembler; } },
 	{ "v75",             be, -1, []() -> util::disasm_interface * { return new v75_disassembler; } },
 	{ "v810",            le,  0, []() -> util::disasm_interface * { return new v810_disassembler; } },
 	{ "v850",            le,  0, []() -> util::disasm_interface * { return new v850_disassembler; } },
@@ -697,6 +715,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "xavix2000",       le,  0, []() -> util::disasm_interface * { return new xavix2000_disassembler; } },
 	{ "xavix2",          le,  0, []() -> util::disasm_interface * { return new xavix2_disassembler; } },
 	{ "xerox530",        be, -1, []() -> util::disasm_interface * { return new xerox530_disassembler; } },
+	{ "xtensa",          le,  0, []() -> util::disasm_interface * { return new xtensa_disassembler; } },
 	{ "z180",            le,  0, []() -> util::disasm_interface * { return new z180_disassembler; } },
 	{ "z8",              be,  0, []() -> util::disasm_interface * { return new z8_disassembler; } },
 	{ "z80",             le,  0, []() -> util::disasm_interface * { return new z80_disassembler; } },

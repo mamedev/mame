@@ -13,7 +13,7 @@
 
 #include "option.h"
 
-#include "bus/ata/idehd.h"
+#include "machine/atastorage.h"
 
 namespace bus::epson_qx {
 
@@ -23,19 +23,17 @@ namespace bus::epson_qx {
 
 /* Epson IDE Device */
 
-class ide_device : public device_t, public bus::epson_qx::device_option_expansion_interface
+// TODO: this thing should probably implement the ATA controller interface rather than having an IDE hard disk with no slot
+class ide_device : public ide_hdd_device_base, public device_option_expansion_interface
 {
 public:
 	// construction/destruction
 	ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
-
-	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
 	uint8_t read(offs_t offset);
@@ -44,7 +42,12 @@ protected:
 	void map(address_map &map);
 
 private:
-	required_device<ide_hdd_device> m_hdd;
+	// ata_hle_device_base implementation
+	virtual void set_irq_out(int state) override { }
+	virtual void set_dmarq_out(int state) override { }
+	virtual void set_dasp_out(int state) override { }
+	virtual void set_pdiag_out(int state) override { }
+
 	required_ioport m_iobase;
 
 	bool m_installed;

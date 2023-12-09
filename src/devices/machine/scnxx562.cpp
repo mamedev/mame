@@ -87,7 +87,6 @@ DONE (x) (p=partly)         NMOS         CMOS
 /* Useful temporary debug printout format */
 // printf("TAG %s%s Data:%d\n", __PRETTY_FUNCTION__, owner()->tag(), data);
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_R       (1U << 1)
 #define LOG_TX      (1U << 2)
 #define LOG_RX      (1U << 3)
@@ -206,23 +205,6 @@ duscc68c562_device::duscc68c562_device(const machine_config &mconfig, const char
 void duscc_device::device_start()
 {
 	LOG("%s\n", FUNCNAME);
-
-	// resolve callbacks
-	m_out_txda_cb.resolve_safe();
-	m_out_dtra_cb.resolve_safe();
-	m_out_rtsa_cb.resolve_safe();
-	m_out_synca_cb.resolve_safe();
-	m_out_rtxca_cb.resolve_safe();
-	m_out_trxca_cb.resolve_safe();
-
-	m_out_txdb_cb.resolve_safe();
-	m_out_dtrb_cb.resolve_safe();
-	m_out_rtsb_cb.resolve_safe();
-	m_out_syncb_cb.resolve_safe();
-	m_out_rtxcb_cb.resolve_safe();
-	m_out_trxcb_cb.resolve_safe();
-
-	m_out_int_cb.resolve_safe();
 
 	// state saving - stuff with runtime values
 	save_item(NAME(m_int_state));

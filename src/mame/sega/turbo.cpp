@@ -480,19 +480,19 @@ void turbo_state::analog_reset_w(uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(turbo_state::coin_meter_1_w)
+void turbo_state::coin_meter_1_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
 
-WRITE_LINE_MEMBER(turbo_state::coin_meter_2_w)
+void turbo_state::coin_meter_2_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(1, state);
 }
 
 
-WRITE_LINE_MEMBER(turbo_state::start_lamp_w)
+void turbo_state::start_lamp_w(int state)
 {
 	m_lamp = state ? 1 : 0;
 }
@@ -941,6 +941,13 @@ void turbo_state::turbo(machine_config &config)
 	m_i8255[3]->in_pb_callback().set_ioport("DSW2");
 	m_i8255[3]->out_pc_callback().set(FUNC(turbo_state::ppi3c_w));
 
+	for (int i = 0; i < 4; i++)
+	{
+		m_i8255[i]->tri_pa_callback().set_constant(0);
+		m_i8255[i]->tri_pb_callback().set_constant(0);
+		m_i8255[i]->tri_pc_callback().set_constant(0);
+	}
+
 	i8279_device &kbdc(I8279(config, "i8279", MASTER_CLOCK/16)); // clock = H1
 	kbdc.out_sl_callback().set(FUNC(turbo_state::scanlines_w));  // scan SL lines
 	kbdc.out_disp_callback().set(FUNC(turbo_state::digit_w));    // display A&B
@@ -982,6 +989,13 @@ void subroc3d_state::subroc3d(machine_config &config)
 	m_i8255[1]->out_pa_callback().set(FUNC(subroc3d_state::sound_a_w));
 	m_i8255[1]->out_pb_callback().set(FUNC(subroc3d_state::sound_b_w));
 	m_i8255[1]->out_pc_callback().set(FUNC(subroc3d_state::sound_c_w));
+
+	for (int i = 0; i < 2; i++)
+	{
+		m_i8255[i]->tri_pa_callback().set_constant(0);
+		m_i8255[i]->tri_pb_callback().set_constant(0);
+		m_i8255[i]->tri_pc_callback().set_constant(0);
+	}
 
 	i8279_device &kbdc(I8279(config, "i8279", MASTER_CLOCK/16));   // unknown clock
 	kbdc.out_sl_callback().set(FUNC(subroc3d_state::scanlines_w)); // scan SL lines
@@ -1026,6 +1040,13 @@ void buckrog_state::buckrog(machine_config &config)
 	m_i8255[1]->out_pa_callback().set(FUNC(buckrog_state::sound_a_w));
 	m_i8255[1]->out_pb_callback().set(FUNC(buckrog_state::sound_b_w));
 	m_i8255[1]->out_pc_callback().set(FUNC(buckrog_state::ppi1c_w));
+
+	for (int i = 0; i < 2; i++)
+	{
+		m_i8255[i]->tri_pa_callback().set_constant(0);
+		m_i8255[i]->tri_pb_callback().set_constant(0);
+		m_i8255[i]->tri_pc_callback().set_constant(0);
+	}
 
 	i8279_device &kbdc(I8279(config, "i8279", MASTER_CLOCK/16));  // unknown clock
 	kbdc.out_sl_callback().set(FUNC(buckrog_state::scanlines_w)); // scan SL lines

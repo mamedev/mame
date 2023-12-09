@@ -17,7 +17,6 @@ m24_z8000_device::m24_z8000_device(const machine_config &mconfig, const char *ta
 
 void m24_z8000_device::device_start()
 {
-	m_halt_out.resolve_safe();
 }
 
 void m24_z8000_device::device_reset()
@@ -212,13 +211,13 @@ void m24_z8000_device::handshake_w(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(m24_z8000_device::mo_w)
+void m24_z8000_device::mo_w(int state)
 {
 	m_z8000->mi_w(state ? ASSERT_LINE : CLEAR_LINE);
 	m_halt_out(state);
 }
 
-WRITE_LINE_MEMBER(m24_z8000_device::timer_irq_w)
+void m24_z8000_device::timer_irq_w(int state)
 {
 	m_timer_irq = state ? true : false;
 	m_z8000->set_input_line(z8001_device::NVI_LINE, state ? ASSERT_LINE : CLEAR_LINE);

@@ -9,7 +9,7 @@ sp_rinter@gmx.de
 
 TODO:
 - add waitstates, CPU is 12MHz but with DTACK waitstates for slow EPROMs,
-  effective speed is less than 10MHz
+  effective speed is around 7.2MHz
 
 ================================================================================
 
@@ -35,10 +35,11 @@ Hardware notes:
 
 #include "emu.h"
 
-#include "cpu/m68000/m68000.h"
 #include "mmboard.h"
-#include "sound/dac.h"
 #include "mmdisplay1.h"
+
+#include "cpu/m68000/m68000.h"
+#include "sound/dac.h"
 
 #include "speaker.h"
 
@@ -51,13 +52,13 @@ namespace {
 class glasgow_state : public driver_device
 {
 public:
-	glasgow_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_board(*this, "board")
-		, m_display(*this, "display")
-		, m_dac(*this, "dac")
-		, m_keys(*this, "KEY.%u", 0)
+	glasgow_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_board(*this, "board"),
+		m_display(*this, "display"),
+		m_dac(*this, "dac"),
+		m_keys(*this, "KEY.%u", 0)
 	{ }
 
 	void glasgow(machine_config &config);
@@ -72,13 +73,13 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<2> m_keys;
 
+	u8 m_kp_mux = 0;
+
 	void glasgow_mem(address_map &map);
 
 	void control_w(u8 data);
 	u8 keys_r();
 	void keys_w(u8 data);
-
-	u8 m_kp_mux = 0;
 };
 
 void glasgow_state::machine_start()
@@ -243,7 +244,7 @@ ROM_END
 //    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS
 SYST( 1984, glasgow,   0,        0,      glasgow,  glasgow, glasgow_state, empty_init, "Hegener + Glaser", "Mephisto III-S Glasgow", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-// newer chesscomputers on 4-ROM hardware (see mephisto_amsterdam.cpp for parent sets)
+// newer chesscomputers on 4-ROM hardware (see amsterdam.cpp for parent sets)
 SYST( 1985, amsterda,  amsterd,  0,      glasgow,  glasgow, glasgow_state, empty_init, "Hegener + Glaser", "Mephisto Amsterdam (Glasgow hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1986, dallas16a, dallas32, 0,      glasgow,  glasgow, glasgow_state, empty_init, "Hegener + Glaser", "Mephisto Dallas 68000 (Glasgow hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1987, roma16a,   roma32,   0,      glasgow,  glasgow, glasgow_state, empty_init, "Hegener + Glaser", "Mephisto Roma 68000 (Glasgow hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

@@ -5,8 +5,10 @@
 
 Novag Savant, chess computer with touchscreen. It was followed by Savant II and
 Savant Royale on the same hardware, the program is the same and they just added
-a bigger opening book. Savant Royale was a German limited release overclock
-version of Savant II. The chess engine is MyChess by David Kittinger.
+a bigger opening book. The chess engine is MyChess by David Kittinger.
+
+Like the 1984 version Chess Robot Adversary, Savant Royale was marketed as 7.5MHz,
+but it's not known how they sped it up,
 
 Hardware overview:
 - Zilog Z80B @ 6MHz
@@ -29,8 +31,8 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "cpu/f8/f8.h"
 #include "machine/f3853.h"
-#include "machine/sensorboard.h"
 #include "machine/nvram.h"
+#include "machine/sensorboard.h"
 #include "sound/dac.h"
 #include "video/hlcd0538.h"
 #include "video/pwm.h"
@@ -39,7 +41,7 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-#include "novag_savant.lh" // clickable
+#include "novag_savant.lh"
 
 
 namespace {
@@ -80,6 +82,12 @@ private:
 	required_shared_ptr<u8> m_nvram;
 	required_ioport_array<3> m_inputs;
 
+	bool m_wait_in = false;
+	u8 m_inp_mux = 0;
+	u8 m_databus = 0;
+	u8 m_control = 0;
+	u64 m_lcd_data = 0;
+
 	// address maps
 	void main_map(address_map &map);
 	void main_io(address_map &map);
@@ -102,12 +110,6 @@ private:
 	void control_w(u8 data);
 	void lcd_w(u8 data);
 	u8 input_r();
-
-	bool m_wait_in = false;
-	u8 m_inp_mux = 0;
-	u8 m_databus = 0;
-	u8 m_control = 0;
-	u64 m_lcd_data = 0;
 };
 
 void savant_state::machine_start()
@@ -278,11 +280,11 @@ void savant_state::main_map(address_map &map)
 void savant_state::main_io(address_map &map)
 {
 	map(0xc0, 0xc0).mirror(0x0038).select(0xff00).rw(FUNC(savant_state::stall_r), FUNC(savant_state::stall_w));
-	map(0xc1, 0xc1).mirror(0xff38).unmapw(); // clock
-	map(0xc2, 0xc2).mirror(0xff38).unmapw(); // printer
-	map(0xc3, 0xc3).mirror(0xff38).unmapr(); // printer
+	map(0xc1, 0xc1).mirror(0xff38).nopw(); // clock
+	map(0xc2, 0xc2).mirror(0xff38).nopw(); // printer
+	map(0xc3, 0xc3).mirror(0xff38).nopr(); // printer
 	map(0xc4, 0xc4).mirror(0xff38).r(FUNC(savant_state::mcustatus_r));
-	map(0xc5, 0xc5).mirror(0xff38).unmapw(); // printer
+	map(0xc5, 0xc5).mirror(0xff38).nopw(); // printer
 }
 
 void savant_state::mcu_map(address_map &map)

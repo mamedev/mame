@@ -28,7 +28,6 @@
 
 #include "softfloat3/source/include/softfloat.h"
 
-#define LOG_GENERAL   (1U << 0)
 #define LOG_EXCEPTION (1U << 1)
 #define LOG_SYSCALLS  (1U << 2)
 
@@ -59,7 +58,7 @@ alpha_device::alpha_device(const machine_config &mconfig, device_type type, cons
 			address_space_config("3", ENDIANNESS_LITTLE, 64, 32, 0)
 		}
 	, m_srom_oe_cb(*this)
-	, m_srom_data_cb(*this)
+	, m_srom_data_cb(*this, 0)
 	, m_icount(0)
 {
 }
@@ -86,9 +85,6 @@ void alpha_device::device_start()
 	// floating point registers
 	for (unsigned i = 0; i < 32; i++)
 		state_add(i + 32, util::string_format("F%d", i).c_str(), m_f[i]);
-
-	m_srom_oe_cb.resolve_safe();
-	m_srom_data_cb.resolve_safe(0);
 }
 
 void alpha_device::device_reset()

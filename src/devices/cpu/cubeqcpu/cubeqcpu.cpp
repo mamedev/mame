@@ -2,7 +2,7 @@
 // copyright-holders:Philip Bennett
 /***************************************************************************
 
-    cubeqcpu.c
+    cubeqcpu.cpp
 
     Implementation of the Cube Quest AM2901-based CPUs
     Copyright Philip J Bennett
@@ -59,16 +59,10 @@ enum alu_dst
 	RAMU  = 7
 };
 
-/***************************************************************************
-    MACROS
-***************************************************************************/
-
-#define _BIT(x, n)          ((x) & (1 << (n)))
 
 /***************************************************************************
     STRUCTURES & TYPEDEFS
 ***************************************************************************/
-
 
 DEFINE_DEVICE_TYPE(CQUESTSND, cquestsnd_cpu_device, "cquestsnd", "Cube Quest Sound CPU")
 DEFINE_DEVICE_TYPE(CQUESTROT, cquestrot_cpu_device, "cquestrot", "Cube Quest Rotate CPU")
@@ -120,7 +114,7 @@ std::unique_ptr<util::disasm_interface> cquestrot_cpu_device::create_disassemble
 cquestlin_cpu_device::cquestlin_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: cpu_device(mconfig, CQUESTLIN, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 64, 8, -3)
-	, m_linedata_r(*this)
+	, m_linedata_r(*this, 0)
 	, m_flags(0)
 	, m_curpc(0)
 {
@@ -177,7 +171,6 @@ u16 cquestrot_cpu_device::rotram_r(offs_t offset)
 
 void cquestsnd_cpu_device::device_start()
 {
-	m_dac_w.resolve_safe();
 	assert(m_sound_region_tag != nullptr);
 	m_sound_data = (u16*)machine().root_device().memregion(m_sound_region_tag)->base();
 
@@ -258,8 +251,6 @@ void cquestsnd_cpu_device::device_reset()
 
 void cquestrot_cpu_device::device_start()
 {
-	m_linedata_w.resolve_safe();
-
 	space(AS_PROGRAM).cache(m_cache);
 	space(AS_PROGRAM).specific(m_program);
 
@@ -379,9 +370,11 @@ device_memory_interface::space_config_vector cquestrot_cpu_device::memory_space_
 	};
 }
 
+
 /***************************************************************************
     LINE DRAWER INITIALIZATION AND SHUTDOWN
 ***************************************************************************/
+
 #define FOREGROUND      0
 #define BACKGROUND      1
 #define ODD_FIELD       0
@@ -389,8 +382,6 @@ device_memory_interface::space_config_vector cquestrot_cpu_device::memory_space_
 
 void cquestlin_cpu_device::device_start()
 {
-	m_linedata_r.resolve_safe(0);
-
 	space(AS_PROGRAM).cache(m_cache);
 	space(AS_PROGRAM).specific(m_program);
 
@@ -510,9 +501,6 @@ void cquestlin_cpu_device::state_string_export(const device_state_entry &entry, 
     SOUND CORE EXECUTION LOOP
 ***************************************************************************/
 
-#define SND_PC          (m_pc)
-#define SND_DATA_IN     (_ramen ? m_sound_data[m_platch] : m_dinlatch)
-
 enum snd_latch_type
 {
 	PLTCH = 0,
@@ -534,6 +522,10 @@ bool cquestsnd_cpu_device::do_sndjmp(u8 jmp)
 
 	return false;
 }
+
+
+#define SND_PC          (m_pc)
+#define SND_DATA_IN     (_ramen ? m_sound_data[m_platch] : m_dinlatch)
 
 void cquestsnd_cpu_device::execute_run()
 {
@@ -580,14 +572,14 @@ void cquestsnd_cpu_device::execute_run()
 			/* Determine the ALU sources */
 			switch (i2_0)
 			{
-				case AQ: r = m_ram[a]; s = m_q;      break;
-				case AB: r = m_ram[a]; s = m_ram[b]; break;
-				case ZQ: r = 0;                s = m_q;      break;
-				case ZB: r = 0;                s = m_ram[b]; break;
-				case ZA: r = 0;                s = m_ram[a]; break;
-				case DA: r = SND_DATA_IN;      s = m_ram[a]; break;
-				case DQ: r = SND_DATA_IN;      s = m_q;      break;
-				case DZ: r = SND_DATA_IN;      s = 0;                break;
+				case AQ: r = m_ram[a];      s = m_q;      break;
+				case AB: r = m_ram[a];      s = m_ram[b]; break;
+				case ZQ: r = 0;             s = m_q;      break;
+				case ZB: r = 0;             s = m_ram[b]; break;
+				case ZA: r = 0;             s = m_ram[a]; break;
+				case DA: r = SND_DATA_IN;   s = m_ram[a]; break;
+				case DQ: r = SND_DATA_IN;   s = m_q;      break;
+				case DZ: r = SND_DATA_IN;   s = 0;        break;
 			}
 
 			/* Perform the ALU operation */
@@ -736,8 +728,6 @@ void cquestsnd_cpu_device::execute_run()
     ROTATE CORE EXECUTION LOOP
 ***************************************************************************/
 
-#define ROT_PC          (m_pc & 0x1ff)
-
 enum rot_spf
 {
 	SPF_UNUSED0 = 0,
@@ -774,13 +764,13 @@ int cquestrot_cpu_device::do_rotjmp(u8 jmp)
 
 	switch (jmp & 7)
 	{
-		/*        */ case 0: ret = 0;                         break;
+		/*        */ case 0: ret = 0;                 break;
 		/* SEQ    */ case 1: ret = (m_seqcnt == 0xf); break;
 		/* CAROUT */ case 2: ret = m_cflag;           break;
 		/* SYNC   */ case 3: ret = !(m_clkcnt & 0x3); break;
-		/* LDWAIT */ case 4: ret = 0;                         break;
+		/* LDWAIT */ case 4: ret = 0;                 break;
 		/* MSB    */ case 5: ret = BIT(m_f, 15);      break;
-		/* >=1    */ case 6: ret = (!_BIT(m_f, 15) && !(m_f == 0)); break;
+		/* >=1    */ case 6: ret = (!BIT(m_f, 15) && !(m_f == 0)); break;
 		/* ZERO   */ case 7: ret = (m_f == 0);        break;
 	}
 
@@ -788,8 +778,8 @@ int cquestrot_cpu_device::do_rotjmp(u8 jmp)
 }
 
 
+#define ROT_PC              (m_pc & 0x1ff)
 #define ROT_SRAM_ADDRESS    ((m_dsrclatch & 2) ? m_yrlatch : (m_rsrclatch | 0x700))
-
 
 void cquestrot_cpu_device::execute_run()
 {
@@ -878,7 +868,7 @@ void cquestrot_cpu_device::execute_run()
 			u32 vflag = 0;
 
 			/* First, determine correct I1 bit */
-			if ((spf == SPF_MULT) && !_BIT(m_q, 0))
+			if ((spf == SPF_MULT) && !BIT(m_q, 0))
 				i2_0 |= 2;
 
 			/* Determine the ALU sources */
@@ -1068,7 +1058,7 @@ void cquestrot_cpu_device::execute_run()
 				| (spf == SPF_SWRT ? 0 : 1);
 
 		/* R-latch is written on rising edge of dsrclatch bit 2 */
-		if (!_BIT(m_dsrclatch, 2) && _BIT(dsrclatch, 2))
+		if (!BIT(m_dsrclatch, 2) && BIT(dsrclatch, 2))
 			m_rsrclatch = t & 0xff;
 
 		m_dsrclatch = dsrclatch;
@@ -1094,7 +1084,7 @@ void cquestrot_cpu_device::execute_run()
 		}
 
 		/* Clock in the divide register */
-		m_divreg = (spf == SPF_DIV) && !_BIT(m_f, 15);
+		m_divreg = (spf == SPF_DIV) && !BIT(m_f, 15);
 
 		/* DRAM accessing */
 		m_prev_dred = !(spf == SPF_DRED);
@@ -1155,7 +1145,7 @@ int cquestlin_cpu_device::do_linjmp(u8 jmp)
 		/*        */ case 0: ret = 0; break;
 		/* MSB    */ case 1: ret = BIT(m_f, 11); break;
 		/* SEQ    */ case 2: ret = (m_seqcnt == 0xfff); break;
-		/* >0     */ case 3: ret = !(m_f == 0) && !_BIT(m_f, 11); break;
+		/* >0     */ case 3: ret = !(m_f == 0) && !BIT(m_f, 11); break;
 		/* CAROUT */ case 4: ret = (m_cflag); break;
 		/* ZERO   */ case 5: ret = (m_f == 0); break;
 	}
@@ -1191,10 +1181,10 @@ u32* cquestlin_cpu_device::cubeqcpu_get_stack_ram()
 }
 
 
+#define LINE_PC         ((m_pc[prog] & 0x7f) | ((prog == BACKGROUND) ? 0x80 : 0))
+
 void cquestlin_cpu_device::execute_run()
 {
-#define LINE_PC ((m_pc[prog] & 0x7f) | ((prog == BACKGROUND) ? 0x80 : 0))
-
 	u32  *stack_ram;
 	u8   *ptr_ram;
 
@@ -1217,7 +1207,7 @@ void cquestlin_cpu_device::execute_run()
 		int prog = (m_clkcnt & 3) ? BACKGROUND : FOREGROUND;
 
 		m_curpc = LINE_PC;
-		u64 inst = m_cache.read_qword(LINE_PC);
+		u64 inst = m_cache.read_qword(m_curpc);
 
 		u32 inslow = inst & 0xffffffff;
 		u32 inshig = inst >> 32;
@@ -1242,16 +1232,16 @@ void cquestlin_cpu_device::execute_run()
 		/* Handle accesses to and from shared SRAM */
 		if (prog == FOREGROUND)
 		{
-			if (!_BIT(m_fglatch, 5))
+			if (!BIT(m_fglatch, 5))
 				data_in = m_sram[m_fadlatch];
 			else
 				data_in = m_linedata_r();
 		}
 		else
 		{
-			if (!_BIT(m_bglatch, 4))
+			if (!BIT(m_bglatch, 4))
 				m_sram[m_badlatch] = m_sramdlatch;
-			else if (_BIT(m_bglatch, 2))
+			else if (BIT(m_bglatch, 2))
 				data_in = m_sram[m_badlatch];
 			else
 				data_in = m_linedata_r();
@@ -1260,7 +1250,7 @@ void cquestlin_cpu_device::execute_run()
 		/* Handle a write to stack RAM (/DOWRT) */
 		if ((m_clkcnt & 3) == 1)
 		{
-			if (_BIT(m_fglatch, 4) && (m_ycnt < 256))
+			if (BIT(m_fglatch, 4) && (m_ycnt < 256))
 			{
 				/* 20-bit words */
 				u32 data;
@@ -1272,7 +1262,7 @@ void cquestlin_cpu_device::execute_run()
 					h = (h & 0x800) ? 0 : 319;
 
 				/* Stack word type depends on STOP/#START bit */
-				if (_BIT(m_fglatch, 3))
+				if (BIT(m_fglatch, 3))
 					data = (0 << 19) | (h << 8) | m_zlatch;
 				else
 					data = (1 << 19) | ((m_clatch & 0x100) << 9) | (h << 8) | (m_clatch & 0xff);
@@ -1289,11 +1279,11 @@ void cquestlin_cpu_device::execute_run()
 			t = (t & ~0xf) | (data_in >> 12);
 
 		/* Determine the correct I1 bit  */
-		if ((spf == LSPF_MULT) && !_BIT(m_q, 0))
+		if ((spf == LSPF_MULT) && !BIT(m_q, 0))
 			i2_0 |= 2;
 
 		/* Determine A0 (BRESA0) */
-		if ((prog == FOREGROUND) && !_BIT(m_fglatch, 2))
+		if ((prog == FOREGROUND) && !BIT(m_fglatch, 2))
 			a |= m_gt0reg;
 
 		/* Now do the ALU operation */
@@ -1439,14 +1429,14 @@ void cquestlin_cpu_device::execute_run()
 				if (mux_sel == 0)
 					_xcet = !(spf == LSPF_BRES);
 				else if (mux_sel == 1)
-					_xcet = _BIT(m_fglatch, 1);
+					_xcet = BIT(m_fglatch, 1);
 				else if (mux_sel == 2)
 					_xcet = !(m_gt0reg && (spf == LSPF_BRES));
 				else
-					_xcet = _BIT(m_fglatch, 0);
+					_xcet = BIT(m_fglatch, 0);
 
 				if (!_xcet)
-					m_xcnt = (m_xcnt + (_BIT(m_sreg, SREG_DX) ? 1 : -1)) & 0xfff;
+					m_xcnt = (m_xcnt + (BIT(m_sreg, SREG_DX) ? 1 : -1)) & 0xfff;
 			}
 
 			if (latch == LLATCH_YLATCH)
@@ -1459,14 +1449,14 @@ void cquestlin_cpu_device::execute_run()
 				if (mux_sel == 0)
 					_ycet = !(m_gt0reg && (spf == LSPF_BRES));
 				else if (mux_sel == 1)
-					_ycet = _BIT(m_fglatch, 0);
+					_ycet = BIT(m_fglatch, 0);
 				else if (mux_sel == 2)
 					_ycet = !(spf == LSPF_BRES);
 				else
-					_ycet = _BIT(m_fglatch, 1);
+					_ycet = BIT(m_fglatch, 1);
 
 				if (!_ycet)
-					m_ycnt = (m_ycnt + (_BIT(m_sreg, SREG_DY) ? 1 : -1)) & 0xfff;
+					m_ycnt = (m_ycnt + (BIT(m_sreg, SREG_DY) ? 1 : -1)) & 0xfff;
 			}
 		}
 
@@ -1480,7 +1470,7 @@ void cquestlin_cpu_device::execute_run()
 			m_badlatch = m_y & 0xfff;
 
 		/* What about the SRAM dlatch? */
-		if (!_BIT(m_bglatch, 5))
+		if (!BIT(m_bglatch, 5))
 			m_sramdlatch = ((t & 0xf) << 12) | (m_y & 0x0fff);
 
 		/* BG and FG latches */
@@ -1508,7 +1498,7 @@ void cquestlin_cpu_device::execute_run()
 			}
 			else
 			{
-				dowrt = (spf == LSPF_BRES) && (_BIT(m_sreg, SREG_DX_DY) || m_gt0reg);
+				dowrt = (spf == LSPF_BRES) && (BIT(m_sreg, SREG_DX_DY) || m_gt0reg);
 				start_stop = BIT(m_sreg, SREG_DY);
 			}
 
@@ -1537,7 +1527,7 @@ void cquestlin_cpu_device::execute_run()
 			m_sreg = (m_sreg << 1) | !BIT(m_f, 11);
 
 			/* Also latch the >0 reg */
-			m_gt0reg = !(m_f == 0) && !_BIT(m_f, 11);
+			m_gt0reg = !(m_f == 0) && !BIT(m_f, 11);
 		}
 		else if (spf == LSPF_FSTRT)
 		{
@@ -1554,7 +1544,7 @@ void cquestlin_cpu_device::execute_run()
 			m_seqcnt = (m_seqcnt + 1) & 0xfff;
 
 			/* Also latch the >0 reg */
-			m_gt0reg = !(m_f == 0) && !_BIT(m_f, 11);
+			m_gt0reg = !(m_f == 0) && !BIT(m_f, 11);
 		}
 
 		m_icount--;

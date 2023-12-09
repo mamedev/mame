@@ -632,7 +632,7 @@ void xbox_base_state::debug_generate_irq(int irq, bool active)
 	mcpxlpc->debug_generate_irq(irq, state);
 }
 
-WRITE_LINE_MEMBER(xbox_base_state::vblank_callback)
+void xbox_base_state::vblank_callback(int state)
 {
 	nvidia_nv2a->vblank_callback(state);
 }
@@ -646,7 +646,7 @@ uint32_t xbox_base_state::screen_update_callback(screen_device &screen, bitmap_r
  * PIC & PIT
  */
 
-WRITE_LINE_MEMBER(xbox_base_state::maincpu_interrupt)
+void xbox_base_state::maincpu_interrupt(int state)
 {
 	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }

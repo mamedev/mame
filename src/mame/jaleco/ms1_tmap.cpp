@@ -49,6 +49,7 @@ megasys1_tilemap_device::megasys1_tilemap_device(const machine_config &mconfig, 
 	: device_t(mconfig, MEGASYS1_TILEMAP, tag, owner, clock),
 		device_gfx_interface(mconfig, *this),
 		m_scrollram(*this, DEVICE_SELF),
+		m_screen(*this, finder_base::DUMMY_TAG),
 		m_8x8_scroll_factor(1),
 		m_16x16_scroll_factor(4),
 		m_bits_per_color_code(4),
@@ -242,6 +243,9 @@ uint16_t megasys1_tilemap_device::scroll_r(offs_t offset)
 
 void megasys1_tilemap_device::scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
+	if (m_screen)
+		m_screen->update_partial(m_screen->vpos()-1);
+
 	switch (offset)
 	{
 		case 0:

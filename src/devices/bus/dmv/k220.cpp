@@ -264,18 +264,18 @@ void dmv_k220_device::portc_w(uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER( dmv_k220_device::write_out0 )
+void dmv_k220_device::write_out0(int state)
 {
 	m_pit->write_clk1(state);
 	m_pit->write_clk2(state);
 }
 
 
-WRITE_LINE_MEMBER( dmv_k220_device::write_out1 )
+void dmv_k220_device::write_out1(int state)
 {
 }
 
 
-WRITE_LINE_MEMBER( dmv_k220_device::write_out2 )
+void dmv_k220_device::write_out2(int state)
 {
 }

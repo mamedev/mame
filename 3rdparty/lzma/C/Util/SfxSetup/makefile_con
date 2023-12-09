@@ -1,5 +1,8 @@
 PROG = 7zS2con.sfx
-CFLAGS = $(CFLAGS) -D_CONSOLE
+MY_FIXED = 1
+
+CFLAGS = $(CFLAGS) -D_CONSOLE \
+  -DZ7_EXTRACT_ONLY \
 
 C_OBJS = \
   $O\7zAlloc.obj \

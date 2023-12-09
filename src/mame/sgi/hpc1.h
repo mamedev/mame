@@ -11,129 +11,131 @@
 
 #pragma once
 
-#include "machine/dp8573.h"
-#include "machine/eepromser.h"
-#include "machine/pit8253.h"
-#include "machine/wd33c9x.h"
-#include "machine/z80scc.h"
+#include "machine/edlc.h"
 
-class hpc1_device : public device_t
+class hpc1_device
+	: public device_t
+	, public device_memory_interface
 {
 public:
-	template <typename T, typename U>
-	hpc1_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag, U &&eeprom_tag)
-		: hpc1_device(mconfig, tag, owner, (uint32_t)0)
-	{
-		m_maincpu.set_tag(std::forward<T>(cpu_tag));
-		m_eeprom.set_tag(std::forward<U>(eeprom_tag));
-	}
+	hpc1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	hpc1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T> void set_gio(T &&tag, int spacenum) { m_gio.set_tag(std::forward<T>(tag), spacenum); }
+	template <typename T> void set_enet(T &&tag) { m_enet.set_tag(std::forward<T>(tag)); }
 
-	uint32_t read(offs_t offset, uint32_t mem_mask = ~0);
-	void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	auto int_w() { return m_int_w.bind(); }
+	template <unsigned N> auto dma_r_cb() { return m_dma_r[N].bind(); }
+	template <unsigned N> auto dma_w_cb() { return m_dma_w[N].bind(); }
+	auto eeprom_dati() { return m_eeprom_dati.bind(); }
+	auto eeprom_out() { return m_eeprom_out.bind(); }
+
+	template <unsigned N> void write_drq(int state);
+	void write_int(int state);
+
+	void map(address_map &map);
 
 protected:
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
 
-	DECLARE_WRITE_LINE_MEMBER(scsi_irq);
-	DECLARE_WRITE_LINE_MEMBER(scsi_drq);
+	// device_memory_interface implementation
+	virtual space_config_vector memory_space_config() const override;
 
-	void set_timer_int_clear(uint32_t data);
-	DECLARE_WRITE_LINE_MEMBER(timer0_int);
-	DECLARE_WRITE_LINE_MEMBER(timer1_int);
-	DECLARE_WRITE_LINE_MEMBER(timer2_int);
-	DECLARE_WRITE_LINE_MEMBER(duart0_int_w);
-	DECLARE_WRITE_LINE_MEMBER(duart1_int_w);
-	DECLARE_WRITE_LINE_MEMBER(duart2_int_w);
+	// dma
+	void enet_dma();
+	void scsi_dma();
+	void scsi_chain();
 
-	void duart_int_w(int channel, int status);
-	void raise_local_irq(int channel, uint8_t source_mask);
-	void lower_local_irq(int channel, uint8_t source_mask);
-	void update_irq(int channel);
+	// ethernet read handlers
+	u32 cxbp_r() { return m_enet_cxbp; }
+	u32 nxbdp_r() { return m_enet_nxbdp; }
+	u32 xbc_r() { return m_enet_xbc; }
+	u32 cxbdp_r() { return m_enet_cxbdp; }
+	u32 cpfxbdp_r() { return m_enet_cpfxbdp; }
+	u32 ppfxbdp_r() { return m_enet_ppfxbdp; }
+	u32 intdelay_r() { return m_enet_intdelay; }
+	u32 trstat_r();
+	u32 rcvstat_r();
+	u32 ctl_r() { return m_enet_ctrl; }
+	u32 rbc_r() { return m_enet_rbc; }
+	u32 crbp_r() { return m_enet_crbp; }
+	u32 nrbdp_r() { return m_enet_nrbdp; }
+	u32 crbdp_r() { return m_enet_crbdp; }
 
-	void do_scsi_dma();
+	// ethernet write handlers
+	void cxbp_w(u32 data);
+	void nxbdp_w(u32 data);
+	void xbc_w(u32 data);
+	void cxbdp_w(u32 data);
+	void cpfxbdp_w(u32 data);
+	void ppfxbdp_w(u32 data);
+	void intdelay_w(u32 data);
+	void trstat_w(u32 data);
+	void rcvstat_w(u32 data);
+	void ctl_w(u32 data);
+	void rbc_w(u32 data);
+	void crbp_w(u32 data);
+	void nrbdp_w(u32 data);
+	void crbdp_w(u32 data);
 
-	void dump_chain(uint32_t base);
-	void fetch_chain();
-	void decrement_chain();
+	// scsi read handlers
+	u32 scsi_bc_r() { return m_scsi_bc; }
+	u32 scsi_cbp_r() { return m_scsi_cbp; }
+	u32 scsi_nbdp_r() { return m_scsi_nbdp; }
+	u32 scsi_ctrl_r() { return m_scsi_ctrl; }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_device<wd33c93_device> m_wd33c93;
-	required_device_array<scc85c30_device, 3> m_scc;
-	required_device<pit8254_device> m_pit;
-	required_device<dp8573_device> m_rtc;
+	// scsi write handlers
+	void scsi_bc_w(u32 data) { m_scsi_bc = data & 0x1fffU; }
+	void scsi_cbp_w(u32 data) { m_scsi_cbp = data & 0x8fff'ffffU; }
+	void scsi_nbdp_w(u32 data);
+	void scsi_ctrl_w(u32 data);
 
-	enum
-	{
-		LOCAL0_FIFO_GIO0    = 0x01,
-		LOCAL0_PARALLEL     = 0x02,
-		LOCAL0_SCSI         = 0x04,
-		LOCAL0_ETHERNET     = 0x08,
-		LOCAL0_GFX_DMA      = 0x10,
-		LOCAL0_DUART        = 0x20,
-		LOCAL0_GIO1         = 0x40,
-		LOCAL0_VME0         = 0x80,
+	u16 dsp_bc_r() { return m_dsp_bc; }
+	void dsp_bc_w(u16 data) { m_dsp_bc = data; }
 
-		LOCAL1_GR1_CASE     = 0x02,
-		LOCAL1_VME1         = 0x08,
-		LOCAL1_DSP          = 0x10,
-		LOCAL1_ACFAIL       = 0x20,
-		LOCAL1_VIDEO        = 0x40,
-		LOCAL1_RETRACE_GIO2 = 0x80
-	};
+	u8 aux_r();
+	void aux_w(u8 data);
 
-	enum
-	{
-		HPC_DMACTRL_RESET   = 0x01,
-		HPC_DMACTRL_FLUSH   = 0x02,
-		HPC_DMACTRL_TO_MEM  = 0x10,
-		HPC_DMACTRL_ENABLE  = 0x80
-	};
+	void pbus_map(address_map &map);
 
-	struct scsi_dma_t
-	{
-		uint32_t m_desc = 0;
-		uint32_t m_addr = 0;
-		uint32_t m_ctrl = 0;
-		uint32_t m_length = 0;
-		uint32_t m_next = 0;
-		bool m_irq = false;
-		bool m_drq = false;
-		bool m_to_mem = false;
-		bool m_active = false;
-	};
+private:
+	address_space_config const m_pbus;
+	required_address_space m_gio;
 
-	static void cdrom_config(device_t *device);
-	static void scsi_devices(device_slot_interface &device);
-	static void indigo_mice(device_slot_interface &device);
-	void wd33c93(device_t *device);
+	optional_device<seeq8003_device> m_enet;
 
-	uint8_t m_misc_status = 0;
-	uint32_t m_cpu_aux_ctrl = 0;
-	uint32_t m_parbuf_ptr = 0;
-	uint32_t m_local_int_status[2]{};
-	uint32_t m_local_int_mask[2]{};
-	bool m_int_status[2]{};
-	uint32_t m_vme_int_mask[2]{};
+	devcb_write_line m_int_w;
+	devcb_read_line m_eeprom_dati;
+	devcb_read8::array<2> m_dma_r;
+	devcb_write8::array<2> m_dma_w;
+	devcb_write8 m_eeprom_out;
 
-	scsi_dma_t m_scsi_dma;
+	u8 m_drq;
 
-	uint8_t m_duart_int_status = 0;
+	u32 m_enet_cxbp;     // enet current transmit buffer pointer
+	u32 m_enet_nxbdp;    // enet current transmit buffer descriptor pointer
+	u32 m_enet_xbc;      // enet transmit byte count
+	u32 m_enet_cxbdp;    // enet current transmit buffer descriptor pointer
+	u32 m_enet_cpfxbdp;  // enet current packet first transmit buffer descriptor pointer
+	u32 m_enet_ppfxbdp;  // enet previous packet first transmit buffer descriptor pointer
+	u32 m_enet_intdelay; // enet interrupt delay count
+	u32 m_enet_txs;      // enet transmit status
+	u32 m_enet_rxs;      // enet receive status
+	u32 m_enet_ctrl;     // enet interrupt, channel reset, buffer overflow
+	u32 m_enet_rbc;      // enet receive byte count
+	u32 m_enet_crbp;     // enet current receive buffer pointer
+	u32 m_enet_nrbdp;    // enet next receive buffer desriptor pointer
+	u32 m_enet_crbdp;    // enet current receive buffer descriptor pointer
 
-	address_space *m_cpu_space = nullptr;
+	u32 m_scsi_bc;       // scsi byte count
+	u32 m_scsi_cbp;      // scsi current buffer pointer
+	u32 m_scsi_nbdp;     // scsi next buffer descriptor pointer
+	u32 m_scsi_ctrl;     // scsi control
 
-	static char const *const RS232A_TAG;
-	static char const *const RS232B_TAG;
+	u16 m_dsp_bc;
 
-	static const XTAL SCC_PCLK;
-	static const XTAL SCC_RXA_CLK;
-	static const XTAL SCC_TXA_CLK;
-	static const XTAL SCC_RXB_CLK;
-	static const XTAL SCC_TXB_CLK;
+	u8 m_aux;
 };
 
 DECLARE_DEVICE_TYPE(SGI_HPC1, hpc1_device)

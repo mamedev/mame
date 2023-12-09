@@ -76,6 +76,11 @@ Notes:
 #include "screen.h"
 #include "speaker.h"
 
+#define LOG_BLITTER (1U << 1)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
 
 namespace {
 
@@ -102,7 +107,7 @@ public:
 	{
 	}
 
-	DECLARE_READ_LINE_MEMBER(igs_hopper_r);
+	int igs_hopper_r();
 
 	void init_lhbv33c();
 	void init_drgnwrldv21j();
@@ -260,13 +265,13 @@ private:
 	void vbowl_link_2_w(u16 data);
 	void vbowl_link_3_w(u16 data);
 	void lhb_okibank_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(sound_irq);
+	void sound_irq(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(lev5_timer_irq_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(lhb_timer_irq_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(lev3_timer_irq_cb);
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_vbowl);
+	void screen_vblank_vbowl(int state);
 	INTERRUPT_GEN_MEMBER(lhb_vblank_irq);
 	void wlcc_decrypt();
 	void lhb_decrypt();
@@ -296,8 +301,6 @@ private:
 	void xymg_mem(address_map &map);
 };
 
-
-#define LOG_BLITTER 0
 
 /***************************************************************************
 
@@ -522,10 +525,8 @@ void igs011_state::igs011_blit_flags_w(offs_t offset, u16 data, u16 mem_mask)
 
 	COMBINE_DATA(&blitter.flags);
 
-#if LOG_BLITTER
-	logerror("%06x: blit x %03x, y %03x, w %03x, h %03x, gfx %03x%04x, depth %02x, pen %02x, flags %03x\n", m_maincpu->pc(),
-					blitter.x,blitter.y,blitter.w,blitter.h,blitter.gfx_hi,blitter.gfx_lo,blitter.depth,blitter.pen,blitter.flags);
-#endif
+	LOGMASKED(LOG_BLITTER, "%06x: blit x %03x, y %03x, w %03x, h %03x, gfx %03x%04x, depth %02x, pen %02x, flags %03x\n", m_maincpu->pc(),
+		blitter.x,blitter.y,blitter.w,blitter.h,blitter.gfx_hi,blitter.gfx_lo,blitter.depth,blitter.pen,blitter.flags);
 
 	u8 *dest     = m_layer[blitter.flags & 0x0007].get();
 	const bool opaque =  !(blitter.flags & 0x0008);
@@ -646,7 +647,7 @@ void igs011_state::machine_start()
 // Inputs
 
 
-READ_LINE_MEMBER(igs011_state::igs_hopper_r)
+int igs011_state::igs_hopper_r()
 {
 	return (m_igs_hopper && ((m_screen->frame_number()/5)&1)) ? 0x0000 : 0x0001;
 }
@@ -2825,7 +2826,7 @@ u16 igs011_state::vbowl_unk_r()
 	return 0xffff;
 }
 
-WRITE_LINE_MEMBER(igs011_state::screen_vblank_vbowl)
+void igs011_state::screen_vblank_vbowl(int state)
 {
 	// rising edge
 	if (state)
@@ -4175,7 +4176,7 @@ void igs011_state::nkishusp(machine_config &config)
 }
 
 
-WRITE_LINE_MEMBER(igs011_state::sound_irq)
+void igs011_state::sound_irq(int state)
 {
 //   m_maincpu->set_input_line(3, state);
 }
@@ -4329,7 +4330,7 @@ ROM_END
 
 /***************************************************************************
 
-Chuugokuryuu (china dragon jpn ver.)
+中國龍/Chuugokuryuu (china dragon jpn ver.)
 (c)IGS
 Distributed by ALTA
 
@@ -4654,7 +4655,7 @@ ROM_END
 
 /***************************************************************************
 
-Mahjong Ryukobou
+龍虎榜/Mahjong Ryukobou
 Alta, 1995
 
 PCB Layout
@@ -4924,8 +4925,8 @@ GAME( 1997, drgnwrld,      0,        drgnwrld,        drgnwrld,  igs011_state, i
 GAME( 1995, drgnwrldv40k,  drgnwrld, drgnwrld_igs012, drgnwrldc, igs011_state, init_drgnwrldv40k, ROT0, "IGS",                     "Dragon World (Korea, V040K)",                 MACHINE_SUPPORTS_SAVE )
 GAME( 1995, drgnwrldv30,   drgnwrld, drgnwrld,        drgnwrld,  igs011_state, init_drgnwrldv30,  ROT0, "IGS",                     "Dragon World (World, V030O)",                 MACHINE_SUPPORTS_SAVE )
 GAME( 1995, drgnwrldv21,   drgnwrld, drgnwrld_igs012, drgnwrld,  igs011_state, init_drgnwrldv21,  ROT0, "IGS",                     "Dragon World (World, V021O)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv21j,  drgnwrld, drgnwrld_igs012, drgnwrldj, igs011_state, init_drgnwrldv21j, ROT0, "IGS / Alta",              "Zhongguo Long (Japan, V021J)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv20j,  drgnwrld, drgnwrld_igs012, drgnwrldj, igs011_state, init_drgnwrldv20j, ROT0, "IGS / Alta",              "Zhongguo Long (Japan, V020J)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv21j,  drgnwrld, drgnwrld_igs012, drgnwrldj, igs011_state, init_drgnwrldv21j, ROT0, "IGS / Alta",              "Chuugokuryuu (Japan, V021J)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv20j,  drgnwrld, drgnwrld_igs012, drgnwrldj, igs011_state, init_drgnwrldv20j, ROT0, "IGS / Alta",              "Chuugokuryuu (Japan, V020J)",                 MACHINE_SUPPORTS_SAVE )
 GAME( 1995, drgnwrldv11h,  drgnwrld, drgnwrld,        drgnwrldc, igs011_state, init_drgnwrldv11h, ROT0, "IGS",                     "Dung Fong Zi Zyu (Hong Kong, V011H, set 1)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1995, drgnwrldv11ha, drgnwrld, drgnwrld_igs012, drgnwrldc, igs011_state, init_drgnwrldv40k, ROT0, "IGS",                     "Dung Fong Zi Zyu (Hong Kong, V011H, set 2)",  MACHINE_SUPPORTS_SAVE ) // different encryption and with IGS012
 GAME( 1995, drgnwrldv10c,  drgnwrld, drgnwrld,        drgnwrldc, igs011_state, init_drgnwrldv10c, ROT0, "IGS",                     "Zhongguo Long (China, V010C)",                MACHINE_SUPPORTS_SAVE )

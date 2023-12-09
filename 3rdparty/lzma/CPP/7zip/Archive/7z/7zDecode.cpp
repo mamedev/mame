@@ -5,25 +5,23 @@
 #include "../../Common/LimitedStreams.h"
 #include "../../Common/ProgressUtils.h"
 #include "../../Common/StreamObjects.h"
+#include "../../Common/StreamUtils.h"
 
 #include "7zDecode.h"
 
 namespace NArchive {
 namespace N7z {
 
-class CDecProgress:
-  public ICompressProgressInfo,
-  public CMyUnknownImp
-{
+Z7_CLASS_IMP_COM_1(
+  CDecProgress
+  , ICompressProgressInfo
+)
   CMyComPtr<ICompressProgressInfo> _progress;
 public:
   CDecProgress(ICompressProgressInfo *progress): _progress(progress) {}
-  
-  MY_UNKNOWN_IMP1(ICompressProgressInfo)
-  STDMETHOD(SetRatioInfo)(const UInt64 *inSize, const UInt64 *outSize);
 };
 
-STDMETHODIMP CDecProgress::SetRatioInfo(const UInt64 * /* inSize */, const UInt64 *outSize)
+Z7_COM7F_IMF(CDecProgress::SetRatioInfo(const UInt64 * /* inSize */, const UInt64 *outSize))
 {
   return _progress->SetRatioInfo(NULL, outSize);
 }
@@ -110,19 +108,22 @@ static bool AreBindInfoExEqual(const CBindInfoEx &a1, const CBindInfoEx &a2)
 }
 
 CDecoder::CDecoder(bool useMixerMT):
-    _bindInfoPrev_Defined(false),
-    _useMixerMT(useMixerMT)
-{}
-
-
-struct CLockedInStream:
-  public IUnknown,
-  public CMyUnknownImp
+    _bindInfoPrev_Defined(false)
 {
+  #if defined(USE_MIXER_ST) && defined(USE_MIXER_MT)
+  _useMixerMT = useMixerMT;
+  #else
+  UNUSED_VAR(useMixerMT)
+  #endif
+}
+
+
+Z7_CLASS_IMP_COM_0(
+  CLockedInStream
+)
+public:
   CMyComPtr<IInStream> Stream;
   UInt64 Pos;
-
-  MY_UNKNOWN_IMP
 
   #ifdef USE_MIXER_MT
   NWindows::NSynchronization::CCriticalSection CriticalSection;
@@ -132,10 +133,10 @@ struct CLockedInStream:
 
 #ifdef USE_MIXER_MT
 
-class CLockedSequentialInStreamMT:
-  public ISequentialInStream,
-  public CMyUnknownImp
-{
+Z7_CLASS_IMP_COM_1(
+  CLockedSequentialInStreamMT
+  , ISequentialInStream
+)
   CLockedInStream *_glob;
   UInt64 _pos;
   CMyComPtr<IUnknown> _globRef;
@@ -146,24 +147,20 @@ public:
     _glob = lockedInStream;
     _pos = startPos;
   }
-
-  MY_UNKNOWN_IMP1(ISequentialInStream)
-
-  STDMETHOD(Read)(void *data, UInt32 size, UInt32 *processedSize);
 };
 
-STDMETHODIMP CLockedSequentialInStreamMT::Read(void *data, UInt32 size, UInt32 *processedSize)
+Z7_COM7F_IMF(CLockedSequentialInStreamMT::Read(void *data, UInt32 size, UInt32 *processedSize))
 {
   NWindows::NSynchronization::CCriticalSectionLock lock(_glob->CriticalSection);
 
   if (_pos != _glob->Pos)
   {
-    RINOK(_glob->Stream->Seek(_pos, STREAM_SEEK_SET, NULL));
+    RINOK(InStream_SeekSet(_glob->Stream, _pos))
     _glob->Pos = _pos;
   }
 
   UInt32 realProcessedSize = 0;
-  HRESULT res = _glob->Stream->Read(data, size, &realProcessedSize);
+  const HRESULT res = _glob->Stream->Read(data, size, &realProcessedSize);
   _pos += realProcessedSize;
   _glob->Pos = _pos;
   if (processedSize)
@@ -176,10 +173,10 @@ STDMETHODIMP CLockedSequentialInStreamMT::Read(void *data, UInt32 size, UInt32 *
 
 #ifdef USE_MIXER_ST
 
-class CLockedSequentialInStreamST:
-  public ISequentialInStream,
-  public CMyUnknownImp
-{
+Z7_CLASS_IMP_COM_1(
+  CLockedSequentialInStreamST
+  , ISequentialInStream
+)
   CLockedInStream *_glob;
   UInt64 _pos;
   CMyComPtr<IUnknown> _globRef;
@@ -190,22 +187,18 @@ public:
     _glob = lockedInStream;
     _pos = startPos;
   }
-
-  MY_UNKNOWN_IMP1(ISequentialInStream)
-
-  STDMETHOD(Read)(void *data, UInt32 size, UInt32 *processedSize);
 };
 
-STDMETHODIMP CLockedSequentialInStreamST::Read(void *data, UInt32 size, UInt32 *processedSize)
+Z7_COM7F_IMF(CLockedSequentialInStreamST::Read(void *data, UInt32 size, UInt32 *processedSize))
 {
   if (_pos != _glob->Pos)
   {
-    RINOK(_glob->Stream->Seek(_pos, STREAM_SEEK_SET, NULL));
+    RINOK(InStream_SeekSet(_glob->Stream, _pos))
     _glob->Pos = _pos;
   }
 
   UInt32 realProcessedSize = 0;
-  HRESULT res = _glob->Stream->Read(data, size, &realProcessedSize);
+  const HRESULT res = _glob->Stream->Read(data, size, &realProcessedSize);
   _pos += realProcessedSize;
   _glob->Pos = _pos;
   if (processedSize)
@@ -226,19 +219,23 @@ HRESULT CDecoder::Decode(
 
     , ISequentialOutStream *outStream
     , ICompressProgressInfo *compressProgress
-    , ISequentialInStream **
-
-    #ifdef USE_MIXER_ST
-    inStreamMainRes
-    #endif
     
-    _7Z_DECODER_CRYPRO_VARS_DECL
+    , ISequentialInStream **
+        #ifdef USE_MIXER_ST
+        inStreamMainRes
+        #endif
 
-    #if !defined(_7ZIP_ST) && !defined(_SFX)
-    , bool mtMode, UInt32 numThreads
+    , bool &dataAfterEnd_Error
+    
+    Z7_7Z_DECODER_CRYPRO_VARS_DECL
+
+    #if !defined(Z7_ST)
+    , bool mtMode, UInt32 numThreads, UInt64 memUsage
     #endif
     )
 {
+  dataAfterEnd_Error = false;
+
   const UInt64 *packPositions = &folders.PackPositions[folders.FoStartPackStreamIndex[folderIndex]];
   CFolderEx folderInfo;
   folders.ParseFolderEx(folderIndex, folderInfo);
@@ -264,7 +261,7 @@ HRESULT CDecoder::Decode(
   We don't need to init isEncrypted and passwordIsDefined
   We must upgrade them only
   
-  #ifndef _NO_CRYPTO
+  #ifndef Z7_NO_CRYPTO
   isEncrypted = false;
   passwordIsDefined = false;
   #endif
@@ -272,6 +269,7 @@ HRESULT CDecoder::Decode(
   
   if (!_bindInfoPrev_Defined || !AreBindInfoExEqual(bindInfo, _bindInfoPrev))
   {
+    _bindInfoPrev_Defined = false;
     _mixerRef.Release();
 
     #ifdef USE_MIXER_MT
@@ -295,22 +293,22 @@ HRESULT CDecoder::Decode(
       #endif
     }
     
-    RINOK(_mixer->SetBindInfo(bindInfo));
+    RINOK(_mixer->SetBindInfo(bindInfo))
     
     FOR_VECTOR(i, folderInfo.Coders)
     {
       const CCoderInfo &coderInfo = folderInfo.Coders[i];
 
-      #ifndef _SFX
+      #ifndef Z7_SFX
       // we don't support RAR codecs here
       if ((coderInfo.MethodID >> 8) == 0x403)
         return E_NOTIMPL;
       #endif
   
       CCreatedCoder cod;
-      RINOK(CreateCoder(
+      RINOK(CreateCoder_Id(
           EXTERNAL_CODECS_LOC_VARS
-          coderInfo.MethodID, false, cod));
+          coderInfo.MethodID, false, cod))
     
       if (coderInfo.IsSimpleCoder())
       {
@@ -328,13 +326,13 @@ HRESULT CDecoder::Decode(
       
       // now there is no codec that uses another external codec
       /*
-      #ifdef EXTERNAL_CODECS
+      #ifdef Z7_EXTERNAL_CODECS
       CMyComPtr<ISetCompressCodecsInfo> setCompressCodecsInfo;
       decoderUnknown.QueryInterface(IID_ISetCompressCodecsInfo, (void **)&setCompressCodecsInfo);
       if (setCompressCodecsInfo)
       {
         // we must use g_ExternalCodecs also
-        RINOK(setCompressCodecsInfo->SetCompressCodecsInfo(__externalCodecs->GetCodecs));
+        RINOK(setCompressCodecsInfo->SetCompressCodecsInfo(_externalCodecs->GetCodecs));
       }
       #endif
       */
@@ -344,83 +342,126 @@ HRESULT CDecoder::Decode(
     _bindInfoPrev_Defined = true;
   }
 
-  _mixer->ReInit();
+  RINOK(_mixer->ReInit2())
   
   UInt32 packStreamIndex = 0;
   UInt32 unpackStreamIndexStart = folders.FoToCoderUnpackSizes[folderIndex];
 
   unsigned i;
 
+  #if !defined(Z7_ST)
+  bool mt_wasUsed = false;
+  #endif
+
   for (i = 0; i < folderInfo.Coders.Size(); i++)
   {
     const CCoderInfo &coderInfo = folderInfo.Coders[i];
     IUnknown *decoder = _mixer->GetCoder(i).GetUnknown();
 
+    // now there is no codec that uses another external codec
+    /*
+    #ifdef Z7_EXTERNAL_CODECS
     {
-      CMyComPtr<ICompressSetDecoderProperties2> setDecoderProperties;
-      decoder->QueryInterface(IID_ICompressSetDecoderProperties2, (void **)&setDecoderProperties);
-      if (setDecoderProperties)
+      Z7_DECL_CMyComPtr_QI_FROM(ISetCompressCodecsInfo,
+          setCompressCodecsInfo, decoder)
+      if (setCompressCodecsInfo)
       {
-        const CByteBuffer &props = coderInfo.Props;
-        size_t size = props.Size();
-        if (size > 0xFFFFFFFF)
-          return E_NOTIMPL;
-        HRESULT res = setDecoderProperties->SetDecoderProperties2((const Byte *)props, (UInt32)size);
-        if (res == E_INVALIDARG)
-          res = E_NOTIMPL;
-        RINOK(res);
+        // we must use g_ExternalCodecs also
+        RINOK(setCompressCodecsInfo->SetCompressCodecsInfo(_externalCodecs->GetCodecs))
       }
     }
+    #endif
+    */
 
-    #if !defined(_7ZIP_ST) && !defined(_SFX)
-    if (mtMode)
+    #if !defined(Z7_ST)
+    if (!mt_wasUsed)
     {
-      CMyComPtr<ICompressSetCoderMt> setCoderMt;
-      decoder->QueryInterface(IID_ICompressSetCoderMt, (void **)&setCoderMt);
-      if (setCoderMt)
+      if (mtMode)
       {
-        RINOK(setCoderMt->SetNumberOfThreads(numThreads));
+        Z7_DECL_CMyComPtr_QI_FROM(ICompressSetCoderMt,
+            setCoderMt, decoder)
+        if (setCoderMt)
+        {
+          mt_wasUsed = true;
+          RINOK(setCoderMt->SetNumberOfThreads(numThreads))
+        }
+      }
+      // if (memUsage != 0)
+      {
+        Z7_DECL_CMyComPtr_QI_FROM(ICompressSetMemLimit,
+            setMemLimit, decoder)
+        if (setMemLimit)
+        {
+          mt_wasUsed = true;
+          RINOK(setMemLimit->SetMemLimit(memUsage))
+        }
       }
     }
     #endif
 
-    #ifndef _NO_CRYPTO
     {
-      CMyComPtr<ICryptoSetPassword> cryptoSetPassword;
-      decoder->QueryInterface(IID_ICryptoSetPassword, (void **)&cryptoSetPassword);
+      Z7_DECL_CMyComPtr_QI_FROM(
+          ICompressSetDecoderProperties2,
+          setDecoderProperties, decoder)
+      const CByteBuffer &props = coderInfo.Props;
+      const UInt32 size32 = (UInt32)props.Size();
+      if (props.Size() != size32)
+        return E_NOTIMPL;
+      if (setDecoderProperties)
+      {
+        HRESULT res = setDecoderProperties->SetDecoderProperties2((const Byte *)props, size32);
+        if (res == E_INVALIDARG)
+          res = E_NOTIMPL;
+        RINOK(res)
+      }
+      else if (size32 != 0)
+      {
+        // v23: we fail, if decoder doesn't support properties
+        return E_NOTIMPL;
+      }
+    }
+
+    #ifndef Z7_NO_CRYPTO
+    {
+      Z7_DECL_CMyComPtr_QI_FROM(
+          ICryptoSetPassword,
+          cryptoSetPassword, decoder)
       if (cryptoSetPassword)
       {
         isEncrypted = true;
         if (!getTextPassword)
           return E_NOTIMPL;
-        CMyComBSTR passwordBSTR;
-        RINOK(getTextPassword->CryptoGetTextPassword(&passwordBSTR));
+        CMyComBSTR_Wipe passwordBSTR;
+        RINOK(getTextPassword->CryptoGetTextPassword(&passwordBSTR))
         passwordIsDefined = true;
-        password.Empty();
+        password.Wipe_and_Empty();
         size_t len = 0;
         if (passwordBSTR)
         {
           password = passwordBSTR;
           len = password.Len();
         }
-        CByteBuffer buffer(len * 2);
+        CByteBuffer_Wipe buffer(len * 2);
         for (size_t k = 0; k < len; k++)
         {
-          wchar_t c = passwordBSTR[k];
+          const wchar_t c = passwordBSTR[k];
           ((Byte *)buffer)[k * 2] = (Byte)c;
           ((Byte *)buffer)[k * 2 + 1] = (Byte)(c >> 8);
         }
-        RINOK(cryptoSetPassword->CryptoSetPassword((const Byte *)buffer, (UInt32)buffer.Size()));
+        RINOK(cryptoSetPassword->CryptoSetPassword((const Byte *)buffer, (UInt32)buffer.Size()))
       }
     }
     #endif
 
+    bool finishMode = false;
     {
-      CMyComPtr<ICompressSetFinishMode> setFinishMode;
-      decoder->QueryInterface(IID_ICompressSetFinishMode, (void **)&setFinishMode);
+      Z7_DECL_CMyComPtr_QI_FROM(
+          ICompressSetFinishMode,
+          setFinishMode, decoder)
       if (setFinishMode)
       {
-        RINOK(setFinishMode->SetFinishMode(BoolToInt(fullUnpack)));
+        finishMode = fullUnpack;
+        RINOK(setFinishMode->SetFinishMode(BoolToUInt(finishMode)))
       }
     }
     
@@ -450,7 +491,7 @@ HRESULT CDecoder::Decode(
             unpackSize :
             &folders.CoderUnpackSizes[unpackStreamIndexStart + i];
     
-    _mixer->SetCoderInfo(i, unpackSizesPointer, packSizesPointers);
+    _mixer->SetCoderInfo(i, unpackSizesPointer, packSizesPointers, finishMode);
   }
 
   if (outStream)
@@ -463,36 +504,49 @@ HRESULT CDecoder::Decode(
   CLockedInStream *lockedInStreamSpec = new CLockedInStream;
   CMyComPtr<IUnknown> lockedInStream = lockedInStreamSpec;
 
-  bool needMtLock = false;
+  #ifdef USE_MIXER_MT
+  #ifdef USE_MIXER_ST
+  bool needMtLock = _useMixerMT;
+  #endif
+  #endif
 
   if (folderInfo.PackStreams.Size() > 1)
   {
     // lockedInStream.Pos = (UInt64)(Int64)-1;
-    // RINOK(inStream->Seek(0, STREAM_SEEK_CUR, &lockedInStream.Pos));
-    RINOK(inStream->Seek(startPos + packPositions[0], STREAM_SEEK_SET, &lockedInStreamSpec->Pos));
+    // RINOK(InStream_GetPos(inStream, lockedInStream.Pos))
+    RINOK(inStream->Seek((Int64)(startPos + packPositions[0]), STREAM_SEEK_SET, &lockedInStreamSpec->Pos))
     lockedInStreamSpec->Stream = inStream;
 
+    #ifdef USE_MIXER_MT
     #ifdef USE_MIXER_ST
-    if (_mixer->IsThere_ExternalCoder_in_PackTree(_mixer->MainCoderIndex))
-    #endif
+    /*
+      For ST-mixer mode:
+      If parallel input stream reading from pack streams is possible,
+      we must use MT-lock for packed streams.
+      Internal decoders in 7-Zip will not read pack streams in parallel in ST-mixer mode.
+      So we force to needMtLock mode only if there is unknown (external) decoder.
+    */
+    if (!needMtLock && _mixer->IsThere_ExternalCoder_in_PackTree(_mixer->MainCoderIndex))
       needMtLock = true;
+    #endif
+    #endif
   }
 
   for (unsigned j = 0; j < folderInfo.PackStreams.Size(); j++)
   {
     CMyComPtr<ISequentialInStream> packStream;
-    UInt64 packPos = startPos + packPositions[j];
+    const UInt64 packPos = startPos + packPositions[j];
 
     if (folderInfo.PackStreams.Size() == 1)
     {
-      RINOK(inStream->Seek(packPos, STREAM_SEEK_SET, NULL));
+      RINOK(InStream_SeekSet(inStream, packPos))
       packStream = inStream;
     }
     else
     {
       #ifdef USE_MIXER_MT
       #ifdef USE_MIXER_ST
-      if (_useMixerMT || needMtLock)
+      if (needMtLock)
       #endif
       {
         CLockedSequentialInStreamMT *lockedStreamImpSpec = new CLockedSequentialInStreamMT;
@@ -518,7 +572,7 @@ HRESULT CDecoder::Decode(
     streamSpec->Init(packPositions[j + 1] - packPositions[j]);
   }
   
-  unsigned num = inStreams.Size();
+  const unsigned num = inStreams.Size();
   CObjArray<ISequentialInStream *> inStreamPointers(num);
   for (i = 0; i < num; i++)
     inStreamPointers[i] = inStreams[i];
@@ -530,7 +584,9 @@ HRESULT CDecoder::Decode(
       progress2 = new CDecProgress(compressProgress);
 
     ISequentialOutStream *outStreamPointer = outStream;
-    return _mixer->Code(inStreamPointers, &outStreamPointer, progress2 ? (ICompressProgressInfo *)progress2 : compressProgress);
+    return _mixer->Code(inStreamPointers, &outStreamPointer,
+        progress2 ? (ICompressProgressInfo *)progress2 : compressProgress,
+        dataAfterEnd_Error);
   }
   
   #ifdef USE_MIXER_ST

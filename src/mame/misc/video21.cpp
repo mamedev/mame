@@ -48,30 +48,31 @@ public:
 	{ }
 
 	void video21(machine_config &config);
-	DECLARE_READ_LINE_MEMBER(hopper_coinout_r);
+	int hopper_coinout_r();
 
 protected:
 	virtual void machine_start() override;
 
 private:
-	void sound_w(uint8_t data);
-	void lamp1_w(uint8_t data);
-	void lamp2_w(uint8_t data);
-
-	int m_hopper_motor = 0;
-	int m_hopper_coin = 0;
-	emu_timer *m_hopper_timer = nullptr;
-	TIMER_CALLBACK_MEMBER(hopper_coinout);
-
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
-
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<u8> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<beep_device> m_beeper;
 	output_finder<6> m_lamps;
+
+	int m_hopper_motor = 0;
+	int m_hopper_coin = 0;
+	emu_timer *m_hopper_timer = nullptr;
+
+	void mem_map(address_map &map);
+	void io_map(address_map &map);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void sound_w(uint8_t data);
+	void lamp1_w(uint8_t data);
+	void lamp2_w(uint8_t data);
+
+	TIMER_CALLBACK_MEMBER(hopper_coinout);
 };
 
 
@@ -168,7 +169,7 @@ void video21_state::io_map(address_map &map) {
 }
 
 
-READ_LINE_MEMBER(video21_state::hopper_coinout_r)
+int video21_state::hopper_coinout_r()
 {
 	return m_hopper_coin;
 }

@@ -5,6 +5,13 @@
 
     Skeleton driver for Yamaha YMW728-F (GEW12) keyboards
 
+    TODO:
+    - according to schematics, CPU XTAL is 14MHz, but that makes it run too fast.
+      When comparing boot-up scroll speed to a video, it should be around 8MHz,
+      7MHz (14/2) is too slow.
+      Increasing tick_rate in gew12.cpp will improve scroll speed, but it won't fix
+      graphics glitches due to writing to LCD before the busy flag is cleared.
+
 */
 
 #include "emu.h"
@@ -39,7 +46,7 @@ private:
 	void palette_init(palette_device& palette);
 
 	required_device<gew12_device> m_maincpu;
-	optional_device<hd44780_device> m_lcdc;
+	required_device<ks0066_device> m_lcdc;
 
 	optional_ioport_array<11> m_keys;
 	optional_ioport_array<6> m_buttons;
@@ -76,17 +83,15 @@ void psr260_state::palette_init(palette_device& palette)
 
 void psr260_state::psr260(machine_config &config)
 {
-	GEW12(config, m_maincpu, 14'000'000);
+	GEW12(config, m_maincpu, 8'000'000); // see TODO
 	m_maincpu->port_out_cb<5>().set(FUNC(psr260_state::lcd_w));
 
 	// TODO: MIDI in/out
 
 	// LCD
-	HD44780(config, m_lcdc, 0);
+	KS0066(config, m_lcdc, 270'000); // OSC = 91K resistor, TODO: actually KS0066U-10B
 	m_lcdc->set_lcd_size(2, 8);
 	m_lcdc->set_pixel_update_cb(FUNC(psr260_state::lcd_update));
-	// code never checks the busy flag, it just delays for a fixed amount and assumes it's ready
-	m_lcdc->set_busy_factor(0.5f);
 
 	// screen (for testing only)
 	// TODO: the actual LCD with custom segments

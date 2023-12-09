@@ -44,13 +44,13 @@ Memo:
 
 void niyanpai_state::init_niyanpai()
 {
-	//uint8_t *SNDROM = memregion(":nichisnd:audiorom")->base();
+	//uint8_t *SNDROM = memregion("nichisnd:audiorom")->base();
 
 	// sound program patch
 	//SNDROM[0x0213] = 0x00;          // DI -> NOP
 
 	// initialize sound rom bank
-	//membank("soundbank")->configure_entries(0, 3, memregion(":nichisnd:audiorom")->base() + 0x8000, 0x8000);
+	//membank("soundbank")->configure_entries(0, 3, memregion("nichisnd:audiorom")->base() + 0x8000, 0x8000);
 	//membank("soundbank")->set_entry(0);
 
 	// initialize out coin flag (musobana)
@@ -107,7 +107,7 @@ void niyanpai_state::tmp68301_parallel_port_w(uint16_t data)
 	machine().bookkeeping().coin_lockout_w(0,data & 0x08);
 }
 
-READ_LINE_MEMBER(niyanpai_state::musobana_outcoin_flag_r)
+int niyanpai_state::musobana_outcoin_flag_r()
 {
 	if (m_motor_on) m_musobana_outcoin_flag ^= 1;
 	else m_musobana_outcoin_flag = 1;
@@ -731,7 +731,7 @@ ROM_START( niyanpai )
 	ROM_LOAD16_BYTE( "npai_01.bin", 0x00000, 0x20000, CRC(a904e8a1) SHA1(77865d7b48cac96af1e3cac4a702f7de4b5ee82b) )
 	ROM_LOAD16_BYTE( "npai_02.bin", 0x00001, 0x20000, CRC(244f9d6f) SHA1(afde18f32c4879a66c0707671d783c21c54cffa4) )
 
-	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) /* TMPZ84C011 sound program */
+	ROM_REGION( 0x20000, "nichisnd:audiorom", 0 ) /* TMPZ84C011 sound program */
 	ROM_LOAD( "npai_03.bin", 0x000000, 0x20000, CRC(d154306b) SHA1(3375568a6d387d850b8996b8bad3d0220de13993) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* gfx */
@@ -750,7 +750,7 @@ ROM_START( musobana )
 	ROM_LOAD16_BYTE( "1.209", 0x00000, 0x20000, CRC(574929a1) SHA1(70ea96c3aa8a3512176b719de0928470541d85cb) )
 	ROM_LOAD16_BYTE( "2.208", 0x00001, 0x20000, CRC(12734fda) SHA1(46241efe4266ad6426eb31db757ae4852c70c25d) )
 
-	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) /* TMPZ84C011 sound program */
+	ROM_REGION( 0x20000, "nichisnd:audiorom", 0 ) /* TMPZ84C011 sound program */
 	ROM_LOAD( "3.804",  0x000000, 0x20000, CRC(0be8f2ce) SHA1(c1ee8907c03f615fbc42654a3c37387714761560) )
 
 	ROM_REGION( 0x500000, "gfx1", 0 ) /* gfx */
@@ -771,7 +771,7 @@ ROM_START( 4psimasy )
 	ROM_LOAD16_BYTE( "1.209", 0x00000, 0x20000, CRC(28dda353) SHA1(3d4738189a7b8b8b0434b3e58550572c3ce74b42) )
 	ROM_LOAD16_BYTE( "2.208", 0x00001, 0x20000, CRC(3679c9fb) SHA1(74a940c3c95723680a63a281f194ef4bbe3dc58a) )
 
-	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) /* TMPZ84C011 sound program */
+	ROM_REGION( 0x20000, "nichisnd:audiorom", 0 ) /* TMPZ84C011 sound program */
 	ROM_LOAD( "3.804",  0x000000, 0x20000, CRC(bd644726) SHA1(1f8e12a081657d6e1dd9c896056d1ffd977dfe95) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* gfx */
@@ -790,7 +790,7 @@ ROM_START( mhhonban )
 	ROM_LOAD16_BYTE( "u209.bin", 0x00000, 0x20000, CRC(121c861f) SHA1(70a6b695998904dccb8791ea5d9acbf7484bd812) )
 	ROM_LOAD16_BYTE( "u208.bin", 0x00001, 0x20000, CRC(d6712d0b) SHA1(a384c8f508ec6885bccb989d150cfd7f36a6898d) )
 
-	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) /* TMPZ84C011 sound program */
+	ROM_REGION( 0x20000, "nichisnd:audiorom", 0 ) /* TMPZ84C011 sound program */
 	ROM_LOAD( "u804.bin",  0x000000, 0x20000, CRC(48407507) SHA1(afd24d16d487fd2b6548d967e2f1ae122e2633a2) )
 
 	ROM_REGION( 0x300000, "gfx1", 0 ) /* gfx */
@@ -807,7 +807,7 @@ ROM_START( zokumahj )
 	ROM_LOAD16_BYTE( "1.bin", 0x00000, 0x20000, CRC(53ca34a9) SHA1(5a1e2660442665efd529ec6c98ffc994c6103419) )
 	ROM_LOAD16_BYTE( "2.bin", 0x00001, 0x20000, CRC(474f9303) SHA1(4b03e3b6b6ee864dfcce3978f19bf329e39b3fe7) )
 
-	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) /* TMPZ84C011 sound program */
+	ROM_REGION( 0x20000, "nichisnd:audiorom", 0 ) /* TMPZ84C011 sound program */
 	ROM_LOAD( "3.bin",  0x000000, 0x20000, CRC(48407507) SHA1(afd24d16d487fd2b6548d967e2f1ae122e2633a2) )
 
 	ROM_REGION( 0x300000, "gfx1", 0 ) /* gfx */

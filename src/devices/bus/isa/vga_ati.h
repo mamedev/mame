@@ -1,11 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald
 /*
- * isa_vga_ati.h
+ * isa/vga_ati.h
  *
  *  Header for ATi Graphics Ultra/Graphics Ultra Pro ISA video cards
- *
- *  Created on: 9/09/2012
  */
 #ifndef MAME_BUS_ISA_VGA_ATI_H
 #define MAME_BUS_ISA_VGA_ATI_H
@@ -13,8 +11,11 @@
 #pragma once
 
 #include "isa.h"
-#include "video/pc_vga.h"
-#include "mach32.h"
+
+#include "video/ati_mach32.h"
+#include "video/ati_mach8.h"
+#include "video/pc_vga_ati.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -41,6 +42,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
+	void io_isa_map(address_map &map);
+
 private:
 	required_device<ati_vga_device> m_vga;
 	required_device<mach8_device> m_8514;
@@ -65,6 +68,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
+	void io_isa_map(address_map &map);
+
 private:
 	required_device<mach32_device> m_vga;
 };
@@ -88,6 +93,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
+	void io_isa_map(address_map &map);
 private:
 	required_device<mach64_device> m_vga;
 };

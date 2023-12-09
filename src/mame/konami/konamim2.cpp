@@ -228,7 +228,6 @@ Notes:
 
 #include "debug/debugcon.h"
 #include "debugger.h"
-#include "romload.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -286,20 +285,17 @@ public:
 
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	void update_disc();
 
 public:
-	DECLARE_WRITE_LINE_MEMBER(ppc1_int);
-	DECLARE_WRITE_LINE_MEMBER(ppc2_int);
+	void ppc1_int(int state);
+	void ppc2_int(int state);
 
 	void cde_sdbg_out(uint32_t data);
 
 	void ldac_out(uint16_t data);
 	void rdac_out(uint16_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(ata_int);
+	void ata_int(int state);
 
 	uint16_t konami_io0_r(offs_t offset);
 	void konami_io0_w(offs_t offset, uint16_t data);
@@ -322,9 +318,6 @@ public:
 		if (!(data & 0x8000))
 		{
 			logerror("ATAPI RESET!\n");
-
-			// TODO: Do we need any of this?
-			update_disc();
 		}
 	}
 
@@ -344,9 +337,6 @@ private:
 
 	optional_device<m48t58_device> m_m48t58;
 	optional_device<ymz280b_device> m_ymz280b;
-
-	// ATAPI
-	cdrom_file *m_available_cdroms = nullptr;
 
 	// Konami SIO
 	uint16_t    m_sio_data = 0;
@@ -374,12 +364,12 @@ private:
  *
  *************************************/
 
-WRITE_LINE_MEMBER(konamim2_state::ppc1_int)
+void konamim2_state::ppc1_int(int state)
 {
 	m_ppc1->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(konamim2_state::ppc2_int)
+void konamim2_state::ppc2_int(int state)
 {
 	m_ppc2->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -417,7 +407,7 @@ void konamim2_state::rdac_out(uint16_t data)
  *
  *************************************/
 
-WRITE_LINE_MEMBER( konamim2_state::ata_int )
+void konamim2_state::ata_int(int state)
 {
 //  m_atapi_timer->adjust( attotime::from_msec(10), state );
 	m_ata_int = state;
@@ -685,9 +675,6 @@ void konamim2_state::machine_start()
 	m_ppc1->ppcdrc_add_fastram(m_bda->ram_start(), m_bda->ram_end(), false, m_bda->ram_ptr());
 	m_ppc2->ppcdrc_add_fastram(m_bda->ram_start(), m_bda->ram_end(), false, m_bda->ram_ptr());
 
-	chd_file *chd = machine().rom_load().get_disk_handle(":cdrom");
-	m_available_cdroms = chd ? new cdrom_file(chd) : nullptr;
-
 	// TODO: REMOVE
 	m_atapi_timer = timer_alloc(FUNC(konamim2_state::atapi_delay), this);
 	m_atapi_timer->adjust( attotime::never );
@@ -696,34 +683,6 @@ void konamim2_state::machine_start()
 	{
 		using namespace std::placeholders;
 		machine().debugger().console().register_command("m2", CMDFLAG_NONE, 1, 4, std::bind(&konamim2_state::debug_commands, this, _1));
-	}
-}
-
-void konamim2_state::machine_reset()
-{
-	update_disc();
-}
-
-void konamim2_state::update_disc()
-{
-	cdrom_file *new_cdrom = m_available_cdroms;
-
-	atapi_hle_device *image = subdevice<atapi_hle_device>("ata:0:cr589");
-	if (image != nullptr)
-	{
-		void *current_cdrom = nullptr;
-		image->GetDevice(&current_cdrom);
-
-		if (current_cdrom != new_cdrom)
-		{
-			current_cdrom = new_cdrom;
-
-			image->SetDevice(new_cdrom);
-		}
-	}
-	else
-	{
-		abort();
 	}
 }
 
@@ -1266,7 +1225,7 @@ ROM_START( polystar )
 	ROM_REGION16_BE( 0x80, "eeprom", 0 ) /* EEPROM default contents */
 	ROM_LOAD( "93c46.7k", 0x000000, 0x000080, CRC(fab5a203) SHA1(153e22aa8cfce80b77ba200957685f796fc99b1c) )
 
-	DISK_REGION( "cdrom" ) // Has 1s of silence near the start of the first audio track
+	DISK_REGION( "ata:0:cr589" ) // Has 1s of silence near the start of the first audio track
 	DISK_IMAGE_READONLY( "623jaa02", 0, BAD_DUMP SHA1(e7d9e628a3e0e085e084e4e3630fa5e3a7345547) )
 ROM_END
 
@@ -1280,7 +1239,7 @@ ROM_START( btltryst )
 	ROM_REGION( 0x2000, "m48t58", 0 ) /* timekeeper SRAM */
 	ROM_LOAD( "m48t58", 0x000000, 0x002000, CRC(71ee073b) SHA1(cc8002d7ee8d1695aebbbb2a3a1e97a7e16948c1) )
 
-	DISK_REGION( "cdrom" )
+	DISK_REGION( "ata:0:cr589" )
 	DISK_IMAGE_READONLY( "636jac02", 0, SHA1(d36556a3a4b91058100924a9e9f1a58983399c6e) )
 ROM_END
 
@@ -1292,7 +1251,7 @@ ROM_START( btltrysta )
 	ROM_REGION( 0x2000, "m48t58", 0 ) /* timekeeper SRAM */
 	ROM_LOAD( "m48t58y", 0x000000, 0x002000, CRC(8611ff09) SHA1(6410236947d99c552c4a1f7dd5fd8c7a5ae4cba1) )
 
-	DISK_REGION( "cdrom" )
+	DISK_REGION( "ata:0:cr589" )
 	DISK_IMAGE_READONLY( "636jaa02", 0, SHA1(d36556a3a4b91058100924a9e9f1a58983399c6e) )
 ROM_END
 #endif
@@ -1307,7 +1266,7 @@ ROM_START( heatof11 )
 	ROM_REGION( 0x2000, "m48t58", 0 ) /* timekeeper SRAM */
 	ROM_LOAD( "dallas.5e",  0x000000, 0x002000, CRC(5b74eafd) SHA1(afbf5f1f5a27407fd6f17c764bbb7fae4ab779f5) )
 
-	DISK_REGION( "cdrom" )
+	DISK_REGION( "ata:0:cr589" )
 	DISK_IMAGE_READONLY( "heatof11", 0, BAD_DUMP SHA1(5a0a2782cd8676d3f6dfad4e0f805b309e230d8b) )
 ROM_END
 
@@ -1324,21 +1283,8 @@ ROM_START( evilngt )
 	ROM_REGION( 0x400000, "ymz", 0 ) /* YMZ280B sound rom on sub board */
 	ROM_LOAD( "810a03.16h", 0x000000, 0x400000, CRC(05112d3a) SHA1(0df2a167b7bc08a32d983b71614d59834efbfb59) )
 
-	DISK_REGION( "cdrom" )
+	DISK_REGION( "ata:0:cr589" )
 	DISK_IMAGE_READONLY( "810uba02", 0, SHA1(e570470c1cbfe187d5bba8125616412f386264ba) )
-ROM_END
-
-ROM_START( evilngte )
-	ROM_REGION64_BE( 0x200000, "boot", 0 )
-	ROM_LOAD16_WORD( "636a01.8q", 0x000000, 0x200000, CRC(7b1dc738) SHA1(32ae8e7ddd38fcc70b4410275a2cc5e9a0d7d33b) )
-
-	ROM_REGION( 0x2000, "m48t58", 0 ) /* timekeeper SRAM */
-	ROM_LOAD( "m48t58y.u1", 0x000000, 0x001000, CRC(169bb8f4) SHA1(55c0bafab5d309fe69156489186e232aa87ca0dd) )
-
-	ROM_REGION( 0x400000, "ymz", 0 ) /* YMZ280B sound rom on sub board */
-	ROM_LOAD( "810a03.16h", 0x000000, 0x400000, CRC(05112d3a) SHA1(0df2a167b7bc08a32d983b71614d59834efbfb59) )
-
-	// TODO: Add CHD
 ROM_END
 
 ROM_START( hellngt )
@@ -1354,7 +1300,7 @@ ROM_START( hellngt )
 	ROM_REGION( 0x400000, "ymz", 0 ) /* YMZ280B sound rom on sub board */
 	ROM_LOAD( "810a03.16h",  0x000000, 0x400000, CRC(05112d3a) SHA1(0df2a167b7bc08a32d983b71614d59834efbfb59) )
 
-	DISK_REGION( "cdrom" )
+	DISK_REGION( "ata:0:cr589" )
 	DISK_IMAGE_READONLY( "810eaa02", 0, SHA1(d701b900eddc7674015823b2cb33e887bf107fa8) )
 ROM_END
 
@@ -1368,7 +1314,7 @@ ROM_START( totlvice )
 	ROM_REGION( 0x100000, "ymz", 0 ) /* YMZ280B sound rom on sub board */
 	ROM_LOAD( "639jaa02.bin",  0x000000, 0x100000, CRC(c6163818) SHA1(b6f8f2d808b98610becc0a5be5443ece3908df0b) )
 
-	DISK_REGION( "cdrom" )
+	DISK_REGION( "ata:0:cr589" )
 	DISK_IMAGE_READONLY( "639eba01", 0, BAD_DUMP SHA1(d95c13575e015169b126f7e8492d150bd7e5ebda) )
 ROM_END
 
@@ -1381,7 +1327,7 @@ ROM_START( totlvicd )
 	ROM_REGION( 0x100000, "ymz", 0 ) /* YMZ280B sound rom on sub board */
 	ROM_LOAD( "639jaa02.bin",  0x000000, 0x100000, CRC(c6163818) SHA1(b6f8f2d808b98610becc0a5be5443ece3908df0b) )
 
-	DISK_REGION( "cdrom" )
+	DISK_REGION( "ata:0:cr589" )
 	DISK_IMAGE_READONLY( "639ead01", 0, SHA1(9d1085281aeb14185e2e78f3f21e7004a591039c) )
 ROM_END
 #endif
@@ -1393,7 +1339,7 @@ ROM_START( totlvicu )
 	ROM_REGION( 0x100000, "ymz", 0 ) /* YMZ280B sound rom on sub board */
 	ROM_LOAD( "639jaa02.bin",  0x000000, 0x100000, CRC(c6163818) SHA1(b6f8f2d808b98610becc0a5be5443ece3908df0b) )
 
-	DISK_REGION( "cdrom" )
+	DISK_REGION( "ata:0:cr589" )
 	DISK_IMAGE_READONLY( "639uac01", 0, BAD_DUMP SHA1(88431b8a0ce83c156c8b19efbba1af901b859404) )
 ROM_END
 
@@ -1404,7 +1350,7 @@ ROM_START( totlvica )
 	ROM_REGION( 0x100000, "ymz", 0 ) /* YMZ280B sound rom on sub board */
 	ROM_LOAD( "639jaa02.bin",  0x000000, 0x100000, CRC(c6163818) SHA1(b6f8f2d808b98610becc0a5be5443ece3908df0b) )
 
-	DISK_REGION( "cdrom" )
+	DISK_REGION( "ata:0:cr589" )
 	DISK_IMAGE_READONLY( "639aab01", 0, SHA1(34f34b26399cc04ffb0207df69f52eba42892eb6) )
 ROM_END
 
@@ -1415,7 +1361,7 @@ ROM_START( totlvicj )
 	ROM_REGION( 0x100000, "ymz", 0 ) /* YMZ280B sound rom on sub board */
 	ROM_LOAD( "639jaa02.bin",  0x000000, 0x100000, CRC(c6163818) SHA1(b6f8f2d808b98610becc0a5be5443ece3908df0b) )
 
-	DISK_REGION( "cdrom" ) // Need a re-image
+	DISK_REGION( "ata:0:cr589" ) // Need a re-image
 	DISK_IMAGE_READONLY( "639jad01", 0, BAD_DUMP SHA1(39d41d5a9d1c40636d174c8bb8172b1121e313f8) )
 ROM_END
 
@@ -1672,7 +1618,6 @@ GAME( 1998, btltryst,  0,        btltryst, btltryst, konamim2_state, init_btltry
 //GAME( 1998, btltrysta, btltryst, btltryst, btltryst, konamim2_state, init_btltryst, ROT0, "Konami", "Battle Tryst (ver JAA)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, heatof11,  0,        heatof11, heatof11, konamim2_state, init_btltryst, ROT0, "Konami", "Heat of Eleven '98 (ver EAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS)
 GAME( 1998, evilngt,   0,        evilngt,  hellngt,  konamim2_state, init_hellngt,  ROT0, "Konami", "Evil Night (ver UBA)",         MACHINE_IMPERFECT_TIMING )
-GAME( 1998, evilngte,  evilngt,  evilngt,  hellngt,  konamim2_state, init_hellngt,  ROT0, "Konami", "Evil Night (ver EAA)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
 GAME( 1998, hellngt,   evilngt,  hellngt,  hellngt,  konamim2_state, init_hellngt,  ROT0, "Konami", "Hell Night (ver EAA)",         MACHINE_IMPERFECT_TIMING )
 
 //CONS( 199?, 3do_m2,     0,      0,    3do_m2,    m2,    driver_device, 0,      "3DO",  "3DO M2",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_NO_SOUND )

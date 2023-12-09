@@ -19,7 +19,6 @@ msx_slot_cartridge_base_device::msx_slot_cartridge_base_device(const machine_con
 
 void msx_slot_cartridge_base_device::device_resolve_objects()
 {
-	m_irq_handler.resolve_safe();
 	m_cartridge = dynamic_cast<msx_cart_interface *>(get_card_device());
 	if (m_cartridge)
 	{
@@ -83,7 +82,7 @@ void msx_slot_cartridge_base_device::call_unload()
 	}
 }
 
-WRITE_LINE_MEMBER(msx_slot_cartridge_base_device::irq_out)
+void msx_slot_cartridge_base_device::irq_out(int state)
 {
 	m_irq_handler(state);
 }
@@ -97,7 +96,7 @@ msx_cart_interface::msx_cart_interface(const machine_config &mconfig, device_t &
 		m_page[i] = nullptr;
 }
 
-WRITE_LINE_MEMBER(msx_cart_interface::irq_out)
+void msx_cart_interface::irq_out(int state)
 {
 	m_exp->irq_out(state);
 }

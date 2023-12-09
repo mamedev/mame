@@ -37,7 +37,6 @@ Display : unknown; similar protocol for HP 3457A documented on
     http://www.eevblog.com/forum/projects/led-display-for-hp-3457a-multimeter-i-did-it-)/25/
 
 
-
 Main cpu I/O ports:
 Port1
 P14-P17 : keypad out (cols)
@@ -74,8 +73,6 @@ T1 : data in thru isol, from analog CPU (opcodes jt1 / jnt1)
 #define P26 (1 << 6)
 #define P27 (1 << 7)
 
-
-
 #define A12_PIN P26
 #define CALRAM_CS P23
 #define DIPSWITCH_CS P22
@@ -85,8 +82,7 @@ T1 : data in thru isol, from analog CPU (opcodes jt1 / jnt1)
 #define DISP_SYNC P23
 #define DISP_ISA P22
 #define DISP_IWA P21
-#define DISP_CK1 P20
-	//don't care about CK2 since it's supposed to be a delayed copy of CK1
+#define DISP_CK1 P20 //don't care about CK2 since it's supposed to be a delayed copy of CK1
 #define DISP_MASK (DISP_PWO | DISP_SYNC | DISP_ISA | DISP_IWA | DISP_CK1)   //used for edge detection
 
 // IO banking : indexes of m_iobank maps
@@ -107,10 +103,10 @@ T1 : data in thru isol, from analog CPU (opcodes jt1 / jnt1)
 
 #include "logmacro.h"
 
-/**** HP 3478A class **/
-
 
 namespace {
+
+/**** HP 3478A class **/
 
 class hp3478a_state : public driver_device
 {
@@ -120,7 +116,6 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_nvram(*this, "nvram")
 		, m_nvram_raw(*this, "nvram")
-		, m_watchdog(*this, "watchdog")
 		, m_bank0(*this, "bank0")
 		, m_iobank(*this, "iobank")
 		, m_keypad(*this, "COL.%u", 0)
@@ -136,7 +131,6 @@ protected:
 
 private:
 	uint8_t p1read();
-	void p1write(uint8_t data);
 	void p2write(uint8_t data);
 	void nvwrite(offs_t offset, uint8_t data);
 
@@ -147,7 +141,6 @@ private:
 	required_device<i8039_device> m_maincpu;
 	required_device<nvram_device> m_nvram;
 	required_shared_ptr<uint8_t> m_nvram_raw;
-	required_device<watchdog_timer_device> m_watchdog;
 	required_memory_bank m_bank0;
 	required_device<address_map_bank_device> m_iobank;
 	required_ioport_array<4> m_keypad;
@@ -187,10 +180,7 @@ private:
 	bool m_lcd_annuns[12];  //local copy of annunciators
 	///////////////////////////
 
-
 	uint8_t m_p2_oldstate;  //used to detect edges on Port2 IO pins. Should be saveable ?
-	uint8_t m_p1_oldstate;  //for P17 edge detection (WDT reset)
-
 };
 
 
@@ -211,16 +201,6 @@ uint8_t hp3478a_state::p1read()
 	}
 	LOGMASKED(DEBUG_KEYPAD, "port1 read: 0x%02X\n", data);
 	return data;
-}
-
-/* pin P17 rising edges also reset the external WDT counter */
-void hp3478a_state::p1write(uint8_t data)
-{
-	if (~m_p1_oldstate & data & 0x80) {
-		//P17 rising edge
-		m_watchdog->watchdog_reset();
-	}
-	m_p1_oldstate = data;
 }
 
 /** a lot of stuff multiplexed on the P2 pins.
@@ -578,8 +558,6 @@ void hp3478a_state::lcd_interface(uint8_t p2new)
 
 
 
-
-
 void hp3478a_state::machine_start()
 {
 	m_bank0->configure_entries(0, 2, memregion("maincpu")->base(), 0x1000);
@@ -589,12 +567,9 @@ void hp3478a_state::machine_start()
 	m_annuns = std::make_unique<output_finder<12> >(*this, "ann%u", (unsigned) 0);
 	m_annuns->resolve();
 
-	m_watchdog->watchdog_enable();
-
-	m_p1_oldstate = 0;
 	m_p2_oldstate = 0;
-
 }
+
 
 /******************************************************************************
  Address Maps
@@ -627,6 +602,7 @@ void hp3478a_state::io_bank(address_map &map)
 /******************************************************************************
  Input Ports
 ******************************************************************************/
+
 static INPUT_PORTS_START( hp3478a )
 /* keypad bit matrix:
             0x08|0x04|0x02|0x01
@@ -702,8 +678,8 @@ static INPUT_PORTS_START( hp3478a )
 	PORT_DIPNAME( 0x80, 0x00, "50/60Hz AC" ) PORT_DIPLOCATION("DIP:8")
 	PORT_DIPSETTING(    0x00, "60Hz" )
 	PORT_DIPSETTING(    0x80, "50Hz" )
-
 INPUT_PORTS_END
+
 
 /******************************************************************************
  Machine Drivers
@@ -715,7 +691,7 @@ void hp3478a_state::hp3478a(machine_config &config)
 	mcu.set_addrmap(AS_PROGRAM, &hp3478a_state::i8039_map);
 	mcu.set_addrmap(AS_IO, &hp3478a_state::i8039_io);
 	mcu.p1_in_cb().set(FUNC(hp3478a_state::p1read));
-	mcu.p1_out_cb().set(FUNC(hp3478a_state::p1write));
+	mcu.p1_out_cb().set("watchdog", FUNC(watchdog_timer_device::reset_line_w)).bit(7);
 	mcu.p2_out_cb().set(FUNC(hp3478a_state::p2write));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -726,15 +702,17 @@ void hp3478a_state::hp3478a(machine_config &config)
 	m_iobank->set_addr_width(18);
 	m_iobank->set_stride(0x100);
 
-	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_ticks(3*5*(1<<19),CPU_CLOCK));
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_ticks(3*5*(1<<19),CPU_CLOCK));
 
 	// video
 	config.set_default_layout(layout_hp3478a);
 }
 
+
 /******************************************************************************
  ROM Definitions
 ******************************************************************************/
+
 ROM_START( hp3478a )
 	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD("rom_dc118.bin", 0, 0x2000, CRC(10097ced) SHA1(bd665cf7e07e63f825b2353c8322ed8a4376b3bd))  // main CPU ROM, can match other datecodes too

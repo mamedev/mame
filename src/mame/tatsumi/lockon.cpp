@@ -390,16 +390,16 @@ void lockon_state::sound_vol(uint8_t data)
 	double lgain = gains[data & 0xf];
 	double rgain = gains[data >> 4];
 
-	m_f2203_1l->flt_volume_set_volume(lgain);
-	m_f2203_2l->flt_volume_set_volume(lgain);
-	m_f2203_3l->flt_volume_set_volume(lgain);
+	m_f2203_1l->set_gain(lgain);
+	m_f2203_2l->set_gain(lgain);
+	m_f2203_3l->set_gain(lgain);
 
-	m_f2203_1r->flt_volume_set_volume(rgain);
-	m_f2203_2r->flt_volume_set_volume(rgain);
-	m_f2203_3r->flt_volume_set_volume(rgain);
+	m_f2203_1r->set_gain(rgain);
+	m_f2203_2r->set_gain(rgain);
+	m_f2203_3r->set_gain(rgain);
 }
 
-WRITE_LINE_MEMBER(lockon_state::ym2203_irq)
+void lockon_state::ym2203_irq(int state)
 {
 	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE );
 }

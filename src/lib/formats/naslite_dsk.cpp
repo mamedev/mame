@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /*********************************************************************
 
-    formats/naslite_dsk.c
+    formats/naslite_dsk.cpp
 
     NASLite 1.72MB with funky interleaving format
 
@@ -14,17 +14,17 @@ naslite_format::naslite_format() : upd765_format(formats)
 {
 }
 
-const char *naslite_format::name() const
+const char *naslite_format::name() const noexcept
 {
 	return "NASLite";
 }
 
-const char *naslite_format::description() const
+const char *naslite_format::description() const noexcept
 {
 	return "NASLite disk image";
 }
 
-const char *naslite_format::extensions() const
+const char *naslite_format::extensions() const noexcept
 {
 	return "img";
 }

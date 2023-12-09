@@ -237,7 +237,7 @@ void saitekosa_analyst_device::device_add_mconfig(machine_config &config)
 	saitekosa_maestro_device::device_add_mconfig(config);
 
 	// video hardware
-	HD44780(config, m_lcd, 0);
+	HD44780(config, m_lcd, 270'000); // OSC = 91K resistor
 }
 
 

@@ -17,8 +17,7 @@
 
 /*
 
-    TODO:
-
+TODO:
     - wait states (UV201: 2.9us, memory except RES1: 1.65us)
     - interlaced video?
     - pinball background colors
@@ -28,7 +27,6 @@
     - video interrupts
     - R-2R ladder DAC
     - reset on cartridge unload
-    - use machine/f3853.h
     - joystick scan timer 555
     - expander 1 (F3870 CPU, cassette, RS-232)
     - expander 2 (modem)
@@ -51,21 +49,95 @@ Using the system:
 */
 
 #include "emu.h"
-#include "vidbrain.h"
 
+#include "bus/vidbrain/exp.h"
+#include "cpu/f8/f8.h"
+#include "machine/f3853.h"
+#include "machine/ram.h"
 #include "machine/rescap.h"
+#include "sound/dac.h"
+
 #include "softlist_dev.h"
 #include "speaker.h"
+#include "uv201.h"
 
-#include "vidbrain.lh"
+//#define VERBOSE (LOG_GENERAL)
+#include "logmacro.h"
 
+namespace {
 
+class vidbrain_state : public driver_device
+{
+public:
+	vidbrain_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_smi(*this, "smi"),
+		m_uv(*this, "uv"),
+		m_dac(*this, "dac"),
+		m_exp(*this, "exp"),
+		m_io(*this, "IO%02u", 0),
+		m_uv201_31(*this, "UV201-31"),
+		m_joy_r(*this, "JOY-R"),
+		m_joy1_x(*this, "JOY1-X"),
+		m_joy1_y(*this, "JOY1-Y"),
+		m_joy2_x(*this, "JOY2-X"),
+		m_joy2_y(*this, "JOY2-Y"),
+		m_joy3_x(*this, "JOY3-X"),
+		m_joy3_y(*this, "JOY3-Y"),
+		m_joy4_x(*this, "JOY4-X"),
+		m_joy4_y(*this, "JOY4-Y")
+	{ }
 
-//**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
+	void vidbrain(machine_config &config);
+	void vidbrain_video(machine_config &config);
 
-#define LOG         1
+	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	void vidbrain_mem(address_map &map);
+	void vidbrain_io(address_map &map);
+
+	TIMER_CALLBACK_MEMBER(joystick_tick);
+
+	void keyboard_w(uint8_t data);
+	uint8_t keyboard_r();
+	void sound_w(uint8_t data);
+
+	void hblank_w(int state);
+	uint8_t memory_read_byte(offs_t offset);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<f3853_device> m_smi;
+	required_device<uv201_device> m_uv;
+	required_device<dac_byte_interface> m_dac;
+	required_device<videobrain_expansion_slot_device> m_exp;
+	required_ioport_array<8> m_io;
+	required_ioport m_uv201_31;
+	required_ioport m_joy_r;
+	required_ioport m_joy1_x;
+	required_ioport m_joy1_y;
+	required_ioport m_joy2_x;
+	required_ioport m_joy2_y;
+	required_ioport m_joy3_x;
+	required_ioport m_joy3_y;
+	required_ioport m_joy4_x;
+	required_ioport m_joy4_y;
+
+	// keyboard state
+	uint8_t m_keylatch = 0;
+	bool m_joy_enable = false;
+
+	// sound state
+	int m_sound_clk = 0;
+
+	// timers
+	emu_timer *m_timer_ne555 = nullptr;
+};
 
 
 
@@ -94,7 +166,7 @@ void vidbrain_state::keyboard_w(uint8_t data)
 
 	*/
 
-	if (LOG) logerror("Keyboard %02x\n", data);
+	LOG("Keyboard %02x\n", data);
 
 	m_keylatch = data;
 }
@@ -155,7 +227,7 @@ void vidbrain_state::sound_w(uint8_t data)
 
 	*/
 
-	if (LOG) logerror("Sound %02x\n", data);
+	LOG("Sound %02x\n", data);
 
 	// sound clock
 	int sound_clk = BIT(data, 4);
@@ -168,7 +240,7 @@ void vidbrain_state::sound_w(uint8_t data)
 	m_sound_clk = sound_clk;
 
 	// joystick enable
-	m_joy_enable = BIT(data, 7);
+	m_joy_enable = !BIT(data, 7);
 }
 
 
@@ -202,7 +274,7 @@ void vidbrain_state::vidbrain_io(address_map &map)
 {
 	map(0x00, 0x00).w(FUNC(vidbrain_state::keyboard_w));
 	map(0x01, 0x01).rw(FUNC(vidbrain_state::keyboard_r), FUNC(vidbrain_state::sound_w));
-	map(0x0c, 0x0f).rw(F3853_TAG, FUNC(f3853_device::read), FUNC(f3853_device::write));
+	map(0x0c, 0x0f).rw(m_smi, FUNC(f3853_device::read), FUNC(f3853_device::write));
 }
 
 
@@ -217,7 +289,7 @@ void vidbrain_state::vidbrain_io(address_map &map)
 
 INPUT_CHANGED_MEMBER( vidbrain_state::trigger_reset )
 {
-	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -229,8 +301,8 @@ static INPUT_PORTS_START( vidbrain )
 	PORT_START("IO00")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('I') PORT_CHAR('"')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('O') PORT_CHAR('#')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("P \xC2\xA2") PORT_CODE(KEYCODE_P) PORT_CHAR('P') PORT_CHAR(0x00a2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("; \xC2\xB6") PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR(0x00b6)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(u8"P ¢") PORT_CODE(KEYCODE_P) PORT_CHAR('P') PORT_CHAR(0x00a2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(u8"; π") PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR(0x03c0)
 
 	PORT_START("IO01")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_CHAR('U') PORT_CHAR('!')
@@ -239,13 +311,13 @@ static INPUT_PORTS_START( vidbrain )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR('\'') PORT_CHAR('*')
 
 	PORT_START("IO02")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Y \xC3\xB7") PORT_CODE(KEYCODE_Y) PORT_CHAR('Y') PORT_CHAR(0x00f7)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(u8"Y ÷") PORT_CODE(KEYCODE_Y) PORT_CHAR('Y') PORT_CHAR(0x00f7)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('J') PORT_CHAR('(')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('M') PORT_CHAR(':')
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 
 	PORT_START("IO03")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("T \xC3\x97") PORT_CODE(KEYCODE_T) PORT_CHAR('T') PORT_CHAR(0x00d7)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(u8"T ×") PORT_CODE(KEYCODE_T) PORT_CHAR('T') PORT_CHAR(0x00d7)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CHAR('H') PORT_CHAR('/')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('N') PORT_CHAR(',')
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("ERASE RESTART") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
@@ -320,28 +392,20 @@ INPUT_PORTS_END
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-WRITE_LINE_MEMBER( vidbrain_state::ext_int_w )
-{
-	if (state)
-	{
-		m_smi->ext_int_w(1);
-	}
-}
-
-WRITE_LINE_MEMBER( vidbrain_state::hblank_w )
+void vidbrain_state::hblank_w(int state)
 {
 	if (state && m_joy_enable)
 	{
 		uint8_t joydata = 0;
 
-		if (!BIT(m_keylatch, 0)) joydata = m_joy1_x->read();
-		if (!BIT(m_keylatch, 1)) joydata = m_joy1_y->read();
-		if (!BIT(m_keylatch, 2)) joydata = m_joy2_x->read();
-		if (!BIT(m_keylatch, 3)) joydata = m_joy2_y->read();
-		if (!BIT(m_keylatch, 4)) joydata = m_joy3_x->read();
-		if (!BIT(m_keylatch, 5)) joydata = m_joy3_y->read();
-		if (!BIT(m_keylatch, 6)) joydata = m_joy4_x->read();
-		if (!BIT(m_keylatch, 7)) joydata = m_joy4_y->read();
+		if (BIT(m_keylatch, 0)) joydata |= m_joy1_x->read();
+		if (BIT(m_keylatch, 1)) joydata |= m_joy1_y->read();
+		if (BIT(m_keylatch, 2)) joydata |= m_joy2_x->read();
+		if (BIT(m_keylatch, 3)) joydata |= m_joy2_y->read();
+		if (BIT(m_keylatch, 4)) joydata |= m_joy3_x->read();
+		if (BIT(m_keylatch, 5)) joydata |= m_joy3_y->read();
+		if (BIT(m_keylatch, 6)) joydata |= m_joy4_x->read();
+		if (BIT(m_keylatch, 7)) joydata |= m_joy4_y->read();
 
 		// NE555 in monostable mode
 		// R = 3K9 + 100K linear pot
@@ -372,7 +436,6 @@ uint8_t vidbrain_state::memory_read_byte(offs_t offset)
 TIMER_CALLBACK_MEMBER(vidbrain_state::joystick_tick)
 {
 	m_uv->ext_int_w(0);
-	m_smi->ext_int_w(0);
 }
 
 
@@ -411,23 +474,23 @@ void vidbrain_state::vidbrain(machine_config &config)
 	F8(config, m_maincpu, XTAL(4'000'000)/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vidbrain_state::vidbrain_mem);
 	m_maincpu->set_addrmap(AS_IO, &vidbrain_state::vidbrain_io);
-	m_maincpu->set_irq_acknowledge_callback(F3853_TAG, FUNC(f3853_device::int_acknowledge));
+	m_maincpu->set_irq_acknowledge_callback(m_smi, FUNC(f3853_device::int_acknowledge));
 
 	// video hardware
-	config.set_default_layout(layout_vidbrain);
-
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
-	screen.set_screen_update(UV201_TAG, FUNC(uv201_device::screen_update));
-	screen.set_raw(3636363, 232, 18, 232, 262, 21, 262);
 	UV201(config, m_uv, 3636363);
-	m_uv->set_screen(SCREEN_TAG);
-	m_uv->ext_int_wr_callback().set(FUNC(vidbrain_state::ext_int_w));
+	m_uv->set_screen("screen");
+	m_uv->ext_int_wr_callback().set(m_smi, FUNC(f3853_device::ext_int_w));
 	m_uv->hblank_wr_callback().set(FUNC(vidbrain_state::hblank_w));
 	m_uv->db_rd_callback().set(FUNC(vidbrain_state::memory_read_byte));
 
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_screen_update(m_uv, FUNC(uv201_device::screen_update));
+	screen.set_raw(3636363, 232, 18, 232, 262, 21, 262);
+	screen.set_physical_aspect(3, 2);
+
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
-	DAC_2BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.167); // 74ls74.u16 + 120k + 56k
+	DAC_2BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // 74ls74.u16 + 120k + 56k
 
 	// devices
 	F3853(config, m_smi, XTAL(4'000'000)/2);
@@ -455,14 +518,16 @@ void vidbrain_state::vidbrain(machine_config &config)
 
 ROM_START( vidbrain )
 	ROM_REGION( 0x800, "res1", 0 )
-	ROM_LOAD( "uvres 1n.d67", 0x000, 0x800, CRC(065fe7c2) SHA1(9776f9b18cd4d7142e58eff45ac5ee4bc1fa5a2a) )
+	ROM_LOAD( "uvres_1n.d67", 0x000, 0x800, CRC(065fe7c2) SHA1(9776f9b18cd4d7142e58eff45ac5ee4bc1fa5a2a) )
 
 	ROM_REGION( 0x800, "res2", 0 )
 	ROM_LOAD( "resn2.e5", 0x000, 0x800, CRC(1d85d7be) SHA1(26c5a25d1289dedf107fa43aa8dfc14692fd9ee6) )
 
-	ROM_REGION( 0x800, F3870_TAG, 0 )
+	ROM_REGION( 0x800, "exp1", 0 )
 	ROM_LOAD( "expander1.bin", 0x0000, 0x0800, CRC(dac31abc) SHA1(e1ac7a9d654c2a70979effc744d98f21d13b4e05) )
 ROM_END
+
+} // anonymous namespace
 
 
 
@@ -471,4 +536,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                        FULLNAME                     FLAGS
-COMP( 1977, vidbrain, 0,      0,      vidbrain, vidbrain, vidbrain_state, empty_init, "VideoBrain Computer Company", "VideoBrain FamilyComputer", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1978, vidbrain, 0,      0,      vidbrain, vidbrain, vidbrain_state, empty_init, "VideoBrain Computer Company", "VideoBrain FamilyComputer", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

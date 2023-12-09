@@ -34,7 +34,7 @@ void upd7002_device::device_start()
 {
 	m_conversion_timer = timer_alloc(FUNC(upd7002_device::conversion_complete), this);
 	m_get_analogue_cb.resolve();
-	m_eoc_cb.resolve();
+	m_eoc_cb.resolve_safe();
 
 	// register for state saving
 	save_item(NAME(m_status));
@@ -63,7 +63,7 @@ void upd7002_device::device_reset()
 *****************************************************************************/
 
 
-READ_LINE_MEMBER( upd7002_device::eoc_r )
+int upd7002_device::eoc_r()
 {
 	return BIT(m_status, 7);
 }
@@ -82,7 +82,7 @@ TIMER_CALLBACK_MEMBER(upd7002_device::conversion_complete)
 
 		// call the EOC function with EOC from status
 		// eoc_r(0) this has just been set to 0
-		if (!m_eoc_cb.isnull()) m_eoc_cb(0);
+		m_eoc_cb(0);
 		m_conversion_counter = 0;
 	}
 }
@@ -132,7 +132,7 @@ void upd7002_device::write(offs_t offset, uint8_t data)
 
 		// call the EOC function with EOC from status
 		// eoc_r(0) this has just been set to 1
-		if (!m_eoc_cb.isnull()) m_eoc_cb(1);
+		m_eoc_cb(1);
 
 		/* the uPD7002 works by sampling the analogue value at the start of the conversion
 		   so it is read hear and stored until the end of the A to D conversion */

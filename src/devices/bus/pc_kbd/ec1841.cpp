@@ -37,9 +37,8 @@
 #include "utf8.h"
 
 
-//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
-#define LOG_KEYBOARD  (1U <<  1)
-#define LOG_DEBUG     (1U <<  2)
+#define LOG_KEYBOARD  (1U << 1)
+#define LOG_DEBUG     (1U << 2)
 
 //#define VERBOSE (LOG_DEBUG)
 //#define LOG_OUTPUT_FUNC printf
@@ -326,7 +325,7 @@ void ec_1841_keyboard_device::device_reset()
 //  clock_write -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( ec_1841_keyboard_device::clock_write )
+void ec_1841_keyboard_device::clock_write(int state)
 {
 	LOG("clock write %d\n", state);
 }
@@ -336,7 +335,7 @@ WRITE_LINE_MEMBER( ec_1841_keyboard_device::clock_write )
 //  data_write -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( ec_1841_keyboard_device::data_write )
+void ec_1841_keyboard_device::data_write(int state)
 {
 	LOG("data write %d\n", state);
 }
@@ -441,7 +440,7 @@ void ec_1841_keyboard_device::p2_w(uint8_t data)
 //  t1_r -
 //-------------------------------------------------
 
-READ_LINE_MEMBER( ec_1841_keyboard_device::t1_r )
+int ec_1841_keyboard_device::t1_r()
 {
 	if (BIT(m_p2,0)) {
 		m_q = 1;

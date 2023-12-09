@@ -452,7 +452,7 @@ void c1pmf_state::osi470_pia_pb_w(uint8_t data)
 	*/
 }
 
-WRITE_LINE_MEMBER( c1pmf_state::osi470_pia_cb2_w )
+void c1pmf_state::osi470_pia_cb2_w(int state)
 {
 }
 
@@ -829,9 +829,9 @@ void c1p_state::c1p(machine_config &config)
 	BEEP(config, "beeper", 300).add_route(ALL_OUTPUTS, "mono", 0.50);
 	TIMER(config, m_beep_timer).configure_generic(FUNC(c1p_state::beep_timer));
 
-	PIA6821(config, "pia_1", 0);
-	PIA6821(config, "pia_2", 0);
-	PIA6821(config, "pia_3", 0);
+	PIA6821(config, "pia_1");
+	PIA6821(config, "pia_2");
+	PIA6821(config, "pia_3");
 
 	/* cassette ACIA */
 	ACIA6850(config, m_acia, 0);
@@ -858,7 +858,7 @@ void c1pmf_state::c1pmf(machine_config &config)
 	c1p(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &c1pmf_state::c1pmf_mem);
 
-	pia6821_device &pia0(PIA6821(config, "pia_0", 0));
+	pia6821_device &pia0(PIA6821(config, "pia_0"));
 	pia0.readpa_handler().set(FUNC(c1pmf_state::osi470_pia_pa_r));
 	pia0.writepa_handler().set(FUNC(c1pmf_state::osi470_pia_pa_w));
 	pia0.writepb_handler().set(FUNC(c1pmf_state::osi470_pia_pb_w));
