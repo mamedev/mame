@@ -9,6 +9,7 @@ local extlibs = {
 	asio       = { "asio",      "3rdparty/asio/include" },
 	expat      = { "expat",     "3rdparty/expat/lib" },
 	zlib       = { "z",         "3rdparty/zlib" },
+	zstd       = { "zstd",      "3rdparty/zstd/lib" },
 	jpeg       = { "jpeg",      "3rdparty/libjpeg" },
 	flac       = { "FLAC",      "3rdparty/flac/include" },
 	sqlite3    = { "sqlite3",   "3rdparty/sqlite3" },
@@ -35,6 +36,11 @@ newoption {
 newoption {
 	trigger = 'with-system-zlib',
 	description = 'Use system Zlib library',
+}
+
+newoption {
+	trigger = 'with-system-zstd',
+	description = 'Use system Zstandard library',
 }
 
 newoption {
