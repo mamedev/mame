@@ -3,7 +3,7 @@
 /*
 	Casio WG-130
 
-	This is the daughterboard version of the GZ-50M and GZ-70SP modules, using the same ROM.
+	This is the daughterboard version of the GZ-30M and GZ-70SP modules, using the same ROM.
 */
 #include "emu.h"
 #include "wg130.h"
@@ -37,7 +37,7 @@ wg130_device::wg130_device(const machine_config &mconfig, const char *tag, devic
 	m_gt913(*this, "gt913")
 {
 }
-	
+
 wg130_device::~wg130_device()
 {
 }
