@@ -14,6 +14,7 @@ TODO:
   from conventional memory instead;
 - Voodoo Banshee doesn't handle VGA text modes correctly, it will set the screen to 80 x 25
   at POST (making MAME UI host to be unusable) without any drawing.
+- pumpit1: video runs at 34 Hz, tons of flickers when song starts;
 - Fix EEPROM hookup (i/o $2ac r/w), throws bad in Pump It Up service mode
 - Hookup ISA sound board (YMZ280B + YAC516 + 3550A DAC);
 - pumpit1: MSCDEX hangs often when Voodoo is disabled;
@@ -83,7 +84,10 @@ MX29F1610MC 16M FlashROM (x7)
 #include "machine/eepromser.h"
 #include "machine/mc146818.h"
 #include "machine/8042kbdc.h"
+#include "sound/ymz280b.h"
 #include "video/voodoo_pci.h"
+
+#include "speaker.h"
 
 #define LOG_FLASH     (1U << 1)
 
@@ -236,19 +240,22 @@ void isa16_oksan_rom_disk::write(offs_t offset, u8 data)
  *
  */
 
-class isa16_oksan_io_sound : public device_t, public device_isa16_card_interface
+class isa16_xtom3d_io_sound : public device_t, public device_isa16_card_interface
 {
 public:
 	// construction/destruction
-	isa16_oksan_io_sound(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa16_xtom3d_io_sound(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	isa16_xtom3d_io_sound(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 private:
+	required_device<ymz280b_device> m_ymz;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_ioport m_system;
 	required_ioport m_in0;
@@ -259,11 +266,27 @@ private:
 	void io_map(address_map &map);
 };
 
-DEFINE_DEVICE_TYPE(ISA16_OKSAN_IO_SOUND, isa16_oksan_io_sound, "isa16_oksan_io_sound", "ISA16 Oksan I/O & Sound board for MK-III")
+class isa16_pumpitup_io_sound : public isa16_xtom3d_io_sound
+{
+public:
+	isa16_pumpitup_io_sound(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-isa16_oksan_io_sound::isa16_oksan_io_sound(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ISA16_OKSAN_IO_SOUND, tag, owner, clock)
+protected:
+	virtual ioport_constructor device_input_ports() const override;
+};
+
+DEFINE_DEVICE_TYPE(ISA16_XTOM3D_IO_SOUND, isa16_xtom3d_io_sound, "isa16_xtom3d_io_sound", "ISA16 X-Tom 3d I/O & Sound board")
+DEFINE_DEVICE_TYPE(ISA16_PUMPITUP_IO_SOUND, isa16_pumpitup_io_sound, "isa16_pumpitup_io_sound", "ISA16 Pump It Up I/O & Sound board")
+
+isa16_xtom3d_io_sound::isa16_xtom3d_io_sound(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: isa16_xtom3d_io_sound(mconfig, ISA16_XTOM3D_IO_SOUND, tag, owner, clock)
+{
+}
+
+isa16_xtom3d_io_sound::isa16_xtom3d_io_sound(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_isa16_card_interface(mconfig, *this)
+	, m_ymz(*this, "ymz")
 	, m_eeprom(*this, "eeprom")
 	, m_system(*this, "SYSTEM")
 	, m_in0(*this, "IN0")
@@ -272,10 +295,23 @@ isa16_oksan_io_sound::isa16_oksan_io_sound(const machine_config &mconfig, const 
 {
 }
 
-void isa16_oksan_io_sound::device_add_mconfig(machine_config &config)
+isa16_pumpitup_io_sound::isa16_pumpitup_io_sound(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: isa16_xtom3d_io_sound(mconfig, ISA16_PUMPITUP_IO_SOUND, tag, owner, clock)
+{
+}
+
+
+void isa16_xtom3d_io_sound::device_add_mconfig(machine_config &config)
 {
 	// TODO: may be 8BIT
 	EEPROM_93C46_16BIT(config, "eeprom");
+
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	YMZ280B(config, m_ymz, XTAL(16'934'400));
+	m_ymz->add_route(0, "lspeaker", 1.0);
+	m_ymz->add_route(1, "rspeaker", 1.0);
 }
 
 static INPUT_PORTS_START(xtom3d)
@@ -304,12 +340,7 @@ static INPUT_PORTS_START(xtom3d)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_DIPNAME( 0x0040, 0x0040, "IN0" )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x00c0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
@@ -318,12 +349,7 @@ static INPUT_PORTS_START(xtom3d)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_DIPNAME( 0x0040, 0x0040, "IN1" )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x00c0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")
 	PORT_DIPNAME( 0x0001, 0x0001, "IN2" )
@@ -350,24 +376,50 @@ static INPUT_PORTS_START(xtom3d)
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( pumpitup )
+	PORT_INCLUDE( xtom3d )
 
-ioport_constructor isa16_oksan_io_sound::device_input_ports() const
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Top-Left step") PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Top-Right step") PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 Center step") PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P1 Bottom-Left step") PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P1 Bottom-Right step") PORT_PLAYER(1)
+	PORT_BIT( 0x00e0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 Top-Left step") PORT_PLAYER(2)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P2 Top-Right step") PORT_PLAYER(2)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P2 Center step") PORT_PLAYER(2)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P2 Bottom-Left step") PORT_PLAYER(2)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P2 Bottom-Right step") PORT_PLAYER(2)
+	PORT_BIT( 0x00e0, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+ioport_constructor isa16_xtom3d_io_sound::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(xtom3d);
 }
 
-void isa16_oksan_io_sound::device_start()
+ioport_constructor isa16_pumpitup_io_sound::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(pumpitup);
+}
+
+
+void isa16_xtom3d_io_sound::device_start()
 {
 	set_isa_device();
 }
 
-void isa16_oksan_io_sound::device_reset()
+void isa16_xtom3d_io_sound::device_reset()
 {
 }
 
-void isa16_oksan_io_sound::io_map(address_map &map)
+void isa16_xtom3d_io_sound::io_map(address_map &map)
 {
 	// $2a0-$2a3 sound
+	map(0x00, 0x03).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0x00ff);
 	map(0x08, 0x09).lr8(
 		NAME([this] (offs_t offset) {
 			return offset & 1 ? m_system->read() : m_in0->read();
@@ -393,11 +445,11 @@ void isa16_oksan_io_sound::io_map(address_map &map)
 	);
 }
 
-void isa16_oksan_io_sound::remap(int space_id, offs_t start, offs_t end)
+void isa16_xtom3d_io_sound::remap(int space_id, offs_t start, offs_t end)
 {
 	if (space_id == AS_IO)
 	{
-		m_isa->install_device(0x02a0, 0x02af, *this, &isa16_oksan_io_sound::io_map);
+		m_isa->install_device(0x02a0, 0x02af, *this, &isa16_xtom3d_io_sound::io_map);
 	}
 }
 
@@ -500,6 +552,7 @@ public:
 	}
 
 	void xtom3d(machine_config &config);
+	void pumpitup(machine_config &config);
 
 private:
 	required_device<pentium2_device> m_maincpu;
@@ -526,7 +579,8 @@ void xtom3d_isa_cards(device_slot_interface &device)
 {
 	device.option_add_internal("oksan_romdisk", ISA16_OKSAN_ROM_DISK);
 	device.option_add_internal("oksan_lpc", ISA16_OKSAN_LPC);
-	device.option_add_internal("oksan_io_sound", ISA16_OKSAN_IO_SOUND);
+	device.option_add_internal("xtom3d_io_sound", ISA16_XTOM3D_IO_SOUND);
+	device.option_add_internal("pumpitup_io_sound", ISA16_PUMPITUP_IO_SOUND);
 }
 
 void xtom3d_state::romdisk_config(device_t *device)
@@ -544,7 +598,7 @@ void xtom3d_state::romdisk_config(device_t *device)
 // TODO: unverified PCI config space
 void xtom3d_state::xtom3d(machine_config &config)
 {
-	PENTIUM2(config, m_maincpu, 450'000'000 / 16); // actually Pentium II 450
+	PENTIUM2(config, m_maincpu, XTAL(33'868'800) * 2); // actually Celeron Socket 370 x10, x2 is (roughly) for AGP bottleneck
 	m_maincpu->set_addrmap(AS_PROGRAM, &xtom3d_state::xtom3d_map);
 //  m_maincpu->set_addrmap(AS_IO, &xtom3d_state::xtom3d_io);
 	m_maincpu->set_irq_acknowledge_callback("pci:07.0:pic8259_master", FUNC(pic8259_device::inta_cb));
@@ -576,7 +630,7 @@ void xtom3d_state::xtom3d(machine_config &config)
 
 	ISA16_SLOT(config, "board1", 0, "pci:07.0:isabus", xtom3d_isa_cards, "oksan_romdisk", true).set_option_machine_config("oksan_romdisk", romdisk_config);
 	ISA16_SLOT(config, "board2", 0, "pci:07.0:isabus", xtom3d_isa_cards, "oksan_lpc", true);
-	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", xtom3d_isa_cards, "oksan_io_sound", true);
+	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", xtom3d_isa_cards, "xtom3d_io_sound", true);
 	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
 	// Expansion slots, mapping SVGA for debugging
@@ -584,6 +638,7 @@ void xtom3d_state::xtom3d(machine_config &config)
 	VOODOO_BANSHEE_X86_PCI(config, m_voodoo, 0, m_maincpu, "screen"); // "pci:0d.0" J4D2
 	// TODO: confirm values
 	m_voodoo->set_fbmem(16);
+	// NOTE: pumpit1 touches this a lot
 	m_voodoo->set_status_cycles(1000);
 	// TODO: check me, probably unconnected
 	subdevice<generic_voodoo_device>(PCI_AGP_ID":voodoo")->vblank_callback().set("pci:07.0", FUNC(i82371eb_isa_device::pc_irq5_w));
@@ -601,6 +656,11 @@ void xtom3d_state::xtom3d(machine_config &config)
 	// "pci:0e.0" J4D1
 }
 
+void xtom3d_state::pumpitup(machine_config &config)
+{
+	xtom3d(config);
+	ISA16_SLOT(config.replace(), "isa1", 0, "pci:07.0:isabus", xtom3d_isa_cards, "pumpitup_io_sound", true);
+}
 
 ROM_START( xtom3d )
 	ROM_REGION32_LE(0x20000, "pci:07.0", 0)
@@ -613,7 +673,7 @@ ROM_START( xtom3d )
 	ROM_LOAD( "u6",  0x600000, 0x200000, CRC(5c092c58) SHA1(d347e1ed957cc989dc71f4f347af926589ae926d) )
 	ROM_LOAD( "u7",  0x800000, 0x200000, CRC(833c179c) SHA1(586555f5a4066a762fc05a43ef01be9fa202bb7f) )
 
-	ROM_REGION(0x400000, "board3:sound_rom", ROMREGION_ERASEFF )
+	ROM_REGION(0x400000, "isa1:xtom3d_io_sound:ymz", ROMREGION_ERASEFF )
 	ROM_LOAD( "u19", 0x000000, 0x200000, CRC(a1ae73d0) SHA1(232c73bfee426b5f651a015c505c26b8ed7176b7) )
 	ROM_LOAD( "u20", 0x200000, 0x200000, CRC(452131d9) SHA1(f62a0f1a7da9025ac1f7d5de4df90166871ac1e5) )
 ROM_END
@@ -627,7 +687,7 @@ ROM_END
 	ROM_LOAD( "bios.u22", 0x000000, 0x020000, CRC(f7c58044) SHA1(fd967d009e0d3c8ed9dd7be852946f2b9dee7671) ) \
 	ROM_REGION32_LE(0x1000000, "board1:game_rom", ROMREGION_ERASEFF ) \
 	ROM_LOAD( "piu10.u8",  0x000000, 0x200000, CRC(5911e31a)  SHA1(295723b9b7da9e55b5dd5586b23b06355f4837ef) ) \
-	ROM_REGION(0x400000, "board3:sound_rom", ROMREGION_ERASEFF ) \
+	ROM_REGION(0x400000, "isa1:pumpitup_io_sound:ymz", ROMREGION_ERASEFF ) \
 	ROM_LOAD( "piu10.u9",  0x000000, 0x200000, CRC(9c436cfa) SHA1(480ea52e74721d1963ced41be5c482b7b913ccd2) )
 
 ROM_START( pumpitup )
@@ -644,21 +704,21 @@ ROM_END
 } // anonymous namespace
 
 GAME(1999, xtom3d, 0, xtom3d, 0, xtom3d_state, empty_init, ROT0, "Andamiro / Jamie System Development", "X Tom 3D", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME(1999, pumpitup, 0,        xtom3d, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump It Up BIOS", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IS_BIOS_ROOT )
-GAME(1999, pumpit1,  pumpitup, xtom3d, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump It Up: The 1st Dance Floor (ver 0.53.1999.9.31)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-//GAME(1999, pumpit2,  pumpitup, xtom3d, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up: The 2nd Dance Floor", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-//GAME(1999, pumpit3,  pumpitup, xtom3d, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The O.B.G: The 3rd Dance Floor", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-// GAME(2000, pumpito,  pumpitup, xtom3d, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The O.B.G: The Season Evolution Dance Floor", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-// GAME(2000, pumpitc,  pumpitup, xtom3d, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up: The Collection", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-// GAME(2000, pumpitpc, pumpitup, xtom3d, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up: The Perfect Collection", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-// GAME(2001, pumpite,  pumpitup, xtom3d, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up Extra", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-// GAME(2001, pumpitpr, pumpitup, xtom3d, 0, xtom3d_state, empty_init, ROT0, "Andamiro","Pump it Up The Premiere: The International Dance Floor", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-// GAME(2001, pumpitpx, pumpitup, xtom3d, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The PREX: The International Dance Floor", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-// GAME(2002, pumpit8,  pumpitup, xtom3d, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The Rebirth: The 8th Dance Floor", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-// GAME(2002, pumpitp2, pumpitup, xtom3d, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The Premiere 2: The International 2nd Dance Floor", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-// GAME(2002, pumpipx2, pumpitup, xtom3d, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The PREX 2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-// GAME(2003, pumpitp3, pumpitup, xtom3d, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The Premiere 3: The International 3rd Dance Floor", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-// GAME(2003, pumpipx3, pumpitup, xtom3d, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The PREX 3: The International 4th Dance Floor", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME(1999, pumpitup, 0,        pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump It Up BIOS", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IS_BIOS_ROOT )
+GAME(1999, pumpit1,  pumpitup, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump It Up: The 1st Dance Floor (ver 0.53.1999.9.31)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//GAME(1999, pumpit2,  pumpitup, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up: The 2nd Dance Floor", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//GAME(1999, pumpit3,  pumpitup, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The O.B.G: The 3rd Dance Floor", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+// GAME(2000, pumpito,  pumpitup, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The O.B.G: The Season Evolution Dance Floor", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+// GAME(2000, pumpitc,  pumpitup, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up: The Collection", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+// GAME(2000, pumpitpc, pumpitup, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up: The Perfect Collection", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+// GAME(2001, pumpite,  pumpitup, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up Extra", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+// GAME(2001, pumpitpr, pumpitup, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro","Pump it Up The Premiere: The International Dance Floor", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+// GAME(2001, pumpitpx, pumpitup, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The PREX: The International Dance Floor", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+// GAME(2002, pumpit8,  pumpitup, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The Rebirth: The 8th Dance Floor", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+// GAME(2002, pumpitp2, pumpitup, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The Premiere 2: The International 2nd Dance Floor", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+// GAME(2002, pumpipx2, pumpitup, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The PREX 2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+// GAME(2003, pumpitp3, pumpitup, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The Premiere 3: The International 3rd Dance Floor", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+// GAME(2003, pumpipx3, pumpitup, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The PREX 3: The International 4th Dance Floor", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 // GAME(1999, "family production,inc", "N3 Heartbreakers Advanced" known to exist on this HW
 // https://namu.wiki/w/%ED%95%98%ED%8A%B8%20%EB%B8%8C%EB%A0%88%EC%9D%B4%EC%BB%A4%EC%A6%88
