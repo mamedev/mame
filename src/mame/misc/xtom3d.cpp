@@ -393,7 +393,7 @@ void xtom3d_state::xtom3d(machine_config &config)
 
 	// Expansion slots, mapping SVGA for debugging
 	#if ENABLE_VOODOO
-	VOODOO_BANSHEE_PCI(config, m_voodoo, 0, m_maincpu, "screen"); // "pci:0d.0" J4D2
+	VOODOO_BANSHEE_X86_PCI(config, m_voodoo, 0, m_maincpu, "screen"); // "pci:0d.0" J4D2
 	// TODO: confirm values
 	m_voodoo->set_fbmem(16);
 	m_voodoo->set_status_cycles(1000);
