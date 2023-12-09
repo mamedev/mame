@@ -198,10 +198,10 @@ void hudson_poems_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitma
 		u16 spriteword2 = m_mainram[(spritebase + i * 2) + 1] & 0xffff;
 		u16 spriteword3 = m_mainram[(spritebase + i * 2) + 1] >> 16;
 
-		int x = (spriteword3 & 0x03ff);
-		int y = (spriteword2 & 0x03ff);
+		const int x = (spriteword3 & 0x03ff);
+		const int y = (spriteword2 & 0x03ff);
 		int tilenum = spriteword1 & 0x03ff;
-		int pal = (spriteword2 & 0x7c00)>>10;
+		const int pal = (spriteword2 & 0x7c00)>>10;
 
 		// is it selecting from multiple tile pages (which can have different bases?) (probably from a register somewhere)
 		tilebase = (m_spritegfxbase[(spriteword0 & 0x0300)>>8] & 0x0003ffff) / 32; // m_spritegfxbase contains a full memory address pointer to RAM
@@ -215,9 +215,9 @@ void hudson_poems_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitma
 		word3 ( aabb bbxx xxxx xxxx ) x = xpos
 		*/
 
-		int alpha = (spriteword0 & 0x3c00)>>10;
-		int flipx = spriteword0 & 2;
-		int flipy = spriteword0 & 1;
+		const int alpha = (spriteword0 & 0x3c00)>>10;
+		const int flipx = spriteword0 & 2;
+		const int flipy = spriteword0 & 1;
 		int height = (spriteword1 & 0x3000)>>12;
 		height = 1 << height;
 		int width = (spriteword1 & 0xc000)>>14;
@@ -233,7 +233,7 @@ void hudson_poems_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitma
 		}
 		else
 		{
-			int basetilenum = tilenum;
+			const int basetilenum = tilenum;
 			for (int xx = 0; xx < width; xx++)
 			{
 				int xpos, ypos;
@@ -273,7 +273,7 @@ void hudson_poems_state::draw_tilemap(screen_device &screen, bitmap_rgb32 &bitma
 	int width, base, bpp, gfxbase, extrapal;
 
 	// guess, could be more/less bits, or somewhere else entirely, works for the 2 scenes that need it
-	int thispriority = (m_tilemapcfg[which] & 0x01f00000) >> 20;
+	const int thispriority = (m_tilemapcfg[which] & 0x01f00000) >> 20;
 
 	if (thispriority != priority)
 		return;
@@ -306,7 +306,7 @@ void hudson_poems_state::draw_tilemap(screen_device &screen, bitmap_rgb32 &bitma
 	// gets overwritten with an incorrect one.  Test mode does not require interrupts to function, although the bit we use to disable them is likely incorrect.
 	// this does NOT really seem to be tied to tilemap number, probably from a config reg
 	// this reg?
-	int whichbase = (m_tilemapcfg[which] & 0x00000060) >> 5;
+	const int whichbase = (m_tilemapcfg[which] & 0x00000060) >> 5;
 	gfxbase = (m_spritegfxbase[whichbase] & 0x0003ffff);
 
 	int yscroll = (m_tilemapscr[which] >> 16) & 0x7ff;
@@ -317,7 +317,7 @@ void hudson_poems_state::draw_tilemap(screen_device &screen, bitmap_rgb32 &bitma
 	if (xscroll & 0x400)
 		xscroll -= 0x800;
 
-	int tilemap_drawheight = ((m_tilemaphigh[which] >> 16) & 0xff);
+	const int tilemap_drawheight = ((m_tilemaphigh[which] >> 16) & 0xff);
 	int tilemap_drawwidth = ((m_tilemaphigh[which] >> 0) & 0x1ff);
 
 	// clamp to size of tilemap (test mode has 256 wide tilemap in RAM, but sets full 320 width?)
@@ -329,12 +329,12 @@ void hudson_poems_state::draw_tilemap(screen_device &screen, bitmap_rgb32 &bitma
 
 	for (int y = 0; y < tilemap_drawheight / 8; y++)
 	{
-		int ypos = (y * 8 + yscroll) & 0x1ff;
+		const int ypos = (y * 8 + yscroll) & 0x1ff;
 
 		for (int x = 0; x < tilemap_drawwidth / 8 / 2; x++)
 		{
 			u32 tiles = m_mainram[base + (y * width / 8 / 2) + x];
-			int xpos = (x * 16 + xscroll) & 0x1ff;
+			const int xpos = (x * 16 + xscroll) & 0x1ff;
 
 			if (bpp == 4)
 			{
@@ -379,8 +379,8 @@ template<int Layer> u32 hudson_poems_state::tilemap_scr_r(offs_t offset, u32 mem
 void hudson_poems_state::draw_tile(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 tile, int xx, int yy, int gfxbase, int extrapal)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(2);
-	int flipx = tile & 0x0800;
-	int flipy = tile & 0x0400;
+	const int flipx = tile & 0x0800;
+	const int flipy = tile & 0x0400;
 	int pal = (tile & 0xf000)>>12;
 	pal += extrapal * 0x10;
 	tile &= 0x3ff;
@@ -391,8 +391,8 @@ void hudson_poems_state::draw_tile(screen_device &screen, bitmap_rgb32 &bitmap, 
 void hudson_poems_state::draw_tile8(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 tile, int xx, int yy, int gfxbase, int extrapal)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(3);
-	int flipx = tile & 0x0800;
-	int flipy = tile & 0x0400;
+	const int flipx = tile & 0x0800;
+	const int flipy = tile & 0x0400;
 	int pal = 0;//(tile & 0xf000)>>8;
 	pal += extrapal;
 	tile &= 0x3ff;
@@ -471,10 +471,10 @@ u32 hudson_poems_state::poems_8000200_r(offs_t offset, u32 mem_mask)
 
 void hudson_poems_state::set_palette_val(int entry)
 {
-	u16 datax = m_palram[entry];
-	int b = ((datax) & 0x001f) >> 0;
-	int g = ((datax) & 0x03e0) >> 5;
-	int r = ((datax) & 0x7c00) >> 10;
+	const u16 datax = m_palram[entry];
+	const int b = ((datax) & 0x001f) >> 0;
+	const int g = ((datax) & 0x03e0) >> 5;
+	const int r = ((datax) & 0x7c00) >> 10;
 	m_palette->set_pen_color(entry, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
@@ -490,7 +490,7 @@ void hudson_poems_state::fade_w(offs_t offset, u32 data, u32 mem_mask)
 
 	u8 val = 0x1f - ((data >> 16) & 0x1f);
 
-	double intensity = (double)(val & 0x1f) / (double)0x1f;
+	const double intensity = (double)(val & 0x1f) / (double)0x1f;
 	for (int i = 0; i < 0x200; i++)
 		m_palette->set_pen_contrast(i, intensity);
 
@@ -659,7 +659,7 @@ GFXDECODE_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(hudson_poems_state::screen_scanline)
 {
-	int scanline = param;
+	const int scanline = param;
 
 	if (scanline == 100)
 	{
