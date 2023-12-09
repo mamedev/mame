@@ -83,7 +83,7 @@ MX29F1610MC 16M FlashROM (x7)
 //#include "bus/rs232/rs232.h"
 //#include "bus/rs232/sun_kbd.h"
 //#include "bus/rs232/terminal.h"
-//#include "machine/fdc37c93x.h"
+#include "machine/eepromser.h"
 #include "machine/mc146818.h"
 #include "machine/8042kbdc.h"
 #include "video/voodoo_pci.h"
@@ -220,6 +220,83 @@ void isa16_oksan_rom_disk::write(offs_t offset, u8 data)
 }
 
 /*
+ * ISA16 Oksan I/O & Sound board
+ *
+ */
+
+class isa16_oksan_io_sound : public device_t, public device_isa16_card_interface
+{
+public:
+	// construction/destruction
+	isa16_oksan_io_sound(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	virtual void device_add_mconfig(machine_config &config) override;
+private:
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
+
+	void remap(int space_id, offs_t start, offs_t end) override;
+	void io_map(address_map &map);
+};
+
+DEFINE_DEVICE_TYPE(ISA16_OKSAN_IO_SOUND, isa16_oksan_io_sound, "isa16_oksan_io_sound", "ISA16 Oksan I/O & Sound board for MK-III")
+
+isa16_oksan_io_sound::isa16_oksan_io_sound(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, ISA16_OKSAN_IO_SOUND, tag, owner, clock)
+	, device_isa16_card_interface(mconfig, *this)
+	, m_eeprom(*this, "eeprom")
+{
+}
+
+void isa16_oksan_io_sound::device_add_mconfig(machine_config &config)
+{
+	// TODO: may be 8BIT
+	EEPROM_93C46_16BIT(config, "eeprom");
+}
+
+void isa16_oksan_io_sound::device_start()
+{
+	set_isa_device();
+}
+
+void isa16_oksan_io_sound::device_reset()
+{
+}
+
+void isa16_oksan_io_sound::io_map(address_map &map)
+{
+	map(0x08, 0x08).lr8(
+		NAME([this] () {
+			return 0xff;
+		})
+	);
+	map(0x0c, 0x0c).lw8(
+		NAME([this] (u8 data) {
+			// bit 0: always written, more CS?
+			m_eeprom->clk_write(BIT(data, 1) ? CLEAR_LINE : ASSERT_LINE);
+			m_eeprom->cs_write(BIT(data, 4) ? ASSERT_LINE : CLEAR_LINE);
+			m_eeprom->di_write(BIT(data, 2) ? ASSERT_LINE : CLEAR_LINE);
+		})
+	);
+	map(0x0e, 0x0e).lr8(
+		NAME([this] () {
+			return m_eeprom->do_read() | 0xfe;
+		})
+	);
+}
+
+void isa16_oksan_io_sound::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_IO)
+	{
+		m_isa->install_device(0x02a0, 0x02af, *this, &isa16_oksan_io_sound::io_map);
+	}
+}
+
+/*
  * ISA16 Oksan Virtual LPC
  *
  * Doesn't really accesses a Super I/O, which implies that the Holtek keyboard
@@ -338,6 +415,7 @@ void xtom3d_isa_cards(device_slot_interface &device)
 {
 	device.option_add_internal("oksan_romdisk", ISA16_OKSAN_ROM_DISK);
 	device.option_add_internal("oksan_lpc", ISA16_OKSAN_LPC);
+	device.option_add_internal("oksan_io_sound", ISA16_OKSAN_IO_SOUND);
 }
 
 void xtom3d_state::romdisk_config(device_t *device)
@@ -387,8 +465,7 @@ void xtom3d_state::xtom3d(machine_config &config)
 
 	ISA16_SLOT(config, "board1", 0, "pci:07.0:isabus", xtom3d_isa_cards, "oksan_romdisk", true).set_option_machine_config("oksan_romdisk", romdisk_config);
 	ISA16_SLOT(config, "board2", 0, "pci:07.0:isabus", xtom3d_isa_cards, "oksan_lpc", true);
-	// TODO: another ISA slot for sound system + EEPROM
-	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", xtom3d_isa_cards, "oksan_io_sound", true);
 	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
 	// Expansion slots, mapping SVGA for debugging
