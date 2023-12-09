@@ -69,6 +69,7 @@ void fidel_clockdiv_state::div_refresh(ioport_value val)
 	m_maincpu->set_clock_scale(1.0);
 	m_div_status = ~0;
 	m_div_scale = (val & 1) ? 0.25 : 0.5;
+	m_div_timer->adjust(attotime::never);
 
 	// set up memory passthroughs
 	m_read_tap.remove();
