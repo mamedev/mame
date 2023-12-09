@@ -269,7 +269,7 @@ void isa16_oksan_io_sound::device_reset()
 void isa16_oksan_io_sound::io_map(address_map &map)
 {
 	map(0x08, 0x08).lr8(
-		NAME([this] () {
+		NAME([] () {
 			return 0xff;
 		})
 	);
