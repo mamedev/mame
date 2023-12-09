@@ -78,7 +78,7 @@ private:
 	void write_d(u8 data);
 	void write_a(u16 data);
 
-	TIMER_CALLBACK_MEMBER(speaker_decay_sim);
+	void speaker_decay_sim(s32 param);
 };
 
 void wildfire_state::machine_start()
@@ -95,7 +95,7 @@ void wildfire_state::machine_start()
     I/O
 *******************************************************************************/
 
-TIMER_CALLBACK_MEMBER(wildfire_state::speaker_decay_sim)
+void wildfire_state::speaker_decay_sim(s32 param)
 {
 	// volume decays when speaker is off (divisor and timer period determine duration)
 	m_volume->set_gain(m_volume->gain() / 1.0025);
