@@ -176,6 +176,13 @@ project "zstd"
 	uuid "5edd8713-bc60-456d-9c95-b928a913c84b"
 	kind "StaticLib"
 
+	configuration { "Release" }
+		defines {
+			"NDEBUG",
+		}
+
+	configuration { }
+
 	defines {
 		"XXH_NAMESPACE=ZSTD_",
 		"DEBUGLEVEL=0",
@@ -721,13 +728,9 @@ end
 			"HAVE_FSEEKO",
 		}
 
-	configuration { "Release" }
-		defines {
-			"NDEBUG",
-		}
-
 	configuration { }
 		defines {
+			"NDEBUG", -- always enable this to avoid debug log spam on compression
 			"HAVE_CONFIG_H", -- mostly because PACKAGE_VERSION is a pain to do otherwise
 			"ENABLE_64_BIT_WORDS=1",
 			"OGG_FOUND=0",
