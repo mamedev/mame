@@ -20,6 +20,16 @@
       - In 49/50 row mode, character descenders are cut off.
       - Screen saver does not disable the screen
 
+  Not Implemented (yet)
+    - With SigmaSoft IGC
+      - Interlace video support (with higher resolution)
+      - Joystick support
+      - Centronics support
+      - Lightpen support
+      - Alternate Font ROM support (missing ROM image)
+    - With Imaginator I-100
+      - Support for Tektronics Emulation (missing ROM image)
+
 ****************************************************************************/
 /***************************************************************************
 
@@ -62,7 +72,7 @@
 #define LOG_REG (1U << 1)    // Shows register setup
 #define LOG_FUNC (1U << 4)   // Function calls
 
-#define VERBOSE (LOG_REG | LOG_FUNC)
+//#define VERBOSE (LOG_REG | LOG_FUNC)
 
 #include "logmacro.h"
 
@@ -117,7 +127,6 @@ DEFINE_DEVICE_TYPE(HEATH_IGC, heath_igc_tlb_device, "heath_igc_tlb_device", "Hea
 DEFINE_DEVICE_TYPE(HEATH_IGC_SUPER19, heath_igc_super19_tlb_device, "heath_igc_super19_tlb_device", "Heath Terminal Logic Board w/ Super19 ROM plus SigmaSoft Interactive Graphics Controller")
 DEFINE_DEVICE_TYPE(HEATH_IGC_ULTRA, heath_igc_ultra_tlb_device, "heath_igc_ultra_tlb_device", "Heath Terminal Logic Board w/ Ultra ROM plus SigmaSoft Interactive Graphics Controller")
 DEFINE_DEVICE_TYPE(HEATH_IGC_WATZ, heath_igc_watz_tlb_device, "heath_igc_watz_tlb_device", "Heath Terminal Logic Board w/Watzman ROM plus SigmaSoft Interactive Graphics Controller")
-
 
 
 

@@ -745,4 +745,4 @@ ROM_END
 
 //    YEAR  NAME           PARENT COMPAT MACHINE        INPUT CLASS      INIT        COMPANY          FULLNAME                           FLAGS
 COMP( 1979, h89,           0,     0,     h89,           h89,  h89_state, empty_init, "Heath Company", "Heathkit H89",                    MACHINE_SUPPORTS_SAVE)
-COMP( 1979, h89_sigmasoft, h89,   0,     h89_sigmasoft, h89,  h89_state, empty_init, "Heath Company", "Heathkit H89 with SigmaSoft IGC", MACHINE_SUPPORTS_SAVE)
+COMP( 1984, h89_sigmasoft, h89,   0,     h89_sigmasoft, h89,  h89_state, empty_init, "Heath Company", "Heathkit H89 with SigmaSoft IGC", MACHINE_SUPPORTS_SAVE)
