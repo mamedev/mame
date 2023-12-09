@@ -70,14 +70,12 @@
 #include <algorithm>
 
 #define LOG_REG (1U << 1)    // Shows register setup
-#define LOG_FUNC (1U << 4)   // Function calls
 
-//#define VERBOSE (LOG_REG | LOG_FUNC)
+//#define VERBOSE (LOG_REG)
 
 #include "logmacro.h"
 
 #define LOGREG(...)        LOGMASKED(LOG_REG, __VA_ARGS__)
-#define LOGFUNC(...)       LOGMASKED(LOG_FUNC, __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
@@ -1798,8 +1796,6 @@ void heath_igc_tlb_device::device_start()
 
 void heath_igc_tlb_device::device_reset()
 {
-	LOGFUNC("%s:\n", FUNCNAME);
-
 	heath_tlb_device::device_reset();
 
 	sigma_ctrl_w(0);
@@ -1856,8 +1852,6 @@ void heath_igc_tlb_device::sigma_video_mem_w(uint8_t data)
 
 uint8_t heath_igc_tlb_device::sigma_video_mem_r(void)
 {
-	LOGFUNC("%s:\n", FUNCNAME);
-
 	// control whether m_io_address is incremented during a read
 	uint32_t addr = (m_read_address_increment_disabled || machine().side_effects_disabled()) ?
 		((m_memory_bank_select << 16) + m_io_address) :
