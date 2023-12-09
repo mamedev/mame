@@ -10,17 +10,14 @@ Customized i440bx Award based BIOS, "OKSAN MK III /EVATE Ver99.04.20"
 TODO:
 - DIR texture folder will throw mangled file structure the second time around (when
   ENABLE_VOODOO is 0 and SVGA is used instead). PAM[5] and [6] areas are written to but
-  they are locked for write ...
+  they are locked for write, the flash ROM interface looks good now so it's trying to read
+  from conventional memory instead;
 - Voodoo Banshee doesn't handle VGA text modes correctly, it will set the screen to 80 x 25
   at POST (making MAME UI host to be unusable) without any drawing.
-  Current stall point (texture init) will eventually write data at VGA memory $a0000-$bffff,
-  likely for drawing an error.
-- Pinpoint what i/o $2a8 is for during texture init (alt serial flash transfer?)
-- EEPROM (i/o $2ac r/w)
+- Fix EEPROM hookup (i/o $2ac r/w), throws bad in Pump It Up service mode
 - Hookup ISA sound board (YMZ280B + YAC516 + 3550A DAC);
 - pumpit1: MSCDEX hangs often when Voodoo is disabled;
-- pumpit1: black screens all the way with Voodoo enabled, eventually throws a fatal error
-  "pci:01.0:00.0:voodoo: Unsupported cmdFifo packet type 7", may require true AGP comms or properly initialized SPD DIMMs;
+- pumpit1: flickers a lot during attract mode demo play, may need better host clock;
 - Pump it Up: every CD after pumpit1 are really multisession disks, which is unsupported
   by chdman at the time of this writing (and doesn't seem worth converting atm);
 - Pump it Up: CAT702 ZN protection for later games;
@@ -87,6 +84,15 @@ MX29F1610MC 16M FlashROM (x7)
 #include "machine/mc146818.h"
 #include "machine/8042kbdc.h"
 #include "video/voodoo_pci.h"
+
+#define LOG_FLASH     (1U << 1)
+
+#define VERBOSE (LOG_GENERAL | LOG_FLASH)
+//#define LOG_OUTPUT_FUNC osd_printf_warning
+
+#include "logmacro.h"
+
+#define LOGFLASH(...)     LOGMASKED(LOG_FLASH,     __VA_ARGS__)
 
 #define ENABLE_VOODOO 1
 
@@ -158,6 +164,8 @@ u8 isa16_oksan_rom_disk::read(offs_t offset)
 	//printf("%02x\n", offset);
 	if (offset == 0xa || offset == 0xb)
 	{
+		//if ((m_flash_addr & 0x0fffff) == 0)
+		//	printf("%02x %08x %d %d\n", m_flash_cmd, m_flash_addr << 1, m_flash_unlock, m_flash_state);
 		if (m_flash_cmd == 0xf0 && m_flash_unlock)
 		{
 			const u32 flash_size = m_flash_rom->bytes() - 1;
@@ -199,19 +207,23 @@ void isa16_oksan_rom_disk::write(offs_t offset, u8 data)
 			break;
 		// data port
 		case 0xa:
-			if (data == 0xaa && m_flash_addr == 0x5555 && m_flash_state == 0)
+		{
+			const u16 flash_lower_addr = m_flash_addr & 0xffff;
+			LOGFLASH("%02x %04x\n", data, m_flash_addr);
+			if (data == 0xaa && flash_lower_addr == 0x5555 && m_flash_state == 0)
 			{
 				m_flash_state = 1;
 			}
-			else if (data == 0x55 && m_flash_addr == 0x2aaa && m_flash_state == 1)
+			else if (data == 0x55 && flash_lower_addr == 0x2aaa && m_flash_state == 1)
 				m_flash_state = 2;
-			else if (m_flash_state == 2 && m_flash_addr == 0x5555)
+			else if (m_flash_state == 2 && flash_lower_addr == 0x5555)
 			{
 				m_flash_state = 0;
 				m_flash_cmd = data;
 				//printf("%02x %08x\n", data, m_flash_addr);
 			}
 			break;
+		}
 		// chip enable, 0 -> 1 transitions
 		case 0xc:
 			m_flash_unlock = bool(BIT(data, 3));
@@ -234,9 +246,14 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 private:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_ioport m_system;
+	required_ioport m_in0;
+	required_ioport m_in1;
+	required_ioport m_in2;
 
 	void remap(int space_id, offs_t start, offs_t end) override;
 	void io_map(address_map &map);
@@ -248,6 +265,10 @@ isa16_oksan_io_sound::isa16_oksan_io_sound(const machine_config &mconfig, const 
 	: device_t(mconfig, ISA16_OKSAN_IO_SOUND, tag, owner, clock)
 	, device_isa16_card_interface(mconfig, *this)
 	, m_eeprom(*this, "eeprom")
+	, m_system(*this, "SYSTEM")
+	, m_in0(*this, "IN0")
+	, m_in1(*this, "IN1")
+	, m_in2(*this, "IN2")
 {
 }
 
@@ -255,6 +276,84 @@ void isa16_oksan_io_sound::device_add_mconfig(machine_config &config)
 {
 	// TODO: may be 8BIT
 	EEPROM_93C46_16BIT(config, "eeprom");
+}
+
+static INPUT_PORTS_START(xtom3d)
+	PORT_START("SYSTEM")
+	PORT_DIPNAME( 0x0001, 0x0001, "SYSTEM" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_DIPNAME( 0x0040, 0x0040, "IN0" )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_DIPNAME( 0x0040, 0x0040, "IN1" )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x0001, 0x0001, "IN2" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+ioport_constructor isa16_oksan_io_sound::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(xtom3d);
 }
 
 void isa16_oksan_io_sound::device_start()
@@ -268,9 +367,15 @@ void isa16_oksan_io_sound::device_reset()
 
 void isa16_oksan_io_sound::io_map(address_map &map)
 {
-	map(0x08, 0x08).lr8(
-		NAME([] () {
-			return 0xff;
+	// $2a0-$2a3 sound
+	map(0x08, 0x09).lr8(
+		NAME([this] (offs_t offset) {
+			return offset & 1 ? m_system->read() : m_in0->read();
+		})
+	);
+	map(0x0a, 0x0b).lr8(
+		NAME([this] (offs_t offset) {
+			return offset & 1 ? m_in2->read() : m_in1->read();
 		})
 	);
 	map(0x0c, 0x0c).lw8(
@@ -345,6 +450,12 @@ void isa16_oksan_lpc::device_add_mconfig(machine_config &config)
 	m_kbdc->system_reset_callback().set_inputline(":maincpu", INPUT_LINE_RESET);
 	m_kbdc->gate_a20_callback().set_inputline(":maincpu", INPUT_LINE_A20);
 	m_kbdc->input_buffer_full_callback().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq1_w));
+#if !ENABLE_VOODOO
+	m_kbdc->set_keyboard_tag("at_keyboard");
+
+	at_keyboard_device &at_keyb(AT_KEYB(config, "at_keyboard", pc_keyboard_device::KEYBOARD_TYPE::AT, 1));
+	at_keyb.keypress().set(m_kbdc, FUNC(kbdc8042_device::keyboard_w));
+#endif
 }
 
 
@@ -441,7 +552,7 @@ void xtom3d_state::xtom3d(machine_config &config)
 
 	PCI_ROOT(config, "pci", 0);
 	// PCB has ZX marking but BIOS returns BX, shouldn't matter
-	I82443BX_HOST(config, "pci:00.0", 0, "maincpu", 32*1024*1024);
+	I82443BX_HOST(config, "pci:00.0", 0, "maincpu", 128*1024*1024);
 	I82443BX_BRIDGE(config, "pci:01.0", 0 ); //"pci:01.0:00.0");
 	//I82443BX_AGP   (config, "pci:01.0:00.0");
 
@@ -469,12 +580,13 @@ void xtom3d_state::xtom3d(machine_config &config)
 	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
 	// Expansion slots, mapping SVGA for debugging
-	#if ENABLE_VOODOO
+#if ENABLE_VOODOO
 	VOODOO_BANSHEE_X86_PCI(config, m_voodoo, 0, m_maincpu, "screen"); // "pci:0d.0" J4D2
 	// TODO: confirm values
 	m_voodoo->set_fbmem(16);
 	m_voodoo->set_status_cycles(1000);
-	//subdevice<generic_voodoo_device>(PCI_AGP_ID":voodoo")->vblank_callback().set(FUNC(xtom3d_state::vblank_assert));
+	// TODO: check me, probably unconnected
+	subdevice<generic_voodoo_device>(PCI_AGP_ID":voodoo")->vblank_callback().set("pci:07.0", FUNC(i82371eb_isa_device::pc_irq5_w));
 
 	// TODO: fix legacy raw setup here
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -482,9 +594,9 @@ void xtom3d_state::xtom3d(machine_config &config)
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 640 - 1, 0, 480 - 1);
 	screen.set_screen_update(PCI_AGP_ID, FUNC(voodoo_banshee_pci_device::screen_update));
-	#else
+#else
 	VIRGE_PCI(config, "pci:0e.0", 0); // J4C1
-	#endif
+#endif
 	// "pci:0d.0" J4D2
 	// "pci:0e.0" J4D1
 }
@@ -533,7 +645,7 @@ ROM_END
 
 GAME(1999, xtom3d, 0, xtom3d, 0, xtom3d_state, empty_init, ROT0, "Andamiro / Jamie System Development", "X Tom 3D", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME(1999, pumpitup, 0,        xtom3d, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump It Up BIOS", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IS_BIOS_ROOT )
-GAME(1999, pumpit1,  pumpitup, xtom3d, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump It Up: The 1st Dance Floor", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME(1999, pumpit1,  pumpitup, xtom3d, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump It Up: The 1st Dance Floor (ver 0.53.1999.9.31)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 //GAME(1999, pumpit2,  pumpitup, xtom3d, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up: The 2nd Dance Floor", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 //GAME(1999, pumpit3,  pumpitup, xtom3d, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The O.B.G: The 3rd Dance Floor", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 // GAME(2000, pumpito,  pumpitup, xtom3d, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The O.B.G: The Season Evolution Dance Floor", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
