@@ -29990,6 +29990,11 @@ suprpokrb                       // (c) 1986 Grayhound Electronics
 @source:misc/gfamily.cpp
 gmfamily                        //
 
+@source:misc/gi6809.cpp
+castawayt                       // (c) 1987 Tranex Australia Pty Ltd.
+jesterch                        // (c) 1987 Tranex Australia Pty Ltd.
+glck6809                        // (c) 198? General Instrument?
+
 @source:misc/globalfr.cpp
 gl_coc                          // Carry On Clubbin' (Global)
 gl_coc29                        //
