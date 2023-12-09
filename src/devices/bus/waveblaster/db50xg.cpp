@@ -5,9 +5,9 @@
 
 // PCB name: XQ791
 
-// It's in large part a mu50 on a board, same swp00, same wave roms.
-// CPU and program are different though, and obvsiously there's no
-// LCD.  The are also no analog inputs, which were half-assed in the
+// It's in large part a mu50 on a board, same swp00, same wave ROMs.
+// CPU and program are different though, and obviously there's no
+// LCD.  There are also no analog inputs, which were half-assed in the
 // mu50 anyway.
 
 #include "emu.h"
