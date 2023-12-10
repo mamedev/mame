@@ -40,6 +40,7 @@ public:
 	template <typename... T> void set_m1_map(T &&... args) { set_addrmap(AS_OPCODES, std::forward<T>(args)...); }
 	template <typename... T> void set_io_map(T &&... args) { set_addrmap(AS_IO, std::forward<T>(args)...); }
 	auto irqack_cb() { return m_irqack_cb.bind(); }
+	auto reti_cb() { return m_reti_cb.bind(); }
 	auto refresh_cb() { return m_refresh_cb.bind(); }
 	auto nomreq_cb() { return m_nomreq_cb.bind(); }
 	auto halt_cb() { return m_halt_cb.bind(); }
@@ -157,6 +158,7 @@ protected:
 	u8 rm(u16 addr);
 	u8 rm_reg(u16 addr);
 	void rm16(u16 addr, PAIR &r);
+	void rm16_sp(PAIR &r);
 	void wm(u16 addr, u8 value);
 	void wm16(u16 addr, PAIR &r);
 	void wm16_sp(PAIR &r);
@@ -246,6 +248,8 @@ protected:
 
 	virtual u8 data_read(u16 addr);
 	virtual void data_write(u16 addr, u8 value);
+	virtual u8 stack_read(u16 addr) { return data_read(addr); }
+	virtual void stack_write(u16 addr, u8 value) { return data_write(addr, value); }
 	virtual u8 opcode_read();
 	virtual u8 arg_read();
 
@@ -259,6 +263,7 @@ protected:
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
 
 	devcb_write_line m_irqack_cb;
+	devcb_write_line m_reti_cb;
 	devcb_write8 m_refresh_cb;
 	devcb_write8 m_nomreq_cb;
 	devcb_write_line m_halt_cb;

@@ -2913,6 +2913,8 @@ if (CPUS["Z80"]~=null or CPUS["KC80"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/cpu/z80/z80.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/z80.h",
+		MAME_DIR .. "src/devices/cpu/z80/t6a84.cpp",
+		MAME_DIR .. "src/devices/cpu/z80/t6a84.h",
 		MAME_DIR .. "src/devices/cpu/z80/tmpz84c011.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/tmpz84c011.h",
 		MAME_DIR .. "src/devices/cpu/z80/tmpz84c015.cpp",
