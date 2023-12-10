@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include "xtensa_helper.h"
 
 class xtensa_device : public cpu_device
 {
@@ -204,8 +203,6 @@ private:
 
 	u32 m_irq_vectors[32];
 	u32 m_startupvector;
-
-	xtensa_helper m_helper;
 };
 
 DECLARE_DEVICE_TYPE(XTENSA, xtensa_device)

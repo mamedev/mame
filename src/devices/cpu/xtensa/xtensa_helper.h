@@ -26,8 +26,44 @@ public:
 	static const int32_t s_b4const[16];
 	static const uint32_t s_b4constu[16];
 	static const char *const s_b_ops[16];
-	std::string format_imm(uint32_t imm);
-	std::string special_reg(uint8_t n, bool wsr);
+
+	static std::string format_imm(uint32_t imm)
+	{
+		if (s32(imm) < 0)
+		{
+			if (s32(imm < -9))
+			{
+				return util::string_format("-0x%X", -imm);
+			}
+			else
+			{
+				return util::string_format("-%X", -imm);
+			}
+		}
+		else
+		{
+			if (imm > 9)
+			{
+				return util::string_format("0x%X", imm);
+			}
+			else
+			{
+				return util::string_format("%X", imm);
+			}
+		}
+	}
+
+	static std::string special_reg(uint8_t n, bool wsr)
+	{
+		if (n == 226 && !wsr)
+			return "interrupt";
+
+		const char *s = xtensa_helper::special_regs[n];
+		if (s[0] == '\0')
+			return util::string_format("s%u", n);
+		else
+			return s;
+	}
 };
 
-#endif
+#endif // MAME_CPU_XTENSA_XTENSA_HELPER_H

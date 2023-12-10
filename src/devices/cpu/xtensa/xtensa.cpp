@@ -906,15 +906,15 @@ void xtensa_device::getop_and_execute()
 				}
 
 				case 0b0110: // RER - Read External Register
-					LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d\n", m_helper.s_st1_ops[BIT(inst, 12, 4)], BIT(inst, 4, 4), BIT(inst, 8, 4));
+					LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d\n", xtensa_helper::s_st1_ops[BIT(inst, 12, 4)], BIT(inst, 4, 4), BIT(inst, 8, 4));
 					break;
 
 				case 0b0111: // WER - Write External Register
-					LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d\n", m_helper.s_st1_ops[BIT(inst, 12, 4)], BIT(inst, 4, 4), BIT(inst, 8, 4));
+					LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d\n", xtensa_helper::s_st1_ops[BIT(inst, 12, 4)], BIT(inst, 4, 4), BIT(inst, 8, 4));
 					break;
 
 				case 0b1110: // NSA (with Miscellaneous Operations Option) - Normalization Shift Amount
-					LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d\n", m_helper.s_st1_ops[BIT(inst, 12, 4)], BIT(inst, 4, 4), BIT(inst, 8, 4));
+					LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d\n", xtensa_helper::s_st1_ops[BIT(inst, 12, 4)], BIT(inst, 4, 4), BIT(inst, 8, 4));
 					break;
 
 				case 0b1111: // NSAU (with Miscellaneous Operations Option) - Normalization Shift Amount Unsigned
@@ -954,11 +954,11 @@ void xtensa_device::getop_and_execute()
 				{
 				case 0b0011: case 0b0101: case 0b0110: case 0b0111: // RITLB0, PITLB, WITLB, RITLB1
 				case 0b1011: case 0b1101: case 0b1110: case 0b1111: // RDTLB0, PDTLB, WDTLB, RDTLB1
-					LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d\n", m_helper.s_tlb_ops[BIT(inst, 12, 4)], BIT(inst, 4, 4), BIT(inst, 8, 4));
+					LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d\n", xtensa_helper::s_tlb_ops[BIT(inst, 12, 4)], BIT(inst, 4, 4), BIT(inst, 8, 4));
 					break;
 
 				case 0b0100: case 0b1100: // IITLB, IDTLB
-					LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d\n", m_helper.s_tlb_ops[BIT(inst, 12, 4)], BIT(inst, 8, 4));
+					LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d\n", xtensa_helper::s_tlb_ops[BIT(inst, 12, 4)], BIT(inst, 8, 4));
 					break;
 
 				default:
@@ -1220,12 +1220,12 @@ void xtensa_device::getop_and_execute()
 			switch (BIT(inst, 20, 4))
 			{
 			case 0b0000: case 0b0001: case 0b0010: case 0b0011: case 0b0100: // ANDB, ANDBC, ORB, ORBC, XORB (with Boolean Option)
-				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sb%d, b%d, b%d\n", m_helper.s_rst2_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
+				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sb%d, b%d, b%d\n", xtensa_helper::s_rst2_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
 				break;
 
 			case 0b1000: case 0b1010: case 0b1011: // MULL, MULUH, MULSH (with 32-bit Integer Multiply Option)
 			case 0b1100: case 0b1101: case 0b1110: case 0b1111: // QUOU, QUOS, REMU, REMS (with 32-bit Integer Divide Option)
-				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, a%d\n", m_helper.s_rst2_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
+				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, a%d\n", xtensa_helper::s_rst2_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
 				break;
 
 			default:
@@ -1241,7 +1241,7 @@ void xtensa_device::getop_and_execute()
 			{
 				const u8 spcreg = BIT(inst, 8, 8);
 				const u8 reg = BIT(inst, 4, 4);
-				LOGMASKED(LOG_EXTREG_OPS, "%s.%-3d a%d\n", "rsr", m_helper.special_reg(spcreg, BIT(inst, 20)), reg);
+				LOGMASKED(LOG_EXTREG_OPS, "%s.%-3d a%d\n", "rsr", xtensa_helper::special_reg(spcreg, BIT(inst, 20)), reg);
 				set_reg(reg, space(AS_EXTREGS).read_dword(spcreg));
 				break;
 			}
@@ -1250,7 +1250,7 @@ void xtensa_device::getop_and_execute()
 			{
 				const u8 spcreg = BIT(inst, 8, 8);
 				const u8 reg = BIT(inst, 4, 4);
-				LOGMASKED(LOG_EXTREG_OPS, "%s.%-3d a%d\n", "wsr", m_helper.special_reg(spcreg, BIT(inst, 20)), reg);
+				LOGMASKED(LOG_EXTREG_OPS, "%s.%-3d a%d\n", "wsr", xtensa_helper::special_reg(spcreg, BIT(inst, 20)), reg);
 				space(AS_EXTREGS).write_dword(spcreg, get_reg(reg));
 				break;
 			}
@@ -1265,15 +1265,15 @@ void xtensa_device::getop_and_execute()
 			}
 
 			case 0b0011: // CLAMPS (with Miscellaneous Operations Option)
-				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, %d\n", m_helper.s_rst3_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4) + 7);
+				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, %d\n", xtensa_helper::s_rst3_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4) + 7);
 				break;
 
 			case 0b0100: // MIN (with Miscellaneous Operations Option)
-				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, a%d\n", m_helper.s_rst3_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
+				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, a%d\n", xtensa_helper::s_rst3_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
 				break;
 
 			case 0b0101: // MAX (with Miscellaneous Operations Option)
-				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, a%d\n", m_helper.s_rst3_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
+				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, a%d\n", xtensa_helper::s_rst3_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
 				break;
 
 			case 0b0110: // MINU (with Miscellaneous Operations Option) - Minimum Value Unsigned
@@ -1291,7 +1291,7 @@ void xtensa_device::getop_and_execute()
 			}
 
 			case 0b0111: // MAXU (with Miscellaneous Operations Option)
-				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, a%d\n", m_helper.s_rst3_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
+				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, a%d\n", xtensa_helper::s_rst3_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
 				break;
 
 			case 0b1000: // MOVEQZ
@@ -1342,11 +1342,11 @@ void xtensa_device::getop_and_execute()
 			}
 
 			case 0b1100: case 0b1101: // MOVF, MOVT (with Boolean Option)
-				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, b%d\n", m_helper.s_rst3_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
+				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, b%d\n", xtensa_helper::s_rst3_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
 				break;
 
 			case 0b1110: case 0b1111: // RUR, WUR (TODO: TIE user_register names)
-				LOGMASKED(LOG_UNHANDLED_OPS, "%s.u%-2d a%d\n", m_helper.s_rst3_ops[BIT(inst, 20, 4)], BIT(inst, 4, 8), BIT(inst, 12, 4));
+				LOGMASKED(LOG_UNHANDLED_OPS, "%s.u%-2d a%d\n", xtensa_helper::s_rst3_ops[BIT(inst, 20, 4)], BIT(inst, 4, 8), BIT(inst, 12, 4));
 				break;
 			}
 			break;
@@ -1395,11 +1395,11 @@ void xtensa_device::getop_and_execute()
 			switch (BIT(inst, 20, 4))
 			{
 			case 0b0000: // L32E
-				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, %s\n", "l32e", BIT(inst, 4, 4), BIT(inst, 8, 4), m_helper.format_imm(int(BIT(inst, 12, 4)) * 4 - 64));
+				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, %s\n", "l32e", BIT(inst, 4, 4), BIT(inst, 8, 4), xtensa_helper::format_imm(int(BIT(inst, 12, 4)) * 4 - 64));
 				break;
 
 			case 0b0100: // S32E
-				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, %s\n", "s32e", BIT(inst, 4, 4), BIT(inst, 8, 4), m_helper.format_imm(int(BIT(inst, 12, 4)) * 4 - 64));
+				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, %s\n", "s32e", BIT(inst, 4, 4), BIT(inst, 8, 4), xtensa_helper::format_imm(int(BIT(inst, 12, 4)) * 4 - 64));
 				break;
 
 			default:
@@ -1412,15 +1412,15 @@ void xtensa_device::getop_and_execute()
 			switch (BIT(inst, 20, 4))
 			{
 			case 0b0000: case 0b0001: case 0b0010: case 0b0100: case 0b0101: // ADD.S, SUB.S, MUL.S, MADD.S, MSUB.S
-				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sf%d, f%d, f%d\n", m_helper.s_fp0_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
+				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sf%d, f%d, f%d\n", xtensa_helper::s_fp0_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
 				break;
 
 			case 0b1000: case 0b1001: case 0b1010: case 0b1011: case 0b1110: // ROUND.S, TRUNC.S, FLOOR.S, CEIL.S, UTRUNC.S
-				LOGMASKED(LOG_UNHANDLED_OPS, "%-7s a%d, f%d, %d\n", m_helper.s_fp0_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
+				LOGMASKED(LOG_UNHANDLED_OPS, "%-7s a%d, f%d, %d\n", xtensa_helper::s_fp0_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
 				break;
 
 			case 0b1100: case 0b1101: // FLOAT.S, UFLOAT.S
-				LOGMASKED(LOG_UNHANDLED_OPS, "%-7s f%d, a%d, %d\n", m_helper.s_fp0_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
+				LOGMASKED(LOG_UNHANDLED_OPS, "%-7s f%d, a%d, %d\n", xtensa_helper::s_fp0_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
 				break;
 
 			case 0b1111: // FP1OP
@@ -1462,15 +1462,15 @@ void xtensa_device::getop_and_execute()
 			switch (BIT(inst, 20, 4))
 			{
 			case 0b0001: case 0b0010: case 0b0011: case 0b0100: case 0b0101: case 0b0110: case 0b0111: // UN.S, OEQ.S, UEQ.S, OLT.S, ULT.S, OLE.S, ULE.S
-				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sb%d, f%d, f%d\n", m_helper.s_fp1_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
+				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sb%d, f%d, f%d\n", xtensa_helper::s_fp1_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
 				break;
 
 			case 0b1000: case 0b1001: case 0b1010: case 0b1011: // MOVEQZ.S, MOVNEZ.S, MOVLTZ.S, MOVGEZ.S
-				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sf%d, f%d, a%d\n", m_helper.s_fp1_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
+				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sf%d, f%d, a%d\n", xtensa_helper::s_fp1_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
 				break;
 
 			case 0b1100: case 0b1101: // MOVF.S, MOVT.S
-				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sf%d, f%d, b%d\n", m_helper.s_fp1_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
+				LOGMASKED(LOG_UNHANDLED_OPS, "%-8sf%d, f%d, b%d\n", xtensa_helper::s_fp1_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
 				break;
 
 			default:
@@ -1565,15 +1565,15 @@ void xtensa_device::getop_and_execute()
 		}
 
 		case 0b1011: // L32AI (with Multiprocessor Synchronization Option)
-			LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, %s\n", m_helper.s_lsai_ops[BIT(inst, 12, 4)], BIT(inst, 4, 4), BIT(inst, 8, 4), m_helper.format_imm((inst >> 16) * 4));
+			LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, %s\n", xtensa_helper::s_lsai_ops[BIT(inst, 12, 4)], BIT(inst, 4, 4), BIT(inst, 8, 4), xtensa_helper::format_imm((inst >> 16) * 4));
 			break;
 
 		case 0b1111: // S32RI (with Multiprocessor Synchronization Option)
-			LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, %s\n", m_helper.s_lsai_ops[BIT(inst, 12, 4)], BIT(inst, 4, 4), BIT(inst, 8, 4), m_helper.format_imm((inst >> 16) * 4));
+			LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, %s\n", xtensa_helper::s_lsai_ops[BIT(inst, 12, 4)], BIT(inst, 4, 4), BIT(inst, 8, 4), xtensa_helper::format_imm((inst >> 16) * 4));
 			break;
 
 		case 0b1110: // S32C1I (with Conditional Store Option)
-			LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, %s\n", m_helper.s_lsai_ops[BIT(inst, 12, 4)], BIT(inst, 4, 4), BIT(inst, 8, 4), m_helper.format_imm((inst >> 16) * 4));
+			LOGMASKED(LOG_UNHANDLED_OPS, "%-8sa%d, a%d, %s\n", xtensa_helper::s_lsai_ops[BIT(inst, 12, 4)], BIT(inst, 4, 4), BIT(inst, 8, 4), xtensa_helper::format_imm((inst >> 16) * 4));
 			break;
 
 		case 0b0111: // CACHE
@@ -1582,30 +1582,30 @@ void xtensa_device::getop_and_execute()
 			case 0b0000: case 0b0001: case 0b0010: case 0b0011: // DPFR, DPFW, DPFRO, DPFWO (with Data Cache Option)
 			case 0b0100: case 0b0101: case 0b0110: case 0b0111: // DHWB, DHWBI, DHI, DII (with Data Cache Option)
 			case 0b1100: case 0b1110: case 0b1111: // IPF, IHI, III (with Instruction Cache Option)
-				LOGMASKED(LOG_UNHANDLED_CACHE_OPS, "%-8sa%d, %s\n", m_helper.s_cache_ops[BIT(inst, 4, 4)], BIT(inst, 8, 4), m_helper.format_imm((inst >> 16) * 4));
+				LOGMASKED(LOG_UNHANDLED_CACHE_OPS, "%-8sa%d, %s\n", xtensa_helper::s_cache_ops[BIT(inst, 4, 4)], BIT(inst, 8, 4), xtensa_helper::format_imm((inst >> 16) * 4));
 				break;
 
 			case 0b1000: // DCE (with Data Cache Option)
 				switch (BIT(inst, 16, 4))
 				{
 				case 0b0000: // DPFL (with Data Cache Index Lock Option)
-					LOGMASKED(LOG_UNHANDLED_CACHE_OPS, "%-8sa%d, %s\n", "dpfl", BIT(inst, 8, 4), m_helper.format_imm((inst >> 20) * 4));
+					LOGMASKED(LOG_UNHANDLED_CACHE_OPS, "%-8sa%d, %s\n", "dpfl", BIT(inst, 8, 4), xtensa_helper::format_imm((inst >> 20) * 4));
 					break;
 
 				case 0b0010: // DHU (with Data Cache Index Lock Option)
-					LOGMASKED(LOG_UNHANDLED_CACHE_OPS, "%-8sa%d, %s\n", "dhu", BIT(inst, 8, 4), m_helper.format_imm((inst >> 20) * 4));
+					LOGMASKED(LOG_UNHANDLED_CACHE_OPS, "%-8sa%d, %s\n", "dhu", BIT(inst, 8, 4), xtensa_helper::format_imm((inst >> 20) * 4));
 					break;
 
 				case 0b0011: // DIU (with Data Cache Index Lock Option)
-					LOGMASKED(LOG_UNHANDLED_CACHE_OPS, "%-8sa%d, %s\n", "diu", BIT(inst, 8, 4), m_helper.format_imm((inst >> 20) * 4));
+					LOGMASKED(LOG_UNHANDLED_CACHE_OPS, "%-8sa%d, %s\n", "diu", BIT(inst, 8, 4), xtensa_helper::format_imm((inst >> 20) * 4));
 					break;
 
 				case 0b0100: // DIWB (added in T1050)
-					LOGMASKED(LOG_UNHANDLED_CACHE_OPS, "%-8sa%d, %s\n", "diwb", BIT(inst, 8, 4), m_helper.format_imm((inst >> 20) * 4));
+					LOGMASKED(LOG_UNHANDLED_CACHE_OPS, "%-8sa%d, %s\n", "diwb", BIT(inst, 8, 4), xtensa_helper::format_imm((inst >> 20) * 4));
 					break;
 
 				case 0b0101: // DIWBI (added in T1050)
-					LOGMASKED(LOG_UNHANDLED_CACHE_OPS, "%-8sa%d, %s\n", "diwbi", BIT(inst, 8, 4), m_helper.format_imm((inst >> 20) * 4));
+					LOGMASKED(LOG_UNHANDLED_CACHE_OPS, "%-8sa%d, %s\n", "diwbi", BIT(inst, 8, 4), xtensa_helper::format_imm((inst >> 20) * 4));
 					break;
 				}
 				break;
@@ -1614,15 +1614,15 @@ void xtensa_device::getop_and_execute()
 				switch (BIT(inst, 16, 4))
 				{
 				case 0b0000: // IPFL
-					LOGMASKED(LOG_UNHANDLED_CACHE_OPS, "%-8sa%d, %s\n", "ipfl", BIT(inst, 8, 4), m_helper.format_imm((inst >> 20) * 4));
+					LOGMASKED(LOG_UNHANDLED_CACHE_OPS, "%-8sa%d, %s\n", "ipfl", BIT(inst, 8, 4), xtensa_helper::format_imm((inst >> 20) * 4));
 					break;
 
 				case 0b0010: // IHU
-					LOGMASKED(LOG_UNHANDLED_CACHE_OPS, "%-8sa%d, %s\n", "ihu", BIT(inst, 8, 4), m_helper.format_imm((inst >> 20) * 4));
+					LOGMASKED(LOG_UNHANDLED_CACHE_OPS, "%-8sa%d, %s\n", "ihu", BIT(inst, 8, 4), xtensa_helper::format_imm((inst >> 20) * 4));
 					break;
 
 				case 0b0011: // IIU
-					LOGMASKED(LOG_UNHANDLED_CACHE_OPS, "%-8sa%d, %s\n", "iiu", BIT(inst, 8, 4), m_helper.format_imm((inst >> 20) * 4));
+					LOGMASKED(LOG_UNHANDLED_CACHE_OPS, "%-8sa%d, %s\n", "iiu", BIT(inst, 8, 4), xtensa_helper::format_imm((inst >> 20) * 4));
 					break;
 
 				default:
@@ -1673,7 +1673,7 @@ void xtensa_device::getop_and_execute()
 		if (BIT(inst, 12, 2) == 0)
 		{
 			// LSI, SSI, LSIU, SSIU
-			LOGMASKED(LOG_UNHANDLED_OPS, "%-8sf%d, a%d, %s\n", m_helper.s_lsci_ops[BIT(inst, 14, 2)], BIT(inst, 4, 4), BIT(inst, 8, 4), m_helper.format_imm(BIT(inst, 16, 8) * 4));
+			LOGMASKED(LOG_UNHANDLED_OPS, "%-8sf%d, a%d, %s\n", xtensa_helper::s_lsci_ops[BIT(inst, 14, 2)], BIT(inst, 4, 4), BIT(inst, 8, 4), xtensa_helper::format_imm(BIT(inst, 16, 8) * 4));
 			break;
 		}
 		else
@@ -1688,8 +1688,8 @@ void xtensa_device::getop_and_execute()
 		case 0b0000: case 0b0001: // MACID, MACCD
 			if (BIT(inst, 18, 2) == 0b10)
 			{
-				LOGMASKED(LOG_UNHANDLED_OPS, "%s.dd.%s.%s m%d, a%d, m%d, m%d\n", m_helper.s_mac16_ops[BIT(inst, 18, 2)],
-											m_helper.s_mac16_half[BIT(inst, 16, 2)],
+				LOGMASKED(LOG_UNHANDLED_OPS, "%s.dd.%s.%s m%d, a%d, m%d, m%d\n", xtensa_helper::s_mac16_ops[BIT(inst, 18, 2)],
+											xtensa_helper::s_mac16_half[BIT(inst, 16, 2)],
 											BIT(inst, 20) ? "lddec" : "ldinc",
 											BIT(inst, 12, 2), BIT(inst, 8, 4),
 											BIT(inst, 14), BIT(inst, 6) + 2);
@@ -1704,8 +1704,8 @@ void xtensa_device::getop_and_execute()
 		case 0b0100: case 0b0101: // MACIA, MACCA
 			if (BIT(inst, 18, 2) == 0b10)
 			{
-				LOGMASKED(LOG_UNHANDLED_OPS, "%s.da.%s.%s m%d, a%d, m%d, a%d\n", m_helper.s_mac16_ops[BIT(inst, 18, 2)],
-											m_helper.s_mac16_half[BIT(inst, 16, 2)],
+				LOGMASKED(LOG_UNHANDLED_OPS, "%s.da.%s.%s m%d, a%d, m%d, a%d\n", xtensa_helper::s_mac16_ops[BIT(inst, 18, 2)],
+											xtensa_helper::s_mac16_half[BIT(inst, 16, 2)],
 											BIT(inst, 20) ? "lddec" : "ldinc",
 											BIT(inst, 12, 2), BIT(inst, 8, 4),
 											BIT(inst, 14), BIT(inst, 4, 4));
@@ -1720,7 +1720,7 @@ void xtensa_device::getop_and_execute()
 		case 0b0010: // MACDD
 			if (BIT(inst, 18, 2) != 0b00)
 			{
-				LOGMASKED(LOG_UNHANDLED_OPS, "%s.dd.%s m%d, m%d\n", m_helper.s_mac16_ops[BIT(inst, 18, 2)], m_helper.s_mac16_half[BIT(inst, 16, 2)], BIT(inst, 14), BIT(inst, 6) + 2);
+				LOGMASKED(LOG_UNHANDLED_OPS, "%s.dd.%s m%d, m%d\n", xtensa_helper::s_mac16_ops[BIT(inst, 18, 2)], xtensa_helper::s_mac16_half[BIT(inst, 16, 2)], BIT(inst, 14), BIT(inst, 6) + 2);
 			}
 			else
 			{
@@ -1732,7 +1732,7 @@ void xtensa_device::getop_and_execute()
 		case 0b0011: // MACAD
 			if (BIT(inst, 18, 2) != 0b00)
 			{
-				LOGMASKED(LOG_UNHANDLED_OPS, "%s.ad.%s a%d, m%d\n", m_helper.s_mac16_ops[BIT(inst, 18, 2)], m_helper.s_mac16_half[BIT(inst, 16, 2)], BIT(inst, 8, 4), BIT(inst, 6) + 2);
+				LOGMASKED(LOG_UNHANDLED_OPS, "%s.ad.%s a%d, m%d\n", xtensa_helper::s_mac16_ops[BIT(inst, 18, 2)], xtensa_helper::s_mac16_half[BIT(inst, 16, 2)], BIT(inst, 8, 4), BIT(inst, 6) + 2);
 			}
 			else
 			{
@@ -1744,7 +1744,7 @@ void xtensa_device::getop_and_execute()
 		case 0b0110: // MACDA
 			if (BIT(inst, 18, 2) != 0b00)
 			{
-				LOGMASKED(LOG_UNHANDLED_OPS, "%s.da.%s m%d, a%d\n", m_helper.s_mac16_ops[BIT(inst, 18, 2)], m_helper.s_mac16_half[BIT(inst, 16, 2)], BIT(inst, 14), BIT(inst, 4, 4));
+				LOGMASKED(LOG_UNHANDLED_OPS, "%s.da.%s m%d, a%d\n", xtensa_helper::s_mac16_ops[BIT(inst, 18, 2)], xtensa_helper::s_mac16_half[BIT(inst, 16, 2)], BIT(inst, 14), BIT(inst, 4, 4));
 			}
 			else
 			{
@@ -1754,7 +1754,7 @@ void xtensa_device::getop_and_execute()
 			break;
 
 		case 0b0111: // MACAA
-			LOGMASKED(LOG_UNHANDLED_OPS, "%s.aa.%s a%d, a%d\n", m_helper.s_mac16_ops[BIT(inst, 18, 2)], m_helper.s_mac16_half[BIT(inst, 16, 2)], BIT(inst, 8, 4), BIT(inst, 4, 4));
+			LOGMASKED(LOG_UNHANDLED_OPS, "%s.aa.%s a%d, a%d\n", xtensa_helper::s_mac16_ops[BIT(inst, 18, 2)], xtensa_helper::s_mac16_half[BIT(inst, 16, 2)], BIT(inst, 8, 4), BIT(inst, 4, 4));
 			break;
 
 		case 0b1000: case 0b1001: // MACI, MACC
@@ -1830,7 +1830,7 @@ void xtensa_device::getop_and_execute()
 		case 0b10: // BI0
 		{
 			const u8 reg = BIT(inst, 8, 4);
-			const u32 imm = m_helper.s_b4const[BIT(inst, 12, 4)];
+			const u32 imm = xtensa_helper::s_b4const[BIT(inst, 12, 4)];
 			const u32 addr = m_pc + 4 + s8(u8(inst >> 16));
 			const u8 optype = BIT(inst, 6, 2);
 			switch (optype)
@@ -1931,7 +1931,7 @@ void xtensa_device::getop_and_execute()
 			case 0b10: // BLTUI - Branch if Less Than Unsigned Immediate
 			{
 				const u8 reg = BIT(inst, 8, 4);
-				const u32 imm = m_helper.s_b4constu[BIT(inst, 12, 4)];
+				const u32 imm = xtensa_helper::s_b4constu[BIT(inst, 12, 4)];
 				const u32 addr = m_pc + 4 + s8(u8(inst >> 16));
 				if (get_reg(reg) < imm)
 				{
@@ -1944,7 +1944,7 @@ void xtensa_device::getop_and_execute()
 			case 0b11: // BGEUI - Branch if Greater Than or Eq Unsigned Immediate
 			{
 				const u8 reg = BIT(inst, 8, 4);
-				const u32 imm = m_helper.s_b4constu[BIT(inst, 12, 4)];
+				const u32 imm = xtensa_helper::s_b4constu[BIT(inst, 12, 4)];
 				const u32 addr = m_pc + 4 + s8(u8(inst >> 16));
 				if (get_reg(reg) >= imm)
 				{
