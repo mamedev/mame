@@ -168,6 +168,63 @@ end
 
 
 --------------------------------------------------
+-- zstd library objects
+--------------------------------------------------
+
+if not _OPTIONS["with-system-zstd"] then
+project "zstd"
+	uuid "5edd8713-bc60-456d-9c95-b928a913c84b"
+	kind "StaticLib"
+
+	configuration { "Release" }
+		defines {
+			"NDEBUG",
+		}
+
+	configuration { }
+
+	defines {
+		"XXH_NAMESPACE=ZSTD_",
+		"DEBUGLEVEL=0",
+		"ZSTD_DISABLE_ASM",
+	}
+
+	files {
+		MAME_DIR .. "3rdparty/zstd/lib/common/debug.c",
+		MAME_DIR .. "3rdparty/zstd/lib/common/entropy_common.c",
+		MAME_DIR .. "3rdparty/zstd/lib/common/error_private.c",
+		MAME_DIR .. "3rdparty/zstd/lib/common/fse_decompress.c",
+		MAME_DIR .. "3rdparty/zstd/lib/common/pool.c",
+		MAME_DIR .. "3rdparty/zstd/lib/common/threading.c",
+		MAME_DIR .. "3rdparty/zstd/lib/common/xxhash.c",
+		MAME_DIR .. "3rdparty/zstd/lib/common/zstd_common.c",
+		MAME_DIR .. "3rdparty/zstd/lib/compress/fse_compress.c",
+		MAME_DIR .. "3rdparty/zstd/lib/compress/hist.c",
+		MAME_DIR .. "3rdparty/zstd/lib/compress/huf_compress.c",
+		MAME_DIR .. "3rdparty/zstd/lib/compress/zstd_compress.c",
+		MAME_DIR .. "3rdparty/zstd/lib/compress/zstd_compress_literals.c",
+		MAME_DIR .. "3rdparty/zstd/lib/compress/zstd_compress_sequences.c",
+		MAME_DIR .. "3rdparty/zstd/lib/compress/zstd_compress_superblock.c",
+		MAME_DIR .. "3rdparty/zstd/lib/compress/zstd_double_fast.c",
+		MAME_DIR .. "3rdparty/zstd/lib/compress/zstd_fast.c",
+		MAME_DIR .. "3rdparty/zstd/lib/compress/zstd_lazy.c",
+		MAME_DIR .. "3rdparty/zstd/lib/compress/zstd_ldm.c",
+		MAME_DIR .. "3rdparty/zstd/lib/compress/zstdmt_compress.c",
+		MAME_DIR .. "3rdparty/zstd/lib/compress/zstd_opt.c",
+		--MAME_DIR .. "3rdparty/zstd/lib/decompress/huf_decompress_amd64.S", only supports GCC-like assemblers and SysV calling convention
+		MAME_DIR .. "3rdparty/zstd/lib/decompress/huf_decompress.c",
+		MAME_DIR .. "3rdparty/zstd/lib/decompress/zstd_ddict.c",
+		MAME_DIR .. "3rdparty/zstd/lib/decompress/zstd_decompress_block.c",
+		MAME_DIR .. "3rdparty/zstd/lib/decompress/zstd_decompress.c",
+	}
+else
+links {
+	ext_lib("zstd"),
+}
+end
+
+
+--------------------------------------------------
 -- SoftFloat library objects
 --------------------------------------------------
 
@@ -671,13 +728,9 @@ end
 			"HAVE_FSEEKO",
 		}
 
-	configuration { "Release" }
-		defines {
-			"NDEBUG",
-		}
-
 	configuration { }
 		defines {
+			"NDEBUG", -- always enable this to avoid debug log spam on compression
 			"HAVE_CONFIG_H", -- mostly because PACKAGE_VERSION is a pain to do otherwise
 			"ENABLE_64_BIT_WORDS=1",
 			"OGG_FOUND=0",

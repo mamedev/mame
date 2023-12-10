@@ -652,6 +652,9 @@ USE_SYSTEM_LIB_EXPAT
 USE_SYSTEM_LIB_ZLIB
     Set to **1** to prefer the system installation of the zlib data compression
     library over the version provided with the MAME source.
+USE_SYSTEM_LIB_ZSTD
+    Set to **1** to prefer the system installation of the Zstandard data
+    compression library over the version provided with the MAME source.
 USE_SYSTEM_LIB_JPEG
     Set to **1** to prefer the system installation of the libjpeg image
     compression library over the version provided with the MAME source.
