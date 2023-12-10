@@ -1471,15 +1471,16 @@ ROM_END
   player/CPU roles are reversed. This version is known as Разведчики космоса
   (Razvedchiki kosmosa, export version: Explorers of Space).
 
-  Another variant of the game which also included a radiation dosimeter was
-  released by Научприбор (Nauchpribor, USSR) in 1991. This unit was named
-  Альтаир (Altair). This unit uses the same screen as ИМ-22 (Весёлые
+  Another variant of the game which also included a radiation scintillation
+  counter was released by Научприбор (Nauchpribor, USSR) in 1991. This unit was
+  named Альтаир (Altair). This unit uses the same screen as ИМ-22 (Весёлые
   футболисты, export version: Monkey Goalkeeper). The ROM has been modified to
-  include showing radiation exposure. The dosimeter mode can be entered by
-  pressing the dosimeter mode button when the unit is showing time. Radiation
-  readings are shown in µSv/h. The dosimeter mode ends automatically after 40
-  seconds. A gas-discharge counter (SBM-20-1) collects radiation exposure and
-  feeds info to the game board via the D0-D3 input lines.
+  include showing radiation exposure ("Dosimeter Mode"). The dosimeter mode can
+  be entered by pressing the dosimeter mode button when the unit is showing
+  time. Radiation readings are shown in µSv/h. The dosimeter mode ends
+  automatically after 40 seconds. A gas-discharge counter (SBM-20-1) collects
+  radiation exposure and feeds info to the game board via the D0-D3 input
+  lines.
 
   The following Mickey Mouse Elektronika clones are emulated in MAME:
 
