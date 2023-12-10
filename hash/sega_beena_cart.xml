@@ -1068,6 +1068,54 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="hiraka_0" supported="yes" cloneof="hirakata">
+		<description>Soreike! Anpanman Hajimete Kaketa yo! Oboeta yo! Hiragana Katakana: 50-on Board Kinou-tsuki (Rev. S-100002-1000)</description>
+		<year>2005</year>
+		<publisher>Sega Toys</publisher>
+		<info name="alt_title" value="それいけ！アンパンマンはじめてかけたよ！おぼえたよ！ひらがな・カタカナ～50音ボード機能つき～"/>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x800000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="S-100002-1000 - Soreike Anpanman Hajimete Kaketa yo Oboeta yo Hiragana Katakana - Gojuuon Board Kinou-tsuki (Japan).bin" size="0x800000" crc="b098263e" sha1="3a79441792d5403e66ca49a353e32c14acfacfa7"/>
+			</dataarea>
+			<dataarea name="page1" size="0x01b8b6ae"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x01b8b6ae" crc="e4c3a37a" sha1="de492d61bf91bee346734f62a6db257a6ce74f1c"/>
+			</dataarea>
+			<dataarea name="page2" size="0x01c3f600"> <!-- book pages -->
+				<rom name="0 - 0002.png" size="0x01c3f600" crc="ef0fccc9" sha1="cc014da292163146e08d89672149ba7dc181f1fc"/>
+			</dataarea>
+			<dataarea name="page3" size="0x01d61a02"> <!-- book pages -->
+				<rom name="0 - 0003.png" size="0x01d61a02" crc="84682ff3" sha1="216425eb85d6cc5855e853d0b135a6426fe2c0a0"/>
+			</dataarea>
+			<dataarea name="page4" size="0x01e10787"> <!-- book pages -->
+				<rom name="0 - 0004.png" size="0x01e10787" crc="d5aa2d56" sha1="42902317bef31b659e9c40f4c51f554aefd610cf"/>
+			</dataarea>
+			<dataarea name="page5" size="0x01da7955"> <!-- book pages -->
+				<rom name="0 - 0005.png" size="0x01da7955" crc="e4795152" sha1="5bd9bd97721b1b69b1362b4261052b9e3a58b8c6"/>
+			</dataarea>
+			<dataarea name="page6" size="0x01d3ac0d"> <!-- book pages -->
+				<rom name="0 - 0006.png" size="0x01d3ac0d" crc="1a58e117" sha1="aa8bb93b8157cc0c8dc895f72203d9ed807e164b"/>
+			</dataarea>
+			<dataarea name="page7" size="0x01ec5159"> <!-- book pages -->
+				<rom name="0 - 0007.png" size="0x01ec5159" crc="f354c1d8" sha1="05959842511ce24faaaf16b7beefc1f3cee3a1e3"/>
+			</dataarea>
+			<dataarea name="page8" size="0x01e66848"> <!-- book pages -->
+				<rom name="0 - 0008.png" size="0x01e66848" crc="95a956fc" sha1="72e116dd2400d321b704e35e1b8d13d2129cae6c"/>
+			</dataarea>
+			<dataarea name="page9" size="0x01e5551d"> <!-- book pages -->
+				<rom name="0 - 0009.png" size="0x01e5551d" crc="42973b09" sha1="182c26df4a2a29893a6a2efe769a4744084e67aa"/>
+			</dataarea>
+			<dataarea name="page10" size="0x012bc820"> <!-- book pages -->
+				<rom name="0 - 0010.png" size="0x012bc820" crc="05f22b7f" sha1="a87f840b3c84e7f1886eead28ea9879ca3630e79"/>
+			</dataarea>
+			<dataarea name="page11" size="0x01213cba"> <!-- book pages -->
+				<rom name="0 - 0011.png" size="0x01213cba" crc="e1e8b81a" sha1="4c0a484b4156fd07a4f2b8eb96d7475e8559c6d0"/>
+			</dataarea>
+			<dataarea name="page12" size="0x01421db2"> <!-- book pages -->
+				<rom name="0 - 0012.png" size="0x01421db2" crc="6b5728a5" sha1="024d1e0deae7bcbdf7f3b6c4483de91b7fd96961"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hirakata" supported="yes">
 		<description>Soreike! Anpanman Hajimete Kaketa yo! Oboeta yo! Hiragana Katakana: 50-on Board Kinou-tsuki</description>
 		<year>2005</year>
@@ -1245,6 +1293,54 @@ license:CC0-1.0
 			</dataarea>
 			<dataarea name="page12" size="0x18ae35d"> <!-- book pages -->
 				<rom name="0 - 0012.png" size="0x18ae35d" crc="d0a30971" sha1="de73c9ada208a36db73ecbe776c9e964de3c8779"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kodaiou" supported="no">
+		<description>Kodai Ouja Kyouryuu King D-Kids Adventure: Dino Slash! Kyouryuu Battle!!</description>
+		<year>2007</year>
+		<publisher>Sega Toys</publisher>
+		<info name="alt_title" value="古代王者恐竜キング Dキッズ・アドベンチャーディノスラッシュ！恐竜バトル！！"/>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x800000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="S-100033-1001 - Kodai Ouja Kyouryuu King D-Kids Adventure Dino Slash Kyouryuu Battle (Japan).bin" size="0x800000" crc="4fefdb6e" sha1="f53bb8ca7ec0e3ba93d6e92e7b1e404269a3d0ff"/>
+			</dataarea>
+			<dataarea name="page1" size="0x1d1ad19"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x1d1ad19" crc="1a8a2425" sha1="afb069474073887830da0ea545e85e1022101c84"/>
+			</dataarea>
+			<dataarea name="page2" size="0x1d31536"> <!-- book pages -->
+				<rom name="0 - 0002.png" size="0x1d31536" crc="e3791e19" sha1="7745bae0ad37f92e20acf52c35820c1fafa563cb"/>
+			</dataarea>
+			<dataarea name="page3" size="0x1c78a63"> <!-- book pages -->
+				<rom name="0 - 0003.png" size="0x1c78a63" crc="975d2324" sha1="b45728327bf077e51c02e06ec77bba879cfb8c3c"/>
+			</dataarea>
+			<dataarea name="page4" size="0x1bab026"> <!-- book pages -->
+				<rom name="0 - 0004.png" size="0x1bab026" crc="b8672a1e" sha1="3d3e4df80d15ead7ec65b741a8a42caaf5812940"/>
+			</dataarea>
+			<dataarea name="page5" size="0x1ae3706"> <!-- book pages -->
+				<rom name="0 - 0005.png" size="0x1ae3706" crc="9f59eb24" sha1="4afb03328cb1967d385c884aa23e00ec4948cb1a"/>
+			</dataarea>
+			<dataarea name="page6" size="0x1b649d5"> <!-- book pages -->
+				<rom name="0 - 0006.png" size="0x1b649d5" crc="42bc861c" sha1="7751028ce7326f6ef35bab0c718203e3b33ce188"/>
+			</dataarea>
+			<dataarea name="page7" size="0x1cb54b0"> <!-- book pages -->
+				<rom name="0 - 0007.png" size="0x1cb54b0" crc="8b354676" sha1="ada4d2de6a3429087304a758248a19680fdf3d81"/>
+			</dataarea>
+			<dataarea name="page8" size="0x1ca22a7"> <!-- book pages -->
+				<rom name="0 - 0008.png" size="0x1ca22a7" crc="23458709" sha1="7f9a544381ec82b2cdb31704f0065e6fa0ebe14f"/>
+			</dataarea>
+			<dataarea name="page9" size="0x1be8325"> <!-- book pages -->
+				<rom name="0 - 0009.png" size="0x1be8325" crc="1b1857f6" sha1="3ddc35ff0f4fb45e8b10e47bbd92272d38bca50f"/>
+			</dataarea>
+			<dataarea name="page10" size="0x1a803bf"> <!-- book pages -->
+				<rom name="0 - 0010.png" size="0x1a803bf" crc="b32f8e6c" sha1="abb3191047bb7c37c3c43331e518044dee654fa6"/>
+			</dataarea>
+			<dataarea name="page11" size="0x1b0dd13"> <!-- book pages -->
+				<rom name="0 - 0011.png" size="0x1b0dd13" crc="fac1037b" sha1="b1262d6fa5898fe0c5b41e170323aa4058af4eed"/>
+			</dataarea>
+			<dataarea name="page12" size="0x1ad78ed"> <!-- book pages -->
+				<rom name="0 - 0012.png" size="0x1ad78ed" crc="849db8af" sha1="de47023a231eb6fd25c1e6e7fc271176e962198f"/>
 			</dataarea>
 		</part>
 	</software>
