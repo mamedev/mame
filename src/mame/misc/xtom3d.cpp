@@ -432,9 +432,9 @@ void isa16_xtom3d_io_sound::io_map(address_map &map)
 	);
 	map(0x0c, 0x0c).lw8(
 		NAME([this] (u8 data) {
-			// bit 0: always written, more CS?
-			m_eeprom->clk_write(BIT(data, 1) ? CLEAR_LINE : ASSERT_LINE);
-			m_eeprom->cs_write(BIT(data, 4) ? ASSERT_LINE : CLEAR_LINE);
+			// bit 4: always written, more CS?
+			m_eeprom->clk_write(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE);
+			m_eeprom->cs_write(BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
 			m_eeprom->di_write(BIT(data, 2) ? ASSERT_LINE : CLEAR_LINE);
 		})
 	);
