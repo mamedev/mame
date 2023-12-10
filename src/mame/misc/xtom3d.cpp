@@ -84,6 +84,7 @@ MX29F1610MC 16M FlashROM (x7)
 #include "machine/eepromser.h"
 #include "machine/mc146818.h"
 #include "machine/8042kbdc.h"
+#include "sound/cdda.h"
 #include "sound/ymz280b.h"
 #include "video/voodoo_pci.h"
 
@@ -310,8 +311,8 @@ void isa16_xtom3d_io_sound::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	YMZ280B(config, m_ymz, XTAL(16'934'400));
-	m_ymz->add_route(0, "lspeaker", 1.0);
-	m_ymz->add_route(1, "rspeaker", 1.0);
+	m_ymz->add_route(0, "lspeaker", 0.5);
+	m_ymz->add_route(1, "rspeaker", 0.5);
 }
 
 static INPUT_PORTS_START(xtom3d)
@@ -548,6 +549,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_voodoo(*this, PCI_AGP_ID)
 		, m_pci_isa(*this, "pci:07.0")
+		, m_pci_ide(*this, PCI_IDE_ID)
 	{
 	}
 
@@ -559,6 +561,7 @@ private:
 	// TODO: optional for debugging
 	optional_device<voodoo_banshee_pci_device> m_voodoo;
 	required_device<i82371eb_isa_device> m_pci_isa;
+	required_device<i82371eb_ide_device> m_pci_ide;
 
 	void xtom3d_map(address_map &map);
 //  void xtom3d_io(address_map &map);
@@ -614,14 +617,14 @@ void xtom3d_state::xtom3d(machine_config &config)
 	isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
 	isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
 
-	i82371eb_ide_device &ide(I82371EB_IDE(config, PCI_IDE_ID, 0, m_maincpu));
-	ide.irq_pri().set("pci:07.0", FUNC(i82371eb_isa_device::pc_irq14_w));
-	ide.irq_sec().set("pci:07.0", FUNC(i82371eb_isa_device::pc_mirq0_w));
+	I82371EB_IDE(config, m_pci_ide, 0, m_maincpu);
+	m_pci_ide->irq_pri().set("pci:07.0", FUNC(i82371eb_isa_device::pc_irq14_w));
+	m_pci_ide->irq_sec().set("pci:07.0", FUNC(i82371eb_isa_device::pc_mirq0_w));
 
-	ide.subdevice<bus_master_ide_controller_device>("ide1")->slot(0).set_default_option("cdrom");
+	m_pci_ide->subdevice<bus_master_ide_controller_device>("ide1")->slot(0).set_default_option(nullptr);
 //  ide.subdevice<bus_master_ide_controller_device>("ide1")->slot(0).set_fixed(true);
 
-	ide.subdevice<bus_master_ide_controller_device>("ide2")->slot(0).set_default_option(nullptr);
+	m_pci_ide->subdevice<bus_master_ide_controller_device>("ide2")->slot(0).set_default_option(nullptr);
 
 	I82371EB_USB (config, "pci:07.2", 0);
 	I82371EB_ACPI(config, "pci:07.3", 0);
@@ -656,9 +659,22 @@ void xtom3d_state::xtom3d(machine_config &config)
 	// "pci:0e.0" J4D1
 }
 
+static void cdrom_config(device_t *device)
+{
+	device->subdevice<cdda_device>("cdda")->add_route(0, ":lmicrophone", 0.25);
+	device->subdevice<cdda_device>("cdda")->add_route(1, ":rmicrophone", 0.25);
+}
+
 void xtom3d_state::pumpitup(machine_config &config)
 {
 	xtom3d(config);
+
+	SPEAKER(config, "lmicrophone").front_left();
+	SPEAKER(config, "rmicrophone").front_right();
+
+	m_pci_ide->subdevice<bus_master_ide_controller_device>("ide1")->slot(0).set_default_option("cdrom");
+	m_pci_ide->subdevice<bus_master_ide_controller_device>("ide1")->slot(0).set_option_machine_config("cdrom", cdrom_config);
+
 	ISA16_SLOT(config.replace(), "isa1", 0, "pci:07.0:isabus", xtom3d_isa_cards, "pumpitup_io_sound", true);
 }
 
