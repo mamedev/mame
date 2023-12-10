@@ -1,9 +1,9 @@
-// license:BSD-3-Clause
-// copyright-holders:AJR
 
-namespace {
 
-static const char *const s_special_regs[256] =
+#include "emu.h"
+#include "xtensa_helper.h"
+
+const char *const xtensa_helper::special_regs[256] =
 {
 	"lbeg", "lend", "lcount", // Loop Option (0-2)
 	"sar", // Core Architecture (3)
@@ -69,7 +69,7 @@ static const char *const s_special_regs[256] =
 	"", "", "", "", "", "", "", ""
 };
 
-static const char *const s_st1_ops[16] =
+const char *const xtensa_helper::s_st1_ops[16] =
 {
 	"ssr", "ssl",
 	"ssa8l", "ssa8b",
@@ -81,7 +81,7 @@ static const char *const s_st1_ops[16] =
 	"nsa", "nsau"
 };
 
-static const char *const s_tlb_ops[16] =
+const char *const xtensa_helper::s_tlb_ops[16] =
 {
 	"", "", "", "ritlb0",
 	"iitlb", "pitlb", "witlb", "ritlb1",
@@ -89,14 +89,14 @@ static const char *const s_tlb_ops[16] =
 	"idtlb", "pdtlb", "wdtlb", "rdtlb1"
 };
 
-static const char *const s_rst2_ops[16] =
+const char *const xtensa_helper::s_rst2_ops[16] =
 {
 	"andb", "andbc", "orb", "orbc", "xorb", "", "", "",
 	"mull", "", "muluh", "mulsh",
 	"quou", "quos", "remu", "rems"
 };
 
-static const char *const s_rst3_ops[16] =
+const char *const xtensa_helper::s_rst3_ops[16] =
 {
 	"rsr", "wsr",
 	"sext", "clamps",
@@ -108,7 +108,7 @@ static const char *const s_rst3_ops[16] =
 	"rur", "wur"
 };
 
-static const char *const s_fp0_ops[16] =
+const char *const xtensa_helper::s_fp0_ops[16] =
 {
 	"add.s", "sub.s", "mul.s", "",
 	"madd.s", "msub.s", "", "",
@@ -116,7 +116,7 @@ static const char *const s_fp0_ops[16] =
 	"float.s", "ufloat.s", "utrunc.s", ""
 };
 
-static const char *const s_fp1_ops[16] =
+const char *const xtensa_helper::s_fp1_ops[16] =
 {
 	"", "un.s",
 	"oeq.s", "ueq.s",
@@ -128,7 +128,7 @@ static const char *const s_fp1_ops[16] =
 	"", ""
 };
 
-static const char *const s_lsai_ops[16] =
+const char *const xtensa_helper::s_lsai_ops[16] =
 {
 	"l8ui", "l16ui", "l32i", "",
 	"s8i", "s16i", "s32i", "",
@@ -136,7 +136,7 @@ static const char *const s_lsai_ops[16] =
 	"addi", "addmi", "s32c1i", "s32ri"
 };
 
-static const char *const s_cache_ops[16] =
+const char *const xtensa_helper::s_cache_ops[16] =
 {
 	"dpfr", "dpfw",
 	"dpfro", "dpfwo",
@@ -148,48 +148,48 @@ static const char *const s_cache_ops[16] =
 	"ihi", "iii"
 };
 
-static const char *const s_lsci_ops[4] =
+const char *const xtensa_helper::s_lsci_ops[4] =
 {
 	"lsi", "ssi", "lsiu", "ssiu"
 };
 
-static const char *const s_mac16_ops[4] =
+const char *const xtensa_helper::s_mac16_ops[4] =
 {
 	"umul", "mul", "mula", "muls"
 };
 
-static const char *const s_mac16_half[4] =
+const char *const xtensa_helper::s_mac16_half[4] =
 {
 	"ll", "hl", "lh", "hh"
 };
 
-static const char *const s_bz_ops[4] =
+const char *const xtensa_helper::s_bz_ops[4] =
 {
 	"beqz", "bnez", "bltz", "bgez"
 };
 
-static const char *const s_bi0_ops[4] =
+const char *const xtensa_helper::s_bi0_ops[4] =
 {
 	"beqi", "bnei", "blti", "bgei"
 };
 
-static const s32 s_b4const[16] =
+const int32_t xtensa_helper::s_b4const[16] =
 {
 	-1, 1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 16, 32, 64, 128, 256
 };
 
-static const u32 s_b4constu[16] =
+const uint32_t xtensa_helper::s_b4constu[16] =
 {
 	32768, 65536, 2, 3, 4, 5, 6, 7, 8, 10, 12, 16, 32, 64, 128, 256
 };
 
-static const char *const s_b_ops[16] =
+const char *const xtensa_helper::s_b_ops[16] =
 {
 	"bnone", "beq", "blt", "bltu", "ball", "bbc", "bbci", "bbci",
 	"bany", "bne", "bge", "bgeu", "bnall", "bbs", "bbsi", "bbsih"
 };
 
-static std::string format_imm(u32 imm)
+std::string xtensa_helper::format_imm(uint32_t imm)
 {
 	if (s32(imm) < 0)
 	{
@@ -216,16 +216,15 @@ static std::string format_imm(u32 imm)
 }
 
 
-static std::string special_reg(u8 n, bool wsr)
+std::string xtensa_helper::special_reg(uint8_t n, bool wsr)
 {
 	if (n == 226 && !wsr)
 		return "interrupt";
 
-	const char *s = s_special_regs[n];
+	const char *s = xtensa_helper::special_regs[n];
 	if (s[0] == '\0')
 		return util::string_format("s%u", n);
 	else
 		return s;
 }
 
-} // anonymous namespace

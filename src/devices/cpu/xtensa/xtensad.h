@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include "xtensa_helper.h"
+
 class xtensa_disassembler : public util::disasm_interface
 {
 public:
@@ -18,6 +20,7 @@ protected:
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
 
 private:
+	xtensa_helper m_helper;
 };
 
 #endif // MAME_CPU_XTENSA_XTENSAD_H

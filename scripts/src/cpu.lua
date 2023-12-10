@@ -3919,11 +3919,14 @@ if CPUS["XTENSA"] then
 	files {
 		MAME_DIR .. "src/devices/cpu/xtensa/xtensa.cpp",
 		MAME_DIR .. "src/devices/cpu/xtensa/xtensa.h",
-		MAME_DIR .. "src/devices/cpu/xtensa/xtensa_tables.h",
+		MAME_DIR .. "src/devices/cpu/xtensa/xtensa_helper.cpp",
+		MAME_DIR .. "src/devices/cpu/xtensa/xtensa_helper.h",
 	}
 end
 
 if opt_tool(CPUS, "XTENSA") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/xtensa/xtensad.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/xtensa/xtensad.h")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/xtensa/xtensa_helper.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/xtensa/xtensa_helper.h")
 end
