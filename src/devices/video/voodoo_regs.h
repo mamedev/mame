@@ -1430,7 +1430,7 @@ private:
 	u8 m_regs[0x20];        // core VGA registers
 	u8 m_crtc[0x27];        // CRTC registers
 	u8 m_seq[0x05];         // sequencer registers
-	u8 m_gc[0x05];          // graphics controller registers
+	u8 m_gc[0x09];          // graphics controller registers
 	u8 m_attr[0x15];        // attribute registers
 	u8 m_attr_flip_flop;    // attribute flip-flop
 };
