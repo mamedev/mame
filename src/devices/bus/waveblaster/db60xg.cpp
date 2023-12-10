@@ -11,7 +11,32 @@
 #include "emu.h"
 #include "db60xg.h"
 
-DEFINE_DEVICE_TYPE(DB60XG, db60xg_device, "db60xg", "Yamaha DB60XG")
+#include "cpu/h8/h83002.h"
+#include "sound/swp00.h"
+
+
+namespace {
+
+class db60xg_device : public device_t, public device_waveblaster_interface
+{
+public:
+	db60xg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	virtual ~db60xg_device();
+
+	virtual void midi_rx(int state) override;
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+private:
+	required_device<h83002_device> m_cpu;
+	required_device<swp00_device> m_swp00;
+
+	void map(address_map &map);
+};
 
 db60xg_device::db60xg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, DB60XG, tag, owner, clock),
@@ -41,11 +66,11 @@ void db60xg_device::device_add_mconfig(machine_config &config)
 {
 	H83002(config, m_cpu, 12_MHz_XTAL);
 	m_cpu->set_addrmap(AS_PROGRAM, &db60xg_device::map);
-	m_cpu->write_sci_tx<0>().set([this](int state) { m_connector->do_midi_tx(state); } );
+	m_cpu->write_sci_tx<0>().set([this] (int state) { m_connector->do_midi_tx(state); });
 
 	SWP00(config, m_swp00);
-	m_swp00->add_route(0, "^", 1.0, AUTO_ALLOC_INPUT, 0);
-	m_swp00->add_route(1, "^", 1.0, AUTO_ALLOC_INPUT, 1);
+	m_swp00->add_route(0, DEVICE_SELF_OWNER, 1.0, AUTO_ALLOC_INPUT, 0);
+	m_swp00->add_route(1, DEVICE_SELF_OWNER, 1.0, AUTO_ALLOC_INPUT, 1);
 }
 
 ROM_START( db60xg )
@@ -72,3 +97,6 @@ const tiny_rom_entry *db60xg_device::device_rom_region() const
 	return ROM_NAME(db60xg);
 }
 
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(DB60XG, device_waveblaster_interface, db60xg_device, "db60xg", "Yamaha DB60XG")

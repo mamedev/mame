@@ -8,9 +8,30 @@
 #include "emu.h"
 #include "wg130.h"
 
-DEFINE_DEVICE_TYPE(WG130, wg130_device, "wg130", "Casio WG-130")
+#include "cpu/h8/gt913.h"
+
 
 namespace {
+
+class wg130_device : public device_t, public device_waveblaster_interface
+{
+public:
+	wg130_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	virtual ~wg130_device();
+
+	virtual void midi_rx(int state) override;
+
+protected:
+	virtual void device_start() override;
+	const tiny_rom_entry *device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+private:
+	required_device<gt913_device> m_gt913;
+
+	void map(address_map &map);
+};
 
 INPUT_PORTS_START(wg130)
 	PORT_START("gt913:kbd:FI0")
@@ -28,8 +49,6 @@ INPUT_PORTS_START(wg130)
 	PORT_START("gt913:kbd:KI1")
 	PORT_START("gt913:kbd:KI2")
 INPUT_PORTS_END
-
-} // anonymous namespace
 
 wg130_device::wg130_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, WG130, tag, owner, clock),
@@ -64,7 +83,7 @@ void wg130_device::device_add_mconfig(machine_config &config)
 	m_gt913->write_port1().set_nop();
 	m_gt913->read_port2().set_constant(0xff);
 	m_gt913->write_port2().set_nop();
-	m_gt913->write_sci_tx<1>().set([this](int state) { m_connector->do_midi_tx(state); } );
+	m_gt913->write_sci_tx<1>().set([this] (int state) { m_connector->do_midi_tx(state); });
 }
 
 ROM_START( wg130 )
@@ -78,7 +97,7 @@ void wg130_device::device_start()
 	the version of this ROM bundled with the SW-10 softsynth has little endian samples, so byteswap them
 	(and stop at the end of sample data, not the end of the whole ROM, otherwise the ROM test fails)
 	*/
-	uint16_t* rom = (uint16_t*)memregion("gt913")->base();
+	uint16_t *const rom = reinterpret_cast<uint16_t *>(memregion("gt913")->base());
 	for (uint32_t addr = 0x2f000 >> 1; addr < 0x1fe8c2 >> 1; addr++)
 		rom[addr] = swapendian_int16(rom[addr]);
 }
@@ -92,3 +111,7 @@ ioport_constructor wg130_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(wg130);
 }
+
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(WG130, device_waveblaster_interface, wg130_device, "wg130", "Casio WG-130")
