@@ -1565,18 +1565,7 @@ static INPUT_PORTS_START( naltair )
 	PORT_INCLUDE( gnw_mmouse )
 
 	PORT_MODIFY("IN.0") // R2
-	PORT_CONFNAME( 0x01, 0x00, "Increase dosimeter reading with +1") // Connected to dosimeter
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
-	PORT_CONFNAME( 0x02, 0x00, "Increase dosimeter reading with +2") // Connected to dosimeter
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
-	PORT_CONFNAME( 0x04, 0x00, "Increase dosimeter reading with +4") // Connected to dosimeter
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x04, DEF_STR( On ) )
-	PORT_CONFNAME( 0x08, 0x00, "Increase dosimeter reading with +8") // Connected to dosimeter
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x08, DEF_STR( On ) )
+	PORT_BIT( 0x0f, 0x00, IPT_DIAL) PORT_NAME("Dosimeter reading") PORT_SENSITIVITY(10) PORT_KEYDELTA(1)
 
 	PORT_MODIFY("IN.1") // R3
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY PORT_NAME("Right Up / Dosimeter Mode")
@@ -1657,11 +1646,6 @@ void gnw_mmouse_state::atakaast(machine_config &config)
 void gnw_mmouse_state::ecircus(machine_config &config)
 {
 	kb1013vk12_common(config, 1657, 1080); // R mask option ?
-}
-
-void gnw_mmouse_state::naltair(machine_config &config)
-{
-	kb1013vk12_common(config, 1655, 1080); // R mask option ?
 }
 
 // roms
@@ -11498,7 +11482,7 @@ SYST( 19??, kosmicpt,     gnw_mmouse,  0,      kosmicpt,     gnw_mmouse,   gnw_m
 SYST( 19??, morataka,     gnw_mmouse,  0,      morataka,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Morskaja ataka", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1992, atakaast,     gnw_mmouse,  0,      atakaast,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Ataka asteroidov", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 19??, ecircus,      gnw_mmouse,  0,      ecircus,      gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Circus (Elektronika)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1991, naltair,      gnw_mmouse,  0,      naltair,      naltair,      gnw_mmouse_state,   empty_init, "bootleg (Nauchpribor)", "Altair (Nauchpribor)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, naltair,      gnw_mmouse,  0,      vfutbol,      naltair,      gnw_mmouse_state,   empty_init, "bootleg (Nauchpribor)", "Altair (Nauchpribor)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1989, kosmicmt,     gnw_fire,    0,      kosmicmt,     gnw_fire,     gnw_fire_state,     empty_init, "bootleg (Elektronika)", "Kosmicheskiy most", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1990, auslalom,     0,           0,      auslalom,     auslalom,     auslalom_state,     empty_init, "Elektronika", "Autoslalom", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
