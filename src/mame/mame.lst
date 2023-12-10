@@ -19237,6 +19237,7 @@ academyga
 amsterd                         // Amsterdam
 dallas16                        // Dallas
 dallas32                        // Dallas
+dallas32a                       // Dallas
 roma16                          // Roma
 roma32                          // Roma
 
@@ -19263,10 +19264,10 @@ mephistoj
 europa
 
 @source:hegenerglaser/glasgow.cpp
-amsterda                        // Amsterdam
-dallas16a                       // Dallas
+amsterdg                        // Amsterdam
+dallas16g                       // Dallas
 glasgow                         // Glasgow
-roma16a                         // Roma
+roma16g                         // Roma
 
 @source:hegenerglaser/milano.cpp
 milano                          // 1991 Mephisto Milano
