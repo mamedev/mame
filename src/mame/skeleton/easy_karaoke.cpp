@@ -110,7 +110,6 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 
@@ -218,6 +217,7 @@ void easy_karaoke_cartslot_state::easy_karaoke(machine_config &config)
 	m_cart->set_device_load(FUNC(easy_karaoke_cartslot_state::cart_load));
 	SOFTWARE_LIST(config, "cart_list").set_original("easy_karaoke_cart");
 }
+
 /*
 The 'karatvst' set has the following 50 songs built in, there don't appear to be any downloaded songs in this NAND dump
 
