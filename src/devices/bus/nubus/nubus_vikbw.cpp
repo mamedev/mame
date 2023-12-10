@@ -2,11 +2,20 @@
 // copyright-holders:R. Belmont
 /***************************************************************************
 
-  Viking 1024x768 fixed-resolution monochrome board
+  Moniterm MacViking II 1024x768 fixed-resolution monochrome board
 
-  VRAM from Fs040000 to Fs0517FF
+  https://wiki.preterhuman.net/Moniterm_MACVIKING_II
+
+  VRAM from Fs040000 to Fs05FFFF (RAM test goes up to Fs065800 for some reason)
   Read from Fs000000 enables VBL, write to Fs000000 disables VBL
   Write to Fs080000 acks VBL
+
+  Crystal (pixel clock) is 72 MHz.
+
+  TODO: Actual raster parameters are unknown.  We've gone with the Apple 19"
+  1024x768 monitor's htotal/vtotal but this used a custom monitor.  There are
+  no register writes other than the IRQ enable/ack so tracing, the CRTC is
+  pure TTL.
 
 ***************************************************************************/
 
@@ -14,53 +23,56 @@
 #include "nubus_vikbw.h"
 #include "screen.h"
 
-#define VIKBW_SCREEN_NAME   "vikbw_screen"
-#define VIKBW_ROM_REGION    "vikbw_rom"
+namespace {
 
-#define VRAM_SIZE   (0x18000)  // 1024x768 @ 1bpp is 98,304 bytes (0x18000)
+static constexpr u32 VRAM_SIZE = 0x20000;       // 4x HM53461 VRAMs (64K x 4 bit)
 
+class nubus_vikbw_device : public device_t,
+						   public device_nubus_card_interface
+{
+public:
+	// construction/destruction
+	nubus_vikbw_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	nubus_vikbw_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+private:
+	uint32_t viking_ack_r();
+	void viking_ack_w(uint32_t data);
+	uint32_t viking_enable_r();
+	void viking_disable_w(uint32_t data);
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	std::vector<uint32_t> m_vram;
+	uint32_t m_vbl_disable, m_palette[2];
+};
 
 ROM_START( vikbw )
-	ROM_REGION(0x2000, VIKBW_ROM_REGION, 0)
+	ROM_REGION(0x2000, "vikingrom", 0)
 	ROM_LOAD( "viking.bin",   0x000000, 0x002000, CRC(92cf04d1) SHA1(d08349edfc82a0bd5ea848e053e1712092308f74) )
 ROM_END
 
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-DEFINE_DEVICE_TYPE(NUBUS_VIKBW, nubus_vikbw_device, "nb_vikbw", "Moniterm Viking video card")
-
-
-//-------------------------------------------------
-//  device_add_mconfig - add device configuration
-//-------------------------------------------------
-
 void nubus_vikbw_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, VIKBW_SCREEN_NAME, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_screen_update(FUNC(nubus_vikbw_device::screen_update));
-	screen.set_size(1024, 768);
-	screen.set_visarea(0, 1024-1, 0, 768-1);
-	screen.set_refresh_hz(70);
+	screen.set_raw(72000000, 1324, 0, 1024, 803, 0, 768);
 }
-
-//-------------------------------------------------
-//  rom_region - device-specific ROM region
-//-------------------------------------------------
 
 const tiny_rom_entry *nubus_vikbw_device::device_rom_region() const
 {
 	return ROM_NAME( vikbw );
 }
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  nubus_vikbw_device - constructor
-//-------------------------------------------------
 
 nubus_vikbw_device::nubus_vikbw_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	nubus_vikbw_device(mconfig, NUBUS_VIKBW, tag, owner, clock)
@@ -74,19 +86,13 @@ nubus_vikbw_device::nubus_vikbw_device(const machine_config &mconfig, device_typ
 {
 }
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
 void nubus_vikbw_device::device_start()
 {
 	uint32_t slotspace;
 
-	install_declaration_rom(VIKBW_ROM_REGION, true);
+	install_declaration_rom("vikingrom", true);
 
 	slotspace = get_slotspace();
-
-//  printf("[vikbw %p] slotspace = %x\n", this, slotspace);
 
 	m_vram.resize(VRAM_SIZE / sizeof(uint32_t));
 	install_bank(slotspace+0x40000, slotspace+0x40000+VRAM_SIZE-1, &m_vram[0]);
@@ -96,10 +102,6 @@ void nubus_vikbw_device::device_start()
 	nubus().install_device(slotspace+0x80000, slotspace+0x80000+3, read32smo_delegate(*this, FUNC(nubus_vikbw_device::viking_ack_r)), write32smo_delegate(*this, FUNC(nubus_vikbw_device::viking_ack_w)));
 }
 
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
 void nubus_vikbw_device::device_reset()
 {
 	m_vbl_disable = 1;
@@ -108,12 +110,6 @@ void nubus_vikbw_device::device_reset()
 	m_palette[0] = rgb_t(255, 255, 255);
 	m_palette[1] = rgb_t(0, 0, 0);
 }
-
-/***************************************************************************
-
-  Viking 1024x768 B&W card section
-
-***************************************************************************/
 
 uint32_t nubus_vikbw_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -164,3 +160,7 @@ uint32_t nubus_vikbw_device::viking_enable_r()
 	m_vbl_disable = 0;
 	return 0;
 }
+
+}   // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(NUBUS_VIKBW, device_nubus_card_interface, nubus_vikbw_device, "nb_vikbw", "Moniterm MacViking II video card")
