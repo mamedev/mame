@@ -25,8 +25,8 @@
 
    -------------
 
-   Marimba Tengoku has a secret test menue (unsure how to access it)
-   the ROM check code for that menu is at 0x661010 in ROM and does a full 32-bit word sum
+   Marimba Tengoku has a secret test menu, see notes near input port definition.
+   The ROM check code for that menu is at 0x661010 in ROM and does a full 32-bit word sum
    of the ROM, comparing it against the value stored in the last 4 bytes (it passes)
 
  */
@@ -192,11 +192,10 @@ void hudson_poems_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitma
 
 	for (int i = 0; i < 64; i++)
 	{
-		int tilebase;
-		u16 spriteword0 = m_mainram[(spritebase + i * 2) + 0] & 0xffff;
-		u16 spriteword1 = m_mainram[(spritebase + i * 2) + 0] >> 16;
-		u16 spriteword2 = m_mainram[(spritebase + i * 2) + 1] & 0xffff;
-		u16 spriteword3 = m_mainram[(spritebase + i * 2) + 1] >> 16;
+		const u16 spriteword0 = m_mainram[(spritebase + i * 2) + 0] & 0xffff;
+		const u16 spriteword1 = m_mainram[(spritebase + i * 2) + 0] >> 16;
+		const u16 spriteword2 = m_mainram[(spritebase + i * 2) + 1] & 0xffff;
+		const u16 spriteword3 = m_mainram[(spritebase + i * 2) + 1] >> 16;
 
 		const int x = (spriteword3 & 0x03ff);
 		const int y = (spriteword2 & 0x03ff);
@@ -204,7 +203,7 @@ void hudson_poems_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitma
 		const int pal = (spriteword2 & 0x7c00)>>10;
 
 		// is it selecting from multiple tile pages (which can have different bases?) (probably from a register somewhere)
-		tilebase = (m_spritegfxbase[(spriteword0 & 0x0300)>>8] & 0x0003ffff) / 32; // m_spritegfxbase contains a full memory address pointer to RAM
+		const int tilebase = (m_spritegfxbase[(spriteword0 & 0x0300)>>8] & 0x0003ffff) / 32; // m_spritegfxbase contains a full memory address pointer to RAM
 
 		tilenum += tilebase;
 
@@ -229,7 +228,7 @@ void hudson_poems_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitma
 
 		if (spriteword0 & 0x8000)
 		{
-
+			// unsure for now
 		}
 		else
 		{

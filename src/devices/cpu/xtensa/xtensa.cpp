@@ -46,12 +46,10 @@ std::unique_ptr<util::disasm_interface> xtensa_device::create_disassembler()
 
 device_memory_interface::space_config_vector xtensa_device::memory_space_config() const
 {
-	space_config_vector spaces = {
-		std::make_pair(AS_PROGRAM, &m_space_config)
+	return space_config_vector{
+		std::make_pair(AS_PROGRAM, &m_space_config),
+		std::make_pair(AS_EXTREGS, &m_extregs_config)
 	};
-
-	spaces.push_back(std::make_pair(AS_EXTREGS, &m_extregs_config));
-	return spaces;
 }
 
 /* Exceptions */
