@@ -1480,8 +1480,7 @@ ROM_END
   be entered by pressing the dosimeter mode button when the unit is showing
   time. Radiation readings are shown in µSv/h. The dosimeter mode ends
   automatically after 40 seconds. A gas-discharge counter (SBM-20-1) collects
-  radiation exposure and feeds info to the game board via the D0-D3 input
-  lines.
+  radiation exposure and feeds info to the game board via the D0-D3 input lines.
 
   The following Mickey Mouse Elektronika clones are emulated in MAME:
 
@@ -11484,7 +11483,7 @@ SYST( 19??, kosmicpt,     gnw_mmouse,  0,      kosmicpt,     gnw_mmouse,   gnw_m
 SYST( 19??, morataka,     gnw_mmouse,  0,      morataka,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Morskaja ataka", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1992, atakaast,     gnw_mmouse,  0,      atakaast,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Ataka asteroidov", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 19??, ecircus,      gnw_mmouse,  0,      ecircus,      gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Circus (Elektronika)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1991, naltair,      gnw_mmouse,  0,      vfutbol,      naltair,      gnw_mmouse_state,   empty_init, "bootleg (Nauchpribor)", "Altair (Nauchpribor)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, naltair,      gnw_mmouse,  0,      vfutbol,      naltair,      gnw_mmouse_state,   empty_init, "bootleg (Nauchpribor)", "Altair (Nauchpribor)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 SYST( 1989, kosmicmt,     gnw_fire,    0,      kosmicmt,     gnw_fire,     gnw_fire_state,     empty_init, "bootleg (Elektronika)", "Kosmicheskiy most", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1990, auslalom,     0,           0,      auslalom,     auslalom,     auslalom_state,     empty_init, "Elektronika", "Autoslalom", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
