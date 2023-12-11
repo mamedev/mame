@@ -1508,7 +1508,7 @@ stream_buffer::sample_t sound_manager::adjust_toward_compressor_scale(stream_buf
 //  and send it to the OSD layer
 //-------------------------------------------------
 
-void sound_manager::update(int param)
+void sound_manager::update(s32 param)
 {
 	LOG("sound_update\n");
 
