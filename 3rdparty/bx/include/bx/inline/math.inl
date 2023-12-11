@@ -377,6 +377,13 @@ namespace bx
 	}
 
 	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC uint8_t floorLog2(Ty _a)
+	{
+		BX_STATIC_ASSERT(isInteger<Ty>(), "Type Ty must be of integer type!");
+		return Ty(_a) < Ty(1) ? Ty(0) : sizeof(Ty)*8 - 1 - countLeadingZeros<Ty>(_a);
+	}
+
+	template<typename Ty>
 	inline BX_CONSTEXPR_FUNC Ty nextPow2(Ty _a)
 	{
 		const uint8_t log2 = ceilLog2(_a);

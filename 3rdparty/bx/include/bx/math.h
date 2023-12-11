@@ -297,6 +297,11 @@ namespace bx
 	template<typename Ty>
 	BX_CONSTEXPR_FUNC uint8_t ceilLog2(Ty _a);
 
+	/// Returns the next biggest integer base 2 logarithm of _a.
+	///
+	template<typename Ty>
+	BX_CONSTEXPR_FUNC uint8_t floorLog2(Ty _a);
+
 	/// Returns the next smallest power of two value.
 	///
 	template<typename Ty>
