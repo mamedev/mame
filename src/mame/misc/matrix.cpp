@@ -22,7 +22,13 @@
 */
 
 #include "emu.h"
+
+#include "bus/isa/isa_cards.h"
 #include "cpu/i386/i386.h"
+#include "machine/mediagx_cs5530_bridge.h"
+#include "machine/mediagx_host.h"
+#include "machine/pci.h"
+
 #include "screen.h"
 
 
@@ -42,15 +48,11 @@ private:
 	required_device<cpu_device> m_maincpu;
 
 	void main_map(address_map &map);
-
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return 0; }
 };
 
 
 void matrix_state::main_map(address_map &map)
 {
-	map(0x000e0000, 0x000fffff).rom().region("bios", 0x20000);
-	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);
 }
 
 static INPUT_PORTS_START( matrix )
@@ -63,18 +65,21 @@ void matrix_state::matrix(machine_config &config)
 	MEDIAGX(config, m_maincpu, 233'000'000); // Cyrix MediaGX GXm-266GP
 	m_maincpu->set_addrmap(AS_PROGRAM, &matrix_state::main_map);
 
-	// video hardware, all TBD
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(640, 480);
-	screen.set_visarea(0, 640-1, 0, 480-1);
-	screen.set_screen_update(FUNC(matrix_state::screen_update));
+	PCI_ROOT(config, "pci", 0);
+	MEDIAGX_HOST(config, "pci:00.0", 0, "maincpu", 128*1024*1024);
+
+	// TODO: unconfirmed PCI space
+	mediagx_cs5530_bridge_device &isa(MEDIAGX_CS5530_BRIDGE(config, "pci:07.0", 0, "maincpu"));
+	isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
+	//isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
+
+	// TODO: unknown number of ISA slots
+	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 }
 
 
 ROM_START( matrix )
-	ROM_REGION32_LE(0x40000, "bios", 0)
+	ROM_REGION32_LE(0x40000, "pci:07.0", 0)
 	ROM_LOAD("d586_bios.bin", 0x00000, 0x40000, CRC(39fc093a) SHA1(3376bac4f0d6e729d5939e3078ecdf700464cba3) )
 
 	ROM_REGION(0x300000, "unsorted", 0) // encrypted?
