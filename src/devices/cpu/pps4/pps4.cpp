@@ -978,7 +978,7 @@ void pps4_device::iT()
  * @brief pps4_device::iTM Transfer and mark indirect
  * HEX   BINARY    CYCLES  MNEMONIC
  * ----------------------------------
- * 0xc0+ 11xx xxxx      2   TM x
+ * 0xd0+ 11x1 xxxx      2   TM x
  *       yyyy yyyy  from page 3
  *
  * Symbolic equation

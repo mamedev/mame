@@ -40,6 +40,7 @@ Year + Game               Board(s)               CPU      Company            Not
 93  Mahjong Cafe Doll     D76052208L-2           TLCS-90  Dynax              Larger palette, RTC
 93  Ichi Ban Jian         MJ911                  Z80      Excel              Larger palette, additional YM2413
 95  Mahjong Tensinhai     D10010318L1            TLCS-90  Dynax              Larger palette, RTC
+96  Mj Raijinhai (DX)     D10010318L1  D10502168 TLCS-90  Dynax              Larger palette, RTC
 96  Janputer '96          NS503X0727             Z80      Dynax              Larger palette, RTC
 97  Pong Boo! 2           NEW PONG-BOO           Z80(?)   OCT                OKI M6295, no PROMs
 97  Janputer Special      CS166P008 + NS5110207  Z80      Dynax              Larger palette, RTC
@@ -259,6 +260,7 @@ public:
 	void mjifb(machine_config &config) ATTR_COLD;
 	void mjdejavu(machine_config &config) ATTR_COLD;
 	void mjtensin(machine_config &config) ATTR_COLD;
+	void majrjh(machine_config &config) ATTR_COLD;
 	void cafedoll(machine_config &config) ATTR_COLD;
 	void cafepara(machine_config &config) ATTR_COLD;
 	void cafetime(machine_config &config) ATTR_COLD;
@@ -376,6 +378,7 @@ private:
 	void mjifb_map(address_map &map) ATTR_COLD;
 	void mjdejavu_map(address_map &map) ATTR_COLD;
 	void mjtensin_map(address_map &map) ATTR_COLD;
+	void majrjh_map(address_map &map) ATTR_COLD;
 	void mjvegasa_map(address_map &map) ATTR_COLD;
 	void cafepara_map(address_map &map) ATTR_COLD;
 	void cafetime_map(address_map &map) ATTR_COLD;
@@ -1395,6 +1398,21 @@ void royalmah_prgbank_state::mjtensin_map(address_map &map)
 	map(0x8000, 0xffff).writeonly().share(m_videoram);
 }
 
+void royalmah_prgbank_state::majrjh_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x7eff).ram().share("nvram");
+	map(0x7fc1, 0x7fc1).r(m_ay, FUNC(ay8910_device::data_r));
+	map(0x7fc2, 0x7fc3).w(m_ay, FUNC(ay8910_device::data_address_w));
+	map(0x7fd0, 0x7fd0).w(FUNC(royalmah_prgbank_state::janptr96_coin_counter_w));
+	map(0x7fd1, 0x7fd1).portr("SYSTEM").w(FUNC(royalmah_prgbank_state::input_port_select_w));
+	map(0x7fe0, 0x7fe0).w(FUNC(royalmah_prgbank_state::mjtensin_6ff3_w));
+	map(0x7fe2, 0x7fe2).w(FUNC(royalmah_prgbank_state::mjderngr_palbank_w));
+	map(0x7fe3, 0x7fe3).rw(FUNC(royalmah_prgbank_state::janptr96_dsw_r), FUNC(royalmah_prgbank_state::janptr96_dswsel_w));
+	map(0x7ff0, 0x7fff).rw(m_rtc, FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0x8000, 0xffff).bankr(m_mainbank);
+	map(0x8000, 0xffff).writeonly().share(m_videoram);
+}
 
 /****************************************************************************
                                 Mahjong Cafe Time
@@ -1416,7 +1434,7 @@ void royalmah_prgbank_state::cafedoll_p6_w(uint8_t data)
 {
 	m_mjvegas_p5_val &= 0x0f;
 
-	if (data & 0x03)
+	if (data & 0x01)
 		m_mjvegas_p5_val |= (1 << 4);
 }
 
@@ -4147,6 +4165,15 @@ void royalmah_prgbank_state::mjtensin(machine_config &config)
 	MSM6242(config, m_rtc, 32.768_kHz_XTAL).out_int_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
 }
 
+void royalmah_prgbank_state::majrjh(machine_config &config)
+{
+	mjtensin(config);
+	tmp91640_device &tmp(TMP91640(config.replace(), m_maincpu, 12_MHz_XTAL));
+	tmp.set_addrmap(AS_PROGRAM, &royalmah_prgbank_state::majrjh_map);
+	tmp.port_read<3>().set(FUNC(royalmah_prgbank_state::mjtensin_p3_r));
+	tmp.port_write<4>().set(FUNC(royalmah_prgbank_state::mjtensin_p4_w));
+}
+
 void royalmah_prgbank_state::cafetime(machine_config &config)
 {
 	mjderngr(config);
@@ -4843,6 +4870,116 @@ ROM_END
 
 /***************************************************************************
 
+Mahjong Raijinhai DX
+Dynax, 1996
+
+PCB Layout
+----------
+
+Top board
+
+D10010318L1
+sticker - D10502168
+|----------------------------------------|
+|DSW2(1)  DSW4(10)                  DIP16|
+|                 |---|                  |
+|DSW1(10) DSW3(10)| * |                  |
+|                 |---|     PROM2        |
+|                                        |
+|                           PROM1        |
+|                                        |
+|                                        |
+|                                        |
+|                                        |
+|                        1051.5E         |
+| |-------------|                        |
+| |     &       |        1052.4E    |---||
+| |-------------|                   | D ||
+|12MHz                   1053.3E    | I ||
+|                                   | P ||
+|BATTERY        32.768kHz           |40 ||
+|         CLOCK          6264       |---||
+|----------------------------------------|
+Notes:
+      Most of the chips have their surface scratched off.
+      *     - Unknown PLCC44 IC. Possibly Mach110 or similar CPLD
+      &     - Unknown SDIP64 IC. Probably a Toshiba TMP91P640. Clock input 12.000MHz
+              Was read as a TMP91P640 and found to be protected.
+      CLOCK - Some kind of clock IC, like Oki M6242 or similar
+      PROM1 - TBP28S42 (equivalent to 82S147) PROM labelled 'D105-1'
+      PROM2 - TBP28S42 (equivalent to 82S147) PROM labelled 'D105-2'
+      DIP16 - Socket for cable that joins to lower board
+      DIP40 - Socket for connector that joins to lower board
+
+
+Bottom board
+
+|--------------------------------------------------------|
+|    BATTERY 6116                                        |
+|  VOL                                                   |
+|                                                        |
+|                                              DIP40     |
+|                                                        |
+|           DSW(8)                              18.432MHz|
+|                                                        |
+|                                                        |
+|M      DIP16                                            |
+|A              4116    4116                             |
+|H                                                       |
+|J              4116    4116                             |
+|O                                                       |
+|N              4116    4116                             |
+|G                                                       |
+|2              4116    4116                             |
+|8  AY3-8910                                             |
+|               4116    4116                             |
+|                                                        |
+|               4116    4116                             |
+|                                                        |
+|               4116    4116                             |
+|                                                        |
+|               4116    4116                             |
+|--------------------------------------------------------|
+Notes:
+      DIP16 - Socket for cable that joins to upper board
+      DIP40 - Socket for connector that joins to upper board
+      AY3-8910 clock - 1.536 [18.432/12]
+      HSync - 15.5kHz
+      VSync - 60Hz
+
+***************************************************************************/
+
+ROM_START( majrjhdx ) // ROM test gives all ok
+	ROM_REGION( 0x290000, "maincpu", 0 )
+	ROM_LOAD( "1051d.5e",         0x00000, 0x40000, CRC(54c31732) SHA1(049e76c42fd248f975c7cce7e74b1f79e2a96bea) )
+	ROM_LOAD( "tmp91p640n-10.3c", 0x00000, 0x04000, CRC(129a11c7) SHA1(450a6a7da29c9206937a16701b34075cda338147) ) // dump from majrjh, works fine
+	ROM_COPY( "maincpu", 0x00000, 0x10000, 0x40000 )
+	ROM_COPY( "maincpu", 0x00000, 0x50000, 0x40000 )
+	ROM_COPY( "maincpu", 0x10000, 0x90000, 0x80000 )
+	ROM_LOAD( "1053d.3e",  0x110000, 0x80000, CRC(10bf7f0f) SHA1(c042240296ac7202da14e809bff36c9b0f97a3df) )
+	ROM_LOAD( "1052d.4e",  0x210000, 0x80000, CRC(7200599c) SHA1(32e7caad9a9ea756b699f601fab90a419a437f57) )
+
+	ROM_REGION( 0x400, "proms", 0 ) // Color PROMs
+	ROM_LOAD( "d105-2.7e", 0x000, 0x200, CRC(587bca5a) SHA1(327f7bfa035f652bbbfba3f74715515236322c09) )
+	ROM_LOAD( "d105-1.6e", 0x200, 0x200, CRC(6d0ce028) SHA1(35f70000a850782356734323fa93b150a77f807c) )
+ROM_END
+
+ROM_START( majrjh ) // ROM test gives all ok
+	ROM_REGION( 0x290000, "maincpu", 0 )
+	ROM_LOAD( "1051d.5e",         0x000000, 0x80000, CRC(5fdc5f9e) SHA1(4a599f83ee1c8ae41a44e98694b6d5515a29b813) ) // 1ST AND 2ND HALF IDENTICAL, tested as 2MB anyway
+	ROM_LOAD( "tmp91p640n-10.3c", 0x000000, 0x04000, CRC(129a11c7) SHA1(450a6a7da29c9206937a16701b34075cda338147) ) // MCU has pins 9 to 10 & 12 to 15 stripped out
+	ROM_COPY( "maincpu", 0x00000, 0x010000, 0x80000 )
+	ROM_COPY( "maincpu", 0x00000, 0x090000, 0x80000 )
+	ROM_LOAD( "1053d.3e",         0x110000, 0x80000, CRC(e5abd309) SHA1(7d80ab9f7bcc66d7332c60a0d02c123582c31a34) )
+	ROM_LOAD( "1052d.4e",         0x210000, 0x80000, CRC(7200599c) SHA1(32e7caad9a9ea756b699f601fab90a419a437f57) )
+
+	ROM_REGION( 0x400, "proms", 0 ) // Color PROMs
+	ROM_LOAD( "d105-2.7e", 0x000, 0x200, CRC(587bca5a) SHA1(327f7bfa035f652bbbfba3f74715515236322c09) )
+	ROM_LOAD( "d105-1.6e", 0x200, 0x200, CRC(6d0ce028) SHA1(35f70000a850782356734323fa93b150a77f807c) )
+ROM_END
+
+/***************************************************************************
+
 Almond Pinky
 Dynax, 1988
 
@@ -5039,7 +5176,7 @@ Notes:
 ROM_START( cafedoll )
 	ROM_REGION( 0x190000, "maincpu", 0 )
 	ROM_LOAD( "7601",              0x000000, 0x80000, CRC(20c80ad9) SHA1(e45edd101c6e26c0fa3c3f15f4a4152a853e41bd) )
-	ROM_LOAD( "76xx.tmp90840",     0x000000, 0x02000, CRC(091a85dc) SHA1(964ccbc13466464c2feee10f807078ec517bed5c) ) // internal ROM
+	ROM_LOAD( "76xx.tmp90840",     0x000000, 0x02000, CRC(091a85dc) SHA1(964ccbc13466464c2feee10f807078ec517bed5c) ) // internal ROM, MCU has pins 10 & 12 to 16 stripped out
 	// bank switched ROMs follow
 	ROM_COPY( "maincpu", 0x000000, 0x010000, 0x80000 )
 	ROM_LOAD( "7602",              0x090000, 0x80000, CRC(f472960c) SHA1(cc2feb4374ba94035101114c73e1690cfeac9b91) )
@@ -5156,7 +5293,7 @@ Notes:
 ROM_START( mjvegas )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF  )
 	ROM_LOAD( "5001a.1b",          0x00000, 0x20000, CRC(91859a47) SHA1(3c452405bf28f5e7302eaccdf472e91b64629a67) ) // external ROM with first 0x2000 empty
-	ROM_LOAD( "50xx.tmp90840",     0x00000, 0x02000, CRC(091a85dc) SHA1(964ccbc13466464c2feee10f807078ec517bed5c) ) // internal ROM
+	ROM_LOAD( "50xx.tmp90840",     0x00000, 0x02000, CRC(091a85dc) SHA1(964ccbc13466464c2feee10f807078ec517bed5c) ) // internal ROM, MCU has pins 9 to 14 stripped out
 
 	// bank switched ROMs follow
 	ROM_COPY( "maincpu", 0x000000, 0x070000, 0x020000 )   // 0c-0f
@@ -6045,9 +6182,11 @@ GAME( 1990,  mjifb3,   mjifb,    mjifb,    mjifb,    royalmah_prgbank_state, ini
 GAME( 1991,  mjvegasa, 0,        mjvegasa, mjvegasa, royalmah_prgbank_state, init_mjvegasa, ROT0,   "Dynax",                      "Mahjong Vegas (Japan, unprotected)",    0 )
 GAME( 1991,  mjvegas,  mjvegasa, mjvegas,  mjvegasa, royalmah_prgbank_state, init_mjvegas,  ROT0,   "Dynax",                      "Mahjong Vegas (Japan)",                 0 )
 GAME( 1992,  cafetime, 0,        cafetime, cafetime, royalmah_prgbank_state, init_cafetime, ROT0,   "Dynax",                      "Mahjong Cafe Time",                     0 )
-GAME( 1993,  cafedoll, 0,        cafedoll, cafetime, royalmah_prgbank_state, init_cafedoll, ROT0,   "Dynax",                      "Mahjong Cafe Doll (Japan, Ver. 1.00)",  MACHINE_NOT_WORKING ) // needs correct banking implementation (P3 seems to be used differently)
+GAME( 1993,  cafedoll, 0,        cafedoll, cafetime, royalmah_prgbank_state, init_cafedoll, ROT0,   "Dynax",                      "Mahjong Cafe Doll (Japan, Ver. 1.00)",  MACHINE_NOT_WORKING ) // fails protection check (at 0x178 it puts 0x55 in 0xFFBF instead of 0x56 like the code expects and chaos ensues)
 GAME( 1993,  ichiban,  0,        ichiban,  ichiban,  royalmah_prgbank_state, init_ichiban,  ROT0,   "Excel",                      "Ichi Ban Jyan",                         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // ROM banking is wrong, causing several GFX problems
 GAME( 1995,  mjtensin, 0,        mjtensin, mjtensin, royalmah_prgbank_state, init_mjtensin, ROT0,   "Dynax",                      "Mahjong Tensinhai (Japan)",             MACHINE_NOT_WORKING )
+GAME( 1996,  majrjhdx, 0,        majrjh,   mjtensin, royalmah_prgbank_state, init_mjtensin, ROT0,   "Dynax",                      "Mahjong Raijinhai DX (Ver. D105)",      0 )
+GAME( 1996,  majrjh,   majrjhdx, majrjh,   mjtensin, royalmah_prgbank_state, init_mjtensin, ROT0,   "Dynax",                      "Mahjong Raijinhai (Ver. D105)",         0 )
 GAME( 1996,  janptr96, 0,        janptr96, janptr96, royalmah_prgbank_state, init_janptr96, ROT0,   "Dynax",                      "Janputer '96 (Japan)",                  0 )
 GAME( 1997,  janptrsp, 0,        janptr96, janptr96, royalmah_prgbank_state, init_janptr96, ROT0,   "Dynax",                      "Janputer Special (Japan)",              0 )
 GAME( 1997,  pongboo2, 0,        pongboo2, ichiban,  royalmah_prgbank_state, init_pongboo2, ROT0,   "OCT",                        "Pong Boo! 2 (Ver. 1.31)",               MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS ) // banking, palette, inputs

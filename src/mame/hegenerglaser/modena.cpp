@@ -24,7 +24,6 @@ Hardware notes:
 #include "machine/clock.h"
 #include "machine/nvram.h"
 #include "machine/sensorboard.h"
-#include "machine/timer.h"
 #include "sound/dac.h"
 #include "video/pwm.h"
 

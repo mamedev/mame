@@ -130,7 +130,7 @@ void seibu_sound_device::device_reset()
 	update_irq_lines(VECTOR_INIT);
 }
 
-void seibu_sound_device::update_irq_lines(int param)
+void seibu_sound_device::update_irq_lines(s32 param)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(seibu_sound_device::update_irq_synced), this), param);
 }

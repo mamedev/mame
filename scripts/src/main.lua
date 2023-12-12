@@ -165,6 +165,7 @@ if (STANDALONE~=true) then
 end
 	links {
 		ext_lib("zlib"),
+		ext_lib("zstd"),
 		ext_lib("flac"),
 		ext_lib("utf8proc"),
 	}

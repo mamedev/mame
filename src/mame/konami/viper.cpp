@@ -3489,7 +3489,7 @@ GAME(2000, gticlub2,  kviper,    viper,     gticlub2,   viper_state, init_viperc
 GAME(2000, gticlub2ea,gticlub2,  viper,     gticlub2ea, viper_state, init_vipercf,  ROT0,  "Konami", "Driving Party: Racing in Italy (ver EAA)", MACHINE_NOT_WORKING)
 GAME(2001, jpark3,    kviper,    viper,     jpark3,     viper_state, init_vipercf,  ROT0,  "Konami", "Jurassic Park III (ver EBC)", MACHINE_NOT_WORKING)
 GAME(2001, jpark3u,   jpark3,    viper,     jpark3,     viper_state, init_vipercf,  ROT0,  "Konami", "Jurassic Park III (ver UBC)", MACHINE_NOT_WORKING)
-GAME(2001, mocapglf,  kviper,    viper_omz, mocapglf,   viper_subscreen_state, init_vipercf,  ROT90, "Konami", "Mocap Golf (ver UAA)", MACHINE_NOT_WORKING)
+GAME(2001, mocapglf,  kviper,    viper_omz, mocapglf,   viper_subscreen_state, init_vipercf,  ROT90, "Konami", "Mocap Golf (ver EAA:B)", MACHINE_NOT_WORKING)
 GAME(2001, mocapb,    kviper,    viper_fullbody, mocapb,     viper_state, init_vipercf,  ROT90, "Konami", "Mocap Boxing (ver AAB)", MACHINE_NOT_WORKING)
 GAME(2001, mocapbj,   mocapb,    viper_fullbody, mocapb,     viper_state, init_vipercf,  ROT90, "Konami", "Mocap Boxing (ver JAA)", MACHINE_NOT_WORKING)
 GAME(2000, p911,      kviper,    viper_fullbody,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver AAE)", MACHINE_NOT_WORKING)

@@ -2864,6 +2864,8 @@ OFF  OFF  ON   Australia
 	ROM_LOAD16_WORD_SWAP_BIOS( 25, "epr-21576h_multi.ic27", 0x000000, 0x200000, CRC(cce01f1f) SHA1(cca17119ad13e3a4ef7cb6902a37b65d6a844aee) ) \
 	ROM_SYSTEM_BIOS( 26, "bios26", "Dev BIOS v1.2" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 26, "epr-21336a.ic27", 0x000000, 0x200000, BAD_DUMP CRC(d3d57af8) SHA1(0eb72c2a20ad8b86d442b77760eab5e89521d469) ) \
+	ROM_SYSTEM_BIOS( 27, "bios27", "Dev Naomi Boot 2491" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 27, "naomi_boot_2491.ic27", 0x000000, 0x200000, CRC(5b28f868) SHA1(d101f58c69d9835e87a969688e43dc9b699b89d0) ) \
 	ROM_REGION( 0x4000, "altera_pof", 0) \
 	ROM_LOAD("315-6188.ic31", 0x0000, 0x2034, CRC(7c9fea46) SHA1(f77c07ae65dfed18c1c4c632c8945be21d02ddaf) )
 
@@ -2880,6 +2882,10 @@ OFF  OFF  ON   Australia
   PC16550DV UART
   Fujitsu MB86604A SCSI controller
   IPL BOOT ROM with printed label "Zukin Ver.0930 / 99/5/24 / SUM:DB9C"
+
+ naomi_boot_2491.ic27 high likely from early Set5 dev.box.
+  Contains monitor routine which run in a dead loop and waiting for commands from host PC via Dev.ROM board's SCSI or serial.
+  Not supposed to boot games.
 */
 
 

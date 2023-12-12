@@ -73,7 +73,7 @@ void chessmachine_device::device_start()
 //  external handlers
 //-------------------------------------------------
 
-void chessmachine_device::data0_w_sync(int param)
+void chessmachine_device::data0_w_sync(s32 param)
 {
 	if ((m_latch[0] & 1) != param)
 	{
@@ -87,7 +87,7 @@ void chessmachine_device::data0_w(int state)
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(chessmachine_device::data0_w_sync), this), state ? 1 : 0);
 }
 
-void chessmachine_device::data1_w_sync(int param)
+void chessmachine_device::data1_w_sync(s32 param)
 {
 	if ((m_latch[0] & 0x80) != param)
 	{
@@ -104,7 +104,7 @@ void chessmachine_device::data1_w(int state)
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(chessmachine_device::data1_w_sync), this), state ? 0x80 : 0);
 }
 
-void chessmachine_device::reset_w_sync(int param)
+void chessmachine_device::reset_w_sync(s32 param)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, param ? ASSERT_LINE : CLEAR_LINE);
 

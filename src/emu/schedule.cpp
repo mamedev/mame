@@ -76,7 +76,7 @@ inline emu_timer &emu_timer::init(
 		running_machine &machine,
 		timer_expired_delegate &&callback,
 		attotime start_delay,
-		int param,
+		s32 param,
 		bool temporary)
 {
 	// ensure the entire timer state is clean
@@ -613,7 +613,7 @@ emu_timer *device_scheduler::timer_alloc(timer_expired_delegate callback)
 //  amount of time
 //-------------------------------------------------
 
-void device_scheduler::timer_set(const attotime &duration, timer_expired_delegate callback, int param)
+void device_scheduler::timer_set(const attotime &duration, timer_expired_delegate callback, s32 param)
 {
 	[[maybe_unused]] emu_timer &timer = m_timer_allocator.alloc()->init(
 			machine(),
@@ -630,7 +630,7 @@ void device_scheduler::timer_set(const attotime &duration, timer_expired_delegat
 //  timer and set it to go off as soon as possible
 //-------------------------------------------------
 
-void device_scheduler::synchronize(timer_expired_delegate callback, int param)
+void device_scheduler::synchronize(timer_expired_delegate callback, s32 param)
 {
 	m_timer_allocator.alloc()->init(
 			machine(),

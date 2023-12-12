@@ -253,7 +253,7 @@ void seeq8003_device::tx_command_w(u8 data)
 	m_tx_command = data;
 }
 
-void seeq8003_device::transmit(int param)
+void seeq8003_device::transmit(s32 param)
 {
 	if (m_tx_fifo.queue_length())
 	{
@@ -328,7 +328,7 @@ int seeq8003_device::receive(u8 *buf, int length)
 	return length;
 }
 
-void seeq8003_device::interrupt(int param)
+void seeq8003_device::interrupt(s32 param)
 {
 	int const state =
 		(!(m_tx_status & TXS_O) && (m_tx_status & m_tx_command & TXS_M)) ||
