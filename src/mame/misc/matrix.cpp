@@ -49,6 +49,8 @@ private:
 
 void matrix_state::main_map(address_map &map)
 {
+	map(0x000e0000, 0x000fffff).rom().region("bios", 0x20000);
+	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);
 }
 
 static INPUT_PORTS_START( matrix )
@@ -75,7 +77,7 @@ ROM_START( matrix )
 	ROM_REGION32_LE(0x40000, "bios", 0)
 	ROM_LOAD("d586_bios.bin", 0x00000, 0x40000, CRC(39fc093a) SHA1(3376bac4f0d6e729d5939e3078ecdf700464cba3) )
 
-	ROM_REGION(0x300000, "unsorted", 0)
+	ROM_REGION(0x300000, "unsorted", 0) // encrypted?
 	ROM_LOAD( "matrix_031203u5.bin",  0x000000, 0x080000, CRC(95aa8fb7) SHA1(8cbfa783a887779350609d6f3ea1e88187bd21a4) )
 	ROM_LOAD( "matrix_031203u6.bin",  0x080000, 0x080000, CRC(38822bc6) SHA1(b57bd9fa44cab9fa4cef8873454c8be0dc7ab781) )
 	ROM_LOAD( "matrix_031203u7.bin",  0x100000, 0x080000, CRC(74d31f1a) SHA1(bf6eae262cab6d24276f43370f3b9e4f687b9a52) )
