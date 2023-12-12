@@ -1625,11 +1625,11 @@ void defender_state::defender(machine_config &config)
 	m_screen->set_visarea(12, 304-1, 7, 247-1);
 }
 	
-void defender_state::defender6802(machine_config &config)
+void defender_state::defender_6802snd(machine_config &config)
 {
 	defender(config);
 
-	// Some clones use a 6802 CPU for sound, but keeping the same external memory.
+	// Some bootlegs use a 6802 CPU for sound
 	M6802(config.replace(), m_soundcpu, SOUND_CLOCK);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &defender_state::sound_map_6802);
 }
@@ -3842,87 +3842,87 @@ void wms_muxed_state::init_alienar()
 
 // Defender hardware games
 
-//    YEAR  NAME        PARENT    MACHINE         INPUT     CLASS            INIT           ROT     COMPANY                                 FULLNAME                                    FLAGS
-GAME( 1980, defender,   0,        defender,       defender, defender_state,  empty_init,    ROT0,   "Williams",                             "Defender (Red label)",                     MACHINE_SUPPORTS_SAVE ) // developers left Williams in 1981 and formed Vid Kidz
-GAME( 1980, defenderg,  defender, defender,       defender, defender_state,  empty_init,    ROT0,   "Williams",                             "Defender (Green label)",                   MACHINE_SUPPORTS_SAVE )
-GAME( 1980, defenderb,  defender, defender,       defender, defender_state,  empty_init,    ROT0,   "Williams",                             "Defender (Blue label)",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1980, defenderw,  defender, defender,       defender, defender_state,  empty_init,    ROT0,   "Williams",                             "Defender (White label)",                   MACHINE_SUPPORTS_SAVE )
-GAME( 1980, defenderj,  defender, defender,       defender, defender_state,  empty_init,    ROT0,   "Williams (Taito Corporation license)", "T.T Defender",                             MACHINE_SUPPORTS_SAVE )
-GAME( 1980, defndjeu,   defender, defender,       defender, defender_state,  init_defndjeu, ROT0,   "bootleg (Jeutel)",                     "Defender (bootleg)",                       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, tornado1,   defender, defender,       defender, defender_state,  init_defndjeu, ROT0,   "bootleg (Jeutel)",                     "Tornado (bootleg of Defender, set 1)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1980, tornado2,   defender, defender,       defender, defender_state,  init_defndjeu, ROT0,   "bootleg (Jeutel)",                     "Tornado (bootleg of Defender, set 2)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // bad dump?
-GAME( 1980, zero,       defender, defender,       defender, defender_state,  init_defndjeu, ROT0,   "bootleg (Jeutel)",                     "Zero (bootleg of Defender, set 1)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1980, zero2,      defender, defender,       defender, defender_state,  init_defndjeu, ROT0,   "bootleg (Amtec)",                      "Zero (bootleg of Defender, set 2)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1981, defenderom, defender, defender6802,   defender, defender_state,  empty_init,    ROT0,   "bootleg (Operamatic)",                 "Operacion Defender (bootleg of Defender)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, defcmnd,    defender, defender,       defender, defender_state,  empty_init,    ROT0,   "bootleg",                              "Defense Command (bootleg of Defender)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1981, defence,    defender, defender,       defender, defender_state,  empty_init,    ROT0,   "bootleg (Outer Limits)",               "Defence Command (bootleg of Defender)",    MACHINE_SUPPORTS_SAVE )
-GAME( 198?, defenseb,   defender, defender,       defender, defender_state,  empty_init,    ROT0,   "bootleg",                              "Defense (bootleg of Defender)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1981, startrkd,   defender, defender,       defender, defender_state,  empty_init,    ROT0,   "bootleg",                              "Star Trek (bootleg of Defender)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1980, attackf,    defender, defender,       defender, defender_state,  empty_init,    ROT0,   "bootleg (Famaresa)",                   "Attack (bootleg of Defender)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1981, galwars2,   defender, defender6802,   defender, defender_state,  empty_init,    ROT0,   "bootleg (Sonic)",                      "Galaxy Wars II (bootleg of Defender)",     MACHINE_SUPPORTS_SAVE ) // Sega Sonic - Sega S.A., only displays Sonic on title screen
+//    YEAR  NAME        PARENT    MACHINE           INPUT     CLASS            INIT           ROT     COMPANY                                 FULLNAME                                    FLAGS
+GAME( 1980, defender,   0,        defender,         defender, defender_state,  empty_init,    ROT0,   "Williams",                             "Defender (Red label)",                     MACHINE_SUPPORTS_SAVE ) // developers left Williams in 1981 and formed Vid Kidz
+GAME( 1980, defenderg,  defender, defender,         defender, defender_state,  empty_init,    ROT0,   "Williams",                             "Defender (Green label)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1980, defenderb,  defender, defender,         defender, defender_state,  empty_init,    ROT0,   "Williams",                             "Defender (Blue label)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1980, defenderw,  defender, defender,         defender, defender_state,  empty_init,    ROT0,   "Williams",                             "Defender (White label)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1980, defenderj,  defender, defender,         defender, defender_state,  empty_init,    ROT0,   "Williams (Taito Corporation license)", "T.T Defender",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1980, defndjeu,   defender, defender,         defender, defender_state,  init_defndjeu, ROT0,   "bootleg (Jeutel)",                     "Defender (bootleg)",                       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, tornado1,   defender, defender,         defender, defender_state,  init_defndjeu, ROT0,   "bootleg (Jeutel)",                     "Tornado (bootleg of Defender, set 1)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1980, tornado2,   defender, defender,         defender, defender_state,  init_defndjeu, ROT0,   "bootleg (Jeutel)",                     "Tornado (bootleg of Defender, set 2)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // bad dump?
+GAME( 1980, zero,       defender, defender,         defender, defender_state,  init_defndjeu, ROT0,   "bootleg (Jeutel)",                     "Zero (bootleg of Defender, set 1)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1980, zero2,      defender, defender,         defender, defender_state,  init_defndjeu, ROT0,   "bootleg (Amtec)",                      "Zero (bootleg of Defender, set 2)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1981, defenderom, defender, defender_6802snd, defender, defender_state,  empty_init,    ROT0,   "bootleg (Operamatic)",                 "Operacion Defender (bootleg of Defender)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, defcmnd,    defender, defender,         defender, defender_state,  empty_init,    ROT0,   "bootleg",                              "Defense Command (bootleg of Defender)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1981, defence,    defender, defender,         defender, defender_state,  empty_init,    ROT0,   "bootleg (Outer Limits)",               "Defence Command (bootleg of Defender)",    MACHINE_SUPPORTS_SAVE )
+GAME( 198?, defenseb,   defender, defender,         defender, defender_state,  empty_init,    ROT0,   "bootleg",                              "Defense (bootleg of Defender)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1981, startrkd,   defender, defender,         defender, defender_state,  empty_init,    ROT0,   "bootleg",                              "Star Trek (bootleg of Defender)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1980, attackf,    defender, defender,         defender, defender_state,  empty_init,    ROT0,   "bootleg (Famaresa)",                   "Attack (bootleg of Defender)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1981, galwars2,   defender, defender_6802snd, defender, defender_state,  empty_init,    ROT0,   "bootleg (Sonic)",                      "Galaxy Wars II (bootleg of Defender)",     MACHINE_SUPPORTS_SAVE ) // Sega Sonic - Sega S.A., only displays Sonic on title screen
 
-GAME( 1980, mayday,     0,        defender,       mayday,   mayday_state,    empty_init,    ROT0,   "Hoei",                 "Mayday (set 1)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // \  original by Hoei, which one of these 3 sets is bootleg/licensed/original is unknown
-GAME( 1980, maydaya,    mayday,   defender,       mayday,   mayday_state,    empty_init,    ROT0,   "Hoei",                 "Mayday (set 2)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) //  > these games have an unemulated protection chip of some sort which is hacked around in /machine/williams.cpp "protection_r" function
-GAME( 1980, maydayb,    mayday,   defender,       mayday,   mayday_state,    empty_init,    ROT0,   "Hoei",                 "Mayday (set 3)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // /
-GAME( 1980, batlzone,   mayday,   defender,       mayday,   mayday_state,    empty_init,    ROT0,   "bootleg (Video Game)", "Battle Zone (bootleg of Mayday)", MACHINE_SUPPORTS_SAVE ) // the bootleg may or may not use the same protection chip, or some hack around it.
+GAME( 1980, mayday,     0,        defender,         mayday,   mayday_state,    empty_init,    ROT0,   "Hoei",                 "Mayday (set 1)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // \  original by Hoei, which one of these 3 sets is bootleg/licensed/original is unknown
+GAME( 1980, maydaya,    mayday,   defender,         mayday,   mayday_state,    empty_init,    ROT0,   "Hoei",                 "Mayday (set 2)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) //  > these games have an unemulated protection chip of some sort which is hacked around in /machine/williams.cpp "protection_r" function
+GAME( 1980, maydayb,    mayday,   defender,         mayday,   mayday_state,    empty_init,    ROT0,   "Hoei",                 "Mayday (set 3)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // /
+GAME( 1980, batlzone,   mayday,   defender,         mayday,   mayday_state,    empty_init,    ROT0,   "bootleg (Video Game)", "Battle Zone (bootleg of Mayday)", MACHINE_SUPPORTS_SAVE ) // the bootleg may or may not use the same protection chip, or some hack around it.
 
-GAME( 1981, colony7,    0,        defender,       colony7,  defender_state,  empty_init,    ROT270, "Taito", "Colony 7 (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, colony7a,   colony7,  defender,       colony7,  defender_state,  empty_init,    ROT270, "Taito", "Colony 7 (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, colony7,    0,        defender,         colony7,  defender_state,  empty_init,    ROT270, "Taito",                "Colony 7 (set 1)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1981, colony7a,   colony7,  defender,         colony7,  defender_state,  empty_init,    ROT270, "Taito",                "Colony 7 (set 2)",                MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, jin,        0,        jin,            jin,      defender_state,  empty_init,    ROT90,  "Falcon", "Jin", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, jin,        0,        jin,              jin,      defender_state,  empty_init,    ROT90,  "Falcon",               "Jin",                             MACHINE_SUPPORTS_SAVE )
 
 
 // Standard Williams hardware
-GAME( 1981, stargate,   0,        williams_b0,    stargate, williams_state,  empty_init,    ROT0,   "Williams / Vid Kidz", "Stargate", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, stargate,   0,        williams_b0,      stargate, williams_state,  empty_init,    ROT0,   "Williams / Vid Kidz", "Stargate", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, conquest,   0,        williams_b1,    conquest, conquest_state,  empty_init,    ROT270, "Williams / Vid Kidz", "Conquest (prototype)", MACHINE_IS_INCOMPLETE | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, conquest,   0,        williams_b1,      conquest, conquest_state,  empty_init,    ROT270, "Williams / Vid Kidz", "Conquest (prototype)", MACHINE_IS_INCOMPLETE | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, robotron,   0,        williams_b1,    robotron, williams_state,  empty_init,    ROT0,   "Williams / Vid Kidz",                   "Robotron: 2084 (Solid Blue label)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1982, robotronyo, robotron, williams_b1,    robotron, williams_state,  empty_init,    ROT0,   "Williams / Vid Kidz",                   "Robotron: 2084 (Yellow/Orange label)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, robotronun, robotron, williams_b1,    robotron, williams_state,  empty_init,    ROT0,   "Williams / Vid Kidz (Unidesa license)", "Robotron: 2084 (Unidesa license)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1982, robotron,   0,        williams_b1,      robotron, williams_state,  empty_init,    ROT0,   "Williams / Vid Kidz",                   "Robotron: 2084 (Solid Blue label)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1982, robotronyo, robotron, williams_b1,      robotron, williams_state,  empty_init,    ROT0,   "Williams / Vid Kidz",                   "Robotron: 2084 (Yellow/Orange label)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, robotronun, robotron, williams_b1,      robotron, williams_state,  empty_init,    ROT0,   "Williams / Vid Kidz (Unidesa license)", "Robotron: 2084 (Unidesa license)",     MACHINE_SUPPORTS_SAVE )
 
 // the 3 below are all noteworthy hacks of the Solid Blue set
-GAME( 1987, robotron87, robotron, williams_b1,    robotron, williams_state,  empty_init,    ROT0,   "hack", "Robotron: 2084 (1987 'shot-in-the-corner' bugfix)", MACHINE_SUPPORTS_SAVE ) // fixes a reset bug.
-GAME( 2012, robotron12, robotron, williams_b1,    robotron, williams_state,  empty_init,    ROT0,   "hack", "Robotron: 2084 (2012 'wave 201 start' hack)",       MACHINE_SUPPORTS_SAVE ) // includes sitc bug fix, used for competitive play.
-GAME( 2015, robotrontd, robotron, williams_b1,    robotron, williams_state,  empty_init,    ROT0,   "hack", "Robotron: 2084 (2015 'tie-die V2' hack)",           MACHINE_SUPPORTS_SAVE ) // inc. sitc fix, mods by some of the original developers, see backstory here http://www.robotron2084guidebook.com/gameplay/raceto100million/robo2k14_tie-die-romset/  (I guess there's a tie-die V1 before it was released to the public?)
+GAME( 1987, robotron87, robotron, williams_b1,      robotron, williams_state,  empty_init,    ROT0,   "hack", "Robotron: 2084 (1987 'shot-in-the-corner' bugfix)", MACHINE_SUPPORTS_SAVE ) // fixes a reset bug.
+GAME( 2012, robotron12, robotron, williams_b1,      robotron, williams_state,  empty_init,    ROT0,   "hack", "Robotron: 2084 (2012 'wave 201 start' hack)",       MACHINE_SUPPORTS_SAVE ) // includes sitc bug fix, used for competitive play.
+GAME( 2015, robotrontd, robotron, williams_b1,      robotron, williams_state,  empty_init,    ROT0,   "hack", "Robotron: 2084 (2015 'tie-die V2' hack)",           MACHINE_SUPPORTS_SAVE ) // inc. sitc fix, mods by some of the original developers, see backstory here http://www.robotron2084guidebook.com/gameplay/raceto100million/robo2k14_tie-die-romset/  (I guess there's a tie-die V1 before it was released to the public?)
 
-GAME( 1982, joust,      0,        joust,          joust,    wms_muxed_state, empty_init,    ROT0,   "Williams", "Joust (Green label)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1982, joustr,     joust,    joust,          joust,    wms_muxed_state, empty_init,    ROT0,   "Williams", "Joust (Red label)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1982, jousty,     joust,    joust,          joust,    wms_muxed_state, empty_init,    ROT0,   "Williams", "Joust (Yellow label)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, joust,      0,        joust,            joust,    wms_muxed_state, empty_init,    ROT0,   "Williams", "Joust (Green label)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1982, joustr,     joust,    joust,            joust,    wms_muxed_state, empty_init,    ROT0,   "Williams", "Joust (Red label)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1982, jousty,     joust,    joust,            joust,    wms_muxed_state, empty_init,    ROT0,   "Williams", "Joust (Yellow label)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, bubbles,    0,        williams_b1,    bubbles,  bubbles_state,   empty_init,    ROT0,   "Williams", "Bubbles",                   MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bubblesr,   bubbles,  williams_b1,    bubbles,  bubbles_state,   empty_init,    ROT0,   "Williams", "Bubbles (Solid Red label)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bubblesp,   bubbles,  williams_b1,    bubbles,  bubbles_state,   empty_init,    ROT0,   "Williams", "Bubbles (prototype)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bubbles,    0,        williams_b1,      bubbles,  bubbles_state,   empty_init,    ROT0,   "Williams", "Bubbles",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bubblesr,   bubbles,  williams_b1,      bubbles,  bubbles_state,   empty_init,    ROT0,   "Williams", "Bubbles (Solid Red label)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bubblesp,   bubbles,  williams_b1,      bubbles,  bubbles_state,   empty_init,    ROT0,   "Williams", "Bubbles (prototype)",       MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, splat,      0,        splat,          splat,    wms_muxed_state, empty_init,    ROT0,   "Williams", "Splat!", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, splat,      0,        splat,            splat,    wms_muxed_state, empty_init,    ROT0,   "Williams", "Splat!", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, sinistar,   0,        upright,        sinistar, sinistar_state,  empty_init,    ROT270, "Williams", "Sinistar (revision 3, upright)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, sinistarc,  sinistar, cockpit,        sinistar, sinistar_state,  empty_init,    ROT270, "Williams", "Sinistar (revision 3, cockpit)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, sinistar2,  sinistar, upright,        sinistar, sinistar_state,  empty_init,    ROT270, "Williams", "Sinistar (revision 2, upright)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, sinistarc2, sinistar, cockpit,        sinistar, sinistar_state,  empty_init,    ROT270, "Williams", "Sinistar (revision 2, cockpit)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, sinistarp,  sinistar, upright,        sinistar, sinistar_state,  empty_init,    ROT270, "Williams", "Sinistar (AMOA-82 prototype)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1982, sinistar,   0,        upright,          sinistar, sinistar_state,  empty_init,    ROT270, "Williams", "Sinistar (revision 3, upright)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, sinistarc,  sinistar, cockpit,          sinistar, sinistar_state,  empty_init,    ROT270, "Williams", "Sinistar (revision 3, cockpit)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, sinistar2,  sinistar, upright,          sinistar, sinistar_state,  empty_init,    ROT270, "Williams", "Sinistar (revision 2, upright)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, sinistarc2, sinistar, cockpit,          sinistar, sinistar_state,  empty_init,    ROT270, "Williams", "Sinistar (revision 2, cockpit)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, sinistarp,  sinistar, upright,          sinistar, sinistar_state,  empty_init,    ROT270, "Williams", "Sinistar (AMOA-82 prototype)",   MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, playball,   0,        playball,       playball, playball_state,  empty_init,    ROT270, "Williams", "PlayBall! (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, playball,   0,        playball,         playball, playball_state,  empty_init,    ROT270, "Williams", "PlayBall! (prototype)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, blaster,    0,        blaster,        blaster,  blaster_state,   empty_init,    ROT0,   "Williams / Vid Kidz", "Blaster",                  MACHINE_SUPPORTS_SAVE ) // 20 levels - stereo sound
-GAME( 1983, blastero,   blaster,  blaster,        blaster,  blaster_state,   empty_init,    ROT0,   "Williams / Vid Kidz", "Blaster (location test)",  MACHINE_SUPPORTS_SAVE ) // 30 levels - stereo sound
-GAME( 1983, blasterkit, blaster,  blastkit,       blastkit, blaster_state,   empty_init,    ROT0,   "Williams / Vid Kidz", "Blaster (conversion kit)", MACHINE_SUPPORTS_SAVE ) // 20 levels - mono sound
+GAME( 1983, blaster,    0,        blaster,          blaster,  blaster_state,   empty_init,    ROT0,   "Williams / Vid Kidz", "Blaster",                  MACHINE_SUPPORTS_SAVE ) // 20 levels - stereo sound
+GAME( 1983, blastero,   blaster,  blaster,          blaster,  blaster_state,   empty_init,    ROT0,   "Williams / Vid Kidz", "Blaster (location test)",  MACHINE_SUPPORTS_SAVE ) // 30 levels - stereo sound
+GAME( 1983, blasterkit, blaster,  blastkit,         blastkit, blaster_state,   empty_init,    ROT0,   "Williams / Vid Kidz", "Blaster (conversion kit)", MACHINE_SUPPORTS_SAVE ) // 20 levels - mono sound
 
-GAME( 1985, spdball,    0,        spdball,        spdball,  spdball_state,   empty_init,    ROT0,   "Williams", "Speed Ball - Contest at Neonworld (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, spdball,    0,        spdball,          spdball,  spdball_state,   empty_init,    ROT0,   "Williams", "Speed Ball - Contest at Neonworld (prototype)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, alienar,    0,        joust,          alienar,  wms_muxed_state, init_alienar,  ROT0,   "Duncan Brown", "Alien Arena",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1985, alienaru,   alienar,  joust,          alienar,  wms_muxed_state, init_alienar,  ROT0,   "Duncan Brown", "Alien Arena (Stargate upgrade)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, alienar,    0,        joust,            alienar,  wms_muxed_state, init_alienar,  ROT0,   "Duncan Brown", "Alien Arena",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1985, alienaru,   alienar,  joust,            alienar,  wms_muxed_state, init_alienar,  ROT0,   "Duncan Brown", "Alien Arena (Stargate upgrade)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, lottofun,   0,        lottofun,       lottofun, williams_state,  empty_init,    ROT0,   "H.A.R. Management", "Lotto Fun", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, lottofun,   0,        lottofun,         lottofun, williams_state,  empty_init,    ROT0,   "H.A.R. Management", "Lotto Fun", MACHINE_SUPPORTS_SAVE )
 
 
 // 2nd Generation Williams hardware with tilemaps
-GAME( 1983, mysticm,    0,        mysticm,        mysticm, mysticm_state,    empty_init,    ROT0,   "Williams", "Mystic Marathon",             MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE)
-GAME( 1983, mysticmp,   mysticm,  mysticm,        mysticm, mysticm_state,    empty_init,    ROT0,   "Williams", "Mystic Marathon (prototype)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // newest ROMs are 'proto 6' ?
+GAME( 1983, mysticm,    0,        mysticm,          mysticm, mysticm_state,    empty_init,    ROT0,   "Williams", "Mystic Marathon",             MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE)
+GAME( 1983, mysticmp,   mysticm,  mysticm,          mysticm, mysticm_state,    empty_init,    ROT0,   "Williams", "Mystic Marathon (prototype)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // newest ROMs are 'proto 6' ?
 
-GAME( 1984, tshoot,     0,        tshoot,         tshoot,  tshoot_state,     empty_init,    ROT0,   "Williams", "Turkey Shoot (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, tshoot,     0,        tshoot,           tshoot,  tshoot_state,     empty_init,    ROT0,   "Williams", "Turkey Shoot (prototype)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1984, inferno,    0,        inferno,        inferno, inferno_state,    empty_init,    ROT0,   "Williams", "Inferno (Williams)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, inferno,    0,        inferno,          inferno, inferno_state,    empty_init,    ROT0,   "Williams", "Inferno (Williams)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, joust2,     0,        joust2,         joust2,  joust2_state,     empty_init,    ROT270, "Williams", "Joust 2 - Survival of the Fittest (revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, joust2r1,   joust2,   joust2,         joust2,  joust2_state,     empty_init,    ROT270, "Williams", "Joust 2 - Survival of the Fittest (revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, joust2,     0,        joust2,           joust2,  joust2_state,     empty_init,    ROT270, "Williams", "Joust 2 - Survival of the Fittest (revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, joust2r1,   joust2,   joust2,           joust2,  joust2_state,     empty_init,    ROT270, "Williams", "Joust 2 - Survival of the Fittest (revision 1)", MACHINE_SUPPORTS_SAVE )

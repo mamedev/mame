@@ -135,7 +135,7 @@ public:
 	{ }
 
 	void defender(machine_config &config);
-	void defender6802(machine_config &config);
+	void defender_6802snd(machine_config &config);
 	void jin(machine_config &config);
 
 	void init_defndjeu();
