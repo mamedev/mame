@@ -2579,6 +2579,21 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/technics/hdae5000.h,BUSES["TECHNICS"] = true
+---------------------------------------------------
+
+if (BUSES["TECHNICS"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/technics/kn5000_extension.cpp",
+		MAME_DIR .. "src/devices/bus/technics/kn5000_extension.h",
+		MAME_DIR .. "src/devices/bus/technics/hdae5000.cpp",
+		MAME_DIR .. "src/devices/bus/technics/hdae5000.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/tiki100/exp.h,BUSES["TIKI100"] = true
 ---------------------------------------------------
 

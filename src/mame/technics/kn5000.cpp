@@ -16,14 +16,17 @@
 	* Hooking up FLASH ROM, VGA & Floppy controllers
 	  and most of the maincpu mem_map
 
+	2023 DEC 12 [Felipe Sanches]:
+	* The optional HD-AE5000 extension board (for audio & hard-drive)
+	  was split out as its own device.
+
 ******************************************************************************/
 
 #include "emu.h"
 #include "cpu/tlcs900/tmp94c241.h"
 #include "imagedev/floppy.h"
-#include "bus/ata/idehd.h"
+#include "bus/technics/hdae5000.h"
 #include "machine/gen_latch.h"
-#include "machine/i8255.h"
 #include "machine/upd765.h"
 #include "video/pc_vga.h"
 #include "screen.h"
@@ -39,9 +42,8 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_subcpu(*this, "subcpu")
 		, m_fdc(*this, "fdc")
-		, m_hdd(*this, "hdd")
-		, m_ppi(*this, "ppi")
 		, m_CHECKING_DEVICE_LED_CN11(*this, "checking_device_led_cn11")
+		, m_extension(*this, "extension")
 	{ }
 
 	void kn5000(machine_config &config);
@@ -49,10 +51,9 @@ public:
 private:
 	required_device<tmp94c241_device> m_maincpu;
 	required_device<tmp94c241_device> m_subcpu;
-	required_device<upd765a_device> m_fdc;
-	required_device<ide_hdd_device> m_hdd;
-	required_device<i8255_device> m_ppi;
+	required_device<upd72067_device> m_fdc;
 	required_device<beep_device> m_CHECKING_DEVICE_LED_CN11;
+	required_device<kn5000_extension_device> m_extension;
 
 	virtual void machine_reset() override;
 
@@ -84,28 +85,16 @@ void kn5000_state::kn5000_maincpu_mem(address_map &map)
 	map(0x000000, 0x0fffff).ram(); // 1Mbyte = 2 * 4Mbit DRAMs @ IC9, IC10 (CS3)
 	//FIXME: map(0x110000, 0x11ffff).m(m_fdc, FUNC(upd765a_device::map)); // Floppy Controller @ IC208
 	//FIXME: map(0x120000, 0x12ffff).w(m_fdc, FUNC(upd765a_device::dack_w)); // Floppy DMA Acknowledge
-	//map(0x130000, 0x13ffff).m(m_hddc, FUNC(?_device::?)); // Optional Hard-drive Controller (model?) IC? on HD-AE5000 board 
 	map(0x140000, 0x14ffff).r("to_maincpu_latch", FUNC(generic_latch_8_device::read)); // @ IC23
 	map(0x140000, 0x14ffff).w("to_subcpu_latch", FUNC(generic_latch_8_device::write)); // @ IC22
-	// 0x160000, 0x16ffff: Optional parallel port interface (NEC uPD71055) IC9 on HD-AE5000 board
-	map(0x160000, 0x160000).lrw8([this](offs_t a) { return m_ppi->read(0); }, "ppi_r0", [this](offs_t a, u8 data) { m_ppi->write(0, data); }, "ppi_w0");
-	map(0x160002, 0x160002).lrw8([this](offs_t a) { return m_ppi->read(1); }, "ppi_r1", [this](offs_t a, u8 data) { m_ppi->write(1, data); }, "ppi_w1");
-	map(0x160004, 0x160004).lrw8([this](offs_t a) { return m_ppi->read(2); }, "ppi_r2", [this](offs_t a, u8 data) { m_ppi->write(2, data); }, "ppi_w2");
-	map(0x160006, 0x160006).lrw8([this](offs_t a) { return m_ppi->read(3); }, "ppi_r3", [this](offs_t a, u8 data) { m_ppi->write(3, data); }, "ppi_w3");
 	map(0x1703b0, 0x1703bf).rw("vga", FUNC(vga_device::port_03b0_r), FUNC(vga_device::port_03b0_w)); // LCD controller @ IC206
 	map(0x1703c0, 0x1703cf).rw("vga", FUNC(vga_device::port_03c0_r), FUNC(vga_device::port_03c0_w));
 	map(0x1703d0, 0x1703df).rw("vga", FUNC(vga_device::port_03d0_r), FUNC(vga_device::port_03d0_w));
-//	map(0x1a0000, 0x1bffff).rw("vga", FUNC(vga_device::mem_linear_r), FUNC(vga_device::mem_linear_w));
-	map(0x1a0000, 0x1bffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
-	map(0x1e0000, 0x1fffff).ram(); // 1Mbit SRAM @ IC21 (CS0)
-	map(0x200000, 0x27ffff).ram(); //optional hsram: 2 * 256k bytes Static RAM @ IC5, IC6 on HD-AE5000 board (CS5)
-	map(0x280000, 0x2fffff).rom().region("optional_hsrom", 0); // 512k bytes FLASH ROM @ IC4 on HD-AE5000 board (CS5)
+	map(0x1a0000, 0x1bffff).rw("vga", FUNC(vga_device::mem_linear_r), FUNC(vga_device::mem_linear_w));
+	map(0x1e0000, 0x1fffff).ram(); // 1Mbit SRAM @ IC21 (CS0)  Note: I think this is the message "ERROR in back-up SRAM"
 	map(0x300000, 0x3fffff).rom().region("custom_data", 0); // 8MBit FLASH ROM @ IC19 (CS5)
-	map(0x400000, 0x7fffff).rom().region("rhythm_data", 0); // 32MBit ROM @ IC14 (A22=1 and CS5)	
-
-	map(0x800000, 0x8fffff).ram(); // hack
-
-//	map(0xc00000, 0xdfffff).mirror(0x200000).rom().region("table_data", 0);//2 * 8MBit ROMs @ IC1, IC3 (CS2)
+	map(0x400000, 0x7fffff).rom().region("rhythm_data", 0); // 32MBit ROM @ IC14 (A22=1 and CS5)
+	map(0xc00000, 0xdfffff).mirror(0x200000).rom().region("table_data", 0);//2 * 8MBit ROMs @ IC1, IC3 (CS2)
 	map(0xe00000, 0xffffff).mask(0x1fffff).rom().region("program", 0); //2 * 8MBit FLASH ROMs @ IC4, IC6
 }
 
@@ -220,7 +209,7 @@ void kn5000_state::kn5000(machine_config &config)
 	//   bit 0 (input) = +5v
 	//   bit 2 (input) = HDDRDY
 	//   bit 4 (?) = MICSNS
-	m_maincpu->porte_read().set([this] { return 0; }); //checked at EF05A6 (v10 ROM)
+	m_maincpu->porte_read().set([this] { return 1; }); //checked at EF05A6 (v10 ROM)
 	                                                   // FIXME: Bit 0 should only be 1 if the optional hard-drive extension board is disabled
 
 	// PORT F:
@@ -265,7 +254,7 @@ void kn5000_state::kn5000(machine_config &config)
 	GENERIC_LATCH_8(config, "to_maincpu_latch"); // @ IC23
 	GENERIC_LATCH_8(config, "to_subcpu_latch"); //  @ IC22
 
-	UPD72067(config, m_fdc, 32'000'000, true, true); // actual controller is UPD72068GF-3B9 at IC208	
+	UPD72067(config, m_fdc, 32'000'000); // actual controller is UPD72068GF-3B9 at IC208	
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, TLCS900_INT4);
 	m_fdc->drq_wr_callback().set_inputline(m_maincpu, TLCS900_INT5);
 	m_fdc->hdl_wr_callback().set_inputline(m_maincpu, TLCS900_INT6);
@@ -278,15 +267,11 @@ void kn5000_state::kn5000(machine_config &config)
 
 	FLOPPY_CONNECTOR(config, "fdc:0", kn5000_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
-	/* Optional Parallel Port */
-	I8255(config, m_ppi); // actual chip is a NEC uPD71055 @ IC9 on the HD-AE5000 board
-	// m_ppi->in_pa_callback().set(FUNC(?_device::ppi_in_a));
-	// m_ppi->out_pb_callback().set(FUNC(?_device::ppi_out_b));
-	// m_ppi->in_pc_callback().set(FUNC(?_device::ppi_in_c));
-	// m_ppi->out_pc_callback().set(FUNC(?_device::ppi_out_c));
-
-	/* Optional Hard Disk - HD-AE5000 */
-	IDE_HARDDISK(config, m_hdd, 0);
+    /* extension port */
+	KN5000_EXTENSION(config, m_extension, 16_MHz_XTAL / 16); //FIXME: which clock signal should be passed to the extension port?
+//	m_extension->firq_callback().set("mainfirq", FUNC(input_merger_device::in_w<3>)); // FIXME: do we need something like this?
+//	m_extension->irq_callback().set("mainirq", FUNC(input_merger_device::in_w<3>)); // FIXME: do we need something like this?
+	m_extension->option_add("hdae5000", HDAE5000);
 
 	/* sound hardware */
 	//SPEAKER(config, "lspeaker").front_left();
@@ -359,25 +344,6 @@ ROM_START(kn5000)
 	ROM_LOAD("kn5000_waveform_rom.ic305", 0x400000, 0x400000, NO_DUMP)
 	ROM_LOAD("kn5000_waveform_rom.ic306", 0x800000, 0x400000, NO_DUMP)
 	ROM_LOAD("kn5000_waveform_rom.ic307", 0xc00000, 0x400000, CRC(20ff4629) SHA1(4b511bff6625f4655cabd96a263bf548d2ef4bf7))
-
-	// HD-AE5000 - Optional Hard-Disk Extension
-	ROM_REGION16_LE(0x80000, "optional_hsrom", 0)
-	ROM_LOAD("hd-ae5000_v2_01i.ic4", 0x000000, 0x80000, CRC(961e6dcd) SHA1(0160c17baa7b026771872126d8146038a19ef53b))
-
-/* TODO: move HD-AE5000 to a separate device and add these declarations :
-	ROM_REGION16_LE(0x80000, "optional_hsrom" , 0)
-	ROM_DEFAULT_BIOS("v2.01i")
-
-	ROM_SYSTEM_BIOS(0, "v1.10i", "Version 1.10i - July 6th, 1998")
-	ROMX_LOAD("hd-ae5000_v1_10i.ic4", 0x000000, 0x80000, CRC(7461374b) SHA1(6019f3c28b6277730418974dde4dc6893fced00e), ROM_BIOS(0))
-
-	ROM_SYSTEM_BIOS(1, "v1.15i", "Version 1.15i - October 13th, 1998")
-	ROMX_LOAD("hd-ae5000_v1_15i.ic4", 0x000000, 0x80000, CRC(e76d4b9f) SHA1(581fa58e2cd6fe381cfc312c73771d25ff2e662c), ROM_BIOS(1))
-
-	// Version 2.01i is described as having "additions like lyrics display etc."
-	ROM_SYSTEM_BIOS(2, "v2.01i", "Version 2.01i - January 15th, 1999") // installation file indicated "v2.0i" but signature inside the ROM is "v2.01i"
-	ROMX_LOAD("hd-ae5000_v2_01i.ic4", 0x000000, 0x80000, CRC(961e6dcd) SHA1(0160c17baa7b026771872126d8146038a19ef53b), ROM_BIOS(2))
-*/
 ROM_END
 
 
