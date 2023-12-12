@@ -47,7 +47,7 @@ is either VCC or GND to distinguish between the two.
 - SciSys Concord II
 - SciSys Electronic Chess Mark 8
 - Tandy 1650 Portable Sensory Chess (Tandy brand Explorer Chess)
-- Tandy 1650 Fast Response Time: Computerized Chess (Tandy brand Concord II)
+- Tandy 1650 (Fast Response Time) Computerized Chess (Tandy brand Concord II)
 
 The Tandy clones run at a lower clock frequency, 3MHz and 6MHz respectively.
 
