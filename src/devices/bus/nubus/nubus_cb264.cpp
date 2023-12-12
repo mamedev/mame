@@ -5,13 +5,14 @@
   RasterOps ColorBoard 264 NuBus video card emulation
 
   fixed resolution 640x480 NuBus video card, 1/2/4/8/24 bit color
-  1.5 MiB of VRAM, Bt473 RAMDAC, and two custom gate arrays.
+  1.5 MiB of VRAM, Bt473KPJ35 RAMDAC, and two custom gate arrays.
 
   0xfsff6004 is color depth: 0 for 1bpp, 1 for 2bpp, 2 for 4bpp, 3 for 8bpp, 4 for 24bpp
   0xfsff6014 is VBL ack: write 1 to ack
   0xfsff603c is VBL disable: write 1 to disable, 0 to enable
 
-  Crystal (pixel clock) is 30.24 MHz
+  Crystal (pixel clock) is 30.24 MHz. A 12.3356 MHz XTAL is also present,
+  likely used only for 30 Hz interlaced NTSC output.
 
   TODO:
   - Figure out the vertical part of the CRTC registers and make the mode dynamic.
@@ -73,7 +74,7 @@ void nubus_cb264_device::device_add_mconfig(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, "cb264_screen", SCREEN_TYPE_RASTER));
 	screen.set_screen_update(FUNC(nubus_cb264_device::screen_update));
-	screen.set_raw(30240000, 860, 0, 640, 524, 0, 480);
+	screen.set_raw(30.24_MHz_XTAL, 864, 0, 640, 525, 0, 480); // 35 kHz horizontal rate, 66.67 Hz vertical rate
 
 	PALETTE(config, m_palette).set_entries(256);
 }
@@ -244,13 +245,13 @@ void nubus_cb264_device::cb264_w(offs_t offset, u32 data, u32 mem_mask)
 		    Vertical:
 		    40: 2   - first line of active display?
 		    44: 209 - last line of active display?
-		    48: 20c - vtotal (524)
+		    48: 20c - vtotal - 1? (525)
 		    4c: f
 
 		    Horizontal:
 		    50: 27  - start of active display
 		    54: c7  - end of active display (0xc7 - 0x27 = 160, 160 * 4 = 640)
-		    58: d7  - htotal (860)
+		    58: d7  - htotal/4 - 1? (864)
 		    5c: 6b
 		*/
 
