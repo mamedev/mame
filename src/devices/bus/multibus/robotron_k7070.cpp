@@ -249,8 +249,10 @@ uint16_t robotron_k7070_device::io_r(offs_t offset, uint16_t mem_mask)
 	}
 
 	if (offset && !machine().side_effects_disabled())
-		LOG("%s: KGS %d == %02x '%c'\n", machine().describe_context(), offset, data,
-			 (data > 0x1f && data < 0x7f) ? data : 0x20);
+	{
+		LOG("%s: KGS %d == %02x '%c'\n", machine().describe_context(),
+				offset, data, (data > 0x1f && data < 0x7f) ? data : 0x20);
+	}
 
 	return data;
 }
@@ -258,8 +260,10 @@ uint16_t robotron_k7070_device::io_r(offs_t offset, uint16_t mem_mask)
 void robotron_k7070_device::io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset)
-		LOG("%s: KGS %d <- %02x '%c', ctrl %02x\n", machine().describe_context(), offset, data,
-			 (data > 0x1f && data < 0x7f) ? data : 0x20, m_kgs_ctrl);
+	{
+		LOG("%s: KGS %d <- %02x '%c', ctrl %02x\n", machine().describe_context(),
+				offset, data, (data > 0x1f && data < 0x7f) ? data : 0x20, m_kgs_ctrl);
+	}
 
 	switch (offset)
 	{
@@ -294,7 +298,7 @@ uint32_t robotron_k7070_device::screen_update_k7072(screen_device &screen, bitma
 			uint8_t code = m_ram[addr++ % 32768];
 			for (int b = 0; b < 8; b++)
 			{
-				bitmap.pix(y, horpos++) = (code >> (7 - b)) & 1;
+				bitmap.pix(y, horpos++) = BIT(code, 7 - b);
 			}
 		}
 	}
@@ -332,8 +336,10 @@ uint8_t robotron_k7070_device::kgs_host_r(offs_t offset)
 	}
 
 	if (offset != 2 && offset != 5 && !machine().side_effects_disabled())
-		LOG("%s: kgs %d == %02x '%c'\n", machine().describe_context(), offset, data,
-				 (data > 0x1f && data < 0x7f) ? data : ' ');
+	{
+		LOG("%s: kgs %d == %02x '%c'\n", machine().describe_context(),
+				offset, data, (data > 0x1f && data < 0x7f) ? data : ' ');
+	}
 
 	return data;
 }
@@ -341,8 +347,10 @@ uint8_t robotron_k7070_device::kgs_host_r(offs_t offset)
 void robotron_k7070_device::kgs_host_w(offs_t offset, uint8_t data)
 {
 	if (offset != 2 && offset != 5)
-		LOG("%s: kgs %d <- %02x '%c', ctrl %02x\n", machine().describe_context(), offset, data,
-			 (data > 0x1f && data < 0x7f) ? data : ' ', m_kgs_ctrl);
+	{
+		LOG("%s: kgs %d <- %02x '%c', ctrl %02x\n", machine().describe_context(),
+				offset, data, (data > 0x1f && data < 0x7f) ? data : ' ', m_kgs_ctrl);
+	}
 
 	switch (offset)
 	{
@@ -413,4 +421,3 @@ void robotron_k7070_device::kgs_memory_remap()
 	m_view_lo.select(m_kgs_iml);
 	m_view_hi.select(m_abg_msel != 0);
 }
-
