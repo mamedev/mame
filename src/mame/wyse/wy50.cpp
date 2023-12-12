@@ -245,7 +245,7 @@ u8 wy50_state::p1_r()
 	// P1.0 = AUX RDY (DTR)
 	// P1.1 = NVD OUT
 	// P1.4 = KEY (inverted, active high)
-	return 0xe4 | m_aux->dsr_r() | (m_earom->data_r() << 1) | (m_aux->cts_r() << 2) | (m_keyboard->sense_r() ? 0x00 : 0x10);
+	return 0xe4 | m_aux->dsr_r() | (m_earom->data_r() << 1) | (m_keyboard->sense_r() ? 0x00 : 0x10);
 }
 
 void wy50_state::p1_w(u8 data)
