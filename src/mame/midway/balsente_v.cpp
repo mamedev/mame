@@ -77,27 +77,6 @@ void balsente_state::palette_select_w(uint8_t data)
 
 /*************************************
  *
- *  Palette RAM write
- *
- *************************************/
-
-void balsente_state::paletteram_w(offs_t offset, uint8_t data)
-{
-	int r, g, b;
-
-	m_generic_paletteram_8[offset] = data & 0x0f;
-
-	r = m_generic_paletteram_8[(offset & ~3) + 0];
-	g = m_generic_paletteram_8[(offset & ~3) + 1];
-	b = m_generic_paletteram_8[(offset & ~3) + 2];
-
-	m_palette->set_pen_color(offset / 4, pal4bit(r), pal4bit(g), pal4bit(b));
-}
-
-
-
-/*************************************
- *
  *  Sprite banking
  *
  *************************************/
