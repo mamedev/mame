@@ -104,6 +104,72 @@ TEST_CASE("ceilLog2", "[math]")
 	}
 }
 
+TEST_CASE("floorLog2", "[math]")
+{
+	REQUIRE(0 == bx::floorLog2(-1) );
+	REQUIRE(0 == bx::floorLog2(0) );
+	REQUIRE(0 == bx::floorLog2(1) );
+	REQUIRE(1 == bx::floorLog2(2) );
+	REQUIRE(2 == bx::floorLog2(4) );
+	REQUIRE(3 == bx::floorLog2(8) );
+	REQUIRE(4 == bx::floorLog2(16) );
+	REQUIRE(5 == bx::floorLog2(32) );
+	REQUIRE(6 == bx::floorLog2(64) );
+	REQUIRE(7 == bx::floorLog2(128) );
+	REQUIRE(8 == bx::floorLog2(256) );
+
+	{
+		uint32_t ii = 0;
+		for (; ii < 8; ++ii)
+		{
+			REQUIRE(ii == bx::floorLog2(uint8_t(1<<ii) ) );
+			REQUIRE(ii == bx::floorLog2(uint16_t(1<<ii) ) );
+			REQUIRE(ii == bx::floorLog2(uint32_t(1<<ii) ) );
+			REQUIRE(ii == bx::floorLog2(uint64_t(1llu<<ii) ) );
+		}
+
+		for (; ii < 16; ++ii)
+		{
+			REQUIRE(ii == bx::floorLog2(uint16_t(1<<ii) ) );
+			REQUIRE(ii == bx::floorLog2(uint32_t(1<<ii) ) );
+			REQUIRE(ii == bx::floorLog2(uint64_t(1llu<<ii) ) );
+		}
+
+		for (; ii < 32; ++ii)
+		{
+			REQUIRE(ii == bx::floorLog2(uint32_t(1<<ii) ) );
+			REQUIRE(ii == bx::floorLog2(uint64_t(1llu<<ii) ) );
+		}
+
+		for (; ii < 64; ++ii)
+		{
+			REQUIRE(ii == bx::floorLog2(uint64_t(1llu<<ii) ) );
+		}
+	}
+}
+
+TEST_CASE("ceil/floorLog2", "[math]")
+{
+	{
+		uint32_t prev = 0;
+		uint32_t next = 0;
+		for (uint32_t ii = 0; ii < (1<<18); ++ii)
+		{
+			if (bx::isPowerOf2(ii) )
+			{
+				REQUIRE(bx::ceilLog2(ii) == bx::floorLog2(ii) );
+				prev = next;
+				++next;
+			}
+			else
+			{
+				REQUIRE(prev == bx::floorLog2(ii) );
+				REQUIRE(next == bx::ceilLog2(ii) );
+			}
+		}
+	}
+}
+
 TEST_CASE("countTrailingZeros", "[math]")
 {
 	REQUIRE( 0 == bx::countTrailingZeros<uint8_t >(1) );
