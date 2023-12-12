@@ -235,7 +235,7 @@ void balsente_state::cpu1_base_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share("spriteram");
 	map(0x0800, 0x7fff).ram().w(FUNC(balsente_state::videoram_w)).share("videoram");
-	map(0x8000, 0x8fff).ram().w(FUNC(balsente_state::paletteram_w)).share("paletteram");
+	map(0x8000, 0x8fff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x9000, 0x9007).w(FUNC(balsente_state::adc_select_w));
 	map(0x9400, 0x9401).r(FUNC(balsente_state::adc_data_r));
 	map(0x9800, 0x981f).mirror(0x0060).lw8(NAME([this] (offs_t offset, u8 data) { m_outlatch->write_d7(offset >> 2, data); }));
@@ -1391,7 +1391,7 @@ void balsente_state::balsente(machine_config &config)
 	m_screen->set_screen_update(FUNC(balsente_state::screen_update_balsente));
 	m_screen->set_palette(m_palette);
 
-	PALETTE(config, m_palette).set_entries(1024);
+	PALETTE(config, m_palette).set_format(4, raw_to_rgb_converter::standard_rgb_decoder<4,4,4, 24,16,8>, 1024);
 
 
 	/* sound hardware */
@@ -2879,8 +2879,8 @@ void balsente_state::expand_roms(uint8_t cd_rom_mask)
 	/* load CD bank data from 0x10000-0x1e000 */
 	/* load EF           from 0x1e000-0x20000 */
 
-	uint8_t *rom = memregion("maincpu")->base();
-	uint32_t len = memregion("maincpu")->bytes();
+	uint8_t *rom = m_mainrom->base();
+	uint32_t len = m_mainrom->bytes();
 
 	int numbanks = (len > 0x20000) ? 16 : 8;
 	uint32_t bxor = (cd_rom_mask & SWAP_HALVES) ? 0x02000 : 0;
