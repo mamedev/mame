@@ -41,11 +41,18 @@ private:
 	required_device_array<rs232_port_device, 2> m_serial;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<u8> m_ram;
+	required_ioport_array<2> m_dsel;
 
 	memory_view m_view_lo;
 	memory_view m_view_hi;
 
 	u16 m_start;
+
+	bool m_abg_msel, m_kgs_iml;
+	uint8_t m_abg_func, m_abg_split;
+	uint16_t m_abg_addr;
+	uint8_t m_kgs_datao, m_kgs_datai, m_kgs_ctrl;
+	bool m_nmi_enable;
 
 	uint8_t kgs_host_r(offs_t offset);
 	void kgs_host_w(offs_t offset, uint8_t data);
@@ -54,12 +61,6 @@ private:
 	void abg_split_w(offs_t offset, uint8_t data);
 	void abg_misc_w(offs_t offset, uint8_t data);
 	void kgs_memory_remap();
-
-	bool m_abg_msel = 0, m_kgs_iml = 0;
-	uint8_t m_abg_func = 0, m_abg_split = 0;
-	uint16_t m_abg_addr = 0;
-	uint8_t m_kgs_datao = 0, m_kgs_datai = 0, m_kgs_ctrl = 0;
-	bool m_nmi_enable = 0;
 
 	uint32_t screen_update_k7072(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void palette_init(palette_device &palette);

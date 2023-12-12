@@ -40,9 +40,15 @@ robotron_k7070_device::robotron_k7070_device(machine_config const &mconfig, char
 	, m_serial(*this, "serial%u", 0U)
 	, m_palette(*this, "palette")
 	, m_ram(*this, "vram0")
+	, m_dsel(*this, "DSEL%u", 0U)
 	, m_view_lo(*this, "view_lo")
 	, m_view_hi(*this, "view_hi")
 {
+	m_abg_msel = m_kgs_iml = 0;
+	m_abg_func = m_abg_split = 0;
+	m_abg_addr = 0;
+	m_kgs_datao = m_kgs_datai = m_kgs_ctrl = 0;
+	m_nmi_enable = 0;
 }
 
 ROM_START(robotron_k7070)
@@ -237,12 +243,13 @@ uint16_t robotron_k7070_device::io_r(offs_t offset, uint16_t mem_mask)
 
 	case 1:
 		data = m_kgs_datai;
-		m_kgs_ctrl &= ~KGS_ST_OBF;
+		if (!machine().side_effects_disabled())
+			m_kgs_ctrl &= ~KGS_ST_OBF;
 		break;
 	}
 
-	if (offset)
-	LOG("%s: KGS %d == %02x '%c'\n", machine().describe_context(), offset, data,
+	if (offset && !machine().side_effects_disabled())
+		LOG("%s: KGS %d == %02x '%c'\n", machine().describe_context(), offset, data,
 			 (data > 0x1f && data < 0x7f) ? data : 0x20);
 
 	return data;
@@ -251,7 +258,7 @@ uint16_t robotron_k7070_device::io_r(offs_t offset, uint16_t mem_mask)
 void robotron_k7070_device::io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset)
-	LOG("%s: KGS %d <- %02x '%c', ctrl %02x\n", machine().describe_context(), offset, data,
+		LOG("%s: KGS %d <- %02x '%c', ctrl %02x\n", machine().describe_context(), offset, data,
 			 (data > 0x1f && data < 0x7f) ? data : 0x20, m_kgs_ctrl);
 
 	switch (offset)
@@ -304,7 +311,8 @@ uint8_t robotron_k7070_device::kgs_host_r(offs_t offset)
 	{
 	case 0:
 		data = m_kgs_datao;
-		m_kgs_ctrl &= ~(KGS_ST_ERR | KGS_ST_IBF);
+		if (!machine().side_effects_disabled())
+			m_kgs_ctrl &= ~(KGS_ST_ERR | KGS_ST_IBF);
 		break;
 
 	case 2:
@@ -312,18 +320,18 @@ uint8_t robotron_k7070_device::kgs_host_r(offs_t offset)
 		break;
 
 	case 6:
-		data = ioport("DSEL0")->read();
+		data = m_dsel[0]->read();
 		break;
 
 	case 7:
-		data = ioport("DSEL1")->read();
+		data = m_dsel[1]->read();
 		break;
 
 	default:
 		break;
 	}
 
-	if (offset != 2 && offset != 5)
+	if (offset != 2 && offset != 5 && !machine().side_effects_disabled())
 		LOG("%s: kgs %d == %02x '%c'\n", machine().describe_context(), offset, data,
 				 (data > 0x1f && data < 0x7f) ? data : ' ');
 
