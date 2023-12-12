@@ -119,12 +119,11 @@ public:
 	void ewc(machine_config &config);
 	void easc(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(switch_cpu_freq) { set_cpu_freq(); }
+	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq);
 
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	void set_cpu_freq();
+	virtual void machine_reset() override { fidel_clockdiv_state::machine_reset(); }
 
 	// devices/pointers
 	optional_device<i8255_device> m_ppi8255;
@@ -169,18 +168,11 @@ void elite_state::machine_start()
 	save_item(NAME(m_speech_bank));
 }
 
-void elite_state::machine_reset()
-{
-	set_cpu_freq();
-	fidel_clockdiv_state::machine_reset();
-}
-
-void elite_state::set_cpu_freq()
+INPUT_CHANGED_MEMBER(elite_state::change_cpu_freq)
 {
 	// known official CPU speeds: 3MHz(EAS), 3.57MHz(PC/EWC/Privat), 4MHz(PC/EAS-C)
 	static const XTAL xtal[3] = { 3_MHz_XTAL, 3.579545_MHz_XTAL, 4_MHz_XTAL };
-	m_maincpu->set_unscaled_clock(xtal[ioport("FAKE")->read() % 3]);
-	div_refresh();
+	m_maincpu->set_unscaled_clock(xtal[newval % 3]);
 }
 
 // EAG
@@ -216,7 +208,8 @@ void eag_state::init_eag2100()
 
 void eag_state::machine_reset()
 {
-	fidel_clockdiv_state::machine_reset();
+	elite_state::machine_reset();
+
 	if (m_rombank != nullptr)
 		m_rombank->set_entry(0);
 }
@@ -409,8 +402,8 @@ static INPUT_PORTS_START( eas )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("CL")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_NAME("RV")
 
-	PORT_START("FAKE")
-	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, elite_state, switch_cpu_freq, 0) // factory set
+	PORT_START("CPU")
+	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, elite_state, change_cpu_freq, 0) // factory set
 	PORT_CONFSETTING(    0x00, "3MHz (EAS)" )
 	PORT_CONFSETTING(    0x01, "3.57MHz (EWC)" )
 	PORT_CONFSETTING(    0x02, "4MHz (EAS-C)" )
@@ -419,8 +412,8 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( ewc )
 	PORT_INCLUDE( eas )
 
-	PORT_MODIFY("FAKE") // default to 3.57MHz
-	PORT_CONFNAME( 0x03, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, elite_state, switch_cpu_freq, 0) // factory set
+	PORT_MODIFY("CPU") // default to 3.57MHz
+	PORT_CONFNAME( 0x03, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, elite_state, change_cpu_freq, 0) // factory set
 	PORT_CONFSETTING(    0x00, "3MHz (EAS)" )
 	PORT_CONFSETTING(    0x01, "3.57MHz (EWC)" )
 	PORT_CONFSETTING(    0x02, "4MHz (EAS-C)" )
@@ -429,8 +422,8 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( easc )
 	PORT_INCLUDE( eas )
 
-	PORT_MODIFY("FAKE") // default to 4MHz
-	PORT_CONFNAME( 0x03, 0x02, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, elite_state, switch_cpu_freq, 0) // factory set
+	PORT_MODIFY("CPU") // default to 4MHz
+	PORT_CONFNAME( 0x03, 0x02, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, elite_state, change_cpu_freq, 0) // factory set
 	PORT_CONFSETTING(    0x00, "3MHz (EAS)" )
 	PORT_CONFSETTING(    0x01, "3.57MHz (EWC)" )
 	PORT_CONFSETTING(    0x02, "4MHz (EAS-C)" )

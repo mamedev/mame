@@ -68,12 +68,10 @@ public:
 	void feleg(machine_config &config);
 	void felega(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(switch_cpu_freq) { set_cpu_freq(); }
+	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq);
 
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	void set_cpu_freq();
 
 private:
 	// devices/pointers
@@ -104,18 +102,11 @@ void as12_state::machine_start()
 	save_item(NAME(m_led_data));
 }
 
-void as12_state::machine_reset()
-{
-	set_cpu_freq();
-	fidel_clockdiv_state::machine_reset();
-}
-
-void as12_state::set_cpu_freq()
+INPUT_CHANGED_MEMBER(as12_state::change_cpu_freq)
 {
 	// known official CPU speeds: 3MHz, 3.57MHz, 4MHz
 	static const XTAL xtal[3] = { 3_MHz_XTAL, 3.579545_MHz_XTAL, 4_MHz_XTAL };
-	m_maincpu->set_unscaled_clock(xtal[ioport("FAKE")->read() % 3]);
-	div_refresh();
+	m_maincpu->set_unscaled_clock(xtal[newval % 3]);
 }
 
 
@@ -209,8 +200,8 @@ static INPUT_PORTS_START( feleg )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("CL")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("RE")
 
-	PORT_START("FAKE")
-	PORT_CONFNAME( 0x03, 0x02, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, as12_state, switch_cpu_freq, 0) // factory set
+	PORT_START("CPU")
+	PORT_CONFNAME( 0x03, 0x02, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, as12_state, change_cpu_freq, 0) // factory set
 	PORT_CONFSETTING(    0x00, "3MHz (original)" )
 	PORT_CONFSETTING(    0x01, "3.57MHz (AS12)" )
 	PORT_CONFSETTING(    0x02, "4MHz (6085)" )
@@ -219,8 +210,8 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( felega )
 	PORT_INCLUDE( feleg )
 
-	PORT_MODIFY("FAKE") // default to 3.57MHz
-	PORT_CONFNAME( 0x03, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, as12_state, switch_cpu_freq, 0) // factory set
+	PORT_MODIFY("CPU") // default to 3.57MHz
+	PORT_CONFNAME( 0x03, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, as12_state, change_cpu_freq, 0) // factory set
 	PORT_CONFSETTING(    0x00, "3MHz (original)" )
 	PORT_CONFSETTING(    0x01, "3.57MHz (AS12)" )
 	PORT_CONFSETTING(    0x02, "4MHz (6085)" )

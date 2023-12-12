@@ -28,7 +28,7 @@ public:
 		m_out_lcd(*this, "lcd%u.%u.%u", 0U, 0U, 0U)
 	{ }
 
-	DECLARE_INPUT_CHANGED_MEMBER(switch_cpu_freq) { set_cpu_freq(); }
+	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq);
 	DECLARE_INPUT_CHANGED_MEMBER(go_button);
 
 protected:
@@ -52,7 +52,6 @@ protected:
 	void clear_lcd() { std::fill(std::begin(m_lcd_data), std::end(m_lcd_data), 0); }
 	void update_lcd();
 	void power_off();
-	void set_cpu_freq();
 	void lcd_data_w(u8 data);
 };
 

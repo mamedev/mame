@@ -109,9 +109,10 @@ void micro2_state::machine_start()
 void micro2_state::set_cpu_freq()
 {
 	// known CPU speeds: 6MHz(XTAL), 6MHz(LC), 12MHz(LC)
-	u32 clock = (ioport("FAKE")->read() & 1) ? 12'000'000 : 6'000'000;
-	m_board->set_delay(attotime::from_ticks(2'000'000, clock)); // see TODO
-	m_maincpu->set_unscaled_clock(clock);
+	u32 freq = (ioport("CPU")->read() & 1) ? 12'000'000 : 6'000'000;
+	m_maincpu->set_unscaled_clock(freq);
+
+	m_board->set_delay(attotime::from_ticks(2'000'000, freq)); // see TODO
 }
 
 
@@ -181,7 +182,7 @@ static INPUT_PORTS_START( micro2 )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CODE(KEYCODE_T) PORT_NAME("Take Back / King")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CODE(KEYCODE_G) PORT_NAME("Go")
 
-	PORT_START("FAKE")
+	PORT_START("CPU")
 	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, micro2_state, change_cpu_freq, 0) // factory set
 	PORT_CONFSETTING(    0x00, "6MHz (original)" )
 	PORT_CONFSETTING(    0x01, "12MHz (Octo)" )

@@ -106,12 +106,11 @@ public:
 	void compan2(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(power_off);
-	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq) { set_cpu_freq(); }
+	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq);
 
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_MACHINE_RESET(compan2) { machine_reset(); set_cpu_freq(); }
 
 private:
 	// devices/pointers
@@ -133,7 +132,6 @@ private:
 	u8 power_r();
 	void led_w(u8 data);
 
-	void set_cpu_freq();
 	TIMER_CALLBACK_MEMBER(set_pin);
 };
 
@@ -147,10 +145,10 @@ void compan2_state::machine_start()
 	save_item(NAME(m_inp_mux));
 }
 
-void compan2_state::set_cpu_freq()
+INPUT_CHANGED_MEMBER(compan2_state::change_cpu_freq)
 {
 	// Concord II MCU speed is around twice higher
-	m_maincpu->set_unscaled_clock((ioport("FAKE")->read() & 1) ? 7'200'000 : 4'000'000);
+	m_maincpu->set_unscaled_clock((newval & 1) ? 7'200'000 : 4'000'000);
 }
 
 
@@ -328,7 +326,7 @@ static INPUT_PORTS_START( compan2 )
 	PORT_MODIFY("IN.2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_CUSTOM) // button config
 
-	PORT_START("FAKE")
+	PORT_START("CPU")
 	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, compan2_state, change_cpu_freq, 0) // factory set
 	PORT_CONFSETTING(    0x00, "4MHz (original)" )
 	PORT_CONFSETTING(    0x01, "7.2MHz (Concord II)" )
@@ -383,9 +381,6 @@ void compan2_state::expchess(machine_config &config)
 void compan2_state::compan2(machine_config &config)
 {
 	expchess(config);
-
-	// basic machine hardware
-	MCFG_MACHINE_RESET_OVERRIDE(compan2_state, compan2)
 	config.set_default_layout(layout_saitek_companion2);
 }
 

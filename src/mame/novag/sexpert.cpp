@@ -84,7 +84,7 @@ public:
 
 	void init_sexpert();
 
-	DECLARE_INPUT_CHANGED_MEMBER(sexpert_cpu_freq) { sexpert_set_cpu_freq(); }
+	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq);
 
 protected:
 	virtual void machine_start() override;
@@ -106,8 +106,6 @@ protected:
 	u8 m_led_data = 0;
 	u8 m_lcd_control = 0;
 	u8 m_lcd_data = 0;
-
-	void sexpert_set_cpu_freq();
 
 	// address maps
 	void sexpert_map(address_map &map);
@@ -134,15 +132,14 @@ void sexpert_state::machine_start()
 	save_item(NAME(m_lcd_data));
 }
 
-void sexpert_state::sexpert_set_cpu_freq()
+INPUT_CHANGED_MEMBER(sexpert_state::change_cpu_freq)
 {
 	// machines were released with either 5MHz or 6MHz CPU
-	m_maincpu->set_unscaled_clock((ioport("FAKE")->read() & 1) ? (12_MHz_XTAL/2) : (10_MHz_XTAL/2));
+	m_maincpu->set_unscaled_clock((newval & 1) ? (12_MHz_XTAL/2) : (10_MHz_XTAL/2));
 }
 
 void sexpert_state::machine_reset()
 {
-	sexpert_set_cpu_freq();
 	m_rombank->set_entry(0);
 }
 
@@ -396,8 +393,8 @@ static INPUT_PORTS_START( sexpert )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("Player/Player / Gambit Book / King")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_NAME("Print Board / Interface")
 
-	PORT_START("FAKE")
-	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, sexpert_state, sexpert_cpu_freq, 0) // factory set
+	PORT_START("CPU")
+	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, sexpert_state, change_cpu_freq, 0) // factory set
 	PORT_CONFSETTING(    0x00, "5MHz" )
 	PORT_CONFSETTING(    0x01, "6MHz" )
 INPUT_PORTS_END
@@ -405,8 +402,8 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( sexpertb )
 	PORT_INCLUDE( sexpert )
 
-	PORT_MODIFY("FAKE") // default CPU for B/C is W65C802P-6 @ 6MHz
-	PORT_CONFNAME( 0x01, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, sexpert_state, sexpert_cpu_freq, 0) // factory set
+	PORT_MODIFY("CPU") // default CPU for B/C is W65C802P-6 @ 6MHz
+	PORT_CONFNAME( 0x01, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, sexpert_state, change_cpu_freq, 0) // factory set
 	PORT_CONFSETTING(    0x00, "5MHz" )
 	PORT_CONFSETTING(    0x01, "6MHz" )
 INPUT_PORTS_END
