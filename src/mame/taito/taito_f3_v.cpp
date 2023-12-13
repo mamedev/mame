@@ -2692,7 +2692,7 @@ inline void taito_f3_state::f3_drawgfx(bitmap_rgb32 &dest_bmp, const rectangle &
 		const pen_t *pal = &m_palette->pen(gfx->colorbase());
 		const u8 *code_base = gfx->get_data(sprite.code % gfx->elements());
 
-		logerror("sprite draw at %f %f size %f %f\n", sprite.x/16.0, sprite.y/16.0, sprite.zoomx/16.0, sprite.zoomy/16.0);
+		//logerror("sprite draw at %f %f size %f %f\n", sprite.x/16.0, sprite.y/16.0, sprite.zoomx/16.0, sprite.zoomy/16.0);
 		
 		{
 			fixed4 sx = sprite.x;
@@ -2710,6 +2710,7 @@ inline void taito_f3_state::f3_drawgfx(bitmap_rgb32 &dest_bmp, const rectangle &
 
 			if (sprite.flipx)
 			{
+				//x_index_base = (sprite.zoomx - (1<<4)) * dx;
 				x_index_base = (16 << 16) - (dx<<4);
 				dx = -dx;
 			}
@@ -2720,6 +2721,7 @@ inline void taito_f3_state::f3_drawgfx(bitmap_rgb32 &dest_bmp, const rectangle &
 
 			if (sprite.flipy)
 			{
+				//x_index_base = (sprite.zoomy - (1<<4)) * dy;
 				y_index = (16 << 16) - (dy<<4);
 				dy = -dy;
 			}
