@@ -255,6 +255,7 @@ Playfield tile info:
 #define DARIUSG_KLUDGE
 #define TAITOF3_VIDEO_DEBUG 0
 
+typedef int fixed4;
 
 // Game specific data - some of this can be removed when the software values are figured out
 struct taito_f3_state::F3config
@@ -2691,23 +2692,25 @@ inline void taito_f3_state::f3_drawgfx(bitmap_rgb32 &dest_bmp, const rectangle &
 		const pen_t *pal = &m_palette->pen(gfx->colorbase());
 		const u8 *code_base = gfx->get_data(sprite.code % gfx->elements());
 
+		logerror("sprite draw at %f %f size %f %f\n", sprite.x/16.0, sprite.y/16.0, sprite.zoomx/16.0, sprite.zoomy/16.0);
+		
 		{
-			int sx = sprite.x;
-			int sy = sprite.y;
-
+			fixed4 sx = sprite.x;
+			fixed4 sy = sprite.y;
+			fixed4 ex = sx + sprite.zoomx;
+			fixed4 ey = sy + sprite.zoomy;
+			
 			/* compute sprite increment per screen pixel */
+			// as: fixed.12 = (fixed.16 ÷ fixed.4)
 			int dx = (16 << 16) / sprite.zoomx;
 			int dy = (16 << 16) / sprite.zoomy;
-
-			int ex = sx + sprite.zoomx;
-			int ey = sy + sprite.zoomy;
-
+			// as: fixed.16 = (fixed.12 × fixed.4)
 			int x_index_base;
 			int y_index;
 
 			if (sprite.flipx)
 			{
-				x_index_base = (sprite.zoomx - 1) * dx;
+				x_index_base = (16 << 16) - (dx<<4);
 				dx = -dx;
 			}
 			else
@@ -2717,7 +2720,7 @@ inline void taito_f3_state::f3_drawgfx(bitmap_rgb32 &dest_bmp, const rectangle &
 
 			if (sprite.flipy)
 			{
-				y_index = (sprite.zoomy - 1) * dy;
+				y_index = (16 << 16) - (dy<<4);
 				dy = -dy;
 			}
 			else
@@ -2725,27 +2728,32 @@ inline void taito_f3_state::f3_drawgfx(bitmap_rgb32 &dest_bmp, const rectangle &
 				y_index = 0;
 			}
 
-			if (sx < myclip.min_x)
+			fixed4 min_x = myclip.min_x<<4;
+			fixed4 min_y = myclip.min_y<<4;
+			fixed4 max_x = myclip.max_x<<4;
+			fixed4 max_y = myclip.max_y<<4;
+			
+			if (sx < min_x)
 			{ /* clip left */
-				int pixels = myclip.min_x - sx;
+				fixed4 pixels = min_x - sx;
 				sx += pixels;
 				x_index_base += pixels * dx;
 			}
-			if (sy < myclip.min_y)
+			if (sy < min_y)
 			{ /* clip top */
-				int pixels = myclip.min_y - sy;
+				fixed4 pixels = min_y - sy;
 				sy += pixels;
 				y_index += pixels * dy;
 			}
 			/* NS 980211 - fixed incorrect clipping */
-			if (ex > myclip.max_x + 1)
+			if (ex > max_x + 1)
 			{ /* clip right */
-				int pixels = ex - myclip.max_x - 1;
+				fixed4 pixels = ex - max_x - 1;
 				ex -= pixels;
 			}
-			if (ey > myclip.max_y + 1)
+			if (ey > max_y + 1)
 			{ /* clip bottom */
-				int pixels = ey - myclip.max_y - 1;
+				fixed4 pixels = ey - max_y - 1;
 				ey -= pixels;
 			}
 
@@ -2753,28 +2761,28 @@ inline void taito_f3_state::f3_drawgfx(bitmap_rgb32 &dest_bmp, const rectangle &
 			{ /* skip if inner loop doesn't draw anything */
 //              if (dest_bmp.bpp == 32)
 				{
-					for (int y = sy; y < ey; y++)
+					for (fixed4 y = sy; y < ey; y+=1<<4)
 					{
 						const u8 *source = code_base + (y_index >> 16) * 16;
-						u32 *dest = &dest_bmp.pix(y);
-						u8 *pri = &m_pri_alp_bitmap.pix(y);
+						u32 *dest = &dest_bmp.pix(y>>4);
+						u8 *pri = &m_pri_alp_bitmap.pix(y>>4);
 
 						int x_index = x_index_base;
-						for (int x = sx; x < ex; x++)
+						for (fixed4 x = sx; x < ex; x+=1<<4)
 						{
 							int c = source[x_index >> 16] & m_sprite_pen_mask;
 							if (c)
 							{
-								const u8 p = pri[x];
+								const u8 p = pri[x>>4];
 								if (p == 0)
 								{
-									dest[x] = pal[sprite.color<<4 | c];
-									pri[x] = 1; // yea
+									dest[x>>4] = pal[sprite.color<<4 | c];
+									pri[x>>4] = 1; // yea
 								}
 							}
-							x_index += dx;
+							x_index += dx<<4;
 						}
-						y_index += dy;
+						y_index += dy<<4;
 					}
 				}
 			}
@@ -2786,17 +2794,9 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 {
 	struct sprite_axis
 	{
-		u16 addition = 16;
-		u8 addition_left = 8;
-		u8 block_zoom = 0;
-		s16 pos = 0, block_pos = 0, global = 0, subglobal = 0;
-		void calc_zoom()
-		{
-			addition = 0x100 - block_zoom + addition_left;
-			addition_left = addition & 0xf;
-			addition = addition >> 4;
-			// zoom = addition << 12;
-		};
+		u16 block_size = 0x100;
+		fixed4 pos = 0, block_pos = 0;
+		s16 global = 0, subglobal = 0;
 		void update(u8 scroll, u16 posw, bool lock, u8 block_ctrl, u8 new_zoom)
 		{
 			s16 new_pos = util::sext(posw, 12);
@@ -2816,18 +2816,16 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 			case 0b00:
 				if (!lock)
 				{
-					block_pos = new_pos;
-					block_zoom = new_zoom;
+					block_pos = new_pos << 4;
+					block_size = (0x100 - new_zoom);
 				}
 				[[fallthrough]];
 			case 0b10:
 				pos = block_pos;
-				addition_left = 8;
-				calc_zoom();
 				break;
 			case 0b11:
-				pos += addition;
-				calc_zoom();
+				pos += block_size;
+				break;
 			}
 		};
 	};
@@ -2839,18 +2837,22 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 	
 	tempsprite *sprite_ptr = &m_spritelist[0];
 	int total_sprites = 0;
-	u16 sprite_top = 0x2000;
-	for (int offs = 0; offs < sprite_top && (total_sprites < 0x400); offs += 8)
+	int bank = 0;
+	for (int offs = 0; offs < 0x400 && (total_sprites < 0x400); offs++)
 	{
-		const u16 *spr = &spriteram16_ptr[offs];
+		const u16 *spr = &spriteram16_ptr[bank + (offs * 8)];
 
 		/* Check if the sprite list jump command bit is set */
 		if (BIT(spr[6], 15))
 		{
-			const u32 new_offs = ((BIT(spr[6], 0, 10) << 4) / 2) | (offs & 0x4000);
-			if (new_offs == offs) // could this be ≤ ?
+			const u32 new_offs = BIT(spr[6], 0, 10);
+			if (new_offs <= offs) // could this be ≤ ?
+			{
+				if (new_offs < offs)
+					logerror("backwards long jump (sprite 0x%x to 0x%x)\n", offs, new_offs);
 				break;
-			offs = new_offs - 8; // subtract because we increment in the for loop
+			}
+			offs = new_offs - 1; // subtract because we increment in the for loop
 		}
 
 		/* Check if special command bit is set */
@@ -2871,10 +2873,7 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 
 			/* Sprite bank select */
 			if (BIT(cntrl, 0))
-			{
-				offs |= 0x4000;
-				sprite_top |= 0x4000;
-			}
+				bank = 0x4000;
 		}
 
 		u8 spritecont = spr[4] >> 8;
@@ -2888,18 +2887,16 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 		
 		const int tile = spr[0] | (BIT(spr[5], 0) << 16);
 		if (!tile) continue;
-		if (!x.addition || !y.addition) continue;
 		
-		/* These features are common to sprite and block parts */
+		fixed4 tx = m_flipscreen ? 512 - x.block_size - x.pos : x.pos;
+		fixed4 ty = m_flipscreen ? 256 - y.block_size - y.pos : y.pos;
+
+		if (tx + x.block_size <= visarea.min_x<<4 || tx > visarea.max_x<<4 || ty + y.block_size <= visarea.min_y<<4 || ty > visarea.max_y<<4)
+			continue;
+		
 		bool flipx = BIT(spritecont, 0);
 		bool flipy = BIT(spritecont, 1);
 		//multi = BIT(spritecont, 3);
-
-		const int tx = m_flipscreen ? 512 - x.addition - x.pos : x.pos;
-		const int ty = m_flipscreen ? 256 - y.addition - y.pos : y.pos;
-
-		if (tx + x.addition <= visarea.min_x || tx > visarea.max_x || ty + y.addition <= visarea.min_y || ty > visarea.max_y)
-			continue;
 		
 		sprite_ptr->x = tx;
 		sprite_ptr->y = ty;
@@ -2907,8 +2904,8 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 		sprite_ptr->flipy = m_flipscreen ? !flipy : flipy;
 		sprite_ptr->code = tile;
 		sprite_ptr->color = color;
-		sprite_ptr->zoomx = x.addition;
-		sprite_ptr->zoomy = y.addition;
+		sprite_ptr->zoomx = x.block_size;
+		sprite_ptr->zoomy = y.block_size;
 		sprite_ptr->pri = BIT(color, 6, 2);
 		sprite_ptr++;
 		total_sprites++;
@@ -2923,10 +2920,7 @@ void taito_f3_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 
 	sprite_ptr = m_sprite_end;
 	m_sprite_pri_usage = 0;
-
-	// if sprites use more than 4bpp, the bottom bits of the color code must be masked out.
-	// This fixes (at least) stage 1 battle ships and attract mode explosions in Ray Force.
-
+	
 	while (sprite_ptr != &m_spritelist[0])
 	{
 		sprite_ptr--;
