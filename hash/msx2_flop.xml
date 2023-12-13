@@ -463,7 +463,7 @@ The following floppies came with the machines.
 			</dataarea>
 		</part>
 		<!-- This is the sound cartridge that came with the game SD Snatcher. This sound cartridge
-		     can _not_ be used with the MSX Game Collections from Konami. -->
+		     _cannot_ be used with the MSX Game Collections from Konami. -->
 		<part name="cart" interface="msx_cart">
 			<feature name="part_id" value="Sound Cartridge"/>
 			<feature name="slot" value="sound_sdsnatch" />
@@ -498,7 +498,7 @@ The following floppies came with the machines.
 			</dataarea>
 		</part>
 		<!-- This is the sound cartridge that came with the game SD Snatcher. This sound cartridge
-		     can _not_ be used with the MSX Game Collections from Konami. -->
+		     _cannot_ be used with the MSX Game Collections from Konami. -->
 		<part name="cart" interface="msx_cart">
 			<feature name="part_id" value="Sound Cartridge"/>
 			<feature name="slot" value="sound_sdsnatch" />
@@ -4134,33 +4134,42 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
-	<!-- Release should contain 5 floppies, but only 4 were in the release. The 5th could be obtained through customer service. -->
-	<!-- Disk 2 has some graphics problems during the demo. -->
 	<software name="dssp2">
 		<description>Disc Station Special 2 (Japan)</description>
 		<year>1988</year>
 		<publisher>Compile</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
 		<info name="alt_title" value="ディスクステーションスペシャル初夏号"/>
 		<info name="serial" value="DS-SP2"/>
-		<info name="gtin" value="04988161900048"/>
+		<info name="barcode" value="04988161900048"/>
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 4"/>
+			<feature name="part_id" value="Disk 1 - Super Cooks"/>
 			<dataarea name="flop" size="737280">
-				<rom name="disc station special - issue 02 (1988)(compile)(jp)(disk 1 of 3).dsk" size="737280" crc="0bfe5103" sha1="66c2678f08d6f92041ed901bf198dee767290122"/>
+				<rom name="disc station special - issue 02 - compile (disk 1).dsk" size="737280" crc="3a5622a5" sha1="1f465217109ce71ecb81c30841ed69514dd8ffd8"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<!-- Bit2 game demo -->
-			<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2 - Hiroku Kubikiri Yakata demo"/>
 			<dataarea name="flop" size="737280">
-				<rom name="disc station special - issue 02 (1988)(compile)(jp)(disk 2 of 3).dsk" size="737280" crc="4245e041" sha1="655f6ce8bd5ff4bffe7022f4d559091b25f33b1f"/>
+				<rom name="disc station special - issue 02 - compile (disk 2).dsk" size="737280" crc="5f8e4a37" sha1="761ae1a302dffc13c63e4240d2f240de74e71bd9"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
-			<!-- Hummingbird game demo. -->
-			<feature name="part_id" value="Disk 3"/>
+			<feature name="part_id" value="Disk 3 - Laplace no Ma demo"/>
 			<dataarea name="flop" size="737280">
-				<rom name="disc station special - issue 02 (1988)(compile)(jp)(disk 3 of 3).dsk" size="737280" crc="c4d6a587" sha1="b318d91e373b44108679cb3e8478371dcc3f18a3"/>
+				<rom name="disc station special - issue 02 - compile (disk 3).dsk" size="737280" crc="c4d6a587" sha1="b318d91e373b44108679cb3e8478371dcc3f18a3"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="737280">
+				<rom name="disc station special - issue 02 - compile (disk 4).dsk" size="737280" crc="3445a05c" sha1="092cfd2c63e22244183770a4072ab7b99988852b"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5 - Super Cooks Data"/>
+			<dataarea name="flop" size="737280">
+				<rom name="disc station special - issue 02 - compile (disk 5).dsk" size="737280" crc="afdb3fcd" sha1="4c50f91358ed8c1aba86f1d4033d1951c9ae307c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9862,6 +9871,18 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
+	<software name="noukouss">
+		<description>Noukou Senshi Sanae Chan (Japan, prototype)</description>
+		<year>1992</year>
+		<publisher>Suzune Ayukawa</publisher>
+		<info name="alt_title" value="農耕戦士 さなえちゃん"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="noukou senshi sanae chan - suzune ayukawa (prototype).dsk" size="737280" crc="e69e8d6e" sha1="810673ec1707304284f54feee2ab856ca69bf283"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="nukenind">
 		<description>Nukenin Densetsu (Japan)</description>
 		<year>1988</year>
@@ -9999,6 +10020,18 @@ The following floppies came with the machines.
 			<feature name="part_id" value="Scenario 3"/>
 			<dataarea name="flop" size="737280">
 				<rom name="onryou senki (1988)(software studio wing)(jp)(disk 4 of 4).dsk" size="737280" crc="17adf357" sha1="c07b46b949384a36b97517fd0137a8760335fb28"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="onukiyab">
+		<description>Oonuki no Yabou (Japan)</description>
+		<year>1995</year>
+		<publisher>Taracot</publisher>
+		<info name="alt_title" value="大貫の野望"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="onuki no yabou - taracot.dsk" size="737280" crc="22a7417b" sha1="e42ce5714d21bd5b0c1796374400ed10d8ea7fb0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12297,83 +12330,80 @@ The following floppies came with the machines.
 		<info name="usage" value="Boot with CTRL pressed. Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
-			<dataarea name="flop" size="737280">
-				<rom name="sailor-fuku senshi felis - cocktail soft (disk 1).dsk" size="737280" crc="4ec25130" sha1="c229ae13f091178efff5e13cc42bce3f3ef53bdf"/>
+			<dataarea name="flop" size="1049616">
+				<rom name="sailor-fuku senshi felis - cocktail soft (disk 1).dmk" size="1049616" crc="57a4938b" sha1="ab11d231d5798144de47c74760068886dcf32a85"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk B"/>
-			<dataarea name="flop" size="737280">
-				<rom name="sailor-fuku senshi felis - cocktail soft (disk 2).dsk" size="737280" crc="438473c8" sha1="eeaaa334e77aece74958e4da8dac43af4bc8fd33"/>
+			<dataarea name="flop" size="1049616">
+				<rom name="sailor-fuku senshi felis - cocktail soft (disk 2).dmk" size="1049616" crc="bbdce71e" sha1="ff09cad4e14944d72568634ef35f411ddfef9f9b"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk C"/>
-			<dataarea name="flop" size="737280">
-				<rom name="sailor-fuku senshi felis - cocktail soft (disk 3).dsk" size="737280" crc="e1196cf7" sha1="814ac5cef29e4cacdc748b720f56b91dbb8ee34a"/>
+			<dataarea name="flop" size="1049616">
+				<rom name="sailor-fuku senshi felis - cocktail soft (disk 3).dmk" size="1049616" crc="f00eea14" sha1="d884f43c1b23113f112818cf74d5560f7dd1c9e4"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="sangoku">
-		<description>Sangokushi (Japan)</description>
-		<year>1986</year>
+		<description>Sangokushi (Japan, 1988-05)</description>
+		<year>1988</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="三國志"/>
 		<info name="usage" value="Boot with CTRL pressed. Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Game Disk"/>
 			<dataarea name="flop" size="737280">
-				<rom name="sangokushi. romance of three kingdoms (1986)(koei)(jp)(disk 1 of 2)(game disk).dsk" size="737280" crc="f1e5aa0e" sha1="4c2abce14386495e7f40e7ddaf4ab964b783e1b4"/>
+				<rom name="sangokushi - koei (game disk, 1988-05).dsk" size="737280" crc="ddcb8e2d" sha1="d40fd28de6881665014080efbd6ff28eb61bad38"/>
 			</dataarea>
 		</part>
-		<!-- Not part of release? -->
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="User Disk"/>
 			<dataarea name="flop" size="737280">
-				<rom name="sangokushi. romance of three kingdoms (1986)(koei)(jp)(disk 2 of 2)(user disk).dsk" size="737280" crc="5e2f3bab" sha1="da978f71c8221ab6a8562332a0716ceb28fd31ee" status="baddump" />
+				<rom name="sangokushi - koei (user disk).dsk" size="737280" crc="5e2f3bab" sha1="da978f71c8221ab6a8562332a0716ceb28fd31ee" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="sangokua" cloneof="sangoku">
-		<description>Sangokushi (Japan, alt)</description>
-		<year>1986</year>
+		<description>Sangokushi (Japan, 1988-01)</description>
+		<year>1988</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="三國志"/>
 		<info name="usage" value="Boot with CTRL pressed. Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Game Disk"/>
 			<dataarea name="flop" size="737280">
-				<rom name="sangokushi. romance of three kingdoms (1986)(koei)(jp)(disk 1 of 2)(game disk)[a].dsk" size="737280" crc="968a0609" sha1="90b989794fa40b9c985197c80302b818402a9eff"/>
+				<rom name="sangokushi - koei (game disk, 1988-01).dsk" size="737280" crc="b27d1eb7" sha1="8e553a0f2cd0312d0eb71bb4af5cd7d47392dee1"/>
 			</dataarea>
 		</part>
-		<!-- Not part of release? -->
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="User Disk"/>
 			<dataarea name="flop" size="737280">
-				<rom name="sangokushi. romance of three kingdoms (1986)(koei)(jp)(disk 2 of 2)(user disk).dsk" size="737280" crc="5e2f3bab" sha1="da978f71c8221ab6a8562332a0716ceb28fd31ee" status="baddump" />
+				<rom name="sangokushi - koei (user disk).dsk" size="737280" crc="5e2f3bab" sha1="da978f71c8221ab6a8562332a0716ceb28fd31ee" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="sangokub" cloneof="sangoku">
-		<description>Sangokushi (Japan, alt 2)</description>
-		<year>1986</year>
+		<description>Sangokushi (Japan, 1987-10)</description>
+		<year>1987</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="三國志"/>
 		<info name="usage" value="Boot with CTRL pressed. Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Game Disk"/>
 			<dataarea name="flop" size="737280">
-				<rom name="sangokushi. romance of three kingdoms (1986)(koei)(jp)(disk 1 of 2)(game disk)[a2].dsk" size="737280" crc="9285455b" sha1="c805924468bc5b3a58945bf49b6d6123022be634"/>
+				<rom name="sangokushi - koei (game disk, 1987-10).dsk" size="737280" crc="f1e5aa0e" sha1="4c2abce14386495e7f40e7ddaf4ab964b783e1b4"/>
 			</dataarea>
 		</part>
-		<!-- Not part of release? -->
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="User Disk"/>
 			<dataarea name="flop" size="737280">
-				<rom name="sangokushi. romance of three kingdoms (1986)(koei)(jp)(disk 2 of 2)(user disk).dsk" size="737280" crc="5e2f3bab" sha1="da978f71c8221ab6a8562332a0716ceb28fd31ee" status="baddump" />
+				<rom name="sangokushi - koei (user disk).dsk" size="737280" crc="5e2f3bab" sha1="da978f71c8221ab6a8562332a0716ceb28fd31ee" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -12432,6 +12462,34 @@ The following floppies came with the machines.
 			<feature name="part_id" value="User Disk"/>
 			<dataarea name="flop" size="741376">
 				<rom name="sangokushi 2. romance of three kingdoms 2 (1990)(koei)(jp)(disk 3 of 3)(user disk)[o].dsk" size="741376" crc="00a6d2f7" sha1="a7d6d4e3fcc03d28e69b6c25f9f5011690128a77" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="saotomeb">
+		<description>Saotome Gakuen Blue Wind (Japan)</description>
+		<year>1990</year>
+		<publisher>studio ANGEL</publisher>
+		<info name="alt_title" value="早乙女学園ブルーウィンド"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<info name="barcode" value="4988706200121"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="saotome gakuen blue wind - studio angel.dsk" size="737280" crc="61b95075" sha1="d0d609397008f5f0193d8b2fbc7b3ac62f2be3ae"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="saotomem">
+		<description>Saotome Military Academy of U.N. Space Force Nyuugaku Annai (Japan)</description>
+		<year>1988</year>
+		<publisher>studio ANGEL</publisher>
+		<info name="alt_title" value="国連宇宙軍士官学校 早乙女学園 入学案内"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<info name="barcode" value="4988706200107"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="saotome military academy of u.n. space force - studio angel.dsk" size="737280" crc="7754decd" sha1="d44b34e492ca6a3f07ec7bc24176dd2110af3bc4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12549,6 +12607,18 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
+	<software name="sdifx">
+		<description>SDI FX (Japan)</description>
+		<year>1994</year>
+		<publisher>IS-Soft</publisher>
+		<info name="usage" value="Boot with CTRL pressed."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="sdi fx - is-soft.dsk" size="737280" crc="dbbc166c" sha1="90a288a2964e0ce08f495f5184bab00ac66ee5c5"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="seiha">
 		<description>Seiha (Japan)</description>
 		<year>1988</year>
@@ -12609,6 +12679,38 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
+	<software name="sekaichi">
+		<description>Sekai de Ichiban Kimi ga Suki! (Japan)</description>
+		<year>1990</year>
+		<publisher>Cocktail Soft</publisher>
+		<info name="alt_title" value="世界で一番君がすき！"/>
+		<info name="usage" value="Boot with CTRL pressed. Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="sekai de ichiban kimi ga suki - cocktail soft (disk a).dsk" size="737280" crc="fbecdac7" sha1="2dea783cb8983e3c39ad9da2bb0f223884bf0767"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="sekai de ichiban kimi ga suki - cocktail soft (disk b).dsk" size="737280" crc="acde7804" sha1="4a8aef3a9047cd33c5f458ff7315fd12056cebb9"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="sekai de ichiban kimi ga suki - cocktail soft (disk c).dsk" size="737280" crc="dc12ba43" sha1="307d5e407b7a805f298669f897646c21cfa60469"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk D"/>
+			<dataarea name="flop" size="737280">
+				<rom name="sekai de ichiban kimi ga suki - cocktail soft (disk d).dsk" size="737280" crc="701fc864" sha1="fad651b4e8636f3d53c5190ed61c40ce106edc57"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- According to generation-msx this was released on single sided floppy. -->
 	<software name="sekte">
 		<description>De Sekte (Netherlands)</description>
@@ -12642,6 +12744,51 @@ The following floppies came with the machines.
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="368640">
 				<rom name="sekte, de (1986)(philips)(nl)[a2].dsk" size="368640" crc="aa8e2a30" sha1="c2fbc20abd5f9c5f5c3d0a6729be163e20321539"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="semattem">
+		<description>Sematte Mitai (Japan)</description>
+		<year>1989</year>
+		<publisher>Hard</publisher>
+		<info name="alt_title" value="せまってみたい"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="sematte mitai - hard (disk a).dsk" size="737280" crc="0a11837b" sha1="d41876dfce31bae0e229d5d945235fd7f34b4b95"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="sematte mitai - hard (disk b).dsk" size="737280" crc="b91ddb17" sha1="6c26218fec22f8f35f069796af70934c805a3fd2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="senknmk">
+		<description>Senno Knife no Mashoujo Kan (Japan)</description>
+		<year>1988</year>
+		<publisher>I-cell</publisher>
+		<info name="alt_title" value="千之ナイフの魔少女館"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="senno knife no mashoujo kan - i-cell.dsk" size="737280" crc="8b8fdadd" sha1="bfb65cfa5c29b2c0042f23bcc3c9ab0dd96686b0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="senknmm">
+		<description>Senno Knife: Meikyuu no Mashoujo (Japan)</description>
+		<year>1989</year>
+		<publisher>I-cell</publisher>
+		<info name="alt_title" value="千之ナイフ 迷宮の魔少女"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="senno knife meikyuu no mashoujo - i-cell.dsk" size="737280" crc="12654906" sha1="2657116d2e38d3285dc753d7ff2b7dc02eaeacad"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12872,6 +13019,19 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
+	<software name="simudayo">
+		<description>Simulation Dayo Zen'in Shuugou! (Japan)</description>
+		<year>1989</year>
+		<publisher>MSX Magazine</publisher>
+		<info name="alt_title" value="シミュレーションだよ全員集合！"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="simulation dayo zenin shuugou - msx magazine.dsk" size="737280" crc="2fbbef86" sha1="f2b06f6c39c3eb1dc4f33529bb746971649df534"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="silviana">
 		<description>Silviana (Japan, cracked)</description>
 		<year>1989</year>
@@ -12909,6 +13069,18 @@ The following floppies came with the machines.
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="silviana (1989)(pack in video)(jp)[a2].dsk" size="737280" crc="abc82749" sha1="6f7d5c6ec74783019764b8bdf959c38d7a547ce6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smlady">
+		<description>SM Lady (Japan)</description>
+		<year>1994</year>
+		<publisher>MO Soft</publisher>
+		<info name="alt_title" value="SMレディ"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="sm lady - mo soft.dsk" size="737280" crc="ed21819f" sha1="0d0cc4a962b52bc5a3bf96146b7d825886259498"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12970,6 +13142,18 @@ The following floppies came with the machines.
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="perfect soukoban (1989)(micro cabin)(disk 2 of 2).dsk" size="737280" crc="fb36c436" sha1="a192e7bb254dfd2fcfc6c4b407eebbbabe7ecdf9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="solitaim">
+		<description>Solitaire (Netherlands)</description>
+		<year>1991</year>
+		<publisher>MK Public Domain</publisher>
+		<info name="usage" value="Requires a mouse."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="solitaire - mk public domain.dsk" size="368640" crc="576a52e2" sha1="dcd3bc4716361cacd5c6e3d990ea67c4bba600fd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13263,6 +13447,18 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
+	<software name="sugohachi">
+		<description>Sugo Hachi (Japan)</description>
+		<year>1989</year>
+		<publisher>MSX Magazine</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="sugo hachi - msx magazine.dsk" size="737280" crc="0455480d" sha1="3797903f022f645a5b9a282722ba5ebdb64f5fe6"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Release contained 2 floppies. -->
 	<software name="suikoden">
 		<description>Suikoden - Tenmei no Chikai (Japan)</description>
@@ -13305,6 +13501,19 @@ The following floppies came with the machines.
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="super daisenryaku. super risk (1988)(micro cabin)(jp).dsk" size="737280" crc="f47c7481" sha1="cfe8b3ad2b58ae45b0f75eff3051ba971f936e87"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="supdaisnmc">
+		<description>Super Daisenryaku Map Collection (Japan)</description>
+		<year>1989</year>
+		<publisher>Micro Cabin</publisher>
+		<info name="alt_title" value="スーパー大戦略マップコレクション"/>
+		<info name="usage" value="Requires Super Daisenryaku."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="super daisenryaku map collection - micro cabin.dsk" size="737280" crc="4efc1ff7" sha1="5dc5d505bbbf5ab49aa5ed35b1f2c5d37a9ab297"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13374,6 +13583,30 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
+	<software name="sprgcol1">
+		<description>Super Program Collection 1 (Japan)</description>
+		<year>1991</year>
+		<publisher>Tokuma Shoten Intermedia</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="super program collection 1 - tokuma shoten intermedia.dsk" size="737280" crc="29e222b0" sha1="959477f28d60fdde2ccec200fc8f73bd2f9bd88d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprgcol4">
+		<description>Super Program Collection 4 (Japan)</description>
+		<year>1993</year>
+		<publisher>Tokuma Shoten Intermedia</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="super program collection 4 - tokuma shoten intermedia.dsk" size="737280" crc="cef5205e" sha1="8fec3118eb311d019ac94b98118747f4a8deb395"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sshangh">
 		<description>Super Shanghai - Dragon's Eye (Japan)</description>
 		<year>1991</year>
@@ -13382,6 +13615,31 @@ The following floppies came with the machines.
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="dragon's eye super shanghai (1991)(hot-b)(jp).dsk" size="737280" crc="9b447e70" sha1="17f2f1e0f234f6ec20a2f4f1d1883e7697bcde47"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="szeolog">
+		<description>Super Zeologue (Japan)</description>
+		<year>1989</year>
+		<publisher>MSX Magazine</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="super zeologue - msx magazine.dsk" size="737280" crc="3ad52090" sha1="72e60f5f638b3350910d15c733be751315190da7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sweet">
+		<description>Sweet (Japan)</description>
+		<year>1994</year>
+		<publisher>Hanaechansoft</publisher>
+		<info name="alt_title" value="スゥイート"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="sweet - hanaechansoft.dsk" size="737280" crc="8f23281c" sha1="1b3a4841424627d56ac26d9df0861f744ec8b7c7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14215,6 +14473,18 @@ The following floppies came with the machines.
 			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="737280">
 				<rom name="trilogy kuki youka shinden - hard (disk 2).dsk" size="737280" crc="b50c54d3" sha1="9f05a64f78e329ce855d92468a230673bfb3629c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tsubhiro">
+		<description>Tsubasa wo Hirogete (Japan)</description>
+		<year>1995</year>
+		<publisher>Tatsuji Software</publisher>
+		<info name="alt_title" value="翼をひろげて"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="tsubasa wo hirogete - tatsuji software.dsk" size="737280" crc="e0ba6ce8" sha1="dbc2c88214b7da121b35cb0aedfab75db1918128"/>
 			</dataarea>
 		</part>
 	</software>
@@ -17149,6 +17419,18 @@ HOMEBREW
 		</part>
 	</software>
 
+	<software name="freecoll">
+		<description>Freeware Collection (Japan)</description>
+		<year>1993</year>
+		<publisher>Studio FG</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="freeware collection - studio fg.dsk" size="737280" crc="d8a0ee09" sha1="58ff2d2650ff66eb2bb23c4ae77ff45b85e582ec"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="galmoon">
 		<description>Galmoon (Japan)</description>
 		<year>1990</year>
@@ -18151,6 +18433,18 @@ HOMEBREW
 		</part>
 	</software>
 
+	<software name="osamuchn">
+		<description>Osamu-chan Shio chi ga Ri (Japan)</description>
+		<year>1989</year>
+		<publisher>Sumsoft</publisher>
+		<info name="alt_title" value="おさむちゃん潮チがリ"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="osamu-chan shio chi ga ri - sumsoft.dsk" size="368640" crc="86c5719b" sha1="ecc24d0235f6ee2e627b5cc2885ded35f5a2d9dd"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ounuki">
 		<description>Ounuki no Yabou - Shouten-ki (Japan)</description>
 		<year>1995</year>
@@ -18713,11 +19007,83 @@ HOMEBREW
 		</part>
 	</software>
 
-	<software name="sexbombb">
+	<software name="sccmusml">
+		<description>SCC MUSIXX Music Loader</description>
+		<year>199?</year>
+		<publisher>Gamesoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="scc musixx music loader - gamesoft.dsk" size="737280" crc="aad7737d" sha1="c3abc81fe4924e5d18e38af48bcbc5b17e668584"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sccblaff">
+		<description>SCC-Blaffer</description>
+		<year>1999</year>
+		<publisher>TeddyWareZ</publisher>
+		<notes>Software requires a cartridge with an SCC chip, but it does not support the SCC cartridges from Snather or SD-Snatcher.</notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="scc-blaffer - teddywarez.dsk" size="737280" crc="13fecd6d" sha1="4e22a9f51aaaaad7a619166a7d2d25e8398745c1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sccblfnt">
+		<description>SCC-Blaffer NT</description>
+		<year>1999</year>
+		<publisher>TeddyWareZ</publisher>
+		<info name="usage" value="Requires a cartridge with an SCC chip."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="scc-blaffer nt - teddywarez.dsk" size="737280" crc="19d9e9d1" sha1="9df4836b5a036245d638a91864c3122e589d9858"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sccmusixx">
+		<description>SCC-Musixx (Netherlands)</description>
+		<year>1991</year>
+		<publisher>Tyfoon Software</publisher>
+		<info name="usage" value="Requires a cartridge with an SCC chip."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="scc-musixx - tyfoon software.dsk" size="737280" crc="d1ae967c" sha1="227ef01443f74e60c3150bde1519a0b15e8681d2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scrabtri">
+		<description>Scrabble Triton</description>
+		<year>1991</year>
+		<publisher>Osaka Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="scrabble triton - osaka software.dsk" size="737280" crc="fbb3ad0c" sha1="990ec1a6ff10d7e2c3414ba127e8ca20faa61ef0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sexbombb" supported="no">
+		<description>Sex Bomb Bunny</description>
+		<year>1999</year>
+		<publisher>Matra</publisher>
+		<notes>Unable to start a game. Bottom lines are cut off on title screen.</notes>
+		<info name="serial" value="VG3301"/>
+		<info name="barcode" value="0860713301"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="sex bomb bunny - matra.dsk" size="737280" crc="96e1891c" sha1="9eb6e637c0aa8ac4dcd2bda0cc8e3307c7b10758"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sexbombds" cloneof="sexbombb" supported="no">
 		<description>Sex Bomb Bunny (Spain, demo)</description>
 		<year>1999</year>
-		<publisher>&lt;homebrew&gt;</publisher>
-		<info name="developer" value="Matra" />
+		<publisher>Matra</publisher>
+		<notes>Unable to start a game. Bottom lines are cut off on title screen.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="sex bomb bunny (demo) (2000)(matra)(es).dsk" size="737280" crc="44502fc8" sha1="779e4d65764e46643b09ebb33926132463aeb9f9"/>
@@ -18725,14 +19091,78 @@ HOMEBREW
 		</part>
 	</software>
 
-	<software name="shadowhe">
-		<description>Shadow Heroes 2 (Japan)</description>
+	<software name="sh1">
+		<description>SH#1 (Japan)</description>
+		<year>1991</year>
+		<publisher>Interpreter Softwere</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="sh1 - interpreter softwere (disk 1).dsk" size="737280" crc="d91602a2" sha1="684a4fcac351f0289ec0c8d419dffdcfb6332cea"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="sh1 - interpreter softwere (disk 2).dsk" size="737280" crc="c4785a13" sha1="dc6427967facee81e01accc6ad1952cdb1fff413"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shadowh2">
+		<description>Shadow Hero 2 (Japan, v1.2)</description>
 		<year>1993</year>
-		<publisher>&lt;doujin&gt;</publisher>
-		<info name="developer" value="Syntax" />
+		<publisher>Syntax</publisher>
+		<info name="alt_title" value="シャドウヒーロー2"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="shadow heroes 2.dsk" size="737280" crc="d18daa60" sha1="c28b60c7d8fdcd95acd8b2f8f045521c333b1bd0"/>
+				<rom name="shadow hero 2 - syntax (v1.2).dsk" size="737280" crc="edd29b3b" sha1="455d73fb5d318f3db2f3b9e342938d4cd512f4b3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shadowh2a" cloneof="shadowh2">
+		<description>Shadow Heroes 2 (Japan, alt)</description>
+		<year>1993</year>
+		<publisher>Syntax</publisher>
+		<info name="alt_title" value="シャドウヒーロー2"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="shadow hero 2 - syntax (alt).dsk" size="737280" crc="d18daa60" sha1="c28b60c7d8fdcd95acd8b2f8f045521c333b1bd0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shadowh3">
+		<description>Shadow Hero 3 + R System (Japan)</description>
+		<year>1993</year>
+		<publisher>Syntax</publisher>
+		<info name="alt_title" value="シャドウヒーロー3+R・SYSTEM"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="shadow hero 3 - r system - syntax.dsk" size="737280" crc="babfe197" sha1="0724dd1d71eefccbf5c5eec8334eb5439b3c220a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shiningc">
+		<description>Shining Crystal (Japan)</description>
+		<year>1995</year>
+		<publisher>Golden Soft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="shining crystal - golden soft.dsk" size="737280" crc="dc0f1525" sha1="4eb3c1af0fd2f9245ced543e2be91b1977438573"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shooterx">
+		<description>Shooter-X (Japan)</description>
+		<year>1993</year>
+		<publisher>T.M</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="shooter-x - t.m.dsk" size="737280" crc="b6aa1686" sha1="ccf0912889c3af8a0d78601d905c7ca8af52d768"/>
 			</dataarea>
 		</part>
 	</software>
@@ -18784,6 +19214,42 @@ HOMEBREW
 		</part>
 	</software>
 
+	<software name="siianime">
+		<description>Siianime</description>
+		<year>1992</year>
+		<publisher>S-IISoft</publisher>
+		<info name="usage" value="Requires a mouse."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="siianime - s-iisoft.dsk" size="737280" crc="13d533a4" sha1="cce5ff24658e453c6fc201e18dbd0cee4bc147eb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="singston">
+		<description>Singular Stone</description>
+		<year>2020</year>
+		<publisher>Tohji Murakata</publisher>
+		<info name="usage" value="Requires MSX-Music/FM-PAC."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="singular stone - tohji murakata.dsk" size="737280" crc="2df02808" sha1="4344e6a754cf01561eb845c3202037fee413d869" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="singstona" cloneof="singston">
+		<description>Singular Stone (download)</description>
+		<year>2022</year>
+		<publisher>Tohji Murakata</publisher>
+		<info name="usage" value="Requires MSX-Music/FM-PAC."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="singular stone - tohji murakata (alt).dsk" size="737280" crc="d99def2f" sha1="fbe833bae19d233a765de2e5b60db34c942353dc" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="soko">
 		<description>Soko (Spain?)</description>
 		<year>1995</year>
@@ -18831,6 +19297,49 @@ HOMEBREW
 		</part>
 	</software>
 
+	<software name="soshites">
+		<description>Soshite Shiawase wa Yattekuru (Japan)</description>
+		<year>1991</year>
+		<publisher>Kankodori Company</publisher>
+		<info name="alt_title" value="そしてしあわせはやってくる"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="soshite shiawase wa yattekuru - kankodori company.dsk" size="737280" crc="ab019fad" sha1="2b7bef78794339cc616fc09e4c948d0544482a08"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="speedgame">
+		<description>Speed Game (Japan)</description>
+		<year>1989</year>
+		<publisher>Soft House TODO</publisher>
+		<notes>Requires a Japanese system.</notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="speed game - soft house todo.dsk" size="737280" crc="1976f465" sha1="9fa0b487b5f3387a9a47a8c59ec5b7c23af8171b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sphere" supported="partial">
+		<description>Sphere</description>
+		<year>2004</year>
+		<publisher>Infinite</publisher>
+		<notes>Requires a system with 512KB memory mapper. Requires Moonsound. Initial Infinite logo has graphics glitches.</notes>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="sphere - infinite (disk 1).dsk" size="737280" crc="bd967a12" sha1="61654ff25d68794e2c9df017e19069a66567ee06"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="737280">
+				<rom name="sphere - infinite (disk 2).dsk" size="737280" crc="1dc57353" sha1="1a0771c29a9a1d1debf094db930fb4d2ac80116e"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="splitbal">
 		<description>Split Ball (Japan)</description>
 		<year>1995</year>
@@ -18839,6 +19348,28 @@ HOMEBREW
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="splitball.dsk" size="737280" crc="f145bcc3" sha1="378fd2f08670da2d50205ee531b67c37adce986c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprngwar">
+		<description>Spring Warrior</description>
+		<year>2016</year>
+		<publisher>Oniric Factor</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="spring warrior - oniric factor.dsk" size="737280" crc="fe6b050e" sha1="bf1f1fd7d57ea42913a34798e512c555cbdc3eab"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starwars">
+		<description>Star Wars</description>
+		<year>1988</year>
+		<publisher>FT-Soft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="star wars - ft-soft.dsk" size="737280" crc="584b7be8" sha1="31df1f1525c64019643dd351ba838ddedd621af5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -18883,6 +19414,30 @@ HOMEBREW
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="street neo fighter ii - the world warrior (1994)(neo)[a2].dsk" size="737280" crc="fc30c469" sha1="f76b3d67541dd315672a2ae4715e69c0d99e4701"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="strsntch">
+		<description>Street Snatch</description>
+		<year>1994</year>
+		<publisher>Futuredisk</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="street snatch - futuredisk.dsk" size="737280" crc="79510b56" sha1="1759d560ef6241f316944b46004617e2110ce50f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="summishm">
+		<description>Sum the Missile Human (Japan)</description>
+		<year>1989</year>
+		<publisher>Sum Soft</publisher>
+		<info name="alt_title" value="ミサイル人間サム"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="sum the missile human - sum soft.dsk" size="737280" crc="8161031f" sha1="748d422826b657aec5a221b1705b5298dedbcf3b"/>
 			</dataarea>
 		</part>
 	</software>
