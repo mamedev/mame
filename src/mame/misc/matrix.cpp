@@ -25,6 +25,7 @@
 
 #include "bus/isa/isa_cards.h"
 #include "cpu/i386/i386.h"
+#include "machine/mc146818.h"
 #include "machine/mediagx_cs5530_bridge.h"
 #include "machine/mediagx_host.h"
 #include "machine/pci.h"
@@ -38,14 +39,16 @@ class matrix_state : public driver_device
 {
 public:
 	matrix_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_rtc(*this, "rtc")
 	{ }
 
 	void matrix(machine_config &config);
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<ds1287_device> m_rtc;
 
 	void main_map(address_map &map);
 };
@@ -64,17 +67,33 @@ void matrix_state::matrix(machine_config &config)
 	// basic machine hardware
 	MEDIAGX(config, m_maincpu, 233'000'000); // Cyrix MediaGX GXm-266GP
 	m_maincpu->set_addrmap(AS_PROGRAM, &matrix_state::main_map);
+	m_maincpu->set_irq_acknowledge_callback("pci:07.0:pic8259_master", FUNC(pic8259_device::inta_cb));
+
+	// TODO: from FDC37C93x super I/O
+	// NOTE: it's not initialized at $3f0 - $370 but accessed anyway, wtf
+	DS1287(config, m_rtc, 32.768_kHz_XTAL);
+	m_rtc->set_binary(true);
+	m_rtc->set_epoch(1980);
+	m_rtc->irq().set("pci:07.0", FUNC(mediagx_cs5530_bridge_device::pc_irq8n_w));
 
 	PCI_ROOT(config, "pci", 0);
 	MEDIAGX_HOST(config, "pci:00.0", 0, "maincpu", 128*1024*1024);
+	// TODO: no clue about the ID used for this, definitely tested
+	// Tries to initialize MediaGX F4 -> ISA -> PCI/AGP, failing in all cases
+	PCI_BRIDGE(config, "pci:01.0", 0, 0x10780000, 0);
+	//RIVATNT(config, "pci:01.0:00.0", 0);
 
 	// TODO: unconfirmed PCI space
 	mediagx_cs5530_bridge_device &isa(MEDIAGX_CS5530_BRIDGE(config, "pci:07.0", 0, "maincpu"));
 	isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
 	//isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
+	isa.rtcale().set([this](u8 data) { m_rtc->address_w(data); });
+	isa.rtccs_read().set([this]() { return m_rtc->data_r(); });
+	isa.rtccs_write().set([this](u8 data) { m_rtc->data_w(data); });
 
 	// TODO: unknown number of ISA slots
 	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+
 }
 
 

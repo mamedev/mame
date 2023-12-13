@@ -91,4 +91,13 @@ void mediagx_host_device::map_extra(
 
 	memory_space->install_ram(0x00000000, 0x0009ffff, &m_ram[0x00000000/4]);
 //  memory_space->install_ram(0x000a0000, 0x000bffff, &m_ram[0x000a0000/4]);
+	// temp
+	memory_space->install_ram(0x000c0000, 0x000dffff, &m_ram[0x000c0000/4]);
+
+	memory_space->install_ram          (0x00100000, 0x00efffff, &m_ram[0x00100000/4]);
+	// memory hole at 15-16 mbytes
+	//if(memory_hole_upper)
+		memory_space->install_ram      (0x00f00000, 0x00ffffff, &m_ram[0x00f00000/4]);
+
+	memory_space->install_ram          (0x01000000, m_ram_size-1, &m_ram[0x01000000/4]);
 }
