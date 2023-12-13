@@ -363,8 +363,8 @@ void xtensa_device::device_start()
 	set_icountptr(m_icount);
 
 	state_add(XTENSA_PC, "PC", m_pc);
-	state_add(STATE_GENPC, "GENPC", m_pc);
-	state_add(STATE_GENPCBASE, "CURPC", m_pc);
+	state_add(STATE_GENPC, "GENPC", m_pc).noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_pc).noshow();
 	state_add(XTENSA_WINDOW, "WinBase", m_extreg_windowbase);
 	state_add(XTENSA_INTENABLE, "IntEnable", m_extreg_intenable);
 	state_add(XTENSA_LOOPBEGIN, "LoopBegin", m_extreg_lbeg);
@@ -373,8 +373,6 @@ void xtensa_device::device_start()
 
 	for (int i = 0; i < 16; i++)
 		state_add(XTENSA_A0 + i, string_format("a%d", i).c_str(), m_a[i]);
-
-	state_add(XTENSA_PC, "PC", m_pc);
 
 	save_item(NAME(m_a_real));
 	save_item(NAME(m_a));
