@@ -14943,6 +14943,9 @@ lw700i                          // (c) 1995 Brother
 @source:brother/lw840.cpp
 lw840                           // Brother LW-840ic (c) 1997 Brother Industries, Ltd.
 
+@source:brother/pn8800fxb.cpp
+pn8800                          // (c) 1996 Brother
+
 @source:burroughs/anzterm.cpp
 anzterm                         // Burroughs EF315-I220
 
