@@ -7,7 +7,6 @@
 #pragma once
 
 #include "pci.h"
-#include "mediagx_cs5530_bridge.h"
 
 #include "bus/isa/isa.h"
 

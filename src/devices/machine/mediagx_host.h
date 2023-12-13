@@ -7,7 +7,6 @@
 #pragma once
 
 #include "pci.h"
-#include "mediagx_host.h"
 
 class mediagx_host_device : public pci_host_device
 {
