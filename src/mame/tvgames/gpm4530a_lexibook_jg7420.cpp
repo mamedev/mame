@@ -7,6 +7,7 @@
 
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
+#include "machine/spi_sdcard.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -19,7 +20,8 @@ public:
 	gpm4530a_lexibook_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_screen(*this, "screen")
+		m_screen(*this, "screen"),
+		m_sdcard(*this, "sdcard")
 	{ }
 
 	void gpm4530a_lexibook(machine_config &config);
@@ -32,6 +34,7 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
+	required_device<spi_sdcard_sdhc_device> m_sdcard;
 
 	uint32_t screen_update_gpm4530a_lexibook(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -71,6 +74,8 @@ void gpm4530a_lexibook_state::gpm4530a_lexibook(machine_config &config)
 	m_screen->set_visarea(0, 320-1, 0, 240-1);
 	m_screen->set_screen_update(FUNC(gpm4530a_lexibook_state::screen_update_gpm4530a_lexibook));
 
+	SPI_SDCARD(config, m_sdcard, 0);
+
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 }
@@ -79,7 +84,7 @@ ROM_START( lx_jg7420 )
 	ROM_REGION( 0x10000, "boot", ROMREGION_ERASEFF )
 	ROM_LOAD( "bootrom.bin", 0x00000, 0x10000, NO_DUMP ) // unknown size/capacity/type
 
-	DISK_REGION( "ata:0:hdd" ) // 4GB SD Card
+	DISK_REGION( "sdcard" ) // 4GB SD Card
 	DISK_IMAGE( "jg7420", 0, SHA1(214a1686c7eefdb4cb5d723e98957600c8cb138d) )
 ROM_END
 
