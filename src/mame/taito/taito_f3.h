@@ -411,7 +411,7 @@ protected:
 
 	void tile_decode();
 
-	inline void f3_drawgfx(bitmap_rgb32 &dest_bmp, const rectangle &clip, gfx_element *gfx, int code, u8 color, bool flipx, bool flipy, int sx, int sy, u16 scalex, u16 scaley, u8 pri_dst);
+	inline void f3_drawgfx(bitmap_rgb32 &dest_bmp, const rectangle &clip, gfx_element *gfx, const tempsprite &sprite);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void get_sprite_info(const u16 *spriteram16_ptr);
 	void print_debug_info(bitmap_rgb32 &bitmap);
