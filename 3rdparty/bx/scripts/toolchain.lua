@@ -961,6 +961,7 @@ function toolchain(_buildDir, _libDir)
 			"-Wfatal-errors",
 			"-Wunused-value",
 			"-Wundef",
+			"-Wno-overriding-t-option",
 			"-mmacosx-version-min=13.0",
 		}
 		includedirs { path.join(bxDir, "include/compat/osx") }
