@@ -2694,13 +2694,33 @@ inline void taito_f3_state::f3_drawgfx(bitmap_rgb32 &dest_bmp, const rectangle &
 
 		//logerror("sprite draw at %f %f size %f %f\n", sprite.x/16.0, sprite.y/16.0, sprite.zoomx/16.0, sprite.zoomy/16.0);
 		
-		{
+		for (int y=0; y<16; y++) {
+			int dy = (sprite.y*16 + y*sprite.zoomy + sprite.zoomy*8)/256;
+			if (dy < myclip.min_y || dy > myclip.max_y)
+				continue;
+			u8 *pri = &m_pri_alp_bitmap.pix(dy);
+			u32 *dest = &dest_bmp.pix(dy);
+			auto src = &code_base[(sprite.flipy ? 15-y : y)*16];
+			for (int x=0; x<16; x++) {
+				int dx = (sprite.x*16 + x*sprite.zoomx + sprite.zoomx*8)/256; // round?
+				if (dx < myclip.min_x || dx > myclip.max_x)
+					continue;
+				const u8 p = pri[dx];
+				int c = src[(sprite.flipx ? 15-x : x)] & m_sprite_pen_mask;
+				if (c && !p) {
+					dest[dx] = pal[sprite.color<<4 | c];
+					pri[dx] = 1;
+				}
+			}
+		}
+		
+		/*{
 			fixed4 sx = sprite.x;
 			fixed4 sy = sprite.y;
 			fixed4 ex = sx + sprite.zoomx;
 			fixed4 ey = sy + sprite.zoomy;
 			
-			/* compute sprite increment per screen pixel */
+			// compute sprite increment per screen pixel
 			// as: fixed.12 = (fixed.16 ÷ fixed.4)
 			int dx = (16 << 16) / sprite.zoomx;
 			int dy = (16 << 16) / sprite.zoomy;
@@ -2736,31 +2756,31 @@ inline void taito_f3_state::f3_drawgfx(bitmap_rgb32 &dest_bmp, const rectangle &
 			fixed4 max_y = myclip.max_y<<4;
 			
 			if (sx < min_x)
-			{ /* clip left */
+			{ // clip left
 				fixed4 pixels = min_x - sx;
 				sx += pixels;
 				x_index_base += pixels * dx;
 			}
 			if (sy < min_y)
-			{ /* clip top */
+			{ // clip top
 				fixed4 pixels = min_y - sy;
 				sy += pixels;
 				y_index += pixels * dy;
 			}
-			/* NS 980211 - fixed incorrect clipping */
+			// NS 980211 - fixed incorrect clipping
 			if (ex > max_x + 1)
-			{ /* clip right */
+			{ // clip right
 				fixed4 pixels = ex - max_x - 1;
 				ex -= pixels;
 			}
 			if (ey > max_y + 1)
-			{ /* clip bottom */
+			{ // clip bottom
 				fixed4 pixels = ey - max_y - 1;
 				ey -= pixels;
 			}
 
 			if (ex > sx)
-			{ /* skip if inner loop doesn't draw anything */
+			{ // skip if inner loop doesn't draw anything
 //              if (dest_bmp.bpp == 32)
 				{
 					for (fixed4 y = sy; y < ey; y+=1<<4)
@@ -2788,7 +2808,7 @@ inline void taito_f3_state::f3_drawgfx(bitmap_rgb32 &dest_bmp, const rectangle &
 					}
 				}
 			}
-		}
+			}*/
 	}
 }
 
