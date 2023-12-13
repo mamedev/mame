@@ -26752,21 +26752,21 @@ Contained in four EPROMs, labeled: "SONIC 0", "1", "2", "3".
 		</part>
 	</software>
 
-    <software name="sonic2p12" cloneof="sonic2">
-        <description>Sonic The Hedgehog 2 (prototype 199209xx, pirate)</description>
-        <year>1992</year>
-        <publisher>Sega</publisher>
-        <notes><![CDATA[
+	<software name="sonic2p12" cloneof="sonic2">
+		<description>Sonic The Hedgehog 2 (prototype 199209xx, pirate)</description>
+		<year>1992</year>
+		<publisher>Sega</publisher>
+		<notes><![CDATA[
 Earlier than the "Beta 4" prototype. No equivalent build has been found in the Sega QA Archive.
 Original scene release which was altered to include a cracktro and bypass the copy protection. Dump originally in smd format, converted to raw binary due to this softlist not supporting smd files.
 ]]></notes>
-        <info name="release" value="19921109"/>
-        <part name="cart" interface="megadriv_cart">
-            <dataarea name="rom" width="16" endianness="big" size="1048576">
-                <rom name="sonic2.bin" size="1048576" crc="0de5d90b" sha1="cc29b1e9325f16cb0e66660129e861e743dab071"/>
-            </dataarea>
-        </part>
-    </software>
+		<info name="release" value="19921109"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="sonic2.bin" size="1048576" crc="0de5d90b" sha1="cc29b1e9325f16cb0e66660129e861e743dab071"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="sonic2p10" cloneof="sonic2">
 		<description>Sonic The Hedgehog 2 (Pre Beta, 19920914)</description>
@@ -35094,17 +35094,17 @@ Has missing sound samples (i.e. tire screech, "time bonus" on checkpoints)
 		These require use of the HeartBeat Catalyst fitness sensor.
 	-->
 
-    <software name="outbackj" supported="no">
-        <description>Outback Joey (HeartBeat Personal Trainer)</description>
-        <year>1993</year>
-        <publisher>HeartBeat Corporation</publisher>
+	<software name="outbackj" supported="no">
+		<description>Outback Joey (HeartBeat Personal Trainer)</description>
+		<year>1993</year>
+		<publisher>HeartBeat Corporation</publisher>
 		<info name="usage" value="Requires HeartBeat Catalyst fitness sensor." />
-        <part name="cart" interface="megadriv_cart">
-            <dataarea name="rom" width="16" endianness="big" size="1048576">
-                <rom name="outback joey.bin" size="1048576" crc="10abd93f" sha1="ec2eef751bc8515bc99293d96f833270916c9af7" />
-            </dataarea>
-        </part>
-    </software>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="outback joey.bin" size="1048576" crc="10abd93f" sha1="ec2eef751bc8515bc99293d96f833270916c9af7" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="pga2hb" cloneof="pga2" supported="no">
 		<description>PGA Tour Golf II (HeartBeat Personal Trainer)</description>
