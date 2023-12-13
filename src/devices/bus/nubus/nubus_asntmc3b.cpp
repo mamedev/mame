@@ -24,8 +24,9 @@
 #include "emu.h"
 #include "nubus_asntmc3b.h"
 
-#include "multibyte.h"
 #include "machine/dp8390.h"
+
+#include "multibyte.h"
 
 #define MAC8390_ROM_REGION  "asntm3b_rom"
 

@@ -11,7 +11,7 @@
   0xfsff6014 is VBL ack: write 1 to ack
   0xfsff603c is VBL disable: write 1 to disable, 0 to enable
 
-  Crystal (pixel clock) is 30.24 MHz. A 12.3356 MHz XTAL is also present,
+  Crystal (pixel clock) is 30.24 MHz. A 12.3356 MHz crystal is also present,
   likely used only for 30 Hz interlaced NTSC output.
 
   TODO:
@@ -22,8 +22,10 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "emupal.h"
+
 #include "nubus_cb264.h"
+
+#include "emupal.h"
 #include "screen.h"
 
 #include <algorithm>
@@ -31,6 +33,7 @@
 namespace {
 
 static constexpr u32 VRAM_SIZE = 0x200000;  // 12x TC524256J (256K x 4 bit VRAM), so 1.5 MiB total
+
 class nubus_cb264_device : public device_t,
 							public device_nubus_card_interface
 {
