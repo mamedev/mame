@@ -72,6 +72,7 @@ namespace bx
 
 	inline void HashMurmur2A::begin(uint32_t _seed)
 	{
+		BX_UNUSED(m_tail);
 		m_hash  = _seed;
 		m_size  = 0;
 		m_count = 0;
@@ -95,6 +96,7 @@ namespace bx
 
 	inline void HashMurmur3::begin(uint32_t _seed)
 	{
+		BX_UNUSED(m_tail);
 		m_hash  = _seed;
 		m_size  = 0;
 		m_count = 0;

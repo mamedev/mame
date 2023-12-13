@@ -463,6 +463,12 @@
 #	define BX_CPP_NAME "C++Unknown"
 #endif // defined(__cplusplus)
 
+#if BX_PLATFORM_OSX && BX_PLATFORM_OSX < 130000
+#error "Minimum supported macOS version is 13.00.\n"
+#elif BX_PLATFORM_IOS && BX_PLATFORM_IOS < 160000
+#error "Minimum supported macOS version is 16.00.\n"
+#endif // BX_PLATFORM_OSX < 130000
+
 #if BX_CPU_ENDIAN_BIG
 static_assert(false, "\n\n"
 	"\t** IMPORTANT! **\n\n"
