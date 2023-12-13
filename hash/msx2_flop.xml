@@ -10025,7 +10025,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="onukiyab">
-		<description>Onuki no Yabou (Japan)</description>
+		<description>Oonuki no Yabou (Japan)</description>
 		<year>1995</year>
 		<publisher>Taracot</publisher>
 		<info name="alt_title" value="大貫の野望"/>
@@ -12467,7 +12467,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="saotomeb">
-		<description>Blue Wind (Japan)</description>
+		<description>Saotome Gakuen Blue Wind (Japan)</description>
 		<year>1990</year>
 		<publisher>studio ANGEL</publisher>
 		<info name="alt_title" value="早乙女学園ブルーウィンド"/>
@@ -12475,7 +12475,7 @@ The following floppies came with the machines.
 		<info name="barcode" value="4988706200121"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="blue wind - studio angel.dsk" size="737280" crc="61b95075" sha1="d0d609397008f5f0193d8b2fbc7b3ac62f2be3ae"/>
+				<rom name="saotome gakuen blue wind - studio angel.dsk" size="737280" crc="61b95075" sha1="d0d609397008f5f0193d8b2fbc7b3ac62f2be3ae"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13019,15 +13019,15 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
-	<software name="shimyure">
-		<description>Shimyureshonda yo Zenin Shuugou! (Japan)</description>
+	<software name="simudayo">
+		<description>Simulation Dayo Zen'in Shuugou! (Japan)</description>
 		<year>1989</year>
 		<publisher>MSX Magazine</publisher>
 		<info name="alt_title" value="シミュレーションだよ全員集合！"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="shimyureshonda yo zenin shuugou - msx magazine.dsk" size="737280" crc="2fbbef86" sha1="f2b06f6c39c3eb1dc4f33529bb746971649df534"/>
+				<rom name="simulation dayo zenin shuugou - msx magazine.dsk" size="737280" crc="2fbbef86" sha1="f2b06f6c39c3eb1dc4f33529bb746971649df534"/>
 			</dataarea>
 		</part>
 	</software>
