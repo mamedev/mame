@@ -2695,14 +2695,14 @@ inline void taito_f3_state::f3_drawgfx(bitmap_rgb32 &dest_bmp, const rectangle &
 		//logerror("sprite draw at %f %f size %f %f\n", sprite.x/16.0, sprite.y/16.0, sprite.zoomx/16.0, sprite.zoomy/16.0);
 		
 		for (int y=0; y<16; y++) {
-			int dy = (sprite.y*16 + y*sprite.zoomy + sprite.zoomy*8)/256;
+			int dy = ( sprite.y * 16 + (y+8) * sprite.zoomy )/256;
 			if (dy < myclip.min_y || dy > myclip.max_y)
 				continue;
 			u8 *pri = &m_pri_alp_bitmap.pix(dy);
 			u32 *dest = &dest_bmp.pix(dy);
 			auto src = &code_base[(sprite.flipy ? 15-y : y)*16];
 			for (int x=0; x<16; x++) {
-				int dx = (sprite.x*16 + x*sprite.zoomx + sprite.zoomx*8)/256; // round?
+				int dx = ( sprite.x * 16 + (x+8) * sprite.zoomx )/256;
 				if (dx < myclip.min_x || dx > myclip.max_x)
 					continue;
 				const u8 p = pri[dx];
