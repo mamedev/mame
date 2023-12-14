@@ -407,9 +407,8 @@ u8 *device_image_interface::get_software_region(std::string_view tag)
 	if (!loaded_through_softlist())
 		return nullptr;
 
-	std::string full_tag = util::string_format("%s:%s", device().tag(), tag);
-	memory_region *region = device().machine().root_device().memregion(full_tag);
-	return region != nullptr ? region->base() : nullptr;
+	memory_region *const region = device().memregion(tag);
+	return region ? region->base() : nullptr;
 }
 
 
@@ -419,9 +418,11 @@ u8 *device_image_interface::get_software_region(std::string_view tag)
 
 u32 device_image_interface::get_software_region_length(std::string_view tag)
 {
-	std::string full_tag = util::string_format("%s:%s", device().tag(), tag);
-	memory_region *region = device().machine().root_device().memregion(full_tag);
-	return region != nullptr ? region->bytes() : 0;
+	if (!loaded_through_softlist())
+		return 0;
+
+	memory_region *const region = device().memregion(tag);
+	return region ? region->bytes() : 0;
 }
 
 
