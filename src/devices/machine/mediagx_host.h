@@ -32,14 +32,33 @@ protected:
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
+	virtual space_config_vector memory_space_config() const override;
 	virtual void config_map(address_map &map) override;
 private:
+	enum
+	{
+		//AS_PCI_MEM = 1,
+		AS_PCI_IO = 2
+	};
 	required_device<cpu_device> m_host_cpu;
 	std::vector<uint32_t> m_ram;
+	address_space_config  m_superio_space_config;
+
+	void superio_map(address_map &map);
+	u8 superio_if_r(offs_t offset);
+	void superio_if_w(offs_t offset, u8 data);
+	u8 m_superio_index = 0;
+	bool m_superio_lock = false;
+
+	struct {
+		u8 gcr = 0;
+	}m_superio;
 
 	int m_ram_size = 0;
 	u8 m_pci_control[2]{};
 	u8 m_pci_arbitration[2]{};
+
+	void gxbase_map(address_map &map);
 };
 
 DECLARE_DEVICE_TYPE(MEDIAGX_HOST, mediagx_host_device)

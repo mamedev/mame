@@ -134,7 +134,7 @@ void mediagx_cs5530_bridge_device::config_map(address_map &map)
 void mediagx_cs5530_bridge_device::internal_io_map(address_map &map)
 {
 	map(0x0000, 0x001f).rw("dma8237_1", FUNC(am9517a_device::read), FUNC(am9517a_device::write));
-	map(0x0020, 0x003f).rw("pic8259_master", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x0020, 0x0021).rw("pic8259_master", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x0040, 0x005f).rw("pit8254", FUNC(pit8254_device::read), FUNC(pit8254_device::write));
 	map(0x0061, 0x0061).rw(FUNC(mediagx_cs5530_bridge_device::at_portb_r), FUNC(mediagx_cs5530_bridge_device::at_portb_w));
 	map(0x0064, 0x0067).nopr();
@@ -154,7 +154,8 @@ void mediagx_cs5530_bridge_device::internal_io_map(address_map &map)
 		})
 	);
 	map(0x0080, 0x009f).rw(FUNC(mediagx_cs5530_bridge_device::at_page8_r), FUNC(mediagx_cs5530_bridge_device::at_page8_w));
-	map(0x00a0, 0x00bf).rw("pic8259_slave", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	// TODO: $92 A20 fast reset/override
+	map(0x00a0, 0x00a1).rw("pic8259_slave", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x00c0, 0x00df).rw(FUNC(mediagx_cs5530_bridge_device::at_dma8237_2_r), FUNC(mediagx_cs5530_bridge_device::at_dma8237_2_w));
 //	map(0x04d0, 0x04d1).rw(FUNC(mediagx_cs5530_bridge_device::eisa_irq_read), FUNC(mediagx_cs5530_bridge_device::eisa_irq_write));
 	map(0x00e0, 0x00ef).noprw();
@@ -234,7 +235,6 @@ void mediagx_cs5530_bridge_device::at_portb_w(uint8_t data)
 
 void mediagx_cs5530_bridge_device::iochck_w(int state)
 {
-	printf("%d %d %d\n",state, m_channel_check, m_nmi_enabled);
 	if (!state && !m_channel_check && m_nmi_enabled)
 		m_host_cpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }

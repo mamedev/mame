@@ -20,11 +20,88 @@ mediagx_host_device::mediagx_host_device(const machine_config &mconfig, const ch
 	: pci_host_device(mconfig, MEDIAGX_HOST, tag, owner, clock)
 	, m_host_cpu(*this, finder_base::DUMMY_TAG)
 {
+	m_superio_space_config = address_space_config("superio_space", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(mediagx_host_device::superio_map), this));
+}
+
+u8 mediagx_host_device::superio_if_r(offs_t offset)
+{
+	if (!offset || m_superio_lock)
+	{
+		LOG("Super I/O: $%02x read while locked %02x\n", offset + 0x22, m_superio_index);
+		return space().unmap();
+	}
+
+	return space(AS_PCI_IO).read_byte(m_superio_index);
+}
+
+void mediagx_host_device::superio_if_w(offs_t offset, u8 data)
+{
+	if (!offset)
+	{
+		m_superio_index = data;
+		m_superio_lock = false;
+		return;
+	}
+
+	if (!m_superio_lock)
+	{
+		m_superio_lock = true;
+		space(AS_PCI_IO).write_byte(m_superio_index, data);
+	}
+	else
+		LOG("Super I/O: $23 write while locked %02x %02x\n", m_superio_index, data);
+}
+
+void mediagx_host_device::superio_map(address_map &map)
+{
+//	map(0x20, 0x20) PCR
+//	map(0xb0, 0xb0) SMHR0
+//	map(0xb1, 0xb1) SMHR1
+//	map(0xb2, 0xb2) SMHR2
+//	map(0xb3, 0xb3) SMHR3
+	// GCR
+	map(0xb8, 0xb8).lrw8(
+		NAME([this] () {
+			return m_superio.gcr;
+		}),
+		NAME([this] (u8 data) {
+			m_superio.gcr = data;
+			if (data & 0xc)
+				LOG("GCR scratchpad setting %02x\n", data);
+			remap_cb();
+		})
+	);
+//	map(0xb9, 0xb9) VGACTL
+//	map(0xba, 0xbd) VGAM0
+//	map(0xc1, 0xc1) CCR1
+//	map(0xc2, 0xc2) CCR2
+//	map(0xc3, 0xc3) CCR3
+//	map(0xe8, 0xe8) CCR4
+//	map(0xeb, 0xeb) CCR7
+	// DIR0
+	map(0xfe, 0xfe).lr8(
+		NAME([] () {
+			// xxxx ---- Device ID
+			// 0100 ---- MediaGX MMX
+			// ---- xxxx Core Multiplier (depends on DIR1)
+			return 0x40 | 0x05;
+		})
+	);
+//	map(0xff, 0xff) DIR1
+}
+
+device_memory_interface::space_config_vector mediagx_host_device::memory_space_config() const
+{
+	auto r = pci_host_device::memory_space_config();
+	r.emplace_back(std::make_pair(AS_PCI_IO,     &m_superio_space_config));
+	return r;
 }
 
 void mediagx_host_device::device_start()
 {
 	pci_host_device::device_start();
+	memory_space = &m_host_cpu->space(AS_PROGRAM);
+	io_space = &m_host_cpu->space(AS_IO);
 
 	memory_window_start = 0;
 	memory_window_end   = 0xffffffff;
@@ -32,9 +109,6 @@ void mediagx_host_device::device_start()
 	io_window_start = 0;
 	io_window_end   = 0xffff;
 	io_offset       = 0;
-
-	memory_space = &m_host_cpu->space(AS_PROGRAM);
-	io_space = &m_host_cpu->space(AS_IO);
 
 	m_ram.resize(m_ram_size/4);
 }
@@ -51,6 +125,8 @@ void mediagx_host_device::device_reset()
 
 	m_pci_arbitration[0] = 0x80;
 	m_pci_arbitration[1] = 0x00;
+
+	m_superio_lock = true;
 
 	remap_cb();
 }
@@ -89,15 +165,40 @@ void mediagx_host_device::map_extra(
 
 	regenerate_config_mapping();
 
+	io_space->install_readwrite_handler(0x22, 0x23,
+		read8sm_delegate(*this, FUNC(mediagx_host_device::superio_if_r)),
+		write8sm_delegate(*this, FUNC(mediagx_host_device::superio_if_w))
+	);
+
 	memory_space->install_ram(0x00000000, 0x0009ffff, &m_ram[0x00000000/4]);
 //  memory_space->install_ram(0x000a0000, 0x000bffff, &m_ram[0x000a0000/4]);
-	// temp
+	// FIXME: BC_XMAP_* regs
 	memory_space->install_ram(0x000c0000, 0x000dffff, &m_ram[0x000c0000/4]);
 
 	memory_space->install_ram          (0x00100000, 0x00efffff, &m_ram[0x00100000/4]);
-	// memory hole at 15-16 mbytes
+	// TODO: verify if there's a memory hole 15M-16M like other x86 PCI hosts
 	//if(memory_hole_upper)
 		memory_space->install_ram      (0x00f00000, 0x00ffffff, &m_ram[0x00f00000/4]);
 
 	memory_space->install_ram          (0x01000000, m_ram_size-1, &m_ram[0x01000000/4]);
+
+	const u32 gx_base = (m_superio.gcr & 3) << 30;
+
+	if (gx_base)
+	{
+		LOG("gxbase mapped at %08x\n", gx_base);
+		memory_space->install_device(gx_base, (gx_base) | 0xffffff, *this, &mediagx_host_device::gxbase_map);
+	}
+}
+
+void mediagx_host_device::gxbase_map(address_map &map)
+{
+//	0x001000 scratchpad
+//	0x008000 Internal bus I/F Unit
+//	0x008100 GFX pipeline
+//	0x008300 Display controller
+//	0x008400 Memory controller
+//	0x008500 Power Management
+//	0x400000 SMM System Code
+//	0x800000 GFX memory
 }
