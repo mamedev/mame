@@ -2695,20 +2695,35 @@ inline void taito_f3_state::f3_drawgfx(bitmap_rgb32 &dest_bmp, const rectangle &
 		//logerror("sprite draw at %f %f size %f %f\n", sprite.x/16.0, sprite.y/16.0, sprite.zoomx/16.0, sprite.zoomy/16.0);
 		
 		for (int y=0; y<16; y++) {
-			int dy = ( sprite.y * 16 + (y+8) * sprite.zoomy )/256;
+			int dy = ( sprite.y * 16 + (y) * sprite.zoomy )/256;
 			if (dy < myclip.min_y || dy > myclip.max_y)
 				continue;
 			u8 *pri = &m_pri_alp_bitmap.pix(dy);
 			u32 *dest = &dest_bmp.pix(dy);
 			auto src = &code_base[(sprite.flipy ? 15-y : y)*16];
+			// maybe we do something with like..
+			// iterate over screen pixels and
+			// like start at `sx % (1<<4)`, then increment by 1 each time
+			// or i mean, no  like
+			// figure out how much you need to add..
+			// god fuck i cant think ever EVER this will NEVER be solved
 			for (int x=0; x<16; x++) {
-				int dx = ( sprite.x * 16 + (x+8) * sprite.zoomx )/256;
+				int dx = ( sprite.x * 16 + (x) * sprite.zoomx + 127)/256;
 				if (dx < myclip.min_x || dx > myclip.max_x)
 					continue;
-				const u8 p = pri[dx];
 				int c = src[(sprite.flipx ? 15-x : x)] & m_sprite_pen_mask;
-				if (c && !p) {
-					dest[dx] = pal[sprite.color<<4 | c];
+				if (c && (!pri[dx] || sprite.zoomy!=0x100 || sprite.zoomx!=0x100)) {
+					if (sprite.zoomy!=0x100 || sprite.zoomx!=0x100) {
+						//logerror("color: %x\n", dest[dx]);
+						if (dest[dx] == 0xFF0000FFUL)
+							dest[dx] = 0xFF00FFFFUL;
+						else if (dest[dx] == 0xFF00FFFFUL)
+							;
+						else
+							dest[dx] = 0xFF0000FFUL;
+					} else {
+						dest[dx] = pal[sprite.color<<4 | c];
+					}
 					pri[dx] = 1;
 				}
 			}
@@ -2910,8 +2925,8 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 		const int tile = spr[0] | (BIT(spr[5], 0) << 16);
 		if (!tile) continue;
 		
-		fixed4 tx = m_flipscreen ? 512 - x.block_size - x.pos : x.pos;
-		fixed4 ty = m_flipscreen ? 256 - y.block_size - y.pos : y.pos;
+		fixed4 tx = m_flipscreen ? (512<<4) - x.block_size - x.pos : x.pos;
+		fixed4 ty = m_flipscreen ? (256<<4) - y.block_size - y.pos : y.pos;
 
 		if (tx + x.block_size <= visarea.min_x<<4 || tx > visarea.max_x<<4 || ty + y.block_size <= visarea.min_y<<4 || ty > visarea.max_y<<4)
 			continue;
