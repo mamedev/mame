@@ -104,8 +104,6 @@ public:
 	// construction/destruction
 	virtual ~device_kim1bus_card_interface();
 
-	device_kim1bus_card_interface *next() const { return m_next; }
-
 	// inline configuration
 	void set_kim1bus(kim1bus_device *kim1bus, const char *slottag) { m_kim1bus = kim1bus; m_kim1bus_slottag = slottag; }
 	template <typename T> void set_onboard(T &&kim1bus) { m_kim1bus_finder.set_tag(std::forward<T>(kim1bus)); m_kim1bus_slottag = device().tag(); }
@@ -128,7 +126,6 @@ private:
 	optional_device<kim1bus_device> m_kim1bus_finder;
 	kim1bus_device *m_kim1bus;
 	const char *m_kim1bus_slottag;
-	device_kim1bus_card_interface *m_next;
 };
 
 #endif  // MAME_BUS_KIM1_KIM1BUS_H

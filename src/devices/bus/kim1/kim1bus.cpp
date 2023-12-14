@@ -139,7 +139,7 @@ void kim1bus_device::nmi_w(int state) { m_out_nmi_cb(state); }
 device_kim1bus_card_interface::device_kim1bus_card_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device, "kim1bus")
 	, m_kim1bus_finder(device, finder_base::DUMMY_TAG), m_kim1bus(nullptr)
-	, m_kim1bus_slottag(nullptr), m_next(nullptr)
+	, m_kim1bus_slottag(nullptr)
 {
 }
 
