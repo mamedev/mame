@@ -2703,10 +2703,10 @@ inline void taito_f3_state::f3_drawgfx(bitmap_rgb32 &dest_bmp, const rectangle &
 			auto src = &code_base[(sprite.flipy ? 15-y : y)*16];
 			
 			for (int x=0; x<16; x++) {
-				int dx = ( sprite.x * 16 + (x) * sprite.zoomx + 127)/256;
+				int dx = ( sprite.x * 16 + (x) * sprite.zoomx + 128)/256;
 				if (dx < myclip.min_x || dx > myclip.max_x)
 					continue;
-				int dx2 = ( sprite.x * 16 + (x+1) * sprite.zoomx + 127)/256;
+				int dx2 = ( sprite.x * 16 + (x+1) * sprite.zoomx + 128)/256;
 				if (dx2==dx)
 					continue;
 				int c = src[(sprite.flipx ? 15-x : x)] & m_sprite_pen_mask;
@@ -2714,20 +2714,6 @@ inline void taito_f3_state::f3_drawgfx(bitmap_rgb32 &dest_bmp, const rectangle &
 					dest[dx] = pal[sprite.color<<4 | c];
 					pri[dx] = 1;
 				}
-				/*if (c && (!pri[dx] || sprite.zoomy!=0x100 || sprite.zoomx!=0x100)) {
-					if (sprite.zoomy!=0x100 || sprite.zoomx!=0x100) {
-						//logerror("color: %x\n", dest[dx]);
-						if (dest[dx] == 0xFF0000FFUL)
-							dest[dx] = 0xFF00FFFFUL;
-						else if (dest[dx] == 0xFF00FFFFUL)
-							;
-						else
-							dest[dx] = 0xFF0000FFUL;
-					} else {
-						dest[dx] = pal[sprite.color<<4 | c];
-					}
-					pri[dx] = 1;
-					}*/
 			}
 		}
 		
