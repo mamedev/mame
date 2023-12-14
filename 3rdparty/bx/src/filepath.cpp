@@ -224,6 +224,7 @@ namespace bx
 		bool result = _NSGetExecutablePath(_out, &len);
 		return 0 == result;
 #else
+		BX_UNUSED(_out, _inOutSize);
 		return false;
 #endif // BX_PLATFORM_*
 	}
