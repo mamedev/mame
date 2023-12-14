@@ -12,7 +12,7 @@ NOTE: It triggers an NMI when the power switch is changed from ON to MEMORY.
 If this is not done, NVRAM won't save properly.
 
 TODO:
-- if/when MAME supports an exit callback, hook up power-off NMI to that
+- if/when MAME supports an exit callback, hook up power-off switch to that
 - verify Concord II MCU speed, the only videos online (for hearing sound pitch)
   are from the Tandy 1650 ones
 
@@ -283,7 +283,7 @@ static INPUT_PORTS_START( enterp )
 	PORT_START("IN.2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
 
-	PORT_START("POWER")
+	PORT_START("POWER") // needs to be triggered for nvram to work
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, compan2_state, power_off, 0) PORT_NAME("Power Off")
 INPUT_PORTS_END
 

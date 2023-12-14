@@ -12,7 +12,7 @@ NOTE: It triggers an NMI when the power switch is changed from ON to SAVE.
 If this is not done, NVRAM won't save properly.
 
 TODO:
-- if/when MAME supports an exit callback, hook up power-off NMI to that
+- if/when MAME supports an exit callback, hook up power-off switch to that
 - dump/add model 210.C (it has two small LCDs like Sphinx Galaxy)
 
 Hardware notes:

@@ -26,7 +26,7 @@ real one (updated MM II engine) didn't get further than a prototype.
 
 Before Rebell 5,0, Ed Schröder's developed his Rebel engine on the more limited MM II
 hardware that only has 4KB RAM. This program was never officially released in a Mephisto
-chess computer, but it competed in the amateur division at the 1985 WMCCC in Amsterdam.
+chess computer, but it competed in the amateur division of the 1985 WMCCC in Amsterdam.
 
 Mephisto 4 Turbo Kit 18mhz - (mm4tk)
 This is a replacement ROM combining the Turbo Kit initial ROM with the original MM IV.
@@ -479,8 +479,8 @@ ROM_END
 
 ROM_START( rebelp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("white_l7", 0x8000, 0x4000, CRC(9a45e1d4) SHA1(26e4c9cd1afe9aea0e8cfc25bdc9138bd99d5992) )
-	ROM_LOAD("green_r7", 0xc000, 0x4000, CRC(2285af5e) SHA1(bea22e32b65eea5fa7617d9d1b3a824a7affe678) )
+	ROM_LOAD("l7", 0x8000, 0x4000, CRC(9a45e1d4) SHA1(26e4c9cd1afe9aea0e8cfc25bdc9138bd99d5992) )
+	ROM_LOAD("r7", 0xc000, 0x4000, CRC(2285af5e) SHA1(bea22e32b65eea5fa7617d9d1b3a824a7affe678) )
 ROM_END
 
 

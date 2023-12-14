@@ -34794,6 +34794,12 @@ sfortec1                        //
 nsnova
 supremo
 
+@source:novag/svip.cpp
+nsvip
+nsvipa
+nsvipb
+nsvipc
+
 @source:novation/basssta.cpp
 bassstr                         //
 sbasssta                        //
