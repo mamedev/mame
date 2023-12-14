@@ -59,7 +59,6 @@ Paste test:
 
 TODO:
 - LEDs should be dark at startup (RS key to activate)
-- slots for expansion & application ports
 - add TTY support
 
 ******************************************************************************/
@@ -232,7 +231,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(kim1_state::cassette_input)
 {
 	double tap_val = m_cass->input();
 
-	if (tap_val <= 0)
+	if (tap_val <= 0.0)
 	{
 		if (m_cassette_high_count)
 		{
@@ -241,7 +240,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(kim1_state::cassette_input)
 		}
 	}
 
-	if (tap_val > 0)
+	if (tap_val > 0.0)
 		m_cassette_high_count++;
 }
 

@@ -10,7 +10,7 @@ NOTE: nsnova does an NMI at power-off (or power-failure). If this isn't done,
 NVRAM won't work properly (supremo doesn't have NVRAM).
 
 TODO:
-- if/when MAME supports an exit callback, hook up nsnova power-off NMI to that
+- if/when MAME supports an exit callback, hook up nsnova power-off switch to that
 - serial port isn't working, same problem as nsvip
 - unmapped reads from 0x33/0x34 (nsnova) or 0x3c/0x3d (supremo)
 - supremo unmapped writes to 0x2000/0x6000, always 0?

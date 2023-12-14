@@ -17,7 +17,7 @@ connects to the Novag Super System Distributor, which can then connect to an
 external chessboard, TV interface, computer, etc.
 
 Hardware notes:
-- Hitachi HD63A03YF @ 9.83MHz
+- Hitachi HD63A03YF (mode 2) @ 9.83MHz
 - 32KB ROM(TC57256AD-12), 2KB RAM(TC5517CFL-20)
 - LCD with 4 digits and custom segments, no LCD chip
 - RJ-12 port, 24 buttons, piezo
