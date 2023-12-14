@@ -75,8 +75,9 @@ AI-8003  Pinpon Music Melody
 			</dataarea>
 		</part>
 		<part name="cass" interface="cass">
-			<dataarea name="cass" size="1">
-				<rom name="alice world (1986)" size="1" status="nodump"/>
+			<!-- Side A, side B is empty -->
+			<dataarea name="cass" size="70982226">
+				<rom name="alice world (1986).flac" size="70982226" crc="d49d9a74" sha1="40e7c48217dd44156de6126521ea6fd25056a4f1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -95,6 +96,21 @@ AI-8003  Pinpon Music Melody
 			</dataarea>
 			<dataarea name="overlay" size="123253">
 				<rom name="robinson land.jpg" size="123253" crc="195302a2" sha1="b5bcc0cf55ac8779f70717b350b0942c96b2ba74"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robinsona" cloneof="robinson" supported="no">
+		<description>Robinson Land (1987)</description>
+		<year>1987</year>
+		<publisher>Sega</publisher>
+		<notes>Cassette is not supported yet.</notes>
+		<info name="alt_title" value="ろびんそん・らんど"/>
+		<!-- No overlay. -->
+		<part name="cass" interface="cass">
+			<!-- Side A, side B is empty -->
+			<dataarea name="cass" size="61534605">
+				<rom name="robinson land (1987).flac" size="61534605" crc="9c7b099d" sha1="e196aafd6b3d4ec90c234205e0a9a6a1696ed38b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -132,8 +148,9 @@ AI-8003  Pinpon Music Melody
 			</dataarea>
 		</part>
 		<part name="cass" interface="cass">
-			<dataarea name="cass" size="1">
-				<rom name="cosmic train (1987)" size="1" status="nodump"/>
+			<!-- Side A, side B is empty -->
+			<dataarea name="cass" size="120000310">
+				<rom name="cosmic train (1987).flac" size="120000310" crc="144f9204" sha1="3d8a0ec86c6e4515857853fedd34588a2545249e"/>
 			</dataarea>
 		</part>
 	</software>
