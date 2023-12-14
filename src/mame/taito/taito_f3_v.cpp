@@ -256,6 +256,7 @@ Playfield tile info:
 #define TAITOF3_VIDEO_DEBUG 0
 
 typedef int fixed4;
+typedef int fixed8;
 
 // Game specific data - some of this can be removed when the software values are figured out
 struct taito_f3_state::F3config
@@ -2695,26 +2696,28 @@ inline void taito_f3_state::f3_drawgfx(bitmap_ind16 &dest_bmp, const rectangle &
 		const u8 *code_base = gfx->get_data(sprite.code % gfx->elements());
 
 		//logerror("sprite draw at %f %f size %f %f\n", sprite.x/16.0, sprite.y/16.0, sprite.zoomx/16.0, sprite.zoomy/16.0);
-
-		int dy8 = (sprite.y << 4);
-		for (int y=0; y<16; y++) {
+		u8 flipx = sprite.flipx ? 0xF : 0;
+		u8 flipy = sprite.flipy ? 0xF : 0;
+		
+		fixed8 dy8 = (sprite.y << 4);
+		for (u8 y=0; y<16; y++) {
 			int dy = dy8 >> 8;
 			dy8 += sprite.zoomy;
 			if (dy < myclip.min_y || dy > myclip.max_y)
 				continue;
 			u8 *pri = &m_pri_alp_bitmap.pix(dy);
 			u16* dest = &dest_bmp.pix(dy);
-			auto src = &code_base[(sprite.flipy ? 15-y : y)*16];
+			auto src = &code_base[(y ^ flipy)*16];
 
-			int dx8 = (sprite.x << 4) + 128; // 128 is ½ in fixed.8
-			for (int x=0; x<16; x++) {
+			fixed8 dx8 = (sprite.x << 4) + 128; // 128 is ½ in fixed.8
+			for (u8 x=0; x<16; x++) {
 				int dx = dx8 >> 8;
 				dx8 += sprite.zoomx;
 				if (dx < myclip.min_x || dx > myclip.max_x)
 					continue;
 				if (dx == dx8 >> 8) // if the next pixel would be in the same column, skip this one
 					continue;
-				int c = src[(sprite.flipx ? 15-x : x)] & m_sprite_pen_mask;
+				int c = src[(x ^ flipx)] & m_sprite_pen_mask;
 				if (c && !pri[dx]) {
 					dest[dx] = gfx->colorbase() + (sprite.color<<4 | c);
 					pri[dx] = 1;
@@ -2728,7 +2731,7 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 {
 	struct sprite_axis
 	{
-		u16 block_size = 0x100;
+		fixed8 block_size = 0x100;
 		fixed4 pos = 0, block_pos = 0;
 		s16 global = 0, subglobal = 0;
 		void update(u8 scroll, u16 posw, bool lock, u8 block_ctrl, u8 new_zoom)
