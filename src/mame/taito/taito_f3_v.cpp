@@ -2701,18 +2701,20 @@ inline void taito_f3_state::f3_drawgfx(bitmap_rgb32 &dest_bmp, const rectangle &
 			u8 *pri = &m_pri_alp_bitmap.pix(dy);
 			u32 *dest = &dest_bmp.pix(dy);
 			auto src = &code_base[(sprite.flipy ? 15-y : y)*16];
-			// maybe we do something with like..
-			// iterate over screen pixels and
-			// like start at `sx % (1<<4)`, then increment by 1 each time
-			// or i mean, no  like
-			// figure out how much you need to add..
-			// god fuck i cant think ever EVER this will NEVER be solved
+			
 			for (int x=0; x<16; x++) {
 				int dx = ( sprite.x * 16 + (x) * sprite.zoomx + 127)/256;
 				if (dx < myclip.min_x || dx > myclip.max_x)
 					continue;
+				int dx2 = ( sprite.x * 16 + (x+1) * sprite.zoomx + 127)/256;
+				if (dx2==dx)
+					continue;
 				int c = src[(sprite.flipx ? 15-x : x)] & m_sprite_pen_mask;
-				if (c && (!pri[dx] || sprite.zoomy!=0x100 || sprite.zoomx!=0x100)) {
+				if (c && !pri[dx]) {
+					dest[dx] = pal[sprite.color<<4 | c];
+					pri[dx] = 1;
+				}
+				/*if (c && (!pri[dx] || sprite.zoomy!=0x100 || sprite.zoomx!=0x100)) {
 					if (sprite.zoomy!=0x100 || sprite.zoomx!=0x100) {
 						//logerror("color: %x\n", dest[dx]);
 						if (dest[dx] == 0xFF0000FFUL)
@@ -2725,7 +2727,7 @@ inline void taito_f3_state::f3_drawgfx(bitmap_rgb32 &dest_bmp, const rectangle &
 						dest[dx] = pal[sprite.color<<4 | c];
 					}
 					pri[dx] = 1;
-				}
+					}*/
 			}
 		}
 		
