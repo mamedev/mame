@@ -2693,21 +2693,24 @@ inline void taito_f3_state::f3_drawgfx(bitmap_rgb32 &dest_bmp, const rectangle &
 		const u8 *code_base = gfx->get_data(sprite.code % gfx->elements());
 
 		//logerror("sprite draw at %f %f size %f %f\n", sprite.x/16.0, sprite.y/16.0, sprite.zoomx/16.0, sprite.zoomy/16.0);
-		
+
+		int dy8 = (sprite.y << 4);
 		for (int y=0; y<16; y++) {
-			int dy = ( sprite.y * 16 + (y) * sprite.zoomy )/256;
+			int dy = dy8 >> 8;
+			dy8 += sprite.zoomy;
 			if (dy < myclip.min_y || dy > myclip.max_y)
 				continue;
 			u8 *pri = &m_pri_alp_bitmap.pix(dy);
 			u32 *dest = &dest_bmp.pix(dy);
 			auto src = &code_base[(sprite.flipy ? 15-y : y)*16];
-			
+
+			int dx8 = (sprite.x << 4) + 128; // 128 is ½ in fixed.8
 			for (int x=0; x<16; x++) {
-				int dx = ( sprite.x * 16 + (x) * sprite.zoomx + 128)/256;
+				int dx = dx8 >> 8;
+				dx8 += sprite.zoomx;
 				if (dx < myclip.min_x || dx > myclip.max_x)
 					continue;
-				int dx2 = ( sprite.x * 16 + (x+1) * sprite.zoomx + 128)/256;
-				if (dx2==dx)
+				if (dx == dx8 >> 8) // if the next pixel would be in the same column, skip this one
 					continue;
 				int c = src[(sprite.flipx ? 15-x : x)] & m_sprite_pen_mask;
 				if (c && !pri[dx]) {
@@ -2716,102 +2719,6 @@ inline void taito_f3_state::f3_drawgfx(bitmap_rgb32 &dest_bmp, const rectangle &
 				}
 			}
 		}
-		
-		/*{
-			fixed4 sx = sprite.x;
-			fixed4 sy = sprite.y;
-			fixed4 ex = sx + sprite.zoomx;
-			fixed4 ey = sy + sprite.zoomy;
-			
-			// compute sprite increment per screen pixel
-			// as: fixed.12 = (fixed.16 ÷ fixed.4)
-			int dx = (16 << 16) / sprite.zoomx;
-			int dy = (16 << 16) / sprite.zoomy;
-			// as: fixed.16 = (fixed.12 × fixed.4)
-			int x_index_base;
-			int y_index;
-
-			if (sprite.flipx)
-			{
-				//x_index_base = (sprite.zoomx - (1<<4)) * dx;
-				x_index_base = (16 << 16) - (dx<<4);
-				dx = -dx;
-			}
-			else
-			{
-				x_index_base = 0;
-			}
-
-			if (sprite.flipy)
-			{
-				//x_index_base = (sprite.zoomy - (1<<4)) * dy;
-				y_index = (16 << 16) - (dy<<4);
-				dy = -dy;
-			}
-			else
-			{
-				y_index = 0;
-			}
-
-			fixed4 min_x = myclip.min_x<<4;
-			fixed4 min_y = myclip.min_y<<4;
-			fixed4 max_x = myclip.max_x<<4;
-			fixed4 max_y = myclip.max_y<<4;
-			
-			if (sx < min_x)
-			{ // clip left
-				fixed4 pixels = min_x - sx;
-				sx += pixels;
-				x_index_base += pixels * dx;
-			}
-			if (sy < min_y)
-			{ // clip top
-				fixed4 pixels = min_y - sy;
-				sy += pixels;
-				y_index += pixels * dy;
-			}
-			// NS 980211 - fixed incorrect clipping
-			if (ex > max_x + 1)
-			{ // clip right
-				fixed4 pixels = ex - max_x - 1;
-				ex -= pixels;
-			}
-			if (ey > max_y + 1)
-			{ // clip bottom
-				fixed4 pixels = ey - max_y - 1;
-				ey -= pixels;
-			}
-
-			if (ex > sx)
-			{ // skip if inner loop doesn't draw anything
-//              if (dest_bmp.bpp == 32)
-				{
-					for (fixed4 y = sy; y < ey; y+=1<<4)
-					{
-						const u8 *source = code_base + (y_index >> 16) * 16;
-						u32 *dest = &dest_bmp.pix(y>>4);
-						u8 *pri = &m_pri_alp_bitmap.pix(y>>4);
-
-						int x_index = x_index_base;
-						for (fixed4 x = sx; x < ex; x+=1<<4)
-						{
-							int c = source[x_index >> 16] & m_sprite_pen_mask;
-							if (c)
-							{
-								const u8 p = pri[x>>4];
-								if (p == 0)
-								{
-									dest[x>>4] = pal[sprite.color<<4 | c];
-									pri[x>>4] = 1; // yea
-								}
-							}
-							x_index += dx<<4;
-						}
-						y_index += dy<<4;
-					}
-				}
-			}
-			}*/
 	}
 }
 
