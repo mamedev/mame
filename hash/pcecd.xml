@@ -374,7 +374,7 @@ https://www.unseen64.net/2021/01/04/angelus2-holynight-pcengine-cancelled/
 		<info name="release" value="19941125"/>
 		<info name="alt_title" value="バトルフィールド 新日本プロレスリング'94 BATTLEFIELD IN 闘強導夢"/>
 		<info name="usage" value="CD-ROM² Arcade System Card required" />
-		<sharedfeat name="requirement" value="acardpro"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="battlefield '94 in tokyo dome (acd)(jpn)" sha1="866e90f08cee3c5820b148f6c2c0791f5972ff51"/>
@@ -1413,7 +1413,7 @@ Returns to intro when pressing Run button on title (player has to hold start in 
 		<info name="release" value="19940715"/>
 		<info name="alt_title" value="栄冠は君に"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
-		<sharedfeat name="requirement" value="acardpro"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="eikan ha kimini - koukou yakyuu zenkoku taikai (acd, scd)(jpn)" sha1="4920b87a8ee81abafcdf568ffa3a6761d7c97ac8"/>
@@ -1675,7 +1675,7 @@ Cheat: Up, up, up, down, down, down, II, II, II, I, I, I during intro for "debug
 		<info name="release" value="19950203"/>
 		<info name="alt_title" value="ファイプロ女子憧夢超女大戦 全女vsJWP"/>
 		<info name="usage" value="CD-ROM² Arcade System Card required" />
-		<sharedfeat name="requirement" value="acardpro"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="fire pro joshi - dome choujo taisen (acd)(jpn)" sha1="a2a2e4108eed453e95f080b746b0797117b886e9"/>
@@ -1941,7 +1941,7 @@ Unsupported [セーブくん] joypad slot peripheral
 		<info name="release" value="19940212"/>
 		<info name="alt_title" value="餓狼伝説2 体験版"/>
 		<info name="usage" value="CD-ROM² Arcade System Card required" />
-		<sharedfeat name="requirement" value="acardpro"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="garou densetsu ii - aratanaru tatakai - sample disc (acd)(jpn)" sha1="978720b488736828bff3d7ecf2f738aec4aa3f36"/>
@@ -1957,7 +1957,7 @@ Unsupported [セーブくん] joypad slot peripheral
 		<info name="release" value="19940312"/>
 		<info name="alt_title" value="餓狼伝説2"/>
 		<info name="usage" value="CD-ROM² Arcade System Card required" />
-		<sharedfeat name="requirement" value="acardpro"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="garou densetsu ii - aratanaru tatakai [imperfect] (acd)(jpn)" sha1="b5d2dedf90a5b90c4d2b588e5f6985b8f38e18b5"/>
@@ -1973,7 +1973,7 @@ Unsupported [セーブくん] joypad slot peripheral
 		<info name="release" value="19941202"/>
 		<info name="alt_title" value="餓狼伝説スペシャル"/>
 		<info name="usage" value="CD-ROM² Arcade System Card required" />
-		<sharedfeat name="requirement" value="acardpro"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="garou densetsu special (acd)(jpn)" sha1="3d43a9d59e3a894580a4bbabc85ee0757b09d84a"/>
@@ -2037,7 +2037,7 @@ Unsupported [セーブくん] joypad slot peripheral
 		<info name="release" value="19951124"/>
 		<info name="alt_title" value="銀河婦警伝説サファイア"/>
 		<info name="usage" value="CD-ROM² Arcade System Card required" />
-		<sharedfeat name="requirement" value="acardpro"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="ginga fukei densetsu sapphire (acd)(jpn)" sha1="5fe3b477286a60e47c367f8dd4d662557a62588b"/>
@@ -2505,7 +2505,7 @@ New game intro sports glitchy portraits
 		<info name="release" value="19950224"/>
 		<info name="alt_title" value="雀神伝説"/>
 		<info name="usage" value="CD-ROM² Arcade System Card required" />
-		<sharedfeat name="requirement" value="acardpro"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="janshin densetsu - quest of jongmaster (acd)(jpn)" sha1="afade5dd161d71ae646f3d2361aef56100362160"/>
@@ -3197,7 +3197,7 @@ Verify [redbook] lip sync and repeat (uses track mode)
 		<info name="release" value="19940915"/>
 		<info name="alt_title" value="マッドストーカー フルメタルフォース"/>
 		<info name="usage" value="CD-ROM² Arcade System Card required" />
-		<sharedfeat name="requirement" value="acardpro"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="mad stalker - full metal force (acd)(jpn)" sha1="c2c1fdb935068405154eca2ab6a4ed68985353dd"/>
@@ -3210,7 +3210,7 @@ Verify [redbook] lip sync and repeat (uses track mode)
 		<year>1994</year>
 		<publisher>NEC Home Electronics</publisher>
 		<info name="usage" value="CD-ROM² Arcade System Card required" />
-		<sharedfeat name="requirement" value="acardpro"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="mad stalker - full metal force - sample disc (acd)(jpn)" sha1="3ee9dd98aa62dac638dc20f22f67029120a1d6d6"/>
@@ -3226,7 +3226,7 @@ Verify [redbook] lip sync and repeat (uses track mode)
 		<info name="release" value="19961213"/>
 		<info name="alt_title" value="魔導物語I 炎の卒園児"/>
 		<info name="usage" value="CD-ROM² Arcade System Card required" />
-		<sharedfeat name="requirement" value="acardpro"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="madou monogatari i - honou no sotsuenji [imperfect] (acd)(jpn)" sha1="b0af74f366ca5284fb9447df1a456e7f624250f0"/>
@@ -4912,7 +4912,7 @@ Hangs on technique screen after level select (assuming you pick them up in stage
 		<info name="release" value="19940326"/>
 		<info name="alt_title" value="龍虎の拳"/>
 		<info name="usage" value="CD-ROM² Arcade System Card required" />
-		<sharedfeat name="requirement" value="acardpro"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="ryuuko no ken (acd)(jpn)" sha1="50c2a68d3b1ab99802ec865af901e8454df62fc4"/>
@@ -4925,7 +4925,7 @@ Hangs on technique screen after level select (assuming you pick them up in stage
 		<year>1994</year>
 		<publisher>Hudson</publisher>
 		<info name="usage" value="CD-ROM² Arcade System Card required" />
-		<sharedfeat name="requirement" value="acardpro"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="ryuuko no ken - sample disc (acd)(jpn)" sha1="d1c5f36592565e3284bdc970b673fd7b577ad784"/>
@@ -5738,7 +5738,7 @@ Eventually hangs requiring a transfer ready irq [SCSI] (untested)
 		<info name="release" value="19940922"/>
 		<info name="alt_title" value="ストライダー飛竜"/>
 		<info name="usage" value="CD-ROM² Arcade System Card required" />
-		<sharedfeat name="requirement" value="acardpro"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="strider hiryuu (acd)(jpn)" sha1="55730fca43667b79ca69a22092ddeb9e47f8eac4"/>
@@ -6183,7 +6183,7 @@ Eventually hangs requiring a transfer ready irq [SCSI] (untested)
 		<info name="release" value="19950224"/>
 		<info name="alt_title" value="カブキ一刀涼談"/>
 		<info name="usage" value="CD-ROM² Arcade System Card required" />
-		<sharedfeat name="requirement" value="acardpro"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="tengai makyou - kabuki ittou ryoudan (acd)(jpn)" sha1="0ebc331c4d7d963f4a6553e6f2020fa5a1031753"/>
@@ -6893,7 +6893,7 @@ Hangs or resets after giving yes to "Is it OK?" prompt (fixed)
 		<info name="release" value="19940604"/>
 		<info name="alt_title" value="ワールドヒーローズ2"/>
 		<info name="usage" value="CD-ROM² Arcade System Card required" />
-		<sharedfeat name="requirement" value="acardpro"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="world heroes ii (acd)(jpn)" sha1="67e7c559c1be2034502cb63efea6881fcc6b8e5a"/>
@@ -6907,7 +6907,7 @@ Hangs or resets after giving yes to "Is it OK?" prompt (fixed)
 		<publisher>Hudson</publisher>
 		<info name="alt_title" value="ワールドヒーローズ2 体験版"/>
 		<info name="usage" value="CD-ROM² Arcade System Card required" />
-		<sharedfeat name="requirement" value="acardpro"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="world heroes ii - sample disc (acd)(jpn)" sha1="b3b8bcd66f58ee57f0e7473df1549f51e9096ade"/>
