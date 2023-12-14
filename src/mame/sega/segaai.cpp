@@ -727,6 +727,7 @@ void segaai_state::segaai(machine_config &config)
 	// Built-in cassette
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->set_interface("cass");
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.70);
 
 	config.set_default_layout(layout_segaai);
