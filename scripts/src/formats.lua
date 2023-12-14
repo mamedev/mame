@@ -37,6 +37,8 @@ project "formats"
 
 		MAME_DIR .. "src/lib/formats/cassimg.cpp",
 		MAME_DIR .. "src/lib/formats/cassimg.h",
+		MAME_DIR .. "src/lib/formats/flacfile.cpp",
+		MAME_DIR .. "src/lib/formats/flacfile.h",
 		MAME_DIR .. "src/lib/formats/wavfile.cpp",
 		MAME_DIR .. "src/lib/formats/wavfile.h",
 

@@ -191,6 +191,7 @@ public:
 
 	// builtin formats
 	static const Format wavfile_format;
+	static const Format flacfile_format;
 
 private:
 	struct manipulation_ranges;
@@ -224,7 +225,8 @@ private:
 #define CASSETTE_FORMATLIST_START(name)     \
 	const cassette_image::Format *const name[] =    \
 	{                                       \
-		&cassette_image::wavfile_format,
+		&cassette_image::wavfile_format,    \
+		&cassette_image::flacfile_format,
 #define CASSETTE_FORMAT(name)               \
 		&(name),
 #define CASSETTE_FORMATLIST_END             \
