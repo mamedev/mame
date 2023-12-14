@@ -215,9 +215,8 @@ protected:
 		// alpha mode in 6000
 		// line enable, clip settings in 7400
 		// priority in 7600
-
-		// TODO: change to ind16 when rewriting draw_sprites
-		bitmap_rgb32 srcbitmap{};
+		
+		bitmap_ind16 srcbitmap{};
 
 		bool brightness; // 7400 0xf000
 	};
@@ -411,7 +410,7 @@ protected:
 
 	void tile_decode();
 
-	inline void f3_drawgfx(bitmap_rgb32 &dest_bmp, const rectangle &clip, gfx_element *gfx, const tempsprite &sprite);
+	inline void f3_drawgfx(bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx, const tempsprite &sprite);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void get_sprite_info(const u16 *spriteram16_ptr);
 	void print_debug_info(bitmap_rgb32 &bitmap);
