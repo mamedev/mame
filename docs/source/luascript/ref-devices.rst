@@ -553,6 +553,12 @@ image:display()
     Returns a “front panel display” string for the device, if supported.  This
     can be used to show status information, like the current head position or
     motor state.
+image:add_media_change_notifier(callback)
+    Add a callback to receive notifications when a media image is loaded or
+    unloaded for the device.  The callback is passed a single string argument
+    which will be ``"loaded"`` if a media image has been loaded or
+    ``"unloaded"`` if the previously loaded media image has been unloaded.
+    Returns a :ref:`notifier subscription <luascript-ref-notifiersub>`.
 
 Properties
 ~~~~~~~~~~

@@ -1,7 +1,7 @@
 // Windows/TimeUtils.h
 
-#ifndef __WINDOWS_TIME_UTILS_H
-#define __WINDOWS_TIME_UTILS_H
+#ifndef ZIP7_INC_WINDOWS_TIME_UTILS_H
+#define ZIP7_INC_WINDOWS_TIME_UTILS_H
 
 #include "../Common/MyTypes.h"
 #include "../Common/MyWindows.h"

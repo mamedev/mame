@@ -4,7 +4,13 @@
 
 #include "../../../Common/MyWindows.h"
 
+#if defined(__MINGW32__) || defined(__MINGW64__)
+#include <shlwapi.h>
+#else
 #include <Shlwapi.h>
+#endif
+
+#include "../../../../C/DllSecur.h"
 
 #include "../../../Common/MyInitGuid.h"
 
@@ -28,33 +34,36 @@
 #include "../../UI/GUI/ExtractGUI.h"
 #include "../../UI/GUI/ExtractRes.h"
 
-#include "../../../../C/DllSecur.h"
-
 using namespace NWindows;
 using namespace NFile;
 using namespace NDir;
 
+extern
+HINSTANCE g_hInstance;
 HINSTANCE g_hInstance;
 
 #ifndef UNDER_CE
 
+static
 DWORD g_ComCtl32Version;
 
 static DWORD GetDllVersion(LPCTSTR dllName)
 {
   DWORD dwVersion = 0;
-  HINSTANCE hinstDll = LoadLibrary(dllName);
+  const HINSTANCE hinstDll = LoadLibrary(dllName);
   if (hinstDll)
   {
-    DLLGETVERSIONPROC pDllGetVersion = (DLLGETVERSIONPROC)GetProcAddress(hinstDll, "DllGetVersion");
-    if (pDllGetVersion)
+    const
+    DLLGETVERSIONPROC func_DllGetVersion = Z7_GET_PROC_ADDRESS(
+    DLLGETVERSIONPROC, hinstDll, "DllGetVersion");
+    if (func_DllGetVersion)
     {
       DLLVERSIONINFO dvi;
       ZeroMemory(&dvi, sizeof(dvi));
       dvi.cbSize = sizeof(dvi);
-      HRESULT hr = (*pDllGetVersion)(&dvi);
+      const HRESULT hr = func_DllGetVersion(&dvi);
       if (SUCCEEDED(hr))
-        dwVersion = MAKELONG(dvi.dwMinorVersion, dvi.dwMajorVersion);
+        dwVersion = (DWORD)MAKELONG(dvi.dwMinorVersion, dvi.dwMajorVersion);
     }
     FreeLibrary(hinstDll);
   }
@@ -63,6 +72,8 @@ static DWORD GetDllVersion(LPCTSTR dllName)
 
 #endif
 
+extern
+bool g_LVN_ITEMACTIVATE_Support;
 bool g_LVN_ITEMACTIVATE_Support = true;
 
 static const wchar_t * const kUnknownExceptionMessage = L"ERROR: Unknown Error!";
@@ -101,7 +112,7 @@ static int APIENTRY WinMain2()
     const UString &s = commandStrings[i];
     if (s.Len() > 1 && s[0] == '-')
     {
-      wchar_t c = MyCharLower_Ascii(s[1]);
+      const wchar_t c = MyCharLower_Ascii(s[1]);
       if (c == 'y')
       {
         assumeYes = true;
@@ -152,7 +163,7 @@ static int APIENTRY WinMain2()
   CMyComPtr<IFolderArchiveExtractCallback> extractCallback = ecs;
   ecs->Init();
 
-  #ifndef _NO_CRYPTO
+  #ifndef Z7_NO_CRYPTO
   ecs->PasswordIsDefined = !password.IsEmpty();
   ecs->Password = password;
   #endif

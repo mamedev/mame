@@ -5,14 +5,17 @@
     nbmj9195 - Nichibutsu Mahjong games for years 1991-1995
 
 ******************************************************************************/
+
 #ifndef MAME_NICHIBUTSU_NBMJ9195_H
 #define MAME_NICHIBUTSU_NBMJ9195_H
 
 #pragma once
 
+#include "nbmjctrl.h"
+
 #include "cpu/z80/tmpz84c011.h"
-#include "nb1413m3.h"      // needed for mahjong input controller
-#include "machine/gen_latch.h"
+#include "machine/74166.h"
+
 #include "emupal.h"
 #include "screen.h"
 
@@ -30,15 +33,20 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch"),
+		m_keys{ { *this, "P1_KEY%u", 0U }, { *this, "P2_KEY%u", 0U } },
+		m_coin(*this, "P%u_COIN", 1U),
+		m_system(*this, "SYSTEM"),
+		m_dsw(*this, "DSW%c", 'A'),
+		m_dsw_shifter(*this, "ttl166_%u", 1U),
 		m_palette_ptr(*this, "paletteram"),
 		m_blit_region(*this, "blitter")
 	{ }
 
-	void NBMJDRV1_base(machine_config &config);
-	void NBMJDRV1(machine_config &config);
-	void NBMJDRV2(machine_config &config);
-	void NBMJDRV3(machine_config &config);
+	int hopper_r();
+
+	void nbmjtype1(machine_config &config);
+	void nbmjtype2(machine_config &config);
+
 	void patimono(machine_config &config);
 	void mjuraden(machine_config &config);
 	void psailor1(machine_config &config);
@@ -68,8 +76,6 @@ public:
 	void ultramhm(machine_config &config);
 	void otatidai(machine_config &config);
 
-	void init_nbmj9195();
-
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -81,16 +87,20 @@ private:
 	required_device<tmpz84c011_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_device<generic_latch_8_device> m_soundlatch;
+	required_ioport_array<5> m_keys[2];
+	optional_ioport_array<2> m_coin;
+	optional_ioport m_system;
+	required_ioport_array<2> m_dsw;
+	optional_device_array<ttl166_device, 2> m_dsw_shifter;
 
 	optional_shared_ptr<uint8_t> m_palette_ptr; //shabdama doesn't use it at least for now
 
 	required_region_ptr<uint8_t> m_blit_region;
 
-	int m_inputport = 0;
-	int m_dipswbitsel = 0;
+	uint8_t m_key_select = 0;
+	int m_dsw_data = 0;
 	int m_outcoin_flag = 0;
-	int m_mscoutm_inputport = 0;
+
 	int m_scrollx[VRAM_MAX];
 	int m_scrolly[VRAM_MAX];
 	int m_scrollx_raster[VRAM_MAX][SCANLINE_MAX];
@@ -119,16 +129,11 @@ private:
 	int m_flipscreen_old[VRAM_MAX];
 	emu_timer *m_blitter_timer = nullptr;
 
-	void soundbank_w(uint8_t data);
-	void inputportsel_w(uint8_t data);
-	uint8_t mscoutm_dipsw_0_r();
-	uint8_t mscoutm_dipsw_1_r();
+	void key_select_w(uint8_t data);
 	uint8_t mscoutm_cpu_portb_r();
 	uint8_t mscoutm_cpu_portc_r();
-	uint8_t others_cpu_porta_r();
 	uint8_t others_cpu_portb_r();
 	uint8_t others_cpu_portc_r();
-	void soundcpu_porte_w(uint8_t data);
 	void palette_w(offs_t offset, uint8_t data);
 	void nb22090_palette_w(offs_t offset, uint8_t data);
 	void blitter_0_w(offs_t offset, uint8_t data);
@@ -141,7 +146,6 @@ private:
 	void gfxflag2_w(uint8_t data);
 	void outcoin_flag_w(uint8_t data);
 	void dipswbitsel_w(uint8_t data);
-	void mscoutm_inputportsel_w(uint8_t data);
 
 	DECLARE_VIDEO_START(_1layer);
 	DECLARE_VIDEO_START(nb22090);
@@ -153,7 +157,6 @@ private:
 	void vramflip(int vram);
 	void update_pixel(int vram, int x, int y);
 	void gfxdraw(int vram);
-	int dipsw_r();
 	void postload();
 
 	void cmehyou_io_map(address_map &map);
@@ -185,8 +188,6 @@ private:
 	void sailorwr_io_map(address_map &map);
 	void sailorws_io_map(address_map &map);
 	void sailorws_map(address_map &map);
-	void sailorws_sound_io_map(address_map &map);
-	void sailorws_sound_map(address_map &map);
 	void yosimotm_io_map(address_map &map);
 	void yosimoto_io_map(address_map &map);
 };

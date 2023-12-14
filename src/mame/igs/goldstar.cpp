@@ -1318,7 +1318,7 @@ void goldstar_state::wcat3_map(address_map &map)
 /* newer / more capable hw */
 void unkch_state::unkch_map(address_map &map)
 {
-	map(0x0000, 0x9fff).rom();
+	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xc1ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xc800, 0xc9ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 
@@ -8713,6 +8713,11 @@ static GFXDECODE_START( gfx_animalhs )
 	GFXDECODE_ENTRY( "gfx2", 0, animalhs_tiles8x32_layout, 128+64, 4 )
 GFXDECODE_END
 
+static GFXDECODE_START( gfx_rolling )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_lsb, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, animalhs_tiles8x32_layout, 0, 16 )
+GFXDECODE_END
+
 
 void wingco_state::system_outputa_w(uint8_t data)
 {
@@ -9782,7 +9787,12 @@ void unkch_state::unkch(machine_config &config)
 	TICKET_DISPENSER(config, m_ticket_dispenser, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 }
 
+void unkch_state::rolling(machine_config &config)
+{
+	unkch(config);
 
+	m_gfxdecode->set_info(gfx_rolling);
+}
 
 // hw unknown - should be somewhat similar to cm
 void goldstar_state::pkrmast(machine_config &config)
@@ -16555,6 +16565,26 @@ ROM_START( unkch4 )  // all roms unique
 ROM_END
 
 
+ROM_START( rolling ) // Z80A + 95101 (AY8910) + Actel A40MX04 + 4 8-dip banks
+	ROM_REGION( 0x10000, "maincpu", 0 ) // two identical ROMs one near the other. Why?
+	ROM_LOAD( "tms27c512.u30", 0x00000, 0x10000, CRC(b4a92b43) SHA1(9e7bca314de40d3fdb4bb470c3da46750ae5fede) )
+	ROM_LOAD( "tms27c512",     0x00000, 0x10000, CRC(b4a92b43) SHA1(9e7bca314de40d3fdb4bb470c3da46750ae5fede) ) // no u location on PCB
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "tms27c010a.u32", 0x00000, 0x20000, CRC(6dc32bf5) SHA1(8bb242040b533bd0105be13ae10dc1cb2b3ff81e) )
+
+	ROM_REGION( 0x40000, "gfx2", 0 )
+	ROM_LOAD( "tms27c020.u33", 0x00000, 0x40000, CRC(ef94ead5) SHA1(92b49181f3a7e6b9054ca28a98d4d22e1ebaaf8f) )
+
+	ROM_REGION( 0xa00, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "palce16v8n.u44", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce16v8n.u45", 0x200, 0x117, NO_DUMP )
+	ROM_LOAD( "palce16v8n.u46", 0x400, 0x117, NO_DUMP )
+	ROM_LOAD( "palce16v8n.u47", 0x600, 0x117, NO_DUMP )
+	ROM_LOAD( "palce20v8h.u48", 0x800, 0x157, NO_DUMP )
+ROM_END
+
+
 ROM_START( cherry96 )  // all roms unique
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "new_96-16-3.u6",  0x00000, 0x10000, CRC(84d5f2fc) SHA1(e3ed0670350920c661c5a40581966671b8a8c7df) )
@@ -20462,6 +20492,8 @@ GAMEL(1999, unkch3,      scmaster,  unkch,    unkch3,    unkch_state,    init_un
 GAMEL(1999, unkch4,      scmaster,  unkch,    unkch4,    unkch_state,    init_unkch4,    ROT0, "bootleg", "Grand Cherry Master (bootleg of Super Cherry Master)",         0,    layout_unkch ) // by 'Toy System' Hungary
 
 GAME( 1996, cherry96,    scmaster,  unkch,    unkch4,    unkch_state,    init_unkch4,    ROT0, "bootleg", "New Cherry '96 (bootleg of New Fruit Bonus?)",                 MACHINE_NOT_WORKING ) // need to be moved to another machine...
+
+GAME( 1998, rolling,     scmaster,  rolling,  unkch4,    unkch_state,    empty_init,     ROT0, "bootleg", "Rolling",                                                      MACHINE_NOT_WORKING ) // inputs, outputs
 
 // this has a 4th reel
 GAME( 200?, ss2001,      0,        ss2001,   cmaster,   cmaster_state,  empty_init,     ROT0, "bootleg", "Super Shanghai 2001",                                          MACHINE_IS_SKELETON ) // TODO: everything

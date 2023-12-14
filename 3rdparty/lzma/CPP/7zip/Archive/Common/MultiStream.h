@@ -1,20 +1,23 @@
 // MultiStream.h
 
-#ifndef __MULTI_STREAM_H
-#define __MULTI_STREAM_H
+#ifndef ZIP7_INC_MULTI_STREAM_H
+#define ZIP7_INC_MULTI_STREAM_H
 
 #include "../../../Common/MyCom.h"
 #include "../../../Common/MyVector.h"
 
 #include "../../IStream.h"
+#include "../../Archive/IArchive.h"
 
-class CMultiStream:
-  public IInStream,
-  public CMyUnknownImp
-{
+Z7_CLASS_IMP_COM_1(
+  CMultiStream
+  , IInStream
+)
+  Z7_IFACE_COM7_IMP(ISequentialInStream)
+
+  unsigned _streamIndex;
   UInt64 _pos;
   UInt64 _totalLength;
-  unsigned _streamIndex;
 
 public:
 
@@ -24,12 +27,12 @@ public:
     UInt64 Size;
     UInt64 GlobalOffset;
     UInt64 LocalPos;
-
     CSubStreamInfo(): Size(0), GlobalOffset(0), LocalPos(0) {}
   };
-  
+
+  CMyComPtr<IArchiveUpdateCallbackFile> updateCallbackFile;
   CObjectVector<CSubStreamInfo> Streams;
-  
+ 
   HRESULT Init()
   {
     UInt64 total = 0;
@@ -37,26 +40,27 @@ public:
     {
       CSubStreamInfo &s = Streams[i];
       s.GlobalOffset = total;
-      total += Streams[i].Size;
-      RINOK(s.Stream->Seek(0, STREAM_SEEK_CUR, &s.LocalPos));
+      total += s.Size;
+      s.LocalPos = 0;
+      {
+        // it was already set to start
+        // RINOK(InStream_GetPos(s.Stream, s.LocalPos));
+      }
     }
     _totalLength = total;
     _pos = 0;
     _streamIndex = 0;
     return S_OK;
   }
-
-  MY_UNKNOWN_IMP1(IInStream)
-
-  STDMETHOD(Read)(void *data, UInt32 size, UInt32 *processedSize);
-  STDMETHOD(Seek)(Int64 offset, UInt32 seekOrigin, UInt64 *newPosition);
 };
 
 /*
-class COutMultiStream:
-  public IOutStream,
-  public CMyUnknownImp
-{
+Z7_CLASS_IMP_COM_1(
+  COutMultiStream,
+  IOutStream
+)
+  Z7_IFACE_COM7_IMP(ISequentialOutStream)
+
   unsigned _streamIndex; // required stream
   UInt64 _offsetPos; // offset from start of _streamIndex index
   UInt64 _absPos;
@@ -78,11 +82,6 @@ public:
     _absPos = 0;
     _length = 0;
   }
-
-  MY_UNKNOWN_IMP1(IOutStream)
-
-  STDMETHOD(Write)(const void *data, UInt32 size, UInt32 *processedSize);
-  STDMETHOD(Seek)(Int64 offset, UInt32 seekOrigin, UInt64 *newPosition);
 };
 */
 

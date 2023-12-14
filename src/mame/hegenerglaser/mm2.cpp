@@ -22,19 +22,21 @@ see(1): http://chesseval.com/ChessEvalJournal/DaimlerBenz.htm
 see(2): http://chesseval.com/RareBoard/DaimlerBenzBoard.htm
 
 MM III was never released officially. Rebell 5,0 is commonly known as MM III, but the
-real one didn't get further than a prototype.
+real one (updated MM II engine) didn't get further than a prototype.
+
+Before Rebell 5,0, Ed Schröder's developed his Rebel engine on the more limited MM II
+hardware that only has 4KB RAM. This program was never officially released in a Mephisto
+chess computer, but it competed in the amateur division at the 1985 WMCCC in Amsterdam.
 
 Mephisto 4 Turbo Kit 18mhz - (mm4tk)
-    This is a replacement rom combining the turbo kit initial rom with the original MM IV.
-    The Turbo Kit powers up to it's tiny rom, copies itself to ram, banks in normal rom,
-    copies that to faster SRAM, then patches the checksum and the LED blink delays.
-    If someone else wants to code up the power up banking, feel free
+This is a replacement ROM combining the Turbo Kit initial ROM with the original MM IV.
+The Turbo Kit powers up to it's tiny ROM, copies itself to RAM, banks in normal ROM,
+copies that to faster SRAM, then patches the checksum and the LED blink delays.
+If someone else wants to code up the power up banking, feel free
 
-    There is an undumped MM V Turbo Kit, which will be the exact same except for location of
-    the patches. The mm5tk just needs the normal mm5 ROM swapped out for that one to
-    blinks the LEDs a little slower.
-
-    -- Cowering (2011)
+There is an undumped MM V Turbo Kit, which will be the exact same except for location of
+the patches. The mm5tk just needs the normal mm5 ROM swapped out for that one to
+blinks the LEDs a little slower.
 
 The MM V prototype was the program that Ed Schröder participated with as "Rebel" at the
 1989 WMCCC in Portorose. It was used with the TK20 TurboKit.
@@ -138,6 +140,7 @@ public:
 	void mm5(machine_config &config);
 	void mm5p(machine_config &config);
 	void mm2(machine_config &config);
+	void rebelp(machine_config &config);
 	void bup(machine_config &config);
 
 protected:
@@ -205,7 +208,7 @@ u8 mm2_state::keys_r(offs_t offset)
 void mm2_state::bup_mem(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
-	map(0x1000, 0x1007).w("outlatch", FUNC(hc259_device::write_d7));
+	map(0x1000, 0x1007).w("outlatch", FUNC(hc259_device::write_d7)).nopr();
 	map(0x1800, 0x1807).r(FUNC(mm2_state::keys_r));
 	map(0x2000, 0x2000).r("board", FUNC(mephisto_board_device::input_r));
 	map(0x2800, 0x2800).w(FUNC(mm2_state::lcd_irqack_w));
@@ -397,6 +400,14 @@ void mm2_state::bup(machine_config &config)
 	config.set_default_layout(layout_mephisto_bup);
 }
 
+void mm2_state::rebelp(machine_config &config)
+{
+	bup(config);
+
+	m_outlatch->q_out_cb<7>().set(m_display, FUNC(mephisto_display1_device::strobe_w)).invert();
+	config.set_default_layout(layout_mephisto_mm2);
+}
+
 void mm2_state::mm2(machine_config &config)
 {
 	bup(config);
@@ -463,6 +474,13 @@ ROM_START( mm2e ) // 13 Sep 1985, serial 05569xx
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("hg86_13.9", 0x8000, 0x4000, CRC(e2daac82) SHA1(c9fa59ca92362f8ee770733073bfa2ab8c7904ad) )
 	ROM_LOAD("c-f_6.9",   0xc000, 0x4000, CRC(5e296939) SHA1(badd2a377259cf738cd076d8fb245c3dc284c24d) )
+ROM_END
+
+
+ROM_START( rebelp )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("white_l7", 0x8000, 0x4000, CRC(9a45e1d4) SHA1(26e4c9cd1afe9aea0e8cfc25bdc9138bd99d5992) )
+	ROM_LOAD("green_r7", 0xc000, 0x4000, CRC(2285af5e) SHA1(bea22e32b65eea5fa7617d9d1b3a824a7affe678) )
 ROM_END
 
 
@@ -537,6 +555,8 @@ SYST( 1985, mm2b,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "He
 SYST( 1985, mm2c,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 4)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1985, mm2d,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 5)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1985, mm2e,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 6)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+
+SYST( 1985, rebelp,  0,      0,      rebelp,   mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto Rebel (prototype, Amsterdam TM version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 SYST( 1986, rebel5,  0,      0,      rebel5,   mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto Rebell 5,0 (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // aka MM III
 SYST( 1986, rebel5a, rebel5, 0,      rebel5,   mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto Rebell 5,0 (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // "

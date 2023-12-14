@@ -198,6 +198,9 @@ class render_manager;
 class render_target;
 class render_texture;
 
+// declared in rendertypes.h
+struct render_bounds;
+
 // declared in rendfont.h
 class render_font;
 

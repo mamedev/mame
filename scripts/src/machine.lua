@@ -2462,6 +2462,30 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/mediagx_cs5530_bridge.h,MACHINES["MEDIAGX_CS5530_BRIDGE"] = true
+---------------------------------------------------
+
+if (MACHINES["MEDIAGX_CS5530_BRIDGE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/mediagx_cs5530_bridge.cpp",
+		MAME_DIR .. "src/devices/machine/mediagx_cs5530_bridge.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/mediagx_host.h,MACHINES["MEDIAGX_HOST"] = true
+---------------------------------------------------
+
+if (MACHINES["MEDIAGX_HOST"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/mediagx_host.cpp",
+		MAME_DIR .. "src/devices/machine/mediagx_host.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/meters.h,MACHINES["METERS"] = true
 ---------------------------------------------------
 
@@ -3000,7 +3024,6 @@ if (MACHINES["PXA255"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/pxa255.cpp",
 		MAME_DIR .. "src/devices/machine/pxa255.h",
-		MAME_DIR .. "src/devices/machine/pxa255defs.h",
 	}
 end
 

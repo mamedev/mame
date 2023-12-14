@@ -59,7 +59,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 
-	virtual void write_sync(int param);
+	virtual void write_sync(s32 param);
 	void p2_map(address_map &map);
 
 	// devices
@@ -85,7 +85,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 
-	virtual void write_sync(int param) override;
+	virtual void write_sync(s32 param) override;
 
 private:
 	void r6530b_w(u8 data);
@@ -116,7 +116,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 
-	void write_sync(int param);
+	void write_sync(s32 param);
 
 	virtual void r1_map(address_map &map);
 
@@ -196,7 +196,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 
-	void write_sync(int param);
+	void write_sync(s32 param);
 	TIMER_CALLBACK_MEMBER(set_nmi);
 	TIMER_CALLBACK_MEMBER(clear_nmi);
 

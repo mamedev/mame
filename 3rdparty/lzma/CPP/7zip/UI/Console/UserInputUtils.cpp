@@ -73,19 +73,26 @@ static bool GetPassword(CStdOutStream *outStream, UString &psw)
 
   #ifdef MY_DISABLE_ECHO
   
-  HANDLE console = GetStdHandle(STD_INPUT_HANDLE);
+  const HANDLE console = GetStdHandle(STD_INPUT_HANDLE);
+
+  /*
+  GetStdHandle() returns
+    INVALID_HANDLE_VALUE: If the function fails.
+    NULL : If an application does not have associated standard handles,
+           such as a service running on an interactive desktop,
+           and has not redirected them. */
   bool wasChanged = false;
   DWORD mode = 0;
-  if (console != INVALID_HANDLE_VALUE && console != 0)
+  if (console != INVALID_HANDLE_VALUE && console != NULL)
     if (GetConsoleMode(console, &mode))
       wasChanged = (SetConsoleMode(console, mode & ~(DWORD)ENABLE_ECHO_INPUT) != 0);
-  bool res = g_StdIn.ScanUStringUntilNewLine(psw);
+  const bool res = g_StdIn.ScanUStringUntilNewLine(psw);
   if (wasChanged)
     SetConsoleMode(console, mode);
   
   #else
   
-  bool res = g_StdIn.ScanUStringUntilNewLine(psw);
+  const bool res = g_StdIn.ScanUStringUntilNewLine(psw);
   
   #endif
 

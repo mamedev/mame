@@ -589,7 +589,7 @@ auto lua_engine::make_notifier_adder(util::notifier<T...> &notifier, const char 
 					delegate<void (T...)>(
 						[this, desc, cbfunc = sol::protected_function(m_lua_state, cb)] (T... args)
 						{
-							auto status(invoke(cbfunc, args...));
+							auto status(invoke(cbfunc, std::forward<T>(args)...));
 							if (!status.valid())
 							{
 								auto err(status.template get<sol::error>());

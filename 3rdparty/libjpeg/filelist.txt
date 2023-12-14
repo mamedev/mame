@@ -1,6 +1,6 @@
 IJG JPEG LIBRARY:  FILE LIST
 
-Copyright (C) 1994-2013, Thomas G. Lane, Guido Vollbeding.
+Copyright (C) 1994-2020, Thomas G. Lane, Guido Vollbeding.
 This file is part of the Independent JPEG Group's software.
 For conditions of distribution and use, see the accompanying README file.
 
@@ -140,7 +140,9 @@ transupp.h	Declarations for jpegtran support routines in transupp.c.
 C source code files:
 
 cjpeg.c		Main program for cjpeg.
+cjpegalt.c	Main program for cjpeg with alternate user interface.
 djpeg.c		Main program for djpeg.
+djpegalt.c	Main program for djpeg with alternate user interface.
 jpegtran.c	Main program for jpegtran.
 cdjpeg.c	Utility routines used by all three programs.
 rdcolmap.c	Code to read a colormap file for djpeg's "-map" switch.
@@ -151,7 +153,7 @@ transupp.c	Support code for jpegtran: lossless image manipulations.
 Image file reader modules for cjpeg:
 
 rdbmp.c		BMP file input.
-rdgif.c		GIF file input (now just a stub).
+rdgif.c		GIF file input.
 rdppm.c		PPM/PGM file input.
 rdrle.c		Utah RLE file input.
 rdtarga.c	Targa file input.
@@ -159,7 +161,7 @@ rdtarga.c	Targa file input.
 Image file writer modules for djpeg:
 
 wrbmp.c		BMP file output.
-wrgif.c		GIF file output (a mere shadow of its former self).
+wrgif.c		GIF file output.
 wrppm.c		PPM/PGM file output.
 wrrle.c		Utah RLE file output.
 wrtarga.c	Targa file output.
@@ -207,6 +209,7 @@ jconfig.txt	Template for making jconfig.h by hand.
 mak*.*		Sample makefiles for particular systems.
 jconfig.*	Sample jconfig.h for particular systems.
 libjpeg.map	Script to generate shared library with versioned symbols.
+libjpeg.pc.in	libjpeg.pc pkg-config file input for configure.
 aclocal.m4	M4 macro definitions for use with Autoconf.
 
 Test files (see install.txt for test procedure):

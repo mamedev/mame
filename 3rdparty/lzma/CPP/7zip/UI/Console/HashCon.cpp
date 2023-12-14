@@ -99,7 +99,7 @@ HRESULT CHashCallbackConsole::SetCompleted(const UInt64 *completeValue)
 static void AddMinuses(AString &s, unsigned num)
 {
   for (unsigned i = 0; i < num; i++)
-    s += '-';
+    s.Add_Minus();
 }
 
 static void AddSpaces_if_Positive(AString &s, int num)

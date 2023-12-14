@@ -1,7 +1,7 @@
 // ExtractingFilePath.h
 
-#ifndef __EXTRACTING_FILE_PATH_H
-#define __EXTRACTING_FILE_PATH_H
+#ifndef ZIP7_INC_EXTRACTING_FILE_PATH_H
+#define ZIP7_INC_EXTRACTING_FILE_PATH_H
 
 #include "../../../Common/MyString.h"
 

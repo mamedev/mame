@@ -155,12 +155,14 @@ constexpr chd_codec_type CHD_CODEC_NONE     = 0;
 
 // general codecs
 constexpr chd_codec_type CHD_CODEC_ZLIB     = CHD_MAKE_TAG('z','l','i','b');
+constexpr chd_codec_type CHD_CODEC_ZSTD     = CHD_MAKE_TAG('z','s','t','d');
 constexpr chd_codec_type CHD_CODEC_LZMA     = CHD_MAKE_TAG('l','z','m','a');
 constexpr chd_codec_type CHD_CODEC_HUFFMAN  = CHD_MAKE_TAG('h','u','f','f');
 constexpr chd_codec_type CHD_CODEC_FLAC     = CHD_MAKE_TAG('f','l','a','c');
 
 // general codecs with CD frontend
 constexpr chd_codec_type CHD_CODEC_CD_ZLIB  = CHD_MAKE_TAG('c','d','z','l');
+constexpr chd_codec_type CHD_CODEC_CD_ZSTD  = CHD_MAKE_TAG('c','d','z','s');
 constexpr chd_codec_type CHD_CODEC_CD_LZMA  = CHD_MAKE_TAG('c','d','l','z');
 constexpr chd_codec_type CHD_CODEC_CD_FLAC  = CHD_MAKE_TAG('c','d','f','l');
 

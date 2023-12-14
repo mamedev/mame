@@ -104,6 +104,10 @@ SOURCE=.\StdAfx.h
 # PROP Default_Filter ""
 # Begin Source File
 
+SOURCE=..\..\..\Windows\Defs.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\Windows\DLL.cpp
 # End Source File
 # Begin Source File
@@ -144,6 +148,10 @@ SOURCE=..\..\..\Windows\FileName.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\Windows\NtCheck.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\Windows\PropVariant.cpp
 # End Source File
 # Begin Source File
@@ -158,10 +166,22 @@ SOURCE=..\..\..\Windows\PropVariantConv.cpp
 
 SOURCE=..\..\..\Windows\PropVariantConv.h
 # End Source File
+# Begin Source File
+
+SOURCE=..\..\..\Windows\TimeUtils.h
+# End Source File
 # End Group
 # Begin Group "Common"
 
 # PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\..\..\Common\Common.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\Common\Defs.h
+# End Source File
 # Begin Source File
 
 SOURCE=..\..\..\Common\IntToString.cpp
@@ -169,6 +189,22 @@ SOURCE=..\..\..\Common\IntToString.cpp
 # Begin Source File
 
 SOURCE=..\..\..\Common\IntToString.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\Common\MyBuffer.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\Common\MyCom.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\Common\MyInitGuid.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\Common\MyLinux.h
 # End Source File
 # Begin Source File
 
@@ -180,11 +216,19 @@ SOURCE=..\..\..\Common\MyString.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\Common\MyTypes.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\Common\MyVector.cpp
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\..\Common\MyVector.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\Common\MyWindows.h
 # End Source File
 # Begin Source File
 
@@ -222,6 +266,54 @@ SOURCE=..\..\Common\FileStreams.cpp
 
 SOURCE=..\..\Common\FileStreams.h
 # End Source File
+# Begin Source File
+
+SOURCE=..\..\Common\UniqBlocks.h
+# End Source File
+# End Group
+# Begin Group "C"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\..\..\..\C\7zTypes.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\C\7zVersion.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\C\7zWindows.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\C\Compiler.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\C\CpuArch.h
+# End Source File
+# End Group
+# Begin Group "7zip"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\..\IDecl.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\IPassword.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\IProgress.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\PropID.h
+# End Source File
 # End Group
 # Begin Source File
 
@@ -229,7 +321,7 @@ SOURCE=.\Client7z.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\..\C\Sort.h
+SOURCE=..\..\Archive\IArchive.h
 # End Source File
 # End Target
 # End Project

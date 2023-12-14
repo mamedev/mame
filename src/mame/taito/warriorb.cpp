@@ -375,7 +375,7 @@ void warriorb_state::pancontrol_w(offs_t offset, u8 data)
 
 	m_pandata[offset] = (data << 1) + data;   // original volume * 3
 	LOGPANDATA("pan %02x %02x %02x %02x", m_pandata[0], m_pandata[1], m_pandata[2], m_pandata[3]);
-	flt->flt_volume_set_volume(m_pandata[offset] / 100.0);
+	flt->set_gain(m_pandata[offset] / 100.0);
 }
 
 

@@ -41,6 +41,7 @@ OP_HANDLER( illegl3 )
 OP_HANDLER( trap )
 {
 	logerror("m6800: illegal opcode: address %04X, op %02X\n",PC-1,(int) M_RDOP_ARG(PC-1)&0xFF);
+	PC--;
 	take_trap();
 }
 

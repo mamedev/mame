@@ -58,6 +58,7 @@ private:
 	static const std::array<s32, 0x80> attack_linear_step;
 	static const std::array<s32, 0x20> decay_linear_step;
 	static const std::array<s32, 16> panmap;
+	static const std::array<u32, 0x400> pitch_base;
 	std::array<s32,  0x80> m_global_step;
 	std::array<s16, 0x100> m_dpcm;
 

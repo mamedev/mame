@@ -414,6 +414,8 @@ public:
 	void unkch(machine_config &config);
 	void bonusch(machine_config &config);
 	void feverch(machine_config &config);
+	void rolling(machine_config &config);
+
 	void bonusch_map(address_map &map);
 	void feverch_map(address_map &map);
 	void megaline_map(address_map &map);

@@ -116,7 +116,7 @@ void device_image_interface::interface_config_complete()
 }
 
 //-------------------------------------------------
-//  check_preset_images - lookup the chds from the
+//  check_preset_images - lookup the CHDs from the
 //  region(s), if any
 //-------------------------------------------------
 
@@ -140,10 +140,10 @@ void device_image_interface::check_preset_images()
 	else
 	{
 		std::string tag = device().owner()->tag();
-		auto *chd = device().machine().rom_load().get_disk_handle(tag);
+		auto *const chd = device().machine().rom_load().get_disk_handle(tag);
 		if (chd)
 		{
-			m_possible_preset_regions.push_back(tag);
+			m_possible_preset_regions.emplace_back(std::move(tag));
 			m_preset_images.push_back(chd);
 			m_current_region = 0;
 			set_image_tag();
@@ -256,9 +256,9 @@ void device_image_interface::set_image_filename(std::string_view filename)
 
 	// find the last "path separator"
 	auto iter = std::find_if(
-		m_image_name.rbegin(),
-		m_image_name.rend(),
-		[](char c) { return (c == '\\') || (c == '/') || (c == ':'); });
+			m_image_name.rbegin(),
+			m_image_name.rend(),
+			[] (char c) { return (c == '\\') || (c == '/') || (c == ':'); });
 
 	if (iter != m_image_name.rend())
 		m_basename.assign(iter.base(), m_image_name.end());
@@ -293,6 +293,17 @@ void device_image_interface::set_image_tag()
 bool device_image_interface::is_filetype(std::string_view candidate_filetype) const
 {
 	return util::streqlower(m_filetype, candidate_filetype);
+}
+
+
+//-------------------------------------------------
+//  add_media_change_notifier - subscribe for
+//  media change notifications
+//-------------------------------------------------
+
+util::notifier_subscription device_image_interface::add_media_change_notifier(delegate<void (media_change_event)> &&n)
+{
+	return m_media_change_notifier.subscribe(std::move(n));
 }
 
 
@@ -396,9 +407,8 @@ u8 *device_image_interface::get_software_region(std::string_view tag)
 	if (!loaded_through_softlist())
 		return nullptr;
 
-	std::string full_tag = util::string_format("%s:%s", device().tag(), tag);
-	memory_region *region = device().machine().root_device().memregion(full_tag);
-	return region != nullptr ? region->base() : nullptr;
+	memory_region *const region = device().memregion(tag);
+	return region ? region->base() : nullptr;
 }
 
 
@@ -408,9 +418,11 @@ u8 *device_image_interface::get_software_region(std::string_view tag)
 
 u32 device_image_interface::get_software_region_length(std::string_view tag)
 {
-	std::string full_tag = util::string_format("%s:%s", device().tag(), tag);
-	memory_region *region = device().machine().root_device().memregion(full_tag);
-	return region != nullptr ? region->bytes() : 0;
+	if (!loaded_through_softlist())
+		return 0;
+
+	memory_region *const region = device().memregion(tag);
+	return region ? region->bytes() : 0;
 }
 
 
@@ -820,7 +832,7 @@ std::pair<std::error_condition, std::string> device_image_interface::load_intern
 
 	// we are now loading
 	m_is_loading = true;
-	m_sequence_counter ++;
+	m_sequence_counter++;
 
 	// record the filename
 	set_image_filename(path);
@@ -828,7 +840,7 @@ std::pair<std::error_condition, std::string> device_image_interface::load_intern
 	if (core_opens_image_file())
 	{
 		// determine open plan
-		std::vector<u32> open_plan = determine_open_plan(is_create);
+		std::vector<u32> const open_plan = determine_open_plan(is_create);
 
 		// attempt to open the file in various ways
 		for (auto iter = open_plan.cbegin(); !m_file && iter != open_plan.cend(); iter++)
@@ -836,25 +848,24 @@ std::pair<std::error_condition, std::string> device_image_interface::load_intern
 			// open the file
 			err.first = load_image_by_path(*iter, path);
 			if (err.first && (err.first != std::errc::no_such_file_or_directory) && (err.first != std::errc::permission_denied))
-				goto done;
+				break;
 		}
 
 		// did we fail to find the file?
-		if (!m_file)
-		{
+		if (!err.first && !m_file)
 			err.first = std::errc::no_such_file_or_directory;
-			goto done;
-		}
 	}
 
-	// call device load or create
-	m_create_format = create_format;
-	m_create_args = create_args;
+	if (!err.first)
+	{
+		// call device load or create
+		m_create_format = create_format;
+		m_create_args = create_args;
 
-	if (!init_phase())
-		err = finish_load();
+		if (!init_phase())
+			err = finish_load();
+	}
 
-done:
 	if (err.first)
 	{
 		osd_printf_error(
@@ -868,6 +879,7 @@ done:
 				err.first.message());
 		clear();
 	}
+
 	return err;
 }
 
@@ -907,11 +919,12 @@ std::pair<std::error_condition, std::string> device_image_interface::load_softwa
 	m_is_loading = true;
 
 	// Check if there's a software list defined for this device and use that if we're not creating an image
-	std::error_condition err = load_software_part(software_identifier);
-	if (err)
+	std::pair<std::error_condition, std::string> err;
+	err.first = load_software_part(software_identifier);
+	if (err.first)
 	{
 		m_is_loading = false;
-		return std::make_pair(err, std::string());
+		return err;
 	}
 
 	// set up softlist stuff
@@ -934,16 +947,31 @@ std::pair<std::error_condition, std::string> device_image_interface::load_softwa
 		fatalerror("Each entry in an XML list must have all of the following fields: description, publisher, year!\n");
 
 	// set file type
-	std::string filename = (m_mame_file != nullptr) && (m_mame_file->filename() != nullptr)
+	std::string filename = (m_mame_file && m_mame_file->filename())
 			? m_mame_file->filename()
 			: "";
 	m_filetype = core_filename_extract_extension(filename, true);
 
 	// call finish_load if necessary
 	if (!init_phase())
-		return finish_load();
-	else
-		return make_pair(std::error_condition(), std::string());
+	{
+		err = finish_load();
+		if (err.first)
+		{
+			osd_printf_error(
+					!err.second.empty()
+						? "Unable to load software item '%1$s': %2$s (%3$s:%4$d %5$s)\n"
+						: "Unable to load software item '%1$s': %5$s (%3$s:%4$d)\n",
+					software_identifier,
+					err.second,
+					err.first.category().name(),
+					err.first.value(),
+					err.first.message());
+			clear();
+		}
+	}
+
+	return err;
 }
 
 
@@ -968,15 +996,19 @@ std::pair<std::error_condition, std::string> device_image_interface::finish_load
 				err = call_load(); // using device load
 		}
 	}
+
 	m_is_loading = false;
 	m_create_format = 0;
 	m_create_args = nullptr;
+	if (!err.first)
+		m_media_change_notifier(media_change_event::LOADED);
+
 	return err;
 }
 
 
 //-------------------------------------------------
-//  create - create a image
+//  create - create an image
 //-------------------------------------------------
 
 std::pair<std::error_condition, std::string> device_image_interface::create(std::string_view path)
@@ -1051,7 +1083,7 @@ void device_image_interface::clear() noexcept
 
 	m_hash.reset();
 
-	m_sequence_counter ++;
+	m_sequence_counter++;
 }
 
 
@@ -1063,10 +1095,15 @@ void device_image_interface::unload()
 {
 	if (is_loaded() || loaded_through_softlist())
 	{
-		m_sequence_counter ++;
+		m_sequence_counter++;
 		call_unload();
+		clear();
+		m_media_change_notifier(media_change_event::UNLOADED);
 	}
-	clear();
+	else
+	{
+		clear(); // just to make sure everything is reset
+	}
 }
 
 

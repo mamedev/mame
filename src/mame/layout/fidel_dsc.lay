@@ -52,235 +52,64 @@ license:CC0-1.0
 		</disk>
 	</element>
 
-	<element name="text_e00">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="1" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_e01">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="2" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_e02">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="3" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_e03">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="4" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_e04">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="5" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_o00">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="6" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_o01">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="7" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_o02">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="8" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_o03">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="9" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_o04">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="10" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_e10">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="11" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_e11">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="12" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_e12">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="13" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_e13">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="14" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_e14">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="15" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_o10">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="16" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_o11">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="17" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_o12">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="18" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_o13">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="19" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_o14">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="20" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_e20">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="21" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_e21">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="22" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_e22">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="23" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_e23">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="24" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_e24">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="25" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_o20">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="26" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_o21">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="27" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_o22">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="28" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_o23">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="29" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_o24">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="30" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_e30">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="31" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_e31">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="32" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_e32">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="33" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_e33">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="34" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_e34">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="35" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_o30">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="36" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_o31">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="37" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_o32">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="38" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_o33">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="39" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_o34">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="40" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_e40">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="41" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_e41">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="42" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_e42">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="43" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_e43">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="44" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_e44">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="45" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_o40">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="46" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_o41">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="47" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_o42">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="48" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_o43">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="49" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
-	<element name="text_o44">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="50" align="2"><color red="0.86" green="0.85" blue="0.84" /></text>
-	</element>
+	<element name="text_e00"><text string="1" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_e01"><text string="2" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_e02"><text string="3" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_e03"><text string="4" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_e04"><text string="5" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_o00"><text string="6" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_o01"><text string="7" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_o02"><text string="8" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_o03"><text string="9" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_o04"><text string="10" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_e10"><text string="11" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_e11"><text string="12" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_e12"><text string="13" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_e13"><text string="14" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_e14"><text string="15" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_o10"><text string="16" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_o11"><text string="17" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_o12"><text string="18" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_o13"><text string="19" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_o14"><text string="20" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_e20"><text string="21" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_e21"><text string="22" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_e22"><text string="23" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_e23"><text string="24" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_e24"><text string="25" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_o20"><text string="26" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_o21"><text string="27" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_o22"><text string="28" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_o23"><text string="29" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_o24"><text string="30" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_e30"><text string="31" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_e31"><text string="32" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_e32"><text string="33" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_e33"><text string="34" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_e34"><text string="35" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_o30"><text string="36" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_o31"><text string="37" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_o32"><text string="38" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_o33"><text string="39" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_o34"><text string="40" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_e40"><text string="41" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_e41"><text string="42" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_e42"><text string="43" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_e43"><text string="44" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_e44"><text string="45" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_o40"><text string="46" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_o41"><text string="47" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_o42"><text string="48" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_o43"><text string="49" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
+	<element name="text_o44"><text string="50" align="2"><color red="0.86" green="0.85" blue="0.84" /></text></element>
 
-	<element name="text_re">
-		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
-		<text string="RE"><color red="0.17" green="0.15" blue="0.15" /></text>
-	</element>
-	<element name="text_cl">
-		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
-		<text string="CL"><color red="0.17" green="0.15" blue="0.15" /></text>
-	</element>
-	<element name="text_pb">
-		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
-		<text string="PB"><color red="0.17" green="0.15" blue="0.15" /></text>
-	</element>
-	<element name="text_rv">
-		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
-		<text string="RV"><color red="0.17" green="0.15" blue="0.15" /></text>
-	</element>
-	<element name="text_lv">
-		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
-		<text string="LV"><color red="0.17" green="0.15" blue="0.15" /></text>
-	</element>
-	<element name="text_wk">
-		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
-		<text string="[K]"><color red="0.17" green="0.15" blue="0.15" /></text>
-	</element>
-	<element name="text_bk">
-		<disk><color red="0.17" green="0.15" blue="0.15" /></disk>
-		<text string="[K]"><color red="0.81" green="0.8" blue="0.79" /></text>
-	</element>
+	<element name="text_re"><text string="RE"><color red="0.17" green="0.15" blue="0.15" /></text></element>
+	<element name="text_cl"><text string="CL"><color red="0.17" green="0.15" blue="0.15" /></text></element>
+	<element name="text_pb"><text string="PB"><color red="0.17" green="0.15" blue="0.15" /></text></element>
+	<element name="text_rv"><text string="RV"><color red="0.17" green="0.15" blue="0.15" /></text></element>
+	<element name="text_lv"><text string="LV"><color red="0.17" green="0.15" blue="0.15" /></text></element>
+	<element name="text_wk"><text string="[K]"><color red="0.17" green="0.15" blue="0.15" /></text></element>
+	<element name="text_bk"><text string="[K]"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 
 
 <!-- sb board -->
@@ -494,43 +323,23 @@ license:CC0-1.0
 	<element name="text_uit1"><text string="S.BOARD"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uit2"><text string="INTERFACE"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uib1"><text string="BOARD:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_uib2">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="RESET"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_uib3">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="CLEAR"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
+	<element name="text_uib2"><text string="RESET"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_uib3"><text string="CLEAR"><color red="0.01" green="0.01" blue="0.01" /></text></element>
 	<element name="text_uis1"><text string="SPAWN:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uih1"><text string="HAND:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_uih2">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="REMOVE"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
+	<element name="text_uih2"><text string="REMOVE"><color red="0.01" green="0.01" blue="0.01" /></text></element>
 	<element name="text_uiu1"><text string="UNDO:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_uiu2a">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string=" &lt;&lt;"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_uiu2b">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string=" &lt;  "><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_uiu2c">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="   &gt;"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_uiu2d">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string=" &gt;&gt;"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
+	<element name="text_uiu2a"><text string=" &lt;&lt;"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_uiu2b"><text string=" &lt;  "><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_uiu2c"><text string="   &gt;"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_uiu2d"><text string=" &gt;&gt;"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_uiu3b"><text string="/"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+
 	<element name="text_uiu3a" defstate="0">
 		<simplecounter maxstate="999" digits="1" align="2">
 			<color red="0.81" green="0.8" blue="0.79" />
 		</simplecounter>
 	</element>
-	<element name="text_uiu3b"><text string="/"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uiu3c" defstate="0">
 		<simplecounter maxstate="999" digits="1" align="1">
 			<color red="0.81" green="0.8" blue="0.79" />

@@ -24,7 +24,7 @@ license:CC0-1.0
 		<info name="serial" value="RC-20" />
 		<part name="cart" interface="cz_cart">
 			<dataarea name="rom" size="0x4000"> <!-- restored from a sysex dump -->
-				<rom name="rc20.bin" size="0x4000" crc="c0ae5b20" sha1="38df0703d469a53f2f2af00eb94de018d7f95a73" status="baddump" />
+				<rom name="rc20.bin" size="0x4000" crc="237a2516" sha1="d1d697fbca0e16a07fa6d2710d2f7327cae81704" status="baddump" />
 			</dataarea>
 		</part>
 	</software>

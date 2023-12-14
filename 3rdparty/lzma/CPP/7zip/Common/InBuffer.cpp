@@ -7,10 +7,10 @@
 #include "InBuffer.h"
 
 CInBufferBase::CInBufferBase() throw():
-  _buf(0),
-  _bufLim(0),
-  _bufBase(0),
-  _stream(0),
+  _buf(NULL),
+  _bufLim(NULL),
+  _bufBase(NULL),
+  _stream(NULL),
   _processedSize(0),
   _bufSize(0),
   _wasFinished(false),
@@ -22,18 +22,18 @@ bool CInBuffer::Create(size_t bufSize) throw()
   const unsigned kMinBlockSize = 1;
   if (bufSize < kMinBlockSize)
     bufSize = kMinBlockSize;
-  if (_bufBase != 0 && _bufSize == bufSize)
+  if (_bufBase != NULL && _bufSize == bufSize)
     return true;
   Free();
   _bufSize = bufSize;
   _bufBase = (Byte *)::MidAlloc(bufSize);
-  return (_bufBase != 0);
+  return (_bufBase != NULL);
 }
 
 void CInBuffer::Free() throw()
 {
   ::MidFree(_bufBase);
-  _bufBase = 0;
+  _bufBase = NULL;
 }
 
 void CInBufferBase::Init() throw()
@@ -42,7 +42,7 @@ void CInBufferBase::Init() throw()
   _buf = _bufBase;
   _bufLim = _buf;
   _wasFinished = false;
-  #ifdef _NO_EXCEPTIONS
+  #ifdef Z7_NO_EXCEPTIONS
   ErrorCode = S_OK;
   #endif
   NumExtraBytes = 0;
@@ -50,7 +50,7 @@ void CInBufferBase::Init() throw()
 
 bool CInBufferBase::ReadBlock()
 {
-  #ifdef _NO_EXCEPTIONS
+  #ifdef Z7_NO_EXCEPTIONS
   if (ErrorCode != S_OK)
     return false;
   #endif
@@ -61,8 +61,8 @@ bool CInBufferBase::ReadBlock()
   _bufLim = _bufBase;
   UInt32 processed;
   // FIX_ME: we can improve it to support (_bufSize >= (1 << 32))
-  HRESULT result = _stream->Read(_bufBase, (UInt32)_bufSize, &processed);
-  #ifdef _NO_EXCEPTIONS
+  const HRESULT result = _stream->Read(_bufBase, (UInt32)_bufSize, &processed);
+  #ifdef Z7_NO_EXCEPTIONS
   ErrorCode = result;
   #else
   if (result != S_OK)

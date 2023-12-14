@@ -1124,7 +1124,6 @@ void heath_superset_tlb_device::device_add_mconfig(machine_config &config)
 	// per line updates are needed for onscreen menu to display properly
 	m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);
 
-	m_crtc->set_begin_update_callback(FUNC(heath_superset_tlb_device::crtc_begin_update));
 	m_crtc->set_update_row_callback(FUNC(heath_superset_tlb_device::crtc_update_row));
 
 	// link up the serial port outputs to font chip.
@@ -1187,11 +1186,6 @@ void heath_superset_tlb_device::crtc_reg_w(offs_t reg, uint8_t val)
 	heath_tlb_device::crtc_reg_w(reg, val);
 }
 
-MC6845_BEGIN_UPDATE(heath_superset_tlb_device::crtc_begin_update)
-{
-	bitmap.fill(rgb_t::black(), cliprect);
-}
-
 MC6845_UPDATE_ROW(heath_superset_tlb_device::crtc_update_row)
 {
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
@@ -1232,7 +1226,7 @@ MC6845_UPDATE_ROW(heath_superset_tlb_device::crtc_update_row)
 	}
 	else
 	{
-		std::fill_n(p, x_count * 8, palette[0]);
+		std::fill_n(p, bitmap.rowpixels(), palette[0]);
 	}
 }
 

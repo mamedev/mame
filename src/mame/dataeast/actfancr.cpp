@@ -113,7 +113,7 @@ uint32_t actfancr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_spritegen->set_flip_screen(flip);
 
 	m_tilegen[0]->deco_bac06_pf_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	m_spritegen->draw_sprites(screen, bitmap, cliprect, m_gfxdecode->gfx(1), m_spriteram16.target(), 0x800/2);
+	m_spritegen->draw_sprites(screen, bitmap, cliprect, m_spriteram16.target(), 0x800/2);
 	m_tilegen[1]->deco_bac06_pf_draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
@@ -329,14 +329,20 @@ static const gfx_layout layout_16x16x4 =
 
 static GFXDECODE_START( gfx_actfan )
 	GFXDECODE_ENTRY( "chars",   0, layout_8x8x4,     0, 16 )
-	GFXDECODE_ENTRY( "sprites", 0, layout_16x16x4, 512, 16 )
 	GFXDECODE_ENTRY( "tiles",   0, layout_16x16x4, 256, 16 )
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_actfan_spr )
+	GFXDECODE_ENTRY( "sprites", 0, layout_16x16x4, 512, 16 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_triothep )
 	GFXDECODE_ENTRY( "chars",   0, layout_8x8x4,     0, 16 )
-	GFXDECODE_ENTRY( "sprites", 0, layout_16x16x4, 256, 16 )
 	GFXDECODE_ENTRY( "tiles",   0, layout_16x16x4, 512, 16 )
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_triothep_spr )
+	GFXDECODE_ENTRY( "sprites", 0, layout_16x16x4, 256, 16 )
 GFXDECODE_END
 
 /******************************************************************************/
@@ -377,14 +383,14 @@ void actfancr_state::actfancr(machine_config &config)
 	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 768);
 
 	DECO_BAC06(config, m_tilegen[0], 0);
-	m_tilegen[0]->set_gfx_region_wide(2, 2, 2);
+	m_tilegen[0]->set_gfx_region_wide(1, 1, 2);
 	m_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO_BAC06(config, m_tilegen[1], 0);
 	m_tilegen[1]->set_gfx_region_wide(0, 0, 0);
 	m_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_MXC06(config, m_spritegen, 0);
+	DECO_MXC06(config, m_spritegen, 0, "palette", gfx_actfan_spr);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -419,8 +425,9 @@ void triothep_state::triothep(machine_config &config)
 
 	// video hardware
 	m_gfxdecode->set_info(gfx_triothep);
+	m_spritegen->set_info(gfx_triothep_spr);
 
-	m_tilegen[0]->set_gfx_region_wide(2, 2, 0);
+	m_tilegen[0]->set_gfx_region_wide(1, 1, 0);
 
 	// sound hardware
 	subdevice<ym2203_device>("ym1")->set_clock(XTAL(12'000'000) / 8); // verified on PCB

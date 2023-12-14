@@ -62,13 +62,13 @@ public:
 	}
 
 	// append a new item to the end of the menu
-	void item_append(const std::string &text, uint32_t flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN) { item_append(std::string(text), std::string(), flags, ref, type); }
-	void item_append(const std::string &text, const std::string &subtext, uint32_t flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN) { item_append(std::string(text), std::string(subtext), flags, ref, type); }
-	void item_append(std::string &&text, uint32_t flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN) { item_append(text, std::string(), flags, ref, type); }
-	void item_append(std::string &&text, std::string &&subtext, uint32_t flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN);
-	void item_append(menu_item item) { item_append(item.text(), item.subtext(), item.flags(), item.ref(), item.type()); }
-	void item_append(menu_item_type type, uint32_t flags = 0);
-	void item_append_on_off(const std::string &text, bool state, uint32_t flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN);
+	int item_append(const std::string &text, uint32_t flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN) { return item_append(std::string(text), std::string(), flags, ref, type); }
+	int item_append(const std::string &text, const std::string &subtext, uint32_t flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN) { return item_append(std::string(text), std::string(subtext), flags, ref, type); }
+	int item_append(std::string &&text, uint32_t flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN) { return item_append(text, std::string(), flags, ref, type); }
+	int item_append(std::string &&text, std::string &&subtext, uint32_t flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN);
+	int item_append(menu_item item) { return item_append(item.text(), item.subtext(), item.flags(), item.ref(), item.type()); }
+	int item_append(menu_item_type type, uint32_t flags = 0);
+	int item_append_on_off(const std::string &text, bool state, uint32_t flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN);
 
 	// set space required for drawing extra content
 	void set_custom_space(float top, float bottom);

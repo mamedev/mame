@@ -383,20 +383,20 @@ void othunder_state::tc0310fam_w(offs_t offset, u8 data)
 	   because we are using the AY-3-8910 emulation. */
 	volr = (m_pan[0] + m_pan[2]) * 100 / (2 * 0x1f);
 	voll = (m_pan[1] + m_pan[3]) * 100 / (2 * 0x1f);
-	m_2610_0l->flt_volume_set_volume(voll / 100.0);
-	m_2610_0r->flt_volume_set_volume(volr / 100.0);
+	m_2610_0l->set_gain(voll / 100.0);
+	m_2610_0r->set_gain(volr / 100.0);
 
 	/* CH1 */
 	volr = m_pan[0] * 100 / 0x1f;
 	voll = m_pan[1] * 100 / 0x1f;
-	m_2610_1l->flt_volume_set_volume(voll / 100.0);
-	m_2610_1r->flt_volume_set_volume(volr / 100.0);
+	m_2610_1l->set_gain(voll / 100.0);
+	m_2610_1r->set_gain(volr / 100.0);
 
 	/* CH2 */
 	volr = m_pan[2] * 100 / 0x1f;
 	voll = m_pan[3] * 100 / 0x1f;
-	m_2610_2l->flt_volume_set_volume(voll / 100.0);
-	m_2610_2r->flt_volume_set_volume(volr / 100.0);
+	m_2610_2l->set_gain(voll / 100.0);
+	m_2610_2r->set_gain(volr / 100.0);
 }
 
 

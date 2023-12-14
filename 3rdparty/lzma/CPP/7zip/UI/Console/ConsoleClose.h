@@ -1,7 +1,7 @@
 // ConsoleClose.h
 
-#ifndef __CONSOLE_CLOSE_H
-#define __CONSOLE_CLOSE_H
+#ifndef ZIP7_INC_CONSOLE_CLOSE_H
+#define ZIP7_INC_CONSOLE_CLOSE_H
 
 namespace NConsoleClose {
 
@@ -21,7 +21,7 @@ inline bool TestBreakSignal()
   return (g_BreakCounter != 0);
 }
 
-class CCtrlHandlerSetter
+class CCtrlHandlerSetter Z7_final
 {
   #ifndef _WIN32
   void (*memo_sig_int)(int);
@@ -29,7 +29,7 @@ class CCtrlHandlerSetter
   #endif
 public:
   CCtrlHandlerSetter();
-  virtual ~CCtrlHandlerSetter();
+  ~CCtrlHandlerSetter();
 };
 
 #endif

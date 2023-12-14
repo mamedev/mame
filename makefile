@@ -66,6 +66,7 @@
 # USE_SYSTEM_LIB_ASIO = 1
 # USE_SYSTEM_LIB_EXPAT = 1
 # USE_SYSTEM_LIB_ZLIB = 1
+# USE_SYSTEM_LIB_ZSTD = 1
 # USE_SYSTEM_LIB_JPEG = 1
 # USE_SYSTEM_LIB_FLAC = 1
 # USE_SYSTEM_LIB_LUA = 1
@@ -510,6 +511,10 @@ endif
 
 ifdef USE_SYSTEM_LIB_ZLIB
 PARAMS += --with-system-zlib='$(USE_SYSTEM_LIB_ZLIB)'
+endif
+
+ifdef USE_SYSTEM_LIB_ZSTD
+PARAMS += --with-system-zstd='$(USE_SYSTEM_LIB_ZSTD)'
 endif
 
 ifdef USE_SYSTEM_LIB_JPEG
@@ -1564,7 +1569,7 @@ endif
 
 ifeq (posix,$(SHELLTYPE))
 $(GENDIR)/version.cpp: makefile $(GENDIR)/git_desc | $(GEN_FOLDERS)
-	@echo '#define BARE_BUILD_VERSION "0.260"' > $@
+	@echo '#define BARE_BUILD_VERSION "0.261"' > $@
 	@echo '#define BARE_VCS_REVISION "$(NEW_GIT_VERSION)"' >> $@
 	@echo 'extern const char bare_build_version[];' >> $@
 	@echo 'extern const char bare_vcs_revision[];' >> $@
@@ -1574,7 +1579,7 @@ $(GENDIR)/version.cpp: makefile $(GENDIR)/git_desc | $(GEN_FOLDERS)
 	@echo 'const char build_version[] = BARE_BUILD_VERSION " (" BARE_VCS_REVISION ")";' >> $@
 else
 $(GENDIR)/version.cpp: makefile $(GENDIR)/git_desc | $(GEN_FOLDERS)
-	@echo #define BARE_BUILD_VERSION "0.260" > $@
+	@echo #define BARE_BUILD_VERSION "0.261" > $@
 	@echo #define BARE_VCS_REVISION "$(NEW_GIT_VERSION)" >> $@
 	@echo extern const char bare_build_version[]; >> $@
 	@echo extern const char bare_vcs_revision[]; >> $@

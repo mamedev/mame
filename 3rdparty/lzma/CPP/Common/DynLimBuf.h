@@ -1,7 +1,7 @@
 // Common/DynLimBuf.h
 
-#ifndef __COMMON_DYN_LIM_BUF_H
-#define __COMMON_DYN_LIM_BUF_H
+#ifndef ZIP7_INC_COMMON_DYN_LIM_BUF_H
+#define ZIP7_INC_COMMON_DYN_LIM_BUF_H
 
 #include <string.h>
 

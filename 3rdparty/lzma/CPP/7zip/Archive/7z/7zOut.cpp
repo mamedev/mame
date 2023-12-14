@@ -14,16 +14,14 @@
 namespace NArchive {
 namespace N7z {
 
-HRESULT COutArchive::WriteSignature()
+static void FillSignature(Byte *buf)
 {
-  Byte buf[8];
   memcpy(buf, kSignature, kSignatureSize);
   buf[kSignatureSize] = kMajorVersion;
   buf[kSignatureSize + 1] = 4;
-  return WriteDirect(buf, 8);
 }
 
-#ifdef _7Z_VOL
+#ifdef Z7_7Z_VOL
 HRESULT COutArchive::WriteFinishSignature()
 {
   RINOK(WriteDirect(kFinishSignature, kSignatureSize));
@@ -49,15 +47,16 @@ static void SetUInt64(Byte *p, UInt64 d)
 
 HRESULT COutArchive::WriteStartHeader(const CStartHeader &h)
 {
-  Byte buf[24];
-  SetUInt64(buf + 4, h.NextHeaderOffset);
-  SetUInt64(buf + 12, h.NextHeaderSize);
-  SetUInt32(buf + 20, h.NextHeaderCRC);
-  SetUInt32(buf, CrcCalc(buf + 4, 20));
-  return WriteDirect(buf, 24);
+  Byte buf[32];
+  FillSignature(buf);
+  SetUInt64(buf + 8 + 4, h.NextHeaderOffset);
+  SetUInt64(buf + 8 + 12, h.NextHeaderSize);
+  SetUInt32(buf + 8 + 20, h.NextHeaderCRC);
+  SetUInt32(buf + 8, CrcCalc(buf + 8 + 4, 20));
+  return WriteDirect(buf, sizeof(buf));
 }
 
-#ifdef _7Z_VOL
+#ifdef Z7_7Z_VOL
 HRESULT COutArchive::WriteFinishHeader(const CFinishHeader &h)
 {
   CCRC crc;
@@ -75,15 +74,15 @@ HRESULT COutArchive::WriteFinishHeader(const CFinishHeader &h)
 }
 #endif
 
-HRESULT COutArchive::Create(ISequentialOutStream *stream, bool endMarker)
+HRESULT COutArchive::Create_and_WriteStartPrefix(ISequentialOutStream *stream /* , bool endMarker */)
 {
   Close();
-  #ifdef _7Z_VOL
+  #ifdef Z7_7Z_VOL
   // endMarker = false;
   _endMarker = endMarker;
   #endif
   SeqStream = stream;
-  if (!endMarker)
+  // if (!endMarker)
   {
     SeqStream.QueryInterface(IID_IOutStream, &Stream);
     if (!Stream)
@@ -91,8 +90,13 @@ HRESULT COutArchive::Create(ISequentialOutStream *stream, bool endMarker)
       return E_NOTIMPL;
       // endMarker = true;
     }
+    RINOK(Stream->Seek(0, STREAM_SEEK_CUR, &_signatureHeaderPos))
+    Byte buf[32];
+    FillSignature(buf);
+    memset(&buf[8], 0, 32 - 8);
+    return WriteDirect(buf, sizeof(buf));
   }
-  #ifdef _7Z_VOL
+  #ifdef Z7_7Z_VOL
   if (endMarker)
   {
     /*
@@ -101,34 +105,16 @@ HRESULT COutArchive::Create(ISequentialOutStream *stream, bool endMarker)
     sh.NextHeaderSize = (UInt32)(Int32)-1;
     sh.NextHeaderCRC = 0;
     WriteStartHeader(sh);
+    return S_OK;
     */
   }
-  else
   #endif
-  {
-    if (!Stream)
-      return E_FAIL;
-    RINOK(WriteSignature());
-    RINOK(Stream->Seek(0, STREAM_SEEK_CUR, &_prefixHeaderPos));
-  }
-  return S_OK;
 }
 
 void COutArchive::Close()
 {
   SeqStream.Release();
   Stream.Release();
-}
-
-HRESULT COutArchive::SkipPrefixArchiveHeader()
-{
-  #ifdef _7Z_VOL
-  if (_endMarker)
-    return S_OK;
-  #endif
-  Byte buf[24];
-  memset(buf, 0, 24);
-  return WriteDirect(buf, 24);
 }
 
 UInt64 COutArchive::GetPos() const
@@ -216,7 +202,7 @@ static unsigned GetBigNumberSize(UInt64 value)
   return i;
 }
 
-#ifdef _7Z_VOL
+#ifdef Z7_7Z_VOL
 UInt32 COutArchive::GetVolHeadersSize(UInt64 dataSize, int nameLength, bool props)
 {
   UInt32 result = GetBigNumberSize(dataSize) * 2 + 41;
@@ -515,14 +501,20 @@ HRESULT COutArchive::EncodeStream(
   outFolders.FolderUnpackCRCs.Defs.Add(true);
   outFolders.FolderUnpackCRCs.Vals.Add(CrcCalc(data, data.Size()));
   // outFolders.NumUnpackStreamsVector.Add(1);
-  UInt64 dataSize64 = data.Size();
-  UInt64 unpackSize = data.Size();
-  RINOK(encoder.Encode(
+  const UInt64 dataSize64 = data.Size();
+  const UInt64 expectSize = data.Size();
+  RINOK(encoder.Encode1(
       EXTERNAL_CODECS_LOC_VARS
       stream,
       // NULL,
-      &dataSize64,
-      folders.AddNew(), outFolders.CoderUnpackSizes, unpackSize, SeqStream, packSizes, NULL))
+      &dataSize64,  // inSizeForReduce
+      expectSize,
+      folders.AddNew(),
+      // outFolders.CoderUnpackSizes, unpackSize,
+      SeqStream, packSizes, NULL))
+  if (!streamSpec->WasFinished())
+    return E_FAIL;
+  encoder.Encode_Post(dataSize64, outFolders.CoderUnpackSizes);
   return S_OK;
 }
 
@@ -833,15 +825,15 @@ HRESULT COutArchive::WriteDatabase(
   {
     headerSize = 0;
     headerOffset = 0;
-    headerCRC = CrcCalc(0, 0);
+    headerCRC = CrcCalc(NULL, 0);
   }
   else
   {
     bool encodeHeaders = false;
-    if (options != 0)
+    if (options)
       if (options->IsEmpty())
-        options = 0;
-    if (options != 0)
+        options = NULL;
+    if (options)
       if (options->PasswordIsDefined || headerOptions.CompressMainHeader)
         encodeHeaders = true;
 
@@ -876,7 +868,7 @@ HRESULT COutArchive::WriteDatabase(
       RINOK(EncodeStream(
           EXTERNAL_CODECS_LOC_VARS
           encoder, buf,
-          packSizes, folders, outFolders));
+          packSizes, folders, outFolders))
 
       _writeToStream = true;
       
@@ -890,11 +882,11 @@ HRESULT COutArchive::WriteDatabase(
       FOR_VECTOR (i, packSizes)
         headerOffset += packSizes[i];
     }
-    RINOK(_outByte.Flush());
+    RINOK(_outByte.Flush())
     headerCRC = CRC_GET_DIGEST(_crc);
     headerSize = _outByte.GetProcessedSize();
   }
-  #ifdef _7Z_VOL
+  #ifdef Z7_7Z_VOL
   if (_endMarker)
   {
     CFinishHeader h;
@@ -910,14 +902,16 @@ HRESULT COutArchive::WriteDatabase(
   }
   else
   #endif
+  if (Stream)
   {
     CStartHeader h;
     h.NextHeaderSize = headerSize;
     h.NextHeaderCRC = headerCRC;
     h.NextHeaderOffset = headerOffset;
-    RINOK(Stream->Seek((Int64)_prefixHeaderPos, STREAM_SEEK_SET, NULL));
+    RINOK(Stream->Seek((Int64)_signatureHeaderPos, STREAM_SEEK_SET, NULL))
     return WriteStartHeader(h);
   }
+  return S_OK;
 }
 
 void CUInt32DefVector::SetItem(unsigned index, bool defined, UInt32 value)

@@ -1273,19 +1273,15 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 					data[ptr++] = 0x8e; // page E, parameter is savable
 					data[ptr++] = 0x0e; // page length
 					data[ptr++] = (1 << 2) | (m_sotc << 1); // IMMED = 1
-					ptr += 6;   // skip reserved bytes
-					// connect each audio channel to 1 output port
+					ptr += 5;   // skip reserved bytes
+					// connect each audio channel to 1 output port and indicate max volume
 					data[ptr++] = 1;
+					data[ptr++] = 0xff;
 					data[ptr++] = 2;
+					data[ptr++] = 0xff;
 					data[ptr++] = 4;
+					data[ptr++] = 0xff;
 					data[ptr++] = 8;
-					// indicate max volume
-					data[ptr++] = 0xff;
-					ptr++;
-					data[ptr++] = 0xff;
-					ptr++;
-					data[ptr++] = 0xff;
-					ptr++;
 					data[ptr++] = 0xff;
 			}
 
@@ -1383,6 +1379,9 @@ void t10mmc::WriteData( uint8_t *data, int dataLength )
 				m_device->logerror("Ch 1 route: %x vol: %x\n", data[10], data[11]);
 				m_device->logerror("Ch 2 route: %x vol: %x\n", data[12], data[13]);
 				m_device->logerror("Ch 3 route: %x vol: %x\n", data[14], data[15]);
+
+				// TODO: CDDA audio channels and output port should be separate
+				// The actual audio channel that gets sent to the output port is configurable and more than one audio channel can go to an output port
 				m_cdda->set_output_gain(0, data[9] / 255.0f);
 				m_cdda->set_output_gain(1, data[11] / 255.0f);
 				break;

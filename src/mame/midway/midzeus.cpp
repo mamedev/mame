@@ -1491,159 +1491,234 @@ ROM_START( invasnab3 ) // Version 3.0 Program ROMs & v2.0 Graphics ROMs, v2.0 So
 	ROM_LOAD32_WORD( "invasion2.u19", 0x1000002, 0x200000, CRC(4b05a2a9) SHA1(3d47c22a809f5883e4795a9153161d3e29c64662) )
 ROM_END
 
+/*
+
+Cruis'N Exotica
+
+While many PCB use mask ROMs for data ROMs, when EPROMs are used the common label format is:
+
+---------------------------
+|    CRUIS'N EXOTICA      |
+)      U22 REV.1.0        |
+| C 1999 Midway Games Inc |
+---------------------------
+
+An early PCB was found with the following labels:
+
+--------------------------------
+| U  CRUIS'N EXOTICA           |
+\ 2      5350-40072-17         |
+/ 2  C 1999  DD74 1/10/2000    |
+|    MIDWAY AMUSMENT GAMES LLC |
+--------------------------------
+
+Each label reads:
+
+ U2  CRUIS'N EXOTICA  C       5350-40072-13  6500           - missing info due to no label
+ U3  CRUIS'N EXOTICA  C 2000  5350-40072-14  8CD4  1/25/00
+ U4  CRUIS'N EXOTICA  C 1999  5350-40072-15  94CD  10-7-99
+U25  CRUIS'N EXOTICA  C 1999  5350-40072-20  44FB  1/10/2000
+U24  CRUIS'N EXOTICA  C 1999  5350-40072-19  DD74  1/10/2000
+U23  CRUIS'N EXOTICA  C 1999  5350-40072-18  8E69  1/10/2000
+U22  CRUIS'N EXOTICA  C 1999  5350-40072-17  84FC  1/10/2000
+U19  CRUIS'N EXOTICA  C 2000  5350-40072-8  E4F0  1/30/00
+U18  CRUIS'N EXOTICA  C 2000  5350-40072-7  CDEC  1/30/00
+U17  CRUIS'N EXOTICA  C 1999  5350-40072-6  ADC6  12-20-99
+U16  CRUIS'N EXOTICA  C 1999  5350-40072-5  83B2  12-20-99
+U15  CRUIS'N EXOTICA  C 1999  5350-40072-4  8E69  12-20-99
+U14  CRUIS'N EXOTICA  C 1999  5350-40072-3  84FC  12-20-99
+
+NOTE: Boards can also be found using "half sized" U18 & U19 ROMs with the remaining data found in U20 & U21,
+      during the boot up, the PCB ROM test shows U18 & U19 checked while U20 & U21 are shown unpopulated and
+      are skipped. However, PCBs with genuine labels have been found in this configuration.
+
+*/
+
 ROM_START( crusnexo )
 	ROM_REGION16_LE( 0xc00000, "dcs", ROMREGION_ERASEFF )   // sound data
-	ROM_LOAD( "exotica.u2", 0x000000, 0x200000, CRC(d2d54acf) SHA1(2b4d6fda30af807228bb281335939dfb6df9b530) )
+	ROM_LOAD( "cruisn_exotica_u2_rev.1.0.u2", 0x000000, 0x200000, CRC(d2d54acf) SHA1(2b4d6fda30af807228bb281335939dfb6df9b530) ) // labeled CRUIS'N EXOTICA  U2 REV.1.0
 	ROM_RELOAD(             0x200000, 0x200000 )
-	ROM_LOAD( "exotica.u3", 0x400000, 0x400000, CRC(28a3a13d) SHA1(8d7d641b883df089adefdd144229afef79db9e8a) )
-	ROM_LOAD( "exotica.u4", 0x800000, 0x400000, CRC(213f7fd8) SHA1(8528d524a62bc41a8e3b39f0dbeeba33c862ee27) )
+	ROM_LOAD( "cruisn_exotica_u3_rev.1.0.u3", 0x400000, 0x400000, CRC(28a3a13d) SHA1(8d7d641b883df089adefdd144229afef79db9e8a) ) // labeled CRUIS'N EXOTICA  U3 REV.1.0
+	ROM_LOAD( "cruisn_exotica_u4_rev.1.0.u4", 0x800000, 0x400000, CRC(213f7fd8) SHA1(8528d524a62bc41a8e3b39f0dbeeba33c862ee27) ) // labeled CRUIS'N EXOTICA  U4 REV.1.0
+	// U5 unpopulated
 
 	ROM_REGION( 0x1000, "pic", 0 ) // PIC16c57 Code
 	ROM_LOAD( "472_cruisn_exot_27.u53", 0x0000, 0x1000, CRC(7ff41d76) SHA1(13d23e634dc8d20fbee11a9c39923b7e54984672) ) // decapped but not hooked up
 
 	ROM_REGION32_LE( 0x0800000, "user1", 0 )
-	ROM_LOAD32_WORD( "exotica-24.u10", 0x0000000, 0x200000, CRC(5e702f7c) SHA1(98c76fb46b304d4d21656d0505d5e5e99c8335bf) ) // Version 2.4  Wed Aug 23, 2000  17:26:53
-	ROM_LOAD32_WORD( "exotica-24.u11", 0x0000002, 0x200000, CRC(5ecb2cbc) SHA1(57283167e48ca96579d0712d9fec23a36fa2b496) )
-	ROM_LOAD32_WORD( "exotica-10.u12", 0x0400000, 0x200000, CRC(21f122b2) SHA1(5473401ec954bf9ab66a8283bd08d17c7960cd29) ) // These 2 ROMs might be labeled as a different version,
-	ROM_LOAD32_WORD( "exotica-10.u13", 0x0400002, 0x200000, CRC(cf9d3609) SHA1(6376891f478185d26370466bef92f0c5304d58d3) ) // but the data doesn't change. Verified for v1.3 & v1.6
+	ROM_LOAD32_WORD( "cruisn_exotica_u10_rev_2.4.u10", 0x0000000, 0x200000, CRC(5e702f7c) SHA1(98c76fb46b304d4d21656d0505d5e5e99c8335bf) ) // Version 2.4  Wed Aug 23, 2000  17:26:53
+	ROM_LOAD32_WORD( "cruisn_exotica_u11_rev_2.4.u11", 0x0000002, 0x200000, CRC(5ecb2cbc) SHA1(57283167e48ca96579d0712d9fec23a36fa2b496) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u12_rev.1.0.u12", 0x0400000, 0x200000, CRC(21f122b2) SHA1(5473401ec954bf9ab66a8283bd08d17c7960cd29) ) // These 2 ROMs might be labeled as a different version,
+	ROM_LOAD32_WORD( "cruisn_exotica_u13_rev.1.0.u13", 0x0400002, 0x200000, CRC(cf9d3609) SHA1(6376891f478185d26370466bef92f0c5304d58d3) ) // but the data doesn't change. Verified for v1.3 & v1.6
 
 	ROM_REGION32_LE( 0x3000000, "user2", 0 )
-	ROM_LOAD32_WORD( "exotica.u14", 0x0000000, 0x400000, CRC(84452fc2) SHA1(06d87263f83ef079e6c5fb9de620e0135040c858) )
-	ROM_LOAD32_WORD( "exotica.u15", 0x0000002, 0x400000, CRC(b6aaebdb) SHA1(6ede6ea123be6a88d1ff38e90f059c9d1f822d6d) )
-	ROM_LOAD32_WORD( "exotica.u16", 0x0800000, 0x400000, CRC(aac6d2a5) SHA1(6c336520269d593b46b82414d9352a3f16955cc3) )
-	ROM_LOAD32_WORD( "exotica.u17", 0x0800002, 0x400000, CRC(71cf5404) SHA1(a6eed1a66fb4f4ddd749e4272a2cdb8e3e354029) )
-	ROM_LOAD32_WORD( "exotica.u22", 0x1000000, 0x400000, CRC(ad6dcda7) SHA1(5c9291753e1659f9adbe7e59fa2d0e030efae5bc) )
-	ROM_LOAD32_WORD( "exotica.u23", 0x1000002, 0x400000, CRC(1f103a68) SHA1(3b3acc63a461677cd424e75e7211fa6f063a37ef) )
-	ROM_LOAD32_WORD( "exotica.u24", 0x1800000, 0x400000, CRC(6312feef) SHA1(4113e4e5d39c99e8131d41a57c973df475b67d18) )
-	ROM_LOAD32_WORD( "exotica.u25", 0x1800002, 0x400000, CRC(b8277b16) SHA1(1355e87affd78e195906aedc9aed9e230374e2bf) )
-	ROM_LOAD32_WORD( "exotica.u18", 0x2000000, 0x200000, CRC(60cf5caa) SHA1(629870a305802d632bd2681131d1ffc0086280d2) )
-	ROM_LOAD32_WORD( "exotica.u19", 0x2000002, 0x200000, CRC(6b919a18) SHA1(20e40e195554146ed1d3fad54f7280823ae89d4b) )
-	ROM_LOAD32_WORD( "exotica.u20", 0x2400000, 0x200000, CRC(4855b68b) SHA1(1f6e557590b2621d0d5c782b95577f1be5cbc51d) )
-	ROM_LOAD32_WORD( "exotica.u21", 0x2400002, 0x200000, CRC(0011b9d6) SHA1(231d768c964a16b905857b0814d758fe93c2eefb) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u14_rev.1.0.u14", 0x0000000, 0x400000, CRC(84452fc2) SHA1(06d87263f83ef079e6c5fb9de620e0135040c858) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u15_rev.1.0.u15", 0x0000002, 0x400000, CRC(b6aaebdb) SHA1(6ede6ea123be6a88d1ff38e90f059c9d1f822d6d) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u16_rev.1.0.u16", 0x0800000, 0x400000, CRC(aac6d2a5) SHA1(6c336520269d593b46b82414d9352a3f16955cc3) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u17_rev.1.0.u17", 0x0800002, 0x400000, CRC(71cf5404) SHA1(a6eed1a66fb4f4ddd749e4272a2cdb8e3e354029) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u22_rev.1.0.u22", 0x1000000, 0x400000, CRC(ad6dcda7) SHA1(5c9291753e1659f9adbe7e59fa2d0e030efae5bc) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u23_rev.1.0.u23", 0x1000002, 0x400000, CRC(1f103a68) SHA1(3b3acc63a461677cd424e75e7211fa6f063a37ef) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u24_rev.1.0.u24", 0x1800000, 0x400000, CRC(6312feef) SHA1(4113e4e5d39c99e8131d41a57c973df475b67d18) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u25_rev.1.0.u25", 0x1800002, 0x400000, CRC(b8277b16) SHA1(1355e87affd78e195906aedc9aed9e230374e2bf) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u18_rev.1.0.u18", 0x2000000, 0x400000, CRC(06efb00e) SHA1(fe4968220c854ee65a78323a44787cee394234a3) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u19_rev.1.0.u19", 0x2000002, 0x400000, CRC(2e75bf61) SHA1(196c24814b873dc0e500bb2187ec54e4cae6a139) )
+	// U20 & U21 unpopulated
 ROM_END
 
 ROM_START( crusnexoa )
 	ROM_REGION16_LE( 0xc00000, "dcs", ROMREGION_ERASEFF )   // sound data
-	ROM_LOAD( "exotica.u2", 0x000000, 0x200000, CRC(d2d54acf) SHA1(2b4d6fda30af807228bb281335939dfb6df9b530) )
+	ROM_LOAD( "cruisn_exotica_u2_rev.1.0.u2", 0x000000, 0x200000, CRC(d2d54acf) SHA1(2b4d6fda30af807228bb281335939dfb6df9b530) ) // labeled CRUIS'N EXOTICA  U2 REV.1.0
 	ROM_RELOAD(             0x200000, 0x200000 )
-	ROM_LOAD( "exotica.u3", 0x400000, 0x400000, CRC(28a3a13d) SHA1(8d7d641b883df089adefdd144229afef79db9e8a) )
-	ROM_LOAD( "exotica.u4", 0x800000, 0x400000, CRC(213f7fd8) SHA1(8528d524a62bc41a8e3b39f0dbeeba33c862ee27) )
+	ROM_LOAD( "cruisn_exotica_u3_rev.1.0.u3", 0x400000, 0x400000, CRC(28a3a13d) SHA1(8d7d641b883df089adefdd144229afef79db9e8a) ) // labeled CRUIS'N EXOTICA  U3 REV.1.0
+	ROM_LOAD( "cruisn_exotica_u4_rev.1.0.u4", 0x800000, 0x400000, CRC(213f7fd8) SHA1(8528d524a62bc41a8e3b39f0dbeeba33c862ee27) ) // labeled CRUIS'N EXOTICA  U4 REV.1.0
+	// U5 unpopulated
 
 	ROM_REGION( 0x1000, "pic", 0 ) // PIC16c57 Code
 	ROM_LOAD( "472_cruisn_exot_27.u53", 0x0000, 0x1000, CRC(7ff41d76) SHA1(13d23e634dc8d20fbee11a9c39923b7e54984672) ) // decapped but not hooked up
 
 	ROM_REGION32_LE( 0x0800000, "user1", 0 )
-	ROM_LOAD32_WORD( "exotica-20.u10", 0x0000000, 0x200000, CRC(43d80f54) SHA1(25683d835f3ed3dee99da33280ae6e21865801e4) ) // Version 2.0  Fri Apr 07, 2000  17:55:07
-	ROM_LOAD32_WORD( "exotica-20.u11", 0x0000002, 0x200000, CRC(dba26b69) SHA1(4900ac3fe67664a543dcd66e41793874f6cdc07f) )
-	ROM_LOAD32_WORD( "exotica-10.u12", 0x0400000, 0x200000, CRC(21f122b2) SHA1(5473401ec954bf9ab66a8283bd08d17c7960cd29) ) // These 2 ROMs might be labeled as a different version,
-	ROM_LOAD32_WORD( "exotica-10.u13", 0x0400002, 0x200000, CRC(cf9d3609) SHA1(6376891f478185d26370466bef92f0c5304d58d3) ) // but the data doesn't change. Verified for v1.3 & v1.6
+	ROM_LOAD32_WORD( "cruisn_exotica_u10_rev_2.0.u10", 0x0000000, 0x200000, CRC(43d80f54) SHA1(25683d835f3ed3dee99da33280ae6e21865801e4) ) // Version 2.0  Fri Apr 07, 2000  17:55:07
+	ROM_LOAD32_WORD( "cruisn_exotica_u11_rev_2.0.u11", 0x0000002, 0x200000, CRC(dba26b69) SHA1(4900ac3fe67664a543dcd66e41793874f6cdc07f) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u12_rev.1.0.u12", 0x0400000, 0x200000, CRC(21f122b2) SHA1(5473401ec954bf9ab66a8283bd08d17c7960cd29) ) // These 2 ROMs might be labeled as a different version,
+	ROM_LOAD32_WORD( "cruisn_exotica_u13_rev.1.0.u13", 0x0400002, 0x200000, CRC(cf9d3609) SHA1(6376891f478185d26370466bef92f0c5304d58d3) ) // but the data doesn't change. Verified for v1.3 & v1.6
 
 	ROM_REGION32_LE( 0x3000000, "user2", 0 )
-	ROM_LOAD32_WORD( "exotica.u14", 0x0000000, 0x400000, CRC(84452fc2) SHA1(06d87263f83ef079e6c5fb9de620e0135040c858) )
-	ROM_LOAD32_WORD( "exotica.u15", 0x0000002, 0x400000, CRC(b6aaebdb) SHA1(6ede6ea123be6a88d1ff38e90f059c9d1f822d6d) )
-	ROM_LOAD32_WORD( "exotica.u16", 0x0800000, 0x400000, CRC(aac6d2a5) SHA1(6c336520269d593b46b82414d9352a3f16955cc3) )
-	ROM_LOAD32_WORD( "exotica.u17", 0x0800002, 0x400000, CRC(71cf5404) SHA1(a6eed1a66fb4f4ddd749e4272a2cdb8e3e354029) )
-	ROM_LOAD32_WORD( "exotica.u22", 0x1000000, 0x400000, CRC(ad6dcda7) SHA1(5c9291753e1659f9adbe7e59fa2d0e030efae5bc) )
-	ROM_LOAD32_WORD( "exotica.u23", 0x1000002, 0x400000, CRC(1f103a68) SHA1(3b3acc63a461677cd424e75e7211fa6f063a37ef) )
-	ROM_LOAD32_WORD( "exotica.u24", 0x1800000, 0x400000, CRC(6312feef) SHA1(4113e4e5d39c99e8131d41a57c973df475b67d18) )
-	ROM_LOAD32_WORD( "exotica.u25", 0x1800002, 0x400000, CRC(b8277b16) SHA1(1355e87affd78e195906aedc9aed9e230374e2bf) )
-	ROM_LOAD32_WORD( "exotica.u18", 0x2000000, 0x200000, CRC(60cf5caa) SHA1(629870a305802d632bd2681131d1ffc0086280d2) )
-	ROM_LOAD32_WORD( "exotica.u19", 0x2000002, 0x200000, CRC(6b919a18) SHA1(20e40e195554146ed1d3fad54f7280823ae89d4b) )
-	ROM_LOAD32_WORD( "exotica.u20", 0x2400000, 0x200000, CRC(4855b68b) SHA1(1f6e557590b2621d0d5c782b95577f1be5cbc51d) )
-	ROM_LOAD32_WORD( "exotica.u21", 0x2400002, 0x200000, CRC(0011b9d6) SHA1(231d768c964a16b905857b0814d758fe93c2eefb) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u14_rev.1.0.u14", 0x0000000, 0x400000, CRC(84452fc2) SHA1(06d87263f83ef079e6c5fb9de620e0135040c858) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u15_rev.1.0.u15", 0x0000002, 0x400000, CRC(b6aaebdb) SHA1(6ede6ea123be6a88d1ff38e90f059c9d1f822d6d) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u16_rev.1.0.u16", 0x0800000, 0x400000, CRC(aac6d2a5) SHA1(6c336520269d593b46b82414d9352a3f16955cc3) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u17_rev.1.0.u17", 0x0800002, 0x400000, CRC(71cf5404) SHA1(a6eed1a66fb4f4ddd749e4272a2cdb8e3e354029) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u22_rev.1.0.u22", 0x1000000, 0x400000, CRC(ad6dcda7) SHA1(5c9291753e1659f9adbe7e59fa2d0e030efae5bc) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u23_rev.1.0.u23", 0x1000002, 0x400000, CRC(1f103a68) SHA1(3b3acc63a461677cd424e75e7211fa6f063a37ef) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u24_rev.1.0.u24", 0x1800000, 0x400000, CRC(6312feef) SHA1(4113e4e5d39c99e8131d41a57c973df475b67d18) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u25_rev.1.0.u25", 0x1800002, 0x400000, CRC(b8277b16) SHA1(1355e87affd78e195906aedc9aed9e230374e2bf) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u18_rev.1.0.u18", 0x2000000, 0x400000, CRC(06efb00e) SHA1(fe4968220c854ee65a78323a44787cee394234a3) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u19_rev.1.0.u19", 0x2000002, 0x400000, CRC(2e75bf61) SHA1(196c24814b873dc0e500bb2187ec54e4cae6a139) )
+	// U20 & U21 unpopulated
+ROM_END
+
+ROM_START( crusnexoaa ) // known alternate ROM configuration - The half size U18 & U19 and use of U20 & U21 can appear with any program ROM revision
+	ROM_REGION16_LE( 0xc00000, "dcs", ROMREGION_ERASEFF )   // sound data
+	ROM_LOAD( "cruisn_exotica_u2_rev.1.0.u2", 0x000000, 0x200000, CRC(d2d54acf) SHA1(2b4d6fda30af807228bb281335939dfb6df9b530) ) // labeled CRUIS'N EXOTICA  U2 REV.1.0
+	ROM_RELOAD(             0x200000, 0x200000 )
+	ROM_LOAD( "cruisn_exotica_u3_rev.1.0.u3", 0x400000, 0x400000, CRC(28a3a13d) SHA1(8d7d641b883df089adefdd144229afef79db9e8a) ) // labeled CRUIS'N EXOTICA  U3 REV.1.0
+	ROM_LOAD( "cruisn_exotica_u4_rev.1.0.u4", 0x800000, 0x400000, CRC(213f7fd8) SHA1(8528d524a62bc41a8e3b39f0dbeeba33c862ee27) ) // labeled CRUIS'N EXOTICA  U4 REV.1.0
+	// U5 unpopulated
+
+	ROM_REGION( 0x1000, "pic", 0 ) // PIC16c57 Code
+	ROM_LOAD( "472_cruisn_exot_27.u53", 0x0000, 0x1000, CRC(7ff41d76) SHA1(13d23e634dc8d20fbee11a9c39923b7e54984672) ) // decapped but not hooked up
+
+	ROM_REGION32_LE( 0x0800000, "user1", 0 )
+	ROM_LOAD32_WORD( "cruisn_exotica_u10_rev_2.0.u10", 0x0000000, 0x200000, CRC(43d80f54) SHA1(25683d835f3ed3dee99da33280ae6e21865801e4) ) // Version 2.0  Fri Apr 07, 2000  17:55:07
+	ROM_LOAD32_WORD( "cruisn_exotica_u11_rev_2.0.u11", 0x0000002, 0x200000, CRC(dba26b69) SHA1(4900ac3fe67664a543dcd66e41793874f6cdc07f) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u12_rev.1.0.u12", 0x0400000, 0x200000, CRC(21f122b2) SHA1(5473401ec954bf9ab66a8283bd08d17c7960cd29) ) // These 2 ROMs might be labeled as a different version,
+	ROM_LOAD32_WORD( "cruisn_exotica_u13_rev.1.0.u13", 0x0400002, 0x200000, CRC(cf9d3609) SHA1(6376891f478185d26370466bef92f0c5304d58d3) ) // but the data doesn't change. Verified for v1.3 & v1.6
+
+	ROM_REGION32_LE( 0x3000000, "user2", 0 )
+	ROM_LOAD32_WORD( "cruisn_exotica_u14_rev.1.0.u14", 0x0000000, 0x400000, CRC(84452fc2) SHA1(06d87263f83ef079e6c5fb9de620e0135040c858) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u15_rev.1.0.u15", 0x0000002, 0x400000, CRC(b6aaebdb) SHA1(6ede6ea123be6a88d1ff38e90f059c9d1f822d6d) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u16_rev.1.0.u16", 0x0800000, 0x400000, CRC(aac6d2a5) SHA1(6c336520269d593b46b82414d9352a3f16955cc3) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u17_rev.1.0.u17", 0x0800002, 0x400000, CRC(71cf5404) SHA1(a6eed1a66fb4f4ddd749e4272a2cdb8e3e354029) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u22_rev.1.0.u22", 0x1000000, 0x400000, CRC(ad6dcda7) SHA1(5c9291753e1659f9adbe7e59fa2d0e030efae5bc) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u23_rev.1.0.u23", 0x1000002, 0x400000, CRC(1f103a68) SHA1(3b3acc63a461677cd424e75e7211fa6f063a37ef) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u24_rev.1.0.u24", 0x1800000, 0x400000, CRC(6312feef) SHA1(4113e4e5d39c99e8131d41a57c973df475b67d18) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u25_rev.1.0.u25", 0x1800002, 0x400000, CRC(b8277b16) SHA1(1355e87affd78e195906aedc9aed9e230374e2bf) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u18_rev.1.0.u18", 0x2000000, 0x200000, CRC(60cf5caa) SHA1(629870a305802d632bd2681131d1ffc0086280d2) ) // sldh - 1st half of U18 compared to other sets
+	ROM_LOAD32_WORD( "cruisn_exotica_u19_rev.1.0.u19", 0x2000002, 0x200000, CRC(6b919a18) SHA1(20e40e195554146ed1d3fad54f7280823ae89d4b) ) // sldh - 1st half of U19 compared to other sets
+	ROM_LOAD32_WORD( "cruisn_exotica_u20_rev.1.0.u20", 0x2400000, 0x200000, CRC(4855b68b) SHA1(1f6e557590b2621d0d5c782b95577f1be5cbc51d) ) // 2nd half of U18 compared to other sets
+	ROM_LOAD32_WORD( "cruisn_exotica_u21_rev.1.0.u21", 0x2400002, 0x200000, CRC(0011b9d6) SHA1(231d768c964a16b905857b0814d758fe93c2eefb) ) // 2nd half of U19 compared to other sets
 ROM_END
 
 ROM_START( crusnexob )
 	ROM_REGION16_LE( 0xc00000, "dcs", ROMREGION_ERASEFF )   // sound data
-	ROM_LOAD( "exotica.u2", 0x000000, 0x200000, CRC(d2d54acf) SHA1(2b4d6fda30af807228bb281335939dfb6df9b530) )
+	ROM_LOAD( "cruisn_exotica_u2_rev.1.0.u2", 0x000000, 0x200000, CRC(d2d54acf) SHA1(2b4d6fda30af807228bb281335939dfb6df9b530) ) // labeled CRUIS'N EXOTICA  U2 REV.1.0
 	ROM_RELOAD(             0x200000, 0x200000 )
-	ROM_LOAD( "exotica.u3", 0x400000, 0x400000, CRC(28a3a13d) SHA1(8d7d641b883df089adefdd144229afef79db9e8a) )
-	ROM_LOAD( "exotica.u4", 0x800000, 0x400000, CRC(213f7fd8) SHA1(8528d524a62bc41a8e3b39f0dbeeba33c862ee27) )
+	ROM_LOAD( "cruisn_exotica_u3_rev.1.0.u3", 0x400000, 0x400000, CRC(28a3a13d) SHA1(8d7d641b883df089adefdd144229afef79db9e8a) ) // labeled CRUIS'N EXOTICA  U3 REV.1.0
+	ROM_LOAD( "cruisn_exotica_u4_rev.1.0.u4", 0x800000, 0x400000, CRC(213f7fd8) SHA1(8528d524a62bc41a8e3b39f0dbeeba33c862ee27) ) // labeled CRUIS'N EXOTICA  U4 REV.1.0
+	// U5 unpopulated
 
 	ROM_REGION( 0x1000, "pic", 0 ) // PIC16c57 Code
 	ROM_LOAD( "472_cruisn_exot_27.u53", 0x0000, 0x1000, CRC(7ff41d76) SHA1(13d23e634dc8d20fbee11a9c39923b7e54984672) ) // decapped but not hooked up
 
 	ROM_REGION32_LE( 0x0800000, "user1", 0 )
-	ROM_LOAD32_WORD( "exotica-16.u10", 0x0000000, 0x200000, CRC(65450140) SHA1(cad41a2cad48426de01feb78d3f71f768e3fc872) ) // Version 1.6  Tue Feb 22, 2000  10:25:01
-	ROM_LOAD32_WORD( "exotica-16.u11", 0x0000002, 0x200000, CRC(e994891f) SHA1(bb088729b665864c7f3b79b97c3c86f9c8f68770) )
-	ROM_LOAD32_WORD( "exotica-10.u12", 0x0400000, 0x200000, CRC(21f122b2) SHA1(5473401ec954bf9ab66a8283bd08d17c7960cd29) ) // These 2 ROMs might be labeled as a different version,
-	ROM_LOAD32_WORD( "exotica-10.u13", 0x0400002, 0x200000, CRC(cf9d3609) SHA1(6376891f478185d26370466bef92f0c5304d58d3) ) // but the data doesn't change. Verified for v1.3 & v1.6
+	ROM_LOAD32_WORD( "cruisn_exotica_u10_rev_1.6.u10", 0x0000000, 0x200000, CRC(65450140) SHA1(cad41a2cad48426de01feb78d3f71f768e3fc872) ) // Version 1.6  Tue Feb 22, 2000  10:25:01
+	ROM_LOAD32_WORD( "cruisn_exotica_u11_rev_1.6.u11", 0x0000002, 0x200000, CRC(e994891f) SHA1(bb088729b665864c7f3b79b97c3c86f9c8f68770) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u12_rev.1.0.u12", 0x0400000, 0x200000, CRC(21f122b2) SHA1(5473401ec954bf9ab66a8283bd08d17c7960cd29) ) // These 2 ROMs might be labeled as a different version,
+	ROM_LOAD32_WORD( "cruisn_exotica_u13_rev.1.0.u13", 0x0400002, 0x200000, CRC(cf9d3609) SHA1(6376891f478185d26370466bef92f0c5304d58d3) ) // but the data doesn't change. Verified for v1.3 & v1.6
 
 	ROM_REGION32_LE( 0x3000000, "user2", 0 )
-	ROM_LOAD32_WORD( "exotica.u14", 0x0000000, 0x400000, CRC(84452fc2) SHA1(06d87263f83ef079e6c5fb9de620e0135040c858) )
-	ROM_LOAD32_WORD( "exotica.u15", 0x0000002, 0x400000, CRC(b6aaebdb) SHA1(6ede6ea123be6a88d1ff38e90f059c9d1f822d6d) )
-	ROM_LOAD32_WORD( "exotica.u16", 0x0800000, 0x400000, CRC(aac6d2a5) SHA1(6c336520269d593b46b82414d9352a3f16955cc3) )
-	ROM_LOAD32_WORD( "exotica.u17", 0x0800002, 0x400000, CRC(71cf5404) SHA1(a6eed1a66fb4f4ddd749e4272a2cdb8e3e354029) )
-	ROM_LOAD32_WORD( "exotica.u22", 0x1000000, 0x400000, CRC(ad6dcda7) SHA1(5c9291753e1659f9adbe7e59fa2d0e030efae5bc) )
-	ROM_LOAD32_WORD( "exotica.u23", 0x1000002, 0x400000, CRC(1f103a68) SHA1(3b3acc63a461677cd424e75e7211fa6f063a37ef) )
-	ROM_LOAD32_WORD( "exotica.u24", 0x1800000, 0x400000, CRC(6312feef) SHA1(4113e4e5d39c99e8131d41a57c973df475b67d18) )
-	ROM_LOAD32_WORD( "exotica.u25", 0x1800002, 0x400000, CRC(b8277b16) SHA1(1355e87affd78e195906aedc9aed9e230374e2bf) )
-	ROM_LOAD32_WORD( "exotica.u18", 0x2000000, 0x200000, CRC(60cf5caa) SHA1(629870a305802d632bd2681131d1ffc0086280d2) )
-	ROM_LOAD32_WORD( "exotica.u19", 0x2000002, 0x200000, CRC(6b919a18) SHA1(20e40e195554146ed1d3fad54f7280823ae89d4b) )
-	ROM_LOAD32_WORD( "exotica.u20", 0x2400000, 0x200000, CRC(4855b68b) SHA1(1f6e557590b2621d0d5c782b95577f1be5cbc51d) )
-	ROM_LOAD32_WORD( "exotica.u21", 0x2400002, 0x200000, CRC(0011b9d6) SHA1(231d768c964a16b905857b0814d758fe93c2eefb) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u14_rev.1.0.u14", 0x0000000, 0x400000, CRC(84452fc2) SHA1(06d87263f83ef079e6c5fb9de620e0135040c858) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u15_rev.1.0.u15", 0x0000002, 0x400000, CRC(b6aaebdb) SHA1(6ede6ea123be6a88d1ff38e90f059c9d1f822d6d) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u16_rev.1.0.u16", 0x0800000, 0x400000, CRC(aac6d2a5) SHA1(6c336520269d593b46b82414d9352a3f16955cc3) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u17_rev.1.0.u17", 0x0800002, 0x400000, CRC(71cf5404) SHA1(a6eed1a66fb4f4ddd749e4272a2cdb8e3e354029) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u22_rev.1.0.u22", 0x1000000, 0x400000, CRC(ad6dcda7) SHA1(5c9291753e1659f9adbe7e59fa2d0e030efae5bc) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u23_rev.1.0.u23", 0x1000002, 0x400000, CRC(1f103a68) SHA1(3b3acc63a461677cd424e75e7211fa6f063a37ef) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u24_rev.1.0.u24", 0x1800000, 0x400000, CRC(6312feef) SHA1(4113e4e5d39c99e8131d41a57c973df475b67d18) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u25_rev.1.0.u25", 0x1800002, 0x400000, CRC(b8277b16) SHA1(1355e87affd78e195906aedc9aed9e230374e2bf) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u18_rev.1.0.u18", 0x2000000, 0x400000, CRC(06efb00e) SHA1(fe4968220c854ee65a78323a44787cee394234a3) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u19_rev.1.0.u19", 0x2000002, 0x400000, CRC(2e75bf61) SHA1(196c24814b873dc0e500bb2187ec54e4cae6a139) )
+	// U20 & U21 unpopulated
 ROM_END
 
 ROM_START( crusnexoc )
 	ROM_REGION16_LE( 0xc00000, "dcs", ROMREGION_ERASEFF )   // sound data
-	ROM_LOAD( "exotica.u2", 0x000000, 0x200000, CRC(d2d54acf) SHA1(2b4d6fda30af807228bb281335939dfb6df9b530) )
+	ROM_LOAD( "cruisn_exotica_u2_rev.1.0.u2", 0x000000, 0x200000, CRC(d2d54acf) SHA1(2b4d6fda30af807228bb281335939dfb6df9b530) ) // labeled CRUIS'N EXOTICA  U2 REV.1.0
 	ROM_RELOAD(             0x200000, 0x200000 )
-	ROM_LOAD( "exotica.u3", 0x400000, 0x400000, CRC(28a3a13d) SHA1(8d7d641b883df089adefdd144229afef79db9e8a) )
-	ROM_LOAD( "exotica.u4", 0x800000, 0x400000, CRC(213f7fd8) SHA1(8528d524a62bc41a8e3b39f0dbeeba33c862ee27) )
+	ROM_LOAD( "cruisn_exotica_u3_rev.1.0.u3", 0x400000, 0x400000, CRC(28a3a13d) SHA1(8d7d641b883df089adefdd144229afef79db9e8a) ) // labeled CRUIS'N EXOTICA  U3 REV.1.0
+	ROM_LOAD( "cruisn_exotica_u4_rev.1.0.u4", 0x800000, 0x400000, CRC(213f7fd8) SHA1(8528d524a62bc41a8e3b39f0dbeeba33c862ee27) ) // labeled CRUIS'N EXOTICA  U4 REV.1.0
+	// U5 unpopulated
 
 	ROM_REGION( 0x1000, "pic", 0 ) // PIC16c57 Code
 	ROM_LOAD( "472_cruisn_exot_27.u53", 0x0000, 0x1000, CRC(7ff41d76) SHA1(13d23e634dc8d20fbee11a9c39923b7e54984672) ) // decapped but not hooked up
 
 	ROM_REGION32_LE( 0x0800000, "user1", 0 )
-	ROM_LOAD32_WORD( "exotica-13.u10", 0x0000000, 0x200000, CRC(ab7f1b5e) SHA1(c0c561e8cb15fd97465278b4b3b15acb27380c5d) ) // Version 1.3  Fri Feb 11, 2000  16:19:13
-	ROM_LOAD32_WORD( "exotica-13.u11", 0x0000002, 0x200000, CRC(62d3c966) SHA1(9a485892295984a292501424d2c78caafac99a75) )
-	ROM_LOAD32_WORD( "exotica-10.u12", 0x0400000, 0x200000, CRC(21f122b2) SHA1(5473401ec954bf9ab66a8283bd08d17c7960cd29) ) // These 2 ROMs might be labeled as a different version,
-	ROM_LOAD32_WORD( "exotica-10.u13", 0x0400002, 0x200000, CRC(cf9d3609) SHA1(6376891f478185d26370466bef92f0c5304d58d3) ) // but the data doesn't change. Verified for v1.3 & v1.6
+	ROM_LOAD32_WORD( "cruisn_exotica_u10_rev_1.3.u10", 0x0000000, 0x200000, CRC(ab7f1b5e) SHA1(c0c561e8cb15fd97465278b4b3b15acb27380c5d) ) // Version 1.3  Fri Feb 11, 2000  16:19:13
+	ROM_LOAD32_WORD( "cruisn_exotica_u11_rev_1.3.u11", 0x0000002, 0x200000, CRC(62d3c966) SHA1(9a485892295984a292501424d2c78caafac99a75) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u12_rev.1.0.u12", 0x0400000, 0x200000, CRC(21f122b2) SHA1(5473401ec954bf9ab66a8283bd08d17c7960cd29) ) // These 2 ROMs might be labeled as a different version,
+	ROM_LOAD32_WORD( "cruisn_exotica_u13_rev.1.0.u13", 0x0400002, 0x200000, CRC(cf9d3609) SHA1(6376891f478185d26370466bef92f0c5304d58d3) ) // but the data doesn't change. Verified for v1.3 & v1.6
 
 	ROM_REGION32_LE( 0x3000000, "user2", 0 )
-	ROM_LOAD32_WORD( "exotica.u14", 0x0000000, 0x400000, CRC(84452fc2) SHA1(06d87263f83ef079e6c5fb9de620e0135040c858) )
-	ROM_LOAD32_WORD( "exotica.u15", 0x0000002, 0x400000, CRC(b6aaebdb) SHA1(6ede6ea123be6a88d1ff38e90f059c9d1f822d6d) )
-	ROM_LOAD32_WORD( "exotica.u16", 0x0800000, 0x400000, CRC(aac6d2a5) SHA1(6c336520269d593b46b82414d9352a3f16955cc3) )
-	ROM_LOAD32_WORD( "exotica.u17", 0x0800002, 0x400000, CRC(71cf5404) SHA1(a6eed1a66fb4f4ddd749e4272a2cdb8e3e354029) )
-	ROM_LOAD32_WORD( "exotica.u22", 0x1000000, 0x400000, CRC(ad6dcda7) SHA1(5c9291753e1659f9adbe7e59fa2d0e030efae5bc) )
-	ROM_LOAD32_WORD( "exotica.u23", 0x1000002, 0x400000, CRC(1f103a68) SHA1(3b3acc63a461677cd424e75e7211fa6f063a37ef) )
-	ROM_LOAD32_WORD( "exotica.u24", 0x1800000, 0x400000, CRC(6312feef) SHA1(4113e4e5d39c99e8131d41a57c973df475b67d18) )
-	ROM_LOAD32_WORD( "exotica.u25", 0x1800002, 0x400000, CRC(b8277b16) SHA1(1355e87affd78e195906aedc9aed9e230374e2bf) )
-	ROM_LOAD32_WORD( "exotica.u18", 0x2000000, 0x200000, CRC(60cf5caa) SHA1(629870a305802d632bd2681131d1ffc0086280d2) )
-	ROM_LOAD32_WORD( "exotica.u19", 0x2000002, 0x200000, CRC(6b919a18) SHA1(20e40e195554146ed1d3fad54f7280823ae89d4b) )
-	ROM_LOAD32_WORD( "exotica.u20", 0x2400000, 0x200000, CRC(4855b68b) SHA1(1f6e557590b2621d0d5c782b95577f1be5cbc51d) )
-	ROM_LOAD32_WORD( "exotica.u21", 0x2400002, 0x200000, CRC(0011b9d6) SHA1(231d768c964a16b905857b0814d758fe93c2eefb) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u14_rev.1.0.u14", 0x0000000, 0x400000, CRC(84452fc2) SHA1(06d87263f83ef079e6c5fb9de620e0135040c858) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u15_rev.1.0.u15", 0x0000002, 0x400000, CRC(b6aaebdb) SHA1(6ede6ea123be6a88d1ff38e90f059c9d1f822d6d) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u16_rev.1.0.u16", 0x0800000, 0x400000, CRC(aac6d2a5) SHA1(6c336520269d593b46b82414d9352a3f16955cc3) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u17_rev.1.0.u17", 0x0800002, 0x400000, CRC(71cf5404) SHA1(a6eed1a66fb4f4ddd749e4272a2cdb8e3e354029) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u22_rev.1.0.u22", 0x1000000, 0x400000, CRC(ad6dcda7) SHA1(5c9291753e1659f9adbe7e59fa2d0e030efae5bc) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u23_rev.1.0.u23", 0x1000002, 0x400000, CRC(1f103a68) SHA1(3b3acc63a461677cd424e75e7211fa6f063a37ef) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u24_rev.1.0.u24", 0x1800000, 0x400000, CRC(6312feef) SHA1(4113e4e5d39c99e8131d41a57c973df475b67d18) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u25_rev.1.0.u25", 0x1800002, 0x400000, CRC(b8277b16) SHA1(1355e87affd78e195906aedc9aed9e230374e2bf) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u18_rev.1.0.u18", 0x2000000, 0x400000, CRC(06efb00e) SHA1(fe4968220c854ee65a78323a44787cee394234a3) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u19_rev.1.0.u19", 0x2000002, 0x400000, CRC(2e75bf61) SHA1(196c24814b873dc0e500bb2187ec54e4cae6a139) )
+	// U20 & U21 unpopulated
 ROM_END
 
 ROM_START( crusnexod )
 	ROM_REGION16_LE( 0xc00000, "dcs", ROMREGION_ERASEFF )   // sound data
-	ROM_LOAD( "exotica.u2", 0x000000, 0x200000, CRC(d2d54acf) SHA1(2b4d6fda30af807228bb281335939dfb6df9b530) )
+	ROM_LOAD( "cruisn_exotica_u2_rev.1.0.u2", 0x000000, 0x200000, CRC(d2d54acf) SHA1(2b4d6fda30af807228bb281335939dfb6df9b530) ) // labeled CRUIS'N EXOTICA  U2 REV.1.0
 	ROM_RELOAD(             0x200000, 0x200000 )
-	ROM_LOAD( "exotica.u3", 0x400000, 0x400000, CRC(28a3a13d) SHA1(8d7d641b883df089adefdd144229afef79db9e8a) )
-	ROM_LOAD( "exotica.u4", 0x800000, 0x400000, CRC(213f7fd8) SHA1(8528d524a62bc41a8e3b39f0dbeeba33c862ee27) )
+	ROM_LOAD( "cruisn_exotica_u3_rev.1.0.u3", 0x400000, 0x400000, CRC(28a3a13d) SHA1(8d7d641b883df089adefdd144229afef79db9e8a) ) // labeled CRUIS'N EXOTICA  U3 REV.1.0
+	ROM_LOAD( "cruisn_exotica_u4_rev.1.0.u4", 0x800000, 0x400000, CRC(213f7fd8) SHA1(8528d524a62bc41a8e3b39f0dbeeba33c862ee27) ) // labeled CRUIS'N EXOTICA  U4 REV.1.0
+	// U5 unpopulated
 
 	ROM_REGION( 0x1000, "pic", 0 ) // PIC16c57 Code
 	ROM_LOAD( "472_cruisn_exot_27.u53", 0x0000, 0x1000, CRC(7ff41d76) SHA1(13d23e634dc8d20fbee11a9c39923b7e54984672) ) // decapped but not hooked up
 
 	ROM_REGION32_LE( 0x0800000, "user1", 0 )
-	ROM_LOAD32_WORD( "exotica-10.u10", 0x0000000, 0x200000, CRC(305fe2c1) SHA1(5d12163da0ae6db7d8d1f64f79c767a3c7df29a0) ) // Version 1.0  Tue Feb 08, 2000  13:22:04
-	ROM_LOAD32_WORD( "exotica-10.u11", 0x0000002, 0x200000, CRC(50b241ff) SHA1(b8a353d9420009c4e521bb088575d704a7f386b3) )
-	ROM_LOAD32_WORD( "exotica-10.u12", 0x0400000, 0x200000, CRC(21f122b2) SHA1(5473401ec954bf9ab66a8283bd08d17c7960cd29) )
-	ROM_LOAD32_WORD( "exotica-10.u13", 0x0400002, 0x200000, CRC(cf9d3609) SHA1(6376891f478185d26370466bef92f0c5304d58d3) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u10_rev.1.0.u10", 0x0000000, 0x200000, CRC(305fe2c1) SHA1(5d12163da0ae6db7d8d1f64f79c767a3c7df29a0) ) // Version 1.0  Tue Feb 08, 2000  13:22:04
+	ROM_LOAD32_WORD( "cruisn_exotica_u11_rev.1.0.u11", 0x0000002, 0x200000, CRC(50b241ff) SHA1(b8a353d9420009c4e521bb088575d704a7f386b3) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u12_rev.1.0.u12", 0x0400000, 0x200000, CRC(21f122b2) SHA1(5473401ec954bf9ab66a8283bd08d17c7960cd29) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u13_rev.1.0.u13", 0x0400002, 0x200000, CRC(cf9d3609) SHA1(6376891f478185d26370466bef92f0c5304d58d3) )
 
 	ROM_REGION32_LE( 0x3000000, "user2", 0 )
-	ROM_LOAD32_WORD( "exotica.u14", 0x0000000, 0x400000, CRC(84452fc2) SHA1(06d87263f83ef079e6c5fb9de620e0135040c858) )
-	ROM_LOAD32_WORD( "exotica.u15", 0x0000002, 0x400000, CRC(b6aaebdb) SHA1(6ede6ea123be6a88d1ff38e90f059c9d1f822d6d) )
-	ROM_LOAD32_WORD( "exotica.u16", 0x0800000, 0x400000, CRC(aac6d2a5) SHA1(6c336520269d593b46b82414d9352a3f16955cc3) )
-	ROM_LOAD32_WORD( "exotica.u17", 0x0800002, 0x400000, CRC(71cf5404) SHA1(a6eed1a66fb4f4ddd749e4272a2cdb8e3e354029) )
-	ROM_LOAD32_WORD( "exotica.u22", 0x1000000, 0x400000, CRC(ad6dcda7) SHA1(5c9291753e1659f9adbe7e59fa2d0e030efae5bc) )
-	ROM_LOAD32_WORD( "exotica.u23", 0x1000002, 0x400000, CRC(1f103a68) SHA1(3b3acc63a461677cd424e75e7211fa6f063a37ef) )
-	ROM_LOAD32_WORD( "exotica.u24", 0x1800000, 0x400000, CRC(6312feef) SHA1(4113e4e5d39c99e8131d41a57c973df475b67d18) )
-	ROM_LOAD32_WORD( "exotica.u25", 0x1800002, 0x400000, CRC(b8277b16) SHA1(1355e87affd78e195906aedc9aed9e230374e2bf) )
-	ROM_LOAD32_WORD( "exotica.u18", 0x2000000, 0x200000, CRC(60cf5caa) SHA1(629870a305802d632bd2681131d1ffc0086280d2) )
-	ROM_LOAD32_WORD( "exotica.u19", 0x2000002, 0x200000, CRC(6b919a18) SHA1(20e40e195554146ed1d3fad54f7280823ae89d4b) )
-	ROM_LOAD32_WORD( "exotica.u20", 0x2400000, 0x200000, CRC(4855b68b) SHA1(1f6e557590b2621d0d5c782b95577f1be5cbc51d) )
-	ROM_LOAD32_WORD( "exotica.u21", 0x2400002, 0x200000, CRC(0011b9d6) SHA1(231d768c964a16b905857b0814d758fe93c2eefb) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u14_rev.1.0.u14", 0x0000000, 0x400000, CRC(84452fc2) SHA1(06d87263f83ef079e6c5fb9de620e0135040c858) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u15_rev.1.0.u15", 0x0000002, 0x400000, CRC(b6aaebdb) SHA1(6ede6ea123be6a88d1ff38e90f059c9d1f822d6d) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u16_rev.1.0.u16", 0x0800000, 0x400000, CRC(aac6d2a5) SHA1(6c336520269d593b46b82414d9352a3f16955cc3) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u17_rev.1.0.u17", 0x0800002, 0x400000, CRC(71cf5404) SHA1(a6eed1a66fb4f4ddd749e4272a2cdb8e3e354029) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u22_rev.1.0.u22", 0x1000000, 0x400000, CRC(ad6dcda7) SHA1(5c9291753e1659f9adbe7e59fa2d0e030efae5bc) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u23_rev.1.0.u23", 0x1000002, 0x400000, CRC(1f103a68) SHA1(3b3acc63a461677cd424e75e7211fa6f063a37ef) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u24_rev.1.0.u24", 0x1800000, 0x400000, CRC(6312feef) SHA1(4113e4e5d39c99e8131d41a57c973df475b67d18) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u25_rev.1.0.u25", 0x1800002, 0x400000, CRC(b8277b16) SHA1(1355e87affd78e195906aedc9aed9e230374e2bf) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u18_rev.1.0.u18", 0x2000000, 0x400000, CRC(06efb00e) SHA1(fe4968220c854ee65a78323a44787cee394234a3) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u19_rev.1.0.u19", 0x2000002, 0x400000, CRC(2e75bf61) SHA1(196c24814b873dc0e500bb2187ec54e4cae6a139) )
+	// U20 & U21 unpopulated
 ROM_END
 
 
@@ -1763,17 +1838,18 @@ void midzeus2_state::init_thegrid()
  *
  *************************************/
 
-GAME(  1997, mk4,      0,        mk4,      mk4,      midzeus_state,  init_mk4,      ROT0, "Midway", "Mortal Kombat 4 (version 3.0)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME(  1997, mk4a,     mk4,      mk4,      mk4,      midzeus_state,  init_mk4,      ROT0, "Midway", "Mortal Kombat 4 (version 2.1)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME(  1997, mk4b,     mk4,      mk4,      mk4,      midzeus_state,  init_mk4,      ROT0, "Midway", "Mortal Kombat 4 (version 1.0)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME(  1999, invasnab, 0,        invasn,   invasn,   midzeus_state,  init_invasn,   ROT0, "Midway", "Invasion - The Abductors (version 5.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME(  1999, invasnab4,invasnab, invasn,   invasn,   midzeus_state,  init_invasn,   ROT0, "Midway", "Invasion - The Abductors (version 4.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME(  1999, invasnab3,invasnab, invasn,   invasn,   midzeus_state,  init_invasn,   ROT0, "Midway", "Invasion - The Abductors (version 3.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAMEL( 1999, crusnexo, 0,        crusnexo, crusnexo, midzeus2_state, init_crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 2.4)",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
-GAMEL( 1999, crusnexoa,crusnexo, crusnexo, crusnexo, midzeus2_state, init_crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 2.0)",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
-GAMEL( 1999, crusnexob,crusnexo, crusnexo, crusnexo, midzeus2_state, init_crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 1.6)",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
-GAMEL( 1999, crusnexoc,crusnexo, crusnexo, crusnexo, midzeus2_state, init_crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 1.3)",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
-GAMEL( 1999, crusnexod,crusnexo, crusnexo, crusnexo, midzeus2_state, init_crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 1.0)",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
-GAME(  2000, thegrid,  0,        thegrid,  thegrid,  midzeus2_state, init_thegrid,  ROT0, "Midway", "The Grid (version 1.2)",                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 10/16/00
-GAME(  2000, thegrida, thegrid,  thegrid,  thegrid,  midzeus2_state, init_thegrid,  ROT0, "Midway", "The Grid (version 1.1)",                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 07/26/00
-GAME(  2000, thegridb, thegrid,  thegrid,  thegrid,  midzeus2_state, init_thegrid,  ROT0, "Midway", "The Grid (version 1.01)",                MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 07/17/00
+GAME(  1997, mk4,        0,        mk4,      mk4,      midzeus_state,  init_mk4,      ROT0, "Midway", "Mortal Kombat 4 (version 3.0)",                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME(  1997, mk4a,       mk4,      mk4,      mk4,      midzeus_state,  init_mk4,      ROT0, "Midway", "Mortal Kombat 4 (version 2.1)",                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME(  1997, mk4b,       mk4,      mk4,      mk4,      midzeus_state,  init_mk4,      ROT0, "Midway", "Mortal Kombat 4 (version 1.0)",                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME(  1999, invasnab,   0,        invasn,   invasn,   midzeus_state,  init_invasn,   ROT0, "Midway", "Invasion - The Abductors (version 5.0)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME(  1999, invasnab4,  invasnab, invasn,   invasn,   midzeus_state,  init_invasn,   ROT0, "Midway", "Invasion - The Abductors (version 4.0)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME(  1999, invasnab3,  invasnab, invasn,   invasn,   midzeus_state,  init_invasn,   ROT0, "Midway", "Invasion - The Abductors (version 3.0)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAMEL( 1999, crusnexo,   0,        crusnexo, crusnexo, midzeus2_state, init_crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 2.4)",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
+GAMEL( 1999, crusnexoa,  crusnexo, crusnexo, crusnexo, midzeus2_state, init_crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 2.0)",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
+GAMEL( 1999, crusnexoaa, crusnexo, crusnexo, crusnexo, midzeus2_state, init_crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 2.0, alternate ROM format)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
+GAMEL( 1999, crusnexob,  crusnexo, crusnexo, crusnexo, midzeus2_state, init_crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 1.6)",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
+GAMEL( 1999, crusnexoc,  crusnexo, crusnexo, crusnexo, midzeus2_state, init_crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 1.3)",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
+GAMEL( 1999, crusnexod,  crusnexo, crusnexo, crusnexo, midzeus2_state, init_crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 1.0)",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
+GAME(  2000, thegrid,    0,        thegrid,  thegrid,  midzeus2_state, init_thegrid,  ROT0, "Midway", "The Grid (version 1.2)",                              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 10/16/00
+GAME(  2000, thegrida,   thegrid,  thegrid,  thegrid,  midzeus2_state, init_thegrid,  ROT0, "Midway", "The Grid (version 1.1)",                              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 07/26/00
+GAME(  2000, thegridb,   thegrid,  thegrid,  thegrid,  midzeus2_state, init_thegrid,  ROT0, "Midway", "The Grid (version 1.01)",                             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 07/17/00

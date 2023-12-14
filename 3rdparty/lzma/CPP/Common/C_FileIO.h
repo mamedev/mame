@@ -1,6 +1,6 @@
 // Common/C_FileIO.h
 
-#ifndef __COMMON_C_FILEIO_H
-#define __COMMON_C_FILEIO_H
+#ifndef ZIP7_INC_COMMON_C_FILEIO_H
+#define ZIP7_INC_COMMON_C_FILEIO_H
 
 #endif

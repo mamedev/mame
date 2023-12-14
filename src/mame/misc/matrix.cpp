@@ -22,7 +22,14 @@
 */
 
 #include "emu.h"
+
+#include "bus/isa/isa_cards.h"
 #include "cpu/i386/i386.h"
+#include "machine/mc146818.h"
+#include "machine/mediagx_cs5530_bridge.h"
+#include "machine/mediagx_host.h"
+#include "machine/pci.h"
+
 #include "screen.h"
 
 
@@ -32,18 +39,18 @@ class matrix_state : public driver_device
 {
 public:
 	matrix_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_rtc(*this, "rtc")
 	{ }
 
 	void matrix(machine_config &config);
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<ds1287_device> m_rtc;
 
 	void main_map(address_map &map);
-
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return 0; }
 };
 
 
@@ -60,22 +67,41 @@ void matrix_state::matrix(machine_config &config)
 	// basic machine hardware
 	MEDIAGX(config, m_maincpu, 233'000'000); // Cyrix MediaGX GXm-266GP
 	m_maincpu->set_addrmap(AS_PROGRAM, &matrix_state::main_map);
+	m_maincpu->set_irq_acknowledge_callback("pci:07.0:pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	// video hardware, all TBD
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(640, 480);
-	screen.set_visarea(0, 640-1, 0, 480-1);
-	screen.set_screen_update(FUNC(matrix_state::screen_update));
+	// TODO: from FDC37C93x super I/O
+	// NOTE: it's not initialized at $3f0 - $370 but accessed anyway, wtf
+	DS1287(config, m_rtc, 32.768_kHz_XTAL);
+	m_rtc->set_binary(true);
+	m_rtc->set_epoch(1980);
+	m_rtc->irq().set("pci:07.0", FUNC(mediagx_cs5530_bridge_device::pc_irq8n_w));
+
+	PCI_ROOT(config, "pci", 0);
+	MEDIAGX_HOST(config, "pci:00.0", 0, "maincpu", 128*1024*1024);
+	// TODO: no clue about the ID used for this, definitely tested
+	// Tries to initialize MediaGX F4 -> ISA -> PCI/AGP, failing in all cases
+	PCI_BRIDGE(config, "pci:01.0", 0, 0x10780000, 0);
+	//RIVATNT(config, "pci:01.0:00.0", 0);
+
+	// TODO: unconfirmed PCI space
+	mediagx_cs5530_bridge_device &isa(MEDIAGX_CS5530_BRIDGE(config, "pci:07.0", 0, "maincpu"));
+	isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
+	//isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
+	isa.rtcale().set([this](u8 data) { m_rtc->address_w(data); });
+	isa.rtccs_read().set([this]() { return m_rtc->data_r(); });
+	isa.rtccs_write().set([this](u8 data) { m_rtc->data_w(data); });
+
+	// TODO: unknown number of ISA slots
+	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+
 }
 
 
 ROM_START( matrix )
-	ROM_REGION32_LE(0x40000, "bios", 0)
+	ROM_REGION32_LE(0x40000, "pci:07.0", 0)
 	ROM_LOAD("d586_bios.bin", 0x00000, 0x40000, CRC(39fc093a) SHA1(3376bac4f0d6e729d5939e3078ecdf700464cba3) )
 
-	ROM_REGION(0x300000, "unsorted", 0)
+	ROM_REGION(0x300000, "unsorted", 0) // encrypted?
 	ROM_LOAD( "matrix_031203u5.bin",  0x000000, 0x080000, CRC(95aa8fb7) SHA1(8cbfa783a887779350609d6f3ea1e88187bd21a4) )
 	ROM_LOAD( "matrix_031203u6.bin",  0x080000, 0x080000, CRC(38822bc6) SHA1(b57bd9fa44cab9fa4cef8873454c8be0dc7ab781) )
 	ROM_LOAD( "matrix_031203u7.bin",  0x100000, 0x080000, CRC(74d31f1a) SHA1(bf6eae262cab6d24276f43370f3b9e4f687b9a52) )

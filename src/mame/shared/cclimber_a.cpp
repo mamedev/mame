@@ -89,7 +89,7 @@ void cclimber_audio_device::sample_rate_w(u8 data)
 
 void cclimber_audio_device::sample_volume_w(u8 data)
 {
-	m_volume->flt_volume_set_volume(double(data & 0x1f) / 31.0); // range 0-31
+	m_volume->set_gain(double(data & 0x1f) / 31.0); // range 0-31
 }
 
 void cclimber_audio_device::sample_trigger(int state)
