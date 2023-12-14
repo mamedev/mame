@@ -98,6 +98,7 @@ tandberg_tdv2100_disp_logic_device::tandberg_tdv2100_disp_logic_device(const mac
 	m_screen(*this, "screen"),
 	m_palette(*this, "palette"),
 	m_font(*this, "display_font_rom"),
+	m_addr_offsets(*this, "row_addr_offsets"),
 	m_vram(*this, "video_ram", 0x800, ENDIANNESS_LITTLE),
 	m_beep(*this, "beep"),
 	m_uart(*this, "uart"),
@@ -135,6 +136,7 @@ void tandberg_tdv2100_disp_logic_device::device_start()
 	m_beep_trigger = timer_alloc(FUNC(tandberg_tdv2100_disp_logic_device::end_beep), this);
 	m_speed_ctrl = timer_alloc(FUNC(tandberg_tdv2100_disp_logic_device::expire_speed_check), this);
 
+	save_item(NAME(m_page_roll));
 	save_item(NAME(m_cursor_row));
 	save_item(NAME(m_cursor_col));
 	save_item(NAME(m_cursor_row_input));
@@ -152,6 +154,7 @@ void tandberg_tdv2100_disp_logic_device::device_reset()
 {
 	m_cursor_row_input = false;
 	m_cursor_col_input = false;
+	m_page_roll = 0;
 	char_to_display(0x19);
 	m_frame_counter = 0;
 	m_underline_input = false;
@@ -183,15 +186,19 @@ void tandberg_tdv2100_disp_logic_device::device_reset()
 
 void tandberg_tdv2100_disp_logic_device::char_to_display(uint8_t byte)
 {
+	// Note: There are no checks in hardware to catch an invalid cursor-position.
+	//       To clear an invalid cursor placement, the cursor-movement mechanism
+	//       may eventually catch it later, but it can also be manually sorted
+	//       out by pressing the CR and/or HOME key.
 	if(m_cursor_row_input)
 	{
-		m_cursor_row = byte&0x7f;
+		place_cursor(byte, m_cursor_col);
 		m_cursor_col_input = true;
 		m_cursor_row_input = false;
 	}
 	else if(m_cursor_col_input)
 	{
-		m_cursor_col = byte&0x1f;
+		place_cursor(m_cursor_row, byte);
 		m_cursor_col_input = false;
 	}
 	else
@@ -226,21 +233,15 @@ void tandberg_tdv2100_disp_logic_device::char_to_display(uint8_t byte)
 
 				// ERLIN, Erase line and move cursor to line start
 				case 0x04:
-					for(int i=0; i<80; i++)
-					{
-						m_vram[m_cursor_row*80 + i] = 0x00;
-					}
+					erase_row(m_cursor_row);
 					char_to_display(0x0d);
 					break;
 
 				// ERPAG, Clear screen and move cursor home
 				case 0x19:
-					for(int j=0; j<25; j++)
+					for(int row=0; row<25; row++)
 					{
-						for(int i=0; i<80; i++)
-						{
-							m_vram[j*80+i] = 0x00;
-						}
+						erase_row(row);
 					}
 					char_to_display(0x1d);
 					break;
@@ -249,7 +250,7 @@ void tandberg_tdv2100_disp_logic_device::char_to_display(uint8_t byte)
 				case 0x08:
 					if(m_cursor_col > 0)
 					{
-						m_cursor_col--;
+						place_cursor(m_cursor_row, m_cursor_col-1);
 					}
 					break;
 
@@ -262,69 +263,61 @@ void tandberg_tdv2100_disp_logic_device::char_to_display(uint8_t byte)
 				case 0x1c:
 					if(m_cursor_row > 0)
 					{
-						m_cursor_row--;
+						place_cursor(m_cursor_row-1, m_cursor_col);
 					}
 					break;
 
 				// CURD, Cursor down
 				case 0x0b:
-					if(m_cursor_row < 24)
+					if((m_cursor_row&0x18) != 24)
 					{
-						m_cursor_row++;
+						place_cursor(m_cursor_row+1, m_cursor_col);
 					}
 					break;
 
 				// LF, Move cursor to next line
 				case 0x0a:
-					if(m_cursor_row < 24)
-					{
-						m_cursor_row++;
-					}
-					else if(auto_roll_up)
+					if((m_cursor_row&0x18) == 24 && auto_roll_up)
 					{
 						char_to_display(0x0c);
 					}
+					char_to_display(0x0b);
 					break;
 
 				// CR, Carridge return
 				case 0x0d:
-					m_cursor_col = 0;
+					place_cursor(m_cursor_row, 0);
 					break;
 
 				// CURH, Cursor home
 				case 0x1d:
-					m_cursor_row = 0;
-					m_cursor_col = 0;
+					place_cursor(0, 0);
 					break;
 
 				// ROLUP, Roll text up
 				case 0x0c:
-					for(int j=0; j<24; j++)
+					if((m_page_roll&0x18) != 24)
 					{
-						for(int i=0; i<80; i++)
-						{
-							m_vram[j*80+i] = m_vram[(j+1)*80+i];
-						}
+						m_page_roll++;
 					}
-					for(int i=0; i<80; i++)
+					else
 					{
-						m_vram[24*80+i] = 0x00;
+						m_page_roll = 0;
 					}
+					erase_row(24);
 					break;
 
 				// RLDWN, Roll text down
 				case 0x17:
-					for(int j=24; j>0; j--)
+					if(m_page_roll > 0)
 					{
-						for(int i=0; i<80; i++)
-						{
-							m_vram[j*80+i] = m_vram[(j-1)*80+i];
-						}
+						m_page_roll--;
 					}
-					for(int i=0; i<80; i++)
+					else
 					{
-							m_vram[i] = 0x00;
+						m_page_roll = 24;
 					}
+					erase_row(0);
 					break;
 
 				// DLE, Set new cursor position
@@ -380,35 +373,55 @@ void tandberg_tdv2100_disp_logic_device::data_to_display(uint8_t byte)
 	{
 		byte = byte|0x80;
 	}
-	if (m_cursor_col < 80 && m_cursor_row < 25)
-	{
-		m_vram[m_cursor_row*80 + m_cursor_col] = byte;
-	}
+
+	m_vram[get_ram_addr(m_cursor_row, m_cursor_col)] = byte;
 	advance_cursor();
 }
 
 void tandberg_tdv2100_disp_logic_device::advance_cursor()
 {
-	m_cursor_col++;
-	if(m_cursor_col == 72 && !m_speed_check)
+	bool auto_cr_lf = m_dsw_u61->read()&0x004;
+	if((m_cursor_col&0x4f) != 79 || auto_cr_lf)
 	{
-		char_to_display(0x07);
+		place_cursor(m_cursor_row, m_cursor_col+1);
 	}
-	else if(m_cursor_col > 79)
-	{
-		bool auto_cr_lf = m_dsw_u61->read()&0x004;
-		if(auto_cr_lf)
-		{
-			char_to_display(0x0d);
-			char_to_display(0x0a);
-		}
-		else
-		{
-			m_cursor_col = 79;
-		}
-	}
+
 	m_speed_check = true;
 	m_speed_ctrl->adjust(attotime::from_usec(16121));
+}
+
+void tandberg_tdv2100_disp_logic_device::place_cursor(int row, int col)
+{
+	bool in_eol_region = ((m_cursor_col&0x48) == 72);
+
+	m_cursor_col = col&0x7f;
+	m_cursor_row = row&0x1f;
+
+	if((m_cursor_col&0x48) == 72 && !in_eol_region && !m_speed_check)
+	{
+		// End of line warning beep
+		char_to_display(0x07);
+	}
+	if((m_cursor_col&0x50) == 80)
+	{
+		// End of line action
+		char_to_display(0x0d);
+		char_to_display(0x0a);
+	}
+}
+
+int tandberg_tdv2100_disp_logic_device::get_ram_addr(int row, int col)
+{
+	int abs_row = (row&0x1f) + m_page_roll;
+	return ((abs_row<<7) + (col&0x7f) + (m_addr_offsets[abs_row]<<4))&0x7ff;
+}
+
+void tandberg_tdv2100_disp_logic_device::erase_row(int row)
+{
+	for(int col = 0; col<80; col++)
+	{
+		m_vram[get_ram_addr(row, col)] = 0;
+	}
 }
 
 TIMER_CALLBACK_MEMBER(tandberg_tdv2100_disp_logic_device::end_beep)
@@ -482,7 +495,7 @@ uint32_t tandberg_tdv2100_disp_logic_device::screen_update(screen_device &screen
 			// This is at the start of a single character
 			int const chr_x_pos = char_col_nr*9;
 			int const in_line_char_nr = char_col_nr - 4;
-			int const vram_address = in_line_char_nr + char_row_nr*80;    //NOTE: On real hardware, a pair of 4-bit PROM are used for this
+			int const vram_address = get_ram_addr(char_row_nr, in_line_char_nr);
 			bool const is_cursor = (m_cursor_col == in_line_char_nr && m_cursor_row == char_row_nr);
 
 			for(int line = 0; line < 14; line++)
@@ -1004,6 +1017,10 @@ ROM_START(tdv2115l)
 	ROM_LOAD( "960558-0 1.82s141.u18", 0x0200, 0x0200, CRC(002856d2) SHA1(d86afc7190163b3c0d7a43516adb14046b978a4f))
 	ROM_LOAD( "960558-0 2.82s141.u19", 0x0400, 0x0200, CRC(422f1959) SHA1(aad1b74ed194c486e53d7fe6469b15c407e08441))
 	ROM_LOAD( "960558-0 3.82s141.u20", 0x0600, 0x0200, CRC(f662df8e) SHA1(c585731612aa1bea8d95223a49011099953cf34e))
+
+	ROM_REGION( 0x40, "row_addr_offsets", ROMREGION_ERASEFF )
+	ROM_LOAD( "prom.82s123.u23", 0x00, 0x20, CRC(b92bfa61) SHA1(3af8108269a0504268ebb8d5bb6ae235d811460c))
+	ROM_LOAD( "prom.82s123.u24", 0x20, 0x20, CRC(a64d8378) SHA1(014d524d977927c140237c47e8ba692c1a89397a))
 ROM_END
 
 const tiny_rom_entry *tandberg_tdv2100_disp_logic_device::device_rom_region() const

@@ -60,6 +60,9 @@ private:
 	void char_to_display(uint8_t byte);
 	void data_to_display(uint8_t byte);
 	void advance_cursor();
+	void place_cursor(int row, int col);
+	int get_ram_addr(int row, int col);
+	void erase_row(int row);
 	TIMER_CALLBACK_MEMBER(expire_speed_check);
 	TIMER_CALLBACK_MEMBER(end_beep);
 
@@ -79,6 +82,7 @@ private:
 	required_device<screen_device>      m_screen;
 	required_device<palette_device>     m_palette;
 	required_region_ptr<uint8_t>        m_font;
+	required_region_ptr<uint8_t>        m_addr_offsets;
 	memory_share_creator<uint8_t>       m_vram;
 	required_device<beep_device>        m_beep;
 	required_device<ay51013_device>     m_uart;
@@ -105,6 +109,7 @@ private:
 	bool m_vblank_state;
 	int m_cursor_row;
 	int m_cursor_col;
+	int m_page_roll;
 	bool m_cursor_row_input;
 	bool m_cursor_col_input;
 	bool m_underline_input;
