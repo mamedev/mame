@@ -35,6 +35,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 	virtual void config_map(address_map &map) override;
 private:
+	void map_shadowram(address_space *memory_space, uint32_t start_offs, uint32_t end_offs, bool read_enable, bool write_enable);
 	enum
 	{
 		//AS_PCI_MEM = 1,
@@ -59,6 +60,8 @@ private:
 	u8 m_pci_arbitration[2]{};
 
 	void gxbase_map(address_map &map);
+
+	u32 m_bc_xmap[3]{};
 };
 
 DECLARE_DEVICE_TYPE(MEDIAGX_HOST, mediagx_host_device)

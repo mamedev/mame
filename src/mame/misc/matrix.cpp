@@ -1,12 +1,12 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders: Angelo Salese
 /*
     'Matrix' slot machine or poker game (the bezel has poker cards) by unidentified manufacturer
     Game title is taken from ROM labels and cabinet. Might be incomplete.
 
     Hardware consists of:
 
-    Motherboard (GXM-530D):
+    Motherboard (GXM-530D): (ETA: BIOS boots as SuperTek ST-MGXm3HB -AS)
     Cyrix MediaGX GXm-266GP 2.9V
     Cyrix GXm Cx5530 with GCT bios
     128MB RAM
