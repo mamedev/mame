@@ -55,7 +55,6 @@
 #include "cpu/mcs48/mcs48.h"
 #include "bus/rs232/rs232.h"
 #include "machine/ay31015.h"
-#include "machine/bankdev.h"
 #include "machine/input_merger.h"
 #include "sound/beep.h"
 #include "video/tms9927.h"
@@ -75,7 +74,6 @@ public:
 		, m_crtc(*this, "crtc")
 		, m_uart(*this, "uart")
 		, m_rs232(*this, "rs232")
-		, m_bankdev(*this, "bankdev")
 		, m_txd_merger(*this, "txd")
 		, m_beep(*this, "beep")
 		, m_dispram_bank(*this, "dispram")
@@ -90,12 +88,15 @@ public:
 		, m_jumpers(*this, "JUMPERS")
 		, m_option(*this, "OPTION")
 		, m_dtr(*this, "DTR")
+		, m_io_view(*this, "io")
+		, m_dispram(*this, "dispram", 0x1000, ENDIANNESS_LITTLE)
 		, m_baudgen_timer(nullptr)
 		, m_force_blank(false)
 		, m_4hz_flasher(false)
 		, m_2hz_flasher(false)
 		, m_lpt_select(false)
 		, m_keyboard_scan(false)
+		, m_bank_select(0)
 	{ }
 
 	void tv912(machine_config &config);
@@ -108,7 +109,6 @@ private:
 
 	void prog_map(address_map &map);
 	void io_map(address_map &map);
-	void bank_map(address_map &map);
 
 	TIMER_CALLBACK_MEMBER(update_baudgen);
 
@@ -127,7 +127,6 @@ private:
 	required_device<tms9927_device> m_crtc;
 	required_device<ay51013_device> m_uart;
 	required_device<rs232_port_device> m_rs232;
-	required_device<address_map_bank_device> m_bankdev;
 	required_device<input_merger_device> m_txd_merger;
 	required_device<beep_device> m_beep;
 	required_memory_bank m_dispram_bank;
@@ -143,6 +142,9 @@ private:
 	required_ioport m_option;
 	required_ioport m_dtr;
 
+	memory_view m_io_view;
+	memory_share_creator<u8> m_dispram;
+
 	emu_timer *m_baudgen_timer;
 
 	bool m_force_blank;
@@ -150,7 +152,7 @@ private:
 	bool m_2hz_flasher;
 	bool m_lpt_select;
 	u8 m_keyboard_scan;
-	std::unique_ptr<u8[]> m_dispram;
+	u8 m_bank_select;
 };
 
 void tv912_state::p1_w(u8 data)
@@ -179,7 +181,9 @@ u8 tv912_state::p2_r()
 void tv912_state::p2_w(u8 data)
 {
 	// P20-P23: Address Signals (4MSBS)
-	m_bankdev->set_bank(data & 0x0f);
+	m_io_view.select(std::min((data >> 2) & 3, 2));
+	m_bank_select = (m_bank_select & 0x08) | (data & 0x07);
+	m_dispram_bank->set_entry(m_bank_select);
 
 	// P24: +4Hz Flasher
 	if (BIT(data, 4) && !m_4hz_flasher)
@@ -246,7 +250,8 @@ void tv912_state::output_40c(u8 data)
 	m_beep->set_state(BIT(data, 1));
 
 	// DB0: +PG SEL
-	m_dispram_bank->set_entry(BIT(data, 0));
+	m_bank_select = (data & 0x01) << 3 | (m_bank_select & 0x07);
+	m_dispram_bank->set_entry(m_bank_select);
 }
 
 TIMER_CALLBACK_MEMBER(tv912_state::update_baudgen)
@@ -274,7 +279,7 @@ u32 tv912_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 		return 0;
 	}
 
-	const u8 *dispram = static_cast<u8 *>(m_dispram_bank->base());
+	const u8 *dispram = &m_dispram[u16(m_bank_select & 0x08) << 8];
 	ioport_value videoctrl = m_video_control->read();
 
 	rectangle curs;
@@ -366,8 +371,7 @@ u32 tv912_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 
 void tv912_state::machine_start()
 {
-	m_dispram = make_unique_clear<u8[]>(0x1000);
-	m_dispram_bank->configure_entries(0, 2, m_dispram.get(), 0x800);
+	m_dispram_bank->configure_entries(0, 16, m_dispram.target(), 0x100);
 
 	m_baudgen_timer = timer_alloc(FUNC(tv912_state::update_baudgen), this);
 	m_baudgen_timer->adjust(attotime::zero, 0);
@@ -377,7 +381,7 @@ void tv912_state::machine_start()
 	save_item(NAME(m_4hz_flasher));
 	save_item(NAME(m_2hz_flasher));
 	save_item(NAME(m_keyboard_scan));
-	save_pointer(NAME(m_dispram), 0x1000);
+	save_item(NAME(m_bank_select));
 }
 
 void tv912_state::machine_reset()
@@ -398,19 +402,15 @@ void tv912_state::prog_map(address_map &map)
 
 void tv912_state::io_map(address_map &map)
 {
-	map(0x00, 0xff).m(m_bankdev, FUNC(address_map_bank_device::amap8));
-}
-
-void tv912_state::bank_map(address_map &map)
-{
-	map(0x000, 0x0ff).mirror(0x300).ram();
-	map(0x400, 0x403).mirror(0x3c0).select(0x030).rw(FUNC(tv912_state::crtc_r), FUNC(tv912_state::crtc_w));
-	map(0x404, 0x404).mirror(0x3f3).r(m_uart, FUNC(ay51013_device::receive));
-	map(0x408, 0x40b).mirror(0x3f0).r(FUNC(tv912_state::uart_status_r));
-	map(0x408, 0x408).mirror(0x3f3).w(m_uart, FUNC(ay51013_device::transmit));
-	map(0x40c, 0x40f).mirror(0x3f0).r(FUNC(tv912_state::keyboard_r));
-	map(0x40c, 0x40c).mirror(0x3f3).w(FUNC(tv912_state::output_40c));
-	map(0x800, 0xfff).bankrw("dispram");
+	map(0x00, 0xff).view(m_io_view);
+	m_io_view[0](0x00, 0xff).ram();
+	m_io_view[1](0x00, 0x03).mirror(0xc0).select(0x30).rw(FUNC(tv912_state::crtc_r), FUNC(tv912_state::crtc_w));
+	m_io_view[1](0x04, 0x04).mirror(0xf3).r(m_uart, FUNC(ay51013_device::receive));
+	m_io_view[1](0x08, 0x0b).mirror(0xf0).r(FUNC(tv912_state::uart_status_r));
+	m_io_view[1](0x08, 0x08).mirror(0xf3).w(m_uart, FUNC(ay51013_device::transmit));
+	m_io_view[1](0x0c, 0x0f).mirror(0xf0).r(FUNC(tv912_state::keyboard_r));
+	m_io_view[1](0x0c, 0x0c).mirror(0xf3).w(FUNC(tv912_state::output_40c));
+	m_io_view[2](0x00, 0xff).bankrw(m_dispram_bank);
 }
 
 INPUT_CHANGED_MEMBER(tv912_state::uart_settings_changed)
@@ -920,12 +920,6 @@ void tv912_state::tv912(machine_config &config)
 	maincpu.t0_in_cb().set(m_rs232, FUNC(rs232_port_device::cts_r));
 	maincpu.t1_in_cb().set(m_crtc, FUNC(tms9927_device::bl_r)).invert();
 	maincpu.prog_out_cb().set(m_uart, FUNC(ay51013_device::write_xr)).invert();
-
-	ADDRESS_MAP_BANK(config, m_bankdev);
-	m_bankdev->set_addrmap(0, &tv912_state::bank_map);
-	m_bankdev->set_data_width(8);
-	m_bankdev->set_addr_width(12);
-	m_bankdev->set_stride(0x100);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(23.814_MHz_XTAL, 105 * TV912_CH_WIDTH, 0, 80 * TV912_CH_WIDTH, 270, 0, 240);
