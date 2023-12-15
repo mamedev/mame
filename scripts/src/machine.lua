@@ -2654,6 +2654,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/msm5001n.h,MACHINES["MSM5001N"] = true
+---------------------------------------------------
+
+if (MACHINES["MSM5001N"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/msm5001n.cpp",
+		MAME_DIR .. "src/devices/machine/msm5001n.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/msm5832.h,MACHINES["MSM5832"] = true
 ---------------------------------------------------
 
