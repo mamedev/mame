@@ -529,7 +529,8 @@ function osdmodulestargetconf()
 
 	if _OPTIONS["USE_VMNET"]=="1" then
 		links {
-			"vmnet.framework"
+			"vmnet.framework",
+			"Security.framework"
 		}
 	end
 
