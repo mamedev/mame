@@ -212,6 +212,17 @@ void heath_tlb_device::device_start()
 
 	m_key_click_timer = timer_alloc(FUNC(heath_tlb_device::key_click_off), this);
 	m_bell_timer = timer_alloc(FUNC(heath_tlb_device::bell_off), this);
+
+	// flip bits in font ROM to avoid having to flip them during scan out since some
+	// boards with graphics has the pixel graphic reversed from the font layout. Doing
+	// it for all devices for consistency.
+	memory_region *region = device().memregion("chargen");
+	int font_rom_size = (region != nullptr)? region->bytes() : 0;
+
+	for(int i = 0; i < font_rom_size; i++)
+	{
+		m_p_chargen[i] = bitswap<8>(m_p_chargen[i], 0, 1, 2, 3, 4, 5, 6, 7);
+	}
 }
 
 void heath_tlb_device::device_reset()
@@ -448,7 +459,7 @@ MC6845_UPDATE_ROW(heath_tlb_device::crtc_update_row)
 			// Display a scanline of a character (8 pixels)
 			for (int b = 0; 8 > b; ++b)
 			{
-				*p++ = palette[BIT(gfx, 7 - b)];
+				*p++ = palette[BIT(gfx, b)];
 			}
 		}
 	}
@@ -1226,7 +1237,7 @@ MC6845_UPDATE_ROW(heath_superset_tlb_device::crtc_update_row)
 			// Display a scanline of a character (8 pixels)
 			for (int b = 0; 8 > b; ++b)
 			{
-				*p++ = palette[BIT(gfx, 7 - b)];
+				*p++ = palette[BIT(gfx, b)];
 			}
 		}
 	}
@@ -1455,7 +1466,7 @@ MC6845_UPDATE_ROW(heath_gp19_tlb_device::crtc_update_row)
 				// Display a scanline of a character (8 pixels)
 				for (int b = 0; 8 > b; ++b)
 				{
-					*p++ = palette[BIT(gfx, 7 - b)];
+					*p++ = palette[BIT(gfx, b)];
 				}
 			}
 		}
@@ -1689,7 +1700,7 @@ MC6845_UPDATE_ROW(heath_imaginator_tlb_device::crtc_update_row)
 					chr &= 0x7f;
 				}
 
-				output |= bitswap<8>(m_p_chargen[(chr << 4) | ra] ^ inv, 0, 1, 2, 3, 4, 5, 6, 7);
+				output |= m_p_chargen[(chr << 4) | ra] ^ inv;
 			}
 
 			if (m_graphics_mode_active && (x > 7 ) && (x < 73))
