@@ -117,7 +117,7 @@ protected:
 	void scsi_drq(bool state, int channel);
 	//void scsi_dma(int channel);
 
-	void enet_transmit(int param = 0);
+	void enet_transmit(int32_t param = 0);
 	void enet_misc_w(u32 data);
 	bool enet_rx_bc_dec(unsigned const count = 1);
 

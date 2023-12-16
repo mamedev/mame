@@ -48,12 +48,12 @@ static inline wchar_t GetLowCharFast(wchar_t c)
 
 static int ParseMatchFinder(const wchar_t *s, int *btMode, int *numHashBytes)
 {
-  wchar_t c = GetLowCharFast(*s++);
+  const wchar_t c = GetLowCharFast(*s++);
   if (c == 'h')
   {
     if (GetLowCharFast(*s++) != 'c')
       return 0;
-    int num = (int)(*s++ - L'0');
+    const int num = (int)(*s++ - L'0');
     if (num < 4 || num > 5)
       return 0;
     if (*s != 0)
@@ -68,7 +68,7 @@ static int ParseMatchFinder(const wchar_t *s, int *btMode, int *numHashBytes)
   {
     if (GetLowCharFast(*s++) != 't')
       return 0;
-    int num = (int)(*s++ - L'0');
+    const int num = (int)(*s++ - L'0');
     if (num < 2 || num > 5)
       return 0;
     if (*s != 0)
@@ -96,6 +96,15 @@ HRESULT SetLzmaProp(PROPID propID, const PROPVARIANT &prop, CLzmaEncProps &ep)
   {
     if (prop.vt == VT_UI8)
       ep.affinity = prop.uhVal.QuadPart;
+    else
+      return E_INVALIDARG;
+    return S_OK;
+  }
+
+  if (propID == NCoderPropID::kHashBits)
+  {
+    if (prop.vt == VT_UI4)
+      ep.numHashOutBits = prop.ulVal;
     else
       return E_INVALIDARG;
     return S_OK;
@@ -133,7 +142,7 @@ HRESULT SetLzmaProp(PROPID propID, const PROPVARIANT &prop, CLzmaEncProps &ep)
 
   if (prop.vt != VT_UI4)
     return E_INVALIDARG;
-  UInt32 v = prop.ulVal;
+  const UInt32 v = prop.ulVal;
   switch (propID)
   {
     case NCoderPropID::kDefaultProp:
@@ -155,8 +164,8 @@ HRESULT SetLzmaProp(PROPID propID, const PROPVARIANT &prop, CLzmaEncProps &ep)
   return S_OK;
 }
 
-STDMETHODIMP CEncoder::SetCoderProperties(const PROPID *propIDs,
-    const PROPVARIANT *coderProps, UInt32 numProps)
+Z7_COM7F_IMF(CEncoder::SetCoderProperties(const PROPID *propIDs,
+    const PROPVARIANT *coderProps, UInt32 numProps))
 {
   CLzmaEncProps props;
   LzmaEncProps_Init(&props);
@@ -164,7 +173,7 @@ STDMETHODIMP CEncoder::SetCoderProperties(const PROPID *propIDs,
   for (UInt32 i = 0; i < numProps; i++)
   {
     const PROPVARIANT &prop = coderProps[i];
-    PROPID propID = propIDs[i];
+    const PROPID propID = propIDs[i];
     switch (propID)
     {
       case NCoderPropID::kEndMarker:
@@ -173,20 +182,20 @@ STDMETHODIMP CEncoder::SetCoderProperties(const PROPID *propIDs,
         props.writeEndMark = (prop.boolVal != VARIANT_FALSE);
         break;
       default:
-        RINOK(SetLzmaProp(propID, prop, props));
+        RINOK(SetLzmaProp(propID, prop, props))
     }
   }
   return SResToHRESULT(LzmaEnc_SetProps(_encoder, &props));
 }
 
 
-STDMETHODIMP CEncoder::SetCoderPropertiesOpt(const PROPID *propIDs,
-    const PROPVARIANT *coderProps, UInt32 numProps)
+Z7_COM7F_IMF(CEncoder::SetCoderPropertiesOpt(const PROPID *propIDs,
+    const PROPVARIANT *coderProps, UInt32 numProps))
 {
   for (UInt32 i = 0; i < numProps; i++)
   {
     const PROPVARIANT &prop = coderProps[i];
-    PROPID propID = propIDs[i];
+    const PROPID propID = propIDs[i];
     if (propID == NCoderPropID::kExpectedDataSize)
       if (prop.vt == VT_UI8)
         LzmaEnc_SetDataSize(_encoder, prop.uhVal.QuadPart);
@@ -195,11 +204,11 @@ STDMETHODIMP CEncoder::SetCoderPropertiesOpt(const PROPID *propIDs,
 }
 
 
-STDMETHODIMP CEncoder::WriteCoderProperties(ISequentialOutStream *outStream)
+Z7_COM7F_IMF(CEncoder::WriteCoderProperties(ISequentialOutStream *outStream))
 {
   Byte props[LZMA_PROPS_SIZE];
-  size_t size = LZMA_PROPS_SIZE;
-  RINOK(LzmaEnc_WriteProperties(_encoder, props, &size));
+  SizeT size = LZMA_PROPS_SIZE;
+  RINOK(LzmaEnc_WriteProperties(_encoder, props, &size))
   return WriteStream(outStream, props, size);
 }
 
@@ -293,8 +302,8 @@ static void PrintStat(HANDLE thread, UInt64 totalTime, const CBaseStat *prevStat
 
 
 
-STDMETHODIMP CEncoder::Code(ISequentialInStream *inStream, ISequentialOutStream *outStream,
-    const UInt64 * /* inSize */, const UInt64 * /* outSize */, ICompressProgressInfo *progress)
+Z7_COM7F_IMF(CEncoder::Code(ISequentialInStream *inStream, ISequentialOutStream *outStream,
+    const UInt64 * /* inSize */, const UInt64 * /* outSize */, ICompressProgressInfo *progress))
 {
   CSeqInStreamWrap inWrap;
   CSeqOutStreamWrap outWrap;

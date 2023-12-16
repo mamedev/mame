@@ -19,6 +19,12 @@ function layout.startplugin()
 		local env = {
 			machine = manager.machine,
 			emu = {
+				device_enumerator = emu.device_enumerator,
+				palette_enumerator = emu.palette_enumerator,
+				screen_enumerator = emu.screen_enumerator,
+				cassette_enumerator = emu.cassette_enumerator,
+				image_enumerator = emu.image_enumerator,
+				slot_enumerator = emu.slot_enumerator,
 				attotime = emu.attotime,
 				render_bounds = emu.render_bounds,
 				render_color = emu.render_color,

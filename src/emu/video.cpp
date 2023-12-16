@@ -518,7 +518,7 @@ void video_manager::exit()
 //  when there are no screens to drive it
 //-------------------------------------------------
 
-void video_manager::screenless_update_callback(int param)
+void video_manager::screenless_update_callback(s32 param)
 {
 	// force an update
 	frame_update(false);

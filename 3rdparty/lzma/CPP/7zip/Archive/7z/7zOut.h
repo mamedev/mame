@@ -1,7 +1,7 @@
 // 7zOut.h
 
-#ifndef __7Z_OUT_H
-#define __7Z_OUT_H
+#ifndef ZIP7_INC_7Z_OUT_H
+#define ZIP7_INC_7Z_OUT_H
 
 #include "7zCompressionMode.h"
 #include "7zEncode.h"
@@ -13,6 +13,8 @@
 
 namespace NArchive {
 namespace N7z {
+
+const unsigned k_StartHeadersRewriteSize = 32;
 
 class CWriteBufferLoc
 {
@@ -240,8 +242,6 @@ struct CArchiveDatabaseOut: public COutFolders
 
 class COutArchive
 {
-  UInt64 _prefixHeaderPos;
-
   HRESULT WriteDirect(const void *data, UInt32 size) { return WriteStream(SeqStream, data, size); }
   
   UInt64 GetPos() const;
@@ -290,44 +290,39 @@ class COutArchive
   
   bool _countMode;
   bool _writeToStream;
-  size_t _countSize;
-  UInt32 _crc;
-  COutBuffer _outByte;
-  CWriteBufferLoc _outByte2;
-
-  #ifdef _7Z_VOL
+  bool _useAlign;
+  #ifdef Z7_7Z_VOL
   bool _endMarker;
   #endif
+  UInt32 _crc;
+  size_t _countSize;
+  CWriteBufferLoc _outByte2;
+  COutBuffer _outByte;
+  UInt64 _signatureHeaderPos;
+  CMyComPtr<IOutStream> Stream;
 
-  bool _useAlign;
-
-  HRESULT WriteSignature();
-  #ifdef _7Z_VOL
+  #ifdef Z7_7Z_VOL
   HRESULT WriteFinishSignature();
-  #endif
-  HRESULT WriteStartHeader(const CStartHeader &h);
-  #ifdef _7Z_VOL
   HRESULT WriteFinishHeader(const CFinishHeader &h);
   #endif
-  CMyComPtr<IOutStream> Stream;
+  HRESULT WriteStartHeader(const CStartHeader &h);
+
 public:
+  CMyComPtr<ISequentialOutStream> SeqStream;
 
   COutArchive() { _outByte.Create(1 << 16); }
-  CMyComPtr<ISequentialOutStream> SeqStream;
-  HRESULT Create(ISequentialOutStream *stream, bool endMarker);
+  HRESULT Create_and_WriteStartPrefix(ISequentialOutStream *stream /* , bool endMarker */);
   void Close();
-  HRESULT SkipPrefixArchiveHeader();
   HRESULT WriteDatabase(
       DECL_EXTERNAL_CODECS_LOC_VARS
       const CArchiveDatabaseOut &db,
       const CCompressionMethodMode *options,
       const CHeaderOptions &headerOptions);
 
-  #ifdef _7Z_VOL
+  #ifdef Z7_7Z_VOL
   static UInt32 GetVolHeadersSize(UInt64 dataSize, int nameLength = 0, bool props = false);
   static UInt64 GetVolPureSize(UInt64 volSize, int nameLength = 0, bool props = false);
   #endif
-
 };
 
 }}

@@ -4,7 +4,7 @@
 
 #include "MultiStream.h"
 
-STDMETHODIMP CMultiStream::Read(void *data, UInt32 size, UInt32 *processedSize)
+Z7_COM7F_IMF(CMultiStream::Read(void *data, UInt32 size, UInt32 *processedSize))
 {
   if (processedSize)
     *processedSize = 0;
@@ -23,10 +23,7 @@ STDMETHODIMP CMultiStream::Read(void *data, UInt32 size, UInt32 *processedSize)
       else if (_pos >= m.GlobalOffset + m.Size)
         left = mid + 1;
       else
-      {
-        _streamIndex = mid;
         break;
-      }
       mid = (left + right) / 2;
     }
     _streamIndex = mid;
@@ -36,12 +33,14 @@ STDMETHODIMP CMultiStream::Read(void *data, UInt32 size, UInt32 *processedSize)
   UInt64 localPos = _pos - s.GlobalOffset;
   if (localPos != s.LocalPos)
   {
-    RINOK(s.Stream->Seek((Int64)localPos, STREAM_SEEK_SET, &s.LocalPos));
+    RINOK(s.Stream->Seek((Int64)localPos, STREAM_SEEK_SET, &s.LocalPos))
   }
-  UInt64 rem = s.Size - localPos;
-  if (size > rem)
-    size = (UInt32)rem;
-  HRESULT result = s.Stream->Read(data, size, &size);
+  {
+    const UInt64 rem = s.Size - localPos;
+    if (size > rem)
+      size = (UInt32)rem;
+  }
+  const HRESULT result = s.Stream->Read(data, size, &size);
   _pos += size;
   s.LocalPos += size;
   if (processedSize)
@@ -49,7 +48,7 @@ STDMETHODIMP CMultiStream::Read(void *data, UInt32 size, UInt32 *processedSize)
   return result;
 }
   
-STDMETHODIMP CMultiStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64 *newPosition)
+Z7_COM7F_IMF(CMultiStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64 *newPosition))
 {
   switch (seekOrigin)
   {
@@ -72,6 +71,9 @@ class COutVolumeStream:
   public ISequentialOutStream,
   public CMyUnknownImp
 {
+  Z7_COM_UNKNOWN_IMP_0
+  Z7_IFACE_COM7_IMP(ISequentialOutStream)
+
   unsigned _volIndex;
   UInt64 _volSize;
   UInt64 _curPos;
@@ -80,8 +82,6 @@ class COutVolumeStream:
   CCRC _crc;
 
 public:
-  MY_UNKNOWN_IMP
-
   CFileItem _file;
   CUpdateOptions _options;
   CMyComPtr<IArchiveUpdateCallback2> VolumeCallback;
@@ -98,7 +98,6 @@ public:
   }
   
   HRESULT Flush();
-  STDMETHOD(Write)(const void *data, UInt32 size, UInt32 *processedSize);
 };
 
 HRESULT COutVolumeStream::Flush()
@@ -107,7 +106,7 @@ HRESULT COutVolumeStream::Flush()
   {
     _file.UnPackSize = _curPos;
     _file.FileCRC = _crc.GetDigest();
-    RINOK(WriteVolumeHeader(_archive, _file, _options));
+    RINOK(WriteVolumeHeader(_archive, _file, _options))
     _archive.Close();
     _volumeStream.Release();
     _file.StartPos += _file.UnPackSize;
@@ -117,7 +116,10 @@ HRESULT COutVolumeStream::Flush()
 */
 
 /*
-STDMETHODIMP COutMultiStream::Write(const void *data, UInt32 size, UInt32 *processedSize)
+
+#include "../../../Common/Defs.h"
+
+Z7_COM7F_IMF(COutMultiStream::Write(const void *data, UInt32 size, UInt32 *processedSize))
 {
   if (processedSize)
     *processedSize = 0;
@@ -126,8 +128,8 @@ STDMETHODIMP COutMultiStream::Write(const void *data, UInt32 size, UInt32 *proce
     if (_streamIndex >= Streams.Size())
     {
       CSubStreamInfo subStream;
-      RINOK(VolumeCallback->GetVolumeSize(Streams.Size(), &subStream.Size));
-      RINOK(VolumeCallback->GetVolumeStream(Streams.Size(), &subStream.Stream));
+      RINOK(VolumeCallback->GetVolumeSize(Streams.Size(), &subStream.Size))
+      RINOK(VolumeCallback->GetVolumeStream(Streams.Size(), &subStream.Stream))
       subStream.Pos = 0;
       Streams.Add(subStream);
       continue;
@@ -142,15 +144,15 @@ STDMETHODIMP COutMultiStream::Write(const void *data, UInt32 size, UInt32 *proce
     if (_offsetPos != subStream.Pos)
     {
       CMyComPtr<IOutStream> outStream;
-      RINOK(subStream.Stream.QueryInterface(IID_IOutStream, &outStream));
-      RINOK(outStream->Seek(_offsetPos, STREAM_SEEK_SET, NULL));
+      RINOK(subStream.Stream.QueryInterface(IID_IOutStream, &outStream))
+      RINOK(outStream->Seek((Int64)_offsetPos, STREAM_SEEK_SET, NULL))
       subStream.Pos = _offsetPos;
     }
 
-    UInt32 curSize = (UInt32)MyMin((UInt64)size, subStream.Size - subStream.Pos);
+    const UInt32 curSize = (UInt32)MyMin((UInt64)size, subStream.Size - subStream.Pos);
     UInt32 realProcessed;
-    RINOK(subStream.Stream->Write(data, curSize, &realProcessed));
-    data = (void *)((Byte *)data + realProcessed);
+    RINOK(subStream.Stream->Write(data, curSize, &realProcessed))
+    data = (const void *)((const Byte *)data + realProcessed);
     size -= realProcessed;
     subStream.Pos += realProcessed;
     _offsetPos += realProcessed;
@@ -170,7 +172,7 @@ STDMETHODIMP COutMultiStream::Write(const void *data, UInt32 size, UInt32 *proce
   return S_OK;
 }
 
-STDMETHODIMP COutMultiStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64 *newPosition)
+Z7_COM7F_IMF(COutMultiStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64 *newPosition))
 {
   switch (seekOrigin)
   {
@@ -181,11 +183,11 @@ STDMETHODIMP COutMultiStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64 *newP
   }
   if (offset < 0)
     return HRESULT_WIN32_ERROR_NEGATIVE_SEEK;
-  _absPos = offset;
+  _absPos = (UInt64)offset;
   _offsetPos = _absPos;
   _streamIndex = 0;
   if (newPosition)
-    *newPosition = offset;
+    *newPosition = (UInt64)offset;
   return S_OK;
 }
 */

@@ -1144,11 +1144,19 @@ void i386_device::i386_repeat(int invert_flag)
 		m_segment_prefix=1;
 		break;
 		case 0x66:
-		m_operand_size ^= 1;
-		m_xmm_operand_size ^= 1;
+		if(!m_operand_prefix)
+		{
+			m_operand_size ^= 1;
+			m_xmm_operand_size ^= 1;
+			m_operand_prefix = 1;
+		}
 		break;
 		case 0x67:
-		m_address_size ^= 1;
+		if(!m_address_prefix)
+		{
+			m_address_size ^= 1;
+			m_address_prefix = 1;
+		}
 		break;
 		default:
 		prefix_flag=0;

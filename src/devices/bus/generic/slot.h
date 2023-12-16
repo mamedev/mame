@@ -267,6 +267,7 @@ public:
 	}
 
 	generic_socket_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+	virtual ~generic_socket_device();
 
 	virtual const char *image_type_name() const noexcept override { return "romimage"; }
 	virtual const char *image_brief_type_name() const noexcept override { return "rom"; }
@@ -287,6 +288,7 @@ public:
 	}
 
 	generic_cartslot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+	virtual ~generic_cartslot_device();
 
 	virtual const char *image_type_name() const noexcept override { return "cartridge"; }
 	virtual const char *image_brief_type_name() const noexcept override { return "cart"; }

@@ -185,11 +185,14 @@ public:
 	bool is_volume_label() const        { return (attributes() & 0x08) != 0x00; }
 	bool is_subdirectory() const        { return (attributes() & 0x10) != 0x00; }
 	bool is_archive() const             { return (attributes() & 0x20) != 0x00; }
+	bool is_deleted() const             { return m_block.r8(m_offset) == DELETED_FILE_MARKER; }
 
 	std::string name() const;
 	meta_data metadata() const;
 
 private:
+	static constexpr u8 DELETED_FILE_MARKER = 0xe5;
+
 	fsblk_t::block_t    m_block;
 	u32                 m_offset;
 };
@@ -710,7 +713,7 @@ void impl::iterate_directory_entries(const directory_span &dir, const std::funct
 		for (u32 index = 0; !done && (index < dirents_per_sector()); index++)
 		{
 			directory_entry dirent(block, index * 32);
-			if (dirent.raw_stem()[0] != 0x00)
+			if (dirent.raw_stem()[0] != 0x00 && !dirent.is_deleted())
 			{
 				// get the filename
 				std::string_view stem = trim_end_spaces(dirent.raw_stem());

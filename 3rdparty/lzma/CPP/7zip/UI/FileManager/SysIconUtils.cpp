@@ -10,10 +10,11 @@
 
 #include "SysIconUtils.h"
 
+#if defined(__MINGW32__) || defined(__MINGW64__)
+#include <shlobj.h>
+#else
 #include <ShlObj.h>
-
-#define MY_CAST_FUNC  (void(*)())
-// #define MY_CAST_FUNC
+#endif
 
 #ifndef _UNICODE
 extern bool g_IsNT;
@@ -21,49 +22,55 @@ extern bool g_IsNT;
 
 int GetIconIndexForCSIDL(int csidl)
 {
-  LPITEMIDLIST pidl = 0;
+  LPITEMIDLIST pidl = NULL;
   SHGetSpecialFolderLocation(NULL, csidl, &pidl);
   if (pidl)
   {
     SHFILEINFO shellInfo;
-    SHGetFileInfo((LPCTSTR)(const void *)(pidl), FILE_ATTRIBUTE_NORMAL,
-      &shellInfo, sizeof(shellInfo),
-      SHGFI_PIDL | SHGFI_SYSICONINDEX);
-    IMalloc  *pMalloc;
+    shellInfo.iIcon = 0;
+    const DWORD_PTR res = SHGetFileInfo((LPCTSTR)(const void *)(pidl), FILE_ATTRIBUTE_NORMAL,
+        &shellInfo, sizeof(shellInfo),
+        SHGFI_PIDL | SHGFI_SYSICONINDEX);
+    /*
+    IMalloc *pMalloc;
     SHGetMalloc(&pMalloc);
     if (pMalloc)
     {
       pMalloc->Free(pidl);
       pMalloc->Release();
     }
-    return shellInfo.iIcon;
+    */
+    // we use OLE2.dll function here
+    CoTaskMemFree(pidl);
+    if (res)
+      return shellInfo.iIcon;
   }
   return 0;
 }
 
 #ifndef _UNICODE
-typedef int (WINAPI * Func_SHGetFileInfoW)(LPCWSTR pszPath, DWORD attrib, SHFILEINFOW *psfi, UINT cbFileInfo, UINT uFlags);
+typedef DWORD_PTR (WINAPI * Func_SHGetFileInfoW)(LPCWSTR pszPath, DWORD attrib, SHFILEINFOW *psfi, UINT cbFileInfo, UINT uFlags);
 
-static struct CSHGetFileInfoInit
+static struct C_SHGetFileInfo_Init
 {
-  Func_SHGetFileInfoW shGetFileInfoW;
-  CSHGetFileInfoInit()
+  Func_SHGetFileInfoW f_SHGetFileInfoW;
+  C_SHGetFileInfo_Init()
   {
-    shGetFileInfoW = (Func_SHGetFileInfoW)
-        MY_CAST_FUNC
-        ::GetProcAddress(::GetModuleHandleW(L"shell32.dll"), "SHGetFileInfoW");
+       f_SHGetFileInfoW = Z7_GET_PROC_ADDRESS(
+    Func_SHGetFileInfoW, ::GetModuleHandleW(L"shell32.dll"),
+        "SHGetFileInfoW");
   }
-} g_SHGetFileInfoInit;
+} g_SHGetFileInfo_Init;
 #endif
 
-static DWORD_PTR MySHGetFileInfoW(LPCWSTR pszPath, DWORD attrib, SHFILEINFOW *psfi, UINT cbFileInfo, UINT uFlags)
+static DWORD_PTR My_SHGetFileInfoW(LPCWSTR pszPath, DWORD attrib, SHFILEINFOW *psfi, UINT cbFileInfo, UINT uFlags)
 {
   #ifdef _UNICODE
   return SHGetFileInfo
   #else
-  if (g_SHGetFileInfoInit.shGetFileInfoW == 0)
+  if (!g_SHGetFileInfo_Init.f_SHGetFileInfoW)
     return 0;
-  return g_SHGetFileInfoInit.shGetFileInfoW
+  return g_SHGetFileInfo_Init.f_SHGetFileInfoW
   #endif
   (pszPath, attrib, psfi, cbFileInfo, uFlags);
 }
@@ -74,7 +81,7 @@ DWORD_PTR GetRealIconIndex(CFSTR path, DWORD attrib, int &iconIndex)
   if (!g_IsNT)
   {
     SHFILEINFO shellInfo;
-    DWORD_PTR res = ::SHGetFileInfo(fs2fas(path), FILE_ATTRIBUTE_NORMAL | attrib, &shellInfo,
+    const DWORD_PTR res = ::SHGetFileInfo(fs2fas(path), FILE_ATTRIBUTE_NORMAL | attrib, &shellInfo,
       sizeof(shellInfo), SHGFI_USEFILEATTRIBUTES | SHGFI_SYSICONINDEX);
     iconIndex = shellInfo.iIcon;
     return res;
@@ -83,7 +90,7 @@ DWORD_PTR GetRealIconIndex(CFSTR path, DWORD attrib, int &iconIndex)
   #endif
   {
     SHFILEINFOW shellInfo;
-    DWORD_PTR res = ::MySHGetFileInfoW(fs2us(path), FILE_ATTRIBUTE_NORMAL | attrib, &shellInfo,
+    const DWORD_PTR res = ::My_SHGetFileInfoW(fs2us(path), FILE_ATTRIBUTE_NORMAL | attrib, &shellInfo,
       sizeof(shellInfo), SHGFI_USEFILEATTRIBUTES | SHGFI_SYSICONINDEX);
     iconIndex = shellInfo.iIcon;
     return res;
@@ -110,7 +117,7 @@ DWORD_PTR GetRealIconIndex(const UString &fileName, DWORD attrib, int &iconIndex
   {
     SHFILEINFOW shellInfo;
     shellInfo.szTypeName[0] = 0;
-    DWORD_PTR res = ::MySHGetFileInfoW(fileName, FILE_ATTRIBUTE_NORMAL | attrib, &shellInfo,
+    DWORD_PTR res = ::My_SHGetFileInfoW(fileName, FILE_ATTRIBUTE_NORMAL | attrib, &shellInfo,
         sizeof(shellInfo), SHGFI_USEFILEATTRIBUTES | SHGFI_SYSICONINDEX | SHGFI_TYPENAME);
     if (typeName)
       *typeName = shellInfo.szTypeName;
@@ -120,15 +127,15 @@ DWORD_PTR GetRealIconIndex(const UString &fileName, DWORD attrib, int &iconIndex
 }
 */
 
-static int FindInSorted_Attrib(const CRecordVector<CAttribIconPair> &vect, DWORD attrib, int &insertPos)
+static int FindInSorted_Attrib(const CRecordVector<CAttribIconPair> &vect, DWORD attrib, unsigned &insertPos)
 {
   unsigned left = 0, right = vect.Size();
   while (left != right)
   {
-    unsigned mid = (left + right) / 2;
-    DWORD midAttrib = vect[mid].Attrib;
+    const unsigned mid = (left + right) / 2;
+    const DWORD midAttrib = vect[mid].Attrib;
     if (attrib == midAttrib)
-      return mid;
+      return (int)mid;
     if (attrib < midAttrib)
       right = mid;
     else
@@ -138,15 +145,15 @@ static int FindInSorted_Attrib(const CRecordVector<CAttribIconPair> &vect, DWORD
   return -1;
 }
 
-static int FindInSorted_Ext(const CObjectVector<CExtIconPair> &vect, const wchar_t *ext, int &insertPos)
+static int FindInSorted_Ext(const CObjectVector<CExtIconPair> &vect, const wchar_t *ext, unsigned &insertPos)
 {
   unsigned left = 0, right = vect.Size();
   while (left != right)
   {
-    unsigned mid = (left + right) / 2;
-    int compare = MyStringCompareNoCase(ext, vect[mid].Ext);
+    const unsigned mid = (left + right) / 2;
+    const int compare = MyStringCompareNoCase(ext, vect[mid].Ext);
     if (compare == 0)
-      return mid;
+      return (int)mid;
     if (compare < 0)
       right = mid;
     else
@@ -162,11 +169,11 @@ int CExtToIconMap::GetIconIndex(DWORD attrib, const wchar_t *fileName /*, UStrin
   unsigned i;
   for (i = 0;; i++)
   {
-    wchar_t c = fileName[i];
+    const wchar_t c = fileName[i];
     if (c == 0)
       break;
     if (c == '.')
-      dotPos = i;
+      dotPos = (int)i;
   }
 
   /*
@@ -181,12 +188,12 @@ int CExtToIconMap::GetIconIndex(DWORD attrib, const wchar_t *fileName /*, UStrin
 
   if ((attrib & FILE_ATTRIBUTE_DIRECTORY) != 0 || dotPos < 0)
   {
-    int insertPos = 0;
-    int index = FindInSorted_Attrib(_attribMap, attrib, insertPos);
+    unsigned insertPos = 0;
+    const int index = FindInSorted_Attrib(_attribMap, attrib, insertPos);
     if (index >= 0)
     {
       // if (typeName) *typeName = _attribMap[index].TypeName;
-      return _attribMap[index].IconIndex;
+      return _attribMap[(unsigned)index].IconIndex;
     }
     CAttribIconPair pair;
     GetRealIconIndex(
@@ -211,8 +218,8 @@ int CExtToIconMap::GetIconIndex(DWORD attrib, const wchar_t *fileName /*, UStrin
   }
 
   const wchar_t *ext = fileName + dotPos + 1;
-  int insertPos = 0;
-  int index = FindInSorted_Ext(_extMap, ext, insertPos);
+  unsigned insertPos = 0;
+  const int index = FindInSorted_Ext(_extMap, ext, insertPos);
   if (index >= 0)
   {
     const CExtIconPair &pa = _extMap[index];
@@ -222,7 +229,7 @@ int CExtToIconMap::GetIconIndex(DWORD attrib, const wchar_t *fileName /*, UStrin
 
   for (i = 0;; i++)
   {
-    wchar_t c = ext[i];
+    const wchar_t c = ext[i];
     if (c == 0)
       break;
     if (c < L'0' || c > L'9')
@@ -257,3 +264,15 @@ int CExtToIconMap::GetIconIndex(DWORD attrib, const UString &fileName)
   return GetIconIndex(attrib, fileName, NULL);
 }
 */
+
+HIMAGELIST GetSysImageList(bool smallIcons)
+{
+  SHFILEINFO shellInfo;
+  return (HIMAGELIST)SHGetFileInfo(TEXT(""),
+      FILE_ATTRIBUTE_NORMAL |
+      FILE_ATTRIBUTE_DIRECTORY,
+      &shellInfo, sizeof(shellInfo),
+      SHGFI_USEFILEATTRIBUTES |
+      SHGFI_SYSICONINDEX |
+      (smallIcons ? SHGFI_SMALLICON : SHGFI_ICON));
+}

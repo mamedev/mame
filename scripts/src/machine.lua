@@ -2462,6 +2462,30 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/mediagx_cs5530_bridge.h,MACHINES["MEDIAGX_CS5530_BRIDGE"] = true
+---------------------------------------------------
+
+if (MACHINES["MEDIAGX_CS5530_BRIDGE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/mediagx_cs5530_bridge.cpp",
+		MAME_DIR .. "src/devices/machine/mediagx_cs5530_bridge.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/mediagx_host.h,MACHINES["MEDIAGX_HOST"] = true
+---------------------------------------------------
+
+if (MACHINES["MEDIAGX_HOST"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/mediagx_host.cpp",
+		MAME_DIR .. "src/devices/machine/mediagx_host.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/meters.h,MACHINES["METERS"] = true
 ---------------------------------------------------
 
@@ -2625,6 +2649,18 @@ if (MACHINES["MOS6551"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/mos6551.cpp",
 		MAME_DIR .. "src/devices/machine/mos6551.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/msm5001n.h,MACHINES["MSM5001N"] = true
+---------------------------------------------------
+
+if (MACHINES["MSM5001N"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/msm5001n.cpp",
+		MAME_DIR .. "src/devices/machine/msm5001n.h",
 	}
 end
 

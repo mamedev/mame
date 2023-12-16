@@ -50,14 +50,13 @@ void saitekosa_maestroa_device::device_start()
 
 void saitekosa_maestroa_device::device_reset()
 {
-	set_cpu_freq();
 	control_w(0);
 }
 
-void saitekosa_maestroa_device::set_cpu_freq()
+INPUT_CHANGED_MEMBER(saitekosa_maestroa_device::change_cpu_freq)
 {
 	static const XTAL xtal[3] = { 4_MHz_XTAL, 5.67_MHz_XTAL, 6_MHz_XTAL };
-	m_maincpu->set_unscaled_clock(xtal[ioport("FAKE")->read() % 3]);
+	m_maincpu->set_unscaled_clock(xtal[newval % 3]);
 }
 
 
@@ -89,8 +88,8 @@ const tiny_rom_entry *saitekosa_maestroa_device::device_rom_region() const
 //-------------------------------------------------
 
 static INPUT_PORTS_START( maestroa )
-	PORT_START("FAKE")
-	PORT_CONFNAME( 0x03, 0x02, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, saitekosa_maestroa_device, switch_cpu_freq, 0) // factory set
+	PORT_START("CPU")
+	PORT_CONFNAME( 0x03, 0x02, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, saitekosa_maestroa_device, change_cpu_freq, 0) // factory set
 	PORT_CONFSETTING(    0x00, "4MHz" )
 	PORT_CONFSETTING(    0x01, "5.67MHz" )
 	PORT_CONFSETTING(    0x02, "6MHz" )

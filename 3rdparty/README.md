@@ -22,11 +22,11 @@ dxsdk - [DirectX SDK EULA](https://github.com/mamedev/mame/blob/master/3rdparty/
 
 expat - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 
+flac - [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause) (codecs), [The GNU General Public License, version 2](https://opensource.org/licenses/GPL-2.0)
+
 genie - [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause)
 
 glm - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
-
-libflac - [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause) (codecs), [The GNU General Public License, version 2](https://opensource.org/licenses/GPL-2.0)
 
 libjpeg - [Custom BSD-like](https://github.com/numenta/nupic/blob/master/external/licenses/LICENSE.libjpeg-6b.txt)
 
@@ -71,3 +71,5 @@ utf8proc - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 wdlfft - [zlib license](http://opensource.org/licenses/Zlib)
 
 zlib - [zlib license](http://opensource.org/licenses/Zlib)
+
+zstd - Dual-licensed [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause) and [The GNU General Public License, version 2](https://opensource.org/licenses/GPL-2.0)

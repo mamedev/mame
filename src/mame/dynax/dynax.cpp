@@ -43,7 +43,6 @@ Year + Game                Main Board   Sub Board    CPU   Sound                
 94 Castle Of Dracula                                 Z80   M6295                            PROM  Blitter is an FPGA
 94 Mj Reach (bootleg)      bootleg                   TLCS  AY8910        YM2413       M6242 PROM  Battery
 94 Maya                                              Z80          YM2203                    PROM  Blitter is an FPGA
-96 Mj Raijinhai DX         D10010318L1  D10502168    TLCS  AY8910                     M6242 PROM  Undumped TMP91P640 Code, Battery
 9? Inca                                              Z80          YM2203                    PROM
 ---------------------------------------------------------------------------------------------------------------------
 
@@ -6610,102 +6609,6 @@ ROM_END
 
 /***************************************************************************
 
-Mahjong Raijinhai DX
-Dynax, 1996
-
-PCB Layout
-----------
-
-Top board
-
-D10010318L1
-sticker - D10502168
-|----------------------------------------|
-|DSW2(1)  DSW4(10)                  DIP16|
-|                 |---|                  |
-|DSW1(10) DSW3(10)| * |                  |
-|                 |---|     PROM2        |
-|                                        |
-|                           PROM1        |
-|                                        |
-|                                        |
-|                                        |
-|                                        |
-|                        1051.5E         |
-| |-------------|                        |
-| |     &       |        1052.4E    |---||
-| |-------------|                   | D ||
-|12MHz                   1053.3E    | I ||
-|                                   | P ||
-|BATTERY        32.768kHz           |40 ||
-|         CLOCK          6264       |---||
-|----------------------------------------|
-Notes:
-      Most of the chips have their surface scratched off.
-      *     - Unknown PLCC44 IC. Possibly Mach110 or similar CPLD
-      &     - Unknown SDIP64 IC. Probably a Toshiba TMP91P640. Clock input 12.000MHz
-              Was read as a TMP91P640 and found to be protected.
-      CLOCK - Some kind of clock IC, like Oki M6242 or similar
-      PROM1 - TBP28S42 (equivalent to 82S147) PROM labelled 'D105-1'
-      PROM2 - TBP28S42 (equivalent to 82S147) PROM labelled 'D105-2'
-      DIP16 - Socket for cable that joins to lower board
-      DIP40 - Socket for connector that joins to lower board
-
-
-Bottom board
-
-|--------------------------------------------------------|
-|    BATTERY 6116                                        |
-|  VOL                                                   |
-|                                                        |
-|                                              DIP40     |
-|                                                        |
-|           DSW(8)                              18.432MHz|
-|                                                        |
-|                                                        |
-|M      DIP16                                            |
-|A              4116    4116                             |
-|H                                                       |
-|J              4116    4116                             |
-|O                                                       |
-|N              4116    4116                             |
-|G                                                       |
-|2              4116    4116                             |
-|8  AY3-8910                                             |
-|               4116    4116                             |
-|                                                        |
-|               4116    4116                             |
-|                                                        |
-|               4116    4116                             |
-|                                                        |
-|               4116    4116                             |
-|--------------------------------------------------------|
-Notes:
-      DIP16 - Socket for cable that joins to upper board
-      DIP40 - Socket for connector that joins to upper board
-      AY3-8910 clock - 1.536 [18.432/12]
-      HSync - 15.5kHz
-      VSync - 60Hz
-
-***************************************************************************/
-
-ROM_START( majrjhdx )
-	ROM_REGION( 0x50000, "maincpu", 0 )
-	ROM_LOAD( "1051d.5e",         0x00000, 0x40000, CRC(54c31732) SHA1(049e76c42fd248f975c7cce7e74b1f79e2a96bea) )
-	ROM_RELOAD(                   0x10000, 0x40000 )    // the first 0x4000 bytes are Z80 code from "MAHJONG THE MYSTERIOUS ORIENT"!
-	ROM_LOAD( "tmp91p640n-10.5b", 0x00000, 0x04000, NO_DUMP )
-
-	ROM_REGION( 0x100000, "blitter", 0 )   // blitter data
-	ROM_LOAD( "1053d.3e",  0x00000, 0x80000, CRC(10bf7f0f) SHA1(c042240296ac7202da14e809bff36c9b0f97a3df) )
-	ROM_LOAD( "1052d.4e",  0x80000, 0x80000, CRC(7200599c) SHA1(32e7caad9a9ea756b699f601fab90a419a437f57) )
-
-	ROM_REGION( 0x400, "proms", 0 ) // Color PROMs
-	ROM_LOAD( "d105-2.7e", 0x000, 0x200, CRC(587bca5a) SHA1(327f7bfa035f652bbbfba3f74715515236322c09) )
-	ROM_LOAD( "d105-1.6e", 0x200, 0x200, CRC(6d0ce028) SHA1(35f70000a850782356734323fa93b150a77f807c) )
-ROM_END
-
-/***************************************************************************
-
 Mahjong Reach (bootleg)
 Dynax, 1994
 
@@ -7426,4 +7329,3 @@ GAME( 1994, mjreach,  0,        mjreach,  mjreach,  dynax_state,       empty_ini
 GAME( 1994, cdracula, 0,        cdracula, cdracula, cdracula_state,    empty_init,    ROT0,   "Yun Sung (Escape license)","Castle Of Dracula",                                             MACHINE_SUPPORTS_SAVE ) // not a dynax board
 GAME( 1995, shpeng,   0,        sprtmtch, drgpunch, dynax_state,       empty_init,    ROT0,   "WSAC Systems?",            "Sea Hunter Penguin",                                            MACHINE_NO_COCKTAIL | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // not a dynax board. proms?
 GAME( 1995, intrgirl, 0,        sprtmtch, drgpunch, dynax_state,       empty_init,    ROT0,   "Barko",                    "Intergirl",                                                     MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // not a dynax board.
-GAME( 1996, majrjhdx, 0,        majrjhdx, tenkai,   dynax_state,       empty_init,    ROT0,   "Dynax",                    "Mahjong Raijinhai DX",                                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

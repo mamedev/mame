@@ -2,7 +2,7 @@
 
 #include "StdAfx.h"
 
-#ifdef SUPPORT_DEVICE_FILE
+#ifdef Z7_DEVICE_FILE
 #include "../../C/Alloc.h"
 #endif
 
@@ -21,7 +21,7 @@
 
 HRESULT GetLastError_noZero_HRESULT()
 {
-  DWORD res = ::GetLastError();
+  const DWORD res = ::GetLastError();
   if (res == 0)
     return E_FAIL;
   return HRESULT_FROM_WIN32(res);
@@ -40,7 +40,7 @@ using namespace NName;
 namespace NWindows {
 namespace NFile {
 
-#ifdef SUPPORT_DEVICE_FILE
+#ifdef Z7_DEVICE_FILE
 
 namespace NSystem
 {
@@ -72,7 +72,7 @@ bool CFileBase::Create(CFSTR path, DWORD desiredAccess,
   if (!Close())
     return false;
 
-  #ifdef SUPPORT_DEVICE_FILE
+  #ifdef Z7_DEVICE_FILE
   IsDeviceFile = false;
   #endif
 
@@ -88,7 +88,7 @@ bool CFileBase::Create(CFSTR path, DWORD desiredAccess,
     IF_USE_MAIN_PATH
       _handle = ::CreateFileW(fs2us(path), desiredAccess, shareMode,
         (LPSECURITY_ATTRIBUTES)NULL, creationDisposition, flagsAndAttributes, (HANDLE)NULL);
-    #ifdef WIN_LONG_PATH
+    #ifdef Z7_LONG_PATH
     if (_handle == INVALID_HANDLE_VALUE && USE_SUPER_PATH)
     {
       UString superPath;
@@ -101,7 +101,7 @@ bool CFileBase::Create(CFSTR path, DWORD desiredAccess,
   
   /*
   #ifndef UNDER_CE
-  #ifndef _SFX
+  #ifndef Z7_SFX
   if (_handle == INVALID_HANDLE_VALUE)
   {
     // it's debug hack to open symbolic links in Windows XP and WSL links in Windows 10
@@ -149,7 +149,7 @@ bool CFileBase::Close() throw()
 
 bool CFileBase::GetLength(UInt64 &length) const throw()
 {
-  #ifdef SUPPORT_DEVICE_FILE
+  #ifdef Z7_DEVICE_FILE
   if (IsDeviceFile && SizeDefined)
   {
     length = Size;
@@ -219,7 +219,7 @@ bool CFileBase::GetPosition(UInt64 &position) const throw()
 
 bool CFileBase::Seek(Int64 distanceToMove, DWORD moveMethod, UInt64 &newPosition) const throw()
 {
-  #ifdef SUPPORT_DEVICE_FILE
+  #ifdef Z7_DEVICE_FILE
   if (IsDeviceFile && SizeDefined && moveMethod == FILE_END)
   {
     distanceToMove += Size;
@@ -262,12 +262,12 @@ bool CFileBase::SeekToEnd(UInt64 &newPosition) const throw()
 
 // ---------- CInFile ---------
 
-#ifdef SUPPORT_DEVICE_FILE
+#ifdef Z7_DEVICE_FILE
 
 void CInFile::CorrectDeviceSize()
 {
   // maybe we must decrease kClusterSize to 1 << 12, if we want correct size at tail
-  static const UInt32 kClusterSize = 1 << 14;
+  const UInt32 kClusterSize = 1 << 14;
   UInt64 pos = Size & ~(UInt64)(kClusterSize - 1);
   UInt64 realNewPosition;
   if (!Seek(pos, realNewPosition))
@@ -462,7 +462,7 @@ static const UInt32 kChunkSizeMax = (1 << 22);
 bool CInFile::Read1(void *data, UInt32 size, UInt32 &processedSize) throw()
 {
   DWORD processedLoc = 0;
-  bool res = BOOLToBool(::ReadFile(_handle, data, size, &processedLoc, NULL));
+  const bool res = BOOLToBool(::ReadFile(_handle, data, size, &processedLoc, NULL));
   processedSize = (UInt32)processedLoc;
   return res;
 }
@@ -480,7 +480,7 @@ bool CInFile::Read(void *data, UInt32 size, UInt32 &processedSize) throw()
   do
   {
     UInt32 processedLoc = 0;
-    bool res = ReadPart(data, size, processedLoc);
+    const bool res = ReadPart(data, size, processedLoc);
     processedSize += processedLoc;
     if (!res)
       return false;
@@ -551,7 +551,7 @@ bool COutFile::Write(const void *data, UInt32 size, UInt32 &processedSize) throw
   do
   {
     UInt32 processedLoc = 0;
-    bool res = WritePart(data, size, processedLoc);
+    const bool res = WritePart(data, size, processedLoc);
     processedSize += processedLoc;
     if (!res)
       return false;
@@ -628,14 +628,14 @@ bool SetDirTime(CFSTR path, const CFiTime *cTime, const CFiTime *aTime, const CF
 
 namespace NIO {
 
-bool CFileBase::OpenBinary(const char *name, int flags)
+bool CFileBase::OpenBinary(const char *name, int flags, mode_t mode)
 {
   #ifdef O_BINARY
   flags |= O_BINARY;
   #endif
 
   Close();
-  _handle = ::open(name, flags, 0666);
+  _handle = ::open(name, flags, mode);
   return _handle != -1;
 
   /*
@@ -804,10 +804,10 @@ bool COutFile::Create(const char *name, bool createAlways)
   if (createAlways)
   {
     Close();
-    _handle = ::creat(name, 0666);
+    _handle = ::creat(name, mode_for_Create);
     return _handle != -1;
   }
-  return OpenBinary(name, O_CREAT | O_EXCL | O_WRONLY);
+  return OpenBinary(name, O_CREAT | O_EXCL | O_WRONLY, mode_for_Create);
 }
 
 bool COutFile::Open(const char *name, DWORD creationDisposition)
@@ -850,13 +850,13 @@ bool COutFile::SetLength(UInt64 length) throw()
     return false;
   }
   // The value of the seek pointer shall not be modified by a call to ftruncate().
-  int iret = ftruncate(_handle, len2);
+  const int iret = ftruncate(_handle, len2);
   return (iret == 0);
 }
 
 bool COutFile::Close()
 {
-  bool res = CFileBase::Close();
+  const bool res = CFileBase::Close();
   if (!res)
     return res;
   if (CTime_defined || ATime_defined || MTime_defined)

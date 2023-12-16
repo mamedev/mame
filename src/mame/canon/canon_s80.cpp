@@ -308,7 +308,7 @@ INPUT_PORTS_END
 void canons80_state::canons80(machine_config &config)
 {
 	// basic machine hardware
-	hd6301x0_cpu_device &maincpu(HD6301X0(config, "maincpu", 6_MHz_XTAL)); // hd63a01xop
+	hd6301x0_cpu_device &maincpu(HD6301X0(config, "maincpu", 6_MHz_XTAL)); // hd63a01x0p
 	maincpu.set_addrmap(AS_PROGRAM, &canons80_state::canons80_map);
 	maincpu.in_p2_cb().set_ioport("P2");
 	maincpu.in_p5_cb().set(FUNC(canons80_state::keyboard_r));

@@ -1,5 +1,4 @@
 // PpmdDecoder.cpp
-// 2020-07-03 : Igor Pavlov : Public domain
 
 #include "StdAfx.h"
 
@@ -29,14 +28,13 @@ CDecoder::~CDecoder()
   Ppmd7_Free(&_ppmd, &g_BigAlloc);
 }
 
-STDMETHODIMP CDecoder::SetDecoderProperties2(const Byte *props, UInt32 size)
+Z7_COM7F_IMF(CDecoder::SetDecoderProperties2(const Byte *props, UInt32 size))
 {
   if (size < 5)
     return E_INVALIDARG;
   _order = props[0];
-  UInt32 memSize = GetUi32(props + 1);
-  if (
-      // _order < PPMD7_MIN_ORDER ||
+  const UInt32 memSize = GetUi32(props + 1);
+  if (_order < PPMD7_MIN_ORDER ||
       _order > PPMD7_MAX_ORDER ||
       memSize < PPMD7_MIN_MEM_SIZE ||
       memSize > PPMD7_MAX_MEM_SIZE)
@@ -48,7 +46,7 @@ STDMETHODIMP CDecoder::SetDecoderProperties2(const Byte *props, UInt32 size)
   return S_OK;
 }
 
-#define _rangeDec _ppmd.rc.dec
+#define MY_rangeDec  _ppmd.rc.dec
 
 #define CHECK_EXTRA_ERROR \
     if (_inStream.Extra) { \
@@ -67,7 +65,7 @@ HRESULT CDecoder::CodeSpec(Byte *memStream, UInt32 size)
     case kStatus_Error: return S_FALSE;
     case kStatus_NeedInit:
       _inStream.Init();
-      if (!Ppmd7z_RangeDec_Init(&_rangeDec))
+      if (!Ppmd7z_RangeDec_Init(&MY_rangeDec))
       {
         _status = kStatus_Error;
         return (_res = S_FALSE);
@@ -110,7 +108,7 @@ HRESULT CDecoder::CodeSpec(Byte *memStream, UInt32 size)
     if (!FinishStream
         || !_outSizeDefined
         || _outSize != _processedSize
-        || _rangeDec.Code == 0)
+        || MY_rangeDec.Code == 0)
       return S_OK;
     /*
     // We can decode additional End Marker here:
@@ -119,7 +117,7 @@ HRESULT CDecoder::CodeSpec(Byte *memStream, UInt32 size)
     */
   }
 
-  if (sym != PPMD7_SYM_END || _rangeDec.Code != 0)
+  if (sym != PPMD7_SYM_END || MY_rangeDec.Code != 0)
   {
     _status = kStatus_Error;
     return (_res = S_FALSE);
@@ -131,8 +129,8 @@ HRESULT CDecoder::CodeSpec(Byte *memStream, UInt32 size)
 
 
 
-STDMETHODIMP CDecoder::Code(ISequentialInStream *inStream, ISequentialOutStream *outStream,
-    const UInt64 *inSize, const UInt64 *outSize, ICompressProgressInfo *progress)
+Z7_COM7F_IMF(CDecoder::Code(ISequentialInStream *inStream, ISequentialOutStream *outStream,
+    const UInt64 *inSize, const UInt64 *outSize, ICompressProgressInfo *progress))
 {
   if (!_outBuf)
   {
@@ -147,16 +145,16 @@ STDMETHODIMP CDecoder::Code(ISequentialInStream *inStream, ISequentialOutStream 
   do
   {
     const UInt64 startPos = _processedSize;
-    HRESULT res = CodeSpec(_outBuf, kBufSize);
-    size_t processed = (size_t)(_processedSize - startPos);
-    RINOK(WriteStream(outStream, _outBuf, processed));
-    RINOK(res);
+    const HRESULT res = CodeSpec(_outBuf, kBufSize);
+    const size_t processed = (size_t)(_processedSize - startPos);
+    RINOK(WriteStream(outStream, _outBuf, processed))
+    RINOK(res)
     if (_status == kStatus_Finished_With_Mark)
       break;
     if (progress)
     {
       const UInt64 inProcessed = _inStream.GetProcessed();
-      RINOK(progress->SetRatioInfo(&inProcessed, &_processedSize));
+      RINOK(progress->SetRatioInfo(&inProcessed, &_processedSize))
     }
   }
   while (!_outSizeDefined || _processedSize < _outSize);
@@ -168,7 +166,7 @@ STDMETHODIMP CDecoder::Code(ISequentialInStream *inStream, ISequentialOutStream 
 }
 
 
-STDMETHODIMP CDecoder::SetOutStreamSize(const UInt64 *outSize)
+Z7_COM7F_IMF(CDecoder::SetOutStreamSize(const UInt64 *outSize))
 {
   _outSizeDefined = (outSize != NULL);
   if (_outSizeDefined)
@@ -179,37 +177,37 @@ STDMETHODIMP CDecoder::SetOutStreamSize(const UInt64 *outSize)
   return S_OK;
 }
 
-STDMETHODIMP CDecoder::SetFinishMode(UInt32 finishMode)
+Z7_COM7F_IMF(CDecoder::SetFinishMode(UInt32 finishMode))
 {
   FinishStream = (finishMode != 0);
   return S_OK;
 }
 
-STDMETHODIMP CDecoder::GetInStreamProcessedSize(UInt64 *value)
+Z7_COM7F_IMF(CDecoder::GetInStreamProcessedSize(UInt64 *value))
 {
   *value = _inStream.GetProcessed();
   return S_OK;
 }
 
-#ifndef NO_READ_FROM_CODER
+#ifndef Z7_NO_READ_FROM_CODER
 
-STDMETHODIMP CDecoder::SetInStream(ISequentialInStream *inStream)
+Z7_COM7F_IMF(CDecoder::SetInStream(ISequentialInStream *inStream))
 {
   InSeqStream = inStream;
   _inStream.Stream = inStream;
   return S_OK;
 }
 
-STDMETHODIMP CDecoder::ReleaseInStream()
+Z7_COM7F_IMF(CDecoder::ReleaseInStream())
 {
   InSeqStream.Release();
   return S_OK;
 }
 
-STDMETHODIMP CDecoder::Read(void *data, UInt32 size, UInt32 *processedSize)
+Z7_COM7F_IMF(CDecoder::Read(void *data, UInt32 size, UInt32 *processedSize))
 {
   const UInt64 startPos = _processedSize;
-  HRESULT res = CodeSpec((Byte *)data, size);
+  const HRESULT res = CodeSpec((Byte *)data, size);
   if (processedSize)
     *processedSize = (UInt32)(_processedSize - startPos);
   return res;

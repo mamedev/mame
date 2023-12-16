@@ -1,7 +1,7 @@
 // PropIDUtils.h
 
-#ifndef __PROPID_UTILS_H
-#define __PROPID_UTILS_H
+#ifndef ZIP7_INC_PROPID_UTILS_H
+#define ZIP7_INC_PROPID_UTILS_H
 
 #include "../../../Common/MyString.h"
 
@@ -11,7 +11,7 @@ void ConvertPropertyToString2(UString &dest, const PROPVARIANT &propVariant, PRO
 
 bool ConvertNtReparseToString(const Byte *data, UInt32 size, UString &s);
 void ConvertNtSecureToString(const Byte *data, UInt32 size, AString &s);
-bool CheckNtSecure(const Byte *data, UInt32 size) throw();;
+bool CheckNtSecure(const Byte *data, UInt32 size) throw();
 
 void ConvertWinAttribToString(char *s, UInt32 wa) throw();
 

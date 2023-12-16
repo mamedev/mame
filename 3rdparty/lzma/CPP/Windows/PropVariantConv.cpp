@@ -36,17 +36,17 @@ bool ConvertUtcFileTimeToString2(const FILETIME &utc, unsigned ns100, char *s, i
     s[0] = (char)('0' + val / 10);
     s += 4;
   }
-  UINT_TO_STR_2('-', st.wMonth);
-  UINT_TO_STR_2('-', st.wDay);
+  UINT_TO_STR_2('-', st.wMonth)
+  UINT_TO_STR_2('-', st.wDay)
   
   if (level > kTimestampPrintLevel_DAY)
   {
-    UINT_TO_STR_2(' ', st.wHour);
-    UINT_TO_STR_2(':', st.wMinute);
+    UINT_TO_STR_2(' ', st.wHour)
+    UINT_TO_STR_2(':', st.wMinute)
     
     if (level >= kTimestampPrintLevel_SEC)
     {
-      UINT_TO_STR_2(':', st.wSecond);
+      UINT_TO_STR_2(':', st.wSecond)
 
       if (level > kTimestampPrintLevel_SEC)
       {

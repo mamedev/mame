@@ -1,7 +1,7 @@
 // Windows/Control/ImageList.h
 
-#ifndef __WINDOWS_CONTROL_IMAGE_LIST_H
-#define __WINDOWS_CONTROL_IMAGE_LIST_H
+#ifndef ZIP7_INC_WINDOWS_CONTROL_IMAGE_LIST_H
+#define ZIP7_INC_WINDOWS_CONTROL_IMAGE_LIST_H
 
 #include <CommCtrl.h>
 
@@ -56,7 +56,7 @@ public:
   bool GetImageInfo(int index, IMAGEINFO* imageInfo) const
     { return BOOLToBool(ImageList_GetImageInfo(m_Object, index, imageInfo)); }
 
-  int Add(HBITMAP hbmImage, HBITMAP hbmMask = 0)
+  int Add(HBITMAP hbmImage, HBITMAP hbmMask = NULL)
     { return ImageList_Add(m_Object, hbmImage, hbmMask); }
   int AddMasked(HBITMAP hbmImage, COLORREF mask)
     { return ImageList_AddMasked(m_Object, hbmImage, mask); }

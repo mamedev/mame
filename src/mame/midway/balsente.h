@@ -54,7 +54,7 @@ public:
 		, m_outlatch(*this, "outlatch")
 		, m_novram(*this, "nov%u", 0U)
 		, m_acia(*this, "acia")
-		, m_generic_paletteram_8(*this, "paletteram")
+		, m_mainrom(*this, "maincpu")
 		, m_bankab(*this, "bankab")
 		, m_bankcd(*this, "bankcd")
 		, m_bankef(*this, "bankef")
@@ -128,7 +128,6 @@ private:
 
 	void videoram_w(offs_t offset, uint8_t data);
 	void palette_select_w(uint8_t data);
-	void paletteram_w(offs_t offset, uint8_t data);
 	void shrike_sprite_select_w(uint8_t data);
 
 	uint32_t screen_update_balsente(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -202,7 +201,8 @@ private:
 	optional_device<ls259_device> m_outlatch;
 	optional_device_array<x2212_device, 2> m_novram;
 	optional_device<acia6850_device> m_acia;
-	optional_shared_ptr<uint8_t> m_generic_paletteram_8;
+
+	required_memory_region m_mainrom;
 
 	required_memory_bank m_bankab;
 	required_memory_bank m_bankcd;

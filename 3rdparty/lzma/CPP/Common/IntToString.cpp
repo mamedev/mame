@@ -16,7 +16,7 @@
 
 char * ConvertUInt32ToString(UInt32 val, char *s) throw()
 {
-  CONVERT_INT_TO_STR(char, 16);
+  CONVERT_INT_TO_STR(char, 16)
 }
 
 char * ConvertUInt64ToString(UInt64 val, char *s) throw()
@@ -25,7 +25,7 @@ char * ConvertUInt64ToString(UInt64 val, char *s) throw()
   {
     return ConvertUInt32ToString((UInt32)val, s);
   }
-  CONVERT_INT_TO_STR(char, 24);
+  CONVERT_INT_TO_STR(char, 24)
 }
 
 void ConvertUInt64ToOct(UInt64 val, char *s) throw()
@@ -102,7 +102,7 @@ void ConvertUInt32ToHex8Digits(UInt32 val, char *s) throw()
   {
     unsigned t = val & 0xF;
     val >>= 4;
-    s[i] = GET_HEX_CHAR(t);;
+    s[i] = GET_HEX_CHAR(t);
   }
 }
 
@@ -121,7 +121,7 @@ void ConvertUInt32ToHex8Digits(UInt32 val, wchar_t *s)
 
 wchar_t * ConvertUInt32ToString(UInt32 val, wchar_t *s) throw()
 {
-  CONVERT_INT_TO_STR(wchar_t, 16);
+  CONVERT_INT_TO_STR(wchar_t, 16)
 }
 
 wchar_t * ConvertUInt64ToString(UInt64 val, wchar_t *s) throw()
@@ -130,7 +130,7 @@ wchar_t * ConvertUInt64ToString(UInt64 val, wchar_t *s) throw()
   {
     return ConvertUInt32ToString((UInt32)val, s);
   }
-  CONVERT_INT_TO_STR(wchar_t, 24);
+  CONVERT_INT_TO_STR(wchar_t, 24)
 }
 
 void ConvertInt64ToString(Int64 val, char *s) throw()

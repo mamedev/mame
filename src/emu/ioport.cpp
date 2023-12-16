@@ -1670,14 +1670,14 @@ void ioport_port::insert_field(ioport_field &newfield, ioport_value &disallowedb
 	for (ioport_field *field = m_fieldlist.first(); field != nullptr; field = nextfield)
 	{
 		nextfield = field->next();
-		if ((field->mask() & newfield.mask()) != 0 &&
+		if ((field->mask() & newfield.mask()) &&
 			(newfield.condition().none() || field->condition().none() || field->condition() == newfield.condition()))
 		{
 			// reduce the mask of the field we found
 			field->reduce_mask(newfield.mask());
 
 			// if the new entry fully overrides the previous one, we nuke
-			if (INPUT_PORT_OVERRIDE_FULLY_NUKES_PREVIOUS || field->mask() == 0)
+			if (!field->mask() || (INPUT_PORT_OVERRIDE_FULLY_NUKES_PREVIOUS && (field->type() != IPT_UNUSED) && (field->type() != IPT_UNKNOWN)))
 				m_fieldlist.remove(*field);
 		}
 	}

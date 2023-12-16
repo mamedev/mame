@@ -1,59 +1,23 @@
 * text=auto !eol
 
-*.bat   eol=crlf    svneol=CRLF#text/plain
-*.cmd   eol=crlf    svneol=CRLF#text/plain
-*.in                svneol=native#text/plain
+*.bat   eol=crlf
+*.cmd   eol=crlf
 *.jed   binary
-*.lst               svneol=native#text/plain
-*.mak               svneol=native#text/plain
-*.man   eol=crlf    svneol=CRLF#text/plain
-*.ops               svneol=native#text/plain
-*.po    eol=lf      svneol=LF#text/plain
-*.rc    eol=crlf    svneol=CRLF#text/plain
-*.sh    eol=lf      svneol=LF#text/plain
+*.man   eol=crlf
+*.po    eol=lf
+*.rc    eol=crlf
+*.sh    eol=lf
 
-*.css               svneol=native#text/css
-*.html              svneol=native#text/html
-*.js                svneol=native#text/javascript
-*.md                svneol=native#text/plain
-*.txt               svneol=native#text/plain
+*.gif   -text
+*.ico   -text
+*.jpg   -text
+*.png   -text
+*.ppm   -text
 
-*.c                 svneol=native#text/plain
-*.cpp               svneol=native#text/plain
-*.h                 svneol=native#text/plain
-*.hpp               svneol=native#text/plain
-*.hxx               svneol=native#text/plain
-*.inc               svneol=native#text/plain
-*.inl               svneol=native#text/plain
-*.ipp               svneol=native#text/plain
-*.lua               svneol=native#text/plain
-*.m                 svneol=native#text/plain
-*.mm                svneol=native#text/plain
-*.py                svneol=native#text/plain
+*.bdf   eol=crlf
 
-*.dtd               svneol=native#application/xml-dtd
-*.cfg               svneol=native#text/xml
-*.hsi               svneol=native#text/xml
-*.lay               svneol=native#text/xml
-*.xml               svneol=native#text/xml
+*.zip   -text
 
-*.gif   -text       svneol=unset#image/gif
-*.ico   -text       svneol=unset#image/x-icon
-*.jpg   -text       svneol=unset#image/jpeg
-*.png   -text       svneol=unset#image/png
-*.ppm   -text       svneol=unset#image/x-portable-pixmap
-
-*.bdf   eol=crlf    svneol=CRLF#application/x-font-bdf
-
-*.zip   -text       svneol=unset#application/zip
-
-makefile svneol=native#text/plain
-Makefile svneol=native#text/plain
-readme svneol=native#text/plain
-README svneol=native#text/plain
-
-hlsl/*.fx svneol=native#text/plain
-keymaps/*.map svneol=native#text/plain
-src/osd/sdl/man/* svneol=LF#text/plain eol=lf
-src/osd/sdl/shader/*.fsh svneol=native#text/plain
-src/osd/sdl/shader/*.vsh svneol=native#text/plain
+3rdparty/flac/test/cuesheets/*.cue                           -text
+3rdparty/flac/test/flac-to-flac-metadata-test-files/*.meta   -text
+3rdparty/flac/test/metaflac-test-files/*.meta                -text

@@ -114,7 +114,7 @@ void senjyo_state::dac_clock_w(int state)
 
 void senjyo_state::dac_volume_w(uint8_t data)
 {
-	m_volume->flt_volume_set_volume((data & 0xf) / 15.0);
+	m_volume->set_gain((data & 0xf) / 15.0);
 }
 
 void senjyo_state::dac_enable_w(uint8_t data)

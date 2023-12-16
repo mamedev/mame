@@ -18,6 +18,7 @@
 #include "emu.h"
 #include "xtensad.h"
 
+#include "xtensa_helper.h"
 
 xtensa_disassembler::xtensa_disassembler()
 	: util::disasm_interface()
@@ -27,220 +28,6 @@ xtensa_disassembler::xtensa_disassembler()
 u32 xtensa_disassembler::opcode_alignment() const
 {
 	return 1;
-}
-
-namespace {
-
-static const char *const s_special_regs[256] =
-{
-	"lbeg", "lend", "lcount", // Loop Option (0-2)
-	"sar", // Core Architecture (3)
-	"br", // Boolean Option (4)
-	"litbase", // Extended L32R Option (5)
-	"", "", "", "", "", "",
-	"scompare1", // Conditional Store Option (12)
-	"", "", "",
-	"acclo", "acchi", // MAC16 Option (16-17)
-	"", "", "", "", "", "", "", "", "", "", "", "", "", "",
-	"m0", "m1", "m2", "m3", // MAC16 Option (32-35)
-	"", "", "", "", "", "", "", "", "", "", "", "",
-	"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
-	"", "", "", "", "", "", "", "",
-	"WindowBase", "WindowStart", // Windowed Register Option (72-73)
-	"", "", "", "", "", "", "", "", "",
-	"ptevaddr", // MMU Option (83)
-	"", "", "", "", "",
-	"mmid", // Trace Port Option (89)
-	"rasid", "itlbcfg", "dtlbcfg", // MMU Option (90-92)
-	"", "", "",
-	"ibreakenable", // Debug Option (96)
-	"",
-	"cacheattr", // XEA1 Only (98)
-	"atomctl", // Conditional Store Option (99)
-	"", "", "", "",
-	"ddr", // Debug Option (104)
-	"",
-	"mepc", "meps", "mesave", "mesr", "mecr", "mevaddr", // Memory ECC/Parity Option (106-111)
-	"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
-	"ibreaka0", "ibreaka1", // Debug Option (128-129)
-	"", "", "", "", "", "", "", "", "", "", "", "", "", "",
-	"dbreaka0", "dbreaka1", // Debug Option (144-145)
-	"", "", "", "", "", "", "", "", "", "", "", "", "", "",
-	"dbreakc0", "dbreakc1", // Debug Option (160-161)
-	"", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
-	"epc1", // Exception Option (177)
-	"epc2", "epc3", "epc4", "epc5", "epc6", "epc7", // High-Priority Interrupt Option (178-183)
-	"", "", "", "", "", "", "", "",
-	"depc", // Exception Option (192)
-	"",
-	"eps2", "eps3", "eps4", "eps5", "eps6", "eps7", // High-Priority Interrupt Option (194-199)
-	"", "", "", "", "", "", "", "", "",
-	"excsave1", // Exception Option (209)
-	"excsave2", "excsave3", "excsave4", "excsave5", "excsave6", "excsave7", // High-Priority Interrupt Option (210-215)
-	"", "", "", "", "", "", "", "",
-	"cpenable", // Coprocessor Option (224)
-	"",
-	"intset", "intclr", "intenable", // Interrupt Option (226-228)
-	"",
-	"ps", // various options (230)
-	"vecbase", // Relocatable Vector Option (231)
-	"exccause", // Exception Option (232)
-	"debugcause", // Debug Option (233)
-	"ccount", // Timer Interrupt Option (234)
-	"prid", // Processor ID Option (235)
-	"icount", "icountlevel", // Debug Option (236-237)
-	"excvaddr", // Exception Option (238)
-	"",
-	"ccompare0", "ccompare1", "ccompare2", // Timer Interrupt Option (240-242)
-	"",
-	"misc0", "misc1", "misc2", "misc3", // Miscellaneous Special Registers Option (244-247)
-	"", "", "", "", "", "", "", ""
-};
-
-static const char *const s_st1_ops[16] =
-{
-	"ssr", "ssl",
-	"ssa8l", "ssa8b",
-	"ssai", "",
-	"rer", "wer",
-	"rotw", "",
-	"", "",
-	"", "",
-	"nsa", "nsau"
-};
-
-static const char *const s_tlb_ops[16] =
-{
-	"", "", "", "ritlb0",
-	"iitlb", "pitlb", "witlb", "ritlb1",
-	"", "", "", "rdtlb0",
-	"idtlb", "pdtlb", "wdtlb", "rdtlb1"
-};
-
-static const char *const s_rst2_ops[16] =
-{
-	"andb", "andbc", "orb", "orbc", "xorb", "", "", "",
-	"mull", "", "muluh", "mulsh",
-	"quou", "quos", "remu", "rems"
-};
-
-static const char *const s_rst3_ops[16] =
-{
-	"rsr", "wsr",
-	"sext", "clamps",
-	"min", "max",
-	"minu", "maxu",
-	"moveqz", "movnez",
-	"movltz", "movgez",
-	"movf", "movt",
-	"rur", "wur"
-};
-
-static const char *const s_fp0_ops[16] =
-{
-	"add.s", "sub.s", "mul.s", "",
-	"madd.s", "msub.s", "", "",
-	"round.s", "trunc.s", "floor.s", "ceil.s",
-	"float.s", "ufloat.s", "utrunc.s", ""
-};
-
-static const char *const s_fp1_ops[16] =
-{
-	"", "un.s",
-	"oeq.s", "ueq.s",
-	"olt.s", "ult.s",
-	"ole.s", "ule.s",
-	"moveqz.s", "movltz.s",
-	"movltz.s", "movgez.s",
-	"movf.s", "movt.s",
-	"", ""
-};
-
-static const char *const s_lsai_ops[16] =
-{
-	"l8ui", "l16ui", "l32i", "",
-	"s8i", "s16i", "s32i", "",
-	"", "l16si", "movi", "l32ai",
-	"addi", "addmi", "s32c1i", "s32ri"
-};
-
-static const char *const s_cache_ops[16] =
-{
-	"dpfr", "dpfw",
-	"dpfro", "dpfwo",
-	"dhwb", "dhwbi",
-	"dhi", "dii",
-	"", "",
-	"", "",
-	"ipf", "",
-	"ihi", "iii"
-};
-
-static const char *const s_lsci_ops[4] =
-{
-	"lsi", "ssi", "lsiu", "ssiu"
-};
-
-static const char *const s_mac16_ops[4] =
-{
-	"umul", "mul", "mula", "muls"
-};
-
-static const char *const s_mac16_half[4] =
-{
-	"ll", "hl", "lh", "hh"
-};
-
-static const char *const s_bz_ops[4] =
-{
-	"beqz", "bnez", "bltz", "bgez"
-};
-
-static const char *const s_bi0_ops[4] =
-{
-	"beqi", "bnei", "blti", "bgei"
-};
-
-static const s32 s_b4const[16] =
-{
-	-1, 1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 16, 32, 64, 128, 256
-};
-
-static const u32 s_b4constu[16] =
-{
-	32768, 65536, 2, 3, 4, 5, 6, 7, 8, 10, 12, 16, 32, 64, 128, 256
-};
-
-static const char *const s_b_ops[16] =
-{
-	"bnone", "beq", "blt", "bltu", "ball", "bbc", "bbci", "bbci",
-	"bany", "bne", "bge", "bgeu", "bnall", "bbs", "bbsi", "bbsih"
-};
-
-} // anonymous namespace
-
-void xtensa_disassembler::format_imm(std::ostream &stream, u32 imm)
-{
-	if (s32(imm) < 0)
-	{
-		stream << '-';
-		imm = -imm;
-	}
-	if (imm > 9)
-		stream << "0x";
-	util::stream_format(stream, "%X", imm);
-}
-
-std::string xtensa_disassembler::special_reg(u8 n, bool wsr)
-{
-	if (n == 226 && !wsr)
-		return "interrupt";
-
-	const char *s = s_special_regs[n];
-	if (s[0] == '\0')
-		return util::string_format("s%u", n);
-	else
-		return s;
 }
 
 offs_t xtensa_disassembler::disassemble(std::ostream &stream, offs_t pc, const xtensa_disassembler::data_buffer &opcodes, const xtensa_disassembler::data_buffer &params)
@@ -439,7 +226,7 @@ offs_t xtensa_disassembler::disassemble(std::ostream &stream, offs_t pc, const x
 				switch (BIT(inst, 12, 4))
 				{
 				case 0b0000: case 0b0001: case 0b0010: case 0b0011: // SSR, SSL, SSA8L, SSA8B
-					util::stream_format(stream, "%-8sa%d", s_st1_ops[BIT(inst, 12, 4)], BIT(inst, 8, 4));
+					util::stream_format(stream, "%-8sa%d", xtensa_helper::s_st1_ops[BIT(inst, 12, 4)], BIT(inst, 8, 4));
 					break;
 
 				case 0b0100: // SSAI
@@ -448,7 +235,7 @@ offs_t xtensa_disassembler::disassemble(std::ostream &stream, offs_t pc, const x
 
 				case 0b0110: case 0b0111: // RER, WER
 				case 0b1110: case 0b1111: // NSA, NSAU (with Miscellaneous Operations Option)
-					util::stream_format(stream, "%-8sa%d, a%d", s_st1_ops[BIT(inst, 12, 4)], BIT(inst, 4, 4), BIT(inst, 8, 4));
+					util::stream_format(stream, "%-8sa%d, a%d", xtensa_helper::s_st1_ops[BIT(inst, 12, 4)], BIT(inst, 4, 4), BIT(inst, 8, 4));
 					break;
 
 				case 0b1000: // ROTW (with Windowed Register Option)
@@ -466,11 +253,11 @@ offs_t xtensa_disassembler::disassemble(std::ostream &stream, offs_t pc, const x
 				{
 				case 0b0011: case 0b0101: case 0b0110: case 0b0111: // RITLB0, PITLB, WITLB, RITLB1
 				case 0b1011: case 0b1101: case 0b1110: case 0b1111: // RDTLB0, PDTLB, WDTLB, RDTLB1
-					util::stream_format(stream, "%-8sa%d, a%d", s_tlb_ops[BIT(inst, 12, 4)], BIT(inst, 4, 4), BIT(inst, 8, 4));
+					util::stream_format(stream, "%-8sa%d, a%d", xtensa_helper::s_tlb_ops[BIT(inst, 12, 4)], BIT(inst, 4, 4), BIT(inst, 8, 4));
 					break;
 
 				case 0b0100: case 0b1100: // IITLB, IDTLB
-					util::stream_format(stream, "%-8sa%d", s_tlb_ops[BIT(inst, 12, 4)], BIT(inst, 8, 4));
+					util::stream_format(stream, "%-8sa%d", xtensa_helper::s_tlb_ops[BIT(inst, 12, 4)], BIT(inst, 8, 4));
 					break;
 
 				default:
@@ -514,8 +301,8 @@ offs_t xtensa_disassembler::disassemble(std::ostream &stream, offs_t pc, const x
 		case 0b0001: // RST1
 			switch (BIT(inst, 20, 4))
 			{
-			case 0b0000: case 0b0001: // SLLI (shift count is 0..31)
-				util::stream_format(stream, "%-8sa%d, a%d, %d", "slli", BIT(inst, 12, 4), BIT(inst, 4, 4), BIT(inst, 8, 4) + (BIT(inst, 20) ? 16 : 0));
+			case 0b0000: case 0b0001: // SLLI (shift count is 1..31)
+				util::stream_format(stream, "%-8sa%d, a%d, %d", "slli", BIT(inst, 12, 4), BIT(inst, 8, 4), 32 - (BIT(inst, 4, 4) + (BIT(inst, 20) ? 16 : 0)));
 				break;
 
 			case 0b0010: case 0b0011: // SRAI (shift count is 0..31)
@@ -527,7 +314,7 @@ offs_t xtensa_disassembler::disassemble(std::ostream &stream, offs_t pc, const x
 				break;
 
 			case 0b0110: // XSR (added in T1040)
-				util::stream_format(stream, "xsr.%-3s a%d", special_reg(BIT(inst, 8, 8), true), BIT(inst, 4, 4));
+				util::stream_format(stream, "xsr.%-3s a%d", xtensa_helper::special_reg(BIT(inst, 8, 8), true), BIT(inst, 4, 4));
 				break;
 
 			case 0b0111: // ACCER (added in RC-2009.0)
@@ -631,12 +418,12 @@ offs_t xtensa_disassembler::disassemble(std::ostream &stream, offs_t pc, const x
 			switch (BIT(inst, 20, 4))
 			{
 			case 0b0000: case 0b0001: case 0b0010: case 0b0011: case 0b0100: // ANDB, ANDBC, ORB, ORBC, XORB (with Boolean Option)
-				util::stream_format(stream, "%-8sb%d, b%d, b%d", s_rst2_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
+				util::stream_format(stream, "%-8sb%d, b%d, b%d", xtensa_helper::s_rst2_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
 				break;
 
 			case 0b1000: case 0b1010: case 0b1011: // MULL, MULUH, MULSH (with 32-bit Integer Multiply Option)
 			case 0b1100: case 0b1101: case 0b1110: case 0b1111: // QUOU, QUOS, REMU, REMS (with 32-bit Integer Divide Option)
-				util::stream_format(stream, "%-8sa%d, a%d, a%d", s_rst2_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
+				util::stream_format(stream, "%-8sa%d, a%d, a%d", xtensa_helper::s_rst2_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
 				break;
 
 			default:
@@ -649,24 +436,24 @@ offs_t xtensa_disassembler::disassemble(std::ostream &stream, offs_t pc, const x
 			switch (BIT(inst, 20, 4))
 			{
 			case 0b0000: case 0b0001: // RSR, WSR
-				util::stream_format(stream, "%s.%-3d a%d", s_rst3_ops[BIT(inst, 20, 4)], special_reg(BIT(inst, 8, 8), BIT(inst, 20)), BIT(inst, 4, 4));
+				util::stream_format(stream, "%s.%-3d a%d", xtensa_helper::s_rst3_ops[BIT(inst, 20, 4)], xtensa_helper::special_reg(BIT(inst, 8, 8), BIT(inst, 20)), BIT(inst, 4, 4));
 				break;
 
 			case 0b0010: case 0b0011: // SEXT, CLAMPS (with Miscellaneous Operations Option)
-				util::stream_format(stream, "%-8sa%d, a%d, %d", s_rst3_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4) + 7);
+				util::stream_format(stream, "%-8sa%d, a%d, %d", xtensa_helper::s_rst3_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4) + 7);
 				break;
 
 			case 0b0100: case 0b0101: case 0b0110: case 0b0111: // MIN, MAX, MINU, MAXU (with Miscellaneous Operations Option)
 			case 0b1000: case 0b1001: case 0b1010: case 0b1011: // MOVEQZ, MOVNEZ, MOVLTZ, MOVGEZ
-				util::stream_format(stream, "%-8sa%d, a%d, a%d", s_rst3_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
+				util::stream_format(stream, "%-8sa%d, a%d, a%d", xtensa_helper::s_rst3_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
 				break;
 
 			case 0b1100: case 0b1101: // MOVF, MOVT (with Boolean Option)
-				util::stream_format(stream, "%-8sa%d, a%d, b%d", s_rst3_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
+				util::stream_format(stream, "%-8sa%d, a%d, b%d", xtensa_helper::s_rst3_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
 				break;
 
 			case 0b1110: case 0b1111: // RUR, WUR (TODO: TIE user_register names)
-				util::stream_format(stream, "%s.u%-2d a%d", s_rst3_ops[BIT(inst, 20, 4)], BIT(inst, 4, 8), BIT(inst, 12, 4));
+				util::stream_format(stream, "%s.u%-2d a%d", xtensa_helper::s_rst3_ops[BIT(inst, 20, 4)], BIT(inst, 4, 8), BIT(inst, 12, 4));
 				break;
 			}
 			break;
@@ -708,13 +495,11 @@ offs_t xtensa_disassembler::disassemble(std::ostream &stream, offs_t pc, const x
 			switch (BIT(inst, 20, 4))
 			{
 			case 0b0000: // L32E
-				util::stream_format(stream, "%-8sa%d, a%d, ", "l32e", BIT(inst, 4, 4), BIT(inst, 8, 4));
-				format_imm(stream, int(BIT(inst, 12, 4)) * 4 - 64);
+				util::stream_format(stream, "%-8sa%d, a%d, %s", "l32e", BIT(inst, 4, 4), BIT(inst, 8, 4), xtensa_helper::format_imm(int(BIT(inst, 12, 4)) * 4 - 64));
 				break;
 
 			case 0b0100: // S32E
-				util::stream_format(stream, "%-8sa%d, a%d, ", "s32e", BIT(inst, 4, 4), BIT(inst, 8, 4));
-				format_imm(stream, int(BIT(inst, 12, 4)) * 4 - 64);
+				util::stream_format(stream, "%-8sa%d, a%d, %s", "s32e", BIT(inst, 4, 4), BIT(inst, 8, 4), xtensa_helper::format_imm(int(BIT(inst, 12, 4)) * 4 - 64));
 				break;
 
 			default:
@@ -727,15 +512,15 @@ offs_t xtensa_disassembler::disassemble(std::ostream &stream, offs_t pc, const x
 			switch (BIT(inst, 20, 4))
 			{
 			case 0b0000: case 0b0001: case 0b0010: case 0b0100: case 0b0101: // ADD.S, SUB.S, MUL.S, MADD.S, MSUB.S
-				util::stream_format(stream, "%-8sf%d, f%d, f%d", s_fp0_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
+				util::stream_format(stream, "%-8sf%d, f%d, f%d", xtensa_helper::s_fp0_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
 				break;
 
 			case 0b1000: case 0b1001: case 0b1010: case 0b1011: case 0b1110: // ROUND.S, TRUNC.S, FLOOR.S, CEIL.S, UTRUNC.S
-				util::stream_format(stream, "%-7s a%d, f%d, %d", s_fp0_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
+				util::stream_format(stream, "%-7s a%d, f%d, %d", xtensa_helper::s_fp0_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
 				break;
 
 			case 0b1100: case 0b1101: // FLOAT.S, UFLOAT.S
-				util::stream_format(stream, "%-7s f%d, a%d, %d", s_fp0_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
+				util::stream_format(stream, "%-7s f%d, a%d, %d", xtensa_helper::s_fp0_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
 				break;
 
 			case 0b1111: // FP1OP
@@ -777,15 +562,15 @@ offs_t xtensa_disassembler::disassemble(std::ostream &stream, offs_t pc, const x
 			switch (BIT(inst, 20, 4))
 			{
 			case 0b0001: case 0b0010: case 0b0011: case 0b0100: case 0b0101: case 0b0110: case 0b0111: // UN.S, OEQ.S, UEQ.S, OLT.S, ULT.S, OLE.S, ULE.S
-				util::stream_format(stream, "%-8sb%d, f%d, f%d", s_fp1_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
+				util::stream_format(stream, "%-8sb%d, f%d, f%d", xtensa_helper::s_fp1_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
 				break;
 
 			case 0b1000: case 0b1001: case 0b1010: case 0b1011: // MOVEQZ.S, MOVNEZ.S, MOVLTZ.S, MOVGEZ.S
-				util::stream_format(stream, "%-8sf%d, f%d, a%d", s_fp1_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
+				util::stream_format(stream, "%-8sf%d, f%d, a%d", xtensa_helper::s_fp1_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
 				break;
 
 			case 0b1100: case 0b1101: // MOVF.S, MOVT.S
-				util::stream_format(stream, "%-8sf%d, f%d, b%d", s_fp1_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
+				util::stream_format(stream, "%-8sf%d, f%d, b%d", xtensa_helper::s_fp1_ops[BIT(inst, 20, 4)], BIT(inst, 12, 4), BIT(inst, 8, 4), BIT(inst, 4, 4));
 				break;
 
 			default:
@@ -808,20 +593,17 @@ offs_t xtensa_disassembler::disassemble(std::ostream &stream, offs_t pc, const x
 		switch (BIT(inst, 12, 4))
 		{
 		case 0b0000: case 0b0100: // L8UI, S8I
-			util::stream_format(stream, "%-8sa%d, a%d, ", s_lsai_ops[BIT(inst, 12, 4)], BIT(inst, 4, 4), BIT(inst, 8, 4));
-			format_imm(stream, inst >> 16);
+			util::stream_format(stream, "%-8sa%d, a%d, %s", xtensa_helper::s_lsai_ops[BIT(inst, 12, 4)], BIT(inst, 4, 4), BIT(inst, 8, 4), xtensa_helper::format_imm(inst >> 16));
 			break;
 
 		case 0b0001: case 0b0101: case 0b1001: // L16UI, S16I, L16SI
-			util::stream_format(stream, "%-8sa%d, a%d, ", s_lsai_ops[BIT(inst, 12, 4)], BIT(inst, 4, 4), BIT(inst, 8, 4));
-			format_imm(stream, (inst >> 16) * 2);
+			util::stream_format(stream, "%-8sa%d, a%d, %s", xtensa_helper::s_lsai_ops[BIT(inst, 12, 4)], BIT(inst, 4, 4), BIT(inst, 8, 4), xtensa_helper::format_imm((inst >> 16) * 2));
 			break;
 
 		case 0b0010: case 0b0110: // L32I, S32I
 		case 0b1011: case 0b1111: // L32AI, S32RI (with Multiprocessor Synchronization Option)
 		case 0b1110: // S32C1I (with Conditional Store Option)
-			util::stream_format(stream, "%-8sa%d, a%d, ", s_lsai_ops[BIT(inst, 12, 4)], BIT(inst, 4, 4), BIT(inst, 8, 4));
-			format_imm(stream, (inst >> 16) * 4);
+			util::stream_format(stream, "%-8sa%d, a%d, %s", xtensa_helper::s_lsai_ops[BIT(inst, 12, 4)], BIT(inst, 4, 4), BIT(inst, 8, 4), xtensa_helper::format_imm((inst >> 16) * 4));
 			break;
 
 		case 0b0111: // CACHE
@@ -830,36 +612,30 @@ offs_t xtensa_disassembler::disassemble(std::ostream &stream, offs_t pc, const x
 			case 0b0000: case 0b0001: case 0b0010: case 0b0011: // DPFR, DPFW, DPFRO, DPFWO (with Data Cache Option)
 			case 0b0100: case 0b0101: case 0b0110: case 0b0111: // DHWB, DHWBI, DHI, DII (with Data Cache Option)
 			case 0b1100: case 0b1110: case 0b1111: // IPF, IHI, III (with Instruction Cache Option)
-				util::stream_format(stream, "%-8sa%d, ", s_cache_ops[BIT(inst, 4, 4)], BIT(inst, 8, 4));
-				format_imm(stream, (inst >> 16) * 4);
+				util::stream_format(stream, "%-8sa%d, %s", xtensa_helper::s_cache_ops[BIT(inst, 4, 4)], BIT(inst, 8, 4), xtensa_helper::format_imm((inst >> 16) * 4));
 				break;
 
 			case 0b1000: // DCE (with Data Cache Option)
 				switch (BIT(inst, 16, 4))
 				{
 				case 0b0000: // DPFL (with Data Cache Index Lock Option)
-					util::stream_format(stream, "%-8sa%d, ", "dpfl", BIT(inst, 8, 4));
-					format_imm(stream, (inst >> 20) * 4);
+					util::stream_format(stream, "%-8sa%d, %s", "dpfl", BIT(inst, 8, 4), xtensa_helper::format_imm((inst >> 20) * 4));
 					break;
 
 				case 0b0010: // DHU (with Data Cache Index Lock Option)
-					util::stream_format(stream, "%-8sa%d, ", "dhu", BIT(inst, 8, 4));
-					format_imm(stream, (inst >> 20) * 4);
+					util::stream_format(stream, "%-8sa%d, %s", "dhu", BIT(inst, 8, 4), xtensa_helper::format_imm((inst >> 20) * 4));
 					break;
 
 				case 0b0011: // DIU (with Data Cache Index Lock Option)
-					util::stream_format(stream, "%-8sa%d, ", "diu", BIT(inst, 8, 4));
-					format_imm(stream, (inst >> 20) * 4);
+					util::stream_format(stream, "%-8sa%d, %s", "diu", BIT(inst, 8, 4), xtensa_helper::format_imm((inst >> 20) * 4));
 					break;
 
 				case 0b0100: // DIWB (added in T1050)
-					util::stream_format(stream, "%-8sa%d, ", "diwb", BIT(inst, 8, 4));
-					format_imm(stream, (inst >> 20) * 4);
+					util::stream_format(stream, "%-8sa%d, %s", "diwb", BIT(inst, 8, 4), xtensa_helper::format_imm((inst >> 20) * 4));
 					break;
 
 				case 0b0101: // DIWBI (added in T1050)
-					util::stream_format(stream, "%-8sa%d, ", "diwbi", BIT(inst, 8, 4));
-					format_imm(stream, (inst >> 20) * 4);
+					util::stream_format(stream, "%-8sa%d, %s", "diwbi", BIT(inst, 8, 4), xtensa_helper::format_imm((inst >> 20) * 4));
 					break;
 				}
 				break;
@@ -868,18 +644,15 @@ offs_t xtensa_disassembler::disassemble(std::ostream &stream, offs_t pc, const x
 				switch (BIT(inst, 16, 4))
 				{
 				case 0b0000: // IPFL
-					util::stream_format(stream, "%-8sa%d, ", "ipfl", BIT(inst, 8, 4));
-					format_imm(stream, (inst >> 20) * 4);
+					util::stream_format(stream, "%-8sa%d, %s", "ipfl", BIT(inst, 8, 4), xtensa_helper::format_imm((inst >> 20) * 4));
 					break;
 
 				case 0b0010: // IHU
-					util::stream_format(stream, "%-8sa%d, ", "ihu", BIT(inst, 8, 4));
-					format_imm(stream, (inst >> 20) * 4);
+					util::stream_format(stream, "%-8sa%d, %s", "ihu", BIT(inst, 8, 4), xtensa_helper::format_imm((inst >> 20) * 4));
 					break;
 
 				case 0b0011: // IIU
-					util::stream_format(stream, "%-8sa%d, ", "iiu", BIT(inst, 8, 4));
-					format_imm(stream, (inst >> 20) * 4);
+					util::stream_format(stream, "%-8sa%d, %s", "iiu", BIT(inst, 8, 4), xtensa_helper::format_imm((inst >> 20) * 4));
 					break;
 
 				default:
@@ -895,13 +668,11 @@ offs_t xtensa_disassembler::disassemble(std::ostream &stream, offs_t pc, const x
 			break;
 
 		case 0b1010: // MOVI
-			util::stream_format(stream, "%-8sa%d, ", "movi", BIT(inst, 4, 4));
-			format_imm(stream, util::sext((inst & 0x000f00) + (inst >> 16), 12));
+			util::stream_format(stream, "%-8sa%d, %s", "movi", BIT(inst, 4, 4), xtensa_helper::format_imm(util::sext((inst & 0x000f00) + (inst >> 16), 12)));
 			break;
 
 		case 0b1100: case 0b1101: // ADDI, ADDMI
-			util::stream_format(stream, "%-8sa%d, a%d, ", s_lsai_ops[BIT(inst, 12, 4)], BIT(inst, 8, 4), BIT(inst, 4, 4));
-			format_imm(stream, s8(u8(inst >> 16)) * (BIT(inst, 12) ? 256 : 1));
+			util::stream_format(stream, "%-8sa%d, a%d, %s", xtensa_helper::s_lsai_ops[BIT(inst, 12, 4)], BIT(inst, 4, 4), BIT(inst, 8, 4), xtensa_helper::format_imm(s8(u8(inst >> 16)) * (BIT(inst, 12) ? 256 : 1)));
 			break;
 
 		default:
@@ -914,8 +685,7 @@ offs_t xtensa_disassembler::disassemble(std::ostream &stream, offs_t pc, const x
 		if (BIT(inst, 12, 2) == 0)
 		{
 			// LSI, SSI, LSIU, SSIU
-			util::stream_format(stream, "%-8sf%d, a%d, ", s_lsci_ops[BIT(inst, 14, 2)], BIT(inst, 4, 4), BIT(inst, 8, 4));
-			format_imm(stream, BIT(inst, 16, 8) * 4);
+			util::stream_format(stream, "%-8sf%d, a%d, %s", xtensa_helper::s_lsci_ops[BIT(inst, 14, 2)], BIT(inst, 4, 4), BIT(inst, 8, 4), xtensa_helper::format_imm(BIT(inst, 16, 8) * 4));
 			return 3 | SUPPORTED;
 		}
 		else
@@ -929,8 +699,8 @@ offs_t xtensa_disassembler::disassemble(std::ostream &stream, offs_t pc, const x
 		{
 		case 0b0000: case 0b0001: // MACID, MACCD
 			if (BIT(inst, 18, 2) == 0b10)
-				util::stream_format(stream, "%s.dd.%s.%s m%d, a%d, m%d, m%d", s_mac16_ops[BIT(inst, 18, 2)],
-											s_mac16_half[BIT(inst, 16, 2)],
+				util::stream_format(stream, "%s.dd.%s.%s m%d, a%d, m%d, m%d", xtensa_helper::s_mac16_ops[BIT(inst, 18, 2)],
+											xtensa_helper::s_mac16_half[BIT(inst, 16, 2)],
 											BIT(inst, 20) ? "lddec" : "ldinc",
 											BIT(inst, 12, 2), BIT(inst, 8, 4),
 											BIT(inst, 14), BIT(inst, 6) + 2);
@@ -943,8 +713,8 @@ offs_t xtensa_disassembler::disassemble(std::ostream &stream, offs_t pc, const x
 
 		case 0b0100: case 0b0101: // MACIA, MACCA
 			if (BIT(inst, 18, 2) == 0b10)
-				util::stream_format(stream, "%s.da.%s.%s m%d, a%d, m%d, a%d", s_mac16_ops[BIT(inst, 18, 2)],
-											s_mac16_half[BIT(inst, 16, 2)],
+				util::stream_format(stream, "%s.da.%s.%s m%d, a%d, m%d, a%d", xtensa_helper::s_mac16_ops[BIT(inst, 18, 2)],
+											xtensa_helper::s_mac16_half[BIT(inst, 16, 2)],
 											BIT(inst, 20) ? "lddec" : "ldinc",
 											BIT(inst, 12, 2), BIT(inst, 8, 4),
 											BIT(inst, 14), BIT(inst, 4, 4));
@@ -957,7 +727,7 @@ offs_t xtensa_disassembler::disassemble(std::ostream &stream, offs_t pc, const x
 
 		case 0b0010: // MACDD
 			if (BIT(inst, 18, 2) != 0b00)
-				util::stream_format(stream, "%s.dd.%s m%d, m%d", s_mac16_ops[BIT(inst, 18, 2)], s_mac16_half[BIT(inst, 16, 2)], BIT(inst, 14), BIT(inst, 6) + 2);
+				util::stream_format(stream, "%s.dd.%s m%d, m%d", xtensa_helper::s_mac16_ops[BIT(inst, 18, 2)], xtensa_helper::s_mac16_half[BIT(inst, 16, 2)], BIT(inst, 14), BIT(inst, 6) + 2);
 			else
 			{
 				util::stream_format(stream, "%-8s0x%02X ; reserved", "db", inst & 0xff);
@@ -967,7 +737,7 @@ offs_t xtensa_disassembler::disassemble(std::ostream &stream, offs_t pc, const x
 
 		case 0b0011: // MACAD
 			if (BIT(inst, 18, 2) != 0b00)
-				util::stream_format(stream, "%s.ad.%s a%d, m%d", s_mac16_ops[BIT(inst, 18, 2)], s_mac16_half[BIT(inst, 16, 2)], BIT(inst, 8, 4), BIT(inst, 6) + 2);
+				util::stream_format(stream, "%s.ad.%s a%d, m%d", xtensa_helper::s_mac16_ops[BIT(inst, 18, 2)], xtensa_helper::s_mac16_half[BIT(inst, 16, 2)], BIT(inst, 8, 4), BIT(inst, 6) + 2);
 			else
 			{
 				util::stream_format(stream, "%-8s0x%02X ; reserved", "db", inst & 0xff);
@@ -977,7 +747,7 @@ offs_t xtensa_disassembler::disassemble(std::ostream &stream, offs_t pc, const x
 
 		case 0b0110: // MACDA
 			if (BIT(inst, 18, 2) != 0b00)
-				util::stream_format(stream, "%s.da.%s m%d, a%d", s_mac16_ops[BIT(inst, 18, 2)], s_mac16_half[BIT(inst, 16, 2)], BIT(inst, 14), BIT(inst, 4, 4));
+				util::stream_format(stream, "%s.da.%s m%d, a%d", xtensa_helper::s_mac16_ops[BIT(inst, 18, 2)], xtensa_helper::s_mac16_half[BIT(inst, 16, 2)], BIT(inst, 14), BIT(inst, 4, 4));
 			else
 			{
 				util::stream_format(stream, "%-8s0x%02X ; reserved", "db", inst & 0xff);
@@ -986,7 +756,7 @@ offs_t xtensa_disassembler::disassemble(std::ostream &stream, offs_t pc, const x
 			break;
 
 		case 0b0111: // MACAA
-			util::stream_format(stream, "%s.aa.%s a%d, a%d", s_mac16_ops[BIT(inst, 18, 2)], s_mac16_half[BIT(inst, 16, 2)], BIT(inst, 8, 4), BIT(inst, 4, 4));
+			util::stream_format(stream, "%s.aa.%s a%d, a%d", xtensa_helper::s_mac16_ops[BIT(inst, 18, 2)], xtensa_helper::s_mac16_half[BIT(inst, 16, 2)], BIT(inst, 8, 4), BIT(inst, 4, 4));
 			break;
 
 		case 0b1000: case 0b1001: // MACI, MACC
@@ -1026,21 +796,18 @@ offs_t xtensa_disassembler::disassemble(std::ostream &stream, offs_t pc, const x
 			break;
 
 		case 0b01: // BZ
-			util::stream_format(stream, "%-8sa%d, 0x%08X", s_bz_ops[BIT(inst, 6, 2)], BIT(inst, 8, 4), pc + 4 + util::sext(inst >> 12, 12));
+			util::stream_format(stream, "%-8sa%d, 0x%08X", xtensa_helper::s_bz_ops[BIT(inst, 6, 2)], BIT(inst, 8, 4), pc + 4 + util::sext(inst >> 12, 12));
 			return 3 | STEP_COND | SUPPORTED;
 
 		case 0b10: // BI0
-			util::stream_format(stream, "%-8sa%d, ", s_bi0_ops[BIT(inst, 6, 2)], BIT(inst, 8, 4));
-			format_imm(stream, s_b4const[BIT(inst, 12, 4)]);
-			util::stream_format(stream, ", 0x%08X", pc + 4 + s8(u8(inst >> 16)));
+			util::stream_format(stream, "%-8sa%d, %s, 0x%08X", xtensa_helper::s_bi0_ops[BIT(inst, 6, 2)], BIT(inst, 8, 4), xtensa_helper::format_imm(xtensa_helper::s_b4const[BIT(inst, 12, 4)]), pc + 4 + s8(u8(inst >> 16)));
 			return 3 | STEP_COND | SUPPORTED;
 
 		case 0b11: // BI1
 			switch (BIT(inst, 6, 2))
 			{
 			case 0b00: // ENTRY
-				util::stream_format(stream, "%-8sa%d, ", "entry", BIT(inst, 8, 4));
-				format_imm(stream, (inst >> 12) * 4);
+				util::stream_format(stream, "%-8sa%d, %s", "entry", BIT(inst, 8, 4), xtensa_helper::format_imm((inst >> 12) * 4));
 				break;
 
 			case 0b01: // B1
@@ -1069,9 +836,7 @@ offs_t xtensa_disassembler::disassemble(std::ostream &stream, offs_t pc, const x
 				break;
 
 			case 0b10: case 0b11: // BLTUI, BGEUI
-				util::stream_format(stream, "%-8sa%d, ", BIT(inst, 6) ? "bgeui" : "bltui", BIT(inst, 8, 4));
-				format_imm(stream, s_b4constu[BIT(inst, 4, 4)]);
-				util::stream_format(stream, ", 0x%08X", pc + 4 + s8(u8(inst >> 16)));
+				util::stream_format(stream, "%-8sa%d, %s, 0x%08X", BIT(inst, 6) ? "bgeui" : "bltui", BIT(inst, 8, 4), xtensa_helper::format_imm(xtensa_helper::s_b4constu[BIT(inst, 12, 4)]), pc + 4 + s8(u8(inst >> 16)));
 				return 3 | STEP_COND | SUPPORTED;
 			}
 			break;
@@ -1079,21 +844,20 @@ offs_t xtensa_disassembler::disassemble(std::ostream &stream, offs_t pc, const x
 		return 3 | SUPPORTED;
 
 	case 0b0111: // B
-		if (BIT(inst, 9, 2) == 0b11)
+		if (BIT(inst, 13, 2) == 0b11)
 		{
 			// BBCI, BBSI
-			util::stream_format(stream, "%-8sa%d, %d, 0x%08X", BIT(inst, 11) ? "bbsi" : "bbci", BIT(inst, 8, 4), BIT(inst, 4, 4) + (BIT(inst, 12) ? 4 : 0), pc + 4 + s8(u8(inst >> 16)));
+			util::stream_format(stream, "%-8sa%d, %d, 0x%08X", BIT(inst, 15) ? "bbsi" : "bbci", BIT(inst, 8, 4), BIT(inst, 4, 4) + (BIT(inst, 12) ? 16 : 0), pc + 4 + s8(u8(inst >> 16)));
 		}
 		else
 		{
 			// BNONE, BEQ, BLT, BLTU, BALL, BBC, BBCI, BANY, BNE, BGE, BGEU, BNALL, BBS
-			util::stream_format(stream, "%-8sa%d, a%d, 0x%08X", s_b_ops[BIT(inst, 12, 4)], BIT(inst, 8, 4), BIT(inst, 4, 4), pc + 4 + s8(u8(inst >> 16)));
+			util::stream_format(stream, "%-8sa%d, a%d, 0x%08X", xtensa_helper::s_b_ops[BIT(inst, 12, 4)], BIT(inst, 8, 4), BIT(inst, 4, 4), pc + 4 + s8(u8(inst >> 16)));
 		}
 		return 3 | STEP_COND | SUPPORTED;
 
 	case 0b1000: case 0b1001: // L32I.N (with Code Density Option)
-		util::stream_format(stream, "%-8sa%d, a%d, ", BIT(inst, 0) ? "s32i.n" : "l32i.n", BIT(inst, 4, 4), BIT(inst, 8, 4));
-		format_imm(stream, BIT(inst, 12, 4) * 4);
+		util::stream_format(stream, "%-8sa%d, a%d, %s", BIT(inst, 0) ? "s32i.n" : "l32i.n", BIT(inst, 4, 4), BIT(inst, 8, 4), xtensa_helper::format_imm(BIT(inst, 12, 4) * 4));
 		return 2 | SUPPORTED;
 
 	case 0b1010: // ADD.N (with Code Density Option)
@@ -1108,8 +872,7 @@ offs_t xtensa_disassembler::disassemble(std::ostream &stream, offs_t pc, const x
 		if (!BIT(inst, 7))
 		{
 			// 7-bit immediate field uses asymmetric sign extension (range is -32..95)
-			util::stream_format(stream, "%-8sa%d, ", "movi.n", BIT(inst, 8, 4));
-			format_imm(stream, int((inst & 0x0070) + BIT(inst, 12, 4) - (BIT(inst, 5, 2) == 0b11 ? 128 : 0)));
+			util::stream_format(stream, "%-8sa%d, %s", "movi.n", BIT(inst, 8, 4), xtensa_helper::format_imm(int((inst & 0x0070) + BIT(inst, 12, 4) - (BIT(inst, 5, 2) == 0b11 ? 128 : 0))));
 			return 2 | SUPPORTED;
 		}
 		else

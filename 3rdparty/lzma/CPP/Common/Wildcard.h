@@ -1,7 +1,7 @@
 // Common/Wildcard.h
 
-#ifndef __COMMON_WILDCARD_H
-#define __COMMON_WILDCARD_H
+#ifndef ZIP7_INC_COMMON_WILDCARD_H
+#define ZIP7_INC_COMMON_WILDCARD_H
 
 #include "MyString.h"
 
@@ -83,7 +83,7 @@ public:
   CCensorNode():
       Parent(NULL)
       // , ExcludeDirItems(false)
-      {};
+      {}
 
   CCensorNode(const UString &name, CCensorNode *parent):
       Parent(parent)

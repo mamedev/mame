@@ -1,7 +1,7 @@
 // PropertyName.h
 
-#ifndef __PROPERTY_NAME_H
-#define __PROPERTY_NAME_H
+#ifndef ZIP7_INC_PROPERTY_NAME_H
+#define ZIP7_INC_PROPERTY_NAME_H
 
 #include "../../../Common/MyString.h"
 

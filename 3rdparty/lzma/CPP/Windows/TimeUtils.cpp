@@ -258,7 +258,7 @@ void GetCurUtc_FiTime(CFiTime &ft) throw()
   
   FiTime_Clear(ft);
   struct timeval now;
-  if (gettimeofday(&now, 0 ) == 0)
+  if (gettimeofday(&now, NULL) == 0)
   {
     ft.tv_sec = now.tv_sec;
     ft.tv_nsec = now.tv_usec * 1000;
@@ -272,7 +272,7 @@ void GetCurUtcFileTime(FILETIME &ft) throw()
 {
   UInt64 v = 0;
   struct timeval now;
-  if (gettimeofday(&now, 0 ) == 0)
+  if (gettimeofday(&now, NULL) == 0)
   {
     v = ((UInt64)now.tv_sec + kUnixTimeOffset) *
       kNumTimeQuantumsInSecond + (UInt64)now.tv_usec * 10;

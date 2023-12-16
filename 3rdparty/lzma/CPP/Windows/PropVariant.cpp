@@ -197,17 +197,17 @@ BSTR CPropVariant::AllocBstr(unsigned numChars)
 
 void CPropVariant::Set_Int32(Int32 value) throw()
 {
-  SET_PROP_id_dest(VT_I4, lVal);
+  SET_PROP_id_dest(VT_I4, lVal)
 }
 
 void CPropVariant::Set_Int64(Int64 value) throw()
 {
-  SET_PROP_id_dest(VT_I8, hVal.QuadPart);
+  SET_PROP_id_dest(VT_I8, hVal.QuadPart)
 }
 
 #define SET_PROP_FUNC(type, id, dest) \
   CPropVariant& CPropVariant::operator=(type value) throw() \
-  { SET_PROP_id_dest(id, dest); return *this; }
+  { SET_PROP_id_dest(id, dest)  return *this; }
 
 SET_PROP_FUNC(Byte, VT_UI1, bVal)
 // SET_PROP_FUNC(Int16, VT_I2, iVal)
@@ -245,7 +245,7 @@ SET_PROP_FUNC(const FILETIME &, VT_FILETIME, filetime)
   we call system functions for VT_BSTR and for unknown typed
 */
  
-CPropVariant::~CPropVariant()
+CPropVariant::~CPropVariant() throw()
 {
   switch ((unsigned)vt)
   {

@@ -59,13 +59,14 @@ Paste test:
 
 TODO:
 - LEDs should be dark at startup (RS key to activate)
-- slots for expansion & application ports
 - add TTY support
 
 ******************************************************************************/
 
 #include "emu.h"
 
+#include "bus/kim1/kim1bus.h"
+#include "bus/kim1/k1016_16k.h"
 #include "cpu/m6502/m6502.h"
 #include "formats/kim1_cas.h"
 #include "imagedev/cassette.h"
@@ -230,7 +231,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(kim1_state::cassette_input)
 {
 	double tap_val = m_cass->input();
 
-	if (tap_val <= 0)
+	if (tap_val <= 0.0)
 	{
 		if (m_cassette_high_count)
 		{
@@ -239,7 +240,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(kim1_state::cassette_input)
 		}
 	}
 
-	if (tap_val > 0)
+	if (tap_val > 0.0)
 		m_cassette_high_count++;
 }
 
@@ -250,14 +251,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(kim1_state::cassette_input)
 
 void kim1_state::mem_map(address_map &map)
 {
-	map.global_mask(0x1fff);
-	map(0x0000, 0x03ff).ram();
-	map(0x1700, 0x170f).mirror(0x0030).m(m_miot[1], FUNC(mos6530_device::io_map));
-	map(0x1740, 0x174f).mirror(0x0030).m(m_miot[0], FUNC(mos6530_device::io_map));
-	map(0x1780, 0x17bf).m(m_miot[1], FUNC(mos6530_device::ram_map));
-	map(0x17c0, 0x17ff).m(m_miot[0], FUNC(mos6530_device::ram_map));
-	map(0x1800, 0x1bff).m(m_miot[1], FUNC(mos6530_device::rom_map));
-	map(0x1c00, 0x1fff).m(m_miot[0], FUNC(mos6530_device::rom_map));
+	map(0x0000, 0x03ff).mirror(0xe000).ram();
+	map(0x1700, 0x170f).mirror(0xe030).m(m_miot[1], FUNC(mos6530_device::io_map));
+	map(0x1740, 0x174f).mirror(0xe030).m(m_miot[0], FUNC(mos6530_device::io_map));
+	map(0x1780, 0x17bf).mirror(0xe000).m(m_miot[1], FUNC(mos6530_device::ram_map));
+	map(0x17c0, 0x17ff).mirror(0xe000).m(m_miot[0], FUNC(mos6530_device::ram_map));
+	map(0x1800, 0x1bff).mirror(0xe000).m(m_miot[1], FUNC(mos6530_device::rom_map));
+	map(0x1c00, 0x1fff).mirror(0xe000).m(m_miot[0], FUNC(mos6530_device::rom_map));
 }
 
 void kim1_state::sync_map(address_map &map)
@@ -309,6 +309,11 @@ INPUT_PORTS_END
 //  MACHINE DRIVERS
 //**************************************************************************
 
+static void kim1_cards(device_slot_interface &device)
+{
+	device.option_add("mtuk1016", KIM1BUS_K1016);   // MTU K-1016 16K RAM card
+}
+
 void kim1_state::kim1(machine_config &config)
 {
 	// basic machine hardware
@@ -340,6 +345,15 @@ void kim1_state::kim1(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	TIMER(config, "cassette_timer").configure_periodic(FUNC(kim1_state::cassette_input), attotime::from_hz(44100));
+
+	// KIM-1 has two edge connectors for expansion; you could plug them into a backplane,
+	// and that's what we're abstracting here.
+	KIM1BUS(config, "bus", 0).set_space(m_maincpu, AS_PROGRAM);
+	KIM1BUS_SLOT(config, "sl1", 0, "bus", kim1_cards, nullptr);
+	KIM1BUS_SLOT(config, "sl2", 0, "bus", kim1_cards, nullptr);
+	KIM1BUS_SLOT(config, "sl3", 0, "bus", kim1_cards, nullptr);
+	KIM1BUS_SLOT(config, "sl4", 0, "bus", kim1_cards, nullptr);
+	KIM1BUS_SLOT(config, "sl5", 0, "bus", kim1_cards, nullptr);
 
 	// software list
 	SOFTWARE_LIST(config, "cass_list").set_original("kim1_cass");

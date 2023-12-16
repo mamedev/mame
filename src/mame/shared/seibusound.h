@@ -78,7 +78,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	void update_irq_lines(int param);
+	void update_irq_lines(s32 param);
 	TIMER_CALLBACK_MEMBER(update_irq_synced);
 
 	// device callbacks

@@ -208,7 +208,6 @@ public:
 		m_pcb_digit(*this, "pcbdigit%u", 0U),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_generic_paletteram_32(*this, "paletteram"),
 		m_sharc_dataram(*this, "sharc_dataram"),
 		m_konppc(*this, "konppc")
 	{ }
@@ -233,7 +232,6 @@ protected:
 	output_finder<2> m_pcb_digit;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<uint32_t> m_generic_paletteram_32;
 	required_shared_ptr<uint32_t> m_sharc_dataram;
 	required_device<konppc_device> m_konppc;
 
@@ -242,7 +240,6 @@ protected:
 	uint8_t m_sound_ctrl;
 	uint8_t m_sound_intck;
 
-	void paletteram32_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint8_t sysreg_r(offs_t offset);
 	void sysreg_w(offs_t offset, uint8_t data);
 	uint32_t ccu_r(offs_t offset, uint32_t mem_mask = ~0);
@@ -295,8 +292,6 @@ public:
 	void jetwave(machine_config &config);
 
 private:
-	void palette_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-
 	void main_memmap(address_map &map);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -318,14 +313,6 @@ uint32_t jetwave_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 
 /*****************************************************************************/
-
-void zr107_state::paletteram32_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	COMBINE_DATA(&m_generic_paletteram_32[offset]);
-	data = m_generic_paletteram_32[offset];
-	m_palette->set_pen_color((offset * 2) + 0, pal5bit(data >> 26), pal5bit(data >> 21), pal5bit(data >> 16));
-	m_palette->set_pen_color((offset * 2) + 1, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
-}
 
 K056832_CB_MEMBER(midnrun_state::tile_callback)
 {
@@ -500,7 +487,7 @@ void midnrun_state::main_memmap(address_map &map)
 	map(0x74000000, 0x74001fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w)).mirror(0x2000);
 	map(0x74020000, 0x7402003f).rw(m_k056832, FUNC(k056832_device::word_r), FUNC(k056832_device::word_w));
 	map(0x74060000, 0x7406003f).rw(FUNC(midnrun_state::ccu_r), FUNC(midnrun_state::ccu_w));
-	map(0x74080000, 0x74081fff).ram().w(FUNC(midnrun_state::paletteram32_w)).share(m_generic_paletteram_32);
+	map(0x74080000, 0x74081fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0x740a0000, 0x740a3fff).r(m_k056832, FUNC(k056832_device::rom_word_r));
 	map(0x78000000, 0x7800ffff).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_r_ppc), FUNC(konppc_device::cgboard_dsp_shared_w_ppc));        // 21N 21K 23N 23K
 	map(0x78010000, 0x7801ffff).w(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_w_ppc));
@@ -515,18 +502,11 @@ void midnrun_state::main_memmap(address_map &map)
 }
 
 
-void jetwave_state::palette_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	COMBINE_DATA(&m_generic_paletteram_32[offset]);
-	data = m_generic_paletteram_32[offset];
-	m_palette->set_pen_color(offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
-}
-
 void jetwave_state::main_memmap(address_map &map)
 {
 	map(0x00000000, 0x000fffff).ram().share(m_workram);
 	map(0x74000000, 0x740000ff).rw(m_k001604, FUNC(k001604_device::reg_r), FUNC(k001604_device::reg_w));
-	map(0x74010000, 0x7401ffff).ram().w(FUNC(jetwave_state::palette_w)).share(m_generic_paletteram_32);
+	map(0x74010000, 0x7401ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0x74020000, 0x7403ffff).rw(m_k001604, FUNC(k001604_device::tile_r), FUNC(k001604_device::tile_w));
 	map(0x74040000, 0x7407ffff).rw(m_k001604, FUNC(k001604_device::char_r), FUNC(k001604_device::char_w));
 	map(0x78000000, 0x7800ffff).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_r_ppc), FUNC(konppc_device::cgboard_dsp_shared_w_ppc));      // 21N 21K 23N 23K
@@ -763,7 +743,7 @@ void zr107_state::zr107(machine_config &config)
 	m_screen->set_visarea(0*8, 64*8-1, 0*8, 48*8-1);
 	m_screen->screen_vblank().set(FUNC(zr107_state::vblank));
 
-	PALETTE(config, m_palette).set_entries(65536);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 4096);
 
 	K001005(config, m_k001005, 0, m_k001006_1);
 
@@ -822,6 +802,8 @@ void jetwave_state::jetwave(machine_config &config)
 	m_screen->set_size(1024, 1024);
 	m_screen->set_visarea(40, 511 + 40, 27, 383 + 27);      // needs CRTC emulation
 	m_screen->set_screen_update(FUNC(jetwave_state::screen_update));
+
+	m_palette->set_format(4, raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 10,5,0>, 16384);
 
 	K001604(config, m_k001604, 0);
 	m_k001604->set_palette(m_palette);

@@ -106,12 +106,12 @@ enum
 // description of where a metadata entry lives within the file
 struct chd_file::metadata_entry
 {
-	uint64_t                  offset;         // offset within the file of the header
-	uint64_t                  next;           // offset within the file of the next header
-	uint64_t                  prev;           // offset within the file of the previous header
-	uint32_t                  length;         // length of the metadata
-	uint32_t                  metatag;        // metadata tag
-	uint8_t                   flags;          // flag bits
+	uint64_t                offset;         // offset within the file of the header
+	uint64_t                next;           // offset within the file of the next header
+	uint64_t                prev;           // offset within the file of the previous header
+	uint32_t                length;         // length of the metadata
+	uint32_t                metatag;        // metadata tag
+	uint8_t                 flags;          // flag bits
 };
 
 
@@ -119,7 +119,7 @@ struct chd_file::metadata_entry
 
 struct chd_file::metadata_hash
 {
-	uint8_t                   tag[4];         // tag of the metadata in big-endian
+	uint8_t                 tag[4];         // tag of the metadata in big-endian
 	util::sha1_t            sha1;           // hash data
 };
 

@@ -15,7 +15,7 @@ extern HINSTANCE g_hInstance;
 static const UINT_PTR kTimerID = 3;
 static const UINT kTimerElapse = 100;
 
-#ifdef LANG
+#ifdef Z7_LANG
 #include "LangUtils.h"
 #endif
 
@@ -32,7 +32,7 @@ HRESULT CProgressSync::ProcessStopAndPause()
   return S_OK;
 }
 
-#ifndef _SFX
+#ifndef Z7_SFX
 CProgressDialog::~CProgressDialog()
 {
   AddToTitle(L"");
@@ -45,15 +45,17 @@ void CProgressDialog::AddToTitle(LPCWSTR s)
 #endif
 
 
+#define UNDEFINED_VAL ((UInt64)(Int64)-1)
+
 bool CProgressDialog::OnInit()
 {
-  _range = (UInt64)(Int64)-1;
-  _prevPercentValue = -1;
+  _range = UNDEFINED_VAL;
+  _prevPercentValue = UNDEFINED_VAL;
 
   _wasCreated = true;
   _dialogCreatedEvent.Set();
 
-  #ifdef LANG
+  #ifdef Z7_LANG
   LangSetDlgItems(*this, NULL, 0);
   #endif
 
@@ -114,7 +116,7 @@ bool CProgressDialog::OnTimer(WPARAM /* timerID */, LPARAM /* callback */)
   if (total == 0)
     total = 1;
 
-  int percentValue = (int)(completed * 100 / total);
+  const UInt64 percentValue = completed * 100 / total;
   if (percentValue != _prevPercentValue)
   {
     wchar_t s[64];
@@ -122,7 +124,7 @@ bool CProgressDialog::OnTimer(WPARAM /* timerID */, LPARAM /* callback */)
     UString title = s;
     title += "% ";
     SetText(title + _title);
-    #ifndef _SFX
+    #ifndef Z7_SFX
     AddToTitle(title + MainAddTitle);
     #endif
     _prevPercentValue = percentValue;
@@ -159,7 +161,7 @@ bool CProgressDialog::OnMessage(UINT message, WPARAM wParam, LPARAM lParam)
   return CModalDialog::OnMessage(message, wParam, lParam);
 }
 
-bool CProgressDialog::OnButtonClicked(int buttonID, HWND buttonHWND)
+bool CProgressDialog::OnButtonClicked(unsigned buttonID, HWND buttonHWND)
 {
   switch (buttonID)
   {

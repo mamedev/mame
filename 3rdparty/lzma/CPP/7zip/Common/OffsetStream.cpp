@@ -2,8 +2,6 @@
 
 #include "StdAfx.h"
 
-#include "../../Common/Defs.h"
-
 #include "OffsetStream.h"
 
 HRESULT COffsetOutStream::Init(IOutStream *stream, UInt64 offset)
@@ -13,12 +11,12 @@ HRESULT COffsetOutStream::Init(IOutStream *stream, UInt64 offset)
   return _stream->Seek((Int64)offset, STREAM_SEEK_SET, NULL);
 }
 
-STDMETHODIMP COffsetOutStream::Write(const void *data, UInt32 size, UInt32 *processedSize)
+Z7_COM7F_IMF(COffsetOutStream::Write(const void *data, UInt32 size, UInt32 *processedSize))
 {
   return _stream->Write(data, size, processedSize);
 }
 
-STDMETHODIMP COffsetOutStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64 *newPosition)
+Z7_COM7F_IMF(COffsetOutStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64 *newPosition))
 {
   if (seekOrigin == STREAM_SEEK_SET)
   {
@@ -27,13 +25,13 @@ STDMETHODIMP COffsetOutStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64 *new
     offset += _offset;
   }
   UInt64 absoluteNewPosition = 0; // =0 for gcc-10
-  HRESULT result = _stream->Seek(offset, seekOrigin, &absoluteNewPosition);
+  const HRESULT result = _stream->Seek(offset, seekOrigin, &absoluteNewPosition);
   if (newPosition)
     *newPosition = absoluteNewPosition - _offset;
   return result;
 }
 
-STDMETHODIMP COffsetOutStream::SetSize(UInt64 newSize)
+Z7_COM7F_IMF(COffsetOutStream::SetSize(UInt64 newSize))
 {
   return _stream->SetSize(_offset + newSize);
 }
