@@ -19,10 +19,8 @@ static constexpr int MAX_CHANNELS = 8;
 
 static cassette_image::error flacfile_identify(cassette_image *cassette, cassette_image::Options *opts)
 {
-	const uint64_t file_size = cassette->image_size();
-	std::vector<uint8_t> file_contents(file_size);
-	cassette->image_read(&file_contents[0], 0, file_size);
-	flac_decoder decoder(&file_contents[0], file_size);
+	cassette->get_raw_cassette_image()->seek(0, SEEK_SET);
+	flac_decoder decoder(*cassette->get_raw_cassette_image());
 	decoder.reset();
 	const int channels = decoder.channels();
 	const int sample_rate = decoder.sample_rate();
@@ -51,10 +49,8 @@ static cassette_image::error flacfile_identify(cassette_image *cassette, cassett
 
 static cassette_image::error flacfile_load(cassette_image *cassette)
 {
-	const uint64_t file_size = cassette->image_size();
-	std::vector<uint8_t> file_contents(file_size);
-	cassette->image_read(&file_contents[0], 0, file_size);
-	flac_decoder decoder(&file_contents[0], file_size);
+	cassette->get_raw_cassette_image()->seek(0, SEEK_SET);
+	flac_decoder decoder(*cassette->get_raw_cassette_image());
 	decoder.reset();
 	const int channels = decoder.channels();
 	const int total_samples = decoder.total_samples();

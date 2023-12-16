@@ -136,6 +136,7 @@ public:
 	uint8_t image_read_byte(uint64_t offset);
 	void image_write(const void *buffer, uint64_t offset, size_t length);
 	uint64_t image_size();
+	util::random_read_write::ptr &get_raw_cassette_image() { return m_io; }
 
 	// waveform accesses
 	error get_samples(int channel,
