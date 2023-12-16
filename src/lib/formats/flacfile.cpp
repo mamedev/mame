@@ -15,7 +15,7 @@
 static constexpr int MAX_CHANNELS = 8;
 
 
-cassette_image::error flacfile_identify(cassette_image *cassette, cassette_image::Options *opts)
+static cassette_image::error flacfile_identify(cassette_image *cassette, cassette_image::Options *opts)
 {
 	const uint64_t file_size = cassette->image_size();
 	std::vector<uint8_t> file_contents(file_size);
@@ -58,7 +58,7 @@ static cassette_image::error flacfile_load(cassette_image *cassette)
 	const int total_samples = decoder.total_samples();
 
 	std::unique_ptr<int16_t[]> samples[MAX_CHANNELS];
-	int16_t* channel_samples[MAX_CHANNELS];
+	int16_t *channel_samples[MAX_CHANNELS];
 	for (int channel = 0; channel < channels; channel++)
 	{
 		samples[channel] = std::make_unique<int16_t[]>(total_samples);
