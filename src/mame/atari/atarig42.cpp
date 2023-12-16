@@ -11,17 +11,17 @@
         * Danger Express (1992)
         * Guardians of the 'Hood (1992)
 
-    Note: Road Riot 4WD sports a communication link with another pcb allowing two players to
-    to compete with each other. The way both pcbs communicate depends on the program version.
+    Note: Road Riot 4WD sports a communication link with another PCB allowing two players to
+    to compete with each other. The way both PCBs communicate depends on the program version.
         * The kit version uses an optional com-link board consisting on an ADSP-2105 (10MHz XTAL)
           routing game link data through the ADSP's serial port.
-        * The dedicated twin cab version uses dual port ram to bridge the two pcbs together (not
+        * The dedicated twin cab version uses dual port RAM to bridge the two PCBs together (not
           networked).
     
 	TODO:
-        * ASIC65 for Road Riot tests bad with a "TIMEOUT ERROR" for the internal ram test. Comm port and checksum test ok
+        * ASIC65 for Road Riot tests bad with a "TIMEOUT ERROR" for the internal RAM test. Comm port and checksum test ok
         * Hook com-link board ADSP-2105 (and serial port) for roadriot and roadriota
-        * Hook dual port ram and dual pcb comms for roadriotb
+        * Hook dual port RAM and dual PCB comms for roadriotb
 
 ***************************************************************************/
 
@@ -677,7 +677,7 @@ ROM_START( roadriot ) // Test mode shows DSP COMM and DSP LINK tests; This is a 
 	ROM_LOAD( "136089-1002.22p",  0x0200, 0x0200, CRC(44288753) SHA1(811582015264f85a32643196cdb331a41430318f) )
 	ROM_LOAD( "136089-1003.21p",  0x0400, 0x0200, CRC(1f571706) SHA1(26d5ea59163b3482ab1f8a26178d0849c5fd9692) )
 
-	ROM_REGION( 0x10000, "commcpu", 0 ) // ADSP-2105 code for communications with another pcb
+	ROM_REGION( 0x10000, "commcpu", 0 ) // ADSP-2105 code for communications with another PCB
 	ROM_LOAD( "136087-1025.4e", 0x0000, 0x10000, CRC(4c645933) SHA1(7a1cf049e368059a79b03598de73c30d8dae5e90) )
 ROM_END
 
@@ -737,7 +737,7 @@ ROM_START( roadriota ) // Test mode shows DSP COMM and DSP LINK tests; This is a
 	ROM_LOAD( "136089-1002.22p",  0x0200, 0x0200, CRC(44288753) SHA1(811582015264f85a32643196cdb331a41430318f) )
 	ROM_LOAD( "136089-1003.21p",  0x0400, 0x0200, CRC(1f571706) SHA1(26d5ea59163b3482ab1f8a26178d0849c5fd9692) )
 
-	ROM_REGION( 0x10000, "commcpu", 0 ) // ADSP-2105 code for communications with another pcb
+	ROM_REGION( 0x10000, "commcpu", 0 ) // ADSP-2105 code for communications with another PCB
 	ROM_LOAD( "136087-1025.4e", 0x0000, 0x10000, CRC(4c645933) SHA1(7a1cf049e368059a79b03598de73c30d8dae5e90) )
 ROM_END
 
