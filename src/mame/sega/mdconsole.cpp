@@ -213,7 +213,14 @@ void md_cons_slot_state::ms_megadriv(machine_config &config)
 	md_exp_port(config);
 
 	MD_CART_SLOT(config, m_cart, md_cart, nullptr).set_must_be_loaded(true);
-	SOFTWARE_LIST(config, "cart_list").set_original("megadriv");
+	SOFTWARE_LIST(config, "cart_list").set_original("megadriv").set_filter("NTSC-U");
+}
+
+void md_cons_slot_state::ms_megadrivj(machine_config &config)
+{
+	ms_megadriv(config);
+
+	subdevice<software_list_device>("cart_list")->set_filter("NTSC-J");
 }
 
 void md_cons_slot_state::ms_megadpal(machine_config &config)
@@ -226,7 +233,7 @@ void md_cons_slot_state::ms_megadpal(machine_config &config)
 	md_exp_port(config);
 
 	MD_CART_SLOT(config, m_cart, md_cart, nullptr).set_must_be_loaded(true);
-	SOFTWARE_LIST(config, "cart_list").set_original("megadriv");
+	SOFTWARE_LIST(config, "cart_list").set_original("megadriv").set_filter("PAL");
 }
 
 void md_cons_slot_state::ms_megadriv2(machine_config &config)
@@ -248,12 +255,15 @@ void md_cons_slot_state::ms_megajet(machine_config &config)
 	// P1 controller is integrated
 	m_ctrl_ports[0]->set_default_option(SMS_CTRL_OPTION_MD_6BUTTON);
 	m_ctrl_ports[0]->set_fixed(true);
+
+	subdevice<software_list_device>("cart_list")->set_filter("NTSC-J");
 }
 
 void md_cons_slot_state::genesis_tmss(machine_config &config)
 {
 	ms_megadriv(config);
-	subdevice<software_list_device>("cart_list")->set_filter("TMSS");
+
+	subdevice<software_list_device>("cart_list")->set_filter("NTSC-U,TMSS");
 }
 
 void md_cons_state::dcat16_megadriv(machine_config &config)
