@@ -8,11 +8,12 @@ license:CC0-1.0
 
 	<element name="black"><rect><color red="0" green="0" blue="0" /></rect></element>
 	<element name="black2"><rect><color red="0.18" green="0.17" blue="0.17" /></rect></element>
+	<element name="black3"><rect><color red="0.15" green="0.14" blue="0.14" /></rect></element>
 	<element name="white"><rect><color red="1" green="1" blue="1" /></rect></element>
 
 	<element name="hl" defstate="0">
 		<rect state="0"><color red="1" green="1" blue="1" /></rect>
-		<rect state="1"><color red="0.86" green="0.86" blue="0.86" /></rect>
+		<rect state="1"><color red="0.88" green="0.88" blue="0.88" /></rect>
 	</element>
 
 	<element name="led" defstate="0">
@@ -434,7 +435,7 @@ license:CC0-1.0
 		<element ref="cwhite"><bounds x="-1" y="-2" width="121" height="90" /></element>
 		<group ref="panel"><bounds x="88" y="28.7" width="31" height="59" /></group>
 
-		<element ref="black2"><bounds x="3.7" y="2.7" width="80.6" height="80.6" /></element>
+		<element ref="black3"><bounds x="3.7" y="2.7" width="80.6" height="80.6" /></element>
 		<group ref="sb_board"><bounds x="4" y="3" width="80" height="80" /></group>
 		<group ref="sb_ui"><bounds x="-12.5" y="3" width="10" height="80" /></group>
 

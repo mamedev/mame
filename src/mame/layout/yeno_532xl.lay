@@ -533,8 +533,8 @@ license:CC0-1.0
 		<group ref="sb_board"><bounds x="4" y="3" width="80" height="80" /></group>
 		<group ref="sb_ui"><bounds x="-11.5" y="3" width="10" height="80" /></group>
 
-		<group ref="lcd2"><bounds x="4" y="-6.5" width="14" height="5.333" /></group>
-		<group ref="lcd1"><bounds x="24" y="-6.5" width="14" height="5.333" /></group>
+		<group ref="lcd2"><bounds x="4" yc="-3.75" width="14" height="5.45" /></group>
+		<group ref="lcd1"><bounds x="24" yc="-3.75" width="14" height="5.45" /></group>
 
 		<group ref="buttons"><bounds x="88" y="3" width="26.316" height="80" /></group>
 
