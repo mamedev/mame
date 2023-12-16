@@ -97,7 +97,7 @@
     - mocapglf, sscopefh, sscopex: implement 2nd screen output, controlled by IP90C63A;
     \- sscopex/sogeki desyncs during gameplay intro, leaves heavy trails in gameplay;
     - ppp2nd: hangs when selecting game mode from service (manages to save);
-    - code1d, code1da, p9112: RTC self check bad;
+    - code1d, code1da: RTC self check bad;
     - code1db: crashes when selecting single course type;
     - thrild2c: blue screen;
     - thrild2ac: black screen;
@@ -478,6 +478,7 @@ public:
 		m_ata(*this, "ata"),
 		m_lpci(*this, "pcibus"),
 		m_ds2430(*this, "ds2430"),
+		m_ds2430_ext(*this, "ds2430_ext"),
 		m_workram(*this, "workram"),
 		m_io_ports(*this, "IN%u", 0U),
 		m_analog_input(*this, "AN%u", 0U),
@@ -488,13 +489,17 @@ public:
 	}
 
 	void viper(machine_config &config);
+	void viper_dongle(machine_config &config);
 	void viper_ppp(machine_config &config);
 	void viper_omz(machine_config &config);
 	void viper_fullbody(machine_config &config);
+	void viper_fbdongle(machine_config &config);
 
 	void init_viper();
 	void init_vipercf();
 	void init_viperhd();
+
+	int ds2430_mux_r();
 
 protected:
 	virtual void machine_start() override;
@@ -515,8 +520,10 @@ private:
 	void voodoo3_lfb_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	uint8_t input_r(offs_t offset);
 	void output_w(offs_t offset, uint8_t data);
-	uint64_t e70000_r(offs_t offset, uint64_t mem_mask = ~0);
-	void e70000_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint8_t ds2430_r();
+	void ds2430_w(uint8_t data = 0);
+	uint8_t ds2430_ext_r();
+	void ds2430_ext_w(uint8_t data = 0);
 	void unk1a_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	void unk1b_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 
@@ -559,6 +566,7 @@ private:
 	uint8_t m_unk_serial_regs[0x80]{};
 	uint32_t m_sound_buffer_offset = 0U;
 	bool m_sound_irq_enabled = false;
+	bool m_ds2430_ext_select = false;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(sound_timer_callback);
 
@@ -658,6 +666,7 @@ private:
 	required_device<ata_interface_device> m_ata;
 	required_device<pci_bus_legacy_device> m_lpci;
 	required_device<ds2430a_device> m_ds2430;
+	optional_device<ds2430a_device> m_ds2430_ext;
 	required_shared_ptr<uint64_t> m_workram;
 	required_ioport_array<8> m_io_ports;
 	required_ioport_array<4> m_analog_input;
@@ -1716,24 +1725,34 @@ void viper_state::output_w(offs_t offset, uint8_t data)
 	LOG("output_w %02x -> %02x\n", offset, data);
 }
 
-uint64_t viper_state::e70000_r(offs_t offset, uint64_t mem_mask)
+uint8_t viper_state::ds2430_r()
 {
-	if (ACCESSING_BITS_56_63 && !machine().side_effects_disabled())
-	{
+	if (!machine().side_effects_disabled())
 		m_ds2430->data_w(0);
-
-//      printf("%s e70000_r: %08X (mask %08X%08X)\n", machine().describe_context().c_str(), offset, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
-	}
 
 	return 0;
 }
 
-void viper_state::e70000_w(offs_t offset, uint64_t data, uint64_t mem_mask)
+void viper_state::ds2430_w(uint8_t data)
 {
-	if (ACCESSING_BITS_56_63)
+	m_ds2430->data_w(1);
+	m_ds2430_ext_select = false;
+}
+
+uint8_t viper_state::ds2430_ext_r()
+{
+	if (m_ds2430_ext.found() && !machine().side_effects_disabled())
+		m_ds2430_ext->data_w(0);
+
+	return 0;
+}
+
+void viper_state::ds2430_ext_w(uint8_t data)
+{
+	if (m_ds2430_ext.found())
 	{
-		m_ds2430->data_w(1);
-//      printf("e70000_w: %08X%08X, %08X (mask %08X%08X) at %08X\n", (uint32_t)(data >> 32), (uint32_t)data, offset, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask, m_maincpu->pc());
+		m_ds2430_ext->data_w(1);
+		m_ds2430_ext_select = true;
 	}
 }
 
@@ -1751,6 +1770,8 @@ void viper_state::unk1b_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 	{
 		// HACK: put DS2430A in reset state (probably side effect of enabling initial output on a GPIO pin)
 		m_ds2430->data_w(0);
+		if (m_ds2430_ext.found())
+			m_ds2430_ext->data_w(0);
 	//  printf("%s unk1b_w: %08X%08X, %08X (mask %08X%08X) at %08X\n", machine().describe_context().c_str(), (uint32_t)(data >> 32), (uint32_t)data, offset, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
 	}
 }
@@ -1848,7 +1869,8 @@ void viper_state::viper_map(address_map &map)
 										 // 0xa8/0xa9 for unexpected irq (namely irq1)
 	map(0xffe50000, 0xffe50007).w(FUNC(viper_state::unk2_w));
 	map(0xffe60000, 0xffe60007).noprw();
-	map(0xffe70000, 0xffe7000f).rw(FUNC(viper_state::e70000_r), FUNC(viper_state::e70000_w)); // DS2430
+	map(0xffe70000, 0xffe70000).rw(FUNC(viper_state::ds2430_r), FUNC(viper_state::ds2430_w));
+	map(0xffe78000, 0xffe78000).rw(FUNC(viper_state::ds2430_ext_r), FUNC(viper_state::ds2430_ext_w));
 	map(0xffe80000, 0xffe80007).w(FUNC(viper_state::unk1a_w));
 	map(0xffe88000, 0xffe88007).w(FUNC(viper_state::unk1b_w));
 	map(0xffe98000, 0xffe98007).noprw(); // network?
@@ -1871,6 +1893,11 @@ void viper_state::viper_ppp_map(address_map &map)
 }
 
 /*****************************************************************************/
+
+int viper_state::ds2430_mux_r()
+{
+	return m_ds2430_ext_select ? m_ds2430_ext->data_r() : m_ds2430->data_r();
+}
 
 static INPUT_PORTS_START( viper )
 	PORT_START("IN0")
@@ -2174,6 +2201,13 @@ INPUT_PORTS_START( p911 )
 	PORT_BIT( 0x01ff, 0x0e7, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0x0020, 0x01af) PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_PLAYER(2)
 INPUT_PORTS_END
 
+INPUT_PORTS_START( p9112 )
+	PORT_INCLUDE( p911 )
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(viper_state, ds2430_mux_r)
+INPUT_PORTS_END
+
 INPUT_PORTS_START( mfightc )
 	PORT_INCLUDE( viper )
 
@@ -2385,6 +2419,7 @@ INPUT_PORTS_START( code1d )
 	PORT_DIPNAME( 0x08, 0x00, "Memory Card Check On Boot" ) PORT_DIPLOCATION("SW:1")
 	PORT_DIPSETTING( 0x08, DEF_STR( On ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(viper_state, ds2430_mux_r)
 
 	PORT_MODIFY("IN4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Action Button")
@@ -2467,6 +2502,8 @@ void viper_state::machine_start()
 	save_item(NAME(m_unk_serial_regs));
 	save_item(NAME(m_sound_buffer_offset));
 	save_item(NAME(m_sound_irq_enabled));
+	if (m_ds2430_ext.found())
+		save_item(NAME(m_ds2430_ext_select));
 
 	save_item(NAME(m_epic.iack));
 	save_item(NAME(m_epic.eicr)); // written but never used
@@ -2522,6 +2559,9 @@ void viper_state::machine_reset()
 	}
 
 	m_ds2430->data_w(1);
+	if (m_ds2430_ext.found())
+		m_ds2430_ext->data_w(1);
+	m_ds2430_ext_select = false;
 }
 
 void viper_state::viper(machine_config &config)
@@ -2577,6 +2617,12 @@ void viper_state::viper(machine_config &config)
 	TIMER(config, "sound_timer").configure_periodic(FUNC(viper_state::sound_timer_callback), attotime::from_hz(44100.0 / 256));
 }
 
+void viper_state::viper_dongle(machine_config &config)
+{
+	viper(config);
+	DS2430A(config, m_ds2430_ext);
+}
+
 void viper_state::viper_ppp(machine_config &config)
 {
 	viper(config);
@@ -2593,6 +2639,12 @@ void viper_state::viper_fullbody(machine_config &config)
 	SPEAKER(config, "rear").rear_center();
 	DMADAC(config.replace(), "dacl").add_route(ALL_OUTPUTS, "front", 1.0);
 	DMADAC(config.replace(), "dacr").add_route(ALL_OUTPUTS, "rear", 1.0);
+}
+
+void viper_state::viper_fbdongle(machine_config &config)
+{
+	viper_fullbody(config);
+	DS2430A(config, m_ds2430_ext);
 }
 
 void viper_state::omz3d_map(address_map &map)
@@ -2954,7 +3006,7 @@ ROM_END
 ROM_START(p9112) /* dongle-protected version */
 	VIPER_BIOS
 
-	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* plug-in male DIN5 dongle containing a DS2430. The sticker on the dongle says 'GCB11-UA' */
+	ROM_REGION(0x28, "ds2430_ext", ROMREGION_ERASE00)       /* plug-in male DIN5 dongle containing a DS2430. The sticker on the dongle says 'GCB11-UA' */
 	ROM_LOAD("ds2430_p9112.u3", 0x00, 0x28, CRC(d745c6ee) SHA1(065c9d0df1703b3bbb53a07f4923fdee3b16f80e))
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
@@ -3295,9 +3347,9 @@ GAME(2001, ppp2nd,    kviper,    viper_ppp, ppp2nd,     viper_state, init_viperh
 GAME(2001, ppp2nda,   ppp2nd,    viper_ppp, ppp2nd,     viper_state, init_viperhd,  ROT0,  "Konami", "ParaParaParadise 2nd Mix (AAA)", MACHINE_NOT_WORKING)
 
 GAME(2001, boxingm,   kviper,    viper,     boxingm,    viper_state, init_vipercf,  ROT0,  "Konami", "Boxing Mania: Ashita no Joe (ver JAA)", MACHINE_NOT_WORKING)
-GAME(2000, code1d,    kviper,    viper,     code1d,     viper_state, init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.21 (ver UAD)", MACHINE_NOT_WORKING)
-GAME(2000, code1db,   code1d,    viper,     code1d,     viper_state, init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.16 (ver UAB)", MACHINE_NOT_WORKING)
-GAME(2000, code1da,   code1d,    viper,     code1d,     viper_state, init_vipercf,  ROT0,  "Konami", "Code One Dispatch (ver UAA)", MACHINE_NOT_WORKING)
+GAME(2000, code1d,    kviper,    viper_dongle,     code1d,     viper_state, init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.21 (ver UAD)", MACHINE_NOT_WORKING)
+GAME(2000, code1db,   code1d,    viper_dongle,     code1d,     viper_state, init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.16 (ver UAB)", MACHINE_NOT_WORKING)
+GAME(2000, code1da,   code1d,    viper_dongle,     code1d,     viper_state, init_vipercf,  ROT0,  "Konami", "Code One Dispatch (ver UAA)", MACHINE_NOT_WORKING)
 GAME(2000, gticlub2,  kviper,    viper,     gticlub2,   viper_state, init_vipercf,  ROT0,  "Konami", "GTI Club: Corso Italiano (ver JAB)", MACHINE_NOT_WORKING)
 GAME(2000, gticlub2ea,gticlub2,  viper,     gticlub2ea, viper_state, init_vipercf,  ROT0,  "Konami", "Driving Party: Racing in Italy (ver EAA)", MACHINE_NOT_WORKING)
 GAME(2001, jpark3,    kviper,    viper,     jpark3,     viper_state, init_vipercf,  ROT0,  "Konami", "Jurassic Park III (ver EBC)", MACHINE_NOT_WORKING)
@@ -3313,7 +3365,7 @@ GAME(2000, p911ud,    p911,      viper_fullbody,     p911,       viper_state, in
 GAME(2000, p911ed,    p911,      viper_fullbody,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 24/7 (ver EAD)", MACHINE_NOT_WORKING)
 GAME(2000, p911ea,    p911,      viper_fullbody,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 24/7 (ver EAD, alt)", MACHINE_NOT_WORKING)
 GAME(2000, p911j,     p911,      viper_fullbody,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver JAE)", MACHINE_NOT_WORKING)
-GAME(2001, p9112,     kviper,    viper_fullbody,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 911 2 (VER. UAA:B)", MACHINE_NOT_WORKING)
+GAME(2001, p9112,     kviper,    viper_fbdongle,     p9112,      viper_state, init_vipercf,  ROT90, "Konami", "Police 911 2 (VER. UAA:B)", MACHINE_NOT_WORKING)
 GAME(2001, sscopex,   kviper,    viper,     sscopex,    viper_subscreen_state, init_vipercf,  ROT0,  "Konami", "Silent Scope EX (ver UAA)", MACHINE_NOT_WORKING)
 GAME(2001, sogeki,    sscopex,   viper,     sogeki,     viper_subscreen_state, init_vipercf,  ROT0,  "Konami", "Sogeki (ver JAA)", MACHINE_NOT_WORKING)
 GAME(2002, sscopefh,  kviper,    viper,     sscopefh,   viper_subscreen_state, init_vipercf,  ROT0,  "Konami", "Silent Scope Fortune Hunter (ver EAA)", MACHINE_NOT_WORKING) // UK only?
