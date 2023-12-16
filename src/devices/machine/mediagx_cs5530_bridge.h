@@ -9,6 +9,7 @@
 #include "pci.h"
 
 #include "bus/isa/isa.h"
+#include "cpu/i386/i386.h"
 #include "machine/am9517a.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
@@ -129,6 +130,8 @@ private:
 	uint16_t m_dma_high_byte = 0;
 	uint8_t m_channel_check = 0;
 	bool m_nmi_enabled = false;
+
+	u8 m_fast_init;
 };
 
 DECLARE_DEVICE_TYPE(MEDIAGX_CS5530_BRIDGE, mediagx_cs5530_bridge_device)
