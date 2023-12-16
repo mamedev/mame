@@ -1915,7 +1915,7 @@ MC6845_UPDATE_ROW(heath_igc_tlb_device::crtc_update_row)
 				}
 
 				// TODO handle alt font
-				output |= bitswap<8>(m_p_chargen[(chr << 4) | ra] ^ inv, 0, 1, 2, 3, 4, 5, 6, 7);
+				output |= m_p_chargen[(chr << 4) | ra] ^ inv;
 			}
 
 			if (m_pixel_video_enabled)
