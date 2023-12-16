@@ -10,7 +10,6 @@
 
 #include "flacfile.h"
 
-#include "endianness.h"
 #include "flac.h"
 
 
@@ -62,12 +61,12 @@ static cassette_image::error flacfile_load(cassette_image *cassette)
 		samples[channel] = std::make_unique<int16_t[]>(total_samples);
 		channel_samples[channel] = &samples[channel][0];
 	}
-	decoder.decode(channel_samples, decoder.total_samples(), util::endianness::native != util::endianness::little);
+	decoder.decode(channel_samples, decoder.total_samples(), false);
 	for (int channel = 0; channel < channels; channel++)
 	{
 		cassette_image::error err = cassette->put_samples(channel, 0.0,
 			(double)total_samples/decoder.sample_rate(), total_samples, 2,
-			channel_samples[channel], cassette_image::WAVEFORM_16BITLE);
+			channel_samples[channel], cassette_image::WAVEFORM_16BIT);
 		if (err != cassette_image::error::SUCCESS)
 			return err;
 	}
