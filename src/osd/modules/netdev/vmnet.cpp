@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:Kelvin Sherlock
+// copyright-holders:Kelvin Sherlock, R. Belmont
 /*
     macOS vmnet network interface, direct version
-    by Kelvin Sherlock
+    by Kelvin Sherlock and R. Belmont
 
     vmnet provides an easy way for emulators and virtual machines to give their guest systems
     access to the outside LAN/Internet.  But for good security reasons it requies you to have
@@ -32,8 +32,11 @@
 #include <cstdlib>
 #include <cstdio>
 
+#include <CoreFoundation/CoreFoundation.h>
+#include <CoreServices/CoreServices.h>
 #include <sys/types.h>
 #include <sys/uio.h>
+#include <unistd.h>
 #include <vmnet/vmnet.h>
 
 #include "vmnet_common.h"
@@ -59,7 +62,39 @@ public:
 	virtual void exit();
 
 	virtual bool probe() {
-		return true;
+		// check #1: are we root?
+		if (!geteuid()) {
+			return true;
+		}
+
+		// check #2: do we have the com.apple.vm.networking entitlement?
+		// (this will never happen, but just in case it does...)
+		SecCodeRef mame;
+		bool hasEntitlement = false;
+		if (SecCodeCopySelf(kSecCSDefaultFlags, &mame) == errSecSuccess)
+		{
+			SecStaticCodeRef static_code;
+			if (SecCodeCopyStaticCode(mame, kSecCSDefaultFlags, &static_code) == errSecSuccess)
+			{
+				CFDictionaryRef signing;
+				if (SecCodeCopySigningInformation(static_code, kSecCSDefaultFlags, &signing) == errSecSuccess)
+				{
+					CFDictionaryRef entitlements = CFDictionaryRef(CFDictionaryGetValue(signing, kSecCodeInfoEntitlementsDict));
+					if (entitlements)
+					{
+						if (CFDictionaryGetValue(entitlements, CFSTR("com.apple.vm.networking")))
+						{
+							hasEntitlement = true;
+						}
+					}
+					CFRelease(signing);
+				}
+				CFRelease(static_code);
+			}
+			CFRelease(mame);
+		}
+
+		return hasEntitlement;
 	}
 };
 
@@ -90,17 +125,20 @@ private:
 netdev_vmnet::netdev_vmnet(const char *name, class device_network_interface *ifdev, int rate)
 	: osd_netdev(ifdev, rate) {
 
-	xpc_object_t dict;
 	dispatch_queue_t q;
+	std::unique_ptr<xpc_object_t, void (*)(xpc_object_t *)> dict(new xpc_object_t,
+			[](xpc_object_t *ptr) {
+				xpc_release(ptr);
+			});
 	dispatch_semaphore_t sem;
 
 	__block vmnet_return_t interface_status;
 
-	dict = xpc_dictionary_create(NULL, NULL, 0);
-	xpc_dictionary_set_uint64(dict, vmnet_operation_mode_key, VMNET_SHARED_MODE);
+	*dict = xpc_dictionary_create(NULL, NULL, 0);
+	xpc_dictionary_set_uint64(&dict, vmnet_operation_mode_key, VMNET_SHARED_MODE);
 	sem = dispatch_semaphore_create(0);
 	q = dispatch_get_global_queue(QOS_CLASS_UTILITY, 0);
-	m_interface = vmnet_start_interface(dict, q, ^(vmnet_return_t status, xpc_object_t params){
+	m_interface = vmnet_start_interface(&dict, q, ^(vmnet_return_t status, xpc_object_t params){
 		interface_status = status;
 		if (status == VMNET_SUCCESS) {
 			const char *cp;
@@ -120,7 +158,6 @@ netdev_vmnet::netdev_vmnet(const char *name, class device_network_interface *ifd
 
 			fprintf(stderr, "vmnet mtu: %u\n", (u32)m_vmnet_mtu);
 			fprintf(stderr, "vmnet packet size: %u\n", (u32)m_vmnet_packet_size);
-
 		}
 		dispatch_semaphore_signal(sem);
 	});
@@ -142,7 +179,6 @@ netdev_vmnet::netdev_vmnet(const char *name, class device_network_interface *ifd
 	}
 
 	dispatch_release(sem);
-	xpc_release(dict);
 }
 
 netdev_vmnet::~netdev_vmnet() {
