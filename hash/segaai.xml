@@ -60,8 +60,8 @@ AI-8003  Pinpon Music Melody
 		</part>
 	</software>
 
-	<software name="alicewora" cloneof="alicewor" supported="no">
-		<description>Alice World (1986)</description>
+	<software name="alicewort" cloneof="alicewor" supported="no">
+		<description>Alice World (tape, older)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<notes>Cassette is not supported yet.</notes>
@@ -100,8 +100,8 @@ AI-8003  Pinpon Music Melody
 		</part>
 	</software>
 
-	<software name="robinsona" cloneof="robinson" supported="no">
-		<description>Robinson Land (1987)</description>
+	<software name="robinsont" cloneof="robinson" supported="no">
+		<description>Robinson Land (tape, older)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<notes>Cassette is not supported yet.</notes>
@@ -133,8 +133,8 @@ AI-8003  Pinpon Music Melody
 		</part>
 	</software>
 
-	<software name="cosmictra" cloneof="cosmictr" supported="no">
-		<description>Cosmic Train (1987)</description>
+	<software name="cosmictrt" cloneof="cosmictr" supported="no">
+		<description>Cosmic Train (tape, older)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<notes>Cassette is not supported yet.</notes>
@@ -173,8 +173,8 @@ AI-8003  Pinpon Music Melody
 		</part>
 	</software>
 
-	<software name="cinderela" cloneof="cinderel" supported="no">
-		<description>Cinderella Labyrinth (1986)</description>
+	<software name="cinderelt" cloneof="cinderel" supported="no">
+		<description>Cinderella Labyrinth (tape, older)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<notes>Cassette is not supported yet.</notes>
@@ -188,8 +188,8 @@ AI-8003  Pinpon Music Melody
 			</dataarea>
 		</part>
 		<part name="cass" interface="cass">
-			<dataarea name="cass" size="1">
-				<rom name="inderella labyrinth (1986)" size="1" status="nodump"/>
+			<dataarea name="cass" size="63843667">
+				<rom name="cinderella labyrinth (1986).flac" size="63843667" crc="f0f89f0e" sha1="800c0cc4924551ba99a4379a85508ac91cfb453b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -211,8 +211,8 @@ AI-8003  Pinpon Music Melody
 		</part>
 	</software>
 
-	<software name="gullivera" cloneof="gulliver" supported="no">
-		<description>Gulliver Pocket (1986)</description>
+	<software name="gullivert" cloneof="gulliver" supported="no">
+		<description>Gulliver Pocket (tape, older)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<notes>Cassette is not supported yet.</notes>
@@ -226,8 +226,8 @@ AI-8003  Pinpon Music Melody
 			</dataarea>
 		</part>
 		<part name="cass" interface="cass">
-			<dataarea name="cass" size="1">
-				<rom name="gulliver pocket (1986)" size="1" status="nodump"/>
+			<dataarea name="cass" size="62076328">
+				<rom name="gulliver pocket (1986).flac" size="62076328" crc="12fd6a59" sha1="c0523cad2656df42ce83465540d6637ca956f176"/>
 			</dataarea>
 		</part>
 	</software>
@@ -249,8 +249,8 @@ AI-8003  Pinpon Music Melody
 		</part>
 	</software>
 
-	<software name="mozartaca" cloneof="mozartac" supported="no">
-		<description>Mozart Academy (1986)</description>
+	<software name="mozartact" cloneof="mozartac" supported="no">
+		<description>Mozart Academy (tape, older)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<notes>Cassette is not supported yet.</notes>
@@ -264,8 +264,8 @@ AI-8003  Pinpon Music Melody
 			</dataarea>
 		</part>
 		<part name="cass" interface="cass">
-			<dataarea name="cass" size="1">
-				<rom name="mozart academy (1986)" size="1" status="nodump"/>
+			<dataarea name="cass" size="63942538">
+				<rom name="mozart academy (1986).flac" size="63942538" crc="165597f8" sha1="5f7e1036e56a361ae89532cdd9996d4c3f8d624c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -288,8 +288,8 @@ AI-8003  Pinpon Music Melody
 		</part>
 	</software>
 
-	<software name="arabianna" cloneof="arabiann" supported="no">
-		<description>Arabian Night (1987)</description>
+	<software name="arabiannt" cloneof="arabiann" supported="no">
+		<description>Arabian Night (tape, older)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<notes>Cassette is not supported yet.</notes>
@@ -303,8 +303,8 @@ AI-8003  Pinpon Music Melody
 			</dataarea>
 		</part>
 		<part name="cass" interface="cass">
-			<dataarea name="cass" size="1">
-				<rom name="arabian night (1987)" size="1" status="nodump"/>
+			<dataarea name="cass" size="130947422">
+				<rom name="arabian night (1987).flac" size="130947422" crc="f750ca29" sha1="f8e46123f3c7172bbf64ab032cac7b8419f9c5b1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -327,8 +327,8 @@ AI-8003  Pinpon Music Melody
 		</part>
 	</software>
 
-	<software name="andersena" cloneof="andersen" supported="no">
-		<description>Andersen Dream (1987)</description>
+	<software name="andersent" cloneof="andersen" supported="no">
+		<description>Andersen Dream (tape, older)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<notes>Cassette is not supported yet.</notes>
@@ -342,8 +342,8 @@ AI-8003  Pinpon Music Melody
 			</dataarea>
 		</part>
 		<part name="cass" interface="cass">
-			<dataarea name="cass" size="1">
-				<rom name="andersen dream (1987)" size="1" status="nodump"/>
+			<dataarea name="cass" size="112724313">
+				<rom name="andersen dream (1987).flac" size="112724313" crc="884806f2" sha1="439b4bd107f3d0d59bba32c43d1486e0763e4ac4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -366,8 +366,8 @@ AI-8003  Pinpon Music Melody
 		</part>
 	</software>
 
-	<software name="oceanfana" cloneof="oceanfan" supported="no">
-		<description>Ocean Fantasy (1987)</description>
+	<software name="oceanfant" cloneof="oceanfan" supported="no">
+		<description>Ocean Fantasy (tape, older)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<notes>Cassette is not supported yet.</notes>
@@ -381,8 +381,8 @@ AI-8003  Pinpon Music Melody
 			</dataarea>
 		</part>
 		<part name="cass" interface="cass">
-			<dataarea name="cass" size="1">
-				<rom name="ocean fantasy (1987)" size="1" status="nodump"/>
+			<dataarea name="cass" size="146922567">
+				<rom name="ocean fantasy (1987).flac" size="146922567" crc="0e67892c" sha1="8d9a1474c87a2e2f147e528b51f9903cf7f08c11"/>
 			</dataarea>
 		</part>
 	</software>
@@ -405,8 +405,8 @@ AI-8003  Pinpon Music Melody
 		</part>
 	</software>
 
-	<software name="columbusa" cloneof="columbus" supported="no">
-		<description>Columbus Map (1987)</description>
+	<software name="columbust" cloneof="columbus" supported="no">
+		<description>Columbus Map (tape, older)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<notes>Cassette is not supported yet.</notes>
@@ -420,8 +420,8 @@ AI-8003  Pinpon Music Melody
 			</dataarea>
 		</part>
 		<part name="cass" interface="cass">
-			<dataarea name="cass" size="1">
-				<rom name="columbus map (1987)" size="1" status="nodump"/>
+			<dataarea name="cass" size="64783507">
+				<rom name="columbus map (1987).flac" size="64783507" crc="4478e9cc" sha1="615f3bb0a3d4be28ce6f7faf5cb165386475c90d"/>
 			</dataarea>
 		</part>
 	</software>
