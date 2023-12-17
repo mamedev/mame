@@ -38,7 +38,7 @@ Unpopulated spaces marked for: DS5002FP, PIC16C54, 93C56 EEPROM, a couple more u
 #include "machine/mediagx_host.h"
 #include "machine/pci.h"
 #include "machine/zfmicro_usb.h"
-//#include "video/rivatnt.h"
+#include "video/rivatnt.h"
 
 #include "screen.h"
 
