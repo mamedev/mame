@@ -24,13 +24,13 @@ public:
 	auto write_transk_callback() { return m_write_transk_cb.bind(); }
 	auto write_break_callback() { return m_write_break_cb.bind(); }
 
-	void w_waitl(int state);
-	void w_onlil(int state);
-	void w_carl(int state);
-	void w_errorl(int state);
-	void w_enql(int state);
-	void w_ackl(int state);
-	void w_nakl(int state);
+	void waitl_w(int state);
+	void onlil_w(int state);
+	void carl_w(int state);
+	void errorl_w(int state);
+	void enql_w(int state);
+	void ackl_w(int state);
+	void nakl_w(int state);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -49,6 +49,8 @@ private:
 	required_ioport_array<15>       m_matrix;
 	required_device<clock_device>   m_scan_clock;
 	required_ioport					m_sw_all_cap;
+	required_ioport					m_key_repeat_delay;
+	required_ioport					m_key_repeat_rate;
 
 	output_finder<>                 m_online_led;
 	output_finder<>                 m_carrier_led;
@@ -73,9 +75,6 @@ private:
 	bool m_control;
 	uint8_t m_char_buffer;
 	uint8_t	m_key_nr_in_buffer;
-
-	int m_key_repeat_delay_ms;
-	int m_key_repeat_rate_hz;
 	emu_timer *m_key_repeat_trigger;
 
 	bool m_8_bit_output;

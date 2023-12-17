@@ -38,10 +38,10 @@ public:
 
 	// Input strobes
 	void process_keyboard_char(uint8_t key);
-	void w_cleark(int state);
-	void w_linek(int state);
-	void w_transk(int state);
-	void w_break(int state);
+	void cleark_w(int state);
+	void linek_w(int state);
+	void transk_w(int state);
+	void break_w(int state);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -56,11 +56,12 @@ private:
 
 	// Video, Cursor & Sound
 	void vblank(int state);
-	int get_attribute(int at_row, int at_col);
+	int get_attribute(int at_row, int at_col, int attribute = 0, int from_row = 0, int from_col = 0);
 	void char_to_display(uint8_t byte);
 	void data_to_display(uint8_t byte);
 	void advance_cursor();
 	void place_cursor(int row, int col);
+	void clear_key_handler();
 	int get_ram_addr(int row, int col);
 	void erase_row(int row);
 	TIMER_CALLBACK_MEMBER(expire_speed_check);
@@ -78,6 +79,8 @@ private:
 	void update_rs232_lamps();
 	void check_rs232_rx_error(int state);
 	void set_uart_state_from_switches();
+	void clock_on_line_flip_flop();
+	void clock_transmit_flip_flop();
 
 	required_device<screen_device>      m_screen;
 	required_device<palette_device>     m_palette;
@@ -124,6 +127,7 @@ private:
 	bool m_tx_handshake;
 
 	// Keyboard
+	bool m_clear_key_held;
 	bool m_line_key_held;
 	bool m_trans_key_held;
 	bool m_break_key_held;

@@ -121,6 +121,7 @@ tandberg_tdv2100_disp_logic_device::tandberg_tdv2100_disp_logic_device(const mac
 	m_speed_check(false),
 	m_rx_handshake(false),
 	m_tx_handshake(false),
+	m_clear_key_held(false),
 	m_line_key_held(false),
 	m_trans_key_held(false),
 	m_break_key_held(false)
@@ -148,6 +149,15 @@ void tandberg_tdv2100_disp_logic_device::device_start()
 	save_item(NAME(m_request_to_send));
 	save_item(NAME(m_rx_handshake));
 	save_item(NAME(m_tx_handshake));
+
+	save_item(NAME(m_frame_counter));
+	save_item(NAME(m_vblank_state));
+	save_item(NAME(m_clear_key_held));
+	save_item(NAME(m_line_key_held));
+	save_item(NAME(m_trans_key_held));
+	save_item(NAME(m_break_key_held));
+	save_item(NAME(m_data_pending_kbd));
+	save_item(NAME(m_data_kbd));
 }
 
 void tandberg_tdv2100_disp_logic_device::device_reset()
@@ -162,19 +172,17 @@ void tandberg_tdv2100_disp_logic_device::device_reset()
 	m_data_terminal_ready = false;
 	m_request_to_send = false;
 	m_data_pending_kbd = false;
+
 	m_uart->write_xr(1);
 	m_uart->write_xr(0);
-	w_cleark(1);
-	w_cleark(0);
+	clear_key_handler();
 
-	bool force_on_line = m_dsw_u39->read()&0x020;
+	bool force_on_line = BIT(m_dsw_u39->read(), 5);
 	set_uart_state_from_switches();
 	if(force_on_line)
 	{
-		w_linek(1);
-		w_linek(0);
-		w_transk(1);
-		w_transk(0);
+		clock_on_line_flip_flop();
+		clock_transmit_flip_flop();
 	}
 	update_rs232_lamps();
 }
@@ -207,8 +215,9 @@ void tandberg_tdv2100_disp_logic_device::char_to_display(uint8_t byte)
 		if((byte&0x7f) < 0x20 || (byte&0x7f) == 0x7f)
 		{
 			// Control characters
-			bool auto_roll_up = !(m_dsw_u39->read()&0x100);
-			bool clear_ascii_hs_by_cleark = ((m_dsw_u39->read()&0x003) == 0x001);
+			int u39 = m_dsw_u39->read();
+			bool auto_roll_up = !BIT(u39, 8);
+			bool clear_ascii_hs_by_cleark = ((u39&0x003) == 0x001);
 			switch(byte&0x7f)
 			{
 				// STX, Turn off video
@@ -380,7 +389,7 @@ void tandberg_tdv2100_disp_logic_device::data_to_display(uint8_t byte)
 
 void tandberg_tdv2100_disp_logic_device::advance_cursor()
 {
-	bool auto_cr_lf = m_dsw_u61->read()&0x004;
+	bool auto_cr_lf = BIT(m_dsw_u61->read(), 2);
 	if((m_cursor_col&0x4f) != 79 || auto_cr_lf)
 	{
 		place_cursor(m_cursor_row, m_cursor_col+1);
@@ -407,6 +416,18 @@ void tandberg_tdv2100_disp_logic_device::place_cursor(int row, int col)
 		// End of line action
 		char_to_display(0x0d);
 		char_to_display(0x0a);
+	}
+}
+
+void tandberg_tdv2100_disp_logic_device::clear_key_handler()
+{
+	bool clear_ascii_hs_by_cleark = ((m_dsw_u39->read()&0x003) == 0x001);
+	m_write_errorl_cb(0);
+	if(clear_ascii_hs_by_cleark)
+	{
+		m_write_enql_cb(0);
+		m_write_ackl_cb(0);
+		m_write_nakl_cb(0);
 	}
 }
 
@@ -445,14 +466,13 @@ void tandberg_tdv2100_disp_logic_device::vblank(int state)
 	m_vblank_state = state;
 }
 
-int tandberg_tdv2100_disp_logic_device::get_attribute(int at_row, int at_col)
+int tandberg_tdv2100_disp_logic_device::get_attribute(int at_row, int at_col, int attribute, int from_row, int from_col)
 {
-	int attribute = 0;
-	for(int char_row = 0; char_row <= at_row; char_row++)
+	for(int char_row = from_row; char_row <= at_row; char_row++)
 	{
-		for(int char_col = 0; char_col < 80; char_col++)
+		for(int char_col = (char_row == from_row)? from_col : 0; char_col < 80; char_col++)
 		{
-			int const vram_data = m_vram[char_col + char_row*80];
+			int const vram_data = m_vram[get_ram_addr(char_row, char_col)];
 			if(vram_data&0x80)
 			{
 				attribute = (vram_data&0x70)>>4;
@@ -470,27 +490,33 @@ uint32_t tandberg_tdv2100_disp_logic_device::screen_update(screen_device &screen
 {
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
-	bool extend_dot7 = ((m_dsw_u61->read()&0x003) == 1);
-	bool blinking_cursor = ((m_dsw_u61->read()&0x030) == 0x010);
-	bool blank_attr_chars = !(m_dsw_u61->read()&0x040);
-	bool blank_ctrl_chars = !(m_dsw_u61->read()&0x100);
-	bool block_cursor = m_dsw_u61->read()&0x200;
+	int u61 = m_dsw_u61->read();
+	bool extend_dot7 = ((u61&0x003) == 0x001);
+	bool underline_mode = BIT(u61, 3);
+	bool blinking_cursor = ((u61&0x030) == 0x010);
+	bool blank_attr_chars = !BIT(u61, 6);
+	bool blank_ctrl_chars = !BIT(u61, 8);
+	bool block_cursor = BIT(u61, 9);
 	bool full_inverse_video = !m_sw_invert_video->read();
 
 	int const char_min_col = cliprect.min_x/9;
 	int const char_max_col = cliprect.max_x/9;
 	int const char_min_row = cliprect.min_y/14;
 	int const char_max_row = cliprect.max_y/14;
-	bool const blink_strobe = m_frame_counter&0x08;
+	int attribute = get_attribute(char_min_row, char_min_col);
+	bool const blink_strobe = BIT(m_frame_counter, 3);
 	bool const cursor_blink_strobe = blink_strobe && !m_speed_check;
 
 	for(int char_row_nr = char_min_row; char_row_nr <= char_max_row; char_row_nr++)
 	{
 		// This is at the start of a char row
 		int const chr_y_pos = char_row_nr*14;
-		int attribute = get_attribute(char_row_nr, char_min_col);
+		if(char_row_nr != char_min_row)
+		{
+			attribute = get_attribute(char_row_nr, char_min_col, attribute, char_row_nr-1, char_max_col+1);
+		}
 
-		for (int char_col_nr = char_min_col; char_col_nr <= char_max_col; char_col_nr++)
+		for(int char_col_nr = char_min_col; char_col_nr <= char_max_col; char_col_nr++)
 		{
 			// This is at the start of a single character
 			int const chr_x_pos = char_col_nr*9;
@@ -520,7 +546,6 @@ uint32_t tandberg_tdv2100_disp_logic_device::screen_update(screen_device &screen
 					}
 
 					// Pattern modifiers
-					bool underline_mode = m_dsw_u61->read()&0x008;
 					if(underline_mode)
 					{
 						// Note: The underline in underline-mode is not affected by blanking!
@@ -583,9 +608,9 @@ uint32_t tandberg_tdv2100_disp_logic_device::screen_update(screen_device &screen
 				}
 				for(int dot = 0; dot < 8; dot++)
 				{
-					bitmap.pix(chr_y_pos + line, chr_x_pos + dot) = palette[((data>>(7-dot))&0x01)<<extra_intensity];
+					bitmap.pix(chr_y_pos + line, chr_x_pos + dot) = palette[BIT(data, 7 - dot)<<extra_intensity];
 				}
-				bitmap.pix(chr_y_pos + line, chr_x_pos + 8) = palette[(dot_nr8&0x01)<<extra_intensity];
+				bitmap.pix(chr_y_pos + line, chr_x_pos + 8) = palette[BIT(dot_nr8, 0)<<extra_intensity];
 			}
 		}
 	}
@@ -610,7 +635,7 @@ void tandberg_tdv2100_disp_logic_device::rs232_rxd_w(int state)
 	{
 		state = 1;
 	}
-	bool ext_echo = m_sw_rs232_settings->read()&0x08;
+	bool ext_echo = BIT(m_sw_rs232_settings->read(), 3);
 	if(!(ext_echo && m_data_terminal_ready))
 	{
 		state = (state && m_uart->so_r());
@@ -631,7 +656,7 @@ void tandberg_tdv2100_disp_logic_device::rs232_dcd_w(int state)
 
 void tandberg_tdv2100_disp_logic_device::rs232_dsr_w(int state)
 {
-	bool auto_rx_handshake = m_sw_rs232_settings->read()&0x10;
+	bool auto_rx_handshake = BIT(m_sw_rs232_settings->read(), 4);
 	bool dcd_handshake = ((m_dsw_u39->read()&0x00c) == 0x008);
 	if(!dcd_handshake && !auto_rx_handshake)
 	{
@@ -642,7 +667,7 @@ void tandberg_tdv2100_disp_logic_device::rs232_dsr_w(int state)
 
 void tandberg_tdv2100_disp_logic_device::rs232_cts_w(int state)
 {
-	bool auto_tx_handshake = m_sw_rs232_settings->read()&0x20;
+	bool auto_tx_handshake = BIT(m_sw_rs232_settings->read(), 5);
 	if(!auto_tx_handshake)
 	{
 		m_tx_handshake = state;
@@ -652,7 +677,7 @@ void tandberg_tdv2100_disp_logic_device::rs232_cts_w(int state)
 
 void tandberg_tdv2100_disp_logic_device::rs232_txd_w(int state)
 {
-	bool ext_echo = m_sw_rs232_settings->read()&0x08;
+	bool ext_echo = BIT(m_sw_rs232_settings->read(), 3);
 	if(!(ext_echo && m_data_terminal_ready))
 	{
 		m_uart->write_si(state);
@@ -682,7 +707,7 @@ void tandberg_tdv2100_disp_logic_device::uart_rx(int state)
 {
 	if(state)
 	{
-		bool tty_mode = m_dsw_u39->read()&0x010;
+		bool tty_mode = BIT(m_dsw_u39->read(), 4);
 		if(tty_mode)
 		{
 			char_to_display(m_uart->receive());
@@ -699,7 +724,7 @@ void tandberg_tdv2100_disp_logic_device::uart_tx(int state)
 {
 	if(state)
 	{
-		bool tty_mode = m_dsw_u39->read()&0x010;
+		bool tty_mode = BIT(m_dsw_u39->read(), 4);
 		if(tty_mode)
 		{
 			if(m_data_pending_kbd)
@@ -736,6 +761,88 @@ void tandberg_tdv2100_disp_logic_device::set_uart_state_from_switches()
 	m_uart->write_tsb(BIT(rs232_settings, 2));
 }
 
+void tandberg_tdv2100_disp_logic_device::clock_on_line_flip_flop()
+{
+	bool force_on_line = BIT(m_dsw_u39->read(), 5);
+	if(force_on_line)
+	{
+		m_data_terminal_ready = true;
+	}
+	else
+	{
+		// Try to toggle RS232 DTR
+		if(m_rx_handshake)
+		{
+			m_data_terminal_ready = false;
+		}
+		else
+		{
+			m_data_terminal_ready = !m_data_terminal_ready;
+		}
+	}
+
+	int rs232_settings = m_sw_rs232_settings->read();
+	if(!m_data_terminal_ready)
+	{
+		bool auto_tx_handshake = BIT(rs232_settings, 5);
+		m_request_to_send = false;
+		m_rs232->write_rts((m_request_to_send) ? 1 : 0);
+		if(auto_tx_handshake)
+		{
+			m_tx_handshake = m_request_to_send;
+		}
+	}
+	m_rs232->write_dtr((m_data_terminal_ready) ? 1 : 0);
+
+	bool auto_rx_handshake = BIT(rs232_settings, 4);
+	if(auto_rx_handshake)
+	{
+		m_rx_handshake = m_data_terminal_ready;
+	}
+	bool hold_line_key_for_rts = ((m_dsw_u73->read()&0x3) == 0x1);
+	if(m_data_terminal_ready && hold_line_key_for_rts)
+	{
+		if(!m_trans_key_held)
+		{
+			clock_transmit_flip_flop();
+		}
+	}
+	update_rs232_lamps();
+}
+
+void tandberg_tdv2100_disp_logic_device::clock_transmit_flip_flop()
+{
+	bool force_on_line = BIT(m_dsw_u39->read(), 5);
+	if(force_on_line)
+	{
+		m_request_to_send = true;
+	}
+	else if(!m_data_terminal_ready)
+	{
+		m_request_to_send = false;
+	}
+	else
+	{
+		// Try to toggle RS232 RTS
+		if(m_tx_handshake)
+		{
+			m_request_to_send = false;
+		}
+		else
+		{
+			m_request_to_send = !m_request_to_send;
+		}
+	}
+	m_rs232->write_rts((m_request_to_send) ? 1 : 0);
+
+	bool auto_tx_handshake = BIT(m_sw_rs232_settings->read(), 5);
+	if(auto_tx_handshake)
+	{
+		m_tx_handshake = m_request_to_send;
+	}
+	update_rs232_lamps();
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 //
 // Strobes for Keyboard
@@ -743,17 +850,14 @@ void tandberg_tdv2100_disp_logic_device::set_uart_state_from_switches()
 
 void tandberg_tdv2100_disp_logic_device::process_keyboard_char(uint8_t key)
 {
+	m_data_kbd = key&0x7f;
 	if(key&0x80)
 	{
-		m_data_kbd = key&0x7f;
 		m_data_pending_kbd = true;
-		bool tty_mode = m_dsw_u39->read()&0x010;
-		if(tty_mode)
+		bool tty_mode = BIT(m_dsw_u39->read(), 4);
+		if(tty_mode && m_uart->tbmt_r())
 		{
-			if(m_uart->tbmt_r())
-			{
-				uart_tx(1);
-			}
+			uart_tx(1);
 		}
 		else
 		{
@@ -762,110 +866,34 @@ void tandberg_tdv2100_disp_logic_device::process_keyboard_char(uint8_t key)
 	}
 }
 
-void tandberg_tdv2100_disp_logic_device::w_break(int state)
+void tandberg_tdv2100_disp_logic_device::break_w(int state)
 {
 	m_break_key_held = state;
 }
 
-void tandberg_tdv2100_disp_logic_device::w_cleark(int state)
+void tandberg_tdv2100_disp_logic_device::cleark_w(int state)
 {
-	if(state)
+	if(state && !m_clear_key_held)
 	{
-		bool clear_ascii_hs_by_cleark = ((m_dsw_u39->read()&0x003) == 0x001);
-		m_write_errorl_cb(0);
-		if(clear_ascii_hs_by_cleark)
-		{
-			m_write_enql_cb(0);
-			m_write_ackl_cb(0);
-			m_write_nakl_cb(0);
-		}
+		clear_key_handler();
 	}
+	m_clear_key_held = state;
 }
 
-void tandberg_tdv2100_disp_logic_device::w_linek(int state)
+void tandberg_tdv2100_disp_logic_device::linek_w(int state)
 {
 	if(state && !m_line_key_held)
 	{
-		bool force_on_line = m_dsw_u39->read()&0x020;
-		if(force_on_line)
-		{
-			m_data_terminal_ready = true;
-		}
-		else
-		{
-			// Try to toggle RS232 DTR
-			if(m_rx_handshake)
-			{
-				m_data_terminal_ready = false;
-			}
-			else
-			{
-				m_data_terminal_ready = !m_data_terminal_ready;
-			}
-		}
-
-		if(!m_data_terminal_ready)
-		{
-			bool auto_tx_handshake = m_sw_rs232_settings->read()&0x20;
-			m_request_to_send = false;
-			m_rs232->write_rts((m_request_to_send) ? 1 : 0);
-			if(auto_tx_handshake)
-			{
-				m_tx_handshake = m_request_to_send;
-			}
-		}
-		m_rs232->write_dtr((m_data_terminal_ready) ? 1 : 0);
-
-		bool auto_rx_handshake = m_sw_rs232_settings->read()&0x10;
-		if(auto_rx_handshake)
-		{
-			m_rx_handshake = m_data_terminal_ready;
-		}
-		bool hold_line_key_for_rts = ((m_dsw_u73->read()&0x3) == 0x1);
-		if(m_data_terminal_ready && hold_line_key_for_rts)
-		{
-			bool old_state = m_trans_key_held;
-			w_transk(1);
-			w_transk((old_state) ? 1 : 0);
-		}
-		update_rs232_lamps();
+		clock_on_line_flip_flop();
 	}
 	m_line_key_held = state;
 }
 
-void tandberg_tdv2100_disp_logic_device::w_transk(int state)
+void tandberg_tdv2100_disp_logic_device::transk_w(int state)
 {
 	if(state && !m_trans_key_held)
 	{
-		bool force_on_line = m_dsw_u39->read()&0x020;
-		if(force_on_line)
-		{
-			m_request_to_send = true;
-		}
-		else if(!m_data_terminal_ready)
-		{
-			m_request_to_send = false;
-		}
-		else
-		{
-			// Try to toggle RS232 RTS
-			if(m_tx_handshake)
-			{
-				m_request_to_send = false;
-			}
-			else
-			{
-				m_request_to_send = !m_request_to_send;
-			}
-		}
-		m_rs232->write_rts((m_request_to_send) ? 1 : 0);
-
-		bool auto_tx_handshake = m_sw_rs232_settings->read()&0x20;
-		if(auto_tx_handshake)
-		{
-			m_tx_handshake = m_request_to_send;
-		}
-		update_rs232_lamps();
+		clock_transmit_flip_flop();
 	}
 	m_trans_key_held = state;
 }
@@ -931,7 +959,7 @@ static INPUT_PORTS_START( tdv2115l )
 		PORT_CONFNAME(0x01, 0x01, "NO PARITY  (No: Enable parity)")                 PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, uart_changed, 0)
 			PORT_CONFSETTING(0x00, DEF_STR( No ))
 			PORT_CONFSETTING(0x01, DEF_STR( Yes ))
-		PORT_CONFNAME(0x02, 0x02, "EVEN PARITY (No: Odd parity, when enabled)")     PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, uart_changed, 0)
+		PORT_CONFNAME(0x02, 0x02, "EVEN PARITY (When enabled. No: Odd parity)")     PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, uart_changed, 0)
 			PORT_CONFSETTING(0x00, DEF_STR( No ))
 			PORT_CONFSETTING(0x02, DEF_STR( Yes ))
 		PORT_CONFNAME(0x04, 0x04, "TWO STOP BITS (No: One stop bit)")               PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, uart_changed, 0)

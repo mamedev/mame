@@ -86,7 +86,6 @@
 
 
 	TODO:
-		* Add key-repeat delay/rate potentiometers
 		* Add click sound and volume potentiometer
 		* Add CRT brightness-adjust potentiometer
 		* Expose 8-bit output mode and add jumpers for layout options
@@ -108,6 +107,8 @@ tandberg_tdv2100_keyboard_device::tandberg_tdv2100_keyboard_device(const machine
 	m_matrix(*this, "X%u", 0),
 	m_scan_clock(*this, "scan_clock"),
 	m_sw_all_cap(*this, "sw_all_cap"),
+	m_key_repeat_delay(*this, "key_repeat_delay"),
+	m_key_repeat_rate(*this, "key_repeat_rate"),
 	m_online_led(*this, "led_online"),
 	m_carrier_led(*this, "led_carrier"),
 	m_error_led(*this, "led_error"),
@@ -127,8 +128,6 @@ tandberg_tdv2100_keyboard_device::tandberg_tdv2100_keyboard_device(const machine
 	m_control(false),
 	m_char_buffer(0x00),
 	m_key_nr_in_buffer(0xff),
-	m_key_repeat_delay_ms(800),     // Set by potentiometer, 500ms -> 1250ms
-	m_key_repeat_rate_hz(20),       // Set by potentiometer, 10Hz -> 30Hz
 	m_8_bit_output(false)           // Hardwiered by PCB-trace jumpers 37-39 and 40-42, set at factory
 	                                //   true:
 	                                //     Use parameter PROM bit 2 to get which keys are inhibited
@@ -137,7 +136,7 @@ tandberg_tdv2100_keyboard_device::tandberg_tdv2100_keyboard_device(const machine
 	                                //     Ignore parameter PROM bit 2
 	                                //     Use msb of char-map PROM to get which keys are inhibited
 {
-	std::fill(m_keystate, m_keystate+15, 0);
+	std::fill(std::begin(m_keystate), std::end(m_keystate), 0);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -158,6 +157,13 @@ void tandberg_tdv2100_keyboard_device::device_start()
 	m_shiftlock_led.resolve();
 
 	save_item(NAME(m_shift_lock));
+
+	save_item(NAME(m_column_counter));
+	save_item(NAME(m_keystate));
+	save_item(NAME(m_shift));
+	save_item(NAME(m_control));
+	save_item(NAME(m_char_buffer));
+	save_item(NAME(m_key_nr_in_buffer));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -239,7 +245,7 @@ void tandberg_tdv2100_keyboard_device::scan_next_column(int state)
 								case 0:
 								case 1:
 									m_keystate[m_column_counter] &= ~(1<<row_counter);  // Turn off released shift key
-									m_shift = m_keystate[m_column_counter]&0x03;	        // Keep shift state if the other shift key is still down
+									m_shift = m_keystate[m_column_counter]&0x03;	    // Keep shift state if the other shift key is still down
 									break;
 
 								case 3:
@@ -315,7 +321,8 @@ void tandberg_tdv2100_keyboard_device::new_keystroke(uint8_t key_nr, bool shift,
 		key_trigger();
 		if(param&0x02)
 		{
-			m_key_repeat_trigger->adjust(attotime::from_msec(m_key_repeat_delay_ms));
+			int key_repeat_delay_ms = 500 + m_key_repeat_delay->read()*750/100;    // 500ms -> 1250ms
+			m_key_repeat_trigger->adjust(attotime::from_msec(key_repeat_delay_ms));
 		}
 	}
 }
@@ -323,7 +330,8 @@ void tandberg_tdv2100_keyboard_device::new_keystroke(uint8_t key_nr, bool shift,
 TIMER_CALLBACK_MEMBER(tandberg_tdv2100_keyboard_device::key_repeat)
 {
 	key_trigger();
-	m_key_repeat_trigger->adjust(attotime::from_hz(m_key_repeat_rate_hz));
+	int key_repeat_rate_hz = 10 + m_key_repeat_rate->read()/5;    // 10Hz -> 30Hz
+	m_key_repeat_trigger->adjust(attotime::from_hz(key_repeat_rate_hz));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -337,37 +345,37 @@ void tandberg_tdv2100_keyboard_device::key_trigger()
 	m_write_kstr_cb(m_char_buffer);
 }
 
-void tandberg_tdv2100_keyboard_device::w_waitl(int state)
+void tandberg_tdv2100_keyboard_device::waitl_w(int state)
 {
 	m_wait_led = !state;
 }
 
-void tandberg_tdv2100_keyboard_device::w_onlil(int state)
+void tandberg_tdv2100_keyboard_device::onlil_w(int state)
 {
 	m_online_led = !state;
 }
 
-void tandberg_tdv2100_keyboard_device::w_carl(int state)
+void tandberg_tdv2100_keyboard_device::carl_w(int state)
 {
 	m_carrier_led = !state;
 }
 
-void tandberg_tdv2100_keyboard_device::w_errorl(int state)
+void tandberg_tdv2100_keyboard_device::errorl_w(int state)
 {
 	m_error_led = !state;
 }
 
-void tandberg_tdv2100_keyboard_device::w_enql(int state)
+void tandberg_tdv2100_keyboard_device::enql_w(int state)
 {
 	m_enquiry_led = !state;
 }
 
-void tandberg_tdv2100_keyboard_device::w_ackl(int state)
+void tandberg_tdv2100_keyboard_device::ackl_w(int state)
 {
 	m_ack_led = !state;
 }
 
-void tandberg_tdv2100_keyboard_device::w_nakl(int state)
+void tandberg_tdv2100_keyboard_device::nakl_w(int state)
 {
 	m_nak_led = !state;
 }
@@ -386,6 +394,12 @@ void tandberg_tdv2100_keyboard_device::device_add_mconfig(machine_config &mconfi
 }
 
 static INPUT_PORTS_START( tdv2115l )
+
+	PORT_START("key_repeat_delay")
+		PORT_ADJUSTER(40, "Key-repeat delay (500ms - 1250ms)")
+
+	PORT_START("key_repeat_rate")
+		PORT_ADJUSTER(50, "Key-repeat rate (10Hz - 30Hz)")
 
 	PORT_START("sw_all_cap")
 		PORT_CONFNAME(0x1, 0x1, "ALL CAP")
@@ -425,7 +439,7 @@ static INPUT_PORTS_START( tdv2115l )
 	PORT_START("X3")
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("ER LINE")            PORT_CODE(KEYCODE_F11)          PORT_CHAR(UCHAR_MAMEKEY(F11))
 		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_TILDE)        PORT_CHAR('^') PORT_CHAR(0x00ac)
-		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("\xC3\x85")           PORT_CODE(KEYCODE_OPENBRACE)    PORT_CHAR(0x00e5) PORT_CHAR(0x00c5)     // Å
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME(u8"Å")                PORT_CODE(KEYCODE_OPENBRACE)    PORT_CHAR(0x00e5) PORT_CHAR(0x00c5)
 		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("A")                  PORT_CODE(KEYCODE_A)            PORT_CHAR('a') PORT_CHAR('A')
 		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("(Space)")            PORT_CODE(KEYCODE_SPACE)        PORT_CHAR(' ')
 		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -436,7 +450,7 @@ static INPUT_PORTS_START( tdv2115l )
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("(Blank 3)")
 		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_SLASH)        PORT_CHAR('-') PORT_CHAR('=')
 		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("P")                  PORT_CODE(KEYCODE_P)            PORT_CHAR('p') PORT_CHAR('P')
-		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("\xC3\x86")           PORT_CODE(KEYCODE_QUOTE)        PORT_CHAR(0x00e6) PORT_CHAR(0x00c6)     // Æ
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME(u8"Æ")                PORT_CODE(KEYCODE_QUOTE)        PORT_CHAR(0x00e6) PORT_CHAR(0x00c6)
 		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
 		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("0 (NumPad)")         PORT_CODE(KEYCODE_0_PAD)        PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
 		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_F10)          PORT_CHAR(UCHAR_MAMEKEY(F10))
@@ -446,7 +460,7 @@ static INPUT_PORTS_START( tdv2115l )
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("(Blank 2)")
 		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_0)            PORT_CHAR('0') PORT_CHAR('_')
 		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("O")                  PORT_CODE(KEYCODE_O)            PORT_CHAR('o') PORT_CHAR('O')
-		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("\xC3\x98")           PORT_CODE(KEYCODE_COLON)        PORT_CHAR(0x00f8) PORT_CHAR(0x00d8)     // Ø
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME(u8"Ø")                PORT_CODE(KEYCODE_COLON)        PORT_CHAR(0x00f8) PORT_CHAR(0x00d8)
 		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_MINUS)        PORT_CHAR('/') PORT_CHAR('?')
 		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_F3)           PORT_CHAR(UCHAR_MAMEKEY(F3))
 		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_LEFT)         PORT_CHAR(UCHAR_MAMEKEY(LEFT))
