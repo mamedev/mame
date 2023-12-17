@@ -7,7 +7,7 @@
 #include "../../../Windows/ErrorMsg.h"
 #include "../../../Windows/FileName.h"
 
-#ifndef _7ZIP_ST
+#ifndef Z7_ST
 #include "../../../Windows/Synchronization.h"
 #endif
 
@@ -19,7 +19,7 @@
 
 using namespace NWindows;
 
-#ifndef _7ZIP_ST
+#ifndef Z7_ST
 static NSynchronization::CCriticalSection g_CriticalSection;
 #define MT_LOCK NSynchronization::CCriticalSectionLock lock(g_CriticalSection);
 #else
@@ -136,7 +136,7 @@ HRESULT CUpdateCallbackConsole::OpenResult(
   {
     if (_so)
     {
-      RINOK(Print_OpenArchive_Props(*_so, codecs, arcLink));
+      RINOK(Print_OpenArchive_Props(*_so, codecs, arcLink))
       *_so << endl;
     }
   }
@@ -150,7 +150,7 @@ HRESULT CUpdateCallbackConsole::OpenResult(
       _se->NormalizePrint_wstr(name);
       *_se << endl;
       HRESULT res = Print_OpenArchive_Error(*_se, codecs, arcLink);
-      RINOK(res);
+      RINOK(res)
       _se->Flush();
     }
   }
@@ -333,6 +333,12 @@ HRESULT CUpdateCallbackConsole::FinishArchive(const CFinishArchiveStat &st)
     s += "Archive size: ";
     PrintSize_bytes_Smart(s, st.OutArcFileSize);
     s.Add_LF();
+    if (st.IsMultiVolMode)
+    {
+      s += "Volumes: ";
+      s.Add_UInt32(st.NumVolumes);
+      s.Add_LF();
+    }
     *_so << endl;
     *_so << s;
     // *_so << endl;
@@ -681,12 +687,12 @@ HRESULT CUpdateCallbackConsole::ReportUpdateOperation(UInt32 op, const wchar_t *
 
 /*
 HRESULT CUpdateCallbackConsole::SetPassword(const UString &
-    #ifndef _NO_CRYPTO
+    #ifndef Z7_NO_CRYPTO
     password
     #endif
     )
 {
-  #ifndef _NO_CRYPTO
+  #ifndef Z7_NO_CRYPTO
   PasswordIsDefined = true;
   Password = password;
   #endif
@@ -700,7 +706,7 @@ HRESULT CUpdateCallbackConsole::CryptoGetTextPassword2(Int32 *passwordIsDefined,
 
   *password = NULL;
 
-  #ifdef _NO_CRYPTO
+  #ifdef Z7_NO_CRYPTO
 
   *passwordIsDefined = false;
   return S_OK;
@@ -711,7 +717,7 @@ HRESULT CUpdateCallbackConsole::CryptoGetTextPassword2(Int32 *passwordIsDefined,
   {
     if (AskPassword)
     {
-      RINOK(GetPassword_HRESULT(_so, Password));
+      RINOK(GetPassword_HRESULT(_so, Password))
       PasswordIsDefined = true;
     }
   }
@@ -729,7 +735,7 @@ HRESULT CUpdateCallbackConsole::CryptoGetTextPassword(BSTR *password)
   
   *password = NULL;
 
-  #ifdef _NO_CRYPTO
+  #ifdef Z7_NO_CRYPTO
 
   return E_NOTIMPL;
   

@@ -27,7 +27,7 @@ actually a CPU. Is this a bootleg of an Home Data original?
 
 Notes from Stefan Lindberg:
 
-Eprom "x70_a04.5g" had wires attached to it, pin 2 and 16 was joined and pin 1,32,31,30 was joined, 
+Eprom "x70_a04.5g" had wires attached to it, pin 2 and 16 was joined and pin 1,32,31,30 was joined,
 i removed them and read the eprom as the type it was (D27c1000D).
 
 Measured frequencies:
@@ -89,7 +89,7 @@ public:
 		, m_subcpu(*this, "subcpu")
 		, m_x70coincpu(*this, "audiocpu")
 		, m_ymsnd(*this, "ymsnd")
-//		, m_vreg(*this, "vreg")
+//      , m_vreg(*this, "vreg")
 		, m_screen(*this, "screen")
 		, m_videoram(*this, "videoram")
 		, m_spriteram(*this, "spriteram")
@@ -107,13 +107,13 @@ public:
 	void mirderby(machine_config &config);
 
 private:
-//	optional_region_ptr<uint8_t> m_blit_rom;
+//  optional_region_ptr<uint8_t> m_blit_rom;
 
 	required_device<mc6809e_device> m_maincpu;
 	required_device<mc6809e_device> m_subcpu;
 	required_device<cpu_device> m_x70coincpu;
 	optional_device<ym2203_device> m_ymsnd;
-//	optional_shared_ptr<uint8_t> m_vreg;
+//  optional_shared_ptr<uint8_t> m_vreg;
 	required_device<screen_device> m_screen;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_spriteram;
@@ -150,9 +150,9 @@ private:
 	void x70coin_io(address_map &map);
 
 	tilemap_t *m_bg_tilemap{};
-//	int m_visible_page = 0;
-//	int m_priority = 0;
-//	[[maybe_unused]] int m_flipscreen = 0;
+//  int m_visible_page = 0;
+//  int m_priority = 0;
+//  [[maybe_unused]] int m_flipscreen = 0;
 	u8 m_prot_data = 0;
 	u8 m_latch = 0;
 	u16 m_gfx_flip = 0;
@@ -191,7 +191,7 @@ void mirderby_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mirderby_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
-//	m_bg_tilemap->set_transparent_pen(0);
+//  m_bg_tilemap->set_transparent_pen(0);
 }
 
 TILE_GET_INFO_MEMBER(mirderby_state::get_bg_tile_info)
@@ -233,7 +233,7 @@ void mirderby_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		// TODO: missing sprites (signed wraparound?)
 
 		//if (attr == 0)
-		//	continue;
+		//  continue;
 
 		// draws in block strips of 16x16
 		const u8 tile_offs[4] = { 0, 1, 0x10, 0x11 };
@@ -319,7 +319,7 @@ void mirderby_state::shared_map(address_map &map)
 	map(0x7000, 0x77ff).ram().share("nvram");
 	map(0x7800, 0x7800).rw(FUNC(mirderby_state::prot_r), FUNC(mirderby_state::prot_w));
 	//0x7ff0 onward seems CRTC
-//	map(0x7ff0, 0x7ff?).writeonly().share("vreg");
+//  map(0x7ff0, 0x7ff?).writeonly().share("vreg");
 	map(0x7ff2, 0x7ff2).portr("SYSTEM");
 	map(0x7ff9, 0x7ffa).lr8(
 		NAME([this] (offs_t offset) {
@@ -372,7 +372,7 @@ void mirderby_state::shared_map(address_map &map)
 	);
 	map(0x7fff, 0x7fff).lrw8(
 		NAME([this] () {
-			//	0x7fff $e / $f writes -> DSW reads
+			//  0x7fff $e / $f writes -> DSW reads
 			return m_ymsnd->read(1);
 		}),
 		NAME([this] (u8 data) {
@@ -635,11 +635,11 @@ void mirderby_state::mirderby(machine_config &config)
 	/* basic machine hardware */
 	MC6809E(config, m_maincpu, 16000000/8);  /* MBL68B09E 2 Mhz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &mirderby_state::main_map);
-//	m_maincpu->set_vblank_int("screen", FUNC(mirderby_state::homedata_irq));
+//  m_maincpu->set_vblank_int("screen", FUNC(mirderby_state::homedata_irq));
 
 	MC6809E(config, m_subcpu, 16000000/8); /* MBL68B09E 2 Mhz */
 	m_subcpu->set_addrmap(AS_PROGRAM, &mirderby_state::sub_map);
-//	m_subcpu->set_vblank_int("screen", FUNC(mirderby_state::homedata_irq));
+//  m_subcpu->set_vblank_int("screen", FUNC(mirderby_state::homedata_irq));
 
 	// im 0, doesn't bother in setting a vector table,
 	// should just require a NMI from somewhere ...
@@ -657,11 +657,11 @@ void mirderby_state::mirderby(machine_config &config)
 	PIT8253(config, m_coin_pit, 0);
 	m_coin_pit->set_clk<0>(XTAL(16'000'000) / 8);
 	m_coin_pit->out_handler<0>().set_inputline(m_x70coincpu, INPUT_LINE_NMI);
-//	m_coin_pit->set_clk<1>(XTAL(16'000'000) / 8);
-//	m_coin_pit->set_clk<2>(XTAL(16'000'000) / 8);
+//  m_coin_pit->set_clk<1>(XTAL(16'000'000) / 8);
+//  m_coin_pit->set_clk<2>(XTAL(16'000'000) / 8);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
-//	config.set_maximum_quantum(attotime::from_hz(6000));
+//  config.set_maximum_quantum(attotime::from_hz(6000));
 	config.set_perfect_quantum("maincpu");
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

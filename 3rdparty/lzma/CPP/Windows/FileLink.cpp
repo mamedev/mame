@@ -8,7 +8,7 @@
 #include <unistd.h>
 #endif
 
-#ifdef SUPPORT_DEVICE_FILE
+#ifdef Z7_DEVICE_FILE
 #include "../../C/Alloc.h"
 #endif
 
@@ -19,6 +19,15 @@
 #include "FileFind.h"
 #include "FileIO.h"
 #include "FileName.h"
+
+#ifdef Z7_OLD_WIN_SDK
+#ifndef ERROR_INVALID_REPARSE_DATA
+#define ERROR_INVALID_REPARSE_DATA       4392L
+#endif
+#ifndef ERROR_REPARSE_TAG_INVALID
+#define ERROR_REPARSE_TAG_INVALID        4393L
+#endif
+#endif
 
 #ifndef _UNICODE
 extern bool g_IsNT;
@@ -72,13 +81,13 @@ static const UInt32 kReparseFlags_Alias       = (1 << 29);
 static const UInt32 kReparseFlags_HighLatency = (1 << 30);
 static const UInt32 kReparseFlags_Microsoft   = ((UInt32)1 << 31);
 
-#define _my_IO_REPARSE_TAG_HSM          (0xC0000004L)
-#define _my_IO_REPARSE_TAG_HSM2         (0x80000006L)
-#define _my_IO_REPARSE_TAG_SIS          (0x80000007L)
-#define _my_IO_REPARSE_TAG_WIM          (0x80000008L)
-#define _my_IO_REPARSE_TAG_CSV          (0x80000009L)
-#define _my_IO_REPARSE_TAG_DFS          (0x8000000AL)
-#define _my_IO_REPARSE_TAG_DFSR         (0x80000012L)
+#define Z7_WIN_IO_REPARSE_TAG_HSM          (0xC0000004L)
+#define Z7_WIN_IO_REPARSE_TAG_HSM2         (0x80000006L)
+#define Z7_WIN_IO_REPARSE_TAG_SIS          (0x80000007L)
+#define Z7_WIN_IO_REPARSE_TAG_WIM          (0x80000008L)
+#define Z7_WIN_IO_REPARSE_TAG_CSV          (0x80000009L)
+#define Z7_WIN_IO_REPARSE_TAG_DFS          (0x8000000AL)
+#define Z7_WIN_IO_REPARSE_TAG_DFSR         (0x80000012L)
 */
 
 #define Get16(p) GetUi16(p)
@@ -112,7 +121,7 @@ static void WriteString(Byte *dest, const wchar_t *path)
     wchar_t c = *path++;
     if (c == 0)
       return;
-    Set16(dest, (UInt16)c);
+    Set16(dest, (UInt16)c)
     dest += 2;
   }
 }
@@ -133,10 +142,10 @@ bool FillLinkData(CByteBuffer &dest, const wchar_t *path, bool isSymLink, bool i
       return false;
     dest.Alloc(8 + size);
     Byte *p = dest;
-    Set32(p, _my_IO_REPARSE_TAG_LX_SYMLINK);
-    Set16(p + 4, (UInt16)(size));
-    Set16(p + 6, 0);
-    Set32(p + 8, _my_LX_SYMLINK_FLAG);
+    Set32(p, Z7_WIN_IO_REPARSE_TAG_LX_SYMLINK)
+    Set16(p + 4, (UInt16)(size))
+    Set16(p + 6, 0)
+    Set32(p + 8, Z7_WIN_LX_SYMLINK_FLAG)
     memcpy(p + 12, utf.Ptr(), utf.Len());
     return true;
   }
@@ -176,12 +185,12 @@ bool FillLinkData(CByteBuffer &dest, const wchar_t *path, bool isSymLink, bool i
   dest.Alloc(size);
   memset(dest, 0, size);
   const UInt32 tag = isSymLink ?
-      _my_IO_REPARSE_TAG_SYMLINK :
-      _my_IO_REPARSE_TAG_MOUNT_POINT;
+      Z7_WIN_IO_REPARSE_TAG_SYMLINK :
+      Z7_WIN_IO_REPARSE_TAG_MOUNT_POINT;
   Byte *p = dest;
-  Set32(p, tag);
-  Set16(p + 4, (UInt16)(size - 8));
-  Set16(p + 6, 0);
+  Set32(p, tag)
+  Set16(p + 4, (UInt16)(size - 8))
+  Set16(p + 6, 0)
   p += 8;
 
   unsigned subOffs = 0;
@@ -191,16 +200,16 @@ bool FillLinkData(CByteBuffer &dest, const wchar_t *path, bool isSymLink, bool i
   else
     printOffs = (unsigned)len1 + 2;
 
-  Set16(p + 0, (UInt16)subOffs);
-  Set16(p + 2, (UInt16)len1);
-  Set16(p + 4, (UInt16)printOffs);
-  Set16(p + 6, (UInt16)len2);
+  Set16(p + 0, (UInt16)subOffs)
+  Set16(p + 2, (UInt16)len1)
+  Set16(p + 4, (UInt16)printOffs)
+  Set16(p + 6, (UInt16)len2)
 
   p += 8;
   if (isSymLink)
   {
-    UInt32 flags = isAbs ? 0 : _my_SYMLINK_FLAG_RELATIVE;
-    Set32(p, flags);
+    UInt32 flags = isAbs ? 0 : Z7_WIN_SYMLINK_FLAG_RELATIVE;
+    Set32(p, flags)
     p += 4;
   }
 
@@ -255,9 +264,9 @@ bool CReparseAttr::Parse(const Byte *p, size_t size)
 
   HeaderError = false;
 
-  if (   Tag != _my_IO_REPARSE_TAG_MOUNT_POINT
-      && Tag != _my_IO_REPARSE_TAG_SYMLINK
-      && Tag != _my_IO_REPARSE_TAG_LX_SYMLINK)
+  if (   Tag != Z7_WIN_IO_REPARSE_TAG_MOUNT_POINT
+      && Tag != Z7_WIN_IO_REPARSE_TAG_SYMLINK
+      && Tag != Z7_WIN_IO_REPARSE_TAG_LX_SYMLINK)
   {
     // for unsupported reparse points
     ErrorCode = (DWORD)ERROR_REPARSE_TAG_INVALID; // ERROR_REPARSE_TAG_MISMATCH
@@ -270,12 +279,12 @@ bool CReparseAttr::Parse(const Byte *p, size_t size)
   p += 8;
   size -= 8;
   
-  if (Tag == _my_IO_REPARSE_TAG_LX_SYMLINK)
+  if (Tag == Z7_WIN_IO_REPARSE_TAG_LX_SYMLINK)
   {
     if (len < 4)
       return false;
     Flags = Get32(p); // maybe it's not Flags
-    if (Flags != _my_LX_SYMLINK_FLAG)
+    if (Flags != Z7_WIN_LX_SYMLINK_FLAG)
       return false;
     len -= 4;
     p += 4;
@@ -304,7 +313,7 @@ bool CReparseAttr::Parse(const Byte *p, size_t size)
   p += 8;
 
   Flags = 0;
-  if (Tag == _my_IO_REPARSE_TAG_SYMLINK)
+  if (Tag == Z7_WIN_IO_REPARSE_TAG_SYMLINK)
   {
     if (len < 4)
       return false;
@@ -341,8 +350,8 @@ bool CReparseShortInfo::Parse(const Byte *p, size_t size)
       (type & kReparseFlags_Microsoft) == 0 ||
       (type & 0xFFFF) != 3)
   */
-  if (Tag != _my_IO_REPARSE_TAG_MOUNT_POINT &&
-      Tag != _my_IO_REPARSE_TAG_SYMLINK)
+  if (Tag != Z7_WIN_IO_REPARSE_TAG_MOUNT_POINT &&
+      Tag != Z7_WIN_IO_REPARSE_TAG_SYMLINK)
     // return true;
     return false;
 
@@ -365,7 +374,7 @@ bool CReparseShortInfo::Parse(const Byte *p, size_t size)
   p += 8;
 
   // UInt32 Flags = 0;
-  if (Tag == _my_IO_REPARSE_TAG_SYMLINK)
+  if (Tag == Z7_WIN_IO_REPARSE_TAG_SYMLINK)
   {
     if (len < 4)
       return false;
@@ -426,13 +435,13 @@ UString CReparseAttr::GetPath() const
   return s;
 }
 
-#ifdef SUPPORT_DEVICE_FILE
+#ifdef Z7_DEVICE_FILE
 
 namespace NSystem
 {
 bool MyGetDiskFreeSpace(CFSTR rootPath, UInt64 &clusterSize, UInt64 &totalSize, UInt64 &freeSize);
 }
-#endif // SUPPORT_DEVICE_FILE
+#endif // Z7_DEVICE_FILE
 
 #if defined(_WIN32) && !defined(UNDER_CE)
 

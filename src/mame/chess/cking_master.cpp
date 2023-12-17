@@ -31,7 +31,7 @@ Hardware notes:
 #include "speaker.h"
 
 // internal artwork
-#include "ck_master.lh"
+#include "cking_master.lh"
 
 
 namespace {
@@ -66,6 +66,8 @@ private:
 	required_device<address_map_bank_device> m_mainmap;
 	required_ioport_array<2> m_inputs;
 
+	u8 m_inp_mux = 0;
+
 	// address maps
 	void main_map(address_map &map);
 	void main_trampoline(address_map &map);
@@ -75,8 +77,6 @@ private:
 	// I/O handlers
 	u8 input_r();
 	void control_w(u8 data);
-
-	u8 m_inp_mux = 0;
 };
 
 
@@ -235,7 +235,7 @@ void master_state::master(machine_config &config)
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 2);
-	config.set_default_layout(layout_ck_master);
+	config.set_default_layout(layout_cking_master);
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();

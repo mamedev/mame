@@ -3,10 +3,16 @@
 /*
    Taito Power-JC System
 
-   Skeleton driver. Requires TLCS-900 CPU core to make progress.
+   Preliminary driver
 
    Hardware appears sufficiently different to JC system to warrant
    a separate driver.
+
+   TODO:
+   - Inconsistent frame rate compared to PCB recordings; game has a tendency to freeze frame hiccup
+   - Analog inputs update at a slower rate (about every 8-10 frames instead of every frame); this issue
+     is also present in taitotz.cpp
+   - Rest of the sound hardware isn't hooked up
 
    PCB Information (incomplete!)
    ===============
@@ -570,7 +576,7 @@ void taitopjc_state::dsp_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 
 void taitopjc_state::ppc603e_mem(address_map &map)
 {
-	map(0x00000000, 0x003fffff).ram().share(m_main_ram);    // Work RAM
+	map(0x00000000, 0x003fffff).ram().share(m_main_ram); // Work RAM
 	map(0x40000000, 0x4000000f).rw(FUNC(taitopjc_state::video_r), FUNC(taitopjc_state::video_w));
 	map(0x80000000, 0x80003fff).rw(FUNC(taitopjc_state::dsp_r), FUNC(taitopjc_state::dsp_w));
 	map(0xc0000000, 0xc0003fff).rw(FUNC(taitopjc_state::ppc_common_r), FUNC(taitopjc_state::ppc_common_w));
@@ -682,7 +688,7 @@ void taitopjc_state::tlcs_unk_w(offs_t offset, uint16_t data)
 
 void taitopjc_state::tlcs900h_mem(address_map &map)
 {
-	map(0x010000, 0x02ffff).ram();     // Work RAM
+	map(0x010000, 0x02ffff).ram(); // Work RAM
 	map(0x040000, 0x0400ff).rw(FUNC(taitopjc_state::tlcs_sound_r), FUNC(taitopjc_state::tlcs_sound_w));
 	map(0x044000, 0x045fff).ram().share("nvram");
 	map(0x060000, 0x061fff).rw(FUNC(taitopjc_state::tlcs_common_r), FUNC(taitopjc_state::tlcs_common_w));
@@ -753,7 +759,7 @@ void taitopjc_state::tms_io_map(address_map &map)
 	map(0x0058, 0x0058).w(m_tc0780fpa, FUNC(tc0780fpa_device::poly_fifo_w));
 	map(0x005a, 0x005a).w(m_tc0780fpa, FUNC(tc0780fpa_device::tex_w));
 	map(0x005b, 0x005b).rw(m_tc0780fpa, FUNC(tc0780fpa_device::tex_addr_r), FUNC(tc0780fpa_device::tex_addr_w));
-	map(0x005e, 0x005e).noprw();        // ?? 0x0001 written every frame
+	map(0x005e, 0x005e).noprw(); // ?? 0x0001 written every frame
 	map(0x005f, 0x005f).r(FUNC(taitopjc_state::dsp_rom_r));
 }
 
@@ -763,48 +769,43 @@ static INPUT_PORTS_START( taitopjc )
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_COIN1 )            // Coin A
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_COIN1 ) // Coin A
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("INPUTS2")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service") PORT_CODE(KEYCODE_7)        // Service switch
-	PORT_SERVICE_NO_TOGGLE( 0x00000002, IP_ACTIVE_LOW)      // Test Button
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service") PORT_CODE(KEYCODE_7) // Service switch
+	PORT_SERVICE_NO_TOGGLE( 0x00000002, IP_ACTIVE_LOW) // Test Button
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_START1 )       // Select 1
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_START2 )       // Select 2
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_START1 ) // Select 1
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_START2 ) // Select 2
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("INPUTS3")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)       // P1 trigger
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)       // P1 bomb
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)       // P2 trigger
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)       // P2 bomb
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) // P1 trigger
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) // P1 bomb
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) // P2 trigger
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) // P2 bomb
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	// Actually cabinet mounted guns (basically analog sticks), but lightgun inputs are more practical in MAME.
-	PORT_START("ANALOG1")       // Player 1 X
-	//PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_X ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(30) PORT_REVERSE
-	PORT_BIT(0x3ff, 0x000, IPT_LIGHTGUN_X) PORT_CROSSHAIR(X, -1.0, 0.0, 0) PORT_MINMAX(0x000, 0x3ff) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1) PORT_REVERSE
+	PORT_START("ANALOG1") // Player 1 X
+	PORT_BIT(0x3ff, 0x200, IPT_AD_STICK_X) PORT_CROSSHAIR(X, -1.0, 0.0, 0) PORT_MINMAX(0x000, 0x3ff) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1) PORT_REVERSE
 
-	PORT_START("ANALOG2")       // Player 1 Y
-	//PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_Y ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(30)
-	PORT_BIT(0x3ff, 0x000, IPT_LIGHTGUN_Y) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0x000, 0x3ff) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1)
+	PORT_START("ANALOG2") // Player 1 Y
+	PORT_BIT(0x3ff, 0x200, IPT_AD_STICK_Y) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0x000, 0x3ff) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("ANALOG3")       // Player 2 X
-	//PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_X ) PORT_PLAYER(2) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(30) PORT_REVERSE
-	PORT_BIT(0x3ff, 0x000, IPT_LIGHTGUN_X) PORT_CROSSHAIR(X, -1.0, 0.0, 0) PORT_MINMAX(0x000, 0x3ff) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2) PORT_REVERSE
+	PORT_START("ANALOG3") // Player 2 X
+	PORT_BIT(0x3ff, 0x200, IPT_AD_STICK_X) PORT_CROSSHAIR(X, -1.0, 0.0, 0) PORT_MINMAX(0x000, 0x3ff) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2) PORT_REVERSE
 
-	PORT_START("ANALOG4")       // Player 2 Y
-	//PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_Y ) PORT_PLAYER(2) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(30)
-	PORT_BIT(0x3ff, 0x000, IPT_LIGHTGUN_Y) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0x000, 0x3ff) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
+	PORT_START("ANALOG4") // Player 2 Y
+	PORT_BIT(0x3ff, 0x200, IPT_AD_STICK_Y) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0x000, 0x3ff) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 
@@ -835,10 +836,10 @@ INTERRUPT_GEN_MEMBER(taitopjc_state::taitopjc_vbi)
 void taitopjc_state::taitopjc(machine_config &config)
 {
 	PPC603E(config, m_maincpu, 100000000);
-	m_maincpu->set_bus_frequency(XTAL(66'666'700)); /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
+	m_maincpu->set_bus_frequency(XTAL(66'666'700)); // Multiplier 1.5, Bus = 66MHz, Core = 100MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitopjc_state::ppc603e_mem);
 
-	/* TMP95C063F I/O CPU */
+	// TMP95C063F I/O CPU
 	TMP95C063(config, m_iocpu, 25000000);
 	m_iocpu->port5_read().set_ioport("INPUTS1");
 	m_iocpu->portd_read().set_ioport("INPUTS2");
@@ -850,13 +851,13 @@ void taitopjc_state::taitopjc(machine_config &config)
 	m_iocpu->set_addrmap(AS_PROGRAM, &taitopjc_state::tlcs900h_mem);
 	m_iocpu->set_vblank_int("screen", FUNC(taitopjc_state::taitopjc_vbi));
 
-	/* TMS320C53 DSP */
+	// TMS320C53 DSP
 	TMS32053(config, m_dsp, 40000000);
 	m_dsp->set_addrmap(AS_PROGRAM, &taitopjc_state::tms_program_map);
 	m_dsp->set_addrmap(AS_DATA, &taitopjc_state::tms_data_map);
 	m_dsp->set_addrmap(AS_IO, &taitopjc_state::tms_io_map);
 
-	MN1020012A(config, m_soundcpu, 10000000); /* MN1020819DA sound CPU - NOTE: May have 64kB internal ROM */
+	MN1020012A(config, m_soundcpu, 10000000); // MN1020819DA sound CPU - NOTE: May have 64kB internal ROM
 	m_soundcpu->set_addrmap(AS_PROGRAM, &taitopjc_state::mn10200_map);
 
 	config.set_maximum_quantum(attotime::from_hz(200000));
@@ -946,4 +947,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1998, optiger, 0, taitopjc, taitopjc, taitopjc_state, init_optiger, ROT0, "Taito", "Operation Tiger (Ver 2.14 O)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+GAME( 1998, optiger, 0, taitopjc, taitopjc, taitopjc_state, init_optiger, ROT0, "Taito", "Operation Tiger (Ver 2.14 O)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_NO_SOUND )

@@ -1779,7 +1779,7 @@ void chihiro_state::chihiro_map_io(address_map &map)
 	map(0x4000, 0x40ff).rw(FUNC(chihiro_state::mediaboard_r), FUNC(chihiro_state::mediaboard_w));
 }
 
-static INPUT_PORTS_START(chihiro)
+static INPUT_PORTS_START( chihiro )
 	PORT_START("TILT")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_TILT)
 	PORT_BIT(0x7f, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -1836,7 +1836,7 @@ static INPUT_PORTS_START(chihiro)
 
 	PORT_START("A7")
 	PORT_BIT(0x87ff, IP_ACTIVE_LOW, IPT_UNUSED)
-	INPUT_PORTS_END
+INPUT_PORTS_END
 
 void chihiro_state::machine_start()
 {

@@ -5,11 +5,11 @@
 #include "ProgressUtils.h"
 
 CLocalProgress::CLocalProgress():
+    SendRatio(true),
+    SendProgress(true),
     ProgressOffset(0),
     InSize(0),
-    OutSize(0),
-    SendRatio(true),
-    SendProgress(true)
+    OutSize(0)
   {}
 
 void CLocalProgress::Init(IProgress *progress, bool inSizeIsMain)
@@ -20,7 +20,7 @@ void CLocalProgress::Init(IProgress *progress, bool inSizeIsMain)
   _inSizeIsMain = inSizeIsMain;
 }
 
-STDMETHODIMP CLocalProgress::SetRatioInfo(const UInt64 *inSize, const UInt64 *outSize)
+Z7_COM7F_IMF(CLocalProgress::SetRatioInfo(const UInt64 *inSize, const UInt64 *outSize))
 {
   UInt64 inSize2 = InSize;
   UInt64 outSize2 = OutSize;
@@ -32,7 +32,7 @@ STDMETHODIMP CLocalProgress::SetRatioInfo(const UInt64 *inSize, const UInt64 *ou
   
   if (SendRatio && _ratioProgress)
   {
-    RINOK(_ratioProgress->SetRatioInfo(&inSize2, &outSize2));
+    RINOK(_ratioProgress->SetRatioInfo(&inSize2, &outSize2))
   }
   
   if (SendProgress)

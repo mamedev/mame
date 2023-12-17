@@ -82,11 +82,11 @@ DEFINE_DEVICE_TYPE(K037122, k037122_device, "k037122", "K037122 2D Tilemap")
 k037122_device::k037122_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, K037122, tag, owner, clock),
 	device_video_interface(mconfig, *this),
-	device_gfx_interface(mconfig, *this, nullptr),
+	device_gfx_interface(mconfig, *this, nullptr, DEVICE_SELF),
+	device_palette_interface(mconfig, *this),
 	m_tile_ram(nullptr),
 	m_char_ram(nullptr),
-	m_reg(nullptr),
-	m_gfx_index(0)
+	m_reg(nullptr)
 {
 }
 
@@ -96,19 +96,14 @@ k037122_device::k037122_device(const machine_config &mconfig, const char *tag, d
 
 void k037122_device::device_start()
 {
-	if (!palette().device().started())
-		throw device_missing_dependencies();
-
-	static const gfx_layout k037122_char_layout =
-	{
-	8, 8,
-	K037122_NUM_TILES,
-	8,
-	{ 0,1,2,3,4,5,6,7 },
-	{ 1*16, 0*16, 3*16, 2*16, 5*16, 4*16, 7*16, 6*16 },
-	{ 0*128, 1*128, 2*128, 3*128, 4*128, 5*128, 6*128, 7*128 },
-	8*128
-	};
+	static const gfx_layout k037122_char_layout = {
+			8, 8,
+			K037122_NUM_TILES,
+			8,
+			{ 0,1,2,3,4,5,6,7 },
+			{ 1*16, 0*16, 3*16, 2*16, 5*16, 4*16, 7*16, 6*16 },
+			{ 0*128, 1*128, 2*128, 3*128, 4*128, 5*128, 6*128, 7*128 },
+			8*128 };
 
 	m_char_ram = make_unique_clear<uint32_t[]>(0x200000 / 4);
 	m_tile_ram = make_unique_clear<uint32_t[]>(0x20000 / 4);
@@ -120,7 +115,7 @@ void k037122_device::device_start()
 	m_tilemap_128->set_transparent_pen(0);
 	m_tilemap_256->set_transparent_pen(0);
 
-	set_gfx(m_gfx_index,std::make_unique<gfx_element>(&palette(), k037122_char_layout, (uint8_t*)m_char_ram.get(), 0, palette().entries() / 16, 0));
+	set_gfx(0 ,std::make_unique<gfx_element>(this, k037122_char_layout, (uint8_t *)m_char_ram.get(), 0, entries() / 16, 0));
 
 	save_pointer(NAME(m_reg), 0x400 / 4);
 	save_pointer(NAME(m_char_ram), 0x200000 / 4);
@@ -149,17 +144,17 @@ void k037122_device::device_reset()
 
 TILE_GET_INFO_MEMBER(k037122_device::tile_info)
 {
-	uint32_t val = m_tile_ram[tile_index + (m_tilemap_base / 4)];
-	int color = (val >> 17) & 0x1f;
-	int tile = val & 0x3fff;
+	uint32_t const val = m_tile_ram[tile_index + (m_tilemap_base / 4)];
+	uint32_t const color = (val >> 17) & 0x1f;
+	uint32_t const tile = val & 0x3fff;
 	int flags = 0;
 
-	if (val & 0x400000)
+	if (BIT(val, 22))
 		flags |= TILE_FLIPX;
-	if (val & 0x800000)
+	if (BIT(val, 23))
 		flags |= TILE_FLIPY;
 
-	tileinfo.set(m_gfx_index, tile, color, flags);
+	tileinfo.set(0, tile, color, flags);
 }
 
 
@@ -167,13 +162,13 @@ void k037122_device::tile_draw( screen_device &screen, bitmap_rgb32 &bitmap, con
 {
 	const rectangle &visarea = screen.visible_area();
 
-	int16_t scrollx = m_reg[0x8] >> 16;
+	int16_t const scrollx = m_reg[0x8] >> 16;
 	int16_t scrolly = m_reg[0x8] & 0xffff;
 
-	int16_t incxx = m_reg[0xa] >> 16;
-	int16_t incxy = m_reg[0xa] & 0xffff;
-	int16_t incyx = m_reg[0x9] >> 16;
-	int16_t incyy = m_reg[0x9] & 0xffff;
+	int16_t const incxx = m_reg[0xa] >> 16;
+	int16_t const incxy = m_reg[0xa] & 0xffff;
+	int16_t const incyx = m_reg[0x9] >> 16;
+	int16_t const incyy = m_reg[0x9] & 0xffff;
 
 	if (m_reg[0xc] & 0x10000)
 	{
@@ -211,12 +206,12 @@ void k037122_device::sram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(m_tile_ram.get() + offset);
 
-	uint32_t address = offset * 4;
+	uint32_t const address = offset * 4;
 
 	if (address >= m_palette_base && address < m_palette_base + 0x8000)
 	{
-		int color = (address - m_palette_base) / 4;
-		palette().set_pen_color(color, pal5bit(data >> 6), pal6bit(data >> 0), pal5bit(data >> 11));
+		uint32_t const color = (address - m_palette_base) / 4;
+		set_pen_color(color, pal5bit(data >> 6), pal6bit(data >> 0), pal5bit(data >> 11));
 	}
 
 	if (address >= m_tilemap_base && address < m_tilemap_base + 0x10000)
@@ -229,18 +224,18 @@ void k037122_device::sram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 uint32_t k037122_device::char_r(offs_t offset)
 {
-	int bank = m_reg[0x30 / 4] & 0x7;
+	uint32_t const bank = m_reg[0x30 / 4] & 0x7;
 
 	return m_char_ram[offset + (bank * (0x40000 / 4))];
 }
 
 void k037122_device::char_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	int bank = m_reg[0x30 / 4] & 0x7;
-	uint32_t addr = offset + (bank * (0x40000/4));
+	uint32_t const bank = m_reg[0x30 / 4] & 0x7;
+	uint32_t const addr = offset + (bank * (0x40000/4));
 
 	COMBINE_DATA(m_char_ram.get() + addr);
-	gfx(m_gfx_index)->mark_dirty(addr / 32);
+	gfx(0)->mark_dirty(addr / 32);
 }
 
 uint32_t k037122_device::reg_r(offs_t offset)
@@ -259,20 +254,20 @@ void k037122_device::reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (offset == 0x34/4 && ACCESSING_BITS_0_15)
 	{
-		uint32_t palette_base = (data & 0x4) ? 0x18000 : 0x00000;
+		uint32_t const palette_base = BIT(data, 2) ? 0x18000 : 0x00000;
 
 		// tilemap is at 0x00000 unless CLUT is there
-		uint32_t tilemap_base = (data & 0x4) ? 0x00000 : 0x08000;
+		uint32_t const tilemap_base = BIT(data, 2) ? 0x00000 : 0x08000;
 
 		if (palette_base != m_palette_base)
 		{
 			m_palette_base = palette_base;
 
 			// update all colors since palette moved
-			for (auto p = 0; p < 8192; p++)
+			for (auto p = 0; p < entries(); p++)
 			{
-				uint32_t color = m_tile_ram[(m_palette_base / 4) + p];
-				palette().set_pen_color(p, pal5bit(color >> 6), pal6bit(color >> 0), pal5bit(color >> 11));
+				uint32_t const color = m_tile_ram[(m_palette_base / 4) + p];
+				set_pen_color(p, pal5bit(color >> 6), pal6bit(color >> 0), pal5bit(color >> 11));
 			}
 		}
 

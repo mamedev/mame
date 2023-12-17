@@ -206,7 +206,7 @@ TILE_GET_INFO_MEMBER(hvyunit_state::get_bg_tile_info)
 	int code = m_videoram[tile_index] + ((attr & 0x0f) << 8);
 	int color = (attr >> 4);
 
-	tileinfo.set(1, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 void hvyunit_state::video_start()
@@ -578,8 +578,11 @@ INPUT_PORTS_END
  *************************************/
 
 static GFXDECODE_START( gfx_hvyunit )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0x100, 16 ) /* sprite bank */
 	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0x000, 16 ) /* background tiles */
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_hvyunit_spr )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0x100, 16 ) /* sprite bank */
 GFXDECODE_END
 
 
@@ -652,8 +655,7 @@ void hvyunit_state::hvyunit(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hvyunit);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 0x800);
 
-	KANEKO_PANDORA(config, m_pandora, 0);
-	m_pandora->set_gfxdecode_tag(m_gfxdecode);
+	KANEKO_PANDORA(config, m_pandora, 0, m_palette, gfx_hvyunit_spr);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

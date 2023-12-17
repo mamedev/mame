@@ -372,7 +372,19 @@ ROM_START( gjrstar2 )
 	ROM_LOAD( "hc05_internal.bin", 0x0000, 0x2000, NO_DUMP )
 
 	ROM_REGION( 0x40000, "extrom", 0 )
-	ROM_LOAD( "27-5740-00.u1", 0x000000, 0x40000, CRC(ff3dc3bb) SHA1(bc16dfc1e12b0008456c700c431c8df6263b671f))     // identical to 'Genius Junior Redstar'
+	ROM_LOAD( "27-5740-00.u1", 0x000000, 0x40000, CRC(ff3dc3bb) SHA1(bc16dfc1e12b0008456c700c431c8df6263b671f)) // Identical to 'Genius Junior Redstar'
+ROM_END
+
+// VTech PCB 35-10100-01
+ROM_START( pcompelr )
+	ROM_REGION( 0x2000, "maincpu", 0 )
+	ROM_LOAD( "hc05_internal.u8", 0x0000, 0x2000, NO_DUMP )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD( "speech.u7", 0x0000, 0x2000, NO_DUMP ) // Labeled "930 0AF21FK / VTECH / ©YY 04044"
+
+	ROM_REGION( 0x40000, "extrom", 0 )
+	ROM_LOAD( "27-05944-000-001.u1", 0x000000, 0x40000, CRC(5018763d) SHA1(70e1d8b8e34e0b2ab10d7ac06c2f454d1f377e77)) // Dumped as AM27C020, pin 1 connected to 32 (Vcc), as per 27c020 specs)
 ROM_END
 
 ROM_START( gjrstar3 )
@@ -420,6 +432,7 @@ COMP( 1993,  gjmovie,  0,       0,      gjmovie,  geniusjr, geniusjr_state, empt
 COMP( 199?,  pitagjr,  gjmovie, 0,      gjmovie,  geniusjr, geniusjr_state, empty_init, "VTech",   "Pitagorin Junior",                  MACHINE_IS_SKELETON )
 COMP( 1996,  gjrstar,  0,       0,      gjrstar,  geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Junior Redstar (Germany)",   MACHINE_IS_SKELETON )
 COMP( 1996,  gjrstar2, gjrstar, 0,      gjrstar,  geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Junior Redstar 2 (Germany)", MACHINE_IS_SKELETON )
+COMP( 1995,  pcompelr, gjrstar, 0,      gjrstar,  geniusjr, geniusjr_state, empty_init, "VTech",   "Precomputer Elektronik (Russia)",   MACHINE_IS_SKELETON ) // Прекомпьютер Электроник
 COMP( 1998,  gjrstar3, 0,       0,      gjrstar,  geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Junior Redstar 3 (Germany)", MACHINE_IS_SKELETON )
 COMP( 1998,  gj5000,   0,       0,      gj5000,   geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Junior 5000 (Germany)",      MACHINE_IS_SKELETON )
 COMP( 1993,  gln,      0,       0,      gln,      geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Leader Notebook",            MACHINE_IS_SKELETON )

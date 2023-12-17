@@ -1,12 +1,10 @@
 // license:BSD-3-Clause
-// copyright-holders:Ville Linde
+// copyright-holders:Ville Linde, Angelo Salese
 
 /*
     Konami Viper System
 
     Driver by Ville Linde
-
-
 
     Software notes (as per Police 911)
     -- VL - 01.06.2011
@@ -79,18 +77,41 @@
     0x0000c130:     ScheduleTask()
     0x00009d00:     LoadProgram(): R3 = ptr to filename
 
-
     TODO:
-    - needs a proper way to dump security dongles, anything but p9112 has placeholder ROM for ds2430.
-    - figure out why games randomly crash (IRQ related?)
+    - needs a proper way to dump security dongles, anything but p9112 has placeholder ROM for
+      ds2430.
+    - Voodoo 3 has issues with LOD minimums, cfr. mocapglf where card check don't display a bar
+      near the percentage;
+    - convert i2c to be a real i2c-complaint device;
+    - hookup adc0838, reads from i2c;
+    - convert epic to be a device, make it input_merger/irq_callback complaint;
+    - (more intermediate steps for proper PCI conversions here)
+    - xtrial: hangs when coined up;
+    - gticlub2: throws NETWORK ERROR after course select;
+    - jpark3: attract mode demo play acts weird, the dinosaur gets submerged
+      and camera doesn't really know what to do, CPU core bug?
+    - jpark3: crashes during second attract cycle;
+    - sscopex, thrild2: attract mode black screens (coin still works), sogeki/sscopefh are unaffected;
+    - thrild2: no BGMs;
+    - wcombat: black screen when entering service mode;
+    - mocapglf, sscopefh, sscopex: implement 2nd screen output, controlled by IP90C63A;
+    \- sscopex/sogeki desyncs during gameplay intro, leaves heavy trails in gameplay;
+    - ppp2nd: hangs when selecting game mode from service (manages to save);
+    - code1db: crashes when selecting single course type;
+    - wcombatj: gets stuck on network check;
+    - thrild2c: blue screen;
+    - thrild2ac: black screen;
+    - all games needs to be verified against factory settings
+      (game options, coin options & sound options often don't match "green colored" defaults)
 
     Other notes:
     - "Distribution error" means there's a region mismatch.
-    - Games that hang randomly seem to hang on IRQ16 possibly? You can see "IRQ16 taken" but it hangs before you see "IRQ16 cleared".
     - Hold TEST while booting (from the very start) to initialize the RTC for most games.
     - It seems that p911 has 3 unique regional images: U/E, K/A, and J. If you try booting, for example, U region on a K/A image, it won't find some files and will error out with "distribution error".
+    - mocapglf: enable "show diag" at boot then disable it once the diag text appears.
+      This will allow game to bypass the I/O SENSOR error later on.
 
-    Game status:
+    Game status (potentially outdated, to be moved on top):
         boxingm             Goes in-game. Controllers are not emulated. Various graphical glitches.
         jpark3              Goes in-game. Controllers are not emulated. Various graphical glitches.
         mocapb,j            Goes in-game. Controllers are not emulated. Various graphical glitches. Random crashes.
@@ -122,7 +143,7 @@
 
 
 
-===========================================================================================================================
+===================================================================================================
 
 Konami Viper Hardware Overview (last updated 5th June 2011 10:56pm)
 
@@ -201,75 +222,8 @@ MB81G163222-80 - Fujitsu MB81G163222-80 256k x 32-bit x 2 banks Synchronous Grap
         LM358 - National Semiconductor LM358 low power dual operational amplifier (SOIC8 @ U14)
        6379AL - NEC uPC6379AL 2-channel 16-bit D/A converter (SOIC8 @ U30)
       ADC0838 - National Semiconductor ADC0838 Serial I/O 8-Bit A/D Converters with Multiplexer Options (SOIC20 @ U13)
-       DS2430 - Dallas DS2430 256-bits 1-Wire EEPROM. Has 256 bits x8 EEPROM (32 bytes), 64 bits x8 (8 bytes)
-                one-time programmable application register and unique factory-lasered and tested 64-bit
-                registration number (8-bit family code + 48-bit serial number + 8-bit CRC) (TO-92 @ U37)
-                The OTP application register on the common DS2430 and the Police 911 2 DS2430 are not programmed
-                (application register reads all 0xFF and the status register reads back 0xFF), so it's probably safe
-                to assume they're not used on any of them.
-                It appears the DS2430 is not protected from reading and the unique silicon serial number is
-                included in the 40 byte dump. This serial number is used as a check to verify the NVRAM and DS2430.
-                In the Police 911 2 NVRAM dump the serial number of the DS2430 is located at 0x002A and 0x1026
-                If the serial number in the NVRAM and DS2430 match then they are paired and the game accepts the NVRAM.
-                If they don't match the game requires an external DS2430 (i.e. dongle) and flags the NVRAM as 'BAD'
-                The serial number is not present in the CF card (2 different Police 911 2 cards of the same version
-                were dumped and matched).
-                When the lasered ROM is read from the DS2430, it comes out from LSB to MSB (family code, LSB of
-                S/N->MSB of S/N, CRC)
-                For Police 911 2 that is 0x14 0xB2 0xB7 0x4A 0x00 0x00 0x00 0x83
-                Family code=0x14
-                S/N=0x0000004AB7B2
-                CRC=0x83
-                In a DS2430 dump, the first 32 bytes is the EEPROM and the lasered ROM is 8 bytes and starts at 0x20h
-                For Police 911 2 that is....
-                00000000h CB 9B 56 EC A0 4C 87 53 51 46 28 E7 00 00 00 74
-                00000010h 30 A9 C7 76 B9 85 A3 43 87 53 50 42 1A E7 FA CF
-                00000020h 14 B2 B7 4A 00 00 00 83
-                It may be possible to hand craft a DS2430 for a dongle-protected version of a game simply by using
-                one of the existing DS2430 dumps and adjusting the serial number found in a dump of the NVRAM to pair them
-                or adjusting the serial number in the NVRAM to match the serial number found in one of the dumped DS2430s.
-                This Police 911 2 board was upgraded from Police 911 by plugging in the dongle and changing the CF card.
-                The NVRAM had previously died and the board was dead. Normally for a Viper game that is fatal. Using
-                the NVRAM from Police 911 allowed it to boot and then the NVRAM upgraded itself with some additional
-                data (the original data remained untouched). This means the dongle does more than just protect the game.
-                Another interesting fact about this upgrade is it has been discovered that the PCB can write to the
-                external DS2430 in the dongle. This has been proven because the serial number of the DS2430 soldered
-                on the PCB is present in the EEPROM area of the Police 911 2 DS2430.
-                Here is a dump of the DS2430 from Police 911. Note the EEPROM area is empty and the serial number (from 0x20 onwards)
-                is present in the above Police 911 2 DS2430 dump at locations 0x11, 0x10 and 0x0F
-                00000000h FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
-                00000010h FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
-                00000020h 14 A9 30 74 00 00 00 E7
-                This proves that the EEPROM area in the DS2430 is unused by an unprotected game and in fact the on-board
-                DS2430 is completely unused by an unprotected game. That is why any unprotected game will work on any
-                Viper PCB regardless of the on-board DS2430 serial number.
-                The existing DS2430 'common' dump used in the unprotected games was actually from a (dongle-protected)
-                Mahjong Fight Club PCB but that PCB was used to test and run all of the unprotected Viper games.
-      M48T58Y - ST Microelectronics M48T58Y Timekeeper RAM (DIP28 @ U39). When this dies (after 10 year lifespan)
-                the game will complain with error RTC BAD then reset. The data inside the RTC can not be hand created
-                (yet) so to revive the PCB the correct RTC data must be re-programmed to a new RTC and replaced
-                on the PCB.
-                Regarding the RTC and protection-related checks....
-                "RTC OK" checks 0x0000->0x0945 (i.e. I can clear the contents after 0x0945 and the game will still
-                happily boot). The NVRAM contents are split into chunks, each of which are checksummed.  It is a 16-bit checksum,
-                computed by summing two consecutive bytes as a 16-bit integer, where the final sum must add up to 0xFFFF (mod
-                65536).  The last two bytes in the chunk are used to make the value 0xFFFF.  There doesn't appear to be a
-                complete checksum over all the chunks (I can pick and choose chunks from various NVRAMs, as long as each chunk
-                checksum checks out). The important chunks for booting are the first two.
-                The first chunk goes from 0x0000-0x000F.  This seems to be a game/region identifier, and doesn't like its
-                contents changed (I didn't try changing every byte, but several of the bytes would throw RTC errors, even with a
-                fixed checksum).  I'd guess that the CF verifies this value, since it's different for every game (i.e. Mocap
-                Boxing NVRAM would have a correct checksum, but shouldn't pass Police 911 checks).
-                The second chunk goes from 0x0010-0x0079.  This seems to be a board identifier.  This has (optionally)
-                several fields, each of which are 20 bytes long.  I'm unsure of the first 6 bytes, the following 6
-                bytes are the DS2430A S/N, and the last 8 bytes are a game/region/dongle identifier.  If running
-                without a dongle, only the first 20 byte field is present.  With a dongle, a second 20 byte field will
-                be present.  Moving this second field into the place of the first field (and fixing the checksum)
-                doesn't work, and the second field will be ignored if the first field is valid for the game (and in
-                which case the dongle will be ignored).  For example, Police 911 will boot with a valid first field,
-                with or without the second field, and with or without the dongle plugged in.  If you have both fields,
-                and leave the dongle plugged in, you can switch between Police 911 and Police 911/2 by simply swapping
-                CF cards.
+       DS2430 - Dallas DS2430 256-bits 1-Wire EEPROM.
+      M48T58Y - ST Microelectronics M48T58Y Timekeeper RAM (DIP28 @ U39).
        29F002 - Fujitsu 29F002 256k x8 EEPROM stamped '941B01' (PLCC44 @ U25). Earlier revision stamped '941A01'
       CN4/CN5 - RCA-type network connection jacks
           CN7 - 80 pin connector (unused in all games?)
@@ -287,9 +241,80 @@ MB81G163222-80 - Fujitsu MB81G163222-80 256k x 32-bit x 2 banks Synchronous Grap
                 CF card version of the same game can be swapped and the existing RTC works but sometimes the RTC data
                 needs to be re-initialised to factory defaults by entering test mode. Sometimes the game will not boot
                 and gives error RTC BAD meaning the RTC is not compatible with the version or the dongle is required.
-                See DS2430 above for more info.
+                See DS2430 below for more info.
        28-WAY - Edge connector used for connecting special controls such as guns etc.
        DIP(4) - 4-position DIP switch. Switch 1 skips the CF check for a faster boot-up. The others appear unused?
+
+[DS2430] Has 256 bits x8 EEPROM (32 bytes), 64 bits x8 (8 bytes)
+    one-time programmable application register and unique factory-lasered and tested 64-bit
+    registration number (8-bit family code + 48-bit serial number + 8-bit CRC) (TO-92 @ U37)
+    The OTP application register on the common DS2430 and the Police 911 2 DS2430 are not programmed
+    (application register reads all 0xFF and the status register reads back 0xFF), so it's probably safe
+    to assume they're not used on any of them.
+    It appears the DS2430 is not protected from reading and the unique silicon serial number is
+    included in the 40 byte dump. This serial number is used as a check to verify the NVRAM and DS2430.
+    In the Police 911 2 NVRAM dump the serial number of the DS2430 is located at 0x002A and 0x1026
+    If the serial number in the NVRAM and DS2430 match then they are paired and the game accepts the NVRAM.
+    If they don't match the game requires an external DS2430 (i.e. dongle) and flags the NVRAM as 'BAD'
+    The serial number is not present in the CF card (2 different Police 911 2 cards of the same version
+    were dumped and matched).
+    When the lasered ROM is read from the DS2430, it comes out from LSB to MSB (family code, LSB of
+    S/N->MSB of S/N, CRC)
+    For Police 911 2 that is 0x14 0xB2 0xB7 0x4A 0x00 0x00 0x00 0x83
+    Family code=0x14
+    S/N=0x0000004AB7B2
+    CRC=0x83
+    In a DS2430 dump, the first 32 bytes is the EEPROM and the lasered ROM is 8 bytes and starts at 0x20h
+    For Police 911 2 that is....
+    00000000h CB 9B 56 EC A0 4C 87 53 51 46 28 E7 00 00 00 74
+    00000010h 30 A9 C7 76 B9 85 A3 43 87 53 50 42 1A E7 FA CF
+    00000020h 14 B2 B7 4A 00 00 00 83
+    It may be possible to hand craft a DS2430 for a dongle-protected version of a game simply by using
+    one of the existing DS2430 dumps and adjusting the serial number found in a dump of the NVRAM to pair them
+    or adjusting the serial number in the NVRAM to match the serial number found in one of the dumped DS2430s.
+    This Police 911 2 board was upgraded from Police 911 by plugging in the dongle and changing the CF card.
+    The NVRAM had previously died and the board was dead. Normally for a Viper game that is fatal. Using
+    the NVRAM from Police 911 allowed it to boot and then the NVRAM upgraded itself with some additional
+    data (the original data remained untouched). This means the dongle does more than just protect the game.
+    Another interesting fact about this upgrade is it has been discovered that the PCB can write to the
+    external DS2430 in the dongle. This has been proven because the serial number of the DS2430 soldered
+    on the PCB is present in the EEPROM area of the Police 911 2 DS2430.
+    Here is a dump of the DS2430 from Police 911. Note the EEPROM area is empty and the serial number (from 0x20 onwards)
+    is present in the above Police 911 2 DS2430 dump at locations 0x11, 0x10 and 0x0F
+    00000000h FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
+    00000010h FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
+    00000020h 14 A9 30 74 00 00 00 E7
+    This proves that the EEPROM area in the DS2430 is unused by an unprotected game and in fact the on-board
+    DS2430 is completely unused by an unprotected game. That is why any unprotected game will work on any
+    Viper PCB regardless of the on-board DS2430 serial number.
+    The existing DS2430 'common' dump used in the unprotected games was actually from a (dongle-protected)
+    Mahjong Fight Club PCB but that PCB was used to test and run all of the unprotected Viper games.
+
+[M48T58Y] When this dies (after 10 year lifespan)
+    the game will complain with error RTC BAD then reset. The data inside the RTC can not be hand created
+    (yet) so to revive the PCB the correct RTC data must be re-programmed to a new RTC and replaced
+    on the PCB.
+    Regarding the RTC and protection-related checks....
+    "RTC OK" checks 0x0000->0x0945 (i.e. I can clear the contents after 0x0945 and the game will still
+    happily boot). The NVRAM contents are split into chunks, each of which are checksummed.  It is a 16-bit checksum,
+    computed by summing two consecutive bytes as a 16-bit integer, where the final sum must add up to 0xFFFF (mod
+    65536).  The last two bytes in the chunk are used to make the value 0xFFFF.  There doesn't appear to be a
+    complete checksum over all the chunks (I can pick and choose chunks from various NVRAMs, as long as each chunk
+    checksum checks out). The important chunks for booting are the first two.
+    The first chunk goes from 0x0000-0x000F.  This seems to be a game/region identifier, and doesn't like its
+    contents changed (I didn't try changing every byte, but several of the bytes would throw RTC errors, even with a
+    fixed checksum).  I'd guess that the CF verifies this value, since it's different for every game (i.e. Mocap
+    Boxing NVRAM would have a correct checksum, but shouldn't pass Police 911 checks).
+    The second chunk goes from 0x0010-0x0079.  This seems to be a board identifier.  This has (optionally)
+    several fields, each of which are 20 bytes long.  I'm unsure of the first 6 bytes, the following 6
+    bytes are the DS2430A S/N, and the last 8 bytes are a game/region/dongle identifier.  If running
+    without a dongle, only the first 20 byte field is present.  With a dongle, a second 20 byte field will
+    be present.  Moving this second field into the place of the first field (and fixing the checksum)
+    doesn't work, and the second field will be ignored if the first field is valid for the game (and in
+    which case the dongle will be ignored).  For example, Police 911 will boot with a valid first field,
+    with or without the second field, and with or without the dongle plugged in.  If you have both fields,
+    and leave the dongle plugged in, you can switch between Police 911 and Police 911/2 by simply swapping
+    CF cards.
 
 The PCB pinout is JAMMA but the analog controls (pots for driving games mostly) connect to pins on the JAMMA connector.
 The 2 outer pins of each pot connect to +5V and GND. If the direction of control is opposite to what is expected simply
@@ -297,7 +322,7 @@ reverse the wires.
 The centre pin of each pot joins to the following pins on the JAMMA connector.....
 Pin 25 Parts side  - GAS POT
 Pin 25 Solder side - STEERING POT
-Pin 26 Parts side  - HANDBRAKE POT (if used, for example Xtrail Racing)
+Pin 26 Parts side  - HANDBRAKE POT (if used, for example Xtrial Racing)
 Pin 26 Solder side - BRAKE POT
 
 For the gun games (Jurassic Park III and Warzaid) the gun connects to the 28 way connector like this......
@@ -408,6 +433,8 @@ The golf club acts like a LED gun. PCB power input is 12V.
 #include "cpu/upd78k/upd78k4.h"
 #include "bus/ata/ataintf.h"
 #include "bus/ata/hdd.h"
+#include "machine/ds2430a.h"
+#include "machine/ins8250.h"
 #include "machine/lpci.h"
 #include "machine/timekpr.h"
 #include "machine/timer.h"
@@ -418,53 +445,72 @@ The golf club acts like a LED gun. PCB power input is 12V.
 #include "screen.h"
 #include "speaker.h"
 
+// configurable logging
+//#define LOG_WARN  (1U << 1)
+#define LOG_I2C     (1U << 2)
+#define LOG_IRQ     (1U << 3)
+#define LOG_TIMER   (1U << 4)
+
+#define VERBOSE (LOG_GENERAL)
+//#define LOG_OUTPUT_STREAM std::cout
+
+#include "logmacro.h"
+
+#define LOGI2C(...)     LOGMASKED(LOG_I2C,     __VA_ARGS__)
+#define LOGIRQ(...)     LOGMASKED(LOG_IRQ,     __VA_ARGS__)
+#define LOGTIMER(...)   LOGMASKED(LOG_TIMER,   __VA_ARGS__)
 
 namespace {
 
-#define VIPER_DEBUG_LOG
-#define VIPER_DEBUG_EPIC_INTS       0
-#define VIPER_DEBUG_EPIC_TIMERS     0
-#define VIPER_DEBUG_EPIC_REGS       0
-#define VIPER_DEBUG_EPIC_I2C        0
-
-
-#define SDRAM_CLOCK         166666666       // Main SDRAMs run at 166MHz
+#define PCI_CLOCK           (XTAL(33'868'800))
+#define SDRAM_CLOCK         (PCI_CLOCK * 3) // Main SDRAMs run at 100 MHz
+#define TIMER_CLOCK         (SDRAM_CLOCK / 8)
 
 class viper_state : public driver_device
 {
 public:
 	viper_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_ata(*this, "ata"),
 		m_voodoo(*this, "voodoo"),
+		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
+		m_duart_com(*this, "duart_com"),
+		m_ata(*this, "ata"),
 		m_lpci(*this, "pcibus"),
-		m_ds2430_bit_timer(*this, "ds2430_timer2"),
+		m_ds2430(*this, "ds2430"),
+		m_ds2430_ext(*this, "ds2430_ext"),
 		m_workram(*this, "workram"),
-		m_ds2430_rom(*this, "ds2430"),
 		m_io_ports(*this, "IN%u", 0U),
+		m_analog_input(*this, "AN%u", 0U),
+		m_gun_input(*this, "GUN%u", 0U),
 		m_io_ppp_sensors(*this, "SENSOR%u", 1U),
 		m_dmadac(*this, { "dacr", "dacl" })
 	{
 	}
 
 	void viper(machine_config &config);
+	void viper_dongle(machine_config &config);
 	void viper_ppp(machine_config &config);
 	void viper_omz(machine_config &config);
+	void viper_fullbody(machine_config &config);
+	void viper_fbdongle(machine_config &config);
 
 	void init_viper();
 	void init_vipercf();
 	void init_viperhd();
 
-	int ds2430_unk_r();
+	int ds2430_mux_r();
 
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	required_device<voodoo_3_device> m_voodoo;
 private:
-	uint32_t epic_r(offs_t offset);
-	void epic_w(offs_t offset, uint32_t data);
+	void mpc8240_soc_map(address_map &map);
+
 	void unk2_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	uint64_t voodoo3_io_r(offs_t offset, uint64_t mem_mask = ~0);
 	void voodoo3_io_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
@@ -473,13 +519,14 @@ private:
 	uint64_t voodoo3_lfb_r(offs_t offset, uint64_t mem_mask = ~0);
 	void voodoo3_lfb_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	uint8_t input_r(offs_t offset);
-	uint64_t e70000_r(offs_t offset, uint64_t mem_mask = ~0);
-	void e70000_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	void output_w(offs_t offset, uint8_t data);
+	uint8_t ds2430_r();
+	void ds2430_w(uint8_t data = 0);
+	uint8_t ds2430_ext_r();
+	void ds2430_ext_w(uint8_t data = 0);
 	void unk1a_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	void unk1b_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
-	uint64_t e00008_r(offs_t offset, uint64_t mem_mask = ~0);
-	void e00008_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
-	uint64_t e00000_r();
+
 	uint64_t pci_config_addr_r();
 	void pci_config_addr_w(uint64_t data);
 	uint64_t pci_config_data_r();
@@ -492,12 +539,12 @@ private:
 	void ata_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	uint64_t unk_serial_r(offs_t offset, uint64_t mem_mask = ~0);
 	void unk_serial_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
-	void voodoo_vblank(int state);
 
 	uint16_t ppp_sensor_r(offs_t offset);
 
-	uint32_t screen_update_viper(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(viper_vblank);
+	void uart_int(int state);
+
+	void voodoo_vblank(int state);
 	void voodoo_pciint(int state);
 
 	//the following two arrays need to stay public til the legacy PCI bus is removed
@@ -509,7 +556,7 @@ private:
 	void omz3d_map(address_map &map);
 
 	TIMER_CALLBACK_MEMBER(epic_global_timer_callback);
-	TIMER_CALLBACK_MEMBER(ds2430_timer_callback);
+	TIMER_CALLBACK_MEMBER(i2c_timer_callback);
 
 	int m_cf_card_ide = 0;
 	int m_unk_serial_bit_w = 0;
@@ -517,9 +564,9 @@ private:
 	uint16_t m_unk_serial_data = 0U;
 	uint16_t m_unk_serial_data_r = 0U;
 	uint8_t m_unk_serial_regs[0x80]{};
-	uint64_t m_e00008_data = 0U;
 	uint32_t m_sound_buffer_offset = 0U;
 	bool m_sound_irq_enabled = false;
+	bool m_ds2430_ext_select = false;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(sound_timer_callback);
 
@@ -582,61 +629,48 @@ private:
 		uint32_t eicr = 0U;
 		uint32_t svr = 0U;
 
+		uint8_t pctpr = 0xfU;
+
 		int active_irq = 0;
 
 		MPC8240_IRQ irq[MPC8240_NUM_INTERRUPTS]{};
 
-		uint8_t i2c_adr = 0U;
-		int i2c_freq_div = 0, i2c_freq_sample_rate = 0;
-		uint8_t i2c_cr = 0U;
-		uint8_t i2c_sr = 0U;
-		int i2c_state = 0;
-
 		MPC8240_GLOBAL_TIMER global_timer[4]{};
-
 	};
 
 	MPC8240_EPIC m_epic{};
 
-#if VIPER_DEBUG_EPIC_REGS
-	const char* epic_get_register_name(uint32_t reg);
-#endif
 	void epic_update_interrupts();
 	void mpc8240_interrupt(int irq);
 	void mpc8240_epic_init();
 	void mpc8240_epic_reset(void);
 
-	// DS2430, to be device-ified, used at least by kpython.cpp, too
-	enum
-	{
-		DS2430_STATE_ROM_COMMAND = 1,
-		DS2430_STATE_MEM_COMMAND,
-		DS2430_STATE_READ_ROM,
-		DS2430_STATE_MEM_FUNCTION,
-		DS2430_STATE_READ_MEM,
-		DS2430_STATE_READ_MEM_ADDRESS
+	struct MPC8240_I2C {
+		uint8_t adr = 0U;
+		int fdr = 0, dffsr = 0;
+		uint8_t cr = 0U;
+		uint8_t sr = 0U;
+		int state = 0;
+		uint8_t addr_latch = 0U;
+		bool rw = 0;
+		emu_timer *timer = nullptr;
 	};
 
-	uint8_t m_ds2430_data = 0U;
-	int m_ds2430_data_count = 0;
-	int m_ds2430_reset = 0;
-	int m_ds2430_state = 0;
-	uint8_t m_ds2430_cmd = 0U;
-	uint8_t m_ds2430_addr = 0U;
-	uint8_t m_ds2430_unk_status = 0U;
-	emu_timer *m_ds2430_timer = nullptr;
-	int ds2430_insert_cmd_bit(int bit);
-
-	void DS2430_w(int bit);
+	MPC8240_I2C m_i2c;
+	uint8_t i2cdr_r(offs_t offset);
+	void i2cdr_w(offs_t offset, uint8_t data);
 
 	required_device<ppc_device> m_maincpu;
+	required_device<screen_device> m_screen;
+	required_device<pc16552_device> m_duart_com;
 	required_device<ata_interface_device> m_ata;
-	required_device<voodoo_3_device> m_voodoo;
 	required_device<pci_bus_legacy_device> m_lpci;
-	required_device<timer_device> m_ds2430_bit_timer;
+	required_device<ds2430a_device> m_ds2430;
+	optional_device<ds2430a_device> m_ds2430_ext;
 	required_shared_ptr<uint64_t> m_workram;
-	required_region_ptr<uint8_t> m_ds2430_rom;
 	required_ioport_array<8> m_io_ports;
+	required_ioport_array<4> m_analog_input;
+	required_ioport_array<4> m_gun_input;
 	optional_ioport_array<4> m_io_ppp_sensors;
 	required_device_array<dmadac_sound_device, 2> m_dmadac;
 
@@ -646,9 +680,63 @@ private:
 	void voodoo3_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
 };
 
-uint32_t viper_state::screen_update_viper(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+class viper_subscreen_state : public viper_state
+{
+public:
+	viper_subscreen_state(const machine_config &mconfig, device_type type, const char *tag)
+		: viper_state(mconfig, type, tag)
+	{}
+
+protected:
+	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
+	virtual void video_start() override;
+private:
+	std::unique_ptr<bitmap_rgb32> m_voodoo_buf;
+	std::unique_ptr<bitmap_rgb32> m_ttl_buf;
+};
+
+uint32_t viper_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return m_voodoo->update(bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
+}
+
+void viper_subscreen_state::video_start()
+{
+	m_voodoo_buf = std::make_unique<bitmap_rgb32>(1024, 1024);
+	m_ttl_buf = std::make_unique<bitmap_rgb32>(1024, 1024);
+}
+
+// TODO: multiscreen games enables TV out in Voodoo core specifically for these games,
+// then drives what to actually draw thru overlay regs.
+// [:voodoo] ':maincpu' (000205C8):internal_io_w(vidInFormat) = 00008000 & FFFFFFFF
+// sscopex (sub screen 320x240, current m_ttl_buf cuts off picture)
+// [:voodoo] ':maincpu' (0002A424):internal_io_w(vidOverlayStartCoords) = 00000000 & FFFFFFFF
+// [:voodoo] ':maincpu' (0002A424):internal_io_w(vidOverlayEndScreenCoord) = 0017F3FF & FFFFFFFF
+// [:voodoo] ':maincpu' (0002A424):internal_io_w(vidOverlayDudxOffsetSrcWidth) = 20000000 & FFFFFFFF
+// [:voodoo] ':maincpu' (0002A424):internal_io_w(vidDesktopOverlayStride) = 00080008 & FFFFFFFF
+// [:voodoo] ':maincpu' (000200DC):internal_io_w(vidOverlayStartCoords) = 0000004E & FFFFFFFF
+// [:voodoo] ':maincpu' (000200DC):internal_io_w(vidOverlayEndScreenCoord) = 000FF289 & FFFFFFFF
+// [:voodoo] ':maincpu' (000200DC):internal_io_w(vidOverlayDudxOffsetSrcWidth) = 11E00000 & FFFFFFFF
+// [:voodoo] ':maincpu' (000200DC):internal_io_w(vidDesktopOverlayStride) = 00050008 & FFFFFFFF
+// mocapglf (sub screen 512x384, ROT90 like main)
+// [:voodoo] ':maincpu' (0102A4AC):internal_io_w(vidOverlayStartCoords) = 00000000 & FFFFFFFF
+// [:voodoo] ':maincpu' (0102A4AC):internal_io_w(vidOverlayEndScreenCoord) = 0017F3FF & FFFFFFFF
+// [:voodoo] ':maincpu' (0102A4AC):internal_io_w(vidOverlayDudxOffsetSrcWidth) = 20000000 & FFFFFFFF
+// [:voodoo] ':maincpu' (0102A4AC):internal_io_w(vidDesktopOverlayStride) = 00080008 & FFFFFFFF
+// [:voodoo] ':maincpu' (010200DC):internal_io_w(vidOverlayStartCoords) = 00000000 & FFFFFFFF
+// [:voodoo] ':maincpu' (010200DC):internal_io_w(vidOverlayEndScreenCoord) = 0017F3FF & FFFFFFFF
+// [:voodoo] ':maincpu' (010200DC):internal_io_w(vidOverlayDudxOffsetSrcWidth) = 20000000 & FFFFFFFF
+// [:voodoo] ':maincpu' (010200DC):internal_io_w(vidDesktopOverlayStride) = 00080008 & FFFFFFFF
+// Stereo video seems disabled (no writes to rightOverlayBuf) so a 30 Hz TTL demuxer may still be
+// used here.
+
+// TODO: we need to read the secondary TV out for nothing atm, otherwise sscopefh (at least) will hang (???)
+uint32_t viper_subscreen_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	m_voodoo->update(screen.frame_number() & 1 ? *m_voodoo_buf : *m_ttl_buf, cliprect);
+
+	copybitmap(bitmap, *m_voodoo_buf, 0, 0, cliprect.min_x, cliprect.min_y, cliprect);
+	return 0;
 }
 
 static inline uint64_t read64be_with_32sle_device_handler(read32s_delegate handler, offs_t offset, uint64_t mem_mask)
@@ -677,10 +765,6 @@ static inline void write64be_with_32sle_device_handler(write32s_delegate handler
 
 uint32_t viper_state::mpc8240_pci_r(int function, int reg, uint32_t mem_mask)
 {
-	#ifdef VIPER_DEBUG_LOG
-//  printf("MPC8240: PCI read %d, %02X, %08X\n", function, reg, mem_mask);
-	#endif
-
 	switch (reg)
 	{
 	}
@@ -689,9 +773,6 @@ uint32_t viper_state::mpc8240_pci_r(int function, int reg, uint32_t mem_mask)
 
 void viper_state::mpc8240_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask)
 {
-	#ifdef VIPER_DEBUG_LOG
-//  printf("MPC8240: PCI write %d, %02X, %08X, %08X\n", function, reg, data, mem_mask);
-	#endif
 	COMBINE_DATA(&m_mpc8240_regs[reg/4]);
 }
 
@@ -721,121 +802,371 @@ void viper_state::pci_config_data_w(uint64_t data)
 /*****************************************************************************/
 // MPC8240 Embedded Programmable Interrupt Controller (EPIC)
 
-#if VIPER_DEBUG_EPIC_REGS
-const char* viper_state::epic_get_register_name(uint32_t reg)
+// TODO: timing calculation, comes from fdr / dffsr
+// most if not all games in the driver sets fdr = 0x27 = 512, dffsr = 0x21
+#define I2C_TIMER_FREQ (SDRAM_CLOCK / 512) / 10
+
+uint8_t viper_state::i2cdr_r(offs_t offset)
 {
-	switch (reg >> 16)
+	u8 res = 0;
+	if (m_i2c.cr & 0x80 && !machine().side_effects_disabled())     // only do anything if the I2C module is enabled
 	{
-		// 0x00000 - 0x0ffff
-		case 0x0:
+		if (m_i2c.state == I2C_STATE_ADDRESS_CYCLE)
 		{
-			switch (reg & 0xffff)
-			{
-				case 0x3000:    return "I2CADR";
-				case 0x3004:    return "I2CFDR";
-				case 0x3008:    return "I2CCR";
-				case 0x300c:    return "I2CSR";
-				case 0x3010:    return "I2CDR";
-			}
-		}
+			LOGI2C("I2C address cycle read\n");
 
-		// 0x40000 - 0x4ffff
-		case 0x4:
-		{
-			switch (reg & 0xffff)
-			{
-				case 0x1000:    return "FRR";
-				case 0x1020:    return "GCR";
-				case 0x1030:    return "EICR";
-				case 0x1080:    return "EVI";
-				case 0x1090:    return "PI";
-				case 0x10e0:    return "SVR";
-				case 0x10f0:    return "TFRR";
-				case 0x1100:    return "GTCCR0";
-				case 0x1110:    return "GTBCR0";
-				case 0x1120:    return "GTVPR0";
-				case 0x1130:    return "GTDR0";
-				case 0x1140:    return "GTCCR1";
-				case 0x1150:    return "GTBCR1";
-				case 0x1160:    return "GTVPR1";
-				case 0x1170:    return "GTDR1";
-				case 0x1180:    return "GTCCR2";
-				case 0x1190:    return "GTBCR2";
-				case 0x11a0:    return "GTVPR2";
-				case 0x11b0:    return "GTDR2";
-				case 0x11c0:    return "GTCCR3";
-				case 0x11d0:    return "GTBCR3";
-				case 0x11e0:    return "GTVPR3";
-				case 0x11f0:    return "GTDR3";
-			}
-			break;
-		}
+			m_i2c.state = I2C_STATE_DATA_TRANSFER;
 
-		// 0x50000 - 0x5ffff
-		case 0x5:
-		{
-			switch (reg & 0xffff)
-			{
-				case 0x0200:    return "IVPR0";
-				case 0x0210:    return "IDR0";
-				case 0x0220:    return "IVPR1";
-				case 0x0230:    return "IDR1";
-				case 0x0240:    return "IVPR2";
-				case 0x0250:    return "IDR2";
-				case 0x0260:    return "IVPR3";
-				case 0x0270:    return "IDR3";
-				case 0x0280:    return "IVPR4";
-				case 0x0290:    return "IDR4";
-				case 0x02a0:    return "SVPR5";
-				case 0x02b0:    return "SDR5";
-				case 0x02c0:    return "SVPR6";
-				case 0x02d0:    return "SDR6";
-				case 0x02e0:    return "SVPR7";
-				case 0x02f0:    return "SDR7";
-				case 0x0300:    return "SVPR8";
-				case 0x0310:    return "SDR8";
-				case 0x0320:    return "SVPR9";
-				case 0x0330:    return "SDR9";
-				case 0x0340:    return "SVPR10";
-				case 0x0350:    return "SDR10";
-				case 0x0360:    return "SVPR11";
-				case 0x0370:    return "SDR11";
-				case 0x0380:    return "SVPR12";
-				case 0x0390:    return "SDR12";
-				case 0x03a0:    return "SVPR13";
-				case 0x03b0:    return "SDR13";
-				case 0x03c0:    return "SVPR14";
-				case 0x03d0:    return "SDR14";
-				case 0x03e0:    return "SVPR15";
-				case 0x03f0:    return "SDR15";
-				case 0x1020:    return "IIVPR0";
-				case 0x1030:    return "IIDR0";
-				case 0x1040:    return "IIVPR1";
-				case 0x1050:    return "IIDR1";
-				case 0x1060:    return "IIVPR2";
-				case 0x1070:    return "IIDR2";
-				case 0x10c0:    return "IIVPR3";
-				case 0x10d0:    return "IIDR3";
-			}
-			break;
+			m_i2c.timer->adjust(attotime::from_hz(I2C_TIMER_FREQ));
 		}
-
-		// 0x60000 - 0x6FFFF
-		case 0x6:
+		else if (m_i2c.state == I2C_STATE_DATA_TRANSFER)
 		{
-			switch (reg & 0xffff)
+			LOGI2C("I2C data read\n");
+
+			m_i2c.state = I2C_STATE_ADDRESS_CYCLE;
+
+			// set transfer complete in status register
+			m_i2c.sr |= 0x80;
+
+			if (m_i2c.rw)
 			{
-				case 0x0080:    return "PCTPR";
-				case 0x00a0:    return "IACK";
-				case 0x00b0:    return "EOI";
+				if ((m_i2c.addr_latch & 0xf0) == 0x10)
+				{
+					// TODO: hackish direct read
+					// What should really happen here is that i2c initiates a transfer with
+					// connected devices in serial form, cycling thru the various devices.
+					// The hard part is to drive the adc (which has 4 write and 2 read lines)
+					// with only sda/scl, and assuming it is really adc and the Guru note doesn't
+					// refer to boxingm instead.
+
+					// 0x1c: voltage, assume 5v
+					if (m_i2c.addr_latch == 0x1c)
+						return 0x80;
+					const u16 adc_value = m_analog_input[m_i2c.addr_latch & 0x3]->read();
+					// FIXME: upper nibble is currently discarded in port defs
+					// is it expecting 7 bits of data and 1 of parity?
+					// cfr. input tests returning different values for each nibble when both are equal.
+					const u8 adc_nibble = BIT(m_i2c.addr_latch, 2) ? 0 : 8;
+
+					res = (adc_value) >> adc_nibble;
+				}
+				else
+					LOG("I2C: unmapped read access %02x\n", m_i2c.addr_latch);
 			}
-			break;
+			else
+				LOG("I2C: read access %02x in write mode!\n", m_i2c.addr_latch);
+
+			// generate interrupt if interrupt are enabled
+			/*if (m_i2c.cr & 0x40)
+			{
+			    printf("I2C interrupt\n");
+			    mpc8240_interrupt(MPC8240_I2C_IRQ);
+
+			    // set interrupt flag in status register
+			    m_i2c.sr |= 0x2;
+			}*/
 		}
 	}
 
-	return nullptr;
+	return res;
 }
-#endif
+
+void viper_state::i2cdr_w(offs_t offset, uint8_t data)
+{
+	if (m_i2c.cr & 0x80)     // only do anything if the I2C module is enabled
+	{
+		if (m_i2c.state == I2C_STATE_ADDRESS_CYCLE)          // waiting for address cycle
+		{
+			//int rw = data & 1;
+			m_i2c.rw = bool(data & 1);
+			m_i2c.addr_latch = (data >> 1) & 0x7f;
+			LOGI2C("I2C address cycle %s, addr = %02X \n"
+				, m_i2c.rw ? "read" : "write"
+				, m_i2c.addr_latch
+			);
+			m_i2c.state = I2C_STATE_DATA_TRANSFER;
+
+			m_i2c.timer->adjust(attotime::from_hz(I2C_TIMER_FREQ));
+		}
+		else if (m_i2c.state == I2C_STATE_DATA_TRANSFER)     // waiting for data transfer
+		{
+			LOGI2C("I2C data transfer, data = %02x\n", data);
+			m_i2c.state = I2C_STATE_ADDRESS_CYCLE;
+
+			m_i2c.timer->adjust(attotime::from_hz(I2C_TIMER_FREQ));
+		}
+	}
+}
+
+TIMER_CALLBACK_MEMBER(viper_state::i2c_timer_callback)
+{
+	// set transfer complete in status register
+	m_i2c.sr |= 0x80;
+
+	// generate interrupt if interrupt are enabled
+	if (m_i2c.cr & 0x40)
+	{
+		LOGI2C("I2C interrupt\n");
+		mpc8240_interrupt(MPC8240_I2C_IRQ);
+
+		// set interrupt flag in status register
+		m_i2c.sr |= 0x2;
+	}
+}
+
+// NOTE: swapendian_int*/8-bit ports used as a temp measure
+// handling with endianness can be done thru new PCI model later on (the EPIC is natively LE)
+
+// NOTE: not everything is "EPIC" but rather is space from the SoC that includes the EPIC.
+// Also a subset of I2O/DMAC/ATU/data path diags are mappable thru a 0x1000 window PCSRBAR,
+// while this full range thru EUMBBAR.
+void viper_state::mpc8240_soc_map(address_map &map)
+{
+//  map(0x00000, 0x00fff) I2O
+//  map(0x01000, 0x01fff) DMAC
+//  map(0x02000, 0x02fff) ATU Address Translation Unit
+	// I2C
+	map(0x03000, 0x03000).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_i2c.adr;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOGI2C("I2CADR %02x\n", data);
+			m_i2c.adr = data;
+		})
+	);
+	map(0x03004, 0x03004).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_i2c.fdr;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_i2c.fdr = data & 0x3f;
+			LOGI2C("I2CFDR FDR %02x\n", m_i2c.fdr);
+		})
+	);
+	map(0x03005, 0x03005).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_i2c.dffsr;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_i2c.dffsr = data & 0x3f;
+			LOGI2C("I2CFDR DFFSR %02x\n", m_i2c.dffsr);
+		})
+	);
+	map(0x03008, 0x03008).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_i2c.cr;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			if ((m_i2c.cr & 0x80) == 0 && (data & 0x80) != 0)
+			{
+				m_i2c.state = I2C_STATE_ADDRESS_CYCLE;
+			}
+			if ((m_i2c.cr & 0x10) != (data & 0x10))
+			{
+				m_i2c.state = I2C_STATE_ADDRESS_CYCLE;
+			}
+			m_i2c.cr = data;
+			LOGI2C("I2CCR %02x\n", data);
+		})
+	);
+	map(0x0300c, 0x0300c).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_i2c.sr;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			// TODO: very wrong, only bits 4 & 2 writeable
+			m_i2c.sr = data;
+			LOGI2C("I2CSR %02x\n", data);
+		})
+	);
+	map(0x03010, 0x03010).rw(FUNC(viper_state::i2cdr_r), FUNC(viper_state::i2cdr_w));
+//  map(0x04000, 0x3ffff) <reserved>
+
+//  map(0x40000, 0x7ffff) EPIC
+	map(0x41030, 0x41033).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			data = swapendian_int32(data);
+			m_epic.eicr = data;
+			LOG("EICR %08x\n", data);
+			if (BIT(data, 27))
+				throw emu_fatalerror("EPIC: serial interrupts mode not implemented\n");
+		})
+	);
+	map(0x41080, 0x41083).lr32(
+		NAME([this] (offs_t offset) {
+			if (!machine().side_effects_disabled())
+				LOG("EVI read\n");
+			// step = 1, device_id = 0, vendor_id = 0
+			return swapendian_int32(0x00010000);
+		})
+	);
+	map(0x410e0, 0x410e0).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			m_epic.svr = data;
+			LOGIRQ("SVR %02x\n", data);
+		})
+	);
+
+	map(0x41110, 0x41113).select(0xc0).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			int timer_num = offset >> 4;
+			data = swapendian_int32(data);
+
+			m_epic.global_timer[timer_num].enable = (data & 0x80000000) ? 0 : 1;
+			m_epic.global_timer[timer_num].base_count = data & 0x7fffffff;
+
+			if (m_epic.global_timer[timer_num].enable && m_epic.global_timer[timer_num].base_count > 0)
+			{
+				attotime timer_duration = attotime::from_hz(TIMER_CLOCK / m_epic.global_timer[timer_num].base_count);
+				m_epic.global_timer[timer_num].timer->adjust(timer_duration, timer_num);
+
+				LOGTIMER("EPIC GTIMER%d: next in %s\n", timer_num, (timer_duration / 8).as_string() );
+			}
+			else
+			{
+				m_epic.global_timer[timer_num].timer->reset();
+			}
+		})
+	);
+
+	map(0x41120, 0x41123).select(0xc0).lrw32(
+		NAME([this] (offs_t offset) {
+			u32 ret = 0;
+			int timer_num = offset >> 4;
+
+			ret |= m_epic.irq[MPC8240_GTIMER0_IRQ + timer_num].mask ? 0x80000000 : 0;
+			ret |= m_epic.irq[MPC8240_GTIMER0_IRQ + timer_num].priority << 16;
+			ret |= m_epic.irq[MPC8240_GTIMER0_IRQ + timer_num].vector;
+			ret |= m_epic.irq[MPC8240_GTIMER0_IRQ + timer_num].active ? 0x40000000 : 0;
+			return swapendian_int32(ret);
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			int timer_num = offset >> 4;
+
+			data = swapendian_int32(data);
+
+			m_epic.irq[MPC8240_GTIMER0_IRQ + timer_num].mask = (data & 0x80000000) ? 1 : 0;
+			m_epic.irq[MPC8240_GTIMER0_IRQ + timer_num].priority = (data >> 16) & 0xf;
+			m_epic.irq[MPC8240_GTIMER0_IRQ + timer_num].vector = data & 0xff;
+
+			LOGIRQ("GTVPR%d %08x\n", timer_num, data);
+
+			if (!machine().side_effects_disabled())
+				epic_update_interrupts();
+		})
+	);
+	map(0x41130, 0x41130).select(0xc0).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			int timer_num = offset >> 4;
+
+			m_epic.irq[MPC8240_GTIMER0_IRQ + timer_num].destination = data & 0x1;
+
+			if (data)
+				throw emu_fatalerror("GTDR%d in P1 mode", timer_num, data & 1);
+		})
+	);
+
+	map(0x50200, 0x50203).select(0x1e0).lrw32(
+		NAME([this] (offs_t offset) {
+			u32 ret = 0;
+			int irq = offset >> 3;
+
+			ret |= m_epic.irq[MPC8240_IRQ0 + irq].mask ? 0x80000000 : 0;
+			ret |= m_epic.irq[MPC8240_IRQ0 + irq].priority << 16;
+			ret |= m_epic.irq[MPC8240_IRQ0 + irq].vector;
+			ret |= m_epic.irq[MPC8240_IRQ0 + irq].active ? 0x40000000 : 0;
+			return swapendian_int32(ret);
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			int irq = offset >> 3;
+
+			data = swapendian_int32(data);
+			m_epic.irq[MPC8240_IRQ0 + irq].mask = (data & 0x80000000) ? 1 : 0;
+			m_epic.irq[MPC8240_IRQ0 + irq].priority = (data >> 16) & 0xf;
+			m_epic.irq[MPC8240_IRQ0 + irq].vector = data & 0xff;
+
+			LOGIRQ("IVPR%d %08x\n", irq, data);
+
+			if (!machine().side_effects_disabled())
+				epic_update_interrupts();
+		})
+	);
+	map(0x50210, 0x50210).select(0x1e0).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			int irq = offset >> 3;
+
+			m_epic.irq[MPC8240_IRQ0 + irq].destination = data & 0x1;
+
+			if (data)
+				throw emu_fatalerror("IDR%d in P1 mode", irq, data & 1);
+		})
+	);
+	map(0x51020, 0x51023).lrw32(
+		NAME([this] (offs_t offset) {
+			u32 ret = 0;
+
+			ret |= m_epic.irq[MPC8240_I2C_IRQ].mask ? 0x80000000 : 0;
+			ret |= m_epic.irq[MPC8240_I2C_IRQ].priority << 16;
+			ret |= m_epic.irq[MPC8240_I2C_IRQ].vector;
+			ret |= m_epic.irq[MPC8240_I2C_IRQ].active ? 0x40000000 : 0;
+			return swapendian_int32(ret);
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			data = swapendian_int32(data);
+
+			m_epic.irq[MPC8240_I2C_IRQ].mask = (data & 0x80000000) ? 1 : 0;
+			m_epic.irq[MPC8240_I2C_IRQ].priority = (data >> 16) & 0xf;
+			m_epic.irq[MPC8240_I2C_IRQ].vector = data & 0xff;
+
+			LOGIRQ("IIVPR0 %08x\n", data);
+
+			if (!machine().side_effects_disabled())
+				epic_update_interrupts();
+		})
+	);
+	map(0x51030, 0x51030).lw8(
+		NAME([this] (offs_t, u8 data) {
+			m_epic.irq[MPC8240_I2C_IRQ].destination = data & 0x1;
+			if (data)
+				throw emu_fatalerror("I2C IRQ in P1 mode");
+			// epic_update_interrupts();
+		})
+	);
+	map(0x60080, 0x60080).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			m_epic.pctpr = data & 0xf;
+			epic_update_interrupts();
+		})
+	);
+	// IACK
+	map(0x600a0, 0x600a0).lr8(
+		NAME([this] (offs_t offset) {
+			u8 ret = 0;
+			if (!machine().side_effects_disabled())
+				epic_update_interrupts();
+			// spurious vector register is returned if no pending interrupts
+			ret = (m_epic.active_irq >= 0) ? m_epic.iack : m_epic.svr;
+			return ret;
+		})
+	);
+	// w/o strobe
+	map(0x600b0, 0x600b0).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			// spammy
+			//LOGIRQ("EOI IRQ%d ACK\n", m_epic.active_irq);
+
+			m_epic.irq[m_epic.active_irq].active = 0;
+			m_epic.active_irq = -1;
+
+			epic_update_interrupts();
+		})
+	);
+//  map(0x80000, 0xfefff) <reserved>
+//  map(0xff000, 0xff017) data path diags
+//  map(0xff018, 0xff048) data path diags watchpoints
+//  map(0xff04d, 0xfffff) <reserved>
+}
 
 TIMER_CALLBACK_MEMBER(viper_state::epic_global_timer_callback)
 {
@@ -843,12 +1174,10 @@ TIMER_CALLBACK_MEMBER(viper_state::epic_global_timer_callback)
 
 	if (m_epic.global_timer[timer_num].enable && m_epic.global_timer[timer_num].base_count > 0)
 	{
-		attotime timer_duration =  attotime::from_hz((SDRAM_CLOCK / 8) / m_epic.global_timer[timer_num].base_count);
+		attotime timer_duration = attotime::from_hz(TIMER_CLOCK / m_epic.global_timer[timer_num].base_count);
 		m_epic.global_timer[timer_num].timer->adjust(timer_duration, timer_num);
 
-#if VIPER_DEBUG_EPIC_TIMERS
-		printf("EPIC GTIMER%d: next in %s\n", timer_num, attotime_string(timer_duration, 8));
-#endif
+		LOGTIMER("EPIC GTIMER%d: next in %s\n", timer_num, timer_duration.as_string() );
 	}
 	else
 	{
@@ -866,13 +1195,18 @@ void viper_state::epic_update_interrupts()
 	int irq = -1;
 	int priority = -1;
 
+	// Do not change the state until current irq is fully serviced.
+	if (m_epic.active_irq >= 0)
+		return;
+
 	// find the highest priority pending interrupt
 	for (i=MPC8240_NUM_INTERRUPTS-1; i >= 0; i--)
 	{
 		if (m_epic.irq[i].pending)
 		{
-			// pending interrupt can only be serviced if its mask is enabled and priority is non-zero
-			if (m_epic.irq[i].mask == 0 && m_epic.irq[i].priority > 0)
+			// pending interrupt can only be serviced if its mask is enabled
+			// and priority is above PCTPR (> 1 for Konami Viper)
+			if (m_epic.irq[i].mask == 0 && m_epic.irq[i].priority > m_epic.pctpr)
 			{
 				if (m_epic.irq[i].priority > priority)
 				{
@@ -885,506 +1219,20 @@ void viper_state::epic_update_interrupts()
 
 	if (irq >= 0 && m_epic.active_irq == -1)
 	{
-#if VIPER_DEBUG_EPIC_INTS
-		if (irq > 4 && irq < 20)
-			printf("EPIC IRQ%d taken\n", irq);
-#endif
-
 		m_epic.active_irq = irq;
 		m_epic.irq[m_epic.active_irq].pending = 0;
 		m_epic.irq[m_epic.active_irq].active = 1;
 
 		m_epic.iack = m_epic.irq[m_epic.active_irq].vector;
 
-#if VIPER_DEBUG_EPIC_INTS
-		if (irq > 4 && irq < 20)
-			printf("vector = %02X\n", m_epic.iack);
-#endif
+		//if (irq > 4 && irq < 20)
+			LOGIRQ("EPIC IRQ%d taken vector = %02X\n", irq, m_epic.iack);
 
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 	}
 	else
 	{
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
-	}
-}
-
-uint32_t viper_state::epic_r(offs_t offset)
-{
-	int reg;
-	reg = offset * 4;
-
-#if VIPER_DEBUG_EPIC_REGS
-	if (reg != 0x600a0)     // IACK is spammy
-	{
-		const char *regname = epic_get_register_name(reg);
-		if (regname)
-		{
-			printf("EPIC: read %08X (%s) at %08X\n", reg, regname, m_maincpu->pc());
-		}
-		else
-		{
-			printf("EPIC: read %08X at %08X\n", reg, m_maincpu->pc());
-		}
-	}
-#endif
-
-	uint32_t ret = 0;
-
-	switch (reg >> 16)
-	{
-		// 0x00000 - 0x0ffff
-		case 0x0:
-		{
-			switch (reg & 0xffff)
-			{
-				case 0x3000:            // Offset 0x3000 - I2CADR
-				{
-					ret = m_epic.i2c_adr;
-					break;
-				}
-				case 0x3004:            // Offset 0x3004 - I2CFDR
-				{
-					ret = m_epic.i2c_freq_div | (m_epic.i2c_freq_sample_rate << 8);
-					break;
-				}
-				case 0x3008:            // Offset 0x3008 - I2CCR
-				{
-					ret = m_epic.i2c_cr;
-					break;
-				}
-				case 0x300c:            // Offset 0x300c - I2CSR
-				{
-					ret = m_epic.i2c_sr;
-					break;
-				}
-				case 0x3010:            // Offset 0x3010 - I2CDR
-				{
-					if (m_epic.i2c_cr & 0x80)     // only do anything if the I2C module is enabled
-					{
-						if (m_epic.i2c_state == I2C_STATE_ADDRESS_CYCLE)
-						{
-#if VIPER_DEBUG_EPIC_I2C
-							printf("I2C address cycle read\n");
-#endif
-
-							m_epic.i2c_state = I2C_STATE_DATA_TRANSFER;
-
-							// set transfer complete in status register
-							m_epic.i2c_sr |= 0x80;
-
-							// generate interrupt if interrupt are enabled
-							if (m_epic.i2c_cr & 0x40)
-							{
-#if VIPER_DEBUG_EPIC_I2C
-								printf("I2C interrupt\n");
-#endif
-								mpc8240_interrupt(MPC8240_I2C_IRQ);
-
-								// set interrupt flag in status register
-								m_epic.i2c_sr |= 0x2;
-							}
-						}
-						else if (m_epic.i2c_state == I2C_STATE_DATA_TRANSFER)
-						{
-#if VIPER_DEBUG_EPIC_I2C
-							printf("I2C data read\n");
-#endif
-
-							m_epic.i2c_state = I2C_STATE_ADDRESS_CYCLE;
-
-							// set transfer complete in status register
-							m_epic.i2c_sr |= 0x80;
-
-							// generate interrupt if interrupt are enabled
-							/*if (m_epic.i2c_cr & 0x40)
-							{
-							    printf("I2C interrupt\n");
-							    mpc8240_interrupt(MPC8240_I2C_IRQ);
-
-							    // set interrupt flag in status register
-							    m_epic.i2c_sr |= 0x2;
-							}*/
-						}
-					}
-					break;
-				}
-			}
-			break;
-		}
-
-		// 0x40000 - 0x4ffff
-		case 0x4:
-		{
-			switch (reg & 0xffff)
-			{
-				case 0x1120:            // Offset 0x41120 - Global Timer 0 vector/priority register
-				case 0x1160:            // Offset 0x41160 - Global Timer 1 vector/priority register
-				case 0x11a0:            // Offset 0x411a0 - Global Timer 2 vector/priority register
-				case 0x11e0:            // Offset 0x411e0 - Global Timer 3 vector/priority register
-				{
-					int timer_num = ((reg & 0xffff) - 0x1120) >> 6;
-
-					ret |= m_epic.irq[MPC8240_GTIMER0_IRQ + timer_num].mask ? 0x80000000 : 0;
-					ret |= m_epic.irq[MPC8240_GTIMER0_IRQ + timer_num].priority << 16;
-					ret |= m_epic.irq[MPC8240_GTIMER0_IRQ + timer_num].vector;
-					ret |= m_epic.irq[MPC8240_GTIMER0_IRQ + timer_num].active ? 0x40000000 : 0;
-					break;
-				}
-			}
-			break;
-		}
-
-		// 0x50000 - 0x5FFFF
-		case 0x5:
-		{
-			switch (reg & 0xffff)
-			{
-				case 0x0200:            // Offset 0x50200 - IRQ0 vector/priority register
-				case 0x0220:            // Offset 0x50220 - IRQ1 vector/priority register
-				case 0x0240:            // Offset 0x50240 - IRQ2 vector/priority register
-				case 0x0260:            // Offset 0x50260 - IRQ3 vector/priority register
-				case 0x0280:            // Offset 0x50280 - IRQ4 vector/priority register
-				case 0x02a0:            // Offset 0x502a0 - IRQ5 vector/priority register
-				case 0x02c0:            // Offset 0x502c0 - IRQ6 vector/priority register
-				case 0x02e0:            // Offset 0x502e0 - IRQ7 vector/priority register
-				case 0x0300:            // Offset 0x50300 - IRQ8 vector/priority register
-				case 0x0320:            // Offset 0x50320 - IRQ9 vector/priority register
-				case 0x0340:            // Offset 0x50340 - IRQ10 vector/priority register
-				case 0x0360:            // Offset 0x50360 - IRQ11 vector/priority register
-				case 0x0380:            // Offset 0x50380 - IRQ12 vector/priority register
-				case 0x03a0:            // Offset 0x503a0 - IRQ13 vector/priority register
-				case 0x03c0:            // Offset 0x503c0 - IRQ14 vector/priority register
-				case 0x03e0:            // Offset 0x503e0 - IRQ15 vector/priority register
-				{
-					int irq = ((reg & 0xffff) - 0x200) >> 5;
-
-					ret |= m_epic.irq[MPC8240_IRQ0 + irq].mask ? 0x80000000 : 0;
-					ret |= m_epic.irq[MPC8240_IRQ0 + irq].priority << 16;
-					ret |= m_epic.irq[MPC8240_IRQ0 + irq].vector;
-					ret |= m_epic.irq[MPC8240_IRQ0 + irq].active ? 0x40000000 : 0;
-					break;
-				}
-				case 0x1020:            // Offset 0x51020 - I2C IRQ vector/priority register
-				{
-					ret |= m_epic.irq[MPC8240_I2C_IRQ].mask ? 0x80000000 : 0;
-					ret |= m_epic.irq[MPC8240_I2C_IRQ].priority << 16;
-					ret |= m_epic.irq[MPC8240_I2C_IRQ].vector;
-					ret |= m_epic.irq[MPC8240_I2C_IRQ].active ? 0x40000000 : 0;
-					break;
-				}
-			}
-			break;
-		}
-
-		// 0x60000 - 0x6FFFF
-		case 0x6:
-		{
-			switch (reg & 0xffff)
-			{
-				case 0x00a0:            // Offset 0x600A0 - IACK
-				{
-					epic_update_interrupts();
-
-					if (m_epic.active_irq >= 0)
-					{
-						ret = m_epic.iack;
-					}
-					else
-					{
-						// spurious vector register is returned if no pending interrupts
-						ret = m_epic.svr;
-					}
-					break;
-				}
-
-			}
-			break;
-		}
-	}
-
-	return swapendian_int32(ret);
-}
-
-void viper_state::epic_w(offs_t offset, uint32_t data)
-{
-	int reg;
-	reg = offset * 4;
-
-	data = swapendian_int32(data);
-
-#if VIPER_DEBUG_EPIC_REGS
-	if (reg != 0x600b0)     // interrupt clearing is spammy
-	{
-		const char *regname = epic_get_register_name(reg);
-		if (regname)
-		{
-			printf("EPIC: write %08X, %08X (%s) at %08X\n", data, reg, regname, m_maincpu->pc());
-		}
-		else
-		{
-			printf("EPIC: write %08X, %08X at %08X\n", data, reg, m_maincpu->pc());
-		}
-	}
-#endif
-
-	switch (reg >> 16)
-	{
-		case 0:
-		{
-			switch (reg & 0xffff)
-			{
-				case 0x3000:            // Offset 0x3000 - I2CADR
-				{
-					m_epic.i2c_adr = data;
-					break;
-				}
-				case 0x3004:            // Offset 0x3004 - I2CFDR
-				{
-					m_epic.i2c_freq_div = data & 0x3f;
-					m_epic.i2c_freq_sample_rate = (data >> 8) & 0x3f;
-					break;
-				}
-				case 0x3008:            // Offset 0x3008 - I2CCR
-				{
-					if ((m_epic.i2c_cr & 0x80) == 0 && (data & 0x80) != 0)
-					{
-						m_epic.i2c_state = I2C_STATE_ADDRESS_CYCLE;
-					}
-					if ((m_epic.i2c_cr & 0x10) != (data & 0x10))
-					{
-						m_epic.i2c_state = I2C_STATE_ADDRESS_CYCLE;
-					}
-					m_epic.i2c_cr = data;
-					break;
-				}
-				case 0x300c:            // Offset 0x300c - I2CSR
-				{
-					m_epic.i2c_sr = data;
-					break;
-				}
-				case 0x3010:            // Offset 0x3010 - I2CDR
-				{
-					if (m_epic.i2c_cr & 0x80)     // only do anything if the I2C module is enabled
-					{
-						if (m_epic.i2c_state == I2C_STATE_ADDRESS_CYCLE)          // waiting for address cycle
-						{
-							//int rw = data & 1;
-
-#if VIPER_DEBUG_EPIC_I2C
-							int addr = (data >> 1) & 0x7f;
-							printf("I2C address cycle, addr = %02X\n", addr);
-#endif
-							m_epic.i2c_state = I2C_STATE_DATA_TRANSFER;
-
-							// set transfer complete in status register
-							m_epic.i2c_sr |= 0x80;
-
-							// generate interrupt if interrupt are enabled
-							if (m_epic.i2c_cr & 0x40)
-							{
-#if VIPER_DEBUG_EPIC_I2C
-								printf("I2C interrupt\n");
-#endif
-								mpc8240_interrupt(MPC8240_I2C_IRQ);
-
-								// set interrupt flag in status register
-								m_epic.i2c_sr |= 0x2;
-							}
-						}
-						else if (m_epic.i2c_state == I2C_STATE_DATA_TRANSFER)     // waiting for data transfer
-						{
-#if VIPER_DEBUG_EPIC_I2C
-							printf("I2C data transfer, data = %02X\n", data);
-#endif
-							m_epic.i2c_state = I2C_STATE_ADDRESS_CYCLE;
-
-							// set transfer complete in status register
-							m_epic.i2c_sr |= 0x80;
-
-							// generate interrupt if interrupts are enabled
-							if (m_epic.i2c_cr & 0x40)
-							{
-#if VIPER_DEBUG_EPIC_I2C
-								printf("I2C interrupt\n");
-#endif
-								mpc8240_interrupt(MPC8240_I2C_IRQ);
-
-								// set interrupt flag in status register
-								m_epic.i2c_sr |= 0x2;
-							}
-						}
-					}
-					break;
-				}
-			}
-			break;
-		}
-
-		// 0x40000 - 0x4FFFF
-		case 4:
-		{
-			switch (reg & 0xffff)
-			{
-				case 0x1030:            // Offset 0x41030 - EICR
-				{
-					m_epic.eicr = data;
-					if (data & 0x08000000)
-						fatalerror("EPIC: serial interrupts mode not implemented\n");
-					break;
-				}
-				case 0x10e0:            // Offset 0x410E0 - Spurious Vector Register
-				{
-					m_epic.svr = data;
-					break;
-				}
-				case 0x1120:            // Offset 0x41120 - Global timer 0 vector/priority register
-				case 0x1160:            // Offset 0x41160 - Global timer 1 vector/priority register
-				case 0x11a0:            // Offset 0x411A0 - Global timer 2 vector/priority register
-				case 0x11e0:            // Offset 0x411E0 - Global timer 3 vector/priority register
-				{
-					int timer_num = ((reg & 0xffff) - 0x1120) >> 6;
-
-					m_epic.irq[MPC8240_GTIMER0_IRQ + timer_num].mask = (data & 0x80000000) ? 1 : 0;
-					m_epic.irq[MPC8240_GTIMER0_IRQ + timer_num].priority = (data >> 16) & 0xf;
-					m_epic.irq[MPC8240_GTIMER0_IRQ + timer_num].vector = data & 0xff;
-
-					epic_update_interrupts();
-					break;
-				}
-				case 0x1130:            // Offset 0x41130 - Global timer 0 destination register
-				case 0x1170:            // Offset 0x41170 - Global timer 1 destination register
-				case 0x11b0:            // Offset 0x411B0 - Global timer 2 destination register
-				case 0x11f0:            // Offset 0x411F0 - Global timer 3 destination register
-				{
-					int timer_num = ((reg & 0xffff) - 0x1130) >> 6;
-
-					m_epic.irq[MPC8240_GTIMER0_IRQ + timer_num].destination = data & 0x1;
-
-					epic_update_interrupts();
-					break;
-				}
-				case 0x1110:            // Offset 0x41110 - Global timer 0 base count register
-				case 0x1150:            // Offset 0x41150 - Global timer 1 base count register
-				case 0x1190:            // Offset 0x41190 - Global timer 2 base count register
-				case 0x11d0:            // Offset 0x411d0 - Global timer 3 base count register
-				{
-					int timer_num = ((reg & 0xffff) - 0x1110) >> 6;
-
-					m_epic.global_timer[timer_num].enable = (data & 0x80000000) ? 0 : 1;
-					m_epic.global_timer[timer_num].base_count = data & 0x7fffffff;
-
-					if (m_epic.global_timer[timer_num].enable && m_epic.global_timer[timer_num].base_count > 0)
-					{
-						attotime timer_duration =  attotime::from_hz((SDRAM_CLOCK / 8) / m_epic.global_timer[timer_num].base_count);
-						m_epic.global_timer[timer_num].timer->adjust(timer_duration, timer_num);
-
-#if VIPER_DEBUG_EPIC_TIMERS
-						printf("EPIC GTIMER%d: next in %s\n", timer_num, attotime_string(timer_duration, 8));
-#endif
-					}
-					else
-					{
-						m_epic.global_timer[timer_num].timer->reset();
-					}
-					break;
-				}
-			}
-			break;
-		}
-
-		// 0x50000 - 0x5FFFF
-		case 0x5:
-		{
-			switch (reg & 0xffff)
-			{
-				case 0x0200:            // Offset 0x50200 - IRQ0 vector/priority register
-				case 0x0220:            // Offset 0x50220 - IRQ1 vector/priority register
-				case 0x0240:            // Offset 0x50240 - IRQ2 vector/priority register
-				case 0x0260:            // Offset 0x50260 - IRQ3 vector/priority register
-				case 0x0280:            // Offset 0x50280 - IRQ4 vector/priority register
-				case 0x02a0:            // Offset 0x502a0 - IRQ5 vector/priority register
-				case 0x02c0:            // Offset 0x502c0 - IRQ6 vector/priority register
-				case 0x02e0:            // Offset 0x502e0 - IRQ7 vector/priority register
-				case 0x0300:            // Offset 0x50300 - IRQ8 vector/priority register
-				case 0x0320:            // Offset 0x50320 - IRQ9 vector/priority register
-				case 0x0340:            // Offset 0x50340 - IRQ10 vector/priority register
-				case 0x0360:            // Offset 0x50360 - IRQ11 vector/priority register
-				case 0x0380:            // Offset 0x50380 - IRQ12 vector/priority register
-				case 0x03a0:            // Offset 0x503a0 - IRQ13 vector/priority register
-				case 0x03c0:            // Offset 0x503c0 - IRQ14 vector/priority register
-				case 0x03e0:            // Offset 0x503e0 - IRQ15 vector/priority register
-				{
-					int irq = ((reg & 0xffff) - 0x200) >> 5;
-
-					m_epic.irq[MPC8240_IRQ0 + irq].mask = (data & 0x80000000) ? 1 : 0;
-					m_epic.irq[MPC8240_IRQ0 + irq].priority = (data >> 16) & 0xf;
-					m_epic.irq[MPC8240_IRQ0 + irq].vector = data & 0xff;
-
-					epic_update_interrupts();
-					break;
-				}
-				case 0x1020:            // Offset 0x51020 - I2C IRQ vector/priority register
-				{
-					m_epic.irq[MPC8240_I2C_IRQ].mask = (data & 0x80000000) ? 1 : 0;
-					m_epic.irq[MPC8240_I2C_IRQ].priority = (data >> 16) & 0xf;
-					m_epic.irq[MPC8240_I2C_IRQ].vector = data & 0xff;
-
-					epic_update_interrupts();
-					break;
-				}
-				case 0x0210:            // Offset 0x50210 - IRQ0 destination register
-				case 0x0230:            // Offset 0x50230 - IRQ1 destination register
-				case 0x0250:            // Offset 0x50250 - IRQ2 destination register
-				case 0x0270:            // Offset 0x50270 - IRQ3 destination register
-				case 0x0290:            // Offset 0x50290 - IRQ4 destination register
-				case 0x02b0:            // Offset 0x502b0 - IRQ5 destination register
-				case 0x02d0:            // Offset 0x502d0 - IRQ6 destination register
-				case 0x02f0:            // Offset 0x502f0 - IRQ7 destination register
-				case 0x0310:            // Offset 0x50310 - IRQ8 destination register
-				case 0x0330:            // Offset 0x50330 - IRQ9 destination register
-				case 0x0350:            // Offset 0x50350 - IRQ10 destination register
-				case 0x0370:            // Offset 0x50370 - IRQ11 destination register
-				case 0x0390:            // Offset 0x50390 - IRQ12 destination register
-				case 0x03b0:            // Offset 0x503b0 - IRQ13 destination register
-				case 0x03d0:            // Offset 0x503d0 - IRQ14 destination register
-				case 0x03f0:            // Offset 0x503f0 - IRQ15 destination register
-				{
-					int irq = ((reg & 0xffff) - 0x210) >> 5;
-
-					m_epic.irq[MPC8240_IRQ0 + irq].destination = data & 0x1;
-
-					epic_update_interrupts();
-					break;
-				}
-				case 0x1030:            // Offset 0x51030 - I2C IRQ destination register
-				{
-					m_epic.irq[MPC8240_I2C_IRQ].destination = data & 0x1;
-					epic_update_interrupts();
-					break;
-				}
-			}
-			break;
-		}
-
-		// 0x60000 - 0x6FFFF
-		case 0x6:
-		{
-			switch (reg & 0xffff)
-			{
-				case 0x00b0:            // Offset 0x600B0 - EOI
-#if VIPER_DEBUG_EPIC_INTS
-					if (m_epic.active_irq > 4 && m_epic.active_irq < 20)
-						printf("EPIC IRQ%d cleared.\n", m_epic.active_irq);
-#endif
-					m_epic.irq[m_epic.active_irq].active = 0;
-					m_epic.active_irq = -1;
-
-					epic_update_interrupts();
-					break;
-			}
-			break;
-		}
 	}
 }
 
@@ -1412,10 +1260,14 @@ void viper_state::mpc8240_epic_reset(void)
 		m_epic.irq[i].mask = 1;
 	}
 
-	m_epic.active_irq = -1;
+	for (auto &gt : m_epic.global_timer)
+	{
+		gt.enable = 0;
+		gt.timer->reset();
+	}
 
-	// Init I2C
-	m_epic.i2c_state = I2C_STATE_ADDRESS_CYCLE;
+	m_epic.active_irq = -1;
+	m_epic.pctpr = 0xf;
 }
 
 /*****************************************************************************/
@@ -1450,7 +1302,7 @@ uint64_t viper_state::cf_card_data_r(offs_t offset, uint64_t mem_mask)
 
 			default:
 			{
-				fatalerror("%s:cf_card_data_r: IDE reg %02X\n", machine().describe_context().c_str(), offset & 0xf);
+				throw emu_fatalerror("%s:cf_card_data_r: IDE reg %02X\n", machine().describe_context().c_str(), offset & 0xf);
 			}
 		}
 	}
@@ -1471,7 +1323,7 @@ void viper_state::cf_card_data_w(offs_t offset, uint64_t data, uint64_t mem_mask
 
 			default:
 			{
-				fatalerror("%s:cf_card_data_w: IDE reg %02X, %04X\n", machine().describe_context().c_str(), offset & 0xf, (uint16_t)(data >> 16));
+				throw emu_fatalerror("%s:cf_card_data_w: IDE reg %02X, %04X\n", machine().describe_context().c_str(), offset & 0xf, (uint16_t)(data >> 16));
 			}
 		}
 	}
@@ -1525,7 +1377,7 @@ uint64_t viper_state::cf_card_r(offs_t offset, uint64_t mem_mask)
 		{
 			int reg = offset;
 
-			printf("cf_r: %04X\n", reg);
+			logerror("cf_r: %04X\n", reg);
 
 			if ((reg >> 1) < sizeof(cf_card_tuples))
 			{
@@ -1533,7 +1385,7 @@ uint64_t viper_state::cf_card_r(offs_t offset, uint64_t mem_mask)
 			}
 			else
 			{
-				fatalerror("%s:compact_flash_r: reg %02X\n", machine().describe_context().c_str(), reg);
+				throw emu_fatalerror("%s:compact_flash_r: reg %02X\n", machine().describe_context().c_str(), reg);
 			}
 		}
 	}
@@ -1542,9 +1394,7 @@ uint64_t viper_state::cf_card_r(offs_t offset, uint64_t mem_mask)
 
 void viper_state::cf_card_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
-	#ifdef VIPER_DEBUG_LOG
 	//logerror("%s:compact_flash_w: %08X%08X, %08X, %08X%08X\n", machine().describe_context(), (uint32_t)(data>>32), (uint32_t)(data), offset, (uint32_t)(mem_mask >> 32), (uint32_t)(mem_mask));
-	#endif
 
 	if (ACCESSING_BITS_16_31)
 	{
@@ -1582,7 +1432,7 @@ void viper_state::cf_card_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 
 				default:
 				{
-					fatalerror("%s:compact_flash_w: IDE reg %02X, data %04X\n", machine().describe_context().c_str(), offset & 0xf, (uint16_t)((data >> 16) & 0xffff));
+					throw emu_fatalerror("%s:compact_flash_w: IDE reg %02X, data %04X\n", machine().describe_context().c_str(), offset & 0xf, (uint16_t)((data >> 16) & 0xffff));
 				}
 			}
 		}
@@ -1602,7 +1452,7 @@ void viper_state::cf_card_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 				}
 				default:
 				{
-					fatalerror("%s:compact_flash_w: reg %02X, data %04X\n", machine().describe_context().c_str(), offset, (uint16_t)((data >> 16) & 0xffff));
+					throw emu_fatalerror("%s:compact_flash_w: reg %02X, data %04X\n", machine().describe_context().c_str(), offset, (uint16_t)((data >> 16) & 0xffff));
 				}
 			}
 		}
@@ -1694,7 +1544,7 @@ uint32_t viper_state::voodoo3_pci_r(int function, int reg, uint32_t mem_mask)
 		}
 
 		default:
-			fatalerror("voodoo3_pci_r: %08X at %08X\n", reg, m_maincpu->pc());
+			throw emu_fatalerror("voodoo3_pci_r: %08X at %08X\n", reg, m_maincpu->pc());
 	}
 }
 
@@ -1761,7 +1611,7 @@ void viper_state::voodoo3_pci_w(int function, int reg, uint32_t data, uint32_t m
 		}
 
 		default:
-			fatalerror("voodoo3_pci_w: %08X, %08X at %08X\n", data, reg, m_maincpu->pc());
+			throw emu_fatalerror("voodoo3_pci_w: %08X, %08X at %08X\n", data, reg, m_maincpu->pc());
 	}
 }
 
@@ -1799,23 +1649,6 @@ void viper_state::voodoo3_lfb_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 }
 
 
-TIMER_CALLBACK_MEMBER(viper_state::ds2430_timer_callback)
-{
-	printf("DS2430 timer callback\n");
-
-	if (param == 1)
-	{
-		m_ds2430_unk_status = 0;
-		m_ds2430_timer->adjust(attotime::from_usec(150), 2);
-	}
-	else if (param == 2)
-	{
-		m_ds2430_unk_status = 1;
-		m_ds2430_reset = 1;
-		m_ds2430_state = DS2430_STATE_ROM_COMMAND;
-	}
-}
-
 uint8_t viper_state::input_r(offs_t offset)
 {
 #if 0
@@ -1827,14 +1660,14 @@ uint8_t viper_state::input_r(offs_t offset)
 	if (ACCESSING_BITS_40_47)
 	{
 		uint64_t reg = 0;
-		reg |= (m_ds2430_unk_status << 5);
+		reg |= (m_ds2430->data_r() << 5);
 		reg |= 0x40;        // if this bit is 0, loads a disk copier instead
 		//r |= 0x04;    // screen flip
 		reg |= 0x08;      // memory card check (1 = enable)
 
 		r |= reg << 40;
 
-		//r |= (uint64_t)(m_ds2430_unk_status << 5) << 40;
+		//r |= (uint64_t)(m_ds2430->data_r() << 5) << 40;
 		//r |= 0x0000400000000000U;
 
 		//r |= 0x0000040000000000U; // screen flip
@@ -1866,148 +1699,60 @@ uint8_t viper_state::input_r(offs_t offset)
 #endif
 }
 
-int viper_state::ds2430_insert_cmd_bit(int bit)
+void viper_state::output_w(offs_t offset, uint8_t data)
 {
-	m_ds2430_data <<= 1;
-	m_ds2430_data |= bit & 1;
-	m_ds2430_data_count++;
-
-	if (m_ds2430_data_count >= 8)
+	/*
+	 * -11- ---- always enabled, bit 6 first then bit 5 (sound engine control?)
+	 * ---1 ---- enabled in tsurugi/mocapglf
+	 * ---- x--- output 1
+	 *           \- start button lamp for sscopex
+	 *           \- rotating light for mocapb
+	 * ---- -x-- output 0
+	 *           \- start button lamp for mocapglf
+	 *           \- coin lockout for mfightc
+	 *           \- scope enable for sscopex
+	 *           \- start button lamp for mocapb
+	 * ---- --xx coin counters
+	 *           \- sscopefh sends signals depending on the coin type
+	 */
+	if (offset == 0)
 	{
-		m_ds2430_cmd = m_ds2430_data;
-		m_ds2430_data = 0;
-		m_ds2430_data_count = 0;
-		return 1;
+		machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+		machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
+		m_sound_irq_enabled = bool(BIT(data, 5));
+		return;
 	}
-	return 0;
+	LOG("output_w %02x -> %02x\n", offset, data);
 }
 
-void viper_state::DS2430_w(int bit)
+uint8_t viper_state::ds2430_r()
 {
-	switch (m_ds2430_state)
-	{
-		case DS2430_STATE_ROM_COMMAND:
-		{
-			if (ds2430_insert_cmd_bit(bit))
-			{
-				printf("DS2430_w: rom command %02X\n", m_ds2430_cmd);
-				switch (m_ds2430_cmd)
-				{
-					case 0x33:      m_ds2430_state = DS2430_STATE_READ_ROM; break;
-					case 0xcc:      m_ds2430_state = DS2430_STATE_MEM_FUNCTION; break;
-					default:        fatalerror("DS2430_w: unimplemented rom command %02X\n", m_ds2430_cmd);
-				}
-			}
-			break;
-		}
-
-		case DS2430_STATE_MEM_FUNCTION:
-		{
-			if (ds2430_insert_cmd_bit(bit))
-			{
-				printf("DS2430_w: mem function %02X\n", m_ds2430_cmd);
-				switch (m_ds2430_cmd)
-				{
-					case 0xf0:      m_ds2430_state = DS2430_STATE_READ_MEM_ADDRESS; break;
-					default:        fatalerror("DS2430_w: unimplemented mem function %02X\n", m_ds2430_cmd);
-				}
-			}
-			break;
-		}
-
-		case DS2430_STATE_READ_MEM_ADDRESS:
-		{
-			if (ds2430_insert_cmd_bit(bit))
-			{
-				printf("DS2430_w: read mem address %02X\n", m_ds2430_cmd);
-				m_ds2430_addr = m_ds2430_cmd;
-				m_ds2430_state = DS2430_STATE_READ_MEM;
-			}
-			break;
-		}
-
-		case DS2430_STATE_READ_MEM:
-		{
-			m_ds2430_unk_status = (m_ds2430_rom[(m_ds2430_data_count/8)] >> (m_ds2430_data_count%8)) & 1;
-			m_ds2430_data_count++;
-			printf("DS2430_w: read mem %d, bit = %d\n", m_ds2430_data_count, m_ds2430_unk_status);
-
-			if (m_ds2430_data_count >= 256)
-			{
-				//machine().debug_break();
-
-				m_ds2430_data_count = 0;
-				m_ds2430_state = DS2430_STATE_ROM_COMMAND;
-				m_ds2430_reset = 0;
-			}
-			break;
-		}
-
-		case DS2430_STATE_READ_ROM:
-		{
-			int rombit = (m_ds2430_rom[0x20 + (m_ds2430_data_count/8)] >> (m_ds2430_data_count%8)) & 1;
-			m_ds2430_data_count++;
-			printf("DS2430_w: read rom %d, bit = %d\n", m_ds2430_data_count, rombit);
-
-			m_ds2430_unk_status = rombit;
-
-			if (m_ds2430_data_count >= 64)
-			{
-				m_ds2430_data_count = 0;
-				m_ds2430_state = DS2430_STATE_ROM_COMMAND;
-				m_ds2430_reset = 0;
-			}
-			break;
-		}
-
-		default:
-		{
-			fatalerror("DS2430_w: unknown state %d\n", m_ds2430_cmd);
-		}
-	}
-
-
-}
-
-uint64_t viper_state::e70000_r(offs_t offset, uint64_t mem_mask)
-{
-	if (ACCESSING_BITS_56_63)
-	{
-		m_ds2430_bit_timer->reset();
-
-//      printf("%s e70000_r: %08X (mask %08X%08X)\n", machine().describe_context().c_str(), offset, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
-	}
+	if (!machine().side_effects_disabled())
+		m_ds2430->data_w(0);
 
 	return 0;
 }
 
-void viper_state::e70000_w(offs_t offset, uint64_t data, uint64_t mem_mask)
+void viper_state::ds2430_w(uint8_t data)
 {
-	if (ACCESSING_BITS_56_63)
+	m_ds2430->data_w(1);
+	m_ds2430_ext_select = false;
+}
+
+uint8_t viper_state::ds2430_ext_r()
+{
+	if (m_ds2430_ext.found() && !machine().side_effects_disabled())
+		m_ds2430_ext->data_w(0);
+
+	return 0;
+}
+
+void viper_state::ds2430_ext_w(uint8_t data)
+{
+	if (m_ds2430_ext.found())
 	{
-		if (!m_ds2430_reset)
-		{
-			m_ds2430_timer->adjust(attotime::from_usec(40), 1);   // presence pulse for 240 microsecs
-
-			m_ds2430_unk_status = 1;
-//          printf("e70000_w: %08X%08X, %08X (mask %08X%08X) at %08X\n", (uint32_t)(data >> 32), (uint32_t)data, offset, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask, m_maincpu->pc());
-		}
-		else
-		{
-			// detect bit state by measuring the duration
-			// Bit 0 = ~3.6 microsecs
-			// Bit 1 = ~98 microsecs
-
-			attotime diff_time = m_ds2430_bit_timer->elapsed();
-			m_ds2430_bit_timer->reset();
-			if (diff_time < attotime::from_usec(20))
-				DS2430_w(0);
-			else
-				DS2430_w(1);
-
-//          const char *dtt = diff_time.as_string(8);
-//          printf("   time %s\n", dtt);
-		}
+		m_ds2430_ext->data_w(1);
+		m_ds2430_ext_select = true;
 	}
 }
 
@@ -2023,34 +1768,12 @@ void viper_state::unk1b_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_56_63)
 	{
-		m_ds2430_unk_status = 0;
+		// HACK: put DS2430A in reset state (probably side effect of enabling initial output on a GPIO pin)
+		m_ds2430->data_w(0);
+		if (m_ds2430_ext.found())
+			m_ds2430_ext->data_w(0);
 	//  printf("%s unk1b_w: %08X%08X, %08X (mask %08X%08X) at %08X\n", machine().describe_context().c_str(), (uint32_t)(data >> 32), (uint32_t)data, offset, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
 	}
-}
-
-uint64_t viper_state::e00008_r(offs_t offset, uint64_t mem_mask)
-{
-	uint64_t r = 0;
-	if (ACCESSING_BITS_0_7)
-	{
-		r |= m_e00008_data;
-	}
-
-	return r;
-}
-
-void viper_state::e00008_w(offs_t offset, uint64_t data, uint64_t mem_mask)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		m_e00008_data = data & 0xff;
-	}
-}
-
-uint64_t viper_state::e00000_r()
-{
-	uint64_t r = 0;//0xffffffffffffffffU;
-	return r;
 }
 
 uint64_t viper_state::unk_serial_r(offs_t offset, uint64_t mem_mask)
@@ -2095,7 +1818,7 @@ void viper_state::unk_serial_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 
 					m_unk_serial_data_r = ((data & 0x1) << 7) | ((data & 0x2) << 5) | ((data & 0x4) << 3) | ((data & 0x8) << 1) | ((data & 0x10) >> 1) | ((data & 0x20) >> 3) | ((data & 0x40) >> 5) | ((data & 0x80) >> 7);
 
-					printf("unk_serial read reg %02X: %04X\n", reg, data);
+					logerror("unk_serial read reg %02X: %04X\n", reg, data);
 				}
 			}
 			if (m_unk_serial_bit_w == 16)
@@ -2104,7 +1827,7 @@ void viper_state::unk_serial_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 				{
 					int reg = m_unk_serial_cmd & 0x7f;
 					m_unk_serial_regs[reg] = m_unk_serial_data;
-					printf("unk_serial write reg %02X: %04X\n", reg, m_unk_serial_data);
+					logerror("unk_serial write reg %02X: %04X\n", reg, m_unk_serial_data);
 				}
 
 				m_unk_serial_bit_w = 0;
@@ -2121,9 +1844,10 @@ void viper_state::viper_map(address_map &map)
 {
 //  map.unmap_value_high();
 	map(0x00000000, 0x00ffffff).mirror(0x1000000).ram().share("workram");
-	map(0x80000000, 0x800fffff).rw(FUNC(viper_state::epic_r), FUNC(viper_state::epic_w));
+	map(0x80000000, 0x800fffff).m(*this, FUNC(viper_state::mpc8240_soc_map));
 	map(0x82000000, 0x83ffffff).rw(FUNC(viper_state::voodoo3_r), FUNC(viper_state::voodoo3_w));
 	map(0x84000000, 0x85ffffff).rw(FUNC(viper_state::voodoo3_lfb_r), FUNC(viper_state::voodoo3_lfb_w));
+	// I/O space, Voodoo 3 sets 0x00800001 as BAR2
 	map(0xfe800000, 0xfe8000ff).rw(FUNC(viper_state::voodoo3_io_r), FUNC(viper_state::voodoo3_io_w));
 	map(0xfec00000, 0xfedfffff).rw(FUNC(viper_state::pci_config_addr_r), FUNC(viper_state::pci_config_addr_w));
 	map(0xfee00000, 0xfeefffff).rw(FUNC(viper_state::pci_config_data_r), FUNC(viper_state::pci_config_data_w));
@@ -2131,22 +1855,33 @@ void viper_state::viper_map(address_map &map)
 	// 0xff200000, 0xff200fff - cf_card_r/w (installed in DRIVER_INIT(vipercf))
 	// 0xff300000, 0xff300fff - ata_r/w (installed in DRIVER_INIT(viperhd))
 //  map(0xff400xxx, 0xff400xxx) ppp2nd sense device
-	map(0xffe00000, 0xffe00007).r(FUNC(viper_state::e00000_r));
-	map(0xffe00008, 0xffe0000f).rw(FUNC(viper_state::e00008_r), FUNC(viper_state::e00008_w));
-	map(0xffe08000, 0xffe08007).noprw();
-	map(0xffe10000, 0xffe10007).r(FUNC(viper_state::input_r));
-	map(0xffe28000, 0xffe28007).nopw(); // ppp2nd leds
-	map(0xffe28008, 0xffe2801f).nopw(); // boxingm reads and writes here to read the pad sensor values
+	map(0xffe00000, 0xffe0000f).rw(m_duart_com, FUNC(pc16552_device::read), FUNC(pc16552_device::write));
+	map(0xffe08000, 0xffe08007).nopw(); // timestamp? watchdog?
+	map(0xffe10000, 0xffe10007).rw(FUNC(viper_state::input_r), FUNC(viper_state::output_w));
+	map(0xffe20000, 0xffe20007).nopw(); // motor k-type for deluxe force feedback (xtrial, gticlub2, jpark3)
+	map(0xffe28000, 0xffe28007).nopw(); // ppp2nd/boxingm extended leds
+	map(0xffe28000, 0xffe28007).nopr(); // sscopex busy flag for secondary screen?
+	// boxingm reads and writes here to read the pad sensor values, 2nd adc?
+	// $10 bit 7 (w) clk_write, $18 bit 7 (r) do_read
+//  map(0xffe28008, 0xffe2801f).noprw();
 	map(0xffe30000, 0xffe31fff).rw("m48t58", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write));
-	map(0xffe40000, 0xffe4000f).noprw();
+	map(0xffe40000, 0xffe40007).noprw(); // JTAG? 0x00 on normal operation, other values on POST,
+										 // 0xa8/0xa9 for unexpected irq (namely irq1)
 	map(0xffe50000, 0xffe50007).w(FUNC(viper_state::unk2_w));
 	map(0xffe60000, 0xffe60007).noprw();
-	map(0xffe70000, 0xffe7000f).rw(FUNC(viper_state::e70000_r), FUNC(viper_state::e70000_w));
+	map(0xffe70000, 0xffe70000).rw(FUNC(viper_state::ds2430_r), FUNC(viper_state::ds2430_w));
+	map(0xffe78000, 0xffe78000).rw(FUNC(viper_state::ds2430_ext_r), FUNC(viper_state::ds2430_ext_w));
 	map(0xffe80000, 0xffe80007).w(FUNC(viper_state::unk1a_w));
 	map(0xffe88000, 0xffe88007).w(FUNC(viper_state::unk1b_w));
-	map(0xffe98000, 0xffe98007).noprw();
-	map(0xffe9a000, 0xffe9bfff).ram();                             // World Combat uses this
-	map(0xffea0000, 0xffea0007).noprw(); // Gun sensor? Read heavily by p9112
+	map(0xffe98000, 0xffe98007).noprw(); // network?
+	map(0xffe9a000, 0xffe9bfff).ram();   // wcombat uses this
+	map(0xffea0000, 0xffea0007).lr8(
+		NAME([this] (offs_t offset) {
+			const u8 res = m_gun_input[offset >> 1]->read() >> ((offset & 1) ? 0 : 8);
+			return res;
+		})
+	).nopw(); // Gun sensor? Read heavily by p9112
+	map(0xffea8000, 0xffea8007).nopw(); // sound DMA trigger for block request?
 	map(0xfff00000, 0xfff3ffff).rom().region("user1", 0);       // Boot ROM
 }
 
@@ -2159,9 +1894,9 @@ void viper_state::viper_ppp_map(address_map &map)
 
 /*****************************************************************************/
 
-int viper_state::ds2430_unk_r()
+int viper_state::ds2430_mux_r()
 {
-	return m_ds2430_unk_status;
+	return m_ds2430_ext_select ? m_ds2430_ext->data_r() : m_ds2430->data_r();
 }
 
 static INPUT_PORTS_START( viper )
@@ -2185,63 +1920,108 @@ static INPUT_PORTS_START( viper )
 	PORT_DIPSETTING( 0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(viper_state, ds2430_unk_r)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ds2430", ds2430a_device, data_r)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // if this bit is 0, loads a disk copier instead
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Test Button")
+	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_DIPNAME( 0x20, 0x20, "3" )
+	PORT_DIPNAME( 0x20, 0x20, "3-5" )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x40, "3-6" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "3-3" )
+	PORT_DIPNAME( 0x80, 0x80, "3-7" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN4")
-	PORT_DIPNAME( 0x01, 0x01, "4" )
+	PORT_DIPNAME( 0x01, 0x01, "4-0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x02, 0x02, "4-1" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x04, 0x04, "4-2" )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x08, 0x08, "4-3" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	// following bits controls screen mux in Mocap Golf?
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x10, "4-4" )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x20, "4-5" )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x40, "4-6" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, "4-7" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN5")
-	PORT_BIT(0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_DIPNAME( 0x01, 0x01, "5-0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "5-1" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "5-2" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "5-3" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "5-4" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "5-5" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "5-6" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "5-7" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN6")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN7")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("GUN0")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("GUN1")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("GUN2")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("GUN3")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("AN0")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("AN1")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("AN2")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("AN3")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( ppp2nd )
@@ -2307,13 +2087,26 @@ INPUT_PORTS_START( thrild2 )
 	PORT_MODIFY("IN4")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Shift Up")
 
-	// TODO: analog channels
+	// TODO: normal type steering wheel (non-K type)
+	PORT_MODIFY("AN0")
+	PORT_BIT( 0xfff, 0x000, IPT_PADDLE ) PORT_NAME("Steering Wheel") PORT_MINMAX(0x800,0x7ff) PORT_SENSITIVITY(50) PORT_KEYDELTA(50)
+
+	PORT_MODIFY("AN1")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_NAME("Gas Pedal") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(25) PORT_REVERSE
+
+	PORT_MODIFY("AN2")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_NAME("Brake Pedal") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(25) PORT_REVERSE
 INPUT_PORTS_END
 
 INPUT_PORTS_START( gticlub2 )
 	PORT_INCLUDE( thrild2 )
 
-	// TODO: specific analog channel for hand brake
+	// K-Type steering wheel
+	PORT_MODIFY("AN0")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_NAME("Steering Wheel") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(50) PORT_REVERSE
+
+	PORT_MODIFY("AN3")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL3 ) PORT_NAME("Handbrake Lever") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(25) PORT_REVERSE
 INPUT_PORTS_END
 
 INPUT_PORTS_START( gticlub2ea )
@@ -2334,17 +2127,18 @@ INPUT_PORTS_START( boxingm )
 	PORT_DIPSETTING( 0x00, DEF_STR( No ) )
 
 	PORT_MODIFY("IN4")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Select L")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Select L")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Select R")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("BodyPad L")
+	// as attract claims, following two are for standing up on KO count
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("BodyPad L")
 
 	PORT_MODIFY("IN5")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("BodyPad R")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("BodyPad R")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // memory card check for boxingm (actually comms enable?)
 
+	// TODO: non-i2c analog ports
 INPUT_PORTS_END
 
-// TODO: left/right escape, 2nd service switch?
 INPUT_PORTS_START( jpark3 )
 	PORT_INCLUDE( viper )
 
@@ -2355,6 +2149,24 @@ INPUT_PORTS_START( jpark3 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Gun Trigger") PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 Gun Trigger") PORT_PLAYER(2)
 
+	PORT_MODIFY("IN5")
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Right Escape button")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Left Escape button")
+
+	PORT_MODIFY("GUN0")
+	PORT_BIT( 0x07ff, 0x2f8, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX( 0x00e0, 0x0510 ) PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_PLAYER(1)
+
+	PORT_MODIFY("GUN1")
+	PORT_BIT( 0x01ff, 0x0e7, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0x0020, 0x01af) PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_PLAYER(1)
+
+	PORT_MODIFY("GUN2")
+	PORT_BIT( 0x07ff, 0x2f8, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX( 0x00e0, 0x0510 ) PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_PLAYER(2)
+
+	PORT_MODIFY("GUN3")
+	PORT_BIT( 0x01ff, 0x0e7, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0x0020, 0x01af) PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 INPUT_PORTS_START( p911 )
@@ -2374,6 +2186,26 @@ INPUT_PORTS_START( p911 )
 	PORT_MODIFY("IN5")
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // P2 SHT2 (checks and fails serial if pressed)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	// TODO: corrupted GFXs on calibration screen
+	PORT_MODIFY("GUN0")
+	PORT_BIT( 0x07ff, 0x2f8, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(Y, -1.0, 0.0, 0) PORT_MINMAX( 0x00e0, 0x0510 ) PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_PLAYER(1)
+
+	PORT_MODIFY("GUN1")
+	PORT_BIT( 0x01ff, 0x0e7, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0x0020, 0x01af) PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_PLAYER(1)
+
+	PORT_MODIFY("GUN2")
+	PORT_BIT( 0x07ff, 0x2f8, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(Y, -1.0, 0.0, 0) PORT_MINMAX( 0x00e0, 0x0510 ) PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_PLAYER(2)
+
+	PORT_MODIFY("GUN3")
+	PORT_BIT( 0x01ff, 0x0e7, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0x0020, 0x01af) PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_PLAYER(2)
+INPUT_PORTS_END
+
+INPUT_PORTS_START( p9112 )
+	PORT_INCLUDE( p911 )
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(viper_state, ds2430_mux_r)
 INPUT_PORTS_END
 
 INPUT_PORTS_START( mfightc )
@@ -2389,16 +2221,37 @@ INPUT_PORTS_START( mfightc )
 
 	PORT_MODIFY("IN5")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // if off tries to check UART
+
+	// TODO: touchscreen
 INPUT_PORTS_END
 
 INPUT_PORTS_START( mocapglf )
 	PORT_INCLUDE( viper )
 
+	PORT_MODIFY("IN3")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Select Up")
+
 	PORT_MODIFY("IN4")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Select Down")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Select Left")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Select Right")
 	PORT_DIPNAME( 0x40, 0x40, "Show Diagnostics On Boot" ) // Shows UART status, lamp status, and accelerometer values
 	PORT_DIPSETTING( 0x00, DEF_STR( Yes ) )
 	PORT_DIPSETTING( 0x40, DEF_STR( No ) )
 
+	// TODO: placeholder, can be tested thru I/O check -> G-Sensor check
+	// (is there missing GFXs for pitch/roll angle displays?)
+	PORT_MODIFY("GUN0")
+	PORT_BIT( 0xffff, 0x8000, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(Y, -1.0, 0.0, 0) PORT_MINMAX( 0x0000, 0xffff ) PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_NAME("Pitch Angle X")
+
+	PORT_MODIFY("GUN1")
+	PORT_BIT( 0xffff, 0x8000, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0x0000, 0xffff) PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_NAME("Pitch Angle Y")
+
+	PORT_MODIFY("GUN2")
+	PORT_BIT( 0xffff, 0x8000, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(Y, -1.0, 0.0, 0) PORT_MINMAX( 0x0000, 0xffff ) PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_NAME("Roll Angle X")
+
+	PORT_MODIFY("GUN3")
+	PORT_BIT( 0xffff, 0x8000, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX( 0x0000, 0xffff ) PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_NAME("Roll Angle Y")
 INPUT_PORTS_END
 
 INPUT_PORTS_START( mocapb )
@@ -2415,6 +2268,21 @@ INPUT_PORTS_START( mocapb )
 
 	PORT_MODIFY("IN5")
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // P2 SHT2 (checks and fails serial if pressed)
+
+	// TODO: placeholders, not really IPT_PEDALs and not really PORT_PLAYER(2)
+	PORT_MODIFY("AN0")
+	PORT_BIT( 0xfff, 0x00, IPT_PEDAL ) PORT_NAME("Left Glove Rear-Front") PORT_MINMAX(0x000,0xfff) PORT_SENSITIVITY(50) PORT_KEYDELTA(25) PORT_REVERSE
+
+	PORT_MODIFY("AN1")
+	PORT_BIT( 0xfff, 0x00, IPT_PEDAL2 ) PORT_NAME("Left Glove Left-Right") PORT_MINMAX(0x000,0xfff) PORT_SENSITIVITY(50) PORT_KEYDELTA(25) PORT_REVERSE
+	// TODO: Left Glove Bottom-Top
+
+	PORT_MODIFY("AN2")
+	PORT_BIT( 0xfff, 0x00, IPT_PEDAL ) PORT_NAME("Right Glove Rear-Front") PORT_MINMAX(0x00,0xfff) PORT_SENSITIVITY(50) PORT_KEYDELTA(25) PORT_REVERSE PORT_PLAYER(2)
+
+	PORT_MODIFY("AN3")
+	PORT_BIT( 0xfff, 0x00, IPT_PEDAL2 ) PORT_NAME("Right Glove Left-Right") PORT_MINMAX(0x00,0xfff) PORT_SENSITIVITY(50) PORT_KEYDELTA(25) PORT_REVERSE PORT_PLAYER(2)
+	// TODO: Right Glove Bottom-Top
 INPUT_PORTS_END
 
 INPUT_PORTS_START( sscopefh )
@@ -2429,7 +2297,8 @@ INPUT_PORTS_START( sscopefh )
 	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
 
 	PORT_MODIFY("IN3")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Refill Key")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Refill Key")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Hopper") // causes hopper errors if pressed, TBD
 
 	PORT_MODIFY("IN4")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("Credit 2 Pounds") // Currency probably changes between regions
@@ -2476,18 +2345,22 @@ INPUT_PORTS_START( tsurugi )
 
 	PORT_MODIFY("IN5")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Foot Pedal")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // deluxe ID? if off tries to check UART & "lampo"/bleeder at POST
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // sensor grip (1) horizontal (0) vertical
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // deluxe ID? memory card check?
+												// if off tries to check UART & "lampo"/bleeder at POST
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Sensor Grip")
 INPUT_PORTS_END
 
 INPUT_PORTS_START( wcombat )
 	PORT_INCLUDE( viper )
 
 	PORT_MODIFY("IN2")
-	PORT_DIPNAME( 0x01, 0x00, "DIP4" ) PORT_DIPLOCATION("SW:4") // Skip device check? wcombatu is playable when this is set
+	PORT_DIPNAME( 0x01, 0x00, "DIP4" ) PORT_DIPLOCATION("SW:4")
 	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW:2")
+	PORT_DIPNAME( 0x02, 0x02, "Mirror Screen X" ) PORT_DIPLOCATION("SW:3")
+	PORT_DIPSETTING( 0x00, DEF_STR( Yes ) )
+	PORT_DIPSETTING( 0x02, DEF_STR( No ) )
+	PORT_DIPNAME( 0x04, 0x04, "Mirror Screen Y" ) PORT_DIPLOCATION("SW:2")
 	PORT_DIPSETTING( 0x00, DEF_STR( Yes ) )
 	PORT_DIPSETTING( 0x04, DEF_STR( No ) )
 	PORT_DIPNAME( 0x08, 0x00, "Memory Card Check On Boot" ) PORT_DIPLOCATION("SW:1")
@@ -2498,7 +2371,24 @@ INPUT_PORTS_START( wcombat )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_MODIFY("IN4")
+	PORT_DIPNAME( 0x04, 0x04, "Diag test enable" ) // possibly PL1 IPT_BUTTON4 sense
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // X flip screen
+
+	// TODO: whatever it reads from the i2c analog ports (needs service mode)
+INPUT_PORTS_END
+
+// twin cab version?
+INPUT_PORTS_START( wcombatj )
+	PORT_INCLUDE( wcombat )
+
+	// TODO: check if DIP2 ID selects side as stated by the manual
+
+	// Specifically works in this version only
+	PORT_MODIFY("IN5")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START4 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START3 )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( xtrial )
@@ -2511,52 +2401,75 @@ INPUT_PORTS_START( xtrial )
 	PORT_DIPNAME( 0x08, 0x00, "Memory Card Check On Boot" ) PORT_DIPLOCATION("SW:1") // Crashes at 45% when card checks are enabled
 	PORT_DIPSETTING( 0x08, DEF_STR( On ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
+
+	PORT_MODIFY("IN3")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Shift Down")
+
+	PORT_MODIFY("IN4")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Shift Up")
+
+	// virtually identical to gticlub
+	PORT_MODIFY("AN0")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_NAME("Steering Wheel") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(50) PORT_REVERSE
+
+	PORT_MODIFY("AN1")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_NAME("Gas Pedal") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(25) PORT_REVERSE
+
+	PORT_MODIFY("AN2")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_NAME("Brake Pedal") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(25) PORT_REVERSE
+
+	PORT_MODIFY("AN3")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL3 ) PORT_NAME("Handbrake Lever") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(25) PORT_REVERSE
 INPUT_PORTS_END
 
 INPUT_PORTS_START( code1d )
 	PORT_INCLUDE( viper )
 
 	PORT_MODIFY("IN2")
-	PORT_DIPNAME( 0x01, 0x00, "DIP4" ) PORT_DIPLOCATION("SW:4") // Unknown, but without this set the game won't display anything besides a blue screen
+	// Unknown, but without this set the game won't display anything besides a blue screen
+	PORT_DIPNAME( 0x01, 0x00, "DIP4" ) PORT_DIPLOCATION("SW:4")
 	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "Calibrate Controls On Boot" ) PORT_DIPLOCATION("SW:2") // Game crashes during boot when this is on
+	// needs it to be on otherwise analog inputs won't work in gameplay
+	PORT_DIPNAME( 0x04, 0x04, "Calibrate Controls On Boot" ) PORT_DIPLOCATION("SW:2")
 	PORT_DIPSETTING( 0x04, DEF_STR( Yes ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( No ) )
 	PORT_DIPNAME( 0x08, 0x00, "Memory Card Check On Boot" ) PORT_DIPLOCATION("SW:1")
 	PORT_DIPSETTING( 0x08, DEF_STR( On ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(viper_state, ds2430_mux_r)
 
 	PORT_MODIFY("IN4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Action Button")
 
+	PORT_MODIFY("AN0")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_NAME("Steering Wheel") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(50) PORT_REVERSE
+
+	PORT_MODIFY("AN1")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_NAME("Gas Pedal") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(25) PORT_REVERSE
+
+	PORT_MODIFY("AN2")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_NAME("Brake Pedal") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(25) PORT_REVERSE
 INPUT_PORTS_END
 
 /*****************************************************************************/
 
-INTERRUPT_GEN_MEMBER(viper_state::viper_vblank)
+void viper_state::uart_int(int state)
 {
-	//mpc8240_interrupt(MPC8240_IRQ0);
-	//mpc8240_interrupt(MPC8240_IRQ3);
+	if (state)
+		mpc8240_interrupt(MPC8240_IRQ2);
 }
 
 void viper_state::voodoo_vblank(int state)
 {
 	if (state)
-	  mpc8240_interrupt(MPC8240_IRQ0);
-	//mpc8240_interrupt(MPC8240_IRQ3);
+		mpc8240_interrupt(MPC8240_IRQ0);
 }
 
 void viper_state::voodoo_pciint(int state)
 {
 	if (state)
-	{
-		// This is a hack.
-		// There's no obvious (to me) trigger for when it's safe to start the audio interrupts, but after testing all of the games that can boot, it's safe to start audio interrupts once pciint is triggering.
-		m_sound_irq_enabled = true;
-
 		mpc8240_interrupt(MPC8240_IRQ4);
-	}
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(viper_state::sound_timer_callback)
@@ -2587,8 +2500,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(viper_state::sound_timer_callback)
 
 void viper_state::machine_start()
 {
-	m_ds2430_timer = timer_alloc(FUNC(viper_state::ds2430_timer_callback), this);
 	mpc8240_epic_init();
+
+	m_i2c.timer = timer_alloc(FUNC(viper_state::i2c_timer_callback), this);
 
 	/* set conservative DRC options */
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
@@ -2606,25 +2520,20 @@ void viper_state::machine_start()
 	save_item(NAME(m_unk_serial_regs));
 	save_item(NAME(m_sound_buffer_offset));
 	save_item(NAME(m_sound_irq_enabled));
-
-	save_item(NAME(m_ds2430_unk_status));
-	save_item(NAME(m_ds2430_data));
-	save_item(NAME(m_ds2430_data_count));
-	save_item(NAME(m_ds2430_reset));
-	save_item(NAME(m_ds2430_state));
-	save_item(NAME(m_ds2430_cmd));
-	save_item(NAME(m_ds2430_addr)); // written but never used
+	if (m_ds2430_ext.found())
+		save_item(NAME(m_ds2430_ext_select));
 
 	save_item(NAME(m_epic.iack));
 	save_item(NAME(m_epic.eicr)); // written but never used
 	save_item(NAME(m_epic.svr));
 	save_item(NAME(m_epic.active_irq));
-	save_item(NAME(m_epic.i2c_adr));
-	save_item(NAME(m_epic.i2c_freq_div));
-	save_item(NAME(m_epic.i2c_freq_sample_rate));
-	save_item(NAME(m_epic.i2c_cr));
-	save_item(NAME(m_epic.i2c_sr));
-	save_item(NAME(m_epic.i2c_state));
+
+	save_item(NAME(m_i2c.adr));
+	save_item(NAME(m_i2c.fdr));
+	save_item(NAME(m_i2c.dffsr));
+	save_item(NAME(m_i2c.cr));
+	save_item(NAME(m_i2c.sr));
+	save_item(NAME(m_i2c.state));
 
 	save_item(STRUCT_MEMBER(m_epic.irq, vector));
 	save_item(STRUCT_MEMBER(m_epic.irq, priority));
@@ -2639,10 +2548,6 @@ void viper_state::machine_start()
 	m_unk_serial_bit_w = 0;
 	std::fill(std::begin(m_unk_serial_regs), std::end(m_unk_serial_regs), 0);
 
-	m_ds2430_data_count = 0;
-	m_ds2430_state = 0;
-	m_ds2430_reset = 0;
-
 	std::fill(std::begin(m_voodoo3_pci_reg), std::end(m_voodoo3_pci_reg), 0);
 	std::fill(std::begin(m_mpc8240_regs), std::end(m_mpc8240_regs), 0);
 }
@@ -2650,6 +2555,9 @@ void viper_state::machine_start()
 void viper_state::machine_reset()
 {
 	mpc8240_epic_reset();
+
+	m_i2c.state = I2C_STATE_ADDRESS_CYCLE;
+	m_i2c.timer->reset();
 
 	ide_hdd_device *hdd = m_ata->subdevice<ata_slot_device>("0")->subdevice<ide_hdd_device>("hdd");
 	uint16_t *identify_device = hdd->identify_device_buffer();
@@ -2668,16 +2576,20 @@ void viper_state::machine_reset()
 		m_dmadac[i]->enable(1);
 	}
 
-	m_ds2430_unk_status = 1;
+	m_ds2430->data_w(1);
+	if (m_ds2430_ext.found())
+		m_ds2430_ext->data_w(1);
+	m_ds2430_ext_select = false;
 }
 
 void viper_state::viper(machine_config &config)
 {
 	/* basic machine hardware */
-	MPC8240(config, m_maincpu, 166666666); // Unknown
-	m_maincpu->set_bus_frequency(100000000);
+	MPC8240(config, m_maincpu, PCI_CLOCK * 6); // 200 Mhz
+	m_maincpu->set_bus_frequency(PCI_CLOCK * 2); // TODO: x2 for AGP, Epic gets x1
 	m_maincpu->set_addrmap(AS_PROGRAM, &viper_state::viper_map);
-	m_maincpu->set_vblank_int("screen", FUNC(viper_state::viper_vblank));
+
+	DS2430A(config, m_ds2430);
 
 	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
 	pcibus.set_device( 0, FUNC(viper_state::mpc8240_pci_r), FUNC(viper_state::mpc8240_pci_w));
@@ -2685,8 +2597,13 @@ void viper_state::viper(machine_config &config)
 
 	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
 
+	PC16552D(config, "duart_com", 0);
+	// TODO: unverified clocks and channel types, likely connects to sensor motion based games
+	NS16550(config, "duart_com:chan0", XTAL(19'660'800));
+	NS16550(config, "duart_com:chan1", XTAL(19'660'800)).out_int_callback().set(FUNC(viper_state::uart_int));
+
 	VOODOO_3(config, m_voodoo, voodoo_3_device::NOMINAL_CLOCK);
-	m_voodoo->set_fbmem(8);
+	m_voodoo->set_fbmem(8); // TODO: should be 16, implement VMI_DATA_5 strapping pin in Voodoo 3 core instead
 	m_voodoo->set_screen("screen");
 	m_voodoo->set_cpu("maincpu");
 	m_voodoo->set_status_cycles(1000); // optimization to consume extra cycles when polling status
@@ -2699,12 +2616,9 @@ void viper_state::viper(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_size(1024, 768);
 	screen.set_visarea(0, 1024 - 1, 0, 768 - 1);
-	screen.set_screen_update(FUNC(viper_state::screen_update_viper));
+	screen.set_screen_update(FUNC(viper_state::screen_update));
 
 	PALETTE(config, "palette").set_entries(65536);
-
-	TIMER(config, "ds2430_timer2", 0);
-	//TIMER(config, "ds2430_timer2").configure_generic(timer_device::expired_delegate());
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -2721,10 +2635,34 @@ void viper_state::viper(machine_config &config)
 	TIMER(config, "sound_timer").configure_periodic(FUNC(viper_state::sound_timer_callback), attotime::from_hz(44100.0 / 256));
 }
 
+void viper_state::viper_dongle(machine_config &config)
+{
+	viper(config);
+	DS2430A(config, m_ds2430_ext);
+}
+
 void viper_state::viper_ppp(machine_config &config)
 {
 	viper(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &viper_state::viper_ppp_map);
+}
+
+// mocapb / p911 alt speaker config
+void viper_state::viper_fullbody(machine_config &config)
+{
+	viper(config);
+	config.device_remove("lspeaker");
+	config.device_remove("rspeaker");
+	SPEAKER(config, "front").front_center();
+	SPEAKER(config, "rear").rear_center();
+	DMADAC(config.replace(), "dacl").add_route(ALL_OUTPUTS, "front", 1.0);
+	DMADAC(config.replace(), "dacr").add_route(ALL_OUTPUTS, "rear", 1.0);
+}
+
+void viper_state::viper_fbdongle(machine_config &config)
+{
+	viper_fullbody(config);
+	DS2430A(config, m_ds2430_ext);
 }
 
 void viper_state::omz3d_map(address_map &map)
@@ -2845,10 +2783,10 @@ ROM_START(code1d) //*
 	VIPER_BIOS
 
 	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* game-specific DS2430 on PCB */
-	ROM_LOAD("ds2430_code1d.u3", 0x00, 0x28, BAD_DUMP CRC(fada04dd) SHA1(49bd4e87d48f0404a091a79354bbc09cde739f5c))
+	ROM_LOAD("ds2430_code1d2.u3", 0x00, 0x28, BAD_DUMP CRC(817e725f) SHA1(0c36ddf1e0c4dc6f6b46ec73d3e86eb58247fa42))
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
-	ROM_LOAD("nvram.u39", 0x00000, 0x2000, NO_DUMP )
+	ROM_LOAD("m48t58_uad.u39", 0x00000, 0x2000, CRC(22ef677d) SHA1(10b1e68d409edeca5af70aff1146b7373eeb3864) )
 
 	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE( "922d02", 0, SHA1(01f35e324c9e8567da0f51b3e68fff1562c32116) )
@@ -2865,19 +2803,6 @@ ROM_START(code1db) //*
 
 	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE( "922b02", 0, SHA1(4d288b5dcfab3678af662783e7083a358eee99ce) )
-ROM_END
-
-ROM_START(code1da) //*
-	VIPER_BIOS
-
-	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* game-specific DS2430 on PCB */
-	ROM_LOAD("ds2430_code1d.u3", 0x00, 0x28, BAD_DUMP CRC(fada04dd) SHA1(49bd4e87d48f0404a091a79354bbc09cde739f5c))
-
-	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
-	ROM_LOAD("m48t58_uaa.u39", 0x00000, 0x2000, CRC(22ef677d) SHA1(10b1e68d409edeca5af70aff1146b7373eeb3864) )
-
-	DISK_REGION( "ata:0:hdd" )
-	DISK_IMAGE( "922uaa02", 0, SHA1(795d82d51a37f197c36366cb36a2dfa8797e5f9f) )
 ROM_END
 
 ROM_START(gticlub2) //*
@@ -3086,7 +3011,7 @@ ROM_END
 ROM_START(p9112) /* dongle-protected version */
 	VIPER_BIOS
 
-	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* plug-in male DIN5 dongle containing a DS2430. The sticker on the dongle says 'GCB11-UA' */
+	ROM_REGION(0x28, "ds2430_ext", ROMREGION_ERASE00)       /* plug-in male DIN5 dongle containing a DS2430. The sticker on the dongle says 'GCB11-UA' */
 	ROM_LOAD("ds2430_p9112.u3", 0x00, 0x28, CRC(d745c6ee) SHA1(065c9d0df1703b3bbb53a07f4923fdee3b16f80e))
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
@@ -3427,32 +3352,31 @@ GAME(2001, ppp2nd,    kviper,    viper_ppp, ppp2nd,     viper_state, init_viperh
 GAME(2001, ppp2nda,   ppp2nd,    viper_ppp, ppp2nd,     viper_state, init_viperhd,  ROT0,  "Konami", "ParaParaParadise 2nd Mix (AAA)", MACHINE_NOT_WORKING)
 
 GAME(2001, boxingm,   kviper,    viper,     boxingm,    viper_state, init_vipercf,  ROT0,  "Konami", "Boxing Mania: Ashita no Joe (ver JAA)", MACHINE_NOT_WORKING)
-GAME(2000, code1d,    kviper,    viper,     code1d,     viper_state, init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.21 (ver UAD)", MACHINE_NOT_WORKING)
-GAME(2000, code1db,   code1d,    viper,     code1d,     viper_state, init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.16 (ver UAB)", MACHINE_NOT_WORKING)
-GAME(2000, code1da,   code1d,    viper,     code1d,     viper_state, init_vipercf,  ROT0,  "Konami", "Code One Dispatch (ver UAA)", MACHINE_NOT_WORKING)
+GAME(2000, code1d,    kviper,    viper_dongle,     code1d,     viper_state, init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.21 (ver UAD)", MACHINE_NOT_WORKING)
+GAME(2000, code1db,   code1d,    viper_dongle,     code1d,     viper_state, init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.16 (ver UAB)", MACHINE_NOT_WORKING)
 GAME(2000, gticlub2,  kviper,    viper,     gticlub2,   viper_state, init_vipercf,  ROT0,  "Konami", "GTI Club: Corso Italiano (ver JAB)", MACHINE_NOT_WORKING)
 GAME(2000, gticlub2ea,gticlub2,  viper,     gticlub2ea, viper_state, init_vipercf,  ROT0,  "Konami", "Driving Party: Racing in Italy (ver EAA)", MACHINE_NOT_WORKING)
 GAME(2001, jpark3,    kviper,    viper,     jpark3,     viper_state, init_vipercf,  ROT0,  "Konami", "Jurassic Park III (ver EBC)", MACHINE_NOT_WORKING)
 GAME(2001, jpark3u,   jpark3,    viper,     jpark3,     viper_state, init_vipercf,  ROT0,  "Konami", "Jurassic Park III (ver UBC)", MACHINE_NOT_WORKING)
-GAME(2001, mocapglf,  kviper,    viper_omz, mocapglf,   viper_state, init_vipercf,  ROT90, "Konami", "Mocap Golf (ver UAA)", MACHINE_NOT_WORKING)
-GAME(2001, mocapb,    kviper,    viper,     mocapb,     viper_state, init_vipercf,  ROT90, "Konami", "Mocap Boxing (ver AAB)", MACHINE_NOT_WORKING)
-GAME(2001, mocapbj,   mocapb,    viper,     mocapb,     viper_state, init_vipercf,  ROT90, "Konami", "Mocap Boxing (ver JAA)", MACHINE_NOT_WORKING)
-GAME(2000, p911,      kviper,    viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver AAE)", MACHINE_NOT_WORKING)
-GAME(2000, p911k,     p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver KAE)", MACHINE_NOT_WORKING)
-GAME(2000, p911ac,    p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver AAC)", MACHINE_NOT_WORKING)
-GAME(2000, p911kc,    p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver KAC)", MACHINE_NOT_WORKING)
-GAME(2000, p911ud,    p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 911 (ver UAD)", MACHINE_NOT_WORKING)
-GAME(2000, p911ed,    p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 24/7 (ver EAD)", MACHINE_NOT_WORKING)
-GAME(2000, p911ea,    p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 24/7 (ver EAD, alt)", MACHINE_NOT_WORKING)
-GAME(2000, p911j,     p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver JAE)", MACHINE_NOT_WORKING)
-GAME(2001, p9112,     kviper,    viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 911 2 (VER. UAA:B)", MACHINE_NOT_WORKING)
-GAME(2001, sscopex,   kviper,    viper,     sscopex,    viper_state, init_vipercf,  ROT0,  "Konami", "Silent Scope EX (ver UAA)", MACHINE_NOT_WORKING)
-GAME(2001, sogeki,    sscopex,   viper,     sogeki,     viper_state, init_vipercf,  ROT0,  "Konami", "Sogeki (ver JAA)", MACHINE_NOT_WORKING)
-GAME(2002, sscopefh,  kviper,    viper,     sscopefh,   viper_state, init_vipercf,  ROT0,  "Konami", "Silent Scope Fortune Hunter (ver EAA)", MACHINE_NOT_WORKING)
+GAME(2001, mocapglf,  kviper,    viper_omz, mocapglf,   viper_subscreen_state, init_vipercf,  ROT90, "Konami", "Mocap Golf (ver EAA:B)", MACHINE_NOT_WORKING)
+GAME(2001, mocapb,    kviper,    viper_fullbody, mocapb,     viper_state, init_vipercf,  ROT90, "Konami", "Mocap Boxing (ver AAB)", MACHINE_NOT_WORKING)
+GAME(2001, mocapbj,   mocapb,    viper_fullbody, mocapb,     viper_state, init_vipercf,  ROT90, "Konami", "Mocap Boxing (ver JAA)", MACHINE_NOT_WORKING)
+GAME(2000, p911,      kviper,    viper_fullbody,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver AAE)", MACHINE_NOT_WORKING)
+GAME(2000, p911k,     p911,      viper_fullbody,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver KAE)", MACHINE_NOT_WORKING)
+GAME(2000, p911ac,    p911,      viper_fullbody,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver AAC)", MACHINE_NOT_WORKING)
+GAME(2000, p911kc,    p911,      viper_fullbody,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver KAC)", MACHINE_NOT_WORKING)
+GAME(2000, p911ud,    p911,      viper_fullbody,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 911 (ver UAD)", MACHINE_NOT_WORKING)
+GAME(2000, p911ed,    p911,      viper_fullbody,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 24/7 (ver EAD)", MACHINE_NOT_WORKING)
+GAME(2000, p911ea,    p911,      viper_fullbody,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 24/7 (ver EAD, alt)", MACHINE_NOT_WORKING)
+GAME(2000, p911j,     p911,      viper_fullbody,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver JAE)", MACHINE_NOT_WORKING)
+GAME(2001, p9112,     kviper,    viper_fbdongle,     p9112,      viper_state, init_vipercf,  ROT90, "Konami", "Police 911 2 (VER. UAA:B)", MACHINE_NOT_WORKING)
+GAME(2001, sscopex,   kviper,    viper,     sscopex,    viper_subscreen_state, init_vipercf,  ROT0,  "Konami", "Silent Scope EX (ver UAA)", MACHINE_NOT_WORKING)
+GAME(2001, sogeki,    sscopex,   viper,     sogeki,     viper_subscreen_state, init_vipercf,  ROT0,  "Konami", "Sogeki (ver JAA)", MACHINE_NOT_WORKING)
+GAME(2002, sscopefh,  kviper,    viper,     sscopefh,   viper_subscreen_state, init_vipercf,  ROT0,  "Konami", "Silent Scope Fortune Hunter (ver EAA)", MACHINE_NOT_WORKING) // UK only?
 GAME(2001, thrild2,   kviper,    viper,     thrild2,    viper_state, init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver EBB)", MACHINE_NOT_WORKING)
-GAME(2001, thrild2j,  thrild2,   viper,     thrild2,    viper_state, init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver JAA)", MACHINE_NOT_WORKING)
-GAME(2001, thrild2a,  thrild2,   viper,     thrild2,    viper_state, init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver AAA)", MACHINE_NOT_WORKING)
-GAME(2001, thrild2ab, thrild2,   viper,     thrild2,    viper_state, init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver AAA, alt)", MACHINE_NOT_WORKING)
+GAME(2001, thrild2j,  thrild2,   viper,     gticlub2,   viper_state, init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver JAA)", MACHINE_NOT_WORKING)
+GAME(2001, thrild2a,  thrild2,   viper,     gticlub2,   viper_state, init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver AAA)", MACHINE_NOT_WORKING)
+GAME(2001, thrild2ab, thrild2,   viper,     gticlub2,   viper_state, init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver AAA, alt)", MACHINE_NOT_WORKING)
 GAME(2001, thrild2ac, thrild2,   viper,     thrild2,    viper_state, init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver AAA, alt 2)", MACHINE_NOT_WORKING)
 GAME(2001, thrild2c,  thrild2,   viper,     thrild2,    viper_state, init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver EAA)", MACHINE_NOT_WORKING)
 GAME(2002, tsurugi,   kviper,    viper,     tsurugi,    viper_state, init_vipercf,  ROT0,  "Konami", "Tsurugi (ver EAB)", MACHINE_NOT_WORKING)
@@ -3462,7 +3386,7 @@ GAME(2002, wcombat,   kviper,    viper,     wcombat,    viper_state, init_viperc
 GAME(2002, wcombatb,  wcombat,   viper,     wcombat,    viper_state, init_vipercf,  ROT0,  "Konami", "World Combat (ver AAD:B, alt)", MACHINE_NOT_WORKING)
 GAME(2002, wcombatk,  wcombat,   viper,     wcombat,    viper_state, init_vipercf,  ROT0,  "Konami", "World Combat (ver KBC:B)", MACHINE_NOT_WORKING)
 GAME(2002, wcombatu,  wcombat,   viper,     wcombat,    viper_state, init_vipercf,  ROT0,  "Konami", "World Combat / Warzaid (ver UCD:B)", MACHINE_NOT_WORKING)
-GAME(2002, wcombatj,  wcombat,   viper,     wcombat,    viper_state, init_vipercf,  ROT0,  "Konami", "World Combat (ver JAA)", MACHINE_NOT_WORKING)
+GAME(2002, wcombatj,  wcombat,   viper,     wcombatj,   viper_state, init_vipercf,  ROT0,  "Konami", "World Combat (ver JAA)", MACHINE_NOT_WORKING)
 GAME(2002, xtrial,    kviper,    viper,     xtrial,     viper_state, init_vipercf,  ROT0,  "Konami", "Xtrial Racing (ver JAB)", MACHINE_NOT_WORKING)
 
 GAME(2002, mfightc,   kviper,    viper,     mfightc,    viper_state, init_vipercf,  ROT0,  "Konami", "Mahjong Fight Club (ver JAD)", MACHINE_NOT_WORKING)

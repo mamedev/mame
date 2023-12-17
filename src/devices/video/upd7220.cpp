@@ -1173,6 +1173,11 @@ void upd7220_device::process_fifo()
 		break;
 
 	case COMMAND_SYNC: /* sync format specify */
+		if (flag == FIFO_COMMAND)
+		{
+			m_de = m_cr & 1;
+		}
+
 		if (m_param_ptr == 9)
 		{
 			m_mode = m_pr[1];

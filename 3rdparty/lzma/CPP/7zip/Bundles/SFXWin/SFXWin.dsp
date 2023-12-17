@@ -44,7 +44,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /Gz /MD /W4 /WX /GX /O1 /D "NDEBUG" /D "_SFXWIN32" /D "_WINDOWS" /D "_MBCS" /D "EXTRACT_ONLY" /D "NO_REGISTRY" /D "NO_READ_FROM_CODER" /D "_SFX" /Yu"StdAfx.h" /FD /c
+# ADD CPP /nologo /Gz /MD /W4 /WX /GX /O1 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "Z7_EXTRACT_ONLY" /D "Z7_NO_REGISTRY" /D "Z7_NO_READ_FROM_CODER" /D "Z7_SFX" /Yu"StdAfx.h" /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x419 /d "NDEBUG"
@@ -71,7 +71,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /Gz /MTd /W4 /WX /Gm /GX /ZI /Od /D "_DEBUG" /D "_SFXWIN32" /D "_WINDOWS" /D "_MBCS" /D "EXTRACT_ONLY" /D "NO_REGISTRY" /D "NO_READ_FROM_CODER" /D "_SFX" /Yu"StdAfx.h" /FD /GZ /c
+# ADD CPP /nologo /Gz /MTd /W4 /WX /Gm /GX /ZI /Od /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "Z7_EXTRACT_ONLY" /D "Z7_NO_REGISTRY" /D "Z7_NO_READ_FROM_CODER" /D "Z7_SFX" /Yu"StdAfx.h" /FD /GZ /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x419 /d "_DEBUG"
@@ -97,8 +97,8 @@ LINK32=link.exe
 # PROP Intermediate_Dir "SFXWin___Win32_ReleaseD"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
-# ADD BASE CPP /nologo /Gz /MT /W3 /GX /O1 /I "..\..\..\\" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "EXTRACT_ONLY" /D "EXCLUDE_COM" /D "NO_REGISTRY" /D "_SFX" /Yu"StdAfx.h" /FD /c
-# ADD CPP /nologo /Gz /MD /W4 /WX /GX /O1 /D "NDEBUG" /D "_SFXWIN32" /D "_WINDOWS" /D "_MBCS" /D "EXTRACT_ONLY" /D "NO_REGISTRY" /D "NO_READ_FROM_CODER" /D "_SFX" /Yu"StdAfx.h" /FD /c
+# ADD BASE CPP /nologo /Gz /MT /W3 /GX /O1 /I "..\..\..\\" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "Z7_EXTRACT_ONLY" /D "Z7_NO_REGISTRY" /D "Z7_SFX" /Yu"StdAfx.h" /FD /c
+# ADD CPP /nologo /Gz /MD /W4 /WX /GX /O1 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "Z7_EXTRACT_ONLY" /D "Z7_NO_REGISTRY" /D "Z7_NO_READ_FROM_CODER" /D "Z7_SFX" /Yu"StdAfx.h" /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x419 /d "NDEBUG"
@@ -221,11 +221,19 @@ SOURCE=..\..\Compress\Bcj2Coder.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Compress\Bcj2Coder.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Compress\Bcj2Register.cpp
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\Compress\BcjCoder.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Compress\BcjCoder.h
 # End Source File
 # Begin Source File
 
@@ -246,6 +254,10 @@ SOURCE=..\..\Compress\BranchRegister.cpp
 # Begin Source File
 
 SOURCE=..\..\Compress\CopyCoder.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Compress\CopyCoder.h
 # End Source File
 # Begin Source File
 
@@ -274,6 +286,10 @@ SOURCE=..\..\Compress\LzmaRegister.cpp
 # Begin Source File
 
 SOURCE=..\..\Compress\PpmdDecoder.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Compress\PpmdDecoder.h
 # End Source File
 # Begin Source File
 
@@ -677,6 +693,10 @@ SOURCE=..\..\..\Common\CommandLineParser.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\Common\Common.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\Common\CRC.cpp
 # End Source File
 # Begin Source File
@@ -851,6 +871,15 @@ SOURCE=..\..\..\..\C\7zCrcOpt.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\..\C\7zStream.c
+# SUBTRACT CPP /YX /Yc /Yu
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\C\7zWindows.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\..\C\Aes.c
 # SUBTRACT CPP /YX /Yc /Yu
 # End Source File
@@ -899,6 +928,10 @@ SOURCE=..\..\..\..\C\Bra86.c
 
 SOURCE=..\..\..\..\C\BraIA64.c
 # SUBTRACT CPP /YX /Yc /Yu
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\C\Compiler.h
 # End Source File
 # Begin Source File
 
@@ -993,13 +1026,33 @@ SOURCE=..\..\..\..\C\Threads.c
 SOURCE=..\..\..\..\C\Threads.h
 # End Source File
 # End Group
+# Begin Group "7zip"
+
+# PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=.\7z.ico
+SOURCE=..\..\Archive\IArchive.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\7z1.ico
+SOURCE=..\..\ICoder.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\IDecl.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\IPassword.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\IProgress.h
+# End Source File
+# End Group
+# Begin Source File
+
+SOURCE=.\7z.ico
 # End Source File
 # Begin Source File
 

@@ -2686,13 +2686,9 @@ public:
 
 	void tmtennis(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(difficulty_switch) { set_clock(); }
-
-protected:
-	virtual void machine_reset() override;
+	DECLARE_INPUT_CHANGED_MEMBER(skill_switch);
 
 private:
-	void set_clock();
 	void update_display();
 	void grid_w(offs_t offset, u8 data);
 	void plate_w(offs_t offset, u8 data);
@@ -2700,20 +2696,14 @@ private:
 	u8 input_r(offs_t offset);
 };
 
-void tmtennis_state::machine_reset()
-{
-	hh_ucom4_state::machine_reset();
-	set_clock();
-}
-
 // handlers
 
-void tmtennis_state::set_clock()
+INPUT_CHANGED_MEMBER(tmtennis_state::skill_switch)
 {
 	// MCU clock is from an LC circuit oscillating by default at ~360kHz,
 	// but on PRO1, the difficulty switch puts a capacitor across the LC circuit
 	// to slow it down to ~260kHz.
-	m_maincpu->set_unscaled_clock((m_inputs[1]->read() & 0x100) ? 260000 : 360000);
+	m_maincpu->set_unscaled_clock((newval & 0x100) ? 260000 : 360000);
 }
 
 void tmtennis_state::update_display()
@@ -2776,9 +2766,9 @@ static INPUT_PORTS_START( tmtennis )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("P1 Button 6")
 
 	PORT_START("IN.1") // E1 port A/B
-	PORT_CONFNAME( 0x101, 0x100, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, tmtennis_state, difficulty_switch, 0)
+	PORT_CONFNAME( 0x101, 0x100, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, tmtennis_state, skill_switch, 0)
 	PORT_CONFSETTING(     0x001, "Practice" )
-	PORT_CONFSETTING(     0x100, "Pro 1" ) // -> difficulty_switch
+	PORT_CONFSETTING(     0x100, "Pro 1" ) // -> skill_switch
 	PORT_CONFSETTING(     0x000, "Pro 2" )
 	PORT_CONFNAME( 0x02, 0x00, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x00, "1" )
@@ -2796,7 +2786,7 @@ INPUT_PORTS_END
 void tmtennis_state::tmtennis(machine_config &config)
 {
 	// basic machine hardware
-	NEC_D552(config, m_maincpu, 360000); // see set_clock
+	NEC_D552(config, m_maincpu, 260000); // see skill_switch
 	m_maincpu->read_a().set(FUNC(tmtennis_state::input_r));
 	m_maincpu->read_b().set(FUNC(tmtennis_state::input_r));
 	m_maincpu->write_c().set(FUNC(tmtennis_state::plate_w));

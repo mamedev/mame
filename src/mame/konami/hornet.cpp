@@ -1310,11 +1310,8 @@ void hornet_state::hornet(machine_config &config)
 	screen.set_raw(XTAL(64'000'000) / 4, 644, 41, 41 + 512, 428, 27, 27 + 384);
 	screen.set_screen_update(FUNC(hornet_state::screen_update<0>));
 
-	PALETTE(config, "palette").set_entries(65536);
-
 	K037122(config, m_k037122[0], 0);
 	m_k037122[0]->set_screen("screen");
-	m_k037122[0]->set_palette("palette");
 
 	K056800(config, m_k056800, XTAL(16'934'400));
 	m_k056800->int_callback().set_inputline(m_audiocpu, M68K_IRQ_2);
@@ -1386,11 +1383,9 @@ void hornet_state::sscope(machine_config &config)
 	m_dsp[1]->set_addrmap(AS_DATA, &hornet_state::sharc1_map);
 
 	m_k037122[0]->set_screen("lscreen");
-	m_k037122[0]->set_palette("palette");
 
 	K037122(config, m_k037122[1], 0); // unknown input clock
 	m_k037122[1]->set_screen("rscreen");
-	m_k037122[1]->set_palette("palette");
 
 	m_voodoo[0]->set_screen("lscreen");
 

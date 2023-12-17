@@ -33,7 +33,7 @@ protected:
 void pc_hyper98_state::pc_h98_map(address_map &map)
 {
 	pc_hyper98_state::pc9801bx2_map(map);
-//	map(0x080000, 0x0bffff).unmaprw(); // RAM window
+//  map(0x080000, 0x0bffff).unmaprw(); // RAM window
 	// TODO: bigger, needs fn mods
 	map(0x0c0000, 0x0dffff).rw(FUNC(pc_hyper98_state::grcg_gvram0_r), FUNC(pc_hyper98_state::grcg_gvram0_w));
 	map(0x0e0000, 0x0e3fff).rw(FUNC(pc_hyper98_state::tvram_r), FUNC(pc_hyper98_state::tvram_w));
@@ -204,7 +204,7 @@ ROM_START( pc_h98s )
 	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )
 
 	LOAD_KANJI_ROMS
-//	LOAD_IDE_ROM
+//  LOAD_IDE_ROM
 ROM_END
 
 COMP( 1991, pc_h98s, 0,   0, pc_h98s, pc_h98,   pc_hyper98_state, init_pc9801_kanji,   "NEC",   "PC-H98S model 8/U8", MACHINE_IS_SKELETON )

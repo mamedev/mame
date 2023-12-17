@@ -98,13 +98,13 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport m_inputs;
 
+	u8 m_inp_mux = 0;
+	u8 m_led_data = 0;
+
 	void update_display();
 	template<int N> void mux_w(u8 data);
 	void leds_w(u16 data);
 	u16 input_r();
-
-	u8 m_inp_mux = 0;
-	u8 m_led_data = 0;
 };
 
 void scptchess_state::machine_start()
@@ -190,7 +190,7 @@ INPUT_PORTS_END
 void scptchess_state::scptchess_v1(machine_config &config)
 {
 	// basic machine hardware
-	HD44801(config, m_maincpu, 400000);
+	HD44801(config, m_maincpu, 400'000);
 	m_maincpu->write_r<2>().set(FUNC(scptchess_state::mux_w<0>));
 	m_maincpu->write_r<3>().set(FUNC(scptchess_state::mux_w<1>));
 	m_maincpu->write_d().set(FUNC(scptchess_state::leds_w));

@@ -40,6 +40,8 @@
 
 #include "emu.h"
 
+#include "taitoio_opto.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/tc009xlvc.h"
 #include "machine/te7750.h"
@@ -47,8 +49,6 @@
 #include "machine/timer.h"
 #include "sound/okim6295.h"
 #include "sound/ymopn.h"
-
-#include "taitoio_opto.h"
 
 #include "screen.h"
 #include "speaker.h"

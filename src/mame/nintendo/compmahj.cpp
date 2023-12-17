@@ -52,10 +52,10 @@ public:
 	void compmahj(machine_config &config);
 
 private:
+	required_device<lh5801_cpu_device> m_maincpu;
+
 	void main_map(address_map &map);
 	void io_map(address_map &map);
-
-	required_device<lh5801_cpu_device> m_maincpu;
 
 	u8 ita_r();
 };

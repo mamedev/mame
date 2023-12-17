@@ -885,7 +885,7 @@ void mediagx_state::mediagx(machine_config &config)
 
 	// TODO: checked at POST, wants a debug device?
 	PC_LPT(config, m_lpt0);
-//	m_lpt0->irq_handler().set("mb:pic8259", FUNC(pic8259_device::ir7_w));
+//  m_lpt0->irq_handler().set("mb:pic8259", FUNC(pic8259_device::ir7_w));
 
 	pcat_common(config);
 

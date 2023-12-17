@@ -4,12 +4,48 @@
 license:CC0-1.0
 -->
 <softwarelist name="sega_beena_cart" description="Sega Beena cartridges">
-	<!-- you must byteswap ROMs to see text, due to endian? -->
 
-	<software name="1nichi10" supported="no">
+	<software name="10masu" supported="yes">
+		<description>Point Gakushuu 10-masu Keisan</description>
+		<year>2006</year>
+		<publisher>Sega Toys</publisher>
+		<info name="alt_title" value="ポイント学習 10マスけいさん"/>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x400000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="S-100019-1004 - Point Gakushuu 10-masu Keisan (Japan).bin" size="0x400000" crc="9c493b67" sha1="293656c39f32d3ecb8a13ad033cb71443ecb52ad"/>
+			</dataarea>
+			<dataarea name="page1" size="0x1a1ff54"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x1a1ff54" crc="eea4e20e" sha1="7408e95d8a40dd5395464e5cb104d5a940554935"/>
+			</dataarea>
+			<dataarea name="page2" size="0x1c46313"> <!-- book pages -->
+				<rom name="0 - 0002.png" size="0x1c46313" crc="d238a1f8" sha1="ae66ab6ae2517c282681d3353b4c12baf38101a2"/>
+			</dataarea>
+			<dataarea name="page3" size="0x1c0e107"> <!-- book pages -->
+				<rom name="0 - 0003.png" size="0x1c0e107" crc="ae16ad22" sha1="a541d35c4d1271c7c65147a411c89a6b2dc3130a"/>
+			</dataarea>
+			<dataarea name="page4" size="0x1bf9904"> <!-- book pages -->
+				<rom name="0 - 0004.png" size="0x1bf9904" crc="c5894f03" sha1="29ce47b0e49c65390794429411af98f197d41f92"/>
+			</dataarea>
+			<dataarea name="page5" size="0x1a520a8"> <!-- book pages -->
+				<rom name="0 - 0005.png" size="0x1a520a8" crc="4663a562" sha1="6fc6df53de9ae2ec4d38ff4f215a5175e700de4c"/>
+			</dataarea>
+			<dataarea name="page6" size="0x1de3fd8"> <!-- book pages -->
+				<rom name="0 - 0006.png" size="0x1de3fd8" crc="435dd30b" sha1="c04ad9b97309c740dc5c082990e85c0e3e8d2cf6"/>
+			</dataarea>
+			<dataarea name="page7" size="0x1c8219e"> <!-- book pages -->
+				<rom name="0 - 0007.png" size="0x1c8219e" crc="25ec00b8" sha1="7452eace81a443dc2c882924af0f73a72ba10581"/>
+			</dataarea>
+			<dataarea name="page8" size="0x1bdf542"> <!-- book pages -->
+				<rom name="0 - 0008.png" size="0x1bdf542" crc="76ff1dd5" sha1="ab86e6336a2f2539c6d03400c64bb46e4be3305a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="1nichi10" supported="partial">
 		<description>1-nichi 10-pun de E ga Jouzu ni Kakeru Beena</description>
 		<year>2008</year>
 		<publisher>Sega Toys</publisher>
+		<notes>SD-Card Reader is not emulated</notes>
 		<info name="alt_title" value="1日10分でえがじょうずにかけるビーナ"/>
 		<part name="cart" interface="sega_beena_cart">
 			<dataarea name="rom" size="0x800000" width="32" endianness="big">
@@ -54,10 +90,228 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="anpawaku" supported="no">
+	<software name="abcprk" supported="yes">
+		<description>Shimajirou no Eigo Activity Ehon: ABC Park de Asobou!</description>
+		<year>2006</year>
+		<publisher>Sega Toys</publisher>
+		<info name="alt_title" value="しまじろうのえいごアクティビティえほん ABCパークであそぼう！"/>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x800000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="T-140001-1001 - Shimajirou no Eigo Activity Ehon - ABC Park de Asobou (Japan).bin" size="0x800000" crc="e2a6b373" sha1="6aabcdc5625d8510dc95e01eae32844900c2a8a5"/>
+			</dataarea>
+			<dataarea name="page1" size="0x1c534e3"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x1c534e3" crc="a29324b2" sha1="bad41fe33e8e2f3cccacc760a87b7b9fa1d081f1"/>
+			</dataarea>
+			<dataarea name="page2" size="0x1aec300"> <!-- book pages -->
+				<rom name="0 - 0002.png" size="0x1aec300" crc="f6176f0b" sha1="8981b3c0b0c2b0c80cd530b111aca3f704f3f01a"/>
+			</dataarea>
+			<dataarea name="page3" size="0x1c5c88d"> <!-- book pages -->
+				<rom name="0 - 0003.png" size="0x1c5c88d" crc="12070a61" sha1="136c572c3c027a60d31d2ea815c562a91afb4889"/>
+			</dataarea>
+			<dataarea name="page4" size="0x1c36373"> <!-- book pages -->
+				<rom name="0 - 0004.png" size="0x1c36373" crc="78297725" sha1="99880bf54bbc5af6c221f54ffdf071e559f17cf7"/>
+			</dataarea>
+			<dataarea name="page5" size="0x1d5fe7a"> <!-- book pages -->
+				<rom name="0 - 0005.png" size="0x1d5fe7a" crc="8096d6a4" sha1="1f9304540695bcd4064effe32ff453f844c852c1"/>
+			</dataarea>
+			<dataarea name="page6" size="0x1ad3b31"> <!-- book pages -->
+				<rom name="0 - 0006.png" size="0x1ad3b31" crc="e81f311b" sha1="dae7e9777ee186253be279ab3ade1b53edf660c8"/>
+			</dataarea>
+			<dataarea name="page7" size="0x1c9cd7b"> <!-- book pages -->
+				<rom name="0 - 0007.png" size="0x1c9cd7b" crc="f36dbb40" sha1="8e15a9e51b534b980b0b474ca9fc54826b02be36"/>
+			</dataarea>
+			<dataarea name="page8" size="0x1bf2493"> <!-- book pages -->
+				<rom name="0 - 0008.png" size="0x1bf2493" crc="1b793d67" sha1="d376e4d367dcf25a924ee0ec90f54f2115a94dd0"/>
+			</dataarea>
+			<dataarea name="page9" size="0x1d02efc"> <!-- book pages -->
+				<rom name="0 - 0009.png" size="0x1d02efc" crc="a1d9eb9d" sha1="5dbca8ce6a27c1faa6b7f718aad22b5808185bc3"/>
+			</dataarea>
+			<dataarea name="page10" size="0x1a41eaf"> <!-- book pages -->
+				<rom name="0 - 0010.png" size="0x1a41eaf" crc="ab1a9902" sha1="a9822f7acef5e4b524b6a879304afbf107763765"/>
+			</dataarea>
+			<dataarea name="page11" size="0x1cef9f0"> <!-- book pages -->
+				<rom name="0 - 0011.png" size="0x1cef9f0" crc="cd4f083b" sha1="f6f814a136783e6c3b78f4e909c9eab688757087"/>
+			</dataarea>
+			<dataarea name="page12" size="0x17e32a4"> <!-- book pages -->
+				<rom name="0 - 0012.png" size="0x17e32a4" crc="d40ab82a" sha1="318af579124674ddb20215e0afa84bc455f24308"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="advdrv" supported="no">
+		<description>Go! Go! Advance Drive: 6-tsu no Machine ni Chousen da!</description>
+		<year>2005</year>
+		<publisher>Sega Toys</publisher>
+		<info name="alt_title" value="GO!GO!アドバンスドライブ～6つのマシンに挑戦だ!～"/>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x800000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="S-100004-1000 - Go Go Advance Drive - 6-tsu no Machine ni Chousen da (Japan).bin" size="0x800000" crc="27013198" sha1="5c43debc3d00ad39e78d526c65f5c6c019c46e53"/>
+			</dataarea>
+			<dataarea name="page1" size="0x1417c15"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x1417c15" crc="a1292e39" sha1="6a37ba2ffcc839415e2f591a1ec5287851c5d648"/>
+			</dataarea>
+			<dataarea name="page2" size="0x16e6cb0"> <!-- book pages -->
+				<rom name="0 - 0002.png" size="0x16e6cb0" crc="c17f9c1d" sha1="5968d4fa08da233fe06fe58684e514f5d61f18b1"/>
+			</dataarea>
+			<dataarea name="page3" size="0x1755d32"> <!-- book pages -->
+				<rom name="0 - 0003.png" size="0x1755d32" crc="9235a71f" sha1="a83779417d0afcadbd742c0db9eaec52e901a391"/>
+			</dataarea>
+			<dataarea name="page4" size="0x16cbe28"> <!-- book pages -->
+				<rom name="0 - 0004.png" size="0x16cbe28" crc="b4f06882" sha1="31334f087480099d3e9389b239ff42fa1d274588"/>
+			</dataarea>
+			<dataarea name="page5" size="0x1734ed9"> <!-- book pages -->
+				<rom name="0 - 0005.png" size="0x1734ed9" crc="a316a839" sha1="f6cbf0bc3f314b7bf3c1dee4541d1a7837435926"/>
+			</dataarea>
+			<dataarea name="page6" size="0x17a4b96"> <!-- book pages -->
+				<rom name="0 - 0006.png" size="0x17a4b96" crc="d59bcca9" sha1="852533b7d69fe01d3c8e1a398775003cd11f53c2"/>
+			</dataarea>
+			<dataarea name="page7" size="0x178eeb8"> <!-- book pages -->
+				<rom name="0 - 0007.png" size="0x178eeb8" crc="d018eb06" sha1="2140a8a765223969911f9db185ba305c8e353c6a"/>
+			</dataarea>
+			<dataarea name="page8" size="0x1742466"> <!-- book pages -->
+				<rom name="0 - 0008.png" size="0x1742466" crc="e475ee4f" sha1="358661d5084e28e7d9f251922f1a9c0ce6705ff0"/>
+			</dataarea>
+			<dataarea name="page9" size="0x1849247"> <!-- book pages -->
+				<rom name="0 - 0009.png" size="0x1849247" crc="f2dd07b9" sha1="08e0f52d72e4da329ded4d321dbc2f02103d88b4"/>
+			</dataarea>
+			<dataarea name="page10" size="0x156a000"> <!-- book pages -->
+				<rom name="0 - 0010.png" size="0x156a000" crc="78996f95" sha1="bb0f466e72778a3b029dc23182d7d4bda031c4da"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anpaabc" supported="no">
+		<description>Soreike! Anpanman Card de Tanoshiku ABC</description>
+		<year>2006</year>
+		<publisher>Sega Toys</publisher>
+		<info name="alt_title" value="それいけ！アンパンマンカードでたのしく♪ABC"/>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x800000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="S-100016-1000 - Soreike Anpanman Card de Tanoshiku ABC (Japan).bin" size="0x800000" crc="c08872bf" sha1="1f575821a7d4ac2af96f1af031b10367ba6ade98"/>
+			</dataarea>
+			<dataarea name="page1" size="0x1897242"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x1897242" crc="eb69057e" sha1="554905c5c38bde64f2488d7bcdb7d8d2f31472da"/>
+			</dataarea>
+			<dataarea name="page2" size="0x185d2b1"> <!-- book pages -->
+				<rom name="0 - 0002.png" size="0x185d2b1" crc="058e578e" sha1="7512cc28c84a3e849d28c979b55327ba90f1cb45"/>
+			</dataarea>
+			<dataarea name="page3" size="0x180c71d"> <!-- book pages -->
+				<rom name="0 - 0003.png" size="0x180c71d" crc="863eb5fb" sha1="dfeedc49aaf56bda7a93b547ae700d03f8712c9c"/>
+			</dataarea>
+			<dataarea name="page4" size="0x1a77273"> <!-- book pages -->
+				<rom name="0 - 0004.png" size="0x1a77273" crc="764a9cc8" sha1="2bad074980b8f8e04a04f0f86591ff7ca7fb95ad"/>
+			</dataarea>
+			<dataarea name="page5" size="0x193e84b"> <!-- book pages -->
+				<rom name="0 - 0005.png" size="0x193e84b" crc="c84b9659" sha1="16075c1e6fe139daf0e0989160857171ab686d0e"/>
+			</dataarea>
+			<dataarea name="page6" size="0x1759710"> <!-- book pages -->
+				<rom name="0 - 0006.png" size="0x1759710" crc="b0114e20" sha1="ae6820e191b7b42ca045571915d6e84a1fa56a4a"/>
+			</dataarea>
+			<dataarea name="page7" size="0x188f521"> <!-- book pages -->
+				<rom name="0 - 0007.png" size="0x188f521" crc="2f92f654" sha1="5dc47ba40815e69ddef868b12ad44350190227a1"/>
+			</dataarea>
+			<dataarea name="page8" size="0x13a85a9"> <!-- book pages -->
+				<rom name="0 - 0008.png" size="0x13a85a9" crc="92338e43" sha1="7e99f82bfe574479e31ba7189ea0042cf0b13c1e"/>
+			</dataarea>
+			<dataarea name="page9" size="0x130f19d"> <!-- book pages -->
+				<rom name="0 - 0009.png" size="0x130f19d" crc="24ad5674" sha1="8993d7f4994ec6bc71f635624dbd693e81f3a5d4"/>
+			</dataarea>
+			<dataarea name="page10" size="0x13a1f78"> <!-- book pages -->
+				<rom name="0 - 0010.png" size="0x13a1f78" crc="1c7b70d5" sha1="e5f5f2a54fa4294ffa6c4960ba6cec5ea0f1d82f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anpasaga" supported="partial">
+		<description>Anpanman o Sagase!</description>
+		<year>2009</year>
+		<publisher>Sega Toys</publisher>
+		<notes>SD-Card Reader is not emulated</notes>
+		<info name="alt_title" value="アンパンマンをさがせ！"/>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x800000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="S-100038-1000 - Anpanman o Sagase (Japan).bin" size="0x800000" crc="2d1d222f" sha1="3e27953601f2d8ea69639f289c35c0917649e3b7"/>
+			</dataarea>
+			<dataarea name="page1" size="0x1881fad"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x1881fad" crc="417df7d6" sha1="700aebde38a5e0261994bd1e9af1db4ead8155c5"/>
+			</dataarea>
+			<dataarea name="page2" size="0x1b2af41"> <!-- book pages -->
+				<rom name="0 - 0002.png" size="0x1b2af41" crc="7aaa7c21" sha1="7fee8a9229f4998bac644007c012cfd1462bd7c0"/>
+			</dataarea>
+			<dataarea name="page3" size="0x1c03ae7"> <!-- book pages -->
+				<rom name="0 - 0003.png" size="0x1c03ae7" crc="0f8e16a0" sha1="7597d0dbf3ffa096a373f376a6c819ced1b427a9"/>
+			</dataarea>
+			<dataarea name="page4" size="0x11160be"> <!-- book pages -->
+				<rom name="0 - 0004.png" size="0x11160be" crc="e0bb4d48" sha1="ac5398d8ccf01bb8b6e8b101a9a32fdf2da7b8df"/>
+			</dataarea>
+			<dataarea name="page5" size="0xf19726"> <!-- book pages -->
+				<rom name="0 - 0005.png" size="0xf19726" crc="09ceb170" sha1="1693f270badf840205d940e5df8482739f9aa4d3"/>
+			</dataarea>
+			<dataarea name="page6" size="0x1b8a90e"> <!-- book pages -->
+				<rom name="0 - 0006.png" size="0x1b8a90e" crc="2aff66d7" sha1="f7a11b45dd173988d90354df93dfcae9f6493cff"/>
+			</dataarea>
+			<dataarea name="page7" size="0x1bf011a"> <!-- book pages -->
+				<rom name="0 - 0007.png" size="0x1bf011a" crc="ba8ee337" sha1="cc4aae6656ae2d2ef116af5bdd4c55c26366627d"/>
+			</dataarea>
+			<dataarea name="page8" size="0x1a5e371"> <!-- book pages -->
+				<rom name="0 - 0008.png" size="0x1a5e371" crc="6b495642" sha1="09f0ddafff84c4cbf7bd5b065306747566cae5fd"/>
+			</dataarea>
+			<dataarea name="page9" size="0x1a045b8"> <!-- book pages -->
+				<rom name="0 - 0009.png" size="0x1a045b8" crc="6916920c" sha1="05a4d61ef6df161581d3eb2204c183a3719ca7df"/>
+			</dataarea>
+			<dataarea name="page10" size="0x1634cf6"> <!-- book pages -->
+				<rom name="0 - 0010.png" size="0x1634cf6" crc="d59fd116" sha1="d38e87a7fb1e83efae80dcb3a4de877adaf357d3"/>
+			</dataarea>
+			<dataarea name="page11" size="0x1669417"> <!-- book pages -->
+				<rom name="0 - 0011.png" size="0x1669417" crc="24bbc59f" sha1="69220651e0d4981b992fc9365f9917e023b77ce7"/>
+			</dataarea>
+			<dataarea name="page12" size="0x14fde43"> <!-- book pages -->
+				<rom name="0 - 0012.png" size="0x14fde43" crc="33cc6977" sha1="e80c472fab8a69770e4ba56308df9dba7b852a23"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anpatv" supported="no">
+		<description>Soreike! Anpanman O-Mise ga Ippai! TV de O-Ryouri Tsukutchao</description>
+		<year>2009</year>
+		<publisher>Sega Toys</publisher>
+		<info name="alt_title" value="それいけ！アンパンマンおみせがいっぱい！TVでおりょうりつくっちゃお"/>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x800000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="S-100040-1000 - Soreike Anpanman o-Mise ga Ippai TV de o-Ryouri Tsukutchao (Japan).bin" size="0x800000" crc="b443fb55" sha1="791bbb6a92fc7be0af4b9530890acd4a70458ed9"/>
+			</dataarea>
+			<dataarea name="page1" size="0x19a3ca7"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x19a3ca7" crc="d9ae8d87" sha1="9981aa2c736ce7d98822e9b03afefe702beb0919"/>
+			</dataarea>
+			<dataarea name="page2" size="0x1c1ceb8"> <!-- book pages -->
+				<rom name="0 - 0002.png" size="0x1c1ceb8" crc="18790397" sha1="6dd5231f90741f6ee132bd8bd3185218f3d65450"/>
+			</dataarea>
+			<dataarea name="page3" size="0x1be8d12"> <!-- book pages -->
+				<rom name="0 - 0003.png" size="0x1be8d12" crc="a1906327" sha1="9cf3d76809e35c023f18ae795a0f5a5da2651b86"/>
+			</dataarea>
+			<dataarea name="page4" size="0x1a94a1c"> <!-- book pages -->
+				<rom name="0 - 0004.png" size="0x1a94a1c" crc="d71e0904" sha1="9f4c05fd8418fd4e73cba4638405927859d72fb6"/>
+			</dataarea>
+			<dataarea name="page5" size="0x1b42f9a"> <!-- book pages -->
+				<rom name="0 - 0005.png" size="0x1b42f9a" crc="6e8f7ec7" sha1="ed55af90c811217d1f989a0ce25b197270a84ab2"/>
+			</dataarea>
+			<dataarea name="page6" size="0x1abb0fc"> <!-- book pages -->
+				<rom name="0 - 0006.png" size="0x1abb0fc" crc="654452cf" sha1="d5236dc60fd45d232b7fe22d0dbf3a8a69204f08"/>
+			</dataarea>
+			<dataarea name="page7" size="0x1a87911"> <!-- book pages -->
+				<rom name="0 - 0007.png" size="0x1a87911" crc="a1e1b1d2" sha1="d936adaf0819183b24741797c9d18f424304215a"/>
+			</dataarea>
+			<dataarea name="page8" size="0x19a1ae4"> <!-- book pages -->
+				<rom name="0 - 0008.png" size="0x19a1ae4" crc="f7bb8849" sha1="d041cc58f48fbecc5a05bbc8757a96e6b70c2a0f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anpawaku" supported="partial">
 		<description>Anpanman no Waku Waku Game Oekaki</description>
 		<year>2007</year>
 		<publisher>Sega Toys</publisher>
+		<notes>SD-Card Reader is not emulated</notes>
 		<info name="alt_title" value="アンパンマンのわくわくゲームおえかき"/>
 		<part name="cart" interface="sega_beena_cart">
 			<dataarea name="rom" size="0x800000" width="32" endianness="big">
@@ -102,8 +356,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="asngnk" supported="no">
-		<description>Shoku Iku Series 1 Soreike! Anpanman-Sukikirai Nai Ko Genki na Ko!</description>
+	<software name="asngnk" supported="yes">
+		<description>Shoku Iku Series 1 Soreike! Anpanman: Sukikirai Nai Ko Genki na Ko!</description>
 		<year>2005</year>
 		<publisher>Sega Toys</publisher>
 		<info name="alt_title" value="食育シリーズ①それいけ！アンパンマンすききらいないこげんきなこ！"/>
@@ -150,7 +404,43 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="btowneyo" supported="no">
+	<software name="btown_2" supported="yes" cloneof="btowneyo">
+		<description>Beena Town e Youkoso (Rev. S-100001-1002)</description>
+		<year>2005</year>
+		<publisher>Sega Toys</publisher>
+		<info name="alt_title" value="ビーナタウンへようこそ"/>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x400000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="S-100001-1002 - Beena Town e Youkoso (Japan).bin" size="0x400000" crc="907d3d39" sha1="316e0b863f393532b0ba67e0b4b8849603065255"/>
+			</dataarea>
+			<dataarea name="page1" size="0x1c327b9"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x1c327b9" crc="3662374d" sha1="5216c18488d6db7a8e93f5d4cbcede5575395a2f"/>
+			</dataarea>
+			<dataarea name="page2" size="0x1ce75de"> <!-- book pages -->
+				<rom name="0 - 0002.png" size="0x1ce75de" crc="1d46d70d" sha1="8dc3f6e08480722baad6eab89e959cee80848a22"/>
+			</dataarea>
+			<dataarea name="page3" size="0x1afac6b"> <!-- book pages -->
+				<rom name="0 - 0003.png" size="0x1afac6b" crc="261b9874" sha1="45bc032838dc564e45f532b8841b546d3b2c4557"/>
+			</dataarea>
+			<dataarea name="page4" size="0x1b8a05b"> <!-- book pages -->
+				<rom name="0 - 0004.png" size="0x1b8a05b" crc="6977c801" sha1="6cdf59e5fb32469948b4827227cb0a464e700a0f"/>
+			</dataarea>
+			<dataarea name="page5" size="0x1c11ce1"> <!-- book pages -->
+				<rom name="0 - 0005.png" size="0x1c11ce1" crc="74419e92" sha1="70ce56359a8d85d4d468843c513fded6f2be69b3"/>
+			</dataarea>
+			<dataarea name="page6" size="0x17be3b5"> <!-- book pages -->
+				<rom name="0 - 0006.png" size="0x17be3b5" crc="a1770e56" sha1="6204924fa7aae1cc8e60fa546b696c9081006e38"/>
+			</dataarea>
+			<dataarea name="page7" size="0x19066f5"> <!-- book pages -->
+				<rom name="0 - 0007.png" size="0x19066f5" crc="3d625200" sha1="d0d78b67fdf0aa36219995665b8a677893d2cd5d"/>
+			</dataarea>
+			<dataarea name="page8" size="0x1c75a06"> <!-- book pages -->
+				<rom name="0 - 0008.png" size="0x1c75a06" crc="57c4a730" sha1="f472267a83d8d37a4e1230e575e2873b9cde2832"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="btowneyo" supported="yes">
 		<description>Beena Town e Youkoso</description>
 		<year>2005</year>
 		<publisher>Sega Toys</publisher>
@@ -182,6 +472,271 @@ license:CC0-1.0
 			</dataarea>
 			<dataarea name="page8" size="0x203de88"> <!-- book pages -->
 				<rom name="0 - 0008.png" size="0x203de88" crc="f8b7cca2" sha1="62be480fe570c4a3724693379fe2917af21c428f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cars2" supported="no">
+		<description>Cars 2 Racing Beena: Mezase! World Champion!</description>
+		<year>2011</year>
+		<publisher>Sega Toys</publisher>
+		<info name="alt_title" value="カーズ2 レーシングビーナめざせ！ワールドチャンピオン！"/>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x800000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="S-100044-1000 - Cars 2 Racing Beena - Mezase World Champion (Japan).bin" size="0x800000" crc="d2c69997" sha1="772fd0455c7e39ef09395015094648c5f0fa62d5"/>
+			</dataarea>
+			<dataarea name="page1" size="0x1da19f7"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x1da19f7" crc="3606f76d" sha1="b62758477f4efc947094c1125647a1da56976c9b"/>
+			</dataarea>
+			<dataarea name="page2" size="0x1e71676"> <!-- book pages -->
+				<rom name="0 - 0002.png" size="0x1e71676" crc="911426ae" sha1="964c4464dca244d84e07cc0830687ef53b130b9d"/>
+			</dataarea>
+			<dataarea name="page3" size="0x1edc2a1"> <!-- book pages -->
+				<rom name="0 - 0003.png" size="0x1edc2a1" crc="27002dcb" sha1="63cf434ece36af22468ffc7f33bca486a874c61e"/>
+			</dataarea>
+			<dataarea name="page4" size="0x1e11185"> <!-- book pages -->
+				<rom name="0 - 0004.png" size="0x1e11185" crc="679a92af" sha1="51ed13a8a2dae4dd2eb4787a19d33c55fb2fcd69"/>
+			</dataarea>
+			<dataarea name="page5" size="0x1e5b6b8"> <!-- book pages -->
+				<rom name="0 - 0005.png" size="0x1e5b6b8" crc="2f9a3890" sha1="491f5958f83a1101fbe994d72c4ce3f9384a84e2"/>
+			</dataarea>
+			<dataarea name="page6" size="0x1f934a7"> <!-- book pages -->
+				<rom name="0 - 0006.png" size="0x1f934a7" crc="56a3e6bc" sha1="1d34afd4e943fc8ec9dae6a6dea8ae25ee8a2311"/>
+			</dataarea>
+			<dataarea name="page7" size="0x1f70896"> <!-- book pages -->
+				<rom name="0 - 0007.png" size="0x1f70896" crc="289e0ba2" sha1="dd976bbffd1f91bfc59c9fec5630587b30aeee50"/>
+			</dataarea>
+			<dataarea name="page8" size="0x1e7314c"> <!-- book pages -->
+				<rom name="0 - 0008.png" size="0x1e7314c" crc="71a010c0" sha1="bc5b6589cce4e5bccbb80ad29ad152b2c36a513d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cinnamo" supported="partial">
+		<description>Cinnamoroll: Cafe Cinnamon de O-Tetsudai</description>
+		<year>2006</year>
+		<publisher>Bandai</publisher>
+		<notes>Missing console pad rendering</notes>
+		<info name="alt_title" value="シナモロールカフェ・シナモンでおてつだい"/>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x400000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="T-110005-1000 - Cinnamoroll - Cafe Cinnamon de o-Tetsudai (Japan).bin" size="0x400000" crc="45e98b8b" sha1="928c4e497b0897240cc875a01aa5d1c101eb5757"/>
+			</dataarea>
+			<dataarea name="page1" size="0x1489837"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x1489837" crc="f087e8c7" sha1="ef4eb42f778842b86ae76a14ef4e0c701622c9d3"/>
+			</dataarea>
+			<dataarea name="page2" size="0x1496163"> <!-- book pages -->
+				<rom name="0 - 0002.png" size="0x1496163" crc="5bf5aa55" sha1="5c76a3c2beaa7a107aadfc4fef0ab2eb6a137ba0"/>
+			</dataarea>
+			<dataarea name="page3" size="0x1622582"> <!-- book pages -->
+				<rom name="0 - 0003.png" size="0x1622582" crc="79def0c8" sha1="e843a1201ff25539cc3bc9cb4a31f1915dd4a531"/>
+			</dataarea>
+			<dataarea name="page4" size="0x151ba19"> <!-- book pages -->
+				<rom name="0 - 0004.png" size="0x151ba19" crc="886abb16" sha1="01e6d250c8e010888a9de5fb9d8b4506ce8718ad"/>
+			</dataarea>
+			<dataarea name="page5" size="0x13f439a"> <!-- book pages -->
+				<rom name="0 - 0005.png" size="0x13f439a" crc="004382d5" sha1="48493bc6cf87afea326a326e1fc2275240c1f6df"/>
+			</dataarea>
+			<dataarea name="page6" size="0x1855f8f"> <!-- book pages -->
+				<rom name="0 - 0006.png" size="0x1855f8f" crc="f98f6c03" sha1="492ce90da6a40096bccddec36cfb4f1fc3d9d330"/>
+			</dataarea>
+			<dataarea name="page7" size="0x1a2a133"> <!-- book pages -->
+				<rom name="0 - 0007.png" size="0x1a2a133" crc="f1085df1" sha1="c9d84549145ba2446112a2a0fea829c8f135d072"/>
+			</dataarea>
+			<dataarea name="page8" size="0x176693f"> <!-- book pages -->
+				<rom name="0 - 0008.png" size="0x176693f" crc="3574c45c" sha1="360909aa974da59ce703eb4c8c6577d2c84412f9"/>
+			</dataarea>
+			<dataarea name="page9" size="0x16a61f7"> <!-- book pages -->
+				<rom name="0 - 0009.png" size="0x16a61f7" crc="a4c91dcf" sha1="30c42f14b53121a3058ea94b7ead2b5b428d952f"/>
+			</dataarea>
+			<dataarea name="page10" size="0x1b5f464"> <!-- book pages -->
+				<rom name="0 - 0010.png" size="0x1b5f464" crc="8c9c08f6" sha1="dd0fa55d07c98382ad4ea9a9f8f2bf2abc05c990"/>
+			</dataarea>
+			<dataarea name="page11" size="0x195b8bf"> <!-- book pages -->
+				<rom name="0 - 0011.png" size="0x195b8bf" crc="dcaf2100" sha1="b524fe5d06da7eb2b0107d4ce3f9ca264240b3b2"/>
+			</dataarea>
+			<dataarea name="page12" size="0x17d31c8"> <!-- book pages -->
+				<rom name="0 - 0012.png" size="0x17d31c8" crc="0d6ab42b" sha1="fffa227e2059f19aad82afd545c6eca9a6e34c98"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cookinbe" supported="no">
+		<description>Cooking Beena: O-Ryouri Dekichatta!</description>
+		<year>2007</year>
+		<publisher>Sega Toys</publisher>
+		<info name="alt_title" value="クッキングビーナ～おりょうりできちゃった！～"/>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x800000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="S-100029-1000 - Cooking Beena-o-Ryouri Dekichatta (Japan).bin" size="0x800000" crc="a3f58ab8" sha1="20b3dfe395f7c97a32c93b580040787b98fd6024"/>
+			</dataarea>
+			<dataarea name="page1" size="0x1f0d2bd"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x1f0d2bd" crc="4bee410c" sha1="75c527111df0e12a960ba02a7d6bb023232dd901"/>
+			</dataarea>
+			<dataarea name="page2" size="0x1ddee9f"> <!-- book pages -->
+				<rom name="0 - 0002.png" size="0x1ddee9f" crc="bdcf11cb" sha1="654df738a2eb6aec22202a8de9963d0283d80383"/>
+			</dataarea>
+			<dataarea name="page3" size="0x1c8258a"> <!-- book pages -->
+				<rom name="0 - 0003.png" size="0x1c8258a" crc="1daf3316" sha1="d7ad47a27b0afc12cc50a5a66d7bb65b870de82f"/>
+			</dataarea>
+			<dataarea name="page4" size="0x1e1e700"> <!-- book pages -->
+				<rom name="0 - 0004.png" size="0x1e1e700" crc="458298f3" sha1="b8a72d18eca5b4a603bcb1efcafb7388516aab20"/>
+			</dataarea>
+			<dataarea name="page5" size="0x1e643db"> <!-- book pages -->
+				<rom name="0 - 0005.png" size="0x1e643db" crc="68f58736" sha1="7517f5df1f644cac392150a9e1b1f5bc0aee2130"/>
+			</dataarea>
+			<dataarea name="page6" size="0x1da0ea5"> <!-- book pages -->
+				<rom name="0 - 0006.png" size="0x1da0ea5" crc="9c567543" sha1="94520e8c1569114ca2b2147f814058073d511df5"/>
+			</dataarea>
+			<dataarea name="page7" size="0x1d9813e"> <!-- book pages -->
+				<rom name="0 - 0007.png" size="0x1d9813e" crc="c5bd8898" sha1="b4a717e41959715310c85fab48fc99d5fc88a6e1"/>
+			</dataarea>
+			<dataarea name="page8" size="0x1b3d110"> <!-- book pages -->
+				<rom name="0 - 0008.png" size="0x1b3d110" crc="db5ff567" sha1="2d4fcb531a1495630ee4404fbd03e3b7e014fbc9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dorahika" supported="yes">
+		<description>Doraemon Tanoshiku O-Keiko Hiragana Katakana</description>
+		<year>2005</year>
+		<publisher>Sega Toys</publisher>
+		<info name="alt_title" value="ドラえもんたのしくおけいこひらがな・カタカナ"/>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x400000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="T-120001-1000 - Doraemon Tanoshiku o-Keiko Hiragana Katakana (Japan).bin" size="0x400000" crc="b6b3c6f0" sha1="d4a702e731de1f1870ba6c46e84e4475a6ce6247"/>
+			</dataarea>
+			<dataarea name="page1" size="0x16ffa3b"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x16ffa3b" crc="d820b97b" sha1="97edc479ce39c9d0855e4773386c7271e85a7b92"/>
+			</dataarea>
+			<dataarea name="page2" size="0x15f8042"> <!-- book pages -->
+				<rom name="0 - 0002.png" size="0x15f8042" crc="47042a80" sha1="0ace9f58e0a239e0bcc6b02472b26510a7b7a302"/>
+			</dataarea>
+			<dataarea name="page3" size="0x1890f56"> <!-- book pages -->
+				<rom name="0 - 0003.png" size="0x1890f56" crc="3cf22616" sha1="964fe87aaa3a2b4403c51c8ceb8cb3dd4e560401"/>
+			</dataarea>
+			<dataarea name="page4" size="0x16aeabb"> <!-- book pages -->
+				<rom name="0 - 0004.png" size="0x16aeabb" crc="e4dae4ef" sha1="3b9f1ca72c86eb6bc4362fcc3818db786e561a9e"/>
+			</dataarea>
+			<dataarea name="page5" size="0x17867c3"> <!-- book pages -->
+				<rom name="0 - 0005.png" size="0x17867c3" crc="abcf5a3c" sha1="cff7db4cb3a0e643fd6ee5c18b4680f0512eb894"/>
+			</dataarea>
+			<dataarea name="page6" size="0x18945a1"> <!-- book pages -->
+				<rom name="0 - 0006.png" size="0x18945a1" crc="e6c1c5af" sha1="40c572c292017cbbfc6c101f7859a8ef07dd769b"/>
+			</dataarea>
+			<dataarea name="page7" size="0x1a17160"> <!-- book pages -->
+				<rom name="0 - 0007.png" size="0x1a17160" crc="3ce5245b" sha1="0ca06265bbff01bab25e2f107e3b0ddff1bac4c8"/>
+			</dataarea>
+			<dataarea name="page8" size="0x1903d18"> <!-- book pages -->
+				<rom name="0 - 0008.png" size="0x1903d18" crc="644ed95b" sha1="65ed7cd9e0b5cf8aa3fffb9aba007fe758a25cf1"/>
+			</dataarea>
+			<dataarea name="page9" size="0x1917739"> <!-- book pages -->
+				<rom name="0 - 0009.png" size="0x1917739" crc="03e78192" sha1="562e0dfc2ad5d7889d75a288bbb5071788a883f3"/>
+			</dataarea>
+			<dataarea name="page10" size="0x1597600"> <!-- book pages -->
+				<rom name="0 - 0010.png" size="0x1597600" crc="43c39329" sha1="359ec28c2473a9cb6fb25df7780981b55a45d7f2"/>
+			</dataarea>
+			<dataarea name="page11" size="0x17b24ff"> <!-- book pages -->
+				<rom name="0 - 0011.png" size="0x17b24ff" crc="4b224b03" sha1="facbe13daf6e8135ac6bb24eaffd27c7398c3f69"/>
+			</dataarea>
+			<dataarea name="page12" size="0x17d6f28"> <!-- book pages -->
+				<rom name="0 - 0012.png" size="0x17d6f28" crc="020a4474" sha1="afa99781e0364fcbb62e5737f4fe39c961499b05"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="doratsyh" supported="yes">
+		<description>Doraemon Tanoshii En Seikatsu Youchien Hoikuen</description>
+		<year>2006</year>
+		<publisher>Sega Toys</publisher>
+		<info name="alt_title" value="ドラえもんたのしいえんせいかつようちえん・ほいくえん"/>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x400000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="T-120002-1000 - Doraemon Tanoshii En Seikatsu Youchien Hoikuen (Japan).bin" size="0x400000" crc="ab5b5b54" sha1="2269e145a004a9c6ccbb6e79c9aa25081a7ede2b"/>
+			</dataarea>
+			<dataarea name="page1" size="0x17f1788"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x17f1788" crc="4118d615" sha1="54a8ed13dcdc3cec8d9f26a9c916f91382a87d29"/>
+			</dataarea>
+			<dataarea name="page2" size="0x1893189"> <!-- book pages -->
+				<rom name="0 - 0002.png" size="0x1893189" crc="fe68025b" sha1="96728e8d842e7e34d8dd79f761edbd9e72db4ad8"/>
+			</dataarea>
+			<dataarea name="page3" size="0x1aa1752"> <!-- book pages -->
+				<rom name="0 - 0003.png" size="0x1aa1752" crc="22796b6e" sha1="cfa1ba2091e86dccbf4df2561e3d1df53afd6914"/>
+			</dataarea>
+			<dataarea name="page4" size="0x1aaa176"> <!-- book pages -->
+				<rom name="0 - 0004.png" size="0x1aaa176" crc="0fbb4fab" sha1="9e48c0e0e73f3207982a79b9cf23e05aff2b64dd"/>
+			</dataarea>
+			<dataarea name="page5" size="0x1aa5f4c"> <!-- book pages -->
+				<rom name="0 - 0005.png" size="0x1aa5f4c" crc="125a28c6" sha1="59c1d1ce13e4b308a21b26fe50efd1af7b2c8445"/>
+			</dataarea>
+			<dataarea name="page6" size="0x184a55e"> <!-- book pages -->
+				<rom name="0 - 0006.png" size="0x184a55e" crc="7eabcefd" sha1="9d3356f02c3bf1f67d35785924d0028f943eb14e"/>
+			</dataarea>
+			<dataarea name="page7" size="0x1bee1d3"> <!-- book pages -->
+				<rom name="0 - 0007.png" size="0x1bee1d3" crc="fab972fb" sha1="61c934ec61bbf8d540cf75c2bf94a007d0a49503"/>
+			</dataarea>
+			<dataarea name="page8" size="0x186bc6d"> <!-- book pages -->
+				<rom name="0 - 0008.png" size="0x186bc6d" crc="69302387" sha1="f53d24252dbb6f72c92c46b6ef6abaf3a5eff3cc"/>
+			</dataarea>
+			<dataarea name="page9" size="0x192a8be"> <!-- book pages -->
+				<rom name="0 - 0009.png" size="0x192a8be" crc="aebe7e70" sha1="9fb7c57af56d046dfb076a0f23e97e3dd0c1eb3c"/>
+			</dataarea>
+			<dataarea name="page10" size="0x1656551"> <!-- book pages -->
+				<rom name="0 - 0010.png" size="0x1656551" crc="cce5f5fb" sha1="b084d0bdb9eef481059cbe5be9c623c68e30e314"/>
+			</dataarea>
+			<dataarea name="page11" size="0x1822970"> <!-- book pages -->
+				<rom name="0 - 0011.png" size="0x1822970" crc="91598ef6" sha1="8ed57ef8a297f1eabc034ea5972806cdb81833a5"/>
+			</dataarea>
+			<dataarea name="page12" size="0x193bdbb"> <!-- book pages -->
+				<rom name="0 - 0012.png" size="0x193bdbb" crc="6498b6c0" sha1="7d8a63048c19b88f47f0cf6632fddf7d42ed817e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dorawwgl" supported="yes">
+		<description>Doraemon Chinou Daikaihatsu! Waku Waku Game Land</description>
+		<year>2006</year>
+		<publisher>Sega Toys</publisher>
+		<info name="alt_title" value="ドラえもん知能大開発！わくわくゲームランド"/>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x400000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="T-120003-1000 - Doraemon Chinou Daikaihatsu Waku Waku Game Land (Japan).bin" size="0x400000" crc="755ab5f4" sha1="2139977a6a8cf870ef40622122d2d8c4e63047cd"/>
+			</dataarea>
+			<dataarea name="page1" size="0x1deadb6"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x1deadb6" crc="d905a0ee" sha1="eeb91d09bca70671760a667dd7921c9f8084746d"/>
+			</dataarea>
+			<dataarea name="page2" size="0x20a98f9"> <!-- book pages -->
+				<rom name="0 - 0002.png" size="0x20a98f9" crc="05057227" sha1="fafd405d4bc770b55cdf783088de11765780a35c"/>
+			</dataarea>
+			<dataarea name="page3" size="0x1fd3375"> <!-- book pages -->
+				<rom name="0 - 0003.png" size="0x1fd3375" crc="6bcab534" sha1="427814d968fc018b463fc650419215c234a7100b"/>
+			</dataarea>
+			<dataarea name="page4" size="0x20cccd6"> <!-- book pages -->
+				<rom name="0 - 0004.png" size="0x20cccd6" crc="91de7242" sha1="8710026b2763ee375538c25f7549569c59ee3470"/>
+			</dataarea>
+			<dataarea name="page5" size="0x20124f0"> <!-- book pages -->
+				<rom name="0 - 0005.png" size="0x20124f0" crc="410d4ccf" sha1="45a4e7a826a1135cf9ae3ffa7df5d6bbd4654752"/>
+			</dataarea>
+			<dataarea name="page6" size="0x21f8b73"> <!-- book pages -->
+				<rom name="0 - 0006.png" size="0x21f8b73" crc="8c6d2b69" sha1="d494f8fba5ef9ac957d0475d760098e40c2d0c0f"/>
+			</dataarea>
+			<dataarea name="page7" size="0x1d4e02f"> <!-- book pages -->
+				<rom name="0 - 0007.png" size="0x1d4e02f" crc="0ef4efe9" sha1="75d3b090998296594af05af030d6f1f0cd515dcb"/>
+			</dataarea>
+			<dataarea name="page8" size="0x1f0788f"> <!-- book pages -->
+				<rom name="0 - 0008.png" size="0x1f0788f" crc="8bbc5a04" sha1="524024424d9ee89cf9ef8bd110b3de4c9b167fca"/>
+			</dataarea>
+			<dataarea name="page9" size="0x1e44a5f"> <!-- book pages -->
+				<rom name="0 - 0009.png" size="0x1e44a5f" crc="79e560be" sha1="141b45b021e7e0bfd93499de9761baa11d3ff039"/>
+			</dataarea>
+			<dataarea name="page10" size="0x1ec2396"> <!-- book pages -->
+				<rom name="0 - 0010.png" size="0x1ec2396" crc="9a8fc7a7" sha1="45c382aa7fa3e13c4245ac837bbf8ce732b261db"/>
+			</dataarea>
+			<dataarea name="page11" size="0x1bdd427"> <!-- book pages -->
+				<rom name="0 - 0011.png" size="0x1bdd427" crc="b2bd718d" sha1="222d71a9481322062180903bd61c1ad83e9ccd71"/>
+			</dataarea>
+			<dataarea name="page12" size="0x1f712bc"> <!-- book pages -->
+				<rom name="0 - 0012.png" size="0x1f712bc" crc="5a8330b1" sha1="4ecbf9a74714f2eb35922cfc40824a47246c6b0a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -228,10 +783,11 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="dtanoshimt" supported="no">
+	<software name="dtanoshimt" supported="partial">
 		<description>Disney Tanoshii Oekaki: O-Mise-ya-san o Tsukutchaou!</description>
 		<year>2007</year>
 		<publisher>Sega Toys</publisher>
+		<notes>SD-Card Reader is not emulated</notes>
 		<info name="alt_title" value="ディズニーたのしいおえかきおみせやさんをつくっちゃおう！"/>
 		<part name="cart" interface="sega_beena_cart">
 			<dataarea name="rom" size="0x800000" width="32" endianness="big">
@@ -270,46 +826,60 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="cookinbe" supported="no">
-		<description>Cooking Beena: O-Ryouri Dekichatta!</description>
-		<year>2007</year>
-		<publisher>Sega Toys</publisher>
-		<info name="alt_title" value="クッキングビーナ～おりょうりできちゃった！～"/>
+	<software name="engsengo" supported="partial">
+		<description>Engine Sentai Go-onger Mach de Oboeru! Aiueo!!</description>
+		<year>2008</year>
+		<publisher>Bandai</publisher>
+		<notes>SD-Card Reader is not emulated</notes>
+		<info name="alt_title" value="炎神戦隊ゴーオンジャーマッハでおぼえる！あいうえお!!"/>
 		<part name="cart" interface="sega_beena_cart">
 			<dataarea name="rom" size="0x800000" width="32" endianness="big">
-				<rom loadflag="load16_word_swap" name="S-100029-1000 - Cooking Beena-o-Ryouri Dekichatta (Japan).bin" size="0x800000" crc="a3f58ab8" sha1="20b3dfe395f7c97a32c93b580040787b98fd6024"/>
+				<rom loadflag="load16_word_swap" name="T-110009-1000 - Engine Sentai Go-onger Mach de Oboeru Aiueo (Japan).bin" size="0x800000" crc="a53eeaed" sha1="1b320737d49e6955f6a5e2f1876a18dd23b2856d"/>
 			</dataarea>
-			<dataarea name="page1" size="0x1f0d2bd"> <!-- book pages -->
-				<rom name="0 - 0001.png" size="0x1f0d2bd" crc="4bee410c" sha1="75c527111df0e12a960ba02a7d6bb023232dd901"/>
+			<dataarea name="page1" size="0x1cdef0c"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x1cdef0c" crc="9d8a4854" sha1="a6a95858187550f7bc187bab43a69ea342ebb0db"/>
 			</dataarea>
-			<dataarea name="page2" size="0x1ddee9f"> <!-- book pages -->
-				<rom name="0 - 0002.png" size="0x1ddee9f" crc="bdcf11cb" sha1="654df738a2eb6aec22202a8de9963d0283d80383"/>
+			<dataarea name="page2" size="0x1cc30af"> <!-- book pages -->
+				<rom name="0 - 0002.png" size="0x1cc30af" crc="fc86d4a0" sha1="bb651548dbf81d34c6086fba028c7c4c47c3e9ad"/>
 			</dataarea>
-			<dataarea name="page3" size="0x1c8258a"> <!-- book pages -->
-				<rom name="0 - 0003.png" size="0x1c8258a" crc="1daf3316" sha1="d7ad47a27b0afc12cc50a5a66d7bb65b870de82f"/>
+			<dataarea name="page3" size="0x1d6f8b0"> <!-- book pages -->
+				<rom name="0 - 0003.png" size="0x1d6f8b0" crc="d381d350" sha1="8ed530a5e7bcc4eac3a900384663ed03e427c418"/>
 			</dataarea>
-			<dataarea name="page4" size="0x1e1e700"> <!-- book pages -->
-				<rom name="0 - 0004.png" size="0x1e1e700" crc="458298f3" sha1="b8a72d18eca5b4a603bcb1efcafb7388516aab20"/>
+			<dataarea name="page4" size="0x1d465ca"> <!-- book pages -->
+				<rom name="0 - 0004.png" size="0x1d465ca" crc="c7451847" sha1="208e6c8379884a73270ec32b48300e81342f8856"/>
 			</dataarea>
-			<dataarea name="page5" size="0x1e643db"> <!-- book pages -->
-				<rom name="0 - 0005.png" size="0x1e643db" crc="68f58736" sha1="7517f5df1f644cac392150a9e1b1f5bc0aee2130"/>
+			<dataarea name="page5" size="0x1db5b34"> <!-- book pages -->
+				<rom name="0 - 0005.png" size="0x1db5b34" crc="5ef815f7" sha1="1095dee6473c77e64859ede1ae7d28b3400a6814"/>
 			</dataarea>
-			<dataarea name="page6" size="0x1da0ea5"> <!-- book pages -->
-				<rom name="0 - 0006.png" size="0x1da0ea5" crc="9c567543" sha1="94520e8c1569114ca2b2147f814058073d511df5"/>
+			<dataarea name="page6" size="0x1ca2fea"> <!-- book pages -->
+				<rom name="0 - 0006.png" size="0x1ca2fea" crc="c080111f" sha1="c2712aece5aba803146c8ca3054f19f38552a060"/>
 			</dataarea>
-			<dataarea name="page7" size="0x1d9813e"> <!-- book pages -->
-				<rom name="0 - 0007.png" size="0x1d9813e" crc="c5bd8898" sha1="b4a717e41959715310c85fab48fc99d5fc88a6e1"/>
+			<dataarea name="page7" size="0x1c7bc8b"> <!-- book pages -->
+				<rom name="0 - 0007.png" size="0x1c7bc8b" crc="9f4517b7" sha1="e3992b070fff4fda8c777179ae532985453148fb"/>
 			</dataarea>
-			<dataarea name="page8" size="0x1b3d110"> <!-- book pages -->
-				<rom name="0 - 0008.png" size="0x1b3d110" crc="db5ff567" sha1="2d4fcb531a1495630ee4404fbd03e3b7e014fbc9"/>
+			<dataarea name="page8" size="0x19ce87c"> <!-- book pages -->
+				<rom name="0 - 0008.png" size="0x19ce87c" crc="a70efb8e" sha1="464b5e787d79b1f40a9ce6b7d1d55c8561d6b97a"/>
+			</dataarea>
+			<dataarea name="page9" size="0x17b4511"> <!-- book pages -->
+				<rom name="0 - 0009.png" size="0x17b4511" crc="d48a3d41" sha1="e62cfe8ffccfa0a19c4ec05723c11fffdfca4a7b"/>
+			</dataarea>
+			<dataarea name="page10" size="0x1b24971"> <!-- book pages -->
+				<rom name="0 - 0010.png" size="0x1b24971" crc="5f9af729" sha1="aab82dc636804907e91eb68b3420308b9f34d8a3"/>
+			</dataarea>
+			<dataarea name="page11" size="0x184c0ca"> <!-- book pages -->
+				<rom name="0 - 0011.png" size="0x184c0ca" crc="2be20b10" sha1="fc6c62314feed9f9ae8208ac48ef805e9221c7d5"/>
+			</dataarea>
+			<dataarea name="page12" size="0x1c5d725"> <!-- book pages -->
+				<rom name="0 - 0012.png" size="0x1c5d725" crc="ff3a0592" sha1="85dd30147a2aa8643bb7760624b1c0d172622a83"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="frpc" supported="no">
-		<description>Issho ni Henshin Fresh Pretty Cure</description>
+	<software name="frpc" supported="partial">
+		<description>Issho ni Henshin Fresh PreCure</description>
 		<year>2009</year>
 		<publisher>Bandai</publisher>
+		<notes>SD-Card Reader is not emulated</notes>
 		<info name="alt_title" value="いっしょにへんしんフレッシュプリキュア！"/>
 		<part name="cart" interface="sega_beena_cart">
 			<dataarea name="rom" size="0x800000" width="32" endianness="big">
@@ -354,8 +924,200 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="hirakata" supported="no">
-		<description>Soreike! Anpanman Hajimete Kaketa yo! Oboeta yo! Hiragana Katakana - Gojuuon Board Kinou-tsuki</description>
+	<software name="fwpcmh" supported="yes">
+		<description>Futari wa PreCure Max Heart</description>
+		<year>2005</year>
+		<publisher>Bandai</publisher>
+		<info name="alt_title" value="ふたりはプリキュア Maxheart"/>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x400000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="T-110001-1001 - Futari wa PreCure Max Heart (Japan).bin" size="0x400000" crc="0c1cafa0" sha1="eea71480c063d9e7fced72c83dfb70b202bfeff5"/>
+			</dataarea>
+			<dataarea name="page1" size="0x1d36c55"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x1d36c55" crc="a90bd402" sha1="be41561396e3c43324db8766afd91cb919521128"/>
+			</dataarea>
+			<dataarea name="page2" size="0x1eade6d"> <!-- book pages -->
+				<rom name="0 - 0002.png" size="0x1eade6d" crc="1be5cd1f" sha1="31c6359d04468eca9d35994b3543644b1b9d5eac"/>
+			</dataarea>
+			<dataarea name="page3" size="0x197248e"> <!-- book pages -->
+				<rom name="0 - 0003.png" size="0x197248e" crc="6c56b081" sha1="697291780a689f88156048041f20d762745a47e3"/>
+			</dataarea>
+			<dataarea name="page4" size="0x197ad38"> <!-- book pages -->
+				<rom name="0 - 0004.png" size="0x197ad38" crc="d4f91d01" sha1="96df1f056ab300401c77d23fa1e07a0b5e0e6bb9"/>
+			</dataarea>
+			<dataarea name="page5" size="0x1b06e89"> <!-- book pages -->
+				<rom name="0 - 0005.png" size="0x1b06e89" crc="45cf0425" sha1="d29eaf83d142d4400100839abd4fe72eef4b2dfa"/>
+			</dataarea>
+			<dataarea name="page6" size="0x1841075"> <!-- book pages -->
+				<rom name="0 - 0006.png" size="0x1841075" crc="0519e7d9" sha1="152b7a7afa7c7a129307d425ad5b60789d47e2c5"/>
+			</dataarea>
+			<dataarea name="page7" size="0x172c0a5"> <!-- book pages -->
+				<rom name="0 - 0007.png" size="0x172c0a5" crc="2411dda4" sha1="5a8034f7430e368824dcd4c4a614baf4490f808a"/>
+			</dataarea>
+			<dataarea name="page8" size="0x1850b5b"> <!-- book pages -->
+				<rom name="0 - 0008.png" size="0x1850b5b" crc="63a16f4b" sha1="3d14477756fec4dc1d082b3b09b20f9fafc76ce5"/>
+			</dataarea>
+			<dataarea name="page9" size="0x18416dd"> <!-- book pages -->
+				<rom name="0 - 0009.png" size="0x18416dd" crc="16482978" sha1="22b0494a2408cd7f8e6830705748b18c86dac413"/>
+			</dataarea>
+			<dataarea name="page10" size="0x14cc758"> <!-- book pages -->
+				<rom name="0 - 0010.png" size="0x14cc758" crc="f8009d42" sha1="42f77733e814ac5c9a28ed78e480db6d4ba67727"/>
+			</dataarea>
+			<dataarea name="page11" size="0x172cda9"> <!-- book pages -->
+				<rom name="0 - 0011.png" size="0x172cda9" crc="903a0fb2" sha1="84a6bdc6f952cecd6fcece8764969a46e4334630"/>
+			</dataarea>
+			<dataarea name="page12" size="0x199516b"> <!-- book pages -->
+				<rom name="0 - 0012.png" size="0x199516b" crc="6f39dac3" sha1="331e12c7161a2706da14cdd1fcd5c375e19c4b69"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="geneki" supported="yes">
+		<description>Geneki Toudai-sei ga Tsukutta! 'Dekiru Ko ni Naru Seikatsu Shuukan Dragon Sakura Youji-hen'</description>
+		<year>2007</year>
+		<publisher>Sega Toys</publisher>
+		<info name="alt_title" value="現役東大生がつくった！「できる子になる生活習慣ドラゴン桜幼児編」"/>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x400000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="S-100024-1000 - Geneki Toudai-sei ga Tsukutta 'Dekiru Ko ni Naru Seikatsu Shuukan Dragon Sakura Youji-hen (Japan).bin" size="0x400000" crc="a0fdbe18" sha1="9990e7bbc8bd5b7bb5c7005dd38114c03f258048"/>
+			</dataarea>
+			<dataarea name="page1" size="0x16cd5b1"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x16cd5b1" crc="4b00f572" sha1="6c674e3ffe214aa0e04a023e4ef4fea5a00e4cb4"/>
+			</dataarea>
+			<dataarea name="page2" size="0x18d6393"> <!-- book pages -->
+				<rom name="0 - 0002.png" size="0x18d6393" crc="aad5c73d" sha1="5412d94ec0d15af0baf014e98edf0a09ab76f521"/>
+			</dataarea>
+			<dataarea name="page3" size="0x18ca8c1"> <!-- book pages -->
+				<rom name="0 - 0003.png" size="0x18ca8c1" crc="148b2692" sha1="46aa3531d762a3df609f07a6c493e5a4fb6f64dc"/>
+			</dataarea>
+			<dataarea name="page4" size="0x198575b"> <!-- book pages -->
+				<rom name="0 - 0004.png" size="0x198575b" crc="7efc85fc" sha1="f6d3abab0ef31f078da2fedaed57f83eaf40a37c"/>
+			</dataarea>
+			<dataarea name="page5" size="0x192f403"> <!-- book pages -->
+				<rom name="0 - 0005.png" size="0x192f403" crc="df371242" sha1="f8dbb9fdec4cc625c49adef11d6ddf5d50befeca"/>
+			</dataarea>
+			<dataarea name="page6" size="0x197e4a8"> <!-- book pages -->
+				<rom name="0 - 0006.png" size="0x197e4a8" crc="c3815660" sha1="3dd8b600fffbc2a58a6bd4dccc5ea4a084639640"/>
+			</dataarea>
+			<dataarea name="page7" size="0x198811b"> <!-- book pages -->
+				<rom name="0 - 0007.png" size="0x198811b" crc="40676eb5" sha1="2459180e751e3fb1c51d01be959f5b01c01eb69f"/>
+			</dataarea>
+			<dataarea name="page8" size="0x182156d"> <!-- book pages -->
+				<rom name="0 - 0008.png" size="0x182156d" crc="6ea73797" sha1="f5c50ce681ec8ec49829a579efbeb48c5f92fdba"/>
+			</dataarea>
+			<dataarea name="page9" size="0x197b9ec"> <!-- book pages -->
+				<rom name="0 - 0009.png" size="0x197b9ec" crc="5e483069" sha1="752bdab082930f5e91b83d7d64c0c310686aea28"/>
+			</dataarea>
+			<dataarea name="page10" size="0x16a3bda"> <!-- book pages -->
+				<rom name="0 - 0010.png" size="0x16a3bda" crc="12f4cd99" sha1="b5d9e60091488620df18d8d0de633909414e30c0"/>
+			</dataarea>
+			<dataarea name="page11" size="0x12dc98c"> <!-- book pages -->
+				<rom name="0 - 0011.png" size="0x12dc98c" crc="a963a00a" sha1="5127b7610cb6b37ee8dfa54336f8ef6d94224fb9"/>
+			</dataarea>
+			<dataarea name="page12" size="0x17da83a"> <!-- book pages -->
+				<rom name="0 - 0012.png" size="0x17da83a" crc="0d974fb1" sha1="1893f3a91b0450dd93b52489f4475b2c7d912995"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ggsentai" supported="yes">
+		<description>GoGo Sentai Boukenger Kazu to Katachi o Oboeyou!</description>
+		<year>2006</year>
+		<publisher>Bandai</publisher>
+		<info name="alt_title" value="轟轟戦隊ボウケンジャーかずとかたちをおぼえよう!"/>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x400000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="T-110003-1000 - GoGo Sentai Boukenger Kazu to Katachi o Oboeyou (Japan).bin" size="0x400000" crc="a052b965" sha1="ea99ab31fcab9c0bf99093cf63b3bded75ada95e"/>
+			</dataarea>
+			<dataarea name="page1" size="0x196ec55"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x196ec55" crc="42135a07" sha1="8f792faed1a286d8f24ccb1310da8fa30cd16458"/>
+			</dataarea>
+			<dataarea name="page2" size="0x1dfca00"> <!-- book pages -->
+				<rom name="0 - 0002.png" size="0x1dfca00" crc="a847d345" sha1="d2b49394636a33a6acae667ee4cfd24a19403427"/>
+			</dataarea>
+			<dataarea name="page3" size="0x1ee7c09"> <!-- book pages -->
+				<rom name="0 - 0003.png" size="0x1ee7c09" crc="d236a65e" sha1="75ec7de137319309fc148e333fbe7093f87ad2b8"/>
+			</dataarea>
+			<dataarea name="page4" size="0x1c50b08"> <!-- book pages -->
+				<rom name="0 - 0004.png" size="0x1c50b08" crc="536d19c7" sha1="1ea1fe40e904c35918b4583523154a4dedb85ed8"/>
+			</dataarea>
+			<dataarea name="page5" size="0x1d63bd4"> <!-- book pages -->
+				<rom name="0 - 0005.png" size="0x1d63bd4" crc="a0189191" sha1="4073a19cac8ac703ebe0b9ea2bf9449b06d35042"/>
+			</dataarea>
+			<dataarea name="page6" size="0x1ccc9be"> <!-- book pages -->
+				<rom name="0 - 0006.png" size="0x1ccc9be" crc="1afa8ce3" sha1="c908795291f6ddc11b7417ba10a2cb7f483714c3"/>
+			</dataarea>
+			<dataarea name="page7" size="0x1d5317a"> <!-- book pages -->
+				<rom name="0 - 0007.png" size="0x1d5317a" crc="e28535d3" sha1="c153aa7c374e9fc7529490444e99452b47eed71c"/>
+			</dataarea>
+			<dataarea name="page8" size="0x1d9c551"> <!-- book pages -->
+				<rom name="0 - 0008.png" size="0x1d9c551" crc="e723d545" sha1="a25a902b7ae1ce7b554b80087bf742ebfc931620"/>
+			</dataarea>
+			<dataarea name="page9" size="0x1e3ec06"> <!-- book pages -->
+				<rom name="0 - 0009.png" size="0x1e3ec06" crc="209ff3ff" sha1="03594c4fb1828285e1a62e5142f5d0fe05077950"/>
+			</dataarea>
+			<dataarea name="page10" size="0x160ab2e"> <!-- book pages -->
+				<rom name="0 - 0010.png" size="0x160ab2e" crc="66a96707" sha1="12b03ea3ed4ddc0541063ca0448a91e7cbfc83bb"/>
+			</dataarea>
+			<dataarea name="page11" size="0x1931fab"> <!-- book pages -->
+				<rom name="0 - 0011.png" size="0x1931fab" crc="13f193a2" sha1="5da9a2449b26a9e3b2f1c3eac05255336d1a6698"/>
+			</dataarea>
+			<dataarea name="page12" size="0x165db4c"> <!-- book pages -->
+				<rom name="0 - 0012.png" size="0x165db4c" crc="110441cb" sha1="5c745dbd7b8e1508394ac4a09e7f6da4e9a6dd77"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hiraka_0" supported="yes" cloneof="hirakata">
+		<description>Soreike! Anpanman Hajimete Kaketa yo! Oboeta yo! Hiragana Katakana: 50-on Board Kinou-tsuki (Rev. S-100002-1000)</description>
+		<year>2005</year>
+		<publisher>Sega Toys</publisher>
+		<info name="alt_title" value="それいけ！アンパンマンはじめてかけたよ！おぼえたよ！ひらがな・カタカナ～50音ボード機能つき～"/>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x800000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="S-100002-1000 - Soreike Anpanman Hajimete Kaketa yo Oboeta yo Hiragana Katakana - Gojuuon Board Kinou-tsuki (Japan).bin" size="0x800000" crc="b098263e" sha1="3a79441792d5403e66ca49a353e32c14acfacfa7"/>
+			</dataarea>
+			<dataarea name="page1" size="0x01b8b6ae"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x01b8b6ae" crc="e4c3a37a" sha1="de492d61bf91bee346734f62a6db257a6ce74f1c"/>
+			</dataarea>
+			<dataarea name="page2" size="0x01c3f600"> <!-- book pages -->
+				<rom name="0 - 0002.png" size="0x01c3f600" crc="ef0fccc9" sha1="cc014da292163146e08d89672149ba7dc181f1fc"/>
+			</dataarea>
+			<dataarea name="page3" size="0x01d61a02"> <!-- book pages -->
+				<rom name="0 - 0003.png" size="0x01d61a02" crc="84682ff3" sha1="216425eb85d6cc5855e853d0b135a6426fe2c0a0"/>
+			</dataarea>
+			<dataarea name="page4" size="0x01e10787"> <!-- book pages -->
+				<rom name="0 - 0004.png" size="0x01e10787" crc="d5aa2d56" sha1="42902317bef31b659e9c40f4c51f554aefd610cf"/>
+			</dataarea>
+			<dataarea name="page5" size="0x01da7955"> <!-- book pages -->
+				<rom name="0 - 0005.png" size="0x01da7955" crc="e4795152" sha1="5bd9bd97721b1b69b1362b4261052b9e3a58b8c6"/>
+			</dataarea>
+			<dataarea name="page6" size="0x01d3ac0d"> <!-- book pages -->
+				<rom name="0 - 0006.png" size="0x01d3ac0d" crc="1a58e117" sha1="aa8bb93b8157cc0c8dc895f72203d9ed807e164b"/>
+			</dataarea>
+			<dataarea name="page7" size="0x01ec5159"> <!-- book pages -->
+				<rom name="0 - 0007.png" size="0x01ec5159" crc="f354c1d8" sha1="05959842511ce24faaaf16b7beefc1f3cee3a1e3"/>
+			</dataarea>
+			<dataarea name="page8" size="0x01e66848"> <!-- book pages -->
+				<rom name="0 - 0008.png" size="0x01e66848" crc="95a956fc" sha1="72e116dd2400d321b704e35e1b8d13d2129cae6c"/>
+			</dataarea>
+			<dataarea name="page9" size="0x01e5551d"> <!-- book pages -->
+				<rom name="0 - 0009.png" size="0x01e5551d" crc="42973b09" sha1="182c26df4a2a29893a6a2efe769a4744084e67aa"/>
+			</dataarea>
+			<dataarea name="page10" size="0x012bc820"> <!-- book pages -->
+				<rom name="0 - 0010.png" size="0x012bc820" crc="05f22b7f" sha1="a87f840b3c84e7f1886eead28ea9879ca3630e79"/>
+			</dataarea>
+			<dataarea name="page11" size="0x01213cba"> <!-- book pages -->
+				<rom name="0 - 0011.png" size="0x01213cba" crc="e1e8b81a" sha1="4c0a484b4156fd07a4f2b8eb96d7475e8559c6d0"/>
+			</dataarea>
+			<dataarea name="page12" size="0x01421db2"> <!-- book pages -->
+				<rom name="0 - 0012.png" size="0x01421db2" crc="6b5728a5" sha1="024d1e0deae7bcbdf7f3b6c4483de91b7fd96961"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hirakata" supported="yes">
+		<description>Soreike! Anpanman Hajimete Kaketa yo! Oboeta yo! Hiragana Katakana: 50-on Board Kinou-tsuki</description>
 		<year>2005</year>
 		<publisher>Sega Toys</publisher>
 		<info name="alt_title" value="それいけ！アンパンマンはじめてかけたよ！おぼえたよ！ひらがな・カタカナ～50音ボード機能つき～"/>
@@ -402,10 +1164,11 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="hkittyhk" supported="no">
+	<software name="hkittyhk" supported="partial">
 		<description>Hello Kitty no Hiragana Katakana O-Namae Kaitemiyou!</description>
 		<year>2008</year>
 		<publisher>Sega Toys</publisher>
+		<notes>SD-Card Reader is not emulated</notes>
 		<info name="alt_title" value="ハローキティのひらがな・カタカナ・おなまえかいてみよう！"/>
 		<part name="cart" interface="sega_beena_cart">
 			<dataarea name="rom" size="0x800000" width="32" endianness="big">
@@ -444,7 +1207,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="kazokum" supported="no">
+	<software name="kazokum" supported="yes">
 		<description>Kazoku Minna no Nouryoku Trainer</description>
 		<year>2005</year>
 		<publisher>Sega Toys</publisher>
@@ -486,7 +1249,103 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="kouchuu" supported="no">
+	<software name="kikatho" supported="yes">
+		<description>Game ga Ippai Kikansha Thomas</description>
+		<year>2005</year>
+		<publisher>Bandai</publisher>
+		<info name="alt_title" value="ゲームがいっぱいきかんしゃトーマス"/>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x400000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="T-110002-1000 - Game ga Ippai Kikansha Thomas (Japan).bin" size="0x400000" crc="981d0224" sha1="8ae4038dd35c04ba14d04e09ce71130957e0b22c"/>
+			</dataarea>
+			<dataarea name="page1" size="0x183c643"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x183c643" crc="2c0a2ec9" sha1="9c9763ba38affb7675e9e745ac7e41f4cb8d30a2"/>
+			</dataarea>
+			<dataarea name="page2" size="0x1d40e11"> <!-- book pages -->
+				<rom name="0 - 0002.png" size="0x1d40e11" crc="a0118660" sha1="2071b8d3d369f49f0cdf346874b5f7843c01104b"/>
+			</dataarea>
+			<dataarea name="page3" size="0x1ae4333"> <!-- book pages -->
+				<rom name="0 - 0003.png" size="0x1ae4333" crc="ded4f053" sha1="138d406167708fde2169b632dbc5a7c47b9feac0"/>
+			</dataarea>
+			<dataarea name="page4" size="0x1cb0af7"> <!-- book pages -->
+				<rom name="0 - 0004.png" size="0x1cb0af7" crc="c05372c5" sha1="6caf57342b707cd46ffcb7a7ca25881aecfe7ad8"/>
+			</dataarea>
+			<dataarea name="page5" size="0x1be0117"> <!-- book pages -->
+				<rom name="0 - 0005.png" size="0x1be0117" crc="957533f2" sha1="cc4e7860c4e096e95ca5d173c772a5354c35e691"/>
+			</dataarea>
+			<dataarea name="page6" size="0x1b2dcdf"> <!-- book pages -->
+				<rom name="0 - 0006.png" size="0x1b2dcdf" crc="059acc74" sha1="8a35cebe71bb34412828a3e51210ead72cec5183"/>
+			</dataarea>
+			<dataarea name="page7" size="0x196c916"> <!-- book pages -->
+				<rom name="0 - 0007.png" size="0x196c916" crc="20254248" sha1="23a5805ee1b32fdd63deec49bc1ec9289850cb0a"/>
+			</dataarea>
+			<dataarea name="page8" size="0x1c58212"> <!-- book pages -->
+				<rom name="0 - 0008.png" size="0x1c58212" crc="d1c3192c" sha1="b0be09adec21a1751bdb7b7286849c0986276f26"/>
+			</dataarea>
+			<dataarea name="page9" size="0x1ae5ee3"> <!-- book pages -->
+				<rom name="0 - 0009.png" size="0x1ae5ee3" crc="46bf8e6c" sha1="6b8dbed51afac4e620f83b12140f7fce000e6491"/>
+			</dataarea>
+			<dataarea name="page10" size="0x1b60384"> <!-- book pages -->
+				<rom name="0 - 0010.png" size="0x1b60384" crc="2065cb50" sha1="35d9fac93a3d37f3f2730e31b89292fb88fd8deb"/>
+			</dataarea>
+			<dataarea name="page11" size="0x1b1678e"> <!-- book pages -->
+				<rom name="0 - 0011.png" size="0x1b1678e" crc="74d16ae8" sha1="003dcfef5fce2477f1a321edaf2fadd8c549c537"/>
+			</dataarea>
+			<dataarea name="page12" size="0x18ae35d"> <!-- book pages -->
+				<rom name="0 - 0012.png" size="0x18ae35d" crc="d0a30971" sha1="de73c9ada208a36db73ecbe776c9e964de3c8779"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kodaiou" supported="no">
+		<description>Kodai Ouja Kyouryuu King D-Kids Adventure: Dino Slash! Kyouryuu Battle!!</description>
+		<year>2007</year>
+		<publisher>Sega Toys</publisher>
+		<info name="alt_title" value="古代王者恐竜キング Dキッズ・アドベンチャーディノスラッシュ！恐竜バトル！！"/>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x800000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="S-100033-1001 - Kodai Ouja Kyouryuu King D-Kids Adventure Dino Slash Kyouryuu Battle (Japan).bin" size="0x800000" crc="4fefdb6e" sha1="f53bb8ca7ec0e3ba93d6e92e7b1e404269a3d0ff"/>
+			</dataarea>
+			<dataarea name="page1" size="0x1d1ad19"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x1d1ad19" crc="1a8a2425" sha1="afb069474073887830da0ea545e85e1022101c84"/>
+			</dataarea>
+			<dataarea name="page2" size="0x1d31536"> <!-- book pages -->
+				<rom name="0 - 0002.png" size="0x1d31536" crc="e3791e19" sha1="7745bae0ad37f92e20acf52c35820c1fafa563cb"/>
+			</dataarea>
+			<dataarea name="page3" size="0x1c78a63"> <!-- book pages -->
+				<rom name="0 - 0003.png" size="0x1c78a63" crc="975d2324" sha1="b45728327bf077e51c02e06ec77bba879cfb8c3c"/>
+			</dataarea>
+			<dataarea name="page4" size="0x1bab026"> <!-- book pages -->
+				<rom name="0 - 0004.png" size="0x1bab026" crc="b8672a1e" sha1="3d3e4df80d15ead7ec65b741a8a42caaf5812940"/>
+			</dataarea>
+			<dataarea name="page5" size="0x1ae3706"> <!-- book pages -->
+				<rom name="0 - 0005.png" size="0x1ae3706" crc="9f59eb24" sha1="4afb03328cb1967d385c884aa23e00ec4948cb1a"/>
+			</dataarea>
+			<dataarea name="page6" size="0x1b649d5"> <!-- book pages -->
+				<rom name="0 - 0006.png" size="0x1b649d5" crc="42bc861c" sha1="7751028ce7326f6ef35bab0c718203e3b33ce188"/>
+			</dataarea>
+			<dataarea name="page7" size="0x1cb54b0"> <!-- book pages -->
+				<rom name="0 - 0007.png" size="0x1cb54b0" crc="8b354676" sha1="ada4d2de6a3429087304a758248a19680fdf3d81"/>
+			</dataarea>
+			<dataarea name="page8" size="0x1ca22a7"> <!-- book pages -->
+				<rom name="0 - 0008.png" size="0x1ca22a7" crc="23458709" sha1="7f9a544381ec82b2cdb31704f0065e6fa0ebe14f"/>
+			</dataarea>
+			<dataarea name="page9" size="0x1be8325"> <!-- book pages -->
+				<rom name="0 - 0009.png" size="0x1be8325" crc="1b1857f6" sha1="3ddc35ff0f4fb45e8b10e47bbd92272d38bca50f"/>
+			</dataarea>
+			<dataarea name="page10" size="0x1a803bf"> <!-- book pages -->
+				<rom name="0 - 0010.png" size="0x1a803bf" crc="b32f8e6c" sha1="abb3191047bb7c37c3c43331e518044dee654fa6"/>
+			</dataarea>
+			<dataarea name="page11" size="0x1b0dd13"> <!-- book pages -->
+				<rom name="0 - 0011.png" size="0x1b0dd13" crc="fac1037b" sha1="b1262d6fa5898fe0c5b41e170323aa4058af4eed"/>
+			</dataarea>
+			<dataarea name="page12" size="0x1ad78ed"> <!-- book pages -->
+				<rom name="0 - 0012.png" size="0x1ad78ed" crc="849db8af" sha1="de47023a231eb6fd25c1e6e7fc271176e962198f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kouchuu" supported="yes">
 		<description>Kouchuu Ouja Mushiking: Mori no Tami no Densetsu: Minna de Tanken! Kouchuu no Mori</description>
 		<year>2005</year>
 		<publisher>Sega Toys</publisher>
@@ -534,10 +1393,58 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="mbubbub" supported="no">
-		<description>Meet Bub-Bub to Eigo Tanken</description>
+	<software name="kounebu" supported="yes">
+		<description>Kouchuu Ouja Mushiking: Nebu-Hakase to Kazu Katachi ni Challenge!</description>
+		<year>2006</year>
+		<publisher>Sega Toys</publisher>
+		<info name="alt_title" value="甲虫王者ムシキングネブ博士とかず・かたちにチャレンジ！"/>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x800000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="S-100015-1000 - Kouchuu Ouja Mushiking - Nebu-Hakase to Kazu Katachi ni Challenge (Japan).bin" size="0x800000" crc="f912f777" sha1="134ebdfd67779400dfead05a6c94b28a0ba8df0e"/>
+			</dataarea>
+			<dataarea name="page1" size="0x1a996aa"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x1a996aa" crc="b6d1ccd5" sha1="f3b08f203de84039c37788d5152a5e0d4e6dee7e"/>
+			</dataarea>
+			<dataarea name="page2" size="0x1be7d02"> <!-- book pages -->
+				<rom name="0 - 0002.png" size="0x1be7d02" crc="7e543eaa" sha1="19671c24b8bd6a93984358aca5270633727bdff1"/>
+			</dataarea>
+			<dataarea name="page3" size="0x1abee27"> <!-- book pages -->
+				<rom name="0 - 0003.png" size="0x1abee27" crc="bc5176e5" sha1="dd0a4a938a3f3c6c572770947a87f1ae16e8fe0a"/>
+			</dataarea>
+			<dataarea name="page4" size="0x1cb12b2"> <!-- book pages -->
+				<rom name="0 - 0004.png" size="0x1cb12b2" crc="ae575502" sha1="d8bd5a0d7908d2212a2d826e4df0552b10f43aeb"/>
+			</dataarea>
+			<dataarea name="page5" size="0x1c38376"> <!-- book pages -->
+				<rom name="0 - 0005.png" size="0x1c38376" crc="1b7453c6" sha1="086993fafbabc4954f0544793db037ed78fd2f4d"/>
+			</dataarea>
+			<dataarea name="page6" size="0x1c4c207"> <!-- book pages -->
+				<rom name="0 - 0006.png" size="0x1c4c207" crc="72c28904" sha1="88417be00bb075a60551800d81d3f4fbac5eaa73"/>
+			</dataarea>
+			<dataarea name="page7" size="0x1c4e3c1"> <!-- book pages -->
+				<rom name="0 - 0007.png" size="0x1c4e3c1" crc="4e2ae0e4" sha1="c6817cff8f92379feb6da9c277096b6570bd5611"/>
+			</dataarea>
+			<dataarea name="page8" size="0x1b8c031"> <!-- book pages -->
+				<rom name="0 - 0008.png" size="0x1b8c031" crc="3fdda44c" sha1="627af09472e8e58b71ced80d520f90649bad14bc"/>
+			</dataarea>
+			<dataarea name="page9" size="0x1b01b16"> <!-- book pages -->
+				<rom name="0 - 0009.png" size="0x1b01b16" crc="0f014072" sha1="71875cd8f1b1b24e82540bd79db20234719bc3a3"/>
+			</dataarea>
+			<dataarea name="page10" size="0x1c5e5d6"> <!-- book pages -->
+				<rom name="0 - 0010.png" size="0x1c5e5d6" crc="bf0fbc39" sha1="12f443a746adc354fa5ada444c8249446114bed4"/>
+			</dataarea>
+			<dataarea name="page11" size="0x1cc2b63"> <!-- book pages -->
+				<rom name="0 - 0011.png" size="0x1cc2b63" crc="d52c1cd3" sha1="5715d2126382b03c38781155094b2e0bb1de3061"/>
+			</dataarea>
+			<dataarea name="page12" size="0x19888d4"> <!-- book pages -->
+				<rom name="0 - 0012.png" size="0x19888d4" crc="5f99907d" sha1="47e4417541024f762e815ad2901e4726accdabe1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mbubbub" supported="yes">
+		<description>Meet Bub: Bub to Eigo Tanken</description>
 		<year>2010</year>
-		<publisher>Moonshot</publisher>
+		<publisher>Sega Toys</publisher>
 		<info name="alt_title" value="Meet Bub バブとえいごたんけん"/>
 		<part name="cart" interface="sega_beena_cart">
 			<dataarea name="rom" size="0x800000" width="32" endianness="big">
@@ -576,9 +1483,232 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="osharem" supported="no">
-		<description>Oshare Majo Love and Berry-Cute ni Oshare</description>
-		<year>20??</year>
+	<software name="meiconan" supported="yes">
+		<description>Meitantei Conan: Kanzen Suiri! Kazu to Zukei no Nazo</description>
+		<year>2006</year>
+		<publisher>Sega Toys</publisher>
+		<info name="alt_title" value="名探偵コナン完全推理！数と図形の謎"/>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x400000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="S-100011-1000 - Meitantei Conan - Kanzen Suiri Kazu to Zukei no Nazo (Japan).bin" size="0x400000" crc="778d58f6" sha1="985844af2626ebcea56a6e764493d023d6cec293"/>
+			</dataarea>
+			<dataarea name="page1" size="0x1b58811"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x1b58811" crc="0f238450" sha1="68a201115b47e2f1b5971ffdd18c24c1024917c7"/>
+			</dataarea>
+			<dataarea name="page2" size="0x1aa5f0b"> <!-- book pages -->
+				<rom name="0 - 0002.png" size="0x1aa5f0b" crc="0ec11f10" sha1="7a22daf882349a2c4dad704cb242b5b9595e80a6"/>
+			</dataarea>
+			<dataarea name="page3" size="0x1a49f5a"> <!-- book pages -->
+				<rom name="0 - 0003.png" size="0x1a49f5a" crc="ded43e35" sha1="7fa0be3b7e96ebc4be74e878a6db65c2c71cafce"/>
+			</dataarea>
+			<dataarea name="page4" size="0x19d02a3"> <!-- book pages -->
+				<rom name="0 - 0004.png" size="0x19d02a3" crc="4c78cd6c" sha1="98b88a1ecf843639d6a4afe877c2a98da1ca02e8"/>
+			</dataarea>
+			<dataarea name="page5" size="0x1a5455f"> <!-- book pages -->
+				<rom name="0 - 0005.png" size="0x1a5455f" crc="eb4da3e1" sha1="cc8a399dd470b783be259932f25a6d6ea79907ac"/>
+			</dataarea>
+			<dataarea name="page6" size="0x19cebf6"> <!-- book pages -->
+				<rom name="0 - 0006.png" size="0x19cebf6" crc="713a8135" sha1="177e1be50feac33e2c840beaed63d81db833f514"/>
+			</dataarea>
+			<dataarea name="page7" size="0x1b6f413"> <!-- book pages -->
+				<rom name="0 - 0007.png" size="0x1b6f413" crc="5b96765d" sha1="504f1e27fde4e1f42bc0045a54047fd7f38c4bd2"/>
+			</dataarea>
+			<dataarea name="page8" size="0x19c8b3a"> <!-- book pages -->
+				<rom name="0 - 0008.png" size="0x19c8b3a" crc="a1351caa" sha1="c4b99afa27f456b4ed99e176d50cae3925a301d9"/>
+			</dataarea>
+			<dataarea name="page9" size="0x1ae9146"> <!-- book pages -->
+				<rom name="0 - 0009.png" size="0x1ae9146" crc="4b302f9b" sha1="3c4e7f8a8e80e9085121d3b780b61fd45adc5da9"/>
+			</dataarea>
+			<dataarea name="page10" size="0x17bf46c"> <!-- book pages -->
+				<rom name="0 - 0010.png" size="0x17bf46c" crc="98dbca5e" sha1="ee641d0303d4d55d1b497da45dacf6e5950b528a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mezzopi" supported="yes">
+		<description>Narumiya Mezzo Piano Oshare &amp; Lesson</description>
+		<year>2006</year>
+		<publisher>Sega Toys</publisher>
+		<info name="alt_title" value="ナルミヤメゾピアノおしゃれ＆レッスン"/>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x400000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="S-100010-1000 - Narumiya Mezzo Piano Oshare and Lesson (Japan).bin" size="0x400000" crc="f541c49a" sha1="000adaa4d9c7404d32fc62ec82c3eafb710c7f64"/>
+			</dataarea>
+			<dataarea name="page1" size="0x1623273"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x1623273" crc="57fd67a4" sha1="b8d5b64fc09694a71956d779dc990f864bdd2883"/>
+			</dataarea>
+			<dataarea name="page2" size="0x10f86e1"> <!-- book pages -->
+				<rom name="0 - 0002.png" size="0x10f86e1" crc="85280892" sha1="fe6f22e41b43d6b506fa9e1ddb429e2f15132ead"/>
+			</dataarea>
+			<dataarea name="page3" size="0x11663ed"> <!-- book pages -->
+				<rom name="0 - 0003.png" size="0x11663ed" crc="6df06434" sha1="5b9568a5a841929463f2ff1553152fef65f6fd31"/>
+			</dataarea>
+			<dataarea name="page4" size="0x18bb0da"> <!-- book pages -->
+				<rom name="0 - 0004.png" size="0x18bb0da" crc="286516f9" sha1="344182fe95f418d7996eac2d2f36b178119ec266"/>
+			</dataarea>
+			<dataarea name="page5" size="0x151b9a6"> <!-- book pages -->
+				<rom name="0 - 0005.png" size="0x151b9a6" crc="ae31e80d" sha1="033d95d8a5762086012285c8c320479e5b5833b1"/>
+			</dataarea>
+			<dataarea name="page6" size="0x104a0e3"> <!-- book pages -->
+				<rom name="0 - 0006.png" size="0x104a0e3" crc="158cf089" sha1="edbd412327349a14585aa339341625d5ab2ed421"/>
+			</dataarea>
+			<dataarea name="page7" size="0x1158767"> <!-- book pages -->
+				<rom name="0 - 0007.png" size="0x1158767" crc="ee614219" sha1="2fcb744662df8aff132f31e97f7162cc0b8e82cd"/>
+			</dataarea>
+			<dataarea name="page8" size="0x1864c28"> <!-- book pages -->
+				<rom name="0 - 0008.png" size="0x1864c28" crc="0aeb2ba4" sha1="b407501dac51dfeef61d9c24806150b04d8ea29a"/>
+			</dataarea>
+			<dataarea name="page9" size="0x17e82cb"> <!-- book pages -->
+				<rom name="0 - 0009.png" size="0x17e82cb" crc="cf51edd7" sha1="fbedc8be2c0d24c2a9b02c55fc794b0bf5b7bc33"/>
+			</dataarea>
+			<dataarea name="page10" size="0x116bf44"> <!-- book pages -->
+				<rom name="0 - 0010.png" size="0x116bf44" crc="00c42464" sha1="a86d636a8d1300b5ea13b7086835f0ab87846d02"/>
+			</dataarea>
+			<dataarea name="page11" size="0x1343059"> <!-- book pages -->
+				<rom name="0 - 0011.png" size="0x1343059" crc="5f9f06b8" sha1="2e3ad834d586dbef7463a794dd1ff76d268113eb"/>
+			</dataarea>
+			<dataarea name="page12" size="0x12ecb96"> <!-- book pages -->
+				<rom name="0 - 0012.png" size="0x12ecb96" crc="3968083e" sha1="04c8c0693b682900e26d01fcdd0065f16ff803fd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="miffy" supported="partial">
+		<description>Omoiyari o Hagukumu Katarikake Ehon Miffy to Asobou Utaou</description>
+		<year>2007</year>
+		<publisher>Sega Toys</publisher>
+		<notes>SD-Card Reader is not emulated</notes>
+		<info name="alt_title" value="思いやりをはぐくむ語りかけ絵本ミッフィーとあそぼう・うたおう"/>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x800000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="S-100027-1020 - Omoiyari o Hagukumu Katarikake Ehon Miffy to Asobou Utaou (Japan).bin" size="0x800000" crc="d7b14a3f" sha1="82dd79cd81349d04614d16e8ad14413f797a5661"/>
+			</dataarea>
+			<dataarea name="page1" size="0x157b1df"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x157b1df" crc="a9242f60" sha1="6e7d1bdc71ccc5c2cb48af4e937c8985a469767f"/>
+			</dataarea>
+			<dataarea name="page2" size="0x160bca2"> <!-- book pages -->
+				<rom name="0 - 0002.png" size="0x160bca2" crc="64e5c5fe" sha1="0e94630dbe1c733f751974f818390adafcce9c72"/>
+			</dataarea>
+			<dataarea name="page3" size="0x99ddd1"> <!-- book pages -->
+				<rom name="0 - 0003.png" size="0x99ddd1" crc="50a79cac" sha1="4c4d44ceb74e11a1bd9c6de9baf0e98b0c06ff34"/>
+			</dataarea>
+			<dataarea name="page4" size="0x17fdbc2"> <!-- book pages -->
+				<rom name="0 - 0004.png" size="0x17fdbc2" crc="8e872130" sha1="f7659e21233e94b0de73ebaf052170a62cfb87e5"/>
+			</dataarea>
+			<dataarea name="page5" size="0x90f605"> <!-- book pages -->
+				<rom name="0 - 0005.png" size="0x90f605" crc="01848ffd" sha1="3bc6a56741b3f8f48a45943b3e2f5ca803779ed9"/>
+			</dataarea>
+			<dataarea name="page6" size="0x1a8f932"> <!-- book pages -->
+				<rom name="0 - 0006.png" size="0x1a8f932" crc="fbc37ddf" sha1="57c31a6c159d6a1ab24405394e97558bbceb27c8"/>
+			</dataarea>
+			<dataarea name="page7" size="0xbc5c44"> <!-- book pages -->
+				<rom name="0 - 0007.png" size="0xbc5c44" crc="1353e89c" sha1="6214148079546ee5f4261772c8a892195fa01b3e"/>
+			</dataarea>
+			<dataarea name="page8" size="0x1680e83"> <!-- book pages -->
+				<rom name="0 - 0008.png" size="0x1680e83" crc="234dac52" sha1="6f990366502a00891ac8c19f001392ca2b63b0e2"/>
+			</dataarea>
+			<dataarea name="page9" size="0x87794c"> <!-- book pages -->
+				<rom name="0 - 0009.png" size="0x87794c" crc="edf22c5c" sha1="d573938ca6d64ff406d30a6f28d643463606bfbe"/>
+			</dataarea>
+			<dataarea name="page10" size="0x1364c79"> <!-- book pages -->
+				<rom name="0 - 0010.png" size="0x1364c79" crc="e8f885e7" sha1="96efb4fdd7dfa528f36e14814c9c289406f82de0"/>
+			</dataarea>
+			<dataarea name="page11" size="0x106019a"> <!-- book pages -->
+				<rom name="0 - 0011.png" size="0x106019a" crc="300b5b45" sha1="1e70c3bffc43a38ecdfe9190a97ac0f48472a333"/>
+			</dataarea>
+			<dataarea name="page12" size="0x1950257"> <!-- book pages -->
+				<rom name="0 - 0012.png" size="0x1950257" crc="2f0b70a5" sha1="f5e232765cc93616606955ee102f07e99e4fd4a2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="niasobo" supported="yes">
+		<description>Nihongo de Asobo</description>
+		<year>2006</year>
+		<publisher>Gakken</publisher>
+		<info name="alt_title" value="にほんごであそぼ"/>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x400000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="T-130001-1003 - Nihongo de Asobo (Japan).bin" size="0x400000" crc="e152dcf4" sha1="bb4242b187a7927408928b8bc2ee63be6c0f5285"/>
+			</dataarea>
+			<dataarea name="page1" size="0x1816398"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x1816398" crc="b9c1683d" sha1="2c231f94efb150d7434772fb84955b3e5e0b2c9e"/>
+			</dataarea>
+			<dataarea name="page2" size="0x19f1ed0"> <!-- book pages -->
+				<rom name="0 - 0002.png" size="0x19f1ed0" crc="64c91b02" sha1="10235c362e5a52a37e0c957f250e47479551d621"/>
+			</dataarea>
+			<dataarea name="page3" size="0x1a72bce"> <!-- book pages -->
+				<rom name="0 - 0003.png" size="0x1a72bce" crc="2f9d1f97" sha1="46e0ef9b6f3662d98f673e4266b7aa3f7a0e2612"/>
+			</dataarea>
+			<dataarea name="page4" size="0x19a059c"> <!-- book pages -->
+				<rom name="0 - 0004.png" size="0x19a059c" crc="d13bef6d" sha1="c15b6c7e675fcfc36e4ccb237e4dca132bcd9386"/>
+			</dataarea>
+			<dataarea name="page5" size="0x1a9a348"> <!-- book pages -->
+				<rom name="0 - 0005.png" size="0x1a9a348" crc="e16cbe1e" sha1="99cadd0825119cda12c523feb1c208b3e3d2dccc"/>
+			</dataarea>
+			<dataarea name="page6" size="0x1a0e308"> <!-- book pages -->
+				<rom name="0 - 0006.png" size="0x1a0e308" crc="10ee53cd" sha1="778dcc7a7aa3d478813f12484643b822c91fcc92"/>
+			</dataarea>
+			<dataarea name="page7" size="0x1a7dd13"> <!-- book pages -->
+				<rom name="0 - 0007.png" size="0x1a7dd13" crc="2c8fcbb4" sha1="c915d142ea2b16e752750df7e8ea7edda535933d"/>
+			</dataarea>
+			<dataarea name="page8" size="0x1b7d986"> <!-- book pages -->
+				<rom name="0 - 0008.png" size="0x1b7d986" crc="56f59246" sha1="8dde1d528c7fcbfe09fd3da5aa5b62c4abbd55b8"/>
+			</dataarea>
+			<dataarea name="page9" size="0x1bd9f1e"> <!-- book pages -->
+				<rom name="0 - 0009.png" size="0x1bd9f1e" crc="9eac5654" sha1="ee0679e664cc9323b9b85f469b36db1363c84177"/>
+			</dataarea>
+			<dataarea name="page10" size="0x1a0ab87"> <!-- book pages -->
+				<rom name="0 - 0010.png" size="0x1a0ab87" crc="9a432a33" sha1="0fcef0d380eb39da2f26001b7c9ca0a088ecf2a7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="odenkun" supported="yes">
+		<description>Oden-kun: Oden Mura no Tanoshii Nakama-tachi</description>
+		<year>2007</year>
+		<publisher>Sega Toys</publisher>
+		<info name="alt_title" value="おでんくんおでんむらのたのしいなかまたち"/>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x400000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="S-100028-1000 - Oden-kun - Oden Mura no Tanoshii Nakama-tachi (Japan).bin" size="0x400000" crc="a112a43c" sha1="b0e137c8b03714280d8e049e1b8e2a3b850f3cbc"/>
+			</dataarea>
+			<dataarea name="page1" size="0x1c29b4a"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x1c29b4a" crc="4c2f4631" sha1="930c60617c3c45da99c162218718af8cec0f8996"/>
+			</dataarea>
+			<dataarea name="page2" size="0x1acd5c9"> <!-- book pages -->
+				<rom name="0 - 0002.png" size="0x1acd5c9" crc="b249d385" sha1="66eccebf8f0a4203115f265c19ef074ff394fbb2"/>
+			</dataarea>
+			<dataarea name="page3" size="0x1bff2eb"> <!-- book pages -->
+				<rom name="0 - 0003.png" size="0x1bff2eb" crc="1f15171d" sha1="9821c245f489dead06e61d5f770cd91cdc1520f5"/>
+			</dataarea>
+			<dataarea name="page4" size="0x1a29fad"> <!-- book pages -->
+				<rom name="0 - 0004.png" size="0x1a29fad" crc="4ad93f12" sha1="3d429ccf71f104558054b99d57e88edb366ac8ef"/>
+			</dataarea>
+			<dataarea name="page5" size="0x1ae4c5b"> <!-- book pages -->
+				<rom name="0 - 0005.png" size="0x1ae4c5b" crc="8e7c824a" sha1="012e484b54cb1916999afb3fa1f85bb6710ee45c"/>
+			</dataarea>
+			<dataarea name="page6" size="0x1ad8d5c"> <!-- book pages -->
+				<rom name="0 - 0006.png" size="0x1ad8d5c" crc="b64e5791" sha1="ca91ac956c10ab4efe27260eb0db90bfae2aff6b"/>
+			</dataarea>
+			<dataarea name="page7" size="0x1b613f3"> <!-- book pages -->
+				<rom name="0 - 0007.png" size="0x1b613f3" crc="ac73361b" sha1="6f8007078981a3b7298072b581175e1fa318fad2"/>
+			</dataarea>
+			<dataarea name="page8" size="0x1b8b24b"> <!-- book pages -->
+				<rom name="0 - 0008.png" size="0x1b8b24b" crc="d33a714c" sha1="9e5e94ef84a26da31b163095a65ecd78d6266a05"/>
+			</dataarea>
+			<dataarea name="page9" size="0x1a2061d"> <!-- book pages -->
+				<rom name="0 - 0009.png" size="0x1a2061d" crc="7a3a1b58" sha1="2f7b141760285dc694587f83a5f184888086403a"/>
+			</dataarea>
+			<dataarea name="page10" size="0x1471263"> <!-- book pages -->
+				<rom name="0 - 0010.png" size="0x1471263" crc="20c5e7f2" sha1="864cf64010aeb747e6bdbf75e364a3171e4212b2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="osharem" supported="yes">
+		<description>Oshare Majo Love and Berry: Cute ni Oshare</description>
+		<year>2006</year>
 		<publisher>Sega Toys</publisher>
 		<info name="alt_title" value="オシャレ魔女ラブ and ベリー キュートにオシャレ"/>
 		<part name="cart" interface="sega_beena_cart">
@@ -624,11 +1754,59 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="partnertv" supported="no">
+	<software name="oshrmoji" supported="yes">
+		<description>Chiiku Drill Oshare Majo Love and Berry: Moji Kazu Chie Asobi</description>
+		<year>2007</year>
+		<publisher>Sega Toys</publisher>
+		<info name="alt_title" value="知育ドリルオシャレ魔女ラブ and ベリーもじ・かず・ちえあそび"/>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x800000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="S-100023-1000 - Chiiku Drill Oshare Majo Love and Berry - Moji Kazu Chie Asobi (Japan).bin" size="0x800000" crc="e1b1d412" sha1="546b5c1e21b2c20120024153d201da8d9896e4c8"/>
+			</dataarea>
+			<dataarea name="page1" size="0x169ed7b"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x169ed7b" crc="dc7d67b7" sha1="a6236cb586a62c4336bd4f2cc975e6fd7d0d7aa0"/>
+			</dataarea>
+			<dataarea name="page2" size="0x1867487"> <!-- book pages -->
+				<rom name="0 - 0002.png" size="0x1867487" crc="e6c125ea" sha1="296786e24c13bbb714b5868576cb5ebb578972f0"/>
+			</dataarea>
+			<dataarea name="page3" size="0x1934524"> <!-- book pages -->
+				<rom name="0 - 0003.png" size="0x1934524" crc="3299a2ac" sha1="4d2d8101daf6175736f0beb0a0f3b762cacc993e"/>
+			</dataarea>
+			<dataarea name="page4" size="0x1a33366"> <!-- book pages -->
+				<rom name="0 - 0004.png" size="0x1a33366" crc="32aced5a" sha1="b78b010f72d87b37ef542d195e12b872f194874a"/>
+			</dataarea>
+			<dataarea name="page5" size="0x1775c1a"> <!-- book pages -->
+				<rom name="0 - 0005.png" size="0x1775c1a" crc="24772801" sha1="3a1130429b29ef9321515bf510c30c14f9548529"/>
+			</dataarea>
+			<dataarea name="page6" size="0x16ad659"> <!-- book pages -->
+				<rom name="0 - 0006.png" size="0x16ad659" crc="c146f62d" sha1="08d59d24d92498fb67687795a30d3cbbf33331b9"/>
+			</dataarea>
+			<dataarea name="page7" size="0x1623390"> <!-- book pages -->
+				<rom name="0 - 0007.png" size="0x1623390" crc="6d4fb353" sha1="20cd545506e2b8fd29d39016067a3e7f66216831"/>
+			</dataarea>
+			<dataarea name="page8" size="0x1865b2e"> <!-- book pages -->
+				<rom name="0 - 0008.png" size="0x1865b2e" crc="85929112" sha1="7ace05c23003159f6ceccdcc27ffc0c08e806beb"/>
+			</dataarea>
+			<dataarea name="page9" size="0x193bbd8"> <!-- book pages -->
+				<rom name="0 - 0009.png" size="0x193bbd8" crc="a11eff32" sha1="21049802dd65d78b8fd76cf0eb295c3d4afdf688"/>
+			</dataarea>
+			<dataarea name="page10" size="0x18e2e34"> <!-- book pages -->
+				<rom name="0 - 0010.png" size="0x18e2e34" crc="108c73fb" sha1="daafbabc6ff4038ac464c842c200fe04223277a6"/>
+			</dataarea>
+			<dataarea name="page11" size="0x17f43fb"> <!-- book pages -->
+				<rom name="0 - 0011.png" size="0x17f43fb" crc="730456f3" sha1="c477feadd3f36eb89ff8ecd1f6c83228ce489588"/>
+			</dataarea>
+			<dataarea name="page12" size="0x16dbb8d"> <!-- book pages -->
+				<rom name="0 - 0012.png" size="0x16dbb8d" crc="81fcb941" sha1="ee389f181104db687e19a81de9f64e2fe7996f8a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="partnertv" supported="yes">
 		<description>Partner In TV! O-Uchi ni Wan-chan ga Yattekita</description>
 		<year>2005</year>
 		<publisher>Sega Toys</publisher>
-		<info name="alt_title" value="Partner in TV! おうちにわんちゃんがやってきた♪"/>
+		<info name="alt_title" value="Partner in TV！ おうちにわんちゃんがやってきた♪"/>
 		<part name="cart" interface="sega_beena_cart">
 			<dataarea name="rom" size="0x400000" width="32" endianness="big">
 				<rom loadflag="load16_word_swap" name="S-100003-1000 - Partner In TV o-Uchi ni Wan-chan ga Yattekita (Japan).bin" size="0x400000" crc="3a3c9f33" sha1="ba2ed83d1caf05b0e84c39d2939b5ac1e11d160f"/>
@@ -672,7 +1850,98 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="pointgt" supported="no">
+	<software name="pashah" supported="no">
+		<description>Pashah to Henshin Beauty Academy</description>
+		<year>2006</year>
+		<publisher>Sega Toys</publisher>
+		<info name="alt_title" value="パシャッとへんしんビューティーアカデミー"/>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x800000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="S-100021-1000 - Pashah to Henshin Beauty Academy (Japan).bin" size="0x800000" crc="d59b6da4" sha1="26be7fd761042cb0af5bc10e5b34a3cf3f1f6d34"/>
+			</dataarea>
+			<dataarea name="page1" size="0x18cbdc5"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x18cbdc5" crc="f7511032" sha1="263092f7f208ce38dc89bb780929dcd1719e8be3"/>
+			</dataarea>
+			<dataarea name="page2" size="0x17a6a68"> <!-- book pages -->
+				<rom name="0 - 0002.png" size="0x17a6a68" crc="e4886fbb" sha1="6069be47102b14ad1b0bed7a3857c7f930aaadfd"/>
+			</dataarea>
+			<dataarea name="page3" size="0x17b9a8d"> <!-- book pages -->
+				<rom name="0 - 0003.png" size="0x17b9a8d" crc="e0558ac7" sha1="108369661a29394123386a61abe1e817cb32ec79"/>
+			</dataarea>
+			<dataarea name="page4" size="0x189e734"> <!-- book pages -->
+				<rom name="0 - 0004.png" size="0x189e734" crc="3e397403" sha1="8d883f39591f2c327184a42478d404eb5c24a533"/>
+			</dataarea>
+			<dataarea name="page5" size="0x1788505"> <!-- book pages -->
+				<rom name="0 - 0005.png" size="0x1788505" crc="e95660a3" sha1="bec21fff744fdfcd9ebc7682959b999a78bc4bdd"/>
+			</dataarea>
+			<dataarea name="page6" size="0x158166e"> <!-- book pages -->
+				<rom name="0 - 0006.png" size="0x158166e" crc="2face338" sha1="388d8db457c09843e2eaa1e1de88f15a88d58d46"/>
+			</dataarea>
+			<dataarea name="page7" size="0x18169b5"> <!-- book pages -->
+				<rom name="0 - 0007.png" size="0x18169b5" crc="613f4849" sha1="3811df0d3869bd0a8bbb0e2448417180115f4e9f"/>
+			</dataarea>
+			<dataarea name="page8" size="0x18bb0a1"> <!-- book pages -->
+				<rom name="0 - 0008.png" size="0x18bb0a1" crc="64386f2e" sha1="81902c54f640c6693fe0741b47844e2ad8beabd1"/>
+			</dataarea>
+			<dataarea name="page9" size="0x1952c0b"> <!-- book pages -->
+				<rom name="0 - 0009.png" size="0x1952c0b" crc="357029c9" sha1="c1964a210e3a52edee59b731ca6030a477dc2d00"/>
+			</dataarea>
+			<dataarea name="page10" size="0x1787f4c"> <!-- book pages -->
+				<rom name="0 - 0010.png" size="0x1787f4c" crc="6b082b7e" sha1="58ac22fb74c736f3845834111baa1c0c719f9cf0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pc5gg" supported="partial">
+		<description>Yes! PreCure 5 GoGo!: LoveLove Hiragana Lesson</description>
+		<year>2008</year>
+		<publisher>Bandai</publisher>
+		<notes>SD-Card Reader is not emulated</notes>
+		<info name="alt_title" value="Yes！プリキュア5GoGo！ lovelove ひらがなレッスン"/>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x800000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="T-110010-1000 - Yes PreCure 5 GoGo - LoveLove Hiragana Lesson (Japan).bin" size="0x800000" crc="3409f8c6" sha1="7bda85cab8e327d074bcf8ff55f9d001a6c15b31"/>
+			</dataarea>
+			<dataarea name="page1" size="0x1e4fcb3"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x1e4fcb3" crc="2560e009" sha1="5dcd202604cf17be5262d98fcb25836667175e55"/>
+			</dataarea>
+			<dataarea name="page2" size="0x203181c"> <!-- book pages -->
+				<rom name="0 - 0002.png" size="0x203181c" crc="fefde08d" sha1="2424dc5a0a46a828619e1488376d610d03641a39"/>
+			</dataarea>
+			<dataarea name="page3" size="0x1fe9c25"> <!-- book pages -->
+				<rom name="0 - 0003.png" size="0x1fe9c25" crc="740fb819" sha1="258821676be55e8c808dd650980386468ce55d21"/>
+			</dataarea>
+			<dataarea name="page4" size="0x1f3d287"> <!-- book pages -->
+				<rom name="0 - 0004.png" size="0x1f3d287" crc="caccb5b0" sha1="fbac8b30242d9875c027890ca6970c183567390e"/>
+			</dataarea>
+			<dataarea name="page5" size="0x1ef409a"> <!-- book pages -->
+				<rom name="0 - 0005.png" size="0x1ef409a" crc="03be24ce" sha1="782575225ea93e4077a6d00a65d51b6cd7ba53b7"/>
+			</dataarea>
+			<dataarea name="page6" size="0x1eb0bc3"> <!-- book pages -->
+				<rom name="0 - 0006.png" size="0x1eb0bc3" crc="d46e7aa4" sha1="ebb2f07ccb33d825a7debbf177a75db65a7f939a"/>
+			</dataarea>
+			<dataarea name="page7" size="0x1f804fc"> <!-- book pages -->
+				<rom name="0 - 0007.png" size="0x1f804fc" crc="3b67b98c" sha1="ffb8c8d21d0526a7dbe96c7d9e893dabbd95357a"/>
+			</dataarea>
+			<dataarea name="page8" size="0x1a93091"> <!-- book pages -->
+				<rom name="0 - 0008.png" size="0x1a93091" crc="07f5a5d2" sha1="021ba75a84e042d0db3f10cfce03603108274b3a"/>
+			</dataarea>
+			<dataarea name="page9" size="0x18e9271"> <!-- book pages -->
+				<rom name="0 - 0009.png" size="0x18e9271" crc="6a5029c1" sha1="2d5eeb80d5b9651e032346eb6873a48e7f5fe056"/>
+			</dataarea>
+			<dataarea name="page10" size="0x1cae8fb"> <!-- book pages -->
+				<rom name="0 - 0010.png" size="0x1cae8fb" crc="dc5c8b87" sha1="125bb294eeaf1cd3d46813d0272259cff7b8823c"/>
+			</dataarea>
+			<dataarea name="page11" size="0x1a6326e"> <!-- book pages -->
+				<rom name="0 - 0011.png" size="0x1a6326e" crc="68a08a87" sha1="95440ed7b1701ad1c7295b4d948046e05f70f8ed"/>
+			</dataarea>
+			<dataarea name="page12" size="0x20cc20e"> <!-- book pages -->
+				<rom name="0 - 0012.png" size="0x20cc20e" crc="031c1fcd" sha1="117486ef427a73384945784e3b5da650c12e03fc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pointgt" supported="yes">
 		<description>Point Gakushuu Tokei</description>
 		<year>2006</year>
 		<publisher>Sega Toys</publisher>
@@ -708,14 +1977,63 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="pokebw" supported="no">
-		<description>Pocket Monsters Best Wishes! Chinou Ikusei Pokémon Daiundoukai</description>
+	<software name="pokebat" supported="yes">
+		<description>Pocket Monster Advance Generation Pokémon Suuji Battle!!</description>
+		<year>2005</year>
+		<publisher>Sega Toys</publisher>
+		<info name="alt_title" value="ポケットモンスターアドバンスジェネレーションポケモンすうじバトル!!"/>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x400000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="S-100007-1000 - Pocket Monster Advance Generation Pokemon Suuji Battle (Japan).bin" size="0x400000" crc="45044fe4" sha1="af27ec3b1480e1342c90ff7b15bcbac794241948"/>
+			</dataarea>
+			<dataarea name="page1" size="0x1ef6007"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x1ef6007" crc="d7c7e722" sha1="2f9caf03541008fd49cf5e9cf3659530a0c6670e"/>
+			</dataarea>
+			<dataarea name="page2" size="0x1fa43d7"> <!-- book pages -->
+				<rom name="0 - 0002.png" size="0x1fa43d7" crc="07f44b30" sha1="caac3c6c7bbbd4506efa96a0e0ea376cdc62771a"/>
+			</dataarea>
+			<dataarea name="page3" size="0x20ae02d"> <!-- book pages -->
+				<rom name="0 - 0003.png" size="0x20ae02d" crc="01efe1e4" sha1="88849bddf9297bb10b4ade6b3416c68cb0c443c7"/>
+			</dataarea>
+			<dataarea name="page4" size="0x1e24d01"> <!-- book pages -->
+				<rom name="0 - 0004.png" size="0x1e24d01" crc="e33f7225" sha1="4e03e1f3e84e03597c9f00ab8b4e6bff298c71af"/>
+			</dataarea>
+			<dataarea name="page5" size="0x1fceebe"> <!-- book pages -->
+				<rom name="0 - 0005.png" size="0x1fceebe" crc="76326d0f" sha1="d17177b54efacc7ee8ca7d7a1a9667f4c9c10552"/>
+			</dataarea>
+			<dataarea name="page6" size="0x200bc9f"> <!-- book pages -->
+				<rom name="0 - 0006.png" size="0x200bc9f" crc="105dab0e" sha1="78834d7d80e2b34eb7692955f04ea34bfae51fb9"/>
+			</dataarea>
+			<dataarea name="page7" size="0x213fec9"> <!-- book pages -->
+				<rom name="0 - 0007.png" size="0x213fec9" crc="c315bd77" sha1="f4a9545ecf1992943557a9dd97a589685e05a026"/>
+			</dataarea>
+			<dataarea name="page8" size="0x207caa2"> <!-- book pages -->
+				<rom name="0 - 0008.png" size="0x207caa2" crc="6bc82a91" sha1="1186a9cfceaaaa748ab26369bb78663177c34f6c"/>
+			</dataarea>
+			<dataarea name="page9" size="0x208af21"> <!-- book pages -->
+				<rom name="0 - 0009.png" size="0x208af21" crc="e9fdf758" sha1="472360be4ccae6f0d67d78648ed2f8054b391216"/>
+			</dataarea>
+			<dataarea name="page10" size="0x1d1bff2"> <!-- book pages -->
+				<rom name="0 - 0010.png" size="0x1d1bff2" crc="9acad698" sha1="735120c646f6020b31222db868e5fc157e2bd0c4"/>
+			</dataarea>
+			<dataarea name="page11" size="0x1b23336"> <!-- book pages -->
+				<rom name="0 - 0011.png" size="0x1b23336" crc="99c81fec" sha1="abe131a0f55b9ec5f0d75e15d89e9bb8aa78aaf7"/>
+			</dataarea>
+			<dataarea name="page12" size="0x198a8ba"> <!-- book pages -->
+				<rom name="0 - 0012.png" size="0x198a8ba" crc="d4893084" sha1="a1878c87e6cb745f1997eaab67ee7f0d209a101a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokebw" supported="partial">
+		<description>Pocket Monster Best Wishes! Chinou Ikusei Pokémon Daiundoukai</description>
 		<year>2010</year>
 		<publisher>Sega Toys</publisher>
+		<notes>SD-Card Reader is not emulated</notes>
 		<info name="alt_title" value="ポケットモンスターベストウイッシュ知能育成ポケモン大運動会"/>
 		<part name="cart" interface="sega_beena_cart">
 			<dataarea name="rom" size="0x800000" width="32" endianness="big">
-				<rom loadflag="load16_word_swap" name="S-100042-1000 - Pocket Monsters Best Wishes Chinou Ikusei Pokemon Daiundoukai (Japan).bin" size="0x800000" crc="a88ec549" sha1="866b56789fcb118e1ac50a8214a630a092aadd2f"/>
+				<rom loadflag="load16_word_swap" name="S-100042-1000 - Pocket Monster Best Wishes Chinou Ikusei Pokemon Daiundoukai (Japan).bin" size="0x800000" crc="a88ec549" sha1="866b56789fcb118e1ac50a8214a630a092aadd2f"/>
 			</dataarea>
 			<dataarea name="page1" size="0x1df00e4"> <!-- book pages -->
 				<rom name="0 - 0001.png" size="0x1df00e4" crc="842d5598" sha1="0d9150822828726ee5d8cdf179afefa11f79ed02"/>
@@ -756,14 +2074,15 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="pokedp" supported="no">
-		<description>Pocket Monsters Diamond &amp; Pearl Pokemon o Sagase! Meiro de Daibouken!</description>
+	<software name="pokedp" supported="partial">
+		<description>Pocket Monster Diamond &amp; Pearl Pokémon o Sagase! Meiro de Daibouken!</description>
 		<year>2009</year>
 		<publisher>Sega Toys</publisher>
+		<notes>SD-Card Reader is not emulated</notes>
 		<info name="alt_title" value="ポケットモンスターダイヤモンド・パール ポケモンをさがせ！めいろでだいぼうけん！"/>
 		<part name="cart" interface="sega_beena_cart">
 			<dataarea name="rom" size="0x800000" width="32" endianness="big">
-				<rom loadflag="load16_word_swap" name="S-100039-1100 - Pocket Monsters Diamond and Pearl Pokemon o Sagase Meiro de Daibouken.bin" size="0x00800000" crc="7bbf9599" sha1="25aba3628c627c3ed603f14cb50cfe6101816db7"/>
+				<rom loadflag="load16_word_swap" name="S-100039-1100 - Pocket Monster Diamond and Pearl Pokemon o Sagase Meiro de Daibouken.bin" size="0x00800000" crc="7bbf9599" sha1="25aba3628c627c3ed603f14cb50cfe6101816db7"/>
 			</dataarea>
 			<dataarea name="page1" size="0x0204f417"> <!-- book pages -->
 				<rom name="0 - 0001.png" size="0x0204f417" crc="088c3d4c" sha1="d66a27f30374568998cff2ed89e494ac7f449687"/>
@@ -804,11 +2123,103 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="precure5" supported="no">
-		<description>Yes! PreCure 5 Asonde Oboeyou Hiragana!</description>
+	<software name="pokedp_0" supported="partial" cloneof="pokedp">
+		<description>Pocket Monster Diamond &amp; Pearl Pokémon o Sagase! Meiro de Daibouken! (Rev. S-100039-1000)</description>
+		<year>2009</year>
+		<publisher>Sega Toys</publisher>
+		<notes>SD-Card Reader is not emulated</notes>
+		<info name="alt_title" value="ポケットモンスターダイヤモンド・パール ポケモンをさがせ！めいろでだいぼうけん！"/>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x800000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="S-100039-1000 - Pocket Monster Diamond and Pearl Pokemon o Sagase Meiro de Daibouken (Japan).bin" size="0x800000" crc="0da4a46b" sha1="bda5f00a03e43c3e03f1ea38bf96f6c276a54a0c"/>
+			</dataarea>
+			<dataarea name="page1" size="0x1f794da"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x1f794da" crc="834a6eb2" sha1="cf7802346281f50c81464db18b81101b591c04de"/>
+			</dataarea>
+			<dataarea name="page2" size="0x1ee361d"> <!-- book pages -->
+				<rom name="0 - 0002.png" size="0x1ee361d" crc="42fed04b" sha1="fa9dcc1fbde4ff521194991654bbb029c778cc93"/>
+			</dataarea>
+			<dataarea name="page3" size="0x1f8e97b"> <!-- book pages -->
+				<rom name="0 - 0003.png" size="0x1f8e97b" crc="5a70b1c3" sha1="04fae6643b27922da097e6c5e88a3b72d324273b"/>
+			</dataarea>
+			<dataarea name="page4" size="0x1d70377"> <!-- book pages -->
+				<rom name="0 - 0004.png" size="0x1d70377" crc="11b8e146" sha1="250bc5b966388e115869637f10cf228e435b3135"/>
+			</dataarea>
+			<dataarea name="page5" size="0x1c91c80"> <!-- book pages -->
+				<rom name="0 - 0005.png" size="0x1c91c80" crc="83f03411" sha1="2a2a74492e29a43a76edbb5fd28a3991b9c98f6b"/>
+			</dataarea>
+			<dataarea name="page6" size="0x20338ea"> <!-- book pages -->
+				<rom name="0 - 0006.png" size="0x20338ea" crc="0f502d14" sha1="3bf60a722a25b1177d1ef78030385d4781f3c1df"/>
+			</dataarea>
+			<dataarea name="page7" size="0x20b37fc"> <!-- book pages -->
+				<rom name="0 - 0007.png" size="0x20b37fc" crc="66df4b42" sha1="0eeb3b798f8665e724917cfe7b5bf98f913658ba"/>
+			</dataarea>
+			<dataarea name="page8" size="0x1b6c868"> <!-- book pages -->
+				<rom name="0 - 0008.png" size="0x1b6c868" crc="290fb95b" sha1="b40b24a0d291ab082296612fb8404b6a0af5514c"/>
+			</dataarea>
+			<dataarea name="page9" size="0x1bee810"> <!-- book pages -->
+				<rom name="0 - 0009.png" size="0x1bee810" crc="1930a3b0" sha1="66168a2cf75b93a0a16c74fe78fe61c1032491cb"/>
+			</dataarea>
+			<dataarea name="page10" size="0x1e20e47"> <!-- book pages -->
+				<rom name="0 - 0010.png" size="0x1e20e47" crc="5255e1ec" sha1="72fe1162a426a2c6a6b7243b68e31b9e5129d7be"/>
+			</dataarea>
+			<dataarea name="page11" size="0x1ead59b"> <!-- book pages -->
+				<rom name="0 - 0011.png" size="0x1ead59b" crc="b7bfc41d" sha1="2b4199c925add203c90d40dbc57e6f62566b72a3"/>
+			</dataarea>
+			<dataarea name="page12" size="0x1b7ff33"> <!-- book pages -->
+				<rom name="0 - 0012.png" size="0x1b7ff33" crc="c4b0b372" sha1="4c34d021621488d293f71dbaf59011e397225a57"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokemoji" supported="yes">
+		<description>Chiiku Drill Pocket Monster Diamond &amp; Pearl: Moji Kazu Chie Asobi</description>
+		<year>2007</year>
+		<publisher>Sega Toys</publisher>
+		<info name="alt_title" value="知育ドリルポケットモンスターダイヤモンド・パールもじ・かず・ちえあそび"/>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x400000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="S-100025-0018 - Chiiku Drill Pocket Monster Diamond and Pearl - Moji Kazu Chie Asobi (Japan).bin" size="0x400000" crc="2b87b332" sha1="24cda24c7b3053e004799793f4042d05e3859e1a"/>
+			</dataarea>
+			<dataarea name="page1" size="0x1a3ae73"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x1a3ae73" crc="e4bc1dfc" sha1="1dcedfe52c17a33a5eb202ea47c9f3d03ced7b2b"/>
+			</dataarea>
+			<dataarea name="page2" size="0x176efa8"> <!-- book pages -->
+				<rom name="0 - 0002.png" size="0x176efa8" crc="6398cc0e" sha1="3c066dd810eaac502b03581f90839dc877d0c267"/>
+			</dataarea>
+			<dataarea name="page3" size="0x190f4e9"> <!-- book pages -->
+				<rom name="0 - 0003.png" size="0x190f4e9" crc="dc5c8600" sha1="d6235cc3fed3312b26d301041a4653b596a86c0b"/>
+			</dataarea>
+			<dataarea name="page4" size="0x19b5828"> <!-- book pages -->
+				<rom name="0 - 0004.png" size="0x19b5828" crc="93f31552" sha1="470606003b7e107e872cde9cbdcf3a3550308a56"/>
+			</dataarea>
+			<dataarea name="page5" size="0x1ac3805"> <!-- book pages -->
+				<rom name="0 - 0005.png" size="0x1ac3805" crc="4c608bc9" sha1="38045c818540432d601ab289602bc0692b97b20a"/>
+			</dataarea>
+			<dataarea name="page6" size="0x18a8fcb"> <!-- book pages -->
+				<rom name="0 - 0006.png" size="0x18a8fcb" crc="cafaa22e" sha1="be50c580bf4d79f710a0ae47d187e0a569629da8"/>
+			</dataarea>
+			<dataarea name="page7" size="0x19b20f1"> <!-- book pages -->
+				<rom name="0 - 0007.png" size="0x19b20f1" crc="5c62db24" sha1="fc54558e9945cfcb0611745da84a93337b13a58f"/>
+			</dataarea>
+			<dataarea name="page8" size="0x1a54d7e"> <!-- book pages -->
+				<rom name="0 - 0008.png" size="0x1a54d7e" crc="524ad2bd" sha1="66387913caf76391134167a262a654b601528530"/>
+			</dataarea>
+			<dataarea name="page9" size="0x1a91722"> <!-- book pages -->
+				<rom name="0 - 0009.png" size="0x1a91722" crc="3ca4a50b" sha1="0c2dac2e9a4ff2541137703aee1be989cfbccfc1"/>
+			</dataarea>
+			<dataarea name="page10" size="0x194f132"> <!-- book pages -->
+				<rom name="0 - 0010.png" size="0x194f132" crc="b5e2f03a" sha1="6568d7a217d9b069e529c11dad547b8f56de4a34"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="precure5" supported="partial">
+		<description>Yes! PreCure 5: Asonde Oboeyou Hiragana!</description>
 		<year>2007</year>
 		<publisher>Bandai</publisher>
-		<info name="alt_title" value="Yes!プリキュア5あそんでおぼえよう！ひらがな！"/>
+		<notes>SD-Card Reader is not emulated</notes>
+		<info name="alt_title" value="Yes！プリキュア5 あそんでおぼえよう！ひらがな！"/>
 		<part name="cart" interface="sega_beena_cart">
 			<dataarea name="rom" size="0x800000" width="32" endianness="big">
 				<rom loadflag="load16_word_swap" name="T-110008-1101 - Yes PreCure 5 Asonde Oboeyou Hiragana.bin" size="0x00800000" crc="6ae77335" sha1="29650349b117b96105882da7b12cac8fe9a04813"/>
@@ -852,10 +2263,11 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="precurehc" supported="no">
+	<software name="precurehc" supported="partial">
 		<description>Oshare ni Henshin HeartCatch PreCure!</description>
 		<year>2010</year>
 		<publisher>Bandai</publisher>
+		<notes>SD-Card Reader is not emulated</notes>
 		<info name="alt_title" value="おしゃれにへんしん★ハートキャッチプリキュア！"/>
 		<part name="cart" interface="sega_beena_cart">
 			<dataarea name="rom" size="0x800000" width="32" endianness="big">
@@ -900,10 +2312,11 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="sssbat" supported="no">
+	<software name="sssbat" supported="partial">
 		<description>Samurai Sentai Shinkenger Battle ga Ippai! Iza Mairu!</description>
 		<year>2009</year>
 		<publisher>Bandai</publisher>
+		<notes>SD-Card Reader is not emulated</notes>
 		<info name="alt_title" value="侍戦隊シンケンジャーバトルがいっぱい！いざ参る！"/>
 		<part name="cart" interface="sega_beena_cart">
 			<dataarea name="rom" size="0x800000" width="32" endianness="big">
@@ -944,6 +2357,181 @@ license:CC0-1.0
 			</dataarea>
 			<dataarea name="page12" size="0x018bfb44"> <!-- book pages -->
 				<rom name="0 - 0012.png" size="0x018bfb44" crc="ed48a893" sha1="e0ca297e88dec53c74462a3018c904d41ffde037"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suitepc" supported="yes">
+		<description>Suite PreCure: Happy Oshare Harmony</description>
+		<year>2011</year>
+		<publisher>Bandai</publisher>
+		<info name="alt_title" value="スイートプリキュア♪ハッピーおしゃれハーモニー"/>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x800000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="T-110016-1000 - Suite PreCure - Happy Oshare Harmony (Japan).bin" size="0x800000" crc="89000b22" sha1="9aef640c347430512e654cbf492d85eff1b94cb9"/>
+			</dataarea>
+			<dataarea name="page1" size="0x1b79040"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x1b79040" crc="998e3ed7" sha1="30e0935c481200092307291aaa266438e8ddc83e"/>
+			</dataarea>
+			<dataarea name="page2" size="0x1e4af95"> <!-- book pages -->
+				<rom name="0 - 0002.png" size="0x1e4af95" crc="7ec0a6f7" sha1="2ebdbb3e5a191245ddfb8374af428b4bf60b1f29"/>
+			</dataarea>
+			<dataarea name="page3" size="0x1dcefe0"> <!-- book pages -->
+				<rom name="0 - 0003.png" size="0x1dcefe0" crc="31f1c7e4" sha1="8545c00eca62d8769ab01710f0436be0237e1bfe"/>
+			</dataarea>
+			<dataarea name="page4" size="0x19cb4ca"> <!-- book pages -->
+				<rom name="0 - 0004.png" size="0x19cb4ca" crc="d9caa6a0" sha1="e85dfa60f1039410fc10048d704678e29666aa81"/>
+			</dataarea>
+			<dataarea name="page5" size="0x19d67f3"> <!-- book pages -->
+				<rom name="0 - 0005.png" size="0x19d67f3" crc="31713360" sha1="36bcece193c0886373f1c8b68a41e7864233167a"/>
+			</dataarea>
+			<dataarea name="page6" size="0x1e4b798"> <!-- book pages -->
+				<rom name="0 - 0006.png" size="0x1e4b798" crc="d21f8f79" sha1="bb7a3fe477f5e457138ce6711bdc374fef36e219"/>
+			</dataarea>
+			<dataarea name="page7" size="0x1e7b856"> <!-- book pages -->
+				<rom name="0 - 0007.png" size="0x1e7b856" crc="b95e564d" sha1="cc6eea7f833769eb6a35d619b3a6b6f6b8977c82"/>
+			</dataarea>
+			<dataarea name="page8" size="0x1b58de1"> <!-- book pages -->
+				<rom name="0 - 0008.png" size="0x1b58de1" crc="4ce5876f" sha1="35ba9af91c575a6c133df573b684ba384273e301"/>
+			</dataarea>
+			<dataarea name="page9" size="0x1b09dd8"> <!-- book pages -->
+				<rom name="0 - 0009.png" size="0x1b09dd8" crc="561d72dc" sha1="c32103aa6cce23fdb37d162cce3756a2f5b8ff6c"/>
+			</dataarea>
+			<dataarea name="page10" size="0x1a82851"> <!-- book pages -->
+				<rom name="0 - 0010.png" size="0x1a82851" crc="29c63331" sha1="5b547d75a4189fd25114002331c545075907d0a3"/>
+			</dataarea>
+			<dataarea name="page11" size="0x19ed72b"> <!-- book pages -->
+				<rom name="0 - 0011.png" size="0x19ed72b" crc="eb125c85" sha1="f464e82b052186acb989889e2358a9d8474fa818"/>
+			</dataarea>
+			<dataarea name="page12" size="0x1a739b4"> <!-- book pages -->
+				<rom name="0 - 0012.png" size="0x1a739b4" crc="17c324e2" sha1="d82ba6cefdd052a89573eeb41c56019deebab7fe"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toasobou" supported="yes">
+		<description>Tomica de Asobou!</description>
+		<year>2006</year>
+		<publisher>Sega Toys</publisher>
+		<info name="alt_title" value="トミカであそぼう!"/>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x800000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="S-100014-1000 - Tomica de Asobou (Japan).bin" size="0x800000" crc="447caa66" sha1="ca44ac31ee66b5162eb43dd228664635b7d155c5"/>
+			</dataarea>
+			<dataarea name="page1" size="0x1bf2dc8"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x1bf2dc8" crc="920a26d1" sha1="d3d36cdb5cc6fe87f51b7db8a845f101b90f5786"/>
+			</dataarea>
+			<dataarea name="page2" size="0x1db4f51"> <!-- book pages -->
+				<rom name="0 - 0002.png" size="0x1db4f51" crc="015ff68e" sha1="cbe5f4f0e30d3336faf836d96fa291d7b9c26d69"/>
+			</dataarea>
+			<dataarea name="page3" size="0x1c93c81"> <!-- book pages -->
+				<rom name="0 - 0003.png" size="0x1c93c81" crc="1ffb2904" sha1="c48af9c4ae7cfd7675c22d76d45a77c0d57478d1"/>
+			</dataarea>
+			<dataarea name="page4" size="0x1b0e669"> <!-- book pages -->
+				<rom name="0 - 0004.png" size="0x1b0e669" crc="1594c30f" sha1="536b1d93ba567e27df0e9f08c36a48d217994696"/>
+			</dataarea>
+			<dataarea name="page5" size="0x1b5d23b"> <!-- book pages -->
+				<rom name="0 - 0005.png" size="0x1b5d23b" crc="925323d8" sha1="44e9e6d5ee54f475f4ec58568e805708a0b74615"/>
+			</dataarea>
+			<dataarea name="page6" size="0x1c3b090"> <!-- book pages -->
+				<rom name="0 - 0006.png" size="0x1c3b090" crc="42095b69" sha1="b31ebfcb3682923cd0c76a21fdcede71d9774b5e"/>
+			</dataarea>
+			<dataarea name="page7" size="0x1c1afea"> <!-- book pages -->
+				<rom name="0 - 0007.png" size="0x1c1afea" crc="f78b2331" sha1="6e1b8c7f0b100e01adc5bdd31bea513374204d95"/>
+			</dataarea>
+			<dataarea name="page8" size="0x190898c"> <!-- book pages -->
+				<rom name="0 - 0008.png" size="0x190898c" crc="27934aca" sha1="6fd1f77066f8fd52e67ded69f5d6a844053201d0"/>
+			</dataarea>
+			<dataarea name="page9" size="0x1763681"> <!-- book pages -->
+				<rom name="0 - 0009.png" size="0x1763681" crc="a5ec8189" sha1="4f8b89479152a8b700e8a6dda9c8043b9faac8f3"/>
+			</dataarea>
+			<dataarea name="page10" size="0x16340a1"> <!-- book pages -->
+				<rom name="0 - 0010.png" size="0x16340a1" crc="a34b1d7f" sha1="aac08be42bb45a42643f00dc725380e5b90d7aaa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toyst3" supported="no">
+		<description>Shooting Beena Toy Story 3: Woody to Buzz no Daibouken!</description>
+		<year>2010</year>
+		<publisher>Sega Toys</publisher>
+		<info name="alt_title" value="シューティングビーナトイ・ストーリー3 ウッディとバズの大冒険！"/>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x800000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="S-100041-1000 - Shooting Beena Toy Story 3 - Woody to Buzz no Daibouken (Japan).bin" size="0x800000" crc="57b63927" sha1="0d89cdf8f9cf52ae8e1e981b8caf9a7c3cf7cb79"/>
+			</dataarea>
+			<dataarea name="page1" size="0x1e4f028"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x1e4f028" crc="d3753a83" sha1="5c06cba7058a8ba36fa6db384a356578156d4ab7"/>
+			</dataarea>
+			<dataarea name="page2" size="0x1ec07ee"> <!-- book pages -->
+				<rom name="0 - 0002.png" size="0x1ec07ee" crc="9fb776e6" sha1="c3f765d533127172e9bb86cb72da95a9af8b20f1"/>
+			</dataarea>
+			<dataarea name="page3" size="0x1fad24c"> <!-- book pages -->
+				<rom name="0 - 0003.png" size="0x1fad24c" crc="1c4e8e5d" sha1="8b504c1350cb342bdfe67476294619834a293563"/>
+			</dataarea>
+			<dataarea name="page4" size="0x201d7f8"> <!-- book pages -->
+				<rom name="0 - 0004.png" size="0x201d7f8" crc="1ec5620a" sha1="9370fdf2fb095b35243bc9d651d2236bd924ffb0"/>
+			</dataarea>
+			<dataarea name="page5" size="0x20beb5f"> <!-- book pages -->
+				<rom name="0 - 0005.png" size="0x20beb5f" crc="36c50608" sha1="89429ef43c37e27f965883e4037b58e5697413c2"/>
+			</dataarea>
+			<dataarea name="page6" size="0x1facd9e"> <!-- book pages -->
+				<rom name="0 - 0006.png" size="0x1facd9e" crc="77368d85" sha1="44d4316774151268da7960322054f973e4b577fc"/>
+			</dataarea>
+			<dataarea name="page7" size="0x1fd837b"> <!-- book pages -->
+				<rom name="0 - 0007.png" size="0x1fd837b" crc="6c07a14d" sha1="710e69e2415ecace5b33e33cd1f2840d66902381"/>
+			</dataarea>
+			<dataarea name="page8" size="0x1cb6125"> <!-- book pages -->
+				<rom name="0 - 0008.png" size="0x1cb6125" crc="6e228523" sha1="bbfb86890ca99ff3b5537392f9593632a04d03fe"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tsentai" supported="partial">
+		<description>Tensou Sentai Goseiger Super Battle Daishuugou!</description>
+		<year>2010</year>
+		<publisher>Bandai</publisher>
+		<notes>SD-Card Reader is not emulated</notes>
+		<info name="alt_title" value="天装戦隊ゴセイジャースーパーバトル大集合！"/>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x800000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="T-110014-1000 - Tensou Sentai Goseiger Super Battle Daishuugou (Japan).bin" size="0x800000" crc="30e68a0f" sha1="02b615677a2ea81f77838ffdcf9d0856def52f3c"/>
+			</dataarea>
+			<dataarea name="page1" size="0x1b60826"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x1b60826" crc="cd63e01e" sha1="0290422b0a93a96ce601dd58b5c8c32e424c6d66"/>
+			</dataarea>
+			<dataarea name="page2" size="0x1b47df9"> <!-- book pages -->
+				<rom name="0 - 0002.png" size="0x1b47df9" crc="bb0c125e" sha1="07e0f29cfabbf9cc18c3a309d687347c3982e763"/>
+			</dataarea>
+			<dataarea name="page3" size="0x1af6e04"> <!-- book pages -->
+				<rom name="0 - 0003.png" size="0x1af6e04" crc="bd87b7be" sha1="6b584c382e6fcc8ee67f64d6f5866707a534096d"/>
+			</dataarea>
+			<dataarea name="page4" size="0x1b5aafc"> <!-- book pages -->
+				<rom name="0 - 0004.png" size="0x1b5aafc" crc="8945330a" sha1="9a03bdea9f62345e301ecc845ad89011dd7e4027"/>
+			</dataarea>
+			<dataarea name="page5" size="0x1a14cb6"> <!-- book pages -->
+				<rom name="0 - 0005.png" size="0x1a14cb6" crc="c4b49cba" sha1="fa5744ab7bce4a535764394ba107fe7687e154f8"/>
+			</dataarea>
+			<dataarea name="page6" size="0x18e96b2"> <!-- book pages -->
+				<rom name="0 - 0006.png" size="0x18e96b2" crc="b29123fd" sha1="a8c30a71b1015808911df5ad1b8731d34f5c2bc4"/>
+			</dataarea>
+			<dataarea name="page7" size="0x1c5b418"> <!-- book pages -->
+				<rom name="0 - 0007.png" size="0x1c5b418" crc="8a0094e0" sha1="3195ae051f51a31fc0526f336b14a4f8dc9111a1"/>
+			</dataarea>
+			<dataarea name="page8" size="0x1b8a445"> <!-- book pages -->
+				<rom name="0 - 0008.png" size="0x1b8a445" crc="a0d137fe" sha1="2e0499b26418f849e526db246909164d65d94577"/>
+			</dataarea>
+			<dataarea name="page9" size="0x1bbc95b"> <!-- book pages -->
+				<rom name="0 - 0009.png" size="0x1bbc95b" crc="d9c73f23" sha1="562ed0b92c81d4211c45c570b3d2cc7e8bd15506"/>
+			</dataarea>
+			<dataarea name="page10" size="0x1a66fc7"> <!-- book pages -->
+				<rom name="0 - 0010.png" size="0x1a66fc7" crc="04e9dc07" sha1="72fe17d300f45bb5c075ce6856ab946192512ba0"/>
+			</dataarea>
+			<dataarea name="page11" size="0x1aea636"> <!-- book pages -->
+				<rom name="0 - 0011.png" size="0x1aea636" crc="e7cab3ba" sha1="f4d642355e4b63209f78d5c4f89fdcdbf47c3f43"/>
+			</dataarea>
+			<dataarea name="page12" size="0x1b9ad03"> <!-- book pages -->
+				<rom name="0 - 0012.png" size="0x1b9ad03" crc="4d5420b1" sha1="ff1e50ebd495940348d3b5417757a684d8eef824"/>
 			</dataarea>
 		</part>
 	</software>

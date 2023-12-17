@@ -208,6 +208,7 @@ const double XTAL::known_xtals[] = {
 	 12'288'000, /* 12.288_MHz_XTAL        Sega Model 3 digital audio board */
 	 12'292'000, /* 12.292_MHz_XTAL        Northwest Digitial Systems GP-19 */
 	 12'324'000, /* 12.324_MHz_XTAL        Otrona Attache */
+	 12'335'600, /* 12.3356_MHz_XTAL       RasterOps ColorBoard 264 (~784x NTSC line rate) */
 	 12'432'000, /* 12.432_MHz_XTAL        Kaneko Fly Boy/Fast Freddie Hardware */
 	 12'472'500, /* 12.4725_MHz_XTAL       Bonanza's Mini Boy 7 */
 	 12'480'000, /* 12.48_MHz_XTAL         TRS-80 Model II */

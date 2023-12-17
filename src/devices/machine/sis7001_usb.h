@@ -29,7 +29,7 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+//  virtual void device_add_mconfig(machine_config &config) override;
 
 //  virtual void reset_all_mappings() override;
 
@@ -38,14 +38,11 @@ protected:
 
 	virtual void config_map(address_map &map) override;
 
-	void io_map(address_map &map);
+	void map(address_map &map);
 
 private:
 	u8 m_downstream_ports;
 	u32 m_HcFmInterval = 0;
-
-	u8 unmap_log_r(offs_t offset);
-	void unmap_log_w(offs_t offset, u8 data);
 };
 
 DECLARE_DEVICE_TYPE(SIS7001_USB, sis7001_usb_device)

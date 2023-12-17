@@ -1071,7 +1071,7 @@ void hpc3_device::eeprom_w(uint32_t data)
 	m_eeprom_clk_cb(BIT(data, 2));
 }
 
-void hpc3_device::enet_transmit(int param)
+void hpc3_device::enet_transmit(int32_t param)
 {
 	// save the first transmit buffer descriptor pointer
 	// TODO: not sure how cpfbdp and ppfbdp work, perhaps round-robin?

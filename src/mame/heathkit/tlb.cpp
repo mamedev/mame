@@ -19,9 +19,6 @@
       - 49/50 row mode only shows half the screen.
       - In 49/50 row mode, character descenders are cut off.
       - Screen saver does not disable the screen
-    - With superset slot option
-      - Screen menus not working properly
-      - Screensaver freezes the screen instead of blanking the screen	
 
 ****************************************************************************/
 /***************************************************************************
@@ -215,6 +212,14 @@ void heath_tlb_device::device_start()
 
 	m_key_click_timer = timer_alloc(FUNC(heath_tlb_device::key_click_off), this);
 	m_bell_timer = timer_alloc(FUNC(heath_tlb_device::bell_off), this);
+
+	// Flip bits in font ROM to avoid having to flip them during scan out since some
+	// boards with graphics has the pixel graphic reversed from the font layout. Doing
+	// it for all devices for consistency.
+	for (size_t i = 0; i < m_p_chargen.length(); i++)
+	{
+		m_p_chargen[i] = bitswap<8>(m_p_chargen[i], 0, 1, 2, 3, 4, 5, 6, 7);
+	}
 }
 
 void heath_tlb_device::device_reset()
@@ -451,7 +456,7 @@ MC6845_UPDATE_ROW(heath_tlb_device::crtc_update_row)
 			// Display a scanline of a character (8 pixels)
 			for (int b = 0; 8 > b; ++b)
 			{
-				*p++ = palette[BIT(gfx, 7 - b)];
+				*p++ = palette[BIT(gfx, b)];
 			}
 		}
 	}
@@ -874,6 +879,7 @@ ROM_START( h19 )
 	ROM_LOAD( "2716_444-37_h19keyb.u445", 0x0000, 0x0800, CRC(5c3e6972) SHA1(df49ce64ae48652346a91648c58178a34fb37d3c))
 ROM_END
 
+
 ROM_START( super19 )
 	// Super-19 ROM
 	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASEFF )
@@ -887,6 +893,7 @@ ROM_START( super19 )
 	ROM_REGION( 0x0800, "keyboard", 0 )
 	ROM_LOAD( "2716_444-37_h19keyb.u445", 0x0000, 0x0800, CRC(5c3e6972) SHA1(df49ce64ae48652346a91648c58178a34fb37d3c))
 ROM_END
+
 
 ROM_START( superset )
 	// SuperSet ROM
@@ -905,6 +912,7 @@ ROM_START( superset )
 	ROM_REGION( 0x0800, "keyboard", 0 )
 	ROM_LOAD( "2716_101-422_superset_kbd.u445", 0x0000, 0x0800, CRC(549d15b3) SHA1(981962e5e05bbdc5a66b0e86870853ce5596e877))
 ROM_END
+
 
 ROM_START( watz19 )
 	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASEFF )
@@ -926,6 +934,7 @@ ROM_START( watz19 )
 	ROM_LOAD( "keybd.u445", 0x0000, 0x0800, CRC(58dc8217) SHA1(1b23705290bdf9fc6342065c6a528c04bff67b13))
 ROM_END
 
+
 ROM_START( ultra19 )
 	// Ultra ROM
 	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASEFF )
@@ -939,6 +948,7 @@ ROM_START( ultra19 )
 	ROM_REGION( 0x0800, "keyboard", 0 )
 	ROM_LOAD( "2716_h19_ultra_keyboard.u445", 0x0000, 0x0800, CRC(76130c92) SHA1(ca39c602af48505139d2750a084b5f8f0e662ff7))
 ROM_END
+
 
 ROM_START( gp19 )
 	// GP-19 ROMs
@@ -955,6 +965,7 @@ ROM_START( gp19 )
 	ROM_REGION( 0x0800, "keyboard", 0 )
 	ROM_LOAD( "2716_444-37_h19keyb.u445", 0x0000, 0x0800, CRC(5c3e6972) SHA1(df49ce64ae48652346a91648c58178a34fb37d3c))
 ROM_END
+
 
 ROM_START( imaginator )
 	// Program code
@@ -1097,6 +1108,7 @@ ioport_constructor heath_super19_tlb_device::device_input_ports() const
 	return INPUT_PORTS_NAME(super19);
 }
 
+
 /**
  * Superset ROM
  *
@@ -1116,6 +1128,9 @@ void heath_superset_tlb_device::device_add_mconfig(machine_config &config)
 	m_maincpu->set_clock(H19_3MHZ);
 	m_maincpu->set_addrmap(AS_PROGRAM, &heath_superset_tlb_device::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &heath_superset_tlb_device::io_map);
+
+	// per line updates are needed for onscreen menu to display properly
+	m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);
 
 	m_crtc->set_update_row_callback(FUNC(heath_superset_tlb_device::crtc_update_row));
 
@@ -1213,13 +1228,13 @@ MC6845_UPDATE_ROW(heath_superset_tlb_device::crtc_update_row)
 			// Display a scanline of a character (8 pixels)
 			for (int b = 0; 8 > b; ++b)
 			{
-				*p++ = palette[BIT(gfx, 7 - b)];
+				*p++ = palette[BIT(gfx, b)];
 			}
 		}
 	}
 	else
 	{
-		std::fill_n(p, x_count * 8, palette[0]);
+		std::fill_n(p, bitmap.rowpixels(), palette[0]);
 	}
 }
 
@@ -1241,6 +1256,7 @@ void heath_superset_tlb_device::out2_internal(int data)
 	m_selected_char_set = (m_selected_char_set & 0x0a) | (data & 0x01);
 }
 
+
 /**
  * Watzman ROM
  *
@@ -1260,6 +1276,7 @@ ioport_constructor heath_watz_tlb_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(watz19);
 }
+
 
 /**
  * UltraROM
@@ -1298,6 +1315,7 @@ ioport_constructor heath_ultra_tlb_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(ultra19);
 }
+
 
 /**
  * Northwest Digital Systems GP-19 add-in board
@@ -1395,7 +1413,6 @@ void heath_gp19_tlb_device::latch_u5_w(uint8_t data)
 	}
 }
 
-
 MC6845_UPDATE_ROW(heath_gp19_tlb_device::crtc_update_row)
 {
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
@@ -1440,7 +1457,7 @@ MC6845_UPDATE_ROW(heath_gp19_tlb_device::crtc_update_row)
 				// Display a scanline of a character (8 pixels)
 				for (int b = 0; 8 > b; ++b)
 				{
-					*p++ = palette[BIT(gfx, 7 - b)];
+					*p++ = palette[BIT(gfx, b)];
 				}
 			}
 		}
@@ -1481,7 +1498,7 @@ ioport_constructor heath_gp19_tlb_device::device_input_ports() const
  */
 heath_imaginator_tlb_device::heath_imaginator_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	heath_tlb_device(mconfig, HEATH_IMAGINATOR, tag, owner, clock),
-	m_mem_view(*this, "memmap"),
+	m_mem_bank(*this, "membank"),
 	m_p_graphic_ram(*this, "graphicram")
 {
 }
@@ -1501,7 +1518,6 @@ void heath_imaginator_tlb_device::device_start()
 {
 	heath_tlb_device::device_start();
 
-	save_item(NAME(m_mem_map));
 	save_item(NAME(m_im2_val));
 	save_item(NAME(m_alphanumeric_mode_active));
 	save_item(NAME(m_graphics_mode_active));
@@ -1509,22 +1525,22 @@ void heath_imaginator_tlb_device::device_start()
 	save_item(NAME(m_allow_imaginator_interrupts));
 	save_item(NAME(m_hsync_irq_raised));
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x6000, 0x7fff, "mem_map_update",
-		[this](offs_t offset, u8 &data, u8 mem_mask) { if (!machine().side_effects_disabled()) { tap_6000h(); } },
-		[this](offs_t offset, u8 &data, u8 mem_mask) { if (!machine().side_effects_disabled()) { tap_6000h(); } });
+	m_mem_bank->configure_entries(0, 2, memregion("maincpu")->base(), 0x2000);
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x8000, 0xbfff, "irq_update",
-		[this](offs_t offset, u8 &data, u8 mem_mask) { if (!machine().side_effects_disabled()) { tap_8000h(); } },
-		[this](offs_t offset, u8 &data, u8 mem_mask) { if (!machine().side_effects_disabled()) { tap_8000h(); } });
+			[this] (offs_t offset, u8 &data, u8 mem_mask) { if (!machine().side_effects_disabled()) { tap_8000h(); } },
+			[this] (offs_t offset, u8 &data, u8 mem_mask) { if (!machine().side_effects_disabled()) { tap_8000h(); } });
 }
 
 void heath_imaginator_tlb_device::device_reset()
 {
 	heath_tlb_device::device_reset();
 
-	m_mem_map = 1;
-
-	m_mem_view.select(m_mem_map);
+	m_mem_bank->set_entry(1);
+	m_tap_6000h.remove();
+	m_tap_6000h = m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x6000, 0x7fff, "mem_map_update",
+			[this] (offs_t offset, u8 &data, u8 mem_mask) { if (!machine().side_effects_disabled()) { tap_6000h(); } },
+			[this] (offs_t offset, u8 &data, u8 mem_mask) { if (!machine().side_effects_disabled()) { tap_6000h(); } });
 
 	m_alphanumeric_mode_active = true;
 	m_graphics_mode_active = false;
@@ -1549,13 +1565,7 @@ void heath_imaginator_tlb_device::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 
-	map(0x0000, 0x1fff).view(m_mem_view);
-
-	// H19 standard ROM
-	m_mem_view[0](0x0000, 0x1fff).rom().region("maincpu", 0);
-
-	// GCP ROM mapped to 0x0000 on power-up/reset
-	m_mem_view[1](0x0000, 0x1fff).rom().region("maincpu", 0x2000);
+	map(0x0000, 0x1fff).bankr(m_mem_bank);
 
 	// Normal spot of the GCP ROM
 	map(0x2000, 0x3fff).rom();
@@ -1579,11 +1589,8 @@ void heath_imaginator_tlb_device::mem_map(address_map &map)
 
 void heath_imaginator_tlb_device::tap_6000h()
 {
-	if (m_mem_map != 0)
-	{
-		m_mem_map = 0;
-		m_mem_view.select(m_mem_map);
-	}
+	m_mem_bank->set_entry(0);
+	m_tap_6000h.remove();
 }
 
 void heath_imaginator_tlb_device::tap_8000h()
@@ -1684,7 +1691,7 @@ MC6845_UPDATE_ROW(heath_imaginator_tlb_device::crtc_update_row)
 					chr &= 0x7f;
 				}
 
-				output |= bitswap<8>(m_p_chargen[(chr << 4) | ra] ^ inv, 0, 1, 2, 3, 4, 5, 6, 7);
+				output |= m_p_chargen[(chr << 4) | ra] ^ inv;
 			}
 
 			if (m_graphics_mode_active && (x > 7 ) && (x < 73))

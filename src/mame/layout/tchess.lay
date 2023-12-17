@@ -20,38 +20,14 @@ license:CC0-1.0
 		<rect state="1"><color red="1" green="1" blue="1" /></rect>
 	</element>
 
-	<element name="text_b2">
-		<rect><color red="0.85" green="0.85" blue="0.85" /></rect>
-		<text string="XMV"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_b3">
-		<rect><color red="0.85" green="0.85" blue="0.85" /></rect>
-		<text string="FP"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_b4">
-		<rect><color red="0.85" green="0.85" blue="0.85" /></rect>
-		<text string="EP"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_b5">
-		<rect><color red="0.85" green="0.85" blue="0.85" /></rect>
-		<text string="PLY"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_b6">
-		<rect><color red="0.85" green="0.85" blue="0.85" /></rect>
-		<text string="RST"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_b11">
-		<rect><color red="0.85" green="0.85" blue="0.85" /></rect>
-		<text string="WSD"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_b16">
-		<rect><color red="0.85" green="0.85" blue="0.85" /></rect>
-		<text string="BSD"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_b21">
-		<rect><color red="0.85" green="0.85" blue="0.85" /></rect>
-		<text string="CE"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
+	<element name="text_b2"><text string="XMV"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_b3"><text string="FP"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_b4"><text string="EP"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_b5"><text string="PLY"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_b6"><text string="RST"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_b11"><text string="WSD"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_b16"><text string="BSD"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_b21"><text string="CE"><color red="0.1" green="0.1" blue="0.1" /></text></element>
 
 	<element name="text_b7a"><text string="A"><color red="0.7" green="0.7" blue="0.7" /></text></element>
 	<element name="text_b7b"><text string="WK"><color red="0.7" green="0.7" blue="0.7" /></text></element>

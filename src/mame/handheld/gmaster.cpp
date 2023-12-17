@@ -80,6 +80,8 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<speaker_sound_device> m_speaker;
 
+	u8 m_chipsel = 0;
+
 	u8 io_r(offs_t offset);
 	void io_w(offs_t offset, u8 data);
 	void portb_w(u8 data);
@@ -88,8 +90,6 @@ private:
 	template<int N> SED1520_UPDATE_CB(screen_update_cb);
 
 	void main_map(address_map &map);
-
-	u8 m_chipsel = 0;
 };
 
 void gmaster_state::machine_start()

@@ -304,8 +304,7 @@ void comebaby_state::comebaby(machine_config &config)
 	// TODO: all untested, check clock
 #if ENABLE_VOODOO
 	VOODOO_3_PCI(config, m_voodoo3, 0, m_maincpu, "screen"); // "pci:0d.0" J4D2
-	m_voodoo3->set_fbmem(2);
-	m_voodoo3->set_tmumem(4, 4);
+	m_voodoo3->set_fbmem(16);
 	m_voodoo3->set_status_cycles(1000);
 
 	// TODO: fix legacy raw setup here

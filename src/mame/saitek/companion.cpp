@@ -61,6 +61,10 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<2> m_inputs;
 
+	u8 m_inp_mux = 0;
+	u8 m_led_data = 0;
+	u8 m_led_direct = 0;
+
 	// address maps
 	void main_map(address_map &map);
 
@@ -70,10 +74,6 @@ private:
 	u8 input_r();
 	void sled_w(int state);
 	void cled_w(int state);
-
-	u8 m_inp_mux = 0;
-	u8 m_led_data = 0;
-	u8 m_led_direct = 0;
 };
 
 void compan_state::machine_start()
@@ -173,7 +173,7 @@ static INPUT_PORTS_START( compan )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME("New Game")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Rook")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_NAME("Play")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) PORT_NAME("Play")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_NAME("Clear Board")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Take Back")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("Multi Move")
@@ -189,7 +189,7 @@ INPUT_PORTS_END
 void compan_state::compan(machine_config &config)
 {
 	// basic machine hardware
-	M6504(config, m_maincpu, 1000000); // approximation, no XTAL
+	M6504(config, m_maincpu, 1'000'000); // approximation, no XTAL
 	m_maincpu->set_addrmap(AS_PROGRAM, &compan_state::main_map);
 
 	PIA6821(config, m_pia);

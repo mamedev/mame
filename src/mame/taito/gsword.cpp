@@ -11,12 +11,12 @@ TODO:
    -The implementation of DAC sound ?
    -MCU hookup is incomplete
    -The true interrupt circuit of SUB CPU
-   -unknown ROM (BANK ROM of sub-cpu ?)
+   -unknown ROM (BANK ROM of sub-CPU?)
 
 Credits:
-- Steve Ellenoff: Original emulation and Mame driver
+- Steve Ellenoff: Original emulation and MAME driver
 - Jarek Parchanski: Dip Switch Fixes, Color improvements, ADPCM Interface code
-- Tatsuyuki Satoh: sound improvements, NEC 8741 emulation, adpcm improvements,
+- Tatsuyuki Satoh: sound improvements, NEC 8741 emulation, ADPCM improvements,
             josvollyvall 8741 emulation
 - Charlie Miltenberger: sprite colors improvements & precious hardware
             information and screenshots
@@ -32,33 +32,33 @@ at these addresses, otherwise you won't never fight with him.
         ROM[0x225A] = 0
 
 
-There are 3 Z80s and two AY-3-8910s..
+There are 3 Z80s and two AY-3-8910s.
 
 Prelim memory map (last updated 6/15/98)
 *****************************************
-GS1     z80 Main Code   (8K)    0000-1FFF
-Gs2     z80 Game Data   (8K)    2000-3FFF
-Gs3     z80 Game Data   (8K)    4000-5FFF
-Gs4     z80 Game Data   (8K)    6000-7FFF
-Gs5     z80 Game Data   (4K)    8000-8FFF
+GS1     Z80 Main Code   (8K)    0000-1FFF
+Gs2     Z80 Game Data   (8K)    2000-3FFF
+Gs3     Z80 Game Data   (8K)    4000-5FFF
+Gs4     Z80 Game Data   (8K)    6000-7FFF
+Gs5     Z80 Game Data   (4K)    8000-8FFF
 Gs6     Sprites         (8K)
 Gs7     Sprites         (8K)
 Gs8     Sprites         (8K)
 Gs10    Tiles           (8K)
 Gs11    Tiles           (8K)
-Gs12    3rd z80 CPU &   (8K)
+Gs12    3rd Z80 CPU &   (8K)
         ADPCM Samples?
 Gs13    ADPCM Samples?  (8K)
 Gs14    ADPCM Samples?  (8K)
-Gs15    2nd z80 CPU     (8K)    0000-1FFF
-Gs16    2nd z80 Data    (8K)    2000-3FFF
+Gs15    2nd Z80 CPU     (8K)    0000-1FFF
+Gs16    2nd Z80 Data    (8K)    2000-3FFF
 *****************************************
 
 **********
 *Main Z80*
 **********
 
-    9000 - 9fff Work Ram
+    9000 - 9fff Work RAM
         982e - 982e Free play
         98e0 - 98e0 Coin Input
         98e1 - 98e1 Player 1 Controls
@@ -69,9 +69,9 @@ Gs16    2nd z80 Data    (8K)    2000-3FFF
         9e80 - 9eff Sprite X & Y in working ram!
 
     a000 - afff Sprite RAM & Video Attributes
-        a000 - a37F ???
-        a380 - a77F Sprite Tile #s
-        a780 - a7FF Sprite Y & X positions
+        a000 - a37f ???
+        a380 - a77f Sprite Tile #s
+        a780 - a7ff Sprite Y & X positions
         a980 - a980 Background Tile Bank Select
         ab00 - ab00 Background Tile Y-Scroll register
         ab80 - abff Sprite Attributes(X & Y Flip)
@@ -86,11 +86,11 @@ PORTS:
 *************
 *2nd Z80 CPU*
 *************
-0000 - 3FFF ROM CODE
-4000 - 43FF WORK RAM
+0000 - 3fff ROM CODE
+4000 - 43ff WORK RAM
 
 write
-6000 adpcm sound command for 3rd CPU
+6000 ADPCM sound command for 3rd CPU
 
 PORTS:
 00 8741-#2 data port
@@ -370,24 +370,24 @@ void gsword_state_base::ay8910_control_port_1_w(u8 data)
 
 u8 gsword_state_base::fake_0_r()
 {
-	return m_fake8910_0+1;
+	return m_fake8910_0 + 1;
 }
 u8 gsword_state_base::fake_1_r()
 {
-	return m_fake8910_1+1;
+	return m_fake8910_1 + 1;
 }
 
 
-/* CPU 2 memory hack */
-/* (402E) timeout upcount must be under 0AH                         */
-/* (4004,4005) clear down counter , if (4004,4005)==0 then (402E)=0 */
+// CPU 2 memory hack
+// (402E) timeout upcount must be under 0AH
+// (4004,4005) clear down counter , if (4004,4005)==0 then (402E)=0
 u8 gsword_state::hack_r(offs_t offset)
 {
 	u8 const data = m_cpu2_ram[offset + 4];
 
 	/*if(offset==1)osd_printf_debug("CNT %02X%02X\n",m_cpu2_ram[5],m_cpu2_ram[4]); */
 
-	/* speedup timeout count down */
+	// speedup timeout count down
 	if (m_protect_hack)
 	{
 		switch(offset)
@@ -414,19 +414,19 @@ void gsword_state::nmi_set_w(u8 data)
 	switch(data)
 	{
 	case 0xff:
-		m_nmi_enable = false; /* NMI must be disabled */
+		m_nmi_enable = false; // NMI must be disabled
 		break;
 	case 0x02:
-		m_nmi_enable = false; /* ANY */
+		m_nmi_enable = false; // ANY
 		break;
 	case 0x0d:
 		m_nmi_enable = true;
 		break;
 	case 0x0f:
-		m_nmi_enable = true; /* NMI must be enabled */
+		m_nmi_enable = true; // NMI must be enabled
 		break;
 	case 0xfe:
-		m_nmi_enable = true; /* NMI must be enabled */
+		m_nmi_enable = true; // NMI must be enabled
 		break;
 	}
 	/* bit1= nmi disable , for ram check */
@@ -470,13 +470,13 @@ void gsword_state::init_gsword()
 {
 #if 0
 	uint8_t *ROM2 = memregion("sub")->base();
-	ROM2[0x1da] = 0xc3; /* patch for rom self check */
+	ROM2[0x1da] = 0xc3; // patch for ROM self check
 
-	ROM2[0x71e] = 0;    /* patch for sound protection or time out function */
+	ROM2[0x71e] = 0;    // patch for sound protection or time out function
 	ROM2[0x71f] = 0;
 #endif
 #if 1
-	/* hack for sound protection or time out function */
+	// hack for sound protection or time out function
 	m_subcpu->space(AS_PROGRAM).install_read_handler(0x4004, 0x4005, read8sm_delegate(*this, FUNC(gsword_state::hack_r)));
 #endif
 }
@@ -486,12 +486,12 @@ void gsword_state::init_gsword2()
 #if 0
 	uint8_t *ROM2 = memregion("sub")->base();
 
-	ROM2[0x1da] = 0xc3; /* patch for rom self check */
-	ROM2[0x726] = 0;    /* patch for sound protection or time out function */
+	ROM2[0x1da] = 0xc3; // patch for ROM self check
+	ROM2[0x726] = 0;    // patch for sound protection or time out function
 	ROM2[0x727] = 0;
 #endif
 #if 1
-	/* hack for sound protection or time out function */
+	// hack for sound protection or time out function
 	m_subcpu->space(AS_PROGRAM).install_read_handler(0x4004, 0x4005, read8sm_delegate(*this, FUNC(gsword_state::hack_r)));
 #endif
 }
@@ -528,7 +528,7 @@ u8 josvolly_state::mcu1_p2_r()
 	// p20 and p21 drive the test inputs of the other MCU
 	// if DIPSW1:8 is allowed to pull p27 low, the game won't even boot to test mode
 	// DIPSW1:1 and DIPSW1:2 are shown in test mode, but switching them on will break comms
-	return 0x80U | ioport("DSW1")->read();
+	return 0x80U | m_dip_switches[0]->read();
 }
 
 u8 josvolly_state::mcu2_p1_r()
@@ -540,7 +540,7 @@ u8 josvolly_state::mcu2_p1_r()
 u8 josvolly_state::mcu2_p2_r()
 {
 	// p27 needs to be tied low for the MCU to start in the right mode
-	return 0x7fU & ioport("DSW2")->read();
+	return 0x7fU & m_dip_switches[1]->read();
 }
 
 void josvolly_state::cpu2_nmi_enable_w(u8 data)
@@ -599,6 +599,10 @@ void josvolly_state::machine_start()
 {
 	gsword_state_base::machine_start();
 
+	m_mcu1_p1 = 0xffU;
+	m_mcu1_p2 = 0xffU;
+	m_mcu2_p1 = 0xffU;
+
 	save_item(NAME(m_cpu2_nmi_enable));
 	save_item(NAME(m_mcu1_p1));
 	save_item(NAME(m_mcu1_p2));
@@ -610,9 +614,6 @@ void josvolly_state::machine_reset()
 	gsword_state_base::machine_reset();
 
 	m_cpu2_nmi_enable = false;
-	m_mcu1_p1 = 0xffU;
-	m_mcu1_p2 = 0xffU;
-	m_mcu2_p1 = 0xffU;
 }
 
 
@@ -625,7 +626,7 @@ void gsword_state_base::cpu1_map(address_map &map)
 	map(0xa400, 0xa77f).ram();
 	map(0xa780, 0xa7ff).ram().share("spritexy_ram");
 	map(0xa980, 0xa980).w(FUNC(gsword_state_base::charbank_w));
-	map(0xaa80, 0xaa80).w(FUNC(gsword_state_base::videoctrl_w));   /* flip screen, char palette bank */
+	map(0xaa80, 0xaa80).w(FUNC(gsword_state_base::videoctrl_w));   // flip screen, char palette bank
 	map(0xab00, 0xab00).w(FUNC(gsword_state_base::scroll_w));
 	map(0xab80, 0xabff).writeonly().share("spriteattram");
 	map(0xb000, 0xb7ff).readonly().w(FUNC(gsword_state_base::videoram_w)).share("videoram");
@@ -655,9 +656,9 @@ void gsword_state::cpu2_io_map(address_map &map)
 	map(0x80, 0x80).rw(FUNC(gsword_state::fake_1_r), FUNC(gsword_state::ay8910_control_port_1_w));
 	map(0x81, 0x81).rw(m_ay1, FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 
-	map(0xe0, 0xe0).nopr(); /* ?? */
-	map(0xa0, 0xa0).nopw(); /* ?? */
-	map(0xe0, 0xe0).nopw(); /* watchdog? */
+	map(0xe0, 0xe0).nopr(); // ??
+	map(0xa0, 0xa0).nopw(); // ??
+	map(0xe0, 0xe0).nopw(); // watchdog?
 }
 
 void gsword_state::cpu3_map(address_map &map)
@@ -679,11 +680,12 @@ void josvolly_state::josvolly_cpu2_map(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x43ff).ram().share("cpu2_ram");
 
-	/* NEC D8255A with silkscreen removed and replaced with "AA 007" */
+//  map(0x6000, 0x6000).w(FUNC(josvolly_state::adpcm_soundcommand_w));
+
+	// NEC D8255A with silkscreen removed and replaced with "AA 007"
 	map(0x8000, 0x8003).rw("aa_007", FUNC(i8255_device::read), FUNC(i8255_device::write));
 
-//  map(0x6000, 0x6000).w(FUNC(josvolly_state::adpcm_soundcommand_w));
-	map(0xA000, 0xA001).rw("mcu2", FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w));
+	map(0xa000, 0xa001).rw("mcu2", FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w));
 }
 
 void josvolly_state::josvolly_cpu2_io_map(address_map &map)
@@ -693,9 +695,8 @@ void josvolly_state::josvolly_cpu2_io_map(address_map &map)
 	map(0x01, 0x01).rw(m_ay0, FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0x40, 0x40).rw(FUNC(josvolly_state::fake_1_r), FUNC(josvolly_state::ay8910_control_port_1_w));
 	map(0x41, 0x41).rw(m_ay1, FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
-
 	map(0x81, 0x81).w(FUNC(josvolly_state::cpu2_nmi_enable_w));
-	map(0xC1, 0xC1).w(FUNC(josvolly_state::cpu2_irq_clear_w));
+	map(0xc1, 0xc1).w(FUNC(josvolly_state::cpu2_irq_clear_w));
 }
 
 
@@ -827,7 +828,7 @@ static INPUT_PORTS_START( gsword )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( josvolly )
-	PORT_START("IN0")       /* IN0 */
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW , IPT_START2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW , IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW , IPT_COIN2 ) PORT_IMPULSE(1)
@@ -837,7 +838,7 @@ static INPUT_PORTS_START( josvolly )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("IN1")       /* IN1 */
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -847,7 +848,7 @@ static INPUT_PORTS_START( josvolly )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("IN2")       /* IN2 */
+	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
@@ -857,7 +858,7 @@ static INPUT_PORTS_START( josvolly )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("DSW1")      /* DSW1 */
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) )   PORT_DIPLOCATION("DIPSW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -881,7 +882,7 @@ static INPUT_PORTS_START( josvolly )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW2")      /* DSW2 */
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, "982C" )              PORT_DIPLOCATION("DIPSW2:8")
 	PORT_DIPSETTING(    0x01, "0" )
 	PORT_DIPSETTING(    0x00, "1" )
@@ -909,34 +910,34 @@ INPUT_PORTS_END
 
 static const gfx_layout gsword_text =
 {
-	8,8,    /* 8x8 characters */
-	1024,   /* 1024 characters */
-	2,      /* 2 bits per pixel */
-	{ 0, 4 },   /* the two bitplanes for 4 pixels are packed into one byte */
+	8,8,        // 8x8 characters
+	1024,       // 1024 characters
+	2,          // 2 bits per pixel
+	{ 0, 4 },   // the two bitplanes for 4 pixels are packed into one byte
 	{ 0, 1, 2, 3, 8*8+0, 8*8+1, 8*8+2, 8*8+3 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	16*8    /* every char takes 16 bytes */
+	16*8        // every char takes 16 bytes
 };
 
 static const gfx_layout gsword_sprites1 =
 {
-	16,16,   /* 16x16 sprites */
-	64*2,    /* 128 sprites */
-	2,       /* 2 bits per pixel */
-	{ 0, 4 },   /* the two bitplanes for 4 pixels are packed into one byte */
+	16,16,      // 16x16 sprites
+	64*2,       // 128 sprites
+	2,          // 2 bits per pixel
+	{ 0, 4 },   // the two bitplanes for 4 pixels are packed into one byte
 	{ 0, 1, 2, 3, 8*8+0, 8*8+1, 8*8+2, 8*8+3,
 			16*8+0, 16*8+1, 16*8+2, 16*8+3, 24*8+0, 24*8+1, 24*8+2, 24*8+3},
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
 			32*8, 33*8, 34*8, 35*8, 36*8, 37*8, 38*8, 39*8 },
-	64*8     /* every sprite takes 64 bytes */
+	64*8        // every sprite takes 64 bytes
 };
 
 static const gfx_layout gsword_sprites2 =
 {
-	32,32,    /* 32x32 sprites */
-	64,       /* 64 sprites */
-	2,       /* 2 bits per pixel */
-	{ 0, 4 }, /* the two bitplanes for 4 pixels are packed into one byte */
+	32,32,      // 32x32 sprites
+	64,         // 64 sprites
+	2,          // 2 bits per pixel
+	{ 0, 4 },   // the two bitplanes for 4 pixels are packed into one byte
 	{ 0, 1, 2, 3, 8*8+0, 8*8+1, 8*8+2, 8*8+3,
 			16*8+0, 16*8+1, 16*8+2, 16*8+3, 24*8+0, 24*8+1, 24*8+2, 24*8+3,
 			64*8+0, 64*8+1, 64*8+2, 64*8+3, 72*8+0, 72*8+1, 72*8+2, 72*8+3,
@@ -945,7 +946,7 @@ static const gfx_layout gsword_sprites2 =
 			32*8, 33*8, 34*8, 35*8, 36*8, 37*8, 38*8, 39*8,
 			128*8, 129*8, 130*8, 131*8, 132*8, 133*8, 134*8, 135*8,
 			160*8, 161*8, 162*8, 163*8, 164*8, 165*8, 166*8, 167*8 },
-	64*8*4    /* every sprite takes (64*8=16x6)*4) bytes */
+	64*8*4      // every sprite takes (64*8=16x6)*4) bytes
 };
 
 static GFXDECODE_START( gfx_gsword )
@@ -957,35 +958,35 @@ GFXDECODE_END
 
 void gsword_state::gsword(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(18'000'000)/6); // verified on PCB
+	// basic machine hardware
+	Z80(config, m_maincpu, 18_MHz_XTAL / 6); // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &gsword_state::cpu1_map);
 	m_maincpu->set_addrmap(AS_IO, &gsword_state::cpu1_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gsword_state::irq0_line_hold));
 
-	Z80(config, m_subcpu, XTAL(18'000'000)/6); // verified on PCB
+	Z80(config, m_subcpu, 18_MHz_XTAL / 6); // verified on PCB
 	m_subcpu->set_addrmap(AS_PROGRAM, &gsword_state::cpu2_map);
 	m_subcpu->set_addrmap(AS_IO, &gsword_state::cpu2_io_map);
 	m_subcpu->set_periodic_int(FUNC(gsword_state::sound_interrupt), attotime::from_hz(4*60));
 
-	Z80(config, m_audiocpu, XTAL(18'000'000)/6); // verified on PCB
+	Z80(config, m_audiocpu, 18_MHz_XTAL / 6); // verified on PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &gsword_state::cpu3_map);
 
-	upi41_cpu_device &mcu1(I8041A(config, "mcu1", XTAL(12'000'000)/2)); // verified on PCB
+	upi41_cpu_device &mcu1(I8041A(config, "mcu1", 12_MHz_XTAL / 2)); // verified on PCB
 	mcu1.p1_in_cb().set([this] () { return ioport("MCU1.P1")->read() | BIT(m_mcu2_p1, 0); });
 	mcu1.p1_out_cb().set([this] (uint8_t data) { m_mcu1_p1 = data; });
 	mcu1.p2_in_cb().set_ioport("DSW2");
 	mcu1.t0_in_cb().set([this] () { return m_tclk_val ? 1 : 0; });      // serial clock
 	mcu1.t1_in_cb().set([this] () { return BIT(m_mcu2_p1, 1); });       // from P11 on other MCU
 
-	upi41_cpu_device &mcu2(I8041A(config, "mcu2", XTAL(12'000'000)/2)); // verified on PCB
+	upi41_cpu_device &mcu2(I8041A(config, "mcu2", 12_MHz_XTAL / 2)); // verified on PCB
 	mcu2.p1_in_cb().set(FUNC(gsword_state::mcu2_p1_r));
 	mcu2.p1_out_cb().set([this] (uint8_t data) { m_mcu2_p1 = data; });
 	mcu2.p2_in_cb().set_ioport("DSW1");
 	mcu2.t0_in_cb().set([this] () { return m_tclk_val ? 1 : 0; });      // serial clock
 	mcu2.t1_in_cb().set([this] () { return BIT(m_mcu1_p1, 1); });       // from P11 on other MCU
 
-	upi41_cpu_device &mcu3(I8041A(config, "mcu3", XTAL(12'000'000)/2)); // verified on PCB
+	upi41_cpu_device &mcu3(I8041A(config, "mcu3", 12_MHz_XTAL / 2)); // verified on PCB
 	mcu3.p1_in_cb().set_ioport("IN0");
 	mcu3.p2_in_cb().set_ioport("IN1");
 	mcu3.p2_out_cb().set(FUNC(gsword_state::mcu3_p2_w));
@@ -993,59 +994,59 @@ void gsword_state::gsword(machine_config &config)
 	mcu3.t1_in_cb().set_ioport("COINS").bit(1);
 
 	// clock unknown, using value from gladiatr
-	CLOCK(config, "tclk", 12'000'000/8/128/2).signal_handler().set([this] (int state) { m_tclk_val = state != 0; });
+	CLOCK(config, "tclk", 12'000'000 / 8 / 128 / 2).signal_handler().set([this] (int state) { m_tclk_val = state != 0; });
 
 	// lazy way to ensure communication works
 	config.set_perfect_quantum("mcu1");
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_visarea(0*8, 32*8 - 1, 2*8, 30*8 - 1);
 	screen.set_screen_update(FUNC(gsword_state::screen_update_gsword));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gsword);
 	PALETTE(config, m_palette, FUNC(gsword_state::gsword_palette), 64*4 + 64*4, 256);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	AY8910(config, m_ay0, XTAL(18'000'000)/12).add_route(ALL_OUTPUTS, "mono", 0.30); // Clock verified on PCB
+	AY8910(config, m_ay0, 18_MHz_XTAL / 12).add_route(ALL_OUTPUTS, "mono", 0.30); // Clock verified on PCB
 
-	AY8910(config, m_ay1, 1500000);
+	AY8910(config, m_ay1, 1'500'000);
 	m_ay1->port_a_write_callback().set(FUNC(gsword_state::nmi_set_w));
 	m_ay1->add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	msm5205_device &msm(MSM5205(config, "msm", XTAL(400'000))); // verified on PCB
-	msm.set_prescaler_selector(msm5205_device::SEX_4B);  /* vclk input mode    */
+	msm5205_device &msm(MSM5205(config, "msm", 400_kHz_XTAL)); // verified on PCB
+	msm.set_prescaler_selector(msm5205_device::SEX_4B);  // vclk input mode
 	msm.add_route(ALL_OUTPUTS, "mono", 0.60);
 }
 
 void josvolly_state::josvolly(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, 18000000/4);     /* ? */
+	// basic machine hardware
+	Z80(config, m_maincpu, 18'000'000 / 4);     // ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &josvolly_state::cpu1_map);
 	m_maincpu->set_addrmap(AS_IO, &josvolly_state::josvolly_cpu1_io_map);
 	m_maincpu->set_periodic_int(FUNC(josvolly_state::irq0_line_hold), attotime::from_hz(2*60));
 
-	Z80(config, m_audiocpu, 12000000/4);    /* ? */
+	Z80(config, m_audiocpu, 12'000'000 / 4);    // ?
 	m_audiocpu->set_addrmap(AS_PROGRAM, &josvolly_state::josvolly_cpu2_map);
 	m_audiocpu->set_addrmap(AS_IO, &josvolly_state::josvolly_cpu2_io_map);
 	m_audiocpu->set_vblank_int("screen", FUNC(josvolly_state::irq0_line_assert));
 
-	upi41_cpu_device &mcu1(I8741A(config, "mcu1", 18000000/2)); /* ? */
+	upi41_cpu_device &mcu1(I8741A(config, "mcu1", 18'000'000 / 2)); // ?
 	mcu1.p1_in_cb().set(FUNC(josvolly_state::mcu1_p1_r));
 	mcu1.p1_out_cb().set(FUNC(josvolly_state::mcu1_p1_w));
 	mcu1.p2_in_cb().set(FUNC(josvolly_state::mcu1_p2_r));
 	mcu1.p2_out_cb().set(FUNC(josvolly_state::mcu1_p2_w));
 
-	upi41_cpu_device &mcu2(I8741A(config, "mcu2", 12000000/2)); /* ? */
+	upi41_cpu_device &mcu2(I8741A(config, "mcu2", 12'000'000 / 2)); // ?
 	mcu2.p1_in_cb().set(FUNC(josvolly_state::mcu2_p1_r));
 	mcu2.p1_out_cb().set(FUNC(josvolly_state::mcu2_p1_w));
 	mcu2.p2_in_cb().set(FUNC(josvolly_state::mcu2_p2_r));
@@ -1062,26 +1063,26 @@ void josvolly_state::josvolly(machine_config &config)
 	// the second MCU polls the first MCU's outputs, so it needs tight sync
 	config.set_perfect_quantum("mcu2");
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_visarea(0*8, 32*8 - 1, 2*8, 30*8 - 1);
 	screen.set_screen_update(FUNC(josvolly_state::screen_update_gsword));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gsword);
 	PALETTE(config, m_palette, FUNC(josvolly_state::josvolly_palette), 64*4 + 64*4, 256);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, m_ay0, 1500000).add_route(ALL_OUTPUTS, "mono", 0.30);
-	AY8910(config, m_ay1, 1500000).add_route(ALL_OUTPUTS, "mono", 0.30);
+	AY8910(config, m_ay0, 1'500'000).add_route(ALL_OUTPUTS, "mono", 0.30);
+	AY8910(config, m_ay1, 1'500'000).add_route(ALL_OUTPUTS, "mono", 0.30);
 
 #if 0
-	MSM5205(config, "msm", 384000).add_route(ALL_OUTPUTS, "mono", 0.60);
+	MSM5205(config, "msm", 384'000).add_route(ALL_OUTPUTS, "mono", 0.60);
 #endif
 }
 
@@ -1104,7 +1105,7 @@ ROM_START( gsword )
 	ROM_LOAD( "ac10-15.5h",   0x0000, 0x2000, CRC(b74e9d43) SHA1(d6e9e05e2e652c9d467dba1f1501d2a7ec8f851c) )
 	ROM_LOAD( "ac0-16.7h",    0x2000, 0x2000, CRC(10accc10) SHA1(311961bfe852582a9c66aaecf9bc4c8f0ac7fccf) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    // 64K for 3nd z80
+	ROM_REGION( 0x10000, "audiocpu", 0 )    // 64K for 3rd Z80
 	ROM_LOAD( "ac10-12.3a",   0x0000, 0x2000, CRC(56eac59f) SHA1(22bde858ddcafad3f731030c39fd525458ecdbdd) )
 	ROM_LOAD( "ac10-13.4a",   0x2000, 0x2000, CRC(3a920eaa) SHA1(256fafda0d522dee993b6840e60532f11a705345) )
 	ROM_LOAD( "ac10-14.3d",   0x4000, 0x2000, CRC(819db933) SHA1(5e8b10d94ca6ba608a074bd5f30f14b95122fe85) )
@@ -1151,7 +1152,7 @@ ROM_START( gsword2 )
 	ROM_LOAD( "ac0-15.5h",    0x0000, 0x2000, CRC(1aa4690e) SHA1(7b0dbc38f3e6af2c9efa44b6759a3cdd9adc992d) )
 	ROM_LOAD( "ac0-16.7h",    0x2000, 0x2000, CRC(10accc10) SHA1(311961bfe852582a9c66aaecf9bc4c8f0ac7fccf) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    // 64K for 3nd z80
+	ROM_REGION( 0x10000, "audiocpu", 0 )    // 64K for 3rd Z80
 	ROM_LOAD( "ac0-12.3a",    0x0000, 0x2000, CRC(a6589068) SHA1(9385abe2449c5c5bac8f49d2afd140acea1791c3) )
 	ROM_LOAD( "ac0-13.4a",    0x2000, 0x2000, CRC(4ee79796) SHA1(3353625903f63910a18fae0a9568a96d75592328) )
 	ROM_LOAD( "ac0-14.3d",    0x4000, 0x2000, CRC(455364b6) SHA1(ebabf077d1ba113c13e7620d61720ed141acb5ad) )

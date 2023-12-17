@@ -8897,21 +8897,18 @@ void seta_state::utoukond(machine_config &config)
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 	m_soundlatch->set_separate_acknowledge(true);
 
 	X1_010(config, m_x1snd, 16000000);
-	m_x1snd->add_route(0, "lspeaker", 1.0);
-	m_x1snd->add_route(1, "rspeaker", 1.0);
+	m_x1snd->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	ym3438_device &ymsnd(YM3438(config, "ymsnd", 16000000/4)); // 4 MHz
+	ym3438_device &ymsnd(YM3438(config, "ymsnd", 16000000/2)); // 8 MHz
 	ymsnd.irq_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
-	ymsnd.add_route(0, "lspeaker", 0.30);
-	ymsnd.add_route(1, "rspeaker", 0.30);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.30);
 }
 
 

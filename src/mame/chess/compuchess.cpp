@@ -131,7 +131,7 @@ public:
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_switch) { update_reset(newval); }
-	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq) { update_cpu_freq(newval); }
+	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq);
 
 	// machine configs
 	void cmpchess(machine_config &config);
@@ -151,6 +151,11 @@ private:
 	optional_device<beep_device> m_beeper;
 	required_ioport_array<4> m_inputs;
 
+	u8 m_inp_mux = 0;
+	u8 m_digit_select = 0;
+	u8 m_digit_data = 0;
+	bool m_blink = false;
+
 	// address maps
 	void main_map(address_map &map);
 	void main_io(address_map &map);
@@ -161,7 +166,6 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(blink) { m_blink = !m_blink; update_display(); }
 	void update_display();
 	void update_reset(ioport_value state);
-	void update_cpu_freq(ioport_value state);
 
 	// I/O handlers
 	void input_w(u8 data);
@@ -173,11 +177,6 @@ private:
 
 	void input_digit_select_w(u8 data) { input_w(data); digit_select_w(data); }
 	void input_digit_data_w(u8 data) { input_w(data); digit_data_w(data); }
-
-	u8 m_inp_mux = 0;
-	u8 m_digit_select = 0;
-	u8 m_digit_data = 0;
-	bool m_blink = false;
 };
 
 
@@ -197,9 +196,6 @@ void cmpchess_state::machine_start()
 
 void cmpchess_state::machine_reset()
 {
-	if (ioport("FAKE") != nullptr)
-		update_cpu_freq(ioport("FAKE")->read());
-
 	update_reset(ioport("RESET")->read());
 }
 
@@ -213,10 +209,10 @@ void cmpchess_state::update_reset(ioport_value state)
 		m_display->clear();
 }
 
-void cmpchess_state::update_cpu_freq(ioport_value state)
+INPUT_CHANGED_MEMBER(cmpchess_state::change_cpu_freq)
 {
 	// 2 MK I versions, 2nd one was a lot faster
-	const u32 freq = state ? 3500000 : 2250000;
+	const u32 freq = (newval & 1) ? 3'500'000 : 2'250'000;
 	m_maincpu->set_unscaled_clock(freq);
 	subdevice<f3853_device>("smi")->set_unscaled_clock(freq);
 }
@@ -368,7 +364,7 @@ static INPUT_PORTS_START( mk1 )
 	PORT_MODIFY("RESET")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, cmpchess_state, reset_switch, 0) PORT_NAME("L.S. Switch")
 
-	PORT_START("FAKE")
+	PORT_START("CPU")
 	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, cmpchess_state, change_cpu_freq, 0) // factory set
 	PORT_CONFSETTING(    0x00, "2.25MHz (Spassky packaging)" )
 	PORT_CONFSETTING(    0x01, "3.5MHz (Karpov packaging)" )
@@ -443,8 +439,8 @@ void cmpchess_state::mk1(machine_config &config)
 	cmpchess(config);
 
 	// basic machine hardware
-	m_maincpu->set_clock(2250000); // see notes
-	subdevice<f3853_device>("smi")->set_clock(2250000);
+	m_maincpu->set_clock(2'250'000); // see notes
+	subdevice<f3853_device>("smi")->set_clock(2'250'000);
 
 	config.set_default_layout(layout_novag_mk1);
 }
@@ -454,11 +450,11 @@ void cmpchess_state::cncchess(machine_config &config)
 	cmpchess2(config);
 
 	// basic machine hardware
-	m_maincpu->set_clock(2000000); // LC circuit, measured 2MHz
+	m_maincpu->set_clock(2'000'000); // LC circuit, measured 2MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &cmpchess_state::cncchess_map);
 	m_maincpu->set_addrmap(AS_IO, &cmpchess_state::cncchess_io);
 
-	subdevice<f3853_device>("smi")->set_clock(2000000);
+	subdevice<f3853_device>("smi")->set_clock(2'000'000);
 
 	config.set_default_layout(layout_conic_cchess);
 

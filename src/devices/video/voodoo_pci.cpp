@@ -49,6 +49,9 @@ DEFINE_DEVICE_TYPE(VOODOO_2_PCI, voodoo_2_pci_device, "voodoo_2_pci", "Voodoo 2 
 DEFINE_DEVICE_TYPE(VOODOO_BANSHEE_PCI, voodoo_banshee_pci_device, "voodoo_banshee_pci", "Voodoo Banshee PCI")
 DEFINE_DEVICE_TYPE(VOODOO_3_PCI, voodoo_3_pci_device, "voodoo_3_pci", "Voodoo 3 PCI")
 
+DEFINE_DEVICE_TYPE(VOODOO_BANSHEE_X86_PCI, voodoo_banshee_x86_pci_device, "banshee_x86", "Voodoo Banshee PCI (x86)")
+
+
 void voodoo_pci_device::config_map(address_map &map)
 {
 	pci_device::config_map(map);
@@ -71,8 +74,13 @@ voodoo_2_pci_device::voodoo_2_pci_device(const machine_config &mconfig, const ch
 {
 }
 
+voodoo_banshee_pci_device::voodoo_banshee_pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: voodoo_pci_device(mconfig, type, tag, owner, clock), m_voodoo(*this, "voodoo")
+{
+}
+
 voodoo_banshee_pci_device::voodoo_banshee_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: voodoo_pci_device(mconfig, VOODOO_BANSHEE_PCI, tag, owner, clock), m_voodoo(*this, "voodoo")
+	: voodoo_banshee_pci_device(mconfig, VOODOO_BANSHEE_PCI, tag, owner, clock)
 {
 }
 
@@ -100,6 +108,10 @@ void voodoo_1_pci_device::device_start()
 
 	add_map(16 * 1024 * 1024, M_MEM | M_PREF, *m_voodoo, FUNC(voodoo_1_device::core_map));
 	bank_infos[0].adr = 0xff000000;
+	// TODO: verify int settings across the arch (should be same, following is from Voodoo 3)
+	//intr_line = 5;
+	// INTA#
+	//intr_pin = 1;
 }
 
 void voodoo_2_pci_device::device_start()
@@ -247,4 +259,34 @@ void voodoo_pci_device::vga_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	// map to I/O space at offset 0xb0
 	m_generic_voodoo->write(0xb0/4 + offset, data, mem_mask);
+}
+
+// x86 cards, same with additional BIOS ROM
+
+voodoo_banshee_x86_pci_device::voodoo_banshee_x86_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: voodoo_banshee_pci_device(mconfig, VOODOO_BANSHEE_X86_PCI, tag, owner, clock)
+	, m_vga_rom(*this, "vga_rom")
+{
+}
+
+void voodoo_banshee_x86_pci_device::device_start()
+{
+	voodoo_banshee_pci_device::device_start();
+
+	add_rom((u8 *)m_vga_rom->base(), 0x8000);
+	expansion_rom_base = 0xc0000;
+}
+
+ROM_START( voodoo_banshee )
+	ROM_REGION32_LE( 0x8000, "vga_rom", ROMREGION_ERASEFF )
+	ROM_SYSTEM_BIOS( 0, "gainward", "Gainward Dragon 4000" )
+	ROMX_LOAD( "gainward.bin", 0x000000, 0x008000, CRC(a53df538) SHA1(679f94619eac11c59effb89fe44bb74f589e3050), ROM_BIOS(0) )
+	ROM_IGNORE( 0x8000 )
+	ROM_SYSTEM_BIOS( 1, "atrend", "A-Trend Helios 3D" )
+	ROMX_LOAD( "a-trend.vbi",  0x000000, 0x008000, CRC(117a9e6f) SHA1(48b0bc08d142be3aa0d937ee56afd299b3b20386), ROM_BIOS(1) )
+ROM_END
+
+const tiny_rom_entry *voodoo_banshee_x86_pci_device::device_rom_region() const
+{
+	return ROM_NAME(voodoo_banshee);
 }

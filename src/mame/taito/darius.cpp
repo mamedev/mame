@@ -480,9 +480,9 @@ void darius_state::update_fm0()
 	const int right = ((0xff - m_pan[0]) * m_vol[6]) >> 8;
 
 	if (m_filter_l[0][3] != nullptr)
-		m_filter_l[0][3]->flt_volume_set_volume(left / 100.0);
+		m_filter_l[0][3]->set_gain(left / 100.0);
 	if (m_filter_r[0][3] != nullptr)
-		m_filter_r[0][3]->flt_volume_set_volume(right / 100.0); /* FM #0 */
+		m_filter_r[0][3]->set_gain(right / 100.0); /* FM #0 */
 }
 
 void darius_state::update_fm1()
@@ -491,9 +491,9 @@ void darius_state::update_fm1()
 	const int right = ((0xff - m_pan[1]) * m_vol[7]) >> 8;
 
 	if (m_filter_l[1][3] != nullptr)
-		m_filter_l[1][3]->flt_volume_set_volume(left / 100.0);
+		m_filter_l[1][3]->set_gain(left / 100.0);
 	if (m_filter_r[1][3] != nullptr)
-		m_filter_r[1][3]->flt_volume_set_volume(right / 100.0); /* FM #1 */
+		m_filter_r[1][3]->set_gain(right / 100.0); /* FM #1 */
 }
 
 void darius_state::update_psg0(int port)
@@ -512,9 +512,9 @@ void darius_state::update_psg0(int port)
 	const int right = ((0xff - m_pan[2]) * m_vol[port]) >> 8;
 
 	if (lvol != nullptr)
-		lvol->flt_volume_set_volume(left / 100.0);
+		lvol->set_gain(left / 100.0);
 	if (rvol != nullptr)
-		rvol->flt_volume_set_volume(right / 100.0);
+		rvol->set_gain(right / 100.0);
 }
 
 void darius_state::update_psg1(int port)
@@ -533,9 +533,9 @@ void darius_state::update_psg1(int port)
 	const int right = ((0xff - m_pan[3]) * m_vol[port + 3]) >> 8;
 
 	if (lvol != nullptr)
-		lvol->flt_volume_set_volume(left / 100.0);
+		lvol->set_gain(left / 100.0);
 	if (rvol != nullptr)
-		rvol->flt_volume_set_volume(right / 100.0);
+		rvol->set_gain(right / 100.0);
 }
 
 void darius_state::update_da()
@@ -544,9 +544,9 @@ void darius_state::update_da()
 	const int right = m_def_vol[(m_pan[4] >> 4) & 0x0f];
 
 	if (m_msm5205_l != nullptr)
-		m_msm5205_l->flt_volume_set_volume(left / 100.0);
+		m_msm5205_l->set_gain(left / 100.0);
 	if (m_msm5205_r != nullptr)
-		m_msm5205_r->flt_volume_set_volume(right / 100.0);
+		m_msm5205_r->set_gain(right / 100.0);
 }
 
 void darius_state::fm0_pan_w(u8 data)

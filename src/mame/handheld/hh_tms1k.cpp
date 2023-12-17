@@ -276,10 +276,10 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "comparc.lh"
 #include "copycat.lh"
 #include "copycata.lh"
+#include "cqback.lh"
 #include "dataman.lh"
 #include "ditto.lh"
 #include "dxfootb.lh"
-#include "cqback.lh"
 #include "ebball.lh"
 #include "ebball2.lh"
 #include "ebball3.lh"
@@ -987,13 +987,13 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	void write_r(u32 data);
-	void write_o(u16 data);
-	u8 read_k();
-
 	output_finder<> m_motor1;
 	output_finder<> m_motor2_left;
 	output_finder<> m_motor2_right;
+
+	void write_r(u32 data);
+	void write_o(u16 data);
+	u8 read_k();
 };
 
 void bcheetah_state::machine_start()
@@ -1873,12 +1873,13 @@ private:
 	required_device<filter_volume_device> m_volume;
 	required_device<timer_device> m_tempo_timer;
 
+	double m_speaker_volume = 0.0;
+
 	void write_o(u16 data);
 	void write_r(u32 data);
 	u8 read_k();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
-	double m_speaker_volume = 0.0;
 };
 
 void cchime_state::machine_start()
@@ -1891,7 +1892,7 @@ void cchime_state::machine_start()
 
 TIMER_DEVICE_CALLBACK_MEMBER(cchime_state::speaker_decay_sim)
 {
-	m_volume->flt_volume_set_volume(m_speaker_volume);
+	m_volume->set_gain(m_speaker_volume);
 
 	// volume decays when speaker is off, decay scale is determined by tone knob
 	const double step = (1.005 - 1.0005) / 100.0; // approximation
@@ -1921,7 +1922,7 @@ void cchime_state::write_o(u16 data)
 
 	// O2: trigger speaker on
 	if (~m_o & data & 4)
-		m_volume->flt_volume_set_volume(m_speaker_volume = 1.0);
+		m_volume->set_gain(m_speaker_volume = 1.0);
 
 	m_o = data;
 }
@@ -2801,32 +2802,22 @@ public:
 
 	void h2hbaseb(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(skill_switch) { set_clock(); }
-
-protected:
-	virtual void machine_reset() override;
+	DECLARE_INPUT_CHANGED_MEMBER(skill_switch);
 
 private:
-	void set_clock();
 	void update_display();
 	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
 
-void h2hbaseb_state::machine_reset()
-{
-	hh_tms1k_state::machine_reset();
-	set_clock();
-}
-
 // handlers
 
-void h2hbaseb_state::set_clock()
+INPUT_CHANGED_MEMBER(h2hbaseb_state::skill_switch)
 {
 	// MCU clock is from an RC circuit with C=47pF, and R value is depending on
 	// skill switch: R=51K(1) or 43K(2)
-	m_maincpu->set_unscaled_clock((m_inputs[5]->read() & 1) ? 400000 : 350000);
+	m_maincpu->set_unscaled_clock((newval & 1) ? 400000 : 350000);
 }
 
 void h2hbaseb_state::update_display()
@@ -2887,7 +2878,7 @@ static INPUT_PORTS_START( h2hbaseb )
 	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Swing")
 
-	PORT_START("IN.5") // fake
+	PORT_START("CPU") // fake
 	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, h2hbaseb_state, skill_switch, 0)
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x01, "2" )
@@ -2898,7 +2889,7 @@ INPUT_PORTS_END
 void h2hbaseb_state::h2hbaseb(machine_config &config)
 {
 	// basic machine hardware
-	TMS1170(config, m_maincpu, 350000); // see set_clock
+	TMS1170(config, m_maincpu, 350000); // see skill_switch
 	m_maincpu->read_k().set(FUNC(h2hbaseb_state::read_k));
 	m_maincpu->write_r().set(FUNC(h2hbaseb_state::write_r));
 	m_maincpu->write_o().set(FUNC(h2hbaseb_state::write_o));
@@ -3097,8 +3088,8 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	u16 m_pinout = 0x07; // cartridge R pins
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	void update_display();
 	void write_r(u32 data);
@@ -3288,8 +3279,8 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	u8 m_pinout = 0xf; // cartridge K pins
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	void update_display();
 	void write_r(u32 data);
@@ -3471,12 +3462,13 @@ protected:
 private:
 	required_device<filter_volume_device> m_volume;
 
+	double m_speaker_volume = 0.0;
+
 	void write_o(u16 data);
 	void write_r(u32 data);
 	u8 read_k();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
-	double m_speaker_volume = 0.0;
 };
 
 void litelrn_state::machine_start()
@@ -3489,7 +3481,7 @@ void litelrn_state::machine_start()
 
 TIMER_DEVICE_CALLBACK_MEMBER(litelrn_state::speaker_decay_sim)
 {
-	m_volume->flt_volume_set_volume(m_speaker_volume);
+	m_volume->set_gain(m_speaker_volume);
 
 	// volume decays when speaker is off, rate is determined by tone knob
 	const double div[3] = { 1.002, 1.004, 1.008 }; // approximation
@@ -3510,7 +3502,7 @@ void litelrn_state::write_o(u16 data)
 {
 	// O0: trigger speaker on
 	if (~data & m_o & 1)
-		m_volume->flt_volume_set_volume(m_speaker_volume = 1.0);
+		m_volume->set_gain(m_speaker_volume = 1.0);
 
 	// O2: select mode switch
 	// other: N/C
@@ -4026,6 +4018,7 @@ public:
 
 private:
 	required_device<ds8874_device> m_ds8874;
+
 	void ds8874_output_w(u16 data);
 
 	void update_display();
@@ -4999,33 +4992,23 @@ public:
 
 	void ebball3(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(skill_switch) { set_clock(); }
-
-protected:
-	virtual void machine_reset() override;
+	DECLARE_INPUT_CHANGED_MEMBER(skill_switch);
 
 private:
-	void set_clock();
 	void update_display();
 	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
 
-void ebball3_state::machine_reset()
-{
-	hh_tms1k_state::machine_reset();
-	set_clock();
-}
-
 // handlers
 
-void ebball3_state::set_clock()
+INPUT_CHANGED_MEMBER(ebball3_state::skill_switch)
 {
 	// MCU clock is from an RC circuit(R=47K, C=33pF) oscillating by default at ~340kHz,
 	// but on PRO, the difficulty switch adds an extra 150K resistor to Vdd to speed
 	// it up to around ~440kHz.
-	m_maincpu->set_unscaled_clock((m_inputs[3]->read() & 1) ? 440000 : 340000);
+	m_maincpu->set_unscaled_clock((newval & 1) ? 440000 : 340000);
 }
 
 void ebball3_state::update_display()
@@ -5101,7 +5084,7 @@ static INPUT_PORTS_START( ebball3 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Bunt")
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("IN.3") // fake
+	PORT_START("CPU") // fake
 	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, ebball3_state, skill_switch, 0)
 	PORT_CONFSETTING(    0x00, "1" ) // AM
 	PORT_CONFSETTING(    0x01, "2" ) // PRO
@@ -5112,7 +5095,7 @@ INPUT_PORTS_END
 void ebball3_state::ebball3(machine_config &config)
 {
 	// basic machine hardware
-	TMS1100(config, m_maincpu, 340000); // see set_clock
+	TMS1100(config, m_maincpu, 340000); // see skill_switch
 	m_maincpu->read_k().set(FUNC(ebball3_state::read_k));
 	m_maincpu->write_r().set(FUNC(ebball3_state::write_r));
 	m_maincpu->write_o().set(FUNC(ebball3_state::write_o));
@@ -5400,33 +5383,23 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_INPUT_CHANGED_MEMBER(skill_switch) { set_clock(); }
+	DECLARE_INPUT_CHANGED_MEMBER(skill_switch);
 	void einvader(machine_config &config);
 
-protected:
-	virtual void machine_reset() override;
-
 private:
-	void set_clock();
 	void update_display();
 	void write_r(u32 data);
 	void write_o(u16 data);
 };
 
-void einvader_state::machine_reset()
-{
-	hh_tms1k_state::machine_reset();
-	set_clock();
-}
-
 // handlers
 
-void einvader_state::set_clock()
+INPUT_CHANGED_MEMBER(einvader_state::skill_switch)
 {
 	// MCU clock is from an RC circuit(R=47K, C=56pF) oscillating by default at ~320kHz,
 	// but on PRO, the difficulty switch adds an extra 180K resistor to Vdd to speed
 	// it up to around ~400kHz.
-	m_maincpu->set_unscaled_clock((m_inputs[0]->read() & 8) ? 400000 : 320000);
+	m_maincpu->set_unscaled_clock((newval & 1) ? 400000 : 320000);
 }
 
 void einvader_state::update_display()
@@ -5469,7 +5442,7 @@ INPUT_PORTS_END
 void einvader_state::einvader(machine_config &config)
 {
 	// basic machine hardware
-	TMS1100(config, m_maincpu, 320000); // see set_clock
+	TMS1100(config, m_maincpu, 320000); // see skill_switch
 	m_maincpu->read_k().set_ioport("IN.0");
 	m_maincpu->write_r().set(FUNC(einvader_state::write_r));
 	m_maincpu->write_o().set(FUNC(einvader_state::write_o));
@@ -5829,36 +5802,26 @@ public:
 	void raisedvl(machine_config &config);
 	void ebknight(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(skill_switch) { set_clock(); }
-
-protected:
-	virtual void machine_reset() override;
+	DECLARE_INPUT_CHANGED_MEMBER(skill_switch);
 
 private:
-	void set_clock();
 	void update_display();
 	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
 
-void raisedvl_state::machine_reset()
-{
-	hh_tms1k_state::machine_reset();
-	set_clock();
-}
-
 // handlers
 
-void raisedvl_state::set_clock()
+INPUT_CHANGED_MEMBER(raisedvl_state::skill_switch)
 {
 	// MCU clock is from an RC circuit with C=47pF, R=47K by default. Skills
 	// 2 and 3 add a 150K resistor in parallel, and skill 4 adds a 100K one.
 	// 0:   R=47K  -> ~350kHz
 	// 2,3: R=35K8 -> ~425kHz (combined)
 	// 4:   R=32K  -> ~465kHz (combined)
-	u8 inp = m_inputs[1]->read();
-	m_maincpu->set_unscaled_clock((inp & 0x20) ? 465000 : ((inp & 0x10) ? 425000 : 350000));
+	static const u32 freq[3] = { 350000, 425000, 465000 };
+	m_maincpu->set_unscaled_clock(freq[(newval >> 4) % 3]);
 }
 
 void raisedvl_state::update_display()
@@ -5916,7 +5879,7 @@ INPUT_PORTS_END
 void raisedvl_state::raisedvl(machine_config &config)
 {
 	// basic machine hardware
-	TMS1100(config, m_maincpu, 350000); // see set_clock
+	TMS1100(config, m_maincpu, 350000); // see skill_switch
 	m_maincpu->read_k().set(FUNC(raisedvl_state::read_k));
 	m_maincpu->write_r().set(FUNC(raisedvl_state::write_r));
 	m_maincpu->write_o().set(FUNC(raisedvl_state::write_o));
@@ -5994,13 +5957,14 @@ private:
 	required_device<filter_volume_device> m_volume;
 	required_device<timer_device> m_speed_timer;
 
+	double m_speaker_volume = 0.0;
+
 	void update_display();
 	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
-	double m_speaker_volume = 0.0;
 };
 
 void mmarvin_state::machine_start()
@@ -6013,7 +5977,7 @@ void mmarvin_state::machine_start()
 
 TIMER_DEVICE_CALLBACK_MEMBER(mmarvin_state::speaker_decay_sim)
 {
-	m_volume->flt_volume_set_volume(m_speaker_volume);
+	m_volume->set_gain(m_speaker_volume);
 
 	// volume decays when speaker is off, decay scale is determined by tone knob
 	const double step = (1.01 - 1.003) / 100.0; // approximation
@@ -6043,7 +6007,7 @@ void mmarvin_state::write_r(u32 data)
 
 	// R9: trigger speaker on
 	if (m_r & ~data & 0x200)
-		m_volume->flt_volume_set_volume(m_speaker_volume = 1.0);
+		m_volume->set_gain(m_speaker_volume = 1.0);
 
 	// R0,R1: digit/led select
 	// R7: digit DP
@@ -6309,31 +6273,21 @@ public:
 
 	void f3in1(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(skill_switch) { set_clock(); }
-
-protected:
-	virtual void machine_reset() override;
+	DECLARE_INPUT_CHANGED_MEMBER(skill_switch);
 
 private:
-	void set_clock();
 	void update_display();
 	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
 
-void f3in1_state::machine_reset()
-{
-	hh_tms1k_state::machine_reset();
-	set_clock();
-}
-
 // handlers
 
-void f3in1_state::set_clock()
+INPUT_CHANGED_MEMBER(f3in1_state::skill_switch)
 {
 	// MCU clock is from an RC circuit where C=47pF, R=39K(PROF) or 56K(REG)
-	m_maincpu->set_unscaled_clock((m_inputs[4]->read() & 1) ? 400000 : 300000);
+	m_maincpu->set_unscaled_clock((newval & 1) ? 400000 : 300000);
 }
 
 void f3in1_state::update_display()
@@ -6394,7 +6348,7 @@ static INPUT_PORTS_START( f3in1 )
 	PORT_CONFSETTING(    0x04, "Basketball" )
 	PORT_CONFSETTING(    0x08, "Soccer" )
 
-	PORT_START("IN.4") // fake
+	PORT_START("CPU") // fake
 	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, f3in1_state, skill_switch, 0)
 	PORT_CONFSETTING(    0x00, "1" ) // REG
 	PORT_CONFSETTING(    0x01, "2" ) // PROF
@@ -6405,7 +6359,7 @@ INPUT_PORTS_END
 void f3in1_state::f3in1(machine_config &config)
 {
 	// basic machine hardware
-	TMS1100(config, m_maincpu, 300000); // see set_clock
+	TMS1100(config, m_maincpu, 300000); // see skill_switch
 	m_maincpu->read_k().set(FUNC(f3in1_state::read_k));
 	m_maincpu->write_r().set(FUNC(f3in1_state::write_r));
 	m_maincpu->write_o().set(FUNC(f3in1_state::write_o));
@@ -7005,6 +6959,7 @@ public:
 
 private:
 	required_device<tms1024_device> m_expander;
+
 	void expander_w(offs_t offset, u8 data);
 
 	void update_display();
@@ -7458,25 +7413,25 @@ protected:
 	virtual void machine_start() override;
 
 private:
+	std::unique_ptr<u16[]> m_pixbuf;
+	u8 m_led_data[2] = { };
+	u16 m_wand_pos[2] = { };
+	attotime m_shake;
+
 	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(check_pos);
-
-	std::unique_ptr<u16[]> m_display;
-	u8 m_led_data[2] = { };
-	u16 m_wand_pos[2] = { };
-	attotime m_shake;
 };
 
 void skywriter_state::machine_start()
 {
 	hh_tms1k_state::machine_start();
 
-	m_display = make_unique_clear<u16[]>(7 * SKYWRITER_WIDTH);
-	save_pointer(NAME(m_display), 7 * SKYWRITER_WIDTH);
+	m_pixbuf = make_unique_clear<u16[]>(7 * SKYWRITER_WIDTH);
+	save_pointer(NAME(m_pixbuf), 7 * SKYWRITER_WIDTH);
 
 	save_item(NAME(m_led_data));
 	save_item(NAME(m_wand_pos));
@@ -7493,7 +7448,7 @@ u32 skywriter_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 		int dy = (i / SKYWRITER_WIDTH) * 4 + 1;
 
 		// write current led state to pixels
-		u8 red = std::clamp<u16>(m_display[i], 0, 0xff);
+		u8 red = std::clamp<u16>(m_pixbuf[i], 0, 0xff);
 		u8 green = red / 16;
 		u8 blue = red / 12;
 
@@ -7505,7 +7460,7 @@ u32 skywriter_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 		// decay led brightness
 		const double rate = 1.15;
-		m_display[i] /= rate;
+		m_pixbuf[i] /= rate;
 	}
 
 	return 0;
@@ -7525,11 +7480,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(skywriter_state::check_pos)
 		m_wand_pos[0] = pos;
 	}
 
-	// write lit leds to display
+	// write lit leds to pixel buffer
 	for (int i = 0; i < 7; i++)
 	{
 		if (BIT(m_led_data[0] | m_led_data[1], i))
-			m_display[i * SKYWRITER_WIDTH + pos] = 0x180;
+			m_pixbuf[i * SKYWRITER_WIDTH + pos] = 0x180;
 	}
 
 	m_led_data[1] = m_led_data[0];
@@ -9499,33 +9454,23 @@ public:
 
 	void ssimon(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(speed_switch) { set_clock(); }
-
-protected:
-	virtual void machine_reset() override;
+	DECLARE_INPUT_CHANGED_MEMBER(speed_switch);
 
 private:
-	void set_clock();
 	void write_r(u32 data);
 	u8 read_k();
 };
 
-void ssimon_state::machine_reset()
-{
-	hh_tms1k_state::machine_reset();
-	set_clock();
-}
-
 // handlers
 
-void ssimon_state::set_clock()
+INPUT_CHANGED_MEMBER(ssimon_state::speed_switch)
 {
 	// MCU clock is from an RC circuit with C=100pF, R=x depending on speed switch:
 	// 0 Simple: R=51K -> ~200kHz
 	// 1 Normal: R=37K -> ~275kHz
 	// 2 Super:  R=22K -> ~400kHz
-	u8 inp = m_inputs[6]->read();
-	m_maincpu->set_unscaled_clock((inp & 2) ? 400000 : ((inp & 1) ? 275000 : 200000));
+	static const u32 freq[3] = { 200000, 275000, 400000 };
+	m_maincpu->set_unscaled_clock(freq[newval % 3]);
 }
 
 void ssimon_state::write_r(u32 data)
@@ -9590,7 +9535,7 @@ static INPUT_PORTS_START( ssimon )
 	PORT_BIT( 0x02, 0x02, IPT_CUSTOM ) PORT_CONDITION("IN.4", 0x0f, EQUALS, 0x00)
 	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("IN.6") // fake
+	PORT_START("CPU") // fake
 	PORT_CONFNAME( 0x03, 0x01, "Speed" ) PORT_CHANGED_MEMBER(DEVICE_SELF, ssimon_state, speed_switch, 0)
 	PORT_CONFSETTING(    0x00, "Simple" )
 	PORT_CONFSETTING(    0x01, "Normal" )
@@ -9610,7 +9555,7 @@ INPUT_PORTS_END
 void ssimon_state::ssimon(machine_config &config)
 {
 	// basic machine hardware
-	TMS1100(config, m_maincpu, 275000); // see set_clock
+	TMS1100(config, m_maincpu, 275000); // see speed_switch
 	m_maincpu->read_k().set(FUNC(ssimon_state::read_k));
 	m_maincpu->write_r().set(FUNC(ssimon_state::write_r));
 
@@ -9679,20 +9624,21 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	void update_speaker();
-	void write_r(u32 data);
-	void write_o(u16 data);
-	u8 read_k();
-
-	TIMER_DEVICE_CALLBACK_MEMBER(gearbox_sim_tick);
-	bool sensor_state() { return m_gearbox_pos < 0 && m_display->element_on(0, 0); }
-	int m_gearbox_pos = 0;
-
 	output_finder<> m_left_motor_forward;
 	output_finder<> m_left_motor_reverse;
 	output_finder<> m_right_motor_forward;
 	output_finder<> m_right_motor_reverse;
 	output_finder<> m_ext_out;
+
+	int m_gearbox_pos = 0;
+
+	TIMER_DEVICE_CALLBACK_MEMBER(gearbox_sim_tick);
+	bool sensor_state() { return m_gearbox_pos < 0 && m_display->element_on(0, 0); }
+
+	void update_speaker();
+	void write_r(u32 data);
+	void write_o(u16 data);
+	u8 read_k();
 };
 
 void bigtrak_state::machine_start()
@@ -9903,9 +9849,6 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	void update_display();
-	bool sensor_led_on() { return m_display->element_on(0, 0); }
-
 	output_finder<> m_motor_pos_out;
 	output_finder<> m_card_pos_out;
 	output_finder<> m_motor_on_out;
@@ -9915,6 +9858,9 @@ private:
 	int m_motor_decay = 0;
 	bool m_motor_on = false;
 	bool m_sensor_blind = false;
+
+	void update_display();
+	bool sensor_led_on() { return m_display->element_on(0, 0); }
 
 	TIMER_DEVICE_CALLBACK_MEMBER(motor_sim_tick);
 
@@ -12325,15 +12271,15 @@ private:
 	required_device<tms5110_device> m_tms5100;
 	required_device<tms6100_device> m_tms6100;
 
+	attotime m_pulse;
+	u8 m_dial = 0;
+	u8 m_ram_address = 0;
+
 	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(sense_weight);
-
-	attotime m_pulse;
-	u8 m_dial = 0;
-	u8 m_ram_address = 0;
 };
 
 void wtalker_state::machine_start()
@@ -15225,8 +15171,8 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	u8 m_notch = 0; // cartridge K1/K2
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	void update_display();
 	void write_r(u32 data);
@@ -16245,18 +16191,17 @@ public:
 
 	void tbreakup(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(skill_switch) { set_clock(); }
+	DECLARE_INPUT_CHANGED_MEMBER(skill_switch);
 
 protected:
-	virtual void machine_reset() override;
 	virtual void machine_start() override;
 
 private:
 	required_device<tms1025_device> m_expander;
 	u8 m_exp_port[7] = { };
+
 	void expander_w(offs_t offset, u8 data);
 
-	void set_clock();
 	void update_display();
 	void write_r(u32 data);
 	void write_o(u16 data);
@@ -16269,18 +16214,12 @@ void tbreakup_state::machine_start()
 	save_item(NAME(m_exp_port));
 }
 
-void tbreakup_state::machine_reset()
-{
-	hh_tms1k_state::machine_reset();
-	set_clock();
-}
-
 // handlers
 
-void tbreakup_state::set_clock()
+INPUT_CHANGED_MEMBER(tbreakup_state::skill_switch)
 {
 	// MCU clock is from an analog circuit with resistor of 73K, PRO2 adds 100K
-	m_maincpu->set_unscaled_clock((m_inputs[3]->read() & 1) ? 500000 : 325000);
+	m_maincpu->set_unscaled_clock((newval & 1) ? 500000 : 325000);
 }
 
 void tbreakup_state::update_display()
@@ -16351,7 +16290,7 @@ static INPUT_PORTS_START( tbreakup )
 	PORT_CONFSETTING(    0x00, "3" )
 	PORT_CONFSETTING(    0x04, "5" )
 
-	PORT_START("IN.3") // fake
+	PORT_START("CPU") // fake
 	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, tbreakup_state, skill_switch, 0)
 	PORT_CONFSETTING(    0x00, "1" ) // PRO 1
 	PORT_CONFSETTING(    0x01, "2" ) // PRO 2
@@ -16362,7 +16301,7 @@ INPUT_PORTS_END
 void tbreakup_state::tbreakup(machine_config &config)
 {
 	// basic machine hardware
-	TMS1040(config, m_maincpu, 325000); // see set_clock
+	TMS1040(config, m_maincpu, 325000); // see skill_switch
 	m_maincpu->read_k().set(FUNC(tbreakup_state::read_k));
 	m_maincpu->write_r().set(FUNC(tbreakup_state::write_r));
 	m_maincpu->write_o().set(FUNC(tbreakup_state::write_o));
@@ -16693,6 +16632,7 @@ public:
 
 private:
 	required_device<tms1024_device> m_expander;
+
 	void expander_w(offs_t offset, u8 data);
 
 	void update_display();

@@ -2,9 +2,14 @@
 // copyright-holders:hap
 /*******************************************************************************
 
-La Régence, French chess computer by "France Double R". German distribution
-by Sandy Electronic, who sub-titled it TSB 4 (Turniersensorbrett), the EPROM
-contents is the same. There is no English version.
+La Régence
+
+NOTE: The hardware triggers an NMI on power-off (or power-failure). If this isn't
+done, NVRAM fails at next power-on.
+
+French chess computer by "France Double R". German distribution by Sandy Electronic,
+who sub-titled it TSB 4 (Turniersensorbrett), the EPROM contents is the same.
+There is no English version.
 
 the chess engine is Richard Lang's Cyrus. This was from when he was working for
 Intelligent Software, before he got hired by Hegener + Glaser.
@@ -16,11 +21,8 @@ Hardware notes:
 - 2KB battery-backed RAM (MSM5128-15RS), 3 sockets, only middle one used
 - TTL, piezo, 8*8+4 LEDs, magnetic sensors
 
-NOTE: The hardware triggers an NMI on power-off (or power-failure). If this isn't
-done, NVRAM fails at next power-on.
-
 TODO:
-- if/when MAME supports an exit callback, hook up power-off NMI to that
+- if/when MAME supports an exit callback, hook up power-off switch to that
 
 *******************************************************************************/
 
@@ -69,6 +71,10 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<2> m_inputs;
 
+	bool m_power = false;
+	u8 m_inp_mux = 0;
+	u8 m_led_data = 0;
+
 	// address maps
 	void main_map(address_map &map);
 
@@ -77,10 +83,6 @@ private:
 	void control_w(u8 data);
 	void leds_w(u8 data);
 	u8 input_r();
-
-	bool m_power = false;
-	u8 m_inp_mux = 0;
-	u8 m_led_data = 0;
 };
 
 void regence_state::machine_start()

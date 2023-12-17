@@ -248,8 +248,10 @@ public:
 	void csc(machine_config &config);
 	void csce(machine_config &config);
 	void cscet(machine_config &config);
+	void su9(machine_config &config);
 	void rsc(machine_config &config);
 
+	DECLARE_INPUT_CHANGED_MEMBER(su9_change_cpu_freq);
 	DECLARE_INPUT_CHANGED_MEMBER(rsc_init_board);
 
 protected:
@@ -265,6 +267,11 @@ protected:
 	optional_region_ptr<u8> m_speech_rom;
 	optional_region_ptr<u8> m_language;
 	optional_ioport_array<9> m_inputs;
+
+	u8 m_led_data = 0;
+	u8 m_7seg_data = 0;
+	u8 m_inp_mux = 0;
+	u8 m_speech_bank = 0;
 
 	// address maps
 	void csc_map(address_map &map);
@@ -287,11 +294,6 @@ protected:
 	void pia1_pb_w(u8 data);
 	u8 pia1_pb_r();
 	void pia1_ca2_w(int state);
-
-	u8 m_led_data = 0;
-	u8 m_7seg_data = 0;
-	u8 m_inp_mux = 0;
-	u8 m_speech_bank = 0;
 };
 
 void csc_state::machine_start()
@@ -303,35 +305,11 @@ void csc_state::machine_start()
 	save_item(NAME(m_speech_bank));
 }
 
-// SU9
-
-class su9_state : public csc_state
-{
-public:
-	su9_state(const machine_config &mconfig, device_type type, const char *tag) :
-		csc_state(mconfig, type, tag)
-	{ }
-
-	void su9(machine_config &config);
-
-	DECLARE_INPUT_CHANGED_MEMBER(su9_cpu_freq) { su9_set_cpu_freq(); }
-
-protected:
-	virtual void machine_reset() override;
-	void su9_set_cpu_freq();
-};
-
-void su9_state::machine_reset()
-{
-	csc_state::machine_reset();
-	su9_set_cpu_freq();
-}
-
-void su9_state::su9_set_cpu_freq()
+INPUT_CHANGED_MEMBER(csc_state::su9_change_cpu_freq)
 {
 	// SU9 CPU is clocked 1.95MHz, DS9 is 2.5MHz, SCC is 3MHz
-	u8 inp = ioport("FAKE")->read();
-	m_maincpu->set_unscaled_clock((inp & 2) ? (3_MHz_XTAL) : ((inp & 1) ? (5_MHz_XTAL/2) : (3.9_MHz_XTAL/2)));
+	static const XTAL xtal[3] = { 3.9_MHz_XTAL/2, 5_MHz_XTAL/2, 3_MHz_XTAL };
+	m_maincpu->set_unscaled_clock(xtal[newval % 3]);
 }
 
 
@@ -588,8 +566,8 @@ static INPUT_PORTS_START( su9 )
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("PV / Queen")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("PB / King")
 
-	PORT_START("FAKE")
-	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, su9_state, su9_cpu_freq, 0) // factory set
+	PORT_START("CPU")
+	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, csc_state, su9_change_cpu_freq, 0) // factory set
 	PORT_CONFSETTING(    0x00, "1.95MHz (original)" )
 	PORT_CONFSETTING(    0x01, "2.5MHz (Deluxe)" )
 	PORT_CONFSETTING(    0x02, "3MHz (Septennial)" )
@@ -675,7 +653,7 @@ void csc_state::cscet(machine_config &config)
 	m_maincpu->set_clock(5_MHz_XTAL);
 }
 
-void su9_state::su9(machine_config &config)
+void csc_state::su9(machine_config &config)
 {
 	csc(config);
 	config.set_default_layout(layout_fidel_su9);
@@ -684,7 +662,7 @@ void su9_state::su9(machine_config &config)
 void csc_state::rsc(machine_config &config)
 {
 	// basic machine hardware
-	M6502(config, m_maincpu, 1800000); // measured approx 1.81MHz
+	M6502(config, m_maincpu, 1'800'000); // measured approx 1.81MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &csc_state::rsc_map);
 
 	auto &irq_clock(CLOCK(config, "irq_clock", 546)); // from 555 timer, measured
@@ -862,6 +840,6 @@ SYST( 1981, csc,      0,      0,      csc,     csc,   csc_state, empty_init, "Fi
 SYST( 1981, csce,     0,      0,      csce,    csc,   csc_state, empty_init, "Fidelity Electronics", "Elite Champion Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1981, cscet,    csce,   0,      cscet,   csc,   csc_state, empty_init, "Fidelity Electronics", u8"Elite Champion Challenger (Travemünde TM version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-SYST( 1983, super9cc, 0,      0,      su9,     su9,   su9_state, empty_init, "Fidelity Electronics", "Super \"9\" Sensory Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1983, super9cc, 0,      0,      su9,     su9,   csc_state, empty_init, "Fidelity Electronics", "Super \"9\" Sensory Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 SYST( 1981, reversic, 0,      0,      rsc,     rsc,   csc_state, empty_init, "Fidelity Electronics", "Reversi Sensory Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

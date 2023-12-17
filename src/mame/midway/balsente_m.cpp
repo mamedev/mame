@@ -177,7 +177,7 @@ void balsente_state::rombank2_select_w(uint8_t data)
 	int bank = data & 7;
 
 	/* top bit controls which half of the ROMs to use (Name that Tune only) */
-	if (memregion("maincpu")->bytes() > 0x20000) bank |= (data >> 4) & 8;
+	if (m_mainrom->bytes() > 0x20000) bank |= (data >> 4) & 8;
 
 	/* when they set the AB bank, it appears as though the CD bank is reset */
 	if (data & 0x20)

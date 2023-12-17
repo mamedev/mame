@@ -40,6 +40,7 @@ void vme_cards(device_slot_interface &device)
 	device.option_add("mvme181",          VME_MVME181);
 	device.option_add("mvme187",          VME_MVME187);
 	device.option_add("mvme327a",         VME_MVME327A);
+	device.option_add("mvme350",          VME_MVME350);
 	device.option_add("mzr8105",          VME_MZR8105);
 	device.option_add("mzr8300",          VME_MZR8300);
 	device.option_add("smvme2000",        VME_SMVME2000);

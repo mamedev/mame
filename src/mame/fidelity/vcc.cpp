@@ -150,6 +150,11 @@ private:
 	required_region_ptr<u8> m_language;
 	required_ioport_array<4> m_inputs;
 
+	u8 m_led_select = 0;
+	u8 m_7seg_data = 0;
+	u8 m_inp_mux = 0;
+	u8 m_speech_bank = 0;
+
 	// address maps
 	void main_map(address_map &map);
 	void main_io(address_map &map);
@@ -162,11 +167,6 @@ private:
 	void ppi_portb_w(u8 data);
 	u8 ppi_portc_r();
 	void ppi_portc_w(u8 data);
-
-	u8 m_led_select = 0;
-	u8 m_7seg_data = 0;
-	u8 m_inp_mux = 0;
-	u8 m_speech_bank = 0;
 };
 
 void vcc_state::machine_start()

@@ -668,7 +668,7 @@ void menu_image_info::menu_activated()
 void menu_image_info::populate()
 {
 	for (device_image_interface &image : image_interface_enumerator(machine().root_device()))
-		image_info(&image);
+		image_info(image);
 }
 
 bool menu_image_info::handle(event const *ev)
@@ -682,20 +682,22 @@ bool menu_image_info::handle(event const *ev)
   image interface device
 -------------------------------------------------*/
 
-void menu_image_info::image_info(device_image_interface *image)
+void menu_image_info::image_info(device_image_interface &image)
 {
-	if (!image->user_loadable())
+	if (!image.user_loadable())
 		return;
 
-	if (image->exists())
+	m_notifiers.emplace_back(image.add_media_change_notifier(delegate(&menu_image_info::reload, this)));
+
+	if (image.exists())
 	{
 		// display device type and filename
-		item_append(image->brief_instance_name(), image->basename(), 0, nullptr);
+		item_append(image.brief_instance_name(), image.basename(), 0, &image);
 
 		// if image has been loaded through softlist, let's add some more info
-		if (image->loaded_through_softlist())
+		if (image.loaded_through_softlist())
 		{
-			software_info const &swinfo(*image->software_entry());
+			software_info const &swinfo(*image.software_entry());
 
 			// display full name, publisher and year
 			item_append(swinfo.longname(), FLAG_DISABLE, nullptr);
@@ -717,9 +719,20 @@ void menu_image_info::image_info(device_image_interface *image)
 	}
 	else
 	{
-		item_append(image->brief_instance_name(), _("[empty]"), 0, nullptr);
+		item_append(image.brief_instance_name(), _("[empty]"), 0, &image);
 	}
 	item_append(menu_item_type::SEPARATOR);
+}
+
+
+/*-------------------------------------------------
+  reload - refresh the menu after a media change
+-------------------------------------------------*/
+
+void menu_image_info::reload(device_image_interface::media_change_event ev)
+{
+	m_notifiers.clear();
+	reset(reset_options::REMEMBER_REF);
 }
 
 } // namespace ui

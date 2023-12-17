@@ -55,33 +55,33 @@ HRESULT SetLzma2Prop(PROPID propID, const PROPVARIANT &prop, CLzma2EncProps &lzm
       lzma2Props.numTotalThreads = (int)(prop.ulVal);
       break;
     default:
-      RINOK(NLzma::SetLzmaProp(propID, prop, lzma2Props.lzmaProps));
+      RINOK(NLzma::SetLzmaProp(propID, prop, lzma2Props.lzmaProps))
   }
   return S_OK;
 }
 
 
-STDMETHODIMP CEncoder::SetCoderProperties(const PROPID *propIDs,
-    const PROPVARIANT *coderProps, UInt32 numProps)
+Z7_COM7F_IMF(CEncoder::SetCoderProperties(const PROPID *propIDs,
+    const PROPVARIANT *coderProps, UInt32 numProps))
 {
   CLzma2EncProps lzma2Props;
   Lzma2EncProps_Init(&lzma2Props);
 
   for (UInt32 i = 0; i < numProps; i++)
   {
-    RINOK(SetLzma2Prop(propIDs[i], coderProps[i], lzma2Props));
+    RINOK(SetLzma2Prop(propIDs[i], coderProps[i], lzma2Props))
   }
   return SResToHRESULT(Lzma2Enc_SetProps(_encoder, &lzma2Props));
 }
 
 
-STDMETHODIMP CEncoder::SetCoderPropertiesOpt(const PROPID *propIDs,
-    const PROPVARIANT *coderProps, UInt32 numProps)
+Z7_COM7F_IMF(CEncoder::SetCoderPropertiesOpt(const PROPID *propIDs,
+    const PROPVARIANT *coderProps, UInt32 numProps))
 {
   for (UInt32 i = 0; i < numProps; i++)
   {
     const PROPVARIANT &prop = coderProps[i];
-    PROPID propID = propIDs[i];
+    const PROPID propID = propIDs[i];
     if (propID == NCoderPropID::kExpectedDataSize)
       if (prop.vt == VT_UI8)
         Lzma2Enc_SetDataSize(_encoder, prop.uhVal.QuadPart);
@@ -90,9 +90,9 @@ STDMETHODIMP CEncoder::SetCoderPropertiesOpt(const PROPID *propIDs,
 }
 
 
-STDMETHODIMP CEncoder::WriteCoderProperties(ISequentialOutStream *outStream)
+Z7_COM7F_IMF(CEncoder::WriteCoderProperties(ISequentialOutStream *outStream))
 {
-  Byte prop = Lzma2Enc_WriteProperties(_encoder);
+  const Byte prop = Lzma2Enc_WriteProperties(_encoder);
   return WriteStream(outStream, &prop, 1);
 }
 
@@ -100,8 +100,8 @@ STDMETHODIMP CEncoder::WriteCoderProperties(ISequentialOutStream *outStream)
 #define RET_IF_WRAP_ERROR(wrapRes, sRes, sResErrorCode) \
   if (wrapRes != S_OK /* && (sRes == SZ_OK || sRes == sResErrorCode) */) return wrapRes;
 
-STDMETHODIMP CEncoder::Code(ISequentialInStream *inStream, ISequentialOutStream *outStream,
-    const UInt64 * /* inSize */, const UInt64 * /* outSize */, ICompressProgressInfo *progress)
+Z7_COM7F_IMF(CEncoder::Code(ISequentialInStream *inStream, ISequentialOutStream *outStream,
+    const UInt64 * /* inSize */, const UInt64 * /* outSize */, ICompressProgressInfo *progress))
 {
   CSeqInStreamWrap inWrap;
   CSeqOutStreamWrap outWrap;

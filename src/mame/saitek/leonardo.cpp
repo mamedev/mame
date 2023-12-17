@@ -27,10 +27,10 @@ Leonardo (1986):
 - 8KB RAM(M5M5165P-15 or compatible)
 - magnet sensors chessboard with 16 leds
 
-The 6301Y0 was seen with internal maskrom serial A96 and B40. It appears to be
-running in mode 1 (expanded mode): the internal ROM is disabled and the MCU can
-be emulated as if it's a HD6303Y. It's not known what's on the internal ROM,
-it could even be from another SciSys chesscomputer.
+The 6301Y0 was seen with internal maskrom serial A96 and B40. It is actually
+one from another SciSys chesscomputer (Turbo 16K or Turbo S-24K). It appears to
+be running in mode 1 (expanded mode): the internal ROM is disabled and the MCU
+can be emulated as if it's a HD6303Y.
 
 Galileo (1988):
 - HD6303YP MCU @ 12MHz
@@ -111,6 +111,11 @@ private:
 	required_device<speaker_sound_device> m_dac;
 	required_ioport_array<9> m_inputs;
 
+	int m_ack_state = 0;
+	int m_rts_state = 0;
+	u8 m_inp_mux = 0;
+	u8 m_led_data[2] = { };
+
 	void main_map(address_map &map);
 
 	void update_display();
@@ -126,11 +131,6 @@ private:
 	void p5_w(u8 data);
 	u8 p5_r();
 	void p6_w(u8 data);
-
-	int m_ack_state = 0;
-	int m_rts_state = 0;
-	u8 m_inp_mux = 0;
-	u8 m_led_data[2] = { };
 };
 
 void leo_state::machine_start()

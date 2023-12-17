@@ -18,7 +18,7 @@
 #include "../../../Windows/FileName.h"
 
 #if defined(_WIN32) && !defined(UNDER_CE)
-#define _USE_SECURITY_CODE
+#define Z7_USE_SECURITY_CODE
 #include "../../../Windows/SecurityUtils.h"
 #endif
 
@@ -183,7 +183,7 @@ CDirItems::CDirItems():
     , ExcludeDirItems(false)
     , ExcludeFileItems(false)
     , ShareForWrite(false)
-   #ifdef _USE_SECURITY_CODE
+   #ifdef Z7_USE_SECURITY_CODE
     , ReadSecure(false)
    #endif
    #ifndef _WIN32
@@ -191,13 +191,13 @@ CDirItems::CDirItems():
    #endif
     , Callback(NULL)
 {
-  #ifdef _USE_SECURITY_CODE
+  #ifdef Z7_USE_SECURITY_CODE
   _saclEnabled = InitLocalPrivileges();
   #endif
 }
 
 
-#ifdef _USE_SECURITY_CODE
+#ifdef Z7_USE_SECURITY_CODE
 
 HRESULT CDirItems::AddSecurityItem(const FString &path, int &secureIndex)
 {
@@ -236,7 +236,7 @@ HRESULT CDirItems::AddSecurityItem(const FString &path, int &secureIndex)
         if (res)
         {
           if (secureSize != TempSecureBuf.Size())
-            errorCode = ERROR_INVALID_FUNCTION;;
+            errorCode = ERROR_INVALID_FUNCTION;
         }
         else
           errorCode = GetLastError();
@@ -253,7 +253,7 @@ HRESULT CDirItems::AddSecurityItem(const FString &path, int &secureIndex)
   return AddError(path, errorCode);
 }
 
-#endif // _USE_SECURITY_CODE
+#endif // Z7_USE_SECURITY_CODE
 
 
 HRESULT CDirItems::EnumerateOneDir(const FString &phyPrefix, CObjectVector<NFind::CFileInfo> &files)
@@ -277,7 +277,7 @@ HRESULT CDirItems::EnumerateOneDir(const FString &phyPrefix, CObjectVector<NFind
     files.Add(fi);
     if (Callback && (ttt & kScanProgressStepMask) == kScanProgressStepMask)
     {
-      RINOK(ScanProgress(phyPrefix));
+      RINOK(ScanProgress(phyPrefix))
     }
   }
 
@@ -309,7 +309,7 @@ HRESULT CDirItems::EnumerateOneDir(const FString &phyPrefix, CObjectVector<NFind
     {
       const FString path = phyPrefix + de.Name;
       {
-        RINOK(AddError(path));
+        RINOK(AddError(path))
         continue;
       }
     }
@@ -318,7 +318,7 @@ HRESULT CDirItems::EnumerateOneDir(const FString &phyPrefix, CObjectVector<NFind
 
     if (Callback && (i & kScanProgressStepMask) == kScanProgressStepMask)
     {
-      RINOK(ScanProgress(phyPrefix));
+      RINOK(ScanProgress(phyPrefix))
     }
   }
 
@@ -332,10 +332,10 @@ HRESULT CDirItems::EnumerateOneDir(const FString &phyPrefix, CObjectVector<NFind
 
 HRESULT CDirItems::EnumerateDir(int phyParent, int logParent, const FString &phyPrefix)
 {
-  RINOK(ScanProgress(phyPrefix));
+  RINOK(ScanProgress(phyPrefix))
 
   CObjectVector<NFind::CFileInfo> files;
-  RINOK(EnumerateOneDir(phyPrefix, files));
+  RINOK(EnumerateOneDir(phyPrefix, files))
 
   FOR_VECTOR (i, files)
   {
@@ -361,10 +361,10 @@ HRESULT CDirItems::EnumerateDir(int phyParent, int logParent, const FString &phy
     if (CanIncludeItem(fi.IsDir()))
     {
     int secureIndex = -1;
-    #ifdef _USE_SECURITY_CODE
+    #ifdef Z7_USE_SECURITY_CODE
     if (ReadSecure)
     {
-      RINOK(AddSecurityItem(phyPrefix + fi.Name, secureIndex));
+      RINOK(AddSecurityItem(phyPrefix + fi.Name, secureIndex))
     }
     #endif
     AddDirFileInfo(phyParent, logParent, secureIndex, fi);
@@ -372,14 +372,14 @@ HRESULT CDirItems::EnumerateDir(int phyParent, int logParent, const FString &phy
     
     if (Callback && (i & kScanProgressStepMask) == kScanProgressStepMask)
     {
-      RINOK(ScanProgress(phyPrefix));
+      RINOK(ScanProgress(phyPrefix))
     }
 
     if (fi.IsDir())
     {
       const FString name2 = fi.Name + FCHAR_PATH_SEPARATOR;
       unsigned parent = AddPrefix(phyParent, logParent, fs2us(name2));
-      RINOK(EnumerateDir((int)parent, (int)parent, phyPrefix + name2));
+      RINOK(EnumerateDir((int)parent, (int)parent, phyPrefix + name2))
     }
   }
   return S_OK;
@@ -412,6 +412,11 @@ HRESULT CDirItems::EnumerateItems2(
   const int phyParent = phyPrefix.IsEmpty() ? -1 : (int)AddPrefix(-1, -1, fs2us(phyPrefix));
   const int logParent = logPrefix.IsEmpty() ? -1 : (int)AddPrefix(-1, -1, logPrefix);
 
+ #ifdef _WIN32
+  const bool phyPrefix_isAltStreamPrefix =
+      NFile::NName::IsAltStreamPrefixWithColon(fs2us(phyPrefix));
+ #endif
+
   FOR_VECTOR (i, filePaths)
   {
     const FString &filePath = filePaths[i];
@@ -419,7 +424,7 @@ HRESULT CDirItems::EnumerateItems2(
     const FString phyPath = phyPrefix + filePath;
     if (!FindFile_KeepDots(fi, phyPath  FOLLOW_LINK_PARAM))
     {
-      RINOK(AddError(phyPath));
+      RINOK(AddError(phyPath))
       continue;
     }
     if (requestedPaths)
@@ -437,20 +442,28 @@ HRESULT CDirItems::EnumerateItems2(
     if (CanIncludeItem(fi.IsDir()))
     {
     int secureIndex = -1;
-    #ifdef _USE_SECURITY_CODE
+    #ifdef Z7_USE_SECURITY_CODE
     if (ReadSecure)
     {
-      RINOK(AddSecurityItem(phyPath, secureIndex));
+      RINOK(AddSecurityItem(phyPath, secureIndex))
     }
     #endif
+   #ifdef _WIN32
+    if (phyPrefix_isAltStreamPrefix && fi.IsAltStream)
+    {
+      const int pos = fi.Name.Find(FChar(':'));
+      if (pos >= 0)
+        fi.Name.DeleteFrontal((unsigned)pos + 1);
+    }
+   #endif
     AddDirFileInfo(phyParentCur, logParent, secureIndex, fi);
     }
     
     if (fi.IsDir())
     {
       const FString name2 = fi.Name + FCHAR_PATH_SEPARATOR;
-      unsigned parent = AddPrefix(phyParentCur, logParent, fs2us(name2));
-      RINOK(EnumerateDir((int)parent, (int)parent, phyPrefix + phyPrefixCur + name2));
+      const unsigned parent = AddPrefix(phyParentCur, logParent, fs2us(name2));
+      RINOK(EnumerateDir((int)parent, (int)parent, phyPrefix + phyPrefixCur + name2))
     }
   }
   
@@ -625,10 +638,10 @@ static HRESULT EnumerateForItem(
     if (dirItems.CanIncludeItem(fi.IsDir()))
     {
       int secureIndex = -1;
-    #ifdef _USE_SECURITY_CODE
+    #ifdef Z7_USE_SECURITY_CODE
       if (dirItems.ReadSecure)
       {
-        RINOK(dirItems.AddSecurityItem(phyPrefix + fi.Name, secureIndex));
+        RINOK(dirItems.AddSecurityItem(phyPrefix + fi.Name, secureIndex))
       }
     #endif
     #if !defined(UNDER_CE)
@@ -654,7 +667,7 @@ static HRESULT EnumerateForItem(
   if (dirItemIndex >= 0)
   {
     CDirItem &dirItem = dirItems.Items[(unsigned)dirItemIndex];
-    RINOK(dirItems.SetLinkInfo(dirItem, fi, phyPrefix));
+    RINOK(dirItems.SetLinkInfo(dirItem, fi, phyPrefix))
     if (dirItem.ReparseData.Size() != 0)
       return S_OK;
   }
@@ -666,7 +679,7 @@ static HRESULT EnumerateForItem(
         phyPrefix + fi.Name,    // with (fi.Name)
         newParts,               // with (fi.Name)
         addAllSubStreams,
-        dirItems));
+        dirItems))
   }
   #endif
 
@@ -787,7 +800,7 @@ static HRESULT EnumerateDirItems(
       enterToSubFolders = true;
   }
   
-  RINOK(dirItems.ScanProgress(phyPrefix));
+  RINOK(dirItems.ScanProgress(phyPrefix))
 
   // try direct_names case at first
   if (addParts.IsEmpty() && !enterToSubFolders)
@@ -818,7 +831,7 @@ static HRESULT EnumerateDirItems(
         bool needAltStreams = true;
         #endif
 
-        #ifdef _USE_SECURITY_CODE
+        #ifdef Z7_USE_SECURITY_CODE
         bool needSecurity = true;
         #endif
         
@@ -838,7 +851,7 @@ static HRESULT EnumerateDirItems(
 
               /*
               // do we need to ignore security info for "\\" folder ?
-              #ifdef _USE_SECURITY_CODE
+              #ifdef Z7_USE_SECURITY_CODE
               needSecurity = false;
               #endif
               */
@@ -866,7 +879,7 @@ static HRESULT EnumerateDirItems(
         #endif
         if (!FindFile_KeepDots(fi, fullPath  FOLLOW_LINK_PARAM2))
         {
-          RINOK(dirItems.AddError(fullPath));
+          RINOK(dirItems.AddError(fullPath))
           continue;
         }
 
@@ -884,7 +897,7 @@ static HRESULT EnumerateDirItems(
         if (isDir ? !item.ForDir : !item.ForFile)
         {
           // RINOK(dirItems.AddError(fullPath, isDir ? MY_ERROR_IS_DIR: MY_ERROR_NOT_DIR));
-          RINOK(dirItems.AddError(fullPath, DI_DEFAULT_ERROR));
+          RINOK(dirItems.AddError(fullPath, DI_DEFAULT_ERROR))
           continue;
         }
         {
@@ -898,10 +911,10 @@ static HRESULT EnumerateDirItems(
        if (dirItems.CanIncludeItem(fi.IsDir()))
        {
         int secureIndex = -1;
-        #ifdef _USE_SECURITY_CODE
+        #ifdef Z7_USE_SECURITY_CODE
         if (needSecurity && dirItems.ReadSecure)
         {
-          RINOK(dirItems.AddSecurityItem(fullPath, secureIndex));
+          RINOK(dirItems.AddSecurityItem(fullPath, secureIndex))
         }
         #endif
 
@@ -912,7 +925,7 @@ static HRESULT EnumerateDirItems(
         #if !defined(UNDER_CE)
         {
           CDirItem &dirItem = dirItems.Items.Back();
-          RINOK(dirItems.SetLinkInfo(dirItem, fi, phyPrefix));
+          RINOK(dirItems.SetLinkInfo(dirItem, fi, phyPrefix))
           if (dirItem.ReparseData.Size() != 0)
             continue;
         }
@@ -926,7 +939,7 @@ static HRESULT EnumerateDirItems(
               fullPath,  // including (name)
               pathParts, // including (fi.Name)
               true, /* addAllSubStreams */
-              dirItems));
+              dirItems))
         }
         #endif // defined(_WIN32)
 
@@ -975,9 +988,9 @@ static HRESULT EnumerateDirItems(
         }
 
         RINOK(EnumerateDirItems_Spec(*nextNode, phyParent, logParent, fi.Name, phyPrefix,
-            newParts, dirItems, true));
+            newParts, dirItems, true))
       }
-      
+
       for (i = 0; i < curNode.SubNodes.Size(); i++)
       {
         if (i < needEnterVector.Size())
@@ -987,17 +1000,20 @@ static HRESULT EnumerateDirItems(
         FString fullPath = phyPrefix + us2fs(nextNode.Name);
         NFind::CFileInfo fi;
         
-        if (phyPrefix.IsEmpty())
+        if (nextNode.Name.IsEmpty())
         {
-          {
-            if (nextNode.Name.IsEmpty())
-              fullPath = CHAR_PATH_SEPARATOR;
-            #ifdef _WIN32
-            else if (NWildcard::IsDriveColonName(nextNode.Name))
-              fullPath.Add_PathSepar();
-            #endif
-          }
+          if (phyPrefix.IsEmpty())
+            fullPath = CHAR_PATH_SEPARATOR;
         }
+      #ifdef _WIN32
+        else if(phyPrefix.IsEmpty()
+            || (phyPrefix.Len() == NName::kSuperPathPrefixSize
+                && IsSuperPath(phyPrefix)))
+        {
+          if (NWildcard::IsDriveColonName(nextNode.Name))
+            fullPath.Add_PathSepar();
+        }
+      #endif
 
         // we don't want to call fi.Find() for root folder or virtual folder
         if ((phyPrefix.IsEmpty() && nextNode.Name.IsEmpty())
@@ -1015,19 +1031,19 @@ static HRESULT EnumerateDirItems(
           {
             if (!nextNode.AreThereIncludeItems())
               continue;
-            RINOK(dirItems.AddError(fullPath));
+            RINOK(dirItems.AddError(fullPath))
             continue;
           }
         
           if (!fi.IsDir())
           {
-            RINOK(dirItems.AddError(fullPath, DI_DEFAULT_ERROR));
+            RINOK(dirItems.AddError(fullPath, DI_DEFAULT_ERROR))
             continue;
           }
         }
 
         RINOK(EnumerateDirItems_Spec(nextNode, phyParent, logParent, fi.Name, phyPrefix,
-            UStringVector(), dirItems, false));
+            UStringVector(), dirItems, false))
       }
 
       return S_OK;
@@ -1073,7 +1089,7 @@ static HRESULT EnumerateDirItems(
         fi.Name = driveName;
 
         RINOK(EnumerateForItem(fi, curNode, phyParent, logParent, phyPrefix,
-            addParts, dirItems, enterToSubFolders));
+            addParts, dirItems, enterToSubFolders))
       }
       return S_OK;
     }
@@ -1088,7 +1104,7 @@ static HRESULT EnumerateDirItems(
   // for (int y = 0; y < 1; y++)
   {
     // files.Clear();
-    RINOK(dirItems.EnumerateOneDir(phyPrefix, files));
+    RINOK(dirItems.EnumerateOneDir(phyPrefix, files))
   /*
   FOR_VECTOR (i, files)
   {
@@ -1134,10 +1150,10 @@ static HRESULT EnumerateDirItems(
     #endif
 
     RINOK(EnumerateForItem(fi, curNode, phyParent, logParent, phyPrefix,
-          addParts, dirItems, enterToSubFolders));
+          addParts, dirItems, enterToSubFolders))
     if (dirItems.Callback && (i & kScanProgressStepMask) == kScanProgressStepMask)
     {
-      RINOK(dirItems.ScanProgress(phyPrefix));
+      RINOK(dirItems.ScanProgress(phyPrefix))
     }
   }
 
@@ -1170,16 +1186,16 @@ HRESULT EnumerateItems(
     RINOK(EnumerateDirItems(pair.Head, phyParent, logParent, us2fs(pair.Prefix), UStringVector(),
         dirItems,
         false // enterToSubFolders
-        ));
+        ))
   }
   dirItems.ReserveDown();
 
  #if defined(_WIN32) && !defined(UNDER_CE)
-  RINOK(dirItems.FillFixedReparse());
+  RINOK(dirItems.FillFixedReparse())
  #endif
 
  #ifndef _WIN32
-  RINOK(dirItems.FillDeviceSizes());
+  RINOK(dirItems.FillDeviceSizes())
  #endif
 
   return S_OK;
@@ -1237,7 +1253,7 @@ HRESULT CDirItems::FillFixedReparse()
       }
       */
 
-      RINOK(AddError(phyPath));
+      RINOK(AddError(phyPath))
       continue;
     }
 
@@ -1485,7 +1501,7 @@ HRESULT EnumerateDirItemsAndSort(
     {
       HRESULT res = EnumerateItems(censor, censorPathMode, addPathPrefix, dirItems);
       st = dirItems.Stat;
-      RINOK(res);
+      RINOK(res)
     }
   
     FOR_VECTOR (i, dirItems.Items)

@@ -467,6 +467,7 @@ void voodoo_banshee_device::device_start()
 	m_io_regs.write(banshee_io_regs::sipMonitor, 0x40000000);
 	m_io_regs.write(banshee_io_regs::lfbMemoryConfig, 0x000a2200);
 	u32 dram0 = 0x00579d29;
+	// HACK: VMI_DATA_6 / VMI_DATA_5 strapping pins
 	if (m_fbmem_in_mb == 16)
 		dram0 |= 0x0c000000;      // Midway Vegas (denver) expects 2 banks of 16MBit SGRAMs
 	else
@@ -1276,6 +1277,8 @@ void voodoo_banshee_device::internal_vga_w(offs_t offset, u8 data)
 		// graphics controller access
 		case banshee_vga_regs::gfxControllerData:
 			m_vga_regs.write_gc(logoffs = m_vga_regs.gfx_controller_index(), data);
+			if (logoffs == 6)
+				recompute_video();
 			logtype = "vga_gc_w";
 			break;
 
@@ -1283,6 +1286,10 @@ void voodoo_banshee_device::internal_vga_w(offs_t offset, u8 data)
 		case banshee_vga_regs::crtcData:
 			m_vga_regs.write_crtc(logoffs = m_vga_regs.crtc_index(), data);
 			logtype = "vga_crtc_w";
+			break;
+
+		case banshee_vga_regs::inputStatus0:
+			recompute_video();
 			break;
 	}
 
@@ -1480,21 +1487,30 @@ void voodoo_banshee_device::recompute_video()
 	else
 		vstop |= vstart & ~0xf;
 
+	if (vstart == 0 || vstop == 0)
+		return;
+
+	// check misc output bits 3-2 and alpha_dis, x86 cares and pumpit1 in particular wants regular 00 VGA 25 MHz setting.
+	const u8 misc_vga_output = m_vga_regs.read(banshee_vga_regs::inputStatus0);
+	const u8 alpha_dis = misc_vga_output & 8 ? 1 : BIT(m_vga_regs.read_gc(6), 0) ? 1 : 8;
+
 	// get pll k, m and n from pllCtrl0
 	const u32 pll0 = m_io_regs.read(banshee_io_regs::pllCtrl0);
 	const u32 k = BIT(pll0, 0, 2);
 	const u32 m = BIT(pll0, 2, 6);
 	const u32 n = BIT(pll0, 8, 8);
-	const double video_clock = (XTAL(14'318'181) * (n + 2) / ((m + 2) << k)).dvalue();
+	const double video_clock = misc_vga_output & 8
+		? (XTAL(14'318'181) * (n + 2) / ((m + 2) << k)).dvalue()
+		: (misc_vga_output & 4 ? XTAL(28'636'363) : XTAL(25'174'800)).dvalue();
 	const double frame_period = vtotal * htotal / video_clock;
 
 	// compute scaled screen size, using the overlay fraction if specified
 	u32 dudx = m_io_regs.read(banshee_io_regs::vidOverlayDudx);
 	u32 dvdy = m_io_regs.read(banshee_io_regs::vidOverlayDvdy);
-	u32 width = (dudx != 0) ? ((m_width * dudx) >> 20) : m_width;
-	u32 height = (dvdy != 0) ? ((m_height * dvdy) >> 20) : m_height;
+	u32 width = ((dudx != 0) ? ((m_width * dudx) >> 20) : m_width) * alpha_dis;
+	u32 height = ((dvdy != 0) ? ((m_height * dvdy) >> 20) : m_height) * alpha_dis;
 	if (LOG_REGISTERS)
-		logerror("configure screen: htotal: %d vtotal: %d vstart: %d vstop: %d width: %d height: %d refresh: %f\n", htotal, vtotal, vstart, vstop, width, height, 1.0 / frame_period);
+		logerror("configure screen: htotal: %d vtotal: %d vstart: %d vstop: %d width: %d height: %d misc_vga: %02x alpha_dis %d refresh: %f\n", htotal, vtotal, vstart, vstop, width, height, misc_vga_output, alpha_dis, 1.0 / frame_period);
 
 	// configure the screen
 	rectangle visarea(0, width - 1, 0, height - 1);

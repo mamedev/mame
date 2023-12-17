@@ -188,8 +188,7 @@ private:
 	DECLARE_VIDEO_START(mia);
 	DECLARE_MACHINE_RESET(tmnt);
 	DECLARE_VIDEO_START(tmnt);
-	uint32_t screen_update_mia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_tmnt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void tmnt_vblank_w(int state);
 	void volume_callback(uint8_t data);
 	K051960_CB_MEMBER(mia_sprite_callback);
@@ -447,20 +446,7 @@ void tmnt_state::tmnt_priority_w(offs_t offset, uint16_t data)
 
 ***************************************************************************/
 
-uint32_t tmnt_state::screen_update_mia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	m_k052109->tilemap_update();
-
-	m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, TILEMAP_DRAW_OPAQUE,0);
-	if ((m_tmnt_priorityflag & 1) == 1) m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), 0, 0);
-	m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, 0, 0);
-	if ((m_tmnt_priorityflag & 1) == 0) m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), 0, 0);
-	m_k052109->tilemap_draw(screen, bitmap, cliprect, 0, 0, 0);
-
-	return 0;
-}
-
-uint32_t tmnt_state::screen_update_tmnt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tmnt_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_k052109->tilemap_update();
 
@@ -854,7 +840,7 @@ void tmnt_state::cuebrick(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(13*8, (64-13)*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(tmnt_state::screen_update_mia));
+	screen.set_screen_update(FUNC(tmnt_state::screen_update));
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set(FUNC(tmnt_state::tmnt_vblank_w));
 
@@ -904,7 +890,7 @@ void tmnt_state::mia(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(13*8, (64-13)*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(tmnt_state::screen_update_mia));
+	screen.set_screen_update(FUNC(tmnt_state::screen_update));
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set(FUNC(tmnt_state::tmnt_vblank_w));
 
@@ -969,7 +955,7 @@ void tmnt_state::tmnt(machine_config &config)
 	screen.set_visarea(12*8, (64-12)*8-1, 2*8, 30*8-1 );
 	// verified against real hardware
 
-	screen.set_screen_update(FUNC(tmnt_state::screen_update_tmnt));
+	screen.set_screen_update(FUNC(tmnt_state::screen_update));
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set(FUNC(tmnt_state::tmnt_vblank_w)); // NVBLK from 051962
 

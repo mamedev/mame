@@ -75,9 +75,9 @@ private:
 	void io_select_w(uint8_t data);
 	uint8_t io_port_r();
 
-	void audio_cmd_w_sync(int param);
-	void audio_trigger_w_sync(int param);
-	void audio_reset_w_sync(int param);
+	void audio_cmd_w_sync(int32_t param);
+	void audio_trigger_w_sync(int32_t param);
+	void audio_reset_w_sync(int32_t param);
 	void audio_cmd_w(uint8_t data) { machine().scheduler().synchronize(timer_expired_delegate(FUNC(killcom_state::audio_cmd_w_sync), this), data); }
 	void audio_trigger_w(int state) { machine().scheduler().synchronize(timer_expired_delegate(FUNC(killcom_state::audio_trigger_w_sync), this), state); }
 	void audio_reset_w(int state) { machine().scheduler().synchronize(timer_expired_delegate(FUNC(killcom_state::audio_reset_w_sync), this), state); }

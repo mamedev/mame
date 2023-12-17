@@ -420,7 +420,7 @@ static INPUT_PORTS_START( sandscrp )
 INPUT_PORTS_END
 
 
-static GFXDECODE_START( gfx_sandscrp )
+static GFXDECODE_START( gfx_sandscrp_spr )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0x000, 0x10 ) // [0] Sprites
 GFXDECODE_END
 
@@ -453,7 +453,6 @@ void sandscrp_state::sandscrp(machine_config &config)
 	screen.screen_vblank().set(FUNC(sandscrp_state::screen_vblank));
 	screen.set_palette("palette");
 
-	GFXDECODE(config, "gfxdecode", "palette", gfx_sandscrp);
 	PALETTE(config, "palette").set_format(palette_device::xGRB_555, 2048);
 
 	KANEKO_TMAP(config, m_view2);
@@ -463,8 +462,7 @@ void sandscrp_state::sandscrp(machine_config &config)
 
 	KANEKO_HIT(config, "calc1_mcu").set_type(0);
 
-	KANEKO_PANDORA(config, m_pandora, 0);
-	m_pandora->set_gfxdecode_tag("gfxdecode");
+	KANEKO_PANDORA(config, m_pandora, 0, "palette", gfx_sandscrp_spr);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

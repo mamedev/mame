@@ -90,6 +90,9 @@ private:
 	required_device<cassette_image_device> m_cassette;
 	required_ioport_array<3> m_inputs;
 
+	u8 m_matrix = 0;
+	bool m_nmi = false;
+
 	void poly880_io(address_map &map);
 	void poly880_mem(address_map &map);
 	void poly880s_mem(address_map &map);
@@ -100,9 +103,6 @@ private:
 	void pio1_pa_w(u8 data);
 	u8 pio1_pb_r();
 	void pio1_pb_w(u8 data);
-
-	u8 m_matrix = 0;
-	bool m_nmi = false;
 };
 
 

@@ -648,7 +648,7 @@ void pc9801_state::pc9801_common_io(address_map &map)
 	// (can be accessed only thru the $3fdb alias)
 	map(0x0070, 0x0077).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0xff00);
 	map(0x0070, 0x007f).rw(FUNC(pc9801_state::txt_scrl_r), FUNC(pc9801_state::txt_scrl_w)).umask16(0x00ff); //display registers / i8253 pit
-//	map(0x0090, 0x0093).rw(m_sio, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0xff00); // CMT SIO (optional, C-Bus)
+//  map(0x0090, 0x0093).rw(m_sio, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0xff00); // CMT SIO (optional, C-Bus)
 	map(0x7fd8, 0x7fdf).rw(m_ppi_mouse, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00);
 }
 

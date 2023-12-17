@@ -6,7 +6,7 @@
 
 #ifndef USE_STATIC_SYSTEM_RAND
 
-#ifndef _7ZIP_ST
+#ifndef Z7_ST
 #include "../../Windows/Synchronization.h"
 #endif
 
@@ -76,9 +76,9 @@ void CRandomGenerator::Init()
   #ifdef _WIN32
 
   DWORD w = ::GetCurrentProcessId();
-  HASH_UPD(w);
+  HASH_UPD(w)
   w = ::GetCurrentThreadId();
-  HASH_UPD(w);
+  HASH_UPD(w)
 
   #ifdef UNDER_CE
   /*
@@ -96,11 +96,14 @@ void CRandomGenerator::Init()
   }
   #else
   {
-    HMODULE hModule = ::LoadLibrary(TEXT("Advapi32.dll"));
+    const HMODULE hModule = ::LoadLibrary(TEXT("advapi32.dll"));
     if (hModule)
     {
       // SystemFunction036() is real name of RtlGenRandom() function
-      Func_RtlGenRandom my_RtlGenRandom = (Func_RtlGenRandom)(void *)GetProcAddress(hModule, "SystemFunction036");
+      const
+      Func_RtlGenRandom
+        my_RtlGenRandom = Z7_GET_PROC_ADDRESS(
+      Func_RtlGenRandom, hModule, "SystemFunction036");
       if (my_RtlGenRandom)
       {
         if (my_RtlGenRandom(buf, kBufSize))
@@ -117,9 +120,9 @@ void CRandomGenerator::Init()
   #else
   
   pid_t pid = getpid();
-  HASH_UPD(pid);
+  HASH_UPD(pid)
   pid = getppid();
-  HASH_UPD(pid);
+  HASH_UPD(pid)
 
   {
     int f = open("/dev/urandom", O_RDONLY);
@@ -164,25 +167,25 @@ void CRandomGenerator::Init()
     #ifdef _WIN32
     LARGE_INTEGER v;
     if (::QueryPerformanceCounter(&v))
-      HASH_UPD(v.QuadPart);
+      HASH_UPD(v.QuadPart)
     #endif
 
     #ifdef USE_POSIX_TIME
     #ifdef USE_POSIX_TIME2
     timeval v;
-    if (gettimeofday(&v, 0) == 0)
+    if (gettimeofday(&v, NULL) == 0)
     {
-      HASH_UPD(v.tv_sec);
-      HASH_UPD(v.tv_usec);
+      HASH_UPD(v.tv_sec)
+      HASH_UPD(v.tv_usec)
     }
     #endif
-    time_t v2 = time(NULL);
-    HASH_UPD(v2);
+    const time_t v2 = time(NULL);
+    HASH_UPD(v2)
     #endif
 
     #ifdef _WIN32
-    DWORD tickCount = ::GetTickCount();
-    HASH_UPD(tickCount);
+    const DWORD tickCount = ::GetTickCount();
+    HASH_UPD(tickCount)
     #endif
     
     for (unsigned j = 0; j < 100; j++)
@@ -198,7 +201,7 @@ void CRandomGenerator::Init()
   _needInit = false;
 }
 
-#ifndef _7ZIP_ST
+#ifndef Z7_ST
   static NWindows::NSynchronization::CCriticalSection g_CriticalSection;
   #define MT_LOCK NWindows::NSynchronization::CCriticalSectionLock lock(g_CriticalSection);
 #else
@@ -222,7 +225,7 @@ void CRandomGenerator::Generate(Byte *data, unsigned size)
     
     Sha256_Init(&hash);
     UInt32 salt = 0xF672ABD1;
-    HASH_UPD(salt);
+    HASH_UPD(salt)
     Sha256_Update(&hash, _buff, SHA256_DIGEST_SIZE);
     MY_ALIGN (16)
     Byte buff[SHA256_DIGEST_SIZE];
@@ -232,6 +235,7 @@ void CRandomGenerator::Generate(Byte *data, unsigned size)
   }
 }
 
+MY_ALIGN (16)
 CRandomGenerator g_RandomGenerator;
 
 #endif

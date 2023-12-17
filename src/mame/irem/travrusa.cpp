@@ -296,17 +296,12 @@ void travrusa_state::machine_reset()
 void travrusa_state::travrusa(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000);   /* 4 MHz (?) */
+	Z80(config, m_maincpu, 18.432_MHz_XTAL / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &travrusa_state::main_map);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(56.75);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(1790)   /* accurate frequency, measured on a Moon Patrol board, is 56.75Hz. */);
-				/* the Lode Runner manual (similar but different hardware) */
-				/* talks about 55Hz and 1790ms vblank duration. */
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(1*8, 31*8-1, 0*8, 32*8-1);
+	screen.set_raw(18.432_MHz_XTAL / 3, 384, 8, 248, 282, 0, 256); // verified from schematics; accurate frequency, measured on a Moon Patrol board, is 56.75Hz
 	screen.set_screen_update(FUNC(travrusa_state::screen_update_travrusa));
 	screen.set_palette(m_palette);
 	// Race start countdown in shtrider needs multiple interrupts per frame to sync, mustache.cpp has the same, and is also a Seibu game

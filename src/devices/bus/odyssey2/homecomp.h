@@ -49,16 +49,16 @@ private:
 	required_device_array<generic_latch_8_device, 2> m_latch;
 	required_device<cassette_image_device> m_cass;
 
+	std::unique_ptr<u8[]> m_ram;
+	u8 m_control = 0;
+	bool m_installed = false;
+
 	void internal_io_w(offs_t offset, u8 data);
 	u8 internal_io_r(offs_t offset);
 	u8 internal_rom_r(offs_t offset) { return m_exrom[offset]; }
 
 	void homecomp_io(address_map &map);
 	void homecomp_mem(address_map &map);
-
-	std::unique_ptr<u8[]> m_ram;
-	u8 m_control = 0;
-	bool m_installed = false;
 };
 
 // device type definition

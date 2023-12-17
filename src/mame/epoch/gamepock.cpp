@@ -56,15 +56,15 @@ private:
 	required_device<speaker_sound_device> m_speaker;
 	required_ioport_array<2> m_inputs;
 
+	u8 m_control = 0;
+	u8 m_lcd_data = 0;
+
 	void control_w(u8 data);
 	void lcd_data_w(u8 data);
 	u8 input_r();
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void main_map(address_map &map);
-
-	u8 m_control = 0;
-	u8 m_lcd_data = 0;
 };
 
 void gamepock_state::machine_start()

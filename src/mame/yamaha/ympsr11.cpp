@@ -6,6 +6,8 @@
 #include "sound/ymopl.h"
 #include "speaker.h"
 
+#include "psr11.lh"
+
 namespace {
 
 class yamaha_psr11_state : public driver_device
@@ -264,6 +266,8 @@ void yamaha_psr11_state::psr11(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 	YM3812(config, m_ym3812, 3.579545_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 3.00);
+
+	config.set_default_layout(layout_psr11);
 }
 
 ROM_START(psr11)

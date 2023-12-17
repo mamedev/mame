@@ -14,13 +14,15 @@ TODO:
 #include "emu.h"
 #include "machine/w83977tf.h"
 
-#include "bus/isa/isa.h"
 //#include "machine/ds128x.h"
 #include "machine/pckeybrd.h"
+
+#include <algorithm>
 
 #define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
+
 
 DEFINE_DEVICE_TYPE(W83977TF, w83977tf_device, "w83977tf", "Winbond W83977TF Super I/O")
 
@@ -43,7 +45,22 @@ w83977tf_device::w83977tf_device(const machine_config &mconfig, const char *tag,
 //  , m_txd2_callback(*this)
 //  , m_ndtr2_callback(*this)
 //  , m_nrts2_callback(*this)
-{ }
+	, m_index(0)
+	, m_logical_index(0)
+	, m_hefras(0)
+	, m_lockreg(0)
+	, m_lock_sequence(0)
+	, m_keyb_irq_line(0)
+	, m_mouse_irq_line(0)
+	, m_rtc_irq_line(0)
+	, m_keyb_address{ 0, 0 }
+{
+	std::fill(std::begin(m_activate), std::end(m_activate), false);
+}
+
+w83977tf_device::~w83977tf_device()
+{
+}
 
 void w83977tf_device::device_start()
 {

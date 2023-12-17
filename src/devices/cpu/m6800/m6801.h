@@ -61,7 +61,7 @@ public:
 	void nvram_set_battery(int state) { m_nvram_battery = bool(state); } // default is 1 (nvram_enable_backup needs to be true)
 	void nvram_set_default_value(uint8_t val) { m_nvram_defval = val; } // default is 0
 	auto standby_cb() { return m_standby_func.bind(); } // notifier (not an output pin)
-	bool standby() { return suspended(SUSPEND_REASON_CLOCK); }
+	int standby() { return suspended(SUSPEND_REASON_CLOCK) ? 1 : 0; }
 
 	void m6801_clock_serial();
 
@@ -122,7 +122,7 @@ protected:
 	uint8_t sci_rdr_r();
 	void sci_tdr_w(uint8_t data);
 
-	uint8_t rcr_r();
+	virtual uint8_t rcr_r();
 	virtual void rcr_w(uint8_t data);
 	uint8_t ff_r();
 
@@ -258,6 +258,11 @@ class hd6301_cpu_device : public m6801_cpu_device
 protected:
 	hd6301_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const m6800_cpu_device::op_func *insn, const uint8_t *cycles, address_map_constructor internal, int nvram_bytes);
 
+	// device_nvram_interface implementation
+	virtual void nvram_default() override;
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
+
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	virtual void take_trap() override;
@@ -310,6 +315,11 @@ public:
 protected:
 	hd6301x_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal, int nvram_bytes);
 
+	// device_nvram_interface implementation
+	virtual void nvram_default() override;
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
+
 	void hd6301x_io(address_map &map);
 	void hd6303x_io(address_map &map);
 	void hd6301x_mem(address_map &map);
@@ -330,6 +340,7 @@ protected:
 	virtual void p6_data_w(uint8_t data);
 	uint8_t p7_data_r();
 	void p7_data_w(uint8_t data);
+	virtual uint8_t rcr_r() override;
 
 	uint8_t tcsr2_r();
 	void tcsr2_w(uint8_t data);
@@ -380,12 +391,17 @@ class hd6301x0_cpu_device : public hd6301x_cpu_device
 {
 public:
 	hd6301x0_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	hd6301x0_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal, int nvram_bytes);
+
+	virtual void device_reset() override;
 };
 
 
 // DC-64S package: HD63701X0C, HD63A701X0C, HD63B701X0C
 // Not fully emulated yet
-class hd63701x0_cpu_device : public hd6301x_cpu_device
+class hd63701x0_cpu_device : public hd6301x0_cpu_device
 {
 public:
 	hd63701x0_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -427,6 +443,7 @@ protected:
 	virtual void p6_data_w(uint8_t data) override;
 	uint8_t p6_csr_r();
 	void p6_csr_w(uint8_t data);
+	virtual uint8_t rcr_r() override;
 	virtual void rcr_w(uint8_t data) override;
 
 	virtual void m6800_check_irq2() override;

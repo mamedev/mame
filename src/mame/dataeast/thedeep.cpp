@@ -158,7 +158,7 @@ TILE_GET_INFO_MEMBER(thedeep_state::get_tile_info)
 {
 	uint8_t code  =   m_textram[ tile_index * 2 + 0 ];
 	uint8_t color =   m_textram[ tile_index * 2 + 1 ];
-	tileinfo.set(2,
+	tileinfo.set(1,
 			code + (color << 8),
 			(color & 0xf0) >> 4,
 			0);
@@ -208,7 +208,7 @@ uint32_t thedeep_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	m_tilegen->deco_bac06_pf_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	m_spritegen->draw_sprites(screen, bitmap, cliprect, m_gfxdecode->gfx(0), reinterpret_cast<uint16_t *>(m_spriteram.target()), 0x400 / 2);
+	m_spritegen->draw_sprites(screen, bitmap, cliprect, reinterpret_cast<uint16_t *>(m_spriteram.target()), 0x400 / 2);
 	m_text_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -478,9 +478,12 @@ static const gfx_layout layout_16x16x4 =
 };
 
 static GFXDECODE_START( gfx_thedeep )
-	GFXDECODE_ENTRY( "sprites", 0, layout_16x16x4,  0x080,  8 )
 	GFXDECODE_ENTRY( "bg_gfx", 0, layout_16x16x4,   0x100, 16 )
 	GFXDECODE_ENTRY( "text", 0, layout_8x8x2,   0x000, 16 )
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_thedeep_spr )
+	GFXDECODE_ENTRY( "sprites", 0, layout_16x16x4,  0x080,  8 )
 GFXDECODE_END
 
 
@@ -539,10 +542,10 @@ void thedeep_state::thedeep(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_thedeep);
 	PALETTE(config, m_palette, FUNC(thedeep_state::palette), 512);
 
-	DECO_MXC06(config, m_spritegen, 0);
+	DECO_MXC06(config, m_spritegen, 0, m_palette, gfx_thedeep_spr);
 
 	DECO_BAC06(config, m_tilegen, 0);
-	m_tilegen->set_gfx_region_wide(1, 1, 0);
+	m_tilegen->set_gfx_region_wide(0, 0, 0);
 	m_tilegen->set_gfxdecode_tag(m_gfxdecode);
 	m_tilegen->set_thedeep_kludge();  // TODO: this game wants TILE_FLIPX always set. Investigate why.
 

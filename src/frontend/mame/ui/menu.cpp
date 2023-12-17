@@ -30,6 +30,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
+#include <type_traits>
 
 
 namespace ui {
@@ -318,10 +319,13 @@ void menu::set_special_main_menu(bool special)
 //  end of the menu
 //-------------------------------------------------
 
-void menu::item_append(menu_item_type type, uint32_t flags)
+int menu::item_append(menu_item_type type, uint32_t flags)
 {
+	assert(menu_item_type::SEPARATOR == type);
 	if (type == menu_item_type::SEPARATOR)
-		item_append(MENU_SEPARATOR_ITEM, flags, nullptr, menu_item_type::SEPARATOR);
+		return item_append(MENU_SEPARATOR_ITEM, flags, nullptr, menu_item_type::SEPARATOR);
+	else
+		return -1;
 }
 
 //-------------------------------------------------
@@ -329,7 +333,7 @@ void menu::item_append(menu_item_type type, uint32_t flags)
 //  end of the menu
 //-------------------------------------------------
 
-void menu::item_append(std::string &&text, std::string &&subtext, uint32_t flags, void *ref, menu_item_type type)
+int menu::item_append(std::string &&text, std::string &&subtext, uint32_t flags, void *ref, menu_item_type type)
 {
 	assert(m_rebuilding);
 
@@ -355,6 +359,8 @@ void menu::item_append(std::string &&text, std::string &&subtext, uint32_t flags
 		m_selected = index;
 	if (m_resetpos == (m_items.size() - 1))
 		m_selected = m_items.size() - 1;
+
+	return int(std::make_signed_t<decltype(index)>(index));
 }
 
 
@@ -363,14 +369,14 @@ void menu::item_append(std::string &&text, std::string &&subtext, uint32_t flags
 //  item to the end of the menu
 //-------------------------------------------------
 
-void menu::item_append_on_off(const std::string &text, bool state, uint32_t flags, void *ref, menu_item_type type)
+int menu::item_append_on_off(const std::string &text, bool state, uint32_t flags, void *ref, menu_item_type type)
 {
 	if (flags & FLAG_DISABLE)
 		ref = nullptr;
 	else
 		flags |= state ? FLAG_LEFT_ARROW : FLAG_RIGHT_ARROW;
 
-	item_append(std::string(text), state ? _("On") : _("Off"), flags, ref, type);
+	return item_append(std::string(text), state ? _("On") : _("Off"), flags, ref, type);
 }
 
 

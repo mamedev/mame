@@ -26,7 +26,7 @@ public:
 	// construction/destruction
 	saitekosa_maestro_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	DECLARE_INPUT_CHANGED_MEMBER(switch_cpu_freq) { set_cpu_freq(); }
+	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq);
 
 	// from host
 	virtual u8 data_r() override;
@@ -48,6 +48,10 @@ protected:
 	required_memory_bank m_rombank;
 	required_device<generic_slot_device> m_extrom;
 
+	u8 m_latch = 0xff;
+	bool m_latch_enable = false;
+	u8 m_extrom_bank = 0;
+
 	virtual void main_map(address_map &map);
 
 	u8 extrom_r(offs_t offset);
@@ -57,12 +61,6 @@ protected:
 	void xdata_w(u8 data);
 	u8 ack_r();
 	void control_w(u8 data);
-
-	void set_cpu_freq();
-
-	u8 m_latch = 0xff;
-	bool m_latch_enable = false;
-	u8 m_extrom_bank = 0;
 };
 
 class saitekosa_analyst_device : public saitekosa_maestro_device

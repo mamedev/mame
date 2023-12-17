@@ -60,7 +60,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_soundcpu;
 	optional_device<okim6295_device> m_oki;
-	required_device<gfxdecode_device> m_gfxdecode;
+	optional_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 	optional_device<generic_latch_8_device> m_soundlatch; // not snowbro3

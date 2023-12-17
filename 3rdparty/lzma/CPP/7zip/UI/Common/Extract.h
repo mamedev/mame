@@ -1,7 +1,7 @@
 // Extract.h
 
-#ifndef __EXTRACT_H
-#define __EXTRACT_H
+#ifndef ZIP7_INC_EXTRACT_H
+#define ZIP7_INC_EXTRACT_H
 
 #include "../../../Windows/FileFind.h"
 
@@ -52,12 +52,12 @@ struct CExtractOptions: public CExtractOptionsBase
   // bool ShowDialog;
   // bool PasswordEnabled;
   // UString Password;
-  #ifndef _SFX
+  #ifndef Z7_SFX
   CObjectVector<CProperty> Properties;
   #endif
 
   /*
-  #ifdef EXTERNAL_CODECS
+  #ifdef Z7_EXTERNAL_CODECS
   CCodecs *Codecs;
   #endif
   */
@@ -96,7 +96,8 @@ HRESULT Extract(
     const CExtractOptions &options,
     IOpenCallbackUI *openCallback,
     IExtractCallbackUI *extractCallback,
-    #ifndef _SFX
+    IFolderArchiveExtractCallback *faeCallback,
+    #ifndef Z7_SFX
     IHashCalc *hash,
     #endif
     UString &errorMessage,

@@ -8,16 +8,20 @@
 #include "tilemap.h"
 
 
-class k007342_device : public device_t
+class k007342_device : public device_t, public device_gfx_interface
 {
 public:
-	using tile_delegate = device_delegate<void (int layer, int bank, int *code, int *color, int *flags)>;
+	using tile_delegate = device_delegate<void (int layer, uint32_t bank, uint32_t &code, uint32_t &color, uint8_t &flags)>;
 
 	k007342_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template<typename T> k007342_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&palette_tag, const gfx_decode_entry *gfxinfo)
+		: k007342_device(mconfig, tag, owner, clock)
+	{
+		set_info(gfxinfo);
+		set_palette(std::forward<T>(palette_tag));
+	}
 
-	//  configuration
-	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
-	void set_gfxnum(int gfxnum) { m_gfxnum = gfxnum; }
+	// configuration
 	template <typename... T> void set_tile_callback(T &&... args) { m_callback.set(std::forward<T>(args)...); }
 
 	uint8_t read(offs_t offset);
@@ -31,36 +35,30 @@ public:
 	int is_int_enabled();
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
 private:
 	// internal state
-	std::unique_ptr<uint8_t[]>    m_ram;
-	std::unique_ptr<uint8_t[]>    m_scroll_ram;
-	uint8_t    *m_videoram_0;
-	uint8_t    *m_videoram_1;
-	uint8_t    *m_colorram_0;
-	uint8_t    *m_colorram_1;
+	std::unique_ptr<uint8_t[]>  m_ram;
+	std::unique_ptr<uint8_t[]>  m_scroll_ram;
+	const uint8_t               *m_videoram[2];
+	const uint8_t               *m_colorram[2];
 
-	tilemap_t  *m_tilemap[2]{};
-	int      m_flipscreen, m_int_enabled;
-	uint8_t    m_regs[8];
-	uint16_t   m_scrollx[2];
-	uint8_t    m_scrolly[2];
-	required_device<gfxdecode_device> m_gfxdecode;
-	tile_delegate m_callback;
-	int m_gfxnum;
+	tilemap_t       *m_tilemap[2];
+	bool            m_flipscreen, m_int_enabled;
+	uint8_t         m_regs[8];
+	uint16_t        m_scrollx[2];
+	uint8_t         m_scrolly[2];
+	tile_delegate   m_callback;
 
 	TILEMAP_MAPPER_MEMBER(scan);
 	TILE_GET_INFO_MEMBER(get_tile_info0);
 	TILE_GET_INFO_MEMBER(get_tile_info1);
-	void get_tile_info( tile_data &tileinfo, int tile_index, int layer, uint8_t *cram, uint8_t *vram );
+	void get_tile_info(tile_data &tileinfo, int tile_index, uint8_t layer);
 };
 
 DECLARE_DEVICE_TYPE(K007342, k007342_device)
-
-// function definition for a callback
-#define K007342_CALLBACK_MEMBER(_name)     void _name(int layer, int bank, int *code, int *color, int *flags)
 
 #endif // MAME_KONAMI_K007342_H

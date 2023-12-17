@@ -29,11 +29,11 @@
 #include "DefaultName.h"
 #include "OpenArchive.h"
 
-#ifndef _SFX
+#ifndef Z7_SFX
 #include "SetProperties.h"
 #endif
 
-#ifndef _SFX
+#ifndef Z7_SFX
 #ifdef SHOW_DEBUG_INFO
 #define PRF(x) x
 #else
@@ -95,7 +95,7 @@ Open:
 using namespace NWindows;
 
 /*
-#ifdef _SFX
+#ifdef Z7_SFX
 #define OPEN_PROPS_PARAM
 #else
 #define OPEN_PROPS_PARAM  , props
@@ -111,7 +111,7 @@ CArc::~CArc()
 }
 */
 
-#ifndef _SFX
+#ifndef Z7_SFX
 
 namespace NArchive {
 namespace NParser {
@@ -172,22 +172,13 @@ struct CParseItem
   }
 };
 
-class CHandler:
-  public IInArchive,
-  public IInArchiveGetStream,
-  public CMyUnknownImp
-{
+Z7_CLASS_IMP_CHandler_IInArchive_1(
+  IInArchiveGetStream
+)
 public:
   CObjectVector<CParseItem> _items;
   UInt64 _maxEndOffset;
   CMyComPtr<IInStream> _stream;
-
-  MY_UNKNOWN_IMP2(
-    IInArchive,
-    IInArchiveGetStream)
-
-  INTERFACE_IInArchive(;)
-  STDMETHOD(GetStream)(UInt32 index, ISequentialInStream **stream);
 
   UInt64 GetLastEnd() const
   {
@@ -300,7 +291,7 @@ static const Byte kProps[] =
 IMP_IInArchive_Props
 IMP_IInArchive_ArcProps_NO
 
-STDMETHODIMP CHandler::Open(IInStream *stream, const UInt64 *, IArchiveOpenCallback * /* openArchiveCallback */)
+Z7_COM7F_IMF(CHandler::Open(IInStream *stream, const UInt64 *, IArchiveOpenCallback * /* openArchiveCallback */))
 {
   COM_TRY_BEGIN
   {
@@ -311,20 +302,20 @@ STDMETHODIMP CHandler::Open(IInStream *stream, const UInt64 *, IArchiveOpenCallb
   COM_TRY_END
 }
 
-STDMETHODIMP CHandler::Close()
+Z7_COM7F_IMF(CHandler::Close())
 {
   _items.Clear();
   _stream.Release();
   return S_OK;
 }
 
-STDMETHODIMP CHandler::GetNumberOfItems(UInt32 *numItems)
+Z7_COM7F_IMF(CHandler::GetNumberOfItems(UInt32 *numItems))
 {
   *numItems = _items.Size();
   return S_OK;
 }
 
-STDMETHODIMP CHandler::GetProperty(UInt32 index, PROPID propID, PROPVARIANT *value)
+Z7_COM7F_IMF(CHandler::GetProperty(UInt32 index, PROPID propID, PROPVARIANT *value))
 {
   COM_TRY_BEGIN
   NCOM::CPropVariant prop;
@@ -340,12 +331,12 @@ STDMETHODIMP CHandler::GetProperty(UInt32 index, PROPID propID, PROPVARIANT *val
       UString s(sz);
       if (!item.Name.IsEmpty())
       {
-        s += '.';
+        s.Add_Dot();
         s += item.Name;
       }
       if (!item.Extension.IsEmpty())
       {
-        s += '.';
+        s.Add_Dot();
         s += item.Extension;
       }
       prop = s; break;
@@ -365,12 +356,12 @@ STDMETHODIMP CHandler::GetProperty(UInt32 index, PROPID propID, PROPVARIANT *val
   COM_TRY_END
 }
 
-HRESULT CHandler::Extract(const UInt32 *indices, UInt32 numItems,
-    Int32 testMode, IArchiveExtractCallback *extractCallback)
+Z7_COM7F_IMF(CHandler::Extract(const UInt32 *indices, UInt32 numItems,
+    Int32 testMode, IArchiveExtractCallback *extractCallback))
 {
   COM_TRY_BEGIN
   
-  bool allFilesMode = (numItems == (UInt32)(Int32)-1);
+  const bool allFilesMode = (numItems == (UInt32)(Int32)-1);
   if (allFilesMode)
     numItems = _items.Size();
   if (_stream && numItems == 0)
@@ -401,35 +392,35 @@ HRESULT CHandler::Extract(const UInt32 *indices, UInt32 numItems,
   {
     lps->InSize = totalSize;
     lps->OutSize = totalSize;
-    RINOK(lps->SetCur());
+    RINOK(lps->SetCur())
     CMyComPtr<ISequentialOutStream> realOutStream;
-    Int32 askMode = testMode ?
+    const Int32 askMode = testMode ?
         NExtract::NAskMode::kTest :
         NExtract::NAskMode::kExtract;
-    UInt32 index = allFilesMode ? i : indices[i];
+    const UInt32 index = allFilesMode ? i : indices[i];
     const CParseItem &item = _items[index];
 
-    RINOK(extractCallback->GetStream(index, &realOutStream, askMode));
+    RINOK(extractCallback->GetStream(index, &realOutStream, askMode))
     UInt64 unpackSize = item.Size;
     totalSize += unpackSize;
     bool skipMode = false;
     if (!testMode && !realOutStream)
       continue;
-    RINOK(extractCallback->PrepareOperation(askMode));
+    RINOK(extractCallback->PrepareOperation(askMode))
 
     outStreamSpec->SetStream(realOutStream);
     realOutStream.Release();
     outStreamSpec->Init(skipMode ? 0 : unpackSize, true);
 
     Int32 opRes = NExtract::NOperationResult::kOK;
-    RINOK(_stream->Seek((Int64)item.Offset, STREAM_SEEK_SET, NULL));
+    RINOK(InStream_SeekSet(_stream, item.Offset))
     streamSpec->Init(unpackSize);
-    RINOK(copyCoder->Code(inStream, outStream, NULL, NULL, progress));
+    RINOK(copyCoder->Code(inStream, outStream, NULL, NULL, progress))
 
     if (outStreamSpec->GetRem() != 0)
       opRes = NExtract::NOperationResult::kDataError;
     outStreamSpec->ReleaseStream();
-    RINOK(extractCallback->SetOperationResult(opRes));
+    RINOK(extractCallback->SetOperationResult(opRes))
   }
   
   return S_OK;
@@ -438,7 +429,7 @@ HRESULT CHandler::Extract(const UInt32 *indices, UInt32 numItems,
 }
 
 
-STDMETHODIMP CHandler::GetStream(UInt32 index, ISequentialInStream **stream)
+Z7_COM7F_IMF(CHandler::GetStream(UInt32 index, ISequentialInStream **stream))
 {
   COM_TRY_BEGIN
   const CParseItem &item = _items[index];
@@ -454,7 +445,7 @@ HRESULT Archive_GetItemBoolProp(IInArchive *arc, UInt32 index, PROPID propID, bo
 {
   NCOM::CPropVariant prop;
   result = false;
-  RINOK(arc->GetProperty(index, propID, &prop));
+  RINOK(arc->GetProperty(index, propID, &prop))
   if (prop.vt == VT_BOOL)
     result = VARIANT_BOOLToBool(prop.boolVal);
   else if (prop.vt != VT_EMPTY)
@@ -486,7 +477,7 @@ static HRESULT Archive_GetArcProp_Bool(IInArchive *arc, PROPID propid, bool &res
 {
   NCOM::CPropVariant prop;
   result = false;
-  RINOK(arc->GetArchiveProperty(propid, &prop));
+  RINOK(arc->GetArchiveProperty(propid, &prop))
   if (prop.vt == VT_BOOL)
     result = VARIANT_BOOLToBool(prop.boolVal);
   else if (prop.vt != VT_EMPTY)
@@ -498,7 +489,7 @@ static HRESULT Archive_GetArcProp_UInt(IInArchive *arc, PROPID propid, UInt64 &r
 {
   defined = false;
   NCOM::CPropVariant prop;
-  RINOK(arc->GetArchiveProperty(propid, &prop));
+  RINOK(arc->GetArchiveProperty(propid, &prop))
   switch (prop.vt)
   {
     case VT_UI4: result = prop.ulVal; break;
@@ -516,7 +507,7 @@ static HRESULT Archive_GetArcProp_Int(IInArchive *arc, PROPID propid, Int64 &res
 {
   defined = false;
   NCOM::CPropVariant prop;
-  RINOK(arc->GetArchiveProperty(propid, &prop));
+  RINOK(arc->GetArchiveProperty(propid, &prop))
   switch (prop.vt)
   {
     case VT_UI4: result = prop.ulVal; break;
@@ -530,7 +521,7 @@ static HRESULT Archive_GetArcProp_Int(IInArchive *arc, PROPID propid, Int64 &res
   return S_OK;
 }
 
-#ifndef _SFX
+#ifndef Z7_SFX
 
 HRESULT CArc::GetItem_PathToParent(UInt32 index, UInt32 parent, UStringVector &parts) const
 {
@@ -550,14 +541,14 @@ HRESULT CArc::GetItem_PathToParent(UInt32 index, UInt32 parent, UStringVector &p
     const void *p;
     UInt32 size;
     UInt32 propType;
-    RINOK(GetRawProps->GetRawProp(curIndex, kpidName, &p, &size, &propType));
+    RINOK(GetRawProps->GetRawProp(curIndex, kpidName, &p, &size, &propType))
     if (p && propType == PROP_DATA_TYPE_wchar_t_PTR_Z_LE)
       s = (const wchar_t *)p;
     else
     #endif
     {
       NCOM::CPropVariant prop;
-      RINOK(Archive->GetProperty(curIndex, kpidName, &prop));
+      RINOK(Archive->GetProperty(curIndex, kpidName, &prop))
       if (prop.vt == VT_BSTR && prop.bstrVal)
         s.SetFromBstr(prop.bstrVal);
       else if (prop.vt == VT_EMPTY)
@@ -568,7 +559,7 @@ HRESULT CArc::GetItem_PathToParent(UInt32 index, UInt32 parent, UStringVector &p
 
     UInt32 curParent = (UInt32)(Int32)-1;
     UInt32 parentType = 0;
-    RINOK(GetRawProps->GetParent(curIndex, &curParent, &parentType));
+    RINOK(GetRawProps->GetParent(curIndex, &curParent, &parentType))
 
     // 18.06: fixed : we don't want to split name to parts
     /*
@@ -742,7 +733,7 @@ HRESULT CArc::GetItem_Path(UInt32 index, UString &result) const
   
   {
     NCOM::CPropVariant prop;
-    RINOK(Archive->GetProperty(index, kpidPath, &prop));
+    RINOK(Archive->GetProperty(index, kpidPath, &prop))
     if (prop.vt == VT_BSTR && prop.bstrVal)
       result.SetFromBstr(prop.bstrVal);
     else if (prop.vt == VT_EMPTY)
@@ -762,15 +753,15 @@ HRESULT CArc::GetItem_DefaultPath(UInt32 index, UString &result) const
 {
   result.Empty();
   bool isDir;
-  RINOK(Archive_IsItem_Dir(Archive, index, isDir));
+  RINOK(Archive_IsItem_Dir(Archive, index, isDir))
   if (!isDir)
   {
     result = DefaultName;
     NCOM::CPropVariant prop;
-    RINOK(Archive->GetProperty(index, kpidExtension, &prop));
+    RINOK(Archive->GetProperty(index, kpidExtension, &prop))
     if (prop.vt == VT_BSTR)
     {
-      result += '.';
+      result.Add_Dot();
       result += prop.bstrVal;
     }
     else if (prop.vt != VT_EMPTY)
@@ -781,11 +772,11 @@ HRESULT CArc::GetItem_DefaultPath(UInt32 index, UString &result) const
 
 HRESULT CArc::GetItem_Path2(UInt32 index, UString &result) const
 {
-  RINOK(GetItem_Path(index, result));
+  RINOK(GetItem_Path(index, result))
   if (Ask_Deleted)
   {
     bool isDeleted = false;
-    RINOK(Archive_IsItem_Deleted(Archive, index, isDeleted));
+    RINOK(Archive_IsItem_Deleted(Archive, index, isDeleted))
     if (isDeleted)
       result.Insert(0, L"[DELETED]" WSTRING_PATH_SEPARATOR);
   }
@@ -830,12 +821,12 @@ HRESULT CArc::GetItem(UInt32 index, CReadArcItem &item) const
   
   item.PathParts.Clear();
 
-  RINOK(Archive_IsItem_Dir(Archive, index, item.IsDir));
+  RINOK(Archive_IsItem_Dir(Archive, index, item.IsDir))
   item.MainIsDir = item.IsDir;
 
-  RINOK(GetItem_Path2(index, item.Path));
+  RINOK(GetItem_Path2(index, item.Path))
 
-  #ifndef _SFX
+  #ifndef Z7_SFX
   UInt32 mainIndex = index;
   #endif
 
@@ -844,7 +835,7 @@ HRESULT CArc::GetItem(UInt32 index, CReadArcItem &item) const
   item.MainPath = item.Path;
   if (Ask_AltStream)
   {
-    RINOK(Archive_IsItem_AltStream(Archive, index, item.IsAltStream));
+    RINOK(Archive_IsItem_AltStream(Archive, index, item.IsAltStream))
   }
   
   bool needFindAltStream = false;
@@ -856,11 +847,11 @@ HRESULT CArc::GetItem(UInt32 index, CReadArcItem &item) const
     {
       UInt32 parentType = 0;
       UInt32 parentIndex;
-      RINOK(GetRawProps->GetParent(index, &parentIndex, &parentType));
+      RINOK(GetRawProps->GetParent(index, &parentIndex, &parentType))
       if (parentType == NParentType::kAltStream)
       {
         NCOM::CPropVariant prop;
-        RINOK(Archive->GetProperty(index, kpidName, &prop));
+        RINOK(Archive->GetProperty(index, kpidName, &prop))
         if (prop.vt == VT_BSTR && prop.bstrVal)
           item.AltStreamName.SetFromBstr(prop.bstrVal);
         else if (prop.vt != VT_EMPTY)
@@ -885,8 +876,8 @@ HRESULT CArc::GetItem(UInt32 index, CReadArcItem &item) const
         }
         else
         {
-          RINOK(GetItem_Path2(parentIndex, item.MainPath));
-          RINOK(Archive_IsItem_Dir(Archive, parentIndex, item.MainIsDir));
+          RINOK(GetItem_Path2(parentIndex, item.MainPath))
+          RINOK(Archive_IsItem_Dir(Archive, parentIndex, item.MainIsDir))
         }
       }
     }
@@ -908,10 +899,10 @@ HRESULT CArc::GetItem(UInt32 index, CReadArcItem &item) const
 
   #endif
   
-  #ifndef _SFX
+  #ifndef Z7_SFX
   if (item._use_baseParentFolder_mode)
   {
-    RINOK(GetItem_PathToParent(mainIndex, (unsigned)item._baseParentFolder, item.PathParts));
+    RINOK(GetItem_PathToParent(mainIndex, (unsigned)item._baseParentFolder, item.PathParts))
     
     #ifdef SUPPORT_ALT_STREAMS
     if ((item.WriteToAltStreamIfColon || needFindAltStream) && !item.PathParts.IsEmpty())
@@ -947,14 +938,14 @@ HRESULT CArc::GetItem(UInt32 index, CReadArcItem &item) const
   return S_OK;
 }
 
-#ifndef _SFX
+#ifndef Z7_SFX
 
 static HRESULT Archive_GetItem_Size(IInArchive *archive, UInt32 index, UInt64 &size, bool &defined)
 {
   NCOM::CPropVariant prop;
   defined = false;
   size = 0;
-  RINOK(archive->GetProperty(index, kpidSize, &prop));
+  RINOK(archive->GetProperty(index, kpidSize, &prop))
   switch (prop.vt)
   {
     case VT_UI1: size = prop.bVal; break;
@@ -975,7 +966,7 @@ HRESULT CArc::GetItem_Size(UInt32 index, UInt64 &size, bool &defined) const
   NCOM::CPropVariant prop;
   defined = false;
   size = 0;
-  RINOK(Archive->GetProperty(index, kpidSize, &prop));
+  RINOK(Archive->GetProperty(index, kpidSize, &prop))
   switch (prop.vt)
   {
     case VT_UI1: size = prop.bVal; break;
@@ -993,7 +984,7 @@ HRESULT CArc::GetItem_MTime(UInt32 index, CArcTime &at) const
 {
   at.Clear();
   NCOM::CPropVariant prop;
-  RINOK(Archive->GetProperty(index, kpidMTime, &prop));
+  RINOK(Archive->GetProperty(index, kpidMTime, &prop))
   
   if (prop.vt == VT_FILETIME)
   {
@@ -1011,7 +1002,7 @@ HRESULT CArc::GetItem_MTime(UInt32 index, CArcTime &at) const
       // (at.Prec == 0) before version 22.
       // so kpidTimeType is required for that code
       prop.Clear();
-      RINOK(Archive->GetProperty(index, kpidTimeType, &prop));
+      RINOK(Archive->GetProperty(index, kpidTimeType, &prop))
       if (prop.vt == VT_UI4)
       {
         UInt32 val = prop.ulVal;
@@ -1038,7 +1029,7 @@ HRESULT CArc::GetItem_MTime(UInt32 index, CArcTime &at) const
   return S_OK;
 }
 
-#ifndef _SFX
+#ifndef Z7_SFX
 
 static inline bool TestSignature(const Byte *p1, const Byte *p2, size_t size)
 {
@@ -1121,7 +1112,7 @@ static bool IsPreArcFormat(const CArcInfoEx &ai)
 {
   if (ai.Flags_PreArc())
     return true;
-  return IsNameFromList(ai.Name, k_PreArcFormats, ARRAY_SIZE(k_PreArcFormats));
+  return IsNameFromList(ai.Name, k_PreArcFormats, Z7_ARRAY_SIZE(k_PreArcFormats));
 }
 
 static const char * const k_Formats_with_simple_signuature[] =
@@ -1143,44 +1134,46 @@ static bool IsNewStyleSignature(const CArcInfoEx &ai)
   // if (ai.Version >= 0x91F)
   if (ai.NewInterface)
     return true;
-  return IsNameFromList(ai.Name, k_Formats_with_simple_signuature, ARRAY_SIZE(k_Formats_with_simple_signuature));
+  return IsNameFromList(ai.Name, k_Formats_with_simple_signuature, Z7_ARRAY_SIZE(k_Formats_with_simple_signuature));
 }
 
-class CArchiveOpenCallback_Offset:
+
+
+class CArchiveOpenCallback_Offset Z7_final:
   public IArchiveOpenCallback,
   public IArchiveOpenVolumeCallback,
-  #ifndef _NO_CRYPTO
+ #ifndef Z7_NO_CRYPTO
   public ICryptoGetTextPassword,
-  #endif
+ #endif
   public CMyUnknownImp
 {
+  Z7_COM_QI_BEGIN2(IArchiveOpenCallback)
+  Z7_COM_QI_ENTRY(IArchiveOpenVolumeCallback)
+ #ifndef Z7_NO_CRYPTO
+  Z7_COM_QI_ENTRY(ICryptoGetTextPassword)
+ #endif
+  Z7_COM_QI_END
+  Z7_COM_ADDREF_RELEASE
+
+  Z7_IFACE_COM7_IMP(IArchiveOpenCallback)
+  Z7_IFACE_COM7_IMP(IArchiveOpenVolumeCallback)
+ #ifndef Z7_NO_CRYPTO
+  Z7_IFACE_COM7_IMP(ICryptoGetTextPassword)
+ #endif
+
 public:
   CMyComPtr<IArchiveOpenCallback> Callback;
   CMyComPtr<IArchiveOpenVolumeCallback> OpenVolumeCallback;
   UInt64 Files;
   UInt64 Offset;
   
-  #ifndef _NO_CRYPTO
+  #ifndef Z7_NO_CRYPTO
   CMyComPtr<ICryptoGetTextPassword> GetTextPassword;
-  #endif
-
-  MY_QUERYINTERFACE_BEGIN2(IArchiveOpenCallback)
-  MY_QUERYINTERFACE_ENTRY(IArchiveOpenVolumeCallback)
-  #ifndef _NO_CRYPTO
-  MY_QUERYINTERFACE_ENTRY(ICryptoGetTextPassword)
-  #endif
-  MY_QUERYINTERFACE_END
-  MY_ADDREF_RELEASE
-
-  INTERFACE_IArchiveOpenCallback(;)
-  INTERFACE_IArchiveOpenVolumeCallback(;)
-  #ifndef _NO_CRYPTO
-  STDMETHOD(CryptoGetTextPassword)(BSTR *password);
   #endif
 };
 
-#ifndef _NO_CRYPTO
-STDMETHODIMP CArchiveOpenCallback_Offset::CryptoGetTextPassword(BSTR *password)
+#ifndef Z7_NO_CRYPTO
+Z7_COM7F_IMF(CArchiveOpenCallback_Offset::CryptoGetTextPassword(BSTR *password))
 {
   COM_TRY_BEGIN
   if (GetTextPassword)
@@ -1190,12 +1183,12 @@ STDMETHODIMP CArchiveOpenCallback_Offset::CryptoGetTextPassword(BSTR *password)
 }
 #endif
 
-STDMETHODIMP CArchiveOpenCallback_Offset::SetTotal(const UInt64 *, const UInt64 *)
+Z7_COM7F_IMF(CArchiveOpenCallback_Offset::SetTotal(const UInt64 *, const UInt64 *))
 {
   return S_OK;
 }
 
-STDMETHODIMP CArchiveOpenCallback_Offset::SetCompleted(const UInt64 *, const UInt64 *bytes)
+Z7_COM7F_IMF(CArchiveOpenCallback_Offset::SetCompleted(const UInt64 *, const UInt64 *bytes))
 {
   if (!Callback)
     return S_OK;
@@ -1205,7 +1198,7 @@ STDMETHODIMP CArchiveOpenCallback_Offset::SetCompleted(const UInt64 *, const UIn
   return Callback->SetCompleted(&Files, &value);
 }
 
-STDMETHODIMP CArchiveOpenCallback_Offset::GetProperty(PROPID propID, PROPVARIANT *value)
+Z7_COM7F_IMF(CArchiveOpenCallback_Offset::GetProperty(PROPID propID, PROPVARIANT *value))
 {
   if (OpenVolumeCallback)
     return OpenVolumeCallback->GetProperty(propID, value);
@@ -1214,7 +1207,7 @@ STDMETHODIMP CArchiveOpenCallback_Offset::GetProperty(PROPID propID, PROPVARIANT
   // return E_NOTIMPL;
 }
 
-STDMETHODIMP CArchiveOpenCallback_Offset::GetStream(const wchar_t *name, IInStream **inStream)
+Z7_COM7F_IMF(CArchiveOpenCallback_Offset::GetStream(const wchar_t *name, IInStream **inStream))
 {
   if (OpenVolumeCallback)
     return OpenVolumeCallback->GetStream(name, inStream);
@@ -1266,32 +1259,32 @@ HRESULT CArc::ReadBasicProps(IInArchive *archive, UInt64 startPos, HRESULT openR
   ErrorInfo.ClearErrors();
   {
     NCOM::CPropVariant prop;
-    RINOK(archive->GetArchiveProperty(kpidErrorFlags, &prop));
+    RINOK(archive->GetArchiveProperty(kpidErrorFlags, &prop))
     ErrorInfo.ErrorFlags = GetOpenArcErrorFlags(prop, &ErrorInfo.ErrorFlags_Defined);
   }
   {
     NCOM::CPropVariant prop;
-    RINOK(archive->GetArchiveProperty(kpidWarningFlags, &prop));
+    RINOK(archive->GetArchiveProperty(kpidWarningFlags, &prop))
     ErrorInfo.WarningFlags = GetOpenArcErrorFlags(prop);
   }
 
   {
     NCOM::CPropVariant prop;
-    RINOK(archive->GetArchiveProperty(kpidError, &prop));
+    RINOK(archive->GetArchiveProperty(kpidError, &prop))
     if (prop.vt != VT_EMPTY)
       ErrorInfo.ErrorMessage = (prop.vt == VT_BSTR ? prop.bstrVal : L"Unknown error");
   }
   
   {
     NCOM::CPropVariant prop;
-    RINOK(archive->GetArchiveProperty(kpidWarning, &prop));
+    RINOK(archive->GetArchiveProperty(kpidWarning, &prop))
     if (prop.vt != VT_EMPTY)
       ErrorInfo.WarningMessage = (prop.vt == VT_BSTR ? prop.bstrVal : L"Unknown warning");
   }
   
   if (openRes == S_OK || ErrorInfo.IsArc_After_NonOpen())
   {
-    RINOK(Archive_GetArcProp_UInt(archive, kpidPhySize, PhySize, PhySize_Defined));
+    RINOK(Archive_GetArcProp_UInt(archive, kpidPhySize, PhySize, PhySize_Defined))
     /*
     RINOK(Archive_GetArcProp_UInt(archive, kpidOkPhySize, OkPhySize, OkPhySize_Defined));
     if (!OkPhySize_Defined)
@@ -1302,7 +1295,7 @@ HRESULT CArc::ReadBasicProps(IInArchive *archive, UInt64 startPos, HRESULT openR
     */
 
     bool offsetDefined;
-    RINOK(Archive_GetArcProp_Int(archive, kpidOffset, Offset, offsetDefined));
+    RINOK(Archive_GetArcProp_Int(archive, kpidOffset, Offset, offsetDefined))
 
     Int64 globalOffset = (Int64)startPos + Offset;
     AvailPhySize = (UInt64)((Int64)FileSize - globalOffset);
@@ -1338,12 +1331,12 @@ HRESULT CArc::PrepareToOpen(const COpenOptions &op, unsigned formatIndex, CMyCom
   // OutputDebugStringA("a1");
   // PrintNumber("formatIndex", formatIndex);
     
-  RINOK(op.codecs->CreateInArchive(formatIndex, archive));
+  RINOK(op.codecs->CreateInArchive(formatIndex, archive))
   // OutputDebugStringA("a2");
   if (!archive)
     return S_OK;
 
-  #ifdef EXTERNAL_CODECS
+  #ifdef Z7_EXTERNAL_CODECS
   if (op.codecs->NeedSetLibCodecs)
   {
     const CArcInfoEx &ai = op.codecs->Formats[formatIndex];
@@ -1355,14 +1348,14 @@ HRESULT CArc::PrepareToOpen(const COpenOptions &op, unsigned formatIndex, CMyCom
       archive.QueryInterface(IID_ISetCompressCodecsInfo, (void **)&setCompressCodecsInfo);
       if (setCompressCodecsInfo)
       {
-        RINOK(setCompressCodecsInfo->SetCompressCodecsInfo(op.codecs));
+        RINOK(setCompressCodecsInfo->SetCompressCodecsInfo(op.codecs))
       }
     }
   }
   #endif
   
   
-  #ifndef _SFX
+  #ifndef Z7_SFX
 
   const CArcInfoEx &ai = op.codecs->Formats[formatIndex];
  
@@ -1392,14 +1385,14 @@ HRESULT CArc::PrepareToOpen(const COpenOptions &op, unsigned formatIndex, CMyCom
       }
     }
     */
-    RINOK(SetProperties(archive, *op.props));
+    RINOK(SetProperties(archive, *op.props))
   }
   
   #endif
   return S_OK;
 }
 
-#ifndef _SFX
+#ifndef Z7_SFX
 
 static HRESULT ReadParseItemProps(IInArchive *archive, const CArcInfoEx &ai, NArchive::NParser::CParseItem &pi)
 {
@@ -1407,14 +1400,14 @@ static HRESULT ReadParseItemProps(IInArchive *archive, const CArcInfoEx &ai, NAr
   pi.FileTime_Defined = false;
   pi.ArcType = ai.Name;
   
-  RINOK(Archive_GetArcProp_Bool(archive, kpidIsNotArcType, pi.IsNotArcType));
+  RINOK(Archive_GetArcProp_Bool(archive, kpidIsNotArcType, pi.IsNotArcType))
 
   // RINOK(Archive_GetArcProp_Bool(archive, kpidIsSelfExe, pi.IsSelfExe));
   pi.IsSelfExe = ai.Flags_PreArc();
   
   {
     NCOM::CPropVariant prop;
-    RINOK(archive->GetArchiveProperty(kpidMTime, &prop));
+    RINOK(archive->GetArchiveProperty(kpidMTime, &prop))
     if (prop.vt == VT_FILETIME)
     {
       pi.FileTime_Defined = true;
@@ -1425,7 +1418,7 @@ static HRESULT ReadParseItemProps(IInArchive *archive, const CArcInfoEx &ai, NAr
   if (!pi.FileTime_Defined)
   {
     NCOM::CPropVariant prop;
-    RINOK(archive->GetArchiveProperty(kpidCTime, &prop));
+    RINOK(archive->GetArchiveProperty(kpidCTime, &prop))
     if (prop.vt == VT_FILETIME)
     {
       pi.FileTime_Defined = true;
@@ -1435,7 +1428,7 @@ static HRESULT ReadParseItemProps(IInArchive *archive, const CArcInfoEx &ai, NAr
   
   {
     NCOM::CPropVariant prop;
-    RINOK(archive->GetArchiveProperty(kpidName, &prop));
+    RINOK(archive->GetArchiveProperty(kpidName, &prop))
     if (prop.vt == VT_BSTR)
     {
       pi.Name.SetFromBstr(prop.bstrVal);
@@ -1443,7 +1436,7 @@ static HRESULT ReadParseItemProps(IInArchive *archive, const CArcInfoEx &ai, NAr
     }
     else
     {
-      RINOK(archive->GetArchiveProperty(kpidExtension, &prop));
+      RINOK(archive->GetArchiveProperty(kpidExtension, &prop))
       if (prop.vt == VT_BSTR)
         pi.Extension.SetFromBstr(prop.bstrVal);
     }
@@ -1451,14 +1444,14 @@ static HRESULT ReadParseItemProps(IInArchive *archive, const CArcInfoEx &ai, NAr
   
   {
     NCOM::CPropVariant prop;
-    RINOK(archive->GetArchiveProperty(kpidShortComment, &prop));
+    RINOK(archive->GetArchiveProperty(kpidShortComment, &prop))
     if (prop.vt == VT_BSTR)
       pi.Comment.SetFromBstr(prop.bstrVal);
   }
 
 
   UInt32 numItems;
-  RINOK(archive->GetNumberOfItems(&numItems));
+  RINOK(archive->GetNumberOfItems(&numItems))
   
   // pi.NumSubFiles = numItems;
   // RINOK(Archive_GetArcProp_UInt(archive, kpidUnpackSize, pi.UnpackSize, pi.UnpackSize_Defined));
@@ -1499,14 +1492,14 @@ HRESULT CArc::CheckZerosTail(const COpenOptions &op, UInt64 offset)
 {
   if (!op.stream)
     return S_OK;
-  RINOK(op.stream->Seek((Int64)offset, STREAM_SEEK_SET, NULL));
+  RINOK(InStream_SeekSet(op.stream, offset))
   const UInt32 kBufSize = 1 << 11;
   Byte buf[kBufSize];
   
   for (;;)
   {
     UInt32 processed = 0;
-    RINOK(op.stream->Read(buf, kBufSize, &processed));
+    RINOK(op.stream->Read(buf, kBufSize, &processed))
     if (processed == 0)
     {
       // ErrorInfo.NonZerosTail = false;
@@ -1527,21 +1520,19 @@ HRESULT CArc::CheckZerosTail(const COpenOptions &op, UInt64 offset)
 
 
 
-#ifndef _SFX
+#ifndef Z7_SFX
 
-class CExtractCallback_To_OpenCallback:
-  public IArchiveExtractCallback,
-  public ICompressProgressInfo,
-  public CMyUnknownImp
-{
+Z7_CLASS_IMP_COM_2(
+  CExtractCallback_To_OpenCallback
+  , IArchiveExtractCallback
+  , ICompressProgressInfo
+)
+  Z7_IFACE_COM7_IMP(IProgress)
 public:
   CMyComPtr<IArchiveOpenCallback> Callback;
   UInt64 Files;
   UInt64 Offset;
 
-  MY_UNKNOWN_IMP2(IArchiveExtractCallback, ICompressProgressInfo)
-  INTERFACE_IArchiveExtractCallback(;)
-  STDMETHOD(SetRatioInfo)(const UInt64 *inSize, const UInt64 *outSize);
   void Init(IArchiveOpenCallback *callback)
   {
     Callback = callback;
@@ -1550,17 +1541,17 @@ public:
   }
 };
 
-STDMETHODIMP CExtractCallback_To_OpenCallback::SetTotal(UInt64 /* size */)
+Z7_COM7F_IMF(CExtractCallback_To_OpenCallback::SetTotal(UInt64 /* size */))
 {
   return S_OK;
 }
 
-STDMETHODIMP CExtractCallback_To_OpenCallback::SetCompleted(const UInt64 * /* completeValue */)
+Z7_COM7F_IMF(CExtractCallback_To_OpenCallback::SetCompleted(const UInt64 * /* completeValue */))
 {
   return S_OK;
 }
 
-STDMETHODIMP CExtractCallback_To_OpenCallback::SetRatioInfo(const UInt64 *inSize, const UInt64 * /* outSize */)
+Z7_COM7F_IMF(CExtractCallback_To_OpenCallback::SetRatioInfo(const UInt64 *inSize, const UInt64 * /* outSize */))
 {
   if (Callback)
   {
@@ -1572,18 +1563,18 @@ STDMETHODIMP CExtractCallback_To_OpenCallback::SetRatioInfo(const UInt64 *inSize
   return S_OK;
 }
 
-STDMETHODIMP CExtractCallback_To_OpenCallback::GetStream(UInt32 /* index */, ISequentialOutStream **outStream, Int32 /* askExtractMode */)
+Z7_COM7F_IMF(CExtractCallback_To_OpenCallback::GetStream(UInt32 /* index */, ISequentialOutStream **outStream, Int32 /* askExtractMode */))
 {
   *outStream = NULL;
   return S_OK;
 }
 
-STDMETHODIMP CExtractCallback_To_OpenCallback::PrepareOperation(Int32 /* askExtractMode */)
+Z7_COM7F_IMF(CExtractCallback_To_OpenCallback::PrepareOperation(Int32 /* askExtractMode */))
 {
   return S_OK;
 }
 
-STDMETHODIMP CExtractCallback_To_OpenCallback::SetOperationResult(Int32 /* operationResult */)
+Z7_COM7F_IMF(CExtractCallback_To_OpenCallback::SetOperationResult(Int32 /* operationResult */))
 {
   return S_OK;
 }
@@ -1597,30 +1588,31 @@ static HRESULT OpenArchiveSpec(IInArchive *archive, bool needPhySize,
   /*
   if (needPhySize)
   {
-    CMyComPtr<IArchiveOpen2> open2;
-    archive->QueryInterface(IID_IArchiveOpen2, (void **)&open2);
+    Z7_DECL_CMyComPtr_QI_FROM(
+        IArchiveOpen2,
+        open2, archive)
     if (open2)
       return open2->ArcOpen2(stream, kOpenFlags_RealPhySize, openCallback);
   }
   */
-  RINOK(archive->Open(stream, maxCheckStartPosition, openCallback));
+  RINOK(archive->Open(stream, maxCheckStartPosition, openCallback))
   if (needPhySize)
   {
     bool phySize_Defined = false;
     UInt64 phySize = 0;
-    RINOK(Archive_GetArcProp_UInt(archive, kpidPhySize, phySize, phySize_Defined));
+    RINOK(Archive_GetArcProp_UInt(archive, kpidPhySize, phySize, phySize_Defined))
     if (phySize_Defined)
       return S_OK;
 
     bool phySizeCantBeDetected = false;
-    RINOK(Archive_GetArcProp_Bool(archive, kpidPhySizeCantBeDetected, phySizeCantBeDetected));
+    RINOK(Archive_GetArcProp_Bool(archive, kpidPhySizeCantBeDetected, phySizeCantBeDetected))
 
     if (!phySizeCantBeDetected)
     {
       PRF(printf("\n-- !phySize_Defined after Open, call archive->Extract()"));
       // It's for bzip2/gz and some xz archives, where Open operation doesn't know phySize.
       // But the Handler will know phySize after full archive testing.
-      RINOK(archive->Extract(NULL, (UInt32)(Int32)-1, BoolToInt(true), extractCallback));
+      RINOK(archive->Extract(NULL, (UInt32)(Int32)-1, BoolToInt(true), extractCallback))
       PRF(printf("\n-- OK"));
     }
   }
@@ -1663,7 +1655,7 @@ HRESULT CArc::OpenStream2(const COpenOptions &op)
   const UString fileName = ExtractFileNameFromPath(Path);
   UString extension;
   {
-    int dotPos = fileName.ReverseFind_Dot();
+    const int dotPos = fileName.ReverseFind_Dot();
     if (dotPos >= 0)
       extension = fileName.Ptr((unsigned)(dotPos + 1));
   }
@@ -1671,7 +1663,7 @@ HRESULT CArc::OpenStream2(const COpenOptions &op)
   CIntVector orderIndices;
   
   bool searchMarkerInHandler = false;
-  #ifdef _SFX
+  #ifdef Z7_SFX
     searchMarkerInHandler = true;
   #endif
 
@@ -1681,25 +1673,25 @@ HRESULT CArc::OpenStream2(const COpenOptions &op)
       isMainFormatArr[i] = false;
   }
 
-  UInt64 maxStartOffset =
+  const UInt64 maxStartOffset =
       op.openType.MaxStartOffset_Defined ?
       op.openType.MaxStartOffset :
       kMaxCheckStartPosition;
 
-  #ifndef _SFX
+  #ifndef Z7_SFX
   bool isUnknownExt = false;
   #endif
 
-  #ifndef _SFX
+  #ifndef Z7_SFX
   bool isForced = false;
   #endif
 
   unsigned numMainTypes = 0;
-  int formatIndex = op.openType.FormatIndex;
+  const int formatIndex = op.openType.FormatIndex;
 
   if (formatIndex >= 0)
   {
-    #ifndef _SFX
+    #ifndef Z7_SFX
     isForced = true;
     #endif
     orderIndices.Add(formatIndex);
@@ -1711,12 +1703,12 @@ HRESULT CArc::OpenStream2(const COpenOptions &op)
   else
   {
     unsigned numFinded = 0;
-    #ifndef _SFX
+    #ifndef Z7_SFX
     bool isPrearcExt = false;
     #endif
     
     {
-      #ifndef _SFX
+      #ifndef Z7_SFX
       
       bool isZip = false;
       bool isRar = false;
@@ -1758,13 +1750,13 @@ HRESULT CArc::OpenStream2(const COpenOptions &op)
         if (op.excludedFormats->FindInSorted((int)i) >= 0)
           continue;
 
-        #ifndef _SFX
+        #ifndef Z7_SFX
         if (IsPreArcFormat(ai))
           isPrearcExt = true;
         #endif
 
         if (ai.FindExtension(extension) >= 0
-            #ifndef _SFX
+            #ifndef Z7_SFX
             || (isZip && ai.Is_Zip())
             || (isRar && ai.Is_Rar())
             #endif
@@ -1795,11 +1787,11 @@ HRESULT CArc::OpenStream2(const COpenOptions &op)
     }
     */
 
-    #ifndef _SFX
+    #ifndef Z7_SFX
 
       if (op.stream && orderIndices.Size() >= 2)
       {
-        RINOK(op.stream->Seek(0, STREAM_SEEK_SET, NULL));
+        RINOK(InStream_SeekToBegin(op.stream))
         CByteBuffer byteBuffer;
         CIntVector orderIndices2;
         if (numFinded == 0 || IsExeExt(extension))
@@ -1808,13 +1800,13 @@ HRESULT CArc::OpenStream2(const COpenOptions &op)
         }
         else if (extension.IsEqualTo("000") || extension.IsEqualTo("001"))
         {
-          int i = FindFormatForArchiveType(op.codecs, orderIndices, "rar");
+          const int i = FindFormatForArchiveType(op.codecs, orderIndices, "rar");
           if (i >= 0)
           {
             const size_t kBufSize = (1 << 10);
             byteBuffer.Alloc(kBufSize);
             size_t processedSize = kBufSize;
-            RINOK(ReadStream(op.stream, byteBuffer, &processedSize));
+            RINOK(ReadStream(op.stream, byteBuffer, &processedSize))
             if (processedSize >= 16)
             {
               const Byte *buf = byteBuffer;
@@ -1834,7 +1826,7 @@ HRESULT CArc::OpenStream2(const COpenOptions &op)
           const size_t kBufSize = (1 << 10);
           byteBuffer.Alloc(kBufSize);
           size_t processedSize = kBufSize;
-          RINOK(ReadStream(op.stream, byteBuffer, &processedSize));
+          RINOK(ReadStream(op.stream, byteBuffer, &processedSize))
           if (processedSize == 0)
             return S_FALSE;
           
@@ -1870,7 +1862,7 @@ HRESULT CArc::OpenStream2(const COpenOptions &op)
       
         FOR_VECTOR (i, orderIndices)
         {
-          int val = orderIndices[i];
+          const int val = orderIndices[i];
           if (val != -1)
             orderIndices2.Add(val);
         }
@@ -1879,12 +1871,12 @@ HRESULT CArc::OpenStream2(const COpenOptions &op)
       
       if (orderIndices.Size() >= 2)
       {
-        int iIso = FindFormatForArchiveType(op.codecs, orderIndices, "iso");
-        int iUdf = FindFormatForArchiveType(op.codecs, orderIndices, "udf");
+        const int iIso = FindFormatForArchiveType(op.codecs, orderIndices, "iso");
+        const int iUdf = FindFormatForArchiveType(op.codecs, orderIndices, "udf");
         if (iUdf > iIso && iIso >= 0)
         {
-          int isoIndex = orderIndices[(unsigned)iIso];
-          int udfIndex = orderIndices[(unsigned)iUdf];
+          const int isoIndex = orderIndices[(unsigned)iIso];
+          const int udfIndex = orderIndices[(unsigned)iUdf];
           orderIndices[(unsigned)iUdf] = isoIndex;
           orderIndices[(unsigned)iIso] = udfIndex;
         }
@@ -1893,7 +1885,7 @@ HRESULT CArc::OpenStream2(const COpenOptions &op)
       numMainTypes = numFinded;
       isUnknownExt = (numMainTypes == 0) || isPrearcExt;
 
-    #else // _SFX
+    #else // Z7_SFX
 
       numMainTypes = orderIndices.Size();
 
@@ -1907,13 +1899,12 @@ HRESULT CArc::OpenStream2(const COpenOptions &op)
   UInt64 fileSize = 0;
   if (op.stream)
   {
-    RINOK(op.stream->Seek(0, STREAM_SEEK_END, &fileSize));
-    RINOK(op.stream->Seek(0, STREAM_SEEK_SET, NULL));
+    RINOK(InStream_GetSize_SeekToBegin(op.stream, fileSize))
   }
   FileSize = fileSize;
 
 
-  #ifndef _SFX
+  #ifndef Z7_SFX
 
   CBoolArr skipFrontalFormat(op.codecs->Formats.Size());
   {
@@ -1945,7 +1936,7 @@ HRESULT CArc::OpenStream2(const COpenOptions &op)
       
       bool exactOnly = false;
 
-      #ifndef _SFX
+      #ifndef Z7_SFX
     
       const CArcInfoEx &ai = op.codecs->Formats[(unsigned)FormatIndex];
       // OutputDebugStringW(ai.Name);
@@ -1963,16 +1954,16 @@ HRESULT CArc::OpenStream2(const COpenOptions &op)
       
       // Some handlers do not set total bytes. So we set it here
       if (op.callback)
-        RINOK(op.callback->SetTotal(NULL, &fileSize));
+        RINOK(op.callback->SetTotal(NULL, &fileSize))
 
       if (op.stream)
       {
-        RINOK(op.stream->Seek(0, STREAM_SEEK_SET, NULL));
+        RINOK(InStream_SeekToBegin(op.stream))
       }
       
       CMyComPtr<IInArchive> archive;
       
-      RINOK(PrepareToOpen(op, (unsigned)FormatIndex, archive));
+      RINOK(PrepareToOpen(op, (unsigned)FormatIndex, archive))
       if (!archive)
         continue;
       
@@ -1991,13 +1982,13 @@ HRESULT CArc::OpenStream2(const COpenOptions &op)
         result = openSeq->OpenSeq(op.seqStream);
       }
       
-      RINOK(ReadBasicProps(archive, 0, result));
+      RINOK(ReadBasicProps(archive, 0, result))
       
       if (result == S_FALSE)
       {
         bool isArc = ErrorInfo.IsArc_After_NonOpen();
 
-        #ifndef _SFX
+        #ifndef Z7_SFX
         // if it's archive, we allow another open attempt for parser
         if (!mode.CanReturnParser || !isArc)
           skipFrontalFormat[(unsigned)FormatIndex] = true;
@@ -2017,7 +2008,7 @@ HRESULT CArc::OpenStream2(const COpenOptions &op)
             // if (formatIndex < 0 && !searchMarkerInHandler)
             {
               // if bad archive was detected, we don't need additional open attempts
-              #ifndef _SFX
+              #ifndef Z7_SFX
               if (!IsPreArcFormat(ai) /* || !mode.SkipSfxStub */)
               #endif
                 return S_FALSE;
@@ -2026,7 +2017,7 @@ HRESULT CArc::OpenStream2(const COpenOptions &op)
         }
         
         /*
-        #ifndef _SFX
+        #ifndef Z7_SFX
         if (IsExeExt(extension) || ai.Flags_PreArc())
         {
         // openOnlyFullArc = false;
@@ -2039,9 +2030,9 @@ HRESULT CArc::OpenStream2(const COpenOptions &op)
         continue;
       }
       
-      RINOK(result);
+      RINOK(result)
       
-      #ifndef _SFX
+      #ifndef Z7_SFX
 
       bool isMainFormat = isMainFormatArr[(unsigned)FormatIndex];
       const COpenSpecFlags &specFlags = mode.GetSpec(isForced, isMainFormat, isUnknownExt);
@@ -2049,7 +2040,7 @@ HRESULT CArc::OpenStream2(const COpenOptions &op)
       bool thereIsTail = ErrorInfo.ThereIsTail;
       if (thereIsTail && mode.ZerosTailIsAllowed)
       {
-        RINOK(CheckZerosTail(op, (UInt64)(Offset + (Int64)PhySize)));
+        RINOK(CheckZerosTail(op, (UInt64)(Offset + (Int64)PhySize)))
         if (ErrorInfo.IgnoreTail)
           thereIsTail = false;
       }
@@ -2103,7 +2094,7 @@ HRESULT CArc::OpenStream2(const COpenOptions &op)
 
   
 
-  #ifndef _SFX
+  #ifndef Z7_SFX
 
   if (!op.stream)
     return S_FALSE;
@@ -2148,9 +2139,9 @@ HRESULT CArc::OpenStream2(const COpenOptions &op)
         endOfFile = true;
       }
       byteBuffer.Alloc(bufSize);
-      RINOK(op.stream->Seek(0, STREAM_SEEK_SET, NULL));
+      RINOK(InStream_SeekToBegin(op.stream))
       processedSize = bufSize;
-      RINOK(ReadStream(op.stream, byteBuffer, &processedSize));
+      RINOK(ReadStream(op.stream, byteBuffer, &processedSize))
       if (processedSize == 0)
         return S_FALSE;
       if (processedSize < bufSize)
@@ -2232,12 +2223,12 @@ HRESULT CArc::OpenStream2(const COpenOptions &op)
       const CArcInfoEx &ai = op.codecs->Formats[(unsigned)FormatIndex];
 
       if (op.callback)
-        RINOK(op.callback->SetTotal(NULL, &fileSize));
+        RINOK(op.callback->SetTotal(NULL, &fileSize))
 
-      RINOK(op.stream->Seek(0, STREAM_SEEK_SET, NULL));
+      RINOK(InStream_SeekToBegin(op.stream))
 
       CMyComPtr<IInArchive> archive;
-      RINOK(PrepareToOpen(op, (unsigned)FormatIndex, archive));
+      RINOK(PrepareToOpen(op, (unsigned)FormatIndex, archive))
       if (!archive)
         continue;
       
@@ -2263,9 +2254,9 @@ HRESULT CArc::OpenStream2(const COpenOptions &op)
         // printf("  OpenForSize Error");
         continue;
       }
-      RINOK(result);
+      RINOK(result)
 
-      RINOK(ReadBasicProps(archive, 0, result));
+      RINOK(ReadBasicProps(archive, 0, result))
 
       if (Offset > 0)
       {
@@ -2302,7 +2293,7 @@ HRESULT CArc::OpenStream2(const COpenOptions &op)
 
       if (mode.CanReturnArc)
       {
-        bool isMainFormat = isMainFormatArr[(unsigned)FormatIndex];
+        const bool isMainFormat = isMainFormatArr[(unsigned)FormatIndex];
         const COpenSpecFlags &specFlags = mode.GetSpec(isForced, isMainFormat, isUnknownExt);
         bool openCur = false;
 
@@ -2312,7 +2303,7 @@ HRESULT CArc::OpenStream2(const COpenOptions &op)
         {
           if (mode.ZerosTailIsAllowed)
           {
-            RINOK(CheckZerosTail(op, (UInt64)(Offset + (Int64)PhySize)));
+            RINOK(CheckZerosTail(op, (UInt64)(Offset + (Int64)PhySize)))
             if (ErrorInfo.IgnoreTail)
               openCur = true;
           }
@@ -2352,7 +2343,7 @@ HRESULT CArc::OpenStream2(const COpenOptions &op)
         continue;
 
       // printf("\nAdd offset = %d", (int)pi.Offset);
-      RINOK(ReadParseItemProps(archive, ai, pi));
+      RINOK(ReadParseItemProps(archive, ai, pi))
       handlerSpec->AddItem(pi);
     }
   }
@@ -2451,7 +2442,7 @@ HRESULT CArc::OpenStream2(const COpenOptions &op)
       // canReturnTailArc = true;
     }
     
-    RINOK(op.stream->Seek(0, STREAM_SEEK_SET, NULL));
+    RINOK(InStream_SeekToBegin(op.stream))
 
     CLimitedCachedInStream *limitedStreamSpec = new CLimitedCachedInStream;
     CMyComPtr<IInStream> limitedStream = limitedStreamSpec;
@@ -2465,13 +2456,13 @@ HRESULT CArc::OpenStream2(const COpenOptions &op)
       openCallback_Offset = openCallback_Offset_Spec;
       openCallback_Offset_Spec->Callback = op.callback;
       openCallback_Offset_Spec->Callback.QueryInterface(IID_IArchiveOpenVolumeCallback, &openCallback_Offset_Spec->OpenVolumeCallback);
-      #ifndef _NO_CRYPTO
+      #ifndef Z7_NO_CRYPTO
       openCallback_Offset_Spec->Callback.QueryInterface(IID_ICryptoGetTextPassword, &openCallback_Offset_Spec->GetTextPassword);
       #endif
     }
 
     if (op.callback)
-      RINOK(op.callback->SetTotal(NULL, &fileSize));
+      RINOK(op.callback->SetTotal(NULL, &fileSize))
   
     CByteBuffer &byteBuffer = limitedStreamSpec->Buffer;
     byteBuffer.Alloc(kBufSize);
@@ -2509,8 +2500,8 @@ HRESULT CArc::OpenStream2(const COpenOptions &op)
           size_t processedSize = kBufSize - bytesInBuf;
           // printf("\nRead ask = %d", (unsigned)processedSize);
           UInt64 seekPos = bufPhyPos + bytesInBuf;
-          RINOK(op.stream->Seek((Int64)(bufPhyPos + bytesInBuf), STREAM_SEEK_SET, NULL));
-          RINOK(ReadStream(op.stream, byteBuffer + bytesInBuf, &processedSize));
+          RINOK(InStream_SeekSet(op.stream, bufPhyPos + bytesInBuf))
+          RINOK(ReadStream(op.stream, byteBuffer + bytesInBuf, &processedSize))
           // printf("   processed = %d", (unsigned)processedSize);
           if (processedSize == 0)
           {
@@ -2568,7 +2559,7 @@ HRESULT CArc::OpenStream2(const COpenOptions &op)
  
         if (pos >= callbackPrev + (1 << 23))
         {
-          RINOK(openCallback_Offset_Spec->SetCompleted(NULL, NULL));
+          RINOK(openCallback_Offset->SetCompleted(NULL, NULL))
           callbackPrev = pos;
         }
       }
@@ -2691,10 +2682,10 @@ HRESULT CArc::OpenStream2(const COpenOptions &op)
         
         if (ai.IsArcFunc && startArcPos >= bufPhyPos)
         {
-          size_t offsetInBuf = (size_t)(startArcPos - bufPhyPos);
+          const size_t offsetInBuf = (size_t)(startArcPos - bufPhyPos);
           if (offsetInBuf < bytesInBuf)
           {
-            UInt32 isArcRes = ai.IsArcFunc(byteBuffer + offsetInBuf, bytesInBuf - offsetInBuf);
+            const UInt32 isArcRes = ai.IsArcFunc(byteBuffer + offsetInBuf, bytesInBuf - offsetInBuf);
             if (isArcRes == k_IsArc_Res_NO)
               continue;
             if (isArcRes == k_IsArc_Res_NEED_MORE && endOfFile)
@@ -2716,7 +2707,7 @@ HRESULT CArc::OpenStream2(const COpenOptions &op)
         const COpenSpecFlags &specFlags = mode.GetSpec(isForced, isMainFormat, isUnknownExt);
         
         CMyComPtr<IInArchive> archive;
-        RINOK(PrepareToOpen(op, index, archive));
+        RINOK(PrepareToOpen(op, index, archive))
         if (!archive)
           return E_FAIL;
         
@@ -2728,12 +2719,12 @@ HRESULT CArc::OpenStream2(const COpenOptions &op)
 
         if (ai.Flags_UseGlobalOffset())
         {
-          limitedStreamSpec->InitAndSeek(0, fileSize);
-          limitedStream->Seek((Int64)startArcPos, STREAM_SEEK_SET, NULL);
+          RINOK(limitedStreamSpec->InitAndSeek(0, fileSize))
+          RINOK(InStream_SeekSet(limitedStream, startArcPos))
         }
         else
         {
-          limitedStreamSpec->InitAndSeek(startArcPos, rem);
+          RINOK(limitedStreamSpec->InitAndSeek(startArcPos, rem))
           arcStreamOffset = startArcPos;
         }
         
@@ -2755,7 +2746,7 @@ HRESULT CArc::OpenStream2(const COpenOptions &op)
             useOffsetCallback ? (IArchiveOpenCallback *)openCallback_Offset : (IArchiveOpenCallback *)op.callback,
             extractCallback_To_OpenCallback);
 
-        RINOK(ReadBasicProps(archive, ai.Flags_UseGlobalOffset() ? 0 : startArcPos, result));
+        RINOK(ReadBasicProps(archive, ai.Flags_UseGlobalOffset() ? 0 : startArcPos, result))
 
         bool isOpen = false;
       
@@ -2784,7 +2775,7 @@ HRESULT CArc::OpenStream2(const COpenOptions &op)
             continue;
           }
           isOpen = true;
-          RINOK(result);
+          RINOK(result)
           PRF(printf("  OK "));
         }
 
@@ -2874,7 +2865,7 @@ HRESULT CArc::OpenStream2(const COpenOptions &op)
           pos = pi.Offset + pi.Size;
 
        
-        RINOK(ReadParseItemProps(archive, ai, pi));
+        RINOK(ReadParseItemProps(archive, ai, pi))
 
         if (pi.Offset < startArcPos && !mode.EachPos /* && phySize_Defined */)
         {
@@ -2903,7 +2894,7 @@ HRESULT CArc::OpenStream2(const COpenOptions &op)
           bool thereIsTail = ErrorInfo.ThereIsTail;
           if (thereIsTail && mode.ZerosTailIsAllowed)
           {
-            RINOK(CheckZerosTail(op, (UInt64)((Int64)arcStreamOffset + Offset + (Int64)PhySize)));
+            RINOK(CheckZerosTail(op, (UInt64)((Int64)arcStreamOffset + Offset + (Int64)PhySize)))
             if (ErrorInfo.IgnoreTail)
               thereIsTail = false;
           }
@@ -3029,7 +3020,7 @@ HRESULT CArc::OpenStream2(const COpenOptions &op)
 
 HRESULT CArc::OpenStream(const COpenOptions &op)
 {
-  RINOK(OpenStream2(op));
+  RINOK(OpenStream2(op))
   // PrintNumber("op.formatIndex 3", op.formatIndex);
 
   if (Archive)
@@ -3039,12 +3030,12 @@ HRESULT CArc::OpenStream(const COpenOptions &op)
     Archive->QueryInterface(IID_IArchiveGetRawProps, (void **)&GetRawProps);
     Archive->QueryInterface(IID_IArchiveGetRootProps, (void **)&GetRootProps);
 
-    RINOK(Archive_GetArcProp_Bool(Archive, kpidIsTree, IsTree));
-    RINOK(Archive_GetArcProp_Bool(Archive, kpidIsDeleted, Ask_Deleted));
-    RINOK(Archive_GetArcProp_Bool(Archive, kpidIsAltStream, Ask_AltStream));
-    RINOK(Archive_GetArcProp_Bool(Archive, kpidIsAux, Ask_Aux));
-    RINOK(Archive_GetArcProp_Bool(Archive, kpidINode, Ask_INode));
-    RINOK(Archive_GetArcProp_Bool(Archive, kpidReadOnly, IsReadOnly));
+    RINOK(Archive_GetArcProp_Bool(Archive, kpidIsTree, IsTree))
+    RINOK(Archive_GetArcProp_Bool(Archive, kpidIsDeleted, Ask_Deleted))
+    RINOK(Archive_GetArcProp_Bool(Archive, kpidIsAltStream, Ask_AltStream))
+    RINOK(Archive_GetArcProp_Bool(Archive, kpidIsAux, Ask_Aux))
+    RINOK(Archive_GetArcProp_Bool(Archive, kpidINode, Ask_INode))
+    RINOK(Archive_GetArcProp_Bool(Archive, kpidReadOnly, IsReadOnly))
 
     const UString fileName = ExtractFileNameFromPath(Path);
     UString extension;
@@ -3074,7 +3065,7 @@ HRESULT CArc::OpenStream(const COpenOptions &op)
   return S_OK;
 }
 
-#ifdef _SFX
+#ifdef Z7_SFX
 
 #ifdef _WIN32
   #define k_ExeExt ".exe"
@@ -3105,7 +3096,7 @@ HRESULT CArc::OpenStreamOrFile(COpenOptions &op)
     if (!fileStreamSpec->Open(us2fs(Path)))
       return GetLastError_noZero_HRESULT();
     op.stream = fileStream;
-    #ifdef _SFX
+    #ifdef Z7_SFX
     IgnoreSplit = true;
     #endif
   }
@@ -3114,7 +3105,7 @@ HRESULT CArc::OpenStreamOrFile(COpenOptions &op)
   if (callback)
   {
     UInt64 fileSize;
-    RINOK(op.stream->Seek(0, STREAM_SEEK_END, &fileSize));
+    RINOK(InStream_GetSize_SeekToEnd(op.stream, fileSize));
     RINOK(op.callback->SetTotal(NULL, &fileSize))
   }
   */
@@ -3122,7 +3113,7 @@ HRESULT CArc::OpenStreamOrFile(COpenOptions &op)
   HRESULT res = OpenStream(op);
   IgnoreSplit = false;
   
-  #ifdef _SFX
+  #ifdef Z7_SFX
   
   if (res != S_FALSE
       || !fileStreamSpec
@@ -3141,7 +3132,7 @@ HRESULT CArc::OpenStreamOrFile(COpenOptions &op)
         if (ai.Is_Split())
           continue;
         UString path3 = path2;
-        path3 += '.';
+        path3.Add_Dot();
         path3 += ai.GetMainExt(); // "7z"  for SFX.
         Path = path3;
         Path += ".001";
@@ -3187,7 +3178,7 @@ HRESULT CArchiveLink::Close()
   for (unsigned i = Arcs.Size(); i != 0;)
   {
     i--;
-    RINOK(Arcs[i].Close());
+    RINOK(Arcs[i].Close())
   }
   IsOpen = false;
   // ErrorsText.Empty();
@@ -3320,13 +3311,13 @@ HRESULT CArchiveLink::Open(COpenOptions &op)
     UInt32 mainSubfile;
     {
       NCOM::CPropVariant prop;
-      RINOK(arc.Archive->GetArchiveProperty(kpidMainSubfile, &prop));
+      RINOK(arc.Archive->GetArchiveProperty(kpidMainSubfile, &prop))
       if (prop.vt == VT_UI4)
         mainSubfile = prop.ulVal;
       else
         break;
       UInt32 numItems;
-      RINOK(arc.Archive->GetNumberOfItems(&numItems));
+      RINOK(arc.Archive->GetNumberOfItems(&numItems))
       if (mainSubfile >= numItems)
         break;
     }
@@ -3345,16 +3336,17 @@ HRESULT CArchiveLink::Open(COpenOptions &op)
       break;
     
     CArc arc2;
-    RINOK(arc.GetItem_Path(mainSubfile, arc2.Path));
+    RINOK(arc.GetItem_Path(mainSubfile, arc2.Path))
 
     bool zerosTailIsAllowed;
-    RINOK(Archive_GetItemBoolProp(arc.Archive, mainSubfile, kpidZerosTailIsAllowed, zerosTailIsAllowed));
+    RINOK(Archive_GetItemBoolProp(arc.Archive, mainSubfile, kpidZerosTailIsAllowed, zerosTailIsAllowed))
 
 
     if (op.callback)
     {
-      CMyComPtr<IArchiveOpenSetSubArchiveName> setSubArchiveName;
-      op.callback->QueryInterface(IID_IArchiveOpenSetSubArchiveName, (void **)&setSubArchiveName);
+      Z7_DECL_CMyComPtr_QI_FROM(
+          IArchiveOpenSetSubArchiveName,
+          setSubArchiveName, op.callback)
       if (setSubArchiveName)
         setSubArchiveName->SetSubArchiveName(arc2.Path);
     }
@@ -3365,7 +3357,7 @@ HRESULT CArchiveLink::Open(COpenOptions &op)
     CIntVector excl;
 
     COpenOptions op2;
-    #ifndef _SFX
+    #ifndef Z7_SFX
     op2.props = op.props;
     #endif
     op2.codecs = op.codecs;
@@ -3388,8 +3380,8 @@ HRESULT CArchiveLink::Open(COpenOptions &op)
       NonOpen_ArcPath = arc2.Path;
       break;
     }
-    RINOK(result);
-    RINOK(arc.GetItem_MTime(mainSubfile, arc2.MTime));
+    RINOK(result)
+    RINOK(arc.GetItem_MTime(mainSubfile, arc2.MTime))
     Arcs.Add(arc2);
   }
   IsOpen = !Arcs.IsEmpty();
@@ -3408,7 +3400,7 @@ HRESULT CArchiveLink::Open2(COpenOptions &op, IOpenCallbackUI *callbackUI)
   if (!op.stream && !op.stdInMode)
   {
     NFile::NDir::GetFullPathAndSplit(us2fs(op.filePath), prefix, name);
-    RINOK(openCallbackSpec->Init2(prefix, name));
+    RINOK(openCallbackSpec->Init2(prefix, name))
   }
   else
   {
@@ -3423,7 +3415,7 @@ HRESULT CArchiveLink::Open2(COpenOptions &op, IOpenCallbackUI *callbackUI)
   PasswordWasAsked = openCallbackSpec->PasswordWasAsked;
   // Password = openCallbackSpec->Password;
 
-  RINOK(res);
+  RINOK(res)
   // VolumePaths.Add(fs2us(prefix + name));
 
   FOR_VECTOR (i, openCallbackSpec->FileNames_WasUsed)
@@ -3446,8 +3438,9 @@ HRESULT CArc::ReOpen(const COpenOptions &op, IArchiveOpenCallback *openCallback_
   UInt64 fileSize = 0;
   if (op.stream)
   {
-    RINOK(op.stream->Seek(0, STREAM_SEEK_END, &fileSize));
-    RINOK(op.stream->Seek(0, STREAM_SEEK_SET, NULL));
+    RINOK(InStream_SeekToBegin(op.stream))
+    RINOK(InStream_AtBegin_GetSize(op.stream, fileSize))
+    // RINOK(InStream_GetSize_SeekToBegin(op.stream, fileSize))
   }
   FileSize = fileSize;
 
@@ -3462,7 +3455,7 @@ HRESULT CArc::ReOpen(const COpenOptions &op, IArchiveOpenCallback *openCallback_
     tailStreamSpec->Stream = op.stream;
     tailStreamSpec->Offset = (UInt64)globalOffset;
     tailStreamSpec->Init();
-    RINOK(tailStreamSpec->SeekToStart());
+    RINOK(tailStreamSpec->SeekToStart())
   }
 
   // There are archives with embedded STUBs (like ZIP), so we must support signature scanning
@@ -3475,7 +3468,7 @@ HRESULT CArc::ReOpen(const COpenOptions &op, IArchiveOpenCallback *openCallback_
   
   if (res == S_OK)
   {
-    RINOK(ReadBasicProps(Archive, (UInt64)globalOffset, res));
+    RINOK(ReadBasicProps(Archive, (UInt64)globalOffset, res))
     ArcStreamOffset = (UInt64)globalOffset;
     if (ArcStreamOffset != 0)
       InStream = op.stream;
@@ -3488,7 +3481,7 @@ HRESULT CArchiveLink::Open3(COpenOptions &op, IOpenCallbackUI *callbackUI)
   HRESULT res = Open2(op, callbackUI);
   if (callbackUI)
   {
-    RINOK(callbackUI->Open_Finished());
+    RINOK(callbackUI->Open_Finished())
   }
   return res;
 }
@@ -3508,6 +3501,8 @@ HRESULT CArchiveLink::ReOpen(COpenOptions &op)
   if (Arcs.Size() == 0) // ???
     return Open2(op, NULL);
 
+  /* if archive is multivolume (unsupported here still)
+     COpenCallbackImp object will exist after Open stage. */
   COpenCallbackImp *openCallbackSpec = new COpenCallbackImp;
   CMyComPtr<IArchiveOpenCallback> openCallbackNew = openCallbackSpec;
 
@@ -3516,7 +3511,7 @@ HRESULT CArchiveLink::ReOpen(COpenOptions &op)
   {
     FString dirPrefix, fileName;
     NFile::NDir::GetFullPathAndSplit(us2fs(op.filePath), dirPrefix, fileName);
-    RINOK(openCallbackSpec->Init2(dirPrefix, fileName));
+    RINOK(openCallbackSpec->Init2(dirPrefix, fileName))
   }
 
 
@@ -3527,7 +3522,9 @@ HRESULT CArchiveLink::ReOpen(COpenOptions &op)
   op.stream = stream;
 
   CArc &arc = Arcs[0];
-  HRESULT res = arc.ReOpen(op, openCallbackNew);
+  const HRESULT res = arc.ReOpen(op, openCallbackNew);
+
+  openCallbackSpec->ReOpenCallback = NULL;
   
   PasswordWasAsked = openCallbackSpec->PasswordWasAsked;
   // Password = openCallbackSpec->Password;
@@ -3536,7 +3533,7 @@ HRESULT CArchiveLink::ReOpen(COpenOptions &op)
   return res;
 }
 
-#ifndef _SFX
+#ifndef Z7_SFX
 
 bool ParseComplexSize(const wchar_t *s, UInt64 &result);
 bool ParseComplexSize(const wchar_t *s, UInt64 &result)

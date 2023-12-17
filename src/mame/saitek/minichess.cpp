@@ -63,16 +63,16 @@ private:
 	output_finder<> m_computing;
 	required_ioport_array<5> m_inputs;
 
+	u8 m_inp_mux = 0;
+	u8 m_lcd_select = 0;
+	u8 m_lcd_data = 0;
+
 	TIMER_DEVICE_CALLBACK_MEMBER(computing) { m_computing = 1; }
 
 	void update_display();
 	template<int N> void seg_w(u8 data);
 	void mux_w(u16 data);
 	u16 input_r();
-
-	u8 m_inp_mux = 0;
-	u8 m_lcd_select = 0;
-	u8 m_lcd_data = 0;
 };
 
 void mini_state::machine_start()
@@ -179,7 +179,7 @@ INPUT_PORTS_END
 void mini_state::smchess(machine_config &config)
 {
 	// basic machine hardware
-	HD44801(config, m_maincpu, 400000);
+	HD44801(config, m_maincpu, 400'000);
 	m_maincpu->write_r<2>().set(FUNC(mini_state::seg_w<0>));
 	m_maincpu->write_r<3>().set(FUNC(mini_state::seg_w<1>));
 	m_maincpu->write_d().set(FUNC(mini_state::mux_w));
