@@ -11,10 +11,14 @@
 
 #include "speaker.h"
 
-#define VERBOSE (LOG_GENERAL)
+#define LOG_MAP    (1U << 1) // log full remaps
+
+#define VERBOSE (LOG_GENERAL | LOG_MAP)
 //#define LOG_OUTPUT_FUNC osd_printf_warning
 
 #include "logmacro.h"
+
+#define LOGMAP(...)    LOGMASKED(LOG_MAP,  __VA_ARGS__)
 
 DEFINE_DEVICE_TYPE(MEDIAGX_CS5530_BRIDGE, mediagx_cs5530_bridge_device, "mediagx_cs5530_bridge", "MediaGX CS5530 Bridge")
 
@@ -28,6 +32,7 @@ mediagx_cs5530_bridge_device::mediagx_cs5530_bridge_device(const machine_config 
 	, m_rtccs_read(*this, 0xff)
 	, m_rtccs_write(*this)
 	, m_host_cpu(*this, finder_base::DUMMY_TAG)
+	, m_ide(*this, finder_base::DUMMY_TAG)
 	, m_pic8259_master(*this, "pic8259_master")
 	, m_pic8259_slave(*this, "pic8259_slave")
 	, m_dma8237_1(*this, "dma8237_1")
@@ -142,6 +147,15 @@ void mediagx_cs5530_bridge_device::config_map(address_map &map)
 //	map(0x52, 0x52) ROM/AT Logic Control
 //	map(0x53, 0x53) Alternate CPU Support
 //	map(0x5a, 0x5b) Decode Control
+	map(0x5a, 0x5b).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_decode_control[offset];
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_decode_control[offset] = data;
+			remap_cb();
+		})
+	);
 //	map(0x5c, 0x5d) PCI Interrupt Steering
 
 //	map(0x70, 0x71) GPCS Base Address
@@ -216,7 +230,7 @@ void mediagx_cs5530_bridge_device::internal_io_map(address_map &map)
 	// TODO: port decoding driven by PCI register $52
 	map(0x0092, 0x0092).lrw8(
 		NAME([this] () {
-			LOG("Fast init $92 read\n");
+			//LOG("Fast init $92 read\n");
 			return m_fast_init;
 		}),
 		NAME([this] (u8 data) {
@@ -487,10 +501,56 @@ void mediagx_cs5530_bridge_device::map_extra(
 {
 	m_isabus->remap(AS_PROGRAM, 0, 1 << 24);
 	map_bios(memory_space, 0xffffffff - m_region->bytes() + 1, 0xffffffff);
-	// TODO: BIOS window conditions
+	// TODO: BIOS window conditions + BIOS ROM
+	if (BIT(m_decode_control[1], 5))
+		LOGMAP("BIOS ROM positive decode\n");
 	map_bios(memory_space, 0x000e0000, 0x000fffff);
+
 	m_isabus->remap(AS_IO, 0, 0xffff);
 	io_space->install_device(0, 0xffff, *this, &mediagx_cs5530_bridge_device::internal_io_map);
+
+	if (BIT(m_decode_control[0], 0))
+		LOGMAP("RTC positive decode $070 & $071\n");
+
+	if (BIT(m_decode_control[0], 1))
+		LOGMAP("KBDC positive decode $060 & $064 (mailbox $62 & $66 %s)\n", BIT(m_decode_control[1], 7) ? "enabled" : "disabled");
+
+	if (BIT(m_decode_control[0], 2))
+		LOGMAP("COM1 positive decode $3f8-$3ff\n");
+
+	if (BIT(m_decode_control[0], 3))
+		LOGMAP("COM2 positive decode $2f8-$2ff\n");
+
+	if (BIT(m_decode_control[0], 4))
+		LOGMAP("COM3 positive decode $3e8-$3ef\n");
+
+	if (BIT(m_decode_control[0], 5))
+		LOGMAP("COM4 positive decode $2e8-$2ef\n");
+
+	if (BIT(m_decode_control[0], 6))
+		LOGMAP("Primary FDC positive decode $3f2-$3f5 & $3f7\n");
+
+	if (BIT(m_decode_control[0], 7))
+		LOGMAP("Secondary FDC positive decode $372-$375 & $377\n");
+
+	if (BIT(m_decode_control[1], 0))
+		LOGMAP("LPT1 positive decode $378-$37f & $778-$77a\n");
+
+	if (BIT(m_decode_control[1], 1))
+		LOGMAP("LPT2 positive decode $278-$27f & $678-$67a\n");
+
+	if (BIT(m_decode_control[1], 2))
+		LOGMAP("LPT3 positive decode $3bc-$3be & $7bc-$7be\n");
+
+	if (BIT(m_decode_control[1], 4))
+	{
+		LOGMAP("Secondary IDE positive decode $170-$177 & $376-$377\n");
+		io_space->install_device(0, 0xffff, *m_ide, &mediagx_cs5530_ide_device::secondary_ide_map);
+	}
+
+	if (BIT(m_decode_control[1], 3))
+	{
+		LOGMAP("Primary IDE positive decode $1f0-$1f7 & $3f6-$3f7\n");
+		io_space->install_device(0, 0xffff, *m_ide, &mediagx_cs5530_ide_device::primary_ide_map);
+	}
 }
-
-
