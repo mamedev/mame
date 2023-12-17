@@ -108,8 +108,8 @@ license:CC0-1.0
 
 <!-- sb board -->
 
-	<element name="cwhite"><rect><color red="0.86" green="0.85" blue="0.85" /></rect></element>
-	<element name="cblack"><rect><color red="0.4" green="0.4" blue="0.4" /></rect></element>
+	<element name="cwhite"><rect><color red="0.81" green="0.8" blue="0.79" /></rect></element>
+	<element name="cblack"><rect><color red="0.41" green="0.4" blue="0.39" /></rect></element>
 
 	<element name="hlbb" defstate="0">
 		<text string=" "><bounds x="0" y="0" width="1" height="1" /></text>

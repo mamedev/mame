@@ -24,9 +24,10 @@ see(2): http://chesseval.com/RareBoard/DaimlerBenzBoard.htm
 MM III was never released officially. Rebell 5,0 is commonly known as MM III, but the
 real one (updated MM II engine) didn't get further than a prototype.
 
-Before Rebell 5,0, Ed Schröder's developed his Rebel engine on the more limited MM II
-hardware that only has 4KB RAM. This program was never officially released in a Mephisto
-chess computer, but it competed in the amateur division of the 1985 WMCCC in Amsterdam.
+Before Rebell 5,0, Ed Schröder developed his Rebel engine on the more limited MM II
+hardware that only has 4KB RAM. This program was never officially released in a
+Mephisto chess computer, it's not a beta version of Rebell 5,0. According to research,
+it competed in the amateur division of the 1985 WMCCC in Amsterdam.
 
 Mephisto 4 Turbo Kit 18mhz - (mm4tk)
 This is a replacement ROM combining the Turbo Kit initial ROM with the original MM IV.
@@ -34,12 +35,12 @@ The Turbo Kit powers up to it's tiny ROM, copies itself to RAM, banks in normal 
 copies that to faster SRAM, then patches the checksum and the LED blink delays.
 If someone else wants to code up the power up banking, feel free
 
-There is an undumped MM V Turbo Kit, which will be the exact same except for location of
-the patches. The mm5tk just needs the normal mm5 ROM swapped out for that one to
+There is an undumped MM V Turbo Kit, which will be the exact same except for location
+of the patches. The mm5tk just needs the normal mm5 ROM swapped out for that one to
 blinks the LEDs a little slower.
 
-The MM V prototype was the program that Ed Schröder participated with as "Rebel" at the
-1989 WMCCC in Portorose. It was used with the TK20 TurboKit.
+The MM V prototype was the program that Ed Schröder participated with as "Rebel" at
+the 1989 WMCCC in Portorose. It was used with the TK20 TurboKit.
 For more information, see: http://chesseval.com/ChessEvalJournal/PrototypeMMV.htm
 
 MM VI (Saitek, 1994) is on different hardware, H8 CPU.
