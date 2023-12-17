@@ -5,7 +5,7 @@
 
 #include "bus/midi/midiinport.h"
 #include "bus/midi/midioutport.h"
-#include "cpu/sh/sh7014.h"
+#include "cpu/sh/sh7042.h"
 
 #include "debugger.h"
 #include "speaker.h"
@@ -33,7 +33,7 @@ void psr540_state::machine_start()
 
 void psr540_state::psr540(machine_config &config)
 {
-	SH7014(config, m_maincpu, 7_MHz_XTAL);
+	SH7042(config, m_maincpu, 7_MHz_XTAL*4); // internal mask rom active, pll x4
 	m_maincpu->set_addrmap(AS_PROGRAM, &psr540_state::map);
 
 	SPEAKER(config, "lspeaker").front_left();
@@ -42,9 +42,21 @@ void psr540_state::psr540(machine_config &config)
 
 void psr540_state::map(address_map &map)
 {
-	map(0x0000000, 0x001ffff).rom().region("kernel", 0);
+	map(0x0000000, 0x001ffff).rom().region("kernel", 0).mirror(0x1e0000);
+
+	// 200000-3fffff: cs0 space
+	// 200000 fdc
 	map(0x0280000, 0x029ffff).ram(); // sram
+	// 2a0000 leds
+	// 2c0000 lcd
+
+	// 400000-7fffff: cs1 space
 	map(0x0400000, 0x07fffff).rom().region("program_rom", 0);
+
+	// c00000-ffffff: cs3 space
+	// c00000: sxw00
+
+	// Dedicated dram space
 	map(0x1000000, 0x13fffff).ram(); // dram
 }
 
