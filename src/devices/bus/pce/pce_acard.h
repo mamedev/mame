@@ -96,10 +96,13 @@ public:
 	virtual void install_memory_handlers(address_space &space) override;
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
 
 private:
-	required_device<pce_cdsys3_base_device> m_cdsys3;
+	pce_scdsys m_scdsys;
+
+	// reading
+	uint8_t register_r(offs_t offset) { return m_scdsys.register_r(offset); }
 };
 
 

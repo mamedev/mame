@@ -41,7 +41,7 @@ pce_acard_duo_device::pce_acard_duo_device(const machine_config &mconfig, const 
 
 pce_acard_pro_device::pce_acard_pro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pce_acard_duo_device(mconfig, PCE_ROM_ACARD_PRO, tag, owner, clock)
-	, m_cdsys3(*this, "cdsys3")
+	, m_scdsys()
 {
 }
 
@@ -62,6 +62,14 @@ void pce_acard_duo_device::device_start()
 	save_item(NAME(m_rotate_reg));
 }
 
+void pce_acard_pro_device::device_start()
+{
+	pce_acard_duo_device::device_start();
+	
+	m_scdsys.init(*this);
+	m_scdsys.set_region(false);
+}
+
 void pce_acard_duo_device::device_reset()
 {
 	for (auto &port : m_port)
@@ -74,11 +82,6 @@ void pce_acard_duo_device::device_reset()
 	m_shift = 0;
 	m_shift_reg = 0;
 	m_rotate_reg = 0;
-}
-
-void pce_acard_pro_device::device_add_mconfig(machine_config &config)
-{
-	PCE_ROM_CDSYS3_BASE(config, m_cdsys3, DERIVED_CLOCK(1,1)).set_region(false);
 }
 
 /*-------------------------------------------------
@@ -95,8 +98,8 @@ void pce_acard_duo_device::install_memory_handlers(address_space &space)
 void pce_acard_pro_device::install_memory_handlers(address_space &space)
 {
 	space.install_rom(0x000000, 0x03ffff, 0x040000, m_rom); // TODO: underdumped or mirrored?
-	space.install_ram(0x0d0000, 0x0fffff, m_cdsys3->ram());
-	space.install_read_handler(0x1ff8c0, 0x1ff8c7, 0, 0x130, 0, emu::rw_delegate(m_cdsys3, FUNC(pce_cdsys3_base_device::register_r)));
+	space.install_ram(0x0d0000, 0x0fffff, m_scdsys.ram());
+	space.install_read_handler(0x1ff8c0, 0x1ff8c7, 0, 0x130, 0, emu::rw_delegate(*this, FUNC(pce_acard_pro_device::register_r)));
 	pce_acard_duo_device::install_memory_handlers(space);
 }
 
