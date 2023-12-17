@@ -98,6 +98,7 @@
     \- sscopex/sogeki desyncs during gameplay intro, leaves heavy trails in gameplay;
     - ppp2nd: hangs when selecting game mode from service (manages to save);
     - code1db: crashes when selecting single course type;
+    - wcombatj: gets stuck on network check;
     - thrild2c: blue screen;
     - thrild2ac: black screen;
     - all games needs to be verified against factory settings
@@ -2353,10 +2354,13 @@ INPUT_PORTS_START( wcombat )
 	PORT_INCLUDE( viper )
 
 	PORT_MODIFY("IN2")
-	PORT_DIPNAME( 0x01, 0x00, "DIP4" ) PORT_DIPLOCATION("SW:4") // Skip device check? wcombatu is playable when this is set
+	PORT_DIPNAME( 0x01, 0x00, "DIP4" ) PORT_DIPLOCATION("SW:4")
 	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW:2")
+	PORT_DIPNAME( 0x02, 0x02, "Mirror Screen X" ) PORT_DIPLOCATION("SW:3")
+	PORT_DIPSETTING( 0x00, DEF_STR( Yes ) )
+	PORT_DIPSETTING( 0x02, DEF_STR( No ) )
+	PORT_DIPNAME( 0x04, 0x04, "Mirror Screen Y" ) PORT_DIPLOCATION("SW:2")
 	PORT_DIPSETTING( 0x00, DEF_STR( Yes ) )
 	PORT_DIPSETTING( 0x04, DEF_STR( No ) )
 	PORT_DIPNAME( 0x08, 0x00, "Memory Card Check On Boot" ) PORT_DIPLOCATION("SW:1")
@@ -2367,9 +2371,24 @@ INPUT_PORTS_START( wcombat )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_MODIFY("IN4")
+	PORT_DIPNAME( 0x04, 0x04, "Diag test enable" ) // possibly PL1 IPT_BUTTON4 sense
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // X flip screen
 
 	// TODO: whatever it reads from the i2c analog ports (needs service mode)
+INPUT_PORTS_END
+
+// twin cab version?
+INPUT_PORTS_START( wcombatj )
+	PORT_INCLUDE( wcombat )
+
+	// TODO: check if DIP2 ID selects side as stated by the manual
+
+	// Specifically works in this version only
+	PORT_MODIFY("IN5")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START4 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START3 )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( xtrial )
@@ -3367,7 +3386,7 @@ GAME(2002, wcombat,   kviper,    viper,     wcombat,    viper_state, init_viperc
 GAME(2002, wcombatb,  wcombat,   viper,     wcombat,    viper_state, init_vipercf,  ROT0,  "Konami", "World Combat (ver AAD:B, alt)", MACHINE_NOT_WORKING)
 GAME(2002, wcombatk,  wcombat,   viper,     wcombat,    viper_state, init_vipercf,  ROT0,  "Konami", "World Combat (ver KBC:B)", MACHINE_NOT_WORKING)
 GAME(2002, wcombatu,  wcombat,   viper,     wcombat,    viper_state, init_vipercf,  ROT0,  "Konami", "World Combat / Warzaid (ver UCD:B)", MACHINE_NOT_WORKING)
-GAME(2002, wcombatj,  wcombat,   viper,     wcombat,    viper_state, init_vipercf,  ROT0,  "Konami", "World Combat (ver JAA)", MACHINE_NOT_WORKING)
+GAME(2002, wcombatj,  wcombat,   viper,     wcombatj,   viper_state, init_vipercf,  ROT0,  "Konami", "World Combat (ver JAA)", MACHINE_NOT_WORKING)
 GAME(2002, xtrial,    kviper,    viper,     xtrial,     viper_state, init_vipercf,  ROT0,  "Konami", "Xtrial Racing (ver JAB)", MACHINE_NOT_WORKING)
 
 GAME(2002, mfightc,   kviper,    viper,     mfightc,    viper_state, init_vipercf,  ROT0,  "Konami", "Mahjong Fight Club (ver JAD)", MACHINE_NOT_WORKING)
