@@ -23,7 +23,7 @@ TODO:
   and says "Sixteen Level Computerized Chess"
 
 Hardware notes:
-- HD6301Y0 MCU, 8MHz or 12MHz (LC osc, no XTAL)
+- Hitachi HD6301Y0P/F MCU, 8MHz or 12MHz (LC osc, no XTAL)
 - 16 board LEDs (can be tri-color), 7 or 8 status LEDs
 - buttons sensor board, piezo
 

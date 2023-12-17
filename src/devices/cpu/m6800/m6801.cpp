@@ -2084,14 +2084,12 @@ void hd6301x_cpu_device::increment_t2cnt(int amount)
 
 		if (BIT(m_rmcr, 5) && !m_use_ext_serclock)
 		{
-			if (m_ext_serclock + amount >= 32)
+			m_ext_serclock++;
+			if (m_ext_serclock >= 32)
 			{
-				m_ext_serclock = (m_ext_serclock + amount) % 32;
-				serial_transmit();
-				serial_receive();
+				m_ext_serclock = 0;
+				machine().scheduler().synchronize(timer_expired_delegate(FUNC(hd6301x_cpu_device::sci_tick), this));
 			}
-			else
-				m_ext_serclock += amount;
 		}
 
 		m_tcsr3 |= 0x80;

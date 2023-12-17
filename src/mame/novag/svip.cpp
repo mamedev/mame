@@ -26,8 +26,7 @@ The LCD is the same as the one in Primo / Supremo / Super Nova.
 
 TODO:
 - if/when MAME supports an exit callback, hook up power-off switch to that
-- serial port isn't working, MCU emulation problem? (it has nothing to do with
-  the distributor box, that's just a dumb expander)
+- serial port isn't working for nsvip V1.x? it only sends empty chars
 - unmapped reads from 0x3* range, same as snova driver
 - is (non-super) VIP on the same hardware? minus EPROM or RS232
 
@@ -138,7 +137,7 @@ u8 svip_state::p2_r()
 		if (m_inp_mux & m_inputs[i]->read())
 			data |= 0x20 << i;
 
-	return ~data;
+	return ~data ^ 8;
 }
 
 void svip_state::p2_w(u8 data)
