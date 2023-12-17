@@ -837,7 +837,7 @@ void psikyosh_state::machine_start()
 void psikyosh_state::psikyo3v1(machine_config &config)
 {
 	/* basic machine hardware */
-	SH2_SH7604(config, m_maincpu, MASTER_CLOCK/2);
+	SH7604(config, m_maincpu, MASTER_CLOCK/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &psikyosh_state::ps3v1_map);
 	m_maincpu->set_vblank_int("screen", FUNC(psikyosh_state::interrupt));
 

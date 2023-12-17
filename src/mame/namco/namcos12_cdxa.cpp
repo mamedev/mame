@@ -85,7 +85,7 @@ void namcos12_cdxa_device::device_reset()
 
 void namcos12_cdxa_device::device_add_mconfig(machine_config &config)
 {
-	SH2_SH7014(config, m_maincpu, XTAL(14'745'600));
+	SH7014(config, m_maincpu, XTAL(14'745'600));
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos12_cdxa_device::sh7014_map);
 
 	ATA_INTERFACE(config, m_ata).options([] (device_slot_interface &device) { device.option_add("cdrom", TOSHIBA_XM6402B_CDROM); }, "cdrom", nullptr, true);

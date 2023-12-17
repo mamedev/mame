@@ -11,10 +11,10 @@
 #include "sh7014.h"
 
 
-DEFINE_DEVICE_TYPE(SH2_SH7014, sh2_sh7014_device,  "sh2_sh7014",  "Hitachi SH-2 (SH7014)")
+DEFINE_DEVICE_TYPE(SH7014, sh7014_device,  "sh7014",  "Hitachi SH-2 (SH7014)")
 
-sh2_sh7014_device::sh2_sh7014_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sh2_device(mconfig, SH2_SH7014, tag, owner, clock, CPU_TYPE_SH2, address_map_constructor(FUNC(sh2_sh7014_device::sh7014_map), this), 32, 0xffffffff)
+sh7014_device::sh7014_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sh2_device(mconfig, SH7014, tag, owner, clock, CPU_TYPE_SH2, address_map_constructor(FUNC(sh7014_device::sh7014_map), this), 32, 0xffffffff)
 	, m_sci(*this, "sci%u", 0u)
 	, m_bsc(*this, "bsc")
 	, m_dmac(*this, "dmac")
@@ -25,14 +25,14 @@ sh2_sh7014_device::sh2_sh7014_device(const machine_config &mconfig, const char *
 {
 }
 
-void sh2_sh7014_device::device_start()
+void sh7014_device::device_start()
 {
 	sh2_device::device_start();
 
 	save_item(NAME(m_ccr));
 }
 
-void sh2_sh7014_device::device_reset()
+void sh7014_device::device_reset()
 {
 	sh2_device::device_reset();
 
@@ -40,7 +40,7 @@ void sh2_sh7014_device::device_reset()
 	m_ccr = 0;
 }
 
-void sh2_sh7014_device::device_add_mconfig(machine_config &config)
+void sh7014_device::device_add_mconfig(machine_config &config)
 {
 	SH7014_SCI(config, m_sci[0], DERIVED_CLOCK(1, 1), m_intc,
 		0, // id
@@ -61,17 +61,17 @@ void sh2_sh7014_device::device_add_mconfig(machine_config &config)
 	SH7014_BSC(config, m_bsc);
 
 	SH7014_DMAC(config, m_dmac, DERIVED_CLOCK(1, 1), *this, m_intc);
-	m_dmac->set_notify_dma_source_callback(FUNC(sh2_sh7014_device::notify_dma_source));
+	m_dmac->set_notify_dma_source_callback(FUNC(sh7014_device::notify_dma_source));
 
 	SH7014_INTC(config, m_intc);
-	m_intc->set_irq_callback(FUNC(sh2_sh7014_device::set_irq));
+	m_intc->set_irq_callback(FUNC(sh7014_device::set_irq));
 
 	SH7014_MTU(config, m_mtu, DERIVED_CLOCK(1, 1), m_intc);
 
 	SH7014_PORT(config, m_port);
 }
 
-void sh2_sh7014_device::sh7014_map(address_map &map)
+void sh7014_device::sh7014_map(address_map &map)
 {
 	// SCI - Serial Communication Interface
 	map(0xffff81a0, 0xffff81af).m(m_sci[0], FUNC(sh7014_sci_device::map));
@@ -125,32 +125,32 @@ void sh2_sh7014_device::sh7014_map(address_map &map)
 	map(0xffff86b0, 0xffff86df).m(m_dmac, FUNC(sh7014_dmac_device::map));
 
 	// CAC - Cache Memory
-	map(0xffff8740, 0xffff8741).rw(FUNC(sh2_sh7014_device::ccr_r), FUNC(sh2_sh7014_device::ccr_w));
+	map(0xffff8740, 0xffff8741).rw(FUNC(sh7014_device::ccr_r), FUNC(sh7014_device::ccr_w));
 
 	// Cache space
 	map(0xfffff000, 0xffffffff).ram();
 }
 
-void sh2_sh7014_device::sh2_exception_internal(const char *message, int irqline, int vector)
+void sh7014_device::sh2_exception_internal(const char *message, int irqline, int vector)
 {
 	// IRQ was taken so clear it in the interrupt controller and pass it down
 	m_intc->set_interrupt(vector, CLEAR_LINE);
 	sh2_device::sh2_exception_internal(message, irqline, vector);
 }
 
-void sh2_sh7014_device::execute_set_input(int irqline, int state)
+void sh7014_device::execute_set_input(int irqline, int state)
 {
 	/*
 	Flow for SH7014 IRQs:
-	sh2_sh7014_device::execute_set_input (for externally triggered IRQs)
+	sh7014_device::execute_set_input (for externally triggered IRQs)
 	-> sh7014_intc_device::set_input
-	-> sh2_sh7014_device::set_irq
+	-> sh7014_device::set_irq
 	-> sh2_device::execute_set_input (if not internal peripheral IRQ) OR DMA interception OR set sh2_device's internal IRQ flags
 	*/
 	m_intc->set_input(irqline, state);
 }
 
-void sh2_sh7014_device::set_irq(int vector, int level, bool is_internal)
+void sh7014_device::set_irq(int vector, int level, bool is_internal)
 {
 	if (!is_internal) {
 		sh2_device::execute_set_input(vector, ASSERT_LINE);
@@ -169,7 +169,7 @@ void sh2_sh7014_device::set_irq(int vector, int level, bool is_internal)
 	m_test_irq = 1;
 }
 
-void sh2_sh7014_device::notify_dma_source(uint32_t source)
+void sh7014_device::notify_dma_source(uint32_t source)
 {
 	if (source == sh7014_dmac_channel_device::RS_SCI_TXI0)
 		m_sci[0]->set_dma_source_tx(true);
@@ -184,13 +184,13 @@ void sh2_sh7014_device::notify_dma_source(uint32_t source)
 ///////
 // CAC
 
-uint16_t sh2_sh7014_device::ccr_r()
+uint16_t sh7014_device::ccr_r()
 {
 	// bits 15-5 are undefined
 	return m_ccr & 0x1f;
 }
 
-void sh2_sh7014_device::ccr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void sh7014_device::ccr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// bit 0 - CECS0 CS0 Space Cache Enable
 	// bit 1 - CECS1 CS1 Space Cache Enable
