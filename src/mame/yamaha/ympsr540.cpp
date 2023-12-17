@@ -33,7 +33,7 @@ void psr540_state::machine_start()
 
 void psr540_state::psr540(machine_config &config)
 {
-	SH2_SH7014(config, m_maincpu, 7_MHz_XTAL);
+	SH7014(config, m_maincpu, 7_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &psr540_state::map);
 
 	SPEAKER(config, "lspeaker").front_left();

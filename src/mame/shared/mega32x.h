@@ -115,8 +115,8 @@ protected:
 
 	/* our main vblank handler resets this */
 	required_device<m68000_base_device> m_main_cpu;
-	required_device<sh2_sh7604_device> m_master_cpu;
-	required_device<sh2_sh7604_device> m_slave_cpu;
+	required_device<sh7604_device> m_master_cpu;
+	required_device<sh7604_device> m_slave_cpu;
 	required_device<dac_word_interface> m_ldac;
 	required_device<dac_word_interface> m_rdac;
 	required_device<timer_device> m_scan_timer;

@@ -57,7 +57,7 @@ private:
 	double         m_oldbrt[2]{};
 
 	/* devices */
-	required_device<sh2_sh7604_device> m_maincpu;
+	required_device<sh7604_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device_array<palette_device, 2> m_palette;
