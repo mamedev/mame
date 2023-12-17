@@ -30399,6 +30399,9 @@ uforobot                        // (c) 2001 Nazionale Elettronica
 wcup                            // (c) 2001 Nazionale Elettronica
 wcup14                          // (c) 2001 Nazionale Elettronica
 
+@source:misc/jackhouse.cpp
+jackhous                        // (c) 1994 Chain Leisure Co., Ltd
+
 @source:misc/jackpool.cpp
 jackpool                        // (c) 1997 Electronic Projects
 
