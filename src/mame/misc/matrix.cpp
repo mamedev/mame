@@ -29,7 +29,7 @@
 #include "machine/mediagx_cs5530_bridge.h"
 #include "machine/mediagx_host.h"
 #include "machine/pci.h"
-//#include "machine/sis7001_usb.h"
+#include "machine/zfmicro_usb.h"
 //#include "video/rivatnt.h"
 
 #include "screen.h"
@@ -100,7 +100,7 @@ void matrix_state::matrix(machine_config &config)
 	// "pci:12.4" XpressVIDEO
 
 	// "pci:13.0" (different) 0x0e11a0f8 ZF Micro Chipset USB (Compaq OpenHCI)
-	//SIS7001_USB(config, "pci:13.0", 0, 2);
+	ZFMICRO_USB(config, "pci:13.0", 0);
 
 	// 2 PCI slots, 2 ISA slots
 	ISA16_SLOT(config, "isa1", 0, "pci:12.0:isabus", pc_isa16_cards, nullptr, false);
