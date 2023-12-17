@@ -123,6 +123,7 @@ private:
 	static FLAC__StreamDecoderWriteStatus write_callback_static(const FLAC__StreamDecoder *decoder, const ::FLAC__Frame *frame, const FLAC__int32 * const buffer[], void *client_data);
 	FLAC__StreamDecoderWriteStatus write_callback(const ::FLAC__Frame *frame, const FLAC__int32 * const buffer[]);
 	static void error_callback_static(const FLAC__StreamDecoder *decoder, FLAC__StreamDecoderErrorStatus status, void *client_data);
+	int16_t convert_to_int16(const ::FLAC__Frame *frame, FLAC__int32 sample);
 
 	// output state
 	FLAC__StreamDecoder *   m_decoder;              // actual decoder
