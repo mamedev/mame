@@ -725,7 +725,7 @@ void segaai_state::segaai(machine_config &config)
 	m_expslot->set_io_space(m_maincpu, AS_IO);
 
 	// Built-in cassette
-	CASSETTE(config, m_cassette);
+	CASSETTE(config, m_cassette).set_stereo();
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
 	m_cassette->set_interface("cass");
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.70);
