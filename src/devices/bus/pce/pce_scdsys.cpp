@@ -39,7 +39,7 @@ pce_cdsys3u_device::pce_cdsys3u_device(const machine_config &mconfig, const char
 {
 }
 
-pce_scdsys::pce_scdsys()
+pce_scdsys_shared::pce_scdsys_shared()
 	: m_ram(nullptr)
 	, m_region(false)
 {
@@ -62,7 +62,7 @@ void pce_cdsys3u_device::device_start()
 	m_scdsys.set_region(true);
 }
 
-void pce_scdsys::init(device_t &device)
+void pce_scdsys_shared::init(device_t &device)
 {
 	m_ram = make_unique_clear<uint8_t[]>(0x30000);
 
@@ -73,7 +73,7 @@ void pce_scdsys::init(device_t &device)
  mapper specific handlers
  -------------------------------------------------*/
 
-uint8_t pce_scdsys::register_r(offs_t offset)
+uint8_t pce_scdsys_shared::register_r(offs_t offset)
 {
 	switch (offset & 0x0f)
 	{

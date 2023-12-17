@@ -99,7 +99,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	pce_scdsys m_scdsys;
+	pce_scdsys_shared m_scdsys;
 
 	// reading
 	uint8_t register_r(offs_t offset) { return m_scdsys.register_r(offset); }

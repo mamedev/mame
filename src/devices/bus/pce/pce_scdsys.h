@@ -8,13 +8,13 @@
 #include "pce_slot.h"
 
 
-// ======================> pce_scdsys
+// ======================> pce_scdsys_shared
 
-class pce_scdsys
+class pce_scdsys_shared
 {
 public:
 	// construction/destruction
-	pce_scdsys();
+	pce_scdsys_shared();
 
 	// configuration
 	void set_region(bool region) { m_region = region; }
@@ -49,7 +49,7 @@ protected:
 	pce_cdsys3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// helper classes
-	pce_scdsys m_scdsys;
+	pce_scdsys_shared m_scdsys;
 
 	// reading
 	uint8_t register_r(offs_t offset) { return m_scdsys.register_r(offset); }
