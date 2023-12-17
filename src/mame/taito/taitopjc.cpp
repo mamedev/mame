@@ -9,10 +9,10 @@
    a separate driver.
 
    TODO:
-   - Inconsistent frame rate compared to pcb recordings; game has a tendency to freeze frame hiccup
-   - Analog inputs update at a slower rate (about every 8-10 frames instead of every frame); This issue
+   - Inconsistent frame rate compared to PCB recordings; game has a tendency to freeze frame hiccup
+   - Analog inputs update at a slower rate (about every 8-10 frames instead of every frame); this issue
      is also present in taitotz.cpp
-   - Rest of sound hardware isn't hooked up
+   - Rest of the sound hardware isn't hooked up
 
    PCB Information (incomplete!)
    ===============
