@@ -18,7 +18,7 @@
 
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(ZFMICRO_USB, zfmicro_usb_device, "sis7001_usb", "ZFMicro PCIUSB Host Controller")
+DEFINE_DEVICE_TYPE(ZFMICRO_USB, zfmicro_usb_device, "zfmicro_usb", "ZFMicro PCIUSB Host Controller")
 
 zfmicro_usb_device::zfmicro_usb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, ZFMICRO_USB, tag, owner, clock)
@@ -91,8 +91,10 @@ void zfmicro_usb_device::device_reset()
 {
 	pci_device::device_reset();
 
-	// TODO: unverified
 	command = 0x0000;
-	status = 0x0000;
+	// DEVSEL# medium timing
+	// Fast Back-to-Back Capable
+	status = 0x0280;
+	// unverified default, assume same as OpenHCI specs
 	m_HcFmInterval = 0x2edf;
 }
