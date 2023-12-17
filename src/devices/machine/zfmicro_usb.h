@@ -1,28 +1,17 @@
 // license: BSD-3-Clause
 // copyright-holders: Angelo Salese
 
-#ifndef MAME_MACHINE_SIS7001_USB_H
-#define MAME_MACHINE_SIS7001_USB_H
+#ifndef MAME_MACHINE_ZFMICRO_USB_H
+#define MAME_MACHINE_ZFMICRO_USB_H
 
 #pragma once
 
 #include "pci.h"
 
-class sis7001_usb_device : public pci_device
+class zfmicro_usb_device : public pci_device
 {
 public:
-	sis7001_usb_device(
-		const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
-		int num_ports
-	) : sis7001_usb_device(mconfig, tag, owner, clock)
-	{
-		// 0x0c0310 - Serial Bus Controller, USB, OpenHCI Host
-		// Assume no rev.
-		set_ids(0x10397001, 0x00, 0x0c0310, 0x00);
-		// TODO: should really read from a std::list interface
-		m_downstream_ports = num_ports;
-	}
-	sis7001_usb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	zfmicro_usb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static constexpr feature_type unemulated_features() { return feature::MEDIA; }
 
@@ -45,6 +34,6 @@ private:
 	u32 m_HcFmInterval = 0;
 };
 
-DECLARE_DEVICE_TYPE(SIS7001_USB, sis7001_usb_device)
+DECLARE_DEVICE_TYPE(ZFMICRO_USB, zfmicro_usb_device)
 
 #endif

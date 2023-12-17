@@ -17863,6 +17863,11 @@ feag                            //
 feag2100                        //
 feag2100a                       //
 fpres                           //
+fpresa                          //
+fpresb                          //
+fpresc                          //
+fpresd                          //
+fprese                          //
 fpresbu                         //
 fpresgla                        //
 
@@ -24505,7 +24510,6 @@ vendettaun                      // GX081 (c) 1991 (World)
 @source:konami/viper.cpp
 boxingm                         // 2001
 code1d                          // 2000
-code1da                         // 2000
 code1db                         // 2000
 gticlub2                        // 2000
 gticlub2ea                      // 2000
@@ -27335,6 +27339,7 @@ nbajamte3                       // (c) 1994 Midway (rev 3.0 3/04/94)
 nbajamte3a                      // (c) 1994 Midway (rev 3.0 2/26/94)
 nbajamte4                       // (c) 1994 Midway (rev 4.0 3/03/94)
 nbajamten                       // (c) 1995 Midway
+nbajamtep2                      // (c) 1993 Midway
 
 @source:midway/midvunit.cpp
 crusnusa                        // (c) 1994 Midway
@@ -30392,6 +30397,9 @@ pinups                          // (c) 200? Nazionale Elettronica
 uforobot                        // (c) 2001 Nazionale Elettronica
 wcup                            // (c) 2001 Nazionale Elettronica
 wcup14                          // (c) 2001 Nazionale Elettronica
+
+@source:misc/jackhouse.cpp
+jackhous                        // (c) 1994 Chain Leisure Co., Ltd
 
 @source:misc/jackpool.cpp
 jackpool                        // (c) 1997 Electronic Projects
@@ -34793,6 +34801,12 @@ sfortec1                        //
 nsnova
 supremo
 
+@source:novag/svip.cpp
+nsvip
+nsvipa
+nsvipb
+nsvipc
+
 @source:novation/basssta.cpp
 bassstr                         //
 sbasssta                        //
@@ -38483,6 +38497,13 @@ sstar28k
 tstar432
 tstar432a
 tstar432b
+
+@source:saitek/turbo16k.cpp
+compan3
+conquist
+t1850
+tmate
+turbo16k
 
 @source:samcoupe/samcoupe.cpp
 samcoupe                        // 1989 Sam Coupe

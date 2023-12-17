@@ -9,7 +9,6 @@
     TODO:
     * Decode barcode from the scan so it doesn't need to be in a software
       part feature and loose files can be supported.
-	* Determine correct barcode value to return when no card is inserted.
 
 *******************************************************************************/
 

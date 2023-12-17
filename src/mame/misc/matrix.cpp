@@ -1,24 +1,30 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders: Angelo Salese
 /*
-    'Matrix' slot machine or poker game (the bezel has poker cards) by unidentified manufacturer
-    Game title is taken from ROM labels and cabinet. Might be incomplete.
+'Matrix' slot machine or poker game (the bezel has poker cards) by unidentified manufacturer
+Game title is taken from ROM labels and cabinet. Might be incomplete.
 
-    Hardware consists of:
+TODO:
+- KBDC, not from super I/O;
+- Don't recognize an attached HDD, check default CMOS settings;
+- loops at PC=eda2d, reads the NMI vector;
+- game roms looks encrypted or bad, may require a missing boot device;
 
-    Motherboard (GXM-530D):
-    Cyrix MediaGX GXm-266GP 2.9V
-    Cyrix GXm Cx5530 with GCT bios
-    128MB RAM
-    SMC FDC37C931
-    5-dip bank
+Hardware consists of:
 
-    Daughter card (FLASH ROM SSD 374-525-627-33-78J54):
-    Lattice ispLSI 1032E 70LJ D980B06
-    Unpopulated spaces marked for: DS5002FP, PIC16C54, 93C56 EEPROM, a couple more unreadable
-    8-dip bank
-    6 ROMs
-    1 RAM
+Motherboard (GXM-530D): (ETA: BIOS boots as SuperTek ST-MGXm3HB, is 530 actually referring to SiS530? -AS)
+Cyrix MediaGX GXm-266GP 2.9V
+Cyrix GXm Cx5530 with GCT bios
+128MB RAM
+SMC FDC37C931
+5-dip bank
+
+Daughter card (FLASH ROM SSD 374-525-627-33-78J54):
+Lattice ispLSI 1032E 70LJ D980B06
+Unpopulated spaces marked for: DS5002FP, PIC16C54, 93C56 EEPROM, a couple more unreadable
+8-dip bank
+6 ROMs
+1 RAM
 */
 
 #include "emu.h"
@@ -27,8 +33,11 @@
 #include "cpu/i386/i386.h"
 #include "machine/mc146818.h"
 #include "machine/mediagx_cs5530_bridge.h"
+#include "machine/mediagx_cs5530_ide.h"
 #include "machine/mediagx_host.h"
 #include "machine/pci.h"
+#include "machine/zfmicro_usb.h"
+//#include "video/rivatnt.h"
 
 #include "screen.h"
 
@@ -67,38 +76,50 @@ void matrix_state::matrix(machine_config &config)
 	// basic machine hardware
 	MEDIAGX(config, m_maincpu, 233'000'000); // Cyrix MediaGX GXm-266GP
 	m_maincpu->set_addrmap(AS_PROGRAM, &matrix_state::main_map);
-	m_maincpu->set_irq_acknowledge_callback("pci:07.0:pic8259_master", FUNC(pic8259_device::inta_cb));
+	m_maincpu->set_irq_acknowledge_callback("pci:12.0:pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	// TODO: from FDC37C93x super I/O
 	// NOTE: it's not initialized at $3f0 - $370 but accessed anyway, wtf
 	DS1287(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->set_binary(true);
 	m_rtc->set_epoch(1980);
-	m_rtc->irq().set("pci:07.0", FUNC(mediagx_cs5530_bridge_device::pc_irq8n_w));
+	m_rtc->irq().set("pci:12.0", FUNC(mediagx_cs5530_bridge_device::pc_irq8n_w));
 
 	PCI_ROOT(config, "pci", 0);
 	MEDIAGX_HOST(config, "pci:00.0", 0, "maincpu", 128*1024*1024);
 	// TODO: no clue about the ID used for this, definitely tested
-	// Tries to initialize MediaGX F4 -> ISA -> PCI/AGP, failing in all cases
+	// Tries to initialize MediaGX F4 -> ISA -> PCI/AGP
+	// May actually be a ZFMicro PCI Bridge (0x10780400)?
 	PCI_BRIDGE(config, "pci:01.0", 0, 0x10780000, 0);
 	//RIVATNT(config, "pci:01.0:00.0", 0);
 
-	// TODO: unconfirmed PCI space
-	mediagx_cs5530_bridge_device &isa(MEDIAGX_CS5530_BRIDGE(config, "pci:07.0", 0, "maincpu"));
+	// "pci:12.0" or "pci:10.0" depending on pin H26 (readable in bridge thru PCI index $44)
+	mediagx_cs5530_bridge_device &isa(MEDIAGX_CS5530_BRIDGE(config, "pci:12.0", 0, "maincpu", "pci:12.2"));
 	isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
 	//isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
 	isa.rtcale().set([this](u8 data) { m_rtc->address_w(data); });
 	isa.rtccs_read().set([this]() { return m_rtc->data_r(); });
 	isa.rtccs_write().set([this](u8 data) { m_rtc->data_w(data); });
 
-	// TODO: unknown number of ISA slots
-	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	// "pci:12.1" SMI & ACPI
 
+	mediagx_cs5530_ide_device &ide(MEDIAGX_CS5530_IDE(config, "pci:12.2", 0, "maincpu"));
+	ide.irq_pri().set("pci:12.0", FUNC(mediagx_cs5530_bridge_device::pc_irq14_w));
+	ide.irq_sec().set("pci:12.0", FUNC(mediagx_cs5530_bridge_device::pc_irq15_w));
+
+	// "pci:12.3" XpressAUDIO
+	// "pci:12.4" XpressVIDEO
+
+	ZFMICRO_USB(config, "pci:13.0", 0);
+
+	// 2 PCI slots, 2 ISA slots
+	ISA16_SLOT(config, "isa1", 0, "pci:12.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa2", 0, "pci:12.0:isabus", pc_isa16_cards, nullptr, false);
 }
 
 
 ROM_START( matrix )
-	ROM_REGION32_LE(0x40000, "pci:07.0", 0)
+	ROM_REGION32_LE(0x40000, "pci:12.0", 0)
 	ROM_LOAD("d586_bios.bin", 0x00000, 0x40000, CRC(39fc093a) SHA1(3376bac4f0d6e729d5939e3078ecdf700464cba3) )
 
 	ROM_REGION(0x300000, "unsorted", 0) // encrypted?

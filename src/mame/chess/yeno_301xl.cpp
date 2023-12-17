@@ -19,7 +19,7 @@ Hardware notes:
 Yeno 309 XT is on the same PCB, and has the same MCU ROM.
 
 TODO:
-- if/when MAME supports an exit callback, hook up power-off IRQ to that
+- if/when MAME supports an exit callback, hook up power-off switch to that
 
 *******************************************************************************/
 

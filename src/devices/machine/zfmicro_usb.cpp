@@ -2,7 +2,7 @@
 // copyright-holders: Angelo Salese
 /**************************************************************************************************
 
-    SiS 7001 USB Host controller
+    ZFMicro USB Host controller
 
     TODO:
     - Stub interface, to be merged with pci-usb;
@@ -11,28 +11,35 @@
 **************************************************************************************************/
 
 #include "emu.h"
-#include "sis7001_usb.h"
+#include "zfmicro_usb.h"
 
 #define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_FUNC osd_printf_warning
 
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(SIS7001_USB, sis7001_usb_device, "sis7001_usb", "SiS 7001 USB Host Controller")
+DEFINE_DEVICE_TYPE(ZFMICRO_USB, zfmicro_usb_device, "zfmicro_usb", "ZFMicro PCIUSB Host Controller")
 
-sis7001_usb_device::sis7001_usb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, SIS7001_USB, tag, owner, clock)
+zfmicro_usb_device::zfmicro_usb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pci_device(mconfig, ZFMICRO_USB, tag, owner, clock)
 {
-
+	// Compaq vendor
+	set_ids(0x0e11a0f8, 0x00, 0x0c0310, 0x00);
+	// TODO: should really read from a std::list interface
+	m_downstream_ports = 2;
 }
 
-void sis7001_usb_device::config_map(address_map &map)
+void zfmicro_usb_device::config_map(address_map &map)
 {
 	pci_device::config_map(map);
-	// no vendor regs?
+//  map(0x40, 0x43) ASIC Test Mode Enable
+//  map(0x44, 0x44) ASIC Operational Mode Enable
+//  ---- ---x Data Buffer Region 16
+//  ---- ---1 16 bytes data buffer
+//  ---- ---0 32 bytes
 }
 
-void sis7001_usb_device::map(address_map &map)
+void zfmicro_usb_device::map(address_map &map)
 {
 	// HcRevision: operational mode
 	// 1 ---- ---- Legacy PS/2 present
@@ -49,45 +56,45 @@ void sis7001_usb_device::map(address_map &map)
 	);
 	// ...
 	// HcRhDescriptorA
-	// 0000 0001 ---- ---- ---- ---- ---- ---- POTPGT 2 ms
+	// 0000 0001 ---- ---- ---- ---- ---- ---- POTPGT (unknown for this, assume 2 ms)
 	// ---- ---- xxxx xxxx xxxx x-xx ---- ---- (writeable bits by host controller driver)
 	// ---- ---- ---- ---- ---- -0-- ---- ---- DT DeviceType (0) not a compound device
 	// ---- ---- ---- ---- ---- ---- xxxx xxxx NDP NumberDownstreamPorts (15 max)
 	map(0x048, 0x04b).lr32(NAME([this]() { return 0x01000000 | m_downstream_ports; }));
 	// ...
-//  map(0x05c, 0x05f) HcRhPortStatus[3] last item for function 2 (3 ports), missing on function 3 (2)
 
 	// legacy support mode (8-bit each)
-//  map(0x100, 0x100) [Hce]Control, bit 0 enables emulation mode
-//  map(0x104, 0x104) [Hce]Input
-//  map(0x108, 0x108) [Hce]Output
-//  map(0x10c, 0x10f) [Hce]Status
+//  map(0x100, 0x100) HceControl, bit 0 enables emulation mode
+//  map(0x104, 0x104) HceInput
+//  map(0x108, 0x108) HceOutput
+//  map(0x10c, 0x10f) HceStatus
 }
 
-void sis7001_usb_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+void zfmicro_usb_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
 	// TODO: overrides I/O ports $0060-$0064 (emulation mode)
 }
 
-void sis7001_usb_device::device_start()
+void zfmicro_usb_device::device_start()
 {
 	pci_device::device_start();
 
-	// Docs don't mention it, should be 4KB
-	add_map(4096, M_MEM, FUNC(sis7001_usb_device::map));
+	add_map(4096, M_MEM, FUNC(zfmicro_usb_device::map));
 
-	// INTD#
-	intr_pin = 4;
+	// INTA#
+	intr_pin = 1;
 }
 
 
-void sis7001_usb_device::device_reset()
+void zfmicro_usb_device::device_reset()
 {
 	pci_device::device_reset();
 
-	// TODO: unverified
 	command = 0x0000;
-	status = 0x0000;
+	// DEVSEL# medium timing
+	// Fast Back-to-Back Capable
+	status = 0x0280;
+	// unverified default, assume same as OpenHCI specs
 	m_HcFmInterval = 0x2edf;
 }

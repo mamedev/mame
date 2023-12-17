@@ -2,9 +2,14 @@
 // copyright-holders:hap
 /*******************************************************************************
 
-La Régence, French chess computer by "France Double R". German distribution
-by Sandy Electronic, who sub-titled it TSB 4 (Turniersensorbrett), the EPROM
-contents is the same. There is no English version.
+La Régence
+
+NOTE: The hardware triggers an NMI on power-off (or power-failure). If this isn't
+done, NVRAM fails at next power-on.
+
+French chess computer by "France Double R". German distribution by Sandy Electronic,
+who sub-titled it TSB 4 (Turniersensorbrett), the EPROM contents is the same.
+There is no English version.
 
 the chess engine is Richard Lang's Cyrus. This was from when he was working for
 Intelligent Software, before he got hired by Hegener + Glaser.
@@ -16,11 +21,8 @@ Hardware notes:
 - 2KB battery-backed RAM (MSM5128-15RS), 3 sockets, only middle one used
 - TTL, piezo, 8*8+4 LEDs, magnetic sensors
 
-NOTE: The hardware triggers an NMI on power-off (or power-failure). If this isn't
-done, NVRAM fails at next power-on.
-
 TODO:
-- if/when MAME supports an exit callback, hook up power-off NMI to that
+- if/when MAME supports an exit callback, hook up power-off switch to that
 
 *******************************************************************************/
 

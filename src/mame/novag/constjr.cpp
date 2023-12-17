@@ -21,7 +21,7 @@ Hardware notes:
 - 8*8 chessboard buttons, 16+4 leds, piezo
 
 TODO:
-- if/when MAME supports an exit callback, hook up power-off NMI to that
+- if/when MAME supports an exit callback, hook up power-off switch to that
 
 BATANB:
 - slower chessboard button response when a piece moves 1 square vertically between

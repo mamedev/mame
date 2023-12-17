@@ -795,14 +795,14 @@ void m6801_cpu_device::set_rmcr(uint8_t data)
 	{
 	case 0:
 		LOGSER("SCI: Using external serial clock: false\n");
-		m_sci_timer->enable(false);
+		m_sci_timer->adjust(attotime::never);
 		m_use_ext_serclock = false;
 		break;
 
 	case 3: // external clock
 		LOGSER("SCI: Using external serial clock: true\n");
 		m_use_ext_serclock = true;
-		m_sci_timer->enable(false);
+		m_sci_timer->adjust(attotime::never);
 		break;
 
 	case 1:
@@ -831,7 +831,7 @@ void hd6301x_cpu_device::set_rmcr(uint8_t data)
 	case 7: // external clock
 		LOGSER("SCI: Using external serial clock: true\n");
 		m_use_ext_serclock = true;
-		m_sci_timer->enable(false);
+		m_sci_timer->adjust(attotime::never);
 		break;
 
 	case 1:
@@ -842,7 +842,7 @@ void hd6301x_cpu_device::set_rmcr(uint8_t data)
 		if (BIT(m_rmcr, 5))
 		{
 			LOGSER("SCI: Using Timer 2 clock\n");
-			m_sci_timer->enable(false);
+			m_sci_timer->adjust(attotime::never);
 		}
 		else
 		{

@@ -316,6 +316,9 @@ flac_decoder::flac_decoder()
 flac_decoder::flac_decoder(const void *buffer, uint32_t length, const void *buffer2, uint32_t length2)
 	: m_decoder(FLAC__stream_decoder_new()),
 		m_file(nullptr),
+		m_sample_rate(0),
+		m_channels(0),
+		m_bits_per_sample(0),
 		m_compressed_offset(0),
 		m_compressed_start(reinterpret_cast<const FLAC__byte *>(buffer)),
 		m_compressed_length(length),
@@ -333,6 +336,9 @@ flac_decoder::flac_decoder(const void *buffer, uint32_t length, const void *buff
 flac_decoder::flac_decoder(util::read_stream &file)
 	: m_decoder(FLAC__stream_decoder_new()),
 		m_file(&file),
+		m_sample_rate(0),
+		m_channels(0),
+		m_bits_per_sample(0),
 		m_compressed_offset(0),
 		m_compressed_start(nullptr),
 		m_compressed_length(0),

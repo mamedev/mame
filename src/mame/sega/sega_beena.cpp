@@ -2119,7 +2119,7 @@ uint32_t tvochken_state::io_expansion_r()
 
 void tvochken_state::scan_card(int state)
 {
-	if (state && (m_card_state == IDLE)) {
+	if (m_card->exists() && state && (m_card_state == IDLE)) {
 		m_card_data = m_card->barcode();
 		m_card_hold_i = 10;
 		m_card_state = START_WRITE_DATA;
