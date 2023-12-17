@@ -43,7 +43,9 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_videoram(*this, "videoram%u", 0U),
+		m_videoram(*this, "new_videoram%u", 0U, 0x0800U, ENDIANNESS_LITTLE),
+		m_bgrom(*this, "bg_tiles"),
+		m_gfx2rom(*this, "gfx2"),
 		m_palette(*this, "palette"),
 		m_hopper(*this, "hopper"),
 		m_lamps(*this, "lamp%u", 0U)
@@ -53,7 +55,7 @@ public:
 	void jackhouse(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override { m_lamps.resolve(); };
 	virtual void video_start() override;
 
 private:
@@ -63,21 +65,16 @@ private:
 	void ramdac_map(address_map &map);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	template<u8 N> TILE_GET_INFO_MEMBER(get_tile_info);
 
-	tilemap_t *m_fg_tilemap = nullptr;
-	tilemap_t *m_bg_tilemap = nullptr;
-	
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	
 	void videoram_w(u16 dst, u16 tile_code, u8 tile_color, u8 sel);
-	
+
 	// Video processor related stuff
 	void video_proc_w(offs_t offs, u8 data);
 	void vp_exec(u8 data);
-	void vp_playfield(u8 data); 
+	void vp_playfield(u8 data);
 
-	// from IO ports	
+	// from IO ports
 	void ram_sel(u8 data);
 	void butt_lamps_w(u8 data);
 	void outports_w(u8 data);
@@ -85,15 +82,20 @@ private:
 	// Devices
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_device_array<ram_device, 6> m_videoram;
+	memory_share_array_creator<u8, 6> m_videoram;
+
+	required_memory_region m_bgrom;
+	required_memory_region m_gfx2rom;
 	required_device<palette_device> m_palette;
 	required_device<hopper_device> m_hopper;
 	output_finder<8> m_lamps;
-	
-	offs_t vr_addr[6] = {0, 0, 0, 0, 0, 0}; 
+
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
+
+	offs_t vr_addr[6] = {0, 0, 0, 0, 0, 0};
 	offs_t vp_vram_col[6] = {0, 0, 0, 0, 0, 0};
 	offs_t vp_vram_row[6] = {0, 0, 0, 0, 0, 0};
-	u8 *m_ram_ptr[6] = {0, 0, 0, 0, 0, 0};
 	u8 vp_buff_addr = 0;
 	u8 vp_buff[16];
 	u8 vp_cmd_mode = 0;
@@ -108,16 +110,14 @@ private:
 	u8 vp_row_end = 0;
 	u8 m_ram_selector;
 	u8 m_cont = 0;
-
 };
 
 #define MASTER_CLOCK    XTAL(6'000'000)
 
 
-
-/*************************
-* Memory map information *
-*************************/
+/***************************************
+*        Memory map information        *
+***************************************/
 
 void jackhouse_state::program_map(address_map &map)
 {
@@ -154,17 +154,6 @@ void jackhouse_state::ramdac_map(address_map &map)
 	map(0x000, 0x2ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
 }
 
-
-void jackhouse_state::machine_start()
-{
-	for(u8 i = 0; i < 6; i++)
-	{
-		m_ram_ptr[i] =  m_videoram[i]->pointer();
-	}
-	m_lamps.resolve();
-}
-
-
 void jackhouse_state::ram_sel(u8 data)
 {
 	m_ram_selector = data;
@@ -178,9 +167,10 @@ void jackhouse_state::ram_sel(u8 data)
 
 void jackhouse_state::videoram_w(u16 dst, u16 tile_code, u8 tile_color, u8 sel)
 {
-	m_ram_ptr[sel][dst] = tile_code & 0xff;
-	m_ram_ptr[sel + 1][dst] = (tile_code >> 8) & 0xff;
-	m_ram_ptr[sel + 2][dst] = tile_color;
+	m_videoram[sel][dst] = tile_code & 0xff;
+	m_videoram[sel + 1][dst] = (tile_code >> 8) & 0xff;
+	m_videoram[sel + 2][dst] = tile_color;
+
 	if (sel == 0)
 		m_fg_tilemap->mark_tile_dirty(dst);
 	else
@@ -189,15 +179,15 @@ void jackhouse_state::videoram_w(u16 dst, u16 tile_code, u8 tile_color, u8 sel)
 
 void jackhouse_state::vp_playfield(u8 data)
 {
-	uint8_t *ROM = memregion("bg_tiles")->base(); 
+	u8 *ROM = m_bgrom->base();
 	u16 tile_index = (((data & 0x03) - 1) * 28 * 64) * 2;
-	for (u8 i = 2; i < 2 + 0x1c; i++)  
+	for (u8 i = 2; i < 2 + 0x1c; i++)
 	{
 		for (u8 j = 0; j < 0x40; j++)
 		{
 			u16 dst = (i * 0x40 + j) & 0x7ff;
 			u16 tile_code = (ROM[tile_index] | ( ROM[tile_index + 1] << 8));
-			//logerror("vp: BG: tile_index:%04x - tile_code:%04x\n", tile_index, tile_code); 
+			//logerror("vp: BG: tile_index:%04x - tile_code:%04x\n", tile_index, tile_code);
 			tile_index += 2;
 			videoram_w(dst, tile_code, data, 3);
 		}
@@ -227,8 +217,7 @@ void jackhouse_state::vp_exec(u8 data)
 		// mode bit 2 - gfx data from vp tables(ports 0f,10)
 		case 0x04:
 		{
-			uint8_t *ROM = memregion("gfx2")->base();
-
+			u8 *ROM = m_gfx2rom->base();
 			u32 tile_index = ( vp_gfxA_src_low | (vp_gfxA_src_high << 8)) * 4;
 			for (u8 i = vp_vram_dest_row; i < vp_vram_dest_row + vp_row_end + 1; i++)
 			{
@@ -236,25 +225,25 @@ void jackhouse_state::vp_exec(u8 data)
 				{
 					u16 dst = (i * 0x40 + j) & 0x7ff;
 					u16 tile_code = ROM[tile_index] | (ROM[tile_index+1] << 8);
-					//logerror("vp: FG:tile_index:%04x - tile_code:%04x\n", tile_index, tile_code); 
+					//logerror("vp: FG:tile_index:%04x - tile_code:%04x\n", tile_index, tile_code);
 					tile_index += 4;
 					videoram_w(dst, tile_code, vp_color_dst, 0);
 				}
 			}
 			break;
 		}
-		// mode bit 3 - Unknown 
+		// mode bit 3 - Unknown
 		case 0x08:
 			break;
 		default:
-			logerror("vp: Illegal mode:%02x dst\n", vp_cmd_mode); 
+			logerror("vp: Illegal mode:%02x dst\n", vp_cmd_mode);
 	}
 }
 
 void jackhouse_state::video_proc_w(offs_t offs, u8 data)
 {
 	// logerror("video_proc_w :offs:%04x data:%02x\n", offs, data);
-	switch (offs)
+	switch ( offs )
 	{
 		case 0x00:  // vram address register low (w/ autoincrement)
 		{
@@ -280,15 +269,14 @@ void jackhouse_state::video_proc_w(offs_t offs, u8 data)
 		case 0x07:
 		{
 			// video ram write: main cpu sends data direct to video ram
-			m_ram_ptr[offs - 2][vr_addr[offs - 2]] = data;
+			m_videoram[offs - 2][vr_addr[offs - 2]] = data;
 			m_fg_tilemap->mark_tile_dirty(vr_addr[offs - 2]);
-			// logerror("%s: VideoRam (%02x) Address:%02x - Write: Data = %04x\n", machine().describe_context(), offs - 2, vr_addr[offs - 2], m_ram_ptr[offs - 2][vr_addr[offs - 2]] );
+			// logerror("%s: VideoRam (%02x) Address:%02x - Write: Data = %04x\n", machine().describe_context(), offs - 2, vr_addr[offs - 2], m_videoram[offs - 2][vr_addr[offs - 2]] );
 			vr_addr[offs - 2] += 1;  // autoincrement
 			break;
 		}
-
 		case 0x08:
-		{ 
+		{
 			// logerror("%s:vgp: Offs:0x08: Unknown data:%02x - cont:%02x\n", machine().describe_context(), data, m_cont);
 			m_cont++;
 			if (m_cont == 0x3f)
@@ -344,7 +332,7 @@ void jackhouse_state::video_proc_w(offs_t offs, u8 data)
 		}
 		case 0x17:
 		{
-			// logerror("vgp: Offs:0x17: row_end: data:%02x\n", data); 
+			// logerror("vgp: Offs:0x17: row_end: data:%02x\n", data);
 			vp_col_end = data;
 			break;
 		}
@@ -354,7 +342,7 @@ void jackhouse_state::video_proc_w(offs_t offs, u8 data)
 			// logerror("vgp: Offs:0x18: col_end                  data:%02x\n", vp_col_end);
 			vp_exec(data);
 			break;
-		} 
+		}
 		case 0x19:
 		{
 			vp_buff_addr = data & 0x0f;
@@ -381,28 +369,22 @@ void jackhouse_state::video_proc_w(offs_t offs, u8 data)
 }
 
 
-TILE_GET_INFO_MEMBER(jackhouse_state::get_fg_tile_info)
+template<u8 N>
+TILE_GET_INFO_MEMBER(jackhouse_state::get_tile_info)
 {
-// ram 0: tile code low | ram 1: tile code hi | ram 2: color
+// ram 0/3: tile code low | ram 1/4: tile code hi | ram 2/5: color
+	u8 sel = N * 3;
 	int offs = tile_index;
-	int color = m_ram_ptr[2][offs];
-	int code =  m_ram_ptr[0][offs] | (m_ram_ptr[1][offs] << 8);
-	tileinfo.set(0, code, color, 0);
-}
+	int color = m_videoram[sel + 2][offs];
+	int code =  m_videoram[sel][offs] | (m_videoram[sel + 1][offs] << 8);
 
-TILE_GET_INFO_MEMBER(jackhouse_state::get_bg_tile_info)
-{
-// ram 3: tile code low | ram 4: tile code hi | ram 5: color
-	int offs = tile_index;
-	int color = m_ram_ptr[5][offs];
-	int code =  m_ram_ptr[3][offs] | (m_ram_ptr[4][offs] << 8);
-	tileinfo.set(1, code, color, 0);
+	tileinfo.set(N, code, color, 0);
 }
 
 void jackhouse_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(jackhouse_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(jackhouse_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(jackhouse_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(jackhouse_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
@@ -413,6 +395,7 @@ uint32_t jackhouse_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
+
 
 /***************************************
 *           Graphics Layouts           *
@@ -446,13 +429,13 @@ GFXDECODE_END
 
 void jackhouse_state::butt_lamps_w(u8 data)
 {
-/* Port 0x90 - Lamps 
+/* Port 0x90 - Lamps
 bit 0 - lamp0 = Bet1/Big
 bit 1 - lamp1 = Double-Up
 bit 2 - lamp2 = Take/Hit
 bit 3 - lamp3 = Bet3
 bit 4 - lamp4 = Start/Stand
-bit 5 -	lamp5 = Bet2/Small/Split
+bit 5 - lamp5 = Bet2/Small/Split
 */
 	for (u8 i = 0; i < 8; i++)
 		m_lamps[i] = BIT(data, i);
@@ -466,7 +449,7 @@ void jackhouse_state::outports_w(u8 data)
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 4));  // Coin 2
 	machine().bookkeeping().coin_counter_w(2, BIT(data, 5));  // Remote
 	machine().bookkeeping().coin_counter_w(3, BIT(data, 6));  // Coin 3
-	machine().bookkeeping().coin_counter_w(4, BIT(data, 0));  // Hand Paid 
+	machine().bookkeeping().coin_counter_w(4, BIT(data, 0));  // Hand Paid
 	machine().bookkeeping().coin_counter_w(5, BIT(data, 2));  // Hopper Coin Out
 
 	m_hopper->motor_w(BIT(data, 7));
@@ -495,7 +478,7 @@ static INPUT_PORTS_START( jackhouse )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("Coin A") PORT_IMPULSE(1)    // coin
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("Coin B") PORT_IMPULSE(1)    // coin
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN ) PORT_NAME("Remote")             // remote credits
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("Coin C") PORT_IMPULSE(1)    // coin 
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("Coin C") PORT_IMPULSE(1)    // coin
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-1") PORT_CODE(KEYCODE_J)              // unknown
@@ -518,7 +501,7 @@ static INPUT_PORTS_START( jackhouse )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME(0x07, 0x07, "Main Chance Rate")	PORT_DIPLOCATION("DSW1:1,2,3")
+	PORT_DIPNAME(0x07, 0x07, "Main Chance Rate")    PORT_DIPLOCATION("DSW1:1,2,3")
 	PORT_DIPSETTING(0x00, "84")
 	PORT_DIPSETTING(0x01, "86")
 	PORT_DIPSETTING(0x02, "88")
@@ -527,22 +510,22 @@ static INPUT_PORTS_START( jackhouse )
 	PORT_DIPSETTING(0x05, "94")
 	PORT_DIPSETTING(0x06, "96")
 	PORT_DIPSETTING(0x07, "98")
-	PORT_DIPNAME(0x18, 0x18, "Credit/Coin")			PORT_DIPLOCATION("DSW1:4,5")
+	PORT_DIPNAME(0x18, 0x18, "Credit/Coin")         PORT_DIPLOCATION("DSW1:4,5")
 	PORT_DIPSETTING(0x18, "1")
 	PORT_DIPSETTING(0x10, "2")
 	PORT_DIPSETTING(0x08, "5")
 	PORT_DIPSETTING(0x00, "10")
-	PORT_DIPNAME(0x60, 0x60, "Credit/Keyin")		PORT_DIPLOCATION("DSW1:6,7")
+	PORT_DIPNAME(0x60, 0x60, "Credit/Keyin")        PORT_DIPLOCATION("DSW1:6,7")
 	PORT_DIPSETTING(0x60, "100")
 	PORT_DIPSETTING(0x40, "200")
 	PORT_DIPSETTING(0x20, "500")
 	PORT_DIPSETTING(0x00, "1000")
-	PORT_DIPNAME(0x80, 0x80, DEF_STR(Unknown))		PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPNAME(0x80, 0x80, DEF_STR(Unknown))      PORT_DIPLOCATION("DSW1:8")
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_DIPSETTING(0x80, DEF_STR(Off))
 
 	PORT_START("DSW2")
-	PORT_DIPNAME(0x07, 0x07, "D-Up Chance Rate")	PORT_DIPLOCATION("DSW2:1,2,3")
+	PORT_DIPNAME(0x07, 0x07, "D-Up Chance Rate")    PORT_DIPLOCATION("DSW2:1,2,3")
 	PORT_DIPSETTING(0x00, "84")
 	PORT_DIPSETTING(0x01, "86")
 	PORT_DIPSETTING(0x02, "88")
@@ -551,7 +534,7 @@ static INPUT_PORTS_START( jackhouse )
 	PORT_DIPSETTING(0x05, "94")
 	PORT_DIPSETTING(0x06, "96")
 	PORT_DIPSETTING(0x07, "98")
-	PORT_DIPNAME(0x38, 0x38, "Bet Min/Max")			PORT_DIPLOCATION("DSW2:4,5,6")
+	PORT_DIPNAME(0x38, 0x38, "Bet Min/Max")         PORT_DIPLOCATION("DSW2:4,5,6")
 	PORT_DIPSETTING(0x38, "Min 02 - Max 10")
 	PORT_DIPSETTING(0x30, "Min 02 - Max 20")
 	PORT_DIPSETTING(0x28, "Min 05 - Max 20")
@@ -560,17 +543,17 @@ static INPUT_PORTS_START( jackhouse )
 	PORT_DIPSETTING(0x10, "Min 10 - Max 100")
 	PORT_DIPSETTING(0x08, "Min 20 - Max 50")
 	PORT_DIPSETTING(0x00, "Min 20 - Max 100")
-	PORT_DIPNAME(0xc0, 0xc0, "Decks")				PORT_DIPLOCATION("DSW2:7,8")
+	PORT_DIPNAME(0xc0, 0xc0, "Decks")               PORT_DIPLOCATION("DSW2:7,8")
 	PORT_DIPSETTING(0x00, "6")
 	PORT_DIPSETTING(0x40, "5")
 	PORT_DIPSETTING(0x80, "4")
 	PORT_DIPSETTING(0xc0, "3")
 
 	PORT_START("DSW3")
-	PORT_DIPNAME(0x01, 0x01, "Freeze")				PORT_DIPLOCATION("DSW3:1")
+	PORT_DIPNAME(0x01, 0x01, "Freeze")              PORT_DIPLOCATION("DSW3:1")
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_DIPSETTING(0x01, DEF_STR(Off))
-	PORT_DIPNAME(0x0e, 0x0e, "Limit Over")			PORT_DIPLOCATION("DSW3:2,3,4")
+	PORT_DIPNAME(0x0e, 0x0e, "Limit Over")          PORT_DIPLOCATION("DSW3:2,3,4")
 	PORT_DIPSETTING(0x0e, "5000")
 	PORT_DIPSETTING(0x0c, "10000")
 	PORT_DIPSETTING(0x0a, "15000")
@@ -579,68 +562,68 @@ static INPUT_PORTS_START( jackhouse )
 	PORT_DIPSETTING(0x04, "40000")
 	PORT_DIPSETTING(0x02, "50000")
 	PORT_DIPSETTING(0x00, "99999")
-	PORT_DIPNAME(0x10, 0x10, "Credit/Keyout")		PORT_DIPLOCATION("DSW3:5")
+	PORT_DIPNAME(0x10, 0x10, "Credit/Keyout")       PORT_DIPLOCATION("DSW3:5")
 	PORT_DIPSETTING(0x00, "100")
 	PORT_DIPSETTING(0x10, "1")
-	PORT_DIPNAME(0x20, 0x20, "Double Up")			PORT_DIPLOCATION("DSW3:6")
+	PORT_DIPNAME(0x20, 0x20, "Double Up")           PORT_DIPLOCATION("DSW3:6")
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x20, DEF_STR(On))
-	PORT_DIPNAME(0x40, 0x40, DEF_STR(Unknown))		PORT_DIPLOCATION("DSW3:7")
+	PORT_DIPNAME(0x40, 0x40, DEF_STR(Unknown))      PORT_DIPLOCATION("DSW3:7")
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_DIPSETTING(0x40, DEF_STR(Off))
-	PORT_DIPNAME(0x80, 0x80, DEF_STR(Unknown))		PORT_DIPLOCATION("DSW3:8")
+	PORT_DIPNAME(0x80, 0x80, DEF_STR(Unknown))      PORT_DIPLOCATION("DSW3:8")
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_DIPSETTING(0x80, DEF_STR(Off))
 
 	PORT_START("DSW4")
-	PORT_DIPNAME(0x01, 0x01, DEF_STR(Unknown))		PORT_DIPLOCATION("DSW4:1")
+	PORT_DIPNAME(0x01, 0x01, DEF_STR(Unknown))      PORT_DIPLOCATION("DSW4:1")
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_DIPSETTING(0x01, DEF_STR(Off))
-	PORT_DIPNAME(0x02, 0x02, DEF_STR(Unknown))		PORT_DIPLOCATION("DSW4:2")
+	PORT_DIPNAME(0x02, 0x02, DEF_STR(Unknown))      PORT_DIPLOCATION("DSW4:2")
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_DIPSETTING(0x02, DEF_STR(Off))
-	PORT_DIPNAME(0x04, 0x04, DEF_STR(Unknown))		PORT_DIPLOCATION("DSW4:3")
+	PORT_DIPNAME(0x04, 0x04, DEF_STR(Unknown))      PORT_DIPLOCATION("DSW4:3")
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_DIPSETTING(0x04, DEF_STR(Off))
-	PORT_DIPNAME(0x08, 0x08, DEF_STR(Unknown))		PORT_DIPLOCATION("DSW4:4")
+	PORT_DIPNAME(0x08, 0x08, DEF_STR(Unknown))      PORT_DIPLOCATION("DSW4:4")
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_DIPSETTING(0x08, DEF_STR(Off))
-	PORT_DIPNAME(0x10, 0x10, DEF_STR(Unknown))		PORT_DIPLOCATION("DSW4:5")
+	PORT_DIPNAME(0x10, 0x10, DEF_STR(Unknown))      PORT_DIPLOCATION("DSW4:5")
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_DIPSETTING(0x10, DEF_STR(Off))
-	PORT_DIPNAME(0x20, 0x20, DEF_STR(Unknown))		PORT_DIPLOCATION("DSW4:6")
+	PORT_DIPNAME(0x20, 0x20, DEF_STR(Unknown))      PORT_DIPLOCATION("DSW4:6")
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_DIPSETTING(0x20, DEF_STR(Off))
-	PORT_DIPNAME(0x40, 0x40, DEF_STR(Unknown))		PORT_DIPLOCATION("DSW4:7")
+	PORT_DIPNAME(0x40, 0x40, DEF_STR(Unknown))      PORT_DIPLOCATION("DSW4:7")
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_DIPSETTING(0x40, DEF_STR(Off))
-	PORT_DIPNAME(0x80, 0x80, DEF_STR(Unknown))		PORT_DIPLOCATION("DSW4:8")
+	PORT_DIPNAME(0x80, 0x80, DEF_STR(Unknown))      PORT_DIPLOCATION("DSW4:8")
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_DIPSETTING(0x80, DEF_STR(Off))
 
 	PORT_START("DSW5")
-	PORT_DIPNAME(0x01, 0x01, DEF_STR(Unknown))		PORT_DIPLOCATION("DSW5:1")
+	PORT_DIPNAME(0x01, 0x01, DEF_STR(Unknown))      PORT_DIPLOCATION("DSW5:1")
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_DIPSETTING(0x01, DEF_STR(Off))
-	PORT_DIPNAME(0x02, 0x02, DEF_STR(Unknown))		PORT_DIPLOCATION("DSW5:2")
+	PORT_DIPNAME(0x02, 0x02, DEF_STR(Unknown))      PORT_DIPLOCATION("DSW5:2")
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_DIPSETTING(0x02, DEF_STR(Off))
-	PORT_DIPNAME(0x04, 0x04, DEF_STR(Unknown))		PORT_DIPLOCATION("DSW5:3")
+	PORT_DIPNAME(0x04, 0x04, DEF_STR(Unknown))      PORT_DIPLOCATION("DSW5:3")
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_DIPSETTING(0x04, DEF_STR(Off))
-	PORT_DIPNAME(0x08, 0x08, DEF_STR(Unknown))		PORT_DIPLOCATION("DSW5:4")
+	PORT_DIPNAME(0x08, 0x08, DEF_STR(Unknown))      PORT_DIPLOCATION("DSW5:4")
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_DIPSETTING(0x08, DEF_STR(Off))
-	PORT_DIPNAME(0x10, 0x10, DEF_STR(Unknown))		PORT_DIPLOCATION("DSW5:5")
+	PORT_DIPNAME(0x10, 0x10, DEF_STR(Unknown))      PORT_DIPLOCATION("DSW5:5")
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_DIPSETTING(0x10, DEF_STR(Off))
-	PORT_DIPNAME(0x20, 0x20, DEF_STR(Unknown))		PORT_DIPLOCATION("DSW5:6")
+	PORT_DIPNAME(0x20, 0x20, DEF_STR(Unknown))      PORT_DIPLOCATION("DSW5:6")
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_DIPSETTING(0x20, DEF_STR(Off))
-	PORT_DIPNAME(0x40, 0x40, DEF_STR(Unknown))		PORT_DIPLOCATION("DSW5:7")
+	PORT_DIPNAME(0x40, 0x40, DEF_STR(Unknown))      PORT_DIPLOCATION("DSW5:7")
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_DIPSETTING(0x40, DEF_STR(Off))
-	PORT_DIPNAME(0x80, 0x80, DEF_STR(Unknown))		PORT_DIPLOCATION("DSW5:8")
+	PORT_DIPNAME(0x80, 0x80, DEF_STR(Unknown))      PORT_DIPLOCATION("DSW5:8")
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_DIPSETTING(0x80, DEF_STR(Off))
 
@@ -660,13 +643,6 @@ void jackhouse_state::jackhouse(machine_config &config)
 	m_maincpu->set_periodic_int(FUNC(jackhouse_state::irq0_line_hold), attotime::from_hz(60));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-
-	RAM(config, m_videoram[0]).set_default_size("2K").set_default_value(0);
-	RAM(config, m_videoram[1]).set_default_size("2K").set_default_value(0);
-	RAM(config, m_videoram[2]).set_default_size("2K").set_default_value(0);
-	RAM(config, m_videoram[3]).set_default_size("2K").set_default_value(0);
-	RAM(config, m_videoram[4]).set_default_size("2K").set_default_value(0);
-	RAM(config, m_videoram[5]).set_default_size("2K").set_default_value(0);
 
 	i8255_device &ppi0(I8255(config, "ppi8255_0"));
 	ppi0.in_pa_callback().set_ioport("IN0");
@@ -702,7 +678,6 @@ void jackhouse_state::jackhouse(machine_config &config)
 	aysnd.port_a_read_callback().set_ioport("DSW2");
 	aysnd.port_b_read_callback().set_ioport("DSW1");
 	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.85);
-
 }
 
 
@@ -720,7 +695,7 @@ ROM_START( jackhous )
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
 	ROM_LOAD( "jack_3.010", 0x00000, 0x20000, CRC(b4c0c053) SHA1(089d684903fa61152ed026bca7921a3a0ea76122) )
-	
+
 	ROM_REGION( 0x04000, "bg_tiles", 0 )
 	ROM_LOAD("bg_tiles.bin", 0x00000, 0x04000, BAD_DUMP CRC(91437a4d) SHA1(543cac1a3959d5e44a54164083fe5c99af7f484e) )
 ROM_END
