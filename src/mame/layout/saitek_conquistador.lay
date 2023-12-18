@@ -6,6 +6,8 @@ license:CC0-1.0
 
 <!-- define elements -->
 
+	<element name="blackb"><rect><color red="0" green="0" blue="0" /></rect></element>
+
 	<element name="led" defstate="0">
 		<rect state="0"><color red="0.014" green="0.14" blue="0.02" /></rect>
 		<rect state="1"><color red="0.1" green="1.0" blue="0.15" /></rect>
@@ -54,7 +56,7 @@ license:CC0-1.0
 	<element name="text_l6b"><text string="AUTO" align="1"></text></element>
 	<element name="text_l7"><text string="COACH" align="1"></text></element>
 	<element name="text_l8"><text string="INFO" align="1"></text></element>
-	<element name="text_l9"><text string="HOUR IN PROGRESS" align="1"></text></element>
+	<element name="text_l9"><text string="HOUR IN PROGRESS" align="2"></text></element>
 
 	<element name="text_b1"><text string="GO"></text></element>
 	<element name="text_b2"><text string="STOP"></text></element>
@@ -430,28 +432,33 @@ license:CC0-1.0
 		<rect state="0"><color red="0.49412" green="0.51765" blue="0.51765" /></rect>
 	</element>
 
-	<group name="lcd1">
+	<group name="lcd">
 		<element ref="lcd_bg"><bounds x="31.75" y="90" width="21" height="8" /></element>
 
-		<element name="ldigit0.3" ref="digit"><bounds x="32.75" y="91" width="4" height="6" /></element>
-		<element name="ldigit0.2" ref="digit"><bounds x="37.75" y="91" width="4" height="6" /></element>
-		<element name="ldigit0.1" ref="digit"><bounds x="42.75" y="91" width="4" height="6" /></element>
-		<element name="ldigit0.0" ref="digit"><bounds x="47.75" y="91" width="4" height="6" /></element>
+		<element name="ldigit~i~.3" ref="digit"><bounds x="32.75" y="91" width="4" height="6" /></element>
+		<element name="ldigit~i~.2" ref="digit"><bounds x="37.75" y="91" width="4" height="6" /></element>
+		<element name="ldigit~i~.1" ref="digit"><bounds x="42.75" y="91" width="4" height="6" /></element>
+		<element name="ldigit~i~.0" ref="digit"><bounds x="47.75" y="91" width="4" height="6" /></element>
 
-		<element name="lc0" ref="ldot"><bounds xc="42.45" yc="92.25" width="0.6" height="0.6" /></element>
-		<element name="lc0" ref="ldot"><bounds xc="42.15" yc="95.65" width="0.6" height="0.6" /></element>
-	</group>
+		<element name="lc~i~" ref="ldot"><bounds xc="42.45" yc="92.25" width="0.6" height="0.6" /></element>
+		<element name="lc~i~" ref="ldot"><bounds xc="42.15" yc="95.65" width="0.6" height="0.6" /></element>
 
-	<group name="lcd2">
-		<element ref="lcd_bg"><bounds x="31.75" y="90" width="21" height="8" /></element>
+		<!-- erase most of 1st digit -->
+		<element ref="lcd_bg"><bounds x="32.5" y="90.5" width="2" height="7" /></element>
 
-		<element name="ldigit1.3" ref="digit"><bounds x="32.75" y="91" width="4" height="6" /></element>
-		<element name="ldigit1.2" ref="digit"><bounds x="37.75" y="91" width="4" height="6" /></element>
-		<element name="ldigit1.1" ref="digit"><bounds x="42.75" y="91" width="4" height="6" /></element>
-		<element name="ldigit1.0" ref="digit"><bounds x="47.75" y="91" width="4" height="6" /></element>
+		<element ref="lcd_bg"><bounds x="33.35" y="90.5" width="3" height="0.95" /></element>
+		<element ref="lcd_bg"><bounds x="33.25" y="90.6" width="3" height="0.95" /></element>
+		<element ref="lcd_bg"><bounds x="33.15" y="90.7" width="3" height="0.95" /></element>
 
-		<element name="lc1" ref="ldot"><bounds xc="42.45" yc="92.25" width="0.6" height="0.6" /></element>
-		<element name="lc1" ref="ldot"><bounds xc="42.15" yc="95.65" width="0.6" height="0.6" /></element>
+		<element ref="lcd_bg"><bounds x="32.95" yc="94.0" width="3" height="0.8" /></element>
+		<element ref="lcd_bg"><bounds x="33.05" yc="94.0" width="3" height="0.6" /></element>
+		<element ref="lcd_bg"><bounds x="33.15" yc="94.0" width="3" height="0.4" /></element>
+
+		<element ref="lcd_bg"><bounds x="32.85" y="96.5" width="3" height="0.95" /></element>
+		<element ref="lcd_bg"><bounds x="32.75" y="96.4" width="3" height="0.95" /></element>
+		<element ref="lcd_bg"><bounds x="32.65" y="96.3" width="3" height="0.95" /></element>
+
+		<element ref="blackb"><bounds x="31.75" y="90" width="3" height="8" /></element>
 	</group>
 
 
@@ -481,15 +488,18 @@ license:CC0-1.0
 		<!-- right side -->
 		<group ref="leds1"><bounds x="106.625" y="10.5" width="40" height="30" /></group>
 		<group ref="buttons1"><bounds x="103.425" y="38.75" width="60" height="60" /></group>
-		<element ref="text_l9"><bounds x="131" yc="22.8" width="20" height="1.4" /></element>
+		<element ref="text_l9"><bounds x="120" yc="22.8" width="20" height="1.4" /></element>
 
 		<element ref="cwhite" blend="multiply"><bounds x="0" y="0" width="170" height="90" /></element>
 
 		<group ref="leds2"><bounds x="106.625" y="10.5" width="40" height="30" /></group>
 		<group ref="buttons2"><bounds x="103.425" y="38.75" width="60" height="60" /></group>
 
-		<group ref="lcd2"><bounds x="131" y="14.8" width="10.5" height="4.1" /></group>
-		<group ref="lcd1"><bounds x="131" y="26.8" width="10.5" height="4.1" /></group>
+		<repeat count="2">
+			<param name="i" start="0" increment="1" />
+			<param name="y" start="26.8" increment="-12" />
+			<group ref="lcd"><bounds x="129.5" y="~y~" width="10.5" height="4.1" /></group>
+		</repeat>
 
 		<!-- chessboard leds -->
 		<element ref="ledo"><bounds x="16.2" yc="7"  width="2" height="0.9" /></element>
