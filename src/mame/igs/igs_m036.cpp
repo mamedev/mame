@@ -11,7 +11,7 @@ GFX: IGS036
 SND: 6295
 ==============================================
 a IGS game use IGS036 chip
-IGS036 could be a upgraded version of IGS036
+IGS036 could be a upgraded version of IGS027A
 but with GFX processor integrated
 
 I don't know the CPU core (should be ARM based due to fail test)
