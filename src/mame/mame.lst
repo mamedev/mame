@@ -33249,7 +33249,6 @@ pc8001mk2                       // 1983
 pc8001mk2sr                     // 1985
 
 @source:nec/pc8401a.cpp
-pc8401a                         // roms needed
 pc8500                          //
 
 @source:nec/pc8801.cpp
