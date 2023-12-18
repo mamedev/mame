@@ -77,9 +77,9 @@ license:CC0-1.0
 		<bounds left="4" right="66" top="-19" bottom="59" />
 
 		<element ref="gray2"><bounds xc="35" yc="-9" width="62" height="20" /></element>
-		<element ref="blackb"><bounds xc="35" yc="-9" width="40.5" height="12.81" /></element>
-		<screen index="0"><bounds xc="35" yc="-9" width="40" height="12.31" /></screen>
-		<element ref="lcdm" blend="multiply"><bounds xc="35" yc="-9" width="40.5" height="12.81" /></element>
+		<element ref="blackb"><bounds xc="35" yc="-9" width="40.5" height="13.12" /></element>
+		<screen index="0"><bounds xc="35" yc="-9" width="40" height="12.62" /></screen>
+		<element ref="lcdm" blend="multiply"><bounds xc="35" yc="-9" width="40.5" height="13.12" /></element>
 
 		<!-- buttons base -->
 		<element ref="grayd"><bounds xc="10" yc="10" width="5.3" height="5.3" /></element>

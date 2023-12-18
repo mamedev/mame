@@ -263,7 +263,7 @@ void svip_state::svip(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
-	screen.set_size(1920/3, 591/3);
+	screen.set_size(1920/3, 606/3);
 	screen.set_visarea_full();
 
 	config.set_default_layout(layout_novag_svip);
@@ -290,8 +290,8 @@ ROM_START( nsvip ) // serial 7604xx
 	ROM_LOAD("yellow", 0x4000, 0x4000, CRC(278e98f0) SHA1(a080e2300c90b6daf42fef960642885eb00ee607) ) // no label
 	ROM_CONTINUE(      0x0000, 0x4000 )
 
-	ROM_REGION( 50926, "screen", 0 )
-	ROM_LOAD("nprimo.svg", 0, 50926, CRC(5ffa1b53) SHA1(8b1f862bfdf0be837a4e8dc94fea592d6ffff629) )
+	ROM_REGION( 35502, "screen", 0 )
+	ROM_LOAD("nvip.svg", 0, 35502, CRC(3e520357) SHA1(f6188bcff8995e84ea28f641cfbd755139498d76) )
 ROM_END
 
 ROM_START( nsvipa ) // serial 7569xx
@@ -302,8 +302,8 @@ ROM_START( nsvipa ) // serial 7569xx
 	ROM_LOAD("v_117", 0x4000, 0x4000, CRC(2a60a474) SHA1(5dd0a1871fcbbb2a6271f284562a62f98bf9bf93) )
 	ROM_CONTINUE(     0x0000, 0x4000 )
 
-	ROM_REGION( 50926, "screen", 0 )
-	ROM_LOAD("nprimo.svg", 0, 50926, CRC(5ffa1b53) SHA1(8b1f862bfdf0be837a4e8dc94fea592d6ffff629) )
+	ROM_REGION( 35502, "screen", 0 )
+	ROM_LOAD("nvip.svg", 0, 35502, CRC(3e520357) SHA1(f6188bcff8995e84ea28f641cfbd755139498d76) )
 ROM_END
 
 ROM_START( nsvipb ) // serial 7545xx
@@ -314,8 +314,8 @@ ROM_START( nsvipb ) // serial 7545xx
 	ROM_LOAD("sv_111", 0x4000, 0x4000, CRC(4be9a23f) SHA1(1fb8ccec112e485eedd899cbe8c0c2cb99e840a4) )
 	ROM_CONTINUE(      0x0000, 0x4000 )
 
-	ROM_REGION( 50926, "screen", 0 )
-	ROM_LOAD("nprimo.svg", 0, 50926, CRC(5ffa1b53) SHA1(8b1f862bfdf0be837a4e8dc94fea592d6ffff629) )
+	ROM_REGION( 35502, "screen", 0 )
+	ROM_LOAD("nvip.svg", 0, 35502, CRC(3e520357) SHA1(f6188bcff8995e84ea28f641cfbd755139498d76) )
 ROM_END
 
 ROM_START( nsvipc ) // serial 7524xx
@@ -326,8 +326,8 @@ ROM_START( nsvipc ) // serial 7524xx
 	ROM_LOAD("s_vip_920", 0x4000, 0x4000, CRC(6f61b1e1) SHA1(df74a599eb59b113ef60c9fc23f9c603a5de4f9e) )
 	ROM_CONTINUE(         0x0000, 0x4000 )
 
-	ROM_REGION( 50926, "screen", 0 )
-	ROM_LOAD("nprimo.svg", 0, 50926, CRC(5ffa1b53) SHA1(8b1f862bfdf0be837a4e8dc94fea592d6ffff629) )
+	ROM_REGION( 35502, "screen", 0 )
+	ROM_LOAD("nvip.svg", 0, 35502, CRC(3e520357) SHA1(f6188bcff8995e84ea28f641cfbd755139498d76) )
 ROM_END
 
 } // anonymous namespace
