@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 /* IGS Gambling games using IGS036 CPU
-   pgm2.c also uses this CPU
+   pgm2.cpp also uses this CPU
 
 <Chao Ji Da Heng 2>
 cjdh2.zip
@@ -11,7 +11,7 @@ GFX: IGS036
 SND: 6295
 ==============================================
 a IGS game use IGS036 chip
-IGS036 could be a upgraded version of IGS027A
+IGS036 could be a upgraded version of IGS036
 but with GFX processor integrated
 
 I don't know the CPU core (should be ARM based due to fail test)
@@ -114,7 +114,7 @@ INPUT_PORTS_END
 
 ROM_START( cjdh2 )
 	ROM_REGION( 0x04000, "maincpu", 0 )
-	// Internal ROM of IGS027A ARM based MCU
+	// Internal ROM of IGS036 ARM based MCU
 	ROM_LOAD( "chaohen2_igs036", 0x00000, 0x4000, NO_DUMP )
 
 	// there is also a square socketed chip like the one on Haunted House (igs_m027) probably in need of dumping
@@ -132,7 +132,7 @@ ROM_END
 
 ROM_START( cjdh2a )
 	ROM_REGION( 0x04000, "maincpu", 0 )
-	// Internal ROM of IGS027A ARM based MCU
+	// Internal ROM of IGS036 ARM based MCU
 	ROM_LOAD( "chaohen2_igs036", 0x00000, 0x4000, NO_DUMP )
 
 	// there is also a square socketed chip like the one on Haunted House (igs_m027) probably in need of dumping
@@ -150,7 +150,7 @@ ROM_END
 
 ROM_START( cjdh2b )
 	ROM_REGION( 0x04000, "maincpu", 0 )
-	// Internal ROM of IGS027A ARM based MCU
+	// Internal ROM of IGS036 ARM based MCU
 	ROM_LOAD( "chaohen2_igs036", 0x00000, 0x4000, NO_DUMP )
 
 	// there is also a square socketed chip like the one on Haunted House (igs_m027) probably in need of dumping
@@ -168,7 +168,7 @@ ROM_END
 
 ROM_START( cjdh2c )
 	ROM_REGION( 0x04000, "maincpu", 0 )
-	// Internal ROM of IGS027A ARM based MCU
+	// Internal ROM of IGS036 ARM based MCU
 	ROM_LOAD( "chaohen2_igs036", 0x00000, 0x4000, NO_DUMP )
 
 	// there is also a square socketed chip like the one on Haunted House (igs_m027) probably in need of dumping
@@ -187,7 +187,7 @@ ROM_END
 
 ROM_START( cjddzsp )
 	ROM_REGION( 0x04000, "maincpu", 0 )
-	// Internal ROM of IGS027A ARM based MCU
+	// Internal ROM of IGS036 ARM based MCU
 	ROM_LOAD( "cjddzsp_igs036", 0x00000, 0x4000, NO_DUMP )
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
@@ -204,7 +204,7 @@ ROM_END
 
 ROM_START( lhtb ) // PCB-0799-02-IU-1, every ROM label starts with 龍虎特別版
 	ROM_REGION( 0x04000, "maincpu", 0 )
-	// Internal ROM of IGS027A ARM based MCU
+	// Internal ROM of IGS036 ARM based MCU
 	ROM_LOAD( "cn1012_igs036", 0x00000, 0x4000, NO_DUMP )
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
@@ -243,7 +243,7 @@ ROM_END
 
 ROM_START( igsm312 )
 	ROM_REGION( 0x04000, "maincpu", 0 )
-	// Internal ROM of IGS027A ARM based MCU
+	// Internal ROM of IGS036 ARM based MCU
 	ROM_LOAD( "igsunk_igs036", 0x00000, 0x4000, NO_DUMP )
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
@@ -319,11 +319,9 @@ void igs_m036_state::pgm_create_dummy_internal_arm_region(void)
 
 
 
-#define IGS036_CPU ARM7
-
 void igs_m036_state::igs_m036(machine_config &config)
 {
-	IGS036_CPU(config, m_maincpu, 20'000'000);
+	IGS036(config, m_maincpu, 20'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m036_state::igs_m036_map);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -341,7 +339,7 @@ void igs_m036_state::igs_m036(machine_config &config)
 
 void igs_m036_state::igs_m036_tt(machine_config &config)
 {
-	IGS036_CPU(config, m_maincpu, 20'000'000);
+	IGS036(config, m_maincpu, 20'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m036_state::igs_m036_map);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
