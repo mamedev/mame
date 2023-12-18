@@ -945,7 +945,7 @@ static INPUT_PORTS_START( tdv2115l )
 			PORT_CONFSETTING(0x0, DEF_STR( On ))
 
 	PORT_START("sw_rs232_baud")
-		PORT_CONFNAME(0x7, 0x6, "SPEED SELECT (Baud-rate)")                         PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, uart_changed, 0)
+		PORT_CONFNAME(0x7, 0x6, "SPEED SELECT [Note: Baud-rate]")                                PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, uart_changed, 0)
 			PORT_CONFSETTING(0x0, "0: 110")
 			PORT_CONFSETTING(0x1, "1: 300")
 			PORT_CONFSETTING(0x2, "2: 600")
@@ -956,19 +956,25 @@ static INPUT_PORTS_START( tdv2115l )
 			PORT_CONFSETTING(0x7, "7: 19200")
 
 	PORT_START("sw_rs232_settings")
-		PORT_CONFNAME(0x01, 0x01, "NO PARITY  (No: Enable parity)")                 PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, uart_changed, 0)
+		// Note: These settings, along with the Baud-rate selector, are located on a switch-panel
+		//       found at the rear of the machine. Lables, including the Yes/No selections, is
+		//       presented here as it appears written on this panel. Notes are added for clarity,
+		//       to describe settings which in their annotated form may be ambiguous or unclear.
+		//       For the original machine, these ambiguities would have been described in sufficient
+		//       detail through a printed user-manual.
+		PORT_CONFNAME(0x01, 0x01, "NO PARITY [Note: Disables or Enables parity]")               PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, uart_changed, 0)
 			PORT_CONFSETTING(0x00, DEF_STR( No ))
 			PORT_CONFSETTING(0x01, DEF_STR( Yes ))
-		PORT_CONFNAME(0x02, 0x02, "EVEN PARITY (When enabled. No: Odd parity)")     PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, uart_changed, 0)
+		PORT_CONFNAME(0x02, 0x02, "EVEN PARITY [Note: Even or Odd parity, if parity enabled]")  PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, uart_changed, 0)
 			PORT_CONFSETTING(0x00, DEF_STR( No ))
 			PORT_CONFSETTING(0x02, DEF_STR( Yes ))
-		PORT_CONFNAME(0x04, 0x04, "TWO STOP BITS (No: One stop bit)")               PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, uart_changed, 0)
+		PORT_CONFNAME(0x04, 0x04, "TWO STOP BITS [Note: Two or One stop bit(s)]")               PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, uart_changed, 0)
 			PORT_CONFSETTING(0x00, DEF_STR( No ))
 			PORT_CONFSETTING(0x04, DEF_STR( Yes ))
-		PORT_CONFNAME(0x08, 0x08, "EXT. ECHO (No: Int. echo when on-line)")
+		PORT_CONFNAME(0x08, 0x08, "EXT. ECHO [Note: No = Local int. echo for half-duplex]")
 			PORT_CONFSETTING(0x00, DEF_STR( No ))
 			PORT_CONFSETTING(0x08, DEF_STR( Yes ))
-		PORT_CONFNAME(0x10, 0x00, "AUTO RFS (RTS)")
+		PORT_CONFNAME(0x10, 0x00, "AUTO RFS [Note: RTS]")
 			PORT_CONFSETTING(0x00, DEF_STR( No ))
 			PORT_CONFSETTING(0x10, DEF_STR( Yes ))
 		PORT_CONFNAME(0x20, 0x00, "AUTO DSR")
