@@ -277,7 +277,7 @@ ROM_START( mghammer )
 
 	ROM_REGION( 0x04000, "iocpu", 0 )
 	// Internal ROM of IGS036E ARM based MCU (1119 0T7643 IGS036E), on I/O board (yes, same IGS036 code as main)
-	ROM_LOAD( "mghammer_igs036e", 0x00000, 0x4000, NO_DUMP )
+	ROM_LOAD( "io_mghammer_igs036e", 0x00000, 0x4000, NO_DUMP )
 
 	ROM_REGION32_LE( 0x200000, "io", 0 ) // external ARM data / prg
 	ROM_LOAD( "io_v_100jp.u1", 0x000000, 0x200000, CRC(cf6c7440) SHA1(53d7b8240b153045569cac72683670df45c6ed32) )

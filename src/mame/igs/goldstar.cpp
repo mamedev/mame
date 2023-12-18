@@ -12949,20 +12949,21 @@ ROM_START( hamhouse )
 	ROM_LOAD( "7_27c256.u43",       0x10000, 0x08000, CRC(31c419f0) SHA1(7c827af5c208bab0ca143558581a57b0b355a3ad) )
 
 	ROM_REGION( 0x08000, "gfx2", 0 )
-	ROM_LOAD( "1_27c64-20.u10",     0x00000, 0x02000, CRC(c4efc953) SHA1(da24c802d33be377ad6d6a357ed32d5214ca7a3f) )
-	ROM_LOAD( "2_27c256.u11",       0x02000, 0x02000, CRC(fac9fe6c) SHA1(0c55c017957d65121b9cc876d914cca2dec5e94e) ) // BADADDR         --xxxxxxxxxxxxx
-	ROM_IGNORE( 0x6000 )
-	ROM_LOAD( "3_hy27c64ad-15.u24", 0x04000, 0x02000, CRC(7f9c41db) SHA1(64c5fb779ecc05eae3264c7767c571eb76fb389f) )
-	ROM_LOAD( "4_d27128a.u26",      0x06000, 0x02000, CRC(8cf3845e) SHA1(4f672d256548211c48e60ce89718c3c195f187d5) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD( "3_hy27c64ad-15.u24", 0x00000, 0x02000, CRC(7f9c41db) SHA1(64c5fb779ecc05eae3264c7767c571eb76fb389f) )
+	ROM_LOAD( "4_d27128a.u26",      0x02000, 0x02000, CRC(8cf3845e) SHA1(4f672d256548211c48e60ce89718c3c195f187d5) ) // 1ST AND 2ND HALF IDENTICAL
 	ROM_IGNORE( 0x2000 )
+	ROM_LOAD( "1_27c64-20.u10",     0x04000, 0x02000, CRC(c4efc953) SHA1(da24c802d33be377ad6d6a357ed32d5214ca7a3f) )
+	ROM_LOAD( "2_27c256.u11",       0x06000, 0x02000, CRC(fac9fe6c) SHA1(0c55c017957d65121b9cc876d914cca2dec5e94e) ) // BADADDR         --xxxxxxxxxxxxx
+	ROM_IGNORE( 0x6000 )
 
 	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x600, "proms", ROMREGION_ERASE00 )
+	ROM_REGION( 0x8200, "proms_base", 0 )
 	// EPROM on a small subboard wired to replace two bipolar PROMS
-	ROM_LOAD( "nm27c256.u55",       0x00000, 0x00400, CRC(f7c7c025) SHA1(f845dc960ed74f64bfff06e3766a1047a26e9de1) )
-	ROM_IGNORE( 0x7c00 )
-	ROM_LOAD( "am27s33pc.u39",      0x00400, 0x00200, NO_DUMP ) // Separated from the other two PROM sockets on the PCB
+	ROM_LOAD( "nm27c256.u55",       0x00000, 0x08000, CRC(f7c7c025) SHA1(f845dc960ed74f64bfff06e3766a1047a26e9de1) )
+	ROM_LOAD( "am27s33pc.u39",      0x08000, 0x00200, NO_DUMP ) // Separated from the other two PROM sockets on the PCB
+
+	ROM_REGION( 0x200, "proms", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x400, "plds", 0 )
 	ROM_LOAD( "atf16v8b.u15",       0x00000, 0x00117, NO_DUMP )
@@ -19211,6 +19212,25 @@ void cmaster_state::init_cmv4()
 	rom[0x020d] = 0x9b;
 }
 
+void cmaster_state::init_hamhouse()
+{
+	init_cmv4();
+
+	// rearrange the palette ROM contents to what MAME expects
+	uint8_t *proms_base = memregion("proms_base")->base();
+	uint8_t *proms = memregion("proms")->base();
+
+	for (int i = 0; i < 0x100; i++)
+	{
+		uint8_t bits74 = proms_base[i] >> 4;
+		uint8_t bits30 = proms_base[i] & 0x0f;
+		proms[i] = bits74;
+		proms[i + 0x100] = bits30;
+	}
+
+	m_palette->update();
+}
+
 void cmaster_state::init_cmpacmanb()
 {
 	uint8_t *rom = memregion("maincpu")->base();
@@ -19451,13 +19471,15 @@ void wingco_state::init_lucky8l()
 	// rearrange the 57C49B-35 contents to what MAME expects
 	uint8_t *proms = memregion("proms")->base();
 
-	for (uint8_t i = 0; i < 0x80; i++)
+	for (int i = 0; i < 0x100; i++)
 	{
 		uint8_t bits74 = proms[i] >> 4;
 		uint8_t bits30 = proms[i] & 0x0f;
 		proms[i] = bits30;
 		proms[i + 0x100] = bits74;
 	}
+
+	m_palette->update();
 }
 
 void wingco_state::init_nd8lines()
@@ -20327,7 +20349,7 @@ GAME ( 199?, wcat3a,     wcat3,    chryangl, cmaster,  cmaster_state,  init_wcat
 GAMEL( 199?, ll3,        cmaster,  cm,       cmasterb, cmaster_state,  init_ll3,       ROT0, "bootleg",           "Lucky Line III",                              MACHINE_NOT_WORKING, layout_cmasterb )  // not looked at yet
 GAMEL( 199?, cmfb55,     cmaster,  cmfb55,   cmaster,  cmaster_state,  init_cmfb55,    ROT0, "bootleg",           "Cherry Master (bootleg, Game FB55 Ver.2)",    MACHINE_NOT_WORKING, layout_cmv4 ) // inputs not done
 GAMEL( 1991, srmagic,    cmv4,     cm,       cmv4,     cmaster_state,  empty_init,     ROT0, "bootleg",           "Super Real Magic (V6.3)",                     MACHINE_NOT_WORKING, layout_cmv4 ) // needs correct I/O
-GAMEL( 199?, hamhouse,   cmaster,  cm,       cmaster,  cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Hamburger House",                             MACHINE_NOT_WORKING, layout_cmaster ) // missing PROM dump, I/O
+GAMEL( 199?, hamhouse,   cmaster,  cm,       cmaster,  cmaster_state,  init_hamhouse,  ROT0, "bootleg",           "Hamburger House",                             MACHINE_NOT_WORKING, layout_cmaster ) // missing PROM dump, I/O
 
 GAMEL( 1991, tonypok,    0,        cm,       tonypok,  cmaster_state,  init_tonypok,   ROT0, "Corsica",           "Poker Master (Tony-Poker V3.A, hack?)",       0 ,                layout_tonypok )
 GAME(  1999, jkrmast,    0,        pkrmast,  pkrmast,  goldstar_state, init_jkrmast,   ROT0, "Pick-A-Party USA",  "Joker Master (V515)",                         MACHINE_NOT_WORKING ) // encryption broken, needs GFX and controls

@@ -204,6 +204,7 @@ public:
 	void init_cmtetrisd();
 	void init_ll3();
 	void init_cmfb55();
+	void init_hamhouse();
 
 	uint32_t screen_update_amcoe1a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
