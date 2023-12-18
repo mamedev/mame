@@ -3,7 +3,7 @@
 // thanks-to:Berger
 /*******************************************************************************
 
-Novag Super VIP, aka Super V.I.P. (model 895)
+Novag Super VIP (aka Super V.I.P.) (model 895)
 
 NOTE: Turn the power switch off before exiting MAME, otherwise NVRAM won't save
 properly.
@@ -11,10 +11,6 @@ properly.
 It's a portable chess computer with keypad input, no embedded chessboard. The
 chess engine is similar to other HD6301/3Y ones by David Kittinger. The 'sequels'
 of this portable design (Ruby, Sapphire, ..) are on H8.
-
-Super VIP is Novag's first chess computer with a proper serial interface. It
-connects to the Novag Super System Distributor, which can then connect to an
-external chessboard, TV interface, computer, etc.
 
 Hardware notes:
 - Hitachi HD63A03YF (mode 2) @ 9.83MHz
@@ -24,9 +20,21 @@ Hardware notes:
 
 The LCD is the same as the one in Primo / Supremo / Super Nova.
 
+Super VIP is Novag's first chess computer with a proper serial interface. It
+connects to the Novag Super System Distributor, which can then connect to an
+external chessboard, TV interface, computer, etc.
+
+Known official Novag Super System (or compatible) peripherals:
+- Super System Chess Board Auto Sensory
+- Super System Chess Board Touch Sensory
+- Super System TV-Interface
+- Universal Electronic Chess Board (aka UCB)
+
 TODO:
 - if/when MAME supports an exit callback, hook up power-off switch to that
-- serial port isn't working for nsvip V1.x? it only sends empty chars
+- add Super System peripherals, each has their own MCU
+- serial port isn't working for nsvip v1.x? it only sends empty chars, maybe
+  there is no problem and the comms protocol is different
 - unmapped reads from 0x3* range, same as snova driver
 - is (non-super) VIP on the same hardware? minus EPROM or RS232
 
@@ -129,15 +137,14 @@ u8 svip_state::p2_r()
 	data |= m_inputs[3]->read() & 5;
 
 	// P23: serial rx
-	if (m_rs232)
-		data |= m_rs232->rxd_r() << 3;
+	data |= m_rs232->rxd_r() ? 0 : 8;
 
 	// P25-P27: multiplexed inputs
 	for (int i = 0; i < 3; i++)
 		if (m_inp_mux & m_inputs[i]->read())
 			data |= 0x20 << i;
 
-	return ~data ^ 8;
+	return ~data;
 }
 
 void svip_state::p2_w(u8 data)
@@ -150,9 +157,8 @@ void svip_state::p2_w(u8 data)
 	}
 	m_lcd_strobe = bool(data & 2);
 
-	// P24: serial tx
-	if (m_rs232)
-		m_rs232->write_txd(BIT(data, 4));
+	// P24: serial tx (TTL)
+	m_rs232->write_txd(BIT(data, 4));
 }
 
 void svip_state::p5_w(u8 data)
@@ -304,7 +310,7 @@ ROM_START( nsvipb ) // serial 7545xx
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD("novag_895_31y0rk75f", 0x0000, 0x4000, CRC(11a3894e) SHA1(fa455181043ac3ee89412aae563171d87ac55596) )
 
-	ROM_REGION( 0x8000, "eprom", 0 ) // I = V1.03
+	ROM_REGION( 0x8000, "eprom", 0 ) // ID = V1.03
 	ROM_LOAD("sv_111", 0x4000, 0x4000, CRC(4be9a23f) SHA1(1fb8ccec112e485eedd899cbe8c0c2cb99e840a4) )
 	ROM_CONTINUE(      0x0000, 0x4000 )
 
@@ -316,7 +322,7 @@ ROM_START( nsvipc ) // serial 7524xx
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD("novag_895_31y0rk75f", 0x0000, 0x4000, CRC(11a3894e) SHA1(fa455181043ac3ee89412aae563171d87ac55596) )
 
-	ROM_REGION( 0x8000, "eprom", 0 ) // I = V1.01
+	ROM_REGION( 0x8000, "eprom", 0 ) // ID = V1.01
 	ROM_LOAD("s_vip_920", 0x4000, 0x4000, CRC(6f61b1e1) SHA1(df74a599eb59b113ef60c9fc23f9c603a5de4f9e) )
 	ROM_CONTINUE(         0x0000, 0x4000 )
 

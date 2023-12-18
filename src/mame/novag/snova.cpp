@@ -209,7 +209,7 @@ void snova_state::p2_w(u8 data)
 	// P22: speaker out
 	m_dac->write(BIT(data, 2));
 
-	// P24: serial tx
+	// P24: serial tx (TTL)
 	if (m_rs232)
 		m_rs232->write_txd(BIT(data, 4));
 

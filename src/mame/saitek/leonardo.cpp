@@ -54,12 +54,13 @@ manual mentions that for it to work properly on Leonardo, the chesscomputer need
 to be upgraded with an EMI PCB (power supply related, meaningless for emulation).
 
 TODO:
-- OSA PC link, uses MCU serial interface
+- OSA PC link is untested, uses MCU serial interface
 
 *******************************************************************************/
 
 #include "emu.h"
 
+#include "bus/rs232/rs232.h"
 #include "bus/saitek_osa/expansion.h"
 #include "cpu/m6800/m6801.h"
 #include "machine/input_merger.h"
@@ -88,6 +89,7 @@ public:
 		m_board(*this, "board"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
+		m_rs232(*this, "rs232"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
@@ -109,6 +111,7 @@ private:
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
 	required_device<speaker_sound_device> m_dac;
+	required_device<rs232_port_device> m_rs232;
 	required_ioport_array<9> m_inputs;
 
 	int m_ack_state = 0;
@@ -217,61 +220,63 @@ u8 leo_state::p2_r()
 {
 	u8 data = 0;
 
-	// d0-d2: multiplexed inputs
+	// P20-P22: multiplexed inputs
 	u8 mux = (m_inp_mux & 8) ? 8 : (m_inp_mux & 7);
 	data = m_inputs[mux]->read();
 
-	// d3: ?
+	// P23: serial rx
+	data |= m_rs232->rxd_r() << 3;
 
-	return ~data;
+	return ~data ^ 8;
 }
 
 void leo_state::p2_w(u8 data)
 {
-	// d5,d6: chessboard led column data
+	// P24: serial tx (TTL)
+	m_rs232->write_txd(BIT(data, 4));
+
+	// P25,P26: chessboard led column data
 	m_led_data[0] = (m_led_data[0] & ~3) | (~data >> 5 & 3);
 	update_display();
-
-	// other: ?
 }
 
 u8 leo_state::p5_r()
 {
-	// d1: N/C, d4: IS strobe (handled with inputline)
+	// P51: N/C, d4: IS strobe (handled with inputline)
 	return 0xff ^ 0x10;
 }
 
 void leo_state::p5_w(u8 data)
 {
-	// d2: expansion NMI-P
+	// P52: expansion NMI-P
 	m_expansion->nmi_w(BIT(data, 2));
 
-	// d3: NAND with STB-P
+	// P53: NAND with STB-P
 	m_stb->in_w<1>(BIT(data, 3));
 
-	// d5: expansion ACK-P (recursive NAND with RTS-P)
+	// P55: expansion ACK-P (recursive NAND with RTS-P)
 	int ack_state = BIT(data, 5);
 	if (m_rts_state || !ack_state)
 		m_expansion->ack_w(ack_state);
 	m_ack_state = ack_state;
 
-	// d6,d7: chessboard led row data
+	// P56,P57: chessboard led row data
 	m_led_data[0] = (m_led_data[0] & 3) | (~data >> 4 & 0xc);
 	update_display();
 
-	// d0: power-off on falling edge
+	// P50: power-off on falling edge
 	m_expansion->pw_w(data & 1);
 }
 
 u8 leo_state::p6_r()
 {
-	// read chessboard sensors and module data
+	// P60-P67: read chessboard sensors and module data
 	return ~m_board->read_file(m_inp_mux & 0xf) & m_expansion->data_r();
 }
 
 void leo_state::p6_w(u8 data)
 {
-	// module data
+	// P60-P67: module data
 	m_expansion->data_w(data);
 }
 
@@ -422,10 +427,13 @@ void leo_state::leonardo(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 	SPEAKER_SOUND(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	// expansion module
+	// expansion module (configure after video)
 	SAITEKOSA_EXPANSION(config, m_expansion, saitekosa_expansion_modules);
 	m_expansion->stb_handler().set(m_stb, FUNC(input_merger_device::in_w<0>));
 	m_expansion->rts_handler().set(FUNC(leo_state::exp_rts_w));
+
+	// rs232 (configure after expansion module)
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 }
 
 void leo_state::leonardoa(machine_config &config)
