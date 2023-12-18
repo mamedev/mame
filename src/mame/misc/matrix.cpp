@@ -42,6 +42,7 @@ Unpopulated spaces marked for: DS5002FP, PIC16C54, 93C56 EEPROM, a couple more u
 
 #include "screen.h"
 
+#define ENABLE_VGA 0
 
 namespace {
 
@@ -102,10 +103,13 @@ void matrix_state::matrix(machine_config &config)
 	PCI_ROOT(config, "pci", 0);
 	MEDIAGX_HOST(config, "pci:00.0", 0, "maincpu", 128*1024*1024);
 	// TODO: no clue about the ID used for this, definitely tested
-	// Tries to initialize MediaGX F4 -> ISA -> PCI/AGP
+	// Tries to initialize MediaGX F4 -> ISA -> PCI
 	// May actually be a ZFMicro PCI Bridge (0x10780400)?
 	PCI_BRIDGE(config, "pci:01.0", 0, 0x10780000, 0);
+#if ENABLE_VGA
+	// NOTE: most MediaGX boards don't even provide an AGP port, at best you get PCI slots.
 	RIVATNT(config, "pci:01.0:00.0", 0);
+#endif
 
 	// "pci:12.0" or "pci:10.0" depending on pin H26 (readable in bridge thru PCI index $44)
 	mediagx_cs5530_bridge_device &isa(MEDIAGX_CS5530_BRIDGE(config, "pci:12.0", 0, "maincpu", "pci:12.2"));
