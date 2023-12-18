@@ -6905,8 +6905,8 @@ GAME( 1998, vs299,       vs2v991, model3_20_5881, model3,   model3_state,    ini
 GAME( 1998, vs299j,      vs2v991, model3_20_5881, model3,   model3_state,    init_vs299, ROT0, "Sega", "Virtua Striker 2 '99.1 (Japan, Revision B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // shows Virtua Striker 2 Version '99.1 icon during demo
 
 /* Model 3 Step 2.1 */
-GAME( 1998, daytona2,          0, model3_21_5881, daytona2, model3_state, init_daytona2, ROT0, "Sega", "Daytona USA 2 (Japan, Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, dayto2pe,          0, model3_21_5881, daytona2, model3_state, init_dayto2pe, ROT0, "Sega", "Daytona USA 2 Power Edition (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, daytona2,          0, model3_21_5881, daytona2, model3_state, init_daytona2, ROT0, "Sega", "Daytona USA 2: Battle on the Edge (Japan, Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, dayto2pe,          0, model3_21_5881, daytona2, model3_state, init_dayto2pe, ROT0, "Sega", "Daytona USA 2: Power Edition (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, dirtdvls,          0, model3_21_5881, scud,     model3_state, init_dirtdvls, ROT0, "Sega", "Dirt Devils (Export, Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, dirtdvlsu,  dirtdvls, model3_21_5881, scud,     model3_state, init_dirtdvls, ROT0, "Sega", "Dirt Devils (USA, Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, dirtdvlsau, dirtdvls, model3_21_5881, scud,     model3_state, init_dirtdvls, ROT0, "Sega", "Dirt Devils (Australia, Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
