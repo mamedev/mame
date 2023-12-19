@@ -7,11 +7,14 @@
 
     TODO:
 
+    - Need a media device to be in any way useful
+      (throws E27 directory full if attempting to create a new file thru WS -> D -> new file name)
     - keyboard interrupt
     - RTC TP pulse
     - clock does not advance in menu (timer irq?)
-    - modernize memory map
-    - mirror e800-ffff to 6800-7fff
+    - some unclear bits in the banking scheme;
+    - mirror e800-ffff to 6800-7fff (why? -AS)
+    - How PC-8508A really banks?
     - soft power on/off
     - NVRAM
     - 8251 USART
@@ -35,6 +38,7 @@
 #include "bus/rs232/rs232.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/bankdev.h"
 #include "machine/i8255.h"
 #include "machine/i8251.h"
 #include "machine/ram.h"
@@ -51,17 +55,14 @@
 #include "utf8.h"
 
 #define SCREEN_TAG      "screen"
-#define CRT_SCREEN_TAG  "screen2"
 
-#define Z80_TAG         "z80"
+#define IPL_TAG         "ipl"
 #define UPD1990A_TAG    "upd1990a"
 #define AY8910_TAG      "ay8910"
 #define SED1330_TAG     "sed1330"
 #define MC6845_TAG      "mc6845"
 #define I8251_TAG       "i8251"
 #define RS232_TAG       "rs232"
-
-#define PC8401A_CRT_VIDEORAM_SIZE   0x2000
 
 namespace {
 
@@ -70,16 +71,17 @@ class pc8401a_state : public driver_device
 public:
 	pc8401a_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, Z80_TAG)
+		, m_maincpu(*this, "maincpu")
 		, m_rtc(*this, UPD1990A_TAG)
 		, m_lcdc(*this, SED1330_TAG)
 		, m_screen(*this, SCREEN_TAG)
 		, m_cart(*this, "cartslot")
 		, m_io_cart(*this, "io_cart")
 		, m_ram(*this, RAM_TAG)
-		, m_rom(*this, Z80_TAG)
-		, m_crt_ram(*this, "crt_ram", PC8401A_CRT_VIDEORAM_SIZE, ENDIANNESS_LITTLE)
+		, m_rom(*this, IPL_TAG)
 		, m_io_y(*this, "Y.%u", 0)
+		, m_bankdev(*this, "bankdev0")
+		, m_crt_view(*this, "crt_view")
 	{ }
 
 	void pc8500(machine_config &config);
@@ -97,8 +99,9 @@ private:
 	required_device<generic_slot_device> m_io_cart;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
-	memory_share_creator<uint8_t> m_crt_ram;
 	required_ioport_array<10> m_io_y;
+	required_device<address_map_bank_device> m_bankdev;
+	memory_view m_crt_view;
 
 	memory_region *m_cart_rom = nullptr;
 
@@ -132,6 +135,28 @@ private:
 	void pc8401a_mem(address_map &map);
 	void pc8500_io(address_map &map);
 	void pc8500_lcdc(address_map &map);
+
+	void bankdev0_map(address_map &map);
+
+	// TODO: these two should really be inside ram_device instead
+	template <unsigned StartBase> uint8_t ram_r(address_space &space, offs_t offset)
+	{
+		const offs_t memory_offset = StartBase + offset;
+
+		if (memory_offset < m_ram->size())
+			return m_ram->pointer()[memory_offset];
+
+		// TODO: floating bus
+		return space.unmap();
+	}
+
+	template <unsigned StartBase> void ram_w(offs_t offset, uint8_t data)
+	{
+		const offs_t memory_offset = StartBase + offset;
+
+		if (memory_offset < m_ram->size())
+			m_ram->pointer()[memory_offset] = data;
+	}
 };
 
 
@@ -224,100 +249,17 @@ void pc8401a_state::port71_w(uint8_t data)
 
 void pc8401a_state::bankswitch(uint8_t data)
 {
-	address_space &program = m_maincpu->space(AS_PROGRAM);
+	// set up A0/A1 memory banking
+	m_bankdev->set_bank(data & 0xf);
 
-	int rombank = data & 0x03;
-	int ram0000 = (data >> 2) & 0x03;
-	int ram8000 = (data >> 4) & 0x03;
+	// A2
+	membank("rambank")->set_entry((data >> 4) & 0x03);
 
-	switch (ram0000)
-	{
-	case 0: /* ROM 0000H to 7FFFH */
-		if (rombank < 3)
-		{
-			/* internal ROM */
-			program.install_read_bank(0x0000, 0x7fff, membank("bank1"));
-			program.unmap_write(0x0000, 0x7fff);
-			membank("bank1")->set_entry(rombank);
-		}
-		else if (m_cart_rom)
-		{
-			/* ROM cartridge */
-			program.install_read_bank(0x0000, 0x7fff, membank("bank1"));
-			program.unmap_write(0x0000, 0x7fff);
-			membank("bank1")->set_entry(6);
-		}
-		else
-			program.unmap_readwrite(0x0000, 0x7fff);
-		//logerror("0x0000-0x7fff = ROM %u\n", rombank);
-		break;
+	// A3
+	m_crt_view.select(BIT(data, 6));
 
-	case 1: /* RAM 0000H to 7FFFH */
-		program.install_readwrite_bank(0x0000, 0x7fff, membank("bank1"));
-		membank("bank1")->set_entry(4);
-		//logerror("0x0000-0x7fff = RAM 0-7fff\n");
-		break;
-
-	case 2: /* RAM 8000H to FFFFH */
-		program.install_readwrite_bank(0x0000, 0x7fff, membank("bank1"));
-		membank("bank1")->set_entry(5);
-		//logerror("0x0000-0x7fff = RAM 8000-ffff\n");
-		break;
-
-	case 3: /* invalid */
-		logerror("0x0000-0x7fff = invalid\n");
-		break;
-	}
-
-	switch (ram8000)
-	{
-	case 0: /* cell addresses 0000H to 3FFFH */
-		program.install_readwrite_bank(0x8000, 0xbfff, membank("bank3"));
-		membank("bank3")->set_entry(0);
-		//logerror("0x8000-0xbfff = RAM 0-3fff\n");
-		break;
-
-	case 1: /* cell addresses 4000H to 7FFFH */
-		program.install_readwrite_bank(0x8000, 0xbfff, membank("bank3"));
-		membank("bank3")->set_entry(1);
-		//logerror("0x8000-0xbfff = RAM 4000-7fff\n");
-		break;
-
-	case 2: /* cell addresses 8000H to BFFFH */
-		program.install_readwrite_bank(0x8000, 0xbfff, membank("bank3"));
-		membank("bank3")->set_entry(2);
-		//logerror("0x8000-0xbfff = RAM 8000-bfff\n");
-		break;
-
-	case 3: /* RAM cartridge */
-		if (m_ram->size() > 64)
-		{
-			program.install_readwrite_bank(0x8000, 0xbfff, membank("bank3"));
-			membank("bank3")->set_entry(3); // TODO or 4
-		}
-		else
-		{
-			program.unmap_readwrite(0x8000, 0xbfff);
-		}
-		//logerror("0x8000-0xbfff = RAM cartridge\n");
-		break;
-	}
-
-	if (BIT(data, 6))
-	{
-		/* CRT video RAM */
-		program.install_readwrite_bank(0xc000, 0xdfff, membank("bank4"));
-		program.unmap_readwrite(0xe000, 0xe7ff);
-		membank("bank4")->set_entry(1);
-		//logerror("0xc000-0xdfff = video RAM\n");
-	}
-	else
-	{
-		/* RAM */
-		program.install_readwrite_bank(0xc000, 0xe7ff, membank("bank4"));
-		membank("bank4")->set_entry(0);
-		//logerror("0xc000-0e7fff = RAM c000-e7fff\n");
-	}
+	if (BIT(data, 7))
+		throw emu_fatalerror("Unknown bank bit 7 set");
 }
 
 /*
@@ -414,14 +356,25 @@ void pc8401a_state::io_rom_addr_w(offs_t offset, uint8_t data)
 	}
 }
 
+void pc8401a_state::bankdev0_map(address_map &map)
+{
+	map(0x00000, 0x17fff).rom().region(IPL_TAG, 0);
+	map(0x18000, 0x1ffff).r(m_cart, FUNC(generic_slot_device::read_rom));
+	map(0x20000, 0x2ffff).rw(FUNC(pc8401a_state::ram_r<0x0000>), FUNC(pc8401a_state::ram_w<0x0000>));
+	map(0x30000, 0x3ffff).unmaprw();
+}
 
 void pc8401a_state::pc8401a_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x7fff).bankrw("bank1");
-	map(0x8000, 0xbfff).bankrw("bank3");
-	map(0xc000, 0xe7ff).bankrw("bank4");
-	map(0xe800, 0xffff).bankrw("bank5");
+	map(0x0000, 0x7fff).m(m_bankdev, FUNC(address_map_bank_device::amap8));
+	map(0x8000, 0xbfff).bankrw("rambank");
+	map(0xc000, 0xe7ff).view(m_crt_view);
+	m_crt_view[0](0xc000, 0xe7ff).rw(FUNC(pc8401a_state::ram_r<0xc000>), FUNC(pc8401a_state::ram_w<0xc000>));
+	m_crt_view[1](0xc000, 0xdfff).unmaprw(); // RAM for PC-8441A?
+	m_crt_view[1](0xe000, 0xe7ff).unmaprw();
+	// TODO: correct? May as well view select with the 0xc*** range ...
+	map(0xe800, 0xffff).rw(FUNC(pc8401a_state::ram_r<0xe800>), FUNC(pc8401a_state::ram_w<0xe800>));
 }
 
 void pc8401a_state::pc8500_io(address_map &map)
@@ -575,28 +528,8 @@ void pc8401a_state::machine_start()
 
 	uint8_t *ram = m_ram->pointer();
 
-	/* set up A0/A1 memory banking */
-	membank("bank1")->configure_entries(0, 4, m_rom->base(), 0x8000);
-	membank("bank1")->configure_entries(4, 2, ram, 0x8000);
-	if (m_cart_rom)
-		membank("bank1")->configure_entries(6, 1, m_cart_rom->base(), 0x8000);
-	membank("bank1")->set_entry(0);
-
 	/* set up A2 memory banking */
-	membank("bank3")->configure_entries(0, 5, ram, 0x4000);
-	membank("bank3")->set_entry(0);
-
-	/* set up A3 memory banking */
-	membank("bank4")->configure_entry(0, ram + 0xc000);
-	membank("bank4")->configure_entry(1, m_crt_ram);
-	membank("bank4")->set_entry(0);
-
-	/* set up A4 memory banking */
-	membank("bank5")->configure_entry(0, ram + 0xe800);
-	membank("bank5")->set_entry(0);
-
-	/* bank switch */
-	bankswitch(0);
+	membank("rambank")->configure_entries(0, 4, ram, 0x4000);
 
 	/* register for state saving */
 	save_item(NAME(m_mmr));
@@ -606,6 +539,7 @@ void pc8401a_state::machine_start()
 void pc8401a_state::machine_reset()
 {
 	m_key_irq_enable = false;
+	bankswitch(0);
 }
 
 void pc8401a_state::pc8500(machine_config &config)
@@ -627,9 +561,9 @@ void pc8401a_state::pc8500(machine_config &config)
 	rs232.rxd_handler().set(I8251_TAG, FUNC(i8251_device::write_rxd));
 	rs232.dsr_handler().set(I8251_TAG, FUNC(i8251_device::write_dsr));
 
-	PALETTE(config, "palette", FUNC(pc8401a_state::palette_init), 2 + 8);
+	PALETTE(config, "palette", FUNC(pc8401a_state::palette_init), 2);
 
-	// pc8401a uses 128 display lines
+	// TODO: pc8401a uses 128 display lines instead of 200
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	m_screen->set_refresh_hz(44);
 	m_screen->set_screen_update(SED1330_TAG, FUNC(sed1330_device::screen_update));
@@ -641,6 +575,8 @@ void pc8401a_state::pc8500(machine_config &config)
 	m_lcdc->set_screen(SCREEN_TAG);
 	m_lcdc->set_addrmap(0, &pc8401a_state::pc8500_lcdc);
 
+	ADDRESS_MAP_BANK(config, m_bankdev).set_map(&pc8401a_state::bankdev0_map).set_options(ENDIANNESS_LITTLE, 8, 15 + 8, 0x8000);
+
 	/* option ROM cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, nullptr, "bin,rom");
 
@@ -651,7 +587,7 @@ void pc8401a_state::pc8500(machine_config &config)
 }
 
 ROM_START( pc8500 )
-	ROM_REGION( 0x20000, Z80_TAG, ROMREGION_ERASEFF )
+	ROM_REGION( 0x20000, IPL_TAG, ROMREGION_ERASEFF )
 	ROM_LOAD( "pc8500.bin", 0x0000, 0x10000, CRC(c2749ef0) SHA1(f766afce9fda9ec84ed5b39ebec334806798afb3) )
 
 	// TODO: identify this
