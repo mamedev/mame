@@ -489,7 +489,6 @@ public:
 	}
 
 	void viper(machine_config &config);
-	void viper_dongle(machine_config &config);
 	void viper_ppp(machine_config &config);
 	void viper_omz(machine_config &config);
 	void viper_fullbody(machine_config &config);
@@ -499,7 +498,7 @@ public:
 	void init_vipercf();
 	void init_viperhd();
 
-	int ds2430_mux_r();
+	int ds2430_combined_r();
 
 protected:
 	virtual void machine_start() override;
@@ -566,7 +565,6 @@ private:
 	uint8_t m_unk_serial_regs[0x80]{};
 	uint32_t m_sound_buffer_offset = 0U;
 	bool m_sound_irq_enabled = false;
-	bool m_ds2430_ext_select = false;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(sound_timer_callback);
 
@@ -1736,7 +1734,6 @@ uint8_t viper_state::ds2430_r()
 void viper_state::ds2430_w(uint8_t data)
 {
 	m_ds2430->data_w(1);
-	m_ds2430_ext_select = false;
 }
 
 uint8_t viper_state::ds2430_ext_r()
@@ -1750,10 +1747,7 @@ uint8_t viper_state::ds2430_ext_r()
 void viper_state::ds2430_ext_w(uint8_t data)
 {
 	if (m_ds2430_ext.found())
-	{
 		m_ds2430_ext->data_w(1);
-		m_ds2430_ext_select = true;
-	}
 }
 
 void viper_state::unk1a_w(offs_t offset, uint64_t data, uint64_t mem_mask)
@@ -1894,9 +1888,10 @@ void viper_state::viper_ppp_map(address_map &map)
 
 /*****************************************************************************/
 
-int viper_state::ds2430_mux_r()
+int viper_state::ds2430_combined_r()
 {
-	return m_ds2430_ext_select ? m_ds2430_ext->data_r() : m_ds2430->data_r();
+	// Inactive DS2430A is held in reset state
+	return m_ds2430->data_r() || m_ds2430_ext->data_r();
 }
 
 static INPUT_PORTS_START( viper )
@@ -2205,7 +2200,7 @@ INPUT_PORTS_START( p9112 )
 	PORT_INCLUDE( p911 )
 
 	PORT_MODIFY("IN2")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(viper_state, ds2430_mux_r)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(viper_state, ds2430_combined_r)
 INPUT_PORTS_END
 
 INPUT_PORTS_START( mfightc )
@@ -2437,7 +2432,6 @@ INPUT_PORTS_START( code1d )
 	PORT_DIPNAME( 0x08, 0x00, "Memory Card Check On Boot" ) PORT_DIPLOCATION("SW:1")
 	PORT_DIPSETTING( 0x08, DEF_STR( On ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(viper_state, ds2430_mux_r)
 
 	PORT_MODIFY("IN4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Action Button")
@@ -2520,8 +2514,6 @@ void viper_state::machine_start()
 	save_item(NAME(m_unk_serial_regs));
 	save_item(NAME(m_sound_buffer_offset));
 	save_item(NAME(m_sound_irq_enabled));
-	if (m_ds2430_ext.found())
-		save_item(NAME(m_ds2430_ext_select));
 
 	save_item(NAME(m_epic.iack));
 	save_item(NAME(m_epic.eicr)); // written but never used
@@ -2579,7 +2571,6 @@ void viper_state::machine_reset()
 	m_ds2430->data_w(1);
 	if (m_ds2430_ext.found())
 		m_ds2430_ext->data_w(1);
-	m_ds2430_ext_select = false;
 }
 
 void viper_state::viper(machine_config &config)
@@ -2633,12 +2624,6 @@ void viper_state::viper(machine_config &config)
 	// Note that adjusting this value has gameplay consequences for ppp2nd: the gameplay's note and animation timings are tied directly to values updated using IRQ3,
 	// so having IRQ3 trigger too quickly or too slowly will mean that the gameplay will either be too fast or too slow.
 	TIMER(config, "sound_timer").configure_periodic(FUNC(viper_state::sound_timer_callback), attotime::from_hz(44100.0 / 256));
-}
-
-void viper_state::viper_dongle(machine_config &config)
-{
-	viper(config);
-	DS2430A(config, m_ds2430_ext);
 }
 
 void viper_state::viper_ppp(machine_config &config)
@@ -3352,8 +3337,8 @@ GAME(2001, ppp2nd,    kviper,    viper_ppp, ppp2nd,     viper_state, init_viperh
 GAME(2001, ppp2nda,   ppp2nd,    viper_ppp, ppp2nd,     viper_state, init_viperhd,  ROT0,  "Konami", "ParaParaParadise 2nd Mix (AAA)", MACHINE_NOT_WORKING)
 
 GAME(2001, boxingm,   kviper,    viper,     boxingm,    viper_state, init_vipercf,  ROT0,  "Konami", "Boxing Mania: Ashita no Joe (ver JAA)", MACHINE_NOT_WORKING)
-GAME(2000, code1d,    kviper,    viper_dongle,     code1d,     viper_state, init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.21 (ver UAD)", MACHINE_NOT_WORKING)
-GAME(2000, code1db,   code1d,    viper_dongle,     code1d,     viper_state, init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.16 (ver UAB)", MACHINE_NOT_WORKING)
+GAME(2000, code1d,    kviper,    viper,     code1d,     viper_state, init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.21 (ver UAD)", MACHINE_NOT_WORKING)
+GAME(2000, code1db,   code1d,    viper,     code1d,     viper_state, init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.16 (ver UAB)", MACHINE_NOT_WORKING)
 GAME(2000, gticlub2,  kviper,    viper,     gticlub2,   viper_state, init_vipercf,  ROT0,  "Konami", "GTI Club: Corso Italiano (ver JAB)", MACHINE_NOT_WORKING)
 GAME(2000, gticlub2ea,gticlub2,  viper,     gticlub2ea, viper_state, init_vipercf,  ROT0,  "Konami", "Driving Party: Racing in Italy (ver EAA)", MACHINE_NOT_WORKING)
 GAME(2001, jpark3,    kviper,    viper,     jpark3,     viper_state, init_vipercf,  ROT0,  "Konami", "Jurassic Park III (ver EBC)", MACHINE_NOT_WORKING)
