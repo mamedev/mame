@@ -557,7 +557,7 @@ license:CC0-1.0
 		<element ref="cwhite"><bounds x="-0.5" y="3" width="81" height="81" /></element>
 
 		<group ref="sb_board"><bounds x="-20.5" y="3.5" width="121" height="80" /></group>
-		<group ref="sb_ui"><bounds x="-33" y="3" width="10" height="80" /></group>
+		<group ref="sb_ui"><bounds x="-33" y="3.5" width="10" height="80" /></group>
 		<group ref="panel"><bounds x="-21" y="85" width="122" height="17" /></group>
 
 		<!-- optional magnet position overlay -->

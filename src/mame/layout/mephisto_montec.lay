@@ -531,7 +531,7 @@ license:CC0-1.0
 
 		<element ref="white"><bounds x="16.5" y="3" width="81" height="81" /></element>
 		<group ref="sb_board"><bounds x="17" y="3.5" width="80" height="80" /></group>
-		<group ref="sb_ui"><bounds x="1.5" y="3" width="10" height="80" /></group>
+		<group ref="sb_ui"><bounds x="1.5" y="3.5" width="10" height="80" /></group>
 
 		<!-- LCD panel -->
 		<group ref="panel"><bounds x="17" y="89.5" width="80" height="14" /></group>
