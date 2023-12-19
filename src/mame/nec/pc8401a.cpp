@@ -7,25 +7,27 @@
 
     TODO:
 
-    - Need a media device to be in any way useful
-      (throws E27 directory full if attempting to create a new file thru WS -> D -> new file name)
-    - keyboard interrupt
+    - keyboard key modifiers (f6-f10 presumably needs holding shift like PC-8001);
+    \- Option testing beyond f5;
+    \- Cannot do anything useful with filer (usage: "filer <filename>"), needs F6;
     - RTC TP pulse
-    - clock does not advance in menu (timer irq?)
     - some unclear bits in the banking scheme;
     - mirror e800-ffff to 6800-7fff (why? -AS)
     - How PC-8508A really banks?
     - soft power on/off
+    - idle sleep timer off by a bunch of seconds (option -> power to test);
     - NVRAM
     - 8251 USART
     - 8255 ports
-    - Merge keyboard with pc8001 / pc8801 / pc88va (same keys, running on a MCU like VA)
     - PC-8431A FDC is same family as PC-80S31K, basically the 3.5" version of it.
       Likely none of the available BIOSes fits here.
 
+    Notes:
+    - Need to format internal RAM before using WS, "format -> F1 -> y"
+
     - peripherals
         * PC-8431A Dual Floppy Drive
-        * PC-8441A CRT / Disk Interface (MC6845, monochrome)
+        * PC-8441A CRT / Disk Interface (MC6845, monochrome & color variants)
         * PC-8461A 1200 Baud Modem
         * PC-8407A 128KB RAM Expansion
         * PC-8508A ROM/RAM Cartridge
@@ -138,7 +140,7 @@ private:
 
 	void bankdev0_map(address_map &map);
 
-	// TODO: these two should really be inside ram_device instead
+	// TODO: temp, should really be a NVRAM device
 	template <unsigned StartBase> uint8_t ram_r(address_space &space, offs_t offset)
 	{
 		const offs_t memory_offset = StartBase + offset;
@@ -180,33 +182,27 @@ void pc8401a_state::pc8500_lcdc(address_map &map)
 
 void pc8401a_state::scan_keyboard()
 {
-	if (!m_key_irq_enable)
-		return;
-	int strobe = 0;
-
 	/* scan keyboard */
+	// TODO: is this just a generic key pressed shortcut rather than being MCU based?
 	for (int row = 0; row < 10; row++)
 	{
 		uint8_t data = m_io_y[row]->read();
 
 		if (data != 0xff)
 		{
-			strobe = 1;
-			m_key_latch = data;
+			//strobe = 1;
+			m_key_latch |= 1;
 		}
 	}
 
-	if (!m_key_strobe && strobe)
-	{
-		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xef); // Z80 - RST 28h
-	}
-
-	if (strobe) m_key_strobe = strobe;
+	m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xef); // Z80 - RST 28h
+	m_key_strobe = 1;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(pc8401a_state::keyboard_tick)
 {
-	scan_keyboard();
+	if (m_key_irq_enable)
+		scan_keyboard();
 }
 
 /*
@@ -215,8 +211,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc8401a_state::keyboard_tick)
  * 0       key pressed
  * 1
  * 2
- * 3
- * 4       must be 1 or CPU goes to HALT (power switch status?)
+ * 3       <unknown>, disables all keys if on
+ * 4       must be 1 or CPU goes to HALT (power status)
  * 5
  * 6
  * 7
@@ -405,14 +401,14 @@ void pc8401a_state::pc8500_io(address_map &map)
 //  map(0x80, 0x80) modem status, set to 0xff to boot
 //  map(0x8b, 0x8b)
 //  map(0x90, 0x93)
-//	map(0x98, 0x98).w(m_crtc, FUNC(mc6845_device::address_w));
-//	map(0x99, 0x99).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+//  map(0x98, 0x98).w(m_crtc, FUNC(mc6845_device::address_w));
+//  map(0x99, 0x99).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x98, 0x99).noprw();
 //  map(0xa0, 0xa1)
 	map(0xb0, 0xb3).w(FUNC(pc8401a_state::io_rom_addr_w));
 	map(0xb3, 0xb3).r(FUNC(pc8401a_state::io_rom_data_r));
 //  map(0xc8, 0xc8)
-//	map(0xfc, 0xff).rw(I8255A_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
+//  map(0xfc, 0xff).rw(I8255A_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xfc, 0xff).noprw();
 }
 
@@ -548,7 +544,8 @@ void pc8401a_state::pc8500(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc8401a_state::pc8401a_mem);
 	m_maincpu->set_addrmap(AS_IO, &pc8401a_state::pc8500_io);
 
-	TIMER(config, "keyboard").configure_periodic(FUNC(pc8401a_state::keyboard_tick), attotime::from_hz(44));
+	// unknown frequency, roughly fits idle sleep mode
+	TIMER(config, "keyboard").configure_periodic(FUNC(pc8401a_state::keyboard_tick), attotime::from_hz(60));
 
 	UPD1990A(config, m_rtc);
 
@@ -589,10 +586,6 @@ void pc8401a_state::pc8500(machine_config &config)
 ROM_START( pc8500 )
 	ROM_REGION( 0x20000, IPL_TAG, ROMREGION_ERASEFF )
 	ROM_LOAD( "pc8500.bin", 0x0000, 0x10000, CRC(c2749ef0) SHA1(f766afce9fda9ec84ed5b39ebec334806798afb3) )
-
-	// TODO: identify this
-	ROM_REGION( 0x1000, "mcu", 0)
-	ROM_LOAD( "kbd.rom", 0x0000, 0x1000, NO_DUMP )
 
 	//ROM_REGION( 0x1000, "chargen", 0 )
 	//ROM_LOAD( "pc8441a.bin", 0x0000, 0x1000, NO_DUMP )
