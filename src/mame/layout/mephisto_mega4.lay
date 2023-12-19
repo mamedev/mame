@@ -67,7 +67,7 @@ license:CC0-1.0
 	<element name="text_plus">  <text string="+">                   <color red="0" green="0" blue="0" /></text> </element>
 	<element name="text_black"> <text string="&#x25a0;" align="1">  <color red="0" green="0" blue="0" /></text> </element>
 	<element name="text_white"> <text string="&#x25a1;" align="1">  <color red="0" green="0" blue="0" /></text> </element>
-	<element name="text_lcd">   <text string="MULTI INFO LCD">      <color red="0.8" green="0.2" blue="0.2" /></text> </element>
+	<element name="text_lcd">   <text string="MULTI INFO LCD">      <color red="0" green="0" blue="0" /></text> </element>
 
 	<element name="text_b1">    <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text string="1  "> <color red="0" green="0" blue="0" /></text> </element>
 	<element name="text_b2">    <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text string="2  "> <color red="0" green="0" blue="0" /></text> </element>
@@ -84,7 +84,7 @@ license:CC0-1.0
 	<element name="text_book9"> <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text align="1" string=" BOOK 9">              <color red="0" green="0" blue="0" /></text> </element>
 	<element name="text_pos0">  <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text align="1" string=" POS  0">              <color red="0" green="0" blue="0" /></text> </element>
 	<element name="text_cl">    <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text align="1" string=" CL">                  <color red="0" green="0" blue="0" /></text> </element>
-	<element name="text_ent">   <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text align="1" string=" ENT">                 <color red="0" green="0" blue="0" /></text> </element>
+	<element name="text_ent">   <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text align="1" string=" ENT">                 <color red="0.8" green="0.2" blue="0.2" /></text> </element>
 	<element name="text_res">   <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text align="1" string=" RES">                 <color red="0.8" green="0.2" blue="0.2" /></text> </element>
 
 	<element name="text_p1"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/wp.svg" /><rect><color red="1" green="1" blue="1" alpha="0.03" /></rect></element>
@@ -414,7 +414,7 @@ license:CC0-1.0
 		<element ref="black"> <bounds x="38.5" y="7.5" width="6" height="4" /> </element>
 		<element ref="black"> <bounds x="47"   y="7.5" width="6" height="4" /> </element>
 		<element ref="black"> <bounds x="55.5" y="7.5" width="6" height="4" /> </element>
-		<element ref="black"> <bounds x="64"   y="7.5" width="6" height="4" /> </element>
+		<element ref="red">   <bounds x="64"   y="7.5" width="6" height="4" /> </element>
 		<element ref="red">   <bounds x="72.5" y="7.5" width="6" height="4" /> </element>
 
 		<element ref="text_plus">  <bounds x="55.5" y="-1.2" width="2" height="1.5" /> </element>
