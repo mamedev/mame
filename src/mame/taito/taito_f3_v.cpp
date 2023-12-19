@@ -1324,6 +1324,7 @@ inline void taito_f3_state::draw_scanlines(
 							u32 orient,
 							int skip_layer_num)
 {
+	#if 0
 	const pen_t *clut = &m_palette->pen(0);
 	const u32 bgcolor = clut[0];
 
@@ -1416,6 +1417,7 @@ inline void taito_f3_state::draw_scanlines(
 			}
 		}
 	}
+	#endif
 }
 
 /******************************************************************************/
@@ -1749,6 +1751,11 @@ void taito_f3_state::get_pf_scroll(int pf_num, u32 &reg_sx, u32 &reg_sy)
 	if (m_flipscreen) {
 		sy =  0x3000000 - sy;
 		sx = -0x1a00000 - sx;
+		
+		if (m_game_config->extend)
+			sx = -sx + (((188 - 512) & 0xffff) << 16);
+		else
+			sx = -sx + (188 << 16);
 	}
 	reg_sx = sx;
 	reg_sy = sy;
@@ -1827,10 +1834,10 @@ void taito_f3_state::scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cl
 		line_data.pf[pf].srcbitmap = &m_tilemap[tmap_number]->pixmap();
 		line_data.pf[pf].flagsbitmap = &m_tilemap[tmap_number]->flagsmap();
 		get_pf_scroll(pf, line_data.pf[pf].reg_sx, line_data.pf[pf].reg_sy);
-		if (m_flipscreen)
-			line_data.pf[pf].reg_fx_y = -line_data.pf[pf].reg_sy - (256 << 16);
-		else
-			line_data.pf[pf].reg_fx_y = line_data.pf[pf].reg_sy;
+		// if (m_flipscreen)
+		// 	line_data.pf[pf].reg_fx_y = line_data.pf[pf].reg_sy - (256 << 16);
+		// else
+		line_data.pf[pf].reg_fx_y = line_data.pf[pf].reg_sy;
 	}
 	line_data.pivot.srcbitmap_pixel = &m_pixel_layer->pixmap();
 	line_data.pivot.flagsbitmap_pixel = &m_pixel_layer->flagsmap();
@@ -2346,6 +2353,7 @@ void taito_f3_state::get_vram_info(tilemap_t *vram_tilemap, tilemap_t *pixel_til
 
 void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	#if 0
 	int i, ys, ye;
 	int y_start, y_end, y_start_next, y_end_next;
 	u8 draw_line[256] = {};
@@ -2716,6 +2724,7 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 		draw_scanlines(bitmap, 320, draw_line_num, line_t, sprite, rot, count_skip_layer);
 		if (y_start < 0) break;
 	}
+	#endif
 }
 
 /******************************************************************************/
