@@ -8,16 +8,20 @@ SciSys Kasparov Leonardo, Saitek Kasparov Galileo.
 This is SciSys's answer to H+G Mephisto modular chesscomputers, but unlike the
 Mephistos, these boards are actual chesscomputers and not an accessory.
 
+NOTE: In order for NVRAM to work properly, press the STOP button to turn off
+the chesscomputer before exiting MAME. Other than ACL (which is an unemulated
+hardware button that disconnects the battery), there is no known method to
+force a cold boot. So if NVRAM somehow becomes broken, remove the NVRAM files.
+
 They called the expansion capability "OSA", for "Open Systems Architecture".
 A serial port for linking to a PC, and a parallel port for expansion modules.
 The expansion modules are basically entire chesscomputers, making the whole
 thing combined a 'dual brain' chesscomputer. The embedded chess engine is by
 Julio Kaplan and Craig Barnes, same as the one in SciSys Turbo S-24K.
 
-NOTE: In order for NVRAM to work properly, press the STOP button to turn off
-the chesscomputer before exiting MAME. Other than ACL (which is an unemulated
-hardware button that disconnects the battery), there is no known method to
-force a cold boot. So if NVRAM somehow becomes broken, remove the NVRAM files.
+OSA serial link transmission format: 1200 baud, 1 start bit, 8 data bits, 1 stop
+bit, no parity. To establish a connection, command "o" must be entered first
+(from eg. a terminal), and then the Comm. LED will turn on.
 
 Hardware notes:
 
@@ -52,9 +56,6 @@ this is mentioned in the repair manual and it says it requires an EPROM upgrade.
 The Sparc module doesn't appear to work with it either. Moreover, the Sparc module
 manual mentions that for it to work properly on Leonardo, the chesscomputer needs
 to be upgraded with an EMI PCB (power supply related, meaningless for emulation).
-
-TODO:
-- OSA PC link is untested, uses MCU serial interface
 
 *******************************************************************************/
 

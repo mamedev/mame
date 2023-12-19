@@ -16,8 +16,7 @@ Hardware notes:
 - Hitachi HD63A03YF (mode 2) @ 9.83MHz
 - 32KB ROM(TC57256AD-12), 2KB RAM(TC5517CFL-20)
 - LCD with 4 digits and custom segments, no LCD chip
-- RJ-12 port (1200 or 9600 baud - default 9600 for v3.x, 1200 for v1.x)
-- 24 buttons, piezo
+- RJ-12 port, 24 buttons, piezo
 
 The LCD is the same as the one in Primo / Supremo / Super Nova.
 
@@ -26,7 +25,8 @@ connects to the Novag Super System Distributor, which can then connect to an
 external chessboard, TV interface, computer, etc.
 
 Serial transmission format for Novag Super System is 1 start bit, 8 data bits,
-1 stop bit, no parity.
+1 stop bit, no parity. On Super VIP, the baud rate is selectable 1200 or 9600,
+default 9600 for v3.x, 1200 for v1.x.
 
 Known official Novag Super System (or compatible) peripherals:
 - Super System Chess Board Auto Sensory
