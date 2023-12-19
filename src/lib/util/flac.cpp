@@ -296,7 +296,7 @@ flac_decoder::flac_decoder()
 		m_file(nullptr),
 		m_sample_rate(0),
 		m_channels(0),
-		m_bits_per_sample(0),
+		m_bits_per_sample(16),
 		m_compressed_offset(0),
 		m_compressed_start(nullptr),
 		m_compressed_length(0),
@@ -318,7 +318,7 @@ flac_decoder::flac_decoder(const void *buffer, uint32_t length, const void *buff
 		m_file(nullptr),
 		m_sample_rate(0),
 		m_channels(0),
-		m_bits_per_sample(0),
+		m_bits_per_sample(16),
 		m_compressed_offset(0),
 		m_compressed_start(reinterpret_cast<const FLAC__byte *>(buffer)),
 		m_compressed_length(length),
@@ -338,7 +338,7 @@ flac_decoder::flac_decoder(util::read_stream &file)
 		m_file(&file),
 		m_sample_rate(0),
 		m_channels(0),
-		m_bits_per_sample(0),
+		m_bits_per_sample(16),
 		m_compressed_offset(0),
 		m_compressed_start(nullptr),
 		m_compressed_length(0),
@@ -580,7 +580,6 @@ void flac_decoder::metadata_callback_static(const FLAC__StreamDecoder *decoder, 
 	// parse out the data we care about
 	auto *fldecoder = reinterpret_cast<flac_decoder *>(client_data);
 	fldecoder->m_sample_rate = metadata->data.stream_info.sample_rate;
-	fldecoder->m_bits_per_sample = metadata->data.stream_info.bits_per_sample;
 	fldecoder->m_channels = metadata->data.stream_info.channels;
 }
 
