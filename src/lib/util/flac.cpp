@@ -632,16 +632,22 @@ FLAC__StreamDecoderWriteStatus flac_decoder::write_callback(const ::FLAC__Frame 
 	return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
 }
 
-int16_t flac_decoder::convert_to_int16(const ::FLAC__Frame *frame, FLAC__int32 sample)
+int16_t flac_decoder::convert_to_int16(const ::FLAC__Frame *frame, FLAC__int32 sample) const
 {
-	if (m_uncompressed_swap)
+	int16_t output_sample;
+	if (frame->header.bits_per_sample > 16)
 	{
-		sample = FLAC__int32(((uint32_t(sample) >> 24) & 0x000000ff) | ((uint32_t(sample) >> 16) & 0x0000ff00) | ((uint32_t(sample) >> 8) & 0x00ff0000) | (uint32_t(sample) & 0xff000000));
+		const int shift = frame->header.bits_per_sample - 16;
+		output_sample = int16_t((sample + (sample & (1 << (shift - 1)))) >> shift);
 	}
-	if (frame->header.bits_per_sample >= 16)
-		return int16_t(uint32_t(sample >> (frame->header.bits_per_sample - 16)));
+	else if (frame->header.bits_per_sample < 16)
+	{
+		const int shift = 16 - frame->header.bits_per_sample;
+		output_sample = int16_t((sample << shift) | ((sample & 1) ? ((1 << shift) - 1) : 0) );
+	}
 	else
-		return int16_t(uint32_t(sample << (16 - frame->header.bits_per_sample)));
+		output_sample = int16_t(sample);
+	return m_uncompressed_swap ? int16_t(swapendian_int16(uint16_t(output_sample))) : output_sample;
 }
 
 /**
