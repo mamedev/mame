@@ -10,13 +10,14 @@
     - keyboard key modifiers (f6-f10 presumably needs holding shift like PC-8001);
     \- Option testing beyond f5;
     \- Cannot do anything useful with filer (usage: "filer <filename>"), needs F6;
-    - RTC TP pulse
+    - blinking, uses unimplemented cursor in graphics mode for SED1330;
+    - RTC TP pulse;
     - some unclear bits in the banking scheme;
-    - mirror e800-ffff to 6800-7fff (why? -AS)
-    - How PC-8508A really banks?
-    - soft power on/off
-    - idle sleep timer off by a bunch of seconds (option -> power to test);
-    - NVRAM
+    - mirror e800-ffff to 6800-7fff (why? -AS);
+    - How PC-8508A really banks? Seems to select with I/O $31 and 0x8000-0xbfff;
+    - soft power on/off;
+    - idle sleep timer off by a bunch of seconds ("option" -> "power" to test);
+    - NVRAM, saner QoL defaults (filling with 0xe5 should be enough);
     - 8251 USART
     - 8255 ports
     - PC-8431A FDC is same family as PC-80S31K, basically the 3.5" version of it.
@@ -164,8 +165,9 @@ private:
 
 void pc8401a_state::palette_init(palette_device &palette) const
 {
-	palette.set_pen_color(0, rgb_t(39, 108, 51));
-	palette.set_pen_color(1, rgb_t(16, 37, 84));
+    // TODO: actual values
+	palette.set_pen_color(0, rgb_t(160, 168, 160));
+	palette.set_pen_color(1, rgb_t(48, 56, 16));
 }
 
 void pc8401a_state::pc8401a_lcdc(address_map &map)
@@ -580,6 +582,7 @@ void pc8401a_state::pc8500(machine_config &config)
 	/* I/O ROM cartridge */
 	GENERIC_CARTSLOT(config, m_io_cart, generic_linear_slot, nullptr, "bin,rom");
 
+    // TODO: wrong, should touch external cart only and have 32K & 128K options, plus be a slot NVRAM anyway.
 	RAM(config, RAM_TAG).set_default_size("64K").set_extra_options("96K");
 }
 
