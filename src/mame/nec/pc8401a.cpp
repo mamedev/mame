@@ -14,11 +14,10 @@
     - RTC TP pulse;
     - some unclear bits in the banking scheme;
     - mirror e800-ffff to 6800-7fff (why? -AS);
-    - How PC-8508A really banks? Seems to select with I/O $31 and 0x8000-0xbfff;
     - soft power on/off;
     - idle sleep timer off by a bunch of seconds ("option" -> "power" to test);
-    - NVRAM, saner QoL defaults (filling with 0xe5 should be enough);
     - 8251 USART
+    - modem (OKI M6946)
     - 8255 ports
     - PC-8431A FDC is same family as PC-80S31K, basically the 3.5" version of it.
       Likely none of the available BIOSes fits here.
@@ -31,7 +30,7 @@
         * PC-8441A CRT / Disk Interface (MC6845, monochrome & color variants)
         * PC-8461A 1200 Baud Modem
         * PC-8407A 128KB RAM Expansion
-        * PC-8508A ROM/RAM Cartridge
+        * PC-8508A ROM/RAM Cartridge (32K & 128K versions)
 
     - Use the 600 baud save rate (PIP CAS2:=A:<filename.ext> this is more reliable than the 1200 baud (PIP CAS:=A:<filename.ext> rate.
 
@@ -44,7 +43,7 @@
 #include "machine/bankdev.h"
 #include "machine/i8255.h"
 #include "machine/i8251.h"
-#include "machine/ram.h"
+#include "machine/nvram.h"
 #include "machine/timer.h"
 #include "machine/upd1990a.h"
 #include "video/mc6845.h"
@@ -80,10 +79,11 @@ public:
 		, m_screen(*this, SCREEN_TAG)
 		, m_cart(*this, "cartslot")
 		, m_io_cart(*this, "io_cart")
-		, m_ram(*this, RAM_TAG)
+		, m_nvram(*this, "nvram")
 		, m_rom(*this, IPL_TAG)
 		, m_io_y(*this, "Y.%u", 0)
-		, m_bankdev(*this, "bankdev0")
+		, m_bankdev0(*this, "bankdev0")
+		, m_bankdev8(*this, "bankdev8")
 		, m_crt_view(*this, "crt_view")
 	{ }
 
@@ -100,16 +100,20 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<generic_slot_device> m_cart;
 	required_device<generic_slot_device> m_io_cart;
-	required_device<ram_device> m_ram;
+	required_device<nvram_device> m_nvram;
 	required_memory_region m_rom;
 	required_ioport_array<10> m_io_y;
-	required_device<address_map_bank_device> m_bankdev;
+	required_device<address_map_bank_device> m_bankdev0;
+	required_device<address_map_bank_device> m_bankdev8;
 	memory_view m_crt_view;
 
+	std::unique_ptr<uint8_t[]> m_internal_nvram;
 	memory_region *m_cart_rom = nullptr;
 
 	void mmr_w(uint8_t data);
 	uint8_t mmr_r();
+	void port31_w(uint8_t data);
+	uint8_t port31_r();
 	uint8_t rtc_r();
 	void rtc_cmd_w(uint8_t data);
 	void rtc_ctrl_w(uint8_t data);
@@ -129,6 +133,7 @@ private:
 
 	// memory state
 	uint8_t m_mmr = 0;                // memory mapping register
+	uint8_t m_ext_mmr = 0;
 	uint32_t m_io_addr = 0;           // I/O ROM address counter
 
 	uint8_t m_key_latch = 0;
@@ -140,32 +145,23 @@ private:
 	void pc8500_lcdc(address_map &map);
 
 	void bankdev0_map(address_map &map);
+	void bankdev8_map(address_map &map);
 
-	// TODO: temp, should really be a NVRAM device
 	template <unsigned StartBase> uint8_t ram_r(address_space &space, offs_t offset)
 	{
-		const offs_t memory_offset = StartBase + offset;
-
-		if (memory_offset < m_ram->size())
-			return m_ram->pointer()[memory_offset];
-
-		// TODO: floating bus
-		return space.unmap();
+		return m_internal_nvram[StartBase + offset];
 	}
 
 	template <unsigned StartBase> void ram_w(offs_t offset, uint8_t data)
 	{
-		const offs_t memory_offset = StartBase + offset;
-
-		if (memory_offset < m_ram->size())
-			m_ram->pointer()[memory_offset] = data;
+		m_internal_nvram[StartBase + offset] = data;
 	}
 };
 
 
 void pc8401a_state::palette_init(palette_device &palette) const
 {
-    // TODO: actual values
+	// TODO: actual values
 	palette.set_pen_color(0, rgb_t(160, 168, 160));
 	palette.set_pen_color(1, rgb_t(48, 56, 16));
 }
@@ -248,10 +244,10 @@ void pc8401a_state::port71_w(uint8_t data)
 void pc8401a_state::bankswitch(uint8_t data)
 {
 	// set up A0/A1 memory banking
-	m_bankdev->set_bank(data & 0xf);
+	m_bankdev0->set_bank(data & 0xf);
 
 	// A2
-	membank("rambank")->set_entry((data >> 4) & 0x03);
+	m_bankdev8->set_bank((data >> 4) & 0x03);
 
 	// A3
 	m_crt_view.select(BIT(data, 6));
@@ -285,6 +281,19 @@ void pc8401a_state::mmr_w(uint8_t data)
 uint8_t pc8401a_state::mmr_r()
 {
 	return m_mmr;
+}
+
+void pc8401a_state::port31_w(uint8_t data)
+{
+	m_ext_mmr = data & 7;
+	//membank("extram_bank")->set_entry(m_ext_mmr);
+	if (data & 0xf8)
+		throw emu_fatalerror("Unknown ext bank %02x set", data);
+}
+
+uint8_t pc8401a_state::port31_r()
+{
+	return m_ext_mmr;
 }
 
 /*
@@ -362,11 +371,18 @@ void pc8401a_state::bankdev0_map(address_map &map)
 	map(0x30000, 0x3ffff).unmaprw();
 }
 
+void pc8401a_state::bankdev8_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0x0bfff).rw(FUNC(pc8401a_state::ram_r<0x0000>), FUNC(pc8401a_state::ram_w<0x0000>));
+	map(0x0c000, 0x0ffff).unmaprw(); // external RAM cartridge
+}
+
 void pc8401a_state::pc8401a_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x7fff).m(m_bankdev, FUNC(address_map_bank_device::amap8));
-	map(0x8000, 0xbfff).bankrw("rambank");
+	map(0x0000, 0x7fff).m(m_bankdev0, FUNC(address_map_bank_device::amap8));
+	map(0x8000, 0xbfff).m(m_bankdev8, FUNC(address_map_bank_device::amap8));
 	map(0xc000, 0xe7ff).view(m_crt_view);
 	m_crt_view[0](0xc000, 0xe7ff).rw(FUNC(pc8401a_state::ram_r<0xc000>), FUNC(pc8401a_state::ram_w<0xc000>));
 	m_crt_view[1](0xc000, 0xdfff).unmaprw(); // RAM for PC-8441A?
@@ -392,7 +408,7 @@ void pc8401a_state::pc8500_io(address_map &map)
 	map(0x10, 0x10).w(FUNC(pc8401a_state::rtc_cmd_w));
 	map(0x20, 0x21).rw(I8251_TAG, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x30, 0x30).rw(FUNC(pc8401a_state::mmr_r), FUNC(pc8401a_state::mmr_w));
-//  map(0x31, 0x31)
+	map(0x31, 0x31).rw(FUNC(pc8401a_state::port31_r), FUNC(pc8401a_state::port31_w));
 	map(0x40, 0x40).rw(FUNC(pc8401a_state::rtc_r), FUNC(pc8401a_state::rtc_ctrl_w));
 //  map(0x41, 0x41)
 //  map(0x50, 0x51)
@@ -402,7 +418,7 @@ void pc8401a_state::pc8500_io(address_map &map)
 	map(0x71, 0x71).rw(FUNC(pc8401a_state::port71_r), FUNC(pc8401a_state::port71_w));
 //  map(0x80, 0x80) modem status, set to 0xff to boot
 //  map(0x8b, 0x8b)
-//  map(0x90, 0x93)
+//  map(0x90, 0x93) CRTC system comms?
 //  map(0x98, 0x98).w(m_crtc, FUNC(mc6845_device::address_w));
 //  map(0x99, 0x99).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x98, 0x99).noprw();
@@ -524,10 +540,9 @@ void pc8401a_state::machine_start()
 	/* initialize RTC */
 	m_rtc->cs_w(1);
 
-	uint8_t *ram = m_ram->pointer();
-
-	/* set up A2 memory banking */
-	membank("rambank")->configure_entries(0, 4, ram, 0x4000);
+	// PC-8401A & PC-8500 ships with 64K of internal RAM
+	m_internal_nvram = std::make_unique<uint8_t[]>(0x10000);
+	m_nvram->set_base(m_internal_nvram.get(), 0x10000);
 
 	/* register for state saving */
 	save_item(NAME(m_mmr));
@@ -574,7 +589,10 @@ void pc8401a_state::pc8500(machine_config &config)
 	m_lcdc->set_screen(SCREEN_TAG);
 	m_lcdc->set_addrmap(0, &pc8401a_state::pc8500_lcdc);
 
-	ADDRESS_MAP_BANK(config, m_bankdev).set_map(&pc8401a_state::bankdev0_map).set_options(ENDIANNESS_LITTLE, 8, 15 + 8, 0x8000);
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_1);
+
+	ADDRESS_MAP_BANK(config, m_bankdev0).set_map(&pc8401a_state::bankdev0_map).set_options(ENDIANNESS_LITTLE, 8, 15 + 8, 0x8000);
+	ADDRESS_MAP_BANK(config, m_bankdev8).set_map(&pc8401a_state::bankdev8_map).set_options(ENDIANNESS_LITTLE, 8, 16, 0x4000);
 
 	/* option ROM cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, nullptr, "bin,rom");
@@ -582,8 +600,8 @@ void pc8401a_state::pc8500(machine_config &config)
 	/* I/O ROM cartridge */
 	GENERIC_CARTSLOT(config, m_io_cart, generic_linear_slot, nullptr, "bin,rom");
 
-    // TODO: wrong, should touch external cart only and have 32K & 128K options, plus be a slot NVRAM anyway.
-	RAM(config, RAM_TAG).set_default_size("64K").set_extra_options("96K");
+	// TODO: wrong, should touch external cart only and have 32K & 128K options, plus be a slot NVRAM anyway.
+	// RAM(config, RAM_TAG).set_default_size("64K").set_extra_options("96K,192K");
 }
 
 ROM_START( pc8500 )
