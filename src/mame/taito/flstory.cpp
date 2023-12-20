@@ -308,7 +308,7 @@ void flstory_state::flstory_draw_sprites(screen_device &screen, bitmap_ind16 &bi
 		uint8_t const pr = m_spriteram[m_spriteram.bytes() - 1 - i];
 		uint32_t const offs = (pr & 0x1f) * 4;
 
-		uint32_t const pri_mask = BIT(pr, 7) ? GFX_PMASK_8 : GFX_PMASK_8 | GFX_PMASK_4;
+		uint32_t const pri_mask = BIT(pr, 7) ? GFX_PMASK_8 : (GFX_PMASK_8 | GFX_PMASK_4);
 
 		uint32_t const code = m_spriteram[offs + 2] + ((m_spriteram[offs + 1] & 0x30) << 4);
 		int sx = m_spriteram[offs + 3];
