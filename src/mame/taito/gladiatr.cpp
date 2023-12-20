@@ -231,7 +231,7 @@ void gladiatr_state_base::ym_irq(int state)
 void gladiatr_state::gladiator_adpcm_w(u8 data)
 {
 	// bit 6 = bank offset
-	m_adpcmbank->set_entry(BIT(data, 6) ? 1 : 0);
+	m_adpcmbank->set_entry(BIT(data, 6));
 
 	m_msm->data_w(data);            // bit 0..3
 	m_msm->reset_w(BIT(data, 5));   // bit 5
@@ -241,7 +241,7 @@ void gladiatr_state::gladiator_adpcm_w(u8 data)
 void ppking_state::ppking_adpcm_w(u8 data)
 {
 	// bit 6 = bank offset
-	//m_adpcmbank->set_entry(BIT(data, 6) ? 1 : 0);
+	//m_adpcmbank->set_entry(BIT(data, 6));
 
 	m_msm->data_w(data);            // bit 0..3
 	m_msm->reset_w(BIT(data, 5));   // bit 5
