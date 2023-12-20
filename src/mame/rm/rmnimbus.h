@@ -75,7 +75,6 @@ public:
 		m_fdc(*this, FDC_TAG),
 		m_z80sio(*this, Z80SIO_TAG),
 		m_screen(*this, "screen"),
-		m_io_config(*this, "config"),
 		m_io_joystick0(*this, JOYSTICK0_TAG),
 		m_io_mouse_button(*this, MOUSE_BUTTON_TAG),
 		m_io_mousex(*this, MOUSEX_TAG),
@@ -103,7 +102,6 @@ private:
 	required_device<wd2793_device> m_fdc;
 	required_device<z80sio_device> m_z80sio;
 	required_device<screen_device> m_screen;
-	required_ioport m_io_config;
 	required_ioport m_io_joystick0;
 	required_ioport m_io_mouse_button;
 	required_ioport m_io_mousex;
@@ -150,6 +148,7 @@ private:
 	void nimbus_rompack_w(offs_t offset, uint8_t data);
 	void nimbus_sound_ay8910_porta_w(uint8_t data);
 	void nimbus_sound_ay8910_portb_w(uint8_t data);
+	uint8_t nimbus_joystick_r();
 	uint8_t nimbus_mouse_js_r();
 	void nimbus_mouse_js_w(uint8_t data);
 	uint16_t nimbus_video_io_r(offs_t offset, uint16_t mem_mask = ~0);
