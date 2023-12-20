@@ -118,13 +118,13 @@ chdman createhd -o ST125N.chd -chs 41921,1,1 -ss 512
 #define MOUSE_INT_ENABLE        0x08
 #define PC8031_INT_ENABLE       0x10
 
-#define MOUSE_NONE      0x00
-#define MOUSE_LEFT      0x01
-#define MOUSE_RIGHT     0x02
-#define MOUSE_DOWN      0x04
-#define MOUSE_UP        0x08
-#define MOUSE_LBUTTON   0x10
-#define MOUSE_RBUTTON   0x20
+#define CONTROLLER_NONE      	0x00
+#define CONTROLLER_LEFT      	0x01
+#define CONTROLLER_RIGHT     	0x02
+#define CONTROLLER_DOWN      	0x04
+#define CONTROLLER_UP        	0x08
+#define CONTROLLER_BUTTON0  	0x10
+#define CONTROLLER_BUTTON1		0x20
 
 // Frequency in Hz to poll for mouse movement.
 #define MOUSE_POLL_FREQUENCY    500
@@ -990,9 +990,6 @@ TIMER_CALLBACK_MEMBER(rmnimbus_state::do_mouse)
 	uint8_t   mya;
 	uint8_t   myb;
 
-	// Read mouse buttons
-	m_nimbus_mouse.m_reg0a4 = m_io_mouse_button->read();
-
 	// Read mose positions and calculate difference from previous value
 	mouse_x = m_io_mousex->read();
 	mouse_y = m_io_mousey->read();
@@ -1075,6 +1072,28 @@ void rmnimbus_state::mouse_js_reset()
 	m_nimbus_mouse.m_mouse_timer->adjust(attotime::zero, 0, attotime::from_hz(MOUSE_POLL_FREQUENCY));
 }
 
+uint8_t rmnimbus_state::nimbus_joystick_r()
+{
+	/* Only the joystick drection data is read from this port
+	   (which corresponds to the the low nibble of m_io_joystick0).
+	   The joystick buttons are read from the mouse data port instead. */
+	uint8_t result = m_io_joystick0->read() & 0x0f;
+
+	if (result & CONTROLLER_RIGHT)
+	{
+		// when the stick is pushed right the left bit must also be set!
+		result |= CONTROLLER_LEFT;
+	}
+
+	if (result & CONTROLLER_UP)
+	{
+		// when the stick is pushed up the down bit must also be set!
+		result |= CONTROLLER_DOWN;
+	}
+
+	return result;
+}
+
 uint8_t rmnimbus_state::nimbus_mouse_js_r()
 {
 	/*
@@ -1091,18 +1110,12 @@ uint8_t rmnimbus_state::nimbus_mouse_js_r()
 	    7       ?? always reads 1
 
 	*/
-	uint8_t result;
-	//int pc=m_maincpu->_pc();
-
-	if (m_io_config->read() & 0x01)
-	{
-		result=m_nimbus_mouse.m_reg0a4 | 0xC0;
-		//logerror("mouse_js_r: pc=%05X, result=%02X\n",pc,result);
-	}
-	else
-	{
-		result = m_io_joystick0->read() | 0xC0;
-	}
+	uint8_t result = m_nimbus_mouse.m_reg0a4 | 0xc0;
+	
+	// set button bits if either mouse or joystick buttons are pressed
+	result |= m_io_mouse_button->read();
+	// NB only the two button bits of the joystick are read from this port
+	result |= m_io_joystick0->read() & 0x30;
 
 	return result;
 }
