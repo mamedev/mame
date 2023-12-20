@@ -4421,8 +4421,12 @@ end
 
 if (BUSES["KIM1BUS"]~=null) then
 	files {
+		MAME_DIR .. "src/devices/bus/kim1/cards.cpp",
+		MAME_DIR .. "src/devices/bus/kim1/cards.h",
 		MAME_DIR .. "src/devices/bus/kim1/kim1bus.cpp",
 		MAME_DIR .. "src/devices/bus/kim1/kim1bus.h",
+		MAME_DIR .. "src/devices/bus/kim1/k1008_vismem.cpp",
+		MAME_DIR .. "src/devices/bus/kim1/k1008_vismem.h",
 		MAME_DIR .. "src/devices/bus/kim1/k1016_16k.cpp",
 		MAME_DIR .. "src/devices/bus/kim1/k1016_16k.h",
 	}
