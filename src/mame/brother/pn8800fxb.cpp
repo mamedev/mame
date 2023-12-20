@@ -19,7 +19,6 @@
     TODO:
     - Fix ROM banking (ROM self-test shows NG)
     - Improve video emulation (offset, modes, etc.)
-    - RTC
     - Floppy
     - Buzzer
     - Centronics
@@ -31,12 +30,16 @@
     Notes:
     - There is a serially connected daughterbord containing the Bookman logic
     - Press CODE+SHIFT+BS on the main menu for a self-test screen
+    - Currently the system always does a cold boot. This means that the
+      century byte at $6180b will be invalid, causing the system to program
+      the RTC with default values.
 
 ****************************************************************************/
 
 #include "emu.h"
 
 #include "cpu/z180/z180.h"
+#include "machine/rp5c01.h"
 #include "machine/timer.h"
 
 #include "emupal.h"
@@ -158,7 +161,7 @@ void pn8800fxb_state::io_map(address_map &map)
 	map(0xb8, 0xb8).rw(FUNC(pn8800fxb_state::keyboard_r), FUNC(pn8800fxb_state::keyboard_w));
 	// c0-c7 cdcc data
 	// c8-cf cdcc control
-	map(0xd0, 0xdf).noprw(); // rtc
+	map(0xd0, 0xdf).rw("rtc", FUNC(tc8521_device::read), FUNC(tc8521_device::write));
 	map(0xe0, 0xe0).mirror(0x07).w(FUNC(pn8800fxb_state::bank_select_w));
 	// e8-ef ga test
 	// f0-f7 buzzer
@@ -579,6 +582,9 @@ void pn8800fxb_state::pn8800fxb(machine_config &config)
 	PALETTE(config, m_palette, FUNC(pn8800fxb_state::palette), 2);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx);
+
+	TC8521(config, "rtc", XTAL(32'768));
+	// alarm output connected to auto power-on
 }
 
 
