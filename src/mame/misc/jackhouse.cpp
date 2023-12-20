@@ -43,7 +43,8 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_videoram(*this, "new_videoram%u", 0U, 0x0800U, ENDIANNESS_LITTLE),
+		m_fgvideoram(*this, "fg_videoram%u", 0U, 0x0800U, ENDIANNESS_LITTLE),
+		m_bgvideoram(*this, "bg_videoram%u", 0U, 0x0800U, ENDIANNESS_LITTLE),
 		m_bgrom(*this, "bg_tiles"),
 		m_gfx2rom(*this, "gfx2"),
 		m_palette(*this, "palette"),
@@ -65,12 +66,31 @@ private:
 	void ramdac_map(address_map &map);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	template<u8 N> TILE_GET_INFO_MEMBER(get_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	void videoram_w(u16 dst, u16 tile_code, u8 tile_color, u8 sel);
+	void fgvideoram_w(u16 dst, u16 tile_code, u8 tile_color);
+	void bgvideoram_w(u16 dst, u16 tile_code, u8 tile_color);
 
-	// Video processor related stuff
-	void video_proc_w(offs_t offs, u8 data);
+	// Video processor
+	void vp_reg_0x00(offs_t offs, u8 data);
+	void vp_reg_0x01(offs_t offs, u8 data);
+	void vp_reg_0x02(offs_t offs, u8 data);
+	void vp_reg_0x04(offs_t offs, u8 data);
+	void vp_reg_0x05(offs_t offs, u8 data);
+	void vp_reg_0x07(offs_t offs, u8 data);
+	void vp_reg_0x08(offs_t offs, u8 data);
+	void vp_reg_0x0f(offs_t offs, u8 data);
+	void vp_reg_0x10(offs_t offs, u8 data);
+	void vp_reg_0x12(offs_t offs, u8 data);
+	void vp_reg_0x13(offs_t offs, u8 data);
+	void vp_reg_0x14(offs_t offs, u8 data);
+	void vp_reg_0x15(offs_t offs, u8 data);
+	void vp_reg_0x16(offs_t offs, u8 data);
+	void vp_reg_0x17(offs_t offs, u8 data);
+	void vp_reg_0x18(offs_t offs, u8 data);
+	void vp_reg_0x1a(offs_t offs, u8 data);
+	void vp_reg_0x1b(offs_t offs, u8 data);
 	void vp_exec(u8 data);
 	void vp_playfield(u8 data);
 
@@ -82,8 +102,8 @@ private:
 	// Devices
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	memory_share_array_creator<u8, 6> m_videoram;
-
+	memory_share_array_creator<u8, 3> m_fgvideoram;
+	memory_share_array_creator<u8, 3> m_bgvideoram;
 	required_memory_region m_bgrom;
 	required_memory_region m_gfx2rom;
 	required_device<palette_device> m_palette;
@@ -93,22 +113,22 @@ private:
 	tilemap_t *m_fg_tilemap = nullptr;
 	tilemap_t *m_bg_tilemap = nullptr;
 
-	offs_t vr_addr[6] = {0, 0, 0, 0, 0, 0};
-	offs_t vp_vram_col[6] = {0, 0, 0, 0, 0, 0};
-	offs_t vp_vram_row[6] = {0, 0, 0, 0, 0, 0};
-	u8 vp_buff_addr = 0;
-	u8 vp_buff[16];
-	u8 vp_cmd_mode = 0;
-	u8 vp_gfxA_src_low = 0;
-	u8 vp_gfxA_src_high = 0;
-	u8 vp_gfxB_src_low = 0;
-	u8 vp_gfxB_src_high = 0;
-	u8 vp_vram_dest_row = 0;
-	u8 vp_vram_dest_col = 0;
-	u8 vp_color_dst = 0;
-	u8 vp_col_end = 0;
-	u8 vp_row_end = 0;
-	u8 m_ram_selector;
+	// vp internal registers
+	offs_t m_fgt_addr = 0; // fg tiles address register
+	offs_t m_bgt_addr = 0; // bg tiles address register
+	offs_t m_fgc_addr = 0; // fg color address register
+	offs_t m_bgc_addr = 0; // bg color address register
+	u8 m_cmd_mode = 0;
+	u8 m_gfxA_src_low = 0;
+	u8 m_gfxA_src_high = 0;
+	u8 m_gfxB_src_low = 0;
+	u8 m_gfxB_src_high = 0;
+	u8 m_vram_dest_row = 0;
+	u8 m_vram_dest_col = 0;
+	u8 m_color_dst = 0;
+	u8 m_col_end = 0;
+	u8 m_row_end = 0;
+	u8 m_ram_selector = 0;
 	u8 m_cont = 0;
 };
 
@@ -128,9 +148,27 @@ void jackhouse_state::program_map(address_map &map)
 void jackhouse_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-
+	map(0x00, 0x00).w(FUNC(jackhouse_state::vp_reg_0x00));
+	map(0x01, 0x01).w(FUNC(jackhouse_state::vp_reg_0x01));
+	map(0x02, 0x03).w(FUNC(jackhouse_state::vp_reg_0x02));
+	map(0x04, 0x04).w(FUNC(jackhouse_state::vp_reg_0x04));
+	map(0x05, 0x06).w(FUNC(jackhouse_state::vp_reg_0x05));
+	map(0x07, 0x07).w(FUNC(jackhouse_state::vp_reg_0x07));
+	map(0x08, 0x08).w(FUNC(jackhouse_state::vp_reg_0x08));
 	map(0x0c, 0x0c).portr("IN3");  // unknown
-	map(0x00, 0x1b).w(FUNC(jackhouse_state::video_proc_w));
+	map(0x0f, 0x0f).w(FUNC(jackhouse_state::vp_reg_0x0f));
+	map(0x10, 0x10).w(FUNC(jackhouse_state::vp_reg_0x10));
+	map(0x11, 0x11).nopw();
+	map(0x12, 0x12).w(FUNC(jackhouse_state::vp_reg_0x12));
+	map(0x13, 0x13).w(FUNC(jackhouse_state::vp_reg_0x13));
+	map(0x14, 0x14).w(FUNC(jackhouse_state::vp_reg_0x14));
+	map(0x15, 0x15).w(FUNC(jackhouse_state::vp_reg_0x15));
+	map(0x16, 0x16).w(FUNC(jackhouse_state::vp_reg_0x16));
+	map(0x17, 0x17).w(FUNC(jackhouse_state::vp_reg_0x17));
+	map(0x18, 0x18).w(FUNC(jackhouse_state::vp_reg_0x18));
+	map(0x19, 0x19).nopw();
+	map(0x1a, 0x1a).w(FUNC(jackhouse_state::vp_reg_0x1a));
+	map(0x1b, 0x1b).w(FUNC(jackhouse_state::vp_reg_0x1b));
 
 	map(0x81, 0x81).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x82, 0x83).w("aysnd", FUNC(ay8910_device::data_address_w));
@@ -161,20 +199,22 @@ void jackhouse_state::ram_sel(u8 data)
 		m_bg_tilemap->enable(false);
 	else
 		m_bg_tilemap->enable(true);
-
-	//logerror("Set Bit Selector: %02x\n", data);
 }
 
-void jackhouse_state::videoram_w(u16 dst, u16 tile_code, u8 tile_color, u8 sel)
+void jackhouse_state::fgvideoram_w(u16 dst, u16 tile_code, u8 tile_color)
 {
-	m_videoram[sel][dst] = tile_code & 0xff;
-	m_videoram[sel + 1][dst] = (tile_code >> 8) & 0xff;
-	m_videoram[sel + 2][dst] = tile_color;
+	m_fgvideoram[0][dst] = tile_code & 0xff;
+	m_fgvideoram[1][dst] = (tile_code >> 8) & 0xff;
+	m_fgvideoram[2][dst] = tile_color;
+	m_fg_tilemap->mark_tile_dirty(dst);
+}
 
-	if (sel == 0)
-		m_fg_tilemap->mark_tile_dirty(dst);
-	else
-		m_bg_tilemap->mark_tile_dirty(dst);
+void jackhouse_state::bgvideoram_w(u16 dst, u16 tile_code, u8 tile_color)
+{
+	m_bgvideoram[0][dst] = tile_code & 0xff;
+	m_bgvideoram[1][dst] = (tile_code >> 8) & 0xff;
+	m_bgvideoram[2][dst] = tile_color;
+	m_bg_tilemap->mark_tile_dirty(dst);
 }
 
 void jackhouse_state::vp_playfield(u8 data)
@@ -187,29 +227,146 @@ void jackhouse_state::vp_playfield(u8 data)
 		{
 			u16 dst = (i * 0x40 + j) & 0x7ff;
 			u16 tile_code = (ROM[tile_index] | ( ROM[tile_index + 1] << 8));
-			//logerror("vp: BG: tile_index:%04x - tile_code:%04x\n", tile_index, tile_code);
 			tile_index += 2;
-			videoram_w(dst, tile_code, data, 3);
+			bgvideoram_w(dst, tile_code, data);
 		}
 	}
 }
 
+
+// Video Processor handlers
+
+void jackhouse_state::vp_reg_0x00(offs_t offs, u8 data)
+{
+	m_fgt_addr = data; // fg tiles address register
+	m_bgt_addr = data; // bg tiles address register
+	m_fgc_addr = data; // fg color address register
+	m_bgc_addr = data; // bg color address register
+
+}
+
+void jackhouse_state::vp_reg_0x01(offs_t offs, u8 data)
+{
+	m_fgt_addr |= data << 6; // fg tiles address register
+	m_bgt_addr |= data << 6; // bg tiles address register
+	m_fgc_addr |= data << 6; // fg color address register
+	m_bgc_addr |= data << 6; // bg color address register
+}
+
+
+// fg tiles
+void jackhouse_state::vp_reg_0x02(offs_t offs, u8 data)
+{
+	m_fgvideoram[offs][m_fgt_addr] = data;
+	m_fg_tilemap->mark_tile_dirty(m_fgt_addr);
+	if (offs == 1)
+		m_fgt_addr += 1;
+}
+
+// fg color
+void jackhouse_state::vp_reg_0x04(offs_t offs, u8 data)
+{
+	m_fgvideoram[2][m_fgc_addr] = data;
+	m_fg_tilemap->mark_tile_dirty(m_fgc_addr);
+	m_fgc_addr += 1;
+}
+
+// bg tiles
+void jackhouse_state::vp_reg_0x05(offs_t offs, u8 data)
+{
+	m_bgvideoram[offs][m_fgt_addr] = data;
+	m_bg_tilemap->mark_tile_dirty(m_fgt_addr);
+	if (offs == 1)
+		m_bgt_addr++;
+}
+
+// bg color
+void jackhouse_state::vp_reg_0x07(offs_t offs, u8 data)
+{
+	m_bgvideoram[2][m_bgc_addr] = data;
+	m_bg_tilemap->mark_tile_dirty(m_bgc_addr);
+	m_bgc_addr++;
+}
+
+void jackhouse_state::vp_reg_0x08(offs_t offs, u8 data)
+{
+	m_cont++;
+	if (m_cont == 0x3f)
+		vp_playfield(m_color_dst);
+}
+
+void jackhouse_state::vp_reg_0x0f(offs_t offs, u8 data)
+{
+	m_gfxA_src_low = data;
+}
+
+void jackhouse_state::vp_reg_0x10(offs_t offs, u8 data)
+{
+	m_gfxA_src_high = data;
+}
+
+void jackhouse_state::vp_reg_0x12(offs_t offs, u8 data)
+{
+	m_color_dst = data;
+}
+
+void jackhouse_state::vp_reg_0x13(offs_t offs, u8 data)
+{
+	m_gfxB_src_low = data;
+}
+
+void jackhouse_state::vp_reg_0x14(offs_t offs, u8 data)
+{
+	m_gfxB_src_high = data;
+}
+
+void jackhouse_state::vp_reg_0x15(offs_t offs, u8 data)
+{
+	m_vram_dest_col = data;
+}
+
+void jackhouse_state::vp_reg_0x16(offs_t offs, u8 data)
+{
+	m_vram_dest_row = data;
+}
+
+void jackhouse_state::vp_reg_0x17(offs_t offs, u8 data)
+{
+	m_col_end = data;
+}
+
+void jackhouse_state::vp_reg_0x18(offs_t offs, u8 data)
+{
+	m_row_end = data;
+	vp_exec(data);
+}
+
+void jackhouse_state::vp_reg_0x1a(offs_t offs, u8 data)
+{
+	m_cont = 0;
+}
+
+void jackhouse_state::vp_reg_0x1b(offs_t offs, u8 data)
+{
+	m_cmd_mode = data;
+}
+
 void jackhouse_state::vp_exec(u8 data)
 {
-	switch( vp_cmd_mode )
+	switch( m_cmd_mode )
 	{
 		// mode bit 0 - gfx data from vp_gfxB_src (ports 13,14)
 		// mode bit 1 - gfx data from vp_gfxB_src (ports 13,14)
 		case 0x01:
 		case 0x02:
 		{
-			u16 tile_code = vp_gfxB_src_low | (vp_gfxB_src_high << 8);
-			for (u8 i = vp_vram_dest_row; i < vp_vram_dest_row + vp_row_end + 1; i++)
+			u16 tile_code = m_gfxB_src_low | (m_gfxB_src_high << 8);
+			for (u8 i = m_vram_dest_row; i < m_vram_dest_row + m_row_end + 1; i++)
 			{
-				for (u8 j = vp_vram_dest_col; j < vp_vram_dest_col + vp_col_end + 1; j++)
+				for (u8 j = m_vram_dest_col; j < m_vram_dest_col + m_col_end + 1; j++)
 				{
 					u16 dst = (i * 0x40 + j) & 0x7ff;
-					videoram_w(dst, tile_code++, vp_color_dst, 0);
+					fgvideoram_w(dst, tile_code++, m_color_dst);
 				}
 			}
 			break;
@@ -218,16 +375,16 @@ void jackhouse_state::vp_exec(u8 data)
 		case 0x04:
 		{
 			u8 *ROM = m_gfx2rom->base();
-			u32 tile_index = ( vp_gfxA_src_low | (vp_gfxA_src_high << 8)) * 4;
-			for (u8 i = vp_vram_dest_row; i < vp_vram_dest_row + vp_row_end + 1; i++)
+			u32 tile_index = ( m_gfxA_src_low | (m_gfxA_src_high << 8)) * 4;
+			for (u8 i = m_vram_dest_row; i < m_vram_dest_row + m_row_end + 1; i++)
 			{
-				for (u8 j = vp_vram_dest_col; j < vp_vram_dest_col + vp_col_end + 1; j++)
+				for (u8 j = m_vram_dest_col; j < m_vram_dest_col + m_col_end + 1; j++)
 				{
 					u16 dst = (i * 0x40 + j) & 0x7ff;
-					u16 tile_code = ROM[tile_index] | (ROM[tile_index+1] << 8);
+					u16 tile_code = ROM[tile_index] | (ROM[tile_index + 1] << 8);
 					//logerror("vp: FG:tile_index:%04x - tile_code:%04x\n", tile_index, tile_code);
 					tile_index += 4;
-					videoram_w(dst, tile_code, vp_color_dst, 0);
+					fgvideoram_w(dst, tile_code, m_color_dst);
 				}
 			}
 			break;
@@ -236,157 +393,37 @@ void jackhouse_state::vp_exec(u8 data)
 		case 0x08:
 			break;
 		default:
-			logerror("vp: Illegal mode:%02x dst\n", vp_cmd_mode);
+			logerror("vp: Illegal mode:%02x dst\n", m_cmd_mode);
 	}
 }
 
-void jackhouse_state::video_proc_w(offs_t offs, u8 data)
+TILE_GET_INFO_MEMBER(jackhouse_state::get_fg_tile_info)
 {
-	// logerror("video_proc_w :offs:%04x data:%02x\n", offs, data);
-	switch ( offs )
-	{
-		case 0x00:  // vram address register low (w/ autoincrement)
-		{
-			for (u8 i = 0; i < 6; i++)
-				vp_vram_col[i] = data;
-			break;
-		}
-		case 0x01:  // vram address register high (w/ autoincrement)
-		{
-			for (u8 i = 0; i < 6; i++)
-			{
-				vp_vram_row[i] = data;
-				vr_addr[i]= 0x40 * vp_vram_row[i] + vp_vram_col[i];
-				// logerror("%s: Acceso VideoRam: Set addr: Address = %04x\n", machine().describe_context(), vr_addr[0]);
-			}
-			break;
-		}
-		case 0x02:
-		case 0x03:
-		case 0x04:
-		case 0x05:
-		case 0x06:
-		case 0x07:
-		{
-			// video ram write: main cpu sends data direct to video ram
-			m_videoram[offs - 2][vr_addr[offs - 2]] = data;
-			m_fg_tilemap->mark_tile_dirty(vr_addr[offs - 2]);
-			// logerror("%s: VideoRam (%02x) Address:%02x - Write: Data = %04x\n", machine().describe_context(), offs - 2, vr_addr[offs - 2], m_videoram[offs - 2][vr_addr[offs - 2]] );
-			vr_addr[offs - 2] += 1;  // autoincrement
-			break;
-		}
-		case 0x08:
-		{
-			// logerror("%s:vgp: Offs:0x08: Unknown data:%02x - cont:%02x\n", machine().describe_context(), data, m_cont);
-			m_cont++;
-			if (m_cont == 0x3f)
-				vp_playfield(vp_color_dst);
-			break;
-		}
-		case 0x0f:
-		{
-			vp_gfxA_src_low = data;
-			// logerror("vgp: Offs:0x0f: Set GFX's source address low:   data:%02x\n", vp_gfxA_src_low);
-			break;
-		}
-		case 0x10:
-		{
-			vp_gfxA_src_high = data;
-			// logerror("vgp: Offs:0x10: Set GFX's source address high:  data:%02x\n", vp_gfxA_src_high);
-			break;
-		}
-		case 0x11:
-		{
-			// logerror("vgp: Offs:0x11: Extra data for Mode Bit 1  y Bit 3 :%02x\n", data);
-			break;
-		}
-		case 0x12:
-		{
-			vp_color_dst = data;
-			// logerror("vgp: Offs:0x12: Set Destination Color           data:%02x\n", vp_color_dst);
-			break;
-		}
-		case 0x13:
-		{
-			vp_gfxB_src_low = data;
-			// logerror("vgp: Offs:0x13: Set GFX's source address low:   data:%02x\n", vp_gfxB_src_low);
-			break;
-		}
-		case 0x14:
-		{
-			vp_gfxB_src_high = data;
-			// logerror("vgp: Offs:0x14: Set GFX's source address high:  data:%02x\n", vp_gfxB_src_high);
-			break;
-		}
-		case 0x15:
-		{
-			vp_vram_dest_col = data;
-			// logerror("vgp: Offs:0x15: Set vp_vram_dest_row dest address low:   data:%02x\n", vp_vram_dest_col);
-			break;
-		}
-		case 0x16:
-		{
-			vp_vram_dest_row = data;
-			// logerror("vgp: Offs:0x16: Set vp_vram_dest_col dest address high:  data:%02x\n", vp_vram_dest_row);
-			break;
-		}
-		case 0x17:
-		{
-			// logerror("vgp: Offs:0x17: row_end: data:%02x\n", data);
-			vp_col_end = data;
-			break;
-		}
-		case 0x18:
-		{
-			vp_row_end = data;
-			// logerror("vgp: Offs:0x18: col_end                  data:%02x\n", vp_col_end);
-			vp_exec(data);
-			break;
-		}
-		case 0x19:
-		{
-			vp_buff_addr = data & 0x0f;
-			// logerror("%s:vgp: Offs:0x19: Set Buffer Address: data:%02x\n", machine().describe_context(), vp_buff_addr);
-			break;
-		}
-		case 0x1a:
-		{
-			vp_buff[vp_buff_addr] = data;
-			// logerror("%s:vgp: Offs:0x1a: Set Buffer Data: offs:%02x - data:%02x\n", machine().describe_context(), vp_buff_addr, vp_buff[vp_buff_addr]);
-			m_cont = 0;
-			break;
-		}
-		case 0x1b:
-		{
-			//select mode ( bit 0, bit 1, bit 2, bit 3 )
-			vp_cmd_mode = data;
-			// logerror("vgp: Offs:0x1b: Mode register: data:%02x\n", vp_cmd_mode);
-			break;
-		}
-		default:
-			logerror(" vgp: Unknown register (out of range): offs:%02x - data:%02x\n", offs, data);
-	}
-}
-
-
-template<u8 N>
-TILE_GET_INFO_MEMBER(jackhouse_state::get_tile_info)
-{
-// ram 0/3: tile code low | ram 1/4: tile code hi | ram 2/5: color
-	u8 sel = N * 3;
+// ram 0: tile code low | ram 1: tile code hi | ram 2: color
 	int offs = tile_index;
-	int color = m_videoram[sel + 2][offs];
-	int code =  m_videoram[sel][offs] | (m_videoram[sel + 1][offs] << 8);
+	int code =  m_fgvideoram[0][offs] | (m_fgvideoram[1][offs] << 8);
+	int color = m_fgvideoram[2][offs];
 
-	tileinfo.set(N, code, color, 0);
+	tileinfo.set(0, code, color, 0);
+}
+
+TILE_GET_INFO_MEMBER(jackhouse_state::get_bg_tile_info)
+{
+// ram 0: tile code low | ram 1: tile code hi | ram 2: color
+	int offs = tile_index;
+	int code =  m_bgvideoram[0][offs] | (m_bgvideoram[1][offs] << 8);
+	int color = m_bgvideoram[2][offs];
+
+	tileinfo.set(1, code, color, 0);
 }
 
 void jackhouse_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(jackhouse_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(jackhouse_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(jackhouse_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(jackhouse_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 }
+
 
 uint32_t jackhouse_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
