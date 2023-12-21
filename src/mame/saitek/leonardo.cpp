@@ -19,9 +19,9 @@ The expansion modules are basically entire chesscomputers, making the whole
 thing combined a 'dual brain' chesscomputer. The embedded chess engine is by
 Julio Kaplan and Craig Barnes, same as the one in SciSys Turbo S-24K.
 
-OSA serial link transmission format: 1200 baud, 1 start bit, 8 data bits, 1 stop
-bit, no parity. To establish a connection, command "o" must be entered first
-(from eg. a terminal), and then the Comm. LED will turn on.
+OSA serial link transmission format: 1 start bit, 8 data bits, 1 stop bit, no
+parity. The default baudrate is 1200. To establish a connection, command "o" must
+be entered first (from eg. a terminal), and then the Comm. LED will turn on.
 
 Hardware notes:
 

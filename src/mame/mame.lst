@@ -19296,6 +19296,7 @@ mm2b                            // Mephisto MM II
 mm2c                            // Mephisto MM II
 mm2d                            // Mephisto MM II
 mm2e                            // Mephisto MM II
+mm2nona
 bup                             // Mephisto B&P
 bupa                            // Mephisto B&P
 mm4                             // Mephisto MM IV
@@ -19308,7 +19309,6 @@ mm5p
 rebel5                          // Mephisto Rebell 5.0
 rebel5a                         // Mephisto Rebell 5.0
 rebel5b                         // Mephisto Rebell 5.0
-rebelp
 
 @source:hegenerglaser/modena.cpp
 modena                          // 1992 Mephisto Modena
