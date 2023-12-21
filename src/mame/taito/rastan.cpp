@@ -480,8 +480,8 @@ void rastan_state::rastan(machine_config &config)
 	m_adpcm_sel->out_callback().set(m_msm, FUNC(msm5205_device::data_w));
 
 	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
-	ciu.set_master_tag(m_maincpu);
-	ciu.set_slave_tag(m_audiocpu);
+	ciu.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	ciu.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
 
 
