@@ -432,26 +432,11 @@ TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info_pixel)
 
 /******************************************************************************/
 
+//static bool bank2 = false;
 void taito_f3_state::screen_vblank(int state)
 {
-	// rising edge
-	if (state)
-	{
-		if (m_sprite_lag==2)
-		{
-			if (machine().video().skip_this_frame() == 0)
-			{
-				get_sprite_info(m_spriteram16_buffered.get());
-			}
-			memcpy(m_spriteram16_buffered.get(), m_spriteram.target(), 0x10000);
-		}
-		else if (m_sprite_lag == 1)
-		{
-			if (machine().video().skip_this_frame() == 0)
-			{
-				get_sprite_info(m_spriteram.target());
-			}
-		}
+	if (state) {
+		//get_sprite_info(m_spriteram.target());
 	}
 }
 
@@ -660,6 +645,8 @@ void taito_f3_state::pf_ram_w(offs_t offset, u16 data, u16 mem_mask)
 
 void taito_f3_state::control_0_w(offs_t offset, u16 data, u16 mem_mask)
 {
+	logerror("@@ scroll command: %04x at: %04x vpos: %d\n", data, offset*2, m_screen->vpos());
+	
 	COMBINE_DATA(&m_control_0[offset]);
 }
 
@@ -675,6 +662,16 @@ u16 taito_f3_state::spriteram_r(offs_t offset)
 
 void taito_f3_state::spriteram_w(offs_t offset, u16 data, u16 mem_mask)
 {
+	if (offset % 8 == 3) {
+		logerror("sprite write: %04x at: %04x vpos: %d\n", data, offset*2, m_screen->vpos());
+	}
+	//if (offset < 8*3) {
+	if (offset % 8 == 5) {
+		if (BIT(m_spriteram[(offset & ~0b111) + 3], 15)) {
+			logerror("!sprite command: %04x at: %04x vpos: %d\n", data, offset*2, m_screen->vpos());
+		}
+	}
+		//}
 	COMBINE_DATA(&m_spriteram[offset]);
 }
 
@@ -1592,7 +1589,7 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 		u16 line_6000 = this_line(0x6000);
 
 		line.pivot.pivot_control = BIT(line_6000, 8, 8);
-		if (line.pivot.pivot_control & 0b01010111) // check if unknown pivot control bits set
+		if (line.pivot.pivot_control & 0b01010101) // check if unknown pivot control bits set
 			logerror("unknown pivot ctrl bits: %02x__ at %04x\n", line.pivot.pivot_control, 0x6000 + y*2);
 
 		for (int sp_group = 0; sp_group < NUM_SPRITEGROUPS; sp_group++) {
@@ -1745,10 +1742,44 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 
 void taito_f3_state::get_pf_scroll(int pf_num, u32 &reg_sx, u32 &reg_sy)
 {
-	u32 sy = ((m_control_0[pf_num + 4] & 0xffff) <<  9) + (1 << 16);
-	u32 sx = ((m_control_0[pf_num] & 0xffc0) << 10) - ((6 + 4 * pf_num) << 16);
-	sx-= ((m_control_0[pf_num] & 0x003f) << 10) + 0x0400 - 0x10000;
+	//u32 sy = ((m_control_0[pf_num + 4] & 0xffff) <<  9) + (1 << 16);
+	//u32 sx = ((m_control_0[pf_num] & 0xffc0) << 10) - ((6 + 4 * pf_num) << 16);
+	
+	u32 sy = (m_control_0[pf_num + 4] << 9) + (1 << 16);
+	//              AAAAAAAAAAAAAAAA
+	//     AAAAAAAAAAAAAAAA.........
+	//         1
+	
+	u16 ctrl = m_control_0[pf_num];
+	//              AAAAAAAAAASSSSSS
+	//         ↓
+	//+   AAAAAAAAAA................
+	//+            1
+	//-             SSSSSS..........
+	//-                  1
+	
+	//    0000000001
+	//   10000000000
+	//-             000001..........
+	//-            1000000..........	
+
+	//+            1
+	//-             SSSSSS..........
+	//-                  1
+	
+	//+   AAAAAAAAAA................
+	//+             111111  (if s = 0b000000)
+	//+             111110  (if s = 0b000001)
+	//+             111101  (if s = 0b000010)
+	
+	//+             111110  (if s = 0b000001)
+	//+             000000  (if s = 0b111111)
+	
+	u32 sx = (BIT(ctrl, 6, 10) << 16) + (BIT(~ctrl, 0, 6) << 10) - ((6 + 4 * pf_num) << 16);
+	
+	// sx-= ((m_control_0[pf_num] & 0x003f) << 10) + 0x0400 - 0x10000;
 	if (m_flipscreen) {
+		logerror("aaa");
 		sy =  0x3000000 - sy;
 		sx = -0x1a00000 - sx;
 		
@@ -1756,6 +1787,9 @@ void taito_f3_state::get_pf_scroll(int pf_num, u32 &reg_sx, u32 &reg_sy)
 			sx = -sx + (((188 - 512) & 0xffff) << 16);
 		else
 			sx = -sx + (188 << 16);
+		
+		sy = -sy - (256 << 16);
+		
 	}
 	reg_sx = sx;
 	reg_sy = sy;
@@ -1833,10 +1867,8 @@ void taito_f3_state::scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cl
 		int tmap_number = pf + line_data.pf[pf].alt_tilemap * 2;
 		line_data.pf[pf].srcbitmap = &m_tilemap[tmap_number]->pixmap();
 		line_data.pf[pf].flagsbitmap = &m_tilemap[tmap_number]->flagsmap();
+		
 		get_pf_scroll(pf, line_data.pf[pf].reg_sx, line_data.pf[pf].reg_sy);
-		// if (m_flipscreen)
-		// 	line_data.pf[pf].reg_fx_y = line_data.pf[pf].reg_sy - (256 << 16);
-		// else
 		line_data.pf[pf].reg_fx_y = line_data.pf[pf].reg_sy;
 	}
 	line_data.pivot.srcbitmap_pixel = &m_pixel_layer->pixmap();
@@ -1872,8 +1904,17 @@ void taito_f3_state::scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cl
 
 	auto prio = [](const auto& obj) -> u8 { return obj->prio(); };
 
+	int ys = m_flipscreen ? 24 : 0;
 	for (int y = y_start; y != y_end; y += y_inc) {
 		read_line_ram(line_data, y);
+		
+		// for (int pf = 0; pf < NUM_PLAYFIELDS; ++pf) {
+		// 	auto p = &line_data.pf[pf];
+		// 	// if (m_flipscreen)
+		// 	// 	line_data.pf[pf].reg_fx_y = line_data.pf[pf].reg_sy - (256 << 16);
+		// 	// else
+		// 	//line_data.pf[pf].reg_fx_y = line_data.pf[pf].reg_sy + (p->y_scale << 9) * y;
+		// }
 
 		// sort layers
 		std::array<std::variant<pivot_inf*, sprite_inf*, playfield_inf*>,
@@ -1890,13 +1931,14 @@ void taito_f3_state::scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cl
 		// draw layers to framebuffer, (for now, in bottom->top order)
 		for (auto gfx : layers) {
 			std::visit([&](auto&& arg) {
-				using T = std::decay_t<decltype(arg)>;
+				draw_line(&bitmap.pix(y+ys), y+ys, 46, 46 + 320, arg);
+				/*using T = std::decay_t<decltype(arg)>;
 				if constexpr (std::is_same_v<T, sprite_inf*>)
 					draw_line(&bitmap.pix(y), y, 46, 46 + 320, arg);
 				else if constexpr (std::is_same_v<T, playfield_inf*>)
 					draw_line(&bitmap.pix(y), y, 46, 46 + 320, arg);
 				else if constexpr (std::is_same_v<T, pivot_inf*>)
-					draw_line(&bitmap.pix(y), y, 46, 46 + 320, arg);
+				draw_line(&bitmap.pix(y), y, 46, 46 + 320, arg);*/
 			}, gfx);
 		}
 
@@ -2034,7 +2076,7 @@ void taito_f3_state::get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos,
 	u8 _y_zoom[256];
 	u16 pri = 0, pal_add = 0;
 
-	sx += ((46 << 16));
+	//sx += ((46 << 16));
 
 	if (m_flipscreen)
 	{
@@ -2815,9 +2857,10 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 	
 	tempsprite *sprite_ptr = &m_spritelist[0];
 	int total_sprites = 0;
-	int bank = 0;
+	
 	for (int offs = 0; offs < 0x400 && (total_sprites < 0x400); offs++)
 	{
+		int bank = m_sprite_bank ? 0x4000 : 0;
 		const u16 *spr = &spriteram16_ptr[bank + (offs * 8)];
 
 		/* Check if the sprite list jump command bit is set */
@@ -2839,7 +2882,11 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 			u16 cntrl = spr[5];
 			m_flipscreen = BIT(cntrl, 13);
 
-			/*  cntrl bit 12(0x1000) = disabled?  (From F2 driver, doesn't seem used anywhere)
+			/*  
+			    ??f? ??dd ???? ??tb
+			    
+			    
+			    cntrl bit 12(0x1000) = disabled?  (From F2 driver, doesn't seem used anywhere)
 			    cntrl bit 4 (0x0010) = ???
 			    cntrl bit 5 (0x0020) = ???
 			    cntrl bit 1 (0x0002) = enabled when Darius Gaiden sprite trail effect should occur (MT #1922)
@@ -2850,8 +2897,7 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 			m_sprite_pen_mask = (m_sprite_extra_planes << 4) | 0x0f;
 
 			/* Sprite bank select */
-			if (BIT(cntrl, 0))
-				bank = 0x4000;
+			m_sprite_bank = BIT(cntrl, 0);
 		}
 
 		u8 spritecont = spr[4] >> 8;
@@ -2913,6 +2959,8 @@ void taito_f3_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 /******************************************************************************/
 u32 taito_f3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	logerror("vpos screen update now: %d\n", m_screen->vpos());;
+	
 	u32 sy_fix[5], sx_fix[5];
 
 	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
@@ -2934,8 +2982,10 @@ u32 taito_f3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	m_pri_alp_bitmap.fill(0, cliprect);
 
 	/* sprites */
-	if (m_sprite_lag == 0)
-		get_sprite_info(m_spriteram.target());
+	//if (m_sprite_lag == 0)
+	// these are getted during vblank now
+	//get_sprite_info(m_spriteram.target());
+	
 
 	/* Update sprite buffer */
 	//draw_sprites(bitmap, cliprect);
@@ -2954,6 +3004,8 @@ u32 taito_f3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	//scanline_draw(bitmap, cliprect);
 	scanline_draw_TWO(bitmap, cliprect);
 
+	get_sprite_info(m_spriteram.target());
+	
 	if (VERBOSE)
 		print_debug_info(bitmap);
 	return 0;

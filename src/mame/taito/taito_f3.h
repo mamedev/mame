@@ -379,6 +379,7 @@ protected:
 	u16 m_pal_add[5]{};
 	std::unique_ptr<tempsprite[]> m_spritelist;
 	const tempsprite *m_sprite_end = nullptr;
+	bool m_sprite_bank = 0;
 	std::unique_ptr<f3_line_inf[]> m_line_inf;
 	std::unique_ptr<f3_playfield_line_inf[]> m_pf_line_inf;
 	std::unique_ptr<f3_spritealpha_line_inf[]> m_sa_line_inf;
