@@ -58,7 +58,7 @@ private:
 
 	// Video, Cursor & Sound
 	void vblank(int state);
-	int get_attribute(int at_row, int at_col, int attribute = 0, int from_row = 0, int from_col = 0);
+	void update_attribute(int at_row, int at_col, int from_row, int from_col);
 	void char_to_display(uint8_t byte);
 	void data_to_display(uint8_t byte);
 	void advance_cursor();
@@ -120,6 +120,9 @@ private:
 	bool m_cursor_col_input;
 	bool m_underline_input;
 	bool m_speed_check;
+	uint8_t m_attribute;
+	uint8_t m_char_max_row;
+	uint8_t m_char_max_col;
 	emu_timer *m_beep_trigger;
 	emu_timer *m_speed_ctrl;
 

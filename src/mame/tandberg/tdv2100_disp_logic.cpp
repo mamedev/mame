@@ -119,6 +119,9 @@ tandberg_tdv2100_disp_logic_device::tandberg_tdv2100_disp_logic_device(const mac
 	m_write_nakl_cb(*this),
 	m_vblank_state(false),
 	m_speed_check(false),
+	m_attribute(0),
+	m_char_max_row(0),
+	m_char_max_col(0),
 	m_rx_handshake(false),
 	m_tx_handshake(false),
 	m_clear_key_held(false),
@@ -151,6 +154,9 @@ void tandberg_tdv2100_disp_logic_device::device_start()
 	save_item(NAME(m_tx_handshake));
 	save_item(NAME(m_frame_counter));
 	save_item(NAME(m_vblank_state));
+	save_item(NAME(m_attribute));
+	save_item(NAME(m_char_max_row));
+	save_item(NAME(m_char_max_col));
 	save_item(NAME(m_clear_key_held));
 	save_item(NAME(m_line_key_held));
 	save_item(NAME(m_trans_key_held));
@@ -466,24 +472,40 @@ void tandberg_tdv2100_disp_logic_device::vblank(int state)
 	m_vblank_state = state;
 }
 
-int tandberg_tdv2100_disp_logic_device::get_attribute(int at_row, int at_col, int attribute, int from_row, int from_col)
+void tandberg_tdv2100_disp_logic_device::update_attribute(int at_row, int at_col, int from_row, int from_col)
 {
-	for(int char_row = from_row; char_row <= at_row; char_row++)
+	if(at_row >= 0 && at_row < 25 && at_col >= 0 && at_col < 80)
 	{
-		for(int char_col = (char_row == from_row)? from_col : 0; char_col < 80; char_col++)
+		bool first_round = true;
+		for(int char_row = from_row; char_row <= 25; char_row++)
 		{
-			int const vram_data = m_vram[get_ram_addr(char_row, char_col)];
-			if(vram_data&0x80)
+			if(char_row == 25)
 			{
-				attribute = (vram_data&0x70)>>4;
+				char_row = 0;
 			}
-			if(char_row == at_row && char_col == at_col)
+			for(int char_col = (first_round)? from_col : 0; char_col < 80; char_col++)
 			{
-				break;
+				if(char_col == 0 && char_row == 0)
+				{
+					m_attribute = 0;
+				}
+				int const vram_data = m_vram[get_ram_addr(char_row, char_col)];
+				if(vram_data&0x80)
+				{
+					m_attribute = (vram_data&0x70)>>4;
+				}
+
+				if(char_row == at_row && char_col == at_col)
+				{
+					return;
+				}
+			}
+			if(first_round)
+			{
+				first_round = false;
 			}
 		}
 	}
-	return attribute;
 }
 
 uint32_t tandberg_tdv2100_disp_logic_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -500,23 +522,23 @@ uint32_t tandberg_tdv2100_disp_logic_device::screen_update(screen_device &screen
 	bool full_inverse_video = !m_sw_invert_video->read();
 
 	int const char_min_col = cliprect.min_x/9;
-	int const char_max_col = cliprect.max_x/9;
 	int const char_min_row = cliprect.min_y/14;
-	int const char_max_row = cliprect.max_y/14;
-	int attribute = get_attribute(char_min_row, char_min_col);
+	update_attribute(char_min_row, char_min_col, m_char_max_row, m_char_max_col);
+	m_char_max_col = cliprect.max_x/9;
+	m_char_max_row = cliprect.max_y/14;
 	bool const blink_strobe = BIT(m_frame_counter, 3);
 	bool const cursor_blink_strobe = blink_strobe && !m_speed_check;
 
-	for(int char_row_nr = char_min_row; char_row_nr <= char_max_row; char_row_nr++)
+	for(int char_row_nr = char_min_row; char_row_nr <= m_char_max_row; char_row_nr++)
 	{
 		// This is at the start of a char row
 		int const chr_y_pos = char_row_nr*14;
 		if(char_row_nr != char_min_row)
 		{
-			attribute = get_attribute(char_row_nr, char_min_col, attribute, char_row_nr-1, char_max_col+1);
+			update_attribute(char_row_nr, char_min_col, char_row_nr-1, m_char_max_col+1);
 		}
 
-		for(int char_col_nr = char_min_col; char_col_nr <= char_max_col; char_col_nr++)
+		for(int char_col_nr = char_min_col; char_col_nr <= m_char_max_col; char_col_nr++)
 		{
 			// This is at the start of a single character
 			int const chr_x_pos = char_col_nr*9;
@@ -559,34 +581,34 @@ uint32_t tandberg_tdv2100_disp_logic_device::screen_update(screen_device &screen
 					{
 						if(vram_data&0x80)
 						{
-							attribute = (vram_data&0x70)>>4;
+							m_attribute = (vram_data&0x70)>>4;
 						}
 						else
 						{
-							if(attribute == 2)
+							if(m_attribute == 2)
 							{
 								// Low intensity
 								extra_intensity = 0;
 							}
-							else if(attribute == 3 && blink_strobe && !draw_cursor)
+							else if(m_attribute == 3 && blink_strobe && !draw_cursor)
 							{
 								// Blink
 								data = 0x00;
 								dot_nr8 = 0x00;
 							}
-							else if(attribute == 4)
+							else if(m_attribute == 4)
 							{
 								// Inverse
 								data = ~data;
 								dot_nr8 = ~dot_nr8;
 							}
-							else if(attribute == 5 && line == 13)
+							else if(m_attribute == 5 && line == 13)
 							{
 								// Underline
 								data = 0xff;
 								dot_nr8 = 0x01;
 							}
-							else if(attribute == 6)
+							else if(m_attribute == 6)
 							{
 								// Invissible
 								data = 0x00;
