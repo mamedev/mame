@@ -65,10 +65,9 @@ TODO:
 
 #include "emu.h"
 
-#include "bus/kim1/kim1bus.h"
 #include "bus/kim1/cards.h"
+#include "bus/kim1/kim1bus.h"
 #include "cpu/m6502/m6502.h"
-#include "formats/kim1_cas.h"
 #include "imagedev/cassette.h"
 #include "machine/mos6530.h"
 #include "machine/timer.h"
@@ -76,6 +75,8 @@ TODO:
 
 #include "softlist_dev.h"
 #include "speaker.h"
+
+#include "formats/kim1_cas.h"
 
 #include "kim1.lh"
 

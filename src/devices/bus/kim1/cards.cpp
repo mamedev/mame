@@ -9,8 +9,9 @@
 #include "emu.h"
 #include "cards.h"
 
-#include "k1008_vismem.h"
 #include "k1016_16k.h"
+#include "k1008_vismem.h"
+
 
 void kim1_cards(device_slot_interface &device)
 {
