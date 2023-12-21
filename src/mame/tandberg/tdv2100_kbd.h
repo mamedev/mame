@@ -67,7 +67,7 @@ private:
 	devcb_write_line                m_write_transk_cb;
 	devcb_write_line                m_write_break_cb;
 
-	int m_column_counter;
+	uint8_t m_column_counter;
 	uint8_t m_keystate[15];
 
 	bool m_shift;

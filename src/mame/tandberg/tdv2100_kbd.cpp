@@ -157,7 +157,6 @@ void tandberg_tdv2100_keyboard_device::device_start()
 	m_shiftlock_led.resolve();
 
 	save_item(NAME(m_shift_lock));
-
 	save_item(NAME(m_column_counter));
 	save_item(NAME(m_keystate));
 	save_item(NAME(m_shift));
@@ -438,7 +437,7 @@ static INPUT_PORTS_START( tdv2115l )
 
 	PORT_START("X3")
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("ER LINE")            PORT_CODE(KEYCODE_F11)          PORT_CHAR(UCHAR_MAMEKEY(F11))
-		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_TILDE)        PORT_CHAR('^') PORT_CHAR(0x00ac)
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_TILDE)        PORT_CHAR('^') PORT_CHAR(0x00ac)    // Logic NOT
 		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME(u8"Å")                PORT_CODE(KEYCODE_OPENBRACE)    PORT_CHAR(0x00e5) PORT_CHAR(0x00c5)
 		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("A")                  PORT_CODE(KEYCODE_A)            PORT_CHAR('a') PORT_CHAR('A')
 		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("(Space)")            PORT_CODE(KEYCODE_SPACE)        PORT_CHAR(' ')
@@ -528,7 +527,7 @@ static INPUT_PORTS_START( tdv2115l )
 
 	PORT_START("X12")
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("NORM")               PORT_CODE(KEYCODE_RCONTROL)     PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))
-		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_3)            PORT_CHAR('3') PORT_CHAR(0x00a3)
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_3)            PORT_CHAR('3') PORT_CHAR(0x00a3)    // £
 		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("W")                  PORT_CODE(KEYCODE_W)            PORT_CHAR('w') PORT_CHAR('W')
 		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("D")                  PORT_CODE(KEYCODE_D)            PORT_CHAR('d') PORT_CHAR('D')
 		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_NAME("C")                  PORT_CODE(KEYCODE_C)            PORT_CHAR('c') PORT_CHAR('C')

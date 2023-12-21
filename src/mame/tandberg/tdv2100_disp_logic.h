@@ -34,6 +34,8 @@ public:
 	auto write_ackl_callback() { return m_write_ackl_cb.bind(); }
 	auto write_nakl_callback() { return m_write_nakl_cb.bind(); }
 
+	DECLARE_INPUT_CHANGED_MEMBER(rs232_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(rs232_lock_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(uart_changed);
 
 	// Input strobes
@@ -69,10 +71,11 @@ private:
 
 	// RS-232
 	void rs232_rxd_w(int state);
+	void rs232_txd_w(int state);
 	void rs232_dcd_w(int state);
 	void rs232_dsr_w(int state);
 	void rs232_cts_w(int state);
-	void rs232_txd_w(int state);
+	void update_all_rs232_signal_paths();
 	void rs232_ri_w(int state);
 	void uart_rx(int state);
 	void uart_tx(int state);
@@ -107,12 +110,12 @@ private:
 	devcb_write_line                    m_write_nakl_cb;
 
 	// Video, Cursor & Sound
-	int m_frame_counter;
+	uint8_t m_frame_counter;
 	bool m_video_enable;
 	bool m_vblank_state;
-	int m_cursor_row;
-	int m_cursor_col;
-	int m_page_roll;
+	uint8_t m_cursor_row;
+	uint8_t m_cursor_col;
+	uint8_t m_page_roll;
 	bool m_cursor_row_input;
 	bool m_cursor_col_input;
 	bool m_underline_input;

@@ -149,7 +149,6 @@ void tandberg_tdv2100_disp_logic_device::device_start()
 	save_item(NAME(m_request_to_send));
 	save_item(NAME(m_rx_handshake));
 	save_item(NAME(m_tx_handshake));
-
 	save_item(NAME(m_frame_counter));
 	save_item(NAME(m_vblank_state));
 	save_item(NAME(m_clear_key_held));
@@ -181,10 +180,11 @@ void tandberg_tdv2100_disp_logic_device::device_reset()
 	set_uart_state_from_switches();
 	if(force_on_line)
 	{
+		// Use conditional catch to force lines active
 		clock_on_line_flip_flop();
 		clock_transmit_flip_flop();
 	}
-	update_rs232_lamps();
+	update_all_rs232_signal_paths();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -606,11 +606,12 @@ uint32_t tandberg_tdv2100_disp_logic_device::screen_update(screen_device &screen
 					data = ~data;
 					dot_nr8 = ~dot_nr8;
 				}
+				auto *pix = &bitmap.pix(chr_y_pos + line, chr_x_pos);
 				for(int dot = 0; dot < 8; dot++)
 				{
-					bitmap.pix(chr_y_pos + line, chr_x_pos + dot) = palette[BIT(data, 7 - dot)<<extra_intensity];
+					pix[dot] = palette[BIT(data, 7 - dot)<<extra_intensity];
 				}
-				bitmap.pix(chr_y_pos + line, chr_x_pos + 8) = palette[BIT(dot_nr8, 0)<<extra_intensity];
+				pix[8] = palette[BIT(dot_nr8, 0)<<extra_intensity];
 			}
 		}
 	}
@@ -629,59 +630,28 @@ void tandberg_tdv2100_disp_logic_device::update_rs232_lamps()
 	m_write_onlil_cb(m_data_terminal_ready && m_rx_handshake && (m_tx_handshake || !need_tx_for_on_line_led));
 }
 
+// Resolves RS232 RxD to UART SI data path only
 void tandberg_tdv2100_disp_logic_device::rs232_rxd_w(int state)
 {
 	if(!(m_data_terminal_ready && m_rx_handshake))
 	{
 		state = 1;
 	}
+
 	bool ext_echo = BIT(m_sw_rs232_settings->read(), 3);
 	if(!(ext_echo && m_data_terminal_ready))
 	{
-		state = (state && m_uart->so_r());
+		state = ((state && m_uart->so_r()) ? 1 : 0);
 	}
 	m_uart->write_si(state);
 }
 
-void tandberg_tdv2100_disp_logic_device::rs232_dcd_w(int state)
-{
-	m_write_carl_cb(state);
-	bool dcd_handshake = ((m_dsw_u39->read()&0x00c) == 0x008);
-	if(dcd_handshake)
-	{
-		m_rx_handshake = state;
-	}
-	update_rs232_lamps();
-}
-
-void tandberg_tdv2100_disp_logic_device::rs232_dsr_w(int state)
-{
-	bool auto_rx_handshake = BIT(m_sw_rs232_settings->read(), 4);
-	bool dcd_handshake = ((m_dsw_u39->read()&0x00c) == 0x008);
-	if(!dcd_handshake && !auto_rx_handshake)
-	{
-		m_rx_handshake = state;
-	}
-	update_rs232_lamps();
-}
-
-void tandberg_tdv2100_disp_logic_device::rs232_cts_w(int state)
-{
-	bool auto_tx_handshake = BIT(m_sw_rs232_settings->read(), 5);
-	if(!auto_tx_handshake)
-	{
-		m_tx_handshake = state;
-	}
-	update_rs232_lamps();
-}
-
+// Resolves UART SO to RS232 TxD data-path, but also refreshes Rx data-path
 void tandberg_tdv2100_disp_logic_device::rs232_txd_w(int state)
 {
-	bool ext_echo = BIT(m_sw_rs232_settings->read(), 3);
-	if(!(ext_echo && m_data_terminal_ready))
-	{
-		m_uart->write_si(state);
-	}
+	// Handle local echo
+	rs232_rxd_w(m_rs232->rxd_r());
+
 	if(!(m_request_to_send && m_tx_handshake))
 	{
 		state = 1;
@@ -691,6 +661,59 @@ void tandberg_tdv2100_disp_logic_device::rs232_txd_w(int state)
 		state = 0;
 	}
 	m_rs232->write_txd(state);
+}
+
+void tandberg_tdv2100_disp_logic_device::rs232_dcd_w(int state)
+{
+	m_write_carl_cb(state);
+
+	bool dcd_handshake = ((m_dsw_u39->read()&0x00c) == 0x008);
+	if(dcd_handshake)
+	{
+		m_rx_handshake = state;
+		update_rs232_lamps();
+		rs232_rxd_w(m_rs232->rxd_r());
+	}
+}
+
+void tandberg_tdv2100_disp_logic_device::rs232_dsr_w(int state)
+{
+	bool dcd_handshake = ((m_dsw_u39->read()&0x00c) == 0x008);
+	if(!dcd_handshake)
+	{
+		bool auto_rx_handshake = BIT(m_sw_rs232_settings->read(), 4);
+		if(auto_rx_handshake)
+		{
+			state = m_data_terminal_ready;
+		}
+		m_rx_handshake = state;
+		update_rs232_lamps();
+		rs232_rxd_w(m_rs232->rxd_r());
+	}
+}
+
+void tandberg_tdv2100_disp_logic_device::rs232_cts_w(int state)
+{
+	bool auto_tx_handshake = BIT(m_sw_rs232_settings->read(), 5);
+	if(auto_tx_handshake)
+	{
+		state = m_request_to_send;
+	}
+	m_tx_handshake = state;
+	update_rs232_lamps();
+	rs232_txd_w(m_uart->so_r());
+}
+
+INPUT_CHANGED_MEMBER(tandberg_tdv2100_disp_logic_device::rs232_changed)
+{
+	update_all_rs232_signal_paths();
+}
+
+void tandberg_tdv2100_disp_logic_device::update_all_rs232_signal_paths()
+{
+	rs232_dcd_w(m_rs232->dcd_r());
+	rs232_dsr_w(m_rs232->dsr_r());
+	rs232_cts_w(m_rs232->cts_r());      // Updates LEDs, refreshes data-paths
 }
 
 void tandberg_tdv2100_disp_logic_device::rs232_ri_w(int state)
@@ -761,6 +784,7 @@ void tandberg_tdv2100_disp_logic_device::set_uart_state_from_switches()
 	m_uart->write_tsb(BIT(rs232_settings, 2));
 }
 
+// Resolves Rx flow-control logic
 void tandberg_tdv2100_disp_logic_device::clock_on_line_flip_flop()
 {
 	bool force_on_line = BIT(m_dsw_u39->read(), 5);
@@ -781,35 +805,24 @@ void tandberg_tdv2100_disp_logic_device::clock_on_line_flip_flop()
 		}
 	}
 
-	int rs232_settings = m_sw_rs232_settings->read();
 	if(!m_data_terminal_ready)
 	{
-		bool auto_tx_handshake = BIT(rs232_settings, 5);
 		m_request_to_send = false;
 		m_rs232->write_rts((m_request_to_send) ? 1 : 0);
-		if(auto_tx_handshake)
-		{
-			m_tx_handshake = m_request_to_send;
-		}
 	}
 	m_rs232->write_dtr((m_data_terminal_ready) ? 1 : 0);
 
-	bool auto_rx_handshake = BIT(rs232_settings, 4);
-	if(auto_rx_handshake)
-	{
-		m_rx_handshake = m_data_terminal_ready;
-	}
-	bool hold_line_key_for_rts = ((m_dsw_u73->read()&0x3) == 0x1);
-	if(m_data_terminal_ready && hold_line_key_for_rts)
-	{
-		if(!m_trans_key_held)
-		{
-			clock_transmit_flip_flop();
-		}
-	}
+	update_all_rs232_signal_paths();
 	update_rs232_lamps();
+
+	bool hold_line_key_for_rts = ((m_dsw_u73->read()&0x3) == 0x1);
+	if(hold_line_key_for_rts && m_data_terminal_ready && m_line_key_held && !m_trans_key_held)
+	{
+		clock_transmit_flip_flop();
+	}
 }
 
+// Resolves Tx flow-control logic
 void tandberg_tdv2100_disp_logic_device::clock_transmit_flip_flop()
 {
 	bool force_on_line = BIT(m_dsw_u39->read(), 5);
@@ -835,12 +848,19 @@ void tandberg_tdv2100_disp_logic_device::clock_transmit_flip_flop()
 	}
 	m_rs232->write_rts((m_request_to_send) ? 1 : 0);
 
-	bool auto_tx_handshake = BIT(m_sw_rs232_settings->read(), 5);
-	if(auto_tx_handshake)
-	{
-		m_tx_handshake = m_request_to_send;
-	}
+	update_all_rs232_signal_paths();
 	update_rs232_lamps();
+}
+
+INPUT_CHANGED_MEMBER(tandberg_tdv2100_disp_logic_device::rs232_lock_changed)
+{
+	bool force_on_line = BIT(m_dsw_u39->read(), 5);
+	if(force_on_line)
+	{
+		// Use conditional catch to force lines active
+		clock_on_line_flip_flop();
+		clock_transmit_flip_flop();
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -868,7 +888,12 @@ void tandberg_tdv2100_disp_logic_device::process_keyboard_char(uint8_t key)
 
 void tandberg_tdv2100_disp_logic_device::break_w(int state)
 {
+	bool old_state = m_break_key_held;
 	m_break_key_held = state;
+	if(state == !old_state)
+	{
+		rs232_txd_w(m_uart->so_r());
+	}
 }
 
 void tandberg_tdv2100_disp_logic_device::cleark_w(int state)
@@ -956,28 +981,22 @@ static INPUT_PORTS_START( tdv2115l )
 			PORT_CONFSETTING(0x7, "7: 19200")
 
 	PORT_START("sw_rs232_settings")
-		// Note: These settings, along with the Baud-rate selector, are located on a switch-panel
-		//       found at the rear of the machine. Lables, including the Yes/No selections, is
-		//       presented here as it appears written on this panel. Notes are added for clarity,
-		//       to describe settings which in their annotated form may be ambiguous or unclear.
-		//       For the original machine, these ambiguities would have been described in sufficient
-		//       detail through a printed user-manual.
-		PORT_CONFNAME(0x01, 0x01, "NO PARITY [Note: Disables or Enables parity]")               PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, uart_changed, 0)
-			PORT_CONFSETTING(0x00, DEF_STR( No ))
-			PORT_CONFSETTING(0x01, DEF_STR( Yes ))
-		PORT_CONFNAME(0x02, 0x02, "EVEN PARITY [Note: Even or Odd parity, if parity enabled]")  PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, uart_changed, 0)
-			PORT_CONFSETTING(0x00, DEF_STR( No ))
-			PORT_CONFSETTING(0x02, DEF_STR( Yes ))
-		PORT_CONFNAME(0x04, 0x04, "TWO STOP BITS [Note: Two or One stop bit(s)]")               PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, uart_changed, 0)
-			PORT_CONFSETTING(0x00, DEF_STR( No ))
-			PORT_CONFSETTING(0x04, DEF_STR( Yes ))
-		PORT_CONFNAME(0x08, 0x08, "EXT. ECHO [Note: No = Local int. echo for half-duplex]")
-			PORT_CONFSETTING(0x00, DEF_STR( No ))
-			PORT_CONFSETTING(0x08, DEF_STR( Yes ))
-		PORT_CONFNAME(0x10, 0x00, "AUTO RFS [Note: RTS]")
+		PORT_CONFNAME(0x01, 0x01, "RS-232 Parity checking")                                     PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, uart_changed, 0)   // NO PARITY [YES/NO]
+			PORT_CONFSETTING(0x01, DEF_STR( Off ))
+			PORT_CONFSETTING(0x00, DEF_STR( On ))
+		PORT_CONFNAME(0x02, 0x02, "RS-232 Parity type")                                         PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, uart_changed, 0)   // EVEN PARITY [NO/YES]
+			PORT_CONFSETTING(0x00, "Odd")
+			PORT_CONFSETTING(0x02, "Even")
+		PORT_CONFNAME(0x04, 0x04, "RS-232 Number of stop bits")                                 PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, uart_changed, 0)   // TWO STOP BITS [NO/YES]
+			PORT_CONFSETTING(0x00, "One")
+			PORT_CONFSETTING(0x04, "Two")
+		PORT_CONFNAME(0x08, 0x08, "RS-232 Internal local echo when on-line (for half duplex)")  PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, rs232_changed, 0)  // EXT. ECHO [YES/NO]
+			PORT_CONFSETTING(0x08, DEF_STR( Off ))
+			PORT_CONFSETTING(0x00, DEF_STR( On ))
+		PORT_CONFNAME(0x10, 0x00, "RS-232 Automatic RTS with CTS")                              PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, rs232_changed, 0)  // AUTO RFS [NO/YES]
 			PORT_CONFSETTING(0x00, DEF_STR( No ))
 			PORT_CONFSETTING(0x10, DEF_STR( Yes ))
-		PORT_CONFNAME(0x20, 0x00, "AUTO DSR")
+		PORT_CONFNAME(0x20, 0x00, "RS-232 Automatic DSR with DTR")                              PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, rs232_changed, 0)  // AUTO DSR [NO/YES]
 			PORT_CONFSETTING(0x00, DEF_STR( No ))
 			PORT_CONFSETTING(0x20, DEF_STR( Yes ))
 
@@ -985,22 +1004,22 @@ static INPUT_PORTS_START( tdv2115l )
 		PORT_DIPNAME(0x003, 0x001, "ACK/NACK/ENQUIRY lamps")
 			PORT_DIPSETTING(0x001, "Reset with CLEAR key")                      // 1: OFF 2: ON
 			PORT_DIPSETTING(0x002, "Reset with SYN ctrl-char (^V)")             // 1: ON  2: OFF
-		PORT_DIPNAME(0x00c, 0x004, "Rx handshake source")
+		PORT_DIPNAME(0x00c, 0x004, "Rx handshake source")                                       PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, rs232_changed, 0)
 			PORT_DIPSETTING(0x004, "DSR")                                       // 3: OFF 4: ON
 			PORT_DIPSETTING(0x008, "DCD")                                       // 3: ON  4: Off
 		PORT_DIPNAME(0x010, 0x010, "Operating mode")
 			PORT_DIPSETTING(0x010, "TTY mode (no CPU)")                         // 5: OFF
 			PORT_DIPSETTING(0x000, "CPU mode (CPU module required)")            // 5: ON
-		PORT_DIPNAME(0x020, 0x020, "DTR/RTS signals")
+		PORT_DIPNAME(0x020, 0x020, "DTR/RTS signals")                                           PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, rs232_lock_changed, 0)
 			PORT_DIPSETTING(0x020, "Permanently asserted")                      // 6: OFF
 			PORT_DIPSETTING(0x000, "Affected by LINE/TRANS keys")               // 6: ON
-		PORT_DIPNAME(0x0c0, 0x040, "Require RTS + CTS for ON LINE lamp")
+		PORT_DIPNAME(0x0c0, 0x040, "Require RTS + CTS for ON LINE lamp")                        PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, rs232_changed, 0)
 			PORT_DIPSETTING(0x040, DEF_STR( Off ))                              // 7: OFF 8: ON
 			PORT_DIPSETTING(0x080, DEF_STR( On ))                               // 7: ON  8: OFF
 		PORT_DIPNAME(0x100, 0x000, "Automatic page-roll after end of page")
 			PORT_DIPSETTING(0x100, DEF_STR( Off ))                              // 9: OFF
 			PORT_DIPSETTING(0x000, DEF_STR( On ))                               // 9: ON
-		PORT_DIPNAME(0x200, 0x000, "RS-232 data length")                                                                PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, uart_changed, 0)
+		PORT_DIPNAME(0x200, 0x000, "RS-232 data length")                                        PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, uart_changed, 0)
 			PORT_DIPSETTING(0x200, "8 data bits")                               // 10: OFF
 			PORT_DIPSETTING(0x000, "7 data bits")                               // 10: ON
 
