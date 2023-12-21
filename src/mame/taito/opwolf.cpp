@@ -947,8 +947,8 @@ void opwolf_state::opwolf(machine_config &config)
 	m_msm[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
-	ciu.set_master_tag(m_maincpu);
-	ciu.set_slave_tag(m_audiocpu);
+	ciu.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	ciu.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
 
 void opwolf_state::opwolfp(machine_config &config)
@@ -1021,8 +1021,8 @@ void opwolf_state::opwolfb(machine_config &config) /* OSC clocks unknown for the
 	m_msm[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
-	ciu.set_master_tag(m_maincpu);
-	ciu.set_slave_tag(m_audiocpu);
+	ciu.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	ciu.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
 
 

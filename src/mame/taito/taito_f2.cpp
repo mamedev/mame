@@ -2807,8 +2807,8 @@ void taitof2_state::taito_f2(machine_config &config)
 	ymsnd.add_route(2, "rspeaker", 1.0);
 
 	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
-	tc0140syt.set_master_tag(m_maincpu);
-	tc0140syt.set_slave_tag(m_audiocpu);
+	tc0140syt.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	tc0140syt.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
 
 void taitof2_state::taito_f2_tc0220ioc(machine_config &config)
@@ -3559,8 +3559,8 @@ void taitof2_state::cameltrya(machine_config &config)
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.10);
 
 	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
-	ciu.set_master_tag(m_maincpu);
-	ciu.set_slave_tag(m_audiocpu);
+	ciu.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	ciu.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
 
 void taitof2_state::driveout(machine_config &config)
@@ -3616,8 +3616,8 @@ void taitof2_state::driveout(machine_config &config)
 	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
-	tc0140syt.set_master_tag(m_maincpu);
-	tc0140syt.set_slave_tag(m_audiocpu);
+	tc0140syt.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	tc0140syt.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
 
 

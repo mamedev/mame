@@ -901,8 +901,8 @@ void taito_fx1a_state::coh1000ta(machine_config &config)
 	MB3773(config, m_mb3773);
 
 	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
-	tc0140syt.set_master_tag(m_maincpu);
-	tc0140syt.set_slave_tag(m_audiocpu);
+	tc0140syt.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	tc0140syt.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
 
 void taito_fx1b_state::fram_w(offs_t offset, uint8_t data)

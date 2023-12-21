@@ -128,8 +128,8 @@ void vicshoot_state::vicshoot(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
-	ciu.set_master_tag(m_maincpu);
-	ciu.set_slave_tag("audiocpu");
+	ciu.nmi_callback().set_inputline("audiocpu", INPUT_LINE_NMI);
+	ciu.reset_callback().set_inputline("audiocpu", INPUT_LINE_RESET);
 
 	ym2203_device &opn(YM2203(config, "opn", 8_MHz_XTAL / 2)); // divider not verified
 	opn.irq_handler().set_inputline("audiocpu", 0);
