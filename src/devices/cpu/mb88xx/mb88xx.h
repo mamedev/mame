@@ -176,6 +176,7 @@ private:
 
 	/* IRQ handling */
 	uint8_t m_pending_interrupt;
+	bool    m_in_irq;
 
 	memory_access<11, 0, 0, ENDIANNESS_BIG>::cache m_cache;
 	memory_access<11, 0, 0, ENDIANNESS_BIG>::specific m_program;

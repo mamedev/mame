@@ -210,6 +210,7 @@ void mb88_cpu_device::device_start()
 	save_item(NAME(m_SB));
 	save_item(NAME(m_SBcount));
 	save_item(NAME(m_pending_interrupt));
+	save_item(NAME(m_in_irq));
 
 	state_add( MB88_PC,  "PC",  m_PC).formatstr("%02X");
 	state_add( MB88_PA,  "PA",  m_PA).formatstr("%02X");
@@ -314,6 +315,7 @@ void mb88_cpu_device::device_reset()
 	m_SB = 0;
 	m_SBcount = 0;
 	m_pending_interrupt = 0;
+	m_in_irq = 0;
 }
 
 /***************************************************************************
@@ -413,8 +415,9 @@ void mb88_cpu_device::update_pio( int cycles )
 	}
 
 	/* process pending interrupts */
-	if (m_pending_interrupt & m_pio)
+	if (!m_in_irq && m_pending_interrupt & m_pio)
 	{
+		m_in_irq = true;
 		uint16_t intpc = GETPC();
 
 		m_SP[m_SI] = intpc;
@@ -429,9 +432,6 @@ void mb88_cpu_device::update_pio( int cycles )
 		{
 			/* if we have a live external source, call the irqcallback */
 			standard_irq_callback( 0, intpc );
-			/* The datasheet doesn't mention if the interrupt flag
-			 * is cleared, but it seems to be only for this case. */
-			m_pio &= ~INT_CAUSE_EXTERNAL;
 			m_PC = 0x02;
 		}
 		else if (m_pending_interrupt & m_pio & INT_CAUSE_TIMER)
@@ -814,6 +814,7 @@ void mb88_cpu_device::execute_run()
 
 			case 0x3c: /* rti ZCS:... */
 				/* restore address and saved state flags on the top bits of the stack */
+				m_in_irq = false;
 				m_SI = ( m_SI - 1 ) & 3;
 				m_PC = m_SP[m_SI] & 0x3f;
 				m_PA = (m_SP[m_SI] >> 6) & 0x1f;
