@@ -52,16 +52,17 @@
 #include "machine/ram.h"
 #include "machine/timer.h"
 
-namespace {
 
 // Single Step
 #define LOG_SS    (1U << 1)
 
-#define VERBOSE ( LOG_SS )
+// #define VERBOSE ( LOG_SS )
 #include "logmacro.h"
 
 #define LOGSS(...)    LOGMASKED(LOG_SS,    __VA_ARGS__)
 
+
+namespace {
 
 class h89_state : public driver_device
 {
@@ -209,17 +210,14 @@ void h89_state::h89_mem(address_map &map)
 
 void h89_state::map_fetch(address_map &map)
 {
-	map(0x0000, 0xffff).lr8(NAME([this](offs_t offset)
-	{
-		return m1_r(offset);
-	}));
+	map(0x0000, 0xffff).r(FUNC(h89_state::m1_r));
 }
 
 uint8_t h89_state::m1_r(offs_t offset)
 {
 	uint8_t data = m_program.read_byte(offset);
 
-	if (m_single_step_enabled && !m_556b_latch)
+	if (!machine().side_effects_disabled() && m_single_step_enabled && !m_556b_latch)
 	{
 		LOGSS("single step m1_r - data: 0x%02x, 555a: %d, 555b: %d, 556b: %d\n", data, m_555a_latch, m_555b_latch, m_556b_latch);
 
