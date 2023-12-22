@@ -220,8 +220,6 @@ void mc6847_friend_device::device_start()
 	m_horizontal_sync = false;
 	set_geometry(m_lines_top_border, LINES_ACTIVE_VIDEO, false);
 
-
-
 	/* save states */
 	save_item(NAME(m_physical_scanline));
 	save_item(NAME(m_logical_scanline));
@@ -471,7 +469,7 @@ inline void mc6847_friend_device::next_scanline()
 //  is_top_pal_padding_line
 //-------------------------------------------------
 
-inline bool mc6847_friend_device::is_top_pal_padding_line(int scanline)
+inline bool mc6847_friend_device::is_top_pal_padding_line(int scanline) const
 {
 	// PAL adds 25 padding scanlines before top border
 	return m_pal && scanline < LINES_PADDING_TOP_PAL;
@@ -482,7 +480,7 @@ inline bool mc6847_friend_device::is_top_pal_padding_line(int scanline)
 //  is_bottom_pal_padding_line
 //-------------------------------------------------
 
-inline bool mc6847_friend_device::is_bottom_pal_padding_line(int scanline)
+inline bool mc6847_friend_device::is_bottom_pal_padding_line(int scanline) const
 {
 	// PAL adds 25 padding scanlines nested INSIDE the bottom border
 	// (just a couple lines up from the end of the bottom border).
@@ -496,7 +494,7 @@ inline bool mc6847_friend_device::is_bottom_pal_padding_line(int scanline)
 //  is_pal_padding_line
 //-------------------------------------------------
 
-inline bool mc6847_friend_device::is_pal_padding_line(int scanline)
+inline bool mc6847_friend_device::is_pal_padding_line(int scanline) const
 {
 	return is_top_pal_padding_line(scanline) || is_bottom_pal_padding_line(scanline);
 }
@@ -614,8 +612,15 @@ std::string mc6847_friend_device::describe_context() const
 //  ctor
 //-------------------------------------------------
 
-mc6847_base_device::mc6847_base_device(const machine_config &mconfig, device_type type, const char *tag,
-		device_t *owner, uint32_t clock, const uint8_t *fontdata, double tpfs, bool pal) :
+mc6847_base_device::mc6847_base_device(
+		const machine_config &mconfig,
+		device_type type,
+		const char *tag,
+		device_t *owner,
+		uint32_t clock,
+		const uint8_t *fontdata,
+		double tpfs,
+		bool pal) :
 	mc6847_friend_device(mconfig, type, tag, owner, clock, fontdata, (type == MC6847T1_NTSC) || (type == MC6847T1_PAL),
 		tpfs, LINES_TOP_BORDER + LINES_ACTIVE_VIDEO - 1, 1, true, pal),
 	m_input_cb(*this, 0),
@@ -668,16 +673,13 @@ void mc6847_base_device::device_config_complete()
 		// 256 pixels of active video area per line, with apparently no roundoff
 		// error or drift.
 		screen().set_raw(
-			(uint32_t)(clock() * 2),
-			456,                                                            // htotal
-			0,                                                              // hbend
-			BMP_L_OR_R_BORDER * 2 + BMP_ACTIVE_VIDEO,                       // hbstart
-			m_tpfs,                                                         // vtotal
-			0,                                                              // vbend
-			m_lines_until_retrace);                                         // vbstart
-
-		if (m_pal)
-			screen().set_physical_aspect(5, 4);
+				uint32_t(clock() * 2),
+				456,                                        // htotal
+				0,                                          // hbend
+				BMP_L_OR_R_BORDER * 2 + BMP_ACTIVE_VIDEO,   // hbstart
+				m_tpfs,                                     // vtotal
+				0,                                          // vbend
+				m_lines_until_retrace);                     // vbstart
 	}
 
 	if (!screen().has_screen_update())
@@ -948,10 +950,9 @@ inline mc6847_base_device::pixel_t mc6847_base_device::border_value(uint8_t mode
 
 uint32_t mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bool is_mc6847t1 = (type() == MC6847T1_NTSC) || (type() == MC6847T1_PAL);
+	const bool is_mc6847t1 = (type() == MC6847T1_NTSC) || (type() == MC6847T1_PAL);
 	int base_x = BMP_L_OR_R_BORDER;
 	int base_y = m_lines_top_border;
-	int x, x2, y, width;
 	int min_x = USE_HORIZONTAL_CLIP ? cliprect.min_x : 0;
 	int max_x = USE_HORIZONTAL_CLIP ? cliprect.max_x : (base_x * 2 + BMP_ACTIVE_VIDEO - 1);
 	int min_y = cliprect.min_y;
@@ -963,48 +964,47 @@ uint32_t mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &
 		return UPDATE_HAS_NOT_CHANGED;
 
 	/* top border */
-	for (y = min_y; y < base_y; y++)
+	for (int y = min_y; y < base_y; y++)
 	{
 		// PAL padding is always black, even when border isn't
-		pixel_t color =
-			is_top_pal_padding_line(y) ?
-			palette[8] :
-			border_value(m_data[0].m_mode[0], palette, is_mc6847t1);
+		const pixel_t color = is_top_pal_padding_line(y)
+				?  palette[8]
+				: border_value(m_data[0].m_mode[0], palette, is_mc6847t1);
 
-		for (x = min_x; x <= max_x; x++)
+		for (int x = min_x; x <= max_x; x++)
 		{
 			*bitmap_addr(bitmap, y, x) = color;
 		}
 	}
 
-	for (y = std::max(0, min_y - base_y); y < std::min(LINES_ACTIVE_VIDEO, max_y - base_y); y++)
+	for (int y = std::max(0, min_y - base_y); y < std::min(LINES_ACTIVE_VIDEO, max_y - base_y); y++)
 	{
 		/* left border */
-		for (x = min_x; x < base_x; x++)
+		for (int x = min_x; x < base_x; x++)
 		{
 			*bitmap_addr(bitmap, y + base_y, x) = border_value(m_data[y].m_mode[0], palette, is_mc6847t1);
 		}
 
 		/* body */
-		x = 0;
-		width = m_data[y].m_sample_count;
+		const int width = m_data[y].m_sample_count;
 		pixel_t *RESTRICT pixels = bitmap_addr(bitmap, base_y + y, base_x);
-		while(x < width)
+		for (int x; x < width; )
 		{
 			/* determine how many bytes exist for which the mode is identical */
+			int x2;
 			for (x2 = x + 1; (x2 < width) && (m_data[y].m_mode[x] == m_data[y].m_mode[x2]); x2++)
 				;
 
 			/* emit the samples */
 			pixels += emit_mc6847_samples<1>(
-				m_data[y].m_mode[x],
-				&m_data[y].m_data[x],
-				x2 - x,
-				pixels,
-				m_palette,
-				m_charrom_cb,
-				x,
-				y);
+					m_data[y].m_mode[x],
+					&m_data[y].m_data[x],
+					x2 - x,
+					pixels,
+					m_palette,
+					m_charrom_cb,
+					x,
+					y);
 
 			/* update x */
 			x = x2;
@@ -1012,34 +1012,34 @@ uint32_t mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &
 
 		/* right border */
 		if (width)
-			for (x = base_x + BMP_ACTIVE_VIDEO; x <= max_x; x++)
+			for (int x = base_x + BMP_ACTIVE_VIDEO; x <= max_x; x++)
 				*bitmap_addr(bitmap, y + base_y, x) = border_value(m_data[y].m_mode[width - 1], palette, is_mc6847t1);
 
 		/* artifacting */
-		if( m_artifacter.get_pal_artifacting() )
+		if (m_artifacter.get_pal_artifacting())
 		{
-			if( y % 2)
+			if (y % 2)
 				m_artifacter.process_artifacts_pal<1>(bitmap, y - 1, base_x, base_y, m_data[y].m_mode[0], palette);
 		}
 		else
+		{
 			m_artifacter.process_artifacts<1>(bitmap_addr(bitmap, y + base_y, base_x), m_data[y].m_mode[0], palette);
-
+		}
 	}
 
-	width = m_data[LINES_ACTIVE_VIDEO-1].m_sample_count;
+	const int width = m_data[LINES_ACTIVE_VIDEO-1].m_sample_count;
 
 	/* bottom border */
 	if (width)
 	{
-		for (y = base_y + LINES_ACTIVE_VIDEO; y <= max_y; y++)
+		for (int y = base_y + LINES_ACTIVE_VIDEO; y <= max_y; y++)
 		{
 			// PAL padding is always black, even when border isn't
-			pixel_t color =
-				is_bottom_pal_padding_line(y) ?
-				palette[8] :
-				border_value(m_data[LINES_ACTIVE_VIDEO - 1].m_mode[width - 1], palette, is_mc6847t1);
+			pixel_t color = is_bottom_pal_padding_line(y)
+					? palette[8]
+					: border_value(m_data[LINES_ACTIVE_VIDEO - 1].m_mode[width - 1], palette, is_mc6847t1);
 
-			for (x = min_x; x <= max_x; x++)
+			for (int x = min_x; x <= max_x; x++)
 			{
 				*bitmap_addr(bitmap, y, x) = color;
 			}

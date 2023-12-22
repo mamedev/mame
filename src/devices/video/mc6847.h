@@ -503,9 +503,9 @@ private:
 	std::string scanline_zone_string(scanline_zone zone) const;
 
 protected:
-	bool is_top_pal_padding_line(int scanline);
-	bool is_bottom_pal_padding_line(int scanline);
-	bool is_pal_padding_line(int scanline);
+	bool is_top_pal_padding_line(int scanline) const;
+	bool is_bottom_pal_padding_line(int scanline) const;
+	bool is_pal_padding_line(int scanline) const;
 };
 
 // actual base class for MC6847 family of devices
