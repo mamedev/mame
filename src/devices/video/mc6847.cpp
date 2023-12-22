@@ -988,7 +988,7 @@ uint32_t mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &
 		/* body */
 		const int width = m_data[y].m_sample_count;
 		pixel_t *RESTRICT pixels = bitmap_addr(bitmap, base_y + y, base_x);
-		for (int x; x < width; )
+		for (int x = 0; x < width; )
 		{
 			/* determine how many bytes exist for which the mode is identical */
 			int x2;
