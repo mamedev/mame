@@ -1707,26 +1707,24 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 	}
 
 	// A000 **********************************
+	// iiii iiii iiff ffff
+	// fractional part inverted (like scroll regs)
 	if (this_line(0xc00) & 1) {
-		u16 pf1_rowscroll = this_line(0xa000);
-		line.pf[0].rowscroll = pf1_rowscroll << 10;
+		u32 rowscroll = this_line(0xa000) << 10;
+		line.pf[0].rowscroll = (rowscroll & 0xffff0000) - (rowscroll & 0x0000ffff);
 	}
 	if (this_line(0xc00) & 2) {
-		u16 pf2_rowscroll = this_line(0xa200);
-		line.pf[1].rowscroll = pf2_rowscroll << 10;
+		u32 rowscroll = this_line(0xa200) << 10;
+		line.pf[1].rowscroll = (rowscroll & 0xffff0000) - (rowscroll & 0x0000ffff);
 	}
 	if (this_line(0xc00) & 4) {
-		u16 pf3_rowscroll = this_line(0xa400);
-		line.pf[2].rowscroll = pf3_rowscroll << 10;
+		u32 rowscroll = this_line(0xa400) << 10;
+		line.pf[2].rowscroll = (rowscroll & 0xffff0000) - (rowscroll & 0x0000ffff);
 	}
 	if (this_line(0xc00) & 8) {
-		u16 pf4_rowscroll = this_line(0xa600);
-		line.pf[3].rowscroll = pf4_rowscroll << 10;
+		u32 rowscroll = this_line(0xa600) << 10;
+		line.pf[3].rowscroll = (rowscroll & 0xffff0000) - (rowscroll & 0x0000ffff);
 	}
-	// why is this shift here ... _x_offset is 16.16
-	// lineram word must be 10.6 ?
-	// i think to conform to the layer scroll regs which are 16.16
-
 
 	// B000 **********************************
 	if (this_line(0xe00) & 1) {
@@ -1772,8 +1770,11 @@ void taito_f3_state::draw_line(u32* dst, int y, int xs, int xe, playfield_inf* p
 		return;
 	const pen_t *clut = &m_palette->pen(0);
 	int y_index = ((pf->reg_fx_y >> 16) + pf->colscroll) & 0x1ff;
+	u32 fx_x = pf->reg_sx + pf->rowscroll + 10*pf->x_scale;
+	fx_x &= (m_width_mask << 16) | 0xffff;
+
 	for (int x = xs; x < xe; x++) {
-		int x_index = ((pf->reg_fx_x >> 16) + x) & m_width_mask;
+		int x_index = ((fx_x >> 16) + x) & m_width_mask;
 		if (!(pf->flagsbitmap->pix(y_index, x_index) & 0xf0))
 			continue;
 		if (u16 col = pf->srcbitmap->pix(y_index, x_index))
@@ -1897,8 +1898,6 @@ void taito_f3_state::scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cl
 			for (int pf = 0; pf < NUM_PLAYFIELDS; ++pf) {
 				auto p = &line_data.pf[pf];
 				p->reg_fx_y += p->y_scale << 9;
-				p->reg_fx_x = p->reg_sx + p->rowscroll + 10*p->x_scale;
-				p->reg_fx_x &= (m_width_mask << 16) | 0xffff;
 			}
 		}
 	}

@@ -246,7 +246,7 @@ protected:
 		u8 x_scale;           // 8000
 		u8 y_scale;           // 8000
 		u16 pal_add;          // 9000
-		u16 rowscroll;        // a000
+		u32 rowscroll;        // a000
 
 		u32 reg_sx;
 		u32 reg_sy;
