@@ -13,6 +13,7 @@
 #include "dooly.h"
 #include "easi_speech.h"
 #include "fmpac.h"
+#include "fs_sr021.h"
 #include "fs_sr022.h"
 #include "halnote.h"
 #include "hbi55.h"
@@ -59,6 +60,7 @@ void msx_cart(device_slot_interface &device, bool is_in_subslot)
 	device.option_add_internal(slotoptions::DOOLY,           MSX_CART_DOOLY);
 	device.option_add_internal(slotoptions::EASISPEECH,      MSX_CART_EASISPEECH);
 	device.option_add_internal(slotoptions::FMPAC,           MSX_CART_FMPAC);
+	device.option_add_internal(slotoptions::FS_SR021,        MSX_CART_FS_SR021);
 	device.option_add_internal(slotoptions::FS_SR022,        MSX_CART_FS_SR022);
 	device.option_add_internal(slotoptions::GAMEMASTER2,     MSX_CART_GAMEMASTER2);
 	device.option_add_internal(slotoptions::HALNOTE,         MSX_CART_HALNOTE);
