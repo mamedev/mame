@@ -4135,7 +4135,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="dssp1" supported="no">
-		<description>Disc Station Special Harugou (Japan)</description>
+		<description>Disc Station Special Haru-gou (Japan)</description>
 		<year>1989</year>
 		<publisher>Compile</publisher>
 		<notes>The software on Disk 1 fails trying to open the file "mem:fuck-off"; possibly hacked verison.</notes>
@@ -4166,7 +4166,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="dssp2">
-		<description>Disc Station Special Shoka (Japan)</description>
+		<description>Disc Station Special Shoka-gou (Japan)</description>
 		<year>1989</year>
 		<publisher>Compile</publisher>
 		<info name="usage" value="Requires a Japanese system."/>
@@ -4206,7 +4206,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="dssp3">
-		<description>Disc Station Special Natsu (Japan)</description>
+		<description>Disc Station Special Natsuyasumi-gou (Japan)</description>
 		<year>1989</year>
 		<publisher>Compile</publisher>
 		<info name="usage" value="Requires a Japanese system."/>
@@ -4236,7 +4236,7 @@ The following floppies came with the machines.
 
 	<!-- Release contained 4 floppies. -->
 	<software name="dssp5">
-		<description>Disc Station Special 5 (Japan)</description>
+		<description>Disc Station Special Christmas-gou (Japan)</description>
 		<year>1988</year>
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ディスクステーションスペシャルクリスマス号"/>
@@ -10214,7 +10214,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="pastltch">
-		<description>Kibun wa Pastel Touch!! Abunai Gakuen Hen (Japan)</description>
+		<description>Kibun wa, Pastel Touch!! Abunai Gakuen Hen (Japan)</description>
 		<year>1990</year>
 		<publisher>Great</publisher>
 		<info name="alt_title" value="気分は、ぱすてるたっち！！アブナイ学園編"/>
