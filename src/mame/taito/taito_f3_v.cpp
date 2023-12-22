@@ -1667,7 +1667,6 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 	}
 
 	// 8000 **********************************
-	// TODO: ignore first scaling offset, somewhere
 	if (this_line(0x800) & 1) {
 		u16 pf0x0y_scale = this_line(0x8000);
 		line.pf[0].x_scale = BIT(pf0x0y_scale, 8, 8);
@@ -1893,12 +1892,14 @@ void taito_f3_state::scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cl
 			}, gfx);
 		}
 
-		// update registers
-		for (int pf = 0; pf < NUM_PLAYFIELDS; ++pf) {
-			auto p = &line_data.pf[pf];
-			p->reg_fx_y += p->y_scale << 9;
-			p->reg_fx_x = p->reg_sx + p->rowscroll + 10*p->x_scale;
-			p->reg_fx_x &= (m_width_mask << 16) | 0xffff;
+		if (y != y_start) {
+			// update registers
+			for (int pf = 0; pf < NUM_PLAYFIELDS; ++pf) {
+				auto p = &line_data.pf[pf];
+				p->reg_fx_y += p->y_scale << 9;
+				p->reg_fx_x = p->reg_sx + p->rowscroll + 10*p->x_scale;
+				p->reg_fx_x &= (m_width_mask << 16) | 0xffff;
+			}
 		}
 	}
 }
