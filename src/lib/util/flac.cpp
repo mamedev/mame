@@ -646,12 +646,13 @@ template <flac_decoder::DECODE_MODE Mode, bool SwapEndian> FLAC__StreamDecoderWr
 		for (int sampnum = 0; sampnum < blocksize && m_uncompressed_offset < m_uncompressed_length; sampnum++, m_uncompressed_offset++)
 			for (int chan = 0; chan < frame->header.channels; chan++)
 			{
-				int16_t output_sample = 0;
+				int16_t output_sample;
 				if (Mode == SCALE_DOWN)
 					output_sample = int16_t((buffer[chan][sampnum] + (buffer[chan][sampnum] & low_bit)) >> shift);
 				else if (Mode == SCALE_UP)
 				{
-					for (int bits_to_set = m_bits_per_sample; bits_to_set > 0; bits_to_set -= frame->header.bits_per_sample)
+					output_sample = int16_t(buffer[chan][sampnum] << (m_bits_per_sample - frame->header.bits_per_sample));
+					for (int bits_to_set = m_bits_per_sample - frame->header.bits_per_sample; bits_to_set > 0; bits_to_set -= frame->header.bits_per_sample)
 					{
 						if (frame->header.bits_per_sample <= bits_to_set)
 						{
@@ -680,7 +681,9 @@ template <flac_decoder::DECODE_MODE Mode, bool SwapEndian> FLAC__StreamDecoderWr
 					if (Mode == SCALE_DOWN)
 						output_sample = int16_t((buffer[chan][sampnum] + (buffer[chan][sampnum] & low_bit)) >> shift);
 					else if (Mode == SCALE_UP)
-						for (int bits_to_set = m_bits_per_sample; bits_to_set > 0; bits_to_set -= frame->header.bits_per_sample)
+					{
+						output_sample = int16_t(buffer[chan][sampnum] << (m_bits_per_sample - frame->header.bits_per_sample));
+						for (int bits_to_set = m_bits_per_sample - frame->header.bits_per_sample; bits_to_set > 0; bits_to_set -= frame->header.bits_per_sample)
 						{
 							if (frame->header.bits_per_sample <= bits_to_set)
 							{
@@ -692,6 +695,7 @@ template <flac_decoder::DECODE_MODE Mode, bool SwapEndian> FLAC__StreamDecoderWr
 							}
 							bits_to_set -= frame->header.bits_per_sample;
 						}
+					}
 					else
 						output_sample = int16_t(buffer[chan][sampnum]);
 					m_uncompressed_start[chan][m_uncompressed_offset] = SwapEndian ? int16_t(swapendian_int16(uint16_t(output_sample))) : output_sample;
