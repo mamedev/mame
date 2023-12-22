@@ -18,8 +18,10 @@
 
     TODO:
     - Fix ROM banking (ROM self-test shows NG)
+    - Memory layout isn't perfect. The spreadsheet tool sets 'rgex'
+      to 1 and doesn't work correctly.
     - Improve video emulation (offset, modes, etc.)
-    - Floppy
+    - Floppy self-test fails (but works otherwise)
     - Centronics
     - Modem
     - Soft power off/on
@@ -38,12 +40,15 @@
 #include "emu.h"
 
 #include "cpu/z180/z180.h"
+#include "imagedev/floppy.h"
 #include "machine/rp5c01.h"
 #include "machine/timer.h"
+#include "machine/upd765.h"
 #include "sound/beep.h"
 
 #include "emupal.h"
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 namespace {
@@ -64,8 +69,12 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_keys(*this, "KO%u", 0U),
 		m_buzzer(*this, "buzzer"),
+		m_fdc(*this, "fdc"),
+		m_floppy(*this, "fdc:0"),
 		m_lomem_view(*this, "lomem")
 	{ }
+
+	int floppy_index_r();
 
 	void pn8800fxb(machine_config &config);
 
@@ -80,6 +89,8 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_ioport_array<9> m_keys;
 	required_device<beep_device> m_buzzer;
+	required_device<hd63266f_device> m_fdc;
+	required_device<floppy_connector> m_floppy;
 	memory_view m_lomem_view;
 
 	uint8_t m_key_select;
@@ -90,6 +101,9 @@ private:
 	uint8_t m_video_ctrl;
 	uint8_t m_video_offset;
 	uint8_t m_cursor_ctrl;
+
+	bool m_fdc_drq;
+
 	uint8_t m_mem_change;
 
 	void mem_map(address_map &map);
@@ -113,6 +127,12 @@ private:
 	void cursor_ctrl_w(uint8_t data);
 
 	void buzzer_w(uint8_t data);
+
+	void fdc_mode_select_w(uint8_t data);
+	void fdc_drq_w(int state);
+	uint8_t fdc_data_r();
+	void fdc_data_w(uint8_t data);
+	int floppy_dskchg_r();
 
 	void mem_change_w(uint8_t data);
 	void bank_select_w(uint8_t data);
@@ -155,8 +175,10 @@ void pn8800fxb_state::io_map(address_map &map)
 	map(0x75, 0x75).rw(FUNC(pn8800fxb_state::video_ctrl_r), FUNC(pn8800fxb_state::video_ctrl_w));
 	map(0x76, 0x76).w(FUNC(pn8800fxb_state::video_offset_w));
 	map(0x77, 0x77).w(FUNC(pn8800fxb_state::cursor_ctrl_w));
-	// 78-7f mode select
-	// 80-87 fdc
+	map(0x78, 0x78).mirror(0x07).w(FUNC(pn8800fxb_state::fdc_mode_select_w));
+	map(0x80, 0x80).mirror(0x04).rw(m_fdc, FUNC(hd63266f_device::msr_r), FUNC(hd63266f_device::abort_w));
+	map(0x81, 0x81).mirror(0x04).rw(FUNC(pn8800fxb_state::fdc_data_r), FUNC(pn8800fxb_state::fdc_data_w));
+	map(0x82, 0x82).mirror(0x04).r(m_fdc, FUNC(hd63266f_device::extstat_r));
 	map(0x88, 0x88).mirror(0x07).portr("misc");
 	map(0x90, 0x90).mirror(0x07).w(FUNC(pn8800fxb_state::mem_change_w));
 	// 98-9f rs break
@@ -181,7 +203,7 @@ void pn8800fxb_state::io_map(address_map &map)
 static INPUT_PORTS_START( pn8800fxb )
 	PORT_START("misc")
 	// 0x01 sp3
-	// 0x02 index
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(pn8800fxb_state, floppy_index_r)
 	PORT_CONFNAME(0x04, 0x00, "AC Adaptor")
 	PORT_CONFSETTING(   0x00, "Good")
 	PORT_CONFSETTING(   0x04, "Not Good")
@@ -198,12 +220,12 @@ static INPUT_PORTS_START( pn8800fxb )
 
 	PORT_START("KO0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT)    PORT_CODE(KEYCODE_RSHIFT)      PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT)      PORT_CHAR(UCHAR_MAMEKEY(LEFT)) PORT_NAME("\xe2\x86\x90  EXPR") // ←
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT)      PORT_CHAR(UCHAR_MAMEKEY(LEFT)) PORT_NAME(u8"\u2190  EXPR") // ←
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)                   PORT_NAME("BS")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER)     PORT_CHAR(13)                  PORT_NAME("RETURN  IND CLR  =")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP)        PORT_CHAR(UCHAR_MAMEKEY(UP))   PORT_NAME("\xe2\x86\x91  PRE S") // ↑
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP)        PORT_CHAR(UCHAR_MAMEKEY(UP))   PORT_NAME(u8"\u2191  PRE S") // ↑
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)     PORT_CHAR(' ')
 
 	PORT_START("KO1")
@@ -217,14 +239,14 @@ static INPUT_PORTS_START( pn8800fxb )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("KO2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN)  PORT_CHAR(UCHAR_MAMEKEY(DOWN))                 PORT_NAME("\xe2\x86\x93  NEXT S") // ↓
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN)  PORT_CHAR(UCHAR_MAMEKEY(DOWN))                 PORT_NAME(u8"\u2193  NEXT S") // ↓
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('\'') PORT_CHAR('"')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)     PORT_CHAR('l')  PORT_CHAR('L')                 PORT_NAME("l  L  L IND  3")
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)     PORT_CHAR('9')  PORT_CHAR('(')                 PORT_NAME("9  (  T CLR  9")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)     PORT_CHAR('o')  PORT_CHAR('O')                 PORT_NAME("o  O  JUST  6")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)  PORT_CHAR('.')  PORT_CHAR('>')  PORT_CHAR(']') PORT_NAME(".  >  ]  .")
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';')  PORT_CHAR(':')                 PORT_NAME(";  :  *")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))                PORT_NAME("\xe2\x86\x92  RELOC") // →
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))                PORT_NAME(u8"\u2192  RELOC") // →
 
 	PORT_START("KO3")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -378,13 +400,21 @@ uint32_t pn8800fxb_state::screen_update(screen_device &screen, bitmap_rgb32 &bit
 						if (lines == 25 && l == 0)
 							continue;
 
-						// character data (or cursor) in lines 1 to 8
+						// character data in lines 1 to 8
 						if (l > 0)
 						{
+							data = m_vram[0x3000 + (code << 3) + l - 1];
+
 							if (cursor_active)
-								data = 0xff;
-							else
-								data = m_vram[0x3000 + (code << 3) + l - 1];
+							{
+								// cursor active for upper lines (5 to 8)?
+								if (BIT(m_cursor_ctrl, 7) && l >= 5)
+									data ^= 0xff;
+
+								// cursor active for lower lines (1 to 4)?
+								if (BIT(m_cursor_ctrl, 6) && l <= 4)
+									data ^= 0xff;
+							}
 						}
 
 						// underline?
@@ -528,6 +558,62 @@ void pn8800fxb_state::buzzer_w(uint8_t data)
 
 
 //**************************************************************************
+//  FLOPPY
+//**************************************************************************
+
+static void hd_floppy(device_slot_interface &device)
+{
+	device.option_add("35hd", FLOPPY_35_HD);
+}
+
+void pn8800fxb_state::fdc_mode_select_w(uint8_t data)
+{
+	// 7654321-  not used
+	// -------0  fdc data rate
+
+	m_fdc->rate_w(BIT(data, 0));
+}
+
+void pn8800fxb_state::fdc_drq_w(int state)
+{
+	m_fdc_drq = bool(state);
+	m_maincpu->set_input_line(Z180_INPUT_LINE_DREQ1, state);
+}
+
+uint8_t pn8800fxb_state::fdc_data_r()
+{
+	if (m_fdc_drq)
+		return m_fdc->dma_r();
+	else
+		return m_fdc->fifo_r();
+}
+
+void pn8800fxb_state::fdc_data_w(uint8_t data)
+{
+	if (m_fdc_drq)
+		m_fdc->dma_w(data);
+	else
+		m_fdc->fifo_w(data);
+}
+
+int pn8800fxb_state::floppy_index_r()
+{
+	if (m_floppy->get_device())
+		return m_floppy->get_device()->idx_r();
+
+	return 0;
+}
+
+int pn8800fxb_state::floppy_dskchg_r()
+{
+	if (m_floppy->get_device())
+		return m_floppy->get_device()->dskchg_r();
+
+	return 0;
+}
+
+
+//**************************************************************************
 //  MACHINE EMULATION
 //**************************************************************************
 
@@ -537,7 +623,7 @@ void pn8800fxb_state::mem_change_w(uint8_t data)
 	// -6------  ramin
 	// --5432--  not used
 	// ------1-  dicsel
-	// -------0  rgex
+	// -------0  rgex (the spreadsheet tool sets this)
 
 	if (data != 0x40)
 		logerror("mem_change_w: dua %d ramin %d dicsel %d rgex %d\n", BIT(data, 7), BIT(data, 6), BIT(data, 1), BIT(data, 0));
@@ -587,11 +673,13 @@ void pn8800fxb_state::machine_start()
 	save_item(NAME(m_video_ctrl));
 	save_item(NAME(m_video_offset));
 	save_item(NAME(m_cursor_ctrl));
+	save_item(NAME(m_fdc_drq));
 	save_item(NAME(m_mem_change));
 }
 
 void pn8800fxb_state::machine_reset()
 {
+	m_fdc_drq = false;
 	m_mem_change = 0x00;
 	m_lomem_view.select(0);
 }
@@ -606,6 +694,7 @@ void pn8800fxb_state::pn8800fxb(machine_config &config)
 	Z80180(config, m_maincpu, 12.288_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pn8800fxb_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &pn8800fxb_state::io_map);
+	m_maincpu->tend1_wr_callback().set(m_fdc, FUNC(hd63266f_device::tc_line_w));
 
 	TIMER(config, "1khz").configure_periodic(FUNC(pn8800fxb_state::int1_timer), attotime::from_hz(1000));
 
@@ -623,8 +712,17 @@ void pn8800fxb_state::pn8800fxb(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_buzzer, 4'000).add_route(ALL_OUTPUTS, "mono", 1.0); // 4.0 kHz generated by the gate array
 
+	// floppy
+	HD63266F(config, m_fdc, 16_MHz_XTAL);
+	m_fdc->set_ready_line_connected(false);
+	m_fdc->drq_wr_callback().set(FUNC(pn8800fxb_state::fdc_drq_w));
+	m_fdc->inp_rd_callback().set(FUNC(pn8800fxb_state::floppy_dskchg_r));
+	FLOPPY_CONNECTOR(config, "fdc:0", hd_floppy, "35hd", floppy_image_device::default_pc_floppy_formats);
+
 	TC8521(config, "rtc", XTAL(32'768));
 	// alarm output connected to auto power-on
+
+	SOFTWARE_LIST(config, "floppy_list").set_original("brother_pn");
 }
 
 
