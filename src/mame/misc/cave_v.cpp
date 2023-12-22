@@ -51,12 +51,12 @@ Note:   if MAME_DEBUG is defined, pressing:
 #include "cave.h"
 
 
-#define CAVE_SPRITETYPE_ZBUF        0x01
-#define CAVE_SPRITETYPE_ZOOM        0x02
+static constexpr u8 CAVE_SPRITETYPE_ZBUF = 0x01;
+static constexpr u8 CAVE_SPRITETYPE_ZOOM = 0x02;
 
-#define SPRITE_FLIPX_CAVE           0x01
-#define SPRITE_FLIPY_CAVE           0x02
-#define SPRITE_VISIBLE_CAVE         0x04
+static constexpr u8 SPRITE_FLIPX_CAVE    = 0x01;
+static constexpr u8 SPRITE_FLIPY_CAVE    = 0x02;
+static constexpr u8 SPRITE_VISIBLE_CAVE  = 0x04;
 
 
 /* Sailormn: the lower 2 Megabytes of tiles banked */
