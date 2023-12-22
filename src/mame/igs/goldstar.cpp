@@ -12938,6 +12938,7 @@ ROM_END
    -1 x Jfc 95101
    -3 banks of 8 DIP switches
    -12.000 MHz xtal
+  Video from the real PCB: https://youtu.be/qiSw044Twdc
 */
 ROM_START( hamhouse )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -12949,7 +12950,7 @@ ROM_START( hamhouse )
 	ROM_LOAD( "7_27c256.u43",       0x10000, 0x08000, CRC(31c419f0) SHA1(7c827af5c208bab0ca143558581a57b0b355a3ad) )
 
 	ROM_REGION( 0x08000, "gfx2", 0 )
-	ROM_LOAD( "3_hy27c64ad-15.u24", 0x00000, 0x02000, CRC(7f9c41db) SHA1(64c5fb779ecc05eae3264c7767c571eb76fb389f) )
+	ROM_LOAD( "3_hy27c64ad-15.u24", 0x00000, 0x02000, BAD_DUMP CRC(c13b3fa8) SHA1(8ae6d4bb468a4c1f98c3a059cda6531e3289333d) ) // Bitrotten
 	ROM_LOAD( "4_d27128a.u26",      0x02000, 0x02000, CRC(8cf3845e) SHA1(4f672d256548211c48e60ce89718c3c195f187d5) ) // 1ST AND 2ND HALF IDENTICAL
 	ROM_IGNORE( 0x2000 )
 	ROM_LOAD( "1_27c64-20.u10",     0x04000, 0x02000, CRC(c4efc953) SHA1(da24c802d33be377ad6d6a357ed32d5214ca7a3f) )
@@ -12958,16 +12959,16 @@ ROM_START( hamhouse )
 
 	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x8200, "proms_base", 0 )
+	ROM_REGION( 0x8400, "proms_base", 0 )
 	// EPROM on a small subboard wired to replace two bipolar PROMS
 	ROM_LOAD( "nm27c256.u55",       0x00000, 0x08000, CRC(f7c7c025) SHA1(f845dc960ed74f64bfff06e3766a1047a26e9de1) )
-	ROM_LOAD( "am27s33pc.u39",      0x08000, 0x00200, NO_DUMP ) // Separated from the other two PROM sockets on the PCB
+	ROM_LOAD( "am27s33pc.u39",      0x08000, 0x00400, CRC(6daaf529) SHA1(b8f81d4467b6b814ec6fc099fbb4f782f736c4f5) ) // Separated from the other two PROM sockets on the PCB
 
 	ROM_REGION( 0x200, "proms", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x400, "plds", 0 )
-	ROM_LOAD( "atf16v8b.u15",       0x00000, 0x00117, NO_DUMP )
-	ROM_LOAD( "atf16v8b.u35",       0x00200, 0x00117, NO_DUMP )
+	ROM_LOAD( "atf16v8b.u15",       0x00000, 0x00117, CRC(9a62f369) SHA1(c027a7e3dc12506ed45ed936b9f650549651be4f) )
+	ROM_LOAD( "atf16v8b.u35",       0x00200, 0x00117, CRC(a883a133) SHA1(d0b1ee535d60bffdc03a8ce94e6a0274ae6621d5) )
 ROM_END
 
 /*
