@@ -41,6 +41,7 @@
 /* Mouse / Joystick */
 
 #define JOYSTICK0_TAG           "joystick0"
+#define JOYSTICK1_TAG           "joystick1"
 #define MOUSE_BUTTON_TAG        "mousebtn"
 #define MOUSEX_TAG              "mousex"
 #define MOUSEY_TAG              "mousey"
@@ -76,6 +77,7 @@ public:
 		m_z80sio(*this, Z80SIO_TAG),
 		m_screen(*this, "screen"),
 		m_io_joystick0(*this, JOYSTICK0_TAG),
+		m_io_joystick1(*this, JOYSTICK1_TAG),
 		m_io_mouse_button(*this, MOUSE_BUTTON_TAG),
 		m_io_mousex(*this, MOUSEX_TAG),
 		m_io_mousey(*this, MOUSEY_TAG)
@@ -103,9 +105,11 @@ private:
 	required_device<z80sio_device> m_z80sio;
 	required_device<screen_device> m_screen;
 	required_ioport m_io_joystick0;
+	required_ioport m_io_joystick1;
 	required_ioport m_io_mouse_button;
 	required_ioport m_io_mousex;
 	required_ioport m_io_mousey;
+	ioport_port* m_io_selected_js;
 
 	bitmap_ind16 m_video_mem;
 
@@ -149,6 +153,8 @@ private:
 	void nimbus_sound_ay8910_porta_w(uint8_t data);
 	void nimbus_sound_ay8910_portb_w(uint8_t data);
 	uint8_t nimbus_joystick_r();
+	void nimbus_select_joystick0(uint8_t data);
+	void nimbus_select_joystick1(uint8_t data);
 	uint8_t nimbus_mouse_js_r();
 	void nimbus_mouse_js_w(uint8_t data);
 	uint16_t nimbus_video_io_r(offs_t offset, uint16_t mem_mask = ~0);

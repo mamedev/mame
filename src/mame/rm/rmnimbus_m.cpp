@@ -1070,14 +1070,16 @@ void rmnimbus_state::mouse_js_reset()
 
 	// Setup timer to poll the mouse
 	m_nimbus_mouse.m_mouse_timer->adjust(attotime::zero, 0, attotime::from_hz(MOUSE_POLL_FREQUENCY));
+
+	m_io_selected_js = m_io_joystick0.target();
 }
 
 uint8_t rmnimbus_state::nimbus_joystick_r()
 {
 	/* Only the joystick drection data is read from this port
-	   (which corresponds to the the low nibble of m_io_joystick0).
+	   (which corresponds to the the low nibble of m_io_selected_js).
 	   The joystick buttons are read from the mouse data port instead. */
-	uint8_t result = m_io_joystick0->read() & 0x0f;
+	uint8_t result = m_io_selected_js->read() & 0x0f;
 
 	if (result & CONTROLLER_RIGHT)
 	{
@@ -1094,18 +1096,28 @@ uint8_t rmnimbus_state::nimbus_joystick_r()
 	return result;
 }
 
+void rmnimbus_state::nimbus_select_joystick0(uint8_t data)
+{
+	m_io_selected_js = m_io_joystick0.target();
+}
+
+void rmnimbus_state::nimbus_select_joystick1(uint8_t data)
+{
+	m_io_selected_js = m_io_joystick1.target();
+}
+
 uint8_t rmnimbus_state::nimbus_mouse_js_r()
 {
 	/*
 
 	    bit     description
 
-	    0       JOY 0-Up    or mouse XB
-	    1       JOY 0-Down  or mouse XA
-	    2       JOY 0-Left  or mouse YA
-	    3       JOY 0-Right or mouse YB
-	    4       JOY 0-b0    or mouse rbutton
-	    5       JOY 0-b1    or mouse lbutton
+	    0       mouse XB
+	    1       mouse XA
+	    2       mouse YA
+	    3       mouse YB
+	    4       JOY 1-button or mouse rbutton
+	    5       JOY 0-button or mouse lbutton
 	    6       ?? always reads 1
 	    7       ?? always reads 1
 
@@ -1114,8 +1126,9 @@ uint8_t rmnimbus_state::nimbus_mouse_js_r()
 	
 	// set button bits if either mouse or joystick buttons are pressed
 	result |= m_io_mouse_button->read();
-	// NB only the two button bits of the joystick are read from this port
-	result |= m_io_joystick0->read() & 0x30;
+	// NB only the button bits of the joystick(s) are read from this port
+	result |= m_io_joystick0->read() & 0x20;
+	result |= m_io_joystick1->read() & 0x10;
 
 	return result;
 }
