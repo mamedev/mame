@@ -37,8 +37,6 @@
 #include "formats/2d_dsk.h"
 #include "formats/mz_cas.h"
 
-#include "utf8.h"
-
 
 namespace {
 
@@ -46,6 +44,7 @@ namespace {
 
 #define UTF8_POUND "\xc2\xa3"
 #define UTF8_YEN "\xc2\xa5"
+#define UTF8_SMALL_PI "\xcf\x80"
 #define UTF8_SPADES "\xe2\x99\xa0"
 #define UTF8_DIAMONDS "\xe2\x99\xa6"
 #define UTF8_CLUBS "\xe2\x99\xa3"

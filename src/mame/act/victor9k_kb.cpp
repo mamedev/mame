@@ -211,7 +211,7 @@ Key Layout (USA Variant): (the S0x markings appear on the back of the PCB)
    S11 - [10]
 
    S12 - CLR/HOME
-   S13 - (Degree symbol U+00B0)/(+- symbol U+00B1)/(Pi symbol U+03C0)
+   S13 - °/±/π
    S14 - !/1/|
    S15 - @/2/<
    S16 - #/3/>
@@ -229,8 +229,8 @@ Key Layout (USA Variant): (the S0x markings appear on the back of the PCB)
    S28 - DEL
    S29 - MODE CALC/= (beige keypad key)
    S30 - % (beige keypad key)
-   S31 - (division symbol U+00F7) (beige keypad key)
-   S32 - (multiplication symbol U+00D7) (beige keypad key)
+   S31 - ÷ (beige keypad key)
+   S32 - × (beige keypad key)
 
    S33 - (up arrow, SCRL, down arrow)//VTAB
    S34 - TAB//BACK
@@ -400,7 +400,7 @@ void victor_9000_keyboard_device::device_add_mconfig(machine_config &config)
 INPUT_PORTS_START( victor9k_keyboard )
 	PORT_START("Y0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CLR/HOME") PORT_CODE(KEYCODE_HOME) // S12
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_PLUSMINUS" " UTF8_DEGREES" " UTF8_SMALL_PI) PORT_CODE(KEYCODE_TILDE) // +-, degree, pi // S13
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"± ° π") PORT_CODE(KEYCODE_TILDE) // S13
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_UP" SCRL " UTF8_DOWN) PORT_CODE(KEYCODE_SCRLOCK) // unicode arrows // S33
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("TAB/BACK") PORT_CODE(KEYCODE_TAB) PORT_CHAR(9) // S34
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RVS On-Off/ESC") PORT_CODE(KEYCODE_ESC) PORT_CHAR(27) // S54
@@ -490,7 +490,7 @@ INPUT_PORTS_START( victor9k_keyboard )
 
 	PORT_START("Y9")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad %") // find a good key for this // S30
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad " UTF8_DIVIDE) PORT_CODE(KEYCODE_SLASH_PAD) // unicode division sign U+00F7 // S31
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"Keypad ÷") PORT_CODE(KEYCODE_SLASH_PAD) // // S31
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 8") PORT_CODE(KEYCODE_8_PAD) // S51
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 9") PORT_CODE(KEYCODE_9_PAD) // S52
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 5") PORT_CODE(KEYCODE_5_PAD) // S72
@@ -499,7 +499,7 @@ INPUT_PORTS_START( victor9k_keyboard )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad Enter") PORT_CODE(KEYCODE_ENTER_PAD) // S94
 
 	PORT_START("Y10")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad " UTF8_MULTIPLY) PORT_CODE(KEYCODE_ASTERISK) // unicode multiply sign U+00D7 // S32
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"Keypad ×") PORT_CODE(KEYCODE_ASTERISK) // // S32
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F10 [10]") PORT_CODE(KEYCODE_F10) // S11
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad -") PORT_CODE(KEYCODE_MINUS_PAD) // S53
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F9 [9]") PORT_CODE(KEYCODE_F9) // S10
