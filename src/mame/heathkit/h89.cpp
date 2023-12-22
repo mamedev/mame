@@ -52,8 +52,17 @@
 #include "machine/ram.h"
 #include "machine/timer.h"
 
-namespace {
 
+// Single Step
+#define LOG_SS    (1U << 1)
+
+// #define VERBOSE ( LOG_SS )
+#include "logmacro.h"
+
+#define LOGSS(...)    LOGMASKED(LOG_SS,    __VA_ARGS__)
+
+
+namespace {
 
 class h89_state : public driver_device
 {
@@ -81,7 +90,7 @@ public:
 
 private:
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_memory_region m_maincpu_region;
 	memory_view m_mem_view;
 	required_device<ram_device> m_ram;
@@ -94,13 +103,20 @@ private:
 	required_device<ins8250_device> m_serial2;
 	required_device<ins8250_device> m_serial3;
 	required_ioport m_config;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
 
 	// General Purpose Port (GPP)
 	uint8_t m_gpp;
 
 	bool m_rom_enabled;
 	bool m_timer_intr_enabled;
+	bool m_single_step_enabled;
 	bool m_floppy_ram_wp;
+
+	// single step flags
+	bool m_555a_latch;
+	bool m_555b_latch;
+	bool m_556b_latch;
 
 	uint32_t m_cpu_speed_multiplier;
 
@@ -122,13 +138,17 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(h89_irq_timer);
-	void h89_io(address_map &map);
+
 	void h89_mem(address_map &map);
+	void map_fetch(address_map &map);
+	uint8_t m1_r(offs_t offset);
+	void h89_io(address_map &map);
 
 	uint8_t raise_NMI_r();
 	void raise_NMI_w(uint8_t data);
 	void console_intr(uint8_t data);
 	void reset_line(int data);
+	void reset_single_step_state();
 };
 
 /*
@@ -186,6 +206,42 @@ void h89_state::h89_mem(address_map &map)
 	// Floppy ROM
 	m_mem_view[0](0x1800, 0x1fff).rom().region("maincpu", 0x1800).unmapw();
 	m_mem_view[1](0x1800, 0x1fff).rom().region("maincpu", 0x1800).unmapw();
+}
+
+void h89_state::map_fetch(address_map &map)
+{
+	map(0x0000, 0xffff).r(FUNC(h89_state::m1_r));
+}
+
+uint8_t h89_state::m1_r(offs_t offset)
+{
+	uint8_t data = m_program.read_byte(offset);
+
+	if (!machine().side_effects_disabled() && m_single_step_enabled && !m_556b_latch)
+	{
+		LOGSS("single step m1_r - data: 0x%02x, 555a: %d, 555b: %d, 556b: %d\n", data, m_555a_latch, m_555b_latch, m_556b_latch);
+
+		if (!m_555a_latch)
+		{
+			// Wait for EI instruction
+			if (data == 0xfb)
+			{
+				m_555a_latch = true;
+			}
+		}
+		else if (!m_555b_latch)
+		{
+			m_555b_latch = true;
+		}
+		else if (!m_556b_latch)
+		{
+			m_556b_latch = true;
+
+			m_intr_socket->set_irq_level(2, 1);
+		}
+	}
+
+	return data;
 }
 
 /*                                 PORT
@@ -443,8 +499,14 @@ void h89_state::machine_start()
 	save_item(NAME(m_gpp));
 	save_item(NAME(m_rom_enabled));
 	save_item(NAME(m_timer_intr_enabled));
+	save_item(NAME(m_single_step_enabled));
 	save_item(NAME(m_floppy_ram_wp));
 	save_item(NAME(m_cpu_speed_multiplier));
+	save_item(NAME(m_555a_latch));
+	save_item(NAME(m_555b_latch));
+	save_item(NAME(m_556b_latch));
+
+	m_maincpu->space(AS_PROGRAM).specific(m_program);
 
 	// update RAM mappings based on RAM size
 	uint8_t *m_ram_ptr = m_ram->pointer();
@@ -477,13 +539,6 @@ void h89_state::machine_start()
 		// remap the top 8k down to addr 0
 		m_mem_view[2].install_ram(0x0000, 0x1fff, m_ram_ptr + ram_size - 0x2000);
 	}
-
-	m_rom_enabled = true;
-	m_timer_intr_enabled = true;
-	m_floppy_ram_wp = false;
-
-	update_gpp(0);
-	update_mem_view();
 }
 
 
@@ -491,7 +546,9 @@ void h89_state::machine_reset()
 {
 	m_rom_enabled = true;
 	m_timer_intr_enabled = true;
+	m_single_step_enabled = false;
 	m_floppy_ram_wp = false;
+	reset_single_step_state();
 
 	ioport_value const cfg(m_config->read());
 
@@ -559,6 +616,15 @@ void h89_state::update_mem_view()
 	m_mem_view.select(m_rom_enabled ? (m_floppy_ram_wp ? 0 : 1) : 2);
 }
 
+void h89_state::reset_single_step_state()
+{
+	LOGSS("reset_single_step_state\n");
+	m_555a_latch = false;
+	m_555b_latch = false;
+	m_556b_latch = false;
+	m_intr_socket->set_irq_level(2, 0);
+}
+
 // General Purpose Port
 //
 // Bit     OUTPUT
@@ -579,6 +645,17 @@ void h89_state::update_gpp(uint8_t gpp)
 	m_gpp = gpp;
 
 	m_timer_intr_enabled = bool(BIT(m_gpp, GPP_ENABLE_TIMER_INTERRUPT_BIT));
+
+	if (BIT(changed_gpp, GPP_SINGLE_STEP_BIT))
+	{
+		LOGSS("single step enable: %d\n", BIT(m_gpp, GPP_SINGLE_STEP_BIT));
+		m_single_step_enabled = bool(BIT(m_gpp, GPP_SINGLE_STEP_BIT));
+
+		if (!m_single_step_enabled)
+		{
+			reset_single_step_state();
+		}
+	}
 
 	if (BIT(changed_gpp, GPP_DISABLE_ROM_BIT))
 	{
@@ -623,8 +700,9 @@ void h89_state::h89(machine_config & config)
 {
 	// basic machine hardware
 	Z80(config, m_maincpu, H89_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &h89_state::h89_mem);
-	m_maincpu->set_addrmap(AS_IO, &h89_state::h89_io);
+	m_maincpu->set_m1_map(&h89_state::map_fetch);
+	m_maincpu->set_memory_map(&h89_state::h89_mem);
+	m_maincpu->set_io_map(&h89_state::h89_io);
 	m_maincpu->set_irq_acknowledge_callback("intr_socket", FUNC(heath_intr_socket::irq_callback));
 
 	HEATH_INTR_SOCKET(config, m_intr_socket, intr_ctrl_options, "h37", true);
