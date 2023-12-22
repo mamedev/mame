@@ -1757,7 +1757,6 @@ void taito_f3_state::get_pf_scroll(int pf_num, u32 &reg_sx, u32 &reg_sy)
 	reg_sy = sy;
 }
 
-void taito_f3_state::draw_line(u32* dst, int y, int xs, int xe, mixable* l) { };
 void taito_f3_state::draw_line(u32* dst, int y, int xs, int xe, sprite_inf* sp)
 {
 	if (!sp->layer_enable())
@@ -1778,8 +1777,29 @@ void taito_f3_state::draw_line(u32* dst, int y, int xs, int xe, playfield_inf* p
 		int x_index = ((pf->reg_fx_x >> 16) + x) & m_width_mask;
 		if (!(pf->flagsbitmap->pix(y_index, x_index) & 0xf0))
 			continue;
-		if (u32 col = clut[pf->srcbitmap->pix(y_index, x_index)])
-			dst[x] = col;
+		if (u16 col = pf->srcbitmap->pix(y_index, x_index))
+			dst[x] = clut[col];
+	}
+}
+
+void taito_f3_state::draw_line(u32* dst, int y, int xs, int xe, pivot_inf* pv)
+{
+	const pen_t *clut = &m_palette->pen(0);
+	auto srcbitmap = pv->use_pix() ? pv->srcbitmap_pixel : pv->srcbitmap_vram;
+	auto flagsbitmap = pv->use_pix() ? pv->flagsbitmap_pixel :
+	pv->flagsbitmap_vram;
+	const u16 height_mask = pv->use_pix() ? 0xff : 0x1ff;
+	const u16 width_mask = 0x1ff;
+
+	int y_index = (pv->reg_sy + y) & height_mask;
+
+	for (int x = xs; x < xe; x++) {
+		int x_index = (pv->reg_sx + x) & width_mask;
+		if (!(flagsbitmap->pix(y_index, x_index) & 0xf0))
+			continue;
+		if (u16 col = srcbitmap->pix(y_index, x_index)) {
+			dst[x] = clut[col];
+		}
 	}
 }
 
@@ -1812,6 +1832,18 @@ void taito_f3_state::scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cl
 		else
 			line_data.pf[pf].reg_fx_y = line_data.pf[pf].reg_sy;
 	}
+	line_data.pivot.srcbitmap_pixel = &m_pixel_layer->pixmap();
+	line_data.pivot.flagsbitmap_pixel = &m_pixel_layer->flagsmap();
+	line_data.pivot.srcbitmap_vram = &m_vram_layer->pixmap();
+	line_data.pivot.flagsbitmap_vram = &m_vram_layer->flagsmap();
+	if (m_flipscreen) {
+		line_data.pivot.reg_sx = (m_control_1[4]) - 12;
+		line_data.pivot.reg_sy = (m_control_1[5] & 0x1ff);
+	} else {
+		line_data.pivot.reg_sx = -(m_control_1[4]) - 5;
+		line_data.pivot.reg_sy = -(m_control_1[5] & 0x1ff);
+	}
+
 	// draw sprite layers
 	{
 		rectangle myclip;

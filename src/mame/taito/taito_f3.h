@@ -231,6 +231,9 @@ protected:
 		u16 pivot_enable; // 7000
 		// mix info from 7200
 		bool use_pix() const { return pivot_control & 0xa0; };
+
+		u32 reg_sx;
+		u32 reg_sy;
 	};
 
 	struct playfield_inf : mixable {
@@ -273,9 +276,9 @@ protected:
 		playfield_inf pf[NUM_PLAYFIELDS];
 	};
 
-	virtual void draw_line(u32* dst, int y, int xs, int xe, mixable* l);
 	virtual void draw_line(u32* dst, int y, int xs, int xe, sprite_inf* sp);
 	virtual void draw_line(u32* dst, int y, int xs, int xe, playfield_inf* pf);
+	virtual void draw_line(u32* dst, int y, int xs, int xe, pivot_inf* pv);
 
 	struct f3_playfield_line_inf
 	{
