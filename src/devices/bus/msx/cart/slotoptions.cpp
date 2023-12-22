@@ -34,6 +34,7 @@ char const *const DOOLY           = "dooly";
 char const *const EC701           = "ec701";
 char const *const EASISPEECH      = "easispeech";
 char const *const FMPAC           = "fmpac";
+char const *const FS_SR021        = "fs_sr021";
 char const *const FS_SR022        = "fs_sr022";
 char const *const GAMEMASTER2     = "gamemaster2";
 char const *const HALNOTE         = "halnote";
