@@ -58,7 +58,8 @@ public:
 
 protected:
 	mc6847_friend_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock,
-			const uint8_t *fontdata, bool is_mc6847t1, double tpfs, int field_sync_falling_edge_scanline, int divider, bool supports_partial_body_scanlines);
+			const uint8_t *fontdata, bool is_mc6847t1, double tpfs, int field_sync_falling_edge_scanline, int divider,
+			bool supports_partial_body_scanlines, bool pal);
 
 	// fonts
 	static const uint8_t vdg_t1_fontdata8x12[];
@@ -271,7 +272,7 @@ protected:
 	virtual void device_post_load() override;
 
 	// other overridables
-	virtual TIMER_CALLBACK_MEMBER(new_frame);
+	virtual void new_frame();
 	virtual TIMER_CALLBACK_MEMBER(horizontal_sync_changed);
 	virtual void field_sync_changed(bool line);
 	virtual void enter_bottom_border();
@@ -455,11 +456,9 @@ private:
 		SCANLINE_ZONE_BOTTOM_BORDER,
 		SCANLINE_ZONE_RETRACE,
 		SCANLINE_ZONE_VBLANK,
-		SCANLINE_ZONE_FRAME_END
 	};
 
 	// timers
-	emu_timer *m_frame_timer;
 	emu_timer *m_hsync_on_timer;
 	emu_timer *m_hsync_off_timer;
 	emu_timer *m_fsync_timer;
@@ -470,7 +469,7 @@ protected:
 private:
 	// incidentals
 	const int m_divider;
-	int m_field_sync_falling_edge_scanline;
+	const int m_field_sync_falling_edge_scanline;
 	bool m_wide;
 	bool m_video_changed;
 	uint16_t m_top_border_scanlines;
@@ -478,6 +477,13 @@ private:
 	bool m_recording_scanline;
 	const bool m_supports_partial_body_scanlines;
 
+protected:
+	const bool m_pal;
+	const uint16_t m_lines_top_border;
+	const uint16_t m_lines_until_vblank;
+	const uint16_t m_lines_until_retrace;
+
+private:
 	// video state
 	uint16_t m_physical_scanline;
 	uint16_t m_logical_scanline;
@@ -495,6 +501,11 @@ private:
 
 	// debugging
 	std::string scanline_zone_string(scanline_zone zone) const;
+
+protected:
+	bool is_top_pal_padding_line(int scanline) const;
+	bool is_bottom_pal_padding_line(int scanline) const;
+	bool is_pal_padding_line(int scanline) const;
 };
 
 // actual base class for MC6847 family of devices
@@ -522,7 +533,7 @@ public:
 	void inv_w(int state)      { change_mode(MODE_INV, state); }
 
 protected:
-	mc6847_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const uint8_t *fontdata, double tpfs);
+	mc6847_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const uint8_t *fontdata, double tpfs, bool pal);
 
 	// device-level overrides
 	virtual void device_config_complete() override;
