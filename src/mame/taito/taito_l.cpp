@@ -1299,8 +1299,8 @@ void fhawk_state::fhawk(machine_config &config)
 	ymsnd.add_route(3, "mono", 0.80);
 
 	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
-	ciu.set_master_tag("slave");
-	ciu.set_slave_tag(m_audio_cpu);
+	ciu.nmi_callback().set_inputline(m_audio_cpu, INPUT_LINE_NMI);
+	ciu.reset_callback().set_inputline(m_audio_cpu, INPUT_LINE_RESET);
 }
 
 void champwr_state::champwr(machine_config &config)
@@ -1361,8 +1361,8 @@ void taitol_2cpu_state::raimais(machine_config &config)
 	ymsnd.add_route(2, "mono", 1.0);
 
 	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
-	tc0140syt.set_master_tag("slave");
-	tc0140syt.set_slave_tag(m_audio_cpu);
+	tc0140syt.nmi_callback().set_inputline(m_audio_cpu, INPUT_LINE_NMI);
+	tc0140syt.reset_callback().set_inputline(m_audio_cpu, INPUT_LINE_RESET);
 }
 
 void taitol_2cpu_state::kurikint(machine_config &config)

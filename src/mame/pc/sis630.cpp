@@ -223,12 +223,12 @@ void sis630_state::sis630(machine_config &config)
 	m_ide_00_1->irq_sec().set("pci:01.0:pic_slave", FUNC(pic8259_device::ir7_w));
 		//FUNC(sis950_lpc_device::pc_mirq0_w));
 
-	SIS950_LPC  (config, m_lpc_01_0, XTAL(33'000'000), "maincpu", "flash");
+	SIS950_LPC(config, m_lpc_01_0, XTAL(33'000'000), "maincpu", "flash");
 	m_lpc_01_0->fast_reset_cb().set([this] (int state) {
 		if (state)
 			machine().schedule_soft_reset();
 	});
-	LPC_ACPI    (config, "pci:01.0:acpi", 0);
+	LPC_ACPI(config, "pci:01.0:acpi", 0);
 	SIS950_SMBUS(config, "pci:01.0:smbus", 0);
 
 	SIS900_ETH(config, "pci:01.1", 0);

@@ -1952,6 +1952,8 @@ if (BUSES["MSX_SLOT"]~=null) then
 		MAME_DIR .. "src/devices/bus/msx/cart/easi_speech.h",
 		MAME_DIR .. "src/devices/bus/msx/cart/fmpac.cpp",
 		MAME_DIR .. "src/devices/bus/msx/cart/fmpac.h",
+		MAME_DIR .. "src/devices/bus/msx/cart/fs_sr021.cpp",
+		MAME_DIR .. "src/devices/bus/msx/cart/fs_sr021.h",
 		MAME_DIR .. "src/devices/bus/msx/cart/fs_sr022.cpp",
 		MAME_DIR .. "src/devices/bus/msx/cart/fs_sr022.h",
 		MAME_DIR .. "src/devices/bus/msx/cart/halnote.cpp",
@@ -4421,8 +4423,12 @@ end
 
 if (BUSES["KIM1BUS"]~=null) then
 	files {
+		MAME_DIR .. "src/devices/bus/kim1/cards.cpp",
+		MAME_DIR .. "src/devices/bus/kim1/cards.h",
 		MAME_DIR .. "src/devices/bus/kim1/kim1bus.cpp",
 		MAME_DIR .. "src/devices/bus/kim1/kim1bus.h",
+		MAME_DIR .. "src/devices/bus/kim1/k1008_vismem.cpp",
+		MAME_DIR .. "src/devices/bus/kim1/k1008_vismem.h",
 		MAME_DIR .. "src/devices/bus/kim1/k1016_16k.cpp",
 		MAME_DIR .. "src/devices/bus/kim1/k1016_16k.h",
 	}

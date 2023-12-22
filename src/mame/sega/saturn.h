@@ -119,8 +119,8 @@ protected:
 		int       old_tvmd = 0;
 	}m_vdp2;
 
-	required_device<sh2_sh7604_device> m_maincpu;
-	required_device<sh2_sh7604_device> m_slave;
+	required_device<sh7604_device> m_maincpu;
+	required_device<sh7604_device> m_slave;
 	required_device<m68000_base_device> m_audiocpu;
 	required_device<scsp_device> m_scsp;
 	required_device<smpc_hle_device> m_smpc_hle;

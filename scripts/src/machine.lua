@@ -2462,30 +2462,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/mediagx_cs5530_bridge.h,MACHINES["MEDIAGX_CS5530_BRIDGE"] = true
----------------------------------------------------
-
-if (MACHINES["MEDIAGX_CS5530_BRIDGE"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/mediagx_cs5530_bridge.cpp",
-		MAME_DIR .. "src/devices/machine/mediagx_cs5530_bridge.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/mediagx_host.h,MACHINES["MEDIAGX_HOST"] = true
----------------------------------------------------
-
-if (MACHINES["MEDIAGX_HOST"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/mediagx_host.cpp",
-		MAME_DIR .. "src/devices/machine/mediagx_host.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/meters.h,MACHINES["METERS"] = true
 ---------------------------------------------------
 
@@ -2913,6 +2889,14 @@ if (MACHINES["PCI"]~=null) then
 		MAME_DIR .. "src/devices/machine/sis85c496.h",
 		MAME_DIR .. "src/devices/machine/vt8231_isa.cpp",
 		MAME_DIR .. "src/devices/machine/vt8231_isa.h",
+		MAME_DIR .. "src/devices/machine/mediagx_cs5530_bridge.cpp",
+		MAME_DIR .. "src/devices/machine/mediagx_cs5530_bridge.h",
+		MAME_DIR .. "src/devices/machine/mediagx_cs5530_ide.cpp",
+		MAME_DIR .. "src/devices/machine/mediagx_cs5530_ide.h",
+		MAME_DIR .. "src/devices/machine/mediagx_host.cpp",
+		MAME_DIR .. "src/devices/machine/mediagx_host.h",
+		MAME_DIR .. "src/devices/machine/zfmicro_usb.cpp",
+		MAME_DIR .. "src/devices/machine/zfmicro_usb.h",
 	}
 end
 

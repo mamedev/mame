@@ -8,9 +8,8 @@ license:CC0-1.0
 
 	<element name="blackb"><rect><color red="0" green="0" blue="0" /></rect></element>
 	<element name="black"><rect><color red="0.21" green="0.17" blue="0.17" /></rect></element>
-	<element name="white"><rect><color red="0.81" green="0.8" blue="0.79" /></rect></element>
-	<element name="disk_white"><disk><color red="0.81" green="0.8" blue="0.79" /></disk></element>
-	<element name="gold"><rect><color red="0.7" green="0.6" blue="0.4" /></rect></element>
+	<element name="whited"><disk><color red="0.81" green="0.8" blue="0.79" /></disk></element>
+	<element name="gold"><rect><color red="0.8" green="0.7" blue="0.5" /></rect></element>
 
 	<element name="digit" defstate="0">
 		<led7seg><color red="1.0" green="0.1" blue="0.15" /></led7seg>
@@ -34,15 +33,15 @@ license:CC0-1.0
 		</text>
 		<rect>
 			<bounds x="0" y="2.5" width="1" height="2.5" />
-			<color red="0.7" green="0.6" blue="0.4" />
+			<color red="0.8" green="0.7" blue="0.5" />
 		</rect>
 		<rect>
 			<bounds x="5" y="2.5" width="1" height="2.5" />
-			<color red="0.7" green="0.6" blue="0.4" />
+			<color red="0.8" green="0.7" blue="0.5" />
 		</rect>
 		<rect>
 			<bounds x="0" y="5" width="6" height="1" />
-			<color red="0.7" green="0.6" blue="0.4" />
+			<color red="0.8" green="0.7" blue="0.5" />
 		</rect>
 	</element>
 	<element name="piece_2">
@@ -52,19 +51,19 @@ license:CC0-1.0
 		</text>
 		<rect>
 			<bounds x="0" y="0" width="1" height="3" />
-			<color red="0.7" green="0.6" blue="0.4" />
+			<color red="0.8" green="0.7" blue="0.5" />
 		</rect>
 		<rect>
 			<bounds x="5" y="2" width="1" height="3" />
-			<color red="0.7" green="0.6" blue="0.4" />
+			<color red="0.8" green="0.7" blue="0.5" />
 		</rect>
 		<rect>
 			<bounds x="0" y="2" width="6" height="1" />
-			<color red="0.7" green="0.6" blue="0.4" />
+			<color red="0.8" green="0.7" blue="0.5" />
 		</rect>
 		<rect>
 			<bounds x="0" y="5" width="6" height="1" />
-			<color red="0.7" green="0.6" blue="0.4" />
+			<color red="0.8" green="0.7" blue="0.5" />
 		</rect>
 	</element>
 	<element name="piece_3">
@@ -74,15 +73,15 @@ license:CC0-1.0
 		</text>
 		<rect>
 			<bounds x="0" y="0" width="1" height="6" />
-			<color red="0.7" green="0.6" blue="0.4" />
+			<color red="0.8" green="0.7" blue="0.5" />
 		</rect>
 		<rect>
 			<bounds x="5" y="2.5" width="1" height="2.5" />
-			<color red="0.7" green="0.6" blue="0.4" />
+			<color red="0.8" green="0.7" blue="0.5" />
 		</rect>
 		<rect>
 			<bounds x="0" y="5" width="6" height="1" />
-			<color red="0.7" green="0.6" blue="0.4" />
+			<color red="0.8" green="0.7" blue="0.5" />
 		</rect>
 	</element>
 	<element name="piece_4">
@@ -92,19 +91,19 @@ license:CC0-1.0
 		</text>
 		<rect>
 			<bounds x="0" y="2" width="1" height="3" />
-			<color red="0.7" green="0.6" blue="0.4" />
+			<color red="0.8" green="0.7" blue="0.5" />
 		</rect>
 		<rect>
 			<bounds x="5" y="2" width="1" height="3" />
-			<color red="0.7" green="0.6" blue="0.4" />
+			<color red="0.8" green="0.7" blue="0.5" />
 		</rect>
 		<rect>
 			<bounds x="0" y="2" width="6" height="1" />
-			<color red="0.7" green="0.6" blue="0.4" />
+			<color red="0.8" green="0.7" blue="0.5" />
 		</rect>
 		<rect>
 			<bounds x="0" y="5" width="6" height="1" />
-			<color red="0.7" green="0.6" blue="0.4" />
+			<color red="0.8" green="0.7" blue="0.5" />
 		</rect>
 	</element>
 	<element name="piece_5">
@@ -114,15 +113,15 @@ license:CC0-1.0
 		</text>
 		<rect>
 			<bounds x="0" y="0" width="1" height="6" />
-			<color red="0.7" green="0.6" blue="0.4" />
+			<color red="0.8" green="0.7" blue="0.5" />
 		</rect>
 		<rect>
 			<bounds x="5" y="0" width="1" height="6" />
-			<color red="0.7" green="0.6" blue="0.4" />
+			<color red="0.8" green="0.7" blue="0.5" />
 		</rect>
 		<rect>
 			<bounds x="0" y="5" width="6" height="1" />
-			<color red="0.7" green="0.6" blue="0.4" />
+			<color red="0.8" green="0.7" blue="0.5" />
 		</rect>
 	</element>
 	<element name="piece_6">
@@ -132,19 +131,19 @@ license:CC0-1.0
 		</text>
 		<rect>
 			<bounds x="0" y="0" width="1" height="6" />
-			<color red="0.7" green="0.6" blue="0.4" />
+			<color red="0.8" green="0.7" blue="0.5" />
 		</rect>
 		<rect>
 			<bounds x="5" y="0" width="1" height="6" />
-			<color red="0.7" green="0.6" blue="0.4" />
+			<color red="0.8" green="0.7" blue="0.5" />
 		</rect>
 		<rect>
 			<bounds x="0" y="2" width="6" height="1" />
-			<color red="0.7" green="0.6" blue="0.4" />
+			<color red="0.8" green="0.7" blue="0.5" />
 		</rect>
 		<rect>
 			<bounds x="0" y="5" width="6" height="1" />
-			<color red="0.7" green="0.6" blue="0.4" />
+			<color red="0.8" green="0.7" blue="0.5" />
 		</rect>
 	</element>
 
@@ -176,23 +175,24 @@ license:CC0-1.0
 	<element name="text_white"><text string="WHITE"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_enter"><text string="ENTER"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 
-	<element name="text_a"><text string="A"><color red="0.7" green="0.6" blue="0.4" /></text></element>
-	<element name="text_b"><text string="B"><color red="0.7" green="0.6" blue="0.4" /></text></element>
-	<element name="text_c"><text string="C"><color red="0.7" green="0.6" blue="0.4" /></text></element>
-	<element name="text_d"><text string="D"><color red="0.7" green="0.6" blue="0.4" /></text></element>
-	<element name="text_e"><text string="E"><color red="0.7" green="0.6" blue="0.4" /></text></element>
-	<element name="text_f"><text string="F"><color red="0.7" green="0.6" blue="0.4" /></text></element>
-	<element name="text_g"><text string="G"><color red="0.7" green="0.6" blue="0.4" /></text></element>
-	<element name="text_h"><text string="H"><color red="0.7" green="0.6" blue="0.4" /></text></element>
+	<!-- chessboard coords should actually be gold color, but that's hard to see -->
+	<element name="text_a"><text string="A"><color red="0.21" green="0.17" blue="0.17" /></text></element>
+	<element name="text_b"><text string="B"><color red="0.21" green="0.17" blue="0.17" /></text></element>
+	<element name="text_c"><text string="C"><color red="0.21" green="0.17" blue="0.17" /></text></element>
+	<element name="text_d"><text string="D"><color red="0.21" green="0.17" blue="0.17" /></text></element>
+	<element name="text_e"><text string="E"><color red="0.21" green="0.17" blue="0.17" /></text></element>
+	<element name="text_f"><text string="F"><color red="0.21" green="0.17" blue="0.17" /></text></element>
+	<element name="text_g"><text string="G"><color red="0.21" green="0.17" blue="0.17" /></text></element>
+	<element name="text_h"><text string="H"><color red="0.21" green="0.17" blue="0.17" /></text></element>
 
-	<element name="text_1"><text string="1"><color red="0.7" green="0.6" blue="0.4" /></text></element>
-	<element name="text_2"><text string="2"><color red="0.7" green="0.6" blue="0.4" /></text></element>
-	<element name="text_3"><text string="3"><color red="0.7" green="0.6" blue="0.4" /></text></element>
-	<element name="text_4"><text string="4"><color red="0.7" green="0.6" blue="0.4" /></text></element>
-	<element name="text_5"><text string="5"><color red="0.7" green="0.6" blue="0.4" /></text></element>
-	<element name="text_6"><text string="6"><color red="0.7" green="0.6" blue="0.4" /></text></element>
-	<element name="text_7"><text string="7"><color red="0.7" green="0.6" blue="0.4" /></text></element>
-	<element name="text_8"><text string="8"><color red="0.7" green="0.6" blue="0.4" /></text></element>
+	<element name="text_1"><text string="1"><color red="0.21" green="0.17" blue="0.17" /></text></element>
+	<element name="text_2"><text string="2"><color red="0.21" green="0.17" blue="0.17" /></text></element>
+	<element name="text_3"><text string="3"><color red="0.21" green="0.17" blue="0.17" /></text></element>
+	<element name="text_4"><text string="4"><color red="0.21" green="0.17" blue="0.17" /></text></element>
+	<element name="text_5"><text string="5"><color red="0.21" green="0.17" blue="0.17" /></text></element>
+	<element name="text_6"><text string="6"><color red="0.21" green="0.17" blue="0.17" /></text></element>
+	<element name="text_7"><text string="7"><color red="0.21" green="0.17" blue="0.17" /></text></element>
+	<element name="text_8"><text string="8"><color red="0.21" green="0.17" blue="0.17" /></text></element>
 
 
 <!-- sb board -->
@@ -454,56 +454,9 @@ license:CC0-1.0
 	</group>
 
 
-<!-- build screen -->
+<!-- display -->
 
-	<view name="Internal Layout">
-		<bounds left="-28.75" top="187" right="784" bottom="628" />
-
-		<element ref="white"><bounds x="33" y="187" width="751" height="441" /></element>
-
-		<!-- chessboard coords/leds -->
-		<element ref="text_a"><bounds x="77.875"  y="600" width="14" height="14" /></element>
-		<element ref="text_b"><bounds x="127.625" y="600" width="14" height="14" /></element>
-		<element ref="text_c"><bounds x="177.375" y="600" width="14" height="14" /></element>
-		<element ref="text_d"><bounds x="227.125" y="600" width="14" height="14" /></element>
-		<element ref="text_e"><bounds x="276.875" y="600" width="14" height="14" /></element>
-		<element ref="text_f"><bounds x="326.625" y="600" width="14" height="14" /></element>
-		<element ref="text_g"><bounds x="376.375" y="600" width="14" height="14" /></element>
-		<element ref="text_h"><bounds x="426.125" y="600" width="14" height="14" /></element>
-
-		<element ref="text_8"><bounds x="45" y="217.875" width="14" height="14" /></element>
-		<element ref="text_7"><bounds x="45" y="267.625" width="14" height="14" /></element>
-		<element ref="text_6"><bounds x="45" y="317.375" width="14" height="14" /></element>
-		<element ref="text_5"><bounds x="45" y="367.125" width="14" height="14" /></element>
-		<element ref="text_4"><bounds x="45" y="416.875" width="14" height="14" /></element>
-		<element ref="text_3"><bounds x="45" y="466.625" width="14" height="14" /></element>
-		<element ref="text_2"><bounds x="45" y="516.375" width="14" height="14" /></element>
-		<element ref="text_1"><bounds x="45" y="566.125" width="14" height="14" /></element>
-
-		<element name="4.0" ref="led"><bounds x="79.875"  y="614" width="10" height="10" /></element>
-		<element name="4.1" ref="led"><bounds x="129.625" y="614" width="10" height="10" /></element>
-		<element name="4.2" ref="led"><bounds x="179.375" y="614" width="10" height="10" /></element>
-		<element name="4.3" ref="led"><bounds x="229.125" y="614" width="10" height="10" /></element>
-		<element name="4.4" ref="led"><bounds x="278.875" y="614" width="10" height="10" /></element>
-		<element name="4.5" ref="led"><bounds x="328.625" y="614" width="10" height="10" /></element>
-		<element name="4.6" ref="led"><bounds x="378.375" y="614" width="10" height="10" /></element>
-		<element name="4.7" ref="led"><bounds x="428.125" y="614" width="10" height="10" /></element>
-
-		<element name="5.7" ref="led"><bounds x="37" y="219.875" width="10" height="10" /></element>
-		<element name="5.6" ref="led"><bounds x="37" y="269.625" width="10" height="10" /></element>
-		<element name="5.5" ref="led"><bounds x="37" y="319.375" width="10" height="10" /></element>
-		<element name="5.4" ref="led"><bounds x="37" y="369.125" width="10" height="10" /></element>
-		<element name="5.3" ref="led"><bounds x="37" y="418.875" width="10" height="10" /></element>
-		<element name="5.2" ref="led"><bounds x="37" y="468.625" width="10" height="10" /></element>
-		<element name="5.1" ref="led"><bounds x="37" y="518.375" width="10" height="10" /></element>
-		<element name="5.0" ref="led"><bounds x="37" y="568.125" width="10" height="10" /></element>
-
-		<!-- chessboard/ui -->
-		<element ref="gold"><bounds x="57" y="197" width="404" height="404" /></element>
-		<group ref="sb_board"><bounds x="60" y="200" width="398" height="398" /></group>
-		<group ref="sb_ui"><bounds x="-22.75" y="200" width="49.75" height="398" /></group>
-
-		<!-- display -->
+	<group name="display">
 		<element ref="gold"><bounds x="471" y="197" width="303" height="121" /></element>
 		<element ref="black"><bounds x="474" y="200" width="297" height="115" /></element>
 		<element ref="blackb"><bounds x="523.5" y="210" width="198" height="49" /></element>
@@ -511,8 +464,14 @@ license:CC0-1.0
 		<element name="digit1" ref="digit"><bounds x="587.5" y="215" width="26" height="39" /></element>
 		<element name="digit2" ref="digit"><bounds x="631.5" y="215" width="26" height="39" /></element>
 		<element name="digit3" ref="digit"><bounds x="676.5" y="215" width="26" height="39" /></element>
+		<element ref="black"><bounds x="618" y="202" width="3" height="111" /></element>
+		<element ref="black"><bounds x="624" y="202" width="3" height="111" /></element>
+	</group>
 
-		<!-- keypad -->
+
+<!-- buttons -->
+
+	<group name="buttons">
 		<element ref="gold"><bounds x="471" y="328" width="303" height="273" /></element>
 
 		<element ref="black"><bounds x="474" y="331" width="72" height="51" /></element>
@@ -564,8 +523,8 @@ license:CC0-1.0
 		<element ref="text_white"><bounds x="625" y="563" width="70" height="18" /></element>
 		<element ref="text_enter"><bounds x="700" y="563" width="70" height="18" /></element>
 
-		<element ref="disk_white"><bounds x="582.5" y="354" width="5" height="5" /></element>
-		<element ref="disk_white"><bounds x="657.5" y="408" width="5" height="5" /></element>
+		<element ref="whited"><bounds x="582.5" y="354" width="5" height="5" /></element>
+		<element ref="whited"><bounds x="657.5" y="408" width="5" height="5" /></element>
 
 		<element ref="piece_1"><bounds x="500" y="519" width="20" height="20" /></element>
 		<element ref="piece_2"><bounds x="575" y="519" width="20" height="20" /></element>
@@ -594,6 +553,74 @@ license:CC0-1.0
 		<element ref="hl" inputtag="IN.0" inputmask="0x080"><bounds x="699" y="439" width="72" height="51" /><color alpha="0.15" /></element>
 		<element ref="hl" inputtag="IN.0" inputmask="0x100"><bounds x="699" y="493" width="72" height="51" /><color alpha="0.15" /></element>
 		<element ref="hl" inputtag="IN.0" inputmask="0x200"><bounds x="699" y="547" width="72" height="51" /><color alpha="0.15" /></element>
+	</group>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="-15" top="-2" right="156" bottom="90" />
+
+		<group ref="sb_ui"><bounds x="-13.5" y="4" width="10" height="80" /></group>
+		<element ref="cwhite"><bounds x="-2" y="-2" width="158" height="92" /></element>
+
+		<group ref="display"><bounds x="89.7" y="3.7" width="60.6" height="24.2" /></group>
+		<group ref="buttons"><bounds x="89.7" y="29.7" width="60.6" height="54.6" /></group>
+
+		<!-- chessboard -->
+		<element ref="gold"><bounds x="2" y="2" width="84" height="84" /></element>
+		<group ref="sb_board"><bounds x="4" y="4" width="80" height="80" /></group>
+
+		<repeat count="9">
+			<param name="x" start="3.7" increment="10" />
+			<param name="y" start="3.7" increment="10" />
+
+			<element ref="gold"><bounds x="3.7" y="~y~" width="82" height="0.6" /></element>
+			<element ref="gold"><bounds x="~x~" y="3.7" width="0.6" height="82" /></element>
+		</repeat>
+
+		<element ref="cwhite"><bounds x="1" y="1" width="86" height="2.7" /></element>
+		<element ref="cwhite"><bounds x="1" y="84.3" width="86" height="2.7" /></element>
+		<element ref="cwhite"><bounds x="1" y="1" width="2.7" height="86" /></element>
+		<element ref="cwhite"><bounds x="84.3" y="1" width="2.7" height="86" /></element>
+
+		<!-- chessboard coords -->
+		<element ref="text_a"><bounds xc="9"  y="84.3" width="5" height="2.5" /></element>
+		<element ref="text_b"><bounds xc="19" y="84.3" width="5" height="2.5" /></element>
+		<element ref="text_c"><bounds xc="29" y="84.3" width="5" height="2.5" /></element>
+		<element ref="text_d"><bounds xc="39" y="84.3" width="5" height="2.5" /></element>
+		<element ref="text_e"><bounds xc="49" y="84.3" width="5" height="2.5" /></element>
+		<element ref="text_f"><bounds xc="59" y="84.3" width="5" height="2.5" /></element>
+		<element ref="text_g"><bounds xc="69" y="84.3" width="5" height="2.5" /></element>
+		<element ref="text_h"><bounds xc="79" y="84.3" width="5" height="2.5" /></element>
+
+		<element ref="text_8"><bounds x="0.2" yc="9"  width="5" height="2.5" /></element>
+		<element ref="text_7"><bounds x="0.2" yc="19" width="5" height="2.5" /></element>
+		<element ref="text_6"><bounds x="0.2" yc="29" width="5" height="2.5" /></element>
+		<element ref="text_5"><bounds x="0.2" yc="39" width="5" height="2.5" /></element>
+		<element ref="text_4"><bounds x="0.2" yc="49" width="5" height="2.5" /></element>
+		<element ref="text_3"><bounds x="0.2" yc="59" width="5" height="2.5" /></element>
+		<element ref="text_2"><bounds x="0.2" yc="69" width="5" height="2.5" /></element>
+		<element ref="text_1"><bounds x="0.2" yc="79" width="5" height="2.5" /></element>
+
+		<!-- chessboard leds -->
+		<element name="4.0" ref="led"><bounds xc="9"  y="87" width="2" height="2" /></element>
+		<element name="4.1" ref="led"><bounds xc="19" y="87" width="2" height="2" /></element>
+		<element name="4.2" ref="led"><bounds xc="29" y="87" width="2" height="2" /></element>
+		<element name="4.3" ref="led"><bounds xc="39" y="87" width="2" height="2" /></element>
+		<element name="4.4" ref="led"><bounds xc="49" y="87" width="2" height="2" /></element>
+		<element name="4.5" ref="led"><bounds xc="59" y="87" width="2" height="2" /></element>
+		<element name="4.6" ref="led"><bounds xc="69" y="87" width="2" height="2" /></element>
+		<element name="4.7" ref="led"><bounds xc="79" y="87" width="2" height="2" /></element>
+
+		<element name="5.7" ref="led"><bounds x="-0.5" yc="9"  width="2" height="2" /></element>
+		<element name="5.6" ref="led"><bounds x="-0.5" yc="19" width="2" height="2" /></element>
+		<element name="5.5" ref="led"><bounds x="-0.5" yc="29" width="2" height="2" /></element>
+		<element name="5.4" ref="led"><bounds x="-0.5" yc="39" width="2" height="2" /></element>
+		<element name="5.3" ref="led"><bounds x="-0.5" yc="49" width="2" height="2" /></element>
+		<element name="5.2" ref="led"><bounds x="-0.5" yc="59" width="2" height="2" /></element>
+		<element name="5.1" ref="led"><bounds x="-0.5" yc="69" width="2" height="2" /></element>
+		<element name="5.0" ref="led"><bounds x="-0.5" yc="79" width="2" height="2" /></element>
 
 	</view>
 </mamelayout>

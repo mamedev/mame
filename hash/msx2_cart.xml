@@ -2873,6 +2873,44 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
+	<software name="fs_sr021" supported="no">
+		<description>FS-SR021 MSX2 Word Processor (Japan)</description>
+		<year>1988</year>
+		<publisher>Panasonic</publisher>
+		<notes>Cartridge hardware is partially emulated.</notes>
+		<info name="alt_title" value="FS-SR021 MSX2用ワープロカートリッジ" />
+		<info name="serial" value="FS-SR021"/>
+		<info name="barcode" value="4902704652515"/>
+		<part name="cart" interface="msx_cart">
+			<!-- IC1? - MB834000A-20 - 512KB ROM -->
+			<!-- IC2? - MB834000-25 - 512KB ROM -->
+			<!-- IC3? - DA532391-S - possibly kanji font, also 512KB ROM? -->
+			<!-- IC4? - MB8464-15L-SK - 8KB SRAM -->
+			<!-- IC5 - MB8464A-15-SK - 8KB SRAM -->
+			<!-- IC6 - SLA7220F - gate array -->
+			<!-- battery -->
+			<feature name="slot" value="fs_sr021" />
+			<!-- writes to 6c00 - 8kb bank at 6000-7fff? -->
+			<!-- writes to 7ff9 - some kind of control? -->
+			<!-- writes to 7000 - 8kb bank at 8000-9fff? -->
+			<!-- writes to 7800 - 8kb bank at a000-bfff? -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="mb834000a.ic1" size="0x80000" status="nodump"/>
+				<rom name="mb834000.ic2" size="0x80000" status="nodump"/>
+				<rom name="da532391.ic3" size="0x80000" status="nodump"/>
+				<!-- Last 512KB is empty/FFs. Should be 3 dumps, with at least 2 of 512KB. -->
+				<rom name="fs-sr021.rom" size="0x200000" crc="c3cdb67a" sha1="13007f9340670deda42c4b53c06c19d3d3c09704" status="baddump"/>
+			</dataarea>
+			<dataarea name="sram" size="0x4000">
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="fs-sr021 msx2 word processor - panasonic.dsk" size="737280" crc="a1ef5c89" sha1="f47f225b75784bb4d2ee533fa8fb57d9525c0029"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="nekkejud">
 		<description>Nekketsu Juudou (Japan)</description>
 		<year>1989</year>

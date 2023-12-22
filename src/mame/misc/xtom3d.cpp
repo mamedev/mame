@@ -594,12 +594,6 @@ void xtom3d_state::romdisk_config(device_t *device)
 	romdisk.set_rom_tag("game_rom");
 }
 
-// TODO: stub for drive options (speed/drive type etc.)
-/*void xtom3d_state::cdrom_config(device_t *device)
-{
-}
-*/
-
 // TODO: unverified PCI config space
 void xtom3d_state::xtom3d(machine_config &config)
 {
@@ -660,6 +654,7 @@ void xtom3d_state::xtom3d(machine_config &config)
 	// "pci:0e.0" J4D1
 }
 
+// TODO: stub for drive options (speed/drive type etc.)
 static void cdrom_config(device_t *device)
 {
 	device->subdevice<cdda_device>("cdda")->add_route(0, ":lmicrophone", 0.25);

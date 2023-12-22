@@ -17450,6 +17450,7 @@ mag_xain
 
 @source:efo/cidelsa.cpp
 altair                          // (c) 1981 Cidelsa
+altair2                         // (c) 198? Cidelsa
 destryer                        // (c) 1981 Cidelsa
 destryera                       // (c) 1981 Cidelsa
 draco                           // (c) 1981 Cidelsa
@@ -19296,6 +19297,7 @@ mm2b                            // Mephisto MM II
 mm2c                            // Mephisto MM II
 mm2d                            // Mephisto MM II
 mm2e                            // Mephisto MM II
+mm2nona
 bup                             // Mephisto B&P
 bupa                            // Mephisto B&P
 mm4                             // Mephisto MM IV
@@ -19308,7 +19310,6 @@ mm5p
 rebel5                          // Mephisto Rebell 5.0
 rebel5a                         // Mephisto Rebell 5.0
 rebel5b                         // Mephisto Rebell 5.0
-rebelp
 
 @source:hegenerglaser/modena.cpp
 modena                          // 1992 Mephisto Modena
@@ -19958,6 +19959,7 @@ cjdh2c                          // (c) 200?
 igsm312                         // (c) 200?
 lhtb                            // (c) 200?
 lhzb3in1                        // (c) 200?
+mghammer                        // (c) 2015
 
 @source:igs/igspoker.cpp
 chleague                        // (c) 199? IGS
@@ -24511,7 +24513,6 @@ vendettaun                      // GX081 (c) 1991 (World)
 @source:konami/viper.cpp
 boxingm                         // 2001
 code1d                          // 2000
-code1da                         // 2000
 code1db                         // 2000
 gticlub2                        // 2000
 gticlub2ea                      // 2000
@@ -30400,6 +30401,9 @@ uforobot                        // (c) 2001 Nazionale Elettronica
 wcup                            // (c) 2001 Nazionale Elettronica
 wcup14                          // (c) 2001 Nazionale Elettronica
 
+@source:misc/jackhouse.cpp
+jackhous                        // (c) 1994 Chain Leisure Co., Ltd
+
 @source:misc/jackpool.cpp
 jackpool                        // (c) 1997 Electronic Projects
 
@@ -30653,11 +30657,15 @@ mosaica                         // (c) 1990 Space + Fuuki license
 fruitstb                        // 199? Webak
 fruitstba                       // 199? Webak
 fruitstbb                       // 1997 Webak
-fruitstbc                       // 1997 Webak
-fruitstbd                       // 1997 Webak
+fruitstbc                       // 1996 Webak
+fruitstbd                       // 1996 Webak
 fruitstbe                       // 1999 Webak
 fruitstbf                       // 1997 Webak
 fruitstbg                       // 1997 Webak
+fruitstbh                       // 1996 Webak
+fruitstbi                       // 1996 Webak
+goldnjkr                        // 1996 Webak
+goldnjkra                       // 1996 Webak
 
 @source:misc/mtu130.cpp
 mtu130
@@ -31174,6 +31182,7 @@ pkscram                         // (c) 1993 Cosmo Electronics Corporation
 plycntrchtr                     // (c) 2000 Recreativos Presas / Undergaming
 plycntrchtrc                    // (c) 2000 Recreativos Presas / Undergaming
 plycntrchtrk                    // (c) 2000 Recreativos Presas / Undergaming
+plycntre3                       // (c) 2004 Recreativos Presas / Undergaming
 
 @source:misc/plsonic4.cpp
 plsonic4                        //
@@ -33246,7 +33255,6 @@ pc8001mk2                       // 1983
 pc8001mk2sr                     // 1985
 
 @source:nec/pc8401a.cpp
-pc8401a                         // roms needed
 pc8500                          //
 
 @source:nec/pc8801.cpp
@@ -38496,6 +38504,13 @@ sstar28k
 tstar432
 tstar432a
 tstar432b
+
+@source:saitek/turbo16k.cpp
+compan3
+conquist
+t1850
+tmate
+turbo16k
 
 @source:samcoupe/samcoupe.cpp
 samcoupe                        // 1989 Sam Coupe

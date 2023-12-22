@@ -155,7 +155,7 @@ license:CC0-1.0
 	70  *EC0070-JPM  J-Pop Mix Volume 34
 	71  *EC0071-JPM  J-Pop Mix Volume 35
 	72  *EC0072-JPM  J-Pop Mix Volume 36
-	73  *EC0073-MKC  MKC volume 1 (Japan)
+	73  *EC0073-MKC  Mood Kayou Collection Volume 1
 	74  *EC0074-JPM  J-Pop Mix Volume 37
 	75  *EC0075-JPM  J-Pop Mix Volume 38
 	76  *EC0076-JPM  J-Pop Mix Volume 39
@@ -168,7 +168,7 @@ license:CC0-1.0
 	82  *EC0082-MBH  Matthew's Best Hit Selection
 	83   EC0083-JPM  J-Pop Mix Volume 43
 	84   EC0084-     Kids' Song Best 40
-	85   EC0085-ETZ  Enka Taizen Volume 3 (custom presentation etc.) (guess)
+	85   EC0085-ETZ  Enka Taizen Volume 3 (custom presentation etc.)
 
 	(more? what's the highest regular number?)
 
@@ -180,8 +180,8 @@ license:CC0-1.0
 	These look like normal e-kara carts
 
 	KD-1  Kids' Song 20
-	KD-2  (unknown)
-	KD-3  (unknown)
+	KD-2  Kids' Song 20
+	KD-3  Kids' Song 20
 	KD-4  Kids' Song 20
 
 	************************************************************************************************************************************************************
@@ -1016,9 +1016,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="ec0073">
-		<description>MKC volume 1 (Japan) (EC0073-MKC)</description>
+		<description>Mood Kayou Collection Volume 1 (Japan) (EC0073-MKC)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="ムード歌謡コレクション Vol.1" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0073-mkc.u1" size="0x100000" crc="e1ffa625" sha1="ee1bcd579a10085c4c094037e25345c17c063c7c"/>
@@ -1121,8 +1122,8 @@ license:CC0-1.0
 
 	<!-- EC0083-JPM  J-Pop Mix Volume 43 -->
 
-	<!-- EC0084-     Kids' Song Best 40 (seen) -->
+	<!-- EC0084-     Kids' Song Best 40 -->
 
-	<!-- EC0085-     (unknown, seen in the wild, sequel to 69, 79 so probably ETZ) -->
+	<!-- EC0085-ETZ  Enka Taizen Volume 3 -->
 
 </softwarelist>

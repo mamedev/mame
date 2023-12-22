@@ -11,7 +11,7 @@ Hardware notes (Diablo):
 - 2*8KB RAM TC5565 battery-backed, 2*32KB hashtable RAM TC55257
 - 3*32KB ROM (27C256 or equivalent)
 - HD44780A00 LCD controller (16x1)
-- R65C51P2 ACIA @ 1.8432MHz, RS232
+- R65C51P2 ACIA @ 1.8432MHz, RS232 for Novag Super System
 - magnetic sensors, 8*8 chessboard leds
 
 Scorpio 68000 hardware is very similar, but with chessboard buttons and side leds.

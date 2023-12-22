@@ -151,8 +151,8 @@ void cucaracha_state::cucaracha(machine_config &config)
 	soundcpu.set_addrmap(AS_PROGRAM, &cucaracha_state::sound_map);
 
 	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
-	ciu.set_master_tag(m_maincpu);
-	ciu.set_slave_tag("soundcpu");
+	ciu.nmi_callback().set_inputline("soundcpu", INPUT_LINE_NMI);
+	ciu.reset_callback().set_inputline("soundcpu", INPUT_LINE_RESET);
 
 	SPEAKER(config, "mono").front_center();
 

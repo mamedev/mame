@@ -7,22 +7,27 @@
 #pragma once
 
 #include "pci.h"
+#include "mediagx_cs5530_ide.h"
 
 #include "bus/isa/isa.h"
+#include "cpu/i386/i386.h"
+#include "machine/8042kbdc.h"
 #include "machine/am9517a.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "sound/spkrdev.h"
 
+
 class mediagx_cs5530_bridge_device : public pci_device
 {
 public:
-	template <typename T>
-	mediagx_cs5530_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
+	template <typename T, typename U>
+	mediagx_cs5530_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, U &&ide_tag)
 		: mediagx_cs5530_bridge_device(mconfig, tag, owner, clock)
 	{
 		set_ids(0x10780100, 0x00, 0x060100, 0x00000000);
 		set_cpu_tag(std::forward<T>(cpu_tag));
+		set_ide_tag(std::forward<U>(ide_tag));
 	}
 
 	mediagx_cs5530_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -31,10 +36,15 @@ public:
 	auto rtcale() { return m_rtcale.bind(); }
 	auto rtccs_read() { return m_rtccs_read.bind(); }
 	auto rtccs_write() { return m_rtccs_write.bind(); }
+	void pc_irq1_w(int state);
 	void pc_irq8n_w(int state);
+	void pc_irq14_w(int state);
+	void pc_irq15_w(int state);
 
-	template <typename T>
-	void set_cpu_tag(T &&tag) { m_host_cpu.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_cpu_tag(T &&tag) { m_host_cpu.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_ide_tag(T &&tag) { m_ide.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_kbdc_tag(T &&tag) { m_kbdc.set_tag(std::forward<T>(tag)); }
+
 protected:
 	virtual void device_add_mconfig(machine_config & config) override;
 	virtual void device_config_complete() override;
@@ -50,7 +60,7 @@ private:
 	void at_pit8254_out0_changed(int state);
 	void at_pit8254_out1_changed(int state);
 	void at_pit8254_out2_changed(int state);
-		uint8_t pc_dma8237_0_dack_r();
+	uint8_t pc_dma8237_0_dack_r();
 	uint8_t pc_dma8237_1_dack_r();
 	uint8_t pc_dma8237_2_dack_r();
 	uint8_t pc_dma8237_3_dack_r();
@@ -82,7 +92,6 @@ private:
 	void at_portb_w(uint8_t data);
 	void at_speaker_set_spkrdata(uint8_t data);
 	uint8_t get_slave_ack(offs_t offset);
-	void pc_irq1_w(int state);
 	void pc_irq3_w(int state);
 	void pc_irq4_w(int state);
 	void pc_irq5_w(int state);
@@ -92,8 +101,6 @@ private:
 	void pc_irq10_w(int state);
 	void pc_irq11_w(int state);
 	void pc_irq12m_w(int state);
-	void pc_irq14_w(int state);
-	void pc_irq15_w(int state);
 	void iochck_w(int state);
 	void pc_select_dma_channel(int channel, bool state);
 	uint8_t at_page8_r(offs_t offset);
@@ -110,6 +117,9 @@ private:
 	devcb_write8 m_rtccs_write;
 
 	required_device<cpu_device> m_host_cpu;
+	required_device<mediagx_cs5530_ide_device> m_ide;
+	required_device<kbdc8042_device> m_kbdc;
+	// southbridge internals
 	required_device<pic8259_device> m_pic8259_master;
 	required_device<pic8259_device> m_pic8259_slave;
 	required_device<am9517a_device> m_dma8237_1;
@@ -129,6 +139,9 @@ private:
 	uint16_t m_dma_high_byte = 0;
 	uint8_t m_channel_check = 0;
 	bool m_nmi_enabled = false;
+
+	u8 m_fast_init;
+	u8 m_decode_control[2]{};
 };
 
 DECLARE_DEVICE_TYPE(MEDIAGX_CS5530_BRIDGE, mediagx_cs5530_bridge_device)

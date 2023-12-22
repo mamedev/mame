@@ -6,7 +6,7 @@ license:CC0-1.0
 
 <!-- define elements -->
 
-	<element name="black2"><rect><color red="0.18" green="0.17" blue="0.17" /></rect></element>
+	<element name="black"><rect><color red="0.15" green="0.14" blue="0.14" /></rect></element>
 	<element name="red"><rect><color red="0.75" green="0.25" blue="0.2" /></rect></element>
 
 	<element name="but" defstate="0">
@@ -417,7 +417,7 @@ license:CC0-1.0
 
 		<element ref="cwhite"><bounds x="-1" y="-2" width="90" height="90" /></element>
 
-		<element ref="black2"><bounds x="3.7" y="2.7" width="80.6" height="80.6" /></element>
+		<element ref="black"><bounds x="3.7" y="2.7" width="80.6" height="80.6" /></element>
 		<group ref="sb_board"><bounds x="4" y="3" width="80" height="80" /></group>
 		<group ref="sb_ui"><bounds x="-12.5" y="3" width="10" height="80" /></group>
 

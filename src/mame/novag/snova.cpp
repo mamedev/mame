@@ -11,7 +11,6 @@ NVRAM won't work properly (supremo doesn't have NVRAM).
 
 TODO:
 - if/when MAME supports an exit callback, hook up nsnova power-off switch to that
-- serial port isn't working, same problem as nsvip
 - unmapped reads from 0x33/0x34 (nsnova) or 0x3c/0x3d (supremo)
 - supremo unmapped writes to 0x2000/0x6000, always 0?
 - is "Aquamarine / Super Nova" the same rom as nsnova and just a redesign?
@@ -210,7 +209,7 @@ void snova_state::p2_w(u8 data)
 	// P22: speaker out
 	m_dac->write(BIT(data, 2));
 
-	// P24: serial tx
+	// P24: serial tx (TTL)
 	if (m_rs232)
 		m_rs232->write_txd(BIT(data, 4));
 
@@ -332,7 +331,7 @@ void snova_state::supremo(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
-	screen.set_size(1920/4, 591/4);
+	screen.set_size(1920/4, 606/4);
 	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_led_pwm).set_size(2, 8);
@@ -373,16 +372,16 @@ ROM_START( nsnova ) // ID = N1.05
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("n_530.u5", 0x8000, 0x8000, CRC(727a0ada) SHA1(129c1edc5c1d2e12ce97ebef81c6d5555464a11d) )
 
-	ROM_REGION( 50926, "screen", 0 )
-	ROM_LOAD("nprimo.svg", 0, 50926, CRC(5ffa1b53) SHA1(8b1f862bfdf0be837a4e8dc94fea592d6ffff629) )
+	ROM_REGION( 35502, "screen", 0 )
+	ROM_LOAD("nvip.svg", 0, 35502, CRC(3e520357) SHA1(f6188bcff8995e84ea28f641cfbd755139498d76) )
 ROM_END
 
 ROM_START( supremo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("sp_a10.u5", 0x8000, 0x8000, CRC(1db63786) SHA1(4f24452ed8955b31ba88f68cc95c357660930aa4) )
 
-	ROM_REGION( 50926, "screen", 0 )
-	ROM_LOAD("nprimo.svg", 0, 50926, CRC(5ffa1b53) SHA1(8b1f862bfdf0be837a4e8dc94fea592d6ffff629) )
+	ROM_REGION( 35502, "screen", 0 )
+	ROM_LOAD("nvip.svg", 0, 35502, CRC(3e520357) SHA1(f6188bcff8995e84ea28f641cfbd755139498d76) )
 ROM_END
 
 } // anonymous namespace

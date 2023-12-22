@@ -38,7 +38,7 @@
 #include "emu.h"
 #include "ds2430a.h"
 
-#include <algorithm>
+#include <numeric> // std::accumulate
 
 #define LOG_PULSE   (1U << 1)
 #define LOG_BITS    (1U << 2)
@@ -65,8 +65,8 @@ DEFINE_DEVICE_TYPE(DS1971, ds1971_device, "ds1971", "Dallas DS1971 EEPROM iButto
 // timing constants
 static constexpr attoseconds_t tRSTL = 480 * ATTOSECONDS_PER_MICROSECOND; // 480 μs ≤ t < ∞
 static constexpr attoseconds_t tRSTH = 480 * ATTOSECONDS_PER_MICROSECOND; // 480 μs ≤ t < ∞
-static constexpr attoseconds_t tPDL = 15 * ATTOSECONDS_PER_MICROSECOND; // 15 μs ≤ t < 60 μs
-static constexpr attoseconds_t tPDH = 120 * ATTOSECONDS_PER_MICROSECOND; // 60 μs ≤ t < 240 μs
+static constexpr attoseconds_t tPDL = 120 * ATTOSECONDS_PER_MICROSECOND; // 60 μs ≤ t < 240 μs
+static constexpr attoseconds_t tPDH = 16 * ATTOSECONDS_PER_MICROSECOND; // 15 μs ≤ t < 60 μs (but must exceed 15 μs for Konami Viper games)
 static constexpr attoseconds_t tSLOT = 60 * ATTOSECONDS_PER_MICROSECOND; // 60 μs ≤ t < 120 μs
 static constexpr attoseconds_t tREC = 1 * ATTOSECONDS_PER_MICROSECOND; // 1 μs ≤ t < ∞
 static constexpr attoseconds_t tLOW0 = 60 * ATTOSECONDS_PER_MICROSECOND; // 60 μs ≤ t < 120 μs
@@ -381,6 +381,7 @@ TIMER_CALLBACK_MEMBER(ds1wire_device::update_state)
 	case state::ROM_READ:
 	case state::ROM_SEARCH:
 	case state::ROM_SEARCH_COMPLEMENT:
+	case state::DONE: // pull up data line after reading last bit
 		m_data_out = true;
 		break;
 
@@ -394,7 +395,6 @@ TIMER_CALLBACK_MEMBER(ds1wire_device::update_state)
 	case state::MEMORY_COMMAND:
 	case state::MEMORY_WRITE:
 	case state::ROM_SEARCH_WRITE:
-	case state::DONE:
 		// Only compilers care about cases that do nothing
 		break;
 	}

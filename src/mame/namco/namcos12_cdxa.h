@@ -69,7 +69,7 @@ private:
 
 	void mb87078_gain_changed(offs_t offset, uint8_t data);
 
-	required_device<sh2_sh7014_device> m_maincpu;
+	required_device<sh7014_device> m_maincpu;
 	required_shared_ptr<uint32_t> m_cram;
 	required_shared_ptr<uint32_t> m_sram;
 	required_device<ata_interface_device> m_ata;

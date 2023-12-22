@@ -135,8 +135,8 @@ void bingowav_state::bingowav(machine_config &config)
 	ymsnd.add_route(2, "mono", 1.0);
 
 	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
-	tc0140syt.set_master_tag(m_maincpu);
-	tc0140syt.set_slave_tag("audiocpu");
+	tc0140syt.nmi_callback().set_inputline("audiocpu", INPUT_LINE_NMI);
+	tc0140syt.reset_callback().set_inputline("audiocpu", INPUT_LINE_RESET);
 
 	m68000_device &termcpu(TMP68303(config, "termcpu", 12000000)); // actually TMP63803F-16
 	termcpu.set_addrmap(AS_PROGRAM, &bingowav_state::bingowav_drive_map);

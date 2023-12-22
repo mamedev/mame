@@ -84,7 +84,7 @@ private:
 	bool m_t1md;
 	bool m_tenb;
 
-	required_device<sh2_sh7604_device> m_hostcpu;
+	required_device<sh7604_device> m_hostcpu;
 	address_space *m_hostspace;
 	void test_pending_irqs();
 
