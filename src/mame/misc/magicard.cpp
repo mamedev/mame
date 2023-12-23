@@ -760,6 +760,68 @@ static INPUT_PORTS_START( hotslots )
 
 INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( jjokeri )
+	PORT_START("SW0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN4 )			PORT_NAME("Remote 2")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )			PORT_NAME("Remote 1")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )		PORT_NAME("Book 2")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SERVICE1 )			PORT_NAME("Book 1")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )	PORT_NAME("Pay/Hoper Out")
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OTHER )			PORT_NAME("Hopper Count") 	PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SERVICE2 )			PORT_NAME("Books 3")  		PORT_CODE(KEYCODE_U)
+
+	PORT_START("SW1")
+	PORT_DIPNAME( 0x01, 0x01, "Service Test" )		PORT_DIPLOCATION("DIP 1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Remote 1" )			PORT_DIPLOCATION("DIP 1:7")
+	PORT_DIPSETTING(    0x02, "100" )
+	PORT_DIPSETTING(    0x00, "10" )
+	PORT_DIPNAME( 0x04, 0x04, "Coin 2" )			PORT_DIPLOCATION("DIP 1:6")
+	PORT_DIPSETTING(    0x04, "10" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x08, 0x08, "Coin 1" )			PORT_DIPLOCATION("DIP 1:5")
+	PORT_DIPSETTING(    0x08, "10" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x10, 0x10, "Cards Back" )		PORT_DIPLOCATION("DIP 1:4")
+	PORT_DIPSETTING(    0x10, "Normal Clean" )
+	PORT_DIPSETTING(    0x00, "Impera Logo" )
+	PORT_DIPNAME( 0x20, 0x20, "Remote 2" )			PORT_DIPLOCATION("DIP 1:3")
+	PORT_DIPSETTING(    0x20, "100" )
+	PORT_DIPSETTING(    0x00, "1M" )
+	PORT_DIPNAME( 0x40, 0x40, "DSW 1:2, unknown" )	PORT_DIPLOCATION("DIP 1:2")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "DSW 1:1, unknown" )	PORT_DIPLOCATION("DIP 1:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("All Coins Out")   PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )  PORT_NAME("Door Switch")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Reserve In 5")    PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Reserve In 6")    PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Reserve In 7")    PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Reserve In 8")    PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Reserve In 9")    PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Hopper Full")     PORT_CODE(KEYCODE_R)
+
+INPUT_PORTS_END
+
+
+
+
+
 void magicard_base_state::machine_reset()
 {
 	uint16_t *const src = (uint16_t *)memregion("maincpu")->base();
@@ -2186,6 +2248,9 @@ ROM_START( jjokeri )
 	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
 	ROM_LOAD16_WORD_SWAP( "g55_6__d27c210.bin", 0x00000, 0x20000, CRC(e208598b) SHA1(697b37e39025d31de6f37bd8bd59b35cee998e63) )
 	ROM_LOAD16_WORD_SWAP( "g55_5__d27c210.bin", 0x20000, 0x20000, CRC(997d4de9) SHA1(47d46b4be99f4d62e23b78219c5f186476b93701) )
+
+	ROM_REGION(0x4000, "nvram", 0)  // Default NVRAM
+	ROM_LOAD( "jjokeri_nvram.bin", 0x0000, 0x4000, CRC(c3f4698d) SHA1(d9a7c776a87878fc546c301dffe9b32093d5eddc) )
 ROM_END
 
 
@@ -2221,4 +2286,4 @@ GAME( 1993, dallaspk,   0,        magicard,       dallaspk,  magicard_state, emp
 GAME( 1993, kajotcrd,   0,        hotslots,       magicard,  hotslots_state, empty_init, ROT0, "Amatic",    "Kajot Card (Version 1.01, Wien Euro)",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
 GAME( 1991, lucky7x,    lucky7i,  magicard,       lucky7i,   magicard_state, empty_init, ROT0, "Impera",    "Lucky 7 (Impera, V04/91a, set 2)",           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1991, jjokeri,    0,        magicard,       lucky7i,   magicard_state, empty_init, ROT0, "Impera",    "Jolly Joker? (Impera, V11/90b)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1991, jjokeri,    0,        magicard,       jjokeri,   magicard_state, empty_init, ROT0, "Impera",    "Jolly Joker? (Impera, V11/90b)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
