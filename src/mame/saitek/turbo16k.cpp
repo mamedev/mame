@@ -13,8 +13,6 @@ NVRAM won't save properly.
 
 TODO:
 - dump/add other MCU revisions, SX8 for tmate/conquist is known to exist
-- is Saitek Electronic Dames the same (or very similar) hardware as Team-Mate?
-- is Turbo S-24K SX6A, and the checkers game mentioned above SX7(A)?
 - SX4A and SX5A read from port 2 bits 3 and 7 while DDR is 0xff, why does it work?
   I added a simple workaround for it in p2_w
 - what is t1850's official title? "1850 Deluxe Table Chess" is from the back of
@@ -179,6 +177,7 @@ protected:
 
 INPUT_CHANGED_MEMBER(turbo16k_state::go_button)
 {
+	// standby check actually comes from P70 high-impedance state
 	if (newval && m_maincpu->standby())
 		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
