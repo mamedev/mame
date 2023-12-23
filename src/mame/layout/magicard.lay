@@ -81,7 +81,7 @@ copyright-holders: Roberto Fresca
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.1" width="1" height="0.4" />
 		</text>
-		<text string="BET/HALF">
+		<text string="HALF">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.5" width="1" height="0.4" />
 		</text>
@@ -96,7 +96,11 @@ copyright-holders: Roberto Fresca
 		</rect>
 		<text string="CANCEL">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.2" width="1" height="0.6" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="BET">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
 		</text>
 	</element>
 
