@@ -317,7 +317,7 @@ void hd6301x_cpu_device::hd6301x_io(address_map &map)
 {
 	hd6303x_io(map);
 	map(0x0002, 0x0002).rw(FUNC(hd6301x_cpu_device::p1_data_r), FUNC(hd6301x_cpu_device::p1_data_w)); // external except in single-chip mode
-	map(0x0004, 0x0004).rw(FUNC(hd6301x_cpu_device::ff_r), FUNC(hd6301x_cpu_device::p3_ddr_w)); // external except in single-chip mode
+	map(0x0004, 0x0004).rw(FUNC(hd6301x_cpu_device::ff_r), FUNC(hd6301x_cpu_device::p3_ddr_1bit_w)); // external except in single-chip mode
 	map(0x0006, 0x0006).rw(FUNC(hd6301x_cpu_device::p3_data_r), FUNC(hd6301x_cpu_device::p3_data_w)); // external except in single-chip mode
 	map(0x0007, 0x0007).rw(FUNC(hd6301x_cpu_device::p4_data_r), FUNC(hd6301x_cpu_device::p4_data_w)); // external except in single-chip mode
 	map(0x0018, 0x0018).rw(FUNC(hd6301x_cpu_device::p7_data_r), FUNC(hd6301x_cpu_device::p7_data_w)); // external except in single-chip mode
@@ -350,9 +350,9 @@ void hd6301y_cpu_device::hd6303y_io(address_map &map)
 void hd6301y_cpu_device::hd6301y_io(address_map &map)
 {
 	hd6303y_io(map);
-	map(0x0000, 0x0000).rw(FUNC(hd6301y_cpu_device::ff_r), FUNC(hd6301y_cpu_device::p1_ddr_w)); // external except in single-chip mode
+	map(0x0000, 0x0000).rw(FUNC(hd6301y_cpu_device::ff_r), FUNC(hd6301y_cpu_device::p1_ddr_1bit_w)); // external except in single-chip mode
 	map(0x0002, 0x0002).rw(FUNC(hd6301y_cpu_device::p1_data_r), FUNC(hd6301y_cpu_device::p1_data_w)); // external except in single-chip mode
-	map(0x0004, 0x0004).rw(FUNC(hd6301y_cpu_device::ff_r), FUNC(hd6301y_cpu_device::p3_ddr_w)); // external except in single-chip mode
+	map(0x0004, 0x0004).rw(FUNC(hd6301y_cpu_device::ff_r), FUNC(hd6301y_cpu_device::p3_ddr_1bit_w)); // external except in single-chip mode
 	map(0x0005, 0x0005).rw(FUNC(hd6301y_cpu_device::ff_r), FUNC(hd6301y_cpu_device::p4_ddr_w)); // external except in single-chip mode
 	map(0x0006, 0x0006).rw(FUNC(hd6301y_cpu_device::p3_data_r), FUNC(hd6301y_cpu_device::p3_data_w)); // external except in single-chip mode
 	map(0x0007, 0x0007).rw(FUNC(hd6301y_cpu_device::p4_data_r), FUNC(hd6301y_cpu_device::p4_data_w)); // external except in single-chip mode
@@ -1567,6 +1567,12 @@ void m6801_cpu_device::p1_ddr_w(uint8_t data)
 	}
 }
 
+void hd6301y_cpu_device::p1_ddr_1bit_w(uint8_t data)
+{
+	// HD6301Y DDR1 is 1-bit (HD6301X does not have DDR1)
+	hd6301_cpu_device::p1_ddr_w((BIT(data, 0) ? 0xff : 0x00));
+}
+
 uint8_t m6801_cpu_device::p1_data_r()
 {
 	if (m_port_ddr[0] == 0xff)
@@ -1594,17 +1600,10 @@ void m6801_cpu_device::p2_ddr_w(uint8_t data)
 	}
 }
 
-// HD6301X0/HD63701X0/HD6303X only
 void hd6301x_cpu_device::p2_ddr_2bit_w(uint8_t data)
 {
-	LOGPORT("Port 2 Data Direction Register: %02x\n", data);
-
-	data = (BIT(data, 1) ? 0xfe : 0x00) | (data & 0x01);
-	if (m_port_ddr[1] != data)
-	{
-		m_port_ddr[1] = data;
-		write_port2();
-	}
+	// HD6301X DDR2 is 2-bit (it is 8-bit again on HD6301Y)
+	hd6301_cpu_device::p2_ddr_w((BIT(data, 1) ? 0xfe : 0x00) | (data & 0x01));
 }
 
 uint8_t m6801_cpu_device::p2_data_r()
@@ -1633,6 +1632,12 @@ void m6801_cpu_device::p3_ddr_w(uint8_t data)
 		m_port_ddr[2] = data;
 		m_out_port_func[2](0, (m_port_data[2] & m_port_ddr[2]) | (m_port_ddr[2] ^ 0xff), m_port_ddr[2]);
 	}
+}
+
+void hd6301x_cpu_device::p3_ddr_1bit_w(uint8_t data)
+{
+	// HD6301X/Y DDR3 is 1-bit
+	hd6301_cpu_device::p3_ddr_w((BIT(data, 0) ? 0xff : 0x00));
 }
 
 uint8_t m6801_cpu_device::p3_data_r()
