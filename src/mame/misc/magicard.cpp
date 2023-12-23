@@ -199,6 +199,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include "magicard.lh"
+
 #define CLOCK_A XTAL(30'000'000)
 #define CLOCK_B XTAL(8'000'000)
 #define CLOCK_C XTAL(19'660'800)
@@ -222,6 +224,8 @@ public:
 		, m_palette(*this, "palette")
 		, m_scc66470(*this,"scc66470")
 		, m_i2cmem(*this, "sereeprom")
+		, m_lamps(*this, "lamp%u", 1U)
+
 	{ }
 
 	void magicard_base(machine_config &config);
@@ -262,6 +266,8 @@ protected:
 	uint8_t m_scl_state;
 
 private:
+	output_finder<8> m_lamps;
+
 	void scc66470_map(address_map &map);
 
 	std::unique_ptr<uint16_t []> m_dram;
@@ -331,6 +337,7 @@ private:
 
 void magicard_base_state::machine_start()
 {
+	m_lamps.resolve();
 	m_dram = make_unique_clear<uint16_t []>(0x80000/2);
 	save_pointer(NAME(m_dram), 0x80000/2);
 	save_item(NAME(m_sda_state));
@@ -438,6 +445,14 @@ void magicard_base_state::output_w(offs_t offset, uint16_t data)
 	// bit 13 - clear lamp
 	// bit 14 - hopper drive
 	// bit 15 - counter in
+
+	m_lamps[0] = BIT(data, 9);      // Lamp 0 - HOLD 1
+	m_lamps[1] = BIT(data, 11);     // Lamp 1 - HOLD 2
+	m_lamps[2] = BIT(data, 7);      // Lamp 2 - HOLD 3
+	m_lamps[3] = BIT(data, 12);     // Lamp 3 - HOLD 4
+	m_lamps[4] = BIT(data, 10);     // Lamp 4 - HOLD 5
+	m_lamps[5] = BIT(data, 13);     // Lamp 5 - CANCEL
+	m_lamps[6] = BIT(data, 8);      // Lamp 6 - START
 }
 
 
@@ -2261,29 +2276,29 @@ ROM_END
 *                Game Drivers                *
 *********************************************/
 
-//    YEAR  NAME        PARENT    MACHINE         INPUT      STATE           INIT        ROT    COMPANY      FULLNAME                                     FLAGS
+//     YEAR  NAME        PARENT    MACHINE         INPUT      STATE           INIT        ROT    COMPANY      FULLNAME                                     FLAGS
 
-GAME( 1994, magicard,   0,        magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v2.01)",                         MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1994, magicrd1,   0,        magicard_pic56, magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.10 14.09.94)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1993, magicrd1a,  magicrd1, magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.5 17.12.93, set 1)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1993, magicrd1b,  magicrd1, magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.5 17.12.93, set 2)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1993, magicrd1c,  magicrd1, magicard_pic54, magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.2 200/93, set 1)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1993, magicrd1d,  magicrd1, magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.2 200/93, set 2)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1994, magicrde,   0,        hotslots_pic54, magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (v2.11a, set 1)",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1994, magicrdea,  magicrde, hotslots_pic54, magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (v2.11a, set 2)",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1994, magicrdeb,  magicrde, hotslots,       magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (V2.11a, set 3)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1994, magicrdec,  magicrde, hotslots,       magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (v2.09a)",              MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1998, magicrdj,   0,        hotslots,       magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card III Jackpot (V4.01 6/98)",        MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1998, magicrdja,  magicrdj, hotslots,       magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card III Jackpot (V4.01 7/98)",        MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 2001, magicle,    0,        magicle,        hotslots,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Lotto Export (5.03)",                  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 2002, hotslots,   0,        hotslots,       hotslots,  hotslots_state, empty_init, ROT0, "Impera",    "Hot Slots (6.00)",                           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1999, quingo,     0,        magicle,        hotslots,  hotslots_state, empty_init, ROT0, "Impera",    "Quingo Export (5.00)",                       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1999, belslots,   0,        magicle,        hotslots,  hotslots_state, empty_init, ROT0, "Impera",    "Bel Slots Export (5.01)",                    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 2001, bigdeal0,   0,        magicle,        magicard,  hotslots_state, empty_init, ROT0, "Impera",    "Big Deal Belgien (5.04)",                    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 199?, puzzleme,   0,        puzzleme,       puzzleme,  hotslots_state, empty_init, ROT0, "Impera",    "Puzzle Me!",                                 MACHINE_SUPPORTS_SAVE )
-GAME( 1991, lucky7i,    0,        magicard,       lucky7i,   magicard_state, empty_init, ROT0, "Impera",    "Lucky 7 (Impera, V04/91a, set 1)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1993, dallaspk,   0,        magicard,       dallaspk,  magicard_state, empty_init, ROT0, "<unknown>", "Dallas Poker",                               MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1993, kajotcrd,   0,        hotslots,       magicard,  hotslots_state, empty_init, ROT0, "Amatic",    "Kajot Card (Version 1.01, Wien Euro)",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  1994, magicard,   0,        magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v2.01)",                         MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  1994, magicrd1,   0,        magicard_pic56, magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.10 14.09.94)",                MACHINE_SUPPORTS_SAVE )
+GAME(  1993, magicrd1a,  magicrd1, magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.5 17.12.93, set 1)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  1993, magicrd1b,  magicrd1, magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.5 17.12.93, set 2)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  1993, magicrd1c,  magicrd1, magicard_pic54, magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.2 200/93, set 1)",            MACHINE_SUPPORTS_SAVE )
+GAME(  1993, magicrd1d,  magicrd1, magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.2 200/93, set 2)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  1994, magicrde,   0,        hotslots_pic54, magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (v2.11a, set 1)",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  1994, magicrdea,  magicrde, hotslots_pic54, magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (v2.11a, set 2)",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  1994, magicrdeb,  magicrde, hotslots,       magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (V2.11a, set 3)",       MACHINE_SUPPORTS_SAVE )
+GAME(  1994, magicrdec,  magicrde, hotslots,       magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (v2.09a)",              MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  1998, magicrdj,   0,        hotslots,       magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card III Jackpot (V4.01 6/98)",        MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  1998, magicrdja,  magicrdj, hotslots,       magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card III Jackpot (V4.01 7/98)",        MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  2001, magicle,    0,        magicle,        hotslots,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Lotto Export (5.03)",                  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  2002, hotslots,   0,        hotslots,       hotslots,  hotslots_state, empty_init, ROT0, "Impera",    "Hot Slots (6.00)",                           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  1999, quingo,     0,        magicle,        hotslots,  hotslots_state, empty_init, ROT0, "Impera",    "Quingo Export (5.00)",                       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  1999, belslots,   0,        magicle,        hotslots,  hotslots_state, empty_init, ROT0, "Impera",    "Bel Slots Export (5.01)",                    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  2001, bigdeal0,   0,        magicle,        magicard,  hotslots_state, empty_init, ROT0, "Impera",    "Big Deal Belgien (5.04)",                    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  199?, puzzleme,   0,        puzzleme,       puzzleme,  hotslots_state, empty_init, ROT0, "Impera",    "Puzzle Me!",                                 MACHINE_SUPPORTS_SAVE )
+GAME(  1991, lucky7i,    0,        magicard,       lucky7i,   magicard_state, empty_init, ROT0, "Impera",    "Lucky 7 (Impera, V04/91a, set 1)",           MACHINE_SUPPORTS_SAVE )
+GAME(  1993, dallaspk,   0,        magicard,       dallaspk,  magicard_state, empty_init, ROT0, "<unknown>", "Dallas Poker",                               MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  1993, kajotcrd,   0,        hotslots,       magicard,  hotslots_state, empty_init, ROT0, "Amatic",    "Kajot Card (Version 1.01, Wien Euro)",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
-GAME( 1991, lucky7x,    lucky7i,  magicard,       lucky7i,   magicard_state, empty_init, ROT0, "Impera",    "Lucky 7 (Impera, V04/91a, set 2)",           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1991, jjokeri,    0,        magicard,       jjokeri,   magicard_state, empty_init, ROT0, "Impera",    "Jolly Joker? (Impera, V11/90b)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  1991, lucky7x,    lucky7i,  magicard,       lucky7i,   magicard_state, empty_init, ROT0, "Impera",    "Lucky 7 (Impera, V04/91a, set 2)",           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAMEL( 1991, jjokeri,    0,        magicard,       jjokeri,   magicard_state, empty_init, ROT0, "Impera",    "Jolly Joker? (Impera, V11/90b)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,  layout_magicard )
