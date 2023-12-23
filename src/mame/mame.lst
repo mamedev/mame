@@ -23297,6 +23297,7 @@ galpans2a                       // 1999.?? (c) 1999 Kaneko (Asia)
 galpans2j                       // 1999.02 (c) 1999 Kaneko (Japan)
 galpans3                        // 2002.07 (c) 2002 Kaneko (Japan)
 galpansu                        // 1999.?? (c) 1999 Kaneko (Korea)
+galpansua                       // 1999.?? (c) 1999 Kaneko (Korea)
 gutsn                           // 2000.06 (c) 2000 Kaneko / Kouyousha (Japan)
 jjparad2                        // 1997.12 (c) 1997 Electro Design Co. (Japan)
 jjparads                        // 1996.12 (c) 1996 Electro Design Co. (Japan)
@@ -36460,6 +36461,7 @@ arenaa                          //
 arenaf                          //
 arenag                          //
 badgirls                        //
+badgirlsa                       //
 badgirlsf                       //
 badgirlsg                       //
 bighouse                        //
@@ -38971,9 +38973,10 @@ srallycb                        // 1995.02 Sega Rally Championship TWIN (Revisio
 srallycc                        // 1995.02 Sega Rally Championship TWIN (Revision A)
 srallycdx                       // 1995.02 Sega Rally Championship DX (Revision A)
 srallycdxa                      // 1995.02 Sega Rally Championship DX
-stcc                            // 1996.09 Sega Touring Car Championship
+stcc                            // 1996.09 Sega Touring Car Championship (newer)
 stcca                           // 1996.09 Sega Touring Car Championship (Revision A)
-stccb                           // 1996.09 Sega Touring Car Championship
+stccb                           // 1996.09 Sega Touring Car Championship (Revision B)
+stcco                           // 1996.09 Sega Touring Car Championship
 topskatr                        // 1997.05 Top Skater (Export, Revision A)
 topskatrj                       // 1997.05 Top Skater (Japan)
 topskatru                       // 1997.05 Top Skater (USA, Revision A)
