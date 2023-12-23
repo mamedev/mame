@@ -97,7 +97,7 @@ uint16_t neogeo_base_state::paletteram_r(offs_t offset)
 void neogeo_base_state::paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset += m_palette_bank;
-	data = COMBINE_DATA(&m_paletteram[offset]);
+	m_paletteram[offset] = data;
 
 	int dark = data >> 15;
 	int r = ((data >> 14) & 0x1) | ((data >> 7) & 0x1e);
