@@ -2783,6 +2783,8 @@ inline void taito_f3_state::f3_drawgfx(bitmap_ind16 &dest_bmp, const rectangle &
 		u8 flipy = sprite.flipy ? 0xF : 0;
 		
 		fixed8 dy8 = (sprite.y << 4);
+		if (!m_flipscreen)
+			dy8 += 255; // round up in non-flipscreen mode?    mayybe flipscreen coordinate adjustments should be done after all this math, during final rendering?. anyway:  testcases: elvactr mission # text (non-flipscreen), kaiserknj attract mode first text line (flipscreen)
 		for (u8 y=0; y<16; y++) {
 			int dy = dy8 >> 8;
 			dy8 += sprite.zoomy;
