@@ -21,6 +21,10 @@ ht1130_device::ht1130_device(const machine_config &mconfig, const char *tag, dev
 	, m_pc(0)
 	, m_tempram(*this, "tempram")
 	, m_displayram(*this, "displayram")
+	, m_port_in_pm(*this, 0xff)
+	, m_port_in_ps(*this, 0xff)
+	, m_port_in_pp(*this, 0xff)
+	, m_port_out_pa(*this)
 {
 }
 
@@ -115,6 +119,10 @@ void ht1130_device::device_start()
 	for (int i = 0; i < 5; i++)
 		state_add(HT1130_R0 + i, string_format("R%d", i).c_str(), m_regs[i]);
 
+	state_add(HT1130_TIMER_EN, "TIMER_EN", m_timer_en);
+	state_add(HT1130_TIMER, "TIMER", m_timer);
+
+
 	save_item(NAME(m_pc));
 	save_item(NAME(m_icount));
 
@@ -124,6 +132,7 @@ void ht1130_device::device_start()
 	save_item(NAME(m_irqen));
 	save_item(NAME(m_timer_en));
 	save_item(NAME(m_inhalt));
+	save_item(NAME(m_timerover));
 	save_item(NAME(m_timer));
 	save_item(NAME(m_stackaddr));
 	save_item(NAME(m_stackcarry));
@@ -139,6 +148,7 @@ void ht1130_device::device_reset()
 	m_irqen = 0;
 	m_timer_en = 0;
 	m_inhalt = 0;
+	m_timerover = 0;
 	m_timer = 0;
 	m_stackaddr = 0;
 	m_stackcarry = 0;
@@ -147,6 +157,8 @@ void ht1130_device::device_reset()
 u8 ht1130_device::fetch()
 {
 	m_icount--; // single byte opcodes take a single cycle, double take 2
+	if (m_timer_en)
+		m_timer++;
 	return m_space.read_byte(m_pc++);
 }
 
@@ -443,13 +455,13 @@ void ht1130_device::do_op()
 
 	case 0b00111001: // TIMER OFF : Set timer to stop counting
 	{
-		LOGMASKED(LOG_UNHANDLED_OPS, "TIMER OFF");
+		m_timer_en = 0;
 		return;
 	}
 
 	case 0b00111000: // TIMER ON : Set timer to start counting
 	{
-		LOGMASKED(LOG_UNHANDLED_OPS, "TIMER ON");
+		m_timer_en = 1;
 		return;
 	}
 
@@ -578,15 +590,8 @@ void ht1130_device::do_op()
 	case 0b01011100: case 0b01011101: case 0b01011110: case 0b01011111:
 	{
 		u8 oprand = fetch();
-		if (!(oprand & 0xf0))
-		{
-			uint8_t fulldata = (inst & 0x0f) | (oprand << 4);
-			LOGMASKED(LOG_UNHANDLED_OPS, "MOV R1R0,0x%02x", fulldata);
-		}
-		else
-		{
-			LOGMASKED(LOG_UNHANDLED_OPS, "<ill %02x %02x>", inst, oprand);
-		}
+		setreg(1, oprand & 0xf);
+		setreg(0, inst & 0xf);
 		return;
 	}
 
@@ -597,15 +602,8 @@ void ht1130_device::do_op()
 	case 0b01101100: case 0b01101101: case 0b01101110: case 0b01101111:
 	{
 		u8 oprand = fetch();
-		if (!(oprand & 0xf0))
-		{
-			uint8_t fulldata = (inst & 0x0f) | (oprand << 4);
-			LOGMASKED(LOG_UNHANDLED_OPS, "MOV R3R2,0x%02x", fulldata);
-		}
-		else
-		{
-			LOGMASKED(LOG_UNHANDLED_OPS, "<ill %02x %02x>", inst, oprand);
-		}
+		setreg(3, oprand & 0xf);
+		setreg(2, inst & 0xf);
 		return;
 	}
 
@@ -785,6 +783,12 @@ void ht1130_device::execute_run()
 	{
 		debugger_instruction_hook(m_pc);
 		do_op();
+
+		if (m_timer & 0x100)
+		{
+			m_timer -= 0x100;
+			m_timerover = 1; // can also generate an interrupt
+		}
 	}
 }
 

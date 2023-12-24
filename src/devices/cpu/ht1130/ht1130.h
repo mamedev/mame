@@ -20,7 +20,15 @@ public:
 		HT1130_R3,
 		HT1130_R4,
 		HT1130_ACC,
+		HT1130_TIMER_EN,
+		HT1130_TIMER,
 	};
+
+	auto pm_in_cb() { return m_port_in_pm.bind(); }
+	auto ps_in_cb() { return m_port_in_ps.bind(); }
+	auto pp_in_cb() { return m_port_in_pp.bind(); }
+
+	auto pa_out_cb() { return m_port_out_pa.bind(); }
 
 protected:
 	// device-level overrides
@@ -72,6 +80,7 @@ private:
 	u8 m_irqen;
 	u8 m_timer_en;
 	u8 m_inhalt;
+	u8 m_timerover;
 	u16 m_timer;
 
 	u16 m_stackaddr;
@@ -79,6 +88,13 @@ private:
 
 	required_shared_ptr<u8> m_tempram;
 	required_shared_ptr<u8> m_displayram;
+
+	devcb_read8 m_port_in_pm;
+	devcb_read8 m_port_in_ps;
+	devcb_read8 m_port_in_pp;
+
+	devcb_write8 m_port_out_pa;
+
 };
 
 DECLARE_DEVICE_TYPE(HT1130, ht1130_device)
