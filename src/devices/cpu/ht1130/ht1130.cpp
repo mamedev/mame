@@ -138,13 +138,13 @@ u8 ht1130_device::getr1r0()
 
 u8 ht1130_device::getr1r0_data()
 {
-	u8 dataaddress = getr1r0();
+	const u8 dataaddress = getr1r0();
 	return space(AS_DATA).read_byte(dataaddress);
 }
 
 void ht1130_device::setr1r0_data(u8 data)
 {
-	u8 dataaddress = getr1r0();
+	const u8 dataaddress = getr1r0();
 	space(AS_DATA).write_byte(dataaddress, data);
 }
 
@@ -155,13 +155,13 @@ u8 ht1130_device::getr3r2()
 
 u8 ht1130_device::getr3r2_data()
 {
-	u8 dataaddress = getr3r2();
+	const u8 dataaddress = getr3r2();
 	return space(AS_DATA).read_byte(dataaddress);
 }
 
 void ht1130_device::setr3r2_data(u8 data)
 {
-	u8 dataaddress = getr3r2();
+	const u8 dataaddress = getr3r2();
 	space(AS_DATA).write_byte(dataaddress, data);
 }
 
@@ -235,13 +235,13 @@ u8 ht1130_device::fetch()
 
 void ht1130_device::do_op()
 {
-	u8 inst = fetch();
+	const u8 inst = fetch();
 
 	switch (inst)
 	{
 	case 0b00001000: // ADC A,[R1R0] : Add data memory contents and carry to the accumulator
 	{
-		u8 data = getr1r0_data();
+		const u8 data = getr1r0_data();
 
 		u8 acc = getacc();
 		acc = acc + data + getcarry();
@@ -256,7 +256,7 @@ void ht1130_device::do_op()
 
 	case 0b00001001: // ADD A,[R1R0] : Add data memory contents to the accumulator
 	{
-		u8 data = getr1r0_data();
+		const u8 data = getr1r0_data();
 
 		u8 acc = getacc();
 		acc = acc + data;
@@ -271,16 +271,16 @@ void ht1130_device::do_op()
 
 	case 0b00011010: // AND A,[R1R0] : Logical AND accumulator with data memory
 	{
-		u8 data = getr1r0_data();
-		u8 acc = getacc();
+		const u8 data = getr1r0_data();
+		const u8 acc = getacc();
 		setacc(acc & data);
 		return;
 	}
 
 	case 0b00011101: // AND [R1R0],A : Logical AND data memory with accumulator
 	{
-		u8 data = getr1r0_data();
-		u8 acc = getacc();
+		const u8 data = getr1r0_data();
+		const u8 acc = getacc();
 		setr1r0_data(data & acc);
 		return;
 	}
@@ -305,21 +305,21 @@ void ht1130_device::do_op()
 
 	case 0b00111111: // DEC A : Decrement accumulator
 	{
-		u8 acc = getacc();
+		const u8 acc = getacc();
 		setacc(acc-1);
 		return;
 	}
 
 	case 0b00001101: // DEC [R1R0] : Decrement data memory
 	{
-		u8 data = getr1r0_data();
+		const u8 data = getr1r0_data();
 		setr1r0_data(data-1);
 		return;
 	}
 
 	case 0b00001111: // DEC [R3R2] : Decrement data memory
 	{
-		u8 data = getr3r2_data();
+		const u8 data = getr3r2_data();
 		setr3r2_data(data-1);
 		return;
 	}
@@ -338,70 +338,70 @@ void ht1130_device::do_op()
 
 	case 0b00110010: // IN A,PM : Input port to accumulator
 	{
-		u8 data = m_port_in_pm() & 0xf;
+		const u8 data = m_port_in_pm() & 0xf;
 		setacc(data);
 		return;
 	}
 
 	case 0b00110011: // IN A,PS : Input port to accumulator
 	{
-		u8 data = m_port_in_ps() & 0xf;
+		const u8 data = m_port_in_ps() & 0xf;
 		setacc(data);
 		return;
 	}
 
 	case 0b00110100: // IN A,PP : Input port to accumulator
 	{
-		u8 data = m_port_in_pp() & 0xf;
+		const u8 data = m_port_in_pp() & 0xf;
 		setacc(data);
 		return;
 	}
 
 	case 0b00110001: // INC A : Increment accumulator
 	{
-		u8 temp = getacc();
+		const u8 temp = getacc();
 		setacc(temp+1);
 		return;
 	}
 
 	case 0b00001100: // INC [R1R0] : Increment data memory
 	{
-		u8 data = getr1r0_data();
+		const u8 data = getr1r0_data();
 		setr1r0_data(data+1);
 		return;
 	}
 
 	case 0b00001110: // INC [R3R2] : Increment data memory
 	{
-		u8 data = getr3r2_data();
+		const u8 data = getr3r2_data();
 		setr3r2_data(data+1);
 		return;
 	}
 
 	case 0b00000100: // MOV A,[R1R0] : Move data memory to accumulator
 	{
-		u8 data = getr1r0_data();
+		const u8 data = getr1r0_data();
 		setacc(data);
 		return;
 	}
 
 	case 0b00000110: // MOV A,[R3R2] : Move data memory to accumulator
 	{
-		u8 data = getr3r2_data();
+		const u8 data = getr3r2_data();
 		setacc(data);
 		return;
 	}
 
 	case 0b00000101: // MOV [R1R0],A : Move accumulator to data memory
 	{
-		u8 acc = getacc();
+		const u8 acc = getacc();
 		setr1r0_data(acc);
 		return;
 	}
 
 	case 0b00000111: // MOV [R3R2],A : Move accumulator to data memory
 	{
-		u8 acc = getacc();
+		const u8 acc = getacc();
 		setr3r2_data(acc);
 		return;
 	}
@@ -414,31 +414,31 @@ void ht1130_device::do_op()
 
 	case 0b00011100: // OR A,[R1R0] : Logical OR accumulator with data memory
 	{
-		u8 data = getr1r0_data();
-		u8 acc = getacc();
+		const u8 data = getr1r0_data();
+		const u8 acc = getacc();
 		setacc(acc | data);
 		return;
 	}
 
 	case 0b00011111: // OR [R1R0],A : Logically OR data memory with accumulator
 	{
-		u8 data = getr1r0_data();
-		u8 acc = getacc();
+		const u8 data = getr1r0_data();
+		const u8 acc = getacc();
 		setr1r0_data(data | acc);
 		return;
 	}
 
 	case 0b00110000: // OUT PA,A : Output accumulator data to port A
 	{
-		u8 data = getacc();
+		const u8 data = getacc();
 		m_port_out_pa(data);
 		return;
 	}
 
 	case 0b01001110: // READ MR0A : Read ROM code of current page to M(R1,R0) and ACC
 	{
-		u16 dataddress = (m_pc & 0xf00) | (getacc() << 4) | (getreg(4));
-		u8 data = space(AS_PROGRAM).read_byte(dataddress);
+		const u16 dataddress = (m_pc & 0xf00) | (getacc() << 4) | (getreg(4));
+		const u8 data = space(AS_PROGRAM).read_byte(dataddress);
 		setr1r0_data((data >> 4) & 0xf);
 		setacc(data & 0xf);
 		return;
@@ -446,8 +446,8 @@ void ht1130_device::do_op()
 
 	case 0b01001100: // READ R4A : Read ROM code of current page to R4 and accumulator
 	{
-		u16 dataddress = (m_pc & 0xf00) | (getacc() << 4) | (getr1r0_data());
-		u8 data = space(AS_PROGRAM).read_byte(dataddress);
+		const u16 dataddress = (m_pc & 0xf00) | (getacc() << 4) | (getr1r0_data());
+		const u8 data = space(AS_PROGRAM).read_byte(dataddress);
 		setreg(4, (data >> 4) & 0xf);
 		setacc(data & 0xf);
 		return;
@@ -455,8 +455,8 @@ void ht1130_device::do_op()
 
 	case 0b01001111: // READF MR0A : Read ROM Code of page F to M(R1,R0) and ACC
 	{
-		u16 dataddress = 0xf00 | (getacc() << 4) | (getreg(4));
-		u8 data = space(AS_PROGRAM).read_byte(dataddress);
+		const u16 dataddress = 0xf00 | (getacc() << 4) | (getreg(4));
+		const u8 data = space(AS_PROGRAM).read_byte(dataddress);
 		setr1r0_data((data >> 4) & 0xf);
 		setacc(data & 0xf);
 		return;
@@ -464,8 +464,8 @@ void ht1130_device::do_op()
 
 	case 0b01001101: // READF R4A : Read ROM code of page F to R4 and accumulator
 	{
-		u16 dataddress = 0xf00 | (getacc() << 4) | (getr1r0_data());
-		u8 data = space(AS_PROGRAM).read_byte(dataddress);
+		const u16 dataddress = 0xf00 | (getacc() << 4) | (getr1r0_data());
+		const u8 data = space(AS_PROGRAM).read_byte(dataddress);
 		setreg(4, (data >> 4) & 0xf);
 		setacc(data & 0xf);
 		return;
@@ -474,7 +474,7 @@ void ht1130_device::do_op()
 	case 0b00000001: // RL A : Rotate accumulator left
 	{
 		u8 acc = getacc();
-		u8 oldr3 = (acc & 8)>>3;
+		const u8 oldr3 = (acc & 8)>>3;
 		if (oldr3)
 			setcarry();
 		else
@@ -486,7 +486,7 @@ void ht1130_device::do_op()
 
 	case 0b00000011: // RLC A : Rotate accumulator left through carry
 	{
-		u8 oldcarry = getcarry();
+		const u8 oldcarry = getcarry();
 		u8 acc = getacc();
 		if (acc & 0x8)
 			setcarry();
@@ -500,7 +500,7 @@ void ht1130_device::do_op()
 	case 0b00000000: // RR A : Rotate accumulator right
 	{
 		u8 acc = getacc();
-		u8 oldr0 = acc & 1;
+		const u8 oldr0 = acc & 1;
 		if (oldr0)
 			setcarry();
 		else
@@ -512,7 +512,7 @@ void ht1130_device::do_op()
 
 	case 0b00000010: // RRC A : Rotate accumulator right through carry
 	{
-		u8 oldcarry = getcarry();
+		const u8 oldcarry = getcarry();
 		u8 acc = getacc();
 		if (acc & 0x1)
 			setcarry();
@@ -525,7 +525,7 @@ void ht1130_device::do_op()
 
 	case 0b00001010: // SBC A,[R1R0] : Subtract data memory contents and carry from ACC
 	{
-		u8 data = getr1r0_data();
+		const u8 data = getr1r0_data();
 
 		u8 acc = getacc();
 		acc = acc + (0xf - data) + getcarry();
@@ -546,7 +546,7 @@ void ht1130_device::do_op()
 
 	case 0b00001011: // SUB A,[R1R0] : Subtract data memory contents from accumulator
 	{
-		u8 data = getr1r0_data();
+		const u8 data = getr1r0_data();
 
 		u8 acc = getacc();
 		acc = acc + (0xf - data) + 1;
@@ -573,16 +573,16 @@ void ht1130_device::do_op()
 
 	case 0b00011011: // XOR A,[R1R0] : Logical XOR accumulator with data memory
 	{
-		u8 data = getr1r0_data();
-		u8 acc = getacc();
+		const u8 data = getr1r0_data();
+		const u8 acc = getacc();
 		setacc(acc ^ data);
 		return;
 	}
 
 	case 0b00011110: // XOR [R1R0],A : Logical XOR data memory with accumulator
 	{
-		u8 data = getr1r0_data();
-		u8 acc = getacc();
+		const u8 data = getr1r0_data();
+		const u8 acc = getacc();
 		setr1r0_data(data ^ acc);
 		return;
 	}
@@ -591,7 +591,7 @@ void ht1130_device::do_op()
 
 	case 0b01000000: // (with 4-bit immediate) : ADD A,XH : Add immediate data to the accumulator
 	{
-		u8 oprand = fetch() & 0x0f;
+		const u8 oprand = fetch() & 0x0f;
 		u8 acc = getacc();
 		acc += oprand;
 		if (acc & 0x10)
@@ -604,30 +604,30 @@ void ht1130_device::do_op()
 
 	case 0b01000010: // (with 4-bit immediate) : AND A,XH : Logical AND immediate data to accumulator
 	{
-		u8 oprand = fetch() & 0x0f;
-		u8 acc = getacc();
+		const u8 oprand = fetch() & 0x0f;
+		const u8 acc = getacc();
 		setacc(acc & oprand);
 		return;
 	}
 
 	case 0b01000110: // (with 4-bit immediate) : MOV R4,XH : Move immediate data to R4
 	{
-		u8 oprand = fetch() & 0x0f;
+		const u8 oprand = fetch() & 0x0f;
 		setreg(4, oprand);
 		return;
 	}
 
 	case 0b01000100: // (with 4-bit immediate) : OR A,XH :  Logical OR immediate data to accumulator
 	{
-		u8 oprand = fetch() & 0x0f;
-		u8 acc = getacc();
+		const u8 oprand = fetch() & 0x0f;
+		const u8 acc = getacc();
 		setacc(acc | oprand);
 		return;
 	}
 
 	case 0b01000001: // (with 4-bit immediate) : SUB A,XH : Subtract immediate data from accumulator0
 	{
-		u8 oprand = fetch() & 0x0f;
+		const u8 oprand = fetch() & 0x0f;
 		u8 acc = getacc();
 		acc += (0xf-oprand) + 1;
 		if (acc & 0x10)
@@ -640,8 +640,8 @@ void ht1130_device::do_op()
 
 	case 0b01000011: // (with 4-bit immediate) : XOR A,XH : Logical XOR immediate data to accumulator
 	{
-		u8 oprand = fetch() & 0x0f;
-		u8 acc = getacc();
+		const u8 oprand = fetch() & 0x0f;
+		const u8 acc = getacc();
 		setacc(acc ^ oprand);
 		return;
 	}
@@ -652,7 +652,7 @@ void ht1130_device::do_op()
 	case 0b01111000: case 0b01111001: case 0b01111010: case 0b01111011:
 	case 0b01111100: case 0b01111101: case 0b01111110: case 0b01111111:
 	{
-		u8 oprand = inst & 0x0f;
+		const u8 oprand = inst & 0x0f;
 		setacc(oprand);
 		return;
 	}
@@ -663,8 +663,8 @@ void ht1130_device::do_op()
 	case 0b00010001: case 0b00010011: case 0b00010101: case 0b00010111:
 	case 0b00011001:
 	{
-		u8 reg = (inst & 0x0e) >> 1;
-		u8 temp = getreg(reg);
+		const u8 reg = (inst & 0x0e) >> 1;
+		const u8 temp = getreg(reg);
 		setreg(reg, temp-1);
 		return;
 	}
@@ -673,8 +673,8 @@ void ht1130_device::do_op()
 	case 0b00010000: case 0b00010010: case 0b00010100: case 0b00010110:
 	case 0b00011000:
 	{
-		u8 reg = (inst & 0x0e) >> 1;
-		u8 temp = getreg(reg);
+		const u8 reg = (inst & 0x0e) >> 1;
+		const u8 temp = getreg(reg);
 		setreg(reg, temp+1);
 		return;
 	}
@@ -683,8 +683,8 @@ void ht1130_device::do_op()
 	case 0b00100001: case 0b00100011: case 0b00100101: case 0b00100111:
 	case 0b00101001:
 	{
-		u8 reg = (inst & 0x0e) >> 1;
-		u8 temp = getreg(reg);
+		const u8 reg = (inst & 0x0e) >> 1;
+		const u8 temp = getreg(reg);
 		setacc(temp);
 		return;
 	}
@@ -693,8 +693,8 @@ void ht1130_device::do_op()
 	case 0b00100000: case 0b00100010: case 0b00100100: case 0b00100110:
 	case 0b00101000:
 	{
-		u8 reg = (inst & 0x0e) >> 1;
-		u8 temp = getacc();
+		const u8 reg = (inst & 0x0e) >> 1;
+		const u8 temp = getacc();
 		setreg(reg, temp);
 		return;
 	}
@@ -709,7 +709,7 @@ void ht1130_device::do_op()
 	case 0b01011000: case 0b01011001: case 0b01011010: case 0b01011011:
 	case 0b01011100: case 0b01011101: case 0b01011110: case 0b01011111:
 	{
-		u8 oprand = fetch();
+		const u8 oprand = fetch();
 		setreg(1, oprand & 0xf);
 		setreg(0, inst & 0xf);
 		return;
@@ -721,7 +721,7 @@ void ht1130_device::do_op()
 	case 0b01101000: case 0b01101001: case 0b01101010: case 0b01101011:
 	case 0b01101100: case 0b01101101: case 0b01101110: case 0b01101111:
 	{
-		u8 oprand = fetch();
+		const u8 oprand = fetch();
 		setreg(3, oprand & 0xf);
 		setreg(2, inst & 0xf);
 		return;
@@ -737,8 +737,8 @@ void ht1130_device::do_op()
 	case 0b11111000: case 0b11111001: case 0b11111010: case 0b11111011:
 	case 0b11111100: case 0b11111101: case 0b11111110: case 0b11111111:
 	{
-		u8 oprand = fetch();
-		uint16_t fulladdr = ((inst & 0x0f) << 8) | oprand;
+		const u8 oprand = fetch();
+		const uint16_t fulladdr = ((inst & 0x0f) << 8) | oprand;
 		m_stackaddr = m_pc;
 		m_pc = fulladdr;
 		return;
@@ -750,8 +750,8 @@ void ht1130_device::do_op()
 	case 0b11101000: case 0b11101001: case 0b11101010: case 0b11101011:
 	case 0b11101100: case 0b11101101: case 0b11101110: case 0b11101111:
 	{
-		u8 oprand = fetch();
-		uint16_t fulladdr = ((inst & 0x0f) << 8) | oprand;
+		const u8 oprand = fetch();
+		const uint16_t fulladdr = ((inst & 0x0f) << 8) | oprand;
 		m_pc = fulladdr;
 		return;
 	}
@@ -764,8 +764,8 @@ void ht1130_device::do_op()
 	case 0b11000000: case 0b11000001: case 0b11000010: case 0b11000011:
 	case 0b11000100: case 0b11000101: case 0b11000110: case 0b11000111:
 	{
-		u8 oprand = fetch();
-		uint16_t fulladdr = ((inst & 0x07) << 8) | oprand | (m_pc & 0x800);
+		const u8 oprand = fetch();
+		const uint16_t fulladdr = ((inst & 0x07) << 8) | oprand | (m_pc & 0x800);
 
 		if (getcarry())
 			m_pc = fulladdr;
@@ -777,8 +777,8 @@ void ht1130_device::do_op()
 	case 0b11001000: case 0b11001001: case 0b11001010: case 0b11001011:
 	case 0b11001100: case 0b11001101: case 0b11001110: case 0b11001111:
 	{
-		u8 oprand = fetch();
-		uint16_t fulladdr = ((inst & 0x07) << 8) | oprand | (m_pc & 0x800);
+		const u8 oprand = fetch();
+		const uint16_t fulladdr = ((inst & 0x07) << 8) | oprand | (m_pc & 0x800);
 
 		if (!getcarry())
 			m_pc = fulladdr;
@@ -790,8 +790,8 @@ void ht1130_device::do_op()
 	case 0b10111000: case 0b10111001: case 0b10111010: case 0b10111011:
 	case 0b10111100: case 0b10111101: case 0b10111110: case 0b10111111:
 	{
-		u8 oprand = fetch();
-		uint16_t fulladdr = ((inst & 0x07) << 8) | oprand | (m_pc & 0x800);
+		const u8 oprand = fetch();
+		const uint16_t fulladdr = ((inst & 0x07) << 8) | oprand | (m_pc & 0x800);
 
 		if (getacc())
 			m_pc = fulladdr;
@@ -803,8 +803,8 @@ void ht1130_device::do_op()
 	case 0b10100000: case 0b10100001: case 0b10100010: case 0b10100011:
 	case 0b10100100: case 0b10100101: case 0b10100110: case 0b10100111:
 	{
-		u8 oprand = fetch();
-		uint16_t fulladdr = ((inst & 0x07) << 8) | oprand | (m_pc & 0x800);
+		const u8 oprand = fetch();
+		const uint16_t fulladdr = ((inst & 0x07) << 8) | oprand | (m_pc & 0x800);
 
 		if (getreg(0))
 			m_pc = fulladdr;
@@ -816,8 +816,8 @@ void ht1130_device::do_op()
 	case 0b10101000: case 0b10101001: case 0b10101010: case 0b10101011:
 	case 0b10101100: case 0b10101101: case 0b10101110: case 0b10101111:
 	{
-		u8 oprand = fetch();
-		uint16_t fulladdr = ((inst & 0x07) << 8) | oprand | (m_pc & 0x800);
+		const u8 oprand = fetch();
+		const uint16_t fulladdr = ((inst & 0x07) << 8) | oprand | (m_pc & 0x800);
 
 		if (getreg(1))
 			m_pc = fulladdr;
@@ -829,8 +829,8 @@ void ht1130_device::do_op()
 	case 0b11011000: case 0b11011001: case 0b11011010: case 0b11011011:
 	case 0b11011100: case 0b11011101: case 0b11011110: case 0b11011111:
 	{
-		u8 oprand = fetch();
-		uint16_t fulladdr = ((inst & 0x07) << 8) | oprand | (m_pc & 0x800);
+		const u8 oprand = fetch();
+		const uint16_t fulladdr = ((inst & 0x07) << 8) | oprand | (m_pc & 0x800);
 
 		if (getreg(4))
 			m_pc = fulladdr;
@@ -842,8 +842,8 @@ void ht1130_device::do_op()
 	case 0b11010000: case 0b11010001: case 0b11010010: case 0b11010011:
 	case 0b11010100: case 0b11010101: case 0b11010110: case 0b11010111:
 	{
-		u8 oprand = fetch();
-		uint16_t fulladdr = ((inst & 0x07) << 8) | oprand | (m_pc & 0x800);
+		const u8 oprand = fetch();
+		const uint16_t fulladdr = ((inst & 0x07) << 8) | oprand | (m_pc & 0x800);
 
 		if (m_timerover)
 		{
@@ -857,8 +857,8 @@ void ht1130_device::do_op()
 	case 0b10110000: case 0b10110001: case 0b10110010: case 0b10110011:
 	case 0b10110100: case 0b10110101: case 0b10110110: case 0b10110111:
 	{
-		u8 oprand = fetch();
-		uint16_t fulladdr = ((inst & 0x07) << 8) | oprand | (m_pc & 0x800);
+		const u8 oprand = fetch();
+		const uint16_t fulladdr = ((inst & 0x07) << 8) | oprand | (m_pc & 0x800);
 
 		if (!getacc())
 			m_pc = fulladdr;
@@ -876,9 +876,9 @@ void ht1130_device::do_op()
 	case 0b10011000: case 0b10011001: case 0b10011010: case 0b10011011:
 	case 0b10011100: case 0b10011101: case 0b10011110: case 0b10011111:
 	{
-		u8 oprand = fetch();
-		uint16_t fulladdr = ((inst & 0x07) << 8) | oprand | (m_pc & 0x800);
-		uint8_t bit = (inst & 0x18) >> 3;
+		const u8 oprand = fetch();
+		const uint16_t fulladdr = ((inst & 0x07) << 8) | oprand | (m_pc & 0x800);
+		const uint8_t bit = (inst & 0x18) >> 3;
 
 		if (getacc() & (1<<bit))
 			m_pc = fulladdr;
@@ -912,35 +912,35 @@ void ht1130_device::do_op()
 
 	case 0b00111011: // MOV A,TMRH : Move timer high nibble to accumulator
 	{
-		u8 data = gettimer_upper();
+		const u8 data = gettimer_upper();
 		setacc(data);
 		return;
 	}
 
 	case 0b00111010: // MOV A,TMRL : Move timer low nibble to accumulator
 	{
-		u8 data = gettimer_lower();
+		const u8 data = gettimer_lower();
 		setacc(data);
 		return;
 	}
 
 	case 0b00111101: // MOV TMRH,A : Move accumulator to timer high nibble
 	{
-		u8 acc = getacc();
+		const u8 acc = getacc();
 		settimer_upper(acc);
 		return;
 	}
 
 	case 0b00111100: // MOV TMRL,A : Move accumulator to timer low nibble
 	{
-		u8 acc = getacc();
+		const u8 acc = getacc();
 		settimer_lower(acc);
 		return;
 	}
 
 	case 0b01000111: // (with 8-bit immediate) : TIMER XXH : Set immediate data to timer counter
 	{
-		u8 oprand = fetch();
+		const u8 oprand = fetch();
 		settimer(oprand);
 		return;
 	}
@@ -986,7 +986,7 @@ void ht1130_device::do_op()
 
 	case 0b00110111: // (with 00111110) : HALT : Halt system clock
 	{
-		u8 oprand = fetch();
+		const u8 oprand = fetch();
 		if (oprand == 0b00111110) // this is a 'NOP' must HALT always be followed by NOP to work?
 		{
 			m_inhalt = 1;
