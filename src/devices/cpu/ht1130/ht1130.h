@@ -41,6 +41,9 @@ private:
 
 	void internal_map(address_map &map);
 
+	inline u8 fetch();
+	void do_op();
+
 	u32 m_pc;
 	s32 m_icount;
 };
