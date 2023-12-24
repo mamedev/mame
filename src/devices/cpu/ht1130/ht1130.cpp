@@ -627,7 +627,7 @@ void ht1130_device::do_op()
 	{
 		u8 oprand = fetch() & 0x0f;
 		u8 acc = getacc();
-		acc -= oprand;
+		acc += (15-oprand) + 1;
 		if (acc & 0x10)
 			setcarry();
 		else
