@@ -487,11 +487,11 @@ void ht1130_device::do_op()
 	{
 		u8 oldcarry = getcarry();
 		u8 acc = getacc();
-		if (acc & 0x1)
+		if (acc & 0x8)
 			setcarry();
 		else
 			clearcarry();
-		acc = (acc >> 1) | (oldcarry << 3);
+		acc = (acc << 1) | oldcarry;
 		setacc(acc);
 		return;
 	}
@@ -512,11 +512,11 @@ void ht1130_device::do_op()
 	{
 		u8 oldcarry = getcarry();
 		u8 acc = getacc();
-		if (acc & 0x8)
+		if (acc & 0x1)
 			setcarry();
 		else
 			clearcarry();
-		acc = (acc << 1) | oldcarry;
+		acc = (acc >> 1) | (oldcarry << 3);
 		setacc(acc);
 		return;
 	}
@@ -526,7 +526,7 @@ void ht1130_device::do_op()
 		u8 data = getr1r0_data();
 
 		u8 acc = getacc();
-		acc = acc + (15 - data) + getcarry();
+		acc = acc + (0xf - data) + getcarry();
 		if (acc & 0x10)
 			setcarry();
 		else
@@ -547,7 +547,7 @@ void ht1130_device::do_op()
 		u8 data = getr1r0_data();
 
 		u8 acc = getacc();
-		acc = acc + (15 - data) + 1;
+		acc = acc + (0xf - data) + 1;
 		if (acc & 0x10)
 			setcarry();
 		else
