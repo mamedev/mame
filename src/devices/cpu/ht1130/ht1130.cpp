@@ -474,11 +474,12 @@ void ht1130_device::do_op()
 	case 0b00000001: // RL A : Rotate accumulator left
 	{
 		u8 acc = getacc();
-		if (acc & 0x8)
+		u8 oldr3 = (acc & 8)>>3;
+		if (oldr3)
 			setcarry();
 		else
 			clearcarry();
-		acc = acc << 1;
+		acc = (acc << 1) | oldr3;
 		setacc(acc);
 		return;
 	}
@@ -499,11 +500,12 @@ void ht1130_device::do_op()
 	case 0b00000000: // RR A : Rotate accumulator right
 	{
 		u8 acc = getacc();
-		if (acc & 0x1)
+		u8 oldr0 = acc & 1;
+		if (oldr0)
 			setcarry();
 		else
 			clearcarry();
-		acc = acc >> 1;
+		acc = (acc >> 1) | oldr0 << 3;
 		setacc(acc);
 		return;
 	}
@@ -627,7 +629,7 @@ void ht1130_device::do_op()
 	{
 		u8 oprand = fetch() & 0x0f;
 		u8 acc = getacc();
-		acc += (15-oprand) + 1;
+		acc += (0xf-oprand) + 1;
 		if (acc & 0x10)
 			setcarry();
 		else
