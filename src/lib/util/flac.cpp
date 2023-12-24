@@ -638,6 +638,12 @@ template <flac_decoder::DECODE_MODE Mode, bool SwapEndian> FLAC__StreamDecoderWr
 	const int blocksize = frame->header.blocksize;
 	const int shift = (Mode == SCALE_DOWN) ? frame->header.bits_per_sample - m_bits_per_sample : (Mode == SCALE_UP) ? m_bits_per_sample - frame->header.bits_per_sample : 0;
 	const int low_bit = 1 << shift;
+	const int right_shift = m_bits_per_sample % frame->header.bits_per_sample;
+	int multiplier = 0;
+	for (int bits_to_set = m_bits_per_sample; bits_to_set > frame->header.bits_per_sample; bits_to_set -= frame->header.bits_per_sample)
+	{
+		multiplier = (multiplier << frame->header.bits_per_sample) | (1 << frame->header.bits_per_sample);
+	}
 
 	// interleaved case
 	if (m_uncompressed_start[1] == nullptr)
@@ -650,21 +656,7 @@ template <flac_decoder::DECODE_MODE Mode, bool SwapEndian> FLAC__StreamDecoderWr
 				if (Mode == SCALE_DOWN)
 					output_sample = int16_t((buffer[chan][sampnum] + (buffer[chan][sampnum] & low_bit)) >> shift);
 				else if (Mode == SCALE_UP)
-				{
-					output_sample = int16_t(buffer[chan][sampnum] << (m_bits_per_sample - frame->header.bits_per_sample));
-					for (int bits_to_set = m_bits_per_sample - frame->header.bits_per_sample; bits_to_set > 0; bits_to_set -= frame->header.bits_per_sample)
-					{
-						if (frame->header.bits_per_sample <= bits_to_set)
-						{
-							output_sample = int16_t(output_sample + (buffer[chan][sampnum] << (bits_to_set - frame->header.bits_per_sample)));
-						}
-						else
-						{
-							output_sample = int16_t(output_sample + (buffer[chan][sampnum] >> (frame->header.bits_per_sample - bits_to_set)));
-						}
-						bits_to_set -= frame->header.bits_per_sample;
-					}
-				}
+					output_sample = int16_t((buffer[chan][sampnum] * multiplier) | ((buffer[chan][sampnum] >> right_shift)));
 				else
 					output_sample = int16_t(buffer[chan][sampnum]);
 				*dest++ = SwapEndian ? int16_t(swapendian_int16(uint16_t(output_sample))) : output_sample;
@@ -681,21 +673,7 @@ template <flac_decoder::DECODE_MODE Mode, bool SwapEndian> FLAC__StreamDecoderWr
 					if (Mode == SCALE_DOWN)
 						output_sample = int16_t((buffer[chan][sampnum] + (buffer[chan][sampnum] & low_bit)) >> shift);
 					else if (Mode == SCALE_UP)
-					{
-						output_sample = int16_t(buffer[chan][sampnum] << (m_bits_per_sample - frame->header.bits_per_sample));
-						for (int bits_to_set = m_bits_per_sample - frame->header.bits_per_sample; bits_to_set > 0; bits_to_set -= frame->header.bits_per_sample)
-						{
-							if (frame->header.bits_per_sample <= bits_to_set)
-							{
-								output_sample = int16_t(output_sample + (buffer[chan][sampnum] << (bits_to_set - frame->header.bits_per_sample)));
-							}
-							else
-							{
-								output_sample = int16_t(output_sample + (buffer[chan][sampnum] >> (frame->header.bits_per_sample - bits_to_set)));
-							}
-							bits_to_set -= frame->header.bits_per_sample;
-						}
-					}
+						output_sample = int16_t((buffer[chan][sampnum] * multiplier) | ((buffer[chan][sampnum] >> right_shift)));
 					else
 						output_sample = int16_t(buffer[chan][sampnum]);
 					m_uncompressed_start[chan][m_uncompressed_offset] = SwapEndian ? int16_t(swapendian_int16(uint16_t(output_sample))) : output_sample;
