@@ -646,7 +646,7 @@ void taito_f3_state::pf_ram_w(offs_t offset, u16 data, u16 mem_mask)
 void taito_f3_state::control_0_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	logerror("@@ scroll command: %04x at: %04x vpos: %d\n", data, offset*2, m_screen->vpos());
-	
+
 	COMBINE_DATA(&m_control_0[offset]);
 }
 
@@ -665,13 +665,12 @@ void taito_f3_state::spriteram_w(offs_t offset, u16 data, u16 mem_mask)
 	if (offset % 8 == 3) {
 		logerror("sprite write: %04x at: %04x vpos: %d\n", data, offset*2, m_screen->vpos());
 	}
-	//if (offset < 8*3) {
 	if (offset % 8 == 5) {
 		if (BIT(m_spriteram[(offset & ~0b111) + 3], 15)) {
 			logerror("!sprite command: %04x at: %04x vpos: %d\n", data, offset*2, m_screen->vpos());
 		}
 	}
-		//}
+
 	COMBINE_DATA(&m_spriteram[offset]);
 }
 
@@ -1744,23 +1743,23 @@ void taito_f3_state::get_pf_scroll(int pf_num, u32 &reg_sx, u32 &reg_sy)
 {
 	// x: iiii iiii iiFF FFFF
 	// y: iiii iiii ifff ffff
-	
+
 	// x scroll is stored as fixed10.6, with fractional bits inverted.
 	// we convert this to regular fixed16.16
-	u32 sx = (m_control_0[pf_num] ^ 0b111111) << (16-6); 
+	u32 sx = (m_control_0[pf_num] ^ 0b111111) << (16-6);
 	u32 sy = (m_control_0[pf_num + 4]) << (16-7); // fixed11.7 to fixed16.16
-	
+
 	sx -= (6 + 4 * pf_num) << 16;
 	sy += 1 << 16;
-	
+
 	if (m_flipscreen) {
 		sx += (416+188) << 16;
 		sy -= 1024 << 16;
-		
+
 		if (m_game_config->extend)
 			sx -= 512 << 16;
 	}
-	
+
 	reg_sx = sx;
 	reg_sy = sy;
 }
@@ -1837,7 +1836,7 @@ void taito_f3_state::scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cl
 		int tmap_number = pf + line_data.pf[pf].alt_tilemap * 2;
 		line_data.pf[pf].srcbitmap = &m_tilemap[tmap_number]->pixmap();
 		line_data.pf[pf].flagsbitmap = &m_tilemap[tmap_number]->flagsmap();
-		
+
 		get_pf_scroll(pf, line_data.pf[pf].reg_sx, line_data.pf[pf].reg_sy);
 		line_data.pf[pf].reg_fx_y = line_data.pf[pf].reg_sy;
 	}
@@ -1856,7 +1855,6 @@ void taito_f3_state::scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cl
 	// draw sprite layers
 	{
 		rectangle myclip;
-		/* KW 991012 -- Added code to force clip to bitmap boundary */
 		myclip = cliprect;
 		myclip &= m_pri_alp_bitmap.cliprect();
 
@@ -1877,14 +1875,6 @@ void taito_f3_state::scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cl
 	int ys = m_flipscreen ? 24 : 0;
 	for (int y = y_start; y != y_end; y += y_inc) {
 		read_line_ram(line_data, y);
-		
-		// for (int pf = 0; pf < NUM_PLAYFIELDS; ++pf) {
-		// 	auto p = &line_data.pf[pf];
-		// 	// if (m_flipscreen)
-		// 	// 	line_data.pf[pf].reg_fx_y = line_data.pf[pf].reg_sy - (256 << 16);
-		// 	// else
-		// 	//line_data.pf[pf].reg_fx_y = line_data.pf[pf].reg_sy + (p->y_scale << 9) * y;
-		// }
 
 		// sort layers
 		std::array<std::variant<pivot_inf*, sprite_inf*, playfield_inf*>,
@@ -1902,13 +1892,6 @@ void taito_f3_state::scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cl
 		for (auto gfx : layers) {
 			std::visit([&](auto&& arg) {
 				draw_line(&bitmap.pix(y+ys), y+ys, 46, 46 + 320, arg);
-				/*using T = std::decay_t<decltype(arg)>;
-				if constexpr (std::is_same_v<T, sprite_inf*>)
-					draw_line(&bitmap.pix(y), y, 46, 46 + 320, arg);
-				else if constexpr (std::is_same_v<T, playfield_inf*>)
-					draw_line(&bitmap.pix(y), y, 46, 46 + 320, arg);
-				else if constexpr (std::is_same_v<T, pivot_inf*>)
-				draw_line(&bitmap.pix(y), y, 46, 46 + 320, arg);*/
 			}, gfx);
 		}
 
@@ -2743,7 +2726,6 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 
 inline void taito_f3_state::f3_drawgfx(bitmap_ind16 &dest_bmp, const rectangle &myclip, gfx_element *gfx, const tempsprite &sprite)
 {
-	
 	if (gfx)
 	{
 		const u8 *code_base = gfx->get_data(sprite.code % gfx->elements());
@@ -2751,7 +2733,7 @@ inline void taito_f3_state::f3_drawgfx(bitmap_ind16 &dest_bmp, const rectangle &
 		//logerror("sprite draw at %f %f size %f %f\n", sprite.x/16.0, sprite.y/16.0, sprite.zoomx/16.0, sprite.zoomy/16.0);
 		u8 flipx = sprite.flipx ? 0xF : 0;
 		u8 flipy = sprite.flipy ? 0xF : 0;
-		
+
 		fixed8 dy8 = (sprite.y << 4);
 		if (!m_flipscreen)
 			dy8 += 255; // round up in non-flipscreen mode?    mayybe flipscreen coordinate adjustments should be done after all this math, during final rendering?. anyway:  testcases for vertical scaling: elvactr mission # text (non-flipscreen), kaiserknj attract mode first text line (flipscreen)
@@ -2802,7 +2784,7 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 				new_pos += subglobal;
 			if (!BIT(scroll, 3))
 				new_pos += global;
-		
+
 			switch (block_ctrl)
 			{
 			case 0b00:
@@ -2824,12 +2806,12 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 	sprite_axis x, y;
 	u8 color = 0;
 	//bool multi = false;
-	
+
 	const rectangle &visarea = m_screen->visible_area();
-	
+
 	tempsprite *sprite_ptr = &m_spritelist[0];
 	int total_sprites = 0;
-	
+
 	for (int offs = 0; offs < 0x400 && (total_sprites < 0x400); offs++)
 	{
 		int bank = m_sprite_bank ? 0x4000 : 0;
@@ -2854,7 +2836,7 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 			u16 cntrl = spr[5];
 			m_flipscreen = BIT(cntrl, 13);
 
-			/*  
+			/*
 			    ??f? ??dd ???? ??tb
 			    
 			    
@@ -2865,7 +2847,7 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 			                     Notice that sprites also completely disappear due of a bug/missing feature in the alpha routines.
 			*/
 
-			m_sprite_extra_planes = BIT(cntrl, 8, 2);   // 00 = 4bpp, 01 = 5bpp, 10 = unused?, 11 = 6bpp
+			m_sprite_extra_planes = BIT(cntrl, 8, 2); // 00 = 4bpp, 01 = 5bpp, 10 = unused?, 11 = 6bpp
 			m_sprite_pen_mask = (m_sprite_extra_planes << 4) | 0x0f;
 
 			/* Sprite bank select */
@@ -2880,20 +2862,20 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 		u16 zooms = spr[1];
 		x.update(scroll_mode, spr[2] & 0xFFF, lock, BIT(spritecont, 4+2, 2), zooms & 0xFF);
 		y.update(scroll_mode, spr[3] & 0xFFF, lock, BIT(spritecont, 4+0, 2), zooms >> 8);
-		
+
 		const int tile = spr[0] | (BIT(spr[5], 0) << 16);
 		if (!tile) continue;
-		
+
 		fixed4 tx = m_flipscreen ? (512<<4) - x.block_size - x.pos : x.pos;
 		fixed4 ty = m_flipscreen ? (256<<4) - y.block_size - y.pos : y.pos;
 
 		if (tx + x.block_size <= visarea.min_x<<4 || tx > visarea.max_x<<4 || ty + y.block_size <= visarea.min_y<<4 || ty > visarea.max_y<<4)
 			continue;
-		
+
 		bool flipx = BIT(spritecont, 0);
 		bool flipy = BIT(spritecont, 1);
 		//multi = BIT(spritecont, 3);
-		
+
 		sprite_ptr->x = tx;
 		sprite_ptr->y = ty;
 		sprite_ptr->flipx = m_flipscreen ? !flipx : flipx;
@@ -2916,7 +2898,7 @@ void taito_f3_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 
 	sprite_ptr = m_sprite_end;
 	m_sprite_pri_usage = 0;
-	
+
 	while (sprite_ptr != &m_spritelist[0])
 	{
 		sprite_ptr--;
@@ -2932,7 +2914,7 @@ void taito_f3_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 u32 taito_f3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	logerror("vpos screen update now: %d\n", m_screen->vpos());;
-	
+
 	u32 sy_fix[5], sx_fix[5];
 
 	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
@@ -2957,7 +2939,7 @@ u32 taito_f3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	//if (m_sprite_lag == 0)
 	// these are getted during vblank now
 	//get_sprite_info(m_spriteram.target());
-	
+
 
 	/* Update sprite buffer */
 	//draw_sprites(bitmap, cliprect);
@@ -2977,7 +2959,7 @@ u32 taito_f3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	scanline_draw_TWO(bitmap, cliprect);
 
 	get_sprite_info(m_spriteram.target());
-	
+
 	if (VERBOSE)
 		print_debug_info(bitmap);
 	return 0;
