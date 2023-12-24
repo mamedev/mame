@@ -170,7 +170,8 @@ void ht1130_device::internal_data_map(address_map &map)
 {
 	map(0x00, 0x9f).ram().w(FUNC(ht1130_device::tempram_w)).share("tempram");
 
-	// the ht1130 is meant to have displayram from 0xe0, so this could be a newer chip?
+	// the HT1130 is meant to have displayram from 0xe0, so this could be a newer chip?
+	// HT1190 has data 00-9f and display b0-ff, possibly a closer match?
 	map(0xa0, 0xff).ram().w(FUNC(ht1130_device::displayram_w)).share("displayram");
 }
 
