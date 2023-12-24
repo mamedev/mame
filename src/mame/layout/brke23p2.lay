@@ -16,7 +16,7 @@ license:CC0-1.0
 
 	<view name="Internal Layout">
 
-		<repeat count="64">
+		<repeat count="12">
 			<param name="s" start="0" increment="8" />
 			<param name="y" start="0" increment="8" />
 			<repeat count="8">
@@ -27,6 +27,20 @@ license:CC0-1.0
 				</element>
 			</repeat>
 		</repeat>
+
+		<!-- right hand side of the pit -->
+		<repeat count="20">
+			<param name="s" start="96" increment="8" />
+			<param name="y" start="0" increment="8" />
+			<repeat count="8">
+				<param name="n" start="~s~" increment="1" />
+				<param name="x" start="100" increment="8" />
+				<element name="seg~n~" ref="segment" state="0">
+					<bounds x="~x~" y="~y~" width="7" height="7"/>
+				</element>
+			</repeat>
+		</repeat>
+		
 	</view>
 
 </mamelayout>
