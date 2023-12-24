@@ -18730,7 +18730,7 @@ gameking                        //
 @source:handheld/gmaster.cpp
 gmaster                         // Hartung Gamemaster
 
-@source:handheld/h1130_brickgame.cpp
+@source:handheld/ht1130_brickgame.cpp
 brke23p2
 
 @source:handheld/hh_cop400.cpp
