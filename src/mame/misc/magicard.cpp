@@ -2263,6 +2263,25 @@ ROM_END
   CZ750, V1.00
   2001, Kajot.
 
+  Xtal 1 [Q1]: 30.000
+  Xtal 2 [Q2]: 30.000
+  Xtal 3 [Q5]: 11.0592
+  Xtal 4 [Q6]: 19.6608
+
+  The 87C571 MCU (IC13) is read protected.
+
+  IC1:
+       PHILIPS
+       SCC68070CCA84
+       594180
+       DfD9949V3
+
+  IC5:
+       PHILIPS
+       SCC66470CAB
+       595831
+       DfD9948I3
+
 */
 ROM_START( simpbest )
 	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
