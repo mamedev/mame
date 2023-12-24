@@ -6,6 +6,7 @@
 #include "ht1130d.h"
 
 #define LOG_UNHANDLED_OPS       (1U << 1)
+#define LOG_UNHANDLED_SOUND_OPS (1U << 2)
 
 #define VERBOSE (LOG_UNHANDLED_OPS)
 #include "logmacro.h"
@@ -72,6 +73,25 @@ u8 ht1130_device::getacc()
 	return m_acc & 0xf;
 }
 
+void ht1130_device::setcarry()
+{
+	m_carry = 1;
+}
+
+void ht1130_device::clearcarry()
+{
+	m_carry = 0;
+}
+
+u8 ht1130_device::getr1r0()
+{
+	return (getreg(1)<<4) | getreg(0);
+}
+
+u8 ht1130_device::getr3r2()
+{
+	return (getreg(3)<<4) | getreg(2);
+}
 
 void ht1130_device::internal_data_map(address_map &map)
 {
@@ -89,6 +109,11 @@ void ht1130_device::device_start()
 	state_add(HT1130_PC, "PC", m_pc);
 	state_add(STATE_GENPC, "GENPC", m_pc).noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).noshow();
+
+	state_add(HT1130_ACC, "ACC", m_acc);
+
+	for (int i = 0; i < 5; i++)
+		state_add(HT1130_R0 + i, string_format("R%d", i).c_str(), m_regs[i]);
 
 	save_item(NAME(m_pc));
 	save_item(NAME(m_icount));
@@ -157,7 +182,7 @@ void ht1130_device::do_op()
 
 	case 0b00101010: // CLC : Clear carry flag
 	{
-		LOGMASKED(LOG_UNHANDLED_OPS, "CLC");
+		clearcarry();
 		return;
 	}
 
@@ -175,13 +200,17 @@ void ht1130_device::do_op()
 
 	case 0b00001101: // DEC [R1R0] : Decrement data memory
 	{
-		LOGMASKED(LOG_UNHANDLED_OPS, "DEC [R1R0]");
+		u8 dataaddress = getr1r0();
+		u8 data = space(AS_DATA).read_byte(dataaddress);
+		space(AS_DATA).write_byte(dataaddress, data-1);
 		return;
 	}
 
 	case 0b00001111: // DEC [R3R2] : Decrement data memory
 	{
-		LOGMASKED(LOG_UNHANDLED_OPS, "DEC [R3R2]");
+		u8 dataaddress = getr3r2();
+		u8 data = space(AS_DATA).read_byte(dataaddress);
+		space(AS_DATA).write_byte(dataaddress, data-1);
 		return;
 	}
 
@@ -224,13 +253,17 @@ void ht1130_device::do_op()
 
 	case 0b00001100: // INC [R1R0] : Increment data memory
 	{
-		LOGMASKED(LOG_UNHANDLED_OPS, "INC [R1R0]");
+		u8 dataaddress = getr1r0();
+		u8 data = space(AS_DATA).read_byte(dataaddress);
+		space(AS_DATA).write_byte(dataaddress, data+1);
 		return;
 	}
 
 	case 0b00001110: // INC [R3R2] : Increment data memory
 	{
-		LOGMASKED(LOG_UNHANDLED_OPS, "INC [R3R2]");
+		u8 dataaddress = getr3r2();
+		u8 data = space(AS_DATA).read_byte(dataaddress);
+		space(AS_DATA).write_byte(dataaddress, data+1);
 		return;
 	}
 
@@ -374,31 +407,31 @@ void ht1130_device::do_op()
 
 	case 0b01001011: // SOUND A : Activate SOUND channel with accumulator
 	{
-		LOGMASKED(LOG_UNHANDLED_OPS, "SOUND A");
+		LOGMASKED(LOG_UNHANDLED_SOUND_OPS, "SOUND A");
 		return;
 	}
 
 	case 0b01001001: // SOUND LOOP : Turn on sound repeat cycle
 	{
-		LOGMASKED(LOG_UNHANDLED_OPS, "SOUND LOOP");
+		LOGMASKED(LOG_UNHANDLED_SOUND_OPS, "SOUND LOOP");
 		return;
 	}
 
 	case 0b01001010: // SOUND OFF : Turn off sound
 	{
-		LOGMASKED(LOG_UNHANDLED_OPS, "SOUND OFF");
+		LOGMASKED(LOG_UNHANDLED_SOUND_OPS, "SOUND OFF");
 		return;
 	}
 
 	case 0b01001000: // SOUND ONE : Turn on sound 1 cycle
 	{
-		LOGMASKED(LOG_UNHANDLED_OPS, "SOUND ONE");
+		LOGMASKED(LOG_UNHANDLED_SOUND_OPS, "SOUND ONE");
 		return;
 	}
 
 	case 0b00101011: // STC : Set carry flag
 	{
-		LOGMASKED(LOG_UNHANDLED_OPS, "STC");
+		setcarry();
 		return;
 	}
 
@@ -450,71 +483,36 @@ void ht1130_device::do_op()
 
 	case 0b01000010: // (with 4-bit immediate) : AND A,XH : Logical AND immediate data to accumulator
 	{
-		u8 oprand = fetch();
-		if (!(oprand & 0xf0))
-		{
-			LOGMASKED(LOG_UNHANDLED_OPS, "AND A,0x%02x", oprand);
-		}
-		else
-		{
-			LOGMASKED(LOG_UNHANDLED_OPS, "<ill %02x %02x>", inst, oprand);
-		}
+		u8 oprand = fetch() & 0x0f;
+		LOGMASKED(LOG_UNHANDLED_OPS, "AND A,0x%02x", oprand);
 		return;
 	}
 
 	case 0b01000110: // (with 4-bit immediate) : MOV R4,XH : Move immediate data to R4
 	{
-		u8 oprand = fetch();
-		if (!(oprand & 0xf0))
-		{
-			LOGMASKED(LOG_UNHANDLED_OPS, "MOV R4,0x%02x", oprand);
-		}
-		else
-		{
-			LOGMASKED(LOG_UNHANDLED_OPS, "<ill %02x %02x>", inst, oprand);
-		}
+		u8 oprand = fetch() & 0x0f;
+		LOGMASKED(LOG_UNHANDLED_OPS, "MOV R4,0x%02x", oprand);
 		return;
 	}
 
 	case 0b01000100: // (with 4-bit immediate) : OR A,XH :  Logical OR immediate data to accumulator
 	{
-		u8 oprand = fetch();
-		if (!(oprand & 0xf0))
-		{
-			LOGMASKED(LOG_UNHANDLED_OPS, "OR A,0x%02x", oprand);
-		}
-		else
-		{
-			LOGMASKED(LOG_UNHANDLED_OPS, "<ill %02x %02x>", inst, oprand);
-		}
+		u8 oprand = fetch() & 0x0f;
+		LOGMASKED(LOG_UNHANDLED_OPS, "OR A,0x%02x", oprand);
 		return;
 	}
 
 	case 0b01000001: // (with 4-bit immediate) : SUB A,XH : Subtract immediate data from accumulator0
 	{
-		u8 oprand = fetch();
-		if (!(oprand & 0xf0))
-		{
-			LOGMASKED(LOG_UNHANDLED_OPS, "SUB A,0x%02x", oprand);
-		}
-		else
-		{
-			LOGMASKED(LOG_UNHANDLED_OPS, "<ill %02x %02x>", inst, oprand);
-		}
+		u8 oprand = fetch() & 0x0f;
+		LOGMASKED(LOG_UNHANDLED_OPS, "SUB A,0x%02x", oprand);
 		return;
 	}
 
 	case 0b01000011: // (with 4-bit immediate) : XOR A,XH : Logical XOR immediate data to accumulator
 	{
-		u8 oprand = fetch();
-		if (!(oprand & 0xf0))
-		{
-			LOGMASKED(LOG_UNHANDLED_OPS, "XOR A,0x%02x", oprand);
-		}
-		else
-		{
-			LOGMASKED(LOG_UNHANDLED_OPS, "<ill %02x %02x>", inst, oprand);
-		}
+		u8 oprand = fetch() & 0x0f;
+		LOGMASKED(LOG_UNHANDLED_OPS, "XOR A,0x%02x", oprand);
 		return;
 	}
 
@@ -525,7 +523,7 @@ void ht1130_device::do_op()
 	case 0b01111100: case 0b01111101: case 0b01111110: case 0b01111111:
 	{
 		u8 oprand = inst & 0x0f;
-		LOGMASKED(LOG_UNHANDLED_OPS, "MOV A,0x%02x", oprand);
+		setacc(oprand);
 		return;
 	}
 
@@ -742,7 +740,7 @@ void ht1130_device::do_op()
 		u8 oprand = fetch();
 		if (!(oprand & 0xf0))
 		{
-			LOGMASKED(LOG_UNHANDLED_OPS, "SOUND %d", oprand);
+			LOGMASKED(LOG_UNHANDLED_SOUND_OPS, "SOUND %d", oprand);
 		}
 		else
 		{
@@ -769,7 +767,7 @@ void ht1130_device::do_op()
 	case 0b01000111: // (with 8-bit immediate) : TIMER XXH : Set immediate data to timer counter
 	{
 		u8 oprand = fetch();
-		LOGMASKED(LOG_UNHANDLED_OPS, "TIMER $02x", oprand);
+		LOGMASKED(LOG_UNHANDLED_OPS, "TIMER %02x", oprand);
 		return;
 	}
 

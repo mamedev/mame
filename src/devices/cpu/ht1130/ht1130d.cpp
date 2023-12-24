@@ -653,7 +653,7 @@ offs_t ht1130_disassembler::disassemble(std::ostream &stream, offs_t pc, const h
 	case 0b01000111: // (with 8-bit immediate) : TIMER XXH : Set immediate data to timer counter
 	{
 		u8 oprand = opcodes.r8(pc + 1);
-		util::stream_format(stream, "TIMER $02x", oprand);
+		util::stream_format(stream, "TIMER %02x", oprand);
 		return 2;
 	}
 

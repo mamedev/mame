@@ -14,6 +14,12 @@ public:
 
 	enum {
 		HT1130_PC,
+		HT1130_R0,
+		HT1130_R1,
+		HT1130_R2,
+		HT1130_R3,
+		HT1130_R4,
+		HT1130_ACC,
 	};
 
 protected:
@@ -49,7 +55,10 @@ private:
 	u8 getreg(u8 which);
 	void setacc(u8 data);
 	u8 getacc();
-
+	void setcarry();
+	void clearcarry();
+	u8 getr1r0();
+	u8 getr3r2();
 
 	inline u8 fetch();
 	void do_op();
