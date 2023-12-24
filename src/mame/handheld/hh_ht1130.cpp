@@ -36,6 +36,10 @@ private:
 	void display_offset_w(uint8_t data);
 	void display_data_w(uint8_t data);
 
+	u8 port_pm_r();
+	u8 port_ps_r();
+	u8 port_pp_r();
+
 	u8 m_displayoffset = 0;
 	output_finder<512> m_seg;
 };
@@ -50,6 +54,16 @@ void ht1130_brickgame_state::machine_reset()
 }
 
 static INPUT_PORTS_START( ht1130_brickgame )
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Mute")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Power")
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Rotate")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Drop")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Right")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Left")
 INPUT_PORTS_END
 
 void ht1130_brickgame_state::display_offset_w(uint8_t data)
@@ -65,12 +79,25 @@ void ht1130_brickgame_state::display_data_w(uint8_t data)
 	}
 }
 
+u8 ht1130_brickgame_state::port_ps_r()
+{
+	return ioport("IN1")->read() & 0xf;
+}
+
+u8 ht1130_brickgame_state::port_pp_r()
+{
+	return ioport("IN2")->read() & 0xf;
+}
 
 void ht1130_brickgame_state::ht1130_brickgame(machine_config &config)
 {
-	HT1130(config, m_maincpu, 1000000);
+	HT1130(config, m_maincpu, 1000000/4); // frequency?
 	m_maincpu->display_offset_out_cb().set(FUNC(ht1130_brickgame_state::display_offset_w));
 	m_maincpu->display_data_out_cb().set(FUNC(ht1130_brickgame_state::display_data_w));
+
+	m_maincpu->ps_in_cb().set(FUNC(ht1130_brickgame_state::port_ps_r));
+	m_maincpu->pp_in_cb().set(FUNC(ht1130_brickgame_state::port_pp_r));
+
 	SPEAKER(config, "speaker").front_center();
 
 	config.set_default_layout(layout_brke23p2);

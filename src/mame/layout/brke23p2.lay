@@ -16,10 +16,10 @@ license:CC0-1.0
 
 	<view name="Internal Layout">
 
-		<repeat count="16">
-			<param name="s" start="0" increment="32" />
+		<repeat count="64">
+			<param name="s" start="0" increment="8" />
 			<param name="y" start="0" increment="8" />
-			<repeat count="32">
+			<repeat count="8">
 				<param name="n" start="~s~" increment="1" />
 				<param name="x" start="0" increment="8" />
 				<element name="seg~n~" ref="segment" state="0">
