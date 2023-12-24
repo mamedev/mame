@@ -77,6 +77,11 @@ u8 ht1130_device::getacc()
 	return m_acc & 0xf;
 }
 
+u8 ht1130_device::getcarry()
+{
+	return m_carry & 1;
+}
+
 void ht1130_device::setcarry()
 {
 	m_carry = 1;
@@ -87,15 +92,65 @@ void ht1130_device::clearcarry()
 	m_carry = 0;
 }
 
+void ht1130_device::settimer(u8 data)
+{
+	m_timer = data;
+}
+
+void ht1130_device::settimer_upper(u8 data)
+{
+	m_timer = (m_timer & 0xf) | (data & 0xf) << 4;
+}
+
+void ht1130_device::settimer_lower(u8 data)
+{
+	m_timer = (m_timer & 0xf0) | (data & 0xf);
+}
+
+u8 ht1130_device::gettimer_upper()
+{
+	return (m_timer >> 4) & 0xf;
+}
+
+u8 ht1130_device::gettimer_lower()
+{
+	return m_timer & 0xf;
+}
+
 u8 ht1130_device::getr1r0()
 {
 	return (getreg(1)<<4) | getreg(0);
+}
+
+u8 ht1130_device::getr1r0_data()
+{
+	u8 dataaddress = getr1r0();
+	return space(AS_DATA).read_byte(dataaddress);
+}
+
+void ht1130_device::setr1r0_data(u8 data)
+{
+	u8 dataaddress = getr1r0();
+	space(AS_DATA).write_byte(dataaddress, data);
 }
 
 u8 ht1130_device::getr3r2()
 {
 	return (getreg(3)<<4) | getreg(2);
 }
+
+u8 ht1130_device::getr3r2_data()
+{
+	u8 dataaddress = getr3r2();
+	return space(AS_DATA).read_byte(dataaddress);
+}
+
+void ht1130_device::setr3r2_data(u8 data)
+{
+	u8 dataaddress = getr3r2();
+	space(AS_DATA).write_byte(dataaddress, data);
+}
+
 
 void ht1130_device::internal_data_map(address_map &map)
 {
@@ -170,13 +225,31 @@ void ht1130_device::do_op()
 	{
 	case 0b00001000: // ADC A,[R1R0] : Add data memory contents and carry to the accumulator
 	{
-		LOGMASKED(LOG_UNHANDLED_OPS, "ADC A,[R1R0]");
+		u8 data = getr1r0_data();
+
+		u8 acc = getacc();
+		acc = acc + data + getcarry();
+		if (acc & 0x10)
+			setcarry();
+		else
+			clearcarry();
+		setacc(acc);
+
 		return;
 	}
 
 	case 0b00001001: // ADD A,[R1R0] : Add data memory contents to the accumulator
 	{
-		LOGMASKED(LOG_UNHANDLED_OPS, "ADD A,[R1R0]");
+		u8 data = getr1r0_data();
+
+		u8 acc = getacc();
+		acc = acc + data;
+		if (acc & 0x10)
+			setcarry();
+		else
+			clearcarry();
+		setacc(acc);
+
 		return;
 	}
 
@@ -206,53 +279,55 @@ void ht1130_device::do_op()
 
 	case 0b00111111: // DEC A : Decrement accumulator
 	{
-		LOGMASKED(LOG_UNHANDLED_OPS, "DEC A");
+		u8 acc = getacc();
+		setacc(acc-1);
 		return;
 	}
 
 	case 0b00001101: // DEC [R1R0] : Decrement data memory
 	{
-		u8 dataaddress = getr1r0();
-		u8 data = space(AS_DATA).read_byte(dataaddress);
-		space(AS_DATA).write_byte(dataaddress, data-1);
+		u8 data = getr1r0_data();
+		setr1r0_data(data-1);
 		return;
 	}
 
 	case 0b00001111: // DEC [R3R2] : Decrement data memory
 	{
-		u8 dataaddress = getr3r2();
-		u8 data = space(AS_DATA).read_byte(dataaddress);
-		space(AS_DATA).write_byte(dataaddress, data-1);
+		u8 data = getr3r2_data();
+		setr3r2_data(data-1);
 		return;
 	}
 
 	case 0b00101101: // DI : Disable interrupt
 	{
-		LOGMASKED(LOG_UNHANDLED_OPS, "DI");
+		m_irqen = 0;
 		return;
 	}
 
 	case 0b00101100: // EI : Enable interrupt
 	{
-		LOGMASKED(LOG_UNHANDLED_OPS, "EI");
+		m_irqen = 1;
 		return;
 	}
 
 	case 0b00110010: // IN A,PM : Input port to accumulator
 	{
-		LOGMASKED(LOG_UNHANDLED_OPS, "IN A,PM");
+		u8 data = m_port_in_pm() & 0xf;
+		setacc(data);
 		return;
 	}
 
 	case 0b00110011: // IN A,PS : Input port to accumulator
 	{
-		LOGMASKED(LOG_UNHANDLED_OPS, "IN A,PS");
+		u8 data = m_port_in_ps() & 0xf;
+		setacc(data);
 		return;
 	}
 
 	case 0b00110100: // IN A,PP : Input port to accumulator
 	{
-		LOGMASKED(LOG_UNHANDLED_OPS, "IN A,PP");
+		u8 data = m_port_in_pp() & 0xf;
+		setacc(data);
 		return;
 	}
 
@@ -265,29 +340,29 @@ void ht1130_device::do_op()
 
 	case 0b00001100: // INC [R1R0] : Increment data memory
 	{
-		u8 dataaddress = getr1r0();
-		u8 data = space(AS_DATA).read_byte(dataaddress);
-		space(AS_DATA).write_byte(dataaddress, data+1);
+		u8 data = getr1r0_data();
+		setr1r0_data(data+1);
 		return;
 	}
 
 	case 0b00001110: // INC [R3R2] : Increment data memory
 	{
-		u8 dataaddress = getr3r2();
-		u8 data = space(AS_DATA).read_byte(dataaddress);
-		space(AS_DATA).write_byte(dataaddress, data+1);
+		u8 data = getr3r2_data();
+		setr3r2_data(data+1);
 		return;
 	}
 
 	case 0b00111011: // MOV A,TMRH : Move timer high nibble to accumulator
 	{
-		LOGMASKED(LOG_UNHANDLED_OPS, "MOV A,TMRH");
+		u8 data = gettimer_upper();
+		setacc(data);
 		return;
 	}
 
 	case 0b00111010: // MOV A,TMRL : Move timer low nibble to accumulator
 	{
-		LOGMASKED(LOG_UNHANDLED_OPS, "MOV A,TMRL");
+		u8 data = gettimer_lower();
+		setacc(data);
 		return;
 	}
 
@@ -305,13 +380,15 @@ void ht1130_device::do_op()
 
 	case 0b00111101: // MOV TMRH,A : Move accumulator to timer high nibble
 	{
-		LOGMASKED(LOG_UNHANDLED_OPS, "MOV TMRH,A");
+		u8 acc = getacc();
+		settimer_upper(acc);
 		return;
 	}
 
 	case 0b00111100: // MOV TMRL,A : Move accumulator to timer low nibble
 	{
-		LOGMASKED(LOG_UNHANDLED_OPS, "MOV TMRL,A");
+		u8 acc = getacc();
+		settimer_lower(acc);
 		return;
 	}
 
@@ -347,7 +424,8 @@ void ht1130_device::do_op()
 
 	case 0b00110000: // OUT PA,A : Output accumulator data to port A
 	{
-		LOGMASKED(LOG_UNHANDLED_OPS, "OUT PA,A");
+		u8 data = getacc();
+		m_port_out_pa(data);
 		return;
 	}
 
@@ -413,7 +491,16 @@ void ht1130_device::do_op()
 
 	case 0b00001010: // SBC A,[R1R0] : Subtract data memory contents and carry from ACC
 	{
-		LOGMASKED(LOG_UNHANDLED_OPS, "SBC A,[R1R0]");
+		u8 data = getr1r0_data();
+
+		u8 acc = getacc();
+		acc = acc + (15 - data) + getcarry();
+		if (acc & 0x10)
+			setcarry();
+		else
+			clearcarry();
+		setacc(acc);
+
 		return;
 	}
 
@@ -449,7 +536,16 @@ void ht1130_device::do_op()
 
 	case 0b00001011: // SUB A,[R1R0] : Subtract data memory contents from accumulator
 	{
-		LOGMASKED(LOG_UNHANDLED_OPS, "SUB A,[R1R0]");
+		u8 data = getr1r0_data();
+
+		u8 acc = getacc();
+		acc = acc + (15 - data) + 1;
+		if (acc & 0x10)
+			setcarry();
+		else
+			clearcarry();
+		setacc(acc);
+
 		return;
 	}
 
@@ -481,15 +577,8 @@ void ht1130_device::do_op()
 
 	case 0b01000000: // (with 4-bit immediate) : ADD A,XH : Add immediate data to the accumulator
 	{
-		u8 oprand = fetch();
-		if (!(oprand & 0xf0))
-		{
-			LOGMASKED(LOG_UNHANDLED_OPS, "ADD A,0x%02x", oprand);
-		}
-		else
-		{
-			LOGMASKED(LOG_UNHANDLED_OPS, "<ill %02x %02x>", inst, oprand);
-		}
+		u8 oprand = fetch() & 0x0f;
+		LOGMASKED(LOG_UNHANDLED_OPS, "ADD A,0x%02x", oprand);
 		return;
 	}
 
@@ -735,15 +824,8 @@ void ht1130_device::do_op()
 	// other Ops
 	case 0b01000101: // (with 4 bit immediate) : SOUND n : Activate SOUND channel n
 	{
-		u8 oprand = fetch();
-		if (!(oprand & 0xf0))
-		{
-			LOGMASKED(LOG_UNHANDLED_SOUND_OPS, "SOUND %d", oprand);
-		}
-		else
-		{
-			LOGMASKED(LOG_UNHANDLED_OPS, "<ill %02x %02x>", inst, oprand);
-		}
+		u8 oprand = fetch() & 0x0f;
+		LOGMASKED(LOG_UNHANDLED_SOUND_OPS, "SOUND %d", oprand);
 		return;
 	}
 
@@ -751,13 +833,13 @@ void ht1130_device::do_op()
 	case 0b00110111: // (with 00111110) : HALT Halt system clock
 	{
 		u8 oprand = fetch();
-		if (oprand == 0b00111110)
+		if (oprand == 0b00111110) // this is a 'NOP' must HALT always be followed by NOP to work?
 		{
 			LOGMASKED(LOG_UNHANDLED_OPS, "HALT");
 		}
 		else
 		{
-			LOGMASKED(LOG_UNHANDLED_OPS, "<ill %02x %02x>", inst, oprand);
+			LOGMASKED(LOG_UNHANDLED_OPS, "<ill HALT %02x %02x>", inst, oprand);
 		}
 		return;
 	}
@@ -765,7 +847,7 @@ void ht1130_device::do_op()
 	case 0b01000111: // (with 8-bit immediate) : TIMER XXH : Set immediate data to timer counter
 	{
 		u8 oprand = fetch();
-		LOGMASKED(LOG_UNHANDLED_OPS, "TIMER %02x", oprand);
+		settimer(oprand);
 		return;
 	}
 

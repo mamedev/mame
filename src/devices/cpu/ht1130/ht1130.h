@@ -65,8 +65,18 @@ private:
 	u8 getacc();
 	void setcarry();
 	void clearcarry();
+	u8 getcarry();
 	u8 getr1r0();
+	u8 getr1r0_data();
+	void setr1r0_data(u8 data);
 	u8 getr3r2();
+	u8 getr3r2_data();
+	void setr3r2_data(u8 data);
+	void settimer(u8 data);
+	void settimer_upper(u8 data);
+	void settimer_lower(u8 data);
+	u8 gettimer_upper();
+	u8 gettimer_lower();
 
 	inline u8 fetch();
 	void do_op();
