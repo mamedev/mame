@@ -22,7 +22,6 @@
       to 1 and doesn't work correctly.
     - Improve video emulation (offset, modes, etc.)
     - Floppy self-test fails (but works otherwise)
-    - Centronics
     - Modem
     - Soft power off/on
     - RAM contents should be retained when turning off
@@ -39,6 +38,7 @@
 
 #include "emu.h"
 
+#include "bus/centronics/ctronics.h"
 #include "cpu/z180/z180.h"
 #include "imagedev/floppy.h"
 #include "machine/rp5c01.h"
@@ -71,6 +71,7 @@ public:
 		m_buzzer(*this, "buzzer"),
 		m_fdc(*this, "fdc"),
 		m_floppy(*this, "fdc:0"),
+		m_centronics(*this, "centronics"),
 		m_lomem_view(*this, "lomem")
 	{ }
 
@@ -91,6 +92,7 @@ private:
 	required_device<beep_device> m_buzzer;
 	required_device<hd63266f_device> m_fdc;
 	required_device<floppy_connector> m_floppy;
+	required_device<centronics_device> m_centronics;
 	memory_view m_lomem_view;
 
 	uint8_t m_key_select;
@@ -103,6 +105,9 @@ private:
 	uint8_t m_cursor_ctrl;
 
 	bool m_fdc_drq;
+
+	bool m_centronics_busy;
+	bool m_centronics_select;
 
 	uint8_t m_mem_change;
 
@@ -133,6 +138,9 @@ private:
 	uint8_t fdc_data_r();
 	void fdc_data_w(uint8_t data);
 	int floppy_dskchg_r();
+
+	uint8_t cdcc_ctrl_r();
+	void cdcc_ctrl_w(uint8_t);
 
 	void mem_change_w(uint8_t data);
 	void bank_select_w(uint8_t data);
@@ -186,8 +194,8 @@ void pn8800fxb_state::io_map(address_map &map)
 	map(0xa8, 0xa8).mirror(0x07).nopr(); // "not used" - but read often
 	map(0xb0, 0xb0).mirror(0x07).portr("power");
 	map(0xb8, 0xb8).rw(FUNC(pn8800fxb_state::keyboard_r), FUNC(pn8800fxb_state::keyboard_w));
-	// c0-c7 cdcc data
-	// c8-cf cdcc control
+	map(0xc0, 0xc0).mirror(0x07).w("centronics_latch", FUNC(output_latch_device::write));
+	map(0xc8, 0xc8).mirror(0x07).rw(FUNC(pn8800fxb_state::cdcc_ctrl_r), FUNC(pn8800fxb_state::cdcc_ctrl_w));
 	map(0xd0, 0xdf).rw("rtc", FUNC(tc8521_device::read), FUNC(tc8521_device::write));
 	map(0xe0, 0xe0).mirror(0x07).w(FUNC(pn8800fxb_state::bank_select_w));
 	// e8-ef ga test
@@ -614,6 +622,31 @@ int pn8800fxb_state::floppy_dskchg_r()
 
 
 //**************************************************************************
+//  CDCC / CENTRONICS
+//**************************************************************************
+
+uint8_t pn8800fxb_state::cdcc_ctrl_r()
+{
+	// 7-------  centronics busy
+	// -6------  centronics select
+	// --54321-  not used
+	// -------0  centronics strobe (write)
+
+	uint8_t data = 0x3f;
+
+	data |= (!m_centronics_select) << 6;
+	data |= (!m_centronics_busy) << 7;
+
+	return data;
+}
+
+void pn8800fxb_state::cdcc_ctrl_w(uint8_t data)
+{
+	m_centronics->write_strobe(BIT(data, 0));
+}
+
+
+//**************************************************************************
 //  MACHINE EMULATION
 //**************************************************************************
 
@@ -674,6 +707,8 @@ void pn8800fxb_state::machine_start()
 	save_item(NAME(m_video_offset));
 	save_item(NAME(m_cursor_ctrl));
 	save_item(NAME(m_fdc_drq));
+	save_item(NAME(m_centronics_busy));
+	save_item(NAME(m_centronics_select));
 	save_item(NAME(m_mem_change));
 }
 
@@ -718,6 +753,14 @@ void pn8800fxb_state::pn8800fxb(machine_config &config)
 	m_fdc->drq_wr_callback().set(FUNC(pn8800fxb_state::fdc_drq_w));
 	m_fdc->inp_rd_callback().set(FUNC(pn8800fxb_state::floppy_dskchg_r));
 	FLOPPY_CONNECTOR(config, "fdc:0", hd_floppy, "35hd", floppy_image_device::default_pc_floppy_formats);
+
+	// centronics
+	output_latch_device &centronics_latch(OUTPUT_LATCH(config, "centronics_latch"));
+
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->set_output_latch(centronics_latch);
+	m_centronics->busy_handler().set([this](int state) { m_centronics_busy = bool(state); });
+	m_centronics->select_handler().set([this](int state) { m_centronics_select = bool(state); });
 
 	TC8521(config, "rtc", XTAL(32'768));
 	// alarm output connected to auto power-on
