@@ -397,23 +397,24 @@ TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info_text)
 
 	const u16 vram_tile = (m_textram[tile_index] & 0xffff);
 
-	if (vram_tile & 0x0100) flags |= TILE_FLIPX;
-	if (vram_tile & 0x8000) flags |= TILE_FLIPY;
+	if (BIT(vram_tile,  8)) flags |= TILE_FLIPX;
+	if (BIT(vram_tile, 15)) flags |= TILE_FLIPY;
 
 	tileinfo.set(0,
 			vram_tile & 0xff,
-			(vram_tile >> 9) & 0x3f,
+			BIT(vram_tile, 9, 6),
 			flags);
 }
 
 TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info_pixel)
 {
-	int col_off;
+
 	u8 flags = 0;
 	int y_offs = (m_control_1[5] & 0x1ff);
 	if (m_flipscreen) y_offs += 0x100;
 
 	/* Colour is shared with VRAM layer */
+	int col_off;
 	if ((((tile_index & 0x1f) * 8 + y_offs) & 0x1ff) > 0xff)
 		col_off = 0x800 + ((tile_index & 0x1f) << 6) + ((tile_index & 0xfe0) >> 5);
 	else
@@ -421,18 +422,17 @@ TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info_pixel)
 
 	const u16 vram_tile = (m_textram[col_off] & 0xffff);
 
-	if (vram_tile & 0x0100) flags |= TILE_FLIPX;
-	if (vram_tile & 0x8000) flags |= TILE_FLIPY;
+	if (BIT(vram_tile,  8)) flags |= TILE_FLIPX;
+	if (BIT(vram_tile, 15)) flags |= TILE_FLIPY;
 
 	tileinfo.set(1,
 			tile_index,
-			(vram_tile >> 9) & 0x3f,
+			BIT(vram_tile, 9, 6),
 			flags);
 }
 
 /******************************************************************************/
 
-//static bool bank2 = false;
 void taito_f3_state::screen_vblank(int state)
 {
 	if (state) {
@@ -446,8 +446,7 @@ void taito_f3_state::video_start()
 
 	m_spritelist = nullptr;
 	m_spriteram16_buffered = nullptr;
-	m_line_inf = nullptr;
-	// m_pf_line_inf = nullptr;
+	//m_line_inf = nullptr;
 	m_tile_opaque_sp = nullptr;
 
 	/* Setup individual game */
@@ -525,8 +524,8 @@ void taito_f3_state::video_start()
 	//m_line_inf = std::make_unique<f3_line_inf[]>(256);
 	m_screen->register_screen_bitmap(m_pri_alp_bitmap);
 	m_tile_opaque_sp = std::make_unique<u8[]>(m_gfxdecode->gfx(2)->elements());
-	for (int i = 0; i < 8; i++)
-		m_tile_opaque_pf[i] = std::make_unique<u8[]>(m_gfxdecode->gfx(3)->elements());
+	for (auto &tile_opaque : m_tile_opaque_pf)
+		tile_opaque = std::make_unique<u8[]>(m_gfxdecode->gfx(3)->elements());
 
 	m_vram_layer->set_transparent_pen(0);
 	m_pixel_layer->set_transparent_pen(0);
@@ -707,7 +706,7 @@ void taito_f3_state::lineram_w(offs_t offset, u16 data, u16 mem_mask)
 
 void taito_f3_state::palette_24bit_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	int r, g, b;
+	u8 r, g, b;
 
 	COMBINE_DATA(&m_paletteram32[offset]);
 
@@ -997,7 +996,7 @@ void taito_f3_state::draw_line(u32* dst, int y, int xs, int xe, sprite_inf* sp)
 		return;
 	const pen_t *clut = &m_palette->pen(0);
 	for (int x = xs; x < xe; x++) {
-		if (u16 col = sp->srcbitmap.pix(y, x)) // 0 = transparent
+		if (const u16 col = sp->srcbitmap.pix(y, x)) // 0 = transparent
 			dst[x] = clut[col];
 	}
 }
@@ -1006,7 +1005,7 @@ void taito_f3_state::draw_line(u32* dst, int y, int xs, int xe, playfield_inf* p
 	if (!pf->layer_enable())
 		return;
 	const pen_t *clut = &m_palette->pen(0);
-	int y_index = ((pf->reg_fx_y >> 16) + pf->colscroll) & 0x1ff;
+	const int y_index = ((pf->reg_fx_y >> 16) + pf->colscroll) & 0x1ff;
 	u32 fx_x = pf->reg_sx + pf->rowscroll + 10*pf->x_scale;
 	fx_x &= (m_width_mask << 16) | 0xffff;
 
@@ -1014,7 +1013,7 @@ void taito_f3_state::draw_line(u32* dst, int y, int xs, int xe, playfield_inf* p
 		int x_index = ((fx_x >> 16) + x) & m_width_mask;
 		if (!(pf->flagsbitmap->pix(y_index, x_index) & 0xf0))
 			continue;
-		if (u16 col = pf->srcbitmap->pix(y_index, x_index))
+		if (const u16 col = pf->srcbitmap->pix(y_index, x_index))
 			dst[x] = clut[col];
 	}
 }
@@ -1022,13 +1021,12 @@ void taito_f3_state::draw_line(u32* dst, int y, int xs, int xe, playfield_inf* p
 void taito_f3_state::draw_line(u32* dst, int y, int xs, int xe, pivot_inf* pv)
 {
 	const pen_t *clut = &m_palette->pen(0);
-	auto srcbitmap = pv->use_pix() ? pv->srcbitmap_pixel : pv->srcbitmap_vram;
-	auto flagsbitmap = pv->use_pix() ? pv->flagsbitmap_pixel :
-	pv->flagsbitmap_vram;
+	const auto *srcbitmap = pv->use_pix() ? pv->srcbitmap_pixel : pv->srcbitmap_vram;
+	const auto *flagsbitmap = pv->use_pix() ? pv->flagsbitmap_pixel : pv->flagsbitmap_vram;
 	const u16 height_mask = pv->use_pix() ? 0xff : 0x1ff;
 	const u16 width_mask = 0x1ff;
 
-	int y_index = (pv->reg_sy + y) & height_mask;
+	const int y_index = (pv->reg_sy + y) & height_mask;
 
 	for (int x = xs; x < xe; x++) {
 		int x_index = (pv->reg_sx + x) & width_mask;
@@ -1055,9 +1053,9 @@ void taito_f3_state::scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cl
 
 	// acquire sprite rendering layers, playfield tilemaps, playfield scroll
 	f3_line_inf line_data{};
-	for (int sp = 0; sp < NUM_SPRITEGROUPS; ++sp) {
+	for (auto &spgroup : line_data.sp) {
 		// aaa why are you making a new one every time...
-		line_data.sp[sp].srcbitmap = bitmap_ind16(bitmap.width(), bitmap.height());
+		spgroup.srcbitmap = bitmap_ind16(bitmap.width(), bitmap.height());
 	}
 	for (int pf = 0; pf < NUM_PLAYFIELDS; ++pf) {
 		int tmap_number = pf + line_data.pf[pf].alt_tilemap * 2;
@@ -1085,10 +1083,9 @@ void taito_f3_state::scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cl
 		myclip = cliprect;
 		myclip &= m_pri_alp_bitmap.cliprect();
 
-		const tempsprite *sprite_ptr;
 		gfx_element *sprite_gfx = m_gfxdecode->gfx(2);
 
-		sprite_ptr = m_sprite_end;
+		const tempsprite *sprite_ptr = m_sprite_end;
 		while (sprite_ptr != &m_spritelist[0])
 		{
 			sprite_ptr--;
@@ -1124,9 +1121,8 @@ void taito_f3_state::scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cl
 
 		if (y != y_start) {
 			// update registers
-			for (int pf = 0; pf < NUM_PLAYFIELDS; ++pf) {
-				auto p = &line_data.pf[pf];
-				p->reg_fx_y += p->y_scale << 9;
+			for (auto &pf : line_data.pf) {
+				pf.reg_fx_y += pf.y_scale << 9;
 			}
 		}
 	}
@@ -1137,39 +1133,40 @@ void taito_f3_state::scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cl
 
 inline void taito_f3_state::f3_drawgfx(bitmap_ind16 &dest_bmp, const rectangle &myclip, gfx_element *gfx, const tempsprite &sprite)
 {
-	if (gfx)
-	{
-		const u8 *code_base = gfx->get_data(sprite.code % gfx->elements());
+	if (gfx == nullptr)
+		return;
 
-		//logerror("sprite draw at %f %f size %f %f\n", sprite.x/16.0, sprite.y/16.0, sprite.zoomx/16.0, sprite.zoomy/16.0);
-		u8 flipx = sprite.flipx ? 0xF : 0;
-		u8 flipy = sprite.flipy ? 0xF : 0;
+	const u8 *code_base = gfx->get_data(sprite.code % gfx->elements());
 
-		fixed8 dy8 = (sprite.y << 4);
-		if (!m_flipscreen)
-			dy8 += 255; // round up in non-flipscreen mode?    mayybe flipscreen coordinate adjustments should be done after all this math, during final rendering?. anyway:  testcases for vertical scaling: elvactr mission # text (non-flipscreen), kaiserknj attract mode first text line (flipscreen)
-		for (u8 y=0; y<16; y++) {
-			int dy = dy8 >> 8;
-			dy8 += sprite.zoomy;
-			if (dy < myclip.min_y || dy > myclip.max_y)
+	//logerror("sprite draw at %f %f size %f %f\n", sprite.x/16.0, sprite.y/16.0, sprite.zoomx/16.0, sprite.zoomy/16.0);
+	const u8 flipx = sprite.flipx ? 0xF : 0;
+	const u8 flipy = sprite.flipy ? 0xF : 0;
+
+	fixed8 dy8 = (sprite.y << 4);
+	if (!m_flipscreen)
+		dy8 += 255; // round up in non-flipscreen mode?    mayybe flipscreen coordinate adjustments should be done after all this math, during final rendering?. anyway:  testcases for vertical scaling: elvactr mission # text (non-flipscreen), kaiserknj attract mode first text line (flipscreen)
+	for (u8 y = 0; y < 16; y++) {
+		const int dy = dy8 >> 8;
+		dy8 += sprite.zoomy;
+		if (dy < myclip.min_y || dy > myclip.max_y)
+			continue;
+		u8 *pri = &m_pri_alp_bitmap.pix(dy);
+		u16* dest = &dest_bmp.pix(dy);
+		auto src = &code_base[(y ^ flipy) * 16];
+
+		fixed8 dx8 = (sprite.x << 4) + 128; // 128 is ½ in fixed.8
+		for (u8 x = 0; x < 16; x++) {
+			const int dx = dx8 >> 8;
+			dx8 += sprite.zoomx;
+			// is this necessary with the large margins outside visarea?
+			if (dx < myclip.min_x || dx > myclip.max_x)
 				continue;
-			u8 *pri = &m_pri_alp_bitmap.pix(dy);
-			u16* dest = &dest_bmp.pix(dy);
-			auto src = &code_base[(y ^ flipy)*16];
-
-			fixed8 dx8 = (sprite.x << 4) + 128; // 128 is ½ in fixed.8
-			for (u8 x=0; x<16; x++) {
-				int dx = dx8 >> 8;
-				dx8 += sprite.zoomx;
-				if (dx < myclip.min_x || dx > myclip.max_x)
-					continue;
-				if (dx == dx8 >> 8) // if the next pixel would be in the same column, skip this one
-					continue;
-				int c = src[(x ^ flipx)] & m_sprite_pen_mask;
-				if (c && !pri[dx]) {
-					dest[dx] = gfx->colorbase() + (sprite.color<<4 | c);
-					pri[dx] = 1;
-				}
+			if (dx == dx8 >> 8) // if the next pixel would be in the same column, skip this one
+				continue;
+			const auto c = src[(x ^ flipx)] & m_sprite_pen_mask;
+			if (c && !pri[dx]) {
+				dest[dx] = gfx->colorbase() + (sprite.color<<4 | c);
+				pri[dx] = 1;
 			}
 		}
 	}
@@ -1223,7 +1220,7 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 	tempsprite *sprite_ptr = &m_spritelist[0];
 	int total_sprites = 0;
 
-	for (int offs = 0; offs < 0x400 && (total_sprites < 0x400); offs++)
+	for (u32 offs = 0; offs < 0x400 && (total_sprites < 0x400); offs++)
 	{
 		int bank = m_sprite_bank ? 0x4000 : 0;
 		const u16 *spr = &spriteram16_ptr[bank + (offs * 8)];
@@ -1265,26 +1262,26 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 			m_sprite_bank = BIT(cntrl, 0);
 		}
 
-		u8 spritecont = spr[4] >> 8;
-		bool lock = BIT(spritecont, 2);
+		const u8 spritecont = spr[4] >> 8;
+		const bool lock = BIT(spritecont, 2);
 		if (!lock)
 			color = spr[4] & 0xFF;
-		u8 scroll_mode = BIT(spr[2], 12, 4);
-		u16 zooms = spr[1];
+		const u8 scroll_mode = BIT(spr[2], 12, 4);
+		const u16 zooms = spr[1];
 		x.update(scroll_mode, spr[2] & 0xFFF, lock, BIT(spritecont, 4+2, 2), zooms & 0xFF);
 		y.update(scroll_mode, spr[3] & 0xFFF, lock, BIT(spritecont, 4+0, 2), zooms >> 8);
 
 		const int tile = spr[0] | (BIT(spr[5], 0) << 16);
 		if (!tile) continue;
 
-		fixed4 tx = m_flipscreen ? (512<<4) - x.block_size - x.pos : x.pos;
-		fixed4 ty = m_flipscreen ? (256<<4) - y.block_size - y.pos : y.pos;
+		const fixed4 tx = m_flipscreen ? (512<<4) - x.block_size - x.pos : x.pos;
+		const fixed4 ty = m_flipscreen ? (256<<4) - y.block_size - y.pos : y.pos;
 
 		if (tx + x.block_size <= visarea.min_x<<4 || tx > visarea.max_x<<4 || ty + y.block_size <= visarea.min_y<<4 || ty > visarea.max_y<<4)
 			continue;
 
-		bool flipx = BIT(spritecont, 0);
-		bool flipy = BIT(spritecont, 1);
+		const bool flipx = BIT(spritecont, 0);
+		const bool flipy = BIT(spritecont, 1);
 		//multi = BIT(spritecont, 3);
 
 		sprite_ptr->x = tx;

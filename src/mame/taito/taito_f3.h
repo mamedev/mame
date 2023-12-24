@@ -240,7 +240,7 @@ protected:
 		bitmap_ind16* srcbitmap;
 		bitmap_ind8*  flagsbitmap;
 
-		int colscroll;        // 4000
+		u16 colscroll;        // 4000
 		bool alt_tilemap;     // 4000
 		bool x_sample_enable; // 6400 x_sample_mask
 		u8 x_scale;           // 8000
@@ -302,7 +302,7 @@ protected:
 	std::unique_ptr<tempsprite[]> m_spritelist;
 	const tempsprite *m_sprite_end = nullptr;
 	bool m_sprite_bank = 0;
-	std::unique_ptr<f3_line_inf[]> m_line_inf;
+	//f3_line_inf m_line_inf;
 	const F3config *m_game_config = nullptr;
 
 	u16 pf_ram_r(offs_t offset);
