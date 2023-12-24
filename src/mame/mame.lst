@@ -18730,9 +18730,6 @@ gameking                        //
 @source:handheld/gmaster.cpp
 gmaster                         // Hartung Gamemaster
 
-@source:handheld/ht1130_brickgame.cpp
-brke23p2
-
 @source:handheld/hh_cop400.cpp
 bshipg                          // Milton Bradley
 comparca                        // Tandy Corporation
@@ -18809,6 +18806,9 @@ tmtron                          // Tomy
 vinvader                        // VTech
 wantgman                        // Actronics / Hanzawa
 zackman                         // Bandai
+
+@source:handheld/hh_ht1130.cpp
+brke23p2
 
 @source:handheld/hh_melps4.cpp
 cfrogger                        // Coleco

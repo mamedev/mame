@@ -58,4 +58,4 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 200?, brke23p2, 0, 0, ht1130_brickgame, ht1130_brickgame, ht1130_brickgame_state, empty_init, "<unknown>", "E23 Plus Mark II 96-in-1", MACHINE_IS_SKELETON )
+CONS( 200?, brke23p2, 0, 0, ht1130_brickgame, ht1130_brickgame, ht1130_brickgame_state, empty_init, "<unknown>", "Brick Game 96 in 1 (E-23 Plus Mark II)", MACHINE_IS_SKELETON )
