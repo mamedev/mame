@@ -38453,6 +38453,9 @@ cp2000
 @source:saitek/delta1.cpp
 ccdelta1
 
+@source:saitek/edames.cpp
+edames
+
 @source:saitek/exechess.cpp
 exechess
 
