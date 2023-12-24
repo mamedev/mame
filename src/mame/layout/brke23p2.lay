@@ -17,30 +17,122 @@ license:CC0-1.0
 	<view name="Internal Layout">
 
 		<repeat count="12">
-			<param name="s" start="0" increment="8" />
+			<param name="s" start="128" increment="8" />
 			<param name="y" start="0" increment="8" />
 			<repeat count="8">
-				<param name="n" start="~s~" increment="1" />
+				<param name="segnum" start="~s~" increment="1" />
 				<param name="x" start="0" increment="8" />
-				<element name="seg~n~" ref="segment" state="0">
+				<element name="seg~segnum~" ref="segment" state="0">
 					<bounds x="~x~" y="~y~" width="7" height="7"/>
 				</element>
 			</repeat>
 		</repeat>
 
-		<!-- right hand side of the pit -->
+
+
+
+
+		<!-- left 8 columns of the pit -->
 		<repeat count="20">
-			<param name="s" start="96" increment="8" />
+			<param name="s" start="224" increment="8" />
 			<param name="y" start="0" increment="8" />
 			<repeat count="8">
-				<param name="n" start="~s~" increment="1" />
-				<param name="x" start="100" increment="8" />
-				<element name="seg~n~" ref="segment" state="0">
+				<param name="segnum" start="~s~" increment="1" />
+				<param name="x" start="180" increment="-8" />
+				<element name="seg~segnum~" ref="segment" state="0">
 					<bounds x="~x~" y="~y~" width="7" height="7"/>
 				</element>
 			</repeat>
 		</repeat>
 		
+		<!-- 8 rows of the 9th column -->
+		<repeat count="8">
+			<param name="segnum" start="144" increment="8" />
+			<param name="y" start="32" increment="8" />
+		
+			<element name="seg~segnum~" ref="segment" state="0">
+				<bounds x="190" y="~y~" width="7" height="7"/>
+			</element>
+		</repeat>	
+	
+		<!-- more 9th column -->
+		<element name="seg218" ref="segment" state="0">
+			<bounds x="190" y="96" width="7" height="7"/>
+		</element>		
+		
+		<element name="seg216" ref="segment" state="0">
+			<bounds x="190" y="104" width="7" height="7"/>
+		</element>		
+		
+		<element name="seg217" ref="segment" state="0">
+			<bounds x="190" y="112" width="7" height="7"/>
+		</element>		
+		
+		<element name="seg219" ref="segment" state="0">
+			<bounds x="190" y="120" width="7" height="7"/>
+		</element>		
+		
+		<element name="seg220" ref="segment" state="0">
+			<bounds x="190" y="128" width="7" height="7"/>
+		</element>	
+	
+		<element name="seg221" ref="segment" state="0">
+			<bounds x="190" y="136" width="7" height="7"/>
+		</element>		
+	
+		<element name="seg223" ref="segment" state="0">
+			<bounds x="190" y="144" width="7" height="7"/>
+		</element>		
+		
+		<element name="seg222" ref="segment" state="0">
+			<bounds x="190" y="152" width="7" height="7"/>
+		</element>		
+	
+	
+		<!-- 8 rows of the 10th column -->
+		<repeat count="8">
+			<param name="segnum" start="145" increment="8" />
+			<param name="y" start="32" increment="8" />
+		
+			<element name="seg~segnum~" ref="segment" state="0">
+				<bounds x="198" y="~y~" width="7" height="7"/>
+			</element>
+		</repeat>	
+	
+		<!-- more 10th column -->
+		<element name="seg210" ref="segment" state="0">
+			<bounds x="198" y="96" width="7" height="7"/>
+		</element>	
+		
+		<element name="seg208" ref="segment" state="0">
+			<bounds x="198" y="104" width="7" height="7"/>
+		</element>			
+		
+		<element name="seg209" ref="segment" state="0">
+			<bounds x="198" y="112" width="7" height="7"/>
+		</element>		
+		
+		<element name="seg211" ref="segment" state="0">
+			<bounds x="198" y="120" width="7" height="7"/>
+		</element>		
+		
+		<element name="seg212" ref="segment" state="0">
+			<bounds x="198" y="128" width="7" height="7"/>
+		</element>	
+	
+		<element name="seg213" ref="segment" state="0">
+			<bounds x="198" y="136" width="7" height="7"/>
+		</element>		
+	
+		<element name="seg215" ref="segment" state="0">
+			<bounds x="198" y="144" width="7" height="7"/>
+		</element>		
+		
+		<element name="seg214" ref="segment" state="0">
+			<bounds x="198" y="152" width="7" height="7"/>
+		</element>		
+	
+
 	</view>
 
 </mamelayout>

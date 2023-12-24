@@ -168,10 +168,10 @@ void ht1130_device::setr3r2_data(u8 data)
 
 void ht1130_device::internal_data_map(address_map &map)
 {
-	map(0x00, 0xbf).ram().w(FUNC(ht1130_device::tempram_w)).share("tempram");
+	map(0x00, 0x9f).ram().w(FUNC(ht1130_device::tempram_w)).share("tempram");
 
 	// the ht1130 is meant to have displayram from 0xe0, so this could be a newer chip?
-	map(0xc0, 0xff).ram().w(FUNC(ht1130_device::displayram_w)).share("displayram");
+	map(0xa0, 0xff).ram().w(FUNC(ht1130_device::displayram_w)).share("displayram");
 }
 
 void ht1130_device::device_start()

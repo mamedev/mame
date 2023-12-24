@@ -91,7 +91,7 @@ u8 ht1130_brickgame_state::port_pp_r()
 
 void ht1130_brickgame_state::ht1130_brickgame(machine_config &config)
 {
-	HT1130(config, m_maincpu, 1000000/4); // frequency?
+	HT1130(config, m_maincpu, 1000000/8); // frequency?
 	m_maincpu->display_offset_out_cb().set(FUNC(ht1130_brickgame_state::display_offset_w));
 	m_maincpu->display_data_out_cb().set(FUNC(ht1130_brickgame_state::display_data_w));
 
