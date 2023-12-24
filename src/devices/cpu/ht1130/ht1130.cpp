@@ -1,6 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
+/*
+
+	TODO:
+	Interrupts (not used by brke23p2)
+	Sound (needs internal frequency ROM data?)
+	IO wake-up from HALT etc.
+
+*/
+
 #include "emu.h"
 #include "ht1130.h"
 #include "ht1130d.h"
@@ -362,20 +371,6 @@ void ht1130_device::do_op()
 		return;
 	}
 
-	case 0b00111011: // MOV A,TMRH : Move timer high nibble to accumulator
-	{
-		u8 data = gettimer_upper();
-		setacc(data);
-		return;
-	}
-
-	case 0b00111010: // MOV A,TMRL : Move timer low nibble to accumulator
-	{
-		u8 data = gettimer_lower();
-		setacc(data);
-		return;
-	}
-
 	case 0b00000100: // MOV A,[R1R0] : Move data memory to accumulator
 	{
 		u8 data = getr1r0_data();
@@ -387,20 +382,6 @@ void ht1130_device::do_op()
 	{
 		u8 data = getr3r2_data();
 		setacc(data);
-		return;
-	}
-
-	case 0b00111101: // MOV TMRH,A : Move accumulator to timer high nibble
-	{
-		u8 acc = getacc();
-		settimer_upper(acc);
-		return;
-	}
-
-	case 0b00111100: // MOV TMRL,A : Move accumulator to timer low nibble
-	{
-		u8 acc = getacc();
-		settimer_lower(acc);
 		return;
 	}
 
@@ -449,37 +430,37 @@ void ht1130_device::do_op()
 
 	case 0b01001110: // READ MR0A : Read ROM code of current page to M(R1,R0) and ACC
 	{
-		LOGMASKED(LOG_UNHANDLED_OPS, "READ MR0A");
+		u16 dataddress = (m_pc & 0xf00) | (getacc() << 4) | (getreg(4));
+		u8 data = space(AS_PROGRAM).read_byte(dataddress);
+		setr1r0_data((data >> 4) & 0xf);
+		setacc(data & 0xf);
 		return;
 	}
 
 	case 0b01001100: // READ R4A : Read ROM code of current page to R4 and accumulator
 	{
-		LOGMASKED(LOG_UNHANDLED_OPS, "READ R4A");
+		u16 dataddress = (m_pc & 0xf00) | (getacc() << 4) | (getr1r0_data());
+		u8 data = space(AS_PROGRAM).read_byte(dataddress);
+		setreg(4, (data >> 4) & 0xf);
+		setacc(data & 0xf);
 		return;
 	}
 
 	case 0b01001111: // READF MR0A : Read ROM Code of page F to M(R1,R0) and ACC
 	{
-		LOGMASKED(LOG_UNHANDLED_OPS, "READF MR0A");
+		u16 dataddress = 0xf00 | (getacc() << 4) | (getreg(4));
+		u8 data = space(AS_PROGRAM).read_byte(dataddress);
+		setr1r0_data((data >> 4) & 0xf);
+		setacc(data & 0xf);
 		return;
 	}
 
 	case 0b01001101: // READF R4A : Read ROM code of page F to R4 and accumulator
 	{
-		LOGMASKED(LOG_UNHANDLED_OPS, "READF R4A");
-		return;
-	}
-
-	case 0b00101110: // RET : Return from subroutine or interrupt
-	{
-		LOGMASKED(LOG_UNHANDLED_OPS, "RET");
-		return;
-	}
-
-	case 0b00101111: // RETI : Return from interrupt subroutine
-	{
-		LOGMASKED(LOG_UNHANDLED_OPS, "RETI");
+		u16 dataddress = 0xf00 | (getacc() << 4) | (getr1r0_data());
+		u8 data = space(AS_PROGRAM).read_byte(dataddress);
+		setreg(4, (data >> 4) & 0xf);
+		setacc(data & 0xf);
 		return;
 	}
 
@@ -709,7 +690,9 @@ void ht1130_device::do_op()
 		return;
 	}
 
-	// dual move ops
+	///////////////////////////////////////////////////////////////////////////////////////
+	// 2 reg Move ops
+	///////////////////////////////////////////////////////////////////////////////////////
 
 	//case 0b0101dddd: // (with 4-bit immediate) : MOV R1R0,XXH : Move immediate data to R1 and R0
 	case 0b01010000: case 0b01010001: case 0b01010010: case 0b01010011:
@@ -735,7 +718,9 @@ void ht1130_device::do_op()
 		return;
 	}
 
-	// Jump / Call opcodes with full addresses
+	///////////////////////////////////////////////////////////////////////////////////////
+	// Jump / Call Ops (full address)
+	///////////////////////////////////////////////////////////////////////////////////////
 
 	// case 0b1111aaaa: // (with 8-bit immediate) : CALL address : Subroutine call
 	case 0b11110000: case 0b11110001: case 0b11110010: case 0b11110011:
@@ -745,7 +730,8 @@ void ht1130_device::do_op()
 	{
 		u8 oprand = fetch();
 		uint16_t fulladdr = ((inst & 0x0f) << 8) | oprand;
-		LOGMASKED(LOG_UNHANDLED_OPS, "CALL %03x", fulladdr);
+		m_stackaddr = m_pc;
+		m_pc = fulladdr;
 		return;
 	}
 
@@ -757,11 +743,13 @@ void ht1130_device::do_op()
 	{
 		u8 oprand = fetch();
 		uint16_t fulladdr = ((inst & 0x0f) << 8) | oprand;
-		LOGMASKED(LOG_UNHANDLED_OPS, "JMP %03x", fulladdr);
+		m_pc = fulladdr;
 		return;
 	}
 
-	// Jump / Call opcodes with partial address
+	///////////////////////////////////////////////////////////////////////////////////////
+	// Jump / Call Ops (partial address)
+	///////////////////////////////////////////////////////////////////////////////////////
 
 	// case 0b11000aaa: (with 8-bit immediate) : JC address : Jump if carry is set
 	case 0b11000000: case 0b11000001: case 0b11000010: case 0b11000011:
@@ -769,7 +757,10 @@ void ht1130_device::do_op()
 	{
 		u8 oprand = fetch();
 		uint16_t fulladdr = ((inst & 0x07) << 8) | oprand | (m_pc & 0x800);
-		LOGMASKED(LOG_UNHANDLED_OPS, "JC %03x", fulladdr);
+
+		if (getcarry())
+			m_pc = fulladdr;
+
 		return;
 	}
 
@@ -779,7 +770,10 @@ void ht1130_device::do_op()
 	{
 		u8 oprand = fetch();
 		uint16_t fulladdr = ((inst & 0x07) << 8) | oprand | (m_pc & 0x800);
-		LOGMASKED(LOG_UNHANDLED_OPS, "JNC %03x", fulladdr);
+
+		if (!getcarry())
+			m_pc = fulladdr;
+
 		return;
 	}
 
@@ -789,7 +783,10 @@ void ht1130_device::do_op()
 	{
 		u8 oprand = fetch();
 		uint16_t fulladdr = ((inst & 0x07) << 8) | oprand | (m_pc & 0x800);
-		LOGMASKED(LOG_UNHANDLED_OPS, "JNZ A,%03x", fulladdr);
+
+		if (getacc())
+			m_pc = fulladdr;
+
 		return;
 	}
 
@@ -799,7 +796,10 @@ void ht1130_device::do_op()
 	{
 		u8 oprand = fetch();
 		uint16_t fulladdr = ((inst & 0x07) << 8) | oprand | (m_pc & 0x800);
-		LOGMASKED(LOG_UNHANDLED_OPS, "JNZ R0,%03x", fulladdr);
+
+		if (getreg(0))
+			m_pc = fulladdr;
+
 		return;
 	}
 
@@ -809,7 +809,10 @@ void ht1130_device::do_op()
 	{
 		u8 oprand = fetch();
 		uint16_t fulladdr = ((inst & 0x07) << 8) | oprand | (m_pc & 0x800);
-		LOGMASKED(LOG_UNHANDLED_OPS, "JNZ R1,%03x", fulladdr);
+
+		if (getreg(1))
+			m_pc = fulladdr;
+
 		return;
 	}
 
@@ -819,7 +822,10 @@ void ht1130_device::do_op()
 	{
 		u8 oprand = fetch();
 		uint16_t fulladdr = ((inst & 0x07) << 8) | oprand | (m_pc & 0x800);
-		LOGMASKED(LOG_UNHANDLED_OPS, "JNZ R4,%03x", fulladdr);
+
+		if (getreg(4))
+			m_pc = fulladdr;
+
 		return;
 	}
 
@@ -829,7 +835,12 @@ void ht1130_device::do_op()
 	{
 		u8 oprand = fetch();
 		uint16_t fulladdr = ((inst & 0x07) << 8) | oprand | (m_pc & 0x800);
-		LOGMASKED(LOG_UNHANDLED_OPS, "JTMR %03x", fulladdr);
+
+		if (m_timerover)
+		{
+			m_pc = fulladdr;
+			m_timerover = 0;
+		}
 		return;
 	}
 
@@ -839,7 +850,10 @@ void ht1130_device::do_op()
 	{
 		u8 oprand = fetch();
 		uint16_t fulladdr = ((inst & 0x07) << 8) | oprand | (m_pc & 0x800);
-		LOGMASKED(LOG_UNHANDLED_OPS, "JZ A,%03x", fulladdr);
+
+		if (!getacc())
+			m_pc = fulladdr;
+
 		return;
 	}
 
@@ -856,25 +870,62 @@ void ht1130_device::do_op()
 		u8 oprand = fetch();
 		uint16_t fulladdr = ((inst & 0x07) << 8) | oprand | (m_pc & 0x800);
 		uint8_t bit = (inst & 0x18) >> 3;
-		LOGMASKED(LOG_UNHANDLED_OPS, "JA%d %03x", bit, fulladdr);
+
+		if (getacc() & (1<<bit))
+			m_pc = fulladdr;
+
 		return;
 	}
 
-	// other Ops
+	///////////////////////////////////////////////////////////////////////////////////////
+	// Return Ops
+	///////////////////////////////////////////////////////////////////////////////////////
 
-
-
-	case 0b00110111: // (with 00111110) : HALT : Halt system clock
+	case 0b00101110: // RET : Return from subroutine or interrupt
 	{
-		u8 oprand = fetch();
-		if (oprand == 0b00111110) // this is a 'NOP' must HALT always be followed by NOP to work?
-		{
-			m_inhalt = 1;
-		}
+		m_pc = m_stackaddr;
+		return;
+	}
+
+	case 0b00101111: // RETI : Return from interrupt subroutine
+	{
+		m_pc = m_stackaddr;
+		if (m_stackcarry)
+			setcarry();
 		else
-		{
-			LOGMASKED(LOG_UNHANDLED_OPS, "<ill HALT %02x %02x>", inst, oprand);
-		}
+			clearcarry();
+		return;
+	}
+
+	///////////////////////////////////////////////////////////////////////////////////////
+	// Timer Ops
+	///////////////////////////////////////////////////////////////////////////////////////
+
+	case 0b00111011: // MOV A,TMRH : Move timer high nibble to accumulator
+	{
+		u8 data = gettimer_upper();
+		setacc(data);
+		return;
+	}
+
+	case 0b00111010: // MOV A,TMRL : Move timer low nibble to accumulator
+	{
+		u8 data = gettimer_lower();
+		setacc(data);
+		return;
+	}
+
+	case 0b00111101: // MOV TMRH,A : Move accumulator to timer high nibble
+	{
+		u8 acc = getacc();
+		settimer_upper(acc);
+		return;
+	}
+
+	case 0b00111100: // MOV TMRL,A : Move accumulator to timer low nibble
+	{
+		u8 acc = getacc();
+		settimer_lower(acc);
 		return;
 	}
 
@@ -917,6 +968,24 @@ void ht1130_device::do_op()
 	{
 		u8 oprand = fetch() & 0x0f;
 		LOGMASKED(LOG_UNHANDLED_SOUND_OPS, "SOUND %d", oprand);
+		return;
+	}
+
+	///////////////////////////////////////////////////////////////////////////////////////
+	// other Ops
+	///////////////////////////////////////////////////////////////////////////////////////
+
+	case 0b00110111: // (with 00111110) : HALT : Halt system clock
+	{
+		u8 oprand = fetch();
+		if (oprand == 0b00111110) // this is a 'NOP' must HALT always be followed by NOP to work?
+		{
+			m_inhalt = 1;
+		}
+		else
+		{
+			LOGMASKED(LOG_UNHANDLED_OPS, "<ill HALT %02x %02x>", inst, oprand);
+		}
 		return;
 	}
 
