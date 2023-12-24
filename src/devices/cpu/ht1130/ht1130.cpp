@@ -34,6 +34,8 @@ ht1130_device::ht1130_device(const machine_config &mconfig, const char *tag, dev
 	, m_port_in_ps(*this, 0xff)
 	, m_port_in_pp(*this, 0xff)
 	, m_port_out_pa(*this)
+	, m_display_offset_out(*this)
+	, m_display_data_out(*this)
 {
 }
 
@@ -63,7 +65,10 @@ void ht1130_device::tempram_w(offs_t offset, u8 data)
 void ht1130_device::displayram_w(offs_t offset, u8 data)
 {
 	m_displayram[offset] = data & 0xf;
-	// notify external?
+
+	// there might be a better way to do this
+	m_display_offset_out(offset);
+	m_display_data_out(m_displayram[offset]);
 }
 
 void ht1130_device::setreg(u8 which, u8 data)
@@ -164,7 +169,9 @@ void ht1130_device::setr3r2_data(u8 data)
 void ht1130_device::internal_data_map(address_map &map)
 {
 	map(0x00, 0x7f).ram().w(FUNC(ht1130_device::tempram_w)).share("tempram");
-	map(0xe0, 0xff).ram().w(FUNC(ht1130_device::displayram_w)).share("displayram");
+
+	// the ht1130 is meant to have displayram from 0xe0, so this could be a newer chip?
+	map(0x80, 0xff).ram().w(FUNC(ht1130_device::displayram_w)).share("displayram");
 }
 
 void ht1130_device::device_start()
