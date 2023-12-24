@@ -2258,6 +2258,25 @@ ROM_START( jjokeri )
 ROM_END
 
 
+/*
+  Simply the Best
+  CZ750, V1.00
+  2001, Kajot.
+
+*/
+ROM_START( simpbest )
+	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
+	ROM_LOAD16_WORD_SWAP( "27c4002.ic23", 0x00000, 0x80000, CRC(ceae7862) SHA1(862baf3312c5076910d001a834661197ca45b766) )
+
+	ROM_REGION( 0x2000, "pic87c571", 0 )  // undumped
+	ROM_LOAD("pic87c571.bin",   0x0000, 0x2000, NO_DUMP )
+
+	ROM_REGION( 0x0100, "sereeprom", 0 )  // Serial EPROM
+	ROM_LOAD16_WORD_SWAP("24c04a.ic27", 0x0000, 0x0100, CRC(3189844c) SHA1(cc017f44d9db92da85c96be750ccec7ee32e5972) )
+	ROM_CONTINUE(                       0x0000, 0x0100)  // discarding 1nd half test pattern filled
+ROM_END
+
+
 } // anonymous namespace
 
 
@@ -2291,3 +2310,5 @@ GAME(  1993, kajotcrd,   0,        hotslots,       magicard,  hotslots_state, em
 
 GAME(  1991, lucky7x,    lucky7i,  magicard,       lucky7i,   magicard_state, empty_init, ROT0, "Impera",    "Lucky 7 (Impera, V04/91a, set 2)",           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAMEL( 1991, jjokeri,    0,        magicard,       jjokeri,   magicard_state, empty_init, ROT0, "Impera",    "Jolly Joker? (Impera, V11/90b)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,  layout_magicard )
+
+GAME(  2001, simpbest,   0,        magicle,        hotslots,  hotslots_state, empty_init, ROT0, "Kajot",     "Simply the Best (CZ750, v1.0)",              MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
