@@ -3,10 +3,10 @@
 
 /*
 
-	TODO:
-	Interrupts (not used by brke23p2)
-	Sound (needs internal frequency ROM data?)
-	IO wake-up from HALT etc.
+    TODO:
+    Interrupts (not used by brke23p2)
+    Sound (needs internal frequency ROM data?)
+    IO wake-up from HALT etc.
 
 */
 

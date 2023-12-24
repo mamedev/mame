@@ -21,7 +21,9 @@ public:
 	ht1130_brickgame_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_seg(*this, "seg%u", 0U)
+		m_seg(*this, "seg%u", 0U),
+		m_in1(*this, "IN1"),
+		m_in2(*this, "IN2")
 	{ }
 
 	void ht1130_brickgame(machine_config &config);
@@ -32,16 +34,18 @@ protected:
 
 private:
 	required_device<ht1130_device> m_maincpu;
+	output_finder<512> m_seg;
+	required_ioport m_in1;
+	required_ioport m_in2;
 
-	void display_offset_w(uint8_t data);
-	void display_data_w(uint8_t data);
+	void display_offset_w(u8 data);
+	void display_data_w(u8 data);
 
 	u8 port_pm_r();
 	u8 port_ps_r();
 	u8 port_pp_r();
 
 	u8 m_displayoffset = 0;
-	output_finder<512> m_seg;
 };
 
 void ht1130_brickgame_state::machine_start()
@@ -66,12 +70,12 @@ static INPUT_PORTS_START( ht1130_brickgame )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Left")
 INPUT_PORTS_END
 
-void ht1130_brickgame_state::display_offset_w(uint8_t data)
+void ht1130_brickgame_state::display_offset_w(u8 data)
 {
 	m_displayoffset = data;
 }
 
-void ht1130_brickgame_state::display_data_w(uint8_t data)
+void ht1130_brickgame_state::display_data_w(u8 data)
 {
 	for (int i = 0; i < 4; i++)
 	{
@@ -81,12 +85,12 @@ void ht1130_brickgame_state::display_data_w(uint8_t data)
 
 u8 ht1130_brickgame_state::port_ps_r()
 {
-	return ioport("IN1")->read() & 0xf;
+	return m_in1->read() & 0xf;
 }
 
 u8 ht1130_brickgame_state::port_pp_r()
 {
-	return ioport("IN2")->read() & 0xf;
+	return m_in2->read() & 0xf;
 }
 
 void ht1130_brickgame_state::ht1130_brickgame(machine_config &config)
@@ -111,4 +115,4 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 200?, brke23p2, 0, 0, ht1130_brickgame, ht1130_brickgame, ht1130_brickgame_state, empty_init, "<unknown>", "Brick Game 96 in 1 (E-23 Plus Mark II)", MACHINE_IS_SKELETON )
+CONS( 200?, brke23p2, 0, 0, ht1130_brickgame, ht1130_brickgame, ht1130_brickgame_state, empty_init, "<unknown>", "Brick Game 96 in 1 (E-23 Plus Mark II)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // needs SVG screen
