@@ -1742,55 +1742,25 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 
 void taito_f3_state::get_pf_scroll(int pf_num, u32 &reg_sx, u32 &reg_sy)
 {
-	//u32 sy = ((m_control_0[pf_num + 4] & 0xffff) <<  9) + (1 << 16);
-	//u32 sx = ((m_control_0[pf_num] & 0xffc0) << 10) - ((6 + 4 * pf_num) << 16);
+	// x: iiii iiii iiFF FFFF
+	// y: iiii iiii ifff ffff
 	
-	u32 sy = (m_control_0[pf_num + 4] << 9) + (1 << 16);
-	//              AAAAAAAAAAAAAAAA
-	//     AAAAAAAAAAAAAAAA.........
-	//         1
+	// x scroll is stored as fixed10.6, with fractional bits inverted.
+	// we convert this to regular fixed16.16
+	u32 sx = (m_control_0[pf_num] ^ 0b111111) << (16-6); 
+	u32 sy = (m_control_0[pf_num + 4]) << (16-7); // fixed11.7 to fixed16.16
 	
-	u16 ctrl = m_control_0[pf_num];
-	//              AAAAAAAAAASSSSSS
-	//         ↓
-	//+   AAAAAAAAAA................
-	//+            1
-	//-             SSSSSS..........
-	//-                  1
+	sx -= (6 + 4 * pf_num) << 16;
+	sy += 1 << 16;
 	
-	//    0000000001
-	//   10000000000
-	//-             000001..........
-	//-            1000000..........	
-
-	//+            1
-	//-             SSSSSS..........
-	//-                  1
-	
-	//+   AAAAAAAAAA................
-	//+             111111  (if s = 0b000000)
-	//+             111110  (if s = 0b000001)
-	//+             111101  (if s = 0b000010)
-	
-	//+             111110  (if s = 0b000001)
-	//+             000000  (if s = 0b111111)
-	
-	u32 sx = (BIT(ctrl, 6, 10) << 16) + (BIT(~ctrl, 0, 6) << 10) - ((6 + 4 * pf_num) << 16);
-	
-	// sx-= ((m_control_0[pf_num] & 0x003f) << 10) + 0x0400 - 0x10000;
 	if (m_flipscreen) {
-		logerror("aaa");
-		sy =  0x3000000 - sy;
-		sx = -0x1a00000 - sx;
+		sx += (416+188) << 16;
+		sy -= 1024 << 16;
 		
 		if (m_game_config->extend)
-			sx = -sx + (((188 - 512) & 0xffff) << 16);
-		else
-			sx = -sx + (188 << 16);
-		
-		sy = -sy - (256 << 16);
-		
+			sx -= 512 << 16;
 	}
+	
 	reg_sx = sx;
 	reg_sy = sy;
 }
@@ -2784,7 +2754,7 @@ inline void taito_f3_state::f3_drawgfx(bitmap_ind16 &dest_bmp, const rectangle &
 		
 		fixed8 dy8 = (sprite.y << 4);
 		if (!m_flipscreen)
-			dy8 += 255; // round up in non-flipscreen mode?    mayybe flipscreen coordinate adjustments should be done after all this math, during final rendering?. anyway:  testcases: elvactr mission # text (non-flipscreen), kaiserknj attract mode first text line (flipscreen)
+			dy8 += 255; // round up in non-flipscreen mode?    mayybe flipscreen coordinate adjustments should be done after all this math, during final rendering?. anyway:  testcases for vertical scaling: elvactr mission # text (non-flipscreen), kaiserknj attract mode first text line (flipscreen)
 		for (u8 y=0; y<16; y++) {
 			int dy = dy8 >> 8;
 			dy8 += sprite.zoomy;
