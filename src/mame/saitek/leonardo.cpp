@@ -125,8 +125,8 @@ private:
 	void update_display();
 	void mux_w(u8 data);
 	void leds_w(u8 data);
-	u8 unk_r();
-	void unk_w(u8 data);
+	u8 p1_r();
+	void p1_w(u8 data);
 	void exp_rts_w(int state);
 
 	u8 p2_r();
@@ -195,15 +195,15 @@ void leo_state::leds_w(u8 data)
 	update_display();
 }
 
-u8 leo_state::unk_r()
+u8 leo_state::p1_r()
 {
-	// ?
+	// ? this is where 6301 port 1 is, but 6303 doesn't have port 1
 	return 0xff;
 }
 
-void leo_state::unk_w(u8 data)
+void leo_state::p1_w(u8 data)
 {
-	// ?
+	// ? " (toggles bit 0)
 }
 
 void leo_state::exp_rts_w(int state)
@@ -289,7 +289,7 @@ void leo_state::p6_w(u8 data)
 
 void leo_state::main_map(address_map &map)
 {
-	map(0x0002, 0x0002).rw(FUNC(leo_state::unk_r), FUNC(leo_state::unk_w)); // external
+	map(0x0002, 0x0002).rw(FUNC(leo_state::p1_r), FUNC(leo_state::p1_w)); // external
 	map(0x4000, 0x5fff).ram().share("nvram");
 	map(0x6000, 0x6000).w(FUNC(leo_state::mux_w));
 	map(0x7000, 0x7000).w(FUNC(leo_state::leds_w));

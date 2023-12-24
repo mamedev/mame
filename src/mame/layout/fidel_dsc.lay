@@ -466,7 +466,7 @@ license:CC0-1.0
 
 		<element ref="white"><bounds x="-1" y="-1" width="119" height="108" /></element>
 		<group ref="sb_board"><bounds x="3" y="3" width="100" height="100" /></group>
-		<group ref="sb_ui"><bounds x="-14.75" y="13.625" width="12.5" height="78.75" /></group>
+		<group ref="sb_ui"><bounds x="-14.75" yc="53" width="12.5" height="78.75" /></group>
 
 		<!-- right side -->
 		<element ref="btn_white"><bounds x="107" y="14.5" width="7" height="7" /></element>
