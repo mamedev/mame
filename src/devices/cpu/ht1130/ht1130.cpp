@@ -16,8 +16,10 @@ DEFINE_DEVICE_TYPE(HT1130, ht1130_device, "ht1130", "Holtek HT1130 core")
 ht1130_device::ht1130_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: cpu_device(mconfig, HT1130, tag, owner, clock)
 	, m_space_config("program", ENDIANNESS_LITTLE, 8, 12, 0, address_map_constructor(FUNC(ht1130_device::internal_map), this))
-	, m_extregs_config("data", ENDIANNESS_LITTLE, 8, 8, 0)
+	, m_extregs_config("data", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(ht1130_device::internal_data_map), this))
 	, m_pc(0)
+	, m_tempram(*this, "tempram")
+	, m_displayram(*this, "displayram")
 {
 }
 
@@ -39,6 +41,44 @@ void ht1130_device::internal_map(address_map &map)
 	map(0x000, 0xfff).rom();
 }
 
+void ht1130_device::tempram_w(offs_t offset, u8 data)
+{
+	m_tempram[offset] = data & 0xf;
+}
+
+void ht1130_device::displayram_w(offs_t offset, u8 data)
+{
+	m_displayram[offset] = data & 0xf;
+	// notify external?
+}
+
+void ht1130_device::setreg(u8 which, u8 data)
+{
+	m_regs[which] = data & 0xf;
+}
+
+u8 ht1130_device::getreg(u8 which)
+{
+	return m_regs[which] & 0xf;
+}
+
+void ht1130_device::setacc(u8 data)
+{
+	m_acc = data & 0xf;
+}
+
+u8 ht1130_device::getacc()
+{
+	return m_acc & 0xf;
+}
+
+
+void ht1130_device::internal_data_map(address_map &map)
+{
+	map(0x00, 0x7f).ram().w(FUNC(ht1130_device::tempram_w)).share("tempram");
+	map(0xe0, 0xff).ram().w(FUNC(ht1130_device::displayram_w)).share("displayram");
+}
+
 void ht1130_device::device_start()
 {
 	space(AS_PROGRAM).cache(m_cache);
@@ -52,11 +92,31 @@ void ht1130_device::device_start()
 
 	save_item(NAME(m_pc));
 	save_item(NAME(m_icount));
+
+	save_item(NAME(m_regs));
+	save_item(NAME(m_acc));
+	save_item(NAME(m_carry));
+	save_item(NAME(m_irqen));
+	save_item(NAME(m_timer_en));
+	save_item(NAME(m_inhalt));
+	save_item(NAME(m_timer));
+	save_item(NAME(m_stackaddr));
+	save_item(NAME(m_stackcarry));
 }
 
 void ht1130_device::device_reset()
 {
 	m_pc = 0;
+
+	m_regs[0] = m_regs[1] = m_regs[2] = m_regs[3] = m_regs[4] = 0;
+	m_acc = 0;
+	m_carry = 0;
+	m_irqen = 0;
+	m_timer_en = 0;
+	m_inhalt = 0;
+	m_timer = 0;
+	m_stackaddr = 0;
+	m_stackcarry = 0;
 }
 
 u8 ht1130_device::fetch()
@@ -157,7 +217,8 @@ void ht1130_device::do_op()
 
 	case 0b00110001: // INC A : Increment accumulator
 	{
-		LOGMASKED(LOG_UNHANDLED_OPS, "INC A");
+		u8 temp = getacc();
+		setacc(temp+1);
 		return;
 	}
 
@@ -475,7 +536,8 @@ void ht1130_device::do_op()
 	case 0b00011001:
 	{
 		u8 reg = (inst & 0x0e) >> 1;
-		LOGMASKED(LOG_UNHANDLED_OPS, "DEC R%d", reg);
+		u8 temp = getreg(reg);
+		setreg(reg, temp-1);
 		return;
 	}
 
@@ -484,7 +546,8 @@ void ht1130_device::do_op()
 	case 0b00011000:
 	{
 		u8 reg = (inst & 0x0e) >> 1;
-		LOGMASKED(LOG_UNHANDLED_OPS, "INC R%d", reg);
+		u8 temp = getreg(reg);
+		setreg(reg, temp+1);
 		return;
 	}
 
@@ -493,7 +556,8 @@ void ht1130_device::do_op()
 	case 0b00101001:
 	{
 		u8 reg = (inst & 0x0e) >> 1;
-		LOGMASKED(LOG_UNHANDLED_OPS, "MOV A,R%d", reg);
+		u8 temp = getreg(reg);
+		setacc(temp);
 		return;
 	}
 
@@ -502,7 +566,8 @@ void ht1130_device::do_op()
 	case 0b00101000:
 	{
 		u8 reg = (inst & 0x0e) >> 1;
-		LOGMASKED(LOG_UNHANDLED_OPS, "MOV R%d, A", reg);
+		u8 temp = getacc();
+		setreg(reg, temp);
 		return;
 	}
 

@@ -40,12 +40,36 @@ private:
 	memory_access<8, 0, 0, ENDIANNESS_LITTLE>::specific m_space;
 
 	void internal_map(address_map &map);
+	void internal_data_map(address_map &map);
+
+	void tempram_w(offs_t offset, u8 data);
+	void displayram_w(offs_t offset, u8 data);
+
+	void setreg(u8 which, u8 data);
+	u8 getreg(u8 which);
+	void setacc(u8 data);
+	u8 getacc();
+
 
 	inline u8 fetch();
 	void do_op();
 
 	u32 m_pc;
 	s32 m_icount;
+
+	u8 m_regs[5];
+	u8 m_acc;
+	u8 m_carry;
+	u8 m_irqen;
+	u8 m_timer_en;
+	u8 m_inhalt;
+	u16 m_timer;
+
+	u16 m_stackaddr;
+	u8 m_stackcarry;
+
+	required_shared_ptr<u8> m_tempram;
+	required_shared_ptr<u8> m_displayram;
 };
 
 DECLARE_DEVICE_TYPE(HT1130, ht1130_device)
