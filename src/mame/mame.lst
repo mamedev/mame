@@ -18807,7 +18807,7 @@ vinvader                        // VTech
 wantgman                        // Actronics / Hanzawa
 zackman                         // Bandai
 
-@source:handheld/hh_ht1130.cpp
+@source:handheld/hh_ht11xx.cpp
 brke23p2
 
 @source:handheld/hh_melps4.cpp

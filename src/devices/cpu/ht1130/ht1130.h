@@ -34,33 +34,34 @@ public:
 	auto display_data_out_cb() { return m_display_data_out.bind(); }
 
 protected:
-	// device-level overrides
+	ht1130_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor data);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// device_execute_interface overrides
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
-	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
-
-private:
-	// address space
-	address_space_config m_space_config;
-	address_space_config m_extregs_config;
-
-	memory_access<8, 0, 0, ENDIANNESS_LITTLE>::cache m_cache;
-	memory_access<8, 0, 0, ENDIANNESS_LITTLE>::specific m_space;
 
 	void internal_map(address_map &map);
 	void internal_data_map(address_map &map);
 
 	inline void tempram_w(offs_t offset, u8 data);
 	inline void displayram_w(offs_t offset, u8 data);
+
+	required_shared_ptr<u8> m_tempram;
+	required_shared_ptr<u8> m_displayram;
+
+private:
+	address_space_config m_space_config;
+	address_space_config m_extregs_config;
+
+	memory_access<8, 0, 0, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<8, 0, 0, ENDIANNESS_LITTLE>::specific m_space;
+
 
 	inline void setreg(u8 which, u8 data);
 	inline u8 getreg(u8 which);
@@ -99,9 +100,6 @@ private:
 	u16 m_stackaddr;
 	u8 m_stackcarry;
 
-	required_shared_ptr<u8> m_tempram;
-	required_shared_ptr<u8> m_displayram;
-
 	devcb_read8 m_port_in_pm;
 	devcb_read8 m_port_in_ps;
 	devcb_read8 m_port_in_pp;
@@ -113,6 +111,17 @@ private:
 
 };
 
+class ht1190_device : public ht1130_device
+{
+public:
+	ht1190_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	void internal_data_map_ht1190(address_map &map);
+
+};
+
+
 DECLARE_DEVICE_TYPE(HT1130, ht1130_device)
+DECLARE_DEVICE_TYPE(HT1190, ht1190_device)
 
 #endif // MAME_CPU_HT1130_HT1130_H

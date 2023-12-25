@@ -15,10 +15,10 @@
 
 namespace {
 
-class ht1130_brickgame_state : public driver_device
+class ht11xx_brickgame_state : public driver_device
 {
 public:
-	ht1130_brickgame_state(const machine_config &mconfig, device_type type, const char *tag) :
+	ht11xx_brickgame_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_seg(*this, "seg%u", 0U),
@@ -26,7 +26,7 @@ public:
 		m_in2(*this, "IN2")
 	{ }
 
-	void ht1130_brickgame(machine_config &config);
+	void ht11xx_brickgame(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -48,16 +48,16 @@ private:
 	u8 m_displayoffset = 0;
 };
 
-void ht1130_brickgame_state::machine_start()
+void ht11xx_brickgame_state::machine_start()
 {
 	m_seg.resolve();
 }
 
-void ht1130_brickgame_state::machine_reset()
+void ht11xx_brickgame_state::machine_reset()
 {
 }
 
-static INPUT_PORTS_START( ht1130_brickgame )
+static INPUT_PORTS_START( ht11xx_brickgame )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Mute")
@@ -70,12 +70,12 @@ static INPUT_PORTS_START( ht1130_brickgame )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Left")
 INPUT_PORTS_END
 
-void ht1130_brickgame_state::display_offset_w(u8 data)
+void ht11xx_brickgame_state::display_offset_w(u8 data)
 {
 	m_displayoffset = data;
 }
 
-void ht1130_brickgame_state::display_data_w(u8 data)
+void ht11xx_brickgame_state::display_data_w(u8 data)
 {
 	for (int i = 0; i < 4; i++)
 	{
@@ -83,24 +83,24 @@ void ht1130_brickgame_state::display_data_w(u8 data)
 	}
 }
 
-u8 ht1130_brickgame_state::port_ps_r()
+u8 ht11xx_brickgame_state::port_ps_r()
 {
 	return m_in1->read() & 0xf;
 }
 
-u8 ht1130_brickgame_state::port_pp_r()
+u8 ht11xx_brickgame_state::port_pp_r()
 {
 	return m_in2->read() & 0xf;
 }
 
-void ht1130_brickgame_state::ht1130_brickgame(machine_config &config)
+void ht11xx_brickgame_state::ht11xx_brickgame(machine_config &config)
 {
-	HT1130(config, m_maincpu, 1000000/8); // frequency?
-	m_maincpu->display_offset_out_cb().set(FUNC(ht1130_brickgame_state::display_offset_w));
-	m_maincpu->display_data_out_cb().set(FUNC(ht1130_brickgame_state::display_data_w));
+	HT1190(config, m_maincpu, 1000000/8); // frequency?
+	m_maincpu->display_offset_out_cb().set(FUNC(ht11xx_brickgame_state::display_offset_w));
+	m_maincpu->display_data_out_cb().set(FUNC(ht11xx_brickgame_state::display_data_w));
 
-	m_maincpu->ps_in_cb().set(FUNC(ht1130_brickgame_state::port_ps_r));
-	m_maincpu->pp_in_cb().set(FUNC(ht1130_brickgame_state::port_pp_r));
+	m_maincpu->ps_in_cb().set(FUNC(ht11xx_brickgame_state::port_ps_r));
+	m_maincpu->pp_in_cb().set(FUNC(ht11xx_brickgame_state::port_pp_r));
 
 	SPEAKER(config, "speaker").front_center();
 
@@ -114,5 +114,5 @@ ROM_END
 
 } // anonymous namespace
 
-
-CONS( 200?, brke23p2, 0, 0, ht1130_brickgame, ht1130_brickgame, ht1130_brickgame_state, empty_init, "<unknown>", "Brick Game 96 in 1 (E-23 Plus Mark II)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // needs SVG screen
+// some dieshots have 1996 on them, it is also possible the software is from Holtek
+CONS( 1996?, brke23p2, 0, 0, ht11xx_brickgame, ht11xx_brickgame, ht11xx_brickgame_state, empty_init, "Holtek", "Brick Game 96 in 1 (E-23 Plus Mark II)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // needs SVG screen

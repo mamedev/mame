@@ -21,21 +21,34 @@
 #include "logmacro.h"
 
 // device type definitions
-DEFINE_DEVICE_TYPE(HT1130, ht1130_device, "ht1130", "Holtek HT1130 core")
+DEFINE_DEVICE_TYPE(HT1130, ht1130_device, "ht1130", "Holtek HT1130")
+DEFINE_DEVICE_TYPE(HT1190, ht1190_device, "ht1190", "Holtek HT1190")
 
-ht1130_device::ht1130_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: cpu_device(mconfig, HT1130, tag, owner, clock)
-	, m_space_config("program", ENDIANNESS_LITTLE, 8, 12, 0, address_map_constructor(FUNC(ht1130_device::internal_map), this))
-	, m_extregs_config("data", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(ht1130_device::internal_data_map), this))
-	, m_pc(0)
+
+
+ht1130_device::ht1130_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor data)
+	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_tempram(*this, "tempram")
 	, m_displayram(*this, "displayram")
+	, m_space_config("program", ENDIANNESS_LITTLE, 8, 12, 0, address_map_constructor(FUNC(ht1130_device::internal_map), this))
+	, m_extregs_config("data", ENDIANNESS_LITTLE, 8, 8, 0, data)
+	, m_pc(0)
 	, m_port_in_pm(*this, 0xff)
 	, m_port_in_ps(*this, 0xff)
 	, m_port_in_pp(*this, 0xff)
 	, m_port_out_pa(*this)
 	, m_display_offset_out(*this)
 	, m_display_data_out(*this)
+{
+}
+
+ht1130_device::ht1130_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: ht1130_device(mconfig, HT1130, tag, owner, clock, address_map_constructor(FUNC(ht1130_device::internal_data_map), this))
+{
+}
+
+ht1190_device::ht1190_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: ht1130_device(mconfig, HT1190, tag, owner, clock, address_map_constructor(FUNC(ht1190_device::internal_data_map_ht1190), this))
 {
 }
 
@@ -168,11 +181,14 @@ void ht1130_device::setr3r2_data(u8 data)
 
 void ht1130_device::internal_data_map(address_map &map)
 {
-	map(0x00, 0x9f).ram().w(FUNC(ht1130_device::tempram_w)).share("tempram");
+	map(0x00, 0x7f).ram().w(FUNC(ht1130_device::tempram_w)).share("tempram");
+	map(0xe0, 0xff).ram().w(FUNC(ht1130_device::displayram_w)).share("displayram");
+}
 
-	// the HT1130 is meant to have displayram from 0xe0, so this could be a newer chip?
-	// HT1190 has data 00-9f and display b0-ff, possibly a closer match?
-	map(0xa0, 0xff).ram().w(FUNC(ht1130_device::displayram_w)).share("displayram");
+void ht1190_device::internal_data_map_ht1190(address_map &map)
+{
+	map(0x00, 0x9f).ram().w(FUNC(ht1190_device::tempram_w)).share("tempram");
+	map(0xb0, 0xff).ram().w(FUNC(ht1190_device::displayram_w)).share("displayram");
 }
 
 void ht1130_device::device_start()

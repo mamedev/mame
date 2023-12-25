@@ -16,8 +16,8 @@ license:CC0-1.0
 
 	<view name="Internal Layout">
 
-		<!-- unknown area, still seems to have some display parts in it (next piece) -->
-		<repeat count="16">
+		<!-- There are seems to have some display parts in it (next piece) -->
+		<repeat count="8">
 			<param name="s" start="0" increment="8" />
 			<param name="y" start="0" increment="8" />
 			<repeat count="8">
@@ -29,11 +29,11 @@ license:CC0-1.0
 			</repeat>
 		</repeat>	
 
-		<!-- remaining display elements (unsorted -->
+		<!-- remaining display elements (unsorted) -->
 
 		<!-- 2 rows of elements where we've already extracted 4 elements for playfield --> 
 		<repeat count="4">
-			<param name="segnum" start="132" increment="1" />
+			<param name="segnum" start="68" increment="1" />
 			<param name="x" start="32" increment="8" />
 			<element name="seg~segnum~" ref="segment" state="0">
 				<bounds x="~x~" y="0" width="7" height="7"/>
@@ -41,7 +41,7 @@ license:CC0-1.0
 		</repeat>
 
 		<repeat count="4">
-			<param name="segnum" start="140" increment="1" />
+			<param name="segnum" start="76" increment="1" />
 			<param name="x" start="32" increment="8" />
 			<element name="seg~segnum~" ref="segment" state="0">
 				<bounds x="~x~" y="8" width="7" height="7"/>
@@ -50,7 +50,7 @@ license:CC0-1.0
 		
 		<!-- 8 rows of elements where we've already extracted 2 elements for playfield --> 
 		<repeat count="6">
-			<param name="segnum" start="146" increment="1" />
+			<param name="segnum" start="82" increment="1" />
 			<param name="x" start="16" increment="8" />
 			<element name="seg~segnum~" ref="segment" state="0">
 				<bounds x="~x~" y="16" width="7" height="7"/>
@@ -58,7 +58,7 @@ license:CC0-1.0
 		</repeat>	
 		
 		<repeat count="6">
-			<param name="segnum" start="154" increment="1" />
+			<param name="segnum" start="90" increment="1" />
 			<param name="x" start="16" increment="8" />
 			<element name="seg~segnum~" ref="segment" state="0">
 				<bounds x="~x~" y="24" width="7" height="7"/>
@@ -66,7 +66,7 @@ license:CC0-1.0
 		</repeat>	
 		
 		<repeat count="6">
-			<param name="segnum" start="162" increment="1" />
+			<param name="segnum" start="98" increment="1" />
 			<param name="x" start="16" increment="8" />
 			<element name="seg~segnum~" ref="segment" state="0">
 				<bounds x="~x~" y="32" width="7" height="7"/>
@@ -74,7 +74,7 @@ license:CC0-1.0
 		</repeat>			
 		
 		<repeat count="6">
-			<param name="segnum" start="170" increment="1" />
+			<param name="segnum" start="106" increment="1" />
 			<param name="x" start="16" increment="8" />
 			<element name="seg~segnum~" ref="segment" state="0">
 				<bounds x="~x~" y="40" width="7" height="7"/>
@@ -82,7 +82,7 @@ license:CC0-1.0
 		</repeat>			
 		
 		<repeat count="6">
-			<param name="segnum" start="178" increment="1" />
+			<param name="segnum" start="114" increment="1" />
 			<param name="x" start="16" increment="8" />
 			<element name="seg~segnum~" ref="segment" state="0">
 				<bounds x="~x~" y="48" width="7" height="7"/>
@@ -90,7 +90,7 @@ license:CC0-1.0
 		</repeat>	
 
 		<repeat count="6">
-			<param name="segnum" start="186" increment="1" />
+			<param name="segnum" start="122" increment="1" />
 			<param name="x" start="16" increment="8" />
 			<element name="seg~segnum~" ref="segment" state="0">
 				<bounds x="~x~" y="56" width="7" height="7"/>
@@ -98,7 +98,7 @@ license:CC0-1.0
 		</repeat>		
 		
 		<repeat count="6">
-			<param name="segnum" start="194" increment="1" />
+			<param name="segnum" start="130" increment="1" />
 			<param name="x" start="16" increment="8" />
 			<element name="seg~segnum~" ref="segment" state="0">
 				<bounds x="~x~" y="64" width="7" height="7"/>
@@ -106,7 +106,7 @@ license:CC0-1.0
 		</repeat>			
 		
 		<repeat count="6">
-			<param name="segnum" start="202" increment="1" />
+			<param name="segnum" start="138" increment="1" />
 			<param name="x" start="16" increment="8" />
 			<element name="seg~segnum~" ref="segment" state="0">
 				<bounds x="~x~" y="72" width="7" height="7"/>
@@ -119,7 +119,7 @@ license:CC0-1.0
 		
 		<!-- left 8 columns of the pit -->
 		<repeat count="20">
-			<param name="s" start="224" increment="8" />
+			<param name="s" start="160" increment="8" />
 			<param name="y" start="0" increment="8" />
 			<repeat count="8">
 				<param name="segnum" start="~s~" increment="1" />
@@ -131,25 +131,25 @@ license:CC0-1.0
 		</repeat>
 				
 		<!-- first 4 rows of 9th column -->
-		<element name="seg139" ref="segment" state="0">
+		<element name="seg75" ref="segment" state="0">
 			<bounds x="188" y="0" width="7" height="7"/>
-		</element>		
-	
-		<element name="seg136" ref="segment" state="0">
-			<bounds x="188" y="8" width="7" height="7"/>
-		</element>	
+		</element>
 
-		<element name="seg138" ref="segment" state="0">
+		<element name="seg72" ref="segment" state="0">
+			<bounds x="188" y="8" width="7" height="7"/>
+		</element>
+
+		<element name="seg74" ref="segment" state="0">
 			<bounds x="188" y="16" width="7" height="7"/>
-		</element>	
-		
-		<element name="seg137" ref="segment" state="0">
+		</element>
+
+		<element name="seg73" ref="segment" state="0">
 			<bounds x="188" y="24" width="7" height="7"/>
-		</element>	
-		
+		</element>
+
 		<!-- 8 rows of the 9th column -->
 		<repeat count="8">
-			<param name="segnum" start="144" increment="8" />
+			<param name="segnum" start="80" increment="8" />
 			<param name="y" start="32" increment="8" />
 		
 			<element name="seg~segnum~" ref="segment" state="0">
@@ -158,58 +158,58 @@ license:CC0-1.0
 		</repeat>	
 	
 		<!-- more 9th column -->
-		<element name="seg218" ref="segment" state="0">
+		<element name="seg154" ref="segment" state="0">
 			<bounds x="188" y="96" width="7" height="7"/>
 		</element>		
 		
-		<element name="seg216" ref="segment" state="0">
+		<element name="seg152" ref="segment" state="0">
 			<bounds x="188" y="104" width="7" height="7"/>
 		</element>		
 		
-		<element name="seg217" ref="segment" state="0">
+		<element name="seg153" ref="segment" state="0">
 			<bounds x="188" y="112" width="7" height="7"/>
 		</element>		
 		
-		<element name="seg219" ref="segment" state="0">
+		<element name="seg155" ref="segment" state="0">
 			<bounds x="188" y="120" width="7" height="7"/>
 		</element>		
 		
-		<element name="seg220" ref="segment" state="0">
+		<element name="seg156" ref="segment" state="0">
 			<bounds x="188" y="128" width="7" height="7"/>
 		</element>	
 	
-		<element name="seg221" ref="segment" state="0">
+		<element name="seg157" ref="segment" state="0">
 			<bounds x="188" y="136" width="7" height="7"/>
 		</element>		
 	
-		<element name="seg223" ref="segment" state="0">
+		<element name="seg159" ref="segment" state="0">
 			<bounds x="188" y="144" width="7" height="7"/>
 		</element>		
 		
-		<element name="seg222" ref="segment" state="0">
+		<element name="seg158" ref="segment" state="0">
 			<bounds x="188" y="152" width="7" height="7"/>
 		</element>		
 		
 		<!-- first 4 rows of 10th column -->
-		<element name="seg131" ref="segment" state="0">
+		<element name="seg67" ref="segment" state="0">
 			<bounds x="196" y="0" width="7" height="7"/>
 		</element>		
 	
-		<element name="seg128" ref="segment" state="0">
+		<element name="seg64" ref="segment" state="0">
 			<bounds x="196" y="8" width="7" height="7"/>
 		</element>	
 
-		<element name="seg130" ref="segment" state="0">
+		<element name="seg66" ref="segment" state="0">
 			<bounds x="196" y="16" width="7" height="7"/>
 		</element>	
 		
-		<element name="seg129" ref="segment" state="0">
+		<element name="seg65" ref="segment" state="0">
 			<bounds x="196" y="24" width="7" height="7"/>
 		</element>			
 		
 		<!-- 8 rows of the 10th column -->
 		<repeat count="8">
-			<param name="segnum" start="145" increment="8" />
+			<param name="segnum" start="81" increment="8" />
 			<param name="y" start="32" increment="8" />
 		
 			<element name="seg~segnum~" ref="segment" state="0">
@@ -218,35 +218,35 @@ license:CC0-1.0
 		</repeat>	
 	
 		<!-- more 10th column -->
-		<element name="seg210" ref="segment" state="0">
+		<element name="seg146" ref="segment" state="0">
 			<bounds x="196" y="96" width="7" height="7"/>
 		</element>	
 		
-		<element name="seg208" ref="segment" state="0">
+		<element name="seg144" ref="segment" state="0">
 			<bounds x="196" y="104" width="7" height="7"/>
 		</element>			
 		
-		<element name="seg209" ref="segment" state="0">
+		<element name="seg145" ref="segment" state="0">
 			<bounds x="196" y="112" width="7" height="7"/>
 		</element>		
 		
-		<element name="seg211" ref="segment" state="0">
+		<element name="seg147" ref="segment" state="0">
 			<bounds x="196" y="120" width="7" height="7"/>
 		</element>		
 		
-		<element name="seg212" ref="segment" state="0">
+		<element name="seg148" ref="segment" state="0">
 			<bounds x="196" y="128" width="7" height="7"/>
 		</element>	
 	
-		<element name="seg213" ref="segment" state="0">
+		<element name="seg149" ref="segment" state="0">
 			<bounds x="196" y="136" width="7" height="7"/>
 		</element>		
 	
-		<element name="seg215" ref="segment" state="0">
+		<element name="seg151" ref="segment" state="0">
 			<bounds x="196" y="144" width="7" height="7"/>
 		</element>		
 		
-		<element name="seg214" ref="segment" state="0">
+		<element name="seg150" ref="segment" state="0">
 			<bounds x="196" y="152" width="7" height="7"/>
 		</element>		
 	
