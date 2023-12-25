@@ -356,14 +356,14 @@ license:CC0-1.0
 		<bounds left="0" right="78" top="-1" bottom="12" />
 		<element ref="panel_background"><bounds x="0" y="0" width="78" height="12" /></element>
 
-		<element name="0.0" ref="led2"> <bounds x="1"  y="0.35" width="2" height="0.85" /> </element>
-		<element name="1.0" ref="led2"> <bounds x="11" y="0.35" width="2" height="0.85" /> </element>
-		<element name="2.0" ref="led2"> <bounds x="21" y="0.35" width="2" height="0.85" /> </element>
-		<element name="3.0" ref="led2"> <bounds x="31" y="0.35" width="2" height="0.85" /> </element>
-		<element name="4.0" ref="led2"> <bounds x="41" y="0.35" width="2" height="0.85" /> </element>
-		<element name="5.0" ref="led2"> <bounds x="51" y="0.35" width="2" height="0.85" /> </element>
-		<element name="6.0" ref="led2"> <bounds x="61" y="0.35" width="2" height="0.85" /> </element>
-		<element name="7.0" ref="led2"> <bounds x="71" y="0.35" width="2" height="0.85" /> </element>
+		<element name="0.0" ref="led2"> <bounds x="1"  y="0.25" width="2" height="0.85" /> </element>
+		<element name="1.0" ref="led2"> <bounds x="11" y="0.25" width="2" height="0.85" /> </element>
+		<element name="2.0" ref="led2"> <bounds x="21" y="0.25" width="2" height="0.85" /> </element>
+		<element name="3.0" ref="led2"> <bounds x="31" y="0.25" width="2" height="0.85" /> </element>
+		<element name="4.0" ref="led2"> <bounds x="41" y="0.25" width="2" height="0.85" /> </element>
+		<element name="5.0" ref="led2"> <bounds x="51" y="0.25" width="2" height="0.85" /> </element>
+		<element name="6.0" ref="led2"> <bounds x="61" y="0.25" width="2" height="0.85" /> </element>
+		<element name="7.0" ref="led2"> <bounds x="71" y="0.25" width="2" height="0.85" /> </element>
 
 		<element ref="hlb" inputtag="KEY.0" inputmask="0x01"> <bounds x="1"  y="2"   width="6" height="4" /> </element>
 		<element ref="hlb" inputtag="KEY.0" inputmask="0x02"> <bounds x="11" y="2"   width="6" height="4" /> </element>
