@@ -353,7 +353,7 @@ void ht1130_device::do_op()
 		return;
 	}
 
-	case 0b00110010: // IN A,PM : Input port to accumulator
+	case 0b00110010: // IN A,PM : Input port to accumulator (doesn't exist on HT1190, does on HT1130?)
 	{
 		const u8 data = m_port_in_pm() & 0xf;
 		setacc(data);
