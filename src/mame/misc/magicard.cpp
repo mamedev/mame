@@ -120,18 +120,18 @@
 
   Impera boards...
 
-  KNOWN REVS | Used with these games         | Differences to previews Revision
+  KNOWN REVS | Used with these games          | Differences to previews Revision
   ======================================================================================================
-  V 1.04     | lucky7i                       | lowest known revision, does not have a socket for the PIC
+  V 1.04     | lucky7i                        | lowest known revision, does not have a socket for the PIC
   ------------------------------------------------------------------------------------------------------
-  V 1.05     | magicrd1, magicrd1c          | PIC16C54 + XTAL got added
+  V 1.05     | magicrd1, magicrd1c            | PIC16C54 + XTAL got added
   ------------------------------------------------------------------------------------------------------
-  V 2.1      | puzzleme                      | ESI1, 24C02, YM2149F, RTC added
+  V 2.1      | puzzleme                       | ESI1, 24C02, YM2149F, RTC added
   ------------------------------------------------------------------------------------------------------
-  V 2.2      | magicrde                      |
+  V 2.2      | magicrde                       |
   ------------------------------------------------------------------------------------------------------
-  V 4.0      | magicrdja, magicrdeb, magicle | ESI1 replaced by ALTERA MAX EPM7128SQC100
-             |                               | YM2149F replaced by YMZ284-D, MX29F1610 added
+  V 4.0      | magicrdja, magicrdeb, magicle, | ESI1 replaced by ALTERA MAX EPM7128SQC100
+             | simpbest                       | YM2149F replaced by YMZ284-D, MX29F1610 added
   ------------------------------------------------------------------------------------------------------
 
 
@@ -200,6 +200,7 @@
 #include "speaker.h"
 
 #include "magicard.lh"
+#include "pokeri.lh"
 
 #define CLOCK_A XTAL(30'000'000)
 #define CLOCK_B XTAL(8'000'000)
@@ -443,16 +444,17 @@ void magicard_base_state::output_w(offs_t offset, uint16_t data)
 	// bit 11 - hold 2 lamp
 	// bit 12 - hold 4 lamp
 	// bit 13 - clear lamp
-	// bit 14 - hopper drive
+	// bit 14 - hopper drive - hold 3 lamp (pokeri)
 	// bit 15 - counter in
 
 	m_lamps[0] = BIT(data, 9);      // Lamp 0 - HOLD 1
 	m_lamps[1] = BIT(data, 11);     // Lamp 1 - HOLD 2
-	m_lamps[2] = BIT(data, 7);      // Lamp 2 - HOLD 3
 	m_lamps[3] = BIT(data, 12);     // Lamp 3 - HOLD 4
 	m_lamps[4] = BIT(data, 10);     // Lamp 4 - HOLD 5
 	m_lamps[5] = BIT(data, 13);     // Lamp 5 - CANCEL
 	m_lamps[6] = BIT(data, 8);      // Lamp 6 - START
+
+	m_lamps[2] = (BIT(data, 7) | BIT(data, 14));      // Lamp 2 - HOLD 3
 }
 
 
@@ -503,8 +505,8 @@ void magicard_state::magicard_map(address_map &map)
 	map(0x001e0000, 0x001e7fff).rw(FUNC(magicard_state::nvram_r), FUNC(magicard_state::nvram_w)).umask16(0x00ff);
 	map(0x00200000, 0x003fffff).rw(m_scc66470, FUNC(scc66470_device::ipa_r), FUNC(scc66470_device::ipa_w));
 	/* 001ffc00-001ffdff System I/O */
-	map(0x001ffc00, 0x001ffc01).portr("SW0");
-	map(0x001ffc40, 0x001ffc41).portr("SW1");
+	map(0x001ffc00, 0x001ffc01).portr("IN0");
+	map(0x001ffc40, 0x001ffc41).portr("IN1");
 	map(0x001ffc80, 0x001ffc81).w( FUNC(magicard_state::output_w));
 	map(0x001ffd01, 0x001ffd01).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x001ffd03, 0x001ffd03).w("ramdac", FUNC(ramdac_device::pal_w));
@@ -526,8 +528,8 @@ void hotslots_state::hotslots_map_base(address_map &map)
 	map(0x00800000, 0x0087fbff).rom().region("maincpu", 0); // boot vectors point here
 	map(0x001fff80, 0x001fffbf).ram(); //DRAM I/O, not accessed by this game, CD buffer?
 	map(0x00400000, 0x0040ffff).ram().share("nvram");
-	map(0x00411000, 0x00411001).portr("SW0");
-	map(0x00412346, 0x00412347).portr("SW1");
+	map(0x00411000, 0x00411001).portr("IN0");
+	map(0x00412346, 0x00412347).portr("IN1");
 	map(0x00413000, 0x00413001).w( FUNC(hotslots_state::output_w));
 	map(0x00414001, 0x00414001).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x00414003, 0x00414003).w("ramdac", FUNC(ramdac_device::pal_w));
@@ -555,7 +557,7 @@ void hotslots_state::puzzleme_map(address_map &map)
 *********************************************/
 
 static INPUT_PORTS_START( magicard )
-	PORT_START("SW0")
+	PORT_START("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN4 )			PORT_NAME("Remote 2")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )			PORT_NAME("Remote 1")
@@ -574,17 +576,17 @@ static INPUT_PORTS_START( magicard )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OTHER )			PORT_NAME("Hopper Count") 	PORT_CODE(KEYCODE_E)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SERVICE2 )			PORT_NAME("Books 3")  		PORT_CODE(KEYCODE_U)
 
-	PORT_START("SW1")
-	PORT_DIPNAME( 0x01, 0x01, "Keyboard Test" )             PORT_DIPLOCATION("DIP 1:8")
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x01, 0x01, "Keyboard Test" )             PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Remote/Keyboard" )           PORT_DIPLOCATION("DIP 1:7")
+	PORT_DIPNAME( 0x02, 0x02, "Remote/Keyboard" )           PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x02, "Remote Switch" )
 	PORT_DIPSETTING(    0x00, "Keyboard" )
-	PORT_DIPNAME( 0x04, 0x04, "Swap Coin Inputs" )          PORT_DIPLOCATION("DIP 1:6")
+	PORT_DIPNAME( 0x04, 0x04, "Swap Coin Inputs" )          PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x04, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x38, 0x38, "Setting" )                   PORT_DIPLOCATION("DIP 1:5,4,3")
+	PORT_DIPNAME( 0x38, 0x38, "Setting" )                   PORT_DIPLOCATION("SW1:5,4,3")
 	PORT_DIPSETTING(    0x38, "Austria 1" )
 	PORT_DIPSETTING(    0x30, "Austria 2" )
 	PORT_DIPSETTING(    0x18, "CSFR 1" )  // Czech Slovak Federal Republic
@@ -593,10 +595,10 @@ static INPUT_PORTS_START( magicard )
 	PORT_DIPSETTING(    0x20, "Germany 2" )
 	PORT_DIPSETTING(    0x08, "Hungary 1" )
 	PORT_DIPSETTING(    0x00, "Hungary 2" )
-	PORT_DIPNAME( 0x40, 0x40, "Hopper" )                    PORT_DIPLOCATION("DIP 1:2")
+	PORT_DIPNAME( 0x40, 0x40, "Hopper" )                    PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x40, "Coin B" )
 	PORT_DIPSETTING(    0x00, "Coin A" )
-	PORT_DIPNAME( 0x80, 0x80, "Hopper" )                    PORT_DIPLOCATION("DIP 1:1")
+	PORT_DIPNAME( 0x80, 0x80, "Hopper" )                    PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -614,7 +616,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( magicrde )
 	PORT_INCLUDE( magicard )
 
-	PORT_MODIFY("SW1")
+	PORT_MODIFY("IN1")
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON7 )     PORT_NAME("Alarm")           PORT_CODE(KEYCODE_S)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON6 )     PORT_NAME("Counter Control") PORT_CODE(KEYCODE_D)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNUSED )      // PORT_NAME("N/C 1")
@@ -624,7 +626,7 @@ static INPUT_PORTS_START( magicrde )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( puzzleme )
-	PORT_START("SW0")
+	PORT_START("IN0")
 
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN3 )            PORT_NAME("Remote")
@@ -643,7 +645,7 @@ static INPUT_PORTS_START( puzzleme )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SW1")
+	PORT_START("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -668,7 +670,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( lucky7i )
 	PORT_INCLUDE( magicard )
 
-	PORT_MODIFY("SW0")
+	PORT_MODIFY("IN0")
 
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 )          PORT_NAME("Win Plan Scroll/Collect")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_BET )       PORT_NAME("Einsatz")
@@ -677,36 +679,36 @@ static INPUT_PORTS_START( lucky7i )
 
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_MODIFY("SW1")
-	PORT_DIPNAME( 0x80, 0x80, "Hopper" )                    PORT_DIPLOCATION("DIP 1:1")
+	PORT_MODIFY("IN1")
+	PORT_DIPNAME( 0x80, 0x80, "Hopper" )                    PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_DIPNAME( 0x40, 0x40, "Hopper-Wert" )               PORT_DIPLOCATION("DIP 1:2")
+	PORT_DIPNAME( 0x40, 0x40, "Hopper-Wert" )               PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x40, "10" )
 	PORT_DIPSETTING(    0x00, "5" )
 
-	PORT_DIPNAME( 0x08, 0x08, "Munzer1" )                   PORT_DIPLOCATION("DIP 1:5")
+	PORT_DIPNAME( 0x08, 0x08, "Munzer1" )                   PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x08, "10" )
 	PORT_DIPSETTING(    0x00, "5" )
 
-	PORT_DIPNAME( 0x04, 0x04, "Munzer2" )                   PORT_DIPLOCATION("DIP 1:6")
+	PORT_DIPNAME( 0x04, 0x04, "Munzer2" )                   PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x04, "10" )
 	PORT_DIPSETTING(    0x00, "5" )
 
-	PORT_DIPNAME( 0x02, 0x02, "Remote 1" )                  PORT_DIPLOCATION("DIP 1:7")
+	PORT_DIPNAME( 0x02, 0x02, "Remote 1" )                  PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x02, "100" )
 	PORT_DIPSETTING(    0x00, "10" )
 
-	PORT_DIPNAME( 0x20, 0x20, "Remote 2" )                  PORT_DIPLOCATION("DIP 1:3")
+	PORT_DIPNAME( 0x20, 0x20, "Remote 2" )                  PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x20, "100" )
 	PORT_DIPSETTING(    0x00, "50" )
 
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DIP 1:4")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DIP 1:8")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -719,36 +721,36 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( dallaspk )
 	PORT_INCLUDE( magicard )
 
-	PORT_MODIFY("SW1")
-	PORT_DIPNAME( 0x80, 0x80, "Hopper" )                    PORT_DIPLOCATION("DIP 1:1")
+	PORT_MODIFY("IN1")
+	PORT_DIPNAME( 0x80, 0x80, "Hopper" )                    PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_DIPNAME( 0x40, 0x40, "Hopper-Wert" )               PORT_DIPLOCATION("DIP 1:2")
+	PORT_DIPNAME( 0x40, 0x40, "Hopper-Wert" )               PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x40, "10" )
 	PORT_DIPSETTING(    0x00, "5" )
 
-	PORT_DIPNAME( 0x08, 0x08, "Munzer1" )                   PORT_DIPLOCATION("DIP 1:5")
+	PORT_DIPNAME( 0x08, 0x08, "Munzer1" )                   PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x08, "10" )
 	PORT_DIPSETTING(    0x00, "5" )
 
-	PORT_DIPNAME( 0x04, 0x04, "Munzer2" )                   PORT_DIPLOCATION("DIP 1:6")
+	PORT_DIPNAME( 0x04, 0x04, "Munzer2" )                   PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x04, "10" )
 	PORT_DIPSETTING(    0x00, "5" )
 
-	PORT_DIPNAME( 0x02, 0x02, "Remote 1" )                  PORT_DIPLOCATION("DIP 1:7")
+	PORT_DIPNAME( 0x02, 0x02, "Remote 1" )                  PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x02, "100" )
 	PORT_DIPSETTING(    0x00, "10" )
 
-	PORT_DIPNAME( 0x20, 0x20, "Remote 2" )                  PORT_DIPLOCATION("DIP 1:3")
+	PORT_DIPNAME( 0x20, 0x20, "Remote 2" )                  PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x20, "100" )
 	PORT_DIPSETTING(    0x00, "50" )
 
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DIP 1:4")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DIP 1:8")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -757,7 +759,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( hotslots )
 	PORT_INCLUDE( magicard )
 
-	PORT_MODIFY("SW1")
+	PORT_MODIFY("IN1")
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON5 )     PORT_NAME("Alarm")           PORT_CODE(KEYCODE_S)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON6 )     PORT_NAME("Counter Control") PORT_CODE(KEYCODE_D)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON7 )     PORT_NAME("Clear coinCard")  PORT_CODE(KEYCODE_H)
@@ -765,8 +767,8 @@ static INPUT_PORTS_START( hotslots )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( jjokeri )
-	PORT_START("SW0")
+static INPUT_PORTS_START( pokeri )
+	PORT_START("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN4 )			PORT_NAME("Remote 2")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )			PORT_NAME("Remote 1")
@@ -785,29 +787,29 @@ static INPUT_PORTS_START( jjokeri )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OTHER )			PORT_NAME("Hopper Count") 	PORT_CODE(KEYCODE_E)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SERVICE2 )			PORT_NAME("Books 3")  		PORT_CODE(KEYCODE_U)
 
-	PORT_START("SW1")
-	PORT_DIPNAME( 0x01, 0x01, "Service Test" )		PORT_DIPLOCATION("DIP 1:8")
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x01, 0x01, "Service Test" )		PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Remote 1" )			PORT_DIPLOCATION("DIP 1:7")
+	PORT_DIPNAME( 0x02, 0x02, "Remote 1" )			PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x02, "100" )
 	PORT_DIPSETTING(    0x00, "10" )
-	PORT_DIPNAME( 0x04, 0x04, "Coin 2" )			PORT_DIPLOCATION("DIP 1:6")
+	PORT_DIPNAME( 0x04, 0x04, "Coin 2" )			PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x04, "10" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x08, 0x08, "Coin 1" )			PORT_DIPLOCATION("DIP 1:5")
+	PORT_DIPNAME( 0x08, 0x08, "Coin 1" )			PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x08, "10" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x10, 0x10, "Cards Back" )		PORT_DIPLOCATION("DIP 1:4")
+	PORT_DIPNAME( 0x10, 0x10, "Cards Back" )		PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x10, "Normal Clean" )
 	PORT_DIPSETTING(    0x00, "Impera Logo" )
-	PORT_DIPNAME( 0x20, 0x20, "Remote 2" )			PORT_DIPLOCATION("DIP 1:3")
+	PORT_DIPNAME( 0x20, 0x20, "Remote 2" )			PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x20, "100" )
 	PORT_DIPSETTING(    0x00, "1M" )
-	PORT_DIPNAME( 0x40, 0x40, "DSW 1:2, unknown" )	PORT_DIPLOCATION("DIP 1:2")
+	PORT_DIPNAME( 0x40, 0x40, "DSW 1:2, unknown" )	PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "DSW 1:1, unknown" )	PORT_DIPLOCATION("DIP 1:1")
+	PORT_DIPNAME( 0x80, 0x80, "DSW 1:1, unknown" )	PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -2242,21 +2244,24 @@ ROM_START( lucky7x )
 ROM_END
 
 /*
-  Jolly Joker?
+  Poker
+  Impera.
   Ver 11/90b
 
   Early board.
 
 */
-ROM_START( jjokeri )
+ROM_START( pokeri )
 	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
 	ROM_LOAD16_WORD_SWAP( "g55_6__d27c210.bin", 0x00000, 0x20000, CRC(e208598b) SHA1(697b37e39025d31de6f37bd8bd59b35cee998e63) )
 	ROM_LOAD16_WORD_SWAP( "g55_5__d27c210.bin", 0x20000, 0x20000, CRC(997d4de9) SHA1(47d46b4be99f4d62e23b78219c5f186476b93701) )
 
-	ROM_REGION(0x4000, "nvram", 0)  // Default NVRAM
-	ROM_LOAD( "jjokeri_nvram.bin", 0x0000, 0x4000, CRC(c3f4698d) SHA1(d9a7c776a87878fc546c301dffe9b32093d5eddc) )
-ROM_END
+	ROM_REGION(0x4d, "ds1207", 0)  // timekey
+	ROM_LOAD( "ds1207.bin", 0x000000, 0x00004d, BAD_DUMP CRC(e0fca9db) SHA1(51d92785fbcadd7e2e420d9f781446991dc72ee2) )  // created to match game
 
+	ROM_REGION(0x4000, "nvram", 0)  // Default NVRAM
+	ROM_LOAD( "pokeri_nvram.bin", 0x0000, 0x4000, CRC(6e2dbbf5) SHA1(fd693e466002ada1efa3bdf2a99a6ea26d484e79) )
+ROM_END
 
 /*
   Simply the Best
@@ -2292,7 +2297,7 @@ ROM_START( simpbest )
 
 	ROM_REGION( 0x0100, "sereeprom", 0 )  // Serial EPROM
 	ROM_LOAD16_WORD_SWAP("24c04a.ic27", 0x0000, 0x0100, CRC(3189844c) SHA1(cc017f44d9db92da85c96be750ccec7ee32e5972) )
-	ROM_CONTINUE(                       0x0000, 0x0100)  // discarding 1nd half test pattern filled
+	ROM_CONTINUE(                       0x0000, 0x0100)  // discarding 1st half, filled with test patterns.
 ROM_END
 
 
@@ -2328,6 +2333,6 @@ GAME(  1993, dallaspk,   0,        magicard,       dallaspk,  magicard_state, em
 GAME(  1993, kajotcrd,   0,        hotslots,       magicard,  hotslots_state, empty_init, ROT0, "Amatic",    "Kajot Card (Version 1.01, Wien Euro)",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
 GAME(  1991, lucky7x,    lucky7i,  magicard,       lucky7i,   magicard_state, empty_init, ROT0, "Impera",    "Lucky 7 (Impera, V04/91a, set 2)",           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAMEL( 1991, jjokeri,    0,        magicard,       jjokeri,   magicard_state, empty_init, ROT0, "Impera",    "Jolly Joker? (Impera, V11/90b)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,  layout_magicard )
+GAMEL( 1991, pokeri,     0,        magicard,       pokeri,    magicard_state, empty_init, ROT0, "Impera",    "Poker (Impera, V11/90b)",                    MACHINE_SUPPORTS_SAVE,                        layout_pokeri )
 
 GAME(  2001, simpbest,   0,        magicle,        hotslots,  hotslots_state, empty_init, ROT0, "Kajot",     "Simply the Best (CZ750, v1.0)",              MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
