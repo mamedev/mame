@@ -324,84 +324,84 @@ offs_t ht1130_disassembler::disassemble(std::ostream &stream, offs_t pc, const h
 
 	case 0b01000000: // (with 4-bit immediate) : ADD A,XH : Add immediate data to the accumulator
 	{
-		u8 oprand = opcodes.r8(pc + 1);
-		if (!(oprand & 0xf0))
+		u8 operand = opcodes.r8(pc + 1);
+		if (!(operand & 0xf0))
 		{
-			util::stream_format(stream, "ADD A,0x%02x", oprand);
+			util::stream_format(stream, "ADD A,0x%02x", operand);
 		}
 		else
 		{
-			util::stream_format(stream, "<ill %02x %02x>", inst, oprand);
+			util::stream_format(stream, "<ill %02x %02x>", inst, operand);
 		}
 		return 2;
 	}
 
 	case 0b01000010: // (with 4-bit immediate) : AND A,XH : Logical AND immediate data to accumulator
 	{
-		u8 oprand = opcodes.r8(pc + 1);
-		if (!(oprand & 0xf0))
+		u8 operand = opcodes.r8(pc + 1);
+		if (!(operand & 0xf0))
 		{
-			util::stream_format(stream, "AND A,0x%02x", oprand);
+			util::stream_format(stream, "AND A,0x%02x", operand);
 		}
 		else
 		{
-			util::stream_format(stream, "<ill %02x %02x>", inst, oprand);
+			util::stream_format(stream, "<ill %02x %02x>", inst, operand);
 		}
 		return 2;
 	}
 
 	case 0b01000110: // (with 4-bit immediate) : MOV R4,XH : Move immediate data to R4
 	{
-		u8 oprand = opcodes.r8(pc + 1);
-		if (!(oprand & 0xf0))
+		u8 operand = opcodes.r8(pc + 1);
+		if (!(operand & 0xf0))
 		{
-			util::stream_format(stream, "MOV R4,0x%02x", oprand);
+			util::stream_format(stream, "MOV R4,0x%02x", operand);
 		}
 		else
 		{
-			util::stream_format(stream, "<ill %02x %02x>", inst, oprand);
+			util::stream_format(stream, "<ill %02x %02x>", inst, operand);
 		}
 		return 2;
 	}
 
 	case 0b01000100: // (with 4-bit immediate) : OR A,XH :  Logical OR immediate data to accumulator
 	{
-		u8 oprand = opcodes.r8(pc + 1);
-		if (!(oprand & 0xf0))
+		u8 operand = opcodes.r8(pc + 1);
+		if (!(operand & 0xf0))
 		{
-			util::stream_format(stream, "OR A,0x%02x", oprand);
+			util::stream_format(stream, "OR A,0x%02x", operand);
 		}
 		else
 		{
-			util::stream_format(stream, "<ill %02x %02x>", inst, oprand);
+			util::stream_format(stream, "<ill %02x %02x>", inst, operand);
 		}
 		return 2;
 	}
 
 	case 0b01000001: // (with 4-bit immediate) : SUB A,XH : Subtract immediate data from accumulator0
 	{
-		u8 oprand = opcodes.r8(pc + 1);
-		if (!(oprand & 0xf0))
+		u8 operand = opcodes.r8(pc + 1);
+		if (!(operand & 0xf0))
 		{
-			util::stream_format(stream, "SUB A,0x%02x", oprand);
+			util::stream_format(stream, "SUB A,0x%02x", operand);
 		}
 		else
 		{
-			util::stream_format(stream, "<ill %02x %02x>", inst, oprand);
+			util::stream_format(stream, "<ill %02x %02x>", inst, operand);
 		}
 		return 2;
 	}
 
 	case 0b01000011: // (with 4-bit immediate) : XOR A,XH : Logical XOR immediate data to accumulator
 	{
-		u8 oprand = opcodes.r8(pc + 1);
-		if (!(oprand & 0xf0))
+		u8 operand = opcodes.r8(pc + 1);
+		if (!(operand & 0xf0))
 		{
-			util::stream_format(stream, "XOR A,0x%02x", oprand);
+			util::stream_format(stream, "XOR A,0x%02x", operand);
 		}
 		else
 		{
-			util::stream_format(stream, "<ill %02x %02x>", inst, oprand);
+			util::stream_format(stream, "<ill %02x %02x>", inst, operand);
 		}
 		return 2;
 	}
@@ -412,8 +412,8 @@ offs_t ht1130_disassembler::disassemble(std::ostream &stream, offs_t pc, const h
 	case 0b01111000: case 0b01111001: case 0b01111010: case 0b01111011:
 	case 0b01111100: case 0b01111101: case 0b01111110: case 0b01111111:
 	{
-		u8 oprand = inst & 0x0f;
-		util::stream_format(stream, "MOV A,0x%02x", oprand);
+		u8 operand = inst & 0x0f;
+		util::stream_format(stream, "MOV A,0x%02x", operand);
 		return 1;
 	}
 
@@ -424,7 +424,7 @@ offs_t ht1130_disassembler::disassemble(std::ostream &stream, offs_t pc, const h
 	case 0b00011001:
 	{
 		u8 reg = (inst & 0x0e) >> 1;
-		util::stream_format(stream, "DEC %s", m_regnames[reg]);
+		util::stream_format(stream, "DEC R%d", reg);
 		return 1;
 	}
 
@@ -433,7 +433,7 @@ offs_t ht1130_disassembler::disassemble(std::ostream &stream, offs_t pc, const h
 	case 0b00011000:
 	{
 		u8 reg = (inst & 0x0e) >> 1;
-		util::stream_format(stream, "INC %s", m_regnames[reg]);
+		util::stream_format(stream, "INC R%d", reg);
 		return 1;
 	}
 
@@ -442,7 +442,7 @@ offs_t ht1130_disassembler::disassemble(std::ostream &stream, offs_t pc, const h
 	case 0b00101001:
 	{
 		u8 reg = (inst & 0x0e) >> 1;
-		util::stream_format(stream, "MOV A,%s", m_regnames[reg]);
+		util::stream_format(stream, "MOV A,R%d", reg);
 		return 1;
 	}
 
@@ -451,7 +451,7 @@ offs_t ht1130_disassembler::disassemble(std::ostream &stream, offs_t pc, const h
 	case 0b00101000:
 	{
 		u8 reg = (inst & 0x0e) >> 1;
-		util::stream_format(stream, "MOV %s, A", m_regnames[reg]);
+		util::stream_format(stream, "MOV R%d, A", reg);
 		return 1;
 	}
 
@@ -463,15 +463,15 @@ offs_t ht1130_disassembler::disassemble(std::ostream &stream, offs_t pc, const h
 	case 0b01011000: case 0b01011001: case 0b01011010: case 0b01011011:
 	case 0b01011100: case 0b01011101: case 0b01011110: case 0b01011111:
 	{
-		u8 oprand = opcodes.r8(pc + 1);
-		if (!(oprand & 0xf0))
+		u8 operand = opcodes.r8(pc + 1);
+		if (!(operand & 0xf0))
 		{
-			uint8_t fulldata = (inst & 0x0f) | (oprand << 4);
+			uint8_t fulldata = (inst & 0x0f) | (operand << 4);
 			util::stream_format(stream, "MOV R1R0,0x%02x", fulldata);
 		}
 		else
 		{
-			util::stream_format(stream, "<ill %02x %02x>", inst, oprand);
+			util::stream_format(stream, "<ill %02x %02x>", inst, operand);
 		}
 		return 2;
 	}
@@ -482,15 +482,15 @@ offs_t ht1130_disassembler::disassemble(std::ostream &stream, offs_t pc, const h
 	case 0b01101000: case 0b01101001: case 0b01101010: case 0b01101011:
 	case 0b01101100: case 0b01101101: case 0b01101110: case 0b01101111:
 	{
-		u8 oprand = opcodes.r8(pc + 1);
-		if (!(oprand & 0xf0))
+		u8 operand = opcodes.r8(pc + 1);
+		if (!(operand & 0xf0))
 		{
-			uint8_t fulldata = (inst & 0x0f) | (oprand << 4);
+			uint8_t fulldata = (inst & 0x0f) | (operand << 4);
 			util::stream_format(stream, "MOV R3R2,0x%02x", fulldata);
 		}
 		else
 		{
-			util::stream_format(stream, "<ill %02x %02x>", inst, oprand);
+			util::stream_format(stream, "<ill %02x %02x>", inst, operand);
 		}
 		return 2;
 	}
@@ -503,8 +503,8 @@ offs_t ht1130_disassembler::disassemble(std::ostream &stream, offs_t pc, const h
 	case 0b11111000: case 0b11111001: case 0b11111010: case 0b11111011:
 	case 0b11111100: case 0b11111101: case 0b11111110: case 0b11111111:
 	{
-		u8 oprand = opcodes.r8(pc + 1);
-		uint16_t fulladdr = ((inst & 0x0f) << 8) | oprand;
+		u8 operand = opcodes.r8(pc + 1);
+		uint16_t fulladdr = ((inst & 0x0f) << 8) | operand;
 		util::stream_format(stream, "CALL %03x", fulladdr);
 		return 2;
 	}
@@ -515,8 +515,8 @@ offs_t ht1130_disassembler::disassemble(std::ostream &stream, offs_t pc, const h
 	case 0b11101000: case 0b11101001: case 0b11101010: case 0b11101011:
 	case 0b11101100: case 0b11101101: case 0b11101110: case 0b11101111:
 	{
-		u8 oprand = opcodes.r8(pc + 1);
-		uint16_t fulladdr = ((inst & 0x0f) << 8) | oprand;
+		u8 operand = opcodes.r8(pc + 1);
+		uint16_t fulladdr = ((inst & 0x0f) << 8) | operand;
 		util::stream_format(stream, "JMP %03x", fulladdr);
 		return 2;
 	}
@@ -527,8 +527,8 @@ offs_t ht1130_disassembler::disassemble(std::ostream &stream, offs_t pc, const h
 	case 0b11000000: case 0b11000001: case 0b11000010: case 0b11000011:
 	case 0b11000100: case 0b11000101: case 0b11000110: case 0b11000111:
 	{
-		u8 oprand = opcodes.r8(pc + 1);
-		uint16_t fulladdr = ((inst & 0x07) << 8) | oprand | (pc & 0x800);
+		u8 operand = opcodes.r8(pc + 1);
+		uint16_t fulladdr = ((inst & 0x07) << 8) | operand | (pc & 0x800);
 		util::stream_format(stream, "JC %03x", fulladdr);
 		return 2;
 	}
@@ -537,8 +537,8 @@ offs_t ht1130_disassembler::disassemble(std::ostream &stream, offs_t pc, const h
 	case 0b11001000: case 0b11001001: case 0b11001010: case 0b11001011:
 	case 0b11001100: case 0b11001101: case 0b11001110: case 0b11001111:
 	{
-		u8 oprand = opcodes.r8(pc + 1);
-		uint16_t fulladdr = ((inst & 0x07) << 8) | oprand | (pc & 0x800);
+		u8 operand = opcodes.r8(pc + 1);
+		uint16_t fulladdr = ((inst & 0x07) << 8) | operand | (pc & 0x800);
 		util::stream_format(stream, "JNC %03x", fulladdr);
 		return 2;
 	}
@@ -547,8 +547,8 @@ offs_t ht1130_disassembler::disassemble(std::ostream &stream, offs_t pc, const h
 	case 0b10111000: case 0b10111001: case 0b10111010: case 0b10111011:
 	case 0b10111100: case 0b10111101: case 0b10111110: case 0b10111111:
 	{
-		u8 oprand = opcodes.r8(pc + 1);
-		uint16_t fulladdr = ((inst & 0x07) << 8) | oprand | (pc & 0x800);
+		u8 operand = opcodes.r8(pc + 1);
+		uint16_t fulladdr = ((inst & 0x07) << 8) | operand | (pc & 0x800);
 		util::stream_format(stream, "JNZ A,%03x", fulladdr);
 		return 2;
 	}
@@ -557,8 +557,8 @@ offs_t ht1130_disassembler::disassemble(std::ostream &stream, offs_t pc, const h
 	case 0b10100000: case 0b10100001: case 0b10100010: case 0b10100011:
 	case 0b10100100: case 0b10100101: case 0b10100110: case 0b10100111:
 	{
-		u8 oprand = opcodes.r8(pc + 1);
-		uint16_t fulladdr = ((inst & 0x07) << 8) | oprand | (pc & 0x800);
+		u8 operand = opcodes.r8(pc + 1);
+		uint16_t fulladdr = ((inst & 0x07) << 8) | operand | (pc & 0x800);
 		util::stream_format(stream, "JNZ R0,%03x", fulladdr);
 		return 2;
 	}
@@ -567,8 +567,8 @@ offs_t ht1130_disassembler::disassemble(std::ostream &stream, offs_t pc, const h
 	case 0b10101000: case 0b10101001: case 0b10101010: case 0b10101011:
 	case 0b10101100: case 0b10101101: case 0b10101110: case 0b10101111:
 	{
-		u8 oprand = opcodes.r8(pc + 1);
-		uint16_t fulladdr = ((inst & 0x07) << 8) | oprand | (pc & 0x800);
+		u8 operand = opcodes.r8(pc + 1);
+		uint16_t fulladdr = ((inst & 0x07) << 8) | operand | (pc & 0x800);
 		util::stream_format(stream, "JNZ R1,%03x", fulladdr);
 		return 2;
 	}
@@ -577,8 +577,8 @@ offs_t ht1130_disassembler::disassemble(std::ostream &stream, offs_t pc, const h
 	case 0b11011000: case 0b11011001: case 0b11011010: case 0b11011011:
 	case 0b11011100: case 0b11011101: case 0b11011110: case 0b11011111:
 	{
-		u8 oprand = opcodes.r8(pc + 1);
-		uint16_t fulladdr = ((inst & 0x07) << 8) | oprand | (pc & 0x800);
+		u8 operand = opcodes.r8(pc + 1);
+		uint16_t fulladdr = ((inst & 0x07) << 8) | operand | (pc & 0x800);
 		util::stream_format(stream, "JNZ R4,%03x", fulladdr);
 		return 2;
 	}
@@ -587,8 +587,8 @@ offs_t ht1130_disassembler::disassemble(std::ostream &stream, offs_t pc, const h
 	case 0b11010000: case 0b11010001: case 0b11010010: case 0b11010011:
 	case 0b11010100: case 0b11010101: case 0b11010110: case 0b11010111:
 	{
-		u8 oprand = opcodes.r8(pc + 1);
-		uint16_t fulladdr = ((inst & 0x07) << 8) | oprand | (pc & 0x800);
+		u8 operand = opcodes.r8(pc + 1);
+		uint16_t fulladdr = ((inst & 0x07) << 8) | operand | (pc & 0x800);
 		util::stream_format(stream, "JTMR %03x", fulladdr);
 		return 2;
 	}
@@ -597,8 +597,8 @@ offs_t ht1130_disassembler::disassemble(std::ostream &stream, offs_t pc, const h
 	case 0b10110000: case 0b10110001: case 0b10110010: case 0b10110011:
 	case 0b10110100: case 0b10110101: case 0b10110110: case 0b10110111:
 	{
-		u8 oprand = opcodes.r8(pc + 1);
-		uint16_t fulladdr = ((inst & 0x07) << 8) | oprand | (pc & 0x800);
+		u8 operand = opcodes.r8(pc + 1);
+		uint16_t fulladdr = ((inst & 0x07) << 8) | operand | (pc & 0x800);
 		util::stream_format(stream, "JZ A,%03x", fulladdr);
 		return 2;
 	}
@@ -613,8 +613,8 @@ offs_t ht1130_disassembler::disassemble(std::ostream &stream, offs_t pc, const h
 	case 0b10011000: case 0b10011001: case 0b10011010: case 0b10011011:
 	case 0b10011100: case 0b10011101: case 0b10011110: case 0b10011111:
 	{
-		u8 oprand = opcodes.r8(pc + 1);
-		uint16_t fulladdr = ((inst & 0x07) << 8) | oprand | (pc & 0x800);
+		u8 operand = opcodes.r8(pc + 1);
+		uint16_t fulladdr = ((inst & 0x07) << 8) | operand | (pc & 0x800);
 		uint8_t bit = (inst & 0x18)>>3;
 		util::stream_format(stream, "JA%d %03x", bit, fulladdr);
 		return 2;
@@ -623,14 +623,14 @@ offs_t ht1130_disassembler::disassemble(std::ostream &stream, offs_t pc, const h
 	// other Ops
 	case 0b01000101: // (with 4 bit immediate) : SOUND n : Activate SOUND channel n
 	{
-		u8 oprand = opcodes.r8(pc + 1);
-		if (!(oprand & 0xf0))
+		u8 operand = opcodes.r8(pc + 1);
+		if (!(operand & 0xf0))
 		{
-			util::stream_format(stream, "SOUND %d", oprand);
+			util::stream_format(stream, "SOUND %d", operand);
 		}
 		else
 		{
-			util::stream_format(stream, "<ill %02x %02x>", inst, oprand);
+			util::stream_format(stream, "<ill %02x %02x>", inst, operand);
 		}
 		return 2;
 	}
@@ -638,22 +638,22 @@ offs_t ht1130_disassembler::disassemble(std::ostream &stream, offs_t pc, const h
 
 	case 0b00110111: // (with 00111110) : HALT Halt system clock
 	{
-		u8 oprand = opcodes.r8(pc + 1);
-		if (oprand == 0b00111110)
+		u8 operand = opcodes.r8(pc + 1);
+		if (operand == 0b00111110)
 		{
 			stream << "HALT";
 		}
 		else
 		{
-			util::stream_format(stream, "<ill %02x %02x>", inst, oprand);
+			util::stream_format(stream, "<ill %02x %02x>", inst, operand);
 		}
 		return 2;
 	}
 
 	case 0b01000111: // (with 8-bit immediate) : TIMER XXH : Set immediate data to timer counter
 	{
-		u8 oprand = opcodes.r8(pc + 1);
-		util::stream_format(stream, "TIMER %02x", oprand);
+		u8 operand = opcodes.r8(pc + 1);
+		util::stream_format(stream, "TIMER %02x", operand);
 		return 2;
 	}
 

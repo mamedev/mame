@@ -36,6 +36,8 @@ public:
 protected:
 	ht1130_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor data);
 
+	virtual uint32_t execute_max_cycles() const noexcept override { return 2; }
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -59,7 +61,6 @@ private:
 	address_space_config m_space_config;
 	address_space_config m_extregs_config;
 
-	memory_access<8, 0, 0, ENDIANNESS_LITTLE>::cache m_cache;
 	memory_access<8, 0, 0, ENDIANNESS_LITTLE>::specific m_space;
 
 

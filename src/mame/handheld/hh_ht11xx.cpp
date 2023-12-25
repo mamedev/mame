@@ -33,28 +33,26 @@ protected:
 	virtual void machine_reset() override;
 
 private:
+	void display_offset_w(u8 data);
+	void display_data_w(u8 data);
+
+	u8 m_displayoffset;
+
 	required_device<ht1130_device> m_maincpu;
 	output_finder<512> m_seg;
 	required_ioport m_in1;
 	required_ioport m_in2;
-
-	void display_offset_w(u8 data);
-	void display_data_w(u8 data);
-
-	u8 port_pm_r();
-	u8 port_ps_r();
-	u8 port_pp_r();
-
-	u8 m_displayoffset = 0;
 };
 
 void ht11xx_brickgame_state::machine_start()
 {
 	m_seg.resolve();
+	save_item(NAME(m_displayoffset));
 }
 
 void ht11xx_brickgame_state::machine_reset()
 {
+	m_displayoffset = 0;
 }
 
 static INPUT_PORTS_START( ht11xx_brickgame )
@@ -83,24 +81,14 @@ void ht11xx_brickgame_state::display_data_w(u8 data)
 	}
 }
 
-u8 ht11xx_brickgame_state::port_ps_r()
-{
-	return m_in1->read() & 0xf;
-}
-
-u8 ht11xx_brickgame_state::port_pp_r()
-{
-	return m_in2->read() & 0xf;
-}
-
 void ht11xx_brickgame_state::ht11xx_brickgame(machine_config &config)
 {
 	HT1190(config, m_maincpu, 1000000/8); // frequency?
 	m_maincpu->display_offset_out_cb().set(FUNC(ht11xx_brickgame_state::display_offset_w));
 	m_maincpu->display_data_out_cb().set(FUNC(ht11xx_brickgame_state::display_data_w));
 
-	m_maincpu->ps_in_cb().set(FUNC(ht11xx_brickgame_state::port_ps_r));
-	m_maincpu->pp_in_cb().set(FUNC(ht11xx_brickgame_state::port_pp_r));
+	m_maincpu->ps_in_cb().set_ioport(m_in1);
+	m_maincpu->pp_in_cb().set_ioport(m_in2);
 
 	SPEAKER(config, "speaker").front_center();
 
