@@ -1516,7 +1516,7 @@ void m6801_cpu_device::p1_ddr_w(uint8_t data)
 void hd6301y_cpu_device::p1_ddr_1bit_w(uint8_t data)
 {
 	// HD6301Y DDR1 is 1-bit (HD6301X does not have DDR1)
-	hd6301_cpu_device::p1_ddr_w((BIT(data, 0) ? 0xff : 0x00));
+	hd6301_cpu_device::p1_ddr_w(BIT(data, 0) ? 0xff : 0x00);
 }
 
 uint8_t m6801_cpu_device::p1_data_r()
@@ -1641,7 +1641,7 @@ void m6801_cpu_device::p3_ddr_w(uint8_t data)
 void hd6301x_cpu_device::p3_ddr_1bit_w(uint8_t data)
 {
 	// HD6301X/Y DDR3 is 1-bit
-	hd6301_cpu_device::p3_ddr_w((BIT(data, 0) ? 0xff : 0x00));
+	hd6301_cpu_device::p3_ddr_w(BIT(data, 0) ? 0xff : 0x00);
 }
 
 uint8_t m6801_cpu_device::p3_data_r()

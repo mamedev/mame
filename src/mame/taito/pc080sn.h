@@ -34,11 +34,6 @@ public:
 	void yscroll_word_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void ctrl_word_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-
-	void common_get_tile_info(tile_data &tileinfo, int tile_index, u16 *ram);
-
 	void set_scroll(int tilemap_num, int scrollx, int scrolly);
 	void set_trans_pen(int tilemap_num, int pen);
 	void tilemap_update();
@@ -57,12 +52,15 @@ protected:
 	virtual void device_post_load() override;
 
 private:
+	template <unsigned N>
+	TILE_GET_INFO_MEMBER(get_tile_info);
+
 	// internal state
-	u16         m_ctrl[8];
+	u16            m_ctrl[8];
 
 	std::unique_ptr<u16[]>         m_ram;
-	u16         *m_bg_ram[2];
-	u16         *m_bgscroll_ram[2];
+	u16            *m_bg_ram[2];
+	u16            *m_bgscroll_ram[2];
 
 	int            m_bgscrollx[2], m_bgscrolly[2];
 

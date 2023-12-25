@@ -54,7 +54,12 @@ DEFINE_DEVICE_TYPE(PC080SN, pc080sn_device, "pc080sn", "Taito PC080SN")
 pc080sn_device::pc080sn_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, PC080SN, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this)
-	, m_ram(nullptr)
+	, m_ram()
+	, m_bg_ram{ nullptr, nullptr }
+	, m_bgscroll_ram{ nullptr, nullptr }
+	, m_bgscrollx{ 0, 0 }
+	, m_bgscrolly{ 0, 0 }
+	, m_tilemap{ nullptr, nullptr }
 	, m_x_offset(0)
 	, m_y_offset(0)
 	, m_y_invert(0)
@@ -62,14 +67,6 @@ pc080sn_device::pc080sn_device(const machine_config &mconfig, const char *tag, d
 {
 	for (auto & elem : m_ctrl)
 		elem = 0;
-
-	for (int i = 0; i < 2; i++)
-	{
-		m_bg_ram[i] = nullptr;
-		m_bgscroll_ram[i] = nullptr;
-		m_bgscrollx[i] = 0;
-		m_bgscrolly[i] = 0;
-	}
 }
 
 //-------------------------------------------------
@@ -81,13 +78,13 @@ void pc080sn_device::device_start()
 	/* use the given gfx set for bg tiles */
 	if (!m_dblwidth) /* standard tilemaps */
 	{
-		m_tilemap[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(pc080sn_device::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-		m_tilemap[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(pc080sn_device::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+		m_tilemap[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(pc080sn_device::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+		m_tilemap[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(pc080sn_device::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	}
 	else    /* double width tilemaps */
 	{
-		m_tilemap[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(pc080sn_device::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
-		m_tilemap[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(pc080sn_device::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
+		m_tilemap[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(pc080sn_device::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
+		m_tilemap[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(pc080sn_device::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
 	}
 
 	m_tilemap[0]->set_transparent_pen(0);
@@ -128,35 +125,26 @@ void pc080sn_device::device_post_load()
     DEVICE HANDLERS
 *****************************************************************************/
 
-void pc080sn_device::common_get_tile_info(tile_data &tileinfo, int tile_index, u16 *ram)
+template <unsigned N>
+TILE_GET_INFO_MEMBER(pc080sn_device::get_tile_info)
 {
 	u16 code, attr;
 
 	if (!m_dblwidth)
 	{
-		code = (ram[2 * tile_index + 1] & 0x3fff);
-		attr = ram[2 * tile_index];
+		code = m_bg_ram[N][2 * tile_index + 1] & 0x3fff;
+		attr = m_bg_ram[N][2 * tile_index];
 	}
 	else
 	{
-		code = (ram[tile_index + 0x2000] & 0x3fff);
-		attr = ram[tile_index];
+		code = m_bg_ram[N][tile_index + 0x2000] & 0x3fff;
+		attr = m_bg_ram[N][tile_index];
 	}
 
 	tileinfo.set(0,
 			code,
 			(attr & 0x1ff),
 			TILE_FLIPYX((attr & 0xc000) >> 14));
-}
-
-TILE_GET_INFO_MEMBER(pc080sn_device::get_bg_tile_info)
-{
-	common_get_tile_info(tileinfo, tile_index, m_bg_ram[0]);
-}
-
-TILE_GET_INFO_MEMBER(pc080sn_device::get_fg_tile_info)
-{
-	common_get_tile_info(tileinfo, tile_index, m_bg_ram[1]);
 }
 
 u16 pc080sn_device::word_r(offs_t offset)
