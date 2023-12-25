@@ -59,9 +59,10 @@ protected:
 
 private:
 	address_space_config m_space_config;
-	address_space_config m_extregs_config;
+	address_space_config m_data_config;
 
 	memory_access<8, 0, 0, ENDIANNESS_LITTLE>::specific m_space;
+	memory_access<8, 0, 0, ENDIANNESS_LITTLE>::specific m_data;
 
 	void setreg(u8 which, u8 data);
 	u8 getreg(u8 which);

@@ -31,7 +31,7 @@ ht1130_device::ht1130_device(const machine_config &mconfig, device_type type, co
 	, m_tempram(*this, "tempram")
 	, m_displayram(*this, "displayram")
 	, m_space_config("program", ENDIANNESS_LITTLE, 8, 12, 0, address_map_constructor(FUNC(ht1130_device::internal_map), this))
-	, m_extregs_config("data", ENDIANNESS_LITTLE, 8, 8, 0, data)
+	, m_data_config("data", ENDIANNESS_LITTLE, 8, 8, 0, data)
 	, m_pc(0)
 	, m_port_in_pm(*this, 0xff)
 	, m_port_in_ps(*this, 0xff)
@@ -61,7 +61,7 @@ device_memory_interface::space_config_vector ht1130_device::memory_space_config(
 {
 	return space_config_vector{
 		std::make_pair(AS_PROGRAM, &m_space_config),
-		std::make_pair(AS_DATA, &m_extregs_config)
+		std::make_pair(AS_DATA, &m_data_config)
 	};
 }
 
@@ -152,13 +152,13 @@ inline u8 ht1130_device::getr1r0()
 inline u8 ht1130_device::getr1r0_data()
 {
 	const u8 dataaddress = getr1r0();
-	return space(AS_DATA).read_byte(dataaddress);
+	return m_data.read_byte(dataaddress);
 }
 
 inline void ht1130_device::setr1r0_data(u8 data)
 {
 	const u8 dataaddress = getr1r0();
-	space(AS_DATA).write_byte(dataaddress, data);
+	m_data.write_byte(dataaddress, data);
 }
 
 inline u8 ht1130_device::getr3r2()
@@ -169,13 +169,13 @@ inline u8 ht1130_device::getr3r2()
 inline u8 ht1130_device::getr3r2_data()
 {
 	const u8 dataaddress = getr3r2();
-	return space(AS_DATA).read_byte(dataaddress);
+	return m_data.read_byte(dataaddress);
 }
 
 inline void ht1130_device::setr3r2_data(u8 data)
 {
 	const u8 dataaddress = getr3r2();
-	space(AS_DATA).write_byte(dataaddress, data);
+	m_data.write_byte(dataaddress, data);
 }
 
 
@@ -194,6 +194,7 @@ void ht1190_device::internal_data_map_ht1190(address_map &map)
 void ht1130_device::device_start()
 {
 	space(AS_PROGRAM).specific(m_space);
+	space(AS_DATA).specific(m_data);
 
 	set_icountptr(m_icount);
 
@@ -454,7 +455,7 @@ void ht1130_device::do_op()
 	case 0b01001110: // READ MR0A : Read ROM code of current page to M(R1,R0) and ACC
 	{
 		const u16 dataddress = (m_pc & 0xf00) | (getacc() << 4) | (getreg(4));
-		const u8 data = space(AS_PROGRAM).read_byte(dataddress);
+		const u8 data = m_space.read_byte(dataddress);
 		setr1r0_data((data >> 4) & 0xf);
 		setacc(data & 0xf);
 		return;
@@ -463,7 +464,7 @@ void ht1130_device::do_op()
 	case 0b01001100: // READ R4A : Read ROM code of current page to R4 and accumulator
 	{
 		const u16 dataddress = (m_pc & 0xf00) | (getacc() << 4) | (getr1r0_data());
-		const u8 data = space(AS_PROGRAM).read_byte(dataddress);
+		const u8 data = m_space.read_byte(dataddress);
 		setreg(4, (data >> 4) & 0xf);
 		setacc(data & 0xf);
 		return;
@@ -472,7 +473,7 @@ void ht1130_device::do_op()
 	case 0b01001111: // READF MR0A : Read ROM Code of page F to M(R1,R0) and ACC
 	{
 		const u16 dataddress = 0xf00 | (getacc() << 4) | (getreg(4));
-		const u8 data = space(AS_PROGRAM).read_byte(dataddress);
+		const u8 data = m_space.read_byte(dataddress);
 		setr1r0_data((data >> 4) & 0xf);
 		setacc(data & 0xf);
 		return;
@@ -481,7 +482,7 @@ void ht1130_device::do_op()
 	case 0b01001101: // READF R4A : Read ROM code of page F to R4 and accumulator
 	{
 		const u16 dataddress = 0xf00 | (getacc() << 4) | (getr1r0_data());
-		const u8 data = space(AS_PROGRAM).read_byte(dataddress);
+		const u8 data = m_space.read_byte(dataddress);
 		setreg(4, (data >> 4) & 0xf);
 		setacc(data & 0xf);
 		return;
