@@ -114,5 +114,5 @@ ROM_END
 
 } // anonymous namespace
 
-// some dieshots have 1996 on them, it is also possible the software is from Holtek
-CONS( 1996?, brke23p2, 0, 0, ht11xx_brickgame, ht11xx_brickgame, ht11xx_brickgame_state, empty_init, "Holtek", "Brick Game 96 in 1 (E-23 Plus Mark II)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // needs SVG screen
+// some other dieshots have 1996 on them, it is also possible the software is from Holtek
+CONS( 1993, brke23p2, 0, 0, ht11xx_brickgame, ht11xx_brickgame, ht11xx_brickgame_state, empty_init, "Holtek", "Brick Game 96 in 1 (E-23 Plus Mark II)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // needs SVG screen
