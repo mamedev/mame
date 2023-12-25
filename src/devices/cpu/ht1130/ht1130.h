@@ -63,7 +63,6 @@ private:
 
 	memory_access<8, 0, 0, ENDIANNESS_LITTLE>::specific m_space;
 
-
 	inline void setreg(u8 which, u8 data);
 	inline u8 getreg(u8 which);
 	inline void setacc(u8 data);
@@ -109,7 +108,6 @@ private:
 
 	devcb_write8 m_display_offset_out;
 	devcb_write8 m_display_data_out;
-
 };
 
 class ht1190_device : public ht1130_device
@@ -117,8 +115,8 @@ class ht1190_device : public ht1130_device
 public:
 	ht1190_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+private:
 	void internal_data_map_ht1190(address_map &map);
-
 };
 
 
