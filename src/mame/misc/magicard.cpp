@@ -319,11 +319,13 @@ public:
 	void hotslots_pic54(machine_config &config);
 	void magicle(machine_config &config);
 	void puzzleme(machine_config &config);
+	void simpbest(machine_config &config);
 
 private:
 	void hotslots_map_base(address_map &map);
 	void hotslots_map(address_map &map);
 	void puzzleme_map(address_map &map);
+	void simpbest_map(address_map &map);
 
 	uint8_t read_ds1207_ds2401(offs_t offset);
 	void write_ds1207_ds2401(offs_t offset, uint8_t data);
@@ -552,6 +554,17 @@ void hotslots_state::puzzleme_map(address_map &map)
 	hotslots_map_base(map);
 }
 
+void hotslots_state::simpbest_map(address_map &map)
+{
+	hotslots_map_base(map);
+
+	/* to do.
+	   too many differencies, and seems that is using
+	   a different palette system instead of RAMDAC.
+	*/
+}
+
+
 /*********************************************
 *                Input Ports                 *
 *********************************************/
@@ -672,49 +685,41 @@ static INPUT_PORTS_START( lucky7i )
 
 	PORT_MODIFY("IN0")
 
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 )          PORT_NAME("Win Plan Scroll/Collect")
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_BET )       PORT_NAME("Einsatz")
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )           PORT_NAME("Start/Gamble")
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )      PORT_NAME("Rental Book Keeping")
-
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
+//	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 )          PORT_NAME("Win Plan Scroll/Collect")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )      PORT_NAME("Hold 5 / Bet (Einsatz)")
+//	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )           PORT_NAME("Start/Gamble")
+//	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )      PORT_NAME("Rental Book Keeping")
+//	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("IN1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Remote 1" )                  PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x02, "100" )
+	PORT_DIPSETTING(    0x00, "10" )
+	PORT_DIPNAME( 0x04, 0x04, "Munzer2" )                   PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x04, "10" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x08, 0x08, "Munzer1" )                   PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x08, "10" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Remote 2" )                  PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x20, "100" )
+	PORT_DIPSETTING(    0x00, "50" )
+	PORT_DIPNAME( 0x40, 0x40, "Hopper-Wert" )               PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x40, "10" )
+	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPNAME( 0x80, 0x80, "Hopper" )                    PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_DIPNAME( 0x40, 0x40, "Hopper-Wert" )               PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(    0x40, "10" )
-	PORT_DIPSETTING(    0x00, "5" )
-
-	PORT_DIPNAME( 0x08, 0x08, "Munzer1" )                   PORT_DIPLOCATION("SW1:5")
-	PORT_DIPSETTING(    0x08, "10" )
-	PORT_DIPSETTING(    0x00, "5" )
-
-	PORT_DIPNAME( 0x04, 0x04, "Munzer2" )                   PORT_DIPLOCATION("SW1:6")
-	PORT_DIPSETTING(    0x04, "10" )
-	PORT_DIPSETTING(    0x00, "5" )
-
-	PORT_DIPNAME( 0x02, 0x02, "Remote 1" )                  PORT_DIPLOCATION("SW1:7")
-	PORT_DIPSETTING(    0x02, "100" )
-	PORT_DIPSETTING(    0x00, "10" )
-
-	PORT_DIPNAME( 0x20, 0x20, "Remote 2" )                  PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x20, "100" )
-	PORT_DIPSETTING(    0x00, "50" )
-
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )    PORT_NAME("Attendant Collect")
+//	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )    PORT_NAME("Attendant Collect")
+//	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED )
+//	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 INPUT_PORTS_END
 
@@ -1028,6 +1033,17 @@ void hotslots_state::puzzleme(machine_config &config)
 
 	config.device_remove("serial_id");
 	config.device_remove("ds1207");
+}
+
+void hotslots_state::simpbest(machine_config &config)
+{
+	hotslots_base(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &hotslots_state::simpbest_map);
+
+	I2C_24C04(config, m_i2cmem).set_e0(1);
+
+	config.device_remove("serial_id");
 }
 
 
@@ -1874,85 +1890,6 @@ ROM_START( magicrd1 )
 	ROM_LOAD( "magicrd1.nv", 0x0000, 0x4000, CRC(5b62f04a) SHA1(0cc6404e1bb66801a562ff7a1479859c17e9f209) )
 ROM_END
 
-/*
-  Lucky 7
-  Impera
-  Version 04/91a
-
-  PCB layout:
-   ________________________________________________________________________________________________________________
-  |                                                                                                                |
-  |      __________                          _____________               ___________        ___                    |
-  |     |  74LS04  |                        |HY51C4256S-10|             |     C     |      |904|     ___           |__
-  |     |__________|                        |_____________|             |___________|      |9  |    |. .|           __|
-  |                                          _____________                                 |   |    |. .|           __|
-  |            ____                         |HY51C4256S-10|                                |LT1|    |. .|           __|
-  |           | A  |                        |_____________|                                |081|    |. .|           __|
-  |           |____|                         _____________                                 |CN |    |. .|           __|
-  |                                         |HY51C4256S-10|                                |___|    |. .|           __|
-  |                                         |_____________|           __________________            |. .|           __|
-  |                                          _____________           |   ADV476KN35E    |           |. .|           __|
-  |                                         |HY51C4256S-10|          |                  |           |___|           __|
-  | _______                                 |_____________|          |     OF19802.3    |                          |
-  ||DS1207 |                                                         |__________________|                          |
-  ||_______|                                                                                                       |
-  |         ___                       XTAL2                                                                        |
-  |        |   |        ________          ________________                                                         |
-  |   ___  |PC7|       |        |        |                |                                                        |__
-  |  |   | |4HC|       |        |        |    IMPERA 8    |                                                         __|
-  |  |HEF| |273|       |HYUNDAI |        |                |                                                         __|
-  |  |400| |A  |       |        |        |                |                                                         __|
-  |  |98B| |   |       |HY6264AL|        |     160710     |                                                         __|
-  |  |P  | |   |       |P_10    |        |                |                                                         __|
-  |  |   | |   |       |        |        |  DTD9105I1 Y   |                                                         __|
-  |  |___| |___|       |        |        |                |                                ___   ___                __|
-  |                    | 9218A  |        |________________|              _____________    |   | |   |               __|
-  |   _______          |        |                                       |  74HC245AP  |   |PC7| |ULN|               __|
-  |  |       |         | KOREA  |                                       |_____________|   |4HC| |280|               __|
-  |  |BATTERY|         |________|                                                         |273| |3A |               __|
-  |  |       |                                                                            |AP | |   |               __|
-  |  |_______|     ________   ________                                                    |   | |   |               __|
-  |               |        | |        |                                                   |   | |   |               __|
-  |               |        | |        |                                  _____________    |___| |___|               __|
-  |   ___         |        | |        |     XTAL1                       |  74HC245AP  |    ___   ___                __|
-  |  | B |        |        | |        |    __________________           |_____________|   |   | |   |               __|
-  |  |___|        |        | |        |   |                  |                            |PC7| |ULN|               __|
-  |               |        | |        |   |    IMPERA 7      |                            |4HC| |280|               __|
-  |               |D27C210 | |D27C210 |   |                  |                            |273| |3A |               __|
-  |               |        | |        |   |     155200       |           _____________    |AP | |   |               __|
-  |   ___   ___   |        | |        |   |                  |          |  74HC245AP  |   |   | |   |               __|
-  |  |   | |   |  |GAME-ROM| |        |   |   DfD9101V3 Y    |          |_____________|   |   | |   |               __|
-  |  |PAL| |PAL|  | Lucky 7| |        |   |                  |                            |___| |___|               __|
-  |  |16L| |16L|  |        | |        |   |                  |                             __________               __|
-  |  |8  | |8  |  |VNr03-07| |        |   |                  |                            |  PC849   |              __|
-  |  |   | |   |  |Sum.D882| |        |   |__________________|           _____________    |__________|              __|
-  |  |   | |   |  |        | |        |                                 |  74HC245AP  |                             __|
-  |  |   | |   |  |        | |        |                                 |_____________|                             __|
-  |  |___| |___|  |________| |________|                                                    ___________              __|
-  |                                                                                       |   DIP 1   |            |
-  | IMPERA BOARD REV V1.04                                                                |___________|            |
-  |________________________________________________________________________________________________________________|
-
-  A = TL7705ACP
-  B = DS1210
-  C = Cover scratched - unreadable
-
-  XTAL1 = 19.6608 (68070)
-  XTAL2 = 30.000  (66470)
-
-*/
-ROM_START( lucky7i )
-	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
-	ROM_LOAD16_WORD_SWAP( "27c210.6", 0x00000, 0x20000, CRC(3a99e9f3) SHA1(b9b533378ce514662cbd85a37ee138a2df760ed4) )
-	ROM_LOAD16_WORD_SWAP( "27c210.5", 0x20000, 0x20000, CRC(b4da8856) SHA1(a33158d75047561fa9674ceb6b22cc63b5b49aed) )
-
-	ROM_REGION(0x4d, "ds1207", 0)  // timekey
-	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(7b838ea7) SHA1(5c22b789251becd20f56f944b76c5b779e5a8892) )  // created to match game
-
-	ROM_REGION(0x4000, "nvram", 0)  // Default NVRAM
-	ROM_LOAD( "lucky7i.nv", 0x0000, 0x4000, CRC(51960419) SHA1(ef7f9d7d9714fda0af23b311232194567887a264) )
-ROM_END
-
 
 /*
 
@@ -2050,6 +1987,107 @@ ROM_START( magicrd1d )
 	ROM_REGION(0x4000, "nvram", 0)  // Default NVRAM
 	ROM_LOAD( "magicrd1d.nv", 0x0000, 0x4000, CRC(2d2e1082) SHA1(f288fa800da59dc89cdca02e528c94161b149f1c) )
 ROM_END
+
+
+/*
+  Lucky 7
+  Impera
+  Version 04/91a
+
+  PCB layout:
+   ________________________________________________________________________________________________________________
+  |                                                                                                                |
+  |      __________                          _____________               ___________        ___                    |
+  |     |  74LS04  |                        |HY51C4256S-10|             |     C     |      |904|     ___           |__
+  |     |__________|                        |_____________|             |___________|      |9  |    |. .|           __|
+  |                                          _____________                                 |   |    |. .|           __|
+  |            ____                         |HY51C4256S-10|                                |LT1|    |. .|           __|
+  |           | A  |                        |_____________|                                |081|    |. .|           __|
+  |           |____|                         _____________                                 |CN |    |. .|           __|
+  |                                         |HY51C4256S-10|                                |___|    |. .|           __|
+  |                                         |_____________|           __________________            |. .|           __|
+  |                                          _____________           |   ADV476KN35E    |           |. .|           __|
+  |                                         |HY51C4256S-10|          |                  |           |___|           __|
+  | _______                                 |_____________|          |     OF19802.3    |                          |
+  ||DS1207 |                                                         |__________________|                          |
+  ||_______|                                                                                                       |
+  |         ___                       XTAL2                                                                        |
+  |        |   |        ________          ________________                                                         |
+  |   ___  |PC7|       |        |        |                |                                                        |__
+  |  |   | |4HC|       |        |        |    IMPERA 8    |                                                         __|
+  |  |HEF| |273|       |HYUNDAI |        |                |                                                         __|
+  |  |400| |A  |       |        |        |                |                                                         __|
+  |  |98B| |   |       |HY6264AL|        |     160710     |                                                         __|
+  |  |P  | |   |       |P_10    |        |                |                                                         __|
+  |  |   | |   |       |        |        |  DTD9105I1 Y   |                                                         __|
+  |  |___| |___|       |        |        |                |                                ___   ___                __|
+  |                    | 9218A  |        |________________|              _____________    |   | |   |               __|
+  |   _______          |        |                                       |  74HC245AP  |   |PC7| |ULN|               __|
+  |  |       |         | KOREA  |                                       |_____________|   |4HC| |280|               __|
+  |  |BATTERY|         |________|                                                         |273| |3A |               __|
+  |  |       |                                                                            |AP | |   |               __|
+  |  |_______|     ________   ________                                                    |   | |   |               __|
+  |               |        | |        |                                                   |   | |   |               __|
+  |               |        | |        |                                  _____________    |___| |___|               __|
+  |   ___         |        | |        |     XTAL1                       |  74HC245AP  |    ___   ___                __|
+  |  | B |        |        | |        |    __________________           |_____________|   |   | |   |               __|
+  |  |___|        |        | |        |   |                  |                            |PC7| |ULN|               __|
+  |               |        | |        |   |    IMPERA 7      |                            |4HC| |280|               __|
+  |               |D27C210 | |D27C210 |   |                  |                            |273| |3A |               __|
+  |               |        | |        |   |     155200       |           _____________    |AP | |   |               __|
+  |   ___   ___   |        | |        |   |                  |          |  74HC245AP  |   |   | |   |               __|
+  |  |   | |   |  |GAME-ROM| |        |   |   DfD9101V3 Y    |          |_____________|   |   | |   |               __|
+  |  |PAL| |PAL|  | Lucky 7| |        |   |                  |                            |___| |___|               __|
+  |  |16L| |16L|  |        | |        |   |                  |                             __________               __|
+  |  |8  | |8  |  |VNr03-07| |        |   |                  |                            |  PC849   |              __|
+  |  |   | |   |  |Sum.D882| |        |   |__________________|           _____________    |__________|              __|
+  |  |   | |   |  |        | |        |                                 |  74HC245AP  |                             __|
+  |  |   | |   |  |        | |        |                                 |_____________|                             __|
+  |  |___| |___|  |________| |________|                                                    ___________              __|
+  |                                                                                       |   DIP 1   |            |
+  | IMPERA BOARD REV V1.04                                                                |___________|            |
+  |________________________________________________________________________________________________________________|
+
+  A = TL7705ACP
+  B = DS1210
+  C = Cover scratched - unreadable
+
+  XTAL1 = 19.6608 (68070)
+  XTAL2 = 30.000  (66470)
+
+*/
+ROM_START( lucky7i )
+	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
+	ROM_LOAD16_WORD_SWAP( "27c210.6", 0x00000, 0x20000, CRC(3a99e9f3) SHA1(b9b533378ce514662cbd85a37ee138a2df760ed4) )
+	ROM_LOAD16_WORD_SWAP( "27c210.5", 0x20000, 0x20000, CRC(b4da8856) SHA1(a33158d75047561fa9674ceb6b22cc63b5b49aed) )
+
+	ROM_REGION(0x4d, "ds1207", 0)  // timekey
+	ROM_LOAD( "ds1207.bin", 0x000000, 0x00004d, BAD_DUMP CRC(7b838ea7) SHA1(5c22b789251becd20f56f944b76c5b779e5a8892) )  // created to match game
+
+	ROM_REGION(0x4000, "nvram", 0)  // Default NVRAM
+	ROM_LOAD( "lucky7i_nvram.bin", 0x0000, 0x4000, CRC(51960419) SHA1(ef7f9d7d9714fda0af23b311232194567887a264) )
+ROM_END
+
+/*
+  Lucky 7 (alt)
+  Ver 04/91a
+  2 bytes of difference.
+
+  Early board.
+
+*/
+ROM_START( lucky7x )
+	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
+	ROM_LOAD16_WORD_SWAP( "nosticker_d27c210_6.bin", 0x00000, 0x20000, CRC(abff21e2) SHA1(88f8265114bbe9ed5004f97d4b3cdc7ae9c3d1e4) )
+	ROM_LOAD16_WORD_SWAP( "nosticker_d27c210_5.bin", 0x20000, 0x20000, CRC(b4da8856) SHA1(a33158d75047561fa9674ceb6b22cc63b5b49aed) )
+
+	ROM_REGION(0x4d, "ds1207", 0)  // timekey
+	ROM_LOAD( "ds1207.bin", 0x000000, 0x00004d, BAD_DUMP CRC(7b838ea7) SHA1(5c22b789251becd20f56f944b76c5b779e5a8892) )  // created to match game
+
+	ROM_REGION(0x4000, "nvram", 0)  // Default NVRAM
+	ROM_LOAD( "lucky7x_nvram.bin", 0x0000, 0x4000, CRC(6f7ac5f1) SHA1(8a36bf38bf226a4001fa73b5243c5784f09063d6) )
+ROM_END
+
 
 /*
   Dallas Poker
@@ -2224,26 +2262,6 @@ ROM_END
 
 
 /*
-  Lucky 7i
-  Ver 04/91a
-  2 bytes of difference.
-
-  Early board.
-
-*/
-ROM_START( lucky7x )
-	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
-	ROM_LOAD16_WORD_SWAP( "nosticker_d27c210_6.bin", 0x00000, 0x20000, CRC(abff21e2) SHA1(88f8265114bbe9ed5004f97d4b3cdc7ae9c3d1e4) )
-	ROM_LOAD16_WORD_SWAP( "nosticker_d27c210_5.bin", 0x20000, 0x20000, CRC(b4da8856) SHA1(a33158d75047561fa9674ceb6b22cc63b5b49aed) )
-
-	ROM_REGION(0x4d, "ds1210", 0)  // timekey
-	ROM_LOAD( "ds1210.bin", 0x000000, 0x00004d, BAD_DUMP CRC(7b838ea7) SHA1(5c22b789251becd20f56f944b76c5b779e5a8892) )  // taken from lucky7i
-
-	ROM_REGION(0x4000, "nvram", 0)  // Default NVRAM
-	ROM_LOAD( "lucky7i.nv", 0x0000, 0x4000, BAD_DUMP CRC(51960419) SHA1(ef7f9d7d9714fda0af23b311232194567887a264) )  // taken from lucky7i
-ROM_END
-
-/*
   Poker
   Impera.
   Ver 11/90b
@@ -2295,9 +2313,8 @@ ROM_START( simpbest )
 	ROM_REGION( 0x0800, "mcu", 0 )  // S87C751 (2K x8 ROM) undumped
 	ROM_LOAD("s87c751.ic13",   0x0000, 0x0800, NO_DUMP )
 
-	ROM_REGION( 0x0100, "sereeprom", 0 )  // Serial EPROM
-	ROM_LOAD16_WORD_SWAP("24c04a.ic27", 0x0000, 0x0100, CRC(3189844c) SHA1(cc017f44d9db92da85c96be750ccec7ee32e5972) )
-	ROM_CONTINUE(                       0x0000, 0x0100)  // discarding 1st half, filled with test patterns.
+	ROM_REGION( 0x0200, "sereeprom", 0 )  // Serial EPROM
+	ROM_LOAD16_WORD_SWAP("24c04a.ic27", 0x0000, 0x0200, CRC(3189844c) SHA1(cc017f44d9db92da85c96be750ccec7ee32e5972) )
 ROM_END
 
 
@@ -2328,11 +2345,11 @@ GAME(  1999, quingo,     0,        magicle,        hotslots,  hotslots_state, em
 GAME(  1999, belslots,   0,        magicle,        hotslots,  hotslots_state, empty_init, ROT0, "Impera",    "Bel Slots Export (5.01)",                    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME(  2001, bigdeal0,   0,        magicle,        magicard,  hotslots_state, empty_init, ROT0, "Impera",    "Big Deal Belgien (5.04)",                    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME(  199?, puzzleme,   0,        puzzleme,       puzzleme,  hotslots_state, empty_init, ROT0, "Impera",    "Puzzle Me!",                                 MACHINE_SUPPORTS_SAVE )
+
 GAME(  1991, lucky7i,    0,        magicard,       lucky7i,   magicard_state, empty_init, ROT0, "Impera",    "Lucky 7 (Impera, V04/91a, set 1)",           MACHINE_SUPPORTS_SAVE )
+GAME(  1991, lucky7x,    lucky7i,  magicard,       lucky7i,   magicard_state, empty_init, ROT0, "Impera",    "Lucky 7 (Impera, V04/91a, set 2)",           MACHINE_SUPPORTS_SAVE )
 GAME(  1993, dallaspk,   0,        magicard,       dallaspk,  magicard_state, empty_init, ROT0, "<unknown>", "Dallas Poker",                               MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME(  1993, kajotcrd,   0,        hotslots,       magicard,  hotslots_state, empty_init, ROT0, "Amatic",    "Kajot Card (Version 1.01, Wien Euro)",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-
-GAME(  1991, lucky7x,    lucky7i,  magicard,       lucky7i,   magicard_state, empty_init, ROT0, "Impera",    "Lucky 7 (Impera, V04/91a, set 2)",           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAMEL( 1991, pokeri,     0,        magicard,       pokeri,    magicard_state, empty_init, ROT0, "Impera",    "Poker (Impera, V11/90b)",                    MACHINE_SUPPORTS_SAVE,                        layout_pokeri )
 
-GAME(  2001, simpbest,   0,        magicle,        hotslots,  hotslots_state, empty_init, ROT0, "Kajot",     "Simply the Best (CZ750, v1.0)",              MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  2001, simpbest,   0,        simpbest,       hotslots,  hotslots_state, empty_init, ROT0, "Kajot",     "Simply the Best (CZ750, v1.0)",              MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
