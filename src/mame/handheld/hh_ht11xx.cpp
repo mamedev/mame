@@ -33,10 +33,7 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	void display_offset_w(u8 data);
-	void display_data_w(u8 data);
-
-	u8 m_displayoffset;
+	void display_data_w(offs_t offset, u8 data);
 
 	required_device<ht1130_device> m_maincpu;
 	output_finder<512> m_seg;
@@ -47,12 +44,10 @@ private:
 void ht11xx_brickgame_state::machine_start()
 {
 	m_seg.resolve();
-	save_item(NAME(m_displayoffset));
 }
 
 void ht11xx_brickgame_state::machine_reset()
 {
-	m_displayoffset = 0;
 }
 
 static INPUT_PORTS_START( ht11xx_brickgame )
@@ -68,23 +63,18 @@ static INPUT_PORTS_START( ht11xx_brickgame )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Left")
 INPUT_PORTS_END
 
-void ht11xx_brickgame_state::display_offset_w(u8 data)
-{
-	m_displayoffset = data;
-}
 
-void ht11xx_brickgame_state::display_data_w(u8 data)
+void ht11xx_brickgame_state::display_data_w(offs_t offset, u8 data)
 {
 	for (int i = 0; i < 4; i++)
 	{
-		m_seg[i | (m_displayoffset * 4)] = (data >> i) & 1;
+		m_seg[i | (offset * 4)] = (data >> i) & 1;
 	}
 }
 
 void ht11xx_brickgame_state::ht11xx_brickgame(machine_config &config)
 {
 	HT1190(config, m_maincpu, 1000000/8); // frequency?
-	m_maincpu->display_offset_out_cb().set(FUNC(ht11xx_brickgame_state::display_offset_w));
 	m_maincpu->display_data_out_cb().set(FUNC(ht11xx_brickgame_state::display_data_w));
 
 	m_maincpu->ps_in_cb().set_ioport(m_in1);

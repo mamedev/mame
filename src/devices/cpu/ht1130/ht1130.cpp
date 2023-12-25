@@ -37,7 +37,6 @@ ht1130_device::ht1130_device(const machine_config &mconfig, device_type type, co
 	, m_port_in_ps(*this, 0xff)
 	, m_port_in_pp(*this, 0xff)
 	, m_port_out_pa(*this)
-	, m_display_offset_out(*this)
 	, m_display_data_out(*this)
 {
 }
@@ -80,8 +79,7 @@ inline void ht1130_device::displayram_w(offs_t offset, u8 data)
 	m_displayram[offset] = data & 0xf;
 
 	// there might be a better way to do this
-	m_display_offset_out(offset);
-	m_display_data_out(m_displayram[offset]);
+	m_display_data_out(offset, m_displayram[offset]);
 }
 
 inline void ht1130_device::setreg(u8 which, u8 data)

@@ -30,7 +30,6 @@ public:
 
 	auto pa_out_cb() { return m_port_out_pa.bind(); }
 
-	auto display_offset_out_cb() { return m_display_offset_out.bind(); }
 	auto display_data_out_cb() { return m_display_data_out.bind(); }
 
 protected:
@@ -107,7 +106,6 @@ private:
 
 	devcb_write8 m_port_out_pa;
 
-	devcb_write8 m_display_offset_out;
 	devcb_write8 m_display_data_out;
 };
 
