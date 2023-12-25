@@ -9751,7 +9751,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="msxfsw2">
-		<description>MSX Free Software 100 Lot.2 (Japan)</description>
+		<description>MSX Free Software 100-sen Lot.2 (Japan)</description>
 		<year>1994</year>
 		<publisher>Family Soft</publisher>
 		<info name="alt_title" value="MSXフリーソフトウェア100選LOT.2"/>
@@ -9777,7 +9777,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="msxfsw1" cloneof="msxfsw2">
-		<description>MSX Free Software 100 (Japan)</description>
+		<description>MSX Free Software 100-sen (Japan)</description>
 		<year>1994</year>
 		<publisher>Family Soft</publisher>
 		<info name="alt_title" value="MSXフリーソフトウェア100選"/>
@@ -9803,7 +9803,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="msxmg5ps">
-		<description>MSX Magazine 5 Tsuki-gou Program Service (Japan, 1991)</description>
+		<description>MSX Magazine 5 Gatsu-gou Program Service (Japan, 1991)</description>
 		<year>1991</year>
 		<publisher>MSX Magazine</publisher>
 		<info name="alt_title" value="ＭＳＸマガジン５月号プログラムサービス"/>
@@ -9815,7 +9815,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="msxmg6ps">
-		<description>MSX Magazine 6 Tsuki-gou Program Service (Japan)</description>
+		<description>MSX Magazine 6 Gatsu-gou Program Service (Japan)</description>
 		<year>1991</year>
 		<publisher>MSX Magazine</publisher>
 		<info name="alt_title" value="ＭＳＸマガジン６月号プログラムサービス"/>
@@ -14067,7 +14067,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="suzumebg">
-		<description>Suzume Borg Suzume (Japan)</description>
+		<description>Jong Borg Suzume (Japan)</description>
 		<year>1990</year>
 		<publisher>Pony Tail Soft</publisher>
 		<info name="alt_title" value="雀ボーグすずめ"/>
@@ -17665,10 +17665,10 @@ HOMEBREW
 	</software>
 
 	<software name="dnumarin">
-		<description>Detective Numarin (Japan)</description>
+		<description>Mei Tantei Numarin The Private Detective (Japan)</description>
 		<year>1988</year>
 		<publisher>A.R.E.SYSTEM</publisher>
-		<info name="alt_title" value="名探偵ぬまりん"/>
+		<info name="alt_title" value="名探偵ぬまりん The Private Detective"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="detective numarin - a.r.e.system.dsk" size="737280" crc="de335470" sha1="d5ac89a10f2d8126c627ffdc46cc8a3f429b1fd5"/>
@@ -17677,10 +17677,10 @@ HOMEBREW
 	</software>
 
 	<software name="dnumarn2">
-		<description>Detective Numarin 2 (Japan)</description>
+		<description>Mei Tantei Numarin 2 The Private Detective (Japan)</description>
 		<year>1989</year>
 		<publisher>A.R.E.SYSTEM</publisher>
-		<info name="alt_title" value="名探偵ぬまりん２"/>
+		<info name="alt_title" value="名探偵ぬまりん２ The Private Detective"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="detective numarin 2 - a.r.e.system.dsk" size="737280" crc="e1a4df8e" sha1="adade22b19410e3ca0ef8acd102692a7d1e97911"/>
@@ -17689,7 +17689,7 @@ HOMEBREW
 	</software>
 
 	<software name="dnumarn3">
-		<description>Detective Numarin 3 (Japan)</description>
+		<description>Mei Tantei Numarin 3 (Japan)</description>
 		<year>1992</year>
 		<publisher>A.R.E.SYSTEM</publisher>
 		<info name="alt_title" value="名探偵ぬまりん３"/>
