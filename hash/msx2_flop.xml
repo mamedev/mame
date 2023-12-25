@@ -8902,7 +8902,12 @@ The following floppies came with the machines.
 		<publisher>Philips</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="el mago de oz - philips.dsk" size="737280" crc="a2bc7f05" sha1="e10ed5db2df41765232a1cdf3caf88c132f3c363"/>
+				<rom name="el mago de oz - philips (disk 1).dsk" size="737280" crc="a2bc7f05" sha1="e10ed5db2df41765232a1cdf3caf88c132f3c363"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="el mago de oz - philips (disk 2).dsk" size="737280" crc="84712ad6" sha1="5d9750d25289ac356fdb7d70231d9bed76bedf21"/>
 			</dataarea>
 		</part>
 	</software>
