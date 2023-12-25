@@ -777,14 +777,14 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 	if (this_line(0x000) & 4) {
 		u16 line_4400 = this_line(0x4400);
 		line.pf[2].colscroll   = line_4400 & 0x1ff;
-		line.pf[2].alt_tilemap = line_4400 & 0x200;
+		line.pf[2].alt_tilemap = static_cast<bool>(line_4400 & 0x200);
 		line.clip[0].set_upper(BIT(line_4400, 12), BIT(line_4400, 13));
 		line.clip[1].set_upper(BIT(line_4400, 14), BIT(line_4400, 15));
 	}
 	if (this_line(0x000) & 8) {
 		u16 line_4600 = this_line(0x4600);
 		line.pf[3].colscroll   = line_4600 & 0x1ff;
-		line.pf[3].alt_tilemap = line_4600 & 0x200;
+		line.pf[3].alt_tilemap = static_cast<bool>(line_4600 & 0x200);
 		line.clip[2].set_upper(BIT(line_4600, 12), BIT(line_4600, 13));
 		line.clip[3].set_upper(BIT(line_4600, 14), BIT(line_4600, 15));
 	}
@@ -856,8 +856,8 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 	if (this_line(0x600) & 1) {
 		u16 line_7000 = this_line(0x7000);
 		line.pivot.pivot_enable = line_7000;
-		if (line_7000) // check if confusing pivot enable bits are set
-			logerror("unknown 'pivot enable' bits: %04x at %04x\n", line_7000, 0x7000 + y*2);
+		//if (line_7000) // check if confusing pivot enable bits are set
+		//	logerror("unknown 'pivot enable' bits: %04x at %04x\n", line_7000, 0x7000 + y*2);
 	}
 	if (this_line(0x600) & 2) {
 		line.pivot.mix_value = this_line(0x7200);
@@ -990,10 +990,62 @@ void taito_f3_state::get_pf_scroll(int pf_num, u32 &reg_sx, u32 &reg_sy)
 	reg_sy = sy;
 }
 
+std::vector<taito_f3_state::clip_plane_inf>
+taito_f3_state::calc_clip(const clip_plane_inf (&clip)[NUM_CLIPPLANES],
+						  const mixable *line)
+{
+	using clip_range = clip_plane_inf;
+	const s16 INF_L = 46;
+	const s16 INF_R = 320 + 46;
+
+	std::bitset<4> normal_planes = line->clip_enable() & ~line->clip_inv();
+	std::bitset<4> invert_planes = line->clip_enable() & line->clip_inv();
+	if (!line->clip_inv_mode())
+		std::swap(normal_planes, invert_planes);
+
+	// start with a visible region spanning the entire space
+	std::vector<clip_range> ranges{1, clip_range{INF_L, INF_R}};
+	for (int plane = 0; plane < NUM_CLIPPLANES; plane++) {
+		s16 clip_l = clip[plane].l - 1;
+		s16 clip_r = clip[plane].r - 2;
+		if (normal_planes[plane]) {
+			// check and clip all existing ranges
+			for (auto it = ranges.begin(); it != ranges.end(); it++) {
+				// if this clip is <1 px wide, clip entire line
+				// remove ranges outside normal clip intersection
+				if (clip_l > clip_r || it->r < clip_l || it->l > clip_r) {
+					ranges.erase(it); --it;
+				} else { // otherwise intersect normally
+					it->l = std::max(it->l, clip_l);
+					it->r = std::min(it->r, clip_r);
+				}
+			}
+		} else if (invert_planes[plane] && (clip_l <= clip_r)) {
+			// ASSUMING: only up to two clip settings legal at a time,
+			// can get up to 3 ranges; figure out which one it *isn't* later
+			std::vector<clip_range> new_ranges{};
+			new_ranges.reserve(2 * ranges.size());
+			new_ranges.insert(new_ranges.end(), ranges.size(), clip_range{INF_L, clip_l});
+			new_ranges.insert(new_ranges.end(), ranges.size(), clip_range{clip_r, INF_R});
+
+			for (auto it = new_ranges.begin(); it != new_ranges.end(); it++) {
+				for (const auto &range : ranges) {
+					it->l = std::max(range.l, it->l);
+					it->r = std::max(range.l, it->r);
+					if (it->l >= it->r) {
+						new_ranges.erase(it); --it;
+						break; // goto...
+					}
+				}
+			}
+			ranges = new_ranges;
+		}
+	}
+	return ranges;
+}
+
 void taito_f3_state::draw_line(u32* dst, int y, int xs, int xe, sprite_inf* sp)
 {
-	if (!sp->layer_enable())
-		return;
 	const pen_t *clut = &m_palette->pen(0);
 	for (int x = xs; x < xe; x++) {
 		if (const u16 col = sp->srcbitmap.pix(y, x)) // 0 = transparent
@@ -1002,8 +1054,6 @@ void taito_f3_state::draw_line(u32* dst, int y, int xs, int xe, sprite_inf* sp)
 }
 void taito_f3_state::draw_line(u32* dst, int y, int xs, int xe, playfield_inf* pf)
 {
-	if (!pf->layer_enable())
-		return;
 	const pen_t *clut = &m_palette->pen(0);
 	const int y_index = ((pf->reg_fx_y >> 16) + pf->colscroll) & 0x1ff;
 	u32 fx_x = pf->reg_sx + pf->rowscroll + 10*pf->x_scale;
@@ -1115,7 +1165,12 @@ void taito_f3_state::scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cl
 		// draw layers to framebuffer, (for now, in bottom->top order)
 		for (auto gfx : layers) {
 			std::visit([&](auto&& arg) {
-				draw_line(&bitmap.pix(y+ys), y+ys, 46, 46 + 320, arg);
+				if (arg->layer_enable()) {
+					std::vector<clip_plane_inf> clip_ranges = calc_clip(line_data.clip, arg);
+					for (const auto &clip : clip_ranges) {
+						draw_line(&bitmap.pix(y+ys), y+ys, clip.l, clip.r, arg);
+					}
+				}
 			}, gfx);
 		}
 
@@ -1127,7 +1182,6 @@ void taito_f3_state::scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cl
 		}
 	}
 }
-
 
 /******************************************************************************/
 
