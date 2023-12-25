@@ -117,8 +117,9 @@ void edames_state::init_board(int state)
 
 INPUT_CHANGED_MEMBER(edames_state::change_cpu_freq)
 {
-	// 8MHz and 12MHz versions were sold
-	m_maincpu->set_unscaled_clock((newval & 2) ? 8'000'000 : 12'000'000);
+	// 6MHz and 10MHz versions don't exist, but the software supports it
+	static const u32 freq[4] = { 6'000'000, 8'000'000, 10'000'000, 12'000'000 };
+	m_maincpu->set_unscaled_clock(freq[~newval & 3]);
 }
 
 
