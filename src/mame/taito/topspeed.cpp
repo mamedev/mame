@@ -908,8 +908,11 @@ static const gfx_layout tile16x8_layout =
 
 static GFXDECODE_START( gfx_topspeed )
 	GFXDECODE_ENTRY( "sprites", 0x0, tile16x8_layout,      0, 256 ) // Sprite parts
-	GFXDECODE_ENTRY( "pc080sn", 0x0, gfx_8x8x4_packed_msb, 0, 512 ) // Playfield
 	// Road Lines gfxdecodable ?
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_topspeed_tmap )
+	GFXDECODE_ENTRY( "pc080sn", 0x0, gfx_8x8x4_packed_msb, 0, 512 ) // Playfield
 GFXDECODE_END
 
 
@@ -963,15 +966,11 @@ void topspeed_state::topspeed(machine_config &config)
 	z80ctc_device& ctc(Z80CTC(config, "ctc", XTAL(16'000'000) / 4));
 	ctc.zc_callback<0>().set(FUNC(topspeed_state::z80ctc_to0));
 
-	PC080SN(config, m_pc080sn[0], 0);
-	m_pc080sn[0]->set_gfx_region(1);
+	PC080SN(config, m_pc080sn[0], 0, "palette", gfx_topspeed_tmap);
 	m_pc080sn[0]->set_offsets(0, 8);
-	m_pc080sn[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	PC080SN(config, m_pc080sn[1], 0);
-	m_pc080sn[1]->set_gfx_region(1);
+	PC080SN(config, m_pc080sn[1], 0, "palette", gfx_topspeed_tmap);
 	m_pc080sn[1]->set_offsets(0, 8);
-	m_pc080sn[1]->set_gfxdecode_tag(m_gfxdecode);
 
 	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
 	ciu.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);

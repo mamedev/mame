@@ -452,11 +452,9 @@ void rastan_state::rastan(machine_config &config)
 	screen.set_screen_update(FUNC(rastan_state::screen_update));
 	screen.set_palette("palette");
 
-	GFXDECODE(config, "gfxdecode", "palette", gfx_rastan);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048);
 
-	PC080SN(config, m_pc080sn, 0);
-	m_pc080sn->set_gfxdecode_tag("gfxdecode");
+	PC080SN(config, m_pc080sn, 0, "palette", gfx_rastan);
 
 	PC090OJ(config, m_pc090oj, 0);
 	m_pc090oj->set_palette("palette");
@@ -821,5 +819,5 @@ GAME( 1987, rastsaga,    rastan, rastan, rastsaga, rastan_state, empty_init, ROT
 GAME( 1987, rastanb,     rastan, rastan, rastsaga, rastan_state, empty_init, ROT0, "Taito Corporation Japan",   "Rastan (World, earlier code base)",                     MACHINE_SUPPORTS_SAVE )
 GAME( 1987, rastanub,    rastan, rastan, rastsaga, rastan_state, empty_init, ROT0, "Taito America Corporation", "Rastan (US, earlier code base)",                        MACHINE_SUPPORTS_SAVE )
 GAME( 1987, rastsagaa,   rastan, rastan, rastsaga, rastan_state, empty_init, ROT0, "Taito Corporation",         "Rastan Saga (Japan Rev 1, earlier code base)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rastsagaabl, rastan, rastan, rastsaga, rastan_state, empty_init, ROT0, "Taito Corporation",         "Rastan Saga (bootleg, Japan Rev 1, earlier code base)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rastsagaabl, rastan, rastan, rastsaga, rastan_state, empty_init, ROT0, "bootleg",                   "Rastan Saga (bootleg, Japan Rev 1, earlier code base)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, rastsagab,   rastan, rastan, rastsaga, rastan_state, empty_init, ROT0, "Taito Corporation",         "Rastan Saga (Japan, earlier code base)",                MACHINE_SUPPORTS_SAVE )

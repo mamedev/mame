@@ -349,7 +349,6 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_pc080sn(*this, "pc080sn"),
-		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")
 	{ }
 
@@ -358,7 +357,6 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<pc080sn_device> m_pc080sn;
-	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 };
 
@@ -398,6 +396,7 @@ class jumping_state : public base_state
 public:
 	jumping_state(const machine_config &mconfig, device_type type, const char *tag) :
 		base_state(mconfig, type, tag),
+		m_gfxdecode(*this, "gfxdecode"),
 		m_spriteram(*this, "spriteram")
 	{ }
 
@@ -414,6 +413,9 @@ private:
 
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
+
+	// devices
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	// memory pointers
 	required_shared_ptr<uint16_t> m_spriteram;
@@ -767,6 +769,9 @@ static const gfx_layout jumping_spritelayout =
 
 static GFXDECODE_START( gfx_jumping )
 	GFXDECODE_ENTRY( "sprites", 0, jumping_spritelayout, 0, 0x80 ) // OBJ 16x16
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_jumping_tmap )
 	GFXDECODE_ENTRY( "pc080sn", 0, jumping_tilelayout,   0, 0x80 ) // SCR 8x8
 GFXDECODE_END
 
@@ -833,12 +838,9 @@ void rbisland_state::rbisland(machine_config &config)
 	screen.set_screen_update(FUNC(rbisland_state::screen_update));
 	screen.set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rbisland);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 
-	PC080SN(config, m_pc080sn, 0);
-	m_pc080sn->set_gfx_region(0);
-	m_pc080sn->set_gfxdecode_tag(m_gfxdecode);
+	PC080SN(config, m_pc080sn, 0, m_palette, gfx_rbisland);
 
 	PC090OJ(config, m_pc090oj, 0);
 	m_pc090oj->set_palette(m_palette);
@@ -884,10 +886,8 @@ void jumping_state::jumping(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jumping);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 2048);
 
-	PC080SN(config, m_pc080sn, 0);
-	m_pc080sn->set_gfx_region(1);
+	PC080SN(config, m_pc080sn, 0, m_palette, gfx_jumping_tmap);
 	m_pc080sn->set_yinvert(1);
-	m_pc080sn->set_gfxdecode_tag(m_gfxdecode);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

@@ -268,7 +268,7 @@ TILE_GET_INFO_MEMBER(darius_state::get_fg_tile_info)
 	u16 code = (m_fg_ram[tile_index + 0x2000] & 0x7ff);
 	u16 attr = m_fg_ram[tile_index];
 
-	tileinfo.set(2,
+	tileinfo.set(1,
 			code,
 			(attr & 0x7f),
 			TILE_FLIPYX((attr & 0xc000) >> 14));
@@ -276,7 +276,7 @@ TILE_GET_INFO_MEMBER(darius_state::get_fg_tile_info)
 
 void darius_state::video_start()
 {
-	m_gfxdecode->gfx(2)->set_granularity(16);
+	m_gfxdecode->gfx(1)->set_granularity(16);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(darius_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
 
 	m_fg_tilemap->set_transparent_pen(0);
@@ -858,8 +858,11 @@ static const gfx_layout textlayout =
 
 static GFXDECODE_START( gfx_darius )
 	GFXDECODE_ENTRY( "sprites", 0, tilelayout,           0, 128 )  /* sprites */
-	GFXDECODE_ENTRY( "pc080sn", 0, gfx_8x8x4_packed_msb, 0, 128 )  /* scr tiles */
 	GFXDECODE_ENTRY( "text",    0, textlayout,           0, 128 )  /* top layer scr tiles */
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_darius_tmap )
+	GFXDECODE_ENTRY( "pc080sn", 0, gfx_8x8x4_packed_msb, 0, 128 )  /* scr tiles */
 GFXDECODE_END
 
 
@@ -962,12 +965,10 @@ void darius_state::darius(machine_config &config)
 	rscreen.set_screen_update(FUNC(darius_state::screen_update_right));
 	rscreen.set_palette(m_palette);
 
-	PC080SN(config, m_pc080sn, 0);
-	m_pc080sn->set_gfx_region(1);
+	PC080SN(config, m_pc080sn, 0, m_palette, gfx_darius_tmap);
 	m_pc080sn->set_offsets(-16, 8);
 	m_pc080sn->set_yinvert(0);
 	m_pc080sn->set_dblwidth(1);
-	m_pc080sn->set_gfxdecode_tag(m_gfxdecode);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
