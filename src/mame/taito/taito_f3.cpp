@@ -465,7 +465,7 @@ void taito_f3_state::f3(machine_config &config)
 	m_screen->set_raw(
 		XTAL(26'686'000)/4,
 		426, 46, 320+46,
-		261, 32, 256
+		261, 24, 256
 	);
 	
 	//m_screen->set_visarea(46, 40*8-1 + 46, 24, 24+232-1);
