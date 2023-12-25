@@ -70,12 +70,12 @@ void ht1130_device::internal_map(address_map &map)
 	map(0x000, 0xfff).rom();
 }
 
-void ht1130_device::tempram_w(offs_t offset, u8 data)
+inline void ht1130_device::tempram_w(offs_t offset, u8 data)
 {
 	m_tempram[offset] = data & 0xf;
 }
 
-void ht1130_device::displayram_w(offs_t offset, u8 data)
+inline void ht1130_device::displayram_w(offs_t offset, u8 data)
 {
 	m_displayram[offset] = data & 0xf;
 
@@ -84,95 +84,95 @@ void ht1130_device::displayram_w(offs_t offset, u8 data)
 	m_display_data_out(m_displayram[offset]);
 }
 
-void ht1130_device::setreg(u8 which, u8 data)
+inline void ht1130_device::setreg(u8 which, u8 data)
 {
 	m_regs[which] = data & 0xf;
 }
 
-u8 ht1130_device::getreg(u8 which)
+inline u8 ht1130_device::getreg(u8 which)
 {
 	return m_regs[which] & 0xf;
 }
 
-void ht1130_device::setacc(u8 data)
+inline void ht1130_device::setacc(u8 data)
 {
 	m_acc = data & 0xf;
 }
 
-u8 ht1130_device::getacc()
+inline u8 ht1130_device::getacc()
 {
 	return m_acc & 0xf;
 }
 
-u8 ht1130_device::getcarry()
+inline u8 ht1130_device::getcarry()
 {
 	return m_carry & 1;
 }
 
-void ht1130_device::setcarry()
+inline void ht1130_device::setcarry()
 {
 	m_carry = 1;
 }
 
-void ht1130_device::clearcarry()
+inline void ht1130_device::clearcarry()
 {
 	m_carry = 0;
 }
 
-void ht1130_device::settimer(u8 data)
+inline void ht1130_device::settimer(u8 data)
 {
 	m_timer = data;
 }
 
-void ht1130_device::settimer_upper(u8 data)
+inline void ht1130_device::settimer_upper(u8 data)
 {
 	m_timer = (m_timer & 0xf) | (data & 0xf) << 4;
 }
 
-void ht1130_device::settimer_lower(u8 data)
+inline void ht1130_device::settimer_lower(u8 data)
 {
 	m_timer = (m_timer & 0xf0) | (data & 0xf);
 }
 
-u8 ht1130_device::gettimer_upper()
+inline u8 ht1130_device::gettimer_upper()
 {
 	return (m_timer >> 4) & 0xf;
 }
 
-u8 ht1130_device::gettimer_lower()
+inline u8 ht1130_device::gettimer_lower()
 {
 	return m_timer & 0xf;
 }
 
-u8 ht1130_device::getr1r0()
+inline u8 ht1130_device::getr1r0()
 {
 	return (getreg(1)<<4) | getreg(0);
 }
 
-u8 ht1130_device::getr1r0_data()
+inline u8 ht1130_device::getr1r0_data()
 {
 	const u8 dataaddress = getr1r0();
 	return space(AS_DATA).read_byte(dataaddress);
 }
 
-void ht1130_device::setr1r0_data(u8 data)
+inline void ht1130_device::setr1r0_data(u8 data)
 {
 	const u8 dataaddress = getr1r0();
 	space(AS_DATA).write_byte(dataaddress, data);
 }
 
-u8 ht1130_device::getr3r2()
+inline u8 ht1130_device::getr3r2()
 {
 	return (getreg(3)<<4) | getreg(2);
 }
 
-u8 ht1130_device::getr3r2_data()
+inline u8 ht1130_device::getr3r2_data()
 {
 	const u8 dataaddress = getr3r2();
 	return space(AS_DATA).read_byte(dataaddress);
 }
 
-void ht1130_device::setr3r2_data(u8 data)
+inline void ht1130_device::setr3r2_data(u8 data)
 {
 	const u8 dataaddress = getr3r2();
 	space(AS_DATA).write_byte(dataaddress, data);

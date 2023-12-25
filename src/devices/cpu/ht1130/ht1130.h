@@ -51,8 +51,8 @@ protected:
 	void internal_map(address_map &map);
 	void internal_data_map(address_map &map);
 
-	inline void tempram_w(offs_t offset, u8 data);
-	inline void displayram_w(offs_t offset, u8 data);
+	void tempram_w(offs_t offset, u8 data);
+	void displayram_w(offs_t offset, u8 data);
 
 	required_shared_ptr<u8> m_tempram;
 	required_shared_ptr<u8> m_displayram;
@@ -63,26 +63,26 @@ private:
 
 	memory_access<8, 0, 0, ENDIANNESS_LITTLE>::specific m_space;
 
-	inline void setreg(u8 which, u8 data);
-	inline u8 getreg(u8 which);
-	inline void setacc(u8 data);
-	inline u8 getacc();
-	inline void setcarry();
-	inline void clearcarry();
-	inline u8 getcarry();
-	inline u8 getr1r0();
-	inline u8 getr1r0_data();
-	inline void setr1r0_data(u8 data);
-	inline u8 getr3r2();
-	inline u8 getr3r2_data();
-	inline void setr3r2_data(u8 data);
-	inline void settimer(u8 data);
-	inline void settimer_upper(u8 data);
-	inline void settimer_lower(u8 data);
-	inline u8 gettimer_upper();
-	inline u8 gettimer_lower();
+	void setreg(u8 which, u8 data);
+	u8 getreg(u8 which);
+	void setacc(u8 data);
+	u8 getacc();
+	void setcarry();
+	void clearcarry();
+	u8 getcarry();
+	u8 getr1r0();
+	u8 getr1r0_data();
+	void setr1r0_data(u8 data);
+	u8 getr3r2();
+	u8 getr3r2_data();
+	void setr3r2_data(u8 data);
+	void settimer(u8 data);
+	void settimer_upper(u8 data);
+	void settimer_lower(u8 data);
+	u8 gettimer_upper();
+	u8 gettimer_lower();
 
-	inline u8 fetch();
+	u8 fetch();
 	void do_op();
 
 	u32 m_pc;
