@@ -14,22 +14,20 @@
 
 namespace {
 
-class ht11xx_brickgame_state : public driver_device
+class hh_ht11xx_state : public driver_device
 {
 public:
-	ht11xx_brickgame_state(const machine_config &mconfig, device_type type, const char *tag) :
+	hh_ht11xx_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_out_x(*this, "seg%u_%u", 0xb0U, 0U),
-		m_in1(*this, "IN1"),
-		m_in2(*this, "IN2")
+		m_in(*this, "IN%u", 1)
 	{ }
 
 	void ht11xx_brickgame(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 private:
 	void mcfg_svg_screen(machine_config &config, u16 width, u16 height, const char *tag = "screen");
@@ -38,17 +36,12 @@ private:
 
 	required_device<ht1130_device> m_maincpu;
 	output_finder<80, 4> m_out_x;
-	required_ioport m_in1;
-	required_ioport m_in2;
+	required_ioport_array<2> m_in;
 };
 
-void ht11xx_brickgame_state::machine_start()
+void hh_ht11xx_state::machine_start()
 {
 	m_out_x.resolve();
-}
-
-void ht11xx_brickgame_state::machine_reset()
-{
 }
 
 static INPUT_PORTS_START( ht11xx_brickgame )
@@ -65,7 +58,7 @@ static INPUT_PORTS_START( ht11xx_brickgame )
 INPUT_PORTS_END
 
 
-void ht11xx_brickgame_state::display_data_w(offs_t offset, u8 data)
+void hh_ht11xx_state::display_data_w(offs_t offset, u8 data)
 {
 	for (int i = 0; i < 4; i++)
 	{
@@ -73,7 +66,7 @@ void ht11xx_brickgame_state::display_data_w(offs_t offset, u8 data)
 	}
 }
 
-void ht11xx_brickgame_state::mcfg_svg_screen(machine_config &config, u16 width, u16 height, const char *tag)
+void hh_ht11xx_state::mcfg_svg_screen(machine_config &config, u16 width, u16 height, const char *tag)
 {
 	screen_device &screen(SCREEN(config, tag, SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
@@ -81,17 +74,17 @@ void ht11xx_brickgame_state::mcfg_svg_screen(machine_config &config, u16 width, 
 	screen.set_visarea_full();
 }
 
-void ht11xx_brickgame_state::ht11xx_brickgame(machine_config &config)
+void hh_ht11xx_state::ht11xx_brickgame(machine_config &config)
 {
 	HT1190(config, m_maincpu, 1000000/8); // frequency?
-	m_maincpu->display_data_out_cb().set(FUNC(ht11xx_brickgame_state::display_data_w));
+	m_maincpu->display_data_out_cb().set(FUNC(hh_ht11xx_state::display_data_w));
 
-	m_maincpu->ps_in_cb().set_ioport(m_in1);
-	m_maincpu->pp_in_cb().set_ioport(m_in2);
+	m_maincpu->ps_in_cb().set_ioport(m_in[0]);
+	m_maincpu->pp_in_cb().set_ioport(m_in[1]);
 
 	SPEAKER(config, "speaker").front_center();
 
-	mcfg_svg_screen(config, 768, 1080);
+	mcfg_svg_screen(config, 758, 1080);
 }
 
 ROM_START( brke23p2 )
@@ -105,4 +98,4 @@ ROM_END
 } // anonymous namespace
 
 // some other dieshots have 1996 on them, it is also possible the software is from Holtek
-CONS( 1993, brke23p2, 0, 0, ht11xx_brickgame, ht11xx_brickgame, ht11xx_brickgame_state, empty_init, "E-Star", "Brick Game 96 in 1 (E-23 Plus Mark II)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 1993, brke23p2, 0, 0, ht11xx_brickgame, ht11xx_brickgame, hh_ht11xx_state, empty_init, "E-Star", "Brick Game 96 in 1 (E-23 Plus Mark II)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
