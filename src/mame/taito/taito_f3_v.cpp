@@ -242,6 +242,7 @@ Playfield tile info:
     0x0200 0000 - Alpha blend mode
     0x01ff 0000 - Colour
 
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -371,15 +372,23 @@ void taito_f3_state::print_debug_info(bitmap_rgb32 &bitmap)
 template<unsigned Layer>
 TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info)
 {
-	const u32 tile = (m_pf_data[Layer][tile_index * 2 + 0] << 16) | (m_pf_data[Layer][tile_index * 2 + 1] & 0xffff);
-	const u16 palette_code = BIT(tile, 16, 9);
-	const u8 abtype        = BIT(tile, 25, 1);
-	const u8 extra_planes  = BIT(tile, 26, 2); // 0 = 4bpp, 1 = 5bpp, 2 = unused?, 3 = 6bpp
+	u16* tilep = &m_pf_data[Layer][tile_index * 2];
+	// tile info:
+	// [yx?? ddac cccc cccc]
+	// yx: x/y flip
+	// ?: upper bits of tile number?
+	// d: bpp
+	// a: alpha blend mode
+	// c: color
+	
+	const u16 palette_code = BIT(tilep[0],  0, 9);
+	const u8 abtype        = BIT(tilep[0],  9, 1);
+	const u8 extra_planes  = BIT(tilep[0], 10, 2); // 0 = 4bpp, 1 = 5bpp, 2 = unused?, 3 = 6bpp
 
 	tileinfo.set(3,
-			tile & 0xffff,
+			tilep[1],
 			palette_code,
-			TILE_FLIPYX(BIT(tile, 30, 2)));
+			TILE_FLIPYX(BIT(tilep[0], 14, 2)));
 
 	tileinfo.category = abtype & 1; // alpha blending type
 	// gfx extra planes and palette code set the same bits of color address
@@ -390,10 +399,15 @@ TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info)
 
 TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info_text)
 {
+	const u16 vram_tile = m_textram[tile_index];
+	// text tile info:
+	// [yccc cccx tttt tttt]
+	// y: y flip
+	// c: palette
+	// x: x flip
+	// t: tile number
+
 	u8 flags = 0;
-
-	const u16 vram_tile = (m_textram[tile_index] & 0xffff);
-
 	if (BIT(vram_tile,  8)) flags |= TILE_FLIPX;
 	if (BIT(vram_tile, 15)) flags |= TILE_FLIPY;
 
@@ -405,20 +419,22 @@ TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info_text)
 
 TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info_pixel)
 {
-
-	u8 flags = 0;
-	int y_offs = (m_control_1[5] & 0x1ff);
-	if (m_flipscreen) y_offs += 0x100;
+	int y_offs = BIT(m_control_1[5], 0, 9);
+	if (m_flipscreen)
+		y_offs += 0x100;
 
 	/* Colour is shared with VRAM layer */
-	int col_off;
-	if ((((tile_index & 0x1f) * 8 + y_offs) & 0x1ff) > 0xff)
-		col_off = 0x800 + ((tile_index & 0x1f) << 6) + ((tile_index & 0xfe0) >> 5);
-	else
-		col_off = ((tile_index & 0x1f) << 6) + ((tile_index & 0xfe0) >> 5);
+	// lllllllhhhhh ??
+	//+ hhhhh
+	//+     lllllll
+	int col_off = (BIT(tile_index, 0, 5) << 6) + BIT(tile_index, 5, 7);
+	if (((BIT(tile_index, 0, 5) * 8 + y_offs) & 0x1ff) > 0xff)
+		col_off += 0x800;
+	// edits here are untested
+	
+	const u16 vram_tile = m_textram[col_off];
 
-	const u16 vram_tile = (m_textram[col_off] & 0xffff);
-
+	u8 flags = 0;
 	if (BIT(vram_tile,  8)) flags |= TILE_FLIPX;
 	if (BIT(vram_tile, 15)) flags |= TILE_FLIPY;
 
@@ -931,19 +947,19 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 	// iiii iiii iiff ffff
 	// fractional part inverted (like scroll regs)
 	if (this_line(0xc00) & 1) {
-		u32 rowscroll = this_line(0xa000) << 10;
+		u16_16 rowscroll = this_line(0xa000) << 10;
 		line.pf[0].rowscroll = (rowscroll & 0xffff0000) - (rowscroll & 0x0000ffff);
 	}
 	if (this_line(0xc00) & 2) {
-		u32 rowscroll = this_line(0xa200) << 10;
+		u16_16 rowscroll = this_line(0xa200) << 10;
 		line.pf[1].rowscroll = (rowscroll & 0xffff0000) - (rowscroll & 0x0000ffff);
 	}
 	if (this_line(0xc00) & 4) {
-		u32 rowscroll = this_line(0xa400) << 10;
+		u16_16 rowscroll = this_line(0xa400) << 10;
 		line.pf[2].rowscroll = (rowscroll & 0xffff0000) - (rowscroll & 0x0000ffff);
 	}
 	if (this_line(0xc00) & 8) {
-		u32 rowscroll = this_line(0xa600) << 10;
+		u16_16 rowscroll = this_line(0xa600) << 10;
 		line.pf[3].rowscroll = (rowscroll & 0xffff0000) - (rowscroll & 0x0000ffff);
 	}
 
@@ -987,7 +1003,7 @@ void taito_f3_state::get_pf_scroll(int pf_num, u16_16 &reg_sx, u16_16 &reg_sy)
 	reg_sy = sy;
 }
 
-void taito_f3_state::draw_line(u32* dst, int y, int xs, int xe, sprite_inf* sp)
+void taito_f3_state::draw_line(pen_t* dst, int y, int xs, int xe, sprite_inf* sp)
 {
 	if (!sp->layer_enable())
 		return;
@@ -997,7 +1013,7 @@ void taito_f3_state::draw_line(u32* dst, int y, int xs, int xe, sprite_inf* sp)
 			dst[x] = clut[col];
 	}
 }
-void taito_f3_state::draw_line(u32* dst, int y, int xs, int xe, playfield_inf* pf)
+void taito_f3_state::draw_line(pen_t* dst, int y, int xs, int xe, playfield_inf* pf)
 {
 	if (!pf->layer_enable())
 		return;
@@ -1015,7 +1031,7 @@ void taito_f3_state::draw_line(u32* dst, int y, int xs, int xe, playfield_inf* p
 	}
 }
 
-void taito_f3_state::draw_line(u32* dst, int y, int xs, int xe, pivot_inf* pv)
+void taito_f3_state::draw_line(pen_t* dst, int y, int xs, int xe, pivot_inf* pv)
 {
 	const pen_t *clut = &m_palette->pen(0);
 	const auto *srcbitmap = pv->use_pix() ? pv->srcbitmap_pixel : pv->srcbitmap_vram;
@@ -1217,7 +1233,7 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 	tempsprite *sprite_ptr = &m_spritelist[0];
 	int total_sprites = 0;
 
-	for (u32 offs = 0; offs < 0x400 && (total_sprites < 0x400); offs++)
+	for (int offs = 0; offs < 0x400 && (total_sprites < 0x400); offs++)
 	{
 		int bank = m_sprite_bank ? 0x4000 : 0;
 		const u16 *spr = &spriteram16_ptr[bank + (offs * 8)];
