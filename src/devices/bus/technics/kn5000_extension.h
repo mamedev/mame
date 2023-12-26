@@ -14,10 +14,8 @@ class kn5000_extension_interface : public device_interface
 {
 public:
 	kn5000_extension_interface(const machine_config &mconfig, device_t &device);
-	virtual ~kn5000_extension_interface() = default;
 
 	virtual void rom_map(address_map &map) = 0;
-
 	virtual void io_map(address_map &map) = 0;
 
 // FIXME: do we need these?
@@ -36,7 +34,6 @@ class kn5000_extension_device : public device_t, public device_single_card_slot_
 
 public:
 	kn5000_extension_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ~kn5000_extension_device() = default;
 
 	void rom_map(address_space_installer &space, offs_t start, offs_t end);
 	void io_map(address_space_installer &space, offs_t start, offs_t end);

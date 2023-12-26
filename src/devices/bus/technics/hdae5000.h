@@ -16,7 +16,6 @@ class hdae5000_device : public device_t, public kn5000_extension_interface
 {
 public:
 	hdae5000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ~hdae5000_device() = default;
 
 	virtual void rom_map(address_map &map) override;
 	virtual void io_map(address_map &map) override;
