@@ -7,6 +7,8 @@
     Interrupts (not used by brke23p2)
     Sound (needs internal frequency ROM data?)
     IO wake-up from HALT etc.
+	1 machine cycle (eg. a 1 byte opcode) takes 4 system clock cycles (from OSC pins).
+	The timer rate can be configured with a mask option (system clock / 2^n), n=0-13 (except 6 for some reason). So, timer rate can be faster or slower than machine cycle rate.
 
 */
 
