@@ -87,9 +87,7 @@ void kn5000_state::kn5000_maincpu_mem(address_map &map)
 	//FIXME: map(0x120000, 0x12ffff).w(m_fdc, FUNC(upd765a_device::dack_w)); // Floppy DMA Acknowledge
 	map(0x140000, 0x14ffff).r("to_maincpu_latch", FUNC(generic_latch_8_device::read)); // @ IC23
 	map(0x140000, 0x14ffff).w("to_subcpu_latch", FUNC(generic_latch_8_device::write)); // @ IC22
-	map(0x1703b0, 0x1703bf).rw("vga", FUNC(vga_device::port_03b0_r), FUNC(vga_device::port_03b0_w)); // LCD controller @ IC206
-	map(0x1703c0, 0x1703cf).rw("vga", FUNC(vga_device::port_03c0_r), FUNC(vga_device::port_03c0_w));
-	map(0x1703d0, 0x1703df).rw("vga", FUNC(vga_device::port_03d0_r), FUNC(vga_device::port_03d0_w));
+	map(0x1703b0, 0x1703df).m("vga", FUNC(vga_device::io_map)); // LCD controller @ IC206
 	map(0x1a0000, 0x1bffff).rw("vga", FUNC(vga_device::mem_linear_r), FUNC(vga_device::mem_linear_w));
 	map(0x1e0000, 0x1fffff).ram(); // 1Mbit SRAM @ IC21 (CS0)  Note: I think this is the message "ERROR in back-up SRAM"
 	map(0x300000, 0x3fffff).rom().region("custom_data", 0); // 8MBit FLASH ROM @ IC19 (CS5)
