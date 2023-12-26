@@ -1174,11 +1174,6 @@ void mos6526_device::tod_w(int state)
 		if (m_tod == m_alarm)
 		{
 			m_icr |= ICR_ALARM;
-			if (IMR_ALARM)
-			{
-				m_write_irq(ASSERT_LINE);
-				m_irq = true;
-			}
 		}
 	}
 }

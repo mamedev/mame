@@ -237,7 +237,7 @@ void amiga_state::vblank()
 {
 }
 
-// todo: cia a clock can be connected to either a fixed 50/60hz signal from the power supply, or the vblank
+// TODO: CIA A clock can be connected to either a fixed 50/60hz signal from the power supply, or the vblank
 TIMER_CALLBACK_MEMBER( amiga_state::scanline_callback )
 {
 	int scanline = param;
@@ -248,9 +248,6 @@ TIMER_CALLBACK_MEMBER( amiga_state::scanline_callback )
 		// signal vblank irq
 		set_interrupt(INTENA_SETCLR | INTENA_VERTB);
 
-		// clock tod
-		m_cia_0->tod_w(1);
-
 		// additional bookkeeping by drivers
 		vblank();
 	}
@@ -258,6 +255,8 @@ TIMER_CALLBACK_MEMBER( amiga_state::scanline_callback )
 	// vblank end
 	if (scanline == m_screen->visible_area().top())
 	{
+		// clock tod
+		m_cia_0->tod_w(1);
 		m_cia_0->tod_w(0);
 	}
 
