@@ -27,6 +27,8 @@ public:
 
 	void ht11xx_brickgame(machine_config &config);
 
+	DECLARE_INPUT_CHANGED_MEMBER(power_pressed);
+
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -54,15 +56,20 @@ void ht11xx_brickgame_state::machine_reset()
 			m_out_x[i][j] = 0;
 }
 
+INPUT_CHANGED_MEMBER(ht11xx_brickgame_state::power_pressed)
+{
+	m_maincpu->wake();
+}
+
 static INPUT_PORTS_START( ht11xx_brickgame )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Mute")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Power")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Power") PORT_CHANGED_MEMBER(DEVICE_SELF, ht11xx_brickgame_state, power_pressed, 0) PORT_IMPULSE(1)
 
-	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Rotate")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Drop")
+	PORT_START("IN2") // not a joystick, but buttons are used for directional inputs in the snake game etc.
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Up / Rotate")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Down / Drop")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Right")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Left")
 INPUT_PORTS_END
