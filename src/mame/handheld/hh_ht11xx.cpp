@@ -20,7 +20,7 @@ public:
 	ht11xx_brickgame_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_out_x(*this, "seg%u_%u", 0U, 0U),
+		m_out_x(*this, "seg%u_%u", 0xb0U, 0U),
 		m_in1(*this, "IN1"),
 		m_in2(*this, "IN2")
 	{ }
@@ -37,7 +37,7 @@ private:
 	void display_data_w(offs_t offset, u8 data);
 
 	required_device<ht1130_device> m_maincpu;
-	output_finder<256, 4> m_out_x;
+	output_finder<80, 4> m_out_x;
 	required_ioport m_in1;
 	required_ioport m_in2;
 };
@@ -69,7 +69,7 @@ void ht11xx_brickgame_state::display_data_w(offs_t offset, u8 data)
 {
 	for (int i = 0; i < 4; i++)
 	{
-		m_out_x[offset+0xb0][i] = (data >> i) & 1;
+		m_out_x[offset][i] = (data >> i) & 1;
 	}
 }
 
@@ -105,4 +105,4 @@ ROM_END
 } // anonymous namespace
 
 // some other dieshots have 1996 on them, it is also possible the software is from Holtek
-CONS( 1993, brke23p2, 0, 0, ht11xx_brickgame, ht11xx_brickgame, ht11xx_brickgame_state, empty_init, "E-Star", "Brick Game 96 in 1 (E-23 Plus Mark II)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // needs SVG screen
+CONS( 1993, brke23p2, 0, 0, ht11xx_brickgame, ht11xx_brickgame, ht11xx_brickgame_state, empty_init, "E-Star", "Brick Game 96 in 1 (E-23 Plus Mark II)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
