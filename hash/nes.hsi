@@ -6720,10 +6720,6 @@ license:CC0-1.0
 		<extrainfo>0 0 1 1</extrainfo>
 
 	</hash>
-	<hash crc32="23d7d48f" sha1="6a6579963319cc14da457c963fa43741bfbf645c" name="Battletoads &amp; Double Dragon - The Ultimate Team (E) [!p]">
-		<extrainfo>7 0 16 0</extrainfo>
-
-	</hash>
 	<hash crc32="ceb65b06" sha1="a14563325b0f33c358142e7363d31614722fddb1" name="Battletoads &amp; Double Dragon - The Ultimate Team (U)">
 		<status>GoodNES Verified Image</status>
 		<extrainfo>7 0 16 0</extrainfo>
@@ -11404,10 +11400,6 @@ license:CC0-1.0
 		<extrainfo>0 1 2 1</extrainfo>
 
 	</hash>
-	<hash crc32="9ab274ae" sha1="340da5fb21bcaa3bcfed17d7d4d8b42cbbdc3bb0" name="Cheetah Men II (Active Enterprises) [!p]">
-		<extrainfo>228 0 16 16</extrainfo>
-
-	</hash>
 	<hash crc32="4047b8f1" sha1="dc702d4133f340ce8c580cd42d70add48ee0c0bd" name="Cheetah Men II (Active Enterprises)">
 		<status>Known Bad Image</status>
 		<extrainfo>228 0 2 1</extrainfo>
@@ -13818,10 +13810,6 @@ license:CC0-1.0
 	</hash>
 	<hash crc32="d5e3ead9" sha1="f49f55748d8f1139f26289c3d390a138af627195" name="CPUtime (PD)">
 		<extrainfo>0 0 1 0</extrainfo>
-
-	</hash>
-	<hash crc32="81af4af9" sha1="aba26002dff0d265bc2ac27a2689924b4fe0ed81" name="Crackout (E) [!p]">
-		<extrainfo>2 0 8 0</extrainfo>
 
 	</hash>
 	<hash crc32="7e9bca05" sha1="d5c0578e199413aaa465b6957e1040f8b1ffa99c" name="Crackout (U) (Prototype)">
@@ -28239,10 +28227,6 @@ license:CC0-1.0
 		<extrainfo>69 0 16 32</extrainfo>
 
 	</hash>
-	<hash crc32="bf888b75" sha1="eae5205928d3fa2afea0374b457d2bb91e414d99" name="Hook (E) [!p]">
-		<extrainfo>1 0 8 16</extrainfo>
-
-	</hash>
 	<hash crc32="ad379d7e" sha1="9ff259fd898437a6d8436ba893a0f3913d2491c6" name="Hook (J)">
 		<status>Overdumped Image</status>
 		<extrainfo>1 0 8 16</extrainfo>
@@ -30639,10 +30623,6 @@ license:CC0-1.0
 		<extrainfo>66 1 2 4</extrainfo>
 
 	</hash>
-	<hash crc32="a0a5a0b9" sha1="6822ee722c43cfbc255ed33f37a3c33d2a22ffec" name="James Bond Jr (E) [!p]">
-		<extrainfo>4 0 8 16</extrainfo>
-
-	</hash>
 	<hash crc32="f6898a59" sha1="a72746a57607b6ae6f5d613ae1218ab1c0de9d54" name="James Bond Jr (U)">
 		<status>GoodNES Verified Image</status>
 		<extrainfo>4 0 8 16</extrainfo>
@@ -32750,10 +32730,6 @@ license:CC0-1.0
 	</hash>
 	<hash crc32="369da42d" sha1="f9496f46df292142db317ac18ecbe1ae856c2724" name="King of Kings (J)">
 		<extrainfo>19 2 8 16</extrainfo>
-
-	</hash>
-	<hash crc32="a55701dd" sha1="77d699d6b04bc55f14a1ccf931902a5f10eeea18" name="King of Kings, The (Wisdom Tree) (V1.1) [!p]">
-		<extrainfo>11 1 8 16</extrainfo>
 
 	</hash>
 	<hash crc32="560bf5a6" sha1="3f9121d5c2f6f3d6a1524d674465b0084c288706" name="King of Kings, The (Wisdom Tree) (V1.2)">
@@ -47965,10 +47941,6 @@ license:CC0-1.0
 		<extrainfo>3 0 2 8</extrainfo>
 
 	</hash>
-	<hash crc32="38b9dc71" sha1="e4bfd5ab3c3649dbd36b9a7280cf431641bcbcec" name="Poker (Unl) [!p]">
-		<extrainfo>3 0 2 3</extrainfo>
-
-	</hash>
 	<hash crc32="f0f9ec4d" sha1="9c0b09a9cb27f1524e4ef6f5f0894ebfdfd66033" name="Poker (Unl) [T+Chi]">
 		<status>Known Bad Image</status>
 		<extrainfo>3 0 2 3</extrainfo>
@@ -49251,10 +49223,6 @@ license:CC0-1.0
 		<extrainfo>232 1 16 0</extrainfo>
 
 	</hash>
-	<hash crc32="6c040686" sha1="6a6c235b96c5cc51a5bf6d6fbaf30e77ad789fc7" name="Quattro Adventure (Camerica) [!p]">
-		<extrainfo>232 1 16 0</extrainfo>
-
-	</hash>
 	<hash crc32="60daab04" sha1="5f71902d90334030ca26f92a74abae20af3c6dc6" name="Quattro Adventure (Camerica) [T+Pol(T.Island Only)]">
 		<extrainfo>232 1 16 0</extrainfo>
 
@@ -49307,10 +49275,6 @@ license:CC0-1.0
 
 	</hash>
 	<hash crc32="b462718e" sha1="f19f655f4da658d264e095e8d5fae774b9b95b64" name="Quattro Sports (Camerica) (V3 Plug-Thru Cart)">
-		<extrainfo>232 1 16 0</extrainfo>
-
-	</hash>
-	<hash crc32="62ef6c79" sha1="6f288136923adfa0b1dc7c5ca5782bf0892dfce1" name="Quattro Sports (Camerica) [!p]">
 		<extrainfo>232 1 16 0</extrainfo>
 
 	</hash>
@@ -60967,10 +60931,6 @@ license:CC0-1.0
 
 	</hash>
 	<hash crc32="83d26dfc" sha1="c305aeeb1d309cbf10e6d852853f936e8ed36976" name="Super Mario Bros. (E) (REVA) [T+Spa100]">
-		<extrainfo>0 1 2 1</extrainfo>
-
-	</hash>
-	<hash crc32="7a9be620" sha1="db295c6bad1b58bc1170c4b300c1c8d2a6bc1a87" name="Super Mario Bros. (E) (REVB) [!p]">
 		<extrainfo>0 1 2 1</extrainfo>
 
 	</hash>
