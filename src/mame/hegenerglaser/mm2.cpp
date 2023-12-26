@@ -373,7 +373,7 @@ void mm2_state::mm4(machine_config &config)
 void mm2_state::mm4tk(machine_config &config)
 {
 	mm4(config);
-	m_maincpu->set_clock(18'000'000);
+	m_maincpu->set_clock(36_MHz_XTAL / 2);
 }
 
 void mm2_state::mm5(machine_config &config)
