@@ -32,13 +32,6 @@ void kn5000_extension_device::io_map(address_space_installer &space, offs_t star
 		space.install_device(start, end, *dev, &kn5000_extension_interface::io_map);
 }
 
-// FIXME: do we need these?
-//void kn5000_extension_device::device_resolve_objects()
-//{
-//	m_firq_callback.resolve_safe();
-//	m_irq_callback.resolve_safe();
-//}
-
 void kn5000_extension_device::device_start()
 {
 }

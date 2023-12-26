@@ -36,21 +36,11 @@ public:
 	kn5000_extension_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~kn5000_extension_device() = default;
 
-// FIXME: do we need these?
-//	auto firq_callback() { return m_firq_callback.bind(); }
-//	auto irq_callback() { return m_irq_callback.bind(); }
-
 	void rom_map(address_space_installer &space, offs_t start, offs_t end);
 	void io_map(address_space_installer &space, offs_t start, offs_t end);
 
 protected:
-// FIXME: do we need these?
-//	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
-
-// FIXME: do we need these?
-//	devcb_write_line m_firq_callback;
-//	devcb_write_line m_irq_callback;
 };
 
 DECLARE_DEVICE_TYPE(KN5000_EXTENSION, kn5000_extension_device)

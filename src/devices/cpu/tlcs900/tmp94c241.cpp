@@ -170,42 +170,42 @@ static const struct {
 
 tmp94c241_device::tmp94c241_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	tlcs900h_device(mconfig, TMP94C241, tag, owner, clock),
-	m_port0_read(*this),
+	m_port0_read(*this, 0),
 	m_port0_write(*this),
-	m_port1_read(*this),
+	m_port1_read(*this, 0),
 	m_port1_write(*this),
-	m_port2_read(*this),
+	m_port2_read(*this, 0),
 	m_port2_write(*this),
-	m_port3_read(*this),
+	m_port3_read(*this, 0),
 	m_port3_write(*this),
-	m_port4_read(*this),
+	m_port4_read(*this, 0),
 	m_port4_write(*this),
-	m_port5_read(*this),
+	m_port5_read(*this, 0),
 	m_port5_write(*this),
-	m_port6_read(*this),
+	m_port6_read(*this, 0),
 	m_port6_write(*this),
-	m_port7_read(*this),
+	m_port7_read(*this, 0),
 	m_port7_write(*this),
-	m_port8_read(*this),
+	m_port8_read(*this, 0),
 	m_port8_write(*this),
-	m_porta_read(*this),
+	m_porta_read(*this, 0),
 	m_porta_write(*this),
-	m_portb_read(*this),
+	m_portb_read(*this, 0),
 	m_portb_write(*this),
-	m_portc_read(*this),
+	m_portc_read(*this, 0),
 	m_portc_write(*this),
-	m_portd_read(*this),
+	m_portd_read(*this, 0),
 	m_portd_write(*this),
-	m_porte_read(*this),
+	m_porte_read(*this, 0),
 	m_porte_write(*this),
-	m_portf_read(*this),
+	m_portf_read(*this, 0),
 	m_portf_write(*this),
-	m_portg_read(*this),
-	m_porth_read(*this),
+	m_portg_read(*this, 0),
+	m_porth_read(*this, 0),
 	m_porth_write(*this),
-	m_portz_read(*this),
+	m_portz_read(*this, 0),
 	m_portz_write(*this),
-	m_an_read(*this),
+	m_an_read(*this, 0),
 	m_port_latch{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 	m_port_control{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 	m_port_function{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
@@ -290,43 +290,6 @@ void tmp94c241_device::device_start()
 	save_item(NAME(m_dram_refresh));
 	save_item(NAME(m_dram_access));
 	save_item(NAME(m_da_drive));
-
-	m_port0_read.resolve_safe(0);
-	m_port0_write.resolve_safe();
-	m_port1_read.resolve_safe(0);
-	m_port1_write.resolve_safe();
-	m_port2_read.resolve_safe(0);
-	m_port2_write.resolve_safe();
-	m_port3_read.resolve_safe(0);
-	m_port3_write.resolve_safe();
-	m_port4_read.resolve_safe(0);
-	m_port4_write.resolve_safe();
-	m_port5_read.resolve_safe(0);
-	m_port5_write.resolve_safe();
-	m_port6_read.resolve_safe(0);
-	m_port6_write.resolve_safe();
-	m_port7_read.resolve_safe(0);
-	m_port7_write.resolve_safe();
-	m_port8_read.resolve_safe(0);
-	m_port8_write.resolve_safe();
-	m_porta_read.resolve_safe(0);
-	m_porta_write.resolve_safe();
-	m_portb_read.resolve_safe(0);
-	m_portb_write.resolve_safe();
-	m_portc_read.resolve_safe(0);
-	m_portc_write.resolve_safe();
-	m_portd_read.resolve_safe(0);
-	m_portd_write.resolve_safe();
-	m_porte_read.resolve_safe(0);
-	m_porte_write.resolve_safe();
-	m_portf_read.resolve_safe(0);
-	m_portf_write.resolve_safe();
-	m_portg_read.resolve_safe(0);
-	m_porth_read.resolve_safe(0);
-	m_porth_write.resolve_safe();
-	m_portz_read.resolve_safe(0);
-	m_portz_write.resolve_safe();
-	m_an_read.resolve_all_safe(0);
 }
 
 
