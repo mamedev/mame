@@ -19,6 +19,9 @@
     - 8520 read/write
     - 5710 read/write
     - optimize
+    - off by one errors in vAmigaTS/showcia1 TODLO (reproducible particularly with -nothrottle)
+    - flag_w & amigafdc both auto-inverts index pulses, it also fails ICR vAmigaTS/showcia1 test
+      (expected: 0x00, actual: 0x10)
 
 */
 
@@ -293,7 +296,10 @@ void mos6526_device::clock_tod()
 void mos8520_device::clock_tod()
 {
 	m_tod++;
-	m_tod &= 0xffffff;
+	m_tod &= 0x00ffffff;
+	// unused bits are floating high as per vAmigaTS/showcia1
+	// FIXME: should really hookup from address_map override instead
+	m_tod |= 0xff000000;
 }
 
 
@@ -727,8 +733,9 @@ void mos6526_device::device_reset()
 	m_load_b1 = 0;
 	m_load_b2 = 0;
 	m_oneshot_b0 = 0;
-	m_ta = 0;
-	m_tb = 0;
+	// initial state is confirmed floating high as per vAmigaTS/showcia1
+	m_ta = 0xffff;
+	m_tb = 0xffff;
 	m_ta_latch = 0xffff;
 	m_tb_latch = 0xffff;
 	m_cra = 0;
