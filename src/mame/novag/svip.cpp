@@ -292,8 +292,8 @@ ROM_START( nsvip ) // serial 7604xx
 	ROM_LOAD("yellow", 0x4000, 0x4000, CRC(278e98f0) SHA1(a080e2300c90b6daf42fef960642885eb00ee607) ) // no label
 	ROM_CONTINUE(      0x0000, 0x4000 )
 
-	ROM_REGION( 35502, "screen", 0 )
-	ROM_LOAD("nvip.svg", 0, 35502, CRC(3e520357) SHA1(f6188bcff8995e84ea28f641cfbd755139498d76) )
+	ROM_REGION( 36006, "screen", 0 )
+	ROM_LOAD("nvip.svg", 0, 36006, CRC(fa69f48d) SHA1(3ed2f85323883d3b2d652833274dcd4ab06c473e) )
 ROM_END
 
 ROM_START( nsvipa ) // serial 7569xx
@@ -304,8 +304,8 @@ ROM_START( nsvipa ) // serial 7569xx
 	ROM_LOAD("v_117", 0x4000, 0x4000, CRC(2a60a474) SHA1(5dd0a1871fcbbb2a6271f284562a62f98bf9bf93) )
 	ROM_CONTINUE(     0x0000, 0x4000 )
 
-	ROM_REGION( 35502, "screen", 0 )
-	ROM_LOAD("nvip.svg", 0, 35502, CRC(3e520357) SHA1(f6188bcff8995e84ea28f641cfbd755139498d76) )
+	ROM_REGION( 36006, "screen", 0 )
+	ROM_LOAD("nvip.svg", 0, 36006, CRC(fa69f48d) SHA1(3ed2f85323883d3b2d652833274dcd4ab06c473e) )
 ROM_END
 
 ROM_START( nsvipb ) // serial 7545xx
@@ -316,8 +316,8 @@ ROM_START( nsvipb ) // serial 7545xx
 	ROM_LOAD("sv_111", 0x4000, 0x4000, CRC(4be9a23f) SHA1(1fb8ccec112e485eedd899cbe8c0c2cb99e840a4) )
 	ROM_CONTINUE(      0x0000, 0x4000 )
 
-	ROM_REGION( 35502, "screen", 0 )
-	ROM_LOAD("nvip.svg", 0, 35502, CRC(3e520357) SHA1(f6188bcff8995e84ea28f641cfbd755139498d76) )
+	ROM_REGION( 36006, "screen", 0 )
+	ROM_LOAD("nvip.svg", 0, 36006, CRC(fa69f48d) SHA1(3ed2f85323883d3b2d652833274dcd4ab06c473e) )
 ROM_END
 
 ROM_START( nsvipc ) // serial 7524xx
@@ -328,8 +328,8 @@ ROM_START( nsvipc ) // serial 7524xx
 	ROM_LOAD("s_vip_920", 0x4000, 0x4000, CRC(6f61b1e1) SHA1(df74a599eb59b113ef60c9fc23f9c603a5de4f9e) )
 	ROM_CONTINUE(         0x0000, 0x4000 )
 
-	ROM_REGION( 35502, "screen", 0 )
-	ROM_LOAD("nvip.svg", 0, 35502, CRC(3e520357) SHA1(f6188bcff8995e84ea28f641cfbd755139498d76) )
+	ROM_REGION( 36006, "screen", 0 )
+	ROM_LOAD("nvip.svg", 0, 36006, CRC(fa69f48d) SHA1(3ed2f85323883d3b2d652833274dcd4ab06c473e) )
 ROM_END
 
 } // anonymous namespace
