@@ -34,19 +34,20 @@ public:
 
 	void wake() // can be configured to wake from certain inputs as a mask option?
 	{
+		machine().scheduler().synchronize();
 		m_inhalt = 0;
 	}
 
 protected:
 	ht1130_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor data);
 
-	virtual uint32_t execute_max_cycles() const noexcept override { return 2; }
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
+	virtual uint32_t execute_max_cycles() const noexcept override { return 2; }
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 

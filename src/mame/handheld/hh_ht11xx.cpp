@@ -51,9 +51,6 @@ void ht11xx_brickgame_state::machine_start()
 
 void ht11xx_brickgame_state::machine_reset()
 {
-	for (int i=0;i<256;i++)
-		for (int j=0;j<4;j++)
-			m_out_x[i][j] = 0;
 }
 
 INPUT_CHANGED_MEMBER(ht11xx_brickgame_state::power_pressed)
