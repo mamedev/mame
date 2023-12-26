@@ -4,11 +4,12 @@
 /*
 
     TODO:
-    Interrupts (not used by brke23p2)
-    Sound (needs internal frequency ROM data?)
-    IO wake-up from HALT etc.
-	1 machine cycle (eg. a 1 byte opcode) takes 4 system clock cycles (from OSC pins).
-	The timer rate can be configured with a mask option (system clock / 2^n), n=0-13 (except 6 for some reason). So, timer rate can be faster or slower than machine cycle rate.
+    - Interrupts (not used by brke23p2)
+    - Sound (needs internal frequency ROM data?)
+    - IO wake-up from HALT etc.
+    - 1 machine cycle (eg. a 1 byte opcode) takes 4 system clock cycles (from OSC pins).
+    - The timer rate can be configured with a mask option (system clock / 2^n), n=0-13 (except 6 for some reason).
+      So, timer rate can be faster or slower than machine cycle rate.
 
 */
 
@@ -441,7 +442,7 @@ void ht1130_device::do_op()
 		return;
 	}
 
-	case 0b00011111: // OR [R1R0],A : Logically OR data memory with accumulator
+	case 0b00011111: // OR [R1R0],A : Logical OR data memory with accumulator
 	{
 		const u8 data = getr1r0_data();
 		const u8 acc = getacc();
@@ -1015,6 +1016,8 @@ void ht1130_device::do_op()
 		if (operand == 0b00111110) // this is a 'NOP' must HALT always be followed by NOP to work?
 		{
 			m_inhalt = 1;
+			if (m_icount > 0)
+				m_icount = 0;
 		}
 		else
 		{
@@ -1033,18 +1036,17 @@ void ht1130_device::do_op()
 
 void ht1130_device::execute_run()
 {
+	if (m_inhalt)
+	{
+		m_icount = 0;
+		return;
+	}
+
 	while (m_icount > 0)
 	{
 		debugger_instruction_hook(m_pc);
 
-		if (!m_inhalt)
-		{
-			do_op();
-		}
-		else
-		{
-			m_icount--;
-		}
+		do_op();
 
 		if (m_timer & 0x100)
 		{
