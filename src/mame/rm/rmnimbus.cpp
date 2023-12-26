@@ -54,8 +54,8 @@ void rmnimbus_state::nimbus_io(address_map &map)
 	map(0x0000, 0x0031).rw(FUNC(rmnimbus_state::nimbus_video_io_r), FUNC(rmnimbus_state::nimbus_video_io_w));
 	map(0x0080, 0x0080).rw(FUNC(rmnimbus_state::nimbus_mcu_r), FUNC(rmnimbus_state::nimbus_mcu_w));
 	map(0x0092, 0x0092).rw(FUNC(rmnimbus_state::nimbus_iou_r), FUNC(rmnimbus_state::nimbus_iou_w));
-	map(0x00a0, 0x00a0).rw(FUNC(rmnimbus_state::nimbus_joystick_r), FUNC(rmnimbus_state::nimbus_select_joystick0));
-	map(0x00a2, 0x00a2).w(FUNC(rmnimbus_state::nimbus_select_joystick1));
+	map(0x00a0, 0x00a0).r(FUNC(rmnimbus_state::nimbus_joystick_r));
+	map(0x00a0, 0x00a3).w(FUNC(rmnimbus_state::nimbus_joystick_select));
 	map(0x00a4, 0x00a4).rw(FUNC(rmnimbus_state::nimbus_mouse_js_r), FUNC(rmnimbus_state::nimbus_mouse_js_w));
 	map(0x00c0, 0x00cf).rw(FUNC(rmnimbus_state::nimbus_pc8031_r), FUNC(rmnimbus_state::nimbus_pc8031_w)).umask16(0x00ff);
 	map(0x00e0, 0x00ef).rw(AY8910_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w)).umask16(0x00ff);

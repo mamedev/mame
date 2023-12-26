@@ -151,8 +151,7 @@ private:
 	void nimbus_sound_ay8910_porta_w(uint8_t data);
 	void nimbus_sound_ay8910_portb_w(uint8_t data);
 	uint8_t nimbus_joystick_r();
-	void nimbus_select_joystick0(uint8_t data);
-	void nimbus_select_joystick1(uint8_t data);
+	void nimbus_joystick_select(offs_t offset, uint16_t data);
 	uint8_t nimbus_mouse_js_r();
 	void nimbus_mouse_js_w(uint8_t data);
 	uint16_t nimbus_video_io_r(offs_t offset, uint16_t mem_mask = ~0);
