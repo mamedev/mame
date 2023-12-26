@@ -235,8 +235,8 @@ static INPUT_PORTS_START( edames ) // see comments for French version labels
 
 	PORT_START("IN.3")
 	PORT_CONFNAME( 0x03, 0x02, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, edames_state, change_cpu_freq, 0) // factory set
-	PORT_CONFSETTING(    0x02, "8MHz" )
-	PORT_CONFSETTING(    0x00, "12MHz" )
+	PORT_CONFSETTING(    0x02, "8MHz (original)" )
+	PORT_CONFSETTING(    0x00, "12MHz (newer)" )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Swap Side")   // Tourne Damier
 
 	PORT_START("RESET")
