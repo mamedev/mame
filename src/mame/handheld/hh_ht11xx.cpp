@@ -6,9 +6,8 @@
 
 #include "cpu/ht1130/ht1130.h"
 
+#include "screen.h"
 #include "speaker.h"
-
-#include "brke23p2.lh"
 
 #define VERBOSE (0)
 #include "logmacro.h"
@@ -21,7 +20,7 @@ public:
 	ht11xx_brickgame_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_seg(*this, "seg%u", 0U),
+		m_out_x(*this, "seg%u_%u", 0U, 0U),
 		m_in1(*this, "IN1"),
 		m_in2(*this, "IN2")
 	{ }
@@ -33,21 +32,26 @@ protected:
 	virtual void machine_reset() override;
 
 private:
+	void mcfg_svg_screen(machine_config &config, u16 width, u16 height, const char *tag = "screen");
+
 	void display_data_w(offs_t offset, u8 data);
 
 	required_device<ht1130_device> m_maincpu;
-	output_finder<512> m_seg;
+	output_finder<256, 4> m_out_x;
 	required_ioport m_in1;
 	required_ioport m_in2;
 };
 
 void ht11xx_brickgame_state::machine_start()
 {
-	m_seg.resolve();
+	m_out_x.resolve();
 }
 
 void ht11xx_brickgame_state::machine_reset()
 {
+	for (int i=0;i<256;i++)
+		for (int j=0;j<4;j++)
+			m_out_x[i][j] = 0;
 }
 
 static INPUT_PORTS_START( ht11xx_brickgame )
@@ -68,8 +72,16 @@ void ht11xx_brickgame_state::display_data_w(offs_t offset, u8 data)
 {
 	for (int i = 0; i < 4; i++)
 	{
-		m_seg[i | (offset * 4)] = (data >> i) & 1;
+		m_out_x[offset+0xb0][i] = (data >> i) & 1;
 	}
+}
+
+void ht11xx_brickgame_state::mcfg_svg_screen(machine_config &config, u16 width, u16 height, const char *tag)
+{
+	screen_device &screen(SCREEN(config, tag, SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(width, height);
+	screen.set_visarea_full();
 }
 
 void ht11xx_brickgame_state::ht11xx_brickgame(machine_config &config)
@@ -82,12 +94,15 @@ void ht11xx_brickgame_state::ht11xx_brickgame(machine_config &config)
 
 	SPEAKER(config, "speaker").front_center();
 
-	config.set_default_layout(layout_brke23p2);
+	mcfg_svg_screen(config, 768, 1080);
 }
 
 ROM_START( brke23p2 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "e23plusmarkii96in1.bin", 0x0000, 0x1000, CRC(8045fac4) SHA1(a36213309e6add31f31e4248f02f17de9914a5c1) ) // visual decap
+
+	ROM_REGION( 139648, "screen", 0)
+	ROM_LOAD( "brke23p2.svg", 0, 139648, CRC(f29ea936) SHA1(d80a37aa4e5647b31454a6d6de5a59c770ef0322) )
 ROM_END
 
 } // anonymous namespace
