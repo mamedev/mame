@@ -9,8 +9,8 @@ Toshiba TLCS-900/H disassembly
 #include "emu.h"
 #include "dasm900.h"
 
-tlcs900_disassembler::tlcs900_disassembler(uint16_t num_SFRs, const char *const SFR_names[])
-	: m_num_SFRs(num_SFRs), m_SFR_names(SFR_names)
+tlcs900_disassembler::tlcs900_disassembler(uint16_t num_sfr, const char *const sfr_names[])
+	: m_num_sfr(num_sfr), m_sfr_names(sfr_names)
 {
 }
 
@@ -1375,11 +1375,11 @@ const char *const tlcs900_disassembler::s_cond[16] =
 };
 
 tmp94c241_disassembler::tmp94c241_disassembler()
-	: tlcs900_disassembler(0x170, s_SFR_names)
+	: tlcs900_disassembler(0x170, s_sfr_names)
 {
 }
 
-const char *const tmp94c241_disassembler::s_SFR_names[0x170] = {
+const char *const tmp94c241_disassembler::s_sfr_names[0x170] = {
 	/* TLCS-900/H2 type 8 bit I/O: */
 	/* 00:*/ "P0",      "0x01",    "P0CR",    "P0FC",    "P1",      "0x05",    "P1CR",    "P1FC",
 	/* 08:*/ "P2",      "0x09",    "P2CR",    "P2FC",    "P3",      "0x0d",    "P3CR",    "P3FC",
@@ -1438,11 +1438,11 @@ const char *const tmp94c241_disassembler::s_SFR_names[0x170] = {
 };
 
 tmp95c061_disassembler::tmp95c061_disassembler()
-	: tlcs900_disassembler(0x80, s_SFR_names)
+	: tlcs900_disassembler(0x80, s_sfr_names)
 {
 }
 
-const char *const tmp95c061_disassembler::s_SFR_names[0x80] = {
+const char *const tmp95c061_disassembler::s_sfr_names[0x80] = {
 	/*00:*/ "0x00",    "P1",      "0x02",    "0x03",    "P1CR",    "0x05",    "P2",      "0x07",
 	/*08:*/ "0x08",    "P2FC",    "0x0a",    "0x0b",    "0x0c",    "P5",      "0x0e",    "0x0f",
 	/*10:*/ "P5CR",    "P5FC",    "P6",      "P7",      "0x14",    "P6FC",    "P7CR",    "P7FC",
@@ -1462,11 +1462,11 @@ const char *const tmp95c061_disassembler::s_SFR_names[0x80] = {
 };
 
 tmp95c063_disassembler::tmp95c063_disassembler()
-	: tlcs900_disassembler(0xA0, s_SFR_names)
+	: tlcs900_disassembler(0xA0, s_sfr_names)
 {
 }
 
-const char *const tmp95c063_disassembler::s_SFR_names[0xA0] = {
+const char *const tmp95c063_disassembler::s_sfr_names[0xA0] = {
 	/*00:*/ "0x00",    "P1",      "0x02",    "0x03",    "P1CR",    "0x05",    "P2",      "0x07",
 	/*08:*/ "0x08",    "P2FC",    "0x0a",    "0x0b",    "0x0c",    "P5",      "0x0e",    "0x0f",
 	/*10:*/ "P5CR",    "P5FC",    "P6",      "P7",      "0x14",    "P6FC",    "P7CR",    "P7FC",
@@ -1490,11 +1490,11 @@ const char *const tmp95c063_disassembler::s_SFR_names[0xA0] = {
 };
 
 tmp96c141_disassembler::tmp96c141_disassembler()
-	: tlcs900_disassembler(0x80, s_SFR_names)
+	: tlcs900_disassembler(0x80, s_sfr_names)
 {
 }
 
-const char *const tmp96c141_disassembler::s_SFR_names[0x80] = {
+const char *const tmp96c141_disassembler::s_sfr_names[0x80] = {
 	/*00:*/ "P0",      "P1",      "P0CR",    "0x03",    "P1CR",    "P1FC",    "P2",      "P3",
 	/*08:*/ "P2CR",    "P2FC",    "P3CR",    "P3FC",    "P4",      "P5",      "P4CR",    "0x0f",
 	/*10:*/ "P4FC",    "0x11",    "P6",      "P7",      "P6CR",    "P7CR",    "P6FC",    "P7FC",
@@ -1595,8 +1595,8 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		{
 		case 0x00:  /* 0xC0 */
 			imm = opcodes.r8( pos++ );
-			if (imm < m_num_SFRs){
-				buf = string_format("%s", m_SFR_names[imm]);
+			if (imm < m_num_sfr){
+				buf = string_format("%s", m_sfr_names[imm]);
 			} else {
 				buf = string_format("0x%02x", imm);
 			}
@@ -1605,8 +1605,8 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		case 0x01:  /* 0xC1 */
 			imm = opcodes.r8( pos++ );
 			imm = imm | (opcodes.r8( pos++ ) << 8);
-			if (imm < m_num_SFRs){
-				buf = string_format("%s", m_SFR_names[imm]);
+			if (imm < m_num_sfr){
+				buf = string_format("%s", m_sfr_names[imm]);
 			} else {
 				buf = string_format("0x%04x", imm);
 			}
@@ -1616,8 +1616,8 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 			imm = opcodes.r8( pos++ );
 			imm = imm | (opcodes.r8( pos++ ) << 8);
 			imm = imm | (opcodes.r8( pos++ ) << 16);
-			if (imm < m_num_SFRs){
-				buf = string_format("%s", m_SFR_names[imm]);
+			if (imm < m_num_sfr){
+				buf = string_format("%s", m_sfr_names[imm]);
 			} else {
 				buf = string_format("0x%06x", imm);
 			}
@@ -1887,8 +1887,8 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		{
 		case 0x00:  /* 0xF0 */
 			imm = opcodes.r8( pos++ );
-			if (imm < m_num_SFRs){
-				buf = string_format("%s", m_SFR_names[imm]);
+			if (imm < m_num_sfr){
+				buf = string_format("%s", m_sfr_names[imm]);
 			} else {
 				buf = string_format("0x%02x", imm);
 			}
@@ -1897,8 +1897,8 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		case 0x01:  /* 0xF1 */
 			imm = opcodes.r8( pos++ );
 			imm = imm | (opcodes.r8( pos++ ) << 8);
-			if (imm < m_num_SFRs){
-				buf = string_format("%s", m_SFR_names[imm]);
+			if (imm < m_num_sfr){
+				buf = string_format("%s", m_sfr_names[imm]);
 			} else {
 				buf = string_format("0x%04x", imm);
 			}
@@ -1908,8 +1908,8 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 			imm = opcodes.r8( pos++ );
 			imm = imm | (opcodes.r8( pos++ ) << 8);
 			imm = imm | (opcodes.r8( pos++ ) << 16);
-			if (imm < m_num_SFRs){
-				buf = string_format("%s", m_SFR_names[imm]);
+			if (imm < m_num_sfr){
+				buf = string_format("%s", m_sfr_names[imm]);
 			} else {
 				buf = string_format("0x%06x", imm);
 			}
@@ -2129,8 +2129,8 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 
 	case O_M8:
 		imm = opcodes.r8( pos++ );
-		if (imm <= m_num_SFRs){
-			util::stream_format(stream, " (%s)", m_SFR_names[imm]);
+		if (imm <= m_num_sfr){
+			util::stream_format(stream, " (%s)", m_sfr_names[imm]);
 		} else {
 			util::stream_format(stream, " (0x%02x)", imm);
 		}
@@ -2139,8 +2139,8 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 	case O_M16:
 		imm = opcodes.r8( pos++ );
 		imm = imm | (opcodes.r8( pos++ ) << 8);
-		if (imm <= m_num_SFRs){
-			util::stream_format(stream, " (%s)", m_SFR_names[imm]);
+		if (imm <= m_num_sfr){
+			util::stream_format(stream, " (%s)", m_sfr_names[imm]);
 		} else {
 			util::stream_format(stream, " (0x%04x)", imm);
 		}
@@ -2289,8 +2289,8 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 
 	case O_M8:
 		imm = opcodes.r8( pos++ );
-		if (imm <= m_num_SFRs){
-			util::stream_format(stream, " (%s)", m_SFR_names[imm]);
+		if (imm <= m_num_sfr){
+			util::stream_format(stream, " (%s)", m_sfr_names[imm]);
 		} else {
 			util::stream_format(stream, " (0x%02x)", imm);
 		}break;
@@ -2298,8 +2298,8 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 	case O_M16:
 		imm = opcodes.r8( pos++ );
 		imm = imm | (opcodes.r8( pos++ ) << 8);
-		if (imm <= m_num_SFRs){
-			util::stream_format(stream, " (%s)", m_SFR_names[imm]);
+		if (imm <= m_num_sfr){
+			util::stream_format(stream, " (%s)", m_sfr_names[imm]);
 		} else {
 			util::stream_format(stream, " (0x%04x)", imm);
 		}
