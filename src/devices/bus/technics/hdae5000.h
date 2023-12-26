@@ -7,7 +7,7 @@
 #define MAME_BUS_HD_AE5000_H
 
 #include "kn5000_extension.h"
-#include "bus/ata/idehd.h"
+#include "bus/ata/hdd.h"
 #include "machine/i8255.h"
 
 class hdae5000_device : public device_t, public kn5000_extension_interface
