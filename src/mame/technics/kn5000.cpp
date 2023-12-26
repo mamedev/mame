@@ -4,34 +4,18 @@
 
 	Technics SX-KN5000 music keyboard driver
 
-	Driver by Felipe C. da S. Sanches <juca@members.fsf.org>
-
-
-	Changelog:
-
-	2021 MAR 18 [Felipe Sanches]:
-	* Initial skeleton driver
-
-	2021 AUG 03 [Felipe Sanches]:
-	* Hooking up FLASH ROM, VGA & Floppy controllers
-	  and most of the maincpu mem_map
-
-	2023 DEC 12 [Felipe Sanches]:
-	* The optional HD-AE5000 extension board (for audio & hard-drive)
-	  was split out as its own device.
-
 ******************************************************************************/
 
 #include "emu.h"
+#include "bus/technics/hdae5000.h"
 #include "cpu/tlcs900/tmp94c241.h"
 #include "imagedev/floppy.h"
-#include "bus/technics/hdae5000.h"
 #include "machine/gen_latch.h"
 #include "machine/upd765.h"
-#include "video/pc_vga.h"
 #include "screen.h"
 #include "sound/beep.h"
 #include "speaker.h"
+#include "video/pc_vga.h"
 
 
 class kn5000_state : public driver_device
@@ -198,9 +182,9 @@ void kn5000_state::kn5000(machine_config &config)
 
 	// PORT D:
 	//   bit 0 (output) = FDCRST
-    //   bit 6 (input) = FD.I/O
+	//   bit 6 (input) = FD.I/O
 	m_maincpu->portd_write().set([this] (u8 data) { m_fdc->reset_w(BIT(data, 0)); });
-    // TODO: bit 6!
+	// TODO: bit 6!
 
 
 	// PORT E:

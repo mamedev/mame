@@ -3,8 +3,10 @@
 //
 //    HD-AE5000 emulation
 //
-#ifndef MAME_BUS_HD_AE5000_H
-#define MAME_BUS_HD_AE5000_H
+#ifndef MAME_BUS_TECHNICS_HDAE5000_H
+#define MAME_BUS_TECHNICS_HDAE5000_H
+
+#pragma once
 
 #include "kn5000_extension.h"
 #include "bus/ata/hdd.h"
@@ -33,4 +35,4 @@ private:
 
 DECLARE_DEVICE_TYPE(HDAE5000, hdae5000_device)
 
-#endif
+#endif // MAME_BUS_TECHNICS_HDAE5000_H

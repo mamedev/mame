@@ -33,10 +33,10 @@
 #define TMP94C241_INTNMWDT 17
 
 // Flip-Flop operations:
-#define FF_INVERT	0b00
-#define FF_SET		0b01
-#define FF_CLEAR	0b10
-#define FF_DONTCARE 0b11
+#define FLIPFLOP_INVERT   0b00
+#define FLIPFLOP_SET      0b01
+#define FLIPFLOP_CLEAR    0b10
+#define FLIPFLOP_DONTCARE 0b11
 
 //**************************************************************************
 //  TYPE DEFINITIONS

@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert, Felipe Sanches
-
+//
 // Generic Technics KN5000 extension slot
 
 #ifndef MAME_BUS_TECHNICS_KN5000_EXTENSION_H

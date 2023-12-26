@@ -357,7 +357,7 @@ void tmp94c241_device::device_reset()
 	std::fill_n(&m_timer[0], 4, 0x00);
 	std::fill_n(&m_timer16[0], 4, 0x00);
 	m_watchdog_mode = 0x80;
-	for (int i = 0; i < 2; i++)
+	for( int i = 0; i < 2; i++ )
 	{
 		m_serial_control[i] &= 0x80;
 		m_serial_mode[i] &= 0x80;
@@ -382,7 +382,7 @@ void tmp94c241_device::device_reset()
 	std::fill_n(&m_dram_access[0], 2, 0x80);
 	m_da_drive = 0x00;
 
-	for (int i = 0; i < TLCS900_NUM_INPUTS; i++)
+	for( int i = 0; i < TLCS900_NUM_INPUTS; i++ )
 		m_level[i] = CLEAR_LINE;
 }
 
@@ -1018,8 +1018,8 @@ void tmp94c241_device::change_timer_flipflop(uint8_t flipflop, uint8_t operation
 {
 	switch(operation)
 	{
-	case FF_INVERT:
-		switch (flipflop)
+	case FLIPFLOP_INVERT:
+		switch( flipflop )
 		{
 		case 0x1: if ((m_port_function[0xc] & 0x03) == 0x02) pc_w(m_port_latch[0xc] ^ 0x01); break;
 		case 0x3: if ((m_port_function[0xc] & 0x03) == 0x02) pc_w(m_port_latch[0xc] ^ 0x02); break;
@@ -1031,8 +1031,8 @@ void tmp94c241_device::change_timer_flipflop(uint8_t flipflop, uint8_t operation
 		case 0xb: if ((m_port_function[0xc] & 0x03) == 0x03) pc_w(m_port_latch[0xc] ^ 0x02); break;
 		}
 		break;
-	case FF_SET:
-		switch (flipflop)
+	case FLIPFLOP_SET:
+		switch( flipflop )
 		{
 		case 0x1: if ((m_port_function[0xc] & 0x03) == 0x02) pc_w(m_port_latch[0xc] & 0x01); break;
 		case 0x3: if ((m_port_function[0xc] & 0x03) == 0x02) pc_w(m_port_latch[0xc] & 0x02); break;
@@ -1044,8 +1044,8 @@ void tmp94c241_device::change_timer_flipflop(uint8_t flipflop, uint8_t operation
 		case 0xb: if ((m_port_function[0xc] & 0x03) == 0x03) pc_w(m_port_latch[0xc] & 0x02); break;
 		}
 		break;
-	case FF_CLEAR:
-		switch (flipflop)
+	case FLIPFLOP_CLEAR:
+		switch( flipflop )
 		{
 		case 0x1: if ((m_port_function[0xc] & 0x03) == 0x02) pc_w(m_port_latch[0xc] | ~0x01); break;
 		case 0x3: if ((m_port_function[0xc] & 0x03) == 0x02) pc_w(m_port_latch[0xc] | ~0x02); break;
@@ -1065,25 +1065,25 @@ void tmp94c241_device::t02ffcr_w(uint8_t data)
 	switch( data & 0x0c )
 	{
 	case 0x00:
-		change_timer_flipflop( 1, FF_INVERT );
+		change_timer_flipflop( 1, FLIPFLOP_INVERT );
 		break;
 	case 0x04:
-		change_timer_flipflop( 1, FF_SET );
+		change_timer_flipflop( 1, FLIPFLOP_SET );
 		break;
 	case 0x08:
-		change_timer_flipflop( 1, FF_CLEAR );
+		change_timer_flipflop( 1, FLIPFLOP_CLEAR );
 		break;
 	}
 	switch( data & 0xc0 )
 	{
 	case 0x00:
-		change_timer_flipflop( 3, FF_INVERT );
+		change_timer_flipflop( 3, FLIPFLOP_INVERT );
 		break;
 	case 0x40:
-		change_timer_flipflop( 3, FF_SET );
+		change_timer_flipflop( 3, FLIPFLOP_SET );
 		break;
 	case 0x80:
-		change_timer_flipflop( 3, FF_CLEAR );
+		change_timer_flipflop( 3, FLIPFLOP_CLEAR );
 		break;
 	}
 
@@ -1208,25 +1208,25 @@ void tmp94c241_device::t4ffcr_w(uint8_t data)
 	switch( data & 0x03 )
 	{
 	case 0x00:
-		change_timer_flipflop( 4, FF_INVERT );
+		change_timer_flipflop( 4, FLIPFLOP_INVERT );
 		break;
 	case 0x01:
-		change_timer_flipflop( 4, FF_SET );
+		change_timer_flipflop( 4, FLIPFLOP_SET );
 		break;
 	case 0x02:
-		change_timer_flipflop( 4, FF_CLEAR );
+		change_timer_flipflop( 4, FLIPFLOP_CLEAR );
 		break;
 	}
 	switch( data & 0xc0 )
 	{
 	case 0x00:
-		change_timer_flipflop( 5, FF_INVERT );
+		change_timer_flipflop( 5, FLIPFLOP_INVERT );
 		break;
 	case 0x40:
-		change_timer_flipflop( 5, FF_SET );
+		change_timer_flipflop( 5, FLIPFLOP_SET );
 		break;
 	case 0x80:
-		change_timer_flipflop( 5, FF_CLEAR );
+		change_timer_flipflop( 5, FLIPFLOP_CLEAR );
 		break;
 	}
 
@@ -1243,25 +1243,25 @@ void tmp94c241_device::t8ffcr_w(uint8_t data)
 	switch( data & 0x03 )
 	{
 	case 0x00:
-		change_timer_flipflop( 8, FF_INVERT );
+		change_timer_flipflop( 8, FLIPFLOP_INVERT );
 		break;
 	case 0x01:
-		change_timer_flipflop( 8, FF_SET );
+		change_timer_flipflop( 8, FLIPFLOP_SET );
 		break;
 	case 0x02:
-		change_timer_flipflop( 8, FF_CLEAR );
+		change_timer_flipflop( 8, FLIPFLOP_CLEAR );
 		break;
 	}
 	switch( data & 0xc0 )
 	{
 	case 0x00:
-		change_timer_flipflop( 9, FF_INVERT );
+		change_timer_flipflop( 9, FLIPFLOP_INVERT );
 		break;
 	case 0x40:
-		change_timer_flipflop( 9, FF_SET );
+		change_timer_flipflop( 9, FLIPFLOP_SET );
 		break;
 	case 0x80:
-		change_timer_flipflop( 9, FF_CLEAR );
+		change_timer_flipflop( 9, FLIPFLOP_CLEAR );
 		break;
 	}
 
@@ -1279,25 +1279,25 @@ void tmp94c241_device::t6ffcr_w(uint8_t data)
 	switch( data & 0x03 )
 	{
 	case 0x00:
-		change_timer_flipflop( 6, FF_INVERT );
+		change_timer_flipflop( 6, FLIPFLOP_INVERT );
 		break;
 	case 0x01:
-		change_timer_flipflop( 6, FF_SET );
+		change_timer_flipflop( 6, FLIPFLOP_SET );
 		break;
 	case 0x02:
-		change_timer_flipflop( 6, FF_CLEAR );
+		change_timer_flipflop( 6, FLIPFLOP_CLEAR );
 		break;
 	}
 	switch( data & 0xc0 )
 	{
 	case 0x00:
-		change_timer_flipflop( 7, FF_INVERT );
+		change_timer_flipflop( 7, FLIPFLOP_INVERT );
 		break;
 	case 0x40:
-		change_timer_flipflop( 7, FF_SET );
+		change_timer_flipflop( 7, FLIPFLOP_SET );
 		break;
 	case 0x80:
-		change_timer_flipflop( 7, FF_CLEAR );
+		change_timer_flipflop( 7, FLIPFLOP_CLEAR );
 		break;
 	}
 
@@ -1314,25 +1314,25 @@ void tmp94c241_device::taffcr_w(uint8_t data)
 	switch( data & 0x03 )
 	{
 	case 0x00:
-		change_timer_flipflop( 0xa, FF_INVERT );
+		change_timer_flipflop( 0xa, FLIPFLOP_INVERT );
 		break;
 	case 0x01:
-		change_timer_flipflop( 0xa, FF_SET );
+		change_timer_flipflop( 0xa, FLIPFLOP_SET );
 		break;
 	case 0x02:
-		change_timer_flipflop( 0xa, FF_CLEAR );
+		change_timer_flipflop( 0xa, FLIPFLOP_CLEAR );
 		break;
 	}
 	switch( data & 0xc0 )
 	{
 	case 0x00:
-		change_timer_flipflop( 0xb, FF_INVERT );
+		change_timer_flipflop( 0xb, FLIPFLOP_INVERT );
 		break;
 	case 0x40:
-		change_timer_flipflop( 0xb, FF_SET );
+		change_timer_flipflop( 0xb, FLIPFLOP_SET );
 		break;
 	case 0x80:
-		change_timer_flipflop( 0xb, FF_CLEAR );
+		change_timer_flipflop( 0xb, FLIPFLOP_CLEAR );
 		break;
 	}
 
@@ -1752,8 +1752,8 @@ void tmp94c241_device::tlcs900_check_irqs()
 	}
 
 	/* Check regular irqs */
-	for( i = TMP94C241_NUM_MASKABLE_IRQS - 1; i >= 0; i-- )
 	// the smaller the vector value, the higher the priority
+	for( i = TMP94C241_NUM_MASKABLE_IRQS - 1; i >= 0; i-- )
 	{
 		if ( m_int_reg[tmp94c241_irq_vector_map[i].reg] & tmp94c241_irq_vector_map[i].iff )
 		{
@@ -1770,7 +1770,7 @@ void tmp94c241_device::tlcs900_check_irqs()
 	}
 
 	/* Check highest allowed priority irq */
-	for ( i = std::max( 1, ( ( m_sr.b.h & 0x70 ) >> 4 ) ); i < 7; i++ )
+	for( i = std::max( 1, ( ( m_sr.b.h & 0x70 ) >> 4 ) ); i < 7; i++ )
 	{
 		if ( irq_vectors[i] >= 0 )
 		{
@@ -1853,7 +1853,7 @@ void tmp94c241_device::tlcs900_handle_timers()
 					TIMER_CHANGE_1++;
 
 				if ( (m_ffcr[0] & 0x03) == 0b10 )
-					change_timer_flipflop( 1, FF_INVERT );
+					change_timer_flipflop( 1, FLIPFLOP_INVERT );
 
 				/* In 16bit timer mode the timer should not be reset */
 				if ( TO1_OPERATING_MODE != MODE_16BIT_TIMER )
@@ -1894,7 +1894,7 @@ void tmp94c241_device::tlcs900_handle_timers()
 				m_check_irqs = 1;
 
 				if ( (m_ffcr[0] & 0x03) == 0b11 )
-					change_timer_flipflop( 1, FF_INVERT );
+					change_timer_flipflop( 1, FLIPFLOP_INVERT );
 
 				/* In 16bit timer mode also reset timer 0 */
 				if ( TO1_OPERATING_MODE == MODE_16BIT_TIMER )
@@ -1929,7 +1929,7 @@ void tmp94c241_device::tlcs900_handle_timers()
 					TIMER_CHANGE_3++;
 
 				if ( ((m_ffcr[0] & 0x30) >> 4) == 0b10 )
-					change_timer_flipflop( 3, FF_INVERT );
+					change_timer_flipflop( 3, FLIPFLOP_INVERT );
 
 				/* In 16bit timer mode the timer should not be reset */
 				if ( T23_OPERATING_MODE != MODE_16BIT_TIMER )
@@ -1970,7 +1970,7 @@ void tmp94c241_device::tlcs900_handle_timers()
 				m_check_irqs = 1;
 
 				if ( ((m_ffcr[0] & 0x30) >> 4) == 0b11 )
-					change_timer_flipflop( 3, FF_INVERT );
+					change_timer_flipflop( 3, FLIPFLOP_INVERT );
 
 				/* In 16bit timer mode also reset timer 2 */
 				if ( T23_OPERATING_MODE == MODE_16BIT_TIMER )
@@ -2004,7 +2004,7 @@ void tmp94c241_device::tlcs900_handle_timers()
 			if ( ((UPCOUNTER_4 == SFR_TREG5) && EQ5T4) ||
 				((UPCOUNTER_4 == SFR_TREG4) && EQ4T4) )
 			{
-				change_timer_flipflop( 4, FF_INVERT );
+				change_timer_flipflop( 4, FLIPFLOP_INVERT );
 				UPCOUNTER_4 = 0;
 				m_int_reg[TMP94C241_INTET45] |= 0x08;
 				m_check_irqs = 1;
@@ -2038,7 +2038,7 @@ void tmp94c241_device::tlcs900_handle_timers()
 			if ( ((UPCOUNTER_6 == SFR_TREG7) && EQ7T6) ||
 				((UPCOUNTER_6 == SFR_TREG6) && EQ6T6) )
 			{
-				change_timer_flipflop( 6, FF_INVERT );
+				change_timer_flipflop( 6, FLIPFLOP_INVERT );
 				UPCOUNTER_6 = 0;
 				m_int_reg[TMP94C241_INTET67] |= 0x08;
 				m_check_irqs = 1;
@@ -2072,7 +2072,7 @@ void tmp94c241_device::tlcs900_handle_timers()
 			if ( ((UPCOUNTER_8 == SFR_TREG9) && EQ9T8) ||
 				((UPCOUNTER_8 == SFR_TREG8) && EQ8T8) )
 			{
-				change_timer_flipflop( 8, FF_INVERT );
+				change_timer_flipflop( 8, FLIPFLOP_INVERT );
 				UPCOUNTER_8 = 0;
 				m_int_reg[TMP94C241_INTET89] |= 0x08;
 				m_check_irqs = 1;
@@ -2106,7 +2106,7 @@ void tmp94c241_device::tlcs900_handle_timers()
 			if ( ((UPCOUNTER_A == SFR_TREGA) && EQATA) ||
 				((UPCOUNTER_A == SFR_TREGB) && EQBTA) )
 			{
-				change_timer_flipflop( 0xa, FF_INVERT );
+				change_timer_flipflop( 0xa, FLIPFLOP_INVERT );
 				UPCOUNTER_A = 0;
 				m_int_reg[TMP94C241_INTETAB] |= 0x08;
 				m_check_irqs = 1;

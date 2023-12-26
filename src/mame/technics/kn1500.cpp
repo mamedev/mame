@@ -4,14 +4,6 @@
 
 	Technics SX-KN1500 music keyboard driver
 
-	Driver by Felipe C. da S. Sanches <juca@members.fsf.org>
-
-
-	Changelog:
-
-	2021 MAR 14 [Felipe Sanches]:
-	* Initial skeleton driver
-
 ******************************************************************************/
 
 #include "emu.h"
@@ -277,14 +269,11 @@ void kn1500_state::kn1500(machine_config &config)
 
 ROM_START(kn1500)
 	ROM_REGION16_LE(0x200000, "prog" , 0)
-	ROM_LOAD("technics_qsigt3c16079_5y68-j079_japan_9649eai.ic15", 0x00000, 0x200000, CRC(0f78da9a) 
-SHA1(53d5c43d833fb005a7bd377583252b84b646253d))
+	ROM_LOAD("technics_qsigt3c16079_5y68-j079_japan_9649eai.ic15", 0x00000, 0x200000, CRC(0f78da9a) SHA1(53d5c43d833fb005a7bd377583252b84b646253d))
 
 	ROM_REGION16_LE(0x200000, "rhythm" , 0)
 //	ROM_LOAD("technics_qsigt3c16068_japan.ic17", 0x00000, 0x200000, NO_DUMP)
-	ROM_LOAD("technics_qsigt3c16079_5y68-j079_japan_9649eai.ic15.rest", 0x00000, 0x200000, CRC(ce60897a) 
-SHA1(9b54f693f693488132b93e8bfed1927d7e741ae1))
-
+	ROM_LOAD("technics_qsigt3c16079_5y68-j079_japan_9649eai.ic15.rest", 0x00000, 0x200000, CRC(ce60897a) SHA1(9b54f693f693488132b93e8bfed1927d7e741ae1))
 ROM_END
 
 
