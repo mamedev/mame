@@ -82,6 +82,7 @@ private:
 	u8 gettimer_upper();
 	u8 gettimer_lower();
 
+	void cycle();
 	u8 fetch();
 	void do_op();
 
