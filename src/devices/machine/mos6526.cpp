@@ -297,9 +297,6 @@ void mos8520_device::clock_tod()
 {
 	m_tod++;
 	m_tod &= 0x00ffffff;
-	// unused bits are floating high as per vAmigaTS/showcia1
-	// FIXME: should really hookup from address_map override instead
-	m_tod |= 0xff000000;
 }
 
 
@@ -938,8 +935,9 @@ uint8_t mos8520_device::read(offs_t offset)
 		data = read_tod(2);
 		break;
 
+	// unused register returns floating high as per vAmigaTS/showcia1
 	case TOD_HR:
-		data = read_tod(3);
+		data = 0xff;
 		break;
 
 	default:
@@ -1109,7 +1107,7 @@ void mos8520_device::write(offs_t offset, uint8_t data)
 		break;
 
 	case TOD_HR:
-		write_tod(3, data);
+		// ignored in mos8520
 		break;
 	}
 }
@@ -1176,6 +1174,11 @@ void mos6526_device::tod_w(int state)
 		if (m_tod == m_alarm)
 		{
 			m_icr |= ICR_ALARM;
+			if (IMR_ALARM)
+			{
+				m_write_irq(ASSERT_LINE);
+				m_irq = true;
+			}
 		}
 	}
 }
