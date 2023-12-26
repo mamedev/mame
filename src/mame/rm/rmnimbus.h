@@ -40,7 +40,9 @@
 
 /* Mouse / Joystick */
 
-#define JOYSTICK0_TAG           "joystick0"
+#define JOYSTICK_TAG_BASE       "joystick"
+#define JOYSTICK0_TAG           JOYSTICK_TAG_BASE "0"
+#define JOYSTICK1_TAG           JOYSTICK_TAG_BASE "1"
 #define MOUSE_BUTTON_TAG        "mousebtn"
 #define MOUSEX_TAG              "mousex"
 #define MOUSEY_TAG              "mousey"
@@ -75,7 +77,7 @@ public:
 		m_fdc(*this, FDC_TAG),
 		m_z80sio(*this, Z80SIO_TAG),
 		m_screen(*this, "screen"),
-		m_io_joystick0(*this, JOYSTICK0_TAG),
+		m_io_joysticks(*this, JOYSTICK_TAG_BASE "%u", 0),
 		m_io_mouse_button(*this, MOUSE_BUTTON_TAG),
 		m_io_mousex(*this, MOUSEX_TAG),
 		m_io_mousey(*this, MOUSEY_TAG)
@@ -102,7 +104,7 @@ private:
 	required_device<wd2793_device> m_fdc;
 	required_device<z80sio_device> m_z80sio;
 	required_device<screen_device> m_screen;
-	required_ioport m_io_joystick0;
+	required_ioport_array<2> m_io_joysticks;
 	required_ioport m_io_mouse_button;
 	required_ioport m_io_mousex;
 	required_ioport m_io_mousey;
@@ -149,6 +151,7 @@ private:
 	void nimbus_sound_ay8910_porta_w(uint8_t data);
 	void nimbus_sound_ay8910_portb_w(uint8_t data);
 	uint8_t nimbus_joystick_r();
+	void nimbus_joystick_select(offs_t offset, uint8_t data);
 	uint8_t nimbus_mouse_js_r();
 	void nimbus_mouse_js_w(uint8_t data);
 	uint16_t nimbus_video_io_r(offs_t offset, uint16_t mem_mask = ~0);
@@ -221,7 +224,7 @@ private:
 		uint8_t status_out = 0;
 	} m_ipc_interface;
 
-	/* Mouse/Joystick */
+	/* Mouse */
 	struct
 	{
 		uint8_t m_mouse_x = 0;
@@ -237,6 +240,8 @@ private:
 
 		emu_timer *m_mouse_timer = nullptr;
 	} m_nimbus_mouse;
+
+	uint8_t m_selected_js_idx = 0;
 
 	bool m_voice_enabled = false;
 

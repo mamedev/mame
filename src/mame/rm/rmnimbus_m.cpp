@@ -1070,14 +1070,16 @@ void rmnimbus_state::mouse_js_reset()
 
 	// Setup timer to poll the mouse
 	m_nimbus_mouse.m_mouse_timer->adjust(attotime::zero, 0, attotime::from_hz(MOUSE_POLL_FREQUENCY));
+
+	m_selected_js_idx = 0;
 }
 
 uint8_t rmnimbus_state::nimbus_joystick_r()
 {
 	/* Only the joystick drection data is read from this port
-	   (which corresponds to the the low nibble of m_io_joystick0).
+	   (which corresponds to the the low nibble of the selected joystick port).
 	   The joystick buttons are read from the mouse data port instead. */
-	uint8_t result = m_io_joystick0->read() & 0x0f;
+	uint8_t result = m_io_joysticks[m_selected_js_idx]->read() & 0x0f;
 
 	if (result & CONTROLLER_RIGHT)
 	{
@@ -1094,18 +1096,28 @@ uint8_t rmnimbus_state::nimbus_joystick_r()
 	return result;
 }
 
+void rmnimbus_state::nimbus_joystick_select(offs_t offset, uint8_t data)
+{
+	/* NB joystick 0 is selected by writing to address 0xa0, and
+	   joystick 1 is selected by writing to address 0xa2 */
+	if (offset % 2 == 0)
+	{
+		m_selected_js_idx = offset >> 1;
+	}
+}
+
 uint8_t rmnimbus_state::nimbus_mouse_js_r()
 {
 	/*
 
 	    bit     description
 
-	    0       JOY 0-Up    or mouse XB
-	    1       JOY 0-Down  or mouse XA
-	    2       JOY 0-Left  or mouse YA
-	    3       JOY 0-Right or mouse YB
-	    4       JOY 0-b0    or mouse rbutton
-	    5       JOY 0-b1    or mouse lbutton
+	    0       mouse XB
+	    1       mouse XA
+	    2       mouse YA
+	    3       mouse YB
+	    4       JOY 1-button or mouse rbutton
+	    5       JOY 0-button or mouse lbutton
 	    6       ?? always reads 1
 	    7       ?? always reads 1
 
@@ -1114,8 +1126,9 @@ uint8_t rmnimbus_state::nimbus_mouse_js_r()
 	
 	// set button bits if either mouse or joystick buttons are pressed
 	result |= m_io_mouse_button->read();
-	// NB only the two button bits of the joystick are read from this port
-	result |= m_io_joystick0->read() & 0x30;
+	// NB only the button bits of the joystick(s) are read from this port
+	result |= m_io_joysticks[0]->read() & 0x20;
+	result |= m_io_joysticks[1]->read() & 0x10;
 
 	return result;
 }
