@@ -16,6 +16,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class kn1500_state : public driver_device
 {
 public:
@@ -276,6 +278,7 @@ ROM_START(kn1500)
 	ROM_LOAD("technics_qsigt3c16079_5y68-j079_japan_9649eai.ic15.rest", 0x00000, 0x200000, CRC(ce60897a) SHA1(9b54f693f693488132b93e8bfed1927d7e741ae1))
 ROM_END
 
+} // anonymous namespace
 
 //   YEAR  NAME   PARENT  COMPAT  MACHINE INPUT   STATE         INIT        COMPANY      FULLNAME                 FLAGS
 CONS(199?, kn1500,    0,       0, kn1500, kn1500, kn1500_state, empty_init, "Technics", "SX-KN1500 PCM Keyboard", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

@@ -18,6 +18,8 @@
 #include "video/pc_vga.h"
 
 
+namespace {
+
 class kn5000_state : public driver_device
 {
 public:
@@ -328,6 +330,7 @@ ROM_START(kn5000)
 	ROM_LOAD("kn5000_waveform_rom.ic307", 0xc00000, 0x400000, CRC(20ff4629) SHA1(4b511bff6625f4655cabd96a263bf548d2ef4bf7))
 ROM_END
 
+} // anonymous namespace
 
 //   YEAR  NAME   PARENT  COMPAT  MACHINE INPUT   STATE         INIT        COMPANY      FULLNAME             FLAGS
 CONS(199?, kn5000,    0,       0, kn5000, kn5000, kn5000_state, empty_init, "Technics", "SX-KN5000 Keyboard", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
