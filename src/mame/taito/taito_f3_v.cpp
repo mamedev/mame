@@ -255,9 +255,6 @@ Playfield tile info:
 #define DARIUSG_KLUDGE
 #define TAITOF3_VIDEO_DEBUG 0
 
-typedef int fixed4;
-typedef int fixed8;
-
 // Game specific data - some of this can be removed when the software values are figured out
 struct taito_f3_state::F3config
 {
@@ -965,15 +962,15 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 	}
 }
 
-void taito_f3_state::get_pf_scroll(int pf_num, u32 &reg_sx, u32 &reg_sy)
+void taito_f3_state::get_pf_scroll(int pf_num, u16_16 &reg_sx, u16_16 &reg_sy)
 {
 	// x: iiii iiii iiFF FFFF
 	// y: iiii iiii ifff ffff
 
 	// x scroll is stored as fixed10.6, with fractional bits inverted.
 	// we convert this to regular fixed16.16
-	u32 sx = (m_control_0[pf_num] ^ 0b111111) << (16-6);
-	u32 sy = (m_control_0[pf_num + 4]) << (16-7); // fixed11.7 to fixed16.16
+	u16_16 sx = (m_control_0[pf_num] ^ 0b111111) << (16-6);
+	u16_16 sy = (m_control_0[pf_num + 4]) << (16-7); // fixed11.7 to fixed16.16
 
 	sx -= (6 + 4 * pf_num) << 16;
 	sy += 1 << 16;
@@ -1006,7 +1003,7 @@ void taito_f3_state::draw_line(u32* dst, int y, int xs, int xe, playfield_inf* p
 		return;
 	const pen_t *clut = &m_palette->pen(0);
 	const int y_index = ((pf->reg_fx_y >> 16) + pf->colscroll) & 0x1ff;
-	u32 fx_x = pf->reg_sx + pf->rowscroll + 10*pf->x_scale;
+	u16_16 fx_x = pf->reg_sx + pf->rowscroll + 10*pf->x_scale;
 	fx_x &= (m_width_mask << 16) | 0xffff;
 
 	for (int x = xs; x < xe; x++) {
@@ -1122,7 +1119,7 @@ void taito_f3_state::scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cl
 		if (y != y_start) {
 			// update registers
 			for (auto &pf : line_data.pf) {
-				pf.reg_fx_y += pf.y_scale << 9;
+				pf.reg_fx_y += pf.y_scale << (16-7);
 			}
 		}
 	}
@@ -1228,7 +1225,7 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 		/* Check if the sprite list jump command bit is set */
 		if (BIT(spr[6], 15))
 		{
-			const u32 new_offs = BIT(spr[6], 0, 10);
+			const int new_offs = BIT(spr[6], 0, 10);
 			if (new_offs <= offs) // could this be ≤ ?
 			{
 				if (new_offs < offs)

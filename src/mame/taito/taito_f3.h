@@ -14,6 +14,10 @@
 #include "tilemap.h"
 #include <bitset>
 
+using fixed8 = int;
+using fixed4 = int;
+using u16_16 = u32;
+
 class taito_f3_state : public driver_device
 {
 public:
@@ -232,8 +236,8 @@ protected:
 		// mix info from 7200
 		bool use_pix() const { return pivot_control & 0xa0; };
 
-		u32 reg_sx;
-		u32 reg_sy;
+		u16 reg_sx;
+		u16 reg_sy;
 	};
 
 	struct playfield_inf : mixable {
@@ -243,15 +247,15 @@ protected:
 		u16 colscroll;        // 4000
 		bool alt_tilemap;     // 4000
 		bool x_sample_enable; // 6400 x_sample_mask
-		u8 x_scale;           // 8000
-		u8 y_scale;           // 8000
+		u16_16 x_scale;           // 8000
+		u16_16 y_scale;           // 8000
 		u16 pal_add;          // 9000
-		u32 rowscroll;        // a000
+		u16_16 rowscroll;        // a000
 
-		u32 reg_sx;
-		u32 reg_sy;
-		u32 reg_fx_x;
-		u32 reg_fx_y;
+		u16_16 reg_sx;
+		u16_16 reg_sy;
+		u16_16 reg_fx_x;
+		u16_16 reg_fx_y;
 		u32 reg_x_count;
 		u32 reg_y_count;
 	};
