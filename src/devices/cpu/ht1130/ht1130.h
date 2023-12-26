@@ -32,12 +32,6 @@ public:
 
 	auto display_data_out_cb() { return m_display_data_out.bind(); }
 
-	void wake() // can be configured to wake from certain inputs as a mask option?
-	{
-		machine().scheduler().synchronize();
-		m_inhalt = 0;
-	}
-
 protected:
 	ht1130_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor data);
 
