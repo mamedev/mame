@@ -1096,11 +1096,14 @@ uint8_t rmnimbus_state::nimbus_joystick_r()
 	return result;
 }
 
-void rmnimbus_state::nimbus_joystick_select(offs_t offset, uint16_t data)
+void rmnimbus_state::nimbus_joystick_select(offs_t offset, uint8_t data)
 {
 	/* NB joystick 0 is selected by writing to address 0xa0, and
 	   joystick 1 is selected by writing to address 0xa2 */
-	m_selected_js_idx = offset;
+	if (offset % 2 == 0)
+	{
+		m_selected_js_idx = offset >> 1;
+	}
 }
 
 uint8_t rmnimbus_state::nimbus_mouse_js_r()
