@@ -70,6 +70,7 @@ using util::BIT;
 #include "cpu/hp2100/hp2100d.h"
 #include "cpu/hpc/hpcdasm.h"
 #include "cpu/hphybrid/hphybrid_dasm.h"
+#include "cpu/ht1130/ht1130d.h"
 #include "cpu/i386/i386dasm.h"
 #include "cpu/i8008/8008dasm.h"
 #include "cpu/i8085/8085dasm.h"
@@ -475,6 +476,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "hpc16083",        le,  0, []() -> util::disasm_interface * { return new hpc16083_disassembler; } },
 	{ "hpc16164",        le,  0, []() -> util::disasm_interface * { return new hpc16164_disassembler; } },
 	{ "hyperstone",      be,  0, []() -> util::disasm_interface * { return new hyperstone_disassembler(&hyperstone_unidasm); } },
+	{ "ht1130",          le,  0, []() -> util::disasm_interface * { return new ht1130_disassembler; } },
 	{ "i4004",           le,  0, []() -> util::disasm_interface * { return new i4004_disassembler; } },
 	{ "i4040",           le,  0, []() -> util::disasm_interface * { return new i4040_disassembler; } },
 	{ "i8008",           le,  0, []() -> util::disasm_interface * { return new i8008_disassembler; } },
