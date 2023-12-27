@@ -63,7 +63,7 @@ void kn1500_state::kn1500_mem(address_map &map)
 {
 	map(0x000000, 0x77ffff).ram(); //~CS3: MSAR3=00 MAMR3=0f
 //	map(0x000080, 0x07ffff).ram(); //~CS3: MSAR3=00 MAMR3=0f
-	//map(0x780000, 0x780003).rw(FUNC(kn1500_state::dsp_lcd_r), FUNC(kn1500_state::dsp_lcd_w)); // ~CS0 & A19=1 & A18-16=000: MSAR0=78 MAMR0=3f
+	map(0x780000, 0x780003).rw(FUNC(kn1500_state::dsp_lcd_r), FUNC(kn1500_state::dsp_lcd_w)); // ~CS0 & A19=1 & A18-16=000: MSAR0=78 MAMR0=3f
 	map(0x780004, 0x78ffff).noprw();
 	map(0x790000, 0x79ffff).rw(FUNC(kn1500_state::tone_generator_r), FUNC(kn1500_state::tone_generator_w)); //~CS0 & A19=1 & A18-16=001: MSAR0=78 MAMR0=3f
 	//map(0x7a0000, 0x7affff).w(m_fdc, FUNC(upd765a_device::dack_w)); //~CS0 & A19=1 & A18-16=010: MSAR0=78 MAMR0=3f
