@@ -15,21 +15,18 @@ The following games exist for this platform
 7 New Baseball
 8 Monster Mansion
 9 Astro Command
-10 Grand Champion
+10 Grand Champion*
 11 Monster Block
 12 Elevator Panic
 
-TODO: Identify which game is which, the PCB scans provided in some cases seem mismatched with the
-      other details.
-	  The D774C PCB is marked "TV Vader & Yosaku" (do they share an MCU?)
-	  The Galaxian PCB is marked D777C-006 but none of these dumps are?
-	  etc.
+* = not dumped
+
 -->
 
 <softwarelist name="cassvisn_cart" description="Epoch Cassette Vision cartridges">
 
-	<software name="d777c002" supported="no">
-		<description>D777C002</description> <!-- New Baseball? -->
+	<software name="nbasebal" supported="no">
+		<description>New Baseball</description>
 		<year>1981</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="cassvisn_cart">
@@ -42,8 +39,8 @@ TODO: Identify which game is which, the PCB scans provided in some cases seem mi
 		</part>
 	</software>
 
-	<software name="d777c004" supported="no">
-		<description>D777C004</description>
+	<software name="bigspt12" supported="no">
+		<description>Big Sports 12</description>
 		<year>1981</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="cassvisn_cart">
@@ -56,8 +53,8 @@ TODO: Identify which game is which, the PCB scans provided in some cases seem mi
 		</part>
 	</software>
 
-	<software name="d777c005" supported="no">
-		<description>D777C005</description>
+	<software name="yosaku" supported="no">
+		<description>Yosaku</description>
 		<year>1981</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="cassvisn_cart">
@@ -70,8 +67,9 @@ TODO: Identify which game is which, the PCB scans provided in some cases seem mi
 		</part>
 	</software>
 
-	<software name="d777c007" supported="no">
-		<description>D777C007</description>
+	<!-- PCB is silkscreened 006, ROM here is 007 is there an undumped earlier version? -->
+	<software name="galaxian" supported="no">
+		<description>Galaxian</description> 
 		<year>1981</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="cassvisn_cart">
@@ -84,8 +82,8 @@ TODO: Identify which game is which, the PCB scans provided in some cases seem mi
 		</part>
 	</software>
 
-	<software name="d777c008" supported="no">
-		<description>D777C008</description>
+	<software name="pakpak" supported="no">
+		<description>PakPak Monster</description>
 		<year>1981</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="cassvisn_cart">
@@ -98,8 +96,8 @@ TODO: Identify which game is which, the PCB scans provided in some cases seem mi
 		</part>
 	</software>
 
-	<software name="d777c009" supported="no">
-		<description>D777C009</description>
+	<software name="monstrmn" supported="no">
+		<description>Monster Mansion</description>
 		<year>1981</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="cassvisn_cart">
@@ -112,8 +110,8 @@ TODO: Identify which game is which, the PCB scans provided in some cases seem mi
 		</part>
 	</software>
 
-	<software name="d777c010" supported="no">
-		<description>D777C010</description>
+	<software name="astrocmd" supported="no">
+		<description>Astro Command</description>
 		<year>1981</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="cassvisn_cart">
@@ -126,8 +124,8 @@ TODO: Identify which game is which, the PCB scans provided in some cases seem mi
 		</part>
 	</software>
 
-	<software name="d777c013" supported="no">
-		<description>D777C013</description>
+	<software name="monstrbk" supported="no">
+		<description>Monster Block</description>
 		<year>1981</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="cassvisn_cart">
@@ -140,8 +138,8 @@ TODO: Identify which game is which, the PCB scans provided in some cases seem mi
 		</part>
 	</software>
 
-	<software name="d777c015" supported="no">
-		<description>D777C015</description>
+	<software name="elvpanic" supported="no">
+		<description>Elevator Panic</description>
 		<year>1981</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="cassvisn_cart">
@@ -154,8 +152,9 @@ TODO: Identify which game is which, the PCB scans provided in some cases seem mi
 		</part>
 	</software>
 
-	<software name="d774c" supported="no">
-		<description>D774C</description>
+	<!-- PCB is skilscreened TV Vader & Yosaku, is there also a version of Yosaku using a D774C? -->
+	<software name="btlvader" supported="no">
+		<description>Battle Vader</description>
 		<year>1981</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="cassvisn_cart">
@@ -168,8 +167,8 @@ TODO: Identify which game is which, the PCB scans provided in some cases seem mi
 		</part>
 	</software>
 
-	<software name="d778c" supported="no">
-		<description>D778C</description>
+	<software name="baseball" supported="no">
+		<description>Baseball</description>
 		<year>1981</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="cassvisn_cart">
