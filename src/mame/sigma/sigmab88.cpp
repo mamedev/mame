@@ -7,6 +7,7 @@
 #include "emu.h"
 
 #include "cpu/h16/hd641016.h"
+#include "machine/6840ptm.h"
 #include "sound/ymopl.h"
 #include "video/hd63484.h"
 
@@ -40,6 +41,25 @@ private:
 void sigmab88_state::h16_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom().region("maincpu", 0);
+	map(0x0c0000, 0x0dffff).ram();
+	map(0x100000, 0x10001f).unmaprw(); // numeric LED segment controller?
+	map(0x102800, 0x10280f).rw("ptm", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
+	map(0x103000, 0x103003).rw("acrtc", FUNC(hd63484_device::read16), FUNC(hd63484_device::write16));
+	map(0x104000, 0x104001).unmapr(); // ?
+	map(0x104400, 0x104401).unmapr(); // ?
+	map(0x104600, 0x104601).unmapr(); // ?
+	map(0x104800, 0x104801).unmapr(); // ?
+	map(0x104a00, 0x104a01).unmapr(); // ?
+	map(0x104e00, 0x104e01).unmapr(); // ?
+	map(0x104e80, 0x104e81).unmapr(); // ?
+	map(0x104f00, 0x104f01).unmapr(); // ?
+	map(0x104f80, 0x104f81).unmapr(); // ?
+	map(0x105000, 0x105003).w("ymsnd", FUNC(ym3812_device::write)).umask16(0xff00);
+	map(0x106000, 0x106001).unmapw(); // ?
+	map(0x107000, 0x107003).unmapw(); // ?
+	//map(0x107900, 0x10790f).w("outlatch0", FUNC(addressable_latch_device::write_d0)).umask16(0x00ff);
+	//map(0x107a00, 0x107a0f).w("outlatch1", FUNC(addressable_latch_device::write_d0)).umask16(0x00ff);
+	//map(0x107c00, 0x107c0f).w("outlatch2", FUNC(addressable_latch_device::write_d0)).umask16(0x00ff);
 	map(0xc00000, 0xc7ffff).rom().region("maincpu", 0);
 }
 
@@ -56,15 +76,18 @@ void sigmab88_state::sigmab88(machine_config &config)
 	HD641016(config, m_maincpu, XTAL(20'000'000)/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sigmab88_state::h16_map);
 
+	PTM6840(config, "ptm", XTAL(20'000'000)/2/16);
+	//ptm.irq_callback().set_inputline(m_maincpu, hd641016_device::IRQ1_LINE);
+
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(1024, 1024);
 	screen.set_visarea(0, 544-1, 0, 436-1);
-	screen.set_screen_update("hd63484", FUNC(hd63484_device::update_screen));
+	screen.set_screen_update("acrtc", FUNC(hd63484_device::update_screen));
 	screen.set_palette(m_palette);
 
-	HD63484(config, "hd63484", XTAL(8'000'000)).set_addrmap(0, &sigmab88_state::hd63484_map);
+	HD63484(config, "acrtc", XTAL(8'000'000)).set_addrmap(0, &sigmab88_state::hd63484_map);
 
 	PALETTE(config, m_palette).set_entries(16);
 
