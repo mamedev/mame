@@ -8,9 +8,31 @@
 // with a computer to transfer files to/from the hard-drive.
 
 #include "emu.h"
+#include "bus/ata/hdd.h"
 #include "hdae5000.h"
+#include "machine/i8255.h"
 
-DEFINE_DEVICE_TYPE(HDAE5000, hdae5000_device, "hdae5000", "HD-AE5000, Hard Disk & Audio Extension")
+namespace {
+
+class hdae5000_device : public device_t, public kn5000_extension_interface
+{
+public:
+	hdae5000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void rom_map(address_map &map) override;
+	virtual void io_map(address_map &map) override;
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+private:
+	required_device<ide_hdd_device> m_hdd;
+	required_device<i8255_device> m_ppi;
+	required_memory_region m_rom;
+};
 
 hdae5000_device::hdae5000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, HDAE5000, tag, owner, clock)
@@ -82,3 +104,7 @@ void hdae5000_device::device_start()
 void hdae5000_device::device_reset()
 {
 }
+
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(HDAE5000, kn5000_extension_interface, hdae5000_device, "hdae5000", "HD-AE5000, Hard Disk & Audio Extension")
