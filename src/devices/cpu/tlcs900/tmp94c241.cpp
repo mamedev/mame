@@ -290,6 +290,12 @@ void tmp94c241_device::device_start()
 	save_item(NAME(m_dram_refresh));
 	save_item(NAME(m_dram_access));
 	save_item(NAME(m_da_drive));
+
+	m_nmi_state = CLEAR_LINE;
+	for( int i = 0; i < TLCS900_NUM_INPUTS; i++ )
+	{
+		m_level[i] = CLEAR_LINE;
+	}
 }
 
 
@@ -302,7 +308,6 @@ void tmp94c241_device::device_reset()
 	tlcs900h_device::device_reset();
 
 	m_ad_cycles_left = 0;
-	m_nmi_state = CLEAR_LINE;
 	m_timer_pre = 0;
 	TIMER_CHANGE_0 = 0;
 	TIMER_CHANGE_1 = 0;
@@ -381,9 +386,6 @@ void tmp94c241_device::device_reset()
 	std::fill_n(&m_dram_refresh[0], 2, 0x00);
 	std::fill_n(&m_dram_access[0], 2, 0x80);
 	m_da_drive = 0x00;
-
-	for( int i = 0; i < TLCS900_NUM_INPUTS; i++ )
-		m_level[i] = CLEAR_LINE;
 }
 
 
