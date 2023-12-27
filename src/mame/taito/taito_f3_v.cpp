@@ -458,6 +458,10 @@ void taito_f3_state::screen_vblank(int state)
 void taito_f3_state::set_extend(bool state) {
 	m_extend = state;
 	// TODO: we need to free these if this is called multiple times
+	// for (int i=0; i<8; i++) {
+	// 	// fuck me in the ass tonite
+	// 	delete m_tilemap[i];
+	// }
 	if (m_extend) {
 		m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taito_f3_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
 		m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taito_f3_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
@@ -645,7 +649,7 @@ void taito_f3_state::pf_ram_w(offs_t offset, u16 data, u16 mem_mask)
 
 void taito_f3_state::control_0_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	logerror("@@ scroll command: %04x at: %04x vpos: %d\n", data, offset*2, m_screen->vpos());
+	//logerror("@@ scroll command: %04x at: %04x vpos: %d\n", data, offset*2, m_screen->vpos());
 
 	COMBINE_DATA(&m_control_0[offset]);
 }
@@ -663,11 +667,11 @@ u16 taito_f3_state::spriteram_r(offs_t offset)
 void taito_f3_state::spriteram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (offset % 8 == 3) {
-		logerror("sprite write: %04x at: %04x vpos: %d\n", data, offset*2, m_screen->vpos());
+		//logerror("sprite write: %04x at: %04x vpos: %d\n", data, offset*2, m_screen->vpos());
 	}
 	if (offset % 8 == 5) {
 		if (BIT(m_spriteram[(offset & ~0b111) + 3], 15)) {
-			logerror("!sprite command: %04x at: %04x vpos: %d\n", data, offset*2, m_screen->vpos());
+			//logerror("!sprite command: %04x at: %04x vpos: %d\n", data, offset*2, m_screen->vpos());
 		}
 	}
 
@@ -921,23 +925,23 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 	// 8000 **********************************
 	if (this_line(0x800) & 1) {
 		u16 pf0x0y_scale = this_line(0x8000);
-		line.pf[0].x_scale = BIT(pf0x0y_scale, 8, 8);
-		line.pf[0].y_scale = BIT(pf0x0y_scale, 0, 8);
+		line.pf[0].x_scale = 256-BIT(pf0x0y_scale, 8, 8);
+		line.pf[0].y_scale = BIT(pf0x0y_scale, 0, 8)<<1;
 	}
 	if (this_line(0x800) & 2) {
 		u16 pf1x3y_scale = this_line(0x8200);
-		line.pf[1].x_scale = BIT(pf1x3y_scale, 8, 8);
-		line.pf[3].y_scale = BIT(pf1x3y_scale, 0, 8);
+		line.pf[1].x_scale = 256-BIT(pf1x3y_scale, 8, 8);
+		line.pf[3].y_scale = BIT(pf1x3y_scale, 0, 8)<<1;
 	}
 	if (this_line(0x800) & 4) {
 		u16 pf2x2y_scale = this_line(0x8400);
-		line.pf[2].x_scale = BIT(pf2x2y_scale, 8, 8);
-		line.pf[2].y_scale = BIT(pf2x2y_scale, 0, 8);
+		line.pf[2].x_scale = 256-BIT(pf2x2y_scale, 8, 8);
+		line.pf[2].y_scale = BIT(pf2x2y_scale, 0, 8)<<1;
 	}
 	if (this_line(0x800) & 8) {
 		u16 pf3x1y_scale = this_line(0x8600);
-		line.pf[3].x_scale = BIT(pf3x1y_scale, 8, 8);
-		line.pf[1].y_scale = BIT(pf3x1y_scale, 0, 8);
+		line.pf[3].x_scale = 256-BIT(pf3x1y_scale, 8, 8);
+		line.pf[1].y_scale = BIT(pf3x1y_scale, 0, 8)<<1;
 	}
 
 	// 9000 **********************************
@@ -962,20 +966,20 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 	// iiii iiii iiff ffff
 	// fractional part inverted (like scroll regs)
 	if (this_line(0xc00) & 1) {
-		u16_16 rowscroll = this_line(0xa000) << 10;
-		line.pf[0].rowscroll = (rowscroll & 0xffff0000) - (rowscroll & 0x0000ffff);
+		fixed8 rowscroll = this_line(0xa000) << (8-6);
+		line.pf[0].rowscroll = (rowscroll & 0xffffff00) - (rowscroll & 0x000000ff);
 	}
 	if (this_line(0xc00) & 2) {
-		u16_16 rowscroll = this_line(0xa200) << 10;
-		line.pf[1].rowscroll = (rowscroll & 0xffff0000) - (rowscroll & 0x0000ffff);
+		fixed8 rowscroll = this_line(0xa200) << (8-6);
+		line.pf[1].rowscroll = (rowscroll & 0xffffff00) - (rowscroll & 0x000000ff);
 	}
 	if (this_line(0xc00) & 4) {
-		u16_16 rowscroll = this_line(0xa400) << 10;
-		line.pf[2].rowscroll = (rowscroll & 0xffff0000) - (rowscroll & 0x0000ffff);
+		fixed8 rowscroll = this_line(0xa400) << (8-6);
+		line.pf[2].rowscroll = (rowscroll & 0xffffff00) - (rowscroll & 0x000000ff);
 	}
 	if (this_line(0xc00) & 8) {
-		u16_16 rowscroll = this_line(0xa600) << 10;
-		line.pf[3].rowscroll = (rowscroll & 0xffff0000) - (rowscroll & 0x0000ffff);
+		fixed8 rowscroll = this_line(0xa600) << (8-6);
+		line.pf[3].rowscroll = (rowscroll & 0xffffff00) - (rowscroll & 0x000000ff);
 	}
 
 	// B000 **********************************
@@ -993,25 +997,25 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 	}
 }
 
-void taito_f3_state::get_pf_scroll(int pf_num, u16_16 &reg_sx, u16_16 &reg_sy)
+void taito_f3_state::get_pf_scroll(int pf_num, fixed8 &reg_sx, fixed8 &reg_sy)
 {
 	// x: iiii iiii iiFF FFFF
 	// y: iiii iiii ifff ffff
 
 	// x scroll is stored as fixed10.6, with fractional bits inverted.
-	// we convert this to regular fixed16.16
-	u16_16 sx = (m_control_0[pf_num] ^ 0b111111) << (16-6);
-	u16_16 sy = (m_control_0[pf_num + 4]) << (16-7); // fixed11.7 to fixed16.16
+	// we convert this to regular fixed24.8
+	fixed8 sx = (m_control_0[pf_num] ^ 0b111111) << (8-6);
+	fixed8 sy = (m_control_0[pf_num + 4]) << (8-7); // fixed11.7 to fixed24.8
 
-	sx -= (6 + 4 * pf_num) << 16;
-	sy += 1 << 16;
+	sx -= (6 + 4 * pf_num) << 8;
+	sy += 1 << 8;
 
 	if (m_flipscreen) {
-		sx += (416+188) << 16;
-		sy -= 1024 << 16;
+		sx += (416+188) << 8;
+		sy -= 1024 << 8;
 
 		if (m_game_config->extend)
-			sx -= 512 << 16;
+			sx -= 512 << 8;
 	}
 
 	reg_sx = sx;
@@ -1028,23 +1032,49 @@ void taito_f3_state::draw_line(pen_t* dst, int y, int xs, int xe, sprite_inf* sp
 			dst[x] = clut[col];
 	}
 }
+
 void taito_f3_state::draw_line(pen_t* dst, int y, int xs, int xe, playfield_inf* pf)
 {
 	if (!pf->layer_enable())
 		return;
 	const pen_t *clut = &m_palette->pen(0);
-	const int y_index = ((pf->reg_fx_y >> 16) + pf->colscroll) & 0x1ff;
-	u16_16 fx_x = pf->reg_sx + pf->rowscroll + 10*pf->x_scale;
-	fx_x &= (m_width_mask << 16) | 0xffff;
+	const int y_index = ((pf->reg_fx_y >> 8) + pf->colscroll) & 0x1ff;
+	
+	if (y==200) {
+		logerror("line#200: sx: %f, rowscroll: %f, scale: %f×\n", pf->reg_sx/256.0, pf->rowscroll/256.0, pf->x_scale/256.0);
+	}
+	
+	fixed8 fx_x = pf->reg_sx + pf->rowscroll;
+	fx_x += 16*((pf->x_scale)-(1<<8));
+	fx_x &= (m_width_mask << 8) | 0xff;
+	/*
+	0 = 1px -> 1px
+	64 = 
+	128 = 1px -> 2px
+	255 = 
+		
 
+	256 = infinity
+	
+		(256/(256-scale))
+		
+		0 = 256/256
+		1 = 1/255
+		128 = 256/128
+		224 = 256/32 (8x)
+		255 = 256/1
+		
+	*/
 	for (int x = xs; x < xe; x++) {
-		int x_index = ((fx_x >> 16) + x) & m_width_mask;
+		int x_index = (((fx_x + (x-46) * pf->x_scale)>>8) + 46) & m_width_mask;
+		//int x_index = ((fx_x >> 16) + x / (pf->x_scale)) & m_width_mask;
 		if (!(pf->flagsbitmap->pix(y_index, x_index) & 0xf0))
 			continue;
 		if (const u16 col = pf->srcbitmap->pix(y_index, x_index))
 			dst[x] = clut[col];
 	}
 }
+
 
 void taito_f3_state::draw_line(pen_t* dst, int y, int xs, int xe, pivot_inf* pv)
 {
@@ -1091,6 +1121,7 @@ void taito_f3_state::scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cl
 
 		get_pf_scroll(pf, line_data.pf[pf].reg_sx, line_data.pf[pf].reg_sy);
 		line_data.pf[pf].reg_fx_y = line_data.pf[pf].reg_sy;
+		line_data.pf[pf].x_scale = (256-0);
 	}
 	line_data.pivot.srcbitmap_pixel = &m_pixel_layer->pixmap();
 	line_data.pivot.flagsbitmap_pixel = &m_pixel_layer->flagsmap();
@@ -1132,7 +1163,7 @@ void taito_f3_state::scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cl
 		if (y != y_start) {
 			// update registers
 			for (auto &pf : line_data.pf) {
-				pf.reg_fx_y += pf.y_scale << (16-7);
+				pf.reg_fx_y += pf.y_scale;
 			}
 		}
 	}
@@ -1149,25 +1180,25 @@ inline void taito_f3_state::f3_drawgfx(const tempsprite &sprite, const rectangle
 	const u8 *code_base = gfx->get_data(sprite.code % gfx->elements());
 
 	//logerror("sprite draw at %f %f size %f %f\n", sprite.x/16.0, sprite.y/16.0, sprite.zoomx/16.0, sprite.zoomy/16.0);
-	const u8 flipx = sprite.flipx ? 0xF : 0;
-	const u8 flipy = sprite.flipy ? 0xF : 0;
+	const u8 flipx = sprite.flip_x ? 0xF : 0;
+	const u8 flipy = sprite.flip_y ? 0xF : 0;
 
-	fixed8 dy8 = (sprite.y << 4);
+	fixed8 dy8 = (sprite.y);
 	if (!m_flipscreen)
 		dy8 += 255; // round up in non-flipscreen mode?    mayybe flipscreen coordinate adjustments should be done after all this math, during final rendering?. anyway:  testcases for vertical scaling: elvactr mission # text (non-flipscreen), kaiserknj attract mode first text line (flipscreen)
 	for (u8 y = 0; y < 16; y++) {
 		const int dy = dy8 >> 8;
-		dy8 += sprite.zoomy;
+		dy8 += sprite.scale_y;
 		if (dy < cliprect.min_y || dy > cliprect.max_y)
 			continue;
 		u8 *pri = &m_pri_alp_bitmap.pix(dy);
 		u16* dest = &dest_bmp.pix(dy);
 		auto src = &code_base[(y ^ flipy) * 16];
 
-		fixed8 dx8 = (sprite.x << 4) + 128; // 128 is ½ in fixed.8
+		fixed8 dx8 = (sprite.x) + 128; // 128 is ½ in fixed.8
 		for (u8 x = 0; x < 16; x++) {
 			const int dx = dx8 >> 8;
-			dx8 += sprite.zoomx;
+			dx8 += sprite.scale_x;
 			// is this necessary with the large margins outside visarea?
 			if (dx < cliprect.min_x || dx > cliprect.max_x)
 				continue;
@@ -1186,8 +1217,8 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 {
 	struct sprite_axis
 	{
-		fixed8 block_size = 0x100;
-		fixed4 pos = 0, block_pos = 0;
+		fixed8 block_scale = 1 << 8;
+		fixed8 pos = 0, block_pos = 0;
 		s16 global = 0, subglobal = 0;
 		void update(u8 scroll, u16 posw, bool lock, u8 block_ctrl, u8 new_zoom)
 		{
@@ -1208,15 +1239,15 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 			case 0b00:
 				if (!lock)
 				{
-					block_pos = new_pos << 4;
-					block_size = (0x100 - new_zoom);
+					block_pos = new_pos << 8;
+					block_scale = (0x100 - new_zoom);
 				}
 				[[fallthrough]];
 			case 0b10:
 				pos = block_pos;
 				break;
 			case 0b11:
-				pos += block_size;
+				pos += block_scale * 16;
 				break;
 			}
 		};
@@ -1284,24 +1315,24 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 		const int tile = spr[0] | (BIT(spr[5], 0) << 16);
 		if (!tile) continue;
 
-		const fixed4 tx = m_flipscreen ? (512<<4) - x.block_size - x.pos : x.pos;
-		const fixed4 ty = m_flipscreen ? (256<<4) - y.block_size - y.pos : y.pos;
+		const fixed8 tx = m_flipscreen ? (512<<8) - x.block_scale*16 - x.pos : x.pos;
+		const fixed8 ty = m_flipscreen ? (256<<8) - y.block_scale*16 - y.pos : y.pos;
 
-		if (tx + x.block_size <= visarea.min_x<<4 || tx > visarea.max_x<<4 || ty + y.block_size <= visarea.min_y<<4 || ty > visarea.max_y<<4)
+		if (tx + x.block_scale*16 <= visarea.min_x<<8 || tx > visarea.max_x<<8 || ty + y.block_scale*16 <= visarea.min_y<<8 || ty > visarea.max_y<<8)
 			continue;
 
-		const bool flipx = BIT(spritecont, 0);
-		const bool flipy = BIT(spritecont, 1);
+		const bool flip_x = BIT(spritecont, 0);
+		const bool flip_y = BIT(spritecont, 1);
 		//multi = BIT(spritecont, 3);
 
 		sprite_ptr->x = tx;
 		sprite_ptr->y = ty;
-		sprite_ptr->flipx = m_flipscreen ? !flipx : flipx;
-		sprite_ptr->flipy = m_flipscreen ? !flipy : flipy;
+		sprite_ptr->flip_x = m_flipscreen ? !flip_x : flip_x;
+		sprite_ptr->flip_y = m_flipscreen ? !flip_y : flip_y;
 		sprite_ptr->code = tile;
 		sprite_ptr->color = color;
-		sprite_ptr->zoomx = x.block_size;
-		sprite_ptr->zoomy = y.block_size;
+		sprite_ptr->scale_x = x.block_scale;
+		sprite_ptr->scale_y = y.block_scale;
 		sprite_ptr->pri = BIT(color, 6, 2);
 		sprite_ptr++;
 		total_sprites++;

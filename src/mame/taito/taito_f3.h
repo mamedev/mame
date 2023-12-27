@@ -15,8 +15,6 @@
 #include <bitset>
 
 using fixed8 = int;
-using fixed4 = int;
-using u16_16 = u32;
 
 class taito_f3_state : public driver_device
 {
@@ -172,13 +170,12 @@ protected:
 	std::unique_ptr<u8[]> m_decoded_gfx4;
 	std::unique_ptr<u8[]> m_decoded_gfx5;
 
-	struct tempsprite
-	{
-		int code = 0;
+	struct tempsprite {
+		u16 code = 0;
 		u8 color = 0;
-		bool flipx = 0, flipy = 0;
-		int x = 0, y = 0;
-		u16 zoomx = 0, zoomy = 0;
+		bool flip_x = 0, flip_y = 0;
+		fixed8 x = 0, y = 0;
+		fixed8 scale_x = 0, scale_y = 0;
 		u8 pri = 0;
 	};
 
@@ -246,17 +243,17 @@ protected:
 		u16 colscroll;        // 4000
 		bool alt_tilemap;     // 4000
 		bool x_sample_enable; // 6400 x_sample_mask
-		u16_16 x_scale;           // 8000
-		u16_16 y_scale;           // 8000
+		fixed8 x_scale;           // 8000
+		fixed8 y_scale;           // 8000
 		u16 pal_add;          // 9000
-		u16_16 rowscroll;        // a000
+		fixed8 rowscroll;        // a000
 
-		u16_16 reg_sx;
-		u16_16 reg_sy;
-		u16_16 reg_fx_x;
-		u16_16 reg_fx_y;
-		u32 reg_x_count;
-		u32 reg_y_count;
+		fixed8 reg_sx;
+		fixed8 reg_sy;
+		//u16_16 reg_fx_x;
+		fixed8 reg_fx_y;
+		//u32 reg_x_count;
+		//u32 reg_y_count;
 	};
 
 	struct f3_line_inf {
@@ -284,7 +281,7 @@ protected:
 	virtual void draw_line(u32* dst, int y, int xs, int xe, pivot_inf* pv);
 
 	int m_game = 0;
-	tilemap_t *m_tilemap[8]{};
+	tilemap_t *m_tilemap[8] = {nullptr};
 	tilemap_t *m_pixel_layer = nullptr;
 	tilemap_t *m_vram_layer = nullptr;
 	//std::unique_ptr<u16[]> m_spriteram16_buffered;
@@ -344,7 +341,7 @@ protected:
 	void print_debug_info(bitmap_rgb32 &bitmap);
 	void read_line_ram(f3_line_inf &line, int y);
 	void scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void get_pf_scroll(int pf_num, u32 &reg_sx, u32 &reg_sy);
+	void get_pf_scroll(int pf_num, fixed8 &reg_sx, fixed8 &reg_sy);
 
 
 private:
