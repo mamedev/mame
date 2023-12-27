@@ -214,15 +214,14 @@ protected:
 		inline bool operator<(const mixable& rhs) const noexcept { return this->prio() < rhs.prio(); };
 		inline bool operator>(const mixable& rhs) const noexcept { return this->prio() > rhs.prio(); };
 	};
-
+	
 	struct sprite_inf : mixable {
 		// alpha mode in 6000
 		// line enable, clip settings in 7400
 		// priority in 7600
-		
-		bitmap_ind16 srcbitmap{};
 
 		bool brightness; // 7400 0xf000
+		bitmap_ind16* srcbitmap;
 	};
 
 	struct pivot_inf : mixable {
@@ -288,16 +287,18 @@ protected:
 	tilemap_t *m_tilemap[8]{};
 	tilemap_t *m_pixel_layer = nullptr;
 	tilemap_t *m_vram_layer = nullptr;
-	std::unique_ptr<u16[]> m_spriteram16_buffered;
+	//std::unique_ptr<u16[]> m_spriteram16_buffered;
 	u16 m_control_0[8]{};
 	u16 m_control_1[8]{};
 	bool m_flipscreen = false;
+	bool m_extend = false;
 	u8 m_sprite_extra_planes = 0;
 	u8 m_sprite_pen_mask = 0;
 	u16 *m_pf_data[8]{};
 	int m_sprite_lag = 0;
 	u8 m_sprite_pri_usage = 0;
 	bitmap_ind8 m_pri_alp_bitmap;
+	bitmap_ind16 m_sprite_framebuffers[NUM_SPRITEGROUPS]{};
 	u16 m_width_mask = 0;
 	u8 m_twidth_mask = 0;
 	u8 m_twidth_mask_bit = 0;
@@ -335,8 +336,10 @@ protected:
 
 	void tile_decode();
 
-	inline void f3_drawgfx(bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx, const tempsprite &sprite);
-	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void set_extend(bool state);
+	
+	inline void f3_drawgfx(const tempsprite &sprite, const rectangle &cliprect);
+	void draw_sprites(const rectangle &cliprect);
 	void get_sprite_info(const u16 *spriteram16_ptr);
 	void print_debug_info(bitmap_rgb32 &bitmap);
 	void read_line_ram(f3_line_inf &line, int y);
