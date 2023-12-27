@@ -1104,9 +1104,6 @@ void taito_f3_state::scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cl
 		line_data.pivot.reg_sy = -(m_control_1[5] & 0x1ff);
 	}
 
-	// draw sprite layers
-	draw_sprites(cliprect);
-	
 	auto prio = [](const auto& obj) -> u8 { return obj->prio(); };
 
 	int ys = m_flipscreen ? 24 : 0;
@@ -1353,8 +1350,11 @@ u32 taito_f3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 
 	scanline_draw_TWO(bitmap, cliprect);
 
+	
 	get_sprite_info(m_spriteram.target());
-
+	// draw sprite layers
+	draw_sprites(cliprect);
+	
 	if (VERBOSE)
 		print_debug_info(bitmap);
 	return 0;
