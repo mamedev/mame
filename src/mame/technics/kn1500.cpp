@@ -258,7 +258,7 @@ void kn1500_state::kn1500(machine_config &config)
 	PALETTE(config, "palette", FUNC(kn1500_state::kn1500_palette), 2);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_kn1500);
 
-	HD44780(config, m_lcdc, 0);
+	HD44780(config, m_lcdc, 250'000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 16);
 	m_lcdc->set_pixel_update_cb(FUNC(kn1500_state::kn1500_pixel_update));
 
