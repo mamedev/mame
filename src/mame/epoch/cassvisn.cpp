@@ -1,6 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:
 
+/*
+
+for architecture details see
+https://www.oguchi-rd.com/LSI%20products.php
+the linked 'design note' contains a large amount of useful information
+https://www.oguchi-rd.com/777/777%20Design%20Note.pdf
+
+*/
+
 #include "emu.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
