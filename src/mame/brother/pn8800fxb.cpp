@@ -17,10 +17,8 @@
     - XTAL XT5 16.0MHz (near FDC)
 
     TODO:
-    - Fix ROM banking (ROM self-test shows NG)
-    - Memory layout isn't perfect. The spreadsheet tool sets 'rgex'
-      to 1 and doesn't work correctly.
-    - Improve video emulation (offset, modes, etc.)
+    - Unknown memory change bits: DUA, RAMIN, DICSEL
+    - Improve video emulation (need test cases)
     - Floppy self-test fails (but works otherwise)
     - Modem
     - Soft power off/on
@@ -28,6 +26,7 @@
     - Bookman (unlikely to make progress, extra PCB contains custom CPU)
 
     Notes:
+    - The PN-8500MDS uses the same gate array. ROM id "UC8247-A-PN87".
     - There is a serially connected daughterbord containing the Bookman logic
     - Press CODE+SHIFT+BS on the main menu for a self-test screen
     - Currently the system always does a cold boot. This means that the
@@ -50,6 +49,7 @@
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
+
 
 namespace {
 
@@ -158,8 +158,8 @@ void pn8800fxb_state::mem_map(address_map &map)
 	map(0x00000, 0x01fff).rom();
 	map(0x02000, 0x05fff).ram().share("window1");
 	map(0x06000, 0x07fff).view(m_lomem_view);
-	m_lomem_view[0](0x06000, 0x07fff).ram().share("window2");
-	m_lomem_view[1](0x06000, 0x07fff).rom().region("maincpu", 0x06000);
+	m_lomem_view[0](0x06000, 0x07fff).rom().region("maincpu", 0x06000);
+	m_lomem_view[1](0x06000, 0x07fff).ram().share("window2");
 	map(0x08000, 0x3ffff).rom();
 	map(0x40000, 0x41fff).unmaprw();
 	map(0x42000, 0x45fff).rom().region("maincpu", 0x02000);
@@ -193,7 +193,7 @@ void pn8800fxb_state::io_map(address_map &map)
 	// a0-a7 rs232
 	map(0xa8, 0xa8).mirror(0x07).nopr(); // "not used" - but read often
 	map(0xb0, 0xb0).mirror(0x07).portr("power");
-	map(0xb8, 0xb8).rw(FUNC(pn8800fxb_state::keyboard_r), FUNC(pn8800fxb_state::keyboard_w));
+	map(0xb8, 0xb8).mirror(0x07).rw(FUNC(pn8800fxb_state::keyboard_r), FUNC(pn8800fxb_state::keyboard_w));
 	map(0xc0, 0xc0).mirror(0x07).w("centronics_latch", FUNC(output_latch_device::write));
 	map(0xc8, 0xc8).mirror(0x07).rw(FUNC(pn8800fxb_state::cdcc_ctrl_r), FUNC(pn8800fxb_state::cdcc_ctrl_w));
 	map(0xd0, 0xdf).rw("rtc", FUNC(tc8521_device::read), FUNC(tc8521_device::write));
@@ -656,13 +656,13 @@ void pn8800fxb_state::mem_change_w(uint8_t data)
 	// -6------  ramin
 	// --5432--  not used
 	// ------1-  dicsel
-	// -------0  rgex (the spreadsheet tool sets this)
+	// -------0  rgex
 
-	if (data != 0x40)
+	if ((data & 0xfe) != 0x40)
 		logerror("mem_change_w: dua %d ramin %d dicsel %d rgex %d\n", BIT(data, 7), BIT(data, 6), BIT(data, 1), BIT(data, 0));
 
 	m_mem_change = data;
-	m_lomem_view.select(BIT(data, 6));
+	m_lomem_view.select(BIT(data, 0));
 }
 
 void pn8800fxb_state::bank_select_w(uint8_t data)
@@ -670,11 +670,10 @@ void pn8800fxb_state::bank_select_w(uint8_t data)
 	// 7654----  not used
 	// ----3210  bank selection
 
-	if (0)
-		logerror("bank_select_w: %02x\n", data);
-
-	if (data < 12)
-		m_rombank->set_entry(data & 0x07); // TODO, but works for now
+	if (BIT(data, 3))
+		m_rombank->set_entry((data & 0x03) + 0); // code
+	else
+		m_rombank->set_entry((data & 0x07) + 4); // dictionary
 }
 
 void pn8800fxb_state::int_ack_w(uint8_t data)
@@ -695,7 +694,7 @@ void pn8800fxb_state::machine_start()
 	// init gfxdecode
 	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(m_palette, charlayout, m_vram.get() + 0x3000, 0, 1, 0));
 
-	// configure rom banking (first 0x40000 fixed?)
+	// configure rom banking (first 0x40000 fixed)
 	m_rombank->configure_entries(0, 12, memregion("maincpu")->base() + 0x40000, 0x10000);
 
 	// register for save states
@@ -757,7 +756,7 @@ void pn8800fxb_state::pn8800fxb(machine_config &config)
 	// centronics
 	output_latch_device &centronics_latch(OUTPUT_LATCH(config, "centronics_latch"));
 
-	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	CENTRONICS(config, m_centronics, centronics_devices, nullptr);
 	m_centronics->set_output_latch(centronics_latch);
 	m_centronics->busy_handler().set([this](int state) { m_centronics_busy = bool(state); });
 	m_centronics->select_handler().set([this](int state) { m_centronics_select = bool(state); });
@@ -787,4 +786,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY     FULLNAME      FLAGS
-COMP( 1996, pn8800, 0,      0,      pn8800fxb, pn8800fxb, pn8800fxb_state, empty_init, "Brother",  "PN-8800FXB", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1996, pn8800, 0,      0,      pn8800fxb, pn8800fxb, pn8800fxb_state, empty_init, "Brother",  "PN-8800FXB", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
