@@ -964,22 +964,14 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 
 	// A000 **********************************
 	// iiii iiii iiff ffff
-	// fractional part inverted (like scroll regs)
-	if (this_line(0xc00) & 1) {
-		fixed8 rowscroll = this_line(0xa000) << (8-6);
-		line.pf[0].rowscroll = (rowscroll & 0xffffff00) - (rowscroll & 0x000000ff);
-	}
-	if (this_line(0xc00) & 2) {
-		fixed8 rowscroll = this_line(0xa200) << (8-6);
-		line.pf[1].rowscroll = (rowscroll & 0xffffff00) - (rowscroll & 0x000000ff);
-	}
-	if (this_line(0xc00) & 4) {
-		fixed8 rowscroll = this_line(0xa400) << (8-6);
-		line.pf[2].rowscroll = (rowscroll & 0xffffff00) - (rowscroll & 0x000000ff);
-	}
-	if (this_line(0xc00) & 8) {
-		fixed8 rowscroll = this_line(0xa600) << (8-6);
-		line.pf[3].rowscroll = (rowscroll & 0xffffff00) - (rowscroll & 0x000000ff);
+	// fractional part is negative (allegedly). i wonder if it's supposed to be inverted instead? and then we just subtract (1<<8) to get almost the same value..
+	for (int i=0; i<4; i++) {
+		if (BIT(this_line(0xc00), i)) {
+			//line.pf[i].rowscroll = (this_line(0xa000 + 0x200*i) ^ 0b111111) << (8-6);
+			fixed8 rowscroll = this_line(0xa000 + 0x200*i) << (8-6);
+			line.pf[i].rowscroll = (rowscroll & 0xffffff00) - (rowscroll & 0x000000ff);
+			// ((i ^ 0b111111) - 0b111111) << (8-6);
+		}
 	}
 
 	// B000 **********************************
@@ -1045,7 +1037,7 @@ void taito_f3_state::draw_line(pen_t* dst, int y, int xs, int xe, playfield_inf*
 	}
 	
 	fixed8 fx_x = pf->reg_sx + pf->rowscroll;
-	fx_x += 16*((pf->x_scale)-(1<<8));
+	fx_x += 10*((pf->x_scale)-(1<<8));
 	fx_x &= (m_width_mask << 8) | 0xff;
 	/*
 	0 = 1px -> 1px
