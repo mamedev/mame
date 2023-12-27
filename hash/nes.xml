@@ -51764,9 +51764,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>CSG Imagesoft</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sxrom" />
-			<feature name="pcb" value="NES-SLROM" />
+			<feature name="pcb" value="NES-SNEPROM" />
 			<dataarea name="prg" size="131072">
-				<rom name="super sushi pinball (usa) (beta).prg" size="131072" crc="24118960" sha1="4aef1331d11d6ce24c1d5809d1b4d2e5549b28c0" />
+				<rom name="0.prg" size="131072" crc="24118960" sha1="4aef1331d11d6ce24c1d5809d1b4d2e5549b28c0" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
