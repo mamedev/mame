@@ -15,6 +15,7 @@ HT113JA Baseball
 HT113RA Poker and Black Jack
 HT113SA Casino Game 5-in-1
 HT113LA Original "Tea" Brick Game
+HTG1395 3-in-1 (Car racing, Soccer, The eagle preys on the chicken)
 
 (and likely many more)
 
