@@ -167,7 +167,7 @@ void kn5000_state::kn5000(machine_config &config)
 
 	// PORT 7:
 	//   bit 5 (~BUSRQ pin): RY/~BY pin of maincpu ROMs
-	m_maincpu->port7_read().set([this] { return (1 << 5); }); // checked at EF3735 (v10 ROM)
+	m_maincpu->port7_read().set([] { return (1 << 5); }); // checked at EF3735 (v10 ROM)
 
 	// PORT 8:
 	//   bit 6 (~WAIT pin) (input): Something involving VGA.RDY, FDC.DMAACK
@@ -193,7 +193,7 @@ void kn5000_state::kn5000(machine_config &config)
 	//   bit 0 (input) = +5v
 	//   bit 2 (input) = HDDRDY
 	//   bit 4 (?) = MICSNS
-	m_maincpu->porte_read().set([this] { return 1; }); //checked at EF05A6 (v10 ROM)
+	m_maincpu->porte_read().set([] { return 1; }); //checked at EF05A6 (v10 ROM)
 	                                                   // FIXME: Bit 0 should only be 1 if the optional hard-drive extension board is disabled
 
 	// PORT F:
@@ -209,7 +209,7 @@ void kn5000_state::kn5000(machine_config &config)
 	
 	// PORT H:
 	//   bit 1 = TC1 Terminal count - microDMA
-	m_maincpu->porth_read().set([this] { return 2; }); // area/region detection: checked at EF083E (v10 ROM)
+	m_maincpu->porth_read().set([] { return 2; }); // area/region detection: checked at EF083E (v10 ROM)
 	                                                   // FIXME: These are resistors on the pcb,
 	                                                   //        but could be declared in the driver as a 2 bit DIP-Switch for area/region selection.
 
