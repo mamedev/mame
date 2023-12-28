@@ -19,8 +19,6 @@ HT113LA Original "Tea" Brick Game
 (and likely many more)
 
 TODO:
-- how does power-on work? power-off makes brke23p2 go into halt mode within an
-  infinite loop, irq is disabled so a wake-up from button press won't do anything
 - add LCD deflicker like hh_sm510?
 
 */
