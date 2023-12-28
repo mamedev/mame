@@ -1,6 +1,24 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
+/*
+
+The following should fit here
+
+HT1132A Space War
+HT1134A Pin Ball
+HT1136A Football
+HT1137A Motorcycle
+HT113AA Streetfighters
+HT113FA Submarine War
+HT113JA Baseball
+HT113RA Poker and Black Jack
+HT113SA Casino Game 5-in-1
+HT113LA Original "Tea" Brick Game
+
+(and likely many more)
+
+*/
 
 #include "emu.h"
 
@@ -98,4 +116,4 @@ ROM_END
 } // anonymous namespace
 
 // some other dieshots have 1996 on them, it is also possible the software is from Holtek
-CONS( 1993, brke23p2, 0, 0, ht11xx_brickgame, ht11xx_brickgame, hh_ht11xx_state, empty_init, "E-Star", "Brick Game 96 in 1 (E-23 Plus Mark II)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 1993, brke23p2, 0, 0, ht11xx_brickgame, ht11xx_brickgame, hh_ht11xx_state, empty_init, "E-Star", "Brick Game 96 in 1 (E-23 Plus Mark II)", MACHINE_IMPERFECT_TIMING | MACHINE_NO_SOUND )
