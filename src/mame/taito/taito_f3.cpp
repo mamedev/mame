@@ -462,11 +462,13 @@ void taito_f3_state::f3(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// from taito z system and crystal on board  not sure if correct?
+	// and measurements from https://www.arcade-projects.com/threads/the-taito-f3-sync.12343/?
 	m_screen->set_raw(
 		XTAL(26'686'000)/4,
-		426, 46, 320+46,
-		261, 24, 256
+		432, 46, 320+46,
+		262, 24, 256
 	);
+	// refresh rate = 26686000/4/432/262 = 58.94..
 	
 	//m_screen->set_refresh_hz(58.97);
 	//m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(624)); /* 58.97 Hz, 624us vblank time */

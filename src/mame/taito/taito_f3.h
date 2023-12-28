@@ -14,6 +14,8 @@
 #include "tilemap.h"
 #include <bitset>
 
+using fixed8 = int;
+
 class taito_f3_state : public driver_device
 {
 public:
@@ -168,13 +170,12 @@ protected:
 	std::unique_ptr<u8[]> m_decoded_gfx4;
 	std::unique_ptr<u8[]> m_decoded_gfx5;
 
-	struct tempsprite
-	{
-		int code = 0;
+	struct tempsprite {
+		u16 code = 0;
 		u8 color = 0;
-		bool flipx = 0, flipy = 0;
-		int x = 0, y = 0;
-		u16 zoomx = 0, zoomy = 0;
+		bool flip_x = 0, flip_y = 0;
+		fixed8 x = 0, y = 0;
+		fixed8 scale_x = 0, scale_y = 0;
 		u8 pri = 0;
 	};
 
@@ -211,20 +212,20 @@ protected:
 		bool clip_inv_mode() const { return mix_value & 0x1000; };
 		bool layer_enable() const { return mix_value & 0x2000; };
 		bool blend_a() const { return mix_value & 0x4000; };
-		bool blend_b() const  { return mix_value & 0x8000; };
+		bool blend_b() const { return mix_value & 0x8000; };
 
 		inline bool operator<(const mixable& rhs) const noexcept { return this->prio() < rhs.prio(); };
 		inline bool operator>(const mixable& rhs) const noexcept { return this->prio() > rhs.prio(); };
 	};
-
+	
 	struct sprite_inf : mixable {
 		// alpha mode in 6000
 		// line enable, clip settings in 7400
 		// priority in 7600
-		
-		bitmap_ind16 srcbitmap{};
 
+		bool x_sample_enable{false}; // 6400
 		bool brightness{false}; // 7400 0xf000
+		bitmap_ind16* srcbitmap;
 	};
 
 	struct pivot_inf : mixable {
@@ -233,13 +234,14 @@ protected:
 		bitmap_ind16* srcbitmap_vram;
 		bitmap_ind8*  flagsbitmap_vram;
 
-		u8 pivot_control{0}; // 6000
-		u16 pivot_enable{0}; // 7000
+		u8 pivot_control{0};     // 6000
+		bool x_sample_enable{0}; // 6400
+		u16 pivot_enable{0};     // 7000
 		// mix info from 7200
 		bool use_pix() const { return pivot_control & 0xa0; };
 
-		u32 reg_sx{0};
-		u32 reg_sy{0};
+		u16 reg_sx{0};
+		u16 reg_sy{0};
 	};
 
 	struct playfield_inf : mixable {
@@ -247,19 +249,17 @@ protected:
 		bitmap_ind8*  flagsbitmap;
 
 		u16 colscroll{0};            // 4000
-		bool alt_tilemap{false};  // 4000
+		bool alt_tilemap{false};     // 4000
 		bool x_sample_enable{false}; // 6400 x_sample_mask
-		u8 x_scale{0x80};               // 8000
-		u8 y_scale{0};               // 8000
+		int x_sample{0};
+		fixed8 x_scale{0x80};        // 8000
+		fixed8 y_scale{0};           // 8000
 		u16 pal_add{0};              // 9000
-		u32 rowscroll{0};            // a000
+		fixed8 rowscroll{0};         // a000
 
-		u32 reg_sx{0};
-		u32 reg_sy{0};
-		u32 reg_fx_x{0};
-		u32 reg_fx_y{0};
-		u32 reg_x_count{0};
-		u32 reg_y_count{0};
+		fixed8 reg_sx{0};
+		fixed8 reg_sy{0};
+		fixed8 reg_fx_y{0};
 	};
 
 	struct f3_line_inf {
@@ -287,19 +287,21 @@ protected:
 	virtual void draw_line(u32* dst, int y, int xs, int xe, pivot_inf* pv);
 
 	int m_game = 0;
-	tilemap_t *m_tilemap[8]{};
+	tilemap_t *m_tilemap[8] = {nullptr};
 	tilemap_t *m_pixel_layer = nullptr;
 	tilemap_t *m_vram_layer = nullptr;
-	std::unique_ptr<u16[]> m_spriteram16_buffered;
+	//std::unique_ptr<u16[]> m_spriteram16_buffered;
 	u16 m_control_0[8]{};
 	u16 m_control_1[8]{};
 	bool m_flipscreen = false;
+	bool m_extend = false;
 	u8 m_sprite_extra_planes = 0;
 	u8 m_sprite_pen_mask = 0;
 	u16 *m_pf_data[8]{};
 	int m_sprite_lag = 0;
 	u8 m_sprite_pri_usage = 0;
 	bitmap_ind8 m_pri_alp_bitmap;
+	bitmap_ind16 m_sprite_framebuffers[NUM_SPRITEGROUPS]{};
 	u16 m_width_mask = 0;
 	u8 m_twidth_mask = 0;
 	u8 m_twidth_mask_bit = 0;
@@ -337,14 +339,16 @@ protected:
 
 	void tile_decode();
 
-	inline void f3_drawgfx(bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx, const tempsprite &sprite);
-	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void set_extend(bool state);
+	
+	inline void f3_drawgfx(const tempsprite &sprite, const rectangle &cliprect);
+	void draw_sprites(const rectangle &cliprect);
 	void get_sprite_info(const u16 *spriteram16_ptr);
 	void print_debug_info(bitmap_rgb32 &bitmap);
 	void read_line_ram(f3_line_inf &line, int y);
 	std::vector<clip_plane_inf> calc_clip(const clip_plane_inf (&clip)[NUM_CLIPPLANES], const mixable *line);
 	void scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void get_pf_scroll(int pf_num, u32 &reg_sx, u32 &reg_sy);
+	void get_pf_scroll(int pf_num, fixed8 &reg_sx, fixed8 &reg_sy);
 
 
 private:
