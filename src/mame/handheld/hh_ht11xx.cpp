@@ -18,6 +18,11 @@ HT113LA Original "Tea" Brick Game
 
 (and likely many more)
 
+TODO:
+- how does power-on work? power-off makes brke23p2 go into halt mode within an
+  infinite loop, irq is disabled so a wake-up from button press won't do anything
+- add LCD deflicker like hh_sm510?
+
 */
 
 #include "emu.h"
@@ -64,9 +69,10 @@ void hh_ht11xx_state::machine_start()
 
 static INPUT_PORTS_START( ht11xx_brickgame )
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Mute")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Power")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_VOLUME_DOWN ) PORT_NAME("Mute")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POWER_ON ) PORT_NAME("Power")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2") // not a joystick, but buttons are used for directional inputs in the snake game etc.
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Up / Rotate")

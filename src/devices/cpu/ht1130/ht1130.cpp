@@ -35,7 +35,6 @@ ht1130_device::ht1130_device(const machine_config &mconfig, device_type type, co
 	, m_displayram(*this, "displayram")
 	, m_space_config("program", ENDIANNESS_LITTLE, 8, 12, 0, address_map_constructor(FUNC(ht1130_device::internal_map), this))
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 8, 0, data)
-	, m_pc(0)
 	, m_port_in_pm(*this, 0xff)
 	, m_port_in_ps(*this, 0xff)
 	, m_port_in_pp(*this, 0xff)
@@ -211,10 +210,20 @@ void ht1130_device::device_start()
 	state_add(HT1130_TIMER_EN, "TIMER_EN", m_timer_en);
 	state_add(HT1130_TIMER, "TIMER", m_timer);
 
+	std::fill(std::begin(m_regs), std::end(m_regs), 0);
+	m_acc = 0;
+	m_stackaddr = 0;
+	m_stackcarry = 0;
+
+	m_pc = 0;
+	m_carry = 0;
+	m_irqen = 0;
+	m_timer_en = 0;
+	m_inhalt = 0;
+	m_timerover = 0;
+	m_timer = 0;
 
 	save_item(NAME(m_pc));
-	save_item(NAME(m_icount));
-
 	save_item(NAME(m_regs));
 	save_item(NAME(m_acc));
 	save_item(NAME(m_carry));
@@ -230,16 +239,12 @@ void ht1130_device::device_start()
 void ht1130_device::device_reset()
 {
 	m_pc = 0;
-	std::fill(std::begin(m_regs), std::end(m_regs), 0);
-	m_acc = 0;
 	m_carry = 0;
 	m_irqen = 0;
 	m_timer_en = 0;
 	m_inhalt = 0;
 	m_timerover = 0;
 	m_timer = 0;
-	m_stackaddr = 0;
-	m_stackcarry = 0;
 }
 
 void ht1130_device::cycle()
