@@ -217,7 +217,7 @@ protected:
 		inline bool operator<(const mixable& rhs) const noexcept { return this->prio() < rhs.prio(); };
 		inline bool operator>(const mixable& rhs) const noexcept { return this->prio() > rhs.prio(); };
 	};
-	
+
 	struct sprite_inf : mixable {
 		// alpha mode in 6000
 		// line enable, clip settings in 7400
@@ -340,7 +340,7 @@ protected:
 	void tile_decode();
 
 	void set_extend(bool state);
-	
+
 	inline void f3_drawgfx(const tempsprite &sprite, const rectangle &cliprect);
 	void draw_sprites(const rectangle &cliprect);
 	void get_sprite_info(const u16 *spriteram16_ptr);
