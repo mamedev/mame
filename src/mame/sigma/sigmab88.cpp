@@ -110,4 +110,4 @@ ROM_END
 
 } // anonymous namespace
 
-GAME( 199?, cool104,  0,        sigmab88, sigmab88, sigmab88_state, empty_init, ROT0, "Sigma", "Cool 104", MACHINE_IS_SKELETON )
+GAME( 1997, cool104,  0,        sigmab88, sigmab88, sigmab88_state, empty_init, ROT0, "Sigma", "Cool 104", MACHINE_IS_SKELETON )
