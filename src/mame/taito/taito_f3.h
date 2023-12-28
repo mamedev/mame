@@ -243,6 +243,7 @@ protected:
 		u16 colscroll;        // 4000
 		bool alt_tilemap;     // 4000
 		bool x_sample_enable; // 6400 x_sample_mask
+		int x_sample;
 		fixed8 x_scale;           // 8000
 		fixed8 y_scale;           // 8000
 		u16 pal_add;          // 9000

@@ -860,8 +860,11 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 	if (this_line(0x400) & 4) {
 		u16 x_mosaic = this_line(0x6400);
 
-		for (int pf_num = 0; pf_num < NUM_PLAYFIELDS; pf_num++)
-			line.pf[pf_num].x_sample_enable = BIT(x_mosaic, pf_num);
+		for (int pf_num = 0; pf_num < NUM_PLAYFIELDS; pf_num++) {
+			if ((line.pf[pf_num].x_sample_enable = BIT(x_mosaic, pf_num))) {
+				line.pf[pf_num].x_sample = (x_mosaic & 0xf0) >> 4;
+			}
+		}
 
 		line.x_sample = (x_mosaic & 0xf0) >> 4;
 
@@ -1059,11 +1062,23 @@ void taito_f3_state::draw_line(pen_t* dst, int y, int xs, int xe, playfield_inf*
 	*/
 	for (int x = xs; x < xe; x++) {
 		int x_index = (((fx_x + (x-46) * pf->x_scale)>>8) + 46) & m_width_mask;
+			
+		if (pf->x_sample_enable) {
+			int n = 16 - pf->x_sample;
+			x_index = ((x_index+68) / n * n)-68;
+		}
+		
+		
 		//int x_index = ((fx_x >> 16) + x / (pf->x_scale)) & m_width_mask;
 		if (!(pf->flagsbitmap->pix(y_index, x_index) & 0xf0))
 			continue;
 		if (const u16 col = pf->srcbitmap->pix(y_index, x_index))
 			dst[x] = clut[col];
+	}
+	if (pf->x_sample_enable) {
+		for (int x=xs; x<xe; x++) {
+			
+		}
 	}
 }
 
@@ -1373,7 +1388,7 @@ u32 taito_f3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 
 	scanline_draw_TWO(bitmap, cliprect);
 
-	
+	// need to swap these to get more sprite lag sometimes ?
 	get_sprite_info(m_spriteram.target());
 	// draw sprite layers
 	draw_sprites(cliprect);
