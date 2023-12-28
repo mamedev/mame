@@ -598,6 +598,20 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
+	<software name="affairej" cloneof="affaire">
+		<description>L'Affaire (Japan)</description>
+		<year>1987</year>
+		<publisher>Pack-In-Video</publisher>
+		<info name="alt_title" value="ラ・フェール～失われた時を求めて～"/>
+		<info name="serial" value="MS-16"/>
+		<info name="barcode" value="4988110800160"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="l'affaire - pack-in-video.dsk" size="737280" crc="38daaf14" sha1="e1be4f19a9f2000b8dde28a9d6fdcfbd91e6b304"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="agnishi">
 		<description>Agni no Ishi - The Stone of Agni (Japan)</description>
 		<year>1989</year>
@@ -8065,6 +8079,21 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
+	<software name="kansator">
+		<description>Kan Satoru Hyakka (Japan)</description>
+		<year>1987</year>
+		<publisher>Sony</publisher>
+		<info name="alt_title" value="漢読百科"/>
+		<info name="serial" value="HBS-E010D"/>
+		<info name="barcode" value="4901780060603"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="kan satoru hyakka - sony.dsk" size="737280" crc="808970a1" sha1="ac0b251978ab5613a8b2655cdc271eac14c84f87"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="orangerd">
 		<description>Kimagure Orange Road - Natsu no Mirage (Japan)</description>
 		<year>1988</year>
@@ -8160,6 +8189,99 @@ The following floppies came with the machines.
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="368640">
 				<rom name="kinetic connection (1986)(sony)(jp).dsk" size="368640" crc="aaccfaad" sha1="9e6393ed395b5c60df1f1f07e885e41af0e3a844"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="konaish1">
+		<description>Konai Shasei Vol. 1 (Japan)</description>
+		<year>1991</year>
+		<publisher>Fairytale</publisher>
+		<info name="alt_title" value="校内写生１巻"/>
+		<info name="barcode" value="4988715001184"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="konai shasei vol. 1 - fairytale (disk a).dsk" size="737280" crc="3d11c23b" sha1="8f761908b399f096bedb004ffcf601e0da1231b4"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="konai shasei vol. 1 - fairytale (disk b).dsk" size="737280" crc="a295be96" sha1="9ac807c8511b8ef6c2f2fe67b5c0bf55986007a7"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="konai shasei vol. 1 - fairytale (disk c).dsk" size="737280" crc="2757e07a" sha1="df6a3e16b79272b374a65c86800f1e4ba866df39"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk D"/>
+			<dataarea name="flop" size="737280">
+				<rom name="konai shasei vol. 1 - fairytale (disk d).dsk" size="737280" crc="364892ff" sha1="1c3402006c1c7e49e4ce606269aff6be92596ee7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="konaish2">
+		<description>Konai Shasei Vol. 2 (Japan)</description>
+		<year>1991</year>
+		<publisher>Fairytale</publisher>
+		<info name="alt_title" value="校内写生２巻"/>
+		<info name="barcode" value="4988715001238"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="konai shasei vol. 2 - fairytale (disk a).dsk" size="737280" crc="1d35b2cb" sha1="a9442be2ab6b5012c950143fffc2682619ad4951"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="konai shasei vol. 2 - fairytale (disk b).dsk" size="737280" crc="4a8d9a02" sha1="9567748f65e3ca7dd64aa0083910c7b048f38768"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="konai shasei vol. 2 - fairytale (disk c).dsk" size="737280" crc="dc7e0a6b" sha1="26269fbb138983356d429541951c9c47d4f0ac64"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk D"/>
+			<dataarea name="flop" size="737280">
+				<rom name="konai shasei vol. 2 - fairytale (disk d).dsk" size="737280" crc="a1b924d2" sha1="1db71bf5784956ae1ef218eb8335491549eb7a6b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="konaish3">
+		<description>Konai Shasei Vol. 3 (Japan)</description>
+		<year>1991</year>
+		<publisher>Fairytale</publisher>
+		<info name="alt_title" value="校内写生３巻"/>
+		<info name="barcode" value="4988715001283"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="konai shasei vol. 3 - fairytale (disk a).dsk" size="737280" crc="deb08ee1" sha1="f05c2beec2d4f006e15c82b39a77df507554318d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="konai shasei vol. 3 - fairytale (disk b).dsk" size="737280" crc="2e061570" sha1="3932b8f9fa3d60c6c55e179ef115332e91161702"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="konai shasei vol. 3 - fairytale (disk c).dsk" size="737280" crc="71ea2d2a" sha1="73ca5b747bcc3f65255c1d8ba86097fb2cd7c486"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8457,75 +8579,14 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
-	<software name="lastarmga" cloneof="lastarmg">
-		<description>Last Armageddon (Japan, alt)</description>
+	<software name="lastaraz">
+		<description>Last Armageddon Alien Zukan (Japan)</description>
 		<year>1988</year>
 		<publisher>Brain Grey</publisher>
-		<info name="alt_title" value="ラスト・ハルマゲドン"/>
-		<info name="serial" value="BG10001"/>
-		<info name="gtin" value="04988652420017"/>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk A"/>
-			<dataarea name="flop" size="737280">
-				<rom name="last armageddon (1988)(brain grey)(jp)(disk 1 of 5).dsk" size="737280" crc="19b9e860" sha1="8c12557f3118e779cb40f542915e33e4161a2087"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk B"/>
-			<dataarea name="flop" size="737280">
-				<rom name="last armageddon (1988)(brain grey)(jp)(disk 2 of 5)[a].dsk" size="737280" crc="954b5247" sha1="aca0f7242eb2b871039e55c69a24e803f947f8da"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Disk C"/>
-			<dataarea name="flop" size="737280">
-				<rom name="last armageddon (1988)(brain grey)(jp)(disk 3 of 5)[a].dsk" size="737280" crc="ab6e861b" sha1="f9d3c5f506ee67028b72ff66c06275637f26c0c8"/>
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_3_5">
-			<feature name="part_id" value="Disk D"/>
-			<dataarea name="flop" size="737280">
-				<rom name="last armageddon (1988)(brain grey)(jp)(disk 4 of 5)[a].dsk" size="737280" crc="0ce5c8e6" sha1="b6a9bc7f2cf0df190570ca7704ddf036f2b2d5a4"/>
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_3_5">
-			<feature name="part_id" value="Disk E"/>
-			<dataarea name="flop" size="737280">
-				<rom name="last armageddon (1988)(brain grey)(jp)(disk 5 of 5)[a].dsk" size="737280" crc="90c9a5df" sha1="a9696eb46239e95916dff9b76cc742418543b768"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="lastarmgb" cloneof="lastarmg">
-		<description>Last Armageddon (Japan, alt 2)</description>
-		<year>1988</year>
-		<publisher>Brain Grey</publisher>
-		<info name="alt_title" value="ラスト・ハルマゲドン"/>
-		<info name="serial" value="BG10001"/>
-		<info name="gtin" value="04988652420017"/>
+		<info name="alt_title" value="Last Armageddonエイリアン図鑑"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="last armageddon (1988)(brain grey)(jp)(disk 1 of 5).dsk" size="737280" crc="19b9e860" sha1="8c12557f3118e779cb40f542915e33e4161a2087"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="last armageddon (1988)(brain grey)(jp)(disk 2 of 5)[a2].dsk" size="737280" crc="d0d95d89" sha1="73527da88a62cc54ba03ee8f64c09b2c43fee33a"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="last armageddon (1988)(brain grey)(jp)(disk 3 of 5)[a2].dsk" size="737280" crc="d3e27e04" sha1="bd376bb38f0453a3646963429f7470d412676232"/>
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="last armageddon (1988)(brain grey)(jp)(disk 4 of 5)[a2].dsk" size="737280" crc="a0332e38" sha1="a2ecc60fb542a84c93efe2746550bb0062c46b81"/>
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="last armageddon (1988)(brain grey)(jp)(disk 5 of 5)[a2].dsk" size="737280" crc="4bde63e6" sha1="80e1e430f9a57881a0a1ebc19cafb81875798dbb"/>
+				<rom name="last armageddon alien zukan - brain grey.dsk" size="737280" crc="cbebc837" sha1="ad59bfc23a9eb393df9295afeca40543df9d8d8f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8687,6 +8748,18 @@ The following floppies came with the machines.
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="lenam - sword of legend (1989)(hertz)(jp)(disk 4 of 4).dsk" size="737280" crc="efb12bac" sha1="02644c62c2a49c44fae3466a5ad2ad0575def6b4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lightbac">
+		<description>Lightning Bacchus - The Knight of Iron (Japan)</description>
+		<year>1989</year>
+		<publisher>NCS</publisher>
+		<info name="alt_title" value="ライトニングバッカス"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="lightning bacchus - the knight of iron - ncs.dsk" size="737280" crc="4ac61288" sha1="1cb3ea2ae9a8963ad8e7ce1bc1ae233af6f26487"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13454,6 +13527,34 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
+	<software name="shirokur">
+		<description>Shiro to Kuro no Densetsu Soushuu-hen (Japan)</description>
+		<year>1991</year>
+		<publisher>Apros Selon</publisher>
+		<info name="alt_title" value="白と黒の伝説総集編"/>
+		<info name="serial" value="SX-021"/>
+		<info name="barcode" value="4932545701073"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Aska-hen"/>
+			<dataarea name="flop" size="737280">
+				<rom name="shiro to kuro no densetsu - apros selon (disk 1).dsk" size="737280" crc="50fd1ae3" sha1="88b62a8625ee574e6660d184165f4a2997a06b9a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Hyakki-hen"/>
+			<dataarea name="flop" size="737280">
+				<rom name="lshiro to kuro no densetsu - apros selon (disk 1).dsk" size="737280" crc="962ffefe" sha1="9ff194aa42cf4a5e5381a7ccae0153bfc51ebb38"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Rinne Tenshou-hen"/>
+			<dataarea name="flop" size="737280">
+				<rom name="shiro to kuro no densetsu - apros selon (disk 1).dsk" size="737280" crc="c5f53731" sha1="6e90b94c369c516d10b712077411724bf7a97076"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="simudayo">
 		<description>Simulation Dayo Zen'in Shuugou! (Japan)</description>
 		<year>1989</year>
@@ -18213,6 +18314,19 @@ HOMEBREW
 		</part>
 	</software>
 
+	<software name="jukirang">
+		<description>Juki, the Ranger. (Japan)</description>
+		<year>1994</year>
+		<publisher>ASCAT</publisher>
+		<info name="alt_title" value="森林警備隊員ユウキ"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="juki the ranger - ascat.dsk" size="737280" crc="a95f22f7" sha1="2675480d9fa08acf84bea755739aeade86da346e"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kkk">
 		<description>Kanzen Kouryaku Kyokugen (Japan)</description>
 		<year>1997</year>
@@ -18284,6 +18398,28 @@ HOMEBREW
 		</part>
 	</software>
 
+	<software name="konaqz2p">
+		<description>Konami Quiz 2 Promo (Dutch)</description>
+		<year>2001</year>
+		<publisher>Delta Soft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="konami quiz 2 promo - delta soft.dsk" size="737280" crc="46f2047d" sha1="0d5ad4e57b9e5e94ddde63b932b4858607e582e7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="konapuzzp">
+		<description>Konapuzz Promo</description>
+		<year>19??</year>
+		<publisher>Delta Soft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="konapuzz promo - delta soft.dsk" size="737280" crc="e7afb254" sha1="e018f393660392bcac14bf842cb8e249cb803f97"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kpiball">
 		<description>Kpiball (Japan)</description>
 		<year>2000</year>
@@ -18292,6 +18428,17 @@ HOMEBREW
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="kpiball.dsk" size="737280" crc="235eb42d" sha1="835b776c9e5f7362914bae4f56811576c019a05a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kungfu">
+		<description>Kung Fu</description>
+		<year>2016</year>
+		<publisher>Oniric Factor</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="kung fu - oniric factor.dsk" size="737280" crc="87a45e36" sha1="3a24ad9e0b0cda18a9f92a1b0cf93d205c702aba"/>
 			</dataarea>
 		</part>
 	</software>
@@ -18312,6 +18459,22 @@ HOMEBREW
 		</part>
 	</software>
 
+	<software name="lasavruro" cloneof="lasavrur">
+		<description>Las Aventuras de Rudolphine Rur (Spanish, older)</description>
+		<year>2020</year>
+		<publisher>Dwalin</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="las aventuras de rudolphine rur - dwalin (part1, older).dsk" size="737280" crc="c32db67e" sha1="e1023e8e7574e483e966f2ebd8fc303b336aa23b" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="las aventuras de rudolphine rur - dwalin (part2, older).dsk" size="737280" crc="d0d19eb1" sha1="d6eb91d42891fc5b9ab9e2dbcf86d241c79ab50e" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lastwar2">
 		<description>Last War 2 (Japan)</description>
 		<year>1991</year>
@@ -18327,11 +18490,21 @@ HOMEBREW
 	<software name="lemmings">
 		<description>Lemmingso (UK?)</description>
 		<year>1997</year>
-		<publisher>&lt;homebrew&gt;</publisher>
-		<info name="developer" value="Hackwrench N.I" />
+		<publisher>N.I</publisher>
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="lem.dsk" size="737280" crc="d18a402e" sha1="d0549a8b360c9cb49a69f08d3b778c9666d29224"/>
+			<dataarea name="flop" size="368640">
+				<rom name="lemmingso - n.i.dsk" size="368640" crc="3744c9e8" sha1="eed37b38156d7395cb5594ef67666ef4711cca68"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="letra">
+		<description>Letra (Netherlands)</description>
+		<year>1995</year>
+		<publisher>MSX Klup</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="letra - msx klup.dsk" size="368640" crc="147ac91a" sha1="4731d0e4c5449389ec6ee6ffc4b0c1331ecf6a79"/>
 			</dataarea>
 		</part>
 	</software>
@@ -18339,16 +18512,17 @@ HOMEBREW
 	<software name="lilo">
 		<description>Lilo - La Conquista de la Fama (Spain)</description>
 		<year>1995</year>
-		<publisher>&lt;homebrew&gt;</publisher>
-		<info name="developer" value="Kai Magazine" />
+		<publisher>Kai Magazine</publisher>
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
-				<rom name="lilo la conquista de la fama (1993)(kai magazine)(sp)(disk 1 of 2).dsk" size="737280" crc="3c1fec87" sha1="8c6e5b3360b311bb9abafe8d09d69874333c83e8"/>
+				<rom name="lilo - la conquista de la fama - kai magazine (disk 1).dsk" size="737280" crc="3c1fec87" sha1="8c6e5b3360b311bb9abafe8d09d69874333c83e8"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="737280">
-				<rom name="lilo la conquista de la fama (1993)(kai magazine)(sp)[2 disks].dsk" size="737280" crc="7fea1d36" sha1="abf006f8946209262d07ff6b3dfa6b9960e9012b"/>
+				<rom name="lilo - la conquista de la fama - kai magazine (disk 2).dsk" size="737280" crc="faa651c3" sha1="09d002c3647d8aa279ea40f8f3a120d2161419d6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -18401,6 +18575,29 @@ HOMEBREW
 		</part>
 	</software>
 
+	<software name="listperiod">
+		<description>Listperiod (Japan)</description>
+		<year>1996</year>
+		<publisher>Suzumizaki-kimitaka</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="listperiod - suzumizaki-kimitaka.dsk" size="737280" crc="c3320e9d" sha1="ab1f8f5b2d68bacebddf9f4226291fa9c92a5851"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="litcasno">
+		<description>Little Casino (Japan)</description>
+		<year>1994</year>
+		<publisher>M2 Club</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="little casino - m2 club.dsk" size="737280" crc="7ceceb36" sha1="20c84a3d7348f680bcf8f07581a11f4db571088f"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="logosman">
 		<description>Logos Man (Japan)</description>
 		<year>1997</year>
@@ -18409,6 +18606,73 @@ HOMEBREW
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="rogosuman (mo soft, 1997).dsk" size="737280" crc="80d82a3e" sha1="5935f4510e842d7943691b6cb2d84e9e9c232d20"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lostworldm" supported="partial">
+		<description>The Lost World (with Moonsound support)</description>
+		<year>2005</year>
+		<publisher>Stichting Sunrise</publisher>
+		<notes>Moonsound support does not work.</notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="the lost world - stichting sunrise (moonsound, disk 1).dsk" size="737280" crc="bb0dfd7a" sha1="bb37e22ae9e9179ce7edfb72f9c0b28030de926b"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="the lost world - stichting sunrise (moonsound, disk 2).dsk" size="737280" crc="1a4ae4af" sha1="58c9f2476585db97e4847910a4b93ad64484ad4f"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="the lost world - stichting sunrise (moonsound, disk 3).dsk" size="737280" crc="c6e30855" sha1="74f3c497d695be33228b7b8c4947047722f00a49"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="the lost world - stichting sunrise (moonsound, disk 4).dsk" size="737280" crc="ca31ea96" sha1="d873b15be2b2c53cf1b1fe753b0d869c4c516b81"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lostworld" cloneof="lostworldm">
+		<description>The Lost World</description>
+		<year>1998</year>
+		<publisher>Stichting Sunrise</publisher>
+		<notes>Moonsound support does not work.</notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="the lost world - stichting sunrise (disk 1).dsk" size="737280" crc="2a7ef565" sha1="88dd38663a4887f0edea9f9cdaca14f60a24463c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="the lost world - stichting sunrise (disk 2).dsk" size="737280" crc="417f5b1f" sha1="9f24c16c09428dcd6eea1721b9187885b2771529"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="the lost world - stichting sunrise (disk 3).dsk" size="737280" crc="af6e6a66" sha1="df2442a0c8c4691435e4a2ed191ffa09a4dfc5e8"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="the lost world - stichting sunrise (disk 4).dsk" size="737280" crc="d2e62663" sha1="41885c970687dca23ac7011aa667b91efd293115"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lovesd2" supported="no">
+		<description>Love's Disc Vol.2 (Japan)</description>
+		<year>19??</year>
+		<publisher>Office Pasta</publisher>
+		<notes>Choosing the third menu option causes a 'System error'.</notes>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="loves disc vol.2 - office pasta.dsk" size="737280" crc="90490480" sha1="f3dd879ca50b37762c472685b0fd29af7c9ab9ab"/>
 			</dataarea>
 		</part>
 	</software>
@@ -18830,8 +19094,8 @@ HOMEBREW
 		<year>1994</year>
 		<publisher>MSX Klup</publisher>
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="msx klup bonus disc - msx klup.dsk" size="737280" crc="09c0cefd" sha1="2ec4caf8fdcac6500ae36e34a6c553cacea2db9c"/>
+			<dataarea name="flop" size="368640">
+				<rom name="msx klup bonus disc - msx klup.dsk" size="368640" crc="09c0cefd" sha1="2ec4caf8fdcac6500ae36e34a6c553cacea2db9c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -19935,6 +20199,28 @@ HOMEBREW
 		</part>
 	</software>
 
+	<software name="ritokeib">
+		<description>Ritoru Keiba (Japan)</description>
+		<year>1994</year>
+		<publisher>M2 Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="ritoru keiba - m2 club.dsk" size="737280" crc="323a842c" sha1="a74e6b86180a2921f5334a5d1521a252ff4ed0c7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ritokeiba" cloneof="ritokeib">
+		<description>Ritoru Keiba (Japan, alt)</description>
+		<year>1994</year>
+		<publisher>M2 Club</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="ritoru keiba - m2 club (alt).dsk" size="737280" crc="c6117246" sha1="447e5001677dc0485601c436e51a36d7019b2a62"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rockcity">
 		<description>Rock City (Japan)</description>
 		<year>1995</year>
@@ -20925,6 +21211,19 @@ HOMEBREW
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="hamiman-b.dsk" size="737280" crc="f1031343" sha1="aa3d35f31be9ca880ba172bbfd1e7f32e544f07d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yaminabe">
+		<description>Yaminabe (Japan)</description>
+		<year>1993</year>
+		<publisher>Fantasy Creators</publisher>
+		<info name="alt_title" value="やみなべ"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="yaminabe - fantasy creators.dsk" size="737280" crc="d625e7f4" sha1="f01141f0c9284f152783319755020563a40da5f3"/>
 			</dataarea>
 		</part>
 	</software>
