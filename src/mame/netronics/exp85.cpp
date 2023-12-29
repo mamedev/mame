@@ -54,31 +54,25 @@
 #include "imagedev/cassette.h"
 #include "sound/spkrdev.h"
 
-#define VERBOSE 0 //(1U)
-#include "logmacro.h"
-
 namespace {
 
-#define I8085A_TAG       "u100"
-#define I8155_TAG        "u106"
-#define I8355_TAG        "u105"
-#define EXTENDED_RAM_TAG "extended_ram"
-
-#define LOW_MEMORY_ROM_MIRROR_ENTRY 0
-#define LOW_MEMORY_RAM_ENTRY        1
+static constexpr int LOW_MEMORY_ROM_MIRROR_ENTRY = 0;
+static constexpr int LOW_MEMORY_RAM_ENTRY        = 1;
 
 class exp85_state : public driver_device
 {
 public:
 	exp85_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, I8085A_TAG)
-		, m_i8155(*this, I8155_TAG)
+		, m_maincpu(*this, "u100")
+		, m_i8155(*this, "u106")
 		, m_rs232(*this, "rs232")
 		, m_cassette(*this, "cassette")
 		, m_speaker(*this, "speaker")
-		, m_rom(*this, I8355_TAG)
-		, m_extended_ram(*this, EXTENDED_RAM_TAG)
+		, m_rom(*this, "u105")
+		, m_extended_ram(*this, "extended_ram")
+		, m_is_preparing_interrupt_call(false)
+		, m_ignore_timer_out(true)
 		, m_tape_control(0)
 		, m_timer(nullptr)
 	{ }
@@ -89,6 +83,23 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_rst75 );
 
 private:
+	virtual void machine_start() override;
+
+	uint8_t i8355_a_r();
+	void i8355_a_w(uint8_t data);
+	int sid_r();
+	void sod_w(int state);
+
+	void status_out(u8 status);
+
+	void exp85_io(address_map &map);
+	void exp85_mem(address_map &map);
+
+	void to_change(int to);
+
+	TIMER_CALLBACK_MEMBER(trap_delay);
+
+	// Member variables
 	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<i8155_device> m_i8155;
 	required_device<rs232_port_device> m_rs232;
@@ -97,31 +108,10 @@ private:
 	required_memory_region m_rom;
 	required_device<ram_device> m_extended_ram;
 
-
-	virtual void machine_start() override;
-
-	uint8_t i8355_a_r();
-	void i8355_a_w(uint8_t data);
-	int sid_r();
-	void sod_w(int state);
-
-	/* memory mapping during reset and interrupt mgmt */
-	void status_out(u8 status);
-	bool prep_int_call = false;
-	bool ignore_to     = true;
-
-	/* cassette state */
+	bool m_is_preparing_interrupt_call;
+	bool m_ignore_timer_out;
 	bool m_tape_control;
-	void exp85_io(address_map &map);
-	void exp85_mem(address_map &map);
-
-	/* timer for delaying the trap line assert */ 
-	emu_timer *m_timer;
-
-    /* timer callback */
-	void to_change(int to);
-
-	TIMER_CALLBACK_MEMBER(trap_delay);
+    emu_timer *m_timer;
 };
 
 
@@ -134,17 +124,17 @@ void exp85_state::exp85_mem(address_map &map)
 	// Microsoft Basic ROM
 	map(0xc000, 0xdfff).rom();
 	// monitor ROM in the 8355 chip.
-	map(0xf000, 0xf7ff).r(I8355_TAG, FUNC(i8355_device::memory_r));
+	map(0xf000, 0xf7ff).r("u105", FUNC(i8355_device::memory_r));
 	// 256 bytes of RAM of level A in the 8155 chip.
-	map(0xf800, 0xf8ff).rw(I8155_TAG, FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
+	map(0xf800, 0xf8ff).rw("u106", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
 }
 
 void exp85_state::exp85_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0xf0, 0xf3).rw(I8355_TAG, FUNC(i8355_device::io_r), FUNC(i8355_device::io_w));
-	map(0xf8, 0xfd).rw(I8155_TAG, FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
+	map(0xf0, 0xf3).rw("u105", FUNC(i8355_device::io_r), FUNC(i8355_device::io_w));
+	map(0xf8, 0xfd).rw("u106", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
 }
 
 /* Input Ports */
@@ -255,21 +245,19 @@ void exp85_state::status_out(u8 status)
 	if (status == 0x23 || status == 0x26)
 	{
 		// When an interrupt is triggered the low memory shall be set to the ROM mirror
-		LOG("set low memory to ROM mirror (PC 0x%x, proc status 0x%x)\n", current_pc, status);
-		prep_int_call = true;
+		m_is_preparing_interrupt_call = true;
 		membank("bank1")->set_entry(LOW_MEMORY_ROM_MIRROR_ENTRY);
 	} 
-	else if (prep_int_call && (current_pc & 0xFF00) == 0x0000)
+	else if (m_is_preparing_interrupt_call && (current_pc & 0xFF00) == 0x0000)
 	{
 		// Avoids setting the lower memory back to RAM until
 		// it branches to the interrupt handler.
-		prep_int_call = false;
+		m_is_preparing_interrupt_call = false;
 	} 
-	else if (!prep_int_call && (current_pc & 0xF000) == 0xF000 && membank("bank1")->entry() == LOW_MEMORY_ROM_MIRROR_ENTRY)
+	else if (!m_is_preparing_interrupt_call && (current_pc & 0xF000) == 0xF000 && membank("bank1")->entry() == LOW_MEMORY_ROM_MIRROR_ENTRY)
 	{
 		// When the interrupt handler is executing and the address is >= 0xF000
 		// the low memory is mapped to RAM
-		LOG("set low memory to RAM (PC 0x%x, status 0x%x)\n", current_pc, status);
 		membank("bank1")->set_entry(LOW_MEMORY_RAM_ENTRY);
 	} 
 		
@@ -312,9 +300,9 @@ void exp85_state::to_change(int to)
 	// In the 8155 implementation the TIMER-OUT line (to) is
 	// asserted by default on initialization; this generates a spurious exception
 	// avoided here via an ignore flag. 
-	if (ignore_to)
+	if (m_ignore_timer_out)
 	{
-		ignore_to = false;
+		m_ignore_timer_out = false;
 		return;
 	}
 
@@ -326,7 +314,6 @@ void exp85_state::to_change(int to)
 	// MAME allows to set a timer of 70ns but that is not enough to get the CPU scheduled for at least 1 cycle
 	// before the interrupt is serviced, so we program a timer to expire beyond a full clock cycle. 
 	m_timer->adjust(m_i8155->clocks_to_attotime(2), to);
-	LOG("to_change %d\n", to);
 }
 
 TIMER_CALLBACK_MEMBER(exp85_state::trap_delay)
@@ -362,7 +349,7 @@ void exp85_state::exp85(machine_config &config)
 	m_i8155->out_to_callback().set(FUNC(exp85_state::to_change));
 
 
-	i8355_device &i8355(I8355(config, I8355_TAG, 6.144_MHz_XTAL/2));
+	i8355_device &i8355(I8355(config, "u105", 6.144_MHz_XTAL/2));
 	i8355.in_pa().set(FUNC(exp85_state::i8355_a_r));
 	i8355.out_pa().set(FUNC(exp85_state::i8355_a_w));
 
@@ -379,14 +366,14 @@ void exp85_state::exp85(machine_config &config)
 /* ROMs */
 
 ROM_START( exp85 )
-	ROM_REGION( 0x10000, I8085A_TAG, 0 ) // Microsoft Basic
+	ROM_REGION( 0x10000, "u100", 0 ) // Microsoft Basic
 	ROM_DEFAULT_BIOS("eia")
 	ROM_LOAD( "c000.bin", 0xc000, 0x0800, CRC(73ce4aad) SHA1(2c69cd0b6c4bdc92f4640bce18467e4e99255bab) )
 	ROM_LOAD( "c800.bin", 0xc800, 0x0800, CRC(eb3fdedc) SHA1(af92d07f7cb7533841b16e1176401363176857e1) )
 	ROM_LOAD( "d000.bin", 0xd000, 0x0800, CRC(c10c4a22) SHA1(30588ba0b27a775d85f8c581ad54400c8521225d) )
 	ROM_LOAD( "d800.bin", 0xd800, 0x0800, CRC(dfa43ef4) SHA1(56a7e7a64928bdd1d5f0519023d1594cacef49b3) )
 	
-	ROM_REGION( 0x800, I8355_TAG, 0 ) // Explorer 85 Monitor 
+	ROM_REGION( 0x800, "u105", 0 ) // Explorer 85 Monitor 
 	ROM_SYSTEM_BIOS( 0, "eia", "EIA Terminal" ) // Serial terminal ROM
 	ROMX_LOAD( "ex 85.u105", 0x0000, 0x0800, CRC(1a99d0d9) SHA1(57b6d48e71257bc4ef2d3dddc9b30edf6c1db766), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "hex", "Hex Keyboard" ) // Keypad ROM (not available)
