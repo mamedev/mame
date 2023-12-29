@@ -23,8 +23,8 @@
 	.XS nnnn-F87F mmmm-C000 <CR>
     .G <CR>
 
-	where nnnn is the previous value of the stack point, and mmmm is the previous
-	value of the stack pointer. 
+	where nnnn is the previous value of the stack pointer, and mmmm is the previous
+	value of the program counter. 
 
 	Basic will request the amount of RAM memory available, 8192 (bytes) must be entered.
 
