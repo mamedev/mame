@@ -96,6 +96,7 @@ void upd777_device::execute_run()
 	{
 		debugger_instruction_hook(m_pc);
 		do_op();
+		m_icount--;
 	}
 }
 
