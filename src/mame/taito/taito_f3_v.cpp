@@ -114,16 +114,17 @@ Line ram memory map:
         Bits: AAAA BBBB CCCC DDDD
 
     0x6400: forward repeat [unemulated]
-        0x00ff: x repeat / mosaic - each tile collapses to 16 single colour lines [unemulated]
-          Bits: mmmm 4321
+        0x03ff: x repeat / mosaic - each tile collapses to 16 single colour lines [unemulated]
+          Bits: ??ps mmmm 4321
             4321 = enable effect for respective playfield
             mmmm = x repeat - 0 = repeat 1st pixel 16 times (sample every 16)
                               1 = repeat 1st pixel 15 times (sample every 15)
                               f = repeat 1st pixel  1 times (sample every pixel)
+               s = enable effect for sprites
+               p = enable effect for pivot layer ?
             (spcinvdj title screen, riding fight)
 
        0xff00: previous pixel response? and palette ram format?? [unemulated]
-        x1xx = ? (bubsymph, commandw, ridingf)
         3xxx = ? (arabianm, ridingf)
         4xxx = blend forward with next pixel on line (after layer mixing) (gseeker intro)
         7xxx = ? (bubsymph, commandw)
@@ -459,7 +460,6 @@ void taito_f3_state::set_extend(bool state) {
 	m_extend = state;
 	// TODO: we need to free these if this is called multiple times
 	// for (int i=0; i<8; i++) {
-	// 	// fuck me in the ass tonite
 	// 	delete m_tilemap[i];
 	// }
 	if (m_extend) {
@@ -868,7 +868,12 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 
 		line.x_sample = (x_mosaic & 0xf0) >> 4;
 
-		line.fx_6400 = (x_mosaic & 0xff00) >> 8;
+		for (int sp_num = 0; sp_num < NUM_SPRITEGROUPS; sp_num++) {
+			line.sp[sp_num].x_sample_enable = BIT(x_mosaic, 9);
+		}
+		line.pivot.x_sample_enable = BIT(x_mosaic, 10);
+
+		line.fx_6400 = (x_mosaic & 0xfc00) >> 8;
 		if (line.fx_6400 && line.fx_6400 != 0x70) // check if unknown effect bits set
 			logerror("unknown fx bits: %02x__ at %04x\n", line.fx_6400, 0x6400 + y*2);
 	}
@@ -1017,6 +1022,13 @@ void taito_f3_state::get_pf_scroll(int pf_num, fixed8 &reg_sx, fixed8 &reg_sy)
 	reg_sy = sy;
 }
 
+static int mosaic(int x, int sample) {
+	int x_count = (x - 46 + 114) % 432;
+	int want = x_count / sample * sample;
+	int back = x_count - want;
+	return x - back;
+}
+
 void taito_f3_state::draw_line(pen_t* dst, int y, int xs, int xe, sprite_inf* sp)
 {
 	if (!sp->layer_enable())
@@ -1039,46 +1051,15 @@ void taito_f3_state::draw_line(pen_t* dst, int y, int xs, int xe, playfield_inf*
 		logerror("line#200: sx: %f, rowscroll: %f, scale: %f×\n", pf->reg_sx/256.0, pf->rowscroll/256.0, pf->x_scale/256.0);
 	}
 	
-	fixed8 fx_x = pf->reg_sx;
-	fx_x += pf->rowscroll;
+	fixed8 fx_x = pf->reg_sx + pf->rowscroll;
 	fx_x += 10*((pf->x_scale)-(1<<8));
 	fx_x &= (m_width_mask << 8) | 0xff;
-	/*
-	0 = 1px -> 1px
-	64 = 
-	128 = 1px -> 2px
-	255 = 
-		
-
-	256 = infinity
 	
-		(256/(256-scale))
-		
-		0 = 256/256
-		1 = 1/255
-		128 = 256/128
-		224 = 256/32 (8x)
-		255 = 256/1
-		
-	*/
-	int back = 0;
 	for (int x = xs; x < xe; x++) {
-		if (pf->x_sample_enable) {
-			int n = 16 - pf->x_sample;
-			int x_count = x-46+114;
-			//if (x > 320+46-2)
-			//	x_count = x - 320+46-2;
-			int want = x_count / n * n;
-			back = x_count - want;
-		}
-		;
-		int real_x = x-back;
-		;
-		//int x_index = ((fx_x>>8) + x - back);
-		;
+		int real_x = pf->x_sample_enable ? mosaic(x, 16 - pf->x_sample) : x;
+		
 		int x_index = (((fx_x + (real_x - 46) * pf->x_scale)>>8) + 46) & m_width_mask;
-		;
-		//int x_index = ((fx_x >> 16) + x / (pf->x_scale)) & m_width_mask;
+		
 		if (!(pf->flagsbitmap->pix(y_index, x_index) & 0xf0))
 			continue;
 		if (const u16 col = pf->srcbitmap->pix(y_index, x_index))
