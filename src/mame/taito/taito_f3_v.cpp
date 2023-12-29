@@ -1039,7 +1039,8 @@ void taito_f3_state::draw_line(pen_t* dst, int y, int xs, int xe, playfield_inf*
 		logerror("line#200: sx: %f, rowscroll: %f, scale: %f×\n", pf->reg_sx/256.0, pf->rowscroll/256.0, pf->x_scale/256.0);
 	}
 	
-	fixed8 fx_x = pf->reg_sx + pf->rowscroll;
+	fixed8 fx_x = pf->reg_sx;
+	fx_x += pf->rowscroll;
 	fx_x += 10*((pf->x_scale)-(1<<8));
 	fx_x &= (m_width_mask << 8) | 0xff;
 	/*
@@ -1060,15 +1061,23 @@ void taito_f3_state::draw_line(pen_t* dst, int y, int xs, int xe, playfield_inf*
 		255 = 256/1
 		
 	*/
+	int back = 0;
 	for (int x = xs; x < xe; x++) {
-		int x_index = (((fx_x + (x-46) * pf->x_scale)>>8) + 46) & m_width_mask;
-			
 		if (pf->x_sample_enable) {
 			int n = 16 - pf->x_sample;
-			x_index = ((x_index+68) / n * n)-68;
+			int x_count = x-46+114;
+			//if (x > 320+46-2)
+			//	x_count = x - 320+46-2;
+			int want = x_count / n * n;
+			back = x_count - want;
 		}
-		
-		
+		;
+		int real_x = x-back;
+		;
+		//int x_index = ((fx_x>>8) + x - back);
+		;
+		int x_index = (((fx_x + (real_x - 46) * pf->x_scale)>>8) + 46) & m_width_mask;
+		;
 		//int x_index = ((fx_x >> 16) + x / (pf->x_scale)) & m_width_mask;
 		if (!(pf->flagsbitmap->pix(y_index, x_index) & 0xf0))
 			continue;
