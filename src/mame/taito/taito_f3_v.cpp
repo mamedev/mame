@@ -1077,17 +1077,17 @@ taito_f3_state::calc_clip(const clip_plane_inf (&clip)[NUM_CLIPPLANES],
 }
 
 static int mosaic(int x, int sample) {
-	int x_count = (x - 46 + 114) % 432;
-	int want = x_count / sample * sample;
-	int back = x_count - want;
-	return x - back;
+	int x_count = (x - 46 + 114);
+	x_count = x_count >= 432 ? x_count - 432 : x_count;
+	return x - (x_count % sample);
 }
 
 void taito_f3_state::draw_line(pen_t* dst, int y, int xs, int xe, sprite_inf* sp)
 {
 	const pen_t *clut = &m_palette->pen(0);
+	const u16 *src = &sp->srcbitmap->pix(y);
 	for (int x = xs; x < xe; x++) {
-		if (const u16 col = sp->srcbitmap->pix(y, x)) // 0 = transparent
+		if (const u16 col = src[x]) // 0 = transparent
 			dst[x] = clut[col];
 	}
 }
@@ -1096,11 +1096,9 @@ void taito_f3_state::draw_line(pen_t* dst, int y, int xs, int xe, playfield_inf*
 {
 	const pen_t *clut = &m_palette->pen(0);
 	const int y_index = ((pf->reg_fx_y >> 8) + pf->colscroll) & 0x1ff;
-	
-	if (y==200) {
-		logerror("line#200: sx: %f, rowscroll: %f, scale: %f×\n", pf->reg_sx/256.0, pf->rowscroll/256.0, pf->x_scale/256.0);
-	}
-	
+	const u16 *src = &pf->srcbitmap->pix(y_index);
+	const u8 *flags = &pf->flagsbitmap->pix(y_index);
+
 	fixed8 fx_x = pf->reg_sx + pf->rowscroll;
 	fx_x += 10*((pf->x_scale)-(1<<8));
 	fx_x &= (m_width_mask << 8) | 0xff;
@@ -1110,15 +1108,10 @@ void taito_f3_state::draw_line(pen_t* dst, int y, int xs, int xe, playfield_inf*
 		
 		int x_index = (((fx_x + (real_x - 46) * pf->x_scale)>>8) + 46) & m_width_mask;
 		
-		if (!(pf->flagsbitmap->pix(y_index, x_index) & 0xf0))
+		if (!(flags[x_index] & 0xf0))
 			continue;
-		if (const u16 col = pf->srcbitmap->pix(y_index, x_index))
+		if (const u16 col = src[x_index])
 			dst[x] = clut[col];
-	}
-	if (pf->x_sample_enable) {
-		for (int x=xs; x<xe; x++) {
-			
-		}
 	}
 }
 
@@ -1126,18 +1119,18 @@ void taito_f3_state::draw_line(pen_t* dst, int y, int xs, int xe, playfield_inf*
 void taito_f3_state::draw_line(pen_t* dst, int y, int xs, int xe, pivot_inf* pv)
 {
 	const pen_t *clut = &m_palette->pen(0);
-	const auto *srcbitmap = pv->use_pix() ? pv->srcbitmap_pixel : pv->srcbitmap_vram;
-	const auto *flagsbitmap = pv->use_pix() ? pv->flagsbitmap_pixel : pv->flagsbitmap_vram;
 	const u16 height_mask = pv->use_pix() ? 0xff : 0x1ff;
 	const u16 width_mask = 0x1ff;
 
 	const int y_index = (pv->reg_sy + y) & height_mask;
+	const u16 *srcbitmap = pv->use_pix() ? &pv->srcbitmap_pixel->pix(y_index) : &pv->srcbitmap_vram->pix(y_index);
+	const u8 *flagsbitmap = pv->use_pix() ? &pv->flagsbitmap_pixel->pix(y_index) : &pv->flagsbitmap_vram->pix(y_index);
 
 	for (int x = xs; x < xe; x++) {
 		int x_index = (pv->reg_sx + x) & width_mask;
-		if (!(flagsbitmap->pix(y_index, x_index) & 0xf0))
+		if (!(flagsbitmap[x_index] & 0xf0))
 			continue;
-		if (u16 col = srcbitmap->pix(y_index, x_index)) {
+		if (u16 col = srcbitmap[x_index]) {
 			dst[x] = clut[col];
 		}
 	}
