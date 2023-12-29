@@ -42,8 +42,6 @@ private:
 	u16 fetch();
 	void do_op();
 
-	u16 m_table[0xfe0/2];
-
 	u32 m_pc;
 	s32 m_icount;
 };

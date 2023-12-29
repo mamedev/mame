@@ -39,8 +39,6 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
-
-	u16 m_table[0xfe0/2];
 };
 
 static INPUT_PORTS_START( cassvisn )
@@ -52,41 +50,6 @@ DEVICE_IMAGE_LOAD_MEMBER(cassvisn_state::cart_load)
 	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "prg");
 	memcpy(memregion("maincpu")->base(), m_cart->get_rom_base(), size);
-
-	upd777_disassembler::populate_addr_table(m_table);
-
-	if (size == 0xfe0)
-	{
-		u8 *ROM = memregion("maincpu")->base();
-
-		u8 m_newrom[0x1000];
-		std::fill(std::begin(m_newrom), std::end(m_newrom), 0xff);
-
-		for (int realadd = 0; realadd < 0x800; realadd++)
-		{
-			int found = -1;
-			for (int checkaddr = 0; checkaddr < 0xfe0/2; checkaddr++)
-			{
-				if (m_table[checkaddr] == realadd)
-					found = checkaddr;
-			}
-
-			if (found != -1)
-			{
-				m_newrom[(realadd * 2) + 1] = ROM[(found * 2) + 0];
-				m_newrom[(realadd * 2) + 0] = ROM[(found * 2) + 1];
-			}
-		}
-
-		FILE *fp;
-		fp=fopen("rearranged_rom.bin", "w+b");
-		if (fp)
-		{
-			fwrite(m_newrom, 0x1000, 1, fp);
-			fclose(fp);
-		}
-	}
-
 	return std::make_pair(std::error_condition(), std::string());
 }
 

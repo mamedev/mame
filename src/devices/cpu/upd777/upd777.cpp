@@ -60,8 +60,6 @@ void upd777_device::device_start()
 	state_add(STATE_GENPC, "GENPC", m_pc).noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).noshow();
 
-	upd777_disassembler::populate_addr_table(m_table);
-
 	save_item(NAME(m_pc));
 	save_item(NAME(m_icount));
 }
