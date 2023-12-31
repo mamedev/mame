@@ -980,16 +980,6 @@ TIMER_CALLBACK_MEMBER(rmnimbus_state::do_mouse)
 	int8_t  xdiff;          // Difference from previous X and Y
 	int8_t  ydiff;
 
-	uint8_t intstate_x;     // Used to calculate if we should trigger interrupt
-	uint8_t intstate_y;
-	int     xint;           // X and Y interrupts to trigger
-	int     yint;
-
-	uint8_t   mxa;          // Values of quadrature encoders for X and Y
-	uint8_t   mxb;
-	uint8_t   mya;
-	uint8_t   myb;
-
 	// Read mose positions and calculate difference from previous value
 	mouse_x = m_io_mousex->read();
 	mouse_y = m_io_mousey->read();
@@ -997,76 +987,83 @@ TIMER_CALLBACK_MEMBER(rmnimbus_state::do_mouse)
 	xdiff = m_nimbus_mouse.m_mouse_x - mouse_x;
 	ydiff = m_nimbus_mouse.m_mouse_y - mouse_y;
 
-	// convert movement into emulated movement of quadrature encoder in mouse.
-	if (xdiff < 0)
-		m_nimbus_mouse.m_mouse_pcx++;
-	else if (xdiff > 0)
-		m_nimbus_mouse.m_mouse_pcx--;
-
-	if (ydiff < 0)
-		m_nimbus_mouse.m_mouse_pcy++;
-	else if (ydiff > 0)
-		m_nimbus_mouse.m_mouse_pcy--;
-
-	// Compensate for quadrature wrap.
-	m_nimbus_mouse.m_mouse_pcx &= 0x03;
-	m_nimbus_mouse.m_mouse_pcy &= 0x03;
-
-	// get value of mouse quadrature encoders for this wheel position
-	mxa = MOUSE_XYA[m_nimbus_mouse.m_mouse_pcx]; // XA
-	mxb = MOUSE_XYB[m_nimbus_mouse.m_mouse_pcx]; // XB
-	mya = MOUSE_XYA[m_nimbus_mouse.m_mouse_pcy]; // YA
-	myb = MOUSE_XYB[m_nimbus_mouse.m_mouse_pcy]; // YB
-
-	// calculate interrupt state
-	intstate_x = (mxb ^ mxa) ^ ((m_ay8910_a & 0x40) >> 6);
-	intstate_y = (myb ^ mya) ^ ((m_ay8910_a & 0x80) >> 7);
-
-	// Generate interrupts if enabled, otherwise return values in
-	// mouse register
 	if (MOUSE_INT_ENABLED(this))
 	{
-		if ((intstate_x==1) && (m_nimbus_mouse.m_intstate_x==0))
-		{
-			xint=mxa ? EXTERNAL_INT_MOUSE_XL : EXTERNAL_INT_MOUSE_XR;
+		// bypass bios ISR and update mouse cursor position locations directly
+		address_space &space = m_maincpu->space(AS_PROGRAM);
 
-			external_int(xint, true);
+		if (xdiff)
+		{
+			uint16_t x = space.read_word_unaligned(m_nimbus_mouse.xpos_loc);
+			if ((xdiff < 0) && (x != space.read_word_unaligned(m_nimbus_mouse.xmax_loc)))
+			{
+				x++;
+			}
+			else if (x != space.read_word_unaligned(m_nimbus_mouse.xmin_loc))
+			{
+				x--;
+			}
+			space.write_word_unaligned(m_nimbus_mouse.xpos_loc, x);
 		}
 
-		if ((intstate_y==1) && (m_nimbus_mouse.m_intstate_y==0))
+		if (ydiff)
 		{
-			yint=myb ? EXTERNAL_INT_MOUSE_YD : EXTERNAL_INT_MOUSE_YU;
-
-			external_int(yint, true);
+			uint16_t y = space.read_word_unaligned(m_nimbus_mouse.ypos_loc);
+			if ((ydiff < 0) && (y != space.read_word_unaligned(m_nimbus_mouse.ymin_loc)))
+			{
+				y--;
+			}
+			else if (y != space.read_word_unaligned(m_nimbus_mouse.ymax_loc))
+			{
+				y++;
+			}
+			space.write_word_unaligned(m_nimbus_mouse.ypos_loc, y);
 		}
 	}
 	else
 	{
-		m_nimbus_mouse.m_reg0a4 &= 0xF0;
-		m_nimbus_mouse.m_reg0a4 |= ( mxb & 0x01) << 3; // XB
-		m_nimbus_mouse.m_reg0a4 |= (~mxb & 0x01) << 2; // XA
-		m_nimbus_mouse.m_reg0a4 |= (~myb & 0x01) << 1; // YA
-		m_nimbus_mouse.m_reg0a4 |= ( myb & 0x01) << 0; // YB
+		// store status to support polling operation of mouse
+		// (not tested as no software seems to use this method!)
+		m_nimbus_mouse.m_reg0a4 = 0;
+		if (xdiff < 0)
+		{
+			m_nimbus_mouse.m_reg0a4 |= CONTROLLER_RIGHT;
+		}
+		else if (xdiff > 0)
+		{
+			m_nimbus_mouse.m_reg0a4 |= CONTROLLER_LEFT;
+		}
+		if (ydiff < 0)
+		{
+			m_nimbus_mouse.m_reg0a4 |= CONTROLLER_DOWN;
+		}
+		else if (ydiff > 0)
+		{
+			m_nimbus_mouse.m_reg0a4 |= CONTROLLER_UP;
+		}
+
 	}
 
 	// Update current mouse position
 	m_nimbus_mouse.m_mouse_x = mouse_x;
 	m_nimbus_mouse.m_mouse_y = mouse_y;
-
-	// and interrupt state
-	m_nimbus_mouse.m_intstate_x=intstate_x;
-	m_nimbus_mouse.m_intstate_y=intstate_y;
 }
 
 void rmnimbus_state::mouse_js_reset()
 {
+	constexpr uint16_t bios_addresses[] = { 0x18cd, 0x196d, 0x196d, 0x1a6d, 0x1a6d, 0x1a77 };
+
 	m_nimbus_mouse.m_mouse_x=128;
 	m_nimbus_mouse.m_mouse_y=128;
-	m_nimbus_mouse.m_mouse_pcx=0;
-	m_nimbus_mouse.m_mouse_pcy=0;
-	m_nimbus_mouse.m_intstate_x=0;
-	m_nimbus_mouse.m_intstate_y=0;
-	m_nimbus_mouse.m_reg0a4=0xC0;
+
+	// calculate addresses for mouse related variable used by the bios mouse ISR
+	auto bios_base = bios_addresses[system_bios() - 1];
+	m_nimbus_mouse.xpos_loc = bios_base + 8;
+	m_nimbus_mouse.ypos_loc = bios_base + 10;
+	m_nimbus_mouse.xmin_loc = bios_base;
+	m_nimbus_mouse.ymin_loc = bios_base + 4;
+	m_nimbus_mouse.xmax_loc = bios_base + 2;
+	m_nimbus_mouse.ymax_loc = bios_base + 6;
 
 	// Setup timer to poll the mouse
 	m_nimbus_mouse.m_mouse_timer->adjust(attotime::zero, 0, attotime::from_hz(MOUSE_POLL_FREQUENCY));
@@ -1078,8 +1075,9 @@ uint8_t rmnimbus_state::nimbus_joystick_r()
 {
 	/* Only the joystick drection data is read from this port
 	   (which corresponds to the the low nibble of the selected joystick port).
-	   The joystick buttons are read from the mouse data port instead. */
-	uint8_t result = m_io_joysticks[m_selected_js_idx]->read() & 0x0f;
+	   The joystick buttons are read from the mouse data port instead.
+	   Unused bits are set to 1. */
+	uint8_t result = m_io_joysticks[m_selected_js_idx]->read() | 0xf0;
 
 	if (result & CONTROLLER_RIGHT)
 	{

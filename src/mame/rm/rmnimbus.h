@@ -227,14 +227,15 @@ private:
 	/* Mouse */
 	struct
 	{
+		uint16_t xpos_loc = 0;
+		uint16_t ypos_loc = 0;
+		uint16_t xmin_loc = 0;
+		uint16_t ymin_loc = 0;
+		uint16_t xmax_loc = 0;
+		uint16_t ymax_loc = 0;
+
 		uint8_t m_mouse_x = 0;
 		uint8_t m_mouse_y = 0;
-
-		uint8_t m_mouse_pcx = 0;
-		uint8_t m_mouse_pcy = 0;
-
-		uint8_t m_intstate_x = 0;
-		uint8_t m_intstate_y = 0;
 
 		uint8_t m_reg0a4 = 0;
 
