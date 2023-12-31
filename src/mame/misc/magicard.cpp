@@ -913,15 +913,7 @@ static INPUT_PORTS_START( simpbest )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Key Alarm")      PORT_CODE(KEYCODE_G)  // "A L A R A M" in the I/O test. 
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Hopper Full")    PORT_CODE(KEYCODE_R)
 
-	PORT_START("IN2")
-	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_OTHER )        PORT_NAME("IN2")       PORT_CODE(KEYCODE_T)
-
-	PORT_START("IN3")
-	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_OTHER )        PORT_NAME("IN3")       PORT_CODE(KEYCODE_Y)
-
 INPUT_PORTS_END
-
-
 
 
 void magicard_base_state::machine_reset()
