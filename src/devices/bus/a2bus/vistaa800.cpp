@@ -44,20 +44,55 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "imagedev/floppy.h"
 #include "vistaa800.h"
 
-/***************************************************************************
-    PARAMETERS
-***************************************************************************/
+#include "machine/wd_fdc.h"
+#include "imagedev/floppy.h"
 
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
+namespace {
 
-DEFINE_DEVICE_TYPE(A2BUS_VISTAA800, a2bus_vistaa800_device, "vistaa800", "Vista A800 8inch disk Controller Card")
+class a2bus_vistaa800_device : public device_t, public device_a2bus_card_interface
+{
+public:
+	a2bus_vistaa800_device(machine_config const &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-#define VISTAA800_ROM_REGION  "vistaa800_rom"
+	// device_a2bus_card_interface implementation
+	virtual uint8_t read_c0nx(uint8_t offset) override;
+	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
+	virtual uint8_t read_cnxx(uint8_t offset) override;
+	virtual uint8_t read_c800(uint16_t offset) override;
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+private:
+	static void floppy_formats(format_registration &fr);
+
+    // fdc handlers
+	void fdc_intrq_w(uint8_t state);
+	void fdc_drq_w(uint8_t state);
+	void fdc_sso_w(uint8_t state);
+
+	required_device<fd1797_device> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+	required_device<floppy_connector> m_floppy2;
+	required_device<floppy_connector> m_floppy3;
+	required_region_ptr<uint8_t> m_rom;
+
+	uint16_t m_dmaaddr;
+	bool m_dmaenable_read;
+	bool m_dmaenable_write;
+	uint8_t m_density;
+	uint8_t m_side;
+	uint8_t m_sso;
+
+};
+
+
 
 static void vistaa800_floppies(device_slot_interface &device)
 {
@@ -67,14 +102,32 @@ static void vistaa800_floppies(device_slot_interface &device)
 	device.option_add("8dsdd",  FLOPPY_8_DSDD);       // 77 trks ds dd 8"
 }
 
-ROM_START( vistaa800 )
-	ROM_REGION(0x0800, VISTAA800_ROM_REGION, 0)
+ROM_START(vistaa800)
+	ROM_REGION(0x0800, "vistaa800_rom", 0)
 	ROM_LOAD( "vista a800 boot 3.1.bin", 0x000000, 0x000800, CRC(22df90b8) SHA1(8e0b4f4c6c467e2280bd250ee54f471728640964) )
 ROM_END
 
-//-------------------------------------------------
-//  device_add_mconfig - add device configuration
-//-------------------------------------------------
+
+a2bus_vistaa800_device::a2bus_vistaa800_device(machine_config const &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, A2BUS_VISTAA800, tag, owner, clock),
+	device_a2bus_card_interface(mconfig, *this),
+	m_fdc(*this, "fdc"),
+	m_floppy0(*this, "fdc:0"),
+	m_floppy1(*this, "fdc:1"),
+	m_floppy2(*this, "fdc:2"),
+	m_floppy3(*this, "fdc:3"),
+	m_rom(*this, "vistaa800_rom")
+{
+}
+
+//----------------------------------------------
+//  device_t implementation
+//----------------------------------------------
+
+const tiny_rom_entry *a2bus_vistaa800_device::device_rom_region() const
+{
+	return ROM_NAME(vistaa800);
+}
 
 void a2bus_vistaa800_device::device_add_mconfig(machine_config &config)
 {
@@ -88,40 +141,6 @@ void a2bus_vistaa800_device::device_add_mconfig(machine_config &config)
 	m_fdc->drq_wr_callback().set(FUNC(a2bus_vistaa800_device::fdc_drq_w));
 	m_fdc->sso_wr_callback().set(FUNC(a2bus_vistaa800_device::fdc_sso_w));
 }
-
-//-------------------------------------------------
-//  rom_region - device-specific ROM region
-//-------------------------------------------------
-
-const tiny_rom_entry *a2bus_vistaa800_device::device_rom_region() const
-{
-	return ROM_NAME( vistaa800 );
-}
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-a2bus_vistaa800_device::a2bus_vistaa800_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, type, tag, owner, clock),
-	device_a2bus_card_interface(mconfig, *this),
-	m_fdc(*this, "fdc"),
-	m_floppy0(*this, "fdc:0"),
-	m_floppy1(*this, "fdc:1"),
-	m_floppy2(*this, "fdc:2"),
-	m_floppy3(*this, "fdc:3"),
-	m_rom(*this, VISTAA800_ROM_REGION)
-{
-}
-
-a2bus_vistaa800_device::a2bus_vistaa800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	a2bus_vistaa800_device(mconfig, A2BUS_VISTAA800, tag, owner, clock)
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
 
 void a2bus_vistaa800_device::device_start()
 {
@@ -143,9 +162,9 @@ void a2bus_vistaa800_device::device_reset()
 	m_sso = 0;
 }
 
-/*-------------------------------------------------
-    read_c0nx - called for reads from this card's c0nx space
--------------------------------------------------*/
+//----------------------------------------------
+//  device_a2bus_card_interface implementation
+//----------------------------------------------
 
 uint8_t a2bus_vistaa800_device::read_c0nx(uint8_t offset)
 {
@@ -194,11 +213,6 @@ uint8_t a2bus_vistaa800_device::read_c0nx(uint8_t offset)
 	return result;
 }
 
-
-/*-------------------------------------------------
-    write_c0nx - called for writes to this card's c0nx space
--------------------------------------------------*/
-
 void a2bus_vistaa800_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	floppy_image_device *floppy = nullptr;
@@ -218,28 +232,23 @@ void a2bus_vistaa800_device::write_c0nx(uint8_t offset, uint8_t data)
 			
 		case 8:
 			m_dmaaddr = (m_dmaaddr & 0xff00) + data;
-			//logerror("set dma low address: %04X\n", m_dmaaddr);
 			break;
 
 		case 9:
 			m_dmaaddr = (m_dmaaddr & 0x00ff) + (data << 8);
-			//logerror("set dma high address: %04X\n", m_dmaaddr);
 			break;
 
 		case 0xa:
 			m_dmaenable_read = true;
-			//logerror("dma enable read\n");
 			break;
 
 		case 0xb:
 			m_dmaenable_write = true;
-			//logerror("dma enable write\n");
 			break;
 
 		case 0xc:
 			m_dmaenable_read = false;
 			m_dmaenable_write = false;
-			//logerror("dma enable off\n");
 			break;
 
 		case 0xd:
@@ -267,10 +276,6 @@ void a2bus_vistaa800_device::write_c0nx(uint8_t offset, uint8_t data)
 	}
 }
 
-/*-------------------------------------------------
-    read_cnxx - called for reads from this card's cnxx space
--------------------------------------------------*/
-
 uint8_t a2bus_vistaa800_device::read_cnxx(uint8_t offset)
 {
 	return m_rom[offset];
@@ -281,15 +286,14 @@ uint8_t a2bus_vistaa800_device::read_c800(uint16_t offset)
 	return m_rom[offset];
 }
 
-/*-------------------------------------------------
-    fdc handlers
--------------------------------------------------*/
+//-------------------------------------------------
+//    fdc handlers
+//-------------------------------------------------
 
 void a2bus_vistaa800_device::fdc_intrq_w(uint8_t state)
 {
 	m_dmaenable_read = false;
 	m_dmaenable_write = false;
-	//logerror("dma finished - off\n");
 }
 
 void a2bus_vistaa800_device::fdc_drq_w(uint8_t state)
@@ -316,3 +320,8 @@ void a2bus_vistaa800_device::fdc_sso_w(uint8_t state)
 {
 	m_sso = state; // Todo: needs to be verified on real h/w. This is meant to be from the drive
 }
+
+} // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_VISTAA800, device_a2bus_card_interface, a2bus_vistaa800_device, "vistaa800", "Vista A800 8inch disk Controller Card")
