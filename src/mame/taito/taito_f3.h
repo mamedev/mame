@@ -261,14 +261,18 @@ protected:
 		fixed8 reg_sy{0};
 		fixed8 reg_fx_y{0};
 	};
+	
+	struct pri_alpha { u8 pri; u8 alpha; };
 
 	struct f3_line_inf {
+		int y{0};
+		pri_alpha pri_alp[432]{};
 		// 5000/4000
 		clip_plane_inf clip[NUM_CLIPPLANES];
 		// 6000 - don't store sync reg ?
 		// pivot_control, sprite alpha
 		// 6200 - define this type better
-		u16 blend{0x0000};
+		u8 blend[4]{0}; // less 0 - 8 more
 		// 6400
 		u8 x_sample{0}; // mosaic effect
 		u8 fx_6400{0}; // unemulated other effects
@@ -282,9 +286,12 @@ protected:
 		playfield_inf pf[NUM_PLAYFIELDS];
 	};
 
-	virtual void draw_line(u32* dst, int y, int xs, int xe, sprite_inf* sp);
-	virtual void draw_line(u32* dst, int y, int xs, int xe, playfield_inf* pf);
-	virtual void draw_line(u32* dst, int y, int xs, int xe, pivot_inf* pv);
+	void blend_s(bool a, bool b, bool sel, u8 prio, const u8 *blendvals, pri_alpha &pri_alp, u32 &dst, u32 src);
+	void blend_d(bool a, bool b, bool sel, u8 prio, const u8 *blendvals, pri_alpha &pri_alp, u32 &dst, u32 src);
+	
+	virtual void draw_line(pen_t* dst, f3_line_inf &line, int xs, int xe, sprite_inf* sp);
+	virtual void draw_line(pen_t* dst, f3_line_inf &line, int xs, int xe, playfield_inf* pf);
+	virtual void draw_line(pen_t* dst, f3_line_inf &line, int xs, int xe, pivot_inf* pv);
 
 	int m_game = 0;
 	tilemap_t *m_tilemap[8] = {nullptr};
