@@ -31,10 +31,10 @@ The following games exist for this platform
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="cassvisn_cart">
 			<dataarea name="prg" size="0x1000">
-				<rom name="d777c005prog.rom" size="0x1000" crc="2186050b" sha1="4f8e1345aedb6226570c9fc34c770ac6031ee419" loadflag="load16_word_swap"/>
+				<rom name="d777c005prog.s01" size="0x1000" crc="2186050b" sha1="4f8e1345aedb6226570c9fc34c770ac6031ee419" loadflag="load16_word_swap"/>
 			</dataarea>			
 			<dataarea name="pat" size="0x4d0">
-				<rom name="d777c005_pat.bin" size="0x4d0" crc="bf085553" sha1="321262b6dd67789e03db8f03160cb1819529f43c"/>
+				<rom name="d777c005_pat.s01" size="0x4d0" crc="bf085553" sha1="321262b6dd67789e03db8f03160cb1819529f43c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -45,10 +45,10 @@ The following games exist for this platform
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="cassvisn_cart">
 			<dataarea name="prg" size="0x1000">
-				<rom name="d778c_prog.rom" size="0x1000" crc="9f3d89e9" sha1="8283846873dc210a0b9ac166156760e852627326" loadflag="load16_word_swap"/>
+				<rom name="d778c_prog.s01" size="0x1000" crc="9f3d89e9" sha1="8283846873dc210a0b9ac166156760e852627326" loadflag="load16_word_swap"/>
 			</dataarea>
 			<dataarea name="pat" size="0x4d0">
-				<rom name="d778c_pat.bin" size="0x4d0" crc="603fa141" sha1="e30f5ce85d8e2419025d52a7c733be2c127cc24f"/>
+				<rom name="d778c_pat.s01" size="0x4d0" crc="603fa141" sha1="e30f5ce85d8e2419025d52a7c733be2c127cc24f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -60,10 +60,10 @@ The following games exist for this platform
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="cassvisn_cart">
 			<dataarea name="prg" size="0x1000">
-				<rom name="d777c007prog.rom" size="0x1000" crc="4be305ea" sha1="b2c62470e6e0fc49d2394c6920b6d222f40ee737" loadflag="load16_word_swap"/>
+				<rom name="d777c007prog.s01" size="0x1000" crc="4be305ea" sha1="b2c62470e6e0fc49d2394c6920b6d222f40ee737" loadflag="load16_word_swap"/>
 			</dataarea>				
 			<dataarea name="pat" size="0x4d0">
-				<rom name="d777c007_pat.bin" size="0x4d0" crc="d343eca4" sha1="e8f0312de0d7f0934a66192c1aaa2c802532b021"/>
+				<rom name="d777c007_pat.s01" size="0x4d0" crc="d343eca4" sha1="e8f0312de0d7f0934a66192c1aaa2c802532b021"/>
 			</dataarea>
 		</part>
 	</software>
@@ -74,10 +74,10 @@ The following games exist for this platform
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="cassvisn_cart">
 			<dataarea name="prg" size="0x1000">
-				<rom name="d777c004prog.rom" size="0x1000" crc="668c9eb1" sha1="3fd5a6406b1fa5cecb9faf318739fece84702041" loadflag="load16_word_swap"/>
+				<rom name="d777c004prog.s01" size="0x1000" crc="668c9eb1" sha1="3fd5a6406b1fa5cecb9faf318739fece84702041" loadflag="load16_word_swap"/>
 			</dataarea>		
 			<dataarea name="pat" size="0x4d0">
-				<rom name="d777c004_pat.bin" size="0x4d0" crc="7df5eb39" sha1="c59f6febf5f51eebc0cc8d288df6b5319510ecbf"/>
+				<rom name="d777c004_pat.s01" size="0x4d0" crc="7df5eb39" sha1="c59f6febf5f51eebc0cc8d288df6b5319510ecbf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -89,10 +89,10 @@ The following games exist for this platform
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="cassvisn_cart">
 			<dataarea name="prg" size="0x1000">
-				<rom name="d774cprog.rom" size="0x1000" crc="11384125" sha1="c8f23af540017516d143b1cc7783835604350c3b" loadflag="load16_word_swap"/>
+				<rom name="d774cprog.s01" size="0x1000" crc="11384125" sha1="c8f23af540017516d143b1cc7783835604350c3b" loadflag="load16_word_swap"/>
 			</dataarea>
 			<dataarea name="pat" size="0x4d0">
-				<rom name="d774c_pat.bin" size="0x4d0" crc="5efbc1f4" sha1="1c5774113c554e26e8d0b7002d2f7b9d79107c82"/>
+				<rom name="d774c_pat.s01" size="0x4d0" crc="5efbc1f4" sha1="1c5774113c554e26e8d0b7002d2f7b9d79107c82"/>
 			</dataarea>
 		</part>
 	</software>
@@ -103,10 +103,10 @@ The following games exist for this platform
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="cassvisn_cart">
 			<dataarea name="prg" size="0x1000">
-				<rom name="d777c008prog.rom" size="0x1000" crc="8178fa14" sha1="c99332a830446e6e627529c71efc23177a1fcd83" loadflag="load16_word_swap"/>
+				<rom name="d777c008prog.s01" size="0x1000" crc="8178fa14" sha1="c99332a830446e6e627529c71efc23177a1fcd83" loadflag="load16_word_swap"/>
 			</dataarea>
 			<dataarea name="pat" size="0x4d0">
-				<rom name="d777c008_pat.bin" size="0x4d0" crc="e17f5d04" sha1="4393b21d3ef4e98ebf8d25ffb9b3f287fbbb23cb"/>
+				<rom name="d777c008_pat.s01" size="0x4d0" crc="e17f5d04" sha1="4393b21d3ef4e98ebf8d25ffb9b3f287fbbb23cb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -117,10 +117,10 @@ The following games exist for this platform
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="cassvisn_cart">
 			<dataarea name="prg" size="0x1000">
-				<rom name="d777c002prog.rom" size="0x1000" crc="fc351c7e" sha1="7473eb9d5612dcd633aa522c8a678a47159e5196" loadflag="load16_word_swap"/>
+				<rom name="d777c002prog.s01" size="0x1000" crc="fc351c7e" sha1="7473eb9d5612dcd633aa522c8a678a47159e5196" loadflag="load16_word_swap"/>
 			</dataarea>
 			<dataarea name="pat" size="0x4d0">
-				<rom name="d777c002_pat.bin" size="0x4d0" crc="434209f8" sha1="e783cb265618c598ad614bf29c833f3e47ee6487"/>
+				<rom name="d777c002_pat.s01" size="0x4d0" crc="434209f8" sha1="e783cb265618c598ad614bf29c833f3e47ee6487"/>
 			</dataarea>
 		</part>
 	</software>
@@ -131,10 +131,10 @@ The following games exist for this platform
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="cassvisn_cart">
 			<dataarea name="prg" size="0x1000">
-				<rom name="d777c009prog.rom" size="0x1000" crc="3b64280f" sha1="db8ae1547aa509613f07dc83cf2975649b71ba0e" loadflag="load16_word_swap"/>
+				<rom name="d777c009prog.s01" size="0x1000" crc="3b64280f" sha1="db8ae1547aa509613f07dc83cf2975649b71ba0e" loadflag="load16_word_swap"/>
 			</dataarea>
 			<dataarea name="pat" size="0x4d0">
-				<rom name="d777c009_pat.bin" size="0x4d0" crc="75deffbd" sha1="4f4c25fa9f96a345f7128ff0b52de315117da549"/>
+				<rom name="d777c009_pat.s01" size="0x4d0" crc="75deffbd" sha1="4f4c25fa9f96a345f7128ff0b52de315117da549"/>
 			</dataarea>
 		</part>
 	</software>
@@ -145,10 +145,10 @@ The following games exist for this platform
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="cassvisn_cart">
 			<dataarea name="prg" size="0x1000">
-				<rom name="d777c010prog.rom" size="0x1000" crc="eef371ef" sha1="755c9e9f883041a188b13dcf75a05316e38bb082" loadflag="load16_word_swap"/>
+				<rom name="d777c010prog.s01" size="0x1000" crc="eef371ef" sha1="755c9e9f883041a188b13dcf75a05316e38bb082" loadflag="load16_word_swap"/>
 			</dataarea>
 			<dataarea name="pat" size="0x4d0">
-				<rom name="d777c010_pat.bin" size="0x4d0" crc="8b0c00bd" sha1="6fc01434fd92172eeaa7600742525ed69ecb90c2"/>
+				<rom name="d777c010_pat.s01" size="0x4d0" crc="8b0c00bd" sha1="6fc01434fd92172eeaa7600742525ed69ecb90c2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -159,10 +159,10 @@ The following games exist for this platform
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="cassvisn_cart">
 			<dataarea name="prg" size="0x1000">
-				<rom name="d777c013prog.rom" size="0x1000" crc="b95c62f9" sha1="1142ab809ea51ddabcc4dc91f24d857987a00b13" loadflag="load16_word_swap"/>
+				<rom name="d777c013prog.s01" size="0x1000" crc="b95c62f9" sha1="1142ab809ea51ddabcc4dc91f24d857987a00b13" loadflag="load16_word_swap"/>
 			</dataarea>
 			<dataarea name="pat" size="0x4d0">
-				<rom name="d777c013_pat.bin" size="0x4d0" crc="abf87caa" sha1="dd629bd43bea70ece9f9cd25b70eeef1caf72828"/>
+				<rom name="d777c013_pat.s01" size="0x4d0" crc="abf87caa" sha1="dd629bd43bea70ece9f9cd25b70eeef1caf72828"/>
 			</dataarea>
 		</part>
 	</software>
@@ -173,10 +173,10 @@ The following games exist for this platform
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="cassvisn_cart">
 			<dataarea name="prg" size="0x1000">
-				<rom name="d777c015prog.rom" size="0x1000" crc="a4ba0e87" sha1="f869e6892c3aa942d85d3cd42f0dd4ddc6312d9d" loadflag="load16_word_swap"/>
+				<rom name="d777c015prog.s01" size="0x1000" crc="a4ba0e87" sha1="f869e6892c3aa942d85d3cd42f0dd4ddc6312d9d" loadflag="load16_word_swap"/>
 			</dataarea>
 			<dataarea name="pat" size="0x4d0">
-				<rom name="d777c015_pat.bin" size="0x4d0" crc="51654eb2" sha1="e5e602a7c5dd2725b67235d401203ddd398bee9b"/>
+				<rom name="d777c015_pat.s01" size="0x4d0" crc="51654eb2" sha1="e5e602a7c5dd2725b67235d401203ddd398bee9b"/>
 			</dataarea>
 		</part>
 	</software>

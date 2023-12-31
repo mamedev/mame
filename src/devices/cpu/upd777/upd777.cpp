@@ -61,7 +61,6 @@ void upd777_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).noshow();
 
 	save_item(NAME(m_pc));
-	save_item(NAME(m_icount));
 }
 
 void upd777_device::device_reset()
