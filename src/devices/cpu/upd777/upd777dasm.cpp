@@ -86,12 +86,12 @@ offs_t upd777_disassembler::disassemble(std::ostream &stream, offs_t pc, const u
 	else if (inst >= 0x800 && inst < 0xc00) // 800 - bff
 	{
 		// Move K[10:1] to A[10:1], Jump to A[11:1]
-		util::stream_format(stream, "JP 0x%03x", inst & 0x3ff);
+		util::stream_format(stream, "JP A11 | 0x%03x (%01x:%02x)", inst & 0x3ff, (inst & 0x380)>>7, inst & 0x07f);
 	}
 	else if (inst >= 0xc00 && inst < 0x1000) // c00 - fff
 	{
 		// Move K[10:1] to A[10:1], 0 to A11, Jump to A[11:1], Push next A[11:1] up to ROM address stack
-		util::stream_format(stream, "JS 0x%03x", inst & 0x3ff);
+		util::stream_format(stream, "JS 0x%03x (%01x:%02x)", inst & 0x3ff, (inst & 0x380)>>7, inst & 0x07f);
 	}
 	else
 	{
