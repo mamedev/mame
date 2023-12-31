@@ -8,25 +8,18 @@ upd777_disassembler::upd777_disassembler()
 	: util::disasm_interface()
 {
 	// init lfsr pc lut
-	for (u32 i = 0, pc = 0; i < 0x80; i++)
+	for (u32 i = 0, pc = 0; i < 0x7f; i++)
 	{
 		m_l2r[i] = pc;
 		m_r2l[pc] = i;
-
-		printf("pc %02x\n", pc);
-
 		int top1 = (pc & 0x40) >> 6;
 		int top2 = (pc & 0x20) >> 5;
 		int nor = (top1 ^ top2) ^ 1;
 		pc = (pc << 1) | nor;
 		pc &= 0x7f;
-
 	}
-}
-
-u32 upd777_disassembler::opcode_alignment() const
-{
-	return 1;
+	m_l2r[0x7f] = 0x7f;
+	m_r2l[0x7f] = 0x7f;
 }
 
 offs_t upd777_disassembler::disassemble(std::ostream &stream, offs_t pc, const upd777_disassembler::data_buffer &opcodes, const upd777_disassembler::data_buffer &params)
