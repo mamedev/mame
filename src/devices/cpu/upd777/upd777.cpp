@@ -11,7 +11,7 @@
 #include "logmacro.h"
 
 // device type definitions
-DEFINE_DEVICE_TYPE(UPD777, upd777_device, "upd777", "uPD777")
+DEFINE_DEVICE_TYPE(UPD777, upd777_device, "upd777", "NEC uPD777")
 
 
 
