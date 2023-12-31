@@ -65,11 +65,12 @@ public:
 	exp85_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "u100")
+		, m_i8355(*this, "u105")
 		, m_i8155(*this, "u106")
 		, m_rs232(*this, "rs232")
 		, m_cassette(*this, "cassette")
 		, m_speaker(*this, "speaker")
-		, m_rom(*this, "u105")
+		, m_rom(*this, "u105") // the 8355 chip contains the monitor ROM  
 		, m_extended_ram(*this, "extended_ram")
 		, m_is_preparing_interrupt_call(false)
 		, m_ignore_timer_out(true)
@@ -101,7 +102,8 @@ private:
 
 	// Member variables
 	required_device<i8085a_cpu_device> m_maincpu;
-	required_device<i8155_device> m_i8155;
+	required_device<i8355_device> m_i8355;
+	required_device<i8155_device> m_i8155;	
 	required_device<rs232_port_device> m_rs232;
 	required_device<cassette_image_device> m_cassette;
 	required_device<speaker_sound_device> m_speaker;
@@ -123,18 +125,18 @@ void exp85_state::exp85_mem(address_map &map)
 	map(0x0000, 0x2000).bankrw("bank1");
 	// Microsoft Basic ROM
 	map(0xc000, 0xdfff).rom();
-	// monitor ROM in the 8355 chip.
-	map(0xf000, 0xf7ff).r("u105", FUNC(i8355_device::memory_r));
+	// Monitor ROM in the 8355 chip
+	map(0xf000, 0xf7ff).r(m_i8355, FUNC(i8355_device::memory_r));
 	// 256 bytes of RAM of level A in the 8155 chip.
-	map(0xf800, 0xf8ff).rw("u106", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
+	map(0xf800, 0xf8ff).rw(m_i8155, FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
 }
 
 void exp85_state::exp85_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0xf0, 0xf3).rw("u105", FUNC(i8355_device::io_r), FUNC(i8355_device::io_w));
-	map(0xf8, 0xfd).rw("u106", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
+	map(0xf0, 0xf3).rw(m_i8355, FUNC(i8355_device::io_r), FUNC(i8355_device::io_w));
+	map(0xf8, 0xfd).rw(m_i8155, FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
 }
 
 /* Input Ports */
@@ -151,7 +153,6 @@ INPUT_CHANGED_MEMBER( exp85_state::trigger_rst75 )
 }
 
 static INPUT_PORTS_START( exp85 )
-
 	PORT_START("SPECIAL")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("R") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, exp85_state, trigger_reset, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("I") PORT_CODE(KEYCODE_F2) PORT_CHANGED_MEMBER(DEVICE_SELF, exp85_state, trigger_rst75, 0)
@@ -248,15 +249,15 @@ void exp85_state::status_out(u8 status)
 		m_is_preparing_interrupt_call = true;
 		membank("bank1")->set_entry(LOW_MEMORY_ROM_MIRROR_ENTRY);
 	} 
-	else if (m_is_preparing_interrupt_call && (current_pc & 0xFF00) == 0x0000)
+	else if (m_is_preparing_interrupt_call && (current_pc & 0xff00) == 0x0000)
 	{
 		// Avoids setting the lower memory back to RAM until
 		// it branches to the interrupt handler.
 		m_is_preparing_interrupt_call = false;
 	} 
-	else if (!m_is_preparing_interrupt_call && (current_pc & 0xF000) == 0xF000 && membank("bank1")->entry() == LOW_MEMORY_ROM_MIRROR_ENTRY)
+	else if (!m_is_preparing_interrupt_call && (current_pc & 0xf000) == 0xf000 && membank("bank1")->entry() == LOW_MEMORY_ROM_MIRROR_ENTRY)
 	{
-		// When the interrupt handler is executing and the address is >= 0xF000
+		// When the interrupt handler is executing and the address is >= 0xf000
 		// the low memory is mapped to RAM
 		membank("bank1")->set_entry(LOW_MEMORY_RAM_ENTRY);
 	} 
@@ -349,9 +350,9 @@ void exp85_state::exp85(machine_config &config)
 	m_i8155->out_to_callback().set(FUNC(exp85_state::to_change));
 
 
-	i8355_device &i8355(I8355(config, "u105", 6.144_MHz_XTAL/2));
-	i8355.in_pa().set(FUNC(exp85_state::i8355_a_r));
-	i8355.out_pa().set(FUNC(exp85_state::i8355_a_w));
+	I8355(config, m_i8355, 6.144_MHz_XTAL/2);
+	m_i8355->in_pa().set(FUNC(exp85_state::i8355_a_r));
+	m_i8355->out_pa().set(FUNC(exp85_state::i8355_a_w));
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
