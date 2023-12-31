@@ -1088,30 +1088,35 @@ static int mosaic(int x, int sample) {
 
 void taito_f3_state::blend_s(bool a, bool b, bool sel, u8 prio, const u8 *blendvals, pri_alpha &pri_alp, u32 &dst, u32 src)
 {
+	int al_a = std::min(255, blendvals[sel] * 32);
+	int al_b = std::min(255, blendvals[2 + sel] * 32);
+	if (b)
+		std::swap(al_a, al_b);
+	rgb_t rgb{src};
+	dst = rgb.scale8(al_b).set_a(255);
+	pri_alp.pri = prio;
+	pri_alp.alpha = al_a;
+}
+void taito_f3_state::blend_o(bool a, bool b, bool sel, u8 prio, const u8 *blendvals, pri_alpha &pri_alp, u32 &dst, u32 src)
+{
 	const int al_a = std::min(255, blendvals[sel] * 32);
 	const int al_b = std::min(255, blendvals[2 + sel] * 32);
-	rgb_t rgb{src};
-	if (a || b) {
-		dst = rgb.scale8(al_b).set_a(255);
-		pri_alp.pri = prio;
-		pri_alp.alpha = al_a;
-	} else if (sel) { // opaque mode, brightness
-		dst = (rgb.scale8(al_b) + rgb.scale8(al_a)).set_a(255);
-		pri_alp.pri = prio;
-		pri_alp.alpha = 0;
-	} else {
-		dst = rgb;
-		pri_alp.pri = prio;
-		pri_alp.alpha = 0;
-	}
+	//const int al_c = std::min<u8>(255, pri_alp.alpha);
+	rgb_t rgb1{src};
+	rgb_t rgb2{src};
+	dst = (rgb1.scale8(al_b) + rgb2.scale8(al_a)).set_a(255);
+	//logerror("[prio: %d] a: %d, b: %d [%08X -> %08X]", prio, al_a, al_b, src, dst);
+	pri_alp.pri = prio;
+	pri_alp.alpha = 0;
 }
 void taito_f3_state::blend_d(bool a, bool b, bool sel, u8 prio, const u8 *blendvals, pri_alpha &pri_alp, u32 &dst, u32 src)
 {
 	const int al_a = std::min(255, blendvals[sel] * 32);
 	const int al_b = std::min(255, blendvals[2 + sel] * 32);
 	const int al_c = std::min<u8>(255, pri_alp.alpha);
-	rgb_t rgb{src};
-	dst += (rgb.scale8(al_b) + rgb.scale8(al_a)).scale8(al_c).set_a(255);
+	rgb_t rgb1{src};
+	rgb_t rgb2{src};
+	dst += (rgb1.scale8(al_b) + rgb2.scale8(al_a)).scale8(al_c).set_a(255);
 	pri_alp.alpha = 0;
 }
 
@@ -1126,18 +1131,22 @@ void taito_f3_state::draw_line(pen_t* dst, f3_line_inf &line, int xs, int xe, sp
 		if (sp->prio() > line.pri_alp[x].pri || (opaque && (line.pri_alp[x].alpha != 0))) {
 
 			if (const u16 col = src[x]) { // 0 = transparent
-				if (line.pri_alp[x].alpha != 0) {
-					blend_d(!sp->blend_a(), !sp->blend_b(), sp->brightness,
+				if (opaque && (line.pri_alp[x].alpha != 0)) {
+					blend_d(!sp->blend_a(), sp->blend_b(), sp->brightness,
+							sp->prio(), line.blend, line.pri_alp[x],
+							dst[x], clut[col]);
+				} else if (opaque) {
+					blend_o(!sp->blend_a(), sp->blend_b(), sp->brightness,
 							sp->prio(), line.blend, line.pri_alp[x],
 							dst[x], clut[col]);
 				} else {
-					blend_s(!sp->blend_a(), !sp->blend_b(), sp->brightness,
+					blend_s(!sp->blend_a(), sp->blend_b(), sp->brightness,
 							sp->prio(), line.blend, line.pri_alp[x],
 							dst[x], clut[col]);
 				}
-			}
+				}
 		}
-	}
+		}
 }
 
 
@@ -1152,6 +1161,7 @@ void taito_f3_state::draw_line(pen_t* dst, f3_line_inf &line, int xs, int xe, pl
 	fx_x += 10*((pf->x_scale)-(1<<8));
 	fx_x &= (m_width_mask << 8) | 0xff;
 
+	logerror("= playfield =\n"); 
 	const bool opaque = !pf->blend_b() && !pf->blend_a();
 	//logerror("pri/alp: %X %X\n", line.pri_alp[180].pri, line.pri_alp[180].alpha);
 	for (int x = xs; x < xe; x++) {
@@ -1163,12 +1173,17 @@ void taito_f3_state::draw_line(pen_t* dst, f3_line_inf &line, int xs, int xe, pl
 			if (!(flags[x_index] & 0xf0))
 				continue;
 			if (const u16 col = src[x_index]) {
-				if (line.pri_alp[x].alpha != 0) {
-					blend_d(pf->blend_a(), pf->blend_b(), flags[x_index] & 0x1,
+				const bool sel = flags[x_index] & 0x1; 
+				if (opaque && (line.pri_alp[x].alpha != 0)) {
+					blend_d(pf->blend_a(), pf->blend_b(), sel,
+							pf->prio(), line.blend, line.pri_alp[x],
+							dst[x], clut[col]);
+				} else if (opaque) {
+					blend_o(pf->blend_a(), pf->blend_b(), sel,
 							pf->prio(), line.blend, line.pri_alp[x],
 							dst[x], clut[col]);
 				} else {
-					blend_s(pf->blend_a(), pf->blend_b(), flags[x_index] & 0x1,
+					blend_s(pf->blend_a(), pf->blend_b(), sel,
 							pf->prio(), line.blend, line.pri_alp[x],
 							dst[x], clut[col]);
 				}
@@ -1198,12 +1213,17 @@ void taito_f3_state::draw_line(pen_t* dst, f3_line_inf &line, int xs, int xe, pi
 			if (!(flagsbitmap[x_index] & 0xf0))
 				continue;
 			if (u16 col = srcbitmap[x_index]) {
-				if (line.pri_alp[x].alpha != 0) {
-					blend_d(pv->blend_a(), pv->blend_b(), 0,
+				const bool sel = false;
+				if (opaque && (line.pri_alp[x].alpha != 0)) {
+					blend_d(pv->blend_a(), pv->blend_b(), sel,
+							pv->prio(), line.blend, line.pri_alp[x],
+							dst[x], clut[col]);
+				} else if (opaque) {
+					blend_o(pv->blend_a(), pv->blend_b(), sel,
 							pv->prio(), line.blend, line.pri_alp[x],
 							dst[x], clut[col]);
 				} else {
-					blend_s(pv->blend_a(), pv->blend_b(), 0,
+					blend_s(pv->blend_a(), pv->blend_b(), sel,
 							pv->prio(), line.blend, line.pri_alp[x],
 							dst[x], clut[col]);
 				}

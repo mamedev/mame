@@ -287,6 +287,7 @@ protected:
 	};
 
 	void blend_s(bool a, bool b, bool sel, u8 prio, const u8 *blendvals, pri_alpha &pri_alp, u32 &dst, u32 src);
+	void blend_o(bool a, bool b, bool sel, u8 prio, const u8 *blendvals, pri_alpha &pri_alp, u32 &dst, u32 src);
 	void blend_d(bool a, bool b, bool sel, u8 prio, const u8 *blendvals, pri_alpha &pri_alp, u32 &dst, u32 src);
 	
 	virtual void draw_line(pen_t* dst, f3_line_inf &line, int xs, int xe, sprite_inf* sp);
