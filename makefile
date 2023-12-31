@@ -20,6 +20,7 @@
 # TARGET = mame
 # SUBTARGET = tiny
 # TOOLS = 1
+# EMULATOR = 1
 # TESTS = 1
 # BENCHMARKS = 1
 # OSD = sdl
@@ -647,6 +648,14 @@ endif
 ifdef TOOLS
 ifneq '$(TOOLS)' '0'
 PARAMS += --with-tools
+endif
+endif
+
+ifndef EMULATOR
+PARAMS += --with-emulator
+else
+ifeq '$(EMULATOR)' '1'
+PARAMS += --with-emulator
 endif
 endif
 
