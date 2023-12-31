@@ -40,6 +40,7 @@ extern char const *const FMPAC;
 extern char const *const FS_SR021;
 extern char const *const FS_SR022;
 extern char const *const GAMEMASTER2;
+extern char const *const GOUDA_SCSI;
 extern char const *const HALNOTE;
 extern char const *const HBI55;
 extern char const *const HFOX;

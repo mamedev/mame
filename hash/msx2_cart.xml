@@ -3778,6 +3778,55 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
+	<!-- Harddisk interfaces -->
+
+	<!-- No hardware, only an upgrade for the internal rom. -->
+	<software name="nov15966">
+		<description>MSX-SCSI Interface (Novaxis v1.59.66)</description>
+		<year>2019</year>
+		<publisher>Jurgen Kramer</publisher>
+		<info name="usage" value="Requires MSX-DOS2."/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="gouda_scsi"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="nov15956.dat" size="0x4000" crc="f4091223" sha1="5fc9aaed426872dde95fd1d48c25e18532c9f266"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- No hardware, only an upgrade for the internal rom. -->
+	<software name="nov15965" cloneof="nov15966">
+		<description>MSX-SCSI Interface (Novaxis v1.59.65)</description>
+		<year>2019</year>
+		<publisher>Jurgen Kramer</publisher>
+		<info name="usage" value="Requires MSX-DOS2."/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="gouda_scsi"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="nov15955.dat" size="0x4000" crc="8182020b" sha1="e4860092464094a41cb2e403280da831df81b221"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nov15964" cloneof="nov15966">
+		<description>MSX-SCSI Interface (Novaxis v1.59.64)</description>
+		<year>1996</year>
+		<publisher>MSX Computer Club Gouda</publisher>
+		<info name="usage" value="Requires MSX-DOS2."/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="gouda_scsi"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="nov15964.rom" size="0x4000" crc="ecf385f2" sha1="352ec8c99fe1397a88ecb3aee6dbb4d121c818e9"/>
+			</dataarea>
+		</part>
+		<part name="flop" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<!-- This was created manually from a collection of files. Needs to be properly dumped. -->
+				<rom name="tools.dsk" size="737280" crc="c0eeb656" sha1="7bdfcf691c5c32d90cd02ae81d23be8a84abdeb4" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
 <!-- Homebrew / Doujin software -->
 
 	<software name="moronslt" supported="partial">

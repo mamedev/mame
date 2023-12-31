@@ -1994,6 +1994,8 @@ if (BUSES["MSX_SLOT"]~=null) then
 		MAME_DIR .. "src/devices/bus/msx/cart/ram.h",
 		MAME_DIR .. "src/devices/bus/msx/cart/rtype.cpp",
 		MAME_DIR .. "src/devices/bus/msx/cart/rtype.h",
+		MAME_DIR .. "src/devices/bus/msx/cart/scsi.cpp",
+		MAME_DIR .. "src/devices/bus/msx/cart/scsi.h",
 		MAME_DIR .. "src/devices/bus/msx/cart/slotexpander.cpp",
 		MAME_DIR .. "src/devices/bus/msx/cart/slotexpander.h",
 		MAME_DIR .. "src/devices/bus/msx/cart/slotoptions.cpp",
