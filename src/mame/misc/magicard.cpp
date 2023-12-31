@@ -2417,6 +2417,9 @@ ROM_START( simpbest )
 	ROM_REGION( 0x0800, "mcu", 0 )  // S87C751 (2K x8 ROM) undumped
 	ROM_LOAD("s87c751.ic13",   0x0000, 0x0800, NO_DUMP )
 
+	ROM_REGION(0x10000, "nvram", 0)  // Default NVRAM
+	ROM_LOAD( "simpbest_nvram.bin", 0x00000, 0x10000, CRC(21f4115f) SHA1(bee0755f151758cc591dddd4f41cca2ffab3ec0d) )
+
 	ROM_REGION( 0x0200, "sereeprom", 0 )  // Serial EPROM
 	ROM_LOAD16_WORD_SWAP("24c04a.ic27", 0x0000, 0x0200, CRC(3189844c) SHA1(cc017f44d9db92da85c96be750ccec7ee32e5972) )
 ROM_END
