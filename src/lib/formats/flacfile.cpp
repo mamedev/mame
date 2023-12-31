@@ -58,7 +58,7 @@ static cassette_image::error flacfile_load(cassette_image *cassette)
 			return cassette_image::error::OUT_OF_MEMORY;
 		channel_samples[channel] = samples[channel].get();
 	}
-	if (!decoder.decode(channel_samples, decoder.total_samples(), false))
+	if (!decoder.decode(channel_samples, decoder.total_samples()))
 		return cassette_image::error::INVALID_IMAGE;
 	for (int channel = 0; channel < channels; channel++)
 	{
