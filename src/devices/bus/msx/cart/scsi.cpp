@@ -9,7 +9,7 @@
 
 /*
 
-Implementation of SCSI interfaces as it appeared in:
+Implementation of SCSI interface as it appeared in:
 - MSX Computer Club Gouda MSX-SCSI Interface
 
 
