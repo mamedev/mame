@@ -750,40 +750,6 @@ void taito_f3_state::palette_24bit_w(offs_t offset, u32 data, u32 mem_mask)
 		r = 15 * ((m_paletteram32[offset] >> 12) & 0xf);
 	}
 
-	/* This is weird - why are only the sprites and VRAM palettes 21 bit? */
-	else if (m_game == CLEOPATR)
-	{
-		if (offset < 0x100 || offset > 0x1000)
-		{
-			r = ((m_paletteram32[offset] >> 16) & 0x7f) << 1;
-			g = ((m_paletteram32[offset] >> 8) & 0x7f) << 1;
-			b = ((m_paletteram32[offset] >> 0) & 0x7f) << 1;
-		}
-		else
-		{
-			r = (m_paletteram32[offset] >> 16) & 0xff;
-			g = (m_paletteram32[offset] >> 8) & 0xff;
-			b = (m_paletteram32[offset] >> 0) & 0xff;
-		}
-	}
-
-	/* Another weird couple - perhaps this is alpha blending related? */
-	else if (m_game == TWINQIX || m_game == RECALH)
-	{
-		if (offset > 0x1c00)
-		{
-			r = ((m_paletteram32[offset] >> 16) & 0x7f) << 1;
-			g = ((m_paletteram32[offset] >> 8) & 0x7f) << 1;
-			b = ((m_paletteram32[offset] >> 0) & 0x7f) << 1;
-		}
-		else
-		{
-			r = (m_paletteram32[offset] >> 16) & 0xff;
-			g = (m_paletteram32[offset] >> 8) & 0xff;
-			b = (m_paletteram32[offset] >> 0) & 0xff;
-		}
-	}
-
 	/* All other games - standard 24 bit palette */
 	else
 	{
@@ -1120,7 +1086,7 @@ void taito_f3_state::blend_d(bool a, bool b, bool sel, u8 prio, const u8 *blendv
 	const int al_c = std::min<u8>(255, pri_alp.alpha);
 	rgb_t rgb1{src};
 	rgb_t rgb2{src};
-	dst += (rgb1.scale8(al_b) + rgb2.scale8(al_a)).scale8(al_c).set_a(255);
+	dst = rgb_t{dst} + (rgb1.scale8(al_b) + rgb2.scale8(al_a)).scale8(al_c).set_a(255);
 	pri_alp.alpha = 0;
 }
 
@@ -1136,15 +1102,15 @@ void taito_f3_state::draw_line(pen_t* dst, f3_line_inf &line, int xs, int xe, sp
 
 			if (const u16 col = src[x]) { // 0 = transparent
 				if (opaque && (line.pri_alp[x].alpha != 0)) {
-					blend_d(!sp->blend_a(), sp->blend_b(), sp->brightness,
+					blend_d(sp->blend_a(), sp->blend_b(), sp->brightness,
 							sp->prio(), line.blend, line.pri_alp[x],
 							dst[x], clut[col]);
 				} else if (opaque) {
-					blend_o(!sp->blend_a(), sp->blend_b(), sp->brightness,
+					blend_o(sp->blend_a(), sp->blend_b(), sp->brightness,
 							sp->prio(), line.blend, line.pri_alp[x],
 							dst[x], clut[col]);
 				} else {
-					blend_s(!sp->blend_a(), sp->blend_b(), sp->brightness,
+					blend_s(sp->blend_a(), sp->blend_b(), sp->brightness,
 							sp->prio(), line.blend, line.pri_alp[x],
 							dst[x], clut[col]);
 				}
