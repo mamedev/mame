@@ -35433,11 +35433,11 @@ Unsupported lightgun or mouse?
 		</part>
 	</software>
 
-	<software name="kolobok">
+	<software name="kolobok" cloneof="uwol">
 		<!-- This is an homebrew port of "Uwol - Quest For Money" for ZX Spectrum -->
 		<!-- Apparently it got burned to real carts and sold in Russia -->
 		<description>Kolobok ~ Pyramid (Russia)</description>
-		<year>199?</year>
+		<year>201?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="Колобок - Пирамида"/>
 		<part name="cart" interface="megadriv_cart">
