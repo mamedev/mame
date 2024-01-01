@@ -71,7 +71,7 @@ public:
 		, m_cassette(*this, "cassette")
 		, m_speaker(*this, "speaker")
 		, m_rom(*this, "u105") // the 8355 chip contains the monitor ROM  
-		, m_extended_ram(*this, "extended_ram")
+		, m_low_memory_view(*this, "low_memory_view")
 		, m_is_preparing_interrupt_call(false)
 		, m_ignore_timer_out(true)
 		, m_tape_control(0)
@@ -108,7 +108,7 @@ private:
 	required_device<cassette_image_device> m_cassette;
 	required_device<speaker_sound_device> m_speaker;
 	required_memory_region m_rom;
-	required_device<ram_device> m_extended_ram;
+	memory_view m_low_memory_view;
 
 	bool m_is_preparing_interrupt_call;
 	bool m_ignore_timer_out;
@@ -122,13 +122,18 @@ void exp85_state::exp85_mem(address_map &map)
 {
 	map.unmap_value_high();
 	// Extended RAM or mapped monitor ROM (only during interrupt and reset)
-	map(0x0000, 0x2000).bankrw("bank1");
+	map(0x0000, 0x1fff).view(m_low_memory_view);
 	// Microsoft Basic ROM
 	map(0xc000, 0xdfff).rom();
 	// Monitor ROM in the 8355 chip
-	map(0xf000, 0xf7ff).r(m_i8355, FUNC(i8355_device::memory_r));
+	map(0xf000, 0xf7ff).rom().region(m_rom, 0);
 	// 256 bytes of RAM of level A in the 8155 chip.
 	map(0xf800, 0xf8ff).rw(m_i8155, FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
+
+    // monitor ROM mirror
+	m_low_memory_view[LOW_MEMORY_ROM_MIRROR_ENTRY](0x0000, 0x07ff).rom().region(m_rom, 0);
+	// extended RAM
+	m_low_memory_view[LOW_MEMORY_RAM_ENTRY](0x0000, 0x1fff).ram();
 }
 
 void exp85_state::exp85_io(address_map &map)
@@ -144,7 +149,7 @@ void exp85_state::exp85_io(address_map &map)
 INPUT_CHANGED_MEMBER( exp85_state::trigger_reset )
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
-	membank("bank1")->set_entry(LOW_MEMORY_ROM_MIRROR_ENTRY);	
+	m_low_memory_view.select(LOW_MEMORY_ROM_MIRROR_ENTRY);
 }
 
 INPUT_CHANGED_MEMBER( exp85_state::trigger_rst75 )
@@ -247,7 +252,7 @@ void exp85_state::status_out(u8 status)
 	{
 		// When an interrupt is triggered the low memory shall be set to the ROM mirror
 		m_is_preparing_interrupt_call = true;
-		membank("bank1")->set_entry(LOW_MEMORY_ROM_MIRROR_ENTRY);
+		m_low_memory_view.select(LOW_MEMORY_ROM_MIRROR_ENTRY);
 	} 
 	else if (m_is_preparing_interrupt_call && (current_pc & 0xff00) == 0x0000)
 	{
@@ -255,11 +260,11 @@ void exp85_state::status_out(u8 status)
 		// it branches to the interrupt handler.
 		m_is_preparing_interrupt_call = false;
 	} 
-	else if (!m_is_preparing_interrupt_call && (current_pc & 0xf000) == 0xf000 && membank("bank1")->entry() == LOW_MEMORY_ROM_MIRROR_ENTRY)
+	else if (!m_is_preparing_interrupt_call && (current_pc & 0xf000) == 0xf000)
 	{
 		// When the interrupt handler is executing and the address is >= 0xf000
 		// the low memory is mapped to RAM
-		membank("bank1")->set_entry(LOW_MEMORY_RAM_ENTRY);
+		m_low_memory_view.select(LOW_MEMORY_RAM_ENTRY);
 	} 
 		
 }
@@ -286,10 +291,8 @@ void exp85_state::machine_start()
 	/* clear the trap line that is asserted on start */
 	m_maincpu->set_input_line(I8085_TRAP_LINE, CLEAR_LINE);
 
-	/* setup memory banking */
-	membank("bank1")->configure_entry(LOW_MEMORY_ROM_MIRROR_ENTRY, m_rom->base());
-	membank("bank1")->configure_entry(LOW_MEMORY_RAM_ENTRY, m_extended_ram->pointer());
-	membank("bank1")->set_entry(LOW_MEMORY_ROM_MIRROR_ENTRY);
+	/* setup memory mirror switch */
+	m_low_memory_view.select(LOW_MEMORY_ROM_MIRROR_ENTRY);
 
 	save_item(NAME(m_tape_control));
 
@@ -360,8 +363,6 @@ void exp85_state::exp85(machine_config &config)
 
 	RS232_PORT(config, "rs232", default_rs232_devices, "terminal").set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
-	/* extended RAM */
-	RAM(config, m_extended_ram).set_default_size("8K");
 }
 
 /* ROMs */
