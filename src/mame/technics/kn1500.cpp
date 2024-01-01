@@ -35,14 +35,14 @@ private:
 	required_device<upd765a_device> m_fdc;
 	required_device<hd44780_device> m_lcdc;
 
-	HD44780_PIXEL_UPDATE(kn1500_pixel_update);
-	void kn1500_palette(palette_device &palette) const;
-	void kn1500_tlcs900_porta_w(offs_t offset, uint8_t data);
-	void kn1500_tlcs900_portb_w(offs_t offset, uint8_t data);
-	void kn1500_tlcs900_port5_w(offs_t offset, uint8_t data);
-	void kn1500_tlcs900_port6_w(offs_t offset, uint8_t data);
-	void kn1500_tlcs900_port7_w(offs_t offset, uint8_t data);
-	void kn1500_mem(address_map &map);
+	HD44780_PIXEL_UPDATE(pixel_update);
+	void palette_init(palette_device &palette) const;
+	void maincpu_porta_w(offs_t offset, uint8_t data);
+	void maincpu_portb_w(offs_t offset, uint8_t data);
+	void maincpu_port5_w(offs_t offset, uint8_t data);
+	void maincpu_port6_w(offs_t offset, uint8_t data);
+	void maincpu_port7_w(offs_t offset, uint8_t data);
+	void maincpu_mem(address_map &map);
 	uint16_t dsp_lcd_r(offs_t offset);
 	void dsp_lcd_w(offs_t offset, uint16_t data);
 	uint16_t tone_generator_r(offs_t offset);
@@ -59,7 +59,7 @@ private:
 	uint8_t m_dsp_lcd_byte; // latch for data sent to DSP or Liquid Crystal
 };
 
-void kn1500_state::kn1500_mem(address_map &map)
+void kn1500_state::maincpu_mem(address_map &map)
 {
 	map(0x000000, 0x77ffff).ram(); //~CS3: MSAR3=00 MAMR3=0f
 //	map(0x000080, 0x07ffff).ram(); //~CS3: MSAR3=00 MAMR3=0f
@@ -80,8 +80,6 @@ void kn1500_state::kn1500_mem(address_map &map)
 //[:maincpu] ':maincpu' (FA049F): unmapped program memory write to DFF83A = 3200 & FF00
 //[:maincpu] ':maincpu' (FA0484): unmapped program memory write to DFF83C = 005A & 00FF
 //[:maincpu] ':maincpu' (FA048F): unmapped program memory write to DFF83C = 0000 & 00FF
-
-
 }
 
 static void kn1500_floppies(device_slot_interface &device)
@@ -102,7 +100,7 @@ static INPUT_PORTS_START(kn1500)
 INPUT_PORTS_END
 
 
-void kn1500_state::kn1500_tlcs900_porta_w(offs_t offset, uint8_t data)
+void kn1500_state::maincpu_porta_w(offs_t offset, uint8_t data)
 {
 	//int DSPRDY = BIT(data, 1);
 	//int ? = BIT(data, 2);
@@ -110,7 +108,7 @@ void kn1500_state::kn1500_tlcs900_porta_w(offs_t offset, uint8_t data)
 }
 
 
-void kn1500_state::kn1500_tlcs900_portb_w(offs_t offset, uint8_t data)
+void kn1500_state::maincpu_portb_w(offs_t offset, uint8_t data)
 {
 	//int ? = BIT(data, 0);
 	//int FDINT = BIT(data, 1);
@@ -122,19 +120,19 @@ void kn1500_state::kn1500_tlcs900_portb_w(offs_t offset, uint8_t data)
 	//int ? = BIT(data, 7);
 }
 
-void kn1500_state::kn1500_tlcs900_port5_w(offs_t offset, uint8_t data)
+void kn1500_state::maincpu_port5_w(offs_t offset, uint8_t data)
 {
 	logerror("port5_w: %02X\n", data);
 	m_mute = BIT(data, 3);
 }
 
-void kn1500_state::kn1500_tlcs900_port6_w(offs_t offset, uint8_t data)
+void kn1500_state::maincpu_port6_w(offs_t offset, uint8_t data)
 {
 	logerror("port6_w: %02X\n", data);
 	m_nreset = BIT(data, 5);
 }
 
-void kn1500_state::kn1500_tlcs900_port7_w(offs_t offset, uint8_t data)
+void kn1500_state::maincpu_port7_w(offs_t offset, uint8_t data)
 {
 	uint8_t value;
 	logerror("port7_w (LCD/DSP): %02X\n", data);
@@ -196,7 +194,7 @@ void kn1500_state::tone_generator_w(offs_t offset, uint16_t data){
 }
 
 
-void kn1500_state::kn1500_palette(palette_device &palette) const
+void kn1500_state::palette_init(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 188));
 	palette.set_pen_color(1, rgb_t(92, 83, 128));
@@ -217,7 +215,7 @@ static GFXDECODE_START( gfx_kn1500 )
 	GFXDECODE_ENTRY( "hd44780:cgrom", 0x0000, prot_charlayout, 0, 1 )
 GFXDECODE_END
 
-HD44780_PIXEL_UPDATE(kn1500_state::kn1500_pixel_update)
+HD44780_PIXEL_UPDATE(kn1500_state::pixel_update)
 {
 	if ( pos < 16 && line==0 )
 	{
@@ -234,12 +232,12 @@ void kn1500_state::kn1500(machine_config &config)
 {
 	TMP95C061(config, m_maincpu, 24_MHz_XTAL); // TMP95C061AF
 	m_maincpu->set_am8_16(0);
-	m_maincpu->set_addrmap(AS_PROGRAM, &kn1500_state::kn1500_mem);
-	m_maincpu->porta_write().set(FUNC(kn1500_state::kn1500_tlcs900_porta_w));
-	m_maincpu->portb_write().set(FUNC(kn1500_state::kn1500_tlcs900_portb_w));
-	m_maincpu->port5_write().set(FUNC(kn1500_state::kn1500_tlcs900_port5_w));
-	m_maincpu->port6_write().set(FUNC(kn1500_state::kn1500_tlcs900_port6_w));
-	m_maincpu->port7_write().set(FUNC(kn1500_state::kn1500_tlcs900_port7_w));
+	m_maincpu->set_addrmap(AS_PROGRAM, &kn1500_state::maincpu_mem);
+	m_maincpu->porta_write().set(FUNC(kn1500_state::maincpu_porta_w));
+	m_maincpu->portb_write().set(FUNC(kn1500_state::maincpu_portb_w));
+	m_maincpu->port5_write().set(FUNC(kn1500_state::maincpu_port5_w));
+	m_maincpu->port6_write().set(FUNC(kn1500_state::maincpu_port6_w));
+	m_maincpu->port7_write().set(FUNC(kn1500_state::maincpu_port7_w));
 
 	UPD765A(config, m_fdc, 24'000'000, true, true); // actual controller is UPD72070GF3BE at IC4
 	m_fdc->drq_wr_callback().set([this](int state){ m_maincpu->set_input_line(TLCS900_INT7, state); });
@@ -255,12 +253,12 @@ void kn1500_state::kn1500(machine_config &config)
 	screen.set_visarea(0, 6*16-1, 0, 9*2-1);
 	screen.set_palette("palette");
 
-	PALETTE(config, "palette", FUNC(kn1500_state::kn1500_palette), 2);
+	PALETTE(config, "palette", FUNC(kn1500_state::palette_init), 2);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_kn1500);
 
 	HD44780(config, m_lcdc, 250'000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 16);
-	m_lcdc->set_pixel_update_cb(FUNC(kn1500_state::kn1500_pixel_update));
+	m_lcdc->set_pixel_update_cb(FUNC(kn1500_state::pixel_update));
 
 
 	/* sound hardware */

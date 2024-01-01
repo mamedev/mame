@@ -17,6 +17,8 @@ namespace {
 class hdae5000_device : public device_t, public kn5000_extension_interface
 {
 public:
+	static constexpr feature_type unemulated_features() { return feature::DISK | feature::SOUND; }
+
 	hdae5000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void rom_map(address_map &map) override;

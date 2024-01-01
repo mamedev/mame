@@ -28,7 +28,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_subcpu(*this, "subcpu")
 		, m_fdc(*this, "fdc")
-		, m_CHECKING_DEVICE_LED_CN11(*this, "checking_device_led_cn11")
+		, m_checking_device_led_cn11(*this, "checking_device_led_cn11")
 		, m_extension(*this, "extension")
 	{ }
 
@@ -38,17 +38,17 @@ private:
 	required_device<tmp94c241_device> m_maincpu;
 	required_device<tmp94c241_device> m_subcpu;
 	required_device<upd72067_device> m_fdc;
-	required_device<beep_device> m_CHECKING_DEVICE_LED_CN11;
+	required_device<beep_device> m_checking_device_led_cn11;
 	required_device<kn5000_extension_device> m_extension;
 
 	virtual void machine_reset() override;
 
-//	void kn5000_tlcs900_portb_w(offs_t offset, uint8_t data);
-//	void kn5000_tlcs900_port5_w(offs_t offset, uint8_t data);
-//	void kn5000_tlcs900_port6_w(offs_t offset, uint8_t data);
-//	void kn5000_tlcs900_port7_w(offs_t offset, uint8_t data);
-	void kn5000_maincpu_mem(address_map &map);
-	void kn5000_subcpu_mem(address_map &map);
+//	void maincpu_portb_w(offs_t offset, uint8_t data);
+//	void maincpu_port5_w(offs_t offset, uint8_t data);
+//	void maincpu_port6_w(offs_t offset, uint8_t data);
+//	void maincpu_port7_w(offs_t offset, uint8_t data);
+	void maincpu_mem(address_map &map);
+	void subcpu_mem(address_map &map);
 //	uint16_t tone_generator_r(offs_t offset);
 //	void tone_generator_w(offs_t offset, uint16_t data);
 };
@@ -66,7 +66,7 @@ MSAR5: 0x00 MAMR5: 0xff  start: 0x000000  mask: 0x7fffff (8MByte)
               CS5: rhythm data at A22=1 (0x400000) (4MB)
 */
 
-void kn5000_state::kn5000_maincpu_mem(address_map &map)
+void kn5000_state::maincpu_mem(address_map &map)
 {
 	map(0x000000, 0x0fffff).ram(); // 1Mbyte = 2 * 4Mbit DRAMs @ IC9, IC10 (CS3)
 	//FIXME: map(0x110000, 0x11ffff).m(m_fdc, FUNC(upd765a_device::map)); // Floppy Controller @ IC208
@@ -82,7 +82,7 @@ void kn5000_state::kn5000_maincpu_mem(address_map &map)
 	map(0xe00000, 0xffffff).mask(0x1fffff).rom().region("program", 0); //2 * 8MBit FLASH ROMs @ IC4, IC6
 }
 
-void kn5000_state::kn5000_subcpu_mem(address_map &map)
+void kn5000_state::subcpu_mem(address_map &map)
 {
 	//map(0x??0000, 0x??ffff).r("to_subcpu_latch", FUNC(generic_latch_8_device::read)); // @ IC22
 	//map(0x??0000, 0x??ffff).w("to_maincpu_latch", FUNC(generic_latch_8_device::write)); // @ IC23
@@ -116,19 +116,19 @@ static INPUT_PORTS_START(kn5000)
 	PORT_DIPSETTING(   0x01, DEF_STR(Off))
 INPUT_PORTS_END
 
-//void kn5000_state::kn5000_tlcs900_portb_w(offs_t offset, uint8_t data)
+//void kn5000_state::maincpu_portb_w(offs_t offset, uint8_t data)
 //{
 //}
 
-//void kn5000_state::kn5000_tlcs900_port5_w(offs_t offset, uint8_t data)
+//void kn5000_state::maincpu_port5_w(offs_t offset, uint8_t data)
 //{
 //}
 
-//void kn5000_state::kn5000_tlcs900_port6_w(offs_t offset, uint8_t data)
+//void kn5000_state::maincpu_port6_w(offs_t offset, uint8_t data)
 //{
 //}
 
-//void kn5000_state::kn5000_tlcs900_port7_w(offs_t offset, uint8_t data)
+//void kn5000_state::maincpu_port7_w(offs_t offset, uint8_t data)
 //{
 //}
 
@@ -144,14 +144,14 @@ INPUT_PORTS_END
 void kn5000_state::machine_reset()
 {
 	/* Setup beep */
-	m_CHECKING_DEVICE_LED_CN11->set_state(0);
+	m_checking_device_led_cn11->set_state(0);
 }
 
 void kn5000_state::kn5000(machine_config &config)
 {
 	TMP94C241(config, m_maincpu, 8_MHz_XTAL); // TMP94C241F @ IC5
 	// Address bus is set to 32 bits by the pins AM1=+5v and AM0=GND
-	m_maincpu->set_addrmap(AS_PROGRAM, &kn5000_state::kn5000_maincpu_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &kn5000_state::maincpu_mem);
 	// Interrupt 0: CLK on "to_maincpu_latch"
 	// Interrupt 4: FDCINT
 	// Interrupt 5: FDCIRQ
@@ -162,7 +162,7 @@ void kn5000_state::kn5000(machine_config &config)
 	// ~NMI: SNS
 	// TC0: FDCTC
 	//
-	// m_maincpu->port?_write().set(FUNC(kn5000_state::kn5000_tlcs900_port?_w));
+	// m_maincpu->port?_write().set(FUNC(kn5000_state::maincpu_port?_w));
 	//
 
 	// PORT 7:
@@ -180,7 +180,7 @@ void kn5000_state::kn5000(machine_config &config)
 	//   bit 0 (input) = "check terminal" switch
 	//   bit 1 (output) = "check terminal" LED
 	m_maincpu->portc_read().set([this] { return ioport("CN11")->read(); });
-	m_maincpu->portc_write().set([this] (u8 data) { m_CHECKING_DEVICE_LED_CN11->set_state(BIT(data, 1) == 0); });
+	m_maincpu->portc_write().set([this] (u8 data) { m_checking_device_led_cn11->set_state(BIT(data, 1) == 0); });
 
 	// PORT D:
 	//   bit 0 (output) = FDCRST
@@ -232,7 +232,7 @@ void kn5000_state::kn5000(machine_config &config)
 
 	TMP94C241(config, m_subcpu, 10_MHz_XTAL); // TMP94C241F @ IC27
 	// Address bus is set to 8 bits by the pins AM1=GND and AM0=GND
-	m_subcpu->set_addrmap(AS_PROGRAM, &kn5000_state::kn5000_subcpu_mem);
+	m_subcpu->set_addrmap(AS_PROGRAM, &kn5000_state::subcpu_mem);
 	// Interrupt 0: CLK on "to_subcpu_latch"
 
 	GENERIC_LATCH_8(config, "to_maincpu_latch"); // @ IC23
@@ -272,7 +272,7 @@ void kn5000_state::kn5000(machine_config &config)
 	vga.set_vram_size(0x100000);
 	
 	// This is a quick hack to beep whenever the checking device LED is on
-	// (just because I find it easier to quickly use a CHECKING_DEVICE_LED_CN11 here for debugging)
+	// (just because I find it more convenient to listen to the beeps while debugging the driver)
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, "checking_device_led_cn11", 12_MHz_XTAL / 3200).add_route(ALL_OUTPUTS, "mono", 0.05);
 }
@@ -280,7 +280,17 @@ void kn5000_state::kn5000(machine_config &config)
 ROM_START(kn5000)
 	ROM_REGION16_LE(0x200000, "program" , 0) // main cpu
 	ROM_DEFAULT_BIOS("v10")
+
 	// FIXME: These are actually stored in a couple flash rom chips IC6 (even) and IC4 (odd)
+	//
+	// Note: These ROMs were extracted from the system update floppies which were
+	//       compressed using a variant of LZSS. There may still be problems with the
+	//       unpacking of the ROM contents. Especially in the lowest 4kbyte window.
+	//       Once we get a proper dump of the boot rom, we may have a better idea of
+	//       the decompression algorithm and then we may need to update this ROM set.
+	//
+	//       More info at:
+	//       https://github.com/felipesanches/kn5000_homebrew/blob/main/kn5000_extract.py
 
 	ROM_SYSTEM_BIOS(0, "v10", "Version 10 - August 2nd, 1999")
 	ROMX_LOAD("kn5000_v10_program.rom", 0x00000, 0x200000, CRC(8f53027e) SHA1(57ebaa13ea6b3d5c67456b16335f06465a29fb0c), ROM_BIOS(0))
