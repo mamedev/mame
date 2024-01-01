@@ -987,6 +987,91 @@ TIMER_CALLBACK_MEMBER(rmnimbus_state::do_mouse)
 	xdiff = m_nimbus_mouse.m_mouse_x - mouse_x;
 	ydiff = m_nimbus_mouse.m_mouse_y - mouse_y;
 
+	if (m_io_config->read() & 0x01)
+	{
+		do_mouse_hle(xdiff, ydiff);
+	}
+	else
+	{
+		do_mouse_real(xdiff, ydiff);
+	}
+
+	// Update current mouse position
+	m_nimbus_mouse.m_mouse_x = mouse_x;
+	m_nimbus_mouse.m_mouse_y = mouse_y;
+}
+
+void rmnimbus_state::do_mouse_real(int8_t xdiff, int8_t ydiff)
+{
+	uint8_t intstate_x;     // Used to calculate if we should trigger interrupt
+	uint8_t intstate_y;
+	int     xint;           // X and Y interrupts to trigger
+	int     yint;
+
+	uint8_t   mxa;          // Values of quadrature encoders for X and Y
+	uint8_t   mxb;
+	uint8_t   mya;
+	uint8_t   myb;
+
+	// convert movement into emulated movement of quadrature encoder in mouse.
+	if (xdiff < 0)
+		m_nimbus_mouse.m_mouse_pcx++;
+	else if (xdiff > 0)
+		m_nimbus_mouse.m_mouse_pcx--;
+
+	if (ydiff < 0)
+		m_nimbus_mouse.m_mouse_pcy++;
+	else if (ydiff > 0)
+		m_nimbus_mouse.m_mouse_pcy--;
+
+	// Compensate for quadrature wrap.
+	m_nimbus_mouse.m_mouse_pcx &= 0x03;
+	m_nimbus_mouse.m_mouse_pcy &= 0x03;
+
+	// get value of mouse quadrature encoders for this wheel position
+	mxa = MOUSE_XYA[m_nimbus_mouse.m_mouse_pcx]; // XA
+	mxb = MOUSE_XYB[m_nimbus_mouse.m_mouse_pcx]; // XB
+	mya = MOUSE_XYA[m_nimbus_mouse.m_mouse_pcy]; // YA
+	myb = MOUSE_XYB[m_nimbus_mouse.m_mouse_pcy]; // YB
+
+	// calculate interrupt state
+	intstate_x = (mxb ^ mxa) ^ ((m_ay8910_a & 0x40) >> 6);
+	intstate_y = (myb ^ mya) ^ ((m_ay8910_a & 0x80) >> 7);
+
+	// Generate interrupts if enabled, otherwise return values in
+	// mouse register
+	if (MOUSE_INT_ENABLED(this))
+	{
+		if ((intstate_x==1) && (m_nimbus_mouse.m_intstate_x==0))
+		{
+			xint=mxa ? EXTERNAL_INT_MOUSE_XL : EXTERNAL_INT_MOUSE_XR;
+
+			external_int(xint, true);
+		}
+
+		if ((intstate_y==1) && (m_nimbus_mouse.m_intstate_y==0))
+		{
+			yint=myb ? EXTERNAL_INT_MOUSE_YD : EXTERNAL_INT_MOUSE_YU;
+
+			external_int(yint, true);
+		}
+	}
+	else
+	{
+		m_nimbus_mouse.m_reg0a4 &= 0xF0;
+		m_nimbus_mouse.m_reg0a4 |= ( mxb & 0x01) << 3; // XB
+		m_nimbus_mouse.m_reg0a4 |= (~mxb & 0x01) << 2; // XA
+		m_nimbus_mouse.m_reg0a4 |= (~myb & 0x01) << 1; // YA
+		m_nimbus_mouse.m_reg0a4 |= ( myb & 0x01) << 0; // YB
+	}
+
+	// and interrupt state
+	m_nimbus_mouse.m_intstate_x=intstate_x;
+	m_nimbus_mouse.m_intstate_y=intstate_y;
+}
+
+void rmnimbus_state::do_mouse_hle(int8_t xdiff, int8_t ydiff)
+{
 	if (MOUSE_INT_ENABLED(this))
 	{
 		// bypass bios ISR and update mouse cursor position locations directly
@@ -1024,7 +1109,10 @@ TIMER_CALLBACK_MEMBER(rmnimbus_state::do_mouse)
 	{
 		// store status to support polling operation of mouse
 		// (not tested as no software seems to use this method!)
-		m_nimbus_mouse.m_reg0a4 = 0;
+		if (xdiff || ydiff)
+		{
+			m_nimbus_mouse.m_reg0a4 = 0;
+		}
 		if (xdiff < 0)
 		{
 			m_nimbus_mouse.m_reg0a4 |= CONTROLLER_RIGHT;
@@ -1043,10 +1131,6 @@ TIMER_CALLBACK_MEMBER(rmnimbus_state::do_mouse)
 		}
 
 	}
-
-	// Update current mouse position
-	m_nimbus_mouse.m_mouse_x = mouse_x;
-	m_nimbus_mouse.m_mouse_y = mouse_y;
 }
 
 void rmnimbus_state::mouse_js_reset()
@@ -1055,6 +1139,11 @@ void rmnimbus_state::mouse_js_reset()
 
 	m_nimbus_mouse.m_mouse_x=128;
 	m_nimbus_mouse.m_mouse_y=128;
+	m_nimbus_mouse.m_mouse_pcx=0;
+	m_nimbus_mouse.m_mouse_pcy=0;
+	m_nimbus_mouse.m_intstate_x=0;
+	m_nimbus_mouse.m_intstate_y=0;
+	m_nimbus_mouse.m_reg0a4=0xC0;
 
 	// calculate addresses for mouse related variable used by the bios mouse ISR
 	auto bios_base = bios_addresses[system_bios() - 1];
