@@ -8,6 +8,34 @@
   Driver by Roberto Fresca, David Haywood, Angelo Salese and Paul Arnold
 
 
+  Games running on this hardware:
+
+  * Magic Card (v2.01),                         Impera,  1994.
+  * Magic Card (v1.10 14.09.94),                Impera,  1994.
+  * Magic Card (v1.5 17.12.93, set 1),          Impera,  1993.
+  * Magic Card (v1.5 17.12.93, set 2),          Impera,  1993.
+  * Magic Card (v1.2 200/93, set 1),            Impera,  1994.
+  * Magic Card (v1.2 200/93, set 2),            Impera,  1994.
+  * Magic Card Export 94 (v2.11a, set 1),       Impera,  1994.
+  * Magic Card Export 94 (v2.11a, set 2),       Impera,  1994.
+  * Magic Card Export 94 (v2.11a, set 3),       Impera,  1994.
+  * Magic Card Export 94 (v2.09a),              Impera,  1994.
+  * Magic Card III Jackpot (V4.01 6/98),        Impera,  1998.
+  * Magic Card III Jackpot (V4.01 7/98),        Impera,  1998.
+  * Magic Lotto Export (5.03),                  Impera,  2001.
+  * Hot Slots (6.00),                           Impera,  2002.
+  * Quingo Export (5.00),                       Impera,  1999.
+  * Bel Slots Export (5.01),                    Impera,  1999.
+  * Big Deal Belgien (5.04),                    Impera,  2001.
+  * Puzzle Me!,                                 Impera,  199?.
+  * Lucky 7 (Impera, V04/91a, set 1),           Impera,  1991.
+  * Lucky 7 (Impera, V04/91a, set 2),           Impera,  1991.
+  * Dallas Poker,                               unknown, 1993.
+  * Kajot Card (Version 1.01, Wien Euro),       Amatic,  1993.
+  * Poker (Impera, V11/90b),                    Impera,  1991.
+  * Simply the Best (CZ750, v1.0),              Kajot,   2001.
+
+
   TODO:
   - driver based off raw guesses (we don't have relevant key docs);
   - Verify RAM config on PCBs;
@@ -20,33 +48,6 @@
   - Correct memory map - at the moment ROM is mapped to several address spaces for
     all games. This is probably wrong.
   - dallaspk produces white noise after some sounds.
-
-  Games running on this hardware:
-
-  * Magic Card (v2.01),                         Impera, 1994.
-  * Magic Card (v1.10 14.09.94),                Impera, 1994.
-  * Magic Card (v1.5 17.12.93, set 1),          Impera, 1993.
-  * Magic Card (v1.5 17.12.93, set 2),          Impera, 1993.
-  * Magic Card (v1.2 200/93, set 1),            Impera, 1994.
-  * Magic Card (v1.2 200/93, set 2),            Impera, 1994.
-  * Magic Card Export 94 (v2.11a, set 1),       Impera, 1994.
-  * Magic Card Export 94 (v2.11a, set 2),       Impera, 1994.
-  * Magic Card Export 94 (v2.11a, set 3),       Impera, 1994.
-  * Magic Card Export 94 (v2.09a),              Impera, 1994.
-  * Magic Card III Jackpot (V4.01 6/98),        Impera, 1998.
-  * Magic Card III Jackpot (V4.01 7/98),        Impera, 1998.
-  * Magic Lotto Export (5.03),                  Impera, 2001.
-  * Hot Slots (6.00),                           Impera, 2002.
-  * Quingo Export (5.00),                       Impera, 1999.
-  * Bel Slots Export (5.01),                    Impera, 1999.
-  * Big Deal Belgien (5.04),                    Impera, 2001.
-  * Puzzle Me!,                                 Impera, 199?.
-  * Lucky 7 (Impera, V04/91a, set 1),           Impera, 1991.
-  * Lucky 7 (Impera, V04/91a, set 2),           Impera, 1991.
-  * Dallas Poker,                               unknown, 1993.
-  * Kajot Card (Version 1.01, Wien Euro),       Amatic, 1993.
-  * Poker (Impera, V11/90b),                    Impera, 1991.
-  * Simply the Best (CZ750, v1.0),              Kajot, 2001.
 
 
 *******************************************************************************
@@ -2459,4 +2460,4 @@ GAME(  1993, dallaspk,   0,        magicard,       dallaspk,  magicard_state, em
 GAME(  1993, kajotcrd,   0,        hotslots,       magicard,  hotslots_state, empty_init, ROT0, "Amatic",    "Kajot Card (Version 1.01, Wien Euro)",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAMEL( 1991, pokeri,     0,        magicard,       pokeri,    magicard_state, empty_init, ROT0, "Impera",    "Poker (Impera, V11/90b)",                    MACHINE_SUPPORTS_SAVE,                        layout_pokeri )
 
-GAMEL( 2001, simpbest,   0,        simpbest,       simpbest,  hotslots_state, empty_init, ROT0, "Kajot",     "Simply the Best (CZ750, v1.0)",              MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION,  layout_simpbest )
+GAMEL( 2001, simpbest,   0,        simpbest,       simpbest,  hotslots_state, empty_init, ROT0, "Kajot",     "Simply the Best (CZ750, v1.0)",              MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING,  layout_simpbest )
