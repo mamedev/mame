@@ -183,17 +183,17 @@ uint8_t a2bus_vistaa800_device::read_c0nx(uint8_t offset)
 			break;
 			
 		case 0xa:
-			if (!machine().side_effecs_disabled())
+			if (!machine().side_effects_disabled())
 				m_dmaenable_read = true;
 			break;
 
 		case 0xb:
-			if (!machine().side_effecs_disabled())
+			if (!machine().side_effects_disabled())
 				m_dmaenable_write = true;
 			break;
 
 		case 0xc:
-			if (!machine().side_effecs_disabled())
+			if (!machine().side_effects_disabled())
 			{
 				m_dmaenable_read = false;
 				m_dmaenable_write = false;
