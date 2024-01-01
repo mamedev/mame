@@ -20816,6 +20816,18 @@ https://segaretro.org/Ma_Qiao_E_Mo_Ta:_Devilish_Mahjong_Tower
 		</part>
 	</software>
 
+	<software name="grapplerx">
+		<description>Meka Grappler X</description>
+		<year>2017</year>
+		<publisher>Sik</publisher>
+		<info name="developer" value="Sik" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="49882">
+				<rom name="Meka Grappler X.bin" size="49882" crc="e8a9fd04" sha1="1f8fcb618372bcf1a243a1ae5599f736e0cc0530" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="menghu" supported="no">
 		<description>Mènghuàn Shuǐguǒ Pán - 777 Casino (Taiwan)</description>
 		<!-- Definitely not earlier than '94 -->
@@ -21241,6 +21253,57 @@ Needs [megadriv_z80_z80_bank_w] workaround to work (emulator copy protection?)
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="mike ditka power football (euro, usa) (alt).bin" size="1048576" crc="de50ca8e" sha1="e0832fcd63fb164cac66c3df4b5dfb23eecbb0f6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="miniplan">
+		<description>Miniplanets Remix (rev 04)</description>
+		<year>2022</year>
+		<publisher>Sik</publisher>
+		<info name="developer" value="Sik" />
+		<info name="version" value="rev 04" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="524288">
+				<rom name="Miniplanets REMIX Ver (REV04).bin" size="524288" crc="6c531b9d" sha1="f5bb5a05bb3a720793f1e43e66efef1377e6029a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="miniplan_dm" cloneof="miniplan">
+		<description>Miniplanets (demo)</description>
+		<year>2018</year>
+		<publisher>Sik</publisher>
+		<info name="developer" value="Sik" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="179782">
+				<rom name="Miniplanets (World) (Demo) (Aftermarket) (Unl).bin" size="179782" crc="dba23f53" sha1="b5fe8dcea993a7dec9f26ec6462ce904161b189f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="miniplan_r02" cloneof="miniplan">
+		<description>Miniplanets (rev 02)</description>
+		<year>2018</year>
+		<publisher>Sik</publisher>
+		<info name="developer" value="Sik" />
+		<info name="version" value="rev 02" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="262144">
+				<rom name="Miniplanets-REV02.bin" size="262144" crc="48460e4a" sha1="5da2996cacf78c12776cd1915bdf6935efa03e03" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="miniplan_r03" cloneof="miniplan">
+		<description>Miniplanets (rev 03)</description>
+		<year>2018</year>
+		<publisher>Sik</publisher>
+		<info name="developer" value="Sik" />
+		<info name="version" value="rev 03" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="262144">
+				<rom name="Miniplanets (rev 03).bin" size="262144" crc="8ea40d2f" sha1="88ccc6781746fb31c1e25b82568ad2a58071ea89" />
 			</dataarea>
 		</part>
 	</software>
@@ -25021,6 +25084,19 @@ Black screen
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="puzzle &amp; action - tanto-r (jpn).bin" size="2097152" crc="d2d2d437" sha1="2bf6965ee883a70b4f0842e9efa17c5e20b5cb47"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="puzzli">
+		<description>Puzzli</description>
+		<year>2020</year>
+		<publisher>Portabledev</publisher>
+		<info name="developer" value="Alekmaul" />
+		<info name="version" value="1.1" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1179648">
+				<rom name="puzzli200526.bin" size="1179648" crc="53eca258" sha1="97374c224d6e38a9e69d6c5ccac5e95ea149f0d7" />
 			</dataarea>
 		</part>
 	</software>
@@ -29234,6 +29310,31 @@ Freezes at the start of any in-game mode
 		</part>
 	</software>
 
+	<software name="sheavydt">
+		<description>Super Heavy Duty</description>
+		<year>2020</year>
+		<publisher>Playnautic</publisher>
+		<info name="developer" value="Riccardo Campione"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="Super Heavy Duty (World) (Aftermarket) (Unl).md" size="4194304" crc="81f8e890" sha1="071a44877dc2bb94284f11d4809cf30f1b811b08" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sheavydt_dm" cloneof="sheavydt">
+		<description>Super Heavy Duty (preview version)</description>
+		<year>2020</year>
+		<publisher>Playnautic</publisher>
+		<info name="developer" value="Riccardo Campione"/>
+		<info name="release" value="20200827"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1835008">
+				<rom name="20200827 - Super Heavy Duty Demo.md" size="1835008" crc="15adc6d6" sha1="d69ade4f60d8e6d33e73a9ac8eb04da2f80c5f54" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="shimpact">
 		<description>Super High Impact (USA)</description>
 		<year>1992</year>
@@ -31147,6 +31248,58 @@ No BGMs
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="262144">
 				<rom name="volfied (jpn).bin" size="262144" crc="b0c5e3f7" sha1="7de808400f64dd0e4f468049fff7d29212ea0215"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ultracor">
+		<description>Ultracore (Europe)</description>
+		<year>2019</year>
+		<publisher>Strictly Limited Games</publisher>
+		<info name="developer" value="Digital Illusions" />
+		<info name="version" value="MD-1.0" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="Ultracore (Europe) (MD-1.0) (Aftermarket) (Unl).bin" size="1048576" crc="77d3d240" sha1="ccf9ea27dc7a3e7aa88e56f1902dd0629dc866cf" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ultracorj" cloneof="ultracor">
+		<description>Ultracore (Japan)</description>
+		<year>2019</year>
+		<publisher>Columbus Circle</publisher>
+		<info name="developer" value="Digital Illusions" />
+		<info name="version" value="MJ-1.0" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="2097152">
+				<rom name="Ultracore (Japan) (MJ-1.0).bin" size="2097152" crc="ae7fda5a" sha1="a7ecac360c0588cb8d4866d2593ca0c94bd6cd00" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ultracoru" cloneof="ultracor">
+		<description>Ultracore (USA)</description>
+		<year>2019</year>
+		<publisher>Strictly Limited Games</publisher>
+		<info name="developer" value="Digital Illusions" />
+		<info name="version" value="MU-1.0" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="Ultracore (USA) (Aftermarket) (Unl).bin" size="1048576" crc="4852c1c0" sha1="228c14c1e1a6b8de7dd9bf103851910eec8ae5bc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ultracora" cloneof="ultracor">
+		<description>Ultracore (Europe, USA) (Switch, PS Vita)</description>
+		<year>2020</year>
+		<publisher>Strictly Limited Games</publisher>
+		<info name="developer" value="Digital Illusions" />
+		<info name="version" value="V-1.0" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="Ultracore (USA, Europe) (Switch, PS Vita) (Aftermarket) (Unl).bin" size="1048576" crc="b270c265" sha1="4d9b2f48cabfa2cc2d5dd518b650eeea0b608ff9" />
 			</dataarea>
 		</part>
 	</software>
