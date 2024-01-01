@@ -41,7 +41,7 @@ This is a 3D system comprising....
 There are only 7 games on this system. In some cases the game name changes depending on the BIOS region.
 The games in order of release are....
 001 Roads Edge / Round Trip RV
-002 Samurai Shodown 64 / Samurai Spirits 64
+002 Samurai Shodown 64 / Samurai Spirits / Pae Wang Jeon Seol 64
 003 Xtreme Rally / Off Beat Racer!
 004 Beast Busters: Second Nightmare
 005 Samurai Shodown 64: Warriors Rage / Samurai Spirits 2: Asura Zanmaden
@@ -462,7 +462,7 @@ for the exact number of ROMs used per game and ROM placements.
 Games that use the LVS-DG1 cart: Road's Edge / Round Trip RV
                                  Xtreme Rally / Off Beat Racer!
                                  Beast Busters: Second Nightmare
-                                 Samurai Shodown 64 / Samurai Spirits 64
+                                 Samurai Shodown 64 / Samurai Spirits / Pae Wang Jeon Seol 64
 
 Games that use the LVS-DG2 cart: Fatal Fury: Wild Ambition / Garou Densetsu: Wild Ambition
                                  Buriki One: World Grapple Tournament '99 in Tokyo
@@ -3215,7 +3215,7 @@ GAME( 1997, hng64,    0,     hng64_default, hng64,          hng64_state, init_hn
 
 /* Games */
 GAME( 1997, roadedge, hng64, hng64_drive,   hng64_drive,    hng64_state, init_roadedge,    ROT0, "SNK",       "Roads Edge / Round Trip RV (rev.B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 001 */
-GAME( 1998, sams64,   hng64, hng64_fight,   hng64_fight,    hng64_state, init_ss64,        ROT0, "SNK",       "Samurai Shodown 64 / Samurai Spirits 64", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND ) /* 002 */
+GAME( 1998, sams64,   hng64, hng64_fight,   hng64_fight,    hng64_state, init_ss64,        ROT0, "SNK",       "Samurai Shodown 64 / Samurai Spirits / Pae Wang Jeon Seol 64", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND ) /* 002 */
 GAME( 1998, xrally,   hng64, hng64_drive,   hng64_drive,    hng64_state, init_hng64_drive, ROT0, "SNK",       "Xtreme Rally / Off Beat Racer!", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 003 */
 GAME( 1998, bbust2,   hng64, hng64_shoot,   hng64_shoot,    hng64_state, init_hng64_shoot, ROT0, "SNK / ADK", "Beast Busters: Second Nightmare", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 004 */ // ADK credited in the ending sequence
 GAME( 1998, sams64_2, hng64, hng64_fight,   hng64_fight,    hng64_state, init_ss64,        ROT0, "SNK",       "Samurai Shodown 64: Warriors Rage / Samurai Spirits 2: Asura Zanmaden", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND ) /* 005 */
