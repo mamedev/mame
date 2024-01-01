@@ -1438,21 +1438,9 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 
 	for (int offs = 0; offs < 0x400 && (total_sprites < 0x400); offs++)
 	{
+		total_sprites++; // prevent infinite loops
 		int bank = m_sprite_bank ? 0x4000 : 0;
 		const u16 *spr = &spriteram16_ptr[bank + (offs * 8)];
-
-		/* Check if the sprite list jump command bit is set */
-		if (BIT(spr[6], 15))
-		{
-			const int new_offs = BIT(spr[6], 0, 10);
-			if (new_offs <= offs) // could this be ≤ ?
-			{
-				if (new_offs < offs)
-					logerror("backwards long jump (sprite 0x%x to 0x%x)\n", offs, new_offs);
-				break;
-			}
-			offs = new_offs - 1; // subtract because we increment in the for loop
-		}
 
 		/* Check if special command bit is set */
 		if (BIT(spr[3], 15))
@@ -1476,6 +1464,18 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 
 			/* Sprite bank select */
 			m_sprite_bank = BIT(cntrl, 0);
+		}
+
+		/* Check if the sprite list jump bit is set */
+		// we have to check this AFTER processing sprite commands because recalh uses a sprite command and jump in the same sprite
+		if (BIT(spr[6], 15))
+		{
+			const int new_offs = BIT(spr[6], 0, 10);
+			if (new_offs == offs) // could this be ≤ ? -- NO! RECALH USES BACKWARDS JUMPS!!
+			{
+				break; // optimization, edge cases to watch for: looped sprite block commands?
+			}
+			offs = new_offs - 1; // subtract because we increment in the for loop
 		}
 
 		const u8 spritecont = spr[4] >> 8;
@@ -1510,7 +1510,6 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 		sprite_ptr->scale_y = y.block_scale;
 		sprite_ptr->pri = BIT(color, 6, 2);
 		sprite_ptr++;
-		total_sprites++;
 	}
 	m_sprite_end = sprite_ptr;
 }
