@@ -124,16 +124,17 @@ void wy55_state::wy55(machine_config &config)
 void wy55_state::wy185es(machine_config &config)
 {
 	wy55(config);
+	m_maincpu->set_clock(11_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_IO, &wy55_state::wy185es_ext_map);
 	m_maincpu->port_out_cb<1>().set_nop();
 
-	SCN2661B(config, m_epci, 14.7456_MHz_XTAL / 3); // SCN2661BC1N28
+	SCN2661B(config, m_epci, 49.4235_MHz_XTAL / 10); // SCN2661BC1N28
 	m_epci->rxrdy_handler().set_inputline(m_maincpu, MCS51_INT1_LINE);
 }
 
 void wy55_state::wy65(machine_config &config)
 {
-	DS80C320(config, m_maincpu, 58.9824_MHz_XTAL / 4);
+	DS80C320(config, m_maincpu, 58.9824_MHz_XTAL / 4); // divider uncertain
 	m_maincpu->set_addrmap(AS_PROGRAM, &wy55_state::prog_map);
 	m_maincpu->set_addrmap(AS_IO, &wy55_state::wy65_ext_map);
 
