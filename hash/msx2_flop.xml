@@ -599,7 +599,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="affairej" cloneof="affaire">
-		<description>L'Affaire (Japan)</description>
+		<description>L'Affaire: Ushinawareta Toki wo Motomete (Japan)</description>
 		<year>1987</year>
 		<publisher>Pack-In-Video</publisher>
 		<info name="alt_title" value="ラ・フェール～失われた時を求めて～"/>
@@ -8411,7 +8411,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="kansator">
-		<description>Kan Satoru Hyakka (Japan)</description>
+		<description>Kandoku Hyakka (Japan)</description>
 		<year>1987</year>
 		<publisher>Sony</publisher>
 		<info name="alt_title" value="漢読百科"/>
@@ -8525,7 +8525,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="konaish1">
-		<description>Konai Shasei Vol. 1 (Japan)</description>
+		<description>Kounai Shasei Vol. 1 (Japan)</description>
 		<year>1991</year>
 		<publisher>Fairytale</publisher>
 		<info name="alt_title" value="校内写生１巻"/>
@@ -8558,7 +8558,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="konaish2">
-		<description>Konai Shasei Vol. 2 (Japan)</description>
+		<description>Kounai Shasei Vol. 2 (Japan)</description>
 		<year>1991</year>
 		<publisher>Fairytale</publisher>
 		<info name="alt_title" value="校内写生２巻"/>
@@ -8591,7 +8591,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="konaish3">
-		<description>Konai Shasei Vol. 3 (Japan)</description>
+		<description>Kounai Shasei Vol. 3 (Japan)</description>
 		<year>1991</year>
 		<publisher>Fairytale</publisher>
 		<info name="alt_title" value="校内写生３巻"/>

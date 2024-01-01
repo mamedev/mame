@@ -89,7 +89,6 @@ private:
 	uint8_t m_density;
 	uint8_t m_side;
 	uint8_t m_sso;
-
 };
 
 
@@ -131,11 +130,11 @@ const tiny_rom_entry *a2bus_vistaa800_device::device_rom_region() const
 
 void a2bus_vistaa800_device::device_add_mconfig(machine_config &config)
 {
-	FD1797(config, m_fdc, 2000000);
-	FLOPPY_CONNECTOR(config, "fdc:0", vistaa800_floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", vistaa800_floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:2", vistaa800_floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:3", vistaa800_floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FD1797(config, m_fdc, 2'000'000);
+	FLOPPY_CONNECTOR(config, m_floppy0, vistaa800_floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, vistaa800_floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy2, vistaa800_floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy3, vistaa800_floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	m_fdc->intrq_wr_callback().set(FUNC(a2bus_vistaa800_device::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(a2bus_vistaa800_device::fdc_drq_w));
@@ -184,16 +183,21 @@ uint8_t a2bus_vistaa800_device::read_c0nx(uint8_t offset)
 			break;
 			
 		case 0xa:
-			m_dmaenable_read = true;
+			if (!machine().side_effecs_disabled())
+				m_dmaenable_read = true;
 			break;
 
 		case 0xb:
-			m_dmaenable_write = true;
+			if (!machine().side_effecs_disabled())
+				m_dmaenable_write = true;
 			break;
 
 		case 0xc:
-			m_dmaenable_read = false;
-			m_dmaenable_write = false;
+			if (!machine().side_effecs_disabled())
+			{
+				m_dmaenable_read = false;
+				m_dmaenable_write = false;
+			}
 			break;
 
 		case 0xf:
@@ -202,7 +206,7 @@ uint8_t a2bus_vistaa800_device::read_c0nx(uint8_t offset)
 				result = result | 0x80;
 			}
 
-			result = result | (m_side << 5); // Todo: check this
+			result = result | (m_side << 5); // TODO: check this
 			break;
 
 		default:
@@ -300,7 +304,7 @@ void a2bus_vistaa800_device::fdc_drq_w(uint8_t state)
 {
 	if (state)
 	{
-		if (m_dmaenable_read) //Todo: verify if both can be turned on at the same time, and which has priority
+		if (m_dmaenable_read) // TODO: verify if both can be turned on at the same time, and which has priority
 		{
 			uint8_t data = m_fdc->data_r();
 			slot_dma_write(m_dmaaddr, data);
@@ -318,10 +322,10 @@ void a2bus_vistaa800_device::fdc_drq_w(uint8_t state)
 
 void a2bus_vistaa800_device::fdc_sso_w(uint8_t state)
 {
-	m_sso = state; // Todo: needs to be verified on real h/w. This is meant to be from the drive
+	m_sso = state; // TODO: needs to be verified on real h/w. This is meant to be from the drive
 }
 
 } // anonymous namespace
 
 
-DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_VISTAA800, device_a2bus_card_interface, a2bus_vistaa800_device, "vistaa800", "Vista A800 8inch disk Controller Card")
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_VISTAA800, device_a2bus_card_interface, a2bus_vistaa800_device, "a2vistaa800", "Vista A800 8inch disk Controller Card")
