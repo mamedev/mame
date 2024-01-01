@@ -6777,7 +6777,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="gingaps">
-		<description>Ginga Hideo Densetsu Powerup &amp; Scenario Shu (Japan)</description>
+		<description>Ginga Eiyuu Densetsu Powerup &amp; Scenario Shu (Japan)</description>
 		<year>1989</year>
 		<publisher>Bothtec</publisher>
 		<info name="alt_title" value="銀河英雄伝説パワーアップ＆シナリオ集"/>
@@ -6787,13 +6787,13 @@ The following floppies came with the machines.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
-				<rom name="ginga hideo densetsu powerup scenario shu - bothtec (disk 1).dsk" size="737280" crc="2ab581f1" sha1="ef8c39f7ec32e0858e0446d3e137afe65daaed42"/>
+				<rom name="ginga eiyuu densetsu powerup scenario shu - bothtec (disk 1).dsk" size="737280" crc="2ab581f1" sha1="ef8c39f7ec32e0858e0446d3e137afe65daaed42"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="737280">
-				<rom name="ginga hideo densetsu powerup scenario shu - bothtec (disk 2).dsk" size="737280" crc="c8fc5ade" sha1="64bac904cfe7d97bdef7ab9c195f07572d9e92d0"/>
+				<rom name="ginga eiyuu densetsu powerup scenario shu - bothtec (disk 2).dsk" size="737280" crc="c8fc5ade" sha1="64bac904cfe7d97bdef7ab9c195f07572d9e92d0"/>
 			</dataarea>
 		</part>
 	</software>
