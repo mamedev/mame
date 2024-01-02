@@ -27,7 +27,7 @@ public:
 	void set_yoffset(int yoffset) { m_yoffset = yoffset; }
 
 	// gaiden.cpp / spbactn.cpp / tecmo16.cpp sprites
-	void gaiden_draw_sprites(screen_device &screen, const rectangle &cliprect, uint16_t* spriteram, int sprite_sizey, int spr_offset_y, bool flip_screen, bitmap_ind16 &sprite_bitmap);
+	void gaiden_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t* spriteram, int sprite_sizey, int spr_offset_y, bool flip_screen);
 
 	// tecmo.cpp sprites
 	void draw_sprites_8bit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* spriteram, int size, int video_type, bool flip_screen);

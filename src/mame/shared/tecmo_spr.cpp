@@ -71,19 +71,19 @@ static const uint8_t layout[8][8] =
 
 static constexpr int NUM_SPRITES = 256;
 
-void tecmo_spr_device::gaiden_draw_sprites(screen_device &screen, const rectangle &cliprect, uint16_t* spriteram, int sprite_sizey, int spr_offset_y, bool flip_screen, bitmap_ind16 &sprite_bitmap)
+void tecmo_spr_device::gaiden_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t* spriteram, int sprite_sizey, int spr_offset_y, bool flip_screen)
 {
 	uint16_t const *source = spriteram;
-	int const sourceinc = 8;
+	constexpr int SOURCE_INC = 8;
 
 	int count = NUM_SPRITES;
 	int const screenwidth = screen.visible_area().width();
 
-	int const attributes_word = 0;
-	int const tilenumber_word = 1;
-	int const colour_word = 2;
-	int const yposition_word = 3;
-	int const xposition_word = 4;
+	constexpr int ATTRIBUTES_WORD = 0;
+	constexpr int TILE_NUMBER_WORD = 1;
+	constexpr int COLOUR_WORD = 2;
+	constexpr int Y_POSITION_WORD = 3;
+	constexpr int X_POSITION_WORD = 4;
 
 	int xmask;
 
@@ -92,12 +92,10 @@ void tecmo_spr_device::gaiden_draw_sprites(screen_device &screen, const rectangl
 	else
 		xmask = 256;
 
-	bitmap_ind16* bitmap = &sprite_bitmap;
-
 	// draw all sprites from front to back
 	while (count--)
 	{
-		uint16_t const attributes = source[attributes_word];
+		uint16_t const attributes = source[ATTRIBUTES_WORD];
 
 		bool enabled = BIT(attributes, 2);
 
@@ -111,7 +109,7 @@ void tecmo_spr_device::gaiden_draw_sprites(screen_device &screen, const rectangl
 				{
 					uint8_t const frame = screen.frame_number() & 1;
 					if (frame == 1)
-						enabled = 0;
+						enabled = false;
 				}
 
 			}
@@ -122,12 +120,12 @@ void tecmo_spr_device::gaiden_draw_sprites(screen_device &screen, const rectangl
 			bool flipx = BIT(attributes, 0);
 			bool flipy = BIT(attributes, 1);
 
-			uint32_t color = source[colour_word];
+			uint32_t color = source[COLOUR_WORD];
 			uint8_t const sizex = 1 << ((color >> 0) & 3);            // 1,2,4,8
 			uint8_t const sizey = 1 << ((color >> sprite_sizey) & 3); // 1,2,4,8
 
 			// raiga & fstarfrc need something like this
-			uint32_t number = (source[tilenumber_word]);
+			uint32_t number = source[TILE_NUMBER_WORD];
 
 			if (sizex >= 2) number &= ~0x01;
 			if (sizey >= 2) number &= ~0x02;
@@ -136,8 +134,8 @@ void tecmo_spr_device::gaiden_draw_sprites(screen_device &screen, const rectangl
 			if (sizex >= 8) number &= ~0x10;
 			if (sizey >= 8) number &= ~0x20;
 
-			int ypos = (source[yposition_word] + spr_offset_y) & 0x01ff;
-			int xpos = source[xposition_word] & ((xmask * 2) - 1);
+			int ypos = (source[Y_POSITION_WORD] + spr_offset_y) & 0x01ff;
+			int xpos = source[X_POSITION_WORD] & ((xmask * 2) - 1);
 
 			color = (color >> 4) & 0x0f;
 
@@ -162,7 +160,7 @@ void tecmo_spr_device::gaiden_draw_sprites(screen_device &screen, const rectangl
 			}
 
 			// this contains the blend bit and the priority bits, the spbactn proto uses 0x0300 for priority, spbactn uses 0x0030, others use 0x00c0
-			color |= (source[attributes_word] & 0x03f0);
+			color |= (source[ATTRIBUTES_WORD] & 0x03f0);
 
 			for (int row = 0; row < sizey; row++)
 			{
@@ -171,7 +169,7 @@ void tecmo_spr_device::gaiden_draw_sprites(screen_device &screen, const rectangl
 					int const sx = xpos + 8 * (flipx ? (sizex - 1 - col) : col);
 					int const sy = ypos + 8 * (flipy ? (sizey - 1 - row) : row);
 
-					gfx(0)->transpen_raw(*bitmap, cliprect,
+					gfx(0)->transpen_raw(bitmap, cliprect,
 						number + layout[row][col],
 						gfx(0)->colorbase() + color * gfx(0)->granularity(),
 						flipx, flipy,
@@ -180,7 +178,7 @@ void tecmo_spr_device::gaiden_draw_sprites(screen_device &screen, const rectangl
 				}
 			}
 		}
-		source += sourceinc;
+		source += SOURCE_INC;
 	}
 }
 

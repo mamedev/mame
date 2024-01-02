@@ -81,10 +81,10 @@ uint32_t tecmo_state::pri_cb(uint8_t pri)
 	switch (pri)
 	{
 		default:
-		case 0x0: return 0; break;
-		case 0x1: return 0xf0; break; // obscured by text layer
-		case 0x2: return 0xf0|0xcc; break; // obscured by foreground
-		case 0x3: return 0xf0|0xcc|0xaa; break; // obscured by bg and fg
+		case 0x0: return 0;
+		case 0x1: return 0xf0; // obscured by text layer
+		case 0x2: return 0xf0|0xcc; // obscured by foreground
+		case 0x3: return 0xf0|0xcc|0xaa; // obscured by bg and fg
 	}
 }
 

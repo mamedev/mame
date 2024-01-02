@@ -182,7 +182,7 @@ void galspnbl_state::mix_sprite_layer(screen_device &screen, bitmap_ind16 &bitma
 uint32_t galspnbl_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_sprite_bitmap.fill(0, cliprect);
-	m_sprgen->gaiden_draw_sprites(screen, cliprect, m_spriteram, 0, 0, flip_screen(), m_sprite_bitmap);
+	m_sprgen->gaiden_draw_sprites(screen, m_sprite_bitmap, cliprect, m_spriteram, 0, 0, flip_screen());
 
 
 	draw_background(bitmap, cliprect);

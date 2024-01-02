@@ -336,8 +336,8 @@ void tecmo16_state::screen_vblank(int state)
 		const rectangle visarea = m_screen->visible_area();
 		// 2 frame sprite lags
 		m_sprite_bitmap.fill(0, visarea);
-		if (m_game_is_riot)  m_sprgen->gaiden_draw_sprites(*m_screen, visarea, m_spriteram->buffer(), 0, 0, flip_screen(), m_sprite_bitmap);
-		else m_sprgen->gaiden_draw_sprites(*m_screen, visarea, m_spriteram->buffer(), 2, 0, flip_screen(), m_sprite_bitmap);
+		if (m_game_is_riot)  m_sprgen->gaiden_draw_sprites(*m_screen, m_sprite_bitmap, visarea, m_spriteram->buffer(), 0, 0, flip_screen());
+		else m_sprgen->gaiden_draw_sprites(*m_screen, m_sprite_bitmap, visarea, m_spriteram->buffer(), 2, 0, flip_screen());
 
 		m_spriteram->copy();
 	}
