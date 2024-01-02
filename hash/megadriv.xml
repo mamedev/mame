@@ -10633,6 +10633,17 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		</part>
 	</software>
 
+	<software name="affinity">
+		<description>Affinity Sorrow (demo)</description>
+		<year>2021</year>
+		<publisher>Second Dimension</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="802304">
+				<rom name="affinity_demo.bin" size="802304" crc="67646a58" sha1="54b557f9bdbe7d1ebc7f230327abb7f0c2175846" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="airdiver">
 		<description>Air Diver (USA)</description>
 		<year>1990</year>
@@ -10753,6 +10764,29 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		</part>
 	</software>
 
+	<software name="aliencat2">
+		<description>Alien Cat 2</description>
+		<year>2020</year>
+		<publisher>PSCD Games</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1310720">
+				<rom name="AlienCat-2.bin" size="1310720" crc="01010466" sha1="bd3913ed0c0b36488ca79820cdb65320f2090a53" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aliencat2_dm" cloneof="aliencat2">
+		<description>Alien Cat 2 (demo)</description>
+		<year>2020</year>
+		<publisher>PSCD Games</publisher>
+		<info name="release" value="20-08-2020" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="AlienCatDemo001.bin" size="1048576" crc="31d4c399" sha1="2e7e32ae7b11d1606d62d5be177772eafc015f36" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="aliensolj" cloneof="aliensol">
 		<description>Alien Soldier (Japan)</description>
 		<year>1995</year>
@@ -10789,6 +10823,17 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="alisia dragoon (usa).bin" size="1048576" crc="d28d5c40" sha1="69bf7a9ebcb851e0d571f93b26d785ca87621b01"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alterego">
+		<description>Alter Ego - Remastered</description>
+		<year>2020</year>
+		<publisher>RetroSouls</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="786432">
+				<rom name="aepd.bin" size="786432" crc="3be95745" sha1="6f80b92b01aa35df3ea08d44225809f9d33c486b" />
 			</dataarea>
 		</part>
 	</software>
@@ -10911,6 +10956,145 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		</part>
 	</software>
 
+	<software name="arkagis">
+		<description>Arkagis Revolution (rev. 01)</description>
+		<year>2020</year>
+		<publisher>Broke Studio</publisher>
+		<info name="developer" value="Sik" />
+		<info name="language" value="English/French/Spanish" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="Arkagis Revolution (REV01) (World) (Unl).bin" size="4194304" crc="a9bdc71b" sha1="c3f03b06a220816b075c84090470a3974dd67bab" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arkagis_00" cloneof="arkagis">
+		<description>Arkagis Revolution (rev. 00 - trial version)</description>
+		<year>2020</year>
+		<publisher>Sik</publisher>
+		<info name="developer" value="Sik" />
+		<info name="language" value="English/French/Spanish" />
+		<info name="release" value="2020-03-04" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="786432">
+				<rom name="Arkagis Revolution - Trial Version (Rev 00).bin" size="786432" crc="c839231e" sha1="ad2e9e1dfc82f687b9bdb5b972a340990ea577f6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arkagis_wx" cloneof="arkagis">
+		<description>Arkagis Revolution (rev. WX - trial version)</description>
+		<year>2019</year>
+		<publisher>Sik</publisher>
+		<info name="developer" value="Sik" />
+		<info name="language" value="English/French/Spanish" />
+		<info name="release" value="2019-02-21" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="786432">
+				<rom name="Arkagis Revolution (World) (En,Fr,Es) (Prerelease) (2019-02-21) (Unl).bin" size="786432" crc="662c4a59" sha1="cf2b2478a018875309456bc84fae1cc55393a57e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arkagis_xz" cloneof="arkagis">
+		<description>Arkagis Revolution (rev. XZ - trial version)</description>
+		<year>2019</year>
+		<publisher>Sik</publisher>
+		<info name="developer" value="Sik" />
+		<info name="language" value="English/Spanish" />
+		<info name="release" value="2019-07-29" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="786432">
+				<rom name="Arkagis Revolution (World) (En,Es) (Prerelease) (2019-07-29) (Unl).bin" size="786432" crc="8b33e732" sha1="42392820a4a215b249891c56011dfdc8fa733dd5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arkagis_yx" cloneof="arkagis">
+		<description>Arkagis Revolution (rev. YX - trial version)</description>
+		<year>2019</year>
+		<publisher>Sik</publisher>
+		<info name="developer" value="Sik" />
+		<info name="language" value="English/Spanish" />
+		<info name="release" value="2019-09-02" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="786432">
+				<rom name="Arkagis Revolution (World) (En,Es) (Prerelease) (2019-09-02) (Unl).bin" size="786432" crc="e4e7f232" sha1="fbd3a97fc2950c1fffbdb3142241697ce5933130" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arkagis_yz" cloneof="arkagis">
+		<description>Arkagis Revolution (rev. YZ - trial version)</description>
+		<year>2019</year>
+		<publisher>Sik</publisher>
+		<info name="developer" value="Sik" />
+		<info name="language" value="English/Spanish" />
+		<info name="release" value="2019-09-16" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="786432">
+				<rom name="Arkagis Revolution (World) (En,Es) (Prerelease) (2019-09-16) (Unl).bin" size="786432" crc="53d271fd" sha1="6dfc4be845ca5488a7923f810556f1522b7682c6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arkagis_zw" cloneof="arkagis">
+		<description>Arkagis Revolution (rev. ZW - trial version)</description>
+		<year>2019</year>
+		<publisher>Sik</publisher>
+		<info name="developer" value="Sik" />
+		<info name="language" value="English/French/Spanish" />
+		<info name="release" value="2019-11-28" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="786432">
+				<rom name="Arkagis Revolution (World) (En,Fr,Es) (Prerelease) (2019-11-28) (Unl).bin" size="786432" crc="980e247e" sha1="42f84dade57eead360dd4e4df949bfaf1415886c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arkagis2">
+		<description>Arkagis Escape (rev. WX - trial version)</description>
+		<year>2023</year>
+		<publisher>Sik</publisher>
+		<info name="developer" value="Sik" />
+		<info name="language" value="English/Japanese/Spanish" />
+		<info name="release" value="2023-01-23" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="Arkagis Escape - Trial Version (Rev WX).bin" size="1048576" crc="3ff3d8d9" sha1="87753a222f3ccaaac459ca04de8d56b22d1261a1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arkagis2_yw" cloneof="arkagis2">
+		<description>Arkagis Escape (rev. YW - trial version)</description>
+		<year>2021</year>
+		<publisher>Sik</publisher>
+		<info name="developer" value="Sik" />
+		<info name="language" value="English/Japanese/Spanish" />
+		<info name="release" value="2021-11-06" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="Arkagis Escape - Trial Version (Rev YW).bin" size="1048576" crc="da0a4587" sha1="b6f2f9124afde22fe2fe2bd92c953c19372145dc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arkagis2_zz" cloneof="arkagis2">
+		<description>Arkagis Escape (rev. ZZ - trial version)</description>
+		<year>2022</year>
+		<publisher>Sik</publisher>
+		<info name="developer" value="Sik" />
+		<info name="language" value="English/Japanese/Spanish" />
+		<info name="release" value="2022-04-29" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="Arkagis Escape - Trial Version (Rev ZZ).bin" size="1048576" crc="c2a2c208" sha1="5a48561f868b49159a4533afaf6867e1bcd9910c" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="smasters" cloneof="arnoldp">
 		<description>Naomichi Ozaki no Super Masters (Japan)</description>
 		<year>1989</year>
@@ -11008,6 +11192,50 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="262144">
 				<rom name="art alive (sep 20, 1991 build).bin" size="262144" crc="952c0375" sha1="926dfc28ceae56e099e9da186578a623c6ebfa0a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astebros">
+		<description>Astebros (demo v2.1, English)</description>
+		<year>2022</year>
+		<publisher>NeoFID Studios</publisher>
+		<info name="release" value="2022-08-23" />
+		<info name="version" value="demo v2.1" />
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="Astebros_DEMO_23082022_1739_ENG.bin" size="4194304" crc="ff29ceb7" sha1="d78ae985788412837cfe17156a988a55454fb1e0" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astebros_fr_d2" cloneof="astebros">
+		<description>Astebros (demo v2.1, French)</description>
+		<year>2022</year>
+		<publisher>NeoFID Studios</publisher>
+		<info name="release" value="2022-08-23" />
+		<info name="version" value="demo v2.1" />
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="Astebros_DEMO_23082022_1739_FRA.bin" size="4194304" crc="49dca986" sha1="de7a738fd7f5247e292e9a232ef916ceab06cfce" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astebros_d1" cloneof="astebros">
+		<description>Astebros (demo v1.1)</description>
+		<year>2022</year>
+		<publisher>NeoFID Studios</publisher>
+		<info name="version" value="demo v1.1" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="3573452">
+				<rom name="ASTEBROS_DEMO.bin" size="3573452" crc="09d7a996" sha1="6255aa2500cd27761ec730c3232df45ceae1d014" />
 			</dataarea>
 		</part>
 	</software>
@@ -11215,6 +11443,32 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 				<rom name="atp tour championship tennis (usa).bin" size="2097152" crc="8c822884" sha1="1ccd027cac63ee56b24a54a84706646d22d0b610"/>
 			</dataarea>
 			<dataarea name="sram" size="16384">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="petscii">
+		<description>Attack of the Petscii Robots (shareware v1.2)</description>
+		<year>2022</year>
+		<publisher>The 8-Bit Guy</publisher>
+		<info name="release" value="2022-06-16" />
+		<info name="version" value="shareware 1.2" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1441792">
+				<rom name="Attack of the PETSCII Robots SHAREWARE_1.2.bin" size="1441792" crc="2d04558d" sha1="edc184f4747df1654d56ccc5d4af2eb26157eac2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="petscii_s10" cloneof="petscii">
+		<description>Attack of the Petscii Robots (shareware v1.0)</description>
+		<year>2022</year>
+		<publisher>The 8-Bit Guy</publisher>
+		<info name="release" value="2022-05-15" />
+		<info name="version" value="shareware 1.0" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1441792">
+				<rom name="Genesis Robots Shareware.bin" size="1441792" crc="f4bb51b5" sha1="d69b489e85b61e76874817e795852c238298f44a" />
 			</dataarea>
 		</part>
 	</software>
@@ -12228,6 +12482,18 @@ https://bootleggames.fandom.com/wiki/Barver_Battle_Saga:_Tai_Kong_Zhan_Shi
 		</part>
 	</software>
 
+	<software name="bjreborn">
+		<description>Black Jewel Reborn (demo v0.2)</description>
+		<year>2022</year>
+		<publisher>PSCD Games</publisher>
+		<info name="version" value="demo v0.2"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="2228224">
+				<rom name="Black_Jewel_Reborn_Demo_v020.bin" size="2228224" crc="ee26ebd5" sha1="0f63b7001410ba96c906cac8736095b3bfafe94f" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bladeven">
 		<description>Blades of Vengeance (Europe, USA)</description>
 		<year>1993</year>
@@ -12426,6 +12692,30 @@ Unsupported [Menacer] peripheral (joypad works)
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="bonanza bros. (euro, jpn).bin" size="524288" crc="adf6476c" sha1="ce46f2b53988f06e0bdfaad1b0dc3e9ca936e1e8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bmarrow">
+		<description>Bone Marrow (demo)</description>
+		<year>2021</year>
+		<publisher>PSCD Games</publisher>
+		<info name="language" value="English/Russian"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="2097152">
+				<rom name="Bone_Marrow_Demo.bin" size="2097152" crc="6b533352" sha1="55c218069406f8a8bcebe91a51dd5708e9a8ac43" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bmarrow2">
+		<description>Bone Marrow Rebirth (demo)</description>
+		<year>2021</year>
+		<publisher>PSCD Games</publisher>
+		<info name="language" value="English/Russian"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1966080">
+				<rom name="Bone_Marrow_Demo v2.bin" size="1966080" crc="6428449c" sha1="1e6a2e526814282eb58b2221570fa3d378fb6d79" />
 			</dataarea>
 		</part>
 	</software>
@@ -12800,6 +13090,18 @@ No [VDP] sprites
 		</part>
 	</software>
 
+	<software name="cascade">
+		<description>Cascade</description>
+		<year>2015</year>
+		<publisher>Super Fighter Team</publisher>
+		<info name="developer" value="Epyx" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="524288">
+				<rom name="cascade (world) (unl).bin" size="524288" crc="e7b287fe" sha1="36179d64524b3be797946a7679dc0b8b9b92daa7"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cvaniap" cloneof="cvania">
 		<description>Castlevania - The New Generation (Europe, prototype)</description>
 		<year>1994</year>
@@ -12859,6 +13161,188 @@ No [VDP] sprites
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="akumajou dracula - vampire killer (jpn).bin" size="1048576" crc="91b57d2b" sha1="3e709bd27577056abbbd6735021eaffd90caa140"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.0, English)</description>
+		<year>2022</year>
+		<publisher>Studio Pixel</publisher>
+		<info name="language" value="English" />
+		<info name="version" value="0.8.0 2022.02" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-en.bin" size="4194304" crc="d476a108" sha1="79c6833b187a02a51f6eccf9283e4d82cca877b5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory_zh" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.0, Chinese)</description>
+		<year>2022</year>
+		<publisher>Studio Pixel</publisher>
+		<info name="language" value="Chinese" />
+		<info name="version" value="0.8.0 2022.02" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-zh.bin" size="4194304" crc="0c1517fc" sha1="da7286cdc75f6e3846f8351abf9325fdbdc687a8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory_fr" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.0, French)</description>
+		<year>2022</year>
+		<publisher>Studio Pixel</publisher>
+		<info name="language" value="French" />
+		<info name="version" value="0.8.0 2022.02" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-fr.bin" size="4194304" crc="f00a8d9f" sha1="d1b89e2e364cd595b5d4c6a2e417f7b79337378a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory_de" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.0, German)</description>
+		<year>2022</year>
+		<publisher>Studio Pixel</publisher>
+		<info name="language" value="German" />
+		<info name="version" value="0.8.0 2022.02" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-de.bin" size="4194304" crc="a04d7b69" sha1="b0ba518ee523fec58bfbcdd2685f507e288b6c14" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory_it" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.0, Italian)</description>
+		<year>2022</year>
+		<publisher>Studio Pixel</publisher>
+		<info name="language" value="Italian" />
+		<info name="version" value="0.8.0 2022.02" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-it.bin" size="4194304" crc="8ec855f9" sha1="34d95d7d0278cb9b7479c262a019692b09e13533" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory_ja" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.0, Japanese)</description>
+		<year>2022</year>
+		<publisher>Studio Pixel</publisher>
+		<info name="language" value="Japanese" />
+		<info name="version" value="0.8.0 2022.02" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-ja.bin" size="4194304" crc="21acbe48" sha1="a22a72b38c02b777729cb158ed4d4564dbdd1cd3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory_ko" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.0, Korean)</description>
+		<year>2022</year>
+		<publisher>Studio Pixel</publisher>
+		<info name="language" value="Korean" />
+		<info name="version" value="0.8.0 2022.02" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-ko.bin" size="4194304" crc="0e411955" sha1="910948d9187d0f11e811ff09d94bcb8977d612ce" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory_pt" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.0, Portuguese)</description>
+		<year>2022</year>
+		<publisher>Studio Pixel</publisher>
+		<info name="language" value="Portuguese" />
+		<info name="version" value="0.8.0 2022.02" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-pt.bin" size="4194304" crc="965704dd" sha1="da54faea4f7b2ec6822e710ba200890653dcee79" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory_br" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.0, Portuguese-Brazil)</description>
+		<year>2022</year>
+		<publisher>Studio Pixel</publisher>
+		<info name="language" value="Portuguse (Brazil)" />
+		<info name="version" value="0.8.0 2022.02" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-br.bin" size="4194304" crc="4b52107a" sha1="4dc22a573c82c8d3403a0ccb062ba489fd0af70b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory_es" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.0, Spanish)</description>
+		<year>2022</year>
+		<publisher>Studio Pixel</publisher>
+		<info name="language" value="Spanish" />
+		<info name="version" value="0.8.0 2022.02" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-es.bin" size="4194304" crc="06405697" sha1="481683730b0496af80f28441aec2a31525c45519" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory070" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.7.0, English)</description>
+		<year>2020</year>
+		<publisher>Studio Pixel</publisher>
+		<info name="language" value="English" />
+		<info name="version" value="0.7.0 - Test build Sep 15 2020" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="Cave Story Doukutsu (v0.7.0).bin" size="4194304" crc="ea2967be" sha1="ff6de3979c8876f17722b14c5c9dc4757d40fd90" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory070_fr" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.7.0, French)</description>
+		<year>2020</year>
+		<publisher>Studio Pixel</publisher>
+		<info name="language" value="French" />
+		<info name="version" value="0.7.0" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-fr (v0.7.0).bin" size="4194304" crc="76cae435" sha1="83f3d24d1a9894c7d9c449f6e156a907876cf89b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory070_it" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.7.0, Italian)</description>
+		<year>2020</year>
+		<publisher>Studio Pixel</publisher>
+		<info name="language" value="Italian" />
+		<info name="version" value="0.7.0" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-it (v0.7.0).bin" size="4194304" crc="84048781" sha1="a72c80402490161db0520f05b61c510655775a38" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory070_pt" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.7.0, Portuguese)</description>
+		<year>2020</year>
+		<publisher>Studio Pixel</publisher>
+		<info name="language" value="Portuguese" />
+		<info name="version" value="0.7.0" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-pt (v0.7.0).bin" size="4194304" crc="9d9dcf5d" sha1="a9330d60c9c8f694eb1d25ba7e0c5de473218907" />
 			</dataarea>
 		</part>
 	</software>
@@ -13227,6 +13711,39 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 				<rom name="coach k college basketball (usa).bin" size="2097152" crc="67c309c6" sha1="8ff5d7a7fcc47f030a3ea69f4534d9c892f58ce2"/>
 			</dataarea>
 			<dataarea name="sram" size="16384">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="coffeecr">
+		<description>Coffee Crisis</description>
+		<year>2017</year>
+		<publisher>Mega Cat Studios</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="Coffee Crisis (World) (Aftermarket) (Unl).bin" size="4194304" crc="870dfce7" sha1="ffb016201754434e26529aad6293caf88a3eb53b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="coffeecr_a" cloneof="coffeecr">
+		<description>Coffee Crisis (alt)</description>
+		<year>2017</year>
+		<publisher>Mega Cat Studios</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="Coffee Crisis (World) (Aftermarket) (Unl) (Alt).bin" size="4194304" crc="5f6f343d" sha1="3ecdc7be47df36992c332ab4ff2524c253dc4252"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="coffeecr_dm" cloneof="coffeecr">
+		<description>Coffee Crisis (demo)</description>
+		<year>2017</year>
+		<publisher>Mega Cat Studios</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="2752512">
+				<rom name="Coffee Crisis (World) (Demo) (Aftermarket) (Unl).bin" size="2752512" crc="85e45420" sha1="60d78851f79b2e659d120d899067d8ae515b9127"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14208,6 +14725,66 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		</part>
 	</software>
 
+	<software name="illmoore">
+		<description>The Curse of Illmoore Bay (demo 20191113)</description>
+		<year>2019</year>
+		<publisher>Second Dimension</publisher>
+		<info name="version" value="demo 20191028" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1512338">
+				<rom name="The Curse of Illmoore Bay Demo (20191113).bin" size="1512338" crc="615818e5" sha1="aed389e3a09c98c99156cfe25f062aa6d80d68cf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="illmoore_d1" cloneof="illmoore">
+		<description>The Curse of Illmoore Bay (demo 20190517)</description>
+		<year>2019</year>
+		<publisher>Second Dimension</publisher>
+		<info name="version" value="demo 20190517" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="672978">
+				<rom name="illmoore (demo 20190517).bin" size="672978" crc="0fd997f5" sha1="9223f175abeec973b03769fae262968a3056134e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="illmoore_d2" cloneof="illmoore">
+		<description>The Curse of Illmoore Bay (demo 20190521)</description>
+		<year>2019</year>
+		<publisher>Second Dimension</publisher>
+		<info name="version" value="demo 20190521" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="675794">
+				<rom name="illmoore (demo 20190521).bin" size="675794" crc="052e05ba" sha1="99dc4eaeb2e41588e9de136050d7b755fd4938c0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="illmoore_d3" cloneof="illmoore">
+		<description>The Curse of Illmoore Bay (demo 20190914)</description>
+		<year>2019</year>
+		<publisher>Second Dimension</publisher>
+		<info name="version" value="demo 20190914" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="759506">
+				<rom name="illmoore (demo 20190914).bin" size="759506" crc="06dd11fa" sha1="de77a6c607551f1f5c9bb72c29981f67bbf1f2c9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="illmoore_d4" cloneof="illmoore">
+		<description>The Curse of Illmoore Bay (Halloween official demo 20191028)</description>
+		<year>2019</year>
+		<publisher>Second Dimension</publisher>
+		<info name="version" value="demo 20191028" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1343432">
+				<rom name="illmoore_halloween_official_demo.bin" size="1343432" crc="fb825096" sha1="70c64556ca58fbb4eb5dea16f4b3e3dca718795f"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="custodian">
 		<description>Custodian</description>
 		<year>2018</year>
@@ -14574,6 +15151,30 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		</part>
 	</software>
 
+	<software name="debtor">
+		<description>Debtor</description>
+		<year>2020</year>
+		<publisher>PSCD Games</publisher>
+		<info name="developer" value="SharkGame" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="2228224">
+				<rom name="Debtor_PD_2020.bin" size="2228224" crc="c16c2aa4" sha1="65cc172216a70ab584a4675cc47949189df65021" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="debtor_dm" cloneof="debtor">
+		<description>Debtor (demo 4)</description>
+		<year>2020</year>
+		<publisher>PSCD Games</publisher>
+		<info name="developer" value="SharkGame" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1179648">
+				<rom name="Debtor_DEMO4.bin" size="1179648" crc="fda0a099" sha1="6afbab824d8ac0e2ea182948c673ce5ff35ad990" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="demomanp" cloneof="demoman">
 		<description>Demolition Man (USA, prototype)</description>
 		<year>1995</year>
@@ -14581,6 +15182,85 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="demolition man (usa) (beta).bin" size="2097152" crc="57ffad7a" sha1="33a33bff7277c2aab45d0d843d13728ce2c62ab2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asteborg" supported="no">
+		<description>Demons of Asteborg (demo 20210913)</description>
+		<year>2021</year>
+		<publisher>Neofid Studios</publisher>
+		<info name="language" value="English/French/German/Italian/Portuguese (Brazil)/Spanish" />
+		<info name="release" value="2020-09-13" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="15335424">
+				<rom name="Demons of Asteborg (World) (En,Fr,De,Es,It,Pt-BR) (v1.1) (Demo 5) (2021-09-13) (Aftermarket) (Unl).bin" size="15335424" crc="98c8962a" sha1="8cbe02b3e6837ede936cf43961ef831c352bd818" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asteborg_d01en" cloneof="asteborg">
+		<description>Demons of Asteborg (demo 0.1, English)</description>
+		<year>2019</year>
+		<publisher>Neofid Studios</publisher>
+		<info name="language" value="English" />
+		<info name="release" value="12-10-2019" />
+		<info name="version" value="demo 0.1" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1441792">
+				<rom name="DemonsOfAsteborgDEMO_EN_V_0.1.bin" size="1441792" crc="c7cdd236" sha1="fab24846b217f30e38ab6e78fcdc42f423b24cfe" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asteborg_d01fr" cloneof="asteborg">
+		<description>Demons of Asteborg (demo 0.1, French)</description>
+		<year>2019</year>
+		<publisher>Neofid Studios</publisher>
+		<info name="language" value="French" />
+		<info name="release" value="12-10-2019" />
+		<info name="version" value="demo 0.1" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1441792">
+				<rom name="DemonsOfAsteborgDEMO_FR_V_0.1.bin" size="1441792" crc="51acebaa" sha1="6fad0a4fb39d7c0faf53c24c735aef1b0d3ed4ac" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asteborg_d2" cloneof="asteborg">
+		<description>Demons of Asteborg (demo 20200721)</description>
+		<year>2020</year>
+		<publisher>Neofid Studios</publisher>
+		<info name="release" value="2020-07-21" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="3407872">
+				<rom name="Demons_of_Asteborg_DEMO_v21072020.bin" size="3407872" crc="8163415e" sha1="be4b6e1e627fbfdf0c25df7496a053a0289691a9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asteborg_d3" cloneof="asteborg" supported="no">
+		<description>Demons of Asteborg (demo 20210827)</description>
+		<year>2021</year>
+		<publisher>Neofid Studios</publisher>
+		<info name="language" value="English/French/German/Italian/Portuguese (Brazil)/Spanish" />
+		<info name="release" value="2020-08-27" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="15335424">
+				<rom name="Demons of Asteborg (World) (En,Fr,De,Es,It,Pt-BR) (v1.1) (Demo 3) (2021-08-27) (Aftermarket) (Unl).bin" size="15335424" crc="dda1a052" sha1="44017e148d2b8a6e07cfc9ee8269e028cb6237b7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asteborg_d4" cloneof="asteborg" supported="no">
+		<description>Demons of Asteborg (demo 20210903)</description>
+		<year>2021</year>
+		<publisher>Neofid Studios</publisher>
+		<info name="language" value="English/French/German/Italian/Portuguese (Brazil)/Spanish" />
+		<info name="release" value="2020-09-03" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="15335424">
+				<rom name="Demons of Asteborg (World) (En,Fr,De,Es,It,Pt-BR) (v1.1) (Demo 4) (2021-09-03) (Aftermarket) (Unl).bin" size="15335424" crc="b9a8f84a" sha1="11c42868e173c80fd0af5fb5284855762d74da80" />
 			</dataarea>
 		</part>
 	</software>
@@ -16033,6 +16713,17 @@ https://segaretro.org/Elitserien_96
 		</part>
 	</software>
 
+	<software name="eyra">
+		<description>Eyra - The Crow Maiden (demo)</description>
+		<year>2020</year>
+		<publisher>Second Dimension</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1091840">
+				<rom name="EyraDemoSega.bin" size="1091840" crc="e7891db4" sha1="f5ab7588e88663c2649231a2b472dbd1f624f5f2" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="f117">
 		<description>F-117 Night Storm (Europe, USA)</description>
 		<year>1993</year>
@@ -16731,6 +17422,29 @@ https://segaretro.org/Feng_Shen_Ying_Jie_Chuan
 		</part>
 	</software>
 
+	<software name="foxyland">
+		<description>FoxyLand</description>
+		<year>2020</year>
+		<publisher>PSCD Games</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="3014656">
+				<rom name="Foxyland_PD_2020.bin" size="3014656" crc="ba322eee" sha1="bf550fb78337f2b2b3c866a4ee53c325d968db5a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="foxyland_dm" cloneof="foxyland">
+		<description>FoxyLand (demo)</description>
+		<year>2019</year>
+		<publisher>PSCD Games</publisher>
+		<info name="version" value="Demo" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="FoxLand_Demo.bin" size="1048576" crc="eaaa0544" sha1="3cde713693c5793d1a84d7382d94c2811c727df1" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="franken">
 		<description>Mary Shelley's Frankenstein (USA)</description>
 		<year>1994</year>
@@ -17125,6 +17839,17 @@ https://segaretro.org/Feng_Shen_Ying_Jie_Chuan
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="mick &amp; mack as the global gladiators (usa) (beta).bin" size="1048576" crc="08c2af21" sha1="433db3e145499ebad4f71aae66ee6726ef30d5db"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gluf">
+		<description>GLUF</description>
+		<year>2020</year>
+		<publisher>RetroSouls</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="glufPD.bin" size="1048576" crc="ce5afac9" sha1="c8091c85417a126da9bb7d6b23692e517ea5ecff" />
 			</dataarea>
 		</part>
 	</software>
@@ -17955,6 +18680,42 @@ Unemulated [Sega Mega Modem] features
 		</part>
 	</software>
 
+	<software name="irena">
+		<description>Irena - Genesis Metal Fury (demo 20211209)</description>
+		<year>2021</year>
+		<publisher>White Ninja Studio</publisher>
+		<info name="version" value="demo - 2021-10-02" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="2621440">
+				<rom name="irena-genesis-metal-fury-demo 2021-12-09.bin" size="2621440" crc="f0ab7cf3" sha1="1390cd145b608f91a85951761954c2da5469d7f0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="irena_dm1" cloneof="irena">
+		<description>Irena - Genesis Metal Fury (demo 20210121)</description>
+		<year>2021</year>
+		<publisher>White Ninja Studio</publisher>
+		<info name="version" value="demo - 2021-01-21" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="2228224">
+				<rom name="irena-ks-demo-update-21012021131841.bin" size="2228224" crc="5d4f1141" sha1="7fba5dcc4d14cc29686c689bf436a441f43e12e1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="irena_dm2" cloneof="irena">
+		<description>Irena - Genesis Metal Fury (demo 20211002)</description>
+		<year>2021</year>
+		<publisher>White Ninja Studio</publisher>
+		<info name="version" value="demo - 2021-10-02" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="2490368">
+				<rom name="irena-genesis-metal-fury-demo 2021-10-02.bin" size="2490368" crc="32126357" sha1="b38727afb57d6d4e99ddef369051889ba79e0a63" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="itcame">
 		<description>It Came from the Desert (USA)</description>
 		<year>1990</year>
@@ -18222,6 +18983,18 @@ Unemulated [Sega Mega Modem] features
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="jerry glanville's pigskin footbrawl (usa).bin" size="1048576" crc="e7f48d30" sha1="fbcd0e7cb8dfc327b6d019afbdde9728f656957a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jjaeger">
+		<description>Jessie Jaeger in Cleopatra's Curse (demo)</description>
+		<year>2020</year>
+		<publisher>Bold Game Studio</publisher>
+		<info name="release" value="14-09-2020" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1441792">
+				<rom name="CleoCurse_Demo.gen" size="1441792" crc="fb462934" sha1="605974ba964def28b8c6a221aa13b5730a67f330" />
 			</dataarea>
 		</part>
 	</software>
@@ -19247,6 +20020,28 @@ Unsupported [Justifier] peripheral (joypad works)
 		</part>
 	</software>
 
+	<software name="lmedusa">
+		<description>Little Medusa</description>
+		<year>2018</year>
+		<publisher>Mega Cat Studios</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="2097152">
+				<rom name="Little Medusa (World) (Aftermarket) (Unl).bin" size="2097152" crc="cbf43975" sha1="6d7bbb1bbd64ba0373b1e5788231fdde13f365e4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lmedusa_d" cloneof="lmedusa">
+		<description>Little Medusa (demo)</description>
+		<year>2018</year>
+		<publisher>Mega Cat Studios</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1179648">
+				<rom name="LittleMedusa (demo).bin" size="1179648" crc="b9f6c84d" sha1="1d87394fa4391f2fc44dd750f37ef2ddba4dfe7f" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lordmon">
 		<description>Lord Monarch - Tokoton Sentou Densetsu (Japan)</description>
 		<year>1994</year>
@@ -20021,6 +20816,18 @@ https://segaretro.org/Ma_Qiao_E_Mo_Ta:_Devilish_Mahjong_Tower
 		</part>
 	</software>
 
+	<software name="grapplerx">
+		<description>Meka Grappler X</description>
+		<year>2017</year>
+		<publisher>Sik</publisher>
+		<info name="developer" value="Sik" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="49882">
+				<rom name="Meka Grappler X.bin" size="49882" crc="e8a9fd04" sha1="1f8fcb618372bcf1a243a1ae5599f736e0cc0530" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="menghu" supported="no">
 		<description>Mènghuàn Shuǐguǒ Pán - 777 Casino (Taiwan)</description>
 		<!-- Definitely not earlier than '94 -->
@@ -20450,6 +21257,57 @@ Needs [megadriv_z80_z80_bank_w] workaround to work (emulator copy protection?)
 		</part>
 	</software>
 
+	<software name="miniplan">
+		<description>Miniplanets Remix (rev 04)</description>
+		<year>2022</year>
+		<publisher>Sik</publisher>
+		<info name="developer" value="Sik" />
+		<info name="version" value="rev 04" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="524288">
+				<rom name="Miniplanets REMIX Ver (REV04).bin" size="524288" crc="6c531b9d" sha1="f5bb5a05bb3a720793f1e43e66efef1377e6029a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="miniplan_dm" cloneof="miniplan">
+		<description>Miniplanets (demo)</description>
+		<year>2018</year>
+		<publisher>Sik</publisher>
+		<info name="developer" value="Sik" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="179782">
+				<rom name="Miniplanets (World) (Demo) (Aftermarket) (Unl).bin" size="179782" crc="dba23f53" sha1="b5fe8dcea993a7dec9f26ec6462ce904161b189f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="miniplan_r02" cloneof="miniplan">
+		<description>Miniplanets (rev 02)</description>
+		<year>2018</year>
+		<publisher>Sik</publisher>
+		<info name="developer" value="Sik" />
+		<info name="version" value="rev 02" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="262144">
+				<rom name="Miniplanets-REV02.bin" size="262144" crc="48460e4a" sha1="5da2996cacf78c12776cd1915bdf6935efa03e03" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="miniplan_r03" cloneof="miniplan">
+		<description>Miniplanets (rev 03)</description>
+		<year>2018</year>
+		<publisher>Sik</publisher>
+		<info name="developer" value="Sik" />
+		<info name="version" value="rev 03" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="262144">
+				<rom name="Miniplanets (rev 03).bin" size="262144" crc="8ea40d2f" sha1="88ccc6781746fb31c1e25b82568ad2a58071ea89" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mfpool">
 		<description>Minnesota Fats - Pool Legend (USA)</description>
 		<year>1995</year>
@@ -20486,6 +21344,32 @@ Needs [megadriv_z80_z80_bank_w] workaround to work (emulator copy protection?)
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="miracle piano teaching system, the (usa).bin" size="524288" crc="a719542e" sha1="5141cb7cc03bc087c17cc663ea3cd889e6faa16c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="misplacd">
+		<description>Misplaced (English)</description>
+		<year>2019</year>
+		<publisher>RetroSouls</publisher>
+		<info name="developer" value="Denis Grachev" />
+		<info name="language" value="English" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="917504">
+				<rom name="Misplaced-EN.bin" size="917504" crc="d79fd3ec" sha1="baa8aab9e0daa4a5b8d20b80c0b221713b2febaf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="misplacd_ru" cloneof="misplacd">
+		<description>Misplaced (Russian)</description>
+		<year>2019</year>
+		<publisher>RetroSouls</publisher>
+		<info name="developer" value="Denis Grachev" />
+		<info name="language" value="Russian" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="917504">
+				<rom name="Misplaced-RU.bin" size="917504" crc="1997b949" sha1="d114faaf71d462221beea585b7fd2720b3768d47"/>
 			</dataarea>
 		</part>
 	</software>
@@ -22386,6 +23270,32 @@ Unemulated [Sega Mega Modem] features
 		</part>
 	</software>
 
+	<software name="oldtower">
+		<description>Old Towers (v1.2)</description>
+		<year>2019</year>
+		<publisher>RetroSouls</publisher>
+		<info name="developer" value="Denis Grachev" />
+		<info name="version" value="v1.2" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="786432">
+				<rom name="ot12.bin" size="786432" crc="d875e97d" sha1="ca2c05c070dac4b2ad7f2425ccad1b7d65949e49"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oldtower11" cloneof="oldtower">
+		<description>Old Towers (v1.1)</description>
+		<year>2019</year>
+		<publisher>RetroSouls</publisher>
+		<info name="developer" value="Denis Grachev" />
+		<info name="version" value="v1.1" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="786432">
+				<rom name="ot11.bin" size="786432" crc="1a7e29fc" sha1="ee9c49fcd163bf3d65d6a5be352417737ca5e960"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="olympgldu1" cloneof="olympgld">
 		<description>Olympic Gold (USA)</description>
 		<year>1992</year>
@@ -23406,6 +24316,149 @@ Black screen
 		</part>
 	</software>
 
+	<software name="phantgear">
+		<description>Phantom Gear (demo 0.32)</description>
+		<year>2023</year>
+		<publisher>Bits Rule Games</publisher>
+		<info name="developer" value="Mega Cat Studios" />
+		<info name="version" value="demo 0.32" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1839833">
+				<rom name="demo (0.32).bin" size="1839833" crc="81d96e08" sha1="8557a56446575534c368c873261216edce16d4d3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="phantgear_d17" cloneof="phantgear">
+		<description>Phantom Gear (demo 0.17) (Bits Rule Games)</description>
+		<year>2021</year>
+		<publisher>Bits Rule Games</publisher>
+		<info name="developer" value="Mega Cat Studios" />
+		<info name="version" value="demo 0.17" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="407099">
+				<rom name="Phantom Gear (World) (v0.17) (Demo) (Bits Rule Games) (Aftermarket) (Unl).bin" size="407099" crc="fd39b961" sha1="9fc7eecfe864264ea217b57cec3708a383b04414" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="phantgear_d17a" cloneof="phantgear">
+		<description>Phantom Gear (demo 0.17) (Mega Cat Studios)</description>
+		<year>2021</year>
+		<publisher>Bits Rule Games</publisher>
+		<info name="developer" value="Mega Cat Studios" />
+		<info name="version" value="demo 0.17" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="465018">
+				<rom name="Phantom Gear (World) (v0.17) (Demo) (Mega Cat Studios) (Aftermarket) (Unl).bin" size="465018" crc="3607a42c" sha1="df1f34687f63566ab542117adf1c09715acfd149" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="phantgear_d20" cloneof="phantgear">
+		<description>Phantom Gear (demo 0.20)</description>
+		<year>2021</year>
+		<publisher>Mega Cat Studios</publisher>
+		<info name="developer" value="Bits Rule Games" />
+		<info name="version" value="demo 0.20" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="834749">
+				<rom name="Phantom-Gear_0.20.bin" size="834749" crc="1c413837" sha1="a10fffe8deaf978b34834de59fda4cb71442c26a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="phantgear_d21" cloneof="phantgear">
+		<description>Phantom Gear (demo 0.21)</description>
+		<year>2021</year>
+		<publisher>Mega Cat Studios</publisher>
+		<info name="developer" value="Bits Rule Games" />
+		<info name="version" value="demo 0.21" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="852665">
+				<rom name="phantom_gear_0.21.bin" size="852665" crc="eb689d17" sha1="0cb02653eb92e2dfa198dbc8181eb4ee7236f2a5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="phantgear_d22" cloneof="phantgear">
+		<description>Phantom Gear (demo 0.22)</description>
+		<year>2021</year>
+		<publisher>Bits Rule Games</publisher>
+		<info name="developer" value="Mega Cat Studios" />
+		<info name="version" value="demo 0.22" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="948445">
+				<rom name="demo (0.22).bin" size="948445" crc="7dccda30" sha1="7eab1e7f9f7d41a7dc9d10776ce71cf2ee9fe43f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="phantgear_d25" cloneof="phantgear">
+		<description>Phantom Gear (demo 0.25)</description>
+		<year>2021</year>
+		<publisher>Bits Rule Games</publisher>
+		<info name="developer" value="Mega Cat Studios" />
+		<info name="version" value="demo 0.25" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1610471">
+				<rom name="Phantom Gear (World) (v0.25) (Demo) (Aftermarket) (Unl).bin" size="1610471" crc="0ed12792" sha1="4a672d2d92c468dad9e641073d065cd144f29575" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="phantgear_d02" cloneof="phantgear">
+		<description>Phantom Gear (demo 0.2)</description>
+		<year>2019</year>
+		<publisher>Mega Cat Studios</publisher>
+		<info name="developer" value="Bits Rule Games" />
+		<info name="version" value="demo 0.2" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="303692">
+				<rom name="Phantom Gear (World) (v0.2) (Demo) (Aftermarket) (Unl).bin" size="303692" crc="d6cf8cdb" sha1="21fcc7b14221b22ac86a2f6eaa062c3c48e97948" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="phantgear_d05" cloneof="phantgear">
+		<description>Phantom Gear (demo 0.5)</description>
+		<year>2019</year>
+		<publisher>Mega Cat Studios</publisher>
+		<info name="developer" value="Bits Rule Games" />
+		<info name="version" value="demo 0.5" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="303792">
+				<rom name="Phantom-Gear.bin" size="303792" crc="40c23595" sha1="a8404371252d7df85d0d84f577c56c4834e36c7c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="phantgear_d06" cloneof="phantgear">
+		<description>Phantom Gear (demo 0.6)</description>
+		<year>2019</year>
+		<publisher>Mega Cat Studios</publisher>
+		<info name="developer" value="Bits Rule Games" />
+		<info name="version" value="demo 0.6" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="303806">
+				<rom name="phantom gear demo.bin" size="303806" crc="d5d3e335" sha1="dec75f8b39752b0bd8afdb43ae504bcf02af94a2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="phantgear_d09" cloneof="phantgear">
+		<description>Phantom Gear (demo 0.9)</description>
+		<year>2019</year>
+		<publisher>Mega Cat Studios</publisher>
+		<info name="developer" value="Bits Rule Games" />
+		<info name="version" value="demo 0.9" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="316070">
+				<rom name="Phantom Gear demo (0.9).bin" size="316070" crc="3df43d25" sha1="4eaa53256e7fdb645b5e48822a088b778a82808f" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pheliosu" cloneof="phelios">
 		<description>Phelios (USA)</description>
 		<year>1990</year>
@@ -24035,6 +25088,19 @@ Black screen
 		</part>
 	</software>
 
+	<software name="puzzli">
+		<description>Puzzli</description>
+		<year>2020</year>
+		<publisher>Portabledev</publisher>
+		<info name="developer" value="Alekmaul" />
+		<info name="version" value="1.1" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1179648">
+				<rom name="puzzli200526.bin" size="1179648" crc="53eca258" sha1="97374c224d6e38a9e69d6c5ccac5e95ea149f0d7" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pyramid">
 		<description>Pyramid Magic (Japan, SegaNet)</description>
 		<year>1991</year>
@@ -24401,6 +25467,28 @@ https://segaretro.org/Rastan_Saga_II
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="rastan saga ii (jpn).bin" size="524288" crc="ebacfb5a" sha1="e7bd8367ae962af48a2e937bf6ced253f428b03d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="reknum">
+		<description>Reknum - Fantasy of Dreams (demo 2)</description>
+		<year>2020</year>
+		<publisher>PSCD Games</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="655360">
+				<rom name="Reknum_Demo_002.bin" size="655360" crc="c40cd1e6" sha1="602163737bf3d914cc354b288b977a48f906f27d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="reknum_dm" cloneof="reknum">
+		<description>Reknum - Fantasy of Dreams (demo)</description>
+		<year>2020</year>
+		<publisher>PSCD Games</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="655360">
+				<rom name="Reknum Demo.bin" size="655360" crc="9a6f0098" sha1="4702d154cb9aea42958d7632b5993fbc896d4971" />
 			</dataarea>
 		</part>
 	</software>
@@ -28222,6 +29310,31 @@ Freezes at the start of any in-game mode
 		</part>
 	</software>
 
+	<software name="sheavydt">
+		<description>Super Heavy Duty</description>
+		<year>2020</year>
+		<publisher>Playnautic</publisher>
+		<info name="developer" value="Riccardo Campione"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="Super Heavy Duty (World) (Aftermarket) (Unl).md" size="4194304" crc="81f8e890" sha1="071a44877dc2bb94284f11d4809cf30f1b811b08" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sheavydt_dm" cloneof="sheavydt">
+		<description>Super Heavy Duty (preview version)</description>
+		<year>2020</year>
+		<publisher>Playnautic</publisher>
+		<info name="developer" value="Riccardo Campione"/>
+		<info name="release" value="20200827"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1835008">
+				<rom name="20200827 - Super Heavy Duty Demo.md" size="1835008" crc="15adc6d6" sha1="d69ade4f60d8e6d33e73a9ac8eb04da2f80c5f54" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="shimpact">
 		<description>Super High Impact (USA)</description>
 		<year>1992</year>
@@ -28720,6 +29833,106 @@ Freezes at the start of any in-game mode
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="marvel land (usa).bin" size="1048576" crc="cd7eeeb7" sha1="29f290c80f992542e73c9ea95190403cb262b6ad"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tanglewd">
+		<description>Tanglewood</description>
+		<year>2018</year>
+		<publisher>Big Evil Corporation</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="Tanglewood (World) (Aftermarket) (Unl).bin" size="4194304" crc="2b914b3b" sha1="7021e58d634c7704b0fab10db401b2a49e842706"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tanglewd_a" cloneof="tanglewd">
+		<description>Tanglewood (GOG release)</description>
+		<year>2018</year>
+		<publisher>Big Evil Corporation</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="tanglewd_md_1_0.bin" size="4194304" crc="1a91c419" sha1="128b547cad971434e6dd815d1c65a268d826d831"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tanglewd_b" cloneof="tanglewd" supported="no">
+		<description>Tanglewood (GOG / Windows release)</description>
+		<year>2018</year>
+		<publisher>Big Evil Corporation</publisher>
+		<notes>Black screen after the initial credits</notes>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="Tanglewood (World) (GOG) (Windows) (Aftermarket) (Unl).bin" size="4194304" crc="ed654373" sha1="a70fd6a3b06c8ee89a77c3f90240455e558c4cfe"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tanglewd_p1" cloneof="tanglewd">
+		<description>Tanglewood (tech demo build v0.0.11)</description>
+		<year>2016</year>
+		<publisher>Big Evil Corporation</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1470640">
+				<rom name="tanglewd (Tech Demo Build v0.0.11).bin" size="1470640" crc="c6504722" sha1="2df3e20ac56b730bf540d98d8b300b6114c48112"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tanglewd_p2" cloneof="tanglewd">
+		<description>Tanglewood (tech demo build v0.0.14)</description>
+		<year>2016</year>
+		<publisher>Big Evil Corporation</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1990268">
+				<rom name="Tanglewood (World) (Demo) (0.0.14) (Aftermarket) (Unl).bin" size="1990268" crc="d23bb250" sha1="c82155a9f7f69c29a59462c118addf07c3b4e60f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tanglewd_p3" cloneof="tanglewd">
+		<description>Tanglewood (tech demo build v0.0.15)</description>
+		<year>2016</year>
+		<publisher>Big Evil Corporation</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="2002030">
+				<rom name="tanglewd (Tech Demo Build v0.0.15).bin" size="2002030" crc="5e0efb0e" sha1="63bc8df62cb26c8a226cd0bd70f6eec3a7f947ca"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tanglewd_p4" cloneof="tanglewd">
+		<description>Tanglewood (tech demo 0.1.04)</description>
+		<year>2017</year>
+		<publisher>Big Evil Corporation</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1284580">
+				<rom name="tanglewd (Tech Demo 0.1.04).bin" size="1284580" crc="dd537516" sha1="6be33a99482476eafa54129857ce21401dbdc9df"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tanglewd_p5" cloneof="tanglewd">
+		<description>Tanglewood (demo 0.8.01)</description>
+		<year>2018</year>
+		<publisher>Big Evil Corporation</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="2166082">
+				<rom name="Tanglewood (World) (Demo) (0.8.01) (Aftermarket) (Unl).bin" size="2166082" crc="61211912" sha1="0a7bd92363de9a9a95045aceba540e5673ecf781"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tanglewd_p6" cloneof="tanglewd">
+		<description>Tanglewood (demo 0.9.37)</description>
+		<year>2018</year>
+		<publisher>Big Evil Corporation</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="2097152">
+				<rom name="tanglewd (Pre Release Build).bin" size="2097152" crc="9cc94381" sha1="635588420cb8a9f8e0699e3dc99c6a7ed61fe610"/>
 			</dataarea>
 		</part>
 	</software>
@@ -29303,6 +30516,28 @@ No BGMs
 		</part>
 	</software>
 
+	<software name="thundpaw">
+		<description>Thunder Paw (demo 2)</description>
+		<year>2021</year>
+		<publisher>PSCD Games</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1572864">
+				<rom name="Thunder Paw Demo 2.bin" size="1572864" crc="f7df60b4" sha1="87eba2120a051318731e9c32369f308f438c08a7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thundpaw_dm" cloneof="thundpaw">
+		<description>Thunder Paw (demo)</description>
+		<year>2021</year>
+		<publisher>PSCD Games</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="917504">
+				<rom name="Thunder Paw Demo.bin" size="917504" crc="7fe98d01" sha1="e2058338b23c6e4016471484fce7a697d5e36043" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tpwres">
 		<description>Thunder Pro Wrestling Retsuden (Japan)</description>
 		<year>1992</year>
@@ -29643,6 +30878,17 @@ No BGMs
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="top pro golf 2 (jpn).bin" size="1048576" crc="b8ce98b3" sha1="95a8918c98420fdfd59a4cb0be8fd5ec69d3593e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tourmaln">
+		<description>Tourmaline</description>
+		<year>2021</year>
+		<publisher>RetroSouls</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="786432">
+				<rom name="tourmaline.bin" size="786432" crc="437aeb56" sha1="76f432e5ceefe667418078fff621fbfa644216be" />
 			</dataarea>
 		</part>
 	</software>
@@ -30006,6 +31252,58 @@ No BGMs
 		</part>
 	</software>
 
+	<software name="ultracor">
+		<description>Ultracore (Europe)</description>
+		<year>2019</year>
+		<publisher>Strictly Limited Games</publisher>
+		<info name="developer" value="Digital Illusions" />
+		<info name="version" value="MD-1.0" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="Ultracore (Europe) (MD-1.0) (Aftermarket) (Unl).bin" size="1048576" crc="77d3d240" sha1="ccf9ea27dc7a3e7aa88e56f1902dd0629dc866cf" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ultracorj" cloneof="ultracor">
+		<description>Ultracore (Japan)</description>
+		<year>2019</year>
+		<publisher>Columbus Circle</publisher>
+		<info name="developer" value="Digital Illusions" />
+		<info name="version" value="MJ-1.0" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="2097152">
+				<rom name="Ultracore (Japan) (MJ-1.0).bin" size="2097152" crc="ae7fda5a" sha1="a7ecac360c0588cb8d4866d2593ca0c94bd6cd00" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ultracoru" cloneof="ultracor">
+		<description>Ultracore (USA)</description>
+		<year>2019</year>
+		<publisher>Strictly Limited Games</publisher>
+		<info name="developer" value="Digital Illusions" />
+		<info name="version" value="MU-1.0" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="Ultracore (USA) (Aftermarket) (Unl).bin" size="1048576" crc="4852c1c0" sha1="228c14c1e1a6b8de7dd9bf103851910eec8ae5bc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ultracora" cloneof="ultracor">
+		<description>Ultracore (Europe, USA) (Switch, PS Vita)</description>
+		<year>2020</year>
+		<publisher>Strictly Limited Games</publisher>
+		<info name="developer" value="Digital Illusions" />
+		<info name="version" value="V-1.0" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="Ultracore (USA, Europe) (Switch, PS Vita) (Aftermarket) (Unl).bin" size="1048576" crc="b270c265" sha1="4d9b2f48cabfa2cc2d5dd518b650eeea0b608ff9" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ultraman">
 		<description>Ultraman - Kuusou Tokusatsu Shiriizu (Japan)</description>
 		<year>1993</year>
@@ -30118,6 +31416,42 @@ No BGMs
 			</dataarea>
 			<!-- Correct? size taken from the header -->
 			<dataarea name="sram" size="2048">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uwol">
+		<description>Uwol - Quest for Money (v1.2)</description>
+		<year>2010</year>
+		<publisher>The Mojon Twins</publisher>
+		<info name="developer" value="Shiru" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="65536">
+				<rom name="Uwol_Quest_For_Money.bin" size="65536" crc="6fa88172" sha1="330853ce882222a700f648ff1cec9d862f3fcd3a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uwol_10" cloneof="uwol">
+		<description>Uwol - Quest for Money (v1.0)</description>
+		<year>2010</year>
+		<publisher>The Mojon Twins</publisher>
+		<info name="developer" value="Shiru" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="65536">
+				<rom name="UWOL - Quest for Money (World) (v1.0) (Aftermarket) (Homebrew).bin" size="65536" crc="552b241b" sha1="273bb1b64b3377bb78db8d7d502f827450b0b361"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uwol_11" cloneof="uwol">
+		<description>Uwol - Quest for Money (v1.1)</description>
+		<year>2010</year>
+		<publisher>The Mojon Twins</publisher>
+		<info name="developer" value="Shiru" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="65536">
+				<rom name="UWOL - Quest for Money (World) (v1.1) (Aftermarket) (Homebrew).bin" size="65536" crc="3c9a4c0a" sha1="0d07368552293716966615d59376a7fee5c0813c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -32480,7 +33814,19 @@ Black screen
 		</part>
 	</software>
 
-	<software name="beggarp" supported="partial">
+	<software name="beggarp1">
+		<description>Beggar Prince (rev 1) (Europe, USA)</description>
+		<year>2006</year>
+		<publisher>Super Fighter Team</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sf001"/>
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="Beggar Prince (World) (Rev 1) (Aftermarket) (Unl).bin" size="4194304" crc="6332edcc" sha1="1aeaef203c7d55fa678b92776b5b8cbc76533652" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beggarp"  cloneof="beggarp1" supported="partial">
 		<description>Beggar Prince (Europe, USA)</description>
 		<year>2005</year>
 		<publisher>Super Fighter Team</publisher>
@@ -32492,7 +33838,7 @@ Black screen
 		</part>
 	</software>
 
-	<software name="xinqig" cloneof="beggarp">
+	<software name="xinqig" cloneof="beggarp1">
 		<description>Xīn Qǐgài Wángzǐ (China)</description>
 		<year>1996</year>
 		<publisher>C&amp;E</publisher>
@@ -32505,7 +33851,7 @@ Black screen
 		</part>
 	</software>
 
-	<software name="xinqig1" cloneof="beggarp">
+	<software name="xinqig1" cloneof="beggarp1">
 		<description>Xīn Qǐgài Wángzǐ (China, alt)</description>
 		<year>1996</year>
 		<publisher>C&amp;E</publisher>
@@ -32554,6 +33900,17 @@ Black screen
 			<feature name="pcb" value="MD-03B"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="clan of heroes - generals of the yang family (world) (unl).bin" size="2097152" crc="aeb3c10c" sha1="a347cd6918ce85c4e1c743fb0792cd56166ed858"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yazzie">
+		<description>Yazzie</description>
+		<year>2020</year>
+		<publisher>RetroSouls</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="655360">
+				<rom name="yazzie.bin" size="655360" crc="93d5ad8a" sha1="5d0b94db54ecb60334b7de605082613f8509b41b" />
 			</dataarea>
 		</part>
 	</software>
@@ -34229,11 +35586,11 @@ Unsupported lightgun or mouse?
 		</part>
 	</software>
 
-	<software name="kolobok">
+	<software name="kolobok" cloneof="uwol">
 		<!-- This is an homebrew port of "Uwol - Quest For Money" for ZX Spectrum -->
 		<!-- Apparently it got burned to real carts and sold in Russia -->
 		<description>Kolobok ~ Pyramid (Russia)</description>
-		<year>199?</year>
+		<year>201?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="Колобок - Пирамида"/>
 		<part name="cart" interface="megadriv_cart">
