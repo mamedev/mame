@@ -27,6 +27,7 @@ private:
 	u8 m_r2l[0x80];
 
 	std::string m_200_optypes[4] = {"·", "invalid", "=", "-"};
+	std::string m_200_reg2[2] = {"A1", "A2" };
 };
 
 #endif // MAME_CPU_UPD777_UPD777DASM_H
