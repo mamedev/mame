@@ -62,19 +62,17 @@ ROM_END
 
 void hdae5000_device::rom_map(address_map &map)
 {
+	map(0x00000, 0x7ffff).rom().region(m_rom, 0);
+}
+
+void hdae5000_device::io_map(address_map &map)
+{
 	//map(0x130000, 0x13ffff).m(m_hddc, FUNC(?_device::?)); // Hard-drive Controller (model?) IC? on HD-AE5000 board 
 	//map(0x160000, 0x16ffff) ... Optional parallel port interface (NEC uPD71055) IC9
 	map(0x160000, 0x160000).lrw8([this](offs_t a) { return m_ppi->read(0); }, "ppi_r0", [this](offs_t a, u8 data) { m_ppi->write(0, data); }, "ppi_w0");
 	map(0x160002, 0x160002).lrw8([this](offs_t a) { return m_ppi->read(1); }, "ppi_r1", [this](offs_t a, u8 data) { m_ppi->write(1, data); }, "ppi_w1");
 	map(0x160004, 0x160004).lrw8([this](offs_t a) { return m_ppi->read(2); }, "ppi_r2", [this](offs_t a, u8 data) { m_ppi->write(2, data); }, "ppi_w2");
 	map(0x160006, 0x160006).lrw8([this](offs_t a) { return m_ppi->read(3); }, "ppi_r3", [this](offs_t a, u8 data) { m_ppi->write(3, data); }, "ppi_w3");
-	map(0x200000, 0x27ffff).ram(); //optional hsram: 2 * 256k bytes Static RAM @ IC5, IC6 (CS5)
-	map(0x280000, 0x2fffff).rom().region(m_rom, 0); // 512k bytes FLASH ROM @ IC4 (CS5)
-	map(0x800000, 0x8fffff).ram(); // hack <- I think this is the SRAM from the HD-AE5000 board
-}
-
-void hdae5000_device::io_map(address_map &map)
-{
 }
 
 const tiny_rom_entry *hdae5000_device::device_rom_region() const
