@@ -17,6 +17,73 @@
 #include "speaker.h"
 #include "video/pc_vga.h"
 
+class mn89304_vga_device : public svga_device
+{
+public:
+    // construction/destruction
+    mn89304_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+    virtual void device_reset() override;
+
+    virtual void palette_update() override;
+    virtual void recompute_params() override;
+    virtual uint16_t offset() override;
+};
+
+DEFINE_DEVICE_TYPE(MN89304_VGA, mn89304_vga_device, "mn89304_vga", "MN89304 VGA")
+
+// TODO: nothing is known about this, configured out of usage in here for now.
+mn89304_vga_device::mn89304_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: svga_device(mconfig, MN89304_VGA, tag, owner, clock)
+{
+    // ...
+}
+
+void mn89304_vga_device::device_reset()
+{
+    svga_device::device_reset();
+    svga.rgb8_en = 1;
+}
+
+// sets up mode 0, by default it will throw 155 Hz, assume divided by 3
+void mn89304_vga_device::recompute_params()
+{
+    u8 xtal_select = (vga.miscellaneous_output & 0x0c) >> 2;
+    int xtal;
+
+    switch(xtal_select & 3)
+    {
+        case 0: xtal = XTAL(25'174'800).value() / 3; break;
+        case 1: xtal = XTAL(28'636'363).value() / 3; break;
+        case 2:
+        default:
+            throw emu_fatalerror("MN89304: setup ext. clock select");
+    }
+
+    recompute_params_clock(1, xtal);
+}
+
+
+void mn89304_vga_device::palette_update()
+{
+    // 4bpp RAMDAC
+    for (int i = 0; i < 256; i++)
+    {
+        set_pen_color(
+            i,
+            pal4bit(vga.dac.color[3*(i & vga.dac.mask) + 0]),
+            pal4bit(vga.dac.color[3*(i & vga.dac.mask) + 1]),
+            pal4bit(vga.dac.color[3*(i & vga.dac.mask) + 2])
+        );
+    }
+}
+
+uint16_t mn89304_vga_device::offset()
+{
+    return svga_device::offset() << 3;
+}
+
 
 namespace {
 
@@ -76,8 +143,8 @@ void kn5000_state::maincpu_mem(address_map &map)
 	//FIXME: map(0x120000, 0x12ffff).w(m_fdc, FUNC(upd765a_device::dack_w)); // Floppy DMA Acknowledge
 	map(0x140000, 0x14ffff).r("to_maincpu_latch", FUNC(generic_latch_8_device::read)); // @ IC23
 	map(0x140000, 0x14ffff).w("to_subcpu_latch", FUNC(generic_latch_8_device::write)); // @ IC22
-	map(0x1703b0, 0x1703df).m("vga", FUNC(vga_device::io_map)); // LCD controller @ IC206
-	map(0x1a0000, 0x1bffff).rw("vga", FUNC(vga_device::mem_linear_r), FUNC(vga_device::mem_linear_w));
+	map(0x1703b0, 0x1703df).m("vga", FUNC(mn89304_vga_device::io_map)); // LCD controller @ IC206
+	map(0x1a0000, 0x1bffff).rw("vga", FUNC(mn89304_vga_device::mem_linear_r), FUNC(mn89304_vga_device::mem_linear_w));
 	map(0x1e0000, 0x1fffff).ram(); // 1Mbit SRAM @ IC21 (CS0)  Note: I think this is the message "ERROR in back-up SRAM"
 	map(0x200000, 0x2fffff).view(m_extension_view);
 	m_extension_view[0](0x200000, 0x27ffff).ram(); //optional hsram: 2 * 256k bytes Static RAM @ IC5, IC6 (CS5)
@@ -226,7 +293,7 @@ void kn5000_state::kn5000(machine_config &config)
 	//   bit 5 (input) = FC2
 	//   bit 6 (input) = FC3
 	//   bit 7 (input) = FC4
-	
+
 	// PORT H:
 	//   bit 1 = TC1 Terminal count - microDMA
 	m_maincpu->porth_read().set([] { return 2; }); // area/region detection: checked at EF083E (v10 ROM)
@@ -259,7 +326,7 @@ void kn5000_state::kn5000(machine_config &config)
 	GENERIC_LATCH_8(config, "to_maincpu_latch"); // @ IC23
 	GENERIC_LATCH_8(config, "to_subcpu_latch"); //  @ IC22
 
-	UPD72067(config, m_fdc, 32'000'000); // actual controller is UPD72068GF-3B9 at IC208	
+	UPD72067(config, m_fdc, 32'000'000); // actual controller is UPD72068GF-3B9 at IC208
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, TLCS900_INT4);
 	m_fdc->drq_wr_callback().set_inputline(m_maincpu, TLCS900_INT5);
 	m_fdc->hdl_wr_callback().set_inputline(m_maincpu, TLCS900_INT6);
@@ -284,14 +351,14 @@ void kn5000_state::kn5000(machine_config &config)
 
 	/* video hardware */
 	// LCD Controller MN89304 @ IC206 24_MHz_XTAL
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_raw(XTAL(40'000'000)/6, 424, 0, 320, 262, 0, 240);
-	screen.set_screen_update("vga", FUNC(vga_device::screen_update));
+	screen.set_screen_update("vga", FUNC(mn89304_vga_device::screen_update));
 
-	vga_device &vga(VGA(config, "vga", 0));
+	mn89304_vga_device &vga(MN89304_VGA(config, "vga", 0));
 	vga.set_screen("screen");
 	vga.set_vram_size(0x100000);
-	
+
 	// This is a quick hack to beep whenever the checking device LED is on
 	// (just because I find it more convenient to listen to the beeps while debugging the driver)
 	SPEAKER(config, "mono").front_center();
