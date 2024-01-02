@@ -149,7 +149,8 @@ void kn5000_state::machine_reset()
 
 void kn5000_state::kn5000(machine_config &config)
 {
-	TMP94C241(config, m_maincpu, 8_MHz_XTAL); // TMP94C241F @ IC5
+	// Note: The CPU has an internal clock doubler
+	TMP94C241(config, m_maincpu, 2 * 8_MHz_XTAL); // TMP94C241F @ IC5
 	// Address bus is set to 32 bits by the pins AM1=+5v and AM0=GND
 	m_maincpu->set_addrmap(AS_PROGRAM, &kn5000_state::maincpu_mem);
 	// Interrupt 0: CLK on "to_maincpu_latch"
@@ -230,7 +231,8 @@ void kn5000_state::kn5000(machine_config &config)
 	// AN0 = EXP (expression pedal?)
 	// AN1 = AFT
 
-	TMP94C241(config, m_subcpu, 10_MHz_XTAL); // TMP94C241F @ IC27
+	// Note: The CPU has an internal clock doubler
+	TMP94C241(config, m_subcpu, 2*10_MHz_XTAL); // TMP94C241F @ IC27
 	// Address bus is set to 8 bits by the pins AM1=GND and AM0=GND
 	m_subcpu->set_addrmap(AS_PROGRAM, &kn5000_state::subcpu_mem);
 	// Interrupt 0: CLK on "to_subcpu_latch"
