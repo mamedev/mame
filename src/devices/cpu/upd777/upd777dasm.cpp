@@ -269,283 +269,217 @@ offs_t upd777_disassembler::disassemble(std::ostream &stream, offs_t pc, const u
 		/////////////////////////////////////////////////////////////////////////////////////////////////////
 		/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		// 200
+		// 200, 220, 208, 228, 20c, 22c
 		case 0b001000000000: case 0b001000000001: case 0b001000000010: case 0b001000000011:
 		case 0b001000100000: case 0b001000100001: case 0b001000100010: case 0b001000100011:
-		{ // Skip if (A1[7:1]·A1[7:1]) makes zero, N->L[2:1]
-		  // Skip if (A1[7:1]·A1[7:1]) makes non zero, N->L[2:1]
+		case 0b001000001000: case 0b001000001001: case 0b001000001010: case 0b001000001011:
+		case 0b001000101000: case 0b001000101001: case 0b001000101010: case 0b001000101011:
+		case 0b001000001100: case 0b001000001101: case 0b001000001110: case 0b001000001111:
+		case 0b001000101100: case 0b001000101101: case 0b001000101110: case 0b001000101111:
+		{
+		  // optype ·
+		  // 200 Skip if (A1[7:1]·A1[7:1]) makes zero, N->L[2:1]
+		  // 220 Skip if (A1[7:1]·A1[7:1]) makes non zero, N->L[2:1]
+		  // optype =
+		  // 208 Skip if (A1[7:1]-A1[7:1]) makes zero, N->L[2:1]  (typo on description?, should be =?)
+		  // 228 Skip if (A1[7:1]-A1[7:1]) makes non zero, N->L[2:1]    (typo on description?, should be =?)
+		  // optype -
+		  // 20c Skip if (A1[7:1]-A1[7:1]) makes borrow, N->L[2:1]
+		  // 22c Skip if (A1[7:1]-A1[7:1]) makes non borrow, N->L[2:1]
 			u8 non = inst & 0x20;
-			util::stream_format(stream, "A1·A1, 0x%d->L EQJ%s", inst & 0x3, non ? "/" : "");
+			u8 optype = (inst & 0x0c) >> 2;
+			util::stream_format(stream, "A1%sA1, 0x%d->L EQJ%s", m_200_optypes[optype], inst & 0x3, non ? "/" : "");
+			break;
+		}
+
+		// 210, 230, 218, 238, 21c, 23c
+		case 0b001000010000: case 0b001000010001: case 0b001000010010: case 0b001000010011:
+		case 0b001000110000: case 0b001000110001: case 0b001000110010: case 0b001000110011:
+		case 0b001000011000: case 0b001000011001: case 0b001000011010: case 0b001000011011:
+		case 0b001000111000: case 0b001000111001: case 0b001000111010: case 0b001000111011:
+		case 0b001000011100: case 0b001000011101: case 0b001000011110: case 0b001000011111:
+		case 0b001000111100: case 0b001000111101: case 0b001000111110: case 0b001000111111:
+		{
+		  // optype ·
+		  // 210 Skip if (A1[7:1]·A2[7:1]) makes zero, N->L[2:1]
+		  // 230 Skip if (A1[7:1]·A2[7:1]) makes non zero, N->L[2:1]
+		  // optype =
+		  // 218 Skip if (A1[7:1]-A2[7:1]) makes zero, N->L[2:1]  (typo on description?, should be =?)
+		  // 238 Skip if (A1[7:1]-A2[7:1]) makes non zero, N->L[2:1]    (typo on description?, should be =?)
+		  // optype -
+		  // 21c Skip if (A1[7:1]-A2[7:1]) makes borrow, N->L[2:1]
+		  // 23c Skip if (A1[7:1]-A2[7:1]) makes non borrow, N->L[2:1]
+			u8 non = inst & 0x20;
+			u8 optype = (inst & 0x0c) >> 2;
+			util::stream_format(stream, "A1%sA2, 0x%d->L EQJ%s", m_200_optypes[optype], inst & 0x3, non ? "/" : "");
+			break;
+		}
+
+		// 240, 260, 248, 268, 24c, 26c
+		case 0b001001000000: case 0b001001000001: case 0b001001000010: case 0b001001000011:
+		case 0b001001100000: case 0b001001100001: case 0b001001100010: case 0b001001100011:
+		case 0b001001001000: case 0b001001001001: case 0b001001001010: case 0b001001001011:
+		case 0b001001101000: case 0b001001101001: case 0b001001101010: case 0b001001101011:
+		case 0b001001001100: case 0b001001001101: case 0b001001001110: case 0b001001001111:
+		case 0b001001101100: case 0b001001101101: case 0b001001101110: case 0b001001101111:
+		{
+		  // optype ·
+		  // 240 Skip if (A2[7:1]·A1[7:1]) makes zero, N->L[2:1]
+		  // 260 Skip if (A2[7:1]·A1[7:1]) makes non zero, N->L[2:1]
+		  // optype =
+		  // 248 Skip if (A2[7:1]-A1[7:1]) makes zero, N->L[2:1]  (typo?)
+		  // 268 Skip if (A2[7:1]-A1[7:1]) makes non zero, N->L[2:1]  (typo?)
+		  // optype -
+		  // 24c Skip if (A2[7:1]-A1[7:1]) makes borrow, N->L[2:1]
+		  // 26c Skip if (A2[7:1]-A1[7:1]) makes non borrow, N->L[2:1]
+			u8 non = inst & 0x20;
+			u8 optype = (inst & 0x0c) >> 2;
+			util::stream_format(stream, "A2%sA1, 0x%d->L EQJ%s", m_200_optypes[optype], inst & 0x3, non ? "/" : "");
+			break;
+		}
+
+		// 250, 270, 258, 278, 25c, 27c
+		case 0b001001010000: case 0b001001010001: case 0b001001010010: case 0b001001010011:
+		case 0b001001110000: case 0b001001110001: case 0b001001110010: case 0b001001110011:
+		case 0b001001011000: case 0b001001011001: case 0b001001011010: case 0b001001011011:
+		case 0b001001111000: case 0b001001111001: case 0b001001111010: case 0b001001111011:
+		case 0b001001011100: case 0b001001011101: case 0b001001011110: case 0b001001011111:
+		case 0b001001111100: case 0b001001111101: case 0b001001111110: case 0b001001111111:
+		{
+		  // optype ·
+  		  // 250 Skip if (A2[7:1]·A2[7:1]) makes zero, N->L[2:1]
+		  // 270 Skip if (A2[7:1]·A2[7:1]) makes non zero, N->L[2:1]
+		  // optype =
+		  // 258 Skip if (A2[7:1]-A2[7:1]) makes zero, N->L[2:1]  (typo?)
+		  // 278 Skip if (A2[7:1]-A2[7:1]) makes non zero, N->L[2:1] (typo?)
+		  // optype -
+		  // 25c Skip if (A2[7:1]-A2[7:1]) makes borrow, N->L[2:1]
+		  // 27c Skip if (A2[7:1]-A2[7:1]) makes non borrow, N->L[2:1]
+			u8 non = inst & 0x20;
+			u8 optype = (inst & 0x0c) >> 2;
+			util::stream_format(stream, "A2%sA2, 0x%d->L EQJ%s", m_200_optypes[optype], inst & 0x3, non ? "/" : "");
+			break;
+		}
+
+		// 280, 2a0, 288, 2a8, 28c, 2ac
+		case 0b001010000000: case 0b001010000001: case 0b001010000010: case 0b001010000011:
+		case 0b001010100000: case 0b001010100001: case 0b001010100010: case 0b001010100011:
+		case 0b001010001000: case 0b001010001001: case 0b001010001010: case 0b001010001011:
+		case 0b001010101000: case 0b001010101001: case 0b001010101010: case 0b001010101011:
+		case 0b001010001100: case 0b001010001101: case 0b001010001110: case 0b001010001111:
+		case 0b001010101100: case 0b001010101101: case 0b001010101110: case 0b001010101111:
+		{
+		  // optype ·
+		  // 280 Skip if (M[H[5:1],L[2:1]][7:1]·A1[7:1]) makes zero, N->L[2:1]
+		  // 2a0 Skip if (M[H[5:1],L[2:1]][7:1]·A1[7:1]) makes non zero, N->L[2:1]
+		  // optype =
+		  // 288 Skip if (M[H[5:1],L[2:1]][7:1]-A1[7:1]) makes zero, N->L[2:1] (typo?)
+		  // 2a8 Skip if (M[H[5:1],L[2:1]][7:1]-A1[7:1]) makes non zero, N->L[2:1] (typo?)
+		  // optype -
+		  // 28c Skip if (M[H[5:1],L[2:1]][7:1]-A1[7:1]) makes borrow, N->L[2:1]
+		  // 2ac Skip if (M[H[5:1],L[2:1]][7:1]-A1[7:1]) makes non borrow, N->L[2:1]
+			u8 non = inst & 0x20;
+			u8 optype = (inst & 0x0c) >> 2;
+			util::stream_format(stream, "M%sA1, 0x%d->L EQJ%s", m_200_optypes[optype], inst & 0x3, non ? "/" : "");
+			break;
+		}
+
+		// 290, 2b0, 298, 2b8, 29c, 2bc
+		case 0b001010010000: case 0b001010010001: case 0b001010010010: case 0b001010010011:
+		case 0b001010110000: case 0b001010110001: case 0b001010110010: case 0b001010110011:
+		case 0b001010011000: case 0b001010011001: case 0b001010011010: case 0b001010011011:
+		case 0b001010111000: case 0b001010111001: case 0b001010111010: case 0b001010111011:
+		case 0b001010011100: case 0b001010011101: case 0b001010011110: case 0b001010011111:
+		case 0b001010111100: case 0b001010111101: case 0b001010111110: case 0b001010111111:
+		{
+		  // optype ·
+		  // 290 Skip if (M[H[5:1],L[2:1]][7:1]·A2[7:1]) makes zero, N->L[2:1]
+		  // 2b0 Skip if (M[H[5:1],L[2:1]][7:1]·A2[7:1]) makes non zero, N->L[2:1]
+		  // optype =
+		  // 298 Skip if (M[H[5:1],L[2:1]][7:1]-A2[7:1]) makes zero, N->L[2:1] (typo?)
+		  // 2b8 Skip if (M[H[5:1],L[2:1]][7:1]-A2[7:1]) makes non zero, N->L[2:1] (typo?)
+		  // optype -
+		  // 29c Skip if (M[H[5:1],L[2:1]][7:1]-A2[7:1]) makes borrow, N->L[2:1]
+		  // 2bc Skip if (M[H[5:1],L[2:1]][7:1]-A2[7:1]) makes non borrow, N->L[2:1]
+			u8 non = inst & 0x20;
+			u8 optype = (inst & 0x0c) >> 2;
+			util::stream_format(stream, "M%sA2, 0x%d->L EQJ%s", m_200_optypes[optype], inst & 0x3, non ? "/" : "");
+			break;
+		}
+
+		// 2c0, 2e0, 2c8, 2e8, 2cc, 2ec
+		case 0b001011000000: case 0b001011000001: case 0b001011000010: case 0b001011000011:
+		case 0b001011100000: case 0b001011100001: case 0b001011100010: case 0b001011100011:
+		case 0b001011001000: case 0b001011001001: case 0b001011001010: case 0b001011001011:
+		case 0b001011101000: case 0b001011101001: case 0b001011101010: case 0b001011101011:
+		case 0b001011001100: case 0b001011001101: case 0b001011001110: case 0b001011001111:
+		case 0b001011101100: case 0b001011101101: case 0b001011101110: case 0b001011101111:
+		{
+		  // optype ·
+ 		  // 2c0 Skip if (H[5:1]·A1[5:1]) makes zero, N->L[2:1]
+		  // 2e0 Skip if (H[5:1]·A1[5:1]) makes non zero, N->L[2:1]
+		  // optype =
+		  // 2c8 Skip if (H[5:1]-A1[5:1]) makes zero, N->L[2:1] (typo?)
+		  // 2e8 Skip if (H[5:1]-A1[5:1]) makes non zero, N->L[2:1] (typo?)
+		  // optype -
+		  // 2cc Skip if (H[5:1]-A1[5:1]) makes borrow, N->L[2:1]
+		  // 2ec Skip if (H[5:1]-A1[5:1]) makes non borrow, N->L[2:1]
+			u8 non = inst & 0x20;
+			u8 optype = (inst & 0x0c) >> 2;
+			util::stream_format(stream, "H%sA1, 0x%d->L EQJ%s", m_200_optypes[optype], inst & 0x3, non ? "/" : "");
+			break;
+		}
+
+		// 2d0, 2f0, 2d8, 2f8, 2dc, 2fc
+		case 0b001011010000: case 0b001011010001: case 0b001011010010: case 0b001011010011:
+		case 0b001011110000: case 0b001011110001: case 0b001011110010: case 0b001011110011:
+		case 0b001011011000: case 0b001011011001: case 0b001011011010: case 0b001011011011:
+		case 0b001011111000: case 0b001011111001: case 0b001011111010: case 0b001011111011:
+		case 0b001011011100: case 0b001011011101: case 0b001011011110: case 0b001011011111:
+		case 0b001011111100: case 0b001011111101: case 0b001011111110: case 0b001011111111:
+		{
+		  // optype ·
+		  // 2d0 Skip if (H[5:1]·A2[5:1]) makes zero, N->L[2:1]
+		  // 2f0 Skip if (H[5:1]·A2[5:1]) makes non zero, N->L[2:1]
+		  // optype =
+		  // 2d8 Skip if (H[5:1]-A2[5:1]) makes zero, N->L[2:1] (typo?)
+		  // 2f8 Skip if (H[5:1]-A2[5:1]) makes non zero, N->L[2:1] (typo?)
+		  // optype -
+		  // 2dc Skip if (H[5:1]-A2[5:1]) makes borrow, N->L[2:1]
+		  // 2fc Skip if (H[5:1]-A2[5:1]) makes non borrow, N->L[2:1]
+			u8 non = inst & 0x20;
+			u8 optype = (inst & 0x0c) >> 2;
+			util::stream_format(stream, "H%sA2, 0x%d->L EQJ%s", m_200_optypes[optype], inst & 0x3, non ? "/" : "");
 			break;
 		}
 
 
+		// these would be 'invalid' optype
 		// 204, 224
 		// case 0b001000000100: case 0b001000000101: case 0b001000000110: case 0b001000000111:
 		// case 0b001000100100: case 0b001000100101: case 0b001000100110: case 0b001000100111:
-
-		// 208, 228
-		case 0b001000001000: case 0b001000001001: case 0b001000001010: case 0b001000001011:
-		case 0b001000101000: case 0b001000101001: case 0b001000101010: case 0b001000101011:
-		{ // Skip if (A1[7:1]-A1[7:1]) makes zero, N->L[2:1]  (typo on description?, should be =?)
-		  // Skip if (A1[7:1]-A1[7:1]) makes non zero, N->L[2:1]    (typo on description?, should be =?)
-			u8 non = inst & 0x20;
-			util::stream_format(stream, "A1=A1, 0x%d->L EQJ%s", inst & 0x3, non ? "/" : "");
-			break;
-		}
-
-		// 20c, 22c
-		case 0b001000001100: case 0b001000001101: case 0b001000001110: case 0b001000001111:
-		case 0b001000101100: case 0b001000101101: case 0b001000101110: case 0b001000101111:
-		{ // Skip if (A1[7:1]-A1[7:1]) makes borrow, N->L[2:1]
-		  // Skip if (A1[7:1]-A1[7:1]) makes non borrow, N->L[2:1]
-			u8 non = inst & 0x20;
-			util::stream_format(stream, "A1-A1, 0x%d->L BOJ%s", inst & 0x3, non ? "/" : "");
-			break;
-		}
-
-		// 210, 230
-		case 0b001000010000: case 0b001000010001: case 0b001000010010: case 0b001000010011:
-		case 0b001000110000: case 0b001000110001: case 0b001000110010: case 0b001000110011:
-
-		{ // Skip if (A1[7:1]·A2[7:1]) makes zero, N->L[2:1]
-		  // Skip if (A1[7:1]·A2[7:1]) makes non zero, N->L[2:1]
-			u8 non = inst & 0x20;
-			util::stream_format(stream, "A1·A2, 0x%d->L EQJ%s", inst & 0x3, non ? "/" : "");
-			break;
-		}
-
 		// 214, 234
 		// case 0b001000010100: case 0b001000010101: case 0b001000010110: case 0b001000010111:
 		// case 0b001000110100: case 0b001000110101: case 0b001000110110: case 0b001000110111:
-
-		// 218, 238
-		case 0b001000011000: case 0b001000011001: case 0b001000011010: case 0b001000011011:
-		case 0b001000111000: case 0b001000111001: case 0b001000111010: case 0b001000111011:
-		{ // Skip if (A1[7:1]-A2[7:1]) makes zero, N->L[2:1]  (typo on description?, should be =?)
-		  // Skip if (A1[7:1]-A2[7:1]) makes non zero, N->L[2:1]    (typo on description?, should be =?)
-			u8 non = inst & 0x20;
-			util::stream_format(stream, "A1=A2, 0x%d->L EQJ%s", inst & 0x3, non ? "/" : "");
-			break;
-		}
-
-		// 21c, 23c
-		case 0b001000011100: case 0b001000011101: case 0b001000011110: case 0b001000011111:
-		case 0b001000111100: case 0b001000111101: case 0b001000111110: case 0b001000111111:
-		{ // Skip if (A1[7:1]-A2[7:1]) makes borrow, N->L[2:1]
-		  // Skip if (A1[7:1]-A2[7:1]) makes non borrow, N->L[2:1]
-			u8 non = inst & 0x20;
-			util::stream_format(stream, "A1-A2, 0x%d->L BOJ%s", inst & 0x3, non ? "/" : "");
-			break;
-		}
-
-		// 240, 260
-		case 0b001001000000: case 0b001001000001: case 0b001001000010: case 0b001001000011:
-		case 0b001001100000: case 0b001001100001: case 0b001001100010: case 0b001001100011:
-		{ // Skip if (A2[7:1]·A1[7:1]) makes zero, N->L[2:1]
-		  // Skip if (A2[7:1]·A1[7:1]) makes non zero, N->L[2:1]
-			u8 non = inst & 0x20;
-			util::stream_format(stream, "A2·A1, 0x%d->L EQJ%s", inst & 0x3, non ? "/" : "");
-			break;
-		}
-
-
 		// 244, 264
-		//case 0b001001000100: case 0b001001000101: case 0b001001000110: case 0b001001000111:
-		//case 0b001001100100: case 0b001001100101: case 0b001001100110: case 0b001001100111:
-
-		// 248, 268
-		case 0b001001001000: case 0b001001001001: case 0b001001001010: case 0b001001001011:
-		case 0b001001101000: case 0b001001101001: case 0b001001101010: case 0b001001101011:
-		{ // Skip if (A2[7:1]-A1[7:1]) makes zero, N->L[2:1]  (typo?)
-		  // Skip if (A2[7:1]-A1[7:1]) makes non zero, N->L[2:1]  (typo?)
-			u8 non = inst & 0x20;
-			util::stream_format(stream, "A2=A1, 0x%d->L EQJ%s", inst & 0x3, non ? "/" : "");
-			break;
-		}
-
-		// 24c, 26c
-		case 0b001001001100: case 0b001001001101: case 0b001001001110: case 0b001001001111:
-		case 0b001001101100: case 0b001001101101: case 0b001001101110: case 0b001001101111:
-		{ // Skip if (A2[7:1]-A1[7:1]) makes borrow, N->L[2:1]
-		  // Skip if (A2[7:1]-A1[7:1]) makes non borrow, N->L[2:1]
-			u8 non = inst & 0x20;
-			util::stream_format(stream, "A2-A1, 0x%d->L BOJ%s", inst & 0x3, non ? "/" : "");
-			break;
-		}
-
-		// 250, 270
-		case 0b001001010000: case 0b001001010001: case 0b001001010010: case 0b001001010011:
-		case 0b001001110000: case 0b001001110001: case 0b001001110010: case 0b001001110011:
-		{ // Skip if (A2[7:1]·A2[7:1]) makes zero, N->L[2:1]
-		  // Skip if (A2[7:1]·A2[7:1]) makes non zero, N->L[2:1]
-			u8 non = inst & 0x20;
-			util::stream_format(stream, "A2·A2, 0x%d->L EQJ%s", inst & 0x3, non ? "/" : "");
-			break;
-		}
-
+		// case 0b001001000100: case 0b001001000101: case 0b001001000110: case 0b001001000111:
+		// case 0b001001100100: case 0b001001100101: case 0b001001100110: case 0b001001100111:
 		// 254, 274
-		//case 0b001001010100: case 0b001001010101: case 0b001001010110: case 0b001001010111:
-		//case 0b001001110100: case 0b001001110101: case 0b001001110110: case 0b001001110111:
-
-		// 258, 278
-		case 0b001001011000: case 0b001001011001: case 0b001001011010: case 0b001001011011:
-		case 0b001001111000: case 0b001001111001: case 0b001001111010: case 0b001001111011:
-		{ // Skip if (A2[7:1]-A2[7:1]) makes zero, N->L[2:1]  (typo?)
-		  // Skip if (A2[7:1]-A2[7:1]) makes non zero, N->L[2:1] (typo?)
-			u8 non = inst & 0x20;
-			util::stream_format(stream, "A2=A2, 0x%d->L EQJ%s", inst & 0x3, non ? "/" : "");
-			break;
-		}
-
-		// 25c, 27c
-		case 0b001001011100: case 0b001001011101: case 0b001001011110: case 0b001001011111:
-		case 0b001001111100: case 0b001001111101: case 0b001001111110: case 0b001001111111:
-		{ // Skip if (A2[7:1]-A2[7:1]) makes borrow, N->L[2:1]
-		  // Skip if (A2[7:1]-A2[7:1]) makes non borrow, N->L[2:1]
-			u8 non = inst & 0x20;
-			util::stream_format(stream, "A2-A2, 0x%d->L BOJ%s", inst & 0x3, non ? "/" : "");
-			break;
-		}
-
-		// 280, 2a0
-		case 0b001010000000: case 0b001010000001: case 0b001010000010: case 0b001010000011:
-		case 0b001010100000: case 0b001010100001: case 0b001010100010: case 0b001010100011:
-		{ // Skip if (M[H[5:1],L[2:1]][7:1]·A1[7:1]) makes zero, N->L[2:1]
-		  // Skip if (M[H[5:1],L[2:1]][7:1]·A1[7:1]) makes non zero, N->L[2:1]
-			u8 non = inst & 0x20;
-			util::stream_format(stream, "M·A1, 0x%d->L EQJ%s", inst & 0x3, non ? "/" : "");
-			break;
-		}
-
+		// case 0b001001010100: case 0b001001010101: case 0b001001010110: case 0b001001010111:
+		// case 0b001001110100: case 0b001001110101: case 0b001001110110: case 0b001001110111:
 		// 284, 2a4
-		//case 0b001010000100: case 0b001010000101: case 0b001010000110: case 0b001010000111:
-		//case 0b001010100100: case 0b001010100101: case 0b001010100110: case 0b001010100111:
-
-		// 288, 2a8
-		case 0b001010001000: case 0b001010001001: case 0b001010001010: case 0b001010001011:
-		case 0b001010101000: case 0b001010101001: case 0b001010101010: case 0b001010101011:
-		{ // Skip if (M[H[5:1],L[2:1]][7:1]-A1[7:1]) makes zero, N->L[2:1] (typo?)
-		  // Skip if (M[H[5:1],L[2:1]][7:1]-A1[7:1]) makes non zero, N->L[2:1] (typo?)
-			u8 non = inst & 0x20;
-			util::stream_format(stream, "M=A1, 0x%d->L EQJ%s", inst & 0x3, non ? "/" : "");
-			break;
-		}
-
-		// 28c, 2ac
-		case 0b001010001100: case 0b001010001101: case 0b001010001110: case 0b001010001111:
-		case 0b001010101100: case 0b001010101101: case 0b001010101110: case 0b001010101111:
-		{ // Skip if (M[H[5:1],L[2:1]][7:1]-A1[7:1]) makes borrow, N->L[2:1]
-		  // Skip if (M[H[5:1],L[2:1]][7:1]-A1[7:1]) makes non borrow, N->L[2:1]
-			u8 non = inst & 0x20;
-			util::stream_format(stream, "M-A1, 0x%d->L BOJ%s", inst & 0x3, non ? "/" : "");
-			break;
-		}
-
-		// 290, 2b0
-		case 0b001010010000: case 0b001010010001: case 0b001010010010: case 0b001010010011:
-		case 0b001010110000: case 0b001010110001: case 0b001010110010: case 0b001010110011:
-		{ // Skip if (M[H[5:1],L[2:1]][7:1]·A2[7:1]) makes zero, N->L[2:1]
-		  // Skip if (M[H[5:1],L[2:1]][7:1]·A2[7:1]) makes non zero, N->L[2:1]
-			u8 non = inst & 0x20;
-			util::stream_format(stream, "M·A2, 0x%d->L EQJ%s", inst & 0x3, non ? "/" : "");
-			break;
-		}
-
+		// case 0b001010000100: case 0b001010000101: case 0b001010000110: case 0b001010000111:
+		// case 0b001010100100: case 0b001010100101: case 0b001010100110: case 0b001010100111:
 		// 294, 2b4
-		//case 0b001010010100: case 0b001010010101: case 0b001010010110: case 0b001010010111:
-		//case 0b001010110100: case 0b001010110101: case 0b001010110110: case 0b001010110111:
-
-		// 298, 2b8
-		case 0b001010011000: case 0b001010011001: case 0b001010011010: case 0b001010011011:
-		case 0b001010111000: case 0b001010111001: case 0b001010111010: case 0b001010111011:
-		{ // Skip if (M[H[5:1],L[2:1]][7:1]-A2[7:1]) makes zero, N->L[2:1] (typo?)
-		  // Skip if (M[H[5:1],L[2:1]][7:1]-A2[7:1]) makes non zero, N->L[2:1] (typo?)
-			u8 non = inst & 0x20;
-			util::stream_format(stream, "M=A2, 0x%d->L EQJ%s", inst & 0x3, non ? "/" : "");
-			break;
-		}
-
-
-		// 29c, 2bc
-		case 0b001010011100: case 0b001010011101: case 0b001010011110: case 0b001010011111:
-		case 0b001010111100: case 0b001010111101: case 0b001010111110: case 0b001010111111:
-		{ // Skip if (M[H[5:1],L[2:1]][7:1]-A2[7:1]) makes borrow, N->L[2:1]
-		  // Skip if (M[H[5:1],L[2:1]][7:1]-A2[7:1]) makes non borrow, N->L[2:1]
-			u8 non = inst & 0x20;
-			util::stream_format(stream, "M-A2, 0x%d->L BOJ%s", inst & 0x3, non ? "/" : "");
-			break;
-		}
-
-		// 2c0, 2e0
-		case 0b001011000000: case 0b001011000001: case 0b001011000010: case 0b001011000011:
-		case 0b001011100000: case 0b001011100001: case 0b001011100010: case 0b001011100011:
-		{ // Skip if (H[5:1]·A1[5:1]) makes zero, N->L[2:1]
-		  // Skip if (H[5:1]·A1[5:1]) makes non zero, N->L[2:1]
-			u8 non = inst & 0x20;
-			util::stream_format(stream, "H·A1, 0x%d->L EQJ%s", inst & 0x3, non ? "/" : "");
-			break;
-		}
-
+		// case 0b001010010100: case 0b001010010101: case 0b001010010110: case 0b001010010111:
+		// case 0b001010110100: case 0b001010110101: case 0b001010110110: case 0b001010110111:
 		// 2c4, 2e4
-		//case 0b001011000100: case 0b001011000101: case 0b001011000110: case 0b001011000111:
-		//case 0b001011100100: case 0b001011100101: case 0b001011100110: case 0b001011100111:
-
-		// 2c8, 2e8
-		case 0b001011001000: case 0b001011001001: case 0b001011001010: case 0b001011001011:
-		case 0b001011101000: case 0b001011101001: case 0b001011101010: case 0b001011101011:
-		{ // Skip if (H[5:1]-A1[5:1]) makes zero, N->L[2:1] (typo?)
-		  // Skip if (H[5:1]-A1[5:1]) makes non zero, N->L[2:1] (typo?)
-			u8 non = inst & 0x20;
-			util::stream_format(stream, "H=A1, 0x%d->L EQJ%s", inst & 0x3, non ? "/" : "");
-			break;
-		}
-
-		// 2cc, 2ec
-		case 0b001011001100: case 0b001011001101: case 0b001011001110: case 0b001011001111:
-		case 0b001011101100: case 0b001011101101: case 0b001011101110: case 0b001011101111:
-		{ // Skip if (H[5:1]-A1[5:1]) makes borrow, N->L[2:1]
-		  // Skip if (H[5:1]-A1[5:1]) makes non borrow, N->L[2:1]
-			u8 non = inst & 0x20;
-			util::stream_format(stream, "H-A1, 0x%d->L BOJ%s", inst & 0x3, non ? "/" : "");
-			break;
-		}
-
-		// 2d0, 2f0
-		case 0b001011010000: case 0b001011010001: case 0b001011010010: case 0b001011010011:
-		case 0b001011110000: case 0b001011110001: case 0b001011110010: case 0b001011110011:
-		{ // Skip if (H[5:1]·A2[5:1]) makes zero, N->L[2:1]
-		  // Skip if (H[5:1]·A2[5:1]) makes non zero, N->L[2:1]
-			u8 non = inst & 0x20;
-			util::stream_format(stream, "H·A2, 0x%d->L EQJ%s", inst & 0x3, non ? "/" : "");
-			break;
-		}
-
-	
+		// case 0b001011000100: case 0b001011000101: case 0b001011000110: case 0b001011000111:
+		// case 0b001011100100: case 0b001011100101: case 0b001011100110: case 0b001011100111:
 		// 2d4, 2f4
-		//case 0b001011010100: case 0b001011010101: case 0b001011010110: case 0b001011010111:
-		//case 0b001011110100: case 0b001011110101: case 0b001011110110: case 0b001011110111:
+		// case 0b001011010100: case 0b001011010101: case 0b001011010110: case 0b001011010111:
+		// case 0b001011110100: case 0b001011110101: case 0b001011110110: case 0b001011110111:
 
-		// 2d8, 2f8
-		case 0b001011011000: case 0b001011011001: case 0b001011011010: case 0b001011011011:
-		case 0b001011111000: case 0b001011111001: case 0b001011111010: case 0b001011111011:
-		{ // Skip if (H[5:1]-A2[5:1]) makes zero, N->L[2:1] (typo?)
-		  // Skip if (H[5:1]-A2[5:1]) makes non zero, N->L[2:1] (typo?)
-			u8 non = inst & 0x20;
-			util::stream_format(stream, "H=A2, 0x%d->L EQJ%s", inst & 0x3, non ? "/" : "");
-			break;
-		}
-
-
-		// 2dc, 2fc
-		case 0b001011011100: case 0b001011011101: case 0b001011011110: case 0b001011011111:
-		case 0b001011111100: case 0b001011111101: case 0b001011111110: case 0b001011111111:
-		{ // Skip if (H[5:1]-A2[5:1]) makes borrow, N->L[2:1]
-		  // Skip if (H[5:1]-A2[5:1]) makes non borrow, N->L[2:1]
-			u8 non = inst & 0x20;
-			util::stream_format(stream, "H-A2, 0x%d->L BOJ%s", inst & 0x3, non ? "/" : "");
-			break;
-		}
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////
 		/////////////////////////////////////////////////////////////////////////////////////////////////////
