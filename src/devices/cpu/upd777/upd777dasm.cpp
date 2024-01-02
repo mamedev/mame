@@ -146,37 +146,41 @@ offs_t upd777_disassembler::disassemble(std::ostream &stream, offs_t pc, const u
 
 		// case 0b000000101010: case 0b000000101011: case 0b000000101100: case 0b000000101101: case 0b000000101110: case 0b000000101111:
 
+		// 030, 034, 038, 03c, 070, 074, 078, 07c
 		case 0b000000110000:
-		{ // Skip if (PD1 input) = 1
-			util::stream_format(stream, "PD1 J");
-			break;
-		}
-
-		// case 0b000000110001: case 0b000000110010: case 0b000000110011:
-		
 		case 0b000000110100:
-		{ // Skip if (PD2 input) = 1
-			util::stream_format(stream, "PD2 J");
-			break;
-		}
-
-		//case 0b000000110101: case 0b000000110110: case 0b000000110111:
-				
 		case 0b000000111000:
-		{ // Skip if (PD3 input) = 1
-			util::stream_format(stream, "PD3 J");
-			break;
-		}
-
-		//case 0b000000111001: case 0b000000111010: case 0b000000111011:
-		
 		case 0b000000111100:
-		{ // Skip if (PD4 input) = 1
-			util::stream_format(stream, "PD4 J");
+		case 0b000001110000:
+		case 0b000001110100:
+		case 0b000001111000:
+		case 0b000001111100:
+		{ // 30 Skip if (PD1 input) = 1
+		  // 34 Skip if (PD2 input) = 1
+		  // 38 Skip if (PD3 input) = 1
+		  // 3c Skip if (PD4 input) = 1
+		  // 70 Skip if (PD1 input) = 0
+		  // 74 Skip if (PD2 input) = 0
+		  // 78 Skip if (PD3 input) = 0
+		  // 7c Skip if (PD4 input) = 0
+			int which = (inst & 0x00c) >> 2;
+			int inv = inst & 0x40;
+			util::stream_format(stream, "PD%d %sJ", which + 1, inv ? "/" : "");
 			break;
 		}
 
-		//case 0b000000111101: case 0b000000111110: case 0b000000111111: case 0b000001000000: case 0b000001000001: case 0b000001000010: case 0b000001000011: case 0b000001000100: case 0b000001000101: case 0b000001000110: case 0b000001000111: case 0b000001001000:
+		// unused instructions after the PDx J and PDx /J opcodes
+		// case 0b000000110001: case 0b000000110010: case 0b000000110011:
+		// case 0b000000110101: case 0b000000110110: case 0b000000110111:
+		// case 0b000000111001: case 0b000000111010: case 0b000000111011:
+		// case 0b000000111101: case 0b000000111110: case 0b000000111111:
+		// 
+		// case 0b000001110001: case 0b000001110010: case 0b000001110011:
+		// case 0b000001110101: case 0b000001110110: case 0b000001110111:
+		// case 0b000001111001: case 0b000001111010: case 0b000001111011:
+		// case 0b000001111101: case 0b000001111110: case 0b000001111111:
+
+		// case 0b000001000000: case 0b000001000001: case 0b000001000010: case 0b000001000011: case 0b000001000100: case 0b000001000101: case 0b000001000110: case 0b000001000111: case 0b000001001000:
 
 		case 0b000001001001:
 		{ // Skip if (4H Horizontal Blank) = 1
@@ -232,38 +236,6 @@ offs_t upd777_disassembler::disassemble(std::ostream &stream, offs_t pc, const u
 		}
 
 		// case 0b000001100001: case 0b000001100010: case 0b000001100011: case 0b000001100100: case 0b000001100101: case 0b000001100110: case 0b000001100111: case 0b000001101000: case 0b000001101001: case 0b000001101010: case 0b000001101011: case 0b000001101100: case 0b000001101101: case 0b000001101110: case 0b000001101111:
-
-		case 0b000001110000:
-		{ // Skip if (PD1 input) = 0
-			util::stream_format(stream, "PD1 /J", inst);
-			break;
-		}
-
-		// case 0b000001110001: case 0b000001110010: case 0b000001110011:
-
-		case 0b000001110100:
-		{ // Skip if (PD2 input) = 0
-			util::stream_format(stream, "PD2 /J", inst);
-			break;
-		}
-
-		// case 0b000001110101: case 0b000001110110: case 0b000001110111:
-
-		case 0b000001111000:
-		{ // Skip if (PD3 input) = 0
-			util::stream_format(stream, "PD3 /J", inst);
-			break;
-		}
-
-		// case 0b000001111001: case 0b000001111010: case 0b000001111011:
-
-		case 0b000001111100:
-		{ // Skip if (PD4 input) = 0
-			util::stream_format(stream, "PD4 /J", inst);
-			break;
-		}
-
-		// case 0b000001111101: case 0b000001111110: case 0b000001111111:
 
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////
