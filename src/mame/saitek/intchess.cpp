@@ -123,10 +123,10 @@ INPUT_CHANGED_MEMBER(intchess_state::reset_button)
 
 void intchess_state::init_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, 0xb0, 0xd0, 0xff);
-	palette.set_pen_color(1, 0x00, 0x00, 0x00);
-	palette.set_pen_color(2, 0x88, 0xa8, 0x50);
-	palette.set_pen_color(3, 0xff, 0xff, 0xff);
+	palette.set_pen_color(0, 0xb0, 0xd0, 0xff); // cyan
+	palette.set_pen_color(1, 0x00, 0x00, 0x00); // black
+	palette.set_pen_color(2, 0x88, 0xa8, 0x50); // green
+	palette.set_pen_color(3, 0xff, 0xff, 0xff); // white
 }
 
 u32 intchess_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

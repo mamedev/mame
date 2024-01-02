@@ -14,10 +14,10 @@ hardware button that disconnects the battery), there is no known method to
 force a cold boot. So if NVRAM somehow becomes broken, remove the NVRAM files.
 
 They called the expansion capability "OSA", for "Open Systems Architecture".
-A serial port for linking to a PC, and a parallel port for expansion modules.
-The expansion modules are basically entire chesscomputers, making the whole
-thing combined a 'dual brain' chesscomputer. The embedded chess engine is by
-Julio Kaplan and Craig Barnes, same as the one in SciSys Turbo S-24K.
+A serial port for linking to a PC or homecomputer, and a parallel port for
+expansion modules. The expansion modules are basically entire chesscomputers,
+making the whole thing combined a 'dual brain' chesscomputer. The embedded chess
+engine is by Julio Kaplan and Craig Barnes, same as the one in Turbo S-24K.
 
 OSA serial link transmission format: 1 start bit, 8 data bits, 1 stop bit, no
 parity. The default baudrate is 1200. To establish a connection, command "o" must

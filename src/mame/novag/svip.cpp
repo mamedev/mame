@@ -265,7 +265,7 @@ void svip_state::svip(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
-	screen.set_size(1920/3, 606/3);
+	screen.set_size(1920/2.5, 606/2.5);
 	screen.set_visarea_full();
 
 	config.set_default_layout(layout_novag_svip);
