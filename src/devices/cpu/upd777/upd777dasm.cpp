@@ -182,12 +182,14 @@ offs_t upd777_disassembler::disassemble(std::ostream &stream, offs_t pc, const u
 
 		// case 0b000001000000: case 0b000001000001: case 0b000001000010: case 0b000001000011: case 0b000001000100: case 0b000001000101: case 0b000001000110: case 0b000001000111: case 0b000001001000:
 
+		// 049
 		case 0b000001001001:
 		{ // Skip if (4H Horizontal Blank) = 1
 			util::stream_format(stream, "4H BLK");
 			break;
 		}
 
+		// 04a
 		case 0b000001001010:
 		{ // Skip if (Vertical Blank) = 1, 0M[[18:00],[3]][1]
 
@@ -197,6 +199,7 @@ offs_t upd777_disassembler::disassemble(std::ostream &stream, offs_t pc, const u
 
 		//case 0b000001001011:
 
+		// 04c
 		case 0b000001001100:
 		{ // Skip if (GP&SW/ input) = 1
 			util::stream_format(stream, "GPSW/");
@@ -451,59 +454,47 @@ offs_t upd777_disassembler::disassemble(std::ostream &stream, offs_t pc, const u
 			break;
 		}
 
-		// 320
+		/////////////////////////////////////////////////////
+		/////////////////////////////////////////////////////
+
+
+		// 320, 324, 328, 32c, 330, 334, 338, 33c, 360, 364, 368, 36c, 370, 374, 378, 37c
 		case 0b001100100000: case 0b001100100001: case 0b001100100010: case 0b001100100011:
-		{ // AND A1[7:1] and A1[7:1], store to A1[7:1], N->L[2:1]
-			util::stream_format(stream, "A1·A1->A1, 0x%d->L", inst & 0x3);
-			break;
-		}
-
-		// 324
 		case 0b001100100100: case 0b001100100101: case 0b001100100110: case 0b001100100111:
-		{ // Add A1[7:1] and A1[7:1], store to A1[7:1], N->L[2:1]
-			util::stream_format(stream, "A1+A1->A1, 0x%d->L", inst & 0x3);
-			break;
-		}
-
-		// 328
 		case 0b001100101000: case 0b001100101001: case 0b001100101010: case 0b001100101011:
-		{ // OR A1[7:1] and A1[7:1], store to A1[7:1], N->L[2:1]
-			util::stream_format(stream, "A1vA1->A1, 0x%d->L", inst & 0x3);
-			break;
-		}
-
-		// 32c
 		case 0b001100101100: case 0b001100101101: case 0b001100101110: case 0b001100101111:
-		{ // Subtract A1[7:1] and A1[7:1], store to A1[7:1], Skip if borrow, N->L[2:1]
-			util::stream_format(stream, "A1-A1->A1, 0x%d->L", inst & 0x3);
-			break;
-		}
-
-		// 330
 		case 0b001100110000: case 0b001100110001: case 0b001100110010: case 0b001100110011:
-		{ // AND A1[7:1] and A2[7:1], store to A1[7:1], N->L[2:1]
-			util::stream_format(stream, "A1·A2->A1, 0x%d->L", inst & 0x3);
-			break;
-		}
-
-		// 334
 		case 0b001100110100: case 0b001100110101: case 0b001100110110: case 0b001100110111:
-		{ // Add A1[7:1] and A2[7:1], store to A1[7:1], N->L[2:1]
-			util::stream_format(stream, "A1+A2->A1, 0x%d->L", inst & 0x3);
-			break;
-		}
-
-		// 338
 		case 0b001100111000: case 0b001100111001: case 0b001100111010: case 0b001100111011:
-		{ // OR A1[7:1] and A2[7:1], store to A1[7:1], N->L[2:1]
-			util::stream_format(stream, "A1vA2->A1, 0x%d->L", inst & 0x3);
-			break;
-		}
-
-		// 33c
 		case 0b001100111100: case 0b001100111101: case 0b001100111110: case 0b001100111111:
-		{ // Subtract A1[7:1] and A2[7:1], store to A1[7:1], Skip if borrow, N->L[2:1]
-			util::stream_format(stream, "A1-A2->A1, 0x%d->L", inst & 0x3);
+		case 0b001101100000: case 0b001101100001: case 0b001101100010: case 0b001101100011:
+		case 0b001101100100: case 0b001101100101: case 0b001101100110: case 0b001101100111:
+		case 0b001101101000: case 0b001101101001: case 0b001101101010: case 0b001101101011:
+		case 0b001101101100: case 0b001101101101: case 0b001101101110: case 0b001101101111:
+		case 0b001101110000: case 0b001101110001: case 0b001101110010: case 0b001101110011:
+		case 0b001101110100: case 0b001101110101: case 0b001101110110: case 0b001101110111:
+		case 0b001101111000: case 0b001101111001: case 0b001101111010: case 0b001101111011:
+		case 0b001101111100: case 0b001101111101: case 0b001101111110: case 0b001101111111:
+		{ // 320 AND A1[7:1] and A1[7:1], store to A1[7:1], N->L[2:1]
+		  // 324 Add A1[7:1] and A1[7:1], store to A1[7:1], N->L[2:1]
+		  // 328 OR A1[7:1] and A1[7:1], store to A1[7:1], N->L[2:1]
+		  // 32c Subtract A1[7:1] and A1[7:1], store to A1[7:1], Skip if borrow, N->L[2:1]
+		  // 330 AND A1[7:1] and A2[7:1], store to A1[7:1], N->L[2:1]
+		  // 334 Add A1[7:1] and A2[7:1], store to A1[7:1], N->L[2:1]
+		  // 338 OR A1[7:1] and A2[7:1], store to A1[7:1], N->L[2:1]
+		  // 33c Subtract A1[7:1] and A2[7:1], store to A1[7:1], Skip if borrow, N->L[2:1]
+		  // 360 AND A2[7:1] and A1[7:1], store to A2[7:1], N->L[2:1]
+		  // 364 Add A2[7:1] and A1[7:1], store to A2[7:1], N->L[2:1]
+		  // 368 OR A2[7:1] and A1[7:1], store to A2[7:1], N->L[2:1]
+		  // 36c Subtract A2[7:1] and A1[7:1], store to A2[7:1], Skip if borrow, N->L[2:1]
+		  // 370 AND A2[7:1] and A2[7:1], store to A2[7:1], N->L[2:1]
+		  // 374 Add A2[7:1] and A2[7:1], store to A2[7:1], N->L[2:1]
+		  // 378 OR A2[7:1] and A2[7:1], store to A2[7:1], N->L[2:1]
+		  // 37c Subtract A2[7:1] and A2[7:1], store to A2[7:1], Skip if borrow, N->L[2:1]
+			int type = (inst & 0x0c)>>2;
+			int reg2 = (inst & 0x10)>>4;
+			int reg1 = (inst & 0x40)>>6;
+			util::stream_format(stream, "%s%s%s->%s, 0x%d->L %s", m_320_reg[reg1], m_320_optypes[type], m_320_reg[reg2], m_320_reg[reg1], inst & 0x3, (type == 3) ? "BOJ" : "");
 			break;
 		}
 
@@ -558,61 +549,7 @@ offs_t upd777_disassembler::disassemble(std::ostream &stream, offs_t pc, const u
 		// 35c
 		// case 0b001101011100: case 0b001101011101: case 0b001101011110: case 0b001101011111:
 
-		// 360
-		case 0b001101100000: case 0b001101100001: case 0b001101100010: case 0b001101100011:
-		{ // AND A2[7:1] and A1[7:1], store to A2[7:1], N->L[2:1]
-			util::stream_format(stream, "A2·A1->A2, 0x%d->L", inst & 0x3);
-			break;
-		}
 
-		// 364
-		case 0b001101100100: case 0b001101100101: case 0b001101100110: case 0b001101100111:
-		{ // Add A2[7:1] and A1[7:1], store to A2[7:1], N->L[2:1]
-			util::stream_format(stream, "A2+A1->A2, 0x%d->L", inst & 0x3);
-			break;
-		}
-
-		// 368
-		case 0b001101101000: case 0b001101101001: case 0b001101101010: case 0b001101101011:
-		{ // OR A2[7:1] and A1[7:1], store to A2[7:1], N->L[2:1]
-			util::stream_format(stream, "A2vA1->A2, 0x%d->L", inst & 0x3);
-			break;
-		}
-
-		// 36c
-		case 0b001101101100: case 0b001101101101: case 0b001101101110: case 0b001101101111:
-		{ // Subtract A2[7:1] and A1[7:1], store to A2[7:1], Skip if borrow, N->L[2:1]
-			util::stream_format(stream, "A2-A1->A2, 0x%d->L", inst & 0x3);
-			break;
-		}
-
-		// 370
-		case 0b001101110000: case 0b001101110001: case 0b001101110010: case 0b001101110011:
-		{ // AND A2[7:1] and A2[7:1], store to A2[7:1], N->L[2:1]
-			util::stream_format(stream, "A2·A2->A2, 0x%d->L", inst & 0x3);
-			break;
-		}
-
-		// 374
-		case 0b001101110100: case 0b001101110101: case 0b001101110110: case 0b001101110111:
-		{ // Add A2[7:1] and A2[7:1], store to A2[7:1], N->L[2:1]
-			util::stream_format(stream, "A2+A2->A2, 0x%d->L", inst & 0x3);
-			break;
-		}
-
-		// 378
-		case 0b001101111000: case 0b001101111001: case 0b001101111010: case 0b001101111011:
-		{ // OR A2[7:1] and A2[7:1], store to A2[7:1], N->L[2:1]
-			util::stream_format(stream, "A2vA2->A2, 0x%d->L", inst & 0x3);
-			break;
-		}
-
-		// 37c
-		case 0b001101111100: case 0b001101111101: case 0b001101111110: case 0b001101111111:
-		{ // Subtract A2[7:1] and A2[7:1], store to A2[7:1], Skip if borrow, N->L[2:1]
-			util::stream_format(stream, "A2-A2->A2, 0x%d->L", inst & 0x3);
-			break;
-		}
 
 		// 380
 		case 0b001110000000: case 0b001110000001: case 0b001110000010: case 0b001110000011:
