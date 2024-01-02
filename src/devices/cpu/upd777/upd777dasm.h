@@ -28,6 +28,7 @@ private:
 
 	std::string m_200_optypes[4] = {"·", "invalid", "=", "-"};
 	std::string m_200_reg2[2] = {"A1", "A2" };
+	std::string m_200_reg1[4] = {"A1", "A2", "M", "H" };
 };
 
 #endif // MAME_CPU_UPD777_UPD777DASM_H
