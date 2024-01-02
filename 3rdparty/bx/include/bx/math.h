@@ -184,7 +184,7 @@ namespace bx
 	///
 	/// @returns `true` if `_a` is less than zero, otherwise returns `false`.
 	///
-	BX_CONSTEXPR_FUNC bool signbit(float _a);
+	BX_CONSTEXPR_FUNC bool signBit(float _a);
 
 	/// Returns value with the magnitude `_value`, and the sign of `_sign`.
 	///
@@ -193,7 +193,7 @@ namespace bx
 	///
 	/// @returns Value with the magnitude `_value`, and the sign of `_sign`.
 	///
-	BX_CONSTEXPR_FUNC float copysign(float _value, float _sign);
+	BX_CONSTEXPR_FUNC float copySign(float _value, float _sign);
 
 	/// Returns the absolute of _a.
 	///

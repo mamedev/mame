@@ -556,23 +556,23 @@ TEST_CASE("sign", "[math][libm]")
 	REQUIRE( 1 == bx::sign( bx::kFloatInfinity) );
 }
 
-TEST_CASE("signbit", "[math][libm]")
+TEST_CASE("signBit", "[math][libm]")
 {
-	STATIC_REQUIRE( bx::signbit(-0.1389f) );
-	STATIC_REQUIRE(!bx::signbit( 0.0000f) );
-	STATIC_REQUIRE(!bx::signbit( 0.1389f) );
+	STATIC_REQUIRE( bx::signBit(-0.1389f) );
+	STATIC_REQUIRE(!bx::signBit( 0.0000f) );
+	STATIC_REQUIRE(!bx::signBit( 0.1389f) );
 
-	REQUIRE( bx::signbit(-bx::kFloatInfinity) );
-	REQUIRE(!bx::signbit( bx::kFloatInfinity) );
+	REQUIRE( bx::signBit(-bx::kFloatInfinity) );
+	REQUIRE(!bx::signBit( bx::kFloatInfinity) );
 }
 
-TEST_CASE("copysign", "[math][libm]")
+TEST_CASE("copySign", "[math][libm]")
 {
-	STATIC_REQUIRE( 0.1389f == bx::copysign(-0.1389f, +1389) );
-	STATIC_REQUIRE(-0.0000f == bx::copysign( 0.0000f, -1389) );
-	STATIC_REQUIRE(-0.1389f == bx::copysign( 0.1389f, -1389) );
+	STATIC_REQUIRE( 0.1389f == bx::copySign(-0.1389f, +1389) );
+	STATIC_REQUIRE(-0.0000f == bx::copySign( 0.0000f, -1389) );
+	STATIC_REQUIRE(-0.1389f == bx::copySign( 0.1389f, -1389) );
 
-	REQUIRE(-bx::kFloatInfinity == bx::copysign(bx::kFloatInfinity, -1389) );
+	REQUIRE(-bx::kFloatInfinity == bx::copySign(bx::kFloatInfinity, -1389) );
 }
 
 TEST_CASE("bitsToFloat, floatToBits, bitsToDouble, doubleToBits", "[math]")
