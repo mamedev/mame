@@ -53,7 +53,7 @@ offs_t upd777_disassembler::disassemble(std::ostream &stream, offs_t pc, const u
 	}
 	else if (inst >= 0x4c0 && inst <= 0x4ff) // 4c0 - 4ff
 	{
-		// H[5:1]+K[5:1]H[5:1], Skip if carry
+		// H[5:1]+K[5:1]->H[5:1], Skip if carry
 		const int k = inst & 0x1f;
 		util::stream_format(stream, "H+0x%02x->H CAJ", k);
 	}
@@ -164,7 +164,7 @@ offs_t upd777_disassembler::disassemble(std::ostream &stream, offs_t pc, const u
 		}
 		case 0b000001001010:
 		{
-			// 04a Skip if (Vertical Blank) = 1, 0M[[18:00],[3]][1]
+			// 04a Skip if (Vertical Blank) = 1, 0->M[[18:00],[3]][1]
 			util::stream_format(stream, "VBLK");
 			break;
 		}
@@ -281,7 +281,7 @@ offs_t upd777_disassembler::disassemble(std::ostream &stream, offs_t pc, const u
 			// 220 Skip if (A1[7:1]·A1[7:1]) makes non zero, N->L[2:1]
 			// 210 Skip if (A1[7:1]·A2[7:1]) makes zero, N->L[2:1]
 			// 230 Skip if (A1[7:1]·A2[7:1]) makes non zero, N->L[2:1]
- 			// 240 Skip if (A2[7:1]·A1[7:1]) makes zero, N->L[2:1]
+			// 240 Skip if (A2[7:1]·A1[7:1]) makes zero, N->L[2:1]
 			// 260 Skip if (A2[7:1]·A1[7:1]) makes non zero, N->L[2:1]
 			// 250 Skip if (A2[7:1]·A2[7:1]) makes zero, N->L[2:1]
 			// 270 Skip if (A2[7:1]·A2[7:1]) makes non zero, N->L[2:1]
@@ -301,7 +301,7 @@ offs_t upd777_disassembler::disassemble(std::ostream &stream, offs_t pc, const u
 			// 238 Skip if (A1[7:1]-A2[7:1]) makes non zero, N->L[2:1]
 			// 248 Skip if (A2[7:1]-A1[7:1]) makes zero, N->L[2:1]
 			// 268 Skip if (A2[7:1]-A1[7:1]) makes non zero, N->L[2:1]
-	 		// 258 Skip if (A2[7:1]-A2[7:1]) makes zero, N->L[2:1]
+			// 258 Skip if (A2[7:1]-A2[7:1]) makes zero, N->L[2:1]
 			// 278 Skip if (A2[7:1]-A2[7:1]) makes non zero, N->L[2:1]
 			// 288 Skip if (M[H[5:1],L[2:1]][7:1]-A1[7:1]) makes zero, N->L[2:1]
 			// 2a8 Skip if (M[H[5:1],L[2:1]][7:1]-A1[7:1]) makes non zero, N->L[2:1]
@@ -317,7 +317,7 @@ offs_t upd777_disassembler::disassemble(std::ostream &stream, offs_t pc, const u
 			// 22c Skip if (A1[7:1]-A1[7:1]) makes non borrow, N->L[2:1]
 			// 21c Skip if (A1[7:1]-A2[7:1]) makes borrow, N->L[2:1]
 			// 23c Skip if (A1[7:1]-A2[7:1]) makes non borrow, N->L[2:1]
- 			// 24c Skip if (A2[7:1]-A1[7:1]) makes borrow, N->L[2:1]
+			// 24c Skip if (A2[7:1]-A1[7:1]) makes borrow, N->L[2:1]
 			// 26c Skip if (A2[7:1]-A1[7:1]) makes non borrow, N->L[2:1]
 			// 25c Skip if (A2[7:1]-A2[7:1]) makes borrow, N->L[2:1]
 			// 27c Skip if (A2[7:1]-A2[7:1]) makes non borrow, N->L[2:1]
