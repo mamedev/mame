@@ -36,7 +36,7 @@ the ROM files below store 12 bit in a 16-bit word with 4 bits unused, so 128 * 1
 
 	<software name="yosaku" supported="no">
 		<description>Yosaku</description>
-		<year>1981</year>
+		<year>1981</year> <!-- 7/30/1981 -->
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="cassvisn_cart">
 			<dataarea name="prg" size="0xf00">
@@ -50,7 +50,7 @@ the ROM files below store 12 bit in a 16-bit word with 4 bits unused, so 128 * 1
 
 	<software name="baseball" supported="no">
 		<description>Baseball</description>
-		<year>1981</year>
+		<year>1981</year> <!-- 7/30/1981 -->
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="cassvisn_cart">
 			<dataarea name="prg" size="0xf00">
@@ -65,7 +65,7 @@ the ROM files below store 12 bit in a 16-bit word with 4 bits unused, so 128 * 1
 	<!-- PCB is silkscreened 006, ROM here is 007 is there an undumped earlier version? -->
 	<software name="galaxian" supported="no">
 		<description>Galaxian</description>
-		<year>1981</year>
+		<year>1981</year> <!-- 8/10/1981 -->
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="cassvisn_cart">
 			<dataarea name="prg" size="0xf00">
@@ -79,7 +79,7 @@ the ROM files below store 12 bit in a 16-bit word with 4 bits unused, so 128 * 1
 
 	<software name="bigspt12" supported="no">
 		<description>Big Sports 12</description>
-		<year>1981</year>
+		<year>1982</year> <!-- 6/15/1982 -->
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="cassvisn_cart">
 			<dataarea name="prg" size="0xf00">
@@ -94,7 +94,7 @@ the ROM files below store 12 bit in a 16-bit word with 4 bits unused, so 128 * 1
 	<!-- PCB is skilscreened TV Vader & Yosaku, is there also a version of Yosaku using a D774C? -->
 	<software name="btlvader" supported="no">
 		<description>Battle Vader</description>
-		<year>1981</year>
+		<year>1982</year> <!-- 3/3/1982 -->
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="cassvisn_cart">
 			<dataarea name="prg" size="0xf00">
@@ -108,7 +108,7 @@ the ROM files below store 12 bit in a 16-bit word with 4 bits unused, so 128 * 1
 
 	<software name="pakpak" supported="no">
 		<description>PakPak Monster</description>
-		<year>1981</year>
+		<year>1982</year> <!-- 7/13/1982 -->
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="cassvisn_cart">
 			<dataarea name="prg" size="0xf00">
@@ -122,7 +122,7 @@ the ROM files below store 12 bit in a 16-bit word with 4 bits unused, so 128 * 1
 
 	<software name="nbasebal" supported="no">
 		<description>New Baseball</description>
-		<year>1981</year>
+		<year>1982</year> <!-- 6/15/1982 -->
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="cassvisn_cart">
 			<dataarea name="prg" size="0xf00">
@@ -136,7 +136,7 @@ the ROM files below store 12 bit in a 16-bit word with 4 bits unused, so 128 * 1
 
 	<software name="monstrmn" supported="no">
 		<description>Monster Mansion</description>
-		<year>1981</year>
+		<year>1982</year> <!-- 10/7/1982 -->
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="cassvisn_cart">
 			<dataarea name="prg" size="0xf00">
@@ -150,7 +150,7 @@ the ROM files below store 12 bit in a 16-bit word with 4 bits unused, so 128 * 1
 
 	<software name="astrocmd" supported="no">
 		<description>Astro Command</description>
-		<year>1981</year>
+		<year>1982</year> <!-- 8/3/1982 -->
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="cassvisn_cart">
 			<dataarea name="prg" size="0xf00">
@@ -164,7 +164,7 @@ the ROM files below store 12 bit in a 16-bit word with 4 bits unused, so 128 * 1
 
 	<software name="monstrbk" supported="no">
 		<description>Monster Block</description>
-		<year>1981</year>
+		<year>1984</year> <!-- 3/16/1984 -->
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="cassvisn_cart">
 			<dataarea name="prg" size="0xf00">
@@ -178,7 +178,7 @@ the ROM files below store 12 bit in a 16-bit word with 4 bits unused, so 128 * 1
 
 	<software name="elvpanic" supported="no">
 		<description>Elevator Panic</description>
-		<year>1981</year>
+		<year>1984</year> <!-- 8/1/1984 -->
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="cassvisn_cart">
 			<dataarea name="prg" size="0xf00">
