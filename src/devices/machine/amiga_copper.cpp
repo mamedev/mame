@@ -245,10 +245,10 @@ int amiga_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy)
 	if (m_pending_offset)
 	{
 		//LOGCHIPSET("%02X.%02X: Write to %s = %04x\n", ypos, xpos / 2, s_custom_reg_names[m_copper_pending_offset & 0xff], m_copper_pending_data);
-		LOGCHIPSET("%02X.%02X: Write to %s = %04x\n",
+		LOGCHIPSET("%02X.%02X: Write to $dff%03x = %04x\n",
 			ypos,
 			xpos / 2,
-			m_pending_offset << 1,
+			(m_pending_offset << 1),
 			m_pending_data
 		);
 		m_host_space->write_word(0xdff000 | (m_pending_offset << 1), m_pending_data);
@@ -313,7 +313,7 @@ int amiga_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy)
 			if (delay[word0] == 0)
 			{
 				//LOGCHIPSET("%02X.%02X: Write to %s = %04x\n", ypos, xpos / 2, s_custom_reg_names[word0 & 0xff], word1);
-				LOGCHIPSET("%02X.%02X: Write to %s = %04x\n",
+				LOGCHIPSET("%02X.%02X: Write to $dff%03x = %04x\n",
 					ypos,
 					xpos / 2,
 					word0 << 1,
