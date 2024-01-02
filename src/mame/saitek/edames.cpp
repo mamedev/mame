@@ -202,7 +202,7 @@ void edames_state::p7_w(u8 data)
 	update_display();
 
 	// P74: speaker out
-	m_dac->write(BIT(data, 4));
+	m_dac->write(BIT(~data, 4));
 }
 
 

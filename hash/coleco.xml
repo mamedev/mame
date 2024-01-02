@@ -2881,6 +2881,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="powheman">
+		<!-- Title screen has been hacked to show "NOT FOR RESALE" -->
+		<description>Masters of the Universe: The Power of He-Man (prototype, hacked)</description>
+		<year>1984</year>
+		<publisher>Mattel Electronics</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="motu-notforresale.rom" size="32768" crc="2277f82b" sha1="be034ef23af778b986b59bf6609dff0c90b6f8de" offset="0x0000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="smurfply">
 		<!-- Smurf Play and Learn (1982)(Coleco)(proto).bin -->
 		<description>Smurf Play and Learn (prototype)</description>

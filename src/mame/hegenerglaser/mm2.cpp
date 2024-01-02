@@ -7,8 +7,9 @@ Mephisto MM II series chesscomputers
 
 TODO:
 - rebel5 unknown read from 0x4002, looks like leftover bookrom check
-- need to emulate TurboKit properly, also for mm5p (it's not as simple as a CPU
-  overclock plus ROM patch)
+- need to emulate TurboKit properly as a slot device, also for mm5p (it's not as
+  simple as a CPU overclock), TK20 EPROM is dumped for the common version (6502
+  Mephisto/Fidelity/Novag/etc.) and for the SciSys Maestro/Analyst version
 - correct rom labels (applies to the filenames with .bin extension)
 
 ================================================================================
@@ -29,14 +30,17 @@ ported his Nona program to MM II hardware, using Ed Schröder's interface (hence
 similarity with Rebel). According to research, this version competed in the 1985 Dutch
 Open Computer Chess Championship.
 
-MM IV Turbo Kit 18MHz - (mm4tk)
-This is a replacement ROM combining the Turbo Kit initial ROM with the original MM IV.
-The Turbo Kit powers up to it's tiny ROM, copies itself to RAM, banks in normal ROM,
+MM IV TurboKit 18MHz - (mm4tk)
+This is a replacement ROM combining the TurboKit initial ROM with the original MM IV.
+The TurboKit powers up to it's tiny ROM, copies itself to RAM, banks in normal ROM,
 copies that to faster SRAM, then patches the checksum and the LED blink delays.
 
-There is an undumped MM V Turbo Kit, which will be the exact same except for location
+There is an undumped MM V TurboKit, which will be the exact same except for location
 of the patches. The mm5tk just needs the normal mm5 ROM swapped out for that one to
 blinks the LEDs a little slower.
+
+Correction: The real TK20 TurboKit does not patch the ROM, so mm4tk (and a possible
+mm5 version of this) is more likely a SteveUK hack.
 
 The MM V prototype was the program that Ed Schröder participated with as "Rebel" at
 the 1989 WMCCC in Portorose. It was used with the TK20 TurboKit.
