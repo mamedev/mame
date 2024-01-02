@@ -908,10 +908,14 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 	}
 	if (this_line(0x600) & 4) {
 		u16 sprite_mix = this_line(0x7400);
+		
+		u16 unknown = BIT(sprite_mix, 10, 2);
+		if (unknown)
+			logerror("unknown sprite mix bits: _%01x__ at %04x\n", unknown << 2, 0x7400 + y*2);
+		
 		for (int group = 0; group < NUM_SPRITEGROUPS; group++) {
-			// watch out for blend bit combine bugs here
 			line.sp[group].mix_value = (line.sp[group].mix_value & 0xc00f)
-				| sprite_mix << 4;
+				| BIT(sprite_mix, 0, 10) << 4;
 			line.sp[group].brightness = BIT(sprite_mix, 12 + group, 1);
 		}
 	}
@@ -1161,7 +1165,7 @@ void taito_f3_state::draw_line(pen_t* dst, f3_line_inf &line, int xs, int xe, pl
 	fx_x += 10*((pf->x_scale)-(1<<8));
 	fx_x &= (m_width_mask << 8) | 0xff;
 
-	logerror("= playfield =\n"); 
+	//logerror("= playfield =\n"); 
 	const bool opaque = !pf->blend_b() && !pf->blend_a();
 	//logerror("pri/alp: %X %X\n", line.pri_alp[180].pri, line.pri_alp[180].alpha);
 	for (int x = xs; x < xe; x++) {
