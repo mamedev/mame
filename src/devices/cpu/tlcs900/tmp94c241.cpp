@@ -1836,13 +1836,13 @@ void tmp94c241_device::tlcs900_handle_timers()
 		case 0:  /* TIO */
 			break;
 		case 1:  /* T1 */
-			TIMER_CHANGE_0 += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
+			TIMER_CHANGE_0 += ( m_timer_pre >> 3 ) - ( old_pre >> 3 );
 			break;
 		case 2:  /* T4 */
-			TIMER_CHANGE_0 += ( m_timer_pre >> 9 ) - ( old_pre >> 9 );
+			TIMER_CHANGE_0 += ( m_timer_pre >> 5 ) - ( old_pre >> 5 );
 			break;
 		case 3:  /* T16 */
-			TIMER_CHANGE_0 += ( m_timer_pre >> 11 ) - ( old_pre >> 11 );
+			TIMER_CHANGE_0 += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
 			break;
 		}
 
@@ -1876,13 +1876,13 @@ void tmp94c241_device::tlcs900_handle_timers()
 		case 0x00:  /* TO0TRG */
 			break;
 		case 0x01:  /* T1 */
-			TIMER_CHANGE_1 += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
+			TIMER_CHANGE_1 += ( m_timer_pre >> 3 ) - ( old_pre >> 3 );
 			break;
 		case 0x02:  /* T16 */
-			TIMER_CHANGE_1 += ( m_timer_pre >> 11 ) - ( old_pre >> 11 );
+			TIMER_CHANGE_1 += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
 			break;
 		case 0x03:  /* T256 */
-			TIMER_CHANGE_1 += ( m_timer_pre >> 15 ) - ( old_pre >> 15 );
+			TIMER_CHANGE_1 += ( m_timer_pre >> 11 ) - ( old_pre >> 11 );
 			break;
 		}
 
@@ -1912,13 +1912,13 @@ void tmp94c241_device::tlcs900_handle_timers()
 		{
 		case 0: /* invalid */
 		case 1: /* T1 */
-			TIMER_CHANGE_2 += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
+			TIMER_CHANGE_2 += ( m_timer_pre >> 3 ) - ( old_pre >> 3 );
 			break;
 		case 2: /* T4 */
-			TIMER_CHANGE_2 += ( m_timer_pre >> 9 ) - ( old_pre >> 9 );
+			TIMER_CHANGE_2 += ( m_timer_pre >> 5 ) - ( old_pre >> 5 );
 			break;
 		case 3: /* T16 */
-			TIMER_CHANGE_2 += ( m_timer_pre >> 11 ) - ( old_pre >> 11 );
+			TIMER_CHANGE_2 += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
 			break;
 		}
 
@@ -1952,13 +1952,13 @@ void tmp94c241_device::tlcs900_handle_timers()
 		case 0: /* TO2TRG */
 			break;
 		case 1: /* T1 */
-			TIMER_CHANGE_3 += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
+			TIMER_CHANGE_3 += ( m_timer_pre >> 3 ) - ( old_pre >> 3 );
 			break;
 		case 2: /* T16 */
-			TIMER_CHANGE_3 += ( m_timer_pre >> 11 ) - ( old_pre >> 11 );
+			TIMER_CHANGE_3 += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
 			break;
 		case 3: /* T256 */
-			TIMER_CHANGE_3 += ( m_timer_pre >> 15 ) - ( old_pre >> 15 );
+			TIMER_CHANGE_3 += ( m_timer_pre >> 11 ) - ( old_pre >> 11 );
 			break;
 		}
 
@@ -1990,13 +1990,13 @@ void tmp94c241_device::tlcs900_handle_timers()
 			// TODO: implement-me!
 			break;
 		case 0x01:  /* T1 */
-			TIMER_CHANGE_4 += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
+			TIMER_CHANGE_4 += ( m_timer_pre >> 3 ) - ( old_pre >> 3 );
 			break;
 		case 0x02:  /* T4 */
-			TIMER_CHANGE_4 += ( m_timer_pre >> 9 ) - ( old_pre >> 9 );
+			TIMER_CHANGE_4 += ( m_timer_pre >> 5 ) - ( old_pre >> 5 );
 			break;
 		case 0x03:  /* T16 */
-			TIMER_CHANGE_4 += ( m_timer_pre >> 11 ) - ( old_pre >> 11 );
+			TIMER_CHANGE_4 += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
 			break;
 		}
 
@@ -2024,13 +2024,13 @@ void tmp94c241_device::tlcs900_handle_timers()
 			// TODO: implement-me!
 			break;
 		case 1: /* T1 */
-			TIMER_CHANGE_6 += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
+			TIMER_CHANGE_6 += ( m_timer_pre >> 3 ) - ( old_pre >> 3 );
 			break;
 		case 2: /* T4 */
-			TIMER_CHANGE_6 += ( m_timer_pre >> 9 ) - ( old_pre >> 9 );
+			TIMER_CHANGE_6 += ( m_timer_pre >> 5 ) - ( old_pre >> 5 );
 			break;
 		case 3: /* T16 */
-			TIMER_CHANGE_6 += ( m_timer_pre >> 11 ) - ( old_pre >> 11 );
+			TIMER_CHANGE_6 += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
 			break;
 		}
 
@@ -2058,13 +2058,13 @@ void tmp94c241_device::tlcs900_handle_timers()
 			// TODO: implement-me!
 			break;
 		case 0x01:  /* T1 */
-			TIMER_CHANGE_8 += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
+			TIMER_CHANGE_8 += ( m_timer_pre >> 3 ) - ( old_pre >> 3 );
 			break;
 		case 0x02:  /* T4 */
-			TIMER_CHANGE_8 += ( m_timer_pre >> 9 ) - ( old_pre >> 9 );
+			TIMER_CHANGE_8 += ( m_timer_pre >> 5 ) - ( old_pre >> 5 );
 			break;
 		case 0x03:  /* T16 */
-			TIMER_CHANGE_8 += ( m_timer_pre >> 11 ) - ( old_pre >> 11 );
+			TIMER_CHANGE_8 += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
 			break;
 		}
 
@@ -2092,13 +2092,13 @@ void tmp94c241_device::tlcs900_handle_timers()
 			// TODO: implement-me!
 			break;
 		case 1: /* T1 */
-			TIMER_CHANGE_A += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
+			TIMER_CHANGE_A += ( m_timer_pre >> 3 ) - ( old_pre >> 3 );
 			break;
 		case 2: /* T4 */
-			TIMER_CHANGE_A += ( m_timer_pre >> 9 ) - ( old_pre >> 9 );
+			TIMER_CHANGE_A += ( m_timer_pre >> 5 ) - ( old_pre >> 5 );
 			break;
 		case 3: /* T16 */
-			TIMER_CHANGE_A += ( m_timer_pre >> 11 ) - ( old_pre >> 11 );
+			TIMER_CHANGE_A += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
 			break;
 		}
 
