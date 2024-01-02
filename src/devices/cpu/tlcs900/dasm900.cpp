@@ -1519,7 +1519,7 @@ u32 tlcs900_disassembler::opcode_alignment() const
 	return 1;
 }
 
-void tlcs900_disassembler::decode_control_register_8(std::ostream &stream, uint32_t imm){
+void tlcs900_disassembler::decode_control_register_8(std::ostream &stream, uint8_t imm){
 	switch( imm )
 	{
 	case 0x22: util::stream_format(stream, " DMAM0"); break;
@@ -1533,7 +1533,7 @@ void tlcs900_disassembler::decode_control_register_8(std::ostream &stream, uint3
 }
 
 
-void tmp94c241_disassembler::decode_control_register_8(std::ostream &stream, uint32_t imm){
+void tmp94c241_disassembler::decode_control_register_8(std::ostream &stream, uint8_t imm){
 	switch( imm )
 	{
 	case 0x42: util::stream_format(stream, " DMAM0"); break;
@@ -1551,7 +1551,7 @@ void tmp94c241_disassembler::decode_control_register_8(std::ostream &stream, uin
 }
 
 
-void tlcs900_disassembler::decode_control_register_16(std::ostream &stream, uint32_t imm){
+void tlcs900_disassembler::decode_control_register_16(std::ostream &stream, uint8_t imm){
 	switch( imm )
 	{
 	case 0x20: util::stream_format(stream, " DMAC0"); break;
@@ -1566,7 +1566,7 @@ void tlcs900_disassembler::decode_control_register_16(std::ostream &stream, uint
 }		
 
 
-void tmp94c241_disassembler::decode_control_register_16(std::ostream &stream, uint32_t imm){
+void tmp94c241_disassembler::decode_control_register_16(std::ostream &stream, uint8_t imm){
 	switch( imm )
 	{
 	case 0x40: util::stream_format(stream, " DMAC0"); break;
@@ -1584,7 +1584,7 @@ void tmp94c241_disassembler::decode_control_register_16(std::ostream &stream, ui
 }
 
 
-void tlcs900_disassembler::decode_control_register_32(std::ostream &stream, uint32_t imm){
+void tlcs900_disassembler::decode_control_register_32(std::ostream &stream, uint8_t imm){
 	switch( imm )
 	{
 	case 0x00: util::stream_format(stream, " DMAS0"); break;
@@ -1602,7 +1602,7 @@ void tlcs900_disassembler::decode_control_register_32(std::ostream &stream, uint
 }
 
 
-void tmp94c241_disassembler::decode_control_register_32(std::ostream &stream, uint32_t imm){
+void tmp94c241_disassembler::decode_control_register_32(std::ostream &stream, uint8_t imm){
 	switch( imm )
 	{
 	case 0x00: util::stream_format(stream, " DMAS0"); break;

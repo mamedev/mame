@@ -15,9 +15,9 @@ class tlcs900_disassembler : public util::disasm_interface
 {
 protected:
 	tlcs900_disassembler(uint16_t num_sfr, const char *const sfr_names[]);
-	void decode_control_register_8(std::ostream &stream, uint32_t imm);
-	void decode_control_register_16(std::ostream &stream, uint32_t imm);
-	void decode_control_register_32(std::ostream &stream, uint32_t imm);
+	virtual void decode_control_register_8(std::ostream &stream, uint8_t imm);
+	virtual void decode_control_register_16(std::ostream &stream, uint8_t imm);
+	virtual void decode_control_register_32(std::ostream &stream, uint8_t imm);
 
 public:
 	virtual ~tlcs900_disassembler() = default;
@@ -120,9 +120,9 @@ class tmp94c241_disassembler : public tlcs900_disassembler
 {
 public:
 	tmp94c241_disassembler();
-	void decode_control_register_8(std::ostream &stream, uint32_t imm);
-	void decode_control_register_16(std::ostream &stream, uint32_t imm);
-	void decode_control_register_32(std::ostream &stream, uint32_t imm);
+	void decode_control_register_8(std::ostream &stream, uint8_t imm) override;
+	void decode_control_register_16(std::ostream &stream, uint8_t imm) override;
+	void decode_control_register_32(std::ostream &stream, uint8_t imm) override;
 
 private:
 	static const char *const s_sfr_names[];
