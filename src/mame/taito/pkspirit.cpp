@@ -52,7 +52,6 @@ Video PCB:
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-#include "tilemap.h"
 
 
 namespace {
@@ -66,8 +65,6 @@ public:
 		, m_mainio(*this, "mainio")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
-		, m_bg_videoram(*this, "bg_videoram")
-		, m_fg_videoram(*this, "fg_videoram")
 		, m_audiobank(*this, "audiobank")
 		, m_opto(*this, "opto%u", 1U)
 	{ }
@@ -84,63 +81,63 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<uint16_t> m_bg_videoram;
-	required_shared_ptr<uint16_t> m_fg_videoram;
 	required_memory_bank m_audiobank;
 
 	required_device_array<taitoio_opto_device, 2> m_opto;
 
-	tilemap_t *m_bg_tilemap = nullptr;
-	tilemap_t *m_fg_tilemap = nullptr;
-
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	void bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void fg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 };
 
-void pkspirit_state::bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	COMBINE_DATA(&m_bg_videoram[offset]);
-	m_bg_tilemap->mark_tile_dirty(offset);
-}
-
-TILE_GET_INFO_MEMBER(pkspirit_state::get_bg_tile_info)
-{
-	int tileno = m_bg_videoram[tile_index];
-	tileinfo.set(0, tileno, 0x8 + 0x6, 0);
-}
-
-void pkspirit_state::fg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	COMBINE_DATA(&m_fg_videoram[offset]);
-	m_fg_tilemap->mark_tile_dirty(offset);
-}
-
-TILE_GET_INFO_MEMBER(pkspirit_state::get_fg_tile_info)
-{
-	int tileno = m_fg_videoram[tile_index];
-	tileinfo.set(0, tileno, 0x8 + 0x6, 0);
-}
-
 
 void pkspirit_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(pkspirit_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(pkspirit_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	m_fg_tilemap->set_transparent_pen(0);
 }
 
 uint32_t pkspirit_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	bitmap.fill(0, cliprect);
+
+	u32 spriteram_start = 0x300ff2; // should be 0xb10000 but a DMA is missing
+	u32 spriteram2_start = 0xb00000;
+
+	for (int i = 0; i < 0x800; i += 8)
+	{
+		uint16_t sp0 = m_maincpu->space().read_word(spriteram_start + i + 0);
+		uint16_t sp1 = m_maincpu->space().read_word(spriteram_start + i + 2);
+		//uint16_t sp2 = m_maincpu->space().read_word(spriteram_start + i + 4);
+		uint16_t sp3 = m_maincpu->space().read_word(spriteram_start + i + 6);
+
+		int sizex = 0x40;
+		int sizey = 0x40;
+		int base = sp3 << 1;
+
+		int pal = (sp1 & 0xfc00) >> 10;
+
+		if ((sp0 != 0x0000) && (sp3 == 0x1000 || sp3 == 0x0000))
+		{
+			//printf("sp%03x : %04x %04x %04x %04x\n", i, sp0, sp1, sp2, sp3);
+
+			int count = 0;
+			for (int y = 0; y < sizey; y++)
+			{
+				int ydraw = y * 16;
+
+				for (int x = 0; x < sizex; x++)
+				{
+					int xdraw = x * 16;
+
+					uint16_t tile = m_maincpu->space().read_word(spriteram2_start + base + count);
+					m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, tile, pal, 0, 0, xdraw, ydraw, 0);
+
+					count += 2;
+				}
+			}
+		}
+	}
+
 	return 0;
 }
 
@@ -160,18 +157,17 @@ void pkspirit_state::main_map(address_map &map) // TODO: verify everything
 	map(0x800003, 0x800003).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
 	//map(0x900000, 0x900001).w // ?
 
-	map(0xa00000, 0xa0003f).ram();
+	map(0xa00000, 0xa0003f).ram(); // is this still palette? (4bpp, for uploaded tiles?)
 	map(0xa04000, 0xa057ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0xb00000, 0xb00fff).ram().w(FUNC(pkspirit_state::fg_videoram_w)).share(m_fg_videoram); // GFX chips RAM?
-	map(0xb01000, 0xb01fff).ram(); // GFX chips RAM?
-	map(0xb02000, 0xb02fff).ram().w(FUNC(pkspirit_state::bg_videoram_w)).share(m_bg_videoram); // GFX chips RAM?
-	map(0xb03000, 0xb03fff).ram(); // GFX chips RAM ?
-	map(0xb04000, 0xb04fff).ram(); // maybe sprite data, arranged as strips of 4 horizontal tiles
-	map(0xb05000, 0xb0ffff).ram(); // GFX chips RAM ?
+	map(0xb00000, 0xb0ffff).ram();
+
+	map(0xb10000, 0xb107ff).ram(); // spritelist should be copied here
 
 	map(0xb10800, 0xb1087f).ram(); // control registers for one of the custom GFX chips?
 	map(0xb20000, 0xb2001f).ram(); // control registers for one of the custom GFX chips?
 }
+
+
 
 void pkspirit_state::sound_map(address_map &map) // TODO: verify everything
 {
@@ -296,6 +292,7 @@ const gfx_layout gfx_16x16x5_planar =
 static GFXDECODE_START( gfx_pkspirit ) // TODO: wrong, needs adjustments
 	GFXDECODE_ENTRY( "tiles", 0, gfx_16x16x5_planar, 0, 256)
 GFXDECODE_END
+
 
 
 void pkspirit_state::pkspirit(machine_config &config)
