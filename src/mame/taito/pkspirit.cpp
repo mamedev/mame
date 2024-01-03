@@ -110,16 +110,31 @@ uint32_t pkspirit_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		//uint16_t sp2 = m_maincpu->space().read_word(spriteram_start + i + 4);
 		uint16_t sp3 = m_maincpu->space().read_word(spriteram_start + i + 6);
 
+
+		int xpos = sp1 & 0x1ff;
+
 		int sizex = 0x40;
 		int sizey = 0x40;
-		int base = sp3 << 1;
+		int base = (sp3 & 0xfff0) << 1;
 
 		int pal = (sp1 & 0xfc00) >> 10;
 
-		if ((sp0 != 0x0000) && (sp3 == 0x1000 || sp3 == 0x0000))
+		if (sp0 == 0x9fe0)
 		{
-			//printf("sp%03x : %04x %04x %04x %04x\n", i, sp0, sp1, sp2, sp3);
+			sizex = 0x40;
+			sizey = 0x40;
+		}
+		else
+		{
+			sizex = 4;
+			sizey = 4;
+		}
 
+		//if (sp0 != 0x0000)
+		//	printf("sp%03x : %04x %04x %04x %04x\n", i, sp0, sp1, sp2, sp3);
+
+		if ((sp0 != 0x0000) && (sp3 == 0x1000 || sp3 == 0x0000 || sp3 == 0x24e1 || sp3 == 0x24f1 || sp3 == 0x2501))
+		{
 			int count = 0;
 			for (int y = 0; y < sizey; y++)
 			{
@@ -127,7 +142,7 @@ uint32_t pkspirit_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 				for (int x = 0; x < sizex; x++)
 				{
-					int xdraw = x * 16;
+					int xdraw = x * 16 + xpos - 0x40;
 
 					uint16_t tile = m_maincpu->space().read_word(spriteram2_start + base + count);
 					m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, tile, pal, 0, 0, xdraw, ydraw, 0);
@@ -136,6 +151,7 @@ uint32_t pkspirit_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 				}
 			}
 		}
+
 	}
 
 	return 0;
