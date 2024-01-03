@@ -110,7 +110,6 @@ uint32_t pkspirit_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		//uint16_t sp2 = m_maincpu->space().read_word(spriteram_start + i + 4);
 		uint16_t sp3 = m_maincpu->space().read_word(spriteram_start + i + 6);
 
-
 		int xpos = sp1 & 0x1ff;
 		int ypos = sp0 & 0x1ff;
 
@@ -120,7 +119,7 @@ uint32_t pkspirit_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		int sizey;
 		int xshift;
 
-		int base = (sp3 & 0xfff0) << 1;
+		int base = (sp3 & 0xfffe) << 1;
 
 		int pal = (sp1 & 0xfc00) >> 10;
 
@@ -128,14 +127,31 @@ uint32_t pkspirit_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		{
 			sizex = 0x40;
 			sizey = 0x40;
-
 			xshift = 0x40;
 		}
 		else
 		{
-			sizex = 4;
-			sizey = 4;
-			xshift = 0;
+			if (sp0 & 0x0800) // TAITO logo sprite on title, playing cards, odds table
+			{
+				sizex = 4;
+				sizey = 4;
+				xshift = 0;
+			}
+			else 
+			{
+				if (sp0 & 0x1000) // GAME OVER
+				{
+					sizex = 4;
+					sizey = 2;
+					xshift = 0;
+				}
+				else // Values on Double Up screen
+				{
+					sizex = 1;
+					sizey = 2;
+					xshift = 0;
+				}
+			}
 		}
 
 		//if (sp0 != 0x0000)
