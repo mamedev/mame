@@ -114,11 +114,12 @@ uint32_t pkspirit_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		int xpos = sp1 & 0x1ff;
 		int ypos = sp0 & 0x1ff;
 
-		if (ypos & 0x100)
-			ypos -= 0x200;
+		ypos = 0x1ff - ypos;
 
-		int sizex = 0x40;
-		int sizey = 0x40;
+		int sizex;
+		int sizey;
+		int xshift;
+
 		int base = (sp3 & 0xfff0) << 1;
 
 		int pal = (sp1 & 0xfc00) >> 10;
@@ -127,11 +128,14 @@ uint32_t pkspirit_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		{
 			sizex = 0x40;
 			sizey = 0x40;
+
+			xshift = 0x40;
 		}
 		else
 		{
 			sizex = 4;
 			sizey = 4;
+			xshift = 0;
 		}
 
 		//if (sp0 != 0x0000)
@@ -142,11 +146,11 @@ uint32_t pkspirit_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 			int count = 0;
 			for (int y = 0; y < sizey; y++)
 			{
-				int ydraw = y * 16 + ypos + 0x20;
+				int ydraw = y * 16 + ypos;
 
 				for (int x = 0; x < sizex; x++)
 				{
-					int xdraw = x * 16 + xpos - 0x40;
+					int xdraw = x * 16 + xpos - xshift;
 
 					uint16_t tile = m_maincpu->space().read_word(spriteram2_start + base + count);
 					m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, tile, pal, 0, 0, xdraw, ydraw, 0);
