@@ -211,6 +211,7 @@ protected:
 		auto clip_enable() const { return std::bitset<4>(mix_value >> 8); };
 		bool clip_inv_mode() const { return mix_value & 0x1000; };
 		bool layer_enable() const { return mix_value & 0x2000; };
+		u8 blend_mask() const { return BIT(mix_value, 14, 2); };
 		bool blend_a() const { return mix_value & 0x4000; };
 		bool blend_b() const { return mix_value & 0x8000; };
 
@@ -262,7 +263,7 @@ protected:
 		fixed8 reg_fx_y{0};
 	};
 	
-	struct pri_alpha { u8 pri; u8 alpha; };
+	struct pri_alpha { u8 pri; u8 active_alpha; u8 alpha; };
 
 	struct f3_line_inf {
 		int y{0};
@@ -286,9 +287,10 @@ protected:
 		playfield_inf pf[NUM_PLAYFIELDS];
 	};
 
-	void blend_s(bool a, bool b, bool sel, u8 prio, const u8 *blendvals, pri_alpha &pri_alp, u32 &dst, u32 src);
-	void blend_o(bool a, bool b, bool sel, u8 prio, const u8 *blendvals, pri_alpha &pri_alp, u32 &dst, u32 src);
-	void blend_d(bool a, bool b, bool sel, u8 prio, const u8 *blendvals, pri_alpha &pri_alp, u32 &dst, u32 src);
+	void blend_s(u8 blend_mode, bool sel, u8 prio, const u8 *blendvals, pri_alpha &pri_alp, u32 &dst, u32 src);
+	void blend_o(u8 blend_mode, bool sel, u8 prio, const u8 *blendvals, pri_alpha &pri_alp, u32 &dst, u32 src);
+	void blend_d(u8 blend_mode, bool sel, u8 prio, const u8 *blendvals, pri_alpha &pri_alp, u32 &dst, u32 src);
+	void blend_dispatch(u8 blend_mode, bool sel, u8 prio, const u8 *blendvals, pri_alpha &pri_alp, u32 &dst, u32 src);
 	
 	virtual void draw_line(pen_t* dst, f3_line_inf &line, int xs, int xe, sprite_inf* sp);
 	virtual void draw_line(pen_t* dst, f3_line_inf &line, int xs, int xe, playfield_inf* pf);
