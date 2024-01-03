@@ -112,6 +112,10 @@ uint32_t pkspirit_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 
 		int xpos = sp1 & 0x1ff;
+		int ypos = sp0 & 0x1ff;
+
+		if (ypos & 0x100)
+			ypos -= 0x200;
 
 		int sizex = 0x40;
 		int sizey = 0x40;
@@ -133,12 +137,12 @@ uint32_t pkspirit_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		//if (sp0 != 0x0000)
 		//	printf("sp%03x : %04x %04x %04x %04x\n", i, sp0, sp1, sp2, sp3);
 
-		if ((sp0 != 0x0000) && (sp3 == 0x1000 || sp3 == 0x0000 || sp3 == 0x24e1 || sp3 == 0x24f1 || sp3 == 0x2501))
+		if (sp0 != 0x0000)
 		{
 			int count = 0;
 			for (int y = 0; y < sizey; y++)
 			{
-				int ydraw = y * 16;
+				int ydraw = y * 16 + ypos + 0x20;
 
 				for (int x = 0; x < sizex; x++)
 				{
