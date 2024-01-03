@@ -767,13 +767,7 @@ void taito_f3_state::palette_24bit_w(offs_t offset, u32 data, u32 mem_mask)
 // y should be called 0->255 for non-flipscreen, 255->0 for flipscreen
 void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 {
-	const auto this_line = [=] (unsigned section)
-	{
-		return m_line_ram[section/2 + y];
-	};
-	// "can you use
-	// arrow syntax here"
-	const auto latched_addr = [=] (u8 section, u8 subsection)
+	const auto latched_addr = [=] (u8 section, u8 subsection) -> offs_t
 	{
 		u16 latches = m_line_ram[(section * 0x200)/2 + y];
 		offs_t base = 0x400 * BIT(latches, 8, 8) + 0x200 * subsection;
@@ -884,7 +878,7 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 		if (offs_t where = latched_addr(4, i)) {
 			u16 pf_scale = m_line_ram[where];
 			// y zooms are interleaved
-			const int FIX_Y = { 0, 3, 2, 1 };
+			const int FIX_Y[] = { 0, 3, 2, 1 };
 			line.pf[i].x_scale = 256-BIT(pf_scale, 8, 8);
 			line.pf[FIX_Y[i]].y_scale = BIT(pf_scale, 0, 8)<<1;
 		}
@@ -1024,8 +1018,12 @@ void taito_f3_state::blend_s(u8 blend_mode, bool sel, u8 prio, const u8 *blendva
 }
 void taito_f3_state::blend_o(u8 blend_mode, bool sel, u8 prio, const u8 *blendvals, pri_alpha &pri_alp, u32 &dst, u32 src)
 {
-	const int al_a = std::min(255, blendvals[sel] * 32);
-	const int al_b = std::min(255, blendvals[2 + sel] * 32);
+	int al_a = std::min(255, blendvals[sel] * 32);
+	int al_b = std::min(255, blendvals[2 + sel] * 32);
+	// implied by bubble memories ?  dubious..
+	/*if (blend_mode == 0b11 && (al_a > 255 || al_b > 255) {
+		al_a = 0; al_b = 255;
+	}*/
 	rgb_t rgb1{src};
 	rgb_t rgb2{src};
 	if (pri_alp.active_alpha) {
@@ -1056,7 +1054,7 @@ void taito_f3_state::blend_d(u8 blend_mode, bool sel, u8 prio, const u8 *blendva
 void taito_f3_state::blend_dispatch(u8 blend_mode, bool sel, u8 prio, const u8 *blendvals, pri_alpha &pri_alp, u32 &dst, u32 src)
 {
 	if (blend_mode == 0b00 || blend_mode == 0b11) { // opaque case
-		blend_o(0, sel, prio, blendvals, pri_alp, dst, src);
+		blend_o(blend_mode, sel, prio, blendvals, pri_alp, dst, src);
 	} else if (pri_alp.active_alpha) { // alt alpha above us
 		blend_d(blend_mode, sel, prio, blendvals, pri_alp, dst, src);
 	} else if (blend_mode) { // first alpha
@@ -1200,9 +1198,9 @@ void taito_f3_state::scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cl
 		// sort layers
 		std::array<std::variant<pivot_inf*, sprite_inf*, playfield_inf*>,
 				   NUM_SPRITEGROUPS + NUM_TILEMAPS> layers = {
-			&line_data.sp[3], &line_data.sp[2], &line_data.sp[1], &line_data.sp[0],
+			&line_data.sp[0], &line_data.sp[1], &line_data.sp[2], &line_data.sp[3],
 			&line_data.pivot,
-			&line_data.pf[3], &line_data.pf[2], &line_data.pf[1], &line_data.pf[0]
+			&line_data.pf[0], &line_data.pf[1], &line_data.pf[2], &line_data.pf[3],
 		};
 		std::stable_sort(layers.begin(), layers.end(),
 						 [prio](auto a, auto b) {
