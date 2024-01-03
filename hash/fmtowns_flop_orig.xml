@@ -47,14 +47,12 @@ CS-1 Towns                                                          Unitek Japan
 Cyber Animater                                                      Fujitsu                           1992/7     FD
 CyberMotion                                                         Fujitsu                           1993/3     FD
 D.O. Kaizokuban                                                     Brother Kougyou (Takeru)          1993/5     FD×03
-Daifugou Gakuen                                                     Brother Kougyou (Takeru)          ?          FDx??
 Daisenryaku 3 '90 Map Collection Vol. 2                             Pegasus Japan                     1992/7     FD
 Data Townsman                                                       Log                               1991/7     FD
 Dennou Kyoushi (Cyber Teacher)                                      Nichikonren Kikaku                1993/?     FD
 Dennou Sakka DX                                                     Nichikonren Kikaku                1993/?     FD×02
 Dennou Sakka DX (Cyber Writer Deluxe)                               Nichikonren Kikaku                1993/?     FD
 Dennou Seito (Cyber Pupil)                                          Nichikonren Kikaku                1993/?     FD
-D-Return                                                            Nichikonren Kikaku                1990/11    FD×02
 Euphony V1.1                                                        Fujitsu                           1989/7     FD
 F-ISAM386 V1.1                                                      Fujitsu                           1991/3     FD
 F-ISAM386 V3.1                                                      Fujitsu                           1992/11    FD
@@ -125,7 +123,6 @@ Microsoft Windows 95 (Tsuujou Package)                              Fujitsu     
 Microsoft Windows Software Kaihatsu Kit V3.1                        Fujitsu                           1993/8     FD
 MIDI World Towns                                                    Musical Plan                      1991/10    FD
 Migenerator Jikkou System V1.1                                      Fujitsu                           1992/8     FD
-Misty 2                                                             Data West                         1989/11    FD
 Misty Vol. 3                                                        Data West                         1990/1     FD
 Misty Vol. 4                                                        Data West                         1990/7     FD
 Misty Vol. 5                                                        Data West                         1990/9     FD
@@ -149,7 +146,7 @@ Otoko to Onna no Aishou Shindan                                     System House
 PC Globe 5.0                                                        Hiro                              1995/3     FD×04
 Planetary Campaign                                                  Nichikonren Kikaku                1993/?     FD
 Pleria                                                              Orange House                      1992/7     FD×05
-Present 2                                                           Orange House                      1992/10    FD×05
+* Present 2                                                         Orange House                      1992/10    FD×05
 Purple Cat Vol. 1                                                   Palm Tree                         1993/3     FD×02
 Purple Cat Vol. 2                                                   Palm Tree                         1993/6     FD×04
 Purple Cat Vol. 3                                                   Palm Tree                         1993/10    FD×05
@@ -692,6 +689,25 @@ Zurukamashi Ver 2.0                                                 Nichikonren 
 			<feature name="part_id" value="Shinkonsan Monogatari" />
 			<dataarea name="flop" size="1261568">
 				<rom name="dream program system sg set 3 (disk 4 - shinkonsan monogatari).hdm" size="1261568" crc="868fe008" sha1="0f3a452e4614cf5f1c72ee5a31fa678b3f059a84"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dreturn">
+		<description>D-Return</description>
+		<year>1990</year>
+		<publisher>日コン連企画 (Nichikonren Kikaku)</publisher>
+		<info name="release" value="199011xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="3402681">
+				<rom name="d-return_disk_1.mfm" size="3402681" crc="3e4fa087" sha1="2d278e6811319dab54e43307d66820097cfc7acb"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="3402656">
+				<rom name="d-return_disk_2.mfm" size="3402656" crc="e6fb631d" sha1="eab3b932591d6dee5cef1f14fb0bfd2b5f32c662"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1564,6 +1580,18 @@ Zurukamashi Ver 2.0                                                 Nichikonren 
 		</part>
 	</software>
 
+	<software name="misty2">
+		<description>Misty 2</description>
+		<year>1989</year>
+		<publisher>データウエスト (Data West)</publisher>
+		<info name="release" value="198911xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="misty2.hdm" size="1261568" crc="58f6cb18" sha1="ef67fb39f779e92eb2076c37f2758c91de8db04d"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mjelegan">
 		<description>Mahjong Elegance</description>
 		<year>1994</year>
@@ -1915,6 +1943,46 @@ Zurukamashi Ver 2.0                                                 Nichikonren 
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="premium 2 (disk 4).hdm" size="1261568" crc="5723ce84" sha1="5948e0ba82688fe321be6b49402722768996c63e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="present2">
+		<description>Present 2</description>
+		<year>1992</year>
+		<publisher>オレンジハウス (Orange House)</publisher>
+		<info name="alt_title" value="プレゼント２" />
+		<info name="release" value="199210xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Kidou Disk" />
+			<dataarea name="flop" size="1261568">
+				<rom name="present2_kidou_disk.hdm" size="1261568" crc="e8af923d" sha1="d6e7f5b8875eb7ef97ecf6b4139eeefc4cd79b33"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="1261568">
+				<!-- Disk A contains one bad sector on tracks 44, 45, 46 and 47. The bad sectors aren't part of any files, so they shouldn't prevent the game from working. -->
+				<rom name="present2_disk_a.hdm" size="1261568" crc="2c56bd32" sha1="da602f06c1ed04b3cc82f2a66fa74b9ba8a443f0" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1261568">
+				<rom name="present2_disk_b.hdm" size="1261568" crc="9559486a" sha1="03c2ce26b2f58ed254089a256919e936e79a9186"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C" />
+			<dataarea name="flop" size="1261568">
+				<rom name="present2_disk_c.hdm" size="1261568" crc="b6d6a8d1" sha1="e5198ff326fca2f93921a58556785e2d05a6004f"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk D" />
+			<dataarea name="flop" size="1261568">
+				<rom name="present2_disk_d.hdm" size="1261568" crc="6545a948" sha1="4900399f76395b6aea46489525e0b8e7dae4132e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2788,6 +2856,21 @@ Zurukamashi Ver 2.0                                                 Nichikonren 
 
 
 <!-- DOUJIN / HOMEBREW DISCS -->
+
+	<software name="daifugo">
+		<description>Daifugou Gakuen (v1.1)</description>
+		<year>1992</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="alt_title" value="大富豪学園" />
+		<info name="developer" value="住職ソフト (Jushoku Software)" />
+		<info name="release" value="19921230" /> <!-- Released at Comic Market 43 -->
+		<info name="usage" value="Requires 2 MB RAM. Boot TownsOS, then run the icon on floppy drive A:" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="daifugou_gakuen.hdm" size="1261568" crc="4b361314" sha1="7232ffda37b2c3a87bc8fd514f4740216b056aae"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="sa2">
 		<description>S. A. 2</description>
