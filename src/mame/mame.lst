@@ -15004,6 +15004,8 @@ masmario2                       // (c) 2005 Capcom
 mmaruchan                       // (c) 2005 Capcom
 mmaruchana                      // (c) 2004 Capcom
 pingu                           // (c) 2006 The Pygos Group / Capcom
+rockmanbc                       // (c) 2006 Capcom
+rockmanmdl                      // (c) 2005 Capcom
 wontame                         // (c) 2008 Capcom
 
 @source:capcom/bionicc.cpp
