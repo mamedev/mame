@@ -65,6 +65,7 @@ public:
 		, m_mainio(*this, "mainio")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
+		, m_vidram(*this, "vidram")
 		, m_audiobank(*this, "audiobank")
 		, m_opto(*this, "opto%u", 1U)
 	{ }
@@ -80,10 +81,13 @@ private:
 	required_device<te7750_device> m_mainio;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_shared_ptr<u16> m_vidram;
 
 	required_memory_bank m_audiobank;
 
 	required_device_array<taitoio_opto_device, 2> m_opto;
+
+	void vidram_w(offs_t offset, u16 data, u16 mem_mask);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -186,6 +190,11 @@ void pkspirit_state::machine_start()
 	m_audiobank->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 }
 
+void pkspirit_state::vidram_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_vidram[offset]);
+	m_gfxdecode->gfx(1)->mark_dirty(offset / 16);
+}
 
 void pkspirit_state::main_map(address_map &map) // TODO: verify everything
 {
@@ -199,7 +208,8 @@ void pkspirit_state::main_map(address_map &map) // TODO: verify everything
 
 	map(0xa00000, 0xa0003f).ram(); // is this still palette? (4bpp, for uploaded tiles?)
 	map(0xa04000, 0xa057ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0xb00000, 0xb0ffff).ram();
+	map(0xb00000, 0xb0ffff).ram();//
+	map(0xb0c000, 0xb0cfff).ram().w(FUNC(pkspirit_state::vidram_w)).share("vidram"); // it uploads a 2bpp tileset here, why? it's just another copy of the basic font
 
 	map(0xb10000, 0xb107ff).ram(); // spritelist should be copied here
 
@@ -328,9 +338,20 @@ const gfx_layout gfx_16x16x5_planar =
 	16*16
 };
 
+const gfx_layout gfx_ram =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	2,
+	{ 0,1 },
+	{ 0,2,4,6,8,10,12,14, 128,130,132,134,136,138,140,142 },
+	{ STEP8(0,16), STEP8(256,16) },
+	32*16
+};
 
 static GFXDECODE_START( gfx_pkspirit ) // TODO: wrong, needs adjustments
 	GFXDECODE_ENTRY( "tiles", 0, gfx_16x16x5_planar, 0, 256)
+	GFXDECODE_RAM( "vidram", 0, gfx_ram, 0, 256 )
 GFXDECODE_END
 
 
