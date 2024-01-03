@@ -771,45 +771,42 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 	{
 		return m_line_ram[section/2 + y];
 	};
+	// "can you use
+	// arrow syntax here"
+	const auto latched_addr = [=] (u8 section, u8 subsection)
+	{
+		u16 latches = m_line_ram[(section * 0x200)/2 + y];
+		offs_t base = 0x400 * BIT(latches, 8, 8) + 0x200 * subsection;
+		if (BIT(latches, subsection + 4))
+			return (base + 0x800) / 2 + y;
+		else if (BIT(latches, subsection))
+			return (base) / 2 + y;
+		return 0;
+	};
 	// 4000 **********************************
-	if (this_line(0x000) & 4) {
-		u16 line_4400 = this_line(0x4400);
-		line.pf[2].colscroll   = line_4400 & 0x1ff;
-		line.pf[2].alt_tilemap = static_cast<bool>(line_4400 & 0x200);
-		line.clip[0].set_upper(BIT(line_4400, 12), BIT(line_4400, 13));
-		line.clip[1].set_upper(BIT(line_4400, 14), BIT(line_4400, 15));
-	}
-	if (this_line(0x000) & 8) {
-		u16 line_4600 = this_line(0x4600);
-		line.pf[3].colscroll   = line_4600 & 0x1ff;
-		line.pf[3].alt_tilemap = static_cast<bool>(line_4600 & 0x200);
-		line.clip[2].set_upper(BIT(line_4600, 12), BIT(line_4600, 13));
-		line.clip[3].set_upper(BIT(line_4600, 14), BIT(line_4600, 15));
+	for (int i : {2, 3}) {
+		if (offs_t where = latched_addr(0, i)) {
+			u16 colscroll = m_line_ram[where];
+			line.pf[i].colscroll   = colscroll & 0x1ff;
+			line.pf[i].alt_tilemap = colscroll & 0x200;
+			line.clip[2*(i-2) + 0].set_upper(BIT(colscroll, 12), BIT(colscroll, 13));
+			line.clip[2*(i-2) + 1].set_upper(BIT(colscroll, 14), BIT(colscroll, 15));
+		}
 	}
 
 	// 5000 **********************************
 	// renderer needs to adjust by -48
-	if (this_line(0x200) & 1) {
-		u16 clip0_lows = this_line(0x5000);
-		line.clip[0].set_lower(BIT(clip0_lows, 0, 8), BIT(clip0_lows, 8, 8));
-	}
-	if (this_line(0x200) & 2) {
-		u16 clip1_lows = this_line(0x5200);
-		line.clip[1].set_lower(BIT(clip1_lows, 0, 8), BIT(clip1_lows, 8, 8));
-	}
-	if (this_line(0x200) & 4) {
-		u16 clip2_lows = this_line(0x5400);
-		line.clip[2].set_lower(BIT(clip2_lows, 0, 8), BIT(clip2_lows, 8, 8));
-	}
-	if (this_line(0x200) & 8) {
-		u16 clip3_lows = this_line(0x5600);
-		line.clip[3].set_lower(BIT(clip3_lows, 0, 8), BIT(clip3_lows, 8, 8));
+	for (int i : {0, 1, 2, 3}) {
+		if (offs_t where = latched_addr(1, i)) {
+			u16 clip_lows = m_line_ram[where];
+			line.clip[i].set_lower(BIT(clip_lows, 0, 8), BIT(clip_lows, 8, 8));
+		}
 	}
 
 	// 6000 **********************************
-	if (this_line(0x400) & 1) {
+	if (offs_t where = latched_addr(2, 0)) {
 		// first value is sync register, special handling unnecessary?
-		u16 line_6000 = this_line(0x6000);
+		u16 line_6000 = m_line_ram[where];
 
 		line.pivot.pivot_control = BIT(line_6000, 8, 8);
 		if (line.pivot.pivot_control & 0b01010101) // check if unknown pivot control bits set
@@ -820,15 +817,15 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 				| BIT(line_6000, sp_group * 2, 2) << 14;
 		}
 	}
-	if (this_line(0x400) & 2) {
-		u16 blend_vals = this_line(0x6200);
+	if (offs_t where = latched_addr(2, 1)) {
+		u16 blend_vals = m_line_ram[where];
 		for (int idx = 0; idx < 4; idx++) {
 			u8 a = BIT(blend_vals, 4 * idx, 4);
 			line.blend[idx] = 0xf - a;
 		}
 	}
-	if (this_line(0x400) & 4) {
-		u16 x_mosaic = this_line(0x6400);
+	if (offs_t where = latched_addr(2, 2)) {
+		u16 x_mosaic = m_line_ram[where];
 
 		for (int pf_num = 0; pf_num < NUM_PLAYFIELDS; pf_num++) {
 			if ((line.pf[pf_num].x_sample_enable = BIT(x_mosaic, pf_num))) {
@@ -847,33 +844,22 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 		if (line.fx_6400 && line.fx_6400 != 0x70) // check if unknown effect bits set
 			logerror("unknown fx bits: %02x__ at %04x\n", line.fx_6400, 0x6400 + y*2);
 	}
-	if (this_line(0x400) & 8) {
-		line.bg_palette = this_line(0x6600);
-	}
-	// bubblem writes these seemingly intentionally
-	if (this_line(0x400) & 0x10) {
-		u16 line_6800 = this_line(0x6800);
-		if (line_6800) // check if mystery subsection 6800 used
-			logerror("mystery subsection 6800: %04x at %04x\n", line_6800, 0x6800 + y*2);
-	}
-	if (this_line(0x400) & 0x20) {
-		u16 line_6a00 = this_line(0x6a00);
-		if (line_6a00) // check if mystery subsection 6a00 used
-			logerror("mystery subsection 6a00: %04x at %04x\n", line_6a00, 0x6a00 + y*2);
+	if (offs_t where = latched_addr(2, 3)) {
+		line.bg_palette = m_line_ram[where];
 	}
 
 	// 7000 **********************************
-	if (this_line(0x600) & 1) {
-		u16 line_7000 = this_line(0x7000);
+	if (offs_t where = latched_addr(3, 0)) {
+		u16 line_7000 = m_line_ram[where];
 		line.pivot.pivot_enable = line_7000;
 		//if (line_7000) // check if confusing pivot enable bits are set
 		//	logerror("unknown 'pivot enable' bits: %04x at %04x\n", line_7000, 0x7000 + y*2);
 	}
-	if (this_line(0x600) & 2) {
-		line.pivot.mix_value = this_line(0x7200);
+	if (offs_t where = latched_addr(3, 1)) {
+		line.pivot.mix_value = m_line_ram[where];
 	}
-	if (this_line(0x600) & 4) {
-		u16 sprite_mix = this_line(0x7400);
+	if (offs_t where = latched_addr(3, 2)) {
+		u16 sprite_mix = m_line_ram[where];
 		
 		u16 unknown = BIT(sprite_mix, 10, 2);
 		if (unknown)
@@ -885,89 +871,49 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 			line.sp[group].brightness = BIT(sprite_mix, 12 + group, 1);
 		}
 	}
-	if (this_line(0x600) & 8) {
-		u16 sprite_prio = this_line(0x7600);
+	if (offs_t where = latched_addr(3, 3)) {
+		u16 sprite_prio = m_line_ram[where];
 		for (int group = 0; group < NUM_SPRITEGROUPS; group++) {
 			line.sp[group].mix_value = (line.sp[group].mix_value & 0xfff0)
 				| BIT(sprite_prio, group * 4, 4);
 		}
 	}
 
-	if (this_line(0x600) & 0x10) {
-		u16 line_7800 = this_line(0x7800);
-		if (line_7800) // check if mystery subsection 6800 used
-			logerror("mystery subsection 7800: %04x at %04x\n", line_7800, 0x7800 + y*2);
-	}
-	if (this_line(0x600) & 0x20) {
-		u16 line_7a00 = this_line(0x7a00);
-		if (line_7a00) // check if mystery subsection 6a00 used
-			logerror("mystery subsection 7a00: %04x at %04x\n", line_7a00, 0x7a00 + y*2);
-	}
-
 	// 8000 **********************************
-	if (this_line(0x800) & 1) {
-		u16 pf0x0y_scale = this_line(0x8000);
-		line.pf[0].x_scale = 256-BIT(pf0x0y_scale, 8, 8);
-		line.pf[0].y_scale = BIT(pf0x0y_scale, 0, 8)<<1;
-	}
-	if (this_line(0x800) & 2) {
-		u16 pf1x3y_scale = this_line(0x8200);
-		line.pf[1].x_scale = 256-BIT(pf1x3y_scale, 8, 8);
-		line.pf[3].y_scale = BIT(pf1x3y_scale, 0, 8)<<1;
-	}
-	if (this_line(0x800) & 4) {
-		u16 pf2x2y_scale = this_line(0x8400);
-		line.pf[2].x_scale = 256-BIT(pf2x2y_scale, 8, 8);
-		line.pf[2].y_scale = BIT(pf2x2y_scale, 0, 8)<<1;
-	}
-	if (this_line(0x800) & 8) {
-		u16 pf3x1y_scale = this_line(0x8600);
-		line.pf[3].x_scale = 256-BIT(pf3x1y_scale, 8, 8);
-		line.pf[1].y_scale = BIT(pf3x1y_scale, 0, 8)<<1;
+	for (int i : { 0, 1, 2, 3 }) {
+		if (offs_t where = latched_addr(4, i)) {
+			u16 pf_scale = m_line_ram[where];
+			// y zooms are interleaved
+			const int FIX_Y = { 0, 3, 2, 1 };
+			line.pf[i].x_scale = 256-BIT(pf_scale, 8, 8);
+			line.pf[FIX_Y[i]].y_scale = BIT(pf_scale, 0, 8)<<1;
+		}
 	}
 
 	// 9000 **********************************
-	if (this_line(0xa00) & 1) {
-		u16 pf1_pal_add = this_line(0x9000);
-		line.pf[0].pal_add = pf1_pal_add * 16;
-	}
-	if (this_line(0xa00) & 2) {
-		u16 pf2_pal_add = this_line(0x9200);
-		line.pf[1].pal_add = pf2_pal_add * 16;
-	}
-	if (this_line(0xa00) & 4) {
-		u16 pf3_pal_add = this_line(0x9400);
-		line.pf[2].pal_add = pf3_pal_add * 16;
-	}
-	if (this_line(0xa00) & 8) {
-		u16 pf4_pal_add = this_line(0x9600);
-		line.pf[3].pal_add = pf4_pal_add * 16;
+	for (int i : { 0, 1, 2, 3 }) {
+		if (offs_t where = latched_addr(5, i)) {
+			u16 pf_pal_add = m_line_ram[where];
+			line.pf[i].pal_add = pf_pal_add * 16;
+		}
 	}
 
 	// A000 **********************************
 	// iiii iiii iiff ffff
 	// fractional part is negative (allegedly). i wonder if it's supposed to be inverted instead? and then we just subtract (1<<8) to get almost the same value..
-	for (int i=0; i<4; i++) {
-		if (BIT(this_line(0xc00), i)) {
-			//line.pf[i].rowscroll = (this_line(0xa000 + 0x200*i) ^ 0b111111) << (8-6);
-			fixed8 rowscroll = this_line(0xa000 + 0x200*i) << (8-6);
+	for (int i : { 0, 1, 2, 3 }) {
+		if (offs_t where = latched_addr(6, i)) {
+			fixed8 rowscroll = m_line_ram[where] << (8-6);
 			line.pf[i].rowscroll = (rowscroll & 0xffffff00) - (rowscroll & 0x000000ff);
 			// ((i ^ 0b111111) - 0b111111) << (8-6);
 		}
 	}
 
 	// B000 **********************************
-	if (this_line(0xe00) & 1) {
-		line.pf[0].mix_value = this_line(0xb000);
-	}
-	if (this_line(0xe00) & 2) {
-		line.pf[1].mix_value = this_line(0xb200);
-	}
-	if (this_line(0xe00) & 4) {
-		line.pf[2].mix_value = this_line(0xb400);
-	}
-	if (this_line(0xe00) & 8) {
-		line.pf[3].mix_value = this_line(0xb600);
+	for (int i : { 0, 1, 2, 3 }) {
+		if (offs_t where = latched_addr(7, i)) {
+			line.pf[i].mix_value = m_line_ram[where];
+		}
 	}
 }
 
