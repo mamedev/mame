@@ -109,10 +109,14 @@ uint32_t pkspirit_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	for (int i = 0; i < 0x800; i += 8)
 	{
-		uint16_t sp0 = m_maincpu->space().read_word(spriteram_start + i + 0);
-		uint16_t sp1 = m_maincpu->space().read_word(spriteram_start + i + 2);
-		//uint16_t sp2 = m_maincpu->space().read_word(spriteram_start + i + 4);
-		uint16_t sp3 = m_maincpu->space().read_word(spriteram_start + i + 6);
+		// somewhat illogical, but the first sprite (one of the large tilemap sized sprites) seems to need to be drawn last
+		// (or there is some priority control)
+		int reali = (i + 0x8) & 0x7ff;
+
+		uint16_t sp0 = m_maincpu->space().read_word(spriteram_start + reali + 0);
+		uint16_t sp1 = m_maincpu->space().read_word(spriteram_start + reali + 2);
+		//uint16_t sp2 = m_maincpu->space().read_word(spriteram_start + reali + 4);
+		uint16_t sp3 = m_maincpu->space().read_word(spriteram_start + reali + 6);
 
 		int xpos = sp1 & 0x1ff;
 		int ypos = sp0 & 0x1ff;
