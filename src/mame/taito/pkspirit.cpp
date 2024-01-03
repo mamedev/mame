@@ -65,6 +65,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_mainio(*this, "mainio")
 		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
 		, m_bg_videoram(*this, "bg_videoram")
 		, m_fg_videoram(*this, "fg_videoram")
 		, m_audiobank(*this, "audiobank")
@@ -81,6 +82,7 @@ private:
 	required_device<tmp68301_device> m_maincpu;
 	required_device<te7750_device> m_mainio;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	required_shared_ptr<uint16_t> m_bg_videoram;
 	required_shared_ptr<uint16_t> m_fg_videoram;
@@ -112,7 +114,7 @@ void pkspirit_state::bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_ma
 TILE_GET_INFO_MEMBER(pkspirit_state::get_bg_tile_info)
 {
 	int tileno = m_bg_videoram[tile_index];
-	tileinfo.set(0, tileno, 0, 0);
+	tileinfo.set(0, tileno, 0x8 + 0x6, 0);
 }
 
 void pkspirit_state::fg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -124,7 +126,7 @@ void pkspirit_state::fg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_ma
 TILE_GET_INFO_MEMBER(pkspirit_state::get_fg_tile_info)
 {
 	int tileno = m_fg_videoram[tile_index];
-	tileinfo.set(0, tileno, 0, 0);
+	tileinfo.set(0, tileno, 0x8 + 0x6, 0);
 }
 
 
@@ -159,7 +161,7 @@ void pkspirit_state::main_map(address_map &map) // TODO: verify everything
 	//map(0x900000, 0x900001).w // ?
 
 	map(0xa00000, 0xa0003f).ram();
-	map(0xa04000, 0xa057ff).ram(); // palette?
+	map(0xa04000, 0xa057ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xb00000, 0xb00fff).ram().w(FUNC(pkspirit_state::fg_videoram_w)).share(m_fg_videoram); // GFX chips RAM?
 	map(0xb01000, 0xb01fff).ram(); // GFX chips RAM?
 	map(0xb02000, 0xb02fff).ram().w(FUNC(pkspirit_state::bg_videoram_w)).share(m_bg_videoram); // GFX chips RAM?
@@ -328,7 +330,7 @@ void pkspirit_state::pkspirit(machine_config &config)
 	screen.screen_vblank().set_inputline(m_maincpu, 1);
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_pkspirit);
-	PALETTE(config, "palette").set_format(palette_device::xRGB_888, 8192); // TODO: wrong
+	PALETTE(config, "palette").set_format(palette_device::xRGB_888, 0x1800/4);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -354,17 +356,17 @@ ROM_START( pkspirit )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) // on video PCB
 	ROM_LOAD( "d41_06.ic21", 0x00000, 0x10000, CRC(64103680) SHA1(81701348691562e296527fb8e1731de2f02d71d1) )
 
-	ROM_REGION( 0xa0000, "tiles", 0 ) // on video PCB, TODO: correct ROM loading
-	ROM_LOAD16_BYTE( "d41_07.ic1",  0x00000, 0x10000, CRC(c57b18f8) SHA1(e25f2ff8d0bf312d23b8ff09f07f63e61c3094c6) )
-	ROM_LOAD16_BYTE( "d41_08.ic2",  0x00001, 0x10000, CRC(67b941dd) SHA1(cc9abb5d7f3cb90a91921097d23261d80f418287) )
-	ROM_LOAD16_BYTE( "d41_10.ic6",  0x20000, 0x10000, CRC(0af0488c) SHA1(36a77b980038731b703f935a6a813bc9295b7889) )
-	ROM_LOAD16_BYTE( "d41_09.ic5",  0x20001, 0x10000, CRC(199820a2) SHA1(ae3af3aa424b535fc03ef6bb99fca146bdcd88b1) )
-	ROM_LOAD16_BYTE( "d41_12.ic9",  0x40000, 0x10000, CRC(7c521521) SHA1(10ac517921a08ce5387656f33bf3e45879fa614a) )
-	ROM_LOAD16_BYTE( "d41_11.ic8",  0x40001, 0x10000, CRC(4913401d) SHA1(d7c92405b7c5505a6b4ac738b6d502cf99f995c6) )
-	ROM_LOAD16_BYTE( "d41_15.ic15", 0x60000, 0x10000, CRC(df078e72) SHA1(b781b1ce3b87755513eefc295f00159f495359d8) )
-	ROM_LOAD16_BYTE( "d41_13.ic11", 0x60001, 0x10000, CRC(78e1fc0b) SHA1(8475a97cc574971ec201840a71dbf823762f2970) )
-	ROM_LOAD16_BYTE( "d41_14.ic12", 0x80000, 0x10000, CRC(3ec2fe4b) SHA1(74877d1623e2336770ff0606d6ca7d7c89a51004) )
-	ROM_LOAD16_BYTE( "d41_16.ic16", 0x80001, 0x10000, CRC(6c9d169d) SHA1(e6cd2ddd6b6242e2fadbbcb4b3170dd54391b25e) )
+	ROM_REGION( 0xa0000, "tiles", 0 )
+	ROM_LOAD16_BYTE( "d41_14.ic12", 0x00000, 0x10000, CRC(3ec2fe4b) SHA1(74877d1623e2336770ff0606d6ca7d7c89a51004) )
+	ROM_LOAD16_BYTE( "d41_16.ic16", 0x00001, 0x10000, CRC(6c9d169d) SHA1(e6cd2ddd6b6242e2fadbbcb4b3170dd54391b25e) )
+	ROM_LOAD16_BYTE( "d41_12.ic9",  0x20000, 0x10000, CRC(7c521521) SHA1(10ac517921a08ce5387656f33bf3e45879fa614a) )
+	ROM_LOAD16_BYTE( "d41_11.ic8",  0x20001, 0x10000, CRC(4913401d) SHA1(d7c92405b7c5505a6b4ac738b6d502cf99f995c6) )
+	ROM_LOAD16_BYTE( "d41_10.ic6",  0x40000, 0x10000, CRC(0af0488c) SHA1(36a77b980038731b703f935a6a813bc9295b7889) )
+	ROM_LOAD16_BYTE( "d41_09.ic5",  0x40001, 0x10000, CRC(199820a2) SHA1(ae3af3aa424b535fc03ef6bb99fca146bdcd88b1) )
+	ROM_LOAD16_BYTE( "d41_07.ic1",  0x60000, 0x10000, CRC(c57b18f8) SHA1(e25f2ff8d0bf312d23b8ff09f07f63e61c3094c6) )
+	ROM_LOAD16_BYTE( "d41_08.ic2",  0x60001, 0x10000, CRC(67b941dd) SHA1(cc9abb5d7f3cb90a91921097d23261d80f418287) )
+	ROM_LOAD16_BYTE( "d41_15.ic15", 0x80000, 0x10000, CRC(df078e72) SHA1(b781b1ce3b87755513eefc295f00159f495359d8) )
+	ROM_LOAD16_BYTE( "d41_13.ic11", 0x80001, 0x10000, CRC(78e1fc0b) SHA1(8475a97cc574971ec201840a71dbf823762f2970) )
 
 	ROM_REGION( 0x40000, "oki", ROMREGION_ERASE00 ) // on video PCB
 	// empty socket at IC38. Confirmed on 2 different PCBs
