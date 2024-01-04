@@ -711,10 +711,8 @@ void kikikai_state::base(machine_config &config)
 	m_ymsnd->add_route(3, "mono", 1.00);
 }
 
-void kikikai_state::kicknrun(machine_config &config)
+void kikikai_state::add_mcu(machine_config &config)
 {
-	base(config);
-
 	// Not too sure IRQs are triggered by MCU..
 	m_maincpu->set_vblank_int("screen", FUNC(kikikai_state::kikikai_interrupt));
 	m_maincpu->set_irq_acknowledge_callback(FUNC(kikikai_state::mcram_vect_r));
@@ -732,6 +730,13 @@ void kikikai_state::kicknrun(machine_config &config)
 	m_screen->screen_vblank().set_inputline(m_mcu, M6801_IRQ_LINE); // same clock latches the INT pin on the second Z80
 }
 
+
+void kikikai_state::kicknrun(machine_config &config)
+{
+	base(config);
+	add_mcu(config);
+}
+
 void kikikai_state::kikikai_mcu(machine_config &config)
 {
 	base(config);
@@ -739,21 +744,7 @@ void kikikai_state::kikikai_mcu(machine_config &config)
 	config.device_remove("sub");
 	m_screen->set_screen_update(FUNC(kikikai_state::screen_update_kikikai));
 
-	// Not too sure IRQs are triggered by MCU..
-	m_maincpu->set_vblank_int("screen", FUNC(kikikai_state::kikikai_interrupt));
-	m_maincpu->set_irq_acknowledge_callback(FUNC(kikikai_state::mcram_vect_r));
-
-	M6801U4(config, m_mcu, XTAL(4'000'000)); // xtal is 4MHz, divided by 4 internally
-	m_mcu->in_p1_cb().set_ioport("IN0");
-	m_mcu->out_p1_cb().set(FUNC(kikikai_state::kikikai_mcu_port1_w));
-	m_mcu->out_p2_cb().set(FUNC(kikikai_state::kikikai_mcu_port2_w));
-	m_mcu->out_p3_cb().set(FUNC(kikikai_state::kikikai_mcu_port3_w));
-	m_mcu->in_p3_cb().set(FUNC(kikikai_state::kikikai_mcu_port3_r));
-	m_mcu->out_p4_cb().set(FUNC(kikikai_state::kikikai_mcu_port4_w));
-
-	config.set_perfect_quantum(m_maincpu);
-
-	m_screen->screen_vblank().set_inputline(m_mcu, M6801_IRQ_LINE); // same clock latches the INT pin on the second Z80
+	add_mcu(config);
 }
 
 

@@ -47,13 +47,15 @@ protected:
 	optional_shared_ptr<u8> m_mcu_sharedram;
 
 private:
+	void add_mcu(machine_config &config);
+
 	void kicknrun_sub_output_w(uint8_t data);
 	virtual void main_f008_w(uint8_t data);
 
 	void main_bankswitch_w(uint8_t data);
 	uint8_t kiki_ym2203_r(offs_t offset);
 
-	virtual INTERRUPT_GEN_MEMBER(kikikai_interrupt);
+	INTERRUPT_GEN_MEMBER(kikikai_interrupt);
 
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
