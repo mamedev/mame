@@ -811,7 +811,7 @@ void goldstar_state::nfm_map(address_map &map)
 	map(0xfc80, 0xffff).ram();
 }
 
-void goldstar_state::animalhs_map(address_map &map)
+void cmaster_state::animalhs_map(address_map &map)
 {
 	map(0x0000, 0xb7ff).rom().nopw();
 
@@ -960,7 +960,7 @@ void goldstar_state::pkrmast_portmap(address_map &map)
 	map(0xf0, 0xf0).nopw();    /* Writing 0's and 1's constantly.  Watchdog feeder? */
 }
 
-void goldstar_state::eldoraddoa_portmap(address_map &map) // TODO: incomplete!
+void cmaster_state::eldoraddoa_portmap(address_map &map) // TODO: incomplete!
 {
 	map.global_mask(0xff);
 
@@ -977,7 +977,7 @@ void goldstar_state::eldoraddoa_portmap(address_map &map) // TODO: incomplete!
 	map(0x23, 0x23).lr8(NAME([] () -> uint8_t { return 0xff; })); // checks battery level here, among other things, writes should be lamps
 }
 
-void goldstar_state::animalhs_portmap(address_map &map) // TODO: incomplete, maybe share base with above eldoraddoa_portmap once both have been verified
+void cmaster_state::animalhs_portmap(address_map &map) // TODO: incomplete, maybe share base with above eldoraddoa_portmap once both have been verified
 {
 	map.global_mask(0xff);
 
@@ -994,11 +994,13 @@ void goldstar_state::animalhs_portmap(address_map &map) // TODO: incomplete, may
 	map(0x63, 0x63).lr8(NAME([] () -> uint8_t { return 0xff; })); // checks battery level here, among other things, writes should be lamps
 }
 
-void goldstar_state::cmast91_portmap(address_map &map)
+void cmaster_state::cmast91_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x03).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
-	map(0x10, 0x13).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* DIP switches */
+	map(0x00, 0x00).portr("IN0").w(FUNC(cmaster_state::outport0_w));
+	map(0x01, 0x01).portr("IN1").w(FUNC(cmaster_state::background_col_w));
+	map(0x02, 0x02).portr("IN2");
+	map(0x10, 0x13).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* DIP switches */
 	map(0x21, 0x21).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x22, 0x23).w("aysnd", FUNC(ay8910_device::data_address_w));
 }
@@ -2333,14 +2335,8 @@ static INPUT_PORTS_START( cmast91 )
 
 	PORT_INCLUDE( cmv4_dsw5 )
 	PORT_MODIFY("DSW5")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )              PORT_DIPLOCATION("DSW5:1")  /* normally Display of Doll On Demo, but no ladies in this set */
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	/* Coin In Limit OK */
 	/* Condition For 3 Kind Of Bonus not checked */
-	PORT_DIPNAME( 0x20, 0x20, "Show Odds In Double Up Game" )   PORT_DIPLOCATION("DSW5:6")  /* OK */
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, "Skill Stop" )                    PORT_DIPLOCATION("DSW5:7")  /* OK */
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -8912,7 +8908,7 @@ void goldstar_state::cm_palette(palette_device &palette) const
 	}
 }
 
-void goldstar_state::cmast91_palette(palette_device &palette) const
+void cmaster_state::cmast91_palette(palette_device &palette) const
 {
 	uint8_t const *const proms = memregion("proms")->base();
 	for (int i = 0; i < 0x100; i++)
@@ -9176,22 +9172,17 @@ void cmaster_state::super7(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &cmaster_state::super7_portmap);
 }
 
-void goldstar_state::cmast91(machine_config &config)
+void cmaster_state::cmast91(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, CPU_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &goldstar_state::cm_map);
-	m_maincpu->set_addrmap(AS_IO, &goldstar_state::cmast91_portmap);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cmaster_state::cm_map);
+	m_maincpu->set_addrmap(AS_IO, &cmaster_state::cmast91_portmap);
 
 	I8255A(config, m_ppi[0]);
-	m_ppi[0]->in_pa_callback().set_ioport("IN0");
-	m_ppi[0]->in_pb_callback().set_ioport("IN1");
-	m_ppi[0]->in_pc_callback().set_ioport("IN2");
-
-	I8255A(config, m_ppi[1]);
-	m_ppi[1]->in_pa_callback().set_ioport("DSW1");
-	m_ppi[1]->in_pb_callback().set_ioport("DSW2");
-	m_ppi[1]->in_pc_callback().set_ioport("DSW3");
+	m_ppi[0]->in_pa_callback().set_ioport("DSW1");
+	m_ppi[0]->in_pb_callback().set_ioport("DSW2");
+	m_ppi[0]->in_pc_callback().set_ioport("DSW3");
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -9199,14 +9190,14 @@ void goldstar_state::cmast91(machine_config &config)
 //  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 1*8, 31*8-1);
-	screen.set_screen_update(FUNC(goldstar_state::screen_update_cmast91));
+	screen.set_screen_update(FUNC(cmaster_state::screen_update_cmast91));
 	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cmast91);
-	PALETTE(config, m_palette, FUNC(goldstar_state::cmast91_palette), 256);
+	PALETTE(config, m_palette, FUNC(cmaster_state::cmast91_palette), 256);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_VIDEO_START_OVERRIDE(goldstar_state, cherrym)
+	MCFG_VIDEO_START_OVERRIDE(cmaster_state, cherrym)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9839,28 +9830,28 @@ void goldstar_state::crazybonb(machine_config &config)
 	m_maincpu->set_addrmap(AS_OPCODES, &goldstar_state::super972_decrypted_opcodes_map);
 }
 
-void goldstar_state::animalhs(machine_config &config)
+void cmaster_state::animalhs(machine_config &config)
 {
 	crazybonb(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &goldstar_state::animalhs_map);
-	m_maincpu->set_addrmap(AS_IO, &goldstar_state::animalhs_portmap);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cmaster_state::animalhs_map);
+	m_maincpu->set_addrmap(AS_IO, &cmaster_state::animalhs_portmap);
 
-	subdevice<screen_device>("screen")->set_screen_update(FUNC(goldstar_state::screen_update_cmast91));
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(cmaster_state::screen_update_cmast91));
 	subdevice<screen_device>("screen")->set_size(64*8, 32*8);
 	subdevice<screen_device>("screen")->set_visarea(0*8, 64*8-1, 1*8+4, 30*8+4-1);
 	m_gfxdecode->set_info(gfx_animalhs);
-	m_palette->set_init(FUNC(goldstar_state::cmast91_palette));
+	m_palette->set_init(FUNC(cmaster_state::cmast91_palette));
 
 	subdevice<ay8910_device>("aysnd")->port_a_read_callback().set_ioport("DSW5");
 	subdevice<ay8910_device>("aysnd")->port_b_read_callback().set_ioport("DSW6");
 }
 
-void goldstar_state::eldoraddoa(machine_config &config)
+void cmaster_state::eldoraddoa(machine_config &config)
 {
 	animalhs(config);
 
-	m_maincpu->set_addrmap(AS_IO, &goldstar_state::eldoraddoa_portmap);
+	m_maincpu->set_addrmap(AS_IO, &cmaster_state::eldoraddoa_portmap);
 }
 
 void unkch_state::megaline(machine_config &config)
@@ -12189,7 +12180,7 @@ ROM_START( cmast91 )
 	ROM_CONTINUE(0xf000,0x1000)
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
-	ROM_LOAD( "7.bin",  0x00000, 0x8000, CRC(1edf1f1d) SHA1(558fa01f1efd7f6541047d3930bdce0974bae5b0))
+	ROM_LOAD( "7.bin",  0x00000, 0x8000, CRC(1edf1f1d) SHA1(558fa01f1efd7f6541047d3930bdce0974bae5b0) )
 	ROM_LOAD( "6.bin",  0x08000, 0x8000, CRC(13582e74) SHA1(27e318542606b8e8d38250749ba996402d314abd) )
 	ROM_LOAD( "5.bin",  0x10000, 0x8000, CRC(28ff88cc) SHA1(46bc0407be857e8348159735b60cfb660f047a56) )
 
@@ -12217,6 +12208,46 @@ ROM_START( cmast91 )
 	ROM_LOAD( "pld4.bin", 0x0600, 0x0104, NO_DUMP )
 ROM_END
 
+ROM_START( cll ) // Dyna D9004 PCB
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cll_80_t.bin",   0x0000, 0x1000, CRC(62d386db) SHA1(9a061e80d78ed13a6dae59e447c138b0f5e5d892) ) // M27512
+	ROM_CONTINUE(               0x4000, 0x1000 )
+	ROM_CONTINUE(               0x1000, 0x1000 )
+	ROM_CONTINUE(               0x5000, 0x1000 )
+	ROM_CONTINUE(               0x2000, 0x1000 )
+	ROM_CONTINUE(               0x6000, 0x1000 )
+	ROM_CONTINUE(               0x3000, 0x1000 )
+	ROM_CONTINUE(               0x7000, 0x9000 )
+
+	ROM_REGION( 0x18000, "gfx1", 0 ) // all UPD27C256A
+	ROM_LOAD( "cm_73.bin",  0x00000, 0x8000, CRC(6bc1d96a) SHA1(9eeae92f171e99bedadd5a681250d3dcaa77d5ee) )
+	ROM_LOAD( "cm_63.bin",  0x08000, 0x8000, CRC(5e03fe51) SHA1(74aefdab3d2008555a740e73d7b8a0a60d2902c3) )
+	ROM_LOAD( "cm_53.bin",  0x10000, 0x8000, CRC(36131408) SHA1(5e1dee61c9e4bd75e63a441eedc49604707296a1) )
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "cm_4.bin",  0x00000, 0x8000, CRC(0dbabaa2) SHA1(44235b19dac1c996e2166672b03f6e3888ecbefa) ) // UPD27C256A, 11xxxxxxxxxxxxx = 0xFF
+	ROM_LOAD( "cm_3.bin",  0x08000, 0x8000, CRC(dc77d04a) SHA1(d8656130cde54d4bb96307899f6d607867e49e6c) ) // AM27C256, 11xxxxxxxxxxxxx = 0xFF
+	ROM_LOAD( "cm_1.bin",  0x10000, 0x8000, CRC(71bdab69) SHA1(d2c594ed88d6368df15b623c48eecc1c219b839e) ) // AM27C256, 11xxxxxxxxxxxxx = 0xFF
+	ROM_LOAD( "cm_2.bin",  0x18000, 0x8000, CRC(201d1e90) SHA1(c3c5224646b777f98ee35d146136788029b1782d) ) // AM27C256, 11xxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x40000, "user1", ROMREGION_ERASE00 ) // girls GFX
+	ROM_LOAD( "9.bin",  0x00000, 0x40000, NO_DUMP ) // PCB shows the girls when dip 5:1 is on
+
+	// PROMs weren't included in the dump, using cmast91's for now. Colors seems correct, though.
+	ROM_REGION( 0x300, "proms", 0 )
+	ROM_LOAD( "p1.bin", 0x0000, 0x0100, BAD_DUMP CRC(ac529f04) SHA1(5bc92e50c85bb23e609172cc15c430ddea7fdcb5) )
+	ROM_LOAD( "p2.bin", 0x0100, 0x0100, BAD_DUMP CRC(3febce95) SHA1(c7c0fec0fb024ebf7d7365a09d28ba3d0037b0b4) )
+	ROM_LOAD( "p3.bin", 0x0200, 0x0100, BAD_DUMP CRC(99dbdf19) SHA1(3680335406f63289f8d9a81b4cd163e4aa0c14d4) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "p4.bin", 0x0000, 0x0100, BAD_DUMP CRC(72212427) SHA1(e87a91f28284313c706ebb8175a3586780636e31) )
+
+	ROM_REGION( 0x800, "plds", 0 )
+	ROM_LOAD( "pld1.bin", 0x0000, 0x0104, NO_DUMP )
+	ROM_LOAD( "pld2.bin", 0x0200, 0x0104, NO_DUMP )
+	ROM_LOAD( "pld3.bin", 0x0400, 0x0104, NO_DUMP )
+	ROM_LOAD( "pld4.bin", 0x0600, 0x0104, NO_DUMP )
+ROM_END
 
 ROM_START( cmast92 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -19326,7 +19357,14 @@ void cmaster_state::init_cmfb55()
 	m_palette->update();
 }
 
-void goldstar_state::init_cmast91()
+void cmaster_state::init_cmast91()
+{
+	save_item(NAME(m_cm_enable_reg));
+	save_item(NAME(m_cmaster_girl_num));
+	save_item(NAME(m_cmaster_girl_pal));
+}
+
+void cmaster_state::init_cll()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -19334,7 +19372,7 @@ void goldstar_state::init_cmast91()
     the mixed modes 2-0 are not working properly.
 */
 	rom[0x0070] = 0x9b;
-	rom[0x0a92] = 0x9b;
+	rom[0x0a9c] = 0x9b;
 }
 
 void wingco_state::init_lucky8a()
@@ -20251,7 +20289,7 @@ void cmaster_state::init_super7() // possibly incomplete decryption. Game appear
 	}
 }
 
-void goldstar_state::init_animalhs()
+void cmaster_state::init_animalhs()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -20259,7 +20297,7 @@ void goldstar_state::init_animalhs()
 		m_decrypted_opcodes[a] = bitswap<8>(rom[a] ^ 0xff, 2, 3, 0, 1, 6, 7, 4, 5);
 }
 
-void goldstar_state::init_eldoraddoa()
+void cmaster_state::init_eldoraddoa()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -20310,9 +20348,9 @@ GAME(  1994, chryangla,  ncb3,     chryangla,ncb3,     cb3_state,      init_chry
 GAME(  1991, eldoradd,   0,        eldoradd, chrygld,  cb3_state,      empty_init,     ROT0, "Dyna",              "El Dorado (V5.1DR)",                          MACHINE_NOT_WORKING ) // everything
 GAME(  1991, eldoraddo,  eldoradd, eldoradd, chrygld,  cb3_state,      empty_init,     ROT0, "Dyna",              "El Dorado (V1.1TA)",                          MACHINE_NOT_WORKING ) // everything
 
-GAME(  1991, eldoraddoa, eldoradd, eldoraddoa,animalhs,cb3_state,      init_eldoraddoa,ROT0, "Dyna",              "El Dorado (V1.4D)",                           MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS ) // improve GFX drawing, correct palette decode, I/O, etc
-GAME(  1991, animalhs,   0,        animalhs, animalhs, goldstar_state, init_animalhs,  ROT0, "Suns Co Ltd.",      "Animal House (V1.0, set 1)",                  MACHINE_NOT_WORKING ) // improve GFX drawing, correct palette decode, I/O, etc
-GAME(  1991, animalhsa,  animalhs, animalhs, animalhs, goldstar_state, init_animalhs,  ROT0, "Suns Co Ltd.",      "Animal House (V1.0, set 2)",                  MACHINE_NOT_WORKING ) // improve GFX drawing, correct palette decode, I/O, etc
+GAME(  1991, eldoraddoa, eldoradd, eldoraddoa,animalhs,cmaster_state,  init_eldoraddoa,ROT0, "Dyna",              "El Dorado (V1.4D)",                           MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS ) // improve GFX drawing, correct palette decode, I/O, etc
+GAME(  1991, animalhs,   0,        animalhs, animalhs, cmaster_state,  init_animalhs,  ROT0, "Suns Co Ltd.",      "Animal House (V1.0, set 1)",                  MACHINE_NOT_WORKING ) // improve GFX drawing, correct palette decode, I/O, etc
+GAME(  1991, animalhsa,  animalhs, animalhs, animalhs, cmaster_state,  init_animalhs,  ROT0, "Suns Co Ltd.",      "Animal House (V1.0, set 2)",                  MACHINE_NOT_WORKING ) // improve GFX drawing, correct palette decode, I/O, etc
 
 // looks like a hack of Cherry Bonus 3
 GAME(  1994, chryangl,   ncb3,     chryangl, chryangl,  cmaster_state, init_chryangl,  ROT0, "bootleg (G.C.I.)",  "Cherry Angel (set 1)",                                MACHINE_NOT_WORKING ) // SKY SUPERCB 1.0 string, decrypted but hangs when betting
@@ -20360,8 +20398,9 @@ GAME(  1993, pkrmasta,   jkrmast,  pkrmast,  pkrmast,  goldstar_state, init_pkrm
 
 GAME(  199?, chthree,    cmaster,  cm,       cmaster,  cmaster_state,  init_chthree,   ROT0, "Promat",            "Channel Three",                               0 ) // hack of cmaster, still shows DYNA CM-1 V1.01 in book-keeping
 
-GAME(  1991, cmast91,    0,        cmast91,  cmast91,  goldstar_state, init_cmast91,   ROT0, "Dyna",              "Cherry Master '91 (ver.1.30)",                0 )
-GAME(  1992, cmast92,    0,        cmast91,  cmast91,  goldstar_state, init_cmast91,   ROT0, "Dyna",              "Cherry Master '92",                           MACHINE_NOT_WORKING ) // no gfx roms are dumped
+GAME(  1991, cmast91,    0,        cmast91,  cmast91,  cmaster_state,  init_cmast91,   ROT0, "Dyna",              "Cherry Master '91 (ver.1.30)",                0 )
+GAME(  1991, cll,        0,        cmast91,  cmast91,  cmaster_state,  init_cll,       ROT0, "Dyna / TAB Austria","Cuty Line Limited (ver.1.30)",                MACHINE_NOT_WORKING ) // needs verifying inputs / dips, missing girls GFX ROM dump
+GAME(  1992, cmast92,    0,        cmast91,  cmast91,  cmaster_state,  init_cmast91,   ROT0, "Dyna",              "Cherry Master '92",                           MACHINE_NOT_WORKING ) // no gfx roms are dumped
 GAME(  1996, cmast97,    0,        cm97,     cmv801,   cmaster_state,  empty_init,     ROT0, "Dyna",              "Cherry Master '97",                           MACHINE_NOT_WORKING ) // fix prom decode, reels
 GAME(  1999, cmast99,    0,        cm,       cmast99,  cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master '99 (V9B.00)",                  MACHINE_NOT_WORKING )
 GAME(  1999, cmast99b,   cmast99,  cm,       cmast99,  cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Cherry Master '99 (V9B.00 bootleg / hack)",   MACHINE_NOT_WORKING )

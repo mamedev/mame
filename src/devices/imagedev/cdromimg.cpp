@@ -100,7 +100,7 @@ std::pair<std::error_condition, std::string> cdrom_image_device::call_load()
 	if (has_preset_images())
 	{
 		setup_current_preset_image();
-		return std::make_pair(image_error(0), std::string());;
+		return std::make_pair(image_error(0), std::string());
 	}
 
 	std::error_condition err;
