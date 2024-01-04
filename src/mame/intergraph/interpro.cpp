@@ -1240,8 +1240,8 @@ void emerald_state::emerald(machine_config &config)
 	m_fdc->drq_wr_callback().set(m_ioga, FUNC(interpro_ioga_device::drq_floppy));
 
 	// connect a 3.5" drive at id 3
-	//FLOPPY_CONNECTOR(config, "fdc:2", "525hd", FLOPPY_525_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(false);
-	FLOPPY_CONNECTOR(config, "fdc:3", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(false);
+	//FLOPPY_CONNECTOR(config, "fdc:2", "525hd", FLOPPY_525_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:3", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(true);
 
 	// serial controllers and ports
 	SCC85C30(config, m_scc1, 4.9152_MHz_XTAL);
@@ -1306,7 +1306,7 @@ void turquoise_state::turquoise(machine_config &config)
 	m_fdc->drq_wr_callback().set(m_ioga, FUNC(interpro_ioga_device::drq_floppy));
 
 	// connect a 3.5" drive at id 3
-	FLOPPY_CONNECTOR(config, "fdc:3", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_mfm_floppy_formats).enable_sound(false);
+	FLOPPY_CONNECTOR(config, "fdc:3", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(true);
 
 	// serial controllers and ports
 	SCC85C30(config, m_scc1, 4.9152_MHz_XTAL);
@@ -1373,7 +1373,7 @@ void sapphire_state::sapphire(machine_config &config)
 	m_fdc->drq_wr_callback().set(m_ioga, FUNC(interpro_ioga_device::drq_floppy));
 
 	// connect a 3.5" drive at id 1
-	FLOPPY_CONNECTOR(config, "fdc:1", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_mfm_floppy_formats).enable_sound(false);
+	FLOPPY_CONNECTOR(config, "fdc:1", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(true);
 
 	// srx arbiter gate array
 	INTERPRO_ARBGA(config, m_arbga, 0);
