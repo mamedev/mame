@@ -8525,7 +8525,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="konaish1">
-		<description>Kounai Shasei Vol. 1 (Japan)</description>
+		<description>Konai Shasei Vol. 1 (Japan)</description> <!-- box says "Konai" -->
 		<year>1991</year>
 		<publisher>Fairytale</publisher>
 		<info name="alt_title" value="校内写生１巻"/>
@@ -8558,7 +8558,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="konaish2">
-		<description>Kounai Shasei Vol. 2 (Japan)</description>
+		<description>Konai Shasei Vol. 2 (Japan)</description> <!-- box says "Konai" -->
 		<year>1991</year>
 		<publisher>Fairytale</publisher>
 		<info name="alt_title" value="校内写生２巻"/>
@@ -8591,7 +8591,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="konaish3">
-		<description>Kounai Shasei Vol. 3 (Japan)</description>
+		<description>Konai Shasei Vol. 3 (Japan)</description> <!-- box says "Konai" -->
 		<year>1991</year>
 		<publisher>Fairytale</publisher>
 		<info name="alt_title" value="校内写生３巻"/>

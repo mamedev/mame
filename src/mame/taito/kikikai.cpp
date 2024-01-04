@@ -727,7 +727,7 @@ void kikikai_state::base(machine_config &config)
 	m_ymsnd->add_route(3, "mono", 1.00);
 }
 
-void kikikai_state::kicknrun(machine_config& config)
+void kikikai_state::kicknrun(machine_config &config)
 {
 	base(config);
 
@@ -762,7 +762,7 @@ void kikikai_simulation_state::kikikai(machine_config &config)
 }
 
 
-void mexico86_state::mexico86_68705(machine_config& config)
+void mexico86_state::mexico86_68705(machine_config &config)
 {
 	base(config);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(mexico86_state::mcram_vect_r));
@@ -790,7 +790,7 @@ void kikikai_state::knightba(machine_config &config)
 
 	config.device_remove("sub");
 
-	m_screen->set_screen_update(FUNC(kikikai_simulation_state::screen_update_kikikai));
+	m_screen->set_screen_update(FUNC(kikikai_state::screen_update_kikikai));
 }
 
 
@@ -811,7 +811,7 @@ ROM_START( kikikai )
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* 4k for the microcontroller (MC6801U4 type MCU) */
 	/* MCU labeled TAITO A85 01,  JPH1020P, 185, PS4 */
-	ROM_LOAD( "a85-01.g8",    0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "a85-01_jph1020p.h8", 0x0000, 0x1000, CRC(01771197) SHA1(84430a56c66ff2781fe1ff35d4f15b332cd0af37) )
 
 	ROM_REGION( 0x40000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "a85-15.a1", 0x00000, 0x10000, CRC(aebc8c32) SHA1(77347cf5780f084a77123eb636cd0bad672a39e8) )

@@ -353,11 +353,13 @@ void kikikai_state::kikikai_mcu_port1_w(uint8_t data)
 	//logerror("%04x: 6801U4 port 1 write %02x\n", m_mcu->pc(), data);
 
 	// bit 0, 1: coin counters (?)
-	if (data & 0x01 && ~m_port1_out & 0x01) {
+	if (data & 0x01 && ~m_port1_out & 0x01)
+	{
 		machine().bookkeeping().coin_counter_w(0, data & 0x01);
 	}
 
-	if (data & 0x02 && ~m_port1_out & 0x02) {
+	if (data & 0x02 && ~m_port1_out & 0x02)
+	{
 		machine().bookkeeping().coin_counter_w(1, data & 0x02);
 	}
 
