@@ -201,24 +201,26 @@ void ht1130_device::init_lcd()
 
 TIMER_CALLBACK_MEMBER(ht1130_device::update_lcd)
 {
-	// prepare SEG data
-	u64 segs = 0;
-	for (int i = 0; i < 0x20; i++)
-		segs = segs << 1 | BIT(m_displayram[i ^ 0x1f], m_comcount & 3);
-
-	m_segment_out(m_comcount, m_inhalt ? 0 : segs);
+	m_segment_out(m_comcount, m_inhalt ? 0 : get_segs(m_comcount));
 	m_comcount = (m_comcount + 1) % m_compins;
 }
 
-TIMER_CALLBACK_MEMBER(ht1190_device::update_lcd)
+u64 ht1130_device::get_segs(u8 com)
 {
-	// prepare SEG data
+	u64 segs = 0;
+	for (int i = 0; i < 0x20; i++)
+		segs = segs << 1 | BIT(m_displayram[i ^ 0x1f], com & 3);
+
+	return segs;
+}
+
+u64 ht1190_device::get_segs(u8 com)
+{
 	u64 segs = 0;
 	for (int i = 0; i < 40; i++)
-		segs = segs << 1 | BIT(m_displayram[(i << 1) | (m_comcount >> 2)], m_comcount & 3);
+		segs = segs << 1 | BIT(m_displayram[(i << 1) | (com >> 2)], com & 3);
 
-	m_segment_out(m_comcount, m_inhalt ? 0 : segs);
-	m_comcount = (m_comcount + 1) % m_compins;
+	return segs;
 }
 
 void ht1130_device::device_start()

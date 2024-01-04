@@ -81,7 +81,8 @@ protected:
 	u8 gettimer_lower();
 
 	void init_lcd();
-	virtual TIMER_CALLBACK_MEMBER(update_lcd);
+	TIMER_CALLBACK_MEMBER(update_lcd);
+	virtual u64 get_segs(u8 com);
 
 	void cycle();
 	u8 fetch();
@@ -121,7 +122,7 @@ public:
 	ht1190_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual TIMER_CALLBACK_MEMBER(update_lcd) override;
+	virtual u64 get_segs(u8 coms) override;
 
 private:
 	void internal_data_map_ht1190(address_map &map);
