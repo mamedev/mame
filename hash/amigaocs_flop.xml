@@ -2658,7 +2658,7 @@ ATK test: C:0 H:U Bad
 		</part>
 	</software>
 
-	<software name="apidya" supported="partial">
+	<software name="apidya" supported="no">
 		<!-- SPS (CAPS) release 764 -->
 		<description>Apidya (Europe)</description>
 		<!-- retail, standalone -->
@@ -2666,7 +2666,6 @@ ATK test: C:0 H:U Bad
 		<year>1992</year>
 		<publisher>Play Byte</publisher>
 		<notes><![CDATA[
-boot OK
 Power-up bar doesn't color the currently active bonus, [Copper] or [Denise]
 ATK test: failed
 ]]></notes>
@@ -5544,8 +5543,8 @@ ATK test: failed
 		<year>1989</year>
 		<publisher>Ocean</publisher>
 		<notes><![CDATA[
-boots in a500p only, [FDC]?
-Has transparent stripes all over the place during intro [copper]
+boots in a500p only, [FDC]? Update: doesn't with new68k
+Has transparent stripes all over the place during intro [Copper]
 ATK test: C:0 H:U Bad
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -9030,7 +9029,7 @@ ATK test: C:0 H:U Bad
 		</part>
 	</software>
 
-	<software name="csoccer" supported="yes">
+	<software name="csoccer" supported="partial">
 		<!-- SPS (CAPS) release 165 -->
 		<description>Cannon Soccer (Europe)</description>
 		<!-- coverdisk, standalone -->
@@ -26277,6 +26276,7 @@ boot OK
 Needs a data disk to save tournament [FDC] format
 Sometimes gives 1 frame of sprite corruption when throwing in from the left
 Gameplay Goal/Half Time/Full Time screen has [Denise] GFX bitplane glitch at the bottom
+new68k: has [Denise] playfield loading corruption on intro screens
 Skips goal scenes by pushing up? (verify)
 ATK test: C:79 Bad
 ]]></notes>
@@ -27737,8 +27737,8 @@ ATK test: OK
 		<publisher>Anco</publisher>
 		<notes><![CDATA[
 blue screen, keeps accessing invalid areas, [FDC] with adkcon=$1100 (fixed)
-Glitchy [Denise] sprites from time to time
-[Denise] Player overlaps draws blue pens
+Glitchy [Denise] sprites from time to time (fixed)
+[Denise] Player bitplane overlaps draws blue pens
 ATK test: C:0 H:U Bad
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -34223,6 +34223,7 @@ ATK test: failed
 		<year>1994</year>
 		<publisher>Ocean</publisher>
 		<notes><![CDATA[
+No [Denise] player sprite on actual stages
 ATK test: failed
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -40852,7 +40853,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="redheat" supported="no">
+	<software name="redheat" supported="partial">
 		<!-- SPS (CAPS) release 565 -->
 		<description>Red Heat (Europe)</description>
 		<!-- retail, standalone -->
@@ -40860,8 +40861,8 @@ ATK test: OK
 		<year>1989</year>
 		<publisher>Ocean</publisher>
 		<notes><![CDATA[
-Black screen, [FDC] dsksync
-Stuck Joystick inputs on transitions (noticeable when game restarts a new game after game over automatically)
+Black screen, [FDC] dsksync (fixed)
+Stuck Joystick inputs on transitions (noticeable when game restarts a new game after game over automatically, verify)
 Guru Meditation on loading, [Blitter] transfer at PC=00bBd6 that pitfalls existing code (reverify, a500p only?)
 ATK test: failed
 ]]></notes>
@@ -40880,8 +40881,8 @@ ATK test: failed
 		<year>1989</year>
 		<publisher>The Hit Squad</publisher>
 		<notes><![CDATA[
-Black screen, [FDC] dsksync
-Stuck Joystick inputs on transitions (noticeable when game restarts a new game after game over automatically)
+Black screen, [FDC] dsksync (fixed)
+Stuck Joystick inputs on transitions (noticeable when game restarts a new game after game over automatically, verify)
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -41073,7 +41074,9 @@ ATK test: OK
 		<year>1990</year>
 		<publisher>Idea</publisher>
 		<notes><![CDATA[
-locks up on AmigaDOS with "Now Loading" msg [FDC] dsksync
+locks up on AmigaDOS with "Now Loading" msg [FDC] dsksync (fixed)
+Menu draws a pointer garbage when it's at the bottom of the screen
+TODO: Understand how to change cpu controlled teams to human
 ATK test: failed
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -41487,6 +41490,8 @@ ATK test: OK
 		<notes><![CDATA[
 No background GFXs [Copper] sprites
 https://codetapper.com/amiga/sprite-tricks/risky-woods/
+new68k: throws Guru Meditation the first time around after inserting correct copy-protection chest codes
+new68k: on second time around it will fail to recognize disk 2 even if it's in
 ATK test: OK
 ]]></notes>
 		<info name="usage" value="Sports manual copy-protection"/>
@@ -42756,6 +42761,7 @@ ATK test: OK
 		<notes><![CDATA[
 Locks up after Kickstart (white screen) [FDC] dsksync (fixed)
 Dies with "INTERUPT 6" (sic) when trying to enter gameplay (can't repro, assume fixed)
+TODO: verify stages 2-3 before promoting
 ATK test: failed
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -47263,7 +47269,8 @@ ATK test: C:0 H:U Bad
 		<year>1990</year>
 		<publisher>Storm</publisher>
 		<notes><![CDATA[
-Red screen on boot, [FDC] dsksync
+Red screen on boot, [FDC] dsksync (fixed)
+Prompts to "insert Saint Dragon disk" often during gameplay [FDC]
 https://codetapper.com/amiga/sprite-tricks/saint-dragon/
 ATK test: failed
 ]]></notes>
@@ -48233,7 +48240,7 @@ ATK test: failed
 		</part>
 	</software>
 
-	<software name="strider" supported="no">
+	<software name="strider" supported="yes">
 		<!-- SPS (CAPS) release 1224 -->
 		<description>Strider (Europe)</description>
 		<!-- retail, standalone -->
@@ -48241,7 +48248,7 @@ ATK test: failed
 		<year>1989</year>
 		<publisher>U.S. Gold</publisher>
 		<notes><![CDATA[
-Hangs on a cyan background [FDC] dsksync
+Hangs on a cyan background [FDC] dsksync (fixed)
 ATK test: failed
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -48482,6 +48489,7 @@ ATK test: failed
 		<year>1989</year>
 		<publisher>MicroStyle</publisher>
 		<notes><![CDATA[
+https://codetapper.com/amiga/sprite-tricks/stunt-car-racer/
 ATK test: C:0 H:U 1 Sector Bad
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -48542,7 +48550,7 @@ ATK test: failed
 		</part>
 	</software>
 
-	<software name="suburban" supported="no">
+	<software name="suburban" supported="yes">
 		<!-- SPS (CAPS) release 959 -->
 		<description>Suburban Commando (Europe)</description>
 		<!-- retail, standalone -->
@@ -48550,8 +48558,7 @@ ATK test: failed
 		<year>1993</year>
 		<publisher>Alternative</publisher>
 		<notes><![CDATA[
-black screen, [FDC] dsksync
-boot OK
+black screen, [FDC] dsksync (fixed)
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -48688,7 +48695,8 @@ ATK test: OK
 		<year>1991</year>
 		<publisher>Dream Factory</publisher>
 		<notes><![CDATA[
-Guru Meditation (yellow screen on a500) [FDC]
+Guru Meditation (yellow screen on a500) [FDC] (fixed)
+Serious [Denise] playfield corruption in gameplay
 ATK test: failed
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -48740,7 +48748,7 @@ ATK test: failed
 		</part>
 	</software>
 
-	<software name="supercr2" supported="no">
+	<software name="supercr2" supported="yes">
 		<!-- SPS (CAPS) release 224 -->
 		<description>Super Cars II (Europe)</description>
 		<!-- retail, standalone -->
@@ -48748,7 +48756,7 @@ ATK test: failed
 		<year>1991</year>
 		<publisher>Gremlin Graphics</publisher>
 		<notes><![CDATA[
-Locks up after Kickstart (white screen) [FDC] dsksync
+Locks up after Kickstart (white screen) [FDC] dsksync (fixed)
 ATK test: failed
 ]]></notes>
 		<info name="usage" value="Sports manual copy-protection"/>
@@ -49130,7 +49138,8 @@ ATK test: OK
 		<year>1995</year>
 		<publisher>U.S. Gold</publisher>
 		<notes><![CDATA[
-a500: black screen, a500p: Guru Meditation after intro [FDC] dsksync
+a500: black screen [FDC] dsksync (fixed)
+a500p: Guru Meditation after intro
 Offset backgrounds during gameplay, [Copper]
 Some minor color glitches (cfr. first bonus stage "perfect" word, some hit confirms), [Copper]?
 Hangs while asking for disk 2 already in after beating M. Bison (tested Sagat, TODO: recheck)
@@ -49925,8 +49934,8 @@ ATK test: OK
 		<year>1989</year>
 		<publisher>Silmarils</publisher>
 		<notes><![CDATA[
-Black screen after AmigaDOS, [FDC] dsksync
-Eventually hangs at Targhan title screen [FDC] with adkcon=$1100
+Black screen after AmigaDOS, [FDC] dsksync (fixed)
+Randomly hangs at Targhan title screen [FDC] with adkcon=$1100
 ATK test: C:79 H:U 1 Sector Bad
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -51752,6 +51761,7 @@ ATK test: C:79 H:L 1 Sector Bad
 		<year>1992</year>
 		<publisher>Anco</publisher>
 		<notes><![CDATA[
+new68k: Hangs at initial pink screen
 ATK test: failed
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -51776,7 +51786,8 @@ ATK test: failed
 		<year>1992</year>
 		<publisher>Anco</publisher>
 		<notes><![CDATA[
-boot OK, has slight garbage GFX stripe on bottom of screen
+new68k: Hangs at initial cyan screen
+[Denise] Has slight garbage GFX stripe on bottom of screen
 Accesses [FDC] DSKDATR during initial loading
 Requires data disk [FDC] format
 ATK test: OK
@@ -52126,7 +52137,8 @@ ATK test: OK
 		<year>1994</year>
 		<publisher>Digital Integration</publisher>
 		<notes><![CDATA[
-Black screen after title screen display, [FDC] with adkcon=$1100
+Black screen after title screen display, [FDC] with adkcon=$1100 (fixed)
+TODO: not extensively tested
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -52449,7 +52461,7 @@ ATK test: failed
 		<year>1993</year>
 		<publisher>Silmarils</publisher>
 		<notes><![CDATA[
-black screen after AmigaDOS [FDC] dsksync
+black screen after AmigaDOS [FDC] dsksync (fixed)
 Mouse cursor is uncontrollable, [joytest] reset counters
 ATK test: C:79 H:U 1 Sector Bad
 ]]></notes>
@@ -52533,11 +52545,12 @@ ATK test: OK
 		<year>1992</year>
 		<publisher>SSI</publisher>
 		<notes><![CDATA[
-Random "please replace volume <gibberish chars> in unit 0" during demo, [FDC] with adkcon=$1100
+Random "please replace volume <gibberish chars> in unit 0" during demo, [FDC] with adkcon=$1100 (fixed)
 Needs optional Save Disk to save, [FDC] format
+TODO: not extensively tested
 ATK test: OK
 ]]></notes>
-		<info name="usage" value="Sports manual copy-protection"/>
+		<info name="usage" value="Sports manual copy-protection, second disk drive highly suggested."/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
@@ -53908,9 +53921,13 @@ ATK test: C:0 H:U Bad
 		<year>1992</year>
 		<publisher>Virgin</publisher>
 		<notes><![CDATA[
-black screen after AmigaDOS loading [FDC] with adkcon=$1100
+black screen after AmigaDOS loading [FDC] with adkcon=$1100 (fixed)
+Needs optional Save Disk to save, [FDC] format
+TODO: test after the manual copy protection check
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Sports manual copy-protection" />
+
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -53980,8 +53997,11 @@ ATK test: OK
 		<year>1992</year>
 		<publisher>Gremlin Graphics</publisher>
 		<notes><![CDATA[
-Red screen, [FDC] dsksync
-Has no [Paula] BGMs
+Red screen, [FDC] dsksync (fixed)
+No [Paula] sound
+[Denise] sprites flickers when hitting the bottom edge
+Status bar don't draw score/lives text [Denise]
+Stage 2 (Wild West) draws black background [Copper]
 https://codetapper.com/amiga/sprite-tricks/videokid/
 ATK test: failed
 ]]></notes>
@@ -54144,8 +54164,8 @@ ATK test: OK
 		<year>1988</year>
 		<publisher>Martech</publisher>
 		<notes><![CDATA[
-Locks up at AmigaDOS [FDC] dsksync
-Screen is too dim (tested on a500p)
+Locks up at AmigaDOS [FDC] dsksync (fixed)
+Screen is too dim (verify, assume standard conversion from Atari ST)
 Doesn't accept joy/key inputs on ranking screen (PC=18dcc)
 ATK test: C:even H:L 1 Sector Bad
 ]]></notes>
@@ -55567,7 +55587,7 @@ ATK test: failed
 		</part>
 	</software>
 
-	<software name="wingfury" supported="no">
+	<software name="wingfury" supported="yes">
 		<!-- SPS (CAPS) release 599 -->
 		<description>Wings of Fury (Europe)</description>
 		<!-- retail, standalone -->
@@ -55575,7 +55595,7 @@ ATK test: failed
 		<year>1990</year>
 		<publisher>Brøderbund</publisher>
 		<notes><![CDATA[
-black screen [FDC] dsksync
+black screen [FDC] dsksync (fixed)
 ATK test: C:0 H:U Bad
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -55947,7 +55967,7 @@ ATK test: failed
 		</part>
 	</software>
 
-	<software name="wolfchld" supported="no">
+	<software name="wolfchld" supported="yes">
 		<!-- SPS (CAPS) release 411 -->
 		<description>Wolfchild (Europe)</description>
 		<!-- retail, standalone -->
@@ -55955,8 +55975,9 @@ ATK test: failed
 		<year>1992</year>
 		<publisher>Core Design</publisher>
 		<notes><![CDATA[
-Shows Core Design logo then hangs with red genlock [FDC] dsksync
-Has GFX stripe glitch when player dies
+Shows Core Design logo then hangs with red genlock [FDC] dsksync (fixed)
+Has GFX stripe glitch when player dies (can't repro, assume fixed)
+Moving to left at very beginning of stage 1 may skip rocket beams, putting game to an infinite vertical scroll (verify, cannot repro reliably)
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -56209,8 +56230,8 @@ ATK test: C:0 H:U Bad
 		<year>1990</year>
 		<publisher>Zeppelin Platinum</publisher>
 		<notes><![CDATA[
-Black screen, [FDC] dsksync
-Crashes after title screen display
+Black screen, [FDC] dsksync (fixed)
+Hangs after title screen display, [FDC] copy protection at PC=64ade (sub-routine PC=64bac, then enables non-canonical dsksync)
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -56380,8 +56401,8 @@ ATK test: failed
 		<year>1991</year>
 		<publisher>Ocean</publisher>
 		<notes><![CDATA[
-White screen [FDC] dsksync
-No [Paula] BGMs
+White screen [FDC] dsksync (fixed)
+No [Paula] sounds
 Gameplay doesn't draw left-right ropes [Copper] sprites
 https://codetapper.com/amiga/sprite-tricks/wwf-wrestlemania/
 ATK test: failed
@@ -56408,7 +56429,7 @@ ATK test: failed
 		<year>1991</year>
 		<publisher>The Hit Squad</publisher>
 		<notes><![CDATA[
-Pink screen [FDC] dsksync
+Pink screen [FDC] dsksync (fixed)
 ATK test: failed
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -56547,7 +56568,8 @@ ATK test: C:1 Bad
 		<year>1988</year>
 		<publisher>Melbourne House</publisher>
 		<notes><![CDATA[
-Locks up at Xenon logo [FDC] dsksync
+Locks up at Xenon logo [FDC] dsksync (fixed)
+Runs too slow
 ATK test: C:0 H:U Bad
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -57195,7 +57217,7 @@ ATK test: failed
 		</part>
 	</software>
 
-	<software name="zoom" supported="no">
+	<software name="zoom" supported="yes">
 		<!-- SPS (CAPS) release 1910 -->
 		<description>Zoom! (Europe)</description>
 		<!-- retail, standalone -->
@@ -57203,7 +57225,7 @@ ATK test: failed
 		<year>1988</year>
 		<publisher>Discovery</publisher>
 		<notes><![CDATA[
-Black screen, jumps to lalaland, [FDC]?
+Black screen, jumps to lalaland, [FDC] (fixed)
 ATK test: failed
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
