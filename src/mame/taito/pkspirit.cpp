@@ -66,6 +66,8 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_vidram(*this, "vidram")
+		, m_sprram(*this, "sprram")
+		, m_mainram(*this, "mainram")
 		, m_audiobank(*this, "audiobank")
 		, m_opto(*this, "opto%u", 1U)
 	{ }
@@ -82,6 +84,8 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<u16> m_vidram;
+	required_shared_ptr<u16> m_sprram;
+	required_shared_ptr<u16> m_mainram;
 
 	required_memory_bank m_audiobank;
 
@@ -104,19 +108,20 @@ uint32_t pkspirit_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 {
 	bitmap.fill(0, cliprect);
 
-	u32 spriteram_start = 0x300ff2; // should be 0xb10000 but a DMA is missing
+	uint16_t *spriteram_start = m_mainram + 0xff2 / 2;
+	//uint16_t* spriteram_start = m_sprram; // once DMA is handled in the TMP68303 this should be used instead
 
-	for (int i = 0; i < 0x800; i += 8)
+	for (int i = 0; i < 0x800 / 2; i += 4)
 	{
 		// somewhat illogical, but the full tilemap sprites need to be drawn first, in reverse order
 		// followed by the regular sprites, again in reverse order.
 		// (or there is some priority control)
-		int reali = ((0x7f8 - i) + 0x10) & 0x7ff;
+		int reali = ((0x3fc - i) + 0x8) & 0x3ff;
 
-		uint16_t sp0 = m_maincpu->space().read_word(spriteram_start + reali + 0);
-		uint16_t sp1 = m_maincpu->space().read_word(spriteram_start + reali + 2);
-		//uint16_t sp2 = m_maincpu->space().read_word(spriteram_start + reali + 4);
-		uint16_t sp3 = m_maincpu->space().read_word(spriteram_start + reali + 6);
+		uint16_t sp0 = spriteram_start[reali + 0];
+		uint16_t sp1 = spriteram_start[reali + 1];
+		//uint16_t sp2 = spriteram_start[preali + 2];
+		uint16_t sp3 = spriteram_start[reali + 3];
 
 		int xpos = sp1 & 0x3ff;
 		int ypos = sp0 & 0x1ff;
@@ -210,7 +215,7 @@ uint32_t pkspirit_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 					uint16_t tile = m_vidram[base + count];
 					m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, tile, pal, 0, 0, xdraw, ydraw, 0);
 
-					count ++;
+					count++;
 				}
 			}
 		}
@@ -236,16 +241,16 @@ void pkspirit_state::main_map(address_map &map) // TODO: verify everything
 	map(0x000000, 0x01ffff).rom().region("maincpu", 0);
 	map(0x100000, 0x10001f).rw(m_mainio, FUNC(te7750_device::read), FUNC(te7750_device::write)).umask16(0x00ff);
 	map(0x200000, 0x200001).portr("DSW");
-	map(0x300000, 0x30ffff).ram(); // main RAM?
+	map(0x300000, 0x30ffff).ram().share("mainram");
 	map(0x800001, 0x800001).w("ciu", FUNC(pc060ha_device::master_port_w));
 	map(0x800003, 0x800003).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
 	//map(0x900000, 0x900001).w // ?
 
-	map(0xa00000, 0xa0003f).ram(); // is this still palette? (4bpp, for uploaded tiles?)
+	map(0xa00000, 0xa0003f).ram(); // is this still palette? (for the uploaded tiles?)
 	map(0xa04000, 0xa057ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xb00000, 0xb0ffff).ram().w(FUNC(pkspirit_state::vidram_w)).share("vidram"); // it uploads a 2bpp tileset at c000-cfff, why? it's just another copy of the basic font
 
-	map(0xb10000, 0xb107ff).ram(); // spritelist should be copied here
+	map(0xb10000, 0xb107ff).ram().share("sprram"); // spritelist should be copied here
 
 	map(0xb10800, 0xb1087f).ram(); // control registers for one of the custom GFX chips?
 	map(0xb20000, 0xb2001f).ram(); // control registers for one of the custom GFX chips?
@@ -416,7 +421,7 @@ void pkspirit_state::pkspirit(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 64*8);
-	screen.set_visarea(0*8, 64*8-1, 0*8, 50*8-1);
+	screen.set_visarea(0*8, 64*8-1, 0*8, 52*8-1); // uncertain height
 	screen.set_palette("palette");
 	screen.set_screen_update(FUNC(pkspirit_state::screen_update));
 	screen.screen_vblank().set_inputline(m_maincpu, 1);
