@@ -46,6 +46,7 @@
 #include "tlb.h"
 #include "z37_fdc.h"
 #include "intr_cntrl.h"
+#include "h_88_cass.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/ins8250.h"
@@ -76,6 +77,7 @@ public:
 		m_floppy_ram(*this, "floppyram"),
 		m_tlbc(*this, "tlbc"),
 		m_h37(*this, "h37"),
+		m_cassette(*this, "h_88_5"),
 		m_intr_socket(*this, "intr_socket"),
 		m_console(*this, "console"),
 		m_serial1(*this, "serial1"),
@@ -85,8 +87,10 @@ public:
 	{
 	}
 
-	void h89(machine_config &config);
+	void h89_base(machine_config &config);
 
+	void h88(machine_config &config);
+	void h89(machine_config &config);
 
 private:
 
@@ -96,7 +100,8 @@ private:
 	required_device<ram_device> m_ram;
 	required_shared_ptr<uint8_t> m_floppy_ram;
 	required_device<heath_tlb_connector> m_tlbc;
-	required_device<heath_z37_fdc_device> m_h37;
+	optional_device<heath_z37_fdc_device> m_h37;
+	optional_device<heath_h_88_cass_device> m_cassette;
 	required_device<heath_intr_socket> m_intr_socket;
 	required_device<ins8250_device> m_console;
 	required_device<ins8250_device> m_serial1;
@@ -142,7 +147,10 @@ private:
 	void h89_mem(address_map &map);
 	void map_fetch(address_map &map);
 	uint8_t m1_r(offs_t offset);
+
+	void h89_base_io(address_map &map);
 	void h89_io(address_map &map);
+	void h88_io(address_map &map);
 
 	uint8_t raise_NMI_r();
 	void raise_NMI_w(uint8_t data);
@@ -248,7 +256,6 @@ uint8_t h89_state::m1_r(offs_t offset)
     Use                      |  Hex  |  Octal
    --------------------------+-------+---------
     Not specified, available |  0-77 |   0-167
-    Cassette I/O (if used)   | 78-79 | 170-171
     Disk I/O #1              | 78-7B | 170-173
     Disk I/O #2              | 7C-7F | 174-177
     Not specified, reserved  | 80-CF | 200-317
@@ -258,20 +265,20 @@ uint8_t h89_state::m1_r(offs_t offset)
     Console I/O              | E8-EF | 350-357
     NMI                      | F0-F1 | 360-361
     General purpose port     | F2    | 362
+    Cassette I/O(MTR-88)     | F8-F9 | 370-371
     NMI                      | FA-FB | 372-373
 */
-void h89_state::h89_io(address_map &map)
+void h89_state::h89_base_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
 
 	// Disk I/O #1 - 0170-0173 (0x78-0x7b)
 	//   Options
-	//     - Cassette I/O (only uses 0x78 - 0x79) - Requires MTR-88 ROM
 	//     - H37 5-1/4" Soft-sectored Controller - Requires MTR-90 ROM
 	//     - H47 Dual 8" Drives - Requires MTR-89 or MTR-90 ROM
 	//     - H67 8" Hard disk + 8" Floppy Drives - Requires MTR-90 ROM
-	map(0x78, 0x7b).rw(m_h37, FUNC(heath_z37_fdc_device::read), FUNC(heath_z37_fdc_device::write));
+	// map(0x78, 0x7b)
 
 	// Disk I/O #2 - 0174-0177 (0x7c-0x7f)
 	//   Options
@@ -300,7 +307,53 @@ void h89_state::h89_io(address_map &map)
 	map(0xfa, 0xfb).rw(FUNC(h89_state::raise_NMI_r), FUNC(h89_state::raise_NMI_w));
 }
 
+void h89_state::h89_io(address_map &map)
+{
+	h89_base_io(map);
+
+	// Disk I/O #1 - 0170-0173 (0x78-0x7b)
+	//   Options
+	//     - H37 5-1/4" Soft-sectored Controller - Requires MTR-90 ROM
+	//     - H47 Dual 8" Drives - Requires MTR-89 or MTR-90 ROM
+	//     - H67 8" Hard disk + 8" Floppy Drives - Requires MTR-90 ROM
+	map(0x78, 0x7b).rw(m_h37, FUNC(heath_z37_fdc_device::read), FUNC(heath_z37_fdc_device::write));
+}
+
+void h89_state::h88_io(address_map &map)
+{
+	h89_base_io(map);
+
+	// Cassette I/O (uses 0xf8 - 0xf9) - Requires MTR-88 ROM
+	map(0xf8, 0xf9).rw(m_cassette, FUNC(heath_h_88_cass_device::read), FUNC(heath_h_88_cass_device::write));
+
+	// 5-1/4" Hard-sectored Controller - only other card supported MTR-88.
+	// map(0x7c, 0x7f)
+}
+
 // Input ports
+static INPUT_PORTS_START( h88 )
+
+	PORT_START("SW501")
+	// MTR-88  (444-40)
+	PORT_DIPNAME( 0x1f, 0x00, DEF_STR( Unused ) )               PORT_DIPLOCATION("SW501:1,2,3,4,5")
+	PORT_DIPNAME( 0x20, 0x20, "Perform memory test at start" )  PORT_DIPLOCATION("SW501:6")
+	PORT_DIPSETTING( 0x20, DEF_STR( No ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0xc0, 0x00, "Console Baud rate" )             PORT_DIPLOCATION("SW501:7,8")
+	PORT_DIPSETTING( 0x00, "9600" )
+	PORT_DIPSETTING( 0x40, "19200" )
+	PORT_DIPSETTING( 0x80, "38400" )
+	PORT_DIPSETTING( 0xc0, "57600" )
+
+	PORT_START("CONFIG")
+	PORT_CONFNAME(0x03, 0x00, "CPU Clock Speed Upgrade")
+	PORT_CONFSETTING(0x00, DEF_STR( None ) )
+	PORT_CONFSETTING(0x01, "2 / 4 MHz")
+	PORT_CONFSETTING(0x02, "2 / 6 MHz")
+
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( h89 )
 
 	PORT_START("SW501")
@@ -354,53 +407,42 @@ static INPUT_PORTS_START( h89 )
 	PORT_DIPSETTING( 0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING( 0x80, "Auto" )
 
-	// MTR-88  (444-40)
-	PORT_DIPNAME( 0x1f, 0x00, "Unused" )  PORT_DIPLOCATION("SW501:1,2,3,4,5") PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x08)
-	PORT_DIPNAME( 0x20, 0x20, "Perform memory test at start" )  PORT_DIPLOCATION("SW501:6") PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x08)
-	PORT_DIPSETTING( 0x20, DEF_STR( No ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0xc0, 0x00, "Console Baud rate" )  PORT_DIPLOCATION("SW501:7,8") PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x08)
-	PORT_DIPSETTING( 0x00, "9600" )
-	PORT_DIPSETTING( 0x40, "19200" )
-	PORT_DIPSETTING( 0x80, "38400" )
-	PORT_DIPSETTING( 0xc0, "57600" )
-
 	// MTR-89 (444-62)
-	PORT_DIPNAME( 0x03, 0x00, "Disk I/O #2" )  PORT_DIPLOCATION("SW501:1,2") PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x0c)
+	PORT_DIPNAME( 0x03, 0x00, "Disk I/O #2" )  PORT_DIPLOCATION("SW501:1,2") PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x08)
 	PORT_DIPSETTING( 0x00, "H-88-1" )
 	PORT_DIPSETTING( 0x01, "H/Z-47" )
 	PORT_DIPSETTING( 0x02, "Undefined" )
 	PORT_DIPSETTING( 0x03, "Undefined" )
-	PORT_DIPNAME( 0x0c, 0x00, "Disk I/O #1" )  PORT_DIPLOCATION("SW501:3,4") PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x0c)
+	PORT_DIPNAME( 0x0c, 0x00, "Disk I/O #1" )  PORT_DIPLOCATION("SW501:3,4") PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x08)
 	PORT_DIPSETTING( 0x00, "Unused" )
 	PORT_DIPSETTING( 0x04, "H/Z-47" )
 	PORT_DIPSETTING( 0x08, "Undefined" )
 	PORT_DIPSETTING( 0x0c, "Undefined" )
-	PORT_DIPNAME( 0x10, 0x00, "Primary Boot from" )  PORT_DIPLOCATION("SW501:5") PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x0c)
+	PORT_DIPNAME( 0x10, 0x00, "Primary Boot from" )  PORT_DIPLOCATION("SW501:5") PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x08)
 	PORT_DIPSETTING( 0x00, "Disk I/O #2" )
 	PORT_DIPSETTING( 0x10, "Disk I/O #1" )
-	PORT_DIPNAME( 0x20, 0x20, "Perform memory test at start" )  PORT_DIPLOCATION("SW501:6") PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x0c)
+	PORT_DIPNAME( 0x20, 0x20, "Perform memory test at start" )  PORT_DIPLOCATION("SW501:6") PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x08)
 	PORT_DIPSETTING( 0x20, DEF_STR( No ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x40, 0x00, "Console Baud rate" )  PORT_DIPLOCATION("SW501:7") PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x0c)
+	PORT_DIPNAME( 0x40, 0x00, "Console Baud rate" )  PORT_DIPLOCATION("SW501:7") PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x08)
 	PORT_DIPSETTING( 0x00, "9600" )
 	PORT_DIPSETTING( 0x40, "19200" )
-	PORT_DIPNAME( 0x80, 0x00, "Boot mode" )  PORT_DIPLOCATION("SW501:8") PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x0c)
+	PORT_DIPNAME( 0x80, 0x00, "Boot mode" )  PORT_DIPLOCATION("SW501:8") PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x08)
 	PORT_DIPSETTING( 0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING( 0x80, "Auto" )
 
 	// MMS 444-84B (and possibly 444-84A)
-	PORT_DIPNAME( 0x03, 0x00, "Disk I/O #2" )  PORT_DIPLOCATION("SW501:1,2") PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x10)
+	PORT_DIPNAME( 0x03, 0x00, "Disk I/O #2" )  PORT_DIPLOCATION("SW501:1,2") PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x0c)
 	PORT_DIPSETTING( 0x00, "H-88-1" )
 	PORT_DIPSETTING( 0x01, "H/Z-47 (Not yet implemented)" )
 	PORT_DIPSETTING( 0x02, "MMS 77320 SASI or Z-67 (Not yet implemented)" )
 	PORT_DIPSETTING( 0x03, "MMS 77422 Network Controller" )
-	PORT_DIPNAME( 0x0c, 0x00, "Disk I/O #1" )  PORT_DIPLOCATION("SW501:3,4") PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x10)
+	PORT_DIPNAME( 0x0c, 0x00, "Disk I/O #1" )  PORT_DIPLOCATION("SW501:3,4") PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x0c)
 	PORT_DIPSETTING( 0x00, "H-89-37" )
 	PORT_DIPSETTING( 0x04, "H/Z-47 (Not yet implemented)" )
 	PORT_DIPSETTING( 0x08, "MMS 77320 SASI or Z-67 (Not yet implemented)" )
 	PORT_DIPSETTING( 0x0c, "MMS 77422 Network Controller" )
-	PORT_DIPNAME( 0x70, 0x00, "Default Boot Device" )  PORT_DIPLOCATION("SW501:5,6,7") PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x10)
+	PORT_DIPNAME( 0x70, 0x00, "Default Boot Device" )  PORT_DIPLOCATION("SW501:5,6,7") PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x0c)
 	PORT_DIPSETTING( 0x00, "MMS 77316 Dbl Den 5\"" )
 	PORT_DIPSETTING( 0x10, "MMS 77316 Dbl Den 8\"" )
 	PORT_DIPSETTING( 0x20, "Disk Device at 0x7C" )
@@ -409,12 +451,12 @@ static INPUT_PORTS_START( h89 )
 	PORT_DIPSETTING( 0x50, "reserved for future use" )
 	PORT_DIPSETTING( 0x60, "MMS Network (77422)" )
 	PORT_DIPSETTING( 0x70, "Use MMS I/O board Config Port" )
-	PORT_DIPNAME( 0x80, 0x00, "Boot mode" )  PORT_DIPLOCATION("SW501:8") PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x10)
+	PORT_DIPNAME( 0x80, 0x00, "Boot mode" )  PORT_DIPLOCATION("SW501:8") PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x0c)
 	PORT_DIPSETTING( 0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING( 0x80, "Auto" )
 
 	// Kres KMR-100
-	PORT_DIPNAME( 0x0f, 0x00, "Default Boot Device" )  PORT_DIPLOCATION("SW501:1,2,3,4") PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x14)
+	PORT_DIPNAME( 0x0f, 0x00, "Default Boot Device" )  PORT_DIPLOCATION("SW501:1,2,3,4") PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x10)
 	PORT_DIPSETTING( 0x00, "H-17 hard-sectored 5\" floppy units 0-2" )
 	PORT_DIPSETTING( 0x01, "H-37 soft-sectored 5\" floppy units 0-3" )
 	PORT_DIPSETTING( 0x02, "Corvus hard disk/Magnolia interface, partitions 0-8" )
@@ -431,22 +473,22 @@ static INPUT_PORTS_START( h89 )
 	PORT_DIPSETTING( 0x0d, "Reserved" )
 	PORT_DIPSETTING( 0x0e, "Reserved" )
 	PORT_DIPSETTING( 0x0f, "Magnolia 128K pseudo disk, banks 0-1" )
-	PORT_DIPNAME( 0x10, 0x00, "Map ROM into RAM on boot" )  PORT_DIPLOCATION("SW501:5") PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x14)
+	PORT_DIPNAME( 0x10, 0x00, "Map ROM into RAM on boot" )  PORT_DIPLOCATION("SW501:5") PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x10)
 	PORT_DIPSETTING( 0x00, DEF_STR( Yes ) )
 	PORT_DIPSETTING( 0x10, DEF_STR( No ) )
-	PORT_DIPNAME( 0x20, 0x20, "Perform memory test at start" )  PORT_DIPLOCATION("SW501:6") PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x14)
+	PORT_DIPNAME( 0x20, 0x20, "Perform memory test at start" )  PORT_DIPLOCATION("SW501:6") PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x10)
 	PORT_DIPSETTING( 0x20, DEF_STR( No ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x40, 0x00, "Have a LLL controller installed" )  PORT_DIPLOCATION("SW501:7") PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x14)
+	PORT_DIPNAME( 0x40, 0x00, "Have a LLL controller installed" )  PORT_DIPLOCATION("SW501:7") PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x10)
 	PORT_DIPSETTING( 0x00, DEF_STR( No ) )
 	PORT_DIPSETTING( 0x40, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x00, "Boot mode" )  PORT_DIPLOCATION("SW501:8") PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x14)
+	PORT_DIPNAME( 0x80, 0x00, "Boot mode" )  PORT_DIPLOCATION("SW501:8") PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x10)
 	PORT_DIPSETTING( 0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING( 0x80, "Auto" )
 
 	// Ultimeth MTRHEX-4k
 	// (values based on testing and comparison with the Kres KMR-100 ROM which was also written by Ultimeth)
-	PORT_DIPNAME( 0x0f, 0x00, "Default Boot Device" )  PORT_DIPLOCATION("SW501:1,2,3,4") PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x18)
+	PORT_DIPNAME( 0x0f, 0x00, "Default Boot Device" )  PORT_DIPLOCATION("SW501:1,2,3,4") PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x14)
 	PORT_DIPSETTING( 0x00, "H-17 hard-sectored 5\" floppy" )
 	PORT_DIPSETTING( 0x01, "H-37 soft-sectored 5\" floppy" )
 	PORT_DIPSETTING( 0x02, "? Corvus hard disk/Magnolia interface" )
@@ -463,16 +505,16 @@ static INPUT_PORTS_START( h89 )
 	PORT_DIPSETTING( 0x0d, "? Reserved" )
 	PORT_DIPSETTING( 0x0e, "? Reserved" )
 	PORT_DIPSETTING( 0x0f, "? Magnolia 128K pseudo disk" )
-	PORT_DIPNAME( 0x10, 0x00, "? Map ROM into RAM on boot" )  PORT_DIPLOCATION("SW501:5") PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x18)
+	PORT_DIPNAME( 0x10, 0x00, "? Map ROM into RAM on boot" )  PORT_DIPLOCATION("SW501:5") PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x14)
 	PORT_DIPSETTING( 0x00, "? Yes" )
 	PORT_DIPSETTING( 0x10, "? No" )
-	PORT_DIPNAME( 0x20, 0x20, "Perform memory test at start" )  PORT_DIPLOCATION("SW501:6") PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x18)
+	PORT_DIPNAME( 0x20, 0x20, "Perform memory test at start" )  PORT_DIPLOCATION("SW501:6") PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x14)
 	PORT_DIPSETTING( 0x20, DEF_STR( No ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x40, 0x00, "? Have a LLL controller installed" )  PORT_DIPLOCATION("SW501:7") PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x18)
+	PORT_DIPNAME( 0x40, 0x00, "? Have a LLL controller installed" )  PORT_DIPLOCATION("SW501:7") PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x14)
 	PORT_DIPSETTING( 0x00, "? No" )
 	PORT_DIPSETTING( 0x40, "? Yes" )
-	PORT_DIPNAME( 0x80, 0x00, "Boot mode" )  PORT_DIPLOCATION("SW501:8") PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x18)
+	PORT_DIPNAME( 0x80, 0x00, "Boot mode" )  PORT_DIPLOCATION("SW501:8") PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x14)
 	PORT_DIPSETTING( 0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING( 0x80, "Auto" )
 
@@ -485,11 +527,10 @@ static INPUT_PORTS_START( h89 )
 	PORT_CONFNAME(0x3c, 0x04, "Switch SW501 Definitions")
 	PORT_CONFSETTING(0x00, "Generic" )
 	PORT_CONFSETTING(0x04, "Heath MTR-90")
-	PORT_CONFSETTING(0x08, "Heath MTR-88")
-	PORT_CONFSETTING(0x0c, "Heath MTR-89")
-	PORT_CONFSETTING(0x10, "MMS 444-84B/444-84A")
-	PORT_CONFSETTING(0x14, "Kres KMR-100")
-	PORT_CONFSETTING(0x18, "Ultimeth MTRHEX-4k")
+	PORT_CONFSETTING(0x08, "Heath MTR-89")
+	PORT_CONFSETTING(0x0c, "MMS 444-84B/444-84A")
+	PORT_CONFSETTING(0x10, "Kres KMR-100")
+	PORT_CONFSETTING(0x14, "Ultimeth MTRHEX-4k")
 
 INPUT_PORTS_END
 
@@ -696,17 +737,13 @@ static void intr_ctrl_options(device_slot_interface &device)
 	device.option_add("h37", HEATH_Z37_INTR_CNTRL);
 }
 
-void h89_state::h89(machine_config & config)
+void h89_state::h89_base(machine_config &config)
 {
 	// basic machine hardware
 	Z80(config, m_maincpu, H89_CLOCK);
 	m_maincpu->set_m1_map(&h89_state::map_fetch);
 	m_maincpu->set_memory_map(&h89_state::h89_mem);
-	m_maincpu->set_io_map(&h89_state::h89_io);
 	m_maincpu->set_irq_acknowledge_callback("intr_socket", FUNC(heath_intr_socket::irq_callback));
-
-	HEATH_INTR_SOCKET(config, m_intr_socket, intr_ctrl_options, "h37", true);
-	m_intr_socket->irq_line_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	RAM(config, m_ram).set_default_size("64K").set_extra_options("16K,32K,48K").set_default_value(0x00);
 
@@ -725,11 +762,6 @@ void h89_state::h89(machine_config & config)
 
 	m_tlbc->reset_cb().set(FUNC(h89_state::reset_line));
 
-	HEATH_Z37_FDC(config, m_h37);
-	m_h37->drq_cb().set(m_intr_socket, FUNC(heath_intr_socket::set_drq));
-	m_h37->irq_cb().set(m_intr_socket, FUNC(heath_intr_socket::set_irq));
-	m_h37->block_interrupt_cb().set(m_intr_socket, FUNC(heath_intr_socket::block_interrupts));
-
 	// H-88-3 3-port serial board
 	INS8250(config, m_serial1, INS8250_CLOCK);
 	INS8250(config, m_serial2, INS8250_CLOCK);
@@ -738,6 +770,43 @@ void h89_state::h89(machine_config & config)
 	// H89 interrupt interval is 2mSec
 	TIMER(config, "irq_timer", 0).configure_periodic(FUNC(h89_state::h89_irq_timer), attotime::from_msec(2));
 }
+
+void h89_state::h88(machine_config &config)
+{
+	h89_base(config);
+	m_maincpu->set_io_map(&h89_state::h88_io);
+
+	HEATH_INTR_SOCKET(config, m_intr_socket, intr_ctrl_options, "original", true);
+	m_intr_socket->irq_line_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+
+	// H-88-5 Cassette interface board
+	HEATH_H88_CASS(config, m_cassette, H89_CLOCK);
+}
+
+void h89_state::h89(machine_config &config)
+{
+	h89_base(config);
+	m_maincpu->set_io_map(&h89_state::h89_io);
+
+	HEATH_INTR_SOCKET(config, m_intr_socket, intr_ctrl_options, "h37", true);
+	m_intr_socket->irq_line_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+
+	// Z-89-37 Soft-sectored controller
+	HEATH_Z37_FDC(config, m_h37);
+	m_h37->drq_cb().set(m_intr_socket, FUNC(heath_intr_socket::set_drq));
+	m_h37->irq_cb().set(m_intr_socket, FUNC(heath_intr_socket::set_irq));
+	m_h37->block_interrupt_cb().set(m_intr_socket, FUNC(heath_intr_socket::block_interrupts));
+}
+
+
+// ROM definition
+ROM_START( h88 )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_LOAD( "2716_444-19_h17.u520", 0x1800, 0x0800, CRC(26e80ae3) SHA1(0c0ee95d7cb1a760f924769e10c0db1678f2435c))
+
+	ROM_LOAD("2716_444-40_mtr88.u518", 0x0000, 0x0800, CRC(093afb79) SHA1(bcc1569ad9da7babf0a4199cab96d8cd59b2dd78))
+ROM_END
 
 // ROM definition
 ROM_START( h89 )
@@ -749,26 +818,23 @@ ROM_START( h89 )
 	ROM_SYSTEM_BIOS(0, "mtr90", "MTR-90 (444-142)")
 	ROMX_LOAD("2732_444-142_mtr90.u518", 0x0000, 0x1000, CRC(c4ff47c5) SHA1(d6f3d71ff270a663003ec18a3ed1fa49f627123a), ROM_BIOS(0))
 
-	ROM_SYSTEM_BIOS(1, "mtr88", "MTR-88 (444-40)")
-	ROMX_LOAD("2716_444-40_mtr88.u518", 0x0000, 0x0800, CRC(093afb79) SHA1(bcc1569ad9da7babf0a4199cab96d8cd59b2dd78), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "mtr89", "MTR-89 (444-62)")
+	ROMX_LOAD("2716_444-62_mtr89.u518", 0x0000, 0x0800, CRC(8f507972) SHA1(ac6c6c1344ee4e09fb60d53c85c9b761217fe9dc), ROM_BIOS(1))
 
-	ROM_SYSTEM_BIOS(2, "mtr89", "MTR-89 (444-62)")
-	ROMX_LOAD("2716_444-62_mtr89.u518", 0x0000, 0x0800, CRC(8f507972) SHA1(ac6c6c1344ee4e09fb60d53c85c9b761217fe9dc), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(2, "mms84b", "MMS 444-84B")
+	ROMX_LOAD("2732_444_84b_mms.u518", 0x0000, 0x1000, CRC(7e75d6f4) SHA1(baf34e036388d1a191197e31f8a93209f04fc58b), ROM_BIOS(2))
 
-	ROM_SYSTEM_BIOS(3, "mms84b", "MMS 444-84B")
-	ROMX_LOAD("2732_444_84b_mms.u518", 0x0000, 0x1000, CRC(7e75d6f4) SHA1(baf34e036388d1a191197e31f8a93209f04fc58b), ROM_BIOS(3))
+	ROM_SYSTEM_BIOS(3, "kmr-100", "Kres KMR-100 V3.a.02")
+	ROMX_LOAD("2732_kmr100_v3_a_02.u518", 0x0000, 0x1000, CRC(fd491592) SHA1(3d5803f95c38b237b07cd230353cd9ddc9858c13), ROM_BIOS(3))
 
-	ROM_SYSTEM_BIOS(4, "kmr-100", "Kres KMR-100 V3.a.02")
-	ROMX_LOAD("2732_kmr100_v3_a_02.u518", 0x0000, 0x1000, CRC(fd491592) SHA1(3d5803f95c38b237b07cd230353cd9ddc9858c13), ROM_BIOS(4))
+	ROM_SYSTEM_BIOS(4, "mtrhex_4k", "Ultimeth ROM")
+	ROMX_LOAD("2732_mtrhex_4k.u518", 0x0000, 0x1000, CRC(e26b29a9) SHA1(ba13d6c9deef682a9a8262bc910d46b577929a13), ROM_BIOS(4))
 
-	ROM_SYSTEM_BIOS(5, "mtrhex_4k", "Ultimeth ROM")
-	ROMX_LOAD("2732_mtrhex_4k.u518", 0x0000, 0x1000, CRC(e26b29a9) SHA1(ba13d6c9deef682a9a8262bc910d46b577929a13), ROM_BIOS(5))
+	ROM_SYSTEM_BIOS(5, "mtr90-84", "Heath's MTR-90 (444-84 - Superseded by 444-142)")
+	ROMX_LOAD("2732_444-84_mtr90.u518", 0x0000, 0x1000, CRC(f10fca03) SHA1(c4a978153af0f2dfcc9ba05be4c1033d33fee30b), ROM_BIOS(5))
 
-	ROM_SYSTEM_BIOS(6, "mtr90-84", "Heath's MTR-90 (444-84 - Superseded by 444-142)")
-	ROMX_LOAD("2732_444-84_mtr90.u518", 0x0000, 0x1000, CRC(f10fca03) SHA1(c4a978153af0f2dfcc9ba05be4c1033d33fee30b), ROM_BIOS(6))
-
-	ROM_SYSTEM_BIOS(7, "mms84a", "MMS 444-84A (Superseded by MMS 444-84B)")
-	ROMX_LOAD("2732_444_84a_mms.u518", 0x0000, 0x1000, CRC(0e541a7e) SHA1(b1deb620fc89c1068e2e663e14be69d1f337a4b9), ROM_BIOS(7))
+	ROM_SYSTEM_BIOS(6, "mms84a", "MMS 444-84A (Superseded by MMS 444-84B)")
+	ROMX_LOAD("2732_444_84a_mms.u518", 0x0000, 0x1000, CRC(0e541a7e) SHA1(b1deb620fc89c1068e2e663e14be69d1f337a4b9), ROM_BIOS(6))
 ROM_END
 
 } // anonymous namespace
@@ -778,3 +844,4 @@ ROM_END
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY          FULLNAME        FLAGS
 COMP( 1979, h89,  0,      0,      h89,     h89,   h89_state, empty_init, "Heath Company", "Heathkit H89", MACHINE_SUPPORTS_SAVE)
+COMP( 1979, h88,  h89,    0,      h88,     h88,   h89_state, empty_init, "Heath Company", "Heathkit H88", MACHINE_SUPPORTS_SAVE)
