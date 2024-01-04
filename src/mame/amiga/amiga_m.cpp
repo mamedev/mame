@@ -1403,7 +1403,7 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 			return;
 
 		case REG_DSKDAT:
-			popmessage("DSKDAT W %04x, contact MAMEdev",data);
+			popmessage("DSKDAT W %04x",data);
 			break;
 
 		case REG_DSKSYNC:

@@ -518,12 +518,15 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 		}
 	}
 
+	/* update sprite data fetching */
+	// ensure this happens once every two scanlines for the RAM manipulation, kickoff cares
+	// this is also unaffected by LACE
+	if ((scanline & 1) == 0)
+		update_sprite_dma(scanline >> 1);
+
 	scanline /= 2;
 
 	m_last_scanline = scanline;
-
-	/* update sprite data fetching */
-	update_sprite_dma(scanline);
 
 	/* all sprites off at the start of the line */
 	memset(m_sprite_remain, 0, sizeof(m_sprite_remain));
