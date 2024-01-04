@@ -76,7 +76,7 @@ int os9_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	int const type = find_size(io, form_factor, variants);
 
 	if (type != -1)
-		return FIFID_STRUCT | FIFID_SIZE;
+		return FIFID_SIZE | FIFID_HINT;
 
 	return 0;
 }
