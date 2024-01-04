@@ -145,36 +145,36 @@ inline u8 ht1130_device::gettimer_lower()
 
 inline u8 ht1130_device::getr1r0()
 {
-	return (getreg(1)<<4) | getreg(0);
+	return (getreg(1) << 4) | getreg(0);
 }
 
 inline u8 ht1130_device::getr1r0_data()
 {
 	const u8 dataaddress = getr1r0();
-	return m_data.read_byte(dataaddress);
+	return m_data.read_byte(dataaddress) & 0xf;
 }
 
 inline void ht1130_device::setr1r0_data(u8 data)
 {
 	const u8 dataaddress = getr1r0();
-	m_data.write_byte(dataaddress, data);
+	m_data.write_byte(dataaddress, data & 0xf);
 }
 
 inline u8 ht1130_device::getr3r2()
 {
-	return (getreg(3)<<4) | getreg(2);
+	return (getreg(3) << 4) | getreg(2);
 }
 
 inline u8 ht1130_device::getr3r2_data()
 {
 	const u8 dataaddress = getr3r2();
-	return m_data.read_byte(dataaddress);
+	return m_data.read_byte(dataaddress) & 0xf;
 }
 
 inline void ht1130_device::setr3r2_data(u8 data)
 {
 	const u8 dataaddress = getr3r2();
-	m_data.write_byte(dataaddress, data);
+	m_data.write_byte(dataaddress, data & 0xf);
 }
 
 
