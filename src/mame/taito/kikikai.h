@@ -28,6 +28,7 @@ public:
 
 	void kicknrun(machine_config &config);
 	void knightba(machine_config &config);
+	void kikikai_mcu(machine_config &config);
 
 protected:
 	u32 screen_update_kicknrun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -123,32 +124,4 @@ private:
 	int      m_address = 0;
 	u8       m_latch = 0U;
 
-};
-
-class kikikai_simulation_state : public kikikai_state
-{
-public:
-	kikikai_simulation_state(const machine_config &mconfig, device_type type, const char *tag) :
-		kikikai_state(mconfig, type, tag)
-	{
-	}
-
-	void kikikai(machine_config &config);
-
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-private:
-	virtual void main_f008_w(uint8_t data) override;
-
-	virtual INTERRUPT_GEN_MEMBER(kikikai_interrupt) override;
-
-	void mcu_simulate(  );
-
-	/* kikikai mcu simulation */
-	int      m_kikikai_simulated_mcu_running = 0;
-	int      m_kikikai_simulated_mcu_initialised = 0;
-	bool     m_coin_last[2]{};
-	u8       m_coin_fract = 0U;
 };

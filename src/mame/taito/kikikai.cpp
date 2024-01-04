@@ -588,6 +588,20 @@ static INPUT_PORTS_START( kikikai )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( kikikai_mcu )
+	PORT_INCLUDE(kikikai)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( knightba )
 
 	PORT_INCLUDE(kikikai)
@@ -650,15 +664,6 @@ void mexico86_state::machine_start()
 	m_port_b_out = 0xff;
 }
 
-void kikikai_simulation_state::machine_start()
-{
-	kikikai_state::machine_start();
-
-	save_item(NAME(m_kikikai_simulated_mcu_running));
-	save_item(NAME(m_kikikai_simulated_mcu_initialised));
-	save_item(NAME(m_coin_last));
-	save_item(NAME(m_coin_fract));
-}
 
 
 void kikikai_state::machine_reset()
@@ -678,16 +683,6 @@ void mexico86_state::machine_reset()
 	m_latch = 0;
 }
 
-void kikikai_simulation_state::machine_reset()
-{
-	kikikai_state::machine_reset();
-
-	m_kikikai_simulated_mcu_running = 0;
-	m_kikikai_simulated_mcu_initialised = 0;
-	m_coin_last[0] = false;
-	m_coin_last[1] = false;
-	m_coin_fract = 0;
-}
 
 void kikikai_state::base(machine_config &config)
 {
@@ -748,17 +743,28 @@ void kikikai_state::kicknrun(machine_config &config)
 	m_screen->screen_vblank().set_inputline(m_mcu, M6801_IRQ_LINE); // same clock latches the INT pin on the second Z80
 }
 
-
-void kikikai_simulation_state::kikikai(machine_config &config)
+void kikikai_state::kikikai_mcu(machine_config &config)
 {
 	base(config);
 
 	config.device_remove("sub");
-	m_screen->set_screen_update(FUNC(kikikai_simulation_state::screen_update_kikikai));
+	m_screen->set_screen_update(FUNC(kikikai_state::screen_update_kikikai));
 
-	// IRQs should be triggered by the MCU, but we don't have it
-	m_maincpu->set_vblank_int("screen", FUNC(kikikai_simulation_state::kikikai_interrupt));
-	m_maincpu->set_irq_acknowledge_callback(FUNC(kikikai_simulation_state::mcram_vect_r));
+	// Not too sure IRQs are triggered by MCU..
+	m_maincpu->set_vblank_int("screen", FUNC(kikikai_state::kikikai_interrupt));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(kikikai_state::mcram_vect_r));
+
+	M6801U4(config, m_mcu, XTAL(4'000'000)); // xtal is 4MHz, divided by 4 internally
+	m_mcu->in_p1_cb().set_ioport("IN0");
+	m_mcu->out_p1_cb().set(FUNC(kikikai_state::kikikai_mcu_port1_w));
+	m_mcu->out_p2_cb().set(FUNC(kikikai_state::kikikai_mcu_port2_w));
+	m_mcu->out_p3_cb().set(FUNC(kikikai_state::kikikai_mcu_port3_w));
+	m_mcu->in_p3_cb().set(FUNC(kikikai_state::kikikai_mcu_port3_r));
+	m_mcu->out_p4_cb().set(FUNC(kikikai_state::kikikai_mcu_port4_w));
+
+	config.set_perfect_quantum(m_maincpu);
+
+	m_screen->screen_vblank().set_inputline(m_mcu, M6801_IRQ_LINE); // same clock latches the INT pin on the second Z80
 }
 
 
@@ -1015,11 +1021,11 @@ ROM_END
  *
  *************************************/
 
-GAME( 1986, kikikai,  0,        kikikai,        kikikai,  kikikai_simulation_state, empty_init, ROT90, "Taito Corporation",          "KiKi KaiKai",                                 MACHINE_SUPPORTS_SAVE )
-GAME( 1986, knightb,  kikikai,  knightb,        kikikai,  mexico86_state,           empty_init, ROT90, "bootleg",                    "Knight Boy",                                  MACHINE_SUPPORTS_SAVE )
-GAME( 1986, knightba, kikikai,  knightba,       knightba, kikikai_state,            empty_init, ROT90, "bootleg (Game Corporation)", "Knight Boy (Game Corporation bootleg)",       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // missing coins, can be played using service to coin
+GAME( 1986, kikikai,  0,        kikikai_mcu,    kikikai_mcu,  kikikai_state,            empty_init, ROT90, "Taito Corporation",          "KiKi KaiKai",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1986, knightb,  kikikai,  knightb,        kikikai,      mexico86_state,           empty_init, ROT90, "bootleg",                    "Knight Boy",                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1986, knightba, kikikai,  knightba,       knightba,     kikikai_state,            empty_init, ROT90, "bootleg (Game Corporation)", "Knight Boy (Game Corporation bootleg)",       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // missing coins, can be played using service to coin
 
-GAME( 1986, kicknrun, 0,        kicknrun,       kicknrun, kikikai_state,            empty_init, ROT0,  "Taito Corporation",          "Kick and Run (World)",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1986, kicknrunu,kicknrun, kicknrun,       kicknrun, kikikai_state,            empty_init, ROT0,  "Taito America Corp",         "Kick and Run (US)",                           MACHINE_SUPPORTS_SAVE )
-GAME( 1986, mexico86, kicknrun, mexico86_68705, mexico86, mexico86_state,           empty_init, ROT0,  "bootleg",                    "Mexico 86 (bootleg of Kick and Run) (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, mexico86a,kicknrun, mexico86_68705, mexico86, mexico86_state,           empty_init, ROT0,  "bootleg",                    "Mexico 86 (bootleg of Kick and Run) (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, kicknrun, 0,        kicknrun,       kicknrun,     kikikai_state,            empty_init, ROT0,  "Taito Corporation",          "Kick and Run (World)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1986, kicknrunu,kicknrun, kicknrun,       kicknrun,     kikikai_state,            empty_init, ROT0,  "Taito America Corp",         "Kick and Run (US)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1986, mexico86, kicknrun, mexico86_68705, mexico86,     mexico86_state,           empty_init, ROT0,  "bootleg",                    "Mexico 86 (bootleg of Kick and Run) (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, mexico86a,kicknrun, mexico86_68705, mexico86,     mexico86_state,           empty_init, ROT0,  "bootleg",                    "Mexico 86 (bootleg of Kick and Run) (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
