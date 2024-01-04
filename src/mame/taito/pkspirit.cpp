@@ -105,20 +105,20 @@ uint32_t pkspirit_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	bitmap.fill(0, cliprect);
 
 	u32 spriteram_start = 0x300ff2; // should be 0xb10000 but a DMA is missing
-	u32 spriteram2_start = 0xb00000;
 
 	for (int i = 0; i < 0x800; i += 8)
 	{
-		// somewhat illogical, but the first sprite (one of the large tilemap sized sprites) seems to need to be drawn last
+		// somewhat illogical, but the full tilemap sprites need to be drawn first, in reverse order
+		// followed by the regular sprites, again in reverse order.
 		// (or there is some priority control)
-		int reali = (i + 0x8) & 0x7ff;
+		int reali = ((0x7f8 - i) + 0x10) & 0x7ff;
 
 		uint16_t sp0 = m_maincpu->space().read_word(spriteram_start + reali + 0);
 		uint16_t sp1 = m_maincpu->space().read_word(spriteram_start + reali + 2);
 		//uint16_t sp2 = m_maincpu->space().read_word(spriteram_start + reali + 4);
 		uint16_t sp3 = m_maincpu->space().read_word(spriteram_start + reali + 6);
 
-		int xpos = sp1 & 0x1ff;
+		int xpos = sp1 & 0x3ff;
 		int ypos = sp0 & 0x1ff;
 
 		ypos = 0x1ff - ypos;
@@ -127,11 +127,11 @@ uint32_t pkspirit_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		int sizey;
 		int xshift;
 
-		int base = (sp3 & 0xfffe) << 1;
+		int base = (sp3 & 0x7ffe);
 
 		int pal = (sp1 & 0xfc00) >> 10;
 
-		if (sp0 == 0x9fe0)
+		if (sp0 & 0x8000) // large tilemap sprites
 		{
 			sizex = 0x40;
 			sizey = 0x40;
@@ -139,26 +139,57 @@ uint32_t pkspirit_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		}
 		else
 		{
-			if (sp0 & 0x0800) // TAITO logo sprite on title, playing cards, odds table
+			xshift = 0;
+			sizex = 1;
+			sizey = 1;
+
+			// TODO work out which bits are controlling this
+			// 0x2000 might be priority?
+			switch (sp0 & 0x7e00)
+			{
+			case 0x0200: // sprites that aren't in use?
+			{
+				sizex = 1;
+				sizey = 1;
+				break;
+			}
+			case 0x0600: // Values on Double Up screen
+			{
+				sizex = 1;
+				sizey = 2;
+				break;
+			}
+			case 0x0e00: // HOLD text
+			{
+				sizex = 2;
+				sizey = 2;
+				break;
+			}
+			case 0x1600: // Game Over
+			{
+				sizex = 4;
+				sizey = 2;
+				break;
+			}
+			case 0x1a00: // TAITO logo on title
 			{
 				sizex = 4;
 				sizey = 4;
-				xshift = 0;
+				break;
 			}
-			else 
+
+			case 0x3800: // Reel on bonus type 2(?) (not sure this is visible)
 			{
-				if (sp0 & 0x1000) // GAME OVER
-				{
-					sizex = 4;
-					sizey = 2;
-					xshift = 0;
-				}
-				else // Values on Double Up screen
-				{
-					sizex = 1;
-					sizey = 2;
-					xshift = 0;
-				}
+				sizex = 4;
+				sizey = 2;
+				break;
+			}
+			case 0x3a00: // Reel on bonus type 2
+			{
+				sizex = 4;
+				sizey = 4; // there is still a slight glitch with this reel if 4 is used, maybe priority?
+				break;
+			}
 			}
 		}
 
@@ -170,16 +201,16 @@ uint32_t pkspirit_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 			int count = 0;
 			for (int y = 0; y < sizey; y++)
 			{
-				int ydraw = y * 16 + ypos;
+				int ydraw = y * 16 + ypos - 31;
 
 				for (int x = 0; x < sizex; x++)
 				{
 					int xdraw = x * 16 + xpos - xshift;
 
-					uint16_t tile = m_maincpu->space().read_word(spriteram2_start + base + count);
+					uint16_t tile = m_vidram[base + count];
 					m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, tile, pal, 0, 0, xdraw, ydraw, 0);
 
-					count += 2;
+					count ++;
 				}
 			}
 		}
@@ -212,8 +243,7 @@ void pkspirit_state::main_map(address_map &map) // TODO: verify everything
 
 	map(0xa00000, 0xa0003f).ram(); // is this still palette? (4bpp, for uploaded tiles?)
 	map(0xa04000, 0xa057ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0xb00000, 0xb0ffff).ram();//
-	map(0xb0c000, 0xb0cfff).ram().w(FUNC(pkspirit_state::vidram_w)).share("vidram"); // it uploads a 2bpp tileset here, why? it's just another copy of the basic font
+	map(0xb00000, 0xb0ffff).ram().w(FUNC(pkspirit_state::vidram_w)).share("vidram"); // it uploads a 2bpp tileset at c000-cfff, why? it's just another copy of the basic font
 
 	map(0xb10000, 0xb107ff).ram(); // spritelist should be copied here
 
@@ -283,18 +313,18 @@ static INPUT_PORTS_START( pkspirit )
 	PORT_DIPNAME( 0x0001, 0x0001, "Credit Type" ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x0001, "A" )
 	PORT_DIPSETTING(      0x0000, "B" )
-	PORT_DIPNAME( 0x0002, 0x0002, "Back Bar" ) PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(      0x0002, "A" )
-	PORT_DIPSETTING(      0x0000, "B" )
+	PORT_DIPNAME( 0x0002, 0x0002, "Background Style" ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(      0x0002, "Green" )
+	PORT_DIPSETTING(      0x0000, "Blue" )
 	PORT_DIPNAME( 0x0004, 0x0004, "Card Speed" ) PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(      0x0004, "A" )
-	PORT_DIPSETTING(      0x0000, "B" )
+	PORT_DIPSETTING(      0x0004, "Fast" )
+	PORT_DIPSETTING(      0x0000, "Slow" )
 	PORT_DIPNAME( 0x0008, 0x0008, "Card Deal Type" ) PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(      0x0008, "A" )
-	PORT_DIPSETTING(      0x0000, "B" )
+	PORT_DIPSETTING(      0x0008, "Slide" )
+	PORT_DIPSETTING(      0x0000, "Appear" )
 	PORT_DIPNAME( 0x0010, 0x0010, "Double Up Type" ) PORT_DIPLOCATION("SW1:5")
-	PORT_DIPSETTING(      0x0010, "A" )
-	PORT_DIPSETTING(      0x0000, "B" )
+	PORT_DIPSETTING(      0x0010, "Without Reel" )
+	PORT_DIPSETTING(      0x0000, "With Reel" )
 	PORT_DIPNAME( 0x0020, 0x0020, "Max Bet" ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(      0x0000, "5" )
 	PORT_DIPSETTING(      0x0020, "10" )
@@ -302,8 +332,8 @@ static INPUT_PORTS_START( pkspirit )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0080, 0x0080, "Card Type" ) PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(      0x0080, "A" )
-	PORT_DIPSETTING(      0x0000, "B" )
+	PORT_DIPSETTING(      0x0080, "Standard Deck" )
+	PORT_DIPSETTING(      0x0000, "Taito Deck" )
 
 	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(      0x0300, DEF_STR( 1C_1C ) )
@@ -318,9 +348,9 @@ static INPUT_PORTS_START( pkspirit )
 	PORT_DIPNAME( 0x1000, 0x1000, "Hopper" ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x1000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, "Double Up Open Pattern" ) PORT_DIPLOCATION("SW2:6") // TODO: improve machine translation
-	PORT_DIPSETTING(      0x2000, "A" )
-	PORT_DIPSETTING(      0x0000, "B" )
+	PORT_DIPNAME( 0x2000, 0x2000, "Double Up Reveal Order" ) PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(      0x2000, "Show Chosen Card First" )
+	PORT_DIPSETTING(      0x0000, "Show Chosen Card Last" )
 	PORT_DIPNAME( 0x4000, 0x4000, "Bell" ) PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(      0x4000, DEF_STR( On ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
@@ -348,7 +378,7 @@ const gfx_layout gfx_ram =
 	RGN_FRAC(1,1),
 	2,
 	{ 0,1 },
-	{ 0,2,4,6,8,10,12,14, 128,130,132,134,136,138,140,142 },
+	{ STEP8(0,2), STEP8(128,2) },
 	{ STEP8(0,16), STEP8(256,16) },
 	32*16
 };
@@ -386,7 +416,7 @@ void pkspirit_state::pkspirit(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 64*8);
-	screen.set_visarea(0*8, 64*8-1, 0*8, 56*8-1);
+	screen.set_visarea(0*8, 64*8-1, 0*8, 50*8-1);
 	screen.set_palette("palette");
 	screen.set_screen_update(FUNC(pkspirit_state::screen_update));
 	screen.screen_vblank().set_inputline(m_maincpu, 1);
