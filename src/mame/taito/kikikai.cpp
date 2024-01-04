@@ -30,17 +30,6 @@ Notes:
   turn wait forever. It's difficult to meet the required level of synchronization.
   This is kludged by filtering the 2203's busy signal.
 
-- KiKi KaiKai uses a custom MC6801U4 MCU which isn't dumped. The bootleg Knight Boy
-  replaces it with a 68705. The bootleg is NOT 100% equivalent to the original
-  (a situation similar to Bubble Bobble): collision detection is imperfect, the
-  player can't be killed by some enemies.
-  I think the bootleggers put the custom mcu in a test rig, examined its bus
-  activity and replicated the behaviour inaccurately because they couldn't
-  figure it all out. Indeed, the 68705 code reads all the memory locations
-  related to the missing collision detection, but does nothing with them.
-
-- KiKi KaiKai coinage mode Type 2 doesn't work.
-
 - Kick and Run is a rom swap for Kiki KaiKai as the pal chips are all A85-0x
   A85 is the Taito rom code for Kiki KaiKai.  Even the MCU is socketed!
 
