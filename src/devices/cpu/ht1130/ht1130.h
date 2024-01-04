@@ -30,11 +30,10 @@ public:
 
 	auto pa_out_cb() { return m_port_out_pa.bind(); }
 
-	auto display_data_out_cb() { return m_display_data_out.bind(); }
+	auto segment_out_cb() { return m_segment_out.bind(); } // COM in offset, SEG in data
 
 protected:
 	ht1130_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor data);
-
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -56,7 +55,6 @@ protected:
 	required_shared_ptr<u8> m_tempram;
 	required_shared_ptr<u8> m_displayram;
 
-private:
 	address_space_config m_space_config;
 	address_space_config m_data_config;
 
@@ -82,6 +80,9 @@ private:
 	u8 gettimer_upper();
 	u8 gettimer_lower();
 
+	void init_lcd();
+	virtual TIMER_CALLBACK_MEMBER(update_lcd);
+
 	void cycle();
 	u8 fetch();
 	void do_op();
@@ -98,6 +99,10 @@ private:
 	u8 m_timerover;
 	u16 m_timer;
 
+	u8 m_compins;
+	u8 m_comcount;
+	emu_timer *m_lcd_timer;
+
 	u16 m_stackaddr;
 	u8 m_stackcarry;
 
@@ -107,13 +112,16 @@ private:
 
 	devcb_write8 m_port_out_pa;
 
-	devcb_write8 m_display_data_out;
+	devcb_write64 m_segment_out;
 };
 
 class ht1190_device : public ht1130_device
 {
 public:
 	ht1190_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	virtual TIMER_CALLBACK_MEMBER(update_lcd) override;
 
 private:
 	void internal_data_map_ht1190(address_map &map);

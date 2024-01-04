@@ -39,18 +39,20 @@ ht1130_device::ht1130_device(const machine_config &mconfig, device_type type, co
 	, m_port_in_ps(*this, 0xff)
 	, m_port_in_pp(*this, 0xff)
 	, m_port_out_pa(*this)
-	, m_display_data_out(*this)
+	, m_segment_out(*this)
 {
 }
 
 ht1130_device::ht1130_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: ht1130_device(mconfig, HT1130, tag, owner, clock, address_map_constructor(FUNC(ht1130_device::internal_data_map), this))
 {
+	m_compins = 4;
 }
 
 ht1190_device::ht1190_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: ht1130_device(mconfig, HT1190, tag, owner, clock, address_map_constructor(FUNC(ht1190_device::internal_data_map_ht1190), this))
 {
+	m_compins = 8;
 }
 
 std::unique_ptr<util::disasm_interface> ht1130_device::create_disassembler()
@@ -79,9 +81,6 @@ inline void ht1130_device::tempram_w(offs_t offset, u8 data)
 inline void ht1130_device::displayram_w(offs_t offset, u8 data)
 {
 	m_displayram[offset] = data & 0xf;
-
-	// there might be a better way to do this
-	m_display_data_out(offset, m_displayram[offset]);
 }
 
 inline void ht1130_device::setreg(u8 which, u8 data)
@@ -191,10 +190,43 @@ void ht1190_device::internal_data_map_ht1190(address_map &map)
 	map(0xb0, 0xff).ram().w(FUNC(ht1190_device::displayram_w)).share(m_displayram);
 }
 
+void ht1130_device::init_lcd()
+{
+	m_lcd_timer = timer_alloc(FUNC(ht1130_device::update_lcd), this);
+
+	// LCD refresh rate is ~64Hz (not affected by system OSC)
+	attotime period = attotime::from_hz(64 * m_compins);
+	m_lcd_timer->adjust(period, 0, period);
+}
+
+TIMER_CALLBACK_MEMBER(ht1130_device::update_lcd)
+{
+	// prepare SEG data
+	u64 segs = 0;
+	for (int i = 0; i < 0x20; i++)
+		segs = segs << 1 | BIT(m_displayram[i ^ 0x1f], m_comcount & 3);
+
+	m_segment_out(m_comcount, m_inhalt ? 0 : segs);
+	m_comcount = (m_comcount + 1) % m_compins;
+}
+
+TIMER_CALLBACK_MEMBER(ht1190_device::update_lcd)
+{
+	// prepare SEG data
+	u64 segs = 0;
+	for (int i = 0; i < 40; i++)
+		segs = segs << 1 | BIT(m_displayram[(i << 1) | (m_comcount >> 2)], m_comcount & 3);
+
+	m_segment_out(m_comcount, m_inhalt ? 0 : segs);
+	m_comcount = (m_comcount + 1) % m_compins;
+}
+
 void ht1130_device::device_start()
 {
 	space(AS_PROGRAM).specific(m_space);
 	space(AS_DATA).specific(m_data);
+
+	init_lcd();
 
 	set_icountptr(m_icount);
 
@@ -222,6 +254,7 @@ void ht1130_device::device_start()
 	m_inhalt = 0;
 	m_timerover = 0;
 	m_timer = 0;
+	m_comcount = 0;
 
 	save_item(NAME(m_pc));
 	save_item(NAME(m_regs));
@@ -232,6 +265,7 @@ void ht1130_device::device_start()
 	save_item(NAME(m_inhalt));
 	save_item(NAME(m_timerover));
 	save_item(NAME(m_timer));
+	save_item(NAME(m_comcount));
 	save_item(NAME(m_stackaddr));
 	save_item(NAME(m_stackcarry));
 }

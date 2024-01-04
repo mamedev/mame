@@ -42,7 +42,7 @@ public:
 	hh_ht11xx_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_out_x(*this, "seg%u_%u", 0xb0U, 0U),
+		m_out_x(*this, "%u.%u", 0U, 0U),
 		m_in(*this, "IN%u", 1)
 	{ }
 
@@ -54,10 +54,10 @@ protected:
 private:
 	void mcfg_svg_screen(machine_config &config, u16 width, u16 height, const char *tag = "screen");
 
-	void display_data_w(offs_t offset, u8 data);
+	void segment_w(offs_t offset, u64 data);
 
 	required_device<ht1130_device> m_maincpu;
-	output_finder<80, 4> m_out_x;
+	output_finder<8, 40> m_out_x;
 	required_ioport_array<2> m_in;
 };
 
@@ -81,11 +81,12 @@ static INPUT_PORTS_START( ht11xx_brickgame )
 INPUT_PORTS_END
 
 
-void hh_ht11xx_state::display_data_w(offs_t offset, u8 data)
+void hh_ht11xx_state::segment_w(offs_t offset, u64 data)
 {
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 40; i++)
 	{
-		m_out_x[offset][i] = (data >> i) & 1;
+		// output to x.y where x = COM# and y = SEG#
+		m_out_x[offset][i] = BIT(data, i);
 	}
 }
 
@@ -100,7 +101,7 @@ void hh_ht11xx_state::mcfg_svg_screen(machine_config &config, u16 width, u16 hei
 void hh_ht11xx_state::ht11xx_brickgame(machine_config &config)
 {
 	HT1190(config, m_maincpu, 1000000/8); // frequency?
-	m_maincpu->display_data_out_cb().set(FUNC(hh_ht11xx_state::display_data_w));
+	m_maincpu->segment_out_cb().set(FUNC(hh_ht11xx_state::segment_w));
 
 	m_maincpu->ps_in_cb().set_ioport(m_in[0]);
 	m_maincpu->pp_in_cb().set_ioport(m_in[1]);
@@ -114,8 +115,8 @@ ROM_START( brke23p2 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "e23plusmarkii96in1.bin", 0x0000, 0x1000, CRC(8045fac4) SHA1(a36213309e6add31f31e4248f02f17de9914a5c1) ) // visual decap
 
-	ROM_REGION( 139648, "screen", 0)
-	ROM_LOAD( "brke23p2.svg", 0, 139648, CRC(f29ea936) SHA1(d80a37aa4e5647b31454a6d6de5a59c770ef0322) )
+	ROM_REGION( 138917, "screen", 0)
+	ROM_LOAD( "brke23p2.svg", 0, 138917, CRC(4e763114) SHA1(8cb006e515f7f90c4959743e3dbe1aa8a0c42cbc) )
 ROM_END
 
 } // anonymous namespace
