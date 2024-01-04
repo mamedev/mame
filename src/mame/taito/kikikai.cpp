@@ -221,14 +221,14 @@ void kikikai_state::kicknrun_sub_cpu_map(address_map &map)
 
 static INPUT_PORTS_START( kicknrun )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
@@ -577,20 +577,6 @@ static INPUT_PORTS_START( kikikai )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( kikikai_mcu )
-	PORT_INCLUDE(kikikai)
-
-	PORT_MODIFY("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-INPUT_PORTS_END
-
 static INPUT_PORTS_START( knightba )
 
 	PORT_INCLUDE(kikikai)
@@ -718,7 +704,7 @@ void kikikai_state::add_mcu(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback(FUNC(kikikai_state::mcram_vect_r));
 
 	M6801U4(config, m_mcu, XTAL(4'000'000)); // xtal is 4MHz, divided by 4 internally
-	m_mcu->in_p1_cb().set_ioport("IN0");
+	m_mcu->in_p1_cb().set_ioport("IN0").invert();
 	m_mcu->out_p1_cb().set(FUNC(kikikai_state::kikikai_mcu_port1_w));
 	m_mcu->out_p2_cb().set(FUNC(kikikai_state::kikikai_mcu_port2_w));
 	m_mcu->out_p3_cb().set(FUNC(kikikai_state::kikikai_mcu_port3_w));
@@ -1001,7 +987,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1986, kikikai,  0,        kikikai_mcu,    kikikai_mcu,  kikikai_state,            empty_init, ROT90, "Taito Corporation",          "KiKi KaiKai",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1986, kikikai,  0,        kikikai_mcu,    kikikai,      kikikai_state,            empty_init, ROT90, "Taito Corporation",          "KiKi KaiKai",                                 MACHINE_SUPPORTS_SAVE )
 GAME( 1986, knightb,  kikikai,  knightb,        kikikai,      mexico86_state,           empty_init, ROT90, "bootleg",                    "Knight Boy",                                  MACHINE_SUPPORTS_SAVE )
 GAME( 1986, knightba, kikikai,  knightba,       knightba,     kikikai_state,            empty_init, ROT90, "bootleg (Game Corporation)", "Knight Boy (Game Corporation bootleg)",       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // missing coins, can be played using service to coin
 
