@@ -434,8 +434,7 @@ public:
 	DECLARE_VIDEO_START( amiga_aga );
 	void amiga_palette(palette_device &palette) const;
 
-	uint32_t screen_update_amiga(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_amiga_aga(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void update_screenmode();
 
 	TIMER_CALLBACK_MEMBER( scanline_callback );
@@ -622,6 +621,7 @@ protected:
 
 	// TODO: move to Agnus/Alice
 	u16 vposr_r();
+	u16 vhposr_r();
 	void vposw_w(u16 data);
 	void bplcon0_w(u16 data);
 	void aga_bplcon0_w(u16 data);
@@ -709,6 +709,7 @@ private:
 
 	bool m_previous_lof;
 	bitmap_rgb32 m_flickerfixer;
+	bitmap_rgb32 m_scanline_bitmap;
 
 	uint16_t m_rx_shift;
 	uint16_t m_tx_shift;

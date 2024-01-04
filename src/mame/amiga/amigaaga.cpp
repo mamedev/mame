@@ -505,6 +505,8 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 			// otherwise just render the contents of the previous frame's scanline
 			int shift = (m_previous_lof == lof) ? 1 : 0;
 
+			if ((scanline - shift) < 0)
+				return;
 			std::copy_n(&m_flickerfixer.pix(scanline - shift), amiga_state::SCREEN_WIDTH, &bitmap.pix(scanline));
 			return;
 		}
@@ -515,6 +517,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 	m_last_scanline = scanline;
 
 	/* update sprite data fetching */
+	// FIXME: verify and apply same logic as per OCS
 	aga_update_sprite_dma(scanline);
 
 	/* all sprites off at the start of the line */
@@ -928,24 +931,4 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 	// save
 	if (dst != nullptr)
 		std::copy_n(dst, amiga_state::SCREEN_WIDTH, &m_flickerfixer.pix(save_scanline));
-}
-
-
-
-/*************************************
- *
- *  Update
- *
- *************************************/
-
-uint32_t amiga_state::screen_update_amiga_aga(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	if (cliprect.top() != cliprect.bottom())
-		return 0;
-
-	// render each scanline in the visible region
-	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
-		aga_render_scanline(bitmap, y);
-
-	return 0;
 }

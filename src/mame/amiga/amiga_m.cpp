@@ -27,6 +27,8 @@
 #define LOG_SERIAL  (1U << 4)
 
 #define VERBOSE (LOG_SERIAL)
+//#define LOG_OUTPUT_FUNC osd_printf_info
+
 #include "logmacro.h"
 
 
@@ -273,13 +275,13 @@ TIMER_CALLBACK_MEMBER( amiga_state::scanline_callback )
 	}
 
 	// render up to this scanline
-	if (!m_screen->update_partial(scanline))
+	//if (!m_screen->update_partial(scanline))
 	{
-		bitmap_rgb32 dummy_bitmap;
+		//bitmap_rgb32 dummy_bitmap;
 		if (IS_AGA())
-			aga_render_scanline(dummy_bitmap, scanline);
+			aga_render_scanline(m_scanline_bitmap, scanline);
 		else
-			render_scanline(dummy_bitmap, scanline);
+			render_scanline(m_scanline_bitmap, scanline);
 	}
 
 	// clock tod (if we actually render this scanline)
@@ -1117,7 +1119,7 @@ void amiga_state::ocs_map(address_map &map)
 //  map(0x000, 0x001).r(FUNC(amiga_state::bltddat_r));
 //  map(0x002, 0x003).r(FUNC(amiga_state::dmaconr_r));
 	map(0x004, 0x005).r(FUNC(amiga_state::vposr_r));
-//  map(0x006, 0x007).r(FUNC(amiga_state::vhposr_r));
+	map(0x006, 0x007).r(FUNC(amiga_state::vhposr_r));
 //  map(0x008, 0x009).r(FUNC(amiga_state::dskdatr_r));
 	// TODO: verify if JOYxDAT really belongs to Denise (???)
 //  map(0x00a, 0x00b).r(FUNC(amiga_state::joydat_r<0>));
@@ -1260,6 +1262,11 @@ u16 amiga_state::vposr_r()
 	res |= m_agnus_id << 8;
 	res |= ((amiga_gethvpos() >> 16) & 0xff);
 	return res;
+}
+
+u16 amiga_state::vhposr_r()
+{
+	return amiga_gethvpos() & 0xffff;
 }
 
 void amiga_state::vposw_w(u16 data)
@@ -1499,7 +1506,7 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 			}
 			break;
 
-		// OCS and AGA versions of Soccer Kid explicitly writes blitter addresses way beyond chip RAM
+		// soccerkd (OCS) and sockid_a (AGA) explicitly writes blitter addresses way beyond chip RAM
 		// This is clearly deterministic: it draws an individual empty tile scattered across playfield
 		// (which also collides on top of it)
 		case REG_BLTAPTH:   case REG_BLTBPTH:   case REG_BLTCPTH:   case REG_BLTDPTH:
@@ -1568,11 +1575,15 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 			data = (data & INTENA_SETCLR) ? (CUSTOM_REG(offset) | (data & 0x7fff)) : (CUSTOM_REG(offset) & ~(data & 0x7fff));
 			CUSTOM_REG(offset) = data;
 			if (temp & INTENA_SETCLR)
-				// if we're enabling irq's, delay a bit
+			{
+				/* if we're enabling irq's, delay a bit */
 				m_irq_timer->adjust(m_maincpu->cycles_to_attotime(AMIGA_IRQ_DELAY_CYCLES));
+			}
 			else
-				// if we're disabling irq's, process right away
+			{
+				/* if we're disabling irq's, process right away */
 				update_irqs();
+			}
 			break;
 
 		case REG_INTREQ:
@@ -1593,11 +1604,15 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 			CUSTOM_REG(offset) = data;
 
 			if (temp & INTENA_SETCLR)
-				// if we're generating irq's, delay a bit
+			{
+				/* if we're generating irq's, delay a bit */
 				m_irq_timer->adjust(m_maincpu->cycles_to_attotime(AMIGA_IRQ_DELAY_CYCLES));
+			}
 			else
-				// if we're clearing irq's, process right away
+			{
+				/* if we're clearing irq's, process right away */
 				update_irqs();
+			}
 			break;
 
 		case REG_ADKCON:
