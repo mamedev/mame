@@ -129,28 +129,530 @@ A85_12 to 17 - 27C512 EPROM
 ***************************************************************************/
 
 #include "emu.h"
-#include "kikikai.h"
 
+#include "cpu/m6800/m6801.h"
+#include "cpu/m6805/m68705.h"
 #include "cpu/z80/z80.h"
+#include "sound/ymopn.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
+namespace {
+
+class kikikai_state : public driver_device
+{
+public:
+	kikikai_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_screen(*this, "screen"),
+		m_inputs(*this, "IN%u", 0),
+		m_rombank(*this, "rombank"),
+		m_sharedram(*this, "sharedram"),
+		m_mainram(*this, "mainram"),
+		m_subcpu(*this, "sub"),
+		m_mcu(*this, "mcu"),
+		m_ymsnd(*this, "ymsnd"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")
+	{
+	}
+
+	void kicknrun(machine_config &config);
+	void knightba(machine_config &config);
+	void kikikai(machine_config &config);
+
+protected:
+	uint32_t screen_update_kicknrun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_kikikai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	IRQ_CALLBACK_MEMBER(mcram_vect_r);
+
+	void base(machine_config &config);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<screen_device> m_screen;
+	optional_ioport_array<8> m_inputs;
+	required_memory_bank m_rombank;
+	optional_shared_ptr<uint8_t> m_sharedram;
+
+private:
+	void add_mcu(machine_config &config);
+
+	void kicknrun_sub_output_w(uint8_t data);
+	virtual void main_f008_w(uint8_t data);
+
+	void main_bankswitch_w(uint8_t data);
+	uint8_t kiki_ym2203_r(offs_t offset);
+
+	INTERRUPT_GEN_MEMBER(kikikai_interrupt);
+
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
+	void kicknrun_sub_cpu_map(address_map &map);
+	void knightba_main_map(address_map &map);
+
+	void kikikai_mcu_port1_w(uint8_t data);
+	void kikikai_mcu_port2_w(uint8_t data);
+	uint8_t kikikai_mcu_port3_r();
+	void kikikai_mcu_port3_w(uint8_t data);
+	void kikikai_mcu_port4_w(uint8_t data);
+
+	/* memory pointers */
+	required_shared_ptr<uint8_t> m_mainram;
+
+	/* video-related */
+	int m_charbank = 0;
+
+	/* devices */
+	optional_device<cpu_device> m_subcpu; // kicknrun / mexico86 only
+	optional_device<m6801_cpu_device> m_mcu;
+	required_device<ym2203_device> m_ymsnd;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
+	/* Kiki KaiKai / Kick 'n Run MCU */
+	uint8_t m_port3_in = 0U;
+	uint8_t m_port1_out = 0U;
+	uint8_t m_port2_out = 0U;
+	uint8_t m_port3_out = 0U;
+	uint8_t m_port4_out = 0U;
+};
+
+class mexico86_state : public kikikai_state
+{
+public:
+	mexico86_state(const machine_config &mconfig, device_type type, const char *tag) :
+		kikikai_state(mconfig, type, tag),
+		m_68705mcu(*this, "68705mcu")
+	{
+	}
+
+	void mexico86(machine_config &config);
+	void knightb(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	virtual void main_f008_w(uint8_t data) override;
+
+	INTERRUPT_GEN_MEMBER(mexico86_68705_interrupt);
+	void mexico86_68705_port_a_w(uint8_t data);
+	void mexico86_68705_port_b_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
+
+	optional_device<m68705p_device> m_68705mcu;
+
+	/* mexico86 68705 protection */
+	uint8_t m_port_a_out = 0U;
+	uint8_t m_port_b_out = 0U;
+	int m_address = 0;
+	uint8_t m_latch = 0U;
+};
+
 
 
 /*************************************
  *
- *  Memory handlers
+ *  Video
+ *
+ *************************************/
+
+uint32_t kikikai_state::screen_update_kicknrun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// Similar to bublbobl.cpp, Video hardware generates sprites only.
+	bitmap.fill(255, cliprect);
+
+	int sx = 0;
+
+	// the score display seems to be outside of the main objectram
+	for (int offs = 0x1500; offs < 0x2000; offs += 4)
+	{
+		if (offs >= 0x1800 && offs < 0x1980)
+			continue;
+
+		if (offs >= 0x19c0)
+			continue;
+
+		// skip empty sprites
+		// this is dword aligned so the uint32_t * cast shouldn't give problems on any architecture
+		if (*(uint32_t *)(&m_mainram[offs]) == 0)
+			continue;
+
+		const int gfx_num = m_mainram[offs + 1];
+		const int gfx_attr = m_mainram[offs + 3];
+
+		int gfx_offs, height;
+		if (!BIT(gfx_num, 7))  // 16x16 sprites
+		{
+			gfx_offs = ((gfx_num & 0x1f) * 0x80) + ((gfx_num & 0x60) >> 1) + 12;
+			height = 2;
+		}
+		else    // tilemaps (each sprite is a 16x256 column)
+		{
+			gfx_offs = ((gfx_num & 0x3f) * 0x80);
+			height = 32;
+		}
+
+		if ((gfx_num & 0xc0) == 0xc0)   // next column
+			sx += 16;
+		else
+		{
+			sx = m_mainram[offs + 2];
+			//if (gfx_attr & 0x40) sx -= 256;
+		}
+		const int sy = 256 - height * 8 - (m_mainram[offs + 0]);
+
+		for (int xc = 0; xc < 2; xc++)
+		{
+			for (int yc = 0; yc < height; yc++)
+			{
+				const int goffs = gfx_offs + xc * 0x40 + yc * 0x02;
+				const int code = m_mainram[goffs] + ((m_mainram[goffs + 1] & 0x07) << 8)
+						+ ((m_mainram[goffs + 1] & 0x80) << 4) + (m_charbank << 12);
+				const int color = ((m_mainram[goffs + 1] & 0x38) >> 3) + ((gfx_attr & 0x02) << 2);
+				const int flipx = m_mainram[goffs + 1] & 0x40;
+				const int flipy = 0;
+
+				//const int x = sx + xc * 8;
+				const int x = (sx + xc * 8) & 0xff;
+				const int y = (sy + yc * 8) & 0xff;
+
+				m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+						code,
+						color,
+						flipx,flipy,
+						x,y,15);
+			}
+		}
+	}
+
+	return 0;
+}
+
+uint32_t kikikai_state::screen_update_kikikai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	int offs;
+	int sx, sy, yc;
+	int gfx_num, /*gfx_attr,*/ gfx_offs;
+	int height;
+	int goffs, code, color, y;
+	int tx, ty;
+
+	bitmap.fill(m_palette->black_pen(), cliprect);
+	sx = 0;
+	for (offs = 0x1500; offs < 0x1800; offs += 4)
+	{
+		if (*(uint32_t*)(m_mainram + offs) == 0)
+			continue;
+
+		ty = m_mainram[offs];
+		gfx_num = m_mainram[offs + 1];
+		tx = m_mainram[offs + 2];
+		//gfx_attr = m_mainram[offs + 3];
+
+		if (gfx_num & 0x80)
+		{
+			gfx_offs = ((gfx_num & 0x3f) << 7);
+			height = 32;
+			if (gfx_num & 0x40) sx += 16;
+			else sx = tx;
+		}
+		else
+		{
+			if (!(ty && tx))
+				continue;
+			gfx_offs = ((gfx_num & 0x1f) << 7) + ((gfx_num & 0x60) >> 1) + 12;
+			height = 2;
+			sx = tx;
+		}
+
+		sy = 256 - (height << 3) - ty;
+
+		height <<= 1;
+		for (yc = 0; yc < height; yc += 2)
+		{
+			y = (sy + (yc << 2)) & 0xff;
+			goffs = gfx_offs + yc;
+			code = m_mainram[goffs] + ((m_mainram[goffs + 1] & 0x1f) << 8);
+			color = (m_mainram[goffs + 1] & 0xe0) >> 5;
+			goffs += 0x40;
+
+			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+					code,
+					color,
+					0,0,
+					sx&0xff,y,15);
+
+			code = m_mainram[goffs] + ((m_mainram[goffs + 1] & 0x1f) << 8);
+			color = (m_mainram[goffs + 1] & 0xe0) >> 5;
+
+			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+					code,
+					color,
+					0,0,
+					(sx+8)&0xff,y,15);
+		}
+	}
+
+	return 0;
+}
+
+
+
+/*************************************
+ *
+ *  I/O handlers
  *
  *************************************/
 
 uint8_t kikikai_state::kiki_ym2203_r(offs_t offset)
 {
-	u8 result = m_ymsnd->read(offset);
+	uint8_t result = m_ymsnd->read(offset);
 
 	if (offset == 0)
 		result &= 0x7f;
 
 	return result;
 }
+
+void kikikai_state::main_bankswitch_w(uint8_t data)
+{
+	if ((data & 7) > 5)
+		logerror("Switching to invalid bank %d\n", data & 7);
+
+	m_rombank->set_entry(data & 7);
+
+	m_charbank = BIT(data, 5);
+}
+
+void kikikai_state::kicknrun_sub_output_w(uint8_t data)
+{
+	/*--x- ---- coin lockout 2*/
+	/*---x ---- coin lockout 1*/
+	/*---- -x-- coin counter*/
+	/*---- --x- <unknown, always high, irq ack?>*/
+}
+
+
+/*
+$f008 - write
+bit 7 = ? (unused?)
+bit 6 = ? (unused?)
+bit 5 = ? (unused?)
+bit 4 = ? (usually set in game)
+bit 3 = ? (usually set in game)
+bit 2 = sound cpu reset line
+bit 1 = microcontroller reset line
+bit 0 = ? (unused?)
+*/
+void kikikai_state::main_f008_w(uint8_t data)
+{
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 4) ? CLEAR_LINE : ASSERT_LINE);
+
+	m_mcu->set_input_line(INPUT_LINE_RESET, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
+}
+
+void mexico86_state::main_f008_w(uint8_t data)
+{
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 4) ? CLEAR_LINE : ASSERT_LINE);
+
+	// mexico 86, knight boy
+	m_68705mcu->set_input_line(INPUT_LINE_RESET, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
+}
+
+INTERRUPT_GEN_MEMBER(kikikai_state::kikikai_interrupt)
+{
+	device.execute().set_input_line(0, ASSERT_LINE);
+}
+
+IRQ_CALLBACK_MEMBER(kikikai_state::mcram_vect_r)
+{
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+	return m_sharedram[0];
+}
+
+
+
+/*************************************
+ *
+ *  Kiki KaiKai / Kick 'n Run MCU
+ *
+ *************************************/
+
+void kikikai_state::kikikai_mcu_port1_w(uint8_t data)
+{
+	//logerror("%04x: 6801U4 port 1 write %02x\n", m_mcu->pc(), data);
+
+	// bit 0, 1: coin counters (?)
+	if (data & 0x01 && ~m_port1_out & 0x01)
+	{
+		machine().bookkeeping().coin_counter_w(0, data & 0x01);
+	}
+
+	if (data & 0x02 && ~m_port1_out & 0x02)
+	{
+		machine().bookkeeping().coin_counter_w(1, data & 0x02);
+	}
+
+	// bit 4, 5: coin lockouts
+	machine().bookkeeping().coin_lockout_w(0, ~data & 0x10);
+	machine().bookkeeping().coin_lockout_w(0, ~data & 0x20);
+
+	// bit 7: ? (set briefly while MCU boots)
+	m_port1_out = data;
+}
+
+void kikikai_state::kikikai_mcu_port2_w(uint8_t data)
+{
+	//logerror("%04x: 6801U4 port 2 write %02x\n", m_mcu->pc(), data);
+
+	// bit 2: clock
+	// latch on high->low transition
+	if ((m_port2_out & 0x04) && (~data & 0x04))
+	{
+		int address = m_port4_out;
+
+		if (data & 0x10)
+		{
+			// read
+			if (data & 0x01)
+			{
+				m_port3_in = m_sharedram[address];
+			}
+			else
+			{
+				m_port3_in = m_inputs[(address & 1) + 1]->read();
+			}
+			m_mcu->pulse_input_line(M6801_IS3_LINE, attotime::from_usec(1));
+		}
+		else
+		{
+			// write
+			m_sharedram[address] = m_port3_out;
+		}
+	}
+
+	m_port2_out = data;
+}
+
+uint8_t kikikai_state::kikikai_mcu_port3_r()
+{
+	//logerror("%04x: 6801U4 port 3 read\n", m_mcu->pc());
+	return m_port3_in;
+}
+
+void kikikai_state::kikikai_mcu_port3_w(uint8_t data)
+{
+	//logerror("%04x: 6801U4 port 3 write %02x\n", m_mcu->pc(), data);
+	m_port3_out = data;
+}
+
+void kikikai_state::kikikai_mcu_port4_w(uint8_t data)
+{
+	//logerror("%04x: 6801U4 port 4 write %02x\n", m_mcu->pc(), data);
+	// bits 0-7 of shared RAM address
+	m_port4_out = data;
+}
+
+
+
+/*************************************
+ *
+ *  Mexico 86 68705 protection interface
+ *
+ *  The following is ENTIRELY GUESSWORK!!!
+ *
+ *************************************/
+
+INTERRUPT_GEN_MEMBER(mexico86_state::mexico86_68705_interrupt)
+{
+	device.execute().set_input_line(M68705_IRQ_LINE, ASSERT_LINE);
+}
+
+
+void mexico86_state::mexico86_68705_port_a_w(uint8_t data)
+{
+	//logerror("%s: 68705 port A write %02x\n", machine().describe_context(), data);
+	m_port_a_out = data;
+}
+
+
+/*
+ *  Port B connections:
+ *
+ *  all bits are logical 1 when read (+5V pullup)
+ *
+ *  0   W  enables latch which holds data from main Z80 memory
+ *  1   W  loads the latch which holds the low 8 bits of the address of
+ *               the main Z80 memory location to access
+ *  2   W  0 = read input ports, 1 = access Z80 memory
+ *  3   W  clocks main Z80 memory access
+ *  4   W  selects Z80 memory access direction (0 = write 1 = read)
+ *  5   W  clocks a flip-flop which causes IRQ on the main Z80
+ *  6   W  not used?
+ *  7   W  not used?
+ */
+
+void mexico86_state::mexico86_68705_port_b_w(offs_t offset, uint8_t data, uint8_t mem_mask)
+{
+	//logerror("%s: 68705 port B write %02x\n", machine().describe_context(), data);
+
+	uint8_t const port_a_value(m_port_a_out & (BIT(m_port_b_out, 0) ? 0xff : m_latch));
+
+	if (BIT(mem_mask, 3) && !BIT(data, 3) && BIT(m_port_b_out, 3))
+	{
+		if (BIT(m_port_b_out, 4)) // read
+		{
+			if (BIT(m_port_b_out, 2))
+			{
+				//logerror("%s: 68705 read %02x from address %04x\n", machine().describe_context(), m_sharedram[m_address], m_address);
+				m_latch = m_sharedram[m_address];
+			}
+			else
+			{
+				//logerror("%s: 68705 read input port %04x\n", machine().describe_context(), m_address);
+				m_latch = m_inputs[(m_address & 1) + 1]->read();
+			}
+		}
+		else // write
+		{
+			//logerror("%s: 68705 write %02x to address %04x\n",machine().describe_context(), port_a_value, m_address);
+			m_sharedram[m_address] = port_a_value;
+		}
+	}
+
+	m_68705mcu->pa_w((BIT(mem_mask, 0) && !BIT(data, 0)) ? m_latch : 0xff);
+
+	if (BIT(mem_mask, 1) && !BIT(data, 1) && BIT(m_port_b_out, 1))
+	{
+		m_address = port_a_value;
+		//if (m_address >= 0x80) logerror("%s: 68705 address %02x\n", machine().describe_context(), port_a_value);
+	}
+
+	if (BIT(mem_mask, 5) && BIT(data, 5) && !BIT(m_port_b_out, 5))
+	{
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+		m_68705mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
+	}
+
+	if (BIT(mem_mask, 6) && !BIT(data, 6) && BIT(m_port_b_out, 6))
+		logerror("%s: 68705 unknown port B bit %02x\n", machine().describe_context(), data);
+
+	if (BIT(mem_mask, 7) && !BIT(data, 7) && BIT(m_port_b_out, 7))
+		logerror("%s: 68705 unknown port B bit %02x\n", machine().describe_context(), data);
+
+	m_port_b_out = data;
+}
+
 
 
 /*************************************
@@ -162,56 +664,50 @@ uint8_t kikikai_state::kiki_ym2203_r(offs_t offset)
 void kikikai_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("bank1");                /* banked roms */
-	map(0xc000, 0xe7ff).ram().share("mainram");         /* shared with sound cpu */
-	map(0xe800, 0xe8ff).ram().share("mcu_sharedram");  /* shared with mcu */
+	map(0x8000, 0xbfff).bankr(m_rombank);         // banked roms
+	map(0xc000, 0xe7ff).ram().share(m_mainram);   // shared with sound cpu
+	map(0xe800, 0xe8ff).ram().share(m_sharedram); // shared with mcu
 	map(0xe900, 0xefff).ram();
-	map(0xf000, 0xf000).w(FUNC(kikikai_state::main_bankswitch_w));    /* program and gfx ROM banks */
-	map(0xf008, 0xf008).w(FUNC(kikikai_state::main_f008_w));          /* cpu reset lines + other unknown stuff */
+	map(0xf000, 0xf000).w(FUNC(kikikai_state::main_bankswitch_w)); // program and gfx ROM banks
+	map(0xf008, 0xf008).w(FUNC(kikikai_state::main_f008_w));       // cpu reset lines + other unknown stuff
 	map(0xf010, 0xf010).portr("IN3");
-	map(0xf018, 0xf018).nopw();                        /* watchdog? */
-	map(0xf800, 0xffff).ram().share("subram");          /* communication ram - to connect 4 players' subboard */
+	map(0xf018, 0xf018).nopw();                   // watchdog?
+	map(0xf800, 0xffff).ram().share("subram");    // communication ram - to connect 4 players' subboard
 }
 
 void kikikai_state::knightba_main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("bank1");                /* banked roms */
-	map(0xc000, 0xe7ff).ram().share("mainram");         /* shared with sound cpu */
+	map(0x8000, 0xbfff).bankr(m_rombank);       // banked roms
+	map(0xc000, 0xe7ff).ram().share(m_mainram); // shared with sound cpu
 	map(0xe800, 0xefff).ram();
-	map(0xf000, 0xf000).w(FUNC(kikikai_state::main_bankswitch_w));    /* program and gfx ROM banks */
+	map(0xf000, 0xf000).w(FUNC(kikikai_state::main_bankswitch_w)); // program and gfx ROM banks
 	map(0xf010, 0xf010).portr("IN3");
-	map(0xf018, 0xf018).nopw();                        /* watchdog? */
+	map(0xf018, 0xf018).nopw();                 // watchdog?
 	map(0xf019, 0xf019).portr("IN1");
 }
 
 void kikikai_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xa7ff).ram().share("mainram");  /* shared with main */
+	map(0x8000, 0xa7ff).ram().share(m_mainram); // shared with main
 	map(0xa800, 0xbfff).ram();
 	map(0xc000, 0xc001).r(FUNC(kikikai_state::kiki_ym2203_r)).w(m_ymsnd, FUNC(ym2203_device::write));
-}
-
-void kikikai_state::kicknrun_sub_output_w(uint8_t data)
-{
-	/*--x- ---- coin lockout 2*/
-	/*---x ---- coin lockout 1*/
-	/*---- -x-- coin counter*/
-	/*---- --x- <unknown, always high, irq ack?>*/
 }
 
 void kikikai_state::kicknrun_sub_cpu_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x47ff).ram(); /* sub cpu ram */
-	map(0x8000, 0x87ff).ram().share("subram");  /* shared with main */
+	map(0x4000, 0x47ff).ram(); // sub cpu ram
+	map(0x8000, 0x87ff).ram().share("subram"); // shared with main
 	map(0xc000, 0xc000).portr("IN4");
 	map(0xc001, 0xc001).portr("IN5");
 	map(0xc002, 0xc002).portr("IN6");
 	map(0xc003, 0xc003).portr("IN7");
 	map(0xc004, 0xc004).w(FUNC(kikikai_state::kicknrun_sub_output_w));
 }
+
+
 
 /*************************************
  *
@@ -455,7 +951,6 @@ static INPUT_PORTS_START( kikikai )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( knightba )
-
 	PORT_INCLUDE(kikikai)
 
 	PORT_MODIFY("IN1")
@@ -487,6 +982,7 @@ static GFXDECODE_START( gfx_mexico86 )
 GFXDECODE_END
 
 
+
 /*************************************
  *
  *  Machine driver
@@ -495,9 +991,8 @@ GFXDECODE_END
 
 void kikikai_state::machine_start()
 {
-	u8 *const ROM = memregion("maincpu")->base();
-
-	membank("bank1")->configure_entries(0, 6, &ROM[0x08000], 0x4000);
+	uint8_t *const ROM = memregion("maincpu")->base();
+	m_rombank->configure_entries(0, 6, &ROM[0x08000], 0x4000);
 
 	save_item(NAME(m_charbank));
 }
@@ -599,7 +1094,7 @@ void kikikai_state::kicknrun(machine_config &config)
 	add_mcu(config);
 }
 
-void kikikai_state::kikikai_mcu(machine_config &config)
+void kikikai_state::kikikai(machine_config &config)
 {
 	base(config);
 
@@ -610,7 +1105,7 @@ void kikikai_state::kikikai_mcu(machine_config &config)
 }
 
 
-void mexico86_state::mexico86_68705(machine_config &config)
+void mexico86_state::mexico86(machine_config &config)
 {
 	base(config);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(mexico86_state::mcram_vect_r));
@@ -619,12 +1114,12 @@ void mexico86_state::mexico86_68705(machine_config &config)
 	m_68705mcu->portc_r().set_ioport("IN0");
 	m_68705mcu->porta_w().set(FUNC(mexico86_state::mexico86_68705_port_a_w));
 	m_68705mcu->portb_w().set(FUNC(mexico86_state::mexico86_68705_port_b_w));
-	m_68705mcu->set_vblank_int("screen", FUNC(mexico86_state::mexico86_m68705_interrupt));
+	m_68705mcu->set_vblank_int("screen", FUNC(mexico86_state::mexico86_68705_interrupt));
 }
 
 void mexico86_state::knightb(machine_config &config)
 {
-	mexico86_68705(config);
+	mexico86(config);
 	config.device_remove("sub");
 	m_screen->set_screen_update(FUNC(mexico86_state::screen_update_kikikai));
 }
@@ -640,6 +1135,7 @@ void kikikai_state::knightba(machine_config &config)
 
 	m_screen->set_screen_update(FUNC(kikikai_state::screen_update_kikikai));
 }
+
 
 
 /*************************************
@@ -854,6 +1350,7 @@ ROM_START( mexico86a )
 	ROM_LOAD( "ampal16r4pc.2.bin", 0x0000, 0x0104, CRC(213a71d1) SHA1(a83b1c089fae72b8216533d0733491c3dc3630af) )
 ROM_END
 
+} // anonymous namespace
 
 
 
@@ -863,11 +1360,11 @@ ROM_END
  *
  *************************************/
 
-GAME( 1986, kikikai,  0,        kikikai_mcu,    kikikai,      kikikai_state,            empty_init, ROT90, "Taito Corporation",          "KiKi KaiKai",                                 MACHINE_SUPPORTS_SAVE )
-GAME( 1986, knightb,  kikikai,  knightb,        kikikai,      mexico86_state,           empty_init, ROT90, "bootleg",                    "Knight Boy",                                  MACHINE_SUPPORTS_SAVE )
-GAME( 1986, knightba, kikikai,  knightba,       knightba,     kikikai_state,            empty_init, ROT90, "bootleg (Game Corporation)", "Knight Boy (Game Corporation bootleg)",       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // missing coins, can be played using service to coin
+GAME( 1986, kikikai,   0,        kikikai,  kikikai,  kikikai_state,  empty_init, ROT90, "Taito Corporation",          "KiKi KaiKai",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1986, knightb,   kikikai,  knightb,  kikikai,  mexico86_state, empty_init, ROT90, "bootleg",                    "Knight Boy",                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1986, knightba,  kikikai,  knightba, knightba, kikikai_state,  empty_init, ROT90, "bootleg (Game Corporation)", "Knight Boy (Game Corporation bootleg)",       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // missing coins, can be played using service to coin
 
-GAME( 1986, kicknrun, 0,        kicknrun,       kicknrun,     kikikai_state,            empty_init, ROT0,  "Taito Corporation",          "Kick and Run (World)",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1986, kicknrunu,kicknrun, kicknrun,       kicknrun,     kikikai_state,            empty_init, ROT0,  "Taito America Corp",         "Kick and Run (US)",                           MACHINE_SUPPORTS_SAVE )
-GAME( 1986, mexico86, kicknrun, mexico86_68705, kicknrun,     mexico86_state,           empty_init, ROT0,  "bootleg",                    "Mexico 86 (bootleg of Kick and Run) (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, mexico86a,kicknrun, mexico86_68705, kicknrun,     mexico86_state,           empty_init, ROT0,  "bootleg",                    "Mexico 86 (bootleg of Kick and Run) (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, kicknrun,  0,        kicknrun, kicknrun, kikikai_state,  empty_init, ROT0,  "Taito Corporation",          "Kick and Run (World)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1986, kicknrunu, kicknrun, kicknrun, kicknrun, kikikai_state,  empty_init, ROT0,  "Taito America Corp",         "Kick and Run (US)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1986, mexico86,  kicknrun, mexico86, kicknrun, mexico86_state, empty_init, ROT0,  "bootleg",                    "Mexico 86 (bootleg of Kick and Run) (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, mexico86a, kicknrun, mexico86, kicknrun, mexico86_state, empty_init, ROT0,  "bootleg",                    "Mexico 86 (bootleg of Kick and Run) (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
