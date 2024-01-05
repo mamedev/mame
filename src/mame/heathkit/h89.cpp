@@ -43,10 +43,10 @@
 
 #include "emu.h"
 
+#include "h_88_cass.h"
+#include "intr_cntrl.h"
 #include "tlb.h"
 #include "z37_fdc.h"
-#include "intr_cntrl.h"
-#include "h_88_cass.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/ins8250.h"
@@ -65,10 +65,13 @@
 
 namespace {
 
-class h89_state : public driver_device
+/**
+ * Base Heathkit H89 functionality
+ */
+class h89_base_state : public driver_device
 {
-public:
-	h89_state(const machine_config &mconfig, device_type type, const char *tag):
+protected:
+	h89_base_state(const machine_config &mconfig, device_type type, const char *tag):
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_maincpu_region(*this, "maincpu"),
@@ -76,8 +79,6 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_floppy_ram(*this, "floppyram"),
 		m_tlbc(*this, "tlbc"),
-		m_h37(*this, "h37"),
-		m_cassette(*this, "h_88_5"),
 		m_intr_socket(*this, "intr_socket"),
 		m_console(*this, "console"),
 		m_serial1(*this, "serial1"),
@@ -89,19 +90,12 @@ public:
 
 	void h89_base(machine_config &config);
 
-	void h88(machine_config &config);
-	void h89(machine_config &config);
-
-private:
-
 	required_device<z80_device> m_maincpu;
 	required_memory_region m_maincpu_region;
 	memory_view m_mem_view;
 	required_device<ram_device> m_ram;
 	required_shared_ptr<uint8_t> m_floppy_ram;
 	required_device<heath_tlb_connector> m_tlbc;
-	optional_device<heath_z37_fdc_device> m_h37;
-	optional_device<heath_h_88_cass_device> m_cassette;
 	required_device<heath_intr_socket> m_intr_socket;
 	required_device<ins8250_device> m_console;
 	required_device<ins8250_device> m_serial1;
@@ -149,14 +143,58 @@ private:
 	uint8_t m1_r(offs_t offset);
 
 	void h89_base_io(address_map &map);
-	void h89_io(address_map &map);
-	void h88_io(address_map &map);
 
 	uint8_t raise_NMI_r();
 	void raise_NMI_w(uint8_t data);
 	void console_intr(uint8_t data);
 	void reset_line(int data);
 	void reset_single_step_state();
+};
+
+/**
+ * Heathkit H88
+ *  - BIOS MTR-88
+ *  - H-88-5 Cassette Interface Board
+ *
+ */
+class h88_state : public h89_base_state
+{
+public:
+	h88_state(const machine_config &mconfig, device_type type, const char *tag):
+		h89_base_state(mconfig, type, tag),
+		m_cassette(*this, "h_88_5")
+	{
+	}
+
+	void h88(machine_config &config);
+
+protected:
+	required_device<heath_h_88_cass_device> m_cassette;
+
+	void h88_io(address_map &map);
+};
+
+
+/**
+ * Heathkit H89
+ *  - Z-89-37 Soft-sectored Floppy Controller
+ *
+ */
+class h89_state : public h89_base_state
+{
+public:
+	h89_state(const machine_config &mconfig, device_type type, const char *tag):
+		h89_base_state(mconfig, type, tag),
+		m_h37(*this, "h37")
+	{
+	}
+
+	void h89(machine_config &config);
+
+protected:
+	required_device<heath_z37_fdc_device> m_h37;
+
+	void h89_io(address_map &map);
 };
 
 /*
@@ -195,7 +233,7 @@ private:
   -------------  0k              -------------  0k
 
 */
-void h89_state::h89_mem(address_map &map)
+void h89_base_state::h89_mem(address_map &map)
 {
 	map.unmap_value_high();
 
@@ -216,12 +254,12 @@ void h89_state::h89_mem(address_map &map)
 	m_mem_view[1](0x1800, 0x1fff).rom().region("maincpu", 0x1800).unmapw();
 }
 
-void h89_state::map_fetch(address_map &map)
+void h89_base_state::map_fetch(address_map &map)
 {
-	map(0x0000, 0xffff).r(FUNC(h89_state::m1_r));
+	map(0x0000, 0xffff).r(FUNC(h89_base_state::m1_r));
 }
 
-uint8_t h89_state::m1_r(offs_t offset)
+uint8_t h89_base_state::m1_r(offs_t offset)
 {
 	uint8_t data = m_program.read_byte(offset);
 
@@ -268,7 +306,7 @@ uint8_t h89_state::m1_r(offs_t offset)
     Cassette I/O(MTR-88)     | F8-F9 | 370-371
     NMI                      | FA-FB | 372-373
 */
-void h89_state::h89_base_io(address_map &map)
+void h89_base_state::h89_base_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
@@ -298,37 +336,31 @@ void h89_state::h89_base_io(address_map &map)
 	map(0xe8, 0xef).rw(m_console, FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
 
 	// ports defined on the H8. On the H89, access to these addresses causes a NMI
-	map(0xf0, 0xf1).rw(FUNC(h89_state::raise_NMI_r),FUNC(h89_state::raise_NMI_w));
+	map(0xf0, 0xf1).rw(FUNC(h89_base_state::raise_NMI_r),FUNC(h89_base_state::raise_NMI_w));
 
 	// General Purpose Port (GPP)
-	map(0xf2, 0xf2).w(FUNC(h89_state::port_f2_w)).portr("SW501");
+	map(0xf2, 0xf2).w(FUNC(h89_base_state::port_f2_w)).portr("SW501");
 
 	// port defined on the H8. On the H89, access to these addresses causes a NMI
-	map(0xfa, 0xfb).rw(FUNC(h89_state::raise_NMI_r), FUNC(h89_state::raise_NMI_w));
+	map(0xfa, 0xfb).rw(FUNC(h89_base_state::raise_NMI_r), FUNC(h89_base_state::raise_NMI_w));
+}
+
+void h88_state::h88_io(address_map &map)
+{
+	h89_base_state::h89_base_io(map);
+
+	// Cassette I/O (uses 0xf8 - 0xf9) - Requires MTR-88 ROM
+	map(0xf8, 0xf9).rw(m_cassette, FUNC(heath_h_88_cass_device::read), FUNC(heath_h_88_cass_device::write));
 }
 
 void h89_state::h89_io(address_map &map)
 {
-	h89_base_io(map);
+	h89_base_state::h89_base_io(map);
 
-	// Disk I/O #1 - 0170-0173 (0x78-0x7b)
-	//   Options
-	//     - H37 5-1/4" Soft-sectored Controller - Requires MTR-90 ROM
-	//     - H47 Dual 8" Drives - Requires MTR-89 or MTR-90 ROM
-	//     - H67 8" Hard disk + 8" Floppy Drives - Requires MTR-90 ROM
+	// H37 5-1/4" Soft-sectored Controller - Requires MTR-90 ROM
 	map(0x78, 0x7b).rw(m_h37, FUNC(heath_z37_fdc_device::read), FUNC(heath_z37_fdc_device::write));
 }
 
-void h89_state::h88_io(address_map &map)
-{
-	h89_base_io(map);
-
-	// Cassette I/O (uses 0xf8 - 0xf9) - Requires MTR-88 ROM
-	map(0xf8, 0xf9).rw(m_cassette, FUNC(heath_h_88_cass_device::read), FUNC(heath_h_88_cass_device::write));
-
-	// 5-1/4" Hard-sectored Controller - only other card supported MTR-88.
-	// map(0x7c, 0x7f)
-}
 
 // Input ports
 static INPUT_PORTS_START( h88 )
@@ -336,6 +368,7 @@ static INPUT_PORTS_START( h88 )
 	PORT_START("SW501")
 	// MTR-88  (444-40)
 	PORT_DIPNAME( 0x1f, 0x00, DEF_STR( Unused ) )               PORT_DIPLOCATION("SW501:1,2,3,4,5")
+	PORT_DIPSETTING( 0x00, "Undefined" )
 	PORT_DIPNAME( 0x20, 0x20, "Perform memory test at start" )  PORT_DIPLOCATION("SW501:6")
 	PORT_DIPSETTING( 0x20, DEF_STR( No ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( Yes ) )
@@ -535,7 +568,7 @@ static INPUT_PORTS_START( h89 )
 INPUT_PORTS_END
 
 
-void h89_state::machine_start()
+void h89_base_state::machine_start()
 {
 	save_item(NAME(m_gpp));
 	save_item(NAME(m_rom_enabled));
@@ -582,8 +615,7 @@ void h89_state::machine_start()
 	}
 }
 
-
-void h89_state::machine_reset()
+void h89_base_state::machine_reset()
 {
 	m_rom_enabled = true;
 	m_timer_intr_enabled = true;
@@ -618,24 +650,24 @@ void h89_state::machine_reset()
 	update_mem_view();
 }
 
-uint8_t h89_state::raise_NMI_r()
+uint8_t h89_base_state::raise_NMI_r()
 {
 	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::from_usec(2));
 
 	return 0x00;
 }
 
-void h89_state::raise_NMI_w(uint8_t)
+void h89_base_state::raise_NMI_w(uint8_t)
 {
 	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::from_usec(2));
 }
 
-void h89_state::console_intr(uint8_t data)
+void h89_base_state::console_intr(uint8_t data)
 {
 	m_intr_socket->set_irq_level(3, data);
 }
 
-void h89_state::reset_line(int data)
+void h89_base_state::reset_line(int data)
 {
 	if (bool(data))
 	{
@@ -644,7 +676,7 @@ void h89_state::reset_line(int data)
 	m_maincpu->set_input_line(INPUT_LINE_RESET, data);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(h89_state::h89_irq_timer)
+TIMER_DEVICE_CALLBACK_MEMBER(h89_base_state::h89_irq_timer)
 {
 	if (m_timer_intr_enabled)
 	{
@@ -652,12 +684,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(h89_state::h89_irq_timer)
 	}
 }
 
-void h89_state::update_mem_view()
+void h89_base_state::update_mem_view()
 {
 	m_mem_view.select(m_rom_enabled ? (m_floppy_ram_wp ? 0 : 1) : 2);
 }
 
-void h89_state::reset_single_step_state()
+void h89_base_state::reset_single_step_state()
 {
 	LOGSS("reset_single_step_state\n");
 	m_555a_latch = false;
@@ -679,7 +711,7 @@ void h89_state::reset_single_step_state()
 //  6    Latched bit I/O 0 on I/O exp connector
 //  7    Latched bit I/O 1 on I/O exp connector
 //
-void h89_state::update_gpp(uint8_t gpp)
+void h89_base_state::update_gpp(uint8_t gpp)
 {
 	uint8_t changed_gpp = gpp ^ m_gpp;
 
@@ -713,7 +745,7 @@ void h89_state::update_gpp(uint8_t gpp)
 }
 
 // General Purpose Port
-void h89_state::port_f2_w(uint8_t data)
+void h89_base_state::port_f2_w(uint8_t data)
 {
 	update_gpp(data);
 
@@ -737,18 +769,21 @@ static void intr_ctrl_options(device_slot_interface &device)
 	device.option_add("h37", HEATH_Z37_INTR_CNTRL);
 }
 
-void h89_state::h89_base(machine_config &config)
+void h89_base_state::h89_base(machine_config &config)
 {
 	// basic machine hardware
 	Z80(config, m_maincpu, H89_CLOCK);
-	m_maincpu->set_m1_map(&h89_state::map_fetch);
-	m_maincpu->set_memory_map(&h89_state::h89_mem);
+	m_maincpu->set_m1_map(&h89_base_state::map_fetch);
+	m_maincpu->set_memory_map(&h89_base_state::h89_mem);
 	m_maincpu->set_irq_acknowledge_callback("intr_socket", FUNC(heath_intr_socket::irq_callback));
 
 	RAM(config, m_ram).set_default_size("64K").set_extra_options("16K,32K,48K").set_default_value(0x00);
 
+	HEATH_INTR_SOCKET(config, m_intr_socket, intr_ctrl_options, nullptr);
+	m_intr_socket->irq_line_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+
 	INS8250(config, m_console, INS8250_CLOCK);
-	m_console->out_int_callback().set(FUNC(h89_state::console_intr));
+	m_console->out_int_callback().set(FUNC(h89_base_state::console_intr));
 
 	HEATH_TLB_CONNECTOR(config, m_tlbc, tlb_options, "heath");
 
@@ -760,7 +795,7 @@ void h89_state::h89_base(machine_config &config)
 	m_tlbc->rts_callback().set(m_console, FUNC(ins8250_uart_device::cts_w));
 	m_tlbc->dtr_callback().set(m_console, FUNC(ins8250_uart_device::dsr_w));
 
-	m_tlbc->reset_cb().set(FUNC(h89_state::reset_line));
+	m_tlbc->reset_cb().set(FUNC(h89_base_state::reset_line));
 
 	// H-88-3 3-port serial board
 	INS8250(config, m_serial1, INS8250_CLOCK);
@@ -768,16 +803,16 @@ void h89_state::h89_base(machine_config &config)
 	INS8250(config, m_serial3, INS8250_CLOCK);
 
 	// H89 interrupt interval is 2mSec
-	TIMER(config, "irq_timer", 0).configure_periodic(FUNC(h89_state::h89_irq_timer), attotime::from_msec(2));
+	TIMER(config, "irq_timer", 0).configure_periodic(FUNC(h89_base_state::h89_irq_timer), attotime::from_msec(2));
 }
 
-void h89_state::h88(machine_config &config)
+void h88_state::h88(machine_config &config)
 {
-	h89_base(config);
-	m_maincpu->set_io_map(&h89_state::h88_io);
+	h89_base_state::h89_base(config);
+	m_maincpu->set_io_map(&h88_state::h88_io);
 
-	HEATH_INTR_SOCKET(config, m_intr_socket, intr_ctrl_options, "original", true);
-	m_intr_socket->irq_line_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	subdevice<heath_intr_socket>("intr_socket")->set_default_option("original");
+	subdevice<heath_intr_socket>("intr_socket")->set_fixed(true);
 
 	// H-88-5 Cassette interface board
 	HEATH_H88_CASS(config, m_cassette, H89_CLOCK);
@@ -785,11 +820,11 @@ void h89_state::h88(machine_config &config)
 
 void h89_state::h89(machine_config &config)
 {
-	h89_base(config);
+	h89_base_state::h89_base(config);
 	m_maincpu->set_io_map(&h89_state::h89_io);
 
-	HEATH_INTR_SOCKET(config, m_intr_socket, intr_ctrl_options, "h37", true);
-	m_intr_socket->irq_line_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	subdevice<heath_intr_socket>("intr_socket")->set_default_option("h37");
+	subdevice<heath_intr_socket>("intr_socket")->set_fixed(true);
 
 	// Z-89-37 Soft-sectored controller
 	HEATH_Z37_FDC(config, m_h37);
@@ -843,5 +878,5 @@ ROM_END
 // Driver
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY          FULLNAME        FLAGS
+COMP( 1979, h88,  h89,    0,      h88,     h88,   h88_state, empty_init, "Heath Company", "Heathkit H88", MACHINE_SUPPORTS_SAVE)
 COMP( 1979, h89,  0,      0,      h89,     h89,   h89_state, empty_init, "Heath Company", "Heathkit H89", MACHINE_SUPPORTS_SAVE)
-COMP( 1979, h88,  h89,    0,      h88,     h88,   h89_state, empty_init, "Heath Company", "Heathkit H88", MACHINE_SUPPORTS_SAVE)

@@ -11,9 +11,9 @@
 
 #pragma once
 
+#include "imagedev/cassette.h"
 #include "machine/i8251.h"
 #include "machine/timer.h"
-#include "imagedev/cassette.h"
 
 #include "formats/h8_cas.h"
 
@@ -42,7 +42,7 @@ protected:
 	required_device<cassette_image_device> m_cass_player;
 	required_device<cassette_image_device> m_cass_recorder;
 
-	u8 m_cass_data[4]{};
+	u8 m_cass_data[4];
 	bool m_cassbit;
 	bool m_cassold;
 };

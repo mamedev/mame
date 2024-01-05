@@ -16,17 +16,17 @@
 
 #include "speaker.h"
 
-#define LOG_REG   (1U << 0)
-#define LOG_LINES (1U << 1)
-#define LOG_CASS  (1U << 2)
-#define LOG_FUNC  (1U << 3)
+#define LOG_REG   (1U << 1)
+#define LOG_LINES (1U << 2)
+#define LOG_CASS  (1U << 3)
+#define LOG_FUNC  (1U << 4)
 //#define VERBOSE (0xff)
 
 #include "logmacro.h"
 
 #define LOGREG(...)        LOGMASKED(LOG_REG, __VA_ARGS__)
 #define LOGLINES(...)      LOGMASKED(LOG_LINES, __VA_ARGS__)
-#define LOGCASS(...)       LOGMASKED(LOG_CASS,    __VA_ARGS__)
+#define LOGCASS(...)       LOGMASKED(LOG_CASS, __VA_ARGS__)
 #define LOGFUNC(...)       LOGMASKED(LOG_FUNC, __VA_ARGS__)
 
 #ifdef _MSC_VER
@@ -84,7 +84,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(heath_h_88_cass_device::kansas_w)
 
 TIMER_DEVICE_CALLBACK_MEMBER(heath_h_88_cass_device::kansas_r)
 {
-	/* cassette - turn 1200/2400Hz to a bit */
+	// cassette - turn 1200/2400Hz to a bit
 	m_cass_data[1]++;
 	u8 cass_ws = (m_cass_player->input() > +0.03) ? 1 : 0;
 
@@ -129,6 +129,7 @@ void heath_h_88_cass_device::device_reset()
 	m_cassold = 0;
 	m_cass_data[0] = 0;
 	m_cass_data[1] = 0;
+	m_cass_data[2] = 0;
 	m_cass_data[3] = 0;
 
 	m_uart->write_cts(0);
