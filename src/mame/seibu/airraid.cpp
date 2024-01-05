@@ -494,8 +494,8 @@ ROM_START( airraid )
 	ROM_LOAD( "4.7f",    0x08000, 0x08000, CRC(3cd715b4) SHA1(da735fb5d262908ddf7ed7dacdea68899f1723ff) )
 
 	ROM_REGION( 0x0200, "proms", 0 ) // this PCB type has different PROMs when compared to the cshootert hardware PCB where they were dumped
-	ROM_LOAD( "pr.c19",  0x0000, 0x0200, NO_DUMP )
-	ROM_LOAD( "6308.a13",  0x0000, 0x0100, NO_DUMP )
+	ROM_LOAD( "pr.c19",   0x0000, 0x0100, NO_DUMP )
+	ROM_LOAD( "6308.a13", 0x0100, 0x0100, NO_DUMP )
 
 	ROM_REGION( 0x02000, "airraid_vid:tx_gfx", 0 ) // TX Layer
 	ROM_LOAD( "3.13e",   0x00000, 0x02000, CRC(672ec0e8) SHA1(a11cd90d6494251ceee3bc7c72f4e7b1580b77e2) )
@@ -575,8 +575,8 @@ ROM_START( cshooter )
 	ROM_LOAD( "4.7f",    0x08000, 0x08000, CRC(3cd715b4) SHA1(da735fb5d262908ddf7ed7dacdea68899f1723ff) ) // 4.g8
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "82s129.c19",  0x0000, 0x0200, CRC(dcd4e66d) SHA1(17f53c7905c20f0c6c0a74ab519b8e4a442835c3) )
-	ROM_LOAD( "63s281.a13",  0x0000, 0x0100, CRC(208d17ca) SHA1(a77d56337bcac8d9a7bc3411239dfb3045e069ec) )
+	ROM_LOAD( "82s129.c19",  0x0000, 0x0100, CRC(dcd4e66d) SHA1(17f53c7905c20f0c6c0a74ab519b8e4a442835c3) )
+	ROM_LOAD( "63s281.a13",  0x0100, 0x0100, CRC(208d17ca) SHA1(a77d56337bcac8d9a7bc3411239dfb3045e069ec) )
 
 	ROM_REGION( 0x02000, "airraid_vid:tx_gfx",  0 ) // TX Layer
 	ROM_LOAD( "3.13e",   0x00000, 0x02000, CRC(704c26d7) SHA1(e5964f409cbc2c4752e3969f3e84ace08d5ad9cb) )
