@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders:David Haywood
 #ifndef MAME_MACHINE_BFG_GU96X8M_K657C2_H
 #define MAME_MACHINE_BFG_GU96X8M_K657C2_H
 
