@@ -12,6 +12,7 @@
 
 #include "emu.h"
 #include "tecmo_spr.h"
+
 #include "screen.h"
 
 
@@ -39,16 +40,15 @@ void tecmo_spr_device::device_reset()
 
 static const uint8_t layout[8][8] =
 {
-	{ 0, 1, 4, 5, 16, 17, 20, 21 },
-	{ 2, 3, 6, 7, 18, 19, 22, 23 },
-	{ 8, 9, 12, 13, 24, 25, 28, 29 },
+	{  0,  1,  4,  5, 16, 17, 20, 21 },
+	{  2,  3,  6,  7, 18, 19, 22, 23 },
+	{  8,  9, 12, 13, 24, 25, 28, 29 },
 	{ 10, 11, 14, 15, 26, 27, 30, 31 },
 	{ 32, 33, 36, 37, 48, 49, 52, 53 },
 	{ 34, 35, 38, 39, 50, 51, 54, 55 },
 	{ 40, 41, 44, 45, 56, 57, 60, 61 },
 	{ 42, 43, 46, 47, 58, 59, 62, 63 }
 };
-
 
 
 
@@ -71,13 +71,9 @@ static const uint8_t layout[8][8] =
 
 static constexpr int NUM_SPRITES = 256;
 
-void tecmo_spr_device::gaiden_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t* spriteram, int sprite_sizey, int spr_offset_y, bool flip_screen)
+void tecmo_spr_device::gaiden_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, const uint16_t *spriteram, int sprite_sizey, int spr_offset_y, bool flip_screen)
 {
-	uint16_t const *source = spriteram;
 	constexpr int SOURCE_INC = 8;
-
-	int count = NUM_SPRITES;
-	int const screenwidth = screen.visible_area().width();
 
 	constexpr int ATTRIBUTES_WORD = 0;
 	constexpr int TILE_NUMBER_WORD = 1;
@@ -85,12 +81,12 @@ void tecmo_spr_device::gaiden_draw_sprites(screen_device &screen, bitmap_ind16 &
 	constexpr int Y_POSITION_WORD = 3;
 	constexpr int X_POSITION_WORD = 4;
 
-	int xmask;
+	int const screenwidth = screen.visible_area().width();
+	int const xmask = (screenwidth >= 512) ? 512 : 256;
 
-	if (screenwidth >= 512)
-		xmask = 512;
-	else
-		xmask = 256;
+	uint16_t const *source = spriteram;
+
+	int count = NUM_SPRITES;
 
 	// draw all sprites from front to back
 	while (count--)
@@ -205,9 +201,7 @@ void tecmo_spr_device::gaiden_draw_sprites(screen_device &screen, bitmap_ind16 &
  *       7 | -------- | unused
 */
 
-
-
-void tecmo_spr_device::draw_sprites_8bit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* spriteram, int size, int video_type, bool flip_screen)
+void tecmo_spr_device::draw_sprites_8bit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *spriteram, int size, int video_type, bool flip_screen)
 {
 	for (int offs = size - 8; offs >= 0; offs -= 8)
 	{
@@ -284,7 +278,7 @@ void tecmo_spr_device::draw_sprites_8bit(screen_device &screen, bitmap_ind16 &bi
 */
 
 
-void tecmo_spr_device::draw_wc90_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* spriteram, int size)
+void tecmo_spr_device::draw_wc90_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *spriteram, int size)
 {
 	// draw all visible sprites of specified priority
 	for (int offs = size - 16; offs >= 0; offs -= 16)
@@ -331,8 +325,7 @@ void tecmo_spr_device::draw_wc90_sprites(screen_device &screen, bitmap_ind16 &bi
 }
 
 
-
-void tecmo_spr_device::tbowl_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int xscroll, uint8_t* spriteram)
+void tecmo_spr_device::tbowl_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int xscroll, const uint8_t *spriteram)
 {
 	for (int offs = 0; offs < 0x800; offs += 8)
 	{

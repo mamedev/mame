@@ -27,16 +27,16 @@ public:
 	void set_yoffset(int yoffset) { m_yoffset = yoffset; }
 
 	// gaiden.cpp / spbactn.cpp / tecmo16.cpp sprites
-	void gaiden_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t* spriteram, int sprite_sizey, int spr_offset_y, bool flip_screen);
+	void gaiden_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, const uint16_t *spriteram, int sprite_sizey, int spr_offset_y, bool flip_screen);
 
 	// tecmo.cpp sprites
-	void draw_sprites_8bit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* spriteram, int size, int video_type, bool flip_screen);
+	void draw_sprites_8bit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *spriteram, int size, int video_type, bool flip_screen);
 
 	// wc90.cpp sprites
-	void draw_wc90_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* spriteram, int size);
+	void draw_wc90_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *spriteram, int size);
 
 	// tbowl.cpp sprites
-	void tbowl_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int xscroll, uint8_t* spriteram);
+	void tbowl_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int xscroll, const uint8_t *spriteram);
 
 protected:
 	virtual void device_start() override;
