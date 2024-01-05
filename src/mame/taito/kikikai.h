@@ -81,11 +81,6 @@ private:
 	required_device<gfxdecode_device>   m_gfxdecode;
 	required_device<palette_device>     m_palette;
 
-	/* queue */
-	//u8 m_queue[64]{};
-	//int m_qfront = 0;
-	//int m_qstate = 0;
-
 	/* Kiki KaiKai / Kick 'n Run MCU */
 	uint8_t    m_port3_in = 0U;
 	uint8_t    m_port1_out = 0U;
@@ -125,5 +120,4 @@ private:
 	u8       m_port_b_out = 0U;
 	int      m_address = 0;
 	u8       m_latch = 0U;
-
 };

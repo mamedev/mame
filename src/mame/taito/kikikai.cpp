@@ -500,7 +500,6 @@ void kikikai_state::machine_start()
 	membank("bank1")->configure_entries(0, 6, &ROM[0x08000], 0x4000);
 
 	save_item(NAME(m_charbank));
-
 }
 
 void mexico86_state::machine_start()
@@ -520,7 +519,7 @@ void mexico86_state::machine_start()
 
 void kikikai_state::machine_reset()
 {
-	/*TODO: check the PCB and see how the halt / reset lines are connected. */
+	// TODO: check the PCB and see how the halt / reset lines are connected.
 	if (m_subcpu != nullptr)
 		m_subcpu->set_input_line(INPUT_LINE_RESET, (ioport("DSW1")->read() & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 
@@ -539,14 +538,14 @@ void mexico86_state::machine_reset()
 void kikikai_state::base(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 24000000/4); /* 6 MHz, Uses clock divided 24MHz OSC */
+	Z80(config, m_maincpu, 24_MHz_XTAL / 4); /* 6 MHz, Uses clock divided 24MHz OSC */
 	m_maincpu->set_addrmap(AS_PROGRAM, &kikikai_state::main_map);
 
-	Z80(config, m_audiocpu, 24000000/4); /* 6 MHz, Uses clock divided 24MHz OSC */
+	Z80(config, m_audiocpu, 24_MHz_XTAL / 4); /* 6 MHz, Uses clock divided 24MHz OSC */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &kikikai_state::sound_map);
 	m_audiocpu->set_vblank_int("screen", FUNC(kikikai_state::irq0_line_hold));
 
-	Z80(config, m_subcpu, 8000000/2); /* 4 MHz, Uses 8Mhz OSC */
+	Z80(config, m_subcpu, 8_MHz_XTAL / 2); /* 4 MHz, Uses 8Mhz OSC */
 	m_subcpu->set_addrmap(AS_PROGRAM, &kikikai_state::kicknrun_sub_cpu_map);
 	m_subcpu->set_vblank_int("screen", FUNC(kikikai_state::irq0_line_hold));
 
@@ -555,7 +554,7 @@ void kikikai_state::base(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(24000000/4, 384, 0, 256, 264, 16, 240);
+	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0, 256, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(kikikai_state::screen_update_kicknrun));
 	m_screen->set_palette(m_palette);
 
@@ -565,7 +564,7 @@ void kikikai_state::base(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	YM2203(config, m_ymsnd, 3000000);
+	YM2203(config, m_ymsnd, 24_MHz_XTAL / 8);
 	m_ymsnd->port_a_read_callback().set_ioport("DSW0");
 	m_ymsnd->port_b_read_callback().set_ioport("DSW1");
 	m_ymsnd->add_route(0, "mono", 0.30);
@@ -580,7 +579,7 @@ void kikikai_state::add_mcu(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(kikikai_state::kikikai_interrupt));
 	m_maincpu->set_irq_acknowledge_callback(FUNC(kikikai_state::mcram_vect_r));
 
-	M6801U4(config, m_mcu, XTAL(4'000'000)); // xtal is 4MHz, divided by 4 internally
+	M6801U4(config, m_mcu, 24_MHz_XTAL / 8);
 	m_mcu->in_p1_cb().set_ioport("IN0").invert();
 	m_mcu->out_p1_cb().set(FUNC(kikikai_state::kikikai_mcu_port1_w));
 	m_mcu->out_p2_cb().set(FUNC(kikikai_state::kikikai_mcu_port2_w));
@@ -616,7 +615,7 @@ void mexico86_state::mexico86_68705(machine_config &config)
 	base(config);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(mexico86_state::mcram_vect_r));
 
-	M68705P3(config, m_68705mcu, 4000000); /* xtal is 4MHz, divided by 4 internally */
+	M68705P3(config, m_68705mcu, 4_MHz_XTAL); /* xtal is 4MHz, divided by 4 internally */
 	m_68705mcu->portc_r().set_ioport("IN0");
 	m_68705mcu->porta_w().set(FUNC(mexico86_state::mexico86_68705_port_a_w));
 	m_68705mcu->portb_w().set(FUNC(mexico86_state::mexico86_68705_port_b_w));

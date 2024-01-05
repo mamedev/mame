@@ -101,8 +101,8 @@ void mexico86_state::mexico86_68705_port_b_w(offs_t offset, u8 data, u8 mem_mask
 		}
 		else // write
 		{
-				//logerror("%s: 68705 write %02x to address %04x\n",machine().describe_context(), port_a_value, m_address);
-				m_mcu_sharedram[m_address] = port_a_value;
+			//logerror("%s: 68705 write %02x to address %04x\n",machine().describe_context(), port_a_value, m_address);
+			m_mcu_sharedram[m_address] = port_a_value;
 		}
 	}
 
