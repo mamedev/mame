@@ -53998,9 +53998,9 @@ ATK test: OK
 		<publisher>Gremlin Graphics</publisher>
 		<notes><![CDATA[
 Red screen, [FDC] dsksync (fixed)
-No [Paula] sound
+No [Paula] sound (fixed)
 [Denise] sprites flickers when hitting the bottom edge
-Status bar don't draw score/lives text [Denise]
+Status bar don't draw score/lives text [Denise] or [Copper]
 Stage 2 (Wild West) draws black background [Copper]
 https://codetapper.com/amiga/sprite-tricks/videokid/
 ATK test: failed
@@ -56402,11 +56402,13 @@ ATK test: failed
 		<publisher>Ocean</publisher>
 		<notes><![CDATA[
 White screen [FDC] dsksync (fixed)
-No [Paula] sounds
+No [Paula] sounds (fixed)
 Gameplay doesn't draw left-right ropes [Copper] sprites
 https://codetapper.com/amiga/sprite-tricks/wwf-wrestlemania/
 ATK test: failed
 ]]></notes>
+		<info name="usage" value="Dislikes mouse connected in any port for practice mode (wants joystick)" />
+
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="851712">
@@ -56432,6 +56434,8 @@ ATK test: failed
 Pink screen [FDC] dsksync (fixed)
 ATK test: failed
 ]]></notes>
+		<info name="usage" value="Dislikes mouse connected in any port for practice mode (versus)" />
+
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="852144">
