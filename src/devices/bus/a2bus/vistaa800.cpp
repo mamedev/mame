@@ -74,7 +74,6 @@ private:
     // fdc handlers
 	void fdc_intrq_w(uint8_t state);
 	void fdc_drq_w(uint8_t state);
-	void fdc_sso_w(uint8_t state);
 
 	required_device<fd1797_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
@@ -88,7 +87,7 @@ private:
 	bool m_dmaenable_write;
 	uint8_t m_density;
 	uint8_t m_side;
-	uint8_t m_sso;
+	floppy_image_device *m_selected_floppy;
 };
 
 
@@ -138,7 +137,6 @@ void a2bus_vistaa800_device::device_add_mconfig(machine_config &config)
 
 	m_fdc->intrq_wr_callback().set(FUNC(a2bus_vistaa800_device::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(a2bus_vistaa800_device::fdc_drq_w));
-	m_fdc->sso_wr_callback().set(FUNC(a2bus_vistaa800_device::fdc_sso_w));
 }
 
 void a2bus_vistaa800_device::device_start()
@@ -148,7 +146,7 @@ void a2bus_vistaa800_device::device_start()
 	save_item(NAME(m_dmaenable_write));
 	save_item(NAME(m_density));
 	save_item(NAME(m_side));
-	save_item(NAME(m_sso));
+	m_selected_floppy = nullptr;
 }
 
 void a2bus_vistaa800_device::device_reset()
@@ -158,7 +156,6 @@ void a2bus_vistaa800_device::device_reset()
 	m_dmaenable_write = false;
 	m_density = 0;
 	m_side = 0;
-	m_sso = 0;
 }
 
 //----------------------------------------------
@@ -202,11 +199,10 @@ uint8_t a2bus_vistaa800_device::read_c0nx(uint8_t offset)
 
 		case 0xf:
 			if (m_dmaenable_read || m_dmaenable_write)
-			{
-				result = result | 0x80;
-			}
+				result |= 0x80;
 
-			result = result | (m_side << 5); // TODO: check this
+			if (m_selected_floppy)
+				result |= (m_selected_floppy->twosid_r() << 6);
 			break;
 
 		default:
@@ -219,8 +215,6 @@ uint8_t a2bus_vistaa800_device::read_c0nx(uint8_t offset)
 
 void a2bus_vistaa800_device::write_c0nx(uint8_t offset, uint8_t data)
 {
-	floppy_image_device *floppy = nullptr;
-
 	switch (offset)
 	{
 		case 0:
@@ -260,17 +254,23 @@ void a2bus_vistaa800_device::write_c0nx(uint8_t offset, uint8_t data)
 			m_fdc->dden_w(m_density);
 
 			m_side = BIT(data, 6);
-			
-			if (BIT(data, 0)) floppy = m_floppy0->get_device();
-			if (BIT(data, 1)) floppy = m_floppy1->get_device();
-			if (BIT(data, 2)) floppy = m_floppy2->get_device();
-			if (BIT(data, 3)) floppy = m_floppy3->get_device();
-			m_fdc->set_floppy(floppy);
 
-			if (floppy)
+			if (BIT(data, 0))
+				m_selected_floppy = m_floppy0->get_device();
+			else if (BIT(data, 1))
+				m_selected_floppy = m_floppy1->get_device();
+			else if (BIT(data, 2))
+				m_selected_floppy = m_floppy2->get_device();
+			else if (BIT(data, 3))
+				m_selected_floppy = m_floppy3->get_device();
+			else
+				m_selected_floppy = nullptr;
+			m_fdc->set_floppy(m_selected_floppy);
+
+			if (m_selected_floppy)
 			{
-				floppy->ss_w(m_side);
-				floppy->mon_w(0);
+				m_selected_floppy->ss_w(m_side);
+				m_selected_floppy->mon_w(0);
 			}
 			break;
 
@@ -304,25 +304,19 @@ void a2bus_vistaa800_device::fdc_drq_w(uint8_t state)
 {
 	if (state)
 	{
-		if (m_dmaenable_read) // TODO: verify if both can be turned on at the same time, and which has priority
+		if (m_dmaenable_read) // read has priority if both were enabled
 		{
 			uint8_t data = m_fdc->data_r();
 			slot_dma_write(m_dmaaddr, data);
 			m_dmaaddr++;
 		}
-
-		if (m_dmaenable_write)
+		else if (m_dmaenable_write)
 		{
 			uint8_t data = slot_dma_read(m_dmaaddr);
 			m_fdc->data_w(data);
 			m_dmaaddr++;
 		}
 	}
-}
-
-void a2bus_vistaa800_device::fdc_sso_w(uint8_t state)
-{
-	m_sso = state; // TODO: needs to be verified on real h/w. This is meant to be from the drive
 }
 
 } // anonymous namespace
