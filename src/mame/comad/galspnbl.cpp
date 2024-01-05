@@ -182,7 +182,7 @@ void galspnbl_state::mix_sprite_layer(screen_device &screen, bitmap_ind16 &bitma
 uint32_t galspnbl_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_sprite_bitmap.fill(0, cliprect);
-	m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode->gfx(1), cliprect, m_spriteram, 0, 0, flip_screen(), m_sprite_bitmap);
+	m_sprgen->gaiden_draw_sprites(screen, m_sprite_bitmap, cliprect, m_spriteram, 0, 0, flip_screen());
 
 
 	draw_background(bitmap, cliprect);
@@ -353,29 +353,20 @@ INPUT_PORTS_END
 static const gfx_layout tilelayout =
 {
 	16,8,
-	RGN_FRAC(1,2),
+	RGN_FRAC(1,1),
 	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, RGN_FRAC(1,2)+0*4, RGN_FRAC(1,2)+1*4, 2*4, 3*4, RGN_FRAC(1,2)+2*4, RGN_FRAC(1,2)+3*4,
-			16*8+0*4, 16*8+1*4, 16*8+RGN_FRAC(1,2)+0*4, 16*8+RGN_FRAC(1,2)+1*4, 16*8+2*4, 16*8+3*4, 16*8+RGN_FRAC(1,2)+2*4, 16*8+RGN_FRAC(1,2)+3*4 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	32*8
-};
-
-static const gfx_layout spritelayout =
-{
-	8,8,
-	RGN_FRAC(1,2),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0, 4, RGN_FRAC(1,2)+0, RGN_FRAC(1,2)+4, 8+0, 8+4, 8+RGN_FRAC(1,2)+0, 8+RGN_FRAC(1,2)+4 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	16*8
+	{ STEP4(0, 1) },
+	{ STEP8(0, 4), STEP8(4*8*8, 4) },
+	{ STEP8(0, 4*8) },
+	16*8*4
 };
 
 static GFXDECODE_START( gfx_galspnbl )
 	GFXDECODE_ENTRY( "tiles",   0, tilelayout,   512, 16 )
-	GFXDECODE_ENTRY( "sprites", 0, spritelayout,   0, 16 )
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_galspnbl_spr )
+	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_packed_msb, 0, 16 )
 GFXDECODE_END
 
 
@@ -401,7 +392,7 @@ void galspnbl_state::galspnbl(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galspnbl);
 	PALETTE(config, m_palette, FUNC(galspnbl_state::palette)).set_format(palette_device::xBGR_444, 1024 + 32768);
 
-	TECMO_SPRITE(config, m_sprgen, 0);
+	TECMO_SPRITE(config, m_sprgen, 0, m_palette, gfx_galspnbl_spr);
 	m_sprgen->set_bootleg(true);
 
 	// sound hardware
@@ -440,12 +431,12 @@ ROM_START( galspnbl )
 	ROM_LOAD( "2.rom",        0x0000, 0x10000, CRC(fae688a7) SHA1(e1ef7abd18f6a820d1a7f0ceb9a9b1a2c7de41f0) )
 
 	ROM_REGION( 0x80000, "tiles", 0 )
-	ROM_LOAD( "17.rom",       0x00000, 0x40000, CRC(7d435701) SHA1(f6a2241c95f101d09b18f550689d125abd3ea9c4) )
-	ROM_LOAD( "18.rom",       0x40000, 0x40000, CRC(136adaac) SHA1(5f5e70a66d256cad9fcdbc5a7fff035f9a3279b9) )
+	ROM_LOAD16_BYTE( "17.rom",       0x00000, 0x40000, CRC(7d435701) SHA1(f6a2241c95f101d09b18f550689d125abd3ea9c4) )
+	ROM_LOAD16_BYTE( "18.rom",       0x00001, 0x40000, CRC(136adaac) SHA1(5f5e70a66d256cad9fcdbc5a7fff035f9a3279b9) )
 
 	ROM_REGION( 0x40000, "sprites", 0 )
-	ROM_LOAD( "15.rom",       0x00000, 0x20000, CRC(4beb840d) SHA1(351cd8da361a55794595d2cf7b0fed9233d0a5a0) )
-	ROM_LOAD( "16.rom",       0x20000, 0x20000, CRC(93d3c610) SHA1(0cf1f311ec2646a436c37e121634731646c06437) )
+	ROM_LOAD16_BYTE( "15.rom",       0x00000, 0x20000, CRC(4beb840d) SHA1(351cd8da361a55794595d2cf7b0fed9233d0a5a0) )
+	ROM_LOAD16_BYTE( "16.rom",       0x00001, 0x20000, CRC(93d3c610) SHA1(0cf1f311ec2646a436c37e121634731646c06437) )
 
 	ROM_REGION( 0x40000, "oki", 0 ) // samples
 	ROM_LOAD( "1.rom",        0x00000, 0x40000, CRC(93c06d3d) SHA1(8620d274ca7824e7e72a1ad1da3eaa804d550653) )
@@ -466,12 +457,12 @@ ROM_START( hotpinbl ) // PCB silkscreened COMAD INDUSTRY CO.,LTD 950804 MADE IN 
 	ROM_LOAD( "hp_02.bin",    0x0000, 0x10000, CRC(82698269) SHA1(5e27e89f1bdd7c3793d40867c50981f5fac0a7fb) )
 
 	ROM_REGION( 0x80000, "tiles", 0 )
-	ROM_LOAD( "hp_13.bin",    0x00000, 0x40000, CRC(d53b64b9) SHA1(347b6ec908e23f848e98eed46fb34b49b728556b) )
-	ROM_LOAD( "hp_14.bin",    0x40000, 0x40000, CRC(2fe3fcee) SHA1(29f96aa3dded6cb0b2fe3d9507fb5638e9778ef3) )
+	ROM_LOAD16_BYTE( "hp_13.bin",    0x00000, 0x40000, CRC(d53b64b9) SHA1(347b6ec908e23f848e98eed46fb34b49b728556b) )
+	ROM_LOAD16_BYTE( "hp_14.bin",    0x00001, 0x40000, CRC(2fe3fcee) SHA1(29f96aa3dded6cb0b2fe3d9507fb5638e9778ef3) )
 
 	ROM_REGION( 0x40000, "sprites", 0 )
-	ROM_LOAD( "hp_11.bin",    0x00000, 0x20000, CRC(deecd7f1) SHA1(752c944d941bfe8f21d32881f32676999ebc5a7f) )
-	ROM_LOAD( "hp_12.bin",    0x20000, 0x20000, CRC(5fd603c2) SHA1(864686cd1ba5beb6cebfd394b60620106c929abd) )
+	ROM_LOAD16_BYTE( "hp_11.bin",    0x00000, 0x20000, CRC(deecd7f1) SHA1(752c944d941bfe8f21d32881f32676999ebc5a7f) )
+	ROM_LOAD16_BYTE( "hp_12.bin",    0x00001, 0x20000, CRC(5fd603c2) SHA1(864686cd1ba5beb6cebfd394b60620106c929abd) )
 
 	ROM_REGION( 0x40000, "oki", 0 ) // samples
 	ROM_LOAD( "hp_01.bin",    0x00000, 0x40000, CRC(93c06d3d) SHA1(8620d274ca7824e7e72a1ad1da3eaa804d550653) )
