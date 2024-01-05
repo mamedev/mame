@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders:James Wallace, blueonesarefaster
 /**********************************************************************
+
+    This is derived from bfm_bda by James Wallace.
 
     Bell Fruit Games 96x8 Dot matrix VFD module interface and emulation.
 
@@ -414,29 +416,31 @@ void bfm_gu96x8m_k657c2_device::write_char(int data)
 			case LOAD_LED_COLOUR:
 				m_load_extra_data = LOAD_COMPLETE;
 
-				if(data == 0xda)
+				switch(data)
 				{
-					m_led_colour |= 1;
-				}
-				else if(data == 0xdb)
-				{
-					m_led_colour &= ~1;
-				}
-				else if(data == 0xde)
-				{
-					m_led_colour |= 2;
-				}
-				else if(data == 0xdf)
-				{
-					m_led_colour &= ~2;
-				}
-				else if(data == 0xdc)
-				{
-					m_led_colour |= 4;
-				}
-				else if(data == 0xdd)
-				{
-					m_led_colour &= ~4;
+					case 0xda:
+						m_led_colour |= 1;
+						break;
+
+					case 0xdb:
+						m_led_colour &= ~1;
+						break;
+
+					case 0xde:
+						m_led_colour |= 2;
+						break;
+
+					case 0xdf:
+						m_led_colour &= ~2;
+						break;
+
+					case 0xdc:
+						m_led_colour |= 4;
+						break;
+
+					case 0xdd:
+						m_led_colour &= ~4;
+						break;
 				}
 				break;
 
