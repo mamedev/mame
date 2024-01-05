@@ -788,6 +788,24 @@ void goldstar_state::cm_map(address_map &map)
 	map(0xfc80, 0xffff).ram();
 }
 
+void cmaster_state::cmast92_map(address_map &map)
+{
+	map(0x0000, 0xcfff).rom();
+
+	map(0xe000, 0xefff).ram().share("nvram");
+
+	// TODO: the following ranges are here only to avoid MAME crashing, should be removed and the newer GFX hardware should be emulated
+	map(0xd000, 0xd7ff).ram().w(FUNC(goldstar_state::goldstar_fg_vidram_w)).share("fg_vidram");
+	map(0xd800, 0xdfff).ram().w(FUNC(goldstar_state::goldstar_fg_atrram_w)).share("fg_atrram");
+
+	map(0xf000, 0xf1ff).ram().w(FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xf200, 0xf3ff).ram().w(FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xf400, 0xf5ff).ram().w(FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
+
+	map(0xf800, 0xf87f).ram().share("reel1_scroll");
+	map(0xfa00, 0xfa7f).ram().share("reel2_scroll");
+	map(0xfc00, 0xfc7f).ram().share("reel3_scroll");
+}
 
 void goldstar_state::nfm_map(address_map &map)
 {
@@ -1005,6 +1023,17 @@ void cmaster_state::cmast91_portmap(address_map &map)
 	map(0x22, 0x23).w("aysnd", FUNC(ay8910_device::data_address_w));
 }
 
+void cmaster_state::cmast92_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x02, 0x03).w("aysnd", FUNC(ay8910_device::data_address_w));
+	map(0x20, 0x23).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* DIP switches */
+	map(0x30, 0x30).portr("IN0");
+	map(0x31, 0x31).portr("IN1");
+	map(0x32, 0x32).portr("IN2");
+	// writes to 0x30-0x35 seem to be video related, but different from the other sets in this driver
+}
 
 void cmaster_state::amcoe1_portmap(address_map &map)
 {
@@ -9035,12 +9064,6 @@ void cb3_state::cherrys(machine_config &config)
 	m_gfxdecode->set_info(gfx_cherrys);
 }
 
-void cb3_state::eldoradd(machine_config &config)
-{
-	ncb3(config);
-	m_gfxdecode->set_info(gfx_cm97);
-}
-
 void goldstar_state::wcherry(machine_config &config)
 {
 	/* basic machine hardware */
@@ -9205,6 +9228,21 @@ void cmaster_state::cmast91(machine_config &config)
 	aysnd.port_a_read_callback().set_ioport("DSW4");
 	aysnd.port_b_read_callback().set_ioport("DSW5");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
+}
+
+void cmaster_state::cmast92(machine_config &config)
+{
+	cmast91(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &cmaster_state::cmast92_map);
+	m_maincpu->set_addrmap(AS_IO, &cmaster_state::cmast92_portmap);
+}
+
+void cmaster_state::eldoradd(machine_config &config)
+{
+	cmast92(config);
+
+	m_gfxdecode->set_info(gfx_cm97); // TODO: wrong, needs correct decode
 }
 
 
@@ -12233,7 +12271,7 @@ ROM_START( cll ) // Dyna D9004 PCB
 	ROM_REGION( 0x40000, "user1", ROMREGION_ERASE00 ) // girls GFX
 	ROM_LOAD( "9.bin",  0x00000, 0x40000, NO_DUMP ) // PCB shows the girls when dip 5:1 is on
 
-	// PROMs weren't included in the dump, using cmast91's for now. Colors seems correct, though.
+	// PROMs weren't included in the dump, using cmast91's for now. Colors seem correct, though.
 	ROM_REGION( 0x300, "proms", 0 )
 	ROM_LOAD( "p1.bin", 0x0000, 0x0100, BAD_DUMP CRC(ac529f04) SHA1(5bc92e50c85bb23e609172cc15c430ddea7fdcb5) )
 	ROM_LOAD( "p2.bin", 0x0100, 0x0100, BAD_DUMP CRC(3febce95) SHA1(c7c0fec0fb024ebf7d7365a09d28ba3d0037b0b4) )
@@ -12249,36 +12287,34 @@ ROM_START( cll ) // Dyna D9004 PCB
 	ROM_LOAD( "pld4.bin", 0x0600, 0x0104, NO_DUMP )
 ROM_END
 
-ROM_START( cmast92 )
+ROM_START( cmast92 ) // DYNA D9106B PCB - Seems to be using a different GFX hw
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cm9230d.rom",   0x00000, 0x01000, CRC(214a0a2d) SHA1(2d349e0888ac2da3df954517fdeb9214a3b17ae1) )
-	// I've not checked the rom loading yet
-	ROM_CONTINUE(0x1000,0x1000)
-	ROM_CONTINUE(0x4000,0x1000)
-	ROM_CONTINUE(0x5000,0x1000)
-	ROM_CONTINUE(0x2000,0x1000)
-	ROM_CONTINUE(0x3000,0x1000)
-	ROM_CONTINUE(0x6000,0x1000)
-	ROM_CONTINUE(0x7000,0x1000)
-	ROM_CONTINUE(0x8000,0x1000)
-	ROM_CONTINUE(0x9000,0x1000)
-	ROM_CONTINUE(0xa000,0x1000)
-	ROM_CONTINUE(0xb000,0x1000)
-	ROM_CONTINUE(0xc000,0x1000)
-	ROM_CONTINUE(0xd000,0x1000)
-	ROM_CONTINUE(0xe000,0x1000)
-	ROM_CONTINUE(0xf000,0x1000)
+	ROM_LOAD( "cm9230d.rom",   0x00000, 0x10000, CRC(214a0a2d) SHA1(2d349e0888ac2da3df954517fdeb9214a3b17ae1) ) // V1.2D
 
-	// we only have a program rom :-(
-	ROM_REGION( 0x18000, "gfx1", 0 )
-	ROM_LOAD( "cherry master 92 graphics",  0x00000, 0x8000, NO_DUMP )
-	ROM_REGION( 0x20000, "gfx2", ROMREGION_ERASEFF )
-	ROM_REGION( 0x40000, "user1", ROMREGION_ERASEFF )
-	ROM_REGION( 0x300, "proms", ROMREGION_ERASEFF )
-	ROM_LOAD( "cherry master 92 proms", 0x00000, 0x100, NO_DUMP )
-	ROM_REGION( 0x100, "proms2", ROMREGION_ERASEFF )
+	// the rest of the (P)ROMs were dumped for V1.1D, adding them as bad until it can be verified they're good for this newer version, too
+	ROM_REGION( 0x120000, "gfx", 0 )
+	ROM_LOAD( "dyna dm9105.2h", 0x000000, 0x100000, NO_DUMP )
+	ROM_LOAD( "1h",             0x000000, 0x020000, BAD_DUMP CRC(2ca1ba89) SHA1(dec50bb0f68f03d3433cc3a09eec5ee60f2d096c) )
+
+	ROM_REGION( 0x300, "proms", 0 )
+	ROM_LOAD( "14h", 0x000, 0x100, BAD_DUMP CRC(20e594fe) SHA1(d798f142732e8da6ec9764133955c041d2259f64) )
+	ROM_LOAD( "15h", 0x100, 0x100, BAD_DUMP CRC(83fab238) SHA1(7c5451d69f865a10b63c013169ddbf57405bc3a9) )
+	ROM_LOAD( "16h", 0x200, 0x100, BAD_DUMP CRC(706e7ee6) SHA1(dca1cc0e2c1c27bc211516ad369f557eb4b3980a) )
 ROM_END
 
+ROM_START( cmast92a ) // DYNA D9106B PCB - Seems to be using a different GFX hw
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "15d", 0x00000, 0x10000, CRC(d703c8e5) SHA1(77d8228878b64a299b4b6f3fe3befcea179ca4af) ) // V1.1D
+
+	ROM_REGION( 0x120000, "gfx", 0 )
+	ROM_LOAD( "dyna dm9105.2h", 0x000000, 0x100000, NO_DUMP )
+	ROM_LOAD( "1h",              0x00000, 0x020000, CRC(2ca1ba89) SHA1(dec50bb0f68f03d3433cc3a09eec5ee60f2d096c) )
+
+	ROM_REGION( 0x300, "proms", 0 )
+	ROM_LOAD( "14h", 0x000, 0x100, CRC(20e594fe) SHA1(d798f142732e8da6ec9764133955c041d2259f64) )
+	ROM_LOAD( "15h", 0x100, 0x100, CRC(83fab238) SHA1(7c5451d69f865a10b63c013169ddbf57405bc3a9) )
+	ROM_LOAD( "16h", 0x200, 0x100, CRC(706e7ee6) SHA1(dca1cc0e2c1c27bc211516ad369f557eb4b3980a) )
+ROM_END
 
 /*
 
@@ -16722,6 +16758,8 @@ ROM_END
     -24 MHz xtal.
     -Winbond WF19054y.
     -5 banks of 8 DIP switches, plus an unpopulated location on the PCB for a sixth one.
+
+    Seems to be using different GFX hw
 */
 ROM_START( eldoradd ) // String "DYNA ELD3 V5.1DR" on program ROM
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -16742,6 +16780,7 @@ ROM_START( eldoradd ) // String "DYNA ELD3 V5.1DR" on program ROM
 ROM_END
 
 // DYNA D9105 PCB with Sharp LH0080B (Z80B) CPU and 2 customs (DYNA DC4000 and DYNA 22A078803), 5x 8-dips, XTAL 24 MHz.
+// Seems to be using a different GFX hardware
 ROM_START( eldoraddo ) // String "DYNA ELD3 V1.1TA" on program ROM
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD16_WORD( "dyna nel 20t.c14", 0x00000, 0x10000, CRC(77b3b2ce) SHA1(e94b976ae9e5a899d916fffc8118486cbedab8b6) )
@@ -20345,9 +20384,6 @@ GAMEL( 199?, cb3f,       ncb3,     ncb3,     ncb3,     cb3_state,      init_cb3f
 GAMEL( 199?, chryglda,   ncb3,     cb3e,     chrygld,  cb3_state,      init_cb3e,      ROT0, "bootleg",           "Cherry Gold I (set 2, encrypted bootleg)",    0,                 layout_chrygld )  // Runs in CB3e hardware.
 GAME(  1994, chryangla,  ncb3,     chryangla,ncb3,     cb3_state,      init_chryangl,  ROT0, "bootleg (G.C.I.)",  "Cherry Angel (encrypted, W-4 hardware)",      MACHINE_NOT_WORKING ) // DYNA CB3  V1.40 string, decrypted but only test screens work
 
-GAME(  1991, eldoradd,   0,        eldoradd, chrygld,  cb3_state,      empty_init,     ROT0, "Dyna",              "El Dorado (V5.1DR)",                          MACHINE_NOT_WORKING ) // everything
-GAME(  1991, eldoraddo,  eldoradd, eldoradd, chrygld,  cb3_state,      empty_init,     ROT0, "Dyna",              "El Dorado (V1.1TA)",                          MACHINE_NOT_WORKING ) // everything
-
 GAME(  1991, eldoraddoa, eldoradd, eldoraddoa,animalhs,cmaster_state,  init_eldoraddoa,ROT0, "Dyna",              "El Dorado (V1.4D)",                           MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS ) // improve GFX drawing, correct palette decode, I/O, etc
 GAME(  1991, animalhs,   0,        animalhs, animalhs, cmaster_state,  init_animalhs,  ROT0, "Suns Co Ltd.",      "Animal House (V1.0, set 1)",                  MACHINE_NOT_WORKING ) // improve GFX drawing, correct palette decode, I/O, etc
 GAME(  1991, animalhsa,  animalhs, animalhs, animalhs, cmaster_state,  init_animalhs,  ROT0, "Suns Co Ltd.",      "Animal House (V1.0, set 2)",                  MACHINE_NOT_WORKING ) // improve GFX drawing, correct palette decode, I/O, etc
@@ -20400,7 +20436,10 @@ GAME(  199?, chthree,    cmaster,  cm,       cmaster,  cmaster_state,  init_chth
 
 GAME(  1991, cmast91,    0,        cmast91,  cmast91,  cmaster_state,  init_cmast91,   ROT0, "Dyna",              "Cherry Master '91 (ver.1.30)",                0 )
 GAME(  1991, cll,        0,        cmast91,  cmast91,  cmaster_state,  init_cll,       ROT0, "Dyna / TAB Austria","Cuty Line Limited (ver.1.30)",                MACHINE_NOT_WORKING ) // needs verifying inputs / dips, missing girls GFX ROM dump
-GAME(  1992, cmast92,    0,        cmast91,  cmast91,  cmaster_state,  init_cmast91,   ROT0, "Dyna",              "Cherry Master '92",                           MACHINE_NOT_WORKING ) // no gfx roms are dumped
+GAME(  1992, cmast92,    0,        eldoradd, cmast91,  cmaster_state,  init_cmast91,   ROT0, "Dyna",              "Cherry Master '92 (V1.2D)",                   MACHINE_NOT_WORKING ) // different GFX hw? Game is running and sounds play
+GAME(  1992, cmast92a,   cmast92,  eldoradd, cmast91,  cmaster_state,  init_cmast91,   ROT0, "Dyna",              "Cherry Master '92 (V1.1D)",                   MACHINE_NOT_WORKING ) // different GFX hw? Game is running and sounds play
+GAME(  1991, eldoradd,   0,        eldoradd, cmast91,  cmaster_state,  empty_init,     ROT0, "Dyna",              "El Dorado (V5.1DR)",                          MACHINE_NOT_WORKING ) // different GFX hw? Game is running and sounds play
+GAME(  1991, eldoraddo,  eldoradd, eldoradd, cmast91,  cmaster_state,  empty_init,     ROT0, "Dyna",              "El Dorado (V1.1TA)",                          MACHINE_NOT_WORKING ) // different GFX hw?
 GAME(  1996, cmast97,    0,        cm97,     cmv801,   cmaster_state,  empty_init,     ROT0, "Dyna",              "Cherry Master '97",                           MACHINE_NOT_WORKING ) // fix prom decode, reels
 GAME(  1999, cmast99,    0,        cm,       cmast99,  cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master '99 (V9B.00)",                  MACHINE_NOT_WORKING )
 GAME(  1999, cmast99b,   cmast99,  cm,       cmast99,  cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Cherry Master '99 (V9B.00 bootleg / hack)",   MACHINE_NOT_WORKING )

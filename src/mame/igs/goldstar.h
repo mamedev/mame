@@ -206,6 +206,8 @@ public:
 	void cmfb55(machine_config &config);
 	void cm97(machine_config &config);
 	void cmast91(machine_config &config);
+	void cmast92(machine_config &config);
+	void eldoradd(machine_config &config);
 	void cmasterc(machine_config &config);
 	void amcoe1a(machine_config &config);
 	void nfm(machine_config &config);
@@ -223,6 +225,8 @@ public:
 	void cm_portmap(address_map &map);
 	void cm97_portmap(address_map &map);
 	void cmast91_portmap(address_map &map);
+	void cmast92_map(address_map &map);
+	void cmast92_portmap(address_map &map);
 	void eldoraddoa_portmap(address_map &map);
 	void super7_portmap(address_map &map);
 	void chryangl_decrypted_opcodes_map(address_map &map);
@@ -324,7 +328,6 @@ public:
 	void cb3c(machine_config &config);
 	void cb3e(machine_config &config);
 	void ncb3(machine_config &config);
-	void eldoradd(machine_config &config);
 	void ncb3_map(address_map &map);
 	void chryangla_map(address_map &map);
 	void chryangla_decrypted_opcodes_map(address_map &map);
