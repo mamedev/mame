@@ -6,7 +6,6 @@
     TODO:
     - Interrupts (not used by brke23p2)
     - Sound (needs internal frequency ROM data?)
-    - IO wake-up from HALT etc.
     - 1 machine cycle (eg. a 1 byte opcode) takes 4 system clock cycles (from OSC pins).
     - The timer rate can be configured with a mask option (system clock / 2^n), n=0-13 (except 6 for some reason).
       So, timer rate can be faster or slower than machine cycle rate.
@@ -254,6 +253,7 @@ void ht1130_device::device_start()
 	m_irqen = 0;
 	m_timer_en = 0;
 	m_inhalt = 0;
+	m_wakeline = 0;
 	m_timerover = 0;
 	m_timer = 0;
 	m_comcount = 0;
@@ -265,6 +265,7 @@ void ht1130_device::device_start()
 	save_item(NAME(m_irqen));
 	save_item(NAME(m_timer_en));
 	save_item(NAME(m_inhalt));
+	save_item(NAME(m_wakeline));
 	save_item(NAME(m_timerover));
 	save_item(NAME(m_timer));
 	save_item(NAME(m_comcount));
@@ -1099,4 +1100,16 @@ void ht1130_device::execute_run()
 
 void ht1130_device::execute_set_input(int inputnum, int state)
 {
+	switch (inputnum)
+	{
+	case HT1130_EXT_WAKEUP_LINE:
+		// wake up is edge triggered
+		if (state && !m_wakeline)
+			m_inhalt = 0;
+		m_wakeline = state;
+		break;
+
+	default:
+		break;
+	}
 }

@@ -6277,14 +6277,12 @@ ROM_END
 
 *******************************************************************************/
 
-class nstarfox_state : public hh_sm510_state
+class nstarfox_state : public gamewatch_state
 {
 public:
 	nstarfox_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{
-		inp_fixed_last();
-	}
+		gamewatch_state(mconfig, type, tag)
+	{ }
 
 	void nstarfox(machine_config &config);
 

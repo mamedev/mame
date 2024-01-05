@@ -6,6 +6,10 @@
 
 #pragma once
 
+// when in halt state, inputs (configured by mask option) can wake up the CPU,
+// driver is required to use set_input_line(HT1130_EXT_WAKEUP_LINE, state)
+#define HT1130_EXT_WAKEUP_LINE 0
+
 
 class ht1130_device : public cpu_device
 {
@@ -24,13 +28,15 @@ public:
 		HT1130_TIMER,
 	};
 
+	// I/O ports
 	auto pm_in_cb() { return m_port_in_pm.bind(); }
 	auto ps_in_cb() { return m_port_in_ps.bind(); }
 	auto pp_in_cb() { return m_port_in_pp.bind(); }
 
 	auto pa_out_cb() { return m_port_out_pa.bind(); }
 
-	auto segment_out_cb() { return m_segment_out.bind(); } // COM in offset, SEG in data
+	// LCD output: COM in offset, SEG in data
+	auto segment_out_cb() { return m_segment_out.bind(); }
 
 protected:
 	ht1130_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor data);
@@ -39,6 +45,8 @@ protected:
 	virtual void device_reset() override;
 
 	virtual void execute_run() override;
+	virtual u32 execute_input_lines() const noexcept override { return 1; }
+	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == HT1130_EXT_WAKEUP_LINE; }
 	virtual void execute_set_input(int inputnum, int state) override;
 	virtual uint32_t execute_max_cycles() const noexcept override { return 2; }
 
@@ -97,6 +105,7 @@ protected:
 	u8 m_irqen;
 	u8 m_timer_en;
 	u8 m_inhalt;
+	u8 m_wakeline;
 	u8 m_timerover;
 	u16 m_timer;
 

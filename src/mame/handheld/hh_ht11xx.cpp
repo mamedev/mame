@@ -47,6 +47,8 @@ public:
 		m_in(*this, "IN%u", 1)
 	{ }
 
+	virtual DECLARE_INPUT_CHANGED_MEMBER(input_wakeup);
+
 	void ht11xx_brickgame(machine_config &config);
 
 protected:
@@ -67,11 +69,16 @@ void hh_ht11xx_state::machine_start()
 	m_out_x.resolve();
 }
 
+INPUT_CHANGED_MEMBER(hh_ht11xx_state::input_wakeup)
+{
+	m_maincpu->set_input_line(HT1130_EXT_WAKEUP_LINE, newval ? CLEAR_LINE : ASSERT_LINE);
+}
+
 static INPUT_PORTS_START( ht11xx_brickgame )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_VOLUME_DOWN ) PORT_NAME("Mute")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POWER_ON ) PORT_NAME("Power")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POWER_ON ) PORT_NAME("Power") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_ht11xx_state, input_wakeup, 0)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2") // not a joystick, but buttons are used for directional inputs in the snake game etc.
