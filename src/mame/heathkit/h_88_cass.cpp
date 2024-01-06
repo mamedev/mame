@@ -2,9 +2,10 @@
 // copyright-holders:Mark Garlanger
 /***************************************************************************
 
-  Heathkit H-17 Floppy controller
+  Heathkit H-88-5 Cassette Interface Card
 
-    This was an option for both the Heathkit H8 and H89 computer systems.
+    Came standard on the H88 computer and was on option for other H89 class
+    systems.
 
 ****************************************************************************/
 
@@ -45,7 +46,6 @@ heath_h_88_cass_device::heath_h_88_cass_device(const machine_config &mconfig, co
 {
 }
 
-
 void heath_h_88_cass_device::write(offs_t reg, u8 val)
 {
 	LOGREG("%s: reg: %d val: 0x%02x\n", FUNCNAME, reg, val);
@@ -62,19 +62,18 @@ u8 heath_h_88_cass_device::read(offs_t reg)
 	return val;
 }
 
-
 TIMER_DEVICE_CALLBACK_MEMBER(heath_h_88_cass_device::kansas_w)
 {
 	m_cass_data[3]++;
 
 	if (m_cassbit != m_cassold)
 	{
-		LOGCASS("kansas_w: m_cassbit changed : %d\n", m_cassbit);
+		LOGCASS("%s: m_cassbit changed : %d\n", FUNCNAME, m_cassbit);
 		m_cass_data[3] = 0;
 		m_cassold = m_cassbit;
 	}
 
-	LOGCASS("kansas_w: m_cassbit: %d\n", m_cassbit);
+	LOGCASS("%s: m_cassbit: %d\n", FUNCNAME, m_cassbit);
 	// 2400Hz -> 0
 	// 1200Hz -> 1
 	const int bit_pos = m_cassbit ? 0 : 1;
@@ -88,11 +87,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(heath_h_88_cass_device::kansas_r)
 	m_cass_data[1]++;
 	u8 cass_ws = (m_cass_player->input() > +0.03) ? 1 : 0;
 
-	LOGCASS("kansas_r: cass_ws: %d\n", cass_ws);
+	LOGCASS("%s: cass_ws: %d\n", FUNCNAME, cass_ws);
 
 	if (cass_ws != m_cass_data[0])
 	{
-		LOGCASS("kansas_r: cass_ws has changed value\n");
+		LOGCASS("%s: cass_ws has changed value\n", FUNCNAME);
 		m_cass_data[0] = cass_ws;
 		m_uart->write_rxd((m_cass_data[1] < 12) ? 1 : 0);
 		m_cass_data[1] = 0;
