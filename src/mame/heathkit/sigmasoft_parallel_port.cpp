@@ -2,7 +2,7 @@
 // copyright-holders:Mark Garlanger
 /***************************************************************************
 
-  SigmaSoft's Universal Parallel Interface Board
+  SigmaSoft Universal Parallel Interface Board
 
 
 ****************************************************************************/
@@ -15,7 +15,7 @@
 // Logging defines
 //
 #define LOG_REG (1U << 1)    // Shows register setup
-#define LOG_FUNC (1U << 4)   // Function calls
+#define LOG_FUNC (1U << 2)   // Function calls
 
 #define VERBOSE (0)
 
@@ -161,13 +161,5 @@ uint8_t sigmasoft_parallel_port::read(offs_t reg)
 }
 
 void sigmasoft_parallel_port::device_start()
-{
-}
-
-void sigmasoft_parallel_port::device_reset()
-{
-}
-
-void sigmasoft_parallel_port::device_add_mconfig(machine_config &config)
 {
 }

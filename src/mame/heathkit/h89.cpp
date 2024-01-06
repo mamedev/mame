@@ -43,10 +43,10 @@
 
 #include "emu.h"
 
-#include "tlb.h"
-#include "z37_fdc.h"
 #include "intr_cntrl.h"
 #include "sigmasoft_parallel_port.h"
+#include "tlb.h"
+#include "z37_fdc.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/ins8250.h"

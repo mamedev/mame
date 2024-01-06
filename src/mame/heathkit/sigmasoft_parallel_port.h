@@ -2,7 +2,7 @@
 // copyright-holders:Mark Garlanger
 /***************************************************************************
 
-  SigmaSoft's Universal Parallel Interface Board
+  SigmaSoft Universal Parallel Interface Board
 
 ****************************************************************************/
 
@@ -20,7 +20,6 @@ public:
 	void write(offs_t reg, uint8_t val);
 	uint8_t   read(offs_t reg);
 
-
 	auto ctrl_r_cb() { return m_ctrl_r.bind(); }
 	auto video_mem_r_cb() { return m_video_mem_r.bind(); }
 
@@ -34,8 +33,6 @@ public:
 protected:
 
 	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
 
 	uint8_t video_mem_r();
 	void video_mem_w(uint8_t val);
