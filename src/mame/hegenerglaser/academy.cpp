@@ -8,7 +8,7 @@ Mephisto Academy
 Hardware notes:
 - PCB label HGS 10 130 01
 - VL65NC02-04PC @ 4.91MHz
-- 2*32KB ROM(TC57256AD-12), 1st ROM half-empty
+- 2*32KB ROM(TC57256AD-12), 1st ROM half-unused
 - 8KB battery-backed RAM(TC5564APL-15)
 - HD44100H, HD44780, 2*16 chars LCD screen
 - 8 tri-color leds (not fully used: always outputs 6 red, 2 green)
@@ -158,8 +158,8 @@ void academy_state::academy(machine_config &config)
 
 ROM_START( academy )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("acad4000.bin", 0x0000, 0x8000, CRC(9c5affdb) SHA1(621d16227e49b0f46ce58ce15107bae23abacadc) )
-	ROM_LOAD("acad8000.bin", 0x8000, 0x8000, CRC(a967922b) SHA1(1327903ff89bf96d72c930c400f367ae19e3ec68) )
+	ROM_LOAD("academy_engl.16k", 0x0000, 0x8000, CRC(9c5affdb) SHA1(621d16227e49b0f46ce58ce15107bae23abacadc) )
+	ROM_LOAD("academy_engl.32k", 0x8000, 0x8000, CRC(a967922b) SHA1(1327903ff89bf96d72c930c400f367ae19e3ec68) )
 ROM_END
 
 ROM_START( academyg )
@@ -174,6 +174,18 @@ ROM_START( academyga )
 	ROM_LOAD("academy_32k_04.10.88", 0x8000, 0x8000, CRC(478155db) SHA1(d363ab6d5bc0f47a6cdfa5132b77535ef8da8256) )
 ROM_END
 
+ROM_START( academygb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("academy_16k_27.8.88", 0x0000, 0x8000, CRC(9530def8) SHA1(376a6263477dd2c36723871acefa2939643747a5) )
+	ROM_LOAD("academy_32k_27.8.88", 0x8000, 0x8000, CRC(bb9e3dc8) SHA1(98cd9bf830de1eeef339a3e1a8604d40e0ac2334) )
+ROM_END
+
+ROM_START( academyd )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("academy_hollandisch_16k_4.10.88", 0x0000, 0x8000, CRC(a8ebdff4) SHA1(a25015bc10c0c3b4dcd726b6ef2495ced188ee2e) )
+	ROM_LOAD("academy_hollandisch_32k_4.10.88", 0x8000, 0x8000, CRC(ec92358e) SHA1(27bd542ac39ded5a6c7d3b8547c1a79c7221c5a7) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -183,6 +195,8 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT   COMPAT  MACHINE   INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1989, academy,   0,       0,      academy,  academy, academy_state, empty_init, "Hegener + Glaser", "Mephisto Academy (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, academy,   0,       0,      academy,  academy, academy_state, empty_init, "Hegener + Glaser", "Mephisto Academy (English, 04-10-88)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1989, academyg,  academy, 0,      academy,  academy, academy_state, empty_init, "Hegener + Glaser", "Mephisto Academy (German, 06-03-89)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1989, academyga, academy, 0,      academy,  academy, academy_state, empty_init, "Hegener + Glaser", "Mephisto Academy (German, 04-10-88)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, academygb, academy, 0,      academy,  academy, academy_state, empty_init, "Hegener + Glaser", "Mephisto Academy (German, 27-08-88)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, academyd,  academy, 0,      academy,  academy, academy_state, empty_init, "Hegener + Glaser", "Mephisto Academy (Dutch, 04-10-88)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

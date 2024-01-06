@@ -168,7 +168,7 @@ void tc0140syt_device::master_comm_w(u8 data)
 u8 tc0140syt_device::master_comm_r()
 {
 	// let slavecpu catch up (after we return and the main cpu finishes what it's doing)
-	if (!machine().side_effects_disabled())	
+	if (!machine().side_effects_disabled())
 		machine().scheduler().synchronize();
 
 	u8 res = 0;

@@ -1028,7 +1028,7 @@ CONS( 2005, sudoku2p, 0,        0, elan_sudoku_pal,  sudoku2p, elan_eu3a05_state
 CONS( 200?, carlecfg, 0,        0, elan_sudoku,  carlecfg,   elan_eu3a05_state, empty_init,  "Excalibur Electronics Inc",  "Carl Edwards' Chase For Glory", MACHINE_NOT_WORKING )
 
 // see https://millionaire.fandom.com/wiki/Haluatko_miljon%C3%A4%C3%A4riksi%3F_(Play_Vision_game)
-CONS( 2006, pvmilfin, 0,        0, elan_pvmilfin,  sudoku,   elan_eu3a05_state, empty_init,  "Play Vision", "Haluatko miljon\xc3\xa4\xc3\xa4riksi? (Finland)", MACHINE_NOT_WORKING )
+CONS( 2006, pvmilfin, 0,        0, elan_pvmilfin,  sudoku,   elan_eu3a05_state, empty_init,  "Play Vision", u8"Haluatko miljonääriksi? (Finland)", MACHINE_NOT_WORKING )
 
 CONS( 2005, pvwwcas,  0,        0, pvwwcas,    sudoku,   elan_eu3a05_pvwwcas_state, init_pvwwcas, "Play Vision / Taikee / V-Tac", "Worldwide Casino Tour 12-in-1", MACHINE_NOT_WORKING )
 

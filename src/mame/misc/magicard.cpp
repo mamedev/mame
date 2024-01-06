@@ -199,6 +199,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include "magicard.lh"
+
 #define CLOCK_A XTAL(30'000'000)
 #define CLOCK_B XTAL(8'000'000)
 #define CLOCK_C XTAL(19'660'800)
@@ -222,6 +224,8 @@ public:
 		, m_palette(*this, "palette")
 		, m_scc66470(*this,"scc66470")
 		, m_i2cmem(*this, "sereeprom")
+		, m_lamps(*this, "lamp%u", 1U)
+
 	{ }
 
 	void magicard_base(machine_config &config);
@@ -262,6 +266,8 @@ protected:
 	uint8_t m_scl_state;
 
 private:
+	output_finder<8> m_lamps;
+
 	void scc66470_map(address_map &map);
 
 	std::unique_ptr<uint16_t []> m_dram;
@@ -331,6 +337,7 @@ private:
 
 void magicard_base_state::machine_start()
 {
+	m_lamps.resolve();
 	m_dram = make_unique_clear<uint16_t []>(0x80000/2);
 	save_pointer(NAME(m_dram), 0x80000/2);
 	save_item(NAME(m_sda_state));
@@ -438,6 +445,14 @@ void magicard_base_state::output_w(offs_t offset, uint16_t data)
 	// bit 13 - clear lamp
 	// bit 14 - hopper drive
 	// bit 15 - counter in
+
+	m_lamps[0] = BIT(data, 9);      // Lamp 0 - HOLD 1
+	m_lamps[1] = BIT(data, 11);     // Lamp 1 - HOLD 2
+	m_lamps[2] = BIT(data, 7);      // Lamp 2 - HOLD 3
+	m_lamps[3] = BIT(data, 12);     // Lamp 3 - HOLD 4
+	m_lamps[4] = BIT(data, 10);     // Lamp 4 - HOLD 5
+	m_lamps[5] = BIT(data, 13);     // Lamp 5 - CANCEL
+	m_lamps[6] = BIT(data, 8);      // Lamp 6 - START
 }
 
 
@@ -541,69 +556,58 @@ void hotslots_state::puzzleme_map(address_map &map)
 
 static INPUT_PORTS_START( magicard )
 	PORT_START("SW0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN4 )			PORT_NAME("Remote 2")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )			PORT_NAME("Remote 1")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 )                      PORT_NAME("Remote 2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN4 )                      PORT_NAME("Remote 1")
-
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
-
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
-
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )                    PORT_NAME("Bet/Clear/Collect")
-
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
-
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
-
-	PORT_BIT( 0x100, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )   PORT_TOGGLE PORT_NAME("Rental Book Keeping")
-	PORT_BIT( 0x200, IP_ACTIVE_LOW, IPT_SERVICE1 )                  PORT_NAME("Owner Book Keeping")
-
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )		PORT_NAME("Book 2")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SERVICE1 )			PORT_NAME("Book 1")
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
-
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )            PORT_NAME("Pay Out")
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 )                  PORT_NAME("Hopper Count") PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SERVICE3 )     PORT_TOGGLE PORT_NAME("Accounting 3")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )	PORT_NAME("Pay/Hopper Out")
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OTHER )			PORT_NAME("Hopper Count") 	PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SERVICE2 )			PORT_NAME("Books 3")  		PORT_CODE(KEYCODE_U)
 
 	PORT_START("SW1")
-	PORT_DIPNAME( 0x80, 0x80, "Hopper" )                    PORT_DIPLOCATION("DIP 1:1")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x01, 0x01, "Keyboard Test" )             PORT_DIPLOCATION("DIP 1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Hopper" )                    PORT_DIPLOCATION("DIP 1:2")
-	PORT_DIPSETTING(    0x40, "Coin B" )
-	PORT_DIPSETTING(    0x00, "Coin A" )
-
+	PORT_DIPNAME( 0x02, 0x02, "Remote/Keyboard" )           PORT_DIPLOCATION("DIP 1:7")
+	PORT_DIPSETTING(    0x02, "Remote Switch" )
+	PORT_DIPSETTING(    0x00, "Keyboard" )
+	PORT_DIPNAME( 0x04, 0x04, "Swap Coin Inputs" )          PORT_DIPLOCATION("DIP 1:6")
+	PORT_DIPSETTING(    0x04, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x38, 0x38, "Setting" )                   PORT_DIPLOCATION("DIP 1:5,4,3")
 	PORT_DIPSETTING(    0x38, "Austria 1" )
 	PORT_DIPSETTING(    0x30, "Austria 2" )
-	PORT_DIPSETTING(    0x18, "Tschech 1" )
-	PORT_DIPSETTING(    0x10, "Tschech 2" )
+	PORT_DIPSETTING(    0x18, "CSFR 1" )  // Czech Slovak Federal Republic
+	PORT_DIPSETTING(    0x10, "CSFR 2" )  // Czech Slovak Federal Republic
 	PORT_DIPSETTING(    0x28, "Germany 1" )
 	PORT_DIPSETTING(    0x20, "Germany 2" )
 	PORT_DIPSETTING(    0x08, "Hungary 1" )
 	PORT_DIPSETTING(    0x00, "Hungary 2" )
-
-	PORT_DIPNAME( 0x04, 0x04, "Swap Coin Inputs" )          PORT_DIPLOCATION("DIP 1:6")
-	PORT_DIPSETTING(    0x04, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x02, 0x02, "Remote/Keyboard" )           PORT_DIPLOCATION("DIP 1:7")
-	PORT_DIPSETTING(    0x02, "Remote Switch" )
-	PORT_DIPSETTING(    0x00, "Keyboard" )
-	PORT_DIPNAME( 0x01, 0x01, "Keyboard Test" )             PORT_DIPLOCATION("DIP 1:8")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x40, 0x40, "Hopper" )                    PORT_DIPLOCATION("DIP 1:2")
+	PORT_DIPSETTING(    0x40, "Coin B" )
+	PORT_DIPSETTING(    0x00, "Coin A" )
+	PORT_DIPNAME( 0x80, 0x80, "Hopper" )                    PORT_DIPLOCATION("DIP 1:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON3 )      PORT_TOGGLE PORT_NAME("Hopper Full")     PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )                   // PORT_NAME("Reserve In 9")
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )                   // PORT_NAME("Reserve In 8")
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNUSED )                   // PORT_NAME("Reserve In 7")
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )                   // PORT_NAME("Reserve In 6")
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )                   // PORT_NAME("Reserve In 5")
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )  PORT_TOGGLE PORT_NAME("Door Switch")
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON4 )                  PORT_NAME("Clear Credit")    PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )  PORT_NAME("Door Switch")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Reserve In 5")    PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Reserve In 6")    PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Reserve In 7")    PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Reserve In 8")    PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Reserve In 9")    PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Hopper Full")     PORT_CODE(KEYCODE_R)
 
 INPUT_PORTS_END
 
@@ -759,6 +763,68 @@ static INPUT_PORTS_START( hotslots )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON7 )     PORT_NAME("Clear coinCard")  PORT_CODE(KEYCODE_H)
 
 INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( jjokeri )
+	PORT_START("SW0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN4 )			PORT_NAME("Remote 2")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )			PORT_NAME("Remote 1")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )		PORT_NAME("Book 2")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SERVICE1 )			PORT_NAME("Book 1")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )	PORT_NAME("Pay/Hopper Out")
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OTHER )			PORT_NAME("Hopper Count") 	PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SERVICE2 )			PORT_NAME("Books 3")  		PORT_CODE(KEYCODE_U)
+
+	PORT_START("SW1")
+	PORT_DIPNAME( 0x01, 0x01, "Service Test" )		PORT_DIPLOCATION("DIP 1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Remote 1" )			PORT_DIPLOCATION("DIP 1:7")
+	PORT_DIPSETTING(    0x02, "100" )
+	PORT_DIPSETTING(    0x00, "10" )
+	PORT_DIPNAME( 0x04, 0x04, "Coin 2" )			PORT_DIPLOCATION("DIP 1:6")
+	PORT_DIPSETTING(    0x04, "10" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x08, 0x08, "Coin 1" )			PORT_DIPLOCATION("DIP 1:5")
+	PORT_DIPSETTING(    0x08, "10" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x10, 0x10, "Cards Back" )		PORT_DIPLOCATION("DIP 1:4")
+	PORT_DIPSETTING(    0x10, "Normal Clean" )
+	PORT_DIPSETTING(    0x00, "Impera Logo" )
+	PORT_DIPNAME( 0x20, 0x20, "Remote 2" )			PORT_DIPLOCATION("DIP 1:3")
+	PORT_DIPSETTING(    0x20, "100" )
+	PORT_DIPSETTING(    0x00, "1M" )
+	PORT_DIPNAME( 0x40, 0x40, "DSW 1:2, unknown" )	PORT_DIPLOCATION("DIP 1:2")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "DSW 1:1, unknown" )	PORT_DIPLOCATION("DIP 1:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )  PORT_NAME("Door Switch")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Reserve In 5")    PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Reserve In 6")    PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Reserve In 7")    PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Reserve In 8")    PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Reserve In 9")    PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Hopper Full")     PORT_CODE(KEYCODE_R)
+
+INPUT_PORTS_END
+
+
+
+
 
 void magicard_base_state::machine_reset()
 {
@@ -2186,6 +2252,47 @@ ROM_START( jjokeri )
 	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
 	ROM_LOAD16_WORD_SWAP( "g55_6__d27c210.bin", 0x00000, 0x20000, CRC(e208598b) SHA1(697b37e39025d31de6f37bd8bd59b35cee998e63) )
 	ROM_LOAD16_WORD_SWAP( "g55_5__d27c210.bin", 0x20000, 0x20000, CRC(997d4de9) SHA1(47d46b4be99f4d62e23b78219c5f186476b93701) )
+
+	ROM_REGION(0x4000, "nvram", 0)  // Default NVRAM
+	ROM_LOAD( "jjokeri_nvram.bin", 0x0000, 0x4000, CRC(c3f4698d) SHA1(d9a7c776a87878fc546c301dffe9b32093d5eddc) )
+ROM_END
+
+
+/*
+  Simply the Best
+  CZ750, V1.00
+  2001, Kajot.
+
+  Xtal 1 [Q1]: 30.000
+  Xtal 2 [Q2]: 30.000
+  Xtal 3 [Q5]: 11.0592
+  Xtal 4 [Q6]: 19.6608
+
+  The 87C571 MCU (IC13) is read protected.
+
+  IC1:
+       PHILIPS
+       SCC68070CCA84
+       594180
+       DfD9949V3
+
+  IC5:
+       PHILIPS
+       SCC66470CAB
+       595831
+       DfD9948I3
+
+*/
+ROM_START( simpbest )
+	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
+	ROM_LOAD16_WORD_SWAP( "27c4002.ic23", 0x00000, 0x80000, CRC(ceae7862) SHA1(862baf3312c5076910d001a834661197ca45b766) )
+
+	ROM_REGION( 0x0800, "mcu", 0 )  // S87C751 (2K x8 ROM) undumped
+	ROM_LOAD("s87c751.ic13",   0x0000, 0x0800, NO_DUMP )
+
+	ROM_REGION( 0x0100, "sereeprom", 0 )  // Serial EPROM
+	ROM_LOAD16_WORD_SWAP("24c04a.ic27", 0x0000, 0x0100, CRC(3189844c) SHA1(cc017f44d9db92da85c96be750ccec7ee32e5972) )
+	ROM_CONTINUE(                       0x0000, 0x0100)  // discarding 1nd half test pattern filled
 ROM_END
 
 
@@ -2196,29 +2303,31 @@ ROM_END
 *                Game Drivers                *
 *********************************************/
 
-//    YEAR  NAME        PARENT    MACHINE         INPUT      STATE           INIT        ROT    COMPANY      FULLNAME                                     FLAGS
+//     YEAR  NAME        PARENT    MACHINE         INPUT      STATE           INIT        ROT    COMPANY      FULLNAME                                     FLAGS
 
-GAME( 1994, magicard,   0,        magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v2.01)",                         MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1994, magicrd1,   0,        magicard_pic56, magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.10 14.09.94)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1993, magicrd1a,  magicrd1, magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.5 17.12.93, set 1)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1993, magicrd1b,  magicrd1, magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.5 17.12.93, set 2)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1993, magicrd1c,  magicrd1, magicard_pic54, magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.2 200/93, set 1)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1993, magicrd1d,  magicrd1, magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.2 200/93, set 2)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1994, magicrde,   0,        hotslots_pic54, magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (v2.11a, set 1)",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1994, magicrdea,  magicrde, hotslots_pic54, magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (v2.11a, set 2)",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1994, magicrdeb,  magicrde, hotslots,       magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (V2.11a, set 3)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1994, magicrdec,  magicrde, hotslots,       magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (v2.09a)",              MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1998, magicrdj,   0,        hotslots,       magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card III Jackpot (V4.01 6/98)",        MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1998, magicrdja,  magicrdj, hotslots,       magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card III Jackpot (V4.01 7/98)",        MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 2001, magicle,    0,        magicle,        hotslots,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Lotto Export (5.03)",                  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 2002, hotslots,   0,        hotslots,       hotslots,  hotslots_state, empty_init, ROT0, "Impera",    "Hot Slots (6.00)",                           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1999, quingo,     0,        magicle,        hotslots,  hotslots_state, empty_init, ROT0, "Impera",    "Quingo Export (5.00)",                       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1999, belslots,   0,        magicle,        hotslots,  hotslots_state, empty_init, ROT0, "Impera",    "Bel Slots Export (5.01)",                    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 2001, bigdeal0,   0,        magicle,        magicard,  hotslots_state, empty_init, ROT0, "Impera",    "Big Deal Belgien (5.04)",                    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 199?, puzzleme,   0,        puzzleme,       puzzleme,  hotslots_state, empty_init, ROT0, "Impera",    "Puzzle Me!",                                 MACHINE_SUPPORTS_SAVE )
-GAME( 1991, lucky7i,    0,        magicard,       lucky7i,   magicard_state, empty_init, ROT0, "Impera",    "Lucky 7 (Impera, V04/91a, set 1)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1993, dallaspk,   0,        magicard,       dallaspk,  magicard_state, empty_init, ROT0, "<unknown>", "Dallas Poker",                               MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1993, kajotcrd,   0,        hotslots,       magicard,  hotslots_state, empty_init, ROT0, "Amatic",    "Kajot Card (Version 1.01, Wien Euro)",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  1994, magicard,   0,        magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v2.01)",                         MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAMEL( 1994, magicrd1,   0,        magicard_pic56, magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.10 14.09.94)",                MACHINE_SUPPORTS_SAVE,                        layout_magicard )
+GAME(  1993, magicrd1a,  magicrd1, magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.5 17.12.93, set 1)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  1993, magicrd1b,  magicrd1, magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.5 17.12.93, set 2)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAMEL( 1993, magicrd1c,  magicrd1, magicard_pic54, magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.2 200/93, set 1)",            MACHINE_SUPPORTS_SAVE,                        layout_magicard )
+GAME(  1993, magicrd1d,  magicrd1, magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.2 200/93, set 2)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  1994, magicrde,   0,        hotslots_pic54, magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (v2.11a, set 1)",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  1994, magicrdea,  magicrde, hotslots_pic54, magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (v2.11a, set 2)",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  1994, magicrdeb,  magicrde, hotslots,       magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (V2.11a, set 3)",       MACHINE_SUPPORTS_SAVE )
+GAME(  1994, magicrdec,  magicrde, hotslots,       magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (v2.09a)",              MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  1998, magicrdj,   0,        hotslots,       magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card III Jackpot (V4.01 6/98)",        MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  1998, magicrdja,  magicrdj, hotslots,       magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card III Jackpot (V4.01 7/98)",        MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  2001, magicle,    0,        magicle,        hotslots,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Lotto Export (5.03)",                  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  2002, hotslots,   0,        hotslots,       hotslots,  hotslots_state, empty_init, ROT0, "Impera",    "Hot Slots (6.00)",                           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  1999, quingo,     0,        magicle,        hotslots,  hotslots_state, empty_init, ROT0, "Impera",    "Quingo Export (5.00)",                       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  1999, belslots,   0,        magicle,        hotslots,  hotslots_state, empty_init, ROT0, "Impera",    "Bel Slots Export (5.01)",                    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  2001, bigdeal0,   0,        magicle,        magicard,  hotslots_state, empty_init, ROT0, "Impera",    "Big Deal Belgien (5.04)",                    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  199?, puzzleme,   0,        puzzleme,       puzzleme,  hotslots_state, empty_init, ROT0, "Impera",    "Puzzle Me!",                                 MACHINE_SUPPORTS_SAVE )
+GAME(  1991, lucky7i,    0,        magicard,       lucky7i,   magicard_state, empty_init, ROT0, "Impera",    "Lucky 7 (Impera, V04/91a, set 1)",           MACHINE_SUPPORTS_SAVE )
+GAME(  1993, dallaspk,   0,        magicard,       dallaspk,  magicard_state, empty_init, ROT0, "<unknown>", "Dallas Poker",                               MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  1993, kajotcrd,   0,        hotslots,       magicard,  hotslots_state, empty_init, ROT0, "Amatic",    "Kajot Card (Version 1.01, Wien Euro)",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
-GAME( 1991, lucky7x,    lucky7i,  magicard,       lucky7i,   magicard_state, empty_init, ROT0, "Impera",    "Lucky 7 (Impera, V04/91a, set 2)",           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1991, jjokeri,    0,        magicard,       lucky7i,   magicard_state, empty_init, ROT0, "Impera",    "Jolly Joker? (Impera, V11/90b)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  1991, lucky7x,    lucky7i,  magicard,       lucky7i,   magicard_state, empty_init, ROT0, "Impera",    "Lucky 7 (Impera, V04/91a, set 2)",           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAMEL( 1991, jjokeri,    0,        magicard,       jjokeri,   magicard_state, empty_init, ROT0, "Impera",    "Jolly Joker? (Impera, V11/90b)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,  layout_magicard )
+
+GAME(  2001, simpbest,   0,        magicle,        hotslots,  hotslots_state, empty_init, ROT0, "Kajot",     "Simply the Best (CZ750, v1.0)",              MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

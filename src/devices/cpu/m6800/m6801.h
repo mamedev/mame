@@ -332,6 +332,7 @@ protected:
 	virtual void write_port2() override;
 
 	void p2_ddr_2bit_w(uint8_t data);
+	void p3_ddr_1bit_w(uint8_t data);
 	virtual uint8_t p3_data_r() override;
 	virtual void p3_data_w(uint8_t data) override;
 	virtual uint8_t p5_data_r();
@@ -436,6 +437,7 @@ protected:
 	// device_execute_interface overrides
 	virtual void execute_set_input(int inputnum, int state) override;
 
+	void p1_ddr_1bit_w(uint8_t data);
 	void p5_ddr_w(uint8_t data);
 	virtual uint8_t p5_data_r() override;
 	void p5_data_w(uint8_t data);

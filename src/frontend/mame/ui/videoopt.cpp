@@ -14,8 +14,6 @@
 #include "rendlay.h"
 #include "rendutil.h"
 
-#include "utf8.h"
-
 
 namespace ui {
 
@@ -151,10 +149,10 @@ void menu_video_options::populate()
 	// add a rotate item
 	switch (m_target.orientation())
 	{
-	case ROT0:      subtext = "None";                   break;
-	case ROT90:     subtext = "CW 90" UTF8_DEGREES;     break;
-	case ROT180:    subtext = "180" UTF8_DEGREES;       break;
-	case ROT270:    subtext = "CCW 90" UTF8_DEGREES;    break;
+	case ROT0:      subtext = "None";       break;
+	case ROT90:     subtext = u8"CW 90°";   break;
+	case ROT180:    subtext = u8"180°";     break;
+	case ROT270:    subtext = u8"CCW 90°";  break;
 	}
 	item_append(_("Rotate"), subtext, FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, reinterpret_cast<void *>(ITEM_ROTATE));
 

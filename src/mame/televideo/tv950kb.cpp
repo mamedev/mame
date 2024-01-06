@@ -8,7 +8,6 @@
 
 #include "emu.h"
 #include "tv950kb.h"
-#include "utf8.h"
 
 DEFINE_DEVICE_TYPE(TV950_KEYBOARD, tv950kb_device, "tv950kb", "TeleVideo 950 Keyboard")
 
@@ -172,12 +171,12 @@ static INPUT_PORTS_START(tv950kb)
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD)) PORT_CODE(KEYCODE_ENTER_PAD) // keypad lower left corner
 
 	PORT_START("ROW11")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Help  " UTF8_LEFT "Wd") PORT_CODE(KEYCODE_F1) // "F1" according to operator's manual
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Top Menu  " UTF8_RIGHT "Wd") PORT_CODE(KEYCODE_F2) // "F2" according to operator's manual
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Move  " UTF8_UP "Scroll") PORT_CODE(KEYCODE_F3) // "F3" according to operator's manual
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("  " UTF8_DOWN "Scroll") PORT_CODE(KEYCODE_F4) // "F4" according to operator's manual
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F1  " UTF8_UP "Scrn") PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_CODE(KEYCODE_F5) // "F5" according to operator's manual
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F2  " UTF8_DOWN "Scrn") PORT_CHAR(UCHAR_MAMEKEY(F2)) PORT_CODE(KEYCODE_F6) // "F6" according to operator's manual
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"Help  \u2190Wd") PORT_CODE(KEYCODE_F1) // "F1" according to operator's manual
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"Top Menu  \u2192Wd") PORT_CODE(KEYCODE_F2) // "F2" according to operator's manual
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"Move  \u2191Scroll") PORT_CODE(KEYCODE_F3) // "F3" according to operator's manual
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"  \u2193Scroll") PORT_CODE(KEYCODE_F4) // "F4" according to operator's manual
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"F1  \u2191Scrn") PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_CODE(KEYCODE_F5) // "F5" according to operator's manual
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"F2  \u2193Scrn") PORT_CHAR(UCHAR_MAMEKEY(F2)) PORT_CODE(KEYCODE_F6) // "F6" according to operator's manual
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F3  Del Wo") PORT_CHAR(UCHAR_MAMEKEY(F3)) PORT_CODE(KEYCODE_F7) // "F7" according to operator's manual
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(F4)) PORT_CODE(KEYCODE_F8) // "F8" according to operator's manual
 
