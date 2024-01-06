@@ -438,8 +438,8 @@ public:
 	void update_screenmode();
 
 	TIMER_CALLBACK_MEMBER( scanline_callback );
-	TIMER_CALLBACK_MEMBER (amiga_irq_proc );
-	TIMER_CALLBACK_MEMBER( amiga_blitter_proc );
+	TIMER_CALLBACK_MEMBER( irq_process_callback );
+	TIMER_CALLBACK_MEMBER( blitter_process_callback );
 	void update_irqs();
 
 	template <int P> DECLARE_CUSTOM_INPUT_MEMBER( amiga_joystick_convert );

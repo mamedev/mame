@@ -19,7 +19,8 @@
     - Find & verify cdang examples (especially for ECS/AGA);
     - Find & verify examples that uses this non-canonically,
       i.e. anything that may use this for controlling Paula, FDC or Blitter;
-    - Add debugger command for printing the current disassembler structure;
+    - Add debugger command for printing the current disassembler structure
+      (current live logging is painfully slow in places, cfr. lweapon);
 
 **************************************************************************************************/
 
@@ -33,6 +34,8 @@
 #define LOG_CHIPSET (1U << 5)   // Show custom chipset writes
 
 #define VERBOSE (LOG_WARN)
+//#define VERBOSE (LOG_WARN | LOG_CHIPSET | LOG_PC | LOG_INST)
+//#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
 
@@ -245,7 +248,7 @@ int amiga_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy)
 	if (m_pending_offset)
 	{
 		//LOGCHIPSET("%02X.%02X: Write to %s = %04x\n", ypos, xpos / 2, s_custom_reg_names[m_copper_pending_offset & 0xff], m_copper_pending_data);
-		LOGCHIPSET("%02X.%02X: Write to $dff%03x = %04x\n",
+		LOGCHIPSET("%02X.%02X: MOVE $dff%03x = %04x\n",
 			ypos,
 			xpos / 2,
 			(m_pending_offset << 1),
@@ -313,7 +316,7 @@ int amiga_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy)
 			if (delay[word0] == 0)
 			{
 				//LOGCHIPSET("%02X.%02X: Write to %s = %04x\n", ypos, xpos / 2, s_custom_reg_names[word0 & 0xff], word1);
-				LOGCHIPSET("%02X.%02X: Write to $dff%03x = %04x\n",
+				LOGCHIPSET("%02X.%02X: MOVE $dff%03x = %04x\n",
 					ypos,
 					xpos / 2,
 					word0 << 1,
@@ -352,7 +355,7 @@ int amiga_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy)
 		/* handle a wait */
 		if ((word1 & 1) == 0)
 		{
-			LOGINST("  Waiting for %04x & %04x (currently %04x)\n",
+			LOGINST("  WAIT %04x & %04x (currently %04x)\n",
 				m_waitval,
 				m_waitmask,
 				(ypos << 8) | (xpos >> 1)
@@ -366,7 +369,7 @@ int amiga_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy)
 		{
 			int curpos = (ypos << 8) | (xpos >> 1);
 
-			LOGINST("  Skipping if %04x & %04x (currently %04x)\n",
+			LOGINST("  SKIP %04x & %04x (currently %04x)\n",
 				m_waitval,
 				m_waitmask,
 				(ypos << 8) | (xpos >> 1)

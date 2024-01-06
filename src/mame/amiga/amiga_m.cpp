@@ -14,7 +14,6 @@
 #include "amiga.h"
 #include "cpu/m68000/m68000.h"
 
-
 /*************************************
  *
  *  Debugging
@@ -165,8 +164,8 @@ void amiga_state::machine_start()
 	m_chip_ram_mask = (m_chip_ram.bytes() - 1) & ~1;
 
 	// set up the timers
-	m_irq_timer = timer_alloc(FUNC(amiga_state::amiga_irq_proc), this);
-	m_blitter_timer = timer_alloc(FUNC(amiga_state::amiga_blitter_proc), this);
+	m_irq_timer = timer_alloc(FUNC(amiga_state::irq_process_callback), this);
+	m_blitter_timer = timer_alloc(FUNC(amiga_state::blitter_process_callback), this);
 	m_serial_timer = timer_alloc(FUNC(amiga_state::serial_shift), this);
 	m_scanline_timer = timer_alloc(FUNC(amiga_state::scanline_callback), this);
 
@@ -240,6 +239,7 @@ void amiga_state::vblank()
 }
 
 // TODO: CIA A clock can be connected to either a fixed 50/60hz signal from the power supply, or the vblank
+// TODO: move almost everything to a DMA scheduler, cfr. HRM diagram
 TIMER_CALLBACK_MEMBER( amiga_state::scanline_callback )
 {
 	int scanline = param;
@@ -360,7 +360,7 @@ void amiga_state::update_irqs()
 		CUSTOM_REG(REG_INTREQ) |= INTENA_EXTER;
 }
 
-TIMER_CALLBACK_MEMBER( amiga_state::amiga_irq_proc )
+TIMER_CALLBACK_MEMBER( amiga_state::irq_process_callback )
 {
 	update_irqs();
 	m_irq_timer->reset();
@@ -853,7 +853,7 @@ uint32_t amiga_state::blit_line()
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER( amiga_state::amiga_blitter_proc )
+TIMER_CALLBACK_MEMBER( amiga_state::blitter_process_callback )
 {
 	uint32_t blitsum = 0;
 
@@ -947,14 +947,14 @@ void amiga_state::blitter_setup()
 
 	/* compute the blit time */
 	// TODO: verify timings
-	// According to https://github.com/alpine9000/amiga_examples test 010,
-	// blitting is currently taking half the time than necessary.
-	// Is it expecting to account for RAM access waitstates or ...?
+	// - https://github.com/alpine9000/amiga_examples test 010,
+	//   blitting is currently taking half the time than necessary.
+	// - viz does heavy bbusy checks.
 	blittime = ticks * height * width;
 
 	/* if 'blitter-nasty' is set, then the blitter takes over the bus. Make the blit semi-immediate */
-	// TODO: blitter nasty doesn't seem to work as intended.
-	// cfr. spinwrld
+	// FIXME: emulate bus priority implications here
+	// cfr. spinwrld no backgrounds
 	if ( CUSTOM_REG(REG_DMACON) & 0x0400 )
 	{
 		/* simulate the 68k not running while the blit is going */
@@ -1315,7 +1315,8 @@ uint16_t amiga_state::custom_chip_r(offs_t offset)
 			return amiga_gethvpos() & 0xffff;
 
 		case REG_SERDATR:
-			LOGMASKED(LOG_SERIAL, "r SERDATR: %04x\n", CUSTOM_REG(REG_SERDATR));
+			if (!machine().side_effects_disabled())
+				LOGMASKED(LOG_SERIAL, "r SERDATR: %04x\n", CUSTOM_REG(REG_SERDATR));
 			return CUSTOM_REG(REG_SERDATR);
 
 		case REG_JOY0DAT:

@@ -34,7 +34,6 @@ license:CC0-1.0
     - check / add any missing parent/clone relationships
     - find out why we have duplicates of some releases with different IPF files (typically the _0 ones)
       (the ones not in the SPS database have been marked as bad?)
-    - move AGA only discs to the AGA list
     - add any other image which can be found
     - test compatibility with emulation, note which games require manuals for operation (either protection or important game notes)
     - document hardware configurations needed for 'fussy' games, and which ones differ in operation depending on HW config
@@ -42,11 +41,12 @@ license:CC0-1.0
       document the original packages (see e.g. 16bithit, tnt and a few others below)
 
     todo (General):
-    - add the various cracked dumps after verifying them
-    - add Public Domain titles, Demos etc. (maybe in separate lists)
-    - add Utilities (separate lists?)
-    - add list to document various Amiga viruses (maybe, if I'm feeling perverted)
-
+    - add the various cracked dumps after verifying them;
+    - add Public Domain and homebrew titles (maybe in separate list);
+    - Pinpoint copy protection mechanisms as a node ID type;
+    - Split virus node warnings as they are (warnings), add identifiers;
+    - rerun ATK test suite at some point, notify changed behaviour (after new68k they definitely
+      are), notify changed behaviour with newer ATK version.
 
     Virus Warning
 
@@ -30332,9 +30332,10 @@ fatalerrors when trying to mount "Incompatible image format or corrupted data"
 		<year>1992</year>
 		<publisher>Ocean</publisher>
 		<notes><![CDATA[
-black screen [FDC] dsksync
-masked Lethal Weapon intro text has raster issue
+black screen [FDC] dsksync (fixed)
+masked Lethal Weapon intro text has raster issue, [Copper] expects +56 scanlines
 TODO: Needs multiple presses with no video feedback on mission select section?
+TODO: test extensively before promoting
 ATK test: C:0 H:U Bad
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -30758,7 +30759,8 @@ ATK test: OK
 		<year>1988</year>
 		<publisher>Mandarin</publisher>
 		<notes><![CDATA[
-crashes in AmigaDOS with DSKDAT R [FDC] with adkcon=$1100
+Crashes in AmigaDOS with DSKDAT R [FDC] with adkcon=$1100 (fixed?)
+Throws random Guru Meditations on disk swap (verify, cfr. "Disconnect 2nd disk drive if you only have 512K" printed at boot)
 ATK test: failed
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -31174,7 +31176,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="lostvik" supported="no">
+	<software name="lostvik" supported="yes">
 		<!-- SPS (CAPS) release 2235 -->
 		<description>The Lost Vikings (Europe)</description>
 		<!-- retail, standalone -->
@@ -31182,10 +31184,12 @@ ATK test: OK
 		<year>1993</year>
 		<publisher>Interplay</publisher>
 		<notes><![CDATA[
-Guru Meditation after selecting new game [FDC] dsksync
-Crashes with wrong GFX colors if player gives up a stage (TODO: recheck)
+Guru Meditation after selecting new game [FDC] dsksync (fixed)
+Crashes with wrong GFX colors if player gives up a stage (can't repro, assume fixed)
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Supports two buttons joystick"/>
+
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -31618,7 +31622,7 @@ ATK test: OK
 		<year>1990</year>
 		<publisher>Krisalis</publisher>
 		<notes><![CDATA[
-new68k: throws [FDC] DSKDATR
+new68k: throws [FDC] DSKDATR, black screen
 ATK test: C:0 H:U Bad
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -34024,7 +34028,7 @@ ATK test: C:0 H:U Bad
 		</part>
 	</software>
 
-	<software name="morph" supported="no">
+	<software name="morph" supported="yes">
 		<!-- SPS (CAPS) release 1148 -->
 		<description>Morph (Europe)</description>
 		<!-- retail, standalone -->
@@ -34032,7 +34036,7 @@ ATK test: C:0 H:U Bad
 		<year>1993</year>
 		<publisher>Millennium</publisher>
 		<notes><![CDATA[
-Hangs at a red screen, [FDC] dsksync
+Hangs at a red screen, [FDC] dsksync (fixed)
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -34371,7 +34375,7 @@ ATK test: OK
 		<year>1989</year>
 		<publisher>Turtle Byte</publisher>
 		<notes><![CDATA[
-Resets machine on initial please wait, [FDC] dsksync
+Resets or hangs machine on initial please wait, [FDC] DSKDATR
 Eventually throws "amiga_fdc_device::live_run - cur_live.bit_counter > 8" with out of bounds access at $200000 (verify track number)
 ATK test: OK
 ]]></notes>
@@ -34839,7 +34843,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="nevermnd" supported="no">
+	<software name="nevermnd" supported="yes">
 		<!-- SPS (CAPS) release 1507 -->
 		<description>Never Mind (Europe)</description>
 		<!-- retail, standalone -->
@@ -34847,8 +34851,8 @@ ATK test: OK
 		<year>1989</year>
 		<publisher>Psyclapse</publisher>
 		<notes><![CDATA[
-black screen with eventually running irq at $ffffff, [FDC] dsksync
-Hangs on CIA timer A readback while setting mode $99
+black screen with eventually running irq at $ffffff, [FDC] dsksync (fixed)
+Hangs on [CIA] timer A readback while setting mode $99 (fixed)
 ATK test: failed
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -36605,7 +36609,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="outrun" supported="no">
+	<software name="outrun" supported="yes">
 		<!-- SPS (CAPS) release 1161 -->
 		<description>Out Run (Europe)</description>
 		<!-- retail, standalone -->
@@ -36613,7 +36617,7 @@ ATK test: OK
 		<year>1989</year>
 		<publisher>U.S. Gold</publisher>
 		<notes><![CDATA[
-Locks up after Kickstart with DSKDAT W $4000 message (white screen) [FDC] dsksync
+Locks up after Kickstart with DSKDAT W $4000 message (white screen) [FDC] dsksync (fixed)
 Uses more [FDC] DSKDAT W $4000 afterwards
 ATK test: failed
 ]]></notes>
@@ -36852,9 +36856,8 @@ ATK test: failed
 		<year>1991</year>
 		<publisher>Global</publisher>
 		<notes><![CDATA[
-Hangs at now loading logo, [FDC] dsksync
-Has scrolling glitches during gameplay, [Copper]
-Sprite is cutoff when player uses the pneumatic drill
+Hangs at now loading logo, [FDC] dsksync (fixed)
+Has scrolling glitches and invisible enemies during gameplay, [Copper]
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -37010,7 +37013,8 @@ ATK test: failed
 		<year>1990</year>
 		<publisher>Futura</publisher>
 		<notes><![CDATA[
-Locks up on AmigaDOS, [FDC] with adkcon=$1100
+Locks up on AmigaDOS, [FDC] with adkcon=$1100 (fixed?)
+Black screen or Guru Meditation by selecting Training Mode multiple times
 ATK test: C:79 H:U 1 Sector Bad
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -37076,10 +37080,10 @@ ATK test: C:0 H:U Bad
 		<year>1990</year>
 		<publisher>Hewson</publisher>
 		<notes><![CDATA[
-Hangs at Kickstart white screen, [FDC] dsksync
+Hangs at Kickstart white screen, [FDC] dsksync (fixed)
 Hangs on a1200 on boot
-Expects to read an autoconfig board at $200000, otherwise it straight off refuses to run with a blue screen (should be possible to run with standard  512k RAM?)
-Bad colors on intro and gameplay
+Bad colors on intro and gameplay, [Copper] dirty table copied from [FDC] dsksync $89** patterns
+Expects to read an autoconfig board at $200000, otherwise it straight off refuses to run with a blue screen (should be possible to run with standard  512k RAM?) (can't repro, assume fixed)
 ATK test: failed
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -40220,11 +40224,12 @@ ATK test: failed
 		<year>1991</year>
 		<publisher>Activision</publisher>
 		<notes><![CDATA[
-Black screen, [FDC] dsksync
+Black screen, [FDC] dsksync (fixed)
 No backgrounds midway thru stage 1 [Copper] sprites
 https://codetapper.com/amiga/sprite-tricks/r-type-2/
 ATK test: failed
 ]]></notes>
+		<info name="usage" value="Supports two buttons joystick"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1012648">
 				<rom name="(sps2065)r-type2.ipf" size="1012648" crc="1f2a2095" sha1="f2b1f6227761fcaa7b814136e98d49965dc5131a"/>
@@ -42000,7 +42005,7 @@ ATK test: OK
 		<year>1991</year>
 		<publisher>Storm</publisher>
 		<notes><![CDATA[
-Black screen [FDC] copy protection check at PC=3ed8 (enables 68k trace mode)
+Black screen [FDC] copy protection check at PC=3ed8 (enables 68k trace mode) (fixed)
 Gameplay doesn't draw status bar on the right, [Copper] sprites
 https://codetapper.com/amiga/sprite-tricks/rod-land/
 ATK test: C:0 H:U Bad
@@ -42487,9 +42492,10 @@ ATK test: OK
 		<year>1991</year>
 		<publisher>Mindcraft</publisher>
 		<notes><![CDATA[
-Fails with a floppy read/write error when creating game, [FDC]
+Fails with a floppy read/write error when creating game, [FDC] format TODO: check with HDD option
 ATK test: OK
 ]]></notes>
+		<!-- TODO: describe install methods -->
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -43144,6 +43150,7 @@ ATK test: OK
 		<publisher>Mindscape</publisher>
 		<notes><![CDATA[
 black screen, [FDC] dsksync
+new68k: Guru Meditation
 [FDC] accesses DSKDATR
 a500: Does not boot aftewards, accesses autoconfig RAM banks at $300000 and $c00000
 a500p: draws no player heli sprite, main menu has no text and there's garbled text OSD during gameplay
@@ -43354,7 +43361,7 @@ ATK test: failed
 		</part>
 	</software>
 
-	<software name="swos" supported="no">
+	<software name="swos" supported="partial">
 		<!-- SPS (CAPS) release 201 -->
 		<description>Sensible World of Soccer (Europe, v1.1)</description>
 		<!-- retail, standalone -->
@@ -43362,6 +43369,7 @@ ATK test: failed
 		<year>1995</year>
 		<publisher>Renegade</publisher>
 		<notes><![CDATA[
+Requires data disks for saving seasons etc. [FDC] format
 ATK test: C:0 H:U Bad
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -43378,14 +43386,16 @@ ATK test: C:0 H:U Bad
 		</part>
 	</software>
 
-	<software name="swosa" cloneof="swos" supported="no">
+	<software name="swosa" cloneof="swos" supported="partial">
 		<!-- SPS (CAPS) release 840 -->
+		<!-- v1.0? -->
 		<description>Sensible World of Soccer (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1994</year>
 		<publisher>Renegade</publisher>
 		<notes><![CDATA[
+Requires data disks for saving seasons etc. [FDC] format
 ATK test: C:0 H:U Bad
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -43410,8 +43420,11 @@ ATK test: C:0 H:U Bad
 		<year>1995</year>
 		<publisher>Renegade</publisher>
 		<notes><![CDATA[
+Requires blank disk [FDC] format
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Update disk for swos" />
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps841)sensibleworldofsoccer_updaterdisk.ipf" size="1049612" crc="26caf128" sha1="8883a8b87fa3c14d89c1d924b393e56fbda41bdf"/>
@@ -43419,7 +43432,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="swos9596" supported="no">
+	<software name="swos9596" supported="partial">
 		<!-- SPS (CAPS) release 1755 -->
 		<description>Sensible World of Soccer 95-96 (Europe)</description>
 		<!-- retail, standalone -->
@@ -43427,6 +43440,7 @@ ATK test: OK
 		<year>1995</year>
 		<publisher>Renegade</publisher>
 		<notes><![CDATA[
+Requires data disks for saving seasons etc. [FDC] format
 ATK test: C:0 H:U Bad
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -43443,7 +43457,7 @@ ATK test: C:0 H:U Bad
 		</part>
 	</software>
 
-	<software name="swosec" supported="no">
+	<software name="swosec" supported="partial">
 		<!-- SPS (CAPS) release 1825 -->
 		<description>Sensible World of Soccer 95-96 - European Championship Edition (Europe)</description>
 		<!-- retail, standalone -->
@@ -43451,6 +43465,7 @@ ATK test: C:0 H:U Bad
 		<year>1996</year>
 		<publisher>Renegade</publisher>
 		<notes><![CDATA[
+Requires data disks for saving seasons etc. [FDC] format
 ATK test: C:0 H:U Bad
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -43467,7 +43482,7 @@ ATK test: C:0 H:U Bad
 		</part>
 	</software>
 
-	<software name="swos9697" supported="no">
+	<software name="swos9697" supported="partial">
 		<!-- SPS (CAPS) release 842 -->
 		<description>Sensible World of Soccer 96-97 (Europe)</description>
 		<!-- retail, standalone -->
@@ -43475,8 +43490,9 @@ ATK test: C:0 H:U Bad
 		<year>1996</year>
 		<publisher>Renegade</publisher>
 		<notes><![CDATA[
-black screen, [FDC] dsksync
-Uses [FDC] dskdatr at end of loading cycles, no noticeable effect?
+black screen, [FDC] dsksync (fixed)
+Uses [FDC] DSKDATR at end of loading cycles, no noticeable effect? (can't repro)
+Requires data disks for saving seasons etc. [FDC] format
 ATK test: C:0 H:U Bad
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -45636,8 +45652,8 @@ ATK test: C:0 H:U Bad
 		<year>1989</year>
 		<publisher>Microdeal</publisher>
 		<notes><![CDATA[
-Locks up after title screen by pressing fire on joystick [FDC] dsksync
-Player GFX sprite is black filled (fixed?)
+Locks up after title screen by pressing fire on joystick [FDC] dsksync (fixed)
+Player GFX sprite is black filled (can't repro, assume fixed)
 a500p: black screen with red mouse pointer on initial loading (btanb?)
 ATK test: C:0 H:U Bad
 ]]></notes>
@@ -45767,8 +45783,7 @@ ATK test: C:79 Bad
 		<year>1993</year>
 		<publisher>Krisalis</publisher>
 		<notes><![CDATA[
-boot OK
-new68k: trashes memory after initial loading [FDC]
+new68k: trashes memory after initial loading, reports regressed track reading in ATK, [FDC] or [CIA]
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -45805,8 +45820,8 @@ ATK test: OK
 		<year>1992</year>
 		<publisher>Codemasters</publisher>
 		<notes><![CDATA[
-black screen [FDC] dsksync
-Hangs on title screen
+black screen [FDC] dsksync (fixed)
+Hangs on title screen, with [FDC] DSKDATR
 ATK test: C:0 H:U Bad
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -45842,6 +45857,7 @@ ATK test: OK
 		<publisher>Kaiko</publisher>
 		<notes><![CDATA[
 Hangs on Lade Spiel (Game loading) after disk swap, [FDC]
+new68k: black screen [FDC]
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -46095,7 +46111,7 @@ ATK test: failed
 		<year>1991</year>
 		<publisher>Empire</publisher>
 		<notes><![CDATA[
-black screen [FDC] dsksync
+black screen [FDC] dsksync (fixed)
 In-game it enables [FDC] dsklen == $0 and hangs (same as dlair2)
 ATK test: failed
 ]]></notes>
@@ -47528,8 +47544,9 @@ ATK test: OK
 		<year>1993</year>
 		<publisher>Bloodhouse</publisher>
 		<notes><![CDATA[
-No GFX stars during intro [Copper]
 Punts after disk swap with "FATAL DISK ERROR! CHECK YOUR MANUAL." [FDC]
+new68k: above happens on first disk
+No GFX stars during intro [Copper]
 https://codetapper.com/amiga/sprite-tricks/stardust/ (coverdisc only?)
 ATK test: failed
 ]]></notes>
