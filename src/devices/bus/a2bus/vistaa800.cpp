@@ -9,6 +9,8 @@
 	This supported up to four double sided/double density 8inch drives.
 	With DMA support for the data transfers, and booting from the first 8inch drive.
 	
+	The card looks like it was released in 1981. The schematic is dated 19th Mar 1981 for the initial drawing, with a later revision date marked, however the month is not readable for it.
+	
 	Manual available here:
 	http://mirrors.apple2.org.za/Apple%20II%20Documentation%20Project/Interface%20Cards/Disk%20Drive%20Controllers/Vista%20A800%20Disk%20Controller/Manuals/Vista%20A800%20Disk%20Controller%20Manual.pdf
 	
@@ -87,7 +89,7 @@ private:
 	bool m_dmaenable_write;
 	uint8_t m_density;
 	uint8_t m_side;
-	floppy_image_device *m_selected_floppy;
+	uint8_t m_twosided;
 };
 
 
@@ -146,7 +148,7 @@ void a2bus_vistaa800_device::device_start()
 	save_item(NAME(m_dmaenable_write));
 	save_item(NAME(m_density));
 	save_item(NAME(m_side));
-	m_selected_floppy = nullptr;
+	save_item(NAME(m_twosided));
 }
 
 void a2bus_vistaa800_device::device_reset()
@@ -156,6 +158,7 @@ void a2bus_vistaa800_device::device_reset()
 	m_dmaenable_write = false;
 	m_density = 0;
 	m_side = 0;
+	m_twosided = 0;
 }
 
 //----------------------------------------------
@@ -201,8 +204,7 @@ uint8_t a2bus_vistaa800_device::read_c0nx(uint8_t offset)
 			if (m_dmaenable_read || m_dmaenable_write)
 				result |= 0x80;
 
-			if (m_selected_floppy)
-				result |= (m_selected_floppy->twosid_r() << 6);
+			result |= (m_twosided << 6); // 0 = two sided disk
 			break;
 
 		default:
@@ -215,6 +217,8 @@ uint8_t a2bus_vistaa800_device::read_c0nx(uint8_t offset)
 
 void a2bus_vistaa800_device::write_c0nx(uint8_t offset, uint8_t data)
 {
+	floppy_image_device *floppy = nullptr;
+	
 	switch (offset)
 	{
 		case 0:
@@ -255,22 +259,17 @@ void a2bus_vistaa800_device::write_c0nx(uint8_t offset, uint8_t data)
 
 			m_side = BIT(data, 6);
 
-			if (BIT(data, 0))
-				m_selected_floppy = m_floppy0->get_device();
-			else if (BIT(data, 1))
-				m_selected_floppy = m_floppy1->get_device();
-			else if (BIT(data, 2))
-				m_selected_floppy = m_floppy2->get_device();
-			else if (BIT(data, 3))
-				m_selected_floppy = m_floppy3->get_device();
-			else
-				m_selected_floppy = nullptr;
-			m_fdc->set_floppy(m_selected_floppy);
+			if (BIT(data, 0)) floppy = m_floppy0->get_device();
+			if (BIT(data, 1)) floppy = m_floppy1->get_device();
+			if (BIT(data, 2)) floppy = m_floppy2->get_device();
+			if (BIT(data, 3)) floppy = m_floppy3->get_device();
+			m_fdc->set_floppy(floppy);
 
-			if (m_selected_floppy)
+			if (floppy)
 			{
-				m_selected_floppy->ss_w(m_side);
-				m_selected_floppy->mon_w(0);
+				floppy->ss_w(m_side);
+				floppy->mon_w(0);
+				m_twosided = floppy->twosid_r();
 			}
 			break;
 
