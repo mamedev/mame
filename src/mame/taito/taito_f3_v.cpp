@@ -51,32 +51,32 @@ Line ram memory map:
   Line set ram: (one word per line, 256 lines per section)
     Each enable bit corresponds to a subsection, e.g. bit 0 sets/latches
     a line in 0x...000-1fe, bit 1 latches a line in 0x...200-3fe, etc.
-    Latch enable bits 4,5,6,7 for potential subsections or alternate
-    subsections 800,a00,c00,e00 are known to be enabled in rare cases
+    In rare cases (e.g. bubblem), the second set of subsections
+    is latched on using bits 4,5,6,7 for ..800,a00,c00,e00, respectively.
 
     0x0000: Line set ram for 4000 (column scroll, alt tilemap, clip) section
-        100x
+        10xx
     0x0200: Line set ram for 5000 (clip planes) section
-        140x
+        14xx
     0x0400: Line set ram for 6000 (blending) section
-        180x
+        18xx
     0x0600: Line set ram for 7000 (pivot and sprite layer mixing) section
-        1c0x
+        1cxx
     0x0800: Line set ram for 8000 (zoom) section
-        200x
+        20xx
     0x0a00: Line set ram for 9000 (palette add) section
-        240x
+        24xx
     0x0c00: Line set ram for a000 (row scroll) section
-        280x
+        28xx
     0x0e00: Line set ram for b000 (playfield mixing info) section
-        2c0x
+        2cxx
 
   "Pivot port" (0x1000-2fff) has only one known used address.
     0x1000: Unknown control word?
         (usually 0x00f0; gseeker, spcinvdj, twinqix, puchicar set 0x0000)
 
 
-  Line data ram (8 sections, 4 normal subsections, 256 lines each):
+  Line data ram (8 sections, 4 normal and 4 alt subsections of 256 lines each):
 
     0x4000: Column scroll (playfield 3/4) & clipping
       4400 Bits: RLrl --Ts ssss ssss
@@ -771,8 +771,10 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 	{
 		u16 latches = m_line_ram[(section * 0x200)/2 + y];
 		offs_t base = 0x400 * BIT(latches, 8, 8) + 0x200 * subsection;
-		if (BIT(latches, subsection + 4))
+		if (BIT(latches, subsection + 4)) {
+			logerror("alt latch @ %4x\n", (base + 0x800) / 2 + y);
 			return (base + 0x800) / 2 + y;
+		}
 		else if (BIT(latches, subsection))
 			return (base) / 2 + y;
 		return 0;
@@ -918,21 +920,34 @@ void taito_f3_state::get_pf_scroll(int pf_num, fixed8 &reg_sx, fixed8 &reg_sy)
 
 	// x scroll is stored as fixed10.6, with fractional bits inverted.
 	// we convert this to regular fixed24.8
-	fixed8 sx = (m_control_0[pf_num] ^ 0b111111) << (8-6);
-	fixed8 sy = (m_control_0[pf_num + 4]) << (8-7); // fixed11.7 to fixed24.8
 
-	sx -= (6 + 4 * pf_num) << 8;
-	sy += 1 << 8;
+	s16 sx_raw = m_control_0[pf_num];
+	s16 sy_raw = m_control_0[pf_num + 4];
 
 	if (m_flipscreen) {
-		sx += (416+188) << 8;
-		sy -= 1024 << 8;
+		sx_raw += 320 << 6; // 10.6
+		sy_raw += 232 << 7; // 9.7
 
-		if (m_game_config->extend)
-			sx -= 512 << 8;
+		sx_raw += (512+192) << 6; // 10.6
+		sy_raw += (256) << 7; // 9.7
+
+		sy_raw += (24 << 7);
+		//if (m_game_config->extend)
+		// 	sx_raw += 512 << 6;
+	}
+	sx_raw += ((40 - 4*pf_num) << 6); // 10.6
+	// why don't we need to do this 24 adjustment for pf 1 and 2 ?  -- only in flip ?
+	sy_raw += (1 << 7); // 9.7
+
+	fixed8 sx = sx_raw << (8-6); // 10.6 to 24.8
+	fixed8 sy = sy_raw << (8-7); // 9.7 to 24.8
+	sx ^= 0b1111'1100;
+	if (m_flipscreen) {
+		sx = -sx;
+		sy = -sy;
 	}
 
-	reg_sx = sx;
+	reg_sx = -sx - (46 << 8);
 	reg_sy = sy;
 }
 
@@ -1097,7 +1112,8 @@ void taito_f3_state::draw_line(pen_t* dst, f3_line_inf &line, int xs, int xe, pl
 void taito_f3_state::draw_line(pen_t* dst, f3_line_inf &line, int xs, int xe, sprite_inf* sp)
 {
 	const pen_t *clut = &m_palette->pen(0);
-	const u16 *src = &sp->srcbitmap->pix(line.y);
+	const int y = m_flipscreen ? (255) - line.y : line.y;
+	const u16 *src = &sp->srcbitmap->pix(y);
 
 	const u8 blend_mode = sp->blend_mask();
 	//logerror("pri/alp: %X %X\n", line.pri_alp[180].pri, line.pri_alp[180].alpha);	
@@ -1123,7 +1139,8 @@ void taito_f3_state::draw_line(pen_t* dst, f3_line_inf &line, int xs, int xe, pi
 	const u16 height_mask = pv->use_pix() ? 0xff : 0x1ff;
 	const u16 width_mask = 0x1ff;
 
-	const int y_index = (pv->reg_sy + line.y) & height_mask;
+	const int y = m_flipscreen ? (255) - line.y : line.y;
+	const int y_index = (pv->reg_sy + y) & height_mask;
 	const u16 *srcbitmap = pv->use_pix() ? &pv->srcbitmap_pixel->pix(y_index) : &pv->srcbitmap_vram->pix(y_index);
 	const u8 *flagsbitmap = pv->use_pix() ? &pv->flagsbitmap_pixel->pix(y_index) : &pv->flagsbitmap_vram->pix(y_index);
 
@@ -1168,7 +1185,10 @@ void taito_f3_state::scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cl
 		line_data.pf[pf].flagsbitmap = &m_tilemap[tmap_number]->flagsmap();
 
 		get_pf_scroll(pf, line_data.pf[pf].reg_sx, line_data.pf[pf].reg_sy);
-		line_data.pf[pf].reg_fx_y = line_data.pf[pf].reg_sy;
+		if (m_flipscreen)
+			line_data.pf[pf].reg_fx_y = -line_data.pf[pf].reg_sy;
+		else
+			line_data.pf[pf].reg_fx_y = line_data.pf[pf].reg_sy;
 		line_data.pf[pf].x_scale = (256-0);
 	}
 	line_data.pivot.srcbitmap_pixel = &m_pixel_layer->pixmap();
@@ -1188,12 +1208,14 @@ void taito_f3_state::scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cl
 	int ys = m_flipscreen ? 24 : 0;
 	for (int y = y_start; y != y_end; y += y_inc) {
 		read_line_ram(line_data, y);
-		line_data.y = y + ys;
+		line_data.y = y;
 		for (auto &pri : line_data.pri_alp) {
 			pri.pri = 0;
 			pri.active_alpha = 0;
 			pri.alpha = 0;
 		}
+		int screen_y = m_flipscreen ? 255 - y : y;
+
 
 		// sort layers
 		std::array<std::variant<pivot_inf*, sprite_inf*, playfield_inf*>,
@@ -1216,7 +1238,7 @@ void taito_f3_state::scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cl
 					// 	arg->mix_value &= 0x3fff; // treat last layer as opaque mode ?
 					std::vector<clip_plane_inf> clip_ranges = calc_clip(line_data.clip, arg);
 					for (const auto &clip : clip_ranges) {
-						draw_line(&bitmap.pix(y+ys), line_data, clip.l, clip.r, arg);
+						draw_line(&bitmap.pix(screen_y), line_data, clip.l, clip.r, arg);
 					}
 				}
 			}, gfx);
@@ -1227,25 +1249,25 @@ void taito_f3_state::scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cl
 		for (auto &pf : line_data.pf) {
 			bool bonus_d = false;
 			for (int xx = 46; xx < 320+46; xx++) {
-				bool temp_bonus = pf.flagsbitmap->pix(y+ys, xx) & 0x1;
+				bool temp_bonus = pf.flagsbitmap->pix(y, xx) & 0x1;
 				if (temp_bonus != bonus_d) {
-					bitmap.pix(y+ys, xx) = temp_bonus ? 0x00FFFF : 0x00FF00;
+					bitmap.pix(y, xx) = temp_bonus ? 0x00FFFF : 0x00FF00;
 					bonus_d = temp_bonus;
 				}
 			}
-			bitmap.pix(y+ys, dbgx++) = pf.blend_b() ? 0x0000FF : 0x000000;
-			bitmap.pix(y+ys, dbgx++) = pf.blend_a() ? 0xFF0000 : 0x000000;
-			bitmap.pix(y+ys, dbgx++) = pf.flagsbitmap->pix(y+ys, 0) & 0x1 ? 0x00FFFF : 0x000000;
+			bitmap.pix(y, dbgx++) = pf.blend_b() ? 0x0000FF : 0x000000;
+			bitmap.pix(y, dbgx++) = pf.blend_a() ? 0xFF0000 : 0x000000;
+			bitmap.pix(y, dbgx++) = pf.flagsbitmap->pix(y+ys, 0) & 0x1 ? 0x00FFFF : 0x000000;
 			dbgx++;
 		}
 		for (auto &sp : line_data.sp) {
-			bitmap.pix(y+ys, dbgx++) = sp.blend_b() ? 0x0000FF : 0x000000;
-			bitmap.pix(y+ys, dbgx++) = sp.blend_a() ? 0xFF0000 : 0x000000;
-			bitmap.pix(y+ys, dbgx++) = sp.brightness ? 0x00FFFF : 0x000000;
+			bitmap.pix(y, dbgx++) = sp.blend_b() ? 0x0000FF : 0x000000;
+			bitmap.pix(y, dbgx++) = sp.blend_a() ? 0xFF0000 : 0x000000;
+			bitmap.pix(y, dbgx++) = sp.brightness ? 0x00FFFF : 0x000000;
 			dbgx++;
 		}
-		bitmap.pix(y+ys, dbgx++) = line_data.pivot.blend_b() ? 0x0000FF : 0x000000;
-		bitmap.pix(y+ys, dbgx++) = line_data.pivot.blend_a() ? 0xFF0000 : 0x000000;
+		bitmap.pix(y, dbgx++) = line_data.pivot.blend_b() ? 0x0000FF : 0x000000;
+		bitmap.pix(y, dbgx++) = line_data.pivot.blend_a() ? 0xFF0000 : 0x000000;
 
 
 		if (y != y_start) {
