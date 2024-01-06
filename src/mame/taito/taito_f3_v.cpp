@@ -769,12 +769,12 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 {
 	const auto latched_addr = [=] (u8 section, u8 subsection) -> offs_t
 	{
-		u16 latches = m_line_ram[(section * 0x200)/2 + y];
-		offs_t base = 0x400 * BIT(latches, 8, 8) + 0x200 * subsection;
-		if (BIT(latches, subsection + 4)) {
-			logerror("alt latch @ %4x\n", (base + 0x800) / 2 + y);
+		const u16 latches = m_line_ram[(section * 0x200)/2 + y];
+		// this may actually be computed from the upper byte? i.e.:
+		//offs_t base = 0x400 * BIT(latches, 8, 8) + 0x200 * subsection;
+		const offs_t base = 0x4000 + 0x1000 * section + 0x200 * subsection;
+		if (BIT(latches, subsection + 4))
 			return (base + 0x800) / 2 + y;
-		}
 		else if (BIT(latches, subsection))
 			return (base) / 2 + y;
 		return 0;
