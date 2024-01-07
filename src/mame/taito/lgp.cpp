@@ -154,7 +154,7 @@ uint32_t lgp_state::screen_update_lgp(screen_device &screen, bitmap_rgb32 &bitma
 /* Main Z80 R/W */
 uint8_t lgp_state::ldp_read()
 {
-	return m_laserdisc->status_r();
+	return m_laserdisc->data_r();
 }
 
 /* Sound Z80 R/W */

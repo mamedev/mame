@@ -177,7 +177,7 @@ void istellar_state::machine_start()
 // Z80 2 R/W
 uint8_t istellar_state::z80_2_ldp_read()
 {
-	uint8_t readResult = m_laserdisc->status_r();
+	uint8_t readResult = m_laserdisc->data_r();
 	LOGCPU2("CPU2 : reading LDP : %x\n", readResult);
 	return readResult;
 }
