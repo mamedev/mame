@@ -1994,6 +1994,8 @@ if (BUSES["MSX_SLOT"]~=null) then
 		MAME_DIR .. "src/devices/bus/msx/cart/ram.h",
 		MAME_DIR .. "src/devices/bus/msx/cart/rtype.cpp",
 		MAME_DIR .. "src/devices/bus/msx/cart/rtype.h",
+		MAME_DIR .. "src/devices/bus/msx/cart/scsi.cpp",
+		MAME_DIR .. "src/devices/bus/msx/cart/scsi.h",
 		MAME_DIR .. "src/devices/bus/msx/cart/slotexpander.cpp",
 		MAME_DIR .. "src/devices/bus/msx/cart/slotexpander.h",
 		MAME_DIR .. "src/devices/bus/msx/cart/slotoptions.cpp",
@@ -2948,6 +2950,8 @@ if (BUSES["A2BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/a2bus/uniprint.h",
 		MAME_DIR .. "src/devices/bus/a2bus/uthernet.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/uthernet.h",
+		MAME_DIR .. "src/devices/bus/a2bus/vistaa800.cpp",
+		MAME_DIR .. "src/devices/bus/a2bus/vistaa800.h",
 	}
 end
 

@@ -15004,6 +15004,8 @@ masmario2                       // (c) 2005 Capcom
 mmaruchan                       // (c) 2005 Capcom
 mmaruchana                      // (c) 2004 Capcom
 pingu                           // (c) 2006 The Pygos Group / Capcom
+rockmanbc                       // (c) 2006 Capcom
+rockmanmdl                      // (c) 2005 Capcom
 wontame                         // (c) 2008 Capcom
 
 @source:capcom/bionicc.cpp
@@ -18807,6 +18809,9 @@ vinvader                        // VTech
 wantgman                        // Actronics / Hanzawa
 zackman                         // Bandai
 
+@source:handheld/hh_ht11xx.cpp
+brke23p2
+
 @source:handheld/hh_melps4.cpp
 cfrogger                        // Coleco
 gjungler                        // Gakken
@@ -19225,7 +19230,8 @@ h8                              //
 h19                             // Heath H19 (Zenith Z-19)
 
 @source:heathkit/h89.cpp
-h89                             // Heath H89 (H88, Zenith Z-89, Z-90)
+h89                             // Heath H89 (WH89, Zenith Z-89, Z-90)
+h88                             // Heath H88 (with cassette tape)
 h89_sigmasoft                   // H89 with the SigmaSoft IGC card
 
 @source:hec2hrp/hec2hrp.cpp
@@ -19245,6 +19251,7 @@ academyd
 academyg
 academyga
 academygb
+academytt
 
 @source:hegenerglaser/amsterdam.cpp
 amsterd                         // Amsterdam
@@ -19718,8 +19725,10 @@ chryanglb                       // bootleg
 chrygld                         // bootleg
 chryglda                        // bootleg
 chthree                         // 199? Promat
+cll                             // (c) 1991 Dyna Electronics
 cmast91                         // (c) 1991 Dyna Electronics
 cmast92                         // (c) 1992 Dyna Electronics
+cmast92a                        // (c) 1992 Dyna Electronics
 cmast97                         // (c) 1996 Dyna Electronics
 cmast99                         // (c) 1999 Dyna Electronics
 cmast99b                        // bootleg
@@ -20113,7 +20122,6 @@ martmast                        // (c) 2001 Martial Masters
 martmast104c                    //
 martmast103c                    //
 martmast102c                    //
-martmasttw                      //
 olds                            // (c) 1999 Oriental Legend Super / Special
 olds100                         //
 olds100a                        //
@@ -23814,7 +23822,8 @@ blkrose                         // Black Rose Rapid Fire Grand Prix
 dragnfly                        // Dragonfly
 enchlamp                        // Enchanted Lamp
 gypmagic                        // Gypsy Magic
-incanp                          // Incan P
+incanp                          // Incan Pyramid (Russia)
+incanpq                         // Incan Pyramid (Queensland)
 jestmagi                        // Jester Magic
 konzero                         // Zero
 luckfoun                        // Lucky Fountain
@@ -27334,6 +27343,7 @@ mk2r91                          // hack
 mkr4                            // (c) 1992 Midway
 mktturbo                        // hack
 nbajam                          // (c) 1993 Midway
+nbajamp1                        // (c) 1993 Midway
 nbajamp2                        // (c) 1993 Midway
 nbajamr1                        // (c) 1993 Midway
 nbajamr2                        // (c) 1993 Midway
@@ -30510,7 +30520,6 @@ belslots                        // (c) 1999 Impera
 bigdeal0                        // (c) 2001 Impera
 dallaspk                        // 1993, unknown
 hotslots                        // (c) 2002 Impera
-jjokeri                         // (c) 199? Impera
 kajotcrd                        // (c) 1993 Amatic
 lucky7i                         // (c) 1991 Impera
 lucky7x                         // (c) 1991 Impera
@@ -30527,6 +30536,7 @@ magicrdec                       // (c) 1994 Impera
 magicrdj                        // (c) 1998 Impera
 magicrdja                       // (c) 1998 Impera
 magicle                         // (c) 2001 Impera
+pokeri                          // (c) 1991 Impera
 puzzleme                        // (c) 199? Impera
 quingo                          // (c) 1999 Impera
 simpbest                        // (c) 2001 Kajot
@@ -38454,6 +38464,9 @@ cp2000
 @source:saitek/delta1.cpp
 ccdelta1
 
+@source:saitek/edames.cpp
+edames
+
 @source:saitek/exechess.cpp
 exechess
 
@@ -41158,6 +41171,9 @@ jwildb52a                       // (c) 199? Sigma
 jwildb52h                       // (c) 199? Sigma
 s8waysfc                        // (c) 1989 Sigma
 
+@source:sigma/sigmab88.cpp
+cool104
+
 @source:sigma/sigmab98.cpp
 animalc                         // (c) 2000 Sammy
 b3rinsya                        // b9805 (c) 1997 Sigma
@@ -43431,6 +43447,7 @@ sidebsjb                        // 1996.07 E23 (c) 1996 Taito Corporation (Japan
 
 @source:taito/taitopjc.cpp
 optiger                         // 1998.09 E63 (c) 1998 Taito
+optigerj
 
 @source:taito/taitosj.cpp
 alpine                          // RH  (c) 1982 Taito Corporation
@@ -43600,6 +43617,9 @@ wgpu                            // C32 (c) 1989 Taito America Corporation (US)
 @source:taito/wyvernf0.cpp
 wyvernf0                        // A39 (c) 1985 Taito Corporation (Japan)
 wyvernf0a                       // A39 (c) 1985 Taito Corporation (Japan)
+
+@source:tandberg/tdv2115l.cpp
+tdv2115l                        //
 
 @source:tandberg/tdv2324.cpp
 tdv2324                         //
@@ -44752,6 +44772,7 @@ jak_bbsf
 zonefamf
 
 @source:tvgames/spg29x_lexibook_jg7425.cpp
+fundr200
 lx_aven
 lx_frozen
 lx_jg7425

@@ -269,7 +269,7 @@ license:CC0-1.0
 		<element ref="green"><bounds x="-2" y="-2" width="98.5" height="89" /></element>
 
 		<group ref="sb_board"><bounds x="2" y="2" width="81" height="81" /></group>
-		<group ref="sb_ui"><bounds x="-13" y="11.25" width="10" height="62.5" /></group>
+		<group ref="sb_ui"><bounds x="-13" yc="42.5" width="10" height="62.5" /></group>
 
 		<!-- board coords -->
 		<element ref="text_1"><bounds x="-0.8" y="6.5" width="2" height="2" /></element>

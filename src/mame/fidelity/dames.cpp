@@ -5,17 +5,17 @@
 
 Fidelity Dame Sensory Challenger (DSC)
 
-Hardware notes:
-- PCB label: 510-1030A01
-- Z80A CPU @ 3.9MHz
-- 8KB ROM(MOS 2364), 1KB RAM(2*TMM314APL)
-- 4-digit 7seg panel, sensory board with 50 buttons
-
 Instead of chess, it's a checkers game for once (international rules).
 
 When playing it on MAME with the sensorboard device, use the modifier keys
 (eg. hold CTRL to ignore sensor). The game expects the player to press a sensor
 only once when doing a multiple capture.
+
+Hardware notes:
+- PCB label: 510-1030A01
+- Z80A CPU @ 3.9MHz
+- 8KB ROM(MOS 2364), 1KB RAM(2*TMM314APL)
+- 4-digit 7seg panel, sensory board with 50 buttons
 
 TODO:
 - doesn't announce winner/loser when the game ends, or is this normal?
@@ -50,7 +50,6 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	// machine configs
 	void dsc(machine_config &config);
 
 protected:
@@ -67,17 +66,16 @@ private:
 	u8 m_inp_mux = 0;
 	u8 m_led_select = 0;
 
-	// address maps
 	void main_map(address_map &map);
+
+	void init_board(int state);
+	u8 read_board_row(u8 row);
 
 	// I/O handlers
 	void update_display();
 	void control_w(u8 data);
 	void select_w(u8 data);
 	u8 input_r();
-
-	void init_board(int state);
-	u8 read_board_row(u8 row);
 };
 
 void dsc_state::machine_start()
@@ -90,10 +88,8 @@ void dsc_state::machine_start()
 
 
 /*******************************************************************************
-    I/O
+    Sensorboard
 *******************************************************************************/
-
-// sensorboard handlers
 
 void dsc_state::init_board(int state)
 {
@@ -131,7 +127,10 @@ u8 dsc_state::read_board_row(u8 row)
 }
 
 
-// TTL
+
+/*******************************************************************************
+    I/O
+*******************************************************************************/
 
 void dsc_state::update_display()
 {
@@ -202,9 +201,9 @@ static INPUT_PORTS_START( dsc )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Black King")
 
 	PORT_START("IN.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Black")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Black Man")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("White King")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("White")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("White Man")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("RV")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("RE")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("PB")
@@ -232,7 +231,7 @@ void dsc_state::dsc(machine_config &config)
 	m_board->init_cb().set(FUNC(dsc_state::init_board));
 	m_board->set_size(5, 10); // 2 columns per x (eg. square 1 & 6 are same x)
 	m_board->set_spawnpoints(4);
-	m_board->set_delay(attotime::from_msec(100));
+	m_board->set_delay(attotime::from_msec(150));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(4, 8);

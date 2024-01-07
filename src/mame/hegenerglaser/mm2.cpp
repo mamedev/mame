@@ -7,8 +7,9 @@ Mephisto MM II series chesscomputers
 
 TODO:
 - rebel5 unknown read from 0x4002, looks like leftover bookrom check
-- need to emulate TurboKit properly, also for mm5p (it's not as simple as a CPU
-  overclock plus ROM patch)
+- need to emulate TurboKit properly as a slot device, also for mm5p (it's not as
+  simple as a CPU overclock), TK20 EPROM is dumped for the common version (6502
+  Mephisto/Fidelity/Novag/etc.) and for the SciSys Maestro/Analyst version
 - correct rom labels (applies to the filenames with .bin extension)
 
 ================================================================================
@@ -29,14 +30,17 @@ ported his Nona program to MM II hardware, using Ed Schröder's interface (hence
 similarity with Rebel). According to research, this version competed in the 1985 Dutch
 Open Computer Chess Championship.
 
-MM IV Turbo Kit 18MHz - (mm4tk)
-This is a replacement ROM combining the Turbo Kit initial ROM with the original MM IV.
-The Turbo Kit powers up to it's tiny ROM, copies itself to RAM, banks in normal ROM,
+MM IV TurboKit 18MHz - (mm4tk)
+This is a replacement ROM combining the TurboKit initial ROM with the original MM IV.
+The TurboKit powers up to it's tiny ROM, copies itself to RAM, banks in normal ROM,
 copies that to faster SRAM, then patches the checksum and the LED blink delays.
 
-There is an undumped MM V Turbo Kit, which will be the exact same except for location
+There is an undumped MM V TurboKit, which will be the exact same except for location
 of the patches. The mm5tk just needs the normal mm5 ROM swapped out for that one to
 blinks the LEDs a little slower.
+
+Correction: The real TK20 TurboKit does not patch the ROM, so mm4tk (and a possible
+mm5 version of this) is more likely a SteveUK hack.
 
 The MM V prototype was the program that Ed Schröder participated with as "Rebel" at
 the 1989 WMCCC in Portorose. It was used with the TK20 TurboKit.
@@ -373,7 +377,7 @@ void mm2_state::mm4(machine_config &config)
 void mm2_state::mm4tk(machine_config &config)
 {
 	mm4(config);
-	m_maincpu->set_clock(18'000'000);
+	m_maincpu->set_clock(36_MHz_XTAL / 2);
 }
 
 void mm2_state::mm5(machine_config &config)
@@ -472,7 +476,7 @@ ROM_END
 
 ROM_START( mm2e ) // 13 Sep 1985, serial 05569xx
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("hg86_13.9", 0x8000, 0x4000, CRC(e2daac82) SHA1(c9fa59ca92362f8ee770733073bfa2ab8c7904ad) )
+	ROM_LOAD("hg_8b_13.9", 0x8000, 0x4000, CRC(e2daac82) SHA1(c9fa59ca92362f8ee770733073bfa2ab8c7904ad) )
 	ROM_LOAD("c-f_6.9",   0xc000, 0x4000, CRC(5e296939) SHA1(badd2a377259cf738cd076d8fb245c3dc284c24d) )
 ROM_END
 

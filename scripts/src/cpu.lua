@@ -3932,3 +3932,20 @@ if opt_tool(CPUS, "XTENSA") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/xtensa/xtensa_helper.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/xtensa/xtensa_helper.h")
 end
+
+--------------------------------------------------
+-- Holtek HT1130
+--@src/devices/cpu/ht1130/ht1130.h,CPUS["HT1130"] = true
+--------------------------------------------------
+
+if CPUS["HT1130"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/ht1130/ht1130.cpp",
+		MAME_DIR .. "src/devices/cpu/ht1130/ht1130.h",
+	}
+end
+
+if opt_tool(CPUS, "HT1130") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ht1130/ht1130d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ht1130/ht1130d.h")
+end

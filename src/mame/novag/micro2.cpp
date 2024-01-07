@@ -10,8 +10,6 @@ This program was used in several Novag chesscomputers:
 - Novag Micro III
 - Novag Presto
 - Novag Octo
-
-suspected, to be confirmed:
 - Novag Allegro (not Allegro 4)
 - Novag Piccolo
 
@@ -23,21 +21,26 @@ Micro II, Micro III(same pcb):
 - Mitsubishi M5L8049-079P-6, 6MHz XTAL
 - buzzer, 20 leds, 8*8 chessboard buttons
 
-Presto (listed differences):
+Presto:
+- PCB label: 100023, 100024
 - NEC D80C49C MCU(serial 186), OSC from LC circuit measured ~6MHz
 
-Octo (listed differences):
+Octo (high-speed):
+- same PCB as Presto
 - NEC D80C49HC MCU(serial 111), 12MHz OSC from LC circuit, this was advertised
   as 15MHz on the box, but measured ~12MHz (older Octo version is probably ~6MHz?)
 - speaker circuit is a bit different, not sure why
 
-Note that even though the MCUs are different, internal ROM contents was confirmed
-to be identical for Micro II/III, Presto, Octo.
+Piccolo (high-speed):
+- PCB label: NOVAG 100041
+- same MCU serial as Octo, LC OSC is around 14MHz
 
-TODO:
-- controls are too sensitive, is there a bug in the CPU core timer emulation?
-  6MHz: valid (single) button press registered between 307ms and 436ms,
-  12MHz: between 154ms and 218ms.
+Note that even though the MCUs are different, internal ROM contents was confirmed
+to be identical for Micro II/III, Presto, Octo, Piccolo.
+
+BTANB:
+- controls are very sensitive (board sensors too): 6MHz: valid (single) button
+  press registered between 307ms and 436ms, 15MHz: between 123ms and 174ms
 
 *******************************************************************************/
 
@@ -108,11 +111,11 @@ void micro2_state::machine_start()
 
 void micro2_state::set_cpu_freq()
 {
-	// known CPU speeds: 6MHz(XTAL), 6MHz(LC), 12MHz(LC)
-	u32 freq = (ioport("CPU")->read() & 1) ? 12'000'000 : 6'000'000;
+	// known CPU speeds: 6MHz(XTAL), 6MHz(LC), ~15MHz(may vary, LC)
+	u32 freq = (ioport("CPU")->read() & 1) ? 15'000'000 : 6'000'000;
 	m_maincpu->set_unscaled_clock(freq);
 
-	m_board->set_delay(attotime::from_ticks(2'000'000, freq)); // see TODO
+	m_board->set_delay(attotime::from_ticks(2'000'000, freq)); // see BTANB
 }
 
 
@@ -185,7 +188,7 @@ static INPUT_PORTS_START( micro2 )
 	PORT_START("CPU")
 	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, micro2_state, change_cpu_freq, 0) // factory set
 	PORT_CONFSETTING(    0x00, "6MHz (original)" )
-	PORT_CONFSETTING(    0x01, "12MHz (Octo)" )
+	PORT_CONFSETTING(    0x01, "15MHz (newer)" )
 INPUT_PORTS_END
 
 

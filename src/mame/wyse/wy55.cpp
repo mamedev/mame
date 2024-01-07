@@ -15,6 +15,7 @@
 #include "cpu/mcs51/mcs51.h"
 //#include "machine/ins8250.h"
 #include "machine/nvram.h"
+#include "machine/scn_pci.h"
 #include "screen.h"
 
 namespace {
@@ -25,6 +26,7 @@ public:
 	wy55_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_epci(*this, "epci")
 		, m_screen(*this, "screen")
 		, m_progbank(*this, "progbank")
 	{
@@ -40,14 +42,18 @@ protected:
 
 private:
 	void wy65_progbank_w(u8 data) { m_progbank->set_entry(data & 0x03); }
+	u8 epci_r(offs_t offset) { return m_epci->read(offset >> 10); }
+	void epci_w(offs_t offset, u8 data) { m_epci->write(offset >> 10, data); }
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void prog_map(address_map &map);
 	void ext_map(address_map &map);
 	void wy65_ext_map(address_map &map);
+	void wy185es_ext_map(address_map &map);
 
 	required_device<mcs51_cpu_device> m_maincpu;
+	optional_device<scn_pci_device> m_epci;
 	required_device<screen_device> m_screen;
 	required_memory_bank m_progbank;
 };
@@ -76,6 +82,15 @@ void wy55_state::ext_map(address_map &map)
 	map(0x8000, 0x9fff).ram().share("nvram1");
 	map(0xa000, 0xbfff).ram().share("fontram");
 	//map(0xf028, 0xf037).rw("uart", FUNC(pc16552_device::read), FUNC(pc16552_device::write));
+}
+
+void wy55_state::wy185es_ext_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram().share("nvram0");
+	map(0x8000, 0x9fff).ram().share("nvram1");
+	map(0xa000, 0xbfff).ram().share("fontram");
+	map(0xe000, 0xefff).r(FUNC(wy55_state::epci_r));
+	map(0xf000, 0xffff).w(FUNC(wy55_state::epci_w));
 }
 
 void wy55_state::wy65_ext_map(address_map &map)
@@ -109,12 +124,17 @@ void wy55_state::wy55(machine_config &config)
 void wy55_state::wy185es(machine_config &config)
 {
 	wy55(config);
+	m_maincpu->set_clock(11_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_IO, &wy55_state::wy185es_ext_map);
 	m_maincpu->port_out_cb<1>().set_nop();
+
+	SCN2661B(config, m_epci, 49.4235_MHz_XTAL / 10); // SCN2661BC1N28
+	m_epci->rxrdy_handler().set_inputline(m_maincpu, MCS51_INT1_LINE);
 }
 
 void wy55_state::wy65(machine_config &config)
 {
-	DS80C320(config, m_maincpu, 58.9824_MHz_XTAL / 4);
+	DS80C320(config, m_maincpu, 58.9824_MHz_XTAL / 4); // divider uncertain
 	m_maincpu->set_addrmap(AS_PROGRAM, &wy55_state::prog_map);
 	m_maincpu->set_addrmap(AS_IO, &wy55_state::wy65_ext_map);
 

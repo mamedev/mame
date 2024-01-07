@@ -70,6 +70,7 @@ using util::BIT;
 #include "cpu/hp2100/hp2100d.h"
 #include "cpu/hpc/hpcdasm.h"
 #include "cpu/hphybrid/hphybrid_dasm.h"
+#include "cpu/ht1130/ht1130d.h"
 #include "cpu/i386/i386dasm.h"
 #include "cpu/i8008/8008dasm.h"
 #include "cpu/i8085/8085dasm.h"
@@ -475,6 +476,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "hpc16083",        le,  0, []() -> util::disasm_interface * { return new hpc16083_disassembler; } },
 	{ "hpc16164",        le,  0, []() -> util::disasm_interface * { return new hpc16164_disassembler; } },
 	{ "hyperstone",      be,  0, []() -> util::disasm_interface * { return new hyperstone_disassembler(&hyperstone_unidasm); } },
+	{ "ht1130",          le,  0, []() -> util::disasm_interface * { return new ht1130_disassembler; } },
 	{ "i4004",           le,  0, []() -> util::disasm_interface * { return new i4004_disassembler; } },
 	{ "i4040",           le,  0, []() -> util::disasm_interface * { return new i4040_disassembler; } },
 	{ "i8008",           le,  0, []() -> util::disasm_interface * { return new i8008_disassembler; } },
@@ -1145,6 +1147,24 @@ void unidasm_data_buffer::decrypt(const unidasm_data_buffer &buffer, bool opcode
 	abort();
 }
 
+static int parse_number(const char *curarg, const char *default_format, u32 *value)
+{
+	int result;
+	if(curarg[0] == '0') {
+		if(tolower((uint8_t)curarg[1]) == 'x')
+			result = sscanf(&curarg[2], "%x", value);
+		else if(tolower((uint8_t)curarg[1]) == 'o')
+			result = sscanf(&curarg[2], "%o", value);
+		else
+			result = sscanf(&curarg[1], "%o", value);
+	}
+	else if(curarg[0] == '$')
+		result = sscanf(&curarg[1], "%x", value);
+	else
+		result = sscanf(&curarg[0], default_format, value);
+	return result;
+}
+
 static int parse_options(int argc, char *argv[], options *opts)
 {
 	bool pending_base = false;
@@ -1188,20 +1208,7 @@ static int parse_options(int argc, char *argv[], options *opts)
 
 		} else if(pending_base) {
 		// base PC
-			int result;
-			if(curarg[0] == '0') {
-				if(tolower((uint8_t)curarg[1]) == 'x')
-					result = sscanf(&curarg[2], "%x", &opts->basepc);
-				else if(tolower((uint8_t)curarg[1]) == 'o')
-					result = sscanf(&curarg[2], "%o", &opts->basepc);
-				else
-					result = sscanf(&curarg[1], "%o", &opts->basepc);
-			}
-			else if(curarg[0] == '$')
-				result = sscanf(&curarg[1], "%x", &opts->basepc);
-			else
-				result = sscanf(&curarg[0], "%x", &opts->basepc);
-			if(result != 1)
+			if(parse_number(curarg, "%x", &opts->basepc) != 1)
 				goto usage;
 			pending_base = false;
 
@@ -1218,26 +1225,13 @@ static int parse_options(int argc, char *argv[], options *opts)
 
 		} else if(pending_skip) {
 			// skip bytes
-			int result;
-			if(curarg[0] == '0') {
-				if(tolower((uint8_t)curarg[1]) == 'x')
-					result = sscanf(&curarg[2], "%x", &opts->skip);
-				else if(tolower((uint8_t)curarg[1]) == 'o')
-					result = sscanf(&curarg[2], "%o", &opts->skip);
-				else
-					result = sscanf(&curarg[1], "%o", &opts->skip);
-			}
-			else if(curarg[0] == '$')
-				result = sscanf(&curarg[1], "%x", &opts->skip);
-			else
-				result = sscanf(curarg, "%d", &opts->skip);
-			if(result != 1)
+			if(parse_number(curarg, "%d", &opts->skip) != 1)
 				goto usage;
 			pending_skip = false;
 
 		} else if(pending_count) {
 			// size
-			if(sscanf(curarg, "%d", &opts->count) != 1)
+			if(parse_number(curarg, "%d", &opts->count) != 1)
 				goto usage;
 			pending_count = false;
 

@@ -259,7 +259,6 @@ protected:
 	hd6301_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const m6800_cpu_device::op_func *insn, const uint8_t *cycles, address_map_constructor internal, int nvram_bytes);
 
 	// device_nvram_interface implementation
-	virtual void nvram_default() override;
 	virtual bool nvram_read(util::read_stream &file) override;
 	virtual bool nvram_write(util::write_stream &file) override;
 
@@ -316,7 +315,6 @@ protected:
 	hd6301x_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal, int nvram_bytes);
 
 	// device_nvram_interface implementation
-	virtual void nvram_default() override;
 	virtual bool nvram_read(util::read_stream &file) override;
 	virtual bool nvram_write(util::write_stream &file) override;
 

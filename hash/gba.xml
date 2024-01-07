@@ -4982,7 +4982,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="cvaniahdj" cloneof="cvaniahd">
+	<software name="cvaniahdj" cloneof="cvaniahd" supported="no">
 		<description>Castlevania - Byakuya no Concerto (Japan)</description>
 		<year>2002</year>
 		<publisher>Konami</publisher>
@@ -5010,10 +5010,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="cvaniahd">
+	<software name="cvaniahd" supported="no">
 		<description>Castlevania - Harmony of Dissonance (Europe)</description>
 		<year>2002</year>
 		<publisher>Konami</publisher>
+		<notes><![CDATA[
+Hangs during cutscene after beating Maxim for best ending path (i.e. before real Dracula fight)
+]]></notes>
 		<info name="serial" value="AGB-ACHP-EUR"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E06-10" />
@@ -5029,7 +5032,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="cvaniahdu" cloneof="cvaniahd">
+	<software name="cvaniahdu" cloneof="cvaniahd" supported="no">
 		<description>Castlevania - Harmony of Dissonance (USA)</description>
 		<year>2002</year>
 		<publisher>Konami</publisher>
@@ -14154,6 +14157,7 @@ license:CC0-1.0
 		<description>Gunstar Future Heroes (Europe)</description>
 		<year>2005</year>
 		<publisher>Sega</publisher>
+		<!-- TODO: verify if it still hangs around endgame -->
 		<info name="serial" value="AGB-BHGP-EUR"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E03-21" />

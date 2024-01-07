@@ -18,6 +18,9 @@ Since the program is on an external module, it appears it was meant to be
 a modular chesscomputer. However, no extra modules were sold separately.
 Module PCB is the same as Super Mondial II College, label HGS 10 116 05.
 
+The T+T version is (presumably the first version of) Polgar ported over to
+Academy hardware. Much unused data remains, and the TRAIN button doesn't work.
+
 *******************************************************************************/
 
 #include "emu.h"
@@ -186,6 +189,13 @@ ROM_START( academyd )
 	ROM_LOAD("academy_hollandisch_32k_4.10.88", 0x8000, 0x8000, CRC(ec92358e) SHA1(27bd542ac39ded5a6c7d3b8547c1a79c7221c5a7) )
 ROM_END
 
+ROM_START( academytt )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("boek", 0x4000, 0x4000, CRC(5503fbb2) SHA1(4dd584b065207d6db408cf02eae9aca825c21f7d) )
+	ROM_CONTINUE(    0x0000, 0x4000 )
+	ROM_LOAD("v-11", 0x8000, 0x8000, CRC(6bc144d5) SHA1(c0c9be144ed0d1fe9ef601c57f38ff9103f2bc64) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -200,3 +210,5 @@ SYST( 1989, academyg,  academy, 0,      academy,  academy, academy_state, empty_
 SYST( 1989, academyga, academy, 0,      academy,  academy, academy_state, empty_init, "Hegener + Glaser", "Mephisto Academy (German, 04-10-88)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1989, academygb, academy, 0,      academy,  academy, academy_state, empty_init, "Hegener + Glaser", "Mephisto Academy (German, 27-08-88)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1989, academyd,  academy, 0,      academy,  academy, academy_state, empty_init, "Hegener + Glaser", "Mephisto Academy (Dutch, 04-10-88)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+
+SYST( 1989, academytt, academy, 0,      academy,  academy, academy_state, empty_init, "Hegener + Glaser", "Mephisto Academy T+T (Dutch, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

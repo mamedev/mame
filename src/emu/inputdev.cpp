@@ -476,7 +476,7 @@ input_device_joystick::input_device_joystick(input_manager &manager, std::string
 s32 input_device_joystick::adjust_absolute_value(s32 result) const
 {
 	// properties are symmetric
-	bool const negative = result < 0;;
+	bool const negative = result < 0;
 	if (negative)
 		result = -result;
 
