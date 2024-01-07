@@ -27,7 +27,7 @@ std::string upd777_disassembler::get_300optype_name(int optype)
 {
 	switch (optype)
 	{
-	case 0x00: return "·"; // 'AND'
+	case 0x00: return "."; // 'AND' expressed as '·' in documentation, but disassembler isn't keen on that
 	case 0x01: return "+";
 	case 0x02: return "v"; // 'OR'
 	case 0x03: return "-";
@@ -39,7 +39,7 @@ std::string upd777_disassembler::get_200optype_name(int optype)
 {
 	switch (optype)
 	{
-	case 0x00: return "·"; // 'AND'
+	case 0x00: return "."; // 'AND' expressed as '·' in documentation, but disassembler isn't keen on that
 	case 0x01: return "<invalid optype>";
 	case 0x02: return "=";
 	case 0x03: return "-";
