@@ -85,6 +85,14 @@ private:
 	u8 get_m_data();
 	void set_m_data(u8 data);
 
+	void set_disp(u8 data);
+	void set_gpe(u8 data);
+	void set_kie(u8 data);
+	void set_sme(u8 data);
+
+	u8 get_kie();
+	u8 get_sme();
+
 	u8 get_a1();
 	u8 get_a2();
 	u8 get_a3();
@@ -104,6 +112,12 @@ private:
 	u8 m_fls;
 
 	u8 m_mode;
+
+	// single bit enable registers?
+	u8 m_disp;
+	u8 m_gpe;
+	u8 m_kie;
+	u8 m_sme;
 };
 
 DECLARE_DEVICE_TYPE(UPD777_CPU, upd777_cpu_device)

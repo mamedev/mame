@@ -112,6 +112,11 @@ void upd777_cpu_device::device_start()
 
 	save_item(NAME(m_stack));
 	save_item(NAME(m_stackpos));
+
+	save_item(NAME(m_disp));
+	save_item(NAME(m_gpe));
+	save_item(NAME(m_kie));
+	save_item(NAME(m_sme));
 }
 
 void upd777_cpu_device::device_reset()
@@ -130,6 +135,11 @@ void upd777_cpu_device::device_reset()
 
 	m_stack[0] = m_stack[1] = m_stack[2] = 0;
 	m_stackpos = 0;
+
+	m_disp = 0;
+	m_gpe = 0;
+	m_kie = 0;
+	m_sme = 0;
 }
 
 u16 upd777_cpu_device::fetch()
@@ -239,6 +249,15 @@ void upd777_cpu_device::set_fls(u8 fls) { m_fls = fls & 0x7f; }
 // 6543210  
 // rbhpRGB (r = reverberate sound effect, b = brightness, h = hue, p = black/prio, RGB = color)
 void upd777_cpu_device::set_mode(u8 mode) { m_mode = mode & 0x7f; }
+
+// single bit enable registers, although they have an important effect on the K->M opcode
+void upd777_cpu_device::set_disp(u8 data) { m_disp = data & 1; }
+void upd777_cpu_device::set_gpe(u8 data) { m_gpe = data & 1; }
+void upd777_cpu_device::set_kie(u8 data) { m_kie = data & 1; }
+void upd777_cpu_device::set_sme(u8 data) { m_sme = data & 1; }
+
+u8 upd777_cpu_device::get_kie() { return m_kie & 1; }
+u8 upd777_cpu_device::get_sme() { return m_sme & 1; }
 
 
 u8 upd777_cpu_device::read_data_mem(u8 addr)
@@ -352,7 +371,19 @@ void upd777_cpu_device::do_op()
 		// When (KIE=1), Store KIN[7:1] to M[H[5:1],L[2:1]][7:1]
 		// When (SME=1), Store HCL[7:1] to M[H[5:1],L[2:1]][7:1]
 		const int k = inst & 0x7f;
-		LOGMASKED(LOG_UNHANDLED_OPS, "0x%02x->M\n", k);
+
+		if (get_kie()) // documentation does not state if KIE or SME has priority
+		{
+			LOGMASKED(LOG_UNHANDLED_OPS, "KIE->M\n", k);
+		}
+		else if (get_sme())
+		{
+			LOGMASKED(LOG_UNHANDLED_OPS, "SME->M\n", k);
+		}
+		else
+		{
+			set_m_data(k & 0x7f);
+		}
 	}
 	else if (inst >= 0b0101'1000'0000 && inst <= 0b0101'1111'1111)
 	{
@@ -960,7 +991,10 @@ void upd777_cpu_device::do_op()
 			const int k = (inst >> 3) & 0x1;
 			const int s = (inst >> 2) & 0x1;
 			const int n = inst & 0x1;
-			LOGMASKED(LOG_UNHANDLED_OPS, "%d->D, %d->G, %d->K, %d->S, %d->A11\n", d, g, k, s, n);
+			set_disp(d);
+			set_gpe(g);
+			set_kie(k);
+			set_sme(s);
 			set_a11(n);
 			break;
 		}
