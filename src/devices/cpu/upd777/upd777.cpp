@@ -107,6 +107,9 @@ void upd777_device::device_start()
 	save_item(NAME(m_l));
 	save_item(NAME(m_h));
 
+	save_item(NAME(m_frs));
+	save_item(NAME(m_fls));
+
 	save_item(NAME(m_stack));
 	save_item(NAME(m_stackpos));
 }
@@ -119,6 +122,9 @@ void upd777_device::device_reset()
 	m_a[0] = m_a[1] = m_a[2] = m_a[3] = 0;
 	m_l = 0;
 	m_h = 0;
+
+	m_frs = 0;
+	m_fls = 0;
 
 	m_skip = 1; // the first opcode is always 'NOP' so maybe skip is 1 on startup?
 
@@ -178,6 +184,11 @@ void upd777_device::set_l(int l)
 	m_l = l & 0x3;
 }
 
+u8 upd777_device::get_l()
+{
+	return m_l & 0x3;
+}
+
 // H reg (upper memory pointer) is 5-bit
 void upd777_device::set_h(int h)
 {
@@ -188,6 +199,13 @@ void upd777_device::set_h(int h)
 u8 upd777_device::get_h_shifted()
 {
 	return (m_h & 0x1f) << 2;
+}
+
+// M is the content of memory address pointed to by H and L
+u8 upd777_device::get_m_data()
+{
+	u8 addr = get_h_shifted() | get_l();
+	return read_data_mem(addr);
 }
 
 // 'A' regs are 7-bit
@@ -201,6 +219,16 @@ u8 upd777_device::get_a1() { return m_a[0] & 0x7f; }
 u8 upd777_device::get_a2() { return m_a[1] & 0x7f; }
 u8 upd777_device::get_a3() { return m_a[2] & 0x7f; }
 u8 upd777_device::get_a4() { return m_a[3] & 0x7f; }
+
+// FRS/FLS are the 2 7-bit sound registers
+void upd777_device::set_frs(u8 frs) { m_frs = frs & 0x7f; }
+void upd777_device::set_fls(u8 fls) { m_fls = fls & 0x7f; }
+
+// MODE is a 7-bit register with the following format
+// 6543210  
+// rbhpRGB (r = reverberate sound effect, b = brightness, h = hue, p = black/prio, RGB = color)
+void upd777_device::set_mode(u8 mode) { m_mode = mode & 0x7f; }
+
 
 u8 upd777_device::read_data_mem(u8 addr)
 {
@@ -564,38 +592,50 @@ void upd777_device::do_op()
 		case 0b0011'0000'1000:
 		{
 			// 308 Move A1[7:1] to FLS[7:1], 0->L[2:1]
-			LOGMASKED(LOG_UNHANDLED_OPS, "A1->FLS, 0->L\n");
+			u8 a1 = get_a1();
+			set_fls(a1);
+			set_l(0);
 			break;
 		}
 		case 0b0011'0100'1000:
 		{
 			// 348 Move A2[7:1] to FLS[7:1], 0->L[2:1]
-			LOGMASKED(LOG_UNHANDLED_OPS, "A2->FLS, 0->L\n");
+			u8 a2 = get_a2();
+			set_fls(a2);
+			set_l(0);
 			break;
 		}
 		case 0b0011'1000'1000:
 		{
 			// 388 Move M[H[5:1],L[2:1]][7:1] to FLS[7:1], 0->L[2:1]
-			LOGMASKED(LOG_UNHANDLED_OPS, "M->FLS, 0->L\n");
+			u8 m = get_m_data();
+			set_fls(m);
+			set_l(0);
 			break;
 		}
 
 		case 0b0011'0000'1001:
 		{
 			// 309 Move A1[7:1] to FRS[7:1], 1->L[2:1]
-			LOGMASKED(LOG_UNHANDLED_OPS, "A1->FRS, 1->L\n");
+			u8 a1 = get_a1();
+			set_frs(a1);
+			set_l(1);
 			break;
 		}
 		case 0b0011'0100'1001:
 		{
 			// 349 Move A2[7:1] to FRS[7:1], 1->L[2:1]
-			LOGMASKED(LOG_UNHANDLED_OPS, "A2->FRS, 1->L\n");
+			u8 a2 = get_a2();
+			set_frs(a2);
+			set_l(1);
 			break;
 		}
 		case 0b0011'1000'1001:
 		{
 			// 389 Move M[H[5:1],L[2:1]][7:1] to FRS[7:1], 1->L[2:1]
-			LOGMASKED(LOG_UNHANDLED_OPS, "M->FRS, 1->L\n");
+			u8 m = get_m_data();
+			set_frs(m);
+			set_l(1);
 			break;
 		}
 
@@ -603,24 +643,27 @@ void upd777_device::do_op()
 		{
 			// 30a Move A1[7:1] to MODE[7:1], 1N->L[2:1]
 			const int n = (inst & 0x1) + 2;
-			LOGMASKED(LOG_UNHANDLED_OPS, "A1->MODE, 0x%d->L\n", n);
-			set_l(n + 2);
+			u8 a1 = get_a1();
+			set_mode(a1);
+			set_l(n);
 			break;
 		}
 		case 0b0011'01001010: case 0b0011'0100'1011:
 		{
 			// 34a Move A2[7:1] to MODE[7:1], 1N->L[2:1]
 			const int n = (inst & 0x1) + 2;
-			LOGMASKED(LOG_UNHANDLED_OPS, "A2->MODE, 0x%d->L\n", n);
-			set_l(n + 2);
+			u8 a2 = get_a2();
+			set_mode(a2);
+			set_l(n);
 			break;
 		}
 		case 0b0011'1000'1010: case 0b00111000'1011:
 		{
 			// 38a Move M[H[5:1],L[2:1]][7:1] to MODE[7:1], 1N->L[2:1]
 			const int n = (inst & 0x1) + 2;
-			LOGMASKED(LOG_UNHANDLED_OPS, "M->MODE, 0x%d->L\n", n);
-			set_l(n + 2);
+			u8 m = get_m_data();
+			set_mode(m);
+			set_l(n);
 			break;
 		}
 

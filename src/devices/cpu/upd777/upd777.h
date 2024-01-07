@@ -66,6 +66,7 @@ private:
 	void push_to_stack(u16 addr);
 	u16 pull_from_stack();
 
+	u8 get_l();
 	void set_l(int l);
 	u8 get_h_shifted();
 	void set_h(int h);
@@ -75,6 +76,13 @@ private:
 	void set_a2(u8 data);
 	void set_a3(u8 data);
 	void set_a4(u8 data);
+
+	void set_frs(u8 frs);
+	void set_fls(u8 fls);
+	void set_mode(u8 mode);
+
+	u8 get_m_data();
+
 	u8 get_a1();
 	u8 get_a2();
 	u8 get_a3();
@@ -90,6 +98,10 @@ private:
 	u16 m_stack[3]; // 3 11-bit registers
 	u8 m_stackpos;
 
+	u8 m_frs;
+	u8 m_fls;
+
+	u8 m_mode;
 };
 
 DECLARE_DEVICE_TYPE(UPD777, upd777_device)
