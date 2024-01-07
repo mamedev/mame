@@ -1,6 +1,9 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
+license:CC0-1.0
+-->
+<!--
 The following software titles are known for the Sega AI:
 
 Cassettes "Kumon Wonder School" 1986-8-1 - 1987-9-1
@@ -67,8 +70,8 @@ AI-8003  Pinpon Music Melody
 			<dataarea name="rom" size="0x20000">
 				<rom name="alice world.bin" size="0x20000" crc="1647d3a6" sha1="680033fb5d0e4b91cd0078d4ab12e5f4fe122119"/>
 			</dataarea>
-			<dataarea name="overlay" size="144325">
-				<rom name="alice world.jpg" size="144325" crc="7f6aaefe" sha1="9fe57a3784115ab972e3e7030fdbe89d9d031540"/>
+			<dataarea name="overlay" size="453649">
+				<rom name="alice world.jpg" size="453649" crc="9c44ccdb" sha1="4b3e8aa25a868f154630cfe166ad89376f9e5917"/>
 			</dataarea>
 		</part>
 	</software>
@@ -109,8 +112,8 @@ AI-8003  Pinpon Music Melody
 			<dataarea name="rom" size="0x20000">
 				<rom name="robinson land.bin" size="0x20000" crc="60d22b3d" sha1="fa17ec899c8ed87681c110c3ef0e05d46fc9cdf3"/>
 			</dataarea>
-			<dataarea name="overlay" size="123253">
-				<rom name="robinson land.jpg" size="123253" crc="195302a2" sha1="b5bcc0cf55ac8779f70717b350b0942c96b2ba74"/>
+			<dataarea name="overlay" size="348822">
+				<rom name="robinson land.jpg" size="348822" crc="f5170856" sha1="97dd3264326232ab320753fd8228195b67f727b8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -144,8 +147,8 @@ AI-8003  Pinpon Music Melody
 			<dataarea name="rom" size="0x20000">
 				<rom name="cosmic train.bin" size="0x20000" crc="cc70a670" sha1="38b8d458540ede5d91f2e1ea8e6dc9a7ed475d82"/>
 			</dataarea>
-			<dataarea name="overlay" size="117048">
-				<rom name="cosmic train.jpg" size="117048" crc="6db3d738" sha1="d2abde0e9d9f79e66e48545bc48f77d3e79c6785"/>
+			<dataarea name="overlay" size="475288">
+				<rom name="cosmic train.jpg" size="475288" crc="f0aa8f0e" sha1="e37165b44aa05c0191b6dac73ed8dfd07e647896"/>
 			</dataarea>
 		</part>
 	</software>
@@ -186,8 +189,8 @@ AI-8003  Pinpon Music Melody
 			<dataarea name="rom" size="0x20000">
 				<rom name="cinderella labyrinth.bin" size="0x20000" crc="cc865679" sha1="49a4cdb6f775786285271f7ea07334a8fad7a7f9"/>
 			</dataarea>
-			<dataarea name="overlay" size="266816">
-				<rom name="cinderella labyrinth.jpg" size="266816" crc="37bab4a3" sha1="25a7547ea3d4a8f65d8fab9b87f4c99d7198fe7e"/>
+			<dataarea name="overlay" size="601568">
+				<rom name="cinderella labyrinth.jpg" size="601568" crc="9d8f9786" sha1="761355f3fd4dfb0a75ca48b6be8833b6f9e8e141"/>
 			</dataarea>
 		</part>
 	</software>
@@ -227,8 +230,8 @@ AI-8003  Pinpon Music Melody
 			<dataarea name="rom" size="0x20000">
 				<rom name="gulliver pocket.bin" size="0x20000" crc="766b1630" sha1="d186bbd6f6e1d4577efc820c80b2e492ac979c4c"/>
 			</dataarea>
-			<dataarea name="overlay" size="161437">
-				<rom name="gulliver pocket.jpg" size="161437" crc="4be74162" sha1="2c9ab53ed2a9923c531a1c3fd283064b76f59f5c"/>
+			<dataarea name="overlay" size="486686">
+				<rom name="gulliver pocket.jpg" size="486686" crc="34a25d62" sha1="33624aa0b6c73cd5c7d0454df6f9a0858c02c28f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -268,8 +271,8 @@ AI-8003  Pinpon Music Melody
 			<dataarea name="rom" size="0x20000">
 				<rom name="mozart academy.bin" size="0x20000" crc="09bbee0f" sha1="16df750fd7f1f1882768e0e6cee89b92863cf79e"/>
 			</dataarea>
-			<dataarea name="overlay" size="112706">
-				<rom name="mozart academy.jpg" size="112706" crc="d91d55c7" sha1="045486555363ba8753e2174619566024e2af1536"/>
+			<dataarea name="overlay" size="364362">
+				<rom name="mozart academy.jpg" size="364362" crc="9e8818ad" sha1="8bd614c0df29b6a897a7776212952b7c3bb6b409"/>
 			</dataarea>
 		</part>
 	</software>
@@ -309,8 +312,8 @@ AI-8003  Pinpon Music Melody
 			<dataarea name="rom" size="0x40000">
 				<rom name="arabian night.bin" size="0x40000" crc="c47ca594" sha1="347d525de9a00da557b684caae7d75680aae50fd"/>
 			</dataarea>
-			<dataarea name="overlay" size="252964">
-				<rom name="arabian night.jpg" size="252964" crc="36156307" sha1="ad80dd4b3b5d91d5612383eed2ec7c11c29199f5"/>
+			<dataarea name="overlay" size="539768">
+				<rom name="arabian night.jpg" size="539768" crc="c880f203" sha1="1c1327e16f1a73e40555882fc7065b772434f861"/>
 			</dataarea>
 		</part>
 	</software>
@@ -350,8 +353,8 @@ AI-8003  Pinpon Music Melody
 			<dataarea name="rom" size="0x20000">
 				<rom name="andersen dream.bin" size="0x20000" crc="ef23c880" sha1="9f78bd9c2e583fa258451a98db13ec2428cef242"/>
 			</dataarea>
-			<dataarea name="overlay" size="131182">
-				<rom name="andersen dream.jpg" size="131182" crc="71901572" sha1="648c528bde5d0dd51f4d1a5faf96ea7b25ecee00"/>
+			<dataarea name="overlay" size="466888">
+				<rom name="andersen dream.jpg" size="466888" crc="0793000a" sha1="62027ae7fd5af95bfbdecdabc1b60dc6fdbac58f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -391,8 +394,8 @@ AI-8003  Pinpon Music Melody
 			<dataarea name="rom" size="0x40000">
 				<rom name="ocean fantasy.bin" size="0x40000" crc="2fe2d406" sha1="eab433b27725b3ef884c66f2ec1ba04af9a61dc1"/>
 			</dataarea>
-			<dataarea name="overlay" size="186691">
-				<rom name="ocean fantasy.jpg" size="186691" crc="c3596591" sha1="6c03b0046c9aaf0099271639307e2dd1b93dcd4a"/>
+			<dataarea name="overlay" size="470555">
+				<rom name="ocean fantasy.jpg" size="470555" crc="fd1f318d" sha1="4ecf38dafbd5f117511835b0ea7faaac171dce29"/>
 			</dataarea>
 		</part>
 	</software>
@@ -432,8 +435,8 @@ AI-8003  Pinpon Music Melody
 			<dataarea name="rom" size="0x20000">
 				<rom name="columbus map.bin" size="0x20000" crc="c95cd4e3" sha1="7aafc37b81d524f046e62dd2e289d142b3c639a6"/>
 			</dataarea>
-			<dataarea name="overlay" size="197012">
-				<rom name="columbus map.jpg" size="197012" crc="ed64e9ed" sha1="ddfe35d8ead25291c6ad3bca5d5bd758d59bb77c"/>
+			<dataarea name="overlay" size="459268">
+				<rom name="columbus map.jpg" size="459268" crc="c5f6477a" sha1="336b89fa073d6a1303c932d604118a7518582b42"/>
 			</dataarea>
 		</part>
 	</software>
@@ -473,8 +476,8 @@ AI-8003  Pinpon Music Melody
 			<dataarea name="rom" size="0x20000">
 				<rom name="runrun music.bin" size="0x20000" crc="9e8f5233" sha1="f0396cb16b6b5295eef71a4acda5c45d492313e1"/>
 			</dataarea>
-			<dataarea name="overlay" size="190090">
-				<rom name="runrun music.jpg" size="190090" crc="cfca8893" sha1="2da3229f81c1650ef745699319fda1d1fab398ee"/>
+			<dataarea name="overlay" size="455482">
+				<rom name="runrun music.jpg" size="455482" crc="aff199c2" sha1="2bf73ee463808f6f4b5b1b7434b94f04ca5d1a40"/>
 			</dataarea>
 		</part>
 	</software>
@@ -491,8 +494,8 @@ AI-8003  Pinpon Music Melody
 			<dataarea name="rom" size="0x20000">
 				<rom name="tantan rhythm.bin" size="0x20000" crc="33059c56" sha1="8ee471bc616cd476b64dcd63eb493c980e0dd888"/>
 			</dataarea>
-			<dataarea name="overlay" size="161927">
-				<rom name="tantan rhythm.jpg" size="161927" crc="a987b544" sha1="e1b2703483e761b2b7cdd1243978fc0c9347eb73"/>
+			<dataarea name="overlay" size="426500">
+				<rom name="tantan rhythm.jpg" size="426500" crc="6306408a" sha1="e9332fbeee99cc502ae3ee6fc9b55f98bf4d44ce"/>
 			</dataarea>
 		</part>
 	</software>
@@ -509,8 +512,8 @@ AI-8003  Pinpon Music Melody
 			<dataarea name="rom" size="0x20000">
 				<rom name="ranran melody.bin" size="0x20000" crc="6e7b1b27" sha1="d66eee759ac03bf877005d699e50af264f0f475b"/>
 			</dataarea>
-			<dataarea name="overlay" size="140887">
-				<rom name="ranran melody.jpg" size="140887" crc="a16ff6cc" sha1="1bad6e2d2797cf5578b6e1863f3cb521655e2dd4"/>
+			<dataarea name="overlay" size="342453">
+				<rom name="ranran melody.jpg" size="342453" crc="a8961042" sha1="69040f152ddacf87cd6801b017fb1326271434f3"/>
 			</dataarea>
 		</part>
 	</software>
