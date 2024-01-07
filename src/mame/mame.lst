@@ -19230,7 +19230,8 @@ h8                              //
 h19                             // Heath H19 (Zenith Z-19)
 
 @source:heathkit/h89.cpp
-h89                             // Heath H89 (H88, Zenith Z-89, Z-90)
+h89                             // Heath H89 (WH89, Zenith Z-89, Z-90)
+h88                             // Heath H88 (with cassette tape)
 
 @source:hec2hrp/hec2hrp.cpp
 hec2hr                          //
