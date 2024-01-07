@@ -8,7 +8,7 @@ license:CC0-1.0
 
 	<element name="led" defstate="0">
 		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
-		<disk state="0"><color red="0.14" green="0.014" blue="0.02" /></disk>
+		<disk state="0"><color red="0.1" green="0.01" blue="0.015" /></disk>
 	</element>
 
 	<element name="text_1"><text string="1"><color red="0.85" green="0.85" blue="0.86" /></text></element>

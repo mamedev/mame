@@ -1083,7 +1083,7 @@ void mb86292_device::fb_commit()
 		{
 			u16 pixel = vram_read_word(c_layer_addr + (x << 1));
 			if ((pixel & 0x7fff) == m_c_layer.transpen)
-				pixel = vram_read_word(bl_layer_addr + (x << 1));;
+				pixel = vram_read_word(bl_layer_addr + (x << 1));
 			vram_write_word(fb_addr + (x << 1), pixel);
 		}
 	}

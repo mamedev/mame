@@ -1503,6 +1503,32 @@ ROM_START( galpans2a )
 	ROM_LOAD( "gs230000.u1",  0x000000, 0x400000, CRC(0348e8e1) SHA1(8a21c7e5cea0bc08a2595213d689c58c0251fdb5) )
 ROM_END
 
+ROM_START( galpansu ) // standard Kaneko NOVA SYSTEM ROM 4 BOARD cart with genuine Kaneko labels & chips
+	SKNS_KOREA
+
+	ROM_REGION32_BE( 0x200000, "user1", 0 ) // SH-2 Code mapped at 0x04000000
+	ROM_LOAD16_BYTE( "gps2k_u6_ver.5.u6", 0x000000, 0x100000, CRC(18ffb6d3) SHA1(73d1c5483ab93855c855c32807a70bf0c4185a1e) )
+	ROM_LOAD16_BYTE( "gps2k_u4_ver.5.u4", 0x000001, 0x100000, CRC(211f3c7c) SHA1(06d3cb95ef7f1e55965b37fb837ec4f3317c83d4) )
+
+	ROM_REGION( 0x1000000, "spritegen", 0 ) // Sprites
+	ROM_LOAD( "gs210000.u21", 0x000000, 0x400000, CRC(294b2f14) SHA1(90cbd0acdaa2d89d208c28aae33ab57c03624089) )
+	ROM_LOAD( "gs210100.u20", 0x400000, 0x400000, CRC(f75c5a9a) SHA1(3919643cee6c88185a1aa3c58c5bc80599bf734e) )
+	ROM_LOAD( "gs210200.u8",  0x800000, 0x400000, CRC(25b4f56b) SHA1(f9a33d5ed54a04ecece3035e75508d191bbe74b1) )
+	ROM_LOAD( "gs210300.u32", 0xc00000, 0x400000, CRC(db6d4424) SHA1(0a88dafd0ee2490ff2ef39ce8eb1931c41bdda42) )
+
+	ROM_REGION( 0x800000, "gfx2", 0 ) // Tiles Plane A
+	ROM_LOAD( "gs220000.u17", 0x000000, 0x400000, CRC(5caae1c0) SHA1(8f77e4cf018d7290b2d804cbff9fccf0bf4d2404) )
+	ROM_LOAD( "gs220100.u9",  0x400000, 0x400000, CRC(8d51f197) SHA1(19d2afab823ea179918e7bcbf4df2283e77570f0) )
+
+	ROM_REGION( 0x800000, "gfx3", ROMREGION_ERASE00 ) // Tiles Plane B
+	// First 0x040000 bytes (0x03ff Tiles) are RAM Based Tiles
+	// 0x040000 - 0x3fffff empty?
+	ROM_LOAD( "gs221000.u3",  0x400000, 0x400000, CRC(58800a18) SHA1(5e6d55ecd12275662d6f59559e137b759f23fff6) )
+
+	ROM_REGION( 0x400000, "ymz", 0 ) // Samples
+	ROM_LOAD( "gs230000.u1",  0x000000, 0x400000, CRC(0348e8e1) SHA1(8a21c7e5cea0bc08a2595213d689c58c0251fdb5) )
+ROM_END
+
 /*
 
 Gals Panic SU (Kaneko 1999)
@@ -1521,7 +1547,7 @@ Gals Panic 2 set.
 
 */
 
-ROM_START( galpansu )
+ROM_START( galpansua )
 	SKNS_KOREA
 
 	ROM_REGION32_BE( 0x200000, "user1", 0 ) // SH-2 Code mapped at 0x04000000
@@ -2047,10 +2073,11 @@ GAME( 1998, puzzloopu, puzzloop, sknsu, puzzloop, skns_state, init_puzzloopu, RO
 GAME( 1998, ryouran ,  skns,     sknsj, skns_1p,  skns_state, init_ryouran,   ROT0,  "Electro Design", "VS Mahjong Otome Ryouran (revision 2)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, ryourano,  ryouran,  sknsj, skns_1p,  skns_state, init_ryouran,   ROT0,  "Electro Design", "VS Mahjong Otome Ryouran (revision 1)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1999, galpans2,  skns,     sknse, galpanis, skns_state, init_galpans2,  ROT0,  "Kaneko", "Gals Panic S2 (Europe)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, galpans2,  skns,     sknse, galpanis, skns_state, init_galpans2,  ROT0,  "Kaneko", "Gals Panic S2 (Europe, version 3)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, galpans2j, galpans2, sknsj, galpanis, skns_state, init_galpans2,  ROT0,  "Kaneko", "Gals Panic S2 (Japan)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, galpans2a, galpans2, sknsa, galpanis, skns_state, init_galpans2,  ROT0,  "Kaneko", "Gals Panic S2 (Asia)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, galpansu,  galpans2, sknsk, galpanis, skns_state, init_galpans2,  ROT0,  "Kaneko", "Gals Panic SU (Korea)", MACHINE_IMPERFECT_GRAPHICS ) // official or hack?
+GAME( 1999, galpans2a, galpans2, sknsa, galpanis, skns_state, init_galpans2,  ROT0,  "Kaneko", "Gals Panic S2 (Asia, version 1.1)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, galpansu,  galpans2, sknsk, galpanis, skns_state, init_galpans2,  ROT0,  "Kaneko", "Gals Panic SU (Korea, version 5)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, galpansua, galpans2, sknsk, galpanis, skns_state, init_galpans2,  ROT0,  "Kaneko", "Gals Panic SU (Korea)", MACHINE_IMPERFECT_GRAPHICS ) // official or hack?
 
 GAME( 1999, panicstr,  skns,     sknsj, galpanis, skns_state, init_panicstr,  ROT0,  "Kaneko", "Panic Street (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 

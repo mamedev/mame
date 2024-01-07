@@ -259,7 +259,6 @@ protected:
 	hd6301_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const m6800_cpu_device::op_func *insn, const uint8_t *cycles, address_map_constructor internal, int nvram_bytes);
 
 	// device_nvram_interface implementation
-	virtual void nvram_default() override;
 	virtual bool nvram_read(util::read_stream &file) override;
 	virtual bool nvram_write(util::write_stream &file) override;
 
@@ -316,7 +315,6 @@ protected:
 	hd6301x_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal, int nvram_bytes);
 
 	// device_nvram_interface implementation
-	virtual void nvram_default() override;
 	virtual bool nvram_read(util::read_stream &file) override;
 	virtual bool nvram_write(util::write_stream &file) override;
 
@@ -332,6 +330,7 @@ protected:
 	virtual void write_port2() override;
 
 	void p2_ddr_2bit_w(uint8_t data);
+	void p3_ddr_1bit_w(uint8_t data);
 	virtual uint8_t p3_data_r() override;
 	virtual void p3_data_w(uint8_t data) override;
 	virtual uint8_t p5_data_r();
@@ -436,6 +435,7 @@ protected:
 	// device_execute_interface overrides
 	virtual void execute_set_input(int inputnum, int state) override;
 
+	void p1_ddr_1bit_w(uint8_t data);
 	void p5_ddr_w(uint8_t data);
 	virtual uint8_t p5_data_r() override;
 	void p5_data_w(uint8_t data);

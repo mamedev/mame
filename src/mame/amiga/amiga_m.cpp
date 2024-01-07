@@ -14,7 +14,6 @@
 #include "amiga.h"
 #include "cpu/m68000/m68000.h"
 
-
 /*************************************
  *
  *  Debugging
@@ -27,6 +26,8 @@
 #define LOG_SERIAL  (1U << 4)
 
 #define VERBOSE (LOG_SERIAL)
+//#define LOG_OUTPUT_FUNC osd_printf_info
+
 #include "logmacro.h"
 
 
@@ -163,8 +164,8 @@ void amiga_state::machine_start()
 	m_chip_ram_mask = (m_chip_ram.bytes() - 1) & ~1;
 
 	// set up the timers
-	m_irq_timer = timer_alloc(FUNC(amiga_state::amiga_irq_proc), this);
-	m_blitter_timer = timer_alloc(FUNC(amiga_state::amiga_blitter_proc), this);
+	m_irq_timer = timer_alloc(FUNC(amiga_state::irq_process_callback), this);
+	m_blitter_timer = timer_alloc(FUNC(amiga_state::blitter_process_callback), this);
 	m_serial_timer = timer_alloc(FUNC(amiga_state::serial_shift), this);
 	m_scanline_timer = timer_alloc(FUNC(amiga_state::scanline_callback), this);
 
@@ -237,7 +238,8 @@ void amiga_state::vblank()
 {
 }
 
-// todo: cia a clock can be connected to either a fixed 50/60hz signal from the power supply, or the vblank
+// TODO: CIA A clock can be connected to either a fixed 50/60hz signal from the power supply, or the vblank
+// TODO: move almost everything to a DMA scheduler, cfr. HRM diagram
 TIMER_CALLBACK_MEMBER( amiga_state::scanline_callback )
 {
 	int scanline = param;
@@ -248,9 +250,6 @@ TIMER_CALLBACK_MEMBER( amiga_state::scanline_callback )
 		// signal vblank irq
 		set_interrupt(INTENA_SETCLR | INTENA_VERTB);
 
-		// clock tod
-		m_cia_0->tod_w(1);
-
 		// additional bookkeeping by drivers
 		vblank();
 	}
@@ -258,6 +257,8 @@ TIMER_CALLBACK_MEMBER( amiga_state::scanline_callback )
 	// vblank end
 	if (scanline == m_screen->visible_area().top())
 	{
+		// clock tod
+		m_cia_0->tod_w(1);
 		m_cia_0->tod_w(0);
 	}
 
@@ -274,13 +275,13 @@ TIMER_CALLBACK_MEMBER( amiga_state::scanline_callback )
 	}
 
 	// render up to this scanline
-	if (!m_screen->update_partial(scanline))
+	//if (!m_screen->update_partial(scanline))
 	{
-		bitmap_rgb32 dummy_bitmap;
+		//bitmap_rgb32 dummy_bitmap;
 		if (IS_AGA())
-			aga_render_scanline(dummy_bitmap, scanline);
+			aga_render_scanline(m_scanline_bitmap, scanline);
 		else
-			render_scanline(dummy_bitmap, scanline);
+			render_scanline(m_scanline_bitmap, scanline);
 	}
 
 	// clock tod (if we actually render this scanline)
@@ -359,7 +360,7 @@ void amiga_state::update_irqs()
 		CUSTOM_REG(REG_INTREQ) |= INTENA_EXTER;
 }
 
-TIMER_CALLBACK_MEMBER( amiga_state::amiga_irq_proc )
+TIMER_CALLBACK_MEMBER( amiga_state::irq_process_callback )
 {
 	update_irqs();
 	m_irq_timer->reset();
@@ -852,7 +853,7 @@ uint32_t amiga_state::blit_line()
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER( amiga_state::amiga_blitter_proc )
+TIMER_CALLBACK_MEMBER( amiga_state::blitter_process_callback )
 {
 	uint32_t blitsum = 0;
 
@@ -946,14 +947,14 @@ void amiga_state::blitter_setup()
 
 	/* compute the blit time */
 	// TODO: verify timings
-	// According to https://github.com/alpine9000/amiga_examples test 010,
-	// blitting is currently taking half the time than necessary.
-	// Is it expecting to account for RAM access waitstates or ...?
+	// - https://github.com/alpine9000/amiga_examples test 010,
+	//   blitting is currently taking half the time than necessary.
+	// - viz does heavy bbusy checks.
 	blittime = ticks * height * width;
 
 	/* if 'blitter-nasty' is set, then the blitter takes over the bus. Make the blit semi-immediate */
-	// TODO: blitter nasty doesn't seem to work as intended.
-	// cfr. spinwrld
+	// FIXME: emulate bus priority implications here
+	// cfr. spinwrld no backgrounds
 	if ( CUSTOM_REG(REG_DMACON) & 0x0400 )
 	{
 		/* simulate the 68k not running while the blit is going */
@@ -1118,7 +1119,7 @@ void amiga_state::ocs_map(address_map &map)
 //  map(0x000, 0x001).r(FUNC(amiga_state::bltddat_r));
 //  map(0x002, 0x003).r(FUNC(amiga_state::dmaconr_r));
 	map(0x004, 0x005).r(FUNC(amiga_state::vposr_r));
-//  map(0x006, 0x007).r(FUNC(amiga_state::vhposr_r));
+	map(0x006, 0x007).r(FUNC(amiga_state::vhposr_r));
 //  map(0x008, 0x009).r(FUNC(amiga_state::dskdatr_r));
 	// TODO: verify if JOYxDAT really belongs to Denise (???)
 //  map(0x00a, 0x00b).r(FUNC(amiga_state::joydat_r<0>));
@@ -1263,6 +1264,11 @@ u16 amiga_state::vposr_r()
 	return res;
 }
 
+u16 amiga_state::vhposr_r()
+{
+	return amiga_gethvpos() & 0xffff;
+}
+
 void amiga_state::vposw_w(u16 data)
 {
 	// TODO: data actually resync the screen?
@@ -1279,7 +1285,7 @@ void amiga_state::bplcon0_w(u16 data)
 	if ((data & (BPLCON0_BPU0 | BPLCON0_BPU1 | BPLCON0_BPU2)) == (BPLCON0_BPU0 | BPLCON0_BPU1 | BPLCON0_BPU2))
 	{
 		/* planes go from 0 to 6, inclusive */
-		popmessage( "This game is doing funky planes stuff. (planes > 6, %04x)", data );
+		popmessage( "bplcon0_w: setting up planes > 6, %04x", data );
 		data &= ~BPLCON0_BPU0;
 	}
 	CUSTOM_REG(REG_BPLCON0) = data;
@@ -1309,7 +1315,8 @@ uint16_t amiga_state::custom_chip_r(offs_t offset)
 			return amiga_gethvpos() & 0xffff;
 
 		case REG_SERDATR:
-			LOGMASKED(LOG_SERIAL, "r SERDATR: %04x\n", CUSTOM_REG(REG_SERDATR));
+			if (!machine().side_effects_disabled())
+				LOGMASKED(LOG_SERIAL, "r SERDATR: %04x\n", CUSTOM_REG(REG_SERDATR));
 			return CUSTOM_REG(REG_SERDATR);
 
 		case REG_JOY0DAT:
@@ -1380,7 +1387,7 @@ uint16_t amiga_state::custom_chip_r(offs_t offset)
 			return m_fdc->adkcon_r();
 
 		case REG_DSKDATR:
-			popmessage("DSKDAT R, contact MAMEdev");
+			popmessage("DSKDAT R");
 			break;
 	}
 
@@ -1404,7 +1411,7 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 			return;
 
 		case REG_DSKDAT:
-			popmessage("DSKDAT W %04x, contact MAMEdev",data);
+			popmessage("DSKDAT W %04x",data);
 			break;
 
 		case REG_DSKSYNC:
@@ -1500,7 +1507,7 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 			}
 			break;
 
-		// OCS and AGA versions of Soccer Kid explicitly writes blitter addresses way beyond chip RAM
+		// soccerkd (OCS) and sockid_a (AGA) explicitly writes blitter addresses way beyond chip RAM
 		// This is clearly deterministic: it draws an individual empty tile scattered across playfield
 		// (which also collides on top of it)
 		case REG_BLTAPTH:   case REG_BLTBPTH:   case REG_BLTCPTH:   case REG_BLTDPTH:
@@ -1569,11 +1576,15 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 			data = (data & INTENA_SETCLR) ? (CUSTOM_REG(offset) | (data & 0x7fff)) : (CUSTOM_REG(offset) & ~(data & 0x7fff));
 			CUSTOM_REG(offset) = data;
 			if (temp & INTENA_SETCLR)
-				// if we're enabling irq's, delay a bit
+			{
+				/* if we're enabling irq's, delay a bit */
 				m_irq_timer->adjust(m_maincpu->cycles_to_attotime(AMIGA_IRQ_DELAY_CYCLES));
+			}
 			else
-				// if we're disabling irq's, process right away
+			{
+				/* if we're disabling irq's, process right away */
 				update_irqs();
+			}
 			break;
 
 		case REG_INTREQ:
@@ -1594,11 +1605,15 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 			CUSTOM_REG(offset) = data;
 
 			if (temp & INTENA_SETCLR)
-				// if we're generating irq's, delay a bit
+			{
+				/* if we're generating irq's, delay a bit */
 				m_irq_timer->adjust(m_maincpu->cycles_to_attotime(AMIGA_IRQ_DELAY_CYCLES));
+			}
 			else
-				// if we're clearing irq's, process right away
+			{
+				/* if we're clearing irq's, process right away */
 				update_irqs();
+			}
 			break;
 
 		case REG_ADKCON:

@@ -50,31 +50,31 @@ license:CC0-1.0
 		<rect><color alpha="0" /></rect>
 	</element>
 
-	<element name="text_1">    <text string="1"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
-	<element name="text_2">    <text string="2"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
-	<element name="text_3">    <text string="3"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
-	<element name="text_4">    <text string="4"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
-	<element name="text_5">    <text string="5"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
-	<element name="text_6">    <text string="6"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
-	<element name="text_7">    <text string="7"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
-	<element name="text_8">    <text string="8"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
-	<element name="text_a">    <text string="A"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
-	<element name="text_b">    <text string="B"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
-	<element name="text_c">    <text string="C"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
-	<element name="text_d">    <text string="D"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
-	<element name="text_e">    <text string="E"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
-	<element name="text_f">    <text string="F"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
-	<element name="text_g">    <text string="G"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
-	<element name="text_h">    <text string="H"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="text_1"> <text string="1"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="text_2"> <text string="2"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="text_3"> <text string="3"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="text_4"> <text string="4"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="text_5"> <text string="5"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="text_6"> <text string="6"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="text_7"> <text string="7"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="text_8"> <text string="8"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="text_a"> <text string="A"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="text_b"> <text string="B"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="text_c"> <text string="C"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="text_d"> <text string="D"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="text_e"> <text string="E"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="text_f"> <text string="F"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="text_g"> <text string="G"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="text_h"> <text string="H"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
 
-	<element name="text_trn">  <text string="TRN">                    <color red="0.76" green="0.74" blue="0.41" /></text> </element>
-	<element name="text_info"> <text string="INFO">                   <color red="0.76" green="0.74" blue="0.41" /></text> </element>
-	<element name="text_mem">  <text string="MEM">                    <color red="0.76" green="0.74" blue="0.41" /></text> </element>
-	<element name="text_pos">  <text string="POS">                    <color red="0.76" green="0.74" blue="0.41" /></text> </element>
-	<element name="text_lev">  <text string="LEV">                    <color red="0.76" green="0.74" blue="0.41" /></text> </element>
-	<element name="text_fct">  <text string="FCT">                    <color red="0.76" green="0.74" blue="0.41" /></text> </element>
-	<element name="text_ent">  <text string="ENT">                    <color red="0.76" green="0.74" blue="0.41" /></text> </element>
-	<element name="text_cl">   <text string="CL">                     <color red="0.76" green="0.74" blue="0.41" /></text> </element>
+	<element name="text_trn">  <text string="TRN">  <color red="0.76" green="0.74" blue="0.41" /></text> </element>
+	<element name="text_info"> <text string="INFO"> <color red="0.76" green="0.74" blue="0.41" /></text> </element>
+	<element name="text_mem">  <text string="MEM">  <color red="0.76" green="0.74" blue="0.41" /></text> </element>
+	<element name="text_pos">  <text string="POS">  <color red="0.76" green="0.74" blue="0.41" /></text> </element>
+	<element name="text_lev">  <text string="LEV">  <color red="0.76" green="0.74" blue="0.41" /></text> </element>
+	<element name="text_fct">  <text string="FCT">  <color red="0.76" green="0.74" blue="0.41" /></text> </element>
+	<element name="text_ent">  <text string="ENT">  <color red="0.76" green="0.74" blue="0.41" /></text> </element>
+	<element name="text_cl">   <text string="CL">   <color red="0.76" green="0.74" blue="0.41" /></text> </element>
 	<element name="text_lcd">  <text string="16/32 BIT DISPLAY MODUL"><color red="0.76" green="0.74" blue="0.41" /></text> </element>
 
 	<element name="static_lcd"><rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect></element>
@@ -385,44 +385,44 @@ license:CC0-1.0
 		<bounds left="0" right="60" top="0" bottom="14" />
 		<group ref="lcd"><bounds x="1" y="3" width="24.5" height="6.5" /></group>
 
-		<element ref="text_p6">           <bounds x="30.25" y="5.55" width="2" height="2" /></element>
-		<element ref="text_p5">           <bounds x="35.25" y="5.55" width="2" height="2" /></element>
-		<element ref="text_p4">           <bounds x="40.25" y="5.55" width="2" height="2" /></element>
-		<element ref="text_p3">           <bounds x="45.25" y="5.55" width="2" height="2" /></element>
-		<element ref="text_p2">           <bounds x="50.25" y="5.55" width="2" height="2" /></element>
-		<element ref="text_p1">           <bounds x="55.25" y="5.55" width="2" height="2" /></element>
+		<element ref="text_p6"> <bounds x="30.25" y="5.55" width="2" height="2" /></element>
+		<element ref="text_p5"> <bounds x="35.25" y="5.55" width="2" height="2" /></element>
+		<element ref="text_p4"> <bounds x="40.25" y="5.55" width="2" height="2" /></element>
+		<element ref="text_p3"> <bounds x="45.25" y="5.55" width="2" height="2" /></element>
+		<element ref="text_p2"> <bounds x="50.25" y="5.55" width="2" height="2" /></element>
+		<element ref="text_p1"> <bounds x="55.25" y="5.55" width="2" height="2" /></element>
 		<element ref="yellow_mask" blend="multiply"><bounds x="30" y="5.51" width="28" height="2.2" /></element>
 
 		<element ref="text_lcd"><bounds x="1" y="1" width="24.5" height="1.2" /></element>
 
-		<element name="led100" ref="led2">     <bounds x="29.1" y="1" width="1.3" height="1.3" />    </element>
-		<element name="led101" ref="led2">     <bounds x="34.1" y="1" width="1.3" height="1.3" />    </element>
-		<element name="led102" ref="led2">     <bounds x="39.1" y="1" width="1.3" height="1.3" />    </element>
-		<element name="led103" ref="led2">     <bounds x="44.1" y="1" width="1.3" height="1.3" />    </element>
-		<element name="led104" ref="led2">     <bounds x="49.1" y="1" width="1.3" height="1.3" />    </element>
-		<element name="led105" ref="led2">     <bounds x="54.1" y="1" width="1.3" height="1.3" />    </element>
+		<element name="led100" ref="led2"> <bounds x="29.1" y="1" width="1.3" height="1.3" /> </element>
+		<element name="led101" ref="led2"> <bounds x="34.1" y="1" width="1.3" height="1.3" /> </element>
+		<element name="led102" ref="led2"> <bounds x="39.1" y="1" width="1.3" height="1.3" /> </element>
+		<element name="led103" ref="led2"> <bounds x="44.1" y="1" width="1.3" height="1.3" /> </element>
+		<element name="led104" ref="led2"> <bounds x="49.1" y="1" width="1.3" height="1.3" /> </element>
+		<element name="led105" ref="led2"> <bounds x="54.1" y="1" width="1.3" height="1.3" /> </element>
 
-		<element ref="text_trn">          <bounds x="30.5" y="1" width="2.5" height="1.2" />  </element>
-		<element ref="text_info">         <bounds x="35.5" y="1" width="2.5" height="1.2" />  </element>
-		<element ref="text_mem">          <bounds x="40.5" y="1" width="2.5" height="1.2" />  </element>
-		<element ref="text_pos">          <bounds x="45.5" y="1" width="2.5" height="1.2" />  </element>
-		<element ref="text_lev">          <bounds x="50.5" y="1" width="2.5" height="1.2" />  </element>
-		<element ref="text_fct">          <bounds x="55.5" y="1" width="2.5" height="1.2" />  </element>
-		<element ref="text_ent">          <bounds x="49.5" y="8" width="3.5" height="1.2" />  </element>
-		<element ref="text_cl">           <bounds x="54.5" y="8" width="3.5" height="1.3" />  </element>
+		<element ref="text_trn">  <bounds x="30.5" y="1" width="2.5" height="1.2" /> </element>
+		<element ref="text_info"> <bounds x="35.5" y="1" width="2.5" height="1.2" /> </element>
+		<element ref="text_mem">  <bounds x="40.5" y="1" width="2.5" height="1.2" /> </element>
+		<element ref="text_pos">  <bounds x="45.5" y="1" width="2.5" height="1.2" /> </element>
+		<element ref="text_lev">  <bounds x="50.5" y="1" width="2.5" height="1.2" /> </element>
+		<element ref="text_fct">  <bounds x="55.5" y="1" width="2.5" height="1.2" /> </element>
+		<element ref="text_ent">  <bounds x="49.5" y="8" width="3.5" height="1.2" /> </element>
+		<element ref="text_cl">   <bounds x="54.5" y="8" width="3.5" height="1.3" /> </element>
 
 		<element ref="yellow_mask"><bounds x="52.5" y="8.5" width="2.5" height="0.1" /></element>
 		<element ref="yellow_mask"><bounds x="51.2" y="9.25" width="0.1" height="0.5" /></element>
 		<element ref="yellow_mask"><bounds x="56.2" y="9.25" width="0.1" height="0.5" /></element>
 
-		<element ref="hlb" inputtag="KEY" inputmask="0x01">       <bounds x="29.5" y="3" width="3.5" height="2.5" />  </element>
-		<element ref="hlb" inputtag="KEY" inputmask="0x02">       <bounds x="34.5" y="3" width="3.5" height="2.5" />  </element>
-		<element ref="hlb" inputtag="KEY" inputmask="0x04">       <bounds x="39.5" y="3" width="3.5" height="2.5" />  </element>
-		<element ref="hlb" inputtag="KEY" inputmask="0x08">       <bounds x="44.5" y="3" width="3.5" height="2.5" />  </element>
-		<element ref="hlb" inputtag="KEY" inputmask="0x10">       <bounds x="49.5" y="3" width="3.5" height="2.5" />  </element>
-		<element ref="hlb" inputtag="KEY" inputmask="0x20">       <bounds x="54.5" y="3" width="3.5" height="2.5" />  </element>
-		<element ref="hlb" inputtag="KEY" inputmask="0x40">       <bounds x="49.5" y="10" width="3.5" height="2.5" />  </element>
-		<element ref="hlb" inputtag="KEY" inputmask="0x80">       <bounds x="54.5" y="10" width="3.5" height="2.5" />  </element>
+		<element ref="hlb" inputtag="KEY" inputmask="0x01"> <bounds x="29.5" y="3" width="3.5" height="2.5" /> </element>
+		<element ref="hlb" inputtag="KEY" inputmask="0x02"> <bounds x="34.5" y="3" width="3.5" height="2.5" /> </element>
+		<element ref="hlb" inputtag="KEY" inputmask="0x04"> <bounds x="39.5" y="3" width="3.5" height="2.5" /> </element>
+		<element ref="hlb" inputtag="KEY" inputmask="0x08"> <bounds x="44.5" y="3" width="3.5" height="2.5" /> </element>
+		<element ref="hlb" inputtag="KEY" inputmask="0x10"> <bounds x="49.5" y="3" width="3.5" height="2.5" /> </element>
+		<element ref="hlb" inputtag="KEY" inputmask="0x20"> <bounds x="54.5" y="3" width="3.5" height="2.5" /> </element>
+		<element ref="hlb" inputtag="KEY" inputmask="0x40"> <bounds x="49.5" y="10" width="3.5" height="2.5" /> </element>
+		<element ref="hlb" inputtag="KEY" inputmask="0x80"> <bounds x="54.5" y="10" width="3.5" height="2.5" /> </element>
 
 		<!-- hidden input above ENT/CL buttons to press both -->
 		<element ref="nothing" inputtag="CLICKABLE" inputmask="0x01"><bounds x="52.2" y="8.0" width="3.1" height="1.1" /></element>
@@ -459,6 +459,6 @@ license:CC0-1.0
 		<group ref="panel"><bounds x="40" y="87.5" width="60" height="14" /></group>
 
 		<group ref="sb_board"><bounds x="17.5" y="2.5" width="80" height="80" /></group>
-		<group ref="sb_ui"><bounds x="1.5" y="3" width="10" height="80" /></group>
+		<group ref="sb_ui"><bounds x="1.5" y="2.5" width="10" height="80" /></group>
 	</view>
 </mamelayout>

@@ -33,6 +33,7 @@ mediagx_cs5530_bridge_device::mediagx_cs5530_bridge_device(const machine_config 
 	, m_rtccs_write(*this)
 	, m_host_cpu(*this, finder_base::DUMMY_TAG)
 	, m_ide(*this, finder_base::DUMMY_TAG)
+	, m_kbdc(*this, finder_base::DUMMY_TAG)
 	, m_pic8259_master(*this, "pic8259_master")
 	, m_pic8259_slave(*this, "pic8259_slave")
 	, m_dma8237_1(*this, "dma8237_1")
@@ -204,13 +205,15 @@ void mediagx_cs5530_bridge_device::config_map(address_map &map)
 //	map(0xf4, 0xf7) Second Level Power Management Status
 }
 
+// TODO: keyboard & RTC ports should map thru map_extra subtractive/positive decoding
 void mediagx_cs5530_bridge_device::internal_io_map(address_map &map)
 {
 	map(0x0000, 0x001f).rw("dma8237_1", FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x0020, 0x0021).rw("pic8259_master", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x0040, 0x005f).rw("pit8254", FUNC(pit8254_device::read), FUNC(pit8254_device::write));
+	map(0x0060, 0x0060).rw(m_kbdc, FUNC(kbdc8042_device::port60_r), FUNC(kbdc8042_device::port60_w));
 	map(0x0061, 0x0061).rw(FUNC(mediagx_cs5530_bridge_device::at_portb_r), FUNC(mediagx_cs5530_bridge_device::at_portb_w));
-	map(0x0064, 0x0067).nopr();
+	map(0x0064, 0x0064).rw(m_kbdc, FUNC(kbdc8042_device::port64_r), FUNC(kbdc8042_device::port64_w));
 	map(0x0070, 0x0070).lw8(
 		NAME([this] (u8 data) {
 			m_nmi_enabled = BIT(data, 7);
@@ -513,7 +516,9 @@ void mediagx_cs5530_bridge_device::map_extra(
 		LOGMAP("RTC positive decode $070 & $071\n");
 
 	if (BIT(m_decode_control[0], 1))
+	{
 		LOGMAP("KBDC positive decode $060 & $064 (mailbox $62 & $66 %s)\n", BIT(m_decode_control[1], 7) ? "enabled" : "disabled");
+	}
 
 	if (BIT(m_decode_control[0], 2))
 		LOGMAP("COM1 positive decode $3f8-$3ff\n");

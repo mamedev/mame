@@ -12,18 +12,6 @@
 
 class gladiatr_state_base : public driver_device
 {
-public:
-	void videoram_w(offs_t offset, u8 data);
-	void colorram_w(offs_t offset, u8 data);
-	void textram_w(offs_t offset, u8 data);
-	void paletteram_w(offs_t offset, u8 data);
-	void spritebuffer_w(int state);
-	void adpcm_command_w(u8 data);
-	u8 adpcm_command_r();
-	void flipscreen_w(int state);
-	void ym_irq(int state);
-
-	void cpu2_map(address_map &map);
 protected:
 	gladiatr_state_base(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
@@ -41,7 +29,6 @@ protected:
 		, m_videoram(*this, "videoram")
 		, m_colorram(*this, "colorram")
 		, m_textram(*this, "textram")
-		, m_paletteram(*this, "paletteram")
 		, m_spriteram(*this, "spriteram")
 		, m_video_attributes(0)
 		, m_fg_scrolly(0)
@@ -53,11 +40,6 @@ protected:
 		, m_bg_tilemap(nullptr)
 	{
 	}
-
-	TILE_GET_INFO_MEMBER(bg_get_tile_info);
-	TILE_GET_INFO_MEMBER(fg_get_tile_info);
-
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_device<z80_device>             m_maincpu;
 	required_device<z80_device>             m_subcpu;
@@ -74,18 +56,34 @@ protected:
 	required_shared_ptr<u8>            m_videoram;
 	required_shared_ptr<u8>            m_colorram;
 	required_shared_ptr<u8>            m_textram;
-	required_shared_ptr<u8>            m_paletteram;
 	required_shared_ptr<u8>            m_spriteram;
 
-	int         m_video_attributes;
-	int         m_fg_scrolly;
-	int         m_fg_tile_bank;
-	int         m_bg_tile_bank;
-	int         m_sprite_bank;
-	int         m_sprite_buffer;
+	u8          m_video_attributes;
+	u16         m_fg_scrolly;
+	u32         m_fg_tile_bank;
+	u32         m_bg_tile_bank;
+	u32         m_sprite_bank;
+	u8          m_sprite_buffer;
 
 	tilemap_t   *m_fg_tilemap;
 	tilemap_t   *m_bg_tilemap;
+
+	void videoram_w(offs_t offset, u8 data);
+	void colorram_w(offs_t offset, u8 data);
+	void textram_w(offs_t offset, u8 data);
+	void spritebuffer_w(int state);
+	void adpcm_command_w(u8 data);
+	u8 adpcm_command_r();
+	void flipscreen_w(int state);
+	void ym_irq(int state);
+
+	TILE_GET_INFO_MEMBER(bg_get_tile_info);
+	TILE_GET_INFO_MEMBER(fg_get_tile_info);
+
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void cpu2_map(address_map &map);
+
 };
 
 class gladiatr_state : public gladiatr_state_base
@@ -93,6 +91,8 @@ class gladiatr_state : public gladiatr_state_base
 public:
 	gladiatr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: gladiatr_state_base(mconfig, type, tag)
+		, m_mainbank(*this, "mainbank")
+		, m_adpcmbank(*this, "adpcmbank")
 		, m_dsw1(*this, "DSW1")
 		, m_dsw2(*this, "DSW2")
 		, m_in0(*this, "IN0")
@@ -120,7 +120,25 @@ public:
 
 	void init_gladiatr();
 
+protected:
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
+	required_memory_bank m_mainbank;
+	required_memory_bank m_adpcmbank;
+	required_ioport m_dsw1, m_dsw2;
+	required_ioport m_in0, m_in1, m_in2;
+	required_ioport m_coins;
+
+	bool    m_tclk_val;
+	u8      m_cctl_p1, m_cctl_p2;
+	u8      m_ucpu_p1, m_csnd_p1;
+
+	u16     m_fg_scrollx;
+	u16     m_bg_scrollx;
+	u16     m_bg_scrolly;
+
 	void spritebank_w(int state);
 	void gladiatr_video_registers_w(offs_t offset, u8 data);
 
@@ -142,27 +160,12 @@ private:
 	void csnd_p1_w(u8 data);
 	u8 csnd_p2_r();
 
-	DECLARE_MACHINE_RESET(gladiator);
-	DECLARE_VIDEO_START(gladiatr);
-
-	uint32_t screen_update_gladiatr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_gladiatr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void gladiatr_cpu1_io(address_map &map);
 	void gladiatr_cpu1_map(address_map &map);
 	void gladiatr_cpu2_io(address_map &map);
 	void gladiatr_cpu3_map(address_map &map);
-
-	required_ioport m_dsw1, m_dsw2;
-	required_ioport m_in0, m_in1, m_in2;
-	required_ioport m_coins;
-
-	bool    m_tclk_val;
-	u8      m_cctl_p1, m_cctl_p2;
-	u8      m_ucpu_p1, m_csnd_p1;
-
-	int     m_fg_scrollx;
-	int     m_bg_scrollx;
-	int     m_bg_scrolly;
 };
 
 class ppking_state : public gladiatr_state_base
@@ -175,31 +178,14 @@ public:
 	{
 	}
 
-	u8 ppking_f1_r();
-	void ppking_qx0_w(offs_t offset, u8 data);
-	void ppking_qx1_w(offs_t offset, u8 data);
-	void ppking_qx3_w(u8 data);
-	u8 ppking_qx3_r(offs_t offset);
-	u8 ppking_qx0_r(offs_t offset);
-	u8 ppking_qx1_r(offs_t offset);
-	u8 ppking_qxcomu_r(offs_t offset);
-	void ppking_qxcomu_w(u8 data);
-	void ppking_video_registers_w(offs_t offset, u8 data);
-	void ppking_adpcm_w(u8 data);
-	void cpu2_irq_ack_w(u8 data);
-
 	void init_ppking();
 
-	DECLARE_MACHINE_RESET(ppking);
-	DECLARE_VIDEO_START(ppking);
-
-	uint32_t screen_update_ppking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 	void ppking(machine_config &config);
-	void ppking_cpu1_io(address_map &map);
-	void ppking_cpu1_map(address_map &map);
-	void ppking_cpu2_io(address_map &map);
-	void ppking_cpu3_map(address_map &map);
+
+protected:
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	required_shared_ptr<u8>    m_nvram;
 	required_device<generic_latch_8_device> m_soundlatch2;
@@ -215,4 +201,24 @@ private:
 
 	bool mcu_parity_check();
 	void mcu_input_check();
+
+	u8 ppking_f1_r();
+	void ppking_qx0_w(offs_t offset, u8 data);
+	void ppking_qx1_w(offs_t offset, u8 data);
+	void ppking_qx3_w(u8 data);
+	u8 ppking_qx3_r(offs_t offset);
+	u8 ppking_qx0_r(offs_t offset);
+	u8 ppking_qx1_r(offs_t offset);
+	u8 ppking_qxcomu_r(offs_t offset);
+	void ppking_qxcomu_w(u8 data);
+	void ppking_video_registers_w(offs_t offset, u8 data);
+	void ppking_adpcm_w(u8 data);
+	void cpu2_irq_ack_w(u8 data);
+
+	u32 screen_update_ppking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void ppking_cpu1_io(address_map &map);
+	void ppking_cpu1_map(address_map &map);
+	void ppking_cpu2_io(address_map &map);
+	void ppking_cpu3_map(address_map &map);
 };

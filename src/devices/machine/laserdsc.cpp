@@ -60,49 +60,54 @@ const uint32_t VIRTUAL_LEAD_OUT_TRACKS = LEAD_OUT_MIN_SIZE_IN_UM * 1000 / NOMINA
 ALLOW_SAVE_TYPE(laserdisc_device::player_state);
 ALLOW_SAVE_TYPE(laserdisc_device::slider_position);
 
+parallel_laserdisc_device::parallel_laserdisc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: laserdisc_device(mconfig, type, tag, owner, clock)
+{
+}
+
 //-------------------------------------------------
 //  laserdisc_device - constructor
 //-------------------------------------------------
 
 laserdisc_device::laserdisc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock),
-		device_sound_interface(mconfig, *this),
-		device_video_interface(mconfig, *this),
-		m_getdisc_callback(*this),
-		m_audio_callback(*this),
-		m_overwidth(0),
-		m_overheight(0),
-		m_overclip(0, -1, 0, -1),
-		m_overupdate_rgb32(*this),
-		m_disc(nullptr),
-		m_is_cav_disc(false),
-		m_width(0),
-		m_height(0),
-		m_fps_times_1million(0),
-		m_samplerate(0),
-		m_readresult(),
-		m_chdtracks(0),
-		m_work_queue(osd_work_queue_alloc(WORK_QUEUE_FLAG_IO)),
-		m_audiosquelch(0),
-		m_videosquelch(0),
-		m_fieldnum(0),
-		m_curtrack(0),
-		m_maxtrack(0),
-		m_attospertrack(0),
-		m_sliderupdate(attotime::zero),
-		m_videoindex(0),
-		m_stream(nullptr),
-		m_audiobufsize(0),
-		m_audiobufin(0),
-		m_audiobufout(0),
-		m_audiocursamples(0),
-		m_audiomaxsamples(0),
-		m_videoenable(false),
-		m_videotex(nullptr),
-		m_videopalette(nullptr),
-		m_overenable(false),
-		m_overindex(0),
-		m_overtex(nullptr)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, device_video_interface(mconfig, *this)
+	, m_getdisc_callback(*this)
+	, m_audio_callback(*this)
+	, m_overwidth(0)
+	, m_overheight(0)
+	, m_overclip(0, -1, 0, -1)
+	, m_overupdate_rgb32(*this)
+	, m_disc(nullptr)
+	, m_is_cav_disc(false)
+	, m_width(0)
+	, m_height(0)
+	, m_fps_times_1million(0)
+	, m_samplerate(0)
+	, m_readresult()
+	, m_chdtracks(0)
+	, m_work_queue(osd_work_queue_alloc(WORK_QUEUE_FLAG_IO))
+	, m_audiosquelch(0)
+	, m_videosquelch(0)
+	, m_fieldnum(0)
+	, m_curtrack(0)
+	, m_maxtrack(0)
+	, m_attospertrack(0)
+	, m_sliderupdate(attotime::zero)
+	, m_videoindex(0)
+	, m_stream(nullptr)
+	, m_audiobufsize(0)
+	, m_audiobufin(0)
+	, m_audiobufout(0)
+	, m_audiocursamples(0)
+	, m_audiomaxsamples(0)
+	, m_videoenable(false)
+	, m_videotex(nullptr)
+	, m_videopalette(nullptr)
+	, m_overenable(false)
+	, m_overindex(0)
+	, m_overtex(nullptr)
 {
 	// initialize overlay_config
 	m_orig_config.m_overposx = m_orig_config.m_overposy = 0.0f;
@@ -453,30 +458,30 @@ void laserdisc_device::sound_stream_update(sound_stream &stream, std::vector<rea
 
 //-------------------------------------------------
 //  set_slider_speed - dynamically change the
-//  slider speed
+//  slider speed, supports fractional values
 //-------------------------------------------------
 
-void laserdisc_device::set_slider_speed(int32_t tracks_per_vsync)
+void laserdisc_device::set_slider_speed(const double tracks_per_vsync)
 {
 	// update to the current time
 	update_slider_pos();
 
 	// if 0, set the time to 0
-	attotime vsyncperiod = screen().frame_period();
+	double vsyncperiod = screen().frame_period().as_double();
 	if (tracks_per_vsync == 0)
 		m_attospertrack = 0;
 
 	// positive values store positive times
 	else if (tracks_per_vsync > 0)
-		m_attospertrack = (vsyncperiod / tracks_per_vsync).as_attoseconds();
+		m_attospertrack = DOUBLE_TO_ATTOSECONDS(vsyncperiod / tracks_per_vsync);
 
 	// negative values store negative times
 	else
 	{
-		m_attospertrack = -(vsyncperiod / -tracks_per_vsync).as_attoseconds();
+		m_attospertrack = DOUBLE_TO_ATTOSECONDS(-vsyncperiod / -tracks_per_vsync);
 	}
 
-	LOGMASKED(LOG_SLIDER, "Slider speed = %d\n", tracks_per_vsync);
+	LOGMASKED(LOG_SLIDER, "Slider speed = %f\n", tracks_per_vsync);
 }
 
 
@@ -994,7 +999,7 @@ void laserdisc_device::read_track_data()
 		vbidata.line16 = 0;
 		vbidata.line17 = vbidata.line18 = vbidata.line1718 = VBI_CODE_LEADIN;
 	}
-//printf("track %5d.%d: %06X %06X %06X\n", m_curtrack, m_fieldnum, vbidata.line16, vbidata.line17, vbidata.line18);
+	LOGMASKED(LOG_SLIDER, "track %5d.%d: %06X %06X %06X\n", m_curtrack, m_fieldnum, vbidata.line16, vbidata.line17, vbidata.line18);
 
 	// if we're about to read the first field in a frame, advance
 	frame_data *frame = &m_frame[m_videoindex];

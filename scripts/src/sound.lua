@@ -1011,6 +1011,20 @@ end
 
 
 ---------------------------------------------------
+-- Silicon Systems SSI-263A HLE
+--@src/devices/sound/ssi263hle.h,SOUNDS["SSI263HLE"] = true
+---------------------------------------------------
+
+if (SOUNDS["SSI263HLE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/ssi263hle.cpp",
+		MAME_DIR .. "src/devices/sound/ssi263hle.h",
+	}
+end
+
+
+
+---------------------------------------------------
 -- Texas Instruments TMS36xx doorbell chime
 --@src/devices/sound/tms36xx.h,SOUNDS["TMS36XX"] = true
 ---------------------------------------------------

@@ -298,7 +298,7 @@ void s3virge_vga_device::crtc_map(address_map &map)
 	);
 	map(0x59, 0x59).lrw8(
 		NAME([this] (offs_t offset) {
-			return (s3virge.linear_address & 0xff000000) >> 24;;
+			return (s3virge.linear_address & 0xff000000) >> 24;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			const uint32_t old_address = s3virge.linear_address;

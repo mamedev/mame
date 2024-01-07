@@ -51758,6 +51758,22 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="sspinbal" cloneof="spinb">
+		<description>Super Sushi Pinball (USA, prototype)</description>
+		<year>1989</year>
+		<publisher>CSG Imagesoft</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="sxrom" />
+			<feature name="pcb" value="NES-SNEPROM-01" />
+			<dataarea name="prg" size="131072">
+				<rom name="0.prg" size="131072" crc="24118960" sha1="4aef1331d11d6ce24c1d5809d1b4d2e5549b28c0" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sweethomp" cloneof="sweethom">
 		<description>Sweet Home (Japan, sample)</description>
 		<year>1989</year>

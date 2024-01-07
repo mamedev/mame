@@ -201,8 +201,8 @@ void cpzodiac_state::cpzodiac(machine_config &config)
 	ymsnd.add_route(2, "rspeaker", 1.0);
 
 	tc0140syt_device &syt(TC0140SYT(config, "syt", 0));
-	syt.set_master_tag(m_maincpu);
-	syt.set_slave_tag(m_audiocpu);
+	syt.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	syt.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
 
 

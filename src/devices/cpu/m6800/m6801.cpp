@@ -9,6 +9,11 @@ TODO:
 - improve STBY pin? RES pin (reset) should be ineffective while STBY is low
 - IS3 interrupt for 6801 port 3 handshake (already implemented for 6301Y)
 - address TRAP (at the moment, only illegal opcode TRAP is emulated)
+  if PC directed these areas:
+  'mode' is selected by the sense of p2.0,p2.1,and p2.3 at reset timing.
+  mode 0,1,2,4,6 : $0000-$001f
+  mode 5         : $0000-$001f,$0200-$efff
+  mode 7         : $0000-$001f,$0100-$efff
 - finish 6301Y port 6 handshake, share implementation with p3csr?
 - 6301Y sci_trcsr2_r/w
 - add 6801U4 extra timer registers (bublbobl, kikikai, though they seem
@@ -317,7 +322,7 @@ void hd6301x_cpu_device::hd6301x_io(address_map &map)
 {
 	hd6303x_io(map);
 	map(0x0002, 0x0002).rw(FUNC(hd6301x_cpu_device::p1_data_r), FUNC(hd6301x_cpu_device::p1_data_w)); // external except in single-chip mode
-	map(0x0004, 0x0004).rw(FUNC(hd6301x_cpu_device::ff_r), FUNC(hd6301x_cpu_device::p3_ddr_w)); // external except in single-chip mode
+	map(0x0004, 0x0004).rw(FUNC(hd6301x_cpu_device::ff_r), FUNC(hd6301x_cpu_device::p3_ddr_1bit_w)); // external except in single-chip mode
 	map(0x0006, 0x0006).rw(FUNC(hd6301x_cpu_device::p3_data_r), FUNC(hd6301x_cpu_device::p3_data_w)); // external except in single-chip mode
 	map(0x0007, 0x0007).rw(FUNC(hd6301x_cpu_device::p4_data_r), FUNC(hd6301x_cpu_device::p4_data_w)); // external except in single-chip mode
 	map(0x0018, 0x0018).rw(FUNC(hd6301x_cpu_device::p7_data_r), FUNC(hd6301x_cpu_device::p7_data_w)); // external except in single-chip mode
@@ -350,9 +355,9 @@ void hd6301y_cpu_device::hd6303y_io(address_map &map)
 void hd6301y_cpu_device::hd6301y_io(address_map &map)
 {
 	hd6303y_io(map);
-	map(0x0000, 0x0000).rw(FUNC(hd6301y_cpu_device::ff_r), FUNC(hd6301y_cpu_device::p1_ddr_w)); // external except in single-chip mode
+	map(0x0000, 0x0000).rw(FUNC(hd6301y_cpu_device::ff_r), FUNC(hd6301y_cpu_device::p1_ddr_1bit_w)); // external except in single-chip mode
 	map(0x0002, 0x0002).rw(FUNC(hd6301y_cpu_device::p1_data_r), FUNC(hd6301y_cpu_device::p1_data_w)); // external except in single-chip mode
-	map(0x0004, 0x0004).rw(FUNC(hd6301y_cpu_device::ff_r), FUNC(hd6301y_cpu_device::p3_ddr_w)); // external except in single-chip mode
+	map(0x0004, 0x0004).rw(FUNC(hd6301y_cpu_device::ff_r), FUNC(hd6301y_cpu_device::p3_ddr_1bit_w)); // external except in single-chip mode
 	map(0x0005, 0x0005).rw(FUNC(hd6301y_cpu_device::ff_r), FUNC(hd6301y_cpu_device::p4_ddr_w)); // external except in single-chip mode
 	map(0x0006, 0x0006).rw(FUNC(hd6301y_cpu_device::p3_data_r), FUNC(hd6301y_cpu_device::p3_data_w)); // external except in single-chip mode
 	map(0x0007, 0x0007).rw(FUNC(hd6301y_cpu_device::p4_data_r), FUNC(hd6301y_cpu_device::p4_data_w)); // external except in single-chip mode
@@ -1417,6 +1422,19 @@ bool hd6301_cpu_device::nvram_write(util::write_stream &file)
 		return false;
 
 	size_t actual;
+	u8 buf[7];
+
+	// misc registers
+	buf[0] = m_s.b.h;
+	buf[1] = m_s.b.l;
+	buf[2] = m_x.b.h;
+	buf[3] = m_x.b.l;
+	buf[4] = m_d.b.h;
+	buf[5] = m_d.b.l;
+	buf[6] = m_tdr;
+
+	if (file.write(&buf, sizeof(buf), actual) || (sizeof(buf) != actual))
+		return false;
 
 	// port output latches
 	if (file.write(&m_port_data[0], sizeof(m_port_data), actual) || sizeof(m_port_data) != actual)
@@ -1445,6 +1463,19 @@ bool hd6301_cpu_device::nvram_read(util::read_stream &file)
 		return false;
 
 	size_t actual;
+	u8 buf[7];
+
+	// misc registers
+	if (file.read(&buf, sizeof(buf), actual) || (sizeof(buf) != actual))
+		return false;
+
+	m_s.b.h = buf[0];
+	m_s.b.l = buf[1];
+	m_x.b.h = buf[2];
+	m_x.b.l = buf[3];
+	m_d.b.h = buf[4];
+	m_d.b.l = buf[5];
+	m_tdr = buf[6];
 
 	// port output latches
 	if (file.read(&m_port_data[0], sizeof(m_port_data), actual) || sizeof(m_port_data) != actual)
@@ -1467,28 +1498,42 @@ bool hd6301x_cpu_device::nvram_read(util::read_stream &file)
 	return true;
 }
 
-void hd6301_cpu_device::nvram_default()
+
+
+// internal registers
+
+void m6801_cpu_device::p1_ddr_w(uint8_t data)
 {
-	if (!nvram_backup_enabled() || m_nvram_bytes == 0)
-		return;
+	LOGPORT("Port 1 Data Direction Register: %02x\n", data);
 
-	m6801_cpu_device::nvram_default();
-
-	// clear other registers
-	std::fill(std::begin(m_port_data), std::end(m_port_data), 0);
+	if (m_port_ddr[0] != data)
+	{
+		m_port_ddr[0] = data;
+		m_out_port_func[0](0, (m_port_data[0] & m_port_ddr[0]) | (m_port_ddr[0] ^ 0xff), m_port_ddr[0]);
+	}
 }
 
-void hd6301x_cpu_device::nvram_default()
+void hd6301y_cpu_device::p1_ddr_1bit_w(uint8_t data)
 {
-	if (!nvram_backup_enabled() || m_nvram_bytes == 0)
-		return;
-
-	hd6301_cpu_device::nvram_default();
-
-	// clear other registers
-	std::fill(std::begin(m_portx_data), std::end(m_portx_data), 0);
+	// HD6301Y DDR1 is 1-bit (HD6301X does not have DDR1)
+	hd6301_cpu_device::p1_ddr_w(BIT(data, 0) ? 0xff : 0x00);
 }
 
+uint8_t m6801_cpu_device::p1_data_r()
+{
+	if (m_port_ddr[0] == 0xff)
+		return m_port_data[0];
+	else
+		return (m_in_port_func[0]() & (m_port_ddr[0] ^ 0xff)) | (m_port_data[0] & m_port_ddr[0]);
+}
+
+void m6801_cpu_device::p1_data_w(uint8_t data)
+{
+	LOGPORT("Port 1 Data Register: %02x\n", data);
+
+	m_port_data[0] = data;
+	m_out_port_func[0](0, (m_port_data[0] & m_port_ddr[0]) | (m_port_ddr[0] ^ 0xff), m_port_ddr[0]);
+}
 
 
 void m6801_cpu_device::write_port2()
@@ -1540,49 +1585,6 @@ void hd6301x_cpu_device::write_port2()
 	m_out_port_func[1](0, data, ddr);
 }
 
-/*
-    if change_pc() directed these areas, call hd63701_trap_pc().
-    'mode' is selected by the sense of p2.0,p2.1,and p2.3 at reset timing.
-    mode 0,1,2,4,6 : $0000-$001f
-    mode 5         : $0000-$001f,$0200-$efff
-    mode 7         : $0000-$001f,$0100-$efff
-*/
-
-void m6801_cpu_device::set_os3(int state)
-{
-	LOG("OS3: %u\n", state);
-
-	m_out_sc2_func(state);
-}
-
-
-void m6801_cpu_device::p1_ddr_w(uint8_t data)
-{
-	LOGPORT("Port 1 Data Direction Register: %02x\n", data);
-
-	if (m_port_ddr[0] != data)
-	{
-		m_port_ddr[0] = data;
-		m_out_port_func[0](0, (m_port_data[0] & m_port_ddr[0]) | (m_port_ddr[0] ^ 0xff), m_port_ddr[0]);
-	}
-}
-
-uint8_t m6801_cpu_device::p1_data_r()
-{
-	if (m_port_ddr[0] == 0xff)
-		return m_port_data[0];
-	else
-		return (m_in_port_func[0]() & (m_port_ddr[0] ^ 0xff)) | (m_port_data[0] & m_port_ddr[0]);
-}
-
-void m6801_cpu_device::p1_data_w(uint8_t data)
-{
-	LOGPORT("Port 1 Data Register: %02x\n", data);
-
-	m_port_data[0] = data;
-	m_out_port_func[0](0, (m_port_data[0] & m_port_ddr[0]) | (m_port_ddr[0] ^ 0xff), m_port_ddr[0]);
-}
-
 void m6801_cpu_device::p2_ddr_w(uint8_t data)
 {
 	LOGPORT("Port 2 Data Direction Register: %02x\n", data);
@@ -1594,17 +1596,10 @@ void m6801_cpu_device::p2_ddr_w(uint8_t data)
 	}
 }
 
-// HD6301X0/HD63701X0/HD6303X only
 void hd6301x_cpu_device::p2_ddr_2bit_w(uint8_t data)
 {
-	LOGPORT("Port 2 Data Direction Register: %02x\n", data);
-
-	data = (BIT(data, 1) ? 0xfe : 0x00) | (data & 0x01);
-	if (m_port_ddr[1] != data)
-	{
-		m_port_ddr[1] = data;
-		write_port2();
-	}
+	// HD6301X DDR2 is 2-bit (it is 8-bit again on HD6301Y)
+	hd6301_cpu_device::p2_ddr_w((BIT(data, 1) ? 0xfe : 0x00) | (data & 0x01));
 }
 
 uint8_t m6801_cpu_device::p2_data_r()
@@ -1624,6 +1619,14 @@ void m6801_cpu_device::p2_data_w(uint8_t data)
 	write_port2();
 }
 
+
+void m6801_cpu_device::set_os3(int state)
+{
+	LOG("OS3: %u\n", state);
+
+	m_out_sc2_func(state);
+}
+
 void m6801_cpu_device::p3_ddr_w(uint8_t data)
 {
 	LOGPORT("Port 3 Data Direction Register: %02x\n", data);
@@ -1633,6 +1636,12 @@ void m6801_cpu_device::p3_ddr_w(uint8_t data)
 		m_port_ddr[2] = data;
 		m_out_port_func[2](0, (m_port_data[2] & m_port_ddr[2]) | (m_port_ddr[2] ^ 0xff), m_port_ddr[2]);
 	}
+}
+
+void hd6301x_cpu_device::p3_ddr_1bit_w(uint8_t data)
+{
+	// HD6301X/Y DDR3 is 1-bit
+	hd6301_cpu_device::p3_ddr_w(BIT(data, 0) ? 0xff : 0x00);
 }
 
 uint8_t m6801_cpu_device::p3_data_r()
@@ -1731,6 +1740,7 @@ void m6801_cpu_device::p3_csr_w(uint8_t data)
 	m_p3csr = data;
 }
 
+
 void m6801_cpu_device::p4_ddr_w(uint8_t data)
 {
 	LOGPORT("Port 4 Data Direction Register: %02x\n", data);
@@ -1769,6 +1779,7 @@ void hd6301y_cpu_device::p5_ddr_w(uint8_t data)
 	}
 }
 
+
 uint8_t hd6301x_cpu_device::p5_data_r()
 {
 	// read-only
@@ -1790,6 +1801,7 @@ void hd6301y_cpu_device::p5_data_w(uint8_t data)
 	m_portx_data[0] = data;
 	m_out_portx_func[0](0, (m_portx_data[0] & m_portx_ddr[0]) | (m_portx_ddr[0] ^ 0xff), m_portx_ddr[0]);
 }
+
 
 void hd6301x_cpu_device::p6_ddr_w(uint8_t data)
 {
@@ -1860,6 +1872,7 @@ void hd6301y_cpu_device::p6_csr_w(uint8_t data)
 		m6800_check_irq2();
 }
 
+
 uint8_t hd6301x_cpu_device::p7_data_r()
 {
 	return 0xe0 | m_portx_data[2];
@@ -1874,6 +1887,7 @@ void hd6301x_cpu_device::p7_data_w(uint8_t data)
 	m_portx_data[2] = data;
 	m_out_portx_func[2](0, m_portx_data[2], 0x1f);
 }
+
 
 uint8_t m6801_cpu_device::tcsr_r()
 {
@@ -1988,6 +2002,7 @@ uint8_t m6801_cpu_device::icrl_r()
 	return (m_input_capture >> 8) & 0xff;
 }
 
+
 uint8_t hd6301x_cpu_device::tcsr2_r()
 {
 	if (!machine().side_effects_disabled())
@@ -2084,14 +2099,12 @@ void hd6301x_cpu_device::increment_t2cnt(int amount)
 
 		if (BIT(m_rmcr, 5) && !m_use_ext_serclock)
 		{
-			if (m_ext_serclock + amount >= 32)
+			m_ext_serclock++;
+			if (m_ext_serclock >= 32)
 			{
-				m_ext_serclock = (m_ext_serclock + amount) % 32;
-				serial_transmit();
-				serial_receive();
+				m_ext_serclock = 0;
+				machine().scheduler().synchronize(timer_expired_delegate(FUNC(hd6301x_cpu_device::sci_tick), this));
 			}
-			else
-				m_ext_serclock += amount;
 		}
 
 		m_tcsr3 |= 0x80;

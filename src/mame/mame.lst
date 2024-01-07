@@ -15004,6 +15004,8 @@ masmario2                       // (c) 2005 Capcom
 mmaruchan                       // (c) 2005 Capcom
 mmaruchana                      // (c) 2004 Capcom
 pingu                           // (c) 2006 The Pygos Group / Capcom
+rockmanbc                       // (c) 2006 Capcom
+rockmanmdl                      // (c) 2005 Capcom
 wontame                         // (c) 2008 Capcom
 
 @source:capcom/bionicc.cpp
@@ -17450,6 +17452,7 @@ mag_xain
 
 @source:efo/cidelsa.cpp
 altair                          // (c) 1981 Cidelsa
+altair2                         // (c) 198? Cidelsa
 destryer                        // (c) 1981 Cidelsa
 destryera                       // (c) 1981 Cidelsa
 draco                           // (c) 1981 Cidelsa
@@ -18806,6 +18809,9 @@ vinvader                        // VTech
 wantgman                        // Actronics / Hanzawa
 zackman                         // Bandai
 
+@source:handheld/hh_ht11xx.cpp
+brke23p2
+
 @source:handheld/hh_melps4.cpp
 cfrogger                        // Coleco
 gjungler                        // Gakken
@@ -19224,7 +19230,8 @@ h8                              //
 h19                             // Heath H19 (Zenith Z-19)
 
 @source:heathkit/h89.cpp
-h89                             // Heath H89 (H88, Zenith Z-89, Z-90)
+h89                             // Heath H89 (WH89, Zenith Z-89, Z-90)
+h88                             // Heath H88 (with cassette tape)
 
 @source:hec2hrp/hec2hrp.cpp
 hec2hr                          //
@@ -19239,8 +19246,11 @@ victor                          //
 
 @source:hegenerglaser/academy.cpp
 academy
+academyd
 academyg
 academyga
+academygb
+academytt
 
 @source:hegenerglaser/amsterdam.cpp
 amsterd                         // Amsterdam
@@ -19295,6 +19305,7 @@ mm2b                            // Mephisto MM II
 mm2c                            // Mephisto MM II
 mm2d                            // Mephisto MM II
 mm2e                            // Mephisto MM II
+mm2nona
 bup                             // Mephisto B&P
 bupa                            // Mephisto B&P
 mm4                             // Mephisto MM IV
@@ -19307,7 +19318,6 @@ mm5p
 rebel5                          // Mephisto Rebell 5.0
 rebel5a                         // Mephisto Rebell 5.0
 rebel5b                         // Mephisto Rebell 5.0
-rebelp
 
 @source:hegenerglaser/modena.cpp
 modena                          // 1992 Mephisto Modena
@@ -19714,8 +19724,10 @@ chryanglb                       // bootleg
 chrygld                         // bootleg
 chryglda                        // bootleg
 chthree                         // 199? Promat
+cll                             // (c) 1991 Dyna Electronics
 cmast91                         // (c) 1991 Dyna Electronics
 cmast92                         // (c) 1992 Dyna Electronics
+cmast92a                        // (c) 1992 Dyna Electronics
 cmast97                         // (c) 1996 Dyna Electronics
 cmast99                         // (c) 1999 Dyna Electronics
 cmast99b                        // bootleg
@@ -19957,6 +19969,7 @@ cjdh2c                          // (c) 200?
 igsm312                         // (c) 200?
 lhtb                            // (c) 200?
 lhzb3in1                        // (c) 200?
+mghammer                        // (c) 2015
 
 @source:igs/igspoker.cpp
 chleague                        // (c) 199? IGS
@@ -20108,7 +20121,6 @@ martmast                        // (c) 2001 Martial Masters
 martmast104c                    //
 martmast103c                    //
 martmast102c                    //
-martmasttw                      //
 olds                            // (c) 1999 Oriental Legend Super / Special
 olds100                         //
 olds100a                        //
@@ -23295,6 +23307,7 @@ galpans2a                       // 1999.?? (c) 1999 Kaneko (Asia)
 galpans2j                       // 1999.02 (c) 1999 Kaneko (Japan)
 galpans3                        // 2002.07 (c) 2002 Kaneko (Japan)
 galpansu                        // 1999.?? (c) 1999 Kaneko (Korea)
+galpansua                       // 1999.?? (c) 1999 Kaneko (Korea)
 gutsn                           // 2000.06 (c) 2000 Kaneko / Kouyousha (Japan)
 jjparad2                        // 1997.12 (c) 1997 Electro Design Co. (Japan)
 jjparads                        // 1996.12 (c) 1996 Electro Design Co. (Japan)
@@ -23808,7 +23821,8 @@ blkrose                         // Black Rose Rapid Fire Grand Prix
 dragnfly                        // Dragonfly
 enchlamp                        // Enchanted Lamp
 gypmagic                        // Gypsy Magic
-incanp                          // Incan P
+incanp                          // Incan Pyramid (Russia)
+incanpq                         // Incan Pyramid (Queensland)
 jestmagi                        // Jester Magic
 konzero                         // Zero
 luckfoun                        // Lucky Fountain
@@ -27328,6 +27342,7 @@ mk2r91                          // hack
 mkr4                            // (c) 1992 Midway
 mktturbo                        // hack
 nbajam                          // (c) 1993 Midway
+nbajamp1                        // (c) 1993 Midway
 nbajamp2                        // (c) 1993 Midway
 nbajamr1                        // (c) 1993 Midway
 nbajamr2                        // (c) 1993 Midway
@@ -30504,7 +30519,6 @@ belslots                        // (c) 1999 Impera
 bigdeal0                        // (c) 2001 Impera
 dallaspk                        // 1993, unknown
 hotslots                        // (c) 2002 Impera
-jjokeri                         // (c) 199? Impera
 kajotcrd                        // (c) 1993 Amatic
 lucky7i                         // (c) 1991 Impera
 lucky7x                         // (c) 1991 Impera
@@ -30521,8 +30535,10 @@ magicrdec                       // (c) 1994 Impera
 magicrdj                        // (c) 1998 Impera
 magicrdja                       // (c) 1998 Impera
 magicle                         // (c) 2001 Impera
+pokeri                          // (c) 1991 Impera
 puzzleme                        // (c) 199? Impera
 quingo                          // (c) 1999 Impera
+simpbest                        // (c) 2001 Kajot
 
 @source:misc/magicfly.cpp
 7mezzo                          // 198? Unknown
@@ -30654,11 +30670,15 @@ mosaica                         // (c) 1990 Space + Fuuki license
 fruitstb                        // 199? Webak
 fruitstba                       // 199? Webak
 fruitstbb                       // 1997 Webak
-fruitstbc                       // 1997 Webak
-fruitstbd                       // 1997 Webak
+fruitstbc                       // 1996 Webak
+fruitstbd                       // 1996 Webak
 fruitstbe                       // 1999 Webak
 fruitstbf                       // 1997 Webak
 fruitstbg                       // 1997 Webak
+fruitstbh                       // 1996 Webak
+fruitstbi                       // 1996 Webak
+goldnjkr                        // 1996 Webak
+goldnjkra                       // 1996 Webak
 
 @source:misc/mtu130.cpp
 mtu130
@@ -31175,6 +31195,7 @@ pkscram                         // (c) 1993 Cosmo Electronics Corporation
 plycntrchtr                     // (c) 2000 Recreativos Presas / Undergaming
 plycntrchtrc                    // (c) 2000 Recreativos Presas / Undergaming
 plycntrchtrk                    // (c) 2000 Recreativos Presas / Undergaming
+plycntre3                       // (c) 2004 Recreativos Presas / Undergaming
 
 @source:misc/plsonic4.cpp
 plsonic4                        //
@@ -33247,7 +33268,6 @@ pc8001mk2                       // 1983
 pc8001mk2sr                     // 1985
 
 @source:nec/pc8401a.cpp
-pc8401a                         // roms needed
 pc8500                          //
 
 @source:nec/pc8801.cpp
@@ -36454,6 +36474,7 @@ arenaa                          //
 arenaf                          //
 arenag                          //
 badgirls                        //
+badgirlsa                       //
 badgirlsf                       //
 badgirlsg                       //
 bighouse                        //
@@ -38442,6 +38463,9 @@ cp2000
 @source:saitek/delta1.cpp
 ccdelta1
 
+@source:saitek/edames.cpp
+edames
+
 @source:saitek/exechess.cpp
 exechess
 
@@ -38614,6 +38638,7 @@ mj3d                            // 2005.12 Sega Network Taisen Mahjong MJ 3 (Rev
 mj3evo                          // 2007.06 Sega Network Taisen Mahjong MJ 3 Evolution (Rev B)
 mj3evoa                         // 2007.02 Sega Network Taisen Mahjong MJ 3 Evolution (Rev A)
 mj3evoup                        // 2006.12 Sega Network Taisen Mahjong MJ 3 Evolution Firmware Update (GDX-0023)
+mj3up                           // 2005.09 Sega Network Taisen Mahjong MJ 3 Firmware Update (GDX-0019)
 ollie                           // 2004.03 Ollie King
 outr2                           // 2003.12 Outrun 2 (Rev A)
 outr2stjo                       // 2004.09 Outrun 2 Special Tours (Japan)
@@ -38965,9 +38990,10 @@ srallycb                        // 1995.02 Sega Rally Championship TWIN (Revisio
 srallycc                        // 1995.02 Sega Rally Championship TWIN (Revision A)
 srallycdx                       // 1995.02 Sega Rally Championship DX (Revision A)
 srallycdxa                      // 1995.02 Sega Rally Championship DX
-stcc                            // 1996.09 Sega Touring Car Championship
+stcc                            // 1996.09 Sega Touring Car Championship (newer)
 stcca                           // 1996.09 Sega Touring Car Championship (Revision A)
-stccb                           // 1996.09 Sega Touring Car Championship
+stccb                           // 1996.09 Sega Touring Car Championship (Revision B)
+stcco                           // 1996.09 Sega Touring Car Championship
 topskatr                        // 1997.05 Top Skater (Export, Revision A)
 topskatrj                       // 1997.05 Top Skater (Japan)
 topskatru                       // 1997.05 Top Skater (USA, Revision A)
@@ -41147,6 +41173,9 @@ jwildb52                        // (c) 199? Sigma
 jwildb52a                       // (c) 199? Sigma
 jwildb52h                       // (c) 199? Sigma
 s8waysfc                        // (c) 1989 Sigma
+
+@source:sigma/sigmab88.cpp
+cool104
 
 @source:sigma/sigmab98.cpp
 animalc                         // (c) 2000 Sammy
@@ -43421,6 +43450,7 @@ sidebsjb                        // 1996.07 E23 (c) 1996 Taito Corporation (Japan
 
 @source:taito/taitopjc.cpp
 optiger                         // 1998.09 E63 (c) 1998 Taito
+optigerj
 
 @source:taito/taitosj.cpp
 alpine                          // RH  (c) 1982 Taito Corporation
@@ -43590,6 +43620,9 @@ wgpu                            // C32 (c) 1989 Taito America Corporation (US)
 @source:taito/wyvernf0.cpp
 wyvernf0                        // A39 (c) 1985 Taito Corporation (Japan)
 wyvernf0a                       // A39 (c) 1985 Taito Corporation (Japan)
+
+@source:tandberg/tdv2115l.cpp
+tdv2115l                        //
 
 @source:tandberg/tdv2324.cpp
 tdv2324                         //
@@ -44742,6 +44775,7 @@ jak_bbsf
 zonefamf
 
 @source:tvgames/spg29x_lexibook_jg7425.cpp
+fundr200
 lx_aven
 lx_frozen
 lx_jg7425

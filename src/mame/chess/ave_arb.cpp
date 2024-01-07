@@ -14,6 +14,7 @@ Auto Response Board (ARB) overview:
 
 The electronic magnetic chessboard is the first of its kind. AVE later licensed
 it to Fidelity (see fidelity/elite.cpp).
+
 ARB is a romless system, the program ROM is on a cartridge.
 
 Known chess modules:

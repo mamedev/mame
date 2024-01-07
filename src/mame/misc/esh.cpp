@@ -148,7 +148,7 @@ uint32_t esh_state::screen_update_esh(screen_device &screen, bitmap_rgb32 &bitma
 
 uint8_t esh_state::ldp_read()
 {
-	return m_laserdisc->status_r();
+	return m_laserdisc->data_r();
 }
 
 void esh_state::misc_write(uint8_t data)

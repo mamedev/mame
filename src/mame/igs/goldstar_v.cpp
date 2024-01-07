@@ -198,7 +198,7 @@ uint32_t goldstar_state::screen_update_goldstar(screen_device &screen, bitmap_rg
 }
 
 
-uint32_t goldstar_state::screen_update_cmast91(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t cmaster_state::screen_update_cmast91(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(rgb_t::black(), cliprect);
 
@@ -221,6 +221,18 @@ uint32_t goldstar_state::screen_update_cmast91(screen_device &screen, bitmap_rgb
 		m_reel1_tilemap->draw(screen, bitmap, visible1, 0, 0);
 		m_reel2_tilemap->draw(screen, bitmap, visible2, 0, 0);
 		m_reel3_tilemap->draw(screen, bitmap, visible3, 0, 0);
+	}
+
+	if (m_cm_enable_reg & 0x04)
+	{
+		if (memregion("user1")->base())
+		{
+			gfx_element *gfx = m_gfxdecode->gfx(2);
+			int const girlyscroll = (int8_t)((m_cm_girl_scroll & 0xf0));
+			int const girlxscroll = (int8_t)((m_cm_girl_scroll & 0x0f) << 4);
+
+			gfx->zoom_transpen(bitmap,cliprect,m_cmaster_girl_num,m_cmaster_girl_pal,0,0,-(girlxscroll*2),-(girlyscroll), 0x20000, 0x10000,0);
+		}
 	}
 
 	if (m_cm_enable_reg & 0x02)

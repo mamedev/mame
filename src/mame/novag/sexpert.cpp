@@ -10,7 +10,7 @@ Hardware notes (Super Expert)
 - 8KB RAM battery-backed, 3*32KB ROM
 - HD44780A00 LCD controller (16x1)
 - beeper(32KHz/32), IRQ(32KHz/128) via MC14060
-- optional R65C51P2 ACIA @ 1.8432MHz, for IBM PC interface (only works in version C)
+- optional R65C51P2 ACIA @ 1.8432MHz, for Super System (only works in version C)
 - printer port, magnetic sensors, 8*8 chessboard leds
 
 I/O via TTL, hardware design was very awkward.

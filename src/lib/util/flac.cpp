@@ -296,7 +296,7 @@ flac_decoder::flac_decoder()
 		m_file(nullptr),
 		m_sample_rate(0),
 		m_channels(0),
-		m_bits_per_sample(0),
+		m_bits_per_sample(16),
 		m_compressed_offset(0),
 		m_compressed_start(nullptr),
 		m_compressed_length(0),
@@ -318,7 +318,7 @@ flac_decoder::flac_decoder(const void *buffer, uint32_t length, const void *buff
 		m_file(nullptr),
 		m_sample_rate(0),
 		m_channels(0),
-		m_bits_per_sample(0),
+		m_bits_per_sample(16),
 		m_compressed_offset(0),
 		m_compressed_start(reinterpret_cast<const FLAC__byte *>(buffer)),
 		m_compressed_length(length),
@@ -338,7 +338,7 @@ flac_decoder::flac_decoder(util::read_stream &file)
 		m_file(&file),
 		m_sample_rate(0),
 		m_channels(0),
-		m_bits_per_sample(0),
+		m_bits_per_sample(16),
 		m_compressed_offset(0),
 		m_compressed_start(nullptr),
 		m_compressed_length(0),
@@ -580,7 +580,6 @@ void flac_decoder::metadata_callback_static(const FLAC__StreamDecoder *decoder, 
 	// parse out the data we care about
 	auto *fldecoder = reinterpret_cast<flac_decoder *>(client_data);
 	fldecoder->m_sample_rate = metadata->data.stream_info.sample_rate;
-	fldecoder->m_bits_per_sample = metadata->data.stream_info.bits_per_sample;
 	fldecoder->m_channels = metadata->data.stream_info.channels;
 }
 
@@ -611,24 +610,74 @@ FLAC__StreamDecoderWriteStatus flac_decoder::write_callback(const ::FLAC__Frame 
 {
 	assert(frame->header.channels == channels());
 
+	if (frame->header.bits_per_sample > m_bits_per_sample)
+	{
+		if (m_uncompressed_swap)
+			return write_callback<SCALE_DOWN, true>(frame, buffer);
+		else
+			return write_callback<SCALE_DOWN, false>(frame, buffer);
+	}
+	else if (frame->header.bits_per_sample < m_bits_per_sample)
+	{
+		if (m_uncompressed_swap)
+			return write_callback<SCALE_UP, true>(frame, buffer);
+		else
+			return write_callback<SCALE_UP, false>(frame, buffer);
+	}
+	else
+	{
+		if (m_uncompressed_swap)
+			return write_callback<SCALE_SAME, true>(frame, buffer);
+		else
+			return write_callback<SCALE_SAME, false>(frame, buffer);
+	}
+}
+
+template <flac_decoder::DECODE_MODE Mode, bool SwapEndian> FLAC__StreamDecoderWriteStatus flac_decoder::write_callback(const ::FLAC__Frame *frame, const FLAC__int32 * const buffer[])
+{
+	const int blocksize = frame->header.blocksize;
+	const int shift = (Mode == SCALE_DOWN) ? frame->header.bits_per_sample - m_bits_per_sample : (Mode == SCALE_UP) ? m_bits_per_sample - frame->header.bits_per_sample : 0;
+	const int low_bit = 1 << shift;
+	const int right_shift = m_bits_per_sample % frame->header.bits_per_sample;
+	int multiplier = 0;
+	for (int bits_to_set = m_bits_per_sample; bits_to_set > frame->header.bits_per_sample; bits_to_set -= frame->header.bits_per_sample)
+	{
+		multiplier = (multiplier << frame->header.bits_per_sample) | (1 << frame->header.bits_per_sample);
+	}
+
 	// interleaved case
-	int shift = m_uncompressed_swap ? 8 : 0;
-	int blocksize = frame->header.blocksize;
 	if (m_uncompressed_start[1] == nullptr)
 	{
 		int16_t *dest = m_uncompressed_start[0] + m_uncompressed_offset * frame->header.channels;
 		for (int sampnum = 0; sampnum < blocksize && m_uncompressed_offset < m_uncompressed_length; sampnum++, m_uncompressed_offset++)
 			for (int chan = 0; chan < frame->header.channels; chan++)
-				*dest++ = int16_t((uint16_t(buffer[chan][sampnum]) << shift) | (uint16_t(buffer[chan][sampnum]) >> shift));
+			{
+				int16_t output_sample;
+				if (Mode == SCALE_DOWN)
+					output_sample = int16_t((buffer[chan][sampnum] + (buffer[chan][sampnum] & low_bit)) >> shift);
+				else if (Mode == SCALE_UP)
+					output_sample = int16_t((buffer[chan][sampnum] * multiplier) | ((buffer[chan][sampnum] >> right_shift)));
+				else
+					output_sample = int16_t(buffer[chan][sampnum]);
+				*dest++ = SwapEndian ? int16_t(swapendian_int16(uint16_t(output_sample))) : output_sample;
+			}
 	}
-
 	// non-interleaved case
 	else
 	{
 		for (int sampnum = 0; sampnum < blocksize && m_uncompressed_offset < m_uncompressed_length; sampnum++, m_uncompressed_offset++)
 			for (int chan = 0; chan < frame->header.channels; chan++)
 				if (m_uncompressed_start[chan] != nullptr)
-					m_uncompressed_start[chan][m_uncompressed_offset] = int16_t((uint16_t(buffer[chan][sampnum]) << shift) | (uint16_t(buffer[chan][sampnum]) >> shift));
+				{
+					int16_t output_sample;
+					if (Mode == SCALE_DOWN)
+						output_sample = int16_t((buffer[chan][sampnum] + (buffer[chan][sampnum] & low_bit)) >> shift);
+					else if (Mode == SCALE_UP)
+						output_sample = int16_t((buffer[chan][sampnum] * multiplier) | ((buffer[chan][sampnum] >> right_shift)));
+					else
+						output_sample = int16_t(buffer[chan][sampnum]);
+					m_uncompressed_start[chan][m_uncompressed_offset] = SwapEndian ? int16_t(swapendian_int16(uint16_t(output_sample))) : output_sample;
+				}
 	}
 	return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
 }

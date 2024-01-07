@@ -401,7 +401,7 @@ license:CC0-1.0
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="3" right="151.625" top="0" bottom="89" />
+		<bounds left="3" right="151.875" top="-0.25" bottom="89" />
 
 		<!-- chessboard coords -->
 		<element ref="text_8"><bounds x="18.7" y="6"  width="2" height="2" /></element>
@@ -422,23 +422,23 @@ license:CC0-1.0
 		<element ref="text_h"><bounds x="95" y="82.6" width="2" height="2" /></element>
 
 		<!-- right side -->
-		<group ref="leds1"><bounds x="103" y="10.5" width="20" height="30" /></group>
-		<group ref="buttons1"><bounds x="103.425" y="28.75" width="60" height="60" /></group>
+		<group ref="leds1"><bounds x="105.375" y="10.5" width="20" height="30" /></group>
+		<group ref="buttons1"><bounds x="103.675" y="28.75" width="60" height="60" /></group>
 
 		<element ref="cwhite" blend="multiply"><bounds x="0" y="0" width="170" height="90" /></element>
 
-		<group ref="leds2"><bounds x="103" y="10.5" width="20" height="30" /></group>
-		<group ref="buttons2"><bounds x="103.425" y="28.75" width="60" height="60" /></group>
+		<group ref="leds2"><bounds x="105.375" y="10.5" width="20" height="30" /></group>
+		<group ref="buttons2"><bounds x="103.675" y="28.75" width="60" height="60" /></group>
 
 		<!-- chessboard leds -->
-		<element name="0.0"  ref="led"><bounds x="16.2" yc="7"  width="2" height="0.9" /></element>
-		<element name="0.1"  ref="led"><bounds x="16.2" yc="17" width="2" height="0.9" /></element>
-		<element name="0.2"  ref="led"><bounds x="16.2" yc="27" width="2" height="0.9" /></element>
-		<element name="0.12" ref="led"><bounds x="16.2" yc="37" width="2" height="0.9" /></element>
-		<element name="0.11" ref="led"><bounds x="16.2" yc="47" width="2" height="0.9" /></element>
-		<element name="0.10" ref="led"><bounds x="16.2" yc="57" width="2" height="0.9" /></element>
-		<element name="0.9"  ref="led"><bounds x="16.2" yc="67" width="2" height="0.9" /></element>
-		<element name="0.8"  ref="led"><bounds x="16.2" yc="77" width="2" height="0.9" /></element>
+		<element name="0.0"  ref="led"><bounds x="15.9" yc="7"  width="2" height="0.9" /></element>
+		<element name="0.1"  ref="led"><bounds x="15.9" yc="17" width="2" height="0.9" /></element>
+		<element name="0.2"  ref="led"><bounds x="15.9" yc="27" width="2" height="0.9" /></element>
+		<element name="0.12" ref="led"><bounds x="15.9" yc="37" width="2" height="0.9" /></element>
+		<element name="0.11" ref="led"><bounds x="15.9" yc="47" width="2" height="0.9" /></element>
+		<element name="0.10" ref="led"><bounds x="15.9" yc="57" width="2" height="0.9" /></element>
+		<element name="0.9"  ref="led"><bounds x="15.9" yc="67" width="2" height="0.9" /></element>
+		<element name="0.8"  ref="led"><bounds x="15.9" yc="77" width="2" height="0.9" /></element>
 
 		<element name="0.7"  ref="led"><bounds xc="26" y="85.2" width="0.9" height="2" /></element>
 		<element name="0.6"  ref="led"><bounds xc="36" y="85.2" width="0.9" height="2" /></element>
@@ -449,6 +449,7 @@ license:CC0-1.0
 		<element name="0.14" ref="led"><bounds xc="86" y="85.2" width="0.9" height="2" /></element>
 		<element name="0.15" ref="led"><bounds xc="96" y="85.2" width="0.9" height="2" /></element>
 
+		<element ref="cwhite"><bounds xc="61" yc="42" width="80.5" height="80.5" /></element>
 		<group ref="sb_board"><bounds x="21" y="2" width="80" height="80" /></group>
 		<group ref="sb_ui"><bounds x="4.5" y="2" width="10" height="80" /></group>
 	</view>

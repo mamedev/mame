@@ -335,7 +335,7 @@ license:CC0-1.0
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="-12.5" right="108.5" top="0.5" bottom="97.25" />
+		<bounds left="-12.5" right="108.5" top="0.5" bottom="97.45" />
 
 		<element ref="red"><bounds x="4" y="2.5" width="102.5" height="81" /></element>
 		<element ref="blackb"><bounds x="85" y="3" width="21" height="80" /></element>
@@ -475,7 +475,7 @@ license:CC0-1.0
 		<element ref="gray"><bounds x="86" y="62.75" width="19" height="0.5" /></element>
 		<element ref="gray"><bounds x="86" y="72.75" width="19" height="0.5" /></element>
 
-		<screen index="0"><bounds x="84.5" y="88.5" width="22" height="6.77" /></screen>
+		<screen index="0"><bounds x="84.5" y="88.5" width="22" height="6.94" /></screen>
 		<element ref="lcdm" blend="multiply"><bounds x="82" y="88" width="30" height="10" /></element>
 	</view>
 
