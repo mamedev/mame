@@ -46,9 +46,9 @@ public:
 	// input and output
 	virtual void data_w(uint8_t data) override;
 	virtual void enter_w(int state) override { }
-	uint8_t data_r() override { return m_status; }
-	int status_strobe_r() override { static int old_val = 0; int value = BIT(m_portc1, 5); if (value != old_val) { old_val = value; printf("status_strobe_r: %d\n", value); } return value; }
-	int ready_r() override { static int old_val = 0; int value = BIT(m_portc1, 4); if (value != old_val) { old_val = value; printf("ready_r: %d\n", value); } return value; }
+	virtual uint8_t data_r() override { return m_status; }
+	virtual int status_strobe_r() override { static int old_val = 0; int value = BIT(m_portc1, 5); if (value != old_val) { old_val = value; printf("status_strobe_r: %d\n", value); } return value; }
+	virtual int ready_r() override { static int old_val = 0; int value = BIT(m_portc1, 4); if (value != old_val) { old_val = value; printf("ready_r: %d\n", value); } return value; }
 
 protected:
 	// device-level overrides

@@ -38,8 +38,8 @@ public:
 	pioneer_pr7820_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// input/output
-	void data_w(uint8_t data) override { }
-	uint8_t data_r() override { return 0; }
+	virtual void data_w(uint8_t data) override { }
+	virtual uint8_t data_r() override { return 0; }
 
 protected:
 	// subclass overrides
@@ -58,8 +58,8 @@ public:
 	philips_22vp932_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// input/output
-	void data_w(uint8_t data) override { }
-	uint8_t data_r() override { return 0; }
+	virtual void data_w(uint8_t data) override { }
+	virtual uint8_t data_r() override { return 0; }
 
 protected:
 	// subclass overrides
