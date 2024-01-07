@@ -5,7 +5,7 @@
 KiKi KaiKai - (c) 1987 Taito
     + Knight Boy (bootleg with 68705)
 
-Kick & Run - (c) 1987 Taito
+Kick and Run - (c) 1987 Taito
     + Mexico 86 (bootleg with 68705)
 
 Ernesto Corvi
@@ -24,11 +24,6 @@ Notes:
 
 - mexico86 does a PS4 STOP ERROR shortly after boot, but works afterwards. PS4 is
   the MC6801U4 MCU, the bootleggers replaced it with a custom programmed 68705 MCU.
-
-- Kiki Kaikai suffers from random lock-ups. It happens when the sound CPU misses
-  CTS from YM2203. The processor will loop infinitely and the main CPU will in
-  turn wait forever. It's difficult to meet the required level of synchronization.
-  This is kludged by filtering the 2203's busy signal.
 
 - Kick and Run is a rom swap for Kiki KaiKai as the pal chips are all A85-0x
   A85 is the Taito rom code for Kiki KaiKai.  Even the MCU is socketed!
@@ -185,9 +180,7 @@ protected:
 private:
 	void kicknrun_sub_output_w(uint8_t data);
 	virtual void main_f008_w(uint8_t data);
-
 	void main_bankswitch_w(uint8_t data);
-	uint8_t kiki_ym2203_r(offs_t offset);
 
 	void main_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
@@ -235,7 +228,7 @@ private:
 
 	required_device<m6801_cpu_device> m_mcu;
 
-	// Kiki KaiKai / Kick 'n Run MCU
+	// Kiki KaiKai / Kick and Run MCU
 	uint8_t m_port3_in = 0U;
 	uint8_t m_port1_out = 0U;
 	uint8_t m_port2_out = 0U;
@@ -290,7 +283,6 @@ uint32_t base_state::screen_update_kicknrun(screen_device &screen, bitmap_ind16 
 {
 	// Similar to bublbobl.cpp, Video hardware generates sprites only.
 	bitmap.fill(255, cliprect);
-
 	int sx = 0;
 
 	// the score display seems to be outside of the main objectram
@@ -360,25 +352,21 @@ uint32_t base_state::screen_update_kicknrun(screen_device &screen, bitmap_ind16 
 
 uint32_t base_state::screen_update_kikikai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int offs;
-	int sx, sy, yc;
-	int gfx_num, /*gfx_attr,*/ gfx_offs;
-	int height;
-	int goffs, code, color, y;
-	int tx, ty;
-
 	bitmap.fill(m_palette->black_pen(), cliprect);
-	sx = 0;
-	for (offs = 0x1500; offs < 0x1800; offs += 4)
+	int sx = 0;
+
+	for (int offs = 0x1500; offs < 0x1800; offs += 4)
 	{
-		if (*(uint32_t*)(m_mainram + offs) == 0)
+		// skip empty sprites
+		if (*(uint32_t *)(&m_mainram[offs]) == 0)
 			continue;
 
-		ty = m_mainram[offs];
-		gfx_num = m_mainram[offs + 1];
-		tx = m_mainram[offs + 2];
-		//gfx_attr = m_mainram[offs + 3];
+		int ty = m_mainram[offs];
+		int gfx_num = m_mainram[offs + 1];
+		int tx = m_mainram[offs + 2];
+		//int gfx_attr = m_mainram[offs + 3];
 
+		int gfx_offs, height;
 		if (gfx_num & 0x80)
 		{
 			gfx_offs = ((gfx_num & 0x3f) << 7);
@@ -395,15 +383,15 @@ uint32_t base_state::screen_update_kikikai(screen_device &screen, bitmap_ind16 &
 			sx = tx;
 		}
 
-		sy = 256 - (height << 3) - ty;
+		int sy = 256 - (height << 3) - ty;
 
 		height <<= 1;
-		for (yc = 0; yc < height; yc += 2)
+		for (int yc = 0; yc < height; yc += 2)
 		{
-			y = (sy + (yc << 2)) & 0xff;
-			goffs = gfx_offs + yc;
-			code = m_mainram[goffs] + ((m_mainram[goffs + 1] & 0x1f) << 8);
-			color = (m_mainram[goffs + 1] & 0xe0) >> 5;
+			int y = (sy + (yc << 2)) & 0xff;
+			int goffs = gfx_offs + yc;
+			int code = m_mainram[goffs] + ((m_mainram[goffs + 1] & 0x1f) << 8);
+			int color = (m_mainram[goffs + 1] & 0xe0) >> 5;
 			goffs += 0x40;
 
 			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
@@ -433,16 +421,6 @@ uint32_t base_state::screen_update_kikikai(screen_device &screen, bitmap_ind16 &
  *  I/O handlers
  *
  *************************************/
-
-uint8_t base_state::kiki_ym2203_r(offs_t offset)
-{
-	uint8_t result = m_ymsnd->read(offset);
-
-	if (offset == 0)
-		result &= 0x7f;
-
-	return result;
-}
 
 void base_state::main_bankswitch_w(uint8_t data)
 {
@@ -483,14 +461,12 @@ void base_state::main_f008_w(uint8_t data)
 void kikikai_state::main_f008_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 4) ? CLEAR_LINE : ASSERT_LINE);
-
 	m_mcu->set_input_line(INPUT_LINE_RESET, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 void mexico86_state::main_f008_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 4) ? CLEAR_LINE : ASSERT_LINE);
-
 	m_mcu->set_input_line(INPUT_LINE_RESET, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
 }
 
@@ -509,7 +485,7 @@ IRQ_CALLBACK_MEMBER(base_state::mcram_vect_r)
 
 /*************************************
  *
- *  Kiki KaiKai / Kick 'n Run MCU
+ *  Kiki KaiKai / Kick and Run MCU
  *
  *************************************/
 
@@ -698,6 +674,7 @@ void base_state::knightba_main_map(address_map &map)
 	map(0xc000, 0xe7ff).ram().share(m_mainram); // shared with sound CPU
 	map(0xe800, 0xefff).ram();
 	map(0xf000, 0xf000).w(FUNC(base_state::main_bankswitch_w)); // program and gfx ROM banks
+	map(0xf008, 0xf008).nopw();
 	map(0xf010, 0xf010).portr("IN3");
 	map(0xf018, 0xf018).nopw();                 // watchdog?
 	map(0xf019, 0xf019).portr("IN1");
@@ -708,7 +685,7 @@ void base_state::sound_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xa7ff).ram().share(m_mainram); // shared with main
 	map(0xa800, 0xbfff).ram();
-	map(0xc000, 0xc001).r(FUNC(base_state::kiki_ym2203_r)).w(m_ymsnd, FUNC(ym2203_device::write));
+	map(0xc000, 0xc001).rw(m_ymsnd, FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 }
 
 void base_state::kicknrun_sub_cpu_map(address_map &map)
@@ -1396,11 +1373,11 @@ ROM_END
  *
  *************************************/
 
-GAME( 1986, kikikai,   0,        kikikai,  kikikai,  kikikai_state,  empty_init, ROT90, "Taito Corporation",          "KiKi KaiKai",                                 MACHINE_SUPPORTS_SAVE )
-GAME( 1986, knightb,   kikikai,  knightb,  kikikai,  mexico86_state, empty_init, ROT90, "bootleg",                    "Knight Boy",                                  MACHINE_SUPPORTS_SAVE )
-GAME( 1986, knightba,  kikikai,  knightba, knightba, base_state,     empty_init, ROT90, "bootleg (Game Corporation)", "Knight Boy (Game Corporation bootleg)",       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // missing coins, can be played using service to coin
+GAME( 1986, kikikai,   0,        kikikai,  kikikai,  kikikai_state,  empty_init, ROT90, "Taito Corporation",          "KiKi KaiKai",                                MACHINE_SUPPORTS_SAVE )
+GAME( 1986, knightb,   kikikai,  knightb,  kikikai,  mexico86_state, empty_init, ROT90, "bootleg",                    "Knight Boy (bootleg of KiKi KaiKai, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, knightba,  kikikai,  knightba, knightba, base_state,     empty_init, ROT90, "bootleg (Game Corporation)", "Knight Boy (bootleg of KiKi KaiKai, set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // missing coins/dsw, can be played using service to coin
 
-GAME( 1986, kicknrun,  0,        kicknrun, kicknrun, kikikai_state,  empty_init, ROT0,  "Taito Corporation",          "Kick and Run (World)",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1986, kicknrunu, kicknrun, kicknrun, kicknrun, kikikai_state,  empty_init, ROT0,  "Taito America Corp",         "Kick and Run (US)",                           MACHINE_SUPPORTS_SAVE )
-GAME( 1986, mexico86,  kicknrun, mexico86, kicknrun, mexico86_state, empty_init, ROT0,  "bootleg",                    "Mexico 86 (bootleg of Kick and Run) (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, mexico86a, kicknrun, mexico86, kicknrun, mexico86_state, empty_init, ROT0,  "bootleg",                    "Mexico 86 (bootleg of Kick and Run) (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, kicknrun,  0,        kicknrun, kicknrun, kikikai_state,  empty_init, ROT0,  "Taito Corporation",          "Kick and Run (World)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1986, kicknrunu, kicknrun, kicknrun, kicknrun, kikikai_state,  empty_init, ROT0,  "Taito America Corp",         "Kick and Run (US)",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1986, mexico86,  kicknrun, mexico86, kicknrun, mexico86_state, empty_init, ROT0,  "bootleg",                    "Mexico 86 (bootleg of Kick and Run, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, mexico86a, kicknrun, mexico86, kicknrun, mexico86_state, empty_init, ROT0,  "bootleg",                    "Mexico 86 (bootleg of Kick and Run, set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

@@ -48,7 +48,7 @@ protected:
 	virtual u32 execute_input_lines() const noexcept override { return 1; }
 	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == HT1130_EXT_WAKEUP_LINE; }
 	virtual void execute_set_input(int inputnum, int state) override;
-	virtual uint32_t execute_max_cycles() const noexcept override { return 2; }
+	virtual u32 execute_max_cycles() const noexcept override { return 2; }
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
