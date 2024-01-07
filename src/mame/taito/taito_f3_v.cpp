@@ -823,18 +823,16 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 	if (offs_t where = latched_addr(2, 2)) {
 		u16 x_mosaic = m_line_ram[where];
 
-		for (int pf_num = 0; pf_num < NUM_PLAYFIELDS; pf_num++) {
-			if ((line.pf[pf_num].x_sample_enable = BIT(x_mosaic, pf_num))) {
-				line.pf[pf_num].x_sample = (x_mosaic & 0xf0) >> 4;
-			}
-		}
+		line.x_sample = BIT(x_mosaic, 4, 4);
 
-		line.x_sample = (x_mosaic & 0xf0) >> 4;
+		for (int pf_num = 0; pf_num < NUM_PLAYFIELDS; pf_num++) {
+			line.pf[pf_num].x_sample_enable = BIT(x_mosaic, pf_num);
+		}
 
 		for (int sp_num = 0; sp_num < NUM_SPRITEGROUPS; sp_num++) {
-			line.sp[sp_num].x_sample_enable = BIT(x_mosaic, 9);
+			line.sp[sp_num].x_sample_enable = BIT(x_mosaic, 8);
 		}
-		line.pivot.x_sample_enable = BIT(x_mosaic, 10);
+		line.pivot.x_sample_enable = BIT(x_mosaic, 9);
 
 		line.fx_6400 = (x_mosaic & 0xfc00) >> 8;
 		if (line.fx_6400 && line.fx_6400 != 0x70) // check if unknown effect bits set
@@ -924,20 +922,22 @@ void taito_f3_state::get_pf_scroll(int pf_num, fixed8 &reg_sx, fixed8 &reg_sy)
 	s16 sx_raw = m_control_0[pf_num];
 	s16 sy_raw = m_control_0[pf_num + 4];
 
+	// why don't we need to do the 24 adjustment for pf 1 and 2 ?
+	sy_raw += (1 << 7); // 9.7
+
 	if (m_flipscreen) {
 		sx_raw += 320 << 6; // 10.6
-		sy_raw += 232 << 7; // 9.7
+		//sy_raw += 232 << 7; // 9.7
 
 		sx_raw += (512+192) << 6; // 10.6
-		sy_raw += (256) << 7; // 9.7
+		//sy_raw += (256) << 7; // 9.7
 
-		sy_raw += (26) << 7;
+		//sy_raw += (26) << 7;
 
 		sy_raw = -sy_raw;
 	}
+
 	sx_raw += ((40 - 4*pf_num) << 6); // 10.6
-	// why don't we need to do this 24 adjustment for pf 1 and 2 ?  -- only in flip ?
-	sy_raw += (1 << 7); // 9.7
 
 	fixed8 sx = sx_raw << (8-6); // 10.6 to 24.8
 	fixed8 sy = sy_raw << (8-7); // 9.7 to 24.8
@@ -1097,7 +1097,7 @@ void taito_f3_state::draw_line(pen_t* dst, f3_line_inf &line, int xs, int xe, pl
 		if (pf->prio() > pri_alp.pri
 			|| (pri_alp.alpha && (pf->blend_mask() != pri_alp.active_alpha))) {
 
-			int real_x = pf->x_sample_enable ? mosaic(x, 16 - pf->x_sample) : x;
+			int real_x = pf->x_sample_enable ? mosaic(x, 16 - line.x_sample) : x;
 			int x_index = (((fx_x + (real_x - 46) * pf->x_scale)>>8) + 46) & m_width_mask;
 
 			if (!(flags[x_index] & 0xf0))
@@ -1124,7 +1124,9 @@ void taito_f3_state::draw_line(pen_t* dst, f3_line_inf &line, int xs, int xe, sp
 		if (sp->prio() > line.pri_alp[x].pri
 			|| (pri_alp.alpha && (blend_mode != pri_alp.active_alpha))) {
 
-			if (const u16 col = src[x]) { // 0 = transparent
+			int real_x = sp->x_sample_enable ? mosaic(x, 16 - line.x_sample) : x;
+
+			if (const u16 col = src[real_x]) { // 0 = transparent
 				const bool sel = sp->brightness;
 				blend_dispatch(sp->blend_mask(), sel, sp->prio(),
 							   line.blend, line.pri_alp[x], dst[x], clut[col]);
@@ -1151,7 +1153,9 @@ void taito_f3_state::draw_line(pen_t* dst, f3_line_inf &line, int xs, int xe, pi
 		if (pv->prio() > pri_alp.pri
 			|| (pri_alp.alpha && (pv->blend_mask() != pri_alp.active_alpha))) {
 
-			int x_index = (pv->reg_sx + x) & width_mask;
+			int real_x = pv->x_sample_enable ? mosaic(x, 16 - line.x_sample) : x;
+
+			int x_index = (pv->reg_sx + real_x) & width_mask;
 			if (!(flagsbitmap[x_index] & 0xf0))
 				continue;
 			if (u16 col = srcbitmap[x_index]) {
@@ -1247,6 +1251,7 @@ void taito_f3_state::scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cl
 		}
 		//logerror("-----------\n");
 
+		/*
 		int dbgx = 46;
 		for (auto &pf : line_data.pf) {
 			bool bonus_d = false;
@@ -1270,7 +1275,7 @@ void taito_f3_state::scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cl
 		}
 		bitmap.pix(y, dbgx++) = line_data.pivot.blend_b() ? 0x0000FF : 0x000000;
 		bitmap.pix(y, dbgx++) = line_data.pivot.blend_a() ? 0xFF0000 : 0x000000;
-
+		*/
 
 		if (y != y_start) {
 			// update registers

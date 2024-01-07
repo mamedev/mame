@@ -236,7 +236,7 @@ protected:
 		bitmap_ind8*  flagsbitmap_vram;
 
 		u8 pivot_control{0};     // 6000
-		bool x_sample_enable{0}; // 6400
+		bool x_sample_enable{false}; // 6400
 		u16 pivot_enable{0};     // 7000
 		// mix info from 7200
 		bool use_pix() const { return pivot_control & 0xa0; };
