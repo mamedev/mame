@@ -22,7 +22,9 @@
 
 #include "emu.h"
 #include "dp83932c.h"
+
 #include "hashing.h"
+#include "multibyte.h"
 
 #define LOG_COMMAND (1U << 1)
 #define LOG_FILTER  (1U << 2)
@@ -386,10 +388,8 @@ void dp83932c_device::transmit()
 		u32 const crc = util::crc32_creator::simple(buf, length);
 
 		// insert the fcs
-		buf[length++] = crc >> 0;
-		buf[length++] = crc >> 8;
-		buf[length++] = crc >> 16;
-		buf[length++] = crc >> 24;
+		put_u32le(&buf[length], crc);
+		length += 4;
 	}
 
 	// advance ctda to the link field
@@ -523,9 +523,7 @@ bool dp83932c_device::address_filter(u8 *buf)
 		return true;
 	}
 
-	u64 const address =
-		(u64(buf[0]) << 40) | (u64(buf[1]) << 32) | (u64(buf[2]) << 24) |
-		(u64(buf[3]) << 16) | (u64(buf[4]) << 8) | (u64(buf[5]) << 0);
+	u64 const address = get_u48be(buf);
 
 	// broadcast
 	if ((address == 0xffff'ffffffffULL) && (m_reg[RCR] & (RCR_AMC | RCR_BRD)))
