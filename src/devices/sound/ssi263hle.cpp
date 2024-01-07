@@ -20,13 +20,16 @@
 
 DEFINE_DEVICE_TYPE(SSI263HLE, ssi263hle_device, "ssi263hle", "SSI-263A Speech Synthesizer")
 
-const char ssi263hle_device::PHONEME_NAMES[0x40][5] =
+namespace
+{
+
+static const char PHONEME_NAMES[0x40][5] =
 {
 	"PA", "E", "E1", "Y", "YI", "AY", "IE", "I", "A", "AI", "EH", "EH1", "AE", "AE1", "AH", "AH1", "W", "O", "OU", "OO", "IU", "IU1", "U", "U1", "UH", "UH1", "UH2", "UH3", "ER", "R", "R1", "R2",
 	"L", "L1", "LF", "W", "B", "D", "KV", "P", "T", "K", "HV", "HVC", "HF", "HFC", "HN", "Z", "S", "J", "SCH", "V", "F", "THV", "TH", "M", "N", "NG", ":A", ":OH", ":U", ":UH", "E2", "LB"
 };
 
-const u8 ssi263hle_device::PHONEMES_TO_SC01[0x40] =
+static const u8 PHONEMES_TO_SC01[0x40] =
 {
 	0x03, 0x2c, 0x3b, 0x3c, 0x22, 0x21, 0x29, 0x27, 0x20, 0x05, 0x01, 0x00, 0x2e, 0x2f, 0x15, 0x15,
 	0x13, 0x26, 0x35, 0x17, 0x36, 0x16, 0x28, 0x37, 0x32, 0x32, 0x31, 0x23, 0x3a, 0x2b, 0x2b, 0x2b,
@@ -34,11 +37,27 @@ const u8 ssi263hle_device::PHONEMES_TO_SC01[0x40] =
 	0x1f, 0x07, 0x11, 0x0f, 0x1d, 0x38, 0x39, 0x0c, 0x0d, 0x14, 0x08, 0x34, 0x28, 0x37, 0x02, 0x18
 };
 
+} // anonymous namespace
+
 ssi263hle_device::ssi263hle_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, SSI263HLE, tag, owner, clock)
 	, device_mixer_interface(mconfig, *this, 1)
 	, m_votrax(*this, "votrax")
 	, m_ar_cb(*this)
+	, m_phoneme_timer(nullptr)
+	, m_duration(0)
+	, m_phoneme(0)
+	, m_inflection(0)
+	, m_rate(0)
+	, m_articulation(0)
+	, m_control(false)
+	, m_amplitude(0)
+	, m_filter(0)
+	, m_mode(0)
+	, m_data_request(1)
+	, m_votrax_fifo_wr(0)
+	, m_votrax_fifo_rd(0)
+	, m_votrax_fifo_cnt(0)
 {
 }
 

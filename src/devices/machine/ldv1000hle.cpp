@@ -20,13 +20,13 @@
 #include "ldv1000hle.h"
 
 
-#define LOG_COMMAND_BYTES       (1u << 1)
-#define LOG_COMMANDS            (1u << 2)
-#define LOG_REPLIES             (1u << 3)
-#define LOG_SEARCHES            (1u << 4)
-#define LOG_STOPS               (1u << 5)
-#define LOG_SQUELCHES           (1u << 6)
-#define LOG_FRAMES              (1u << 7)
+#define LOG_COMMAND_BYTES       (1U << 1)
+#define LOG_COMMANDS            (1U << 2)
+#define LOG_REPLIES             (1U << 3)
+#define LOG_SEARCHES            (1U << 4)
+#define LOG_STOPS               (1U << 5)
+#define LOG_SQUELCHES           (1U << 6)
+#define LOG_FRAMES              (1U << 7)
 #define LOG_ALL                 (LOG_COMMAND_BYTES | LOG_COMMANDS | LOG_REPLIES | LOG_SEARCHES | LOG_STOPS | LOG_SQUELCHES | LOG_FRAMES)
 
 #define VERBOSE (0)
@@ -53,8 +53,8 @@ pioneer_ldv1000hle_device::pioneer_ldv1000hle_device(const machine_config &mconf
 	, m_pre_stop_status(0)
 	, m_mode(MODE_PARK)
 	, m_curr_frame(0)
-	, m_search_frame(~0u)
-	, m_stop_frame(~0u)
+	, m_search_frame(~0U)
+	, m_stop_frame(~0U)
 	, m_cmd_number_length(0)
 	, m_curr_register(0)
 	, m_scan_speed(60)
@@ -124,8 +124,8 @@ void pioneer_ldv1000hle_device::device_reset()
 	m_pre_stop_status = 0;
 	m_mode = MODE_PARK;
 	m_curr_frame = 0;
-	m_search_frame = ~0u;
-	m_stop_frame = ~0u;
+	m_search_frame = ~0U;
+	m_stop_frame = ~0U;
 	m_cmd_number_length = 0;
 	m_curr_register = 0;
 	m_scan_speed = 0;
@@ -230,14 +230,14 @@ s32 pioneer_ldv1000hle_device::player_update(const vbi_metadata &vbi, int fieldn
 		if (m_mode == MODE_SCAN_REVERSE)
 			elapsed_tracks *= -1;
 
-		if (m_stop_frame != ~0u)
+		if (m_stop_frame != ~0U)
 		{
 			const int next_frame = (int)m_curr_frame + elapsed_tracks;
 			if (next_frame >= m_stop_frame)
 			{
 				// If we've landed on (or exceeded) our desired frame and are in a SKIP FORWARD command, resume from the desired frame.
 				elapsed_tracks = (int)m_stop_frame - (int)m_curr_frame;
-				m_stop_frame = ~0u;
+				m_stop_frame = ~0U;
 				set_playing(STATUS_FORWARD, m_play_speed);
 			}
 		}
@@ -279,27 +279,27 @@ TIMER_CALLBACK_MEMBER(pioneer_ldv1000hle_device::process_vbi_data)
 
 		if (m_mode != MODE_STOP)
 		{
-			if (m_stop_frame != ~0u && m_search_frame == ~0u)
+			if (m_stop_frame != ~0U && m_search_frame == ~0U)
 			{
 				s32 old_delta = (s32)m_stop_frame - (s32)old_frame;
 				s32 curr_delta = (s32)m_stop_frame - (s32)m_curr_frame;
 				LOGMASKED(LOG_STOPS, "%s: Stop frame is currently %d, old frame is %d, current frame is %d, old delta %d, curr delta %d\n", machine().describe_context(), m_stop_frame, old_frame, m_curr_frame, old_delta, curr_delta);
 				if (curr_delta == 0 || (old_delta < 0) != (curr_delta < 0))
 				{
-					m_stop_frame = ~0u;
+					m_stop_frame = ~0U;
 					LOGMASKED(LOG_STOPS, "%s: Stop frame: Zero delta, entering stop mode\n", machine().describe_context());
 					set_stopped((m_status & STATUS_READY) | STATUS_STOP);
 				}
 			}
 
-			if (m_search_frame != ~0u)
+			if (m_search_frame != ~0U)
 			{
 				s32 delta = (s32)m_search_frame - (s32)m_curr_frame;
 				LOGMASKED(LOG_SEARCHES, "%s: Searching from current frame %d with delta %d\n", machine().describe_context(), m_curr_frame, delta);
 				if (delta == 0)
 				{
 					// We've found our frame, enter play, pause or still mode.
-					m_search_frame = ~0u;
+					m_search_frame = ~0U;
 					LOGMASKED(LOG_SEARCHES, "%s: Search Mark: Zero delta, entering still mode\n", machine().describe_context());
 					set_stopped(STATUS_SEARCH_FINISH);
 				}
@@ -628,8 +628,8 @@ void pioneer_ldv1000hle_device::process_command(size_t cmd_index)
 				m_status = STATUS_SCAN;
 				m_scan_speed = 4000; // "The two SCAN commands move the player's optical head at the rate of approximately 2000 frames per second in the direction specified"
 				m_scan_speed_accum = 0;
-				m_stop_frame = ~0u;
-				m_search_frame = ~0u;
+				m_stop_frame = ~0U;
+				m_search_frame = ~0U;
 				break;
 
 			case CMD_STEP_FWD:
@@ -646,8 +646,8 @@ void pioneer_ldv1000hle_device::process_command(size_t cmd_index)
 				LOGMASKED(LOG_COMMANDS, "process_command: Reject\n");
 				set_mode(MODE_PARK);
 				m_status = STATUS_PARK;
-				m_stop_frame = ~0u;
-				m_search_frame = ~0u;
+				m_stop_frame = ~0U;
+				m_search_frame = ~0U;
 				break;
 
 			case CMD_NO_ENTRY:
@@ -910,8 +910,8 @@ void pioneer_ldv1000hle_device::set_playing(const u8 new_status, const double fi
 	set_mode(MODE_PLAY);
 	m_status = new_status;
 	m_play_speed = fields_per_vsync;
-	m_search_frame = ~0u;
-	m_stop_frame = ~0u;
+	m_search_frame = ~0U;
+	m_stop_frame = ~0U;
 }
 
 
@@ -968,8 +968,8 @@ void pioneer_ldv1000hle_device::cmd_step(const int direction)
 {
 	advance_slider(direction);
 	set_stopped(STATUS_STOP);
-	m_stop_frame = ~0u;
-	m_search_frame = ~0u;
+	m_stop_frame = ~0U;
+	m_search_frame = ~0U;
 }
 
 
@@ -996,7 +996,7 @@ void pioneer_ldv1000hle_device::cmd_search(const u32 frame)
 	set_mode(MODE_SEARCH);
 	m_status = STATUS_SEARCH;
 	m_search_frame = frame;
-	m_stop_frame = ~0u;
+	m_stop_frame = ~0U;
 }
 
 
@@ -1009,7 +1009,7 @@ void pioneer_ldv1000hle_device::cmd_skip_forward(const s32 amount)
 {
 	LOGMASKED(LOG_COMMANDS, "Command: Skip Forward %d\n", amount);
 	set_mode(MODE_SEARCH);
-	m_search_frame = ~0u;
+	m_search_frame = ~0U;
 	m_stop_frame = m_curr_frame + amount;
 	m_scan_speed = amount;
 }

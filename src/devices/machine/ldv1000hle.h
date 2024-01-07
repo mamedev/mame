@@ -178,8 +178,8 @@ private:
 	emu_timer *         m_deassert_command_strobe_timer;
 	u8                  m_cmd_buffer[21];
 	u32                 m_cmd_length;
-	u8					m_status;
-	u8					m_pre_stop_status;
+	u8                  m_status;
+	u8                  m_pre_stop_status;
 
 	u8                  m_mode;                 // current player mode
 	u32                 m_curr_frame;           // frame number
@@ -192,7 +192,7 @@ private:
 	u32                 m_curr_register;
 	u32                 m_scan_speed;
 	u32                 m_scan_speed_accum;
-	double				m_play_speed;
+	double              m_play_speed;
 	bool                m_audio_enable[2];
 	bool                m_status_strobe;
 	bool                m_command_strobe;

@@ -16,14 +16,15 @@
 #ifndef MAME_SOUND_SSI263HLE_H
 #define MAME_SOUND_SSI263HLE_H
 
-#include "sound/votrax.h"
-
-
 #pragma once
+
+#include "sound/votrax.h"
 
 class ssi263hle_device : public device_t, public device_mixer_interface
 {
 public:
+	static constexpr feature_type imperfect_features() { return feature::SOUND; }
+
 	ssi263hle_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	void map(address_map &map);
@@ -53,24 +54,21 @@ private:
 
 	emu_timer *m_phoneme_timer = nullptr;
 
-	u8 m_duration = 0;
-	u8 m_phoneme = 0;
-	u16 m_inflection = 0;
-	u8 m_rate = 0;
-	u8 m_articulation = 0;
-	bool m_control = false;
-	u8 m_amplitude = 0;
-	u8 m_filter = 0;
-	u8 m_mode = 0;
-	u8 m_data_request = 1;
+	u8 m_duration;
+	u8 m_phoneme;
+	u16 m_inflection;
+	u8 m_rate;
+	u8 m_articulation;
+	bool m_control;
+	u8 m_amplitude;
+	u8 m_filter;
+	u8 m_mode;
+	u8 m_data_request;
 
 	u8 m_votrax_fifo[1024];
-	u32 m_votrax_fifo_wr = 0;
-	u32 m_votrax_fifo_rd = 0;
-	u32 m_votrax_fifo_cnt = 0;
-
-	static const char PHONEME_NAMES[0x40][5];
-	static const u8 PHONEMES_TO_SC01[0x40];
+	u32 m_votrax_fifo_wr;
+	u32 m_votrax_fifo_rd;
+	u32 m_votrax_fifo_cnt;
 };
 
 DECLARE_DEVICE_TYPE(SSI263HLE, ssi263hle_device)
