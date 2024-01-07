@@ -17,8 +17,6 @@
 
 #include "ssi263hle.h"
 
-#define VERBOSE (1)
-#include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(SSI263HLE, ssi263hle_device, "ssi263hle", "SSI-263A Speech Synthesizer")
 
@@ -104,14 +102,12 @@ void ssi263hle_device::device_add_mconfig(machine_config &config)
 
 TIMER_CALLBACK_MEMBER(ssi263hle_device::phoneme_tick)
 {
-	LOG("phoneme tick\n");
 	m_data_request = 0;
 	m_ar_cb(m_data_request);
 }
 
 void ssi263hle_device::duration_phoneme_w(u8 data)
 {
-	LOG("duration_phoneme_w: %02x\n", data);
 	const int frame_time = ((4096 * (16 - m_rate)) / 2); // microseconds, should actually be derived from our clock, but this way we get microseconds directly
 	const int phoneme_time = frame_time * (4 - m_duration); // microseconds
 
@@ -154,14 +150,12 @@ void ssi263hle_device::duration_phoneme_w(u8 data)
 
 void ssi263hle_device::inflection_w(u8 data)
 {
-	LOG("inflection_w: %02x\n", data);
 	m_inflection &= 0x807;
 	m_inflection |= data << 3;
 }
 
 void ssi263hle_device::rate_inflection_w(u8 data)
 {
-	LOG("rate_inflection_w: %02x\n", data);
 	m_inflection &= 0x7f8;
 	m_inflection |= (BIT(data, 3) << 11) | (data & 0x07);
 	m_rate = data >> 4;
@@ -170,7 +164,6 @@ void ssi263hle_device::rate_inflection_w(u8 data)
 
 void ssi263hle_device::control_articulation_amplitude_w(u8 data)
 {
-	LOG("control_articulation_amplitude_w: %02x\n", data);
 	if (m_control && !BIT(data, 7))
 	{
 		m_mode = m_duration;
@@ -183,16 +176,13 @@ void ssi263hle_device::control_articulation_amplitude_w(u8 data)
 
 void ssi263hle_device::filter_frequency_w(u8 data)
 {
-	LOG("filter_frequency_w: %02x\n", data);
 	m_filter = data;
 }
 
 u8 ssi263hle_device::status_r()
 {
-	const u8 data = BIT(~m_data_request, 0) << 7;
 	// D7 is an output for the inverted state of A/_R. Register address bits are ignored.
-	LOG("status_r: %02x\n", data);
-	return data;
+	return BIT(~m_data_request, 0) << 7;
 }
 
 void ssi263hle_device::votrax_request(int state)
@@ -201,8 +191,6 @@ void ssi263hle_device::votrax_request(int state)
 	{
 		return;
 	}
-
-	LOG("votrax_request: %d\n", state);
 
 	m_votrax_fifo_cnt--;
 	const u8 previous_phoneme = m_votrax_fifo[m_votrax_fifo_rd];

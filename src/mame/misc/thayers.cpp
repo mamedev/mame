@@ -29,7 +29,7 @@
 #define LOG_COINS		(1u << 5)
 #define LOG_ALL			(LOG_IRQS | LOG_COP | LOG_KEYBOARD | LOG_PLAYER | LOG_COINS)
 
-#define VERBOSE (LOG_IRQS | LOG_PLAYER | LOG_GENERAL)
+#define VERBOSE (0)
 #include "logmacro.h"
 
 namespace {
