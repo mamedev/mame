@@ -21,6 +21,10 @@ public:
 		UPD777_SKIP,
 		UPD777_H,
 		UPD777_L,
+		UPD777_ADDR_STACK0,
+		UPD777_ADDR_STACK1,
+		UPD777_ADDR_STACK2,
+		UPD777_ADDR_STACK_POS,
 	};
 
 protected:
@@ -59,6 +63,8 @@ private:
 
 	u8 read_data_mem(u8 addr);
 	void write_data_mem(u8 addr, u8 data);
+	void push_to_stack(u16 addr);
+	u16 pull_from_stack();
 
 	void set_l(int l);
 	u8 get_h_shifted();
@@ -81,6 +87,8 @@ private:
 	u8 m_a[4]; // A1 to A4
 	u8 m_h;
 	u8 m_l;
+	u16 m_stack[3]; // 3 11-bit registers
+	u8 m_stackpos;
 
 };
 

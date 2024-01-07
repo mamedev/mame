@@ -93,7 +93,12 @@ void upd777_device::device_start()
 	state_add(UPD777_L, "L", m_l);
 	state_add(UPD777_H, "H", m_h);
 
-	//state_add(UPD777_SKIP, "SKIP", m_skip);
+	state_add(UPD777_ADDR_STACK0, "ADDR_STACK0", m_stack[0]);
+	state_add(UPD777_ADDR_STACK1, "ADDR_STACK1", m_stack[1]);
+	state_add(UPD777_ADDR_STACK2, "ADDR_STACK2", m_stack[2]);
+	state_add(UPD777_ADDR_STACK_POS, "ADDR_STACK_POS", m_stackpos);
+
+	//state_add(UPD777_SKIP, "SKIP", m_skip); // will always be showing 0 as debugger doesn't hook on skipped opcodes
 
 	save_item(NAME(m_ppc));
 	save_item(NAME(m_pc));
@@ -101,6 +106,9 @@ void upd777_device::device_start()
 	save_item(NAME(m_a));
 	save_item(NAME(m_l));
 	save_item(NAME(m_h));
+
+	save_item(NAME(m_stack));
+	save_item(NAME(m_stackpos));
 }
 
 void upd777_device::device_reset()
@@ -113,6 +121,9 @@ void upd777_device::device_reset()
 	m_h = 0;
 
 	m_skip = 1; // the first opcode is always 'NOP' so maybe skip is 1 on startup?
+
+	m_stack[0] = m_stack[1] = m_stack[2] = 0;
+	m_stackpos = 0;
 }
 
 u16 upd777_device::fetch()
@@ -122,6 +133,34 @@ u16 upd777_device::fetch()
 	increment_pc();
 	return opcode;
 }
+
+void upd777_device::push_to_stack(u16 addr)
+{
+	if (m_stackpos < 3)
+	{
+		m_stack[m_stackpos] = addr;
+		m_stackpos++;
+	}
+	else
+	{
+		logerror("attempting to push to full address stack\n");
+	}
+}
+
+u16 upd777_device::pull_from_stack()
+{
+	if (m_stackpos > 0)
+	{
+		m_stackpos--;
+		return m_stack[m_stackpos];
+	}
+	else
+	{
+		logerror("attempting to pull from empty address stack\n");
+		return 0;
+	}
+}
+
 
 void upd777_device::set_a11(int a11)
 {
@@ -286,7 +325,8 @@ void upd777_device::do_op()
 	{
 		// c00 - fff Move K[10:1] to A[10:1], 0 to A11, Jump to A[11:1], Push next A[11:1] up to ROM address stack
 		const int k = inst & 0x3ff;
-		LOGMASKED(LOG_UNHANDLED_OPS, "JS 0x%03x (%01x:%02x)\n", k & 0x3ff, (k & 0x380)>>7, k & 0x07f);
+		push_to_stack(m_pc);
+		set_new_pc(k);
 	}
 	else
 	{
@@ -295,7 +335,7 @@ void upd777_device::do_op()
 		case 0b0000'0000'0000:
 		{
 			// 000 No Operation
-			LOGMASKED(LOG_UNHANDLED_OPS, "NOP\n");
+			// nothing
 			break;
 		}
 		case 0b0000'0000'0100:
@@ -319,7 +359,8 @@ void upd777_device::do_op()
 		case 0b0000'0010'0000:
 		{
 			// 020 Subroutine End, Pop down address stack
-			LOGMASKED(LOG_UNHANDLED_OPS, "SRE\n");
+			u16 addr = pull_from_stack();
+			set_new_pc(addr);
 			break;
 		}
 		case 0b0000'0010'1000: case 0b0000'0010'1001:
@@ -394,7 +435,9 @@ void upd777_device::do_op()
 		case 0b0000'0110'0000:
 		{
 			// 060 Subroutine End, Pop down address stack, Skip
-			LOGMASKED(LOG_UNHANDLED_OPS, "SRE+1\n");
+			u16 addr = pull_from_stack();
+			set_new_pc(addr);
+			m_skip = 1;
 			break;
 		}
 
