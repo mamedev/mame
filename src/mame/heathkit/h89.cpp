@@ -367,8 +367,11 @@ static INPUT_PORTS_START( h88 )
 
 	PORT_START("SW501")
 	// MTR-88  (444-40)
-	PORT_DIPNAME( 0x1f, 0x00, DEF_STR( Unused ) )               PORT_DIPLOCATION("SW501:1,2,3,4,5")
-	PORT_DIPSETTING( 0x00, "Undefined" )
+	PORT_DIPUNUSED_DIPLOC(0x01, 0x00, "SW501:1")
+	PORT_DIPUNUSED_DIPLOC(0x02, 0x00, "SW501:2")
+	PORT_DIPUNUSED_DIPLOC(0x04, 0x00, "SW501:3")
+	PORT_DIPUNUSED_DIPLOC(0x08, 0x00, "SW501:4")
+	PORT_DIPUNUSED_DIPLOC(0x10, 0x00, "SW501:5")
 	PORT_DIPNAME( 0x20, 0x20, "Perform memory test at start" )  PORT_DIPLOCATION("SW501:6")
 	PORT_DIPSETTING( 0x20, DEF_STR( No ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( Yes ) )
@@ -811,8 +814,8 @@ void h88_state::h88(machine_config &config)
 	h89_base_state::h89_base(config);
 	m_maincpu->set_io_map(&h88_state::h88_io);
 
-	subdevice<heath_intr_socket>("intr_socket")->set_default_option("original");
-	subdevice<heath_intr_socket>("intr_socket")->set_fixed(true);
+	m_intr_socket->set_default_option("original");
+	m_intr_socket->set_fixed(true);
 
 	// H-88-5 Cassette interface board
 	HEATH_H88_CASS(config, m_cassette, H89_CLOCK);
@@ -823,8 +826,8 @@ void h89_state::h89(machine_config &config)
 	h89_base_state::h89_base(config);
 	m_maincpu->set_io_map(&h89_state::h89_io);
 
-	subdevice<heath_intr_socket>("intr_socket")->set_default_option("h37");
-	subdevice<heath_intr_socket>("intr_socket")->set_fixed(true);
+	m_intr_socket->set_default_option("h37");
+	m_intr_socket->set_fixed(true);
 
 	// Z-89-37 Soft-sectored controller
 	HEATH_Z37_FDC(config, m_h37);
