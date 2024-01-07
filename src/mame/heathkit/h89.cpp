@@ -854,8 +854,8 @@ void h88_state::h88(machine_config &config)
 
 	m_maincpu->set_io_map(&h88_state::h88_io);
 
-	subdevice<heath_intr_socket>("intr_socket")->set_default_option("original");
-	subdevice<heath_intr_socket>("intr_socket")->set_fixed(true);
+	m_intr_socket->set_default_option("original");
+	m_intr_socket->set_fixed(true);
 
 	// H-88-5 Cassette interface board
 	HEATH_H88_CASS(config, m_cassette, H89_CLOCK);
@@ -867,8 +867,8 @@ void h89_state::h89(machine_config &config)
 
 	m_maincpu->set_io_map(&h89_state::h89_io);
 
-	subdevice<heath_intr_socket>("intr_socket")->set_default_option("h37");
-	subdevice<heath_intr_socket>("intr_socket")->set_fixed(true);
+	m_intr_socket->set_default_option("h37");
+	m_intr_socket->set_fixed(true);
 
 	// Z-89-37 Soft-sectored controller
 	HEATH_Z37_FDC(config, m_h37);
