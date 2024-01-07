@@ -271,7 +271,7 @@ TIMER_CALLBACK_MEMBER(pioneer_ldv1000hle_device::process_vbi_data)
 		else
 			m_curr_frame = bcd_to_literal(line & 0x7ffff);
 
-		LOGMASKED(LOG_FRAMES, "Current frame is %d (track: %d, VBI 16: %06x, VBI 17: %06x, VBI 18: %06x, VBI 1718: %06x\n", m_curr_frame, get_curtrack(),
+		LOGMASKED(LOG_FRAMES, "Current frame is %d (VBI 16: %06x, VBI 17: %06x, VBI 18: %06x, VBI 1718: %06x\n", m_curr_frame,
 			get_field_code(LASERDISC_CODE_LINE16, false),
 			get_field_code(LASERDISC_CODE_LINE17, false),
 			get_field_code(LASERDISC_CODE_LINE18, false),
