@@ -86,7 +86,8 @@ offs_t upd777_disassembler::disassemble(std::ostream &stream, offs_t pc, const u
 	else if (inst >= 0b0100'1000'0000 && inst <= 0b0100'1011'1111)
 	{
 		// 480-4bf H[5:1]-K[5:1]->H[5:1], Skip if borrow
-		util::stream_format(stream, "H-0x%02x->H BOJ", inst & 0x1f);
+		const int k = inst & 0x1f;
+		util::stream_format(stream, "H-0x%02x->H BOJ", k);
 	}
 	else if (inst >= 0b0100'1100'0000 && inst <= 0b0100'1111'1111)
 	{

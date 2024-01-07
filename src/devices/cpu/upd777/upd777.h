@@ -69,6 +69,7 @@ private:
 	u8 get_l();
 	void set_l(int l);
 	u8 get_h_shifted();
+	u8 get_h();
 	void set_h(int h);
 	void set_a11(int a11);
 	void set_new_pc(int newpc);
@@ -82,6 +83,7 @@ private:
 	void set_mode(u8 mode);
 
 	u8 get_m_data();
+	void set_m_data(u8 data);
 
 	u8 get_a1();
 	u8 get_a2();

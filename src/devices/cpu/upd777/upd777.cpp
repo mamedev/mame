@@ -201,11 +201,22 @@ u8 upd777_device::get_h_shifted()
 	return (m_h & 0x1f) << 2;
 }
 
+u8 upd777_device::get_h()
+{
+	return m_h & 0x1f;
+}
+
 // M is the content of memory address pointed to by H and L
 u8 upd777_device::get_m_data()
 {
 	u8 addr = get_h_shifted() | get_l();
-	return read_data_mem(addr);
+	return read_data_mem(addr & 0x7f) & 0x7f;
+}
+
+void upd777_device::set_m_data(u8 data)
+{
+	u8 addr = get_h_shifted() | get_l();
+	return write_data_mem(addr & 0x7f, data & 0x7f);
 }
 
 // 'A' regs are 7-bit
@@ -295,7 +306,11 @@ void upd777_device::do_op()
 		// 100-17f M[H[5:1],L[2:1]][7:1]+K[7:1]->M[H[5:1],L[2:1]][7:1], Skip if carry, N->L[2:1]
 		const int k = inst & 0x1f;
 		const int n = (inst >> 5) & 0x3;
-		LOGMASKED(LOG_UNHANDLED_OPS, "M+0x%02x->M, 0x%d->L\n", k, n);
+		u8 m = get_m_data();
+		m = m + k;
+		if (m & 0x80)
+			m_skip = 1;
+		set_m_data(m & 0x7f);
 		set_l(n);
 	}
 	else if (inst >= 0b0001'1000'0000 && inst <= 0b0001'1111'1111)
@@ -303,19 +318,32 @@ void upd777_device::do_op()
 		// 180-1ff M[H[5:1],L[2:1]][7:1]-K[7:1]->M[H[5:1],L[2:1]][7:1], Skip if borrow, N->L[2:1]
 		const int k = inst & 0x1f;
 		const int n = (inst >> 5) & 0x3;
-		LOGMASKED(LOG_UNHANDLED_OPS, "M-0x%02x->M, 0x%d->L\n", k, n);
+		u8 m = get_m_data();
+		m = m - k;
+		if (m & 0x80)
+			m_skip = 1;
+		set_m_data(m & 0x7f);
 		set_l(n);
 	}
 	else if (inst >= 0b0100'1000'0000 && inst <= 0b0100'1011'1111)
 	{
 		// 480-4bf H[5:1]-K[5:1]->H[5:1], Skip if borrow
-		LOGMASKED(LOG_UNHANDLED_OPS, "H-0x%02x->H BOJ\n", inst & 0x1f);
+		const int k = inst & 0x1f;
+		u8 h = get_h();
+		h = h - k;
+		if (h & 0x20)
+			m_skip = 1;
+		set_h(h & 0x1f);
 	}
 	else if (inst >= 0b0100'1100'0000 && inst <= 0b0100'1111'1111)
 	{
 		// 4c0 - 4ff H[5:1]+K[5:1]->H[5:1], Skip if carry
 		const int k = inst & 0x1f;
-		LOGMASKED(LOG_UNHANDLED_OPS, "H+0x%02x->H CAJ\n", k);
+		u8 h = get_h();
+		h = h + k;
+		if (h & 0x20)
+			m_skip = 1;
+		set_h(h & 0x1f);
 	}
 	else if (inst >= 0b0101'0000'0000 && inst <= 0b0101'0111'1111)
 	{
