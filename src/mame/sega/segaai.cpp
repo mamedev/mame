@@ -729,6 +729,7 @@ void segaai_state::segaai(machine_config &config)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
 	m_cassette->set_interface("cass");
 	m_cassette->add_route(0, "mono", 0.70); // Channel 0 contains regular recorded sound
+	m_cassette->set_channel(1); // Channel 1 contains data
 
 	config.set_default_layout(layout_segaai);
 }
