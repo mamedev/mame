@@ -63,9 +63,9 @@ offs_t upd777_disassembler::disassemble(std::ostream &stream, offs_t pc, const u
 {
 	u16 inst = opcodes.r16(pc);
 
-	if (inst >= 0b0000'0000'0000 && inst <= 0b0000'1111'1111)
+	if (inst >= 0b0000'1000'0000 && inst <= 0b0000'1111'1111)
 	{
-		// 000 - 0ff Skip if (M[H[5:1],L[2:1]][7:1]-K[7:1]) makes borrow
+		// 080 - 0ff Skip if (M[H[5:1],L[2:1]][7:1]-K[7:1]) makes borrow
 		const int k = inst & 0x7f;
 		util::stream_format(stream, "M-0x%02x", k);
 	}
