@@ -28,6 +28,8 @@
 #include "emu.h"
 #include "a78_slot.h"
 
+#include "multibyte.h"
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -365,14 +367,14 @@ std::pair<std::error_condition, std::string> a78_cart_slot_device::call_load()
 		{
 			// Load and check the header
 			int mapper;
-			char head[128];
+			uint8_t head[128];
 			fread(head, 128);
 
 			auto err = verify_header(head);
 			if (err.first)
 				return err;
 
-			len = (head[49] << 24) | (head[50] << 16) | (head[51] << 8) | head[52];
+			len = get_u32be(&head[49]);
 			if (len + 128 > length())
 			{
 				logerror("Invalid length in the header. The game might be corrupted.\n");
@@ -380,7 +382,7 @@ std::pair<std::error_condition, std::string> a78_cart_slot_device::call_load()
 			}
 
 			// let's try to auto-fix some common errors in the header
-			mapper = validate_header((head[53] << 8) | head[54], true);
+			mapper = validate_header(get_u16be(&head[53]), true);
 
 			switch (mapper & 0x2e)
 			{
@@ -444,7 +446,7 @@ std::pair<std::error_condition, std::string> a78_cart_slot_device::call_load()
 				osd_printf_info("Run it through the expansion to exploit this feature.\n");
 			}
 
-			internal_header_logging((uint8_t *)head, length());
+			internal_header_logging(head, length());
 
 			m_cart->rom_alloc(len);
 			fread(m_cart->get_rom_base(), len);
@@ -485,11 +487,11 @@ void a78_cart_slot_device::call_unload()
  has an admissible header
  -------------------------------------------------*/
 
-std::pair<std::error_condition, std::string> a78_cart_slot_device::verify_header(const char *header)
+std::pair<std::error_condition, std::string> a78_cart_slot_device::verify_header(const uint8_t *header)
 {
 	const char *magic = "ATARI7800";
 
-	if (strncmp(magic, header + 1, 9))
+	if (strncmp(magic, reinterpret_cast<const char *>(header + 1), 9))
 		return std::make_pair(image_error::INVALIDIMAGE, "Not a valid A7800 image");
 
 	logerror("returning ID_OK\n");
@@ -514,7 +516,7 @@ std::string a78_cart_slot_device::get_default_card_software(get_default_card_sof
 		hook.image_file()->read(&head[0], 128, actual); // FIXME: check error return or read returning short
 
 		// let's try to auto-fix some common errors in the header
-		int const mapper = validate_header((head[53] << 8) | head[54], false);
+		int const mapper = validate_header(get_u16be(&head[53]), false);
 
 		int type = A78_TYPE0;
 		switch (mapper & 0x2e)
@@ -699,11 +701,11 @@ void a78_cart_slot_device::write_40xx(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void a78_cart_slot_device::internal_header_logging(uint8_t *header, uint32_t len)
+void a78_cart_slot_device::internal_header_logging(const uint8_t *header, uint32_t len)
 {
 	char head_title[35];
-	uint32_t head_length = (header[49] << 24) | (header[50] << 16) | (header[51] << 8) | header[52];
-	uint16_t head_mapper = (header[53] << 8) | header[54];
+	uint32_t head_length = get_u32be(&header[49]);
+	uint16_t head_mapper = get_u16be(&header[53]);
 	uint8_t head_ctrl1 = header[55];
 	uint8_t head_ctrl2 = header[56];
 	uint8_t head_ispal = header[57];
