@@ -74,13 +74,34 @@ void upd777_device::device_start()
 	state_add(STATE_GENPC, "GENPC", m_pc).noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).noshow();
 
+	state_add(UPD777_A1, "A1", m_a[0]);
+	state_add(UPD777_A2, "A2", m_a[1]);
+	state_add(UPD777_A3, "A3", m_a[2]);
+	state_add(UPD777_A4, "A4", m_a[3]);
+
+	state_add(UPD777_L, "L", m_l);
+	state_add(UPD777_H, "H", m_h);
+
+	//state_add(UPD777_SKIP, "SKIP", m_skip);
+
+	save_item(NAME(m_ppc));
 	save_item(NAME(m_pc));
+	save_item(NAME(m_skip));
+	save_item(NAME(m_a));
+	save_item(NAME(m_l));
+	save_item(NAME(m_h));
 }
 
 void upd777_device::device_reset()
 {
 	m_ppc = 0;
 	m_pc = 0;
+
+	m_a[0] = m_a[1] = m_a[2] = m_a[3] = 0;
+	m_l = 0;
+	m_h = 0;
+
+	m_skip = 1; // the first opcode is always 'NOP' so maybe skip is 1 on startup?
 }
 
 u16 upd777_device::fetch()
@@ -89,6 +110,26 @@ u16 upd777_device::fetch()
 	m_ppc = m_pc;
 	increment_pc();
 	return opcode;
+}
+
+void upd777_device::set_a11(int a11)
+{
+	m_pc = (m_pc & 0x3ff) | (a11 & 1) << 10;
+}
+
+void upd777_device::set_new_pc(int newpc)
+{
+	m_pc = newpc;
+}
+
+void upd777_device::set_l(int l)
+{
+	m_l = l & 0x3;
+}
+
+void upd777_device::set_h(int h)
+{
+	m_h = h & 0x1f;
 }
 
 // temporary, for the opcode logging
@@ -145,6 +186,7 @@ void upd777_device::do_op()
 		const int k = inst & 0x1f;
 		const int n = (inst >> 5) & 0x3;
 		LOGMASKED(LOG_UNHANDLED_OPS, "M+0x%02x->M, 0x%d->L\n", k, n);
+		set_l(n);
 	}
 	else if (inst >= 0b0001'1000'0000 && inst <= 0b0001'1111'1111)
 	{
@@ -152,6 +194,7 @@ void upd777_device::do_op()
 		const int k = inst & 0x1f;
 		const int n = (inst >> 5) & 0x3;
 		LOGMASKED(LOG_UNHANDLED_OPS, "M-0x%02x->M, 0x%d->L\n", k, n);
+		set_l(n);
 	}
 	else if (inst >= 0b0100'1000'0000 && inst <= 0b0100'1011'1111)
 	{
@@ -177,7 +220,8 @@ void upd777_device::do_op()
 	{
 		// 580 - 5ff Store K[7:6] to L[2:1] and K[5:1] to H[5:1]
 		const int k = inst & 0x7f;
-		LOGMASKED(LOG_UNHANDLED_OPS, "0x%02x->L,H\n", k);
+		set_l(k >> 5);
+		set_h(k & 0x1f);
 	}
 	else if (inst >= 0b0110'0000'0000 && inst <= 0b0111'1111'1111)
 	{
@@ -193,7 +237,7 @@ void upd777_device::do_op()
 	{
 		// 800 - bff Move K[10:1] to A[10:1], Jump to A[11:1]
 		u16 fulladdress = (m_ppc & 0x400) | (inst & 0x3ff);
-		LOGMASKED(LOG_UNHANDLED_OPS, "JP 0x%03x (%01x:%02x)\n", fulladdress, (fulladdress & 0x780)>>7, inst & 0x07f);
+		set_new_pc(fulladdress);
 	}
 	else if (inst >= 0b1100'0000'0000 && inst <= 0b1111'1111'1111)
 	{
@@ -416,6 +460,7 @@ void upd777_device::do_op()
 			const int reg2 = (inst & 0x10) >> 4;
 			const int n = inst & 0x3;
 			LOGMASKED(LOG_UNHANDLED_OPS, "%s%s%s, 0x%d->L %s%s\n", get_reg_name(reg1), get_200optype_name(optype), get_reg_name(reg2), n, (optype == 3) ? "BOJ" : "EQJ", non ? "/" : "");
+			set_l(n);
 			break;
 		}
 
@@ -423,7 +468,7 @@ void upd777_device::do_op()
 		{
 			// 300 N->L[2:1]
 			const int n = inst & 0x3;
-			LOGMASKED(LOG_UNHANDLED_OPS, "0x%d->L\n", n);
+			set_l(n);
 			break;
 		}
 
@@ -470,6 +515,7 @@ void upd777_device::do_op()
 			// 30a Move A1[7:1] to MODE[7:1], 1N->L[2:1]
 			const int n = (inst & 0x1) + 2;
 			LOGMASKED(LOG_UNHANDLED_OPS, "A1->MODE, 0x%d->L\n", n);
+			set_l(n + 2);
 			break;
 		}
 		case 0b0011'01001010: case 0b0011'0100'1011:
@@ -477,6 +523,7 @@ void upd777_device::do_op()
 			// 34a Move A2[7:1] to MODE[7:1], 1N->L[2:1]
 			const int n = (inst & 0x1) + 2;
 			LOGMASKED(LOG_UNHANDLED_OPS, "A2->MODE, 0x%d->L\n", n);
+			set_l(n + 2);
 			break;
 		}
 		case 0b0011'1000'1010: case 0b00111000'1011:
@@ -484,6 +531,7 @@ void upd777_device::do_op()
 			// 38a Move M[H[5:1],L[2:1]][7:1] to MODE[7:1], 1N->L[2:1]
 			const int n = (inst & 0x1) + 2;
 			LOGMASKED(LOG_UNHANDLED_OPS, "M->MODE, 0x%d->L\n", n);
+			set_l(n + 2);
 			break;
 		}
 
@@ -492,6 +540,7 @@ void upd777_device::do_op()
 			// 310 Move A2[7:1] to A1[7:1], N->L[2:1]
 			const int n = inst & 0x3;
 			LOGMASKED(LOG_UNHANDLED_OPS, "A2->A1, 0x%d->L\n", n);
+			set_l(n);
 			break;
 		}
 		case 0b0011'0100'0000: case 0b0011'0100'0001: case 0b0011'0100'0010: case 0b0011'0100'0011:
@@ -499,6 +548,7 @@ void upd777_device::do_op()
 			// 340 Move A1[7:1] to A2[7:1], N->L[2:1]
 			const int n = inst & 0x3;
 			LOGMASKED(LOG_UNHANDLED_OPS, "A1->A2, 0x%d->L\n", n);
+			set_l(n);
 			break;
 		}
 
@@ -507,6 +557,7 @@ void upd777_device::do_op()
 			// 318 Right shift A1[7:1], 0->A1[7], N->L[2:1]
 			const int n = inst & 0x3;
 			LOGMASKED(LOG_UNHANDLED_OPS, "A1->RS, 0x%d->L\n", n);
+			set_l(n);
 			break;
 		}
 		case 0b0011'0101'1000: case 0b0011'0101'1001: case 0b0011'0101'1010: case 0b0011'0101'1011:
@@ -514,6 +565,7 @@ void upd777_device::do_op()
 			// 358 Right shift A2[7:1], 0->A2[7], N->L[2:1]
 			const int n = inst & 0x3;
 			LOGMASKED(LOG_UNHANDLED_OPS, "A2->RS, 0x%d->L\n", n);
+			set_l(n);
 			break;
 		}
 		case 0b0011'1001'1000: case 0b0011'1001'1001: case 0b0011'1001'1010: case 0b0011'1001'1011:
@@ -521,6 +573,7 @@ void upd777_device::do_op()
 			// 398 Right shift M[H[5:1],L[2:1]][7:1], 0->M[H[5:1],L[2:1]][7], N->L[2:1]
 			const int n = inst & 0x3;
 			LOGMASKED(LOG_UNHANDLED_OPS, "M->RS, 0x%d->L\n", n);
+			set_l(n);
 			break;
 		}
 
@@ -529,6 +582,7 @@ void upd777_device::do_op()
 			// 31c Subtract A1[7:1] and A2[7:1], store to A2[7:1], Skip if borrow, N->L[2:1]
 			const int n = inst & 0x3;
 			LOGMASKED(LOG_UNHANDLED_OPS, "A1-A2->A2, 0x%d->L\n", n);
+			set_l(n);
 			break;
 		}
 		case 0b0011'0100'1100: case 0b0011'0100'1101: case 0b0011'0100'1110: case 0b0011'0100'1111:
@@ -536,6 +590,7 @@ void upd777_device::do_op()
 			// 34c Subtract A2[7:1] and A1[7:1], store to A1[7:1], Skip if borrow, N->L[2:1]
 			const int n = inst & 0x3;
 			LOGMASKED(LOG_UNHANDLED_OPS, "A2-A1->A1, 0x%d->L\n", n);
+			set_l(n);
 			break;
 		}
 
@@ -577,6 +632,7 @@ void upd777_device::do_op()
 			const int reg1 = (inst & 0x40) >> 6;
 			const int n = inst & 0x3;
 			LOGMASKED(LOG_UNHANDLED_OPS, "%s%s%s->%s, 0x%d->L %s\n", get_reg_name(reg1), get_300optype_name(optype), get_reg_name(reg2), get_reg_name(reg1), n, (optype == 3) ? "BOJ" : "");
+			set_l(n);
 			break;
 		}
 
@@ -588,6 +644,7 @@ void upd777_device::do_op()
 			const int reg = (inst & 0x10) >> 4;
 			const int n = inst & 0x3;
 			LOGMASKED(LOG_UNHANDLED_OPS, "A%d->M, 0x%d->L\n", reg + 1, n);
+			set_l(n);
 			break;
 		}
 
@@ -599,6 +656,7 @@ void upd777_device::do_op()
 			const int reg = (inst & 0x10) >> 4;
 			const int n = inst & 0x3;
 			LOGMASKED(LOG_UNHANDLED_OPS, "M<->A%d, 0x%d->L\n", reg + 1, n);
+			set_l(n);
 			break;
 		}
 
@@ -610,6 +668,7 @@ void upd777_device::do_op()
 			const int reg = (inst & 0x10) >> 4;
 			const int n = inst & 0x3;
 			LOGMASKED(LOG_UNHANDLED_OPS, "M->A%d, 0x%d->L\n", reg + 1, n);
+			set_l(n);
 			break;
 		}
 
@@ -634,6 +693,7 @@ void upd777_device::do_op()
 			const int reg2 = (inst & 0x10) >> 4;
 			const int n = inst & 0x3;
 			LOGMASKED(LOG_UNHANDLED_OPS, "M%s%s->M, 0x%d->L\n", get_300optype_name(optype), get_reg_name(reg2), n);
+			set_l(n);
 			break;
 		}
 
@@ -658,6 +718,7 @@ void upd777_device::do_op()
 			const int reg = (inst & 0x10) >> 4;
 			const int n = inst & 0x3;
 			LOGMASKED(LOG_UNHANDLED_OPS, "H%s%s->H, 0x%d->L\n", get_300optype_name(optype), get_reg_name(reg), n);
+			set_l(n);
 			break;
 		}
 
@@ -669,6 +730,7 @@ void upd777_device::do_op()
 			const int reg = (inst & 0x10) >> 4;
 			const int n = inst & 0x3;
 			LOGMASKED(LOG_UNHANDLED_OPS, "A%d->H, 0x%d->L\n", reg + 1, n);
+			set_l(n);
 			break;
 		}
 		case 0b0011'1100'1100: case 0b0011'1100'1101: case 0b0011'1100'1110: case 0b0011'1100'1111:
@@ -679,6 +741,7 @@ void upd777_device::do_op()
 			const int reg = (inst & 0x10) >> 4;
 			const int n = inst & 0x3;
 			LOGMASKED(LOG_UNHANDLED_OPS, "H->A%d, 0x%d->L\n", reg + 1, n);
+			set_l(n);
 			break;
 		}
 
@@ -686,7 +749,7 @@ void upd777_device::do_op()
 		{
 			// 400 N->A[11]
 			const int n = inst & 0x1;
-			LOGMASKED(LOG_UNHANDLED_OPS, "%d->A11\n", n);
+			set_a11(n);
 			break;
 		}
 		case 0b0100'0000'0010: case 0b0100'0000'0011:
@@ -694,6 +757,7 @@ void upd777_device::do_op()
 			// 402 Jump to (000,M[H[5:1],L[2:1]][5:1],1N), 0->L[2:1], N->A[11]
 			const int n = inst & 0x1;
 			LOGMASKED(LOG_UNHANDLED_OPS, "JPM, 0->L, %d->A11\n", n);
+			set_a11(n);
 			break;
 		}
 		case 0b0100'0100'0000: case 0b0100'0100'0001: case 0b0100'0100'0100: case 0b0100'0100'0101:
@@ -712,6 +776,7 @@ void upd777_device::do_op()
 			const int s = (inst >> 2) & 0x1;
 			const int n = inst & 0x1;
 			LOGMASKED(LOG_UNHANDLED_OPS, "%d->D, %d->G, %d->K, %d->S, %d->A11\n", d, g, k, s, n);
+			set_a11(n);
 			break;
 		}
 
@@ -728,6 +793,12 @@ void upd777_device::execute_run()
 {
 	while (m_icount > 0)
 	{
+		if (m_skip)
+		{
+			fetch();
+			m_skip = 0;
+		}
+
 		debugger_instruction_hook(m_pc);
 		do_op();
 		m_icount--;

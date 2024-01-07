@@ -13,7 +13,14 @@ public:
 	upd777_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	enum {
-		UPD777_PC = 0
+		UPD777_PC = 0,
+		UPD777_A1,
+		UPD777_A2,
+		UPD777_A3,
+		UPD777_A4,
+		UPD777_SKIP,
+		UPD777_H,
+		UPD777_L,
 	};
 
 protected:
@@ -47,9 +54,19 @@ private:
 	u16 fetch();
 	void do_op();
 
+	void set_l(int l);
+	void set_h(int h);
+	void set_a11(int a11);
+	void set_new_pc(int newpc);
+
 	u32 m_ppc;
 	u32 m_pc;
 	s32 m_icount;
+	u8 m_skip;
+	u8 m_a[4]; // A1 to A4
+	u8 m_h;
+	u8 m_l;
+
 };
 
 DECLARE_DEVICE_TYPE(UPD777, upd777_device)
