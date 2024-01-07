@@ -177,7 +177,7 @@ private:
 	emu_timer *         m_assert_command_strobe_timer;
 	emu_timer *         m_deassert_command_strobe_timer;
 	u8                  m_cmd_buffer[21];
-	size_t              m_cmd_length;
+	u32                 m_cmd_length;
 	u8					m_status;
 	u8					m_pre_stop_status;
 
@@ -186,11 +186,10 @@ private:
 	u32                 m_search_frame;
 	u32                 m_stop_frame;
 	u8                  m_cmd_number[5];
-	size_t              m_cmd_number_length;
+	u32                 m_cmd_number_length;
 
 	u16                 m_user_ram[1024];
 	u32                 m_curr_register;
-	u8                  m_video_switch;
 	u32                 m_scan_speed;
 	u32                 m_scan_speed_accum;
 	double				m_play_speed;
