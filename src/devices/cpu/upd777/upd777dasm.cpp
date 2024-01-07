@@ -168,6 +168,7 @@ offs_t upd777_disassembler::disassemble(std::ostream &stream, offs_t pc, const u
 		case 0b0000'0010'1000: case 0b0000'0010'1001:
 		{
 			// 028 Shift STB[4:1], N->STB[1]
+			// STB is an input strobe / shifter
 			const int n = inst & 1;
 			util::stream_format(stream, "0x%d->STB", n);
 			break;
@@ -286,7 +287,7 @@ offs_t upd777_disassembler::disassemble(std::ostream &stream, offs_t pc, const u
 		case 0b0010'1101'1100: case 0b0010'1101'1101: case 0b0010'1101'1110: case 0b0010'1101'1111:
 		case 0b0010'1111'1100: case 0b0010'1111'1101: case 0b0010'1111'1110: case 0b0010'1111'1111:
 		{
-			// optype ·
+			// optype · (AND)
 			// 200 Skip if (A1[7:1]·A1[7:1]) makes zero, N->L[2:1]
 			// 220 Skip if (A1[7:1]·A1[7:1]) makes non zero, N->L[2:1]
 			// 210 Skip if (A1[7:1]·A2[7:1]) makes zero, N->L[2:1]
