@@ -35,7 +35,7 @@ DECLARE_DEVICE_TYPE(PIONEER_LDV1000, pioneer_ldv1000_device)
 // ======================> pioneer_ldv1000_device
 
 // base ldv1000 class
-class pioneer_ldv1000_device : public laserdisc_device
+class pioneer_ldv1000_device : public parallel_laserdisc_device
 {
 public:
 	// construction/destruction
@@ -44,11 +44,11 @@ public:
 	auto command_strobe_callback() { return m_command_strobe_cb.bind(); }
 
 	// input and output
-	void data_w(uint8_t data);
-	void enter_w(uint8_t data);
-	uint8_t status_r() const { return m_status; }
-	uint8_t status_strobe_r() const { return (m_portc1 & 0x20) ? ASSERT_LINE : CLEAR_LINE; }
-	uint8_t command_strobe_r() const { return (m_portc1 & 0x10) ? ASSERT_LINE : CLEAR_LINE; }
+	virtual void data_w(uint8_t data) override;
+	virtual void enter_w(int state) override { }
+	virtual uint8_t data_r() override { return m_status; }
+	virtual int status_strobe_r() override { static int old_val = 0; int value = BIT(m_portc1, 5); if (value != old_val) { old_val = value; printf("status_strobe_r: %d\n", value); } return value; }
+	virtual int ready_r() override { static int old_val = 0; int value = BIT(m_portc1, 4); if (value != old_val) { old_val = value; printf("ready_r: %d\n", value); } return value; }
 
 protected:
 	// device-level overrides

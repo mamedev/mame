@@ -352,7 +352,7 @@ ROM_START( timetrv2 )
 	ROM_LOAD( "epr-72491.u9",   0xc0000, 0x40000, CRC(c7998e2f) SHA1(26060653b2368f52c304e6433b4f447f99a36839) )
 
 	DISK_REGION( "laserdisc" )
-	DISK_IMAGE_READONLY( "timetrv", 0, SHA1(8abb5e6aa58ab49477ef89f507264d35454f99d3) BAD_DUMP )
+	DISK_IMAGE_READONLY( "timetrv2", 0, SHA1(0bb0c34df0aae2b5e019c6dc2fc071e23c82ba75) )
 ROM_END
 
 } // anonymous namespace

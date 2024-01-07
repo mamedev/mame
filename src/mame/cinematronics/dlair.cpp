@@ -96,7 +96,7 @@ private:
 
 	uint8_t laserdisc_data_r()
 	{
-		if (m_ldv1000 != nullptr) return m_ldv1000->status_r();
+		if (m_ldv1000 != nullptr) return m_ldv1000->data_r();
 		if (m_pr7820 != nullptr) return m_pr7820->data_r();
 		if (m_22vp932 != nullptr) return m_22vp932->data_r();
 		return 0;
@@ -115,7 +115,7 @@ private:
 
 	uint8_t laserdisc_ready_r()
 	{
-		if (m_ldv1000 != nullptr) return m_ldv1000->command_strobe_r();
+		if (m_ldv1000 != nullptr) return m_ldv1000->ready_r();
 		if (m_pr7820 != nullptr) return m_pr7820->ready_r();
 		return CLEAR_LINE;
 	}
