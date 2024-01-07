@@ -49,6 +49,20 @@ void upd777_device::internal_data_map(address_map &map)
 {
 }
 
+void upd777_device::increment_pc()
+{
+	u16 lowpc = m_pc & 0x07f;
+	u16 highpc = m_pc & 0x780;
+
+	const int top1 = (lowpc & 0x40) >> 6;
+	const int top2 = (lowpc & 0x20) >> 5;
+	const int nor = (top1 ^ top2) ^ 1;
+	lowpc = (lowpc << 1) | nor;
+	lowpc &= 0x7f;
+
+	m_pc = highpc | lowpc;
+}
+
 void upd777_device::device_start()
 {
 	space(AS_PROGRAM).specific(m_space);
@@ -70,7 +84,9 @@ void upd777_device::device_reset()
 
 u16 upd777_device::fetch()
 {
-	return m_space.read_word(m_pc++);
+	u16 opcode = m_space.read_word(m_pc);
+	increment_pc();
+	return opcode;
 }
 
 void upd777_device::do_op()

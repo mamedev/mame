@@ -37,7 +37,6 @@ public:
 
 	void cassvisn(machine_config &config);
 
-	void init_cass();
 protected:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 private:
@@ -80,12 +79,31 @@ INPUT_PORTS_END
 
 DEVICE_IMAGE_LOAD_MEMBER(cassvisn_state::cart_load)
 {
+	if (!image.loaded_through_softlist())
+		return std::make_pair(image_error::UNSUPPORTED, "Cartridges must be loaded from the software list");
+
 	uint32_t size = m_cart->common_get_size("prg");
+
+	if (size != 0xf00)
+		return std::make_pair(image_error::UNSUPPORTED, "prg region size must be 0xf00 in size");
+
 	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "prg");
-	memcpy(memregion("maincpu")->base(), m_cart->get_rom_base(), size);
+	uint8_t* prgbase = memregion("maincpu")->base();
+	memcpy(prgbase, m_cart->get_rom_base(), size);
+
+	for (int i = 0; i < size; i += 2)
+	{
+		uint8_t temp = prgbase[i + 0];
+		prgbase[i + 0] = prgbase[i + 1];
+		prgbase[i + 1] = temp;
+	}
 
 	size = m_cart->common_get_size("pat");
+
+	if (size != 0x4d0)
+		return std::make_pair(image_error::UNSUPPORTED, "pat region size must be 0x4d0 in size");
+
 	m_cart->common_load_rom(memregion("patterns")->base(), size, "pat");
 	return std::make_pair(std::error_condition(), std::string());
 }
@@ -118,10 +136,6 @@ ROM_START( cassvisn )
 	ROM_REGION( 0x4d0, "patterns", ROMREGION_ERASEFF )
 ROM_END
 
-void cassvisn_state::init_cass()
-{
-}
-
 } // anonymous namespace
 
-CONS( 1981, cassvisn, 0, 0, cassvisn,  cassvisn, cassvisn_state, init_cass, "Epoch", "Cassette Vision", MACHINE_IS_SKELETON )
+CONS( 1981, cassvisn, 0, 0, cassvisn,  cassvisn, cassvisn_state, empty_init, "Epoch", "Cassette Vision", MACHINE_IS_SKELETON )

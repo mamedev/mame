@@ -22,56 +22,94 @@ upd777_disassembler::upd777_disassembler()
 	m_r2l[0x7f] = 0x7f;
 }
 
+
+std::string upd777_disassembler::get_300optype_name(int optype)
+{
+	switch (optype)
+	{
+	case 0x00: return "·"; // 'AND'
+	case 0x01: return "+";
+	case 0x02: return "v"; // 'OR'
+	case 0x03: return "-";
+	}
+	return "<invalid optype>";
+}
+
+std::string upd777_disassembler::get_200optype_name(int optype)
+{
+	switch (optype)
+	{
+	case 0x00: return "·"; // 'AND'
+	case 0x01: return "<invalid optype>";
+	case 0x02: return "=";
+	case 0x03: return "-";
+	}
+	return "<invalid optype>";
+}
+
+std::string upd777_disassembler::get_reg_name(int reg)
+{
+	switch (reg)
+	{
+	case 0x00: return "A1"; // general reg A1
+	case 0x01: return "A2"; // general reg A2
+	case 0x02: return "M"; // content of memory
+	case 0x03: return "H"; // high address
+	}
+	return "<invalid reg>";
+}
+
 offs_t upd777_disassembler::disassemble(std::ostream &stream, offs_t pc, const upd777_disassembler::data_buffer &opcodes, const upd777_disassembler::data_buffer &params)
 {
 	u16 inst = opcodes.r16(pc);
 
-	if (inst >= 0x080 && inst <= 0x0ff)
+	if (inst >= 0b0000'0000'0000 && inst <= 0b0000'1111'1111)
 	{
-		// Skip if (M[H[5:1],L[2:1]][7:1]-K[7:1]) makes borrow
+		// 000 - 0ff Skip if (M[H[5:1],L[2:1]][7:1]-K[7:1]) makes borrow
 		const int k = inst & 0x7f;
 		util::stream_format(stream, "M-0x%02x", k);
 	}
-	else if (inst >= 0x100 && inst <= 0x17f)
+	else if (inst >= 0b0001'0000'0000 && inst <= 0b0001'0111'1111)
 	{
-		// M[H[5:1],L[2:1]][7:1]+K[7:1]->M[H[5:1],L[2:1]][7:1], Skip if carry, N->L[2:1]
+		// 100-17f M[H[5:1],L[2:1]][7:1]+K[7:1]->M[H[5:1],L[2:1]][7:1], Skip if carry, N->L[2:1]
 		const int k = inst & 0x1f;
 		const int n = (inst >> 5) & 0x3;
 		util::stream_format(stream, "M+0x%02x->M, 0x%d->L", k, n);
 	}
-	else if (inst >= 0x180 && inst <= 0x1ff)
+	else if (inst >= 0b0001'1000'0000 && inst <= 0b0001'1111'1111)
 	{
-		// M[H[5:1],L[2:1]][7:1]-K[7:1]->M[H[5:1],L[2:1]][7:1], Skip if borrow, N->L[2:1]
+		// 180-1ff M[H[5:1],L[2:1]][7:1]-K[7:1]->M[H[5:1],L[2:1]][7:1], Skip if borrow, N->L[2:1]
 		const int k = inst & 0x1f;
 		const int n = (inst >> 5) & 0x3;
 		util::stream_format(stream, "M-0x%02x->M, 0x%d->L", k, n);
 	}
-	else if (inst >= 0x480 && inst <= 0x4bf) // 480 - 4bf
+	else if (inst >= 0b0100'1000'0000 && inst <= 0b0100'1011'1111)
 	{
-		// H[5:1]-K[5:1]->H[5:1], Skip if borrow
+		// 480-4bf H[5:1]-K[5:1]->H[5:1], Skip if borrow
 		util::stream_format(stream, "H-0x%02x->H BOJ", inst & 0x1f);
 	}
-	else if (inst >= 0x4c0 && inst <= 0x4ff) // 4c0 - 4ff
+	else if (inst >= 0b0100'1100'0000 && inst <= 0b0100'1111'1111)
 	{
-		// H[5:1]+K[5:1]->H[5:1], Skip if carry
+		// 4c0 - 4ff H[5:1]+K[5:1]->H[5:1], Skip if carry
 		const int k = inst & 0x1f;
 		util::stream_format(stream, "H+0x%02x->H CAJ", k);
 	}
-	else if (inst >= 0x500 && inst <= 0x57f) // 500 - 57f
+	else if (inst >= 0b0101'0000'0000 && inst <= 0b0101'0111'1111)
 	{
+		// 500 - 57f
 		// When (KIE=0)&(SME=0), Store K[7:1] to M[H[5:1],L[2:1]][7:1]
 		// When (KIE=1), Store KIN[7:1] to M[H[5:1],L[2:1]][7:1]
 		// When (SME=1), Store HCL[7:1] to M[H[5:1],L[2:1]][7:1]
 		const int k = inst & 0x7f;
 		util::stream_format(stream, "0x%02x->M", k);
 	}
-	else if (inst >= 0x580 && inst <= 0x5ff) // 580 - 5ff
+	else if (inst >= 0b0101'1000'0000 && inst <= 0b0101'1111'1111)
 	{
-		// Store K[7:6] to L[2:1] and K[5:1] to H[5:1]
+		// 580 - 5ff Store K[7:6] to L[2:1] and K[5:1] to H[5:1]
 		const int k = inst & 0x7f;
 		util::stream_format(stream, "0x%02x->L,H", k);
 	}
-	else if (inst >= 0x600 && inst <= 0x7ff) // 600 - 7ff
+	else if (inst >= 0b0110'0000'0000 && inst <= 0b0111'1111'1111)
 	{
 		// 600-67f Store K[7:1] to A1[7:1]
 		// 680-6ff Store K[7:1] to A2[7:1]
@@ -81,15 +119,15 @@ offs_t upd777_disassembler::disassemble(std::ostream &stream, offs_t pc, const u
 		const int k = inst & 0x7f;
 		util::stream_format(stream, "0x%02x->A%d", k, reg+1);
 	}
-	else if (inst >= 0x800 && inst < 0xc00) // 800 - bff
+	else if (inst >= 0b1000'0000'0000 && inst <= 0b1011'1111'1111)
 	{
-		// Move K[10:1] to A[10:1], Jump to A[11:1]
+		// 800 - bff Move K[10:1] to A[10:1], Jump to A[11:1]
 		u16 fulladdress = (pc & 0x400) | (inst & 0x3ff);
 		util::stream_format(stream, "JP 0x%03x (%01x:%02x)", fulladdress, (fulladdress & 0x780)>>7, inst & 0x07f);
 	}
-	else if (inst >= 0xc00 && inst < 0x1000) // c00 - fff
+	else if (inst >= 0b1100'0000'0000 && inst <= 0b1111'1111'1111)
 	{
-		// Move K[10:1] to A[10:1], 0 to A11, Jump to A[11:1], Push next A[11:1] up to ROM address stack
+		// c00 - fff Move K[10:1] to A[10:1], 0 to A11, Jump to A[11:1], Push next A[11:1] up to ROM address stack
 		const int k = inst & 0x3ff;
 		util::stream_format(stream, "JS 0x%03x (%01x:%02x)", k & 0x3ff, (k & 0x380)>>7, k & 0x07f);
 	}
@@ -97,51 +135,51 @@ offs_t upd777_disassembler::disassemble(std::ostream &stream, offs_t pc, const u
 	{
 		switch (inst)
 		{
-		case 0b000000000000:
+		case 0b0000'0000'0000:
 		{
 			// 000 No Operation
 			util::stream_format(stream, "NOP");
 			break;
 		}
-		case 0b000000000100:
+		case 0b0000'0000'0100:
 		{
 			// 004 Skip if (Gun Port Latch) = 1
 			util::stream_format(stream, "GPL");
 			break;
 		}
-		case 0b000000001000:
+		case 0b0000'0000'1000:
 		{
 			// 008 Move H[5:1] to Line Buffer Register[5:1]
 			util::stream_format(stream, "H->NRM");
 			break;
 		}
-		case 0b000000011000:
+		case 0b0000'0001'1000:
 		{
 			// 018 H[5:1]<->X4[5:1], 0->X4[7:6], 0->X3[7:1], 0->X1'[1], 0->A1'[1], L[2:1]<->L'[2:1]
 			util::stream_format(stream, "H<->X");
 			break;
 		}
-		case 0b000000100000:
+		case 0b0000'0010'0000:
 		{
 			// 020 Subroutine End, Pop down address stack
 			util::stream_format(stream, "SRE");
 			break;
 		}
-		case 0b000000101000: case 0b000000101001:
+		case 0b0000'0010'1000: case 0b0000'0010'1001:
 		{
 			// 028 Shift STB[4:1], N->STB[1]
 			const int n = inst & 1;
 			util::stream_format(stream, "0x%d->STB", n);
 			break;
 		}
-		case 0b000000110000:
-		case 0b000000110100:
-		case 0b000000111000:
-		case 0b000000111100:
-		case 0b000001110000:
-		case 0b000001110100:
-		case 0b000001111000:
-		case 0b000001111100:
+		case 0b0000'0011'0000:
+		case 0b0000'0011'0100:
+		case 0b0000'0011'1000:
+		case 0b0000'0011'1100:
+		case 0b0000'0111'0000:
+		case 0b0000'0111'0100:
+		case 0b0000'0111'1000:
+		case 0b0000'0111'1100:
 		{
 			// 30 Skip if (PD1 input) = 1
 			// 34 Skip if (PD2 input) = 1
@@ -156,97 +194,97 @@ offs_t upd777_disassembler::disassemble(std::ostream &stream, offs_t pc, const u
 			util::stream_format(stream, "PD%d %sJ", which + 1, inv ? "/" : "");
 			break;
 		}
-		case 0b000001001001:
+		case 0b0000'0100'1001:
 		{
 			// 049 Skip if (4H Horizontal Blank) = 1
 			util::stream_format(stream, "4H BLK");
 			break;
 		}
-		case 0b000001001010:
+		case 0b0000'0100'1010:
 		{
 			// 04a Skip if (Vertical Blank) = 1, 0->M[[18:00],[3]][1]
 			util::stream_format(stream, "VBLK");
 			break;
 		}
-		case 0b000001001100:
+		case 0b0000'0100'1100:
 		{
 			// 04c Skip if (GP&SW/ input) = 1
 			util::stream_format(stream, "GPSW/");
 			break;
 		}
-		case 0b000001010100:
+		case 0b0000'0101'0100:
 		{
 			// 054 Move (A4[7:1],A3[7:1],A2[7:1],A1[7:1]) to M[H[5:1]][28:1]
 			util::stream_format(stream, "A->MA");
 			break;
 		}
-		case 0b000001011000:
+		case 0b0000'0101'1000:
 		{
 			// 058 Move M[H[5:1]][28:1] to (A4[7:1],A3[7:1],A2[7:1],A1[7:1])
 			util::stream_format(stream, "MA->A");
 			break;
 		}
-		case 0b000001011100:
+		case 0b0000'0101'1100:
 		{
 			// 05c Exchange (A4[7:1],A3[7:1],A2[7:1],A1[7:1]) and M[H[5:1]][28:1]
 			util::stream_format(stream, "MA<->A");
 			break;
 		}
-		case 0b000001100000:
+		case 0b0000'0110'0000:
 		{
 			// 060 Subroutine End, Pop down address stack, Skip
 			util::stream_format(stream, "SRE+1");
 			break;
 		}
 
-		case 0b001000000000: case 0b001000000001: case 0b001000000010: case 0b001000000011:
-		case 0b001000100000: case 0b001000100001: case 0b001000100010: case 0b001000100011:
-		case 0b001000001000: case 0b001000001001: case 0b001000001010: case 0b001000001011:
-		case 0b001000101000: case 0b001000101001: case 0b001000101010: case 0b001000101011:
-		case 0b001000001100: case 0b001000001101: case 0b001000001110: case 0b001000001111:
-		case 0b001000101100: case 0b001000101101: case 0b001000101110: case 0b001000101111:
-		case 0b001000010000: case 0b001000010001: case 0b001000010010: case 0b001000010011:
-		case 0b001000110000: case 0b001000110001: case 0b001000110010: case 0b001000110011:
-		case 0b001000011000: case 0b001000011001: case 0b001000011010: case 0b001000011011:
-		case 0b001000111000: case 0b001000111001: case 0b001000111010: case 0b001000111011:
-		case 0b001000011100: case 0b001000011101: case 0b001000011110: case 0b001000011111:
-		case 0b001000111100: case 0b001000111101: case 0b001000111110: case 0b001000111111:
-		case 0b001001000000: case 0b001001000001: case 0b001001000010: case 0b001001000011:
-		case 0b001001100000: case 0b001001100001: case 0b001001100010: case 0b001001100011:
-		case 0b001001001000: case 0b001001001001: case 0b001001001010: case 0b001001001011:
-		case 0b001001101000: case 0b001001101001: case 0b001001101010: case 0b001001101011:
-		case 0b001001001100: case 0b001001001101: case 0b001001001110: case 0b001001001111:
-		case 0b001001101100: case 0b001001101101: case 0b001001101110: case 0b001001101111:
-		case 0b001001010000: case 0b001001010001: case 0b001001010010: case 0b001001010011:
-		case 0b001001110000: case 0b001001110001: case 0b001001110010: case 0b001001110011:
-		case 0b001001011000: case 0b001001011001: case 0b001001011010: case 0b001001011011:
-		case 0b001001111000: case 0b001001111001: case 0b001001111010: case 0b001001111011:
-		case 0b001001011100: case 0b001001011101: case 0b001001011110: case 0b001001011111:
-		case 0b001001111100: case 0b001001111101: case 0b001001111110: case 0b001001111111:
-		case 0b001010000000: case 0b001010000001: case 0b001010000010: case 0b001010000011:
-		case 0b001010100000: case 0b001010100001: case 0b001010100010: case 0b001010100011:
-		case 0b001010001000: case 0b001010001001: case 0b001010001010: case 0b001010001011:
-		case 0b001010101000: case 0b001010101001: case 0b001010101010: case 0b001010101011:
-		case 0b001010001100: case 0b001010001101: case 0b001010001110: case 0b001010001111:
-		case 0b001010101100: case 0b001010101101: case 0b001010101110: case 0b001010101111:
-		case 0b001010010000: case 0b001010010001: case 0b001010010010: case 0b001010010011:
-		case 0b001010110000: case 0b001010110001: case 0b001010110010: case 0b001010110011:
-		case 0b001010011000: case 0b001010011001: case 0b001010011010: case 0b001010011011:
-		case 0b001010111000: case 0b001010111001: case 0b001010111010: case 0b001010111011:
-		case 0b001010011100: case 0b001010011101: case 0b001010011110: case 0b001010011111:
-		case 0b001010111100: case 0b001010111101: case 0b001010111110: case 0b001010111111:
-		case 0b001011000000: case 0b001011000001: case 0b001011000010: case 0b001011000011:
-		case 0b001011100000: case 0b001011100001: case 0b001011100010: case 0b001011100011:
-		case 0b001011001000: case 0b001011001001: case 0b001011001010: case 0b001011001011:
-		case 0b001011101000: case 0b001011101001: case 0b001011101010: case 0b001011101011:
-		case 0b001011001100: case 0b001011001101: case 0b001011001110: case 0b001011001111:
-		case 0b001011101100: case 0b001011101101: case 0b001011101110: case 0b001011101111:
-		case 0b001011010000: case 0b001011010001: case 0b001011010010: case 0b001011010011:
-		case 0b001011110000: case 0b001011110001: case 0b001011110010: case 0b001011110011:
-		case 0b001011011000: case 0b001011011001: case 0b001011011010: case 0b001011011011:
-		case 0b001011111000: case 0b001011111001: case 0b001011111010: case 0b001011111011:
-		case 0b001011011100: case 0b001011011101: case 0b001011011110: case 0b001011011111:
-		case 0b001011111100: case 0b001011111101: case 0b001011111110: case 0b001011111111:
+		case 0b0010'0000'0000: case 0b0010'0000'0001: case 0b0010'0000'0010: case 0b0010'0000'0011:
+		case 0b0010'0010'0000: case 0b0010'0010'0001: case 0b0010'0010'0010: case 0b0010'0010'0011:
+		case 0b0010'0000'1000: case 0b0010'0000'1001: case 0b0010'0000'1010: case 0b0010'0000'1011:
+		case 0b0010'0010'1000: case 0b0010'0010'1001: case 0b0010'0010'1010: case 0b0010'0010'1011:
+		case 0b0010'0000'1100: case 0b0010'0000'1101: case 0b0010'0000'1110: case 0b0010'0000'1111:
+		case 0b0010'0010'1100: case 0b0010'0010'1101: case 0b0010'0010'1110: case 0b0010'0010'1111:
+		case 0b0010'0001'0000: case 0b0010'0001'0001: case 0b0010'0001'0010: case 0b0010'0001'0011:
+		case 0b0010'0011'0000: case 0b0010'0011'0001: case 0b0010'0011'0010: case 0b0010'0011'0011:
+		case 0b0010'0001'1000: case 0b0010'0001'1001: case 0b0010'0001'1010: case 0b0010'0001'1011:
+		case 0b0010'0011'1000: case 0b0010'0011'1001: case 0b0010'0011'1010: case 0b0010'0011'1011:
+		case 0b0010'0001'1100: case 0b0010'0001'1101: case 0b0010'0001'1110: case 0b0010'0001'1111:
+		case 0b0010'0011'1100: case 0b0010'0011'1101: case 0b0010'0011'1110: case 0b0010'0011'1111:
+		case 0b0010'0100'0000: case 0b0010'0100'0001: case 0b0010'0100'0010: case 0b0010'0100'0011:
+		case 0b0010'0110'0000: case 0b0010'0110'0001: case 0b0010'0110'0010: case 0b0010'0110'0011:
+		case 0b0010'0100'1000: case 0b0010'0100'1001: case 0b0010'0100'1010: case 0b0010'0100'1011:
+		case 0b0010'0110'1000: case 0b0010'0110'1001: case 0b0010'0110'1010: case 0b0010'0110'1011:
+		case 0b0010'0100'1100: case 0b0010'0100'1101: case 0b0010'0100'1110: case 0b0010'0100'1111:
+		case 0b0010'0110'1100: case 0b0010'0110'1101: case 0b0010'0110'1110: case 0b0010'0110'1111:
+		case 0b0010'0101'0000: case 0b0010'0101'0001: case 0b0010'0101'0010: case 0b0010'0101'0011:
+		case 0b0010'0111'0000: case 0b0010'0111'0001: case 0b0010'0111'0010: case 0b0010'0111'0011:
+		case 0b0010'0101'1000: case 0b0010'0101'1001: case 0b0010'0101'1010: case 0b0010'0101'1011:
+		case 0b0010'0111'1000: case 0b0010'0111'1001: case 0b0010'0111'1010: case 0b0010'0111'1011:
+		case 0b0010'0101'1100: case 0b0010'0101'1101: case 0b0010'0101'1110: case 0b0010'0101'1111:
+		case 0b0010'0111'1100: case 0b0010'0111'1101: case 0b0010'0111'1110: case 0b0010'0111'1111:
+		case 0b0010'1000'0000: case 0b0010'1000'0001: case 0b0010'1000'0010: case 0b0010'1000'0011:
+		case 0b0010'1010'0000: case 0b0010'1010'0001: case 0b0010'1010'0010: case 0b0010'1010'0011:
+		case 0b0010'1000'1000: case 0b0010'1000'1001: case 0b0010'1000'1010: case 0b0010'1000'1011:
+		case 0b0010'1010'1000: case 0b0010'1010'1001: case 0b0010'1010'1010: case 0b0010'1010'1011:
+		case 0b0010'1000'1100: case 0b0010'1000'1101: case 0b0010'1000'1110: case 0b0010'1000'1111:
+		case 0b0010'1010'1100: case 0b0010'1010'1101: case 0b0010'1010'1110: case 0b0010'1010'1111:
+		case 0b0010'1001'0000: case 0b0010'1001'0001: case 0b0010'1001'0010: case 0b0010'1001'0011:
+		case 0b0010'1011'0000: case 0b0010'1011'0001: case 0b0010'1011'0010: case 0b0010'1011'0011:
+		case 0b0010'1001'1000: case 0b0010'1001'1001: case 0b0010'1001'1010: case 0b0010'1001'1011:
+		case 0b0010'1011'1000: case 0b0010'1011'1001: case 0b0010'1011'1010: case 0b0010'1011'1011:
+		case 0b0010'1001'1100: case 0b0010'1001'1101: case 0b0010'1001'1110: case 0b0010'1001'1111:
+		case 0b0010'1011'1100: case 0b0010'1011'1101: case 0b0010'1011'1110: case 0b0010'1011'1111:
+		case 0b0010'1100'0000: case 0b0010'1100'0001: case 0b0010'1100'0010: case 0b0010'1100'0011:
+		case 0b0010'1110'0000: case 0b0010'1110'0001: case 0b0010'1110'0010: case 0b0010'1110'0011:
+		case 0b0010'1100'1000: case 0b0010'1100'1001: case 0b0010'1100'1010: case 0b0010'1100'1011:
+		case 0b0010'1110'1000: case 0b0010'1110'1001: case 0b0010'1110'1010: case 0b0010'1110'1011:
+		case 0b0010'1100'1100: case 0b0010'1100'1101: case 0b0010'1100'1110: case 0b0010'1100'1111:
+		case 0b0010'1110'1100: case 0b0010'1110'1101: case 0b0010'1110'1110: case 0b0010'1110'1111:
+		case 0b0010'1101'0000: case 0b0010'1101'0001: case 0b0010'1101'0010: case 0b0010'1101'0011:
+		case 0b0010'1111'0000: case 0b0010'1111'0001: case 0b0010'1111'0010: case 0b0010'1111'0011:
+		case 0b0010'1101'1000: case 0b0010'1101'1001: case 0b0010'1101'1010: case 0b0010'1101'1011:
+		case 0b0010'1111'1000: case 0b0010'1111'1001: case 0b0010'1111'1010: case 0b0010'1111'1011:
+		case 0b0010'1101'1100: case 0b0010'1101'1101: case 0b0010'1101'1110: case 0b0010'1101'1111:
+		case 0b0010'1111'1100: case 0b0010'1111'1101: case 0b0010'1111'1110: case 0b0010'1111'1111:
 		{
 			// optype ·
 			// 200 Skip if (A1[7:1]·A1[7:1]) makes zero, N->L[2:1]
@@ -306,11 +344,11 @@ offs_t upd777_disassembler::disassemble(std::ostream &stream, offs_t pc, const u
 			const int reg1 = (inst & 0xc0) >> 6;
 			const int reg2 = (inst & 0x10) >> 4;
 			const int n = inst & 0x3;
-			util::stream_format(stream, "%s%s%s, 0x%d->L %s%s", m_200_reg1[reg1], m_200_optypes[optype], m_200_reg2[reg2], n, (optype == 3) ? "BOJ" : "EQJ", non ? "/" : "");
+			util::stream_format(stream, "%s%s%s, 0x%d->L %s%s", get_reg_name(reg1), get_200optype_name(optype), get_reg_name(reg2), n, (optype == 3) ? "BOJ" : "EQJ", non ? "/" : "");
 			break;
 		}
 
-		case 0b001100000000: case 0b001100000001: case 0b001100000010: case 0b001100000011:
+		case 0b0011'0000'0000: case 0b0011'0000'0001: case 0b0011'0000'0010: case 0b0011'0000'0011:
 		{
 			// 300 N->L[2:1]
 			const int n = inst & 0x3;
@@ -318,59 +356,59 @@ offs_t upd777_disassembler::disassemble(std::ostream &stream, offs_t pc, const u
 			break;
 		}
 
-		case 0b001100001000:
+		case 0b0011'0000'1000:
 		{
 			// 308 Move A1[7:1] to FLS[7:1], 0->L[2:1]
 			util::stream_format(stream, "A1->FLS, 0->L");
 			break;
 		}
-		case 0b001101001000:
+		case 0b0011'0100'1000:
 		{
 			// 348 Move A2[7:1] to FLS[7:1], 0->L[2:1]
 			util::stream_format(stream, "A2->FLS, 0->L");
 			break;
 		}
-		case 0b001110001000:
+		case 0b0011'1000'1000:
 		{
 			// 388 Move M[H[5:1],L[2:1]][7:1] to FLS[7:1], 0->L[2:1]
 			util::stream_format(stream, "M->FLS, 0->L");
 			break;
 		}
 
-		case 0b001100001001:
+		case 0b0011'0000'1001:
 		{
 			// 309 Move A1[7:1] to FRS[7:1], 1->L[2:1]
 			util::stream_format(stream, "A1->FRS, 1->L");
 			break;
 		}
-		case 0b001101001001:
+		case 0b0011'0100'1001:
 		{
 			// 349 Move A2[7:1] to FRS[7:1], 1->L[2:1]
 			util::stream_format(stream, "A2->FRS, 1->L");
 			break;
 		}
-		case 0b001110001001:
+		case 0b0011'1000'1001:
 		{
 			// 389 Move M[H[5:1],L[2:1]][7:1] to FRS[7:1], 1->L[2:1]
 			util::stream_format(stream, "M->FRS, 1->L");
 			break;
 		}
 
-		case 0b001100001010: case 0b001100001011:
+		case 0b0011'0000'1010: case 0b0011'0000'1011:
 		{
 			// 30a Move A1[7:1] to MODE[7:1], 1N->L[2:1]
 			const int n = (inst & 0x1) + 2;
 			util::stream_format(stream, "A1->MODE, 0x%d->L", n);
 			break;
 		}
-		case 0b001101001010: case 0b001101001011:
+		case 0b0011'01001010: case 0b0011'0100'1011:
 		{
 			// 34a Move A2[7:1] to MODE[7:1], 1N->L[2:1]
 			const int n = (inst & 0x1) + 2;
 			util::stream_format(stream, "A2->MODE, 0x%d->L", n);
 			break;
 		}
-		case 0b001110001010: case 0b001110001011:
+		case 0b0011'1000'1010: case 0b00111000'1011:
 		{
 			// 38a Move M[H[5:1],L[2:1]][7:1] to MODE[7:1], 1N->L[2:1]
 			const int n = (inst & 0x1) + 2;
@@ -378,14 +416,14 @@ offs_t upd777_disassembler::disassemble(std::ostream &stream, offs_t pc, const u
 			break;
 		}
 
-		case 0b001100010000: case 0b001100010001: case 0b001100010010: case 0b001100010011:
+		case 0b0011'0001'0000: case 0b0011'0001'0001: case 0b0011'0001'0010: case 0b0011'0001'0011:
 		{
 			// 310 Move A2[7:1] to A1[7:1], N->L[2:1]
 			const int n = inst & 0x3;
 			util::stream_format(stream, "A2->A1, 0x%d->L", n);
 			break;
 		}
-		case 0b001101000000: case 0b001101000001: case 0b001101000010: case 0b001101000011:
+		case 0b0011'0100'0000: case 0b0011'0100'0001: case 0b0011'0100'0010: case 0b0011'0100'0011:
 		{
 			// 340 Move A1[7:1] to A2[7:1], N->L[2:1]
 			const int n = inst & 0x3;
@@ -393,21 +431,21 @@ offs_t upd777_disassembler::disassemble(std::ostream &stream, offs_t pc, const u
 			break;
 		}
 
-		case 0b001100011000: case 0b001100011001: case 0b001100011010: case 0b001100011011:
+		case 0b0011'0001'1000: case 0b0011'0001'1001: case 0b0011'0001'1010: case 0b0011'0001'1011:
 		{
 			// 318 Right shift A1[7:1], 0->A1[7], N->L[2:1]
 			const int n = inst & 0x3;
 			util::stream_format(stream, "A1->RS, 0x%d->L", n);
 			break;
 		}
-		case 0b001101011000: case 0b001101011001: case 0b001101011010: case 0b001101011011:
+		case 0b0011'0101'1000: case 0b0011'0101'1001: case 0b0011'0101'1010: case 0b0011'0101'1011:
 		{
 			// 358 Right shift A2[7:1], 0->A2[7], N->L[2:1]
 			const int n = inst & 0x3;
 			util::stream_format(stream, "A2->RS, 0x%d->L", n);
 			break;
 		}
-		case 0b001110011000: case 0b001110011001: case 0b001110011010: case 0b001110011011:
+		case 0b0011'1001'1000: case 0b0011'1001'1001: case 0b0011'1001'1010: case 0b0011'1001'1011:
 		{
 			// 398 Right shift M[H[5:1],L[2:1]][7:1], 0->M[H[5:1],L[2:1]][7], N->L[2:1]
 			const int n = inst & 0x3;
@@ -415,14 +453,14 @@ offs_t upd777_disassembler::disassemble(std::ostream &stream, offs_t pc, const u
 			break;
 		}
 
-		case 0b001100011100: case 0b001100011101: case 0b001100011110: case 0b001100011111:
+		case 0b0011'0001'1100: case 0b0011'0001'1101: case 0b0011'0001'1110: case 0b0011'0001'1111:
 		{
 			// 31c Subtract A1[7:1] and A2[7:1], store to A2[7:1], Skip if borrow, N->L[2:1]
 			const int n = inst & 0x3;
 			util::stream_format(stream, "A1-A2->A2, 0x%d->L", n);
 			break;
 		}
-		case 0b001101001100: case 0b001101001101: case 0b001101001110: case 0b001101001111:
+		case 0b0011'0100'1100: case 0b0011'0100'1101: case 0b0011'0100'1110: case 0b0011'0100'1111:
 		{
 			// 34c Subtract A2[7:1] and A1[7:1], store to A1[7:1], Skip if borrow, N->L[2:1]
 			const int n = inst & 0x3;
@@ -430,22 +468,22 @@ offs_t upd777_disassembler::disassemble(std::ostream &stream, offs_t pc, const u
 			break;
 		}
 
-		case 0b001100100000: case 0b001100100001: case 0b001100100010: case 0b001100100011:
-		case 0b001100100100: case 0b001100100101: case 0b001100100110: case 0b001100100111:
-		case 0b001100101000: case 0b001100101001: case 0b001100101010: case 0b001100101011:
-		case 0b001100101100: case 0b001100101101: case 0b001100101110: case 0b001100101111:
-		case 0b001100110000: case 0b001100110001: case 0b001100110010: case 0b001100110011:
-		case 0b001100110100: case 0b001100110101: case 0b001100110110: case 0b001100110111:
-		case 0b001100111000: case 0b001100111001: case 0b001100111010: case 0b001100111011:
-		case 0b001100111100: case 0b001100111101: case 0b001100111110: case 0b001100111111:
-		case 0b001101100000: case 0b001101100001: case 0b001101100010: case 0b001101100011:
-		case 0b001101100100: case 0b001101100101: case 0b001101100110: case 0b001101100111:
-		case 0b001101101000: case 0b001101101001: case 0b001101101010: case 0b001101101011:
-		case 0b001101101100: case 0b001101101101: case 0b001101101110: case 0b001101101111:
-		case 0b001101110000: case 0b001101110001: case 0b001101110010: case 0b001101110011:
-		case 0b001101110100: case 0b001101110101: case 0b001101110110: case 0b001101110111:
-		case 0b001101111000: case 0b001101111001: case 0b001101111010: case 0b001101111011:
-		case 0b001101111100: case 0b001101111101: case 0b001101111110: case 0b001101111111:
+		case 0b0011'0010'0000: case 0b0011'0010'0001: case 0b0011'0010'0010: case 0b0011'0010'0011:
+		case 0b0011'0010'0100: case 0b0011'0010'0101: case 0b0011'0010'0110: case 0b0011'0010'0111:
+		case 0b0011'0010'1000: case 0b0011'0010'1001: case 0b0011'0010'1010: case 0b0011'0010'1011:
+		case 0b0011'0010'1100: case 0b0011'0010'1101: case 0b0011'0010'1110: case 0b0011'0010'1111:
+		case 0b0011'0011'0000: case 0b0011'0011'0001: case 0b0011'0011'0010: case 0b0011'0011'0011:
+		case 0b0011'0011'0100: case 0b0011'0011'0101: case 0b0011'0011'0110: case 0b0011'0011'0111:
+		case 0b0011'0011'1000: case 0b0011'0011'1001: case 0b0011'0011'1010: case 0b0011'0011'1011:
+		case 0b0011'0011'1100: case 0b0011'0011'1101: case 0b0011'0011'1110: case 0b0011'0011'1111:
+		case 0b0011'0110'0000: case 0b0011'0110'0001: case 0b0011'0110'0010: case 0b0011'0110'0011:
+		case 0b0011'0110'0100: case 0b0011'0110'0101: case 0b0011'0110'0110: case 0b0011'0110'0111:
+		case 0b0011'0110'1000: case 0b0011'0110'1001: case 0b0011'0110'1010: case 0b0011'0110'1011:
+		case 0b0011'0110'1100: case 0b0011'0110'1101: case 0b0011'0110'1110: case 0b0011'0110'1111:
+		case 0b0011'0111'0000: case 0b0011'0111'0001: case 0b0011'0111'0010: case 0b0011'0111'0011:
+		case 0b0011'0111'0100: case 0b0011'0111'0101: case 0b0011'0111'0110: case 0b0011'0111'0111:
+		case 0b0011'0111'1000: case 0b0011'0111'1001: case 0b0011'0111'1010: case 0b0011'0111'1011:
+		case 0b0011'0111'1100: case 0b0011'0111'1101: case 0b0011'0111'1110: case 0b0011'0111'1111:
 		{
 			// 320 AND A1[7:1] and A1[7:1], store to A1[7:1], N->L[2:1]
 			// 324 Add A1[7:1] and A1[7:1], store to A1[7:1], N->L[2:1]
@@ -467,12 +505,12 @@ offs_t upd777_disassembler::disassemble(std::ostream &stream, offs_t pc, const u
 			const int reg2 = (inst & 0x10) >> 4;
 			const int reg1 = (inst & 0x40) >> 6;
 			const int n = inst & 0x3;
-			util::stream_format(stream, "%s%s%s->%s, 0x%d->L %s", m_320_reg[reg1], m_320_optypes[optype], m_320_reg[reg2], m_320_reg[reg1], n, (optype == 3) ? "BOJ" : "");
+			util::stream_format(stream, "%s%s%s->%s, 0x%d->L %s", get_reg_name(reg1), get_300optype_name(optype), get_reg_name(reg2), get_reg_name(reg1), n, (optype == 3) ? "BOJ" : "");
 			break;
 		}
 
-		case 0b001110000000: case 0b001110000001: case 0b001110000010: case 0b001110000011:
-		case 0b001110010000: case 0b001110010001: case 0b001110010010: case 0b001110010011:
+		case 0b0011'1000'0000: case 0b0011'1000'0001: case 0b0011'1000'0010: case 0b0011'1000'0011:
+		case 0b0011'1001'0000: case 0b0011'1001'0001: case 0b0011'1001'0010: case 0b0011'1001'0011:
 		{
 			// 380 Move A1[7:1] to M[H[5:1],L[2:1]][7:1], N->L[2:1]
 			// 390 Move A2[7:1] to M[H[5:1],L[2:1]][7:1], N->L[2:1]
@@ -482,8 +520,8 @@ offs_t upd777_disassembler::disassemble(std::ostream &stream, offs_t pc, const u
 			break;
 		}
 
-		case 0b001110000100: case 0b001110000101: case 0b001110000110: case 0b001110000111:
-		case 0b001110010100: case 0b001110010101: case 0b001110010110: case 0b001110010111:
+		case 0b0011'1000'0100: case 0b0011'1000'0101: case 0b0011'1000'0110: case 0b0011'1000'0111:
+		case 0b0011'1001'0100: case 0b0011'1001'0101: case 0b0011'1001'0110: case 0b0011'1001'0111:
 		{
 			// 384 Exchange M[H[5:1],L[2:1]][7:1] and A1[7:1], N->L[2:1]
 			// 394 Exchange M[H[5:1],L[2:1]][7:1] and A2[7:1], N->L[2:1]
@@ -493,8 +531,8 @@ offs_t upd777_disassembler::disassemble(std::ostream &stream, offs_t pc, const u
 			break;
 		}
 
-		case 0b001110001100: case 0b001110001101: case 0b001110001110: case 0b001110001111:
-		case 0b001110011100: case 0b001110011101: case 0b001110011110: case 0b001110011111:
+		case 0b0011'1000'1100: case 0b0011'1000'1101: case 0b0011'1000'1110: case 0b0011'1000'1111:
+		case 0b0011'1001'1100: case 0b0011'1001'1101: case 0b0011'1001'1110: case 0b0011'1001'1111:
 		{
 			// 38c Move M[H[5:1],L[2:1]][7:1] to A1[7:1], N->L[2:1]
 			// 39c Move M[H[5:1],L[2:1]][7:1] to A2[7:1], N->L[2:1]
@@ -504,14 +542,14 @@ offs_t upd777_disassembler::disassemble(std::ostream &stream, offs_t pc, const u
 			break;
 		}
 
-		case 0b001110100000: case 0b001110100001: case 0b001110100010: case 0b001110100011:
-		case 0b001110100100: case 0b001110100101: case 0b001110100110: case 0b001110100111:
-		case 0b001110101000: case 0b001110101001: case 0b001110101010: case 0b001110101011:
-		case 0b001110101100: case 0b001110101101: case 0b001110101110: case 0b001110101111:
-		case 0b001110110000: case 0b001110110001: case 0b001110110010: case 0b001110110011:
-		case 0b001110110100: case 0b001110110101: case 0b001110110110: case 0b001110110111:
-		case 0b001110111000: case 0b001110111001: case 0b001110111010: case 0b001110111011:
-		case 0b001110111100: case 0b001110111101: case 0b001110111110: case 0b001110111111:
+		case 0b0011'1010'0000: case 0b0011'1010'0001: case 0b0011'1010'0010: case 0b0011'1010'0011:
+		case 0b0011'1010'0100: case 0b0011'1010'0101: case 0b0011'1010'0110: case 0b0011'1010'0111:
+		case 0b0011'1010'1000: case 0b0011'1010'1001: case 0b0011'1010'1010: case 0b0011'1010'1011:
+		case 0b0011'1010'1100: case 0b0011'1010'1101: case 0b0011'1010'1110: case 0b0011'1010'1111:
+		case 0b0011'1011'0000: case 0b0011'1011'0001: case 0b0011'1011'0010: case 0b0011'1011'0011:
+		case 0b0011'1011'0100: case 0b0011'1011'0101: case 0b0011'1011'0110: case 0b0011'1011'0111:
+		case 0b0011'1011'1000: case 0b0011'1011'1001: case 0b0011'1011'1010: case 0b0011'1011'1011:
+		case 0b0011'1011'1100: case 0b0011'1011'1101: case 0b0011'1011'1110: case 0b0011'1011'1111:
 		{
 			// 3a0 AND M[H[5:1],L[2:1]][7:1] and A1[7:1], store to M[H[5:1],L[2:1]][7:1], N->L[2:1]
 			// 3a4 Add M[H[5:1],L[2:1]][7:1] and A1[7:1], store to M[H[5:1],L[2:1]][7:1], N->L[2:1] Skip if carry
@@ -524,18 +562,18 @@ offs_t upd777_disassembler::disassemble(std::ostream &stream, offs_t pc, const u
 			const int optype = (inst & 0x0c) >> 2;
 			const int reg2 = (inst & 0x10) >> 4;
 			const int n = inst & 0x3;
-			util::stream_format(stream, "M%s%s->M, 0x%d->L", m_320_optypes[optype], m_320_reg[reg2], n);
+			util::stream_format(stream, "M%s%s->M, 0x%d->L", get_300optype_name(optype), get_reg_name(reg2), n);
 			break;
 		}
 
-		case 0b001111100000: case 0b001111100001: case 0b001111100010: case 0b001111100011:
-		case 0b001111100100: case 0b001111100101: case 0b001111100110: case 0b001111100111:
-		case 0b001111101000: case 0b001111101001: case 0b001111101010: case 0b001111101011:
-		case 0b001111101100: case 0b001111101101: case 0b001111101110: case 0b001111101111:
-		case 0b001111110000: case 0b001111110001: case 0b001111110010: case 0b001111110011:
-		case 0b001111110100: case 0b001111110101: case 0b001111110110: case 0b001111110111:
-		case 0b001111111000: case 0b001111111001: case 0b001111111010: case 0b001111111011:
-		case 0b001111111100: case 0b001111111101: case 0b001111111110: case 0b001111111111:
+		case 0b0011'1110'0000: case 0b0011'1110'0001: case 0b0011'1110'0010: case 0b0011'1110'0011:
+		case 0b0011'1110'0100: case 0b0011'1110'0101: case 0b0011'1110'0110: case 0b0011'1110'0111:
+		case 0b0011'1110'1000: case 0b0011'1110'1001: case 0b0011'1110'1010: case 0b0011'1110'1011:
+		case 0b0011'1110'1100: case 0b0011'1110'1101: case 0b0011'1110'1110: case 0b0011'1110'1111:
+		case 0b0011'1111'0000: case 0b0011'1111'0001: case 0b0011'1111'0010: case 0b0011'1111'0011:
+		case 0b0011'1111'0100: case 0b0011'1111'0101: case 0b0011'1111'0110: case 0b0011'1111'0111:
+		case 0b0011'1111'1000: case 0b0011'1111'1001: case 0b0011'1111'1010: case 0b0011'1111'1011:
+		case 0b0011'1111'1100: case 0b0011'1111'1101: case 0b0011'1111'1110: case 0b0011'1111'1111:
 		{
 			// 3e0 AND H[5:1] and A1[5:1], store to H[5:1], N->L[2:1]
 			// 3e4 Add H[5:1] and A1[5:1], store to H[5:1], N->L[2:1]
@@ -548,12 +586,12 @@ offs_t upd777_disassembler::disassemble(std::ostream &stream, offs_t pc, const u
 			const int optype = (inst & 0x0c) >> 2;
 			const int reg = (inst & 0x10) >> 4;
 			const int n = inst & 0x3;
-			util::stream_format(stream, "H%s%s->H, 0x%d->L", m_320_optypes[optype], m_320_reg[reg], n);
+			util::stream_format(stream, "H%s%s->H, 0x%d->L", get_300optype_name(optype), get_reg_name(reg), n);
 			break;
 		}
 
-		case 0b001111000000: case 0b001111000001: case 0b001111000010: case 0b001111000011:
-		case 0b001111010000: case 0b001111010001: case 0b001111010010: case 0b001111010011:
+		case 0b0011'1100'0000: case 0b0011'1100'0001: case 0b0011'1100'0010: case 0b0011'1100'0011:
+		case 0b0011'1101'0000: case 0b0011'1101'0001: case 0b0011'1101'0010: case 0b0011'1101'0011:
 		{
 			// 3c0 Move A1[5:1] to H[5:1], N->L[2:1]
 			// 3d0 Move A2[5:1] to H[5:1], N->L[2:1]
@@ -562,8 +600,8 @@ offs_t upd777_disassembler::disassemble(std::ostream &stream, offs_t pc, const u
 			util::stream_format(stream, "A%d->H, 0x%d->L", reg + 1, n);
 			break;
 		}
-		case 0b001111001100: case 0b001111001101: case 0b001111001110: case 0b001111001111:
-		case 0b001111011100: case 0b001111011101: case 0b001111011110: case 0b001111011111:
+		case 0b0011'1100'1100: case 0b0011'1100'1101: case 0b0011'1100'1110: case 0b0011'1100'1111:
+		case 0b0011'1101'1100: case 0b0011'1101'1101: case 0b0011'1101'1110: case 0b0011'1101'1111:
 		{
 			// 3cc Move H[5:1] to A1[5:1], 0->A1[7:6], N->L[2:1]
 			// 3dc Move H[5:1] to A2[5:1], 0->A2[7:6], N->L[2:1]
@@ -573,28 +611,28 @@ offs_t upd777_disassembler::disassemble(std::ostream &stream, offs_t pc, const u
 			break;
 		}
 
-		case 0b010000000000: case 0b010000000001:
+		case 0b0100'0000'0000: case 0b0100'0000'0001:
 		{
 			// 400 N->A[11]
 			const int n = inst & 0x1;
 			util::stream_format(stream, "%d->A11", n);
 			break;
 		}
-		case 0b010000000010: case 0b010000000011:
+		case 0b0100'0000'0010: case 0b0100'0000'0011:
 		{
 			// 402 Jump to (000,M[H[5:1],L[2:1]][5:1],1N), 0->L[2:1], N->A[11]
 			const int n = inst & 0x1;
 			util::stream_format(stream, "JPM, 0->L, %d->A11", n);
 			break;
 		}
-		case 0b010001000000: case 0b010001000001: case 0b010001000100: case 0b010001000101:
-		case 0b010001001000: case 0b010001001001: case 0b010001001100: case 0b010001001101:
-		case 0b010001010000: case 0b010001010001: case 0b010001010100: case 0b010001010101:
-		case 0b010001011000: case 0b010001011001: case 0b010001011100: case 0b010001011101:
-		case 0b010001100000: case 0b010001100001: case 0b010001100100: case 0b010001100101:
-		case 0b010001101000: case 0b010001101001: case 0b010001101100: case 0b010001101101:
-		case 0b010001110000: case 0b010001110001: case 0b010001110100: case 0b010001110101:
-		case 0b010001111000: case 0b010001111001: case 0b010001111100: case 0b010001111101:
+		case 0b0100'0100'0000: case 0b0100'0100'0001: case 0b0100'0100'0100: case 0b0100'0100'0101:
+		case 0b0100'0100'1000: case 0b0100'0100'1001: case 0b0100'0100'1100: case 0b0100'0100'1101:
+		case 0b0100'0101'0000: case 0b0100'0101'0001: case 0b0100'0101'0100: case 0b0100'0101'0101:
+		case 0b0100'0101'1000: case 0b0100'0101'1001: case 0b0100'0101'1100: case 0b0100'0101'1101:
+		case 0b0100'0110'0000: case 0b0100'0110'0001: case 0b0100'0110'0100: case 0b0100'0110'0101:
+		case 0b0100'0110'1000: case 0b0100'0110'1001: case 0b0100'0110'1100: case 0b0100'0110'1101:
+		case 0b0100'0111'0000: case 0b0100'0111'0001: case 0b0100'0111'0100: case 0b0100'0111'0101:
+		case 0b0100'0111'1000: case 0b0100'0111'1001: case 0b0100'0111'1100: case 0b0100'0111'1101:
 		{
 			// 440 Set D to DISP, G to GPE, K to KIE, S to SME, N->A[11]
 			const int d = (inst >> 5) & 0x1;

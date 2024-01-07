@@ -26,13 +26,9 @@ private:
 	u8 m_l2r[0x80];
 	u8 m_r2l[0x80];
 
-	std::string m_200_optypes[4] = {"·", "invalid", "=", "-"};
-	std::string m_200_reg2[2] = {"A1", "A2" };
-	std::string m_200_reg1[4] = {"A1", "A2", "M", "H" };
-
-	std::string m_320_optypes[4] = {"·", "+", "v", "-"};
-	std::string m_320_reg[2] = {"A1", "A2" };
-
+	std::string get_300optype_name(int optype);
+	std::string get_200optype_name(int optype);
+	std::string get_reg_name(int reg);
 };
 
 #endif // MAME_CPU_UPD777_UPD777DASM_H

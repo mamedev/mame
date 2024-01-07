@@ -39,6 +39,7 @@ private:
 	memory_access<11, 1, -1, ENDIANNESS_LITTLE>::specific m_space;
 	memory_access<8, 0, 0, ENDIANNESS_LITTLE>::specific m_data;
 
+	void increment_pc();
 	u16 fetch();
 	void do_op();
 

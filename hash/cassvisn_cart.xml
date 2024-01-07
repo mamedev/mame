@@ -40,7 +40,7 @@ the ROM files below store 12 bit in a 16-bit word with 4 bits unused, so 128 * 1
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="cassvisn_cart">
 			<dataarea name="prg" size="0xf00">
-				<rom name="d777c005prog.s01" size="0xf00" crc="f917d2f0" sha1="b26baf2fd9b961b5a0e0475dfac93c18bd54cc4d" loadflag="load16_word_swap"/>
+				<rom name="d777c005prog.s01" size="0xf00" crc="f917d2f0" sha1="b26baf2fd9b961b5a0e0475dfac93c18bd54cc4d"/>
 			</dataarea>			
 			<dataarea name="pat" size="0x4d0">
 				<rom name="d777c005_pat.s01" size="0x4d0" crc="bf085553" sha1="321262b6dd67789e03db8f03160cb1819529f43c"/>
@@ -54,7 +54,7 @@ the ROM files below store 12 bit in a 16-bit word with 4 bits unused, so 128 * 1
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="cassvisn_cart">
 			<dataarea name="prg" size="0xf00">
-				<rom name="d778c_prog.s01" size="0xf00" crc="34127969" sha1="56528b54720b844a6275d219fb78e51caf06f777" loadflag="load16_word_swap"/>
+				<rom name="d778c_prog.s01" size="0xf00" crc="34127969" sha1="56528b54720b844a6275d219fb78e51caf06f777"/>
 			</dataarea>
 			<dataarea name="pat" size="0x4d0">
 				<rom name="d778c_pat.s01" size="0x4d0" crc="603fa141" sha1="e30f5ce85d8e2419025d52a7c733be2c127cc24f"/>
@@ -69,7 +69,7 @@ the ROM files below store 12 bit in a 16-bit word with 4 bits unused, so 128 * 1
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="cassvisn_cart">
 			<dataarea name="prg" size="0xf00">
-				<rom name="d777c007prog.s01" size="0xf00" crc="538c13d3" sha1="537287e63b311caa281d8c6456f9cbe2eaebb9e7" loadflag="load16_word_swap"/>
+				<rom name="d777c007prog.s01" size="0xf00" crc="538c13d3" sha1="537287e63b311caa281d8c6456f9cbe2eaebb9e7"/>
 			</dataarea>				
 			<dataarea name="pat" size="0x4d0">
 				<rom name="d777c007_pat.s01" size="0x4d0" crc="d343eca4" sha1="e8f0312de0d7f0934a66192c1aaa2c802532b021"/>
@@ -83,7 +83,7 @@ the ROM files below store 12 bit in a 16-bit word with 4 bits unused, so 128 * 1
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="cassvisn_cart">
 			<dataarea name="prg" size="0xf00">
-				<rom name="d777c004prog.s01" size="0xf00" crc="030fc0d2" sha1="b1efe8ff1bc51082502253e63721e656ee75edda" loadflag="load16_word_swap"/>
+				<rom name="d777c004prog.s01" size="0xf00" crc="030fc0d2" sha1="b1efe8ff1bc51082502253e63721e656ee75edda"/>
 			</dataarea>		
 			<dataarea name="pat" size="0x4d0">
 				<rom name="d777c004_pat.s01" size="0x4d0" crc="7df5eb39" sha1="c59f6febf5f51eebc0cc8d288df6b5319510ecbf"/>
@@ -98,7 +98,7 @@ the ROM files below store 12 bit in a 16-bit word with 4 bits unused, so 128 * 1
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="cassvisn_cart">
 			<dataarea name="prg" size="0xf00">
-				<rom name="d774cprog.s01" size="0xf00" crc="2bbe734f" sha1="04f2b6003b41bad2d246bd2e912887fdc77520c4" loadflag="load16_word_swap"/>
+				<rom name="d774cprog.s01" size="0xf00" crc="2bbe734f" sha1="04f2b6003b41bad2d246bd2e912887fdc77520c4"/>
 			</dataarea>
 			<dataarea name="pat" size="0x4d0">
 				<rom name="d774c_pat.s01" size="0x4d0" crc="5efbc1f4" sha1="1c5774113c554e26e8d0b7002d2f7b9d79107c82"/>
@@ -112,7 +112,7 @@ the ROM files below store 12 bit in a 16-bit word with 4 bits unused, so 128 * 1
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="cassvisn_cart">
 			<dataarea name="prg" size="0xf00">
-				<rom name="d777c008prog.s01" size="0xf00" crc="254127d5" sha1="1217542ba02d84eeb0fad7b271a188ed2737fa71" loadflag="load16_word_swap"/>
+				<rom name="d777c008prog.s01" size="0xf00" crc="254127d5" sha1="1217542ba02d84eeb0fad7b271a188ed2737fa71"/>
 			</dataarea>
 			<dataarea name="pat" size="0x4d0">
 				<rom name="d777c008_pat.s01" size="0x4d0" crc="e17f5d04" sha1="4393b21d3ef4e98ebf8d25ffb9b3f287fbbb23cb"/>
@@ -126,7 +126,7 @@ the ROM files below store 12 bit in a 16-bit word with 4 bits unused, so 128 * 1
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="cassvisn_cart">
 			<dataarea name="prg" size="0xf00">
-				<rom name="d777c002prog.s01" size="0xf00" crc="65dae0cb" sha1="468ec1869235e96da2374f7a165d1d9ca96f3044" loadflag="load16_word_swap"/>
+				<rom name="d777c002prog.s01" size="0xf00" crc="65dae0cb" sha1="468ec1869235e96da2374f7a165d1d9ca96f3044"/>
 			</dataarea>
 			<dataarea name="pat" size="0x4d0">
 				<rom name="d777c002_pat.s01" size="0x4d0" crc="434209f8" sha1="e783cb265618c598ad614bf29c833f3e47ee6487"/>
@@ -140,7 +140,7 @@ the ROM files below store 12 bit in a 16-bit word with 4 bits unused, so 128 * 1
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="cassvisn_cart">
 			<dataarea name="prg" size="0xf00">
-				<rom name="d777c009prog.s01" size="0xf00" crc="e453a00c" sha1="7f3c20653c8f6168d17cad40eac5926e6e9bb7b0" loadflag="load16_word_swap"/>
+				<rom name="d777c009prog.s01" size="0xf00" crc="e453a00c" sha1="7f3c20653c8f6168d17cad40eac5926e6e9bb7b0"/>
 			</dataarea>
 			<dataarea name="pat" size="0x4d0">
 				<rom name="d777c009_pat.s01" size="0x4d0" crc="75deffbd" sha1="4f4c25fa9f96a345f7128ff0b52de315117da549"/>
@@ -154,7 +154,7 @@ the ROM files below store 12 bit in a 16-bit word with 4 bits unused, so 128 * 1
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="cassvisn_cart">
 			<dataarea name="prg" size="0xf00">
-				<rom name="d777c010prog.s01" size="0xf00" crc="2691f5ce" sha1="f5510e139c6bda266450d3feaffe073374608b08" loadflag="load16_word_swap"/>
+				<rom name="d777c010prog.s01" size="0xf00" crc="2691f5ce" sha1="f5510e139c6bda266450d3feaffe073374608b08"/>
 			</dataarea>
 			<dataarea name="pat" size="0x4d0">
 				<rom name="d777c010_pat.s01" size="0x4d0" crc="8b0c00bd" sha1="6fc01434fd92172eeaa7600742525ed69ecb90c2"/>
@@ -168,7 +168,7 @@ the ROM files below store 12 bit in a 16-bit word with 4 bits unused, so 128 * 1
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="cassvisn_cart">
 			<dataarea name="prg" size="0xf00">
-				<rom name="d777c013prog.s01" size="0xf00" crc="81903844" sha1="0fbccdb42c245ad62b14041256df0f33e83bc32a" loadflag="load16_word_swap"/>
+				<rom name="d777c013prog.s01" size="0xf00" crc="81903844" sha1="0fbccdb42c245ad62b14041256df0f33e83bc32a"/>
 			</dataarea>
 			<dataarea name="pat" size="0x4d0">
 				<rom name="d777c013_pat.s01" size="0x4d0" crc="abf87caa" sha1="dd629bd43bea70ece9f9cd25b70eeef1caf72828"/>
@@ -182,7 +182,7 @@ the ROM files below store 12 bit in a 16-bit word with 4 bits unused, so 128 * 1
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="cassvisn_cart">
 			<dataarea name="prg" size="0xf00">
-				<rom name="d777c015prog.s01" size="0xf00" crc="709002f2" sha1="d88213dfcac99e303a34a0ad0561bf9242279873" loadflag="load16_word_swap"/>
+				<rom name="d777c015prog.s01" size="0xf00" crc="709002f2" sha1="d88213dfcac99e303a34a0ad0561bf9242279873"/>
 			</dataarea>
 			<dataarea name="pat" size="0x4d0">
 				<rom name="d777c015_pat.s01" size="0x4d0" crc="51654eb2" sha1="e5e602a7c5dd2725b67235d401203ddd398bee9b"/>
