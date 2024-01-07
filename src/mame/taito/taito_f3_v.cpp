@@ -931,9 +931,9 @@ void taito_f3_state::get_pf_scroll(int pf_num, fixed8 &reg_sx, fixed8 &reg_sy)
 		sx_raw += (512+192) << 6; // 10.6
 		sy_raw += (256) << 7; // 9.7
 
-		sy_raw += (24 << 7);
-		//if (m_game_config->extend)
-		// 	sx_raw += 512 << 6;
+		sy_raw += (26) << 7;
+
+		sy_raw = -sy_raw;
 	}
 	sx_raw += ((40 - 4*pf_num) << 6); // 10.6
 	// why don't we need to do this 24 adjustment for pf 1 and 2 ?  -- only in flip ?
@@ -943,11 +943,13 @@ void taito_f3_state::get_pf_scroll(int pf_num, fixed8 &reg_sx, fixed8 &reg_sy)
 	fixed8 sy = sy_raw << (8-7); // 9.7 to 24.8
 	sx ^= 0b1111'1100;
 	if (m_flipscreen) {
-		sx = -sx;
+		sx = sx - (46 << 8);
 		sy = -sy;
+	} else {
+		sx = sx - (46 << 8);
 	}
 
-	reg_sx = -sx - (46 << 8);
+	reg_sx = sx;
 	reg_sy = sy;
 }
 
@@ -1185,9 +1187,9 @@ void taito_f3_state::scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cl
 		line_data.pf[pf].flagsbitmap = &m_tilemap[tmap_number]->flagsmap();
 
 		get_pf_scroll(pf, line_data.pf[pf].reg_sx, line_data.pf[pf].reg_sy);
-		if (m_flipscreen)
-			line_data.pf[pf].reg_fx_y = -line_data.pf[pf].reg_sy;
-		else
+		// if (m_flipscreen)
+		// 	line_data.pf[pf].reg_fx_y = -line_data.pf[pf].reg_sy;
+		// else
 			line_data.pf[pf].reg_fx_y = line_data.pf[pf].reg_sy;
 		line_data.pf[pf].x_scale = (256-0);
 	}
