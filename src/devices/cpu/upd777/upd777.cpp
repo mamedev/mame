@@ -18,7 +18,8 @@ DEFINE_DEVICE_TYPE(UPD777, upd777_device, "upd777", "NEC uPD777")
 upd777_device::upd777_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor data)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_space_config("program", ENDIANNESS_LITTLE, 16, 11, -1, address_map_constructor(FUNC(upd777_device::internal_map), this))
-	, m_data_config("data", ENDIANNESS_LITTLE, 8, 8, 0, data)
+	, m_data_config("data", ENDIANNESS_LITTLE, 8, 7, 0, data)
+	, m_datamem(*this, "datamem")
 {
 }
 
@@ -47,6 +48,16 @@ void upd777_device::internal_map(address_map &map)
 
 void upd777_device::internal_data_map(address_map &map)
 {
+	// 0x20 groups of 4 7-bit values
+	// groups 0x00-0x18 are used for sprite/pattern entries with the format
+
+	//     6543210
+	// 00  yyyyyyp   (y = ypos, p = PRIO)
+	// 01  xxxxxxx   (x = xpos)
+	// 02  ttttttt   (t = pattern)
+	// 03  YYYRGBS   (Y = , RGB = color, S=ySUB)  
+
+	map(0x00, 0x7f).ram().share("datamem");
 }
 
 void upd777_device::increment_pc()
@@ -122,14 +133,46 @@ void upd777_device::set_new_pc(int newpc)
 	m_pc = newpc;
 }
 
+// L reg (lower memory pointer is 2 bit
 void upd777_device::set_l(int l)
 {
 	m_l = l & 0x3;
 }
 
+// H reg (upper memory pointer) is 5-bit
 void upd777_device::set_h(int h)
 {
 	m_h = h & 0x1f;
+}
+
+// H reg is used as upper bits of memory address
+u8 upd777_device::get_h_shifted()
+{
+	return (m_h & 0x1f) << 2;
+}
+
+// 'A' regs are 7-bit
+void upd777_device::set_a1(u8 data) { m_a[0] = data & 0x7f; }
+void upd777_device::set_a2(u8 data) { m_a[1] = data & 0x7f; }
+void upd777_device::set_a3(u8 data) { m_a[2] = data & 0x7f; }
+void upd777_device::set_a4(u8 data) { m_a[3] = data & 0x7f; }
+
+// 'A' regs are 7-bit
+u8 upd777_device::get_a1() { return m_a[0] & 0x7f; }
+u8 upd777_device::get_a2() { return m_a[1] & 0x7f; }
+u8 upd777_device::get_a3() { return m_a[2] & 0x7f; }
+u8 upd777_device::get_a4() { return m_a[3] & 0x7f; }
+
+u8 upd777_device::read_data_mem(u8 addr)
+{
+	// data memory is 7-bit
+	return m_data.read_byte(addr) & 0x7f;
+}
+
+void upd777_device::write_data_mem(u8 addr, u8 data)
+{
+	// data memory is 7-bit
+	m_data.write_byte(addr, data & 0x7f);
 }
 
 // temporary, for the opcode logging
@@ -330,7 +373,10 @@ void upd777_device::do_op()
 		case 0b0000'0101'0100:
 		{
 			// 054 Move (A4[7:1],A3[7:1],A2[7:1],A1[7:1]) to M[H[5:1]][28:1]
-			LOGMASKED(LOG_UNHANDLED_OPS, "A->MA\n");
+			write_data_mem(get_h_shifted() | 0, get_a1());
+			write_data_mem(get_h_shifted() | 1, get_a2());
+			write_data_mem(get_h_shifted() | 2, get_a3());
+			write_data_mem(get_h_shifted() | 3, get_a4());
 			break;
 		}
 		case 0b0000'0101'1000:

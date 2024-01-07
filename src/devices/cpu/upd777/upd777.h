@@ -46,6 +46,8 @@ private:
 	memory_access<11, 1, -1, ENDIANNESS_LITTLE>::specific m_space;
 	memory_access<8, 0, 0, ENDIANNESS_LITTLE>::specific m_data;
 
+	required_shared_ptr<u8> m_datamem;
+
 	std::string get_300optype_name(int optype);
 	std::string get_200optype_name(int optype);
 	std::string get_reg_name(int reg);
@@ -54,10 +56,23 @@ private:
 	u16 fetch();
 	void do_op();
 
+
+	u8 read_data_mem(u8 addr);
+	void write_data_mem(u8 addr, u8 data);
+
 	void set_l(int l);
+	u8 get_h_shifted();
 	void set_h(int h);
 	void set_a11(int a11);
 	void set_new_pc(int newpc);
+	void set_a1(u8 data);
+	void set_a2(u8 data);
+	void set_a3(u8 data);
+	void set_a4(u8 data);
+	u8 get_a1();
+	u8 get_a2();
+	u8 get_a3();
+	u8 get_a4();
 
 	u32 m_ppc;
 	u32 m_pc;
