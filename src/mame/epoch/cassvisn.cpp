@@ -110,7 +110,7 @@ DEVICE_IMAGE_LOAD_MEMBER(cassvisn_state::cart_load)
 
 void cassvisn_state::cassvisn(machine_config &config)
 {
-	UPD777(config, m_maincpu, 1000000); // frequency? UPD774 / UPD778 in some carts?
+	UPD777_CPU(config, m_maincpu, 1000000); // frequency? UPD774 / UPD778 in some carts?
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "cassvisn_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);

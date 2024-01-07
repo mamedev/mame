@@ -11,29 +11,29 @@
 #include "logmacro.h"
 
 // device type definitions
-DEFINE_DEVICE_TYPE(UPD777, upd777_device, "upd777", "NEC uPD777")
+DEFINE_DEVICE_TYPE(UPD777_CPU, upd777_cpu_device, "upd777cpu", "NEC uPD777 (CPU)")
 
 
 
-upd777_device::upd777_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor data)
+upd777_cpu_device::upd777_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor data)
 	: cpu_device(mconfig, type, tag, owner, clock)
-	, m_space_config("program", ENDIANNESS_LITTLE, 16, 11, -1, address_map_constructor(FUNC(upd777_device::internal_map), this))
+	, m_space_config("program", ENDIANNESS_LITTLE, 16, 11, -1, address_map_constructor(FUNC(upd777_cpu_device::internal_map), this))
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 7, 0, data)
 	, m_datamem(*this, "datamem")
 {
 }
 
-upd777_device::upd777_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: upd777_device(mconfig, UPD777, tag, owner, clock, address_map_constructor(FUNC(upd777_device::internal_data_map), this))
+upd777_cpu_device::upd777_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: upd777_cpu_device(mconfig, UPD777_CPU, tag, owner, clock, address_map_constructor(FUNC(upd777_cpu_device::internal_data_map), this))
 {
 }
 
-std::unique_ptr<util::disasm_interface> upd777_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> upd777_cpu_device::create_disassembler()
 {
 	return std::make_unique<upd777_disassembler>();
 }
 
-device_memory_interface::space_config_vector upd777_device::memory_space_config() const
+device_memory_interface::space_config_vector upd777_cpu_device::memory_space_config() const
 {
 	return space_config_vector{
 		std::make_pair(AS_PROGRAM, &m_space_config),
@@ -41,12 +41,12 @@ device_memory_interface::space_config_vector upd777_device::memory_space_config(
 	};
 }
 
-void upd777_device::internal_map(address_map &map)
+void upd777_cpu_device::internal_map(address_map &map)
 {
 	map(0x000, 0x7ff).rom();
 }
 
-void upd777_device::internal_data_map(address_map &map)
+void upd777_cpu_device::internal_data_map(address_map &map)
 {
 	// 0x20 groups of 4 7-bit values
 	// groups 0x00-0x18 are used for sprite/pattern entries with the format
@@ -60,7 +60,7 @@ void upd777_device::internal_data_map(address_map &map)
 	map(0x00, 0x7f).ram().share("datamem");
 }
 
-void upd777_device::increment_pc()
+void upd777_cpu_device::increment_pc()
 {
 	u16 lowpc = m_pc & 0x07f;
 	u16 highpc = m_pc & 0x780;
@@ -74,7 +74,7 @@ void upd777_device::increment_pc()
 	m_pc = highpc | lowpc;
 }
 
-void upd777_device::device_start()
+void upd777_cpu_device::device_start()
 {
 	space(AS_PROGRAM).specific(m_space);
 	space(AS_DATA).specific(m_data);
@@ -114,7 +114,7 @@ void upd777_device::device_start()
 	save_item(NAME(m_stackpos));
 }
 
-void upd777_device::device_reset()
+void upd777_cpu_device::device_reset()
 {
 	m_ppc = 0;
 	m_pc = 0;
@@ -132,7 +132,7 @@ void upd777_device::device_reset()
 	m_stackpos = 0;
 }
 
-u16 upd777_device::fetch()
+u16 upd777_cpu_device::fetch()
 {
 	u16 opcode = m_space.read_word(m_pc);
 	m_ppc = m_pc;
@@ -140,7 +140,7 @@ u16 upd777_device::fetch()
 	return opcode;
 }
 
-void upd777_device::push_to_stack(u16 addr)
+void upd777_cpu_device::push_to_stack(u16 addr)
 {
 	if (m_stackpos < 3)
 	{
@@ -153,7 +153,7 @@ void upd777_device::push_to_stack(u16 addr)
 	}
 }
 
-u16 upd777_device::pull_from_stack()
+u16 upd777_cpu_device::pull_from_stack()
 {
 	if (m_stackpos > 0)
 	{
@@ -168,93 +168,93 @@ u16 upd777_device::pull_from_stack()
 }
 
 
-void upd777_device::set_a11(int a11)
+void upd777_cpu_device::set_a11(int a11)
 {
 	m_pc = (m_pc & 0x3ff) | (a11 & 1) << 10;
 }
 
-void upd777_device::set_new_pc(int newpc)
+void upd777_cpu_device::set_new_pc(int newpc)
 {
 	m_pc = newpc;
 }
 
 // L reg (lower memory pointer is 2 bit
-void upd777_device::set_l(int l)
+void upd777_cpu_device::set_l(int l)
 {
 	m_l = l & 0x3;
 }
 
-u8 upd777_device::get_l()
+u8 upd777_cpu_device::get_l()
 {
 	return m_l & 0x3;
 }
 
 // H reg (upper memory pointer) is 5-bit
-void upd777_device::set_h(int h)
+void upd777_cpu_device::set_h(int h)
 {
 	m_h = h & 0x1f;
 }
 
 // H reg is used as upper bits of memory address
-u8 upd777_device::get_h_shifted()
+u8 upd777_cpu_device::get_h_shifted()
 {
 	return (m_h & 0x1f) << 2;
 }
 
-u8 upd777_device::get_h()
+u8 upd777_cpu_device::get_h()
 {
 	return m_h & 0x1f;
 }
 
 // M is the content of memory address pointed to by H and L
-u8 upd777_device::get_m_data()
+u8 upd777_cpu_device::get_m_data()
 {
 	u8 addr = get_h_shifted() | get_l();
 	return read_data_mem(addr & 0x7f) & 0x7f;
 }
 
-void upd777_device::set_m_data(u8 data)
+void upd777_cpu_device::set_m_data(u8 data)
 {
 	u8 addr = get_h_shifted() | get_l();
 	return write_data_mem(addr & 0x7f, data & 0x7f);
 }
 
 // 'A' regs are 7-bit
-void upd777_device::set_a1(u8 data) { m_a[0] = data & 0x7f; }
-void upd777_device::set_a2(u8 data) { m_a[1] = data & 0x7f; }
-void upd777_device::set_a3(u8 data) { m_a[2] = data & 0x7f; }
-void upd777_device::set_a4(u8 data) { m_a[3] = data & 0x7f; }
+void upd777_cpu_device::set_a1(u8 data) { m_a[0] = data & 0x7f; }
+void upd777_cpu_device::set_a2(u8 data) { m_a[1] = data & 0x7f; }
+void upd777_cpu_device::set_a3(u8 data) { m_a[2] = data & 0x7f; }
+void upd777_cpu_device::set_a4(u8 data) { m_a[3] = data & 0x7f; }
 
 // 'A' regs are 7-bit
-u8 upd777_device::get_a1() { return m_a[0] & 0x7f; }
-u8 upd777_device::get_a2() { return m_a[1] & 0x7f; }
-u8 upd777_device::get_a3() { return m_a[2] & 0x7f; }
-u8 upd777_device::get_a4() { return m_a[3] & 0x7f; }
+u8 upd777_cpu_device::get_a1() { return m_a[0] & 0x7f; }
+u8 upd777_cpu_device::get_a2() { return m_a[1] & 0x7f; }
+u8 upd777_cpu_device::get_a3() { return m_a[2] & 0x7f; }
+u8 upd777_cpu_device::get_a4() { return m_a[3] & 0x7f; }
 
 // FRS/FLS are the 2 7-bit sound registers
-void upd777_device::set_frs(u8 frs) { m_frs = frs & 0x7f; }
-void upd777_device::set_fls(u8 fls) { m_fls = fls & 0x7f; }
+void upd777_cpu_device::set_frs(u8 frs) { m_frs = frs & 0x7f; }
+void upd777_cpu_device::set_fls(u8 fls) { m_fls = fls & 0x7f; }
 
 // MODE is a 7-bit register with the following format
 // 6543210  
 // rbhpRGB (r = reverberate sound effect, b = brightness, h = hue, p = black/prio, RGB = color)
-void upd777_device::set_mode(u8 mode) { m_mode = mode & 0x7f; }
+void upd777_cpu_device::set_mode(u8 mode) { m_mode = mode & 0x7f; }
 
 
-u8 upd777_device::read_data_mem(u8 addr)
+u8 upd777_cpu_device::read_data_mem(u8 addr)
 {
 	// data memory is 7-bit
 	return m_data.read_byte(addr) & 0x7f;
 }
 
-void upd777_device::write_data_mem(u8 addr, u8 data)
+void upd777_cpu_device::write_data_mem(u8 addr, u8 data)
 {
 	// data memory is 7-bit
 	m_data.write_byte(addr, data & 0x7f);
 }
 
 // temporary, for the opcode logging
-std::string upd777_device::get_300optype_name(int optype)
+std::string upd777_cpu_device::get_300optype_name(int optype)
 {
 	switch (optype)
 	{
@@ -266,7 +266,7 @@ std::string upd777_device::get_300optype_name(int optype)
 	return "<invalid optype>";
 }
 
-std::string upd777_device::get_200optype_name(int optype)
+std::string upd777_cpu_device::get_200optype_name(int optype)
 {
 	switch (optype)
 	{
@@ -278,7 +278,7 @@ std::string upd777_device::get_200optype_name(int optype)
 	return "<invalid optype>";
 }
 
-std::string upd777_device::get_reg_name(int reg)
+std::string upd777_cpu_device::get_reg_name(int reg)
 {
 	switch (reg)
 	{
@@ -291,7 +291,7 @@ std::string upd777_device::get_reg_name(int reg)
 }
 
 
-void upd777_device::do_op()
+void upd777_cpu_device::do_op()
 {
 	const u16 inst = fetch();
 
@@ -369,7 +369,13 @@ void upd777_device::do_op()
 		// 780-7ff Store K[7:1] to A4[7:1]
 		const int reg = (inst & 0x180) >> 7;
 		const int k = inst & 0x7f;
-		LOGMASKED(LOG_UNHANDLED_OPS, "0x%02x->A%d\n", k, reg+1);
+		switch (reg)
+		{
+		case 0: set_a1(k); break;
+		case 1: set_a2(k); break;
+		case 2: set_a3(k); break;
+		case 3: set_a4(k); break;
+		}
 	}
 	else if (inst >= 0b1000'0000'0000 && inst <= 0b1011'1111'1111)
 	{
@@ -453,6 +459,7 @@ void upd777_device::do_op()
 		{
 			// 049 Skip if (4H Horizontal Blank) = 1
 			LOGMASKED(LOG_UNHANDLED_OPS, "4H BLK\n");
+			m_skip = 1;
 			break;
 		}
 		case 0b0000'0100'1010:
@@ -479,13 +486,31 @@ void upd777_device::do_op()
 		case 0b0000'0101'1000:
 		{
 			// 058 Move M[H[5:1]][28:1] to (A4[7:1],A3[7:1],A2[7:1],A1[7:1])
-			LOGMASKED(LOG_UNHANDLED_OPS, "MA->A\n");
+			u8 m1 = read_data_mem(get_h_shifted() | 0);
+			u8 m2 = read_data_mem(get_h_shifted() | 1);
+			u8 m3 = read_data_mem(get_h_shifted() | 2);
+			u8 m4 = read_data_mem(get_h_shifted() | 3);
+			set_a1(m1);
+			set_a2(m2);
+			set_a3(m3);
+			set_a4(m4);
 			break;
 		}
 		case 0b0000'0101'1100:
 		{
 			// 05c Exchange (A4[7:1],A3[7:1],A2[7:1],A1[7:1]) and M[H[5:1]][28:1]
-			LOGMASKED(LOG_UNHANDLED_OPS, "MA<->A\n");
+			u8 m1 = read_data_mem(get_h_shifted() | 0);
+			u8 m2 = read_data_mem(get_h_shifted() | 1);
+			u8 m3 = read_data_mem(get_h_shifted() | 2);
+			u8 m4 = read_data_mem(get_h_shifted() | 3);
+			write_data_mem(get_h_shifted() | 0, get_a1());
+			write_data_mem(get_h_shifted() | 1, get_a2());
+			write_data_mem(get_h_shifted() | 2, get_a3());
+			write_data_mem(get_h_shifted() | 3, get_a4());
+			set_a1(m1);
+			set_a2(m2);
+			set_a3(m3);
+			set_a4(m4);
 			break;
 		}
 		case 0b0000'0110'0000:
@@ -949,7 +974,7 @@ void upd777_device::do_op()
 	}
 }
 
-void upd777_device::execute_run()
+void upd777_cpu_device::execute_run()
 {
 	while (m_icount > 0)
 	{
@@ -965,6 +990,6 @@ void upd777_device::execute_run()
 	}
 }
 
-void upd777_device::execute_set_input(int inputnum, int state)
+void upd777_cpu_device::execute_set_input(int inputnum, int state)
 {
 }

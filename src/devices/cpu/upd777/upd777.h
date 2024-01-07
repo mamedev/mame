@@ -7,10 +7,10 @@
 #pragma once
 
 
-class upd777_device : public cpu_device
+class upd777_cpu_device : public cpu_device
 {
 public:
-	upd777_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	upd777_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	enum {
 		UPD777_PC = 0,
@@ -28,7 +28,7 @@ public:
 	};
 
 protected:
-	upd777_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor data);
+	upd777_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor data);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -106,6 +106,6 @@ private:
 	u8 m_mode;
 };
 
-DECLARE_DEVICE_TYPE(UPD777, upd777_device)
+DECLARE_DEVICE_TYPE(UPD777_CPU, upd777_cpu_device)
 
 #endif // MAME_CPU_UPD777_UPD777_H
