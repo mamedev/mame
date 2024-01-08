@@ -14,7 +14,7 @@
 //
 // Logging defines
 //
-#define LOG_REG (1U << 1)    // Shows register setup
+#define LOG_REG  (1U << 1)   // Shows register setup
 #define LOG_FUNC (1U << 2)   // Function calls
 
 #define VERBOSE (0)

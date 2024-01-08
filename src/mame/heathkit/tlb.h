@@ -329,7 +329,7 @@ protected:
 
 	void control_reg_w(uint8_t data);
 	void video_memory_w(uint8_t data);
-	uint8_t video_memory_r(void);
+	uint8_t video_memory_r();
 
 	void io_addr_lo_w(uint8_t data);
 	void io_addr_hi_w(uint8_t data);

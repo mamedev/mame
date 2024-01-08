@@ -850,7 +850,7 @@ void h89_base_state::h89_base(machine_config &config)
 
 void h88_state::h88(machine_config &config)
 {
-	h89_base_state::h89_base(config);
+	h89_base(config);
 
 	m_maincpu->set_io_map(&h88_state::h88_io);
 

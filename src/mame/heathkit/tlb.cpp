@@ -121,11 +121,12 @@ DEFINE_DEVICE_TYPE(HEATH_ULTRA, heath_ultra_tlb_device, "heath_ultra_tlb", "Heat
 DEFINE_DEVICE_TYPE(HEATH_WATZ, heath_watz_tlb_device, "heath_watz_tlb", "Heath Terminal Logic Board w/Watzman ROM")
 DEFINE_DEVICE_TYPE(HEATH_GP19, heath_gp19_tlb_device, "heath_gp19_tlb", "Heath Terminal Logic Board plus Northwest Digital Systems GP-19")
 DEFINE_DEVICE_TYPE(HEATH_IMAGINATOR, heath_imaginator_tlb_device, "heath_imaginator_tlb", "Heath Terminal Logic Board plus Cleveland Codonics Imaginator I-100")
+
+// Devices for the terminal boards compatible with SigmaSoft IGC
 DEFINE_DEVICE_TYPE(HEATH_IGC, heath_igc_tlb_device, "heath_igc_tlb_device", "Heath Terminal Logic Board plus SigmaSoft Interactive Graphics Controller")
 DEFINE_DEVICE_TYPE(HEATH_IGC_SUPER19, heath_igc_super19_tlb_device, "heath_igc_super19_tlb_device", "Heath Terminal Logic Board w/ Super19 ROM plus SigmaSoft Interactive Graphics Controller")
 DEFINE_DEVICE_TYPE(HEATH_IGC_ULTRA, heath_igc_ultra_tlb_device, "heath_igc_ultra_tlb_device", "Heath Terminal Logic Board w/ Ultra ROM plus SigmaSoft Interactive Graphics Controller")
 DEFINE_DEVICE_TYPE(HEATH_IGC_WATZ, heath_igc_watz_tlb_device, "heath_igc_watz_tlb_device", "Heath Terminal Logic Board w/Watzman ROM plus SigmaSoft Interactive Graphics Controller")
-
 
 
 device_heath_tlb_card_interface::device_heath_tlb_card_interface(const machine_config &mconfig, device_t &device) :
@@ -1852,7 +1853,7 @@ void heath_igc_tlb_device::sigma_video_mem_w(uint8_t data)
 	m_p_graphic_ram[(m_memory_bank_select << 16) + m_io_address++] = data;
 }
 
-uint8_t heath_igc_tlb_device::sigma_video_mem_r(void)
+uint8_t heath_igc_tlb_device::sigma_video_mem_r()
 {
 	// control whether m_io_address is incremented during a read
 	uint32_t addr = (m_read_address_increment_disabled || machine().side_effects_disabled()) ?

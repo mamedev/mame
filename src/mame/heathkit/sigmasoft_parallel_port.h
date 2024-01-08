@@ -17,18 +17,18 @@ class sigmasoft_parallel_port : public device_t
 public:
 	sigmasoft_parallel_port(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	void write(offs_t reg, uint8_t val);
-	uint8_t   read(offs_t reg);
+	void    write(offs_t reg, uint8_t val);
+	uint8_t read(offs_t reg);
 
-	auto ctrl_r_cb() { return m_ctrl_r.bind(); }
+	auto ctrl_r_cb()      { return m_ctrl_r.bind(); }
 	auto video_mem_r_cb() { return m_video_mem_r.bind(); }
 
-	auto video_mem_cb() { return m_video_mem_w.bind(); }
-	auto io_lo_cb() { return m_io_lo_addr.bind(); }
-	auto io_hi_cb() { return m_io_hi_addr.bind(); }
-	auto window_lo_cb() { return m_window_lo_addr.bind(); }
-	auto window_hi_cb() { return m_window_hi_addr.bind(); }
-	auto ctrl_cb() { return m_ctrl_w.bind(); }
+	auto video_mem_cb()   { return m_video_mem_w.bind(); }
+	auto io_lo_cb()       { return m_io_lo_addr.bind(); }
+	auto io_hi_cb()       { return m_io_hi_addr.bind(); }
+	auto window_lo_cb()   { return m_window_lo_addr.bind(); }
+	auto window_hi_cb()   { return m_window_hi_addr.bind(); }
+	auto ctrl_cb()        { return m_ctrl_w.bind(); }
 
 protected:
 
