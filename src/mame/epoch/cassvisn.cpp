@@ -36,7 +36,7 @@ protected:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 private:
 
-	required_device<cpu_device> m_maincpu;
+	required_device<upd777_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 };
 
@@ -55,14 +55,13 @@ DEVICE_IMAGE_LOAD_MEMBER(cassvisn_state::cart_load)
 
 	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_BIG);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "prg");
-	uint8_t* prgbase = memregion("maincpu:prg")->base();
+	uint16_t* prgbase = m_maincpu->get_prgregion();
 	memcpy(prgbase, m_cart->get_rom_base(), size);
 
-	for (int i = 0; i < size; i += 2)
+	// TODO: why is this needed? doesn't matter if we set endianness to big or little
+	for (int i = 0; i < size / 2; i++)
 	{
-		uint8_t temp = prgbase[i + 0];
-		prgbase[i + 0] = prgbase[i + 1];
-		prgbase[i + 1] = temp;
+		prgbase[i] = ((prgbase[i] & 0xff00) >> 8) | ((prgbase[i] & 0x00ff) << 8);
 	}
 
 	size = m_cart->common_get_size("pat");
@@ -70,7 +69,7 @@ DEVICE_IMAGE_LOAD_MEMBER(cassvisn_state::cart_load)
 	if (size != 0x4d0)
 		return std::make_pair(image_error::UNSUPPORTED, "pat region size must be 0x4d0 in size");
 
-	m_cart->common_load_rom(memregion("maincpu:patterns")->base(), size, "pat");
+	m_cart->common_load_rom(m_maincpu->get_patregion(), size, "pat");
 	return std::make_pair(std::error_condition(), std::string());
 }
 

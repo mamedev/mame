@@ -10,7 +10,9 @@ upd777_device::upd777_device(const machine_config &mconfig, const char *tag, dev
 	upd777_cpu_device(mconfig, UPD777, tag, owner, clock),
 	m_gfxdecode(*this, "gfxdecode"),
 	m_palette(*this, "palette"),
-	m_screen(*this, "screen")
+	m_screen(*this, "screen"),
+	m_prgregion(*this, "prg"),
+	m_patregion(*this, "patterns")
 {
 }
 
@@ -27,7 +29,7 @@ uint32_t upd777_device::screen_update(screen_device &screen, bitmap_ind16 &bitma
 {
 	bitmap.fill(0, cliprect);
 	gfx_element *gfx = m_gfxdecode->gfx(0);
-	gfx_element *gfx2 = m_gfxdecode->gfx(0);
+	gfx_element *gfx2 = m_gfxdecode->gfx(1);
 
 	for (int i = 0; i <= 0x18; i++)
 	{
