@@ -10,10 +10,6 @@
 #define VERBOSE (LOG_UNHANDLED_OPS)
 #include "logmacro.h"
 
-// device type definitions
-DEFINE_DEVICE_TYPE(UPD777_CPU, upd777_cpu_device, "upd777cpu", "NEC uPD777 (CPU)")
-
-
 
 upd777_cpu_device::upd777_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor data)
 	: cpu_device(mconfig, type, tag, owner, clock)
@@ -23,8 +19,8 @@ upd777_cpu_device::upd777_cpu_device(const machine_config &mconfig, device_type 
 {
 }
 
-upd777_cpu_device::upd777_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: upd777_cpu_device(mconfig, UPD777_CPU, tag, owner, clock, address_map_constructor(FUNC(upd777_cpu_device::internal_data_map), this))
+upd777_cpu_device::upd777_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: upd777_cpu_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(upd777_cpu_device::internal_data_map), this))
 {
 }
 
@@ -43,7 +39,7 @@ device_memory_interface::space_config_vector upd777_cpu_device::memory_space_con
 
 void upd777_cpu_device::internal_map(address_map &map)
 {
-	map(0x000, 0x7ff).rom();
+	map(0x000, 0x7ff).rom().region("prg", 0);
 }
 
 void upd777_cpu_device::internal_data_map(address_map &map)
@@ -440,7 +436,8 @@ void upd777_cpu_device::do_op()
 		case 0b0000'0000'1000:
 		{
 			// 008 Move H[5:1] to Line Buffer Register[5:1]
-			LOGMASKED(LOG_UNHANDLED_OPS, "H->NRM\n");
+			u8 h = get_h();
+			LOGMASKED(LOG_UNHANDLED_OPS, "H(%02x)->NRM\n", h);
 			break;
 		}
 		case 0b0000'0001'1000:

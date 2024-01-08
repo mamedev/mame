@@ -10,7 +10,6 @@
 class upd777_cpu_device : public cpu_device
 {
 public:
-	upd777_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	enum {
 		UPD777_PC = 0,
@@ -28,6 +27,7 @@ public:
 	};
 
 protected:
+	upd777_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 	upd777_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor data);
 
 	virtual void device_start() override;
@@ -119,7 +119,5 @@ private:
 	u8 m_kie;
 	u8 m_sme;
 };
-
-DECLARE_DEVICE_TYPE(UPD777_CPU, upd777_cpu_device)
 
 #endif // MAME_CPU_UPD777_UPD777_H

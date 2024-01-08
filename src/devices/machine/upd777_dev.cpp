@@ -1,0 +1,63 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
+
+#include "emu.h"
+#include "upd777_dev.h"
+
+DEFINE_DEVICE_TYPE(UPD777,    upd777_device,    "upd777",    "uPD777")
+
+upd777_device::upd777_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	upd777_cpu_device(mconfig, UPD777, tag, owner, clock),
+	m_gfxdecode(*this, "gfxdecode"),
+	m_palette(*this, "palette")
+{
+}
+
+uint32_t upd777_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	return 0;
+}
+
+// documentation says patterns 0x00 - 0x6e are 7x7
+// and patterns 0x70 - 0x7e are 8x7
+// but they all seem to be stored at 11x7, just with some columns blank?
+static const gfx_layout test_layout =
+{
+	11,7,
+	0x80,
+	8,
+	{ 0 },
+	{ 0,1,2,3,4,5,6,7,8,9,10 },
+	{ 0*11,1*11,2*11,3*11,4*11,5*11,6*11 },
+	7*11
+};
+
+
+static GFXDECODE_START( gfx_ud777 )
+	GFXDECODE_ENTRY( "patterns", 0, test_layout, 0, 1  )
+GFXDECODE_END
+
+void upd777_device::device_add_mconfig(machine_config &config)
+{
+	// or pass the screen from the driver?
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 16, 256-16-1);
+	screen.set_screen_update(FUNC(upd777_device::screen_update));
+	screen.set_palette(m_palette);
+
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ud777);
+	PALETTE(config, m_palette).set_entries(0x1000);
+}
+
+ROM_START( upd777 )
+	ROM_REGION16_LE( 0x1000, "prg", ROMREGION_ERASEFF )
+	ROM_REGION( 0x4d0, "patterns", ROMREGION_ERASEFF )
+ROM_END
+
+const tiny_rom_entry *upd777_device::device_rom_region() const
+{
+	return ROM_NAME(upd777);
+}
