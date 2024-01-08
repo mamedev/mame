@@ -38171,6 +38171,7 @@ psion3a2_de                     // 1995 Psion Series 3a (German)
 psion3a2_ru                     // 1997 Psion Series 3a (Russian)
 psion3c                         // 1996 Psion Series 3c
 psion3mx                        // 1998 Psion Series 3mx
+psion3mx_fr                     // 1998 Psion Series 3mx (French)
 
 @source:psion/psion5.cpp
 psion5mx                        // 1999 Psion Series 5mx
