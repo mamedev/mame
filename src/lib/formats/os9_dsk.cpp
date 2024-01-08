@@ -76,7 +76,7 @@ int os9_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	int const type = find_size(io, form_factor, variants);
 
 	if (type != -1)
-		return FIFID_SIZE;
+		return FIFID_SIZE | FIFID_HINT;
 
 	return 0;
 }
@@ -287,166 +287,174 @@ const os9_format::format os9_format::formats[] = {
 		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
 		2000, 18, 80, 2, 256, {}, -1, {1, 7, 13, 2, 8, 14, 3, 9, 15, 4, 10, 16, 5, 11, 17, 6, 12, 18}, 18, 28, 20
 	},
+	{ // 6 360K 3"5 double density
+		floppy_image::FF_35, floppy_image::SSDD, floppy_image::MFM,
+		2000, 18, 80, 1, 256, {}, -1, {1, 7, 13, 2, 8, 14, 3, 9, 15, 4, 10, 16, 5, 11, 17, 6, 12, 18}, 18, 28, 20
+	},
+	{ // 7 720K 3"5 double density
+		floppy_image::FF_35, floppy_image::DSDD, floppy_image::MFM,
+		2000, 18, 80, 2, 256, {}, -1, {1, 7, 13, 2, 8, 14, 3, 9, 15, 4, 10, 16, 5, 11, 17, 6, 12, 18}, 18, 28, 20
+	},
 
 	// Non-COCO formats, with a sector base ID of zero.
 
-	{ // 6 87.5K 5 1/4 inch single density
+	{ // 8 87.5K 5 1/4 inch single density
 		floppy_image::FF_525, floppy_image::SSSD, floppy_image::FM,
 		4000, 10, 35, 1, 256, {}, -1, {0, 3, 6, 9, 2, 5, 8, 1, 4, 7}, 40, 16, 11
 	},
-	{ // 7 100K 5 1/4 inch single density
+	{ // 9 100K 5 1/4 inch single density
 		floppy_image::FF_525, floppy_image::SSSD, floppy_image::FM,
 		4000, 10, 40, 1, 256, {}, -1, {0, 3, 6, 9, 2, 5, 8, 1, 4, 7}, 40, 16, 11
 	},
-	{ // 8 200K 5 1/4 inch single density
+	{ // 10 200K 5 1/4 inch single density
 		floppy_image::FF_525, floppy_image::SSSD, floppy_image::FM,
 		4000, 10, 80, 1, 256, {}, -1, {0, 3, 6, 9, 2, 5, 8, 1, 4, 7}, 40, 16, 11
 	},
-	{ // 9 175K 5 1/4 inch single density
+	{ // 11 175K 5 1/4 inch single density
 		floppy_image::FF_525, floppy_image::DSSD, floppy_image::FM,
 		4000, 10, 35, 2, 256, {}, -1, {0, 3, 6, 9, 2, 5, 8, 1, 4, 7}, 40, 16, 11
 	},
-	{ // 10 200K 5 1/4 inch single density
+	{ // 12 200K 5 1/4 inch single density
 		floppy_image::FF_525, floppy_image::DSSD, floppy_image::FM,
 		4000, 10, 40, 2, 256, {}, -1, {0, 3, 6, 9, 2, 5, 8, 1, 4, 7}, 40, 16, 11
 	},
-	{ // 11 400K 5 1/4 inch single density
+	{ // 13 400K 5 1/4 inch single density
 		floppy_image::FF_525, floppy_image::DSSD, floppy_image::FM,
 		4000, 10, 80, 2, 256, {}, -1, {0, 3, 6, 9, 2, 5, 8, 1, 4, 7}, 40, 16, 11
 	},
-	{ // 12 138.5K 5 1/4 inch double density (single density track 0)
+	{ // 14 138.5K 5 1/4 inch double density (single density track 0)
 		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
 		2000, 16, 35, 1, 256, {}, -1, {0, 3, 6, 9, 12, 15, 2, 5, 8, 11, 14, 1, 4, 7, 10, 13}, 18, 28, 20
 	},
-	{ // 13 140K 5 1/4 inch double density
+	{ // 15 140K 5 1/4 inch double density
 		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
 		2000, 16, 35, 1, 256, {}, -1, {0, 3, 6, 9, 12, 15, 2, 5, 8, 11, 14, 1, 4, 7, 10, 13}, 18, 28, 20
 	},
-	{ // 14 278.5K 5 1/4 inch double density (single density track 0)
+	{ // 16 278.5K 5 1/4 inch double density (single density track 0)
 		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
 		2000, 16, 35, 2, 256, {}, -1, {0, 3, 6, 9, 12, 15, 2, 5, 8, 11, 14, 1, 4, 7, 10, 13}, 18, 28, 20
 	},
-	{ // 15 280K 5 1/4 inch double density
+	{ // 17 280K 5 1/4 inch double density
 		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
 		2000, 16, 35, 2, 256, {}, -1, {0, 3, 6, 9, 12, 15, 2, 5, 8, 11, 14, 1, 4, 7, 10, 13}, 18, 28, 20
 	},
-	{ // 16 158.5K 5 1/4 inch double density (single density track 0)
+	{ // 18 158.5K 5 1/4 inch double density (single density track 0)
 		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
 		2000, 16, 40, 1, 256, {}, -1, {0, 3, 6, 9, 12, 15, 2, 5, 8, 11, 14, 1, 4, 7, 10, 13}, 18, 28, 20
 	},
-	{ // 17 160K 5 1/4 inch double density
+	{ // 19 160K 5 1/4 inch double density
 		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
 		2000, 16, 40, 1, 256, {}, -1, {0, 3, 6, 9, 12, 15, 2, 5, 8, 11, 14, 1, 4, 7, 10, 13}, 18, 28, 20
-	},
-	{ // 18 318.5K 5 1/4 inch double density (single density track 0)
-		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
-		2000, 16, 40, 2, 256, {}, -1, {0, 3, 6, 9, 12, 15, 2, 5, 8, 11, 14, 1, 4, 7, 10, 13}, 18, 28, 20
-	},
-	{ // 19 320K 5 1/4 inch double density
-		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
-		2000, 16, 40, 2, 256, {}, -1, {0, 3, 6, 9, 12, 15, 2, 5, 8, 11, 14, 1, 4, 7, 10, 13}, 18, 28, 20
 	},
 	{ // 20 318.5K 5 1/4 inch double density (single density track 0)
 		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
-		2000, 16, 80, 1, 256, {}, -1, {0, 3, 6, 9, 12, 15, 2, 5, 8, 11, 14, 1, 4, 7, 10, 13}, 18, 28, 20
+		2000, 16, 40, 2, 256, {}, -1, {0, 3, 6, 9, 12, 15, 2, 5, 8, 11, 14, 1, 4, 7, 10, 13}, 18, 28, 20
 	},
 	{ // 21 320K 5 1/4 inch double density
 		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
+		2000, 16, 40, 2, 256, {}, -1, {0, 3, 6, 9, 12, 15, 2, 5, 8, 11, 14, 1, 4, 7, 10, 13}, 18, 28, 20
+	},
+	{ // 22 318.5K 5 1/4 inch double density (single density track 0)
+		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
 		2000, 16, 80, 1, 256, {}, -1, {0, 3, 6, 9, 12, 15, 2, 5, 8, 11, 14, 1, 4, 7, 10, 13}, 18, 28, 20
 	},
-	{ // 22 638.5 5 1/4 inch double density (single density track 0)
+	{ // 23 320K 5 1/4 inch double density
+		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
+		2000, 16, 80, 1, 256, {}, -1, {0, 3, 6, 9, 12, 15, 2, 5, 8, 11, 14, 1, 4, 7, 10, 13}, 18, 28, 20
+	},
+	{ // 24 638.5 5 1/4 inch double density (single density track 0)
 		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
 		2000, 16, 80, 2, 256, {}, -1, {0, 3, 6, 9, 12, 15, 2, 5, 8, 11, 14, 1, 4, 7, 10, 13}, 18, 28, 20
 	},
-	{ // 23 640K 5 1/4 inch double density
+	{ // 25 640K 5 1/4 inch double density
 		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
 		2000, 16, 80, 2, 256, {}, -1, {0, 3, 6, 9, 12, 15, 2, 5, 8, 11, 14, 1, 4, 7, 10, 13}, 18, 28, 20
 	},
-	{ // 24 155.5K 5 1/4 inch double density (single density track 0)
+	{ // 26 155.5K 5 1/4 inch double density (single density track 0)
 		floppy_image::FF_525, floppy_image::SSDD, floppy_image::MFM,
 		2000, 18, 35, 1, 256, {}, -1, {0, 5, 10, 15, 2, 7, 12, 17, 4, 9, 14, 1, 6, 11, 16, 3, 8, 13}, 80, 22, 24
 	},
-	{ // 25 157.5K 5 1/4 inch double density
+	{ // 27 157.5K 5 1/4 inch double density
 		floppy_image::FF_525, floppy_image::SSDD, floppy_image::MFM,
 		2000, 18, 35, 1, 256, {}, -1, {0, 5, 10, 15, 2, 7, 12, 17, 4, 9, 14, 1, 6, 11, 16, 3, 8, 13}, 80, 22, 24
 	},
-	{ // 26 311K 5 1/4 inch double density (single density track 0)
+	{ // 28 311K 5 1/4 inch double density (single density track 0)
 		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
 		2000, 18, 35, 2, 256, {}, -1, {0, 5, 10, 15, 2, 7, 12, 17, 4, 9, 14, 1, 6, 11, 16, 3, 8, 13}, 80, 22, 24
 	},
-	{ // 27 315K 5 1/4 inch double density
+	{ // 29 315K 5 1/4 inch double density
 		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
 		2000, 18, 35, 2, 256, {}, -1, {0, 5, 10, 15, 2, 7, 12, 17, 4, 9, 14, 1, 6, 11, 16, 3, 8, 13}, 80, 22, 24
 	},
-	{ // 28 178K 5 1/4 inch double density (single density track 0)
+	{ // 30 178K 5 1/4 inch double density (single density track 0)
 		floppy_image::FF_525, floppy_image::SSDD, floppy_image::MFM,
 		2000, 18, 40, 1, 256, {}, -1, {0, 5, 10, 15, 2, 7, 12, 17, 4, 9, 14, 1, 6, 11, 16, 3, 8, 13}, 80, 22, 24
 	},
-	{ // 29 180K 5 1/4 inch double density
+	{ // 31 180K 5 1/4 inch double density
 		floppy_image::FF_525, floppy_image::SSDD, floppy_image::MFM,
 		2000, 18, 40, 1, 256, {}, -1, {0, 5, 10, 15, 2, 7, 12, 17, 4, 9, 14, 1, 6, 11, 16, 3, 8, 13}, 80, 22, 24
 	},
-	{ // 30 356K 5 1/4 inch double density (single density track 0)
+	{ // 32 356K 5 1/4 inch double density (single density track 0)
 		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
 		2000, 18, 40, 2, 256, {}, -1, {0, 5, 10, 15, 2, 7, 12, 17, 4, 9, 14, 1, 6, 11, 16, 3, 8, 13}, 80, 22, 24
 	},
-	{ // 31 360K 5 1/4 inch double density
+	{ // 33 360K 5 1/4 inch double density
 		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
 		2000, 18, 40, 2, 256, {}, -1, {0, 5, 10, 15, 2, 7, 12, 17, 4, 9, 14, 1, 6, 11, 16, 3, 8, 13}, 80, 22, 24
 	},
-	{ // 32 358K 5 1/4 inch quad density (single density track 0)
+	{ // 34 358K 5 1/4 inch quad density (single density track 0)
 		floppy_image::FF_525, floppy_image::SSQD, floppy_image::MFM,
 		2000, 18, 80, 1, 256, {}, -1, {0, 5, 10, 15, 2, 7, 12, 17, 4, 9, 14, 1, 6, 11, 16, 3, 8, 13}, 80, 22, 24
 	},
-	{ // 33 360K 5 1/4 inch quad density
+	{ // 35 360K 5 1/4 inch quad density
 		floppy_image::FF_525, floppy_image::SSQD, floppy_image::MFM,
 		2000, 18, 80, 1, 256, {}, -1, {0, 5, 10, 15, 2, 7, 12, 17, 4, 9, 14, 1, 6, 11, 16, 3, 8, 13}, 80, 22, 24
 	},
-	{ // 34 716K 5 1/4 inch quad density (single density track 0)
+	{ // 36 716K 5 1/4 inch quad density (single density track 0)
 		floppy_image::FF_525, floppy_image::DSQD, floppy_image::MFM,
 		2000, 18, 80, 2, 256, {}, -1, {0, 5, 10, 15, 2, 7, 12, 17, 4, 9, 14, 1, 6, 11, 16, 3, 8, 13}, 80, 22, 24
 	},
-	{ // 35 720K 5 1/4 inch quad density
+	{ // 37 720K 5 1/4 inch quad density
 		floppy_image::FF_525, floppy_image::DSQD, floppy_image::MFM,
 		2000, 18, 80, 2, 256, {}, -1, {0, 5, 10, 15, 2, 7, 12, 17, 4, 9, 14, 1, 6, 11, 16, 3, 8, 13}, 80, 22, 24
 	},
-	{ // 36 288.75K 8 inch single density
+	{ // 38 288.75K 8 inch single density
 		floppy_image::FF_8, floppy_image::SSSD, floppy_image::FM,
 		2000, 15, 77, 1, 256, {}, -1, {0, 2, 4, 6, 8, 10, 12, 14, 1, 3, 5, 7, 9, 11, 13}, 40, 12, 12
 	},
-	{ // 37 577.5K 8 inch single density
+	{ // 39 577.5K 8 inch single density
 		floppy_image::FF_8, floppy_image::DSSD, floppy_image::FM,
 		2000, 15, 77, 2, 256, {}, -1, {0, 2, 4, 6, 8, 10, 12, 14, 1, 3, 5, 7, 9, 11, 13}, 40, 12, 12
 	},
-	{ // 38 308K 8 inch single density
+	{ // 40 308K 8 inch single density
 		floppy_image::FF_8, floppy_image::SSSD, floppy_image::FM,
 		2000, 16, 77, 1, 256, {}, -1, {0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15}, 35, 12, 12
 	},
-	{ // 39 616K 8 inch single density
+	{ // 41 616K 8 inch single density
 		floppy_image::FF_8, floppy_image::DSSD, floppy_image::FM,
 		2000, 16, 77, 2, 256, {}, -1, {0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15}, 35, 12, 12
 	},
-	{ // 40 497.75K 8 inch double density (single density track 0)
+	{ // 42 497.75K 8 inch double density (single density track 0)
 		floppy_image::FF_8, floppy_image::SSDD, floppy_image::MFM,
 		1000, 26, 77, 1, 256, {}, -1, {0, 19, 12, 5, 24, 17, 10, 3, 22, 15, 8, 1, 20, 13, 6, 25, 18, 11, 4, 23, 16, 9, 2, 21, 14, 7}, 80, 22, 24
 	},
-	{ // 41 500.5K 8 inch double density
+	{ // 43 500.5K 8 inch double density
 		floppy_image::FF_8, floppy_image::SSDD, floppy_image::MFM,
 		1000, 26, 77, 1, 256, {}, -1, {0, 19, 12, 5, 24, 17, 10, 3, 22, 15, 8, 1, 20, 13, 6, 25, 18, 11, 4, 23, 16, 9, 2, 21, 14, 7}, 80, 22, 24
 	},
-	{ // 42 995.5K 8 inch double density (single density track 0)
+	{ // 44 995.5K 8 inch double density (single density track 0)
 		floppy_image::FF_8, floppy_image::DSDD, floppy_image::MFM,
 		1000, 26, 77, 2, 256, {}, -1, {0, 19, 12, 5, 24, 17, 10, 3, 22, 15, 8, 1, 20, 13, 6, 25, 18, 11, 4, 23, 16, 9, 2, 21, 14, 7}, 80, 22, 24
 	},
-	{ // 43 1001K 8 inch double density
+	{ // 45 1001K 8 inch double density
 		floppy_image::FF_8, floppy_image::DSDD, floppy_image::MFM,
 		1000, 26, 77, 2, 256, {}, -1, {0, 19, 12, 5, 24, 17, 10, 3, 22, 15, 8, 1, 20, 13, 6, 25, 18, 11, 4, 23, 16, 9, 2, 21, 14, 7}, 80, 22, 24
 	},
-	{ // 44 1440K 3 1/2 inch high density (single density track 0)
+	{ // 46 1440K 3 1/2 inch high density (single density track 0)
 		floppy_image::FF_35,  floppy_image::DSHD, floppy_image::MFM,
 		1000, 36, 80, 2, 256, {}, -1, {0, 25, 14, 3, 28, 17, 6, 31, 20, 9, 34, 23, 12, 1, 26, 15, 4, 29, 18, 7, 32, 21, 10, 35, 24, 13, 2, 27, 16, 5, 30, 19, 8, 33, 22, 11}, 80, 22, 24
 	},
-	{ // 45 1440K 3 1/2 inch high density.
+	{ // 47 1440K 3 1/2 inch high density.
 		floppy_image::FF_35,  floppy_image::DSHD, floppy_image::MFM,
 		1000, 36, 80, 2, 256, {}, -1, {0, 25, 14, 3, 28, 17, 6, 31, 20, 9, 34, 23, 12, 1, 26, 15, 4, 29, 18, 7, 32, 21, 10, 35, 24, 13, 2, 27, 16, 5, 30, 19, 8, 33, 22, 11}, 80, 22, 24
 	},
@@ -468,118 +476,122 @@ const os9_format::format os9_format::formats_track0[] = {
 	},
 	{ // 5 720K 5"25 double density
 	},
+	{ // 6 360K 3"5 double density
+	},
+	{ // 7 720K 3"5 double density
+	},
 
 	// Non-COCO formats, with a sector base ID of zero.
 
-	{ // 6 87.5K 5 1/4 inch single density
+	{ // 8 87.5K 5 1/4 inch single density
 	},
-	{ // 7 100K 5 1/4 inch single density
-	},
-	{ // 8 200K 5 1/4 inch single density
-	},
-	{ // 9 175K 5 1/4 inch single density
+	{ // 9 100K 5 1/4 inch single density
 	},
 	{ // 10 200K 5 1/4 inch single density
 	},
-	{ // 11 400K 5 1/4 inch single density
+	{ // 11 175K 5 1/4 inch single density
 	},
-	{ // 12 138.5K 5 1/4 inch double density (single density track 0)
+	{ // 12 200K 5 1/4 inch single density
+	},
+	{ // 13 400K 5 1/4 inch single density
+	},
+	{ // 14 138.5K 5 1/4 inch double density (single density track 0)
 		floppy_image::FF_525, floppy_image::SSSD, floppy_image::FM,
 		4000, 10, 35, 1, 256, {}, -1, {0, 3, 6, 9, 2, 5, 8, 1, 4, 7}, 40, 16, 11
 	},
-	{ // 13 140K 5 1/4 inch double density
+	{ // 15 140K 5 1/4 inch double density
 	},
-	{ // 14 278.5K 5 1/4 inch double density (single density track 0)
+	{ // 16 278.5K 5 1/4 inch double density (single density track 0)
 		floppy_image::FF_525, floppy_image::SSSD, floppy_image::FM,
 		4000, 10, 35, 2, 256, {}, -1, {0, 3, 6, 9, 2, 5, 8, 1, 4, 7}, 40, 16, 11
 	},
-	{ // 15 280K 5 1/4 inch double density
+	{ // 17 280K 5 1/4 inch double density
 	},
-	{ // 16 158.5K 5 1/4 inch double density (single density track 0)
+	{ // 18 158.5K 5 1/4 inch double density (single density track 0)
 		floppy_image::FF_525, floppy_image::SSSD, floppy_image::FM,
 		4000, 10, 40, 1, 256, {}, -1, {0, 3, 6, 9, 2, 5, 8, 1, 4, 7}, 40, 16, 11
 	},
-	{ // 17 160K 5 1/4 inch double density
-	},
-	{ // 18 318.5K 5 1/4 inch double density (single density track 0)
-		floppy_image::FF_525, floppy_image::SSSD, floppy_image::FM,
-		4000, 10, 40, 2, 256, {}, -1, {0, 3, 6, 9, 2, 5, 8, 1, 4, 7}, 40, 16, 11
-	},
-	{ // 19 320K 5 1/4 inch double density
+	{ // 19 160K 5 1/4 inch double density
 	},
 	{ // 20 318.5K 5 1/4 inch double density (single density track 0)
 		floppy_image::FF_525, floppy_image::SSSD, floppy_image::FM,
-		4000, 10, 80, 1, 256, {}, -1, {0, 3, 6, 9, 2, 5, 8, 1, 4, 7}, 40, 16, 11
+		4000, 10, 40, 2, 256, {}, -1, {0, 3, 6, 9, 2, 5, 8, 1, 4, 7}, 40, 16, 11
 	},
 	{ // 21 320K 5 1/4 inch double density
 	},
-	{ // 22 638.5 5 1/4 inch double density (single density track 0)
-		floppy_image::FF_525, floppy_image::SSSD, floppy_image::FM,
-		4000, 10, 80, 2, 256, {}, -1, {0, 3, 6, 9, 2, 5, 8, 1, 4, 7}, 40, 16, 11
-	},
-	{ // 23 640K 5 1/4 inch double density
-	},
-	{ // 24 155.5K 5 1/4 inch double density (single density track 0)
-		floppy_image::FF_525, floppy_image::SSSD, floppy_image::FM,
-		4000, 10, 35, 1, 256, {}, -1, {0, 3, 6, 9, 2, 5, 8, 1, 4, 7}, 40, 16, 11
-	},
-	{ // 25 157.5K 5 1/4 inch double density
-	},
-	{ // 26 311K 5 1/4 inch double density (single density track 0)
-		floppy_image::FF_525, floppy_image::SSSD, floppy_image::FM,
-		4000, 10, 35, 2, 256, {}, -1, {0, 3, 6, 9, 2, 5, 8, 1, 4, 7}, 40, 16, 11
-	},
-	{ // 27 315K 5 1/4 inch double density
-	},
-	{ // 28 178K 5 1/4 inch double density (single density track 0)
-		floppy_image::FF_525, floppy_image::SSSD, floppy_image::FM,
-		4000, 10, 40, 1, 256, {}, -1, {0, 3, 6, 9, 2, 5, 8, 1, 4, 7}, 40, 16, 11
-	},
-	{ // 29 180K 5 1/4 inch double density
-	},
-	{ // 30 356K 5 1/4 inch double density (single density track 0)
-		floppy_image::FF_525, floppy_image::SSSD, floppy_image::FM,
-		4000, 10, 40, 2, 256, {}, -1, {0, 3, 6, 9, 2, 5, 8, 1, 4, 7}, 40, 16, 11
-	},
-	{ // 31 360K 5 1/4 inch double density
-	},
-	{ // 32 358K 5 1/4 inch quad density (single density track 0)
+	{ // 22 318.5K 5 1/4 inch double density (single density track 0)
 		floppy_image::FF_525, floppy_image::SSSD, floppy_image::FM,
 		4000, 10, 80, 1, 256, {}, -1, {0, 3, 6, 9, 2, 5, 8, 1, 4, 7}, 40, 16, 11
 	},
-	{ // 33 360K 5 1/4 inch quad density
+	{ // 23 320K 5 1/4 inch double density
 	},
-	{ // 34 716K 5 1/4 inch quad density (single density track 0)
+	{ // 24 638.5 5 1/4 inch double density (single density track 0)
 		floppy_image::FF_525, floppy_image::SSSD, floppy_image::FM,
 		4000, 10, 80, 2, 256, {}, -1, {0, 3, 6, 9, 2, 5, 8, 1, 4, 7}, 40, 16, 11
 	},
-	{ // 35 720K 5 1/4 inch quad density
+	{ // 25 640K 5 1/4 inch double density
 	},
-	{ // 36 288.75K 8 inch single density
+	{ // 26 155.5K 5 1/4 inch double density (single density track 0)
+		floppy_image::FF_525, floppy_image::SSSD, floppy_image::FM,
+		4000, 10, 35, 1, 256, {}, -1, {0, 3, 6, 9, 2, 5, 8, 1, 4, 7}, 40, 16, 11
 	},
-	{ // 37 577.5K 8 inch single density
+	{ // 27 157.5K 5 1/4 inch double density
 	},
-	{ // 38 308K 8 inch single density
+	{ // 28 311K 5 1/4 inch double density (single density track 0)
+		floppy_image::FF_525, floppy_image::SSSD, floppy_image::FM,
+		4000, 10, 35, 2, 256, {}, -1, {0, 3, 6, 9, 2, 5, 8, 1, 4, 7}, 40, 16, 11
 	},
-	{ // 39 616K 8 inch single density
+	{ // 29 315K 5 1/4 inch double density
 	},
-	{ // 40 497.75K 8 inch double density (single density track 0)
+	{ // 30 178K 5 1/4 inch double density (single density track 0)
+		floppy_image::FF_525, floppy_image::SSSD, floppy_image::FM,
+		4000, 10, 40, 1, 256, {}, -1, {0, 3, 6, 9, 2, 5, 8, 1, 4, 7}, 40, 16, 11
+	},
+	{ // 31 180K 5 1/4 inch double density
+	},
+	{ // 32 356K 5 1/4 inch double density (single density track 0)
+		floppy_image::FF_525, floppy_image::SSSD, floppy_image::FM,
+		4000, 10, 40, 2, 256, {}, -1, {0, 3, 6, 9, 2, 5, 8, 1, 4, 7}, 40, 16, 11
+	},
+	{ // 33 360K 5 1/4 inch double density
+	},
+	{ // 34 358K 5 1/4 inch quad density (single density track 0)
+		floppy_image::FF_525, floppy_image::SSSD, floppy_image::FM,
+		4000, 10, 80, 1, 256, {}, -1, {0, 3, 6, 9, 2, 5, 8, 1, 4, 7}, 40, 16, 11
+	},
+	{ // 35 360K 5 1/4 inch quad density
+	},
+	{ // 36 716K 5 1/4 inch quad density (single density track 0)
+		floppy_image::FF_525, floppy_image::SSSD, floppy_image::FM,
+		4000, 10, 80, 2, 256, {}, -1, {0, 3, 6, 9, 2, 5, 8, 1, 4, 7}, 40, 16, 11
+	},
+	{ // 37 720K 5 1/4 inch quad density
+	},
+	{ // 38 288.75K 8 inch single density
+	},
+	{ // 39 577.5K 8 inch single density
+	},
+	{ // 40 308K 8 inch single density
+	},
+	{ // 41 616K 8 inch single density
+	},
+	{ // 42 497.75K 8 inch double density (single density track 0)
 		floppy_image::FF_8, floppy_image::DSSD, floppy_image::FM,
 		2000, 15, 77, 1, 256, {}, -1, {0, 2, 4, 6, 8, 10, 12, 14, 1, 3, 5, 7, 9, 11, 13}, 40, 12, 12
 	},
-	{ // 41 500.5K 8 inch double density
+	{ // 43 500.5K 8 inch double density
 	},
-	{ // 42 995.5K 8 inch double density (single density track 0)
+	{ // 44 995.5K 8 inch double density (single density track 0)
 		floppy_image::FF_8, floppy_image::DSSD, floppy_image::FM,
 		2000, 15, 77, 2, 256, {}, -1, {0, 2, 4, 6, 8, 10, 12, 14, 1, 3, 5, 7, 9, 11, 13}, 40, 12, 12
 	},
-	{ // 43 1001K 8 inch double density
+	{ // 45 1001K 8 inch double density
 	},
-	{ // 44 1440K 3 1/2 inch high density (single density track 0)
+	{ // 46 1440K 3 1/2 inch high density (single density track 0)
 		floppy_image::FF_35,  floppy_image::DSSD, floppy_image::FM,
 		2000, 18, 80, 2, 256, {}, -1, {0, 5, 10, 15, 2, 7, 12, 17, 4, 9, 14, 1, 6, 11, 16, 3, 8, 13}, 40, 12, 12
 	},
-	{ // 45 1440K 3 1/2 inch high density.
+	{ // 47 1440K 3 1/2 inch high density.
 	},
 	{}
 };
