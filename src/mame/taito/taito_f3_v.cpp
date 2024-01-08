@@ -199,28 +199,49 @@ Line ram memory map:
 
     F3 sprite format:
 
-    Word 0: 0xffff      Tile number (LSB)
-    Word 1: 0xff00      X zoom
-            0x00ff      Y zoom
-    Word 2: 0x0fff      X position (12 bits signed)
-    Word 3: 0x0fff      Y position (12 bits signed)
-    Word 4: 0xf000      Sprite block position controls 
-            0x0800      Is child
-            0x0400      Reuse prev color
-            0x0200      Y flip
-            0x0100      X flip
-            0x00ff      Colour
-    Word 5: 0xc000      ? Unknown/unused?
-            0x2000      Flipscreen...?
-            0x1000      Sprite is disabled? (check Riding Fight)
-            0x0c00      ? Unknown/unused?
-            0x0300      Extra planes enable (00 = 4bpp, 01 = 5bpp, 11 = 6bpp)
-            0x00fc      ? Unknown/unused?
-            0x0002      Set during darius gaiden sprite trails (disable unblitting?)
-            0x0001      Tile number (MSB/bankswitch)
-    Word 6: 0x8000      If set, jump to sprite location in low bits
-            0x03ff      Location to jump to.
-    Word 7: 0xffff      Unused?  Always zero?
+    word 0: [tttt tttt tttt tttt]
+     t: lower 16 bits of tile number
+
+    word 1: [yyyy yyyy xxxx xxxx]
+     y: y zoom (scale factor is: (256-zoom)/256)
+     x: x zoom
+
+    word 2: [iiss xxxx xxxx xxxx]
+     i: ignore global/subglobal scroll
+     s: set global/subglobal scroll
+     x: x position (signed 12 bits)
+
+    word 3: [c.BA yyyy yyyy yyyy]
+     c: special command (parameters are in word 5)
+     B: ? set by gseeker on a special command (also sets word 3 to FFEE: probably a position overflow again)
+     A: ? set by ridingf on ACTUAL SPRITES during gameplay - probably just the position overflowing
+     y: y position (signed 12 bits)
+     (???) ridingf sets this word to 0x9000 at 0x3710, and 0x9001 at 0xB710
+
+    word 4: [bbbb mlyx cccc cccc]
+     b: block position controls
+     m: "multi" ? has something to do with sprite blocks but i don't use it
+     l: "lock" (set to 0 on the first sprite in a block, 1 on all others)
+     y: y flip
+     x: x flip
+     c: color palette
+
+    word 5: [.... .... .... ...h] (normal sprite)
+     h: upper bit of tile number
+    word 5: [..fA ..pp ..?? ..tb] (if special command bit set)
+     f: enable flipscreen
+     A: ??? set by ridingf
+     p: enable extra planes (00 = 4bpp, 01 = 5bpp, 11 = 6bpp)
+     t: enable sprite trails (don't clear framebuffer)
+     b: sprite bank to switch to
+     (???) ridingf sets this word to 1000/1001 at 0x3710 and 0xB710
+
+    word 6: [j... ..ii iiii iiii]
+     j: jump command if set
+     i: index to jump to (0-1023)
+
+    word 7: [.... .... .... ....]
+     (unused)
 
 ****************************************************************************
 
@@ -563,6 +584,8 @@ void taito_f3_state::video_start()
 	m_gfxdecode->gfx(3)->set_granularity(16);
 
 	m_flipscreen = false;
+	m_sprite_bank = 0;
+	m_sprite_trails = false;
 	//memset(m_spriteram16_buffered.get(), 0, 0x10000);
 	memset(&m_spriteram[0], 0, 0x10000);
 
@@ -1350,11 +1373,9 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 			if (!BIT(scroll, 3))
 				new_pos += global;
 
-			switch (block_ctrl)
-			{
+			switch (block_ctrl) {
 			case 0b00:
-				if (!lock)
-				{
+				if (!lock) {
 					block_pos = new_pos << 8;
 					block_scale = (0x100 - new_zoom);
 				}
@@ -1383,39 +1404,54 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 		int bank = m_sprite_bank ? 0x4000 : 0;
 		const u16 *spr = &spriteram16_ptr[bank + (offs * 8)];
 
-		/* Check if special command bit is set */
-		if (BIT(spr[3], 15))
-		{
+		// Check if special command bit is set
+		if (BIT(spr[3], 15)) {
 			u16 cntrl = spr[5];
 			m_flipscreen = BIT(cntrl, 13);
 
 			/*
 			    ??f? ??dd ???? ??tb
-			    
-			    
+
 			    cntrl bit 12(0x1000) = disabled?  (From F2 driver, doesn't seem used anywhere)
 			    cntrl bit 4 (0x0010) = ???
 			    cntrl bit 5 (0x0020) = ???
-			    cntrl bit 1 (0x0002) = enabled when Darius Gaiden sprite trail effect should occur (MT #1922)
-			                     Notice that sprites also completely disappear due of a bug/missing feature in the alpha routines.
 			*/
 
-			m_sprite_extra_planes = BIT(cntrl, 8, 2); // 00 = 4bpp, 01 = 5bpp, 10 = unused?, 11 = 6bpp
+			m_sprite_extra_planes = BIT(cntrl, 8, 2); // 00 = 4bpp, 01 = 5bpp, 10 = nonsense, 11 = 6bpp
 			m_sprite_pen_mask = (m_sprite_extra_planes << 4) | 0x0f;
+			m_sprite_trails = BIT(cntrl, 1);
 
-			/* Sprite bank select */
+			if (cntrl & 0b1101'1100'1111'1100) {
+				logerror("unknown sprite command bits: %4x\n", cntrl);
+			}
+
+			// Sprite bank select
 			m_sprite_bank = BIT(cntrl, 0);
+		} else {
+			if (spr[5]>>1) {
+				logerror("unknown word 5 bits: %4x\n", spr[5]);
+			}
 		}
 
-		/* Check if the sprite list jump bit is set */
+		if (spr[3] & 0b0110'0000'0000'0000) {
+			logerror("unknown sprite y upper bits: %4x\n", spr[3]);
+		}
+		if (spr[6] & 0b0111'1100'0000'0000) {
+			// landmakrj: 8BFF ?
+			logerror("unknown sprite jump bits: %4x\n", spr[6]);
+		}
+		if (spr[7] != 0) {
+			logerror("unknown sprite word 7: %4x\n", spr[7]);
+		}
+
+		// Check if the sprite list jump bit is set
 		// we have to check this AFTER processing sprite commands because recalh uses a sprite command and jump in the same sprite
-		if (BIT(spr[6], 15))
-		{
+		// i wonder if this should go after other sprite processsing as well?  can a regular sprite have a jump ?
+		if (BIT(spr[6], 15)) {
 			const int new_offs = BIT(spr[6], 0, 10);
 			if (new_offs == offs) // could this be ≤ ? -- NO! RECALH USES BACKWARDS JUMPS!!
-			{
 				break; // optimization, edge cases to watch for: looped sprite block commands?
-			}
+
 			offs = new_offs - 1; // subtract because we increment in the for loop
 		}
 
@@ -1428,8 +1464,8 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 		x.update(scroll_mode, spr[2] & 0xFFF, lock, BIT(spritecont, 4+2, 2), zooms & 0xFF);
 		y.update(scroll_mode, spr[3] & 0xFFF, lock, BIT(spritecont, 4+0, 2), zooms >> 8);
 
-		const int tile = spr[0] | (BIT(spr[5], 0) << 16);
-		if (!tile) continue;
+		int tile = spr[0] | (BIT(spr[5], 0) << 16);
+		if (!tile) continue; // todo: is this the correct way to tell if a sprite exists?
 
 		const fixed8 tx = m_flipscreen ? (512<<8) - x.block_scale*16 - x.pos : x.pos;
 		const fixed8 ty = m_flipscreen ? (256<<8) - y.block_scale*16 - y.pos : y.pos;
@@ -1455,23 +1491,22 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 	m_sprite_end = sprite_ptr;
 }
 
+
 void taito_f3_state::draw_sprites(const rectangle &cliprect)
 {
-	// todo: don't clear these if trails are enabled
-	m_pri_alp_bitmap.fill(0);
-	for (auto &sp_bitmap : m_sprite_framebuffers) {
-		sp_bitmap.fill(0);
+	if (!m_sprite_trails) {
+		m_pri_alp_bitmap.fill(0);
+		for (auto &sp_bitmap : m_sprite_framebuffers) {
+			sp_bitmap.fill(0);
+		}
 	}
-	
+
 	rectangle myclip = cliprect;
 	myclip &= m_pri_alp_bitmap.cliprect();
-	
+
 	for (auto* spr = m_sprite_end; spr-- != &m_spritelist[0]; ) {
 		f3_drawgfx(*spr, myclip);
 	}
-	
-	//m_sprite_pri_usage = 0;
-	//m_sprite_pri_usage |= 1 << pri; ?? do we still need this?
 }
 
 /******************************************************************************/
@@ -1482,12 +1517,6 @@ u32 taito_f3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	bitmap.fill(0, cliprect);
-	
-	/* sprites */
-	//if (m_sprite_lag == 0)
-	// these are getted during vblank now
-	//get_sprite_info(m_spriteram.target());
-
 
 	/* Update sprite buffer */
 	//draw_sprites(bitmap, cliprect);

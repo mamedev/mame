@@ -307,9 +307,10 @@ protected:
 	bool m_extend = false;
 	u8 m_sprite_extra_planes = 0;
 	u8 m_sprite_pen_mask = 0;
+	bool m_sprite_trails = false;
 	u16 *m_pf_data[8]{};
 	int m_sprite_lag = 0;
-	u8 m_sprite_pri_usage = 0;
+	//u8 m_sprite_pri_usage = 0;
 	bitmap_ind8 m_pri_alp_bitmap;
 	bitmap_ind16 m_sprite_framebuffers[NUM_SPRITEGROUPS]{};
 	u16 m_width_mask = 0;
