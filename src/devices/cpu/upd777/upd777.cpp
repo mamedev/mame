@@ -314,7 +314,10 @@ void upd777_cpu_device::do_op()
 	{
 		// 080 - 0ff Skip if (M[H[5:1],L[2:1]][7:1]-K[7:1]) makes borrow
 		const int k = inst & 0x7f;
-		LOGMASKED(LOG_UNHANDLED_OPS, "M-0x%02x\n", k);
+		u8 m = get_m_data();
+		m = m - k;
+		if (m & 0x80)
+			m_skip = 1;
 	}
 	else if (inst >= 0b0001'0000'0000 && inst <= 0b0001'0111'1111)
 	{
@@ -927,7 +930,50 @@ void upd777_cpu_device::do_op()
 			const int reg2 = (inst & 0x10) >> 4;
 			const int reg1 = (inst & 0x40) >> 6;
 			const int n = inst & 0x3;
-			LOGMASKED(LOG_UNHANDLED_OPS, "%s%s%s->%s, 0x%d->L %s\n", get_reg_name(reg1), get_300optype_name(optype), get_reg_name(reg2), get_reg_name(reg1), n, (optype == 3) ? "BOJ" : "");
+
+			u8 src1 = 0;
+			if (reg1 == 0)
+				src1 = get_a1();
+			else
+				src1 = get_a2();
+
+			u8 src2 = 0;
+			if (reg2 == 0)
+				src2 = get_a1();
+			else
+				src2 = get_a2();
+
+			switch (optype)
+			{
+			case 0: // AND
+			{
+				src1 = src1 & src2;
+				break;
+			}
+			case 1: // ADD
+			{
+				src1 = src1 + src2;
+				break;
+			}
+			case 2: // OR
+			{
+				src1 = src1 | src2;
+				break;
+			}
+			case 3: // MINUS
+			{
+				src1 = src1 - src2;
+				if (src1 & 0x80)
+					m_skip = 1;
+				break;
+			}
+			}
+
+			if (reg1 == 0)
+				set_a1(src1);
+			else
+				set_a2(src1);
+
 			set_l(n);
 			break;
 		}

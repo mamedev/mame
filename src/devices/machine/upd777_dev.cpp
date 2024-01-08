@@ -52,7 +52,7 @@ uint32_t upd777_device::screen_update(screen_device &screen, bitmap_ind16 &bitma
 // 0x30-0x67 are 'Bent' (7x7)
 // 0x68-0x6f are 'Y Repeat' (7x7)
 // 0x70-0x77 are 'XY Repeat' (8x7)
-// 0x78-0x7f are 'X Repeat' (8x8)
+// 0x78-0x7f are 'X Repeat' (8x7)
 // 
 // NOTE, sprite patterns *7 and *f are unused so documentation expresses these ranges as to 66, 6e etc. rather than 67 6f
 //
