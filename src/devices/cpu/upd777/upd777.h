@@ -114,6 +114,10 @@ private:
 
 	u8 m_mode;
 
+	// what are these, used by H<->X opcode
+	u8 m_ldash;
+	u8 m_x4;
+
 	// single bit enable registers?
 	u8 m_disp;
 	u8 m_gpe;

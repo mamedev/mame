@@ -101,6 +101,8 @@ void upd777_cpu_device::device_start()
 	save_item(NAME(m_skip));
 	save_item(NAME(m_a));
 	save_item(NAME(m_l));
+	save_item(NAME(m_ldash));
+	save_item(NAME(m_x4));
 	save_item(NAME(m_h));
 
 	save_item(NAME(m_frs));
@@ -122,6 +124,8 @@ void upd777_cpu_device::device_reset()
 
 	m_a[0] = m_a[1] = m_a[2] = m_a[3] = 0;
 	m_l = 0;
+	m_ldash = 0;
+	m_x4 = 0;
 	m_h = 0;
 
 	m_frs = 0;
@@ -447,6 +451,18 @@ void upd777_cpu_device::do_op()
 		{
 			// 018 H[5:1]<->X4[5:1], 0->X4[7:6], 0->X3[7:1], 0->X1'[1], 0->A1'[1], L[2:1]<->L'[2:1]
 			LOGMASKED(LOG_UNHANDLED_OPS, "H<->X\n");
+			// this opcode is not well explained! but X4 etc. are referenced on Data RAM & Register Files which makes
+			// it even more confusing
+			u8 temp;
+
+			temp = m_x4;
+			m_x4 = get_h();
+			m_h = temp;
+
+			temp = m_ldash;
+			m_ldash = get_l();
+			set_l(temp);
+
 			break;
 		}
 		case 0b0000'0010'0000:
@@ -880,7 +896,12 @@ void upd777_cpu_device::do_op()
 		{
 			// 31c Subtract A1[7:1] and A2[7:1], store to A2[7:1], Skip if borrow, N->L[2:1]
 			const int n = inst & 0x3;
-			LOGMASKED(LOG_UNHANDLED_OPS, "A1-A2->A2, 0x%d->L\n", n);
+			u8 a1 = get_a1();
+			u8 a2 = get_a2();
+			a2 = a1 - a2;
+			if (a2 & 0x80)
+				m_skip = 1;
+			set_a2(a2);
 			set_l(n);
 			break;
 		}
@@ -888,7 +909,12 @@ void upd777_cpu_device::do_op()
 		{
 			// 34c Subtract A2[7:1] and A1[7:1], store to A1[7:1], Skip if borrow, N->L[2:1]
 			const int n = inst & 0x3;
-			LOGMASKED(LOG_UNHANDLED_OPS, "A2-A1->A1, 0x%d->L\n", n);
+			u8 a1 = get_a1();
+			u8 a2 = get_a2();
+			a1 = a2 - a1;
+			if (a1 & 0x80)
+				m_skip = 1;
+			set_a1(a1);
 			set_l(n);
 			break;
 		}
@@ -1053,7 +1079,43 @@ void upd777_cpu_device::do_op()
 			const int optype = (inst & 0x0c) >> 2;
 			const int reg2 = (inst & 0x10) >> 4;
 			const int n = inst & 0x3;
-			LOGMASKED(LOG_UNHANDLED_OPS, "M%s%s->M, 0x%d->L\n", get_300optype_name(optype), get_reg_name(reg2), n);
+
+			u8 src2 = 0;
+			if (reg2 == 0)
+				src2 = get_a1();
+			else
+				src2 = get_a2();
+
+			u8 m = get_m_data();
+
+			switch (optype)
+			{
+			case 0: // AND
+			{
+				m = m & src2;
+				break;
+			}
+			case 1: // ADD
+			{
+				m = m + src2;
+				if (m & 0x80)
+					m_skip = 1;
+				break;
+			}
+			case 2: // OR
+			{
+				m = m | src2;
+				break;
+			}
+			case 3: // MINUS
+			{
+				m = m - src2;
+				if (m & 0x80)
+					m_skip = 1;
+				break;
+			}
+			}
+			set_m_data(m);
 			set_l(n);
 			break;
 		}
@@ -1076,9 +1138,42 @@ void upd777_cpu_device::do_op()
 			// 3f8 OR H[5:1] and A2[5:1], store to H[5:1], N->L[2:1]
 			// 3fc Subtract H[5:1] and A2[5:1], store to H[5:1], Skip if borrow, N->L[2:1]
 			const int optype = (inst & 0x0c) >> 2;
-			const int reg = (inst & 0x10) >> 4;
+			const int reg2 = (inst & 0x10) >> 4;
 			const int n = inst & 0x3;
-			LOGMASKED(LOG_UNHANDLED_OPS, "H%s%s->H, 0x%d->L\n", get_300optype_name(optype), get_reg_name(reg), n);
+			u8 src2 = 0;
+			if (reg2 == 0)
+				src2 = get_a1() & 0x1f;
+			else
+				src2 = get_a2() & 0x1f;
+
+			u8 h = get_h();
+
+			switch (optype)
+			{
+			case 0: // AND
+			{
+				h = h & src2;
+				break;
+			}
+			case 1: // ADD
+			{
+				h = h + src2;
+				break;
+			}
+			case 2: // OR
+			{
+				h = h | src2;
+				break;
+			}
+			case 3: // MINUS
+			{
+				h = h - src2;
+				if (h & 0x20)
+					m_skip = 1;
+				break;
+			}
+			}
+			set_h(h & 0x1f);
 			set_l(n);
 			break;
 		}
