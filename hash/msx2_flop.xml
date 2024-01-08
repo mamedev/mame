@@ -2488,6 +2488,26 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
+	<!-- Has a 50Hz selector hack -->
+	<software name="daisenr2ck">
+		<description>Daisenryaku II - Campaign Version Customer Kit (Japan)</description>
+		<year>1993</year>
+		<publisher>Micro Cabin</publisher>
+		<info name="alt_title" value="キャンペーン版大戦略IIかすたまキット"/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="daisenryaku ii - campaign version customer kit - micro cabin (disk 1).dsk" size="737280" crc="e236695e" sha1="ec43c4f9e90fb3cb32775b81f72a0c9336d5b4c1" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="737280">
+				<rom name="daisenryaku ii - campaign version customer kit - micro cabin (disk 2).dsk" size="737280" crc="bbc322cf" sha1="32bd7864ad944f4069a698d451a4f077cab1e33d" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- This was released on a single sided disk. Hacked? -->
 	<software name="daisenr">
 		<description>Daisenryaku (Japan)</description>
@@ -2538,6 +2558,21 @@ The following floppies came with the machines.
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="daisenryaku. risk (1987)(micro cabin)(jp)[a3].dsk" size="737280" crc="2292123c" sha1="deff5e055d32f8e08de09e7fbd3bb7ae12525426"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="daisenms">
+		<description>Daisenryaku Map Shuu (Japan)</description>
+		<year>1988</year>
+		<publisher>Micro Cabin</publisher>
+		<info name="alt_title" value="大戦略マップ集"/>
+		<info name="serial" value="712425"/>
+		<info name="barcode" value="4987508712425"/>
+		<info name="usage" value="Boot with CTRL pressed. Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="daisenryaku map shuu - micro cabin.dsk" size="368640" crc="c4ad48d7" sha1="4cb8412ae48009d0993b03c8ada7a1579b0fa5b0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2695,6 +2730,18 @@ The following floppies came with the machines.
 			<feature name="part_id" value="Save Disk"/>
 			<dataarea name="flop" size="737280">
 				<rom name="dante 2 (1992)(msx magazine)(jp)(disk 4 of 4)(save disk).dsk" size="737280" crc="c2eb7ef4" sha1="b0a8d6bc529aedc3c62900274c0403797448fa2e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="danteck">
+		<description>Dante Yuushuu Sakuhin Cross Kingdom (Japan)</description>
+		<year>1991</year>
+		<publisher>MSX Magazine</publisher>
+		<info name="alt_title" value="Dante優秀作品CROSS KINGDOM"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="dante yuushuu sakuhin cross kingdom - msx magazine.dsk" size="737280" crc="5b38db6d" sha1="9ff9b9f932588b979725c72690540eddac53b50f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3067,6 +3114,26 @@ The following floppies came with the machines.
 			<feature name="part_id" value="C-Disk"/>
 			<dataarea name="flop" size="737280">
 				<rom name="dennou gakuen 3 - gunbuster (1990)(gainax)(jp)(disk 3 of 3)[a].dsk" size="737280" crc="280a8d38" sha1="c2c24b55ab2058258680ce70fa71712de162481e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="derringer">
+		<description>Derringer (Japan)</description>
+		<year>1988</year>
+		<publisher>Jast</publisher>
+		<info name="alt_title" value="デリンジャー"/>
+		<info name="barcode" value="4982260001002"/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="derringer - jast (disk 1).dsk" size="737280" crc="87f4b649" sha1="5ec4182e0c3645acc81433ffd0b6e4dcfbbdd1b4"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="737280">
+				<rom name="derringer - jast (disk 2).dsk" size="737280" crc="37958bdf" sha1="df38d68f5270fcacd098ce41b648f0c8955d1ef6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4310,6 +4377,34 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
+	<software name="diskng1">
+		<description>Disk Version Namcot Game Series 1 (Japan)</description>
+		<year>1989</year>
+		<publisher>Namcot</publisher>
+		<info name="alt_title" value="ディスク版・ナムコット・ゲーム集 第１弾"/>
+		<info name="serial" value="NMX-900309"/>
+		<info name="barcode" value="4907892030213"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk version namcot game series 1 - namcot.dsk" size="737280" crc="0fdc43fe" sha1="e5420b8788501793a3235a8d889e93486582284c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="diskng2">
+		<description>Disk Version Namcot Game Series 2 (Japan)</description>
+		<year>1990</year>
+		<publisher>Namcot</publisher>
+		<info name="alt_title" value="ディスク版・ナムコット・ゲーム集 第２弾"/>
+		<info name="serial" value="NMX-900310"/>
+		<info name="barcode" value="4907892030220"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk version namcot game series 2 - namcot.dsk" size="737280" crc="0a5a34ad" sha1="82c96e602bf5f881663bc2436e85adb5c4476b18"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dokicard">
 		<description>Doki Doki Card League (Japan)</description>
 		<year>1990</year>
@@ -4908,6 +5003,27 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
+	<software name="dgnworld">
+		<description>Dragonworld (Spain)</description>
+		<year>1986</year>
+		<publisher>Philips</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="dragon world - philips (disk 1).dsk" size="368640" crc="d8770b01" sha1="19dee699a9dc64e45fce115d57256367396e4999"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="dragon world - philips (disk 2).dsk" size="368640" crc="528fa37f" sha1="1bb8efb7046189aff52a446a766a753cf1ac4a34"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="dragon world - philips (disk 3).dsk" size="368640" crc="1af42cb1" sha1="fc9a6f1bfe25647fb137e6cdd65804ee844ba728"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dps">
 		<description>D.P.S. - Dream Program System (Japan)</description>
 		<year>1989</year>
@@ -5225,6 +5341,18 @@ The following floppies came with the machines.
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="e.a.s.e. - philips desktop v1.4 (1988)(philips)(m5)[mouse].dsk" size="737280" crc="e3b6ddd1" sha1="902685d3d08a6e36fa4061e2248244865801fd64"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ease12" cloneof="ease">
+		<description>Ease - Philips Desktop (Europe, v1.2)</description>
+		<year>1988</year>
+		<publisher>Philips</publisher>
+		<info name="usage" value="Requires a mouse in general purpose port 1."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="e.a.s.e. - philips desktop - philips (v1.2).dsk" size="737280" crc="92fdfb48" sha1="bca5a0c0d9532c4f37af4d7a108030d92ff70707"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5557,6 +5685,33 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
+	<software name="entasis">
+		<description>Entasis (Japan)</description>
+		<year>1994</year>
+		<publisher>White Mouse Software</publisher>
+		<info name="alt_title" value="えんたしす"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="entasis - white mouse software.dsk" size="737280" crc="f1b6f971" sha1="ffab669b3363be6adcff8800f191773042c3950e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="entfuhrer">
+		<description>Entführer Yousei Yuukai Jiken (Japan)</description>
+		<year>1989</year>
+		<publisher>Grocer</publisher>
+		<info name="alt_title" value="エントフューラー 妖精誘拐事件"/>
+		<info name="barcode" value="4988706201081"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="entfuhrer yousei yuukai jiken - grocer.dsk" size="737280" crc="88c5a613" sha1="ff812cdaeb51fda1170de1826eb62821d2030ed9"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="estland">
 		<description>Estland Monogatari - Estland Campaign (Japan)</description>
 		<year>1991</year>
@@ -5572,25 +5727,6 @@ The following floppies came with the machines.
 			<feature name="part_id" value="Game Disk"/>
 			<dataarea name="flop" size="737280">
 				<rom name="estland campaing (1991)(medo)(jp)(disk 2 of 2)(game disk).dsk" size="737280" crc="2e632a27" sha1="9568f5febabae81af47902d04c9f888f12e7327e"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="estlanda" cloneof="estland">
-		<description>Estland Monogatari - Estland Campaign (Japan, alt Game Disk)</description>
-		<year>1991</year>
-		<publisher>Medo</publisher>
-		<info name="alt_title" value="エストランド物語"/>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Demo Disk"/>
-			<dataarea name="flop" size="737280">
-				<rom name="estland campaing (1991)(medo)(jp)(disk 1 of 2)(demo disk).dsk" size="737280" crc="f1d614b7" sha1="838322bc7e3f40274f7e8803654093e85cd7c48d"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Game Disk"/>
-			<dataarea name="flop" size="737280">
-				<rom name="estland campaing (1991)(medo)(jp)(disk 2 of 2)(game disk)[a].dsk" size="737280" crc="2fae80b2" sha1="8faf0539870d9b745c79a76b45391f27097a6dc9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5795,6 +5931,17 @@ The following floppies came with the machines.
 			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="737280">
 				<rom name="famicle parodic 2 (1990)(bit2)(jp)(disk 2 of 2).dsk" size="737280" crc="e37b988d" sha1="7ce756e3b39aaa14a73cdfd3bcbdcb6ec70ad032"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fastan">
+		<description>Fastan (Netherlands, v1.01)</description>
+		<year>1987</year>
+		<publisher>Stark-Texel</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="fastan - stark-texel (v1.01).dsk" size="368640" crc="ee9ed8c7" sha1="ed2fdf2f73aa7af6a6efea12499dd9244fa10be4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6106,6 +6253,17 @@ The following floppies came with the machines.
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="737280">
 				<rom name="fire hawk - thexder ii (1989)(game arts)(jp)(disk 2 of 2).dsk" size="737280" crc="84a26ec3" sha1="ca33dd80bb8ce424991ae7c23cbe98ae6a439930"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fistan">
+		<description>Fistan (Netherlands, v2.05)</description>
+		<year>1986</year>
+		<publisher>Stark-Texel</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="fistan - stark-texel (v2.05).dsk" size="368640" crc="09e56e37" sha1="7f97254df972090e51f68cfe4b74ce8f575c0ea9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9406,6 +9564,26 @@ The following floppies came with the machines.
 			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="737280">
 				<rom name="mahjong shikaku (1990)(nihon bussan)(jp)(disk 3 of 3).dsk" size="737280" crc="17d99824" sha1="cb3960ca23ecb3cce3dee2ce981c17152b583643"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mainichi">
+		<description>Mainichi ga Ecchi (Japan)</description>
+		<year>1991</year>
+		<publisher>Heart Soft</publisher>
+		<info name="alt_title" value="毎日がえっち"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="mainichi ga ecchi - heart soft (disk 1).dsk" size="737280" crc="827ac894" sha1="9c56f21c53ed5eda21005105d6021ecf2a9c0f36"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="737280">
+				<rom name="mainichi ga ecchi - heart soft (disk 2).dsk" size="737280" crc="f8d18f5d" sha1="48270ca2669381d99c9c18e066c15fdb5e7ea7cc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13912,6 +14090,45 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
+	<software name="shitaiok">
+		<description>Shitai Okiba de Yuushoku o Akagawa Jirou (Japan)</description>
+		<year>1989</year>
+		<publisher>Tokuma Shoten Intermedia</publisher>
+		<info name="alt_title" value="死体置場で夕食を 赤川次郎"/>
+		<info name="serial" value="MXTC-32004"/>
+		<info name="barcode" value="4988008002096"/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="737280">
+				<rom name="shitai okiba de yuushoku o akagawa jirou - tokuma shoten intermedia (disk a).dsk" size="737280" crc="13a658f4" sha1="c1d368971ded6e50709a5cb05d8c7d72f4167a6b"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="737280">
+				<rom name="shitai okiba de yuushoku o akagawa jirou - tokuma shoten intermedia (disk b).dsk" size="737280" crc="0b5ebb35" sha1="402b30b216946fe237bfc546a6b348038a724ab8"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="shitai okiba de yuushoku o akagawa jirou - tokuma shoten intermedia (disk c).dsk" size="737280" crc="7aa47f1c" sha1="9897370ff167d60df04888d92efe0c77b1294194"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk D"/>
+			<dataarea name="flop" size="737280">
+				<rom name="shitai okiba de yuushoku o akagawa jirou - tokuma shoten intermedia (disk d).dsk" size="737280" crc="f9e8cc51" sha1="e6741586824dde94aff34a31c7764ea72ecb2d7a"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk E"/>
+			<dataarea name="flop" size="737280">
+				<rom name="shitai okiba de yuushoku o akagawa jirou - tokuma shoten intermedia (disk e).dsk" size="737280" crc="50734193" sha1="68dd9ebd5a16b319f005b49464d6328c83a48087"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="simudayo">
 		<description>Simulation Dayo Zen'in Shuugou! (Japan)</description>
 		<year>1989</year>
@@ -17966,6 +18183,17 @@ HOMEBREW
 		</part>
 	</software>
 
+	<software name="djcoll1">
+		<description>Collection 1 (French)</description>
+		<year>1998</year>
+		<publisher>Django</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="collection 1 - django.dsk" size="737280" crc="1290a72d" sha1="2fc09ee59276aedfe7c9f194e14a5bdf7bbecadb"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="conquer">
 		<description>Conqueror (Japan)</description>
 		<year>1992</year>
@@ -18098,6 +18326,18 @@ HOMEBREW
 		</part>
 	</software>
 
+	<software name="dancingstar">
+		<description>Dancing Star (Japan)</description>
+		<year>1998</year>
+		<publisher>T.M. / Zap</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="dancing star - t.m. zap.dsk" size="737280" crc="77f7e71c" sha1="05b4b0fba0a8c95d4a05795e65f04b4a48d1cb08"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dass">
 		<description>DASS (Netherlands)</description>
 		<year>1992</year>
@@ -18118,6 +18358,17 @@ HOMEBREW
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="dead or live.dsk" size="737280" crc="63334aeb" sha1="b86ae378c953e9df7cdc71500104daca8a811820"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="destrmov">
+		<description>Destroy Mover (Japan)</description>
+		<year>1993</year>
+		<publisher>Sequence</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="destroy mover - sequence.dsk" size="737280" crc="64ab8a44" sha1="56edf920fc7b38e4bcbf6f12f24ced069d59b65e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -18155,6 +18406,29 @@ HOMEBREW
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="detective numarin 3 - a.r.e.system.dsk" size="737280" crc="2577baa0" sha1="ecaf47d16ea080d800f75033aec71b9f7e51cd6c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dimies">
+		<description>Dimies</description>
+		<year>1991</year>
+		<publisher>H-Corp</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="dimies - h-corp.dsk" size="737280" crc="46376623" sha1="d7621e02e4564256f1c7668d78a1b85d11017111"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="discool3">
+		<description>Disk Cool III (French)</description>
+		<year>19??</year>
+		<publisher>Fabrice Autour</publisher>
+		<info name="usage" value="Requires MSX-MUSIC."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk cool iii - fabrice autour.dsk" size="737280" crc="d36b04e7" sha1="b54977145f9e81c6ca9d9b3734d0b354f7b4c046"/>
 			</dataarea>
 		</part>
 	</software>
@@ -18219,6 +18493,39 @@ HOMEBREW
 		</part>
 	</software>
 
+	<software name="dominonx">
+		<description>Dominon X</description>
+		<year>2017</year>
+		<publisher>CompileO</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="dominon x - compileo.dsk" size="737280" crc="0689d9a5" sha1="7e4ea3dccc9d1f74909bf4d5766f810d892a0022"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dontwarro">
+		<description>Don't Warro! Be Japo!</description>
+		<year>2003</year>
+		<publisher>Paxanga Soft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="dont warro be japo - paxanga soft.dsk" size="368640" crc="612672ef" sha1="4c96dff9e52d9546dc8d34f09cfb1286a3415f71"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="doopmtrip">
+		<description>Doopm Trip</description>
+		<year>2017</year>
+		<publisher>N.I</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="doopm trip - n.i.dsk" size="368640" crc="26103a61" sha1="23de14b4232d7f2324390dce7241214e366ae2b0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dbz">
 		<description>Dragon Ball Z (Korea)</description>
 		<year>199?</year>
@@ -18226,6 +18533,18 @@ HOMEBREW
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="dragon ball z.dsk" size="737280" crc="b0042660" sha1="452caf93b14bbd4c8e7b5d630eb07766f664dda2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dgnrouge">
+		<description>Dragon Rouge (Japan)</description>
+		<year>1990</year>
+		<publisher>Emutsu no Tomo</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="dragon rouge - emutsu no tomo.dsk" size="737280" crc="81c091d9" sha1="4c22b7d93a7870996b20c0d59e139f501d2b6b1c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -18242,14 +18561,73 @@ HOMEBREW
 		</part>
 	</software>
 
-	<software name="ducktale">
-		<description>Duck Tales (Netherlands)</description>
-		<year>1994</year>
-		<publisher>&lt;homebrew&gt;</publisher>
-		<info name="developer" value="Emphasys" />
+	<software name="drmfght">
+		<description>Dream Fighters (Japan)</description>
+		<year>1996</year>
+		<publisher>Monoki</publisher>
+		<info name="usage" value="Disk must not be write protected. Requires a system with Kanji support."/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="duck tales.dsk" size="737280" crc="e5d62a79" sha1="ce56341e7a0968370e56eb3948061fd9b752c83a"/>
+				<rom name="dream fighters - monoki.dsk" size="737280" crc="a17e02ca" sha1="25413d2010d4693c4f9f53455dab5fd446343629"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dribol">
+		<description>Dribol (English)</description>
+		<year>2015</year>
+		<publisher>Oniric Factor</publisher>
+		<info name="usage" value="Hold CTRL at boot until the beep."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="dribol - oniric factor (english).dsk" size="737280" crc="8dbf2f67" sha1="f62b231ebb3e5c40fc454976359e533b5cb898e6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dribols" cloneof="dribol">
+		<description>Dribol (Spanish)</description>
+		<year>2015</year>
+		<publisher>Oniric Factor</publisher>
+		<info name="usage" value="Hold CTRL at boot until the beep."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="dribol - oniric factor (spanish).dsk" size="737280" crc="113cf87b" sha1="2e2eba8b47d392a1f1f7f0abb4a4d3bfbbd26fa1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ducktales">
+		<description>DuckTales (English)</description>
+		<year>1994</year>
+		<publisher>Emphasys</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="ducktales - emphasys (english).dsk" size="737280" crc="37ae08de" sha1="648514e72576ca0e020c2b7c8cff3d13002bf9b2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ducktalesd" cloneof="ducktales">
+		<description>DuckTales (Dutch)</description>
+		<year>1994</year>
+		<publisher>Emphasys</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="ducktales - emphasys (dutch).dsk" size="737280" crc="5a10b81e" sha1="45bd3a6f0ebe3e41f0cb94fd26590623f59003cc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dungmanj">
+		<description>Dungeon Manjirou (Japan)</description>
+		<year>1988</year>
+		<publisher>MSX Magazine</publisher>
+		<info name="alt_title" value="ダンジョン万次郎"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="dungeon manjirou - msx magazine.dsk" size="737280" crc="0fdf77d6" sha1="10535738c6dd179463fdd7ada4e26d2540e3e340"/>
 			</dataarea>
 		</part>
 	</software>
@@ -18262,6 +18640,18 @@ HOMEBREW
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="dungeon_striker.dsk" size="737280" crc="57619450" sha1="98a29dca1f984443c9be5d3d8cc9ace896729101"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dungwand">
+		<description>Dungeon Wanderer (Japan)</description>
+		<year>1992</year>
+		<publisher>T.M. / Zap</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="dungeon wanderer - t.m. zap.dsk" size="737280" crc="371e67e9" sha1="17f92d9e8c6cfc63c4473f723bccad223aae795f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -18299,6 +18689,69 @@ HOMEBREW
 		</part>
 	</software>
 
+	<software name="erotpac1">
+		<description>Erotic Pac #1 (France)</description>
+		<year>1989</year>
+		<publisher>Sink System</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="erotic pac 1 - sink system (disk 1).dsk" size="368640" crc="6c10900b" sha1="0067f7edef0735989ecdd9d535040332fc8bdfac"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="erotic pac 1 - sink system (disk 2).dsk" size="368640" crc="bf1bdf32" sha1="4401e8603d86119ef00d75b67612d5a2153addb3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="even">
+		<description>Even (Japan)</description>
+		<year>1994</year>
+		<publisher>FRIEVE</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="even - frieve.dsk" size="737280" crc="5de0ef70" sha1="c924cdf0bd6bb083ca06a077d8ab8579c11d5d20"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="evildeath">
+		<description>Evil Death - The Adventure (Netherlands)</description>
+		<year>1987</year>
+		<publisher>Scorpionsoft</publisher>
+		<info name="usage" value="Requires a mouse."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="evil death - the adventure - scorpionsoft.dsk" size="368640" crc="5bd0508c" sha1="9c626270fe3790017b77f467e3e08f6acdfed507"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="evilspirit">
+		<description>Evil Spirit</description>
+		<year>1992</year>
+		<publisher>BOF</publisher>
+		<info name="usage" value="Requires a mouse."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="evil spirit - bof.dsk" size="737280" crc="4036eb3d" sha1="838bc71b065f03d45e865afce68a80a48f2b411c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="exor">
+		<description>EXOR</description>
+		<year>1997</year>
+		<publisher>Aurora</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="exor - aurora.dsk" size="737280" crc="47dabaa2" sha1="1af9868cd846af507b99420fb018d58b50d85730"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="fzeruexd">
 		<description>F-Zeru Kai (Japan)</description>
 		<year>1991</year>
@@ -18331,6 +18784,127 @@ HOMEBREW
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="fbout.dsk" size="737280" crc="6d94c63f" sha1="ab2e2490121f148e47705c00f7487693ba6c54b1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="finalwiz">
+		<description>Finally Wizard (Japan)</description>
+		<year>1989</year>
+		<publisher>Data System</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="finally wizard - data system (disk 1).dsk" size="737280" crc="4ae75097" sha1="a800e77ac245c57de21923d2b4610f6ad04a0db5"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="finally wizard - data system (disk 2).dsk" size="737280" crc="e1436e1b" sha1="a264d5670179feb3b8e5d50733fa84ce400c85bb"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="finally wizard - data system (disk 3).dsk" size="737280" crc="04abbb27" sha1="947107546dbfa90b60ccab143f2f8b4d2ed56d26"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="finditp">
+		<description>Findit promo (Netherlands)</description>
+		<year>2000</year>
+		<publisher>Delta Soft</publisher>
+		<info name="usage" value="Requires a mouse."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="findit promo - delta soft.dsk" size="737280" crc="9fdc48f6" sha1="d84691fffd1c05748d14362629c30a670c3d11c6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flat1d">
+		<description>FLAT1 (demo)</description>
+		<year>2017</year>
+		<publisher>Darkstone</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="flat1 - darkstone (demo).dsk" size="368640" crc="e69776d1" sha1="f7c904c4fde29d0faed196a5bb08f8fc279b4ac3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fltmrsh1">
+		<description>Flat Marsh o Sagase! 1-2-3 (Japan)</description>
+		<year>1994</year>
+		<publisher>Gigamix</publisher>
+		<info name="alt_title" value="ふらっとまぁしゅを探せ! 1-2-3"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="flat marsh sagase 1-2-3 - gigamix.dsk" size="737280" crc="293b4684" sha1="8ab74156480427fbffc939fc87b597fa109afac3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fltmrsh4">
+		<description>Flat Marsh o Sagase! 4 Dokidoki Toukyou Keibajou-hen (Japan)</description>
+		<year>1995</year>
+		<publisher>Gigamix</publisher>
+		<info name="alt_title" value="ふらっとまぁしゅを探せ！４・ドキドキ東京競馬場編"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="flat marsh sagase 4 dokidoki toukyou keibajou-hen - gigamix.dsk" size="737280" crc="2e9480d0" sha1="052f709cc7868167939a9ed16366a403ae62d414"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fonydd1">
+		<description>Fony's Demo Disk 1 (Netherlands)</description>
+		<year>1991</year>
+		<publisher>Fony</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="fonys demo disk 1 - fony.dsk" size="368640" crc="ac5474df" sha1="196bfa3f5228a896a578fd2e547aa22380b04846"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fonydd2">
+		<description>Fony's Demo Disk II (Netherlands)</description>
+		<year>1992</year>
+		<publisher>Fony</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="fonys demo disk 2 - fony (disk 1).dsk" size="737280" crc="a6add818" sha1="16fdf9ed9eee8422c6e2120c909c1a1804850d8d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="fonys demo disk 2 - fony (disk 2).dsk" size="737280" crc="b4a45ff0" sha1="5ba908d5831c5473625fa6f928c10eb681f4f17f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fourrow" supported="no">
+		<description>Four on a Row</description>
+		<year>1995</year>
+		<publisher>MSX-Club West-Friesland</publisher>
+		<notes>Requires two MSX computers to be linked? JoyNet cable?</notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="four on a row - msx-club west-friesland.dsk" size="368640" crc="baf4852b" sha1="38c721c53fe817858b3a9a147470dc5fd8e62ead"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fourrowd" cloneof="fourrow" supported="no">
+		<description>Four on a Row (demo)</description>
+		<year>1995</year>
+		<publisher>MSX-Club West-Friesland</publisher>
+		<notes>Requires two MSX computers to be linked?</notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="four on a row - msx-club west-friesland (demo).dsk" size="368640" crc="1ae7503c" sha1="9cf1120cf56f54da04cf6222cf003b16d47597c1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -18378,6 +18952,29 @@ HOMEBREW
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="freeware collection - studio fg.dsk" size="737280" crc="d8a0ee09" sha1="58ff2d2650ff66eb2bb23c4ae77ff45b85e582ec"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frutapro">
+		<!-- Released by a group from Spain but texts are in French. -->
+		<description>Fruta Prohibida (Spain, French)</description>
+		<year>1988</year>
+		<publisher>A &amp; J Club Almuñecar MSX2</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="fruta prohibida - a j club almunecar msx2.dsk" size="737280" crc="e8570da3" sha1="72649ce52a4ecde8e38104e9b321baea25b22a31"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="futtimed">
+		<description>Future Time Demo</description>
+		<year>1990</year>
+		<publisher>Sander Soft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="future time demo - sander soft.dsk" size="368640" crc="bac9ac2c" sha1="56854fd89fa16545f537b7b2be8cd07926c455e9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -19756,6 +20353,17 @@ HOMEBREW
 		</part>
 	</software>
 
+	<software name="msx2dedi">
+		<description>MSX2 Demo Digitalizaciones (Spain)</description>
+		<year>1987</year>
+		<publisher>Majara Soft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="msx2 demo digitalizaciones - majara soft.dsk" size="737280" crc="3d9dbf04" sha1="7d0a64b5e98a1f7e7b39b24d6637bb623bbdb48b"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="nofuss">
 		<description>No Fuss (Netherlands)</description>
 		<year>1991</year>
@@ -20504,6 +21112,28 @@ HOMEBREW
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="368640">
 				<rom name="puzzel - msx club enschede.dsk" size="368640" crc="b6be0ddb" sha1="870fb8c72920c28df6fb48ceaad21ecc2b093f5e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="puzcol1">
+		<description>Puzzel Collectie 1 (Netherlands)</description>
+		<year>1994</year>
+		<publisher>Delta Soft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="puzzel collectie 1 - delta soft.dsk" size="737280" crc="127328cd" sha1="88fba9f8810e3bb31f26dad4165a30ecfd272737"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="puzcol2">
+		<description>Puzzel Collectie 2 (Netherlands)</description>
+		<year>1994</year>
+		<publisher>Delta Soft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="puzzel collectie 2 - delta soft.dsk" size="737280" crc="41d092c3" sha1="c92a8c9b455617ddc1a2a6ffe0b6c4b3b1fce260"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21823,6 +22453,17 @@ HOMEBREW
 		</part>
 	</software>
 
+	<software name="zdoomp">
+		<description>zDOOM (prototype)</description>
+		<year>2021</year>
+		<publisher>NYYRIKKI</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="zdoom - nyyrikki (prototype).dsk" size="737280" crc="569686b1" sha1="7b7e1a767c42e38d5f3d2c58a648b3a6f80087f2"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="zeeslag" supported="no">
 		<description>Zeeslag (Netherlands)</description>
 		<year>1994</year>
@@ -22498,6 +23139,19 @@ DISKMAG
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="boggle (1992)(triple soft)(nl)[a].dsk" size="737280" crc="859c20b2" sha1="173603dd6ad75fca13dda341c4a41cdb0c91eea7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="detstory">
+		<description>Detective Story (Dutch)</description>
+		<year>1993</year>
+		<publisher>MSX Club België/Nederland</publisher>
+		<info name="magazine" value="MSX Club Magazine 44" />
+		<info name="developer" value="Timmysoft" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="detective story - timmysoft.dsk" size="368640" crc="7aa4b235" sha1="724bd0a569b5b180dc0b71858f6a224a6af89a92"/>
 			</dataarea>
 		</part>
 	</software>
