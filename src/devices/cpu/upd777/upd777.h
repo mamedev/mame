@@ -43,6 +43,8 @@ protected:
 	void internal_map(address_map &map);
 	void internal_data_map(address_map &map);
 
+	required_shared_ptr<u8> m_datamem;
+
 private:
 	address_space_config m_space_config;
 	address_space_config m_data_config;
@@ -50,7 +52,6 @@ private:
 	memory_access<11, 1, -1, ENDIANNESS_LITTLE>::specific m_space;
 	memory_access<8, 0, 0, ENDIANNESS_LITTLE>::specific m_data;
 
-	required_shared_ptr<u8> m_datamem;
 
 	std::string get_300optype_name(int optype);
 	std::string get_200optype_name(int optype);

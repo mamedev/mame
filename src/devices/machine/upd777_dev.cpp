@@ -15,6 +15,27 @@ upd777_device::upd777_device(const machine_config &mconfig, const char *tag, dev
 
 uint32_t upd777_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	bitmap.fill(0, cliprect);
+	gfx_element *gfx = m_gfxdecode->gfx(0);
+
+	for (int i = 0; i <= 0x18; i++)
+	{
+		u8 s0 = m_datamem[(i * 4) + 0];
+		u8 s1 = m_datamem[(i * 4) + 1];
+		u8 s2 = m_datamem[(i * 4) + 2];
+		u8 s3 = m_datamem[(i * 4) + 3];
+
+		int ypos = (s0 & 0x7e) >> 1;
+		//int prio = (s0 & 0x01);
+		int xpos = (s1 & 0x7f);
+		int patn = (s2 & 0x7f);
+		//int ylow = (s3 & 0x70);
+		int pal = (s3 & 0x0e) >> 1;
+		//int ysub = (s3 & 0x01);
+
+		gfx->zoom_transpen(bitmap, cliprect, patn, pal, 0, 0, xpos * 3, ypos * 4, 0x40000, 0x40000, 0);
+	}
+
 	return 0;
 }
 
@@ -25,7 +46,7 @@ static const gfx_layout test_layout =
 {
 	11,7,
 	0x80,
-	8,
+	1,
 	{ 0 },
 	{ 0,1,2,3,4,5,6,7,8,9,10 },
 	{ 0*11,1*11,2*11,3*11,4*11,5*11,6*11 },
@@ -34,8 +55,25 @@ static const gfx_layout test_layout =
 
 
 static GFXDECODE_START( gfx_ud777 )
-	GFXDECODE_ENTRY( "patterns", 0, test_layout, 0, 1  )
+	GFXDECODE_ENTRY( "patterns", 0, test_layout, 0, 8 )
 GFXDECODE_END
+
+
+void upd777_device::palette_init(palette_device &palette) const
+{
+	// just a fake palette for now
+	for (int i = 0; i < palette.entries(); i++)
+	{
+		if (i & 1)
+		{
+			palette.set_pen_color(i, rgb_t(((i >> 1) & 1) ? 0xff : 0x7f, ((i >> 2) & 1) ? 0xff : 0x7f, ((i >> 3) & 1) ? 0xff : 0x7f));
+		}
+		else
+		{
+			palette.set_pen_color(i, rgb_t(0, 0, 0));
+		}
+	}
+}
 
 void upd777_device::device_add_mconfig(machine_config &config)
 {
@@ -44,12 +82,12 @@ void upd777_device::device_add_mconfig(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(256, 256);
-	screen.set_visarea(0, 256-1, 16, 256-16-1);
+	screen.set_visarea(0, 256-1, 0, 256-0-1);
 	screen.set_screen_update(FUNC(upd777_device::screen_update));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ud777);
-	PALETTE(config, m_palette).set_entries(0x1000);
+	PALETTE(config, m_palette, FUNC(upd777_device::palette_init), 32 * 3).set_entries(0x10);
 }
 
 ROM_START( upd777 )

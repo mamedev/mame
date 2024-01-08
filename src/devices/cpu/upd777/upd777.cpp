@@ -13,9 +13,9 @@
 
 upd777_cpu_device::upd777_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor data)
 	: cpu_device(mconfig, type, tag, owner, clock)
+	, m_datamem(*this, "datamem")
 	, m_space_config("program", ENDIANNESS_LITTLE, 16, 11, -1, address_map_constructor(FUNC(upd777_cpu_device::internal_map), this))
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 7, 0, data)
-	, m_datamem(*this, "datamem")
 {
 }
 
@@ -657,7 +657,82 @@ void upd777_cpu_device::do_op()
 			const int reg1 = (inst & 0xc0) >> 6;
 			const int reg2 = (inst & 0x10) >> 4;
 			const int n = inst & 0x3;
-			LOGMASKED(LOG_UNHANDLED_OPS, "%s%s%s, 0x%d->L %s%s\n", get_reg_name(reg1), get_200optype_name(optype), get_reg_name(reg2), n, (optype == 3) ? "BOJ" : "EQJ", non ? "/" : "");
+			//LOGMASKED(LOG_UNHANDLED_OPS, "2xx %s%s%s, 0x%d->L %s%s\n", get_reg_name(reg1), get_200optype_name(optype), get_reg_name(reg2), n, (optype == 3) ? "BOJ" : "EQJ", non ? "/" : "");
+			u8 srcreg2 = 0;
+			switch (reg2)
+			{
+			case 0: srcreg2 = get_a1(); break;
+			case 1: srcreg2 = get_a2(); break;
+			}
+
+			u8 srcreg1 = 0;
+			switch (reg1)
+			{
+			case 0: srcreg1 = get_a1(); break;
+			case 1: srcreg1 = get_a2(); break;
+			case 2: srcreg1 = get_m_data(); break;
+			case 3:
+			{
+				srcreg1 = get_h();
+				srcreg2 &= 0x1f;
+				break;
+			}
+			}
+
+			switch (optype)
+			{
+			case 0: // AND
+			{
+				if (!non)
+				{
+					if (srcreg1 & srcreg2)
+						m_skip = 1;
+				}
+				else
+				{
+					if (!(srcreg1 & srcreg2))
+						m_skip = 1;
+				}
+				break;
+			}
+			case 1: // invalid
+			{
+				// can't happen, no switch case leads here
+				break;
+			}
+			case 2: // =
+			{
+				if (!non)
+				{
+					if (srcreg1 == srcreg2)
+						m_skip = 1;
+				}
+				else
+				{
+					if (!(srcreg1 == srcreg2))
+						m_skip = 1;
+				}
+				break;
+			}
+			case 3: // -
+			{
+				u8 result = srcreg1 - srcreg2;
+
+				if (!non)
+				{
+					if (result & 0x80)
+						m_skip = 1;
+				}
+				else
+				{
+					if (!(result & 0x80))
+						m_skip = 1;
+				}
+
+				break;
+			}
+			}
+
 			set_l(n);
 			break;
 		}
@@ -752,7 +827,8 @@ void upd777_cpu_device::do_op()
 		{
 			// 310 Move A2[7:1] to A1[7:1], N->L[2:1]
 			const int n = inst & 0x3;
-			LOGMASKED(LOG_UNHANDLED_OPS, "A2->A1, 0x%d->L\n", n);
+			u8 a2 = get_a2();
+			set_a1(a2);
 			set_l(n);
 			break;
 		}
@@ -760,7 +836,8 @@ void upd777_cpu_device::do_op()
 		{
 			// 340 Move A1[7:1] to A2[7:1], N->L[2:1]
 			const int n = inst & 0x3;
-			LOGMASKED(LOG_UNHANDLED_OPS, "A1->A2, 0x%d->L\n", n);
+			u8 a1 = get_a1();
+			set_a2(a1);
 			set_l(n);
 			break;
 		}
@@ -769,7 +846,9 @@ void upd777_cpu_device::do_op()
 		{
 			// 318 Right shift A1[7:1], 0->A1[7], N->L[2:1]
 			const int n = inst & 0x3;
-			LOGMASKED(LOG_UNHANDLED_OPS, "A1->RS, 0x%d->L\n", n);
+			u8 a1 = get_a1();
+			a1 = a1 >> 1;
+			set_a1(a1);
 			set_l(n);
 			break;
 		}
@@ -777,7 +856,9 @@ void upd777_cpu_device::do_op()
 		{
 			// 358 Right shift A2[7:1], 0->A2[7], N->L[2:1]
 			const int n = inst & 0x3;
-			LOGMASKED(LOG_UNHANDLED_OPS, "A2->RS, 0x%d->L\n", n);
+			u8 a2 = get_a2();
+			a2 = a2 >> 1;
+			set_a2(a2);
 			set_l(n);
 			break;
 		}
@@ -785,7 +866,9 @@ void upd777_cpu_device::do_op()
 		{
 			// 398 Right shift M[H[5:1],L[2:1]][7:1], 0->M[H[5:1],L[2:1]][7], N->L[2:1]
 			const int n = inst & 0x3;
-			LOGMASKED(LOG_UNHANDLED_OPS, "M->RS, 0x%d->L\n", n);
+			u8 m = get_m_data();
+			m = m >> 1;
+			set_m_data(m);
 			set_l(n);
 			break;
 		}
@@ -856,7 +939,12 @@ void upd777_cpu_device::do_op()
 			// 390 Move A2[7:1] to M[H[5:1],L[2:1]][7:1], N->L[2:1]
 			const int reg = (inst & 0x10) >> 4;
 			const int n = inst & 0x3;
-			LOGMASKED(LOG_UNHANDLED_OPS, "A%d->M, 0x%d->L\n", reg + 1, n);
+			u8 src = 0;
+			if (reg == 0)
+				src = get_a1();
+			else
+				src = get_a2();
+			set_m_data(src);
 			set_l(n);
 			break;
 		}
@@ -868,7 +956,17 @@ void upd777_cpu_device::do_op()
 			// 394 Exchange M[H[5:1],L[2:1]][7:1] and A2[7:1], N->L[2:1]
 			const int reg = (inst & 0x10) >> 4;
 			const int n = inst & 0x3;
-			LOGMASKED(LOG_UNHANDLED_OPS, "M<->A%d, 0x%d->L\n", reg + 1, n);
+			u8 src = 0;
+			if (reg == 0)
+				src = get_a1();
+			else
+				src = get_a2();
+			u8 m = get_m_data();
+			set_m_data(src);
+			if (reg == 0)
+				set_a1(m);
+			else
+				set_a2(m);
 			set_l(n);
 			break;
 		}
@@ -880,7 +978,11 @@ void upd777_cpu_device::do_op()
 			// 39c Move M[H[5:1],L[2:1]][7:1] to A2[7:1], N->L[2:1]
 			const int reg = (inst & 0x10) >> 4;
 			const int n = inst & 0x3;
-			LOGMASKED(LOG_UNHANDLED_OPS, "M->A%d, 0x%d->L\n", reg + 1, n);
+			u8 m = get_m_data();
+			if (reg == 0)
+				set_a1(m);
+			else
+				set_a2(m);
 			set_l(n);
 			break;
 		}
@@ -942,7 +1044,12 @@ void upd777_cpu_device::do_op()
 			// 3d0 Move A2[5:1] to H[5:1], N->L[2:1]
 			const int reg = (inst & 0x10) >> 4;
 			const int n = inst & 0x3;
-			LOGMASKED(LOG_UNHANDLED_OPS, "A%d->H, 0x%d->L\n", reg + 1, n);
+			u8 src = 0;
+			if (reg == 0)
+				src = get_a1() & 0x1f;
+			else
+				src = get_a2() & 0x1f;
+			set_h(src);
 			set_l(n);
 			break;
 		}
@@ -953,7 +1060,11 @@ void upd777_cpu_device::do_op()
 			// 3dc Move H[5:1] to A2[5:1], 0->A2[7:6], N->L[2:1]
 			const int reg = (inst & 0x10) >> 4;
 			const int n = inst & 0x3;
-			LOGMASKED(LOG_UNHANDLED_OPS, "H->A%d, 0x%d->L\n", reg + 1, n);
+			u8 h = get_h() & 0x1f;
+			if (reg == 0)
+				set_a1(h);
+			else
+				set_a2(h);
 			set_l(n);
 			break;
 		}
