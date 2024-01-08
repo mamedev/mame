@@ -14,7 +14,7 @@ https://www.oguchi-rd.com/777/777%20Design%20Note.pdf
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
-#include "machine/upd777_dev.h"
+#include "cpu/upd777/upd777_dev.h"
 
 #include "softlist_dev.h"
 
@@ -53,7 +53,7 @@ DEVICE_IMAGE_LOAD_MEMBER(cassvisn_state::cart_load)
 	if (size != 0xf00)
 		return std::make_pair(image_error::UNSUPPORTED, "prg region size must be 0xf00 in size");
 
-	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_BIG);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "prg");
 	uint8_t* prgbase = memregion("maincpu:prg")->base();
 	memcpy(prgbase, m_cart->get_rom_base(), size);

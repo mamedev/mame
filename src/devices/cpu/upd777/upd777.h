@@ -40,6 +40,8 @@ protected:
 
 	virtual space_config_vector memory_space_config() const override;
 
+	virtual bool get_vbl_state() = 0;
+
 	void internal_map(address_map &map);
 	void internal_data_map(address_map &map);
 
@@ -49,8 +51,8 @@ private:
 	address_space_config m_space_config;
 	address_space_config m_data_config;
 
-	memory_access<11, 1, -1, ENDIANNESS_LITTLE>::specific m_space;
-	memory_access<8, 0, 0, ENDIANNESS_LITTLE>::specific m_data;
+	memory_access<11, 1, -1, ENDIANNESS_BIG>::specific m_space;
+	memory_access<8, 0, 0, ENDIANNESS_BIG>::specific m_data;
 
 
 	std::string get_300optype_name(int optype);

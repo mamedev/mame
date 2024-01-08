@@ -14,8 +14,8 @@
 upd777_cpu_device::upd777_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor data)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_datamem(*this, "datamem")
-	, m_space_config("program", ENDIANNESS_LITTLE, 16, 11, -1, address_map_constructor(FUNC(upd777_cpu_device::internal_map), this))
-	, m_data_config("data", ENDIANNESS_LITTLE, 8, 7, 0, data)
+	, m_space_config("program", ENDIANNESS_BIG, 16, 11, -1, address_map_constructor(FUNC(upd777_cpu_device::internal_map), this))
+	, m_data_config("data", ENDIANNESS_BIG, 8, 7, 0, data)
 {
 }
 
@@ -513,6 +513,11 @@ void upd777_cpu_device::do_op()
 		{
 			// 04a Skip if (Vertical Blank) = 1, 0->M[[18:00],[3]][1]
 			LOGMASKED(LOG_UNHANDLED_OPS, "VBLK\n");
+			if (get_vbl_state())
+				m_skip = 1;
+
+			// need to do the 0->M[[18:00],[3]][1] bit
+
 			break;
 		}
 		case 0b0000'0100'1100:
