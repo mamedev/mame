@@ -9569,7 +9569,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="mainichi">
-		<description>Mainichi Ga Ecchi (Japan)</description>
+		<description>Mainichi ga Ecchi (Japan)</description>
 		<year>1991</year>
 		<publisher>Heart Soft</publisher>
 		<info name="alt_title" value="毎日がえっち"/>
@@ -18834,7 +18834,7 @@ HOMEBREW
 	</software>
 
 	<software name="fltmrsh1">
-		<description>Flat Marsh Sagase! 1-2-3 (Japan)</description>
+		<description>Flat Marsh o Sagase! 1-2-3 (Japan)</description>
 		<year>1994</year>
 		<publisher>Gigamix</publisher>
 		<info name="alt_title" value="ふらっとまぁしゅを探せ! 1-2-3"/>
@@ -18846,7 +18846,7 @@ HOMEBREW
 	</software>
 
 	<software name="fltmrsh4">
-		<description>Flat Marsh Sagase! 4 Dokidoki Toukyou Keibajou-hen (Japan)</description>
+		<description>Flat Marsh o Sagase! 4 Dokidoki Toukyou Keibajou-hen (Japan)</description>
 		<year>1995</year>
 		<publisher>Gigamix</publisher>
 		<info name="alt_title" value="ふらっとまぁしゅを探せ！４・ドキドキ東京競馬場編"/>
