@@ -1211,7 +1211,7 @@ void taito_f3_state::scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cl
 
 	auto prio = [](const auto& obj) -> u8 { return obj->prio(); };
 
-	int ys = m_flipscreen ? 24 : 0;
+	//int ys = m_flipscreen ? 24 : 0;
 	for (int y = y_start; y != y_end; y += y_inc) {
 		read_line_ram(line_data, y);
 		line_data.y = y;

@@ -171,12 +171,12 @@ protected:
 	std::unique_ptr<u8[]> m_decoded_gfx5;
 
 	struct tempsprite {
-		u16 code = 0;
-		u8 color = 0;
-		bool flip_x = 0, flip_y = 0;
-		fixed8 x = 0, y = 0;
-		fixed8 scale_x = 0, scale_y = 0;
-		u8 pri = 0;
+		int code; // 17 bits
+		u8 color;
+		bool flip_x, flip_y;
+		fixed8 x, y;
+		fixed8 scale_x, scale_y;
+		u8 pri;
 	};
 
 	static const int NUM_PLAYFIELDS = 4;
