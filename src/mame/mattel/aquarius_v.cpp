@@ -2,9 +2,9 @@
 // copyright-holders:Nathan Woods
 /***************************************************************************
 
-  aquarius.c
+  aquarius_v.cpp
 
-  Functions to emulate the video hardware of the aquarius.
+  Functions to emulate the video hardware of the Aquarius.
 
 ***************************************************************************/
 
@@ -72,18 +72,18 @@ TILE_GET_INFO_MEMBER(aquarius_state::get_tile_info)
 	{
 	case 0: case 1: case 27: case 28:
 		// border top/bottom
-		tileinfo.set(0, m_videoram[0], m_colorram[0], 0);
+		tileinfo.set(0, m_videoram[0] | (m_gfx_bank << 8), m_colorram[0], 0);
 		break;
 	default:
 		switch (col)
 		{
 		case 0: case 1: case 42: case 43:
 			// border left/right
-			tileinfo.set(0, m_videoram[0], m_colorram[0], 0);
+			tileinfo.set(0, m_videoram[0] | (m_gfx_bank << 8), m_colorram[0], 0);
 			break;
 		default:
 			// display area
-			tileinfo.set(0, m_videoram[(row - 2) * 40 + (col - 2)], m_colorram[(row - 2) * 40 + (col - 2)], 0);
+			tileinfo.set(0, m_videoram[(row - 2) * 40 + (col - 2)] | (m_gfx_bank << 8), m_colorram[(row - 2) * 40 + (col - 2)], 0);
 			break;
 		}
 		break;
