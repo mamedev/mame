@@ -22,6 +22,11 @@ static const char *const s_mnemonic[] =
 	"retn","rl"  ,"rla" ,"rlc" ,"rlca","rld" ,"rr"  ,"rra" ,
 	"rrc" ,"rrca","rrd" ,"rst" ,"sbc" ,"scf" ,"set" ,"sla" ,
 	"sll" ,"sra" ,"srl" ,"sub" ,"xor "
+	// z80n
+	                                  ,"swap","mirr","test",
+	"bsla","bsra","bsrl","bsrf","brlc","mul" ,"otib","nreg",
+	"pxdn","pxad","stae","ldix","ldws","lddx","lirx","lprx",
+	"ldrx"
 };
 
 const u32 z80_disassembler::s_flags[] =
@@ -35,6 +40,11 @@ const u32 z80_disassembler::s_flags[] =
 	STEP_OUT ,0        ,0        ,0        ,0        ,0    ,0        ,0        ,
 	0        ,0        ,0        ,STEP_OVER,0        ,0    ,0        ,0        ,
 	0        ,0        ,0        ,0        ,0
+	// z80n
+	                                                 ,0    ,0        ,0        ,
+	0        ,0        ,0        ,0        ,0        ,0    ,0        ,0        ,
+	0        ,0        ,0        ,0        ,0        ,0    ,0        ,0        ,
+	0
 };
 
 const z80_disassembler::z80dasm z80_disassembler::mnemonic_xx_cb[256] =
@@ -171,74 +181,6 @@ const z80_disassembler::z80dasm z80_disassembler::mnemonic_cb[256] =
 	{zSET,"6,h"},   {zSET,"6,l"},   {zSET,"6,(hl)"},{zSET,"6,a"},
 	{zSET,"7,b"},   {zSET,"7,c"},   {zSET,"7,d"},   {zSET,"7,e"},
 	{zSET,"7,h"},   {zSET,"7,l"},   {zSET,"7,(hl)"},{zSET,"7,a"}
-};
-
-const z80_disassembler::z80dasm z80_disassembler::mnemonic_ed[256] =
-{
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zIN,"b,(c)"},  {zOUT,"(c),b"}, {zSBC,"hl,bc"}, {zLD,"(W),bc"},
-	{zNEG,nullptr}, {zRETN,nullptr},{zIM,"0"},      {zLD,"i,a"},
-	{zIN,"c,(c)"},  {zOUT,"(c),c"}, {zADC,"hl,bc"}, {zLD,"bc,(W)"},
-	{zNEG,"*"},     {zRETI,nullptr},{zIM,"0"},      {zLD,"r,a"},
-	{zIN,"d,(c)"},  {zOUT,"(c),d"}, {zSBC,"hl,de"}, {zLD,"(W),de"},
-	{zNEG,"*"},     {zRETN,nullptr},{zIM,"1"},      {zLD,"a,i"},
-	{zIN,"e,(c)"},  {zOUT,"(c),e"}, {zADC,"hl,de"}, {zLD,"de,(W)"},
-	{zNEG,"*"},     {zRETI,nullptr},{zIM,"2"},      {zLD,"a,r"},
-	{zIN,"h,(c)"},  {zOUT,"(c),h"}, {zSBC,"hl,hl"}, {zLD,"(W),hl"},
-	{zNEG,"*"},     {zRETN,nullptr},{zIM,"0"},      {zRRD,"(hl)"},
-	{zIN,"l,(c)"},  {zOUT,"(c),l"}, {zADC,"hl,hl"}, {zLD,"hl,(W)"},
-	{zNEG,"*"},     {zRETI,nullptr},{zIM,"0"},      {zRLD,"(hl)"},
-	{zIN,"0,(c)"},  {zOUT,"(c),0"}, {zSBC,"hl,sp"}, {zLD,"(W),sp"},
-	{zNEG,"*"},     {zRETN,nullptr},{zIM,"1"},      {zDB,"?"},
-	{zIN,"a,(c)"},  {zOUT,"(c),a"}, {zADC,"hl,sp"}, {zLD,"sp,(W)"},
-	{zNEG,"*"},     {zRETI,nullptr},{zIM,"2"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zLDI,nullptr},       {zCPI,nullptr},       {zINI,nullptr},       {zOUTI,nullptr},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zLDD,nullptr},       {zCPD,nullptr},       {zIND,nullptr},       {zOUTD,nullptr},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zLDIR,nullptr},      {zCPIR,nullptr},      {zINIR,nullptr},      {zOTIR,nullptr},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zLDDR,nullptr},      {zCPDR,nullptr},      {zINDR,nullptr},      {zOTDR,nullptr},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"}
 };
 
 const z80_disassembler::z80dasm z80_disassembler::mnemonic_xx[256] =

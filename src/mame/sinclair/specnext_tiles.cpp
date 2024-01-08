@@ -1,0 +1,111 @@
+// license:BSD-3-Clause
+/**********************************************************************
+
+    Spectrum Next Tiles
+
+**********************************************************************/
+
+#include "emu.h"
+#include "screen.h"
+
+#include "specnext_tiles.h"
+
+static const gfx_layout gfx_8x8x4 =
+{
+    8, 8, 256 * 2, 4,
+    { STEP4(0, 1) },
+    { STEP8(0, 4) },
+    { STEP8(0, 4 * 8) },
+    4 * 8 * 8
+};
+
+static const gfx_layout gfx_8x8x4_r =
+{
+    8, 8, 256 * 2, 4,
+    { STEP4(0, 1) },
+    { STEP8(4 * 8 * 7, -4 * 8) },
+    { STEP8(0, 4) },
+    4 * 8 * 8
+};
+
+static GFXDECODE_START( gfx_tiles )
+    GFXDECODE_ENTRY( nullptr, 0, gfx_8x8x4, 0x200, 16 )
+    GFXDECODE_ENTRY( nullptr, 0, gfx_8x8x4_r, 0x200, 16 )
+GFXDECODE_END
+
+specnext_tiles_device::specnext_tiles_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, SPECNEXT_TILES, tag, owner, clock)
+    , device_gfx_interface(mconfig, *this, gfx_tiles, ":palette")
+    , m_ram(*this, "^ram")
+{
+}
+
+TILE_GET_INFO_MEMBER(specnext_tiles_device::get_tile_info)
+{
+    bool attr_in_map = BIT(~m_control, 5);
+    u8* data = &m_tiles_info[tile_index << attr_in_map];
+    u8 attr = attr_in_map ? *(data + attr_in_map) : m_default_flags;
+    u16 code = *data;
+
+    u32 category;
+    if (BIT(m_control, 1))
+    {
+        code |= BIT(attr, 0) << 8;
+        category = BIT(m_control, 0) ? 2 : 1;
+    }
+    else
+    {
+        category = BIT(attr, 0) ? 2 : 1;
+    }
+	tileinfo.category = category;
+
+    tileinfo.set(BIT(attr, 1), code, BIT(attr, 4, 4), (TILE_FLIPY * BIT(attr, 2) | (TILE_FLIPX * BIT(attr, 3))));
+}
+
+void specnext_tiles_device::tilemap_update()
+{
+    m_tiles_info = m_ram->pointer() + 0x40000 + (5 << 14);
+    for (auto i = 0; i < 2; ++i)
+    {
+        gfx(i)->set_source(m_tiles_info + ((m_tm_tile_base & 0x3f) << 8));
+        m_tilemap[i]->set_palette_offset(0x100 * BIT(m_control, 4));
+        m_tilemap[i]->set_transparent_pen(m_transp_colour);
+        m_tilemap[i]->set_scrollx(-m_offset.first - m_tm_scroll_x);
+        m_tilemap[i]->set_scrolly(-m_offset.second - m_tm_scroll_y);
+        m_tilemap[i]->mark_mapping_dirty();
+        m_tilemap[i]->mark_all_dirty();
+    }
+
+    m_tiles_info += (m_tm_map_base & 0x3f) << 8;
+}
+
+void specnext_tiles_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bool over_ula)
+{
+    m_tilemap[BIT(m_control, 6)]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(over_ula ? 2 : 1));
+}
+
+void specnext_tiles_device::device_start()
+{
+    m_tilemap[0] = &machine().tilemap().create(*this
+        , tilemap_get_info_delegate(*this, FUNC(specnext_tiles_device::get_tile_info))
+        , TILEMAP_SCAN_ROWS, 8, 8, 40, 32);
+    m_tilemap[1] = &machine().tilemap().create(*this
+        , tilemap_get_info_delegate(*this, FUNC(specnext_tiles_device::get_tile_info))
+        , TILEMAP_SCAN_ROWS, 8, 8, 80, 32);
+
+    //save_item(NAME(m_offset));
+    save_item(NAME(m_control));
+    save_item(NAME(m_default_flags));
+    save_item(NAME(m_transp_colour));
+    save_item(NAME(m_tm_map_base));
+    save_item(NAME(m_tm_tile_base));
+    save_item(NAME(m_tm_scroll_x));
+    save_item(NAME(m_tm_scroll_y));
+    save_item(NAME(m_clip_x1));
+    save_item(NAME(m_clip_x2));
+    save_item(NAME(m_clip_y1));
+    save_item(NAME(m_clip_y2));
+}
+
+// device type definition
+DEFINE_DEVICE_TYPE(SPECNEXT_TILES, specnext_tiles_device, "tiles", "Spectrum Next Tiles")

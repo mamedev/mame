@@ -30,6 +30,7 @@ protected:
 
 	enum e_mnemonics
 	{
+		// z80
 		zADC  ,zADD  ,zAND  ,zBIT  ,zCALL ,zCCF  ,zCP   ,zCPD  ,
 		zCPDR ,zCPI  ,zCPIR ,zCPL  ,zDAA  ,zDB   ,zDEC  ,zDI   ,
 		zDJNZ ,zEI   ,zEX   ,zEXX  ,zHLT  ,zIM   ,zIN   ,zINC  ,
@@ -39,6 +40,11 @@ protected:
 		zRETN ,zRL   ,zRLA  ,zRLC  ,zRLCA ,zRLD  ,zRR   ,zRRA  ,
 		zRRC  ,zRRCA ,zRRD  ,zRST  ,zSBC  ,zSCF  ,zSET  ,zSLA  ,
 		zSLL  ,zSRA  ,zSRL  ,zSUB  ,zXOR
+		// z80n
+		                                  ,zSWAP ,zMIRR ,zTEST ,
+		zBSLA ,zBSRA ,zBSRL ,zBSRF ,zBRLC ,zMUL  ,zOTIB ,zNREG ,
+		zPXDN ,zPXAD ,zSTAE ,zLDIX ,zLDWS ,zLDDX ,zLIRX ,zLPRX ,
+		zLDRX
 	};
 
 	static inline char sign(s8 offset);

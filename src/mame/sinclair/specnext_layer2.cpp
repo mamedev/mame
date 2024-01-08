@@ -1,0 +1,60 @@
+// license:BSD-3-Clause
+/**********************************************************************
+
+    Spectrum Next Layer2
+
+**********************************************************************/
+
+#include "emu.h"
+#include "screen.h"
+
+#include "specnext_layer2.h"
+
+specnext_layer2_device::specnext_layer2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, SPECNEXT_LAYER2, tag, owner, clock)
+    , device_gfx_interface(mconfig, *this, nullptr, ":palette")
+    , m_ram(*this, "^ram")
+{
+}
+
+void specnext_layer2_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	if (!m_ports.layer2_en || m_ports.resolution != 0b00)
+		return;
+
+    const u16 pen_base = 0x400/* | (m_regs.nr_43_active_layer2_palette << 8)*/ | (m_ports.palette_offset << 4);
+	for (u16 vpos = cliprect.top(); vpos <= cliprect.bottom(); vpos++)
+	{
+		const u8 y = vpos - m_offset.second;
+		const u8 x = cliprect.left() - m_offset.first;
+		u8 *scr = m_ram->pointer() + 0x40000 + (m_ports.layer2_active_bank << 14) + (y * 256) + x;
+		u16 *pix = &(bitmap.pix(vpos, cliprect.left()));
+		for (u16 hpos = cliprect.left(); hpos <= cliprect.right(); hpos++, pix++, scr++)
+		{
+			const u16 pen = pen_base + *scr;
+			if (palette().pen_color(pen) != m_global_transparent) // offst
+				*pix = pen;
+		}
+	}
+}
+
+void specnext_layer2_device::device_start()
+{
+    //save_item(NAME(m_offset));
+    /*
+    save_item(NAME(m_ports.layer2_en));
+    save_item(NAME(m_ports.resolution));
+    save_item(NAME(m_ports.palette_offset));
+    save_item(NAME(m_ports.layer2_active_bank));
+
+    save_item(NAME(m_ports.scroll_x));
+    save_item(NAME(m_ports.scroll_y));
+    save_item(NAME(m_ports.clip_x1));
+    save_item(NAME(m_ports.clip_x2));
+    save_item(NAME(m_ports.clip_y1));
+    save_item(NAME(m_ports.clip_y2));
+    */
+}
+
+// device type definition
+DEFINE_DEVICE_TYPE(SPECNEXT_LAYER2, specnext_layer2_device, "layer2", "Spectrum Next Layer2")

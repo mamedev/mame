@@ -735,6 +735,7 @@ void z80dma_device::write(uint8_t data)
 				case COMMAND_ENABLE_DMA:
 					LOG("Z80DMA Enable DMA\n");
 					m_dma_enabled = 1;
+					m_byte_counter = 0;
 					break;
 				case COMMAND_READ_MASK_FOLLOWS:
 					LOG("Z80DMA Set Read Mask\n");

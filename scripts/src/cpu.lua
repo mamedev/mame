@@ -2887,16 +2887,19 @@ end
 --------------------------------------------------
 -- Zilog Z80
 --@src/devices/cpu/z80/z80.h,CPUS["Z80"] = true
+--@src/devices/cpu/z80/z80n.h,CPUS["Z80N"] = true
 --@src/devices/cpu/z80/kc82.h,CPUS["KC80"] = true
 --@src/devices/cpu/z80/kl5c80a12.h,CPUS["KC80"] = true
 --@src/devices/cpu/z80/kl5c80a16.h,CPUS["KC80"] = true
 --@src/devices/cpu/z80/ky80.h,CPUS["KC80"] = true
 --------------------------------------------------
 
-if (CPUS["Z80"]~=null or CPUS["KC80"]~=null) then
+if (CPUS["Z80"]~=null or CPUS["Z80N"]~=null or CPUS["KC80"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/cpu/z80/z80.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/z80.h",
+		MAME_DIR .. "src/devices/cpu/z80/z80n.cpp",
+		MAME_DIR .. "src/devices/cpu/z80/z80n.h",
 		MAME_DIR .. "src/devices/cpu/z80/tmpz84c011.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/tmpz84c011.h",
 		MAME_DIR .. "src/devices/cpu/z80/tmpz84c015.cpp",
@@ -2934,9 +2937,15 @@ if CPUS["KC80"] then
 end
 
 local want_disasm_z80  = opt_tool(CPUS, "Z80")
+local want_disasm_z80n = opt_tool(CPUS, "Z80N")
 local want_disasm_kc80 = opt_tool(CPUS, "KC80")
 
-if want_disasm_z80 or want_disasm_kc80 then
+if want_disasm_z80 or want_disasm_z80n or want_disasm_kc80 then
+	if want_disasm_z80n then
+		table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/z80/z80dasm_menmonic_ed_n.cpp")
+	else
+		table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/z80/z80dasm_menmonic_ed.cpp")
+	end
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/z80/z80dasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/z80/z80dasm.h")
 end
