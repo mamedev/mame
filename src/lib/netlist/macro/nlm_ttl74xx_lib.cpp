@@ -1848,6 +1848,45 @@ static NETLIST_START(TTL_74148_DIP)
 	)
 }
 
+//- Identifier: TTL_74151_DIP
+//- Title: SN74151 Data selector/multiplexer
+//- Pinalias: D3,D2,D1,D0,Y,W,G,Gnd,C,B,A,D7,D6,D5,D4,Vcc
+//- Package: DIP-16
+//- NamingConvention: Naming conventions follow Texas Instruments datasheet
+//- FunctionTable:
+//-   https://www.ti.com/lit/ds/symlink/sn74ls151.pdf
+//-
+//-         +---+---+----+--++----+-----+
+//-         | C | B | A | G ||  Y |  W  |
+//-         +===+===+===+===++====+=====+
+//-         | X | X | X | H ||  L |  H  |
+//-         | L | L | L | L || D0 | ~D0 |
+//-         | L | L | H | L || D1 | ~D1 |
+//-         | L | H | L | L || D2 | ~D2 |
+//-         | L | H | H | L || D3 | ~D3 |
+//-         | H | L | L | L || D4 | ~D4 |
+//-         | H | L | H | L || D5 | ~D5 |
+//-         | H | H | L | L || D6 | ~D6 |
+//-         | H | H | H | L || D7 | ~D7 |
+//-         +---+---+---+---++----+-----+
+//-
+static NETLIST_START(TTL_74151_DIP)
+{
+	NET_REGISTER_DEV(TTL_74151_GATE, A)
+
+	DIPPINS(         //        +--------------+
+		A.D3, A.VCC, //     D3 |1     ++    16| VCC
+		A.D2, A.D4,  //     D2 |2           15| D4
+		A.D1, A.D5,  //     D1 |3           14| D5
+		A.D0, A.D6,  //     D0 |4   74151   13| D6
+		A.Y,  A.D7,  //      Y |5           12| D7
+		A.W,   A.A,  //      W |6           11| A
+		A.G,   A.B,  //      G |7           10| B
+		A.GND, A.C   //    GND |8            9| C
+					 //        +--------------+
+	)
+}
+
 //- Identifier: TTL_74153_DIP
 //- Title: 54153/DM54153/DM74153 Dual 4-Line to 1-LineData Selectors/Multiplexers
 //- Pinalias: G1,B,1C3,1C2,1C1,1C0,Y1,GND,Y2,2C0,2C1,2C2,2C3,A,G2,VCC
@@ -3272,6 +3311,29 @@ static TRUTH_TABLE(TTL_74148_GATE, 9, 5, "")
 	TT_FAMILY("74XX")
 }
 
+static TRUTH_TABLE(TTL_74151_GATE, 12, 2, "")
+{
+	TT_HEAD("C,B,A,G,D0,D1,D2,D3,D4,D5,D6,D7|Y,W")
+	TT_LINE( "X,X,X,1,0,X,X,X,X,X,X,X|0,1|38,30")
+	TT_LINE( "0,0,0,0,1,X,X,X,X,X,X,X|1,0|38,30")
+	TT_LINE( "0,0,0,0,0,X,X,X,X,X,X,X|0,1|38,30")
+	TT_LINE( "0,0,1,0,X,1,X,X,X,X,X,X|1,0|38,30")
+	TT_LINE( "0,0,1,0,X,0,X,X,X,X,X,X|0,1|38,30")
+	TT_LINE( "0,1,0,0,X,X,1,X,X,X,X,X|1,0|38,30")
+	TT_LINE( "0,1,0,0,X,X,0,X,X,X,X,X|0,1|38,30")
+	TT_LINE( "0,1,1,0,X,X,X,1,X,X,X,X|1,0|38,30")
+	TT_LINE( "0,1,1,0,X,X,X,0,X,X,X,X|0,1|38,30")
+	TT_LINE( "1,0,0,0,X,X,X,X,1,X,X,X|1,0|38,30")
+	TT_LINE( "1,0,0,0,X,X,X,X,0,X,X,X|0,1|38,30")
+	TT_LINE( "1,0,1,0,X,X,X,X,X,1,X,X|1,0|38,30")
+	TT_LINE( "1,0,1,0,X,X,X,X,X,0,X,X|0,1|38,30")
+	TT_LINE( "1,1,0,0,X,X,X,X,X,X,1,X|1,0|38,30")
+	TT_LINE( "1,1,0,0,X,X,X,X,X,X,0,X|0,1|38,30")
+	TT_LINE( "1,1,1,0,X,X,X,X,X,X,X,1|1,0|38,30")
+	TT_LINE( "1,1,1,0,X,X,X,X,X,X,X,0|0,1|38,30")
+	TT_FAMILY("74XX")
+}
+
 static TRUTH_TABLE(TTL_74155A_GATE, 4, 4, "")
 {
 	TT_HEAD("B,A,G,C|Y0,Y1,Y2,Y3")
@@ -3428,6 +3490,7 @@ NETLIST_START(ttl74xx_lib)
 	TRUTHTABLE_ENTRY(TTL_74139_GATE)
 	TRUTHTABLE_ENTRY(TTL_74147_GATE)
 	TRUTHTABLE_ENTRY(TTL_74148_GATE)
+	TRUTHTABLE_ENTRY(TTL_74151_GATE)
 	TRUTHTABLE_ENTRY(TTL_74155A_GATE)
 	TRUTHTABLE_ENTRY(TTL_74155B_GATE)
 	TRUTHTABLE_ENTRY(TTL_74156A_GATE)
@@ -3487,6 +3550,7 @@ NETLIST_START(ttl74xx_lib)
 	LOCAL_LIB_ENTRY(TTL_74139_DIP)
 	LOCAL_LIB_ENTRY(TTL_74147_DIP)
 	LOCAL_LIB_ENTRY(TTL_74148_DIP)
+	LOCAL_LIB_ENTRY(TTL_74151_DIP)
 	LOCAL_LIB_ENTRY(TTL_74153_DIP)
 	LOCAL_LIB_ENTRY(TTL_74155_DIP)
 	LOCAL_LIB_ENTRY(TTL_74156_DIP)
