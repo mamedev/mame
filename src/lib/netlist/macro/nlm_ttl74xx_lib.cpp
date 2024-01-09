@@ -1767,6 +1767,47 @@ static NETLIST_START(TTL_74139_DIP)
 	)
 }
 
+//- Identifier: TTL_74147_DIP
+//- Title: SN74147 10-Line to 4-Line and 8-line to 3-line priority encoders
+//- Pinalias: 4,5,6,7,8,C,B,GND,A,9,1,2,3,D,NC,Vcc
+//- Package: DIP-16
+//- NamingConvention: Naming conventions follow Texas Instruments datasheet
+//- FunctionTable:
+//-   https://www.ti.com/lit/ds/symlink/sn74ls148.pdf
+//-
+//-                          10-line to 4 line encoder
+//-     +-----+-----+-----+-----+-----+-----+-----+-----+-----+---+---+---+---+
+//-     |  1  |  2  |  3  |  4  |  5  |  6  |  7  |  8  |  9  | D | C | B | A |
+//-     +=====+=====+=====+=====+=====+=====+=====+=====+=====+===+===+===+===+
+//-     |  H  |  H  |  H  |  H  |  H  |  H  |  H  |  H  |  H  | H | H | H | H |
+//-     |  X  |  X  |  X  |  X  |  X  |  X  |  X  |  X  |  L  | L | H | H | L |
+//-     |  X  |  X  |  X  |  X  |  X  |  X  |  X  |  L  |  H  | L | H | H | H |
+//-     |  X  |  X  |  X  |  X  |  X  |  X  |  L  |  H  |  H  | H | L | L | L |
+//-     |  X  |  X  |  X  |  X  |  X  |  L  |  H  |  H  |  H  | H | L | L | H |
+//-     |  X  |  X  |  X  |  X  |  L  |  H  |  H  |  H  |  H  | H | L | H | L |
+//-     |  X  |  X  |  X  |  L  |  H  |  H  |  H  |  H  |  H  | H | L | H | H |
+//-     |  X  |  X  |  L  |  H  |  H  |  H  |  H  |  H  |  H  | H | H | L | L |
+//-     |  X  |  L  |  H  |  H  |  H  |  H  |  H  |  H  |  H  | H | H | L | H |
+//-     |  L  |  H  |  H  |  H  |  H  |  H  |  H  |  H  |  H  | H | H | H | L |
+//-     +-----+-----+-----+-----+-----+-----+-----+-----+-----+---+---+---+---+
+static NETLIST_START(TTL_74147_DIP)
+{
+	TTL_74147(A)
+	NC_PIN(NC)
+
+	DIPPINS(         //        +--------------+
+		A.I4, A.VCC, //      4 |1     ++    16| VCC
+		A.I5, NC.I,  //      5 |2           15| NC
+		A.I6, A.D,   //      6 |3           14| D
+		A.I7, A.I3,  //      7 |4   74147   13| 3
+		A.I8, A.I2,  //      8 |5           12| 2
+		A.C, A.I1,   //      C |6           11| 1
+		A.B, A.I9,   //      B |7           10| 9
+		A.GND, A.A   //    GND |8            9| A
+					 //        +--------------+
+	)
+}
+
 //- Identifier: TTL_74153_DIP
 //- Title: 54153/DM54153/DM74153 Dual 4-Line to 1-LineData Selectors/Multiplexers
 //- Pinalias: G1,B,1C3,1C2,1C1,1C0,Y1,GND,Y2,2C0,2C1,2C2,2C3,A,G2,VCC
@@ -3159,6 +3200,22 @@ static TRUTH_TABLE(TTL_74139_GATE, 3, 4, "")
 	TT_FAMILY("74XX")
 }
 
+static TRUTH_TABLE(TTL_74147_GATE, 9, 4, "")
+{
+	TT_HEAD("1,2,3,4,5,6,7,8,9|D,C,B,A")
+	TT_LINE("1,1,1,1,1,1,1,1,1|1,1,1,1|10,10,10,10")
+	TT_LINE("X,X,X,X,X,X,X,X,0|0,1,1,0|10,10,10,10")
+	TT_LINE("X,X,X,X,X,X,X,0,1|0,1,1,1|10,10,10,10")
+	TT_LINE("X,X,X,X,X,X,0,1,1|1,0,0,0|10,10,10,10")
+	TT_LINE("X,X,X,X,X,0,1,1,1|1,0,0,1|10,10,10,10")
+	TT_LINE("X,X,X,X,0,1,1,1,1|1,0,1,0|10,10,10,10")
+	TT_LINE("X,X,X,0,1,1,1,1,1|1,0,1,1|10,10,10,10")
+	TT_LINE("X,X,0,1,1,1,1,1,1|1,1,0,0|10,10,10,10")
+	TT_LINE("X,0,1,1,1,1,1,1,1|1,1,0,1|10,10,10,10")
+	TT_LINE("0,1,1,1,1,1,1,1,1|1,1,1,0|10,10,10,10")
+	TT_FAMILY("74XX")
+}
+
 static TRUTH_TABLE(TTL_74155A_GATE, 4, 4, "")
 {
 	TT_HEAD("B,A,G,C|Y0,Y1,Y2,Y3")
@@ -3370,6 +3427,7 @@ NETLIST_START(ttl74xx_lib)
 	LOCAL_LIB_ENTRY(TTL_74125_DIP)
 	LOCAL_LIB_ENTRY(TTL_74126_DIP)
 	LOCAL_LIB_ENTRY(TTL_74139_DIP)
+	LOCAL_LIB_ENTRY(TTL_74147_DIP)
 	LOCAL_LIB_ENTRY(TTL_74153_DIP)
 	LOCAL_LIB_ENTRY(TTL_74155_DIP)
 	LOCAL_LIB_ENTRY(TTL_74156_DIP)
