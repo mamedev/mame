@@ -43448,8 +43448,9 @@ sidebsja                        // 1996.07 E23 (c) 1996 Taito Corporation (Japan
 sidebsjb                        // 1996.07 E23 (c) 1996 Taito Corporation (Japan) - Ver 2.5 J
 
 @source:taito/taitopjc.cpp
-optiger                         // 1998.09 E63 (c) 1998 Taito
-optigerj
+optiger                         // 1998.09 E63 (c) 1998 Taito Corporation - Ver 2.14 O
+optigera                        // 1998.09 E63 (c) 1998 Taito Corporation - Ver 2.10 O
+optigerj                        // 1998.09 E63 (c) 1998 Taito Corporation - Ver 2.09 J
 
 @source:taito/taitosj.cpp
 alpine                          // RH  (c) 1982 Taito Corporation
