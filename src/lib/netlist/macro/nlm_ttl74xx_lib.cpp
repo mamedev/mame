@@ -2574,7 +2574,7 @@ static NETLIST_START(TTL_74293_DIP)
 //- Identifier: TTL_74368_DIP
 //- Title: SN74368 Hex Inverting Buffers and Line Drivers With 3-State Outputs
 //- Pinalias: 1G,1A1,1Y1,1A2,1Y2,1A3,1Y3,Gnd,1Y4,1A4,2Y1,2A1,2Y2,2A2,2G,Vcc
-//- Package: DIP
+//- Package: DIP-16
 //- NamingConvention: Naming conventions follow Texas Instruments datasheet
 //- FunctionTable:
 //-   https://www.ti.com/lit/ds/symlink/sn74hc368.pdf
