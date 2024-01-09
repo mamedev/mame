@@ -1768,7 +1768,7 @@ static NETLIST_START(TTL_74139_DIP)
 }
 
 //- Identifier: TTL_74147_DIP
-//- Title: SN74147 10-Line to 4-Line and 8-line to 3-line priority encoders
+//- Title: SN74147 10-Line to 4-Line priority encoder
 //- Pinalias: 4,5,6,7,8,C,B,GND,A,9,1,2,3,D,NC,Vcc
 //- Package: DIP-16
 //- NamingConvention: Naming conventions follow Texas Instruments datasheet
@@ -1804,6 +1804,46 @@ static NETLIST_START(TTL_74147_DIP)
 		A.C, A.I1,   //      C |6           11| 1
 		A.B, A.I9,   //      B |7           10| 9
 		A.GND, A.A   //    GND |8            9| A
+					 //        +--------------+
+	)
+}
+
+//- Identifier: TTL_74148_DIP
+//- Title: SN74148 8-line to 3-line priority encoders
+//- Pinalias: 4,5,6,7,EI,A2,A1,GND,A0,0,1,2,3,GS,E0,Vcc
+//- Package: DIP-16
+//- NamingConvention: Naming conventions follow Texas Instruments datasheet
+//- FunctionTable:
+//-   https://www.ti.com/lit/ds/symlink/sn74ls148.pdf
+//-
+//-                          10-line to 4 line encoder
+//-     +-----+-----+-----+-----+-----+-----+-----+-----+-----+----+----+----+----+----+
+//-     | EI  |  0  |  1  |  2  |  3  |  4  |  5  |  6  |  7  | A2 | A1 | A0 | GS | E0 |
+//-     +=====+=====+=====+=====+=====+=====+=====+=====+=====+====+====+====+====+====+
+//-     |  H  |  X  |  X  |  X  |  X  |  X  |  X  |  X  |  X  |  H |  H |  H |  H |  H |
+//-     |  L  |  H  |  X  |  H  |  H  |  H  |  H  |  H  |  H  |  H |  H |  H |  H |  L |
+//-     |  L  |  X  |  X  |  X  |  X  |  X  |  X  |  X  |  L  |  L |  L |  L |  L |  H |
+//-     |  L  |  X  |  X  |  X  |  X  |  X  |  X  |  L  |  H  |  L |  L |  H |  L |  H |
+//-     |  L  |  X  |  X  |  X  |  X  |  X  |  L  |  H  |  H  |  L |  H |  L |  L |  H |
+//-     |  L  |  X  |  X  |  X  |  X  |  L  |  H  |  H  |  H  |  L |  H |  H |  L |  H |
+//-     |  L  |  X  |  X  |  X  |  L  |  H  |  H  |  H  |  H  |  H |  L |  L |  L |  H |
+//-     |  L  |  X  |  X  |  L  |  H  |  H  |  H  |  H  |  H  |  H |  L |  H |  L |  H |
+//-     |  L  |  X  |  L  |  H  |  H  |  H  |  H  |  H  |  H  |  H |  H |  L |  L |  H |
+//-     |  L  |  L  |  H  |  H  |  H  |  H  |  H  |  H  |  H  |  H |  H |  H |  L |  H |
+//-     +-----+-----+-----+-----+-----+-----+-----+-----+-----+----+----+----+----+----+
+static NETLIST_START(TTL_74148_DIP)
+{
+	NET_REGISTER_DEV(TTL_74148_GATE, A)
+
+	DIPPINS(         //        +--------------+
+		A.I4, A.VCC, //      4 |1     ++    16| VCC
+		A.I5, A.E0,  //      5 |2           15| E0
+		A.I6, A.GS,  //      6 |3           14| GS
+		A.I7, A.I3,  //      7 |4   74148   13| 3
+		A.EI, A.I2,  //     EI |5           12| 2
+		A.A2, A.I1,  //     A2 |6           11| 1
+		A.A1, A.I0,  //     A1 |7           10| 0
+		A.GND, A.A0  //    GND |8            9| A0
 					 //        +--------------+
 	)
 }
@@ -3216,6 +3256,22 @@ static TRUTH_TABLE(TTL_74147_GATE, 9, 4, "")
 	TT_FAMILY("74XX")
 }
 
+static TRUTH_TABLE(TTL_74148_GATE, 9, 5, "")
+{
+	TT_HEAD("EI,0,1,2,3,4,5,6,7|A2,A1,A0,GS,EO")
+	TT_LINE( "1,X,X,X,X,X,X,X,X|1,1,1,1,1|10,10,10,10")
+	TT_LINE( "0,1,1,1,1,1,1,1,1|1,1,1,1,0|10,10,10,10")
+	TT_LINE( "0,X,X,X,X,X,X,X,0|0,0,0,0,1|10,10,10,10")
+	TT_LINE( "0,X,X,X,X,X,X,0,1|0,0,1,0,1|10,10,10,10")
+	TT_LINE( "0,X,X,X,X,X,0,1,1|0,1,0,0,1|10,10,10,10")
+	TT_LINE( "0,X,X,X,X,0,1,1,1|0,1,1,0,1|10,10,10,10")
+	TT_LINE( "0,X,X,X,0,1,1,1,1|1,0,0,0,1|10,10,10,10")
+	TT_LINE( "0,X,X,0,1,1,1,1,1|1,0,1,0,1|10,10,10,10")
+	TT_LINE( "0,X,0,1,1,1,1,1,1|1,1,0,0,1|10,10,10,10")
+	TT_LINE( "0,0,1,1,1,1,1,1,1|1,1,1,0,1|10,10,10,10")
+	TT_FAMILY("74XX")
+}
+
 static TRUTH_TABLE(TTL_74155A_GATE, 4, 4, "")
 {
 	TT_HEAD("B,A,G,C|Y0,Y1,Y2,Y3")
@@ -3371,6 +3427,7 @@ NETLIST_START(ttl74xx_lib)
 	TRUTHTABLE_ENTRY(TTL_7486_XOR)
 	TRUTHTABLE_ENTRY(TTL_74139_GATE)
 	TRUTHTABLE_ENTRY(TTL_74147_GATE)
+	TRUTHTABLE_ENTRY(TTL_74148_GATE)
 	TRUTHTABLE_ENTRY(TTL_74155A_GATE)
 	TRUTHTABLE_ENTRY(TTL_74155B_GATE)
 	TRUTHTABLE_ENTRY(TTL_74156A_GATE)
@@ -3429,6 +3486,7 @@ NETLIST_START(ttl74xx_lib)
 	LOCAL_LIB_ENTRY(TTL_74126_DIP)
 	LOCAL_LIB_ENTRY(TTL_74139_DIP)
 	LOCAL_LIB_ENTRY(TTL_74147_DIP)
+	LOCAL_LIB_ENTRY(TTL_74148_DIP)
 	LOCAL_LIB_ENTRY(TTL_74153_DIP)
 	LOCAL_LIB_ENTRY(TTL_74155_DIP)
 	LOCAL_LIB_ENTRY(TTL_74156_DIP)
