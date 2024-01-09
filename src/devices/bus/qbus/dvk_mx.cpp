@@ -21,6 +21,8 @@
 #include "emu.h"
 #include "dvk_mx.h"
 
+#include "formats/dvk_mx_dsk.h"
+
 #define LOG_WARN    (1U << 1)   // Show warnings
 #define LOG_SHIFT   (1U << 2)   // Shows shift register contents
 #define LOG_REGS    (1U << 3)   // Digital input/output register and data rate select
@@ -397,18 +399,13 @@ void dvk_mx_device::live_run(attotime limit)
 				return;
 
 			if (!(cur_live.bit_counter & 255))
-			LOGSHIFT("%s (%s): shift = %04x data=%02x c=%d\n", cur_live.tm.to_string(), limit.to_string(), cur_live.shift_reg,
-					(cur_live.shift_reg & 0x4000 ? 0x80 : 0x00) |
-					(cur_live.shift_reg & 0x1000 ? 0x40 : 0x00) |
-					(cur_live.shift_reg & 0x0400 ? 0x20 : 0x00) |
-					(cur_live.shift_reg & 0x0100 ? 0x10 : 0x00) |
-					(cur_live.shift_reg & 0x0040 ? 0x08 : 0x00) |
-					(cur_live.shift_reg & 0x0010 ? 0x04 : 0x00) |
-					(cur_live.shift_reg & 0x0004 ? 0x02 : 0x00) |
-					(cur_live.shift_reg & 0x0001 ? 0x01 : 0x00),
-					cur_live.bit_counter);
+			{
+				LOGSHIFT("%s (%s): shift = %04x data=%02x c=%d\n", cur_live.tm.to_string(), limit.to_string(), cur_live.shift_reg,
+					bitswap<8>(cur_live.shift_reg, 14, 12, 10, 8, 6, 4, 2, 0), cur_live.bit_counter);
+			}
 
-			if (cur_live.shift_reg == 0xaaaaffaf) {
+			if (cur_live.shift_reg == 0xaaaaffaf)
+			{
 				LOGLIVE("%s: Found SYNC\n", cur_live.tm.to_string());
 				cur_live.data_separator_phase = false;
 				cur_live.bit_counter = 0;

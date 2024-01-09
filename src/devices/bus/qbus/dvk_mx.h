@@ -6,18 +6,16 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_QBUS_DVK_MX_H
+#define MAME_BUS_QBUS_DVK_MX_H
 
-#ifndef __DVK_MX_H__
-#define __DVK_MX_H__
+#pragma once
 
 #include "qbus.h"
 
-#include "formats/dvk_mx_dsk.h"
+#include "machine/fdc_pll.h"
 #include "machine/pdp11.h"
 #include "imagedev/floppy.h"
-
-#include "machine/fdc_pll.h"
 
 
 //**************************************************************************
@@ -169,4 +167,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(DVK_MX, dvk_mx_device)
 
-#endif /* __DVK_MX_H__ */
+#endif

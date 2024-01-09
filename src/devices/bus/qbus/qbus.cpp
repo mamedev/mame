@@ -15,8 +15,8 @@
 #include "pc11.h"
 #include "qtx.h"
 #include "dvk_kgd.h"
-
 #include "dvk_mx.h"
+
 
 void qbus_cards(device_slot_interface &device)
 {
