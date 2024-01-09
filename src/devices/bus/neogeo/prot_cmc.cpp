@@ -661,18 +661,6 @@ static const uint8_t m1_address_0_7_xor[256] =
 };
 
 
-/* The CMC50 hardware does a checksum of the first 64kb of the M1 rom, and
-   uses this checksum as the basis of the key with which to decrypt the rom */
-uint16_t cmc_prot_device::generate_cs16(uint8_t *rom, int size)
-{
-	uint16_t cs16 = 0x0000;
-	for (int i = 0; i < size; i++)
-		cs16 += rom[i];
-
-	return cs16 & 0xffff;
-}
-
-
 int cmc_prot_device::m1_address_scramble(int address, uint16_t key)
 {
 	const int p1[8][16] = {
@@ -711,7 +699,9 @@ void cmc_prot_device::cmc50_m1_decrypt(uint8_t* romcrypt, uint32_t romcrypt_size
 
 	std::vector<uint8_t> buffer(rom_size);
 
-	uint16_t key = generate_cs16(rom, 0x10000);
+	/* The CMC50 hardware does a checksum of the first 64kb of the M1 rom, and
+	   uses this checksum as the basis of the key with which to decrypt the rom */
+	uint16_t key = util::sum16_creator::simple(rom, 0x10000);
 
 	//printf("key %04x\n",key);
 
