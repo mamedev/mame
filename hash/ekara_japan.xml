@@ -145,7 +145,7 @@ license:CC0-1.0
 	61  *EC0061-JPM  J-Pop Mix Volume 27
 	62  *EC0062-JPM  J-Pop Mix Volume 28
 	63  *EC0063-JPM  J-Pop Mix Volume 29
-	64   EC0064-ENK  Enkamichi Volume 9
+	64  *EC0064-ENK  Enkamichi Volume 9
 	65  *EC0065-JPM  J-Pop Mix Volume 30
 	66  *EC0066-JPM  J-Pop Mix Volume 31
 	67  *EC0067-JPM  J-Pop Mix Volume 32
@@ -923,7 +923,17 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- EC0064-ENK  Enkamichi Volume 9 -->
+	<software name="ec0064">
+		<description>Enkamichi Volume 9 (Japan) (EC0064-ENK)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="演歌道ベスト Vol.9" />
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0064-enk.u1" size="0x100000" crc="ec2fefb3" sha1="1a56f251d32ff3eb5a20c70ac040c6e0f7d9307d"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="ec0065">
 		<description>J-Pop Mix Volume 30 (Japan) (EC0065-JPM)</description>
