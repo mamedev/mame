@@ -2571,6 +2571,47 @@ static NETLIST_START(TTL_74293_DIP)
 	)
 }
 
+//- Identifier: TTL_74368_DIP
+//- Title: SN74368 Hex Inverting Buffers and Line Drivers With 3-State Outputs
+//- Pinalias: 1G,1A1,1Y1,1A2,1Y2,1A3,1Y3,Gnd,1Y4,1A4,2Y1,2A1,2Y2,2A2,2G,Vcc
+//- Package: DIP
+//- NamingConvention: Naming conventions follow Texas Instruments datasheet
+//- FunctionTable:
+//-   https://www.ti.com/lit/ds/symlink/sn74hc368.pdf
+//-   https://www.ti.com/lit/ds/symlink/sn74ls368a.pdf
+//-
+//-         +----+---++---+
+//-         | OE | A || Y |
+//-         +====+===++===+
+//-         |  1 | X || Z |
+//-         |  0 | 1 || 0 |
+//-         |  0 | 0 || 1 |
+//-         +---+----++---+
+//-
+static NETLIST_START(TTL_74368_DIP)
+{
+	NET_REGISTER_DEV(TTL_74368_GATE, A)
+	NET_REGISTER_DEV(TTL_74368_GATE, B)
+
+	NET_C(A.VCC, B.VCC)
+	NET_C(A.GND, B.GND)
+
+	NET_C(A.A, B.A)
+	NET_C(A.B, B.B)
+
+	DIPPINS(         //      +--------------+
+		A.OE, A.VCC, //  1OE |1     ++    16| VCC
+		A.A1, B.OE,  //  1A1 |2           15| 2OE
+		A.Y1, B.A2,  //  1Y1 |3           14| 2A2
+		A.A2, B.Y2,  //  1A2 |4   74368   13| 2Y2
+		A.Y2, B.A1,  //  1Y2 |5           12| 2A1
+		A.A3, B.Y1,  //  1A3 |6           11| 2Y1
+		A.Y3, A.A4,  //  1Y4 |7           10| 1A4
+		A.GND, A.Y4  //  GND |8            9| 1Y4
+					 //      +--------------+
+	)
+}
+
 //- Identifier: TTL_74377_DIP
 //- Title: DM54LS377/DM74LS377 Octal D Flip-Flop with Common Enable and Clock
 //- Pinalias: EQ,Q0,D0,D1,Q1,Q2,D2,D3,Q3,GND,CP,Q4,D4,D5,Q5,Q6,D6,D7,Q7,VCC
@@ -3429,6 +3470,29 @@ static TRUTH_TABLE(TTL_74279B, 4, 1, "")
 	TT_FAMILY("74XX")
 }
 
+static TRUTH_TABLE(TTL_74368_GATE, 5, 4, "")
+{
+	TT_HEAD("OE,A1,A2,A3,A4|Y1,Y2,Y3,Y4")
+	TT_LINE("1,X,X,X,X|0,0,0,0|45,45,45,45")
+	TT_LINE("0,0,0,0,0|1,1,1,1|45,45,45,45")
+	TT_LINE("0,0,0,0,1|1,1,1,0|45,45,45,45")
+	TT_LINE("0,0,0,1,0|1,1,0,1|45,45,45,45")
+	TT_LINE("0,0,0,1,1|1,1,0,0|45,45,45,45")
+	TT_LINE("0,0,1,0,0|1,0,1,1|45,45,45,45")
+	TT_LINE("0,0,1,0,1|1,0,1,0|45,45,45,45")
+	TT_LINE("0,0,1,1,0|1,0,0,1|45,45,45,45")
+	TT_LINE("0,0,1,1,1|1,0,0,0|45,45,45,45")
+	TT_LINE("0,1,0,0,0|0,1,1,1|45,45,45,45")
+	TT_LINE("0,1,0,0,1|0,1,1,0|45,45,45,45")
+	TT_LINE("0,1,0,1,0|0,1,0,1|45,45,45,45")
+	TT_LINE("0,1,0,1,1|0,1,0,0|45,45,45,45")
+	TT_LINE("0,1,1,0,0|0,0,1,1|45,45,45,45")
+	TT_LINE("0,1,1,0,1|0,0,1,0|45,45,45,45")
+	TT_LINE("0,1,1,1,0|0,0,0,1|45,45,45,45")
+	TT_LINE("0,1,1,1,1|0,0,0,0|45,45,45,45")
+	TT_FAMILY("74XX")
+}
+
 static TRUTH_TABLE(TTL_9312, 12, 2,
 				   "+A,+B,+C,+G,+D0,+D1,+D2,+D3,+D4,+D5,+D6,+D7,@VCC,@GND")
 {
@@ -3499,6 +3563,7 @@ NETLIST_START(ttl74xx_lib)
 	TRUTHTABLE_ENTRY(TTL_74260_NOR)
 	TRUTHTABLE_ENTRY(TTL_74279A)
 	TRUTHTABLE_ENTRY(TTL_74279B)
+	TRUTHTABLE_ENTRY(TTL_74368_GATE)
 	TRUTHTABLE_ENTRY(TTL_9312)
 
 	LOCAL_LIB_ENTRY(TTL_7400_DIP)
@@ -3570,6 +3635,7 @@ NETLIST_START(ttl74xx_lib)
 	LOCAL_LIB_ENTRY(TTL_74290_DIP)
 	LOCAL_LIB_ENTRY(TTL_74293_DIP)
 	LOCAL_LIB_ENTRY(TTL_74365_DIP)
+	LOCAL_LIB_ENTRY(TTL_74368_DIP)
 	LOCAL_LIB_ENTRY(TTL_74377_DIP)
 	LOCAL_LIB_ENTRY(TTL_74378_DIP)
 	LOCAL_LIB_ENTRY(TTL_74379_DIP)
