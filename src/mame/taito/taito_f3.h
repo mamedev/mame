@@ -205,6 +205,7 @@ protected:
 	};
 
 	struct mixable {// layer compositing information
+		bool x_sample_enable{false};
 		u16 mix_value{0};
 		u8 prio() const { return mix_value & 0x000f; };
 		auto clip_inv() const { return std::bitset<4>(mix_value >> 4); };
@@ -224,7 +225,7 @@ protected:
 		// line enable, clip settings in 7400
 		// priority in 7600
 
-		bool x_sample_enable{false}; // 6400
+		// mosaic enable in 6400
 		bool brightness{false}; // 7400 0xf000
 		bitmap_ind16* srcbitmap;
 	};
@@ -236,7 +237,7 @@ protected:
 		bitmap_ind8*  flagsbitmap_vram;
 
 		u8 pivot_control{0};     // 6000
-		bool x_sample_enable{false}; // 6400
+		// mosaic enable in 6400
 		u16 pivot_enable{0};     // 7000
 		// mix info from 7200
 		bool use_pix() const { return pivot_control & 0xa0; };
@@ -251,8 +252,7 @@ protected:
 
 		u16 colscroll{0};            // 4000
 		bool alt_tilemap{false};     // 4000
-		bool x_sample_enable{false}; // 6400 x_sample_mask
-		int x_sample{0};
+		// mosaic enable in 6400
 		fixed8 x_scale{0x80};        // 8000
 		fixed8 y_scale{0};           // 8000
 		u16 pal_add{0};              // 9000
@@ -270,12 +270,11 @@ protected:
 		pri_alpha pri_alp[432]{};
 		// 5000/4000
 		clip_plane_inf clip[NUM_CLIPPLANES];
-		// 6000 - don't store sync reg ?
-		// pivot_control, sprite alpha
-		// 6200 - define this type better
+		// 6000 - pivot_control, sprite alpha
+		// 6200
 		u8 blend[4]{0}; // less 0 - 8 more
 		// 6400
-		u8 x_sample{0}; // mosaic effect
+		u8 x_sample{16 - 0}; // mosaic effect
 		u8 fx_6400{0}; // unemulated other effects
 		// 6600
 		u16 bg_palette{0}; // unemulated, needs investigation, bad name?

@@ -832,8 +832,8 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 			logerror("unknown pivot ctrl bits: %02x__ at %04x\n", line.pivot.pivot_control, 0x6000 + y*2);
 
 		for (int sp_group = 0; sp_group < NUM_SPRITEGROUPS; sp_group++) {
-			line.sp[sp_group].mix_value = (line.sp[sp_group].mix_value & 0x3fff)
-				| BIT(line_6000, sp_group * 2, 2) << 14;
+			line.sp[sp_group].mix_value &= 0x3fff;
+			line.sp[sp_group].mix_value |= BIT(line_6000, sp_group * 2, 2) << 14;
 		}
 	}
 	if (offs_t where = latched_addr(2, 1)) {
@@ -846,7 +846,7 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 	if (offs_t where = latched_addr(2, 2)) {
 		u16 x_mosaic = m_line_ram[where];
 
-		line.x_sample = BIT(x_mosaic, 4, 4);
+		line.x_sample = 16 - BIT(x_mosaic, 4, 4);
 
 		for (int pf_num = 0; pf_num < NUM_PLAYFIELDS; pf_num++) {
 			line.pf[pf_num].x_sample_enable = BIT(x_mosaic, pf_num);
@@ -902,7 +902,7 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 			u16 pf_scale = m_line_ram[where];
 			// y zooms are interleaved
 			const int FIX_Y[] = { 0, 3, 2, 1 };
-			line.pf[i].x_scale = 256-BIT(pf_scale, 8, 8);
+			line.pf[i].x_scale = 256 - BIT(pf_scale, 8, 8);
 			line.pf[FIX_Y[i]].y_scale = BIT(pf_scale, 0, 8)<<1;
 		}
 	}
@@ -1120,7 +1120,7 @@ void taito_f3_state::draw_line(pen_t* dst, f3_line_inf &line, int xs, int xe, pl
 		if (pf->prio() > pri_alp.pri
 			|| (pri_alp.alpha && (pf->blend_mask() != pri_alp.active_alpha))) {
 
-			int real_x = pf->x_sample_enable ? mosaic(x, 16 - line.x_sample) : x;
+			int real_x = pf->x_sample_enable ? mosaic(x, line.x_sample) : x;
 			int x_index = (((fx_x + (real_x - 46) * pf->x_scale)>>8) + 46) & m_width_mask;
 
 			if (!(flags[x_index] & 0xf0))
@@ -1147,7 +1147,7 @@ void taito_f3_state::draw_line(pen_t* dst, f3_line_inf &line, int xs, int xe, sp
 		if (sp->prio() > line.pri_alp[x].pri
 			|| (pri_alp.alpha && (blend_mode != pri_alp.active_alpha))) {
 
-			int real_x = sp->x_sample_enable ? mosaic(x, 16 - line.x_sample) : x;
+			int real_x = sp->x_sample_enable ? mosaic(x, line.x_sample) : x;
 
 			if (const u16 col = src[real_x]) { // 0 = transparent
 				const bool sel = sp->brightness;
@@ -1176,7 +1176,7 @@ void taito_f3_state::draw_line(pen_t* dst, f3_line_inf &line, int xs, int xe, pi
 		if (pv->prio() > pri_alp.pri
 			|| (pri_alp.alpha && (pv->blend_mask() != pri_alp.active_alpha))) {
 
-			int real_x = pv->x_sample_enable ? mosaic(x, 16 - line.x_sample) : x;
+			int real_x = pv->x_sample_enable ? mosaic(x, line.x_sample) : x;
 
 			int x_index = (pv->reg_sx + real_x) & width_mask;
 			if (!(flagsbitmap[x_index] & 0xf0))
