@@ -9,6 +9,8 @@
 #include "emu.h"
 #include "isbc_215g.h"
 
+#include "multibyte.h"
+
 DEFINE_DEVICE_TYPE(ISBC_215G, isbc_215g_device, "isbc_215g", "ISBC 215G Winchester Disk Controller")
 
 isbc_215g_device::isbc_215g_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -32,7 +34,7 @@ void isbc_215g_device::find_sector()
 	// 1:     cyl low
 	// 2:     head
 	// 3:     sector
-	uint16_t cyl = ((m_idcompare[0] & 0xf) << 8) | m_idcompare[1];
+	uint16_t cyl = get_u16be(&m_idcompare[0]) & 0xfff;
 	uint16_t bps = 128 << ((m_idcompare[0] >> 4) & 3);
 
 	if(!m_geom[m_drive])
@@ -280,13 +282,11 @@ void isbc_215g_device::io_w(offs_t offset, uint16_t data)
 			break;
 		case 0x18:
 			//sector id/format
-			m_idcompare[1] = data & 0xff;
-			m_idcompare[0] = data >> 8;
+			put_u16be(&m_idcompare[0], data);
 			break;
 		case 0x1c:
 			//sector id low
-			m_idcompare[3] = data & 0xff;
-			m_idcompare[2] = data >> 8;
+			put_u16be(&m_idcompare[2], data);
 			break;
 		default:
 			logerror("isbc_215g: invalid port write 0x80%02x\n", offset*2);

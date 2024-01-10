@@ -4,6 +4,8 @@
 #include "emu.h"
 #include "wpc_pic.h"
 
+#include "multibyte.h"
+
 DEFINE_DEVICE_TYPE(WPC_PIC, wpc_pic_device, "wpc_pic", "Williams Pinball Controller PIC Security")
 
 wpc_pic_device::wpc_pic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -45,7 +47,7 @@ uint8_t wpc_pic_device::read()
 
 void wpc_pic_device::check_game_id()
 {
-	uint32_t cmp = (cmpchk[0] << 16) | (cmpchk[1] << 8) | cmpchk[2];
+	uint32_t cmp = get_u24be(cmpchk);
 	for(int i=0; i<1000; i++) {
 		uint32_t v = (i >> 8) * 0x3133 + (i & 0xff) * 0x3231;
 		v = v & 0xffffff;
@@ -116,9 +118,7 @@ void wpc_pic_device::serial_to_pic()
 
 	v = 100*no[0] + 10*no[1] + no[2];
 	v = (v >> 8) * ((serial[17] << 8) | serial[19]) + (v & 0xff) * ((serial[18] << 8) | serial[17]);
-	chk[0] = v >> 16;
-	chk[1] = v >> 8;
-	chk[2] = v;
+	put_u24be(chk, v);
 }
 
 void wpc_pic_device::device_start()
