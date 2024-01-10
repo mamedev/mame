@@ -554,7 +554,7 @@ void sc4_state::sc4_mem_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 						case 0x0330:
 							logerror("%08x meter write %04x\n",pc, data);
 							//m_meterstatus = (m_meterstatus&0xc0) | (data & 0x3f);
-							m_sec->clk_w(~data&0x20);
+							m_sec->clk_w(!BIT(data, 5));
 							break;
 
 						case 0x1248:
@@ -568,7 +568,8 @@ void sc4_state::sc4_mem_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 						case 0x1330:
 							bfm_sc4_reel4_w(data&0xf);
 							//m_meterstatus = (m_meterstatus&0x3f) | ((data & 0x30) << 2);
-							m_sec->data_w(~data&0x10);
+							m_sec->data_w(!BIT(data, 4));
+							m_sec->cs_w(!BIT(data, 5));
 							break;
 
 						default:
