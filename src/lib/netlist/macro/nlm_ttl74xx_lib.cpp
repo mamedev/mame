@@ -1767,6 +1767,126 @@ static NETLIST_START(TTL_74139_DIP)
 	)
 }
 
+//- Identifier: TTL_74147_DIP
+//- Title: SN74147 10-Line to 4-Line priority encoder
+//- Pinalias: 4,5,6,7,8,C,B,GND,A,9,1,2,3,D,NC,Vcc
+//- Package: DIP-16
+//- NamingConvention: Naming conventions follow Texas Instruments datasheet
+//- FunctionTable:
+//-   https://www.ti.com/lit/ds/symlink/sn74ls148.pdf
+//-
+//-                          10-line to 4 line encoder
+//-     +-----+-----+-----+-----+-----+-----+-----+-----+-----+---+---+---+---+
+//-     |  1  |  2  |  3  |  4  |  5  |  6  |  7  |  8  |  9  | D | C | B | A |
+//-     +=====+=====+=====+=====+=====+=====+=====+=====+=====+===+===+===+===+
+//-     |  H  |  H  |  H  |  H  |  H  |  H  |  H  |  H  |  H  | H | H | H | H |
+//-     |  X  |  X  |  X  |  X  |  X  |  X  |  X  |  X  |  L  | L | H | H | L |
+//-     |  X  |  X  |  X  |  X  |  X  |  X  |  X  |  L  |  H  | L | H | H | H |
+//-     |  X  |  X  |  X  |  X  |  X  |  X  |  L  |  H  |  H  | H | L | L | L |
+//-     |  X  |  X  |  X  |  X  |  X  |  L  |  H  |  H  |  H  | H | L | L | H |
+//-     |  X  |  X  |  X  |  X  |  L  |  H  |  H  |  H  |  H  | H | L | H | L |
+//-     |  X  |  X  |  X  |  L  |  H  |  H  |  H  |  H  |  H  | H | L | H | H |
+//-     |  X  |  X  |  L  |  H  |  H  |  H  |  H  |  H  |  H  | H | H | L | L |
+//-     |  X  |  L  |  H  |  H  |  H  |  H  |  H  |  H  |  H  | H | H | L | H |
+//-     |  L  |  H  |  H  |  H  |  H  |  H  |  H  |  H  |  H  | H | H | H | L |
+//-     +-----+-----+-----+-----+-----+-----+-----+-----+-----+---+---+---+---+
+static NETLIST_START(TTL_74147_DIP)
+{
+	NET_REGISTER_DEV(TTL_74147_GATE, A)
+	NC_PIN(NC)
+
+	DIPPINS(         //        +--------------+
+		A.I4, A.VCC, //      4 |1     ++    16| VCC
+		A.I5, NC.I,  //      5 |2           15| NC
+		A.I6, A.D,   //      6 |3           14| D
+		A.I7, A.I3,  //      7 |4   74147   13| 3
+		A.I8, A.I2,  //      8 |5           12| 2
+		A.C, A.I1,   //      C |6           11| 1
+		A.B, A.I9,   //      B |7           10| 9
+		A.GND, A.A   //    GND |8            9| A
+					 //        +--------------+
+	)
+}
+
+//- Identifier: TTL_74148_DIP
+//- Title: SN74148 8-line to 3-line priority encoders
+//- Pinalias: 4,5,6,7,EI,A2,A1,GND,A0,0,1,2,3,GS,E0,Vcc
+//- Package: DIP-16
+//- NamingConvention: Naming conventions follow Texas Instruments datasheet
+//- FunctionTable:
+//-   https://www.ti.com/lit/ds/symlink/sn74ls148.pdf
+//-
+//-                          10-line to 4 line encoder
+//-     +-----+-----+-----+-----+-----+-----+-----+-----+-----+----+----+----+----+----+
+//-     | EI  |  0  |  1  |  2  |  3  |  4  |  5  |  6  |  7  | A2 | A1 | A0 | GS | E0 |
+//-     +=====+=====+=====+=====+=====+=====+=====+=====+=====+====+====+====+====+====+
+//-     |  H  |  X  |  X  |  X  |  X  |  X  |  X  |  X  |  X  |  H |  H |  H |  H |  H |
+//-     |  L  |  H  |  X  |  H  |  H  |  H  |  H  |  H  |  H  |  H |  H |  H |  H |  L |
+//-     |  L  |  X  |  X  |  X  |  X  |  X  |  X  |  X  |  L  |  L |  L |  L |  L |  H |
+//-     |  L  |  X  |  X  |  X  |  X  |  X  |  X  |  L  |  H  |  L |  L |  H |  L |  H |
+//-     |  L  |  X  |  X  |  X  |  X  |  X  |  L  |  H  |  H  |  L |  H |  L |  L |  H |
+//-     |  L  |  X  |  X  |  X  |  X  |  L  |  H  |  H  |  H  |  L |  H |  H |  L |  H |
+//-     |  L  |  X  |  X  |  X  |  L  |  H  |  H  |  H  |  H  |  H |  L |  L |  L |  H |
+//-     |  L  |  X  |  X  |  L  |  H  |  H  |  H  |  H  |  H  |  H |  L |  H |  L |  H |
+//-     |  L  |  X  |  L  |  H  |  H  |  H  |  H  |  H  |  H  |  H |  H |  L |  L |  H |
+//-     |  L  |  L  |  H  |  H  |  H  |  H  |  H  |  H  |  H  |  H |  H |  H |  L |  H |
+//-     +-----+-----+-----+-----+-----+-----+-----+-----+-----+----+----+----+----+----+
+static NETLIST_START(TTL_74148_DIP)
+{
+	NET_REGISTER_DEV(TTL_74148_GATE, A)
+
+	DIPPINS(         //        +--------------+
+		A.I4, A.VCC, //      4 |1     ++    16| VCC
+		A.I5, A.E0,  //      5 |2           15| E0
+		A.I6, A.GS,  //      6 |3           14| GS
+		A.I7, A.I3,  //      7 |4   74148   13| 3
+		A.EI, A.I2,  //     EI |5           12| 2
+		A.A2, A.I1,  //     A2 |6           11| 1
+		A.A1, A.I0,  //     A1 |7           10| 0
+		A.GND, A.A0  //    GND |8            9| A0
+					 //        +--------------+
+	)
+}
+
+//- Identifier: TTL_74151_DIP
+//- Title: SN74151 Data selector/multiplexer
+//- Pinalias: D3,D2,D1,D0,Y,W,G,Gnd,C,B,A,D7,D6,D5,D4,Vcc
+//- Package: DIP-16
+//- NamingConvention: Naming conventions follow Texas Instruments datasheet
+//- FunctionTable:
+//-   https://www.ti.com/lit/ds/symlink/sn74ls151.pdf
+//-
+//-         +---+---+----+--++----+-----+
+//-         | C | B | A | G ||  Y |  W  |
+//-         +===+===+===+===++====+=====+
+//-         | X | X | X | H ||  L |  H  |
+//-         | L | L | L | L || D0 | ~D0 |
+//-         | L | L | H | L || D1 | ~D1 |
+//-         | L | H | L | L || D2 | ~D2 |
+//-         | L | H | H | L || D3 | ~D3 |
+//-         | H | L | L | L || D4 | ~D4 |
+//-         | H | L | H | L || D5 | ~D5 |
+//-         | H | H | L | L || D6 | ~D6 |
+//-         | H | H | H | L || D7 | ~D7 |
+//-         +---+---+---+---++----+-----+
+//-
+static NETLIST_START(TTL_74151_DIP)
+{
+	NET_REGISTER_DEV(TTL_74151_GATE, A)
+
+	DIPPINS(         //        +--------------+
+		A.D3, A.VCC, //     D3 |1     ++    16| VCC
+		A.D2, A.D4,  //     D2 |2           15| D4
+		A.D1, A.D5,  //     D1 |3           14| D5
+		A.D0, A.D6,  //     D0 |4   74151   13| D6
+		A.Y,  A.D7,  //      Y |5           12| D7
+		A.W,   A.A,  //      W |6           11| A
+		A.G,   A.B,  //      G |7           10| B
+		A.GND, A.C   //    GND |8            9| C
+					 //        +--------------+
+	)
+}
+
 //- Identifier: TTL_74153_DIP
 //- Title: 54153/DM54153/DM74153 Dual 4-Line to 1-LineData Selectors/Multiplexers
 //- Pinalias: G1,B,1C3,1C2,1C1,1C0,Y1,GND,Y2,2C0,2C1,2C2,2C3,A,G2,VCC
@@ -2448,6 +2568,47 @@ static NETLIST_START(TTL_74293_DIP)
 		NC.I, A.QA,   //   NC |6            9| QA
 		A.GND, A.QD   //  GND |7            8| QD
 					  //      +--------------+
+	)
+}
+
+//- Identifier: TTL_74368_DIP
+//- Title: SN74368 Hex Inverting Buffers and Line Drivers With 3-State Outputs
+//- Pinalias: 1G,1A1,1Y1,1A2,1Y2,1A3,1Y3,Gnd,1Y4,1A4,2Y1,2A1,2Y2,2A2,2G,Vcc
+//- Package: DIP-16
+//- NamingConvention: Naming conventions follow Texas Instruments datasheet
+//- FunctionTable:
+//-   https://www.ti.com/lit/ds/symlink/sn74hc368.pdf
+//-   https://www.ti.com/lit/ds/symlink/sn74ls368a.pdf
+//-
+//-         +----+---++---+
+//-         | OE | A || Y |
+//-         +====+===++===+
+//-         |  1 | X || Z |
+//-         |  0 | 1 || 0 |
+//-         |  0 | 0 || 1 |
+//-         +---+----++---+
+//-
+static NETLIST_START(TTL_74368_DIP)
+{
+	NET_REGISTER_DEV(TTL_74368_GATE, A)
+	NET_REGISTER_DEV(TTL_74368_GATE, B)
+
+	NET_C(A.VCC, B.VCC)
+	NET_C(A.GND, B.GND)
+
+	NET_C(A.A, B.A)
+	NET_C(A.B, B.B)
+
+	DIPPINS(         //      +--------------+
+		A.OE, A.VCC, //  1OE |1     ++    16| VCC
+		A.A1, B.OE,  //  1A1 |2           15| 2OE
+		A.Y1, B.A2,  //  1Y1 |3           14| 2A2
+		A.A2, B.Y2,  //  1A2 |4   74368   13| 2Y2
+		A.Y2, B.A1,  //  1Y2 |5           12| 2A1
+		A.A3, B.Y1,  //  1A3 |6           11| 2Y1
+		A.Y3, A.A4,  //  1Y4 |7           10| 1A4
+		A.GND, A.Y4  //  GND |8            9| 1Y4
+					 //      +--------------+
 	)
 }
 
@@ -3159,6 +3320,61 @@ static TRUTH_TABLE(TTL_74139_GATE, 3, 4, "")
 	TT_FAMILY("74XX")
 }
 
+static TRUTH_TABLE(TTL_74147_GATE, 9, 4, "")
+{
+	TT_HEAD("1,2,3,4,5,6,7,8,9|D,C,B,A")
+	TT_LINE("1,1,1,1,1,1,1,1,1|1,1,1,1|10")
+	TT_LINE("X,X,X,X,X,X,X,X,0|0,1,1,0|10")
+	TT_LINE("X,X,X,X,X,X,X,0,1|0,1,1,1|10")
+	TT_LINE("X,X,X,X,X,X,0,1,1|1,0,0,0|10")
+	TT_LINE("X,X,X,X,X,0,1,1,1|1,0,0,1|10")
+	TT_LINE("X,X,X,X,0,1,1,1,1|1,0,1,0|10")
+	TT_LINE("X,X,X,0,1,1,1,1,1|1,0,1,1|10")
+	TT_LINE("X,X,0,1,1,1,1,1,1|1,1,0,0|10")
+	TT_LINE("X,0,1,1,1,1,1,1,1|1,1,0,1|10")
+	TT_LINE("0,1,1,1,1,1,1,1,1|1,1,1,0|10")
+	TT_FAMILY("74XX")
+}
+
+static TRUTH_TABLE(TTL_74148_GATE, 9, 5, "")
+{
+	TT_HEAD("EI,0,1,2,3,4,5,6,7|A2,A1,A0,GS,EO")
+	TT_LINE( "1,X,X,X,X,X,X,X,X|1,1,1,1,1|10")
+	TT_LINE( "0,1,1,1,1,1,1,1,1|1,1,1,1,0|10")
+	TT_LINE( "0,X,X,X,X,X,X,X,0|0,0,0,0,1|10")
+	TT_LINE( "0,X,X,X,X,X,X,0,1|0,0,1,0,1|10")
+	TT_LINE( "0,X,X,X,X,X,0,1,1|0,1,0,0,1|10")
+	TT_LINE( "0,X,X,X,X,0,1,1,1|0,1,1,0,1|10")
+	TT_LINE( "0,X,X,X,0,1,1,1,1|1,0,0,0,1|10")
+	TT_LINE( "0,X,X,0,1,1,1,1,1|1,0,1,0,1|10")
+	TT_LINE( "0,X,0,1,1,1,1,1,1|1,1,0,0,1|10")
+	TT_LINE( "0,0,1,1,1,1,1,1,1|1,1,1,0,1|10")
+	TT_FAMILY("74XX")
+}
+
+static TRUTH_TABLE(TTL_74151_GATE, 12, 2, "")
+{
+	TT_HEAD("C,B,A,G,D0,D1,D2,D3,D4,D5,D6,D7|Y,W")
+	TT_LINE( "X,X,X,1,X,X,X,X,X,X,X,X|0,1|38,30")
+	TT_LINE( "0,0,0,0,1,X,X,X,X,X,X,X|1,0|38,30")
+	TT_LINE( "0,0,0,0,0,X,X,X,X,X,X,X|0,1|38,30")
+	TT_LINE( "0,0,1,0,X,1,X,X,X,X,X,X|1,0|38,30")
+	TT_LINE( "0,0,1,0,X,0,X,X,X,X,X,X|0,1|38,30")
+	TT_LINE( "0,1,0,0,X,X,1,X,X,X,X,X|1,0|38,30")
+	TT_LINE( "0,1,0,0,X,X,0,X,X,X,X,X|0,1|38,30")
+	TT_LINE( "0,1,1,0,X,X,X,1,X,X,X,X|1,0|38,30")
+	TT_LINE( "0,1,1,0,X,X,X,0,X,X,X,X|0,1|38,30")
+	TT_LINE( "1,0,0,0,X,X,X,X,1,X,X,X|1,0|38,30")
+	TT_LINE( "1,0,0,0,X,X,X,X,0,X,X,X|0,1|38,30")
+	TT_LINE( "1,0,1,0,X,X,X,X,X,1,X,X|1,0|38,30")
+	TT_LINE( "1,0,1,0,X,X,X,X,X,0,X,X|0,1|38,30")
+	TT_LINE( "1,1,0,0,X,X,X,X,X,X,1,X|1,0|38,30")
+	TT_LINE( "1,1,0,0,X,X,X,X,X,X,0,X|0,1|38,30")
+	TT_LINE( "1,1,1,0,X,X,X,X,X,X,X,1|1,0|38,30")
+	TT_LINE( "1,1,1,0,X,X,X,X,X,X,X,0|0,1|38,30")
+	TT_FAMILY("74XX")
+}
+
 static TRUTH_TABLE(TTL_74155A_GATE, 4, 4, "")
 {
 	TT_HEAD("B,A,G,C|Y0,Y1,Y2,Y3")
@@ -3254,6 +3470,29 @@ static TRUTH_TABLE(TTL_74279B, 4, 1, "")
 	TT_FAMILY("74XX")
 }
 
+static TRUTH_TABLE(TTL_74368_GATE, 5, 4, "")
+{
+	TT_HEAD("OE,A1,A2,A3,A4|Y1,Y2,Y3,Y4")
+	TT_LINE("1,X,X,X,X|0,0,0,0|45")
+	TT_LINE("0,0,0,0,0|1,1,1,1|45")
+	TT_LINE("0,0,0,0,1|1,1,1,0|45")
+	TT_LINE("0,0,0,1,0|1,1,0,1|45")
+	TT_LINE("0,0,0,1,1|1,1,0,0|45")
+	TT_LINE("0,0,1,0,0|1,0,1,1|45")
+	TT_LINE("0,0,1,0,1|1,0,1,0|45")
+	TT_LINE("0,0,1,1,0|1,0,0,1|45")
+	TT_LINE("0,0,1,1,1|1,0,0,0|45")
+	TT_LINE("0,1,0,0,0|0,1,1,1|45")
+	TT_LINE("0,1,0,0,1|0,1,1,0|45")
+	TT_LINE("0,1,0,1,0|0,1,0,1|45")
+	TT_LINE("0,1,0,1,1|0,1,0,0|45")
+	TT_LINE("0,1,1,0,0|0,0,1,1|45")
+	TT_LINE("0,1,1,0,1|0,0,1,0|45")
+	TT_LINE("0,1,1,1,0|0,0,0,1|45")
+	TT_LINE("0,1,1,1,1|0,0,0,0|45")
+	TT_FAMILY("74XX")
+}
+
 static TRUTH_TABLE(TTL_9312, 12, 2,
 				   "+A,+B,+C,+G,+D0,+D1,+D2,+D3,+D4,+D5,+D6,+D7,@VCC,@GND")
 {
@@ -3313,6 +3552,9 @@ NETLIST_START(ttl74xx_lib)
 	TRUTHTABLE_ENTRY(TTL_7442)
 	TRUTHTABLE_ENTRY(TTL_7486_XOR)
 	TRUTHTABLE_ENTRY(TTL_74139_GATE)
+	TRUTHTABLE_ENTRY(TTL_74147_GATE)
+	TRUTHTABLE_ENTRY(TTL_74148_GATE)
+	TRUTHTABLE_ENTRY(TTL_74151_GATE)
 	TRUTHTABLE_ENTRY(TTL_74155A_GATE)
 	TRUTHTABLE_ENTRY(TTL_74155B_GATE)
 	TRUTHTABLE_ENTRY(TTL_74156A_GATE)
@@ -3321,6 +3563,7 @@ NETLIST_START(ttl74xx_lib)
 	TRUTHTABLE_ENTRY(TTL_74260_NOR)
 	TRUTHTABLE_ENTRY(TTL_74279A)
 	TRUTHTABLE_ENTRY(TTL_74279B)
+	TRUTHTABLE_ENTRY(TTL_74368_GATE)
 	TRUTHTABLE_ENTRY(TTL_9312)
 
 	LOCAL_LIB_ENTRY(TTL_7400_DIP)
@@ -3370,6 +3613,9 @@ NETLIST_START(ttl74xx_lib)
 	LOCAL_LIB_ENTRY(TTL_74125_DIP)
 	LOCAL_LIB_ENTRY(TTL_74126_DIP)
 	LOCAL_LIB_ENTRY(TTL_74139_DIP)
+	LOCAL_LIB_ENTRY(TTL_74147_DIP)
+	LOCAL_LIB_ENTRY(TTL_74148_DIP)
+	LOCAL_LIB_ENTRY(TTL_74151_DIP)
 	LOCAL_LIB_ENTRY(TTL_74153_DIP)
 	LOCAL_LIB_ENTRY(TTL_74155_DIP)
 	LOCAL_LIB_ENTRY(TTL_74156_DIP)
@@ -3389,6 +3635,7 @@ NETLIST_START(ttl74xx_lib)
 	LOCAL_LIB_ENTRY(TTL_74290_DIP)
 	LOCAL_LIB_ENTRY(TTL_74293_DIP)
 	LOCAL_LIB_ENTRY(TTL_74365_DIP)
+	LOCAL_LIB_ENTRY(TTL_74368_DIP)
 	LOCAL_LIB_ENTRY(TTL_74377_DIP)
 	LOCAL_LIB_ENTRY(TTL_74378_DIP)
 	LOCAL_LIB_ENTRY(TTL_74379_DIP)
