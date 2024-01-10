@@ -7,7 +7,7 @@ Saitek Electronic Champion Backgammon
 
 Hardware notes:
 - PCB label: GT4-PE-009
-- Hitachi HD6301Y0P @ ~xxx
+- Hitachi HD6301Y0P @ ~4MHz (no XTAL)
 - LCD with custom segments, 24 LEDs, piezo
 
 TODO:
@@ -52,9 +52,9 @@ private:
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
-	required_ioport_array<2> m_inputs;
+	required_ioport_array<5> m_inputs;
 
-	u8 m_inp_mux = 0;
+	u8 m_but_mux = 0;
 
 	// I/O handlers
 	void p1_w(u8 data);
@@ -70,7 +70,7 @@ private:
 void ecbackg_state::machine_start()
 {
 	// register for savestates
-	save_item(NAME(m_inp_mux));
+	save_item(NAME(m_but_mux));
 }
 
 
@@ -93,6 +93,8 @@ void ecbackg_state::p1_w(u8 data)
 
 u8 ecbackg_state::p2_r()
 {
+	// P24: P57
+
 	//printf("r2 ");
 	return 0xff;
 }
@@ -100,6 +102,9 @@ u8 ecbackg_state::p2_r()
 void ecbackg_state::p2_w(u8 data)
 {
 	//printf("w2_%X ",data);
+
+	// P23: speaker out
+	m_dac->write(BIT(data, 3));
 }
 
 void ecbackg_state::p3_w(u8 data)
@@ -114,12 +119,22 @@ void ecbackg_state::p4_w(u8 data)
 
 u8 ecbackg_state::p5_r()
 {
-	//printf("r5 ");
-	return 0xff;
+	// P50-P57: multiplexed inputs
+	u8 data = 0;
+
+	// read buttons
+	for (int i = 0; i < 5; i++)
+		if (BIT(m_but_mux, i))
+			data |= m_inputs[i]->read();
+
+	return ~data;
 }
 
 void ecbackg_state::p6_w(u8 data)
 {
+	// P60,P63-P66: button mux
+	m_but_mux = (~data >> 2 & 0x1e) | (~data & 1);
+
 	//printf("w6_%X ",data);
 }
 
@@ -136,24 +151,31 @@ void ecbackg_state::p7_w(u8 data)
 
 static INPUT_PORTS_START( ecbackg )
 	PORT_START("IN.0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) // stats
 
 	PORT_START("IN.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) // bear off
+
+	PORT_START("IN.2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) // double
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) // reject
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) // play
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) // game option
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) // level
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) // take back
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_9) // verify
+
+	PORT_START("IN.3")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) // roll dice
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) // d1
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) // d2
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) // d3
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) // d4
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) // d5
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) // d6
+
+	PORT_START("IN.4")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_0) // new game
 INPUT_PORTS_END
 
 
@@ -165,7 +187,7 @@ INPUT_PORTS_END
 void ecbackg_state::ecbackg(machine_config &config)
 {
 	// basic machine hardware
-	HD6301Y0(config, m_maincpu, 8'000'000);
+	HD6301Y0(config, m_maincpu, 4'000'000); // approximation
 	m_maincpu->nvram_enable_backup(true);
 	m_maincpu->standby_cb().set(m_maincpu, FUNC(hd6301y0_cpu_device::nvram_set_battery));
 	m_maincpu->standby_cb().append([this](int state) { if (state) m_display->clear(); });
