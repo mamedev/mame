@@ -250,8 +250,8 @@ void wy100_state::wy100(machine_config &config)
 	m_modem->cts_handler().set(m_pci, FUNC(scn2651_device::cts_w));
 	m_modem->rxd_handler().set(m_pci, FUNC(scn2651_device::rxd_w));
 
-	RS232_PORT(config, m_printer, default_rs232_devices, nullptr);
-	m_printer->dsr_handler().set(m_pci, FUNC(scn2651_device::dsr_w));
+	RS232_PORT(config, m_printer, default_rs232_devices, "loopback");
+	m_printer->rxd_handler().set(m_pci, FUNC(scn2651_device::dsr_w)); // actually pin 20 (DTR), but diagnostic self-test requires it to be looped back from pin 3 (TXD)
 }
 
 
