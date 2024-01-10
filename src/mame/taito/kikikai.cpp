@@ -1105,10 +1105,9 @@ void kikikai_state::kicknrun(machine_config &config)
 void kikikai_state::kikikai(machine_config &config)
 {
 	base(config);
+	add_mcu(config);
 
 	m_screen->set_screen_update(FUNC(kikikai_state::screen_update_kikikai));
-
-	add_mcu(config);
 }
 
 
