@@ -2942,9 +2942,9 @@ local want_disasm_kc80 = opt_tool(CPUS, "KC80")
 
 if want_disasm_z80 or want_disasm_z80n or want_disasm_kc80 then
 	if want_disasm_z80n then
-		table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/z80/z80dasm_menmonic_ed_n.cpp")
+		table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/z80/z80dasm_mnemonic_ed_n.cpp")
 	else
-		table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/z80/z80dasm_menmonic_ed.cpp")
+		table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/z80/z80dasm_mnemonic_ed.cpp")
 	end
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/z80/z80dasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/z80/z80dasm.h")

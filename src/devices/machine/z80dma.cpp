@@ -149,7 +149,11 @@ DEFINE_DEVICE_TYPE(Z80DMA, z80dma_device, "z80dma", "Z80 DMA Controller")
 //-------------------------------------------------
 
 z80dma_device::z80dma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, Z80DMA, tag, owner, clock)
+	: z80dma_device(mconfig, Z80DMA, tag, owner, clock)
+{}
+
+z80dma_device::z80dma_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_z80daisy_interface(mconfig, *this)
 	, m_out_busreq_cb(*this)
 	, m_out_int_cb(*this)
@@ -159,8 +163,7 @@ z80dma_device::z80dma_device(const machine_config &mconfig, const char *tag, dev
 	, m_out_mreq_cb(*this)
 	, m_in_iorq_cb(*this, 0)
 	, m_out_iorq_cb(*this)
-{
-}
+{}
 
 
 //-------------------------------------------------
@@ -735,7 +738,6 @@ void z80dma_device::write(uint8_t data)
 				case COMMAND_ENABLE_DMA:
 					LOG("Z80DMA Enable DMA\n");
 					m_dma_enabled = 1;
-					m_byte_counter = 0;
 					break;
 				case COMMAND_READ_MASK_FOLLOWS:
 					LOG("Z80DMA Set Read Mask\n");

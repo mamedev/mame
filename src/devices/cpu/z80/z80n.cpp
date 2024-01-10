@@ -2,7 +2,7 @@
 // copyright-holders:Andrei I. Holub
 /***************************************************************************
 
-  Z80N 
+	Z80N
 
 ***************************************************************************/
 
@@ -34,215 +34,215 @@ DEFINE_DEVICE_TYPE(Z80N, z80n_device, "z80n", "Z80N")
 //-------------------------------------------------
 
 z80n_device::z80n_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-    : z80_device(mconfig, Z80N, tag, owner, clock)
-    , m_in_nextreg_cb(*this, 0)
-    , m_out_nextreg_cb(*this)
+	: z80_device(mconfig, Z80N, tag, owner, clock)
+	, m_in_nextreg_cb(*this, 0)
+	, m_out_nextreg_cb(*this)
 {
 }
 
-inline void z80n_device::retn()
+void z80n_device::retn()
 {
-    z80_device::retn();
-    if (m_stackless)
-    {
-        push(m_pc);
-        m_pc.b.l = m_in_nextreg_cb(0xc2);
-        m_pc.b.h = m_in_nextreg_cb(0xc3);
-    }
+	z80_device::retn();
+	if (m_stackless)
+	{
+		push(m_pc);
+		m_pc.b.l = m_in_nextreg_cb(0xc2);
+		m_pc.b.h = m_in_nextreg_cb(0xc3);
+	}
 }
 
-inline void z80n_device::ed_23()
+void z80n_device::ed_23()
 {
-    A = (A << 4) | (A >> 4);
+	A = (A << 4) | (A >> 4);
 }
 
-inline void z80n_device::ed_24()
+void z80n_device::ed_24()
 {
-    A = bitswap<8>(A, 0, 1, 2, 3, 4, 5, 6, 7);
+	A = bitswap<8>(A, 0, 1, 2, 3, 4, 5, 6, 7);
 }
 
-inline void z80n_device::ed_27()
+void z80n_device::ed_27()
 {
-    const u8 a = A;
-    and_a(arg());
-    A = a;
+	const u8 a = A;
+	and_a(arg());
+	A = a;
 }
 
-inline void z80n_device::ed_28()
+void z80n_device::ed_28()
 {
-    DE <<= B & 31;
+	DE <<= std::min(B & 31, 16);
 }
 
-inline void z80n_device::ed_29()
+void z80n_device::ed_29()
 {
-    const u16 lb = DE & 0x8000;
-    for (auto i = 0; i < (B & 31); i++)
-    {
-        DE >>= 1;
-        DE |= lb;
-    }
+	const u16 fill = (DE & 0x8000) ? ~u16(0) : u16(0);
+	DE = (DE >> std::min(B & 31, 16)) | (fill << (16 - std::min(B & 31, 16)));
 }
 
-inline void z80n_device::ed_2a()
+void z80n_device::ed_2a()
 {
-    DE >>= (B & 31);
+	DE >>= std::min(B & 31, 16);
 }
 
-inline void z80n_device::ed_2b()
+void z80n_device::ed_2b()
 {
-    for (auto i = 0; i < (B & 31); i++)
-    {
-        DE >>= 1;
-        DE |= 0x8000;
-    }
+	DE = (DE >> std::min(B & 31, 16)) | (~u16(0) << (16 - std::min(B & 31, 16)));
 }
 
-inline void z80n_device::ed_2c()
+void z80n_device::ed_2c()
 {
-    DE = (DE << (B & 15)) | (DE >> (16 - (B & 15)));
+	DE = (DE << (B & 15)) | (DE >> (16 - (B & 15)));
 }
 
-inline void z80n_device::ed_30()
+void z80n_device::ed_30()
 {
-    DE = D * E;
+	DE = D * E;
 }
 
-inline void z80n_device::ed_31()
+void z80n_device::ed_31()
 {
-    HL += A;
+	HL += A;
 }
 
-inline void z80n_device::ed_32()
+void z80n_device::ed_32()
 {
-    DE += A;
+	DE += A;
 }
 
-inline void z80n_device::ed_33()
+void z80n_device::ed_33()
 {
-    BC += A;
+	BC += A;
 }
 
-inline void z80n_device::ed_34()
+void z80n_device::ed_34()
 {
-    HL += arg16();
+	HL += arg16();
 }
 
-inline void z80n_device::ed_35()
+void z80n_device::ed_35()
 {
-    DE += arg16();
+	DE += arg16();
 }
 
-inline void z80n_device::ed_36()
+void z80n_device::ed_36()
 {
-    BC += arg16();
+	BC += arg16();
 }
 
-inline void z80n_device::ed_8a()
+void z80n_device::ed_8a()
 {
-    PAIR tmp = {{0, 0, 0, 0}};
-    tmp.b.h = arg();
-    tmp.b.l = arg();
-    push(tmp);
+	PAIR tmp = {{0, 0, 0, 0}};
+	tmp.b.h = arg();
+	tmp.b.l = arg();
+	push(tmp);
 }
 
-inline void z80n_device::ed_90()
+void z80n_device::ed_90()
 {
-    const u8 data = rm(HL);
-    out(BC, data);
-    HL++;
+	const u8 data = rm(HL);
+	out(BC, data);
+	HL++;
 }
 
-inline void z80n_device::ed_91()
+void z80n_device::ed_91()
 {
-    const u8 reg = arg();
-    const u8 data = arg();
-    m_out_nextreg_cb(reg, data);
+	const u8 reg = arg();
+	const u8 data = arg();
+	m_out_nextreg_cb(reg, data);
 }
 
-inline void z80n_device::ed_92()
+void z80n_device::ed_92()
 {
-    const u8 reg = arg();
-    m_out_nextreg_cb(reg, A);
+	const u8 reg = arg();
+	m_out_nextreg_cb(reg, A);
 }
 
-inline void z80n_device::ed_93()
+void z80n_device::ed_93()
 {
-    HL = (0x07 != (H & 0x07))
-        ? HL + 0x100
-        : (0xe0 != (L & 0xe0))
-            ? (HL & 0xf8ff) + 0x20
-            : ((HL & 0xf81f) + 0x800);
+	if (0x07 != (H & 0x07))
+		HL = HL + 0x100;
+	else if (0xe0 != (L & 0xe0))
+		HL = (HL & 0xf8ff) + 0x20;
+	else
+		HL = (HL & 0xf81f) + 0x800;
 }
 
-inline void z80n_device::ed_94()
+void z80n_device::ed_94()
 {
-    HL = 0x4000 + ((D & 0xc0) << 5) + ((D & 0x07) << 8) + ((D & 0x38) << 2) + (E >> 3);
+	HL = 0x4000 + ((D & 0xc0) << 5) + ((D & 0x07) << 8) + ((D & 0x38) << 2) + (E >> 3);
 }
 
-inline void z80n_device::ed_95()
+void z80n_device::ed_95()
 {
-    A = 0x80 >> (E & 7);
+	A = 0x80 >> (E & 7);
 }
 
-inline void z80n_device::ed_98()
+void z80n_device::ed_98()
 {
-    PCD = (PCD & 0xc000) + (in(BC) << 6);
+	PCD = (PCD & 0xc000) + (in(BC) << 6);
 }
 
-inline void z80n_device::ed_a4()
+void z80n_device::ed_a4()
 {
-    u8 data = rm(HL);
-    if (data != A)
-        wm(DE, data);
-    HL++;
-    DE++;
-    BC--;
+	u8 data = rm(HL);
+	if (data != A)
+		wm(DE, data);
+	HL++;
+	DE++;
+	BC--;
 }
 
-inline void z80n_device::ed_a5()
+void z80n_device::ed_a5()
 {
-    wm(DE, rm(HL));
-    L++;
-    D = inc(D);
+	wm(DE, rm(HL));
+	L++;
+	D = inc(D);
 }
 
-inline void z80n_device::ed_ac()
+void z80n_device::ed_ac()
 {
-    const u8 data = rm(HL);
-    if (data != A)
-        wm(DE, data);
-    DE++;
-    HL--;
-    BC--;
+	const u8 data = rm(HL);
+	if (data != A)
+		wm(DE, data);
+	DE++;
+	HL--;
+	BC--;
 }
 
-inline void z80n_device::ed_b4()
+void z80n_device::ed_b4()
 {
-    ed_a4();
-    if (BC != 0)
-        PC -= 2;
+	ed_a4();
+	if (BC != 0)
+		PC -= 2;
 }
 
-inline void z80n_device::ed_b7()
+void z80n_device::ed_b7()
 {
-    const u8 data = rm((HL & 0xfff8) + (E & 7));
-    if (data != A)
-        wm(DE, data);
-    DE++;
-    BC--;
-    if (BC != 0)
-        PC -= 2;
+	const u8 data = rm((HL & 0xfff8) + (E & 7));
+	if (data != A)
+		wm(DE, data);
+	DE++;
+	BC--;
+	if (BC != 0)
+		PC -= 2;
 }
 
-inline void z80n_device::ed_bc()
+void z80n_device::ed_bc()
 {
-    ed_ac();
-    if (BC != 0)
-        PC -= 2;
+	ed_ac();
+	if (BC != 0)
+		PC -= 2;
+}
+
+
+void z80n_device::device_start()
+{
+	z80_device::device_start();
+	save_item(NAME(m_stackless));
 }
 
 void z80n_device::device_reset()
 {
-    z80_device::device_reset();
-    m_stackless = 0;
+	z80_device::device_reset();
+	m_stackless = 0;
 }

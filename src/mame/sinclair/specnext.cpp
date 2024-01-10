@@ -22,6 +22,7 @@ TODO:
 #include "beta_m.h"
 #include "spec128.h"
 #include "specnext_divmmc.h"
+#include "specnext_dma.h"
 #include "specnext_layer2.h"
 #include "specnext_sprites.h"
 #include "specnext_tiles.h"
@@ -31,7 +32,6 @@ TODO:
 #include "cpu/z80/z80n.h"
 #include "machine/i2cmem.h"
 #include "machine/spi_sdcard.h"
-#include "machine/z80dma.h"
 #include "machine/z80ctc.h"
 #include "sound/ay8910.h"
 
@@ -68,6 +68,7 @@ public:
 		, m_view7(*this, "mem_view7")
 		, m_ctc(*this, "ctc")
 		, m_z80dma(*this, "z80dma")
+		, m_zxndma(*this, "zxndma")
 		, m_eeprom(*this, "eeprom")
 		, m_sdcard(*this, "sdcard")
 		, m_centronics(*this, "centronics")
@@ -87,8 +88,9 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	void reset_hard();
 	virtual void video_start() override;
-	virtual void spectrum_128_update_memory() override {};
+	virtual void spectrum_128_update_memory() override {}
 
 	u8 on_fetch_divmmc(offs_t offset);
 	void map_fetch(address_map &map);
@@ -110,7 +112,7 @@ protected:
 	void memory_change(u16 port, u8 data);
 	u16 get_layer2_active_page(u8 bank);
 	virtual u32 screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
-	virtual void spectrum_update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override {}; // ULA screen just border
+	virtual void spectrum_update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override {} // ULA screen just border
 
 	required_device<z80n_device> m_maincpu;
 
@@ -127,76 +129,72 @@ private:
 
 	u8 g_machine_id() { return m_io_issue->read() ? MACHINE_NEXT : MACHINE_TBBLUE; }
 	u8 g_board_issue() { return m_io_issue->read(); }
-	constexpr bool machine_type_48() { return m_regs.nr_03_machine_type == 0 || m_regs.nr_03_machine_type == 1; }
-	constexpr bool machine_type_128() { return m_regs.nr_03_machine_type == 2 || m_regs.nr_03_machine_type == 4; }
-	constexpr bool machine_type_p3() { return !machine_type_48() && !machine_type_128(); }
+	bool machine_type_48() const { return m_nr_03_machine_type == 0 || m_nr_03_machine_type == 1; }
+	bool machine_type_128() const { return m_nr_03_machine_type == 2 || m_nr_03_machine_type == 4; }
+	bool machine_type_p3() const { return !machine_type_48() && !machine_type_128(); }
 
 	void nr_02_w(u8 nr_wr_dat);
 	void nr_07_cpu_speed_w(u8 data);
 
-	void nr_12_layer2_active_bank_w(u8 data) { m_regs.nr_12_layer2_active_bank = data; m_layer2->layer2_active_bank_w(layer2_active_bank()); }
-	void nr_13_layer2_shadow_bank_w(u8 data) { m_regs.nr_13_layer2_shadow_bank = data; m_layer2->layer2_active_bank_w(layer2_active_bank()); }
-
+	void nr_12_layer2_active_bank_w(u8 data) { m_nr_12_layer2_active_bank = data; m_layer2->layer2_active_bank_w(layer2_active_bank()); }
+	void nr_13_layer2_shadow_bank_w(u8 data) { m_nr_13_layer2_shadow_bank = data; m_layer2->layer2_active_bank_w(layer2_active_bank()); }
 	void nr_14_global_transparent_rgb_w(u8 data);
-	//void _w(u8 data) { m_regs. = data; ->_w(m_regs.); }
+	void nr_15_sprite_priority_w(bool data) { m_nr_15_sprite_priority = data; m_sprites->zero_on_top_w(m_nr_15_sprite_priority); }
+	void nr_15_sprite_border_clip_en_w(bool data) { m_nr_15_sprite_border_clip_en = data; m_sprites->border_clip_en_w(m_nr_15_sprite_border_clip_en); }
+	void nr_15_sprite_over_border_en_w(bool data) { m_nr_15_sprite_over_border_en = data; m_sprites->over_border_w(m_nr_15_sprite_over_border_en); }
+	void nr_16_layer2_scrollx_w(u8 data) { m_nr_16_layer2_scrollx = data; m_layer2->scroll_x_w(m_nr_16_layer2_scrollx); }
+	void nr_17_layer2_scrolly_w(u8 data) { m_nr_17_layer2_scrolly = data; m_layer2->scroll_y_w(m_nr_17_layer2_scrolly); }
+	void nr_18_layer2_clip_x1_w(u8 data) { m_nr_18_layer2_clip_x1 = data; m_layer2->clip_x1_w(m_nr_18_layer2_clip_x1); }
+	void nr_18_layer2_clip_x2_w(u8 data) { m_nr_18_layer2_clip_x2 = data; m_layer2->clip_x2_w(m_nr_18_layer2_clip_x2); }
+	void nr_18_layer2_clip_y1_w(u8 data) { m_nr_18_layer2_clip_y1 = data; m_layer2->clip_y1_w(m_nr_18_layer2_clip_y1); }
+	void nr_18_layer2_clip_y2_w(u8 data) { m_nr_18_layer2_clip_y2 = data; m_layer2->clip_y2_w(m_nr_18_layer2_clip_y2); }
+	void nr_19_sprite_clip_x1_w(u8 data) { m_nr_19_sprite_clip_x1 = data; m_sprites->clip_x1_w(m_nr_19_sprite_clip_x1); }
+	void nr_19_sprite_clip_x2_w(u8 data) { m_nr_19_sprite_clip_x2 = data; m_sprites->clip_x2_w(m_nr_19_sprite_clip_x2); }
+	void nr_19_sprite_clip_y1_w(u8 data) { m_nr_19_sprite_clip_y1 = data; m_sprites->clip_y1_w(m_nr_19_sprite_clip_y1); }
+	void nr_19_sprite_clip_y2_w(u8 data) { m_nr_19_sprite_clip_y2 = data; m_sprites->clip_y2_w(m_nr_19_sprite_clip_y2); }
+	void nr_1a_ula_clip_x1_w(u8 data) { m_nr_1a_ula_clip_x1 = data; m_ula->ula_clip_x1_w(m_nr_1a_ula_clip_x1); }
+	void nr_1a_ula_clip_x2_w(u8 data) { m_nr_1a_ula_clip_x2 = data; m_ula->ula_clip_x2_w(m_nr_1a_ula_clip_x2); }
+	void nr_1a_ula_clip_y1_w(u8 data) { m_nr_1a_ula_clip_y1 = data; m_ula->ula_clip_y1_w(m_nr_1a_ula_clip_y1); }
+	void nr_1a_ula_clip_y2_w(u8 data) { m_nr_1a_ula_clip_y2 = data; m_ula->ula_clip_y2_w(m_nr_1a_ula_clip_y2); }
+	void nr_1b_tm_clip_x1_w(u8 data) { m_nr_1b_tm_clip_x1 = data; m_tiles->clip_x1_w(m_nr_1b_tm_clip_x1); }
+	void nr_1b_tm_clip_x2_w(u8 data) { m_nr_1b_tm_clip_x2 = data; m_tiles->clip_x2_w(m_nr_1b_tm_clip_x2); }
+	void nr_1b_tm_clip_y1_w(u8 data) { m_nr_1b_tm_clip_y1 = data; m_tiles->clip_y1_w(m_nr_1b_tm_clip_y1); }
+	void nr_1b_tm_clip_y2_w(u8 data) { m_nr_1b_tm_clip_y2 = data; m_tiles->clip_y2_w(m_nr_1b_tm_clip_y2); }
+	void nr_26_ula_scrollx_w(u8 data) { m_nr_26_ula_scrollx = data; m_ula->ula_scroll_x_w(m_nr_26_ula_scrollx); }
+	void nr_27_ula_scrolly_w(u8 data) { m_nr_27_ula_scrolly = data; m_ula->ula_scroll_y_w(m_nr_27_ula_scrolly); }
 
-	void nr_15_sprite_priority_w(bool data) { m_regs.nr_15_sprite_priority = data; m_sprites->zero_on_top_w(m_regs.nr_15_sprite_priority); }
-	void nr_15_sprite_border_clip_en_w(bool data) { m_regs.nr_15_sprite_border_clip_en = data; m_sprites->border_clip_en_w(m_regs.nr_15_sprite_border_clip_en); }
-	void nr_15_sprite_over_border_en_w(bool data) { m_regs.nr_15_sprite_over_border_en = data; m_sprites->over_border_w(m_regs.nr_15_sprite_over_border_en); }
-	void nr_16_layer2_scrollx_w(u8 data) { m_regs.nr_16_layer2_scrollx = data; m_layer2->scroll_x_w(m_regs.nr_16_layer2_scrollx); }
-	void nr_17_layer2_scrolly_w(u8 data) { m_regs.nr_17_layer2_scrolly = data; m_layer2->scroll_y_w(m_regs.nr_17_layer2_scrolly); }
-	void nr_18_layer2_clip_x1_w(u8 data) { m_regs.nr_18_layer2_clip_x1 = data; m_layer2->clip_x1_w(m_regs.nr_18_layer2_clip_x1); }
-	void nr_18_layer2_clip_x2_w(u8 data) { m_regs.nr_18_layer2_clip_x2 = data; m_layer2->clip_x2_w(m_regs.nr_18_layer2_clip_x2); }
-	void nr_18_layer2_clip_y1_w(u8 data) { m_regs.nr_18_layer2_clip_y1 = data; m_layer2->clip_y1_w(m_regs.nr_18_layer2_clip_y1); }
-	void nr_18_layer2_clip_y2_w(u8 data) { m_regs.nr_18_layer2_clip_y2 = data; m_layer2->clip_y2_w(m_regs.nr_18_layer2_clip_y2); }
-	void nr_19_sprite_clip_x1_w(u8 data) { m_regs.nr_19_sprite_clip_x1 = data; m_sprites->clip_x1_w(m_regs.nr_19_sprite_clip_x1); }
-	void nr_19_sprite_clip_x2_w(u8 data) { m_regs.nr_19_sprite_clip_x2 = data; m_sprites->clip_x2_w(m_regs.nr_19_sprite_clip_x2); }
-	void nr_19_sprite_clip_y1_w(u8 data) { m_regs.nr_19_sprite_clip_y1 = data; m_sprites->clip_y1_w(m_regs.nr_19_sprite_clip_y1); }
-	void nr_19_sprite_clip_y2_w(u8 data) { m_regs.nr_19_sprite_clip_y2 = data; m_sprites->clip_y2_w(m_regs.nr_19_sprite_clip_y2); }
-	void nr_1a_ula_clip_x1_w(u8 data) { m_regs.nr_1a_ula_clip_x1 = data; m_ula->ula_clip_x1_w(m_regs.nr_1a_ula_clip_x1); }
-	void nr_1a_ula_clip_x2_w(u8 data) { m_regs.nr_1a_ula_clip_x2 = data; m_ula->ula_clip_x2_w(m_regs.nr_1a_ula_clip_x2); }
-	void nr_1a_ula_clip_y1_w(u8 data) { m_regs.nr_1a_ula_clip_y1 = data; m_ula->ula_clip_y1_w(m_regs.nr_1a_ula_clip_y1); }
-	void nr_1a_ula_clip_y2_w(u8 data) { m_regs.nr_1a_ula_clip_y2 = data; m_ula->ula_clip_y2_w(m_regs.nr_1a_ula_clip_y2); }
-	void nr_1b_tm_clip_x1_w(u8 data) { m_regs.nr_1b_tm_clip_x1 = data; m_tiles->clip_x1_w(m_regs.nr_1b_tm_clip_x1); }
-	void nr_1b_tm_clip_x2_w(u8 data) { m_regs.nr_1b_tm_clip_x2 = data; m_tiles->clip_x2_w(m_regs.nr_1b_tm_clip_x2); }
-	void nr_1b_tm_clip_y1_w(u8 data) { m_regs.nr_1b_tm_clip_y1 = data; m_tiles->clip_y1_w(m_regs.nr_1b_tm_clip_y1); }
-	void nr_1b_tm_clip_y2_w(u8 data) { m_regs.nr_1b_tm_clip_y2 = data; m_tiles->clip_y2_w(m_regs.nr_1b_tm_clip_y2); }
-	void nr_26_ula_scrollx_w(u8 data) { m_regs.nr_26_ula_scrollx = data; m_ula->ula_scroll_x_w(m_regs.nr_26_ula_scrollx); }
-	void nr_27_ula_scrolly_w(u8 data) { m_regs.nr_27_ula_scrolly = data; m_ula->ula_scroll_y_w(m_regs.nr_27_ula_scrolly); }
+	void nr_30_tm_scrollx_w(u16 data) { m_nr_30_tm_scrollx = data; m_tiles->tm_scroll_x_w(m_nr_30_tm_scrollx); }
+	void nr_31_tm_scrolly_w(u8 data) { m_nr_31_tm_scrolly = data; m_tiles->tm_scroll_y_w(m_nr_31_tm_scrolly); }
+	void nr_32_lores_scrollx_w(u8 data) { m_nr_32_lores_scrollx = data;  }
+	void nr_33_lores_scrolly_w(u8 data) { m_nr_33_lores_scrolly = data;  }
 
-	void nr_30_tm_scrollx_w(u16 data) { m_regs.nr_30_tm_scrollx = data; m_tiles->tm_scroll_x_w(m_regs.nr_30_tm_scrollx); }
-	void nr_31_tm_scrolly_w(u8 data) { m_regs.nr_31_tm_scrolly = data; m_tiles->tm_scroll_y_w(m_regs.nr_31_tm_scrolly); }
-	void nr_32_lores_scrollx_w(u8 data) { m_regs.nr_32_lores_scrollx = data;  }
-	void nr_33_lores_scrolly_w(u8 data) { m_regs.nr_33_lores_scrolly = data;  }
+	void nr_42_ulanext_format_w(u8 data) { m_nr_42_ulanext_format = data; m_ula->ulanext_format_w(m_nr_42_ulanext_format); }
+	void nr_43_ulanext_en_w(bool data) { m_nr_43_ulanext_en = data; m_ula->ulanext_en_w(m_nr_43_ulanext_en); }
 
-	void nr_42_ulanext_format_w(u8 data) { m_regs.nr_42_ulanext_format = data; m_ula->ulanext_format_w(m_regs.nr_42_ulanext_format); }
-	//void _w() { mregs.nr_43_active_ula_palette = data; m_ula->_w(m_regs.nr_43_active_ula_palette); }
-	void nr_43_ulanext_en_w(bool data) { m_regs.nr_43_ulanext_en = data; m_ula->ulanext_en_w(m_regs.nr_43_ulanext_en); }
+	void nr_4b_sprite_transparent_index_w(u8 data) { m_nr_4b_sprite_transparent_index = data; m_sprites->transp_colour_w(m_nr_4b_sprite_transparent_index); }
+	void nr_4c_tm_transparent_index_w(u8 data) { m_nr_4c_tm_transparent_index = data; m_tiles->transp_colour_w(m_nr_4c_tm_transparent_index); }
 
-	void nr_4b_sprite_transparent_index_w(u8 data) { m_regs.nr_4b_sprite_transparent_index = data; m_sprites->transp_colour_w(m_regs.nr_4b_sprite_transparent_index); }
-	void nr_4c_tm_transparent_index_w(u8 data) { m_regs.nr_4c_tm_transparent_index = data; m_tiles->transp_colour_w(m_regs.nr_4c_tm_transparent_index); }
+	void nr_68_ula_fine_scroll_x_w(bool data) { m_nr_68_ula_fine_scroll_x = data; m_ula->ula_fine_scroll_x_w(m_nr_68_ula_fine_scroll_x); }
 
-	void nr_68_ula_fine_scroll_x_w(bool data) { m_regs.nr_68_ula_fine_scroll_x = data; m_ula->ula_fine_scroll_x_w(m_regs.nr_68_ula_fine_scroll_x); }
+	void nr_6b_tm_control_w(u8 data) { m_nr_6b_tm_control = data; m_tiles->control_w(m_nr_6b_tm_control); }
+	void nr_6c_tm_default_attr_w(u8 data) { m_nr_6c_tm_default_attr = data; m_tiles->default_flags_w(m_nr_6c_tm_default_attr); }
+	void nr_6e_tilemap_base_w(bool data7, u8 data5_0) { m_nr_6e_tilemap_base_7 = data7; m_nr_6e_tilemap_base = data5_0; m_tiles->tm_map_base_w((m_nr_6e_tilemap_base_7 << 6) | m_nr_6e_tilemap_base); }
+	void nr_6f_tilemap_tiles_w(bool data7, u8 data5_0) { m_nr_6f_tilemap_tiles_7 = data7; m_nr_6f_tilemap_tiles = data5_0; m_tiles->tm_tile_base_w((m_nr_6f_tilemap_tiles_7 << 6) | m_nr_6f_tilemap_tiles); }
 
-	void nr_6b_tm_control_w(u8 data) { m_regs.nr_6b_tm_control = data; m_tiles->control_w(m_regs.nr_6b_tm_control); }
-	void nr_6c_tm_default_attr_w(u8 data) { m_regs.nr_6c_tm_default_attr = data; m_tiles->default_flags_w(m_regs.nr_6c_tm_default_attr); }
-	void nr_6e_tilemap_base_w(bool data7, u8 data5_0) { m_regs.nr_6e_tilemap_base_7 = data7; m_regs.nr_6e_tilemap_base = data5_0; m_tiles->tm_map_base_w((m_regs.nr_6e_tilemap_base_7 << 6) | m_regs.nr_6e_tilemap_base); }
-	void nr_6f_tilemap_tiles_w(bool data7, u8 data5_0) { m_regs.nr_6f_tilemap_tiles_7 = data7; m_regs.nr_6f_tilemap_tiles = data5_0; m_tiles->tm_tile_base_w((m_regs.nr_6f_tilemap_tiles_7 << 6) | m_regs.nr_6f_tilemap_tiles); }
+	void nr_70_layer2_resolution_w(u8 data) { m_nr_70_layer2_resolution = data; m_layer2->resolution_w(m_nr_70_layer2_resolution); }
+	void nr_70_layer2_palette_offset_w(u8 data) { m_nr_70_layer2_palette_offset = data; m_layer2->palette_offset_w(m_nr_70_layer2_palette_offset); }
 
-	void nr_70_layer2_resolution_w(u8 data) { m_regs.nr_70_layer2_resolution = data; m_layer2->resolution_w(m_regs.nr_70_layer2_resolution); }
-	void nr_70_layer2_palette_offset_w(u8 data) { m_regs.nr_70_layer2_palette_offset = data; m_layer2->palette_offset_w(m_regs.nr_70_layer2_palette_offset); }
-
-	bool nr_8c_altrom_en() const { return BIT(m_regs.nr_8c_altrom, 7); }
-	bool nr_8c_altrom_rw() const { return BIT(m_regs.nr_8c_altrom, 6); }
-	bool nr_8c_altrom_lock_rom1() const { return BIT(m_regs.nr_8c_altrom, 5); }
-	bool nr_8c_altrom_lock_rom0() const { return BIT(m_regs.nr_8c_altrom, 4); }
+	bool nr_8c_altrom_en() const { return BIT(m_nr_8c_altrom, 7); }
+	bool nr_8c_altrom_rw() const { return BIT(m_nr_8c_altrom, 6); }
+	bool nr_8c_altrom_lock_rom1() const { return BIT(m_nr_8c_altrom, 5); }
+	bool nr_8c_altrom_lock_rom0() const { return BIT(m_nr_8c_altrom, 4); }
 
 	bool nr_8f_mapping_mode_profi() const { return 0; }
-	bool nr_8f_mapping_mode_pentagon() const { return m_regs.nr_8f_mapping_mode == 0b10 || nr_8f_mapping_mode_pentagon_1024_en(); }
-	bool nr_8f_mapping_mode_pentagon_1024() const { return m_regs.nr_8f_mapping_mode == 0b11; }
+	bool nr_8f_mapping_mode_pentagon() const { return m_nr_8f_mapping_mode == 0b10 || nr_8f_mapping_mode_pentagon_1024_en(); }
+	bool nr_8f_mapping_mode_pentagon_1024() const { return m_nr_8f_mapping_mode == 0b11; }
 	bool nr_8f_mapping_mode_pentagon_1024_en() const { return nr_8f_mapping_mode_pentagon_1024() && BIT(~m_port_eff7_data, 2); }
 
-	u32 internal_port_enable() const { return ~0; } // ...
+	u32 internal_port_enable() const { return ~0; } // TODO
 	bool port_ff_io_en() const { return BIT(internal_port_enable(), 0); }
 	bool port_7ffd_io_en() const { return BIT(internal_port_enable(), 1); }
 	bool port_dffd_io_en() const { return BIT(internal_port_enable(), 2); }
@@ -232,11 +230,11 @@ private:
 	bool port_1ffd_special() const { return BIT(m_port_1ffd_data, 0); }
 	u8 port_1ffd_rom() const { return (BIT(m_port_1ffd_data, 2) << 1) | BIT(m_port_7ffd_data, 4); }
 
-	u8 layer2_active_bank() const { return  m_regs.port_123b_layer2_map_shadow ? m_regs.nr_13_layer2_shadow_bank : m_regs.nr_12_layer2_active_bank; }
-	void port_123b_layer2_en_w(bool data) { m_regs.port_123b_layer2_en = data; m_layer2->layer2_en_w(m_regs.port_123b_layer2_en); }
-	void port_123b_layer2_map_shadow_w(bool data) { m_regs.port_123b_layer2_map_shadow = data; m_layer2->layer2_active_bank_w(layer2_active_bank()); }
+	u8 layer2_active_bank() const { return  m_port_123b_layer2_map_shadow ? m_nr_13_layer2_shadow_bank : m_nr_12_layer2_active_bank; }
+	void port_123b_layer2_en_w(bool data) { m_port_123b_layer2_en = data; m_layer2->layer2_en_w(m_port_123b_layer2_en); }
+	void port_123b_layer2_map_shadow_w(bool data) { m_port_123b_layer2_map_shadow = data; m_layer2->layer2_active_bank_w(layer2_active_bank()); }
 
-	void port_ff3b_ulap_en_w(bool data) { m_regs.port_ff3b_ulap_en = data; m_ula->ulap_en_w(m_regs.port_ff3b_ulap_en); }
+	void port_ff3b_ulap_en_w(bool data) { m_port_ff3b_ulap_en = data; m_ula->ulap_en_w(m_port_ff3b_ulap_en); }
 	u16 nr_palette_dat();
 
 	memory_access<8, 0, 0, ENDIANNESS_LITTLE>::specific m_next_regs;
@@ -246,7 +244,8 @@ private:
 	memory_bank_array_creator<8> m_bank_ram;
 	memory_view m_view0, m_view1, m_view2, m_view3, m_view4, m_view5, m_view6, m_view7;
 	required_device<z80ctc_device> m_ctc;
-	required_device<z80dma_device> m_z80dma;
+	required_device<specnext_dma_device> m_z80dma;
+	required_device<specnext_dma_device> m_zxndma;
 	required_device<i2cmem_device> m_eeprom; // nvram
 	required_device<spi_sdcard_sdv2_device> m_sdcard;
 	required_device<centronics_device> m_centronics;
@@ -276,212 +275,207 @@ private:
 	bool m_sram_rom3;
 	bool m_sram_alt_128_n;
 
-	struct specnext_regs
-	{
-		bool nr_02_bus_reset;
-		bool nr_02_iotrap;
-		bool nr_02_generate_mf_nmi;
-		bool nr_02_generate_divmmc_nmi;
-		u8 nr_02_reset_type : 3;
-		u8 nr_03_machine_type : 3;
-		bool nr_03_user_dt_lock;
-		u8 nr_03_machine_timing : 3;
-		bool nr_03_config_mode;
-		u8 nr_04_romram_bank : 7;
-		u8 nr_05_joy1 : 2;
-		u8 nr_05_joy0 : 2;
-		u8 nr_06_psg_mode : 2;
-		bool nr_06_ps2_mode;
-		bool nr_06_button_m1_nmi_en;
-		bool nr_06_button_drive_nmi_en;
-		bool nr_06_hotkey_5060_en;
-		bool nr_06_internal_speaker_beep;
-		bool nr_06_hotkey_cpu_speed_en;
-		u8 nr_07_cpu_speed : 2;
-		bool nr_08_keyboard_issue2;
-		bool nr_08_psg_turbosound_en;
-		bool nr_08_port_ff_rd_en;
-		bool nr_08_dac_en;
-		bool nr_08_internal_speaker_en;
-		bool nr_08_psg_stereo_mode;
-		bool nr_08_contention_disable;
-		bool nr_09_hdmi_audio_en;
-		bool nr_09_sprite_tie;
-		u8 nr_09_psg_mono : 3;
-		u8 nr_0a_mouse_dpi : 2;
-		bool nr_0a_mouse_button_reverse;
-		bool nr_0a_divmmc_automap_en;
-		u8 nr_0a_mf_type : 2;
-		bool nr_0b_joy_iomode_0;
-		u8 nr_0b_joy_iomode : 2;
-		bool nr_0b_joy_iomode_en;
-		u8 g_sub_version;
-		u8 g_board_issue : 4;
-		u8 nr_10_coreid : 5;
-		u8 g_video_inc : 2;
-		u8 nr_11_video_timing : 3;
-		bool nr_10_flashboot;
-		u8 nr_12_layer2_active_bank : 7;
-		u8 nr_13_layer2_shadow_bank : 7;
-		u8 nr_14_global_transparent_rgb;
-		bool nr_15_sprite_en;
-		bool nr_15_sprite_over_border_en;
-		u8 nr_15_layer_priority : 3;
-		bool nr_15_sprite_border_clip_en;
-		bool nr_15_sprite_priority;
-		bool nr_15_lores_en;
-		u8 nr_16_layer2_scrollx;
-		u8 nr_17_layer2_scrolly;
-		u8 nr_18_layer2_clip_x1;
-		u8 nr_18_layer2_clip_x2;
-		u8 nr_18_layer2_clip_y1;
-		u8 nr_18_layer2_clip_y2;
-		u8 nr_18_layer2_clip_idx : 2;
-		u8 nr_19_sprite_clip_x1;
-		u8 nr_19_sprite_clip_x2;
-		u8 nr_19_sprite_clip_y1;
-		u8 nr_19_sprite_clip_y2;
-		u8 nr_19_sprite_clip_idx : 2;
-		u8 nr_1a_ula_clip_x1;
-		u8 nr_1a_ula_clip_x2;
-		u8 nr_1a_ula_clip_y1;
-		u8 nr_1a_ula_clip_y2;
-		u8 nr_1a_ula_clip_idx : 2;
-		u8 nr_1b_tm_clip_x1;
-		u8 nr_1b_tm_clip_x2;
-		u8 nr_1b_tm_clip_y1;
-		u8 nr_1b_tm_clip_y2;
-		u8 nr_1b_tm_clip_idx : 2;
-		bool nr_22_line_interrupt_en;
-		u16 nr_23_line_interrupt : 9;
-		u8 nr_26_ula_scrollx;
-		u8 nr_27_ula_scrolly;
-		u8 nr_2d_i2s_sample : 2;
-		u16 nr_30_tm_scrollx : 10;
-		u8 nr_31_tm_scrolly;
-		u8 nr_32_lores_scrollx;
-		u8 nr_33_lores_scrolly;
-		u8 nr_palette_idx;
-		bool nr_palette_sub_idx;
-		u8 nr_42_ulanext_format;
-		bool nr_43_palette_autoinc_disable;
-		u8 nr_43_palette_write_select : 3;
-		bool nr_43_active_sprite_palette;
-		bool nr_43_active_layer2_palette;
-		bool nr_43_active_ula_palette;
-		bool nr_43_ulanext_en;
-		u8 nr_stored_palette_value;
-		u8 nr_4a_fallback_rgb;
-		u8 nr_4b_sprite_transparent_index;
-		u8 nr_4c_tm_transparent_index : 4;
-		u16 nr_copper_addr : 11;
-		u8 nr_copper_data_stored;
-		u8 nr_62_copper_mode : 2;
-		u8 mmu[8];
-		u8 nr_64_copper_offset;
-		bool nr_68_ula_en;
-		u8 nr_68_blend_mode : 2;
-		bool nr_68_cancel_extended_keys;
-		bool nr_68_ula_fine_scroll_x;
-		bool nr_68_ula_stencil_mode;
-		bool nr_6a_lores_radastan;
-		bool nr_6a_lores_radastan_xor;
-		u8 nr_6a_lores_palette_offset : 4;
-		bool nr_6b_tm_en;
-		u8 nr_6b_tm_control : 7;
-		u8 nr_6c_tm_default_attr;
-		u8 nr_6e_tilemap_base : 6;
-		bool nr_6e_tilemap_base_7;
-		u8 nr_6f_tilemap_tiles : 6;
-		bool nr_6f_tilemap_tiles_7;
-		u8 nr_70_layer2_resolution : 2;
-		u8 nr_70_layer2_palette_offset : 4;
-		bool nr_71_layer2_scrollx_msb;
-		u8 nr_7f_user_register_0;
-		u8 nr_80_expbus;
-		u8 nr_81_expbus_speed : 2;
-		bool nr_81_expbus_clken;
-		bool nr_81_expbus_nmi_debounce_disable;
-		bool nr_81_expbus_ula_override;
-		u8 nr_82_internal_port_enable;
-		u8 nr_83_internal_port_enable;
-		u8 nr_84_internal_port_enable;
-		u8 nr_85_internal_port_enable : 4;
-		bool nr_85_internal_port_reset_type;
-		u8 nr_86_bus_port_enable;
-		u8 nr_87_bus_port_enable;
-		u8 nr_88_bus_port_enable;
-		u8 nr_89_bus_port_enable : 4;
-		bool nr_89_bus_port_reset_type;
-		u8 nr_8a_bus_port_propagate : 6;
-		u8 nr_8c_altrom;
-		u8 nr_8f_mapping_mode : 2;
-		u8 nr_90_pi_gpio_o_en;
-		u8 nr_91_pi_gpio_o_en;
-		u8 nr_92_pi_gpio_o_en;
-		u8 nr_93_pi_gpio_o_en : 4;
-		u8 nr_98_pi_gpio_o;
-		u8 nr_99_pi_gpio_o;
-		u8 nr_9a_pi_gpio_o;
-		u8 nr_9b_pi_gpio_o : 4;
-		u8 nr_a0_pi_peripheral_en;
-		u8 nr_a2_pi_i2s_ctl;
-		bool nr_a8_esp_gpio0_en;
-		bool nr_a9_esp_gpio0;
-		u8 nr_b8_divmmc_ep_0;
-		u8 nr_b9_divmmc_ep_valid_0;
-		u8 nr_ba_divmmc_ep_timing_0;
-		u8 nr_bb_divmmc_ep_1;
-		u8 nr_c0_im2_vector : 3;
-		bool nr_c0_stackless_nmi;
-		bool nr_c0_int_mode_pulse_0_im2_1;
-		u8 nr_c2_retn_address_lsb;
-		u8 nr_c3_retn_address_msb;
-		bool nr_c4_int_en_0_expbus;
-		u8 nr_c6_int_en_2_654 : 3;
-		u8 nr_c6_int_en_2_210 : 3;
-		bool nr_cc_dma_int_en_0_7;
-		u8 nr_cc_dma_int_en_0_10 : 2;
-		u8 nr_cd_dma_int_en_1;
-		u8 nr_ce_dma_int_en_2_654 : 3;
-		u8 nr_ce_dma_int_en_2_210 : 3;
-		bool nr_d8_io_trap_fdc_en;
-		u8 nr_d9_iotrap_write;
-		u8 nr_da_iotrap_cause: 3;
-		bool nr_f0_select;
-		bool nr_f0_xdna_en;
-		bool nr_f0_xadc_en;
-		u8 nr_f0_xdev_cmd;
-		bool nr_f0_xadc_eoc;
-		bool nr_f0_xadc_eos;
-		bool nr_f8_xadc_dwe;
-		u8 nr_f8_xadc_daddr : 7;
-		bool nr_f8_xadc_den;
-		u8 nr_f9_xadc_d0;
-		u8 nr_fa_xadc_d1;
+	u8 m_mmu[8];
+	bool m_nr_02_bus_reset;
+	bool m_nr_02_iotrap;
+	bool m_nr_02_generate_mf_nmi;
+	bool m_nr_02_generate_divmmc_nmi;
+	bool m_nr_02_hard_reset;
+	u8 m_nr_02_reset_type; // u3
+	u8 m_nr_03_machine_type; // u3
+	bool m_nr_03_user_dt_lock;
+	u8 m_nr_03_machine_timing; // u3
+	bool m_nr_03_config_mode;
+	u8 m_nr_04_romram_bank; // u7
+	u8 m_nr_05_joy1; // u2
+	u8 m_nr_05_joy0; // u2
+	u8 m_nr_06_psg_mode; // u2
+	bool m_nr_06_ps2_mode;
+	bool m_nr_06_button_m1_nmi_en;
+	bool m_nr_06_button_drive_nmi_en;
+	bool m_nr_06_hotkey_5060_en;
+	bool m_nr_06_internal_speaker_beep;
+	bool m_nr_06_hotkey_cpu_speed_en;
+	u8 m_nr_07_cpu_speed; // u2
+	bool m_nr_08_keyboard_issue2;
+	bool m_nr_08_psg_turbosound_en;
+	bool m_nr_08_port_ff_rd_en;
+	bool m_nr_08_dac_en;
+	bool m_nr_08_internal_speaker_en;
+	bool m_nr_08_psg_stereo_mode;
+	bool m_nr_08_contention_disable;
+	bool m_nr_09_hdmi_audio_en;
+	bool m_nr_09_sprite_tie;
+	u8 m_nr_09_psg_mono; // u3
+	u8 m_nr_0a_mouse_dpi; // u2
+	bool m_nr_0a_mouse_button_reverse;
+	bool m_nr_0a_divmmc_automap_en;
+	u8 m_nr_0a_mf_type; // u2
+	bool m_nr_0b_joy_iomode_0;
+	u8 m_nr_0b_joy_iomode; // u2
+	bool m_nr_0b_joy_iomode_en;
+	u8 m_nr_10_coreid; // u5
+	u8 m_nr_11_video_timing; // u3
+	bool m_nr_10_flashboot;
+	u8 m_nr_12_layer2_active_bank; // u7
+	u8 m_nr_13_layer2_shadow_bank; // u7
+	u8 m_nr_14_global_transparent_rgb;
+	bool m_nr_15_sprite_en;
+	bool m_nr_15_sprite_over_border_en;
+	u8 m_nr_15_layer_priority; // u3
+	bool m_nr_15_sprite_border_clip_en;
+	bool m_nr_15_sprite_priority;
+	bool m_nr_15_lores_en;
+	u8 m_nr_16_layer2_scrollx;
+	u8 m_nr_17_layer2_scrolly;
+	u8 m_nr_18_layer2_clip_x1;
+	u8 m_nr_18_layer2_clip_x2;
+	u8 m_nr_18_layer2_clip_y1;
+	u8 m_nr_18_layer2_clip_y2;
+	u8 m_nr_18_layer2_clip_idx; // u2
+	u8 m_nr_19_sprite_clip_x1;
+	u8 m_nr_19_sprite_clip_x2;
+	u8 m_nr_19_sprite_clip_y1;
+	u8 m_nr_19_sprite_clip_y2;
+	u8 m_nr_19_sprite_clip_idx; // u2
+	u8 m_nr_1a_ula_clip_x1;
+	u8 m_nr_1a_ula_clip_x2;
+	u8 m_nr_1a_ula_clip_y1;
+	u8 m_nr_1a_ula_clip_y2;
+	u8 m_nr_1a_ula_clip_idx; // u2
+	u8 m_nr_1b_tm_clip_x1;
+	u8 m_nr_1b_tm_clip_x2;
+	u8 m_nr_1b_tm_clip_y1;
+	u8 m_nr_1b_tm_clip_y2;
+	u8 m_nr_1b_tm_clip_idx; // u2
+	bool m_nr_22_line_interrupt_en;
+	u16 m_nr_23_line_interrupt; // u9
+	u8 m_nr_26_ula_scrollx;
+	u8 m_nr_27_ula_scrolly;
+	u8 m_nr_2d_i2s_sample; // u2
+	u16 m_nr_30_tm_scrollx; // u10
+	u8 m_nr_31_tm_scrolly;
+	u8 m_nr_32_lores_scrollx;
+	u8 m_nr_33_lores_scrolly;
+	u8 m_nr_palette_idx;
+	bool m_nr_palette_sub_idx;
+	u8 m_nr_42_ulanext_format;
+	bool m_nr_43_palette_autoinc_disable;
+	u8 m_nr_43_palette_write_select; // u3
+	bool m_nr_43_active_sprite_palette;
+	bool m_nr_43_active_layer2_palette;
+	bool m_nr_43_active_ula_palette;
+	bool m_nr_43_ulanext_en;
+	u8 m_nr_stored_palette_value;
+	u8 m_nr_4a_fallback_rgb;
+	u8 m_nr_4b_sprite_transparent_index;
+	u8 m_nr_4c_tm_transparent_index; // u4
+	u16 m_nr_copper_addr; // u11
+	u8 m_nr_copper_data_stored;
+	u8 m_nr_62_copper_mode; // u2
+	u8 m_nr_64_copper_offset;
+	bool m_nr_68_ula_en;
+	u8 m_nr_68_blend_mode; // u2
+	bool m_nr_68_cancel_extended_keys;
+	bool m_nr_68_ula_fine_scroll_x;
+	bool m_nr_68_ula_stencil_mode;
+	bool m_nr_6a_lores_radastan;
+	bool m_nr_6a_lores_radastan_xor;
+	u8 m_nr_6a_lores_palette_offset; // u4
+	bool m_nr_6b_tm_en;
+	u8 m_nr_6b_tm_control; // u7
+	u8 m_nr_6c_tm_default_attr;
+	u8 m_nr_6e_tilemap_base; // u6
+	bool m_nr_6e_tilemap_base_7;
+	u8 m_nr_6f_tilemap_tiles; // u6
+	bool m_nr_6f_tilemap_tiles_7;
+	u8 m_nr_70_layer2_resolution; // u2
+	u8 m_nr_70_layer2_palette_offset; // u4
+	bool m_nr_71_layer2_scrollx_msb;
+	u8 m_nr_7f_user_register_0;
+	u8 m_nr_80_expbus;
+	u8 m_nr_81_expbus_speed; // u2
+	bool m_nr_81_expbus_clken;
+	bool m_nr_81_expbus_nmi_debounce_disable;
+	bool m_nr_81_expbus_ula_override;
+	u8 m_nr_82_internal_port_enable;
+	u8 m_nr_83_internal_port_enable;
+	u8 m_nr_84_internal_port_enable;
+	u8 m_nr_85_internal_port_enable; // u4
+	bool m_nr_85_internal_port_reset_type;
+	u8 m_nr_86_bus_port_enable;
+	u8 m_nr_87_bus_port_enable;
+	u8 m_nr_88_bus_port_enable;
+	u8 m_nr_89_bus_port_enable; // u4
+	bool m_nr_89_bus_port_reset_type;
+	u8 m_nr_8a_bus_port_propagate; // u6
+	u8 m_nr_8c_altrom;
+	u8 m_nr_8f_mapping_mode; // u2
+	u8 m_nr_90_pi_gpio_o_en;
+	u8 m_nr_91_pi_gpio_o_en;
+	u8 m_nr_92_pi_gpio_o_en;
+	u8 m_nr_93_pi_gpio_o_en; // u4
+	u8 m_nr_98_pi_gpio_o;
+	u8 m_nr_99_pi_gpio_o;
+	u8 m_nr_9a_pi_gpio_o;
+	u8 m_nr_9b_pi_gpio_o; // u4
+	u8 m_nr_a0_pi_peripheral_en;
+	u8 m_nr_a2_pi_i2s_ctl;
+	bool m_nr_a8_esp_gpio0_en;
+	bool m_nr_a9_esp_gpio0;
+	u8 m_nr_b8_divmmc_ep_0;
+	u8 m_nr_b9_divmmc_ep_valid_0;
+	u8 m_nr_ba_divmmc_ep_timing_0;
+	u8 m_nr_bb_divmmc_ep_1;
+	u8 m_nr_c0_im2_vector; // u3
+	bool m_nr_c0_stackless_nmi;
+	bool m_nr_c0_int_mode_pulse_0_im2_1;
+	u8 m_nr_c2_retn_address_lsb;
+	u8 m_nr_c3_retn_address_msb;
+	bool m_nr_c4_int_en_0_expbus;
+	u8 m_nr_c6_int_en_2_654; // u3
+	u8 m_nr_c6_int_en_2_210; // u3
+	bool m_nr_cc_dma_int_en_0_7;
+	u8 m_nr_cc_dma_int_en_0_10; // u2
+	u8 m_nr_cd_dma_int_en_1;
+	u8 m_nr_ce_dma_int_en_2_654; // u3
+	u8 m_nr_ce_dma_int_en_2_210; // u3
+	bool m_nr_d8_io_trap_fdc_en;
+	u8 m_nr_d9_iotrap_write;
+	u8 m_nr_da_iotrap_cause: 3;
+	bool m_nr_f0_select;
+	bool m_nr_f0_xdna_en;
+	bool m_nr_f0_xadc_en;
+	u8 m_nr_f0_xdev_cmd;
+	bool m_nr_f0_xadc_eoc;
+	bool m_nr_f0_xadc_eos;
+	bool m_nr_f8_xadc_dwe;
+	u8 m_nr_f8_xadc_daddr; // u7
+	bool m_nr_f8_xadc_den;
+	u8 m_nr_f9_xadc_d0;
+	u8 m_nr_fa_xadc_d1;
 
-		bool pulse_int_n;
-		u8 nr_09_scanlines : 2;
+	bool m_pulse_int_n;
+	u8 m_nr_09_scanlines; // u2
 
-		u8 eff_nr_03_machine_timing : 3;
-		bool eff_nr_05_5060;
-		bool eff_nr_05_scandouble_en;
-		bool eff_nr_08_contention_disable;
-		u8 eff_nr_09_scanlines : 2;
+	u8 m_eff_nr_03_machine_timing; // u3
+	bool m_eff_nr_05_5060;
+	bool m_eff_nr_05_scandouble_en;
+	bool m_eff_nr_08_contention_disable;
+	u8 m_eff_nr_09_scanlines; // u2
 
 
-		bool port_123b_layer2_en;
-		bool port_123b_layer2_map_wr_en;
-		bool port_123b_layer2_map_rd_en;
-		bool port_123b_layer2_map_shadow;
-		u8 port_123b_layer2_map_segment : 2;
-		u8 port_123b_layer2_offset : 3;
+	bool m_port_123b_layer2_en;
+	bool m_port_123b_layer2_map_wr_en;
+	bool m_port_123b_layer2_map_rd_en;
+	bool m_port_123b_layer2_map_shadow;
+	u8 m_port_123b_layer2_map_segment; // u2
+	u8 m_port_123b_layer2_offset; // u3
 
-		u8 port_bf3b_ulap_mode : 2;
-		u8 port_bf3b_ulap_index : 6;
-		bool port_ff3b_ulap_en;
-		u8 nr_palette_priority : 2;
-	} m_regs;
+	u8 m_port_bf3b_ulap_mode; // u2
+	u8 m_port_bf3b_ulap_index; // u6
+	bool m_port_ff3b_ulap_en;
+	u8 m_nr_palette_priority; // u2
 
 	emu_timer *m_spi_clock;
 	int m_spi_clock_cycles;
@@ -543,7 +537,7 @@ void specnext_state::bank_update(u8 bank)
 		}
 	}
 
-	const u8 mem_active_page = m_regs.mmu[bank];
+	const u8 mem_active_page = m_mmu[bank];
 	const bool mem_active_bank5 = mem_active_page == 0x0a || mem_active_page == 0x0b;
 	const bool mem_active_bank7 = mem_active_page == 0x0e;
 	const u16 mmu_A21_A13 = ((0b0001 + BIT(mem_active_page, 5, 3)) << 5) | BIT(mem_active_page, 0, 5);
@@ -555,8 +549,8 @@ void specnext_state::bank_update(u8 bank)
 	const bool sram_pre_alt_en = nr_8c_altrom_en();
 	const bool sram_pre_alt_128_n = m_sram_alt_128_n;
 	const bool sram_pre_rom3 = m_sram_rom3;
-	const bool sram_pre_layer2_rd_en = m_regs.port_123b_layer2_map_rd_en;
-	const bool sram_pre_layer2_wr_en = m_regs.port_123b_layer2_map_wr_en;
+	const bool sram_pre_layer2_rd_en = m_port_123b_layer2_map_rd_en;
+	const bool sram_pre_layer2_wr_en = m_port_123b_layer2_map_wr_en;
 	const u16 sram_pre_layer2_A21_A13 = layer2_A21_A13;
 
 	u8 sram_pre_A20_A13, sram_pre_override;
@@ -582,9 +576,9 @@ void specnext_state::bank_update(u8 bank)
 			sram_pre_rdonly = 0;
 			sram_pre_override = 0b110;
 		}
-		else if (m_regs.nr_03_config_mode)
+		else if (m_nr_03_config_mode)
 		{
-			sram_pre_A20_A13 = (m_regs.nr_04_romram_bank << 1) | cpu_a13;
+			sram_pre_A20_A13 = (m_nr_04_romram_bank << 1) | cpu_a13;
 			sram_pre_active = 1;
 			sram_pre_bank5 = sram_pre_bank7 = 0;
 			sram_pre_rdonly = 0;
@@ -607,7 +601,7 @@ void specnext_state::bank_update(u8 bank)
 		sram_pre_bank5 = mem_active_bank5;
 		sram_pre_bank7 = mem_active_bank7;
 		sram_pre_rdonly = 0;
-		sram_pre_override = (((bank & 0x06) != 0x06) && (m_regs.port_123b_layer2_map_segment == 0x03)) << 1;
+		sram_pre_override = (((bank & 0x06) != 0x06) && (m_port_123b_layer2_map_segment == 0x03)) << 1;
 	}
 
 	const bool sram_pre_romcs_n = 0; // expbus_eff_en && !expbus_eff_disable_mem;
@@ -624,7 +618,7 @@ void specnext_state::bank_update(u8 bank)
 
 	m_divmmc->cpu_a_15_13_w(bank);
 	m_divmmc->en_w(port_divmmc_io_en());
-	m_divmmc->automap_reset_w(!port_divmmc_io_en() || !m_regs.nr_0a_divmmc_automap_en);
+	m_divmmc->automap_reset_w(!port_divmmc_io_en() || !m_nr_0a_divmmc_automap_en);
 	m_divmmc->automap_active_w(sram_divmmc_automap_en);
 	m_divmmc->automap_rom3_active_w(sram_divmmc_automap_rom3_en);
 	m_divmmc->retn_seen_w(0);
@@ -633,8 +627,6 @@ void specnext_state::bank_update(u8 bank)
 
 	u8 sram_A20_A13;
 	bool sram_active, sram_bank5, sram_bank7, sram_rdonly, sram_romcs_en, sram_mem_hide_n;
-	// process (sram_pre_override, divmmc_rom_en, divmmc_ram_en, divmmc_bank, divmmc_rdonly, sram_layer2_map_en, sram_pre_layer2_A21_A13,
-	//          sram_romcs, sram_pre_A20_A13, sram_altrom_en, sram_pre_alt_128_n, sram_pre_rdonly, sram_pre_active, sram_pre_bank5, sram_pre_bank7)
 	if (BIT(sram_pre_override, 2) && m_divmmc->divmmc_rom_en_r())
 	{
 		sram_A20_A13 = 0b00001000;
@@ -710,7 +702,7 @@ void specnext_state::bank_update(u8 bank)
 void specnext_state::memory_change(u16 port, u8 data)
 {
 	const bool mode_profi = nr_8f_mapping_mode_profi();
-	bool nr_8f_we_dly = 0; // ...
+	bool nr_8f_we_dly = 0; // TODO?
 	const bool port_1ffd_special_old = ((port == 0x1ffd  && !port_7ffd_locked()) || port == 0x8e) && port_1ffd_special();
 
 	const bool port_memory_change_dly = ((port == 0x7ffd || port == 0x1ffd) && !port_7ffd_locked()) || (port == 0xdffd && (mode_profi || !port_7ffd_locked())) || port == 0xeff7 || port == 0x8e || nr_8f_we_dly;
@@ -784,8 +776,8 @@ void specnext_state::memory_change(u16 port, u8 data)
 
 u16 specnext_state::get_layer2_active_page(u8 bank)
 {
-	const u8 layer2_active_bank_offset_pre = m_regs.port_123b_layer2_map_segment == 0b11 ? BIT(bank, 1, 2) : m_regs.port_123b_layer2_map_segment;
-	const u8 layer2_active_bank_offset = layer2_active_bank_offset_pre + m_regs.port_123b_layer2_offset;
+	const u8 layer2_active_bank_offset_pre = m_port_123b_layer2_map_segment == 0b11 ? BIT(bank, 1, 2) : m_port_123b_layer2_map_segment;
+	const u8 layer2_active_bank_offset = layer2_active_bank_offset_pre + m_port_123b_layer2_offset;
 	const u8 layer2_active_page = ((layer2_active_bank() + layer2_active_bank_offset) << 1) & BIT(bank, 0);
 
 	return layer2_active_page;
@@ -804,7 +796,7 @@ u32 specnext_state::screen_update_spectrum(screen_device &screen, bitmap_ind16 &
 	//screen.priority().fill(0, cliprect);
 
 	std::tuple<u8, u8, u8> layers{3, 3, 3}; //sprite_layer, l2_layer, ula_layer;
-	switch (m_regs.nr_15_layer_priority)
+	switch (m_nr_15_layer_priority)
 	{
 	case 0b000: layers = {2, 1, 0}; break;
 	case 0b001: layers = {1, 2, 0}; break;
@@ -820,18 +812,18 @@ u32 specnext_state::screen_update_spectrum(screen_device &screen, bitmap_ind16 &
 	{
 		if (std::get<2>(layers) == layer)
 		{
-			if (m_regs.nr_6b_tm_en)
+			if (m_nr_6b_tm_en)
 				m_tiles->draw(screen, bitmap, clip320x256, 0);
-			if (m_regs.nr_68_ula_en)
+			if (m_nr_68_ula_en)
 				m_ula->draw(screen, bitmap, clip256x192, flash);
-			if (m_regs.nr_6b_tm_en)
+			if (m_nr_6b_tm_en)
 				m_tiles->draw(screen, bitmap, clip320x256, 1);
 		}
 
 		if (std::get<1>(layers) == layer)
 			m_layer2->draw(screen, bitmap, clip256x192);
 
-		if (m_regs.nr_15_sprite_en && (std::get<0>(layers) == layer))
+		if (m_nr_15_sprite_en && (std::get<0>(layers) == layer))
 			m_sprites->draw(screen, bitmap, clip320x256);
 	}
 
@@ -840,8 +832,8 @@ u32 specnext_state::screen_update_spectrum(screen_device &screen, bitmap_ind16 &
 
 u16 specnext_state::nr_palette_dat()
 {
-	u16 nr_palette_index = (BIT(m_regs.nr_43_palette_write_select, 1) << 9) | (BIT(m_regs.nr_43_palette_write_select, 2) << 8) | m_regs.nr_palette_idx;
-	if ((BIT(m_regs.nr_43_palette_write_select, 1) != BIT(m_regs.nr_43_palette_write_select, 0)))
+	u16 nr_palette_index = (BIT(m_nr_43_palette_write_select, 1) << 9) | (BIT(m_nr_43_palette_write_select, 2) << 8) | m_nr_palette_idx;
+	if ((BIT(m_nr_43_palette_write_select, 1) != BIT(m_nr_43_palette_write_select, 0)))
 		nr_palette_index |= 0x400;
 
 	rgb_t rgb = m_palette->pen_color(nr_palette_index);
@@ -850,8 +842,8 @@ u16 specnext_state::nr_palette_dat()
 
 void specnext_state::palette_val_w(u16 nr_palette_value)
 {
-	u16 nr_palette_index = (BIT(m_regs.nr_43_palette_write_select, 1) << 9) | (BIT(m_regs.nr_43_palette_write_select, 2) << 8) | m_regs.nr_palette_idx;
-	if ((BIT(m_regs.nr_43_palette_write_select, 1) xor BIT(m_regs.nr_43_palette_write_select, 0)))
+	u16 nr_palette_index = (BIT(m_nr_43_palette_write_select, 1) << 9) | (BIT(m_nr_43_palette_write_select, 2) << 8) | m_nr_palette_idx;
+	if ((BIT(m_nr_43_palette_write_select, 1) xor BIT(m_nr_43_palette_write_select, 0)))
 		nr_palette_index |= 0x400;
 
 	m_palette->set_pen_color(nr_palette_index, rgbexpand<3,3,3>(nr_palette_value, 6, 3, 0));
@@ -860,7 +852,7 @@ void specnext_state::palette_val_w(u16 nr_palette_value)
 void specnext_state::ula_palette_w(u8 data)
 {
 	u16 nr_palette_value = (data << 1) | BIT(data, 1) | BIT(data, 0);
-	u16 nr_palette_index_utm = (BIT(m_regs.nr_43_palette_write_select, 2) << 8) | (0b11 << 6) | m_regs.port_bf3b_ulap_index;
+	u16 nr_palette_index_utm = (BIT(m_nr_43_palette_write_select, 2) << 8) | (0b11 << 6) | m_port_bf3b_ulap_index;
 
 	m_palette->set_pen_color(nr_palette_index_utm, rgbexpand<3,3,3>(nr_palette_value, 6, 3, 0));
 }
@@ -915,7 +907,7 @@ TIMER_CALLBACK_MEMBER(specnext_state::spi_clock)
 
 void specnext_state::mmu_w(offs_t bank, u8 data)
 {
-	m_regs.mmu[bank] = data;
+	m_mmu[bank] = data;
 	bank_update(bank);
 }
 
@@ -947,34 +939,34 @@ u8 specnext_state::reg_r(offs_t nr_register)
 		port_253b_dat = G_VERSION;
 		break;
 	case 0x02:
-		port_253b_dat = (m_regs.nr_02_bus_reset << 7) | (0b00 << 5) | (m_regs.nr_02_iotrap << 4) | (m_regs.nr_02_generate_mf_nmi << 3) | (m_regs.nr_02_generate_divmmc_nmi << 2) | BIT(m_regs.nr_02_reset_type, 0, 2);
+		port_253b_dat = (m_nr_02_bus_reset << 7) | (0b00 << 5) | (m_nr_02_iotrap << 4) | (m_nr_02_generate_mf_nmi << 3) | (m_nr_02_generate_divmmc_nmi << 2) | BIT(m_nr_02_reset_type, 0, 2);
 		break;
 	case 0x03:
-		port_253b_dat = (m_regs.nr_palette_sub_idx << 7) | (0b00 << 5) | (m_regs.nr_03_machine_timing << 4) | (m_regs.nr_03_user_dt_lock << 3) | m_regs.nr_03_machine_type;
+		port_253b_dat = (m_nr_palette_sub_idx << 7) | (0b00 << 5) | (m_nr_03_machine_timing << 4) | (m_nr_03_user_dt_lock << 3) | m_nr_03_machine_type;
 		break;
 	case 0x05:
-		port_253b_dat = (BIT(m_regs.nr_05_joy0, 0, 2) << 6) | (BIT(m_regs.nr_05_joy1, 0, 2) << 4) | (BIT(m_regs.nr_05_joy0, 2) << 3) | (m_regs.eff_nr_05_5060 << 2) | (BIT(m_regs.nr_05_joy1, 2) << 1) | m_regs.eff_nr_05_scandouble_en;
+		port_253b_dat = (BIT(m_nr_05_joy0, 0, 2) << 6) | (BIT(m_nr_05_joy1, 0, 2) << 4) | (BIT(m_nr_05_joy0, 2) << 3) | (m_eff_nr_05_5060 << 2) | (BIT(m_nr_05_joy1, 2) << 1) | m_eff_nr_05_scandouble_en;
 		break;
 	case 0x06:
-		port_253b_dat = (m_regs.nr_06_hotkey_cpu_speed_en << 7) | (m_regs.nr_06_internal_speaker_beep << 6) | (m_regs.nr_06_hotkey_5060_en << 5) | (m_regs.nr_06_button_drive_nmi_en << 4) | (m_regs.nr_06_button_m1_nmi_en << 3) | (m_regs.nr_06_ps2_mode << 2) | m_regs.nr_06_psg_mode;
+		port_253b_dat = (m_nr_06_hotkey_cpu_speed_en << 7) | (m_nr_06_internal_speaker_beep << 6) | (m_nr_06_hotkey_5060_en << 5) | (m_nr_06_button_drive_nmi_en << 4) | (m_nr_06_button_m1_nmi_en << 3) | (m_nr_06_ps2_mode << 2) | m_nr_06_psg_mode;
 		break;
 	case 0x07:
 		{
 			const u8 clock_scale = BIT(u8(m_maincpu->clock_scale()), 0, 3);
-			port_253b_dat = (0b00 << 6) | ((clock_scale >> 1) << 4) | (0b00 << 2) | m_regs.nr_07_cpu_speed;
+			port_253b_dat = (0b00 << 6) | ((clock_scale >> 1) << 4) | (0b00 << 2) | m_nr_07_cpu_speed;
 		}
 		break;
 	case 0x08:
-		port_253b_dat = ((!port_7ffd_locked()) << 7) | (m_regs.eff_nr_08_contention_disable << 6) | (m_regs.nr_08_psg_stereo_mode << 5) | (m_regs.nr_08_internal_speaker_en << 4) | (m_regs.nr_08_dac_en << 3) | (m_regs.nr_08_port_ff_rd_en << 2) | (m_regs.nr_08_psg_turbosound_en << 1) | m_regs.nr_08_keyboard_issue2;
+		port_253b_dat = ((!port_7ffd_locked()) << 7) | (m_eff_nr_08_contention_disable << 6) | (m_nr_08_psg_stereo_mode << 5) | (m_nr_08_internal_speaker_en << 4) | (m_nr_08_dac_en << 3) | (m_nr_08_port_ff_rd_en << 2) | (m_nr_08_psg_turbosound_en << 1) | m_nr_08_keyboard_issue2;
 		break;
 	case 0x09:
-		port_253b_dat = (m_regs.nr_09_psg_mono  << 5) | (m_regs.nr_09_sprite_tie << 4) | (0 << 3) | ((!m_regs.nr_09_hdmi_audio_en) << 2) | m_regs.eff_nr_09_scanlines;
+		port_253b_dat = (m_nr_09_psg_mono  << 5) | (m_nr_09_sprite_tie << 4) | (0 << 3) | ((!m_nr_09_hdmi_audio_en) << 2) | m_eff_nr_09_scanlines;
 		break;
 	case 0x0a:
-		port_253b_dat = (m_regs.nr_0a_mf_type << 6) | (0 << 5) | (m_regs.nr_0a_divmmc_automap_en << 4) | (m_regs.nr_0a_mouse_button_reverse << 3) | (0 << 2) | m_regs.nr_0a_mouse_dpi;
+		port_253b_dat = (m_nr_0a_mf_type << 6) | (0 << 5) | (m_nr_0a_divmmc_automap_en << 4) | (m_nr_0a_mouse_button_reverse << 3) | (0 << 2) | m_nr_0a_mouse_dpi;
 		break;
 	case 0x0b:
-		port_253b_dat = (m_regs.nr_0b_joy_iomode_en << 7) | (0 << 6) | (m_regs.nr_0b_joy_iomode << 4) | (0b000 << 1) | m_regs.nr_0b_joy_iomode_0;
+		port_253b_dat = (m_nr_0b_joy_iomode_en << 7) | (0 << 6) | (m_nr_0b_joy_iomode << 4) | (0b000 << 1) | m_nr_0b_joy_iomode_0;
 		break;
 	case 0x0e:
 		port_253b_dat = G_SUB_VERSION;
@@ -983,95 +975,95 @@ u8 specnext_state::reg_r(offs_t nr_register)
 		port_253b_dat = (0b0000 << 4) | g_board_issue();
 		break;
 	case 0x10:
-		port_253b_dat = (0 << 7) | (m_regs.nr_10_coreid << 2) | 0b00;// | i_SPKEY_BUTTONS(1 downto 0);
+		port_253b_dat = (0 << 7) | (m_nr_10_coreid << 2) | 0b00;// | i_SPKEY_BUTTONS(1 downto 0);
 		break;
 	case 0x11:
-		port_253b_dat = (0b00000 << 3) | m_regs.nr_11_video_timing;
+		port_253b_dat = (0b00000 << 3) | m_nr_11_video_timing;
 		break;
 	case 0x12:
-		port_253b_dat = (0 << 7) | m_regs.nr_12_layer2_active_bank;
+		port_253b_dat = (0 << 7) | m_nr_12_layer2_active_bank;
 		break;
 	case 0x13:
-		port_253b_dat = (0 << 7) | m_regs.nr_13_layer2_shadow_bank;
+		port_253b_dat = (0 << 7) | m_nr_13_layer2_shadow_bank;
 		break;
 	case 0x14:
-		port_253b_dat = m_regs.nr_14_global_transparent_rgb;
+		port_253b_dat = m_nr_14_global_transparent_rgb;
 		break;
 	case 0x15:
-		port_253b_dat = (m_regs.nr_15_lores_en << 7) | (m_regs.nr_15_sprite_priority << 6) | (m_regs.nr_15_sprite_border_clip_en << 5) | (m_regs.nr_15_layer_priority << 2) | (m_regs.nr_15_sprite_over_border_en << 1) | m_regs.nr_15_sprite_en;
+		port_253b_dat = (m_nr_15_lores_en << 7) | (m_nr_15_sprite_priority << 6) | (m_nr_15_sprite_border_clip_en << 5) | (m_nr_15_layer_priority << 2) | (m_nr_15_sprite_over_border_en << 1) | m_nr_15_sprite_en;
 		break;
 	case 0x16:
-		port_253b_dat = m_regs.nr_16_layer2_scrollx;
+		port_253b_dat = m_nr_16_layer2_scrollx;
 		break;
 	case 0x17:
-		port_253b_dat = m_regs.nr_17_layer2_scrolly;
+		port_253b_dat = m_nr_17_layer2_scrolly;
 		break;
 	case 0x18:
-		switch (m_regs.nr_18_layer2_clip_idx)
+		switch (m_nr_18_layer2_clip_idx)
 		{
 		case 0b00:
-			port_253b_dat = m_regs.nr_18_layer2_clip_x1;
+			port_253b_dat = m_nr_18_layer2_clip_x1;
 			break;
 		case 0b01:
-			port_253b_dat = m_regs.nr_18_layer2_clip_x2;
+			port_253b_dat = m_nr_18_layer2_clip_x2;
 			break;
 		case 0b10:
-			port_253b_dat = m_regs.nr_18_layer2_clip_y1;
+			port_253b_dat = m_nr_18_layer2_clip_y1;
 			break;
 		default:
-			port_253b_dat = m_regs.nr_18_layer2_clip_y2;
+			port_253b_dat = m_nr_18_layer2_clip_y2;
 		}
 		break;
 	case 0x19:
-		switch (m_regs.nr_19_sprite_clip_idx)
+		switch (m_nr_19_sprite_clip_idx)
 		{
 		case 0b00:
-			port_253b_dat = m_regs.nr_19_sprite_clip_x1;
+			port_253b_dat = m_nr_19_sprite_clip_x1;
 			break;
 		case 0b01:
-			port_253b_dat = m_regs.nr_19_sprite_clip_x2;
+			port_253b_dat = m_nr_19_sprite_clip_x2;
 			break;
 		case 0b10:
-			port_253b_dat = m_regs.nr_19_sprite_clip_y1;
+			port_253b_dat = m_nr_19_sprite_clip_y1;
 			break;
 		default:
-			port_253b_dat = m_regs.nr_19_sprite_clip_y2;
+			port_253b_dat = m_nr_19_sprite_clip_y2;
 		}
 		break;
 	case 0x1a:
-		switch (m_regs.nr_1a_ula_clip_idx)
+		switch (m_nr_1a_ula_clip_idx)
 		{
 		case 0b00:
-			port_253b_dat = m_regs.nr_1a_ula_clip_x1;
+			port_253b_dat = m_nr_1a_ula_clip_x1;
 			break;
 		case 0b01:
-			port_253b_dat = m_regs.nr_1a_ula_clip_x2;
+			port_253b_dat = m_nr_1a_ula_clip_x2;
 			break;
 		case 0b10:
-			port_253b_dat = m_regs.nr_1a_ula_clip_y1;
+			port_253b_dat = m_nr_1a_ula_clip_y1;
 			break;
 		default:
-			port_253b_dat = m_regs.nr_1a_ula_clip_y2;
+			port_253b_dat = m_nr_1a_ula_clip_y2;
 		}
 		break;
 	case 0x1b:
-		switch (m_regs.nr_1b_tm_clip_idx)
+		switch (m_nr_1b_tm_clip_idx)
 		{
 		case 0b00:
-			port_253b_dat = m_regs.nr_1b_tm_clip_x1;
+			port_253b_dat = m_nr_1b_tm_clip_x1;
 			break;
 		case 0b01:
-			port_253b_dat = m_regs.nr_1b_tm_clip_x2;
+			port_253b_dat = m_nr_1b_tm_clip_x2;
 			break;
 		case 0b10:
-			port_253b_dat = m_regs.nr_1b_tm_clip_y1;
+			port_253b_dat = m_nr_1b_tm_clip_y1;
 			break;
 		default:
-			port_253b_dat = m_regs.nr_1b_tm_clip_y2;
+			port_253b_dat = m_nr_1b_tm_clip_y2;
 		}
 		break;
 	case 0x1c:
-		port_253b_dat = (m_regs.nr_1b_tm_clip_idx << 6) | (m_regs.nr_1a_ula_clip_idx << 4) | (m_regs.nr_19_sprite_clip_idx << 2) | m_regs.nr_18_layer2_clip_idx;
+		port_253b_dat = (m_nr_1b_tm_clip_idx << 6) | (m_nr_1a_ula_clip_idx << 4) | (m_nr_19_sprite_clip_idx << 2) | m_nr_18_layer2_clip_idx;
 		break;
 	case 0x1e:
 		port_253b_dat = (0b0000000 << 1);// | cvc(8);
@@ -1083,170 +1075,170 @@ u8 specnext_state::reg_r(offs_t nr_register)
 		port_253b_dat = 0;//(BIT(im2_int_status, 0) <<) | (BIT(im2_int_status, 11) <<) | (0b00 <<) | BIT(im2_int_status, 3, 4);
 		break;
 	case 0x22:
-		port_253b_dat = ((!m_regs.pulse_int_n) << 7) | (0b0000 << 3) | /*(port_ff_interrupt_disable << 2) |*/ (m_regs.nr_22_line_interrupt_en << 1) | BIT(m_regs.nr_23_line_interrupt, 8);
+		port_253b_dat = ((!m_pulse_int_n) << 7) | (0b0000 << 3) | /*(port_ff_interrupt_disable << 2) |*/ (m_nr_22_line_interrupt_en << 1) | BIT(m_nr_23_line_interrupt, 8);
 		break;
 	case 0x23:
-		port_253b_dat = BIT(m_regs.nr_23_line_interrupt, 0, 8);
+		port_253b_dat = BIT(m_nr_23_line_interrupt, 0, 8);
 		break;
 	case 0x26:
-		port_253b_dat = m_regs.nr_26_ula_scrollx;
+		port_253b_dat = m_nr_26_ula_scrollx;
 		break;
 	case 0x27:
-		port_253b_dat = m_regs.nr_27_ula_scrolly;
+		port_253b_dat = m_nr_27_ula_scrolly;
 		break;
 	case 0x28:
-		port_253b_dat = m_regs.nr_stored_palette_value;
+		port_253b_dat = m_nr_stored_palette_value;
 		break;
 	case 0x2c:
 		port_253b_dat = 0;//pi_audio_L(9 downto 2);
-		//m_regs.nr_2d_i2s_sample = pi_audio_L(1 downto 0);
+		//m_nr_2d_i2s_sample = pi_audio_L(1 downto 0);
 		break;
 	case 0x2d:
-		port_253b_dat = (m_regs.nr_2d_i2s_sample << 6) | 0b000000;
+		port_253b_dat = (m_nr_2d_i2s_sample << 6) | 0b000000;
 		break;
 	case 0x2e:
 		port_253b_dat = 0;//pi_audio_R(9 downto 2);
-		//m_regs.nr_2d_i2s_sample = pi_audio_R(1 downto 0);
+		//m_nr_2d_i2s_sample = pi_audio_R(1 downto 0);
 		break;
 	case 0x2f:
-		port_253b_dat = (0b000000 << 2) | BIT(m_regs.nr_30_tm_scrollx, 8, 2);
+		port_253b_dat = (0b000000 << 2) | BIT(m_nr_30_tm_scrollx, 8, 2);
 		break;
 	case 0x30:
-		port_253b_dat = BIT(m_regs.nr_30_tm_scrollx, 0, 8);
+		port_253b_dat = BIT(m_nr_30_tm_scrollx, 0, 8);
 		break;
 	case 0x31:
-		port_253b_dat = m_regs.nr_31_tm_scrolly;
+		port_253b_dat = m_nr_31_tm_scrolly;
 		break;
 	case 0x32:
-		port_253b_dat = m_regs.nr_32_lores_scrollx;
+		port_253b_dat = m_nr_32_lores_scrollx;
 		break;
 	case 0x33:
-		port_253b_dat = m_regs.nr_33_lores_scrolly;
+		port_253b_dat = m_nr_33_lores_scrolly;
 		break;
 	case 0x34:
 		port_253b_dat = m_sprites->mirror_num_r() & 0x7f;
 		break;
 	case 0x40:
-		port_253b_dat = m_regs.nr_palette_idx;
+		port_253b_dat = m_nr_palette_idx;
 		break;
 	case 0x41:
 		port_253b_dat = BIT(nr_palette_dat(), 1, 8);
 		break;
 	case 0x42:
-		port_253b_dat = m_regs.nr_42_ulanext_format;
+		port_253b_dat = m_nr_42_ulanext_format;
 		break;
 	case 0x43:
-		port_253b_dat = (m_regs.nr_43_palette_autoinc_disable << 7) | (m_regs.nr_43_palette_write_select << 4) | (m_regs.nr_43_active_sprite_palette << 3) | (m_regs.nr_43_active_layer2_palette << 2) | (m_regs.nr_43_active_ula_palette << 1) | m_regs.nr_43_ulanext_en;
+		port_253b_dat = (m_nr_43_palette_autoinc_disable << 7) | (m_nr_43_palette_write_select << 4) | (m_nr_43_active_sprite_palette << 3) | (m_nr_43_active_layer2_palette << 2) | (m_nr_43_active_ula_palette << 1) | m_nr_43_ulanext_en;
 		break;
 	case 0x44:
 		port_253b_dat = (BIT(nr_palette_dat(), 9, 2) << 6) | (0b00000 << 1) | BIT(nr_palette_dat(), 0);
 		break;
 	case 0x4a:
-		port_253b_dat = m_regs.nr_4a_fallback_rgb;
+		port_253b_dat = m_nr_4a_fallback_rgb;
 		break;
 	case 0x4b:
-		port_253b_dat = m_regs.nr_4b_sprite_transparent_index;
+		port_253b_dat = m_nr_4b_sprite_transparent_index;
 		break;
 	case 0x4c:
-		port_253b_dat = (0b0000 << 4) | m_regs.nr_4c_tm_transparent_index;
+		port_253b_dat = (0b0000 << 4) | m_nr_4c_tm_transparent_index;
 		break;
 	case 0x50: case 0x51: case 0x52: case 0x53:
 	case 0x54: case 0x55: case 0x56: case 0x57:
-		port_253b_dat = m_regs.mmu[nr_register - 0x50];
+		port_253b_dat = m_mmu[nr_register - 0x50];
 		break;
 	case 0x61:
-		port_253b_dat = BIT(m_regs.nr_copper_addr, 0, 8);
+		port_253b_dat = BIT(m_nr_copper_addr, 0, 8);
 		break;
 	case 0x62:
-		port_253b_dat = (m_regs.nr_62_copper_mode << 6) | (0b000 << 3) | BIT(m_regs.nr_copper_addr, 8, 3);
+		port_253b_dat = (m_nr_62_copper_mode << 6) | (0b000 << 3) | BIT(m_nr_copper_addr, 8, 3);
 		break;
 	case 0x64:
-		port_253b_dat = m_regs.nr_64_copper_offset;
+		port_253b_dat = m_nr_64_copper_offset;
 		break;
 		case 0x68:
-		port_253b_dat = ((!m_regs.nr_68_ula_en) << 7) | (m_regs.nr_68_blend_mode << 5) | (m_regs.nr_68_cancel_extended_keys << 4) | (m_regs.port_ff3b_ulap_en << 3) | (m_regs.nr_68_ula_fine_scroll_x << 2) | (0 << 1) | m_regs.nr_68_ula_stencil_mode;
+		port_253b_dat = ((!m_nr_68_ula_en) << 7) | (m_nr_68_blend_mode << 5) | (m_nr_68_cancel_extended_keys << 4) | (m_port_ff3b_ulap_en << 3) | (m_nr_68_ula_fine_scroll_x << 2) | (0 << 1) | m_nr_68_ula_stencil_mode;
 		break;
 	case 0x69:
-		port_253b_dat = (m_regs.port_123b_layer2_en << 7) | (port_7ffd_shadow() << 6) | BIT(m_port_ff_data, 0, 6);
+		port_253b_dat = (m_port_123b_layer2_en << 7) | (port_7ffd_shadow() << 6) | BIT(m_port_ff_data, 0, 6);
 		break;
 	case 0x6a:
-		port_253b_dat = (0b00 << 6) | (m_regs.nr_6a_lores_radastan << 5) | (m_regs.nr_6a_lores_radastan_xor << 4) | m_regs.nr_6a_lores_palette_offset;
+		port_253b_dat = (0b00 << 6) | (m_nr_6a_lores_radastan << 5) | (m_nr_6a_lores_radastan_xor << 4) | m_nr_6a_lores_palette_offset;
 		break;
 	case 0x6b:
-		port_253b_dat = (m_regs.nr_6b_tm_en << 7) | m_regs.nr_6b_tm_control;
+		port_253b_dat = (m_nr_6b_tm_en << 7) | m_nr_6b_tm_control;
 		break;
 	case 0x6c:
-		port_253b_dat = m_regs.nr_6c_tm_default_attr;
+		port_253b_dat = m_nr_6c_tm_default_attr;
 		break;
 	case 0x6e:
-		port_253b_dat = (m_regs.nr_6e_tilemap_base_7 << 7) | (0 << 6) | m_regs.nr_6e_tilemap_base;
+		port_253b_dat = (m_nr_6e_tilemap_base_7 << 7) | (0 << 6) | m_nr_6e_tilemap_base;
 		break;
 	case 0x6f:
-		port_253b_dat = (m_regs.nr_6f_tilemap_tiles_7 << 7) | (0 << 6) | m_regs.nr_6f_tilemap_tiles;
+		port_253b_dat = (m_nr_6f_tilemap_tiles_7 << 7) | (0 << 6) | m_nr_6f_tilemap_tiles;
 		break;
 	case 0x70:
-		port_253b_dat = (0b00 << 6) | (m_regs.nr_70_layer2_resolution << 4) | m_regs.nr_70_layer2_palette_offset;
+		port_253b_dat = (0b00 << 6) | (m_nr_70_layer2_resolution << 4) | m_nr_70_layer2_palette_offset;
 		break;
 	case 0x71:
-		port_253b_dat = (0b0000000 << 1) | m_regs.nr_71_layer2_scrollx_msb;
+		port_253b_dat = (0b0000000 << 1) | m_nr_71_layer2_scrollx_msb;
 		break;
 	case 0x7f:
-		port_253b_dat = m_regs.nr_7f_user_register_0;
+		port_253b_dat = m_nr_7f_user_register_0;
 		break;
 	case 0x80:
-		port_253b_dat = m_regs.nr_80_expbus;
+		port_253b_dat = m_nr_80_expbus;
 		break;
 	case 0x81:
-		port_253b_dat = /*(i_BUS_ROMCS_n <<) |*/ (m_regs.nr_81_expbus_ula_override << 6) | (m_regs.nr_81_expbus_nmi_debounce_disable << 5) | (m_regs.nr_81_expbus_clken << 4) | (0b00 << 2) | m_regs.nr_81_expbus_speed;
+		port_253b_dat = /*(i_BUS_ROMCS_n <<) |*/ (m_nr_81_expbus_ula_override << 6) | (m_nr_81_expbus_nmi_debounce_disable << 5) | (m_nr_81_expbus_clken << 4) | (0b00 << 2) | m_nr_81_expbus_speed;
 		break;
 	case 0x82:
-		port_253b_dat = m_regs.nr_82_internal_port_enable;
+		port_253b_dat = m_nr_82_internal_port_enable;
 		break;
 	case 0x83:
-		port_253b_dat = m_regs.nr_83_internal_port_enable;
+		port_253b_dat = m_nr_83_internal_port_enable;
 		break;
 	case 0x84:
-		port_253b_dat = m_regs.nr_84_internal_port_enable;
+		port_253b_dat = m_nr_84_internal_port_enable;
 		break;
 	case 0x85:
-		port_253b_dat = (m_regs.nr_85_internal_port_reset_type << 7) | (0b000 << 4) | m_regs.nr_85_internal_port_enable;
+		port_253b_dat = (m_nr_85_internal_port_reset_type << 7) | (0b000 << 4) | m_nr_85_internal_port_enable;
 		break;
 	case 0x86:
-		port_253b_dat = m_regs.nr_86_bus_port_enable;
+		port_253b_dat = m_nr_86_bus_port_enable;
 		break;
 	case 0x87:
-		port_253b_dat = m_regs.nr_87_bus_port_enable;
+		port_253b_dat = m_nr_87_bus_port_enable;
 		break;
 	case 0x88:
-		port_253b_dat = m_regs.nr_88_bus_port_enable;
+		port_253b_dat = m_nr_88_bus_port_enable;
 		break;
 	case 0x89:
-		port_253b_dat = (m_regs.nr_89_bus_port_reset_type << 7) | (0b000 << 4) | m_regs.nr_89_bus_port_enable;
+		port_253b_dat = (m_nr_89_bus_port_reset_type << 7) | (0b000 << 4) | m_nr_89_bus_port_enable;
 		break;
 	case 0x8a:
-		port_253b_dat = (0b00 << 6) | m_regs.nr_8a_bus_port_propagate;
+		port_253b_dat = (0b00 << 6) | m_nr_8a_bus_port_propagate;
 		break;
 	case 0x8c:
-		port_253b_dat = m_regs.nr_8c_altrom;
+		port_253b_dat = m_nr_8c_altrom;
 		break;
 	case 0x8e:
 		port_253b_dat = (BIT(m_port_dffd_data, 0) << 7) | (BIT(m_port_7ffd_data, 0, 3) << 4) | (1 << 3) | (BIT(m_port_1ffd_data, 0) << 2)
 			| (BIT(m_port_1ffd_data, 2) << 1) | ((BIT(m_port_7ffd_data, 4) && !BIT(m_port_1ffd_data, 0)) || (BIT(m_port_1ffd_data, 1) && BIT(m_port_1ffd_data, 0)));;
 		break;
 	case 0x8f:
-		port_253b_dat = (0b000000 << 2) | m_regs.nr_8f_mapping_mode;
+		port_253b_dat = (0b000000 << 2) | m_nr_8f_mapping_mode;
 		break;
 	case 0x90:
-		port_253b_dat = m_regs.nr_90_pi_gpio_o_en;
+		port_253b_dat = m_nr_90_pi_gpio_o_en;
 		break;
 	case 0x91:
-		port_253b_dat = m_regs.nr_91_pi_gpio_o_en;
+		port_253b_dat = m_nr_91_pi_gpio_o_en;
 		break;
 	case 0x92:
-		port_253b_dat = m_regs.nr_92_pi_gpio_o_en;
+		port_253b_dat = m_nr_92_pi_gpio_o_en;
 		break;
 	case 0x93:
-		port_253b_dat = (0b0000 << 4) | m_regs.nr_93_pi_gpio_o_en;
+		port_253b_dat = (0b0000 << 4) | m_nr_93_pi_gpio_o_en;
 		break;
 	case 0x98:
 		port_253b_dat = 0;//i_GPIO(7 downto 0);
@@ -1261,13 +1253,13 @@ u8 specnext_state::reg_r(offs_t nr_register)
 		port_253b_dat = (0b0000 << 4);// | i_GPIO(27 downto 24);
 		break;
 	case 0xa0:
-		port_253b_dat = (0b00 << 6) | (BIT(m_regs.nr_a0_pi_peripheral_en, 3, 3) << 2) | (0b00 << 1) | BIT(m_regs.nr_a0_pi_peripheral_en, 0);
+		port_253b_dat = (0b00 << 6) | (BIT(m_nr_a0_pi_peripheral_en, 3, 3) << 2) | (0b00 << 1) | BIT(m_nr_a0_pi_peripheral_en, 0);
 		break;
 	case 0xa2:
-		port_253b_dat = (BIT(m_regs.nr_a2_pi_i2s_ctl, 6, 2) << 6) | (0 << 5) | (BIT(m_regs.nr_a2_pi_i2s_ctl, 2, 3) << 2) | (1 << 1) | BIT(m_regs.nr_a2_pi_i2s_ctl, 0);
+		port_253b_dat = (BIT(m_nr_a2_pi_i2s_ctl, 6, 2) << 6) | (0 << 5) | (BIT(m_nr_a2_pi_i2s_ctl, 2, 3) << 2) | (1 << 1) | BIT(m_nr_a2_pi_i2s_ctl, 0);
 		break;
 	case 0xa8:
-		port_253b_dat = (0b0000000 << 7) | m_regs.nr_a8_esp_gpio0_en;
+		port_253b_dat = (0b0000000 << 7) | m_nr_a8_esp_gpio0_en;
 		break;
 	case 0xa9:
 		port_253b_dat = (0b00000 << 3);// | (i_ESP_GPIO_20(2) <<) | (0 << 1) | i_ESP_GPIO_20(0);
@@ -1282,34 +1274,34 @@ u8 specnext_state::reg_r(offs_t nr_register)
 		port_253b_dat = 0;//(i_JOY_RIGHT(10 downto 8) <<) | (i_JOY_RIGHT(11) <<) | (i_JOY_LEFT(10 downto 8) <<) | i_JOY_LEFT(11);
 		break;
 	case 0xb8:
-		port_253b_dat = m_regs.nr_b8_divmmc_ep_0;
+		port_253b_dat = m_nr_b8_divmmc_ep_0;
 		break;
 	case 0xb9:
-		port_253b_dat = m_regs.nr_b9_divmmc_ep_valid_0;
+		port_253b_dat = m_nr_b9_divmmc_ep_valid_0;
 		break;
 	case 0xba:
-		port_253b_dat = m_regs.nr_ba_divmmc_ep_timing_0;
+		port_253b_dat = m_nr_ba_divmmc_ep_timing_0;
 		break;
 	case 0xbb:
-		port_253b_dat = m_regs.nr_bb_divmmc_ep_1;
+		port_253b_dat = m_nr_bb_divmmc_ep_1;
 		break;
 	case 0xc0:
-		port_253b_dat = (m_regs.nr_c0_im2_vector << 5) | (0 << 4) | (m_regs.nr_c0_stackless_nmi << 3) | /*(z80_im_mode << 1) |*/ m_regs.nr_c0_int_mode_pulse_0_im2_1;
+		port_253b_dat = (m_nr_c0_im2_vector << 5) | (0 << 4) | (m_nr_c0_stackless_nmi << 3) | /*(z80_im_mode << 1) |*/ m_nr_c0_int_mode_pulse_0_im2_1;
 		break;
 	case 0xc2:
-		port_253b_dat = m_regs.nr_c2_retn_address_lsb;
+		port_253b_dat = m_nr_c2_retn_address_lsb;
 		break;
 	case 0xc3:
-		port_253b_dat = m_regs.nr_c3_retn_address_msb;
+		port_253b_dat = m_nr_c3_retn_address_msb;
 		break;
 	case 0xc4:
-		port_253b_dat = (m_regs.nr_c4_int_en_0_expbus << 7) | (0b00000 << 2);// | ula_int_en;
+		port_253b_dat = (m_nr_c4_int_en_0_expbus << 7) | (0b00000 << 2);// | ula_int_en;
 		break;
 	case 0xc5:
 		port_253b_dat = 0;//ctc_int_en;
 		break;
 	case 0xc6:
-		port_253b_dat = (0 << 7) | (m_regs.nr_c6_int_en_2_654 << 4) | (0 << 3) | m_regs.nr_c6_int_en_2_210;
+		port_253b_dat = (0 << 7) | (m_nr_c6_int_en_2_654 << 4) | (0 << 3) | m_nr_c6_int_en_2_210;
 		break;
 	case 0xc8:
 		port_253b_dat = (0b000000 << 2);// | (im2_int_status(0) << 1) | im2_int_status(11);
@@ -1321,34 +1313,34 @@ u8 specnext_state::reg_r(offs_t nr_register)
 		port_253b_dat = (0 << 7);// | (im2_int_status(13) <<  6) | (im2_int_status(2) << 5) | (im2_int_status(2) << 4) | (0 << 3) | (im2_int_status(12) << 2) | (im2_int_status(1) << 1) | im2_int_status(1);
 		break;
 	case 0xcc:
-		port_253b_dat = (m_regs.nr_cc_dma_int_en_0_7 << 7) | (0b00000 << 2) | m_regs.nr_cc_dma_int_en_0_10;
+		port_253b_dat = (m_nr_cc_dma_int_en_0_7 << 7) | (0b00000 << 2) | m_nr_cc_dma_int_en_0_10;
 		break;
 	case 0xcd:
-		port_253b_dat = m_regs.nr_cd_dma_int_en_1;
+		port_253b_dat = m_nr_cd_dma_int_en_1;
 		break;
 	case 0xce:
-		port_253b_dat = (0 << 7) | (m_regs.nr_ce_dma_int_en_2_654 << 4) | (0 << 3) | m_regs.nr_ce_dma_int_en_2_210;
+		port_253b_dat = (0 << 7) | (m_nr_ce_dma_int_en_2_654 << 4) | (0 << 3) | m_nr_ce_dma_int_en_2_210;
 		break;
 	case 0xd8:
-		port_253b_dat = (0b0000000 << 1) | m_regs.nr_d8_io_trap_fdc_en;
+		port_253b_dat = (0b0000000 << 1) | m_nr_d8_io_trap_fdc_en;
 		break;
 	case 0xd9:
-		port_253b_dat = m_regs.nr_d9_iotrap_write;
+		port_253b_dat = m_nr_d9_iotrap_write;
 		break;
 	case 0xda:
-		port_253b_dat = (0b000000 << 2) | m_regs.nr_da_iotrap_cause;
+		port_253b_dat = (0b000000 << 2) | m_nr_da_iotrap_cause;
 		break;
 	case 0xf0:
-		port_253b_dat = m_regs.nr_f0_xdev_cmd;
+		port_253b_dat = m_nr_f0_xdev_cmd;
 		break;
 	case 0xf8:
-		port_253b_dat = (0 << 7) | m_regs.nr_f8_xadc_daddr;
+		port_253b_dat = (0 << 7) | m_nr_f8_xadc_daddr;
 		break;
 	case 0xf9:
-		port_253b_dat = m_regs.nr_f9_xadc_d0;
+		port_253b_dat = m_nr_f9_xadc_d0;
 		break;
 	case 0xfa:
-		port_253b_dat = m_regs.nr_fa_xadc_d1;
+		port_253b_dat = m_nr_fa_xadc_d1;
 		break;
 	default:
 		port_253b_dat = 0x00;
@@ -1369,89 +1361,89 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 	case 0x03:
 		m_bootrom_en = 0;
 
-		if (BIT(nr_wr_dat, 7) == 1 && m_regs.nr_03_user_dt_lock == 0 && BIT(nr_wr_dat, 3) == 0)
+		if (BIT(nr_wr_dat, 7) == 1 && m_nr_03_user_dt_lock == 0 && BIT(nr_wr_dat, 3) == 0)
 		{
 			switch (BIT(nr_wr_dat, 4, 3))
 			{
 			case 0b000:
-				m_regs.nr_03_machine_timing = 0b001;
+				m_nr_03_machine_timing = 0b001;
 				break;
 			case 0b001:
-				m_regs.nr_03_machine_timing = 0b001;
+				m_nr_03_machine_timing = 0b001;
 				break;
 			case 0b010:
-				m_regs.nr_03_machine_timing = 0b010;
+				m_nr_03_machine_timing = 0b010;
 				break;
 			case 0b011:
-				m_regs.nr_03_machine_timing = 0b011;
+				m_nr_03_machine_timing = 0b011;
 				break;
 			case 0b100:
-				m_regs.nr_03_machine_timing = 0b100;
+				m_nr_03_machine_timing = 0b100;
 				break;
 			default:
-				m_regs.nr_03_machine_timing = 0b011;
+				m_nr_03_machine_timing = 0b011;
 			}
 		}
 
-		m_regs.nr_03_user_dt_lock = m_regs.nr_03_user_dt_lock ^ BIT(nr_wr_dat, 3);
+		m_nr_03_user_dt_lock = m_nr_03_user_dt_lock ^ BIT(nr_wr_dat, 3);
 
-		if (m_regs.nr_03_config_mode == 1)
+		if (m_nr_03_config_mode == 1)
 		{
 			switch (BIT(nr_wr_dat, 0, 3))
 			{
 			case 0b001:
-				m_regs.nr_03_machine_type = 0b001;
+				m_nr_03_machine_type = 0b001;
 				break;
 			case 0b010:
-				m_regs.nr_03_machine_type = 0b010;
+				m_nr_03_machine_type = 0b010;
 				break;
 			case 0b011:
-				m_regs.nr_03_machine_type = 0b011;
+				m_nr_03_machine_type = 0b011;
 				break;
 			case 0b100:
-				m_regs.nr_03_machine_type = 0b100;
+				m_nr_03_machine_type = 0b100;
 				break;
 			}
 		}
 
 		if (BIT(nr_wr_dat, 0, 3) == 0b111)
-			m_regs.nr_03_config_mode = 1;
+			m_nr_03_config_mode = 1;
 		else if (BIT(nr_wr_dat, 0, 3) != 0b000)
-			m_regs.nr_03_config_mode = 0;
+			m_nr_03_config_mode = 0;
 
 		mem_update();
 		break;
 	case 0x04:
-		m_regs.nr_04_romram_bank = BIT(nr_wr_dat, 0, 7);
+		m_nr_04_romram_bank = BIT(nr_wr_dat, 0, 7);
 		bank_update(0);
 		bank_update(1);
 		break;
 	case 0x05:
-		m_regs.nr_05_joy0 = (BIT(nr_wr_dat, 3) << 3) | BIT(nr_wr_dat, 6, 3);
-		m_regs.nr_05_joy1 = (BIT(nr_wr_dat, 1) << 3) | BIT(nr_wr_dat, 4, 3);
+		m_nr_05_joy0 = (BIT(nr_wr_dat, 3) << 3) | BIT(nr_wr_dat, 6, 3);
+		m_nr_05_joy1 = (BIT(nr_wr_dat, 1) << 3) | BIT(nr_wr_dat, 4, 3);
 		break;
 	case 0x06:
-		m_regs.nr_06_hotkey_cpu_speed_en = BIT(nr_wr_dat, 7);
-		m_regs.nr_06_internal_speaker_beep = BIT(nr_wr_dat, 6);
-		m_regs.nr_06_hotkey_5060_en = BIT(nr_wr_dat, 5);
-		m_regs.nr_06_button_drive_nmi_en = BIT(nr_wr_dat, 4);
-		m_regs.nr_06_button_m1_nmi_en = BIT(nr_wr_dat, 3);
-		if (m_regs.nr_03_config_mode == 1)
-			m_regs.nr_06_ps2_mode = BIT(nr_wr_dat, 2);
-		m_regs.nr_06_psg_mode = BIT(nr_wr_dat, 0, 2);
+		m_nr_06_hotkey_cpu_speed_en = BIT(nr_wr_dat, 7);
+		m_nr_06_internal_speaker_beep = BIT(nr_wr_dat, 6);
+		m_nr_06_hotkey_5060_en = BIT(nr_wr_dat, 5);
+		m_nr_06_button_drive_nmi_en = BIT(nr_wr_dat, 4);
+		m_nr_06_button_m1_nmi_en = BIT(nr_wr_dat, 3);
+		if (m_nr_03_config_mode == 1)
+			m_nr_06_ps2_mode = BIT(nr_wr_dat, 2);
+		m_nr_06_psg_mode = BIT(nr_wr_dat, 0, 2);
 		break;
 	case 0x07:
 		nr_07_cpu_speed_w(BIT(nr_wr_dat, 0, 2));
 		break;
 	case 0x08:
-		m_regs.nr_08_contention_disable = BIT(nr_wr_dat, 6);
-		m_regs.eff_nr_08_contention_disable = m_regs.nr_08_contention_disable; // ...
-		m_regs.nr_08_psg_stereo_mode = BIT(nr_wr_dat, 5);
-		m_regs.nr_08_internal_speaker_en = BIT(nr_wr_dat, 4);
-		m_regs.nr_08_dac_en = BIT(nr_wr_dat, 3);
-		m_regs.nr_08_port_ff_rd_en = BIT(nr_wr_dat, 2);
-		m_regs.nr_08_psg_turbosound_en = BIT(nr_wr_dat, 1);
-		m_regs.nr_08_keyboard_issue2 = BIT(nr_wr_dat, 0);
+		m_nr_08_contention_disable = BIT(nr_wr_dat, 6);
+		m_eff_nr_08_contention_disable = m_nr_08_contention_disable;
+		m_nr_08_psg_stereo_mode = BIT(nr_wr_dat, 5);
+		m_nr_08_internal_speaker_en = BIT(nr_wr_dat, 4);
+		m_nr_08_dac_en = BIT(nr_wr_dat, 3);
+		m_nr_08_port_ff_rd_en = BIT(nr_wr_dat, 2);
+		m_nr_08_psg_turbosound_en = BIT(nr_wr_dat, 1);
+		m_nr_08_keyboard_issue2 = BIT(nr_wr_dat, 0);
 
 		if (BIT(nr_wr_dat, 7))
 		{
@@ -1460,10 +1452,10 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		}
 		break;
 	case 0x09:
-		m_regs.nr_09_psg_mono = BIT(nr_wr_dat, 5, 3);
-		m_regs.nr_09_sprite_tie = BIT(nr_wr_dat, 4);
-		m_sprites->mirror_tie_w(m_regs.nr_09_sprite_tie);
-		m_regs.nr_09_hdmi_audio_en = not BIT(nr_wr_dat, 2);
+		m_nr_09_psg_mono = BIT(nr_wr_dat, 5, 3);
+		m_nr_09_sprite_tie = BIT(nr_wr_dat, 4);
+		m_sprites->mirror_tie_w(m_nr_09_sprite_tie);
+		m_nr_09_hdmi_audio_en = not BIT(nr_wr_dat, 2);
 
 		if (BIT(nr_wr_dat, 3))
 		{
@@ -1471,43 +1463,43 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 			bank_update(0);
 			bank_update(1);
 		}
-		m_regs.nr_09_scanlines = BIT(nr_wr_dat, 0, 2);
+		m_nr_09_scanlines = BIT(nr_wr_dat, 0, 2);
 		break;
 	case 0x0a:
-		if (m_regs.nr_03_config_mode == 1)
-			m_regs.nr_0a_mf_type = BIT(nr_wr_dat, 6, 2);
-		m_regs.nr_0a_divmmc_automap_en = BIT(nr_wr_dat, 4);
-		m_regs.nr_0a_mouse_button_reverse = BIT(nr_wr_dat, 3);
-		m_regs.nr_0a_mouse_dpi = BIT(nr_wr_dat, 0, 2);
+		if (m_nr_03_config_mode == 1)
+			m_nr_0a_mf_type = BIT(nr_wr_dat, 6, 2);
+		m_nr_0a_divmmc_automap_en = BIT(nr_wr_dat, 4);
+		m_nr_0a_mouse_button_reverse = BIT(nr_wr_dat, 3);
+		m_nr_0a_mouse_dpi = BIT(nr_wr_dat, 0, 2);
 		mem_update();
 		break;
 	case 0x0b:
-		m_regs.nr_0b_joy_iomode_en = BIT(nr_wr_dat, 7);
-		m_regs.nr_0b_joy_iomode = BIT(nr_wr_dat, 4, 2);
-		m_regs.nr_0b_joy_iomode_0 = BIT(nr_wr_dat, 0);
+		m_nr_0b_joy_iomode_en = BIT(nr_wr_dat, 7);
+		m_nr_0b_joy_iomode = BIT(nr_wr_dat, 4, 2);
+		m_nr_0b_joy_iomode_0 = BIT(nr_wr_dat, 0);
 		break;
 	case 0x10:
-		m_regs.nr_10_flashboot = BIT(nr_wr_dat, 7);
+		m_nr_10_flashboot = BIT(nr_wr_dat, 7);
 		if (g_board_issue() != 2)
 		{
-			if (m_regs.nr_03_config_mode)
-				m_regs.nr_10_coreid = BIT(nr_wr_dat, 0, 5);
+			if (m_nr_03_config_mode)
+				m_nr_10_coreid = BIT(nr_wr_dat, 0, 5);
 		}
 		else if (g_board_issue() == 2)
 		{
-			if (m_regs.nr_03_config_mode && BIT(~nr_wr_dat, 4) && BIT(nr_wr_dat, 0, 4) != 0b1111)
-				m_regs.nr_10_coreid = BIT(nr_wr_dat, 0, 4);
+			if (m_nr_03_config_mode && BIT(~nr_wr_dat, 4) && BIT(nr_wr_dat, 0, 4) != 0b1111)
+				m_nr_10_coreid = BIT(nr_wr_dat, 0, 4);
 		}
 		break;
 	case 0x11:
-		if (m_regs.nr_03_config_mode == 1)
+		if (m_nr_03_config_mode == 1)
 		{
 			if (BIT(nr_wr_dat, 0, 3) == 0b111)
-				m_regs.nr_11_video_timing = 0b000;
+				m_nr_11_video_timing = 0b000;
 			else if (G_VIDEO_INC == 0b10)
-				m_regs.nr_11_video_timing = (0b00 << 1) | BIT(nr_wr_dat, 0);
+				m_nr_11_video_timing = (0b00 << 1) | BIT(nr_wr_dat, 0);
 			else
-				m_regs.nr_11_video_timing = BIT(nr_wr_dat, 0, 3);
+				m_nr_11_video_timing = BIT(nr_wr_dat, 0, 3);
 		}
 		break;
 	case 0x12:
@@ -1521,12 +1513,12 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		break;
 	case 0x15:
 		m_screen->update_now();
-		m_regs.nr_15_lores_en = BIT(nr_wr_dat, 7);
+		m_nr_15_lores_en = BIT(nr_wr_dat, 7);
 		nr_15_sprite_priority_w(BIT(nr_wr_dat, 6));
 		nr_15_sprite_border_clip_en_w(BIT(nr_wr_dat, 5));
-		m_regs.nr_15_layer_priority = BIT(nr_wr_dat, 2, 3);
+		m_nr_15_layer_priority = BIT(nr_wr_dat, 2, 3);
 		nr_15_sprite_over_border_en_w(BIT(nr_wr_dat, 1));
-		m_regs.nr_15_sprite_en = BIT(nr_wr_dat, 0);
+		m_nr_15_sprite_en = BIT(nr_wr_dat, 0);
 		break;
 	case 0x16:
 		nr_16_layer2_scrollx_w(nr_wr_dat);
@@ -1535,7 +1527,7 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		nr_17_layer2_scrolly_w(nr_wr_dat);
 		break;
 	case 0x18:
-		switch (m_regs.nr_18_layer2_clip_idx)
+		switch (m_nr_18_layer2_clip_idx)
 		{
 		case 0b00:
 			nr_18_layer2_clip_x1_w(nr_wr_dat);
@@ -1549,10 +1541,10 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		default:
 			nr_18_layer2_clip_y2_w(nr_wr_dat);
 		}
-		m_regs.nr_18_layer2_clip_idx = m_regs.nr_18_layer2_clip_idx + 1;
+		m_nr_18_layer2_clip_idx = m_nr_18_layer2_clip_idx + 1;
 		break;
 	case 0x19:
-		switch (m_regs.nr_19_sprite_clip_idx)
+		switch (m_nr_19_sprite_clip_idx)
 		{
 		case 0b00:
 			nr_19_sprite_clip_x1_w(nr_wr_dat);
@@ -1566,10 +1558,10 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		default:
 			nr_19_sprite_clip_y2_w(nr_wr_dat);
 		}
-		m_regs.nr_19_sprite_clip_idx = m_regs.nr_19_sprite_clip_idx + 1;
+		m_nr_19_sprite_clip_idx = m_nr_19_sprite_clip_idx + 1;
 		break;
 	case 0x1a:
-		switch (m_regs.nr_1a_ula_clip_idx)
+		switch (m_nr_1a_ula_clip_idx)
 		{
 		case 0b00:
 			nr_1a_ula_clip_x1_w(nr_wr_dat);
@@ -1583,10 +1575,10 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		default:
 			nr_1a_ula_clip_y2_w(nr_wr_dat);
 		}
-		m_regs.nr_1a_ula_clip_idx = m_regs.nr_1a_ula_clip_idx + 1;
+		m_nr_1a_ula_clip_idx = m_nr_1a_ula_clip_idx + 1;
 		break;
 	case 0x1b:
-		switch (m_regs.nr_1b_tm_clip_idx)
+		switch (m_nr_1b_tm_clip_idx)
 		{
 		case 0b00:
 			nr_1b_tm_clip_x1_w(nr_wr_dat);
@@ -1600,24 +1592,24 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		default:
 			nr_1b_tm_clip_y2_w(nr_wr_dat);
 		}
-		m_regs.nr_1b_tm_clip_idx = m_regs.nr_1b_tm_clip_idx + 1;
+		m_nr_1b_tm_clip_idx = m_nr_1b_tm_clip_idx + 1;
 		break;
 	case 0x1c:
 		if (BIT(nr_wr_dat, 0) == 1)
-			m_regs.nr_18_layer2_clip_idx = 0b00;
+			m_nr_18_layer2_clip_idx = 0b00;
 		if (BIT(nr_wr_dat, 1) == 1)
-			m_regs.nr_19_sprite_clip_idx = 0b00;
+			m_nr_19_sprite_clip_idx = 0b00;
 		if (BIT(nr_wr_dat, 2) == 1)
-			m_regs.nr_1a_ula_clip_idx = 0b00;
+			m_nr_1a_ula_clip_idx = 0b00;
 		if (BIT(nr_wr_dat, 3) == 1)
-			m_regs.nr_1b_tm_clip_idx = 0b00;
+			m_nr_1b_tm_clip_idx = 0b00;
 		break;
 	case 0x22:
-		m_regs.nr_22_line_interrupt_en = BIT(nr_wr_dat, 1);
-		m_regs.nr_23_line_interrupt = (m_regs.nr_23_line_interrupt & ~0x0100) | (BIT(nr_wr_dat, 0) << 8);
+		m_nr_22_line_interrupt_en = BIT(nr_wr_dat, 1);
+		m_nr_23_line_interrupt = (m_nr_23_line_interrupt & ~0x0100) | (BIT(nr_wr_dat, 0) << 8);
 		break;
 	case 0x23:
-		m_regs.nr_23_line_interrupt = (m_regs.nr_23_line_interrupt & ~0x00ff) | nr_wr_dat;
+		m_nr_23_line_interrupt = (m_nr_23_line_interrupt & ~0x00ff) | nr_wr_dat;
 		break;
 	case 0x26:
 		nr_26_ula_scrollx_w(nr_wr_dat);
@@ -1647,10 +1639,10 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		// nr_right_we_i  => nr_2e_we
 		break;
 	case 0x2f:
-		nr_30_tm_scrollx_w((m_regs.nr_30_tm_scrollx & ~0x0300) | (BIT(nr_wr_dat, 0, 2) << 8));
+		nr_30_tm_scrollx_w((m_nr_30_tm_scrollx & ~0x0300) | (BIT(nr_wr_dat, 0, 2) << 8));
 		break;
 	case 0x30:
-		nr_30_tm_scrollx_w((m_regs.nr_30_tm_scrollx & ~0x00ff) | nr_wr_dat);
+		nr_30_tm_scrollx_w((m_nr_30_tm_scrollx & ~0x00ff) | nr_wr_dat);
 		break;
 	case 0x31:
 		nr_31_tm_scrolly_w(nr_wr_dat);
@@ -1671,44 +1663,44 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		m_sprites->mirror_data_w(nr_wr_dat);
 		break;
 	case 0x40:
-		m_regs.nr_palette_idx = nr_wr_dat;
-		m_regs.nr_palette_sub_idx = 0;
+		m_nr_palette_idx = nr_wr_dat;
+		m_nr_palette_sub_idx = 0;
 		break;
 	case 0x41:
 		palette_val_w((nr_wr_dat << 1) | BIT(nr_wr_dat, 1) | BIT(nr_wr_dat, 0));
-		if (m_regs.nr_43_palette_autoinc_disable == 0)
-			m_regs.nr_palette_idx = m_regs.nr_palette_idx + 1;
-		m_regs.nr_palette_sub_idx = 0;
+		if (m_nr_43_palette_autoinc_disable == 0)
+			m_nr_palette_idx = m_nr_palette_idx + 1;
+		m_nr_palette_sub_idx = 0;
 		break;
 	case 0x42:
 		nr_42_ulanext_format_w(nr_wr_dat);
 		break;
 	case 0x43:
-		m_regs.nr_43_palette_autoinc_disable = BIT(nr_wr_dat, 7);
-		m_regs.nr_43_palette_write_select = BIT(nr_wr_dat, 4, 3);
-		m_regs.nr_43_active_sprite_palette = BIT(nr_wr_dat, 3);
-		m_regs.nr_43_active_layer2_palette = BIT(nr_wr_dat, 2);
-		m_regs.nr_43_active_ula_palette = BIT(nr_wr_dat, 1);
+		m_nr_43_palette_autoinc_disable = BIT(nr_wr_dat, 7);
+		m_nr_43_palette_write_select = BIT(nr_wr_dat, 4, 3);
+		m_nr_43_active_sprite_palette = BIT(nr_wr_dat, 3);
+		m_nr_43_active_layer2_palette = BIT(nr_wr_dat, 2);
+		m_nr_43_active_ula_palette = BIT(nr_wr_dat, 1);
 		nr_43_ulanext_en_w(BIT(nr_wr_dat, 0));
-		m_regs.nr_palette_sub_idx = 0;
+		m_nr_palette_sub_idx = 0;
 		break;
 	case 0x44:
-		if (m_regs.nr_palette_sub_idx == 0)
-			m_regs.nr_stored_palette_value = nr_wr_dat;
+		if (m_nr_palette_sub_idx == 0)
+			m_nr_stored_palette_value = nr_wr_dat;
 		else
 		{
-			m_regs.nr_palette_priority = BIT(nr_wr_dat, 6, 2);
-			palette_val_w((m_regs.nr_stored_palette_value << 1) | BIT(nr_wr_dat, 0));
-			m_regs.nr_palette_priority = 0b00;
-			if (m_regs.nr_43_palette_autoinc_disable == 0)
-				m_regs.nr_palette_idx = m_regs.nr_palette_idx + 1;
+			m_nr_palette_priority = BIT(nr_wr_dat, 6, 2);
+			palette_val_w((m_nr_stored_palette_value << 1) | BIT(nr_wr_dat, 0));
+			m_nr_palette_priority = 0b00;
+			if (m_nr_43_palette_autoinc_disable == 0)
+				m_nr_palette_idx = m_nr_palette_idx + 1;
 		}
-		m_regs.nr_palette_sub_idx = !m_regs.nr_palette_sub_idx;
+		m_nr_palette_sub_idx = !m_nr_palette_sub_idx;
 		break;
 	case 0x4a:
 		{
-			m_regs.nr_4a_fallback_rgb = nr_wr_dat;
-			rgb_t fb = rgbexpand<3,3,3>((m_regs.nr_4a_fallback_rgb << 1) | BIT(m_regs.nr_4a_fallback_rgb, 1) | BIT(m_regs.nr_4a_fallback_rgb, 0), 6, 3, 0);
+			m_nr_4a_fallback_rgb = nr_wr_dat;
+			rgb_t fb = rgbexpand<3,3,3>((m_nr_4a_fallback_rgb << 1) | BIT(m_nr_4a_fallback_rgb, 1) | BIT(m_nr_4a_fallback_rgb, 0), 6, 3, 0);
 			m_palette->set_pen_color(UTM_FALLBACK_PEN, rgbexpand<3,3,3>(fb, 6, 3, 0));
 		}
 		break;
@@ -1725,33 +1717,33 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 	case 0x60:
 		//nr_copper_we <= '1';
 		//nr_copper_write_8 <= '1';
-		if (BIT(m_regs.nr_copper_addr, 0) == 0)
-			m_regs.nr_copper_data_stored = nr_wr_dat;
-		m_regs.nr_copper_addr = m_regs.nr_copper_addr + 1;
+		if (BIT(m_nr_copper_addr, 0) == 0)
+			m_nr_copper_data_stored = nr_wr_dat;
+		m_nr_copper_addr = m_nr_copper_addr + 1;
 		break;
 	case 0x61:
-		m_regs.nr_copper_addr = (m_regs.nr_copper_addr & ~0x00ff) | nr_wr_dat;
+		m_nr_copper_addr = (m_nr_copper_addr & ~0x00ff) | nr_wr_dat;
 		break;
 	case 0x62:
-		m_regs.nr_62_copper_mode = BIT(nr_wr_dat, 6, 3);
-		m_regs.nr_copper_addr = (m_regs.nr_copper_addr & ~0x0700) | (BIT(nr_wr_dat, 0, 3) << 8);
+		m_nr_62_copper_mode = BIT(nr_wr_dat, 6, 3);
+		m_nr_copper_addr = (m_nr_copper_addr & ~0x0700) | (BIT(nr_wr_dat, 0, 3) << 8);
 		break;
 	case 0x63:
 		//nr_copper_we <= '1';
-		if (BIT(m_regs.nr_copper_addr, 0) == 0)
-			m_regs.nr_copper_data_stored = nr_wr_dat;
-		m_regs.nr_copper_addr = m_regs.nr_copper_addr + 1;
+		if (BIT(m_nr_copper_addr, 0) == 0)
+			m_nr_copper_data_stored = nr_wr_dat;
+		m_nr_copper_addr = m_nr_copper_addr + 1;
 		break;
 	case 0x64:
-		m_regs.nr_64_copper_offset = nr_wr_dat;
+		m_nr_64_copper_offset = nr_wr_dat;
 		break;
 	case 0x68:
-		m_regs.nr_68_ula_en = not BIT(nr_wr_dat, 7);
-		m_regs.nr_68_blend_mode = BIT(nr_wr_dat, 5, 2);
-		m_regs.nr_68_cancel_extended_keys = BIT(nr_wr_dat, 4);
+		m_nr_68_ula_en = not BIT(nr_wr_dat, 7);
+		m_nr_68_blend_mode = BIT(nr_wr_dat, 5, 2);
+		m_nr_68_cancel_extended_keys = BIT(nr_wr_dat, 4);
 		port_ff3b_ulap_en_w(BIT(nr_wr_dat, 3));
 		nr_68_ula_fine_scroll_x_w(BIT(nr_wr_dat, 2));
-		m_regs.nr_68_ula_stencil_mode = BIT(nr_wr_dat, 0);
+		m_nr_68_ula_stencil_mode = BIT(nr_wr_dat, 0);
 		break;
 	case 0x69:
 		m_port_ff_data = (m_port_ff_data & 0xc0) | (nr_wr_dat & 0x3f);
@@ -1760,12 +1752,12 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		memory_change(0x69, nr_wr_dat);
 		break;
 	case 0x6a:
-		m_regs.nr_6a_lores_radastan = BIT(nr_wr_dat, 5);
-		m_regs.nr_6a_lores_radastan_xor = BIT(nr_wr_dat, 4);
-		m_regs.nr_6a_lores_palette_offset = BIT(nr_wr_dat, 0, 4);
+		m_nr_6a_lores_radastan = BIT(nr_wr_dat, 5);
+		m_nr_6a_lores_radastan_xor = BIT(nr_wr_dat, 4);
+		m_nr_6a_lores_palette_offset = BIT(nr_wr_dat, 0, 4);
 		break;
 	case 0x6b:
-		m_regs.nr_6b_tm_en = BIT(nr_wr_dat, 7);
+		m_nr_6b_tm_en = BIT(nr_wr_dat, 7);
 		nr_6b_tm_control_w(BIT(nr_wr_dat, 0, 7));
 		break;
 	case 0x6c:
@@ -1779,61 +1771,61 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		break;
 	case 0x70:
 		nr_70_layer2_resolution_w(BIT(nr_wr_dat, 4, 2));
-		if (m_regs.nr_70_layer2_resolution != 0b00)
-			LOGWARN("Unimplemented resolution %x\n", u8(m_regs.nr_70_layer2_resolution));
+		if (m_nr_70_layer2_resolution != 0b00)
+			LOGWARN("Unimplemented resolution %x\n", u8(m_nr_70_layer2_resolution));
 		nr_70_layer2_palette_offset_w(BIT(nr_wr_dat, 0, 4));
 		break;
 	case 0x71:
-		m_regs.nr_71_layer2_scrollx_msb = BIT(nr_wr_dat, 0);
+		m_nr_71_layer2_scrollx_msb = BIT(nr_wr_dat, 0);
 		break;
 	case 0x7f:
-		m_regs.nr_7f_user_register_0 = nr_wr_dat;
+		m_nr_7f_user_register_0 = nr_wr_dat;
 		break;
 	case 0x80:
-		m_regs.nr_80_expbus = nr_wr_dat;
+		m_nr_80_expbus = nr_wr_dat;
 		break;
 	case 0x81:
-		m_regs.nr_81_expbus_ula_override = BIT(nr_wr_dat, 6);
-		m_regs.nr_81_expbus_nmi_debounce_disable = BIT(nr_wr_dat, 5);
-		m_regs.nr_81_expbus_clken = BIT(nr_wr_dat, 4);
-		m_regs.nr_81_expbus_speed = 0b00;
+		m_nr_81_expbus_ula_override = BIT(nr_wr_dat, 6);
+		m_nr_81_expbus_nmi_debounce_disable = BIT(nr_wr_dat, 5);
+		m_nr_81_expbus_clken = BIT(nr_wr_dat, 4);
+		m_nr_81_expbus_speed = 0b00;
 		break;
 	case 0x82:
-		m_regs.nr_82_internal_port_enable = nr_wr_dat;
+		m_nr_82_internal_port_enable = nr_wr_dat;
 		break;
 	case 0x83:
-		m_regs.nr_83_internal_port_enable = nr_wr_dat;
+		m_nr_83_internal_port_enable = nr_wr_dat;
 		mem_update();
 		break;
 	case 0x84:
-		m_regs.nr_84_internal_port_enable = nr_wr_dat;
+		m_nr_84_internal_port_enable = nr_wr_dat;
 		break;
 	case 0x85:
-		m_regs.nr_85_internal_port_enable = BIT(nr_wr_dat, 0, 4);
-		m_regs.nr_85_internal_port_reset_type = BIT(nr_wr_dat, 7);
+		m_nr_85_internal_port_enable = BIT(nr_wr_dat, 0, 4);
+		m_nr_85_internal_port_reset_type = BIT(nr_wr_dat, 7);
 		break;
 	case 0x86:
-		m_regs.nr_86_bus_port_enable = nr_wr_dat;
+		m_nr_86_bus_port_enable = nr_wr_dat;
 		break;
 	case 0x87:
-		m_regs.nr_87_bus_port_enable = nr_wr_dat;
+		m_nr_87_bus_port_enable = nr_wr_dat;
 		break;
 	case 0x88:
-		m_regs.nr_88_bus_port_enable = nr_wr_dat;
+		m_nr_88_bus_port_enable = nr_wr_dat;
 		break;
 	case 0x89:
-		m_regs.nr_89_bus_port_enable = BIT(nr_wr_dat, 0, 4);
-		m_regs.nr_89_bus_port_reset_type = BIT(nr_wr_dat, 7);
+		m_nr_89_bus_port_enable = BIT(nr_wr_dat, 0, 4);
+		m_nr_89_bus_port_reset_type = BIT(nr_wr_dat, 7);
 		break;
 	case 0x8a:
-		m_regs.nr_8a_bus_port_propagate = BIT(nr_wr_dat, 0, 6);
+		m_nr_8a_bus_port_propagate = BIT(nr_wr_dat, 0, 6);
 		break;
 	case 0x8c:
-		m_regs.nr_8c_altrom = nr_wr_dat;
+		m_nr_8c_altrom = nr_wr_dat;
 		bank_update(0);
 		bank_update(1);
 		break;
-	case 0x8e: // ....
+	case 0x8e:
 		LOGMEM("8e (%x): 1f=%x 7f=%x df=%x\n", nr_wr_dat, m_port_1ffd_data, m_port_7ffd_data, m_port_dffd_data);
 		if (BIT(nr_wr_dat, 3))
 		{
@@ -1854,84 +1846,84 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		LOGMEM("8e: 1f=%x 7f=%x df=%x\n", m_port_1ffd_data, m_port_7ffd_data, m_port_dffd_data);
 		break;
 	case 0x8f:
-		m_regs.nr_8f_mapping_mode = BIT(nr_wr_dat, 0, 2);
+		m_nr_8f_mapping_mode = BIT(nr_wr_dat, 0, 2);
 		memory_change(0x8f, nr_wr_dat);
 		break;
 	case 0x90:
-		m_regs.nr_90_pi_gpio_o_en = (BIT(nr_wr_dat, 2, 6) << 2) | 0b00;
+		m_nr_90_pi_gpio_o_en = (BIT(nr_wr_dat, 2, 6) << 2) | 0b00;
 		break;
 	case 0x91:
-		m_regs.nr_91_pi_gpio_o_en = nr_wr_dat;
+		m_nr_91_pi_gpio_o_en = nr_wr_dat;
 		break;
 	case 0x92:
-		m_regs.nr_92_pi_gpio_o_en = nr_wr_dat;
+		m_nr_92_pi_gpio_o_en = nr_wr_dat;
 		break;
 	case 0x93:
-		m_regs.nr_93_pi_gpio_o_en = BIT(nr_wr_dat, 0, 4);
+		m_nr_93_pi_gpio_o_en = BIT(nr_wr_dat, 0, 4);
 		break;
 	case 0x98:
-		m_regs.nr_98_pi_gpio_o = nr_wr_dat;
+		m_nr_98_pi_gpio_o = nr_wr_dat;
 		break;
 	case 0x99:
-		m_regs.nr_99_pi_gpio_o = nr_wr_dat;
+		m_nr_99_pi_gpio_o = nr_wr_dat;
 		break;
 	case 0x9a:
-		m_regs.nr_9a_pi_gpio_o = nr_wr_dat;
+		m_nr_9a_pi_gpio_o = nr_wr_dat;
 		break;
 	case 0x9b:
-		m_regs.nr_9b_pi_gpio_o = BIT(nr_wr_dat, 0, 4);
+		m_nr_9b_pi_gpio_o = BIT(nr_wr_dat, 0, 4);
 		break;
 	case 0xa0:
-		m_regs.nr_a0_pi_peripheral_en = nr_wr_dat;
+		m_nr_a0_pi_peripheral_en = nr_wr_dat;
 		break;
 	case 0xa2:
-		m_regs.nr_a2_pi_i2s_ctl = nr_wr_dat;
+		m_nr_a2_pi_i2s_ctl = nr_wr_dat;
 		break;
 	case 0xa8:
-		m_regs.nr_a8_esp_gpio0_en = BIT(nr_wr_dat, 0);
+		m_nr_a8_esp_gpio0_en = BIT(nr_wr_dat, 0);
 		break;
 	case 0xa9:
-		m_regs.nr_a9_esp_gpio0 = BIT(nr_wr_dat, 0);
+		m_nr_a9_esp_gpio0 = BIT(nr_wr_dat, 0);
 		break;
 	case 0xb8:
-		m_regs.nr_b8_divmmc_ep_0 = nr_wr_dat;
+		m_nr_b8_divmmc_ep_0 = nr_wr_dat;
 		break;
 	case 0xb9:
-		m_regs.nr_b9_divmmc_ep_valid_0 = nr_wr_dat;
+		m_nr_b9_divmmc_ep_valid_0 = nr_wr_dat;
 		break;
 	case 0xba:
-		m_regs.nr_ba_divmmc_ep_timing_0 = nr_wr_dat;
+		m_nr_ba_divmmc_ep_timing_0 = nr_wr_dat;
 		break;
 	case 0xbb:
-		m_regs.nr_bb_divmmc_ep_1 = nr_wr_dat;
+		m_nr_bb_divmmc_ep_1 = nr_wr_dat;
 		break;
 	case 0xc0:
-		m_regs.nr_c0_im2_vector = BIT(nr_wr_dat, 5, 3);
-		m_regs.nr_c0_stackless_nmi = BIT(nr_wr_dat, 3);
-		m_maincpu->nmi_stackless_w(m_regs.nr_c0_stackless_nmi);
-		m_regs.nr_c0_int_mode_pulse_0_im2_1 = BIT(nr_wr_dat, 0);
+		m_nr_c0_im2_vector = BIT(nr_wr_dat, 5, 3);
+		m_nr_c0_stackless_nmi = BIT(nr_wr_dat, 3);
+		m_maincpu->nmi_stackless_w(m_nr_c0_stackless_nmi);
+		m_nr_c0_int_mode_pulse_0_im2_1 = BIT(nr_wr_dat, 0);
 		break;
 	case 0xc4:
-		m_regs.nr_c4_int_en_0_expbus = BIT(nr_wr_dat, 7);
-		m_regs.nr_22_line_interrupt_en = BIT(nr_wr_dat, 1);
+		m_nr_c4_int_en_0_expbus = BIT(nr_wr_dat, 7);
+		m_nr_22_line_interrupt_en = BIT(nr_wr_dat, 1);
 		break;
 	case 0xc6:
-		m_regs.nr_c6_int_en_2_654 = (BIT(nr_wr_dat, 6) << 2) | (BIT(nr_wr_dat, 5) << 1) | BIT(nr_wr_dat, 4);
-		m_regs.nr_c6_int_en_2_210 = (BIT(nr_wr_dat, 2) << 2) | (BIT(nr_wr_dat, 1) << 1) | BIT(nr_wr_dat, 0);
+		m_nr_c6_int_en_2_654 = (BIT(nr_wr_dat, 6) << 2) | (BIT(nr_wr_dat, 5) << 1) | BIT(nr_wr_dat, 4);
+		m_nr_c6_int_en_2_210 = (BIT(nr_wr_dat, 2) << 2) | (BIT(nr_wr_dat, 1) << 1) | BIT(nr_wr_dat, 0);
 		break;
 	case 0xcc:
-		m_regs.nr_cc_dma_int_en_0_7 = BIT(nr_wr_dat, 7);
-		m_regs.nr_cc_dma_int_en_0_10 = BIT(nr_wr_dat, 0, 2);
+		m_nr_cc_dma_int_en_0_7 = BIT(nr_wr_dat, 7);
+		m_nr_cc_dma_int_en_0_10 = BIT(nr_wr_dat, 0, 2);
 		break;
 	case 0xcd:
-		m_regs.nr_cd_dma_int_en_1 = nr_wr_dat;
+		m_nr_cd_dma_int_en_1 = nr_wr_dat;
 		break;
 	case 0xce:
-		m_regs.nr_ce_dma_int_en_2_654 = BIT(nr_wr_dat, 4, 3);
-		m_regs.nr_ce_dma_int_en_2_210 = BIT(nr_wr_dat, 0, 3);
+		m_nr_ce_dma_int_en_2_654 = BIT(nr_wr_dat, 4, 3);
+		m_nr_ce_dma_int_en_2_210 = BIT(nr_wr_dat, 0, 3);
 		break;
 	case 0xd8:
-		m_regs.nr_d8_io_trap_fdc_en = BIT(nr_wr_dat, 0);
+		m_nr_d8_io_trap_fdc_en = BIT(nr_wr_dat, 0);
 		break;
 	default:
 		LOGWARN("wR: %X <- %x\n", nr_wr_reg, nr_wr_dat);
@@ -1944,26 +1936,29 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 
 void specnext_state::nr_02_w(u8 nr_wr_dat)
 {
-	m_regs.nr_02_bus_reset = BIT(nr_wr_dat, 7);
-	m_regs.nr_02_iotrap = BIT(nr_wr_dat, 4);
-	m_regs.nr_02_generate_mf_nmi = BIT(nr_wr_dat, 3);
-	if (!m_regs.nr_02_generate_mf_nmi)
+	m_nr_02_bus_reset = BIT(nr_wr_dat, 7);
+	m_nr_02_iotrap = BIT(nr_wr_dat, 4);
+	m_nr_02_generate_mf_nmi = BIT(nr_wr_dat, 3);
+	if (!m_nr_02_generate_mf_nmi)
 		;
-	m_regs.nr_02_generate_divmmc_nmi = BIT(nr_wr_dat, 2);
-	if (!m_regs.nr_02_generate_divmmc_nmi)
+	m_nr_02_generate_divmmc_nmi = BIT(nr_wr_dat, 2);
+	if (!m_nr_02_generate_divmmc_nmi)
 		;
 
-	if (BIT(nr_wr_dat, 1))
-		machine().schedule_hard_reset();
-	else if (BIT(nr_wr_dat, 0))
+
+	if (BIT(nr_wr_dat, 1)) // hard reset
 	{
-		m_regs.nr_02_reset_type = (BIT(m_regs.nr_02_reset_type, 2) << 1) | BIT(m_regs.nr_02_reset_type, 1) | BIT(m_regs.nr_02_reset_type, 0);
-		machine().schedule_soft_reset();
+		m_nr_02_hard_reset = 1;
+		reset();
+	}
+	if (BIT(nr_wr_dat, 0)) // soft reset
+	{
+		m_nr_02_reset_type = (BIT(m_nr_02_reset_type, 2) << 1) | BIT(m_nr_02_reset_type, 1) | BIT(m_nr_02_reset_type, 0);
+		reset();
 
-		// Load snapshot after reboot from bootrom
-		snapshot_image_device *snapshot = subdevice<snapshot_image_device>("snapshot");
-		snapshot->set_delay(attotime::zero);
-		snapshot->call_load();
+		//snapshot_image_device *snapshot = subdevice<snapshot_image_device>("snapshot");
+		//snapshot->set_delay(attotime::zero);
+		//snapshot->call_load();
 	}
 	else
 		LOGWARN("NMI? %x\n", nr_wr_dat);
@@ -1971,15 +1966,16 @@ void specnext_state::nr_02_w(u8 nr_wr_dat)
 
 void specnext_state::nr_07_cpu_speed_w(u8 data)
 {
-	m_regs.nr_07_cpu_speed = data;
+	m_nr_07_cpu_speed = data;
 	m_maincpu->set_clock_scale(1 << data);
 	m_z80dma->set_clock_scale(1 << data);
+	m_zxndma->set_clock_scale(1 << data);
 }
 
 void specnext_state::nr_14_global_transparent_rgb_w(u8 data)
 {
-	m_regs.nr_14_global_transparent_rgb = data;
-	m_global_transparent = (m_regs.nr_14_global_transparent_rgb << 1) | BIT(m_regs.nr_14_global_transparent_rgb, 1) | BIT(m_regs.nr_14_global_transparent_rgb, 0);
+	m_nr_14_global_transparent_rgb = data;
+	m_global_transparent = (m_nr_14_global_transparent_rgb << 1) | BIT(m_nr_14_global_transparent_rgb, 1) | BIT(m_nr_14_global_transparent_rgb, 0);
 	m_ula->set_global_transparent(m_global_transparent);
 	m_layer2->set_global_transparent(m_global_transparent);
 }
@@ -2015,9 +2011,9 @@ void specnext_state::map_fetch(address_map &map)
 		if (!machine().side_effects_disabled())
 		{
 			const u8 b = offset >> 3;
-			const bool divmmc_rst_ep = BIT(m_regs.nr_b8_divmmc_ep_0, b);
-			const bool divmmc_rst_ep_valid = BIT(m_regs.nr_b9_divmmc_ep_valid_0, b);
-			const bool divmmc_rst_ep_timing = BIT(m_regs.nr_ba_divmmc_ep_timing_0, b);
+			const bool divmmc_rst_ep = BIT(m_nr_b8_divmmc_ep_0, b);
+			const bool divmmc_rst_ep_valid = BIT(m_nr_b9_divmmc_ep_valid_0, b);
+			const bool divmmc_rst_ep_timing = BIT(m_nr_ba_divmmc_ep_timing_0, b);
 
 			m_divmmc->automap_instant_on_w(divmmc_rst_ep && divmmc_rst_ep_valid && divmmc_rst_ep_timing);
 			m_divmmc->automap_delayed_on_w(divmmc_rst_ep && divmmc_rst_ep_valid && !divmmc_rst_ep_timing);
@@ -2033,7 +2029,7 @@ void specnext_state::map_fetch(address_map &map)
 	{
 		if (!machine().side_effects_disabled())
 		{
-			m_divmmc->automap_delayed_off_w(BIT(m_regs.nr_bb_divmmc_ep_1, 6));
+			m_divmmc->automap_delayed_off_w(BIT(m_nr_bb_divmmc_ep_1, 6));
 			return on_fetch_divmmc(0x1ff8 + offset);
 		}
 		else
@@ -2043,7 +2039,7 @@ void specnext_state::map_fetch(address_map &map)
 	{
 		if (!machine().side_effects_disabled())
 		{
-			m_divmmc->automap_rom3_instant_on_w(BIT(m_regs.nr_bb_divmmc_ep_1, 7));
+			m_divmmc->automap_rom3_instant_on_w(BIT(m_nr_bb_divmmc_ep_1, 7));
 			return on_fetch_divmmc(0x3d00 + offset);
 		}
 		else
@@ -2053,7 +2049,7 @@ void specnext_state::map_fetch(address_map &map)
 	{
 		if (!machine().side_effects_disabled())
 		{
-			m_divmmc->automap_rom3_delayed_on_w(BIT(m_regs.nr_bb_divmmc_ep_1, 2));
+			m_divmmc->automap_rom3_delayed_on_w(BIT(m_nr_bb_divmmc_ep_1, 2));
 			return on_fetch_divmmc(0x04c6 + offset);
 		}
 		else
@@ -2063,7 +2059,7 @@ void specnext_state::map_fetch(address_map &map)
 	{
 		if (!machine().side_effects_disabled())
 		{
-			m_divmmc->automap_rom3_delayed_on_w(BIT(m_regs.nr_bb_divmmc_ep_1, 3));
+			m_divmmc->automap_rom3_delayed_on_w(BIT(m_nr_bb_divmmc_ep_1, 3));
 			return on_fetch_divmmc(0x0562 + offset);
 		}
 		else
@@ -2073,7 +2069,7 @@ void specnext_state::map_fetch(address_map &map)
 	{
 		if (!machine().side_effects_disabled())
 		{
-			m_divmmc->automap_rom3_delayed_on_w(BIT(m_regs.nr_bb_divmmc_ep_1, 4));
+			m_divmmc->automap_rom3_delayed_on_w(BIT(m_nr_bb_divmmc_ep_1, 4));
 			return on_fetch_divmmc(0x04d7 + offset);
 		}
 		else
@@ -2083,7 +2079,7 @@ void specnext_state::map_fetch(address_map &map)
 	{
 		if (!machine().side_effects_disabled())
 		{
-			m_divmmc->automap_rom3_delayed_on_w(BIT(m_regs.nr_bb_divmmc_ep_1, 5));
+			m_divmmc->automap_rom3_delayed_on_w(BIT(m_nr_bb_divmmc_ep_1, 5));
 			return on_fetch_divmmc(0x056a + offset);
 		}
 		else
@@ -2093,8 +2089,8 @@ void specnext_state::map_fetch(address_map &map)
 	{
 		if (!machine().side_effects_disabled())
 		{
-			m_divmmc->automap_nmi_instant_on_w(BIT(m_regs.nr_bb_divmmc_ep_1, 1));
-			m_divmmc->automap_nmi_delayed_on_w(BIT(m_regs.nr_bb_divmmc_ep_1, 0));
+			m_divmmc->automap_nmi_instant_on_w(BIT(m_nr_bb_divmmc_ep_1, 1));
+			m_divmmc->automap_nmi_delayed_on_w(BIT(m_nr_bb_divmmc_ep_1, 0));
 			return on_fetch_divmmc(0x0066 + offset);
 		}
 		else
@@ -2123,8 +2119,7 @@ void specnext_state::map_io(address_map &map)
 	map(0x0000, 0xffff).unmaprw();
 
 	map(0x0000, 0x0000).select(0xfffe).rw(FUNC(specnext_state::spectrum_ula_r), FUNC(specnext_state::spectrum_ula_w));
-	map(0x00ff, 0x00ff).mirror(0xff00).r(FUNC(specnext_state::floating_bus_r)).lw8(NAME([this](u8 data)
-	{
+	map(0x00ff, 0x00ff).mirror(0xff00).r(FUNC(specnext_state::floating_bus_r)).lw8(NAME([this](u8 data) {
 		m_port_ff_data = data; // ???
 		ula_palette_w(data);
 	}));
@@ -2132,87 +2127,106 @@ void specnext_state::map_io(address_map &map)
 	map(0xc005, 0xc005).mirror(0x3ff8).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));	// #fffd
 	map(0x8005, 0x8005).mirror(0x3ff8).w("ay8912", FUNC(ay8910_device::data_w));									// #bffd
 
-	map(0x0001, 0x0001).mirror(0x7ffc).lw8(NAME([this](u8 data)
-	{
+	map(0x0001, 0x0001).mirror(0x7ffc).lw8(NAME([this](u8 data) {
 		if (!port_7ffd_locked())
 		{
 			m_port_7ffd_data = data;
 			memory_change(0x7ffd, data);
 		}
 	}));
-	map(0x4001, 0x4001).mirror(0x3ffc).lw8(NAME([this](u8 data) // ZX Spectrum 128 memory +3 only
-	{
+	map(0x4001, 0x4001).mirror(0x3ffc).lw8(NAME([this](u8 data) { // ZX Spectrum 128 memory +3 only
 		if (!port_7ffd_locked())
 		{
 			m_port_7ffd_data = data;
 			memory_change(0x7ffd, data);
 		}
 	}));
-	map(0xd001, 0xd001).mirror(0x0ffc).lw8(NAME([this](u8 data) { if (!port_7ffd_locked() || nr_8f_mapping_mode_profi()) { m_port_dffd_data = data; memory_change(0xdffd, data); }}));
-	map(0x1001, 0x1001).mirror(0x0ffc).lw8(NAME([this](u8 data) { if (!port_7ffd_locked()) { m_port_1ffd_data = data; memory_change(0x1ffd, data); }}));
+	map(0xd001, 0xd001).mirror(0x0ffc).lw8(NAME([this](u8 data) {
+		if (!port_7ffd_locked() || nr_8f_mapping_mode_profi())
+		{
+			m_port_dffd_data = data; memory_change(0xdffd, data);
+		}
+	}));
+	map(0x1001, 0x1001).mirror(0x0ffc).lw8(NAME([this](u8 data) {
+		if (!port_7ffd_locked())
+		{
+			m_port_1ffd_data = data; memory_change(0x1ffd, data);
+		}
+	}));
 	map(0xe0f7, 0xe0f7).mirror(0x0f00).lw8(NAME([this](u8 data) { m_port_eff7_data = data; memory_change(0xeff7, data); }));
 	map(0x103b, 0x103b).lw8(//NAME([this]() { return 0xfe | m_eeprom->read_scl(); })
 		NAME([this](u8 data) { m_eeprom->write_scl(data & 1); })); // i2c SCL
 	map(0x113b, 0x113b).lrw8(NAME([this]() { return 0xfe | m_eeprom->read_sda(); })
 		, NAME([this](u8 data) { m_eeprom->write_sda(data & 1); })); // i2c SDA
-	map(0x123b, 0x123b).lrw8(NAME([this]()
-	{
-		return (m_regs.port_123b_layer2_map_segment << 6) | (0b00 << 4) | (m_regs.port_123b_layer2_map_shadow << 3) | (m_regs.port_123b_layer2_map_rd_en << 2) | (m_regs.port_123b_layer2_en << 1) | m_regs.port_123b_layer2_map_wr_en;
-	}), NAME([this](u8 data)
-	{
+	map(0x123b, 0x123b).lrw8(NAME([this]() {
+		return (m_port_123b_layer2_map_segment << 6) | (0b00 << 4) | (m_port_123b_layer2_map_shadow << 3) | (m_port_123b_layer2_map_rd_en << 2) | (m_port_123b_layer2_en << 1) | m_port_123b_layer2_map_wr_en;
+	}), NAME([this](u8 data) {
 		if (BIT(~data, 4))
 		{
 			port_123b_layer2_en_w(BIT(data, 1));
-			m_regs.port_123b_layer2_map_wr_en = BIT(data, 0);
-			m_regs.port_123b_layer2_map_rd_en = BIT(data, 2);
+			m_port_123b_layer2_map_wr_en = BIT(data, 0);
+			m_port_123b_layer2_map_rd_en = BIT(data, 2);
 			port_123b_layer2_map_shadow_w(BIT(data, 3));
-			m_regs.port_123b_layer2_map_segment = BIT(data, 6, 2);
+			m_port_123b_layer2_map_segment = BIT(data, 6, 2);
 		}
 		else
-			m_regs.port_123b_layer2_offset = BIT(data, 0, 3);
+			m_port_123b_layer2_offset = BIT(data, 0, 3);
 	}));
 	map(0x243b, 0x243b).lrw8(NAME([this]() { return m_nr_register; })
 		, NAME([this](u8 data) { m_nr_register = data; }));
 	map(0x253b, 0x253b).lrw8(NAME([this]() { return m_next_regs.read_byte(m_nr_register); })
 		, NAME([this](u8 data) { m_next_regs.write_byte(m_nr_register, data); }));
-	map(0x303b, 0x303b).lrw8(NAME([this]() { return port_sprite_io_en() ? m_sprites->mirror_num_r() : 0x00; }),
-								NAME([this](u8 data) { if (port_sprite_io_en()) { m_sprites->io_w(0x303b, data); } }));
-	map(0xbf3b, 0xbf3b).lw8(NAME([this](u8 data)
-	{
+	map(0x303b, 0x303b).lrw8(NAME([this]() {
+		return port_sprite_io_en() ? m_sprites->mirror_num_r() : 0x00;
+	}), NAME([this](u8 data) {
+		if (port_sprite_io_en())
+		{
+			m_sprites->io_w(0x303b, data);
+		}
+	}));
+	map(0xbf3b, 0xbf3b).lw8(NAME([this](u8 data) {
 		if (port_ulap_io_en())
 		{
-			m_regs.port_bf3b_ulap_mode = BIT(data, 6, 2);
+			m_port_bf3b_ulap_mode = BIT(data, 6, 2);
 			if (BIT(data, 6, 2) == 0b00)
-				m_regs.port_bf3b_ulap_index = BIT(data, 0, 6);
+				m_port_bf3b_ulap_index = BIT(data, 0, 6);
 		}
 	})); // ULA+ Register
-	map(0xff3b, 0xff3b).lrw8(NAME([this]()
-	{
+	map(0xff3b, 0xff3b).lrw8(NAME([this]() {
 		u8 port_ff3b_dat = 0x00;
 		if (port_ulap_io_en())
 		{
-			port_ff3b_dat = m_regs.port_bf3b_ulap_mode == 0b00
+			port_ff3b_dat = m_port_bf3b_ulap_mode == 0b00
 				? bitswap<8>(nr_palette_dat(), 5, 4, 3, 8, 7, 6, 2, 1)
-			    : m_regs.port_ff3b_ulap_en;
+				: m_port_ff3b_ulap_en;
 		}
 		return port_ff3b_dat;
-	}), NAME([this](u8 data)
-	{
+	}), NAME([this](u8 data) {
 		if (port_ulap_io_en())
 		{
-			if (m_regs.port_bf3b_ulap_mode == 0b01)
+			if (m_port_bf3b_ulap_mode == 0b01)
 				port_ff3b_ulap_en_w(BIT(data, 0));
 		}
 	})); // ULA+ Data
-	map(0x0057, 0x0057).mirror(0xff00).lw8(NAME([this](u8 data) { if (port_sprite_io_en()) { m_sprites->io_w(0x0057, data); } }));
-	map(0x005b, 0x005b).mirror(0xff00).lw8(NAME([this](u8 data) { if (port_sprite_io_en()) { m_sprites->io_w(0x005b, data); } }));
+	map(0x0057, 0x0057).mirror(0xff00).lw8(NAME([this](u8 data) {
+		if (port_sprite_io_en())
+		{
+			m_sprites->io_w(0x0057, data);
+		}
+	}));
+	map(0x005b, 0x005b).mirror(0xff00).lw8(NAME([this](u8 data) {
+		if (port_sprite_io_en())
+		{
+			m_sprites->io_w(0x005b, data);
+		}
+	}));
 	map(0x00e7, 0x00e7).mirror(0xff00).lw8(NAME([this](u8 data) { m_port_e7_reg = data; } ));
 	map(0x00e3, 0x00e3).mirror(0xff00).lrw8(NAME([this]() { return m_port_e3_reg & ~0x30; })
 		, NAME([this](u8 data) { m_port_e3_reg = (m_port_e3_reg & 0x40) | data; bank_update(0); bank_update(1); }));
 	map(0x00eb, 0x00eb).mirror(0xff00).rw(FUNC(specnext_state::spi_data_r), FUNC(specnext_state::spi_data_w));
 
-	map(0x000b, 0x000b).mirror(0xff00).rw(m_z80dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
-	map(0x006b, 0x006b).mirror(0xff00).noprw(); // zxnDMA
+	map(0x000b, 0x000b).mirror(0xff00).rw(m_z80dma, FUNC(specnext_dma_device::read), FUNC(specnext_dma_device::write));
+	map(0x006b, 0x006b).mirror(0xff00).rw(m_z80dma, FUNC(specnext_dma_device::read), FUNC(specnext_dma_device::write));
 
 	map(0x0bdf, 0x0bdf).mirror(0xf000).lr8(NAME([this]() -> u8 { return m_io_mouse[0]->read(); }));					// #fbdf
 	map(0x0fdf, 0x0fdf).mirror(0xf000).lr8(NAME([this]() -> u8 { return ~m_io_mouse[1]->read(); }));				// #ffdf
@@ -2276,16 +2290,31 @@ void specnext_state::machine_start()
 		m_bank_ram[i]->configure_entries(0, m_ram->size() / 0x2000, m_ram->pointer(), 0x2000);
 	m_bank_boot_rom->configure_entry(0, memregion("maincpu")->base());
 
+	u8 *ram = m_ram->pointer() + 0x40000;
+	m_ula->set_host_ram_ptr(ram);
+	m_tiles->set_host_ram_ptr(ram);
+	m_layer2->set_host_ram_ptr(ram);
+
+
+	m_nr_02_hard_reset = 1;
+}
+
+void specnext_state::reset_hard()
+{
+	m_nr_02_hard_reset = 0;
+
+	m_bootrom_en = 1;
+
 	// dma_mode= 0;
 	// nmi_mf = 0;
 	// nmi_divmmc = 0;
 	// nmi_expbus = 0;
-	m_regs.nr_80_expbus = 0;
+	m_nr_80_expbus = 0;
 	// expbus_eff_en = 0;
 	// expbus_eff_disable_io = 0;
 	// expbus_eff_disable_mem = 0;
 	// expbus_eff_clken = 0;
-	m_regs.nr_8c_altrom = 0;
+	m_nr_8c_altrom = 0;
 	// bus_iorq_ula = 0;
 	// port_253b_rd_qq = 0;
 	// sram_req_d = 1;
@@ -2295,101 +2324,103 @@ void specnext_state::machine_start()
 	m_port_e7_reg = 0xff;
 	// joy_iomode_pin7 = 1;
 	// port_fe_border = 0;
-	m_regs.nr_8f_mapping_mode = 0;
+	m_nr_8f_mapping_mode = 0;
 	// port_memory_change_dly = 0;
 	// port_memory_ram_change_dly = 0;
-	// m_regs.nr_8f_we_dly = 0;
+	// m_nr_8f_we_dly = 0;
 	// m_port_123b_dat = 0;
-	m_regs.nr_02_bus_reset = 0;
-	m_regs.nr_03_machine_timing = 0b011;
-	m_regs.nr_03_user_dt_lock = 0;
-	m_bootrom_en = 1;
-	m_regs.nr_03_config_mode = 1;
-	m_regs.nr_03_machine_type = 0b011;
-	m_regs.nr_04_romram_bank = 0;
-	m_regs.nr_05_joy0 = 0b001;
-	m_regs.nr_05_joy1 = 0b000;
-	m_regs.nr_06_hotkey_cpu_speed_en = 1;
-	m_regs.nr_06_hotkey_5060_en = 1;
-	m_regs.nr_06_button_drive_nmi_en = 0;
-	m_regs.nr_06_button_m1_nmi_en = 0;
-	m_regs.nr_06_ps2_mode = 0;
-	m_regs.nr_06_psg_mode = 0b00;
+	m_nr_02_bus_reset = 0;
+	m_nr_03_machine_timing = 0b011;
+	m_nr_03_user_dt_lock = 0;
+	m_nr_03_config_mode = 1;
+	m_nr_03_machine_type = 0b011;
+	m_nr_04_romram_bank = 0;
+	m_nr_05_joy0 = 0b001;
+	m_nr_05_joy1 = 0b000;
+	m_nr_06_hotkey_cpu_speed_en = 1;
+	m_nr_06_hotkey_5060_en = 1;
+	m_nr_06_button_drive_nmi_en = 0;
+	m_nr_06_button_m1_nmi_en = 0;
+	m_nr_06_ps2_mode = 0;
+	m_nr_06_psg_mode = 0b00;
 	nr_07_cpu_speed_w(0b00);
-	m_regs.nr_06_internal_speaker_beep = 0;
-	m_regs.nr_08_contention_disable = 0;
-	m_regs.nr_08_psg_stereo_mode = 0;
-	m_regs.nr_08_internal_speaker_en = 1;
-	m_regs.nr_08_dac_en = 0;
-	m_regs.nr_08_port_ff_rd_en = 0;
-	m_regs.nr_08_psg_turbosound_en = 0;
-	m_regs.nr_08_keyboard_issue2 = 0;
-	m_regs.nr_09_psg_mono = 0;
-	m_regs.nr_09_hdmi_audio_en = 1;
-	m_regs.nr_09_sprite_tie = 0;
-	m_regs.nr_0a_mf_type = 0b00;
-	m_regs.nr_0a_divmmc_automap_en = 0;
-	m_regs.nr_0a_mouse_button_reverse = 0;
-	m_regs.nr_0a_mouse_dpi = 0b01;
-	m_regs.nr_10_flashboot = 0;
-	m_regs.nr_10_coreid = 0b00001;
-	m_regs.nr_7f_user_register_0 = 0xff;
-	m_regs.nr_81_expbus_ula_override = 0;
-	m_regs.nr_81_expbus_nmi_debounce_disable = 0;
-	m_regs.nr_81_expbus_clken = 0;
-	m_regs.nr_81_expbus_speed = 0b00;
-	m_regs.nr_82_internal_port_enable = 0xff;
-	m_regs.nr_83_internal_port_enable = 0xff;
-	m_regs.nr_84_internal_port_enable = 0xff;
-	m_regs.nr_85_internal_port_enable = 0x0f;
-	m_regs.nr_85_internal_port_reset_type = 1;
-	m_regs.nr_86_bus_port_enable = 0xff;
-	m_regs.nr_87_bus_port_enable = 0xff;
-	m_regs.nr_88_bus_port_enable = 0xff;
-	m_regs.nr_89_bus_port_enable = 0x0f;
-	m_regs.nr_89_bus_port_reset_type = 1;
-	m_regs.nr_8a_bus_port_propagate = 0x3f;
-	m_regs.nr_90_pi_gpio_o_en = 0;
-	m_regs.nr_91_pi_gpio_o_en = 0;
-	m_regs.nr_92_pi_gpio_o_en = 0;
-	m_regs.nr_93_pi_gpio_o_en = 0;
-	m_regs.nr_a8_esp_gpio0_en = 0;
-	m_regs.nr_a9_esp_gpio0 = 1;
-	m_regs.nr_f0_select = 1;
-	m_regs.nr_f0_xdna_en = 0;
-	m_regs.nr_f0_xadc_en = 0;
-	m_regs.nr_f0_xdev_cmd = 0x00;
-	m_regs.nr_f0_xadc_eoc = 0;
-	m_regs.nr_f0_xadc_eos = 0;
-	m_regs.nr_f8_xadc_dwe = 0;
-	m_regs.nr_f8_xadc_daddr = 0x00;
-	m_regs.nr_f8_xadc_den = 0;
-	m_regs.nr_f9_xadc_d0 = 0;
-	m_regs.nr_fa_xadc_d1 = 0;
-	//m_regs.nr_05_5060 = 0;
-	//m_regs.nr_05_scandouble_en = 1;
-	m_regs.nr_09_scanlines = 0b00;
-	m_regs.nr_02_reset_type = 0b100;
+	m_nr_06_internal_speaker_beep = 0;
+	m_nr_08_contention_disable = 0;
+	m_nr_08_psg_stereo_mode = 0;
+	m_nr_08_internal_speaker_en = 1;
+	m_nr_08_dac_en = 0;
+	m_nr_08_port_ff_rd_en = 0;
+	m_nr_08_psg_turbosound_en = 0;
+	m_nr_08_keyboard_issue2 = 0;
+	m_nr_09_psg_mono = 0;
+	m_nr_09_hdmi_audio_en = 1;
+	m_nr_09_sprite_tie = 0;
+	m_nr_0a_mf_type = 0b00;
+	m_nr_0a_divmmc_automap_en = 0;
+	m_nr_0a_mouse_button_reverse = 0;
+	m_nr_0a_mouse_dpi = 0b01;
+	m_nr_10_flashboot = 0;
+	m_nr_10_coreid = 0b00001;
+	m_nr_7f_user_register_0 = 0xff;
+	m_nr_81_expbus_ula_override = 0;
+	m_nr_81_expbus_nmi_debounce_disable = 0;
+	m_nr_81_expbus_clken = 0;
+	m_nr_81_expbus_speed = 0b00;
+	m_nr_82_internal_port_enable = 0xff;
+	m_nr_83_internal_port_enable = 0xff;
+	m_nr_84_internal_port_enable = 0xff;
+	m_nr_85_internal_port_enable = 0x0f;
+	m_nr_85_internal_port_reset_type = 1;
+	m_nr_86_bus_port_enable = 0xff;
+	m_nr_87_bus_port_enable = 0xff;
+	m_nr_88_bus_port_enable = 0xff;
+	m_nr_89_bus_port_enable = 0x0f;
+	m_nr_89_bus_port_reset_type = 1;
+	m_nr_8a_bus_port_propagate = 0x3f;
+	m_nr_90_pi_gpio_o_en = 0;
+	m_nr_91_pi_gpio_o_en = 0;
+	m_nr_92_pi_gpio_o_en = 0;
+	m_nr_93_pi_gpio_o_en = 0;
+	m_nr_a8_esp_gpio0_en = 0;
+	m_nr_a9_esp_gpio0 = 1;
+	m_nr_f0_select = 1;
+	m_nr_f0_xdna_en = 0;
+	m_nr_f0_xadc_en = 0;
+	m_nr_f0_xdev_cmd = 0x00;
+	m_nr_f0_xadc_eoc = 0;
+	m_nr_f0_xadc_eos = 0;
+	m_nr_f8_xadc_dwe = 0;
+	m_nr_f8_xadc_daddr = 0x00;
+	m_nr_f8_xadc_den = 0;
+	m_nr_f9_xadc_d0 = 0;
+	m_nr_fa_xadc_d1 = 0;
+	//m_nr_05_5060 = 0;
+	//m_nr_05_scandouble_en = 1;
+	m_nr_09_scanlines = 0b00;
+	m_nr_02_reset_type = 0b100;
 	// nr_keymap_sel = 0;
 	// nr_keymap_addr = 0;
 	// hotkeys_1 = 0;
 	// hotkeys_0 = 0;
 	// video_timing_change_d = 0;
-	m_regs.eff_nr_03_machine_timing = 0b011;
-	m_regs.eff_nr_08_contention_disable = 0;
+	m_eff_nr_03_machine_timing = 0b011;
+	m_eff_nr_08_contention_disable = 0;
 	// xdna_load = 0;
 	// xdna_shift = 0;
 	// xadc_reset = 0;
 	// xadc_convst = 0;
 
 	// m_port_00_data = 0;
-	m_regs.nr_0a_divmmc_automap_en = 1;
+	m_nr_0a_divmmc_automap_en = 1;
 }
 
 void specnext_state::machine_reset()
 {
 	// TODO prevent from soft reset in config mode?
 	spectrum_128_state::machine_reset();
+
+	if (m_nr_02_hard_reset)
+		reset_hard();
 
 	m_spi_clock->adjust(attotime::never);
 	m_spi_clock_cycles = 0;
@@ -2401,16 +2432,16 @@ void specnext_state::machine_reset()
 	//dma_mode  = 0;
 	//z80_retn_seen_28_d  = 0;
 	//im2_dma_delay  = 0;
-	m_regs.pulse_int_n  = 1;
-	m_regs.nr_c2_retn_address_lsb  = 0x00;
-	m_regs.nr_c3_retn_address_msb  = 0x00;
+	m_pulse_int_n  = 1;
+	m_nr_c2_retn_address_lsb  = 0x00;
+	m_nr_c3_retn_address_msb  = 0x00;
 	//z80_stackless_retn_en  = 0;
 	//nmi_mf  = 0;
 	//nmi_divmmc  = 0;
 	//nmi_expbus  = 0;
 	//nmi_state  = S_NMI_IDLE;
-	m_regs.nr_80_expbus = (m_regs.nr_80_expbus << 4) | (m_regs.nr_80_expbus & 0x0f);
-	m_regs.nr_8c_altrom = (m_regs.nr_8c_altrom << 4) | (m_regs.nr_8c_altrom & 0x0f);
+	m_nr_80_expbus = (m_nr_80_expbus << 4) | (m_nr_80_expbus & 0x0f);
+	m_nr_8c_altrom = (m_nr_8c_altrom << 4) | (m_nr_8c_altrom & 0x0f);
 	//port_253b_rd_qq  = 0b00;
 	//sram_req_d  = 0;
 	//i2c_scl_o  = 1;
@@ -2435,20 +2466,20 @@ void specnext_state::machine_reset()
 */	
 	//port_memory_change_dly  = 0;
 	//port_memory_ram_change_dly  = 0;
-	//m_regs.nr_8f_we_dly  = 0;
-	m_regs.nr_02_generate_mf_nmi  = 0;
-	m_regs.nr_02_generate_divmmc_nmi  = 0;
-	m_regs.nr_da_iotrap_cause  = 0x00;
-	m_regs.nr_d9_iotrap_write  = 0x00;
+	//m_nr_8f_we_dly  = 0;
+	m_nr_02_generate_mf_nmi  = 0;
+	m_nr_02_generate_divmmc_nmi  = 0;
+	m_nr_da_iotrap_cause  = 0x00;
+	m_nr_d9_iotrap_write  = 0x00;
 	port_123b_layer2_en_w(0);
-	m_regs.port_123b_layer2_map_wr_en  = 0;
-	m_regs.port_123b_layer2_map_rd_en  = 0;
+	m_port_123b_layer2_map_wr_en  = 0;
+	m_port_123b_layer2_map_rd_en  = 0;
 	port_123b_layer2_map_shadow_w(0);
-	m_regs.port_123b_layer2_map_segment  = 0x00;
-	m_regs.port_123b_layer2_offset  = 0x00;
+	m_port_123b_layer2_map_segment  = 0x00;
+	m_port_123b_layer2_offset  = 0x00;
 	m_port_e3_reg  = 0x00;
-	m_regs.port_bf3b_ulap_mode  = 0x00;
-	m_regs.port_bf3b_ulap_index  = 0x00;
+	m_port_bf3b_ulap_mode  = 0x00;
+	m_port_bf3b_ulap_index  = 0x00;
 	port_ff3b_ulap_en_w(0);
 	m_nr_register = 0x24;
 	//copper_requester_d  = 0;
@@ -2460,7 +2491,7 @@ void specnext_state::machine_reset()
 	//cpu_nr_reg  = 0x00;
 	//cpu_nr_dat  = 0x00;
 	nr_07_cpu_speed_w(0b00);
-	m_regs.eff_nr_08_contention_disable  = 0;
+	m_eff_nr_08_contention_disable  = 0;
 
 	//expbus_eff_en  = expbus_en;
 	//expbus_eff_disable_io  = expbus_disable_io;
@@ -2468,28 +2499,28 @@ void specnext_state::machine_reset()
 	//expbus_eff_clken  = expbus_clken;
 
 
-	m_regs.nr_06_hotkey_cpu_speed_en = 1;
-	m_regs.nr_06_hotkey_5060_en = 1;
+	m_nr_06_hotkey_cpu_speed_en = 1;
+	m_nr_06_hotkey_5060_en = 1;
 
-	m_regs.nr_08_contention_disable = 0;
+	m_nr_08_contention_disable = 0;
 
-	m_regs.nr_09_sprite_tie = 0;
+	m_nr_09_sprite_tie = 0;
 
-	m_regs.nr_0b_joy_iomode_en = 0;
-	m_regs.nr_0b_joy_iomode = 0b00;
-	m_regs.nr_0b_joy_iomode_0 = 1;
+	m_nr_0b_joy_iomode_en = 0;
+	m_nr_0b_joy_iomode = 0b00;
+	m_nr_0b_joy_iomode_0 = 1;
 
 	nr_12_layer2_active_bank_w(0b0001000);
 	nr_13_layer2_shadow_bank_w(0b0001011);
 
 	nr_14_global_transparent_rgb_w(0xe3);
 
-	m_regs.nr_15_lores_en = 0;
+	m_nr_15_lores_en = 0;
 	nr_15_sprite_priority_w(0);
 	nr_15_sprite_border_clip_en_w(0);
-	m_regs.nr_15_layer_priority = 0x00;
+	m_nr_15_layer_priority = 0x00;
 	nr_15_sprite_over_border_en_w(0);
-	m_regs.nr_15_sprite_en = 0;
+	m_nr_15_sprite_en = 0;
 
 	nr_16_layer2_scrollx_w(0x00);
 	nr_17_layer2_scrolly_w(0x00);
@@ -2497,28 +2528,28 @@ void specnext_state::machine_reset()
 	nr_18_layer2_clip_x2_w(0xff);
 	nr_18_layer2_clip_y1_w(0x00);
 	nr_18_layer2_clip_y2_w(0xbf);
-	m_regs.nr_18_layer2_clip_idx = 0b00;
+	m_nr_18_layer2_clip_idx = 0b00;
 
 	nr_19_sprite_clip_x1_w(0x00);
 	nr_19_sprite_clip_x2_w(0xff);
 	nr_19_sprite_clip_y1_w(0x00);
 	nr_19_sprite_clip_y2_w(0xbf);
-	m_regs.nr_19_sprite_clip_idx = 0b00;
+	m_nr_19_sprite_clip_idx = 0b00;
 
 	nr_1a_ula_clip_x1_w(0x00);
 	nr_1a_ula_clip_x2_w(0xff);
 	nr_1a_ula_clip_y1_w(0x00);
 	nr_1a_ula_clip_y2_w(0xbf);
-	m_regs.nr_1a_ula_clip_idx = 0b00;
+	m_nr_1a_ula_clip_idx = 0b00;
 
 	nr_1b_tm_clip_x1_w(0x00);
 	nr_1b_tm_clip_x2_w(0x9f);
 	nr_1b_tm_clip_y1_w(0x00);
 	nr_1b_tm_clip_y2_w(0xff);
-	m_regs.nr_1b_tm_clip_idx = 0b00;
+	m_nr_1b_tm_clip_idx = 0b00;
 
-	m_regs.nr_22_line_interrupt_en = 0;
-	m_regs.nr_23_line_interrupt = 0x00;
+	m_nr_22_line_interrupt_en = 0;
+	m_nr_23_line_interrupt = 0x00;
 	nr_26_ula_scrollx_w(0x00);
 	nr_27_ula_scrolly_w(0x00);
 	nr_30_tm_scrollx_w(0x00);
@@ -2526,41 +2557,41 @@ void specnext_state::machine_reset()
 	nr_32_lores_scrollx_w(0x00);
 	nr_33_lores_scrolly_w(0x00);
 
-	m_regs.nr_palette_idx = 0x00;
-	m_regs.nr_palette_sub_idx = 0;
+	m_nr_palette_idx = 0x00;
+	m_nr_palette_sub_idx = 0;
 
 	nr_42_ulanext_format_w(0x07);
 
-	m_regs.nr_43_palette_autoinc_disable = 0;
-	m_regs.nr_43_palette_write_select = 0b000;
-	m_regs.nr_43_active_sprite_palette = 0;
-	m_regs.nr_43_active_layer2_palette = 0;
-	m_regs.nr_43_active_ula_palette = 0;
+	m_nr_43_palette_autoinc_disable = 0;
+	m_nr_43_palette_write_select = 0b000;
+	m_nr_43_active_sprite_palette = 0;
+	m_nr_43_active_layer2_palette = 0;
+	m_nr_43_active_ula_palette = 0;
 	nr_43_ulanext_en_w(0);
 
-	m_regs.nr_stored_palette_value = 0x00;
+	m_nr_stored_palette_value = 0x00;
 
-	reg_w(0x4a, 0xe3); // m_regs.nr_4a_fallback_rgb = 0xe3;
+	reg_w(0x4a, 0xe3); // m_nr_4a_fallback_rgb = 0xe3;
 	nr_4b_sprite_transparent_index_w(0xe3);
 	nr_4c_tm_transparent_index_w(0xf);
 
-	m_regs.nr_62_copper_mode = 0b00;
-	m_regs.nr_copper_addr = 0x00;
-	m_regs.nr_copper_data_stored = 0x00;
+	m_nr_62_copper_mode = 0b00;
+	m_nr_copper_addr = 0x00;
+	m_nr_copper_data_stored = 0x00;
 
-	m_regs.nr_64_copper_offset = 0x00;
+	m_nr_64_copper_offset = 0x00;
 
-	m_regs.nr_68_ula_en = 1;
-	m_regs.nr_68_blend_mode = 0b00;
-	m_regs.nr_68_cancel_extended_keys = 0;
+	m_nr_68_ula_en = 1;
+	m_nr_68_blend_mode = 0b00;
+	m_nr_68_cancel_extended_keys = 0;
 	nr_68_ula_fine_scroll_x_w(0);
-	m_regs.nr_68_ula_stencil_mode = 0;
+	m_nr_68_ula_stencil_mode = 0;
 
-	m_regs.nr_6a_lores_radastan = 0;
-	m_regs.nr_6a_lores_palette_offset = 0x0;
-	m_regs.nr_6a_lores_radastan_xor = 0;
+	m_nr_6a_lores_radastan = 0;
+	m_nr_6a_lores_palette_offset = 0x0;
+	m_nr_6a_lores_radastan_xor = 0;
 
-	m_regs.nr_6b_tm_en = 0;
+	m_nr_6b_tm_en = 0;
 	nr_6b_tm_control_w(0x00);
 	nr_6c_tm_default_attr_w(0x00);
 	nr_6e_tilemap_base_w(0, 0b101100);
@@ -2569,64 +2600,64 @@ void specnext_state::machine_reset()
 	nr_70_layer2_resolution_w(0b00);
 	nr_70_layer2_palette_offset_w(0x00);
 
-	m_regs.nr_71_layer2_scrollx_msb = 0;
+	m_nr_71_layer2_scrollx_msb = 0;
 
-	if (m_regs.nr_85_internal_port_reset_type)
+	if (m_nr_85_internal_port_reset_type)
 	{
-		m_regs.nr_82_internal_port_enable = 0xff;
-		m_regs.nr_83_internal_port_enable = 0xff;
-		m_regs.nr_84_internal_port_enable = 0xff;
-		m_regs.nr_85_internal_port_enable = 0xf;
+		m_nr_82_internal_port_enable = 0xff;
+		m_nr_83_internal_port_enable = 0xff;
+		m_nr_84_internal_port_enable = 0xff;
+		m_nr_85_internal_port_enable = 0xf;
 	}
 
-	if (!m_regs.nr_89_bus_port_reset_type)
+	if (!m_nr_89_bus_port_reset_type)
 	{
-		m_regs.nr_86_bus_port_enable = 0xff;
-		m_regs.nr_87_bus_port_enable = 0xff;
-		m_regs.nr_88_bus_port_enable = 0xff;
-		m_regs.nr_89_bus_port_enable = 0xf;
+		m_nr_86_bus_port_enable = 0xff;
+		m_nr_87_bus_port_enable = 0xff;
+		m_nr_88_bus_port_enable = 0xff;
+		m_nr_89_bus_port_enable = 0xf;
 	}
 
-	m_regs.nr_98_pi_gpio_o = 0xff;
-	m_regs.nr_99_pi_gpio_o = 0x01;
-	m_regs.nr_9a_pi_gpio_o = 0x00;
-	m_regs.nr_9b_pi_gpio_o = 0x00;
+	m_nr_98_pi_gpio_o = 0xff;
+	m_nr_99_pi_gpio_o = 0x01;
+	m_nr_9a_pi_gpio_o = 0x00;
+	m_nr_9b_pi_gpio_o = 0x00;
 
-	m_regs.nr_90_pi_gpio_o_en = 0x00;
-	m_regs.nr_91_pi_gpio_o_en = 0x00;
-	m_regs.nr_92_pi_gpio_o_en = 0x00;
-	m_regs.nr_93_pi_gpio_o_en = 0x00;
+	m_nr_90_pi_gpio_o_en = 0x00;
+	m_nr_91_pi_gpio_o_en = 0x00;
+	m_nr_92_pi_gpio_o_en = 0x00;
+	m_nr_93_pi_gpio_o_en = 0x00;
 
-	m_regs.nr_a0_pi_peripheral_en = 0x00;
-	m_regs.nr_a2_pi_i2s_ctl = 0x00;
+	m_nr_a0_pi_peripheral_en = 0x00;
+	m_nr_a2_pi_i2s_ctl = 0x00;
 
-	m_regs.nr_a8_esp_gpio0_en = 0;
-	m_regs.nr_a9_esp_gpio0 = 1;
+	m_nr_a8_esp_gpio0_en = 0;
+	m_nr_a9_esp_gpio0 = 1;
 
-	m_regs.nr_b8_divmmc_ep_0 = 0x83;
-	m_regs.nr_b9_divmmc_ep_valid_0 = 0x01;
-	m_regs.nr_ba_divmmc_ep_timing_0 = 0x00;
-	m_regs.nr_bb_divmmc_ep_1 = 0xcd;
+	m_nr_b8_divmmc_ep_0 = 0x83;
+	m_nr_b9_divmmc_ep_valid_0 = 0x01;
+	m_nr_ba_divmmc_ep_timing_0 = 0x00;
+	m_nr_bb_divmmc_ep_1 = 0xcd;
 
-	m_regs.nr_c0_im2_vector = 0x00;
-	m_regs.nr_c0_stackless_nmi = 0;
-	m_maincpu->nmi_stackless_w(m_regs.nr_c0_stackless_nmi);
-	m_regs.nr_c0_int_mode_pulse_0_im2_1 = 0;
+	m_nr_c0_im2_vector = 0x00;
+	m_nr_c0_stackless_nmi = 0;
+	m_maincpu->nmi_stackless_w(m_nr_c0_stackless_nmi);
+	m_nr_c0_int_mode_pulse_0_im2_1 = 0;
 
-	m_regs.nr_c4_int_en_0_expbus = 1;
+	m_nr_c4_int_en_0_expbus = 1;
 
-	m_regs.nr_c6_int_en_2_654 = 0x00;
-	m_regs.nr_c6_int_en_2_210 = 0x00;
+	m_nr_c6_int_en_2_654 = 0x00;
+	m_nr_c6_int_en_2_210 = 0x00;
 
-	m_regs.nr_cc_dma_int_en_0_7 = 0;
-	m_regs.nr_cc_dma_int_en_0_10 = 0x00;
-	m_regs.nr_cd_dma_int_en_1 = 0x00;
-	m_regs.nr_ce_dma_int_en_2_654 = 0x00;
-	m_regs.nr_ce_dma_int_en_2_210 = 0x00;
+	m_nr_cc_dma_int_en_0_7 = 0;
+	m_nr_cc_dma_int_en_0_10 = 0x00;
+	m_nr_cd_dma_int_en_1 = 0x00;
+	m_nr_ce_dma_int_en_2_654 = 0x00;
+	m_nr_ce_dma_int_en_2_210 = 0x00;
 
-	m_regs.nr_d8_io_trap_fdc_en = 0;
+	m_nr_d8_io_trap_fdc_en = 0;
 
-	if (m_regs.nr_03_config_mode)
+	if (m_nr_03_config_mode)
 		m_bootrom_en = 1;
 
 	mmu_w(0, 0xff);
@@ -2662,9 +2693,9 @@ void specnext_state::video_start()
 	// see (1)
 	prg.install_write_tap(0x0000, 0xbfff, "layer2_w", [this](offs_t offset, u8 &data, u8 mem_mask)
 	{
-		if (m_regs.port_123b_layer2_map_wr_en)
+		if (m_port_123b_layer2_map_wr_en)
 		{
-			const u8 type = m_regs.port_123b_layer2_map_segment;
+			const u8 type = m_port_123b_layer2_map_segment;
 			u8* to = m_ram->pointer() + 0x40000 + (layer2_active_bank() << 14);
 			if ((type < 3) && (offset < 0x4000))
 				to[offset + (type << 14)] = data;
@@ -2693,7 +2724,7 @@ void specnext_state::tbblue(machine_config &config)
 	m_maincpu->set_m1_map(&specnext_state::map_fetch);
 	m_maincpu->set_memory_map(&specnext_state::map_mem);
 	m_maincpu->set_io_map(&specnext_state::map_io);
-	m_maincpu->set_vblank_int("screen", FUNC(specnext_state::spec_interrupt)); // ...
+	m_maincpu->set_vblank_int("screen", FUNC(specnext_state::spec_interrupt));
 	m_maincpu->out_nextreg_cb().set(FUNC(specnext_state::reg_w));
 	m_maincpu->in_nextreg_cb().set(FUNC(specnext_state::reg_r));
 
@@ -2703,14 +2734,19 @@ void specnext_state::tbblue(machine_config &config)
 	//m_ctc->zc_callback<0>().set(m_ctc, FUNC(z80ctc_device::trg1));
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	Z80DMA(config, m_z80dma, X1_128_SINCLAIR / 10);
+	SPECNEXT_DMA(config, m_z80dma, X1_128_SINCLAIR / 10);
 	m_z80dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
 	m_z80dma->in_mreq_callback().set([this](offs_t offset) { return m_program.read_byte(offset); });
 	m_z80dma->out_mreq_callback().set([this](offs_t offset, u8 data) { m_program.write_byte(offset, data); });
 	m_z80dma->in_iorq_callback().set([this](offs_t offset) { return m_io.read_byte(offset); });
 	m_z80dma->out_iorq_callback().set([this](offs_t offset, u8 data) { m_io.write_byte(offset, data); });
 
-	//ZXNDMA(config, m_zxndma, X1_128_SINCLAIR / 10);
+	SPECNEXT_DMA(config, m_zxndma, X1_128_SINCLAIR / 10);
+	m_zxndma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	m_zxndma->in_mreq_callback().set([this](offs_t offset) { return m_program.read_byte(offset); });
+	m_zxndma->out_mreq_callback().set([this](offs_t offset, u8 data) { m_program.write_byte(offset, data); });
+	m_zxndma->in_iorq_callback().set([this](offs_t offset) { return m_io.read_byte(offset); });
+	m_zxndma->out_iorq_callback().set([this](offs_t offset, u8 data) { m_io.write_byte(offset, data); });
 
 	ADDRESS_MAP_BANK(config, m_regs_map).set_map(&specnext_state::map_regs).set_options(ENDIANNESS_LITTLE, 8, 8, 0);
 
@@ -2729,15 +2765,19 @@ void specnext_state::tbblue(machine_config &config)
 	PALETTE(config, m_palette, palette_device::BLACK, 512 * 4 + 1); // ulatm, l2s, +1 == fallback
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_tbblue);
 
-	const std::pair<u16, u16> raster = {SPEC_LEFT_BORDER, SPEC128_UNSEEN_LINES + SPEC_TOP_BORDER};
-	SPECNEXT_ULA(config, m_ula, 0).set_raster_offset(raster);
-	SPECNEXT_TILES(config, m_tiles, 0).set_raster_offset(raster);
-	SPECNEXT_LAYER2(config, m_layer2, 0).set_raster_offset(raster);
-	SPECNEXT_SPRITES(config, m_sprites, 0).set_raster_offset(raster);
+	SPECNEXT_ULA(config, m_ula, 0).set_raster_offset(SPEC_LEFT_BORDER, SPEC128_UNSEEN_LINES + SPEC_TOP_BORDER);
+	m_ula->set_palette(m_palette);
+	SPECNEXT_TILES(config, m_tiles, 0).set_raster_offset(SPEC_LEFT_BORDER, SPEC128_UNSEEN_LINES + SPEC_TOP_BORDER);
+	m_tiles->set_palette(m_palette);
+	SPECNEXT_LAYER2(config, m_layer2, 0).set_raster_offset(SPEC_LEFT_BORDER, SPEC128_UNSEEN_LINES + SPEC_TOP_BORDER);
+	m_layer2->set_palette(m_palette);
+	SPECNEXT_SPRITES(config, m_sprites, 0).set_raster_offset(SPEC_LEFT_BORDER, SPEC128_UNSEEN_LINES + SPEC_TOP_BORDER);
+	m_sprites->set_palette(m_palette);
 
 	config.device_remove("snapshot");
-	SNAPSHOT(config, "snapshot", "ach,frz,plusd,prg,sem,sit,sna,snp,snx,sp,z80,zx", attotime::never)
-		.set_load_callback(FUNC(specnext_state::snapshot_cb));
+	// TODO: find the way to load after bootrom sent restart
+	//SNAPSHOT(config, "snapshot", "ach,frz,plusd,prg,sem,sit,sna,snp,snx,sp,z80,zx", attotime::never)
+	//	.set_load_callback(FUNC(specnext_state::snapshot_cb));
 }
 
 ROM_START(tbblue)
