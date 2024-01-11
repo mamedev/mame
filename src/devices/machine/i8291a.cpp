@@ -242,7 +242,7 @@ void i8291a_device::update_int()
 
 	if (m_intr_out != intr) {
 		LOGMASKED(LOG_INT, "%s: intr %s\n", __FUNCTION__, intr ? "true" : "false");
-		m_int_write_func(intr);
+		m_int_write_func(intr != bool(m_auxb & REG_AUXB_INT_ACTIVE_LOW));
 		m_intr_out = intr;
 	}
 }
@@ -433,6 +433,9 @@ void i8291a_device::aux_mode_w(uint8_t data)
 		break;
 	case 5:
 		LOGMASKED(LOG_REG, "AUXB = %02X\n", data & 0x1f);
+		// force interrupt line update if polarity is changed
+		if ((data ^ m_auxb) & REG_AUXB_INT_ACTIVE_LOW)
+			m_intr_out = !m_intr_out;
 		m_auxb = data;
 		break;
 	case 3:
