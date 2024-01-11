@@ -33222,6 +33222,9 @@ db32016                         // National Semiconductor DB32016
 @source:natsemi/ns5652.cpp
 ns5652                          //
 
+@source:natsemi/sys16.cpp
+sys16                           // National Semiconductor SYS16
+
 @source:ncd/ncd68k.cpp
 ncd16                           // 1989 Network Computing Devices
 ncd17c                          // 1990 Network Computing Devices
