@@ -12268,8 +12268,9 @@ ROM_START( cll ) // Dyna D9004 PCB
 	ROM_LOAD( "cm_1.bin",  0x10000, 0x8000, CRC(71bdab69) SHA1(d2c594ed88d6368df15b623c48eecc1c219b839e) ) // AM27C256, 11xxxxxxxxxxxxx = 0xFF
 	ROM_LOAD( "cm_2.bin",  0x18000, 0x8000, CRC(201d1e90) SHA1(c3c5224646b777f98ee35d146136788029b1782d) ) // AM27C256, 11xxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x40000, "user1", ROMREGION_ERASE00 ) // girls GFX
-	ROM_LOAD( "9.bin",  0x00000, 0x40000, NO_DUMP ) // PCB shows the girls when dip 5:1 is on
+	ROM_REGION( 0x40000, "user1", ROMREGION_ERASE00 ) // girls GFX, PCB shows the girls when dip 5:1 is on
+	 // videos show it has the same screens as cmast91. Reusing that ROM for now, but would be better to have it dumped
+	ROM_LOAD( "9.bin",  0x00000, 0x40000, BAD_DUMP CRC(92342276) SHA1(f9436752f2ec67cf873fd01c729c7c113dc18be0) )
 
 	// PROMs weren't included in the dump, using cmast91's for now. Colors seem correct, though.
 	ROM_REGION( 0x300, "proms", 0 )

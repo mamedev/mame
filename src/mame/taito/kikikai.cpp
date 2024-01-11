@@ -462,6 +462,8 @@ void kikikai_state::main_f008_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 4) ? CLEAR_LINE : ASSERT_LINE);
 	m_mcu->set_input_line(INPUT_LINE_RESET, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
+
+	// TODO: bit 0 is flipscreen
 }
 
 void mexico86_state::main_f008_w(uint8_t data)
