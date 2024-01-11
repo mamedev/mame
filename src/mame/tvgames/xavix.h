@@ -725,6 +725,7 @@ public:
 	void xavix_cart_popira(machine_config &config);
 	void xavix_cart_ddrfammt(machine_config &config);
 	void xavix_cart_evio(machine_config &config);
+	void xavix_cart_hikara(machine_config &config);
 
 protected:
 

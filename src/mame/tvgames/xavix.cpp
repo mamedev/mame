@@ -1517,6 +1517,14 @@ void xavix_cart_state::xavix_cart_ekara(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list_japan_ac").set_original("ekara_japan_ac");
 }
 
+void xavix_cart_state::xavix_cart_hikara(machine_config &config)
+{
+	xavix_cart(config);
+
+	/* software lists */
+	SOFTWARE_LIST(config, "cart_list").set_original("hikara");
+}
+
 void xavix_cart_state::xavix_cart_popira(machine_config &config)
 {
 	xavix_cart(config);
@@ -1886,6 +1894,14 @@ ROM_START( ekaramix )
 	ROM_RELOAD(0x000000, 0x200000)
 ROM_END
 
+ROM_START( hikara )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "hikara.u3", 0x000000, 0x100000, CRC(6b91102a) SHA1(684dcfeaa8ac2888da2055617603494ce5fed93c) )
+	ROM_RELOAD(0x600000, 0x100000)
+	ROM_FILL(0xed19, 1, 0xf0) // temp, bypass unknown boot check
+	ROM_FILL(0xed1e, 1, 0xd0)
+ROM_END
+
 ROM_START( ddrfammt )
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "ekara_ddr_ha010_81947.bin", 0x600000, 0x200000, CRC(737d5d1a) SHA1(a1043047056dd27bca69767ee2044461ec549465) )
@@ -2068,3 +2084,5 @@ CONS( 2002, gcslottv, 0,           0,  xavix_cart_gcslottv,  gcslottv,     xavix
 
 // Let’s!TVプレイ 超にんきスポット!ころがしほーだい たまごっちりぞーと   (Let's! TV Play Chou Ninki Spot! Korogashi-Houdai Tamagotchi Resort) (only on the Japanese list? http://test.shinsedai.co.jp/english/products/Applied/list.html )   This also allows you to use an IR reciever to import a Tamagotchi from compatible games
 CONS( 2006, ltv_tam,  0,           0,  xavix_i2c_24lc04_tam,  ltv_tam,xavix_i2c_ltv_tam_state,      init_xavix,    "Bandai / SSD Company LTD",                      "Let's! TV Play Chou Ninki Spot! Korogashi-Houdai Tamagotchi Resort (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+CONS( 2008, hikara,   0,           0,  xavix_cart_hikara, ekara,    xavix_ekara_state,    init_xavix,    "Takara / SSD Company LTD / Hasbro",            "Hi-Kara (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ )
