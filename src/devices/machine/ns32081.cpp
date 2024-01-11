@@ -306,6 +306,7 @@ void ns32081_device::write_op(u16 data)
 void ns32081_device::execute()
 {
 	softfloat_exceptionFlags = 0;
+	u32 const fsr = m_fsr;
 	m_fsr &= ~FSR_TT;
 
 	m_status = 0;
@@ -409,7 +410,7 @@ void ns32081_device::execute()
 				// SFSR dest
 				//      gen
 				//      write.D
-				m_op[2].value = m_fsr;
+				m_op[2].value = fsr;
 				m_op[2].expected = 4;
 				m_tcy = 13;
 				break;
