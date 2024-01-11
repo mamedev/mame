@@ -60,6 +60,7 @@ license:CC0-1.0
 			<dataarea name="rom" size="0x200000">
 				<rom name="bh0802001.u1" size="0x200000" crc="1294fbcc" sha1="aa68b6aeb497837f8fed595a3537f49a2a17dd11"/>
 				<!-- doesn't reach here for this set yet! (check why) -->
+				<!--
 				<rom size="1" value="0xf0" offset="0x95b8" loadflag="fill"/>
 				<rom size="1" value="0xd0" offset="0x95bd" loadflag="fill"/>
 				-->
