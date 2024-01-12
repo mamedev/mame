@@ -1333,16 +1333,20 @@ static GFXDECODE_START( gfx_xavix )
 	GFXDECODE_ENTRY( "bios", 0, char16layout8bpp, 0, 1 )
 GFXDECODE_END
 
-
-void xavix_state::xavix(machine_config &config)
+void xavix_state::set_xavix_cpumaps(machine_config &config)
 {
-	/* basic machine hardware */
-	XAVIX(config, m_maincpu, MAIN_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &xavix_state::xavix_map);
 	m_maincpu->set_addrmap(5, &xavix_state::xavix_lowbus_map);
 	m_maincpu->set_addrmap(6, &xavix_state::xavix_extbus_map);
 	m_maincpu->set_vblank_int("screen", FUNC(xavix_state::interrupt));
 	m_maincpu->set_vector_callback(FUNC(xavix_state::get_vectors));
+}
+
+void xavix_state::xavix(machine_config &config)
+{
+	/* basic machine hardware */
+	XAVIX(config, m_maincpu, MAIN_CLOCK);
+	set_xavix_cpumaps(config);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(xavix_state::scanline_cb), "screen", 0, 1);
 
@@ -1549,6 +1553,12 @@ void xavix_cart_state::xavix_cart_ekara(machine_config &config)
 void xavix_cart_state::xavix_cart_hikara(machine_config &config)
 {
 	xavix_cart(config);
+
+	// The songs seem too slow at regular clock.  It is speculated that the later
+	// CPU types run at ~43Mhz, so maybe this is really a XaviX 2000/2003 type chip
+	// with a higher clock, even if no extra opcodes are used.
+	XAVIX(config.replace(), m_maincpu, MAIN_CLOCK * 2);
+	set_xavix_cpumaps(config);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("hikara");

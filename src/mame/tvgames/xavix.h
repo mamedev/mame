@@ -189,6 +189,9 @@ protected:
 	virtual uint8_t read_io1(uint8_t direction);
 	virtual void write_io0(uint8_t data, uint8_t direction);
 	virtual void write_io1(uint8_t data, uint8_t direction);
+
+	void set_xavix_cpumaps(machine_config &config);
+
 	required_ioport m_in0;
 	required_ioport m_in1;
 	required_ioport_array<8> m_an_in;
