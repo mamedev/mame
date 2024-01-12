@@ -418,60 +418,42 @@ int xavix_ekara_state::ekara_multi1_r()
 
 int xavix_hikara_state::ekara_multi0_r()
 {
-	switch (m_extraioselect & 0x1f)
-	{
-	case 0x02: return (m_extra0->read() & 0x04) >> 2; break;
-	case 0x04: return (m_extra0->read() & 0x10) >> 4; break;
-	case 0x08: return (m_extra0->read() & 0x40) >> 6; break;
-	case 0x10: return (m_extra0->read() & 0x01) >> 0; break;
+	uint8_t ret = 0x00;
 
-	default:
-		LOG("latching inputs with invalid m_extraioselect value of %02x\n", m_extraioselect);
-		return 0x00;
-	}
-	return 0x00;
+	for (int i = 1; i < 5; i++)
+		if (m_extraioselect & (1 << i)) ret |= (m_extra0->read() & (1 << i)) >> i;
+
+	return ret;
 }
 
 int xavix_hikara_state::ekara_multi1_r()
 {
-	switch (m_extraioselect & 0x1f)
-	{
-	case 0x04: return (m_extra1->read() & 0x20) >> 5;
-	case 0x08: return (m_extra1->read() & 0x80) >> 7;
-	case 0x10: return (m_extra1->read() & 0x02) >> 1;
+	uint8_t ret = 0x00;
 
-	default:
-		LOG("latching inputs with invalid m_extraioselect value of %02x\n", m_extraioselect);
-		return 0x00;
-	}
-	return 0x00;
+	for (int i = 1; i < 5; i++)
+		if (m_extraioselect & (1 << i)) ret |= (m_extra1->read() & (1 << i)) >> i;
+
+	return ret;
 }
 
 int xavix_hikara_state::ekara_multi2_r()
 {
-	switch (m_extraioselect & 0x1f)
-	{
-	case 0x08: return (m_extra2->read() & 0x40) >> 6; break;
-	case 0x10: return (m_extra2->read() & 0x01) >> 0; break;
+	uint8_t ret = 0x00;
 
-	default:
-		LOG("latching inputs with invalid m_extraioselect value of %02x\n", m_extraioselect);
-		return 0x00;
-	}
-	return 0x00;
+	for (int i = 1; i < 5; i++)
+		if (m_extraioselect & (1 << i)) ret |= (m_extra2->read() & (1 << i)) >> i;
+
+	return ret;
 }
 
 int xavix_hikara_state::ekara_multi3_r()
 {
-	switch (m_extraioselect & 0x1f)
-	{
-	case 0x10: return (m_extra3->read() & 0x02) >> 1;
+	uint8_t ret = 0x00;
 
-	default:
-		LOG("latching inputs with invalid m_extraioselect value of %02x\n", m_extraioselect);
-		return 0x00;
-	}
-	return 0x00;
+	for (int i = 1; i < 5; i++)
+		if (m_extraioselect & (1 << i)) ret |= (m_extra3->read() & (1 << i)) >> i;
+
+	return ret;
 }
 
 
