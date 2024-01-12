@@ -1,10 +1,9 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont, Karl Stenerud, hap
+// copyright-holders:R. Belmont, Karl Stenerud
+#ifndef MAME_CPU_M37710_M37710CM_H
+#define MAME_CPU_M37710_M37710CM_H
+
 #pragma once
-
-#ifndef __M37710CM_H__
-#define __M37710CM_H__
-
 
 /* ======================================================================== */
 /* ================================ INCLUDES ============================== */
@@ -33,8 +32,8 @@
 /* ================================ GENERAL =============================== */
 /* ======================================================================== */
 
-#define MAKE_INT_8(A) int8_t((A)&0xff)
-#define MAKE_UINT_8(A) ((A)&0xff)
+#define MAKE_INT_8(A)   int8_t((A)&0xff)
+#define MAKE_UINT_8(A)  ((A)&0xff)
 #define MAKE_UINT_16(A) ((A)&0xffff)
 #define MAKE_UINT_24(A) ((A)&0xffffff)
 
@@ -52,15 +51,15 @@
 /* ================================== CPU ================================= */
 /* ======================================================================== */
 
-#define REG_A           m_a     /* Accumulator */
-#define REG_B           m_b     /* Accumulator hi byte */
+#define REG_A           m_a         /* Accumulator */
+#define REG_B           m_b         /* Accumulator hi byte */
 #define REG_BA          m_ba        /* Secondary Accumulator */
 #define REG_BB          m_bb        /* Secondary Accumulator hi byte */
-#define REG_X           m_x     /* Index X Register */
-#define REG_Y           m_y     /* Index Y Register */
+#define REG_X           m_x         /* Index X Register */
+#define REG_Y           m_y         /* Index Y Register */
 #define REG_XH          m_xh        /* X high byte */
 #define REG_YH          m_yh        /* Y high byte */
-#define REG_S           m_s     /* Stack Pointer */
+#define REG_S           m_s         /* Stack Pointer */
 #define REG_PC          m_pc        /* Program Counter */
 #define REG_PPC         m_ppc       /* Previous Program Counter */
 #define REG_PG          m_pg        /* Program Bank */
@@ -81,7 +80,7 @@
 #define REG_IM3         m_im3       /* Immediate load target */
 #define REG_IM4         m_im4       /* Immediate load target */
 #define INT_ACK         m_int_ack   /* Interrupt Acknowledge function pointer */
-#define CLOCKS          m_ICount        /* Clock cycles remaining */
+#define CLOCKS          m_ICount    /* Clock cycles remaining */
 #define IRQ_DELAY       m_irq_delay /* Delay 1 instruction before checking IRQ */
 #define CPU_STOPPED     m_stopped   /* Stopped status of the CPU */
 
@@ -396,4 +395,4 @@
 /* ======================================================================== */
 /* ================================== CPU ================================= */
 /* ======================================================================== */
-#endif /* __M37710CM_H__ */
+#endif /* MAME_CPU_M37710_M37710CM_H */
