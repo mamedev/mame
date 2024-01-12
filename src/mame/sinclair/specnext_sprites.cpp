@@ -91,7 +91,7 @@ void specnext_sprites_device::update_sprites_cache()
 
 	sprite_data *anchor;
 	bool anchor_vis = false;
-	u8* sprite_attr = m_sprite_attr_ram;
+	u8 *sprite_attr = m_sprite_attr_ram;
 	for (auto i = 0; i < 128; i++, sprite_attr += 8)
 	{
 		const bool spr_relative = BIT(sprite_attr[3], 6) && ((sprite_attr[4] >> 6) == 0b01);

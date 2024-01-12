@@ -43,7 +43,7 @@ specnext_tiles_device::specnext_tiles_device(const machine_config &mconfig, cons
 TILE_GET_INFO_MEMBER(specnext_tiles_device::get_tile_info)
 {
 	const bool attr_in_map = BIT(~m_control, 5);
-	const u8* data = &m_tiles_info[tile_index << attr_in_map];
+	const u8 *data = &m_tiles_info[tile_index << attr_in_map];
 	u8 attr = attr_in_map ? *(data + attr_in_map) : m_default_flags;
 	u16 code = *data;
 
@@ -66,7 +66,7 @@ void specnext_tiles_device::tilemap_update()
 {
 	if (gfx(0) == nullptr) return;
 
-	const u8* tiles_offset = m_host_ram_ptr + (5 << 14);
+	const u8 *tiles_offset = m_host_ram_ptr + (5 << 14);
 	for (auto i = 0; i < 2; ++i)
 	{
 		gfx(i)->set_source(tiles_offset + ((m_tm_tile_base & 0x3f) << 8));

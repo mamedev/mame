@@ -38,11 +38,17 @@ void specnext_dma_device::write(u8 data)
 	}
 }
 
+
 void specnext_dma_device::device_start()
 {
 	z80dma_device::device_start();
 
-	//save_item(NAME());
+	save_item(NAME(m_dma_mode));
+}
+
+void specnext_dma_device::device_reset()
+{
+	m_dma_mode = 0;
 }
 
 // device type definition

@@ -9,9 +9,9 @@ class specnext_ula_device : public device_t, public device_gfx_interface
 public:
 	specnext_ula_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	void set_raster_offset(u16 offset_h,  u16 offset_v) { m_offset_h = offset_h; m_offset_v = offset_v; }
-	void set_host_ram_ptr(const u8 *host_ram_ptr) { m_host_ram_ptr = host_ram_ptr; }
-	void set_global_transparent(u16 global_transparent) { m_global_transparent = global_transparent; }
+	specnext_ula_device &set_raster_offset(u16 offset_h,  u16 offset_v) { m_offset_h = offset_h; m_offset_v = offset_v; return *this; }
+	specnext_ula_device &set_host_ram_ptr(const u8 *host_ram_ptr) { m_host_ram_ptr = host_ram_ptr; return *this; }
+	void set_global_transparent(u8 global_transparent) { m_global_transparent = global_transparent; }
 
 	void ulanext_en_w(bool ulanext_en) { m_ulanext_en = ulanext_en; }
 	void ulanext_format_w(u8 ulanext_format) { m_ulanext_format = ulanext_format; }
@@ -34,7 +34,7 @@ protected:
 private:
 	u16 m_offset_h, m_offset_v;
 	const u8 *m_host_ram_ptr;
-	u16 m_global_transparent;
+	u8 m_global_transparent;
 
 	bool m_ulanext_en;
 	u8 m_ulanext_format;

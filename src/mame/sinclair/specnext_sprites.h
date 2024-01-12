@@ -9,7 +9,7 @@ class specnext_sprites_device : public device_t, public device_gfx_interface
 public:
 	specnext_sprites_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	void set_raster_offset(u16 offset_h,  u16 offset_v) { m_offset_h = offset_h - OVER_BORDER; m_offset_v = offset_v - OVER_BORDER; }
+	specnext_sprites_device &set_raster_offset(u16 offset_h,  u16 offset_v) { m_offset_h = offset_h - OVER_BORDER; m_offset_v = offset_v - OVER_BORDER; return *this; }
 	void update_config();
 	void update_sprites_cache();
 	void draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

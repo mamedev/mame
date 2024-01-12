@@ -22,6 +22,8 @@ void specnext_layer2_device::draw(screen_device &screen, bitmap_ind16 &bitmap, c
 	if (!m_layer2_en || m_resolution != 0b00)
 		return;
 
+	const rgb_t gt0 = rgbexpand<3,3,3>((m_global_transparent << 1) | 0, 6, 3, 0);
+	const rgb_t gt1 = rgbexpand<3,3,3>((m_global_transparent << 1) | 1, 6, 3, 0);
 	const u16 pen_base = 0x400/* | (m_regs.nr_43_active_layer2_palette << 8)*/ | (m_palette_offset << 4);
 	for (u16 vpos = cliprect.top(); vpos <= cliprect.bottom(); vpos++)
 	{
@@ -32,7 +34,7 @@ void specnext_layer2_device::draw(screen_device &screen, bitmap_ind16 &bitmap, c
 		for (u16 hpos = cliprect.left(); hpos <= cliprect.right(); hpos++, pix++, scr++)
 		{
 			const u16 pen = pen_base + *scr;
-			if (palette().pen_color(pen) != m_global_transparent) // offst
+			if (palette().pen_color(pen) != gt0 && palette().pen_color(pen) != gt1)
 				*pix = pen;
 		}
 	}

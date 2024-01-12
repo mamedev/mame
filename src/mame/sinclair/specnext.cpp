@@ -67,8 +67,7 @@ public:
 		, m_view6(*this, "mem_view6")
 		, m_view7(*this, "mem_view7")
 		, m_ctc(*this, "ctc")
-		, m_z80dma(*this, "z80dma")
-		, m_zxndma(*this, "zxndma")
+		, m_dma(*this, "dma")
 		, m_eeprom(*this, "eeprom")
 		, m_sdcard(*this, "sdcard")
 		, m_centronics(*this, "centronics")
@@ -100,7 +99,8 @@ protected:
 	u8 reg_r(offs_t reg);
 	void reg_w(offs_t reg, u8 data);
 	void mmu_w(offs_t bank, u8 data);
-	void cpu_speed_w(u8 data);
+	u8 dma_r(bool dma_mode);
+	void dma_w(bool dma_mode, u8 data);
 	u8 spi_data_r();
 	void spi_data_w(u8 data);
 	void spi_miso_w(u8 data);
@@ -244,8 +244,7 @@ private:
 	memory_bank_array_creator<8> m_bank_ram;
 	memory_view m_view0, m_view1, m_view2, m_view3, m_view4, m_view5, m_view6, m_view7;
 	required_device<z80ctc_device> m_ctc;
-	required_device<specnext_dma_device> m_z80dma;
-	required_device<specnext_dma_device> m_zxndma;
+	required_device<specnext_dma_device> m_dma;
 	required_device<i2cmem_device> m_eeprom; // nvram
 	required_device<spi_sdcard_sdv2_device> m_sdcard;
 	required_device<centronics_device> m_centronics;
@@ -909,6 +908,18 @@ void specnext_state::mmu_w(offs_t bank, u8 data)
 {
 	m_mmu[bank] = data;
 	bank_update(bank);
+}
+
+u8 specnext_state::dma_r(bool dma_mode)
+{
+	m_dma->dma_mode_w(dma_mode);
+	return m_dma->read();
+}
+
+void specnext_state::dma_w(bool dma_mode, u8 data)
+{
+	m_dma->dma_mode_w(dma_mode);
+	m_dma->write(data);
 }
 
 u8 specnext_state::on_fetch_divmmc(offs_t offset)
@@ -1701,7 +1712,7 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		{
 			m_nr_4a_fallback_rgb = nr_wr_dat;
 			rgb_t fb = rgbexpand<3,3,3>((m_nr_4a_fallback_rgb << 1) | BIT(m_nr_4a_fallback_rgb, 1) | BIT(m_nr_4a_fallback_rgb, 0), 6, 3, 0);
-			m_palette->set_pen_color(UTM_FALLBACK_PEN, rgbexpand<3,3,3>(fb, 6, 3, 0));
+			m_palette->set_pen_color(UTM_FALLBACK_PEN, fb);
 		}
 		break;
 	case 0x4b:
@@ -1968,16 +1979,15 @@ void specnext_state::nr_07_cpu_speed_w(u8 data)
 {
 	m_nr_07_cpu_speed = data;
 	m_maincpu->set_clock_scale(1 << data);
-	m_z80dma->set_clock_scale(1 << data);
-	m_zxndma->set_clock_scale(1 << data);
+	m_dma->set_clock_scale(1 << data);
 }
 
 void specnext_state::nr_14_global_transparent_rgb_w(u8 data)
 {
 	m_nr_14_global_transparent_rgb = data;
 	m_global_transparent = (m_nr_14_global_transparent_rgb << 1) | BIT(m_nr_14_global_transparent_rgb, 1) | BIT(m_nr_14_global_transparent_rgb, 0);
-	m_ula->set_global_transparent(m_global_transparent);
-	m_layer2->set_global_transparent(m_global_transparent);
+	m_ula->set_global_transparent(data);
+	m_layer2->set_global_transparent(data);
 }
 
 void specnext_state::map_fetch(address_map &map)
@@ -2225,8 +2235,8 @@ void specnext_state::map_io(address_map &map)
 		, NAME([this](u8 data) { m_port_e3_reg = (m_port_e3_reg & 0x40) | data; bank_update(0); bank_update(1); }));
 	map(0x00eb, 0x00eb).mirror(0xff00).rw(FUNC(specnext_state::spi_data_r), FUNC(specnext_state::spi_data_w));
 
-	map(0x000b, 0x000b).mirror(0xff00).rw(m_z80dma, FUNC(specnext_dma_device::read), FUNC(specnext_dma_device::write));
-	map(0x006b, 0x006b).mirror(0xff00).rw(m_z80dma, FUNC(specnext_dma_device::read), FUNC(specnext_dma_device::write));
+	map(0x000b, 0x000b).mirror(0xff00).lrw8(NAME([this]() { return dma_r(1); }), NAME([this](u8 data) { dma_w(1, data); }));
+	map(0x006b, 0x006b).mirror(0xff00).lrw8(NAME([this]() { return dma_r(0); }), NAME([this](u8 data) { dma_w(0, data); }));
 
 	map(0x0bdf, 0x0bdf).mirror(0xf000).lr8(NAME([this]() -> u8 { return m_io_mouse[0]->read(); }));					// #fbdf
 	map(0x0fdf, 0x0fdf).mirror(0xf000).lr8(NAME([this]() -> u8 { return ~m_io_mouse[1]->read(); }));				// #ffdf
@@ -2305,7 +2315,7 @@ void specnext_state::reset_hard()
 
 	m_bootrom_en = 1;
 
-	// dma_mode= 0;
+	m_dma->dma_mode_w(0);
 	// nmi_mf = 0;
 	// nmi_divmmc = 0;
 	// nmi_expbus = 0;
@@ -2429,7 +2439,7 @@ void specnext_state::machine_reset()
 	m_port_ff_data = 0; // ???
 	m_divmmc_active = 0; // ???
 
-	//dma_mode  = 0;
+	m_dma->dma_mode_w(0);
 	//z80_retn_seen_28_d  = 0;
 	//im2_dma_delay  = 0;
 	m_pulse_int_n  = 1;
@@ -2696,7 +2706,7 @@ void specnext_state::video_start()
 		if (m_port_123b_layer2_map_wr_en)
 		{
 			const u8 type = m_port_123b_layer2_map_segment;
-			u8* to = m_ram->pointer() + 0x40000 + (layer2_active_bank() << 14);
+			u8 *to = m_ram->pointer() + 0x40000 + (layer2_active_bank() << 14);
 			if ((type < 3) && (offset < 0x4000))
 				to[offset + (type << 14)] = data;
 			else // if (type == 3)
@@ -2707,7 +2717,7 @@ void specnext_state::video_start()
 	{
 		if (nr_8c_altrom_en() && nr_8c_altrom_rw())
 		{
-			u8* altrom = m_ram->pointer() + ((0b00001100 | (m_sram_alt_128_n << 1)) << 13);
+			u8 *altrom = m_ram->pointer() + ((0b00001100 | (m_sram_alt_128_n << 1)) << 13);
 			altrom[offset] = data;
 		}
 	});
@@ -2718,7 +2728,7 @@ void specnext_state::tbblue(machine_config &config)
 	spectrum_128(config);
 	config.device_remove("exp");
 	// m_ram->set_default_size("1M").set_extra_options("2M");
-	m_ram->set_default_size("2M");
+	m_ram->set_default_size("2M").set_default_value(0);
 
 	Z80N(config.replace(), m_maincpu, X1_128_SINCLAIR / 10);
 	m_maincpu->set_m1_map(&specnext_state::map_fetch);
@@ -2734,19 +2744,12 @@ void specnext_state::tbblue(machine_config &config)
 	//m_ctc->zc_callback<0>().set(m_ctc, FUNC(z80ctc_device::trg1));
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	SPECNEXT_DMA(config, m_z80dma, X1_128_SINCLAIR / 10);
-	m_z80dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
-	m_z80dma->in_mreq_callback().set([this](offs_t offset) { return m_program.read_byte(offset); });
-	m_z80dma->out_mreq_callback().set([this](offs_t offset, u8 data) { m_program.write_byte(offset, data); });
-	m_z80dma->in_iorq_callback().set([this](offs_t offset) { return m_io.read_byte(offset); });
-	m_z80dma->out_iorq_callback().set([this](offs_t offset, u8 data) { m_io.write_byte(offset, data); });
-
-	SPECNEXT_DMA(config, m_zxndma, X1_128_SINCLAIR / 10);
-	m_zxndma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
-	m_zxndma->in_mreq_callback().set([this](offs_t offset) { return m_program.read_byte(offset); });
-	m_zxndma->out_mreq_callback().set([this](offs_t offset, u8 data) { m_program.write_byte(offset, data); });
-	m_zxndma->in_iorq_callback().set([this](offs_t offset) { return m_io.read_byte(offset); });
-	m_zxndma->out_iorq_callback().set([this](offs_t offset, u8 data) { m_io.write_byte(offset, data); });
+	SPECNEXT_DMA(config, m_dma, X1_128_SINCLAIR / 10);
+	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	m_dma->in_mreq_callback().set([this](offs_t offset) { return m_program.read_byte(offset); });
+	m_dma->out_mreq_callback().set([this](offs_t offset, u8 data) { m_program.write_byte(offset, data); });
+	m_dma->in_iorq_callback().set([this](offs_t offset) { return m_io.read_byte(offset); });
+	m_dma->out_iorq_callback().set([this](offs_t offset, u8 data) { m_io.write_byte(offset, data); });
 
 	ADDRESS_MAP_BANK(config, m_regs_map).set_map(&specnext_state::map_regs).set_options(ENDIANNESS_LITTLE, 8, 8, 0);
 
@@ -2761,22 +2764,25 @@ void specnext_state::tbblue(machine_config &config)
 
 	SPECNEXT_DIVMMC(config, m_divmmc, 0);
 
-	config.device_remove("palette");
-	PALETTE(config, m_palette, palette_device::BLACK, 512 * 4 + 1); // ulatm, l2s, +1 == fallback
+	PALETTE(config.replace(), m_palette, palette_device::BLACK, 512 * 4 + 1); // ulatm, l2s, +1 == fallback
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_tbblue);
 
-	SPECNEXT_ULA(config, m_ula, 0).set_raster_offset(SPEC_LEFT_BORDER, SPEC128_UNSEEN_LINES + SPEC_TOP_BORDER);
-	m_ula->set_palette(m_palette);
-	SPECNEXT_TILES(config, m_tiles, 0).set_raster_offset(SPEC_LEFT_BORDER, SPEC128_UNSEEN_LINES + SPEC_TOP_BORDER);
-	m_tiles->set_palette(m_palette);
-	SPECNEXT_LAYER2(config, m_layer2, 0).set_raster_offset(SPEC_LEFT_BORDER, SPEC128_UNSEEN_LINES + SPEC_TOP_BORDER);
-	m_layer2->set_palette(m_palette);
-	SPECNEXT_SPRITES(config, m_sprites, 0).set_raster_offset(SPEC_LEFT_BORDER, SPEC128_UNSEEN_LINES + SPEC_TOP_BORDER);
-	m_sprites->set_palette(m_palette);
+	SPECNEXT_ULA(config, m_ula, 0)
+		.set_raster_offset(SPEC_LEFT_BORDER, SPEC128_UNSEEN_LINES + SPEC_TOP_BORDER)
+		.set_palette(m_palette);
+	SPECNEXT_TILES(config, m_tiles, 0)
+		.set_raster_offset(SPEC_LEFT_BORDER, SPEC128_UNSEEN_LINES + SPEC_TOP_BORDER)
+		.set_palette(m_palette);
+	SPECNEXT_LAYER2(config, m_layer2, 0)
+		.set_raster_offset(SPEC_LEFT_BORDER, SPEC128_UNSEEN_LINES + SPEC_TOP_BORDER)
+		.set_palette(m_palette);
+	SPECNEXT_SPRITES(config, m_sprites, 0)
+		.set_raster_offset(SPEC_LEFT_BORDER, SPEC128_UNSEEN_LINES + SPEC_TOP_BORDER)
+		.set_palette(m_palette);
 
 	config.device_remove("snapshot");
 	// TODO: find the way to load after bootrom sent restart
-	//SNAPSHOT(config, "snapshot", "ach,frz,plusd,prg,sem,sit,sna,snp,snx,sp,z80,zx", attotime::never)
+	//SNAPSHOT(config.replace(), "snapshot", "ach,frz,plusd,prg,sem,sit,sna,snp,snx,sp,z80,zx", attotime::never)
 	//	.set_load_callback(FUNC(specnext_state::snapshot_cb));
 }
 

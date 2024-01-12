@@ -19,6 +19,8 @@ specnext_ula_device::specnext_ula_device(const machine_config &mconfig, const ch
 
 void specnext_ula_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bool flash)
 {
+	const rgb_t gt0 = rgbexpand<3,3,3>((m_global_transparent << 1) | 0, 6, 3, 0);
+	const rgb_t gt1 = rgbexpand<3,3,3>((m_global_transparent << 1) | 1, 6, 3, 0);
 	//m_host_ram_ptr + ((port_7ffd_shadow() ? 7 : 5) << 14);
 	const u8 *screen_location = m_host_ram_ptr + (5 << 14); // TODO +shadow
 	for (u16 vpos = cliprect.top(); vpos <= cliprect.bottom(); vpos++)
@@ -32,7 +34,7 @@ void specnext_ula_device::draw(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 		while (hpos <= cliprect.right())
 		{
-			u16 ink, pap;
+			u8 ink, pap;
 			if (m_ulap_en)
 			{
 				ink = ((*attr >> 3) & 0x18) | (*attr & 0x07);
@@ -51,7 +53,7 @@ void specnext_ula_device::draw(screen_device &screen, bitmap_ind16 &bitmap, cons
 			for (u8 b = (0x80 >> (x & 7)); b; b >>= 1, x++, hpos++, pix++)
 			{
 				const u16 pen = (pix8 & b) ? ink : pap;
-				if (palette().pen_color(pen) != m_global_transparent)
+				if (palette().pen_color(pen) != gt0 && palette().pen_color(pen) != gt1)
 					*pix = pen;
 			}
 			scr++;

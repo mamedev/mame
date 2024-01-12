@@ -11,8 +11,8 @@ class specnext_tiles_device : public device_t, public device_gfx_interface
 public:
 	specnext_tiles_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	void set_raster_offset(u16 offset_h,  u16 offset_v) { m_offset_h = offset_h - OVER_BORDER; m_offset_v = offset_v - OVER_BORDER; }
-	void set_host_ram_ptr(const u8 *host_ram_ptr) { m_host_ram_ptr = host_ram_ptr; }
+	specnext_tiles_device &set_raster_offset(u16 offset_h,  u16 offset_v) { m_offset_h = offset_h - OVER_BORDER; m_offset_v = offset_v - OVER_BORDER; return *this; }
+	specnext_tiles_device &set_host_ram_ptr(const u8 *host_ram_ptr) { m_host_ram_ptr = host_ram_ptr; return *this; }
 	void tilemap_update();
 
 	void control_w(u8 control) { m_control = control; tilemap_update(); }
@@ -42,7 +42,7 @@ protected:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
 	const u8 *m_host_ram_ptr;
-	const u8* m_tiles_info;
+	const u8 *m_tiles_info;
 	tilemap_t *m_tilemap[2];
 
 private:
