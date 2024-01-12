@@ -9,7 +9,7 @@ license:CC0-1.0
 	***********************************************************************************
 
 	-->
-	
+
 	<software name="user5" supported="no">
 		<description>User cartridge with 5 songs (Japan)</description>
 		<year>2008</year>
@@ -25,7 +25,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="jpop1" supported="no">
-		<description>Vol 1 -  J-Pop 1</description>
+		<description>Vol 1: J-Pop 1</description>
 		<year>2008</year>
 		<publisher>Takara Tomy</publisher>
 		<part name="cart" interface="ekara_cart">
@@ -39,7 +39,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="jpop2" supported="no">
-		<description>Vol 1 -  J-Pop 2</description>
+		<description>Vol 2: J-Pop 2</description>
 		<year>2008</year>
 		<publisher>Takara Tomy</publisher>
 		<part name="cart" interface="ekara_cart">
@@ -52,20 +52,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="vol4" supported="no">
-		<description>Vol 4</description>
+	<software name="anime1" supported="no">
+		<description>Vol 4: Anime 1</description>
 		<year>2008</year>
 		<publisher>Takara Tomy</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="bh0802001.u1" size="0x200000" crc="1294fbcc" sha1="aa68b6aeb497837f8fed595a3537f49a2a17dd11"/>
-				<!-- doesn't reach here for this set yet! (check why) -->
-				<!--
-				<rom size="1" value="0xf0" offset="0x95b8" loadflag="fill"/>
-				<rom size="1" value="0xd0" offset="0x95bd" loadflag="fill"/>
-				-->
+				<!-- temp patch to boot -->
+				<rom size="1" value="0xf0" offset="0x9412" loadflag="fill"/>
+				<rom size="1" value="0xd0" offset="0x9417" loadflag="fill"/>
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 </softwarelist>
