@@ -390,41 +390,6 @@ void taito_f3_state::device_post_load()
 
 /******************************************************************************/
 
-void taito_f3_state::print_debug_info(bitmap_rgb32 &bitmap)
-{
-#if (TAITOF3_VIDEO_DEBUG)
-	const u16 *line_ram = m_line_ram;
-	const u16* m_spriteram16_buffered = m_spriteram.target();
-	
-	popmessage("%04X %04X %04X %04X %04X %04X %04X %04X\n"
-			   "%04X %04X %04X %04X %04X %04X %04X %04X\n"
-			   "%04X %04X %04X %04X %04X %04X %04X %04X\n"
-			   "Ctr1: %04x %04x %04x %04x\n"
-			   "Ctr2: %04x %04x %04x %04x\n"
-			   "Colm: %04x %04x %04x %04x\n"
-			   "Clip: %04x %04x %04x %04x\n"
-			   "Sprt: %04x %04x %04x %04x\n"
-			   "Pivt: %04x %04x %04x %04x\n"
-			   "Zoom: %04x %04x %04x %04x\n"
-			   "Line: %04x %04x %04x %04x\n"
-			   "Pri : %04x %04x %04x %04x\n",
-			   m_spriteram16_buffered[0], m_spriteram16_buffered[1], m_spriteram16_buffered[2], m_spriteram16_buffered[3], m_spriteram16_buffered[4], m_spriteram16_buffered[5], m_spriteram16_buffered[6], m_spriteram16_buffered[7],
-			   m_spriteram16_buffered[8], m_spriteram16_buffered[9], m_spriteram16_buffered[10], m_spriteram16_buffered[11], m_spriteram16_buffered[12], m_spriteram16_buffered[13], m_spriteram16_buffered[14], m_spriteram16_buffered[15],
-			   m_spriteram16_buffered[16], m_spriteram16_buffered[17], m_spriteram16_buffered[18], m_spriteram16_buffered[19], m_spriteram16_buffered[20], m_spriteram16_buffered[21], m_spriteram16_buffered[22], m_spriteram16_buffered[23],
-			   line_ram[0x0100/2] & 0xffff, line_ram[0x0300/2] & 0xffff, line_ram[0x0500/2] & 0xffff, line_ram[0x0700/2] & 0xffff,
-			   line_ram[0x0900/2] & 0xffff, line_ram[0x0b00/2] & 0xffff, line_ram[0x0d00/2] & 0xffff, line_ram[0x0f00/2] & 0xffff,
-			   line_ram[0x4180/2] & 0xffff, line_ram[0x4380/2] & 0xffff, line_ram[0x4580/2] & 0xffff, line_ram[0x4780/2] & 0xffff,
-			   line_ram[0x5180/2] & 0xffff, line_ram[0x5380/2] & 0xffff, line_ram[0x5580/2] & 0xffff, line_ram[0x5780/2] & 0xffff,
-			   line_ram[0x6180/2] & 0xffff, line_ram[0x6380/2] & 0xffff, line_ram[0x6580/2] & 0xffff, line_ram[0x6780/2] & 0xffff,
-			   line_ram[0x7180/2] & 0xffff, line_ram[0x7380/2] & 0xffff, line_ram[0x7580/2] & 0xffff, line_ram[0x7780/2] & 0xffff,
-			   line_ram[0x8180/2] & 0xffff, line_ram[0x8380/2] & 0xffff, line_ram[0x8580/2] & 0xffff, line_ram[0x8780/2] & 0xffff,
-			   line_ram[0xa180/2] & 0xffff, line_ram[0xa380/2] & 0xffff, line_ram[0xa580/2] & 0xffff, line_ram[0xa780/2] & 0xffff,
-			   line_ram[0xb180/2] & 0xffff, line_ram[0xb380/2] & 0xffff, line_ram[0xb580/2] & 0xffff, line_ram[0xb780/2] & 0xffff);
-#endif
-}
-
-/******************************************************************************/
-
 template<unsigned Layer>
 TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info)
 {
@@ -505,7 +470,7 @@ TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info_pixel)
 void taito_f3_state::screen_vblank(int state)
 {
 	if (state) {
-		//get_sprite_info(m_spriteram.target());
+		//get_sprite_info();
 	}
 }
 
@@ -1329,8 +1294,10 @@ inline void taito_f3_state::f3_drawgfx(const tempsprite &sprite, const rectangle
 	}
 }
 
-void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
+void taito_f3_state::get_sprite_info()
 {
+	const u16 *spriteram16_ptr = m_spriteram.target();
+
 	struct sprite_axis
 	{
 		fixed8 block_scale = 1 << 8;
@@ -1499,19 +1466,19 @@ u32 taito_f3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 
 	bitmap.fill(0, cliprect);
 
-	/* Update sprite buffer */
-	//draw_sprites(bitmap, cliprect);
-
-	/* Draw final framebuffer */
-
-	scanline_draw_TWO(bitmap, cliprect);
-
-	// need to swap these to get more sprite lag sometimes ?
-	get_sprite_info(m_spriteram.target());
-	// draw sprite layers
-	draw_sprites(cliprect);
+	if (m_sprite_lag == 0) {
+		get_sprite_info();
+		draw_sprites(cliprect);
+		scanline_draw_TWO(bitmap, cliprect);
+	} else if (m_sprite_lag == 1) {
+		scanline_draw_TWO(bitmap, cliprect);
+		get_sprite_info();
+		draw_sprites(cliprect);
+	} else { // 2
+		scanline_draw_TWO(bitmap, cliprect);
+		draw_sprites(cliprect);
+		get_sprite_info();
+	}
 	
-	if (VERBOSE)
-		print_debug_info(bitmap);
 	return 0;
 }
