@@ -5,13 +5,18 @@
 
 Saitek Electronic Champion Backgammon
 
+NOTE: Before exiting MAME, change the power switch from GO to STOP. Otherwise,
+NVRAM won't save properly.
+
 Hardware notes:
 - PCB label: GT4-PE-009
 - Hitachi HD6301Y0P @ ~4MHz (no XTAL)
-- LCD with custom segments, 24 LEDs, piezo
+- LCD with custom segments
+- 24 LEDs, 13*2 buttons sensor board, piezo
 
 TODO:
-- everything
+- if/when MAME supports an exit callback, hook up power-off switch to that
+- sensorboard, lcd, internal artwork
 
 *******************************************************************************/
 
@@ -43,8 +48,11 @@ public:
 
 	void ecbackg(machine_config &config);
 
+	DECLARE_INPUT_CHANGED_MEMBER(power_off);
+
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override { m_power = true; }
 
 private:
 	// devices/pointers
@@ -54,7 +62,10 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<5> m_inputs;
 
-	u8 m_but_mux = 0;
+	bool m_power = false;
+	u8 m_inp_mux = 0;
+
+	void init_board(int state);
 
 	// I/O handlers
 	void p1_w(u8 data);
@@ -70,9 +81,18 @@ private:
 void ecbackg_state::machine_start()
 {
 	// register for savestates
-	save_item(NAME(m_but_mux));
+	save_item(NAME(m_inp_mux));
 }
 
+void ecbackg_state::init_board(int state)
+{
+}
+
+INPUT_CHANGED_MEMBER(ecbackg_state::power_off)
+{
+	if (newval)
+		m_power = false;
+}
 
 
 /*******************************************************************************
@@ -93,15 +113,22 @@ void ecbackg_state::p1_w(u8 data)
 
 u8 ecbackg_state::p2_r()
 {
-	// P24: P57
-
 	//printf("r2 ");
-	return 0xff;
+
+	// P27: power switch state
+	u8 data = m_power ? 0 : 0x80;
+
+	// P24: P57
+	data |= ~p5_r() >> 3 & 0x10;
+	return ~data;
 }
 
 void ecbackg_state::p2_w(u8 data)
 {
 	//printf("w2_%X ",data);
+
+	// P20-P22: led select
+	m_display->write_my(~data & 7);
 
 	// P23: speaker out
 	m_dac->write(BIT(data, 3));
@@ -124,7 +151,7 @@ u8 ecbackg_state::p5_r()
 
 	// read buttons
 	for (int i = 0; i < 5; i++)
-		if (BIT(m_but_mux, i))
+		if (BIT(bitswap<5>(m_inp_mux,6,5,4,3,0), i))
 			data |= m_inputs[i]->read();
 
 	return ~data;
@@ -132,8 +159,9 @@ u8 ecbackg_state::p5_r()
 
 void ecbackg_state::p6_w(u8 data)
 {
-	// P60,P63-P66: button mux
-	m_but_mux = (~data >> 2 & 0x1e) | (~data & 1);
+	// P60-P67: input mux, led data
+	m_inp_mux = ~data;
+	m_display->write_mx(~data);
 
 	//printf("w6_%X ",data);
 }
@@ -176,6 +204,9 @@ static INPUT_PORTS_START( ecbackg )
 
 	PORT_START("IN.4")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_0) // new game
+
+	PORT_START("POWER") // needs to be triggered for nvram to work
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, ecbackg_state, power_off, 0) PORT_NAME("Stop")
 INPUT_PORTS_END
 
 
@@ -201,11 +232,14 @@ void ecbackg_state::ecbackg(machine_config &config)
 	m_maincpu->out_p7_cb().set(FUNC(ecbackg_state::p7_w));
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
+	m_board->init_cb().set(FUNC(ecbackg_state::init_board));
+	m_board->set_size(13, 10);
+	m_board->set_spawnpoints(2);
 	m_board->set_delay(attotime::from_msec(150));
-	//m_board->set_nvram_enable(true);
+	m_board->set_nvram_enable(true);
 
 	// video hardware
-	PWM_DISPLAY(config, m_display).set_size(4, 6);
+	PWM_DISPLAY(config, m_display).set_size(3, 8);
 	//config.set_default_layout(layout_saitek_ecbackg);
 
 	// sound hardware
