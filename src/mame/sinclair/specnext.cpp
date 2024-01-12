@@ -712,17 +712,17 @@ void specnext_state::memory_change(u16 port, u8 data)
 	{
 		if (port_1ffd_special())
 		{
-			LOGWARN("extended memory paging: \n");
-/*
-			MMU0 <= X"0" & (m_port_1ffd_data(2) || m_port_1ffd_data(1)) & "00" & 0;
-			MMU1 <= X"0" & (m_port_1ffd_data(2) || m_port_1ffd_data(1)) & "00" & '1';
-			MMU2 <= X"0" & (m_port_1ffd_data(2) || m_port_1ffd_data(1)) & (m_port_1ffd_data(2) && m_port_1ffd_data(1)) & '1' & 0;
-			MMU3 <= X"0" & (m_port_1ffd_data(2) || m_port_1ffd_data(1)) & (m_port_1ffd_data(2) && m_port_1ffd_data(1)) & '1' & '1';
-			MMU4 <= X"0" & (m_port_1ffd_data(2) || m_port_1ffd_data(1)) & "10" & 0;
-			MMU5 <= X"0" & (m_port_1ffd_data(2) || m_port_1ffd_data(1)) & "10" & '1';
-			MMU6 <= X"0" & (not(m_port_1ffd_data(2)) && m_port_1ffd_data(1)) & "11" & 0;
-			MMU7 <= X"0" & (not(m_port_1ffd_data(2)) && m_port_1ffd_data(1)) & "11" & '1';
-*/
+			u8 b3 = (BIT(m_port_1ffd_data, 2) || BIT(m_port_1ffd_data, 1)) << 3;
+			mmu_w(0, b3 | 0b000);
+			mmu_w(1, b3 | 0b001);
+			const u8 b2 = (BIT(m_port_1ffd_data, 2) && BIT(m_port_1ffd_data, 1)) << 2;
+			mmu_w(2, b3 | b2 | 0b10);
+			mmu_w(3, b3 | b2 | 0b11);
+			mmu_w(4, b3 | 0b100);
+			mmu_w(5, b3 | 0b101);
+			b3 = (BIT(~m_port_1ffd_data, 2) && BIT(m_port_1ffd_data, 1)) << 3;
+			mmu_w(6, b3 | 0b110);
+			mmu_w(7, b3 | 0b111);
 		}
 		else
 		{
@@ -1306,7 +1306,10 @@ u8 specnext_state::reg_r(offs_t nr_register)
 		port_253b_dat = m_nr_c3_retn_address_msb;
 		break;
 	case 0xc4:
-		port_253b_dat = (m_nr_c4_int_en_0_expbus << 7) | (0b00000 << 2);// | ula_int_en;
+		{
+			const u8 ula_int_en = (m_nr_22_line_interrupt_en << 1) | 0;//!m_port_ff_interrupt_disable;
+			port_253b_dat = (m_nr_c4_int_en_0_expbus << 7) | (0b00000 << 2) | ula_int_en;
+		}
 		break;
 	case 0xc5:
 		port_253b_dat = 0;//ctc_int_en;
@@ -1552,7 +1555,7 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		default:
 			nr_18_layer2_clip_y2_w(nr_wr_dat);
 		}
-		m_nr_18_layer2_clip_idx = m_nr_18_layer2_clip_idx + 1;
+		++m_nr_18_layer2_clip_idx &= 0x03;
 		break;
 	case 0x19:
 		switch (m_nr_19_sprite_clip_idx)
@@ -1569,7 +1572,7 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		default:
 			nr_19_sprite_clip_y2_w(nr_wr_dat);
 		}
-		m_nr_19_sprite_clip_idx = m_nr_19_sprite_clip_idx + 1;
+		++m_nr_19_sprite_clip_idx &= 0x03;
 		break;
 	case 0x1a:
 		switch (m_nr_1a_ula_clip_idx)
@@ -1586,7 +1589,7 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		default:
 			nr_1a_ula_clip_y2_w(nr_wr_dat);
 		}
-		m_nr_1a_ula_clip_idx = m_nr_1a_ula_clip_idx + 1;
+		++m_nr_1a_ula_clip_idx &= 0x03;
 		break;
 	case 0x1b:
 		switch (m_nr_1b_tm_clip_idx)
@@ -1603,7 +1606,7 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		default:
 			nr_1b_tm_clip_y2_w(nr_wr_dat);
 		}
-		m_nr_1b_tm_clip_idx = m_nr_1b_tm_clip_idx + 1;
+		++m_nr_1b_tm_clip_idx &= 0x03;
 		break;
 	case 0x1c:
 		if (BIT(nr_wr_dat, 0) == 1)
@@ -1680,7 +1683,7 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 	case 0x41:
 		palette_val_w((nr_wr_dat << 1) | BIT(nr_wr_dat, 1) | BIT(nr_wr_dat, 0));
 		if (m_nr_43_palette_autoinc_disable == 0)
-			m_nr_palette_idx = m_nr_palette_idx + 1;
+			++m_nr_palette_idx;
 		m_nr_palette_sub_idx = 0;
 		break;
 	case 0x42:
@@ -1704,7 +1707,7 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 			palette_val_w((m_nr_stored_palette_value << 1) | BIT(nr_wr_dat, 0));
 			m_nr_palette_priority = 0b00;
 			if (m_nr_43_palette_autoinc_disable == 0)
-				m_nr_palette_idx = m_nr_palette_idx + 1;
+				++m_nr_palette_idx;
 		}
 		m_nr_palette_sub_idx = !m_nr_palette_sub_idx;
 		break;
@@ -1730,7 +1733,7 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		//nr_copper_write_8 <= '1';
 		if (BIT(m_nr_copper_addr, 0) == 0)
 			m_nr_copper_data_stored = nr_wr_dat;
-		m_nr_copper_addr = m_nr_copper_addr + 1;
+		++m_nr_copper_addr;
 		break;
 	case 0x61:
 		m_nr_copper_addr = (m_nr_copper_addr & ~0x00ff) | nr_wr_dat;
@@ -1743,7 +1746,7 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		//nr_copper_we <= '1';
 		if (BIT(m_nr_copper_addr, 0) == 0)
 			m_nr_copper_data_stored = nr_wr_dat;
-		m_nr_copper_addr = m_nr_copper_addr + 1;
+		++m_nr_copper_addr;
 		break;
 	case 0x64:
 		m_nr_64_copper_offset = nr_wr_dat;

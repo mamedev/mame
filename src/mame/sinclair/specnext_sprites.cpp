@@ -85,6 +85,9 @@ void specnext_sprites_device::draw(screen_device &screen, bitmap_ind16 &bitmap, 
 	}
 }
 
+/* The cache only stores visible sprites.
+  Sprites becomes visible only it's anchor(+v), or relative(+v) to visible anchor.
+*/
 void specnext_sprites_device::update_sprites_cache()
 {
 	m_sprites_cache.reserve(128);
@@ -98,7 +101,7 @@ void specnext_sprites_device::update_sprites_cache()
 		bool is_visible = BIT(sprite_attr[3], 7);
 
 		if (spr_relative)
-			is_visible &= anchor_vis;
+			is_visible &= anchor_vis; // skip relative unless visible anchor is found
 		else
 			anchor_vis = is_visible;
 
@@ -106,10 +109,7 @@ void specnext_sprites_device::update_sprites_cache()
 		{
 			u8 spr_cur_attr[5] = {};
 			if (!spr_relative) // Anchor
-			{
 				memcpy(spr_cur_attr, sprite_attr, 5);
-				anchor = &m_sprites_cache.back() + 1;
-			}
 			else
 			{
 				const u8 spr_rel_x0 = anchor->rotate ? sprite_attr[1] : sprite_attr[0];
@@ -157,6 +157,8 @@ void specnext_sprites_device::update_sprites_cache()
 				spr_cur.pattern = (spr_cur.pattern << 1) | spr_cur_n6;
 
 			m_sprites_cache.push_back(spr_cur);
+			if (!spr_relative)
+				anchor = &m_sprites_cache.back();
 		}
 	}
 }
