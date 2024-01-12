@@ -280,11 +280,13 @@ protected:
 
 	// I/O handlers
 	u16 read_inputs();
+	void update_inputs();
 	void update_display();
 	void update_sound();
 	u8 speech_r(offs_t offset);
 
 	u8 pia0_read(offs_t offset);
+	void pia0_write(offs_t offset, u8 data);
 	void pia0_pa_w(u8 data);
 	void pia0_pb_w(u8 data);
 	u8 pia0_pa_r();
@@ -366,6 +368,16 @@ u16 csc_state::read_inputs()
 	return ~data;
 }
 
+void csc_state::update_inputs()
+{
+	// PIA 0 CA1/CB1: button row 6/7
+	if (!machine().side_effects_disabled())
+	{
+		m_pia[0]->ca1_w(BIT(read_inputs(), 6));
+		m_pia[0]->cb1_w(BIT(read_inputs(), 7));
+	}
+}
+
 void csc_state::update_display()
 {
 	// 7442 0-8: led select (also input mux)
@@ -389,14 +401,14 @@ u8 csc_state::speech_r(offs_t offset)
 
 u8 csc_state::pia0_read(offs_t offset)
 {
-	// CA1/CB1: button row 6/7
-	if (!machine().side_effects_disabled())
-	{
-		m_pia[0]->ca1_w(BIT(read_inputs(), 6));
-		m_pia[0]->cb1_w(BIT(read_inputs(), 7));
-	}
-
+	update_inputs();
 	return m_pia[0]->read(offset);
+}
+
+void csc_state::pia0_write(offs_t offset, u8 data)
+{
+	update_inputs();
+	m_pia[0]->write(offset, data);
 }
 
 u8 csc_state::pia0_pa_r()
@@ -495,7 +507,7 @@ void csc_state::csc_map(address_map &map)
 	map(0x0000, 0x07ff).mirror(0x4000).ram();
 	map(0x0800, 0x0bff).mirror(0x4400).ram();
 	map(0x1000, 0x1003).mirror(0x47fc).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1800, 0x1803).mirror(0x47fc).w(m_pia[0], FUNC(pia6821_device::write)).r(FUNC(csc_state::pia0_read));
+	map(0x1800, 0x1803).mirror(0x47fc).rw(FUNC(csc_state::pia0_read), FUNC(csc_state::pia0_write));
 	map(0x2000, 0x3fff).mirror(0x4000).rom();
 	map(0xa000, 0xafff).mirror(0x1000).rom();
 	map(0xc000, 0xffff).rom();
