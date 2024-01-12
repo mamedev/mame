@@ -57,7 +57,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="jpop1" supported="no">
-		<description>Vol 1: J-Pop 1</description>
+		<description>Vol 1: J-Pop 1 (Japan)</description>
 		<year>2008</year>
 		<publisher>Takara Tomy</publisher>
 		<part name="cart" interface="ekara_cart">
@@ -71,7 +71,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="jpop2" supported="no">
-		<description>Vol 2: J-Pop 2</description>
+		<description>Vol 2: J-Pop 2 (Japan)</description>
 		<year>2008</year>
 		<publisher>Takara Tomy</publisher>
 		<part name="cart" interface="ekara_cart">
@@ -85,7 +85,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="anime1" supported="no">
-		<description>Vol 4: Anime 1</description>
+		<description>Vol 4: Anime 1 (Japan)</description>
 		<year>2008</year>
 		<publisher>Takara Tomy</publisher>
 		<part name="cart" interface="ekara_cart">
