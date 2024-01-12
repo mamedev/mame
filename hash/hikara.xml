@@ -10,8 +10,11 @@ license:CC0-1.0
 
 	-->
 
+	<!-- User cartridges are advertised as 'prepaid' and come in 5,10, or 20 song capacity for the user to download songs to.
+         The service is no longer available.
+	-->
 	<software name="user5" supported="no">
-		<description>User cartridge with 5 songs (Japan)</description>
+		<description>Hi-kara 5-song capacity user cartridge (used, with 5 songs) (Japan)</description>
 		<year>2008</year>
 		<publisher>Takara Tomy</publisher>
 		<part name="cart" interface="ekara_cart">
