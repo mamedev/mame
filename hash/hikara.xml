@@ -8,6 +8,35 @@ license:CC0-1.0
 
 	***********************************************************************************
 
+	cartridge pinout
+
+	01 | NC                         27 | GND
+	02 | connects to 13             28 | NC
+	03 | A15                        29 | NC
+	04 | A14                        30 | NC
+	05 | A13                        31 | NC
+	06 | A12                        32 | VCC
+	07 | A11                        33 | D07
+	08 | A10                        34 | D06
+	09 | A09                        35 | D05
+	10 | A08                        36 | D04
+	11 | A07                        37 | D03
+	12 | A06                        38 | D02
+	13 | connects to 02             39 | D01
+	14 | CE                         40 | D00
+	15 | A05                        41 | GND
+	16 | A04                        42 | WE
+	17 | A03                        43 | OE
+	18 | A02                        44 | VCC
+	19 | A01                        45 | NC
+	20 | A00                        46 | A22
+	21 | VCC                        47 | A21
+	22 | NC                         48 | A20
+	23 | NC                         49 | A19
+	24 | NC                         50 | A18
+	25 | NC                         51 | A17
+	26 | GND                        52 | A16
+
 	-->
 
 	<!-- User cartridges are advertised as 'prepaid' and come in 5,10, or 20 song capacity for the user to download songs to.
