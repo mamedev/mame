@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:
 
 #include "emu.h"
 #include "upd777.h"
@@ -812,63 +812,163 @@ void upd777_cpu_device::do_op()
 		set_sme(s);
 		set_a11(n);
 	}
+	else if (inst == 0b0000'0000'0000)
+	{
+		// 000 No Operation
+		// nothing
+	}
+	else if (inst == 0b0000'0000'0100)
+	{
+		// 004 Skip if (Gun Port Latch) = 1
+		LOGMASKED(LOG_UNHANDLED_OPS, "GPL\n");
+	}
+	else if (inst == 0b0000'0000'1000)
+	{
+		// 008 Move H[5:1] to Line Buffer Register[5:1]
+		u8 h = get_h();
+		//LOGMASKED(LOG_UNHANDLED_OPS, "H(%02x)->NRM\n", h);
+
+		// this seems to push a value from RAM into the line buffer for the current 4(?) scanlines
+		u8 m1 = read_data_mem(get_h_shifted() | 0);
+		u8 m2 = read_data_mem(get_h_shifted() | 1);
+		u8 m3 = read_data_mem(get_h_shifted() | 2);
+		u8 m4 = read_data_mem(get_h_shifted() | 3);
+		push_to_line_buffer(h, m1,m2,m3,m4);
+	}
+	else if (inst == 0b0000'0001'1000)
+	{
+		// 018 H[5:1]<->X4[5:1], 0->X4[7:6], 0->X3[7:1], 0->X1'[1], 0->A1'[1], L[2:1]<->L'[2:1]
+		LOGMASKED(LOG_UNHANDLED_OPS, "H<->X\n");
+#if 1
+		// this opcode is not well explained! but X4 etc. are referenced on Data RAM & Register Files which makes
+		// it even more confusing (while L' isn't referenced anywhere else at all!)
+		u8 temp;
+
+		temp = m_x4;
+		m_x4 = get_h();
+		m_h = temp;
+
+		temp = m_ldash;
+		m_ldash = get_l();
+		set_l(temp);
+#endif
+	}
+	else if (inst == 0b0000'0010'0000)
+	{
+		// 020 Subroutine End, Pop down address stack
+		u16 addr = pull_from_stack();
+		set_new_pc(addr);
+	}
+	else if (inst == 0b0000'0100'1001)
+	{
+		// 049 Skip if (4H Horizontal Blank) = 1
+		//LOGMASKED(LOG_UNHANDLED_OPS, "4H BLK\n");
+		if (get_hbl_4_state())
+			m_skip = 1;
+	}
+	else if (inst == 0b0000'0100'1010)
+	{
+		// 04a Skip if (Vertical Blank) = 1, 0->M[[18:00],[3]][1]
+		//LOGMASKED(LOG_UNHANDLED_OPS, "VBLK\n");
+		if (get_vbl_state())
+			m_skip = 1;
+
+		// need to do the 0->M[[18:00],[3]][1] bit
+	}
+	else if (inst == 0b0000'0100'1100)
+	{
+		// 04c Skip if (GP&SW/ input) = 1
+		LOGMASKED(LOG_UNHANDLED_OPS, "GPSW/\n");
+	}
+	else if (inst == 0b0000'0101'0100)
+	{
+		// 054 Move (A4[7:1],A3[7:1],A2[7:1],A1[7:1]) to M[H[5:1]][28:1]
+		write_data_mem(get_h_shifted() | 0, get_a1());
+		write_data_mem(get_h_shifted() | 1, get_a2());
+		write_data_mem(get_h_shifted() | 2, get_a3());
+		write_data_mem(get_h_shifted() | 3, get_a4());
+	}
+	else if (inst == 0b0000'0101'1000)
+	{
+		// 058 Move M[H[5:1]][28:1] to (A4[7:1],A3[7:1],A2[7:1],A1[7:1])
+		u8 m1 = read_data_mem(get_h_shifted() | 0);
+		u8 m2 = read_data_mem(get_h_shifted() | 1);
+		u8 m3 = read_data_mem(get_h_shifted() | 2);
+		u8 m4 = read_data_mem(get_h_shifted() | 3);
+		set_a1(m1);
+		set_a2(m2);
+		set_a3(m3);
+		set_a4(m4);
+	}
+	else if (inst == 0b0000'0101'1100)
+	{
+		// 05c Exchange (A4[7:1],A3[7:1],A2[7:1],A1[7:1]) and M[H[5:1]][28:1]
+		u8 m1 = read_data_mem(get_h_shifted() | 0);
+		u8 m2 = read_data_mem(get_h_shifted() | 1);
+		u8 m3 = read_data_mem(get_h_shifted() | 2);
+		u8 m4 = read_data_mem(get_h_shifted() | 3);
+		write_data_mem(get_h_shifted() | 0, get_a1());
+		write_data_mem(get_h_shifted() | 1, get_a2());
+		write_data_mem(get_h_shifted() | 2, get_a3());
+		write_data_mem(get_h_shifted() | 3, get_a4());
+		set_a1(m1);
+		set_a2(m2);
+		set_a3(m3);
+		set_a4(m4);
+	}
+	else if (inst == 0b0000'0110'0000)
+	{
+		// 060 Subroutine End, Pop down address stack, Skip
+		u16 addr = pull_from_stack();
+		set_new_pc(addr);
+		m_skip = 1;
+	}
+	else if (inst == 0b0011'0000'1000)
+	{
+		// 308 Move A1[7:1] to FLS[7:1], 0->L[2:1]
+		u8 a1 = get_a1();
+		set_fls(a1);
+		set_l(0);
+	}
+	else if (inst == 0b0011'0100'1000)
+	{
+		// 348 Move A2[7:1] to FLS[7:1], 0->L[2:1]
+		u8 a2 = get_a2();
+		set_fls(a2);
+		set_l(0);
+	}
+	else if (inst == 0b0011'1000'1000)
+	{
+		// 388 Move M[H[5:1],L[2:1]][7:1] to FLS[7:1], 0->L[2:1]
+		u8 m = get_m_data();
+		set_fls(m);
+		set_l(0);
+	}
+	else if (inst == 0b0011'0000'1001)
+	{
+		// 309 Move A1[7:1] to FRS[7:1], 1->L[2:1]
+		u8 a1 = get_a1();
+		set_frs(a1);
+		set_l(1);
+	}
+	else if (inst == 0b0011'0100'1001)
+	{
+		// 349 Move A2[7:1] to FRS[7:1], 1->L[2:1]
+		u8 a2 = get_a2();
+		set_frs(a2);
+		set_l(1);
+	}
+	else if (inst == 0b0011'1000'1001)
+	{
+		// 389 Move M[H[5:1],L[2:1]][7:1] to FRS[7:1], 1->L[2:1]
+		u8 m = get_m_data();
+		set_frs(m);
+		set_l(1);
+	}
 	else
 	{
 		switch (inst)
 		{
-		case 0b0000'0000'0000:
-		{
-			// 000 No Operation
-			// nothing
-			break;
-		}
-		case 0b0000'0000'0100:
-		{
-			// 004 Skip if (Gun Port Latch) = 1
-			LOGMASKED(LOG_UNHANDLED_OPS, "GPL\n");
-			break;
-		}
-		case 0b0000'0000'1000:
-		{
-			// 008 Move H[5:1] to Line Buffer Register[5:1]
-			u8 h = get_h();
-			//LOGMASKED(LOG_UNHANDLED_OPS, "H(%02x)->NRM\n", h);
-
-			// this seems to push a value from RAM into the line buffer for the current 4(?) scanlines
-			u8 m1 = read_data_mem(get_h_shifted() | 0);
-			u8 m2 = read_data_mem(get_h_shifted() | 1);
-			u8 m3 = read_data_mem(get_h_shifted() | 2);
-			u8 m4 = read_data_mem(get_h_shifted() | 3);
-			push_to_line_buffer(h, m1,m2,m3,m4);
-
-			break;
-		}
-		case 0b0000'0001'1000:
-		{
-			// 018 H[5:1]<->X4[5:1], 0->X4[7:6], 0->X3[7:1], 0->X1'[1], 0->A1'[1], L[2:1]<->L'[2:1]
-			LOGMASKED(LOG_UNHANDLED_OPS, "H<->X\n");
-#if 1
-			// this opcode is not well explained! but X4 etc. are referenced on Data RAM & Register Files which makes
-			// it even more confusing (while L' isn't referenced anywhere else at all!)
-			u8 temp;
-
-			temp = m_x4;
-			m_x4 = get_h();
-			m_h = temp;
-
-			temp = m_ldash;
-			m_ldash = get_l();
-			set_l(temp);
-#endif
-			break;
-		}
-		case 0b0000'0010'0000:
-		{
-			// 020 Subroutine End, Pop down address stack
-			u16 addr = pull_from_stack();
-			set_new_pc(addr);
-			break;
-		}
 		case 0b0000'0010'1000: case 0b0000'0010'1001:
 		{
 			// 028 Shift STB[4:1], N->STB[1]
@@ -899,133 +999,12 @@ void upd777_cpu_device::do_op()
 			LOGMASKED(LOG_UNHANDLED_OPS, "PD%d %sJ\n", which + 1, inv ? "/" : "");
 			break;
 		}
-		case 0b0000'0100'1001:
-		{
-			// 049 Skip if (4H Horizontal Blank) = 1
-			//LOGMASKED(LOG_UNHANDLED_OPS, "4H BLK\n");
-			if (get_hbl_4_state())
-				m_skip = 1;
-			break;
-		}
-		case 0b0000'0100'1010:
-		{
-			// 04a Skip if (Vertical Blank) = 1, 0->M[[18:00],[3]][1]
-			//LOGMASKED(LOG_UNHANDLED_OPS, "VBLK\n");
-			if (get_vbl_state())
-				m_skip = 1;
 
-			// need to do the 0->M[[18:00],[3]][1] bit
-
-			break;
-		}
-		case 0b0000'0100'1100:
-		{
-			// 04c Skip if (GP&SW/ input) = 1
-			LOGMASKED(LOG_UNHANDLED_OPS, "GPSW/\n");
-			break;
-		}
-		case 0b0000'0101'0100:
-		{
-			// 054 Move (A4[7:1],A3[7:1],A2[7:1],A1[7:1]) to M[H[5:1]][28:1]
-			write_data_mem(get_h_shifted() | 0, get_a1());
-			write_data_mem(get_h_shifted() | 1, get_a2());
-			write_data_mem(get_h_shifted() | 2, get_a3());
-			write_data_mem(get_h_shifted() | 3, get_a4());
-			break;
-		}
-		case 0b0000'0101'1000:
-		{
-			// 058 Move M[H[5:1]][28:1] to (A4[7:1],A3[7:1],A2[7:1],A1[7:1])
-			u8 m1 = read_data_mem(get_h_shifted() | 0);
-			u8 m2 = read_data_mem(get_h_shifted() | 1);
-			u8 m3 = read_data_mem(get_h_shifted() | 2);
-			u8 m4 = read_data_mem(get_h_shifted() | 3);
-			set_a1(m1);
-			set_a2(m2);
-			set_a3(m3);
-			set_a4(m4);
-			break;
-		}
-		case 0b0000'0101'1100:
-		{
-			// 05c Exchange (A4[7:1],A3[7:1],A2[7:1],A1[7:1]) and M[H[5:1]][28:1]
-			u8 m1 = read_data_mem(get_h_shifted() | 0);
-			u8 m2 = read_data_mem(get_h_shifted() | 1);
-			u8 m3 = read_data_mem(get_h_shifted() | 2);
-			u8 m4 = read_data_mem(get_h_shifted() | 3);
-			write_data_mem(get_h_shifted() | 0, get_a1());
-			write_data_mem(get_h_shifted() | 1, get_a2());
-			write_data_mem(get_h_shifted() | 2, get_a3());
-			write_data_mem(get_h_shifted() | 3, get_a4());
-			set_a1(m1);
-			set_a2(m2);
-			set_a3(m3);
-			set_a4(m4);
-			break;
-		}
-		case 0b0000'0110'0000:
-		{
-			// 060 Subroutine End, Pop down address stack, Skip
-			u16 addr = pull_from_stack();
-			set_new_pc(addr);
-			m_skip = 1;
-			break;
-		}
 		case 0b0011'0000'0000: case 0b0011'0000'0001: case 0b0011'0000'0010: case 0b0011'0000'0011:
 		{
 			// 300 N->L[2:1]
 			const int n = inst & 0x3;
 			set_l(n);
-			break;
-		}
-
-		case 0b0011'0000'1000:
-		{
-			// 308 Move A1[7:1] to FLS[7:1], 0->L[2:1]
-			u8 a1 = get_a1();
-			set_fls(a1);
-			set_l(0);
-			break;
-		}
-		case 0b0011'0100'1000:
-		{
-			// 348 Move A2[7:1] to FLS[7:1], 0->L[2:1]
-			u8 a2 = get_a2();
-			set_fls(a2);
-			set_l(0);
-			break;
-		}
-		case 0b0011'1000'1000:
-		{
-			// 388 Move M[H[5:1],L[2:1]][7:1] to FLS[7:1], 0->L[2:1]
-			u8 m = get_m_data();
-			set_fls(m);
-			set_l(0);
-			break;
-		}
-
-		case 0b0011'0000'1001:
-		{
-			// 309 Move A1[7:1] to FRS[7:1], 1->L[2:1]
-			u8 a1 = get_a1();
-			set_frs(a1);
-			set_l(1);
-			break;
-		}
-		case 0b0011'0100'1001:
-		{
-			// 349 Move A2[7:1] to FRS[7:1], 1->L[2:1]
-			u8 a2 = get_a2();
-			set_frs(a2);
-			set_l(1);
-			break;
-		}
-		case 0b0011'1000'1001:
-		{
-			// 389 Move M[H[5:1],L[2:1]][7:1] to FRS[7:1], 1->L[2:1]
-			u8 m = get_m_data();
-			set_frs(m);
-			set_l(1);
 			break;
 		}
 

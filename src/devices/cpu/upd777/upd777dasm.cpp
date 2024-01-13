@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:
 
 #include "emu.h"
 #include "upd777dasm.h"
@@ -364,40 +364,100 @@ offs_t upd777_disassembler::disassemble(std::ostream &stream, offs_t pc, const u
 		const int n = inst & 0x1;
 		util::stream_format(stream, "%d->D, %d->G, %d->K, %d->S, %d->A11", d, g, k, s, n);
 	}
+	else if (inst == 0b0000'0000'0000)
+	{
+		// 000 No Operation
+		util::stream_format(stream, "NOP");
+	}
+	else if (inst == 0b0000'0000'0100)
+	{
+		// 004 Skip if (Gun Port Latch) = 1
+		util::stream_format(stream, "GPL");
+	}
+	else if (inst == 0b0000'0000'1000)
+	{
+		// 008 Move H[5:1] to Line Buffer Register[5:1]
+		util::stream_format(stream, "H->NRM");
+	}
+	else if (inst == 0b0000'0001'1000)
+	{
+		// 018 H[5:1]<->X4[5:1], 0->X4[7:6], 0->X3[7:1], 0->X1'[1], 0->A1'[1], L[2:1]<->L'[2:1]
+		util::stream_format(stream, "H<->X");
+	}
+	else if (inst == 0b0000'0010'0000)
+	{
+		// 020 Subroutine End, Pop down address stack
+		util::stream_format(stream, "SRE");
+	}
+	else if (inst == 0b0000'0100'1001)
+	{
+		// 049 Skip if (4H Horizontal Blank) = 1
+		util::stream_format(stream, "4H BLK");
+	}
+	else if (inst == 0b0000'0100'1010)
+	{
+		// 04a Skip if (Vertical Blank) = 1, 0->M[[18:00],[3]][1]
+		util::stream_format(stream, "VBLK");
+	}
+	else if (inst == 0b0000'0100'1100)
+	{
+		// 04c Skip if (GP&SW/ input) = 1
+		util::stream_format(stream, "GPSW/");
+	}
+	else if (inst == 0b0000'0101'0100)
+	{
+		// 054 Move (A4[7:1],A3[7:1],A2[7:1],A1[7:1]) to M[H[5:1]][28:1]
+		util::stream_format(stream, "A->MA");
+	}
+	else if (inst == 0b0000'0101'1000)
+	{
+		// 058 Move M[H[5:1]][28:1] to (A4[7:1],A3[7:1],A2[7:1],A1[7:1])
+		util::stream_format(stream, "MA->A");
+	}
+	else if (inst == 0b0000'0101'1100)
+	{
+		// 05c Exchange (A4[7:1],A3[7:1],A2[7:1],A1[7:1]) and M[H[5:1]][28:1]
+		util::stream_format(stream, "MA<->A");
+	}
+	else if (inst == 0b0000'0110'0000)
+	{
+		// 060 Subroutine End, Pop down address stack, Skip
+		util::stream_format(stream, "SRE+1");
+	}
+	else if (inst == 0b0011'0000'1000)
+	{
+		// 308 Move A1[7:1] to FLS[7:1], 0->L[2:1]
+		util::stream_format(stream, "A1->FLS, 0->L");
+	}
+	else if (inst == 0b0011'0100'1000)
+	{
+		// 348 Move A2[7:1] to FLS[7:1], 0->L[2:1]
+		util::stream_format(stream, "A2->FLS, 0->L");
+	}
+	else if (inst == 0b0011'1000'1000)
+	{
+		// 388 Move M[H[5:1],L[2:1]][7:1] to FLS[7:1], 0->L[2:1]
+		util::stream_format(stream, "M->FLS, 0->L");
+	}
+	else if (inst == 0b0011'0000'1001)
+	{
+		// 309 Move A1[7:1] to FRS[7:1], 1->L[2:1]
+		util::stream_format(stream, "A1->FRS, 1->L");
+	}
+	else if (inst == 0b0011'0100'1001)
+	{
+		// 349 Move A2[7:1] to FRS[7:1], 1->L[2:1]
+		util::stream_format(stream, "A2->FRS, 1->L");
+	}
+	else if (inst == 0b0011'1000'1001)
+	{
+		// 389 Move M[H[5:1],L[2:1]][7:1] to FRS[7:1], 1->L[2:1]
+		util::stream_format(stream, "M->FRS, 1->L");
+	}
 	else
 	{
 		switch (inst)
 		{
-		case 0b0000'0000'0000:
-		{
-			// 000 No Operation
-			util::stream_format(stream, "NOP");
-			break;
-		}
-		case 0b0000'0000'0100:
-		{
-			// 004 Skip if (Gun Port Latch) = 1
-			util::stream_format(stream, "GPL");
-			break;
-		}
-		case 0b0000'0000'1000:
-		{
-			// 008 Move H[5:1] to Line Buffer Register[5:1]
-			util::stream_format(stream, "H->NRM");
-			break;
-		}
-		case 0b0000'0001'1000:
-		{
-			// 018 H[5:1]<->X4[5:1], 0->X4[7:6], 0->X3[7:1], 0->X1'[1], 0->A1'[1], L[2:1]<->L'[2:1]
-			util::stream_format(stream, "H<->X");
-			break;
-		}
-		case 0b0000'0010'0000:
-		{
-			// 020 Subroutine End, Pop down address stack
-			util::stream_format(stream, "SRE");
-			break;
-		}
 		case 0b0000'0010'1000: case 0b0000'0010'1001:
 		{
 			// 028 Shift STB[4:1], N->STB[1]
@@ -428,91 +488,12 @@ offs_t upd777_disassembler::disassemble(std::ostream &stream, offs_t pc, const u
 			util::stream_format(stream, "PD%d %sJ", which + 1, inv ? "/" : "");
 			break;
 		}
-		case 0b0000'0100'1001:
-		{
-			// 049 Skip if (4H Horizontal Blank) = 1
-			util::stream_format(stream, "4H BLK");
-			break;
-		}
-		case 0b0000'0100'1010:
-		{
-			// 04a Skip if (Vertical Blank) = 1, 0->M[[18:00],[3]][1]
-			util::stream_format(stream, "VBLK");
-			break;
-		}
-		case 0b0000'0100'1100:
-		{
-			// 04c Skip if (GP&SW/ input) = 1
-			util::stream_format(stream, "GPSW/");
-			break;
-		}
-		case 0b0000'0101'0100:
-		{
-			// 054 Move (A4[7:1],A3[7:1],A2[7:1],A1[7:1]) to M[H[5:1]][28:1]
-			util::stream_format(stream, "A->MA");
-			break;
-		}
-		case 0b0000'0101'1000:
-		{
-			// 058 Move M[H[5:1]][28:1] to (A4[7:1],A3[7:1],A2[7:1],A1[7:1])
-			util::stream_format(stream, "MA->A");
-			break;
-		}
-		case 0b0000'0101'1100:
-		{
-			// 05c Exchange (A4[7:1],A3[7:1],A2[7:1],A1[7:1]) and M[H[5:1]][28:1]
-			util::stream_format(stream, "MA<->A");
-			break;
-		}
-		case 0b0000'0110'0000:
-		{
-			// 060 Subroutine End, Pop down address stack, Skip
-			util::stream_format(stream, "SRE+1");
-			break;
-		}
+
 		case 0b0011'0000'0000: case 0b0011'0000'0001: case 0b0011'0000'0010: case 0b0011'0000'0011:
 		{
 			// 300 N->L[2:1]
 			const int n = inst & 0x3;
 			util::stream_format(stream, "0x%d->L", n);
-			break;
-		}
-
-		case 0b0011'0000'1000:
-		{
-			// 308 Move A1[7:1] to FLS[7:1], 0->L[2:1]
-			util::stream_format(stream, "A1->FLS, 0->L");
-			break;
-		}
-		case 0b0011'0100'1000:
-		{
-			// 348 Move A2[7:1] to FLS[7:1], 0->L[2:1]
-			util::stream_format(stream, "A2->FLS, 0->L");
-			break;
-		}
-		case 0b0011'1000'1000:
-		{
-			// 388 Move M[H[5:1],L[2:1]][7:1] to FLS[7:1], 0->L[2:1]
-			util::stream_format(stream, "M->FLS, 0->L");
-			break;
-		}
-
-		case 0b0011'0000'1001:
-		{
-			// 309 Move A1[7:1] to FRS[7:1], 1->L[2:1]
-			util::stream_format(stream, "A1->FRS, 1->L");
-			break;
-		}
-		case 0b0011'0100'1001:
-		{
-			// 349 Move A2[7:1] to FRS[7:1], 1->L[2:1]
-			util::stream_format(stream, "A2->FRS, 1->L");
-			break;
-		}
-		case 0b0011'1000'1001:
-		{
-			// 389 Move M[H[5:1],L[2:1]][7:1] to FRS[7:1], 1->L[2:1]
-			util::stream_format(stream, "M->FRS, 1->L");
 			break;
 		}
 
