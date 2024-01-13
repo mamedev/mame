@@ -291,6 +291,79 @@ offs_t upd777_disassembler::disassemble(std::ostream &stream, offs_t pc, const u
 		const int n = inst & 0x3;
 		util::stream_format(stream, "%s%s%s->%s, 0x%d->L %s", get_reg_name(reg1), get_300optype_name(optype), get_reg_name(reg2), get_reg_name(reg1), n, (optype == 3) ? "BOJ" : "");
 	}
+	else if ((inst & 0b1111'1110'0000) == 0b0011'1010'0000)
+	{
+		//   0b0011'101r'oonn (where r = reg, o = optype, n = next l value)
+#if 0
+		case 0b0011'1010'0000: case 0b0011'1010'0001: case 0b0011'1010'0010: case 0b0011'1010'0011:
+		case 0b0011'1010'0100: case 0b0011'1010'0101: case 0b0011'1010'0110: case 0b0011'1010'0111:
+		case 0b0011'1010'1000: case 0b0011'1010'1001: case 0b0011'1010'1010: case 0b0011'1010'1011:
+		case 0b0011'1010'1100: case 0b0011'1010'1101: case 0b0011'1010'1110: case 0b0011'1010'1111:
+		case 0b0011'1011'0000: case 0b0011'1011'0001: case 0b0011'1011'0010: case 0b0011'1011'0011:
+		case 0b0011'1011'0100: case 0b0011'1011'0101: case 0b0011'1011'0110: case 0b0011'1011'0111:
+		case 0b0011'1011'1000: case 0b0011'1011'1001: case 0b0011'1011'1010: case 0b0011'1011'1011:
+		case 0b0011'1011'1100: case 0b0011'1011'1101: case 0b0011'1011'1110: case 0b0011'1011'1111:
+#endif
+		// 3a0 AND M[H[5:1],L[2:1]][7:1] and A1[7:1], store to M[H[5:1],L[2:1]][7:1], N->L[2:1]
+		// 3a4 Add M[H[5:1],L[2:1]][7:1] and A1[7:1], store to M[H[5:1],L[2:1]][7:1], N->L[2:1] Skip if carry
+		// 3a8 OR M[H[5:1],L[2:1]][7:1] and A1[7:1], store to M[H[5:1],L[2:1]][7:1], N->L[2:1]
+		// 3ac Subtract M[H[5:1],L[2:1]][7:1] and A1[7:1], store to M[H[5:1],L[2:1]][7:1], N->L[2:1] Skip if borrow
+		// 3b0 AND M[H[5:1],L[2:1]][7:1] and A2[7:1], store to M[H[5:1],L[2:1]][7:1], N->L[2:1]
+		// 3b4 Add M[H[5:1],L[2:1]][7:1] and A2[7:1], store to M[H[5:1],L[2:1]][7:1], N->L[2:1] Skip if carry
+		// 3b8 OR M[H[5:1],L[2:1]][7:1] and A2[7:1], store to M[H[5:1],L[2:1]][7:1], N->L[2:1]
+		// 3bc Subtract M[H[5:1],L[2:1]][7:1] and A2[7:1], store to M[H[5:1],L[2:1]][7:1], N->L[2:1] Skip if borrow
+		const int optype = (inst & 0x0c) >> 2;
+		const int reg2 = (inst & 0x10) >> 4;
+		const int n = inst & 0x3;
+		util::stream_format(stream, "M%s%s->M, 0x%d->L", get_300optype_name(optype), get_reg_name(reg2), n);
+	}
+	else if ((inst & 0b1111'1110'0000) == 0b0011'1110'0000)
+	{
+#if 0
+		//   0b0011'111r'oonn (where r = reg, o = optype, n = next l value)
+		case 0b0011'1110'0000: case 0b0011'1110'0001: case 0b0011'1110'0010: case 0b0011'1110'0011:
+		case 0b0011'1110'0100: case 0b0011'1110'0101: case 0b0011'1110'0110: case 0b0011'1110'0111:
+		case 0b0011'1110'1000: case 0b0011'1110'1001: case 0b0011'1110'1010: case 0b0011'1110'1011:
+		case 0b0011'1110'1100: case 0b0011'1110'1101: case 0b0011'1110'1110: case 0b0011'1110'1111:
+		case 0b0011'1111'0000: case 0b0011'1111'0001: case 0b0011'1111'0010: case 0b0011'1111'0011:
+		case 0b0011'1111'0100: case 0b0011'1111'0101: case 0b0011'1111'0110: case 0b0011'1111'0111:
+		case 0b0011'1111'1000: case 0b0011'1111'1001: case 0b0011'1111'1010: case 0b0011'1111'1011:
+		case 0b0011'1111'1100: case 0b0011'1111'1101: case 0b0011'1111'1110: case 0b0011'1111'1111:	
+		// 3e0 AND H[5:1] and A1[5:1], store to H[5:1], N->L[2:1]
+		// 3e4 Add H[5:1] and A1[5:1], store to H[5:1], N->L[2:1]
+		// 3e8 OR H[5:1] and A1[5:1], store to H[5:1], N->L[2:1]
+		// 3ec Subtract H[5:1] and A1[5:1], store to H[5:1], Skip if borrow, N->L[2:1]
+		// 3f0 AND H[5:1] and A2[5:1], store to H[5:1], N->L[2:1]
+		// 3f4 Add H[5:1] and A2[5:1], store to H[5:1], N->L[2:1]
+		// 3f8 OR H[5:1] and A2[5:1], store to H[5:1], N->L[2:1]
+		// 3fc Subtract H[5:1] and A2[5:1], store to H[5:1], Skip if borrow, N->L[2:1]
+#endif
+		const int optype = (inst & 0x0c) >> 2;
+		const int reg = (inst & 0x10) >> 4;
+		const int n = inst & 0x3;
+		util::stream_format(stream, "H%s%s->H, 0x%d->L", get_300optype_name(optype), get_reg_name(reg), n);
+	}
+	else if ((inst & 0b1111'1100'0010) == 0b0100'0100'0000)
+	{
+#if 0 
+		//   0b0100'01dg'ks0n (where  d = DISP, G = GPE, K = KIE, S = SME, n = A11)
+		case 0b0100'0100'0000: case 0b0100'0100'0001: case 0b0100'0100'0100: case 0b0100'0100'0101:
+		case 0b0100'0100'1000: case 0b0100'0100'1001: case 0b0100'0100'1100: case 0b0100'0100'1101:
+		case 0b0100'0101'0000: case 0b0100'0101'0001: case 0b0100'0101'0100: case 0b0100'0101'0101:
+		case 0b0100'0101'1000: case 0b0100'0101'1001: case 0b0100'0101'1100: case 0b0100'0101'1101:
+		case 0b0100'0110'0000: case 0b0100'0110'0001: case 0b0100'0110'0100: case 0b0100'0110'0101:
+		case 0b0100'0110'1000: case 0b0100'0110'1001: case 0b0100'0110'1100: case 0b0100'0110'1101:
+		case 0b0100'0111'0000: case 0b0100'0111'0001: case 0b0100'0111'0100: case 0b0100'0111'0101:
+		case 0b0100'0111'1000: case 0b0100'0111'1001: case 0b0100'0111'1100: case 0b0100'0111'1101:
+#endif	
+		// 440 Set D to DISP, G to GPE, K to KIE, S to SME, N->A[11]
+		const int d = (inst >> 5) & 0x1;
+		const int g = (inst >> 4) & 0x1;
+		const int k = (inst >> 3) & 0x1;
+		const int s = (inst >> 2) & 0x1;
+		const int n = inst & 0x1;
+		util::stream_format(stream, "%d->D, %d->G, %d->K, %d->S, %d->A11", d, g, k, s, n);
+	}
 	else
 	{
 		switch (inst)
@@ -548,55 +621,6 @@ offs_t upd777_disassembler::disassemble(std::ostream &stream, offs_t pc, const u
 			util::stream_format(stream, "M->A%d, 0x%d->L", reg + 1, n);
 			break;
 		}
-
-		case 0b0011'1010'0000: case 0b0011'1010'0001: case 0b0011'1010'0010: case 0b0011'1010'0011:
-		case 0b0011'1010'0100: case 0b0011'1010'0101: case 0b0011'1010'0110: case 0b0011'1010'0111:
-		case 0b0011'1010'1000: case 0b0011'1010'1001: case 0b0011'1010'1010: case 0b0011'1010'1011:
-		case 0b0011'1010'1100: case 0b0011'1010'1101: case 0b0011'1010'1110: case 0b0011'1010'1111:
-		case 0b0011'1011'0000: case 0b0011'1011'0001: case 0b0011'1011'0010: case 0b0011'1011'0011:
-		case 0b0011'1011'0100: case 0b0011'1011'0101: case 0b0011'1011'0110: case 0b0011'1011'0111:
-		case 0b0011'1011'1000: case 0b0011'1011'1001: case 0b0011'1011'1010: case 0b0011'1011'1011:
-		case 0b0011'1011'1100: case 0b0011'1011'1101: case 0b0011'1011'1110: case 0b0011'1011'1111:
-		{
-			// 3a0 AND M[H[5:1],L[2:1]][7:1] and A1[7:1], store to M[H[5:1],L[2:1]][7:1], N->L[2:1]
-			// 3a4 Add M[H[5:1],L[2:1]][7:1] and A1[7:1], store to M[H[5:1],L[2:1]][7:1], N->L[2:1] Skip if carry
-			// 3a8 OR M[H[5:1],L[2:1]][7:1] and A1[7:1], store to M[H[5:1],L[2:1]][7:1], N->L[2:1]
-			// 3ac Subtract M[H[5:1],L[2:1]][7:1] and A1[7:1], store to M[H[5:1],L[2:1]][7:1], N->L[2:1] Skip if borrow
-			// 3b0 AND M[H[5:1],L[2:1]][7:1] and A2[7:1], store to M[H[5:1],L[2:1]][7:1], N->L[2:1]
-			// 3b4 Add M[H[5:1],L[2:1]][7:1] and A2[7:1], store to M[H[5:1],L[2:1]][7:1], N->L[2:1] Skip if carry
-			// 3b8 OR M[H[5:1],L[2:1]][7:1] and A2[7:1], store to M[H[5:1],L[2:1]][7:1], N->L[2:1]
-			// 3bc Subtract M[H[5:1],L[2:1]][7:1] and A2[7:1], store to M[H[5:1],L[2:1]][7:1], N->L[2:1] Skip if borrow
-			const int optype = (inst & 0x0c) >> 2;
-			const int reg2 = (inst & 0x10) >> 4;
-			const int n = inst & 0x3;
-			util::stream_format(stream, "M%s%s->M, 0x%d->L", get_300optype_name(optype), get_reg_name(reg2), n);
-			break;
-		}
-
-		case 0b0011'1110'0000: case 0b0011'1110'0001: case 0b0011'1110'0010: case 0b0011'1110'0011:
-		case 0b0011'1110'0100: case 0b0011'1110'0101: case 0b0011'1110'0110: case 0b0011'1110'0111:
-		case 0b0011'1110'1000: case 0b0011'1110'1001: case 0b0011'1110'1010: case 0b0011'1110'1011:
-		case 0b0011'1110'1100: case 0b0011'1110'1101: case 0b0011'1110'1110: case 0b0011'1110'1111:
-		case 0b0011'1111'0000: case 0b0011'1111'0001: case 0b0011'1111'0010: case 0b0011'1111'0011:
-		case 0b0011'1111'0100: case 0b0011'1111'0101: case 0b0011'1111'0110: case 0b0011'1111'0111:
-		case 0b0011'1111'1000: case 0b0011'1111'1001: case 0b0011'1111'1010: case 0b0011'1111'1011:
-		case 0b0011'1111'1100: case 0b0011'1111'1101: case 0b0011'1111'1110: case 0b0011'1111'1111:
-		{
-			// 3e0 AND H[5:1] and A1[5:1], store to H[5:1], N->L[2:1]
-			// 3e4 Add H[5:1] and A1[5:1], store to H[5:1], N->L[2:1]
-			// 3e8 OR H[5:1] and A1[5:1], store to H[5:1], N->L[2:1]
-			// 3ec Subtract H[5:1] and A1[5:1], store to H[5:1], Skip if borrow, N->L[2:1]
-			// 3f0 AND H[5:1] and A2[5:1], store to H[5:1], N->L[2:1]
-			// 3f4 Add H[5:1] and A2[5:1], store to H[5:1], N->L[2:1]
-			// 3f8 OR H[5:1] and A2[5:1], store to H[5:1], N->L[2:1]
-			// 3fc Subtract H[5:1] and A2[5:1], store to H[5:1], Skip if borrow, N->L[2:1]
-			const int optype = (inst & 0x0c) >> 2;
-			const int reg = (inst & 0x10) >> 4;
-			const int n = inst & 0x3;
-			util::stream_format(stream, "H%s%s->H, 0x%d->L", get_300optype_name(optype), get_reg_name(reg), n);
-			break;
-		}
-
 		case 0b0011'1100'0000: case 0b0011'1100'0001: case 0b0011'1100'0010: case 0b0011'1100'0011:
 		case 0b0011'1101'0000: case 0b0011'1101'0001: case 0b0011'1101'0010: case 0b0011'1101'0011:
 		{
@@ -630,24 +654,6 @@ offs_t upd777_disassembler::disassemble(std::ostream &stream, offs_t pc, const u
 			// 402 Jump to (000,M[H[5:1],L[2:1]][5:1],1N), 0->L[2:1], N->A[11]
 			const int n = inst & 0x1;
 			util::stream_format(stream, "JPM, 0->L, %d->A11", n);
-			break;
-		}
-		case 0b0100'0100'0000: case 0b0100'0100'0001: case 0b0100'0100'0100: case 0b0100'0100'0101:
-		case 0b0100'0100'1000: case 0b0100'0100'1001: case 0b0100'0100'1100: case 0b0100'0100'1101:
-		case 0b0100'0101'0000: case 0b0100'0101'0001: case 0b0100'0101'0100: case 0b0100'0101'0101:
-		case 0b0100'0101'1000: case 0b0100'0101'1001: case 0b0100'0101'1100: case 0b0100'0101'1101:
-		case 0b0100'0110'0000: case 0b0100'0110'0001: case 0b0100'0110'0100: case 0b0100'0110'0101:
-		case 0b0100'0110'1000: case 0b0100'0110'1001: case 0b0100'0110'1100: case 0b0100'0110'1101:
-		case 0b0100'0111'0000: case 0b0100'0111'0001: case 0b0100'0111'0100: case 0b0100'0111'0101:
-		case 0b0100'0111'1000: case 0b0100'0111'1001: case 0b0100'0111'1100: case 0b0100'0111'1101:
-		{
-			// 440 Set D to DISP, G to GPE, K to KIE, S to SME, N->A[11]
-			const int d = (inst >> 5) & 0x1;
-			const int g = (inst >> 4) & 0x1;
-			const int k = (inst >> 3) & 0x1;
-			const int s = (inst >> 2) & 0x1;
-			const int n = inst & 0x1;
-			util::stream_format(stream, "%d->D, %d->G, %d->K, %d->S, %d->A11", d, g, k, s, n);
 			break;
 		}
 

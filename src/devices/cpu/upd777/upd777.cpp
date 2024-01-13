@@ -674,8 +674,143 @@ void upd777_cpu_device::do_op()
 		}
 		set_a1_or_a2(reg1, src1);
 		set_l(n);
+	}
+	else if ((inst & 0b1111'1110'0000) == 0b0011'1010'0000)
+	{
+#if 0
+		//   0b0011'101r'oonn (where r = reg, o = optype, n = next l value)
+		case 0b0011'1010'0000: case 0b0011'1010'0001: case 0b0011'1010'0010: case 0b0011'1010'0011:
+		case 0b0011'1010'0100: case 0b0011'1010'0101: case 0b0011'1010'0110: case 0b0011'1010'0111:
+		case 0b0011'1010'1000: case 0b0011'1010'1001: case 0b0011'1010'1010: case 0b0011'1010'1011:
+		case 0b0011'1010'1100: case 0b0011'1010'1101: case 0b0011'1010'1110: case 0b0011'1010'1111:
+		case 0b0011'1011'0000: case 0b0011'1011'0001: case 0b0011'1011'0010: case 0b0011'1011'0011:
+		case 0b0011'1011'0100: case 0b0011'1011'0101: case 0b0011'1011'0110: case 0b0011'1011'0111:
+		case 0b0011'1011'1000: case 0b0011'1011'1001: case 0b0011'1011'1010: case 0b0011'1011'1011:
+		case 0b0011'1011'1100: case 0b0011'1011'1101: case 0b0011'1011'1110: case 0b0011'1011'1111:
+#endif	
+		// 3a0 AND M[H[5:1],L[2:1]][7:1] and A1[7:1], store to M[H[5:1],L[2:1]][7:1], N->L[2:1]
+		// 3a4 Add M[H[5:1],L[2:1]][7:1] and A1[7:1], store to M[H[5:1],L[2:1]][7:1], N->L[2:1] Skip if carry
+		// 3a8 OR M[H[5:1],L[2:1]][7:1] and A1[7:1], store to M[H[5:1],L[2:1]][7:1], N->L[2:1]
+		// 3ac Subtract M[H[5:1],L[2:1]][7:1] and A1[7:1], store to M[H[5:1],L[2:1]][7:1], N->L[2:1] Skip if borrow
+		// 3b0 AND M[H[5:1],L[2:1]][7:1] and A2[7:1], store to M[H[5:1],L[2:1]][7:1], N->L[2:1]
+		// 3b4 Add M[H[5:1],L[2:1]][7:1] and A2[7:1], store to M[H[5:1],L[2:1]][7:1], N->L[2:1] Skip if carry
+		// 3b8 OR M[H[5:1],L[2:1]][7:1] and A2[7:1], store to M[H[5:1],L[2:1]][7:1], N->L[2:1]
+		// 3bc Subtract M[H[5:1],L[2:1]][7:1] and A2[7:1], store to M[H[5:1],L[2:1]][7:1], N->L[2:1] Skip if borrow
+		const int optype = (inst & 0x0c) >> 2;
+		const int reg2 = (inst & 0x10) >> 4;
+		const int n = inst & 0x3;
+		u8 src2 = get_a1_or_a2(reg2);
+		u8 m = get_m_data();
 
+		switch (optype)
+		{
+		case 0: // AND
+		{
+			m = m & src2;
+			break;
+		}
+		case 1: // ADD
+		{
+			m = m + src2;
+			if (m & 0x80)
+				m_skip = 1;
+			break;
+		}
+		case 2: // OR
+		{
+			m = m | src2;
+			break;
+		}
+		case 3: // MINUS
+		{
+			m = m - src2;
+			if (m & 0x80)
+				m_skip = 1;
+			break;
+		}
+		}
+		set_m_data(m);
+		set_l(n);
+	}
+	else if ((inst & 0b1111'1110'0000) == 0b0011'1110'0000)
+	{
+#if 0
+		//   0b0011'111r'oonn (where r = reg, o = optype, n = next l value)
+		case 0b0011'1110'0000: case 0b0011'1110'0001: case 0b0011'1110'0010: case 0b0011'1110'0011:
+		case 0b0011'1110'0100: case 0b0011'1110'0101: case 0b0011'1110'0110: case 0b0011'1110'0111:
+		case 0b0011'1110'1000: case 0b0011'1110'1001: case 0b0011'1110'1010: case 0b0011'1110'1011:
+		case 0b0011'1110'1100: case 0b0011'1110'1101: case 0b0011'1110'1110: case 0b0011'1110'1111:
+		case 0b0011'1111'0000: case 0b0011'1111'0001: case 0b0011'1111'0010: case 0b0011'1111'0011:
+		case 0b0011'1111'0100: case 0b0011'1111'0101: case 0b0011'1111'0110: case 0b0011'1111'0111:
+		case 0b0011'1111'1000: case 0b0011'1111'1001: case 0b0011'1111'1010: case 0b0011'1111'1011:
+		case 0b0011'1111'1100: case 0b0011'1111'1101: case 0b0011'1111'1110: case 0b0011'1111'1111:
+#endif
+		// 3e0 AND H[5:1] and A1[5:1], store to H[5:1], N->L[2:1]
+		// 3e4 Add H[5:1] and A1[5:1], store to H[5:1], N->L[2:1]
+		// 3e8 OR H[5:1] and A1[5:1], store to H[5:1], N->L[2:1]
+		// 3ec Subtract H[5:1] and A1[5:1], store to H[5:1], Skip if borrow, N->L[2:1]
+		// 3f0 AND H[5:1] and A2[5:1], store to H[5:1], N->L[2:1]
+		// 3f4 Add H[5:1] and A2[5:1], store to H[5:1], N->L[2:1]
+		// 3f8 OR H[5:1] and A2[5:1], store to H[5:1], N->L[2:1]
+		// 3fc Subtract H[5:1] and A2[5:1], store to H[5:1], Skip if borrow, N->L[2:1]
+		const int optype = (inst & 0x0c) >> 2;
+		const int reg2 = (inst & 0x10) >> 4;
+		const int n = inst & 0x3;
+		u8 src2 = get_a1_or_a2(reg2) & 0x1f;
+		u8 h = get_h();
 
+		switch (optype)
+		{
+		case 0: // AND
+		{
+			h = h & src2;
+			break;
+		}
+		case 1: // ADD
+		{
+			h = h + src2;
+			break;
+		}
+		case 2: // OR
+		{
+			h = h | src2;
+			break;
+		}
+		case 3: // MINUS
+		{
+			h = h - src2;
+			if (h & 0x20)
+				m_skip = 1;
+			break;
+		}
+		}
+		set_h(h & 0x1f);
+		set_l(n);
+	}
+	else if ((inst & 0b1111'1100'0010) == 0b0100'0100'0000)
+	{
+#if 0 
+		//   0b0100'01dg'ks0n (where  d = DISP, G = GPE, K = KIE, S = SME, n = A11)
+		case 0b0100'0100'0000: case 0b0100'0100'0001: case 0b0100'0100'0100: case 0b0100'0100'0101:
+		case 0b0100'0100'1000: case 0b0100'0100'1001: case 0b0100'0100'1100: case 0b0100'0100'1101:
+		case 0b0100'0101'0000: case 0b0100'0101'0001: case 0b0100'0101'0100: case 0b0100'0101'0101:
+		case 0b0100'0101'1000: case 0b0100'0101'1001: case 0b0100'0101'1100: case 0b0100'0101'1101:
+		case 0b0100'0110'0000: case 0b0100'0110'0001: case 0b0100'0110'0100: case 0b0100'0110'0101:
+		case 0b0100'0110'1000: case 0b0100'0110'1001: case 0b0100'0110'1100: case 0b0100'0110'1101:
+		case 0b0100'0111'0000: case 0b0100'0111'0001: case 0b0100'0111'0100: case 0b0100'0111'0101:
+		case 0b0100'0111'1000: case 0b0100'0111'1001: case 0b0100'0111'1100: case 0b0100'0111'1101:
+#endif		
+		// 440 Set D to DISP, G to GPE, K to KIE, S to SME, N->A[11]
+		const int d = (inst >> 5) & 0x1;
+		const int g = (inst >> 4) & 0x1;
+		const int k = (inst >> 3) & 0x1;
+		const int s = (inst >> 2) & 0x1;
+		const int n = inst & 0x1;
+		set_disp(d);
+		set_gpe(g);
+		set_kie(k);
+		set_sme(s);
+		set_a11(n);
 	}
 	else
 	{
@@ -1038,115 +1173,6 @@ void upd777_cpu_device::do_op()
 			set_l(n);
 			break;
 		}
-
-		case 0b0011'1010'0000: case 0b0011'1010'0001: case 0b0011'1010'0010: case 0b0011'1010'0011:
-		case 0b0011'1010'0100: case 0b0011'1010'0101: case 0b0011'1010'0110: case 0b0011'1010'0111:
-		case 0b0011'1010'1000: case 0b0011'1010'1001: case 0b0011'1010'1010: case 0b0011'1010'1011:
-		case 0b0011'1010'1100: case 0b0011'1010'1101: case 0b0011'1010'1110: case 0b0011'1010'1111:
-		case 0b0011'1011'0000: case 0b0011'1011'0001: case 0b0011'1011'0010: case 0b0011'1011'0011:
-		case 0b0011'1011'0100: case 0b0011'1011'0101: case 0b0011'1011'0110: case 0b0011'1011'0111:
-		case 0b0011'1011'1000: case 0b0011'1011'1001: case 0b0011'1011'1010: case 0b0011'1011'1011:
-		case 0b0011'1011'1100: case 0b0011'1011'1101: case 0b0011'1011'1110: case 0b0011'1011'1111:
-		{
-			// 3a0 AND M[H[5:1],L[2:1]][7:1] and A1[7:1], store to M[H[5:1],L[2:1]][7:1], N->L[2:1]
-			// 3a4 Add M[H[5:1],L[2:1]][7:1] and A1[7:1], store to M[H[5:1],L[2:1]][7:1], N->L[2:1] Skip if carry
-			// 3a8 OR M[H[5:1],L[2:1]][7:1] and A1[7:1], store to M[H[5:1],L[2:1]][7:1], N->L[2:1]
-			// 3ac Subtract M[H[5:1],L[2:1]][7:1] and A1[7:1], store to M[H[5:1],L[2:1]][7:1], N->L[2:1] Skip if borrow
-			// 3b0 AND M[H[5:1],L[2:1]][7:1] and A2[7:1], store to M[H[5:1],L[2:1]][7:1], N->L[2:1]
-			// 3b4 Add M[H[5:1],L[2:1]][7:1] and A2[7:1], store to M[H[5:1],L[2:1]][7:1], N->L[2:1] Skip if carry
-			// 3b8 OR M[H[5:1],L[2:1]][7:1] and A2[7:1], store to M[H[5:1],L[2:1]][7:1], N->L[2:1]
-			// 3bc Subtract M[H[5:1],L[2:1]][7:1] and A2[7:1], store to M[H[5:1],L[2:1]][7:1], N->L[2:1] Skip if borrow
-			const int optype = (inst & 0x0c) >> 2;
-			const int reg2 = (inst & 0x10) >> 4;
-			const int n = inst & 0x3;
-			u8 src2 = get_a1_or_a2(reg2);
-			u8 m = get_m_data();
-
-			switch (optype)
-			{
-			case 0: // AND
-			{
-				m = m & src2;
-				break;
-			}
-			case 1: // ADD
-			{
-				m = m + src2;
-				if (m & 0x80)
-					m_skip = 1;
-				break;
-			}
-			case 2: // OR
-			{
-				m = m | src2;
-				break;
-			}
-			case 3: // MINUS
-			{
-				m = m - src2;
-				if (m & 0x80)
-					m_skip = 1;
-				break;
-			}
-			}
-			set_m_data(m);
-			set_l(n);
-			break;
-		}
-
-		case 0b0011'1110'0000: case 0b0011'1110'0001: case 0b0011'1110'0010: case 0b0011'1110'0011:
-		case 0b0011'1110'0100: case 0b0011'1110'0101: case 0b0011'1110'0110: case 0b0011'1110'0111:
-		case 0b0011'1110'1000: case 0b0011'1110'1001: case 0b0011'1110'1010: case 0b0011'1110'1011:
-		case 0b0011'1110'1100: case 0b0011'1110'1101: case 0b0011'1110'1110: case 0b0011'1110'1111:
-		case 0b0011'1111'0000: case 0b0011'1111'0001: case 0b0011'1111'0010: case 0b0011'1111'0011:
-		case 0b0011'1111'0100: case 0b0011'1111'0101: case 0b0011'1111'0110: case 0b0011'1111'0111:
-		case 0b0011'1111'1000: case 0b0011'1111'1001: case 0b0011'1111'1010: case 0b0011'1111'1011:
-		case 0b0011'1111'1100: case 0b0011'1111'1101: case 0b0011'1111'1110: case 0b0011'1111'1111:
-		{
-			// 3e0 AND H[5:1] and A1[5:1], store to H[5:1], N->L[2:1]
-			// 3e4 Add H[5:1] and A1[5:1], store to H[5:1], N->L[2:1]
-			// 3e8 OR H[5:1] and A1[5:1], store to H[5:1], N->L[2:1]
-			// 3ec Subtract H[5:1] and A1[5:1], store to H[5:1], Skip if borrow, N->L[2:1]
-			// 3f0 AND H[5:1] and A2[5:1], store to H[5:1], N->L[2:1]
-			// 3f4 Add H[5:1] and A2[5:1], store to H[5:1], N->L[2:1]
-			// 3f8 OR H[5:1] and A2[5:1], store to H[5:1], N->L[2:1]
-			// 3fc Subtract H[5:1] and A2[5:1], store to H[5:1], Skip if borrow, N->L[2:1]
-			const int optype = (inst & 0x0c) >> 2;
-			const int reg2 = (inst & 0x10) >> 4;
-			const int n = inst & 0x3;
-			u8 src2 = get_a1_or_a2(reg2) & 0x1f;
-			u8 h = get_h();
-
-			switch (optype)
-			{
-			case 0: // AND
-			{
-				h = h & src2;
-				break;
-			}
-			case 1: // ADD
-			{
-				h = h + src2;
-				break;
-			}
-			case 2: // OR
-			{
-				h = h | src2;
-				break;
-			}
-			case 3: // MINUS
-			{
-				h = h - src2;
-				if (h & 0x20)
-					m_skip = 1;
-				break;
-			}
-			}
-			set_h(h & 0x1f);
-			set_l(n);
-			break;
-		}
-
 		case 0b0011'1100'0000: case 0b0011'1100'0001: case 0b0011'1100'0010: case 0b0011'1100'0011:
 		case 0b0011'1101'0000: case 0b0011'1101'0001: case 0b0011'1101'0010: case 0b0011'1101'0011:
 		{
@@ -1187,29 +1213,6 @@ void upd777_cpu_device::do_op()
 			set_a11(n);
 			break;
 		}
-		case 0b0100'0100'0000: case 0b0100'0100'0001: case 0b0100'0100'0100: case 0b0100'0100'0101:
-		case 0b0100'0100'1000: case 0b0100'0100'1001: case 0b0100'0100'1100: case 0b0100'0100'1101:
-		case 0b0100'0101'0000: case 0b0100'0101'0001: case 0b0100'0101'0100: case 0b0100'0101'0101:
-		case 0b0100'0101'1000: case 0b0100'0101'1001: case 0b0100'0101'1100: case 0b0100'0101'1101:
-		case 0b0100'0110'0000: case 0b0100'0110'0001: case 0b0100'0110'0100: case 0b0100'0110'0101:
-		case 0b0100'0110'1000: case 0b0100'0110'1001: case 0b0100'0110'1100: case 0b0100'0110'1101:
-		case 0b0100'0111'0000: case 0b0100'0111'0001: case 0b0100'0111'0100: case 0b0100'0111'0101:
-		case 0b0100'0111'1000: case 0b0100'0111'1001: case 0b0100'0111'1100: case 0b0100'0111'1101:
-		{
-			// 440 Set D to DISP, G to GPE, K to KIE, S to SME, N->A[11]
-			const int d = (inst >> 5) & 0x1;
-			const int g = (inst >> 4) & 0x1;
-			const int k = (inst >> 3) & 0x1;
-			const int s = (inst >> 2) & 0x1;
-			const int n = inst & 0x1;
-			set_disp(d);
-			set_gpe(g);
-			set_kie(k);
-			set_sme(s);
-			set_a11(n);
-			break;
-		}
-
 		default:
 		{
 			LOGMASKED(LOG_UNHANDLED_OPS, "%04x <ILLEGAL>\n", inst);
