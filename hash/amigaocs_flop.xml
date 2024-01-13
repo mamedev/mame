@@ -104,6 +104,7 @@ license:CC0-1.0
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[
+Doesn't draw [Denise] status messages in gameplay
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -698,6 +699,7 @@ ATK test: OK
 		<year>1992</year>
 		<publisher>Electronic Zoo</publisher>
 		<notes><![CDATA[
+Missing mouse pointer, [Copper] or [Denise] sprites
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -1603,8 +1605,13 @@ ATK test: OK
 		<year>1988</year>
 		<publisher>ECP ~ Electronic Arts</publisher>
 		<notes><![CDATA[
+Randomly moans in AmigaDOS with a "Volume Read/Write error" [FDC] adkcon=$1100, recoverable
+Runs slightly fast (verify)
+Several [Denise] glitches (verify)
 ATK test: OK
 ]]></notes>
+		<!-- From ranking screen -->
+		<info name="developer" value="Kyle Hodgetts" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps2087)alert.ipf" size="1049612" crc="19924d7e" sha1="e55aa56af6be1b06f9f1148713935f04354569c8"/>
@@ -2022,8 +2029,11 @@ ATK test: OK
 		<year>1988</year>
 		<publisher>ECP</publisher>
 		<notes><![CDATA[
+Runs slightly fast (verify)
 ATK test: OK
 ]]></notes>
+		<!-- from ranking screen -->
+		<info name="developer" value="Kyle Hodgetts, Tony Windsor, Barry Smith" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1921)alpha-1.ipf" size="1049612" crc="f890bd14" sha1="8a604afc3d7b17ec17fd7b69b3f79af46d0d368b"/>
@@ -5485,7 +5495,7 @@ boot OK
 ATK test: OK
 ]]></notes>
 		<info name="alt_title" value="BattleTech - The Crescent Hawk's Inception (Box)" />
-		<!-- Developer: Westwood -->
+		<info name="developer" value="Westwood" />
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
@@ -6246,6 +6256,7 @@ ATK test: C:0 H:U Bad
 		<notes><![CDATA[
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Requires HDD install"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Diskette 1" />
 			<dataarea name="flop" size="1049612">
@@ -11794,7 +11805,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="cortex" supported="no">
+	<software name="cortex" supported="partial">
 		<!-- SPS (CAPS) release 1932 -->
 		<description>Cortex (Europe)</description>
 		<!-- retail, standalone -->
@@ -11802,8 +11813,13 @@ ATK test: OK
 		<year>1988</year>
 		<publisher>ECP</publisher>
 		<notes><![CDATA[
+Runs slightly fast (verify)
+[Denise] scrolling glitches for split second during gameplay (verify)
 ATK test: OK
 ]]></notes>
+		<!-- from ranking screen -->
+		<info name="developer" value="Kyle Hodgetts, Tony Windsor, Barry Smith" />
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1932)cortex.ipf" size="1049612" crc="8ad2d8fc" sha1="9b02fa47bf7125ecb22e8a219421d312650165d3"/>
@@ -12251,16 +12267,18 @@ ATK test: OK
 		<year>1990</year>
 		<publisher>Starbyte</publisher>
 		<notes><![CDATA[
+Black screen [FDC]
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
+			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps1090)crown_disk1of2.ipf" size="1049612" crc="48584947" sha1="590836e8f7240526b3eb69ee1e8a332d46344100"/>
+				<rom name="(sps1090)crown_disk1of2.ipf" size="1049612"
+				crc="48584947" sha1="590836e8f7240526b3eb69ee1e8a332d46344100"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2" />
+			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1090)crown_disk2of2.ipf" size="1049612" crc="eac3a661" sha1="4ee34220f8777b251434f06158eb39c6dbd4cc93"/>
 			</dataarea>
@@ -18220,13 +18238,14 @@ ATK test: C:0 H:U Bad
 		<!-- budget, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
-		<!-- Developer: Anco -->
 		<publisher>Prism Leisure</publisher>
 		<notes><![CDATA[
 boot OK
 ATK test: OK
 ]]></notes>
 		<info name="alt_title" value="Ice Hockey (Box)" />
+		<info name="developer" value="Anco" />
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps2483)faceofficehockey.ipf" size="1049612" crc="e4ce4b76" sha1="5b08ae614f7ec53dba7422b9f4373f4186bd01b1"/>
@@ -20411,7 +20430,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="funs2u6" supported="no">
+	<software name="funs2u6" supported="yes">
 		<!-- SPS (CAPS) release 2079 -->
 		<description>Fun School 2 - For the Under-6s (Europe)</description>
 		<!-- retail, standalone -->
@@ -22120,6 +22139,8 @@ ATK test: OK
 		<year>1993</year>
 		<publisher>Audiogenic</publisher>
 		<notes><![CDATA[
+Randomly moans in AmigaDOS with a "Volume Read/Write error" [FDC] adkcon=$1100
+Hangs later on with "Please Insert Original Gooch Disk" [FDC] dsksync=$8914
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -24366,7 +24387,7 @@ ATK test: failed
 		</part>
 	</software>
 
-	<software name="huey" supported="no">
+	<software name="huey" supported="partial">
 		<!-- SPS (CAPS) release 2086 -->
 		<description>Huey (Europe)</description>
 		<!-- retail, standalone -->
@@ -24374,8 +24395,11 @@ ATK test: failed
 		<year>1989</year>
 		<publisher>ECP</publisher>
 		<notes><![CDATA[
+Runs slightly fast (verify)
 ATK test: OK
 ]]></notes>
+		<!-- From ranking screen -->
+		<info name="developer" value="Kyle Hodgetts" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps2086)huey.ipf" size="1049612" crc="e24b248d" sha1="3d94fc9cc351cf3b360d93413fd6696aba5d95a3"/>
@@ -28209,8 +28233,13 @@ ATK test: failed
 		<year>1991</year>
 		<publisher>Microids</publisher>
 		<notes><![CDATA[
+Cannot select any team in practice mode (verify, should be joystick up/down?)
+Crashed once at the end of a match (verify)
+[Denise] bitplane corruption for the team name at end of match
+TODO: verify saving
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Sports manual copy-protection" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps2565)killerball.ipf" size="1049180" crc="d586afe6" sha1="b01d5781dd492b4b6a292c0b08eedf52ee236d93"/>
@@ -31517,13 +31546,13 @@ ATK test: OK
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1990</year>
-		<!-- Developer: Rainbow Arts -->
 		<publisher>Golden Goblins</publisher>
 		<notes><![CDATA[
 boot OK
 ATK test: OK
 ]]></notes>
 		<info name="usage" value="Sports icon sheet copy-protection"/>
+		<info name="developer" value="Rainbow Arts" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -32819,7 +32848,6 @@ ATK test: OK
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1990</year>
-		<!-- Developer: Team 17 -->
 		<publisher>Codemasters</publisher>
 		<notes><![CDATA[
 Black screen [FDC] copy protection check at PC=11be (enables 68k trace mode)
@@ -32830,6 +32858,7 @@ a1200: Player sprite is half cut, [Copper]
 1 bitplane has wrong colors with vertical scroll, [Copper]
 ATK test: C:0 H:U Bad
 ]]></notes>
+		<info name="developer" value="Team 17" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049304">
@@ -36789,7 +36818,8 @@ a500: CPU vs CPU acts oddly, like missing easy receivers (doesn't occur in a500n
 Unsupported Genias or Standard 4-players parallel interface
 ATK test: OK
 ]]></notes>
-		<!-- Developer: Genias -->
+		<info name="developer" value="Genias" />
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps2439)overthenet.ipf" size="1049180" crc="7fcbc438" sha1="ee82d07d9d32270075313f86726bb32e615cd835"/>
@@ -40637,14 +40667,16 @@ ATK test: failed
 
 	<software name="arkania" supported="no">
 		<!-- SPS (CAPS) release 616 -->
-		<description>Realms of Arkania - Blade of Destiny (Europe)</description>
+		<description>Realms of Arkania - Blade of Destiny (Europe, v2.0)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS,ECS, PAL) -->
 		<year>1993</year>
 		<publisher>U.S. Gold</publisher>
 		<notes><![CDATA[
+Randomly returns [FDC] errors when loading from Workbench or during HDD install
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Has optional HDD install, sports manual copy protection" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -40696,6 +40728,7 @@ ATK test: OK
 	</software>
 
 	<software name="schwraug" cloneof="arkania" supported="no">
+		<!-- TODO: no version reported in character generation screen, implicitly v1.0? -->
 		<!-- SPS (CAPS) release 806 -->
 		<description>Das Schwarze Auge - Die Schicksalsklinge (Germany)</description>
 		<!-- retail, standalone -->
@@ -42952,9 +42985,10 @@ ATK test: OK
 		<description>Second Samurai (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1993</year>
+		<publisher>Psygnosis</publisher>
 		<notes><![CDATA[
+Hangs on Loading after disk swap [FDC], with [Paula] farts
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -48001,6 +48035,8 @@ ATK test: OK
 		<notes><![CDATA[
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Sports manual copy protection" />
+
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Game Disk" />
 			<dataarea name="flop" size="1049612">
@@ -52217,6 +52253,7 @@ ATK test: C:0 H:U Bad
 		<year>1994</year>
 		<publisher>I.C.E.</publisher>
 		<notes><![CDATA[
+Hangs on please wait after stage 1, [FDC]
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -52259,6 +52296,7 @@ ATK test: OK
 		<publisher>Domark</publisher>
 		<notes><![CDATA[
 Transparency sprite issue when ball goes near the goal lines (i.e. top or bottom of field)
+new68k: Guru Meditation after AmigaDOS
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -52393,8 +52431,12 @@ ATK test: C:0 H:U 1 Sector Bad
 		<year>1991</year>
 		<publisher>Gremlin Graphics</publisher>
 		<notes><![CDATA[
+[Paula] keeps repeating the same samples on intro
+Can't start engine in gameplay
 ATK test: failed
 ]]></notes>
+		<info name="usage" value="Sports manual copy protection (traffic signs)" />
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="702122">
 				<rom name="(sps1766)toyotacelicagtrally.ipf" size="702122" crc="efd7307c" sha1="40b26ea1741ff4f8b7fddfa91147130d613b5387"/>
@@ -55663,7 +55705,7 @@ ATK test: failed
 		</part>
 	</software>
 
-	<software name="wintol" supported="no">
+	<software name="wintol" supported="partial">
 		<!-- SPS (CAPS) release 1127 -->
 		<description>Winter Olympics (Europe)</description>
 		<!-- retail, standalone -->
@@ -55671,8 +55713,10 @@ ATK test: failed
 		<year>1994</year>
 		<publisher>U.S. Gold</publisher>
 		<notes><![CDATA[
+Has [Denise] HAM glitches on loading event screens
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Sports manual copy protection"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
