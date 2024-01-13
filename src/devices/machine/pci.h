@@ -5,7 +5,6 @@
 
 #pragma once
 
-
 class pci_device : public device_t {
 public:
 	typedef delegate<void ()> mapper_cb;

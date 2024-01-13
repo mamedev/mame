@@ -13,7 +13,7 @@ virge_pci_device::virge_pci_device(const machine_config &mconfig, const char *ta
 }
 
 virge_pci_device::virge_pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, type, tag, owner, clock),
+	: pci_card_device(mconfig, type, tag, owner, clock),
 	m_vga(*this, "vga"),
 	m_bios(*this, "bios"),
 	m_screen(*this, finder_base::DUMMY_TAG)

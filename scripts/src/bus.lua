@@ -5410,3 +5410,27 @@ if (BUSES["WAVEBLASTER"]~=null) then
 		MAME_DIR .. "src/devices/bus/waveblaster/wg130.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/bus/pci/pci_slot.h,BUSES["PCI"] = true
+---------------------------------------------------
+
+if (BUSES["PCI"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/pci/pci_slot.cpp",
+		MAME_DIR .. "src/devices/bus/pci/pci_slot.h",
+		MAME_DIR .. "src/devices/bus/pci/virge_pci.cpp",
+		MAME_DIR .. "src/devices/bus/pci/virge_pci.h",
+		MAME_DIR .. "src/devices/bus/pci/riva128.cpp",
+		MAME_DIR .. "src/devices/bus/pci/riva128.h",
+		MAME_DIR .. "src/devices/bus/pci/rivatnt.cpp",
+		MAME_DIR .. "src/devices/bus/pci/rivatnt.h",
+		MAME_DIR .. "src/devices/bus/pci/geforce.cpp",
+		MAME_DIR .. "src/devices/bus/pci/geforce.h",
+		MAME_DIR .. "src/devices/bus/pci/mga2064w.cpp",
+		MAME_DIR .. "src/devices/bus/pci/mga2064w.h",
+		MAME_DIR .. "src/devices/bus/pci/sw1000xg.cpp",
+		MAME_DIR .. "src/devices/bus/pci/sw1000xg.h",
+	}
+end

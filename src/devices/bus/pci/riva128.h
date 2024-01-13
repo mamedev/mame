@@ -6,10 +6,10 @@
 
 #pragma once
 
-#include "machine/pci.h"
+#include "pci_slot.h"
 #include "video/pc_vga_nvidia.h"
 
-class riva128_device : public pci_device
+class riva128_device : public pci_card_device
 {
 public:
 	riva128_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

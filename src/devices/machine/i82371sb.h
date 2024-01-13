@@ -40,8 +40,9 @@ public:
 	auto stpclk() { return m_stpclk_callback.bind(); }
 	auto boot_state_hook() { return m_boot_state_hook.bind(); }
 
-	template <typename T>
-	void set_cpu_tag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_cpu_tag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
+
+	void pci_irq_w(offs_t line, u8 state);
 
 	void pc_pirqa_w(int state);
 	void pc_pirqb_w(int state);

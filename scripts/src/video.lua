@@ -283,42 +283,6 @@ end
 
 --------------------------------------------------
 --
---@src/devices/video/riva128.h,VIDEOS["RIVA128"] = true
---------------------------------------------------
-
-if (VIDEOS["RIVA128"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/video/riva128.cpp",
-		MAME_DIR .. "src/devices/video/riva128.h",
-	}
-end
-
---------------------------------------------------
---
---@src/devices/video/rivatnt.h,VIDEOS["RIVATNT"] = true
---------------------------------------------------
-
-if (VIDEOS["RIVATNT"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/video/rivatnt.cpp",
-		MAME_DIR .. "src/devices/video/rivatnt.h",
-	}
-end
-
---------------------------------------------------
---
---@src/devices/video/geforce.h,VIDEOS["GEFORCE"] = true
---------------------------------------------------
-
-if (VIDEOS["GEFORCE"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/video/geforce.cpp",
-		MAME_DIR .. "src/devices/video/geforce.h",
-	}
-end
-
---------------------------------------------------
---
 --@src/devices/video/gf4500.h,VIDEOS["GF4500"] = true
 --------------------------------------------------
 
@@ -931,18 +895,6 @@ end
 
 --------------------------------------------------
 --
---@src/devices/video/mga2064w.h,VIDEOS["MGA2064W"] = true
---------------------------------------------------
-
-if (VIDEOS["MGA2064W"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/video/mga2064w.cpp",
-		MAME_DIR .. "src/devices/video/mga2064w.h",
-	}
-end
-
---------------------------------------------------
---
 --@src/devices/video/pc_vga_nvidia.h,VIDEOS["PC_VGA_NVIDIA"] = true
 --------------------------------------------------
 
@@ -1059,19 +1011,6 @@ if (VIDEOS["CLGD546X_LAGUNA"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/clgd546x_laguna.cpp",
 		MAME_DIR .. "src/devices/video/clgd546x_laguna.h",
-	}
-end
-
-
---------------------------------------------------
---
---@src/devices/video/virge_pci.h,VIDEOS["VIRGE_PCI"] = true
---------------------------------------------------
-
-if (VIDEOS["VIRGE_PCI"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/video/virge_pci.cpp",
-		MAME_DIR .. "src/devices/video/virge_pci.h",
 	}
 end
 
