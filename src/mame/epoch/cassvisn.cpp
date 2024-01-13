@@ -14,7 +14,7 @@ https://www.oguchi-rd.com/777/777%20Design%20Note.pdf
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
-#include "cpu/upd777/upd777_dev.h"
+#include "cpu/upd777/upd777.h"
 
 #include "softlist_dev.h"
 
@@ -36,7 +36,7 @@ protected:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 private:
 
-	required_device<upd777_device> m_maincpu;
+	required_device<upd777_cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 };
 
@@ -70,6 +70,7 @@ DEVICE_IMAGE_LOAD_MEMBER(cassvisn_state::cart_load)
 		return std::make_pair(image_error::UNSUPPORTED, "pat region size must be 0x4d0 in size");
 
 	m_cart->common_load_rom(m_maincpu->get_patregion(), size, "pat");
+
 	return std::make_pair(std::error_condition(), std::string());
 }
 

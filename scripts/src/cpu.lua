@@ -3959,8 +3959,6 @@ if CPUS["UPD777"] then
 	files {
 		MAME_DIR .. "src/devices/cpu/upd777/upd777.cpp",
 		MAME_DIR .. "src/devices/cpu/upd777/upd777.h",
-		MAME_DIR .. "src/devices/cpu/upd777/upd777_dev.cpp",
-		MAME_DIR .. "src/devices/cpu/upd777/upd777_dev.h",
 	}
 end
 

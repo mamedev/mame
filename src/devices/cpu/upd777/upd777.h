@@ -6,10 +6,13 @@
 
 #pragma once
 
+#include "emupal.h"
+#include "screen.h"
 
 class upd777_cpu_device : public cpu_device
 {
 public:
+	upd777_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	enum {
 		UPD777_PC = 0,
@@ -26,8 +29,10 @@ public:
 		UPD777_ADDR_STACK_POS,
 	};
 
+	u16* get_prgregion() { return &m_prgregion[0]; }
+	u8* get_patregion() { return &m_patregion[0]; }
+
 protected:
-	upd777_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 	upd777_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor data);
 
 	virtual void device_start() override;
@@ -36,11 +41,15 @@ protected:
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	virtual space_config_vector memory_space_config() const override;
 
-	virtual bool get_vbl_state() = 0;
+	bool get_vbl_state();
+
 
 	void internal_map(address_map &map);
 	void internal_data_map(address_map &map);
@@ -123,6 +132,21 @@ private:
 	u8 m_gpe;
 	u8 m_kie;
 	u8 m_sme;
+
+	///////////////////////////////////// VIDEO RELATED
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void palette_init(palette_device &palette) const;
+
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
+	required_region_ptr<uint16_t> m_prgregion;
+	required_region_ptr<uint8_t> m_patregion;
+
 };
+
+DECLARE_DEVICE_TYPE(UPD777, upd777_cpu_device)
 
 #endif // MAME_CPU_UPD777_UPD777_H
