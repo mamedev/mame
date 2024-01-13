@@ -418,42 +418,22 @@ int xavix_ekara_state::ekara_multi1_r()
 
 int xavix_hikara_state::ekara_multi0_r()
 {
-	uint8_t ret = 0x00;
-
-	for (int i = 1; i < 5; i++)
-		if (m_extraioselect & (1 << i)) ret |= (m_extra0->read() & (1 << i)) >> i;
-
-	return ret;
+	return (m_extraioselect & m_extra0->read() & 0x0e) ? 0x01 : 0x00;
 }
 
 int xavix_hikara_state::ekara_multi1_r()
 {
-	uint8_t ret = 0x00;
-
-	for (int i = 1; i < 5; i++)
-		if (m_extraioselect & (1 << i)) ret |= (m_extra1->read() & (1 << i)) >> i;
-
-	return ret;
+	return (m_extraioselect & m_extra1->read() & 0x0e) ? 0x01 : 0x00;
 }
 
 int xavix_hikara_state::ekara_multi2_r()
 {
-	uint8_t ret = 0x00;
-
-	for (int i = 1; i < 5; i++)
-		if (m_extraioselect & (1 << i)) ret |= (m_extra2->read() & (1 << i)) >> i;
-
-	return ret;
+	return (m_extraioselect & m_extra2->read() & 0x0e) ? 0x01 : 0x00;
 }
 
 int xavix_hikara_state::ekara_multi3_r()
 {
-	uint8_t ret = 0x00;
-
-	for (int i = 1; i < 5; i++)
-		if (m_extraioselect & (1 << i)) ret |= (m_extra3->read() & (1 << i)) >> i;
-
-	return ret;
+	return (m_extraioselect & m_extra3->read() & 0x0e) ? 0x01 : 0x00;
 }
 
 
