@@ -25,7 +25,7 @@ license:CC0-1.0
 
 	 "please play this cartridge on e-kara series, popira, popira 2, taiko de popira or jumping popira"
 
-	 SP-01  'Super Cartridge' SP-01 Best Hit
+	*SP-01  'Super Cartridge' SP-01 Best Hit
 	*SP-02  'Super Cartridge' SP-02 Best Hit
 	*SP-03  'Super Cartridge' SP-03 TV Pop Junior
 	*SP-04  'Super Cartridge' SP-04 Best Hit
@@ -36,6 +36,19 @@ license:CC0-1.0
 	(more? what's the SP highest number? correct titles for each of these etc.)
 
 	-->
+
+	<software name="sp01">
+		<description>Super Cartridge: Best Hit (Japan) (SP-01)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="スーパーカートリッジ ベストヒット"/>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24c08_epitch"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="sp01.u1" size="0x200000" crc="af1e8755" sha1="4282635c1aac5a7e2f1edf1c21127d33e713fcbc"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="sp02">
 		<description>Super Cartridge: Best Hit (Japan) (SP-02)</description>

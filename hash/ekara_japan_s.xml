@@ -128,15 +128,15 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- this crashes on the scoring screen, the same occurs on real hardware, could be bitrot or a broken revision -->
+	<!-- this crashes on the scoring screen, the same occurs on real hardware, ROM confirmed from 2 different cartridges, does a fixed version exist? -->
 	<software name="sc0008">
-		<description>Saiten Cartridge: Challenge Idol vol.2 (Japan) (SC0008-SAI)</description>
+		<description>Saiten Cartridge: Challenge Idol vol.2 (Japan) (SC0008-SAI) (broken master)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="採点カートリッジ チャレンジアイドル vol.2"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="sc0008-sai.u1" size="0x100000" crc="5d887910" sha1="5e32cccd99ba7e19974c6a9462e13cb7f8543b2a" status="baddump"/>
+				<rom name="sc0008-sai.u1" size="0x100000" crc="5d887910" sha1="5e32cccd99ba7e19974c6a9462e13cb7f8543b2a"/>
 			</dataarea>
 		</part>
 	</software>

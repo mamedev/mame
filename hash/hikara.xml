@@ -1,0 +1,111 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="hikara" description="Takara Tomy Hi-kara cartridges">
+	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit
+
+	***********************************************************************************
+
+	cartridge pinout
+
+	01 | NC                         27 | GND
+	02 | connects to 13             28 | NC
+	03 | A15                        29 | NC
+	04 | A14                        30 | NC
+	05 | A13                        31 | NC
+	06 | A12                        32 | VCC
+	07 | A11                        33 | D07
+	08 | A10                        34 | D06
+	09 | A09                        35 | D05
+	10 | A08                        36 | D04
+	11 | A07                        37 | D03
+	12 | A06                        38 | D02
+	13 | connects to 02             39 | D01
+	14 | CE                         40 | D00
+	15 | A05                        41 | GND
+	16 | A04                        42 | WE
+	17 | A03                        43 | OE
+	18 | A02                        44 | VCC
+	19 | A01                        45 | NC
+	20 | A00                        46 | A22
+	21 | VCC                        47 | A21
+	22 | NC                         48 | A20
+	23 | NC                         49 | A19
+	24 | NC                         50 | A18
+	25 | NC                         51 | A17
+	26 | GND                        52 | A16
+
+	-->
+
+	<!-- User cartridges are advertised as 'prepaid' and come in 5,10, or 20 song capacity for the user to download songs to.
+	     The service is no longer available.
+	-->
+
+	<!-- this one has some songs programmed into it:
+	    キューティーハニー  倖田來未        Cutie Honey     Kōda Kumi
+	    KissHug             aiko            KissHug         aiko
+	    さくらんぼ          大塚愛          Sakuranbo       Ōtsuka Ai
+	    Dream Fighter       Perfume         Dream Fighter   Perfume
+	    ポリリズム          Perfume         Polyrhythm      Perfume) -->	
+	<software name="user5" supported="no">
+		<description>Hi-kara 5-song capacity user cartridge (used, with 5 songs) (Japan)</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="A29L800ATV.u1" size="0x100000" crc="679f92e9" sha1="9af880f7f09c0e616d0f0b3cd499ab42de3ab210"/>
+				<!-- temp patch to boot -->
+				<rom size="1" value="0xf0" offset="0x8ec4" loadflag="fill"/>
+				<rom size="1" value="0xd0" offset="0x8ec9" loadflag="fill"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jpop1" supported="no">
+		<description>Best Hit Collection Volume 1: J-Pop 1 (Japan)</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<info name="alt_title" value="ベストヒットコレクション vol.1 J-POP①"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="bh0801001.u1" size="0x200000" crc="298dff43" sha1="c644a00154d129808261688482943b93440c33dc"/>
+				<!-- temp patch to boot -->
+				<rom size="1" value="0xf0" offset="0x93b5" loadflag="fill"/>
+				<rom size="1" value="0xd0" offset="0x93ba" loadflag="fill"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jpop2" supported="no">
+		<description>Best Hit Collection Volume 2: J-Pop 2 (Japan)</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<info name="alt_title" value="ベストヒットコレクション vol.2 J-POP②"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="bh0801002.u1" size="0x200000" crc="ef4c68f3" sha1="ea9d62d6ba98f3c067f39b6d2e9d8b03d441b315"/>
+				<!-- temp patch to boot -->
+				<rom size="1" value="0xf0" offset="0x93b5" loadflag="fill"/>
+				<rom size="1" value="0xd0" offset="0x93ba" loadflag="fill"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anime1" supported="no">
+		<description>Best Hit Collection Volume 4: Anime Song 1</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<info name="alt_title" value="ベストヒットコレクション vol.4 アニメソング①"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="bh0802001.u1" size="0x200000" crc="1294fbcc" sha1="aa68b6aeb497837f8fed595a3537f49a2a17dd11"/>
+				<!-- temp patch to boot -->
+				<rom size="1" value="0xf0" offset="0x9412" loadflag="fill"/>
+				<rom size="1" value="0xd0" offset="0x9417" loadflag="fill"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

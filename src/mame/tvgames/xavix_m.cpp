@@ -416,6 +416,27 @@ int xavix_ekara_state::ekara_multi1_r()
 	return 0x00;
 }
 
+int xavix_hikara_state::ekara_multi0_r()
+{
+	return (m_extraioselect & m_extra0->read() & 0x0e) ? 0x01 : 0x00;
+}
+
+int xavix_hikara_state::ekara_multi1_r()
+{
+	return (m_extraioselect & m_extra1->read() & 0x0e) ? 0x01 : 0x00;
+}
+
+int xavix_hikara_state::ekara_multi2_r()
+{
+	return (m_extraioselect & m_extra2->read() & 0x0e) ? 0x01 : 0x00;
+}
+
+int xavix_hikara_state::ekara_multi3_r()
+{
+	return (m_extraioselect & m_extra3->read() & 0x0e) ? 0x01 : 0x00;
+}
+
+
 uint8_t xavix_state::read_io0(uint8_t direction)
 {
 //  LOG("%s: read_io0\n", machine().describe_context());
@@ -444,13 +465,6 @@ void xavix_state::write_io1(uint8_t data, uint8_t direction)
 
 void xavix_i2c_state::write_io1(uint8_t data, uint8_t direction)
 {
-	// ignore these writes so that epo_edfx can send read requests to the ee-prom and doesn't just report an error
-	// TODO: check if these writes shouldn't be happening (the first is a direct write, the 2nd is from a port direction change)
-	//  or if the i2cmem code is oversensitive, or if something else is missing to reset the state
-	if (hackaddress1 != -1)
-		if ((m_maincpu->pc() == hackaddress1) || (m_maincpu->pc() == hackaddress2))
-			return;
-
 	if (direction & 0x08)
 	{
 		m_i2cmem->write_sda((data & 0x08) >> 3);

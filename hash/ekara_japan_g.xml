@@ -23,7 +23,7 @@ license:CC0-1.0
 	G-6  *GC0006-BHT  Best Hit Volume 3
 	G-7  *GC0007-BAT  Best Artist Volume 3
 	G-8  *GC0008-MIN  mini-moni
-	G-9   GC0009-TPJ  TV Pop Junior Volume 3 (Volume 2 is 'P-2' in 'P' series)
+	G-9  *GC0009-TPJ  TV Pop Junior Volume 3 (Volume 2 is 'P-2' in 'P' series)
 	G-10 *GC0010-BAT  Best Artist Volume 4
 	G-11 *GC0011-TPJ  TV Pop Junior Volume 4
 	G-12  GC0012-BHT  Best Hit Volume 5 (Volume 4 is 'P-1' in 'P' series)
@@ -142,6 +142,18 @@ license:CC0-1.0
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="gc0008-min(alt).u1" size="0x200000" crc="b34d1721" sha1="3621f02423f55c43d1b16855c01189719ddbcb6e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gc0009">
+		<description>TV Pop Junior Volume 3 (Japan) (GC0009-TPJ)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="TV POPジュニアVol.3"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="gc0009-tpj.u1" size="0x100000" crc="aed34640" sha1="2a55eb5e518ca18a5fd66d4e43269954015bb238"/>
 			</dataarea>
 		</part>
 	</software>
