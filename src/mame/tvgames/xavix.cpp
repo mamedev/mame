@@ -1563,8 +1563,7 @@ void xavix_cart_state::xavix_cart_hikara(machine_config &config)
 	// The songs seem too slow at regular clock.  It is speculated that the later
 	// CPU types run at ~43Mhz, so maybe this is really a XaviX 2000/2003 type chip
 	// with a higher clock, even if no extra opcodes are used.
-	XAVIX(config.replace(), m_maincpu, MAIN_CLOCK * 2);
-	set_xavix_cpumaps(config);
+	m_maincpu->set_clock(MAIN_CLOCK * 2);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("hikara");
