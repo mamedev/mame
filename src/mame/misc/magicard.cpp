@@ -30,7 +30,7 @@
   * Puzzle Me!,                                 Impera,  199?.
   * Lucky 7 (Impera, V04/91a, set 1),           Impera,  1991.
   * Lucky 7 (Impera, V04/91a, set 2),           Impera,  1991.
-  * Dallas Poker,                               unknown, 1993.
+  * Dallas Poker (CZ/V1),                       AHF Automatentechnik, 1993.
   * Kajot Card (Version 1.01, Wien Euro),       Amatic,  1993.
   * Poker (Impera, V11/90b),                    Impera,  1991.
   * Simply the Best (CZ750, v1.0),              Kajot,   2001.
@@ -47,7 +47,6 @@
   - determine what drives int1_w. (It's RTC on boards with RTC) (Not all games use this)
   - Correct memory map - at the moment ROM is mapped to several address spaces for
     all games. This is probably wrong.
-  - dallaspk produces white noise after some sounds.
 
 
 *******************************************************************************
@@ -206,6 +205,7 @@
 #include "speaker.h"
 
 #include "magicard.lh"
+#include "dallaspk.lh"
 #include "pokeri.lh"
 #include "simpbest.lh"
 
@@ -294,6 +294,8 @@ public:
 	void magicard_pic54(machine_config &config);
 	void magicard(machine_config &config);
 	void magicard_pic56(machine_config &config);
+
+	void init_dallaspk();
 
 protected:
 	virtual void machine_start() override;
@@ -751,40 +753,39 @@ static INPUT_PORTS_START( lucky7i )
 
 INPUT_PORTS_END
 
+
 static INPUT_PORTS_START( dallaspk )
 	PORT_INCLUDE( magicard )
 
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_POKER_CANCEL )     PORT_NAME("Cancel / Take")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )      PORT_NAME("Hold 4 / Black")
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )      PORT_NAME("Hold 2 / Red")
+
 	PORT_MODIFY("IN1")
-	PORT_DIPNAME( 0x80, 0x80, "Hopper" )                    PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x01, 0x01, "I/O Test" )                  PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_DIPNAME( 0x40, 0x40, "Hopper-Wert" )               PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(    0x40, "10" )
-	PORT_DIPSETTING(    0x00, "5" )
-
-	PORT_DIPNAME( 0x08, 0x08, "Munzer1" )                   PORT_DIPLOCATION("SW1:5")
-	PORT_DIPSETTING(    0x08, "10" )
-	PORT_DIPSETTING(    0x00, "5" )
-
-	PORT_DIPNAME( 0x04, 0x04, "Munzer2" )                   PORT_DIPLOCATION("SW1:6")
-	PORT_DIPSETTING(    0x04, "10" )
-	PORT_DIPSETTING(    0x00, "5" )
-
 	PORT_DIPNAME( 0x02, 0x02, "Remote 1" )                  PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x02, "100" )
 	PORT_DIPSETTING(    0x00, "10" )
-
-	PORT_DIPNAME( 0x20, 0x20, "Remote 2" )                  PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x20, "100" )
-	PORT_DIPSETTING(    0x00, "50" )
-
+	PORT_DIPNAME( 0x04, 0x04, "Munzer2" )                   PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x04, "10" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x08, 0x08, "Munzer1" )                   PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x08, "10" )
+	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x20, 0x20, "Remote 2" )                  PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x20, "100" )
+	PORT_DIPSETTING(    0x00, "50" )
+	PORT_DIPNAME( 0x40, 0x40, "Hopper-Wert" )               PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x40, "10" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x80, 0x80, "Hopper" )                    PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 INPUT_PORTS_END
@@ -2426,6 +2427,20 @@ ROM_START( simpbest )
 ROM_END
 
 
+/*********************************************
+*                Driver Init                 *
+*********************************************/
+
+void magicard_state::init_dallaspk()
+{
+//  Dallas Poker...
+//  NOP'ing to avoid the 68070 UART stuck...
+	uint8_t *rom = memregion("maincpu")->base();
+
+	rom[0x00482e] = 0x18;
+	rom[0x00482f] = 0x60;
+}
+
 } // anonymous namespace
 
 
@@ -2433,31 +2448,31 @@ ROM_END
 *                Game Drivers                *
 *********************************************/
 
-//     YEAR  NAME        PARENT    MACHINE         INPUT      STATE           INIT        ROT    COMPANY      FULLNAME                                     FLAGS
+//     YEAR  NAME        PARENT    MACHINE         INPUT      STATE           INIT           ROT     COMPANY                 FULLNAME                                     FLAGS
 
-GAME(  1994, magicard,   0,        magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v2.01)",                         MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAMEL( 1994, magicrd1,   0,        magicard_pic56, magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.10 14.09.94)",                MACHINE_SUPPORTS_SAVE,                        layout_magicard )
-GAME(  1993, magicrd1a,  magicrd1, magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.5 17.12.93, set 1)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME(  1993, magicrd1b,  magicrd1, magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.5 17.12.93, set 2)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAMEL( 1993, magicrd1c,  magicrd1, magicard_pic54, magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.2 200/93, set 1)",            MACHINE_SUPPORTS_SAVE,                        layout_magicard )
-GAME(  1993, magicrd1d,  magicrd1, magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.2 200/93, set 2)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME(  1994, magicrde,   0,        hotslots_pic54, magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (v2.11a, set 1)",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME(  1994, magicrdea,  magicrde, hotslots_pic54, magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (v2.11a, set 2)",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME(  1994, magicrdeb,  magicrde, hotslots,       magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (V2.11a, set 3)",       MACHINE_SUPPORTS_SAVE )
-GAME(  1994, magicrdec,  magicrde, hotslots,       magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (v2.09a)",              MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME(  1998, magicrdj,   0,        hotslots,       magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card III Jackpot (V4.01 6/98)",        MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME(  1998, magicrdja,  magicrdj, hotslots,       magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card III Jackpot (V4.01 7/98)",        MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME(  2001, magicle,    0,        magicle,        hotslots,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Lotto Export (5.03)",                  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME(  2002, hotslots,   0,        hotslots,       hotslots,  hotslots_state, empty_init, ROT0, "Impera",    "Hot Slots (6.00)",                           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME(  1999, quingo,     0,        magicle,        hotslots,  hotslots_state, empty_init, ROT0, "Impera",    "Quingo Export (5.00)",                       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME(  1999, belslots,   0,        magicle,        hotslots,  hotslots_state, empty_init, ROT0, "Impera",    "Bel Slots Export (5.01)",                    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME(  2001, bigdeal0,   0,        magicle,        magicard,  hotslots_state, empty_init, ROT0, "Impera",    "Big Deal Belgien (5.04)",                    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME(  199?, puzzleme,   0,        puzzleme,       puzzleme,  hotslots_state, empty_init, ROT0, "Impera",    "Puzzle Me!",                                 MACHINE_SUPPORTS_SAVE )
+GAME(  1994, magicard,   0,        magicard,       magicard,  magicard_state, empty_init,    ROT0,  "Impera",               "Magic Card (v2.01)",                         MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAMEL( 1994, magicrd1,   0,        magicard_pic56, magicard,  magicard_state, empty_init,    ROT0,  "Impera",               "Magic Card (v1.10 14.09.94)",                MACHINE_SUPPORTS_SAVE,                        layout_magicard )
+GAME(  1993, magicrd1a,  magicrd1, magicard,       magicard,  magicard_state, empty_init,    ROT0,  "Impera",               "Magic Card (v1.5 17.12.93, set 1)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  1993, magicrd1b,  magicrd1, magicard,       magicard,  magicard_state, empty_init,    ROT0,  "Impera",               "Magic Card (v1.5 17.12.93, set 2)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAMEL( 1993, magicrd1c,  magicrd1, magicard_pic54, magicard,  magicard_state, empty_init,    ROT0,  "Impera",               "Magic Card (v1.2 200/93, set 1)",            MACHINE_SUPPORTS_SAVE,                        layout_magicard )
+GAME(  1993, magicrd1d,  magicrd1, magicard,       magicard,  magicard_state, empty_init,    ROT0,  "Impera",               "Magic Card (v1.2 200/93, set 2)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  1994, magicrde,   0,        hotslots_pic54, magicrde,  hotslots_state, empty_init,    ROT0,  "Impera",               "Magic Card Export 94 (v2.11a, set 1)",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  1994, magicrdea,  magicrde, hotslots_pic54, magicrde,  hotslots_state, empty_init,    ROT0,  "Impera",               "Magic Card Export 94 (v2.11a, set 2)",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  1994, magicrdeb,  magicrde, hotslots,       magicrde,  hotslots_state, empty_init,    ROT0,  "Impera",               "Magic Card Export 94 (V2.11a, set 3)",       MACHINE_SUPPORTS_SAVE )
+GAME(  1994, magicrdec,  magicrde, hotslots,       magicrde,  hotslots_state, empty_init,    ROT0,  "Impera",               "Magic Card Export 94 (v2.09a)",              MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  1998, magicrdj,   0,        hotslots,       magicrde,  hotslots_state, empty_init,    ROT0,  "Impera",               "Magic Card III Jackpot (V4.01 6/98)",        MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  1998, magicrdja,  magicrdj, hotslots,       magicrde,  hotslots_state, empty_init,    ROT0,  "Impera",               "Magic Card III Jackpot (V4.01 7/98)",        MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  2001, magicle,    0,        magicle,        hotslots,  hotslots_state, empty_init,    ROT0,  "Impera",               "Magic Lotto Export (5.03)",                  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  2002, hotslots,   0,        hotslots,       hotslots,  hotslots_state, empty_init,    ROT0,  "Impera",               "Hot Slots (6.00)",                           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  1999, quingo,     0,        magicle,        hotslots,  hotslots_state, empty_init,    ROT0,  "Impera",               "Quingo Export (5.00)",                       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  1999, belslots,   0,        magicle,        hotslots,  hotslots_state, empty_init,    ROT0,  "Impera",               "Bel Slots Export (5.01)",                    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  2001, bigdeal0,   0,        magicle,        magicard,  hotslots_state, empty_init,    ROT0,  "Impera",               "Big Deal Belgien (5.04)",                    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  199?, puzzleme,   0,        puzzleme,       puzzleme,  hotslots_state, empty_init,    ROT0,  "Impera",               "Puzzle Me!",                                 MACHINE_SUPPORTS_SAVE )
 
-GAME(  1991, lucky7i,    0,        magicard,       lucky7i,   magicard_state, empty_init, ROT0, "Impera",    "Lucky 7 (Impera, V04/91a, set 1)",           MACHINE_SUPPORTS_SAVE )
-GAME(  1991, lucky7x,    lucky7i,  magicard,       lucky7i,   magicard_state, empty_init, ROT0, "Impera",    "Lucky 7 (Impera, V04/91a, set 2)",           MACHINE_SUPPORTS_SAVE )
-GAME(  1993, dallaspk,   0,        magicard,       dallaspk,  magicard_state, empty_init, ROT0, "<unknown>", "Dallas Poker",                               MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME(  1993, kajotcrd,   0,        hotslots,       magicard,  hotslots_state, empty_init, ROT0, "Amatic",    "Kajot Card (Version 1.01, Wien Euro)",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAMEL( 1991, pokeri,     0,        magicard,       pokeri,    magicard_state, empty_init, ROT0, "Impera",    "Poker (Impera, V11/90b)",                    MACHINE_SUPPORTS_SAVE,                        layout_pokeri )
+GAME(  1991, lucky7i,    0,        magicard,       lucky7i,   magicard_state, empty_init,    ROT0,  "Impera",               "Lucky 7 (Impera, V04/91a, set 1)",           MACHINE_SUPPORTS_SAVE )
+GAME(  1991, lucky7x,    lucky7i,  magicard,       lucky7i,   magicard_state, empty_init,    ROT0,  "Impera",               "Lucky 7 (Impera, V04/91a, set 2)",           MACHINE_SUPPORTS_SAVE )
+GAMEL( 1993, dallaspk,   0,        magicard,       dallaspk,  magicard_state, init_dallaspk, ROT0,  "AHF Automatentechnik", "Dallas Poker (CZ/V1)",                       MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING,  layout_dallaspk )
+GAME(  1993, kajotcrd,   0,        hotslots,       magicard,  hotslots_state, empty_init,    ROT0,  "Amatic",               "Kajot Card (Version 1.01, Wien Euro)",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAMEL( 1991, pokeri,     0,        magicard,       pokeri,    magicard_state, empty_init,    ROT0,  "Impera",               "Poker (Impera, V11/90b)",                    MACHINE_SUPPORTS_SAVE,                        layout_pokeri )
 
-GAMEL( 2001, simpbest,   0,        simpbest,       simpbest,  hotslots_state, empty_init, ROT0, "Kajot",     "Simply the Best (CZ750, v1.0)",              MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING,  layout_simpbest )
+GAMEL( 2001, simpbest,   0,        simpbest,       simpbest,  hotslots_state, empty_init,    ROT0,  "Kajot",                "Simply the Best (CZ750, v1.0)",              MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING,  layout_simpbest )
