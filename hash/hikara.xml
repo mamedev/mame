@@ -40,15 +40,15 @@ license:CC0-1.0
 	-->
 
 	<!-- User cartridges are advertised as 'prepaid' and come in 5,10, or 20 song capacity for the user to download songs to.
-         The service is no longer available.
+	     The service is no longer available.
 	-->
 
 	<!-- this one has some songs programmed into it:
-	    キューティーハニー			倖田來未 (Cutie Honey – Kōda Kumi)
-		KissHug					aiko
-		さくらんぼ				大塚愛 (Sakuranbo – Ōtsuka Ai)
-		Dream Fighter			Perfume
-		ポリリズム				Perfume (Polyrhythm – Perfume) -->	
+	    キューティーハニー  倖田來未        Cutie Honey     Kōda Kumi
+	    KissHug             aiko            KissHug         aiko
+	    さくらんぼ          大塚愛          Sakuranbo       Ōtsuka Ai
+	    Dream Fighter       Perfume         Dream Fighter   Perfume
+	    ポリリズム          Perfume         Polyrhythm      Perfume) -->	
 	<software name="user5" supported="no">
 		<description>Hi-kara 5-song capacity user cartridge (used, with 5 songs) (Japan)</description>
 		<year>2008</year>
