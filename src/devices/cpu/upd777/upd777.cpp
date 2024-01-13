@@ -415,6 +415,189 @@ void upd777_cpu_device::do_op()
 		push_to_stack(m_pc);
 		set_new_pc(k);
 	}
+	else if (((inst & 0b1111'0000'0000) == 0b0010'0000'0000) && ((inst & 0b0000'0000'1100) != 0b0000'0000'0100))
+	{
+		// 0b0010'rrnR'oonn where rr = reg1 (A1, A2, M or H), n = invert condition, R = reg2 (A1 or A2) and oo = optype (only 0,2,3 are valid, no cases here for 1) nn = next l value
+		// the above 'if' statement is a shit way of representing the following bitfields
+#if 0
+		case 0b0010'0000'0000: case 0b0010'0000'0001: case 0b0010'0000'0010: case 0b0010'0000'0011:
+		case 0b0010'0010'0000: case 0b0010'0010'0001: case 0b0010'0010'0010: case 0b0010'0010'0011:
+		case 0b0010'0000'1000: case 0b0010'0000'1001: case 0b0010'0000'1010: case 0b0010'0000'1011:
+		case 0b0010'0010'1000: case 0b0010'0010'1001: case 0b0010'0010'1010: case 0b0010'0010'1011:
+		case 0b0010'0000'1100: case 0b0010'0000'1101: case 0b0010'0000'1110: case 0b0010'0000'1111:
+		case 0b0010'0010'1100: case 0b0010'0010'1101: case 0b0010'0010'1110: case 0b0010'0010'1111:
+		case 0b0010'0001'0000: case 0b0010'0001'0001: case 0b0010'0001'0010: case 0b0010'0001'0011:
+		case 0b0010'0011'0000: case 0b0010'0011'0001: case 0b0010'0011'0010: case 0b0010'0011'0011:
+		case 0b0010'0001'1000: case 0b0010'0001'1001: case 0b0010'0001'1010: case 0b0010'0001'1011:
+		case 0b0010'0011'1000: case 0b0010'0011'1001: case 0b0010'0011'1010: case 0b0010'0011'1011:
+		case 0b0010'0001'1100: case 0b0010'0001'1101: case 0b0010'0001'1110: case 0b0010'0001'1111:
+		case 0b0010'0011'1100: case 0b0010'0011'1101: case 0b0010'0011'1110: case 0b0010'0011'1111:
+		case 0b0010'0100'0000: case 0b0010'0100'0001: case 0b0010'0100'0010: case 0b0010'0100'0011:
+		case 0b0010'0110'0000: case 0b0010'0110'0001: case 0b0010'0110'0010: case 0b0010'0110'0011:
+		case 0b0010'0100'1000: case 0b0010'0100'1001: case 0b0010'0100'1010: case 0b0010'0100'1011:
+		case 0b0010'0110'1000: case 0b0010'0110'1001: case 0b0010'0110'1010: case 0b0010'0110'1011:
+		case 0b0010'0100'1100: case 0b0010'0100'1101: case 0b0010'0100'1110: case 0b0010'0100'1111:
+		case 0b0010'0110'1100: case 0b0010'0110'1101: case 0b0010'0110'1110: case 0b0010'0110'1111:
+		case 0b0010'0101'0000: case 0b0010'0101'0001: case 0b0010'0101'0010: case 0b0010'0101'0011:
+		case 0b0010'0111'0000: case 0b0010'0111'0001: case 0b0010'0111'0010: case 0b0010'0111'0011:
+		case 0b0010'0101'1000: case 0b0010'0101'1001: case 0b0010'0101'1010: case 0b0010'0101'1011:
+		case 0b0010'0111'1000: case 0b0010'0111'1001: case 0b0010'0111'1010: case 0b0010'0111'1011:
+		case 0b0010'0101'1100: case 0b0010'0101'1101: case 0b0010'0101'1110: case 0b0010'0101'1111:
+		case 0b0010'0111'1100: case 0b0010'0111'1101: case 0b0010'0111'1110: case 0b0010'0111'1111:
+		case 0b0010'1000'0000: case 0b0010'1000'0001: case 0b0010'1000'0010: case 0b0010'1000'0011:
+		case 0b0010'1010'0000: case 0b0010'1010'0001: case 0b0010'1010'0010: case 0b0010'1010'0011:
+		case 0b0010'1000'1000: case 0b0010'1000'1001: case 0b0010'1000'1010: case 0b0010'1000'1011:
+		case 0b0010'1010'1000: case 0b0010'1010'1001: case 0b0010'1010'1010: case 0b0010'1010'1011:
+		case 0b0010'1000'1100: case 0b0010'1000'1101: case 0b0010'1000'1110: case 0b0010'1000'1111:
+		case 0b0010'1010'1100: case 0b0010'1010'1101: case 0b0010'1010'1110: case 0b0010'1010'1111:
+		case 0b0010'1001'0000: case 0b0010'1001'0001: case 0b0010'1001'0010: case 0b0010'1001'0011:
+		case 0b0010'1011'0000: case 0b0010'1011'0001: case 0b0010'1011'0010: case 0b0010'1011'0011:
+		case 0b0010'1001'1000: case 0b0010'1001'1001: case 0b0010'1001'1010: case 0b0010'1001'1011:
+		case 0b0010'1011'1000: case 0b0010'1011'1001: case 0b0010'1011'1010: case 0b0010'1011'1011:
+		case 0b0010'1001'1100: case 0b0010'1001'1101: case 0b0010'1001'1110: case 0b0010'1001'1111:
+		case 0b0010'1011'1100: case 0b0010'1011'1101: case 0b0010'1011'1110: case 0b0010'1011'1111:
+		case 0b0010'1100'0000: case 0b0010'1100'0001: case 0b0010'1100'0010: case 0b0010'1100'0011:
+		case 0b0010'1110'0000: case 0b0010'1110'0001: case 0b0010'1110'0010: case 0b0010'1110'0011:
+		case 0b0010'1100'1000: case 0b0010'1100'1001: case 0b0010'1100'1010: case 0b0010'1100'1011:
+		case 0b0010'1110'1000: case 0b0010'1110'1001: case 0b0010'1110'1010: case 0b0010'1110'1011:
+		case 0b0010'1100'1100: case 0b0010'1100'1101: case 0b0010'1100'1110: case 0b0010'1100'1111:
+		case 0b0010'1110'1100: case 0b0010'1110'1101: case 0b0010'1110'1110: case 0b0010'1110'1111:
+		case 0b0010'1101'0000: case 0b0010'1101'0001: case 0b0010'1101'0010: case 0b0010'1101'0011:
+		case 0b0010'1111'0000: case 0b0010'1111'0001: case 0b0010'1111'0010: case 0b0010'1111'0011:
+		case 0b0010'1101'1000: case 0b0010'1101'1001: case 0b0010'1101'1010: case 0b0010'1101'1011:
+		case 0b0010'1111'1000: case 0b0010'1111'1001: case 0b0010'1111'1010: case 0b0010'1111'1011:
+		case 0b0010'1101'1100: case 0b0010'1101'1101: case 0b0010'1101'1110: case 0b0010'1101'1111:
+		case 0b0010'1111'1100: case 0b0010'1111'1101: case 0b0010'1111'1110: case 0b0010'1111'1111:
+#endif
+		// optype · (AND)
+		// 200 Skip if (A1[7:1]·A1[7:1]) makes zero, N->L[2:1]
+		// 220 Skip if (A1[7:1]·A1[7:1]) makes non zero, N->L[2:1]
+		// 210 Skip if (A1[7:1]·A2[7:1]) makes zero, N->L[2:1]
+		// 230 Skip if (A1[7:1]·A2[7:1]) makes non zero, N->L[2:1]
+		// 240 Skip if (A2[7:1]·A1[7:1]) makes zero, N->L[2:1]
+		// 260 Skip if (A2[7:1]·A1[7:1]) makes non zero, N->L[2:1]
+		// 250 Skip if (A2[7:1]·A2[7:1]) makes zero, N->L[2:1]
+		// 270 Skip if (A2[7:1]·A2[7:1]) makes non zero, N->L[2:1]
+		// 280 Skip if (M[H[5:1],L[2:1]][7:1]·A1[7:1]) makes zero, N->L[2:1]
+		// 2a0 Skip if (M[H[5:1],L[2:1]][7:1]·A1[7:1]) makes non zero, N->L[2:1]
+		// 290 Skip if (M[H[5:1],L[2:1]][7:1]·A2[7:1]) makes zero, N->L[2:1]
+		// 2b0 Skip if (M[H[5:1],L[2:1]][7:1]·A2[7:1]) makes non zero, N->L[2:1]
+		// 2c0 Skip if (H[5:1]·A1[5:1]) makes zero, N->L[2:1]
+		// 2e0 Skip if (H[5:1]·A1[5:1]) makes non zero, N->L[2:1]
+		// 2d0 Skip if (H[5:1]·A2[5:1]) makes zero, N->L[2:1]
+		// 2f0 Skip if (H[5:1]·A2[5:1]) makes non zero, N->L[2:1]
+
+		// optype = (these are expressed as x=y in the opcopde syntax, but x-y in the description, in reality it seems to act as 'CMP' so x-y = 0)
+		// 208 Skip if (A1[7:1]-A1[7:1]) makes zero, N->L[2:1]
+		// 228 Skip if (A1[7:1]-A1[7:1]) makes non zero, N->L[2:1]
+		// 218 Skip if (A1[7:1]-A2[7:1]) makes zero, N->L[2:1]
+		// 238 Skip if (A1[7:1]-A2[7:1]) makes non zero, N->L[2:1]
+		// 248 Skip if (A2[7:1]-A1[7:1]) makes zero, N->L[2:1]
+		// 268 Skip if (A2[7:1]-A1[7:1]) makes non zero, N->L[2:1]
+		// 258 Skip if (A2[7:1]-A2[7:1]) makes zero, N->L[2:1]
+		// 278 Skip if (A2[7:1]-A2[7:1]) makes non zero, N->L[2:1]
+		// 288 Skip if (M[H[5:1],L[2:1]][7:1]-A1[7:1]) makes zero, N->L[2:1]
+		// 2a8 Skip if (M[H[5:1],L[2:1]][7:1]-A1[7:1]) makes non zero, N->L[2:1]
+		// 298 Skip if (M[H[5:1],L[2:1]][7:1]-A2[7:1]) makes zero, N->L[2:1]
+		// 2b8 Skip if (M[H[5:1],L[2:1]][7:1]-A2[7:1]) makes non zero, N->L[2:1]
+		// 2c8 Skip if (H[5:1]-A1[5:1]) makes zero, N->L[2:1]
+		// 2e8 Skip if (H[5:1]-A1[5:1]) makes non zero, N->L[2:1]
+		// 2d8 Skip if (H[5:1]-A2[5:1]) makes zero, N->L[2:1]
+		// 2f8 Skip if (H[5:1]-A2[5:1]) makes non zero, N->L[2:1]
+
+		// optype -
+		// 20c Skip if (A1[7:1]-A1[7:1]) makes borrow, N->L[2:1]
+		// 22c Skip if (A1[7:1]-A1[7:1]) makes non borrow, N->L[2:1]
+		// 21c Skip if (A1[7:1]-A2[7:1]) makes borrow, N->L[2:1]
+		// 23c Skip if (A1[7:1]-A2[7:1]) makes non borrow, N->L[2:1]
+		// 24c Skip if (A2[7:1]-A1[7:1]) makes borrow, N->L[2:1]
+		// 26c Skip if (A2[7:1]-A1[7:1]) makes non borrow, N->L[2:1]
+		// 25c Skip if (A2[7:1]-A2[7:1]) makes borrow, N->L[2:1]
+		// 27c Skip if (A2[7:1]-A2[7:1]) makes non borrow, N->L[2:1]
+		// 28c Skip if (M[H[5:1],L[2:1]][7:1]-A1[7:1]) makes borrow, N->L[2:1]
+		// 2ac Skip if (M[H[5:1],L[2:1]][7:1]-A1[7:1]) makes non borrow, N->L[2:1]
+		// 29c Skip if (M[H[5:1],L[2:1]][7:1]-A2[7:1]) makes borrow, N->L[2:1]
+		// 2bc Skip if (M[H[5:1],L[2:1]][7:1]-A2[7:1]) makes non borrow, N->L[2:1]
+		// 2cc Skip if (H[5:1]-A1[5:1]) makes borrow, N->L[2:1]
+		// 2ec Skip if (H[5:1]-A1[5:1]) makes non borrow, N->L[2:1]
+		// 2dc Skip if (H[5:1]-A2[5:1]) makes borrow, N->L[2:1]
+		// 2fc Skip if (H[5:1]-A2[5:1]) makes non borrow, N->L[2:1]
+		const int non = inst & 0x20;
+		const int optype = (inst & 0x0c) >> 2;
+		const int reg1 = (inst & 0xc0) >> 6;
+		const int reg2 = (inst & 0x10) >> 4;
+		const int n = inst & 0x3;
+		u8 srcreg2 = get_a1_or_a2(reg2);
+		u8 srcreg1 = 0;
+		switch (reg1)
+		{
+		case 0: srcreg1 = get_a1(); break;
+		case 1: srcreg1 = get_a2(); break;
+		case 2: srcreg1 = get_m_data(); break;
+		case 3:
+		{
+			srcreg1 = get_h();
+			srcreg2 &= 0x1f;
+			break;
+		}
+		}
+
+		switch (optype)
+		{
+		case 0: // AND
+		{
+			if (!non)
+			{
+				if ((srcreg1 & srcreg2) == 0) // skip if (x·y) makes zero, N->L[2:1] 
+					m_skip = 1;
+			}
+			else
+			{
+				if ((srcreg1 & srcreg2) != 0) // skip if (x·y) makes non zero, N->L[2:1]
+					m_skip = 1;
+			}
+			break;
+		}
+		case 1: // invalid
+		{
+			// can't happen, no switch case leads here
+			break;
+		}
+		case 2: // =
+		{
+			if (!non)
+			{
+				if (srcreg1 == srcreg2) // skip if (x-y) makes zero, N->L[2:1]
+					m_skip = 1;
+			}
+			else
+			{
+				if (srcreg1 != srcreg2) // skip if (x-y) makes non zero, N->L[2:1]
+					m_skip = 1;
+			}
+			break;
+		}
+		case 3: // -
+		{
+			u8 result = srcreg1 - srcreg2;
+
+			if (!non)
+			{
+				if (result & 0x80) // skip if (x-y) makes borrow, N->L[2:1]
+					m_skip = 1;
+			}
+			else
+			{
+				if ((result & 0x80) == 0) // skip if (x-y) makes non borrow, N->L[2:1]
+					m_skip = 1;
+			}
+
+			break;
+		}
+		}
+
+		set_l(n);
+	}
 	else
 	{
 		switch (inst)
@@ -574,188 +757,6 @@ void upd777_cpu_device::do_op()
 			m_skip = 1;
 			break;
 		}
-
-		// 0b0010'rrnR'oo00 where rr = reg1 (A1, A2, M or H), n = invert condition, R = reg2 (A1 or A2) and oo = optype (only 0,2,3 are valid, no cases here for 1)
-		case 0b0010'0000'0000: case 0b0010'0000'0001: case 0b0010'0000'0010: case 0b0010'0000'0011:
-		case 0b0010'0010'0000: case 0b0010'0010'0001: case 0b0010'0010'0010: case 0b0010'0010'0011:
-		case 0b0010'0000'1000: case 0b0010'0000'1001: case 0b0010'0000'1010: case 0b0010'0000'1011:
-		case 0b0010'0010'1000: case 0b0010'0010'1001: case 0b0010'0010'1010: case 0b0010'0010'1011:
-		case 0b0010'0000'1100: case 0b0010'0000'1101: case 0b0010'0000'1110: case 0b0010'0000'1111:
-		case 0b0010'0010'1100: case 0b0010'0010'1101: case 0b0010'0010'1110: case 0b0010'0010'1111:
-		case 0b0010'0001'0000: case 0b0010'0001'0001: case 0b0010'0001'0010: case 0b0010'0001'0011:
-		case 0b0010'0011'0000: case 0b0010'0011'0001: case 0b0010'0011'0010: case 0b0010'0011'0011:
-		case 0b0010'0001'1000: case 0b0010'0001'1001: case 0b0010'0001'1010: case 0b0010'0001'1011:
-		case 0b0010'0011'1000: case 0b0010'0011'1001: case 0b0010'0011'1010: case 0b0010'0011'1011:
-		case 0b0010'0001'1100: case 0b0010'0001'1101: case 0b0010'0001'1110: case 0b0010'0001'1111:
-		case 0b0010'0011'1100: case 0b0010'0011'1101: case 0b0010'0011'1110: case 0b0010'0011'1111:
-		case 0b0010'0100'0000: case 0b0010'0100'0001: case 0b0010'0100'0010: case 0b0010'0100'0011:
-		case 0b0010'0110'0000: case 0b0010'0110'0001: case 0b0010'0110'0010: case 0b0010'0110'0011:
-		case 0b0010'0100'1000: case 0b0010'0100'1001: case 0b0010'0100'1010: case 0b0010'0100'1011:
-		case 0b0010'0110'1000: case 0b0010'0110'1001: case 0b0010'0110'1010: case 0b0010'0110'1011:
-		case 0b0010'0100'1100: case 0b0010'0100'1101: case 0b0010'0100'1110: case 0b0010'0100'1111:
-		case 0b0010'0110'1100: case 0b0010'0110'1101: case 0b0010'0110'1110: case 0b0010'0110'1111:
-		case 0b0010'0101'0000: case 0b0010'0101'0001: case 0b0010'0101'0010: case 0b0010'0101'0011:
-		case 0b0010'0111'0000: case 0b0010'0111'0001: case 0b0010'0111'0010: case 0b0010'0111'0011:
-		case 0b0010'0101'1000: case 0b0010'0101'1001: case 0b0010'0101'1010: case 0b0010'0101'1011:
-		case 0b0010'0111'1000: case 0b0010'0111'1001: case 0b0010'0111'1010: case 0b0010'0111'1011:
-		case 0b0010'0101'1100: case 0b0010'0101'1101: case 0b0010'0101'1110: case 0b0010'0101'1111:
-		case 0b0010'0111'1100: case 0b0010'0111'1101: case 0b0010'0111'1110: case 0b0010'0111'1111:
-		case 0b0010'1000'0000: case 0b0010'1000'0001: case 0b0010'1000'0010: case 0b0010'1000'0011:
-		case 0b0010'1010'0000: case 0b0010'1010'0001: case 0b0010'1010'0010: case 0b0010'1010'0011:
-		case 0b0010'1000'1000: case 0b0010'1000'1001: case 0b0010'1000'1010: case 0b0010'1000'1011:
-		case 0b0010'1010'1000: case 0b0010'1010'1001: case 0b0010'1010'1010: case 0b0010'1010'1011:
-		case 0b0010'1000'1100: case 0b0010'1000'1101: case 0b0010'1000'1110: case 0b0010'1000'1111:
-		case 0b0010'1010'1100: case 0b0010'1010'1101: case 0b0010'1010'1110: case 0b0010'1010'1111:
-		case 0b0010'1001'0000: case 0b0010'1001'0001: case 0b0010'1001'0010: case 0b0010'1001'0011:
-		case 0b0010'1011'0000: case 0b0010'1011'0001: case 0b0010'1011'0010: case 0b0010'1011'0011:
-		case 0b0010'1001'1000: case 0b0010'1001'1001: case 0b0010'1001'1010: case 0b0010'1001'1011:
-		case 0b0010'1011'1000: case 0b0010'1011'1001: case 0b0010'1011'1010: case 0b0010'1011'1011:
-		case 0b0010'1001'1100: case 0b0010'1001'1101: case 0b0010'1001'1110: case 0b0010'1001'1111:
-		case 0b0010'1011'1100: case 0b0010'1011'1101: case 0b0010'1011'1110: case 0b0010'1011'1111:
-		case 0b0010'1100'0000: case 0b0010'1100'0001: case 0b0010'1100'0010: case 0b0010'1100'0011:
-		case 0b0010'1110'0000: case 0b0010'1110'0001: case 0b0010'1110'0010: case 0b0010'1110'0011:
-		case 0b0010'1100'1000: case 0b0010'1100'1001: case 0b0010'1100'1010: case 0b0010'1100'1011:
-		case 0b0010'1110'1000: case 0b0010'1110'1001: case 0b0010'1110'1010: case 0b0010'1110'1011:
-		case 0b0010'1100'1100: case 0b0010'1100'1101: case 0b0010'1100'1110: case 0b0010'1100'1111:
-		case 0b0010'1110'1100: case 0b0010'1110'1101: case 0b0010'1110'1110: case 0b0010'1110'1111:
-		case 0b0010'1101'0000: case 0b0010'1101'0001: case 0b0010'1101'0010: case 0b0010'1101'0011:
-		case 0b0010'1111'0000: case 0b0010'1111'0001: case 0b0010'1111'0010: case 0b0010'1111'0011:
-		case 0b0010'1101'1000: case 0b0010'1101'1001: case 0b0010'1101'1010: case 0b0010'1101'1011:
-		case 0b0010'1111'1000: case 0b0010'1111'1001: case 0b0010'1111'1010: case 0b0010'1111'1011:
-		case 0b0010'1101'1100: case 0b0010'1101'1101: case 0b0010'1101'1110: case 0b0010'1101'1111:
-		case 0b0010'1111'1100: case 0b0010'1111'1101: case 0b0010'1111'1110: case 0b0010'1111'1111:
-		{
-			// optype · (AND)
-			// 200 Skip if (A1[7:1]·A1[7:1]) makes zero, N->L[2:1]
-			// 220 Skip if (A1[7:1]·A1[7:1]) makes non zero, N->L[2:1]
-			// 210 Skip if (A1[7:1]·A2[7:1]) makes zero, N->L[2:1]
-			// 230 Skip if (A1[7:1]·A2[7:1]) makes non zero, N->L[2:1]
-			// 240 Skip if (A2[7:1]·A1[7:1]) makes zero, N->L[2:1]
-			// 260 Skip if (A2[7:1]·A1[7:1]) makes non zero, N->L[2:1]
-			// 250 Skip if (A2[7:1]·A2[7:1]) makes zero, N->L[2:1]
-			// 270 Skip if (A2[7:1]·A2[7:1]) makes non zero, N->L[2:1]
-			// 280 Skip if (M[H[5:1],L[2:1]][7:1]·A1[7:1]) makes zero, N->L[2:1]
-			// 2a0 Skip if (M[H[5:1],L[2:1]][7:1]·A1[7:1]) makes non zero, N->L[2:1]
-			// 290 Skip if (M[H[5:1],L[2:1]][7:1]·A2[7:1]) makes zero, N->L[2:1]
-			// 2b0 Skip if (M[H[5:1],L[2:1]][7:1]·A2[7:1]) makes non zero, N->L[2:1]
-			// 2c0 Skip if (H[5:1]·A1[5:1]) makes zero, N->L[2:1]
-			// 2e0 Skip if (H[5:1]·A1[5:1]) makes non zero, N->L[2:1]
-			// 2d0 Skip if (H[5:1]·A2[5:1]) makes zero, N->L[2:1]
-			// 2f0 Skip if (H[5:1]·A2[5:1]) makes non zero, N->L[2:1]
-
-			// optype = (these are expressed as x=y in the opcopde syntax, but x-y in the description, in reality it seems to act as 'CMP' so x-y = 0)
-			// 208 Skip if (A1[7:1]-A1[7:1]) makes zero, N->L[2:1]
-			// 228 Skip if (A1[7:1]-A1[7:1]) makes non zero, N->L[2:1]
-			// 218 Skip if (A1[7:1]-A2[7:1]) makes zero, N->L[2:1]
-			// 238 Skip if (A1[7:1]-A2[7:1]) makes non zero, N->L[2:1]
-			// 248 Skip if (A2[7:1]-A1[7:1]) makes zero, N->L[2:1]
-			// 268 Skip if (A2[7:1]-A1[7:1]) makes non zero, N->L[2:1]
-			// 258 Skip if (A2[7:1]-A2[7:1]) makes zero, N->L[2:1]
-			// 278 Skip if (A2[7:1]-A2[7:1]) makes non zero, N->L[2:1]
-			// 288 Skip if (M[H[5:1],L[2:1]][7:1]-A1[7:1]) makes zero, N->L[2:1]
-			// 2a8 Skip if (M[H[5:1],L[2:1]][7:1]-A1[7:1]) makes non zero, N->L[2:1]
-			// 298 Skip if (M[H[5:1],L[2:1]][7:1]-A2[7:1]) makes zero, N->L[2:1]
-			// 2b8 Skip if (M[H[5:1],L[2:1]][7:1]-A2[7:1]) makes non zero, N->L[2:1]
-			// 2c8 Skip if (H[5:1]-A1[5:1]) makes zero, N->L[2:1]
-			// 2e8 Skip if (H[5:1]-A1[5:1]) makes non zero, N->L[2:1]
-			// 2d8 Skip if (H[5:1]-A2[5:1]) makes zero, N->L[2:1]
-			// 2f8 Skip if (H[5:1]-A2[5:1]) makes non zero, N->L[2:1]
-
-			// optype -
-			// 20c Skip if (A1[7:1]-A1[7:1]) makes borrow, N->L[2:1]
-			// 22c Skip if (A1[7:1]-A1[7:1]) makes non borrow, N->L[2:1]
-			// 21c Skip if (A1[7:1]-A2[7:1]) makes borrow, N->L[2:1]
-			// 23c Skip if (A1[7:1]-A2[7:1]) makes non borrow, N->L[2:1]
-			// 24c Skip if (A2[7:1]-A1[7:1]) makes borrow, N->L[2:1]
-			// 26c Skip if (A2[7:1]-A1[7:1]) makes non borrow, N->L[2:1]
-			// 25c Skip if (A2[7:1]-A2[7:1]) makes borrow, N->L[2:1]
-			// 27c Skip if (A2[7:1]-A2[7:1]) makes non borrow, N->L[2:1]
-			// 28c Skip if (M[H[5:1],L[2:1]][7:1]-A1[7:1]) makes borrow, N->L[2:1]
-			// 2ac Skip if (M[H[5:1],L[2:1]][7:1]-A1[7:1]) makes non borrow, N->L[2:1]
-			// 29c Skip if (M[H[5:1],L[2:1]][7:1]-A2[7:1]) makes borrow, N->L[2:1]
-			// 2bc Skip if (M[H[5:1],L[2:1]][7:1]-A2[7:1]) makes non borrow, N->L[2:1]
-			// 2cc Skip if (H[5:1]-A1[5:1]) makes borrow, N->L[2:1]
-			// 2ec Skip if (H[5:1]-A1[5:1]) makes non borrow, N->L[2:1]
-			// 2dc Skip if (H[5:1]-A2[5:1]) makes borrow, N->L[2:1]
-			// 2fc Skip if (H[5:1]-A2[5:1]) makes non borrow, N->L[2:1]
-			const int non = inst & 0x20;
-			const int optype = (inst & 0x0c) >> 2;
-			const int reg1 = (inst & 0xc0) >> 6;
-			const int reg2 = (inst & 0x10) >> 4;
-			const int n = inst & 0x3;
-			u8 srcreg2 = get_a1_or_a2(reg2);
-			u8 srcreg1 = 0;
-			switch (reg1)
-			{
-			case 0: srcreg1 = get_a1(); break;
-			case 1: srcreg1 = get_a2(); break;
-			case 2: srcreg1 = get_m_data(); break;
-			case 3:
-			{
-				srcreg1 = get_h();
-				srcreg2 &= 0x1f;
-				break;
-			}
-			}
-
-			switch (optype)
-			{
-			case 0: // AND
-			{
-				if (!non)
-				{
-					if ((srcreg1 & srcreg2) == 0) // skip if (x·y) makes zero, N->L[2:1] 
-						m_skip = 1;
-				}
-				else
-				{
-					if ((srcreg1 & srcreg2) != 0) // skip if (x·y) makes non zero, N->L[2:1]
-						m_skip = 1;
-				}
-				break;
-			}
-			case 1: // invalid
-			{
-				// can't happen, no switch case leads here
-				break;
-			}
-			case 2: // =
-			{
-				if (!non)
-				{
-					if (srcreg1 == srcreg2) // skip if (x-y) makes zero, N->L[2:1]
-						m_skip = 1;
-				}
-				else
-				{
-					if (srcreg1 != srcreg2) // skip if (x-y) makes non zero, N->L[2:1]
-						m_skip = 1;
-				}
-				break;
-			}
-			case 3: // -
-			{
-				u8 result = srcreg1 - srcreg2;
-
-				if (!non)
-				{
-					if (result & 0x80) // skip if (x-y) makes borrow, N->L[2:1]
-						m_skip = 1;
-				}
-				else
-				{
-					if ((result & 0x80) == 0) // skip if (x-y) makes non borrow, N->L[2:1]
-						m_skip = 1;
-				}
-
-				break;
-			}
-			}
-
-			set_l(n);
-			break;
-		}
-
 		case 0b0011'0000'0000: case 0b0011'0000'0001: case 0b0011'0000'0010: case 0b0011'0000'0011:
 		{
 			// 300 N->L[2:1]
