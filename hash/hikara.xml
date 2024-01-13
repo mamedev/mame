@@ -42,6 +42,13 @@ license:CC0-1.0
 	<!-- User cartridges are advertised as 'prepaid' and come in 5,10, or 20 song capacity for the user to download songs to.
          The service is no longer available.
 	-->
+
+	<!-- this one has some songs programmed into it:
+	     ??? (untranslated)		???  (untranslated)
+		 KissHug				aiko
+		 ??? (untranslated)     ???  (untranslated)
+		 Dream Fighter			Perfume
+		 ??? (untranslated)		Perfume						-->
 	<software name="user5" supported="no">
 		<description>Hi-kara 5-song capacity user cartridge (used, with 5 songs) (Japan)</description>
 		<year>2008</year>
@@ -57,9 +64,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="jpop1" supported="no">
-		<description>Vol 1: J-Pop 1 (Japan)</description>
+		<description>Best Hit Collection Volume 1: J-Pop 1 (Japan)</description>
 		<year>2008</year>
 		<publisher>Takara Tomy</publisher>
+		<info name="alt_title" value="ベストヒットコレクション vol.1 J-POP①"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="bh0801001.u1" size="0x200000" crc="298dff43" sha1="c644a00154d129808261688482943b93440c33dc"/>
@@ -71,9 +79,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="jpop2" supported="no">
-		<description>Vol 2: J-Pop 2 (Japan)</description>
+		<description>Best Hit Collection Volume 1: J-Pop 2 (Japan)</description>
 		<year>2008</year>
 		<publisher>Takara Tomy</publisher>
+		<info name="alt_title" value="ベストヒットコレクション vol.2 J-POP②"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="bh0801002.u1" size="0x200000" crc="ef4c68f3" sha1="ea9d62d6ba98f3c067f39b6d2e9d8b03d441b315"/>
@@ -85,9 +94,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="anime1" supported="no">
-		<description>Vol 4: Anime 1 (Japan)</description>
+		<description>Best Hit Collection Volume 4: Anime Song 1</description>
 		<year>2008</year>
 		<publisher>Takara Tomy</publisher>
+		<info name="alt_title" value="ベストヒットコレクション vol.4 アニメソング①"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="bh0802001.u1" size="0x200000" crc="1294fbcc" sha1="aa68b6aeb497837f8fed595a3537f49a2a17dd11"/>
