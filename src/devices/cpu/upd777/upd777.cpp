@@ -550,9 +550,7 @@ void upd777_cpu_device::do_op()
 	}
 	else if ((inst & 0b1111'1010'0000) == 0b0011'0010'0000)
 	{
-		// the above 'if' statement is a shit way of representing the following bitfields
-		//   0b0011'0r1R'oonn (where r = reg1, R = reg2, o = optype, and n = next l value)
-		
+		//   0b0011'0r1R'oonn (where r = reg1, R = reg2, o = optype, and n = next l value)	
 		// 320 AND A1[7:1] and A1[7:1], store to A1[7:1], N->L[2:1]
 		// 324 Add A1[7:1] and A1[7:1], store to A1[7:1], N->L[2:1]
 		// 328 OR A1[7:1] and A1[7:1], store to A1[7:1], N->L[2:1]
