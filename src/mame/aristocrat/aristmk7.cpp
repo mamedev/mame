@@ -4,6 +4,10 @@
 
 Aristocrat MK7 "Viridian WS" (circa ~2006)
 
+TODO:
+- Throws "MK7i FPGA not found" & "Smartcard init failed" in shutms11 when bootstrapping with custom
+  GRUB;
+
 Notes:
 - Games (mostly) runs on either CF or SATA ext2 partitions (heuristics TBD);
 - PCIe version 2.0;
@@ -202,13 +206,30 @@ void aristmk7_state::aristmk7(machine_config &config)
 	// ...
 }
 
-ROM_START(aristmk7)
-	ROM_REGION32_LE(0x100000, "bios", 0)
-	// Phoenix based BIOS
+// Phoenix based BIOS
+#define ARISTMK7_BIOS \
+	ROM_REGION32_LE(0x100000, "bios", 0) \
 	ROM_LOAD( "mk7-bios_590176_01_1.00.7.u1", 0x000000, 0x100000, CRC(f2fea07e) SHA1(285038473fbe3a5708045e2f8b14562f3c24b203) )
+
+
+ROM_START( aristmk7 )
+	ARISTMK7_BIOS
+ROM_END
+
+ROM_START( a7lucky88 )
+	ARISTMK7_BIOS
+
+	// compact flash
+	DISK_REGION( "ide:0:hdd" )
+	DISK_IMAGE( "l88", 0, SHA1(5734872adc867f10ee21790e544efb260fd3d266) )
+
+	ROM_REGION( 0x10000, "sam", ROMREGION_ERASEFF )
+	ROM_LOAD( "sam.bin", 0, 0x10000, NO_DUMP )
 ROM_END
 
 } // anonymous namespace
 
 
-GAME(2006?, aristmk7, 0, aristmk7, aristmk7, aristmk7_state, empty_init, ROT0, "Aristocrat", "Aristocrat MK-7 BIOS", MACHINE_IS_SKELETON )// | MACHINE_IS_BIOS_ROOT )
+GAME(2006?, aristmk7, 0, aristmk7, aristmk7, aristmk7_state, empty_init, ROT0, "Aristocrat", "Aristocrat MK-7 BIOS", MACHINE_IS_SKELETON | MACHINE_IS_BIOS_ROOT )
+
+GAME(200?,  a7lucky88, aristmk7, aristmk7, aristmk7, aristmk7_state, empty_init, ROT0, "Aristocrat", "Lucky 88 (Aristocrat MK-7)", MACHINE_IS_SKELETON )
