@@ -96,6 +96,9 @@ private:
 	u8 get_a3();
 	u8 get_a4();
 
+	u8 get_a1_or_a2(int reg);
+	void set_a1_or_a2(int reg, u8 value);
+
 	u32 m_ppc;
 	u32 m_pc;
 	s32 m_icount;

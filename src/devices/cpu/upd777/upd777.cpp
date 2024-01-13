@@ -245,6 +245,22 @@ u8 upd777_cpu_device::get_a2() { return m_a[1] & 0x7f; }
 u8 upd777_cpu_device::get_a3() { return m_a[2] & 0x7f; }
 u8 upd777_cpu_device::get_a4() { return m_a[3] & 0x7f; }
 
+u8 upd777_cpu_device::get_a1_or_a2(int reg)
+{
+	if (reg == 0)
+		return get_a1();
+	else
+		return get_a2();
+}
+
+void upd777_cpu_device::set_a1_or_a2(int reg, u8 value)
+{
+	if (reg == 0)
+		set_a1(value);
+	else
+		set_a2(value);
+}
+
 // FRS/FLS are the 2 7-bit sound registers
 void upd777_cpu_device::set_frs(u8 frs) { m_frs = frs & 0x7f; }
 void upd777_cpu_device::set_fls(u8 fls) { m_fls = fls & 0x7f; }
@@ -344,10 +360,12 @@ void upd777_cpu_device::do_op()
 		if (get_kie()) // documentation does not state if KIE or SME has priority
 		{
 			LOGMASKED(LOG_UNHANDLED_OPS, "KIE->M\n", k);
+			set_m_data(0);
 		}
 		else if (get_sme())
 		{
 			LOGMASKED(LOG_UNHANDLED_OPS, "SME->M\n", k);
+			set_m_data(0);
 		}
 		else
 		{
@@ -417,6 +435,7 @@ void upd777_cpu_device::do_op()
 		{
 			// 018 H[5:1]<->X4[5:1], 0->X4[7:6], 0->X3[7:1], 0->X1'[1], 0->A1'[1], L[2:1]<->L'[2:1]
 			LOGMASKED(LOG_UNHANDLED_OPS, "H<->X\n");
+#if 1
 			// this opcode is not well explained! but X4 etc. are referenced on Data RAM & Register Files which makes
 			// it even more confusing
 			u8 temp;
@@ -428,7 +447,7 @@ void upd777_cpu_device::do_op()
 			temp = m_ldash;
 			m_ldash = get_l();
 			set_l(temp);
-
+#endif
 			break;
 		}
 		case 0b0000'0010'0000:
@@ -647,13 +666,7 @@ void upd777_cpu_device::do_op()
 			const int reg1 = (inst & 0xc0) >> 6;
 			const int reg2 = (inst & 0x10) >> 4;
 			const int n = inst & 0x3;
-			u8 srcreg2 = 0;
-			switch (reg2)
-			{
-			case 0: srcreg2 = get_a1(); break;
-			case 1: srcreg2 = get_a2(); break;
-			}
-
+			u8 srcreg2 = get_a1_or_a2(reg2);
 			u8 srcreg1 = 0;
 			switch (reg1)
 			{
@@ -927,17 +940,8 @@ void upd777_cpu_device::do_op()
 			const int reg1 = (inst & 0x40) >> 6;
 			const int n = inst & 0x3;
 
-			u8 src1 = 0;
-			if (reg1 == 0)
-				src1 = get_a1();
-			else
-				src1 = get_a2();
-
-			u8 src2 = 0;
-			if (reg2 == 0)
-				src2 = get_a1();
-			else
-				src2 = get_a2();
+			u8 src1 = get_a1_or_a2(reg1);
+			u8 src2 = get_a1_or_a2(reg2);
 
 			switch (optype)
 			{
@@ -949,6 +953,9 @@ void upd777_cpu_device::do_op()
 			case 1: // ADD
 			{
 				src1 = src1 + src2;
+				// not in this case?
+				//if (src1 & 0x80)
+				//	m_skip = 1;
 				break;
 			}
 			case 2: // OR
@@ -964,12 +971,7 @@ void upd777_cpu_device::do_op()
 				break;
 			}
 			}
-
-			if (reg1 == 0)
-				set_a1(src1);
-			else
-				set_a2(src1);
-
+			set_a1_or_a2(reg1, src1);
 			set_l(n);
 			break;
 		}
@@ -981,11 +983,7 @@ void upd777_cpu_device::do_op()
 			// 390 Move A2[7:1] to M[H[5:1],L[2:1]][7:1], N->L[2:1]
 			const int reg = (inst & 0x10) >> 4;
 			const int n = inst & 0x3;
-			u8 src = 0;
-			if (reg == 0)
-				src = get_a1();
-			else
-				src = get_a2();
+			u8 src = get_a1_or_a2(reg);
 			set_m_data(src);
 			set_l(n);
 			break;
@@ -998,17 +996,10 @@ void upd777_cpu_device::do_op()
 			// 394 Exchange M[H[5:1],L[2:1]][7:1] and A2[7:1], N->L[2:1]
 			const int reg = (inst & 0x10) >> 4;
 			const int n = inst & 0x3;
-			u8 src = 0;
-			if (reg == 0)
-				src = get_a1();
-			else
-				src = get_a2();
+			u8 src = get_a1_or_a2(reg);
 			u8 m = get_m_data();
 			set_m_data(src);
-			if (reg == 0)
-				set_a1(m);
-			else
-				set_a2(m);
+			set_a1_or_a2(reg,m);
 			set_l(n);
 			break;
 		}
@@ -1021,10 +1012,7 @@ void upd777_cpu_device::do_op()
 			const int reg = (inst & 0x10) >> 4;
 			const int n = inst & 0x3;
 			u8 m = get_m_data();
-			if (reg == 0)
-				set_a1(m);
-			else
-				set_a2(m);
+			set_a1_or_a2(reg,m);
 			set_l(n);
 			break;
 		}
@@ -1049,13 +1037,7 @@ void upd777_cpu_device::do_op()
 			const int optype = (inst & 0x0c) >> 2;
 			const int reg2 = (inst & 0x10) >> 4;
 			const int n = inst & 0x3;
-
-			u8 src2 = 0;
-			if (reg2 == 0)
-				src2 = get_a1();
-			else
-				src2 = get_a2();
-
+			u8 src2 = get_a1_or_a2(reg2);
 			u8 m = get_m_data();
 
 			switch (optype)
@@ -1110,12 +1092,7 @@ void upd777_cpu_device::do_op()
 			const int optype = (inst & 0x0c) >> 2;
 			const int reg2 = (inst & 0x10) >> 4;
 			const int n = inst & 0x3;
-			u8 src2 = 0;
-			if (reg2 == 0)
-				src2 = get_a1() & 0x1f;
-			else
-				src2 = get_a2() & 0x1f;
-
+			u8 src2 = get_a1_or_a2(reg2) & 0x1f;
 			u8 h = get_h();
 
 			switch (optype)
@@ -1155,11 +1132,7 @@ void upd777_cpu_device::do_op()
 			// 3d0 Move A2[5:1] to H[5:1], N->L[2:1]
 			const int reg = (inst & 0x10) >> 4;
 			const int n = inst & 0x3;
-			u8 src = 0;
-			if (reg == 0)
-				src = get_a1() & 0x1f;
-			else
-				src = get_a2() & 0x1f;
+			u8 src = get_a1_or_a2(reg);
 			set_h(src);
 			set_l(n);
 			break;
@@ -1172,10 +1145,7 @@ void upd777_cpu_device::do_op()
 			const int reg = (inst & 0x10) >> 4;
 			const int n = inst & 0x3;
 			u8 h = get_h() & 0x1f;
-			if (reg == 0)
-				set_a1(h);
-			else
-				set_a2(h);
+			set_a1_or_a2(reg,h);
 			set_l(n);
 			break;
 		}
