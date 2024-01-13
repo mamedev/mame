@@ -183,6 +183,7 @@ license:CC0-1.0
 		<description>Concerto Selection</description>
 		<year>2003</year>
 		<publisher>Tomy</publisher>
+		<info name="alt_title" value="コンチェルトセレクション"/>
 		<info name="serial" value="eM13"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
