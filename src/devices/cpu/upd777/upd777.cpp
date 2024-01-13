@@ -67,6 +67,10 @@ void upd777_cpu_device::increment_pc()
 	lowpc = (lowpc << 1) | nor;
 	lowpc &= 0x7f;
 
+	// is returning to the start of the page the correct behavior?
+	if (lowpc == 0x00)
+		logerror("overflowing PC, returning to start of current page\n");
+
 	m_pc = highpc | lowpc;
 }
 
@@ -188,7 +192,7 @@ void upd777_cpu_device::set_new_pc(int newpc)
 	m_pc = newpc;
 }
 
-// L reg (lower memory pointer is 2 bit
+// L reg (lower memory pointer) is 2 bit
 void upd777_cpu_device::set_l(int l)
 {
 	m_l = l & 0x3;
@@ -271,44 +275,6 @@ void upd777_cpu_device::write_data_mem(u8 addr, u8 data)
 	// data memory is 7-bit
 	m_data.write_byte(addr, data & 0x7f);
 }
-
-// temporary, for the opcode logging
-std::string upd777_cpu_device::get_300optype_name(int optype)
-{
-	switch (optype)
-	{
-	case 0x00: return "."; // 'AND' expressed as '·' in documentation, but disassembler isn't keen on that
-	case 0x01: return "+";
-	case 0x02: return "v"; // 'OR'
-	case 0x03: return "-";
-	}
-	return "<invalid optype>";
-}
-
-std::string upd777_cpu_device::get_200optype_name(int optype)
-{
-	switch (optype)
-	{
-	case 0x00: return "."; // 'AND' expressed as '·' in documentation, but disassembler isn't keen on that
-	case 0x01: return "<invalid optype>";
-	case 0x02: return "=";
-	case 0x03: return "-";
-	}
-	return "<invalid optype>";
-}
-
-std::string upd777_cpu_device::get_reg_name(int reg)
-{
-	switch (reg)
-	{
-	case 0x00: return "A1"; // general reg A1
-	case 0x01: return "A2"; // general reg A2
-	case 0x02: return "M"; // content of memory
-	case 0x03: return "H"; // high address
-	}
-	return "<invalid reg>";
-}
-
 
 void upd777_cpu_device::do_op()
 {
@@ -681,7 +647,6 @@ void upd777_cpu_device::do_op()
 			const int reg1 = (inst & 0xc0) >> 6;
 			const int reg2 = (inst & 0x10) >> 4;
 			const int n = inst & 0x3;
-			//LOGMASKED(LOG_UNHANDLED_OPS, "2xx %s%s%s, 0x%d->L %s%s\n", get_reg_name(reg1), get_200optype_name(optype), get_reg_name(reg2), n, (optype == 3) ? "BOJ" : "EQJ", non ? "/" : "");
 			u8 srcreg2 = 0;
 			switch (reg2)
 			{

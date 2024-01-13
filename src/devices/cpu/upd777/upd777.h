@@ -54,11 +54,6 @@ private:
 	memory_access<11, 1, -1, ENDIANNESS_BIG>::specific m_space;
 	memory_access<8, 0, 0, ENDIANNESS_BIG>::specific m_data;
 
-
-	std::string get_300optype_name(int optype);
-	std::string get_200optype_name(int optype);
-	std::string get_reg_name(int reg);
-
 	void increment_pc();
 	u16 fetch();
 	void do_op();
