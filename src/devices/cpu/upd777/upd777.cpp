@@ -598,6 +598,85 @@ void upd777_cpu_device::do_op()
 
 		set_l(n);
 	}
+	else if ((inst & 0b1111'1010'0000) == 0b0011'0010'0000)
+	{
+		// the above 'if' statement is a shit way of representing the following bitfields
+		//   0b0011'0r1R'oonn (where r = reg1, R = reg2, o = optype, and n = next l value)
+#if 0
+		case 0b0011'0010'0000: case 0b0011'0010'0001: case 0b0011'0010'0010: case 0b0011'0010'0011:
+		case 0b0011'0010'0100: case 0b0011'0010'0101: case 0b0011'0010'0110: case 0b0011'0010'0111:
+		case 0b0011'0010'1000: case 0b0011'0010'1001: case 0b0011'0010'1010: case 0b0011'0010'1011:
+		case 0b0011'0010'1100: case 0b0011'0010'1101: case 0b0011'0010'1110: case 0b0011'0010'1111:
+		case 0b0011'0011'0000: case 0b0011'0011'0001: case 0b0011'0011'0010: case 0b0011'0011'0011:
+		case 0b0011'0011'0100: case 0b0011'0011'0101: case 0b0011'0011'0110: case 0b0011'0011'0111:
+		case 0b0011'0011'1000: case 0b0011'0011'1001: case 0b0011'0011'1010: case 0b0011'0011'1011:
+		case 0b0011'0011'1100: case 0b0011'0011'1101: case 0b0011'0011'1110: case 0b0011'0011'1111:
+		case 0b0011'0110'0000: case 0b0011'0110'0001: case 0b0011'0110'0010: case 0b0011'0110'0011:
+		case 0b0011'0110'0100: case 0b0011'0110'0101: case 0b0011'0110'0110: case 0b0011'0110'0111:
+		case 0b0011'0110'1000: case 0b0011'0110'1001: case 0b0011'0110'1010: case 0b0011'0110'1011:
+		case 0b0011'0110'1100: case 0b0011'0110'1101: case 0b0011'0110'1110: case 0b0011'0110'1111:
+		case 0b0011'0111'0000: case 0b0011'0111'0001: case 0b0011'0111'0010: case 0b0011'0111'0011:
+		case 0b0011'0111'0100: case 0b0011'0111'0101: case 0b0011'0111'0110: case 0b0011'0111'0111:
+		case 0b0011'0111'1000: case 0b0011'0111'1001: case 0b0011'0111'1010: case 0b0011'0111'1011:
+		case 0b0011'0111'1100: case 0b0011'0111'1101: case 0b0011'0111'1110: case 0b0011'0111'1111:
+#endif		
+		// 320 AND A1[7:1] and A1[7:1], store to A1[7:1], N->L[2:1]
+		// 324 Add A1[7:1] and A1[7:1], store to A1[7:1], N->L[2:1]
+		// 328 OR A1[7:1] and A1[7:1], store to A1[7:1], N->L[2:1]
+		// 32c Subtract A1[7:1] and A1[7:1], store to A1[7:1], Skip if borrow, N->L[2:1]
+		// 330 AND A1[7:1] and A2[7:1], store to A1[7:1], N->L[2:1]
+		// 334 Add A1[7:1] and A2[7:1], store to A1[7:1], N->L[2:1]
+		// 338 OR A1[7:1] and A2[7:1], store to A1[7:1], N->L[2:1]
+		// 33c Subtract A1[7:1] and A2[7:1], store to A1[7:1], Skip if borrow, N->L[2:1]
+		// 360 AND A2[7:1] and A1[7:1], store to A2[7:1], N->L[2:1]
+		// 364 Add A2[7:1] and A1[7:1], store to A2[7:1], N->L[2:1]
+		// 368 OR A2[7:1] and A1[7:1], store to A2[7:1], N->L[2:1]
+		// 36c Subtract A2[7:1] and A1[7:1], store to A2[7:1], Skip if borrow, N->L[2:1]
+		// 370 AND A2[7:1] and A2[7:1], store to A2[7:1], N->L[2:1]
+		// 374 Add A2[7:1] and A2[7:1], store to A2[7:1], N->L[2:1]
+		// 378 OR A2[7:1] and A2[7:1], store to A2[7:1], N->L[2:1]
+		// 37c Subtract A2[7:1] and A2[7:1], store to A2[7:1], Skip if borrow, N->L[2:1]
+		const int optype = (inst & 0x0c) >> 2;
+		const int reg2 = (inst & 0x10) >> 4;
+		const int reg1 = (inst & 0x40) >> 6;
+		const int n = inst & 0x3;
+
+		u8 src1 = get_a1_or_a2(reg1);
+		u8 src2 = get_a1_or_a2(reg2);
+
+		switch (optype)
+		{
+		case 0: // AND
+		{
+			src1 = src1 & src2;
+			break;
+		}
+		case 1: // ADD
+		{
+			src1 = src1 + src2;
+			// not in this case?
+			//if (src1 & 0x80)
+			//	m_skip = 1;
+			break;
+		}
+		case 2: // OR
+		{
+			src1 = src1 | src2;
+			break;
+		}
+		case 3: // MINUS
+		{
+			src1 = src1 - src2;
+			if (src1 & 0x80)
+				m_skip = 1;
+			break;
+		}
+		}
+		set_a1_or_a2(reg1, src1);
+		set_l(n);
+
+
+	}
 	else
 	{
 		switch (inst)
@@ -919,81 +998,6 @@ void upd777_cpu_device::do_op()
 			set_l(n);
 			break;
 		}
-
-		case 0b0011'0010'0000: case 0b0011'0010'0001: case 0b0011'0010'0010: case 0b0011'0010'0011:
-		case 0b0011'0010'0100: case 0b0011'0010'0101: case 0b0011'0010'0110: case 0b0011'0010'0111:
-		case 0b0011'0010'1000: case 0b0011'0010'1001: case 0b0011'0010'1010: case 0b0011'0010'1011:
-		case 0b0011'0010'1100: case 0b0011'0010'1101: case 0b0011'0010'1110: case 0b0011'0010'1111:
-		case 0b0011'0011'0000: case 0b0011'0011'0001: case 0b0011'0011'0010: case 0b0011'0011'0011:
-		case 0b0011'0011'0100: case 0b0011'0011'0101: case 0b0011'0011'0110: case 0b0011'0011'0111:
-		case 0b0011'0011'1000: case 0b0011'0011'1001: case 0b0011'0011'1010: case 0b0011'0011'1011:
-		case 0b0011'0011'1100: case 0b0011'0011'1101: case 0b0011'0011'1110: case 0b0011'0011'1111:
-		case 0b0011'0110'0000: case 0b0011'0110'0001: case 0b0011'0110'0010: case 0b0011'0110'0011:
-		case 0b0011'0110'0100: case 0b0011'0110'0101: case 0b0011'0110'0110: case 0b0011'0110'0111:
-		case 0b0011'0110'1000: case 0b0011'0110'1001: case 0b0011'0110'1010: case 0b0011'0110'1011:
-		case 0b0011'0110'1100: case 0b0011'0110'1101: case 0b0011'0110'1110: case 0b0011'0110'1111:
-		case 0b0011'0111'0000: case 0b0011'0111'0001: case 0b0011'0111'0010: case 0b0011'0111'0011:
-		case 0b0011'0111'0100: case 0b0011'0111'0101: case 0b0011'0111'0110: case 0b0011'0111'0111:
-		case 0b0011'0111'1000: case 0b0011'0111'1001: case 0b0011'0111'1010: case 0b0011'0111'1011:
-		case 0b0011'0111'1100: case 0b0011'0111'1101: case 0b0011'0111'1110: case 0b0011'0111'1111:
-		{
-			// 320 AND A1[7:1] and A1[7:1], store to A1[7:1], N->L[2:1]
-			// 324 Add A1[7:1] and A1[7:1], store to A1[7:1], N->L[2:1]
-			// 328 OR A1[7:1] and A1[7:1], store to A1[7:1], N->L[2:1]
-			// 32c Subtract A1[7:1] and A1[7:1], store to A1[7:1], Skip if borrow, N->L[2:1]
-			// 330 AND A1[7:1] and A2[7:1], store to A1[7:1], N->L[2:1]
-			// 334 Add A1[7:1] and A2[7:1], store to A1[7:1], N->L[2:1]
-			// 338 OR A1[7:1] and A2[7:1], store to A1[7:1], N->L[2:1]
-			// 33c Subtract A1[7:1] and A2[7:1], store to A1[7:1], Skip if borrow, N->L[2:1]
-			// 360 AND A2[7:1] and A1[7:1], store to A2[7:1], N->L[2:1]
-			// 364 Add A2[7:1] and A1[7:1], store to A2[7:1], N->L[2:1]
-			// 368 OR A2[7:1] and A1[7:1], store to A2[7:1], N->L[2:1]
-			// 36c Subtract A2[7:1] and A1[7:1], store to A2[7:1], Skip if borrow, N->L[2:1]
-			// 370 AND A2[7:1] and A2[7:1], store to A2[7:1], N->L[2:1]
-			// 374 Add A2[7:1] and A2[7:1], store to A2[7:1], N->L[2:1]
-			// 378 OR A2[7:1] and A2[7:1], store to A2[7:1], N->L[2:1]
-			// 37c Subtract A2[7:1] and A2[7:1], store to A2[7:1], Skip if borrow, N->L[2:1]
-			const int optype = (inst & 0x0c) >> 2;
-			const int reg2 = (inst & 0x10) >> 4;
-			const int reg1 = (inst & 0x40) >> 6;
-			const int n = inst & 0x3;
-
-			u8 src1 = get_a1_or_a2(reg1);
-			u8 src2 = get_a1_or_a2(reg2);
-
-			switch (optype)
-			{
-			case 0: // AND
-			{
-				src1 = src1 & src2;
-				break;
-			}
-			case 1: // ADD
-			{
-				src1 = src1 + src2;
-				// not in this case?
-				//if (src1 & 0x80)
-				//	m_skip = 1;
-				break;
-			}
-			case 2: // OR
-			{
-				src1 = src1 | src2;
-				break;
-			}
-			case 3: // MINUS
-			{
-				src1 = src1 - src2;
-				if (src1 & 0x80)
-					m_skip = 1;
-				break;
-			}
-			}
-			set_a1_or_a2(reg1, src1);
-			set_l(n);
-			break;
-		}
-
 		case 0b0011'1000'0000: case 0b0011'1000'0001: case 0b0011'1000'0010: case 0b0011'1000'0011:
 		case 0b0011'1001'0000: case 0b0011'1001'0001: case 0b0011'1001'0010: case 0b0011'1001'0011:
 		{
