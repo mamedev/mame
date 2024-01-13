@@ -396,8 +396,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-
-
 	<software name="crsword">
 		<description>Crossed Swords (Japan)</description>
 		<year>1994</year>
@@ -411,8 +409,6 @@ license:CC0-1.0
 			</diskarea>
 		</part>
 	</software>
-
-
 
 	<software name="cyberlip">
 		<description>Cyber-Lip (Japan, USA)</description>
@@ -606,7 +602,6 @@ license:CC0-1.0
 			</diskarea>
 		</part>
 	</software>
-
 
 	<software name="janshin">
 		<description>Janshin Densetsu - Quest of the Jongmaster (Japan)</description>
@@ -916,8 +911,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-
-
 	<software name="turfmast">
 		<description>Big Tournament Golf (Japan)</description>
 		<year>1996</year>
@@ -973,7 +966,6 @@ license:CC0-1.0
 			</diskarea>
 		</part>
 	</software>
-
 
 	<software name="overtop">
 		<description>OverTop (Japan)</description>
