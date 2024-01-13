@@ -5,6 +5,7 @@
 #include "upd777.h"
 #include "upd777dasm.h"
 
+
 #define LOG_UNHANDLED_OPS       (1U << 1)
 
 #define VERBOSE (LOG_UNHANDLED_OPS)
@@ -434,7 +435,15 @@ void upd777_cpu_device::do_op()
 		{
 			// 008 Move H[5:1] to Line Buffer Register[5:1]
 			u8 h = get_h();
-			LOGMASKED(LOG_UNHANDLED_OPS, "H(%02x)->NRM\n", h);
+			//LOGMASKED(LOG_UNHANDLED_OPS, "H(%02x)->NRM\n", h);
+
+			// this seems to push a value from RAM into the line buffer for the current 4(?) scanlines
+			u8 m1 = read_data_mem(get_h_shifted() | 0);
+			u8 m2 = read_data_mem(get_h_shifted() | 1);
+			u8 m3 = read_data_mem(get_h_shifted() | 2);
+			u8 m4 = read_data_mem(get_h_shifted() | 3);
+			push_to_line_buffer(h, m1,m2,m3,m4);
+
 			break;
 		}
 		case 0b0000'0001'1000:
@@ -443,7 +452,7 @@ void upd777_cpu_device::do_op()
 			LOGMASKED(LOG_UNHANDLED_OPS, "H<->X\n");
 #if 1
 			// this opcode is not well explained! but X4 etc. are referenced on Data RAM & Register Files which makes
-			// it even more confusing
+			// it even more confusing (while L' isn't referenced anywhere else at all!)
 			u8 temp;
 
 			temp = m_x4;
@@ -496,14 +505,15 @@ void upd777_cpu_device::do_op()
 		case 0b0000'0100'1001:
 		{
 			// 049 Skip if (4H Horizontal Blank) = 1
-			LOGMASKED(LOG_UNHANDLED_OPS, "4H BLK\n");
-			m_skip = 1;
+			//LOGMASKED(LOG_UNHANDLED_OPS, "4H BLK\n");
+			if (get_hbl_4_state())
+				m_skip = 1;
 			break;
 		}
 		case 0b0000'0100'1010:
 		{
 			// 04a Skip if (Vertical Blank) = 1, 0->M[[18:00],[3]][1]
-			LOGMASKED(LOG_UNHANDLED_OPS, "VBLK\n");
+			//LOGMASKED(LOG_UNHANDLED_OPS, "VBLK\n");
 			if (get_vbl_state())
 				m_skip = 1;
 
@@ -565,6 +575,7 @@ void upd777_cpu_device::do_op()
 			break;
 		}
 
+		// 0b0010'rrnR'oo00 where rr = reg1 (A1, A2, M or H), n = invert condition, R = reg2 (A1 or A2) and oo = optype (only 0,2,3 are valid, no cases here for 1)
 		case 0b0010'0000'0000: case 0b0010'0000'0001: case 0b0010'0000'0010: case 0b0010'0000'0011:
 		case 0b0010'0010'0000: case 0b0010'0010'0001: case 0b0010'0010'0010: case 0b0010'0010'0011:
 		case 0b0010'0000'1000: case 0b0010'0000'1001: case 0b0010'0000'1010: case 0b0010'0000'1011:
@@ -1239,8 +1250,25 @@ bool upd777_cpu_device::get_vbl_state()
 	return false;
 }
 
+bool upd777_cpu_device::get_hbl_4_state()
+{
+	// I *think* this is Hblank for every 4th line (so a new display list can be written?)
+	int vpos = m_screen->vpos();
+	if ((vpos % 4) == 0)
+	{
+		int hpos = m_screen->hpos();
+		if (hpos > 200)
+			return true;
+	}
+
+	return false;
+}
+
 uint32_t upd777_cpu_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	// this needs to be scanline based, drawing whatever has been pushed to the linebuffer for the current
+	// group of scanlines!
+
 	bitmap.fill(0, cliprect);
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	gfx_element *gfx2 = m_gfxdecode->gfx(1);
@@ -1328,6 +1356,18 @@ void upd777_cpu_device::palette_init(palette_device &palette) const
 	}
 }
 
+void upd777_cpu_device::push_to_line_buffer(u8 h, u8 m1, u8 m2, u8 m3, u8 m4)
+{
+	logerror("sprite %02x pushed to line buffer at scanline %d hpos %d: details %02x %02x %02x %02x\n", h, m_screen->vpos(), m_screen->hpos(), m1, m2, m3, m4);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(upd777_cpu_device::scanline_timer)
+{
+	int scanline = param;
+
+	logerror("scanline %d\n", scanline);
+}
+
 void upd777_cpu_device::device_add_mconfig(machine_config &config)
 {
 	// or pass the screen from the driver?
@@ -1338,6 +1378,8 @@ void upd777_cpu_device::device_add_mconfig(machine_config &config)
 	m_screen->set_visarea(0, 512-1, 0, 256-0-1);
 	m_screen->set_screen_update(FUNC(upd777_cpu_device::screen_update));
 	m_screen->set_palette(m_palette);
+
+	TIMER(config, "scantimer").configure_scanline(FUNC(upd777_cpu_device::scanline_timer), "screen", 0, 1);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ud777);
 	PALETTE(config, m_palette, FUNC(upd777_cpu_device::palette_init), 32 * 3).set_entries(0x10);

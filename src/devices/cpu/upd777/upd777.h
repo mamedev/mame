@@ -9,6 +9,8 @@
 #include "emupal.h"
 #include "screen.h"
 
+#include "machine/timer.h"
+
 class upd777_cpu_device : public cpu_device
 {
 public:
@@ -49,6 +51,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	bool get_vbl_state();
+	bool get_hbl_4_state();
 
 
 	void internal_map(address_map &map);
@@ -137,7 +140,11 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void push_to_line_buffer(u8 h, u8 m1, u8 m2, u8 m3, u8 m4);
+
 	void palette_init(palette_device &palette) const;
+
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
