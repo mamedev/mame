@@ -709,12 +709,12 @@ void upd777_cpu_device::do_op()
 			{
 				if (!non)
 				{
-					if (srcreg1 & srcreg2)
+					if ((srcreg1 & srcreg2) == 0) // skip if (x·y) makes zero, N->L[2:1] 
 						m_skip = 1;
 				}
 				else
 				{
-					if (!(srcreg1 & srcreg2))
+					if ((srcreg1 & srcreg2) != 0) // skip if (x·y) makes non zero, N->L[2:1]
 						m_skip = 1;
 				}
 				break;
@@ -728,12 +728,12 @@ void upd777_cpu_device::do_op()
 			{
 				if (!non)
 				{
-					if (srcreg1 == srcreg2)
+					if (srcreg1 == srcreg2) // skip if (x-y) makes zero, N->L[2:1]
 						m_skip = 1;
 				}
 				else
 				{
-					if (!(srcreg1 == srcreg2))
+					if (srcreg1 != srcreg2) // skip if (x-y) makes non zero, N->L[2:1]
 						m_skip = 1;
 				}
 				break;
@@ -744,12 +744,12 @@ void upd777_cpu_device::do_op()
 
 				if (!non)
 				{
-					if (result & 0x80)
+					if (result & 0x80) // skip if (x-y) makes borrow, N->L[2:1]
 						m_skip = 1;
 				}
 				else
 				{
-					if (!(result & 0x80))
+					if ((result & 0x80) == 0) // skip if (x-y) makes non borrow, N->L[2:1]
 						m_skip = 1;
 				}
 
