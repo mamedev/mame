@@ -17578,6 +17578,9 @@ touryuu                         // (c) 200? Yuki Enterprise
 @source:eolith/vegaeo.cpp
 crazywar                        // (c) 2002 Eolith
 
+@source:epoch/cassvisn.cpp
+cassvisn
+
 @source:epoch/gamepock.cpp
 gamepock                        // Epoch Game Pocket Computer
 
