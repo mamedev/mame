@@ -107,7 +107,7 @@ Notes:
 #include "emu.h"
 
 #include "bus/ata/ataintf.h"
-#include "bus/ata/fx5400w.h"
+#include "bus/ata/atapicdr.h"
 #include "bus/rs232/null_modem.h"
 #include "bus/rs232/pty.h"
 #include "bus/rs232/rs232.h"
@@ -576,7 +576,8 @@ void sttechno_state::shambros(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::BGR_555);
 
-	ATA_INTERFACE(config, m_ata).options([] (device_slot_interface &device) { device.option_add("cdrom", FX5400W); }, "cdrom", nullptr, true);
+	ATA_INTERFACE(config, m_ata).options(ata_devices, "cdrom", nullptr, true);
+	m_ata->slot(0).set_option_machine_config("cdrom", [] (device_t *device) { downcast<atapi_cdrom_device &>(*device).set_is_ready(true); });
 
 	FUJITSU_29F160TE_16BIT(config, m_flash[0]);
 	FUJITSU_29F160TE_16BIT(config, m_flash[1]);

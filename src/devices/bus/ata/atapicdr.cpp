@@ -22,7 +22,7 @@ atapi_cdrom_device::atapi_cdrom_device(const machine_config &mconfig, const char
 atapi_cdrom_device::atapi_cdrom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	atapi_hle_device(mconfig, type, tag, owner, clock),
 	device_ata_interface(mconfig, *this),
-	ultra_dma_mode(0)
+	m_ultra_dma_mode(0)
 {
 }
 
@@ -98,14 +98,14 @@ void atapi_cdrom_device::device_start()
 
 	m_identify_buffer[ 49 ] = 0x0600; // Word 49=Capabilities, IORDY may be disabled (bit_10), LBA Supported mandatory (bit_9)
 
-	m_identify_buffer[ 88 ] = ultra_dma_mode;
+	m_identify_buffer[ 88 ] = m_ultra_dma_mode;
 
 	atapi_hle_device::device_start();
 }
 
 void atapi_cdrom_device::set_ultra_dma_mode(uint16_t mode)
 {
-	ultra_dma_mode = mode;
+	m_ultra_dma_mode = mode;
 }
 
 void atapi_cdrom_device::device_reset()

@@ -101,7 +101,9 @@ uint16_t stt_sa1_device::key_r()
 	if (!m_enabled)
 		return 0;
 
-	m_stream->update();
+	if (!machine().side_effects_disabled())
+		m_stream->update();
+
 	return m_keyctrl;
 }
 
