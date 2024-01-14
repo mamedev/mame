@@ -11436,6 +11436,97 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="looptris">
+        <description>Looptris</description>
+		<year>2021</year>
+		<publisher>Blastar</publisher>
+		<info name="release" value="20211226" />
+		<sharedfeat name="release" value="AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x80000">
+				<rom loadflag="load16_word_swap" name="looptris.p1" offset="0x000000" size="0x80000" crc="8fcb5104" sha1="6a0da5c4e72ef57600ecd15cba64e3871f48391e" />
+			</dataarea>
+			<dataarea name="fixed" size="0x020000">
+				<rom name="looptris.s1" offset="0x000000" size="0x020000" crc="70e70448" sha1="40461af534afcba341d2f14b755d6de353fe7afd" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x020000">
+				<rom name="looptris.m1" offset="0x000000" size="0x020000" crc="e7105df8" sha1="9f4efad6dcc8b9617d59576415019820e973f45c" />
+			</dataarea>
+			<dataarea name="ymsnd:adpcma" size="0x80000">
+				<rom name="looptris.v1" offset="0x000000" size="0x80000" crc="dfa63cd2" sha1="bbf4a74a660f12cc037cfa0ac5c664988016ee45" />
+			</dataarea>
+			<dataarea name="sprites" size="0x100000">
+				<rom loadflag="load16_byte" name="looptris.c1" offset="0x000000" size="0x80000" crc="b9413f13" sha1="5e7175dff9510dad55f8f05e9b307c3c05d92209" />
+				<rom loadflag="load16_byte" name="looptris.c2" offset="0x000001" size="0x80000" crc="9409dbe8" sha1="1e9562aa34f6202e8012104ab79916453fec072e" />
+			</dataarea>
+		</part>
+    </software>
 
+	<software name="looptrsp">
+        <description>Looptris Plus</description>
+		<year>2022</year>
+		<publisher>Blastar</publisher>
+		<info name="release" value="20221224" />
+		<sharedfeat name="release" value="AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x80000">
+				<rom loadflag="load16_word_swap" name="looptrsp.p1" offset="0x000000" size="0x80000" crc="894bb290" sha1="f33ed9fe75ca7b5a6da00fe5bff76e26cba85e08" />
+			</dataarea>
+			<dataarea name="fixed" size="0x020000">
+				<rom offset="0x000000" size="0x020000" name="looptrsp.s1" crc="70e70448" sha1="40461af534afcba341d2f14b755d6de353fe7afd" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x020000">
+				<rom offset="0x000000" size="0x020000" name="looptrsp.m1" crc="249bba11" sha1="e8248ff9bc391b1163746c256b137928a9d81fe0" />
+			</dataarea>
+			<dataarea name="ymsnd:adpcma" size="0x200000">
+				<rom name="looptrsp.v1" offset="0x000000" size="0x080000" crc="c9f86637" sha1="edb712d5cce180e1d5b6e338e9abfab1125c5581" />
+				<rom name="looptrsp.v2" offset="0x080000" size="0x080000" crc="41b3e17a" sha1="ef216379dbdbbea04cfffa47123436213a8cf26e" />
+				<rom name="looptrsp.v3" offset="0x100000" size="0x080000" crc="1ed4e538" sha1="921913be499194236535052ed3140fb7169d16e9" />
+				<rom name="looptrsp.v4" offset="0x180000" size="0x080000" crc="705e7065" sha1="a5eea38afa58db69c0f17e0379da3d819639971f" />
+			</dataarea>
+			<dataarea name="sprites" size="0x100000">
+				<rom loadflag="load16_byte" name="looptrsp.c1" offset="0x000000" size="0x80000" crc="b9413f13" sha1="5e7175dff9510dad55f8f05e9b307c3c05d92209" />
+				<rom loadflag="load16_byte" name="looptrsp.c2" offset="0x000001" size="0x80000" crc="9409dbe8" sha1="1e9562aa34f6202e8012104ab79916453fec072e" />
+			</dataarea>
+		</part>
+    </software>
+
+	<software name="neotris" supported="partial">
+		<description>NeoTRIS</description>
+		<year>2020</year>
+		<publisher>Chips on Steroids</publisher>
+		<notes><![CDATA[
+Four player adapter not supported
+]]></notes>
+		<sharedfeat name="release" value="AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x080000">
+				<rom loadflag="load16_word_swap" name="neotris-p1.bin" offset="0x000000" size="0x080000" crc="4cd619cf" sha1="081a7819c71171a37f10d1b20f8887ca90df49a8" />
+			</dataarea>
+			<dataarea name="fixed" size="0x020000">
+				<rom name="neotris-s1.bin" offset="0x000000" size="0x020000" crc="6809043a" sha1="31efdd2bd0713d7a87f2c6dc92e43f312f8d8626" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x010000">
+				<rom name="neotris-m1.bin" offset="0x000000" size="0x010000" crc="5a63bb9d" sha1="de024be2535253d6846c380d05717002c0cc032d" />
+			</dataarea>
+			<dataarea name="ymsnd:adpcma" size="0x1000000">
+				<rom name="neotris-v1.bin" offset="0x000000" size="0x400000" crc="fef16eb4" sha1="64021cf913c4594d27d0602afc28754f0b76091f" />
+				<rom name="neotris-v2.bin" offset="0x400000" size="0x400000" crc="f0d28e19" sha1="e47318bf3b5ef1d9e08928eb7f7ca7dfc15ab2e5" />
+				<rom name="neotris-v3.bin" offset="0x800000" size="0x400000" crc="fc652c8b" sha1="a76040eef8dd76da3657bc39b6b5c3dded539829" />
+				<rom name="neotris-v4.bin" offset="0xC00000" size="0x400000" crc="c25764ca" sha1="ee0f2fa8db2da5c95b94c062bff8ee37ec2b2c7d" />
+			</dataarea>
+			<dataarea name="sprites" size="0x1800000">
+				<rom loadflag="load16_byte" name="neotris-c1.bin" offset="0x000000" size="0x400000" crc="e1c8eca9" sha1="be1babdc0ae0fd9916e8335c1635148e0498a961" />
+				<rom loadflag="load16_byte" name="neotris-c2.bin" offset="0x000001" size="0x400000" crc="11ca6e64" sha1="166c1f973f4fd7f472c3ddd37e0eb945c36d7454" />
+				<rom loadflag="load16_byte" name="neotris-c3.bin" offset="0x800000" size="0x400000" crc="1d9e2046" sha1="c2415775170455bd44e19e7c7c8e10817da56385" />
+				<rom loadflag="load16_byte" name="neotris-c4.bin" offset="0x800001" size="0x400000" crc="9091e795" sha1="59e7a751633ce8f3db138fc818e50003da4582dc" />
+				<rom loadflag="load16_byte" name="neotris-c5.bin" offset="0x1000000" size="0x400000" crc="bf278afe" sha1="e7f84cb325dd4535accd44d84f61c53cb4bab312" />
+				<rom loadflag="load16_byte" name="neotris-c6.bin" offset="0x1000001" size="0x400000" crc="8eb17e24" sha1="7977475bf19073b8bc38fcb88be9226453c7d6e4" />
+			</dataarea>
+		</part>
+	</software>
 
 </softwarelist>
