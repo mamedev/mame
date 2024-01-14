@@ -34,6 +34,7 @@ when actually playing the games because otherwise you'll be sending inputs to th
 #include "jaleco_vj_ups.h"
 
 #include "bus/isa/isa_cards.h"
+#include "bus/pci/virge_pci.h"
 #include "bus/rs232/rs232.h"
 #include "machine/fdc37c93x.h"
 #include "machine/i82371sb.h"
@@ -41,7 +42,6 @@ when actually playing the games because otherwise you'll be sending inputs to th
 #include "machine/i82439tx.h"
 #include "machine/pci-ide.h"
 #include "machine/pci.h"
-#include "video/virge_pci.h"
 
 
 jaleco_vj_pc_device::jaleco_vj_pc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -125,7 +125,8 @@ void jaleco_vj_pc_device::device_add_mconfig(machine_config &config)
 
 	// TODO: pci:07.3 0x30401106 VIA VT83C572, VT86C586/A/B Power Management Controller
 
-	VIRGEDX_PCI(config, "pci:10.0", 0); // TODO: Should actually be pci:0a.0 but it only shows a black screen
+	// TODO: Should actually be pci:0a.0 but it only shows a black screen
+	PCI_SLOT(config, "pci:2", pci_cards, 16, 1, 2, 3, 0, "virgedx").set_fixed(true);
 
 	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "fdc37c93x", true).set_option_machine_config("fdc37c93x", [this] (device_t *device) { superio_config(*device); });
 	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", isa_cards, "vj_sound", true).set_option_machine_config("vj_sound", [this] (device_t *device) { sound_config(*device); });

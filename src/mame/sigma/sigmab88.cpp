@@ -96,6 +96,8 @@ void sigmab88_state::sigmab88(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 }
 
+// should these have a colour PROM like b52?
+
 ROM_START( cool104 )
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD16_BYTE("wwp2080-7213-1.bin", 0x00000, 0x40000, CRC(95b4b518) SHA1(1ac64131508999a5206a5b3e3efbc965419eb247))
@@ -104,10 +106,19 @@ ROM_START( cool104 )
 	ROM_REGION(0x100000, "data", 0) // does this map to CPU space?
 	ROM_LOAD16_BYTE("grp0301-010-1.bin", 0x00000, 0x80000, CRC(fc00a817) SHA1(30f9d6ce9091e35e341cc6e57765f97453aa863f))
 	ROM_LOAD16_BYTE("grp0301-010-2.bin", 0x00001, 0x80000, CRC(a5b19862) SHA1(6552bcd481ba807c66c1b20f6809dbd4d886183a))
+ROM_END
 
-	// should this have a colour PROM like b52?
+ROM_START( freedeal )
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD16_BYTE("wwp2047-1712-1.bin", 0x00000, 0x40000, CRC(da552ce7) SHA1(d09902d8fcb8cbd908df97d3a265ea8b185e4963))
+	ROM_LOAD16_BYTE("wwp2047-1712-2.bin", 0x00001, 0x40000, CRC(322020e7) SHA1(640c0d24e17424cad68f00a5df293d8bbbc30309))
+
+	ROM_REGION(0x100000, "data", 0) // does this map to CPU space?
+	ROM_LOAD16_BYTE("grp8001-010-1.bin", 0x00000, 0x80000, CRC(5071d33d) SHA1(3adf92cfc322e3636ce3587ca86c7848f2cb49ca))
+	ROM_LOAD16_BYTE("grp8001-010-2.bin", 0x00001, 0x80000, CRC(09913d97) SHA1(ab77d220a477be9b677bc1c101876b0e7d3596f9))
 ROM_END
 
 } // anonymous namespace
 
 GAME( 1997, cool104,  0,        sigmab88, sigmab88, sigmab88_state, empty_init, ROT0, "Sigma", "Cool 104", MACHINE_IS_SKELETON )
+GAME( 1997, freedeal, 0,        sigmab88, sigmab88, sigmab88_state, empty_init, ROT0, "Sigma", "Free Deal Twin Jokers Progressive", MACHINE_IS_SKELETON )

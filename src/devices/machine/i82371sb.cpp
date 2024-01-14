@@ -765,6 +765,10 @@ void i82371sb_isa_device::redirect_irq(int irq, int state)
 	}
 }
 
+void i82371sb_isa_device::pci_irq_w(offs_t line, u8 state)
+{
+}
+
 void i82371sb_isa_device::pc_pirqa_w(int state)
 {
 	int irq = pirqrc[0] & 15;

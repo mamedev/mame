@@ -20,6 +20,7 @@
 #include "emu.h"
 
 #include "bus/isa/isa_cards.h"
+#include "bus/pci/pci_slot.h"
 #include "bus/rs232/hlemouse.h"
 #include "bus/rs232/null_modem.h"
 #include "bus/rs232/rs232.h"
@@ -39,9 +40,6 @@
 #include "machine/pci-ide.h"
 #include "machine/w83977tf.h"
 #include "video/clgd546x_laguna.h"
-#include "video/mga2064w.h"
-#include "video/riva128.h"
-#include "video/virge_pci.h"
 
 namespace {
 
@@ -570,8 +568,11 @@ void pcipc_state::pcipc(machine_config &config)
 	i82371sb_ide_device &ide(I82371SB_IDE(config, "pci:07.1", 0, "maincpu"));
 	ide.irq_pri().set("pci:07.0", FUNC(i82371sb_isa_device::pc_irq14_w));
 	ide.irq_sec().set("pci:07.0", FUNC(i82371sb_isa_device::pc_mirq0_w));
-//  MGA2064W(config, "pci:12.0", 0);
-	VIRGE_PCI(config, "pci:12.0", 0);   // use VIRGEDX_PCI for its VESA 2.0 BIOS
+
+	PCI_SLOT(config, "pci:1", pci_cards, 15, 0, 1, 2, 3, nullptr).irq_cb().set(isa, FUNC(i82371sb_isa_device::pci_irq_w));
+	PCI_SLOT(config, "pci:2", pci_cards, 16, 1, 2, 3, 0, nullptr).irq_cb().set(isa, FUNC(i82371sb_isa_device::pci_irq_w));
+	PCI_SLOT(config, "pci:3", pci_cards, 17, 2, 3, 0, 1, nullptr).irq_cb().set(isa, FUNC(i82371sb_isa_device::pci_irq_w));
+	PCI_SLOT(config, "pci:4", pci_cards, 18, 3, 0, 1, 2, "virge").irq_cb().set(isa, FUNC(i82371sb_isa_device::pci_irq_w));
 
 	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "fdc37c93x", true).set_option_machine_config("fdc37c93x", smc_superio_config);
 	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
@@ -593,6 +594,8 @@ void pcipc_state::pcipc(machine_config &config)
 	serport1.dsr_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ndsr2_w));
 	serport1.ri_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::nri2_w));
 	serport1.cts_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ncts2_w));
+
+	//	SW1000XG(config, "pci:11.0");
 }
 
 void pcipc_state::pcipctx(machine_config &config)
@@ -606,20 +609,11 @@ void pcipc_state::pcipctx(machine_config &config)
 	i82371sb_isa_device &isa(I82371SB_ISA(config, "pci:07.0", 0, "maincpu"));
 	isa.boot_state_hook().set(FUNC(pcipc_state::boot_state_award_w));
 //  IDE_PCI(config, "pci:07.1", 0, 0x80867010, 0x03, 0x00000000);
-	// TODO: eventually change this to something else
-	MGA2064W(config, "pci:12.0", 0);
-}
 
-void pcipc_state::pcinv3(machine_config &config)
-{
-	pcipc_state::pcipc(config);
-	RIVA128(config.replace(), "pci:12.0", 0);
-}
-
-void pcipc_state::pcimga(machine_config &config)
-{
-	pcipc_state::pcipc(config);
-	MGA2064W(config.replace(), "pci:12.0", 0);
+	PCI_SLOT(config, "pci:1", pci_cards, 15, 0, 1, 2, 3, nullptr).irq_cb().set(isa, FUNC(i82371sb_isa_device::pci_irq_w));
+	PCI_SLOT(config, "pci:2", pci_cards, 16, 1, 2, 3, 0, nullptr).irq_cb().set(isa, FUNC(i82371sb_isa_device::pci_irq_w));
+	PCI_SLOT(config, "pci:3", pci_cards, 17, 2, 3, 0, 1, nullptr).irq_cb().set(isa, FUNC(i82371sb_isa_device::pci_irq_w));
+	PCI_SLOT(config, "pci:4", pci_cards, 18, 3, 0, 1, 2, "mga2064w").irq_cb().set(isa, FUNC(i82371sb_isa_device::pci_irq_w));
 }
 
 void pcipc_state::pciagp(machine_config &config)
@@ -697,18 +691,6 @@ ROM_START(pcipctx)
 	ROM_LOAD("ibm-vga.bin", 0x00000, 0x8000, BAD_DUMP CRC(74e3fadb) SHA1(dce6491424f1726203776dfae9a967a98a4ba7b5) )
 ROM_END
 
-ROM_START(pcinv3)
-	ROM_REGION32_LE(0x40000, "pci:07.0", 0) /* PC bios */
-	ROM_SYSTEM_BIOS(0, "m55ns04", "m55ns04") // Micronics M55HI-Plus with no sound
-	ROMX_LOAD("m55-04ns.rom", 0x20000, 0x20000, CRC(0116b2b0) SHA1(19b0203decfd4396695334517488d488aec3ccde), ROM_BIOS(0))
-ROM_END
-
-ROM_START(pcimga)
-	ROM_REGION32_LE(0x40000, "pci:07.0", 0) /* PC bios */
-	ROM_SYSTEM_BIOS(0, "m55ns04", "m55ns04") // Micronics M55HI-Plus with no sound
-	ROMX_LOAD("m55-04ns.rom", 0x20000, 0x20000, CRC(0116b2b0) SHA1(19b0203decfd4396695334517488d488aec3ccde), ROM_BIOS(0))
-ROM_END
-
 ROM_START(pciagp)
 	ROM_REGION32_LE(0x40000, "pci:07.0", 0) /* PC bios */
 	// a.k.a. the BIOS present in savquest.cpp
@@ -723,7 +705,5 @@ INPUT_PORTS_END
 
 
 COMP(1998, pcipc,    0,     0, pcipc,   pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430HX)", MACHINE_NO_SOUND )
-COMP(1998, pcinv3,   pcipc, 0, pcinv3,  pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430HX with nVidia Riva 128)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Windows 98 doesn't recognize video card, may need AGP BIOS instead
-COMP(1998, pcimga,   pcipc, 0, pcimga,  pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430HX with Matrox Millennium)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // cfr. MGA2064W emulation
 COMP(1998, pcipctx,  0,     0, pcipctx, pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430TX)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // unemulated super I/O
 COMP(1999, pciagp,   0,     0, pciagp,  pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI/AGP PC (440BX)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // errors out with ISA state 0x05 (keyboard), does stuff if bypassed but eventually PnP breaks OS booting

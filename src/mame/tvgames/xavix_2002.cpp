@@ -324,11 +324,8 @@ void xavix_state::xavix2002(machine_config &config)
 	xavix(config);
 
 	XAVIX2002(config.replace(), m_maincpu, MAIN_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &xavix_state::xavix_map);
+	set_xavix_cpumaps(config);
 	m_maincpu->set_addrmap(5, &xavix_state::superxavix_lowbus_map); // has extra video, io etc.
-	m_maincpu->set_addrmap(6, &xavix_state::xavix_extbus_map);
-	m_maincpu->set_vblank_int("screen", FUNC(xavix_state::interrupt));
-	m_maincpu->set_vector_callback(FUNC(xavix_state::get_vectors));
 
 	m_palette->set_entries(512);
 
