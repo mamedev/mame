@@ -1865,6 +1865,19 @@ ROM_START(bay_d300)
 	ROM_LOAD("bayw.u21", 0x080000, 0x80000, CRC(b7598881) SHA1(19d1dde1cb6634a7c7b5cdb4fa01cd09cc7d7777))
 ROM_END
 
+ROM_START(bay_g300)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("baywatch_cpug_c5_3.00.bin", 0x0000, 0x10000, CRC(8f85fd10) SHA1(1fd561bf6145caf15846a776b0b92e7953fdf3ff))
+	ROM_REGION16_BE(0x100000, "dmdcpu", 0)
+	ROM_LOAD16_BYTE("baywatch_dispg_rom0_3.00.bin", 0x00000001, 0x00080000, CRC(30b0a96a) SHA1(ff0e4d4a1726ff2a553ebe4f21c0534e0a06b960))
+	ROM_LOAD16_BYTE("baywatch_dispg_rom3_3.00.bin", 0x00000000, 0x00080000, CRC(c7e50fad) SHA1(95b60855cb6718eb9c8a7231e9cd2e1c326cd1e3))
+	ROM_REGION(0x010000, "soundcpu", 0)
+	ROM_LOAD("bayw.u7", 0x0000, 0x10000, CRC(90d6d8a8) SHA1(482c5643453f21a078257aa13398845ef19cab3c))
+	ROM_REGION(0x1000000, "bsmt", 0)
+	ROM_LOAD("bayw.u17", 0x000000, 0x80000, CRC(b20fde56) SHA1(2f2db49245e4a6a8251cbe896b2437fcec88d42d))
+	ROM_LOAD("bayw.u21", 0x080000, 0x80000, CRC(b7598881) SHA1(19d1dde1cb6634a7c7b5cdb4fa01cd09cc7d7777))
+ROM_END
+
 ROM_START(bay_f201)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("baycpuf.201", 0x0000, 0x10000, CRC(d2fddeaa) SHA1(839baca46823dc72a7ef1421764815f69f0e7084))
@@ -2122,6 +2135,7 @@ GAME(1995,  bmf_jp,        batmanf,  de_3b,     de3, de_3_state, empty_init, ROT
 GAME(1995,  bmf_time,      batmanf,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Batman Forever (Timed Play)",                                              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1995,  baywatch,      0,        de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Baywatch",                                                                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1995,  bay_d300,      baywatch, de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Baywatch (3.00 Dutch)",                                                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  bay_g300,      baywatch, de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Baywatch (3.00 German)",                                                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1995,  bay_d400,      baywatch, de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Baywatch (4.00 English)",                                                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1995,  bay_e400,      baywatch, de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Baywatch (4.00 Dutch)",                                                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1995,  bay_f201,      baywatch, de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Baywatch (2.01 French)",                                                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

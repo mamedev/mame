@@ -267,6 +267,19 @@ ROM_START(bbnny_lu)
 	ROM_RELOAD(0x50000, 0x10000)
 ROM_END
 
+ROM_START(bbnny_lg)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("bugs_bunny_u26_lg-2_nova_apparate.bin", 0x0000, 0x8000, CRC(0ba81bae) SHA1(ce56eadf26ee74a3a7b185893dceb09dc4929fa8))
+	ROM_LOAD("bugs_bunny_u27_lg-2_nova_apparate.bin", 0x8000, 0x8000, CRC(33344679) SHA1(c504c8a85820b3ca8923513bbba5e058138be4a1))
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
+	ROM_LOAD("bugs_u4.l2", 0x00000, 0x10000, CRC(04bc9aa5) SHA1(c3da2dc3e26b88a0ebc6f87e61fc71bec45330c3))
+	ROM_RELOAD(0x10000, 0x10000)
+	ROM_LOAD("bugs_u19.l1", 0x20000, 0x10000, CRC(a2084702) SHA1(ffd749387e7b52bad1e98c6a8939fb87bc67524c))
+	ROM_RELOAD(0x30000, 0x10000)
+	ROM_LOAD("bugs_u20.l1", 0x40000, 0x10000, CRC(5df734ef) SHA1(c8d153444dd6171c3ebddc8100ab06fde3373cc6))
+	ROM_RELOAD(0x50000, 0x10000)
+ROM_END
+
 /*--------------------
 / Diner 8/90 (#571)
 /--------------------*/
@@ -736,6 +749,7 @@ ROM_END
 
 GAME(1990,  bbnny_l2,   0,          s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Bugs Bunny Birthday Ball (L-2)",               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1990,  bbnny_lu,   bbnny_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Bugs Bunny Birthday Ball (LU-2) European",     MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  bbnny_lg,   bbnny_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Bugs Bunny Birthday Ball (LG-2) German",       MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1990,  diner_l4,   0,          s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Diner (LA-4)",                                 MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1990,  diner_l3,   diner_l4,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Diner (LA-3)",                                 MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1990,  diner_l2,   diner_l4,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Diner (LU-2) Europe",                          MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
