@@ -11493,7 +11493,7 @@ license:CC0-1.0
 		</part>
     </software>
 
-	<software name="neotris">
+	<software name="neotris" supported="partial">
 		<description>NeoTRIS</description>
 		<year>2020</year>
 		<publisher>Chips on Steroids</publisher>
