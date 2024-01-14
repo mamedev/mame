@@ -29,6 +29,9 @@ void stt_sa1_device::enable_w(uint16_t data)
 
 uint16_t stt_sa1_device::read(offs_t offset, uint16_t mem_mask)
 {
+	if (offset >= std::size(m_regs))
+		return 0;
+
 	return m_regs[offset]; // TODO: Should this return addr_cur for regs 1 and 2 instead?
 }
 
@@ -36,6 +39,9 @@ void stt_sa1_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	const int v = offset >> 4;
 	const int reg = offset & 0xf;
+
+	if (offset >= std::size(m_regs))
+		return;
 
 	m_regs[offset] = data;
 
