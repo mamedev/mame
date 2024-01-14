@@ -23,6 +23,7 @@ upd777_cpu_device::upd777_cpu_device(const machine_config &mconfig, device_type 
 	, m_screen(*this, "screen")
 	, m_prgregion(*this, "prg")
 	, m_patregion(*this, "patterns")
+	, m_port_in(*this, 0xff)
 {
 }
 
@@ -384,7 +385,7 @@ void upd777_cpu_device::do_op()
 			LOGMASKED(LOG_UNHANDLED_OPS, "KIE->M\n", k);
 			// Inputs for Cassette Vision appear to be read by this
 			// (selected based on the STB output value?)
-			set_m_data(0);
+			set_m_data(m_port_in());
 		}
 		else if (get_sme())
 		{

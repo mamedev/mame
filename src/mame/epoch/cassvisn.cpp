@@ -41,6 +41,14 @@ private:
 };
 
 static INPUT_PORTS_START( cassvisn )
+	PORT_START("IN")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON3 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // Jump
 INPUT_PORTS_END
 
 DEVICE_IMAGE_LOAD_MEMBER(cassvisn_state::cart_load)
@@ -77,6 +85,7 @@ DEVICE_IMAGE_LOAD_MEMBER(cassvisn_state::cart_load)
 void cassvisn_state::cassvisn(machine_config &config)
 {
 	UPD777(config, m_maincpu, 1000000); // frequency? UPD774 / UPD778 in some carts?
+	m_maincpu->in_cb().set_ioport("IN");
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "cassvisn_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);

@@ -34,6 +34,8 @@ public:
 	u16* get_prgregion() { return &m_prgregion[0]; }
 	u8* get_patregion() { return &m_patregion[0]; }
 
+	auto in_cb() { return m_port_in.bind(); }
+
 protected:
 	upd777_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor data);
 
@@ -152,6 +154,7 @@ private:
 	required_region_ptr<uint16_t> m_prgregion;
 	required_region_ptr<uint8_t> m_patregion;
 
+	devcb_read8 m_port_in;
 };
 
 DECLARE_DEVICE_TYPE(UPD777, upd777_cpu_device)
