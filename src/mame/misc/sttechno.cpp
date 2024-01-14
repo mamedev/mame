@@ -320,7 +320,7 @@ uint8_t sttechno_state::sttsa1_read_sample(offs_t offset)
 TIMER_DEVICE_CALLBACK_MEMBER(sttechno_state::irq6_timer)
 {
 	// IRQ 6 is responsible for incrementing the in-game song sync timer
-	// If the IRQ is too fast or too slow then it effects a lot of gameplay-related things: the measure markers, the note placements, the timing judgements
+	// If the IRQ is too fast or too slow then it affects a lot of gameplay-related things: the measure markers, the note placements, the timing judgements
 	// The animation during the gameplay where the character on the right side jumps up and down is also based on this IRQ
 	m_maincpu->set_input_line(6, HOLD_LINE);
 }
@@ -371,9 +371,13 @@ void sttechno_state::uart_data_w(uint16_t data)
 uint16_t sttechno_state::uart_data_r()
 {
 	uint16_t r = m_uart_rx;
-	m_uart_rx = 0;
-	m_maincpu->set_input_line(4, CLEAR_LINE);
-	m_uart_rx_busy = false;
+
+	if (!machine().side_effects_disabled()) {
+		m_uart_rx = 0;
+		m_maincpu->set_input_line(4, CLEAR_LINE);
+		m_uart_rx_busy = false;
+	}
+
 	return r;
 }
 
@@ -440,7 +444,8 @@ uint16_t sttechno_state::video_unk_r()
 
 	// HACK: Copy the OBJ data into the unused second half of the OBJ RAM for rendering
 	// This helps fix some small graphical glitches (sound test menu's text flicker, flickering during initial installation when programming the video flash)
-	std::copy_n(std::begin(m_sttga1_ram_obj), 0x2000, std::begin(m_sttga1_ram_obj) + 0x2000);
+	if (!machine().side_effects_disabled())
+		std::copy_n(std::begin(m_sttga1_ram_obj), 0x2000, std::begin(m_sttga1_ram_obj) + 0x2000);
 
 	return 0;
 }

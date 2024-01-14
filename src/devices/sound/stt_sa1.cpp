@@ -5,8 +5,8 @@
     Originally implemented in an FPGA
 */
 #include "emu.h"
-#include "multibyte.h"
 #include "stt_sa1.h"
+#include "multibyte.h"
 
 // #define VERBOSE (LOG_GENERAL)
 // #define LOG_OUTPUT_STREAM std::cout
@@ -38,15 +38,13 @@ uint16_t stt_sa1_device::read(offs_t offset, uint16_t mem_mask)
 
 void stt_sa1_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	if (offset < 0x100 / 2)
-	{
+	if (offset < 0x100 / 2) {
 		const int v = offset >> 4;
 		const int reg = offset & 0xf;
 
 		m_regs[offset] = data;
 
-		switch (reg)
-		{
+		switch (reg) {
 			case 1:
 				m_voice[v].addr_start = m_voice[v].addr_cur = (m_voice[v].addr_cur & 0xffff0000000) | (uint64_t(data) << 12);
 				LOG("voice %d: start = %08llx\n", v, m_voice[v].addr_cur >> 12);
@@ -93,9 +91,7 @@ void stt_sa1_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
 				LOG("Unknown register usage: voice %d, register %x, data %04x\n", v, reg, data);
 				break;
 		}
-	}
-	else
-	{
+	} else {
 		put_u16be(&m_ram[offset * 2], data);
 	}
 }
@@ -164,8 +160,7 @@ void stt_sa1_device::device_reset()
 
 	std::fill(std::begin(m_regs), std::end(m_regs), 0);
 
-	for (int i = 0; i < 8; i++)
-	{
+	for (int i = 0; i < 8; i++) {
 		m_voice[i].addr_start = 0;
 		m_voice[i].addr_cur = 0;
 		m_voice[i].addr_end = 0;
@@ -182,27 +177,24 @@ void stt_sa1_device::sound_stream_update(sound_stream &stream, std::vector<read_
 	outputs[0].fill(0);
 	outputs[1].fill(0);
 
-	for (int v = 0; v < 8; v++)
-	{
-		voice_t *voice = &m_voice[v];
+	for (int v = 0; v < 8; v++) {
+		voice_t &voice = m_voice[v];
 
-		for (int i = 0; i < outputs[0].samples() && voice->enabled; i++)
-		{
-			const offs_t offset = voice->addr_cur >> 12;
+		for (int i = 0; i < outputs[0].samples() && voice.enabled; i++) {
+			const offs_t offset = voice.addr_cur >> 12;
 			const int sample = read_sample(offset) << 8;
 
-			voice->addr_cur += voice->freq;
+			voice.addr_cur += voice.freq;
 
-			outputs[0].add_int(i, (sample * voice->vol_l) >> 16, 32768 * 8);
-			outputs[1].add_int(i, (sample * voice->vol_r) >> 16, 32768 * 8);
+			outputs[0].add_int(i, (sample * voice.vol_l) >> 16, 32768 * 8);
+			outputs[1].add_int(i, (sample * voice.vol_r) >> 16, 32768 * 8);
 
-			if (voice->addr_cur >= voice->addr_end)
-			{
-				if (!voice->is_looped) {
-					voice->enabled = false;
+			if (voice.addr_cur >= voice.addr_end) {
+				if (!voice.is_looped) {
+					voice.enabled = false;
 					m_keyctrl &= ~(1 << v);
 				} else {
-					voice->addr_cur = voice->addr_start;
+					voice.addr_cur = voice.addr_start;
 				}
 			}
 		}
