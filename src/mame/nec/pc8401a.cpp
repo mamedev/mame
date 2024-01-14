@@ -20,8 +20,9 @@
        Note: holding 0-0 & 0-1 at boot will draw the aforementioned special chars *only*.
        Is it related to not having CALC app as well? (-> verify when PC-8401* dump surfaces)
     \- LEDs, if any;
-    - 8251 USART
-    - modem (OKI M6946)
+    - No sound, is this supposed to have at least a beeper or dac1bit?
+    - 8251 USART;
+    - modem (OKI M6946);
     - PC-8431A FDC is same family as PC-80S31K, basically the 3.5" version of it.
       Likely none of the available BIOSes fits here.
 
@@ -90,6 +91,7 @@ public:
 		, m_crt_view(*this, "crt_view")
 	{ }
 
+	void pc8401a(machine_config &config);
 	void pc8500(machine_config &config);
 
 protected:
@@ -142,10 +144,9 @@ private:
 	uint8_t m_key_latch = 0;
 	bool m_key_irq_enable = false;
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_tick);
-	[[maybe_unused]] void pc8401a_lcdc(address_map &map);
+	void pc8401a_lcdc(address_map &map);
 	void pc8401a_mem(address_map &map);
 	void pc8500_io(address_map &map);
-	void pc8500_lcdc(address_map &map);
 
 	void bankdev0_map(address_map &map);
 	void bankdev8_map(address_map &map);
@@ -170,12 +171,6 @@ void pc8401a_state::palette_init(palette_device &palette) const
 }
 
 void pc8401a_state::pc8401a_lcdc(address_map &map)
-{
-	map.global_mask(0x1fff);
-	map(0x0000, 0x1fff).ram();
-}
-
-void pc8401a_state::pc8500_lcdc(address_map &map)
 {
 	map.global_mask(0x3fff);
 	map(0x0000, 0x3fff).ram();
@@ -562,7 +557,7 @@ void pc8401a_state::machine_reset()
 	bankswitch(0);
 }
 
-void pc8401a_state::pc8500(machine_config &config)
+void pc8401a_state::pc8401a(machine_config &config)
 {
 	Z80(config, m_maincpu, 7.987_MHz_XTAL / 2); // NEC uPD70008C
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc8401a_state::pc8401a_mem);
@@ -584,17 +579,16 @@ void pc8401a_state::pc8500(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(pc8401a_state::palette_init), 2);
 
-	// TODO: pc8401a uses 128 display lines instead of 200
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	m_screen->set_refresh_hz(44);
 	m_screen->set_screen_update(SED1330_TAG, FUNC(sed1330_device::screen_update));
-	m_screen->set_size(480, 208);
-	m_screen->set_visarea(0, 480-1, 0, 200-1);
+	m_screen->set_size(480, 130);
+	m_screen->set_visarea(0, 480-1, 0, 128-1);
 	m_screen->set_palette("palette");
 
 	SED1330(config, m_lcdc, 7.987_MHz_XTAL);
 	m_lcdc->set_screen(SCREEN_TAG);
-	m_lcdc->set_addrmap(0, &pc8401a_state::pc8500_lcdc);
+	m_lcdc->set_addrmap(0, &pc8401a_state::pc8401a_lcdc);
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_1);
 
@@ -611,6 +605,21 @@ void pc8401a_state::pc8500(machine_config &config)
 	// RAM(config, RAM_TAG).set_default_size("64K").set_extra_options("96K,192K");
 }
 
+void pc8401a_state::pc8500(machine_config &config)
+{
+	pc8401a(config);
+	m_screen->set_size(480, 208);
+	m_screen->set_visarea(0, 480-1, 0, 200-1);
+}
+
+ROM_START( pc8401bd )
+	ROM_REGION( 0x20000, IPL_TAG, ROMREGION_ERASEFF )
+	ROM_LOAD( "pc8401bd.bin", 0x0000, 0x10000, CRC(75d9cbfd) SHA1(78cba85bf94045a5a3ffb58f0361ba047471274b) )
+
+	//ROM_REGION( 0x1000, "chargen", 0 )
+	//ROM_LOAD( "pc8441a.bin", 0x0000, 0x1000, NO_DUMP )
+ROM_END
+
 ROM_START( pc8500 )
 	ROM_REGION( 0x20000, IPL_TAG, ROMREGION_ERASEFF )
 	ROM_LOAD( "pc8500.bin", 0x0000, 0x10000, CRC(c2749ef0) SHA1(f766afce9fda9ec84ed5b39ebec334806798afb3) )
@@ -625,5 +634,6 @@ ROM_END
 
 /*    YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY  FULLNAME */
 //COMP( 1984, pc8401a,  0,       0,      pc8401a, pc8401a, pc8401a_state, empty_init, "NEC",   "PC-8401A-LS", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-//COMP( 1984, pc8401bd, pc8401a, 0,      pc8401a, pc8401a, pc8401a_state, empty_init, "NEC",   "PC-8401BD", MACHINE_NOT_WORKING)
-COMP( 1985, pc8500,   0,       0,      pc8500,  pc8401a, pc8401a_state,  empty_init, "NEC",   "PC-8500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+// TODO: clone of above
+COMP( 1984, pc8401bd, 0,       0,      pc8401a, pc8401a, pc8401a_state, empty_init, "NEC",   "PC-8401BD", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1985, pc8500,   0,       0,      pc8500,  pc8401a, pc8401a_state, empty_init, "NEC",   "PC-8500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
