@@ -37916,7 +37916,7 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="classkng" cloneof="claskong">
+	<software name="claskong_a" cloneof="claskong">
 		<description>Classic Kong</description>
 		<year>2012</year>
 		<publisher>Piko Interactive</publisher>
@@ -49307,7 +49307,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
-	<software name="mazechal_a" cloneof="mazechal">
+	<software name="mazechal_pal" cloneof="mazechal">
 		<description>MazezaM Challenge DX (v2.1, PAL)</description>
 		<year>2020</year>
 		<publisher>Portabledev</publisher>
@@ -49322,7 +49322,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
-	<software name="mazechal_b" cloneof="mazechal">
+	<software name="mazechal_13" cloneof="mazechal">
 		<description>MazezaM Challenge (v1.3)</description>
 		<year>2012</year>
 		<publisher>Portabledev</publisher>
@@ -49337,7 +49337,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
-	<software name="mazechal_c" cloneof="mazechal">
+	<software name="mazechal_12" cloneof="mazechal">
 		<description>MazezaM Challenge (v1.2)</description>
 		<year>2012</year>
 		<publisher>Portabledev</publisher>
@@ -49352,7 +49352,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
-	<software name="mazechal_d" cloneof="mazechal">
+	<software name="mazechal_11" cloneof="mazechal">
 		<description>MazezaM Challenge (v1.1)</description>
 		<year>2012</year>
 		<publisher>Portabledev</publisher>
@@ -62176,7 +62176,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
-	<software name="sureinst_a" cloneof="sureinst">
+	<software name="sureinst_101" cloneof="sureinst">
 		<description>Sure Instinct (NTSC, v1.0.1)</description>
 		<year>2021</year>
 		<publisher>Benjamin Schulte</publisher>
@@ -62189,7 +62189,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 	
-	<software name="sureinst_b" cloneof="sureinst">
+	<software name="sureinst_10" cloneof="sureinst">
 		<description>Sure Instinct (NTSC, v1.0)</description>
 		<year>2021</year>
 		<publisher>Benjamin Schulte</publisher>
@@ -62202,7 +62202,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
-	<software name="sureinst_c" cloneof="sureinst">
+	<software name="sureinst_pal102" cloneof="sureinst">
 		<description>Sure Instinct (PAL, v1.0.2)</description>
 		<year>2021</year>
 		<publisher>Benjamin Schulte</publisher>
@@ -62215,7 +62215,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
-	<software name="sureinst_d" cloneof="sureinst">
+	<software name="sureinst_pal101" cloneof="sureinst">
 		<description>Sure Instinct (PAL, v1.0.1)</description>
 		<year>2021</year>
 		<publisher>Benjamin Schulte</publisher>
@@ -62228,7 +62228,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
-	<software name="sureinst_e" cloneof="sureinst">
+	<software name="sureinst_pal10" cloneof="sureinst">
 		<description>Sure Instinct (PAL, v1.0)</description>
 		<year>2021</year>
 		<publisher>Benjamin Schulte</publisher>
