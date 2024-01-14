@@ -105,6 +105,7 @@ Notes:
 */
 
 #include "emu.h"
+#include "multibyte.h"
 
 #include "bus/ata/ataintf.h"
 #include "bus/ata/atapicdr.h"
@@ -146,6 +147,7 @@ public:
 		, m_rs232(*this, "rs232")
 		, m_sttga1_ram_obj(*this, "sttga1_ram_obj")
 		, m_sttga1_ram_pal(*this, "sttga1_ram_pal")
+		, m_sound_ram(*this, "sound_ram")
 	{}
 
 	void shambros(machine_config &config) ATTR_COLD;
@@ -161,6 +163,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void cpu_map(address_map &map);
+	void sound_map(address_map &map);
 
 	void bank_w(uint16_t data);
 	void bank_write_enable_w(uint16_t data);
@@ -186,7 +189,6 @@ private:
 	void sttga1_video_flash_write_enable_w(offs_t offset, uint16_t data);
 	void sttga1_enabled_w(offs_t offset, uint16_t data);
 
-	uint8_t sttsa1_read_sample(offs_t offset);
 	void sound_device_enable_w(offs_t offset, uint16_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq6_timer);
@@ -200,6 +202,7 @@ private:
 
 	required_shared_ptr<uint16_t> m_sttga1_ram_obj;
 	required_shared_ptr<uint16_t> m_sttga1_ram_pal;
+	required_shared_ptr<uint8_t> m_sound_ram;
 
 	uint16_t m_bank;
 	bool m_bank_write_enabled;
@@ -305,18 +308,6 @@ uint32_t sttechno_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-uint8_t sttechno_state::sttsa1_read_sample(offs_t offset)
-{
-	uint16_t r = 0;
-
-	if (offset >= 0x600000 && offset < 0x800000)
-		r = m_flash[0]->read_raw((offset - 0x600000) / 2);
-	else if (offset >= 0x800000 && offset < 0xa00000)
-		r = m_flash[1]->read_raw((offset - 0x800000) / 2);
-
-	return BIT(r, (offset & 1) * 8, 8);
-}
-
 TIMER_DEVICE_CALLBACK_MEMBER(sttechno_state::irq6_timer)
 {
 	// IRQ 6 is responsible for incrementing the in-game song sync timer
@@ -341,7 +332,11 @@ void sttechno_state::bank_write_enable_w(uint16_t data)
 void sttechno_state::data_w(offs_t offset, uint16_t data)
 {
 	if (m_bank >= 0 && m_bank <= 2) {
-		m_sound->write(offset + (0x100000 * m_bank), data);
+		const offs_t offs = offset + (0x100000 * m_bank);
+		if (offs < 0x100 / 2)
+			m_sound->write(offs, data);
+		else
+			put_u16be(&m_sound_ram[offs*2], data);
 	} else if (m_bank == 3 && m_bank_write_enabled) {
 		m_flash[0]->write(offset, data);
 	} else if (m_bank == 4 && m_bank_write_enabled) {
@@ -352,7 +347,11 @@ void sttechno_state::data_w(offs_t offset, uint16_t data)
 uint16_t sttechno_state::data_r(offs_t offset)
 {
 	if (m_bank >= 0 && m_bank <= 2) {
-		return m_sound->read(offset + (0x100000 * m_bank));
+		const offs_t offs = offset + (0x100000 * m_bank);
+		if (offs < 0x100 / 2)
+			return m_sound->read(offs);
+		else
+			return get_u16be(&m_sound_ram[offs*2]);
 	} else if (m_bank == 3) {
 		return m_flash[0]->read(offset);
 	} else if (m_bank == 4) {
@@ -511,6 +510,17 @@ void sttechno_state::cpu_map(address_map &map)
 	map(0xc00000, 0xdfffff).rw(FUNC(sttechno_state::data_r), FUNC(sttechno_state::data_w));
 }
 
+void sttechno_state::sound_map(address_map &map)
+{
+	map(0x000000, 0x5fffff).ram().share(m_sound_ram);
+	map(0x600000, 0x7fffff).lr8(NAME([this] (offs_t offset) -> uint8_t {
+		return BIT(m_flash[0]->read_raw(offset >> 1), 8 * (offset & 1), 8);
+	}));
+	map(0x800000, 0x9fffff).lr8(NAME([this] (offs_t offset, uint16_t mem_mask) -> uint8_t {
+		return BIT(m_flash[1]->read_raw(offset >> 1), 8 * (offset & 1), 8);
+	}));
+}
+
 
 static INPUT_PORTS_START( shambros )
 	PORT_START("IN1")
@@ -587,9 +597,9 @@ void sttechno_state::shambros(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	STT_SA1(config, m_sound, XTAL(42'954'545) / 3);
+	m_sound->set_addrmap(0, &sttechno_state::sound_map);
 	m_sound->add_route(0, "lspeaker", 1.0);
 	m_sound->add_route(1, "rspeaker", 1.0);
-	m_sound->read_sample_callback().set(FUNC(sttechno_state::sttsa1_read_sample));
 	TIMER(config, "irq6_timer").configure_periodic(FUNC(sttechno_state::irq6_timer), attotime::from_hz(XTAL(42'954'545) / 3 / 448 / 128)); // probably some interrupt?
 
 	RS232_PORT(config, m_rs232, sttechno_debug_serial_devices, nullptr);

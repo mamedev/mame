@@ -5,15 +5,16 @@
 
 #pragma once
 
+#include "dirom.h"
+
 class stt_sa1_device : public device_t,
-					   public device_sound_interface
+					   public device_sound_interface,
+					   public device_rom_interface<24, 0, 0, ENDIANNESS_BIG>
 {
 public:
 	static constexpr feature_type imperfect_features() { return feature::SOUND; } // unemulated and/or unverified effects and envelopes
 
 	stt_sa1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	auto read_sample_callback() { return m_readsample_cb.bind(); }
 
 	void enable_w(uint16_t data);
 
@@ -30,8 +31,6 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
-	int8_t read_sample(offs_t offset);
-
 	struct voice_t {
 		uint64_t addr_start;
 		uint64_t addr_end;
@@ -45,12 +44,9 @@ private:
 
 	sound_stream *m_stream;
 
-	devcb_read8 m_readsample_cb;
-
 	voice_t m_voice[8];
 	uint16_t m_keyctrl; // Key on/off control bit
 
-	std::unique_ptr<uint8_t[]> m_ram;
 	uint16_t m_regs[128];
 
 	bool m_enabled;
