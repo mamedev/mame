@@ -11497,6 +11497,9 @@ license:CC0-1.0
 		<description>NeoTRIS</description>
 		<year>2020</year>
 		<publisher>Chips on Steroids</publisher>
+		<notes><![CDATA[
+Four player adapter not supported
+]]></notes>
 		<sharedfeat name="release" value="AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
