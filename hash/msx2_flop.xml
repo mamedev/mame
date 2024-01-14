@@ -538,6 +538,7 @@ The following floppies came with the machines.
 		<description>3 Tsu no Negai (Japan)</description>
 		<year>1998</year>
 		<publisher>MesLibres</publisher>
+		<info name="alt_title" value="3つの願い"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -7292,14 +7293,14 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="gogo1148" supported="partial">
-		<description>Gogo 11-ji 48-bu Version 4 (Japan)</description>
+		<description>Gogo 11-ji 48-pun Version 4 (Japan)</description>
 		<year>1992</year>
 		<publisher>Fantasy Creators</publisher>
 		<notes>Slight graphics glitch at top line of screem when starting a game.</notes>
 		<info name="alt_title" value="午後１１時４８分 Version 4"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="gogo 11-ji 48-bu version 4 - fantasy creators.dsk" size="737280" crc="a8d914c9" sha1="18311f4c45a6495d768d81ee55940e4f6e996305"/>
+				<rom name="gogo 11-ji 48-pun version 4 - fantasy creators.dsk" size="737280" crc="a8d914c9" sha1="18311f4c45a6495d768d81ee55940e4f6e996305"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7971,7 +7972,7 @@ The following floppies came with the machines.
 		<description>Hatchake Ayayo-san II: Ikenai Holiday (Japan)</description>
 		<year>1990</year>
 		<publisher>HARD</publisher>
-		<info name="alt_title" value="はっちゃけあやよさんIIいけないホリディ"/>
+		<info name="alt_title" value="はっちゃけあやよさんIIいけないホリデイ"/>
 		<info name="barcode" value="4988694000963"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
