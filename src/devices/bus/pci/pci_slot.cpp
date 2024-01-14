@@ -10,6 +10,7 @@
 #include "rivatnt.h"
 #include "geforce.h"
 #include "mga2064w.h"
+#include "promotion.h"
 #include "sw1000xg.h"
 
 DEFINE_DEVICE_TYPE(PCI_SLOT, pci_slot_device, "pci_slot", "PCI extension motherboard port")
@@ -66,6 +67,9 @@ pci_card_device::~pci_card_device()
 
 void pci_cards(device_slot_interface &device)
 {
+	// 0x01 - mass storage controllers
+	// 0x02 - network controllers
+	// 0x03 - display controllers
 	device.option_add("virge",          VIRGE_PCI);
 	device.option_add("virgedx",        VIRGEDX_PCI);
 	device.option_add("riva128",        RIVA128);
@@ -79,5 +83,22 @@ void pci_cards(device_slot_interface &device)
 	device.option_add("geforce256_ddr", GEFORCE256_DDR);
 	device.option_add("quadro",         QUADRO);
 	device.option_add("mga2064w",       MGA2064W);
+	device.option_add("promotion3210",  PROMOTION3210);
+	// 0x04 - multimedia controllers
 	device.option_add("sw1000xg",       SW1000XG);
+	// 0x05 - memory controllers
+	// 0x06 - bridge devices
+	// 0x07 - simple communication controllers
+	// 0x08 - generic system peripherals
+	// 0x09 - input devices
+	// 0x0a - docking stations
+	// 0x0b - processors
+	// 0x0c - Serial Bus controllers
+	// 0x0d - wireless controllers
+	// 0x0e - Intelligent I/O controllers
+	// 0x0f - Satellite Communication controllers
+	// 0x10 - Encryption/Decryption controllers
+	// 0x11 - Data acquisition and signal processing controllers
+	// 0x12 - Processing accelerators
+	// 0x13 - Debug
 }
