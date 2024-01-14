@@ -325,10 +325,17 @@ void upd777_cpu_device::do_op()
 		const int n = (inst >> 5) & 0x3;
 		u8 m = get_m_data();
 		m = m + k;
+		set_m_data(m & 0x7f);
+
 		if (m & 0x80)
 			m_skip = 1;
-		set_m_data(m & 0x7f);
-		set_l(n);
+
+		// TODO: prevents infinitely scrolling screen, and allows pakpak to boot, but this does't make logical
+		//       sense, unless the 'Skip if carry' in the text above is specifically meaning this only applies
+		//       when skipping, however if you apply the same to the next opcode it breaks text rendering
+		//       eg 'score' text in the same game.
+		if (m_skip)
+			set_l(n);
 	}
 	else if (inst >= 0b0001'1000'0000 && inst <= 0b0001'1111'1111)
 	{
@@ -337,9 +344,11 @@ void upd777_cpu_device::do_op()
 		const int n = (inst >> 5) & 0x3;
 		u8 m = get_m_data();
 		m = m - k;
+		set_m_data(m & 0x7f);
+
 		if (m & 0x80)
 			m_skip = 1;
-		set_m_data(m & 0x7f);
+
 		set_l(n);
 	}
 	else if (inst >= 0b0100'1000'0000 && inst <= 0b0100'1011'1111)
