@@ -1361,6 +1361,10 @@ zorroa6                         // (c) 2003
 zorroa6a                        // (c) 2006
 zorroa6u                        // (c) 2005
 
+@source:aristocrat/aristmk7.cpp
+aristmk7                        // (c) 2006?
+a7lucky88                       // (c) 200?
+
 @source:aristocrat/caswin.cpp
 caswin                          // (c) 1985
 rcasino                         // (c) 1984 Dyna Electronics (D-2608208A1-2)
@@ -35721,8 +35725,6 @@ streetgr3                       // (c) 1993
 
 @source:pc/pcipc.cpp
 pciagp                          //
-pcimga                          //
-pcinv3                          //
 pcipc                           //
 pcipctx                         //
 
@@ -41186,6 +41188,7 @@ s8waysfc                        // (c) 1989 Sigma
 
 @source:sigma/sigmab88.cpp
 cool104
+freedeal
 
 @source:sigma/sigmab98.cpp
 animalc                         // (c) 2000 Sammy
@@ -45037,6 +45040,7 @@ evio                            //
 gcslottv                        //
 gungunad                        //
 has_wamg                        //
+hikara							//
 jarajal                         //
 jpopira                         //
 ltv_tam                         //

@@ -21,7 +21,7 @@
 DEFINE_DEVICE_TYPE(MGA2064W, mga2064w_device, "mga2064w", "Matrox Millennium \"IS-STORM / MGA-2064W\"")
 
 mga2064w_device::mga2064w_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, MGA2064W, tag, owner, clock)
+	: pci_card_device(mconfig, MGA2064W, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, m_svga(*this, "svga")
 	, m_vga_rom(*this, "vga_rom")
