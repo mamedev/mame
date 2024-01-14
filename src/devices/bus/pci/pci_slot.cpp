@@ -11,6 +11,7 @@
 #include "geforce.h"
 #include "mga2064w.h"
 #include "promotion.h"
+#include "ds2416.h"
 #include "sw1000xg.h"
 
 DEFINE_DEVICE_TYPE(PCI_SLOT, pci_slot_device, "pci_slot", "PCI extension motherboard port")
@@ -84,8 +85,11 @@ void pci_cards(device_slot_interface &device)
 	device.option_add("quadro",         QUADRO);
 	device.option_add("mga2064w",       MGA2064W);
 	device.option_add("promotion3210",  PROMOTION3210);
+
 	// 0x04 - multimedia controllers
 	device.option_add("sw1000xg",       SW1000XG);
+	device.option_add("ds2416",         DS2416);
+
 	// 0x05 - memory controllers
 	// 0x06 - bridge devices
 	// 0x07 - simple communication controllers

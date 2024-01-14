@@ -71,7 +71,7 @@ const tiny_rom_entry *rivatnt_device::device_rom_region() const
 // NV4 removes the indirect_io_map from NV3
 void rivatnt_device::device_start()
 {
-	pci_device::device_start();
+	pci_card_device::device_start();
 
 	add_map( 16*1024*1024, M_MEM, FUNC(rivatnt_device::mmio_map));
 	add_map(128*1024*1024, M_MEM, FUNC(rivatnt_device::vram_aperture_map));
@@ -119,7 +119,7 @@ const tiny_rom_entry *rivatnt2_device::device_rom_region() const
 // All NV5 definitely wants 64K ROM BIOS (would fail CRC checks)
 void rivatnt2_device::device_start()
 {
-	pci_device::device_start();
+	pci_card_device::device_start();
 
 	add_map( 16*1024*1024, M_MEM, FUNC(rivatnt2_device::mmio_map));
 	add_map(128*1024*1024, M_MEM, FUNC(rivatnt2_device::vram_aperture_map));

@@ -61,7 +61,7 @@ void virge_pci_device::lfb_map(address_map& map)
 
 void virge_pci_device::config_map(address_map &map)
 {
-	pci_device::config_map(map);
+	pci_card_device::config_map(map);
 	map(0x10, 0x13).rw(FUNC(virge_pci_device::base_address_r),FUNC(virge_pci_device::base_address_w));
 }
 
@@ -141,7 +141,7 @@ void virge_pci_device::postload()
 void virge_pci_device::device_start()
 {
 	set_ids(0x53335631, 0x00, 0x030000, 0x000000);
-	pci_device::device_start();
+	pci_card_device::device_start();
 
 	add_rom(m_bios->base(),0x8000);
 	expansion_rom_base = 0xc0000;
@@ -157,7 +157,7 @@ void virge_pci_device::device_start()
 void virgedx_pci_device::device_start()
 {
 	set_ids(0x53338a01, 0x00, 0x030000, 0x000000);
-	pci_device::device_start();
+	pci_card_device::device_start();
 
 	add_rom(m_bios->base(),0x8000);
 	expansion_rom_base = 0xc0000;

@@ -78,7 +78,7 @@ void riva128_device::device_add_mconfig(machine_config &config)
 
 void riva128_device::device_start()
 {
-	pci_device::device_start();
+	pci_card_device::device_start();
 
 	add_map( 16*1024*1024, M_MEM, FUNC(riva128_device::mmio_map));
 	add_map(128*1024*1024, M_MEM, FUNC(riva128_device::vram_aperture_map));
@@ -96,7 +96,7 @@ void riva128_device::device_start()
 
 void riva128_device::device_reset()
 {
-	pci_device::device_reset();
+	pci_card_device::device_reset();
 
 	// TODO: to be checked
 	command = 0x0000;
@@ -110,7 +110,7 @@ void riva128_device::device_reset()
 // TODO: counter-check everything
 void riva128_device::config_map(address_map &map)
 {
-	pci_device::config_map(map);
+	pci_card_device::config_map(map);
 	map(0x34, 0x34).lr8(NAME([] () { return 0x44; }));
 
 //  map(0x40, 0x43) subsystem ID alias (writeable)

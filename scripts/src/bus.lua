@@ -5432,7 +5432,11 @@ if (BUSES["PCI"]~=null) then
 		MAME_DIR .. "src/devices/bus/pci/mga2064w.h",
 		MAME_DIR .. "src/devices/bus/pci/promotion.cpp",
 		MAME_DIR .. "src/devices/bus/pci/promotion.h",
+		MAME_DIR .. "src/devices/bus/pci/ymp21.cpp",
+		MAME_DIR .. "src/devices/bus/pci/ymp21.h",
 		MAME_DIR .. "src/devices/bus/pci/sw1000xg.cpp",
 		MAME_DIR .. "src/devices/bus/pci/sw1000xg.h",
+		MAME_DIR .. "src/devices/bus/pci/ds2416.cpp",
+		MAME_DIR .. "src/devices/bus/pci/ds2416.h",
 	}
 end
