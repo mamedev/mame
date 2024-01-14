@@ -336,7 +336,7 @@ license:CC0-1.0
 	<rom name="Bang^2 Busters (France) (En,Ja) (Unl) (Track 3).bin" size="9988944" crc="898b1a26" sha1="771dfb863f36ab898bc7251abe67529d2060a282"/>
 	-->
 	<software name="bbbuster">
-		<description>Bang Bang Busters (France)</description>
+		<description>Bang Bang Busters</description>
 		<year>2011</year>
 		<publisher>Neo Conception International</publisher>
 		<info name="alt_title" value="バンバン バスターズ"/>
