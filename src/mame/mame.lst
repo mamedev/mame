@@ -31684,9 +31684,6 @@ version4v                       // (c) 2006 Amcoe
 version4v2                      // (c) 2006 Amcoe
 version4v3                      // (c) 2006 Amcoe
 
-@source:misc/shambros.cpp
-shambros
-
 @source:misc/shangkid.cpp
 chinhero                        // (c) 1984 Taiyo
 chinhero2                       // (c) 1984 Taiyo
@@ -31833,6 +31830,9 @@ stop
 
 @source:misc/strkzn.cpp
 strkzn                          // (c) 1994 Purple Star
+
+@source:misc/sttechno.cpp
+shambros
 
 @source:misc/stuntair.cpp
 stuntair                        // (c) 1983 Nuova Videotron

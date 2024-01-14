@@ -969,6 +969,19 @@ end
 
 
 ---------------------------------------------------
+-- ST-Techno custom sound chip
+--@src/devices/sound/stt_sa1.h,SOUNDS["STT_SA1"] = true
+---------------------------------------------------
+
+if (SOUNDS["STT_SA1"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/stt_sa1.cpp",
+		MAME_DIR .. "src/devices/sound/stt_sa1.h",
+	}
+end
+
+
+---------------------------------------------------
 -- S14001A speech synthesizer
 --@src/devices/sound/s14001a.h,SOUNDS["S14001A"] = true
 ---------------------------------------------------
