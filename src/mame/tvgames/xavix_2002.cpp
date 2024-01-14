@@ -346,13 +346,36 @@ void xavix_i2c_jmat_state::xavix2002_i2c_jmat(machine_config &config)
 	m_xavix2002io->write_2_callback().set(FUNC(xavix_i2c_jmat_state::write_extended_io2));
 }
 
-void xavix2002_superpttv_state::xavix2002_superpctv(machine_config& config)
+DEVICE_IMAGE_LOAD_MEMBER(xavix2002_super_tv_pc_state::cart_load)
+{
+	if (!image.loaded_through_softlist())
+		return std::make_pair(image_error::UNSUPPORTED, "Cartridges must be loaded from the software list");
+
+	uint32_t size = m_cart->common_get_size("prg");
+
+	if (size != 0x400000)
+		return std::make_pair(image_error::UNSUPPORTED, "must be 0x400000 in size");
+
+	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_BIG);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "prg");
+	memcpy(memregion("bios")->base(), m_cart->get_rom_base(), size);
+
+	return std::make_pair(std::error_condition(), std::string());
+}
+
+void xavix2002_super_tv_pc_state::xavix2002_super_tv_pc(machine_config& config)
 {
 	xavix2002(config);
 
-	m_xavix2002io->read_0_callback().set(FUNC(xavix2002_superpttv_state::read_extended_io0));
-	m_xavix2002io->read_1_callback().set(FUNC(xavix2002_superpttv_state::read_extended_io1));
-	m_xavix2002io->read_2_callback().set(FUNC(xavix2002_superpttv_state::read_extended_io2));
+	m_xavix2002io->read_0_callback().set(FUNC(xavix2002_super_tv_pc_state::read_extended_io0));
+	m_xavix2002io->read_1_callback().set(FUNC(xavix2002_super_tv_pc_state::read_extended_io1));
+	m_xavix2002io->read_2_callback().set(FUNC(xavix2002_super_tv_pc_state::read_extended_io2));
+
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "super_tv_pc_cart");
+	m_cart->set_width(GENERIC_ROM16_WIDTH);
+	m_cart->set_device_load(FUNC(xavix2002_super_tv_pc_state::cart_load));
+
+	SOFTWARE_LIST(config, "cart_list").set_original("super_tv_pc_cart");
 }
 
 
@@ -487,9 +510,17 @@ ROM_START( epo_tfit )
 	ROM_LOAD("tennisfitness.bin", 0x000000, 0x400000, CRC(cbf65bd2) SHA1(30b3da6f061b2dd91679db42a050f715901beb87) )
 ROM_END
 
-ROM_START( suprpctv )
+ROM_START( stvpchk )
 	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00) // inverted line?
 	ROM_LOAD("superpctv.bin", 0x200000, 0x200000, CRC(4a55a81c) SHA1(178b4b595a3aefc6d1c176031b436fc3312009e7) )
+	ROM_CONTINUE(0x000000, 0x200000)
+	ROM_CONTINUE(0x600000, 0x200000)
+	ROM_CONTINUE(0x400000, 0x200000)
+ROM_END
+
+ROM_START( stvpcdog )
+	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00) // inverted line?
+	ROM_LOAD("supertvpc_dogs.u4", 0x200000, 0x200000, CRC(ab326e6d) SHA1(e22205f6ff4c8cc46538d78e27535be63acea42a) )
 	ROM_CONTINUE(0x000000, 0x200000)
 	ROM_CONTINUE(0x600000, 0x200000)
 	ROM_CONTINUE(0x400000, 0x200000)
@@ -545,7 +576,9 @@ CONS( 2005, tmy_thom, 0, 0, xavix2002_i2c_24c04,    xavix_i2c,  xavix_i2c_state,
 // has HT24LC16
 CONS( 2008, udance,   0, 0, xavix2002, xavix, xavix_state, init_xavix, "Tiger / SSD Company LTD", "U-Dance", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-// this has RAM in the usual ROM space, needs handling, also has Atmel 24LC64.
-CONS( 200?, suprpctv, 0, 0, xavix2002_superpctv,    xavix,      xavix2002_superpttv_state, init_xavix, "Epoch / SSD Company LTD", "Super PC TV (Epoch)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+// this has RAM in the usual ROM space, needs handling, also has Atmel 24LC64, hangs after 'loading' sequence
+CONS( 200?, stvpchk,  0, 0, xavix2002_super_tv_pc,    xavix,      xavix2002_super_tv_pc_state, init_xavix, "Epoch / SSD Company LTD", "Super TV PC - Hello Kitty (Epoch)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+// this one actually boots to the desktop (as does the 'hamster' cart and 'ecc' cart)
+CONS( 2004, stvpcdog, 0, 0, xavix2002_super_tv_pc,    xavix,      xavix2002_super_tv_pc_state, init_xavix, "Epoch / SSD Company LTD", "Super TV PC - Dogs (Epoch)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 
