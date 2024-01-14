@@ -128,6 +128,8 @@ private:
 
 	u8 m_mode;
 
+	u8 m_stb;
+
 	// what are these, used by H<->X opcode
 	u8 m_ldash;
 	u8 m_x4;

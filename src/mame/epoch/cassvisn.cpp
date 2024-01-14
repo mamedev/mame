@@ -27,7 +27,8 @@ public:
 	cassvisn_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_cart(*this, "cartslot")
+		m_cart(*this, "cartslot"),
+		m_in(*this, "IN%u", 0)
 	{ }
 
 	void cassvisn(machine_config &config);
@@ -35,20 +36,36 @@ public:
 protected:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 private:
+	u8 input_r(offs_t offset);
 
 	required_device<upd777_cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
+	required_ioport_array<2> m_in;
 };
 
+u8 cassvisn_state::input_r(offs_t offset)
+{
+	return m_in[offset & 1]->read();
+}
+
 static INPUT_PORTS_START( cassvisn )
-	PORT_START("IN")
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON3 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // Jump
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON3 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // Jump on elvpanic
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON10 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON9 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON8 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON7 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON6 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON5 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) // Jump on monstrmn 
 INPUT_PORTS_END
 
 DEVICE_IMAGE_LOAD_MEMBER(cassvisn_state::cart_load)
@@ -84,8 +101,8 @@ DEVICE_IMAGE_LOAD_MEMBER(cassvisn_state::cart_load)
 
 void cassvisn_state::cassvisn(machine_config &config)
 {
-	UPD777(config, m_maincpu, 1000000); // frequency? UPD774 / UPD778 in some carts?
-	m_maincpu->in_cb().set_ioport("IN");
+	UPD777(config, m_maincpu, 2000000); // frequency? UPD774 / UPD778 in some carts?
+	m_maincpu->in_cb().set(FUNC(cassvisn_state::input_r));
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "cassvisn_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);

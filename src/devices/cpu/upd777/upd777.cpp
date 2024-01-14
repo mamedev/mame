@@ -126,6 +126,9 @@ void upd777_cpu_device::device_start()
 	save_item(NAME(m_frs));
 	save_item(NAME(m_fls));
 
+	save_item(NAME(m_mode));
+	save_item(NAME(m_stb));
+
 	save_item(NAME(m_stack));
 	save_item(NAME(m_stackpos));
 
@@ -385,7 +388,7 @@ void upd777_cpu_device::do_op()
 			LOGMASKED(LOG_UNHANDLED_OPS, "KIE->M\n", k);
 			// Inputs for Cassette Vision appear to be read by this
 			// (selected based on the STB output value?)
-			set_m_data(m_port_in());
+			set_m_data(m_port_in(m_stb));
 		}
 		else if (get_sme())
 		{
@@ -891,6 +894,9 @@ void upd777_cpu_device::do_op()
 		// STB is an input strobe / shifter
 		const int n = inst & 1;
 		LOGMASKED(LOG_UNHANDLED_OPS, "0x%d->STB\n", n);
+
+		m_stb = (m_stb << 1) | n;
+		m_stb &= 0xf;
 	}
 
 	else if ((inst == 0b0011'0000'1010) || (inst == 0b0011'0000'1011))
