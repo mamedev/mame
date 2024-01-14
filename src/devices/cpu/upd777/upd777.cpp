@@ -76,7 +76,13 @@ void upd777_cpu_device::increment_pc()
 
 	// is returning to the start of the page the correct behavior?
 	if (lowpc == 0x00)
-		logerror("overflowing PC, returning to start of current page\n");
+	{
+		logerror("overflowing PC, returning to start of current page %03x\n", highpc);
+		// pakpak runs better if you do this, but that is clearly by chance as
+		// most other cases show this isn't meant to happen
+		//highpc += 0x80;
+		//highpc &= 0x7ff;
+	}
 
 	m_pc = highpc | lowpc;
 }
@@ -367,6 +373,8 @@ void upd777_cpu_device::do_op()
 		if (get_kie()) // documentation does not state if KIE or SME has priority
 		{
 			LOGMASKED(LOG_UNHANDLED_OPS, "KIE->M\n", k);
+			// Inputs for Cassette Vision appear to be read by this
+			// (selected based on the STB output value?)
 			set_m_data(0);
 		}
 		else if (get_sme())
@@ -770,10 +778,11 @@ void upd777_cpu_device::do_op()
 	else if (inst == 0b0000'0100'1010)
 	{
 		// 04a Skip if (Vertical Blank) = 1, 0->M[[18:00],[3]][1]
-		//LOGMASKED(LOG_UNHANDLED_OPS, "VBLK\n");
+		LOGMASKED(LOG_UNHANDLED_OPS, "VBLK\n");
 		if (get_vbl_state())
 			m_skip = 1;
 
+		// TODO:
 		// need to do the 0->M[[18:00],[3]][1] bit
 	}
 	else if (inst == 0b0000'0100'1100)
