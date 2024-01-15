@@ -124,7 +124,7 @@ Notes:
 #include "speaker.h"
 
 #define LOG_VIDEO_DISPLAY  (1U << 1)
-#define LOG_UART  (1U << 2)
+#define LOG_UART           (1U << 2)
 
 // #define VERBOSE (LOG_GENERAL | LOG_UART)
 // #define LOG_OUTPUT_STREAM std::cout
@@ -148,13 +148,14 @@ public:
 		, m_sttga1_ram_obj(*this, "sttga1_ram_obj")
 		, m_sttga1_ram_pal(*this, "sttga1_ram_pal")
 		, m_sound_ram(*this, "sound_ram")
-	{}
+	{
+	}
 
 	void shambros(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual void tra_callback() override;
 	virtual void rcv_complete() override;
@@ -162,14 +163,14 @@ protected:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void cpu_map(address_map &map);
-	void sound_map(address_map &map);
+	void cpu_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 	void bank_w(uint16_t data);
 	void bank_write_enable_w(uint16_t data);
 
 	void data_w(offs_t offset, uint16_t data);
-	uint16_t data_r(offs_t offset);
+	uint16_t data_r(address_space &space, offs_t offset);
 
 	void uart_data_w(uint16_t data);
 	uint16_t uart_data_r();
@@ -202,10 +203,10 @@ private:
 
 	required_shared_ptr<uint16_t> m_sttga1_ram_obj;
 	required_shared_ptr<uint16_t> m_sttga1_ram_pal;
-	required_shared_ptr<uint8_t> m_sound_ram;
+	required_shared_ptr<uint16_t> m_sound_ram;
 
 	uint16_t m_bank;
-	bool m_bank_write_enabled;
+	uint16_t m_flash_write_enabled;
 
 	bool m_sttga1_video_flash_write_enable;
 	bool m_sttga1_enabled;
@@ -219,7 +220,7 @@ private:
 void sttechno_state::machine_start()
 {
 	save_item(NAME(m_bank));
-	save_item(NAME(m_bank_write_enabled));
+	save_item(NAME(m_flash_write_enabled));
 	save_item(NAME(m_sttga1_video_flash_write_enable));
 	save_item(NAME(m_sttga1_enabled));
 	save_item(NAME(m_uart_rx));
@@ -237,7 +238,7 @@ void sttechno_state::machine_reset()
 	transmit_register_reset();
 
 	m_bank = 0;
-	m_bank_write_enabled = false;
+	m_flash_write_enabled = 0;
 
 	m_sttga1_video_flash_write_enable = false;
 	m_sttga1_enabled = false;
@@ -326,7 +327,7 @@ void sttechno_state::bank_write_enable_w(uint16_t data)
 	// Only appears to be used for banks 3 and 4
 	// For bank 3 it'll write 1, for bank 4 it'll write 2
 	// The game typically enables write, writes data, then immediately clears the write flag
-	m_bank_write_enabled = data != 0;
+	m_flash_write_enabled = data;
 }
 
 void sttechno_state::data_w(offs_t offset, uint16_t data)
@@ -336,22 +337,24 @@ void sttechno_state::data_w(offs_t offset, uint16_t data)
 		if (offs < 0x100 / 2)
 			m_sound->write(offs, data);
 		else
-			put_u16be(&m_sound_ram[offs*2], data);
-	} else if (m_bank == 3 && m_bank_write_enabled) {
-		m_flash[0]->write(offset, data);
-	} else if (m_bank == 4 && m_bank_write_enabled) {
-		m_flash[1]->write(offset, data);
+			m_sound_ram[offs] = data;
+	} else if (m_bank == 3) {
+		if (BIT(m_flash_write_enabled, 0))
+			m_flash[0]->write(offset, data);
+	} else if (m_bank == 4) {
+		if (BIT(m_flash_write_enabled, 1))
+			m_flash[1]->write(offset, data);
 	}
 }
 
-uint16_t sttechno_state::data_r(offs_t offset)
+uint16_t sttechno_state::data_r(address_space &space, offs_t offset)
 {
 	if (m_bank >= 0 && m_bank <= 2) {
 		const offs_t offs = offset + (0x100000 * m_bank);
 		if (offs < 0x100 / 2)
 			return m_sound->read(offs);
 		else
-			return get_u16be(&m_sound_ram[offs*2]);
+			return m_sound_ram[offs];
 	} else if (m_bank == 3) {
 		return m_flash[0]->read(offset);
 	} else if (m_bank == 4) {
@@ -513,12 +516,8 @@ void sttechno_state::cpu_map(address_map &map)
 void sttechno_state::sound_map(address_map &map)
 {
 	map(0x000000, 0x5fffff).ram().share(m_sound_ram);
-	map(0x600000, 0x7fffff).lr8(NAME([this] (offs_t offset) -> uint8_t {
-		return BIT(m_flash[0]->read_raw(offset >> 1), 8 * (offset & 1), 8);
-	}));
-	map(0x800000, 0x9fffff).lr8(NAME([this] (offs_t offset) -> uint8_t {
-		return BIT(m_flash[1]->read_raw(offset >> 1), 8 * (offset & 1), 8);
-	}));
+	map(0x600000, 0x7fffff).r(m_flash[0], FUNC(intelfsh16_device::read_raw));
+	map(0x800000, 0x9fffff).r(m_flash[1], FUNC(intelfsh16_device::read_raw));
 }
 
 

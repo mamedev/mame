@@ -9,7 +9,7 @@
 
 class stt_sa1_device : public device_t,
 					   public device_sound_interface,
-					   public device_rom_interface<24, 0, 0, ENDIANNESS_BIG>
+					   public device_rom_interface<24, 1, 0, ENDIANNESS_BIG>
 {
 public:
 	static constexpr feature_type imperfect_features() { return feature::SOUND; } // unemulated and/or unverified effects and envelopes

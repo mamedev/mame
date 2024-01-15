@@ -25,6 +25,9 @@ void atapi_hle_device::device_reset()
 
 void atapi_hle_device::set_is_ready(bool state)
 {
+	if (has_running_machine() && (machine().phase() >= machine_phase::RESET))
+		throw emu_fatalerror("Static ready state should only be set during configuration");
+
 	m_is_ready = state;
 }
 
