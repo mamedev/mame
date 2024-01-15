@@ -7053,6 +7053,35 @@ Contains software drivers for a ScanExpress 6000SP Flatbed Scanner, SCSI i/f
 		</part>
 	</software>
 
+	<software name="s3drv21" supported="no">
+		<description>S3 Drivers Collection 1998 (Rev 2.1)</description>
+		<year>1998</year>
+		<publisher>S3</publisher>
+		<notes><![CDATA[
+Provided with an OEM S3 ViRGE/DX, this CD is dated March 1998 and contains the following:
+- 3D Demos (Direct3D)
+- DirectX (versions 3.0, 3.0A, and 5)
+- Galileo
+- S3 86CM65 Drivers (Windows 3.1, 95, NT4, AutoCAD)
+- S3 SonicVibes Drivers (Windows 95, NT4, DOS) (plus DLS demo files, DLS manager, Voyetra S3 AudioStation)
+- S3 Trio32 Drivers (Windows 3.1, 95, NT4, OS/2, AutoCAD, MicroStation)
+- S3 Trio3D Drivers (Windows 95)
+- S3 Trio64 Drivers (Windows 3.1, 95, NT4, OS/2, AutoCAD, MicroStation)
+- S3 Trio64UV+ Drivers (Windows 3.1, 95, AutoCAD)
+- S3 Trio64/V2 Drivers (Windows 3.1, 95, NT4, OS/2)
+- S3 Trio64V+ Drivers (Windows 3.1, 95, NT4, OS/2, AutoCAD, MicroStation)
+- Assorted S3 Utilites (S3 Refresh, S3 VBE, S3ID, SMODE)
+- S3 ViRGE Drivers (Windows 3.1, 95, NT4, OS/2, AutoCAD, MicroStation)
+- S3 ViRGE VX/DX/GX Drivers (Windows 3.1, 95, NT4, OS/2, AutoCAD) (plus S3RUN patch to run older ViRGE games)
+- S3 ViRGE GX/2 Drivers (Windows 3.1, 95, NT4)
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="s3drv21" sha1="78a64306e1b9ffb29eb9a50d1a3a010ebc2365e3"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- DOS / Windows 3.1 / 95 -->
 	<software name="sb16">
 		<description>Sound Blaster 16 CD driver</description>
