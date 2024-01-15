@@ -169,7 +169,7 @@ private:
 	void bank_write_enable_w(uint16_t data);
 
 	void data_w(offs_t offset, uint16_t data);
-	uint16_t data_r(address_space &space, offs_t offset);
+	uint16_t data_r(offs_t offset);
 
 	void uart_data_w(uint16_t data);
 	uint16_t uart_data_r();
@@ -336,7 +336,7 @@ void sttechno_state::data_w(offs_t offset, uint16_t data)
 		if (offs < 0x100 / 2)
 			m_sound->write(offs, data);
 		else
-			m_sound_ram[offs] = data;
+			m_sound_ram[offs] = swapendian_int16(data);
 	} else if (m_bank == 3) {
 		if (BIT(m_flash_write_enabled, 0))
 			m_flash[0]->write(offset, data);
@@ -346,14 +346,14 @@ void sttechno_state::data_w(offs_t offset, uint16_t data)
 	}
 }
 
-uint16_t sttechno_state::data_r(address_space &space, offs_t offset)
+uint16_t sttechno_state::data_r( offs_t offset)
 {
 	if (m_bank >= 0 && m_bank <= 2) {
 		const offs_t offs = offset + (0x100000 * m_bank);
 		if (offs < 0x100 / 2)
 			return m_sound->read(offs);
 		else
-			return m_sound_ram[offs];
+			return swapendian_int16(m_sound_ram[offs]);
 	} else if (m_bank == 3) {
 		return m_flash[0]->read(offset);
 	} else if (m_bank == 4) {
@@ -619,4 +619,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2003, shambros, 0, shambros, shambros, sttechno_state, empty_init, ROT0, "Kato's", "Shamisen Brothers Vol 1 (V1.01K)", 0 )
+GAME( 2003, shambros, 0, shambros, shambros, sttechno_state, empty_init, ROT0, "Kato's", "Shamisen Brothers Vol 1 (V1.01K)", MACHINE_IMPERFECT_TIMING )
