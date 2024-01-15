@@ -372,7 +372,7 @@ void xavix2002_super_tv_pc_state::xavix2002_super_tv_pc(machine_config& config)
 	m_xavix2002io->read_2_callback().set(FUNC(xavix2002_super_tv_pc_state::read_extended_io2));
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "super_tv_pc_cart");
-	m_cart->set_width(GENERIC_ROM16_WIDTH);
+	m_cart->set_width(GENERIC_ROM8_WIDTH);
 	m_cart->set_device_load(FUNC(xavix2002_super_tv_pc_state::cart_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("super_tv_pc_cart");
