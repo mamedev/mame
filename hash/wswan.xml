@@ -1601,7 +1601,7 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 	</software>
 
 	<software name="mconanmc">
-		<description>Meitantei Conan - Majutsushi no Chousenjou!</description>
+		<description>Detective Conan: Majutsushi no Chousenjou!</description>
 		<year>1999</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SWJ-BAN012"/>
@@ -1623,7 +1623,7 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 	</software>
 
 	<software name="mconannm">
-		<description>Meitantei Conan - Nishi no Meitantei Saidai no Kiki!</description>
+		<description>Detective Conan: Nishi no Meitantei Saidai no Kiki!</description>
 		<year>2000</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SWJ-BAN027"/>
