@@ -17,9 +17,9 @@
 DEFINE_DEVICE_TYPE(PCI_SLOT, pci_slot_device, "pci_slot", "PCI extension motherboard port")
 
 pci_slot_device::pci_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-        device_t(mconfig, PCI_SLOT, tag, owner, clock),
-        device_single_card_slot_interface<pci_card_interface>(mconfig, *this),
-        m_irq_cb(*this)
+	device_t(mconfig, PCI_SLOT, tag, owner, clock),
+	device_single_card_slot_interface<pci_card_interface>(mconfig, *this),
+	m_irq_cb(*this)
 {
 }
 

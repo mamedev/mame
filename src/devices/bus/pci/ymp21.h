@@ -18,10 +18,24 @@ protected:
 	virtual void device_reset() override;
 
 private:
+	memory_share_creator<u32> m_mailbox_buffer;
+	std::array<u32, 5> m_mailbox_size;
+
 	void map(address_map &map);
 
-	u32 read(offs_t offset, u32 mem_mask);
-	void write(offs_t offset, u32 data, u32 mem_mask);
+	void uart_w(offs_t offset, u8 data);
+	u8 uart_r(offs_t offset);
+
+	void port0_w(u32 data);
+	u32 port0_r();
+	void port1_w(u32 data);
+	void irq_w(u32 data);
+	u32 status_r();
+
+	void mailbox_w(offs_t offset, u32 data, u32 mem_mask);
+	void mailbox_size_w(offs_t offset, u32 data);
+	u32 mailbox_size_r(offs_t offset);
+	void mailbox_address_w(offs_t offset, u32 data);
 };
 
 #endif
