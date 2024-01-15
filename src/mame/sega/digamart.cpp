@@ -2,7 +2,7 @@
 // copyright-holders:
 
 /*
-Diga Mart (Sega, 1993)
+Diga Mart (Sega, 1983)
 
 It's a crane machine with prizes on a moving track/turntable under a dome,
 with 4 player positions surrounding it.
@@ -10,7 +10,7 @@ with 4 player positions surrounding it.
 Stickers on PCB:
 
 834-5781
-8601.... (covered on pic)
+86012400242K
 
 Main chips on PCB:
 
