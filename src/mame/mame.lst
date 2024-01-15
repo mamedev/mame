@@ -36954,6 +36954,7 @@ dd_l2                           //
 dd_lu1                          //
 dd_p6                           //
 diner_f2                        //
+diner_g2                        //
 diner_l1                        //
 diner_l2                        //
 diner_l3                        //
@@ -38735,6 +38736,9 @@ croquisg                        // (c) 1996 Deniam (Germany)
 karianx                         // (c) 1996 Deniam
 logicpr2                        // (c) 1997 Deniam (Japan)
 logicpro                        // (c) 1996 Deniam
+
+@source:sega/digamart.cpp
+digamart
 
 @source:sega/dotrikun.cpp
 dotrikun                        // cabinet test board
@@ -45040,7 +45044,7 @@ evio                            //
 gcslottv                        //
 gungunad                        //
 has_wamg                        //
-hikara							//
+hikara                          //
 jarajal                         //
 jpopira                         //
 ltv_tam                         //

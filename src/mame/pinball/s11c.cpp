@@ -335,6 +335,19 @@ ROM_START(diner_f2)
 	ROM_RELOAD(0x50000, 0x10000)
 ROM_END
 
+ROM_START(diner_g2)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("dinr_u26.l2", 0x4000, 0x4000, CRC(8b6aa22e) SHA1(6b802a85fc2babf5a183fb434df11597363c1c9d))
+	ROM_LOAD("diner_nova_apparate_u27_rev2.bin", 0x8000, 0x8000, CRC(74be688e) SHA1(053d32a7db72a310521781db94d6090ef8553c89))
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
+	ROM_LOAD("dinr_u4.l1", 0x00000, 0x10000, CRC(3bd28368) SHA1(41eec2f5f863039deaabfae8aece4b1cf15e4b78))
+	ROM_RELOAD(0x10000, 0x10000)
+	ROM_LOAD("dinr_u19.l1", 0x20000, 0x10000, CRC(278b9a30) SHA1(41e59adb8b6c08caee46c3dd73256480b4041619))
+	ROM_RELOAD(0x30000, 0x10000)
+	ROM_LOAD("dinr_u20.l1", 0x40000, 0x10000, CRC(511fb260) SHA1(e6e25b464c5c38f3c0492436f1e8aa2be33dd278))
+	ROM_RELOAD(0x50000, 0x10000)
+ROM_END
+
 ROM_START(diner_l1)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("u26-lu1.rom", 0x4000, 0x4000, CRC(259b302f) SHA1(d7e19c2d2ad7805d9158178c24d180d158a59b0c))
@@ -754,6 +767,7 @@ GAME(1990,  diner_l4,   0,          s11c,   s11c, s11c_state, init_s11c,  ROT0, 
 GAME(1990,  diner_l3,   diner_l4,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Diner (LA-3)",                                 MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1990,  diner_l2,   diner_l4,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Diner (LU-2) Europe",                          MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1990,  diner_f2,   diner_l4,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Diner (LF-2) French",                          MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  diner_g2,   diner_l4,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Diner (LG-2) German",                          MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1990,  diner_l1,   diner_l4,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Diner (LU-1) Europe",                          MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1990,  diner_p0,   diner_l4,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Diner (PA-0 prototype)",                       MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1990,  dd_l2,      0,          s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Dr. Dude (LA-2)",                              MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
