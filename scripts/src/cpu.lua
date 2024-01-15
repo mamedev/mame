@@ -2894,12 +2894,10 @@ end
 --@src/devices/cpu/z80/ky80.h,CPUS["KC80"] = true
 --------------------------------------------------
 
-if (CPUS["Z80"]~=null or CPUS["Z80N"]~=null or CPUS["KC80"]~=null) then
+if CPUS["Z80"] or CPUS["KC80"] or CPUS["Z80N"] then
 	files {
 		MAME_DIR .. "src/devices/cpu/z80/z80.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/z80.h",
-		MAME_DIR .. "src/devices/cpu/z80/z80n.cpp",
-		MAME_DIR .. "src/devices/cpu/z80/z80n.h",
 		MAME_DIR .. "src/devices/cpu/z80/tmpz84c011.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/tmpz84c011.h",
 		MAME_DIR .. "src/devices/cpu/z80/tmpz84c015.cpp",
@@ -2914,6 +2912,13 @@ if (CPUS["Z80"]~=null or CPUS["Z80N"]~=null or CPUS["KC80"]~=null) then
 		MAME_DIR .. "src/devices/cpu/z80/r800.h",
 		MAME_DIR .. "src/devices/cpu/z80/z84c015.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/z84c015.h",
+	}
+end
+
+if CPUS["Z80N"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/z80/z80n.cpp",
+		MAME_DIR .. "src/devices/cpu/z80/z80n.h",
 	}
 end
 
@@ -2936,18 +2941,15 @@ if CPUS["KC80"] then
 	}
 end
 
-local want_disasm_z80  = opt_tool(CPUS, "Z80")
-local want_disasm_z80n = opt_tool(CPUS, "Z80N")
-local want_disasm_kc80 = opt_tool(CPUS, "KC80")
-
-if want_disasm_z80 or want_disasm_z80n or want_disasm_kc80 then
-	if want_disasm_z80n then
-		table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/z80/z80dasm_mnemonic_ed_n.cpp")
-	else
-		table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/z80/z80dasm_mnemonic_ed.cpp")
-	end
+if opt_tool(CPUS, "Z80") or opt_tool(CPUS, "KC80") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/z80/z80dasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/z80/z80dasm.h")
+end
+
+if opt_tool(CPUS, "Z80N") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/z80/z80ndasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/z80/z80dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/z80/z80ndasm.h")
 end
 
 --------------------------------------------------

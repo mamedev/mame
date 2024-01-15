@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "z80n.h"
+#include "z80ndasm.h"
 
 #ifndef PCD
 #define PCD     m_pc.d
@@ -29,9 +30,10 @@
 
 DEFINE_DEVICE_TYPE(Z80N, z80n_device, "z80n", "Z80N")
 
-//-------------------------------------------------
-//  z80n_device - constructor
-//-------------------------------------------------
+std::unique_ptr<util::disasm_interface> z80n_device::create_disassembler()
+{
+	return std::make_unique<z80n_disassembler>();
+}
 
 z80n_device::z80n_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: z80_device(mconfig, Z80N, tag, owner, clock)

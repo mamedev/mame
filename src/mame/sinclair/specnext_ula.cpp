@@ -17,11 +17,20 @@ specnext_ula_device::specnext_ula_device(const machine_config &mconfig, const ch
 {
 }
 
+specnext_ula_device &specnext_ula_device::set_palette(const char *tag, u16 base_offset, u16 alt_offset)
+{
+	device_gfx_interface::set_palette(tag);
+	m_palette_base_offset = base_offset,
+	m_palette_alt_offset = alt_offset;
+	return *this;
+}
+
 void specnext_ula_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bool flash)
 {
 	const rgb_t gt0 = rgbexpand<3,3,3>((m_global_transparent << 1) | 0, 6, 3, 0);
 	const rgb_t gt1 = rgbexpand<3,3,3>((m_global_transparent << 1) | 1, 6, 3, 0);
 	//m_host_ram_ptr + ((port_7ffd_shadow() ? 7 : 5) << 14);
+	const u16 pal_base = m_ula_palette_select ? m_palette_alt_offset : m_palette_base_offset;
 	const u8 *screen_location = m_host_ram_ptr + (5 << 14); // TODO +shadow
 	for (u16 vpos = cliprect.top(); vpos <= cliprect.bottom(); vpos++)
 	{
@@ -52,7 +61,7 @@ void specnext_ula_device::draw(screen_device &screen, bitmap_ind16 &bitmap, cons
 			const u8 pix8 = (flash && (*attr & 0x80)) ? ~*scr : *scr;
 			for (u8 b = (0x80 >> (x & 7)); b; b >>= 1, x++, hpos++, pix++)
 			{
-				const u16 pen = (pix8 & b) ? ink : pap;
+				const u16 pen = pal_base + ((pix8 & b) ? ink : pap);
 				if (palette().pen_color(pen) != gt0 && palette().pen_color(pen) != gt1)
 					*pix = pen;
 			}
@@ -71,6 +80,7 @@ void specnext_ula_device::device_add_mconfig(machine_config &config)
 void specnext_ula_device::device_start()
 {
 	save_item(NAME(m_global_transparent));
+	save_item(NAME(m_ula_palette_select));
 	save_item(NAME(m_ulanext_en));
 	save_item(NAME(m_ulanext_format));
 	save_item(NAME(m_ulap_en));

@@ -17,6 +17,15 @@ specnext_layer2_device::specnext_layer2_device(const machine_config &mconfig, co
 {
 }
 
+specnext_layer2_device &specnext_layer2_device::set_palette(const char *tag, u16 base_offset, u16 alt_offset)
+{
+	device_gfx_interface::set_palette(tag);
+	m_palette_base_offset = base_offset,
+	m_palette_alt_offset = alt_offset;
+
+	return *this;
+}
+
 void specnext_layer2_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (!m_layer2_en || m_resolution != 0b00)
@@ -24,7 +33,7 @@ void specnext_layer2_device::draw(screen_device &screen, bitmap_ind16 &bitmap, c
 
 	const rgb_t gt0 = rgbexpand<3,3,3>((m_global_transparent << 1) | 0, 6, 3, 0);
 	const rgb_t gt1 = rgbexpand<3,3,3>((m_global_transparent << 1) | 1, 6, 3, 0);
-	const u16 pen_base = 0x400/* | (m_regs.nr_43_active_layer2_palette << 8)*/ | (m_palette_offset << 4);
+	const u16 pen_base = (m_layer2_palette_select ? m_palette_alt_offset : m_palette_base_offset) | (m_palette_offset << 4);
 	for (u16 vpos = cliprect.top(); vpos <= cliprect.bottom(); vpos++)
 	{
 		const u8 y = vpos - m_offset_v;
@@ -48,6 +57,8 @@ void specnext_layer2_device::device_add_mconfig(machine_config &config)
 
 void specnext_layer2_device::device_start()
 {
+	save_item(NAME(m_layer2_palette_select));
+
 	save_item(NAME(m_layer2_en));
 	save_item(NAME(m_resolution));
 	save_item(NAME(m_palette_offset));

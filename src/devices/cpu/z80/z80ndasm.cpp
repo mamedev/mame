@@ -1,13 +1,13 @@
+// license:BSD-3-Clause
 /*****************************************************************************
  *
- *   z80dasm_menmonic_ed.cpp
+ *   Z80N disassembler
  *
  *****************************************************************************/
 
-#include "emu.h"
-#include "z80dasm.h"
+#include "z80ndasm.h"
 
-const z80_disassembler::z80dasm z80_disassembler::mnemonic_ed[256] =
+const z80_disassembler::z80dasm z80n_disassembler::mnemonic_ed_n[256] =
 {
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
@@ -17,12 +17,12 @@ const z80_disassembler::z80dasm z80_disassembler::mnemonic_ed[256] =
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
+	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zSWAP,nullptr},
+	{zMIRR,nullptr},{zDB,"?"},      {zDB,"?"},      {zTEST,"B"},
+	{zBSLA,"de,b"}, {zBSRA,"de,b"}, {zBSRL,"de,b"}, {zBSRF,"de,b"},
+	{zBRLC,"de,b"}, {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
+	{zMUL,"d,e"},   {zADD,"hl,a"},  {zADD,"de,a"},  {zADD,"bc,a"},
+	{zADD,"hl,W"},  {zADD,"de,W"},  {zADD,"bc,W"},  {zDB,"?"},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
 	{zIN,"b,(c)"},  {zOUT,"(c),b"}, {zSBC,"hl,bc"}, {zLD,"(W),bc"},
@@ -43,20 +43,20 @@ const z80_disassembler::z80dasm z80_disassembler::mnemonic_ed[256] =
 	{zNEG,"*"},     {zRETI,nullptr},{zIM,"2"},      {zDB,"?"},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
+	{zDB,"?"},      {zDB,"?"},      {zPUSH,"B,B"},  {zDB,"?"},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
+	{zOTIB,nullptr},{zNREG,"B,B"},  {zNREG,"B,a"},  {zPXDN,nullptr},
+	{zPXAD,nullptr},{zSTAE,nullptr},{zDB,"?"},      {zDB,"?"},
+	{zJP,"(c)"},    {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
 	{zLDI,nullptr}, {zCPI,nullptr}, {zINI,nullptr}, {zOUTI,nullptr},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
+	{zLDIX,nullptr},{zLDWS,nullptr},{zDB,"?"},      {zDB,"?"},
 	{zLDD,nullptr}, {zCPD,nullptr}, {zIND,nullptr}, {zOUTD,nullptr},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
+	{zLDDX,nullptr},{zDB,"?"},      {zDB,"?"},      {zDB,"?"},
 	{zLDIR,nullptr},{zCPIR,nullptr},{zINIR,nullptr},{zOTIR,nullptr},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
+	{zLIRX,nullptr},{zDB,"?"},      {zDB,"?"},      {zLPRX,nullptr},
 	{zLDDR,nullptr},{zCPDR,nullptr},{zINDR,nullptr},{zOTDR,nullptr},
-	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
+	{zLDRX,nullptr},{zDB,"?"},      {zDB,"?"},      {zDB,"?"},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},

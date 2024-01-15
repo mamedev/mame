@@ -11,7 +11,10 @@ public:
 
 	specnext_layer2_device &set_raster_offset(u16 offset_h,  u16 offset_v) { m_offset_h = offset_h; m_offset_v = offset_v; return *this; }
 	specnext_layer2_device &set_host_ram_ptr(const u8 *host_ram_ptr) { m_host_ram_ptr = host_ram_ptr; return *this; }
+	specnext_layer2_device &set_palette(const char *tag, u16 base_offset, u16 alt_offset);
+
 	void set_global_transparent(u8 global_transparent) { m_global_transparent = global_transparent; }
+	void layer2_palette_select_w(bool layer2_palette_select) { m_layer2_palette_select = layer2_palette_select; }
 
 	void layer2_en_w(bool layer2_en) { m_layer2_en = layer2_en; }
 	void resolution_w(u8 resolution) { m_resolution = resolution & 0x03; }
@@ -35,6 +38,9 @@ private:
 	u16 m_offset_h, m_offset_v;
 	const u8 *m_host_ram_ptr;
 	u8 m_global_transparent;
+	u16 m_palette_base_offset;
+	u16 m_palette_alt_offset;
+	bool m_layer2_palette_select;
 
 	bool m_layer2_en;
 	u8 m_resolution; // u2: 00 = 256x192, 01 = 320x256, 1X = 640x256x4

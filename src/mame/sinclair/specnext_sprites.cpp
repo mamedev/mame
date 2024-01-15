@@ -52,10 +52,10 @@ static const gfx_layout gfx_16x16x4_r =
 };
 
 static GFXDECODE_START( gfx_sprites )
-	GFXDECODE_DEVICE_RAM( "pattern_ram", 0, gfx_16x16x8, 0x600, 256 )
-	GFXDECODE_DEVICE_RAM( "pattern_ram", 0, gfx_16x16x4, 0x600, 16 )
-	GFXDECODE_DEVICE_RAM( "pattern_ram", 0, gfx_16x16x8_r, 0x600, 256 )
-	GFXDECODE_DEVICE_RAM( "pattern_ram", 0, gfx_16x16x4_r, 0x600, 16 )
+	GFXDECODE_DEVICE_RAM( "pattern_ram", 0, gfx_16x16x8, 0, 256 )
+	GFXDECODE_DEVICE_RAM( "pattern_ram", 0, gfx_16x16x4, 0, 16 )
+	GFXDECODE_DEVICE_RAM( "pattern_ram", 0, gfx_16x16x8_r, 0, 256 )
+	GFXDECODE_DEVICE_RAM( "pattern_ram", 0, gfx_16x16x4_r, 0, 16 )
 GFXDECODE_END
 
 specnext_sprites_device::specnext_sprites_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -64,6 +64,16 @@ specnext_sprites_device::specnext_sprites_device(const machine_config &mconfig, 
 	, m_sprite_pattern_ram(*this, "pattern_ram", 64 * 256, ENDIANNESS_LITTLE)
 	, m_sprite_attr_ram(*this, "attr_ram", 128 * 8, ENDIANNESS_LITTLE)
 {
+}
+
+specnext_sprites_device &specnext_sprites_device::set_palette(const char *tag, u16 base_offset, u16 alt_offset)
+{
+	device_gfx_interface::set_palette(tag);
+	m_palette_base_offset = base_offset,
+	m_palette_alt_offset = alt_offset;
+	update_config();
+
+	return *this;
 }
 
 void specnext_sprites_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -167,9 +177,11 @@ void specnext_sprites_device::update_config()
 {
 	if (gfx(0) == nullptr) return;
 
-	// Change granularity to 16 for 8bpp
-	gfx(0)->set_granularity(16);
-	gfx(2)->set_granularity(16);
+	for (auto i = 0; i < 4; ++i)
+	{
+		gfx(i)->set_granularity(16); // Change granularity to 16 for 8bpp
+		gfx(i)->set_colorbase(m_sprite_palette_select ? m_palette_alt_offset : m_palette_base_offset);
+	}
 
 	m_clip_window = m_over_border
 		? (m_border_clip_en == 0 )
@@ -191,7 +203,7 @@ void specnext_sprites_device::io_w(offs_t addr, u8 data)
 		gfx(3)->mark_all_dirty();
 
 		m_sprite_pattern_ram[m_pattern_index] = data;
-		m_pattern_index++;
+		++m_pattern_index &= 0x3fff;
 	}
 	else if (addr == 0x303b)
 	{
@@ -259,6 +271,8 @@ void specnext_sprites_device::device_add_mconfig(machine_config &config)
 
 void specnext_sprites_device::device_start()
 {
+	save_item(NAME(m_sprite_palette_select));
+
 	save_item(NAME(m_zero_on_top));
 	save_item(NAME(m_border_clip_en));
 	save_item(NAME(m_over_border));

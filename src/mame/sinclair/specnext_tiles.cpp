@@ -30,14 +30,24 @@ static const gfx_layout gfx_8x8x4_r =
 };
 
 static GFXDECODE_START( gfx_tiles )
-	GFXDECODE_ENTRY( nullptr, 0, gfx_8x8x4, 0x200, 16 )
-	GFXDECODE_ENTRY( nullptr, 0, gfx_8x8x4_r, 0x200, 16 )
+	GFXDECODE_ENTRY( nullptr, 0, gfx_8x8x4, 0, 16 )
+	GFXDECODE_ENTRY( nullptr, 0, gfx_8x8x4_r, 0, 16 )
 GFXDECODE_END
 
 specnext_tiles_device::specnext_tiles_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, SPECNEXT_TILES, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this, gfx_tiles)
 {
+}
+
+specnext_tiles_device &specnext_tiles_device::set_palette(const char *tag, u16 base_offset, u16 alt_offset)
+{
+	device_gfx_interface::set_palette(tag);
+	m_palette_base_offset = base_offset,
+	m_palette_alt_offset = alt_offset;
+	tilemap_update();
+
+	return *this;
 }
 
 TILE_GET_INFO_MEMBER(specnext_tiles_device::get_tile_info)
@@ -70,7 +80,7 @@ void specnext_tiles_device::tilemap_update()
 	for (auto i = 0; i < 2; ++i)
 	{
 		gfx(i)->set_source(tiles_offset + ((m_tm_tile_base & 0x3f) << 8));
-		m_tilemap[i]->set_palette_offset(0x100 * BIT(m_control, 4));
+		m_tilemap[i]->set_palette_offset(BIT(m_control, 4) ? m_palette_alt_offset : m_palette_base_offset);
 		m_tilemap[i]->set_transparent_pen(m_transp_colour);
 		m_tilemap[i]->set_scrollx(-m_offset_h - m_tm_scroll_x);
 		m_tilemap[i]->set_scrolly(-m_offset_v - m_tm_scroll_y);
@@ -101,6 +111,7 @@ void specnext_tiles_device::device_start()
 		, tilemap_get_info_delegate(*this, FUNC(specnext_tiles_device::get_tile_info))
 		, TILEMAP_SCAN_ROWS, 8, 8, 80, 32);
 
+	save_item(NAME(m_tm_palette_select));
 	save_item(NAME(m_control));
 	save_item(NAME(m_default_flags));
 	save_item(NAME(m_transp_colour));

@@ -57,6 +57,7 @@ protected:
 	static const z80dasm mnemonic_xx[256];
 	static const z80dasm mnemonic_main[256];
 
+	virtual const z80dasm &get_mnemonic_ed(u8 opcode) { return mnemonic_ed[opcode]; }
 };
 
 #endif

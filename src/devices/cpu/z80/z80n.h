@@ -64,6 +64,8 @@ protected:
 	devcb_read8 m_in_nextreg_cb;
 	devcb_write8 m_out_nextreg_cb;
 
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
 private:
 	bool m_stackless;
 

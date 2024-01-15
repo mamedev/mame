@@ -170,6 +170,9 @@ private:
 
 	void nr_42_ulanext_format_w(u8 data) { m_nr_42_ulanext_format = data; m_ula->ulanext_format_w(m_nr_42_ulanext_format); }
 	void nr_43_ulanext_en_w(bool data) { m_nr_43_ulanext_en = data; m_ula->ulanext_en_w(m_nr_43_ulanext_en); }
+	void nr_43_active_ula_palette_w(bool data) { m_nr_43_active_ula_palette = data; m_ula->ula_palette_select_w(m_nr_43_active_ula_palette); }
+	void nr_43_active_layer2_palette_w(bool data) { m_nr_43_active_layer2_palette = data; m_layer2->layer2_palette_select_w(m_nr_43_active_layer2_palette); }
+	void nr_43_active_sprite_palette_w(bool data) { m_nr_43_active_sprite_palette = data; m_sprites->sprite_palette_select_w(m_nr_43_active_sprite_palette); }
 
 	void nr_4b_sprite_transparent_index_w(u8 data) { m_nr_4b_sprite_transparent_index = data; m_sprites->transp_colour_w(m_nr_4b_sprite_transparent_index); }
 	void nr_4c_tm_transparent_index_w(u8 data) { m_nr_4c_tm_transparent_index = data; m_tiles->transp_colour_w(m_nr_4c_tm_transparent_index); }
@@ -1692,9 +1695,9 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 	case 0x43:
 		m_nr_43_palette_autoinc_disable = BIT(nr_wr_dat, 7);
 		m_nr_43_palette_write_select = BIT(nr_wr_dat, 4, 3);
-		m_nr_43_active_sprite_palette = BIT(nr_wr_dat, 3);
-		m_nr_43_active_layer2_palette = BIT(nr_wr_dat, 2);
-		m_nr_43_active_ula_palette = BIT(nr_wr_dat, 1);
+		nr_43_active_sprite_palette_w(BIT(nr_wr_dat, 3));
+		nr_43_active_layer2_palette_w(BIT(nr_wr_dat, 2));
+		nr_43_active_ula_palette_w(BIT(nr_wr_dat, 1));
 		nr_43_ulanext_en_w(BIT(nr_wr_dat, 0));
 		m_nr_palette_sub_idx = 0;
 		break;
@@ -2577,9 +2580,9 @@ void specnext_state::machine_reset()
 
 	m_nr_43_palette_autoinc_disable = 0;
 	m_nr_43_palette_write_select = 0b000;
-	m_nr_43_active_sprite_palette = 0;
-	m_nr_43_active_layer2_palette = 0;
-	m_nr_43_active_ula_palette = 0;
+	nr_43_active_sprite_palette_w(0);
+	nr_43_active_layer2_palette_w(0);
+	nr_43_active_ula_palette_w(0);
 	nr_43_ulanext_en_w(0);
 
 	m_nr_stored_palette_value = 0x00;
@@ -2772,19 +2775,18 @@ void specnext_state::tbblue(machine_config &config)
 
 	SPECNEXT_ULA(config, m_ula, 0)
 		.set_raster_offset(SPEC_LEFT_BORDER, SPEC128_UNSEEN_LINES + SPEC_TOP_BORDER)
-		.set_palette(m_palette);
+		.set_palette(m_palette->device().tag(), 0x000, 0x100);
 	SPECNEXT_TILES(config, m_tiles, 0)
 		.set_raster_offset(SPEC_LEFT_BORDER, SPEC128_UNSEEN_LINES + SPEC_TOP_BORDER)
-		.set_palette(m_palette);
+		.set_palette(m_palette->device().tag(), 0x200, 0x300);
 	SPECNEXT_LAYER2(config, m_layer2, 0)
 		.set_raster_offset(SPEC_LEFT_BORDER, SPEC128_UNSEEN_LINES + SPEC_TOP_BORDER)
-		.set_palette(m_palette);
+		.set_palette(m_palette->device().tag(), 0x400, 0x500);
 	SPECNEXT_SPRITES(config, m_sprites, 0)
 		.set_raster_offset(SPEC_LEFT_BORDER, SPEC128_UNSEEN_LINES + SPEC_TOP_BORDER)
-		.set_palette(m_palette);
+		.set_palette(m_palette->device().tag(), 0x600, 0x700);
 
-	config.device_remove("snapshot");
-	// TODO: find the way to load after bootrom sent restart
+	config.device_remove("snapshot"); // TODO: find the way to load after bootrom sent restart
 	//SNAPSHOT(config.replace(), "snapshot", "ach,frz,plusd,prg,sem,sit,sna,snp,snx,sp,z80,zx", attotime::never)
 	//	.set_load_callback(FUNC(specnext_state::snapshot_cb));
 }
