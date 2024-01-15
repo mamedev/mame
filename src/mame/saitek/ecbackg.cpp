@@ -10,13 +10,13 @@ NVRAM won't save properly.
 
 Hardware notes:
 - PCB label: GT4-PE-009
-- Hitachi HD6301Y0P @ ~4MHz (no XTAL)
+- Hitachi HD6301Y0P @ ~4MHz (LC osc, no XTAL)
 - LCD with custom segments
 - 24 LEDs, 13*2 buttons sensor board, piezo
 
 TODO:
 - if/when MAME supports an exit callback, hook up power-off switch to that
-- finish sensorboard handling, finish lcd(svg), internal artwork
+- finish sensorboard handling, internal artwork
 
 *******************************************************************************/
 
@@ -27,6 +27,7 @@ TODO:
 #include "sound/dac.h"
 #include "video/pwm.h"
 
+#include "screen.h"
 #include "speaker.h"
 
 //#include "saitek_ecbackg.lh"
@@ -50,7 +51,7 @@ public:
 
 	void ecbackg(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(power_off);
+	DECLARE_INPUT_CHANGED_MEMBER(power_off) { if (newval) m_power = false; }
 
 protected:
 	virtual void machine_start() override;
@@ -69,7 +70,7 @@ private:
 	bool m_power = false;
 	u8 m_inp_mux = 0;
 	u32 m_lcd_segs = 0;
-	u8 m_lcd_com[2] = { };
+	u8 m_lcd_com = 0;
 
 	// I/O handlers
 	void init_board(int state);
@@ -145,25 +146,6 @@ u8 ecbackg_state::board_r(u8 row)
     I/O
 *******************************************************************************/
 
-// power
-
-INPUT_CHANGED_MEMBER(ecbackg_state::power_off)
-{
-	if (newval)
-		m_power = false;
-}
-
-void ecbackg_state::standby(int state)
-{
-	// clear display
-	if (state)
-	{
-		m_lcd_pwm->clear();
-		m_led_pwm->clear();
-	}
-}
-
-
 // LCD
 
 void ecbackg_state::lcd_pwm_w(offs_t offset, u8 data)
@@ -173,6 +155,13 @@ void ecbackg_state::lcd_pwm_w(offs_t offset, u8 data)
 
 void ecbackg_state::update_lcd()
 {
+	for (int i = 0; i < 2; i++)
+	{
+		// LCD common is analog (voltage level)
+		const u8 com = population_count_32(m_lcd_com >> (i * 2) & 3);
+		const u32 data = (com == 0) ? m_lcd_segs : (com == 2) ? ~m_lcd_segs : 0;
+		m_lcd_pwm->write_row(i, data);
+	}
 }
 
 template <int N>
@@ -187,14 +176,23 @@ void ecbackg_state::lcd_segs_w(u8 data)
 
 void ecbackg_state::lcd_com_w(u8 data)
 {
-	// P70/P71,P72/P73: LCD common (voltage level)
-	m_lcd_com[0] = population_count_32(data & 3);
-	m_lcd_com[1] = population_count_32(data & 0xc);
+	// P70-P73: LCD common
+	m_lcd_com = data & 0xf;
 	update_lcd();
 }
 
 
 // misc
+
+void ecbackg_state::standby(int state)
+{
+	// clear display
+	if (state)
+	{
+		m_lcd_pwm->clear();
+		m_led_pwm->clear();
+	}
+}
 
 u8 ecbackg_state::p2_r()
 {
@@ -248,31 +246,31 @@ void ecbackg_state::p6_w(u8 data)
 
 static INPUT_PORTS_START( ecbackg )
 	PORT_START("IN.0")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) // stats
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Statistics")
 
 	PORT_START("IN.1")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) // bear off
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_NAME("Bear Off")
 
 	PORT_START("IN.2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) // double
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) // reject
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) // play
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) // game option
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) // level
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) // take back
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_9) // verify
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_NAME("Double / Accept")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_J) PORT_NAME("Reject")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) PORT_NAME("Play")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("Game Option")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("Level")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Take Back")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_NAME("Verify")
 
 	PORT_START("IN.3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) // roll dice
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) // d1
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) // d2
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) // d3
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) // d4
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) // d5
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) // d6
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("Roll Dice")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Dice 1")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Dice 2")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Dice 3")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Dice 4")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Dice 5")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Dice 6")
 
 	PORT_START("IN.4")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_0) // new game
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME("New Game")
 
 	PORT_START("POWER") // needs to be triggered for nvram to work
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, ecbackg_state, power_off, 0) PORT_NAME("Stop")
@@ -287,7 +285,7 @@ INPUT_PORTS_END
 void ecbackg_state::ecbackg(machine_config &config)
 {
 	// basic machine hardware
-	HD6301Y0(config, m_maincpu, 4'000'000); // approximation
+	HD6301Y0(config, m_maincpu, 4'000'000); // approximation, no XTAL
 	m_maincpu->nvram_enable_backup(true);
 	m_maincpu->standby_cb().set(m_maincpu, FUNC(hd6301y0_cpu_device::nvram_set_battery));
 	m_maincpu->standby_cb().append(FUNC(ecbackg_state::standby));
@@ -311,6 +309,11 @@ void ecbackg_state::ecbackg(machine_config &config)
 	PWM_DISPLAY(config, m_lcd_pwm).set_size(2, 24);
 	m_lcd_pwm->output_x().set(FUNC(ecbackg_state::lcd_pwm_w));
 
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(1920/3, 518/3);
+	screen.set_visarea_full();
+
 	PWM_DISPLAY(config, m_led_pwm).set_size(3, 8);
 	//config.set_default_layout(layout_saitek_ecbackg);
 
@@ -328,6 +331,9 @@ void ecbackg_state::ecbackg(machine_config &config)
 ROM_START( ecbackg )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD("saitek_89_gx4b_c12_31y0rm79p.u1", 0x0000, 0x4000, CRC(d7278545) SHA1(9ece31cdb237067aeec480c066e0917752697a4d) )
+
+	ROM_REGION( 109665, "screen", 0 )
+	ROM_LOAD("ecbackg.svg", 0, 109665, CRC(6592acfe) SHA1(8425d7ce519a921cdbe4298ae9c6789f90d4d0b5) )
 ROM_END
 
 } // anonymous namespace

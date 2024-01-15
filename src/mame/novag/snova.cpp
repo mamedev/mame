@@ -372,16 +372,16 @@ ROM_START( nsnova ) // ID = N1.05
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("n_530.u5", 0x8000, 0x8000, CRC(727a0ada) SHA1(129c1edc5c1d2e12ce97ebef81c6d5555464a11d) )
 
-	ROM_REGION( 36006, "screen", 0 )
-	ROM_LOAD("nvip.svg", 0, 36006, CRC(fa69f48d) SHA1(3ed2f85323883d3b2d652833274dcd4ab06c473e) )
+	ROM_REGION( 36256, "screen", 0 )
+	ROM_LOAD("nvip.svg", 0, 36256, CRC(3373e0d5) SHA1(25bfbf0405017388c30f4529106baccb4723bc6b) )
 ROM_END
 
 ROM_START( supremo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("sp_a10.u5", 0x8000, 0x8000, CRC(1db63786) SHA1(4f24452ed8955b31ba88f68cc95c357660930aa4) )
 
-	ROM_REGION( 36006, "screen", 0 )
-	ROM_LOAD("nvip.svg", 0, 36006, CRC(fa69f48d) SHA1(3ed2f85323883d3b2d652833274dcd4ab06c473e) )
+	ROM_REGION( 36256, "screen", 0 )
+	ROM_LOAD("nvip.svg", 0, 36256, CRC(3373e0d5) SHA1(25bfbf0405017388c30f4529106baccb4723bc6b) )
 ROM_END
 
 } // anonymous namespace
