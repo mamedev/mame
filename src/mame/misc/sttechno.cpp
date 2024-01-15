@@ -516,7 +516,7 @@ void sttechno_state::sound_map(address_map &map)
 	map(0x600000, 0x7fffff).lr8(NAME([this] (offs_t offset) -> uint8_t {
 		return BIT(m_flash[0]->read_raw(offset >> 1), 8 * (offset & 1), 8);
 	}));
-	map(0x800000, 0x9fffff).lr8(NAME([this] (offs_t offset, uint16_t mem_mask) -> uint8_t {
+	map(0x800000, 0x9fffff).lr8(NAME([this] (offs_t offset) -> uint8_t {
 		return BIT(m_flash[1]->read_raw(offset >> 1), 8 * (offset & 1), 8);
 	}));
 }
