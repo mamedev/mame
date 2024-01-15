@@ -13,7 +13,7 @@ Double Mouse Party
 
 	<!-- these appear to require the system BIOS as they access above the 4MB mark for audio during the boot screen -->
 	<software name="hamatro" supported="no">
-		<description>Tottoko Hamtaro Ham Ham Ongaku Paradichu!</description>
+		<description>Tottoko Hamtaro Ham Ham Ongaku Paradaichu!</description>
 		<year>2004</year>
 		<publisher>Epoch</publisher>
 		<info name="alt_title" value="とっとこハム太郎 ハムハムおんがくぱらだいちゅ！"/>
@@ -39,7 +39,7 @@ Double Mouse Party
 	<!-- C-03 -->
 	
 	<software name="conan" supported="no">
-		<description>Meitantei Conan: Suiri Adventure</description>
+		<description>Detective Conan: Suiri Adventure</description>
 		<year>2005</year>
 		<publisher>Epoch</publisher>
 		<info name="alt_title" value="名探偵コナン 推理アドベンチャー"/>
@@ -65,10 +65,10 @@ Double Mouse Party
 	<!-- C-06 -->
 
 	<software name="link" supported="no">
-		<description>Pet Mobile Link</description>
+		<description>Pet Keitai Link</description>
 		<year>2006</year>
 		<publisher>Epoch</publisher>
-		<info name="alt_title" value="ペット ケータイリ ンク"/>
+		<info name="alt_title" value="ペットケータイ Link"/>
 		<part name="cart" interface="super_tv_pc_cart">
 			<dataarea name="prg" size="0x400000">
 				<rom name="c-07.u1" size="0x400000" crc="8aeea23c" sha1="e89921fe7714c60dcd60cc29382268350ac6f3f5"/>
