@@ -827,9 +827,10 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 		// first value is sync register, special handling unnecessary?
 		u16 line_6000 = m_line_ram[where];
 
+		line.pivot.blend_select = BIT(line_6000, 9);
 		line.pivot.pivot_control = BIT(line_6000, 8, 8);
-		if (line.pivot.pivot_control & 0b01010101) // check if unknown pivot control bits set
-			logerror("unknown pivot ctrl bits: %02x__ at %04x\n", line.pivot.pivot_control, 0x6000 + y*2);
+		if (line.pivot.pivot_control & 0b01011101) // check if unknown pivot control bits set
+			logerror("unknown 6000 pivot ctrl bits: %02x__ at %04x\n", line.pivot.pivot_control, 0x6000 + y*2);
 
 		for (int sp_group = 0; sp_group < NUM_SPRITEGROUPS; sp_group++) {
 			line.sp[sp_group].mix_value &= 0x3fff;
@@ -859,7 +860,7 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 
 		line.fx_6400 = (x_mosaic & 0xfc00) >> 8;
 		if (line.fx_6400 && line.fx_6400 != 0x70) // check if unknown effect bits set
-			logerror("unknown fx bits: %02x__ at %04x\n", line.fx_6400, 0x6400 + y*2);
+			logerror("unknown 6400 fx bits: %02x__ at %04x\n", line.fx_6400, 0x6400 + y*2);
 	}
 	if (offs_t where = latched_addr(2, 3)) {
 		line.bg_palette = m_line_ram[where];
@@ -869,8 +870,8 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 	if (offs_t where = latched_addr(3, 0)) {
 		u16 line_7000 = m_line_ram[where];
 		line.pivot.pivot_enable = line_7000;
-		//if (line_7000) // check if confusing pivot enable bits are set
-		//	logerror("unknown 'pivot enable' bits: %04x at %04x\n", line_7000, 0x7000 + y*2);
+		if (line_7000) // check if confusing pivot enable bits are set
+			logerror("unknown 7000 'pivot enable' bits: %04x at %04x\n", line_7000, 0x7000 + y*2);
 	}
 	if (offs_t where = latched_addr(3, 1)) {
 		line.pivot.mix_value = m_line_ram[where];
@@ -1128,7 +1129,8 @@ void taito_f3_state::draw_line(pen_t* dst, f3_line_inf &line, int xs, int xe, pl
 			if (const u16 col = src[x_index]) {
 				const bool sel = flags[x_index] & 0x1;
 				blend_dispatch(pf->blend_mask(), sel, pf->prio(),
-							   line.blend, line.pri_alp[x], dst[x], clut[col]);
+							   line.blend, line.pri_alp[x],
+							   dst[x], clut[pf->pal_add + col]);
 			}
 		}
 	}
@@ -1150,7 +1152,7 @@ void taito_f3_state::draw_line(pen_t* dst, f3_line_inf &line, int xs, int xe, sp
 			int real_x = sp->x_sample_enable ? mosaic(x, line.x_sample) : x;
 
 			if (const u16 col = src[real_x]) { // 0 = transparent
-				const bool sel = sp->brightness;
+				const bool sel = sp->blend_select;
 				blend_dispatch(sp->blend_mask(), sel, sp->prio(),
 							   line.blend, line.pri_alp[x], dst[x], clut[col]);
 			}
@@ -1182,7 +1184,7 @@ void taito_f3_state::draw_line(pen_t* dst, f3_line_inf &line, int xs, int xe, pi
 			if (!(flagsbitmap[x_index] & 0xf0))
 				continue;
 			if (u16 col = srcbitmap[x_index]) {
-				const bool sel = false;
+				const bool sel = pv->blend_select;
 				blend_dispatch(pv->blend_mask(), sel, pv->prio(),
 							   line.blend, line.pri_alp[x], dst[x], clut[col]);
 			}

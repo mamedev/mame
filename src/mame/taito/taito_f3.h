@@ -226,7 +226,7 @@ protected:
 		// priority in 7600
 
 		// mosaic enable in 6400
-		bool brightness{false}; // 7400 0xf000
+		bool blend_select{false}; // 7400 0xf000
 		bitmap_ind16* srcbitmap;
 	};
 
@@ -237,6 +237,7 @@ protected:
 		bitmap_ind8*  flagsbitmap_vram;
 
 		u8 pivot_control{0};     // 6000
+		bool blend_select{false};
 		// mosaic enable in 6400
 		u16 pivot_enable{0};     // 7000
 		// mix info from 7200
