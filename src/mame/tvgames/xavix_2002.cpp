@@ -518,7 +518,7 @@ ROM_START( stvpchk )
 	ROM_CONTINUE(0x400000, 0x200000)
 ROM_END
 
-ROM_START( stvpcdog )
+ROM_START( stvpc )
 	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00) // inverted line?
 	ROM_LOAD("supertvpc_dogs.u4", 0x200000, 0x200000, CRC(ab326e6d) SHA1(e22205f6ff4c8cc46538d78e27535be63acea42a) )
 	ROM_CONTINUE(0x000000, 0x200000)
@@ -576,9 +576,10 @@ CONS( 2005, tmy_thom, 0, 0, xavix2002_i2c_24c04,    xavix_i2c,  xavix_i2c_state,
 // has HT24LC16
 CONS( 2008, udance,   0, 0, xavix2002, xavix, xavix_state, init_xavix, "Tiger / SSD Company LTD", "U-Dance", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-// this has RAM in the usual ROM space, needs handling, also has Atmel 24LC64, hangs after 'loading' sequence
+// these have RAM in the usual ROM space (still needs handling) & also have an Atmel 24LC64,
+// this one (pet themed) boots to the desktop (as does the 'hamster' cart and 'ecc' cart)
+CONS( 2004, stvpc,    0, 0, xavix2002_super_tv_pc,    xavix,      xavix2002_super_tv_pc_state, init_xavix, "Epoch / SSD Company LTD", "Super TV PC (Epoch)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+// hangs after 'loading' sequence
 CONS( 200?, stvpchk,  0, 0, xavix2002_super_tv_pc,    xavix,      xavix2002_super_tv_pc_state, init_xavix, "Epoch / SSD Company LTD", "Super TV PC - Hello Kitty (Epoch)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-// this one actually boots to the desktop (as does the 'hamster' cart and 'ecc' cart)
-CONS( 2004, stvpcdog, 0, 0, xavix2002_super_tv_pc,    xavix,      xavix2002_super_tv_pc_state, init_xavix, "Epoch / SSD Company LTD", "Super TV PC - Dogs (Epoch)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-
+// Hamtaro and Doraemon themed Super TV PC units also exist, likely with their own internal ROMs
 
