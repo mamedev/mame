@@ -536,7 +536,7 @@ void i386_device::i486_mov_cr_r32()        // Opcode 0x0f 22
 
 void i386_device::i486_wait()
 {
-	if ((m_cr[0] & 0xa) == 0xa)
+	if ((m_cr[0] & (CR0_TS | CR0_MP)) == (CR0_TS | CR0_MP))
 	{
 		i386_trap(FAULT_NM, 0, 0);
 		return;

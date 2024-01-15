@@ -2801,7 +2801,7 @@ void i386_device::sse_group_0fae()  // Opcode 0f ae
 		uint32_t ea;
 		switch ( (modm & 0x38) >> 3 )
 		{
-			case 0: // fxsave
+			case 0: // fxsave instruction
 			{
 				u8 atag = 0;
 				ea = GetEA(modm, 1);
@@ -2829,7 +2829,7 @@ void i386_device::sse_group_0fae()  // Opcode 0f ae
 				}
 				break;
 			}
-			case 1:
+			case 1: // fxrstor instruction
 			{
 				u8 atag;
 				ea = GetEA(modm, 0);

@@ -2114,7 +2114,7 @@ void i386_device::register_state_i386()
 	state_add( I386_GS_BASE,    "GSBASE", m_sreg[GS].base).formatstr("%08X");
 	state_add( I386_GS_LIMIT,   "GSLIMIT", m_sreg[GS].limit).formatstr("%08X");
 	state_add( I386_GS_FLAGS,   "GSFLAGS", m_sreg[GS].flags).mask(0xf0ff).formatstr("%04X");
-	state_add( I386_CR0,        "CR0", m_cr[0]).formatstr("%08X");
+	state_add( I386_CR0,        "CR0", m_debugger_temp).formatstr("%32s");
 	state_add( I386_CR1,        "CR1", m_cr[1]).formatstr("%08X");
 	state_add( I386_CR2,        "CR2", m_cr[2]).formatstr("%08X");
 	state_add( I386_CR3,        "CR3", m_cr[3]).formatstr("%08X");
@@ -2152,9 +2152,9 @@ void i386_device::register_state_i386_x87()
 {
 	register_state_i386();
 
-	state_add( X87_CTRL,   "x87_CW", m_x87_cw).formatstr("%04X");
-	state_add( X87_STATUS, "x87_SW", m_x87_sw).formatstr("%04X");
-	state_add( X87_TAG,    "x87_TAG", m_x87_tw).formatstr("%04X");
+	state_add( X87_CTRL,   "x87_CW", m_debugger_temp).formatstr("%32s");
+	state_add( X87_STATUS, "x87_SW", m_debugger_temp).formatstr("%32s");
+	state_add( X87_TAG,    "x87_TAG", m_debugger_temp).formatstr("%32s");
 	state_add( X87_ST0,    "ST0", m_debugger_temp ).callexport().formatstr("%15s");
 	state_add( X87_ST1,    "ST1", m_debugger_temp ).callexport().formatstr("%15s");
 	state_add( X87_ST2,    "ST2", m_debugger_temp ).callexport().formatstr("%15s");
@@ -2248,6 +2248,8 @@ void i386_device::state_export(const device_state_entry &entry)
 
 void i386_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
+	static const char tf[] = { 'V', '0', 'S', 'E' };
+
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
@@ -2265,6 +2267,60 @@ void i386_device::state_string_export(const device_state_entry &entry, std::stri
 				m_AF ? " A" : " a",
 				m_PF ? " P" : " p",
 				m_CF ? " C" : " c");
+			break;
+		case I386_CR0:
+			str = string_format("%08X %s%s%s%s%s%s%s%s",
+				m_cr[0],
+				m_cr[0] & CR0_PG ? "PG" : "pg",
+				m_cr[0] & CR0_WP ? " WP" : " wp",
+				m_cr[0] & CR0_NE ? " NE" : " ne",
+				m_cr[0] & CR0_ET ? " ET" : " et",
+				m_cr[0] & CR0_TS ? " TS" : " ts",
+				m_cr[0] & CR0_EM ? " EM" : " em",
+				m_cr[0] & CR0_MP ? " MP" : " mp",
+				m_cr[0] & CR0_PE ? " PE" : " pe");
+				break;
+		case X87_CTRL:
+			str = string_format("%04X %d %d %s%s%s%s%s%s",
+				m_x87_cw,
+				(m_x87_cw >> X87_CW_RC_SHIFT) & X87_CW_PC_MASK,
+				(m_x87_cw >> X87_CW_PC_SHIFT) & X87_CW_RC_MASK,
+				m_x87_cw & X87_CW_PM ? "P" : "p",
+				m_x87_cw & X87_CW_UM ? " U" : " u",
+				m_x87_cw & X87_CW_OM ? " O" : " o",
+				m_x87_cw & X87_CW_ZM ? " Z" : " z",
+				m_x87_cw & X87_CW_DM ? " D" : " d",
+				m_x87_cw & X87_CW_IM ? " I" : " i");
+			break;
+		case X87_STATUS:
+			str = string_format("%04X %s %d %s%s%s%s%s%s%s%s",
+				m_x87_sw,
+				m_x87_sw & X87_SW_BUSY ? "B" : "b",
+				(m_x87_sw >> X87_SW_TOP_SHIFT) & X87_SW_TOP_MASK,
+				m_x87_sw &X87_SW_C3 ? "1" : "0",
+				m_x87_sw &X87_SW_C2 ? "1" : "0",
+				m_x87_sw &X87_SW_C1 ? "1" : "0",
+				m_x87_sw &X87_SW_C0 ? "1" : "0",
+				m_x87_sw & X87_SW_ES ? " E" : " e",
+				m_x87_sw & X87_SW_SF ? " S" : " s",
+				m_x87_sw & X87_SW_PE ? " P" : " p",
+				m_x87_sw & X87_SW_UE ? " U" : " u",
+				m_x87_sw & X87_SW_OE ? " O" : " o",
+				m_x87_sw & X87_SW_ZE ? " Z" : " z",
+				m_x87_sw & X87_SW_DE ? " D" : " d",
+				m_x87_sw & X87_SW_IE ? " I" : " i");
+				break;
+		case X87_TAG:
+			str = string_format("%04X %c %c %c %c %c %c %c %c",
+				m_x87_tw,
+				tf[(m_x87_tw >> 0) & 3],
+				tf[(m_x87_tw >> 2) & 3],
+				tf[(m_x87_tw >> 4) & 3],
+				tf[(m_x87_tw >> 6) & 3],
+				tf[(m_x87_tw >> 8) & 3],
+				tf[(m_x87_tw >> 10) & 3],
+				tf[(m_x87_tw >> 12) & 3],
+				tf[(m_x87_tw >> 14) & 3]);
 			break;
 		case X87_ST0:
 			str = string_format("%f", fx80_to_double(ST(0)));

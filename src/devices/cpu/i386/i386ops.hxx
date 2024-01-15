@@ -2499,7 +2499,7 @@ void i386_device::i386_clts()              // Opcode 0x0f 0x06
 
 void i386_device::i386_wait()              // Opcode 0x9B
 {
-	if ((m_cr[0] & 0xa) == 0xa)
+	if ((m_cr[0] & (CR0_TS | CR0_MP)) == (CR0_TS | CR0_MP))
 	{
 		i386_trap(FAULT_NM, 0, 0);
 		return;
