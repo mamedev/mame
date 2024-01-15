@@ -105,7 +105,6 @@ Notes:
 */
 
 #include "emu.h"
-#include "multibyte.h"
 
 #include "bus/ata/ataintf.h"
 #include "bus/ata/atapicdr.h"
