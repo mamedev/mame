@@ -6766,7 +6766,7 @@ Realtek drivers, RTL8139C [PCI] ethernet based.
 
 	<software name="scroll3d" supported="no">
 		<description>Scroll 3D Mouse Setup Disk for PS/2 and Serial (v2.0)</description>
-		<year>1996</year>
+		<year>1999</year>
 		<publisher>Aidem Systems Inc.</publisher>
 		<notes><![CDATA[
 PnP mouse for Windows 95/98 with IntelliMouse wheel support
