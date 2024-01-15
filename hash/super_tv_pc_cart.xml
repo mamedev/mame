@@ -12,7 +12,7 @@ Double Mouse Party
 <softwarelist name="super_tv_pc_cart" description="Epoch Super TV PC cartridges">
 
 	<!-- these appear to require the system BIOS as they access above the 4MB mark for audio during the boot screen -->
-	<software name="hamatro" supported="no">
+	<software name="hamtaro" supported="no">
 		<description>Tottoko Hamtaro Ham Ham Ongaku Paradaichu!</description>
 		<year>2004</year>
 		<publisher>Epoch</publisher>
