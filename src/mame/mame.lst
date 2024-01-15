@@ -45936,11 +45936,6 @@ dx11                            //
 @source:yamaha/ymdx100.cpp
 dx100                           //
 
-@source:yamaha/ymmu100.cpp
-mu100                           // 1997 MU-100
-mu100r                          // 1997 MU-100 Rackable version
-mu100b                          // 1998 MU-100B
-
 @source:yamaha/ymmu5.cpp
 mu5                             // 1994 MU-5
 
@@ -45949,6 +45944,14 @@ mu50                            // 1995 MU-50
 
 @source:yamaha/ymmu80.cpp
 mu80                            // 1994 MU-80
+
+@source:yamaha/ymmu90.cpp
+mu90                            // 1996 MU-90
+
+@source:yamaha/ymmu100.cpp
+mu100                           // 1997 MU-100
+mu100r                          // 1997 MU-100 Rackable version
+mu100b                          // 1998 MU-100B
 
 @source:yamaha/ympcs30.cpp
 pcs30                           // 1984
