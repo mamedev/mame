@@ -23,8 +23,10 @@ private:
 
 	void map(address_map &map);
 
-	void uart_w(offs_t offset, u8 data);
-	u8 uart_r(offs_t offset);
+	void uart_data_w(offs_t offset, u8 data);
+	u8 uart_data_r(offs_t offset);
+	void uart_ctrl_w(offs_t offset, u8 data);
+	u8 uart_status_r(offs_t offset);
 
 	void port0_w(u32 data);
 	u32 port0_r();

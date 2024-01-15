@@ -27,7 +27,8 @@ void ymp21_device::device_reset()
 
 void ymp21_device::map(address_map &map)
 {
-	map(0x3e000, 0x3e003).rw(FUNC(ymp21_device::uart_r), FUNC(ymp21_device::uart_w));
+	map(0x3e000, 0x3e000).rw(FUNC(ymp21_device::uart_status_r), FUNC(ymp21_device::uart_ctrl_w)).select(2);
+	map(0x3e001, 0x3e001).rw(FUNC(ymp21_device::uart_data_r), FUNC(ymp21_device::uart_data_w)).select(2);
 
 	map(0x3f000, 0x3f07f).w(FUNC(ymp21_device::mailbox_w)).select(0x00700);
 	map(0x3f080, 0x3f083).rw(FUNC(ymp21_device::mailbox_size_r), FUNC(ymp21_device::mailbox_size_w)).select(0x00700);
@@ -38,14 +39,25 @@ void ymp21_device::map(address_map &map)
 	map(0x3ff10, 0x3ff13).w(FUNC(ymp21_device::port0_w));
 }
 
-void ymp21_device::uart_w(offs_t offset, u8 data)
+void ymp21_device::uart_data_w(offs_t offset, u8 data)
 {
-	logerror("uart_w %d, %02x\n", offset, data);
+	logerror("uart_data_w %d, %02x\n", offset, data);
 }
 
-u8 ymp21_device::uart_r(offs_t offset)
+u8 ymp21_device::uart_data_r(offs_t offset)
 {
-	logerror("uart_r %d\n", offset);
+	logerror("uart_data_r %d\n", offset);
+	return 0;
+}
+
+void ymp21_device::uart_ctrl_w(offs_t offset, u8 data)
+{
+	logerror("uart_ctrl_w %d, %02x\n", offset, data);
+}
+
+u8 ymp21_device::uart_status_r(offs_t offset)
+{
+	logerror("uart_status_r %d\n", offset);
 	return 0;
 }
 
