@@ -17921,6 +17921,7 @@ fscc9ps                         //
 @source:fidelity/vcc.cpp
 uvc                             //
 vcc                             //
+vcca                            //
 
 @source:fidelity/vsc.cpp
 vsc                             //

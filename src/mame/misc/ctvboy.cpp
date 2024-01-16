@@ -5,14 +5,14 @@
 Gakken Compact Vision TV Boy (TVボーイ)
 
 Hardware notes:
-- HD6801V0P or MC6801U4 @ 3.57MHz
+- MC6801U4 or HD6801V0P @ 3.57MHz
 - MC6847, MC1372
 - 2KB RAM (HM6116)
-- 1-bit sound with volume filter
+- 1-bit sound with volume decay
 - cartridge slot
 
 There is no CPU inside the console. The MCU is on the cartridge, the console
-itself has the video hardware and buttons.
+itself has the video hardware and controls.
 
 TODO:
 - add softwarelist
