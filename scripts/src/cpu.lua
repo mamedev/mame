@@ -3949,3 +3949,20 @@ if opt_tool(CPUS, "HT1130") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ht1130/ht1130d.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ht1130/ht1130d.h")
 end
+
+--------------------------------------------------
+-- Seiko Epson S1C33 family
+--@src/devices/cpu/s1c33/s1c33.h,CPUS["S1C33"] = true
+--------------------------------------------------
+
+if CPUS["S1C33"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/s1c33/s1c33.cpp",
+		MAME_DIR .. "src/devices/cpu/s1c33/s1c33.h",
+	}
+end
+
+if opt_tool(CPUS, "S1C33") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/s1c33/s1c33dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/s1c33/s1c33dasm.h")
+end
