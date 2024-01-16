@@ -2,7 +2,7 @@
 // copyright-holders:Angelo Salese
 /**************************************************************************************************
 
-S3 SonicVibes 86C617 multimedia audio based chipset
+S3 Sonic Vibes 86C617 multimedia audio based chipset
 
 First (and only) S3 audio card.
 
@@ -13,13 +13,23 @@ Known subvendor ID cards (from dosdays.co.uk, TODO: subvendor IDs):
 - GVC Media Technology card (FCC ID: M4CS0027) - line out jack, 32Kx8 SRAM chip for reverb effects
 - Ennyah 3D PCI Sound - appears to just be a rebadged ExpertColor MED6617.
 
+Notes:
+- Phoenix BIOSes (such as the one in pcipc) do not set up PnP properly, specifically mapping all
+  the BARs to $fc** ranges in DOS. To fix user needs to preload s3legacy.exe driver, available in
+  ibm5170_cdrom:s3drv21
+
 TODO:
-- everything;
+- Complete BAR mapping and base device hookup;
+- Implement IRQ and DMA routing;
+- Verify that DSP is different than SB Pro;
+- Optional wavetable ROMs (ibm5170_cdrom:s3drv21 have it)
 
 **************************************************************************************************/
 
 #include "emu.h"
 #include "sonicvibes.h"
+
+#include "speaker.h"
 
 #define LOG_WARN      (1U << 1)
 
@@ -30,17 +40,21 @@ TODO:
 #define LOGWARN(...)            LOGMASKED(LOG_WARN, __VA_ARGS__)
 
 
-DEFINE_DEVICE_TYPE(SONICVIBES, sonicvibes_device,   "sonicvibes",   "S3 SonicVibes 86C617 PCI card")
+// Documentation spells "SonicVibes", on-chip markings says "Sonic Vibes" instead
+DEFINE_DEVICE_TYPE(SONICVIBES, sonicvibes_device,   "sonicvibes",   "S3 Sonic Vibes 86C617 PCI card")
 
 
 
 sonicvibes_device::sonicvibes_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: pci_card_device(mconfig, type, tag, owner, clock)
+	, m_opl3(*this, "opl3")
+	, m_joy(*this, "pc_joy")
 {
 	// TODO: return actual subvendor ID
 	set_ids(0x5333ca00, 0x00, 0x040100, 0x5333ca00);
 }
 
+// FIXME: subvendor cards eventually need subclassing, relies on above
 sonicvibes_device::sonicvibes_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: sonicvibes_device(mconfig, SONICVIBES, tag, owner, clock)
 {
@@ -48,18 +62,34 @@ sonicvibes_device::sonicvibes_device(const machine_config &mconfig, const char *
 
 void sonicvibes_device::device_add_mconfig(machine_config &config)
 {
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
+	// TODO: (barely visible) only 24'576 xtal on a Turtle Beach PCB, is it really 12-ish MHz?
+	YMF262(config, m_opl3, XTAL(14'318'181));
+	m_opl3->add_route(0, "lspeaker", 1.0);
+	m_opl3->add_route(1, "rspeaker", 1.0);
+	m_opl3->add_route(2, "lspeaker", 1.0);
+	m_opl3->add_route(3, "rspeaker", 1.0);
+
+//  DAC_16BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5); // unknown DAC
+//  DAC_16BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
+
+	PC_JOY(config, m_joy);
+
+//  MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(FUNC(sb_device::midi_rx_w));
+//  MIDI_PORT(config, "mdout", midiout_slot, "midiout");
 }
 
 void sonicvibes_device::device_start()
 {
 	pci_card_device::device_start();
 
-//	add_map( 16, M_IO, FUNC(sonicvibes_device::games_base_map));
-//	add_map( 16, M_IO, FUNC(sonicvibes_device::enhanced_map));
-//	add_map(  4, M_IO, FUNC(sonicvibes_device::fm_map));
-//	add_map(  4, M_IO, FUNC(sonicvibes_device::midi_map));
-//	add_map(  8, M_IO, FUNC(sonicvibes_device::gameport_map));
+	add_map( 16, M_IO, FUNC(sonicvibes_device::games_legacy_map));
+	add_map( 16, M_IO, FUNC(sonicvibes_device::enhanced_map));
+	add_map(  4, M_IO, FUNC(sonicvibes_device::fm_map));
+	add_map(  4, M_IO, FUNC(sonicvibes_device::midi_map));
+	add_map(  8, M_IO, FUNC(sonicvibes_device::gameport_map));
 
 	// INTA#
 	intr_pin = 1;
@@ -79,13 +109,49 @@ void sonicvibes_device::device_reset()
 void sonicvibes_device::config_map(address_map &map)
 {
 	pci_card_device::config_map(map);
-//	map(0x40, 0x43) DMA_A
-//	map(0x48, 0x4b) DMA_C
+//  map(0x40, 0x43) DMA_A
+//  map(0x48, 0x4b) DMA_C
 	map(0x50, 0x53).lr32(
 		NAME([this] () {
 			LOGWARN("Read reserved register $50\n");
 			return 0x00010000;
 		})
 	);
-//	map(0x60, 0x63) Wavetable Memory Base
+//  map(0x60, 0x63) Wavetable Memory Base
+}
+
+// 220h
+void sonicvibes_device::games_legacy_map(address_map &map)
+{
+	map(0x00, 0x03).rw(m_opl3, FUNC(ymf262_device::read), FUNC(ymf262_device::write));
+	map(0x08, 0x09).rw(m_opl3, FUNC(ymf262_device::read), FUNC(ymf262_device::write));
+}
+
+// 530h
+void sonicvibes_device::enhanced_map(address_map &map)
+{
+//  map(0x00, 0x00) CODEC/Mixer Control
+//  map(0x01, 0x01) CODEC/Mixer Interrupt Mask
+//  map(0x02, 0x02) CODEC/Mixer Status (r/o)
+
+//  map(0x04, 0x04) CODEC/Mixer Index Address
+//  map(0x05, 0x05) CODEC/Mixer Index Data
+}
+
+// 388h
+void sonicvibes_device::fm_map(address_map &map)
+{
+	map(0x00, 0x03).rw(m_opl3, FUNC(ymf262_device::read), FUNC(ymf262_device::write));
+}
+
+// 330h
+void sonicvibes_device::midi_map(address_map &map)
+{
+
+}
+
+// 200h
+void sonicvibes_device::gameport_map(address_map &map)
+{
+	map(0x00, 0x07).rw(m_joy, FUNC(pc_joy_device::joy_port_r), FUNC(pc_joy_device::joy_port_w));
 }
