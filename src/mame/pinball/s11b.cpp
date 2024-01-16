@@ -635,6 +635,24 @@ ROM_START(bguns_p1)
 	ROM_RELOAD(0x38000,0x8000)
 ROM_END
 
+ROM_START(bguns_p1a)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("bigguns_u26_rom-2_lgx.bin", 0x4000, 0x4000, CRC(d75ca79d) SHA1(6d185cda4c62bf1cae0448c89b4f93a90aed855c))
+	ROM_LOAD("bigguns_u27_rom-1_lgx.bin", 0x8000, 0x8000, CRC(2fba9a0d) SHA1(16629a5f009865825207378118a147e3135c51cf))
+	ROM_REGION(0x10000, "audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("guns_u21.l1", 0x8000, 0x8000, CRC(35c6bfe4) SHA1(83dbd10311add75f56046de58d315f8a87389703))
+	ROM_LOAD("guns_u22.l1", 0x0000, 0x8000, CRC(091a5cb8) SHA1(db77314241eb6ed7f4385f99312a49b7caad1283))
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
+	ROM_LOAD("gund_u4.l1", 0x00000, 0x8000, CRC(d4a430a3) SHA1(5b44e3f313cc7cb75f51c239013d46e5eb986f9d))
+	ROM_RELOAD(0x08000,0x8000)
+	ROM_RELOAD(0x10000,0x8000)
+	ROM_RELOAD(0x18000,0x8000)
+	ROM_LOAD("guns_u19.l1", 0x20000, 0x8000, CRC(ec1a6c23) SHA1(45bb4f78b89de9e690b5f9741d17f97766e702d6))
+	ROM_RELOAD(0x28000,0x8000)
+	ROM_RELOAD(0x30000,0x8000)
+	ROM_RELOAD(0x38000,0x8000)
+ROM_END
+
 /*------------------------------
 / Black Knight 2000 6/89 (#563)
 /------------------------------*/
@@ -1621,6 +1639,7 @@ GAME(1987,  bguns_l8,       0,          s11b,   s11b, s11b_state, init_s11bnn, R
 GAME(1987,  bguns_l7,       bguns_l8,   s11b,   s11b, s11b_state, init_s11bnn, ROT0, "Williams", "Big Guns (L-7)",                               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1987,  bguns_la,       bguns_l8,   s11b,   s11b, s11b_state, init_s11bnn, ROT0, "Williams", "Big Guns (L-A)",                               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1987,  bguns_p1,       bguns_l8,   s11b,   s11b, s11b_state, init_s11bnn, ROT0, "Williams", "Big Guns (P-1)",                               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1987,  bguns_p1a,      bguns_l8,   s11b,   s11b, s11b_state, init_s11bnn, ROT0, "Williams", "Big Guns (P-1, alternate set)",                MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1989,  bk2k_l4,        0,          s11b,   s11b, s11b_state, init_s11bin, ROT0, "Williams", "Black Knight 2000 (L-4)",                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1989,  bk2k_lg1,       bk2k_l4,    s11b,   s11b, s11b_state, init_s11bin, ROT0, "Williams", "Black Knight 2000 (LG-1)",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1989,  bk2k_lg3,       bk2k_l4,    s11b,   s11b, s11b_state, init_s11bin, ROT0, "Williams", "Black Knight 2000 (LG-3)",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
