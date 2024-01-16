@@ -332,8 +332,8 @@ ROM_START( ecbackg )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD("saitek_89_gx4b_c12_31y0rm79p.u1", 0x0000, 0x4000, CRC(d7278545) SHA1(9ece31cdb237067aeec480c066e0917752697a4d) )
 
-	ROM_REGION( 109665, "screen", 0 )
-	ROM_LOAD("ecbackg.svg", 0, 109665, CRC(6592acfe) SHA1(8425d7ce519a921cdbe4298ae9c6789f90d4d0b5) )
+	ROM_REGION( 109526, "screen", 0 )
+	ROM_LOAD("ecbackg.svg", 0, 109526, CRC(b8149d74) SHA1(0cc6f1a2c50f53f8d2be73379019d275799d0546) )
 ROM_END
 
 } // anonymous namespace
