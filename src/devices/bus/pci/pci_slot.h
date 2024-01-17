@@ -75,8 +75,8 @@ protected:
 	u8 m_pin_state;
 	std::array<u8, 4> m_irq_map;
 
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	void irq_pin_w(offs_t line, int state);
 };
