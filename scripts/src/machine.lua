@@ -4642,18 +4642,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/opti82c861.h,MACHINES["OPTI82C861"] = true
----------------------------------------------------
-
-if (MACHINES["OPTI82C861"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/opti82c861.cpp",
-		MAME_DIR .. "src/devices/machine/opti82c861.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/output_latch.h,MACHINES["OUTPUT_LATCH"] = true
 ---------------------------------------------------
 

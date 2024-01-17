@@ -15,6 +15,7 @@
 #include "sonicvibes.h"
 #include "sw1000xg.h"
 #include "rtl8029as_pci.h"
+#include "opti82c861.h"
 
 DEFINE_DEVICE_TYPE(PCI_SLOT, pci_slot_device, "pci_slot", "PCI extension motherboard port")
 
@@ -103,6 +104,8 @@ void pci_cards(device_slot_interface &device)
 	// 0x0a - docking stations
 	// 0x0b - processors
 	// 0x0c - Serial Bus controllers
+	device.option_add("opti82c861",     OPTI_82C861);
+
 	// 0x0d - wireless controllers
 	// 0x0e - Intelligent I/O controllers
 	// 0x0f - Satellite Communication controllers
