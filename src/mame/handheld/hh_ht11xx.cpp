@@ -50,6 +50,7 @@ public:
 	virtual DECLARE_INPUT_CHANGED_MEMBER(input_wakeup);
 
 	void brke23p2(machine_config &config);
+	void ga888(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -61,7 +62,7 @@ private:
 
 	required_device<ht1130_device> m_maincpu;
 	output_finder<8, 40> m_out_x;
-	required_ioport_array<2> m_in;
+	required_ioport_array<3> m_in;
 };
 
 void hh_ht11xx_state::machine_start()
@@ -86,8 +87,30 @@ static INPUT_PORTS_START( brke23p2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Down / Drop")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Right")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Left")
+
+	PORT_START("IN3")
+	// not used
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( ga888 ) // the unit also has an up button, and a reset button, is 'up' connected to anything?
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_VOLUME_DOWN ) PORT_NAME("Pause / Power") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_ht11xx_state, input_wakeup, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START ) PORT_NAME("Start / Rotate")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Down / Drop")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Right / Sound")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Left")
+INPUT_PORTS_END
 
 void hh_ht11xx_state::segment_w(offs_t offset, u64 data)
 {
@@ -121,15 +144,47 @@ void hh_ht11xx_state::brke23p2(machine_config &config)
 	mcfg_svg_screen(config, 755, 1080);
 }
 
+void hh_ht11xx_state::ga888(machine_config &config)
+{
+	HT1190(config, m_maincpu, 1000000/8); // frequency? is this really a 1190? uses port PM which doesn't exist in that document
+	m_maincpu->segment_out_cb().set(FUNC(hh_ht11xx_state::segment_w));
+
+	m_maincpu->ps_in_cb().set_ioport(m_in[0]);
+	m_maincpu->pp_in_cb().set_ioport(m_in[1]);
+	m_maincpu->pm_in_cb().set_ioport(m_in[2]);
+
+	SPEAKER(config, "speaker").front_center();
+
+	mcfg_svg_screen(config, 698, 1080);
+}
+
 ROM_START( brke23p2 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "brke23p2.bin", 0x0000, 0x1000, CRC(8045fac4) SHA1(a36213309e6add31f31e4248f02f17de9914a5c1) ) // visual decap
+
+	ROM_REGION( 0x100, "melody", 0 )
+	ROM_LOAD( "brke23p2.snd", 0x000, 0x100, NO_DUMP ) // unknown size
 
 	ROM_REGION( 160500, "screen", 0)
 	ROM_LOAD( "brke23p2.svg", 0, 160500, CRC(9edf8aab) SHA1(f2ab907d23517612196648f1b5b0cb9b4a1ab3bd) )
 ROM_END
 
+ROM_START( ga888 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "ga888.bin", 0x0000, 0x1000, CRC(cb3f8ff4) SHA1(00b08773e8ee7577377f4d52cd1e6bb657b6f242) ) // visual decap
+
+	ROM_REGION( 0x100, "melody", 0 )
+	ROM_LOAD( "ga888.snd", 0x000, 0x100, NO_DUMP ) // unknown size
+
+	ROM_REGION( 84755, "screen", 0)
+	ROM_LOAD( "ga888.svg", 0, 84755, CRC(76370877) SHA1(db7ddb1061e82b096e5ce144fbd1858fe3a1423d) )
+ROM_END
+
+
 } // anonymous namespace
 
 // some other dieshots have 1996 on them, it is also possible the software is from Holtek
 CONS( 1993, brke23p2, 0, 0, brke23p2, brke23p2, hh_ht11xx_state, empty_init, "E-Star", "Brick Game 96 in 1 (E-23 Plus Mark II)", MACHINE_IMPERFECT_TIMING | MACHINE_NO_SOUND )
+
+CONS( 199?, ga888,    0, 0, ga888,    ga888, hh_ht11xx_state, empty_init, "<unknown>", "Brick Game GA888", MACHINE_IMPERFECT_TIMING | MACHINE_NO_SOUND ) // clone of Tetris Jr?
+
