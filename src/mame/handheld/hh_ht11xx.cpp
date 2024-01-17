@@ -42,33 +42,71 @@ class hh_ht11xx_state : public driver_device
 public:
 	hh_ht11xx_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_out_x(*this, "%u.%u", 0U, 0U),
-		m_in(*this, "IN%u", 1)
+		m_maincpu(*this, "maincpu")
 	{ }
 
 	virtual DECLARE_INPUT_CHANGED_MEMBER(input_wakeup);
 
+protected:
+
+	void mcfg_svg_screen(machine_config &config, u16 width, u16 height, const char *tag = "screen");
+
+	required_device<ht1130_device> m_maincpu;
+};
+
+class hh_ht1190_state : public hh_ht11xx_state
+{
+public:
+	hh_ht1190_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ht11xx_state(mconfig, type, tag),
+		m_out_x(*this, "%u.%u", 0U, 0U),
+		m_in(*this, "IN%u", 1)
+	{ }
+
 	void brke23p2(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+	void segment_w(offs_t offset, u64 data);
+
+private:
+	output_finder<8, 40> m_out_x;
+	required_ioport_array<2> m_in;
+};
+
+
+class hh_ht1130_state : public hh_ht11xx_state
+{
+public:
+	hh_ht1130_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ht11xx_state(mconfig, type, tag),
+		m_out_x(*this, "%u.%u", 0U, 0U),
+		m_in(*this, "IN%u", 1)
+	{ }
+
 	void ga888(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
 
-private:
-	void mcfg_svg_screen(machine_config &config, u16 width, u16 height, const char *tag = "screen");
-
 	void segment_w(offs_t offset, u64 data);
 
-	required_device<ht1130_device> m_maincpu;
-	output_finder<8, 40> m_out_x;
+private:
+	output_finder<4, 32> m_out_x;
 	required_ioport_array<3> m_in;
 };
 
-void hh_ht11xx_state::machine_start()
+void hh_ht1190_state::machine_start()
 {
 	m_out_x.resolve();
 }
+
+void hh_ht1130_state::machine_start()
+{
+	m_out_x.resolve();
+}
+
 
 INPUT_CHANGED_MEMBER(hh_ht11xx_state::input_wakeup)
 {
@@ -87,9 +125,6 @@ static INPUT_PORTS_START( brke23p2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Down / Drop")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Right")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Left")
-
-	PORT_START("IN3")
-	// not used
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ga888 ) // the unit also has an up button, and a reset button, is 'up' connected to anything?
@@ -112,7 +147,7 @@ static INPUT_PORTS_START( ga888 ) // the unit also has an up button, and a reset
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Left")
 INPUT_PORTS_END
 
-void hh_ht11xx_state::segment_w(offs_t offset, u64 data)
+void hh_ht1190_state::segment_w(offs_t offset, u64 data)
 {
 	for (int i = 0; i < 40; i++)
 	{
@@ -120,6 +155,16 @@ void hh_ht11xx_state::segment_w(offs_t offset, u64 data)
 		m_out_x[offset][i] = BIT(data, i);
 	}
 }
+
+void hh_ht1130_state::segment_w(offs_t offset, u64 data)
+{
+	for (int i = 0; i < 32; i++)
+	{
+		// output to x.y where x = COM# and y = SEG#
+		m_out_x[offset][i] = BIT(data, i);
+	}
+}
+
 
 void hh_ht11xx_state::mcfg_svg_screen(machine_config &config, u16 width, u16 height, const char *tag)
 {
@@ -131,10 +176,10 @@ void hh_ht11xx_state::mcfg_svg_screen(machine_config &config, u16 width, u16 hei
 	config.set_default_layout(layout_hh_ht11xx_single);
 }
 
-void hh_ht11xx_state::brke23p2(machine_config &config)
+void hh_ht1190_state::brke23p2(machine_config &config)
 {
 	HT1190(config, m_maincpu, 1000000/8); // frequency?
-	m_maincpu->segment_out_cb().set(FUNC(hh_ht11xx_state::segment_w));
+	m_maincpu->segment_out_cb().set(FUNC(hh_ht1190_state::segment_w));
 
 	m_maincpu->ps_in_cb().set_ioport(m_in[0]);
 	m_maincpu->pp_in_cb().set_ioport(m_in[1]);
@@ -144,10 +189,10 @@ void hh_ht11xx_state::brke23p2(machine_config &config)
 	mcfg_svg_screen(config, 755, 1080);
 }
 
-void hh_ht11xx_state::ga888(machine_config &config)
+void hh_ht1130_state::ga888(machine_config &config)
 {
-	HT1190(config, m_maincpu, 1000000/8); // frequency? is this really a 1190? uses port PM which doesn't exist in that document
-	m_maincpu->segment_out_cb().set(FUNC(hh_ht11xx_state::segment_w));
+	HT1130(config, m_maincpu, 1000000/8); // frequency?
+	m_maincpu->segment_out_cb().set(FUNC(hh_ht1130_state::segment_w));
 
 	m_maincpu->ps_in_cb().set_ioport(m_in[0]);
 	m_maincpu->pp_in_cb().set_ioport(m_in[1]);
@@ -176,15 +221,15 @@ ROM_START( ga888 )
 	ROM_REGION( 0x100, "melody", 0 )
 	ROM_LOAD( "ga888.snd", 0x000, 0x100, NO_DUMP ) // unknown size
 
-	ROM_REGION( 84755, "screen", 0)
-	ROM_LOAD( "ga888.svg", 0, 84755, CRC(76370877) SHA1(db7ddb1061e82b096e5ce144fbd1858fe3a1423d) )
+	ROM_REGION( 84795, "screen", 0)
+	ROM_LOAD( "ga888.svg", 0, 84795, CRC(5aa70531) SHA1(fc7bc442e6c88365047cf081d1113c741b144934) )
 ROM_END
 
 
 } // anonymous namespace
 
 // some other dieshots have 1996 on them, it is also possible the software is from Holtek
-CONS( 1993, brke23p2, 0, 0, brke23p2, brke23p2, hh_ht11xx_state, empty_init, "E-Star", "Brick Game 96 in 1 (E-23 Plus Mark II)", MACHINE_IMPERFECT_TIMING | MACHINE_NO_SOUND )
+CONS( 1993, brke23p2, 0, 0, brke23p2, brke23p2, hh_ht1190_state, empty_init, "E-Star", "Brick Game 96 in 1 (E-23 Plus Mark II)", MACHINE_IMPERFECT_TIMING | MACHINE_NO_SOUND )
 
-CONS( 199?, ga888,    0, 0, ga888,    ga888, hh_ht11xx_state, empty_init, "<unknown>", "Brick Game GA888", MACHINE_IMPERFECT_TIMING | MACHINE_NO_SOUND ) // clone of Tetris Jr?
+CONS( 199?, ga888,    0, 0, ga888,    ga888, hh_ht1130_state, empty_init, "<unknown>", "Brick Game GA888", MACHINE_IMPERFECT_TIMING | MACHINE_NO_SOUND ) // clone of Tetris Jr?
 
