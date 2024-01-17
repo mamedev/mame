@@ -34,18 +34,15 @@ public:
 
 	virtual ~pci_slot_device();
 
-	auto irq_cb() { return m_irq_cb.bind(); }
-
 	u8 get_slot() const;
 	class pci_card_device *get_card() const;
 
-	void irq_w(offs_t line, u8 state);
+	void get_irq_map(std::array<u8, 4> &map) const { map = m_irq; }
 
 protected:
 	virtual void device_start() override;
 
 private:
-	devcb_write8 m_irq_cb;
 	std::array<u8, 4> m_irq;
 	u8 m_slot;
 };
@@ -53,7 +50,6 @@ private:
 class pci_card_interface : public device_interface
 {
 public:
-	void irq_w(offs_t line, u8 state);
 
 protected:
 	pci_slot_device *m_pci_slot;
@@ -67,6 +63,22 @@ class pci_card_device : public pci_device, public pci_card_interface
 public:
 	pci_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~pci_card_device();
+
+	void set_irq_map(u8 irqa, u8 irqb = 0xff, u8 irqc = 0xff, u8 irqd = 0xff) {
+		m_irq_map[0] = irqa;
+		m_irq_map[1] = irqb;
+		m_irq_map[2] = irqc;
+		m_irq_map[3] = irqd;
+	}
+
+protected:
+	u8 m_pin_state;
+	std::array<u8, 4> m_irq_map;
+
+	virtual void device_start();
+	virtual void device_reset();
+
+	void irq_pin_w(offs_t line, int state);
 };
 
 DECLARE_DEVICE_TYPE(PCI_SLOT, pci_slot_device)

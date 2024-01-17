@@ -122,6 +122,14 @@ void pci_device::device_start()
 	save_item(NAME(status));
 	save_item(NAME(intr_line));
 	save_item(NAME(intr_pin));
+
+	device_t *root = owner();
+	while(root && root->type() != PCI_ROOT)
+		root = root->owner();
+	if(!root)
+		fatalerror("PCI device %s is without a PCI root\n", tag());
+
+	m_pci_root = downcast<pci_root_device *>(root);
 }
 
 void pci_device::device_reset()
@@ -1002,7 +1010,9 @@ void pci_host_device::root_config_write(uint8_t bus, uint8_t device, uint16_t re
 
 
 pci_root_device::pci_root_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PCI_ROOT, tag, owner, clock)
+	: device_t(mconfig, PCI_ROOT, tag, owner, clock),
+	  m_pin_mapper(*this),
+	  m_irq_handler(*this)
 {
 }
 
@@ -1012,4 +1022,14 @@ void pci_root_device::device_start()
 
 void pci_root_device::device_reset()
 {
+}
+
+void pci_root_device::irq_pin_w(int pin, int state)
+{
+	m_irq_handler(m_pin_mapper(pin), state);
+}
+
+void pci_root_device::irq_w(int line, int state)
+{
+	m_irq_handler(line, state);
 }

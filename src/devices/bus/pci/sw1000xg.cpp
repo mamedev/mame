@@ -23,6 +23,8 @@ void sw1000xg_device::device_start()
 void sw1000xg_device::device_reset()
 {
 	ymp21_device::device_reset();
+
+	m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 void sw1000xg_device::h8_map(address_map &map)

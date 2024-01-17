@@ -21,8 +21,7 @@ DEFINE_DEVICE_TYPE(PCI_SLOT, pci_slot_device, "pci_slot", "PCI extension motherb
 
 pci_slot_device::pci_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PCI_SLOT, tag, owner, clock),
-	device_single_card_slot_interface<pci_card_interface>(mconfig, *this),
-	m_irq_cb(*this)
+	device_single_card_slot_interface<pci_card_interface>(mconfig, *this)
 {
 }
 
@@ -52,11 +51,10 @@ pci_card_interface::pci_card_interface(const machine_config &mconfig, device_t &
 
 void pci_card_interface::interface_pre_start()
 {
-	m_pci_slot = downcast<pci_slot_device *>(device().owner());
-}
+	// Beware, the owner may not be a pci_slot_device, in which case
+	// the cast is expected to return nullptr.
 
-void pci_card_interface::irq_w(offs_t line, u8 state)
-{
+	m_pci_slot = dynamic_cast<pci_slot_device *>(device().owner());
 }
 
 pci_card_device::pci_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
@@ -67,6 +65,38 @@ pci_card_device::pci_card_device(const machine_config &mconfig, device_type type
 
 pci_card_device::~pci_card_device()
 {
+}
+
+void pci_card_device::device_start()
+{
+	pci_device::device_start();
+
+	if(m_pci_slot)
+		m_pci_slot->get_irq_map(m_irq_map);
+
+	m_pin_state = 0;
+	save_item(NAME(m_pin_state));
+}
+
+void pci_card_device::device_reset()
+{
+	pci_device::device_reset();
+
+	for(int i=0; i != 4; i++)
+		if(m_pin_state & (1 << i))
+			m_pci_root->irq_pin_w(m_irq_map[i], 0);
+	m_pin_state = 0;
+}
+
+void pci_card_device::irq_pin_w(offs_t line, int state)
+{
+	state = state != 0;
+	int pstate = (m_pin_state >> line) & 1;
+	if(pstate == state)
+		return;
+	m_pin_state = (m_pin_state & ~(1 << line)) | (state << line);
+
+	m_pci_root->irq_pin_w(m_irq_map[line], state);	
 }
 
 void pci_cards(device_slot_interface &device)

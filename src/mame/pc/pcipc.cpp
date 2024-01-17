@@ -569,10 +569,10 @@ void pcipc_state::pcipc(machine_config &config)
 	ide.irq_pri().set("pci:07.0", FUNC(i82371sb_isa_device::pc_irq14_w));
 	ide.irq_sec().set("pci:07.0", FUNC(i82371sb_isa_device::pc_mirq0_w));
 
-	PCI_SLOT(config, "pci:1", pci_cards, 15, 0, 1, 2, 3, nullptr).irq_cb().set(isa, FUNC(i82371sb_isa_device::pci_irq_w));
-	PCI_SLOT(config, "pci:2", pci_cards, 16, 1, 2, 3, 0, nullptr).irq_cb().set(isa, FUNC(i82371sb_isa_device::pci_irq_w));
-	PCI_SLOT(config, "pci:3", pci_cards, 17, 2, 3, 0, 1, nullptr).irq_cb().set(isa, FUNC(i82371sb_isa_device::pci_irq_w));
-	PCI_SLOT(config, "pci:4", pci_cards, 18, 3, 0, 1, 2, "virge").irq_cb().set(isa, FUNC(i82371sb_isa_device::pci_irq_w));
+	PCI_SLOT(config, "pci:1", pci_cards, 15, 0, 1, 2, 3, nullptr);
+	PCI_SLOT(config, "pci:2", pci_cards, 16, 1, 2, 3, 0, nullptr);
+	PCI_SLOT(config, "pci:3", pci_cards, 17, 2, 3, 0, 1, nullptr);
+	PCI_SLOT(config, "pci:4", pci_cards, 18, 3, 0, 1, 2, "virge");
 
 	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "fdc37c93x", true).set_option_machine_config("fdc37c93x", smc_superio_config);
 	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
@@ -610,10 +610,10 @@ void pcipc_state::pcipctx(machine_config &config)
 	isa.boot_state_hook().set(FUNC(pcipc_state::boot_state_award_w));
 //  IDE_PCI(config, "pci:07.1", 0, 0x80867010, 0x03, 0x00000000);
 
-	PCI_SLOT(config, "pci:1", pci_cards, 15, 0, 1, 2, 3, nullptr).irq_cb().set(isa, FUNC(i82371sb_isa_device::pci_irq_w));
-	PCI_SLOT(config, "pci:2", pci_cards, 16, 1, 2, 3, 0, nullptr).irq_cb().set(isa, FUNC(i82371sb_isa_device::pci_irq_w));
-	PCI_SLOT(config, "pci:3", pci_cards, 17, 2, 3, 0, 1, nullptr).irq_cb().set(isa, FUNC(i82371sb_isa_device::pci_irq_w));
-	PCI_SLOT(config, "pci:4", pci_cards, 18, 3, 0, 1, 2, "mga2064w").irq_cb().set(isa, FUNC(i82371sb_isa_device::pci_irq_w));
+	PCI_SLOT(config, "pci:1", pci_cards, 15, 0, 1, 2, 3, nullptr);
+	PCI_SLOT(config, "pci:2", pci_cards, 16, 1, 2, 3, 0, nullptr);
+	PCI_SLOT(config, "pci:3", pci_cards, 17, 2, 3, 0, 1, nullptr);
+	PCI_SLOT(config, "pci:4", pci_cards, 18, 3, 0, 1, 2, "mga2064w");
 }
 
 void pcipc_state::pciagp(machine_config &config)
