@@ -7993,7 +7993,66 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger MC Hammer: U Can't Touch This (model 7-863)
+  Tiger The Rocketeer (model 7-864)
+  * Sharp SM510 under epoxy (die label M96)
+  * lcd screen with custom segments, 1-bit sound
+
+  MCU ROM is the same for Robocop 2, The Rocketeer.
+
+*******************************************************************************/
+
+class trockteer_state : public hh_sm510_state
+{
+public:
+	trockteer_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{
+		inp_fixed_last();
+	}
+
+	void trockteer(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( trockteer )
+	PORT_INCLUDE( trobocop2 )
+
+	PORT_MODIFY("IN.0")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed) PORT_NAME("P1 Up/Rocket Pack")
+
+	PORT_MODIFY("IN.3")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Fire Right")
+
+	PORT_MODIFY("IN.4")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Fire Up")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Fire Left")
+INPUT_PORTS_END
+
+// config
+
+void trockteer_state::trockteer(machine_config &config)
+{
+	sm510_tiger(config, 1463, 1080);
+}
+
+// roms
+
+ROM_START( trockteer )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "m96", 0x0000, 0x1000, CRC(3704b60c) SHA1(04275833e1a79fd33226faf060890b66ae54e1d3) )
+
+	ROM_REGION( 558128, "screen", 0)
+	ROM_LOAD( "trockteer.svg", 0, 558128, CRC(70ff1f46) SHA1(5cd94655654614206ed11844ba31650edb51eb22) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Tiger MC Hammer: U Can't Touch This (model 7-865)
   * Sharp SM511 under epoxy (die label N63)
   * lcd screen with custom segments, 1-bit sound
 
@@ -8073,65 +8132,6 @@ ROM_START( tmchammer )
 
 	ROM_REGION( 456487, "screen", 0)
 	ROM_LOAD( "tmchammer.svg", 0, 456487, CRC(1cd10ff3) SHA1(092396c56adae7f872c3b5916ef3ecf67ab30161) )
-ROM_END
-
-
-
-
-
-/*******************************************************************************
-
-  Tiger The Rocketeer (model 7-864)
-  * Sharp SM510 under epoxy (die label M96)
-  * lcd screen with custom segments, 1-bit sound
-
-  MCU ROM is the same for Robocop 2, The Rocketeer.
-
-*******************************************************************************/
-
-class trockteer_state : public hh_sm510_state
-{
-public:
-	trockteer_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{
-		inp_fixed_last();
-	}
-
-	void trockteer(machine_config &config);
-};
-
-// inputs
-
-static INPUT_PORTS_START( trockteer )
-	PORT_INCLUDE( trobocop2 )
-
-	PORT_MODIFY("IN.0")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed) PORT_NAME("P1 Up/Rocket Pack")
-
-	PORT_MODIFY("IN.3")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Fire Right")
-
-	PORT_MODIFY("IN.4")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Fire Up")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Fire Left")
-INPUT_PORTS_END
-
-// config
-
-void trockteer_state::trockteer(machine_config &config)
-{
-	sm510_tiger(config, 1463, 1080);
-}
-
-// roms
-
-ROM_START( trockteer )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "m96", 0x0000, 0x1000, CRC(3704b60c) SHA1(04275833e1a79fd33226faf060890b66ae54e1d3) )
-
-	ROM_REGION( 558128, "screen", 0)
-	ROM_LOAD( "trockteer.svg", 0, 558128, CRC(70ff1f46) SHA1(5cd94655654614206ed11844ba31650edb51eb22) )
 ROM_END
 
 
@@ -11535,8 +11535,8 @@ SYST( 1991, txmen,        0,           0,      txmen,        txmen,        txmen
 SYST( 1991, tddragon3,    0,           0,      tddragon3,    tddragon3,    tddragon3_state,    empty_init, "Tiger Electronics (licensed from Technos)", "Double Dragon 3: The Rosetta Stone (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1991, tflash,       0,           0,      tflash,       tflash,       tflash_state,       empty_init, "Tiger Electronics", "The Flash (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1991, trobhood,     tgaunt,      0,      trobhood,     trobhood,     trobhood_state,     empty_init, "Tiger Electronics", "Robin Hood (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1991, tmchammer,    0,           0,      tmchammer,    tmchammer,    tmchammer_state,    empty_init, "Tiger Electronics", "MC Hammer: U Can't Touch This (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1991, trockteer,    trobocop2,   0,      trockteer,    trockteer,    trockteer_state,    empty_init, "Tiger Electronics", "The Rocketeer (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, tmchammer,    0,           0,      tmchammer,    tmchammer,    tmchammer_state,    empty_init, "Tiger Electronics", "MC Hammer: U Can't Touch This (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1991, tbtoads,      0,           0,      tbtoads,      tbtoads,      tbtoads_state,      empty_init, "Tiger Electronics (licensed from Rare/Tradewest)", "Battletoads (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1991, thook,        0,           0,      thook,        thook,        thook_state,        empty_init, "Tiger Electronics", "Hook (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1992, tbttf,        0,           0,      tbttf,        tbttf,        tbttf_state,        empty_init, "Tiger Electronics", "Back to the Future (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
