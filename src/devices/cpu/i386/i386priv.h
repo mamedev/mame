@@ -297,11 +297,11 @@ extern int i386_parity_table[256];
 #define FAULT_THROW(fault,error) { throw (uint64_t)(fault | (uint64_t)error << 32); }
 #define PF_THROW(error) { m_cr[2] = address; FAULT_THROW(FAULT_PF,error); }
 
-#define PROTECTED_MODE      (m_cr[0] & 0x1)
+#define PROTECTED_MODE      (m_cr[0] & CR0_PE)
 #define STACK_32BIT         (m_sreg[SS].d)
 #define V8086_MODE          (m_VM)
 #define NESTED_TASK         (m_NT)
-#define WP                  (m_cr[0] & 0x10000)
+#define WP                  (m_cr[0] & CR0_WP)
 
 #define SetOF_Add32(r,s,d)  (m_OF = (((r) ^ (s)) & ((r) ^ (d)) & 0x80000000) ? 1: 0)
 #define SetOF_Add16(r,s,d)  (m_OF = (((r) ^ (s)) & ((r) ^ (d)) & 0x8000) ? 1 : 0)

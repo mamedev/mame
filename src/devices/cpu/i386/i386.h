@@ -237,7 +237,7 @@ protected:
 		CR0_ET = 1 << 4,       // Extension type
 		CR0_TS = 1 << 3,       // Task switched
 		CR0_EM = 1 << 2,       // Emulation
-		CR0_MP = 1 << 1,       // Monitor copreocessor
+		CR0_MP = 1 << 1,       // Monitor coprocessor
 		CR0_PE = 1 << 0,       // Protection enabled
 	};
 

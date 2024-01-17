@@ -516,7 +516,7 @@ void i386_device::i486_mov_cr_r32()        // Opcode 0x0f 22
 	{
 		case 0:
 			CYCLES(CYCLES_MOV_REG_CR0);
-			if((oldcr ^ m_cr[cr]) & 0x80010000)
+			if((oldcr ^ m_cr[cr]) & (CR0_PG | CR0_WP))
 				vtlb_flush_dynamic();
 			if (PROTECTED_MODE != BIT(data, 0))
 				debugger_privilege_hook();

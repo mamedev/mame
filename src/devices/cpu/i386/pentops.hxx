@@ -7,7 +7,7 @@ extern flag float64_is_nan( float64 a ); // since its not defined in softfloat.h
 
 void i386_device::MMXPROLOG()
 {
-	if (m_cr[0] & 0xc)
+	if (m_cr[0] & (CR0_TS | CR0_EM))
 	{
 		i386_trap(FAULT_NM, 0, 0);
 		return;
@@ -1912,7 +1912,7 @@ void i386_device::mmx_paddd_r64_rm64()  // Opcode 0f fe
 
 void i386_device::mmx_emms() // Opcode 0f 77
 {
-	if (m_cr[0] & 0xc)
+	if (m_cr[0] & (CR0_TS | CR0_EM))
 	{
 		i386_trap(FAULT_NM, 0, 0);
 		return;
