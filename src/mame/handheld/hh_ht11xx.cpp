@@ -40,14 +40,14 @@ namespace {
 class hh_ht11xx_state : public driver_device
 {
 public:
-	hh_ht11xx_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
-	{ }
 
 	virtual DECLARE_INPUT_CHANGED_MEMBER(input_wakeup);
 
 protected:
+	hh_ht11xx_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu")
+	{ }
 
 	void mcfg_svg_screen(machine_config &config, u16 width, u16 height, const char *tag = "screen");
 
