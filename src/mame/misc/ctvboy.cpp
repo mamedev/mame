@@ -6,8 +6,8 @@ Gakken Compact Vision TV Boy (TVボーイ)
 
 Hardware notes:
 - MC6801U4 or HD6801V0P @ 3.57MHz
-- MC6847, MC1372
-- 2KB RAM (HM6116)
+- MC6847P, MC1372P
+- 2KB RAM (HM6116P-4)
 - 1-bit sound with volume decay
 - cartridge slot
 
@@ -147,7 +147,7 @@ void ctvboy_state::p1_w(u8 data)
 
 u8 ctvboy_state::p1_r()
 {
-	// P17: hsync?
+	// P17: MC6847 HS
 	return m_mc6847->hs_r() ? 0 : 0x80;
 }
 

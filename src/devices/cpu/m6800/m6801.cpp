@@ -2228,9 +2228,9 @@ void m6801u4_cpu_device::ocr2h_w(uint8_t data)
 {
 	LOGTIMER("Output Compare High Register %d: %02x\n", N + 1, data);
 
-	if (!(m_pending_tsr & (TSR_OCF2 << (N - 1))))
+	if (!(m_pending_tsr & (TSR_OCF2 * N)))
 	{
-		m_tsr &= ~(TSR_OCF2 << (N - 1));
+		m_tsr &= ~(TSR_OCF2 * N);
 		modified_tcsr();
 	}
 
@@ -2246,9 +2246,9 @@ void m6801u4_cpu_device::ocr2l_w(uint8_t data)
 {
 	LOGTIMER("Output Compare Low Register %d: %02x\n", N + 1, data);
 
-	if (!(m_pending_tsr & (TSR_OCF2 << (N - 1))))
+	if (!(m_pending_tsr & (TSR_OCF2 * N)))
 	{
-		m_tsr &= ~(TSR_OCF2 << (N - 1));
+		m_tsr &= ~(TSR_OCF2 * N);
 		modified_tcsr();
 	}
 
