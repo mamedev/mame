@@ -11437,7 +11437,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="looptris">
-        <description>Looptris</description>
+		<description>Looptris</description>
 		<year>2021</year>
 		<publisher>Blastar</publisher>
 		<info name="release" value="20211226" />
@@ -11461,10 +11461,10 @@ license:CC0-1.0
 				<rom loadflag="load16_byte" name="looptris.c2" offset="0x000001" size="0x80000" crc="9409dbe8" sha1="1e9562aa34f6202e8012104ab79916453fec072e" />
 			</dataarea>
 		</part>
-    </software>
+	</software>
 
 	<software name="looptrsp">
-        <description>Looptris Plus</description>
+		<description>Looptris Plus</description>
 		<year>2022</year>
 		<publisher>Blastar</publisher>
 		<info name="release" value="20221224" />
@@ -11491,7 +11491,7 @@ license:CC0-1.0
 				<rom loadflag="load16_byte" name="looptrsp.c2" offset="0x000001" size="0x80000" crc="9409dbe8" sha1="1e9562aa34f6202e8012104ab79916453fec072e" />
 			</dataarea>
 		</part>
-    </software>
+	</software>
 
 	<software name="neotris" supported="partial">
 		<description>NeoTRIS</description>

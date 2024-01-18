@@ -46,7 +46,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="conan" supported="no">
 		<description>Detective Conan: Suiri Adventure</description>
 		<year>2005</year>
@@ -81,8 +81,8 @@ license:CC0-1.0
 		<part name="cart" interface="super_tv_pc_cart">
 			<dataarea name="prg" size="0x400000">
 				<rom name="c-07.u1" size="0x400000" crc="8aeea23c" sha1="e89921fe7714c60dcd60cc29382268350ac6f3f5" />
-			</dataarea>			
+			</dataarea>
 		</part>
 	</software>
-	
+
 </softwarelist>
