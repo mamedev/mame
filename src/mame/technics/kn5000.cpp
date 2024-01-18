@@ -151,6 +151,7 @@ void kn5000_state::maincpu_mem(address_map &map)
 	m_extension_view[0](0x280000, 0x2fffff).rom(); // 512k bytes FLASH ROM @ IC4 (CS5)
 	map(0x300000, 0x3fffff).rom().region("custom_data", 0); // 8MBit FLASH ROM @ IC19 (CS5)
 	map(0x400000, 0x7fffff).rom().region("rhythm_data", 0); // 32MBit ROM @ IC14 (A22=1 and CS5)
+	map(0x800000, 0x82ffff).rom().region("subprogram", 0); // not sure yet in which chip this is stored, but I suspect it should be IC19
 	map(0xc00000, 0xdfffff).mirror(0x200000).rom().region("table_data", 0);//2 * 8MBit ROMs @ IC1, IC3 (CS2)
 	map(0xe00000, 0xffffff).mask(0x1fffff).rom().region("program", 0); //2 * 8MBit FLASH ROMs @ IC4, IC6
 }
@@ -371,32 +372,43 @@ ROM_START(kn5000)
 
 	// FIXME: These are actually stored in a couple flash rom chips IC6 (even) and IC4 (odd)
 	//
-	// Note: These ROMs were extracted from the system update floppies which were
-	//       compressed using a variant of LZSS. There may still be problems with the
-	//       unpacking of the ROM contents. Especially in the lowest 4kbyte window.
-	//       Once we get a proper dump of the boot rom, we may have a better idea of
-	//       the decompression algorithm and then we may need to update this ROM set.
+	// Note: These ROMs from v5 to v10 were extracted from the system update floppies
+	//       which were compressed using LZSS.
+	//
+	//       System update disks for older versions were not found yet, so dumping
+	//       efforts will require other methods.
 	//
 	//       More info at:
 	//       https://github.com/felipesanches/kn5000_homebrew/blob/main/kn5000_extract.py
 
 	ROM_SYSTEM_BIOS(0, "v10", "Version 10 - August 2nd, 1999")
-	ROMX_LOAD("kn5000_v10_program.rom", 0x00000, 0x200000, CRC(8f53027e) SHA1(57ebaa13ea6b3d5c67456b16335f06465a29fb0c), ROM_BIOS(0))
+	ROMX_LOAD("kn5000_v10_program.rom", 0x00000, 0x200000, CRC(00303406) SHA1(1f2abc5b1b7b9e16fdf796f26d939edaceded354), ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS(1, "v9", "Version 9 - January 26th, 1999")
-	ROMX_LOAD("kn5000_v9_program.rom", 0x00000, 0x200000, CRC(48f2e11d) SHA1(17440a451eb8d756acd224d6b8335fdbdace93e4), ROM_BIOS(1))
+	ROMX_LOAD("kn5000_v9_program.rom", 0x00000, 0x200000, CRC(c791d765) SHA1(d9a3b462b1f9302402e8d37aacd15f069f56abd9), ROM_BIOS(1))
 
 	ROM_SYSTEM_BIOS(2, "v8", "Version 8 - November 13th, 1998")
-	ROMX_LOAD("kn5000_v8_program.rom", 0x00000, 0x200000, CRC(c9d7843a) SHA1(0496dc46fec5b13ef8ded0fd7930ea81258c462d), ROM_BIOS(2))
+	ROMX_LOAD("kn5000_v8_program.rom", 0x00000, 0x200000, CRC(46b4b242) SHA1(a10a6f5a35175b74c3cfb42cef3bdf571c2858bb), ROM_BIOS(2))
 
 	ROM_SYSTEM_BIOS(3, "v7", "Version 7 - June 26th, 1998")
-	ROMX_LOAD("kn5000_v7_program.rom", 0x00000, 0x200000, CRC(2ac168c8) SHA1(280a07fe8981d63ea1aa3dfe751184134599eb11), ROM_BIOS(3))
+	ROMX_LOAD("kn5000_v7_program.rom", 0x00000, 0x200000, CRC(a5a25eb0) SHA1(4c682cb248034a2de04c688b0a45654b8726bffb), ROM_BIOS(3))
 
 	ROM_SYSTEM_BIOS(4, "v6", "Version 6 - January 16th, 1998") // sometimes refered to as "update6v0"
-	ROMX_LOAD("kn5000_v6_program.rom", 0x00000, 0x200000, CRC(8d66ed48) SHA1(f7f10a65aa654795e942c1863dc97aac8ab7ea8b), ROM_BIOS(4))
+	ROMX_LOAD("kn5000_v6_program.rom", 0x00000, 0x200000, CRC(0205db30) SHA1(51108e2d75b180a034395e90bd40ca2bd2a0adfb), ROM_BIOS(4))
 
 	ROM_SYSTEM_BIOS(5, "v5", "Version 5 - November 12th, 1997") // sometimes refered to as "update5v0"
-	ROMX_LOAD("kn5000_v5_program.rom", 0x00000, 0x200000, CRC(b6100cf0) SHA1(a416fe4ed6084eecc155de3453216b99e305d9c6), ROM_BIOS(5))
+	ROMX_LOAD("kn5000_v5_program.rom", 0x00000, 0x200000, CRC(fbd035e3) SHA1(7b69a8aaa84ee3d337acc0c29c34154c5da2df32), ROM_BIOS(5))
+
+	ROM_SYSTEM_BIOS(6, "v4", "Version 4") // I have a v4 board but haven't dumped it yet
+	ROMX_LOAD("kn5000_v4_program.rom", 0x00000, 0x200000, NO_DUMP, ROM_BIOS(6))
+
+	ROM_SYSTEM_BIOS(7, "v3", "Version 3") // I have a v3 board but haven't dumped it yet
+	ROMX_LOAD("kn5000_v3_program.rom", 0x00000, 0x200000, NO_DUMP, ROM_BIOS(7))
+
+	ROM_SYSTEM_BIOS(8, "v2", "Version 2") // I've seen one v2 main board for sale on ebay (and it seems to have a different pcb layout & chip references)
+	ROMX_LOAD("kn5000_v2_program.rom", 0x00000, 0x200000, NO_DUMP, ROM_BIOS(8))
+
+	// Note: I've never seen a version 1 main board.
 
 
 	ROM_REGION16_LE(0x20000, "mask", 0) // subcpu (boot rom?)
@@ -420,6 +432,24 @@ ROM_START(kn5000)
 
 	ROM_REGION16_LE(0x400000, "rhythm_data", 0)
 	ROM_LOAD("kn5000_rhythm_data_rom.ic14", 0x000000, 0x400000, CRC(76d11a5e) SHA1(e4b572d318c9fe7ba00e5b44ea783e89da9c68bd))
+
+
+	// Note: Even though this "subprogram" address range contain executable code for the subcpu, it is actually loaded by the maincpu
+	//       from a flash rom and then transfered to the subcpu RAM via the inter-cpu communications latches at some point during boot.
+	ROM_REGION16_LE(0x30000, "subprogram", 0)
+	ROM_DEFAULT_BIOS("v142")
+
+	ROM_SYSTEM_BIOS(0, "v142", "Version 142 - Used with Program ROM v9 and v10")
+	ROMX_LOAD("kn5000_subprogram_v142.rom", 0x000000, 0x030000, CRC(fe3b640a) SHA1(5c3a2b9311318c19e1a29ca460dea693bcb2c405), ROM_BIOS(0))
+
+	ROM_SYSTEM_BIOS(1, "v141", "Version 141 - Used with Program ROM v7 and v8")
+	ROMX_LOAD("kn5000_subprogram_v141.rom", 0x000000, 0x030000, CRC(4f6ea155) SHA1(39b0dd7b23abd3cdfedce65dd4fef0e2ab16ab69), ROM_BIOS(1))
+
+	ROM_SYSTEM_BIOS(2, "v140", "Version 140 - Used with Program ROM v5 and v6")
+	ROMX_LOAD("kn5000_subprogram_v140.rom", 0x000000, 0x030000, CRC(d9a537aa) SHA1(b7f471522ab3125e5eb42c7368d57a56084ce32a), ROM_BIOS(2))
+
+	ROM_SYSTEM_BIOS(3, "v139", "Version 139 - Used with Program ROM v4")
+	ROMX_LOAD("kn5000_subprogram_v139.rom", 0x000000, 0x030000, NO_DUMP, ROM_BIOS(3))
 
 	ROM_REGION16_LE(0x1000000, "waveform", 0)
 	ROM_LOAD("kn5000_waveform_rom.ic304", 0x000000, 0x400000, NO_DUMP)
