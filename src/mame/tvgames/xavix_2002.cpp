@@ -349,7 +349,8 @@ void xavix_i2c_jmat_state::xavix2002_i2c_jmat(machine_config &config)
 DEVICE_IMAGE_LOAD_MEMBER(xavix2002_super_tv_pc_state::cart_load)
 {
 	u64 length;
-	memory_region *cart_region;
+	memory_region *cart_region = nullptr;
+
 	if (m_cart->loaded_through_softlist())
 	{
 		cart_region = m_cart->memregion("prg");
