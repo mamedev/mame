@@ -353,8 +353,8 @@ DEVICE_IMAGE_LOAD_MEMBER(xavix2002_super_tv_pc_state::cart_load)
 
 	uint32_t size = m_cart->common_get_size("prg");
 
-	if (size != 0x400000)
-		return std::make_pair(image_error::UNSUPPORTED, "must be 0x400000 in size");
+	if ((size != 0x400000) && (size != 0x200000))
+		return std::make_pair(image_error::UNSUPPORTED, "must be 0x200000 or 0x400000 in size");
 
 	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_BIG);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "prg");
