@@ -8,6 +8,7 @@ license:CC0-1.0
 
 	<element name="black"><rect><color red="0.17" green="0.17" blue="0.17" /></rect></element>
 	<element name="white"><rect><color red="0.85" green="0.85" blue="0.85" /></rect></element>
+	<element name="lcdm"><rect><color red="0.7" green="0.71" blue="0.72" /></rect></element>
 
 	<element name="hlb" defstate="0">
 		<rect state="0"><color alpha="0" /></rect>
@@ -18,7 +19,32 @@ license:CC0-1.0
 		<rect state="1"><color red="1" green="1" blue="1" /></rect>
 	</element>
 
-	<element name="dice">
+	<element name="text_b2"><text string="CUB"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_b4"><text string="CLR"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_b5"><text string="BAR"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_b10"><text string="Δ"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_b15"><text string="E&#x2009;N"><color red="0.1" green="0.1" blue="0.1" /></text></element> <!-- thin space -->
+	<element name="text_b20"><text string="Δ"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_b21"><text string="S&#x2009;T"><color red="0.1" green="0.1" blue="0.1" /></text></element> <!-- thin space -->
+	<element name="text_b22"><text string="ACC"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_b23"><text string="DBL"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_b24"><text string="V&#x2009;R"><color red="0.1" green="0.1" blue="0.1" /></text></element> <!-- thin space -->
+	<element name="text_b25"><text string="B&#x2009;O"><color red="0.1" green="0.1" blue="0.1" /></text></element> <!-- thin space -->
+
+	<element name="text_b6"><text string="1"><color red="0.87" green="0.87" blue="0.87" /></text></element>
+	<element name="text_b7"><text string="2"><color red="0.87" green="0.87" blue="0.87" /></text></element>
+	<element name="text_b8"><text string="3"><color red="0.87" green="0.87" blue="0.87" /></text></element>
+	<element name="text_b9"><text string="4"><color red="0.87" green="0.87" blue="0.87" /></text></element>
+	<element name="text_b11"><text string="5"><color red="0.87" green="0.87" blue="0.87" /></text></element>
+	<element name="text_b12"><text string="6"><color red="0.87" green="0.87" blue="0.87" /></text></element>
+	<element name="text_b13"><text string="7"><color red="0.87" green="0.87" blue="0.87" /></text></element>
+	<element name="text_b14"><text string="8"><color red="0.87" green="0.87" blue="0.87" /></text></element>
+	<element name="text_b16"><text string="9"><color red="0.87" green="0.87" blue="0.87" /></text></element>
+	<element name="text_b17"><text string="10"><color red="0.87" green="0.87" blue="0.87" /></text></element>
+	<element name="text_b18"><text string="11"><color red="0.87" green="0.87" blue="0.87" /></text></element>
+	<element name="text_b19"><text string="12"><color red="0.87" green="0.87" blue="0.87" /></text></element>
+
+	<element name="dice1">
 		<rect>
 			<bounds x="0" y="0" width="10" height="10" />
 			<color red="0.1" green="0.1" blue="0.1" />
@@ -49,58 +75,79 @@ license:CC0-1.0
 		</disk>
 	</element>
 
-	<element name="text_b2"><text string="CUB"><color red="0.1" green="0.1" blue="0.1" /></text></element>
-	<element name="text_b4"><text string="CLR"><color red="0.1" green="0.1" blue="0.1" /></text></element>
-	<element name="text_b5"><text string="BAR"><color red="0.1" green="0.1" blue="0.1" /></text></element>
-	<element name="text_b10"><text string="Δ"><color red="0.1" green="0.1" blue="0.1" /></text></element>
-	<element name="text_b15"><text string="E&#x2009;N"><color red="0.1" green="0.1" blue="0.1" /></text></element> <!-- thin space -->
-	<element name="text_b20"><text string="Δ"><color red="0.1" green="0.1" blue="0.1" /></text></element>
-	<element name="text_b21"><text string="S&#x2009;T"><color red="0.1" green="0.1" blue="0.1" /></text></element> <!-- thin space -->
-	<element name="text_b22"><text string="ACC"><color red="0.1" green="0.1" blue="0.1" /></text></element>
-	<element name="text_b23"><text string="DBL"><color red="0.1" green="0.1" blue="0.1" /></text></element>
-	<element name="text_b24"><text string="V&#x2009;R"><color red="0.1" green="0.1" blue="0.1" /></text></element> <!-- thin space -->
-	<element name="text_b25"><text string="B&#x2009;O"><color red="0.1" green="0.1" blue="0.1" /></text></element> <!-- thin space -->
+	<element name="dice2">
+		<rect>
+			<bounds xc="5" yc="5" width="10" height="10" />
+			<color red="1" green="1" blue="1" />
+		</rect>
 
-	<element name="text_b6"><text string="1"><color red="0.87" green="0.87" blue="0.87" /></text></element>
-	<element name="text_b7"><text string="2"><color red="0.87" green="0.87" blue="0.87" /></text></element>
-	<element name="text_b8"><text string="3"><color red="0.87" green="0.87" blue="0.87" /></text></element>
-	<element name="text_b9"><text string="4"><color red="0.87" green="0.87" blue="0.87" /></text></element>
-	<element name="text_b11"><text string="5"><color red="0.87" green="0.87" blue="0.87" /></text></element>
-	<element name="text_b12"><text string="6"><color red="0.87" green="0.87" blue="0.87" /></text></element>
-	<element name="text_b13"><text string="7"><color red="0.87" green="0.87" blue="0.87" /></text></element>
-	<element name="text_b14"><text string="8"><color red="0.87" green="0.87" blue="0.87" /></text></element>
-	<element name="text_b16"><text string="9"><color red="0.87" green="0.87" blue="0.87" /></text></element>
-	<element name="text_b17"><text string="10"><color red="0.87" green="0.87" blue="0.87" /></text></element>
-	<element name="text_b18"><text string="11"><color red="0.87" green="0.87" blue="0.87" /></text></element>
-	<element name="text_b19"><text string="12"><color red="0.87" green="0.87" blue="0.87" /></text></element>
+		<rect>
+			<bounds xc="5" yc="5" width="6.66" height="10" />
+			<color red="0" green="0" blue="0" />
+		</rect>
+		<rect>
+			<bounds xc="5" yc="5" width="10" height="6.66" />
+			<color red="0" green="0" blue="0" />
+		</rect>
 
+		<disk>
+			<bounds xc="1.67" yc="1.67" width="3.34" height="3.34" />
+			<color red="0" green="0" blue="0" />
+		</disk>
+		<disk>
+			<bounds xc="8.33" yc="1.67" width="3.34" height="3.34" />
+			<color red="0" green="0" blue="0" />
+		</disk>
+		<disk>
+			<bounds xc="1.67" yc="8.33" width="3.34" height="3.34" />
+			<color red="0" green="0" blue="0" />
+		</disk>
+		<disk>
+			<bounds xc="8.33" yc="8.33" width="3.34" height="3.34" />
+			<color red="0" green="0" blue="0" />
+		</disk>
 
-<!-- 7seg display -->
+		<disk>
+			<bounds xc="1.67" yc="1.67" width="2.8" height="2.8" />
+			<color red="1" green="1" blue="1" />
+		</disk>
+		<disk>
+			<bounds xc="8.33" yc="1.67" width="2.8" height="2.8" />
+			<color red="1" green="1" blue="1" />
+		</disk>
+		<disk>
+			<bounds xc="1.67" yc="8.33" width="2.8" height="2.8" />
+			<color red="1" green="1" blue="1" />
+		</disk>
+		<disk>
+			<bounds xc="8.33" yc="8.33" width="2.8" height="2.8" />
+			<color red="1" green="1" blue="1" />
+		</disk>
 
-	<element name="digit" defstate="0">
-		<led7seg><color red="1.0" green="0.1" blue="0.15" /></led7seg>
+		<rect>
+			<bounds xc="5" yc="5" width="6.66" height="9.46" />
+			<color red="1" green="1" blue="1" />
+		</rect>
+		<rect>
+			<bounds xc="5" yc="5" width="9.46" height="6.66" />
+			<color red="1" green="1" blue="1" />
+		</rect>
 	</element>
-
-	<group name="display">
-		<element               ref="digit"><bounds x="0" y="0" width="0.66" height="1" /></element> <!-- N/C -->
-		<element name="digit0" ref="digit"><bounds x="1" y="0" width="0.66" height="1" /></element>
-		<element name="digit1" ref="digit"><bounds x="2" y="0" width="0.66" height="1" /></element>
-		<element name="digit2" ref="digit"><bounds x="3" y="0" width="0.66" height="1" /></element>
-		<element name="digit3" ref="digit"><bounds x="4" y="0" width="0.66" height="1" /></element>
-		<element               ref="digit"><bounds x="5" y="0" width="0.66" height="1" /></element> <!-- N/C -->
-		<element name="digit4" ref="digit"><bounds x="6" y="0" width="0.66" height="1" /></element>
-		<element name="digit5" ref="digit"><bounds x="7" y="0" width="0.66" height="1" /></element>
-		<element               ref="digit"><bounds x="8" y="0" width="0.66" height="1" /></element> <!-- N/C -->
-	</group>
 
 
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="9" right="35.5" top="1.5" bottom="37.25" />
+		<bounds left="9" right="35.5" top="0.243" bottom="36.75" />
 
-		<group ref="display"><bounds x="10" y="4.5" width="24.5" height="2.75" /></group>
+		<!-- lcd -->
+		<screen index="0"><bounds xc="22.25" y="2.493" width="24.5" height="5.257" /></screen>
+		<element ref="lcdm" blend="multiply"><bounds xc="22.25" y="2.493" width="25" height="5.757" /></element>
 
+		<element ref="dice2" blend="multiply"><bounds xc="26.49" yc="5.12" width="4.4" height="4.4" /></element>
+		<element ref="dice2" blend="multiply"><bounds xc="31.32" yc="5.12" width="4.4" height="4.4" /></element>
+
+		<!-- button panel -->
 		<element ref="white"><bounds x="10" y="10" width="4.5" height="4.5" /></element> <!-- ON switch is here -->
 		<element ref="white"><bounds x="15" y="10" width="4.5" height="4.5" /></element>
 		<element ref="white"><bounds x="20" y="10" width="4.5" height="4.5" /></element>
@@ -128,7 +175,7 @@ license:CC0-1.0
 		<element ref="white"><bounds x="30" y="30" width="4.5" height="4.5" /></element>
 
 		<element ref="text_b2"><bounds x="15.25" y="10.5" width="4" height="3.5" /></element>
-		<element ref="dice"><bounds xc="22.25" yc="12.25" width="2.7" height="2.7" /></element>
+		<element ref="dice1"><bounds xc="22.25" yc="12.25" width="2.7" height="2.7" /></element>
 		<element ref="text_b4"><bounds x="25.25" y="10.5" width="4" height="3.5" /></element>
 		<element ref="text_b5"><bounds x="30.25" y="10.5" width="4" height="3.5" /></element>
 
