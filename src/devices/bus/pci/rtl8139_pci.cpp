@@ -15,7 +15,7 @@ https://admin.pci-ids.ucw.cz/read/PC/10ec/8139
 **************************************************************************************************/
 
 #include "emu.h"
-#include "RTL8139_PCI.h"
+#include "rtl8139_pci.h"
 
 #define LOG_WARN      (1U << 1)
 
