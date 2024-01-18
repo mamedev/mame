@@ -352,7 +352,6 @@ Campaign ban Daisenryaku 2 Unit Kaizou Pack
 Software House Parsley
 ======================
 image 2
-Be Rain
 
 Softhouse Aladdin
 =================
@@ -1761,6 +1760,30 @@ Weapon bar goes under some playfield elements during gameplay, on stage 1 pick a
 			<feature name="part_id" value="Opening Disk" />
 			<dataarea name="flop" size="1261824">
 				<rom name="battletech (1992)(crossmedia)(disk 3 of 3)(opening).dim" size="1261824" crc="bab3c811" sha1="f81e18e98cc3be079a9dadc919b07650cc1c3666" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="berain">
+		<description>Be Rain</description>
+		<year>1992</year>
+		<publisher>ソフトウェアハウスぱせり (Software House Parsley)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="1281968">
+				<rom name="berain_a.d88" size="1281968" crc="1fbbbe87" sha1="f5f590078658f7a436242b8e7ba0a41f4c97bba4" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1281968">
+				<rom name="berain_b.d88" size="1281968" crc="acff6777" sha1="a991bd67a37e0cd9b8dad40841ef115a1d56d012" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C" />
+			<dataarea name="flop" size="1281968">
+				<rom name="berain_c.d88" size="1281968" crc="b192ea5f" sha1="879b876880fe91f00b7c4e38d551c818ebc1701b" />
 			</dataarea>
 		</part>
 	</software>
@@ -22928,6 +22951,19 @@ sold through Takeru vending machines -->
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="akazopa">
+		<description>Akazukin Cha Cha no Chotto dake yo - Otameshi Plus Alpha ver 0.53</description>
+		<year>1996</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="alt_title" value="赤ずきんチャチャのチョットダケヨ・ヲタ飯版ＰＬＵＳα" />
+		<info name="developer" value="Psijack" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1281968">
+				<rom name="akazukin cha cha no chotto dake yo - otameshi plus alpha.d88" size="1281968" crc="f4c2371c" sha1="e5d8668e4a5b1aff9b3049af787bd12e85c9b96d" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="akazukin">
 		<description>Akazukin Monogatari</description>
@@ -29645,6 +29681,21 @@ Expects to read track data from [FDC] drive 1, works if same disk loaded.
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261824">
 				<rom name="prostitute maker (1993)(t&amp;h project)(disk 2 of 2)(disk b).dim" size="1261824" crc="30305694" sha1="8cd92477877fa9a88cead22d186ef7f9dc10d781" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Title is confirmed in executable -->
+	<!-- Game plays in Tate mode -->
+	<software name="prote">
+		<description>Prote Pruste</description>
+		<year>1999</year>
+		<publisher>Soft Bank</publisher>
+		<info name="alt_title" value="プロト プラスト" />
+		<info name="developer" value="ChinaSpark" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="proto.xdf" size="1261568" crc="89a16b9b" sha1="c288242843f7c3e808d3b6fbf0959da7c45bf7b3" />
 			</dataarea>
 		</part>
 	</software>
