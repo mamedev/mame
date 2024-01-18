@@ -15,6 +15,7 @@
 #include "sonicvibes.h"
 #include "sw1000xg.h"
 #include "rtl8029as_pci.h"
+#include "rtl8139_pci.h"
 #include "opti82c861.h"
 
 DEFINE_DEVICE_TYPE(PCI_SLOT, pci_slot_device, "pci_slot", "PCI extension motherboard port")
@@ -104,6 +105,7 @@ void pci_cards(device_slot_interface &device)
 	// 0x01 - mass storage controllers
 	// 0x02 - network controllers
 	device.option_add("rtl8029as",      RTL8029AS_PCI);
+	device.option_add("rtl8139",        RTL8139_PCI);
 
 	// 0x03 - display controllers
 	device.option_add("virge",          VIRGE_PCI);
