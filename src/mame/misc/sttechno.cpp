@@ -331,8 +331,8 @@ void sttechno_state::bank_write_enable_w(uint16_t data)
 
 void sttechno_state::data_w(offs_t offset, uint16_t data)
 {
-	if (m_bank >= 0 && m_bank <= 2) {
-		const offs_t offs = offset + (0x100000 * m_bank);
+	if (m_bank <= 2) {
+		const offs_t offs = offset + (0x10'0000 * m_bank);
 		if (offs < 0x100 / 2)
 			m_sound->write(offs, data);
 		else
@@ -348,8 +348,8 @@ void sttechno_state::data_w(offs_t offset, uint16_t data)
 
 uint16_t sttechno_state::data_r( offs_t offset)
 {
-	if (m_bank >= 0 && m_bank <= 2) {
-		const offs_t offs = offset + (0x100000 * m_bank);
+	if (m_bank <= 2) {
+		const offs_t offs = offset + (0x10'0000 * m_bank);
 		if (offs < 0x100 / 2)
 			return m_sound->read(offs);
 		else
@@ -466,7 +466,7 @@ uint16_t sttechno_state::sttga1_video_flash_r(offs_t offset)
 
 void sttechno_state::sttga1_video_flash_write_enable_w(offs_t offset, uint16_t data)
 {
-	// If it's set to 1 then 0xa00000 addresses flash, and if it's 0 then it addresses RAM?
+	// If it's set to 1 then 0xa0'0000 addresses flash, and if it's 0 then it addresses RAM?
 	m_sttga1_video_flash_write_enable = data != 0;
 }
 

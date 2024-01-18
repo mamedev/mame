@@ -10,7 +10,7 @@ All known officially released games are dumped, 6 total.
 <softwarelist name="ctvboy" description="Gakken Compact Vision TV Boy cartridges">
 
 	<software name="chitaikuu">
-		<description>Chi Taikuu Daisakusen</description>
+		<description>Chitaikuu Daisakusen</description>
 		<year>1983</year>
 		<publisher>Gakken</publisher>
 		<info name="alt_title" value="地対空大作戦"/>
