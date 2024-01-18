@@ -158,16 +158,17 @@ void kn5000_state::maincpu_mem(address_map &map)
 
 void kn5000_state::subcpu_mem(address_map &map)
 {
-	//map(0x??0000, 0x??ffff).r("to_subcpu_latch", FUNC(generic_latch_8_device::read)); // @ IC22
-	//map(0x??0000, 0x??ffff).w("to_maincpu_latch", FUNC(generic_latch_8_device::write)); // @ IC23
+	// There seems to also be devices at 110000, 130000 and 1e0000
+
+	map(0x000000, 0x0fffff).ram(); // 1Mbyte = 2 * 4Mbit DRAMs @ IC28, IC29
+	map(0x120000, 0x12ffff).r("to_subcpu_latch", FUNC(generic_latch_8_device::read)); // @ IC22
+	map(0x120000, 0x12ffff).w("to_maincpu_latch", FUNC(generic_latch_8_device::write)); // @ IC23
 	//map(0x??????, 0x??????).rw(FUNC(kn5000_state::tone_generator_r), FUNC(kn5000_state::tone_generator_w)); // @ IC303
 	//map(0x??????, 0x??????).rw(FUNC(kn5000_state::dsp1_r), FUNC(kn5000_state::dsp1_w)); // @ IC311
-	//map(0x?00000, 0x?fffff).ram(); // 1Mbyte = 2 * 4Mbit DRAMs @ IC28, IC29
-	//map(0x??0000, 0x?1ffff).rom().region("mask", 0); // 1Mbit MASK ROM @ IC30
 
 	// This is not necessarily correct.
 	// Just silencing oslog messages for the subcpu while we don't have a proper ROM dump.
-	map(0xfe0000, 0xffffff).rom().region("mask", 0);
+	map(0xfe0000, 0xffffff).rom().region("mask", 0); // 1Mbit MASK ROM @ IC30
 
 	//Note:
 	// DSP2 @ IC302 uses a serial bus
