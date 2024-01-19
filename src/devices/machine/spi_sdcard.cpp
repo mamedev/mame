@@ -297,7 +297,8 @@ void spi_sdcard_device::do_command()
 
 		case 13: // CMD13 - SEND_STATUS
 			m_data[0] = 0; // TODO
-			send_data(1, SD_STATE_STBY);
+			m_data[1] = 0;
+			send_data(2, SD_STATE_STBY);
 			break;
 
 		case 16: // CMD16 - SET_BLOCKLEN

@@ -3,6 +3,11 @@
 
 	Spectrum Next Layer2
 
+TODO:
+* clipping
+* scroll
+* resolution != 0
+
 **********************************************************************/
 
 #include "emu.h"

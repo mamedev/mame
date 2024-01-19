@@ -197,7 +197,10 @@ private:
 	bool nr_8f_mapping_mode_pentagon_1024() const { return m_nr_8f_mapping_mode == 0b11; }
 	bool nr_8f_mapping_mode_pentagon_1024_en() const { return nr_8f_mapping_mode_pentagon_1024() && BIT(~m_port_eff7_data, 2); }
 
-	u32 internal_port_enable() const { return ~0; } // TODO
+	u32 internal_port_enable() const { return ((m_nr_89_bus_port_enable && m_nr_85_internal_port_enable) << 24)
+		| ((m_nr_88_bus_port_enable && m_nr_84_internal_port_enable) << 16)
+		| ((m_nr_87_bus_port_enable && m_nr_83_internal_port_enable) << 8)
+		| (m_nr_86_bus_port_enable && m_nr_82_internal_port_enable); }
 	bool port_ff_io_en() const { return BIT(internal_port_enable(), 0); }
 	bool port_7ffd_io_en() const { return BIT(internal_port_enable(), 1); }
 	bool port_dffd_io_en() const { return BIT(internal_port_enable(), 2); }
@@ -1436,8 +1439,8 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		bank_update(1);
 		break;
 	case 0x05:
-		m_nr_05_joy0 = (BIT(nr_wr_dat, 3) << 3) | BIT(nr_wr_dat, 6, 3);
-		m_nr_05_joy1 = (BIT(nr_wr_dat, 1) << 3) | BIT(nr_wr_dat, 4, 3);
+		m_nr_05_joy0 = (BIT(nr_wr_dat, 3) << 2) | BIT(nr_wr_dat, 6, 2);
+		m_nr_05_joy1 = (BIT(nr_wr_dat, 1) << 2) | BIT(nr_wr_dat, 4, 2);
 		break;
 	case 0x06:
 		m_nr_06_hotkey_cpu_speed_en = BIT(nr_wr_dat, 7);
