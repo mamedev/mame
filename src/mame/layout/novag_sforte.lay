@@ -358,7 +358,7 @@ license:CC0-1.0
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="-12.5" right="114" top="-1" bottom="88" />
+		<bounds left="-12.5" right="114" top="0" bottom="88" />
 
 		<group ref="sb_board"><bounds x="4" y="3" width="80" height="80" /></group>
 		<group ref="sb_ui"><bounds x="-11" y="3" width="10" height="80" /></group>
