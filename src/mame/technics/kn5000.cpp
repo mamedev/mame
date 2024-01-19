@@ -411,8 +411,18 @@ ROM_START(kn5000)
 
 	// Note: I've never seen a version 1 main board.
 
+	// Note: Even though this "subprogram" address range contain executable code for the subcpu, it is actually loaded by the maincpu
+	//       from a flash rom and then transfered to the subcpu RAM via the inter-cpu communications latches at some point during boot.
+	ROM_REGION16_LE(0x30000, "subprogram", 0)
+	ROMX_LOAD("kn5000_subprogram_v142.rom", 0x000000, 0x030000, CRC(fe3b640a) SHA1(5c3a2b9311318c19e1a29ca460dea693bcb2c405), ROM_BIOS(0)) // v10
+	ROMX_LOAD("kn5000_subprogram_v142.rom", 0x000000, 0x030000, CRC(fe3b640a) SHA1(5c3a2b9311318c19e1a29ca460dea693bcb2c405), ROM_BIOS(1)) // v9
+	ROMX_LOAD("kn5000_subprogram_v141.rom", 0x000000, 0x030000, CRC(4f6ea155) SHA1(39b0dd7b23abd3cdfedce65dd4fef0e2ab16ab69), ROM_BIOS(2)) // v8
+	ROMX_LOAD("kn5000_subprogram_v141.rom", 0x000000, 0x030000, CRC(4f6ea155) SHA1(39b0dd7b23abd3cdfedce65dd4fef0e2ab16ab69), ROM_BIOS(3)) // v7
+	ROMX_LOAD("kn5000_subprogram_v140.rom", 0x000000, 0x030000, CRC(d9a537aa) SHA1(b7f471522ab3125e5eb42c7368d57a56084ce32a), ROM_BIOS(4)) // v6
+	ROMX_LOAD("kn5000_subprogram_v140.rom", 0x000000, 0x030000, CRC(d9a537aa) SHA1(b7f471522ab3125e5eb42c7368d57a56084ce32a), ROM_BIOS(5)) // v5
+	ROMX_LOAD("kn5000_subprogram_v139.rom", 0x000000, 0x030000, NO_DUMP, ROM_BIOS(6)) // v4
 
-	ROM_REGION16_LE(0x20000, "mask", 0) // subcpu (boot rom?)
+	ROM_REGION16_LE(0x20000, "mask", 0) // subcpu boot rom
 	ROM_LOAD("kn5000_mask_rom.ic30", 0x00000, 0x20000, NO_DUMP)
 	// hack to keep the CPU from touching SFRs arbitrarily while we do not have a proper ROM dump:
 	ROM_FILL(0x000000, 1, 0x68) // 68 fe = infinite loop
@@ -433,24 +443,6 @@ ROM_START(kn5000)
 
 	ROM_REGION16_LE(0x400000, "rhythm_data", 0)
 	ROM_LOAD("kn5000_rhythm_data_rom.ic14", 0x000000, 0x400000, CRC(76d11a5e) SHA1(e4b572d318c9fe7ba00e5b44ea783e89da9c68bd))
-
-
-	// Note: Even though this "subprogram" address range contain executable code for the subcpu, it is actually loaded by the maincpu
-	//       from a flash rom and then transfered to the subcpu RAM via the inter-cpu communications latches at some point during boot.
-	ROM_REGION16_LE(0x30000, "subprogram", 0)
-	ROM_DEFAULT_BIOS("v142")
-
-	ROM_SYSTEM_BIOS(0, "v142", "Version 142 - Used with Program ROM v9 and v10")
-	ROMX_LOAD("kn5000_subprogram_v142.rom", 0x000000, 0x030000, CRC(fe3b640a) SHA1(5c3a2b9311318c19e1a29ca460dea693bcb2c405), ROM_BIOS(0))
-
-	ROM_SYSTEM_BIOS(1, "v141", "Version 141 - Used with Program ROM v7 and v8")
-	ROMX_LOAD("kn5000_subprogram_v141.rom", 0x000000, 0x030000, CRC(4f6ea155) SHA1(39b0dd7b23abd3cdfedce65dd4fef0e2ab16ab69), ROM_BIOS(1))
-
-	ROM_SYSTEM_BIOS(2, "v140", "Version 140 - Used with Program ROM v5 and v6")
-	ROMX_LOAD("kn5000_subprogram_v140.rom", 0x000000, 0x030000, CRC(d9a537aa) SHA1(b7f471522ab3125e5eb42c7368d57a56084ce32a), ROM_BIOS(2))
-
-	ROM_SYSTEM_BIOS(3, "v139", "Version 139 - Used with Program ROM v4")
-	ROMX_LOAD("kn5000_subprogram_v139.rom", 0x000000, 0x030000, NO_DUMP, ROM_BIOS(3))
 
 	ROM_REGION16_LE(0x1000000, "waveform", 0)
 	ROM_LOAD("kn5000_waveform_rom.ic304", 0x000000, 0x400000, NO_DUMP)
