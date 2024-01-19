@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
 
-#ifndef MAME_SOUND_DS2416_H
-#define MAME_SOUND_DS2416_H
+#ifndef MAME_BUS_PCI_DS2416_H
+#define MAME_BUS_PCI_DS2416_H
 
 #pragma once
 

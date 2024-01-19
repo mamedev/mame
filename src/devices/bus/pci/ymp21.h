@@ -3,12 +3,15 @@
 
 // PCI interfacing gate array common to the sw1000xg and the ds2416
 
-#ifndef MAME_SOUND_YMP21_H
-#define MAME_SOUND_YMP21_H
+#ifndef MAME_BUS_PCI_YMP21_H
+#define MAME_BUS_PCI_YMP21_H
 
 #pragma once
 
 #include "pci_slot.h"
+
+#include <array>
+
 
 class ymp21_device : public pci_card_device {
 protected:
@@ -28,8 +31,8 @@ private:
 
 	void map(address_map &map);
 
-	TIMER_CALLBACK_MEMBER(uart_rx); 
-	TIMER_CALLBACK_MEMBER(uart_tx); 
+	TIMER_CALLBACK_MEMBER(uart_rx);
+	TIMER_CALLBACK_MEMBER(uart_tx);
 
 	void uart_data_w(offs_t offset, u8 data);
 	u8 uart_data_r(offs_t offset);

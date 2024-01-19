@@ -135,7 +135,7 @@ void promotion3210_device::vram_w(offs_t offset, uint8_t data)
 void promotion3210_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
-//	if (1)
+//  if (1)
 	{
 		memory_space->install_readwrite_handler(0xa0000, 0xbffff, read8sm_delegate(*this, FUNC(promotion3210_device::vram_r)), write8sm_delegate(*this, FUNC(promotion3210_device::vram_w)));
 

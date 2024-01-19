@@ -1,14 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
 
-#ifndef MAME__SONICVIBES_H
-#define MAME__SONICVIBES_H
+#ifndef MAME_BUS_PCI_SONICVIBES_H
+#define MAME_BUS_PCI_SONICVIBES_H
 
 #pragma once
 
 #include "pci_slot.h"
+
 #include "bus/pc_joy/pc_joy.h"
 #include "sound/ymopl.h"
+
 
 class sonicvibes_device : public pci_card_device
 {
@@ -39,4 +41,4 @@ private:
 
 DECLARE_DEVICE_TYPE(SONICVIBES, sonicvibes_device)
 
-#endif // MAME__SONICVIBES_H
+#endif // MAME_BUS_PCI_SONICVIBES_H

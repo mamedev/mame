@@ -36,9 +36,9 @@ void sw1000xg_device::h8_map(address_map &map)
 
 void sw1000xg_device::swp30_map(address_map &map)
 {
-	//	map(0x000000, 0x1fffff).rom().region("swp30",         0).mirror(0x200000);
-	//	map(0x400000, 0x4fffff).rom().region("swp30",  0x800000).mirror(0x300000);
-	//	map(0x800000, 0x9fffff).rom().region("swp30", 0x1000000).mirror(0x200000);
+	//  map(0x000000, 0x1fffff).rom().region("swp30",         0).mirror(0x200000);
+	//  map(0x400000, 0x4fffff).rom().region("swp30",  0x800000).mirror(0x300000);
+	//  map(0x800000, 0x9fffff).rom().region("swp30", 0x1000000).mirror(0x200000);
 }
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \

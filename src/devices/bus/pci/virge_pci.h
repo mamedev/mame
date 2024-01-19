@@ -5,8 +5,8 @@
  *   S3 ViRGE 3D accelerator card
  */
 
-#ifndef MAME_VIDEO_VIRGE_PCI_H
-#define MAME_VIDEO_VIRGE_PCI_H
+#ifndef MAME_BUS_PCI_VIRGE_PCI_H
+#define MAME_BUS_PCI_VIRGE_PCI_H
 
 #pragma once
 

@@ -1,13 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders: Angelo Salese
 
-#ifndef MAME_VIDEO_RIVA128_H
-#define MAME_VIDEO_RIVA128_H
+#ifndef MAME_BUS_PCI_RIVA128_H
+#define MAME_BUS_PCI_RIVA128_H
 
 #pragma once
 
 #include "pci_slot.h"
 #include "video/pc_vga_nvidia.h"
+
 
 class riva128_device : public pci_card_device
 {
@@ -61,4 +62,4 @@ protected:
 DECLARE_DEVICE_TYPE(RIVA128,   riva128_device)
 DECLARE_DEVICE_TYPE(RIVA128ZX, riva128zx_device)
 
-#endif // MAME_VIDEO_RIVA128_H
+#endif // MAME_BUS_PCI_RIVA128_H

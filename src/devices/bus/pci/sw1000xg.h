@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
 
-#ifndef MAME_SOUND_SW1000XG_H
-#define MAME_SOUND_SW1000XG_H
+#ifndef MAME_BUS_PCI_SW1000XG_H
+#define MAME_BUS_PCI_SW1000XG_H
 
 #pragma once
 
@@ -10,6 +10,7 @@
 
 #include "cpu/h8/h83002.h"
 #include "sound/swp30.h"
+
 
 class sw1000xg_device : public ymp21_device {
 public:

@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders: R. Belmont
 
-#ifndef MAME_MACHINE_OPTI82C861_H
-#define MAME_MACHINE_OPTI82C861_H
+#ifndef MAME_BUS_PCI_OPTI82C861_H
+#define MAME_BUS_PCI_OPTI82C861_H
 
 #pragma once
 

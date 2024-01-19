@@ -62,8 +62,8 @@ void rtl8139_pci_device::device_start()
 {
 	pci_card_device::device_start();
 
-//	add_map( 256, M_IO, FUNC(rtl8139_pci_device::ioar_map));
-//	add_map( 256, M_MEM, FUNC(rtl8139_pci_device::memar_map));
+//  add_map( 256, M_IO, FUNC(rtl8139_pci_device::ioar_map));
+//  add_map( 256, M_MEM, FUNC(rtl8139_pci_device::memar_map));
 
 	// INTA#
 	intr_pin = 1;

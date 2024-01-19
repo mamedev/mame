@@ -8,6 +8,9 @@
 
 #include "machine/pci.h"
 
+#include <array>
+
+
 class pci_card_interface;
 
 class pci_slot_device: public device_t, public device_single_card_slot_interface<pci_card_interface>
@@ -17,7 +20,7 @@ public:
 
 	template <typename T>
 	pci_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, u8 slot, u8 irqa, u8 irqb, u8 irqc, u8 irqd, const char *dflt)
-                : pci_slot_device(mconfig, tag, owner, (uint32_t)0)
+		: pci_slot_device(mconfig, tag, owner, (uint32_t)0)
 	{
 		option_reset();
 		opts(*this);
@@ -47,21 +50,19 @@ private:
 	u8 m_slot;
 };
 
+
 class pci_card_interface : public device_interface
 {
-public:
-
 protected:
-	pci_slot_device *m_pci_slot;
+	pci_slot_device *const m_pci_slot;
 
 	pci_card_interface(const machine_config &mconfig, device_t &device);
-	virtual void interface_pre_start() override;
 };
+
 
 class pci_card_device : public pci_device, public pci_card_interface
 {
 public:
-	pci_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~pci_card_device();
 
 	void set_irq_map(u8 irqa, u8 irqb = 0xff, u8 irqc = 0xff, u8 irqd = 0xff) {
@@ -77,6 +78,8 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	pci_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	void irq_pin_w(offs_t line, int state);
 };
