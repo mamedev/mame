@@ -7922,17 +7922,16 @@ Offset [CRTC] screen
 		</part>
 	</software>
 
-
 	<software name="hilegfan" supported="no">
 		<description>Hi-Leg Fantasy (GECD)(Japan)</description>
 		<year>1994</year>
-		<publisher>Game Express</publisher>
+		<publisher>Games Express</publisher>
 		<notes><![CDATA[
-[Game Express] title, using unemulated HW slot features
+[Games Express] title, using unemulated HW slot features
 ]]></notes>
 		<info name="serial" value="GED-1011"/>
 		<info name="release" value="19940916"/>
-		<info name="usage" value="Game Express CD Card required" />
+		<info name="usage" value="Games Express CD Card required" />
 		<sharedfeat name="requirement" value="pce:gecd"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -7944,12 +7943,12 @@ Offset [CRTC] screen
 	<software name="avtanjo" supported="no">
 		<description>AV Tanjou (GECD)(Japan)</description>
 		<year>1995</year>
-		<publisher>Game Express</publisher>
+		<publisher>Games Express</publisher>
 		<notes><![CDATA[
-[Game Express] title, using unemulated HW slot features
+[Games Express] title, using unemulated HW slot features
 ]]></notes>
 		<info name="serial" value="GED-1015"/>
-		<info name="usage" value="Game Express CD Card required" />
+		<info name="usage" value="Games Express CD Card required" />
 		<sharedfeat name="requirement" value="pce:gecd"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -7961,13 +7960,13 @@ Offset [CRTC] screen
 	<software name="idolpai" supported="no">
 		<description>Bishoujo Janshi Idol Pai (GECD)(Japan)</description>
 		<year>1995</year>
-		<publisher>Game Express</publisher>
+		<publisher>Games Express</publisher>
 		<notes><![CDATA[
-[Game Express] title, using unemulated HW slot features
+[Games Express] title, using unemulated HW slot features
 ]]></notes>
 		<info name="serial" value="GED-1016"/>
 		<info name="release" value="19951110"/>
-		<info name="usage" value="Game Express CD Card required" />
+		<info name="usage" value="Games Express CD Card required" />
 		<sharedfeat name="requirement" value="pce:gecd"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -7979,13 +7978,13 @@ Offset [CRTC] screen
 	<software name="pachinko" supported="no">
 		<description>CD Bishoujo Pachinko Kyuuma Yon Shimai (Japan)(Jpn)</description>
 		<year>1995</year>
-		<publisher>Game Express</publisher>
+		<publisher>Games Express</publisher>
 		<notes><![CDATA[
-[Game Express] title, using unemulated HW slot features
+[Games Express] title, using unemulated HW slot features
 ]]></notes>
 		<info name="serial" value="GECD-1014"/>
 		<info name="release" value="19950105"/>
-		<info name="usage" value="Game Express CD Card required" />
+		<info name="usage" value="Games Express CD Card required" />
 		<sharedfeat name="requirement" value="pce:gecd"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -7997,13 +7996,13 @@ Offset [CRTC] screen
 	<software name="hanafuda" supported="no">
 		<description>CD Hanafuda Bishoujo Fan Club (GECD)(Japan)</description>
 		<year>1994</year>
-		<publisher>Game Express</publisher>
+		<publisher>Games Express</publisher>
 		<notes><![CDATA[
-[Game Express] title, using unemulated HW slot features
+[Games Express] title, using unemulated HW slot features
 ]]></notes>
 		<info name="serial" value="GED-1013"/>
 		<info name="release" value="19941125"/>
-		<info name="usage" value="Game Express CD Card required" />
+		<info name="usage" value="Games Express CD Card required" />
 		<sharedfeat name="requirement" value="pce:gecd"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -8015,13 +8014,13 @@ Offset [CRTC] screen
 	<software name="mahjong" supported="no">
 		<description>CD Mahjong Bishoujo Chuushinha (GECD)(Japan)</description>
 		<year>1993</year>
-		<publisher>Game Express</publisher>
+		<publisher>Games Express</publisher>
 		<notes><![CDATA[
-[Game Express] title, using unemulated HW slot features
+[Games Express] title, using unemulated HW slot features
 ]]></notes>
 		<info name="serial" value="GECD-1010"/>
 		<info name="release" value="19930730"/>
-		<info name="usage" value="Game Express CD Card required" />
+		<info name="usage" value="Games Express CD Card required" />
 		<sharedfeat name="requirement" value="pce:gecd"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -8033,13 +8032,13 @@ Offset [CRTC] screen
 	<software name="pachislt" supported="no">
 		<description>CD Pachisuro Bishoujo Gambler (GECD)(Japan)</description>
 		<year>1994</year>
-		<publisher>Game Express</publisher>
+		<publisher>Games Express</publisher>
 		<notes><![CDATA[
-[Game Express] title, using unemulated HW slot features
+[Games Express] title, using unemulated HW slot features
 ]]></notes>
 		<info name="serial" value="GECD-1012"/>
 		<info name="release" value="19940729"/>
-		<info name="usage" value="Game Express CD Card required" />
+		<info name="usage" value="Games Express CD Card required" />
 		<sharedfeat name="requirement" value="pce:gecd"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
