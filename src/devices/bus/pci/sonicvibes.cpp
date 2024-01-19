@@ -124,7 +124,13 @@ void sonicvibes_device::config_map(address_map &map)
 void sonicvibes_device::games_legacy_map(address_map &map)
 {
 	map(0x00, 0x03).rw(m_opl3, FUNC(ymf262_device::read), FUNC(ymf262_device::write));
+//	map(0x04, 0x04) Mixer Register Index (w/o)
+//	map(0x05, 0x05) Mixer Register Data
+//	map(0x06, 0x06) Reset
 	map(0x08, 0x09).rw(m_opl3, FUNC(ymf262_device::read), FUNC(ymf262_device::write));
+//	map(0x0a, 0x0a) Input Data (r/o)
+//	map(0x0c, 0x0c) Write Data/Command (w) Write Buffer Status (r)
+//	map(0x0e, 0x0e) Read Output Buffer Status (r/o)
 }
 
 // 530h

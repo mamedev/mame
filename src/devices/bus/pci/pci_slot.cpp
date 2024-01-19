@@ -14,6 +14,7 @@
 #include "ds2416.h"
 #include "sonicvibes.h"
 #include "sw1000xg.h"
+#include "zr36057.h"
 #include "rtl8029as_pci.h"
 #include "rtl8139_pci.h"
 #include "opti82c861.h"
@@ -127,6 +128,7 @@ void pci_cards(device_slot_interface &device)
 	device.option_add("sw1000xg",       SW1000XG);
 	device.option_add("ds2416",         DS2416);
 	device.option_add("sonicvibes",     SONICVIBES);
+	device.option_add("zr36057",        ZR36057_PCI);
 
 	// 0x05 - memory controllers
 	// 0x06 - bridge devices

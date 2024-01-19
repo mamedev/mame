@@ -5440,6 +5440,8 @@ if (BUSES["PCI"]~=null) then
 		MAME_DIR .. "src/devices/bus/pci/ds2416.h",
 		MAME_DIR .. "src/devices/bus/pci/sonicvibes.cpp",
 		MAME_DIR .. "src/devices/bus/pci/sonicvibes.h",
+		MAME_DIR .. "src/devices/bus/pci/zr36057.cpp",
+		MAME_DIR .. "src/devices/bus/pci/zr36057.h",
 		MAME_DIR .. "src/devices/bus/pci/rtl8029as_pci.cpp",
 		MAME_DIR .. "src/devices/bus/pci/rtl8029as_pci.h",
 		MAME_DIR .. "src/devices/bus/pci/rtl8139_pci.cpp",
