@@ -18,6 +18,9 @@
 #include "emu.h"
 #include "vt100_kbd.h"
 
+#include "speaker.h"
+
+//#define VERBOSE 1
 #include "logmacro.h"
 
 

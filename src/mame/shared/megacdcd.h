@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_SHARED_SEGACDCD_H
-#define MAME_SHARED_SEGACDCD_H
+#ifndef MAME_SHARED_MEGACDCD_H
+#define MAME_SHARED_MEGACDCD_H
 
 #include "imagedev/cdromimg.h"
 #include "machine/timer.h"
@@ -193,4 +193,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(LC89510_TEMP, lc89510_temp_device)
 
-#endif // MAME_SHARED_SEGACDCD_H
+#endif // MAME_SHARED_MEGACDCD_H

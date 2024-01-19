@@ -10,8 +10,10 @@
 #include "cpu/sh/sh7604.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
+
 #include "emupal.h"
 #include "screen.h"
+
 
 class sega_32x_device : public device_t, public device_palette_interface, public device_sound_interface, public device_video_interface
 {

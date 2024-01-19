@@ -1,12 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:
 
-#ifndef MAME_VIDEO_ZR36057_PCI_H
-#define MAME_VIDEO_ZR36057_PCI_H
+#ifndef MAME_BUS_PCI_ZR36057_H
+#define MAME_BUS_PCI_ZR36057_H
 
 #pragma once
 
 #include "pci_slot.h"
+
 
 class zr36057_device : public pci_card_device
 {
@@ -35,4 +36,4 @@ private:
 
 DECLARE_DEVICE_TYPE(ZR36057_PCI, zr36057_device)
 
-#endif // MAME_VIDEO_ZR36057_PCI_H
+#endif // MAME_BUS_PCI_ZR36057_H
