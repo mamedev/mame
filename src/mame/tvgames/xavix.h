@@ -189,6 +189,9 @@ protected:
 	virtual uint8_t read_io1(uint8_t direction);
 	virtual void write_io0(uint8_t data, uint8_t direction);
 	virtual void write_io1(uint8_t data, uint8_t direction);
+
+	void set_xavix_cpumaps(machine_config &config);
+
 	required_ioport m_in0;
 	required_ioport m_in1;
 	required_ioport_array<8> m_an_in;
@@ -607,9 +610,7 @@ class xavix_i2c_state : public xavix_state
 public:
 	xavix_i2c_state(const machine_config &mconfig, device_type type, const char *tag)
 		: xavix_state(mconfig, type, tag),
-		m_i2cmem(*this, "i2cmem"),
-		hackaddress1(-1),
-		hackaddress2(-1)
+		m_i2cmem(*this, "i2cmem")
 	{ }
 
 	void xavix_i2c_24lc04(machine_config &config);
@@ -624,21 +625,10 @@ public:
 	void xavix2002_i2c_24c04(machine_config &config);
 	void xavix2002_i2c_mrangbat(machine_config& config);
 
-	void init_epo_efdx()
-	{
-		init_xavix();
-		hackaddress1 = 0x958a;
-		hackaddress2 = 0x8524;
-	}
-
 protected:
 	virtual void write_io1(uint8_t data, uint8_t direction) override;
 
 	required_device<i2cmem_device> m_i2cmem;
-
-private:
-	int hackaddress1;
-	int hackaddress2;
 };
 
 class xavix_i2c_ltv_tam_state : public xavix_i2c_state
@@ -725,6 +715,7 @@ public:
 	void xavix_cart_popira(machine_config &config);
 	void xavix_cart_ddrfammt(machine_config &config);
 	void xavix_cart_evio(machine_config &config);
+	void xavix_cart_hikara(machine_config &config);
 
 protected:
 
@@ -969,10 +960,8 @@ public:
 		m_extraiowrite(0)
 	{ }
 
-	int ekara_multi0_r();
-	int ekara_multi1_r();
-
-//  void xavix_ekara(machine_config &config);
+	virtual int ekara_multi0_r();
+	virtual int ekara_multi1_r();
 
 protected:
 
@@ -984,6 +973,27 @@ protected:
 
 	uint8_t m_extraioselect;
 	uint8_t m_extraiowrite;
+};
+
+class xavix_hikara_state : public xavix_ekara_state
+{
+public:
+	xavix_hikara_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_ekara_state(mconfig, type, tag),
+		m_extra2(*this, "EXTRA2"),
+		m_extra3(*this, "EXTRA3")
+	{ }
+
+	virtual int ekara_multi0_r() override;
+	virtual int ekara_multi1_r() override;
+	int ekara_multi2_r();
+	int ekara_multi3_r();
+
+protected:
+
+	required_ioport m_extra2;
+	required_ioport m_extra3;
+
 };
 
 

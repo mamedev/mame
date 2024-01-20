@@ -29,8 +29,9 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	static constexpr unsigned WIDTH = 80;
-	static constexpr unsigned HEIGHT = 50;
+	static inline constexpr unsigned WIDTH = 80;
+	static inline constexpr unsigned HEIGHT = 50;
+
 	uint32_t tp_update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void scroll_line();
 	void write_char(uint8_t data);

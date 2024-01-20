@@ -7,7 +7,7 @@ nVidia NV3/NV3T Riva 128
 
 TODO:
 - Windows 98 punts device detection by attempting to modify the (supposedly) PMC ID.
-\- Maybe the card is supposed to send an INTA trap on the write attempt?
+- Maybe the card is supposed to send an INTA trap on the write attempt?
 
 References:
 - https://envytools.readthedocs.io/en/latest/hw/mmio.html?highlight=mmio#nv3-g80-mmio-map
@@ -32,7 +32,7 @@ DEFINE_DEVICE_TYPE(RIVA128,   riva128_device,   "riva128",   "SGS-Thompson/nVidi
 DEFINE_DEVICE_TYPE(RIVA128ZX, riva128zx_device, "riva128zx", "SGS-Thompson/nVidia Riva 128 ZX (NV3T)")
 
 riva128_device::riva128_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, type, tag, owner, clock)
+	: pci_card_device(mconfig, type, tag, owner, clock)
 	, m_svga(*this, "svga")
 	, m_vga_rom(*this, "vga_rom")
 {
@@ -78,7 +78,7 @@ void riva128_device::device_add_mconfig(machine_config &config)
 
 void riva128_device::device_start()
 {
-	pci_device::device_start();
+	pci_card_device::device_start();
 
 	add_map( 16*1024*1024, M_MEM, FUNC(riva128_device::mmio_map));
 	add_map(128*1024*1024, M_MEM, FUNC(riva128_device::vram_aperture_map));
@@ -96,7 +96,7 @@ void riva128_device::device_start()
 
 void riva128_device::device_reset()
 {
-	pci_device::device_reset();
+	pci_card_device::device_reset();
 
 	// TODO: to be checked
 	command = 0x0000;
@@ -110,7 +110,7 @@ void riva128_device::device_reset()
 // TODO: counter-check everything
 void riva128_device::config_map(address_map &map)
 {
-	pci_device::config_map(map);
+	pci_card_device::config_map(map);
 	map(0x34, 0x34).lr8(NAME([] () { return 0x44; }));
 
 //  map(0x40, 0x43) subsystem ID alias (writeable)

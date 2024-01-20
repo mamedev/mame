@@ -27,7 +27,7 @@ men queens instead of kings, perhaps due to a translation from French (dame).
 Hardware notes (Compact Dames Computer):
 - PCB label: DH1-PE-009 REV.1
 - Hitachi HD6301Y0P MCU, 8MHz or 12MHz (LC osc, no XTAL)
-- 20+8 LEDs, buttons sensor board, piezo
+- 20+8 LEDs, 5*10 buttons sensor board, piezo
 
 *******************************************************************************/
 

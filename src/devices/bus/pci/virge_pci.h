@@ -5,15 +5,15 @@
  *   S3 ViRGE 3D accelerator card
  */
 
-#ifndef MAME_VIDEO_VIRGE_PCI_H
-#define MAME_VIDEO_VIRGE_PCI_H
+#ifndef MAME_BUS_PCI_VIRGE_PCI_H
+#define MAME_BUS_PCI_VIRGE_PCI_H
 
 #pragma once
 
-#include "machine/pci.h"
+#include "pci_slot.h"
 #include "video/s3virge.h"
 
-class virge_pci_device : public pci_device
+class virge_pci_device : public pci_card_device
 {
 public:
 	template <typename T>

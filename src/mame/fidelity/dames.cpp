@@ -104,8 +104,8 @@ u8 dsc_state::read_board_row(u8 row)
 {
 	u8 data = 0;
 
-	// inputs to sensorboard translation table
-	static const u8 lut_i2sb[64] =
+	// inputs to sensorboard translation table (0xff is invalid)
+	static const u8 lut_board[64] =
 	{
 		0x00, 0x50, 0x60, 0x70, 0x40, 0x30, 0x20, 0x10,
 		0x01, 0x51, 0x61, 0x71, 0x41, 0x31, 0x21, 0x11,
@@ -119,7 +119,7 @@ u8 dsc_state::read_board_row(u8 row)
 
 	for (int i = 0; i < 8; i++)
 	{
-		u8 pos = lut_i2sb[row * 8 + i];
+		u8 pos = lut_board[row * 8 + i];
 		data = data << 1 | m_board->read_sensor(pos & 0xf, pos >> 4);
 	}
 

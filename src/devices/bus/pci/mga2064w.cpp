@@ -21,7 +21,7 @@
 DEFINE_DEVICE_TYPE(MGA2064W, mga2064w_device, "mga2064w", "Matrox Millennium \"IS-STORM / MGA-2064W\"")
 
 mga2064w_device::mga2064w_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, MGA2064W, tag, owner, clock)
+	: pci_card_device(mconfig, MGA2064W, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, m_svga(*this, "svga")
 	, m_vga_rom(*this, "vga_rom")
@@ -63,7 +63,7 @@ void mga2064w_device::device_add_mconfig(machine_config &config)
 
 void mga2064w_device::device_start()
 {
-	pci_device::device_start();
+	pci_card_device::device_start();
 	// NB: following is swapped on G400
 	add_map(    16*1024, M_MEM, FUNC(mga2064w_device::mgabase1_map));
 	add_map(8*1024*1024, M_MEM, FUNC(mga2064w_device::mgabase2_map));
@@ -74,7 +74,7 @@ void mga2064w_device::device_start()
 
 void mga2064w_device::device_reset()
 {
-	pci_device::device_reset();
+	pci_card_device::device_reset();
 
 	// INTA#
 	intr_pin = 1;
@@ -91,7 +91,7 @@ device_memory_interface::space_config_vector mga2064w_device::memory_space_confi
 
 void mga2064w_device::config_map(address_map &map)
 {
-	pci_device::config_map(map);
+	pci_card_device::config_map(map);
 //  map(0x40, 0x43) OPTION
 	map(0x44, 0x47).rw(FUNC(mga2064w_device::mga_index_r), FUNC(mga2064w_device::mga_index_w));
 	map(0x48, 0x4b).rw(FUNC(mga2064w_device::mga_data_r), FUNC(mga2064w_device::mga_data_w));

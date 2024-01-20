@@ -576,7 +576,7 @@ uint32_t exerion_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 		int code2 = code;
 
 		int const color = ((flags >> 1) & 0x03) | ((code >> 5) & 0x04) | (code & 0x08) | (m_sprite_palette * 16);
-		gfx_element *gfx = doubled ? m_gfxdecode->gfx(2) : m_gfxdecode->gfx(1);
+		gfx_element *gfx = m_gfxdecode->gfx(doubled ? 2 : 1);
 
 		if (m_cocktail_flip)
 		{
@@ -595,13 +595,14 @@ uint32_t exerion_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 				code &= ~0x10, code2 |= 0x10;
 
 			gfx->transmask(bitmap, cliprect, code2, color, xflip, yflip, x, y + gfx->height(),
-							m_palette->transpen_mask(*gfx, color, 0x10));
+					m_palette->transpen_mask(*gfx, color, 0x10));
 		}
 
 		gfx->transmask(bitmap, cliprect, code, color, xflip, yflip, x, y,
-						m_palette->transpen_mask(*gfx, color, 0x10));
+				m_palette->transpen_mask(*gfx, color, 0x10));
 
-		if (doubled) i += 4;
+		if (doubled)
+			i += 4;
 	}
 
 	// draw the visible text layer
@@ -613,9 +614,9 @@ uint32_t exerion_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 			int const offs = sx + sy * 64;
 			m_gfxdecode->gfx(0)->transpen(bitmap, cliprect,
-				m_videoram[offs] + 256 * m_char_bank,
-				((m_videoram[offs] & 0xf0) >> 4) + m_char_palette * 16,
-				m_cocktail_flip, m_cocktail_flip, x, y, 0);
+					m_videoram[offs] + 256 * m_char_bank,
+					((m_videoram[offs] & 0xf0) >> 4) + m_char_palette * 16,
+					m_cocktail_flip, m_cocktail_flip, x, y, 0);
 		}
 
 	return 0;

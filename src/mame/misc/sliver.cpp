@@ -95,7 +95,8 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_screen(*this, "screen"),
 		m_soundlatch(*this, "soundlatch"),
-		m_colorram(*this, "colorram") { }
+		m_palette(*this, "palette")
+	{ }
 
 	void sliver(machine_config &config);
 
@@ -120,7 +121,7 @@ private:
 	required_device<i8051_device> m_audiocpu;
 	required_device<screen_device> m_screen;
 	required_device<generic_latch_8_device> m_soundlatch;
-	required_shared_ptr<uint8_t> m_colorram;
+	required_device<palette_device> m_palette;
 	bitmap_rgb32 m_bitmap_fg;
 	bitmap_rgb32 m_bitmap_bg;
 
@@ -140,7 +141,7 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void plot_pixel_rgb(int x, int y, uint32_t r, uint32_t g, uint32_t b);
-	void plot_pixel_pal(int x, int y, int addr);
+	void plot_pixel_pal(int x, int y, u8 addr);
 	void blit_gfx();
 	void render_jpeg();
 
@@ -173,16 +174,12 @@ void sliver_state::plot_pixel_rgb(int x, int y, uint32_t r, uint32_t g, uint32_t
 	m_bitmap_bg.pix(y, x) = r | (g<<8) | (b<<16);
 }
 
-void sliver_state::plot_pixel_pal(int x, int y, int addr)
+void sliver_state::plot_pixel_pal(int x, int y, u8 addr)
 {
 	if (y < 0 || x < 0 || x > 383 || y > 255)
 		return;
 
-	uint32_t b=(m_colorram[addr] << 2) | (m_colorram[addr] & 0x3);
-	uint32_t g=(m_colorram[addr+0x100] << 2) | (m_colorram[addr+0x100] & 3);
-	uint32_t r=(m_colorram[addr+0x200] << 2) | (m_colorram[addr+0x200] & 3);
-
-	m_bitmap_fg.pix(y, x) = r | (g<<8) | (b<<16);
+	m_bitmap_fg.pix(y, x) = m_palette->pen(addr);
 }
 
 void sliver_state::fifo_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -213,7 +210,8 @@ void sliver_state::blit_gfx()
 
 	while (tmpptr < m_fptr)
 	{
-		int x,y,romdata;
+		int x,y;
+		u8 romdata;
 		int w,h;
 		int romoffs=m_fifo[tmpptr+0]+(m_fifo[tmpptr+1] << 8)+(m_fifo[tmpptr+2] << 16);
 
@@ -510,7 +508,7 @@ INPUT_PORTS_END
 
 void sliver_state::ramdac_map(address_map &map)
 {
-	map(0x000, 0x3ff).ram().share("colorram");
+	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER ( sliver_state::obj_irq_cb )

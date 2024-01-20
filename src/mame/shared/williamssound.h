@@ -7,6 +7,10 @@
     Functions to emulate general the various Williams/Midway sound cards.
 
 ****************************************************************************/
+#ifndef MAME_SHARED_WILLIAMSSOUND_H
+#define MAME_SHARED_WILLIAMSSOUND_H
+
+#pragma once
 
 #include "machine/6821pia.h"
 #include "cpu/m6800/m6800.h"
@@ -315,3 +319,5 @@ private:
 	required_device<hc55516_device> m_hc;
 	u8 m_dummy = 0;   // needed for save-state support
 };
+
+#endif // MAME_SHARED_WILLIAMSSOUND_H

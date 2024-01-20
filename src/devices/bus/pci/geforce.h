@@ -1,14 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders: Angelo Salese
 
-#ifndef MAME_VIDEO_GEFORCE_H
-#define MAME_VIDEO_GEFORCE_H
+#ifndef MAME_BUS_PCI_GEFORCE_H
+#define MAME_BUS_PCI_GEFORCE_H
 
 #pragma once
 
+#include "rivatnt.h"
+
 #include "machine/pci.h"
 #include "video/pc_vga_nvidia.h"
-#include "rivatnt.h"
+
 
 class geforce256_device : public rivatnt2_device
 {
@@ -47,4 +49,4 @@ DECLARE_DEVICE_TYPE(GEFORCE256_DDR,   geforce256_ddr_device)
 DECLARE_DEVICE_TYPE(QUADRO,           quadro_device)
 
 
-#endif // MAME_VIDEO_GEFORCE_H
+#endif // MAME_BUS_PCI_GEFORCE_H

@@ -273,7 +273,6 @@ protected:
 	required_device<dac_bit_interface> m_dac;
 	optional_ioport_array<3> m_inputs;
 
-	bool m_rotate = true;
 	u8 m_select = 0;
 	u8 m_7seg_data = 0;
 	u8 m_led_data = 0;
@@ -288,6 +287,7 @@ protected:
 	void update_dsr();
 	void mux_w(offs_t offset, u8 data);
 	u8 input_r(offs_t offset);
+	virtual u8 board_r() { return m_board->read_rank(m_select, true); }
 	void leds_w(offs_t offset, u8 data);
 	void digit_w(offs_t offset, u8 data);
 };
@@ -391,9 +391,7 @@ class excel68k_state : public eag_state
 public:
 	excel68k_state(const machine_config &mconfig, device_type type, const char *tag) :
 		eag_state(mconfig, type, tag)
-	{
-		m_rotate = false;
-	}
+	{ }
 
 	// machine configs
 	void fex68k(machine_config &config);
@@ -407,6 +405,9 @@ private:
 	void fex68km2_map(address_map &map);
 	void fex68km3_map(address_map &map);
 	void fex68km4_map(address_map &map);
+
+	// I/O handlers
+	virtual u8 board_r() override { return m_board->read_file(m_select); }
 };
 
 
@@ -455,13 +456,7 @@ u8 eag_state::input_r(offs_t offset)
 	// a1-a3,d7: multiplexed inputs (active low)
 	// read chessboard sensors
 	if (m_select < 8)
-	{
-		// EAG chessboard is rotated 90 degrees
-		if (m_rotate)
-			data = m_board->read_rank(m_select, true);
-		else
-			data = m_board->read_file(m_select);
-	}
+		data = board_r();
 
 	// read button panel
 	else if (m_select == 8)

@@ -352,7 +352,6 @@ Campaign ban Daisenryaku 2 Unit Kaizou Pack
 Software House Parsley
 ======================
 image 2
-Be Rain
 
 Softhouse Aladdin
 =================
@@ -1761,6 +1760,30 @@ Weapon bar goes under some playfield elements during gameplay, on stage 1 pick a
 			<feature name="part_id" value="Opening Disk" />
 			<dataarea name="flop" size="1261824">
 				<rom name="battletech (1992)(crossmedia)(disk 3 of 3)(opening).dim" size="1261824" crc="bab3c811" sha1="f81e18e98cc3be079a9dadc919b07650cc1c3666" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="berain">
+		<description>Be Rain</description>
+		<year>1992</year>
+		<publisher>ソフトウェアハウスぱせり (Software House Parsley)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="1281968">
+				<rom name="berain_a.d88" size="1281968" crc="1fbbbe87" sha1="f5f590078658f7a436242b8e7ba0a41f4c97bba4" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1281968">
+				<rom name="berain_b.d88" size="1281968" crc="acff6777" sha1="a991bd67a37e0cd9b8dad40841ef115a1d56d012" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C" />
+			<dataarea name="flop" size="1281968">
+				<rom name="berain_c.d88" size="1281968" crc="b192ea5f" sha1="879b876880fe91f00b7c4e38d551c818ebc1701b" />
 			</dataarea>
 		</part>
 	</software>
@@ -18752,7 +18775,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	<software name="sion">
 		<description>Sion</description>
 		<year>1991</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="sion (1991)(soft bank).dim" size="1261824" crc="213b0d42" sha1="4200246bb5e2a597e213006356261ffadc724e37" />
@@ -18760,11 +18783,11 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 		</part>
 	</software>
 
-	<!-- Distributed with Oh! X magazine -->
+	<!-- Distributed with Oh! X magazine May 1992 issue -->
 	<software name="sion2">
-		<description>Sion II</description>
+		<description>Sion II: The First Attack.</description>
 		<year>1992</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="sion ii (1992)(soft bank).dim" size="1261824" crc="6609eb49" sha1="5242f21637dcedd362713f47c7fac4776efc6ac4" />
@@ -18776,7 +18799,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	<software name="sion4">
 		<description>Sion IV</description>
 		<year>1995</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="sion iv (1995)(soft bank).dim" size="1261824" crc="fffe63a8" sha1="f75c14ee70aefb0e873774c517598a748a899a15" />
@@ -21471,7 +21494,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	<software name="ohxzmus1">
 		<description>Bessatsu Oh! X Music System 01 Z-Music v1.0</description>
 		<year>1991</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261568">
@@ -21495,7 +21518,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	<software name="ohxzmus1a" cloneof="ohxzmus1">
 		<description>Bessatsu Oh! X Music System 01 Z-Music v1.0 (alt)</description>
 		<year>1991</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261824">
@@ -21520,7 +21543,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	<software name="ohxzmus2">
 		<description>Bessatsu Oh! X Music System 02 Z-Music v2.0</description>
 		<year>1991</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261568">
@@ -21562,7 +21585,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	<software name="ohxzmus2a" cloneof="ohxzmus2">
 		<description>Bessatsu Oh! X Music System 02 Z-Music v2.0 (alt)</description>
 		<year>1991</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261824">
@@ -21604,7 +21627,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	<software name="ohxs10">
 		<description>Oh! X - Soukan 10 - Shuunen Kinen Pro-68K Sono 4 - Sion 2</description>
 		<year>1992</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="oh x soukan 10 shuunen kinen pro-68k sono 4 sion 2 (1992)(soft bank).dim" size="1261824" crc="76bbf14e" sha1="35aa2a42a85af361e397d1a40b90b5a86f2fc098" />
@@ -21616,7 +21639,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	<software name="ohx9006">
 		<description>Oh! X 1990.06 - Soukan 8 - Shuunen Kinen PRO-68K</description>
 		<year>1990</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="pro68k_8_anniversary.hdm" size="1261568" crc="967393a6" sha1="40f7b544e65c2f88c57737d7624037882a717542" />
@@ -21627,7 +21650,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	<software name="ohx9006a" cloneof="ohx9006">
 		<description>Oh! X 1990.06 - Soukan 8 - Shuunen Kinen PRO-68K (alt)</description>
 		<year>1990</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="oh x 1990.06 soukan 8 shuunen kinen pro-68k (1990)(soft bank).dim" size="1261824" crc="f74a44c8" sha1="06096e3fcfd1f1e33a255b28c2beaef1cea419f3" />
@@ -21639,7 +21662,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	<software name="ohx9105">
 		<description>Oh! X 1991.05 - Ougoun Shuukan PRO-68K</description>
 		<year>1991</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="pro68k_ogonshukan.hdm" size="1261568" crc="0dad2e7a" sha1="66a6617d9b63fb6d3f07b408307937fc53d905e2" />
@@ -21650,7 +21673,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	<software name="ohx9105a" cloneof="ohx9105">
 		<description>Oh! X 1991.05 - Ougoun Shuukan PRO-68K (alt)</description>
 		<year>1991</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="oh x 1991.05 ougou shuukan pro-68k (1991)(soft bank).dim" size="1261824" crc="8cb03c87" sha1="dce2135fedbfb751368bae0fcb6ea7ac81792d15" />
@@ -21663,7 +21686,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	<software name="ohx91xx">
 		<description>Oh! X 1991.?? - Ginga Shinnen PRO-68k</description>
 		<year>1991</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="pro68k_happy_new_year.hdm" size="1261568" crc="43793bd3" sha1="8d83508dd3a5aeb4dff08941223cc8dc1c8e674a" />
@@ -21675,7 +21698,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	<software name="ohx9206">
 		<description>Oh! X 1992.06 - Soukan X - Shuunen Kinen PRO-68K</description>
 		<year>1992</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="pro68k_x_anniversary.hdm" size="1261568" crc="9605f006" sha1="5492d995cfe61919e5083423c0a1eff24ca1a396" />
@@ -21686,7 +21709,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	<software name="ohx9206a" cloneof="ohx9206">
 		<description>Oh! X 1992.06 - Soukan X - Shuunen Kinen PRO-68K (alt)</description>
 		<year>1992</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="oh x 1992.06 soukan x shuunen kinen pro-68k (1992)(soft bank).dim" size="1261824" crc="52a80f0a" sha1="49bb89e5c9e531f710ac542c7f91b0f81d9fac69" />
@@ -21697,7 +21720,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	<software name="ohx9207">
 		<description>Oh! X 1992.07 - DoGA CGA System v2.50</description>
 		<year>1992</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1474816">
 				<rom name="oh x 1992.07 doga cga system v2.50 (1992)(soft bank).dim" size="1474816" crc="f47374da" sha1="803bdbb9fa3c7f1106993df33a6726fa53879162" />
@@ -21708,7 +21731,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	<software name="ohx9310">
 		<description>Oh! X 1993.10 - Aki Matsuri PRO-68K</description>
 		<year>1993</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1474816">
 				<rom name="oh x 1993.10 aki matsuri pro-68k (1993)(soft bank).dim" size="1474816" crc="49bb290a" sha1="c4d7d4615b382024aa07a138a015f36ca82b53c9" />
@@ -21719,7 +21742,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	<software name="ohx9403">
 		<description>Oh! X 1994.03 - Hinamatsuri PRO-68K</description>
 		<year>1994</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="oh x 1994.03 hinamatsuri pro-68k (1994)(soft bank).dim" size="1261824" crc="df0a437b" sha1="e1f8c758cf1d03360b10f1c8b36b0d12a93a8d9a" />
@@ -21730,7 +21753,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	<software name="ohx9405">
 		<description>Oh! X 1994.05 - Koi no Bori PRO-68K</description>
 		<year>1994</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="oh x 1994.05 koi no bori pro-68k (1994)(soft bank).dim" size="1261824" crc="b2f80d35" sha1="d0b2b62c80b33f4b0213b2e6b47408f8db1626e8" />
@@ -21741,7 +21764,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	<software name="ohx9407">
 		<description>Oh! X 1994.07 - CGA Nyuumon Kit Genie</description>
 		<year>1994</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="oh x 1994.07 cga nyuumon kit genie (1994)(soft bank).dim" size="1261824" crc="e7196476" sha1="2ef826740ce9d5257bdd6a8064ccc10cb185b7c2" />
@@ -21753,7 +21776,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	<software name="ohx9410">
 		<description>Oh! X 1994.10 - Momiji Gari PRO-68K</description>
 		<year>1994</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="oh_x_momijigari.xdf" size="1261568" crc="9a8cc220" sha1="a4557c6a6d587da5aad8a0361da5fc2db02f36b3" />
@@ -21764,7 +21787,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	<software name="ohx9410a" cloneof="ohx9410">
 		<description>Oh! X 1994.10 - Momiji Gari PRO-68K (alt)</description>
 		<year>1994</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="oh x 1994.10 momiji gari pro-68k (1994)(soft bank).dim" size="1261824" crc="e0b3575f" sha1="0b012396a08f21e49dfbb828de3838ab7b4a3c4a" />
@@ -21776,7 +21799,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	<software name="ohx9412">
 		<description>Oh! X 1994.12 - XL/Image Otameshi-ban +α</description>
 		<year>1994</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="oh_x_xl_image_trial.xdf" size="1261568" crc="5441cc42" sha1="719d606281f1c6885ed42eadd254156958a109d1" />
@@ -21787,7 +21810,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	<software name="ohx9412a" cloneof="ohx9412">
 		<description>Oh! X 1994.12 - XL/Image Otameshi-ban +α (alt)</description>
 		<year>1994</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="oh x 1994.12 xl image + alpha (1994)(soft bank).dim" size="1261824" crc="e95647b8" sha1="8e11cfa23ee9686c6469f2a44fadb9d3f6bb0c31" />
@@ -21798,7 +21821,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	<software name="ohx9505">
 		<description>Oh! X 1995.05 Oh! - Dennou Club</description>
 		<year>1995</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="oh x 1995.05 oh dennou club (1995)(soft bank).dim" size="1261824" crc="9867e7d4" sha1="7faadd752dbfe791436bff00e9d6999f9f04d300" />
@@ -21809,7 +21832,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	<software name="ohx9508">
 		<description>Oh! X 1995.08 - Shochuu Mimai PRO-68K</description>
 		<year>1995</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="oh x 1995.08 shochuu mimai pro-68k (1995)(soft bank).dim" size="1261824" crc="0ef7e907" sha1="6ff2746efb769b150c15d37fe6d7be4e088a806b" />
@@ -21820,7 +21843,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	<software name="ohx9512">
 		<description>Oh! X 1995.12 - Merry X'mas PRO-68K</description>
 		<year>1995</year>
-		<publisher>Soft Bank</publisher>
+		<publisher>ソフトバンク (SoftBank)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261824">
@@ -22925,6 +22948,19 @@ sold through Takeru vending machines -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="akazukin_cha_cha_cg.xdf" size="1261568" crc="6062e4cf" sha1="910c826b387519601db369b8064e4eb488cdd00c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="akazopa">
+		<description>Akazukin Cha Cha no Chotto dake yo - Otameshi Plus Alpha ver 0.53</description>
+		<year>1996</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="alt_title" value="赤ずきんチャチャのチョットダケヨ・ヲタ飯版ＰＬＵＳα" />
+		<info name="developer" value="Psijack" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1281968">
+				<rom name="akazukin cha cha no chotto dake yo - otameshi plus alpha.d88" size="1281968" crc="f4c2371c" sha1="e5d8668e4a5b1aff9b3049af787bd12e85c9b96d" />
 			</dataarea>
 		</part>
 	</software>
@@ -29645,6 +29681,21 @@ Expects to read track data from [FDC] drive 1, works if same disk loaded.
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261824">
 				<rom name="prostitute maker (1993)(t&amp;h project)(disk 2 of 2)(disk b).dim" size="1261824" crc="30305694" sha1="8cd92477877fa9a88cead22d186ef7f9dc10d781" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Title is confirmed in executable -->
+	<!-- Game plays in Tate mode -->
+	<software name="prote">
+		<description>Prote Pruste</description>
+		<year>1999</year>
+		<publisher>ソフトバンク (SoftBank)</publisher>
+		<info name="alt_title" value="プロト プラスト" />
+		<info name="developer" value="ChinaSpark" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="proto.xdf" size="1261568" crc="89a16b9b" sha1="c288242843f7c3e808d3b6fbf0959da7c45bf7b3" />
 			</dataarea>
 		</part>
 	</software>

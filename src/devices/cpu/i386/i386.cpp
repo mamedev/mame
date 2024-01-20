@@ -203,7 +203,7 @@ bool i386_device::i386_translate_address(int intention, bool debug, offs_t *addr
 	bool user = (intention & TR_USER) ? true : false;
 	bool write = (intention & TR_WRITE) ? true : false;
 
-	if (!(m_cr[0] & 0x80000000))
+	if (!(m_cr[0] & CR0_PG))
 	{
 		if (entry)
 			*entry = 0x77;
@@ -213,7 +213,7 @@ bool i386_device::i386_translate_address(int intention, bool debug, offs_t *addr
 	uint32_t page_dir = m_program->read_dword(pdbr + directory * 4);
 	if (page_dir & 1)
 	{
-		if ((page_dir & 0x80) && (m_cr[4] & 0x10))
+		if ((page_dir & 0x80) && (m_cr[4] & CR4_PSE))
 		{
 			a = (page_dir & 0xffc00000) | (a & 0x003fffff);
 			if (debug)
@@ -283,7 +283,7 @@ bool i386_device::i386_translate_address(int intention, bool debug, offs_t *addr
 
 bool i386_device::translate_address(int pl, int type, uint32_t *address, uint32_t *error)
 {
-	if (!(m_cr[0] & 0x80000000)) // Some (very few) old OS's won't work with this
+	if (!(m_cr[0] & CR0_PG)) // Some (very few) old OS's won't work with this
 		return true;
 
 	const vtlb_entry *table = vtlb_table();
@@ -2152,9 +2152,9 @@ void i386_device::register_state_i386_x87()
 {
 	register_state_i386();
 
-	state_add( X87_CTRL,   "x87_CW", m_x87_cw).formatstr("%04X");
-	state_add( X87_STATUS, "x87_SW", m_x87_sw).formatstr("%04X");
-	state_add( X87_TAG,    "x87_TAG", m_x87_tw).formatstr("%04X");
+	state_add(X87_CTRL,  "x87_CW", m_x87_cw).formatstr("%04X");
+	state_add(X87_STATUS,"x87_SW", m_x87_sw).formatstr("%04X");
+	state_add(X87_TAG,  "x87_TAG", m_x87_tw).formatstr("%04X");
 	state_add( X87_ST0,    "ST0", m_debugger_temp ).callexport().formatstr("%15s");
 	state_add( X87_ST1,    "ST1", m_debugger_temp ).callexport().formatstr("%15s");
 	state_add( X87_ST2,    "ST2", m_debugger_temp ).callexport().formatstr("%15s");
@@ -2800,7 +2800,7 @@ void i386_device::execute_run()
 				{
 					uint32_t phys_addr = 0;
 					uint32_t error;
-					phys_addr = (m_cr[0] & (1 << 31)) ? translate_address(m_CPL, TR_FETCH, &m_dr[i], &error) : m_dr[i];
+					phys_addr = (m_cr[0] & CR0_PG) ? translate_address(m_CPL, TR_FETCH, &m_dr[i], &error) : m_dr[i];
 					if(breakpoint_length != 0) // Not one byte in length? logerror it, I have no idea how this works on real processors.
 					{
 						LOGMASKED(LOG_INVALID_OPCODE, "i386: Breakpoint length not 1 byte on an instruction breakpoint\n");

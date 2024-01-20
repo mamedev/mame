@@ -811,6 +811,18 @@ ROM_START(hook_401)
 	ROM_LOAD("hook-voi.u21", 0x040000, 0x40000, CRC(b5c275e2) SHA1(ff51c2007132a1310ac53b5ab2a4af7d0ab15948))
 ROM_END
 
+ROM_START(hook_f401)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("hokcpua.401", 0x0000, 0x10000, CRC(20223298) SHA1(a8063765db947b059eadaad6654ed0c5cad9198d)) // unknown if there is a special french CPU 4.01, as the dump only included the display ROM
+	ROM_REGION(0x20000, "dmdcpu", 0)
+	ROM_LOAD("hook_display_f401.bin", 0x00000, 0x20000, CRC(b501edbd) SHA1(df369f569243d633aa24edd4289ace645e4a9358))
+	ROM_REGION(0x010000, "soundcpu", 0)
+	ROM_LOAD("hooksnd.u7", 0x8000, 0x8000, CRC(642f45b3) SHA1(a4b2084f32e52a596547384906281d04424332fc))
+	ROM_REGION(0x1000000, "bsmt", 0)
+	ROM_LOAD("hook-voi.u17", 0x000000, 0x40000, CRC(6ea9fcd2) SHA1(bffc66df542e06dedddaa403b5513446d9d6fc8c))
+	ROM_LOAD("hook-voi.u21", 0x040000, 0x40000, CRC(b5c275e2) SHA1(ff51c2007132a1310ac53b5ab2a4af7d0ab15948))
+ROM_END
+
 ROM_START(hook_401_p)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("hokcpua.401", 0x0000, 0x10000, CRC(20223298) SHA1(a8063765db947b059eadaad6654ed0c5cad9198d))
@@ -821,6 +833,18 @@ ROM_START(hook_401_p)
 	ROM_REGION(0x1000000, "bsmt", 0)
 	ROM_LOAD("hook-voi_p.u17", 0x000000, 0x40000, CRC(667cf0fb) SHA1(dd12a7fa280384381ebc5c3d8add652eddb294fb))
 	ROM_LOAD("hook-voi_p.u21", 0x040000, 0x40000, CRC(04775416) SHA1(5675aea39b76178ff476b0f627223a1c75a3d6b7))
+ROM_END
+
+ROM_START(hook_400)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("hokcpua.401", 0x0000, 0x10000, CRC(20223298) SHA1(a8063765db947b059eadaad6654ed0c5cad9198d))// no CPU-Version < 4.01 yet
+	ROM_REGION(0x20000, "dmdcpu", 0)
+	ROM_LOAD("hook_dspl_4.00.bin", 0x00000, 0x20000, CRC(14d2387c) SHA1(b3e78ffa7e9bdd4bc7fe08e3a0a8631178a5fc09))
+	ROM_REGION(0x010000, "soundcpu", 0)
+	ROM_LOAD("hooksnd.u7", 0x8000, 0x8000, CRC(642f45b3) SHA1(a4b2084f32e52a596547384906281d04424332fc))
+	ROM_REGION(0x1000000, "bsmt", 0)
+	ROM_LOAD("hook-voi.u17", 0x000000, 0x40000, CRC(6ea9fcd2) SHA1(bffc66df542e06dedddaa403b5513446d9d6fc8c))
+	ROM_LOAD("hook-voi.u21", 0x040000, 0x40000, CRC(b5c275e2) SHA1(ff51c2007132a1310ac53b5ab2a4af7d0ab15948))
 ROM_END
 
 ROM_START(hook_e406)
@@ -1488,6 +1512,20 @@ ROM_START(tomy_300h)
 	ROM_LOAD("tommysnd.u37", 0x180000, 0x80000, CRC(46180085) SHA1(f761c27532180de313f23b41f02341783be8938b))
 ROM_END
 
+ROM_START(tomy_201h)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("tommy_2.01_dutch_cpu.bin", 0x0000, 0x10000, CRC(9705af61) SHA1(8a302d2f217d0f10bf100606643fc1780564da67))
+	ROM_REGION(0x80000, "dmdcpu", 0)
+	ROM_LOAD("tommy_2.00_display.bin", 0x00000, 0x80000, CRC(e554e0dc) SHA1(2b3baf20280134e3a40c41e0e0c39578dd905abe))
+	ROM_REGION(0x010000, "soundcpu", 0)
+	ROM_LOAD("tommysnd.u7", 0x0000, 0x10000, CRC(ab0b4626) SHA1(31237b4f5e866710506f1336e3ca2dbd6a89385a))
+	ROM_REGION(0x1000000, "bsmt", 0)
+	ROM_LOAD("tommysnd.u17", 0x000000, 0x80000, CRC(11bb2aa7) SHA1(57b4867c109996861f45ead1ceedb7153aff852e))
+	ROM_LOAD("tommysnd.u21", 0x080000, 0x80000, CRC(bb4aeec3) SHA1(2ac6cd25b79584fa6ad2c8a36c3cc58ab8ec0206))
+	ROM_LOAD("tommysnd.u36", 0x100000, 0x80000, CRC(208d7aeb) SHA1(af8af2094d1a91c7b4ef8ac6d4f594728e97450f))
+	ROM_LOAD("tommysnd.u37", 0x180000, 0x80000, CRC(46180085) SHA1(f761c27532180de313f23b41f02341783be8938b))
+ROM_END
+
 ROM_START(tomy_102)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("tomcpua.102", 0x0000, 0x10000, CRC(e470b78e) SHA1(9d358e9d87469cdefb5c373f16c51774bbd390ea))
@@ -1851,6 +1889,19 @@ ROM_START(bay_d300)
 	ROM_LOAD("bayw.u21", 0x080000, 0x80000, CRC(b7598881) SHA1(19d1dde1cb6634a7c7b5cdb4fa01cd09cc7d7777))
 ROM_END
 
+ROM_START(bay_g300)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("baywatch_cpug_c5_3.00.bin", 0x0000, 0x10000, CRC(8f85fd10) SHA1(1fd561bf6145caf15846a776b0b92e7953fdf3ff))
+	ROM_REGION16_BE(0x100000, "dmdcpu", 0)
+	ROM_LOAD16_BYTE("baywatch_dispg_rom0_3.00.bin", 0x00000001, 0x00080000, CRC(30b0a96a) SHA1(ff0e4d4a1726ff2a553ebe4f21c0534e0a06b960))
+	ROM_LOAD16_BYTE("baywatch_dispg_rom3_3.00.bin", 0x00000000, 0x00080000, CRC(c7e50fad) SHA1(95b60855cb6718eb9c8a7231e9cd2e1c326cd1e3))
+	ROM_REGION(0x010000, "soundcpu", 0)
+	ROM_LOAD("bayw.u7", 0x0000, 0x10000, CRC(90d6d8a8) SHA1(482c5643453f21a078257aa13398845ef19cab3c))
+	ROM_REGION(0x1000000, "bsmt", 0)
+	ROM_LOAD("bayw.u17", 0x000000, 0x80000, CRC(b20fde56) SHA1(2f2db49245e4a6a8251cbe896b2437fcec88d42d))
+	ROM_LOAD("bayw.u21", 0x080000, 0x80000, CRC(b7598881) SHA1(19d1dde1cb6634a7c7b5cdb4fa01cd09cc7d7777))
+ROM_END
+
 ROM_START(bay_f201)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("baycpuf.201", 0x0000, 0x10000, CRC(d2fddeaa) SHA1(839baca46823dc72a7ef1421764815f69f0e7084))
@@ -2031,6 +2082,8 @@ GAME(1992,  hook_408,      0,        de_3_dmd1, de3, de_3_state, empty_init, ROT
 GAME(1992,  hook_404,      hook_408, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Hook (USA 4.04, display A4.01)",                                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // HOOK USA 4.04
 GAME(1992,  hook_401,      hook_408, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Hook (USA 4.01, display A4.01)",                                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // HOOK USA 4.01
 GAME(1992,  hook_401_p,    hook_408, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Hook (USA 4.01 with prototype sound, display A4.01)",                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // HOOK USA 4.01
+GAME(1992,  hook_f401,     hook_408, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Hook (USA 4.01, display F4.01)",                                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // HOOK USA 4.01 DISPLAY: HOOK F4.01
+GAME(1992,  hook_400,      hook_408, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Hook (USA 4.01, display A4.00)",                                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // HOOK USA 4.01 DISPLAY: HOOK A4.00
 GAME(1992,  hook_e406,     hook_408, de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Hook (UK 4.06, display A4.01)",                                            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // HOOK U.K. 4.06
 GAME(1993,  jupk_513,      0,        de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Jurassic Park (USA 5.13, display A5.10)",                                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // JURASSIC PARK SEP. 28, 1993 USA CPU 5.13. DISPLAY VERSION- JURASSIC A5.10 8/24/1993
 GAME(1993,  jupk_501,      jupk_513, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Jurassic Park (USA 5.01, display A5.01)",                                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // JURASSIC PARK JUNE 28, 1993 USA CPU 5.01. DISPLAY VERSION- JURASSIC A5.01 6/24/1993
@@ -2082,7 +2135,8 @@ GAME(1991,  tmnt_a07,      tmnt_104, de_3_dmdo, de3, de_3_state, empty_init, ROT
 GAME(1994,  tomy_400,      0,        de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "The Who's Tommy Pinball Wizard (USA 4.00, display A4.00)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // TOMMY APRIL 6, 1994 USA CPU 4.00. DISPLAY VERSION- TOMMY A4.00 MAY 5, 1994
 GAME(1994,  tomy_301g,     tomy_400, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "The Who's Tommy Pinball Wizard (German 3.01, display G3.00)",              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // TOMMY MARCH 22, 1994 GERMAN CPU 3.01. DISPLAY VERSION- TOMMY G3.00 FEBRUARY 16, 1994
 GAME(1994,  tomy_300h,     tomy_400, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "The Who's Tommy Pinball Wizard (Dutch 3.00, display A3.00)",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // TOMMY FEBRUARY 16, 1994 DUTCH CPU 3.00. DISPLAY VERSION- TOMMY A3.00 FEBRUARY 15, 1994
-GAME(1994,  tomy_102,      tomy_400, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "The Who's Tommy Pinball Wizard (USA 1.02, display A3.00)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // TOMMY JANUARY 26, 1994 USA CPU 1.02. DISPLAY VERSION- TOMMY A3.00 FEBRUARY 15, 1994
+GAME(1994,  tomy_201h,     tomy_400, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "The Who's Tommy Pinball Wizard (Dutch 2.01, display A2.00)",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // TOMMY FEBRUARY 16, 1994 DUTCH CPU 3.00. DISPLAY VERSION- TOMMY A3.00 FEBRUARY 15, 1994
+GAME(1994,  tomy_102,      tomy_400, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "The Who's Tommy Pinball Wizard (USA 1.02, display A3.00)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // TOMMY FEBRUARY 11, 1994 DUTCH CPU 2.01. DISPLAY VERSION- TOMMY A2.00 FEBRUARY 1, 1994
 GAME(1994,  tomy_102be,    tomy_400, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "The Who's Tommy Pinball Wizard (Belgium 1.02, display A1.02)",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // TOMMY JANUARY 26, 1994 BELGIUM CPU 1.02. DISPLAY VERSION- TOMMY A1.02 JANUARY 25, 1994
 GAME(1994,  wwfr_106,      0,        de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "WWF Royal Rumble (USA 1.06, display A1.02)",                               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // RUMBLIN' AN' A TUMBLIN' WWF WRESTLING AUG. 01, 1994 USA CPU 1.06. DISPLAY VERSION- WWF A1.02 JUNE 29, 1994
 GAME(1994,  wwfr_103,      wwfr_106, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "WWF Royal Rumble (USA 1.03, display A1.01)",                               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // RUMBLIN' AN' A TUMBLIN' WWF WRESTLING APR. 28, 1994 USA CPU 1.03. DISPLAY VERSION- WWF A1.01 APRIL 14, 1994
@@ -2107,6 +2161,7 @@ GAME(1995,  bmf_jp,        batmanf,  de_3b,     de3, de_3_state, empty_init, ROT
 GAME(1995,  bmf_time,      batmanf,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Batman Forever (Timed Play)",                                              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1995,  baywatch,      0,        de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Baywatch",                                                                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1995,  bay_d300,      baywatch, de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Baywatch (3.00 Dutch)",                                                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  bay_g300,      baywatch, de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Baywatch (3.00 German)",                                                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1995,  bay_d400,      baywatch, de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Baywatch (4.00 English)",                                                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1995,  bay_e400,      baywatch, de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Baywatch (4.00 Dutch)",                                                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1995,  bay_f201,      baywatch, de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Baywatch (2.01 French)",                                                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

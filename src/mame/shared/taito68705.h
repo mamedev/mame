@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Vas Crabb
-#ifndef MAME_SHARED_TAITO68705INTERFACE_H
-#define MAME_SHARED_TAITO68705INTERFACE_H
+#ifndef MAME_SHARED_TAITO68705_H
+#define MAME_SHARED_TAITO68705_H
 
 #pragma once
 
@@ -140,4 +140,4 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 };
 
-#endif // MAME_SHARED_TAITO68705INTERFACE_H
+#endif // MAME_SHARED_TAITO68705_H

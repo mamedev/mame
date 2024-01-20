@@ -90,9 +90,11 @@ protected:
 	virtual uint16_t offset() override;
 
 	virtual void s3_define_video_mode(void);
+	virtual bool get_interlace_mode() override { return BIT(s3.cr42, 5); }
 
 private:
 	ibm8514a_device* m_8514;
+	void refresh_pitch_offset();
 };
 
 // device type definition

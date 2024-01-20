@@ -13,8 +13,7 @@ DIP locations verified from manual for:
       - wboy
       - choplift
 
-TODO: - remove patch in nobb if possible and fully understand the
-        ports involved in the protection
+TODO: - fully understand nobb ports involved in the protection
       - different XTAL/divider configurations for some Star Jacker
         cabinets? See you.tube/-a7srHVPb_U
 
@@ -484,7 +483,7 @@ void system1_state::sound_control_w(u8 data)
 	/* bit 0 = MUTE (inverted sense on System 2) */
 	machine().sound().system_mute((data ^ m_mute_xor) & 1);
 
-	/* bit 6 = feedback from sound board that read occurrred */
+	/* bit 6 = feedback from sound board that read occurred */
 
 	/* bit 7 controls the sound CPU's NMI line */
 	m_soundcpu->set_input_line(INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
@@ -5438,6 +5437,7 @@ ROM_START( nob )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "dm03.9h", 0x0000, 0x4000, CRC(415adf76) SHA1(fbd6f8921aa3246702983ba81fa9ae53fa10c19d) )
+	ROM_RELOAD(          0x4000, 0x4000 )
 
 	ROM_REGION( 0x18000, "tiles", 0 )
 	ROM_LOAD( "dm02.13b", 0x08000, 0x8000, CRC(f12df039) SHA1(159de205f77fd74da30717054e6ddda2c0bb63d0) )
@@ -5469,6 +5469,7 @@ ROM_START( nobb )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "nobo-m.bin", 0x0000, 0x4000, CRC(415adf76) SHA1(fbd6f8921aa3246702983ba81fa9ae53fa10c19d) )
+	ROM_RELOAD(             0x4000, 0x4000 )
 
 	ROM_REGION( 0x18000, "tiles", 0 )
 	ROM_LOAD( "nobo-j.bin", 0x08000, 0x8000, CRC(f12df039) SHA1(159de205f77fd74da30717054e6ddda2c0bb63d0) )
@@ -5629,14 +5630,9 @@ void system1_state::init_nobb()
 
 //  ROM[0x10000 + 0 * 0x8000 + 0x3347] = 0x18;  // 'jr' instead of 'jr z'
 
-	/* Patch to get sound in later levels(the program enters into a tight loop)*/
-	address_space &iospace = m_maincpu->space(AS_IO);
-	u8 *ROM2 = memregion("soundcpu")->base();
-
-	ROM2[0x02f9] = 0x28;//'jr z' instead of 'jr'
-
 	init_bank44();
 
+	address_space &iospace = m_maincpu->space(AS_IO);
 	iospace.install_read_handler(0x1c, 0x1c, read8smo_delegate(*this, FUNC(system1_state::nobb_inport1c_r)));
 	iospace.install_read_handler(0x02, 0x02, read8smo_delegate(*this, FUNC(system1_state::nobb_inport22_r)));
 	iospace.install_read_handler(0x03, 0x03, read8smo_delegate(*this, FUNC(system1_state::nobb_inport23_r)));

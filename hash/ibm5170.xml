@@ -5951,10 +5951,13 @@ license:CC0-1.0
 
 	<!-- Driver Disks -->
 
-	<software name="scrlmous">
+	<software name="scrlmous" supported="no">
 		<description>Genius Scroll Mouse</description>
 		<year>2004</year>
 		<publisher>KYE Systems Corp.</publisher>
+		<notes><![CDATA[
+Windows drivers for [PS/2] and [USB] optical mouse family (VID=0x0458)
+]]></notes>
 		<info name="alt_title" value="MouseMate Software Scroll Mouse for Windows XP/Me/98/2000/2003" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="disk_serial" value="12060321100-B" />
@@ -5964,10 +5967,16 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="3c90xed">
-		<description>3Com 3c90x Etherlink Drivers</description>
+	<software name="3c90xed" supported="no">
+		<description>3Com 3C90x EtherLink PCI NICs Drivers</description>
 		<year>1999</year>
 		<publisher>3Com Corporation</publisher>
+		<notes><![CDATA[
+Various 3C90x [PCI] drivers
+Subset of EtherCD
+]]></notes>
+		<sharedfeat name="platform" value="Windows 3.11 for Workgroups, Windows 95" />
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="3com 3c90x etherlink drivers.img" size="1474560" crc="dc648ec1" sha1="e3f78391fe3063d7d73eb46e47eb412ca75d5f36"/>
@@ -5975,10 +5984,16 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="3celc53">
+	<software name="3celc53" supported="no">
 		<description>3Com EtherLink III Lan PC Card (Version 5.3)</description>
 		<year>1996</year>
 		<publisher>3Com Corporation</publisher>
+		<notes><![CDATA[
+3C589 LAN+Modem [ISA], [Jazz] and [PCMCIA] Ethernet card drivers
+Contains AutoLink software for NetWare DOS support
+]]></notes>
+		<sharedfeat name="platform" value="Windows 3.11 for Workgroups, Windows NT 3.5, Windows 95, DOS, OS/2" />
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="3com etherlink 3 lan pc card (version 5.3).img" size="1474560" crc="cf807155" sha1="f7e6e91e5b92e4cac38117fcdb8c2992e340341d"/>
@@ -5986,10 +6001,16 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="3cmlc22">
+	<software name="3cmlc22" supported="no">
 		<description>3Com Megahertz Lan 10-100 Cardbus PC Card (Version 2.2)</description>
 		<year>1999</year>
 		<publisher>3Com Corporation</publisher>
+		<notes><![CDATA[
+3C575 LAN [ISA], [PCI], [Jazz] and [PCMCIA] Ethernet card drivers
+Contains AutoLink software for NetWare DOS support
+]]></notes>
+		<sharedfeat name="platform" value="Windows 3.11 for Workgroups, Windows NT 4.0, Windows 95, DOS" />
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="3com megahertz lan 10-100 cardbus pc card (version 2.2).img" size="1474560" crc="396b570b" sha1="d45108ba37ba499b89e778b30c3ad58758046b2c"/>
@@ -5997,10 +6018,15 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="3cmd501">
+	<software name="3cmd501" supported="no">
 		<description>3Com Modem Driver (Version 5.01)</description>
 		<year>1998</year>
 		<publisher>3Com Corporation</publisher>
+		<notes><![CDATA[
+3Com and US Robotics [modem] drivers
+]]></notes>
+		<sharedfeat name="platform" value="Windows 3.11 for Workgroups, Windows NT 3.5" />
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="3com modem driver (version 5.01).img" size="1474560" crc="f62b42a4" sha1="08d678bbdd85ec171327f023b49ea62aebbed7d1"/>
@@ -6008,10 +6034,15 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="a4tiww7">
+	<software name="a4tiww7" supported="no">
 		<description>A4Tech iWheelWorks (version 7.0)</description>
 		<year>2000</year>
 		<publisher>A4Tech</publisher>
+		<notes><![CDATA[
+[PS/2] and [USB] optical mouse family drivers
+]]></notes>
+		<sharedfeat name="platform" value="Windows 3.1, Windows 95, Windows 98, Windows ME, Windows NT 4.0, Windows 2000, DOS" />
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="a4tech iwheelworks (version 7.0).img" size="1474560" crc="d514994a" sha1="1187b8595c5118d88b9bebf2bbdb74a057852dce"/>
@@ -6023,6 +6054,9 @@ license:CC0-1.0
 		<description>ASUS DVD / CD-ROM Drive Installation Disk Rev 1.5</description>
 		<year>1999</year>
 		<publisher>ASUSTek Computer</publisher>
+		<notes><![CDATA[
+ASUS [DVD] driver, supporting various early [PCI] chipsets (roughly up to Intel 82801AB/ICH), cfr. driver.txt
+]]></notes>
 		<info name="version" value="1.5" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
@@ -6067,11 +6101,14 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="cdgod55">
-		<!-- Contains drivers for various makes and models; the MAME ATAPI CD-ROM device is compatible with e.g. the "COMPAQ", "NEC", and "TATUNG" drivers -->
+	<software name="cdgod55" supported="partial">
 		<description>CD-ROM God Boot Disk Version 5.5 BETA2</description>
 		<year>1998</year>
 		<publisher>Kristopher Marciniak</publisher>
+		<notes><![CDATA[
+Contains drivers for various makes and models; [ATAPI] CD-ROM device is compatible with e.g. the "COMPAQ", "NEC", and "TATUNG" drivers
+]]></notes>
+
 		<info name="version" value="5.5 BETA2" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
@@ -6131,7 +6168,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="prolin30">
+	<software name="prolin30" supported="no">
 		<description>Compaq ProLinea 486-based PC's - Microsoft Windows 3.0 Support Diskette</description>
 		<year>1992</year>
 		<publisher>Compaq</publisher>
@@ -6145,7 +6182,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="prolin31">
+	<software name="prolin31" supported="no">
 		<description>Compaq ProLinea 486-based PC's - Microsoft Windows 3.1 Support Diskette</description>
 		<year>1992</year>
 		<publisher>Compaq</publisher>
@@ -6159,10 +6196,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="pds2keth">
+	<software name="pds2keth" supported="no">
 		<description>Compex RL2000 PnP Series Ethernet Adapter</description>
 		<year>1997</year>
 		<publisher>PDS</publisher>
+		<notes><![CDATA[
+Compex RL2000(A) PnP drivers, [ISA], [EISA], [PCI], [Jazz]
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="compex rl2000(a) pnp series ethernet adapter.img" size="1474560" crc="5f9c7545" sha1="efc5983466414aa6ca9edaae9d1dd6adc25cef84"/>
@@ -6170,10 +6210,15 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="csc4237b">
+	<software name="csc4237b" supported="no">
 		<description>Crystal Semiconductor Corp CS4237B (Version 1.80)</description>
 		<year>1996</year>
+		<!-- Cirrus Logic? -->
 		<publisher>Crystal Semiconductor Corp.</publisher>
+		<notes><![CDATA[
+[ISA] driver for CS4237B [WSS] chipset
+cs4232.inf hints for an expansion ROM check
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="crystal semiconductor corp cs4237b (version 1.80) (37bxx3d-141296-34).img" size="1474560" crc="adc33367" sha1="ead63de3a30fcf996a4c8cd2b9c6f914363ee7c3"/>
@@ -6181,10 +6226,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="diagnost">
+	<software name="diagnost" supported="no">
 		<description>Diagnostics - Test, Setup, and MDMI Utilities for Products with 640K of RAM Installed</description>
 		<year>1992</year>
 		<publisher>Compaq</publisher>
+		<notes><![CDATA[
+Needs identification about what Compaq based PC this runs with (I386 based?)
+]]></notes>
 		<info name="version" value="8.11 Rev. A" />
 		<info name="release" value="19921014"/>
 		<info name="serial" value="120200-012" />
@@ -6195,10 +6243,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="divaisdn">
+	<software name="divaisdn" supported="no">
 		<description>DIVA T/A ISDN Modem Setup Wizard for Windows 3.x</description>
 		<year>1997</year>
 		<publisher>Eicon Technology Corporation</publisher>
+		<notes><![CDATA[
+Eicon ISDN [modem] drivers
+]]></notes>
 		<info name="version" value="1 Release 4" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1 of 2" />
@@ -6324,7 +6375,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="hpdj420">
+	<software name="hpdj420" supported="no">
 		<description>HP DeskJet 420 Series Printer Software v8.5 for Windows 98, Windows 95 or 3.1x (Den, Swe, Fin, Nor)</description>
 		<year>1998</year>
 		<publisher>Hewlett-Packard</publisher>
@@ -6342,7 +6393,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="ezscsi31g">
+	<software name="ezscsi31g" supported="no">
 		<!-- dumped via Kryoflux from original media, shows as unmodified -->
 		<description>Adaptec EZ-SCSI 3.1 (German)</description>
 		<year>1995</year>
@@ -6364,7 +6415,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="ltdrv52c">
+	<software name="ltdrv52c" supported="no">
 		<description>LT Windows Modem V.90 Data+Fax Modem Version (Version 5.31)</description>
 		<year>1999</year>
 		<publisher>Lucent Technologies</publisher>
@@ -6375,10 +6426,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="hpecd136">
+	<software name="hpecd136" supported="no">
 		<description>HP SureStore External CD-Writer Plus Driver (Version 1.36)</description>
 		<year>1999</year>
 		<publisher>Hewlett-Packard</publisher>
+		<notes><![CDATA[
+External [SCSI] CD-R driver
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="hp surestore external cd-writer plus driver (version 1.36).img" size="1474560" crc="318bff31" sha1="5516f071e089d8c1273ed360a4344ec5fd25937c"/>
@@ -6427,11 +6481,14 @@ Driver for [pc_joy:magnum6_pad]
 		</part>
 	</software>
 
-	<software name="magics20">
+	<software name="magics20" supported="no">
 		<!-- from Acer CPR 1.2 recovery CD-ROM -->
 		<description>Magic S20 Sound Card</description>
 		<year>1994</year>
 		<publisher>Acer Inc.</publisher>
+		<notes><![CDATA[
+[ISA] based sound card with OPTi 82C929 and Crystal CS4231A chipsets
+]]></notes>
 		<info name="version" value="2.11A" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
@@ -6530,10 +6587,13 @@ Driver for [pc_joy:magnum6_pad]
 		</part>
 	</software>
 
-	<software name="fastart">
+	<software name="fastart" supported="no">
 		<description>MS-DOS FASTART/SYSTEM - The Compaq Personal Computer FASTART/SYSTEM Diskette</description>
 		<year>1992</year>
 		<publisher>Compaq</publisher>
+		<notes><![CDATA[
+cfr. diagnost
+]]></notes>
 		<info name="version" value="5.00 Rev. D" />
 		<info name="release" value="19920717"/>
 		<info name="serial" value="145149-001" />
@@ -6569,10 +6629,14 @@ Driver for [pc_joy:magnum6_pad]
 		</part>
 	</software>
 
-	<software name="nd010pci">
+	<software name="nd010pci" supported="no">
 		<description>NexNIC ND010 PCI Adapter (Ethernet/Fast Ethernet)</description>
 		<year>1998</year>
 		<publisher>Unex Technology Corporation</publisher>
+		<notes><![CDATA[
+Realtek OEM driver, RTL8139 [PCI] ethernet based.
+https://admin.pci-ids.ucw.cz/read/PC/10ec/8139/1429d010
+]]></notes>
 		<info name="version" value="3.02" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1153756">
@@ -6581,10 +6645,13 @@ Driver for [pc_joy:magnum6_pad]
 		</part>
 	</software>
 
-	<software name="nokiamon">
+	<software name="nokiamon" supported="no">
 		<description>Nokia Monitor Setup for Windows 95</description>
 		<year>1998</year>
 		<publisher>Nokia</publisher>
+		<notes><![CDATA[
+Various Nokia [monitor] drivers, 44x-based
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="zk0004.img" size="1474560" crc="b4be6044" sha1="25b1967cfd372ad3f6b0855d54e52ae0d6e88c9a"/>
@@ -6592,10 +6659,13 @@ Driver for [pc_joy:magnum6_pad]
 		</part>
 	</software>
 
-	<software name="nusound">
+	<software name="nusound" supported="no">
 		<description>NuSound PnP Install Disk</description>
 		<year>1995</year>
 		<publisher>Orchid</publisher>
+		<notes><![CDATA[
+[ISA] based sound card with Crystal CS4232 [WSS] and CS9233 chipsets
+]]></notes>
 		<info name="version" value="1.0" />
 		<info name="usage" value="Windows 95: 1. When NuSound is detected, select &quot;driver from disk&quot; and click &quot;OK&quot; / 2. To install applications, select &quot;start&quot; and &quot;run&quot; / 3. Type A:setup.exe (or B) and click &quot;OK&quot; / Windows: 1. From Program Manager select &quot;file&quot; and &quot;run&quot; / 2. Type A:setup.exe (or B) and click &quot;OK&quot;" />
 		<part name="flop1" interface="floppy_3_5">
@@ -6621,10 +6691,14 @@ Driver for [pc_joy:magnum6_pad]
 		</part>
 	</software>
 
-	<software name="oki400wp">
+	<software name="oki400wp" supported="no">
 		<description>Oki OL 400w Printer Driver</description>
-		<year>1993</year>
+		<!-- Year derived from file timestamps -->
+		<year>1995</year>
 		<publisher>Okidata</publisher>
+		<notes><![CDATA[
+Driver for a laser [printer]
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="oki ol400w win3x disk1.img" size="1474560" crc="bff55368" sha1="074ffea26c06dc49ff3f7f34003a5927db2767bc"/>
@@ -6641,6 +6715,7 @@ Driver for [pc_joy:magnum6_pad]
 		<description>Ontrack Disk Manager</description>
 		<year>1997</year>
 		<publisher>Quantum Data Systems</publisher>
+		<!-- TODO: test this -->
 		<part name="flop1" interface="floppy_3_5">
 			<!--
 			Ontrack Disk Manager
@@ -6661,10 +6736,13 @@ Driver for [pc_joy:magnum6_pad]
 		</part>
 	</software>
 
-	<software name="rlt81398">
+	<software name="rlt81398" supported="no">
 		<description>Realtek RTL8139-810X Fast Ethernet Adapter (Version 5.502.1231.2001)</description>
 		<year>2002</year>
 		<publisher>Realtek</publisher>
+		<notes><![CDATA[
+Realtek drivers, RTL8139 [PCI] ethernet based.
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="realtek rtl8139-810x fast ethernet adapter (version 5.502.1231.2001).img" size="1474560" crc="07953bc3" sha1="40d0945d658fbefc2aa7c46b7f5e0c834b4d57be"/>
@@ -6672,10 +6750,13 @@ Driver for [pc_joy:magnum6_pad]
 		</part>
 	</software>
 
-	<software name="rlt8139c">
+	<software name="rlt8139c" supported="no">
 		<description>Realtek RTL8139C PCI Fast Ethernet Adapter (Version 1.20)</description>
 		<year>2001</year>
 		<publisher>Realtek</publisher>
+		<notes><![CDATA[
+Realtek drivers, RTL8139C [PCI] ethernet based.
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="realtek rtl8139c pci fast ethernet adapter (version 1.20).img" size="1474560" crc="06fec5ff" sha1="9a00d8dbf12fe4680625983f1f79f6cfe3650a38"/>
@@ -6683,10 +6764,28 @@ Driver for [pc_joy:magnum6_pad]
 		</part>
 	</software>
 
-	<software name="scroll3d">
-		<description>Scroll 3D Mouse Setup Disk for PS/2 and Serial</description>
-		<year>2000?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="scroll3d" supported="no">
+		<description>Scroll 3D Mouse Setup Disk for PS/2 and Serial (v2.0)</description>
+		<year>1999</year>
+		<publisher>Aidem Systems Inc.</publisher>
+		<notes><![CDATA[
+PnP mouse for Windows 95/98 with IntelliMouse wheel support
+]]></notes>
+		<info name="version" value="2.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="scroll3d.img" size="1474560" crc="45c103d4" sha1="714fd801da425f37d6277c3cfa0e08f7fd23e083"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scroll3da" cloneof="scroll3d" supported="no">
+		<description>Scroll 3D Mouse Setup Disk for PS/2 and Serial (v1.0?)</description>
+		<year>1996</year>
+		<publisher>Aidem Systems Inc.</publisher>
+		<notes><![CDATA[
+PnP mouse for Windows 95 with IntelliMouse wheel support
+]]></notes>
 		<info name="version" value="2.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="4236544">
@@ -6702,6 +6801,7 @@ Driver for [pc_joy:magnum6_pad]
 		<description>SmartBoard Driver (DOS)</description>
 		<year>1995</year>
 		<publisher>Tasc</publisher>
+		<!-- TODO: test this -->
 		<info name="usage" value="SmartBoard SB20 or SB30 required." />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -6710,10 +6810,13 @@ Driver for [pc_joy:magnum6_pad]
 		</part>
 	</software>
 
-	<software name="s3200pci">
+	<software name="s3200pci" supported="no">
 		<description>SN-3200 PCI Ethernet Adapter Driver (Jun 15 1998)</description>
 		<year>1999</year>
 		<publisher>D-Link Systems</publisher><!-- Not 100% sure about it, but the drivers say Realtek, Seems to be a cloned N2000 Compatible Ethernet Adapter -->
+		<notes><![CDATA[
+Realtek drivers, RTL8029 [PCI] ethernet based.
+]]></notes>
 		<info name="alt_title" value="Realtek RTL8029 Ethernet Adapter" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
@@ -6855,10 +6958,14 @@ Driver for [pc_joy:magnum6_pad]
 		</part>
 	</software>
 
-	<software name="sb16ide">
+	<software name="sb16ide" supported="no">
 		<description>Creative IDE/EIDE - ATAPI drive Installation Disk</description>
-		<year>1993</year>
+		<year>1999?</year>
 		<publisher>Creative Labs</publisher>
+		<notes><![CDATA[
+Creative [IDE], [EIDE], [ATAPI] Windows 95/98 driver (sbide.sys)
+File modification dates ranges from 1992 to 1999, and setup.ins marked 2099
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="CREATIVE_DRIVERS_DISK_INSTALLATION_DISK_PN1200001301.img" size="1474560" crc="9ca3a1c7" sha1="c6cf3b49433a59f5552a963fdfa8d1099cb36d5b"/>
@@ -6866,10 +6973,14 @@ Driver for [pc_joy:magnum6_pad]
 		</part>
 	</software>
 
-	<software name="sb16tts">
+	<software name="sb16tts" supported="partial">
 		<description>Sound Blaster 16 Value Edition Text-to-Speech</description>
 		<year>1994</year>
 		<publisher>Creative Labs</publisher>
+		<notes><![CDATA[
+Working in DOS (sbtalker\read.exe)
+Untested in Windows 3.1
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="disk_serial" value="P/N: 1213501030" />
 			<dataarea name="flop" size = "1474560">
@@ -6878,10 +6989,13 @@ Driver for [pc_joy:magnum6_pad]
 		</part>
 	</software>
 
-	<software name="sndwav32">
+	<software name="sndwav32" supported="no">
 		<description>SoundWave 32 Series</description>
 		<year>1994</year>
 		<publisher>Orchid</publisher>
+		<notes><![CDATA[
+ADSP-2115 + AD1848KP [ISA] card with [SB16] and [MPU-401] compatibility, and [IDE] or [SCSI] option connectors
+]]></notes>
 		<info name="version" value="3.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Install/Driver Disk #1" />
@@ -6903,10 +7017,13 @@ Driver for [pc_joy:magnum6_pad]
 		</part>
 	</software>
 
-	<software name="sysgwmd">
+	<software name="sysgwmd" supported="no">
 		<description>Sysgration Window Mouse Driver (Version 1.01)</description>
 		<year>1996</year>
 		<publisher>Sysgration Corporation</publisher>
+		<notes><![CDATA[
+[PS/2] and [Serial] mouse with scroll-wheel
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="sysgration window mouse driver (version 1.01).img" size="1474560" crc="0b99e05d" sha1="4a21b803f1b222abf74050049e375fc9d458019c"/>
@@ -6914,7 +7031,7 @@ Driver for [pc_joy:magnum6_pad]
 		</part>
 	</software>
 
-	<software name="usrfmd2">
+	<software name="usrfmd2" supported="no">
 		<description>U.S. Robotics Fax and I-Modem Driver Disk (Version 2.0)</description>
 		<year>1996</year>
 		<publisher>U.S. Robotics, Inc.</publisher>
@@ -6925,7 +7042,7 @@ Driver for [pc_joy:magnum6_pad]
 		</part>
 	</software>
 
-	<software name="usrfmd37">
+	<software name="usrfmd37" supported="no">
 		<description>U.S. Robotics Fax and I-Modem Driver Disk (Version 3.7)</description>
 		<year>1997</year>
 		<publisher>U.S. Robotics, Inc.</publisher>
@@ -6936,7 +7053,7 @@ Driver for [pc_joy:magnum6_pad]
 		</part>
 	</software>
 
-	<software name="usrim122">
+	<software name="usrim122" supported="no">
 		<description>U.S. Robotics I-modem Configuration Manager (Version 1.2.2)</description>
 		<year>1996</year>
 		<publisher>U.S. Robotics, Inc.</publisher>
@@ -6947,10 +7064,13 @@ Driver for [pc_joy:magnum6_pad]
 		</part>
 	</software>
 
-	<software name="viewmid">
+	<software name="viewmid" supported="no">
 		<description>ViewSonic Monitor Installation Disk</description>
 		<year>1998</year>
 		<publisher>ViewSonic Corporation</publisher>
+		<notes><![CDATA[
+ViewSonic [monitor] driver, with various ICM color profiles
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="viewsonic monitor installation disk.img" size="1474560" crc="41a256cc" sha1="a98453b28bd2dba943d3e8c64cd98b9a460cd470"/>
@@ -6962,6 +7082,10 @@ Driver for [pc_joy:magnum6_pad]
 		<description>WinBook XL Audio</description>
 		<year>1997</year>
 		<publisher>WinBook Computer</publisher>
+		<notes><![CDATA[
+Drivers for a WinBook XL laptop (Pentium, OPL3-SAx, 3C589 PCMCIA based)
+cfr. wbxlboot
+]]></notes>
 		<info name="serial" value="XL1A" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Audio - Windows 95 - DOS"/>
