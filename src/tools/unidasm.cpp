@@ -27,6 +27,7 @@ using util::BIT;
 #include "cpu/asap/asapdasm.h"
 #include "cpu/avr8/avr8dasm.h"
 #include "cpu/bcp/bcpdasm.h"
+#include "cpu/c33/c33dasm.h"
 #include "cpu/capricorn/capricorn_dasm.h"
 #include "cpu/ccpu/ccpudasm.h"
 #include "cpu/cdc1700/cdc1700d.h"
@@ -412,6 +413,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "b5500",           le,  0, []() -> util::disasm_interface * { return new b5500_disassembler; } },
 	{ "b6000",           le,  0, []() -> util::disasm_interface * { return new b6000_disassembler; } },
 	{ "b6100",           le,  0, []() -> util::disasm_interface * { return new b6100_disassembler; } },
+	{ "c33",             le,  0, []() -> util::disasm_interface * { return new c33_disassembler; } },
 	{ "capricorn",       le,  0, []() -> util::disasm_interface * { return new capricorn_disassembler; } },
 	{ "ccpu",            le,  0, []() -> util::disasm_interface * { return new ccpu_disassembler; } },
 	{ "cdc1700",         be, -1, []() -> util::disasm_interface * { return new cdc1700_disassembler; } },

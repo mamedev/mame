@@ -3949,3 +3949,12 @@ if opt_tool(CPUS, "HT1130") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ht1130/ht1130d.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ht1130/ht1130d.h")
 end
+
+--------------------------------------------------
+-- Epson C33 STD, C33 ADV, etc., disassembler only
+--------------------------------------------------
+
+if opt_tool(CPUS, "C33") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/c33/c33dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/c33/c33dasm.h")
+end
