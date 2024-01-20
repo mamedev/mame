@@ -17352,6 +17352,7 @@ realbrko                        // "600" Billiard Academy Real Break 1998 (Europ
 @source:dynax/royalmah.cpp
 cafebrk                         // "528" Mahjong Cafe Break (C) 1999 Nakanihon / Dynax
 cafedoll                        // "76" (c) 1993 Dynax
+cafedollg                       // "76" (c) 1993 Dynax
 cafepara                        // "001" 1999 Techno-Top
 cafetime                        // "63" (c) 1992 Dynax
 chalgirl                        // bootleg
@@ -36239,11 +36240,13 @@ gnr_200                         //
 gnr_300                         //
 gnr_300d                        //
 gnr_300f                        //
+hook_400                        //
 hook_401                        //
 hook_401_p                      //
 hook_404                        //
 hook_408                        //
 hook_e406                       //
+hook_f401                       //
 jupk_305                        // (c) 1993 Data East
 jupk_307                        //
 jupk_501                        //
@@ -36916,6 +36919,7 @@ bnzai_pa                        //
 cycln_l1                        //
 cycln_l4                        //
 cycln_l5                        //
+eatpm_3g                        //
 eatpm_4g                        //
 eatpm_4u                        //
 eatpm_f1                        //
@@ -36954,6 +36958,8 @@ taxi_p5                         //
 tsptr_l3                        //
 whirl_l2                        //
 whirl_l3                        //
+whirl_lg1                       //
+whirl_lg2                       //
 whirl_lg3                       //
 
 @source:pinball/s11c.cpp
