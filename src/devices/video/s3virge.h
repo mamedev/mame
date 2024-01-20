@@ -194,6 +194,7 @@ protected:
 	devcb_write_line m_linear_config_changed_cb;
 
 	virtual void s3_define_video_mode(void) override;
+
 	// has no 8514/A device
 private:
 	emu_timer* m_draw_timer;
