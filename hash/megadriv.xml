@@ -16439,7 +16439,7 @@ https://segaretro.org/Feng_Shen_Ying_Jie_Chuan
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom name="ferias frustradas do pica-pau (bra).bin" size="1048576" crc="7b2e416d" sha1="ec546d1c00c88554b5e9135f097cb1c388cfd68f"/>
+				<rom name="ferias frustradas do pica-pau (bra).bin" size="1048576" crc="b03507c4" sha1="295e3fe1eaec3e5181e7dcb46cec6507d393b82d"/>
 			</dataarea>
 		</part>
 	</software>
