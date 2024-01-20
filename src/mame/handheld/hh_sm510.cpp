@@ -7993,6 +7993,91 @@ ROM_END
 
 /*******************************************************************************
 
+  Tiger Pit-Fighter (model 7-863)
+  * Sharp SM510 under epoxy (die label MA8)
+  * lcd screen with custom segments, 1-bit sound
+
+*******************************************************************************/
+
+class tpitfight_state : public hh_sm510_state
+{
+public:
+	tpitfight_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{
+		inp_fixed_last();
+	}
+
+	void tpitfight(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( tpitfight )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_CHANGED_CB(input_changed) PORT_NAME("Left Attack High")
+	PORT_BIT( 0x0a, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Right Attack Low")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_CB(input_changed) PORT_NAME("Right Attack High")
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Pick On Right")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x09, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // S4
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Left Attack Low")
+	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.4") // S5
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Pick On Left")
+	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.5") // S6
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Select")
+	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.6") // GND!
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
+
+	PORT_START("BA")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_VOLUME_DOWN ) PORT_NAME("Sound")
+
+	PORT_START("B")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POWER_OFF )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+// config
+
+void tpitfight_state::tpitfight(machine_config &config)
+{
+	sm510_tiger(config, 1486, 1080);
+}
+
+// roms
+
+ROM_START( tpitfight )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "ma8", 0x0000, 0x1000, CRC(8470a539) SHA1(f857da9a498dfbae10307c55f3c4e49c94fe4ea8) )
+
+	ROM_REGION( 319292, "screen", 0)
+	ROM_LOAD( "tpitfight.svg", 0, 319292, CRC(6b96f503) SHA1(1fa765300a689c26c5e1c7deb88262b4d19a0bf4) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
   Tiger The Rocketeer (model 7-864)
   * Sharp SM510 under epoxy (die label M96)
   * lcd screen with custom segments, 1-bit sound
@@ -11535,6 +11620,7 @@ SYST( 1991, txmen,        0,           0,      txmen,        txmen,        txmen
 SYST( 1991, tddragon3,    0,           0,      tddragon3,    tddragon3,    tddragon3_state,    empty_init, "Tiger Electronics (licensed from Technos)", "Double Dragon 3: The Rosetta Stone (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1991, tflash,       0,           0,      tflash,       tflash,       tflash_state,       empty_init, "Tiger Electronics", "The Flash (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1991, trobhood,     tgaunt,      0,      trobhood,     trobhood,     trobhood_state,     empty_init, "Tiger Electronics", "Robin Hood (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, tpitfight,    0,           0,      tpitfight,    tpitfight,    tpitfight_state,    empty_init, "Tiger Electronics", "Pit-Fighter (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1991, trockteer,    trobocop2,   0,      trockteer,    trockteer,    trockteer_state,    empty_init, "Tiger Electronics", "The Rocketeer (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1991, tmchammer,    0,           0,      tmchammer,    tmchammer,    tmchammer_state,    empty_init, "Tiger Electronics", "MC Hammer: U Can't Touch This (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1991, tbtoads,      0,           0,      tbtoads,      tbtoads,      tbtoads_state,      empty_init, "Tiger Electronics (licensed from Rare/Tradewest)", "Battletoads (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
