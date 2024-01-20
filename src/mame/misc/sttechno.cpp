@@ -283,10 +283,12 @@ uint32_t sttechno_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 			for (int tile_x = 0; tile_x < tiles_w; tile_x++) {
 				for (int pix_y = 0; pix_y < 16; pix_y++) {
 					for (int pix_x = 0; pix_x < 16; pix_x++) {
-						const int tx = xflip ? (x + ((tiles_w - tile_x - 1) * 16) + (15 - pix_x)) % 512 // 512x512 framebuffer size, must be wrapped
-							: (x + (tile_x * 16) + pix_x) % 512;
-						const int ty = yflip ? (y + (tiles_h - tile_y - 1) * 16 + (15 - pix_y)) % 512
-							: (y + tile_y * 16 + pix_y) % 512;
+						const int tx = xflip
+								? ((x + ((tiles_w - tile_x - 1) * 16) + (15 - pix_x)) % 512) // 512x512 framebuffer size, must be wrapped
+								: ((x + (tile_x * 16) + pix_x) % 512);
+						const int ty = yflip
+								? ((y + (tiles_h - tile_y - 1) * 16 + (15 - pix_y)) % 512)
+								: ((y + tile_y * 16 + pix_y) % 512);
 
 						if (!cliprect.contains(tx, ty))
 							continue;
