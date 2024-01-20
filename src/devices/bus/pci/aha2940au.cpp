@@ -41,6 +41,7 @@ aha2940au_scsi_device::aha2940au_scsi_device(const machine_config &mconfig, cons
 {
 }
 
+// NOTE: BIOS is FAT compressed, decompress as 8bios.bin under the hood.
 ROM_START( aha2940au )
 	ROM_REGION32_LE( 0x8000, "scsi_rom", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v1.30", "AHA-2940AU (v1.30)" )
