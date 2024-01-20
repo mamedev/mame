@@ -902,6 +902,7 @@ Intro shows several horizontal black/transparent strips over GFXs
 		<description>Cotton - Fantastic Night Dreams (Japan)</description>
 		<year>1993</year>
 		<publisher>Hudson</publisher>
+		<info name="language" value="Japanese"/>
 		<info name="serial" value="HCD3043"/>
 		<info name="release" value="19930212"/>
 		<info name="alt_title" value="コットン"/>
@@ -2453,6 +2454,7 @@ New game intro sports glitchy portraits
 		<description>J. B. Harold Satsujin Club (Japan)</description>
 		<year>1990</year>
 		<publisher>Hudson</publisher>
+		<info name="language" value="Japanese" />
 		<info name="serial" value="HCD0013"/>
 		<info name="release" value="19901123"/>
 		<info name="alt_title" value="J. B. ハロルド 殺人クラブ"/>
@@ -4908,6 +4910,7 @@ Hangs on technique screen after level select (assuming you pick them up in stage
 		<description>Ryuuko no Ken (Japan)</description>
 		<year>1994</year>
 		<publisher>Hudson</publisher>
+		<info name="language" value="English/Japanese/Spanish"/>
 		<info name="serial" value="HCD4061"/>
 		<info name="release" value="19940326"/>
 		<info name="alt_title" value="龍虎の拳"/>
@@ -4924,6 +4927,7 @@ Hangs on technique screen after level select (assuming you pick them up in stage
 		<description>Ryuuko no Ken - Sample Disc (Japan)</description>
 		<year>1994</year>
 		<publisher>Hudson</publisher>
+		<info name="language" value="Japanese"/>
 		<info name="usage" value="CD-ROM² Arcade System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -6809,6 +6813,7 @@ Cuts off [ADPCM] playback, enables half irq
 		<notes><![CDATA[
 Hangs or resets after giving yes to "Is it OK?" prompt (fixed)
 ]]></notes>
+		<info name="language" value="English/Japanese"/>
 		<info name="serial" value="PVCD0001"/>
 		<info name="release" value="19900330"/>
 		<info name="alt_title" value="カルメンサンディエゴを追え! 世界編"/>
@@ -7291,6 +7296,7 @@ https://mametesters.org/view.php?id=7262
 		<description>Cotton - Fantastic Night Dreams (USA)</description>
 		<year>1993</year>
 		<publisher>Success</publisher>
+		<info name="language" value="English"/>
 		<info name="serial" value="TGXCD1038"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
@@ -7448,6 +7454,7 @@ https://mametesters.org/view.php?id=7972 (fixed)
 		<description>J. B. Harold Murder Club (USA)</description>
 		<year>1991</year>
 		<publisher>Riverhill Soft</publisher>
+		<info name="language" value="English" />
 		<info name="serial" value="TGXCD1012"/>
 		<info name="usage" value="CD-ROM System Card required" />
 		<sharedfeat name="requirement" value="cdsys"/>
@@ -7457,7 +7464,6 @@ https://mametesters.org/view.php?id=7972 (fixed)
 			</diskarea>
 		</part>
 	</software>
-
 
 	<!--
 	Source: http://redump.org/disc/62014/
