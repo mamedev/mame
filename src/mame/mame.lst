@@ -72,7 +72,7 @@ bootsctnub                      // (c) 1999
 bparty                          // (c) 2000
 bpartya                         // (c) 2000
 bumblbug                        // (c) 1996
-bumblbugql                      // (c) 1996
+bumblbugq                       // (c) 1996
 bumblbugu                       // (c) 1997
 bumblbugua                      // (c) 1997
 buttdeli                        // (c) 1995
@@ -87,10 +87,10 @@ cashchamnz                      // (c) 1998
 cashcra5                        // (c) 1997
 cashcra5a                       // (c) 1997
 chariotc                        // (c) 1998
-chariotcv                       // (c) 1998
+chariotcpe                      // (c) 1998
 checkma5                        // (c) 2001
 chickna5                        // (c) 1996
-chickna5ql                      // (c) 1998
+chickna5q                       // (c) 1998
 chickna5u                       // (c) 1998
 chickna5ua                      // (c) 1998
 chickna5v                       // (c) 1996
@@ -109,7 +109,7 @@ dolphntrb                       // (c) 1996
 dolphntrce                      // (c) 1999
 dolphntrcea                     // (c) 1999
 dolphntrceb                     // (c) 1999
-dolphntrql                      // (c) 2000
+dolphntrq                       // (c) 2000
 dolphntru                       // (c) 1996
 dreamwv                         // (c) 1997
 drgneye                         // (c) 1997
@@ -135,6 +135,7 @@ goldpyrb                        // (c) 1998
 goldenra                        // (c) 2000
 honeypot                        // (c) 2000
 hnktonku                        // (c) 2001
+hrtthrob                        // (c) 2006
 incasun                         // (c) 1999
 incasunsp                       // (c) 1999
 incasunnz                       // (c) 2000
@@ -142,7 +143,8 @@ incasunv                        // (c) 1999
 incasunu                        // (c) 2000
 incasunua                       // (c) 2000
 indrema5                        // (c) 1998
-indrema5ql                      // (c) 2000
+indrema5q                       // (c) 2000
+indrema5v                       // (c) 1998
 jumpbean                        // (c) 1996
 jumpjoey                        // (c) 1996
 jungjuic                        // (c) 1996
@@ -156,6 +158,7 @@ kyhatonu                        // (c) 2000
 locoloot                        // (c) 1997
 locoloota                       // (c) 1997
 locolootnz                      // (c) 1998
+locolootq                       // (c) 1997
 locolootu                       // (c) 2001
 lonewolf                        // (c) 1997
 luckyclo                        // (c) 1995
@@ -227,16 +230,16 @@ qnilefl                         // (c) 2001
 qnilemax                        // (c) 1999
 qnilenl                         // (c) 2000
 qnilenz                         // (c) 1998
-qnileql                         // (c) 1999
+qnilepe                         // (c) 1997
+qnileq                          // (c) 1999
 qnileu                          // (c) 1997
 qnileua                         // (c) 1997
-qnilev                          // (c) 1997
 qtbird                          // (c) 1994
 rainwarr                        // (c) 2001
 rainwarrce                      // (c) 2001
 reelpwr                         // (c) 1996
 reelrock                        // (c) 1998
-reelrockql                      // (c) 2000
+reelrockq                       // (c) 2000
 retrsam                         // (c) 1997
 retrsama                        // (c) 1997
 retrsamb                        // (c) 1997
@@ -251,6 +254,7 @@ snowcat                         // (c) 1996
 sumospin                        // (c) 1997
 swhr2                           // (c) 1995
 swhr2a                          // (c) 1995
+swhr2q                          // (c) 1996
 swhr2u                          // (c) 1998
 swhr2v                          // (c) 1995
 thndh                           // (c) 1996
@@ -1003,26 +1007,29 @@ vdmaster                        // Video Master
 86lions                         // (c) 1985?
 arcwins                         // (c) 1996
 autmoon                         // (c) 1999
-blkrhino                        // (c) 1996
+blkrhino                        // (c) 1995
+blkrhinonz                      // (c) 1996
 cgold                           // (c) 1986 Ainsworth Nominees P.L.
 cgold2                          // (c) 1995
 clkwise                         // (c) 1986 Ainsworth Nominees P.L.
 coralr2                         // (c) 2000
-eforest                         // (c) 1996
-eforesta                        // (c) 1995
-eforestb                        // (c) 1996
+eforest                         // (c) 1995
+eforestnz                       // (c) 1996
+eforestu                        // (c) 1996
 ffortune                        // (c) 1998
 fhunter                         // (c) 1996
 fhuntera                        // (c) 1996
 fvrpitch                        // (c) 1986 Ainsworth Nominees P.L.
 gldnpkr                         // (c) 1986 Ainsworth Nominees P.L.
 goldenc                         // (c) 1996
+grnlizrd                        // (c) 1994
 gtroppo                         // (c) 1986 Ainsworth Nominees P.L.
 gunnrose                        // (c) 1993
 kgbird                          // (c) 1996
 kgbirda                         // (c) 1996
 phantomp                        // (c) 1998
 swtht2nz                        // (c) 1998
+teqsun                          // (c) 1993
 topgear                         // (c) 1996
 wildone                         // (c) 1997
 wtigernz                        // (c) 1996
