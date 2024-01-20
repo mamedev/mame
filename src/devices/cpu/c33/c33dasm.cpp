@@ -7,6 +7,7 @@
     * Only C33 ADV Core is currently supported - add support for C33 STD Core
     * Reconstruct more assembler synthetics
     * Should psrset and psrclr use symbolic names for bits?
+    * Should 32-bit extended displacements always be displayed as signed?
     * Should loop instructions have friendlier syntax?
 */
 
@@ -280,8 +281,8 @@ std::pair<char const *, unsigned> const class_7_ops[8] = {
 		{ "ld.uh     %%r%1$u,[%%dp + 0x%2$x]", 2 },   // 111 011
 		{ "ld.w      %%r%1$u,[%%dp + 0x%2$x]", 4 },   // 111 100
 		{ "ld.b      [%%dp + 0x%2$x],%%r%1$u", 1 },   // 111 101
-		{ "ld.h      [%%dp + 0x%2$x],%%r%1$u", 1 },   // 111 110
-		{ "ld.w      [%%dp + 0x%2$x],%%r%1$u", 1 } }; // 111 111
+		{ "ld.h      [%%dp + 0x%2$x],%%r%1$u", 2 },   // 111 110
+		{ "ld.w      [%%dp + 0x%2$x],%%r%1$u", 4 } }; // 111 111
 
 } // anonymous namespace
 
@@ -356,7 +357,7 @@ offs_t c33_disassembler::disassemble(
 	if (offs_t const r = max_ext(stream, 0, ext_imm, ext_count); r)
 		return r;
 
-	stream << "<unknown>";
+	stream << "<invalid>";
 	return 2;
 }
 
