@@ -31,7 +31,7 @@ public:
 	void receiver_sync_reg_w(uint8_t data);
 
 	u8   receiver_output_reg_r();
-    u8   status_word_r();
+	u8   status_word_r();
 	u8   receiver_sync_search();
 
 	// transmit statuses
@@ -78,10 +78,10 @@ protected:
 	bool m_transmit_buffer_empty;
 	bool m_fill_char_transmitted;
 
-    // transmit registers
+	// transmit registers
 	u8   m_transmitter_holding_reg;
 	u8   m_transmitter_fill_reg;
-    u8   m_transmitter_shift_reg;
+	u8   m_transmitter_shift_reg;
 
 	// transmit status callbacks
 	devcb_write_line m_tbmt; // Transmit Buffer Empty
@@ -93,13 +93,13 @@ protected:
 	// receive flags
 	bool m_received_data_available;
 	bool m_receiver_overrun;
-    bool m_receiver_parity_error; // not currently used
-    bool m_sync_character_received;
+	bool m_receiver_parity_error; // not currently used
+	bool m_sync_character_received;
 
-    // receive registers
+	// receive registers
 	u8   m_receiver_output_reg;
 	u8   m_receiver_sync_reg;
-    u8   m_receiver_shift_reg;
+	u8   m_receiver_shift_reg;
 
 	// receiver status callbacks
 	devcb_write_line m_rda;  // Received Data Available

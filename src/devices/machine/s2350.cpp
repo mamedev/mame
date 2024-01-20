@@ -222,7 +222,7 @@ u8 s2350_device::receiver_sync_search()
 {
 	set_sync_character_received(false);
 	m_sync_search_active      = true;
-	
+
 	LOGREG("%s: 0x%02x\n", FUNCNAME, m_receiver_sync_reg);
 
 	return m_receiver_sync_reg;
@@ -239,14 +239,14 @@ u8 s2350_device::receiver_output_reg_r()
 
 u8 s2350_device::status_word_r()
 {
-    u8 status = 0x00;
+	u8 status = 0x00;
 
-    status |= m_received_data_available ? 0x01 : 0x00;
-    status |= m_receiver_overrun        ? 0x02 : 0x00;
-    status |= m_receiver_parity_error   ? 0x04 : 0x00;
-    status |= m_sync_character_received ? 0x08 : 0x00;
-    status |= m_fill_char_transmitted   ? 0x40 : 0x00;
-    status |= m_transmit_buffer_empty   ? 0x80 : 0x00;
+	status |= m_received_data_available ? 0x01 : 0x00;
+	status |= m_receiver_overrun        ? 0x02 : 0x00;
+	status |= m_receiver_parity_error   ? 0x04 : 0x00;
+	status |= m_sync_character_received ? 0x08 : 0x00;
+	status |= m_fill_char_transmitted   ? 0x40 : 0x00;
+	status |= m_transmit_buffer_empty   ? 0x80 : 0x00;
 
 	set_fill_char_transmitted(false);
 	set_receiver_overrun(false);
@@ -255,7 +255,7 @@ u8 s2350_device::status_word_r()
 
 	LOGREG("%s: 0x%02x\n", FUNCNAME, status);
 
-    return status;
+	return status;
 }
 
 void s2350_device::serial_rx_w(int state)
