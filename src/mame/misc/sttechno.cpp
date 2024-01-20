@@ -279,18 +279,22 @@ uint32_t sttechno_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 			break;
 		}
 
-		for (int tile_x = 0; tile_x < tiles_h; tile_x++) {
-			for (int tile_y = 0; tile_y < tiles_w; tile_y++) {
+		for (int tile_y = 0; tile_y < tiles_h; tile_y++) {
+			for (int tile_x = 0; tile_x < tiles_w; tile_x++) {
 				for (int pix_y = 0; pix_y < 16; pix_y++) {
 					for (int pix_x = 0; pix_x < 16; pix_x++) {
-						const int ty = (y + tile_x * 16 + pix_y) % 512; // 512x512 framebuffer size, must be wrapped
-						const int tx = (x + (tile_y * 16) + pix_x) % 512;
+						const int tx = xflip
+								? ((x + ((tiles_w - tile_x - 1) * 16) + (15 - pix_x)) % 512) // 512x512 framebuffer size, must be wrapped
+								: ((x + (tile_x * 16) + pix_x) % 512);
+						const int ty = yflip
+								? ((y + (tiles_h - tile_y - 1) * 16 + (15 - pix_y)) % 512)
+								: ((y + tile_y * 16 + pix_y) % 512);
 
 						if (!cliprect.contains(tx, ty))
 							continue;
 
 						uint16_t *const pix = &bitmap.pix(ty, tx);
-						const uint32_t char_offset = char_offset_base + (tile_x * (0x100 * tiles_w)) + (tile_y * 0x100) + (pix_y * 16) + pix_x;
+						const uint32_t char_offset = char_offset_base + (tile_y * (0x100 * tiles_w)) + (tile_x * 0x100) + (pix_y * 16) + pix_x;
 						const uint16_t char_data = m_video_flash->read_raw(char_offset / 2);
 						const int colidx = BIT(char_data, 8 * (1 - (char_offset & 1)), 8);
 						uint16_t color = m_sttga1_ram_pal[palidx * 0x100 + colidx];
