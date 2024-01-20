@@ -50,6 +50,7 @@ public:
 	typedef delegate<void (floppy_image_device *)> load_cb;
 	typedef delegate<void (floppy_image_device *)> unload_cb;
 	typedef delegate<void (floppy_image_device *, int)> index_pulse_cb;
+	typedef delegate<void (floppy_image_device *, int)> sector_pulse_cb;
 	typedef delegate<void (floppy_image_device *, int)> ready_cb;
 	typedef delegate<void (floppy_image_device *, int)> wpt_cb;
 	typedef delegate<void (floppy_image_device *, int)> led_cb;
@@ -111,6 +112,7 @@ public:
 	void setup_load_cb(load_cb cb);
 	void setup_unload_cb(unload_cb cb);
 	void setup_index_pulse_cb(index_pulse_cb cb);
+	void setup_sector_pulse_cb(sector_pulse_cb cb);
 	void setup_ready_cb(ready_cb cb);
 	void setup_wpt_cb(wpt_cb cb);
 	void setup_led_cb(led_cb cb);
@@ -128,7 +130,7 @@ public:
 	virtual bool wpt_r(); // Mac sony drives using this for various reporting
 	int dskchg_r() { return dskchg; }
 	bool trk00_r() { return (has_trk00_sensor ? (cyl != 0) : 1); }
-	int idx_r() { return idx; }
+	int idx_r() { return idx || sector_hole; }
 	int mon_r() { return mon; }
 	bool ss_r() { return ss; }
 	bool twosid_r();
@@ -150,6 +152,7 @@ public:
 	int get_sides() { return sides; }
 	uint32_t get_form_factor() const;
 	uint32_t get_variant() const;
+	uint32_t get_sectoring() const;
 
 	static void default_fm_floppy_formats(format_registration &fr);
 	static void default_mfm_floppy_formats(format_registration &fr);
@@ -173,6 +176,7 @@ protected:
 	virtual const software_list_loader &get_software_list_loader() const override;
 
 	TIMER_CALLBACK_MEMBER(index_resync);
+	TIMER_CALLBACK_MEMBER(sector_hole_resync);
 
 	virtual void track_changed();
 	virtual void setup_characteristics() = 0;
@@ -189,6 +193,7 @@ protected:
 	std::vector<fs_info>  m_fs;
 	std::vector<const fs::manager_t *> m_fs_managers;
 	emu_timer             *index_timer;
+	emu_timer             *sector_hole_timer;
 
 	/* Physical characteristics, filled by setup_characteristics */
 	int tracks; /* addressable tracks */
@@ -212,6 +217,7 @@ protected:
 
 	/* state of output lines */
 	int idx;  /* index pulse */
+	int sector_hole; /* hard-sector hole pulse */
 	int wpt;  /* write protect */
 	int rdy;  /* ready */
 	int dskchg;     /* disk changed */
@@ -238,6 +244,7 @@ protected:
 	load_cb cur_load_cb;
 	unload_cb cur_unload_cb;
 	index_pulse_cb cur_index_pulse_cb;
+	sector_pulse_cb cur_sector_pulse_cb;
 	ready_cb cur_ready_cb;
 	wpt_cb cur_wpt_cb;
 	led_cb cur_led_cb;

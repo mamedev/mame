@@ -101,17 +101,46 @@ bool floppy_image::track_is_formatted(int track, int head, int subtrack) const n
 	return false;
 }
 
-const char *floppy_image::get_variant_name(uint32_t form_factor, uint32_t variant) noexcept
+const char *floppy_image::get_variant_name(uint32_t form_factor, uint32_t variant, uint32_t sectoring) noexcept
 {
-	switch(variant) {
-	case SSSD: return "Single side, single density";
-	case SSDD: return "Single side, double density";
-	case SSQD: return "Single side, quad density";
-	case DSDD: return "Double side, double density";
-	case DSQD: return "Double side, quad density";
-	case DSHD: return "Double side, high density";
-	case DSED: return "Double side, extended density";
+	if (sectoring == SOFT) {
+		switch(variant) {
+		case SSSD: return "Single side, single density";
+		case SSDD: return "Single side, double density";
+		case SSQD: return "Single side, quad density";
+		case DSSD: return "Doubld side, single density";
+		case DSDD: return "Double side, double density";
+		case DSQD: return "Double side, quad density";
+		case DSHD: return "Double side, high density";
+		case DSED: return "Double side, extended density";
+		}
+	} else if (sectoring == H10) {
+		switch(variant) {
+		case SSSD: return "Single side, single density, 10-sector";
+		case SSDD: return "Single side, double density, 10-sector";
+		case SSQD: return "Single side, quad density, 10-sector";
+		case DSSD: return "Doubld side, single density, 10-sector";
+		case DSDD: return "Double side, double density, 10-sector";
+		case DSQD: return "Double side, quad density, 10-sector";
+		}
+	} else if (sectoring == H16) {
+		switch(variant) {
+		case SSSD: return "Single side, single density, 16-sector";
+		case SSDD: return "Single side, double density, 16-sector";
+		case SSQD: return "Single side, quad density, 16-sector";
+		case DSSD: return "Doubld side, single density, 16-sector";
+		case DSDD: return "Double side, double density, 16-sector";
+		case DSQD: return "Double side, quad density, 16-sector";
+		}
+	} else if (sectoring == H32) {
+		switch(variant) {
+		case SSSD: return "Single side, single density, 32-sector";
+		case SSDD: return "Single side, double density, 32-sector";
+		case DSSD: return "Doubld side, single density, 32-sector";
+		case DSDD: return "Double side, double density, 32-sector";
+		}
 	}
+
 	return "Unknown";
 }
 

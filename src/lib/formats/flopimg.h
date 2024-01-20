@@ -542,6 +542,14 @@ public:
 		M2FM = 0x4D32464D  //!< "M2FM", modified modified frequency modulation
 	};
 
+	//! Sectoring
+	enum {
+		SOFT = 0x54464F53,  //!< "SOFT", Soft-sectored
+		H10  = 0x20303148,  //!< "H10 ", Hard 10-sectored
+		H16  = 0x20363148,  //!< "H16 ", Hard 16-sectored
+		H32  = 0x20323348   //!< "H32 ", Hard 32-sectored
+	};
+
 	// construction/destruction
 
 
@@ -558,10 +566,14 @@ public:
 	uint32_t get_form_factor() const noexcept { return form_factor; }
 	//! @return the variant.
 	uint32_t get_variant() const noexcept { return variant; }
+	//! @return the disk sectoring.
+	uint32_t get_sectoring() const noexcept { return sectoring; }
 	//! @param v the variant.
 	void set_variant(uint32_t v) { variant = v; }
 	//! @param v the variant.
 	void set_form_variant(uint32_t f, uint32_t v) { if(form_factor == FF_UNKNOWN) form_factor = f; variant = v; }
+	//! @param s the sectoring.
+	void set_sectoring(uint32_t s) { sectoring = s; }
 
 	/*!
 	  @param track
@@ -599,16 +611,17 @@ public:
 	//! @return whether a given track is formatted
 	bool track_is_formatted(int track, int head, int subtrack = 0) const noexcept;
 
-	//! Returns the variant name for the particular disk form factor/variant
+	//! Returns the variant name for the particular disk form factor/variant/sectoring
 	//! @param form_factor
 	//! @param variant
+	//! @param sectoring
 	//! @return a string containing the variant name.
-	static const char *get_variant_name(uint32_t form_factor, uint32_t variant) noexcept;
+	static const char *get_variant_name(uint32_t form_factor, uint32_t variant, uint32_t sectoring = SOFT) noexcept;
 
 private:
 	int tracks, heads;
 
-	uint32_t form_factor, variant;
+	uint32_t form_factor, variant, sectoring;
 
 	struct track_info
 	{

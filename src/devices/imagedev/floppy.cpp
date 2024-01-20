@@ -254,7 +254,7 @@ floppy_image_device::floppy_image_device(const machine_config &mconfig, device_t
 		motor_always_on(false),
 		dskchg_writable(false),
 		has_trk00_sensor(true),
-		dir(0), stp(0), wtg(0), mon(0), ss(0), ds(-1), idx(0), wpt(0), rdy(0), dskchg(0),
+		dir(0), stp(0), wtg(0), mon(0), ss(0), ds(-1), idx(0), sector_hole(0), wpt(0), rdy(0), dskchg(0),
 		ready(false),
 		rpm(0),
 		angular_speed(0),
@@ -293,6 +293,11 @@ void floppy_image_device::setup_unload_cb(unload_cb cb)
 void floppy_image_device::setup_index_pulse_cb(index_pulse_cb cb)
 {
 	cur_index_pulse_cb = cb;
+}
+
+void floppy_image_device::setup_sector_pulse_cb(sector_pulse_cb cb)
+{
+	cur_sector_pulse_cb = cb;
 }
 
 void floppy_image_device::setup_ready_cb(ready_cb cb)
@@ -444,6 +449,7 @@ void floppy_image_device::device_start()
 	drive_index = atoi(owner()->basetag());
 
 	idx = 0;
+	sector_hole = 0;
 
 	/* motor off */
 	mon = 1;
@@ -457,6 +463,8 @@ void floppy_image_device::device_start()
 	wpt = 0;
 	dskchg = exists() ? 1 : 0;
 	index_timer = timer_alloc(FUNC(floppy_image_device::index_resync), this);
+	sector_hole_timer = timer_alloc(FUNC(floppy_image_device::sector_hole_resync), this);
+
 	image_dirty = false;
 	ready = true;
 	ready_counter = 0;
@@ -473,6 +481,7 @@ void floppy_image_device::device_start()
 	save_item(NAME(actual_ss));
 	save_item(NAME(ds));
 	save_item(NAME(idx));
+	save_item(NAME(sector_hole));
 	save_item(NAME(wpt));
 	save_item(NAME(rdy));
 	save_item(NAME(dskchg));
@@ -566,6 +575,7 @@ void floppy_image_device::init_floppy_load(bool write_supported)
 	revolution_count = 0;
 
 	index_resync(0);
+	sector_hole_resync(0);
 
 	wpt = 1; // disk sleeve is covering the sensor
 	if (!cur_wpt_cb.isnull())
@@ -871,6 +881,7 @@ void floppy_image_device::mon_w(int state)
 			ready_counter = 2;
 		}
 		index_resync(0);
+		sector_hole_resync(0);
 	}
 
 	/* on -> off */
@@ -935,6 +946,74 @@ TIMER_CALLBACK_MEMBER(floppy_image_device::index_resync)
 			cur_index_pulse_cb(this, idx);
 	}
 }
+
+TIMER_CALLBACK_MEMBER(floppy_image_device::sector_hole_resync)
+{
+	const uint32_t sectoring = get_sectoring();
+	const int full_rotation  = 200'000'000;
+	const int hole_length    =   2'000'000;
+	int sector_spacing;
+
+	switch (sectoring) {
+		case floppy_image::H10:
+			sector_spacing = full_rotation / 10;
+			break;
+		case floppy_image::H16:
+			sector_spacing = full_rotation / 16;
+			break;
+		case floppy_image::H32:
+			sector_spacing = full_rotation / 32;
+			break;
+		case floppy_image::SOFT:
+		case 0:
+		default:
+			return;
+	}
+
+	if (revolution_start_time.is_never()) {
+		if (sector_hole) {
+			sector_hole = 0;
+
+			if (!cur_sector_pulse_cb.isnull())
+				cur_sector_pulse_cb(this, idx);
+
+		}
+		return;
+	}
+
+	int start_sector_offset = sector_spacing / 2;
+
+	attotime delta = machine().time() - revolution_start_time;
+	while (delta >= rev_time) {
+		delta -= rev_time;
+		revolution_start_time += rev_time;
+		revolution_count++;
+	}
+
+	int position = int(delta.as_double() * angular_speed + 0.5);
+
+	int offset_position = position - start_sector_offset;
+	int sector_offset = offset_position % sector_spacing;
+
+	int new_sector_hole = (offset_position > 0) && (sector_offset < hole_length);
+
+	attotime sector_pos_time = attotime::from_double(sector_offset / angular_speed);
+	if (new_sector_hole) {
+		attotime sector_hole_up_time = attotime::from_double(2000000 / angular_speed);
+		index_timer->adjust(sector_hole_up_time - sector_pos_time);
+	} else {
+		attotime next_sector_time = attotime::from_double(sector_spacing / angular_speed);
+		index_timer->adjust(next_sector_time - sector_pos_time);
+	}
+
+	if (new_sector_hole != sector_hole) {
+		sector_hole = new_sector_hole;
+
+		if (!cur_sector_pulse_cb.isnull())
+			cur_sector_pulse_cb(this, idx);
+	}
+}
+
 
 bool floppy_image_device::ready_r()
 {
@@ -1416,6 +1495,11 @@ uint32_t floppy_image_device::get_form_factor() const
 uint32_t floppy_image_device::get_variant() const
 {
 	return image ? image->get_variant() : 0;
+}
+
+uint32_t floppy_image_device::get_sectoring() const
+{
+	return image ? image->get_sectoring() : 0;
 }
 
 std::vector<uint32_t> &floppy_image_device::get_buffer()
