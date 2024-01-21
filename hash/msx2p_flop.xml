@@ -5,21 +5,10 @@ license:CC0-1.0
 -->
 
 <softwarelist name="msx2p_flop" description="MSX2+ disk images">
-
-<!--
-
-Disks to sort:
-    EVA Player for Sunrise ATA-IDE
-
--->
-
 <!--
 
 Known undumped:
-    Destiny-1
     NBX 3.2
-    Super Zeologue
-    Shuumatsunosugoshikata / The world is drawing to an W/end
     Doozle (Dutch tool)
     Mouse Master ( http://www.generation-msx.nl/software/msx-club-gouda/mouse-master/release/2542/ )
 
@@ -27,92 +16,70 @@ Known undumped:
 
 
 	<software name="beppin">
-		<description>Beppin (Japan)</description>
+		<description>Beppin Disk (Japan)</description>
 		<year>1988</year>
 		<publisher>Wisdom</publisher>
-
+		<info name="alt_title" value="Beppin ディスク"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="beppin (1988)(cain)(nl).dsk" size="737280" crc="e151563d" sha1="db2364b83d8976d21b89aa4d34c092a5ce383269"/>
+				<rom name="beppin disk - wisdom.dsk" size="737280" crc="e151563d" sha1="db2364b83d8976d21b89aa4d34c092a5ce383269"/>
 			</dataarea>
 		</part>
 	</software>
 
-<!-- Tagoo soft db reports this to be a 2 disks game in Japan... where does opening disk come from?!? -->
-	<software name="f1spirit">
+	<software name="f1spirit" supported="partial">
 		<description>F-1 Spirit 3D Special (Japan)</description>
 		<year>1988</year>
-		<publisher>Konami</publisher>
-		<info name="alt_title" value="F1スピリット3Dスペシャル" />
-
+		<publisher>Panasoft</publisher>
+		<notes>Scrolling problems during gameplay.</notes>
+		<info name="alt_title" value="F1スピリット3Dスペシャル"/>
+		<info name="serial" value="RA005 / SW-M007"/>
+		<info name="barcode" value="4902704840066"/>
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Opening Disk"/>
+			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
-				<rom name="f-1 spirit 3d special (1988)(konami)(disk 1 of 3)(opening disk).dsk" size="737280" crc="69058209" sha1="155702d3d41b8f8b3d4659d42aa474ce12f4d3c9"/>
+				<rom name="f-1 spirit 3d special - panasoft (disk a).dsk" size="737280" crc="96811cc3" sha1="9877150e691d41b615683684cf0b78fc84649d37"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Game Disk A"/>
+			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="737280">
-				<rom name="f-1 spirit 3d special (1988)(konami)(disk 2 of 3)(game disk a).dsk" size="737280" crc="96811cc3" sha1="9877150e691d41b615683684cf0b78fc84649d37"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Game Disk B"/>
-			<dataarea name="flop" size="737280">
-				<rom name="f-1 spirit 3d special (1988)(konami)(disk 3 of 3)(game disk b).dsk" size="737280" crc="72039928" sha1="9ab94b449cb3b2c7ea7f87c2f03eebfacddc4019"/>
+				<rom name="f-1 spirit 3d special - panasoft (disk b).dsk" size="737280" crc="72039928" sha1="9ab94b449cb3b2c7ea7f87c2f03eebfacddc4019"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="f1spirita" cloneof="f1spirit">
+	<software name="f1spirita" cloneof="f1spirit" supported="partial">
 		<description>F-1 Spirit 3D Special (Japan, alt)</description>
 		<year>1988</year>
-		<publisher>Konami</publisher>
-		<info name="alt_title" value="F1スピリット3Dスペシャル" />
-
+		<publisher>Panasoft</publisher>
+		<notes>Scrolling problems during gameplay.</notes>
+		<info name="alt_title" value="F1スピリット3Dスペシャル"/>
+		<info name="serial" value="RA005 / SW-M007"/>
+		<info name="barcode" value="4902704840066"/>
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Opening Disk"/>
+			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
-				<rom name="f-1 spirit 3d special (1988)(konami)(disk 1 of 3)(opening disk).dsk" size="737280" crc="69058209" sha1="155702d3d41b8f8b3d4659d42aa474ce12f4d3c9"/>
+				<rom name="f-1 spirit 3d special - panasoft (disk a, alt).dsk" size="737280" crc="eb1d19a3" sha1="f3b1dafa72bdc5affaf49bac3481ad5276a51375"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Game Disk A"/>
+			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="737280">
-				<rom name="f-1 spirit 3d special (1988)(konami)(disk 2 of 3)(game disk a)[a].dsk" size="737280" crc="b05f67a2" sha1="3fd1c3dacd8fc3b4fc4902ac35296ce30991ac9b"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Game Disk B"/>
-			<dataarea name="flop" size="737280">
-				<rom name="f-1 spirit 3d special (1988)(konami)(disk 3 of 3)(game disk b)[a].dsk" size="737280" crc="94fc3831" sha1="a645c37119c59eab0d42f0a2cfbc47dc9678bc3c"/>
+				<rom name="f-1 spirit 3d special - panasoft (disk b, alt).dsk" size="737280" crc="94fc3831" sha1="a645c37119c59eab0d42f0a2cfbc47dc9678bc3c"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="f1spiritb" cloneof="f1spirit">
-		<description>F-1 Spirit 3D Special (Japan, alt Disk A)</description>
-		<year>1988</year>
-		<publisher>Konami</publisher>
-		<info name="alt_title" value="F1スピリット3Dスペシャル" />
-
+	<software name="f1spiritd" cloneof="f1spirit" supported="partial">
+		<description>F-1 Spirit 3D Special (Japan, demo)</description>
+		<year>19??</year>
+		<publisher>Panasoft</publisher>
+		<notes>Scrolling problems during gameplay.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Opening Disk"/>
 			<dataarea name="flop" size="737280">
-				<rom name="f-1 spirit 3d special (1988)(konami)(disk 1 of 3)(opening disk).dsk" size="737280" crc="69058209" sha1="155702d3d41b8f8b3d4659d42aa474ce12f4d3c9"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Game Disk A"/>
-			<dataarea name="flop" size="737280">
-				<rom name="f-1 spirit 3d special (1988)(konami)(disk 2 of 3)(game disk a)[a2].dsk" size="737280" crc="eb1d19a3" sha1="f3b1dafa72bdc5affaf49bac3481ad5276a51375"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Game Disk B"/>
-			<dataarea name="flop" size="737280">
-				<rom name="f-1 spirit 3d special (1988)(konami)(disk 3 of 3)(game disk b).dsk" size="737280" crc="72039928" sha1="9ab94b449cb3b2c7ea7f87c2f03eebfacddc4019"/>
+				<rom name="f-1 spirit 3d special - panasoft (demo).dsk" size="737280" crc="69058209" sha1="155702d3d41b8f8b3d4659d42aa474ce12f4d3c9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -121,8 +88,7 @@ Known undumped:
 		<description>Pro Yakyuu Family Stadium - Homerun Contest (Japan)</description>
 		<year>1989</year>
 		<publisher>Namcot</publisher>
-		<info name="alt_title" value="プロ野球ファミリースタジアムホームランコンテスト" />
-
+		<info name="alt_title" value="プロ野球ファミリースタジアムホームランコンテスト"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="family stadium pro baseball - homerun contest (1989)(namcot)(jp).dsk" size="737280" crc="19a2ea6b" sha1="ebcabafe5936317f19b7db957f448a4952a17011"/>
@@ -134,8 +100,7 @@ Known undumped:
 		<description>Pro Yakyuu Family Stadium - Homerun Contest (Japan, alt)</description>
 		<year>1989</year>
 		<publisher>Namcot</publisher>
-		<info name="alt_title" value="プロ野球ファミリースタジアムホームランコンテスト" />
-
+		<info name="alt_title" value="プロ野球ファミリースタジアムホームランコンテスト"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="family stadium pro baseball - homerun contest (1989)(namcot)(jp)[a].dsk" size="737280" crc="bd3d819d" sha1="53d1c26f5d87c53f8fa26154c2c568c657d314f6"/>
@@ -147,22 +112,23 @@ Known undumped:
 		<description>J.B. Harold 3 - D.C. Connection (Japan)</description>
 		<year>1989</year>
 		<publisher>Riverhill Soft</publisher>
-		<info name="alt_title" value="ＪＢハロルド3～Ｄ．Ｃ．コネクション" />
-
+		<info name="alt_title" value="ＪＢハロルド3～Ｄ．Ｃ．コネクション"/>
+		<info name="barcode" value="4967652102246"/>
+		<info name="usage" value="Requires a mouse."/>
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk I"/>
 			<dataarea name="flop" size="737280">
 				<rom name="j.b. harold 3 - d.c. connection (1989)(riverhill soft)(jp)(disk 1 of 3)[mouse].dsk" size="737280" crc="79543c5d" sha1="9b2919c1c7725458305f8120975d94c2f6524d19"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk II"/>
 			<dataarea name="flop" size="737280">
 				<rom name="j.b. harold 3 - d.c. connection (1989)(riverhill soft)(jp)(disk 2 of 3)[mouse].dsk" size="737280" crc="b3454990" sha1="6a6e5caaf72d3f9285bf5adc11e90ab7242f22c7"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 3"/>
+			<feature name="part_id" value="Disk III"/>
 			<dataarea name="flop" size="737280">
 				<rom name="j.b. harold 3 - d.c. connection (1989)(riverhill soft)(jp)(disk 3 of 3)[mouse].dsk" size="737280" crc="1eb4c4d6" sha1="c2bf5d6aff3b5b676fccdd010eedd67a4a2523ff"/>
 			</dataarea>
@@ -173,22 +139,23 @@ Known undumped:
 		<description>J.B. Harold 3 - D.C. Connection (Japan, alt)</description>
 		<year>1989</year>
 		<publisher>Riverhill Soft</publisher>
-		<info name="alt_title" value="ＪＢハロルド3～Ｄ．Ｃ．コネクション" />
-
+		<info name="alt_title" value="ＪＢハロルド3～Ｄ．Ｃ．コネクション"/>
+		<info name="barcode" value="4967652102246"/>
+		<info name="usage" value="Requires a mouse."/>
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk I"/>
 			<dataarea name="flop" size="737280">
 				<rom name="j.b. harold 3 - d.c. connection (1989)(riverhill soft)(jp)(disk 1 of 3)[mouse].dsk" size="737280" crc="79543c5d" sha1="9b2919c1c7725458305f8120975d94c2f6524d19"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk II"/>
 			<dataarea name="flop" size="737280">
 				<rom name="j.b. harold 3 - d.c. connection (1989)(riverhill soft)(jp)(disk 2 of 3)[a][mouse].dsk" size="737280" crc="952b3db8" sha1="319333dc9f37342802199fe576da759fef66501d"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 3"/>
+			<feature name="part_id" value="Disk III"/>
 			<dataarea name="flop" size="737280">
 				<rom name="j.b. harold 3 - d.c. connection (1989)(riverhill soft)(jp)(disk 3 of 3)[a][mouse].dsk" size="737280" crc="4915e99b" sha1="c4f00d065f61f893a075e26b879dde68d2a493d5"/>
 			</dataarea>
@@ -196,60 +163,81 @@ Known undumped:
 	</software>
 
 
-<!-- Tagoo soft db reports this to be a 2 disks game in Japan... where does disk 3 come from? -->
-	<software name="kohakuir">
+	<software name="kohakuir" supported="no">
 		<description>Kohakuiro no Yuigon - Seiyou Karuta Renzoku Satsujin Jiken (Japan)</description>
 		<year>1988</year>
 		<publisher>Riverhill Soft</publisher>
-		<info name="alt_title" value="琥珀色の遺言" />
-
+		<notes>Software reboots machine during first game play screen after pressing space or enter a few times.</notes>
+		<info name="alt_title" value="琥珀色の遺言"/>
+		<info name="barcode" value="4967652102194"/>
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk I"/>
 			<dataarea name="flop" size="737280">
 				<rom name="kohakuiro no yuigon. amber's will (1988)(riverhill soft)(jp)(disk 1 of 3).dsk" size="737280" crc="a7243795" sha1="db05159539daebe28b66921209161295999af6d3"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk II"/>
 			<dataarea name="flop" size="737280">
 				<rom name="kohakuiro no yuigon. amber's will (1988)(riverhill soft)(jp)(disk 2 of 3).dsk" size="737280" crc="b0e1eae4" sha1="a7c082f99cfa46323e641a52962e7d673fd7a6bd"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk III"/>
 			<dataarea name="flop" size="737280">
 				<rom name="kohakuiro no yuigon. amber's will (1988)(riverhill soft)(jp)(disk 3 of 3).dsk" size="737280" crc="daaf92c2" sha1="fbe01190e5b674d08b39b7d3cbca136fe52bf8a5"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="kohakuira" cloneof="kohakuir">
+	<software name="kohakuira" cloneof="kohakuir" supported="no">
 		<description>Kohakuiro no Yuigon - Seiyou Karuta Renzoku Satsujin Jiken (Japan, alt)</description>
 		<year>1988</year>
 		<publisher>Riverhill Soft</publisher>
-		<info name="alt_title" value="琥珀色の遺言" />
-
+		<notes>Top of screen partially corrupted when it asks for disk 2. Software reboots machine during first game play screen after pressing space or enter a few times.</notes>
+		<info name="alt_title" value="琥珀色の遺言"/>
+		<info name="barcode" value="4967652102194"/>
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk I"/>
 			<dataarea name="flop" size="737280">
 				<rom name="kohakuiro no yuigon. amber's will (1988)(riverhill soft)(jp)(disk 1 of 3)[a].dsk" size="737280" crc="a10009a9" sha1="f96e0998a5d01fabb85c89eb4b12898176397edf"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk II"/>
 			<dataarea name="flop" size="737280">
 				<rom name="kohakuiro no yuigon. amber's will (1988)(riverhill soft)(jp)(disk 2 of 3)[a].dsk" size="737280" crc="a8c68a53" sha1="a33a4688b046e6af495735ca3ed13695c8d4af42"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk III"/>
 			<dataarea name="flop" size="737280">
 				<rom name="kohakuiro no yuigon. amber's will (1988)(riverhill soft)(jp)(disk 3 of 3)[a].dsk" size="737280" crc="3aa43fa7" sha1="06a250229e98a9467506f0ebb7de63d6ebb382e8"/>
 			</dataarea>
 		</part>
 	</software>
 
+	<software name="komainuq" supported="partial">
+		<description>The Komainu Quest (Japan)</description>
+		<year>1989</year>
+		<publisher>Seto JC</publisher>
+		<notes>Bottom line of the status bar flickers during gameplay.</notes>
+		<info name="alt_title" value="こま犬クエスト"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="the komainu quest - seto jc.dsk" size="737280" crc="11d01bf1" sha1="cfabf08b7b4a8379d085fb39a8462ba99050fe35"/>
+			</dataarea>
+		</part>
+	</software>
 
-	<software name="laydock2">
+	<software name="laydock2" supported="partial">
 		<description>Laydock 2 - Last Attack (Japan)</description>
 		<year>1988</year>
-		<publisher>T&amp;E Soft</publisher>
-		<info name="alt_title" value="レイドック2ラストアタック" />
-
+		<publisher>Panasoft</publisher>
+		<notes>Bottom line of the status bar flickers during gameplay.</notes>
+		<info name="alt_title" value="レイドック2ラストアタック"/>
+		<info name="serial" value="SW-M006"/>
+		<info name="barcode" value="4902704840059"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -264,136 +252,206 @@ Known undumped:
 		</part>
 	</software>
 
-	<software name="laydock2a" cloneof="laydock2">
-		<description>Laydock 2 - Last Attack (Japan, alt)</description>
-		<year>1988</year>
-		<publisher>T&amp;E Soft</publisher>
-		<info name="alt_title" value="レイドック2ラストアタック" />
-
+	<software name="maoufuk">
+		<description>Maou no Fukkatsu DX (Japan)</description>
+		<year>1993</year>
+		<publisher>Panic Studio</publisher>
+		<info name="alt_title" value="魔王の復活DX"/>
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
-				<rom name="laydock 2 - last attack (1988)(t&amp;e soft)(jp)(disk 1 of 2)[a].dsk" size="737280" crc="1b68b1a9" sha1="db7cf4672f46017b69b02eb175b4a446a948c601"/>
+				<rom name="maou no fakkutsu dx - panic studio (disk 1).dsk" size="737280" crc="b135035b" sha1="9d7c801585779fa594c45fe2cce8bf82615cc6e6"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="737280">
-				<rom name="laydock 2 - last attack (1988)(t&amp;e soft)(jp)(disk 2 of 2)[a].dsk" size="737280" crc="25777c4e" sha1="bbbc09ed823847b567caa1f321f578cbaf3a356f"/>
+				<rom name="maou no fakkutsu dx - panic studio (disk 2).dsk" size="737280" crc="ecf68cfd" sha1="228fcba0f80a38ae54e0515e2fd20bc07578cad2"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="maou no fakkutsu dx - panic studio (disk 3).dsk" size="737280" crc="5210dfe8" sha1="21d4991a04838b85408832b651b129d6b0ae65be"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Has smooth horizontal scrolling, unlike the MSX2 release - this effect is not emulated correctly -->
-	<software name="midgarts" supported="no">
+	<software name="midgarts">
 		<description>Mid-Garts (MSX2+) (Japan)</description>
 		<year>1989</year>
 		<publisher>WolfTeam</publisher>
-		<info name="alt_title" value="ミッドガルツ" />
-
+		<info name="alt_title" value="ミッドガルツ"/>
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk I"/>
 			<dataarea name="flop" size="737280">
 				<rom name="m2p_006a.dsk" size="737280" crc="9eef9228" sha1="a5c831306c86d445d42ec13f7551346f28814686"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk II"/>
 			<dataarea name="flop" size="737280">
 				<rom name="m2p_006b.dsk" size="737280" crc="26f58049" sha1="5ba41719f93bd8dc55b6a1b027cf321a31dd0884"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 3"/>
+			<feature name="part_id" value="Disk III"/>
 			<dataarea name="flop" size="737280">
 				<rom name="m2p_006c.dsk" size="737280" crc="691c1eff" sha1="42cdf6f5bb4d7d39f4a11e7fec31b0a5ecf7ecd4"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 4"/>
+			<feature name="part_id" value="Disk IV"/>
 			<dataarea name="flop" size="737280">
 				<rom name="m2p_006d.dsk" size="737280" crc="bdf45ec0" sha1="ee868c95dacc2edee29e7c390bcb2f87ec07b898"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 5"/>
+			<feature name="part_id" value="Disk V"/>
 			<dataarea name="flop" size="737280">
 				<rom name="m2p_006e.dsk" size="737280" crc="406f5f54" sha1="90b4f39cb440b2cb3b2479ee5e633818ebe54bb4"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 6"/>
+			<feature name="part_id" value="Disk VI"/>
 			<dataarea name="flop" size="737280">
 				<rom name="m2p_006f.dsk" size="737280" crc="c65264da" sha1="8c847557b7838afff2354eb8a9d7f02e5d70519c"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="pacdisc">
-		<description>Pana Amusement Collection Disc (Japan)</description>
-		<year>1988</year>
-		<publisher>Panasoft</publisher>
-
+	<software name="mutekisy">
+		<description>Muteki Senshi Yajiuman (Japan)</description>
+		<year>1995</year>
+		<publisher>Team Plankton</publisher>
+		<info name="alt_title" value="無敵戦士ヤジウマン"/>
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
-				<rom name="pana amusement collection 1 (1988)(panasoft)(jp).dsk" size="737280" crc="4dee2cff" sha1="e4bc138daedac129c39923cbe4a07bf79a880f8b"/>
+				<rom name="muteki senshi yajiuman - team plankton (disk 1).dsk" size="737280" crc="f358d1af" sha1="acc3c0144e8d1a3059333e5d61c3b54039d1612f"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="737280">
-				<rom name="pana amusement collection 2 (1988)(panasoft)(jp).dsk" size="737280" crc="83f786e1" sha1="94c2cde50db86b91ad7d73cf6354a240c97ab3ea"/>
+				<rom name="muteki senshi yajiuman - team plankton (disk 2).dsk" size="737280" crc="3a956abc" sha1="51b4943d712d56f94e2f44c2f05491d163df907a"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="muteki senshi yajiuman - team plankton (disk 3).dsk" size="737280" crc="9efce070" sha1="173051e3ec3d21d2cf7833c452fbf24935f618cb"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="pacdisca" cloneof="pacdisc">
-		<description>Pana Amusement Collection Disc (Japan, alt)</description>
-		<year>1988</year>
-		<publisher>Panasoft</publisher>
-
+	<software name="scr11des">
+		<description>Screen 11 Designer (Netherlands)</description>
+		<year>1994</year>
+		<publisher>Stichting Sunrise</publisher>
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
-				<rom name="pana amusement collection 1 (1988)(panasoft)(jp)[a].dsk" size="737280" crc="340292e7" sha1="f86f628e6cef41b777796c4797b9153b5c722710"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="737280">
-				<rom name="pana amusement collection 2 (1988)(panasoft)(jp)[a].dsk" size="737280" crc="3ecc097d" sha1="552da3bf49e85911acc8f7a5c744ca86105bd081"/>
+				<rom name="screen 11 designer - stichting sunrise.dsk" size="737280" crc="e28f8056" sha1="de6d7242fd912fe9fd751ab3a5cb67a9dd25335c"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="pacdiscb" cloneof="pacdisc">
-		<description>Pana Amusement Collection Disc (Japan, alt 2)</description>
-		<year>1988</year>
-		<publisher>Panasoft</publisher>
-
+	<software name="shuumatsu">
+		<description>Shuumatsu no Sugoshikata - The World is Drawing to an W/End (Japan)</description>
+		<year>2001</year>
+		<publisher>Abogado Powers</publisher>
+		<info name="alt_title" value="終末の過ごし方～The world is drawing to an W/end～"/>
+		<info name="barcode" value="4513869900108"/>
+		<info name="usage" value="Boot with CTRL pressed."/>
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
-				<rom name="pana amusement collection 1 (1988)(panasoft)(jp)[a2].dsk" size="737280" crc="441d35a8" sha1="fe949aa959949e478a22c93b67b2247a1cf3d7f9"/>
+				<rom name="shuum,astu no sugoshikata - abogado powers (disk a).dsk" size="737280" crc="1760342f" sha1="8a1550cb23b5e6cf47d404d465dbfe1f0e63b808"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="737280">
-				<rom name="pana amusement collection 2 (1988)(panasoft)(jp)[a2].dsk" size="737280" crc="4bf555e3" sha1="5eeb6b2b85a19664ef9b21c130fe9b995c4b4784"/>
+				<rom name="shuum,astu no sugoshikata - abogado powers (disk b).dsk" size="737280" crc="415ffc3e" sha1="4982d77849806433e33b17916bc5d2013512f488"/>
 			</dataarea>
 		</part>
-	</software>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="737280">
+				<rom name="shuum,astu no sugoshikata - abogado powers (disk c).dsk" size="737280" crc="e9e78c5b" sha1="10b7aa5dc8c2bf81b5e6e5af1ad10e78e9b156c4"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk D"/>
+			<dataarea name="flop" size="737280">
+				<rom name="shuum,astu no sugoshikata - abogado powers (disk d).dsk" size="737280" crc="95766ca2" sha1="192204ebd8c389948f4b0c596f13be297990b37e"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk E"/>
+			<dataarea name="flop" size="737280">
+				<rom name="shuum,astu no sugoshikata - abogado powers (disk e).dsk" size="737280" crc="53165b62" sha1="9f3bf91905fd884651c71ed874028da495342e85"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk F"/>
+			<dataarea name="flop" size="737280">
+				<rom name="shuum,astu no sugoshikata - abogado powers (disk f).dsk" size="737280" crc="40286445" sha1="d5381ee5c49aa83bd49ea752b656db038cb95ea2"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disk G"/>
+			<dataarea name="flop" size="737280">
+				<rom name="shuum,astu no sugoshikata - abogado powers (disk g).dsk" size="737280" crc="c88fe861" sha1="0d252d15daa343d67d740f554b8298e2b7ba1f5e"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Disk H"/>
+			<dataarea name="flop" size="737280">
+				<rom name="shuum,astu no sugoshikata - abogado powers (disk h).dsk" size="737280" crc="5482463e" sha1="30b9faa23d4209886e5237ac36e28b6caab138d6"/>
+			</dataarea>
+		</part>
+ 	</software>
 
 	<software name="hbf1xv">
 		<description>Sony HB-F1XV Story Disk (Japan)</description>
 		<year>1990</year>
 		<publisher>Sony</publisher>
-
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="sony hb-f1xv story disk (1990)(sony)(jp).dsk" size="737280" crc="f8db5647" sha1="1a27dbdfc863f91f504e5a478b6ea4bd324f93e2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetris2" supported="no">
+		<description>Tetris II Special Edition</description>
+		<year>1996</year>
+		<publisher>R.A.M.</publisher>
+		<notes>Copy protection dongle not supported.</notes>
+		<info name="usage" value="Requires MSX-DOS 2."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="disco 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="tetris ii special edition - r.a.m. (disk 1).dsk" size="737280" crc="d4ba5d0a" sha1="a9398352d55fcb972b5de7435f4a3844b6cbb195"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="disco 2"/>
+			<dataarea name="flop" size="737280">
+				<rom name="tetris ii special edition - r.a.m. (disk 2).dsk" size="737280" crc="1fb32adf" sha1="24d129e3a3069867067862245c52cbe1f03af50f"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="disco 3"/>
+			<dataarea name="flop" size="737280">
+				<rom name="tetris ii special edition - r.a.m. (disk 3).dsk" size="737280" crc="249a2520" sha1="6dc4a731403d6e3ce7f59006e65b150b9438d8ed"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="unmei">
+		<description>Unmei - Destiny (Japan)</description>
+		<year>1995</year>
+		<publisher>Sign House</publisher>
+		<info name="alt_title" value="運命~Destiny~"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="unmei - destiny - sign house.dsk" size="737280" crc="57b2ef9e" sha1="5584eba519da196ebce46d1f936db543e06eb425"/>
 			</dataarea>
 		</part>
 	</software>
@@ -402,54 +460,15 @@ Known undumped:
 
 <!-- Coverdisks? -->
 
-	<software name="twinkle">
-		<description>Twinkle Star - Hoshi no Mahou Tsukai (Japan)</description>
-		<year>1990</year>
-		<publisher>MSX Magazine</publisher>
-		<info name="alt_title" value="ＴＷＩＮＫＬＥ ＳＴＡＲ 星の魔法使い" />
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="twinkle star (1990)(msx magazine)(jp).dsk" size="737280" crc="c97eb5cd" sha1="d89cf80e53210ddd48e64a866d0b073713ba3160"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="twinklea" cloneof="twinkle">
-		<description>Twinkle Star - Hoshi no Mahou Tsukai (Japan, alt)</description>
-		<year>1990</year>
-		<publisher>MSX Magazine</publisher>
-		<info name="alt_title" value="ＴＷＩＮＫＬＥ ＳＴＡＲ 星の魔法使い" />
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="twinkle star (1990)(msx magazine)(jp)[a].dsk" size="737280" crc="06f4dde6" sha1="c27fadbc9188cf959ea74e83557143d9fe5e34fa"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="yoshidak">
 		<description>Yoshida Kensetsu (Japan)</description>
 		<year>1990</year>
 		<publisher>MSX Magazine</publisher>
-		<info name="alt_title" value="吉田建設" />
-
+		<info name="alt_title" value="吉田建設"/>
+		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="yoshida kensetsu. super zelixer (1990)(msx magazine)(jp).dsk" size="737280" crc="0a42c38f" sha1="d5121af2a9db3b04c52334a200fdd9202f12a920"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="yoshidaka" cloneof="yoshidak">
-		<description>Yoshida Kensetsu (Japan, alt)</description>
-		<year>1990</year>
-		<publisher>MSX Magazine</publisher>
-		<info name="alt_title" value="吉田建設" />
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="yoshida kensetsu. super zelixer (1990)(msx magazine)(jp)[a].dsk" size="737280" crc="ea733f7b" sha1="9eef34210d3ae9988f137cf70730a5a1c57a59ee"/>
 			</dataarea>
 		</part>
 	</software>
@@ -458,8 +477,8 @@ Known undumped:
 		<description>Yoshida Kensetsu (Japan, alt 2)</description>
 		<year>1990</year>
 		<publisher>MSX Magazine</publisher>
-		<info name="alt_title" value="吉田建設" />
-
+		<info name="alt_title" value="吉田建設"/>
+		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="yoshida kensetsu. super zelixer (1990)(msx magazine)(jp)[a2].dsk" size="737280" crc="44c87cea" sha1="3fdf86ccb98de95bd7b3775783257e377526e6ca"/>
@@ -471,8 +490,8 @@ Known undumped:
 		<description>Yoshida Kensetsu (Japan, alt 3)</description>
 		<year>1990</year>
 		<publisher>MSX Magazine</publisher>
-		<info name="alt_title" value="吉田建設" />
-
+		<info name="alt_title" value="吉田建設"/>
+		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="yoshida kensetsu. super zelixer (1990)(msx magazine)(jp)[a3].dsk" size="737280" crc="b6c1d954" sha1="055066483bcad253b0c79af6fa65ec68ea2c45e7"/>
@@ -484,11 +503,11 @@ Known undumped:
 		<description>Yoshida Kensetsu (Japan, alt 4)</description>
 		<year>1990</year>
 		<publisher>MSX Magazine</publisher>
-		<info name="alt_title" value="吉田建設" />
-
+		<info name="alt_title" value="吉田建設"/>
+		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="twinkle star ii (1990)(msx magazine)(jp).dsk" size="737280" crc="4e3c96ff" sha1="9f051f845904bf1cd1adf08cbc0ef4804d1f48a5"/>
+				<rom name="yoshida kensetsu. super zelixer (1990)(msx magazine)(jp)[a4].dsk" size="737280" crc="4e3c96ff" sha1="9f051f845904bf1cd1adf08cbc0ef4804d1f48a5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -497,11 +516,11 @@ Known undumped:
 		<description>Yoshida Kensetsu (Japan, alt 5)</description>
 		<year>1990</year>
 		<publisher>MSX Magazine</publisher>
-		<info name="alt_title" value="吉田建設" />
-
+		<info name="alt_title" value="吉田建設"/>
+		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="twinkle star ii (1990)(msx magazine)(jp)[a].dsk" size="737280" crc="e00896f1" sha1="987c59d42eb13ffff8a021d28f4cce1a31178667"/>
+				<rom name="yoshida kensetsu. super zelixer (1990)(msx magazine)(jp)[a5].dsk" size="737280" crc="e00896f1" sha1="987c59d42eb13ffff8a021d28f4cce1a31178667"/>
 			</dataarea>
 		</part>
 	</software>
@@ -510,7 +529,6 @@ Known undumped:
 		<description>Lübeck (Japan)</description>
 		<year>1990</year>
 		<publisher>MSX Magazine</publisher>
-
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="lubeck (1990)(msx magazine)(jp).dsk" size="737280" crc="bc7f8e95" sha1="b143989e8c0a7826a21373b4271713a0465bbcac"/>
@@ -522,34 +540,9 @@ Known undumped:
 		<description>Lübeck (Japan, alt)</description>
 		<year>1990</year>
 		<publisher>MSX Magazine</publisher>
-
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="lubeck (1990)(msx magazine)(jp)[a].dsk" size="737280" crc="2ff5b9c9" sha1="8b41aac1d940fe06b2ae806eba1e5d3cebaf5134"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="seasard">
-		<description>Sea Sardine Side-2 (Japan)</description>
-		<year>1991</year>
-		<publisher>MSX Magazine</publisher>
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="sea sardine (1991)(msx magazine)(jp).dsk" size="737280" crc="f4c7f839" sha1="be457095238dbcac7b66103185c1a702b60e2255"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="seasarda" cloneof="seasard">
-		<description>Sea Sardine Side-2 (Japan, alt)</description>
-		<year>1991</year>
-		<publisher>MSX Magazine</publisher>
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="sea sardine (1991)(msx magazine)(jp)[a].dsk" size="737280" crc="17f83eb5" sha1="b23a12945e1bcb461be086cf9d0468952d79c703"/>
 			</dataarea>
 		</part>
 	</software>
@@ -558,7 +551,7 @@ Known undumped:
 		<description>The Wig (Japan)</description>
 		<year>1989</year>
 		<publisher>MSX Magazine</publisher>
-
+		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="wig, the (1989)(msx magazine)(jp).dsk" size="737280" crc="c88649e5" sha1="88411e1c1547d032c47bf41522bbadef634cc9f3"/>
@@ -570,7 +563,7 @@ Known undumped:
 		<description>The Wig (Japan, alt)</description>
 		<year>1989</year>
 		<publisher>MSX Magazine</publisher>
-
+		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="wig, the (1989)(msx magazine)(jp)[a].dsk" size="737280" crc="781df33a" sha1="ec186a538f45fb22e42b83f5e16d494456879950"/>
@@ -584,9 +577,7 @@ Known undumped:
 	<software name="gladius">
 		<description>Gladius (Germany)</description>
 		<year>1992</year>
-		<publisher>&lt;homebrew&gt;</publisher>
-		<info name="developer" value="M. Pfeil / MP" />
-
+		<publisher>M. Pfeil / MP</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="gladius (1992)(msx magazine)(de).dsk" size="737280" crc="c0c93a68" sha1="bf04414ea4891b03ef8c6484eebcc8d5dba4ef5e"/>
@@ -594,12 +585,25 @@ Known undumped:
 		</part>
 	</software>
 
-	<software name="gradius3">
+	<software name="gradius3l" supported="no">
+		<description>Gradius III Legends</description>
+		<year>2001</year>
+		<publisher>Imanok</publisher>
+		<notes>System hangs or reboots when trying to start a game.</notes>
+		<info name="usage" value="Requires a machine with at least 128KB RAM."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="gradius iii legends - imanok.dsk" size="737280" crc="97f6f4cc" sha1="c607f7ca10e03fa4dbf23469a7c423c2af60734d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gradius3ld" cloneof="gradius3l" supported="no">
 		<description>Gradius III Legends (Spain, demo)</description>
 		<year>2001</year>
-		<publisher>&lt;homebrew&gt;</publisher>
-		<info name="developer" value="Imanok" />
-
+		<publisher>Imanok</publisher>
+		<notes>System hangs or reboots when trying to start a game.</notes>
+		<info name="usage" value="Requires a machine with at least 128KB RAM."/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="gradius iii legends (demo) (2001)(imanok).dsk" size="737280" crc="c72466e9" sha1="9e3ca9b729ebf31ebf72d64012297d13bd40691e"/>
@@ -611,8 +615,7 @@ Known undumped:
 		<description>Hennano de Zukatto</description>
 		<year>1996</year>
 		<publisher>&lt;doujin&gt;</publisher>
-		<info name="alt_title" value="変なのでズカッと" />
-
+		<info name="alt_title" value="変なのでズカッと"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="zukatto.dsk" size="737280" crc="302574ed" sha1="0513ce6664d2cea4e0eb863a68a923401ecaa0da"/>
@@ -623,9 +626,8 @@ Known undumped:
 	<software name="megadoom">
 		<description>Megadoom (Netherlands)</description>
 		<year>1992</year>
-		<publisher>&lt;homebrew&gt;</publisher>
-		<info name="developer" value="First Class Software" />
-
+		<publisher>First Class Software</publisher>
+		<info name="usage" value="Requires a machine with at least 128KB RAM."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Opening Disk"/>
 			<dataarea name="flop" size="737280">
@@ -643,9 +645,7 @@ Known undumped:
 	<software name="megadoomd" cloneof="megadoom">
 		<description>Megadoom (Netherlands, demo)</description>
 		<year>1992</year>
-		<publisher>&lt;homebrew&gt;</publisher>
-		<info name="developer" value="First Class Software" />
-
+		<publisher>First Class Software</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -660,12 +660,22 @@ Known undumped:
 		</part>
 	</software>
 
+	<software name="playbln">
+		<description>Playboy Late Night</description>
+		<year>1991</year>
+		<publisher>MSX Club Challenger</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="playboy late night - msx club challenger.dsk" size="737280" crc="bb945978" sha1="42594512434e00081b773ef3b888d7130863d826"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pbstrip">
 		<description>Playboy Strippoker (Netherlands)</description>
 		<year>1992</year>
-		<publisher>&lt;homebrew&gt;</publisher>
-		<info name="developer" value="First Class Software" />
-
+		<publisher>First Class Software</publisher>
+		<info name="usage" value="Requires 128KB RAM."/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="playboy strippoker (1992)(first class software)(nl).dsk" size="737280" crc="f98efc23" sha1="898a8cad406389b27a54f1cbbe77a922c225b2ba"/>
@@ -673,12 +683,11 @@ Known undumped:
 		</part>
 	</software>
 
+	<!-- Software does not autoboot. -->
 	<software name="sonyc">
-		<description>Sonyc (Spain)</description>
+		<description>Sonyc (Spain, demo)</description>
 		<year>1995</year>
-		<publisher>&lt;homebrew&gt;</publisher>
-		<info name="developer" value="Analogy" />
-
+		<publisher>Analogy</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="sonyc (demo) (1995)(analogy)(es).dsk" size="737280" crc="2bb51edf" sha1="29acb7529bcaca5b2f82a208e501ca6352ae87f8"/>
@@ -689,9 +698,7 @@ Known undumped:
 	<software name="trtmania">
 		<description>Turtle Mania (Germany, demo)</description>
 		<year>1997</year>
-		<publisher>&lt;homebrew&gt;</publisher>
-		<info name="developer" value="WR" />
-
+		<publisher>WR</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="turtle mania (demo) (1997)(wr)(de).dsk" size="737280" crc="6ac549ce" sha1="26f53fc39126975de5a607fd73c32b970a6124fc"/>
@@ -702,15 +709,12 @@ Known undumped:
 	<software name="witchiz">
 		<description>The Witch 'Iz' (Japan, bad dump?)</description>
 		<year>1991</year>
-		<publisher>&lt;doujin&gt;</publisher>
-		<info name="alt_title" value="Chihiro" />
-
+		<publisher>Chihiro</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="witch iz, the (1991)(chihiro)[b].dsk" size="737280" crc="9eef4495" sha1="d096b1ef10c9d7b3ddffda0ec14b841c2c14cada"/>
 			</dataarea>
 		</part>
 	</software>
-
 
 </softwarelist>
