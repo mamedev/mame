@@ -131,7 +131,7 @@ public:
 
 	int dskchg_r() { return m_dskchg; }
 	bool trk00_r() { return (m_has_trk00_sensor ? (m_cyl != 0) : 1); }
-	int idx_r() { return m_idx; }
+	int idx_r() { return m_idx || m_sector_hole; }
 	int mon_r() { return m_mon; }
 	bool ss_r() { return m_ss; }
 	bool twosid_r();
