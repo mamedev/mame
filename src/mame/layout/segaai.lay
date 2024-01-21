@@ -20,6 +20,9 @@ license:CC0-1.0
 			]]></data>
 		</image>
 	</element>
+	<element name="touchpad_area">
+		<rect><color red="0.1" green="0.1" blue="0.1" /></rect>
+	</element>
 	<element name="overlay">
 		<rect><color alpha="0" /></rect>
 	</element>
@@ -31,11 +34,14 @@ license:CC0-1.0
 		<screen index="0">
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
+		<element id="touchpad_area" ref="touchpad_area">
+			<bounds x="0.094" y="3.25" width="3.8" height="2.75" />
+		</element>
 		<element id="overlay" ref="overlay">
 			<bounds x="0" y="3.1" width="4" height="3" />
 		</element>
 		<element id="touchpad" ref="touchpad">
-			<bounds x="0" y="3.2" width="4" height="2.8" />
+			<bounds x="0.094" y="3.25" width="3.8" height="2.75" />
 		</element>
 		<element id="touchpadcursor" ref="touchpadcursor">
 			<!-- will be positioned by script -->
