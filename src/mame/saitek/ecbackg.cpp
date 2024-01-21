@@ -169,8 +169,7 @@ void ecbackg_state::lcd_segs_w(u8 data)
 {
 	// P1x, P3x, P4x: LCD segments
 	const u8 shift = 8 * N;
-	const u32 mask = 0xff << shift;
-	m_lcd_segs = (m_lcd_segs & ~mask) | (data << shift);
+	m_lcd_segs = (m_lcd_segs & ~(0xff << shift)) | (data << shift);
 	update_lcd();
 }
 

@@ -3,7 +3,7 @@
 // thanks-to:Berger
 /*******************************************************************************
 
-Novag Accord
+Novag Accord (model 875)
 
 NOTE: It triggers an NMI at power-off (or power-failure). If this isn't done,
 NVRAM won't work properly.
