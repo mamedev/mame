@@ -171,8 +171,6 @@ private:
 	static constexpr u8 IRQ_V9938 = 0x01;
 	static constexpr u8 IRQ_UPD7759 = 0x08;
 
-	// 8255 Port A bits
-	static constexpr u8 UPD7759_BUSY = 0x40;
 	// 8255 Port B bits
 	static constexpr u8 TOUCH_PAD_PRESSED = 0x02;
 	static constexpr u8 TOUCH_PAD_DATA_AVAILABLE = 0x04;
@@ -187,7 +185,6 @@ private:
 	void vdp_interrupt(int state);
 	void upd7759_drq_w(int state);
 	IRQ_CALLBACK_MEMBER(irq_callback);
-	u8 i8255_porta_r();
 	u8 i8255_portb_r();
 	u8 i8255_portc_r();
 	void i8255_portc_w(u8 data);
@@ -343,7 +340,8 @@ static INPUT_PORTS_START(ai_kbd)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_8WAY
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("PL")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("RL")
-	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("upd7759", upd7759_device, busy_r)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED) // Microphone sensor
 
 	PORT_START("PORT5")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("Grey Button")
@@ -429,27 +427,6 @@ IRQ_CALLBACK_MEMBER(segaai_state::irq_callback)
 
 	update_irq_state();
 	return m_vector;
-}
-
-
-/*
-Mainboard 8255 port A
-
- 76543210
- +-------- Microphone sensor (1 = sound enabled)
-  +------- -BUSY output from the uPD7759
-   +------ PR trigger (active low)
-    +----- PL trigger (active low)
-     +---- Pad right (active low)
-      +--- Pad lefta (active low)
-       +-- Pad down (active low)
-        +- Pad up (active low)
-*/
-u8 segaai_state::i8255_porta_r()
-{
-	u8 data = (m_upd7759->busy_r() ? UPD7759_BUSY : 0) | (m_port4->read() & ~UPD7759_BUSY);
-
-	return data;
 }
 
 
@@ -698,7 +675,7 @@ void segaai_state::segaai(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 
 	I8255(config, m_i8255);
-	m_i8255->in_pa_callback().set(FUNC(segaai_state::i8255_porta_r));
+	m_i8255->in_pa_callback().set_ioport(m_port4);
 	m_i8255->in_pb_callback().set(FUNC(segaai_state::i8255_portb_r));
 	m_i8255->in_pc_callback().set(FUNC(segaai_state::i8255_portc_r));
 	m_i8255->out_pc_callback().set(FUNC(segaai_state::i8255_portc_w));
