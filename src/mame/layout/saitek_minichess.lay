@@ -11,6 +11,7 @@ license:CC0-1.0
 	<element name="blackb"><rect><color red="0" green="0" blue="0" /></rect></element>
 	<element name="white"><rect><color red="0.8" green="0.8" blue="0.8" /></rect></element>
 	<element name="gray"><rect><color red="0.25" green="0.25" blue="0.25" /></rect></element>
+	<element name="lcdm"><rect><color red="0.54" green="0.57" blue="0.58" /></rect></element>
 
 	<element name="button" defstate="0">
 		<rect state="0"><color red="0.8" green="0.8" blue="0.8" /></rect>
@@ -64,57 +65,13 @@ license:CC0-1.0
 	<element name="text_p6"><image file="chess/wp.svg"><color alpha="0.87" /></image></element>
 
 
-<!-- lcd -->
-
-	<element name="lcd_bg"><rect><color red="0.54" green="0.57" blue="0.58" /></rect></element>
-
-	<element name="digit" defstate="0">
-		<led7seg><color red="0.2" green="0.16" blue="0.16" /></led7seg>
-	</element>
-	<element name="seg0" defstate="0">
-		<text state="1" string="COMPUTING"><color red="0.2" green="0.16" blue="0.16" /></text>
-		<text state="0" string="COMPUTING"><color red="0.49412" green="0.51765" blue="0.51765" /></text>
-	</element>
-	<element name="seg1" defstate="0">
-		<text state="1" string="FIND POSITION" align="2"><color red="0.2" green="0.16" blue="0.16" /></text>
-		<text state="0" string="FIND POSITION" align="2"><color red="0.49412" green="0.51765" blue="0.51765" /></text>
-	</element>
-	<element name="seg2" defstate="0">
-		<text state="1" string="x"><color red="0.2" green="0.16" blue="0.16" /></text>
-		<text state="0" string="x"><color red="0.49412" green="0.51765" blue="0.51765" /></text>
-	</element>
-	<element name="seg3" defstate="0">
-		<text state="1" string="+"><color red="0.2" green="0.16" blue="0.16" /></text>
-		<text state="0" string="+"><color red="0.49412" green="0.51765" blue="0.51765" /></text>
-	</element>
-	<element name="seg4" defstate="0">
-		<text state="1" string="I LOSE" align="1"><color red="0.2" green="0.16" blue="0.16" /></text>
-		<text state="0" string="I LOSE" align="1"><color red="0.49412" green="0.51765" blue="0.51765" /></text>
-	</element>
-
-	<group name="lcd">
-		<bounds x="18" y="23.5" width="74" height="27.5" />
-		<element ref="lcd_bg"><bounds x="18" y="23.5" width="74" height="27.5" /></element>
-
-		<!-- note: it also has a lightning symbol for low-battery at the left, but is unused -->
-		<element name="1.7" ref="seg2"><bounds x="50.1" y="31.4" width="10" height="15" /></element>
-		<element name="3.7" ref="seg3"><bounds x="81.1" y="28.1" width="10" height="16" /></element>
-		<element name="0.7" ref="seg1"><bounds x="22" y="44.3" width="28" height="4" /></element>
-		<element name="2.7" ref="seg4"><bounds x="71" y="44.3" width="13" height="4" /></element>
-		<element name="computing" ref="seg0"><bounds x="40" y="25.7" width="30" height="4" /></element>
-
-		<element name="digit0" ref="digit"><bounds x="29.5" y="30" width="10" height="14" /></element>
-		<element name="digit1" ref="digit"><bounds x="40" y="30" width="10" height="14" /></element>
-		<element name="digit2" ref="digit"><bounds x="60" y="30" width="10" height="14" /></element>
-		<element name="digit3" ref="digit"><bounds x="70.5" y="30" width="10" height="14" /></element>
-	</group>
-
-
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="8" right="27.6" top="13.5" bottom="46.9" />
-		<group ref="lcd"><bounds x="8" y="13.5" width="19.6" height="7.28378" /></group>
+		<bounds left="8" right="27.6" top="15" bottom="46.9" />
+
+		<screen index="0"><bounds x="8" y="15" width="19.6" height="5.788" /></screen>
+		<element ref="lcdm" blend="multiply"><bounds x="7.5" y="14.5" width="21" height="7" /></element>
 
 		<!-- buttons -->
 		<element ref="gray"><bounds x="10.02" y="24.975" width="3.56" height="0.95" /></element>

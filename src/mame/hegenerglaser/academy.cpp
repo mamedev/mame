@@ -1,6 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco, hap
-// thanks-to:yoyo_chessboard
 /*******************************************************************************
 
 Mephisto Academy
