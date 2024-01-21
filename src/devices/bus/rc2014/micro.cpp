@@ -38,6 +38,9 @@ private:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
+	virtual void card_int_w(int state) override { m_maincpu->set_input_line(INPUT_LINE_IRQ0, state); }
+	virtual void card_rx_w(int state) override  { m_acia->write_rxd(state); }
+
 	void clk_w(int state) { m_bus->clk_w(state); }
 	void tx_w(int state) { m_bus->tx_w(state); }
 
@@ -96,10 +99,6 @@ void rc2014_micro::device_resolve_objects()
 	// Setup CPU
 	m_bus->assign_installer(AS_PROGRAM, &m_maincpu->space(AS_PROGRAM));
 	m_bus->assign_installer(AS_IO, &m_maincpu->space(AS_IO));
-	m_bus->int_callback().append_inputline(m_maincpu, INPUT_LINE_IRQ0);
-
-	// Setup ACIA
-	m_bus->rx_callback().append(m_acia, FUNC(acia6850_device::write_rxd));
 }
 
 static DEVICE_INPUT_DEFAULTS_START( terminal )

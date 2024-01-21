@@ -37,6 +37,10 @@ protected:
 	void tx_w(int state) { m_bus->tx_w(state); }
 	void tx2_w(int state) { m_bus->tx2_w(state); }
 
+	virtual void card_int_w(int state) override { m_maincpu->set_input_line(INPUT_LINE_IRQ0, state); }
+	virtual void card_rx_w(int state) override { m_maincpu->rxa0_w(state); } 
+	virtual void card_rx2_w(int state) override { m_maincpu->rxa1_w(state); } 
+
 	// object finders
 	required_device<z180_device> m_maincpu;
 
@@ -60,11 +64,6 @@ void z180cpu_base::device_resolve_objects()
 {
 	m_bus->assign_installer(AS_PROGRAM, &m_maincpu->space(AS_PROGRAM));
 	m_bus->assign_installer(AS_IO, &m_maincpu->space(AS_IO));
-
-	m_bus->int_callback().append_inputline(m_maincpu, INPUT_LINE_IRQ0);
-
-	m_bus->rx_callback().append(m_maincpu, FUNC(z180_device::rxa0_w));
-	m_bus->rx2_callback().append(m_maincpu, FUNC(z180_device::rxa1_w));
 }
 
 // This is here only to configure our terminal for interactive use

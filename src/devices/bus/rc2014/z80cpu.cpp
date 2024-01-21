@@ -66,6 +66,8 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_resolve_objects() override;
+
+	virtual void card_int_w(int state) override { m_maincpu->set_input_line(INPUT_LINE_IRQ0, state); }
 };
 
 z80cpu_device::z80cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -83,8 +85,6 @@ void z80cpu_device::device_resolve_objects()
 {
 	m_bus->assign_installer(AS_PROGRAM, &m_maincpu->space(AS_PROGRAM));
 	m_bus->assign_installer(AS_IO, &m_maincpu->space(AS_IO));
-
-	m_bus->int_callback().append_inputline(m_maincpu, INPUT_LINE_IRQ0);
 }
 
 //**************************************************************************
@@ -101,6 +101,9 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_resolve_objects() override;
+
+	virtual void card_int_w(int state) override { m_maincpu->set_input_line(INPUT_LINE_IRQ0, state); }
+	virtual void card_nmi_w(int state) override { m_maincpu->set_input_line(INPUT_LINE_NMI, state); }
 };
 
 z80cpu21_device::z80cpu21_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -118,9 +121,6 @@ void z80cpu21_device::device_resolve_objects()
 {
 	m_bus->assign_installer(AS_PROGRAM, &m_maincpu->space(AS_PROGRAM));
 	m_bus->assign_installer(AS_IO, &m_maincpu->space(AS_IO));
-
-	m_bus->int_callback().append_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	m_bus->nmi_callback().append_inputline(m_maincpu, INPUT_LINE_NMI);
 }
 
 }
