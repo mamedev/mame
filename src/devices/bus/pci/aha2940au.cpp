@@ -47,6 +47,10 @@ ROM_START( aha2940au )
 	ROM_SYSTEM_BIOS( 0, "v1.30", "AHA-2940AU (v1.30)" )
 	// "589247-00_c_bios_2400_(C)1996_v1.30.u3"
 	ROMX_LOAD( "589247-00.u3", 0x0000, 0x8000, CRC(de00492b) SHA1(a6015bcd51e51015a5710d7ac1929e28bf033db4), ROM_BIOS(0) )
+
+	// default eeprom contents, to be verified
+	ROM_REGION( 0x80, "eeprom", ROMREGION_ERASEFF )
+	ROM_LOAD( "93c46.u1", 0x00, 0x80, CRC(c82242ce) SHA1(93311b8c02e87492a40c1df6ea4eb60628bb2825) )
 ROM_END
 
 const tiny_rom_entry *aha2940au_scsi_device::device_rom_region() const
@@ -56,7 +60,8 @@ const tiny_rom_entry *aha2940au_scsi_device::device_rom_region() const
 
 void aha2940au_scsi_device::device_add_mconfig(machine_config &config)
 {
-	// TODO: AIC-7860Q
+	// AIC-7860Q
+	// 93C46 EEPROM
 }
 
 void aha2940au_scsi_device::device_start()
