@@ -11417,6 +11417,28 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
+	<software name="pacdisc" supported="no">
+		<description>Pana Amusement Collection Disc (Japan)</description>
+		<year>1988</year>
+		<publisher>Panasoft</publisher>
+		<notes>No proper dumps and should be 3 disks. The last menu item on disk 2 displays garbage.</notes>
+		<info name="alt_title" value="パナアミューズメントコレクション"/>
+		<info name="serial" value="SW-M008"/>
+		<info name="barcode" value="4902704840073"/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="pana amusement collection 1 (1988)(panasoft)(jp).dsk" size="737280" crc="4dee2cff" sha1="e4bc138daedac129c39923cbe4a07bf79a880f8b" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="737280">
+				<rom name="pana amusement collection 2 (1988)(panasoft)(jp).dsk" size="737280" crc="d9e6725b" sha1="94d741c816095b8dab4cff5bffd4e0fcd351f700" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="passvent">
 		<description>Les Passagers du Vent (France)</description>
 		<year>1986</year>
@@ -14802,6 +14824,17 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
+	<software name="soundmac">
+		<description>Sound Machine voor MSX2 Computers (Netherlands?)</description>
+		<year>1988</year>
+		<publisher>Brainchild</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="sound machine - brainchild.dsk" size="368640" crc="4747264d" sha1="c217833176c96971882bdba413bdef363a525a0a"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hoshisun">
 		<description>Hoshi no Suna Monogatari (Japan)</description>
 		<year>1990</year>
@@ -16068,6 +16101,32 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
+	<software name="twinkle">
+		<description>Twinkle Star - Hoshi no Mahou Tsukai (Japan)</description>
+		<year>1990</year>
+		<publisher>MSX Magazine</publisher>
+		<info name="alt_title" value="ＴＷＩＮＫＬＥ ＳＴＡＲ 星の魔法使い"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="twinkle star (1990)(msx magazine)(jp).dsk" size="737280" crc="c97eb5cd" sha1="d89cf80e53210ddd48e64a866d0b073713ba3160"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="twinklea" cloneof="twinkle">
+		<description>Twinkle Star - Hoshi no Mahou Tsukai (Japan, alt)</description>
+		<year>1990</year>
+		<publisher>MSX Magazine</publisher>
+		<info name="alt_title" value="ＴＷＩＮＫＬＥ ＳＴＡＲ 星の魔法使い"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="twinkle star (1990)(msx magazine)(jp)[a].dsk" size="737280" crc="06f4dde6" sha1="c27fadbc9188cf959ea74e83557143d9fe5e34fa"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ultima">
 		<description>Ultima I - The First Age of Darkness (Japan)</description>
 		<year>1986</year>
@@ -16393,6 +16452,19 @@ The following floppies came with the machines.
 			<feature name="part_id" value="Disk D"/>
 			<dataarea name="flop" size="737280">
 				<rom name="valis - the fantasm soldier ii (1989)(telenet japan)(jp)(disk 4 of 4)[a].dsk" size="737280" crc="ed7ce43a" sha1="35dcb8d59bdf124618bc8d96e98824a6f4d6b4b7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="videobench">
+		<description>VideoBench (Netherlands)</description>
+		<year>1991</year>
+		<publisher>NewVision</publisher>
+		<info name="serial" value="NV-06"/>
+		<info name="usage" value="Requires a mouse."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="videobench - newvision.dsk" size="737280" crc="a2255be6" sha1="3245a8931dc67a4275b853cdef61cc40785b5341"/>
 			</dataarea>
 		</part>
 	</software>
