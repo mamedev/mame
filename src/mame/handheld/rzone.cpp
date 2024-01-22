@@ -352,6 +352,6 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT  CLASS        INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1995, rzbatfor,  0,      0,      rzbatfor,  rzone, rzone_state, empty_init, "Tiger Electronics", "R-Zone: Batman Forever", MACHINE_SUPPORTS_SAVE )
-SYST( 1996, rztoshden, 0,      0,      rztoshden, rzone, rzone_state, empty_init, "Tiger Electronics (licensed from Takara)", "R-Zone: Battle Arena Toshinden", MACHINE_SUPPORTS_SAVE )
-SYST( 1996, rzindy500, 0,      0,      rzindy500, rzone, rzone_state, empty_init, "Tiger Electronics (licensed from Sega)", "R-Zone: Indy 500", MACHINE_SUPPORTS_SAVE )
+SYST( 1995, rzbatfor,  0,      0,      rzbatfor,  rzone, rzone_state, empty_init, "Tiger Electronics", "R-Zone: Batman Forever", MACHINE_SUPPORTS_SAVE ) // licensed from DC Comics
+SYST( 1996, rztoshden, 0,      0,      rztoshden, rzone, rzone_state, empty_init, "Tiger Electronics", "R-Zone: Battle Arena Toshinden", MACHINE_SUPPORTS_SAVE ) // licensed from Takara
+SYST( 1996, rzindy500, 0,      0,      rzindy500, rzone, rzone_state, empty_init, "Tiger Electronics", "R-Zone: Indy 500", MACHINE_SUPPORTS_SAVE ) // licensed from Sega
