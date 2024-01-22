@@ -75,11 +75,6 @@
 
 ****************************************************************************************/
 
-// Debug Notes:
-// good luck credits vars 6Bh - 1ABh - 501Bh(nvram) - bin
-// jester ch credits vars 34h - 179h - 5018h(nvram) - bin
-// castaway  credits vars 1Eh - 14Ah - 5025h(nvram) - bin
-
 #include "emu.h"
 #include "emupal.h"
 #include "screen.h"
