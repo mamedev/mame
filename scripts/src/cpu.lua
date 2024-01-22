@@ -3951,8 +3951,20 @@ if opt_tool(CPUS, "HT1130") then
 end
 
 --------------------------------------------------
--- Epson C33 STD, C33 ADV, etc., disassembler only
+-- Epson C33 STD, C33 ADV, etc.
+--@src/devices/cpu/c33/c33common.h,CPUS["C33"] = true
 --------------------------------------------------
+
+if CPUS["C33"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/c33/c33common.h",
+		MAME_DIR .. "src/devices/cpu/c33/c33helpers.ipp",
+		MAME_DIR .. "src/devices/cpu/c33/c33std.cpp",
+		MAME_DIR .. "src/devices/cpu/c33/c33std.h",
+		MAME_DIR .. "src/devices/cpu/c33/s1c33209.cpp",
+		MAME_DIR .. "src/devices/cpu/c33/s1c33209.h",
+	}
+end
 
 if opt_tool(CPUS, "C33") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/c33/c33dasm.cpp")

@@ -41399,6 +41399,10 @@ am1000                          // (c) 1988 Alpha Micro
 anto2495                        //
 anto2614                        //
 
+@source:skeleton/aquaplus_piece.cpp
+piece512k                       //
+piece2m                         //
+
 @source:skeleton/argox.cpp
 os214                           //
 
