@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders:Vas Crabb
 
 #ifndef MAME_CPU_UPD777_UPD777_H
 #define MAME_CPU_UPD777_UPD777_H

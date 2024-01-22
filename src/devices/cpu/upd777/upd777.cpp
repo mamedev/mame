@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders:Vas Crabb
 
 #include "emu.h"
 #include "upd777.h"
