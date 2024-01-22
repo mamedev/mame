@@ -12,6 +12,12 @@
 
 **************************************************************************
 
+    TODO:
+    - No viable solution for reading configuration DIPs at init time,
+      so only LD-V1000 versions are supported at this time.
+
+**************************************************************************
+
     There are two revisions of the Cinematronics board used in the
     U.S. Rev A
 
@@ -38,7 +44,7 @@
 
 #include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
-#include "machine/ldv1000.h"
+#include "machine/ldv1000hle.h"
 #include "machine/ldstub.h"
 #include "machine/watchdog.h"
 #include "machine/z80ctc.h"
@@ -72,8 +78,6 @@ public:
 
 	int laserdisc_status_r();
 	int laserdisc_command_r();
-	void init_fixed();
-	void init_variable();
 
 	void dlair_base(machine_config &config);
 	void dlair_pr7820(machine_config &config);
@@ -140,7 +144,7 @@ private:
 	optional_device<speaker_sound_device> m_speaker;
 	optional_device<gfxdecode_device> m_gfxdecode;
 	optional_device<palette_device> m_palette;
-	optional_device<pioneer_ldv1000_device> m_ldv1000;
+	optional_device<pioneer_ldv1000hle_device> m_ldv1000;
 	optional_device<pioneer_pr7820_device> m_pr7820;
 	optional_device<philips_22vp932_device> m_22vp932;
 	optional_shared_ptr<uint8_t> m_videoram;
@@ -519,7 +523,7 @@ static INPUT_PORTS_START( dlair )
 	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_HIGH, "A:8" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "Sound every 8 attracts" ) PORT_DIPLOCATION("B:1")
+	PORT_DIPNAME( 0x01, 0x01, "Sound Every 8 Attracts" ) PORT_DIPLOCATION("B:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("B:2")
@@ -571,9 +575,9 @@ static INPUT_PORTS_START( dlaire )
 	PORT_INCLUDE(dlair)
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x08, 0x00, "LD Player" )  PORT_DIPLOCATION("B:3")    /* In Rev F, F2 and so on... before it was Joystick Sound Feedback */
-	PORT_DIPSETTING(    0x08, "LD-PR7820" )
-	PORT_DIPSETTING(    0x00, "LDV-1000" )
+	PORT_DIPNAME( 0x08, 0x08, "LD Player" )  PORT_DIPLOCATION("B:3")    /* In Rev F, F2 and so on... before it was Joystick Sound Feedback */
+	PORT_DIPSETTING(    0x08, "LD-V1000" )
+	PORT_DIPSETTING(    0x00, "LD-PR7820" )
 INPUT_PORTS_END
 
 
@@ -620,7 +624,7 @@ static INPUT_PORTS_START( dleuro )
 	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_HIGH, "A:8" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "Sound every 8 attracts" ) PORT_DIPLOCATION("B:1")
+	PORT_DIPNAME( 0x01, 0x01, "Sound Every 8 Attracts" ) PORT_DIPLOCATION("B:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("B:2")
@@ -658,7 +662,6 @@ static INPUT_PORTS_START( spaceace )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("A:2")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x02, "5" )
-	// TODO: manual claims following is "Difficulty Increase", which more or less is again rank ...
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("A:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) ) // 5 chapters without losing life
 	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) ) // 3
@@ -668,16 +671,16 @@ static INPUT_PORTS_START( spaceace )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("A:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x00, "Demo Sounds Frequency" ) PORT_DIPLOCATION("A:6")
-	PORT_DIPSETTING(    0x00, "All the time" )
-	PORT_DIPSETTING(    0x20, "1 out of eight times" )
+	PORT_DIPNAME( 0x20, 0x00, "Sound Every 8 Attracts" ) PORT_DIPLOCATION("A:6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_HIGH, "A:7")
 	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_HIGH, "A:8")
 
 	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, "LD Player" ) PORT_DIPLOCATION("B:1")
-	PORT_DIPSETTING(    0x00, "LD-PR7820" )
-	PORT_DIPSETTING(    0x01, "LDV-1000" )
+	PORT_DIPSETTING(    0x00, "LD-V1000" )
+	PORT_DIPSETTING(    0x01, "LD-PR7820" )
 	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_HIGH, "B:2")
 	PORT_DIPUNUSED_DIPLOC( 0x04, IP_ACTIVE_HIGH, "B:3")
 	PORT_DIPUNUSED_DIPLOC( 0x08, IP_ACTIVE_HIGH, "B:4")
@@ -756,7 +759,7 @@ void dlair_state::dlair_pr7820(machine_config &config)
 void dlair_state::dlair_ldv1000(machine_config &config)
 {
 	dlair_base(config);
-	PIONEER_LDV1000(config, m_ldv1000, 0);
+	PIONEER_LDV1000HLE(config, m_ldv1000, 0);
 	m_ldv1000->add_route(0, "lspeaker", 1.0);
 	m_ldv1000->add_route(1, "rspeaker", 1.0);
 	m_ldv1000->add_ntsc_screen(config, "screen");
@@ -817,7 +820,7 @@ ROM_START( dlair )      /* revision F2 */
 	ROM_LOAD( "dl_f2_u4.bin", 0x6000, 0x2000,  CRC(f5ec23d2) SHA1(71149e2d359cc5944fbbb53dd7d0c2b42fbc9bb4) )
 
 	DISK_REGION( "ld_ldv1000" )
-	DISK_IMAGE_READONLY( "dlair", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "dlair", 0, SHA1(c3ee2e27aa4847bf3884fc0d18f26f315456aa9e) )
 ROM_END
 
 ROM_START( dlair_1 )     /* Serial #001, courtesy Jason Finn */
@@ -889,7 +892,7 @@ ROM_START( dlaird )     /* revision D */
 	ROM_LOAD( "dl_d_u5.bin", 0x8000, 0x2000,  CRC(2b469c89) SHA1(646394b51325ca9163221a43b5af64a8067eb80b) )
 
 	DISK_REGION( "ld_ldv1000" )
-	DISK_IMAGE_READONLY( "dlair", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "dlair", 0, SHA1(c3ee2e27aa4847bf3884fc0d18f26f315456aa9e) )
 ROM_END
 
 ROM_START( dlaire )     /* revision E */
@@ -900,7 +903,7 @@ ROM_START( dlaire )     /* revision E */
 	ROM_LOAD( "dl_e_u4.bin", 0x6000, 0x2000,  CRC(4ebffba5) SHA1(d04711247ffa88e371ec461465dd75a8158d90bc) )
 
 	DISK_REGION( "ld_ldv1000" )
-	DISK_IMAGE_READONLY( "dlair", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "dlair", 0, SHA1(c3ee2e27aa4847bf3884fc0d18f26f315456aa9e) )
 ROM_END
 
 ROM_START( dlairf )     /* revision F */
@@ -911,7 +914,7 @@ ROM_START( dlairf )     /* revision F */
 	ROM_LOAD( "dl_f_u4.bin", 0x6000, 0x2000,  CRC(a817324e) SHA1(1299c83342fc70932f67bda8ae60bace91d66429) )
 
 	DISK_REGION( "ld_ldv1000" )
-	DISK_IMAGE_READONLY( "dlair", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "dlair", 0, SHA1(c3ee2e27aa4847bf3884fc0d18f26f315456aa9e) )
 ROM_END
 
 ROM_START( dleuro )     /* European Atari version */
@@ -1008,26 +1011,6 @@ ROM_START( spaceaceeuro )       /* Italian Sidam version */
 	DISK_IMAGE_READONLY( "saeuro", 0, NO_DUMP )
 ROM_END
 
-
-
-
-/*************************************
- *
- *  Driver initialization
- *
- *************************************/
-
-void dlair_state::init_fixed()
-{
-//  m_laserdisc_type = LASERDISC_TYPE_FIXED;
-}
-
-
-void dlair_state::init_variable()
-{
-//  m_laserdisc_type = LASERDISC_TYPE_VARIABLE;
-}
-
 } // anonymous namespace
 
 
@@ -1037,21 +1020,21 @@ void dlair_state::init_variable()
  *
  *************************************/
 
-GAMEL( 1983, dlair,        0,        dlair_ldv1000, dlaire,   dlair_state, init_variable, ROT0, "Cinematronics", "Dragon's Lair (US Rev. F2)", MACHINE_NOT_WORKING, layout_dlair )
-GAMEL( 1983, dlairf,       dlair,    dlair_ldv1000, dlaire,   dlair_state, init_variable, ROT0, "Cinematronics", "Dragon's Lair (US Rev. F)",  MACHINE_NOT_WORKING, layout_dlair )
-GAMEL( 1983, dlaire,       dlair,    dlair_ldv1000, dlaire,   dlair_state, init_variable, ROT0, "Cinematronics", "Dragon's Lair (US Rev. E)",  MACHINE_NOT_WORKING, layout_dlair )
-GAMEL( 1983, dlaird,       dlair,    dlair_ldv1000, dlair,    dlair_state, init_fixed,    ROT0, "Cinematronics", "Dragon's Lair (US Rev. D, Pioneer LD-V1000)",  MACHINE_NOT_WORKING, layout_dlair )
-GAMEL( 1983, dlairc,       dlair,    dlair_pr7820,  dlair,    dlair_state, init_fixed,    ROT0, "Cinematronics", "Dragon's Lair (US Rev. C, Pioneer PR-7820)",  MACHINE_NOT_WORKING, layout_dlair )
-GAMEL( 1983, dlairb,       dlair,    dlair_pr7820,  dlair,    dlair_state, init_fixed,    ROT0, "Cinematronics", "Dragon's Lair (US Rev. B, Pioneer PR-7820)",  MACHINE_NOT_WORKING, layout_dlair )
-GAMEL( 1983, dlaira,       dlair,    dlair_pr7820,  dlair,    dlair_state, init_fixed,    ROT0, "Cinematronics", "Dragon's Lair (US Rev. A, Pioneer PR-7820)",  MACHINE_NOT_WORKING, layout_dlair )
-GAMEL( 1983, dlair_2,      dlair,    dlair_pr7820,  dlair,    dlair_state, init_fixed,    ROT0, "Cinematronics", "Dragon's Lair (US Beta 2?, Pioneer PR-7820)",  MACHINE_NOT_WORKING, layout_dlair )
-GAMEL( 1983, dlair_1,      dlair,    dlair_pr7820,  dlair,    dlair_state, init_fixed,    ROT0, "Cinematronics", "Dragon's Lair (US Beta 1, Pioneer PR-7820)",  MACHINE_NOT_WORKING, layout_dlair )
+GAMEL( 1983, dlair,        0,        dlair_ldv1000, dlaire,   dlair_state, empty_init, ROT0, "Cinematronics", "Dragon's Lair (US Rev. F2)", MACHINE_SUPPORTS_SAVE, layout_dlair )
+GAMEL( 1983, dlairf,       dlair,    dlair_ldv1000, dlaire,   dlair_state, empty_init, ROT0, "Cinematronics", "Dragon's Lair (US Rev. F)",  MACHINE_SUPPORTS_SAVE, layout_dlair )
+GAMEL( 1983, dlaire,       dlair,    dlair_ldv1000, dlaire,   dlair_state, empty_init, ROT0, "Cinematronics", "Dragon's Lair (US Rev. E)",  MACHINE_SUPPORTS_SAVE, layout_dlair )
+GAMEL( 1983, dlaird,       dlair,    dlair_ldv1000, dlair,    dlair_state, empty_init, ROT0, "Cinematronics", "Dragon's Lair (US Rev. D, Pioneer LD-V1000)",  MACHINE_SUPPORTS_SAVE, layout_dlair )
+GAMEL( 1983, dlairc,       dlair,    dlair_pr7820,  dlair,    dlair_state, empty_init, ROT0, "Cinematronics", "Dragon's Lair (US Rev. C, Pioneer PR-7820)",  MACHINE_NOT_WORKING, layout_dlair )
+GAMEL( 1983, dlairb,       dlair,    dlair_pr7820,  dlair,    dlair_state, empty_init, ROT0, "Cinematronics", "Dragon's Lair (US Rev. B, Pioneer PR-7820)",  MACHINE_NOT_WORKING, layout_dlair )
+GAMEL( 1983, dlaira,       dlair,    dlair_pr7820,  dlair,    dlair_state, empty_init, ROT0, "Cinematronics", "Dragon's Lair (US Rev. A, Pioneer PR-7820)",  MACHINE_NOT_WORKING, layout_dlair )
+GAMEL( 1983, dlair_2,      dlair,    dlair_pr7820,  dlair,    dlair_state, empty_init, ROT0, "Cinematronics", "Dragon's Lair (US Beta 2?, Pioneer PR-7820)",  MACHINE_NOT_WORKING, layout_dlair )
+GAMEL( 1983, dlair_1,      dlair,    dlair_pr7820,  dlair,    dlair_state, empty_init, ROT0, "Cinematronics", "Dragon's Lair (US Beta 1, Pioneer PR-7820)",  MACHINE_NOT_WORKING, layout_dlair )
 
-GAMEL( 1983, dleuro,       dlair,    dleuro,        dleuro,   dlair_state, init_fixed,    ROT0, "Cinematronics (Atari license)", "Dragon's Lair (European)",  MACHINE_NOT_WORKING, layout_dlair )
-GAMEL( 1983, dleuroalt,    dlair,    dleuro,        dleuro,   dlair_state, init_fixed,    ROT0, "Cinematronics (Atari license)", "Dragon's Lair (European, alternate)",  MACHINE_NOT_WORKING, layout_dlair )
-GAMEL( 1983, dlital,       dlair,    dleuro,        dleuro,   dlair_state, init_fixed,    ROT0, "Cinematronics (Sidam license?)","Dragon's Lair (Italian)",  MACHINE_NOT_WORKING, layout_dlair )
+GAMEL( 1983, dleuro,       dlair,    dleuro,        dleuro,   dlair_state, empty_init, ROT0, "Cinematronics (Atari license)", "Dragon's Lair (European)",  MACHINE_NOT_WORKING, layout_dlair )
+GAMEL( 1983, dleuroalt,    dlair,    dleuro,        dleuro,   dlair_state, empty_init, ROT0, "Cinematronics (Atari license)", "Dragon's Lair (European, alternate)",  MACHINE_NOT_WORKING, layout_dlair )
+GAMEL( 1983, dlital,       dlair,    dleuro,        dleuro,   dlair_state, empty_init, ROT0, "Cinematronics (Sidam license?)","Dragon's Lair (Italian)",  MACHINE_NOT_WORKING, layout_dlair )
 
-GAMEL( 1983, spaceace,     0,        dlair_ldv1000, spaceace, dlair_state, init_variable, ROT0, "Cinematronics", "Space Ace (US Rev. A3)", MACHINE_NOT_WORKING, layout_dlair )
-GAMEL( 1983, spaceacea2,   spaceace, dlair_ldv1000, spaceace, dlair_state, init_variable, ROT0, "Cinematronics", "Space Ace (US Rev. A2)", MACHINE_NOT_WORKING, layout_dlair )
-GAMEL( 1983, spaceacea,    spaceace, dlair_ldv1000, spaceace, dlair_state, init_variable, ROT0, "Cinematronics", "Space Ace (US Rev. A)", MACHINE_NOT_WORKING, layout_dlair )
-GAMEL( 1983, spaceaceeuro, spaceace, dleuro,        spaceace, dlair_state, init_fixed,    ROT0, "Cinematronics (Atari license)", "Space Ace (European)",  MACHINE_NOT_WORKING, layout_dlair )
+GAMEL( 1983, spaceace,     0,        dlair_ldv1000, spaceace, dlair_state, empty_init, ROT0, "Cinematronics", "Space Ace (US Rev. A3)", MACHINE_NOT_WORKING, layout_dlair )
+GAMEL( 1983, spaceacea2,   spaceace, dlair_ldv1000, spaceace, dlair_state, empty_init, ROT0, "Cinematronics", "Space Ace (US Rev. A2)", MACHINE_NOT_WORKING, layout_dlair )
+GAMEL( 1983, spaceacea,    spaceace, dlair_ldv1000, spaceace, dlair_state, empty_init, ROT0, "Cinematronics", "Space Ace (US Rev. A)", MACHINE_NOT_WORKING, layout_dlair )
+GAMEL( 1983, spaceaceeuro, spaceace, dleuro,        spaceace, dlair_state, empty_init, ROT0, "Cinematronics (Atari license)", "Space Ace (European)",  MACHINE_NOT_WORKING, layout_dlair )
