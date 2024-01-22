@@ -149,9 +149,8 @@ void virge_pci_device::device_start()
 	add_rom(m_bios->base(),0x8000);
 	expansion_rom_base = 0xc0000;
 
-	add_map(32 * 1024 * 1024, M_MEM | M_DISABLED, FUNC(virge_pci_device::lfb_map));
+	add_map(64 * 1024 * 1024, M_MEM | M_DISABLED, FUNC(virge_pci_device::lfb_map));
 	set_map_address(0, 0x70000000);
-	set_map_size(0, 0x01100000);  // Linear addressing maps to a 32MB address space
 
 	remap_cb();
 	machine().save().register_postload(save_prepost_delegate(FUNC(virge_pci_device::postload), this));
@@ -165,9 +164,8 @@ void virgedx_pci_device::device_start()
 	add_rom(m_bios->base(),0x8000);
 	expansion_rom_base = 0xc0000;
 
-	add_map(4 * 1024 * 1024, M_MEM | M_DISABLED, FUNC(virge_pci_device::lfb_map));
+	add_map(64 * 1024 * 1024, M_MEM | M_DISABLED, FUNC(virge_pci_device::lfb_map));
 	set_map_address(0, 0x70000000);
-	set_map_size(0, 0x01100000);  // Linear addressing maps to a 32MB address space
 
 	remap_cb();
 	machine().save().register_postload(save_prepost_delegate(FUNC(virgedx_pci_device::postload), this));
