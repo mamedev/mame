@@ -207,8 +207,8 @@ ROM_START( brke23p2 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "brke23p2.bin", 0x0000, 0x1000, CRC(8045fac4) SHA1(a36213309e6add31f31e4248f02f17de9914a5c1) ) // visual decap
 
-	ROM_REGION( 0x100, "melody", 0 )
-	ROM_LOAD( "brke23p2.snd", 0x000, 0x100, NO_DUMP ) // unknown size
+	ROM_REGION( 0x280, "melody", 0 )
+	ROM_LOAD( "e23plusmarkii96in1.srom", 0x000, 0x280, CRC(591a8a21) SHA1(f039359e8e1d1bf75581a4c852b263c8c140e072) )
 
 	ROM_REGION( 160500, "screen", 0)
 	ROM_LOAD( "brke23p2.svg", 0, 160500, CRC(9edf8aab) SHA1(f2ab907d23517612196648f1b5b0cb9b4a1ab3bd) )
@@ -218,8 +218,8 @@ ROM_START( ga888 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "ga888.bin", 0x0000, 0x1000, CRC(cb3f8ff4) SHA1(00b08773e8ee7577377f4d52cd1e6bb657b6f242) ) // visual decap
 
-	ROM_REGION( 0x100, "melody", 0 )
-	ROM_LOAD( "ga888.snd", 0x000, 0x100, NO_DUMP ) // unknown size
+	ROM_REGION( 0x280, "melody", 0 )
+	ROM_LOAD( "ga888.srom", 0x000, 0x280, CRC(a8495ac7) SHA1(f6c24fc9622bff73ab09b5ee77eb338f27f7a6b1) )
 
 	ROM_REGION( 84795, "screen", 0)
 	ROM_LOAD( "ga888.svg", 0, 84795, CRC(5aa70531) SHA1(fc7bc442e6c88365047cf081d1113c741b144934) )
