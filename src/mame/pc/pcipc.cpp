@@ -41,6 +41,10 @@
 #include "machine/w83977tf.h"
 #include "video/clgd546x_laguna.h"
 
+// enable ISA verbose messaging at I/O $80
+// NOTE: xubuntu 6.10 will ping the port a lot once it gets to GNOME.
+#define VERBOSE_ISA_DEBUG 0
+
 namespace {
 
 class pcipc_state : public driver_device
@@ -454,6 +458,7 @@ const pcipc_state::boot_state_info pcipc_state::boot_state_infos_award[] = {
 
 void pcipc_state::boot_state_phoenix_w(uint8_t data)
 {
+#if VERBOSE_ISA_DEBUG
 	const char *desc = "";
 	for(int i=0; boot_state_infos_phoenix[i].message; i++)
 		if(boot_state_infos_phoenix[i].val == data) {
@@ -461,11 +466,12 @@ void pcipc_state::boot_state_phoenix_w(uint8_t data)
 			break;
 		}
 	logerror("Boot state %02x - %s\n", data, desc);
-
+#endif
 }
 
 void pcipc_state::boot_state_phoenix_ver40_rev6_w(uint8_t data)
 {
+#if VERBOSE_ISA_DEBUG
 	const char *desc = "";
 	for(int i=0; boot_state_infos_phoenix_ver40_rev6[i].message; i++)
 		if(boot_state_infos_phoenix_ver40_rev6[i].val == data) {
@@ -473,12 +479,13 @@ void pcipc_state::boot_state_phoenix_ver40_rev6_w(uint8_t data)
 			break;
 		}
 	logerror("Boot state %02x - %s\n", data, desc);
-//  printf("[%02X]",data);
+#endif
 }
 
 
 void pcipc_state::boot_state_award_w(uint8_t data)
 {
+#if VERBOSE_ISA_DEBUG
 	const char *desc = "";
 	for(int i=0; boot_state_infos_award[i].message; i++)
 		if(boot_state_infos_award[i].val == data) {
@@ -486,7 +493,7 @@ void pcipc_state::boot_state_award_w(uint8_t data)
 			break;
 		}
 	logerror("Boot state %02x - %s\n", data, desc);
-
+#endif
 }
 
 static void isa_internal_devices(device_slot_interface &device)

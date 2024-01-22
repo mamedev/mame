@@ -238,6 +238,9 @@ void s3virge_vga_device::crtc_map(address_map &map)
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			s3.cr53 = data;
+			LOGREG("CR53: write %02x\n", data);
+			// FIXME: this is just to make PCI to catch up for the side effect of relocating MMIO.
+			// TODO: Big Endian at bits 2-1
 			m_linear_config_changed_cb(s3virge.linear_address_enable);
 		})
 	);

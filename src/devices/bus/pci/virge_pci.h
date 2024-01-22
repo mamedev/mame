@@ -63,6 +63,7 @@ protected:
 
 private:
 	void refresh_linear_window();
+	u32 get_vga_linear_address();
 };
 
 class virgedx_pci_device : public virge_pci_device
