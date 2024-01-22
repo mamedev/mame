@@ -2134,7 +2134,13 @@ void lua_engine::initialize()
 		};
 	output_type["name_to_id"] = &output_manager::name_to_id;
 	output_type["id_to_name"] = &output_manager::id_to_name;
-
+	output_type["item_table"] = sol::property([this] (output_manager &o)
+		{
+			sol::table table = sol().create_table();
+			for (const auto& [key, value] : o.itemtable())
+				table[key] = value.id();
+			return table;
+		});
 
 	auto mame_manager_type = sol().registry().new_usertype<mame_machine_manager>("manager", sol::no_constructor);
 	mame_manager_type["machine"] = sol::property(&mame_machine_manager::machine);

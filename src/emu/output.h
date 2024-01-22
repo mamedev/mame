@@ -194,6 +194,9 @@ public:
 	// map a unique ID back to a name
 	const char *id_to_name(u32 id);
 
+	// return the item table
+	const std::unordered_map<std::string, output_item> &itemtable() const noexcept { return m_itemtable; }
+
 private:
 	output_item *find_item(std::string_view string);
 	output_item &create_new_item(std::string_view outname, s32 value);
