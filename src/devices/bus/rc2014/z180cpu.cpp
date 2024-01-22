@@ -9,9 +9,10 @@
 #include "emu.h"
 #include "z180cpu.h"
 
+#include "bus/rs232/rs232.h"
 #include "cpu/z180/z180.h"
 #include "machine/clock.h"
-#include "bus/rs232/rs232.h"
+
 
 namespace {
 
@@ -25,7 +26,7 @@ protected:
 	// construction/destruction
 	z180cpu_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_resolve_objects() override;
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -38,8 +39,8 @@ protected:
 	void tx2_w(int state) { m_bus->tx2_w(state); }
 
 	virtual void card_int_w(int state) override { m_maincpu->set_input_line(INPUT_LINE_IRQ0, state); }
-	virtual void card_rx_w(int state) override { m_maincpu->rxa0_w(state); } 
-	virtual void card_rx2_w(int state) override { m_maincpu->rxa1_w(state); } 
+	virtual void card_rx_w(int state) override { m_maincpu->rxa0_w(state); }
+	virtual void card_rx2_w(int state) override { m_maincpu->rxa1_w(state); }
 
 	// object finders
 	required_device<z180_device> m_maincpu;
@@ -111,7 +112,7 @@ public:
 	sc111_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 };
 
@@ -124,7 +125,9 @@ void sc111_device::device_start()
 {
 }
 
-}
+} // anonymous namespace
+
+
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************

@@ -23,7 +23,7 @@ public:
 	ram_32k_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 private:
@@ -61,7 +61,7 @@ protected:
 	// construction/destruction
 	ram_64k_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_post_load() override { update_banks(); }
@@ -131,7 +131,7 @@ public:
 	ram_64k_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_reset() override;
 
 	// base-class overrides
@@ -176,7 +176,7 @@ public:
 	ram_64k_device_40pin(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_reset() override;
 
 	// base-class overrides
@@ -204,7 +204,9 @@ void ram_64k_device_40pin::device_reset()
 	}
 }
 
-}
+} // anonymous namespace
+
+
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************

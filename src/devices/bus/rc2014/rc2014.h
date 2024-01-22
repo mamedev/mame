@@ -60,6 +60,10 @@
 
 #include "machine/z80daisy.h"
 
+#include <functional>
+#include <vector>
+
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -101,6 +105,7 @@ protected:
 	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
 private:
 	using card_vector = std::vector<std::reference_wrapper<device_rc2014_card_interface> >;
 
@@ -131,6 +136,7 @@ public:
 	virtual void card_user2_w(int state) { }
 	virtual void card_user3_w(int state) { }
 	virtual void card_user4_w(int state) { }
+
 protected:
 	rc2014_bus_device  *m_bus;
 };
@@ -187,8 +193,10 @@ public:
 	void user8_w(int state);
 
 	void add_card(device_rc2014_ext_card_interface &card);
+
 protected:
 	rc2014_ext_bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 private:
 	using card_vector = std::vector<std::reference_wrapper<device_rc2014_ext_card_interface> >;
 	card_vector m_device_list;
@@ -203,6 +211,7 @@ class device_rc2014_ext_card_interface : public device_rc2014_card_interface
 protected:
 	// construction/destruction
 	device_rc2014_ext_card_interface(const machine_config &mconfig, device_t &device);
+
 public:
 	virtual void card_clk2_w(int state) { }
 	virtual void card_page_w(int state) { }
@@ -213,6 +222,7 @@ public:
 	virtual void card_user6_w(int state) { }
 	virtual void card_user7_w(int state) { }
 	virtual void card_user8_w(int state) { }
+
 protected:
 	rc2014_ext_bus_device  *m_bus;
 };
@@ -257,10 +267,13 @@ public:
 	rc2014_rc80_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void add_card(device_rc2014_rc80_card_interface &card);
+
 protected:
 	rc2014_rc80_bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-	// device-level overrides
+
+	// device_t implementation
 	virtual void device_start() override;
+
 private:
 	using card_vector = std::vector<std::reference_wrapper<device_rc2014_rc80_card_interface> >;
 	card_vector m_device_list;
@@ -298,12 +311,13 @@ public:
 	}
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_resolve_objects() override;
 };
 
-// device type definition
+
+// device type declarations
 DECLARE_DEVICE_TYPE(RC2014_BUS,  rc2014_bus_device)
 DECLARE_DEVICE_TYPE(RC2014_SLOT, rc2014_slot_device)
 

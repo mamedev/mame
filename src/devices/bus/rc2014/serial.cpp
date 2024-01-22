@@ -8,9 +8,11 @@
 
 #include "emu.h"
 #include "serial.h"
+
+#include "bus/rs232/rs232.h"
 #include "machine/6850acia.h"
 #include "machine/z80sio.h"
-#include "bus/rs232/rs232.h"
+
 
 namespace {
 
@@ -26,7 +28,7 @@ public:
 	serial_io_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -36,6 +38,7 @@ protected:
 
 	virtual void card_clk_w(int state) override  { m_acia->write_txc(state); m_acia->write_rxc(state); }
 	virtual void card_rx_w(int state) override   { m_acia->write_rxd(state); }
+
 private:
 	required_device<acia6850_device> m_acia;
 };
@@ -259,7 +262,9 @@ void dual_serial_device_40pin::device_resolve_objects()
 	m_bus->add_to_daisy_chain(m_sio->tag());
 }
 
-}
+} // anonymous namespace
+
+
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************

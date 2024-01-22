@@ -8,13 +8,15 @@
 
 #include "emu.h"
 #include "micro.h"
+
 #include "modules.h"
 
+#include "bus/ata/ataintf.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "machine/6850acia.h"
 #include "machine/clock.h"
-#include "bus/ata/ataintf.h"
-#include "bus/rs232/rs232.h"
+
 
 namespace {
 
@@ -30,7 +32,7 @@ public:
 	rc2014_micro(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 private:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_resolve_objects() override;
@@ -177,7 +179,7 @@ public:
 	rc2014_mini_cpm(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_post_load() override { update_banks(); }
@@ -290,7 +292,9 @@ const tiny_rom_entry *rc2014_mini_cpm::device_rom_region() const
 	return ROM_NAME( rc2014_mini_cpm );
 }
 
-}
+} // anonymous namespace
+
+
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
