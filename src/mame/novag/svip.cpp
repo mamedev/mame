@@ -13,7 +13,7 @@ chess engine is similar to other HD6301/3Y ones by David Kittinger. The 'sequels
 of this portable design (Ruby, Sapphire, ..) are on H8.
 
 Hardware notes:
-- Hitachi HD63A03YF (mode 2) @ 9.83MHz
+- Hitachi HD6301YF (mode 2) @ 9.83MHz
 - 32KB ROM(TC57256AD-12), 2KB RAM(TC5517CFL-20)
 - LCD with 4 digits and custom segments, no LCD chip
 - RJ-12 port, 24 buttons, piezo

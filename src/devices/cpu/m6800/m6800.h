@@ -100,8 +100,8 @@ protected:
 
 	uint32_t RM16(uint32_t Addr );
 	void WM16(uint32_t Addr, PAIR *p );
-	void enter_interrupt(const char *message,uint16_t irq_vector);
-	virtual void m6800_check_irq2() { }
+	void enter_interrupt(uint16_t irq_vector);
+	virtual void check_irq2() { }
 	void check_irq_lines();
 	virtual void increment_counter(int amount);
 	virtual void eat_cycles();
