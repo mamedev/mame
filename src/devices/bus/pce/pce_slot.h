@@ -100,14 +100,13 @@ public:
 	void set_intf(const char * interface) { m_interface = interface; }
 
 protected:
-	required_address_space m_address_space;
-
 	// device_t implementation
 	virtual void device_start() override;
 
 	const char *m_interface;
 	int m_type;
 	device_pce_cart_interface *m_cart;
+	required_address_space m_address_space;
 };
 
 

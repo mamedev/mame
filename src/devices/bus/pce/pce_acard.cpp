@@ -175,9 +175,9 @@ void pce_acard_duo_device::peripheral_w(offs_t offset, uint8_t data)
 
 				if (m_shift_reg != 0)
 				{
-					m_shift = (m_shift_reg < 8) ?
-					(m_shift << m_shift_reg)
-					: (m_shift >> (16 - m_shift_reg));
+					m_shift = (m_shift_reg < 8)
+							? (m_shift << m_shift_reg)
+							: (m_shift >> (16 - m_shift_reg));
 				}
 				break;
 			case 5:
@@ -185,9 +185,9 @@ void pce_acard_duo_device::peripheral_w(offs_t offset, uint8_t data)
 
 				if (m_rotate_reg != 0)
 				{
-					m_shift = (m_rotate_reg < 8) ? 
-					((m_shift << m_rotate_reg) | (m_shift >> (32 - m_rotate_reg)))
-					: ((m_shift >> (16 - m_rotate_reg)) | (m_shift << (32 - (16 - m_rotate_reg))));
+					m_shift = (m_rotate_reg < 8)
+							? ((m_shift << m_rotate_reg) | (m_shift >> (32 - m_rotate_reg)))
+							: ((m_shift >> (16 - m_rotate_reg)) | (m_shift << (32 - (16 - m_rotate_reg))));
 				}
 				break;
 		}

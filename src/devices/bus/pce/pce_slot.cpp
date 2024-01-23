@@ -138,10 +138,10 @@ pce_cart_slot_device::pce_cart_slot_device(const machine_config &mconfig, const 
 	device_t(mconfig, PCE_CART_SLOT, tag, owner, clock),
 	device_cartrom_image_interface(mconfig, *this),
 	device_single_card_slot_interface<device_pce_cart_interface>(mconfig, *this),
-	m_address_space(*this, finder_base::DUMMY_TAG, -1, 8),
 	m_interface("pce_cart"),
 	m_type(PCE_STD),
-	m_cart(nullptr)
+	m_cart(nullptr),
+	m_address_space(*this, finder_base::DUMMY_TAG, -1, 8)
 {
 }
 
@@ -265,7 +265,7 @@ std::pair<std::error_condition, std::string> pce_cart_slot_device::call_load()
 		if (m_type == PCE_POPULOUS)
 			m_cart->ram_alloc(0x8000);
 
-		m_cart->install_memory_handlers(*m_address_space.target());
+		m_cart->install_memory_handlers(*m_address_space);
 	}
 
 	return std::make_pair(std::error_condition(), std::string());

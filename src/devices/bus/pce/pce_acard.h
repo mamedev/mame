@@ -40,7 +40,7 @@ private:
 
 	struct dram_port
 	{
-		inline uint32_t ram_addr()
+		uint32_t ram_addr()
 		{
 			if (BIT(m_ctrl, 1))
 				return (m_base_addr + m_addr_offset + (BIT(m_ctrl, 3) ? 0xff0000 : 0)) & 0x1fffff;
@@ -48,7 +48,7 @@ private:
 				return m_base_addr & 0x1fffff;
 		}
 
-		inline void addr_increment()
+		void addr_increment()
 		{
 			if (BIT(m_ctrl, 0))
 			{
@@ -64,7 +64,7 @@ private:
 			}
 		}
 
-		inline void adjust_addr()
+		void adjust_addr()
 		{
 			m_base_addr += m_addr_offset + (BIT(m_ctrl, 3) ? 0xff0000 : 0);
 			m_base_addr &= 0xffffff;
