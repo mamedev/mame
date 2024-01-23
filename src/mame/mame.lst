@@ -15983,6 +15983,9 @@ arbv2                           //
 @source:chess/cking_master.cpp
 ckmaster                        //
 
+@source:chess/cking_triomphe.cpp
+triomphe
+
 @source:chess/compuchess.cpp
 ccmk1                           // Chess Champion MK I
 cmpchess

@@ -470,8 +470,7 @@ void m6800_cpu_device::enter_interrupt(uint16_t irq_vector)
 	SEI;
 	PCD = RM16(irq_vector);
 
-	if (cycles_to_eat > 0)
-		increment_counter(cycles_to_eat);
+	increment_counter(cycles_to_eat);
 }
 
 /* check the IRQ lines for pending interrupts */
@@ -483,22 +482,19 @@ void m6800_cpu_device::check_irq_lines()
 		m_nmi_pending = false;
 		enter_interrupt(0xfffc);
 	}
-	else
+	else if (m_irq_state[M6800_IRQ_LINE] != CLEAR_LINE)
 	{
-		if (m_irq_state[M6800_IRQ_LINE] != CLEAR_LINE)
-		{
-			/* standard IRQ */
-			m_wai_state &= ~M6800_SLP;
+		/* standard IRQ */
+		m_wai_state &= ~M6800_SLP;
 
-			if (!(CC & 0x10))
-			{
-				standard_irq_callback(M6800_IRQ_LINE, m_pc.w.l);
-				enter_interrupt(0xfff8);
-			}
+		if (!(CC & 0x10))
+		{
+			standard_irq_callback(M6800_IRQ_LINE, m_pc.w.l);
+			enter_interrupt(0xfff8);
 		}
-		else
-			check_irq2();
 	}
+	else
+		check_irq2();
 }
 
 void m6800_cpu_device::increment_counter(int amount)

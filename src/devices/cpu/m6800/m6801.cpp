@@ -2010,8 +2010,7 @@ void hd6301y_cpu_device::p6_csr_w(uint8_t data)
 	LOGPORT("Port 6 Control/Status Register: %02x\n", data);
 
 	m_p6csr = (m_p6csr & 0x80) | (data & 0x7f);
-	if (!(m_cc & 0x10) && data & 0x40)
-		check_irq2();
+	check_irq2();
 }
 
 
