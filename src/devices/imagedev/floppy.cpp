@@ -40,6 +40,7 @@
 // Show step operation
 #define TRACE_STEP 0
 #define TRACE_AUDIO 0
+#define TRACE_SECTORING 1
 
 #define PITCH_SEEK_SAMPLES 1
 
@@ -229,6 +230,7 @@ void floppy_connector::device_config_complete()
 	{
 		dev->set_formats(formats);
 		dev->enable_sound(m_enable_sound);
+		dev->set_sectoring_type(m_sectoring_type);
 	}
 }
 
@@ -251,6 +253,7 @@ floppy_image_device::floppy_image_device(const machine_config &mconfig, device_t
 		m_tracks(0),
 		m_sides(0),
 		m_form_factor(0),
+		m_sectoring_type(0),
 		m_motor_always_on(false),
 		m_dskchg_writable(false),
 		m_has_trk00_sensor(true),
@@ -388,6 +391,17 @@ void floppy_image_device::set_rpm(float _rpm)
 	m_rpm = _rpm;
 	m_rev_time = attotime::from_double(60/m_rpm);
 	m_angular_speed = m_rpm/60.0*2e8;
+}
+
+void floppy_image_device::set_sectoring_type(uint32_t sectoring_type)
+{
+	logerror("set_sectoring_type: old: 0x%08x - new: 0x%08x\n", m_sectoring_type, sectoring_type);
+	m_sectoring_type = sectoring_type;
+}
+
+uint32_t floppy_image_device::get_sectoring_type()
+{
+	return m_sectoring_type;
 }
 
 void floppy_image_device::setup_write(const floppy_image_format_t *_output_format)
@@ -948,20 +962,28 @@ TIMER_CALLBACK_MEMBER(floppy_image_device::index_resync)
 
 TIMER_CALLBACK_MEMBER(floppy_image_device::sector_hole_resync)
 {
-	const uint32_t sectoring = get_sectoring();
+	const uint32_t sectoring = get_disk_sectoring();
 	const int full_rotation  = 200'000'000;
 	const int hole_length    =   2'000'000;
-	int sector_spacing;
+	int sectors;
+
+	logerror("sector_hole_resync: 0x%08x\n", sectoring);
+
+	if (m_mon) {
+		logerror("motor off\n");
+
+		return;
+	}
 
 	switch (sectoring) {
 		case floppy_image::H10:
-			sector_spacing = full_rotation / 10;
+			sectors = 10;
 			break;
 		case floppy_image::H16:
-			sector_spacing = full_rotation / 16;
+			sectors = 16;
 			break;
 		case floppy_image::H32:
-			sector_spacing = full_rotation / 32;
+			sectors = 32;
 			break;
 		case floppy_image::SOFT:
 		case 0:
@@ -969,7 +991,10 @@ TIMER_CALLBACK_MEMBER(floppy_image_device::sector_hole_resync)
 			return;
 	}
 
+	int sector_spacing = full_rotation / sectors;
+
 	if (m_revolution_start_time.is_never()) {
+		logerror("rev start time is never\n");
 		if (m_sector_hole) {
 			m_sector_hole = 0;
 
@@ -984,28 +1009,38 @@ TIMER_CALLBACK_MEMBER(floppy_image_device::sector_hole_resync)
 
 	attotime delta = machine().time() - m_revolution_start_time;
 	while (delta >= m_rev_time) {
+		logerror("Completed rev\n");
 		delta -= m_rev_time;
 		m_revolution_start_time += m_rev_time;
 		m_revolution_count++;
 	}
-
 	int position = int(delta.as_double() * m_angular_speed + 0.5);
 
 	int offset_position = position - start_sector_offset;
+	/*if (offset_position < 0) {
+		offset_position = 0;
+	}*/
 	int sector_offset = offset_position % sector_spacing;
 
-	int new_sector_hole = (offset_position > 0) && (sector_offset < hole_length);
+	logerror("delta: %s - pos: %d - offset_pos: %d - sector_offset: %d\n", delta.to_string(), position, offset_position, sector_offset);
+
+	int new_sector_hole = /*(offset_position >= 0) && */(sector_offset < hole_length);
 
 	attotime sector_pos_time = attotime::from_double(sector_offset / m_angular_speed);
 	if (new_sector_hole) {
-		attotime sector_hole_up_time = attotime::from_double(2000000 / m_angular_speed);
-		m_sector_hole_timer->adjust(sector_hole_up_time - sector_pos_time);
+		attotime sector_hole_up_time = attotime::from_double(hole_length / m_angular_speed);
+		attotime adjust_time = sector_hole_up_time - sector_pos_time;
+		m_sector_hole_timer->adjust(adjust_time);
+		logerror("new_sector_hole: sector hole up: %s  - adjust: %s\n", sector_hole_up_time.to_string(), adjust_time.to_string());
 	} else {
-		attotime next_sector_time = attotime::from_double(sector_spacing / m_angular_speed);
-		m_sector_hole_timer->adjust(next_sector_time - sector_pos_time);
+		attotime next_sector_time = attotime::from_double((sector_spacing) / m_angular_speed);
+		attotime adjust_time = next_sector_time - sector_pos_time;
+		m_sector_hole_timer->adjust(adjust_time);
+		logerror("no sector hole: next_sector_time: %s - adjust %s\n", next_sector_time.to_string(), adjust_time.to_string());
 	}
 
 	if (new_sector_hole != m_sector_hole) {
+		logerror("change in sector_hole: new: %d - old: %d\n", new_sector_hole, m_sector_hole);
 		m_sector_hole = new_sector_hole;
 
 		if (!m_cur_sector_pulse_cb.isnull())
@@ -1038,7 +1073,9 @@ void floppy_image_device::check_led()
 
 double floppy_image_device::get_pos()
 {
-	return m_index_timer->elapsed().as_double();
+	if(m_revolution_start_time.is_never())
+		return 0;
+	return (machine().time() - m_revolution_start_time).as_double();
 }
 
 bool floppy_image_device::twosid_r()
@@ -1496,9 +1533,9 @@ uint32_t floppy_image_device::get_variant() const
 	return m_image ? m_image->get_variant() : 0;
 }
 
-uint32_t floppy_image_device::get_sectoring() const
+uint32_t floppy_image_device::get_disk_sectoring() const
 {
-	return m_image ? m_image->get_sectoring() : 0;
+	return m_sectoring_type; // || (m_image ? m_image->get_sectoring() : 0);
 }
 
 std::vector<uint32_t> &floppy_image_device::get_buffer()

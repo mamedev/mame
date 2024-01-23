@@ -91,6 +91,8 @@ public:
 	const floppy_image_format_t *get_load_format() const;
 	std::pair<std::error_condition, const floppy_image_format_t *> identify(std::string_view filename);
 	void set_rpm(float rpm);
+	void set_sectoring_type(uint32_t sectoring_type);
+	uint32_t get_sectoring_type();
 
 	void init_fs(const fs_info *fs, const fs::meta_data &meta);
 
@@ -153,7 +155,7 @@ public:
 	int get_sides() { return m_sides; }
 	uint32_t get_form_factor() const;
 	uint32_t get_variant() const;
-	uint32_t get_sectoring() const;
+	uint32_t get_disk_sectoring() const;
 
 	static void default_fm_floppy_formats(format_registration &fr);
 	static void default_mfm_floppy_formats(format_registration &fr);
@@ -200,6 +202,7 @@ protected:
 	int m_tracks; /* addressable tracks */
 	int m_sides;  /* number of heads */
 	uint32_t m_form_factor; /* 3"5, 5"25, etc */
+	uint32_t m_sectoring_type; /* SOFT, Hard 10/16/32 */
 	bool m_motor_always_on;
 	bool m_dskchg_writable;
 	bool m_has_trk00_sensor;
@@ -497,6 +500,7 @@ public:
 
 	template <typename T> void set_formats(T &&_formats) { formats = std::forward<T>(_formats); }
 	void enable_sound(bool doit) { m_enable_sound = doit; }
+	void set_sectoring_type(uint32_t sectoring_type) { m_sectoring_type = sectoring_type; }
 
 	floppy_image_device *get_device();
 
@@ -507,6 +511,7 @@ protected:
 private:
 	std::function<void (format_registration &fr)> formats;
 	bool m_enable_sound;
+	uint32_t m_sectoring_type;
 };
 
 
