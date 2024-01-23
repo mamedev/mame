@@ -73,7 +73,7 @@ license:CC0-1.0
 							function ()
 								local lbounds = touchpad.bounds
 								curwidth = lbounds.width / 16
-								curheight = lbounds.height / 16
+								curheight = (lbounds.height / 16) * (3.8 / 2.75)
 								curxoffs = lbounds.x0 - (curwidth * 0.5)
 								curyoffs = lbounds.y0 - (curheight * 0.5)
 								curxscale = lbounds.width / 255
