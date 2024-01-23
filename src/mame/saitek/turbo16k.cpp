@@ -13,8 +13,6 @@ NVRAM won't save properly.
 
 TODO:
 - dump/add other MCU revisions, SX8 for tmate/conquist is known to exist
-- is Saitek Electronic Dames the same (or very similar) hardware as Team-Mate?
-- is Turbo S-24K SX6A, and the checkers game mentioned above SX7(A)?
 - SX4A and SX5A read from port 2 bits 3 and 7 while DDR is 0xff, why does it work?
   I added a simple workaround for it in p2_w
 - what is t1850's official title? "1850 Deluxe Table Chess" is from the back of
@@ -23,7 +21,7 @@ TODO:
   and says "Sixteen Level Computerized Chess"
 
 Hardware notes:
-- HD6301Y0 MCU, 8MHz or 12MHz (LC osc, no XTAL)
+- Hitachi HD6301Y0P/F MCU, 8MHz or 12MHz (LC osc, no XTAL)
 - 16 board LEDs (can be tri-color), 7 or 8 status LEDs
 - buttons sensor board, piezo
 
@@ -148,7 +146,9 @@ void turbo16k_state::machine_start()
 
 INPUT_CHANGED_MEMBER(turbo16k_state::change_cpu_freq)
 {
-	m_maincpu->set_unscaled_clock((newval & 1) ? 8'000'000 : 12'000'000);
+	// 4MHz and 16MHz versions don't exist, but the software supports it
+	static const u32 freq[4] = { 4'000'000, 8'000'000, 12'000'000, 16'000'000 };
+	m_maincpu->set_unscaled_clock(freq[bitswap<2>(newval,4,0)]);
 }
 
 // Conquistador
@@ -179,6 +179,7 @@ protected:
 
 INPUT_CHANGED_MEMBER(turbo16k_state::go_button)
 {
+	// standby check actually comes from P70 high-impedance state
 	if (newval && m_maincpu->standby())
 		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }

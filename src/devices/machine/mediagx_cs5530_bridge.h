@@ -11,6 +11,7 @@
 
 #include "bus/isa/isa.h"
 #include "cpu/i386/i386.h"
+#include "machine/8042kbdc.h"
 #include "machine/am9517a.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
@@ -35,12 +36,14 @@ public:
 	auto rtcale() { return m_rtcale.bind(); }
 	auto rtccs_read() { return m_rtccs_read.bind(); }
 	auto rtccs_write() { return m_rtccs_write.bind(); }
+	void pc_irq1_w(int state);
 	void pc_irq8n_w(int state);
 	void pc_irq14_w(int state);
 	void pc_irq15_w(int state);
 
 	template <typename T> void set_cpu_tag(T &&tag) { m_host_cpu.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_ide_tag(T &&tag) { m_ide.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_kbdc_tag(T &&tag) { m_kbdc.set_tag(std::forward<T>(tag)); }
 
 protected:
 	virtual void device_add_mconfig(machine_config & config) override;
@@ -89,7 +92,6 @@ private:
 	void at_portb_w(uint8_t data);
 	void at_speaker_set_spkrdata(uint8_t data);
 	uint8_t get_slave_ack(offs_t offset);
-	void pc_irq1_w(int state);
 	void pc_irq3_w(int state);
 	void pc_irq4_w(int state);
 	void pc_irq5_w(int state);
@@ -116,6 +118,7 @@ private:
 
 	required_device<cpu_device> m_host_cpu;
 	required_device<mediagx_cs5530_ide_device> m_ide;
+	required_device<kbdc8042_device> m_kbdc;
 	// southbridge internals
 	required_device<pic8259_device> m_pic8259_master;
 	required_device<pic8259_device> m_pic8259_slave;

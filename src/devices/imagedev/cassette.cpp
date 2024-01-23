@@ -450,9 +450,13 @@ void cassette_image_device::sound_stream_update(sound_stream &stream, std::vecto
 		if (m_samples.size() < outputs[0].samples())
 			m_samples.resize(outputs[0].samples());
 
+		const cassette_image::Info info = cassette->get_info();
 		for (int ch = 0; ch < outputs.size(); ch++)
 		{
-			cassette->get_samples(0, time_index, duration, outputs[0].samples(), 2, &m_samples[0], cassette_image::WAVEFORM_16BIT);
+			if (ch < info.channels)
+				cassette->get_samples(ch, time_index, duration, outputs[0].samples(), 2, &m_samples[0], cassette_image::WAVEFORM_16BIT);
+			else
+				cassette->get_samples(0, time_index, duration, outputs[0].samples(), 2, &m_samples[0], cassette_image::WAVEFORM_16BIT);
 			for (int sampindex = 0; sampindex < outputs[ch].samples(); sampindex++)
 				outputs[ch].put_int(sampindex, m_samples[sampindex], 32768);
 		}

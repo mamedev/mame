@@ -200,23 +200,14 @@ uint32_t pc8001_state::screen_update( screen_device &screen, bitmap_rgb32 &bitma
 
 /* Read/Write Handlers */
 
+/*
+ * ---- ---x RTC C0
+ * ---- --x- RTC C1
+ * ---- -x-- RTC C2
+ * ---- x--- RTC DATA IN
+ */
 void pc8001_base_state::port10_w(uint8_t data)
 {
-	/*
-
-	    bit     description
-
-	    0       RTC C0
-	    1       RTC C1
-	    2       RTC C2
-	    3       RTC DATA IN
-	    4
-	    5
-	    6
-	    7
-
-	*/
-
 	// RTC
 	m_rtc->c0_w(BIT(data, 0));
 	m_rtc->c1_w(BIT(data, 1));
@@ -309,23 +300,15 @@ uint8_t pc8001_state::port40_r()
 	return data;
 }
 
+/*
+ * --x- ---- SPEAKER
+ * ---- x--- CRT /CLDS CLK
+ * ---- -x-- RTC CLK
+ * ---- --x- RTC STB
+ * ---- ---x Centronics STROBE
+ */
 void pc8001_state::port40_w(uint8_t data)
 {
-	/*
-
-	    bit     description
-
-	    0       STROBE
-	    1       RTC STB
-	    2       RTC CLK
-	    3       CRT /CLDS CLK
-	    4
-	    5       SPEAKER
-	    6
-	    7
-
-	*/
-
 	m_centronics->write_strobe(BIT(data, 0));
 
 	m_rtc->stb_w(BIT(data, 1));
@@ -375,7 +358,7 @@ void pc8001_state::pc8001_io(address_map &map)
 //  map(0xc1, 0xc1).rw(PC8011_CH1_I8251_TAG, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 //  map(0xc2, 0xc2).rw(PC8011_CH2_I8251_TAG, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 //  map(0xc3, 0xc3).rw(PC8011_CH2_I8251_TAG, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-//  map(0xc8, 0xc8) RS-232 output enable?)
+//  map(0xc8, 0xc8) RS-232 output enable?
 //  map(0xca, 0xca) RS-232 output disable?
 //  map(0xd0, 0xd3).rw(PC8011_IEEE488_I8255A_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
 //  map(0xd8, 0xd8).r(FUNC(pc8001_state::pc8011_ieee488_control_signal_input_r));

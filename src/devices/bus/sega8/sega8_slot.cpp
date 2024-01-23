@@ -28,6 +28,8 @@
 #include "emu.h"
 #include "sega8_slot.h"
 
+#include "multibyte.h"
+
 #define VERBOSE 0
 #include "logmacro.h"
 
@@ -280,7 +282,7 @@ std::error_condition sega8_cart_slot_device::verify_cart( const uint8_t *magic, 
 	return retval;
 }
 
-void sega8_cart_slot_device::set_lphaser_xoffset( uint8_t *rom, int size )
+void sega8_cart_slot_device::set_lphaser_xoffset( const uint8_t *rom, int size )
 {
 	static const uint8_t signatures[7][16] =
 	{
@@ -537,7 +539,7 @@ int sega8_cart_slot_device::get_cart_type(const uint8_t *ROM, uint32_t len) cons
 		{
 			if (ROM[i] == 0x32) // Z80 opcode for: LD (xxxx), A
 			{
-				uint16_t addr = (ROM[i + 2] << 8) | ROM[i + 1];
+				uint16_t addr = get_u16le(&ROM[i + 1]);
 				if (addr == 0xffff)
 				{ i += 2; _ffff++; continue; }
 				if (addr == 0x0002 || addr == 0x0003 || addr == 0x0004)
@@ -586,7 +588,7 @@ int sega8_cart_slot_device::get_cart_type(const uint8_t *ROM, uint32_t len) cons
 		{
 			if (ROM[i] == 0x32)
 			{
-				uint16_t addr = ROM[i + 1] | (ROM[i + 2] << 8);
+				uint16_t addr = get_u16le(&ROM[i + 1]);
 
 				switch (addr & 0xf000)
 				{
@@ -747,7 +749,7 @@ void sega8_cart_slot_device::write_io(offs_t offset, uint8_t data)
  Internal header logging
  -------------------------------------------------*/
 
-void sega8_cart_slot_device::internal_header_logging(uint8_t *ROM, uint32_t len, uint32_t nvram_len)
+void sega8_cart_slot_device::internal_header_logging(const uint8_t *ROM, uint32_t len, uint32_t nvram_len)
 {
 	static const char *const system_region[] =
 	{
@@ -789,11 +791,6 @@ void sega8_cart_slot_device::internal_header_logging(uint8_t *ROM, uint32_t len,
 		0x20000,
 	};
 
-	char reserved[10];
-	uint8_t version, csum_size, region, serial[3];
-	uint16_t checksum, csum = 0;
-	uint32_t csum_end;
-
 	// LOG FILE DETAILS
 	logerror("FILE DETAILS\n" );
 	logerror("============\n" );
@@ -811,41 +808,39 @@ void sega8_cart_slot_device::internal_header_logging(uint8_t *ROM, uint32_t len,
 	if (len < 0x8000)
 		return;
 
+	char reserved[10];
 	for (int i = 0; i < 10; i++)
 		reserved[i] = ROM[0x7ff0 + i];
 
-	checksum = ROM[0x7ffa] | (ROM[0x7ffb] << 8);
+	uint16_t checksum = get_u16le(&ROM[0x7ffa]);
 
+	uint8_t serial[3];
 	for (int i = 0; i < 3; i++)
 		serial[i] = ROM[0x7ffc + i];
 	serial[2] &= 0x0f;
 
-	version = (ROM[0x7ffe] & 0xf0) >> 4;
+	uint8_t version = (ROM[0x7ffe] & 0xf0) >> 4;
 
-	csum_size = ROM[0x7fff] & 0x0f;
-	csum_end = csum_length[csum_size];
+	uint8_t csum_size = ROM[0x7fff] & 0x0f;
+	uint32_t csum_end = csum_length[csum_size];
 	if (!csum_end || csum_end > len)
 		csum_end = len;
 
-	region = (ROM[0x7fff] & 0xf0) >> 4;
+	uint8_t region = (ROM[0x7fff] & 0xf0) >> 4;
 
 	// compute cart checksum to compare with expected one
-	for (int i = 0; i < csum_end; i++)
-	{
-		if (i < 0x7ff0 || i >= 0x8000)
-		{
-			csum += ROM[i];
-			csum &= 0xffff;
-		}
-	}
+	util::sum16_creator sum16;
+	sum16.append(ROM, std::min<uint32_t>(csum_end, 0x7ff0));
+	if (csum_end > 0x8000)
+		sum16.append(&ROM[0x8000], csum_end - 0x8000);
 
 	logerror("INTERNAL HEADER\n" );
 	logerror("===============\n" );
 	logerror("Reserved String: %.10s\n", reserved);
 	logerror("Region: %s\n", system_region[region]);
-	logerror("Checksum: (Expected) 0x%x - (Computed) 0x%x\n", checksum, csum);
+	logerror("Checksum: (Expected) 0x%x - (Computed) 0x%x\n", checksum, sum16.finish());
 	logerror("   [checksum over 0x%X bytes]\n", csum_length[csum_size]);
-	logerror("Serial String: %X\n", serial[0] | (serial[1] << 8) | (serial[2] << 16));
+	logerror("Serial String: %X\n", get_u24le(serial));
 	logerror("Software Revision: %x\n", version);
 	logerror("\n" );
 
@@ -853,14 +848,14 @@ void sega8_cart_slot_device::internal_header_logging(uint8_t *ROM, uint32_t len,
 	if (m_type == SEGA8_CODEMASTERS)
 	{
 		uint8_t day, month, year, hour, minute;
-		csum = 0;
+		uint16_t csum = 0;
 
 		day = ROM[0x7fe1];
 		month = ROM[0x7fe2];
 		year = ROM[0x7fe3];
 		hour = ROM[0x7fe4];
 		minute = ROM[0x7fe5];
-		checksum = ROM[0x7fe6] | (ROM[0x7fe7] << 8);
+		checksum = get_u16le(&ROM[0x7fe6]);
 		csum_size = ROM[0x7fe0];
 
 		// compute cart checksum to compare with expected one
@@ -868,7 +863,7 @@ void sega8_cart_slot_device::internal_header_logging(uint8_t *ROM, uint32_t len,
 		{
 			if (i < 0x7ff0 || i >= 0x8000)
 			{
-				csum += (ROM[i] | (ROM[i + 1] << 8));
+				csum += get_u16le(&ROM[i]);
 				csum &= 0xffff;
 			}
 		}

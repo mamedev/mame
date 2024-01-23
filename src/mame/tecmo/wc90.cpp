@@ -129,6 +129,7 @@ private:
 	void fgvideoram_w(offs_t offset, uint8_t data);
 	void txvideoram_w(offs_t offset, uint8_t data);
 
+	uint32_t pri_cb(uint8_t pri);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
@@ -208,6 +209,25 @@ TILE_GET_INFO_MEMBER(wc90_state::track_get_fg_tile_info)
 
 /***************************************************************************
 
+  Callbacks for the sprite priority
+
+***************************************************************************/
+
+uint32_t wc90_state::pri_cb(uint8_t pri)
+{
+	switch (pri)
+	{
+		case 0: return 0;
+		case 1: return GFX_PMASK_4;
+		case 2: return GFX_PMASK_4 | GFX_PMASK_2;
+		case 3: return -1;// GFX_PMASK_4 | GFX_PMASK_2 | GFX_PMASK_1; // unused
+		default: return -1;
+	}
+}
+
+
+/***************************************************************************
+
   Start the video hardware emulation.
 
 ***************************************************************************/
@@ -265,9 +285,9 @@ void wc90_state::txvideoram_w(offs_t offset, uint8_t data)
 
 ***************************************************************************/
 
-
 uint32_t wc90_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	screen.priority().fill(0, cliprect);
 	m_bg_tilemap->set_scrollx(0, m_scrollxlo[2][0] + 256 * m_scrollxhi[2][0]);
 	m_bg_tilemap->set_scrolly(0, m_scrollylo[2][0] + 256 * m_scrollyhi[2][0]);
 	m_fg_tilemap->set_scrollx(0, m_scrollxlo[1][0] + 256 * m_scrollxhi[1][0]);
@@ -275,13 +295,10 @@ uint32_t wc90_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	m_tx_tilemap->set_scrollx(0, m_scrollxlo[0][0] + 256 * m_scrollxhi[0][0]);
 	m_tx_tilemap->set_scrolly(0, m_scrollylo[0][0] + 256 * m_scrollyhi[0][0]);
 
-//  m_sprgen->draw_wc90_sprites(bitmap, cliprect, m_gfxdecode->gfx(3), m_spriteram, m_spriteram.bytes(), 3); // unused
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	m_sprgen->draw_wc90_sprites(bitmap, cliprect, m_gfxdecode->gfx(3), m_spriteram, m_spriteram.bytes(), 2);
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	m_sprgen->draw_wc90_sprites(bitmap, cliprect, m_gfxdecode->gfx(3), m_spriteram, m_spriteram.bytes(), 1);
-	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	m_sprgen->draw_wc90_sprites(bitmap, cliprect, m_gfxdecode->gfx(3), m_spriteram, m_spriteram.bytes(), 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 1);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 2);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 4);
+	m_sprgen->draw_wc90_sprites(screen, bitmap, cliprect, m_spriteram, m_spriteram.bytes());
 	return 0;
 }
 
@@ -516,37 +533,14 @@ static INPUT_PORTS_START( pac90 )
 INPUT_PORTS_END
 
 
-static const gfx_layout tilelayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4,
-			32*8+0*4, 32*8+1*4, 32*8+2*4, 32*8+3*4, 32*8+4*4, 32*8+5*4, 32*8+6*4, 32*8+7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			16*32, 17*32, 18*32, 19*32, 20*32, 21*32, 22*32, 23*32 },
-	128*8
-};
-
-
-static const gfx_layout spritelayout8 =
-{
-	8,8,
-	RGN_FRAC(1,2),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, RGN_FRAC(1,2)+0*4, RGN_FRAC(1,2)+1*4, 2*4, 3*4, RGN_FRAC(1,2)+2*4, RGN_FRAC(1,2)+3*4 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	16*8
-};
-
-
 static GFXDECODE_START( gfx_wc90 )
-	GFXDECODE_ENTRY( "chars",    0x00000, gfx_8x8x4_packed_msb, 1*16*16, 16*16 )
-	GFXDECODE_ENTRY( "tiles1_2", 0x00000, tilelayout,           2*16*16, 16*16 )
-	GFXDECODE_ENTRY( "tiles3_4", 0x00000, tilelayout,           3*16*16, 16*16 )
-	GFXDECODE_ENTRY( "sprites",  0x00000, spritelayout8,        0*16*16, 16*16 )
+	GFXDECODE_ENTRY( "chars",    0, gfx_8x8x4_packed_msb,               1*16*16, 16*16 )
+	GFXDECODE_ENTRY( "tiles1_2", 0, gfx_8x8x4_row_2x2_group_packed_msb, 2*16*16, 16*16 )
+	GFXDECODE_ENTRY( "tiles3_4", 0, gfx_8x8x4_row_2x2_group_packed_msb, 3*16*16, 16*16 )
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_wc90_spr )
+	GFXDECODE_ENTRY( "sprites",  0, gfx_8x8x4_packed_msb, 0*16*16, 16*16 )
 GFXDECODE_END
 
 
@@ -586,7 +580,8 @@ void wc90_state::wc90(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wc90);
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 1024).set_endianness(ENDIANNESS_BIG);
 
-	TECMO_SPRITE(config, m_sprgen, 0);
+	TECMO_SPRITE(config, m_sprgen, 0, m_palette, gfx_wc90_spr);
+	m_sprgen->set_pri_callback(FUNC(wc90_state::pri_cb));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -637,10 +632,10 @@ ROM_START( twcup90 )
 	ROM_LOAD( "ic91_11v.bin", 0x20000, 0x20000, CRC(188d3789) SHA1(35654a99a20735bae09b32f74255f8132dee9af2) )
 
 	ROM_REGION( 0x080000, "sprites", 0 )
-	ROM_LOAD( "ic50_12v.bin", 0x00000, 0x20000, CRC(da1fe922) SHA1(5184053c2b7dd2bf1cd2e9f783686f2c0db7e47b) )
-	ROM_LOAD( "ic54_13v.bin", 0x20000, 0x20000, CRC(9ad03c2c) SHA1(1c1947f9b51a58002e9992fc7c0c1a1c59b4d740) )
-	ROM_LOAD( "ic60_14v.bin", 0x40000, 0x20000, CRC(499dfb1b) SHA1(ac67985d36fea18c82a4ea00019d9e6e4bcb5d0d) )
-	ROM_LOAD( "ic65_15v.bin", 0x60000, 0x20000, CRC(d8ea5c81) SHA1(ccb3f7d565b1c1b8e874a2df91cda40dde2962ed) )
+	ROM_LOAD16_BYTE( "ic50_12v.bin", 0x00000, 0x20000, CRC(da1fe922) SHA1(5184053c2b7dd2bf1cd2e9f783686f2c0db7e47b) )
+	ROM_LOAD16_BYTE( "ic54_13v.bin", 0x40000, 0x20000, CRC(9ad03c2c) SHA1(1c1947f9b51a58002e9992fc7c0c1a1c59b4d740) )
+	ROM_LOAD16_BYTE( "ic60_14v.bin", 0x00001, 0x20000, CRC(499dfb1b) SHA1(ac67985d36fea18c82a4ea00019d9e6e4bcb5d0d) )
+	ROM_LOAD16_BYTE( "ic65_15v.bin", 0x40001, 0x20000, CRC(d8ea5c81) SHA1(ccb3f7d565b1c1b8e874a2df91cda40dde2962ed) )
 
 	ROM_REGION( 0x20000, "ymsnd", 0 )
 	ROM_LOAD( "ic82_06.bin",  0x00000, 0x20000, CRC(2fd692ed) SHA1(0273dc39181504320bec0187d074b2f86c821508) )
@@ -670,10 +665,10 @@ ROM_START( twcup90a )
 	ROM_LOAD( "ic91_11v.bin", 0x20000, 0x20000, CRC(188d3789) SHA1(35654a99a20735bae09b32f74255f8132dee9af2) )
 
 	ROM_REGION( 0x080000, "sprites", 0 )
-	ROM_LOAD( "ic50_12v.bin", 0x00000, 0x20000, CRC(da1fe922) SHA1(5184053c2b7dd2bf1cd2e9f783686f2c0db7e47b) )
-	ROM_LOAD( "ic54_13v.bin", 0x20000, 0x20000, CRC(9ad03c2c) SHA1(1c1947f9b51a58002e9992fc7c0c1a1c59b4d740) )
-	ROM_LOAD( "ic60_14v.bin", 0x40000, 0x20000, CRC(499dfb1b) SHA1(ac67985d36fea18c82a4ea00019d9e6e4bcb5d0d) )
-	ROM_LOAD( "ic65_15v.bin", 0x60000, 0x20000, CRC(d8ea5c81) SHA1(ccb3f7d565b1c1b8e874a2df91cda40dde2962ed) )
+	ROM_LOAD16_BYTE( "ic50_12v.bin", 0x00000, 0x20000, CRC(da1fe922) SHA1(5184053c2b7dd2bf1cd2e9f783686f2c0db7e47b) )
+	ROM_LOAD16_BYTE( "ic54_13v.bin", 0x40000, 0x20000, CRC(9ad03c2c) SHA1(1c1947f9b51a58002e9992fc7c0c1a1c59b4d740) )
+	ROM_LOAD16_BYTE( "ic60_14v.bin", 0x00001, 0x20000, CRC(499dfb1b) SHA1(ac67985d36fea18c82a4ea00019d9e6e4bcb5d0d) )
+	ROM_LOAD16_BYTE( "ic65_15v.bin", 0x40001, 0x20000, CRC(d8ea5c81) SHA1(ccb3f7d565b1c1b8e874a2df91cda40dde2962ed) )
 
 	ROM_REGION( 0x20000, "ymsnd", 0 )
 	ROM_LOAD( "ic82_06.bin",  0x00000, 0x20000, CRC(2fd692ed) SHA1(0273dc39181504320bec0187d074b2f86c821508) )
@@ -703,10 +698,10 @@ ROM_START( twcup90b )
 	ROM_LOAD( "ic91_11v.bin", 0x20000, 0x20000, CRC(188d3789) SHA1(35654a99a20735bae09b32f74255f8132dee9af2) )
 
 	ROM_REGION( 0x080000, "sprites", 0 )
-	ROM_LOAD( "ic50_12v.bin", 0x00000, 0x20000, CRC(da1fe922) SHA1(5184053c2b7dd2bf1cd2e9f783686f2c0db7e47b) )
-	ROM_LOAD( "ic54_13v.bin", 0x20000, 0x20000, CRC(9ad03c2c) SHA1(1c1947f9b51a58002e9992fc7c0c1a1c59b4d740) )
-	ROM_LOAD( "ic60_14v.bin", 0x40000, 0x20000, CRC(499dfb1b) SHA1(ac67985d36fea18c82a4ea00019d9e6e4bcb5d0d) )
-	ROM_LOAD( "ic65_15v.bin", 0x60000, 0x20000, CRC(d8ea5c81) SHA1(ccb3f7d565b1c1b8e874a2df91cda40dde2962ed) )
+	ROM_LOAD16_BYTE( "ic50_12v.bin", 0x00000, 0x20000, CRC(da1fe922) SHA1(5184053c2b7dd2bf1cd2e9f783686f2c0db7e47b) )
+	ROM_LOAD16_BYTE( "ic54_13v.bin", 0x40000, 0x20000, CRC(9ad03c2c) SHA1(1c1947f9b51a58002e9992fc7c0c1a1c59b4d740) )
+	ROM_LOAD16_BYTE( "ic60_14v.bin", 0x00001, 0x20000, CRC(499dfb1b) SHA1(ac67985d36fea18c82a4ea00019d9e6e4bcb5d0d) )
+	ROM_LOAD16_BYTE( "ic65_15v.bin", 0x40001, 0x20000, CRC(d8ea5c81) SHA1(ccb3f7d565b1c1b8e874a2df91cda40dde2962ed) )
 
 	ROM_REGION( 0x20000, "ymsnd", 0 )
 	ROM_LOAD( "ic82_06.bin",  0x00000, 0x20000, CRC(2fd692ed) SHA1(0273dc39181504320bec0187d074b2f86c821508) )
@@ -736,10 +731,10 @@ ROM_START( twcup90c ) // 2 PCB set: 6303 A and 6303 B. ic87_01 is very similar t
 	ROM_LOAD( "ic91_11v.bin", 0x20000, 0x20000, CRC(188d3789) SHA1(35654a99a20735bae09b32f74255f8132dee9af2) )
 
 	ROM_REGION( 0x080000, "sprites", 0 )
-	ROM_LOAD( "ic50_12v.bin", 0x00000, 0x20000, CRC(da1fe922) SHA1(5184053c2b7dd2bf1cd2e9f783686f2c0db7e47b) )
-	ROM_LOAD( "ic54_13v.bin", 0x20000, 0x20000, CRC(9ad03c2c) SHA1(1c1947f9b51a58002e9992fc7c0c1a1c59b4d740) )
-	ROM_LOAD( "ic60_14v.bin", 0x40000, 0x20000, CRC(499dfb1b) SHA1(ac67985d36fea18c82a4ea00019d9e6e4bcb5d0d) )
-	ROM_LOAD( "ic65_15v.bin", 0x60000, 0x20000, CRC(d8ea5c81) SHA1(ccb3f7d565b1c1b8e874a2df91cda40dde2962ed) )
+	ROM_LOAD16_BYTE( "ic50_12v.bin", 0x00000, 0x20000, CRC(da1fe922) SHA1(5184053c2b7dd2bf1cd2e9f783686f2c0db7e47b) )
+	ROM_LOAD16_BYTE( "ic54_13v.bin", 0x40000, 0x20000, CRC(9ad03c2c) SHA1(1c1947f9b51a58002e9992fc7c0c1a1c59b4d740) )
+	ROM_LOAD16_BYTE( "ic60_14v.bin", 0x00001, 0x20000, CRC(499dfb1b) SHA1(ac67985d36fea18c82a4ea00019d9e6e4bcb5d0d) )
+	ROM_LOAD16_BYTE( "ic65_15v.bin", 0x40001, 0x20000, CRC(d8ea5c81) SHA1(ccb3f7d565b1c1b8e874a2df91cda40dde2962ed) )
 
 	ROM_REGION( 0x20000, "ymsnd", 0 )
 	ROM_LOAD( "ic82_06.bin",  0x00000, 0x20000, CRC(2fd692ed) SHA1(0273dc39181504320bec0187d074b2f86c821508) )
@@ -769,10 +764,10 @@ ROM_START( twcup90t )
 	ROM_LOAD( "ic91_11v.bin", 0x20000, 0x20000, CRC(188d3789) SHA1(35654a99a20735bae09b32f74255f8132dee9af2) )
 
 	ROM_REGION( 0x080000, "sprites", 0 )
-	ROM_LOAD( "ic50_12v.bin", 0x00000, 0x20000, CRC(da1fe922) SHA1(5184053c2b7dd2bf1cd2e9f783686f2c0db7e47b) )
-	ROM_LOAD( "ic54_13v.bin", 0x20000, 0x20000, CRC(9ad03c2c) SHA1(1c1947f9b51a58002e9992fc7c0c1a1c59b4d740) )
-	ROM_LOAD( "ic60_14v.bin", 0x40000, 0x20000, CRC(499dfb1b) SHA1(ac67985d36fea18c82a4ea00019d9e6e4bcb5d0d) )
-	ROM_LOAD( "ic65_15v.bin", 0x60000, 0x20000, CRC(d8ea5c81) SHA1(ccb3f7d565b1c1b8e874a2df91cda40dde2962ed) )
+	ROM_LOAD16_BYTE( "ic50_12v.bin", 0x00000, 0x20000, CRC(da1fe922) SHA1(5184053c2b7dd2bf1cd2e9f783686f2c0db7e47b) )
+	ROM_LOAD16_BYTE( "ic54_13v.bin", 0x40000, 0x20000, CRC(9ad03c2c) SHA1(1c1947f9b51a58002e9992fc7c0c1a1c59b4d740) )
+	ROM_LOAD16_BYTE( "ic60_14v.bin", 0x00001, 0x20000, CRC(499dfb1b) SHA1(ac67985d36fea18c82a4ea00019d9e6e4bcb5d0d) )
+	ROM_LOAD16_BYTE( "ic65_15v.bin", 0x40001, 0x20000, CRC(d8ea5c81) SHA1(ccb3f7d565b1c1b8e874a2df91cda40dde2962ed) )
 
 	ROM_REGION( 0x20000, "ymsnd", 0 )
 	ROM_LOAD( "ic82_06.bin",  0x00000, 0x20000, CRC(2fd692ed) SHA1(0273dc39181504320bec0187d074b2f86c821508) )
@@ -801,8 +796,8 @@ ROM_START( pac90 )
 	//ROM_LOAD( "ic91_11v.bin", 0x20000, 0x20000, CRC(188d3789) SHA1(35654a99a20735bae09b32f74255f8132dee9af2) )
 
 	ROM_REGION( 0x080000, "sprites", ROMREGION_ERASE00 )
-	ROM_LOAD( "sprite1.ic50", 0x00000, 0x10000, CRC(190852ea) SHA1(fad7eb3aa53d03917173dd5a040655cfd329db32) )
-	ROM_LOAD( "sprite2.ic60", 0x40000, 0x10000, CRC(33effbea) SHA1(dbf6b735f3c8bacb695caf5d15ac8b7961bffc74) )
+	ROM_LOAD16_BYTE( "sprite1.ic50", 0x00000, 0x10000, CRC(190852ea) SHA1(fad7eb3aa53d03917173dd5a040655cfd329db32) )
+	ROM_LOAD16_BYTE( "sprite2.ic60", 0x00001, 0x10000, CRC(33effbea) SHA1(dbf6b735f3c8bacb695caf5d15ac8b7961bffc74) )
 
 	ROM_REGION( 0x20000, "ymsnd", ROMREGION_ERASE00 )
 	ROM_LOAD( "voice.ic82",  0x00000, 0x10000, CRC(abc61f3d) SHA1(c6f123d16a26c4d77c635617dd97bb4b906c463a) )

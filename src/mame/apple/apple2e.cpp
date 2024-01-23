@@ -1186,11 +1186,17 @@ void apple2e_state::machine_reset()
 		m_isiicplus = false;
 	}
 
-	if (((m_sysconfig.read_safe(0) & 0x30) == 0x30) || (m_isiicplus))
+	u8 config = m_sysconfig.read_safe(0) & 0x30;
+
+	if (((config & 0x10) == 0x10) || (m_isiicplus))
 	{
-		m_accel_speed = 4000000;    // Zip speed
-		accel_full_speed();
-		m_accel_fast = true;
+		m_accel_speed = 4000000;    // Zip speed, set if present, even if not active initially
+
+		if (((config & 0x20) == 0x20) || (m_isiicplus))
+		{
+			accel_full_speed();
+			m_accel_fast = true;
+		}
 	}
 
 	if (m_accel_laser)

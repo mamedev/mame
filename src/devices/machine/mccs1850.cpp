@@ -18,6 +18,8 @@
 #include "emu.h"
 #include "mccs1850.h"
 
+#include "multibyte.h"
+
 //#define VERBOSE 0
 #include "logmacro.h"
 
@@ -158,10 +160,7 @@ inline uint8_t mccs1850_device::read_register(offs_t offset)
 	case REGISTER_COUNTER_LATCH:
 	case REGISTER_COUNTER_LATCH+3: // Required by the NeXT power on test
 		// load counter value into latch
-		m_ram[REGISTER_COUNTER_LATCH] = m_counter >> 24;
-		m_ram[REGISTER_COUNTER_LATCH + 1] = m_counter >> 16;
-		m_ram[REGISTER_COUNTER_LATCH + 2] = m_counter >> 8;
-		m_ram[REGISTER_COUNTER_LATCH + 3] = m_counter;
+		put_u32be(&m_ram[REGISTER_COUNTER_LATCH], m_counter);
 		break;
 
 	case REGISTER_TEST_1:
@@ -247,7 +246,7 @@ inline void mccs1850_device::write_register(offs_t offset, uint8_t data)
 
 TIMER_CALLBACK_MEMBER(mccs1850_device::advance_seconds)
 {
-	uint32_t alarm = (m_ram[REGISTER_ALARM_LATCH] << 24) | (m_ram[REGISTER_ALARM_LATCH + 1] << 16) | (m_ram[REGISTER_ALARM_LATCH + 2] << 8) | m_ram[REGISTER_ALARM_LATCH + 3];
+	uint32_t alarm = get_u32be(&m_ram[REGISTER_ALARM_LATCH]);
 
 	m_counter++;
 

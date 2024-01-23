@@ -12,7 +12,10 @@
    - Inconsistent frame rate compared to PCB recordings; game has a tendency to freeze frame hiccup
    - Analog inputs update at a slower rate (about every 8-10 frames instead of every frame); this issue
      is also present in taitotz.cpp
-   - Rest of the sound hardware isn't hooked up
+   - Hook up remaining sound / Zoom hardware - see /src/sony/taito_zm.cpp for reference
+
+NOTE: Known to exist but currently unsupported, is a Japanese Operation Tiger set that shows a "Second Mission" sub-title
+
 
    PCB Information (incomplete!)
    ===============
@@ -55,7 +58,11 @@
    Second PCB
    ----------
 
-   19 ROMs
+   8 EPROMs
+   11 mask ROMs
+    - 4 graphics ROMs
+    - 4 polygon data ROMs
+    - 3 Zoom ZSG-2 samples
 
    TMP95C063F
    25.0000MHz osc
@@ -840,7 +847,7 @@ void taitopjc_state::taitopjc(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitopjc_state::ppc603e_mem);
 
 	// TMP95C063F I/O CPU
-	TMP95C063(config, m_iocpu, 25000000);
+	TMP95C063(config, m_iocpu, 25_MHz_XTAL);
 	m_iocpu->port5_read().set_ioport("INPUTS1");
 	m_iocpu->portd_read().set_ioport("INPUTS2");
 	m_iocpu->porte_read().set_ioport("INPUTS3");
@@ -852,12 +859,13 @@ void taitopjc_state::taitopjc(machine_config &config)
 	m_iocpu->set_vblank_int("screen", FUNC(taitopjc_state::taitopjc_vbi));
 
 	// TMS320C53 DSP
-	TMS32053(config, m_dsp, 40000000);
+	TMS32053(config, m_dsp, 40_MHz_XTAL);
 	m_dsp->set_addrmap(AS_PROGRAM, &taitopjc_state::tms_program_map);
 	m_dsp->set_addrmap(AS_DATA, &taitopjc_state::tms_data_map);
 	m_dsp->set_addrmap(AS_IO, &taitopjc_state::tms_io_map);
 
-	MN1020012A(config, m_soundcpu, 10000000); // MN1020819DA sound CPU - NOTE: May have 64kB internal ROM
+	// MN1020819DA sound CPU
+	MN1020012A(config, m_soundcpu, 25_MHz_XTAL/2); // clock divisor unverified - NOTE: May have 64kB internal ROM
 	m_soundcpu->set_addrmap(AS_PROGRAM, &taitopjc_state::mn10200_map);
 
 	config.set_maximum_quantum(attotime::from_hz(200000));
@@ -895,45 +903,143 @@ void taitopjc_state::init_optiger()
 }
 
 
-ROM_START( optiger )
+ROM_START( optiger ) // Ver 2.14 O
 	ROM_REGION64_BE( 0x200000, "user1", 0 )
-	ROM_LOAD32_BYTE( "e63-33-1_p-hh.23", 0x000000, 0x080000, CRC(5ab176e2) SHA1(a0a5b7c0e91928d0a49987f88f6ae647f5cb3e34) )
-	ROM_LOAD32_BYTE( "e63-32-1_p-hl.22", 0x000001, 0x080000, CRC(cca8bacc) SHA1(e5a081f5c12a52601745f5b67fe3412033581b00) )
-	ROM_LOAD32_BYTE( "e63-31-1_p-lh.8",  0x000002, 0x080000, CRC(ad69e649) SHA1(9fc853d2cb6e7cac87dc06bad91048f191b799c5) )
-	ROM_LOAD32_BYTE( "e63-30-1_p-ll.7",  0x000003, 0x080000, CRC(a6183479) SHA1(e556c3edf100342079e680ec666f018fca7a82b0) )
+	ROM_LOAD32_BYTE( "e63_33-1.ic23", 0x000000, 0x080000, CRC(5ab176e2) SHA1(a0a5b7c0e91928d0a49987f88f6ae647f5cb3e34) ) // PCB silkscreened IC23 (P-HH)
+	ROM_LOAD32_BYTE( "e63_32-1.ic22", 0x000001, 0x080000, CRC(cca8bacc) SHA1(e5a081f5c12a52601745f5b67fe3412033581b00) ) // PCB silkscreened IC22 (P-HL)
+	ROM_LOAD32_BYTE( "e63_31-1.ic8",  0x000002, 0x080000, CRC(ad69e649) SHA1(9fc853d2cb6e7cac87dc06bad91048f191b799c5) ) // PCB silkscreened IC8 (P-LH)
+	ROM_LOAD32_BYTE( "e63_30-1.ic7",  0x000003, 0x080000, CRC(a6183479) SHA1(e556c3edf100342079e680ec666f018fca7a82b0) ) // PCB silkscreened IC7 (P-LL)
 
-	ROM_REGION( 0x8000, "dsp", 0 )
-	ROM_LOAD( "tms320bc53.bin", 0x0000, 0x8000, CRC(4b8e7fd6) SHA1(07d354a2e4d7554e215fa8d91b5eeeaf573766b0) ) // decapped. TODO: believed to be a generic TI part, verify if it is and if dump is good, if so move in the CPU core
+	ROM_REGION( 0x8000, "dsp", 0 ) // surface mounted on K11X0870A POWER JC MOTHER-G PCB
+	ROM_LOAD( "tms320bc53pq80.ic8", 0x0000, 0x8000, CRC(4b8e7fd6) SHA1(07d354a2e4d7554e215fa8d91b5eeeaf573766b0) ) // decapped. TODO: believed to be a generic TI part, verify if it is and if dump is good, if so move in the CPU core
 
 	ROM_REGION16_LE( 0x20000, "dspdata", 0 )
-	ROM_LOAD16_BYTE( "e63-04_l.29",  0x000000, 0x010000, CRC(eccae391) SHA1(e5293c16342cace54dc4b6dfb827558e18ac25a4) )
-	ROM_LOAD16_BYTE( "e63-03_h.28",  0x000001, 0x010000, CRC(58fce52f) SHA1(1e3d9ee034b25e658ca45a8b900de2aa54b00135) )
+	ROM_LOAD16_BYTE( "taito_e63_04.ic29", 0x000000, 0x010000, CRC(eccae391) SHA1(e5293c16342cace54dc4b6dfb827558e18ac25a4) ) // PCB silkscreened IC29 (L)     AT27C512
+	ROM_LOAD16_BYTE( "taito_e63_03.ic28", 0x000001, 0x010000, CRC(58fce52f) SHA1(1e3d9ee034b25e658ca45a8b900de2aa54b00135) ) // PCB silkscreened IC28 (H)     AT27C512
 
 	ROM_REGION( 0x40000, "iocpu", 0 )
-	ROM_LOAD16_BYTE( "e63-28-1_0.59", 0x000000, 0x020000, CRC(ef41ffaf) SHA1(419621f354f548180d37961b861304c469e43a65) )
-	ROM_LOAD16_BYTE( "e63-27-1_1.58", 0x000001, 0x020000, CRC(facc17a7) SHA1(40d69840cfcfe5a509d69824c2994de56a3c6ece) )
+	ROM_LOAD16_BYTE( "e63_28-1.ic59", 0x000000, 0x020000, CRC(ef41ffaf) SHA1(419621f354f548180d37961b861304c469e43a65) ) // PCB silkscreened IC59 (0)     27C1001
+	ROM_LOAD16_BYTE( "e63_27-1.ic58", 0x000001, 0x020000, CRC(facc17a7) SHA1(40d69840cfcfe5a509d69824c2994de56a3c6ece) ) // PCB silkscreened IC58 (1)     27C1001
 
-	ROM_REGION( 0x80000, "mn10200", 0 )
-	ROM_LOAD16_BYTE( "e63-17-1_s-l.18", 0x000000, 0x040000, CRC(2a063d5b) SHA1(a2b2fe4d8bad1aef7d9dcc0be607cc4e5bc4f0eb) )
-	ROM_LOAD16_BYTE( "e63-18-1_s-h.19", 0x000001, 0x040000, CRC(2f590881) SHA1(7fb827a676f45b24380558b0068b76cb858314f6) )
+	ROM_REGION( 0x80000, "mn10200", 0 ) // sound CPU to drive Zoom ZSG-2/Zoom ZFX-2
+	ROM_LOAD16_BYTE( "e63_17-1.ic18", 0x000000, 0x040000, CRC(2a063d5b) SHA1(a2b2fe4d8bad1aef7d9dcc0be607cc4e5bc4f0eb) ) // PCB silkscreened IC18 (S-L)    27C2001
+	ROM_LOAD16_BYTE( "e63_18-1.ic19", 0x000001, 0x040000, CRC(2f590881) SHA1(7fb827a676f45b24380558b0068b76cb858314f6) ) // PCB silkscreened IC19 (S-H)    27C2001
 
-	ROM_REGION64_BE( 0x1000000, "gfx1", 0 )
-	ROM_LOAD32_WORD_SWAP( "e63-21_c-h.24", 0x000000, 0x400000, CRC(c818b211) SHA1(dce07bfe71a9ba11c3f028a640226c6e59c6aece) )
-	ROM_LOAD32_WORD_SWAP( "e63-15_c-l.9",  0x000002, 0x400000, CRC(4ec6a2d7) SHA1(2ee6270cff7ea2459121961a29d42e000cee2921) )
-	ROM_LOAD32_WORD_SWAP( "e63-22_m-h.25", 0x800000, 0x400000, CRC(6d895eb6) SHA1(473795da42fd29841a926f18a93e5992f4feb27c) )
-	ROM_LOAD32_WORD_SWAP( "e63-16_m-l.10", 0x800002, 0x400000, CRC(d39c1e34) SHA1(6db0ce2251841db3518a9bd9c4520c3c666d19a0) )
+	ROM_REGION64_BE( 0x1000000, "gfx1", 0 ) // mask ROMs
+	ROM_LOAD32_WORD_SWAP( "e63-21.ic24", 0x000000, 0x400000, CRC(c818b211) SHA1(dce07bfe71a9ba11c3f028a640226c6e59c6aece) ) // PCB silkscreened IC24 (C-H)    23C32000
+	ROM_LOAD32_WORD_SWAP( "e63-15.ic9",  0x000002, 0x400000, CRC(4ec6a2d7) SHA1(2ee6270cff7ea2459121961a29d42e000cee2921) ) // PCB silkscreened IC9 (C-L)    23C32000
+	ROM_LOAD32_WORD_SWAP( "e63-22.ic25", 0x800000, 0x400000, CRC(6d895eb6) SHA1(473795da42fd29841a926f18a93e5992f4feb27c) ) // PCB silkscreened IC25 (M-H)    23C32000
+	ROM_LOAD32_WORD_SWAP( "e63-16.ic10", 0x800002, 0x400000, CRC(d39c1e34) SHA1(6db0ce2251841db3518a9bd9c4520c3c666d19a0) ) // PCB silkscreened IC10 (M-L)    23C32000
 
-	ROM_REGION16_BE( 0x1000000, "poly", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "e63-09_poly0.3", 0x000000, 0x400000, CRC(c3e2b1e0) SHA1(ee71f3f59b46e26dbe2ff724da2c509267c8bf2f) )
-	ROM_LOAD16_WORD_SWAP( "e63-10_poly1.4", 0x400000, 0x400000, CRC(f4a56390) SHA1(fc3c51a7f4639479e66ad50dcc94255d94803c97) )
-	ROM_LOAD16_WORD_SWAP( "e63-11_poly2.5", 0x800000, 0x400000, CRC(2293d9f8) SHA1(16adaa0523168ee63a7a34b29622c623558fdd82) )
-	// Poly 3 is not populated
+	ROM_REGION16_BE( 0x1000000, "poly", ROMREGION_ERASEFF ) // mask ROMs
+	ROM_LOAD16_WORD_SWAP( "e63-09.ic3", 0x000000, 0x400000, CRC(c3e2b1e0) SHA1(ee71f3f59b46e26dbe2ff724da2c509267c8bf2f) ) // PCB silkscreened IC3 (POLY0)    23C32000
+	ROM_LOAD16_WORD_SWAP( "e63-10.ic4", 0x400000, 0x400000, CRC(f4a56390) SHA1(fc3c51a7f4639479e66ad50dcc94255d94803c97) ) // PCB silkscreened IC4 (POLY1)    23C32000
+	ROM_LOAD16_WORD_SWAP( "e63-11.ic5", 0x800000, 0x400000, CRC(2293d9f8) SHA1(16adaa0523168ee63a7a34b29622c623558fdd82) ) // PCB silkscreened IC5 (POLY2)    23C32000
+	// IC6 (POLY3) is not populated
 
-	ROM_REGION( 0x800000, "sound_data", 0 )
-	ROM_LOAD( "e63-23_wd0.36", 0x000000, 0x200000, CRC(d69e196e) SHA1(f738bb9e1330f6dabb5e0f0378a1a8eb48a4fa40) )
-	ROM_LOAD( "e63-24_wd1.37", 0x200000, 0x200000, CRC(cd55f17b) SHA1(08f847ef2fd592dbaf63ef9e370cdf1f42012f74) )
-	ROM_LOAD( "e63-25_wd2.38", 0x400000, 0x200000, CRC(bd35bdac) SHA1(5cde6c1a6b74659507b31fcb88257e65f230bfe2) )
-	ROM_LOAD( "e63-26_wd3.39", 0x600000, 0x200000, CRC(346bd413) SHA1(0f6081d22db88eef08180278e7ae97283b5e8452) )
+	ROM_REGION( 0x800000, "sound_data", 0 ) // mask ROMs - Zoom ZSG-2 samples
+	ROM_LOAD( "e63-23.ic36", 0x000000, 0x200000, CRC(d69e196e) SHA1(f738bb9e1330f6dabb5e0f0378a1a8eb48a4fa40) ) // PCB silkscreened IC36 (WD0)    23C16000
+	ROM_LOAD( "e63-24.ic37", 0x200000, 0x200000, CRC(cd55f17b) SHA1(08f847ef2fd592dbaf63ef9e370cdf1f42012f74) ) // PCB silkscreened IC37 (WD1)    23C16000
+	ROM_LOAD( "e63-25.ic38", 0x400000, 0x200000, CRC(bd35bdac) SHA1(5cde6c1a6b74659507b31fcb88257e65f230bfe2) ) // PCB silkscreened IC38 (WD2)    23C16000
+	ROM_LOAD( "e63-26.ic39", 0x600000, 0x200000, CRC(346bd413) SHA1(0f6081d22db88eef08180278e7ae97283b5e8452) ) // PCB silkscreened IC39 (WD3)    23C16000
+
+	ROM_REGION( 0x850, "plds", 0 )
+	ROM_LOAD( "e63-01_palce16v8h-5-5.ic23",  0x000, 0x117, CRC(f114c13f) SHA1(ca9ec41d5c16347bdf107b340e6e1b9e6b7c74a9) )
+	ROM_LOAD( "e63-02_palce22v10h-5-5.ic25", 0x117, 0x2dd, CRC(8418da84) SHA1(b235761f78ecb16d764fbefb00d04092d3a22ca9) )
+	ROM_LOAD( "e63-05_palce16v8h-10-4.ic36", 0x3f4, 0x117, CRC(e27e9734) SHA1(77dadfbedb625b65617640bb73c59c9e5b0c927f) )
+	ROM_LOAD( "e63-06_palce16v8h-10-4.ic41", 0x50b, 0x117, CRC(75184422) SHA1(d35e98e0278d713139eb1c833f41f57ed0dd3c9f) )
+	ROM_LOAD( "e63-07_palce16v8h-10-4.ic43", 0x622, 0x117, CRC(eb77b03f) SHA1(567f92a4fd1fa919d5e9047ee15c058bf40855fb) )
+	ROM_LOAD( "e63-08_palce16v8h-15-4.ic49", 0x739, 0x117, CRC(c305c56d) SHA1(49592fa43c548ac6b08951d03677a3f23e9c8de8) )
+ROM_END
+
+ROM_START( optigera ) // Ver 2.10 O
+	ROM_REGION64_BE( 0x200000, "user1", 0 )
+	ROM_LOAD32_BYTE( "e63_33.ic23", 0x000000, 0x080000, CRC(414a7c77) SHA1(d4bbaa13244f1e5f4d418354f40303b9bcc00411) ) // PCB silkscreened IC23 (P-HH)
+	ROM_LOAD32_BYTE( "e63_32.ic22", 0x000001, 0x080000, CRC(8fec33e8) SHA1(1eb0c5613937cd63dc2f54efa33c98920c55f251) ) // PCB silkscreened IC22 (P-HL)
+	ROM_LOAD32_BYTE( "e63_31.ic8",  0x000002, 0x080000, CRC(672f9d4f) SHA1(7eb79963a5d4fb504ffbcf3f51c9bdf659ae053b) ) // PCB silkscreened IC8 (P-LH)
+	ROM_LOAD32_BYTE( "e63_30.ic7",  0x000003, 0x080000, CRC(b5a63d08) SHA1(c12dd21008fb58179413934a5952ebd2d2040111) ) // PCB silkscreened IC7 (P-LL)
+
+	ROM_REGION( 0x8000, "dsp", 0 ) // surface mounted on K11X0870A POWER JC MOTHER-G PCB
+	ROM_LOAD( "tms320bc53pq80.ic8", 0x0000, 0x8000, CRC(4b8e7fd6) SHA1(07d354a2e4d7554e215fa8d91b5eeeaf573766b0) ) // decapped. TODO: believed to be a generic TI part, verify if it is and if dump is good, if so move in the CPU core
+
+	ROM_REGION16_LE( 0x20000, "dspdata", 0 )
+	ROM_LOAD16_BYTE( "taito_e63_04.ic29", 0x000000, 0x010000, CRC(eccae391) SHA1(e5293c16342cace54dc4b6dfb827558e18ac25a4) ) // PCB silkscreened IC29 (L)     AT27C512
+	ROM_LOAD16_BYTE( "taito_e63_03.ic28", 0x000001, 0x010000, CRC(58fce52f) SHA1(1e3d9ee034b25e658ca45a8b900de2aa54b00135) ) // PCB silkscreened IC28 (H)     AT27C512
+
+	ROM_REGION( 0x40000, "iocpu", 0 )
+	ROM_LOAD16_BYTE( "e63_28.ic59", 0x000000, 0x020000, CRC(601dc916) SHA1(49b1629c4b5a5482c932ebd69b46b40489118012) ) // PCB silkscreened IC59 (0)     27C1001
+	ROM_LOAD16_BYTE( "e63_27.ic58", 0x000001, 0x020000, CRC(930d899f) SHA1(fef194020c8c8b5906a6f2a954a1a0312d970f3d) ) // PCB silkscreened IC58 (1)     27C1001
+
+	ROM_REGION( 0x80000, "mn10200", 0 ) // sound CPU to drive Zoom ZSG-2/Zoom ZFX-2
+	ROM_LOAD16_BYTE( "e63_17.ic18", 0x000000, 0x040000, CRC(daac9e43) SHA1(9ef779a9a5e991ffcfcf30e94ef75329c1030fc2) ) // PCB silkscreened IC18 (S-L)    27C2001
+	ROM_LOAD16_BYTE( "e63_18.ic19", 0x000001, 0x040000, CRC(69c97004) SHA1(65dc3dee0eb7faa1422c38947510abaeb23da7e3) ) // PCB silkscreened IC19 (S-H)    27C2001
+
+	ROM_REGION64_BE( 0x1000000, "gfx1", 0 ) // mask ROMs
+	ROM_LOAD32_WORD_SWAP( "e63-21.ic24", 0x000000, 0x400000, CRC(c818b211) SHA1(dce07bfe71a9ba11c3f028a640226c6e59c6aece) ) // PCB silkscreened IC24 (C-H)    23C32000
+	ROM_LOAD32_WORD_SWAP( "e63-15.ic9",  0x000002, 0x400000, CRC(4ec6a2d7) SHA1(2ee6270cff7ea2459121961a29d42e000cee2921) ) // PCB silkscreened IC9 (C-L)    23C32000
+	ROM_LOAD32_WORD_SWAP( "e63-22.ic25", 0x800000, 0x400000, CRC(6d895eb6) SHA1(473795da42fd29841a926f18a93e5992f4feb27c) ) // PCB silkscreened IC25 (M-H)    23C32000
+	ROM_LOAD32_WORD_SWAP( "e63-16.ic10", 0x800002, 0x400000, CRC(d39c1e34) SHA1(6db0ce2251841db3518a9bd9c4520c3c666d19a0) ) // PCB silkscreened IC10 (M-L)    23C32000
+
+	ROM_REGION16_BE( 0x1000000, "poly", ROMREGION_ERASEFF ) // mask ROMs
+	ROM_LOAD16_WORD_SWAP( "e63-09.ic3", 0x000000, 0x400000, CRC(c3e2b1e0) SHA1(ee71f3f59b46e26dbe2ff724da2c509267c8bf2f) ) // PCB silkscreened IC3 (POLY0)    23C32000
+	ROM_LOAD16_WORD_SWAP( "e63-10.ic4", 0x400000, 0x400000, CRC(f4a56390) SHA1(fc3c51a7f4639479e66ad50dcc94255d94803c97) ) // PCB silkscreened IC4 (POLY1)    23C32000
+	ROM_LOAD16_WORD_SWAP( "e63-11.ic5", 0x800000, 0x400000, CRC(2293d9f8) SHA1(16adaa0523168ee63a7a34b29622c623558fdd82) ) // PCB silkscreened IC5 (POLY2)    23C32000
+	// IC6 (POLY3) is not populated
+
+	ROM_REGION( 0x800000, "sound_data", 0 ) // mask ROMs - Zoom ZSG-2 samples
+	ROM_LOAD( "e63-23.ic36", 0x000000, 0x200000, CRC(d69e196e) SHA1(f738bb9e1330f6dabb5e0f0378a1a8eb48a4fa40) ) // PCB silkscreened IC36 (WD0)    23C16000
+	ROM_LOAD( "e63-24.ic37", 0x200000, 0x200000, CRC(cd55f17b) SHA1(08f847ef2fd592dbaf63ef9e370cdf1f42012f74) ) // PCB silkscreened IC37 (WD1)    23C16000
+	ROM_LOAD( "e63-25.ic38", 0x400000, 0x200000, CRC(bd35bdac) SHA1(5cde6c1a6b74659507b31fcb88257e65f230bfe2) ) // PCB silkscreened IC38 (WD2)    23C16000
+	ROM_LOAD( "e63-26.ic39", 0x600000, 0x200000, CRC(346bd413) SHA1(0f6081d22db88eef08180278e7ae97283b5e8452) ) // PCB silkscreened IC39 (WD3)    23C16000
+
+	ROM_REGION( 0x850, "plds", 0 )
+	ROM_LOAD( "e63-01_palce16v8h-5-5.ic23",  0x000, 0x117, CRC(f114c13f) SHA1(ca9ec41d5c16347bdf107b340e6e1b9e6b7c74a9) )
+	ROM_LOAD( "e63-02_palce22v10h-5-5.ic25", 0x117, 0x2dd, CRC(8418da84) SHA1(b235761f78ecb16d764fbefb00d04092d3a22ca9) )
+	ROM_LOAD( "e63-05_palce16v8h-10-4.ic36", 0x3f4, 0x117, CRC(e27e9734) SHA1(77dadfbedb625b65617640bb73c59c9e5b0c927f) )
+	ROM_LOAD( "e63-06_palce16v8h-10-4.ic41", 0x50b, 0x117, CRC(75184422) SHA1(d35e98e0278d713139eb1c833f41f57ed0dd3c9f) )
+	ROM_LOAD( "e63-07_palce16v8h-10-4.ic43", 0x622, 0x117, CRC(eb77b03f) SHA1(567f92a4fd1fa919d5e9047ee15c058bf40855fb) )
+	ROM_LOAD( "e63-08_palce16v8h-15-4.ic49", 0x739, 0x117, CRC(c305c56d) SHA1(49592fa43c548ac6b08951d03677a3f23e9c8de8) )
+ROM_END
+
+ROM_START( optigerj ) // ver 2.09 J
+	ROM_REGION64_BE( 0x200000, "user1", 0 )
+	ROM_LOAD32_BYTE( "e63_20.ic23", 0x000000, 0x080000, CRC(04b9820b) SHA1(7a5bd7fd7003948b57d862dc1ecd38ddd25a4ca2) ) // PCB silkscreened IC23 (P-HH)
+	ROM_LOAD32_BYTE( "e63_19.ic22", 0x000001, 0x080000, CRC(a25ff024) SHA1(46e8023a028a384609177d00a47cdfdbbda100be) ) // PCB silkscreened IC22 (P-HL)
+	ROM_LOAD32_BYTE( "e63_14.ic8",  0x000002, 0x080000, CRC(2e68fc12) SHA1(a8ee3e51ad8eb1477db8f67380261cee1dada104) ) // PCB silkscreened IC8 (P-LH)
+	ROM_LOAD32_BYTE( "e63_13.ic7",  0x000003, 0x080000, CRC(d1c877e6) SHA1(05314984b7fbc21478b50f7b1281d1f3745496d4) ) // PCB silkscreened IC7 (P-LL)
+
+	ROM_REGION( 0x8000, "dsp", 0 ) // surface mounted on K11X0870A POWER JC MOTHER-G PCB
+	ROM_LOAD( "tms320bc53pq80.ic8", 0x0000, 0x8000, CRC(4b8e7fd6) SHA1(07d354a2e4d7554e215fa8d91b5eeeaf573766b0) ) // decapped. TODO: believed to be a generic TI part, verify if it is and if dump is good, if so move in the CPU core
+
+	ROM_REGION16_LE( 0x20000, "dspdata", 0 )
+	ROM_LOAD16_BYTE( "taito_e63_04.ic29", 0x000000, 0x010000, CRC(eccae391) SHA1(e5293c16342cace54dc4b6dfb827558e18ac25a4) ) // PCB silkscreened IC29 (L)     AT27C512
+	ROM_LOAD16_BYTE( "taito_e63_03.ic28", 0x000001, 0x010000, CRC(58fce52f) SHA1(1e3d9ee034b25e658ca45a8b900de2aa54b00135) ) // PCB silkscreened IC28 (H)     AT27C512
+
+	ROM_REGION( 0x40000, "iocpu", 0 )
+	ROM_LOAD16_BYTE( "e63_28.ic59", 0x000000, 0x020000, CRC(601dc916) SHA1(49b1629c4b5a5482c932ebd69b46b40489118012) ) // PCB silkscreened IC59 (0)     27C1001
+	ROM_LOAD16_BYTE( "e63_27.ic58", 0x000001, 0x020000, CRC(930d899f) SHA1(fef194020c8c8b5906a6f2a954a1a0312d970f3d) ) // PCB silkscreened IC58 (1)     27C1001
+
+	ROM_REGION( 0x80000, "mn10200", 0 ) // sound CPU to drive Zoom ZSG-2/Zoom ZFX-2
+	ROM_LOAD16_BYTE( "e63_17.ic18", 0x000000, 0x040000, CRC(daac9e43) SHA1(9ef779a9a5e991ffcfcf30e94ef75329c1030fc2) ) // PCB silkscreened IC18 (S-L)    27C2001
+	ROM_LOAD16_BYTE( "e63_18.ic19", 0x000001, 0x040000, CRC(69c97004) SHA1(65dc3dee0eb7faa1422c38947510abaeb23da7e3) ) // PCB silkscreened IC19 (S-H)    27C2001
+
+	ROM_REGION64_BE( 0x1000000, "gfx1", 0 ) // mask ROMs
+	ROM_LOAD32_WORD_SWAP( "e63-21.ic24", 0x000000, 0x400000, CRC(c818b211) SHA1(dce07bfe71a9ba11c3f028a640226c6e59c6aece) ) // PCB silkscreened IC24 (C-H)    23C32000
+	ROM_LOAD32_WORD_SWAP( "e63-15.ic9",  0x000002, 0x400000, CRC(4ec6a2d7) SHA1(2ee6270cff7ea2459121961a29d42e000cee2921) ) // PCB silkscreened IC9 (C-L)    23C32000
+	ROM_LOAD32_WORD_SWAP( "e63-22.ic25", 0x800000, 0x400000, CRC(6d895eb6) SHA1(473795da42fd29841a926f18a93e5992f4feb27c) ) // PCB silkscreened IC25 (M-H)    23C32000
+	ROM_LOAD32_WORD_SWAP( "e63-16.ic10", 0x800002, 0x400000, CRC(d39c1e34) SHA1(6db0ce2251841db3518a9bd9c4520c3c666d19a0) ) // PCB silkscreened IC10 (M-L)    23C32000
+
+	ROM_REGION16_BE( 0x1000000, "poly", ROMREGION_ERASEFF ) // mask ROMs
+	ROM_LOAD16_WORD_SWAP( "e63-09.ic3", 0x000000, 0x400000, CRC(c3e2b1e0) SHA1(ee71f3f59b46e26dbe2ff724da2c509267c8bf2f) ) // PCB silkscreened IC3 (POLY0)    23C32000
+	ROM_LOAD16_WORD_SWAP( "e63-10.ic4", 0x400000, 0x400000, CRC(f4a56390) SHA1(fc3c51a7f4639479e66ad50dcc94255d94803c97) ) // PCB silkscreened IC4 (POLY1)    23C32000
+	ROM_LOAD16_WORD_SWAP( "e63-11.ic5", 0x800000, 0x400000, CRC(2293d9f8) SHA1(16adaa0523168ee63a7a34b29622c623558fdd82) ) // PCB silkscreened IC5 (POLY2)    23C32000
+	// IC6 (POLY3) is not populated
+
+	ROM_REGION( 0x800000, "sound_data", 0 ) // mask ROMs - Zoom ZSG-2 samples
+	ROM_LOAD( "e63-23.ic36", 0x000000, 0x200000, CRC(d69e196e) SHA1(f738bb9e1330f6dabb5e0f0378a1a8eb48a4fa40) ) // PCB silkscreened IC36 (WD0)    23C16000
+	ROM_LOAD( "e63-24.ic37", 0x200000, 0x200000, CRC(cd55f17b) SHA1(08f847ef2fd592dbaf63ef9e370cdf1f42012f74) ) // PCB silkscreened IC37 (WD1)    23C16000
+	ROM_LOAD( "e63-25.ic38", 0x400000, 0x200000, CRC(bd35bdac) SHA1(5cde6c1a6b74659507b31fcb88257e65f230bfe2) ) // PCB silkscreened IC38 (WD2)    23C16000
+	ROM_LOAD( "e63-26.ic39", 0x600000, 0x200000, CRC(346bd413) SHA1(0f6081d22db88eef08180278e7ae97283b5e8452) ) // PCB silkscreened IC39 (WD3)    23C16000
 
 	ROM_REGION( 0x850, "plds", 0 )
 	ROM_LOAD( "e63-01_palce16v8h-5-5.ic23",  0x000, 0x117, CRC(f114c13f) SHA1(ca9ec41d5c16347bdf107b340e6e1b9e6b7c74a9) )
@@ -947,4 +1053,6 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1998, optiger, 0, taitopjc, taitopjc, taitopjc_state, init_optiger, ROT0, "Taito", "Operation Tiger (Ver 2.14 O)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_NO_SOUND )
+GAME( 1998, optiger,  0,       taitopjc, taitopjc, taitopjc_state, init_optiger, ROT0, "Taito", "Operation Tiger (Ver 2.14 O)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_NO_SOUND ) // Operation Tiger Ver 2.14 O, Oct  5 1998  13:58:13
+GAME( 1998, optigera, optiger, taitopjc, taitopjc, taitopjc_state, init_optiger, ROT0, "Taito", "Operation Tiger (Ver 2.10 O)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_NO_SOUND ) // Operation Tiger Ver 2.10 O, Sep 19 1998  14:06:18
+GAME( 1998, optigerj, optiger, taitopjc, taitopjc, taitopjc_state, init_optiger, ROT0, "Taito", "Operation Tiger (Ver 2.09 J)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_NO_SOUND ) // Operation Tiger Ver 2.09 J, Sep 12 1998  19:28:59

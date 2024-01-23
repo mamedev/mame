@@ -19,10 +19,10 @@
 #include "sh7014_port.h"
 #include "sh7014_sci.h"
 
-class sh2_sh7014_device : public sh2_device
+class sh7014_device : public sh2_device
 {
 public:
-	sh2_sh7014_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sh7014_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<int Sci> auto sci_tx_w() {
 		return m_sci[Sci].lookup()->write_sci_tx();
@@ -78,6 +78,6 @@ private:
 	uint16_t m_ccr;
 };
 
-DECLARE_DEVICE_TYPE(SH2_SH7014,  sh2_sh7014_device)
+DECLARE_DEVICE_TYPE(SH7014,  sh7014_device)
 
 #endif // MAME_CPU_SH_SH7014_H

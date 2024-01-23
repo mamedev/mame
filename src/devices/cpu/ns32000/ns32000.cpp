@@ -2261,9 +2261,43 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						// SUBPi src,dst
 						//      gen,gen
 						//      read.i,rmw.i
-						fatalerror("unimplemented: subp (%s)\n", machine().describe_context());
+						{
+							mode[0].read_i(size);
+							mode[1].rmw_i(size);
+							decode(mode, bytes);
 
-						// TODO: tcy 16/18
+							u32 const src1 = gen_read(mode[0]);
+							u32 const src2 = gen_read(mode[1]);
+
+							// binary coded decimal subtraction with carry
+							// TODO: CHECK
+							u32 dst = 0;
+							bool carry = m_psr & PSR_C;
+							unsigned const tcy = carry ? 18 : 16;
+							for (unsigned digit = 0; digit < (size + 1) * 2; digit++)
+							{
+								signed sum = BIT(src2, digit * 4, 4) - BIT(src1, digit * 4, 4) - carry;
+
+								if (sum < 0)
+								{
+									sum = sum + 10;
+									carry = true;
+								}
+								else
+									carry = false;
+
+								dst |= sum << digit * 4;
+							}
+
+							if (carry)
+								m_psr |= PSR_C;
+							else
+								m_psr &= ~PSR_C;
+
+							gen_write(mode[1], dst);
+
+							tex = mode[0].tea + mode[1].tea + tcy;
+						}
 						break;
 					case 0xc:
 						// ABSi src,dst
@@ -2346,9 +2380,43 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						// ADDPi src,dst
 						//       gen,gen
 						//       read.i,rmw.i
-						fatalerror("unimplemented: addp (%s)\n", machine().describe_context());
+						{
+							mode[0].read_i(size);
+							mode[1].rmw_i(size);
+							decode(mode, bytes);
 
-						// TODO: tcy 16/18
+							u32 const src1 = gen_read(mode[0]);
+							u32 const src2 = gen_read(mode[1]);
+
+							// binary coded decimal addition with carry
+							// TODO: CHECK
+							u32 dst = 0;
+							bool carry = m_psr & PSR_C;
+							unsigned const tcy = carry ? 18 : 16;
+							for (unsigned digit = 0; digit < (size + 1) * 2; digit++)
+							{
+								unsigned sum = BIT(src1, digit * 4, 4) + BIT(src2, digit * 4, 4) + carry;
+
+								if (sum > 9)
+								{
+									sum = sum - 10;
+									carry = true;
+								}
+								else
+									carry = false;
+
+								dst |= sum << digit * 4;
+							}
+
+							if (carry)
+								m_psr |= PSR_C;
+							else
+								m_psr &= ~PSR_C;
+
+							gen_write(mode[1], dst);
+
+							tex = mode[0].tea + mode[1].tea + tcy;
+						}
 						break;
 					}
 				}

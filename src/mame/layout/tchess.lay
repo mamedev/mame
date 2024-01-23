@@ -81,9 +81,9 @@ license:CC0-1.0
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="9" right="35.5" top="1.5" bottom="37.25" />
+		<bounds left="9" right="35.5" top="2.75" bottom="36.75" />
 
-		<group ref="display"><bounds x="10" y="4.5" width="24.5" height="2.75" /></group>
+		<group ref="display"><bounds x="10" y="5" width="24.5" height="2.75" /></group>
 
 		<element ref="white"><bounds x="10" y="10" width="4.5" height="4.5" /></element> <!-- ON switch is here -->
 		<element ref="white"><bounds x="15" y="10" width="4.5" height="4.5" /></element>

@@ -2,7 +2,7 @@
 // copyright-holders:Ryan Holtz
 /*************************************************************************
 
-    ldv1000hle.h
+    ldv4200hle.h
 
     Pioneer LD-V4200 laserdisc player simulation.
 

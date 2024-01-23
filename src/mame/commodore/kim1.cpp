@@ -65,10 +65,9 @@ TODO:
 
 #include "emu.h"
 
+#include "bus/kim1/cards.h"
 #include "bus/kim1/kim1bus.h"
-#include "bus/kim1/k1016_16k.h"
 #include "cpu/m6502/m6502.h"
-#include "formats/kim1_cas.h"
 #include "imagedev/cassette.h"
 #include "machine/mos6530.h"
 #include "machine/timer.h"
@@ -76,6 +75,8 @@ TODO:
 
 #include "softlist_dev.h"
 #include "speaker.h"
+
+#include "formats/kim1_cas.h"
 
 #include "kim1.lh"
 
@@ -308,11 +309,6 @@ INPUT_PORTS_END
 //**************************************************************************
 //  MACHINE DRIVERS
 //**************************************************************************
-
-static void kim1_cards(device_slot_interface &device)
-{
-	device.option_add("mtuk1016", KIM1BUS_K1016);   // MTU K-1016 16K RAM card
-}
 
 void kim1_state::kim1(machine_config &config)
 {

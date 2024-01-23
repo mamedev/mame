@@ -13878,7 +13878,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="mconanch">
-		<description>Meitantei Conan - Chika Yuuenchi Satsujin Jiken (Japan)</description>
+		<description>Detective Conan: Chika Yuuenchi Satsujin Jiken (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-ADCJ-JPN" />
@@ -13894,7 +13894,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="mconangi">
-		<description>Meitantei Conan - Giwaku no Gouka Ressha (Japan)</description>
+		<description>Detective Conan: Giwaku no Gouka Ressha (Japan)</description>
 		<year>1998</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-ADKJ-JPN" />

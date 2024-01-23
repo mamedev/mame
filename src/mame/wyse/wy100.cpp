@@ -63,6 +63,8 @@ private:
 	void io_map(address_map &map);
 	void bank_map(address_map &map);
 
+	static void printer_devices(device_slot_interface &slot);
+
 	required_device<mcs48_cpu_device> m_maincpu;
 	required_device<address_map_bank_device> m_rambank;
 	required_device_array<i8276_device, 2> m_crtc;
@@ -199,6 +201,42 @@ static INPUT_PORTS_START(wy100)
 INPUT_PORTS_END
 
 
+class wy100_loopback_device : public device_t, public device_rs232_port_interface
+{
+public:
+	wy100_loopback_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_start() override;
+
+	virtual void input_txd(int state) override;
+};
+
+DEFINE_DEVICE_TYPE_PRIVATE(WY100_LOOPBACK, device_rs232_port_interface, wy100_loopback_device, "wy100_loopback", "WY-100 Printer Loopback (3 to 20)")
+
+wy100_loopback_device::wy100_loopback_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, WY100_LOOPBACK, tag, owner, clock)
+	, device_rs232_port_interface(mconfig, *this)
+{
+}
+
+void wy100_loopback_device::device_start()
+{
+}
+
+void wy100_loopback_device::input_txd(int state)
+{
+	output_dsr(state);
+}
+
+
+void wy100_state::printer_devices(device_slot_interface &slot)
+{
+	default_rs232_devices(slot);
+	slot.option_replace("loopback", WY100_LOOPBACK);
+	slot.option_remove("dec_loopback");
+}
+
 void wy100_state::wy100(machine_config &config)
 {
 	I8039(config, m_maincpu, 10.1376_MHz_XTAL); // INS8039N-11
@@ -250,8 +288,8 @@ void wy100_state::wy100(machine_config &config)
 	m_modem->cts_handler().set(m_pci, FUNC(scn2651_device::cts_w));
 	m_modem->rxd_handler().set(m_pci, FUNC(scn2651_device::rxd_w));
 
-	RS232_PORT(config, m_printer, default_rs232_devices, nullptr);
-	m_printer->dsr_handler().set(m_pci, FUNC(scn2651_device::dsr_w));
+	RS232_PORT(config, m_printer, wy100_state::printer_devices, "loopback");
+	m_printer->dsr_handler().set(m_pci, FUNC(scn2651_device::dsr_w)); // actually pin 20 (DTR)
 }
 
 

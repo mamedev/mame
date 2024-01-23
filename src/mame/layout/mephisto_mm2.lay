@@ -557,7 +557,7 @@ license:CC0-1.0
 		<element ref="cwhite"><bounds x="17" y="2" width="81" height="81" /></element>
 
 		<group ref="sb_board"><bounds x="17.5" y="2.5" width="80" height="80" /></group>
-		<group ref="sb_ui"><bounds x="1.5" y="3" width="10" height="80" /></group>
+		<group ref="sb_ui"><bounds x="1.5" y="2.5" width="10" height="80" /></group>
 
 		<!-- chessboard coords -->
 		<element ref="text_8"><bounds x="14.2" y="6.5" width="2" height="2" /></element>

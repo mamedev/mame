@@ -26,7 +26,7 @@ public:
 
 	// configuration helpers
 	sensorboard_device &set_type(sb_type type); // sensor type
-	sensorboard_device &set_size(u8 width, u8 height) { m_width = width; m_height = height; return *this; } // board dimensions, max 12 * 10
+	sensorboard_device &set_size(u8 width, u8 height) { m_width = width; m_height = height; return *this; } // board dimensions, max 13 * 10
 	sensorboard_device &set_spawnpoints(u8 i) { m_maxspawn = i; m_maxid = i; return *this; } // number of piece spawnpoints, max 16
 	sensorboard_device &set_max_id(u8 i) { m_maxid = i; return *this; } // maximum piece id (if larger than set_spawnpoints)
 	sensorboard_device &set_delay(attotime delay) { m_sensordelay = delay; return *this; } // delay when activating a sensor (like PORT_IMPULSE), set to attotime::never to disable

@@ -71,15 +71,9 @@
 
   - Discover the proper way to tie PIA's signals to Microprocessor's IRQs.
   - Coin In device support.
-  - Discrete sound.
 
 
 ****************************************************************************************/
-
-// Debug Notes:
-// good luck credits vars 6Bh - 1ABh - 501Bh(nvram) - bin
-// jester ch credits vars 34h - 179h - 5018h(nvram) - bin
-// castaway  credits vars 1Eh - 14Ah - 5025h(nvram) - bin
 
 #include "emu.h"
 #include "emupal.h"
@@ -89,9 +83,12 @@
 
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
+#include "machine/netlist.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "video/mc6845.h"
+
+#include "nl_gi6809.h"
 
 namespace {
 
@@ -100,7 +97,6 @@ namespace {
 #define CPU_CLOCK       (MASTER_CLOCK / 2)
 #define PIXEL_CLOCK     (MASTER_CLOCK / 16)
 
-
 class gi6809_state : public driver_device
 {
 public:
@@ -108,6 +104,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_slavecpu(*this, "slavecpu"),
+		m_crtc(*this, "crtc"),
 		m_pia(*this, "pia%u", 0U),
 		m_screen(*this, "screen"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -115,8 +112,11 @@ public:
 		m_colorram(*this, "colorram"),
 		m_input(*this, "IN0-%u", 0U),
 		m_hopper(*this, "hopper"),
-		m_coin_key(*this, "CoinKey"),
-		m_lamps(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U),
+		m_sound_bit0(*this, "sound_nl:bit0"),
+		m_sound_bit1(*this, "sound_nl:bit1"),
+		m_sound_bit2(*this, "sound_nl:bit2"),
+		m_sound_bit3(*this, "sound_nl:bit3")
 	{ }
 
 	void castawayt(machine_config &config);
@@ -131,6 +131,7 @@ protected:
 	void gi6809_base(machine_config &config);
 
 private:
+
 	// Address Maps
 	void glckmain_map(address_map &map);
 	void glckslave_map(address_map &map);
@@ -142,286 +143,51 @@ private:
 	// Devices
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_slavecpu;
+	required_device<mc6845_device> m_crtc;
 	required_device_array<pia6821_device, 2> m_pia;
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_shared_ptr<uint8_t> m_videoram;
-	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<u8> m_videoram;
+	required_shared_ptr<u8> m_colorram;
 	required_ioport_array<4> m_input;
 	required_device<ticket_dispenser_device> m_hopper;
-	optional_ioport m_coin_key;
 	output_finder<8> m_lamps;
 
-	// Video Hardware
+	// Audio triggers
+	required_device<netlist_mame_logic_input_device> m_sound_bit0;
+	required_device<netlist_mame_logic_input_device> m_sound_bit1;
+	required_device<netlist_mame_logic_input_device> m_sound_bit2;
+	required_device<netlist_mame_logic_input_device> m_sound_bit3;
 
+	// Video Hardware
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	void gi6809_videoram_w(offs_t offset, uint8_t data);
-	void gi6809_colorram_w(offs_t offset, uint8_t data);
+	void gi6809_videoram_w(offs_t offset, u8 data);
+	void gi6809_colorram_w(offs_t offset, u8 data);
 	void gi6809_palette(palette_device &palette) const;
-	void castawayt_palette(palette_device &palette) const;
 	uint32_t screen_update_gi6809(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	// Input ports
-	uint8_t gi6809_mux_port_r();
-	uint8_t cast_mux_port_r();
+	u8 gi6809_mux_port_r();
 
 	// Output ports
-	void lamps3_w(uint8_t data);
-	void lamps3h_w(uint8_t data);
-	void lamps5_w(uint8_t data);
-	void lamps8_w(uint8_t data);
-	void snd_mux_w(uint8_t data);
-
-	// Input-Output lines
-	int pia0_ca1_r();
-	int ret_vsync_r();
-
-	void crtc_vs_gl_w(int state);
-	void crtc_vs_ca_w(int state);
-	void crtc_vs_je_w(int state);
+	void lamps3_w(u8 data);
+	void lamps3h_w(u8 data);
+	void lamps5_w(u8 data);
+	void lamps8_w(u8 data);
+	void snd_mux_w(u8 data);
 
 	// internal
-	uint8_t sn_read1_r() { return m_sernum1[(m_ser_ptr++) & 0x0f]; }
-	uint8_t sn_read2_r() { return m_sernum2[(m_ser_ptr++) & 0x0f]; }
-	uint8_t cast_sens_r() { return 0xff; }
+	u8 sn_read1_r() { return m_sernum1[(m_ser_ptr++) & 0x0f]; }
+	u8 sn_read2_r() { return m_sernum2[(m_ser_ptr++) & 0x0f]; }
+	u8 cast_sens_r() { return 0xff; }
 
+	// vars
 	tilemap_t *m_bg_tilemap;
-
-	// Latches
-	uint8_t m_mux_data = 0xff;
-
-	// states
-	bool m_vsync = 0;
-
-	// internal
-	uint8_t m_ser_ptr = 0;
-	uint8_t m_sernum1[0x10] = { 3, 0, 3, 4, 4,  1, 4, 1, 0, 0, 0, 0, 0, 0, 2, 6 };
-	uint8_t m_sernum2[0x10] = { 4, 7, 4, 9, 2, 13, 4, 3, 0, 0, 0, 0, 0, 0, 0, 1 };
-
+	u8 m_mux_data = 0xff;
+	u8 m_ser_ptr = 0;
+	u8 m_sernum1[0x10] = { 3, 0, 3, 4, 4,  1, 4, 1, 0, 0, 0, 0, 0, 0, 2, 6 };
+	u8 m_sernum2[0x10] = { 4, 7, 4, 9, 2, 13, 4, 3, 0, 0, 0, 0, 0, 0, 0, 1 };
 };
-
-
-void gi6809_state::machine_start()
-{
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gi6809_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_lamps.resolve();
-}
-
-
-/********************************
-*       Interrupt Control       *
-********************************/
-
-void gi6809_state::crtc_vs_gl_w(int state)
-{
-	m_vsync = state;
-}
-
-
-void gi6809_state::crtc_vs_ca_w(int state)
-{
-	m_vsync = state;
-}
-
-
-void gi6809_state::crtc_vs_je_w(int state)
-{
-	m_vsync = state;
-	m_pia[1]->cb1_w(state);   // IRQB-> IRQ Master
-	m_pia[1]->ca1_w(!state);  // IRQA-> FIRQ Master
-	m_pia[0]->ca1_w(state);   // IRQA-> IRQ Slave
-}
-
-
-int gi6809_state::ret_vsync_r()
-{
-	return m_vsync;
-}
-
-
-int gi6809_state::pia0_ca1_r()
-{
-	m_pia[1]->read(1);
-	return m_vsync;
-}
-
-
-/*********************************************
-*               Video Hardware               *
-*********************************************/
-
-void gi6809_state::gi6809_videoram_w(offs_t offset, uint8_t data)
-{
-	m_videoram[offset] = data;
-	m_bg_tilemap->mark_tile_dirty(offset);
-}
-
-void gi6809_state::gi6809_colorram_w(offs_t offset, uint8_t data)
-{
-	m_colorram[offset] = data;
-	m_bg_tilemap->mark_tile_dirty(offset);
-}
-
-
-TILE_GET_INFO_MEMBER(gi6809_state::get_bg_tile_info)
-{
-/*  - bits -
-    7654 3210
-    --xx xx--   tiles color.
-    ---- --x-   tiles bank.
-    ---- ---x   tiles extended address (MSB).
-    xx-- ----   unused.
-*/
-
-	int attr = m_colorram[tile_index];
-	int code = ((attr & 1) << 8) | m_videoram[tile_index];
-	int bank = (attr & 0x02) >> 1;      // bit 1 switch the gfx banks
-	int color = (attr & 0x3c) >> 2;     // bits 2-3-4-5 for color
-
-	tileinfo.set(bank, code, color, 0);
-}
-
-
-uint32_t gi6809_state::screen_update_gi6809(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	return 0;
-}
-
-
-void gi6809_state::gi6809_palette(palette_device &palette) const
-{
-/*
-    This hardware has a feature called BLUE KILLER.
-    Using the original intensity line, the PCB has a bridge
-    that allows (as default) to turn the background black.
-
-    All games running on this hardware
-    were designed with black background.
-
-    7654 3210
-    ---- ---x   red component.
-    ---- --x-   green component.
-    ---- -x--   blue component.
-    ---- x---   blue killer.
-    xxxx ----   unused.
-*/
-
-	// 0000KBGR
-	uint8_t const *const color_prom = memregion("proms")->base();
-	if (!color_prom)
-		return;
-
-	for (int i = 0; i < palette.entries(); i++)
-	{
-		// blue killer (from schematics)
-		int const bk = BIT(color_prom[i], 3);
-
-		// red component
-		int const r = BIT(color_prom[i], 0) * 0xff;
-
-		// green component
-		int const g = BIT(color_prom[i], 1) * 0xff;
-
-		// blue component
-		int const b = bk * BIT(color_prom[i], 2) * 0xff;
-
-		palette.set_pen_color(i, rgb_t(r, g, b));
-	}
-}
-
-
-/*******************************************
-*               Read Handlers              *
-*******************************************/
-
-uint8_t gi6809_state::gi6809_mux_port_r()
-{
-	uint8_t data = 0xff;
-
-	for (int i = 0; i < 4 ; i++)
-		if (BIT(~m_mux_data, i + 4))
-		{
-			data &= m_input[i]->read();
-/*
-    ToDo: three stages coin in system
-*/
-		}
-	return data;
-}
-
-
-uint8_t gi6809_state::cast_mux_port_r()
-{
-	uint8_t data = 0xff;
-
-	for (int i = 0; i < 4 ; i++)
-		if (BIT(~m_mux_data, i + 4))
-		{
-			data &= m_input[i]->read();
-		}
-	return data;
-}
-
-
-/*******************************************
-*               Write Handlers             *
-*******************************************/
-
-void gi6809_state::lamps3_w(uint8_t data)
-{
-	// glck6809 - No lamps action
-	data = data ^ 0xff;
-
-	m_lamps[5] = BIT(data, 5);  // lamp 5 Coin lockout
-	m_lamps[6] = BIT(data, 6);  // lamp 6 Hopper Motor
-	m_lamps[7] = BIT(data, 7);  // lamp 7 Attendant Lamp
-}
-
-
-void gi6809_state::lamps3h_w(uint8_t data)
-{
-	data = data ^ 0xff;
-
-	m_lamps[5] = BIT(data, 5);  // lamp 5 Coin lockout
-	m_lamps[6] = BIT(data, 6);  // lamp 6 Hopper Motor
-	m_lamps[7] = BIT(data, 7);  // lamp 7 Attendant Lamp
-	m_hopper->motor_w(BIT(data, 6));
-}
-
-
-void gi6809_state::lamps5_w(uint8_t data)
-{
-	// glck6809 - No lamps action
-	data = data ^ 0xff;
-
-	m_lamps[0] = BIT(data, 0);
-	m_lamps[1] = BIT(data, 1);
-	m_lamps[2] = BIT(data, 2);
-	m_lamps[3] = BIT(data, 3);
-	m_lamps[4] = BIT(data, 4);
-}
-
-
-void gi6809_state::lamps8_w(uint8_t data)
-{
-	data = data ^ 0xff;
-
-	m_lamps[0] = BIT(data, 0);
-	m_lamps[1] = BIT(data, 1);
-	m_lamps[2] = BIT(data, 2);
-	m_lamps[3] = BIT(data, 3);
-	m_lamps[4] = BIT(data, 4);
-	m_lamps[5] = BIT(data, 5);
-	m_lamps[6] = BIT(data, 6);
-	m_lamps[7] = BIT(data, 7);
-}
-
-
-void gi6809_state::snd_mux_w(uint8_t data)
-{
-	m_mux_data = data;
-}
 
 
 /*********************************************
@@ -444,7 +210,7 @@ void gi6809_state::glckslave_map(address_map &map)
 {
 	map(0x0000, 0x03ff).ram().share("ram");
 	map(0x1004, 0x1007).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x4000, 0x400f).r(FUNC(gi6809_state::sn_read1_r));  // unknown device
+	map(0x4000, 0x400f).nopw().r(FUNC(gi6809_state::sn_read1_r));  // unknown device
 	map(0x5000, 0x5fff).ram().share("nvram");
 	map(0xe000, 0xffff).rom();
 }
@@ -498,6 +264,158 @@ void gi6809_state::jestslave_map(address_map &map)
 }
 
 
+/*******************************************
+*               Write Handlers             *
+*******************************************/
+
+void gi6809_state::lamps3_w(u8 data)
+{
+	// glck6809 - no lamps activity
+
+	m_lamps[5] = BIT(data, 5);  // lamp 5 Coin lockout
+	m_lamps[6] = BIT(data, 6);  // lamp 6 Hopper Motor
+	m_lamps[7] = BIT(data, 7);  // lamp 7 Attendant Lamp
+}
+
+void gi6809_state::lamps3h_w(uint8_t data)
+{
+	m_lamps[5] = BIT(data, 5);  // lamp 5 Coin lockout
+	m_lamps[6] = BIT(data, 6);  // lamp 6 Hopper Motor
+	m_lamps[7] = BIT(data, 7);  // lamp 7 Attendant Lamp
+	m_hopper->motor_w(!BIT(data, 6));
+}
+
+void gi6809_state::lamps5_w(u8 data)
+{
+	// glck6809 - no lamps activity
+
+	m_lamps[0] = BIT(data, 0);
+	m_lamps[1] = BIT(data, 1);
+	m_lamps[2] = BIT(data, 2);
+	m_lamps[3] = BIT(data, 3);
+	m_lamps[4] = BIT(data, 4);
+}
+
+void gi6809_state::lamps8_w(u8 data)
+{
+	m_lamps[0] = BIT(data, 0);
+	m_lamps[1] = BIT(data, 1);
+	m_lamps[2] = BIT(data, 2);
+	m_lamps[3] = BIT(data, 3);
+	m_lamps[4] = BIT(data, 4);
+	m_lamps[5] = BIT(data, 5);
+	m_lamps[6] = BIT(data, 6);
+	m_lamps[7] = BIT(data, 7);
+}
+
+
+/*******************************************
+*               Read Handlers              *
+*******************************************/
+
+u8 gi6809_state::gi6809_mux_port_r()
+{
+	u8 data = 0xff;
+
+	for (int i = 0; i < 4 ; i++)
+		if (BIT(~m_mux_data, i + 4))
+			data &= m_input[i]->read();
+	return data;
+}
+
+void gi6809_state::snd_mux_w(u8 data)
+{
+	m_mux_data = data;
+	m_sound_bit0->write(BIT(data,0));
+	m_sound_bit1->write(BIT(data,1));
+	m_sound_bit2->write(BIT(data,2));
+	m_sound_bit3->write(BIT(data,3));
+	logerror("Sound Code:%02x\n", data & 0x0f);
+}
+
+
+/*********************************************
+*               Video Hardware               *
+*********************************************/
+
+void gi6809_state::gi6809_videoram_w(offs_t offset, u8 data)
+{
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+void gi6809_state::gi6809_colorram_w(offs_t offset, u8 data)
+{
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+uint32_t gi6809_state::screen_update_gi6809(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	return 0;
+}
+
+TILE_GET_INFO_MEMBER(gi6809_state::get_bg_tile_info)
+{
+/*  - bits -
+    7654 3210
+    --xx xx--   tiles color.
+    ---- --x-   tiles bank.
+    ---- ---x   tiles extended address (MSB).
+    xx-- ----   unused.
+*/
+
+	int attr = m_colorram[tile_index];
+	int code = ((attr & 1) << 8) | m_videoram[tile_index];
+	int bank = (attr & 0x02) >> 1;      // bit 1 switch the gfx banks
+	int color = (attr & 0x3c) >> 2;     // bits 2-3-4-5 for color
+
+	tileinfo.set(bank, code, color, 0);
+}
+
+void gi6809_state::gi6809_palette(palette_device &palette) const
+{
+/*
+    This hardware has a feature called BLUE KILLER.
+    Using the original intensity line, the PCB has a bridge
+    that allows (as default) to turn the background black.
+
+    All games running on this hardware
+    were designed with black background.
+
+    7654 3210
+    ---- ---x   red component.
+    ---- --x-   green component.
+    ---- -x--   blue component.
+    ---- x---   blue killer.
+    xxxx ----   unused.
+*/
+
+	// 0000KBGR
+	u8 const *const color_prom = memregion("proms")->base();
+	if (!color_prom)
+		return;
+
+	for (int i = 0; i < palette.entries(); i++)
+	{
+		// blue killer (from schematics)
+		int const bk = BIT(color_prom[i], 3);
+
+		// red component
+		int const r = BIT(color_prom[i], 0) * 0xff;
+
+		// green component
+		int const g = BIT(color_prom[i], 1) * 0xff;
+
+		// blue component
+		int const b = bk * BIT(color_prom[i], 2) * 0xff;
+
+		palette.set_pen_color(i, rgb_t(r, g, b));
+	}
+}
+
+
 /*********************************************
 *                Input Ports                 *
 *********************************************/
@@ -516,10 +434,10 @@ void gi6809_state::jestslave_map(address_map &map)
 static INPUT_PORTS_START( glck6809 )
 	// Multiplexed - 4x5bits
 	PORT_START("IN0-0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Supervisor Key")  PORT_TOGGLE  // Full Menu.
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Attendant Key")   PORT_TOGGLE  // Partial Menu.
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )    PORT_NAME("Reserve Machine") PORT_CODE(KEYCODE_8)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_GAMBLE_DOOR )  PORT_NAME("Door - Att Menu")  PORT_TOGGLE
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 )     PORT_NAME("Supervisor Key")  PORT_TOGGLE  // Full Menu.
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )     PORT_NAME("Attendant Key")   PORT_TOGGLE  // Partial Menu.
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Reserve Machine") PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_GAMBLE_DOOR ) PORT_NAME("Door - Att Menu") PORT_TOGGLE
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -528,9 +446,9 @@ static INPUT_PORTS_START( glck6809 )
 	PORT_START("IN0-1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )  PORT_NAME("D-UP - Menu Back")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )        // Coin Upper Sensor, polled from matrix scan.
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )  // Coin Upper Sensor - to be implemented
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )        // Coin Lower Sensor, polled from matrix scan.
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )  // Coin Lower Sensor - to be implemented
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -556,17 +474,14 @@ static INPUT_PORTS_START( glck6809 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("PIA0_A")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER )  // Meter Sensor 1 (PIA0_A 01)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER )  // Meter Sensor 2 (PIA0_A 02)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER )  // Meter Sensor 3 (PIA0_A 04)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER )  // Meter Sensor 4 (PIA0_A 08)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER )  // Meter Sensor 5 (PIA0_A 10)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("Meter Sensor 1 (PIA0_A 01)")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("Meter Sensor 2 (PIA0_A 02)")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("Meter Sensor 3 (PIA0_A 04)")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("Meter Sensor 4 (PIA0_A 08)")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("Meter Sensor 5 (PIA0_A 10)")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("CoinKey")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(1)
 
 INPUT_PORTS_END
 
@@ -576,8 +491,8 @@ static INPUT_PORTS_START( castawayt )
 	PORT_INCLUDE( glck6809 )
 
 	PORT_MODIFY("IN0-0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Accountancy Key")  PORT_TOGGLE
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )    PORT_NAME("Reserve / Test Menu (Accountancy) / Back (Test Menu)") PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 )      PORT_NAME("Accountancy Key")  PORT_TOGGLE
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )         PORT_NAME("Reserve / Test Menu (Accountancy) / Back (Test Menu)") PORT_CODE(KEYCODE_8)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_GAMBLE_DOOR )  PORT_NAME("Door - Test Menu")  PORT_TOGGLE
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -637,11 +552,11 @@ static INPUT_PORTS_START( jesterch )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("Coin Mech")       PORT_CODE(KEYCODE_H)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("Hopper Sensor")   PORT_CODE(KEYCODE_J)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("Cashbox Switch")  PORT_CODE(KEYCODE_K)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 INPUT_PORTS_END
 
@@ -672,6 +587,17 @@ static GFXDECODE_START( gfx_gi6809 )
 GFXDECODE_END
 
 
+
+/*********************************************
+*              Machine Start                 *
+*********************************************/
+
+void gi6809_state::machine_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gi6809_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_lamps.resolve();
+}
+
 /*********************************************
 *              Machine Reset                 *
 *********************************************/
@@ -683,7 +609,7 @@ void gi6809_state::machine_reset()
 
 
 /*********************************************
-*              Machine Drivers               *
+*              Machine Config                *
 *********************************************/
 
 void gi6809_state::gi6809_base(machine_config &config)
@@ -700,6 +626,14 @@ void gi6809_state::gi6809_base(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
+	NETLIST_SOUND(config, "sound_nl", 48000)
+		.set_source(NETLIST_NAME(gi6809))
+		.add_route(ALL_OUTPUTS, "mono", 1.0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:bit0", "PA0.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:bit1", "PA1.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:bit2", "PA2.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:bit3", "PA3.IN", 0);
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(1.0, 0.0);
 
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 }
@@ -715,22 +649,25 @@ void gi6809_state::glck6809(machine_config &config)
 	MC6809E(config, m_slavecpu, CPU_CLOCK_GL);
 	m_slavecpu->set_addrmap(AS_PROGRAM, &gi6809_state::glckslave_map);
 
-	mc6845_device &crtc(MC6845(config, "crtc", PIXEL_CLOCK));
-	crtc.set_screen("screen");
-	crtc.set_show_border_area(false);
-	crtc.set_char_width(8);
-	crtc.out_vsync_callback().set(FUNC(gi6809_state::crtc_vs_gl_w));
+	MC6845(config, m_crtc, PIXEL_CLOCK);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
 
 	PIA6821(config, m_pia[0], 0);  // controlled by slave
 	m_pia[0]->readpa_handler().set_ioport("PIA0_A");
 	m_pia[0]->writepb_handler().set(FUNC(gi6809_state::lamps5_w));
+	m_pia[0]->ca2_handler().set([](bool state) {});
+	m_pia[0]->cb2_handler().set([](bool state) {});
 
 	PIA6821(config, m_pia[1], 0);  // controlled by master
 	m_pia[1]->writepa_handler().set(FUNC(gi6809_state::snd_mux_w));
 	m_pia[1]->readpb_handler().set(FUNC(gi6809_state::gi6809_mux_port_r));
 	m_pia[1]->writepb_handler().set(FUNC(gi6809_state::lamps3_w));
-	m_pia[1]->readcb1_handler().set(FUNC(gi6809_state::ret_vsync_r));
+	m_pia[1]->readcb1_handler().set(m_crtc, FUNC(mc6845_device::vsync_r));
 	m_pia[1]->irqb_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
+	m_pia[1]->ca2_handler().set([](bool state) {});
+	m_pia[1]->cb2_handler().set([](bool state) {});
 }
 
 
@@ -744,23 +681,28 @@ void gi6809_state::castawayt(machine_config &config)
 	MC6809(config, m_slavecpu, CPU_CLOCK);
 	m_slavecpu->set_addrmap(AS_PROGRAM, &gi6809_state::castslave_map);
 
-	mc6845_device &crtc(MC6845(config, "crtc", PIXEL_CLOCK));
-	crtc.set_screen("screen");
-	crtc.set_show_border_area(false);
-	crtc.set_char_width(8);
-	crtc.out_vsync_callback().set(FUNC(gi6809_state::crtc_vs_ca_w));
+	MC6845(config, m_crtc, PIXEL_CLOCK);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->out_vsync_callback().set(m_pia[1], FUNC(pia6821_device::cb1_w));
+	m_crtc->out_vsync_callback().append([this](u8 state) { m_pia[1]->read(1); });
 
 	PIA6821(config, m_pia[0], 0);  // DDRA:00 (All In) - DDRB:FF (All Out)
 	m_pia[0]->readpa_handler().set_ioport("PIA0_A");
 	m_pia[0]->writepb_handler().set(FUNC(gi6809_state::lamps8_w));
-	m_pia[0]->readca1_handler().set(FUNC(gi6809_state::pia0_ca1_r));
+	m_pia[0]->readca1_handler().set(m_crtc, FUNC(mc6845_device::vsync_r));
 	m_pia[0]->ca2_handler().set([](bool state) {});
 
 	PIA6821(config, m_pia[1], 0);  // DDRA:FF (All Out) - DDRB:EO (OOOI-IIII)
 	m_pia[1]->writepa_handler().set(FUNC(gi6809_state::snd_mux_w));
-	m_pia[1]->readpb_handler().set(FUNC(gi6809_state::cast_mux_port_r));
+	m_pia[1]->readpb_handler().set(FUNC(gi6809_state::gi6809_mux_port_r));
 	m_pia[1]->writepb_handler().set(FUNC(gi6809_state::lamps3h_w));
-	m_pia[1]->readcb1_handler().set(FUNC(gi6809_state::ret_vsync_r));
+
+	//m_pia[1]->readca1_handler() coin in upper opto to be implemented
+	//m_pia[1]->readca2_handler() coin in lower opto to be implemented
+
+	m_pia[1]->readcb1_handler().set(m_crtc, FUNC(mc6845_device::vsync_r));
 	m_pia[1]->cb2_handler().set([](bool state) {});
 	m_pia[1]->irqa_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
 	m_pia[1]->irqb_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
@@ -777,11 +719,13 @@ void gi6809_state::jesterch(machine_config &config)
 	MC6809E(config, m_slavecpu, CPU_CLOCK/2);
 	m_slavecpu->set_addrmap(AS_PROGRAM, &gi6809_state::jestslave_map);
 
-	mc6845_device &crtc(MC6845(config, "crtc", PIXEL_CLOCK));
-	crtc.set_screen("screen");
-	crtc.set_show_border_area(false);
-	crtc.set_char_width(8);
-	crtc.out_vsync_callback().set(FUNC(gi6809_state::crtc_vs_je_w));
+	MC6845(config, m_crtc, PIXEL_CLOCK);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->out_vsync_callback().set(m_pia[1], FUNC(pia6821_device::cb1_w));
+	m_crtc->out_vsync_callback().append(m_pia[0], FUNC(pia6821_device::ca1_w));
+	m_crtc->out_vsync_callback().append([this](u8 state) { m_pia[1]->ca1_w(!state); });
 
 	PIA6821(config, m_pia[0], 0);  // DDRA:00 (All In) - DDRB:1F (IIIO-OOOO)
 	m_pia[0]->readpa_handler().set_ioport("PIA0_A");
@@ -792,8 +736,12 @@ void gi6809_state::jesterch(machine_config &config)
 
 	PIA6821(config, m_pia[1], 0);  // DDRA:FF (All Out) - DDRB:EO (OOOI-IIII)
 	m_pia[1]->writepa_handler().set(FUNC(gi6809_state::snd_mux_w));
-	m_pia[1]->readpb_handler().set(FUNC(gi6809_state::cast_mux_port_r));
+	m_pia[1]->readpb_handler().set(FUNC(gi6809_state::gi6809_mux_port_r));
 	m_pia[1]->writepb_handler().set(FUNC(gi6809_state::lamps3_w));
+	
+	//m_pia[1]->readca1_handler() coin in upper opto to be implemented
+	//m_pia[1]->readca2_handler() coin in lower opto to be implemented	
+	
 	m_pia[1]->ca2_handler().set([](bool state) {});
 	m_pia[1]->cb2_handler().set([](bool state) {});
 	m_pia[1]->irqb_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
@@ -826,7 +774,6 @@ ROM_START( castawayt )
 	ROM_LOAD( "ca_bp.u31",   0x0100, 0x0100, CRC(4d233808) SHA1(ac864bc5fe23e76786c78119b052eb68fa923ad4) )
 ROM_END
 
-
 ROM_START( jesterch )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "27512.u8",  0x0000, 0x10000, CRC(64045d54) SHA1(6a48e868f854153dad2e28043ceeabf3e028cc6b) )
@@ -847,7 +794,6 @@ ROM_START( jesterch )
 	ROM_LOAD( "jc_bp.u35",   0x0000, 0x0100, CRC(9d9a0aae) SHA1(d2ccf8576164da34e2d9b7d1c5c76cba82bc012c) )
 	ROM_LOAD( "jc_bp.u31",   0x0100, 0x0100, CRC(4d233808) SHA1(ac864bc5fe23e76786c78119b052eb68fa923ad4) )  // from CA
 ROM_END
-
 
 ROM_START( glck6809 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -896,7 +842,7 @@ void gi6809_state::init_cast()
 *                Game Drivers                *
 *********************************************/
 
-//    YEAR  NAME       PARENT     MACHINE    INPUT      STATE         INIT         ROT     COMPANY                      FULLNAME                                        FLAGS
-GAME( 1987, castawayt, 0,         castawayt, castawayt, gi6809_state, init_cast,   ROT0,  "Tranex Australia Pty Ltd.", "Cast Away (dual 6809 GI Australasia PCB)",      MACHINE_NOT_WORKING )
-GAME( 1987, jesterch,  0,         jesterch,  jesterch,  gi6809_state, empty_init,  ROT0,  "Tranex Australia Pty Ltd.", "Jester Chance (dual 6809 GI Australasia PCB)",  MACHINE_NOT_WORKING )
-GAME( 198?, glck6809,  0,         glck6809,  glck6809,  gi6809_state, empty_init,  ROT0,  "General Instrument?",       "Good Luck! (dual 6809 GI Australasia PCB)",     MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT MACHINE    INPUT      STATE         INIT        ROT     COMPANY                      FULLNAME                                        FLAGS
+GAME( 1987, castawayt, 0,     castawayt, castawayt, gi6809_state, init_cast,  ROT0,  "Tranex Australia Pty Ltd.", "Cast Away (dual 6809 GI Australasia PCB)",      MACHINE_NOT_WORKING )
+GAME( 1987, jesterch,  0,     jesterch,  jesterch,  gi6809_state, empty_init, ROT0,  "Tranex Australia Pty Ltd.", "Jester Chance (dual 6809 GI Australasia PCB)",  MACHINE_NOT_WORKING )
+GAME( 198?, glck6809,  0,     glck6809,  glck6809,  gi6809_state, empty_init, ROT0,  "General Instrument?",       "Good Luck! (dual 6809 GI Australasia PCB)",     MACHINE_NOT_WORKING )

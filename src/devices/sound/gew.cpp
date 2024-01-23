@@ -593,16 +593,17 @@ void gew_pcm_device::sound_stream_update(sound_stream &stream, std::vector<read_
 				}
 
 				slot.m_offset += step;
+
+				if (spos ^ (slot.m_offset >> TL_SHIFT))
+				{
+					slot.m_prev_sample = csample;
+				}
+
 				if (slot.m_offset >= (slot.m_sample.m_end << TL_SHIFT))
 				{
 					slot.m_offset -= (slot.m_sample.m_end - slot.m_sample.m_loop) << TL_SHIFT;
 					// DD-9 expects the looped silence at the end of some samples to be the same whether reversed or not
 					slot.m_reverse = false;
-				}
-
-				if (spos ^ (slot.m_offset >> TL_SHIFT))
-				{
-					slot.m_prev_sample = csample;
 				}
 
 				if ((slot.m_total_level >> TL_SHIFT) != slot.m_dest_total_level)

@@ -23,7 +23,7 @@ Hardware notes:
 TODO:
 - if/when MAME supports an exit callback, hook up power-off switch to that
 
-BATANB:
+BTANB:
 - slower chessboard button response when a piece moves 1 square vertically between
   the 4th and the 5th ranks, hence the 350ms set_delay
 

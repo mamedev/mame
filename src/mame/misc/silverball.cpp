@@ -41,9 +41,9 @@
 #include "machine/i82371eb_ide.h"
 #include "machine/i82371eb_acpi.h"
 #include "machine/i82371eb_usb.h"
-#include "video/virge_pci.h"
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
+#include "bus/pci/virge_pci.h"
 #include "machine/w83977tf.h"
 
 namespace {
@@ -146,7 +146,7 @@ void silverball_state::silverball_i440zx(machine_config &config)
 	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
 	// TODO: actually a Trio64V2
-	VIRGE_PCI(config, "pci:0e.0", 0);
+	PCI_SLOT(config, "pci:1", pci_cards, 14, 0, 1, 2, 3, "virge");
 }
 
 

@@ -9,6 +9,7 @@
 #include "lw30_dsk.h"
 
 #include "ioprocs.h"
+#include "multibyte.h"
 
 #include <array>
 #include <cassert>
@@ -162,10 +163,10 @@ bool lw30_format::load(util::random_read &io, uint32_t form_factor, const std::v
 			// according to check_track_and_sector
 			for(const auto& d : sector_prefix) // 8 bytes
 				rawdata[i++] = d;
-			rawdata[i++] = sync_table[track] & 0xff;
-			rawdata[i++] = sync_table[track] >> 8;
-			rawdata[i++] = sync_table[sector] & 0xff;
-			rawdata[i++] = sync_table[sector] >> 8;
+			put_u16le(&rawdata[i], sync_table[track]);
+			i += 2;
+			put_u16le(&rawdata[i], sync_table[sector]);
+			i += 2;
 			rawdata[i++] = 0xdd;
 			for(const auto& d : sector_header) // 16 bytes
 				rawdata[i++] = d;

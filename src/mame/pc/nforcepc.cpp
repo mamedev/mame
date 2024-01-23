@@ -35,7 +35,7 @@
 #include "machine/pci-ide.h"
 #include "machine/pckeybrd.h"
 #include "bus/isa/isa.h"
-#include "video/virge_pci.h"
+#include "bus/pci/virge_pci.h"
 
 #include "formats/naslite_dsk.h"
 
@@ -1239,7 +1239,7 @@ void nforcepc_state::nforcepc(machine_config &config)
 	ide.subdevice<ide_controller_32_device>("ide1")->options(ata_devices, "hdd", nullptr, true);
 	ide.subdevice<ide_controller_32_device>("ide2")->options(ata_devices, "cdrom", nullptr, true);
 	NV2A_AGP(config, "pci:1e.0", 0, 0x10de01b7, 0xb2); // 10de:01b7 NVIDIA Corporation nForce AGP to PCI Bridge
-	VIRGEDX_PCI(config, "pci:0a.0", 0);
+	PCI_SLOT(config, "pci:1", pci_cards, 10, 0, 1, 2, 3, "virgedx");
 	SST_49LF020(config, "bios", 0);
 
 	FLOPPY_CONNECTOR(config, "pci:01.0:0:fdc:0", pc_hd_floppies, "35hd", floppy_formats);

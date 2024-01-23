@@ -30,12 +30,12 @@ TODO:
 - fart noise at boot if maestroa module is inserted
 - weird beep at boot if sparc module is inserted (related to above?)
 - make it a subdriver of leonardo.cpp? or too many differences
-- same TODO list as leonardo.cpp
 
 *******************************************************************************/
 
 #include "emu.h"
 
+#include "bus/rs232/rs232.h"
 #include "bus/saitek_osa/expansion.h"
 #include "cpu/m6800/m6801.h"
 #include "machine/input_merger.h"
@@ -68,6 +68,7 @@ public:
 		m_lcd_pwm(*this, "lcd_pwm"),
 		m_lcd(*this, "lcd"),
 		m_dac(*this, "dac"),
+		m_rs232(*this, "rs232"),
 		m_inputs(*this, "IN.%u", 0),
 		m_out_lcd(*this, "s%u.%u", 0U, 0U)
 	{ }
@@ -91,6 +92,7 @@ private:
 	required_device<pwm_display_device> m_lcd_pwm;
 	required_device<sed1502_device> m_lcd;
 	required_device<speaker_sound_device> m_dac;
+	required_device<rs232_port_device> m_rs232;
 	required_ioport_array<8+1> m_inputs;
 	output_finder<16, 34> m_out_lcd;
 
@@ -244,46 +246,51 @@ u8 ren_state::p2_r()
 {
 	u8 data = 0;
 
-	// d0-d2: multiplexed inputs
+	// P20-P22: multiplexed inputs
 	if (~m_inp_mux & 8)
 		data = m_inputs[m_inp_mux & 7]->read();
 
-	// d3: ?
-	return ~data;
+	// P23: serial rx
+	data |= m_rs232->rxd_r() << 3;
+
+	return ~data ^ 8;
 }
 
 void ren_state::p2_w(u8 data)
 {
-	// d5,d6: b/w leds
+	// P24: serial tx (TTL)
+	m_rs232->write_txd(BIT(data, 4));
+
+	// P25,P26: b/w leds
 	m_led_data[1] = (m_led_data[1] & ~3) | (~data >> 5 & 3);
 	update_display();
 }
 
 u8 ren_state::p5_r()
 {
-	// d6: battery status
+	// P56: battery status
 	u8 b = m_inputs[8]->read() & 0x40;
 
-	// d4: IS strobe (handled with inputline)
+	// P54: IS strobe (handled with inputline)
 	// other: ?
 	return b | (0xff ^ 0x50);
 }
 
 void ren_state::p5_w(u8 data)
 {
-	// d1: expansion NMI-P
+	// P51: expansion NMI-P
 	m_expansion->nmi_w(BIT(data, 1));
 
-	// d3: NAND with STB-P
+	// P53: NAND with STB-P
 	m_stb->in_w<1>(BIT(data, 3));
 
-	// d5: expansion ACK-P (recursive NAND with RTS-P)
+	// P55: expansion ACK-P (recursive NAND with RTS-P)
 	int ack_state = BIT(data, 5);
 	if (m_rts_state || !ack_state)
 		m_expansion->ack_w(ack_state);
 	m_ack_state = ack_state;
 
-	// d0: power-off on falling edge
+	// P50: power-off on falling edge
 	m_expansion->pw_w(data & 1);
 
 	// other: ?
@@ -291,13 +298,13 @@ void ren_state::p5_w(u8 data)
 
 u8 ren_state::p6_r()
 {
-	// read chessboard sensors and module data
+	// P60-P67: read chessboard sensors and module data
 	return ~m_board->read_file(m_inp_mux & 0xf) & m_expansion->data_r();
 }
 
 void ren_state::p6_w(u8 data)
 {
-	// module data
+	// P60-P67: module data
 	m_expansion->data_w(data);
 }
 
@@ -428,10 +435,13 @@ void ren_state::ren(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 	SPEAKER_SOUND(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	// expansion module
+	// expansion module (configure after video)
 	SAITEKOSA_EXPANSION(config, m_expansion, saitekosa_expansion_modules);
 	m_expansion->stb_handler().set(m_stb, FUNC(input_merger_device::in_w<0>));
 	m_expansion->rts_handler().set(FUNC(ren_state::exp_rts_w));
+
+	// rs232 (configure after expansion module)
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 }
 
 

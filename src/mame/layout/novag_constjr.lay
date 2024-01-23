@@ -326,7 +326,7 @@ license:CC0-1.0
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="-16" right="99.5" top="-1" bottom="88" />
+		<bounds left="-16" right="99.5" top="0" bottom="88" />
 
 		<element ref="cblack"><bounds x="3" y="3" width="90" height="80" /></element>
 		<group ref="sb_board"><bounds x="3" y="3" width="80" height="80" /></group>

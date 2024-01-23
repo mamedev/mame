@@ -28,6 +28,8 @@
 #include "emuopts.h"
 #include "machine/ch376.h"
 
+#include "multibyte.h"
+
 #include "logmacro.h"
 
 
@@ -415,10 +417,7 @@ void ch376_device::write(offs_t offset, u8 data)
 			case STATE_GET_FILE_SIZE:
 				// the host must write 0x68 here; it's unclear what the real chip does if the value doesn't match.
 				// reply with the size of the currently open file.
-				m_dataBuffer[0] = m_cur_file_size & 0xff;
-				m_dataBuffer[1] = (m_cur_file_size >> 8) & 0xff;
-				m_dataBuffer[2] = (m_cur_file_size >> 16) & 0xff;
-				m_dataBuffer[3] = (m_cur_file_size >> 24) & 0xff;
+				put_u32le(m_dataBuffer, m_cur_file_size);
 				m_dataPtr = 0;
 				m_dataLen = 4;
 				break;
@@ -501,19 +500,9 @@ bool ch376_device::generateNextDirEntry()
 		m_dataBuffer[0xc] = 0;  // no attributes
 
 		if (ourEntry->size >= u64(0x100000000))
-		{
-			m_dataBuffer[0x1d] = 0xff;
-			m_dataBuffer[0x1e] = 0xff;
-			m_dataBuffer[0x1f] = 0xff;
-			m_dataBuffer[0x20] = 0xff;
-		}
+			std::fill_n(&m_dataBuffer[0x1d], 4, 0xff);
 		else
-		{
-			m_dataBuffer[0x1d] = (ourEntry->size & 0xff);
-			m_dataBuffer[0x1e] = ((ourEntry->size >> 8) & 0xff);
-			m_dataBuffer[0x1f] = ((ourEntry->size >> 16) & 0xff);
-			m_dataBuffer[0x20] = ((ourEntry->size >> 24) & 0xff);
-		}
+			put_u32le(&m_dataBuffer[0x1d], ourEntry->size);
 	}
 	else    // not a file or directory, recurse and hope the next one's better
 	{

@@ -171,11 +171,6 @@ public:
 		m_file->tell(result);
 		return result;
 	}
-	bool image_feof()
-	{
-		check_for_file();
-		return m_file->eof();
-	}
 
 	// allocate and read into buffers
 	u32 fread(std::unique_ptr<u8 []> &ptr, u32 length) { ptr = std::make_unique<u8 []>(length); return fread(ptr.get(), length); }

@@ -82,7 +82,7 @@ protected:
 	void audio_cpu_enable_nmi_w(offs_t offset, uint8_t data);
 	uint16_t unmapped_r(address_space &space);
 	uint16_t paletteram_r(offs_t offset);
-	void paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void paletteram_w(offs_t offset, uint16_t data);
 	uint16_t video_register_r(address_space &space, offs_t offset, uint16_t mem_mask = ~0);
 	void video_register_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 

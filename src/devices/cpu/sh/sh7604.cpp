@@ -28,11 +28,11 @@ static constexpr int div_tab[4] = { 3, 5, 7, 0 };
 static constexpr int wdtclk_tab[8] = { 1, 6, 7, 8, 9, 10, 12, 13 };
 
 
-DEFINE_DEVICE_TYPE(SH2_SH7604,  sh2_sh7604_device,  "sh2_7604",  "Hitachi SH-2 (SH7604)")
+DEFINE_DEVICE_TYPE(SH7604,  sh7604_device,  "sh2_7604",  "Hitachi SH-2 (SH7604)")
 
 
-sh2_sh7604_device::sh2_sh7604_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sh2_device(mconfig, SH2_SH7604, tag, owner, clock, CPU_TYPE_SH2, address_map_constructor(FUNC(sh2_sh7604_device::sh7604_map), this), 32, 0xc7ffffff)
+sh7604_device::sh7604_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sh2_device(mconfig, SH7604, tag, owner, clock, CPU_TYPE_SH2, address_map_constructor(FUNC(sh7604_device::sh7604_map), this), 32, 0xc7ffffff)
 	, m_test_irq(0), m_internal_irq_vector(0)
 	, m_smr(0), m_brr(0), m_scr(0), m_tdr(0), m_ssr(0)
 	, m_tier(0), m_ftcsr(0), m_frc_tcr(0), m_tocr(0), m_frc(0), m_ocra(0), m_ocrb(0), m_frc_icr(0)
@@ -71,19 +71,19 @@ sh2_sh7604_device::sh2_sh7604_device(const machine_config &mconfig, const char *
 		m_dmac[i].drcr = m_dmac[i].sar = m_dmac[i].dar = m_dmac[i].tcr = m_dmac[i].chcr = 0;
 }
 
-void sh2_sh7604_device::device_start()
+void sh7604_device::device_start()
 {
 	sh2_device::device_start();
 
-	m_timer = timer_alloc(FUNC(sh2_sh7604_device::sh2_timer_callback), this);
+	m_timer = timer_alloc(FUNC(sh7604_device::sh2_timer_callback), this);
 	m_timer->adjust(attotime::never);
-	m_wdtimer = timer_alloc(FUNC(sh2_sh7604_device::sh2_wdtimer_callback), this);
+	m_wdtimer = timer_alloc(FUNC(sh7604_device::sh2_wdtimer_callback), this);
 	m_wdtimer->adjust(attotime::never);
 
-	m_dma_current_active_timer[0] = timer_alloc(FUNC(sh2_sh7604_device::sh2_dma_current_active_callback), this);
+	m_dma_current_active_timer[0] = timer_alloc(FUNC(sh7604_device::sh2_dma_current_active_callback), this);
 	m_dma_current_active_timer[0]->adjust(attotime::never);
 
-	m_dma_current_active_timer[1] = timer_alloc(FUNC(sh2_sh7604_device::sh2_dma_current_active_callback), this);
+	m_dma_current_active_timer[1] = timer_alloc(FUNC(sh7604_device::sh2_dma_current_active_callback), this);
 	m_dma_current_active_timer[1]->adjust(attotime::never);
 
 	/* resolve callbacks */
@@ -171,7 +171,7 @@ void sh2_sh7604_device::device_start()
 	save_item(NAME(m_rtcnt));
 }
 
-void sh2_sh7604_device::device_reset()
+void sh7604_device::device_reset()
 {
 	sh2_device::device_reset();
 
@@ -199,97 +199,97 @@ void sh2_sh7604_device::device_reset()
 	m_wtcsr = 0;
 }
 
-void sh2_sh7604_device::sh7604_map(address_map &map)
+void sh7604_device::sh7604_map(address_map &map)
 {
-	map(0x40000000, 0xbfffffff).r(FUNC(sh2_sh7604_device::sh2_internal_a5));
+	map(0x40000000, 0xbfffffff).r(FUNC(sh7604_device::sh2_internal_a5));
 
 //  TODO: cps3boot breaks with this enabled. Needs callback
 //  map(0xc0000000, 0xc0000fff).ram(); // cache data array
 
-//  map(0xe0000000, 0xe00001ff).mirror(0x1ffffe00).rw(FUNC(sh2_sh7604_device::sh7604_r), FUNC(sh2_sh7604_device::sh7604_w));
+//  map(0xe0000000, 0xe00001ff).mirror(0x1ffffe00).rw(FUNC(sh7604_device::sh7604_r), FUNC(sh7604_device::sh7604_w));
 	// TODO: internal map takes way too much resources if mirrored with 0x1ffffe00
 	//       we eventually internalize again via trampoline & sh7604_device
 	//       Also area 0xffff8000-0xffffbfff is for synchronous DRAM mode,
 	//       so this isn't actually a full mirror
 	// SCI
-	map(0xfffffe00, 0xfffffe00).rw(FUNC(sh2_sh7604_device::smr_r), FUNC(sh2_sh7604_device::smr_w));
-	map(0xfffffe01, 0xfffffe01).rw(FUNC(sh2_sh7604_device::brr_r), FUNC(sh2_sh7604_device::brr_w));
-	map(0xfffffe02, 0xfffffe02).rw(FUNC(sh2_sh7604_device::scr_r), FUNC(sh2_sh7604_device::scr_w));
-	map(0xfffffe03, 0xfffffe03).rw(FUNC(sh2_sh7604_device::tdr_r), FUNC(sh2_sh7604_device::tdr_w));
-	map(0xfffffe04, 0xfffffe04).rw(FUNC(sh2_sh7604_device::ssr_r), FUNC(sh2_sh7604_device::ssr_w));
-	map(0xfffffe05, 0xfffffe05).r(FUNC(sh2_sh7604_device::rdr_r));
+	map(0xfffffe00, 0xfffffe00).rw(FUNC(sh7604_device::smr_r), FUNC(sh7604_device::smr_w));
+	map(0xfffffe01, 0xfffffe01).rw(FUNC(sh7604_device::brr_r), FUNC(sh7604_device::brr_w));
+	map(0xfffffe02, 0xfffffe02).rw(FUNC(sh7604_device::scr_r), FUNC(sh7604_device::scr_w));
+	map(0xfffffe03, 0xfffffe03).rw(FUNC(sh7604_device::tdr_r), FUNC(sh7604_device::tdr_w));
+	map(0xfffffe04, 0xfffffe04).rw(FUNC(sh7604_device::ssr_r), FUNC(sh7604_device::ssr_w));
+	map(0xfffffe05, 0xfffffe05).r(FUNC(sh7604_device::rdr_r));
 
 	// FRC
-	map(0xfffffe10, 0xfffffe10).rw(FUNC(sh2_sh7604_device::tier_r), FUNC(sh2_sh7604_device::tier_w));
-	map(0xfffffe11, 0xfffffe11).rw(FUNC(sh2_sh7604_device::ftcsr_r), FUNC(sh2_sh7604_device::ftcsr_w));
-	map(0xfffffe12, 0xfffffe13).rw(FUNC(sh2_sh7604_device::frc_r), FUNC(sh2_sh7604_device::frc_w));
-	map(0xfffffe14, 0xfffffe15).rw(FUNC(sh2_sh7604_device::ocra_b_r), FUNC(sh2_sh7604_device::ocra_b_w));
-	map(0xfffffe16, 0xfffffe16).rw(FUNC(sh2_sh7604_device::frc_tcr_r), FUNC(sh2_sh7604_device::frc_tcr_w));
-	map(0xfffffe17, 0xfffffe17).rw(FUNC(sh2_sh7604_device::tocr_r), FUNC(sh2_sh7604_device::tocr_w));
-	map(0xfffffe18, 0xfffffe19).r(FUNC(sh2_sh7604_device::frc_icr_r));
+	map(0xfffffe10, 0xfffffe10).rw(FUNC(sh7604_device::tier_r), FUNC(sh7604_device::tier_w));
+	map(0xfffffe11, 0xfffffe11).rw(FUNC(sh7604_device::ftcsr_r), FUNC(sh7604_device::ftcsr_w));
+	map(0xfffffe12, 0xfffffe13).rw(FUNC(sh7604_device::frc_r), FUNC(sh7604_device::frc_w));
+	map(0xfffffe14, 0xfffffe15).rw(FUNC(sh7604_device::ocra_b_r), FUNC(sh7604_device::ocra_b_w));
+	map(0xfffffe16, 0xfffffe16).rw(FUNC(sh7604_device::frc_tcr_r), FUNC(sh7604_device::frc_tcr_w));
+	map(0xfffffe17, 0xfffffe17).rw(FUNC(sh7604_device::tocr_r), FUNC(sh7604_device::tocr_w));
+	map(0xfffffe18, 0xfffffe19).r(FUNC(sh7604_device::frc_icr_r));
 
 	// INTC
-	map(0xfffffe60, 0xfffffe61).rw(FUNC(sh2_sh7604_device::iprb_r), FUNC(sh2_sh7604_device::iprb_w));
-	map(0xfffffe62, 0xfffffe63).rw(FUNC(sh2_sh7604_device::vcra_r), FUNC(sh2_sh7604_device::vcra_w));
-	map(0xfffffe64, 0xfffffe65).rw(FUNC(sh2_sh7604_device::vcrb_r), FUNC(sh2_sh7604_device::vcrb_w));
-	map(0xfffffe66, 0xfffffe67).rw(FUNC(sh2_sh7604_device::vcrc_r), FUNC(sh2_sh7604_device::vcrc_w));
-	map(0xfffffe68, 0xfffffe69).rw(FUNC(sh2_sh7604_device::vcrd_r), FUNC(sh2_sh7604_device::vcrd_w));
+	map(0xfffffe60, 0xfffffe61).rw(FUNC(sh7604_device::iprb_r), FUNC(sh7604_device::iprb_w));
+	map(0xfffffe62, 0xfffffe63).rw(FUNC(sh7604_device::vcra_r), FUNC(sh7604_device::vcra_w));
+	map(0xfffffe64, 0xfffffe65).rw(FUNC(sh7604_device::vcrb_r), FUNC(sh7604_device::vcrb_w));
+	map(0xfffffe66, 0xfffffe67).rw(FUNC(sh7604_device::vcrc_r), FUNC(sh7604_device::vcrc_w));
+	map(0xfffffe68, 0xfffffe69).rw(FUNC(sh7604_device::vcrd_r), FUNC(sh7604_device::vcrd_w));
 
-	map(0xfffffe71, 0xfffffe71).rw(FUNC(sh2_sh7604_device::drcr_r<0>), FUNC(sh2_sh7604_device::drcr_w<0>));
-	map(0xfffffe72, 0xfffffe72).rw(FUNC(sh2_sh7604_device::drcr_r<1>), FUNC(sh2_sh7604_device::drcr_w<1>));
+	map(0xfffffe71, 0xfffffe71).rw(FUNC(sh7604_device::drcr_r<0>), FUNC(sh7604_device::drcr_w<0>));
+	map(0xfffffe72, 0xfffffe72).rw(FUNC(sh7604_device::drcr_r<1>), FUNC(sh7604_device::drcr_w<1>));
 
 	// WTC
-	map(0xfffffe80, 0xfffffe81).rw(FUNC(sh2_sh7604_device::wtcnt_r), FUNC(sh2_sh7604_device::wtcnt_w));
-	map(0xfffffe82, 0xfffffe83).rw(FUNC(sh2_sh7604_device::rstcsr_r), FUNC(sh2_sh7604_device::rstcsr_w));
+	map(0xfffffe80, 0xfffffe81).rw(FUNC(sh7604_device::wtcnt_r), FUNC(sh7604_device::wtcnt_w));
+	map(0xfffffe82, 0xfffffe83).rw(FUNC(sh7604_device::rstcsr_r), FUNC(sh7604_device::rstcsr_w));
 
 	// standby and cache control
-	map(0xfffffe90, 0xfffffe91).rw(FUNC(sh2_sh7604_device::fmr_sbycr_r), FUNC(sh2_sh7604_device::fmr_sbycr_w));
-	map(0xfffffe92, 0xfffffe92).rw(FUNC(sh2_sh7604_device::ccr_r), FUNC(sh2_sh7604_device::ccr_w));
+	map(0xfffffe90, 0xfffffe91).rw(FUNC(sh7604_device::fmr_sbycr_r), FUNC(sh7604_device::fmr_sbycr_w));
+	map(0xfffffe92, 0xfffffe92).rw(FUNC(sh7604_device::ccr_r), FUNC(sh7604_device::ccr_w));
 
 	// INTC second section
-	map(0xfffffee0, 0xfffffee1).rw(FUNC(sh2_sh7604_device::intc_icr_r), FUNC(sh2_sh7604_device::intc_icr_w));
-	map(0xfffffee2, 0xfffffee3).rw(FUNC(sh2_sh7604_device::ipra_r), FUNC(sh2_sh7604_device::ipra_w));
-	map(0xfffffee4, 0xfffffee5).rw(FUNC(sh2_sh7604_device::vcrwdt_r), FUNC(sh2_sh7604_device::vcrwdt_w));
+	map(0xfffffee0, 0xfffffee1).rw(FUNC(sh7604_device::intc_icr_r), FUNC(sh7604_device::intc_icr_w));
+	map(0xfffffee2, 0xfffffee3).rw(FUNC(sh7604_device::ipra_r), FUNC(sh7604_device::ipra_w));
+	map(0xfffffee4, 0xfffffee5).rw(FUNC(sh7604_device::vcrwdt_r), FUNC(sh7604_device::vcrwdt_w));
 
 	// DIVU
-	map(0xffffff00, 0xffffff03).rw(FUNC(sh2_sh7604_device::dvsr_r), FUNC(sh2_sh7604_device::dvsr_w));
-	map(0xffffff04, 0xffffff07).rw(FUNC(sh2_sh7604_device::dvdnt_r), FUNC(sh2_sh7604_device::dvdnt_w));
-	map(0xffffff08, 0xffffff0b).rw(FUNC(sh2_sh7604_device::dvcr_r), FUNC(sh2_sh7604_device::dvcr_w));
+	map(0xffffff00, 0xffffff03).rw(FUNC(sh7604_device::dvsr_r), FUNC(sh7604_device::dvsr_w));
+	map(0xffffff04, 0xffffff07).rw(FUNC(sh7604_device::dvdnt_r), FUNC(sh7604_device::dvdnt_w));
+	map(0xffffff08, 0xffffff0b).rw(FUNC(sh7604_device::dvcr_r), FUNC(sh7604_device::dvcr_w));
 	// INTC third section
-	map(0xffffff0c, 0xffffff0f).rw(FUNC(sh2_sh7604_device::vcrdiv_r), FUNC(sh2_sh7604_device::vcrdiv_w));
+	map(0xffffff0c, 0xffffff0f).rw(FUNC(sh7604_device::vcrdiv_r), FUNC(sh7604_device::vcrdiv_w));
 	// DIVU continued (64-bit plus mirrors)
-	map(0xffffff10, 0xffffff13).rw(FUNC(sh2_sh7604_device::dvdnth_r), FUNC(sh2_sh7604_device::dvdnth_w));
-	map(0xffffff14, 0xffffff17).rw(FUNC(sh2_sh7604_device::dvdntl_r), FUNC(sh2_sh7604_device::dvdntl_w));
-	map(0xffffff18, 0xffffff1b).r(FUNC(sh2_sh7604_device::dvdnth_r));
-	map(0xffffff1c, 0xffffff1f).r(FUNC(sh2_sh7604_device::dvdntl_r));
+	map(0xffffff10, 0xffffff13).rw(FUNC(sh7604_device::dvdnth_r), FUNC(sh7604_device::dvdnth_w));
+	map(0xffffff14, 0xffffff17).rw(FUNC(sh7604_device::dvdntl_r), FUNC(sh7604_device::dvdntl_w));
+	map(0xffffff18, 0xffffff1b).r(FUNC(sh7604_device::dvdnth_r));
+	map(0xffffff1c, 0xffffff1f).r(FUNC(sh7604_device::dvdntl_r));
 
 	// DMAC
-	map(0xffffff80, 0xffffff83).rw(FUNC(sh2_sh7604_device::sar_r<0>), FUNC(sh2_sh7604_device::sar_w<0>));
-	map(0xffffff84, 0xffffff87).rw(FUNC(sh2_sh7604_device::dar_r<0>), FUNC(sh2_sh7604_device::dar_w<0>));
-	map(0xffffff88, 0xffffff8b).rw(FUNC(sh2_sh7604_device::dmac_tcr_r<0>), FUNC(sh2_sh7604_device::dmac_tcr_w<0>));
-	map(0xffffff8c, 0xffffff8f).rw(FUNC(sh2_sh7604_device::chcr_r<0>), FUNC(sh2_sh7604_device::chcr_w<0>));
+	map(0xffffff80, 0xffffff83).rw(FUNC(sh7604_device::sar_r<0>), FUNC(sh7604_device::sar_w<0>));
+	map(0xffffff84, 0xffffff87).rw(FUNC(sh7604_device::dar_r<0>), FUNC(sh7604_device::dar_w<0>));
+	map(0xffffff88, 0xffffff8b).rw(FUNC(sh7604_device::dmac_tcr_r<0>), FUNC(sh7604_device::dmac_tcr_w<0>));
+	map(0xffffff8c, 0xffffff8f).rw(FUNC(sh7604_device::chcr_r<0>), FUNC(sh7604_device::chcr_w<0>));
 
-	map(0xffffff90, 0xffffff93).rw(FUNC(sh2_sh7604_device::sar_r<1>), FUNC(sh2_sh7604_device::sar_w<1>));
-	map(0xffffff94, 0xffffff97).rw(FUNC(sh2_sh7604_device::dar_r<1>), FUNC(sh2_sh7604_device::dar_w<1>));
-	map(0xffffff98, 0xffffff9b).rw(FUNC(sh2_sh7604_device::dmac_tcr_r<1>), FUNC(sh2_sh7604_device::dmac_tcr_w<1>));
-	map(0xffffff9c, 0xffffff9f).rw(FUNC(sh2_sh7604_device::chcr_r<1>), FUNC(sh2_sh7604_device::chcr_w<1>));
+	map(0xffffff90, 0xffffff93).rw(FUNC(sh7604_device::sar_r<1>), FUNC(sh7604_device::sar_w<1>));
+	map(0xffffff94, 0xffffff97).rw(FUNC(sh7604_device::dar_r<1>), FUNC(sh7604_device::dar_w<1>));
+	map(0xffffff98, 0xffffff9b).rw(FUNC(sh7604_device::dmac_tcr_r<1>), FUNC(sh7604_device::dmac_tcr_w<1>));
+	map(0xffffff9c, 0xffffff9f).rw(FUNC(sh7604_device::chcr_r<1>), FUNC(sh7604_device::chcr_w<1>));
 
-	map(0xffffffa0, 0xffffffa3).rw(FUNC(sh2_sh7604_device::vcrdma_r<0>), FUNC(sh2_sh7604_device::vcrdma_w<0>));
-	map(0xffffffa8, 0xffffffab).rw(FUNC(sh2_sh7604_device::vcrdma_r<1>), FUNC(sh2_sh7604_device::vcrdma_w<1>));
-	map(0xffffffb0, 0xffffffb3).rw(FUNC(sh2_sh7604_device::dmaor_r), FUNC(sh2_sh7604_device::dmaor_w));
+	map(0xffffffa0, 0xffffffa3).rw(FUNC(sh7604_device::vcrdma_r<0>), FUNC(sh7604_device::vcrdma_w<0>));
+	map(0xffffffa8, 0xffffffab).rw(FUNC(sh7604_device::vcrdma_r<1>), FUNC(sh7604_device::vcrdma_w<1>));
+	map(0xffffffb0, 0xffffffb3).rw(FUNC(sh7604_device::dmaor_r), FUNC(sh7604_device::dmaor_w));
 
 	// BSC
-	map(0xffffffe0, 0xffffffe3).rw(FUNC(sh2_sh7604_device::bcr1_r), FUNC(sh2_sh7604_device::bcr1_w));
-	map(0xffffffe4, 0xffffffe7).rw(FUNC(sh2_sh7604_device::bcr2_r), FUNC(sh2_sh7604_device::bcr2_w));
-	map(0xffffffe8, 0xffffffeb).rw(FUNC(sh2_sh7604_device::wcr_r), FUNC(sh2_sh7604_device::wcr_w));
-	map(0xffffffec, 0xffffffef).rw(FUNC(sh2_sh7604_device::mcr_r), FUNC(sh2_sh7604_device::mcr_w));
-	map(0xfffffff0, 0xfffffff3).rw(FUNC(sh2_sh7604_device::rtcsr_r), FUNC(sh2_sh7604_device::rtcsr_w));
-	map(0xfffffff4, 0xfffffff7).rw(FUNC(sh2_sh7604_device::rtcnt_r), FUNC(sh2_sh7604_device::rtcnt_w));
-	map(0xfffffff8, 0xfffffffb).rw(FUNC(sh2_sh7604_device::rtcor_r), FUNC(sh2_sh7604_device::rtcor_w));
+	map(0xffffffe0, 0xffffffe3).rw(FUNC(sh7604_device::bcr1_r), FUNC(sh7604_device::bcr1_w));
+	map(0xffffffe4, 0xffffffe7).rw(FUNC(sh7604_device::bcr2_r), FUNC(sh7604_device::bcr2_w));
+	map(0xffffffe8, 0xffffffeb).rw(FUNC(sh7604_device::wcr_r), FUNC(sh7604_device::wcr_w));
+	map(0xffffffec, 0xffffffef).rw(FUNC(sh7604_device::mcr_r), FUNC(sh7604_device::mcr_w));
+	map(0xfffffff0, 0xfffffff3).rw(FUNC(sh7604_device::rtcsr_r), FUNC(sh7604_device::rtcsr_w));
+	map(0xfffffff4, 0xfffffff7).rw(FUNC(sh7604_device::rtcnt_r), FUNC(sh7604_device::rtcnt_w));
+	map(0xfffffff8, 0xfffffffb).rw(FUNC(sh7604_device::rtcor_r), FUNC(sh7604_device::rtcor_w));
 }
 
 
-void sh2_sh7604_device::sh2_exception(const char *message, int irqline)
+void sh7604_device::sh2_exception(const char *message, int irqline)
 {
 	int vector;
 
@@ -330,12 +330,12 @@ void sh2_sh7604_device::sh2_exception(const char *message, int irqline)
 	sh2_exception_internal(message, irqline, vector);
 }
 
-uint32_t sh2_sh7604_device::sh2_internal_a5()
+uint32_t sh7604_device::sh2_internal_a5()
 {
 	return 0xa5a5a5a5;
 }
 
-void sh2_sh7604_device::sh2_timer_resync()
+void sh7604_device::sh2_timer_resync()
 {
 	// TODO: setting 3 is "External clock: count on rising edge"
 	int divider = div_tab[m_frc_tcr & 3];
@@ -351,7 +351,7 @@ void sh2_sh7604_device::sh2_timer_resync()
 	}
 }
 
-void sh2_sh7604_device::sh2_timer_activate()
+void sh7604_device::sh2_timer_activate()
 {
 	int max_delta = 0xfffff;
 
@@ -395,7 +395,7 @@ void sh2_sh7604_device::sh2_timer_activate()
 	}
 }
 
-TIMER_CALLBACK_MEMBER(sh2_sh7604_device::sh2_timer_callback)
+TIMER_CALLBACK_MEMBER(sh7604_device::sh2_timer_callback)
 {
 	sh2_timer_resync();
 	uint16_t frc = m_frc;
@@ -418,18 +418,18 @@ TIMER_CALLBACK_MEMBER(sh2_sh7604_device::sh2_timer_callback)
 	sh2_timer_activate();
 }
 
-void sh2_sh7604_device::sh2_wtcnt_recalc()
+void sh7604_device::sh2_wtcnt_recalc()
 {
 	if (m_wdtimer->expire() != attotime::never)
 		m_wtcnt = 0x100 - (attotime_to_cycles(m_wdtimer->remaining()) >> wdtclk_tab[m_wtcsr & 7]);
 }
 
-void sh2_sh7604_device::sh2_wdt_activate()
+void sh7604_device::sh2_wdt_activate()
 {
 	m_wdtimer->adjust(cycles_to_attotime((0x100 - m_wtcnt) << wdtclk_tab[m_wtcsr & 7]));
 }
 
-TIMER_CALLBACK_MEMBER(sh2_sh7604_device::sh2_wdtimer_callback)
+TIMER_CALLBACK_MEMBER(sh7604_device::sh2_wdtimer_callback)
 {
 	m_wtcnt = 0;
 	if (!(m_wtcsr & 0x40))  // timer mode
@@ -469,7 +469,7 @@ TIMER_CALLBACK_MEMBER(sh2_sh7604_device::sh2_wdtimer_callback)
 
 
 
-void sh2_sh7604_device::sh2_notify_dma_data_available()
+void sh7604_device::sh2_notify_dma_data_available()
 {
 	//printf("call notify\n");
 
@@ -487,7 +487,7 @@ void sh2_sh7604_device::sh2_notify_dma_data_available()
 
 }
 
-void sh2_sh7604_device::sh2_do_dma(int dmach)
+void sh7604_device::sh2_do_dma(int dmach)
 {
 	if (m_active_dma_count[dmach] > 0)
 	{
@@ -708,13 +708,13 @@ void sh2_sh7604_device::sh2_do_dma(int dmach)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(sh2_sh7604_device::sh2_dma_current_active_callback)
+TIMER_CALLBACK_MEMBER(sh7604_device::sh2_dma_current_active_callback)
 {
 	sh2_do_dma(param & 1);
 }
 
 
-void sh2_sh7604_device::sh2_dmac_check(int dmach)
+void sh7604_device::sh2_dmac_check(int dmach)
 {
 	if (m_dmac[dmach].chcr & m_dmaor & 1)
 	{
@@ -792,59 +792,59 @@ void sh2_sh7604_device::sh2_dmac_check(int dmach)
  */
 // TODO: identical to H8 counterpart
 
-uint8_t sh2_sh7604_device::smr_r()
+uint8_t sh7604_device::smr_r()
 {
 	return m_smr;
 }
 
-void sh2_sh7604_device::smr_w(uint8_t data)
+void sh7604_device::smr_w(uint8_t data)
 {
 	m_smr = data;
 }
 
-uint8_t sh2_sh7604_device::brr_r()
+uint8_t sh7604_device::brr_r()
 {
 	return m_brr;
 }
 
-void sh2_sh7604_device::brr_w(uint8_t data)
+void sh7604_device::brr_w(uint8_t data)
 {
 	m_brr = data;
 }
 
-uint8_t sh2_sh7604_device::scr_r()
+uint8_t sh7604_device::scr_r()
 {
 	return m_scr;
 }
 
-void sh2_sh7604_device::scr_w(uint8_t data)
+void sh7604_device::scr_w(uint8_t data)
 {
 	m_scr = data;
 }
 
-uint8_t sh2_sh7604_device::tdr_r()
+uint8_t sh7604_device::tdr_r()
 {
 	return m_tdr;
 }
 
-void sh2_sh7604_device::tdr_w(uint8_t data)
+void sh7604_device::tdr_w(uint8_t data)
 {
 	m_tdr = data;
 	//printf("%c", data & 0xff);
 }
 
-uint8_t sh2_sh7604_device::ssr_r()
+uint8_t sh7604_device::ssr_r()
 {
 	// 0x84 is needed by EGWord on Saturn to make it to boot for some reason.
 	return m_ssr | 0x84;
 }
 
-void sh2_sh7604_device::ssr_w(uint8_t data)
+void sh7604_device::ssr_w(uint8_t data)
 {
 	m_ssr = data;
 }
 
-uint8_t sh2_sh7604_device::rdr_r()
+uint8_t sh7604_device::rdr_r()
 {
 	return 0;
 }
@@ -853,12 +853,12 @@ uint8_t sh2_sh7604_device::rdr_r()
  * FRC
  */
 
-uint8_t sh2_sh7604_device::tier_r()
+uint8_t sh7604_device::tier_r()
 {
 	return m_tier;
 }
 
-void sh2_sh7604_device::tier_w(uint8_t data)
+void sh7604_device::tier_w(uint8_t data)
 {
 	sh2_timer_resync();
 	m_tier = data;
@@ -866,7 +866,7 @@ void sh2_sh7604_device::tier_w(uint8_t data)
 	sh2_recalc_irq();
 }
 
-uint8_t sh2_sh7604_device::ftcsr_r()
+uint8_t sh7604_device::ftcsr_r()
 {
 	// TODO: to be tested
 	if (!m_ftcsr_read_cb.isnull())
@@ -875,7 +875,7 @@ uint8_t sh2_sh7604_device::ftcsr_r()
 	return m_ftcsr;
 }
 
-void sh2_sh7604_device::ftcsr_w(uint8_t data)
+void sh7604_device::ftcsr_w(uint8_t data)
 {
 	uint8_t old = m_ftcsr;
 
@@ -886,13 +886,13 @@ void sh2_sh7604_device::ftcsr_w(uint8_t data)
 	sh2_recalc_irq();
 }
 
-uint16_t sh2_sh7604_device::frc_r()
+uint16_t sh7604_device::frc_r()
 {
 	sh2_timer_resync();
 	return m_frc;
 }
 
-void sh2_sh7604_device::frc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void sh7604_device::frc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	sh2_timer_resync();
 	COMBINE_DATA(&m_frc);
@@ -900,12 +900,12 @@ void sh2_sh7604_device::frc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	sh2_recalc_irq();
 }
 
-uint16_t sh2_sh7604_device::ocra_b_r()
+uint16_t sh7604_device::ocra_b_r()
 {
 	return (m_tocr & 0x10) ? m_ocrb : m_ocra;
 }
 
-void sh2_sh7604_device::ocra_b_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void sh7604_device::ocra_b_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	sh2_timer_resync();
 	if (m_tocr & 0x10)
@@ -916,12 +916,12 @@ void sh2_sh7604_device::ocra_b_w(offs_t offset, uint16_t data, uint16_t mem_mask
 	sh2_recalc_irq();
 }
 
-uint8_t sh2_sh7604_device::frc_tcr_r()
+uint8_t sh7604_device::frc_tcr_r()
 {
 	return m_frc_tcr & 0x83;
 }
 
-void sh2_sh7604_device::frc_tcr_w(uint8_t data)
+void sh7604_device::frc_tcr_w(uint8_t data)
 {
 	sh2_timer_resync();
 	m_frc_tcr = data & 0x83;
@@ -929,12 +929,12 @@ void sh2_sh7604_device::frc_tcr_w(uint8_t data)
 	sh2_recalc_irq();
 }
 
-uint8_t sh2_sh7604_device::tocr_r()
+uint8_t sh7604_device::tocr_r()
 {
 	return (m_tocr & 0x13) | 0xe0;
 }
 
-void sh2_sh7604_device::tocr_w(uint8_t data)
+void sh7604_device::tocr_w(uint8_t data)
 {
 	sh2_timer_resync();
 	// TODO: output levels A/B (bits 1-0)
@@ -943,7 +943,7 @@ void sh2_sh7604_device::tocr_w(uint8_t data)
 	sh2_recalc_irq();
 }
 
-uint16_t sh2_sh7604_device::frc_icr_r()
+uint16_t sh7604_device::frc_icr_r()
 {
 	return m_frc_icr;
 }
@@ -952,26 +952,26 @@ uint16_t sh2_sh7604_device::frc_icr_r()
  * INTC
  */
 
-uint16_t sh2_sh7604_device::intc_icr_r()
+uint16_t sh7604_device::intc_icr_r()
 {
 	// TODO: flip meaning based off NMI edge select bit (NMIE)
 	uint16_t nmilv = m_nmi_line_state == ASSERT_LINE ? 0 : 0x8000;
 	return nmilv | (m_intc_icr & 0x0101);
 }
 
-void sh2_sh7604_device::intc_icr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void sh7604_device::intc_icr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_intc_icr);
 	m_nmie = BIT(m_intc_icr, 8);
 	m_vecmd = BIT(m_intc_icr, 0);
 }
 
-uint16_t sh2_sh7604_device::ipra_r()
+uint16_t sh7604_device::ipra_r()
 {
 	return m_ipra & 0xfff0;
 }
 
-void sh2_sh7604_device::ipra_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void sh7604_device::ipra_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_ipra);
 	m_irq_level.divu = (m_ipra >> 12) & 0xf;
@@ -980,12 +980,12 @@ void sh2_sh7604_device::ipra_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	sh2_recalc_irq();
 }
 
-uint16_t sh2_sh7604_device::iprb_r()
+uint16_t sh7604_device::iprb_r()
 {
 	return m_iprb & 0xff00;
 }
 
-void sh2_sh7604_device::iprb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void sh7604_device::iprb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_iprb);
 	m_irq_level.sci = (m_iprb >> 12) & 0xf;
@@ -993,36 +993,36 @@ void sh2_sh7604_device::iprb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	sh2_recalc_irq();
 }
 
-uint16_t sh2_sh7604_device::vcra_r()
+uint16_t sh7604_device::vcra_r()
 {
 	return m_vcra & 0x7f7f;
 }
 
-void sh2_sh7604_device::vcra_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void sh7604_device::vcra_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vcra);
 	// ...
 	sh2_recalc_irq();
 }
 
-uint16_t sh2_sh7604_device::vcrb_r()
+uint16_t sh7604_device::vcrb_r()
 {
 	return m_vcrb;
 }
 
-void sh2_sh7604_device::vcrb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void sh7604_device::vcrb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vcrb);
 	// ...
 	sh2_recalc_irq();
 }
 
-uint16_t sh2_sh7604_device::vcrc_r()
+uint16_t sh7604_device::vcrc_r()
 {
 	return m_vcrc & 0x7f7f;
 }
 
-void sh2_sh7604_device::vcrc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void sh7604_device::vcrc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vcrc);
 	m_irq_vector.fic = (m_vcrc >> 8) & 0x7f;
@@ -1030,36 +1030,36 @@ void sh2_sh7604_device::vcrc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	sh2_recalc_irq();
 }
 
-uint16_t sh2_sh7604_device::vcrd_r()
+uint16_t sh7604_device::vcrd_r()
 {
 	return m_vcrd & 0x7f00;
 }
 
-void sh2_sh7604_device::vcrd_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void sh7604_device::vcrd_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vcrd);
 	m_irq_vector.fov = (m_vcrc >> 8) & 0x7f;
 	sh2_recalc_irq();
 }
 
-uint16_t sh2_sh7604_device::vcrwdt_r()
+uint16_t sh7604_device::vcrwdt_r()
 {
 	return m_vcrwdt & 0x7f7f;
 }
 
-void sh2_sh7604_device::vcrwdt_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void sh7604_device::vcrwdt_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vcrwdt);
 	// ...
 	sh2_recalc_irq();
 }
 
-uint32_t sh2_sh7604_device::vcrdiv_r()
+uint32_t sh7604_device::vcrdiv_r()
 {
 	return m_vcrdiv & 0x7f;
 }
 
-void sh2_sh7604_device::vcrdiv_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void sh7604_device::vcrdiv_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_vcrdiv);
 	// TODO: unemulated, level is seemingly not documented/settable?
@@ -1071,12 +1071,12 @@ void sh2_sh7604_device::vcrdiv_w(offs_t offset, uint32_t data, uint32_t mem_mask
  * DIVU
  */
 
-uint32_t sh2_sh7604_device::dvcr_r()
+uint32_t sh7604_device::dvcr_r()
 {
 	return (m_divu_ovfie ? 2 : 0) | (m_divu_ovf ? 1 : 0);
 }
 
-void sh2_sh7604_device::dvcr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void sh7604_device::dvcr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -1092,22 +1092,22 @@ void sh2_sh7604_device::dvcr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	}
 }
 
-uint32_t sh2_sh7604_device::dvsr_r()
+uint32_t sh7604_device::dvsr_r()
 {
 	return m_dvsr;
 }
 
-void sh2_sh7604_device::dvsr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void sh7604_device::dvsr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_dvsr);
 }
 
-uint32_t sh2_sh7604_device::dvdnt_r()
+uint32_t sh7604_device::dvdnt_r()
 {
 	return m_dvdntl;
 }
 
-void sh2_sh7604_device::dvdnt_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void sh7604_device::dvdnt_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_dvdntl);
 	int32_t a = m_dvdntl;
@@ -1127,22 +1127,22 @@ void sh2_sh7604_device::dvdnt_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	}
 }
 
-uint32_t sh2_sh7604_device::dvdnth_r()
+uint32_t sh7604_device::dvdnth_r()
 {
 	return m_dvdnth;
 }
 
-uint32_t sh2_sh7604_device::dvdntl_r()
+uint32_t sh7604_device::dvdntl_r()
 {
 	return m_dvdntl;
 }
 
-void sh2_sh7604_device::dvdnth_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void sh7604_device::dvdnth_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_dvdnth);
 }
 
-void sh2_sh7604_device::dvdntl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void sh7604_device::dvdntl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_dvdntl);
 	int64_t a = m_dvdntl | ((uint64_t)m_dvdnth << 32);
@@ -1177,18 +1177,18 @@ void sh2_sh7604_device::dvdntl_w(offs_t offset, uint32_t data, uint32_t mem_mask
  * WTC
  */
 
-uint16_t sh2_sh7604_device::wtcnt_r()
+uint16_t sh7604_device::wtcnt_r()
 {
 	sh2_wtcnt_recalc();
 	return ((m_wtcsr | 0x18) << 8) | (m_wtcnt & 0xff);
 }
 
-uint16_t sh2_sh7604_device::rstcsr_r()
+uint16_t sh7604_device::rstcsr_r()
 {
 	return (m_rstcsr & 0xe0) | 0x1f;
 }
 
-void sh2_sh7604_device::wtcnt_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void sh7604_device::wtcnt_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_wtcw[0]);
 	switch (m_wtcw[0] & 0xff00)
@@ -1222,7 +1222,7 @@ void sh2_sh7604_device::wtcnt_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	}
 }
 
-void sh2_sh7604_device::rstcsr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void sh7604_device::rstcsr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_wtcw[1]);
 	switch (m_wtcw[1] & 0xff00)
@@ -1238,12 +1238,12 @@ void sh2_sh7604_device::rstcsr_w(offs_t offset, uint16_t data, uint16_t mem_mask
 	}
 }
 
-uint16_t sh2_sh7604_device::fmr_sbycr_r()
+uint16_t sh7604_device::fmr_sbycr_r()
 {
 	return m_sbycr;
 }
 
-void sh2_sh7604_device::fmr_sbycr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void sh7604_device::fmr_sbycr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (mem_mask)
 	{
@@ -1263,12 +1263,12 @@ void sh2_sh7604_device::fmr_sbycr_w(offs_t offset, uint16_t data, uint16_t mem_m
 	}
 }
 
-uint8_t sh2_sh7604_device::ccr_r()
+uint8_t sh7604_device::ccr_r()
 {
 	return m_ccr & ~0x30;
 }
 
-void sh2_sh7604_device::ccr_w(uint8_t data)
+void sh7604_device::ccr_w(uint8_t data)
 {
 	/*
 	    xx-- ---- Way 0/1
@@ -1281,79 +1281,79 @@ void sh2_sh7604_device::ccr_w(uint8_t data)
 	m_ccr = data;
 }
 
-uint32_t sh2_sh7604_device::bcr1_r()
+uint32_t sh7604_device::bcr1_r()
 {
 	return (m_bcr1 & ~0xe008) | (m_is_slave ? 0x8000 : 0);
 }
 
-void sh2_sh7604_device::bcr1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void sh7604_device::bcr1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_bcr1);
 }
 
-uint32_t sh2_sh7604_device::bcr2_r()
+uint32_t sh7604_device::bcr2_r()
 {
 	return m_bcr2;
 }
 
-void sh2_sh7604_device::bcr2_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void sh7604_device::bcr2_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_bcr2);
 }
 
-uint32_t sh2_sh7604_device::wcr_r()
+uint32_t sh7604_device::wcr_r()
 {
 	return m_wcr;
 }
 
-void sh2_sh7604_device::wcr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void sh7604_device::wcr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_wcr);
 }
 
-uint32_t sh2_sh7604_device::mcr_r()
+uint32_t sh7604_device::mcr_r()
 {
 	return m_mcr & ~0x103;
 }
 
-void sh2_sh7604_device::mcr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void sh7604_device::mcr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_mcr);
 }
 
-uint32_t sh2_sh7604_device::rtcsr_r()
+uint32_t sh7604_device::rtcsr_r()
 {
 	return m_rtcsr & 0xf8;
 }
 
-void sh2_sh7604_device::rtcsr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void sh7604_device::rtcsr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_rtcsr);
 }
 
-uint32_t sh2_sh7604_device::rtcnt_r()
+uint32_t sh7604_device::rtcnt_r()
 {
 	return m_rtcnt & 0xff;
 }
 
-void sh2_sh7604_device::rtcnt_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void sh7604_device::rtcnt_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_rtcnt);
 	m_rtcnt &= 0xff;
 }
 
-uint32_t sh2_sh7604_device::rtcor_r()
+uint32_t sh7604_device::rtcor_r()
 {
 	return m_rtcor & 0xff;
 }
 
-void sh2_sh7604_device::rtcor_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void sh7604_device::rtcor_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_rtcor);
 	m_rtcor &= 0xff;
 }
 
-void sh2_sh7604_device::set_frt_input(int state)
+void sh7604_device::set_frt_input(int state)
 {
 	if (m_frt_input == state)
 		return;
@@ -1378,7 +1378,7 @@ void sh2_sh7604_device::set_frt_input(int state)
 	sh2_recalc_irq();
 }
 
-void sh2_sh7604_device::sh2_recalc_irq()
+void sh7604_device::sh2_recalc_irq()
 {
 	int irq = 0;
 	int vector = -1;
@@ -1444,13 +1444,13 @@ void sh2_sh7604_device::sh2_recalc_irq()
  */
 
 template <int Channel>
-uint32_t sh2_sh7604_device::vcrdma_r()
+uint32_t sh7604_device::vcrdma_r()
 {
 	return m_vcrdma[Channel] & 0x7f;
 }
 
 template <int Channel>
-void sh2_sh7604_device::vcrdma_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void sh7604_device::vcrdma_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_vcrdma[Channel]);
 	m_irq_vector.dmac[Channel] = m_vcrdma[Channel] & 0x7f;
@@ -1458,63 +1458,63 @@ void sh2_sh7604_device::vcrdma_w(offs_t offset, uint32_t data, uint32_t mem_mask
 }
 
 template <int Channel>
-uint8_t sh2_sh7604_device::drcr_r()
+uint8_t sh7604_device::drcr_r()
 {
 	return m_dmac[Channel].drcr & 3;
 }
 
 template <int Channel>
-void sh2_sh7604_device::drcr_w(uint8_t data)
+void sh7604_device::drcr_w(uint8_t data)
 {
 	m_dmac[Channel].drcr = data & 3;
 	sh2_recalc_irq();
 }
 
 template <int Channel>
-uint32_t sh2_sh7604_device::sar_r()
+uint32_t sh7604_device::sar_r()
 {
 	return m_dmac[Channel].sar;
 }
 
 template <int Channel>
-void sh2_sh7604_device::sar_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void sh7604_device::sar_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_dmac[Channel].sar);
 }
 
 template <int Channel>
-uint32_t sh2_sh7604_device::dar_r()
+uint32_t sh7604_device::dar_r()
 {
 	return m_dmac[Channel].dar;
 }
 
 template <int Channel>
-void sh2_sh7604_device::dar_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void sh7604_device::dar_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_dmac[Channel].dar);
 }
 
 template <int Channel>
-uint32_t sh2_sh7604_device::dmac_tcr_r()
+uint32_t sh7604_device::dmac_tcr_r()
 {
 	return m_dmac[Channel].tcr;
 }
 
 template <int Channel>
-void sh2_sh7604_device::dmac_tcr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void sh7604_device::dmac_tcr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_dmac[Channel].tcr);
 	m_dmac[Channel].tcr &= 0xffffff;
 }
 
 template <int Channel>
-uint32_t sh2_sh7604_device::chcr_r()
+uint32_t sh7604_device::chcr_r()
 {
 	return m_dmac[Channel].chcr;
 }
 
 template <int Channel>
-void sh2_sh7604_device::chcr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void sh7604_device::chcr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old;
 	old = m_dmac[Channel].chcr;
@@ -1523,12 +1523,12 @@ void sh2_sh7604_device::chcr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	sh2_dmac_check(Channel);
 }
 
-uint32_t sh2_sh7604_device::dmaor_r()
+uint32_t sh7604_device::dmaor_r()
 {
 	return m_dmaor & 0xf;
 }
 
-void sh2_sh7604_device::dmaor_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void sh7604_device::dmaor_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{

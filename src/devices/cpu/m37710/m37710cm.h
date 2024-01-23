@@ -1,10 +1,9 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont, Karl Stenerud, hap
+// copyright-holders:R. Belmont, Karl Stenerud
+#ifndef MAME_CPU_M37710_M37710CM_H
+#define MAME_CPU_M37710_M37710CM_H
+
 #pragma once
-
-#ifndef __M37710CM_H__
-#define __M37710CM_H__
-
 
 /* ======================================================================== */
 /* ================================ INCLUDES ============================== */
@@ -33,18 +32,8 @@
 /* ================================ GENERAL =============================== */
 /* ======================================================================== */
 
-#undef int8
-
-/* Allow for architectures that don't have 8-bit sizes */
-#if UCHAR_MAX == 0xff
-#define int8 char
-#define MAKE_INT_8(A) (int8)((A)&0xff)
-#else
-#define int8   int
-static inline int MAKE_INT_8(int A) {return (A & 0x80) ? A | ~0xff : A & 0xff;}
-#endif /* UCHAR_MAX == 0xff */
-
-#define MAKE_UINT_8(A) ((A)&0xff)
+#define MAKE_INT_8(A)   int8_t((A)&0xff)
+#define MAKE_UINT_8(A)  ((A)&0xff)
 #define MAKE_UINT_16(A) ((A)&0xffff)
 #define MAKE_UINT_24(A) ((A)&0xffffff)
 
@@ -62,15 +51,15 @@ static inline int MAKE_INT_8(int A) {return (A & 0x80) ? A | ~0xff : A & 0xff;}
 /* ================================== CPU ================================= */
 /* ======================================================================== */
 
-#define REG_A           m_a     /* Accumulator */
-#define REG_B           m_b     /* Accumulator hi byte */
+#define REG_A           m_a         /* Accumulator */
+#define REG_B           m_b         /* Accumulator hi byte */
 #define REG_BA          m_ba        /* Secondary Accumulator */
 #define REG_BB          m_bb        /* Secondary Accumulator hi byte */
-#define REG_X           m_x     /* Index X Register */
-#define REG_Y           m_y     /* Index Y Register */
+#define REG_X           m_x         /* Index X Register */
+#define REG_Y           m_y         /* Index Y Register */
 #define REG_XH          m_xh        /* X high byte */
 #define REG_YH          m_yh        /* Y high byte */
-#define REG_S           m_s     /* Stack Pointer */
+#define REG_S           m_s         /* Stack Pointer */
 #define REG_PC          m_pc        /* Program Counter */
 #define REG_PPC         m_ppc       /* Previous Program Counter */
 #define REG_PG          m_pg        /* Program Bank */
@@ -91,7 +80,7 @@ static inline int MAKE_INT_8(int A) {return (A & 0x80) ? A | ~0xff : A & 0xff;}
 #define REG_IM3         m_im3       /* Immediate load target */
 #define REG_IM4         m_im4       /* Immediate load target */
 #define INT_ACK         m_int_ack   /* Interrupt Acknowledge function pointer */
-#define CLOCKS          m_ICount        /* Clock cycles remaining */
+#define CLOCKS          m_ICount    /* Clock cycles remaining */
 #define IRQ_DELAY       m_irq_delay /* Delay 1 instruction before checking IRQ */
 #define CPU_STOPPED     m_stopped   /* Stopped status of the CPU */
 
@@ -232,7 +221,7 @@ static inline int MAKE_INT_8(int A) {return (A & 0x80) ? A | ~0xff : A & 0xff;}
 #define NFLAG_8(A)      (A)
 #define NFLAG_16(A)     ((A)>>8)
 
-#define CFLAG_1()    ((FLAG_C>>8)&1)
+#define CFLAG_1()       ((FLAG_C>>8)&1)
 
 /* ======================================================================== */
 /* ========================== EFFECTIVE ADDRESSES ========================= */
@@ -241,8 +230,8 @@ static inline int MAKE_INT_8(int A) {return (A & 0x80) ? A | ~0xff : A & 0xff;}
 /* Effective-address based memory access macros */
 #define read_8_NORM(A)      m37710i_read_8_normal(A)
 #define read_8_IMM(A)       m37710i_read_8_immediate(A)
-#define read_8_D(A)     m37710i_read_8_direct(A)
-#define read_8_A(A)     m37710i_read_8_normal(A)
+#define read_8_D(A)         m37710i_read_8_direct(A)
+#define read_8_A(A)         m37710i_read_8_normal(A)
 #define read_8_AL(A)        m37710i_read_8_normal(A)
 #define read_8_DX(A)        m37710i_read_8_direct(A)
 #define read_8_DY(A)        m37710i_read_8_direct(A)
@@ -257,7 +246,7 @@ static inline int MAKE_INT_8(int A) {return (A & 0x80) ? A | ~0xff : A & 0xff;}
 #define read_8_DIY(A)       m37710i_read_8_normal(A)
 #define read_8_DLIY(A)      m37710i_read_8_normal(A)
 #define read_8_AXI(A)       m37710i_read_8_normal(A)
-#define read_8_S(A)     m37710i_read_8_normal(A)
+#define read_8_S(A)         m37710i_read_8_normal(A)
 #define read_8_SIY(A)       m37710i_read_8_normal(A)
 
 #define read_16_NORM(A)     m37710i_read_16_normal(A)
@@ -344,66 +333,66 @@ static inline int MAKE_INT_8(int A) {return (A & 0x80) ? A | ~0xff : A & 0xff;}
 
 
 #define OPER_8_IMM()        read_8_IMM(EA_IMM8())
-#define OPER_8_D()      read_8_D(EA_D())
-#define OPER_8_A()      read_8_A(EA_A())
-#define OPER_8_AL()     read_8_AL(EA_AL())
-#define OPER_8_DX()     read_8_DX(EA_DX())
-#define OPER_8_DY()     read_8_DY(EA_DY())
-#define OPER_8_AX()     read_8_AX(EA_AX())
+#define OPER_8_D()          read_8_D(EA_D())
+#define OPER_8_A()          read_8_A(EA_A())
+#define OPER_8_AL()         read_8_AL(EA_AL())
+#define OPER_8_DX()         read_8_DX(EA_DX())
+#define OPER_8_DY()         read_8_DY(EA_DY())
+#define OPER_8_AX()         read_8_AX(EA_AX())
 #define OPER_8_ALX()        read_8_ALX(EA_ALX())
-#define OPER_8_AY()     read_8_AY(EA_AY())
-#define OPER_8_DI()     read_8_DI(EA_DI())
+#define OPER_8_AY()         read_8_AY(EA_AY())
+#define OPER_8_DI()         read_8_DI(EA_DI())
 #define OPER_8_DLI()        read_8_DLI(EA_DLI())
-#define OPER_8_AI()     read_8_AI(EA_AI())
+#define OPER_8_AI()         read_8_AI(EA_AI())
 #define OPER_8_ALI()        read_8_ALI(EA_ALI())
 #define OPER_8_DXI()        read_8_DXI(EA_DXI())
 #define OPER_8_DIY()        read_8_DIY(EA_DIY())
-#define OPER_8_DLIY()   read_8_DLIY(EA_DLIY())
+#define OPER_8_DLIY()       read_8_DLIY(EA_DLIY())
 #define OPER_8_AXI()        read_8_AXI(EA_AXI())
-#define OPER_8_S()      read_8_S(EA_S())
+#define OPER_8_S()          read_8_S(EA_S())
 #define OPER_8_SIY()        read_8_SIY(EA_SIY())
 
-#define OPER_16_IMM()   read_16_IMM(EA_IMM16())
-#define OPER_16_D()     read_16_D(EA_D())
-#define OPER_16_A()     read_16_A(EA_A())
+#define OPER_16_IMM()       read_16_IMM(EA_IMM16())
+#define OPER_16_D()         read_16_D(EA_D())
+#define OPER_16_A()         read_16_A(EA_A())
 #define OPER_16_AL()        read_16_AL(EA_AL())
 #define OPER_16_DX()        read_16_DX(EA_DX())
 #define OPER_16_DY()        read_16_DY(EA_DY())
 #define OPER_16_AX()        read_16_AX(EA_AX())
-#define OPER_16_ALX()   read_16_ALX(EA_ALX())
+#define OPER_16_ALX()       read_16_ALX(EA_ALX())
 #define OPER_16_AY()        read_16_AY(EA_AY())
 #define OPER_16_DI()        read_16_DI(EA_DI())
-#define OPER_16_DLI()   read_16_DLI(EA_DLI())
+#define OPER_16_DLI()       read_16_DLI(EA_DLI())
 #define OPER_16_AI()        read_16_AI(EA_AI())
-#define OPER_16_ALI()   read_16_ALI(EA_ALI())
-#define OPER_16_DXI()   read_16_DXI(EA_DXI())
-#define OPER_16_DIY()   read_16_DIY(EA_DIY())
-#define OPER_16_DLIY()  read_16_DLIY(EA_DLIY())
-#define OPER_16_AXI()   read_16_AXI(EA_AXI())
-#define OPER_16_S()     read_16_S(EA_S())
-#define OPER_16_SIY()   read_16_SIY(EA_SIY())
+#define OPER_16_ALI()       read_16_ALI(EA_ALI())
+#define OPER_16_DXI()       read_16_DXI(EA_DXI())
+#define OPER_16_DIY()       read_16_DIY(EA_DIY())
+#define OPER_16_DLIY()      read_16_DLIY(EA_DLIY())
+#define OPER_16_AXI()       read_16_AXI(EA_AXI())
+#define OPER_16_S()         read_16_S(EA_S())
+#define OPER_16_SIY()       read_16_SIY(EA_SIY())
 
-#define OPER_24_IMM()   read_24_IMM(EA_IMM24())
-#define OPER_24_D()     read_24_D(EA_D())
-#define OPER_24_A()     read_24_A(EA_A())
+#define OPER_24_IMM()       read_24_IMM(EA_IMM24())
+#define OPER_24_D()         read_24_D(EA_D())
+#define OPER_24_A()         read_24_A(EA_A())
 #define OPER_24_AL()        read_24_AL(EA_AL())
 #define OPER_24_DX()        read_24_DX(EA_DX())
 #define OPER_24_DY()        read_24_DY(EA_DY())
 #define OPER_24_AX()        read_24_AX(EA_AX())
-#define OPER_24_ALX()   read_24_ALX(EA_ALX())
+#define OPER_24_ALX()       read_24_ALX(EA_ALX())
 #define OPER_24_AY()        read_24_AY(EA_AY())
 #define OPER_24_DI()        read_24_DI(EA_DI())
-#define OPER_24_DLI()   read_24_DLI(EA_DLI())
+#define OPER_24_DLI()       read_24_DLI(EA_DLI())
 #define OPER_24_AI()        read_24_AI(EA_AI())
-#define OPER_24_ALI()   read_24_ALI(EA_ALI())
-#define OPER_24_DXI()   read_24_DXI(EA_DXI())
-#define OPER_24_DIY()   read_24_DIY(EA_DIY())
-#define OPER_24_DLIY()  read_24_DLIY(EA_DLIY())
-#define OPER_24_AXI()   read_24_AXI(EA_AXI())
-#define OPER_24_S()     read_24_S(EA_S())
-#define OPER_24_SIY()   read_24_SIY(EA_SIY())
+#define OPER_24_ALI()       read_24_ALI(EA_ALI())
+#define OPER_24_DXI()       read_24_DXI(EA_DXI())
+#define OPER_24_DIY()       read_24_DIY(EA_DIY())
+#define OPER_24_DLIY()      read_24_DLIY(EA_DLIY())
+#define OPER_24_AXI()       read_24_AXI(EA_AXI())
+#define OPER_24_S()         read_24_S(EA_S())
+#define OPER_24_SIY()       read_24_SIY(EA_SIY())
 
 /* ======================================================================== */
 /* ================================== CPU ================================= */
 /* ======================================================================== */
-#endif /* __M37710CM_H__ */
+#endif /* MAME_CPU_M37710_M37710CM_H */

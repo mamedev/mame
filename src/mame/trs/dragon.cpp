@@ -516,7 +516,7 @@ void dragon_state::dragon_base(machine_config &config)
 	// video hardware
 	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
 
-	MC6847_PAL(config, m_vdg, 4.433619_MHz_XTAL);
+	MC6847_PAL(config, m_vdg, 14.218_MHz_XTAL / 4);
 	m_vdg->set_screen(SCREEN_TAG);
 	m_vdg->hsync_wr_callback().set(FUNC(dragon_state::horizontal_sync));
 	m_vdg->fsync_wr_callback().set(FUNC(dragon_state::field_sync));

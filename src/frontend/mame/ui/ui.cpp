@@ -47,8 +47,6 @@
 #include "../osd/modules/lib/osdlib.h"
 #include "../osd/modules/lib/osdobj_common.h"
 
-#include "utf8.h"
-
 #include <chrono>
 #include <functional>
 #include <type_traits>
@@ -1634,7 +1632,7 @@ int32_t mame_ui_manager::slider_volume(std::string *str, int32_t newval)
 
 	int32_t curval = machine().sound().attenuation();
 	if (str)
-		*str = string_format(_("%1$3d" UTF8_NBSP "dB"), curval);
+		*str = string_format(_(u8"%1$3d\u00a0dB"), curval);
 
 	return curval;
 }
@@ -1770,7 +1768,7 @@ int32_t mame_ui_manager::slider_refresh(screen_device &screen, std::string *str,
 	}
 
 	if (str)
-		*str = string_format(_("%1$.3f" UTF8_NBSP "Hz"), screen.frame_period().as_hz());
+		*str = string_format(_(u8"%1$.3f\u00a0Hz"), screen.frame_period().as_hz());
 	refresh = screen.frame_period().as_hz();
 	return floor((refresh - defrefresh) * 1000.0 + 0.5);
 }

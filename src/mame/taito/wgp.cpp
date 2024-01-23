@@ -906,8 +906,8 @@ void wgp_state::wgp(machine_config &config)
 	ymsnd.add_route(2, "rspeaker", 1.0);
 
 	TC0140SYT(config, m_tc0140syt, 0);
-	m_tc0140syt->set_master_tag(m_subcpu);
-	m_tc0140syt->set_slave_tag(m_audiocpu);
+	m_tc0140syt->nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_tc0140syt->reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
 
 void wgp_state::wgp2(machine_config &config)

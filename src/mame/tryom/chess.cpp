@@ -42,6 +42,7 @@ public:
 	chess_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_psu(*this, "psu"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
 		m_inputs(*this, "IN.%u", 0)
@@ -55,6 +56,7 @@ protected:
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
+	required_device<f38t56_device> m_psu;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<5> m_inputs;
@@ -183,7 +185,7 @@ void chess_state::main_io(address_map &map)
 {
 	map(0x00, 0x00).rw(FUNC(chess_state::p0_r), FUNC(chess_state::p0_w));
 	map(0x01, 0x01).rw(FUNC(chess_state::p1_r), FUNC(chess_state::p1_w));
-	map(0x04, 0x07).rw("psu", FUNC(f38t56_device::read), FUNC(f38t56_device::write));
+	map(0x04, 0x07).rw(m_psu, FUNC(f38t56_device::read), FUNC(f38t56_device::write));
 }
 
 
@@ -241,15 +243,15 @@ void chess_state::tchess(machine_config &config)
 	F8(config, m_maincpu, 4500000/2); // approximation
 	m_maincpu->set_addrmap(AS_PROGRAM, &chess_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &chess_state::main_io);
-	m_maincpu->set_irq_acknowledge_callback("psu", FUNC(f38t56_device::int_acknowledge));
+	m_maincpu->set_irq_acknowledge_callback(m_psu, FUNC(f38t56_device::int_acknowledge));
 
-	f38t56_device &psu(F38T56(config, "psu", 4500000/2));
-	psu.set_int_vector(0x20);
-	psu.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
-	psu.read_a().set(FUNC(chess_state::p4_r));
-	psu.write_a().set(FUNC(chess_state::p4_w));
-	psu.read_b().set(FUNC(chess_state::p5_r));
-	psu.write_b().set(FUNC(chess_state::p5_w));
+	F38T56(config, m_psu, 4500000/2);
+	m_psu->set_int_vector(0x20);
+	m_psu->int_req_callback().set_inputline(m_maincpu, F8_INPUT_LINE_INT_REQ);
+	m_psu->read_a().set(FUNC(chess_state::p4_r));
+	m_psu->write_a().set(FUNC(chess_state::p4_w));
+	m_psu->read_b().set(FUNC(chess_state::p5_r));
+	m_psu->write_b().set(FUNC(chess_state::p5_w));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(6, 7);
@@ -280,5 +282,5 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS        INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1981, tchess,  0,      0,      tchess,  tchess, chess_state, empty_init, "Tryom", "Electronic Chess (Tryom)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS        INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1981, tchess, 0,      0,      tchess,  tchess, chess_state, empty_init, "Tryom", "Electronic Chess (Tryom)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

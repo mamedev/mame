@@ -16,7 +16,7 @@ license:CC0-1.0
 	M-5  *MC0005-KSM  Kids Song Mini Volume 1 (TV Song)
 	M-6  *MC0006-KSM  Kids Song Mini Volume 2 (TV Hero)
 	M-7  *MC0007-ATM  Artist Mini Volume 5 (SMAP, KinKi Kids, ARASHI, TOKIO)
-	M-8   MC0008-     Kids Song Mini Volume 3?
+	M-8  *MC0008-KSM  Kids Song Mini Volume 3
 	M-9   MC0009-     JPop Mix Mini Volume 1
 	M-10 *MC0010-ATM  Artist Mini Volume 6 (Utada Hikaru)
 	M-11  MC0011-     Kids Song Mini Volume 4 (Fantastic)
@@ -105,6 +105,18 @@ license:CC0-1.0
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x080000">
 				<rom name="mc0007-atm.u1" size="0x080000" crc="a9a19914" sha1="556adfad645ae635901b690ee57173766a5e497a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc0008">
+		<description>Kids Song Mini Volume 2 (Japan) (MC0008-KSM)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="キッズソングミニ mini vol.3"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x080000">
+				<rom name="mc0008-ksm.u1" size="0x080000" crc="5238a3d4" sha1="8da36edcc6c28de31e955edca1cf893cc5d7fce3"/>
 			</dataarea>
 		</part>
 	</software>

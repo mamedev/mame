@@ -24,14 +24,16 @@
     * = encrypted
 
 ***************************************************************************/
-#ifndef MAME_SHARED_SEIBU_H
-#define MAME_SHARED_SEIBU_H
+#ifndef MAME_SHARED_SEIBUSOUND_H
+#define MAME_SHARED_SEIBUSOUND_H
 
 #pragma once
 
 #include "cpu/z80/z80.h"
 #include "sound/msm5205.h"
+
 #include "dirom.h"
+
 
 class seibu_sound_common {
 public:
@@ -192,4 +194,4 @@ DECLARE_DEVICE_TYPE(SEIBU_ADPCM, seibu_adpcm_device)
 
 /**************************************************************************/
 
-#endif // MAME_SHARED_SEIBU_H
+#endif // MAME_SHARED_SEIBUSOUND_H

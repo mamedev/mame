@@ -59,7 +59,6 @@ public:
 
 	void sfix_decrypt(uint8_t* rom, uint32_t rom_size, uint8_t* fixed, uint32_t fixed_size);
 
-	uint16_t generate_cs16(uint8_t *rom, int size);
 	int m1_address_scramble(int address, uint16_t key);
 	void cmc50_m1_decrypt(uint8_t* romcrypt, uint32_t romcrypt_size, uint8_t* romaudio, uint32_t romaudio_size);
 

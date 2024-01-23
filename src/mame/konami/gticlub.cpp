@@ -868,7 +868,8 @@ uint32_t hangplt_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 {
 	bitmap.fill(m_palette[Which]->pen(0), cliprect);
 
-//  m_k001604[Which]->draw_back_layer(bitmap, cliprect);
+	// FIXME: service mode cross hatch comes from this layer (which somehow also disables 3d render)
+//	m_k001604[Which]->draw_back_layer(screen, bitmap, cliprect);
 	m_voodoo[Which]->update(bitmap, cliprect);
 	m_k001604[Which]->draw_front_layer(screen, bitmap, cliprect);
 
@@ -1016,14 +1017,14 @@ void hangplt_state::hangplt(machine_config &config)
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
 	lscreen.set_refresh_hz(60);
-	lscreen.set_size(512, 384);
-	lscreen.set_visarea(0, 511, 0, 383);
+	lscreen.set_size(600, 420);
+	lscreen.set_visarea(44, 555, 27, 410);
 	lscreen.set_screen_update(FUNC(hangplt_state::screen_update<0>));
 
 	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
 	rscreen.set_refresh_hz(60);
-	rscreen.set_size(512, 384);
-	rscreen.set_visarea(0, 511, 0, 383);
+	rscreen.set_size(600, 420);
+	rscreen.set_visarea(44, 555, 27, 410);
 	rscreen.set_screen_update(FUNC(hangplt_state::screen_update<1>));
 
 	K001604(config, m_k001604[0], 0);

@@ -859,7 +859,7 @@ void i386_device::i286_task_switch(uint16_t selector, uint8_t nested)
 	m_task.flags = seg.flags;
 
 	/* Set TS bit in CR0 */
-	m_cr[0] |= 0x08;
+	m_cr[0] |= CR0_TS;
 
 	/* Load incoming task state from the new task's TSS */
 	tss = m_task.base;
@@ -972,7 +972,7 @@ void i386_device::i386_task_switch(uint16_t selector, uint8_t nested)
 	m_task.flags = seg.flags;
 
 	/* Set TS bit in CR0 */
-	m_cr[0] |= 0x08;
+	m_cr[0] |= CR0_TS;
 
 	/* Load incoming task state from the new task's TSS */
 	tss = m_task.base;

@@ -61,6 +61,17 @@ X-6203 : Chess
 		</part>
 	</software>
 
+	<software name="arabiced">
+		<description>Arabic Editor</description>
+		<year>198?</year>
+		<publisher>Ecico</publisher>
+		<part name="cart" interface="aquarius_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="arabic_editor.bin" size="0x4000" crc="a0a534a9" sha1="3c463071d49adf7914ea6dd62beab284bb3c4e22"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="astrsmah">
 		<description>Astrosmash</description>
 		<year>1983</year>

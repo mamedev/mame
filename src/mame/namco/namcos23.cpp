@@ -1764,7 +1764,7 @@ private:
 	required_shared_ptr<uint32_t> m_charram;
 	required_shared_ptr<uint32_t> m_textram;
 	optional_shared_ptr<uint32_t> m_czattr;
-	optional_device<sh2_sh7604_device> m_gmen_sh2;
+	optional_device<sh7604_device> m_gmen_sh2;
 	optional_shared_ptr<uint32_t> m_gmen_sh2_shared;
 	required_device<gfxdecode_device> m_gfxdecode;
 	optional_ioport m_lightx;
@@ -3981,7 +3981,7 @@ void namcos23_state::gmen(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos23_state::gmen_mips_map);
 
-	SH2_SH7604(config, m_gmen_sh2, XTAL(28'700'000));
+	SH7604(config, m_gmen_sh2, XTAL(28'700'000));
 	m_gmen_sh2->set_addrmap(AS_PROGRAM, &namcos23_state::gmen_sh2_map);
 
 	MCFG_MACHINE_RESET_OVERRIDE(namcos23_state,gmen)

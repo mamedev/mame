@@ -86,7 +86,7 @@ private:
 	{
 		emu_timer *irq_timer;
 		uint32_t curlocation;
-		uint16_t curlength;
+		uint32_t curlength;
 		uint16_t curticks;
 		uint8_t index;
 		bool dma_enabled;

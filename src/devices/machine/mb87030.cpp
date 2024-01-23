@@ -176,8 +176,8 @@ auto mb87030_device::get_state_name(State state) const
 
 void mb87030_device::update_state(mb87030_device::State new_state, int delay, int timeout)
 {
-	LOG("new state: %s -> %s (delay %d, timeout %d)\n", get_state_name(m_state),
-			get_state_name(new_state), delay, timeout);
+	LOG("new state: %s -> %s (delay %d, timeout %d, %s)\n", get_state_name(m_state),
+			get_state_name(new_state), delay, timeout, machine().time().to_string());
 	m_state = new_state;
 	if (delay)
 		m_delay_timer->adjust(clocks_to_attotime(delay));
@@ -410,7 +410,7 @@ void mb87030_device::step(bool timeout)
 		if (!m_tc || m_fifo.full())
 			break;
 
-		LOG("pushing read data: %02X\n", data);
+		LOG("pushing read data: %02X (%d filled)\n", data, m_fifo.queue_length() + 1);
 		m_fifo.enqueue(data);
 		if (m_dma_transfer)
 			m_dreq_handler(true);
@@ -431,6 +431,7 @@ void mb87030_device::step(bool timeout)
 		}
 
 		if (m_tc && !m_fifo.empty()) {
+			LOG("pulling write data: %02X (%d left)\n", data, m_fifo.queue_length() - 1);
 			scsi_bus->data_w(scsi_refid, m_fifo.dequeue());
 			update_state(State::TransferSendAck, 10);
 			break;
@@ -865,7 +866,7 @@ void mb87030_device::exbf_w(uint8_t data)
 
 void mb87030_device::dma_w(uint8_t data)
 {
-	LOG("dma_w: %02X\n", data);
+	LOG("dma_w: %02X (%d entered)\n", data, m_fifo.queue_length() + 1);
 	m_dreg = data;
 	if (!m_fifo.full()) {
 		m_fifo.enqueue(data);
@@ -886,7 +887,7 @@ uint8_t mb87030_device::dma_r()
 			m_dreq_handler(false);
 	}
 
-	LOG("dma_r: %02X\n", m_dreg);
+	LOG("dma_r: %02X (%d left)\n", m_dreg, m_fifo.queue_length());
 	step(false);
 	return m_dreg;
 }

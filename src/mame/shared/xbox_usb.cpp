@@ -9,6 +9,8 @@
 #include "machine/pci.h"
 #include "machine/idectrl.h"
 
+#include "multibyte.h"
+
 #define LOG_OHCI (0)
 
 
@@ -901,18 +903,14 @@ void device_usb_ohci_function_interface::add_device_descriptor(const USBStandard
 	uint8_t *const p = &descriptors[descriptors_pos];
 	p[0] = descriptor.bLength;
 	p[1] = descriptor.bDescriptorType;
-	p[2] = descriptor.bcdUSB & 255;
-	p[3] = descriptor.bcdUSB >> 8;
+	put_u16le(&p[2], descriptor.bcdUSB);
 	p[4] = descriptor.bDeviceClass;
 	p[5] = descriptor.bDeviceSubClass;
 	p[6] = descriptor.bDeviceProtocol;
 	p[7] = descriptor.bMaxPacketSize0;
-	p[8] = descriptor.idVendor & 255;
-	p[9] = descriptor.idVendor >> 8;
-	p[10] = descriptor.idProduct & 255;
-	p[11] = descriptor.idProduct >> 8;
-	p[12] = descriptor.bcdDevice & 255;
-	p[13] = descriptor.bcdDevice >> 8;
+	put_u16le(&p[8], descriptor.idVendor);
+	put_u16le(&p[10], descriptor.idProduct);
+	put_u16le(&p[12], descriptor.bcdDevice);
 	p[14] = descriptor.iManufacturer;
 	p[15] = descriptor.iProduct;
 	p[16] = descriptor.iSerialNumber;
@@ -926,8 +924,7 @@ void device_usb_ohci_function_interface::add_configuration_descriptor(const USBS
 	uint8_t *const p = &descriptors[descriptors_pos];
 	p[0] = descriptor.bLength;
 	p[1] = descriptor.bDescriptorType;
-	p[2] = descriptor.wTotalLength & 255;
-	p[3] = descriptor.wTotalLength >> 8;
+	put_u16le(&p[2], descriptor.wTotalLength);
 	p[4] = descriptor.bNumInterfaces;
 	p[5] = descriptor.bConfigurationValue;
 	p[6] = descriptor.iConfiguration;
@@ -1003,8 +1000,7 @@ void device_usb_ohci_function_interface::add_endpoint_descriptor(const USBStanda
 	p[1] = descriptor.bDescriptorType;
 	p[2] = descriptor.bEndpointAddress;
 	p[3] = descriptor.bmAttributes;
-	p[4] = descriptor.wMaxPacketSize & 255;
-	p[5] = descriptor.wMaxPacketSize >> 8;
+	put_u16le(&p[4], descriptor.wMaxPacketSize);
 	p[6] = descriptor.bInterval;
 	descriptors_pos += descriptor.bLength;
 
@@ -1526,20 +1522,16 @@ int ohci_game_controller_device::handle_interrupt_pid(int endpoint, int pid, uin
 		buffer[11] = m_TriggerR->read();
 		v = m_ThumbstickLh->read();
 		v = (v - 128) * 256;
-		buffer[12] = (uint16_t)v & 255;
-		buffer[13] = (uint16_t)v >> 8;
+		put_u16le(&buffer[12], v);
 		v = m_ThumbstickLv->read();
 		v = (v - 128) * 256;
-		buffer[14] = (uint16_t)v & 255;
-		buffer[15] = (uint16_t)v >> 8;
+		put_u16le(&buffer[14], v);
 		v = m_ThumbstickRh->read();
 		v = (v - 128) * 256;
-		buffer[16] = (uint16_t)v & 255;
-		buffer[17] = (uint16_t)v >> 8;
+		put_u16le(&buffer[16], v);
 		v = m_ThumbstickRv->read();
 		v = (v - 128) * 256;
-		buffer[18] = (uint16_t)v & 255;
-		buffer[19] = (uint16_t)v >> 8;
+		put_u16le(&buffer[18], v);
 		return size;
 	}
 	return -1;

@@ -6,7 +6,8 @@
 atapi_hle_device::atapi_hle_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	ata_hle_device_base(mconfig, type, tag, owner, clock),
 	m_packet(0),
-	m_data_size(0)
+	m_data_size(0),
+	m_is_ready(false)
 {
 }
 
@@ -20,6 +21,14 @@ void atapi_hle_device::device_reset()
 {
 	t10_reset();
 	ata_hle_device_base::device_reset();
+}
+
+void atapi_hle_device::set_is_ready(bool state)
+{
+	if (has_running_machine() && (machine().phase() >= machine_phase::RESET))
+		throw emu_fatalerror("Static ready state should only be set during configuration");
+
+	m_is_ready = state;
 }
 
 void atapi_hle_device::process_buffer()

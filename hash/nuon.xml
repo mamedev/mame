@@ -49,8 +49,7 @@ Region locked, will only work in Korea region players.
 		<info name="alt_title" value="짱구는 못말려 3: 돌아온 짱구" />
 		<part interface="dvdrom" name="dvdrom">
 			<diskarea name="dvdrom">
-				<disk name="jjangguneun monmallyeo 3 - doraon jjanggu (korea)" sha1="ff2bfb2108643610969980112c5938491f3df3bb
-" />
+				<disk name="jjangguneun monmallyeo 3 - doraon jjanggu (korea)" sha1="ff2bfb2108643610969980112c5938491f3df3bb" />
 			</diskarea>
 		</part>
 	</software>

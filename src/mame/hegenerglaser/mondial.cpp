@@ -4,6 +4,9 @@
 
 Mephisto Mondial
 
+The chess engine is Nona by Frans Morsch, the first time his program was included
+in a chess computer.
+
 Hardware notes:
 - G65SC02-1 @ 2MHz
 - 2KB RAM(TC5517AP), 16KB ROM

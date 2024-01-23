@@ -145,7 +145,7 @@ license:CC0-1.0
 	61  *EC0061-JPM  J-Pop Mix Volume 27
 	62  *EC0062-JPM  J-Pop Mix Volume 28
 	63  *EC0063-JPM  J-Pop Mix Volume 29
-	64   EC0064-ENK  Enkamichi Volume 9
+	64  *EC0064-ENK  Enkamichi Volume 9
 	65  *EC0065-JPM  J-Pop Mix Volume 30
 	66  *EC0066-JPM  J-Pop Mix Volume 31
 	67  *EC0067-JPM  J-Pop Mix Volume 32
@@ -155,7 +155,7 @@ license:CC0-1.0
 	70  *EC0070-JPM  J-Pop Mix Volume 34
 	71  *EC0071-JPM  J-Pop Mix Volume 35
 	72  *EC0072-JPM  J-Pop Mix Volume 36
-	73  *EC0073-MKC  MKC volume 1 (Japan)
+	73  *EC0073-MKC  Mood Kayou Collection Volume 1
 	74  *EC0074-JPM  J-Pop Mix Volume 37
 	75  *EC0075-JPM  J-Pop Mix Volume 38
 	76  *EC0076-JPM  J-Pop Mix Volume 39
@@ -168,7 +168,7 @@ license:CC0-1.0
 	82  *EC0082-MBH  Matthew's Best Hit Selection
 	83   EC0083-JPM  J-Pop Mix Volume 43
 	84   EC0084-     Kids' Song Best 40
-	85   EC0085-ETZ  Enka Taizen Volume 3 (custom presentation etc.) (guess)
+	85   EC0085-ETZ  Enka Taizen Volume 3 (custom presentation etc.)
 
 	(more? what's the highest regular number?)
 
@@ -180,8 +180,8 @@ license:CC0-1.0
 	These look like normal e-kara carts
 
 	KD-1  Kids' Song 20
-	KD-2  (unknown)
-	KD-3  (unknown)
+	KD-2  Kids' Song 20
+	KD-3  Kids' Song 20
 	KD-4  Kids' Song 20
 
 	************************************************************************************************************************************************************
@@ -263,7 +263,7 @@ license:CC0-1.0
 		<description>Enkamichi Volume 1 (Japan) (EC0006-ENK)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
-		<info name="alt_title" value="演歌道ベスト Vol.1" />
+		<info name="alt_title" value="演歌道 Vol.1" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0006-enk.u1" size="0x100000" crc="294a0639" sha1="f1f58057a80257c9083093be146ed287ca1aee39"/>
@@ -378,7 +378,7 @@ license:CC0-1.0
 		<description>Enkamichi Volume 2 (Japan) (EC0016-ENK)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
-		<info name="alt_title" value="演歌道ベスト Vol.2" />
+		<info name="alt_title" value="演歌道 Vol.2" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0016-enk.u1" size="0x100000" crc="1bac5cc7" sha1="d80e266d079ea2e8a5acb8c1ed97a94c5d31e6ec"/>
@@ -538,7 +538,7 @@ license:CC0-1.0
 		<description>Enkamichi Volume 3 (Japan) (EC0030-ENK)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
-		<info name="alt_title" value="演歌道ベスト Vol.3" />
+		<info name="alt_title" value="演歌道 Vol.3" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0030-enk.u1" size="0x100000" crc="28556ca2" sha1="bf5b14208e339369e2d719441e673bf2c6534978"/>
@@ -621,7 +621,7 @@ license:CC0-1.0
 		<description>Enkamichi Volume 4 (Japan) (EC0037-ENK)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
-		<info name="alt_title" value="演歌道ベスト Vol.4" />
+		<info name="alt_title" value="演歌道 Vol.4" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0037-enk.u1" size="0x100000" crc="3c61036c" sha1="b09096a58f361f70041b35c29a02b768ef1758d2"/>
@@ -691,7 +691,7 @@ license:CC0-1.0
 		<description>Enkamichi Volume 5 (Japan) (EC0043-ENK)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
-		<info name="alt_title" value="演歌道ベスト Vol.5" />
+		<info name="alt_title" value="演歌道 Vol.5" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0043-enk.u1" size="0x100000" crc="c730037d" sha1="c283b99fe4ae51adc3e13a6fae4eaffb891ec20d"/>
@@ -753,7 +753,7 @@ license:CC0-1.0
 		<description>Enkamichi Volume 6 (Japan) (EC0048-ENK)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
-		<info name="alt_title" value="演歌道ベスト Vol.6" />
+		<info name="alt_title" value="演歌道 Vol.6" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0048-enk.u1" size="0x100000" crc="32ad1da7" sha1="7033988a6652fffca840348c68d5d54e5e28f225"/>
@@ -801,7 +801,7 @@ license:CC0-1.0
 		<description>Enkamichi Volume 7 (Japan) (EC0052-ENK)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
-		<info name="alt_title" value="演歌道ベスト Vol.7" />
+		<info name="alt_title" value="演歌道 Vol.7" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0052-enk.u1" size="0x100000" crc="120662ff" sha1="292d15f49f6bf450662f343e805fd49c484a04ad"/>
@@ -923,7 +923,17 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- EC0064-ENK  Enkamichi Volume 9 -->
+	<software name="ec0064">
+		<description>Enkamichi Volume 9 (Japan) (EC0064-ENK)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="演歌道 Vol.9" />
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0064-enk.u1" size="0x100000" crc="ec2fefb3" sha1="1a56f251d32ff3eb5a20c70ac040c6e0f7d9307d"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="ec0065">
 		<description>J-Pop Mix Volume 30 (Japan) (EC0065-JPM)</description>
@@ -1016,9 +1026,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="ec0073">
-		<description>MKC volume 1 (Japan) (EC0073-MKC)</description>
+		<description>Mood Kayou Collection Volume 1 (Japan) (EC0073-MKC)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="ムード歌謡コレクション Vol.1" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0073-mkc.u1" size="0x100000" crc="e1ffa625" sha1="ee1bcd579a10085c4c094037e25345c17c063c7c"/>
@@ -1121,8 +1132,8 @@ license:CC0-1.0
 
 	<!-- EC0083-JPM  J-Pop Mix Volume 43 -->
 
-	<!-- EC0084-     Kids' Song Best 40 (seen) -->
+	<!-- EC0084-     Kids' Song Best 40 -->
 
-	<!-- EC0085-     (unknown, seen in the wild, sequel to 69, 79 so probably ETZ) -->
+	<!-- EC0085-ETZ  Enka Taizen Volume 3 -->
 
 </softwarelist>

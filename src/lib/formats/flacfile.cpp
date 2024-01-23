@@ -23,8 +23,6 @@ static cassette_image::error flacfile_identify(cassette_image *cassette, cassett
 {
 	cassette->get_raw_cassette_image()->seek(0, SEEK_SET);
 	flac_decoder decoder(*cassette->get_raw_cassette_image());
-	if (!decoder.reset())
-		return cassette_image::error::INVALID_IMAGE;
 	const int channels = decoder.channels();
 	const int sample_rate = decoder.sample_rate();
 	const int bits_per_sample = decoder.bits_per_sample();
@@ -48,8 +46,6 @@ static cassette_image::error flacfile_load(cassette_image *cassette)
 {
 	cassette->get_raw_cassette_image()->seek(0, SEEK_SET);
 	flac_decoder decoder(*cassette->get_raw_cassette_image());
-	if (!decoder.reset())
-		return cassette_image::error::INVALID_IMAGE;
 	const int channels = decoder.channels();
 	const int total_samples = decoder.total_samples();
 
@@ -62,7 +58,7 @@ static cassette_image::error flacfile_load(cassette_image *cassette)
 			return cassette_image::error::OUT_OF_MEMORY;
 		channel_samples[channel] = samples[channel].get();
 	}
-	if (!decoder.decode(channel_samples, decoder.total_samples(), false))
+	if (!decoder.decode(channel_samples, decoder.total_samples()))
 		return cassette_image::error::INVALID_IMAGE;
 	for (int channel = 0; channel < channels; channel++)
 	{

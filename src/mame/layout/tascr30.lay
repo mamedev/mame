@@ -15,21 +15,21 @@ license:CC0-1.0
 		<disk><color red="0.1" green="0.05" blue="0.07" /></disk>
 	</element>
 	<element name="ledr" defstate="0">
-		<disk state="1">    <color red="1" green="0" blue="0" />  </disk>
+		<disk state="1"><color red="1" green="0" blue="0" /></disk>
 	</element>
 	<element name="ledg" defstate="0">
-		<disk state="0">    <color red="0.05" green="0.15" blue="0.05" />   </disk>
-		<disk state="1">    <color red="0.1" green="1" blue="0.15" />   </disk>
+		<disk state="0"><color red="0.05" green="0.15" blue="0.05" /></disk>
+		<disk state="1"><color red="0.1" green="1" blue="0.15" /></disk>
 	</element>
 
 	<element name="hlb">
-		<rect state="0"> <color red="0.1" green="0.1" blue="0.1" /> </rect>
-		<rect state="1"> <color red="0.4" green="0.4" blue="0.4" /> </rect>
+		<rect state="0"><color red="0.1" green="0.1" blue="0.1" /></rect>
+		<rect state="1"><color red="0.4" green="0.4" blue="0.4" /></rect>
 	</element>
 
 	<element name="hlbr">
-		<disk state="0"> <color red="0.75" green="0.5" blue="0.25" /> </disk>
-		<disk state="1"> <color red="0.65" green="0.4" blue="0.2" /> </disk>
+		<disk state="0"><color red="0.75" green="0.5" blue="0.25" /></disk>
+		<disk state="1"><color red="0.65" green="0.4" blue="0.2" /></disk>
 	</element>
 
 	<element name="piece" defstate="0">

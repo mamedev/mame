@@ -564,10 +564,8 @@ TIMER_CALLBACK_MEMBER(smc91c9x_device::tx_poll)
 		{
 			u32 crc = util::crc32_creator::simple(tx_buffer + 4, length - 4);
 
-			tx_buffer[length++] = (crc >> 0) & 0xff;
-			tx_buffer[length++] = (crc >> 8) & 0xff;
-			tx_buffer[length++] = (crc >> 16) & 0xff;
-			tx_buffer[length++] = (crc >> 24) & 0xff;
+			put_u32le(&tx_buffer[length], crc);
+			length += 4;
 		}
 
 		// Remove status, length

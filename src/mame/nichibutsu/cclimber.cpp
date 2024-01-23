@@ -1530,7 +1530,7 @@ ROM_START( ccbootmm )
 	ROM_REGION( 0x0160, "proms", 0 )
 	ROM_LOAD( "cclimber.pr1", 0x0000, 0x0020, CRC(751c3325) SHA1(edce2bc883996c1d72dc6c1c9f62799b162d415a) )
 	ROM_LOAD( "cclimber.pr2", 0x0020, 0x0020, CRC(ab1940fa) SHA1(8d98e05cbaa6f55770c12e0a9a8ed9c73cc54423) )
-	ROM_LOAD( "cclimber.pr3", 0x0040, 0x0020, CRC(71317756) SHA1(1195f0a037e379cc1a3c0314cb746f5cd2bffe50) )
+	ROM_LOAD( "cclimber.pr3", 0x0040, 0x0020, CRC(b4e827a5) SHA1(31a5a5ad54417a474d22bb16c473415d99a2b6f1) )
 	ROM_LOAD( "ccboot.prm",   0x0060, 0x0100, CRC(9e11550d) SHA1(b8cba8e16e10e23fba1f11551102ab77b680bdf0) )    // decryption table (not used)
 
 	ROM_REGION( 0x2000, "cclimber_audio:samples", 0 )
