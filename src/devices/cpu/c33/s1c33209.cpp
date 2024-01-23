@@ -82,7 +82,7 @@ void s1c33209_device::device_reset()
 template <offs_t RomBytes>
 void s1c33209_device::memory_map(address_map &map)
 {
-	map(0x000'0000, 0x000'1fff).mirror(0x000'2000).ram();
+	map(0x000'0000, 0x000'1fff).mirror(0x000'2000).ram(); // actually 32 bits wide (single cycle word access)
 	map(0x003'0000, 0x003'ffff).m(*this, FUNC(s1c33209_device::peripheral_map));
 	map(0x004'0000, 0x004'ffff).mirror(0x001'0000).m(*this, FUNC(s1c33209_device::peripheral_map));
 	//map(0x006'0000, 0x007'ffff) area 2     reserved for debug mode

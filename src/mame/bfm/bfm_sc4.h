@@ -2,16 +2,16 @@
 // copyright-holders:David Haywood
 /* Scorpion 4 + 5 driver related includes */
 /* mainly used for stuff which is currently shared between sc4 / 5 sets to avoid duplication */
-#ifndef MAME_BFM_BFP_SC4_H
-#define MAME_BFM_BFP_SC4_H
+#ifndef MAME_BFM_BFM_SC4_H
+#define MAME_BFM_BFM_SC4_H
 
 #pragma once
 
 #include "sec.h"
 #include "machine/steppers.h" // stepper motor
 
-#include "bfm_gu96x8m_k657c2.h"
 #include "bfm_bda.h"
+#include "bfm_gu96x8m_k657c2.h"
 
 #include "sound/ymz280b.h"
 #include "machine/mc68681.h"
@@ -3378,4 +3378,4 @@ INPUT_PORTS_EXTERN( sc4_raw );
 	/* not for either of these games? */ \
 	ROM_LOAD( "casroysnd.bin", 0x00000, 0x80000, CRC(cf1d4b59) SHA1(1b2bc74c6fcc43197a6f295bc34554da01f7b517) )
 
-#endif // MAME_BFM_BFP_SC4_H
+#endif // MAME_BFM_BFM_SC4_H

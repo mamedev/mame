@@ -40,7 +40,6 @@ namespace {
 class hh_ht11xx_state : public driver_device
 {
 public:
-
 	virtual DECLARE_INPUT_CHANGED_MEMBER(input_wakeup);
 
 protected:

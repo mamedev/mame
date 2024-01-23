@@ -29,7 +29,7 @@ C6   10738     Bus Interface Circuit } These 2 interface the C5 eprom to the CPU
 
 ToDo:
 - Everything (the code below is mostly a carry-over from gts1 and is incomplete or guesswork).
-- There's lots of manuals, with lots of info, but not what we need. For example, no proper schematics.
+- There are lots of manuals, with lots of info, but not what we need. For example, no proper schematics.
 - No info on the sound (all it says is 4 TTL chips controlled by 6 bits of the IO expander).
 - A plug-in printer is used to view and alter settings. We have no info about it.
 - Default layout.
@@ -382,18 +382,18 @@ void recel_state::recel(machine_config & config)
 	genpin_audio(config);
 }
 
-/* The BIOS is the same for all sets, but is labeled different depending on the ROM type:
+/* The BIOS is the same for all sets, but is labeled differently depending on the ROM type:
     -13: For machines with personality PROM 1702.
     -14: For machines with 2716 EPROM.
-   On both cases, the second half of each chip is not used, having their A11 ping grounded
+   In both cases, the second half of each chip is not used, with their A11 pins grounded
    (these chips have A1 to A11, there's no A0).
 */
 #define RECEL_BIOS \
 	ROM_REGION( 0x800, "maincpu", ROMREGION_ERASEFF ) \
 	ROM_LOAD("a2361.b1", 0x0000, 0x0400, CRC(d0c4695d) SHA1(4846adb3f6c292626840ba5255ffc5e788a69301) ) \
-        ROM_IGNORE( 0x400 ) \
+		ROM_IGNORE( 0x400 ) \
 	ROM_LOAD("a2362.b2", 0x0400, 0x0400, CRC(39a70611) SHA1(8545e168a5f256150bcff12d1e6d8efffd08c3cd) ) \
-        ROM_IGNORE( 0x400 )
+		ROM_IGNORE( 0x400 )
 
 ROM_START( recel )
 	RECEL_BIOS
