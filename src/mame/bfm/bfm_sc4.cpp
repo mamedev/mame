@@ -676,7 +676,14 @@ void sc4_adder4_state::sc4_adder4_map(address_map &map)
 
 void bfm_sc45_state::bfm_sc4_reset_serial_vfd()
 {
-	m_vfd0->reset();
+	if (m_vfd0)
+	{
+		m_vfd0->reset();
+	}
+	else
+	{
+		m_vfd1->reset();
+	}
 	vfd_old_clock = false;
 }
 
@@ -711,9 +718,13 @@ void bfm_sc45_state::bfm_sc45_write_serial_vfd(bool cs, bool clock, bool data)
 						{
 							m_dm01->writedata(vfd_ser_value);
 						}
-						else
+						else if (m_vfd0)
 						{
 							m_vfd0->write_char(vfd_ser_value);
+						}
+						else
+						{
+							m_vfd1->write_char(vfd_ser_value);
 						}
 					}
 				}

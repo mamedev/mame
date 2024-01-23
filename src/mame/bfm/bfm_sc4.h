@@ -10,6 +10,7 @@
 #include "sec.h"
 #include "machine/steppers.h" // stepper motor
 
+#include "bfm_gu96x8m_k657c2.h"
 #include "bfm_bda.h"
 
 #include "sound/ymz280b.h"
@@ -91,6 +92,7 @@ protected:
 		: driver_device(mconfig, type, tag)
 		, m_duart(*this, "duart68681")
 		, m_vfd0(*this, "vfd0")
+		, m_vfd1(*this, "vfd1")
 		, m_dm01(*this, "dm01")
 		, m_ymz(*this, "ymz")
 		, m_lamps(*this, "lamp%u", 0U)
@@ -101,6 +103,7 @@ protected:
 
 	required_device<mc68681_device> m_duart;
 	optional_device<bfm_bda_device> m_vfd0;
+	optional_device<bfm_gu96x8m_k657c2_device> m_vfd1;
 	optional_device<bfm_dm01_device> m_dm01;
 	required_device<ymz280b_device> m_ymz;
 	output_finder<0x20 * 8> m_lamps;
