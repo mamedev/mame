@@ -137,11 +137,11 @@ s2350_device::s2350_device(const machine_config &mconfig, const char *tag, devic
 	device_t(mconfig, S2350, tag, owner, clock),
 	m_tbmt(*this),
 	m_fct(*this),
+	m_tx_cb(*this),
 	m_rda(*this),
 	m_scr(*this),
 	m_ror(*this),
-	m_rpe(*this),
-	m_tx_cb(*this)
+	m_rpe(*this)
 {
 }
 
@@ -221,7 +221,7 @@ void s2350_device::receiver_sync_reg_w(u8 data)
 u8 s2350_device::receiver_sync_search()
 {
 	set_sync_character_received(false);
-	m_sync_search_active      = true;
+	m_sync_search_active = true;
 
 	LOGREG("%s: 0x%02x\n", FUNCNAME, m_receiver_sync_reg);
 
@@ -248,17 +248,19 @@ u8 s2350_device::status_word_r()
 	status |= m_fill_char_transmitted   ? 0x40 : 0x00;
 	status |= m_transmit_buffer_empty   ? 0x80 : 0x00;
 
-	set_fill_char_transmitted(false);
-	set_receiver_overrun(false);
-	set_receiver_parity_error(false);
-	set_sync_character_received(false);
+	if (!machine().side_effects_disabled()) {
+		set_fill_char_transmitted(false);
+		set_receiver_overrun(false);
+		set_receiver_parity_error(false);
+		set_sync_character_received(false);
+	}
 
 	LOGREG("%s: 0x%02x\n", FUNCNAME, status);
 
 	return status;
 }
 
-void s2350_device::serial_rx_w(int state)
+void s2350_device::rx_w(int state)
 {
 	m_serial_rx_line = state;
 }
@@ -288,56 +290,56 @@ void s2350_device::receive_byte(u8 data)
 	set_received_data_available(true);
 }
 
-void s2350_device::set_transmit_buffer_empty(int val)
+void s2350_device::set_transmit_buffer_empty(bool val)
 {
 	LOGLINE("%s - val: %d\n", FUNCNAME, val);
 
-	m_transmit_buffer_empty = bool(val);
+	m_transmit_buffer_empty = val;
 
 	m_tbmt(val);
 }
 
-void s2350_device::set_fill_char_transmitted(int val)
+void s2350_device::set_fill_char_transmitted(bool val)
 {
 	LOGLINE("%s - val: %d\n", FUNCNAME, val);
 
-	m_fill_char_transmitted = bool(val);
+	m_fill_char_transmitted = val;
 
 	m_fct(val);
 }
 
-void s2350_device::set_received_data_available(int val)
+void s2350_device::set_received_data_available(bool val)
 {
 	LOGLINE("%s - val: %d\n", FUNCNAME, val);
 
-	m_received_data_available = bool(val);
+	m_received_data_available = val;
 
 	m_rda(val);
 }
 
-void s2350_device::set_receiver_overrun(int val)
+void s2350_device::set_receiver_overrun(bool val)
 {
 	LOGLINE("%s - val: %d\n", FUNCNAME, val);
 
-	m_receiver_overrun = bool(val);
+	m_receiver_overrun = val;
 
 	m_ror(val);
 }
 
-void s2350_device::set_receiver_parity_error(int val)
+void s2350_device::set_receiver_parity_error(bool val)
 {
 	LOGLINE("%s - val: %d\n", FUNCNAME, val);
 
-	m_receiver_parity_error = bool(val);
+	m_receiver_parity_error = val;
 
 	m_rpe(val);
 }
 
-void s2350_device::set_sync_character_received(int val)
+void s2350_device::set_sync_character_received(bool val)
 {
 	LOGLINE("%s - val: %d\n", FUNCNAME, val);
 
-	m_sync_character_received = bool(val);
+	m_sync_character_received = val;
 
 	m_scr(val);
 }
