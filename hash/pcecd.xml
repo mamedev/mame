@@ -63,7 +63,7 @@ license:CC0-1.0
 		<info name="release" value="19940708"/>
 		<info name="alt_title" value="サザン アイズ 3X3EYES ~三只眼燮成~"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="3 x 3 eyes - sanjiyan hensei (acd, scd)(jpn)" sha1="f31323d30474ba046ba9944c3ac3c1470bc0c126"/>
@@ -535,7 +535,7 @@ https://www.unseen64.net/2021/01/04/angelus2-holynight-pcengine-cancelled/
 		<info name="release" value="19940617"/>
 		<info name="alt_title" value="ブランディッシ"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="brandish (acd, scd)(jpn)" sha1="e0c0c55ca145c2e0f1a1efa7a4d5f2f59d34c913"/>
@@ -1413,7 +1413,7 @@ Returns to intro when pressing Run button on title (player has to hold start in 
 		<info name="release" value="19940715"/>
 		<info name="alt_title" value="栄冠は君に"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="eikan ha kimini - koukou yakyuu zenkoku taikai (acd, scd)(jpn)" sha1="4920b87a8ee81abafcdf568ffa3a6761d7c97ac8"/>
@@ -1740,7 +1740,7 @@ Uses sound LFO FM
 		<info name="release" value="19950407"/>
 		<info name="alt_title" value="フォ-メ-ションサッカ-95 デッラセリエA"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="formation soccer '95 - della serie a (acd, scd)(jpn)" sha1="e907f2f637eed0a1f0ea52371f51f9dcb6042a6f"/>
@@ -2473,7 +2473,7 @@ New game intro sports glitchy portraits
 		<info name="release" value="19941223"/>
 		<info name="alt_title" value="Jリーグ トリメンダスサッカー'94"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="j. league tremendous soccer '94 (acd, scd)(jpn)" sha1="a5ed925bc880ab8a9546973b88e8cb32bfac50de"/>
@@ -3058,7 +3058,7 @@ Hangs after first attack turn (shoot to the foe behind the tree) (fixed)
 		<info name="release" value="19951013"/>
 		<info name="alt_title" value="リンダキューブ"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="linda (acd, scd)(jpn)" sha1="dc0ae10710aa7ba4f49a3e2606d939230891a340"/>
@@ -3246,7 +3246,7 @@ Crashes on (skippable) new game intro, [SCSI] timing sensitive
 		<info name="release" value="19940812"/>
 		<info name="alt_title" value="ぽっぷるメイル"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="magical fantasy adventure - popful mail (acd, scd)(jpn)" sha1="fce1f8fc9fd82e7b918178450846e1fc7e6d432e"/>
@@ -3342,7 +3342,7 @@ Crashes on (skippable) new game intro, [SCSI] timing sensitive
 		<info name="release" value="19950811"/>
 		<info name="alt_title" value="麻雀ソード プリンセスクエスト外伝"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="mahjong sword - princess quest gaiden (acd, scd)(jpn)" sha1="6ce6561a7f6bf2c2508e1c1c442fc3810ad7db71"/>
@@ -4251,7 +4251,7 @@ Unsupported [セーブくん] joypad slot peripheral
 		<info name="release" value="19950616"/>
 		<info name="alt_title" value="プリンセスメーカー2"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="princess maker ii (acd, scd)(jpn)" sha1="6aa2c991496a68302daf297f23b96819d63ebefa"/>
@@ -4284,7 +4284,7 @@ Unsupported [セーブくん] joypad slot peripheral
 		<info name="release" value="19950811"/>
 		<info name="alt_title" value="プライベート アイドル"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="private eyedol (acd, scd)(jpn)" sha1="a80b9c9178b60efd84a9ec5de4dddc59e8f621e3"/>
@@ -5100,7 +5100,7 @@ Unsupported [セーブくん] joypad slot peripheral
 		<info name="release" value="19940916"/>
 		<info name="alt_title" value="セクシーアイドル麻雀 ファッション物語"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="sexy idol mahjong fashion monogatari (acd, scd)(jpn)" sha1="a640c7241a0c041eb25f73656545b32da310d020"/>
@@ -5539,7 +5539,7 @@ Offset [CRTC] screen
 		<info name="release" value="19941223"/>
 		<info name="alt_title" value="卒業2"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="sotsugyou ii - neo generation (acd, scd)(jpn)" sha1="df09e386502dc040c1fea86025a3f7da4f38f682"/>
@@ -5914,7 +5914,7 @@ Eventually hangs requiring a transfer ready irq [SCSI] (untested)
 		<info name="release" value="19940805"/>
 		<info name="alt_title" value="スーパーリアル麻雀PII・PIIIカスタム"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="super real mahjong p ii iii custom (acd, scd)(jpn)" sha1="3f3b4e7c5c2ae0faabf139eb95e5e6002162928b"/>
@@ -5946,7 +5946,7 @@ Eventually hangs requiring a transfer ready irq [SCSI] (untested)
 		<info name="release" value="19950303"/>
 		<info name="alt_title" value="スーパーリアル麻雀P.Vカスタム"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="super real mahjong p v custom (acd, scd)(jpn)" sha1="248e967c4069bf047b1a114a7768bb2110f430a4"/>
@@ -6087,7 +6087,7 @@ Eventually hangs requiring a transfer ready irq [SCSI] (untested)
 		<info name="release" value="19940922"/>
 		<info name="alt_title" value="誕生～デビュー～"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="tanjou debut (acd, scd)(jpn)" sha1="859060b5ada85083f5e262309f5f1b7ec7e3998c"/>
@@ -6295,7 +6295,7 @@ Eventually hangs requiring a transfer ready irq [SCSI] (untested)
 		<info name="release" value="19940304"/>
 		<info name="alt_title" value="アトラスRenaissance Voyager"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="the atlas - renaissance voyager (acd, scd)(jpn)" sha1="a3b7b45550eef37f2f85fe2d98334341ccd67840"/>
@@ -6778,7 +6778,7 @@ Cuts off [ADPCM] playback, enables half irq
 		<info name="release" value="19940708"/>
 		<info name="alt_title" value="バスティール2"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="vasteel ii (acd, scd)(jpn)" sha1="fa01d9a03416d35a313740728a797f8792ddfda1"/>
@@ -6923,7 +6923,7 @@ Hangs or resets after giving yes to "Is it OK?" prompt (fixed)
 		<info name="release" value="19950519"/>
 		<info name="alt_title" value="レッスルエンジェルス ダブルインパクト"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="wrestling angels - double impact (acd, scd)(jpn)" sha1="d79ce768849f21a9010c221d8dd7817a4a1b94f9"/>
