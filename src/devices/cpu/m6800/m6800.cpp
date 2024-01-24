@@ -67,10 +67,6 @@ TODO:
 #include "m6800.h"
 #include "6800dasm.h"
 
-#define VERBOSE 0
-
-#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
-
 
 #define pPPC    m_ppc
 #define pPC     m_pc
@@ -255,7 +251,7 @@ const uint8_t m6800_cpu_device::flags8d[256]= /* decrement */
 
 /* Note: don't use 0 cycles here for invalid opcodes so that we don't */
 /* hang in an infinite loop if we hit one */
-#define XX 5 // invalid opcode unknown cc
+#define XX 4 // invalid opcode unknown cc
 const uint8_t m6800_cpu_device::cycles_6800[256] =
 {
 		/* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
@@ -453,16 +449,14 @@ void m6800_cpu_device::WM16(uint32_t Addr, PAIR *p )
 }
 
 /* IRQ enter */
-void m6800_cpu_device::enter_interrupt(const char *message,uint16_t irq_vector)
+void m6800_cpu_device::enter_interrupt(uint16_t irq_vector)
 {
 	int cycles_to_eat = 0;
 
-	LOG((message));
-	if (m_wai_state & (M6800_WAI | M6800_SLP))
+	if (m_wai_state & M6800_WAI)
 	{
-		if (m_wai_state & M6800_WAI)
-			cycles_to_eat = 4;
-		m_wai_state &= ~(M6800_WAI | M6800_SLP);
+		cycles_to_eat = 4;
+		m_wai_state &= ~M6800_WAI;
 	}
 	else
 	{
@@ -476,8 +470,7 @@ void m6800_cpu_device::enter_interrupt(const char *message,uint16_t irq_vector)
 	SEI;
 	PCD = RM16(irq_vector);
 
-	if (cycles_to_eat > 0)
-		increment_counter(cycles_to_eat);
+	increment_counter(cycles_to_eat);
 }
 
 /* check the IRQ lines for pending interrupts */
@@ -485,30 +478,23 @@ void m6800_cpu_device::check_irq_lines()
 {
 	if (m_nmi_pending)
 	{
-		if (m_wai_state & M6800_SLP)
-			m_wai_state &= ~M6800_SLP;
-
+		m_wai_state &= ~M6800_SLP;
 		m_nmi_pending = false;
-		enter_interrupt("take NMI\n", 0xfffc);
+		enter_interrupt(0xfffc);
+	}
+	else if (m_irq_state[M6800_IRQ_LINE] != CLEAR_LINE)
+	{
+		/* standard IRQ */
+		m_wai_state &= ~M6800_SLP;
+
+		if (!(CC & 0x10))
+		{
+			standard_irq_callback(M6800_IRQ_LINE, m_pc.w.l);
+			enter_interrupt(0xfff8);
+		}
 	}
 	else
-	{
-		if (m_irq_state[M6800_IRQ_LINE] != CLEAR_LINE)
-		{
-			/* standard IRQ */
-			if (m_wai_state & M6800_SLP)
-				m_wai_state &= ~M6800_SLP;
-
-			if (!(CC & 0x10))
-			{
-				standard_irq_callback(M6800_IRQ_LINE, m_pc.w.l);
-				enter_interrupt("take IRQ1\n", 0xfff8);
-			}
-		}
-		else
-			if (!(CC & 0x10))
-				m6800_check_irq2();
-	}
+		check_irq2();
 }
 
 void m6800_cpu_device::increment_counter(int amount)
@@ -608,7 +594,6 @@ void m6800_cpu_device::execute_set_input(int irqline, int state)
 		break;
 
 	default:
-		LOG(("set_irq_line %d,%d\n", irqline, state));
 		m_irq_state[irqline] = state;
 		break;
 	}

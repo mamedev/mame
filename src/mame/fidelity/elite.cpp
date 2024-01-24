@@ -36,7 +36,7 @@ hardware overview:
 *In West Germany, some distributors released it with overclocked CPUs,
 advertised as 3.2, 3.6, or 4MHz. Unmodified EAS PCB photos show only a 3MHz XTAL.
 Though model EWC(improved Budapest) had a 3.57MHz XTAL and EAS-C(Glasgow) had
-a 4MHz XTAL.
+a 4MHz XTAL. Model E4.0 is also assumed to be 4MHz.
 
 A condensator/battery keeps RAM contents alive for a while when powered off.
 

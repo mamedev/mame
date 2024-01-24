@@ -15983,6 +15983,9 @@ arbv2                           //
 @source:chess/cking_master.cpp
 ckmaster                        //
 
+@source:chess/cking_triomphe.cpp
+triomphe
+
 @source:chess/compuchess.cpp
 ccmk1                           // Chess Champion MK I
 cmpchess
@@ -18826,6 +18829,7 @@ zackman                         // Bandai
 
 @source:handheld/hh_ht11xx.cpp
 brke23p2
+ga888
 
 @source:handheld/hh_melps4.cpp
 cfrogger                        // Coleco
@@ -36776,8 +36780,7 @@ trailer                         //
 ufo_x                           //
 
 @source:pinball/recel.cpp
-recel13                         //
-recel14                         //
+recel                           //
 r_alaska                        //
 r_blackm4                       //
 r_blackmag                      //
@@ -36791,7 +36794,6 @@ r_mrevil                        //
 r_pokrplus                      //
 r_quijote                       //
 r_screech                       //
-r_screech4                      //
 r_swash                         //
 r_torneo                        //
 
@@ -39292,6 +39294,7 @@ ninjaslt                        // 2000.11 Ninja Assault (World, NJA2 Ver.A)
 ninjaslta                       // 2000.11 Ninja Assault (Asia, NJA4 Ver.A)
 ninjasltj                       // 2000.11 Ninja Assault (Japan, NJA1 Ver.A)
 ninjasltu                       // 2000.11 Ninja Assault (US, NJA3 Ver.A)
+ntvmys                          // 2000.08 Nittere Shiki! Mirai Yosou Studio / NTV Future Forecast Studio (Japan)
 oinori                          // 2003.08 Oinori-daimyoujin Matsuri
 otrigger                        // 1999.11 OutTrigger
 pjustic                         // 2000.12 Moero! Justice Gakuen / Project Justice
@@ -39457,6 +39460,9 @@ tvochken                        //
 
 @source:sega/sega_sawatte.cpp
 sawatte                         //
+
+@source:sega/segaai.cpp
+segaai                          // (c) 1986 Sega
 
 @source:sega/segaatom.cpp
 spongbob                        // (c) 200? Sega

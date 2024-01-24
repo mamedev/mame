@@ -13,7 +13,7 @@ the chesscomputer before exiting MAME. Unlike Leonardo/Galileo, it looks like
 it will always do a cold boot if you reset without having pressed STOP.
 
 Hardware notes:
-- 6301Y0(mode 1) or HD6303YP MCU @ 10MHz
+- HD6301Y0P (mode 1) or HD6303YP MCU @ 10MHz
 - 8KB RAM, 32KB ROM
 - "HELIOS" I/O (NEC gate array)
 - Epson SED1502F, LCD screen

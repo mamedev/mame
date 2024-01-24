@@ -222,7 +222,10 @@ OP_HANDLER( slp )
 {
 	/* wait for next IRQ (same as waiting of wai) */
 	m_wai_state |= M6800_SLP;
-	eat_cycles();
+
+	check_irq_lines();
+	if (m_wai_state & M6800_SLP)
+		eat_cycles();
 }
 
 /* $1b ABA inherent ***** */
@@ -428,6 +431,7 @@ OP_HANDLER( rti )
 	PULLBYTE(A);
 	PULLWORD(pX);
 	PULLWORD(pPC);
+
 	check_irq_lines();
 }
 
@@ -455,13 +459,16 @@ OP_HANDLER( wai )
 	 * hardware stack, then waits for an interrupt.
 	 */
 	m_wai_state |= M6800_WAI;
+
 	PUSHWORD(pPC);
 	PUSHWORD(pX);
 	PUSHBYTE(A);
 	PUSHBYTE(B);
 	PUSHBYTE(CC);
+
 	check_irq_lines();
-	if (m_wai_state & M6800_WAI) eat_cycles();
+	if (m_wai_state & M6800_WAI)
+		eat_cycles();
 }
 
 /* $3f SWI absolute indirect ----- */
@@ -472,6 +479,7 @@ OP_HANDLER( swi )
 	PUSHBYTE(A);
 	PUSHBYTE(B);
 	PUSHBYTE(CC);
+
 	SEI;
 	PCD = RM16(0xfffa);
 }
