@@ -3206,6 +3206,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/s2350.h,MACHINES["S2350"] = true
+---------------------------------------------------
+
+if (MACHINES["S2350"]~=null) then
+       files {
+               MAME_DIR .. "src/devices/machine/s2350.cpp",
+               MAME_DIR .. "src/devices/machine/s2350.h",
+       }
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/s2636.h,MACHINES["S2636"] = true
 ---------------------------------------------------
 
