@@ -4753,6 +4753,30 @@ ROM_START( euroch92 )
 	/* no Delta-T samples */
 ROM_END
 
+ROM_START( euroch92j )
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 512k for 68000 code
+	ROM_LOAD16_BYTE( "ec92_25.rom", 0x00000, 0x20000, CRC(98482202) SHA1(4fc03fb2a2c21f302d95047535f66d26421dcda2) )
+	ROM_LOAD16_BYTE( "ec92_23.rom", 0x00001, 0x20000, CRC(ae5e75e9) SHA1(82d935684182bfb42367232a3b71d4664b170ffe) )
+	ROM_LOAD16_BYTE( "ec92_26.rom", 0x40000, 0x20000, CRC(b986ccb2) SHA1(862a5da1bd4e8743d55f2e5bab2ade6c3dec682c) )
+	ROM_LOAD16_BYTE( "c80-28.ic6",  0x40001, 0x20000, CRC(5d13f580) SHA1(402aad6ece4d735b0770bf64b80a08313abc3ac4) )
+
+	ROM_REGION( 0x100000, "tc0480scp", 0 )   // SCR
+	ROM_LOAD32_WORD( "ec92_21.rom", 0x00000, 0x80000, CRC(5759ed37) SHA1(2a661ea40735afbda3d0141ce3f706c64281097b) )
+	ROM_LOAD32_WORD( "ec92_22.rom", 0x00002, 0x80000, CRC(d9a0d38e) SHA1(192f0303f4f64df46dc20701ed4362a4e14e40e7) )
+
+	ROM_REGION( 0x200000, "sprites", 0 )   // OBJ
+	ROM_LOAD( "ec92_19.rom", 0x000000, 0x100000, CRC(219141a5) SHA1(b549e91049dcb796d4104b4426674dd87589efde) )
+	ROM_LOAD( "c80-02.10",   0x100000, 0x100000, CRC(060a8b61) SHA1(b1888d8bce4c4624dc5bb64168c604ec64537c0e) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    // 64k for Z80 code
+	ROM_LOAD( "ec92_27.rom", 0x00000, 0x10000, CRC(2db48e65) SHA1(43a47ebc91c043a996e966cf808d71256e158494) )
+
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  // YM2610 samples
+	ROM_LOAD( "c80-03.57", 0x000000, 0x100000, CRC(609938d5) SHA1(54c7a7265dee5cb031fd402f4c74858d73bec652) )
+
+	// no Delta-T samples
+ROM_END
+
 ROM_START( footchmpbl )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
 	ROM_LOAD16_BYTE( "cpu7.rom10", 0x00000, 0x40000, CRC(b2297030) SHA1(1ae3c9395a108c9f4b65173365a7b8934af4230c) )
@@ -5561,6 +5585,7 @@ GAME( 1990, hthero,     footchmp, hthero,    hthero,     taitof2_state, empty_in
 GAME( 1992, footchmpbl, footchmp, footchmpbl,footchmpbl, taitof2_state, empty_init,    ROT0,   "bootleg",                   "Football Champ / Euro Football Champ (World) (bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // very different hw register etc.
 
 GAME( 1992, euroch92,   0,        footchmp,  footchmp,   taitof2_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Euro Champ '92 (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, euroch92j,  euroch92, footchmp,  footchmp,   taitof2_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Euro Champ '92 (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1990, koshien,    0,        koshien,   koshien,    taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "Ah Eikou no Koshien (Japan)", MACHINE_SUPPORTS_SAVE )
 
