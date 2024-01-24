@@ -16444,6 +16444,17 @@ https://segaretro.org/Feng_Shen_Ying_Jie_Chuan
 		</part>
 	</software>
 
+	<software name="feriasp" cloneof="ferias">
+		<description>Férias Frustradas do Pica-Pau (Brazil, pirate)</description>
+		<year>1995</year>
+		<publisher>Tec Toy</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="ferias frustradas do pica-pau (pirate).bin" size="1048576" crc="7b2e416d" sha1="ec546d1c00c88554b5e9135f097cb1c388cfd68f"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ferrarip" cloneof="ferrari">
 		<description>Ferrari Grand Prix Challenge (prototype)</description>
 		<year>1992</year>
