@@ -161,7 +161,7 @@ void ymtx81z_state::tx81z(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	ym2414_device &ymsnd(YM2414(config, "ymsnd", 7.15909_MHz_XTAL / 2));
-	ymsnd.irq_handler().set_inputline(m_maincpu, HD6301_IRQ_LINE);
+	ymsnd.irq_handler().set_inputline(m_maincpu, HD6301_IRQ1_LINE);
 	ymsnd.add_route(0, "lspeaker", 0.60);
 	ymsnd.add_route(1, "rspeaker", 0.60);
 }

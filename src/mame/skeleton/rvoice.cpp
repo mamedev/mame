@@ -106,7 +106,7 @@ void rvoice_state::rvoicepc(machine_config &config)
 
 	mos6551_device &acia(MOS6551(config, "acia65c51", 0));
 	acia.set_xtal(1.8432_MHz_XTAL);
-	acia.irq_handler().set_inputline(m_maincpu, HD6301_IRQ_LINE);
+	acia.irq_handler().set_inputline(m_maincpu, HD6301_IRQ1_LINE);
 	acia.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	acia.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 

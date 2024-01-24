@@ -186,7 +186,7 @@ u8 ctvboy_state::mc6847_vram_r(offs_t offset)
 void ctvboy_state::vblank_irq(int state)
 {
 	if (!state)
-		m_maincpu->pulse_input_line(M6801_IRQ_LINE, attotime::from_usec(15));
+		m_maincpu->pulse_input_line(M6801_IRQ1_LINE, attotime::from_usec(15));
 }
 
 

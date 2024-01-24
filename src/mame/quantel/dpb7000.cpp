@@ -3801,7 +3801,7 @@ void dpb7000_state::dpb7000(machine_config &config)
 	m_tds_cpu->in_p4_cb().set(FUNC(dpb7000_state::tds_p4_r));
 
 	SCN2681(config, m_tds_duart, 3.6864_MHz_XTAL);
-	m_tds_duart->irq_cb().set_inputline(m_tds_cpu, M6803_IRQ_LINE);
+	m_tds_duart->irq_cb().set_inputline(m_tds_cpu, M6803_IRQ1_LINE);
 	m_tds_duart->a_tx_cb().set(m_acia[1], FUNC(acia6850_device::write_rxd));
 	m_tds_duart->b_tx_cb().set(FUNC(dpb7000_state::duart_b_w));
 

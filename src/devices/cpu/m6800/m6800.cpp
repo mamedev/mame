@@ -67,6 +67,13 @@ TODO:
 #include "m6800.h"
 #include "6800dasm.h"
 
+#define LOG_IRQ (1U << 1)
+
+//#define VERBOSE (LOG_IRQ)
+#include "logmacro.h"
+
+#define LOGIRQ(...) LOGMASKED(LOG_IRQ, __VA_ARGS__)
+
 
 #define pPPC    m_ppc
 #define pPC     m_pc
@@ -121,17 +128,6 @@ TODO:
 #define PUSHWORD(w) WM(SD,w.b.l); --S; WM(SD,w.b.h); --S
 #define PULLBYTE(b) S++; b = RM(SD)
 #define PULLWORD(w) S++; w.d = RM(SD)<<8; S++; w.d |= RM(SD)
-
-/* operate one instruction for */
-#define ONE_MORE_INSN() {       \
-	uint8_t ireg;                           \
-	pPPC = pPC;                             \
-	debugger_instruction_hook(PCD);         \
-	ireg=M_RDOP(PCD);                       \
-	PC++;                                   \
-	(this->*m_insn[ireg])();                \
-	increment_counter(m_cycles[ireg]);      \
-}
 
 /* CC masks                       HI NZVC
                                 7654 3210   */
@@ -449,9 +445,11 @@ void m6800_cpu_device::WM16(uint32_t Addr, PAIR *p )
 }
 
 /* IRQ enter */
-void m6800_cpu_device::enter_interrupt(uint16_t irq_vector)
+void m6800_cpu_device::enter_interrupt(const char *message, uint16_t irq_vector)
 {
 	int cycles_to_eat = 0;
+
+	LOGIRQ("Take %s interrupt\n", message);
 
 	if (m_wai_state & M6800_WAI)
 	{
@@ -480,9 +478,9 @@ void m6800_cpu_device::check_irq_lines()
 	{
 		m_wai_state &= ~M6800_SLP;
 		m_nmi_pending = false;
-		enter_interrupt(0xfffc);
+		enter_interrupt("NMI", 0xfffc);
 	}
-	else if (m_irq_state[M6800_IRQ_LINE] != CLEAR_LINE)
+	else if (check_irq1_enabled())
 	{
 		/* standard IRQ */
 		m_wai_state &= ~M6800_SLP;
@@ -490,11 +488,16 @@ void m6800_cpu_device::check_irq_lines()
 		if (!(CC & 0x10))
 		{
 			standard_irq_callback(M6800_IRQ_LINE, m_pc.w.l);
-			enter_interrupt(0xfff8);
+			enter_interrupt("IRQ1", 0xfff8);
 		}
 	}
 	else
 		check_irq2();
+}
+
+bool m6800_cpu_device::check_irq1_enabled()
+{
+	return m_irq_state[M6800_IRQ_LINE] != CLEAR_LINE;
 }
 
 void m6800_cpu_device::increment_counter(int amount)
@@ -579,7 +582,6 @@ void m6800_cpu_device::device_reset()
 	m_wai_state = 0;
 	m_nmi_state = 0;
 	m_nmi_pending = 0;
-	m_irq_state[M6800_IRQ_LINE] = 0;
 }
 
 
@@ -599,9 +601,7 @@ void m6800_cpu_device::execute_set_input(int irqline, int state)
 	}
 }
 
-/****************************************************************************
- * Execute cycles CPU cycles. Return number of cycles really executed
- ****************************************************************************/
+
 void m6800_cpu_device::execute_run()
 {
 	check_irq_lines();
@@ -616,14 +616,19 @@ void m6800_cpu_device::execute_run()
 		}
 		else
 		{
-			pPPC = pPC;
-			debugger_instruction_hook(PCD);
-			uint8_t ireg=M_RDOP(PCD);
-			PC++;
-			(this->*m_insn[ireg])();
-			increment_counter(m_cycles[ireg]);
+			execute_one();
 		}
 	} while (m_icount > 0);
+}
+
+void m6800_cpu_device::execute_one()
+{
+	pPPC = pPC;
+	debugger_instruction_hook(PCD);
+	uint8_t ireg = M_RDOP(PCD);
+	PC++;
+	(this->*m_insn[ireg])();
+	increment_counter(m_cycles[ireg]);
 }
 
 std::unique_ptr<util::disasm_interface> m6800_cpu_device::create_disassembler()

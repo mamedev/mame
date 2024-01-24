@@ -93,7 +93,7 @@ void y301xl_state::machine_start()
 
 void y301xl_state::machine_reset()
 {
-	m_maincpu->set_input_line(HD6301_IRQ_LINE, CLEAR_LINE);
+	m_maincpu->set_input_line(HD6301_IRQ1_LINE, CLEAR_LINE);
 	m_maincpu->set_input_line(M6801_STBY_LINE, CLEAR_LINE);
 }
 
@@ -107,7 +107,7 @@ INPUT_CHANGED_MEMBER(y301xl_state::power_off)
 	if (newval && !m_maincpu->standby())
 	{
 		// IRQ1 when power switch is set to SAVE, followed by STBY after a short delay
-		m_maincpu->set_input_line(HD6301_IRQ_LINE, ASSERT_LINE);
+		m_maincpu->set_input_line(HD6301_IRQ1_LINE, ASSERT_LINE);
 		m_standbytimer->adjust(attotime::from_msec(50));
 	}
 }
