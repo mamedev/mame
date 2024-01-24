@@ -248,7 +248,8 @@ u8 s2350_device::status_word_r()
 	status |= m_fill_char_transmitted   ? 0x40 : 0x00;
 	status |= m_transmit_buffer_empty   ? 0x80 : 0x00;
 
-	if (!machine().side_effects_disabled()) {
+	if (!machine().side_effects_disabled())
+	{
 		set_fill_char_transmitted(false);
 		set_receiver_overrun(false);
 		set_receiver_parity_error(false);
