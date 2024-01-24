@@ -1413,7 +1413,7 @@ Returns to intro when pressing Run button on title (player has to hold start in 
 		<info name="release" value="19940715"/>
 		<info name="alt_title" value="栄冠は君に"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
-		<sharedfeat name="requirement" value="pce:acardpro"/>
+		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="eikan ha kimini - koukou yakyuu zenkoku taikai (acd, scd)(jpn)" sha1="4920b87a8ee81abafcdf568ffa3a6761d7c97ac8"/>
