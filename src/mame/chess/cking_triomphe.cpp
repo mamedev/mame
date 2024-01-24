@@ -11,7 +11,10 @@ TRAP interrupt for the beeper routine. Very strange.
 Hardware notes:
 - PCB label: TRIUMPHE CHESS KING
 - Hitachi HD6301V1P, 4MHz XTAL
-- 8*8 chessboard buttons, 32 LEDs (not counting power-on LED, piezo
+- 8*8 chessboard buttons, 32 LEDs, piezo
+
+It's in the same housing as Chess King Master, they repurposed the green LED
+for a power-on LED.
 
 *******************************************************************************/
 
@@ -182,5 +185,5 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1985, triomphe, 0,        0,      triomphe, triomphe, triomphe_state, empty_init, "Chess King / Intelligent Software", "Triomphe", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1985, triomphe, 0,      0,      triomphe, triomphe, triomphe_state, empty_init, "Chess King / Intelligent Software", "Triomphe", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
