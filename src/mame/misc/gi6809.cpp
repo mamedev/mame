@@ -657,8 +657,8 @@ void gi6809_state::glck6809(machine_config &config)
 	PIA6821(config, m_pia[0], 0);  // controlled by slave
 	m_pia[0]->readpa_handler().set_ioport("PIA0_A");
 	m_pia[0]->writepb_handler().set(FUNC(gi6809_state::lamps5_w));
-	m_pia[0]->ca2_handler().set([](bool state) {});
-	m_pia[0]->cb2_handler().set([](bool state) {});
+	m_pia[0]->ca2_handler().set_nop();
+	m_pia[0]->cb2_handler().set_nop();
 
 	PIA6821(config, m_pia[1], 0);  // controlled by master
 	m_pia[1]->writepa_handler().set(FUNC(gi6809_state::snd_mux_w));
@@ -666,8 +666,8 @@ void gi6809_state::glck6809(machine_config &config)
 	m_pia[1]->writepb_handler().set(FUNC(gi6809_state::lamps3_w));
 	m_pia[1]->readcb1_handler().set(m_crtc, FUNC(mc6845_device::vsync_r));
 	m_pia[1]->irqb_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
-	m_pia[1]->ca2_handler().set([](bool state) {});
-	m_pia[1]->cb2_handler().set([](bool state) {});
+	m_pia[1]->ca2_handler().set_nop();
+	m_pia[1]->cb2_handler().set_nop();
 }
 
 
@@ -692,7 +692,7 @@ void gi6809_state::castawayt(machine_config &config)
 	m_pia[0]->readpa_handler().set_ioport("PIA0_A");
 	m_pia[0]->writepb_handler().set(FUNC(gi6809_state::lamps8_w));
 	m_pia[0]->readca1_handler().set(m_crtc, FUNC(mc6845_device::vsync_r));
-	m_pia[0]->ca2_handler().set([](bool state) {});
+	m_pia[0]->ca2_handler().set_nop();
 
 	PIA6821(config, m_pia[1], 0);  // DDRA:FF (All Out) - DDRB:EO (OOOI-IIII)
 	m_pia[1]->writepa_handler().set(FUNC(gi6809_state::snd_mux_w));
@@ -703,7 +703,7 @@ void gi6809_state::castawayt(machine_config &config)
 	//m_pia[1]->readca2_handler() coin in lower opto to be implemented
 
 	m_pia[1]->readcb1_handler().set(m_crtc, FUNC(mc6845_device::vsync_r));
-	m_pia[1]->cb2_handler().set([](bool state) {});
+	m_pia[1]->cb2_handler().set_nop();
 	m_pia[1]->irqa_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
 	m_pia[1]->irqb_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 }
@@ -731,8 +731,8 @@ void gi6809_state::jesterch(machine_config &config)
 	m_pia[0]->readpa_handler().set_ioport("PIA0_A");
 	m_pia[0]->writepb_handler().set(FUNC(gi6809_state::lamps5_w));
 	m_pia[0]->irqa_handler().set_inputline(m_slavecpu, M6809_IRQ_LINE);
-	m_pia[0]->ca2_handler().set([](bool state) {});
-	m_pia[0]->cb2_handler().set([](bool state) {});
+	m_pia[0]->ca2_handler().set_nop();
+	m_pia[0]->cb2_handler().set_nop();
 
 	PIA6821(config, m_pia[1], 0);  // DDRA:FF (All Out) - DDRB:EO (OOOI-IIII)
 	m_pia[1]->writepa_handler().set(FUNC(gi6809_state::snd_mux_w));
@@ -742,8 +742,8 @@ void gi6809_state::jesterch(machine_config &config)
 	//m_pia[1]->readca1_handler() coin in upper opto to be implemented
 	//m_pia[1]->readca2_handler() coin in lower opto to be implemented	
 	
-	m_pia[1]->ca2_handler().set([](bool state) {});
-	m_pia[1]->cb2_handler().set([](bool state) {});
+	m_pia[1]->ca2_handler().set_nop();
+	m_pia[1]->cb2_handler().set_nop();
 	m_pia[1]->irqb_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 	m_pia[1]->irqa_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
 }
